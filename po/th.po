@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2010-02-01 16:28+0000\n"
-"PO-Revision-Date: 2010-02-07 20:34+0700\n"
+"POT-Creation-Date: 2010-02-22 15:40+0000\n"
+"PO-Revision-Date: 2010-03-22 16:27+0700\n"
 "Last-Translator: Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
 "Language-Team: Thai <thai-l10n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -59,13 +59,13 @@ msgstr "ไม่สามารถหาจุดเมานท์ที่บ
 msgid "Invalid filename %s"
 msgstr "ชื่อแฟ้ม %s ใช้ไม่ได้"
 
-#: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1188
-#: ../client/gdaemonvfs.c:1323 ../client/gdaemonvfs.c:1376
+#: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1200
+#: ../client/gdaemonvfs.c:1335 ../client/gdaemonvfs.c:1388
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "เกิดข้อผิดพลาดขณะกำหนดค่าข้อมูลกำกับแฟ้ม: %s"
 
-#: ../client/gdaemonfile.c:2233 ../client/gdaemonvfs.c:1377
+#: ../client/gdaemonfile.c:2233 ../client/gdaemonvfs.c:1389
 msgid "values must be string or list of strings"
 msgstr "ค่าที่กำหนดต้องเป็นข้อความหรือรายการของข้อความ"
 
@@ -126,7 +126,7 @@ msgstr "ไม่รองรับการเลื่อนตำแหน่
 msgid "Error while getting mount info: %s"
 msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลการเมานท์: %s"
 
-#: ../client/gdaemonvfs.c:1189
+#: ../client/gdaemonvfs.c:1201
 msgid "Can't contact session bus"
 msgstr "ไม่สามารถติดต่อกับบัสของวาระ"
 
@@ -225,7 +225,8 @@ msgstr "เกิดข้อผิดพลาดขณะเชื่อมต
 msgid "%s Filesystem Service"
 msgstr "บริการระบบแฟ้ม %s"
 
-#: ../daemon/daemon-main.c:110
+#: ../daemon/daemon-main.c:110 ../programs/gvfs-copy.c:90
+#: ../programs/gvfs-move.c:78
 #, c-format
 msgid "Error: %s"
 msgstr "ผิดพลาด: %s"
@@ -258,7 +259,7 @@ msgstr "เกิดข้อผิดพลาดขณะตั้งต้น
 msgid "Unmount Anyway"
 msgstr "เลิกเมานท์ต่อไป"
 
-#: ../daemon/gvfsbackend.c:934 ../monitor/gdu/ggdudrive.c:1021
+#: ../daemon/gvfsbackend.c:934 ../monitor/gdu/ggdudrive.c:1022
 #: ../monitor/gdu/ggdumount.c:922
 msgid "Cancel"
 msgstr "ยกเลิก"
@@ -361,8 +362,8 @@ msgstr "ยังไม่รองรับการสำรองแฟ้ม
 msgid "Invalid seek type"
 msgstr "ชนิดการเลื่อนตำแหน่งไม่ถูกต้อง"
 
-#: ../daemon/gvfsbackendafc.c:1175 ../daemon/gvfsbackendsftp.c:1786
-#: ../daemon/gvfsbackendsftp.c:4591 ../daemon/gvfsbackendsmb.c:1702
+#: ../daemon/gvfsbackendafc.c:1175 ../daemon/gvfsbackendsftp.c:1820
+#: ../daemon/gvfsbackendsftp.c:4625 ../daemon/gvfsbackendsmb.c:1702
 #: ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
 msgstr "ไม่รองรับปฏิบัติการนี้"
@@ -370,14 +371,14 @@ msgstr "ไม่รองรับปฏิบัติการนี้"
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:318 ../daemon/gvfsbackendsftp.c:2223
-#: ../daemon/gvfsftpdircache.c:419
+#: ../daemon/gvfsbackendarchive.c:318 ../daemon/gvfsbackendsftp.c:2257
+#: ../daemon/gvfsftpdircache.c:428
 #, c-format
 msgid "/ on %s"
 msgstr "/ ที่ %s"
 
 #: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:564
-#: ../daemon/gvfsbackendsftp.c:1714
+#: ../daemon/gvfsbackendsftp.c:1733
 msgid "No hostname specified"
 msgstr "ไม่ได้ระบุชื่อโฮสต์"
 
@@ -393,7 +394,7 @@ msgid "File doesn't exist"
 msgstr "ไม่มีแฟ้มอยู่"
 
 #: ../daemon/gvfsbackendarchive.c:625 ../daemon/gvfsbackendcomputer.c:645
-#: ../daemon/gvfsbackendgphoto2.c:1877 ../daemon/gvfsbackendobexftp.c:1071
+#: ../daemon/gvfsbackendgphoto2.c:1886 ../daemon/gvfsbackendobexftp.c:1071
 #: ../daemon/gvfsbackendsmb.c:702 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "ไม่สามารถเปิดไดเรกทอรี"
@@ -401,7 +402,7 @@ msgstr "ไม่สามารถเปิดไดเรกทอรี"
 #: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
 #: ../daemon/gvfsbackendftp.c:258 ../daemon/gvfsbackendnetwork.c:693
-#: ../daemon/gvfsbackendsftp.c:3837 ../daemon/gvfsftpdircache.c:154
+#: ../daemon/gvfsbackendsftp.c:3871 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
 msgstr "แฟ้มดังกล่าวไม่ใช่ไดเรกทอรี"
 
@@ -419,16 +420,16 @@ msgstr "ไม่สามารถสร้างไดเรกทอรีช
 #: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
 #: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
 #: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:690
-#: ../daemon/gvfsbackendgphoto2.c:1205 ../daemon/gvfsbackendgphoto2.c:2198
-#: ../daemon/gvfsbackendgphoto2.c:2917 ../daemon/gvfsbackendsftp.c:1790
-#: ../daemon/gvfsbackendsftp.c:2903 ../daemon/gvfsbackendsftp.c:2916
-#: ../daemon/gvfsbackendsftp.c:2936 ../daemon/gvfsbackendtrash.c:216
+#: ../daemon/gvfsbackendgphoto2.c:1207 ../daemon/gvfsbackendgphoto2.c:2207
+#: ../daemon/gvfsbackendgphoto2.c:2926 ../daemon/gvfsbackendsftp.c:1824
+#: ../daemon/gvfsbackendsftp.c:2937 ../daemon/gvfsbackendsftp.c:2950
+#: ../daemon/gvfsbackendsftp.c:2970 ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
 msgstr "ไม่มีแฟ้มหรือไดเรกทอรีดังกล่าว"
 
 #: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2223
-#: ../daemon/gvfsbackendsftp.c:1782
+#: ../daemon/gvfsbackendsftp.c:1816
 msgid "Directory not empty"
 msgstr "ไดเรกทอรีไม่ว่าง"
 
@@ -445,7 +446,7 @@ msgstr "แบ็กเอนด์เขียนซีดี/ดีวีด�
 #: ../daemon/gvfsbackendburn.c:753 ../daemon/gvfsbackendburn.c:789
 #: ../daemon/gvfsbackendburn.c:924 ../daemon/gvfsbackendburn.c:986
 #: ../daemon/gvfsbackendburn.c:990 ../daemon/gvfsbackendburn.c:1000
-#: ../daemon/gvfsbackendgphoto2.c:2991
+#: ../daemon/gvfsbackendgphoto2.c:3000
 msgid "File exists"
 msgstr "แฟ้มมีอยู่แล้ว"
 
@@ -483,8 +484,8 @@ msgid "Can't copy directory over directory"
 msgstr "ไม่สามารถคัดลอกไดเรกทอรีทับไดเรกทอรี"
 
 #: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1787
-#: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1784
-#: ../daemon/gvfsbackendsftp.c:4399
+#: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1818
+#: ../daemon/gvfsbackendsftp.c:4433
 msgid "Target file exists"
 msgstr "มีแฟ้มปลายทางอยู่แล้ว"
 
@@ -494,24 +495,24 @@ msgid "Can't recursively copy directory"
 msgstr "ไม่สามารถคัดลอกไดเรกทอรีทั้งยวง"
 
 #: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
-#: ../daemon/gvfsbackendgphoto2.c:2571 ../daemon/gvfsbackendgphoto2.c:2780
-#: ../daemon/gvfsbackendgphoto2.c:2877 ../daemon/gvfsbackendgphoto2.c:2970
+#: ../daemon/gvfsbackendgphoto2.c:2580 ../daemon/gvfsbackendgphoto2.c:2789
+#: ../daemon/gvfsbackendgphoto2.c:2886 ../daemon/gvfsbackendgphoto2.c:2979
 msgid "Not supported"
 msgstr "ไม่รองรับ"
 
-#: ../daemon/gvfsbackendcdda.c:332 ../daemon/gvfsbackendgphoto2.c:1508
+#: ../daemon/gvfsbackendcdda.c:332 ../daemon/gvfsbackendgphoto2.c:1510
 msgid "Cannot create gudev client"
 msgstr "ไม่สามารถสร้างบริบทสำหรับ gudev"
 
-#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1526
+#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1528
 msgid "Cannot connect to the system bus"
 msgstr "ไม่สามารถเชื่อมต่อไปยังบัสระบบ"
 
-#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1538
+#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1540
 msgid "Cannot create libhal context"
 msgstr "ไม่สามารถสร้างบริบทสำหรับ libhal"
 
-#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1551
+#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1553
 msgid "Cannot initialize libhal"
 msgstr "ไม่สามารถตั้งต้น libhal"
 
@@ -564,7 +565,7 @@ msgstr "เกิดข้อผิดพลาดจาก 'paranoia' ที่
 msgid "Error seeking in stream on drive %s"
 msgstr "เกิดข้อผิดพลาดขณะเลื่อนตำแหน่งในสตรีมที่ไดรว์ %s"
 
-#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1885
+#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1894
 #, c-format
 msgid "No such file"
 msgstr "ไม่มีแฟ้มดังกล่าว"
@@ -590,7 +591,7 @@ msgstr "ระบบแฟ้ม"
 msgid "Can't open mountable file"
 msgstr "ไม่สามารถเปิดแฟ้มสำหรับเมานท์"
 
-#: ../daemon/gvfsbackendcomputer.c:840 ../daemon/gvfsbackendsftp.c:1146
+#: ../daemon/gvfsbackendcomputer.c:840 ../daemon/gvfsbackendsftp.c:1151
 #, c-format
 msgid "Internal error: %s"
 msgstr "เกิดข้อผิดพลาดภายใน: %s"
@@ -680,12 +681,12 @@ msgstr "ไม่สามารถสร้างคำร้องขอ"
 #: ../daemon/gvfsbackenddav.c:1930 ../daemon/gvfsbackenddav.c:2183
 #: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:649
 #: ../daemon/gvfsbackendftp.c:830 ../daemon/gvfsbackendftp.c:1180
-#: ../daemon/gvfsbackendftp.c:1358 ../daemon/gvfsbackendsftp.c:4243
+#: ../daemon/gvfsbackendftp.c:1358 ../daemon/gvfsbackendsftp.c:4277
 #: ../daemon/gvfsbackendsmb.c:2038
 msgid "Target file already exists"
 msgstr "มีแฟ้มปลายทางอยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsbackenddav.c:2003 ../daemon/gvfsbackendsftp.c:3377
+#: ../daemon/gvfsbackenddav.c:2003 ../daemon/gvfsbackendsftp.c:3411
 #: ../daemon/gvfsbackendsmb.c:1132
 msgid "The file was externally modified"
 msgstr "แฟ้มถูกเปลี่ยนแปลงจากโปรแกรมภายนอก"
@@ -726,7 +727,7 @@ msgstr "กรุณาป้อนรหัสผ่านสำหรับ ft
 msgid "Enter password for ftp on %s"
 msgstr "กรุณาป้อนรหัสผ่านสำหรับ ftp ที่ %s"
 
-#: ../daemon/gvfsbackendftp.c:417 ../daemon/gvfsbackendsftp.c:969
+#: ../daemon/gvfsbackendftp.c:417 ../daemon/gvfsbackendsftp.c:974
 #: ../daemon/gvfsbackendsmb.c:606 ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
 msgstr "กล่องโต้ตอบรหัสผ่านถูกยกเลิก"
@@ -746,46 +747,46 @@ msgstr "ftp ในนาม %s ที่ %s"
 msgid "Insufficient permissions"
 msgstr "ได้รับอนุญาตสิทธิ์ไม่เพียงพอ"
 
-#: ../daemon/gvfsbackendftp.c:670 ../daemon/gvfsbackendsftp.c:2287
-#: ../daemon/gvfsbackendsftp.c:3023 ../daemon/gvfsbackendsftp.c:3364
-#: ../daemon/gvfsbackendsftp.c:4234
+#: ../daemon/gvfsbackendftp.c:670 ../daemon/gvfsbackendsftp.c:2321
+#: ../daemon/gvfsbackendsftp.c:3057 ../daemon/gvfsbackendsftp.c:3398
+#: ../daemon/gvfsbackendsftp.c:4268
 msgid "File is directory"
 msgstr "แฟ้มเป็นไดเรกทอรี"
 
 #: ../daemon/gvfsbackendftp.c:878 ../daemon/gvfsbackendftp.c:1143
-#: ../daemon/gvfsbackendsftp.c:3230
+#: ../daemon/gvfsbackendsftp.c:3264
 msgid "backups not supported yet"
 msgstr "ยังไม่รองรับการสำรองแฟ้ม"
 
-#: ../daemon/gvfsbackendgphoto2.c:504
+#: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "%s: %d: มีแฟ้มหรือไดเรกทอรีอยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsbackendgphoto2.c:511
+#: ../daemon/gvfsbackendgphoto2.c:513
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "%s: %d: ไม่มีแฟ้มหรือไดเรกทอรีดังกล่าว"
 
-#: ../daemon/gvfsbackendgphoto2.c:517
+#: ../daemon/gvfsbackendgphoto2.c:519
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: ชื่อแฟ้มใช้ไม่ได้"
 
-#: ../daemon/gvfsbackendgphoto2.c:523
+#: ../daemon/gvfsbackendgphoto2.c:525
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "%s: %d: ไม่รองรับ"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:718 ../daemon/gvfsbackendgphoto2.c:724
+#: ../daemon/gvfsbackendgphoto2.c:720 ../daemon/gvfsbackendgphoto2.c:726
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "กล้องดิจิทัล (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:947 ../monitor/gphoto2/ggphoto2volume.c:197
+#: ../daemon/gvfsbackendgphoto2.c:949 ../monitor/gphoto2/ggphoto2volume.c:197
 #: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
 msgid "%s Camera"
@@ -793,169 +794,169 @@ msgstr "กล้อง %s"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:950 ../monitor/gphoto2/ggphoto2volume.c:192
+#: ../daemon/gvfsbackendgphoto2.c:952 ../monitor/gphoto2/ggphoto2volume.c:192
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "เครื่องเล่นเพลง %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:959 ../monitor/gphoto2/ggphoto2volume.c:203
+#: ../daemon/gvfsbackendgphoto2.c:961 ../monitor/gphoto2/ggphoto2volume.c:203
 #: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "กล้อง"
 
-#: ../daemon/gvfsbackendgphoto2.c:961 ../monitor/gphoto2/ggphoto2volume.c:306
+#: ../daemon/gvfsbackendgphoto2.c:963 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "เครื่องเล่นเพลง"
 
-#: ../daemon/gvfsbackendgphoto2.c:1567
+#: ../daemon/gvfsbackendgphoto2.c:1569
 msgid "No device specified"
 msgstr "ไม่ได้ระบุอุปกรณ์"
 
-#: ../daemon/gvfsbackendgphoto2.c:1588
+#: ../daemon/gvfsbackendgphoto2.c:1590
 msgid "Cannot create gphoto2 context"
 msgstr "ไม่สามารถสร้างบริบทสำหรับ gphoto2"
 
-#: ../daemon/gvfsbackendgphoto2.c:1598
+#: ../daemon/gvfsbackendgphoto2.c:1600
 msgid "Error creating camera"
 msgstr "เกิดข้อผิดพลาดขณะสร้างอ็อบเจกต์กล้องถ่ายรูป"
 
-#: ../daemon/gvfsbackendgphoto2.c:1611 ../daemon/gvfsbackendgphoto2.c:1621
+#: ../daemon/gvfsbackendgphoto2.c:1613 ../daemon/gvfsbackendgphoto2.c:1623
 msgid "Error loading device information"
 msgstr "เกิดข้อผิดพลาดขณะโหลดข้อมูลอุปกรณ์"
 
-#: ../daemon/gvfsbackendgphoto2.c:1633
+#: ../daemon/gvfsbackendgphoto2.c:1635
 msgid "Error looking up device information"
 msgstr "เกิดข้อผิดพลาดขณะหาข้อมูลอุปกรณ์"
 
-#: ../daemon/gvfsbackendgphoto2.c:1643
+#: ../daemon/gvfsbackendgphoto2.c:1645
 msgid "Error getting device information"
 msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลอุปกรณ์"
 
-#: ../daemon/gvfsbackendgphoto2.c:1656
+#: ../daemon/gvfsbackendgphoto2.c:1658
 msgid "Error setting up camera communications port"
 msgstr "เกิดข้อผิดพลาดขณะกำหนดค่าพอร์ตสื่อสารของกล้องถ่ายรูป"
 
-#: ../daemon/gvfsbackendgphoto2.c:1667
+#: ../daemon/gvfsbackendgphoto2.c:1669
 msgid "Error initializing camera"
 msgstr "เกิดข้อผิดพลาดขณะตั้งค่าเริ่มต้นของกล้องถ่ายรูป"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1681
+#: ../daemon/gvfsbackendgphoto2.c:1683
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "การเมานท์ gphoto2 ที่ %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1756
+#: ../daemon/gvfsbackendgphoto2.c:1765
 msgid "No camera specified"
 msgstr "ไม่ได้ระบุกล้องถ่ายรูป"
 
-#: ../daemon/gvfsbackendgphoto2.c:1797 ../daemon/gvfsbackendgphoto2.c:1823
+#: ../daemon/gvfsbackendgphoto2.c:1806 ../daemon/gvfsbackendgphoto2.c:1832
 #, c-format
 msgid "Filesystem is busy"
 msgstr "ระบบแฟ้มใช้งานอยู่"
 
-#: ../daemon/gvfsbackendgphoto2.c:1893
+#: ../daemon/gvfsbackendgphoto2.c:1902
 msgid "Error creating file object"
 msgstr "เกิดข้อผิดพลาดขณะสร้างอ็อบเจกต์แฟ้ม"
 
-#: ../daemon/gvfsbackendgphoto2.c:1908
+#: ../daemon/gvfsbackendgphoto2.c:1917
 msgid "Error getting file"
 msgstr "เกิดข้อผิดพลาดขณะหยิบแฟ้มมาใช้"
 
-#: ../daemon/gvfsbackendgphoto2.c:1918
+#: ../daemon/gvfsbackendgphoto2.c:1927
 msgid "Error getting data from file"
 msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลจากแฟ้ม"
 
-#: ../daemon/gvfsbackendgphoto2.c:1976
+#: ../daemon/gvfsbackendgphoto2.c:1985
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "ตัวระบุไอคอน '%s' ผิดรูปแบบ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2052 ../daemon/gvfsbackendgphoto2.c:3241
+#: ../daemon/gvfsbackendgphoto2.c:2061 ../daemon/gvfsbackendgphoto2.c:3250
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "เกิดข้อผิดพลาดขณะเลื่อนตำแหน่งในสตรีมที่กล้องถ่ายรูป %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2192 ../daemon/gvfsbackendsftp.c:2906
+#: ../daemon/gvfsbackendgphoto2.c:2201 ../daemon/gvfsbackendsftp.c:2940
 #: ../daemon/gvfsbackendsmbbrowse.c:1390
 msgid "Not a directory"
 msgstr "ไม่ใช่ไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2225
+#: ../daemon/gvfsbackendgphoto2.c:2234
 msgid "Failed to get folder list"
 msgstr "ดึงรายชื่อโฟลเดอร์ไม่สำเร็จ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2291
+#: ../daemon/gvfsbackendgphoto2.c:2300
 msgid "Failed to get file list"
 msgstr "ดึงรายชื่อแฟ้มไม่สำเร็จ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2583
+#: ../daemon/gvfsbackendgphoto2.c:2592
 msgid "Error creating directory"
 msgstr "เกิดข้อผิดพลาดขณะสร้างไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2792
+#: ../daemon/gvfsbackendgphoto2.c:2801
 msgid "Name already exists"
 msgstr "มีชื่อซ้ำอยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsbackendgphoto2.c:2803 ../daemon/gvfsbackendgphoto2.c:3432
+#: ../daemon/gvfsbackendgphoto2.c:2812 ../daemon/gvfsbackendgphoto2.c:3441
 msgid "New name too long"
 msgstr "ชื่อใหม่ยาวเกินไป"
 
-#: ../daemon/gvfsbackendgphoto2.c:2813 ../daemon/gvfsbackendgphoto2.c:3443
+#: ../daemon/gvfsbackendgphoto2.c:2822 ../daemon/gvfsbackendgphoto2.c:3452
 msgid "Error renaming dir"
 msgstr "เกิดข้อผิดพลาดขณะเปลี่ยนชื่อไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2826 ../daemon/gvfsbackendgphoto2.c:3456
+#: ../daemon/gvfsbackendgphoto2.c:2835 ../daemon/gvfsbackendgphoto2.c:3465
 msgid "Error renaming file"
 msgstr "เกิดข้อผิดพลาดขณะเปลี่ยนชื่อแฟ้ม"
 
-#: ../daemon/gvfsbackendgphoto2.c:2890
+#: ../daemon/gvfsbackendgphoto2.c:2899
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "ไดเรกทอรี '%s' ไม่ว่าง"
 
-#: ../daemon/gvfsbackendgphoto2.c:2901
+#: ../daemon/gvfsbackendgphoto2.c:2910
 msgid "Error deleting directory"
 msgstr "เกิดข้อผิดพลาดขณะลบไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2927
+#: ../daemon/gvfsbackendgphoto2.c:2936
 msgid "Error deleting file"
 msgstr "เกิดข้อผิดพลาดขณะลบแฟ้ม"
 
-#: ../daemon/gvfsbackendgphoto2.c:2980
+#: ../daemon/gvfsbackendgphoto2.c:2989
 msgid "Can't write to directory"
 msgstr "ไม่สามารถเขียนลงในไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:3027
+#: ../daemon/gvfsbackendgphoto2.c:3036
 msgid "Cannot allocate new file to append to"
 msgstr "ไม่สามารถสร้างแฟ้มใหม่เพื่อเขียนต่อท้าย"
 
-#: ../daemon/gvfsbackendgphoto2.c:3042
+#: ../daemon/gvfsbackendgphoto2.c:3051
 msgid "Cannot read file to append to"
 msgstr "ไม่สามารถอ่านแฟ้มที่จะเขียนต่อท้าย"
 
-#: ../daemon/gvfsbackendgphoto2.c:3053
+#: ../daemon/gvfsbackendgphoto2.c:3062
 msgid "Cannot get data of file to append to"
 msgstr "ไม่สามารถอ่านข้อมูลจากแฟ้มที่จะเขียนต่อท้าย"
 
-#: ../daemon/gvfsbackendgphoto2.c:3340
+#: ../daemon/gvfsbackendgphoto2.c:3349
 msgid "Error writing file"
 msgstr "เกิดข้อผิดพลาดขณะเขียนแฟ้ม"
 
-#: ../daemon/gvfsbackendgphoto2.c:3388
+#: ../daemon/gvfsbackendgphoto2.c:3397
 msgid "Not supported (not same directory)"
 msgstr "ไม่รองรับ (ไม่ใช่ไดเรกทอรีเดียวกัน)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3400
+#: ../daemon/gvfsbackendgphoto2.c:3409
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "ไม่รองรับ (ต้นทางเป็นไดเรกทอรี, ปลายทางเป็นไดเรกทอรี)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3408
+#: ../daemon/gvfsbackendgphoto2.c:3417
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "ไม่รองรับ (ต้นทางเป็นไดเรกทอรี, ปลายทางเป็นแฟ้มที่มีอยู่)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3420
+#: ../daemon/gvfsbackendgphoto2.c:3429
 msgid "Not supported (src is file, dst is dir)"
 msgstr "ไม่รองรับ (ต้นทางเป็นแฟ้ม, ปลายทางเป็นไดเรกทอรี)"
 
@@ -1008,65 +1009,65 @@ msgstr "อุปกรณ์ต้องการซอฟต์แวร์ร
 msgid "Error deleting file: %s"
 msgstr "เกิดข้อผิดพลาดขณะลบแฟ้ม: %s"
 
-#: ../daemon/gvfsbackendsftp.c:295 ../daemon/gvfsbackendsftp.c:651
+#: ../daemon/gvfsbackendsftp.c:301 ../daemon/gvfsbackendsftp.c:657
 msgid "ssh program unexpectedly exited"
 msgstr "โปรแกรม ssh จบการทำงานกะทันหัน"
 
-#: ../daemon/gvfsbackendsftp.c:303 ../daemon/gvfsbackendsftp.c:1788
+#: ../daemon/gvfsbackendsftp.c:309 ../daemon/gvfsbackendsftp.c:1822
 #: ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "ไม่ได้รับอนุญาต"
 
-#: ../daemon/gvfsbackendsftp.c:310
+#: ../daemon/gvfsbackendsftp.c:316
 msgid "Hostname not known"
 msgstr "ไม่รู้จักชื่อโฮสต์"
 
-#: ../daemon/gvfsbackendsftp.c:317
+#: ../daemon/gvfsbackendsftp.c:323
 msgid "No route to host"
 msgstr "ไม่มีเส้นทางไปยังโฮสต์"
 
-#: ../daemon/gvfsbackendsftp.c:324
+#: ../daemon/gvfsbackendsftp.c:330
 msgid "Connection refused by server"
 msgstr "เซิร์ฟเวอร์ปฏิเสธการเชื่อมต่อ"
 
-#: ../daemon/gvfsbackendsftp.c:331
+#: ../daemon/gvfsbackendsftp.c:337
 msgid "Host key verification failed"
 msgstr "การตรวจสอบกุญแจสำหรับโฮสต์ไม่ผ่าน"
 
-#: ../daemon/gvfsbackendsftp.c:495
+#: ../daemon/gvfsbackendsftp.c:501
 msgid "Unable to spawn ssh program"
 msgstr "ไม่สามารถ spawn โปรแกรม ssh"
 
-#: ../daemon/gvfsbackendsftp.c:511
+#: ../daemon/gvfsbackendsftp.c:517
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "ไม่สามารถ spawn โปรแกรม ssh: %s"
 
-#: ../daemon/gvfsbackendsftp.c:613 ../daemon/gvfsbackendsftp.c:874
+#: ../daemon/gvfsbackendsftp.c:619 ../daemon/gvfsbackendsftp.c:879
 msgid "Timed out when logging in"
 msgstr "หมดเวลาขณะเข้าระบบ"
 
-#: ../daemon/gvfsbackendsftp.c:953
+#: ../daemon/gvfsbackendsftp.c:958
 msgid "Enter passphrase for key"
 msgstr "กรุณาป้อนวลีรหัสผ่านสำหรับกุญแจ"
 
-#: ../daemon/gvfsbackendsftp.c:955
+#: ../daemon/gvfsbackendsftp.c:960
 msgid "Enter password"
 msgstr "กรุณาป้อนรหัสผ่าน"
 
-#: ../daemon/gvfsbackendsftp.c:1031
+#: ../daemon/gvfsbackendsftp.c:1036
 msgid "Can't send password"
 msgstr "ไม่สามารถส่งรหัสผ่าน"
 
-#: ../daemon/gvfsbackendsftp.c:1039
+#: ../daemon/gvfsbackendsftp.c:1044
 msgid "Log In Anyway"
 msgstr "เข้าระบบต่อไป"
 
-#: ../daemon/gvfsbackendsftp.c:1039
+#: ../daemon/gvfsbackendsftp.c:1044
 msgid "Cancel Login"
 msgstr "ยกเลิกการเข้าระบบ"
 
-#: ../daemon/gvfsbackendsftp.c:1048
+#: ../daemon/gvfsbackendsftp.c:1053
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -1081,78 +1082,78 @@ msgstr ""
 "ข้อความบอกเอกลักษณ์ที่เครื่องฝั่งโน้นส่งมาคือ %s  ถ้าคุณต้องการมั่นใจว่าปลอดภัยที่จะดำเนินการต่อ "
 "กรุณาติดต่อผู้ดูแลระบบ"
 
-#: ../daemon/gvfsbackendsftp.c:1068
+#: ../daemon/gvfsbackendsftp.c:1073
 msgid "Login dialog cancelled"
 msgstr "กล่องโต้ตอบเข้าระบบถูกยกเลิก"
 
-#: ../daemon/gvfsbackendsftp.c:1088
+#: ../daemon/gvfsbackendsftp.c:1093
 msgid "Can't send host identity confirmation"
 msgstr "ไม่สามารถส่งคำยืนยันเอกลักษณ์โฮสต์"
 
-#: ../daemon/gvfsbackendsftp.c:1615 ../daemon/gvfsbackendsftp.c:1638
+#: ../daemon/gvfsbackendsftp.c:1631 ../daemon/gvfsbackendsftp.c:1654
 msgid "Protocol error"
 msgstr "โพรโทคอลผิดพลาด"
 
 #. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1663
+#: ../daemon/gvfsbackendsftp.c:1679
 #, c-format
 msgid "sftp for %s on %s"
 msgstr "sftp ในนาม %s ที่ %s"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1666
+#: ../daemon/gvfsbackendsftp.c:1682
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp ที่ %s"
 
-#: ../daemon/gvfsbackendsftp.c:1704
+#: ../daemon/gvfsbackendsftp.c:1723
 msgid "Unable to find supported ssh command"
 msgstr "ไม่พบคำสั่ง ssh ที่รองรับ"
 
-#: ../daemon/gvfsbackendsftp.c:1963 ../daemon/gvfsbackendsftp.c:2352
-#: ../daemon/gvfsbackendsftp.c:2431 ../daemon/gvfsbackendsftp.c:2442
-#: ../daemon/gvfsbackendsftp.c:2498 ../daemon/gvfsbackendsftp.c:2584
-#: ../daemon/gvfsbackendsftp.c:2634 ../daemon/gvfsbackendsftp.c:2680
-#: ../daemon/gvfsbackendsftp.c:2755 ../daemon/gvfsbackendsftp.c:2862
-#: ../daemon/gvfsbackendsftp.c:2979 ../daemon/gvfsbackendsftp.c:3060
-#: ../daemon/gvfsbackendsftp.c:3132 ../daemon/gvfsbackendsftp.c:3144
-#: ../daemon/gvfsbackendsftp.c:3202 ../daemon/gvfsbackendsftp.c:3244
-#: ../daemon/gvfsbackendsftp.c:3429 ../daemon/gvfsbackendsftp.c:3461
-#: ../daemon/gvfsbackendsftp.c:3516 ../daemon/gvfsbackendsftp.c:3573
-#: ../daemon/gvfsbackendsftp.c:3870 ../daemon/gvfsbackendsftp.c:3937
-#: ../daemon/gvfsbackendsftp.c:4072 ../daemon/gvfsbackendsftp.c:4132
-#: ../daemon/gvfsbackendsftp.c:4167 ../daemon/gvfsbackendsftp.c:4195
-#: ../daemon/gvfsbackendsftp.c:4303 ../daemon/gvfsbackendsftp.c:4357
-#: ../daemon/gvfsbackendsftp.c:4396 ../daemon/gvfsbackendsftp.c:4430
-#: ../daemon/gvfsbackendsftp.c:4464 ../daemon/gvfsbackendsftp.c:4479
-#: ../daemon/gvfsbackendsftp.c:4494 ../daemon/gvfsbackendsftp.c:4572
+#: ../daemon/gvfsbackendsftp.c:1997 ../daemon/gvfsbackendsftp.c:2386
+#: ../daemon/gvfsbackendsftp.c:2465 ../daemon/gvfsbackendsftp.c:2476
+#: ../daemon/gvfsbackendsftp.c:2532 ../daemon/gvfsbackendsftp.c:2618
+#: ../daemon/gvfsbackendsftp.c:2668 ../daemon/gvfsbackendsftp.c:2714
+#: ../daemon/gvfsbackendsftp.c:2789 ../daemon/gvfsbackendsftp.c:2896
+#: ../daemon/gvfsbackendsftp.c:3013 ../daemon/gvfsbackendsftp.c:3094
+#: ../daemon/gvfsbackendsftp.c:3166 ../daemon/gvfsbackendsftp.c:3178
+#: ../daemon/gvfsbackendsftp.c:3236 ../daemon/gvfsbackendsftp.c:3278
+#: ../daemon/gvfsbackendsftp.c:3463 ../daemon/gvfsbackendsftp.c:3495
+#: ../daemon/gvfsbackendsftp.c:3550 ../daemon/gvfsbackendsftp.c:3607
+#: ../daemon/gvfsbackendsftp.c:3904 ../daemon/gvfsbackendsftp.c:3971
+#: ../daemon/gvfsbackendsftp.c:4106 ../daemon/gvfsbackendsftp.c:4166
+#: ../daemon/gvfsbackendsftp.c:4201 ../daemon/gvfsbackendsftp.c:4229
+#: ../daemon/gvfsbackendsftp.c:4337 ../daemon/gvfsbackendsftp.c:4391
+#: ../daemon/gvfsbackendsftp.c:4430 ../daemon/gvfsbackendsftp.c:4464
+#: ../daemon/gvfsbackendsftp.c:4498 ../daemon/gvfsbackendsftp.c:4513
+#: ../daemon/gvfsbackendsftp.c:4528 ../daemon/gvfsbackendsftp.c:4606
 msgid "Invalid reply received"
 msgstr "ได้รับคำตอบที่ใช้ไม่ได้"
 
-#: ../daemon/gvfsbackendsftp.c:2211 ../daemon/gvfsbackendsmb.c:1424
+#: ../daemon/gvfsbackendsftp.c:2245 ../daemon/gvfsbackendsmb.c:1424
 #: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr " (รหัสอักขระผิดรูปแบบ)"
 
-#: ../daemon/gvfsbackendsftp.c:2296
+#: ../daemon/gvfsbackendsftp.c:2330
 msgid "Failure"
 msgstr "ล้มเหลว"
 
-#: ../daemon/gvfsbackendsftp.c:2404
+#: ../daemon/gvfsbackendsftp.c:2438
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
 msgstr "icon_id '%s' ใช้การไม่ได้ใน OpenIconForRead"
 
-#: ../daemon/gvfsbackendsftp.c:2700
+#: ../daemon/gvfsbackendsftp.c:2734
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "เกิดข้อผิดพลาดขณะสร้างแฟ้มสำรอง: %s"
 
-#: ../daemon/gvfsbackendsftp.c:3306
+#: ../daemon/gvfsbackendsftp.c:3340
 msgid "Unable to create temporary file"
 msgstr "ไม่สามารถสร้างแฟ้มชั่วคราว"
 
-#: ../daemon/gvfsbackendsftp.c:4229 ../daemon/gvfsbackendsmb.c:2027
+#: ../daemon/gvfsbackendsftp.c:4263 ../daemon/gvfsbackendsmb.c:2027
 msgid "Can't move directory over directory"
 msgstr "ไม่สามารถย้ายไดเรกทอรีทับไดเรกทอรี"
 
@@ -1349,9 +1350,9 @@ msgstr "%s: %s"
 
 #: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
 #: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:110 ../programs/gvfs-info.c:371
+#: ../programs/gvfs-copy.c:122 ../programs/gvfs-info.c:371
 #: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:59
-#: ../programs/gvfs-move.c:98 ../programs/gvfs-open.c:140
+#: ../programs/gvfs-move.c:110 ../programs/gvfs-open.c:140
 #: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
 #: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
@@ -1422,21 +1423,21 @@ msgstr "เครื่องมือติดตามโวลุม GDU ข�
 msgid "Floppy Drive"
 msgstr "ไดรว์ฟลอปปี้"
 
-#: ../monitor/gdu/ggdudrive.c:256
+#: ../monitor/gdu/ggdudrive.c:258
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "ไดรว์ไม่มีชื่อ (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:258
+#: ../monitor/gdu/ggdudrive.c:260
 msgid "Unnamed Drive"
 msgstr "ไดรว์ไม่มีชื่อ"
 
-#: ../monitor/gdu/ggdudrive.c:559 ../monitor/hal/ghaldrive.c:662
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/hal/ghaldrive.c:662
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr "ไม่สามารถดันสื่อออก: มีโวลุมตั้งแต่หนึ่งโวลุมขึ้นไปในสื่อกำลังถูกใช้งานอยู่"
 
-#: ../monitor/gdu/ggdudrive.c:1014
+#: ../monitor/gdu/ggdudrive.c:1015
 msgid ""
 "Start drive in degraded mode?\n"
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
@@ -1446,7 +1447,7 @@ msgstr ""
 "การเปิดใช้ไดรว์ในโหมดคุณภาพต่ำหมายความว่า ไดรว์จะไม่ยืดหยุ่นต่อความผิดพลาดอีกต่อไป "
 "ข้อมูลในไดรว์อาจสูญหายโดยไม่สามารถกู้คืนได้ถ้ามีองค์ประกอบใดองค์ประกอบหนึ่งทำงานผิดพลาด"
 
-#: ../monitor/gdu/ggdudrive.c:1020
+#: ../monitor/gdu/ggdudrive.c:1021
 msgid "Start Anyway"
 msgstr "เปิดใช้ต่อไป"
 
@@ -1859,9 +1860,9 @@ msgstr ""
 "หมายเหตุ: คุณสามารถส่งผ่านไปป์ต่อให้คำสั่ง cat ได้ ถ้าต้องการใช้ตัวเลือกการจัดรูปแบบบางอย่าง "
 "เช่น -n, -T และอื่นๆ"
 
-#: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:108
+#: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:120
 #: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
-#: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-move.c:96
+#: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-move.c:108
 #: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
 #: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
 #, c-format
@@ -1904,32 +1905,29 @@ msgstr "ไม่ต้องเดินไปตามลิงก์สัญ
 msgid "progress"
 msgstr "ความคืบหน้า"
 
-#: ../programs/gvfs-copy.c:101 ../programs/gvfs-move.c:89
-#: ../programs/gvfs-save.c:156
-msgid "- output files at <location>"
-msgstr "- แฟ้มออกที่ <location>"
+#: ../programs/gvfs-copy.c:114
+msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
+msgstr "SOURCE... DEST - คัดลอกแฟ้มจาก SOURCE (ต้นทาง) ไปยัง DEST (ปลายทาง)"
 
-#: ../programs/gvfs-copy.c:119 ../programs/gvfs-move.c:107
-#, c-format
+#: ../programs/gvfs-copy.c:131 ../programs/gvfs-move.c:119
 msgid "Missing operand\n"
 msgstr "ไม่มีโอเปอแรนด์\n"
 
-#: ../programs/gvfs-copy.c:127 ../programs/gvfs-move.c:115
-#, c-format
+#: ../programs/gvfs-copy.c:139 ../programs/gvfs-move.c:127
 msgid "Too many arguments\n"
 msgstr "อาร์กิวเมนต์มากเกินไป\n"
 
-#: ../programs/gvfs-copy.c:136 ../programs/gvfs-move.c:124
+#: ../programs/gvfs-copy.c:148 ../programs/gvfs-move.c:136
 #, c-format
 msgid "Target %s is not a directory\n"
 msgstr "เป้าหมาย %s ไม่ใช่ไดเรกทอรี\n"
 
-#: ../programs/gvfs-copy.c:177
+#: ../programs/gvfs-copy.c:192
 #, c-format
 msgid "overwrite %s?"
 msgstr "เขียนทับ %s หรือไม่?"
 
-#: ../programs/gvfs-copy.c:191
+#: ../programs/gvfs-copy.c:206
 #, c-format
 msgid "Error copying file %s: %s\n"
 msgstr "เกิดข้อผิดพลาดขณะคัดลอกแฟ้ม %s: %s\n"
@@ -2080,6 +2078,10 @@ msgstr "- สร้างไดเรกทอรี"
 msgid "Error creating directory: %s\n"
 msgstr "เกิดข้อผิดพลาดขณะสร้างไดเรกทอรี: %s\n"
 
+#: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
+msgid "Don't send single MOVED events."
+msgstr "ไม่ต้องส่งเหตุการณ์ MOVED เดี่ยวๆ"
+
 #: ../programs/gvfs-mount.c:54
 msgid "Mount as mountable"
 msgstr "เมาทน์ตามที่กำหนดให้เมานท์ได้"
@@ -2142,7 +2144,11 @@ msgstr "ไม่มีโวลุมสำหรับแฟ้มอุปก
 msgid "- mount <location>"
 msgstr "- เมานท์ <location>"
 
-#: ../programs/gvfs-move.c:173
+#: ../programs/gvfs-move.c:102
+msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
+msgstr "SOURCE... DEST - ย้ายแฟ้มจาก SOURCE (ต้นทาง) ไปยัง DEST (ปลายทาง)"
+
+#: ../programs/gvfs-move.c:188
 #, c-format
 msgid "Error moving file %s: %s\n"
 msgstr "เกิดข้อผิดพลาดขณะย้ายแฟ้ม %s: %s\n"
@@ -2237,6 +2243,10 @@ msgstr "เกิดข้อผิดพลาดขณะปิด: %s\n"
 msgid "Etag not available\n"
 msgstr "แฟ้มไม่มี etag\n"
 
+#: ../programs/gvfs-save.c:156
+msgid "DEST - read from standard input and save to DEST"
+msgstr "DEST - อ่านข้อมูลจากอินพุตมาตรฐานแล้วบันทึกลง DEST (ปลายทาง)"
+
 #: ../programs/gvfs-set-attribute.c:36
 msgid ""
 "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
@@ -2285,6 +2295,9 @@ msgstr "เดินไปตามลิงก์สัญลักษณ์, �
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
 msgstr "- แสดงเนื้อหาของไดเรกทอรีในรูปแบบคล้ายโครงสร้างต้นไม้"
+
+#~ msgid "- output files at <location>"
+#~ msgstr "- แฟ้มออกที่ <location>"
 
 #~ msgid "Invalid return value from get_info"
 #~ msgstr "มีการคืนค่าที่ใช้การไม่ได้จาก get_info"
