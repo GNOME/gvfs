@@ -199,6 +199,16 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
     int usb_bus_num;
     int usb_device_num;
 
+  /* For iPhones and iPod Touches, don't mount gphoto mounts,
+   * we already have access through AFC */
+#ifdef HAVE_AFC
+    if (g_udev_device_get_property_as_boolean (device, "USBMUX_SUPPORTED"))
+      {
+	/* g_debug ("ignoring device, is AFC"); */
+	return;
+      }
+#endif /* HAVE_AFC */
+
     property = g_udev_device_get_property (device, "BUSNUM");
     if (property == NULL) {
 	g_warning("device %s has no BUSNUM property, ignoring", g_udev_device_get_device_file (device));
