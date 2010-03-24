@@ -3,13 +3,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>, 2008.
+# Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>, 2008, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: eu\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-03-07 12:39+0100\n"
-"PO-Revision-Date: 2008-03-07 12:40+0100\n"
+"PO-Revision-Date: 2010-03-24 09:45+0100\n"
 "Last-Translator: Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>\n"
 "Language-Team: Basque <itzulpena@euskalgnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -213,7 +213,7 @@ msgstr "Direktorioa ez dago hutsik"
 
 #: ../daemon/gvfsbackendburn.c:460 ../daemon/gvfsbackendburn.c:898
 msgid "Can't copy file over directory"
-msgstr "Ezin da fixtategia direktorio gainean kopiatu"
+msgstr "Ezin da fitxategia direktorio gainean kopiatu"
 
 #. Translators: this is the display name of the backend
 #: ../daemon/gvfsbackendburn.c:652
@@ -401,7 +401,7 @@ msgstr "Sartu %s(r)en pasahitza"
 
 #: ../daemon/gvfsbackenddav.c:1092
 msgid "Please enter proxy password"
-msgstr "Sartu proxyaren pasahitza"
+msgstr "Sartu proxy-aren pasahitza"
 
 #: ../daemon/gvfsbackenddav.c:1206 ../daemon/gvfsbackendhttp.c:273
 #: ../daemon/gvfsbackendobexftp.c:605 ../daemon/gvfsbackendobexftp.c:616
@@ -700,7 +700,7 @@ msgid ""
 "sure it is safe to continue, contact the system administrator."
 msgstr ""
 "Urruneko ordenagailuaren (%s) identitatea ezezaguna da.\n"
-"Ordenagailu batean aurreneko aldiz saioa hastean getatu ohi da.\n"
+"Ordenagailu batean aurreneko aldiz saioa hastean gertatu ohi da.\n"
 "\n"
 "Urruneko ordenagailuak bidalitako identitatea %s da. Jarraitzea segurua ote "
 "den jakiteko, jar zaitez sistemako administratzailearekin harremanetan."
