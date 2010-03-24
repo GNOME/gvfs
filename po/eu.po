@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: eu\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-03-12 18:04+0100\n"
-"PO-Revision-Date: 2010-03-12 18:07+0100\n"
+"PO-Revision-Date: 2010-03-24 09:42+0100\n"
 "Last-Translator: Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>\n"
 "Language-Team: Basque <itzulpena@euskalgnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -438,7 +438,7 @@ msgstr "Direktorioa ez dago hutsik"
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
 #: ../daemon/gvfsbackendobexftp.c:1810
 msgid "Can't copy file over directory"
-msgstr "Ezin da fixtategia direktorio gainean kopiatu"
+msgstr "Ezin da fitxategia direktorio gainean kopiatu"
 
 #. Translators: this is the display name of the backend
 #: ../daemon/gvfsbackendburn.c:651
@@ -666,7 +666,7 @@ msgstr "Sartu %s(r)en pasahitza"
 
 #: ../daemon/gvfsbackenddav.c:1362
 msgid "Please enter proxy password"
-msgstr "Sartu proxyaren pasahitza"
+msgstr "Sartu proxy-aren pasahitza"
 
 #: ../daemon/gvfsbackenddav.c:1702 ../daemon/gvfsbackenddav.c:1706
 msgid "Not a WebDAV enabled share"
@@ -904,7 +904,7 @@ msgstr "Izen hori badago lehendik ere"
 
 #: ../daemon/gvfsbackendgphoto2.c:2812 ../daemon/gvfsbackendgphoto2.c:3441
 msgid "New name too long"
-msgstr "Izen barria luzeegia da"
+msgstr "Izen berria luzeegia da"
 
 #: ../daemon/gvfsbackendgphoto2.c:2822 ../daemon/gvfsbackendgphoto2.c:3452
 msgid "Error renaming dir"
@@ -1080,7 +1080,7 @@ msgid ""
 "sure it is safe to continue, contact the system administrator."
 msgstr ""
 "Urruneko ordenagailuaren (%s) identitatea ezezaguna da.\n"
-"Ordenagailu batean aurreneko aldiz saioa hastean getatu ohi da.\n"
+"Ordenagailu batean aurreneko aldiz saioa hastean gertatu ohi da.\n"
 "\n"
 "Urruneko ordenagailuak bidalitako identitatea %s da. Jarraitzea segurua ote "
 "den jakiteko, jar zaitez sistemako administratzailearekin harremanetan."
@@ -1941,7 +1941,7 @@ msgstr "Errorea %s fitxategia kopiatzean: %s\n"
 
 #: ../programs/gvfs-info.c:37
 msgid "List writable attributes"
-msgstr "Zerrendatu atributu idazkorrak"
+msgstr "Zerrendatu atributu idazgarriak"
 
 #: ../programs/gvfs-info.c:38
 msgid "Get filesystem info"
@@ -2034,7 +2034,7 @@ msgstr "Mantendu fitxategiarekin lekuz aldatzean"
 #: ../programs/gvfs-info.c:307
 #, c-format
 msgid "Error getting writable attributes: %s\n"
-msgstr "Errorea atributu idazkorrak lortzean: %s\n"
+msgstr "Errorea atributu idazgarriak lortzean: %s\n"
 
 #: ../programs/gvfs-info.c:312
 #, c-format
@@ -2044,7 +2044,7 @@ msgstr "Atributu ezargarriak:\n"
 #: ../programs/gvfs-info.c:335
 #, c-format
 msgid "Writable attribute namespaces:\n"
-msgstr "Atributu idazkorren izen-espazioak:\n"
+msgstr "Atributu idazgarrien izen-espazioak:\n"
 
 #: ../programs/gvfs-info.c:362
 msgid "- show info for <location>"
