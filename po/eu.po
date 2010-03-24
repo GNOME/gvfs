@@ -3,20 +3,20 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>, 2008, 2009.
+# Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>, 2008, 2009, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: eu\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-12 20:29+0100\n"
-"PO-Revision-Date: 2009-02-12 20:37+0100\n"
+"PO-Revision-Date: 2010-03-24 09:44+0100\n"
 "Last-Translator: Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>\n"
 "Language-Team: Basque <itzulpena@euskalgnu.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1984
 msgid "Operation not supported, files on different mounts"
@@ -313,7 +313,7 @@ msgstr "Direktorioa ez dago hutsik"
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:906
 #: ../daemon/gvfsbackendobexftp.c:1783
 msgid "Can't copy file over directory"
-msgstr "Ezin da fixtategia direktorio gainean kopiatu"
+msgstr "Ezin da fitxategia direktorio gainean kopiatu"
 
 #. Translators: this is the display name of the backend
 #: ../daemon/gvfsbackendburn.c:651
@@ -522,7 +522,7 @@ msgstr "Sartu %s(r)en pasahitza"
 
 #: ../daemon/gvfsbackenddav.c:1327
 msgid "Please enter proxy password"
-msgstr "Sartu proxyaren pasahitza"
+msgstr "Sartu proxy-aren pasahitza"
 
 #: ../daemon/gvfsbackenddav.c:1662 ../daemon/gvfsbackenddav.c:1666
 msgid "Not a WebDAV enabled share"
@@ -807,7 +807,7 @@ msgstr "Izen hori badago lehendik ere"
 
 #: ../daemon/gvfsbackendgphoto2.c:2513 ../daemon/gvfsbackendgphoto2.c:3141
 msgid "New name too long"
-msgstr "Izen barria luzeegia da"
+msgstr "Izen berria luzeegia da"
 
 #: ../daemon/gvfsbackendgphoto2.c:2523 ../daemon/gvfsbackendgphoto2.c:3152
 msgid "Error renaming dir"
@@ -978,7 +978,7 @@ msgid ""
 "sure it is safe to continue, contact the system administrator."
 msgstr ""
 "Urruneko ordenagailuaren (%s) identitatea ezezaguna da.\n"
-"Ordenagailu batean aurreneko aldiz saioa hastean getatu ohi da.\n"
+"Ordenagailu batean aurreneko aldiz saioa hastean gertatu ohi da.\n"
 "\n"
 "Urruneko ordenagailuak bidalitako identitatea %s da. Jarraitzea segurua ote "
 "den jakiteko, jar zaitez sistemako administratzailearekin harremanetan."
