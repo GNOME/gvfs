@@ -1,3 +1,9 @@
+Major changes in 1.6
+====================
+* afc: Allow copy of folders
+* gphoto2: Don't access things accessible via afc too
+* Translation updates
+
 Major changes in 1.5.5
 ======================
 * Fix with-dbus-service-dir configure switch
