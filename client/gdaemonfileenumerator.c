@@ -276,9 +276,10 @@ trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
 						 (GDestroyNotify)free_info_list);
     }
 
-  g_simple_async_result_complete_in_idle (daemon->async_res);
+  _g_simple_async_result_complete_with_cancellable (daemon->async_res,
+                                                    daemon->async_cancel);
   
-  daemon->async_cancel = 0;
+  daemon->async_cancel = NULL;
   daemon->cancelled_tag = 0;
 
   if (daemon->timeout_tag != 0)
@@ -549,7 +550,7 @@ g_daemon_file_enumerator_close_async (GFileEnumerator      *enumerator,
 
   res = g_simple_async_result_new (G_OBJECT (enumerator), callback, user_data,
 				   g_daemon_file_enumerator_close_async);
-  g_simple_async_result_complete_in_idle (res);
+  _g_simple_async_result_complete_with_cancellable (res, cancellable);
   g_object_unref (res);
 }
 
