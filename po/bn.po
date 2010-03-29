@@ -346,12 +346,12 @@ msgstr "মাউন্ট বর্ণনা সঠিক নয়"
 
 #: ../daemon/gvfsbackendafc.c:286
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
-msgstr "Invalid AFC location: must be in the form of afc://uuid:port-number"
+msgstr "অকার্যকর AFC অবস্থান: must be in the form of afc://uuid:port-number"
 
 #: ../daemon/gvfsbackendafc.c:301
 #, c-format
 msgid "Service %d on Apple Mobile Device"
-msgstr "Service %d on Apple Mobile Device"
+msgstr "অ্যাপেল মোবাইল ডিভাইসে %d সার্ভিস"
 
 #: ../daemon/gvfsbackendafc.c:307
 #, c-format
@@ -989,7 +989,7 @@ msgstr "Windows Network"
 #. * shows computers in your local network.
 #: ../daemon/gvfsbackendnetwork.c:931
 msgid "Network Location Monitor"
-msgstr "Network Location Monitor"
+msgstr "নেটওয়ার্ক লোকেশন মনিটর"
 
 #. Set the mountspec according to original uri, no matter whether user changes
 #. credentials during mount loop. Nautilus and other gio clients depend
@@ -1210,7 +1210,7 @@ msgstr "রিকার্সিভ রূপে ডিরেক্টরটি 
 
 #: ../daemon/gvfsbackendsmb.c:2165
 msgid "Windows Shares Filesystem Service"
-msgstr "Windows Shares Filesystem Service"
+msgstr "উইন্ডোজ শেয়ার ফাইলসিস্টেম সার্ভিস"
 
 #. translators: %s is a server name
 #: ../daemon/gvfsbackendsmbbrowse.c:365
@@ -1240,7 +1240,7 @@ msgstr "এটি স্বাভাবিক ফাইল নয়"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1503
 msgid "Windows Network Filesystem Service"
-msgstr "Windows Network Filesystem Service"
+msgstr "উইন্ডোজ নেটওয়ার্ক ফাইল সিস্টেম সার্ভিস"
 
 #: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
 msgid "The trash folder may not be deleted"
@@ -1454,9 +1454,8 @@ msgid ""
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
 "to failures. Data on the drive may be irrevocably lost if a component fails."
 msgstr ""
-"Start drive in degraded mode?\n"
-"Starting a drive in degraded mode means that the drive is no longer tolerant "
-"to failures. Data on the drive may be irrevocably lost if a component fails."
+"ড্রাইভটি ডিগ্রেডেড মোডে শুরু করতে চান?\nএই মোডে চালানো মানে এটি ব্যর্থ হতে "
+"পারে। ফাইলের ডাটা হারিয়ে যেতে পারে।"
 
 #: ../monitor/gdu/ggdudrive.c:1021
 msgid "Start Anyway"
@@ -1849,7 +1848,7 @@ msgstr "%1$s: %2$s:বন্ধ করতে ত্রুটি: %3$s\n"
 # this looks like an option from the command line, hence not translating
 #: ../programs/gvfs-cat.c:136
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
-msgstr "LOCATION... - concatenate LOCATIONS to standard output."
+msgstr "LOCATION... - কনক্যাটেনেট LOCATIONS স্ট্যান্ডার্ড আউটপুটে।"
 
 # this looks like an option from the command line, hence not translating
 #. Translators: this message will appear after the usage string
@@ -1926,11 +1925,11 @@ msgstr "SOURCE... DEST - SOURCE হতে DEST এ ফাইল অনুলি�
 
 #: ../programs/gvfs-copy.c:132 ../programs/gvfs-move.c:120
 msgid "Missing operand\n"
-msgstr "Missing operand\n"
+msgstr "মিসিং অপারেন্ড\n"
 
 #: ../programs/gvfs-copy.c:140 ../programs/gvfs-move.c:128
 msgid "Too many arguments\n"
-msgstr "Too many arguments\n"
+msgstr "অতিরিক্ত আর্গুমেন্ট\n"
 
 #: ../programs/gvfs-copy.c:149 ../programs/gvfs-move.c:137
 #, c-format
@@ -2231,15 +2230,15 @@ msgstr "ফাইলের পরিশেষে যোগ করা হবে"
 
 #: ../programs/gvfs-save.c:46
 msgid "When creating a file, restrict access to the current user only"
-msgstr "When creating a file, restrict access to the current user only"
+msgstr "একটি ফাইল তৈরির সময়, বর্তমান ব্যবহারকারীকে প্রবেশে বাধা দেয়া হয়"
 
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
-msgstr "Print new etag at end"
+msgstr "শেষ নতুন etag মুদ্রণ করুন"
 
 #: ../programs/gvfs-save.c:48
 msgid "The etag of the file being overwritten"
-msgstr "The etag of the file being overwritten"
+msgstr "etag ফাইল উপরিলিখন করা হয়েছে"
 
 #: ../programs/gvfs-save.c:76
 #, c-format
@@ -2307,7 +2306,7 @@ msgstr "ফাইল মুছে ফেলতে ত্রুটি: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symlinks, mounts and shortcuts like dirs"
-msgstr "Follow symlinks, mounts and shortcuts like dirs"
+msgstr "dirs হিসেবে symlinks, মাউন্ট এবং শর্টকাট অনুসরণ করা হবে"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
