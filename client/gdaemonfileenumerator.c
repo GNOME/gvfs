@@ -53,7 +53,6 @@ struct _GDaemonFileEnumerator
 
   /* For async ops, also protected by infos lock */
   int async_requested_files;
-  GCancellable *async_cancel;
   gulong cancelled_tag;
   guint timeout_tag;
   GSimpleAsyncResult *async_res;
@@ -220,6 +219,24 @@ add_metadata (GFileInfo *info,
   g_free (path);
 }
 
+static GCancellable *
+simple_async_result_get_cancellable (GSimpleAsyncResult *res)
+{
+  return g_object_get_data (G_OBJECT (res), "file-enumerator-cancellable");
+}
+
+static void
+simple_async_result_set_cancellable (GSimpleAsyncResult *res,
+                                     GCancellable       *cancellable)
+{
+  if (!cancellable)
+    return;
+
+  g_object_set_data_full (G_OBJECT (res),
+                          "file-enumerator-cancellable",
+                          g_object_ref (cancellable),
+                          g_object_unref);
+}
 
 /* Called with infos lock held */
 static void
@@ -229,6 +246,8 @@ trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
 
   if (daemon->cancelled_tag != 0)
     {
+      GCancellable *cancellable = simple_async_result_get_cancellable (daemon->async_res);
+
       /* If ok, we're a normal callback on the main thread,
 	 ensure protection against a thread cancelling and
 	 running the callback again.
@@ -240,10 +259,10 @@ trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
 	 handler.
       */
       if (ok)
-	g_cancellable_disconnect (daemon->async_cancel,
+	g_cancellable_disconnect (cancellable,
 				  daemon->cancelled_tag);
       else
-	g_signal_handler_disconnect (daemon->async_cancel,
+	g_signal_handler_disconnect (cancellable,
 				     daemon->cancelled_tag);
     }
 
@@ -278,7 +297,6 @@ trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
 
   g_simple_async_result_complete_in_idle (daemon->async_res);
   
-  daemon->async_cancel = 0;
   daemon->cancelled_tag = 0;
 
   if (daemon->timeout_tag != 0)
@@ -489,12 +507,12 @@ g_daemon_file_enumerator_next_files_async (GFileEnumerator     *enumerator,
     }
   
   G_LOCK (infos);
-  daemon->async_cancel = cancellable;
   daemon->cancelled_tag = 0;
   daemon->timeout_tag = 0;
   daemon->async_requested_files = num_files;
   daemon->async_res = g_simple_async_result_new (G_OBJECT (enumerator), callback, user_data,
 						 g_daemon_file_enumerator_next_files_async);
+  simple_async_result_set_cancellable (daemon->async_res, cancellable);
 
   /* Maybe we already have enough info to fulfill the requeust already */
   if (daemon->done ||
@@ -515,12 +533,24 @@ g_daemon_file_enumerator_next_files_async (GFileEnumerator     *enumerator,
 
 static GList *
 g_daemon_file_enumerator_next_files_finish (GFileEnumerator  *enumerator,
-					    GAsyncResult     *result,
+					    GAsyncResult     *res,
 					    GError          **error)
 {
+  GSimpleAsyncResult *result = G_SIMPLE_ASYNC_RESULT (res);
+  GCancellable *cancellable;
   GList *l;
 
-  l = g_simple_async_result_get_op_res_gpointer (G_SIMPLE_ASYNC_RESULT (result));
+  cancellable = simple_async_result_get_cancellable (result);
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_CANCELLED,
+                   "%s", _("Operation was cancelled"));
+      return NULL;
+    }
+
+  l = g_simple_async_result_get_op_res_gpointer (result);
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
   return g_list_copy (l);
 }
@@ -549,6 +579,7 @@ g_daemon_file_enumerator_close_async (GFileEnumerator      *enumerator,
 
   res = g_simple_async_result_new (G_OBJECT (enumerator), callback, user_data,
 				   g_daemon_file_enumerator_close_async);
+  simple_async_result_set_cancellable (res, cancellable);
   g_simple_async_result_complete_in_idle (res);
   g_object_unref (res);
 }
@@ -558,5 +589,17 @@ g_daemon_file_enumerator_close_finish (GFileEnumerator      *enumerator,
 				       GAsyncResult         *result,
 				       GError              **error)
 {
+  GCancellable *cancellable;
+  
+  cancellable = simple_async_result_get_cancellable (G_SIMPLE_ASYNC_RESULT (result));
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_CANCELLED,
+                   "%s", _("Operation was cancelled"));
+      return FALSE;
+    }
+
   return TRUE;
 }
