@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-03-20 20:40+0100\n"
-"PO-Revision-Date: 2010-03-14 23:05+0100\n"
+"PO-Revision-Date: 2010-04-02 18:32+0200\n"
 "Last-Translator: Gil Forcada <gilforcada@guifi.net>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "MIME-Version: 1.0\n"
@@ -275,7 +275,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackendafc.c:145
 msgid "Internal Apple File Control error"
-msgstr "S'ha produït un error intern al Apple File Control"
+msgstr "S'ha produït un error intern a l'Apple File Control"
 
 #: ../daemon/gvfsbackendafc.c:149 ../daemon/gvfsbackendftp.c:633
 msgid "File does not exist"
@@ -295,12 +295,12 @@ msgstr "S'ha interromput la connexió"
 
 #: ../daemon/gvfsbackendafc.c:164
 msgid "Invalid Apple File Control data received"
-msgstr "S'han rebut unes dades no vàlides del Apple File Control"
+msgstr "S'han rebut unes dades no vàlides de l'Apple File Control"
 
 #: ../daemon/gvfsbackendafc.c:168
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
-msgstr "S'ha produït un error no gestionat al Apple File Control (%d)"
+msgstr "S'ha produït un error no gestionat a l'Apple File Control (%d)"
 
 #: ../daemon/gvfsbackendafc.c:185
 msgid "Lockdown Error: Invalid Argument"
@@ -1395,7 +1395,7 @@ msgstr "Ja està muntada la ubicació"
 
 #: ../daemon/mount.c:1044
 msgid "Location is not mountable"
-msgstr "La ubicació no és pot muntar"
+msgstr "La ubicació no es pot muntar"
 
 #: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
 #: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
@@ -1868,7 +1868,7 @@ msgid ""
 msgstr ""
 "Concatena fitxers a les ubicacions i imprimeix a la sortida estàndard. "
 "Funciona de la mateixa manera que l'eina «cat» de sempre, però utilitza la "
-"ubicació del gvfs enlloc de fitxers locals: per exemple, podeu fer servir "
+"ubicació del gvfs en lloc de fitxers locals: per exemple, podeu fer servir "
 "com a ubicació per concatenar coses com smb://servidor/recurs/fitxer.txt."
 
 #: ../programs/gvfs-cat.c:148
