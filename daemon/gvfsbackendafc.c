@@ -395,12 +395,15 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   lockdownd_client_free (lockdown_cli);
 
   /* Add camera item if necessary */
-  dcim_afcinfo = NULL;
-  if (afc_get_file_info (self->afc_cli, "/DCIM", &dcim_afcinfo) == AFC_E_SUCCESS)
-    g_vfs_backend_set_x_content_types (backend, camera_x_content_types);
-  else
-    g_vfs_backend_set_x_content_types (backend, media_player_x_content_types);
-  g_strfreev (dcim_afcinfo);
+  if (virtual_port < 2)
+    {
+      dcim_afcinfo = NULL;
+      if (afc_get_file_info (self->afc_cli, "/DCIM", &dcim_afcinfo) == AFC_E_SUCCESS)
+        g_vfs_backend_set_x_content_types (backend, camera_x_content_types);
+      else
+        g_vfs_backend_set_x_content_types (backend, media_player_x_content_types);
+      g_strfreev (dcim_afcinfo);
+    }
 
   self->connected = TRUE;
   g_vfs_job_succeeded (G_VFS_JOB(job));
