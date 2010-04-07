@@ -116,10 +116,15 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
       model = NULL;
       if (afc_get_device_info_key (afc_cli, "Model", &model) == AFC_E_SUCCESS)
         {
-          if(g_str_has_prefix(model, "iPod") != FALSE)
+          if (g_str_has_prefix(model, "iPod") != FALSE)
             {
               g_free (self->icon);
               self->icon = g_strdup ("multimedia-player-apple-ipod-touch");
+            }
+          else if (g_str_has_prefix(model, "iPad") != FALSE)
+            {
+              g_free (self->icon);
+              self->icon = g_strdup ("computer-apple-ipad");
             }
           g_free (model);
         }

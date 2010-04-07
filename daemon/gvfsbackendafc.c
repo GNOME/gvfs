@@ -386,6 +386,10 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
     {
       g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "multimedia-player-apple-ipod-touch");
     }
+  else if ((self->model != NULL) && (strstr(self->model, "iPad") != NULL))
+    {
+      g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "computer-apple-ipad");
+    }
   else
     {
       g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "phone-apple-iphone");
