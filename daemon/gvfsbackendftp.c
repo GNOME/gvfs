@@ -481,7 +481,7 @@ try_login:
       ftp->addr = G_SOCKET_CONNECTABLE (g_vfs_ftp_connection_get_address (task.conn, &task.error));
       if (ftp->addr == NULL)
         {
-          g_debug ("# error querying remote address: %s\nUsing original address instead.", task.error->message);
+          g_debug ("# error querying remote address: %s\nUsing original address instead.\n", task.error->message);
           g_vfs_ftp_task_clear_error (&task);
           ftp->addr = g_object_ref (addr);
         }
