@@ -191,33 +191,66 @@ gvfs_backend_ftp_setup_directory_cache (GVfsBackendFtp *ftp)
   ftp->dir_cache = g_vfs_ftp_dir_cache_new (ftp->dir_funcs);
 }
 
+/* This parses a file according to RFC 959 Appendix II:
+ *
+ * the server should return a line of the form:
+ *   257<space>"<directory-name>"<space><commentary>
+ * That is, the server will tell the user what string to use when
+ * referring to the created  directory.  The directory name can
+ * contain any character; embedded double-quotes should be escaped by
+ * double-quotes (the "quote-doubling" convention).
+ *
+ * Note that we actually accept (as regexp):
+ * ....\s*"<directory-name>".*
+ * so we're quite a bit more lax.
+ *
+ * If parsing this name fails, this function returns NULL.
+ */
 static GVfsFtpFile *
 g_vfs_backend_create_file_from_reply (GVfsBackendFtp *ftp, const char *name)
 {
-  const char *end;
-
-  end = name + strlen (name);
+  GVfsFtpFile *file;
+  const char *quote;
+  GString *unescaped;
 
   /* strip leading spaces */
   while (g_ascii_isspace (*name))
     name++;
 
-  /* strip leading and trailing quote character */
-  /* FIXME: need to unescape th contained string? */
-  if (*name == '"' && end[-1] == '"')
+  if (*name++ != '"')
     {
-      name++;
-      end--;
+      g_debug ("# filename didn't start with a quote\n");
+      return NULL;
     }
 
-  if (*end == '\0') {
-    return g_vfs_ftp_file_new_from_ftp (ftp, name);
-  } else {
-    char *s = g_strndup (name, end - name);
-    GVfsFtpFile *file = g_vfs_ftp_file_new_from_ftp (ftp, s);
-    g_free (s);
-    return file;
-  }
+  unescaped = g_string_new (NULL);
+  while ((quote = strchr (name, '"')))
+    {
+      g_string_append_len (unescaped, name, quote-name);
+      name = quote + 2;
+      if (quote[1] == '"')
+        g_string_append_c (unescaped, '"');
+      else
+        break;
+    }
+
+  /* NB: The name variable may point into bad space here */
+  if (quote == NULL)
+    {
+      g_debug ("# filename didn't end with a quote\n");
+      g_string_free (unescaped, TRUE);
+      return NULL;
+    }
+  else if (!g_ascii_isspace (quote[1]))
+    {
+      /* issue a warning here, just so we can guess right from debug logs */
+      g_debug ("# warning: filename didn't contain space after final quote\n");
+    }
+
+  file = g_vfs_ftp_file_new_from_ftp (ftp, unescaped->str);
+
+  g_string_free (unescaped, TRUE);
+  return file;
 }
 
 static void
@@ -236,9 +269,12 @@ gvfs_backend_ftp_determine_default_location (GVfsFtpTask *task)
     }
 
   home = g_vfs_backend_create_file_from_reply (task->backend, reply[0] + 4);
-  g_vfs_backend_set_default_location (G_VFS_BACKEND (task->backend),
-                                      g_vfs_ftp_file_get_gvfs_path (home));
-  g_vfs_ftp_file_free (home);
+  if (home != NULL)
+    {
+      g_vfs_backend_set_default_location (G_VFS_BACKEND (task->backend),
+                                          g_vfs_ftp_file_get_gvfs_path (home));
+      g_vfs_ftp_file_free (home);
+    }
 
   g_strfreev (reply);
 }
