@@ -14,14 +14,14 @@
   <maintainer>
     <foaf:Person>
       <foaf:name>Alexander Larsson</foaf:name>
-      <foaf:mbox rdf:resource="alexl@redhat.com" />
+      <foaf:mbox rdf:resource="mailto:alexl@redhat.com" />
       <gnome:userid>alexl</gnome:userid>
     </foaf:Person>
   </maintainer>
   <maintainer>
     <foaf:Person>
       <foaf:name>Christian Kellner</foaf:name>
-      <foaf:mbox rdf:resource="gicmo@gnome.org" />
+      <foaf:mbox rdf:resource="mailto:gicmo@gnome.org" />
       <gnome:userid>gicmo</gnome:userid>
     </foaf:Person>
   </maintainer>
