@@ -519,6 +519,7 @@ _g_dbus_get_file_info (DBusMessageIter *iter,
   g_object_unref (info);
   g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		       _("Invalid file info format"));
+  dbus_message_iter_next (iter);
   return NULL;
 }
 
