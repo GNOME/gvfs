@@ -1,3 +1,13 @@
+Major changes in 1.6.1
+======================
+* Translation updates
+* client: Always return ERROR_CANCELLED for cancelled operations
+* afc: Don't handle jailbroken phones
+* afc: Detect ipad with right name and icon
+* ftp: Better handling of some PWD results
+* gdu: Support eject of blank cdroms
+* client: Don't loop on problematic dbus input
+
 Major changes in 1.6
 ====================
 * afc: Allow copy of folders
