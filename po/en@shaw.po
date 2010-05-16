@@ -1,12 +1,13 @@
 # Shavian translation for gvfs.
-# Copyright (C) 2009 The Gnome Foundation.
-# Thomas Thurman <tthurman@gnome.org>, 2009.
+# Copyright (C) 2009-2010 The Gnome Foundation.
+# Thomas Thurman <tthurman@gnome.org>, 2010.
+# Transliterate Apple as ·𐑨𐑐𐑩𐑤
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
-"POT-Creation-Date: 2010-04-26 09:22+0000\n"
-"PO-Revision-Date: 2010-05-12 18:37 -0400\n"
+"POT-Creation-Date: 2010-05-12 22:47+0000\n"
+"PO-Revision-Date: 2010-05-16 16:06 -0400\n"
 "Last-Translator: Thomas Thurman <tthurman@gnome.org>\n"
 "Language-Team: Shavian <ubuntu-l10n-en-shaw@launchpad.net>\n"
 "MIME-Version: 1.0\n"
@@ -34,17 +35,15 @@ msgstr "𐑪𐑐𐑼𐑱𐑖𐑩𐑯 𐑯𐑪𐑑 𐑕𐑩𐑐𐑹𐑑𐑩𐑛, 
 msgid "Invalid return value from %s"
 msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑮𐑦𐑑𐑻𐑯 𐑝𐑨𐑤𐑿 𐑓𐑮𐑪𐑥 %s"
 
-#, fuzzy
 #: ../client/gdaemonfile.c:985 ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
-msgstr "𐑒𐑫𐑛𐑯𐑑 𐑜𐑧𐑑 𐑕𐑑𐑮𐑰𐑥 𐑓𐑲𐑤 descriptor"
+msgstr "𐑒𐑫𐑛𐑯𐑑 𐑜𐑧𐑑 𐑕𐑑𐑮𐑰𐑥 𐑓𐑲𐑤 𐑛𐑩𐑕𐑒𐑮𐑦𐑐𐑑𐑼"
 
-#, fuzzy
 #: ../client/gdaemonfile.c:1106 ../client/gdaemonfile.c:1169
 #: ../client/gdaemonfile.c:1232 ../client/gdaemonfile.c:1298
 #: ../client/gdaemonfile.c:2615 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
-msgstr "𐑛𐑦𐑛𐑯𐑑 𐑜𐑧𐑑 𐑕𐑑𐑮𐑰𐑥 𐑓𐑲𐑤 descriptor"
+msgstr "𐑛𐑦𐑛𐑯𐑑 𐑜𐑧𐑑 𐑕𐑑𐑮𐑰𐑥 𐑓𐑲𐑤 𐑛𐑩𐑕𐑒𐑮𐑦𐑐𐑑𐑼"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
@@ -57,11 +56,12 @@ msgstr "𐑒𐑫𐑛 𐑯𐑪𐑑 𐑓𐑲𐑯𐑛 𐑦𐑯𐑒𐑤𐑴𐑟𐑦�
 msgid "Invalid filename %s"
 msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑓𐑲𐑤𐑯𐑱𐑥 %s"
 
-#, fuzzy, c-format
+#, c-format
+#, fuzzy
 #: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1200
 #: ../client/gdaemonvfs.c:1335 ../client/gdaemonvfs.c:1388
 msgid "Error setting file metadata: %s"
-msgstr "𐑻𐑼 𐑛𐑦𐑤𐑰𐑑𐑦𐑙 𐑓𐑲𐑤: %s"
+msgstr "𐑻𐑼 𐑕𐑧𐑑𐑦𐑙 𐑓𐑲𐑤 metadata: %s"
 
 #: ../client/gdaemonfile.c:2233 ../client/gdaemonvfs.c:1389
 msgid "values must be string or list of strings"
@@ -152,15 +152,17 @@ msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑓𐑲𐑤 𐑦𐑯𐑓𐑴 𐑓𐑹𐑥�
 msgid "Invalid attribute info list content"
 msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑩𐑑𐑮𐑦𐑚𐑿𐑑 𐑦𐑯𐑓𐑴 𐑤𐑦𐑕𐑑 𐑒𐑪𐑯𐑑𐑧𐑯𐑑"
 
-#, fuzzy, c-format
+#, c-format
+#, fuzzy
 #: ../common/gvfsdnssdresolver.c:209
 msgid "Error initializing Avahi: %s"
-msgstr "𐑻𐑼 𐑑𐑮𐑨𐑖𐑦𐑙 𐑓𐑲𐑤: %s\n"
+msgstr "𐑻𐑼 initializing Avahi: %s"
 
-#, fuzzy, c-format
+#, c-format
+#, fuzzy
 #: ../common/gvfsdnssdresolver.c:255
 msgid "Error creating Avahi resolver: %s"
-msgstr "𐑻𐑼 𐑒𐑮𐑦𐑱𐑑𐑦𐑙 𐑛𐑲𐑮𐑧𐑒𐑑𐑼𐑦: %s\n"
+msgstr "𐑻𐑼 𐑒𐑮𐑦𐑱𐑑𐑦𐑙 Avahi 𐑮𐑦𐑟𐑪𐑤𐑝𐑼: %s"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -178,12 +180,14 @@ msgstr "𐑻𐑼 𐑮𐑦𐑟𐑪𐑤𐑝𐑦𐑙 \"%s\" 𐑕𐑻𐑝𐑦𐑕 \"
 #. * - the third %s refers to the domain
 #. * - the fourth %s refers to the required TXT keys
 #.
-#, fuzzy, c-format
+#, c-format
 #: ../common/gvfsdnssdresolver.c:1126
 msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
-msgstr "𐑻𐑼 𐑮𐑦𐑟𐑪𐑤𐑝𐑦𐑙 \"%s\" 𐑕𐑻𐑝𐑦𐑕 \"%s\" 𐑪𐑯 𐑛𐑴𐑥𐑱𐑯 \"%s\""
+msgstr ""
+"𐑻𐑼 𐑮𐑦𐑟𐑪𐑤𐑝𐑦𐑙 \"%s\" 𐑕𐑻𐑝𐑦𐑕 \"%s\" 𐑪𐑯 𐑛𐑴𐑥𐑱𐑯 \"%s\". 𐑢𐑳𐑯 𐑹 𐑥𐑹 TXT 𐑮𐑩𐑒𐑹𐑛𐑟 𐑸 𐑥𐑦𐑕𐑦𐑙. "
+"𐑒𐑰𐑟 𐑮𐑦𐑒𐑢𐑲𐑼𐑛: \"%s\"."
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -195,19 +199,18 @@ msgstr "𐑻𐑼 𐑮𐑦𐑟𐑪𐑤𐑝𐑦𐑙 \"%s\" 𐑕𐑻𐑝𐑦𐑕 \"
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
 msgstr "𐑑𐑲𐑥𐑛 𐑬𐑑 𐑮𐑦𐑟𐑪𐑤𐑝𐑦𐑙 \"%s\" 𐑕𐑻𐑝𐑦𐑕 \"%s\" 𐑪𐑯 𐑛𐑴𐑥𐑱𐑯 \"%s\""
 
-#, fuzzy, c-format
+#, c-format
+#, fuzzy
 #: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
 msgid "Malformed dns-sd encoded_triple '%s'"
-msgstr "𐑥𐑨𐑤𐑓𐑹𐑥𐑛 𐑲𐑒𐑪𐑯 𐑲𐑛𐑧𐑯𐑑𐑦𐑓𐑲𐑼 '%s'"
+msgstr "𐑥𐑨𐑤𐑓𐑹𐑥𐑛 dns-sd _encodedtriple '%s'"
 
 #, c-format
-#, fuzzy
 #: ../common/gvfsicon.c:250
 msgid "Can't handle version %d of GVfsIcon encoding"
 msgstr "𐑒𐑭𐑯𐑑 𐑣𐑨𐑯𐑛𐑩𐑤 𐑝𐑻𐑠𐑩𐑯 %d 𐑝 GVfsIcon 𐑧𐑯𐑒𐑴𐑛𐑦𐑙"
 
-#, fuzzy
 #: ../common/gvfsicon.c:260
 msgid "Malformed input data for GVfsIcon"
 msgstr "𐑥𐑨𐑤𐑓𐑹𐑥𐑛 𐑦𐑯𐑐𐑫𐑑 𐑛𐑱𐑑𐑩 𐑓𐑹 GVfsIcon"
@@ -215,7 +218,7 @@ msgstr "𐑥𐑨𐑤𐑓𐑹𐑥𐑛 𐑦𐑯𐑐𐑫𐑑 𐑛𐑱𐑑𐑩 𐑓�
 #, c-format
 #: ../daemon/daemon-main.c:76 ../daemon/daemon-main.c:230
 msgid "Error connecting to D-Bus: %s"
-msgstr "𐑻𐑼 𐑒𐑩𐑯𐑧𐑒𐑑𐑦𐑙 𐑑 D-𐑚𐑳𐑕: %s"
+msgstr "𐑻𐑼 𐑒𐑩𐑯𐑧𐑒𐑑𐑦𐑙 𐑑 ·D-𐑚𐑳𐑕: %s"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "ftp"
@@ -231,10 +234,9 @@ msgid "Error: %s"
 msgstr "𐑻𐑼: %s"
 
 #, c-format
-#, fuzzy
 #: ../daemon/daemon-main.c:155
 msgid "Usage: %s --spawner dbus-id object_path"
-msgstr "𐑿𐑕𐑦𐑡: %s --spawner dbus-𐑦𐑛 object_path"
+msgstr "𐑿𐑕𐑦𐑡: %s --spawner dbus-id _objectpath"
 
 #, c-format
 #: ../daemon/daemon-main.c:179 ../daemon/daemon-main.c:197
@@ -270,42 +272,36 @@ msgstr "𐑒𐑨𐑯𐑕𐑩𐑤"
 msgid "Volume is busy\nOne or more applications are keeping the volume busy."
 msgstr "𐑝𐑪𐑤𐑿𐑥 𐑦𐑟 𐑚𐑦𐑟𐑰\n𐑢𐑳𐑯 𐑹 𐑥𐑹 𐑩𐑐𐑤𐑦𐑒𐑱𐑕𐑩𐑯𐑟 𐑸 𐑒𐑰𐑐𐑦𐑙 𐑞 𐑝𐑪𐑤𐑿𐑥 𐑚𐑦𐑟𐑰."
 
-#, fuzzy
 #: ../daemon/gvfsbackendafc.c:150
 msgid "Internal Apple File Control error"
-msgstr "𐑦𐑯𐑑𐑻𐑯𐑩𐑤 𐑨𐑐𐑤 𐑓𐑲𐑤 𐑒𐑩𐑯𐑑𐑮𐑴𐑤 𐑻𐑼"
+msgstr "𐑦𐑯𐑑𐑻𐑯𐑩𐑤 ·𐑨𐑐𐑩𐑤 𐑓𐑲𐑤 𐑒𐑩𐑯𐑑𐑮𐑴𐑤 𐑻𐑼"
 
 #: ../daemon/gvfsbackendafc.c:154 ../daemon/gvfsbackendftp.c:669
 msgid "File does not exist"
 msgstr "𐑓𐑲𐑤 𐑛𐑳𐑟 𐑯𐑪𐑑 𐑧𐑒𐑟𐑦𐑕𐑑"
 
-#, fuzzy
 #: ../daemon/gvfsbackendafc.c:157
 msgid "The directory is not empty"
 msgstr "𐑞 𐑛𐑲𐑮𐑧𐑒𐑑𐑼𐑦 𐑦𐑟 𐑯𐑪𐑑 𐑧𐑥𐑐𐑑𐑦"
 
-#, fuzzy
 #: ../daemon/gvfsbackendafc.c:161
 msgid "The device did not respond"
 msgstr "𐑞 𐑛𐑦𐑝𐑲𐑕 𐑛𐑦𐑛 𐑯𐑪𐑑 𐑮𐑰𐑕𐑐𐑪𐑯𐑛"
 
-#, fuzzy
 #: ../daemon/gvfsbackendafc.c:165
 msgid "The connection was interrupted"
 msgstr "𐑞 𐑒𐑩𐑯𐑧𐑒𐑖𐑩𐑯 𐑢𐑪𐑟 𐑦𐑯𐑑𐑼𐑳𐑐𐑑𐑩𐑛"
 
-#, fuzzy
 #: ../daemon/gvfsbackendafc.c:169
 msgid "Invalid Apple File Control data received"
-msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑨𐑐𐑤 𐑓𐑲𐑤 𐑒𐑩𐑯𐑑𐑮𐑴𐑤 𐑛𐑱𐑑𐑩 𐑮𐑦𐑕𐑰𐑝𐑛"
+msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 ·𐑨𐑐𐑩𐑤 𐑓𐑲𐑤 𐑒𐑩𐑯𐑑𐑮𐑴𐑤 𐑛𐑱𐑑𐑩 𐑮𐑦𐑕𐑰𐑝𐑛"
 
 #, c-format
 #, fuzzy
 #: ../daemon/gvfsbackendafc.c:173
 msgid "Unhandled Apple File Control error (%d)"
-msgstr "Unhandled 𐑨𐑐𐑤 𐑓𐑲𐑤 𐑒𐑩𐑯𐑑𐑮𐑴𐑤 𐑻𐑼 (%d)"
+msgstr "Unhandled ·𐑨𐑐𐑩𐑤 𐑓𐑲𐑤 𐑒𐑩𐑯𐑑𐑮𐑴𐑤 𐑻𐑼 (%d)"
 
-#, fuzzy
 #: ../daemon/gvfsbackendafc.c:190
 msgid "Lockdown Error: Invalid Argument"
 msgstr "𐑤𐑭𐑒𐑛𐑶𐑯 𐑻𐑼: 𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑸𐑜𐑿𐑥𐑩𐑯𐑑"
@@ -343,27 +339,24 @@ msgstr "Unhandled libimobiledevice 𐑻𐑼 (%d)"
 msgid "Invalid mount spec"
 msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑥𐑬𐑯𐑑 𐑕𐑐𐑧𐑒"
 
-#, fuzzy
 #: ../daemon/gvfsbackendafc.c:286
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 AFC 𐑤𐑴𐑒𐑱𐑖𐑩𐑯: 𐑥𐑳𐑕𐑑 𐑚𐑰 𐑦𐑯 𐑞 𐑓𐑹𐑥 𐑝 afc://uuid:𐑐𐑹𐑑-𐑯𐑳𐑥𐑚𐑼"
 
 #, c-format
-#, fuzzy
 #: ../daemon/gvfsbackendafc.c:301
 msgid "Service %d on Apple Mobile Device"
-msgstr "𐑕𐑻𐑝𐑦𐑕 %d 𐑪𐑯 𐑨𐑐𐑤 𐑥𐑴𐑚𐑲𐑤 𐑛𐑦𐑝𐑲𐑕"
+msgstr "𐑕𐑻𐑝𐑦𐑕 %d 𐑪𐑯 ·𐑨𐑐𐑩𐑤 𐑥𐑴𐑚𐑲𐑤 𐑛𐑦𐑝𐑲𐑕"
 
 #, c-format
-#, fuzzy
 #: ../daemon/gvfsbackendafc.c:307
 msgid "Apple Mobile Device"
-msgstr "𐑨𐑐𐑤 𐑥𐑴𐑚𐑲𐑤 𐑛𐑦𐑝𐑲𐑕"
+msgstr "·𐑨𐑐𐑩𐑤 𐑥𐑴𐑚𐑲𐑤 𐑛𐑦𐑝𐑲𐑕"
 
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsbackendafc.c:358
 msgid "%s (%s)"
-msgstr "%s: %s"
+msgstr "%s (%s)"
 
 #: ../daemon/gvfsbackendafc.c:498 ../daemon/gvfsbackendarchive.c:632
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1886
@@ -372,7 +365,7 @@ msgstr "%s: %s"
 msgid "Can't open directory"
 msgstr "𐑒𐑭𐑯𐑑 𐑴𐑐𐑩𐑯 𐑛𐑲𐑮𐑧𐑒𐑑𐑼𐑦"
 
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsbackendafc.c:506 ../daemon/gvfsbackendarchive.c:624
 #: ../daemon/gvfsbackendarchive.c:668 ../daemon/gvfsbackendarchive.c:720
 #: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendcdda.c:986
@@ -381,14 +374,12 @@ msgstr "𐑒𐑭𐑯𐑑 𐑴𐑐𐑩𐑯 𐑛𐑲𐑮𐑧𐑒𐑑𐑼𐑦"
 #: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
 #: ../daemon/gvfsbackendsmbbrowse.c:1324 ../daemon/gvfsbackendsmbbrowse.c:1394
 msgid "File doesn't exist"
-msgstr "𐑓𐑲𐑤 𐑛𐑳𐑟 𐑯𐑪𐑑 𐑧𐑒𐑟𐑦𐑕𐑑"
+msgstr "𐑓𐑲𐑤 𐑛𐑳𐑟𐑯𐑑 𐑧𐑒𐑟𐑦𐑕𐑑"
 
-#, fuzzy
 #: ../daemon/gvfsbackendafc.c:614 ../daemon/gvfsbackendafc.c:1353
 msgid "Backups are not yet supported."
 msgstr "𐑚𐑨𐑒𐑩𐑐𐑕 𐑸 𐑯𐑪𐑑 𐑘𐑧𐑑 𐑕𐑩𐑐𐑹𐑑𐑩𐑛."
 
-#, fuzzy
 #: ../daemon/gvfsbackendafc.c:752
 msgid "Invalid seek type"
 msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑕𐑰𐑒 𐑑𐑲𐑐"
@@ -515,7 +506,6 @@ msgstr "𐑒𐑭𐑯𐑑 recursively 𐑒𐑪𐑐𐑦 𐑛𐑲𐑮𐑧𐑒𐑑�
 msgid "Not supported"
 msgstr "𐑯𐑪𐑑 𐑕𐑩𐑐𐑹𐑑𐑩𐑛"
 
-#, fuzzy
 #: ../daemon/gvfsbackendcdda.c:332 ../daemon/gvfsbackendgphoto2.c:1510
 msgid "Cannot create gudev client"
 msgstr "𐑒𐑨𐑯𐑪𐑑 𐑒𐑮𐑦𐑱𐑑 gudev 𐑒𐑤𐑲𐑩𐑯𐑑"
@@ -524,12 +514,10 @@ msgstr "𐑒𐑨𐑯𐑪𐑑 𐑒𐑮𐑦𐑱𐑑 gudev 𐑒𐑤𐑲𐑩𐑯𐑑
 msgid "Cannot connect to the system bus"
 msgstr "𐑒𐑨𐑯𐑪𐑑 𐑒𐑩𐑯𐑧𐑒𐑑 𐑑 𐑞 𐑕𐑦𐑕𐑑𐑩𐑥 𐑚𐑳𐑕"
 
-#, fuzzy
 #: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1540
 msgid "Cannot create libhal context"
 msgstr "𐑒𐑨𐑯𐑪𐑑 𐑒𐑮𐑦𐑱𐑑 libhal 𐑒𐑪𐑯𐑑𐑧𐑒𐑕𐑑"
 
-#, fuzzy
 #: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1553
 msgid "Cannot initialize libhal"
 msgstr "𐑒𐑨𐑯𐑪𐑑 𐑦𐑯𐑦𐑖𐑩𐑤𐑲𐑟 libhal"
@@ -549,10 +537,10 @@ msgid "Drive %s does not contain audio files"
 msgstr "𐑛𐑮𐑲𐑝 %s 𐑛𐑳𐑟 𐑯𐑪𐑑 𐑒𐑩𐑯𐑑𐑱𐑯 𐑷𐑛𐑦𐑴 𐑓𐑲𐑤𐑟"
 
 #. Translator: %s is the device the disc is inserted into
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsbackendcdda.c:439
 msgid "cdda mount on %s"
-msgstr "gphoto2 𐑥𐑬𐑯𐑑 𐑪𐑯 %s"
+msgstr "cdda 𐑥𐑬𐑯𐑑 𐑪𐑯 %s"
 
 #, c-format
 #: ../daemon/gvfsbackendcdda.c:440 ../daemon/gvfsbackendcdda.c:960
@@ -561,12 +549,12 @@ msgstr "gphoto2 𐑥𐑬𐑯𐑑 𐑪𐑯 %s"
 msgid "Audio Disc"
 msgstr "𐑷𐑛𐑦𐑴 𐑛𐑦𐑕𐑒"
 
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsbackendcdda.c:503
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
-msgstr[0] "𐑓𐑲𐑤𐑕𐑦𐑕𐑑𐑩𐑥 𐑦𐑟 𐑚𐑦𐑟𐑰"
-msgstr[1] "𐑓𐑲𐑤𐑕𐑦𐑕𐑑𐑩𐑥 𐑦𐑟 𐑚𐑦𐑟𐑰"
+msgstr[0] "𐑓𐑲𐑤 𐑕𐑦𐑕𐑑𐑩𐑥 𐑦𐑟 𐑚𐑦𐑟𐑰: %d 𐑴𐑐𐑩𐑯 𐑓𐑲𐑤"
+msgstr[1] "𐑓𐑲𐑤 𐑕𐑦𐑕𐑑𐑩𐑥 𐑦𐑟 𐑚𐑦𐑟𐑰: %d 𐑴𐑐𐑩𐑯 𐑓𐑲𐑤𐑟"
 
 #, c-format
 #: ../daemon/gvfsbackendcdda.c:695
@@ -590,7 +578,6 @@ msgid "No such file"
 msgstr "𐑯𐑴 𐑕𐑳𐑗 𐑓𐑲𐑤"
 
 #, c-format
-#, fuzzy
 #: ../daemon/gvfsbackendcdda.c:993
 msgid "The file does not exist or isn't an audio track"
 msgstr "𐑞 𐑓𐑲𐑤 𐑛𐑳𐑟 𐑯𐑪𐑑 𐑧𐑒𐑟𐑦𐑕𐑑 𐑹 𐑦𐑟𐑯𐑑 𐑩𐑯 𐑷𐑛𐑦𐑴 𐑑𐑮𐑨𐑒"
@@ -603,7 +590,6 @@ msgstr "𐑷𐑛𐑦𐑴 CD 𐑓𐑲𐑤𐑕𐑦𐑕𐑑𐑩𐑥 𐑕𐑻𐑝�
 msgid "Computer"
 msgstr "𐑒𐑩𐑥𐑐𐑿𐑑𐑼"
 
-#, fuzzy
 #: ../daemon/gvfsbackendcomputer.c:521
 msgid "File System"
 msgstr "𐑓𐑲𐑤 𐑕𐑦𐑕𐑑𐑩𐑥"
@@ -676,7 +662,6 @@ msgstr "𐑳𐑯𐑦𐑒𐑕𐑐𐑧𐑒𐑑𐑩𐑛 𐑮𐑦𐑐𐑤𐑲 𐑓�
 msgid "Response invalid"
 msgstr "𐑮𐑦𐑕𐑐𐑪𐑯𐑕 𐑦𐑯𐑝𐑨𐑤𐑦𐑛"
 
-#, fuzzy
 #: ../daemon/gvfsbackenddav.c:1357
 msgid "WebDAV share"
 msgstr "WebDAV 𐑖𐑺"
@@ -690,15 +675,14 @@ msgstr "𐑧𐑯𐑑𐑼 𐑐𐑭𐑕𐑢𐑼𐑛 𐑓𐑹 %s"
 msgid "Please enter proxy password"
 msgstr "𐑐𐑤𐑰𐑟 𐑧𐑯𐑑𐑼 𐑐𐑮𐑪𐑒𐑕𐑦 𐑐𐑭𐑕𐑢𐑼𐑛"
 
-#, fuzzy
 #: ../daemon/gvfsbackenddav.c:1702 ../daemon/gvfsbackenddav.c:1706
 msgid "Not a WebDAV enabled share"
 msgstr "𐑯𐑪𐑑 𐑩 WebDAV 𐑦𐑯𐑱𐑚𐑩𐑤𐑛 𐑖𐑺"
 
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsbackenddav.c:1734
 msgid "WebDAV on %s"
-msgstr "/ 𐑪𐑯 %s"
+msgstr "WebDAV 𐑪𐑯 %s"
 
 #: ../daemon/gvfsbackenddav.c:1794 ../daemon/gvfsbackenddav.c:1867
 msgid "Could not create request"
@@ -732,7 +716,6 @@ msgid "Can't monitor file or directory."
 msgstr "𐑒𐑭𐑯𐑑 𐑥𐑪𐑯𐑦𐑑𐑼 𐑓𐑲𐑤 𐑹 𐑛𐑲𐑮𐑧𐑒𐑑𐑼𐑦."
 
 #. TODO: Names, etc
-#, fuzzy
 #: ../daemon/gvfsbackenddnssd.c:748
 msgid "Dns-SD"
 msgstr "Dns-SD"
@@ -743,32 +726,32 @@ msgid "Network"
 msgstr "𐑯𐑧𐑑𐑢𐑻𐑒"
 
 #. Translators: the first %s is the username, the second the host name
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsbackendftp.c:423
 msgid "Enter password for ftp as %s on %s"
-msgstr "𐑧𐑯𐑑𐑼 𐑐𐑭𐑕𐑢𐑼𐑛 𐑓𐑹 %s"
+msgstr "𐑧𐑯𐑑𐑼 𐑐𐑭𐑕𐑢𐑼𐑛 𐑓𐑹 ftp 𐑨𐑟 %s 𐑪𐑯 %s"
 
 #. translators: %s here is the hostname
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsbackendftp.c:426
 msgid "Enter password for ftp on %s"
-msgstr "𐑧𐑯𐑑𐑼 𐑐𐑭𐑕𐑢𐑼𐑛 𐑓𐑹 %s"
+msgstr "𐑧𐑯𐑑𐑼 𐑐𐑭𐑕𐑢𐑼𐑛 𐑓𐑹 ftp 𐑪𐑯 %s"
 
 #: ../daemon/gvfsbackendftp.c:453 ../daemon/gvfsbackendsftp.c:974
 #: ../daemon/gvfsbackendsmb.c:606 ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
 msgstr "𐑐𐑭𐑕𐑢𐑼𐑛 𐑛𐑲𐑩𐑤𐑪𐑜 𐑒𐑨𐑯𐑕𐑩𐑤𐑛"
 
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsbackendftp.c:563
 msgid "ftp on %s"
-msgstr "/ 𐑪𐑯 %s"
+msgstr "ftp 𐑪𐑯 %s"
 
 #. Translators: the first %s is the username, the second the host name
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsbackendftp.c:567
 msgid "ftp as %s on %s"
-msgstr "%s 𐑪𐑯 %s"
+msgstr "ftp 𐑨𐑟 %s 𐑪𐑯 %s"
 
 #: ../daemon/gvfsbackendftp.c:660
 msgid "Insufficient permissions"
@@ -931,10 +914,9 @@ msgstr "𐑯𐑱𐑥 𐑷𐑤𐑮𐑧𐑛𐑦 𐑧𐑒𐑟𐑦𐑕𐑑𐑕"
 msgid "New name too long"
 msgstr "𐑯𐑿 𐑯𐑱𐑥 𐑑𐑵 𐑤𐑪𐑙"
 
-#, fuzzy
 #: ../daemon/gvfsbackendgphoto2.c:2822 ../daemon/gvfsbackendgphoto2.c:3452
 msgid "Error renaming dir"
-msgstr "𐑻𐑼 𐑮𐑰𐑯𐑱𐑥𐑦𐑙 dir"
+msgstr "𐑻𐑼 𐑮𐑰𐑯𐑱𐑥𐑦𐑙 𐑛𐑽"
 
 #: ../daemon/gvfsbackendgphoto2.c:2835 ../daemon/gvfsbackendgphoto2.c:3465
 msgid "Error renaming file"
@@ -977,20 +959,17 @@ msgstr "𐑻𐑼 𐑮𐑲𐑑𐑦𐑙 𐑓𐑲𐑤"
 msgid "Not supported (not same directory)"
 msgstr "𐑯𐑪𐑑 𐑕𐑩𐑐𐑹𐑑𐑩𐑛 (𐑯𐑪𐑑 𐑕𐑱𐑥 𐑛𐑲𐑮𐑧𐑒𐑑𐑼𐑦)"
 
-#, fuzzy
 #: ../daemon/gvfsbackendgphoto2.c:3409
 msgid "Not supported (src is dir, dst is dir)"
-msgstr "𐑯𐑪𐑑 𐑕𐑩𐑐𐑹𐑑𐑩𐑛 (src 𐑦𐑟 dir, dst 𐑦𐑟 dir)"
+msgstr "𐑯𐑪𐑑 𐑕𐑩𐑐𐑹𐑑𐑩𐑛 (𐑕𐑹𐑕 𐑦𐑟 𐑛𐑽, 𐑛𐑧𐑕𐑑 𐑦𐑟 𐑛𐑽)"
 
-#, fuzzy
 #: ../daemon/gvfsbackendgphoto2.c:3417
 msgid "Not supported (src is dir, dst is existing file)"
-msgstr "𐑯𐑪𐑑 𐑕𐑩𐑐𐑹𐑑𐑩𐑛 (src 𐑦𐑟 dir, dst 𐑦𐑟 𐑧𐑒𐑟𐑦𐑕𐑑𐑦𐑙 𐑓𐑲𐑤)"
+msgstr "𐑯𐑪𐑑 𐑕𐑩𐑐𐑹𐑑𐑩𐑛 (𐑕𐑹𐑕 𐑦𐑟 𐑛𐑽, 𐑛𐑧𐑕𐑑 𐑦𐑟 𐑧𐑒𐑟𐑦𐑕𐑑𐑦𐑙 𐑓𐑲𐑤)"
 
-#, fuzzy
 #: ../daemon/gvfsbackendgphoto2.c:3429
 msgid "Not supported (src is file, dst is dir)"
-msgstr "𐑯𐑪𐑑 𐑕𐑩𐑐𐑹𐑑𐑩𐑛 (src 𐑦𐑟 𐑓𐑲𐑤, dst 𐑦𐑟 dir)"
+msgstr "𐑯𐑪𐑑 𐑕𐑩𐑐𐑹𐑑𐑩𐑛 (𐑕𐑹𐑕 𐑦𐑟 𐑓𐑲𐑤, 𐑛𐑧𐑕𐑑 𐑦𐑟 𐑛𐑽)"
 
 #, c-format
 #: ../daemon/gvfsbackendhttp.c:257
@@ -1024,7 +1003,6 @@ msgstr "𐑯𐑧𐑑𐑢𐑻𐑒 𐑤𐑴𐑒𐑱𐑖𐑩𐑯 𐑥𐑪𐑯𐑦�
 msgid "%s on %s"
 msgstr "%s 𐑪𐑯 %s"
 
-#, fuzzy
 #: ../daemon/gvfsbackendobexftp.c:890
 msgid "USB support missing. Please contact your software vendor"
 msgstr "USB 𐑕𐑩𐑐𐑹𐑑 𐑥𐑦𐑕𐑦𐑙. 𐑐𐑤𐑰𐑟 𐑒𐑪𐑯𐑑𐑨𐑒𐑑 𐑿𐑼 𐑕𐑪𐑓𐑑𐑢𐑺 𐑝𐑧𐑯𐑛𐑻"
@@ -1042,7 +1020,6 @@ msgstr "𐑛𐑦𐑝𐑲𐑕 𐑮𐑦𐑒𐑢𐑲𐑼𐑟 𐑩 𐑕𐑪𐑓𐑑�
 msgid "Error deleting file: %s"
 msgstr "𐑻𐑼 𐑛𐑦𐑤𐑰𐑑𐑦𐑙 𐑓𐑲𐑤: %s"
 
-#, fuzzy
 #: ../daemon/gvfsbackendsftp.c:301 ../daemon/gvfsbackendsftp.c:657
 msgid "ssh program unexpectedly exited"
 msgstr "ssh 𐑐𐑮𐑴𐑜𐑮𐑨𐑥 𐑩𐑯𐑦𐑒𐑕𐑐𐑧𐑒𐑑𐑦𐑛𐑤𐑰 𐑧𐑜𐑟𐑦𐑑𐑩𐑛"
@@ -1068,13 +1045,11 @@ msgstr "𐑒𐑩𐑯𐑧𐑒𐑖𐑩𐑯 𐑮𐑦𐑓𐑿𐑟𐑛 𐑚𐑲 𐑕�
 msgid "Host key verification failed"
 msgstr "𐑣𐑴𐑕𐑑 𐑒𐑰 𐑝𐑧𐑮𐑩𐑓𐑩𐑒𐑱𐑖𐑩𐑯 𐑓𐑱𐑤𐑛"
 
-#, fuzzy
 #: ../daemon/gvfsbackendsftp.c:501
 msgid "Unable to spawn ssh program"
 msgstr "𐑳𐑯𐑱𐑚𐑩𐑤 𐑑 𐑕𐑐𐑭𐑯 ssh 𐑐𐑮𐑴𐑜𐑮𐑨𐑥"
 
 #, c-format
-#, fuzzy
 #: ../daemon/gvfsbackendsftp.c:517
 msgid "Unable to spawn ssh program: %s"
 msgstr "𐑳𐑯𐑱𐑚𐑩𐑤 𐑑 𐑕𐑐𐑭𐑯 ssh 𐑐𐑮𐑴𐑜𐑮𐑨𐑥: %s"
@@ -1129,18 +1104,17 @@ msgid "Protocol error"
 msgstr "𐑐𐑮𐑴𐑑𐑩𐑒𐑪𐑤 𐑻𐑼"
 
 #. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsbackendsftp.c:1679
 msgid "sftp for %s on %s"
-msgstr "%s 𐑪𐑯 %s"
+msgstr "sftp 𐑓𐑹 %s 𐑪𐑯 %s"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsbackendsftp.c:1682
 msgid "sftp on %s"
-msgstr "%s 𐑪𐑯 %s"
+msgstr "sftp 𐑪𐑯 %s"
 
-#, fuzzy
 #: ../daemon/gvfsbackendsftp.c:1723
 msgid "Unable to find supported ssh command"
 msgstr "𐑳𐑯𐑱𐑚𐑩𐑤 𐑑 𐑓𐑲𐑯𐑛 𐑕𐑩𐑐𐑹𐑑𐑩𐑛 ssh 𐑒𐑩𐑥𐑭𐑯𐑛"
@@ -1175,7 +1149,6 @@ msgid "Failure"
 msgstr "𐑓𐑱𐑤𐑘𐑼"
 
 #, c-format
-#, fuzzy
 #: ../daemon/gvfsbackendsftp.c:2438
 msgid "Invalid icon_id '%s' in OpenIconForRead"
 msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 icon_id '%s' 𐑦𐑯 OpenIconForRead"
@@ -1287,10 +1260,10 @@ msgstr "𐑑𐑮𐑨𐑖"
 msgid "Invalid backend type"
 msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑚𐑨𐑒𐑧𐑯𐑛 𐑑𐑲𐑐"
 
-#, fuzzy, c-format
+#, c-format
 #: ../daemon/gvfsdaemonutils.c:104
 msgid "Error sending fd: %s"
-msgstr "𐑻𐑼 𐑴𐑐𐑩𐑯𐑦𐑙 𐑓𐑲𐑤: %s\n"
+msgstr "𐑻𐑼 𐑕𐑧𐑯𐑛𐑦𐑙 fd: %s"
 
 #: ../daemon/gvfsftpconnection.c:180
 msgid "Unexpected end of stream"
@@ -1301,14 +1274,12 @@ msgstr "𐑳𐑯𐑦𐑒𐑕𐑐𐑧𐑒𐑑𐑩𐑛 𐑧𐑯𐑛 𐑝 𐑕𐑑�
 msgid "Invalid reply"
 msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑮𐑦𐑐𐑤𐑲"
 
-#, fuzzy
 #: ../daemon/gvfsftpconnection.c:392
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr "𐑓𐑱𐑤𐑛 𐑑 𐑒𐑮𐑦𐑱𐑑 𐑨𐑒𐑑𐑦𐑝 FTP 𐑒𐑩𐑯𐑧𐑒𐑖𐑩𐑯. 𐑥𐑱𐑚𐑰 𐑿𐑼 𐑮𐑵𐑑𐑼 𐑛𐑳𐑟 𐑯𐑪𐑑 𐑕𐑩𐑐𐑹𐑑 𐑞𐑦𐑕?"
 
-#, fuzzy
 #: ../daemon/gvfsftpconnection.c:399
 msgid "Failed to create active FTP connection."
 msgstr "𐑓𐑱𐑤𐑛 𐑑 𐑒𐑮𐑦𐑱𐑑 𐑨𐑒𐑑𐑦𐑝 FTP 𐑒𐑩𐑯𐑧𐑒𐑖𐑩𐑯."
@@ -1317,7 +1288,6 @@ msgstr "𐑓𐑱𐑤𐑛 𐑑 𐑒𐑮𐑦𐑱𐑑 𐑨𐑒𐑑𐑦𐑝 FTP 𐑒
 msgid "Filename contains invalid characters."
 msgstr "𐑓𐑲𐑤𐑯𐑱𐑥 𐑒𐑩𐑯𐑑𐑱𐑯𐑟 𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑒𐑸𐑩𐑒𐑑𐑼𐑟."
 
-#, fuzzy
 #: ../daemon/gvfsftptask.c:262
 msgid "The FTP server is busy. Try again later"
 msgstr "𐑞 FTP 𐑕𐑻𐑝𐑼 𐑦𐑟 𐑚𐑦𐑟𐑰. 𐑑𐑮𐑲 𐑩𐑜𐑱𐑯 𐑤𐑱𐑑𐑼"
@@ -1376,12 +1346,10 @@ msgstr "𐑮𐑦𐑐𐑤𐑱𐑕 𐑴𐑤𐑛 𐑛𐑰𐑥𐑩𐑯."
 msgid "Don't start fuse."
 msgstr "𐑛𐑴𐑯𐑑 𐑕𐑑𐑸𐑑 𐑓𐑘𐑵𐑟."
 
-#, fuzzy
 #: ../daemon/main.c:58
 msgid "GVFS Daemon"
 msgstr "GVFS 𐑛𐑰𐑥𐑩𐑯"
 
-#, fuzzy
 #: ../daemon/main.c:61
 msgid "Main daemon for GVFS"
 msgstr "𐑥𐑱𐑯 𐑛𐑰𐑥𐑩𐑯 𐑓𐑹 GVFS"
@@ -1408,10 +1376,11 @@ msgstr "𐑑𐑮𐑲 \"%s --help\" 𐑓𐑹 𐑥𐑹 𐑦𐑯𐑓𐑼𐑥𐑱�
 msgid "Invalid arguments from spawned child"
 msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 𐑸𐑜𐑿𐑥𐑩𐑯𐑑𐑕 𐑓𐑮𐑪𐑥 𐑕𐑐𐑪𐑯𐑛 𐑗𐑲𐑤𐑛"
 
-#, fuzzy, c-format
+#, c-format
+#, fuzzy
 #: ../daemon/mount.c:779
 msgid "Automount failed: %s"
-msgstr "𐑻𐑼 𐑥𐑵𐑝𐑦𐑙 𐑓𐑲𐑤: %s"
+msgstr "Automount 𐑓𐑱𐑤𐑛: %s"
 
 #: ../daemon/mount.c:824 ../daemon/mount.c:898
 msgid "The specified location is not mounted"
@@ -1430,12 +1399,13 @@ msgstr "𐑤𐑴𐑒𐑱𐑖𐑩𐑯 𐑦𐑟 𐑷𐑤𐑮𐑧𐑛𐑦 𐑥𐑬�
 msgid "Location is not mountable"
 msgstr "𐑤𐑴𐑒𐑱𐑖𐑩𐑯 𐑦𐑟 𐑯𐑪𐑑 mountable"
 
-#, fuzzy, c-format
+#, c-format
+#, fuzzy
 #: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
 #: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
 #: ../metadata/meta-daemon.c:449
 msgid "Can't find metadata file %s"
-msgstr "𐑒𐑨𐑯𐑪𐑑 𐑓𐑲𐑯𐑛 𐑛𐑮𐑲𐑝 %s"
+msgstr "𐑒𐑭𐑯𐑑 𐑓𐑲𐑯𐑛 metadata 𐑓𐑲𐑤 %s"
 
 #, fuzzy
 #: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
@@ -1467,7 +1437,6 @@ msgstr "GVFS Metadata 𐑛𐑰𐑥𐑩𐑯"
 msgid "Metadata daemon for GVFS"
 msgstr "Metadata 𐑛𐑰𐑥𐑩𐑯 𐑓𐑹 GVFS"
 
-#, fuzzy
 #: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
 msgid "GVfs GDU Volume Monitor"
 msgstr "GVfs GDU 𐑝𐑪𐑤𐑿𐑥 𐑥𐑪𐑯𐑦𐑑𐑼"
@@ -1562,15 +1531,13 @@ msgstr "CD-R 𐑛𐑦𐑕𐑒"
 msgid "Blank CD-R Disc"
 msgstr "𐑚𐑤𐑨𐑙𐑒 CD-R 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
 msgid "CD-RW Disc"
-msgstr "·𐑒·𐑛-RW 𐑛𐑦𐑕𐑒"
+msgstr "CD-RW 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
 msgid "Blank CD-RW Disc"
-msgstr "𐑚𐑤𐑨𐑙𐑒 ·𐑒·𐑛-RW 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑨𐑙𐑒 CD-RW 𐑛𐑦𐑕𐑒"
 
 #: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
 #: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
@@ -1590,15 +1557,13 @@ msgstr "DVD-RAM 𐑛𐑦𐑕𐑒"
 msgid "Blank DVD-RAM Disc"
 msgstr "𐑚𐑤𐑨𐑙𐑒 DVD-RAM 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
 msgid "DVD-RW Disc"
-msgstr "·𐑛·𐑝·𐑛-RW 𐑛𐑦𐑕𐑒"
+msgstr "DVD-RW 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
 msgid "Blank DVD-RW Disc"
-msgstr "𐑚𐑤𐑨𐑙𐑒 ·𐑛·𐑝·𐑛-RW 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑨𐑙𐑒 DVD-RW 𐑛𐑦𐑕𐑒"
 
 #: ../monitor/gphoto2/hal-utils.c:47 ../monitor/hal/hal-utils.c:47
 msgid "DVD+R Disc"
@@ -1608,85 +1573,69 @@ msgstr "DVD+R 𐑛𐑦𐑕𐑒"
 msgid "Blank DVD+R Disc"
 msgstr "𐑚𐑤𐑨𐑙𐑒 DVD+R 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
 msgid "DVD+RW Disc"
-msgstr "·𐑛·𐑝·𐑛+RW 𐑛𐑦𐑕𐑒"
+msgstr "DVD+RW 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
 msgid "Blank DVD+RW Disc"
-msgstr "𐑚𐑤𐑨𐑙𐑒 ·𐑛·𐑝·𐑛+RW 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑨𐑙𐑒 DVD+RW 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:49 ../monitor/hal/hal-utils.c:49
 msgid "DVD+R DL Disc"
-msgstr "·𐑛·𐑝·𐑛+𐑭𐑮 DL 𐑛𐑦𐑕𐑒"
+msgstr "DVD+R DL 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:49 ../monitor/hal/hal-utils.c:49
 msgid "Blank DVD+R DL Disc"
-msgstr "𐑚𐑤𐑨𐑙𐑒 ·𐑛·𐑝·𐑛+𐑭𐑮 DL 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑨𐑙𐑒 DVD+R DL 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:50 ../monitor/hal/hal-utils.c:50
 msgid "Blu-Ray Disc"
-msgstr "Blu-𐑮𐑱 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑵-𐑮𐑱 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:50 ../monitor/hal/hal-utils.c:50
 msgid "Blank Blu-Ray Disc"
-msgstr "𐑚𐑤𐑨𐑙𐑒 Blu-𐑮𐑱 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑨𐑙𐑒 𐑚𐑤𐑵-𐑮𐑱 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:51 ../monitor/hal/hal-utils.c:51
 msgid "Blu-Ray R Disc"
-msgstr "Blu-𐑮𐑱 𐑭𐑮 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑵-𐑮𐑱 𐑭𐑮 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:51 ../monitor/hal/hal-utils.c:51
 msgid "Blank Blu-Ray R Disc"
-msgstr "𐑚𐑤𐑨𐑙𐑒 Blu-𐑮𐑱 𐑭𐑮 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑨𐑙𐑒 𐑚𐑤𐑵-𐑮𐑱 𐑭𐑮 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:52 ../monitor/hal/hal-utils.c:52
 msgid "Blu-Ray RW Disc"
-msgstr "Blu-𐑮𐑱 RW 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑵-𐑮𐑱 RW 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:52 ../monitor/hal/hal-utils.c:52
 msgid "Blank Blu-Ray RW Disc"
-msgstr "𐑚𐑤𐑨𐑙𐑒 Blu-𐑮𐑱 RW 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑨𐑙𐑒 𐑚𐑤𐑵-𐑮𐑱 RW 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:53 ../monitor/hal/hal-utils.c:53
 msgid "HD DVD Disc"
-msgstr "HD ·𐑛·𐑝·𐑛 𐑛𐑦𐑕𐑒"
+msgstr "HD DVD 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:53 ../monitor/hal/hal-utils.c:53
 msgid "Blank HD DVD Disc"
-msgstr "𐑚𐑤𐑨𐑙𐑒 HD ·𐑛·𐑝·𐑛 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑨𐑙𐑒 HD DVD 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:54 ../monitor/hal/hal-utils.c:54
 msgid "HD DVD-R Disc"
-msgstr "HD ·𐑛·𐑝·𐑛-𐑭𐑮 𐑛𐑦𐑕𐑒"
+msgstr "HD DVD-𐑭𐑮 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:54 ../monitor/hal/hal-utils.c:54
 msgid "Blank HD DVD-R Disc"
-msgstr "𐑚𐑤𐑨𐑙𐑒 HD ·𐑛·𐑝·𐑛-𐑭𐑮 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑨𐑙𐑒 HD DVD-𐑭𐑮 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:55 ../monitor/hal/hal-utils.c:55
 msgid "HD DVD-RW Disc"
-msgstr "HD ·𐑛·𐑝·𐑛-RW 𐑛𐑦𐑕𐑒"
+msgstr "HD DVD-RW 𐑛𐑦𐑕𐑒"
 
-#, fuzzy
 #: ../monitor/gphoto2/hal-utils.c:55 ../monitor/hal/hal-utils.c:55
 msgid "Blank HD DVD-RW Disc"
-msgstr "𐑚𐑤𐑨𐑙𐑒 HD ·𐑛·𐑝·𐑛-RW 𐑛𐑦𐑕𐑒"
+msgstr "𐑚𐑤𐑨𐑙𐑒 HD DVD-RW 𐑛𐑦𐑕𐑒"
 
 #: ../monitor/gphoto2/hal-utils.c:56 ../monitor/hal/hal-utils.c:56
 msgid "MO Disc"
@@ -1712,10 +1661,9 @@ msgstr "CD-ROM"
 msgid "CD-R"
 msgstr "CD-R"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:131
 msgid "CD-RW"
-msgstr "·𐑒·𐑛-RW"
+msgstr "CD-RW"
 
 #: ../monitor/hal/ghaldrive.c:135
 msgid "DVD-ROM"
@@ -1725,19 +1673,17 @@ msgstr "DVD-ROM"
 msgid "DVD+R"
 msgstr "DVD+R"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:139
 msgid "DVD+RW"
-msgstr "·𐑛·𐑝·𐑛+RW"
+msgstr "DVD+RW"
 
 #: ../monitor/hal/ghaldrive.c:141
 msgid "DVD-R"
 msgstr "DVD-R"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:143
 msgid "DVD-RW"
-msgstr "·𐑛·𐑝·𐑛-RW"
+msgstr "DVD-RW"
 
 #: ../monitor/hal/ghaldrive.c:145
 msgid "DVD-RAM"
@@ -1747,40 +1693,33 @@ msgstr "DVD-RA<"
 msgid "DVD±R"
 msgstr "DVD±R"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:151
 msgid "DVD±RW"
-msgstr "·𐑛·𐑝·𐑛±RW"
+msgstr "DVD±RW"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:153
 msgid "HDDVD"
 msgstr "HDDVD"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:155
 msgid "HDDVD-r"
-msgstr "HDDVD-𐑭𐑮"
+msgstr "HDDVD-r"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:157
 msgid "HDDVD-RW"
 msgstr "HDDVD-RW"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:159
 msgid "Blu-ray"
-msgstr "Blu-𐑮𐑱"
+msgstr "𐑚𐑤𐑵-𐑮𐑱"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:161
 msgid "Blu-ray-R"
-msgstr "Blu-𐑮𐑱-𐑭𐑮"
+msgstr "𐑚𐑤𐑵-𐑮𐑱-R"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:163
 msgid "Blu-ray-RE"
-msgstr "Blu-𐑮𐑱-𐑮𐑰"
+msgstr "𐑚𐑤𐑵-𐑮𐑱-RE"
 
 #. translators: This wis something like "CD-ROM/DVD Drive" or
 #. "CD-RW/Blue-ray Drive" depending on the properties of the drive
@@ -1800,7 +1739,6 @@ msgstr "%s 𐑛𐑮𐑲𐑝"
 msgid "Software RAID Drive"
 msgstr "𐑕𐑪𐑓𐑑𐑢𐑺 RAID 𐑛𐑮𐑲𐑝"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:187
 msgid "USB Drive"
 msgstr "USB 𐑛𐑮𐑲𐑝"
@@ -1809,15 +1747,13 @@ msgstr "USB 𐑛𐑮𐑲𐑝"
 msgid "ATA Drive"
 msgstr "ATA 𐑛𐑮𐑲𐑝"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:191
 msgid "SCSI Drive"
 msgstr "SCSI 𐑛𐑮𐑲𐑝"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:193
 msgid "FireWire Drive"
-msgstr "FireWire 𐑛𐑮𐑲𐑝"
+msgstr "·𐑓𐑲𐑼𐑢𐑲𐑼 𐑛𐑮𐑲𐑝"
 
 #: ../monitor/hal/ghaldrive.c:197
 msgid "Tape Drive"
@@ -1838,7 +1774,6 @@ msgstr "MemoryStick 𐑛𐑮𐑲𐑝"
 msgid "SmartMedia Drive"
 msgstr "SmartMedia 𐑛𐑮𐑲𐑝"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:205
 msgid "SD/MMC Drive"
 msgstr "SD/MMC 𐑛𐑮𐑲𐑝"
@@ -1847,10 +1782,9 @@ msgstr "SD/MMC 𐑛𐑮𐑲𐑝"
 msgid "Zip Drive"
 msgstr "𐑟𐑦𐑐 𐑛𐑮𐑲𐑝"
 
-#, fuzzy
 #: ../monitor/hal/ghaldrive.c:209
 msgid "Jaz Drive"
-msgstr "Jaz 𐑛𐑮𐑲𐑝"
+msgstr "·𐑡𐑨𐑟 𐑛𐑮𐑲𐑝"
 
 #: ../monitor/hal/ghaldrive.c:211
 msgid "Thumb Drive"
@@ -1860,20 +1794,20 @@ msgstr "𐑔𐑳𐑥 𐑛𐑮𐑲𐑝"
 msgid "Mass Storage Drive"
 msgstr "𐑥𐑨𐑕 𐑕𐑑𐑹𐑦𐑡 𐑛𐑮𐑲𐑝"
 
-#, fuzzy, c-format
+#, c-format
 #: ../monitor/hal/ghalmount.c:159 ../monitor/hal/ghalvolume.c:163
 msgid "%.1f kB"
-msgstr "%.1f MB"
+msgstr "%.1f kB"
 
 #, c-format
 #: ../monitor/hal/ghalmount.c:164 ../monitor/hal/ghalvolume.c:168
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#, fuzzy, c-format
+#, c-format
 #: ../monitor/hal/ghalmount.c:169 ../monitor/hal/ghalvolume.c:173
 msgid "%.1f GB"
-msgstr "%.1f MB"
+msgstr "%.1f GB"
 
 #: ../monitor/hal/ghalmount.c:323 ../monitor/hal/ghalvolume.c:244
 msgid "Mixed Audio/Data Disc"
@@ -1905,10 +1839,10 @@ msgstr "%s: %s: 𐑻𐑼 𐑴𐑐𐑩𐑯𐑦𐑙 𐑓𐑲𐑤: %s\n"
 
 #. Translators: the first %s is the program name, the
 #. second one is the URI of the file.
-#, fuzzy, c-format
+#, c-format
 #: ../programs/gvfs-cat.c:80
 msgid "%s: %s, error writing to stdout"
-msgstr "%s: %s: 𐑻𐑼 𐑮𐑰𐑛𐑦𐑙: %s\n"
+msgstr "%s: %s, 𐑻𐑼 𐑮𐑲𐑑𐑦𐑙 𐑑 stdout"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1930,7 +1864,6 @@ msgstr "𐑤𐑴𐑒𐑱𐑖𐑩𐑯... - 𐑒𐑩𐑯𐑒𐑨𐑑𐑩𐑯𐑱�
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#, fuzzy
 #: ../programs/gvfs-cat.c:141
 msgid ""
 "Concatenate files at locations and print to the standard output. Works just "
@@ -1948,14 +1881,15 @@ msgid ""
 "other."
 msgstr "𐑯𐑴𐑑: 𐑡𐑳𐑕𐑑 𐑐𐑲𐑐 𐑔𐑮𐑵 cat 𐑦𐑓 𐑿 𐑯𐑰𐑛 𐑦𐑑𐑕 𐑓𐑹𐑥𐑨𐑑𐑦𐑙 𐑪𐑐𐑖𐑩𐑯 𐑤𐑲𐑒 -n, -T 𐑹 𐑳𐑞𐑼."
 
-#, fuzzy, c-format
+#, c-format
+#, fuzzy
 #: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:121
 #: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
 #: ../programs/gvfs-mkdir.c:58 ../programs/gvfs-move.c:109
 #: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
 #: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
 msgid "Error parsing commandline options: %s\n"
-msgstr "𐑻𐑼 𐑥𐑬𐑯𐑑𐑦𐑙 𐑤𐑴𐑒𐑱𐑖𐑩𐑯: %s\n"
+msgstr "𐑻𐑼 𐑐𐑸𐑕𐑦𐑙 commandline 𐑪𐑐𐑖𐑩𐑯𐑟: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -1993,7 +1927,6 @@ msgstr "𐑯𐑧𐑝𐑼 𐑓𐑪𐑤𐑴 𐑕𐑦𐑥𐑚𐑪𐑤𐑦𐑒 𐑤�
 msgid "progress"
 msgstr "𐑐𐑮𐑩𐑜𐑮𐑧𐑕"
 
-#, fuzzy
 #: ../programs/gvfs-copy.c:115
 msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
 msgstr "𐑕𐑹𐑕... 𐑛𐑧𐑕𐑑 - 𐑒𐑪𐑐𐑦 𐑓𐑲𐑤(𐑕) 𐑓𐑮𐑪𐑥 𐑕𐑹𐑕 𐑑 𐑛𐑧𐑕𐑑"
@@ -2122,15 +2055,17 @@ msgstr "𐑒𐑰𐑐 𐑢𐑦𐑞 𐑓𐑲𐑤 𐑢𐑧𐑯 𐑥𐑵𐑝𐑛"
 msgid "Error getting writable attributes: %s\n"
 msgstr "𐑻𐑼 𐑜𐑧𐑑𐑦𐑙 𐑮𐑲𐑑𐑩𐑚𐑩𐑤 𐑩𐑑𐑮𐑦𐑚𐑿𐑑𐑕: %s\n"
 
-#, fuzzy, c-format
+#, c-format
+#, fuzzy
 #: ../programs/gvfs-info.c:312
 msgid "Settable attributes:\n"
-msgstr "𐑤𐑦𐑕𐑑 𐑮𐑲𐑑𐑩𐑚𐑩𐑤 𐑩𐑑𐑮𐑦𐑚𐑿𐑑𐑕"
+msgstr "Settable 𐑩𐑑𐑮𐑦𐑚𐑿𐑑𐑕:\n"
 
-#, fuzzy, c-format
+#, c-format
+#, fuzzy
 #: ../programs/gvfs-info.c:335
 msgid "Writable attribute namespaces:\n"
-msgstr "𐑤𐑦𐑕𐑑 𐑮𐑲𐑑𐑩𐑚𐑩𐑤 𐑩𐑑𐑮𐑦𐑚𐑿𐑑𐑕"
+msgstr "𐑮𐑲𐑑𐑩𐑚𐑩𐑤 𐑩𐑑𐑮𐑦𐑚𐑿𐑑 namespaces:\n"
 
 #: ../programs/gvfs-info.c:362
 msgid "- show info for <location>"
@@ -2171,7 +2106,6 @@ msgstr "- 𐑒𐑮𐑦𐑱𐑑 𐑛𐑲𐑮𐑧𐑒𐑑𐑼𐑦𐑟"
 msgid "Error creating directory: %s\n"
 msgstr "𐑻𐑼 𐑒𐑮𐑦𐑱𐑑𐑦𐑙 𐑛𐑲𐑮𐑧𐑒𐑑𐑼𐑦: %s\n"
 
-#, fuzzy
 #: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
 msgid "Don't send single MOVED events."
 msgstr "𐑛𐑴𐑯𐑑 𐑕𐑧𐑯𐑛 𐑕𐑦𐑙𐑜𐑩𐑤 𐑥𐑵𐑝𐑛 𐑦𐑝𐑧𐑯𐑑𐑕."
@@ -2212,10 +2146,11 @@ msgstr "𐑥𐑪𐑯𐑦𐑑𐑼 𐑦𐑝𐑧𐑯𐑑𐑕"
 msgid "Error mounting location: %s\n"
 msgstr "𐑻𐑼 𐑥𐑬𐑯𐑑𐑦𐑙 𐑤𐑴𐑒𐑱𐑖𐑩𐑯: %s\n"
 
-#, fuzzy, c-format
+#, c-format
+#, fuzzy
 #: ../programs/gvfs-mount.c:241
 msgid "Error unmounting mount: %s\n"
-msgstr "𐑻𐑼 𐑥𐑬𐑯𐑑𐑦𐑙 %s: %s\n"
+msgstr "𐑻𐑼 unmounting 𐑥𐑬𐑯𐑑: %s\n"
 
 #, c-format
 #: ../programs/gvfs-mount.c:262
@@ -2241,7 +2176,6 @@ msgstr "𐑯𐑴 𐑝𐑪𐑤𐑿𐑥 𐑓𐑹 𐑛𐑦𐑝𐑲𐑕 𐑓𐑲𐑤
 msgid "- mount <location>"
 msgstr "- 𐑥𐑬𐑯𐑑 <𐑤𐑴𐑒𐑱𐑖𐑩𐑯>"
 
-#, fuzzy
 #: ../programs/gvfs-move.c:103
 msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
 msgstr "𐑕𐑹𐑕... 𐑛𐑧𐑕𐑑 - 𐑥𐑵𐑝 𐑓𐑲𐑤(𐑕) 𐑓𐑮𐑪𐑥 𐑕𐑹𐑕 𐑑 𐑛𐑧𐑕𐑑"
@@ -2315,12 +2249,10 @@ msgstr "𐑩𐑐𐑧𐑯𐑛 𐑑 𐑧𐑯𐑛 𐑝 𐑓𐑲𐑤"
 msgid "When creating a file, restrict access to the current user only"
 msgstr "𐑢𐑧𐑯 𐑒𐑮𐑦𐑱𐑑𐑦𐑙 𐑩 𐑓𐑲𐑤, 𐑮𐑰𐑕𐑑𐑮𐑦𐑒𐑑 𐑨𐑒𐑕𐑧𐑕 𐑑 𐑞 𐑒𐑳𐑮𐑩𐑯𐑑 𐑿𐑟𐑼 𐑴𐑯𐑤𐑦"
 
-#, fuzzy
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
 msgstr "𐑐𐑮𐑦𐑯𐑑 𐑯𐑿 etag 𐑨𐑑 𐑧𐑯𐑛"
 
-#, fuzzy
 #: ../programs/gvfs-save.c:48
 msgid "The etag of the file being overwritten"
 msgstr "𐑞 etag 𐑝 𐑞 𐑓𐑲𐑤 𐑚𐑰𐑦𐑙 𐑴𐑝𐑻𐑮𐑦𐑑𐑩𐑯"
@@ -2330,7 +2262,6 @@ msgstr "𐑞 etag 𐑝 𐑞 𐑓𐑲𐑤 𐑚𐑰𐑦𐑙 𐑴𐑝𐑻𐑮𐑦�
 msgid "Error opening file: %s\n"
 msgstr "𐑻𐑼 𐑴𐑐𐑩𐑯𐑦𐑙 𐑓𐑲𐑤: %s\n"
 
-#, fuzzy
 #: ../programs/gvfs-save.c:109
 msgid "Error reading stdin"
 msgstr "𐑻𐑼 𐑮𐑰𐑛𐑦𐑙 stdin"
@@ -2341,12 +2272,10 @@ msgid "Error closing: %s\n"
 msgstr "𐑻𐑼 𐑒𐑤𐑴𐑟𐑦𐑙: %s\n"
 
 #, c-format
-#, fuzzy
 #: ../programs/gvfs-save.c:134
 msgid "Etag not available\n"
 msgstr "Etag 𐑯𐑪𐑑 𐑩𐑝𐑱𐑤𐑩𐑚𐑩𐑤\n"
 
-#, fuzzy
 #: ../programs/gvfs-save.c:156
 msgid "DEST - read from standard input and save to DEST"
 msgstr "𐑛𐑧𐑕𐑑 - 𐑮𐑧𐑛 𐑓𐑮𐑪𐑥 𐑕𐑑𐑨𐑯𐑛𐑼𐑛 𐑦𐑯𐑐𐑫𐑑 𐑯 𐑕𐑱𐑝 𐑑 𐑛𐑧𐑕𐑑"
@@ -2395,7 +2324,7 @@ msgstr "𐑻𐑼 𐑑𐑮𐑨𐑖𐑦𐑙 𐑓𐑲𐑤: %s\n"
 #, fuzzy
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symlinks, mounts and shortcuts like dirs"
-msgstr "𐑓𐑪𐑤𐑴 symlinks, 𐑥𐑶𐑯𐑑𐑕 𐑯 𐑖𐑹𐑑𐑒𐑳𐑑𐑕 𐑤𐑲𐑒 dirs"
+msgstr "𐑓𐑪𐑤𐑴 symlinks, 𐑥𐑶𐑯𐑑𐑕 𐑯 𐑖𐑹𐑑𐑒𐑳𐑑𐑕 𐑤𐑲𐑒 𐑛𐑽𐑟"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
