@@ -242,7 +242,7 @@ GDU_REQUIRED=2.29.0
 if test "x$enable_gdu" != "xno"; then
   PKG_CHECK_EXISTS([gdu >= $GDU_REQUIRED], msg_gdu=yes)
 
-  if test "x$msg_gdu" == "xyes"; then
+  if test "x$msg_gdu" = "xyes"; then
     PKG_CHECK_MODULES([GDU],[gdu >= $GDU_REQUIRED])
     AC_DEFINE(HAVE_GDU, 1, [Define to 1 if gnome-disk-utility is available])
   fi
