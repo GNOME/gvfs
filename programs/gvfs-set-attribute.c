@@ -132,7 +132,7 @@ main (int argc, char *argv[])
       return 1;
     }
 
-  if (argc < 1)
+  if (argc < 2)
     {
       g_printerr (_("Location not specified\n"));
       return 1;
@@ -140,7 +140,7 @@ main (int argc, char *argv[])
 
   file = g_file_new_for_commandline_arg (argv[1]);
 
-  if (argc < 2)
+  if (argc < 3)
     {
       g_printerr (_("Attribute not specified\n"));
       return 1;
@@ -149,6 +149,12 @@ main (int argc, char *argv[])
   attribute = argv[2];
 
   type = attribute_type_from_string (attr_type);
+  if ((argc < 4) && (type != G_FILE_ATTRIBUTE_TYPE_INVALID))
+    {
+      g_printerr (_("Value not specified\n"));
+      return 1;
+    }
+
   switch (type)
     {
     case G_FILE_ATTRIBUTE_TYPE_STRING:
