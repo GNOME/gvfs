@@ -33,7 +33,7 @@ static gboolean nofollow_symlinks = FALSE;
 
 static GOptionEntry entries[] =
 {
-  { "type", 't', 0, G_OPTION_ARG_STRING, &attr_type, N_("attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, stringv]"), NULL },
+  { "type", 't', 0, G_OPTION_ARG_STRING, &attr_type, N_("attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, stringv, unset]"), NULL },
   { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symlinks"), NULL },
 	{ NULL }
 };
