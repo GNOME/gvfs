@@ -35,7 +35,7 @@
 #include <glib/gi18n.h>
 
 #include <gio/gio.h>
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gsysutils.h"
 #include "gvfsdaemonutils.h"
 #include "gvfsdaemonprotocol.h"

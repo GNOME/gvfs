@@ -31,7 +31,7 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobmove.h"
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfsjobsetattribute.h"
 

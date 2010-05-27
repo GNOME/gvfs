@@ -30,7 +30,7 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
-#include <gdbusutils.h>
+#include <gvfsdbusutils.h>
 
 #include "gproxyvolumemonitor.h"
 #include "gproxydrive.h"

@@ -32,7 +32,7 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobcopy.h"
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 
 G_DEFINE_TYPE (GVfsJobCopy, g_vfs_job_copy, G_VFS_TYPE_JOB_DBUS)

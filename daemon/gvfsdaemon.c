@@ -42,7 +42,7 @@
 #include <gvfsjobmount.h>
 #include <gvfsjobopenforread.h>
 #include <gvfsjobopenforwrite.h>
-#include <gdbusutils.h>
+#include <gvfsdbusutils.h>
 
 enum {
   PROP_0

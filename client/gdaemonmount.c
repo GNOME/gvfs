@@ -32,7 +32,7 @@
 #include "gvfsdaemondbus.h"
 #include "gdaemonfile.h"
 #include "gvfsdaemonprotocol.h"
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gmountsource.h"
 #include "gmountoperationdbus.h"
 

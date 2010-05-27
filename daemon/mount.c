@@ -32,7 +32,7 @@
 #include "mount.h"
 #include "gmountoperationdbus.h"
 #include "gvfsdaemonprotocol.h"
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include <glib.h>
 #include <gio/gio.h>
 

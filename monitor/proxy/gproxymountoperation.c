@@ -27,7 +27,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <gdbusutils.h>
+#include <gvfsdbusutils.h>
 
 #include "gproxymountoperation.h"
 

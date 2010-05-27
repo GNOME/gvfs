@@ -28,7 +28,7 @@
 #include <gvfsdaemon.h>
 #include <gvfsjob.h>
 #include <gmountspec.h>
-#include <gdbusutils.h>
+#include <gvfsdbusutils.h>
 
 G_BEGIN_DECLS
 

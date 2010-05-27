@@ -23,7 +23,7 @@
 #include <config.h>
 
 #include <gmountsource.h>
-#include <gdbusutils.h>
+#include <gvfsdbusutils.h>
 #include <gio/gio.h>
 #include <gvfsdaemonprotocol.h>
 

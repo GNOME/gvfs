@@ -31,7 +31,7 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobcreatemonitor.h"
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gvfsdaemonutils.h"
 
 G_DEFINE_TYPE (GVfsJobCreateMonitor, g_vfs_job_create_monitor, G_VFS_TYPE_JOB_DBUS)

@@ -58,7 +58,7 @@
 #include <gvfsjobpull.h>
 #include <gvfsjobsetattribute.h>
 #include <gvfsjobqueryattributes.h>
-#include <gdbusutils.h>
+#include <gvfsdbusutils.h>
 
 enum {
   PROP_0,

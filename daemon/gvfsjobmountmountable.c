@@ -31,7 +31,7 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobmountmountable.h"
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gvfsdaemonutils.h"
 
 G_DEFINE_TYPE (GVfsJobMountMountable, g_vfs_job_mount_mountable, G_VFS_TYPE_JOB_DBUS)

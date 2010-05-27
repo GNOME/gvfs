@@ -28,7 +28,7 @@
 #include <locale.h>
 #include <stdlib.h>
 #include <dbus/dbus.h>
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "metatree.h"
 #include "gvfsdaemonprotocol.h"
 

@@ -3,7 +3,7 @@
 #include <glib/gstdio.h>
 #include <dbus/dbus.h>
 #include "gvfsdaemonprotocol.h"
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 
 static gboolean unset = FALSE;
 static gboolean list = FALSE;

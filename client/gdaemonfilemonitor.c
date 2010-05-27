@@ -27,7 +27,7 @@
 #include <gio/gio.h>
 #include <gvfsdaemondbus.h>
 #include <gvfsdaemonprotocol.h>
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gmountspec.h"
 #include "gdaemonfile.h"
 

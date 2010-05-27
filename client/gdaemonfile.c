@@ -37,7 +37,7 @@
 #include <gdaemonfilemonitor.h>
 #include <gdaemonfileenumerator.h>
 #include <glib/gi18n-lib.h>
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gmountoperationdbus.h"
 #include <gio/gio.h>
 #include "metatree.h"

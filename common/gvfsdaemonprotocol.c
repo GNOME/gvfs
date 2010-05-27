@@ -26,7 +26,7 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n-lib.h>
 #include <gvfsdaemonprotocol.h>
-#include <gdbusutils.h>
+#include <gvfsdbusutils.h>
 #include <gio/gio.h>
 
 static const char *

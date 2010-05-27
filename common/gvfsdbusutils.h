@@ -20,8 +20,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_DBUS_UTILS_H__
-#define __G_DBUS_UTILS_H__
+#ifndef __GVFS_DBUS_UTILS_H__
+#define __GVFS_DBUS_UTILS_H__
 
 #include <glib.h>
 #include <dbus/dbus.h>
@@ -92,4 +92,4 @@ void        _g_dbus_connection_call_async           (DBusConnection *connection,
 G_END_DECLS
 
 
-#endif /* __G_DBUS_UTILS_H__ */
+#endif /* __GVFS_DBUS_UTILS_H__ */

@@ -33,7 +33,7 @@
 #include <gvfsdaemonprotocol.h>
 #include <gmodule.h>
 #include "gvfsdaemondbus.h"
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gmountspec.h"
 #include "gvfsurimapper.h"
 #include "gdaemonvolumemonitor.h"

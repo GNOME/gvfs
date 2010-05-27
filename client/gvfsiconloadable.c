@@ -31,7 +31,7 @@
 #include "gdaemonvfs.h"
 #include "gdaemonfileinputstream.h"
 #include "gvfsdaemonprotocol.h"
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 
 /* see comment in common/giconvfs.c for why the GLoadableIcon interface is here */
 

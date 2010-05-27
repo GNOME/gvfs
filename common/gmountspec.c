@@ -27,7 +27,7 @@
 
 #include <glib/gi18n-lib.h>
 
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gmountspec.h"
 
 static GHashTable *unique_hash = NULL;

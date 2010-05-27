@@ -25,7 +25,7 @@
 #include <string.h>
 
 #include <gmounttracker.h>
-#include <gdbusutils.h>
+#include <gvfsdbusutils.h>
 #include <gvfsdaemonprotocol.h>
 
 enum {

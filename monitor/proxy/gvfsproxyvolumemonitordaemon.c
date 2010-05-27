@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <glib/gprintf.h>
 
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gvfsproxyvolumemonitordaemon.h"
 
 /* ---------------------------------------------------------------------------------------------------- */

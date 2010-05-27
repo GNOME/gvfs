@@ -23,7 +23,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include <gdbusutils.h>
+#include <gvfsdbusutils.h>
 
 #include "hal-pool.h"
 #include "hal-marshal.h"

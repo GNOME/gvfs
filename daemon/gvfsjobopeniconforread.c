@@ -32,7 +32,7 @@
 #include <glib/gi18n.h>
 #include "gvfsreadchannel.h"
 #include "gvfsjobopeniconforread.h"
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gvfsdaemonutils.h"
 
 G_DEFINE_TYPE (GVfsJobOpenIconForRead, g_vfs_job_open_icon_for_read, G_VFS_TYPE_JOB_OPEN_FOR_READ)

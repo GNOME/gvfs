@@ -31,7 +31,7 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobenumerate.h"
-#include "gdbusutils.h"
+#include "gvfsdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 
 G_DEFINE_TYPE (GVfsJobEnumerate, g_vfs_job_enumerate, G_VFS_TYPE_JOB_DBUS)

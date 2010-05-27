@@ -35,7 +35,7 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 #include <gio/gio.h>
-#include <gdbusutils.h>
+#include <gvfsdbusutils.h>
 
 #include "gproxyvolumemonitor.h"
 #include "gproxymount.h"

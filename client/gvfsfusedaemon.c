@@ -46,7 +46,7 @@
 /* stuff from common/ */
 #include <gdaemonmount.h>
 #include <gvfsdaemonprotocol.h>
-#include <gdbusutils.h>
+#include <gvfsdbusutils.h>
 
 #define FUSE_USE_VERSION 26
 #include <fuse.h>
