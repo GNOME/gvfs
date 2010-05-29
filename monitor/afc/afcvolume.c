@@ -11,11 +11,8 @@
 
 #include <libimobiledevice/libimobiledevice.h>
 #include <libimobiledevice/lockdown.h>
-#include <libimobiledevice/afc.h>
 
 #include "afcvolume.h"
-
-#define DEFAULT_SERVICE "com.apple.afc"
 
 struct _GVfsAfcVolume {
   GObject parent;
@@ -72,12 +69,11 @@ static int
 _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
 {
   idevice_t dev;
-  afc_client_t afc_cli;
   lockdownd_client_t lockdown_cli = NULL;
   idevice_error_t err;
-  guint retries;
+  guint retries
+  plist_t value;
   char *model, *display_name;
-  guint16 port;
 
   retries = 0;
   do {
@@ -90,7 +86,7 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
   if (err != IDEVICE_E_SUCCESS)
     return 0;
 
-  if (lockdownd_client_new_with_handshake (dev, &lockdown_cli, "gvfs-afc-volume-monitor") != LOCKDOWN_E_SUCCESS)
+  if (lockdownd_client_new (dev, &lockdown_cli, "gvfs-afc-volume-monitor") != LOCKDOWN_E_SUCCESS)
     {
       idevice_free (dev);
       return 0;
@@ -103,32 +99,24 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
       self->name = display_name;
     }
 
-  if (lockdownd_start_service (lockdown_cli, DEFAULT_SERVICE, &port) != LOCKDOWN_E_SUCCESS)
-    {
-      lockdownd_client_free (lockdown_cli);
-      idevice_free (dev);
-      return 0;
-    }
-
-  if (afc_client_new (dev, port, &afc_cli) == AFC_E_SUCCESS)
+  value = NULL;
+  if (lockdownd_get_value (lockdown_cli, NULL, "DeviceClass", &value) == LOCKDOWN_E_SUCCESS)
     {
       /* set correct fd icon spec name depending on device model */
       model = NULL;
-      if (afc_get_device_info_key (afc_cli, "Model", &model) == AFC_E_SUCCESS)
+      plist_get_string_val(value, &model);
+      if (g_str_equal(model, "iPod") != FALSE)
         {
-          if (g_str_has_prefix(model, "iPod") != FALSE)
-            {
-              g_free (self->icon);
-              self->icon = g_strdup ("multimedia-player-apple-ipod-touch");
-            }
-          else if (g_str_has_prefix(model, "iPad") != FALSE)
-            {
-              g_free (self->icon);
-              self->icon = g_strdup ("computer-apple-ipad");
-            }
-          g_free (model);
+          g_free (self->icon);
+          self->icon = g_strdup ("multimedia-player-apple-ipod-touch");
         }
-      afc_client_free(afc_cli);
+      else if (g_str_equal(model, "iPad") != FALSE)
+        {
+          g_free (self->icon);
+          self->icon = g_strdup ("computer-apple-ipad");
+        }
+      g_free (model);
+      plist_free (value);
     }
 
   lockdownd_client_free (lockdown_cli);
