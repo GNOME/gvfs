@@ -189,6 +189,9 @@ g_vfs_backend_lockdownd_check (lockdownd_error_t cond, GVfsJob *job)
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                         _("Lockdown Error: Invalid Argument"));
       break;
+    case LOCKDOWN_E_PASSWORD_PROTECTED:
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                        _("Permission denied"));
     default:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Unhandled Lockdown error (%d)"), cond);
@@ -253,7 +256,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 {
   const char *str;
   char *tmp;
-  char *display_name;
+  char *display_name = NULL;
   guint16 port;
   int virtual_port;
   GMountSpec *real_spec;
@@ -264,6 +267,13 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   char *camera_x_content_types[] = { "x-content/audio-player", "x-content/image-dcf", NULL};
   char *media_player_x_content_types[] = {"x-content/audio-player", NULL};
   char **dcim_afcinfo;
+  plist_t value;
+  lockdownd_error_t lerr;
+  const gchar *choices[] = {_("Cancel"), _("Try again")};
+  gboolean aborted = FALSE;
+  gchar *message = NULL;
+  gint choice;
+  gboolean ret;
 
   self = G_VFS_BACKEND_AFC(backend);
   self->connected = FALSE;
@@ -309,6 +319,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   g_vfs_backend_set_display_name (G_VFS_BACKEND(self), display_name);
   g_free (display_name);
+  display_name = NULL;
 
   real_spec = g_mount_spec_new ("afc");
   tmp = g_strdup_printf ("%40s", (char *) &self->uuid);
@@ -336,13 +347,10 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   if (G_UNLIKELY(g_vfs_backend_idevice_check(err, G_VFS_JOB(job))))
     goto out_destroy_service;
-  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_client_new_with_handshake (self->dev,
-                                                                                     &lockdown_cli,
-                                                                                     "gvfsd-afc"),
-                                                G_VFS_JOB(job))))
-    {
-      goto out_destroy_dev;
-    }
+
+  /* first, connect without handshake to get preliminary information */
+  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_client_new (self->dev, &lockdown_cli, "gvfsd-afc"), G_VFS_JOB(job))))
+    goto out_destroy_dev;
 
   /* try to use pretty device name */
   if (LOCKDOWN_E_SUCCESS == lockdownd_get_device_name (lockdown_cli, &display_name))
@@ -361,9 +369,62 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
             {
               g_vfs_backend_set_display_name (G_VFS_BACKEND(self), display_name);
             }
-          g_free (display_name);
-      }
+        }
     }
+
+  /* set correct fd icon spec name depending on device model */
+  value = NULL;
+  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_get_value (lockdown_cli, NULL, "DeviceClass", &value), G_VFS_JOB(job))))
+    goto out_destroy_lockdown;
+
+  plist_get_string_val (value, &self->model);
+  if ((self->model != NULL) && (g_str_equal (self->model, "iPod") != FALSE))
+    {
+      g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "multimedia-player-apple-ipod-touch");
+    }
+  else if ((self->model != NULL) && (g_str_equal (self->model, "iPad") != FALSE))
+    {
+      g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "computer-apple-ipad");
+    }
+  else
+    {
+      g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "phone-apple-iphone");
+    }
+
+  lockdownd_client_free (lockdown_cli);
+  lockdown_cli = NULL;
+
+  /* now, try to connect with handshake */
+  do {
+    lerr = lockdownd_client_new_with_handshake (self->dev,
+                                                &lockdown_cli,
+                                                "gvfsd-afc");
+    if (lerr != LOCKDOWN_E_PASSWORD_PROTECTED)
+      break;
+
+    aborted = FALSE;
+    if (!message)
+      /* translators:
+       * %s is the device name. 'Try again' is the caption of the button
+       * shown in the dialog which is defined above. */
+      message = g_strdup_printf (_("Device '%s' is password protected. Enter the password on the device and click 'Try again'."), display_name);
+
+    ret = g_mount_source_ask_question (src,
+                                       message,
+                                       choices,
+                                       2,
+                                       &aborted,
+                                       &choice);
+    if (!ret || aborted || (choice == 0))
+      break;
+  } while (1);
+
+  g_free (display_name);
+  display_name = NULL;
+  g_free (message);
+
+  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
+    goto out_destroy_dev;
 
   if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_start_service (lockdown_cli,
                                                                          self->service, &port),
@@ -376,23 +437,6 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
                                           G_VFS_JOB(job))))
     {
       goto out_destroy_lockdown;
-    }
-
-  /* set correct fd icon spec name depending on device model */
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_get_device_info_key (self->afc_cli, "Model", &self->model), G_VFS_JOB(job))))
-    goto out_destroy_afc;
-
-  if ((self->model != NULL) && (strstr(self->model, "iPod") != NULL))
-    {
-      g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "multimedia-player-apple-ipod-touch");
-    }
-  else if ((self->model != NULL) && (strstr(self->model, "iPad") != NULL))
-    {
-      g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "computer-apple-ipad");
-    }
-  else
-    {
-      g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "phone-apple-iphone");
     }
 
   /* lockdown connection is not needed anymore */
@@ -413,9 +457,6 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   g_vfs_job_succeeded (G_VFS_JOB(job));
   return;
 
-out_destroy_afc:
-  afc_client_free (self->afc_cli);
-
 out_destroy_lockdown:
   lockdownd_client_free (lockdown_cli);
 
@@ -424,7 +465,8 @@ out_destroy_dev:
 
 out_destroy_service:
   g_free (self->service);
-  g_free(self->model);
+  g_free (self->model);
+  g_free (display_name);
 }
 
 static void
