@@ -71,7 +71,7 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
   idevice_t dev;
   lockdownd_client_t lockdown_cli = NULL;
   idevice_error_t err;
-  guint retries
+  guint retries;
   plist_t value;
   char *model, *display_name;
 
