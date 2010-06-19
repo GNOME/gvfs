@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs-master-po-gl-70600.merged\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-03 23:38+0200\n"
-"PO-Revision-Date: 2010-06-03 23:38+0200\n"
+"POT-Creation-Date: 2010-06-19 03:34+0200\n"
+"PO-Revision-Date: 2010-06-20 00:55+0200\n"
 "Last-Translator: Fran Diéguez <frandieguez@ubuntu.com>\n"
 "Language-Team: Galician <gnome@g11.net>\n"
 "MIME-Version: 1.0\n"
@@ -561,7 +561,7 @@ msgstr "Non é posíbel encontrar o dispositivo %s"
 #: ../daemon/gvfsbackendcdda.c:430
 #, c-format
 msgid "Drive %s does not contain audio files"
-msgstr "O dispositivo %s non contén ficheiros de audio"
+msgstr "O dispositivo %s non contén ficheiros de son"
 
 #. Translator: %s is the device the disc is inserted into
 #: ../daemon/gvfsbackendcdda.c:439
@@ -574,7 +574,7 @@ msgstr "CDDA montado en %s"
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #, c-format
 msgid "Audio Disc"
-msgstr "Disco de audio"
+msgstr "Disco de son"
 
 #: ../daemon/gvfsbackendcdda.c:503
 #, c-format
@@ -607,11 +607,11 @@ msgstr "Non existe ese ficheiro"
 #: ../daemon/gvfsbackendcdda.c:993
 #, c-format
 msgid "The file does not exist or isn't an audio track"
-msgstr "O ficheiro non existe ou non é unha pista de audio"
+msgstr "O ficheiro non existe ou non é unha pista de son"
 
 #: ../daemon/gvfsbackendcdda.c:1099
 msgid "Audio CD Filesystem Service"
-msgstr "Servizo de sistemas de ficheiros de CD de audio"
+msgstr "Servizo de sistemas de ficheiros de CD de son"
 
 #: ../daemon/gvfsbackendcomputer.c:192 ../daemon/gvfsbackendcomputer.c:756
 msgid "Computer"
@@ -832,7 +832,7 @@ msgstr "Cámara %s"
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
-msgstr "Reprodutor de audio %s"
+msgstr "Reprodutor de son %s"
 
 #: ../daemon/gvfsbackendgphoto2.c:961 ../monitor/gphoto2/ggphoto2volume.c:203
 #: ../monitor/gphoto2/ggphoto2volume.c:308
@@ -841,7 +841,7 @@ msgstr "Cámara"
 
 #: ../daemon/gvfsbackendgphoto2.c:963 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
-msgstr "Reprodutor de audio"
+msgstr "Reprodutor de son"
 
 #: ../daemon/gvfsbackendgphoto2.c:1569
 msgid "No device specified"
@@ -1825,7 +1825,7 @@ msgstr "%.1f GB"
 
 #: ../monitor/hal/ghalmount.c:323 ../monitor/hal/ghalvolume.c:244
 msgid "Mixed Audio/Data Disc"
-msgstr "Disco mixto de audio e datos"
+msgstr "Disco mixto de son e datos"
 
 #. Translators: %s is the size of the mount (e.g. 512 MB)
 #. Translators: %s is the size of the volume (e.g. 512 MB)
