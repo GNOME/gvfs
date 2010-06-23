@@ -595,7 +595,7 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
                                        type == 'l' ? G_FILE_TYPE_SYMBOLIC_LINK :
                                        G_FILE_TYPE_DIRECTORY);
 
-      if (unix)
+      if (is_unix)
         g_file_info_set_is_hidden (info, result.fe_fnlen > 0 &&
                                          result.fe_fname[0] == '.');
 
