@@ -1,3 +1,12 @@
+Major changes in 1.6.3
+======================
+* translation updates
+* fix the build against recent glib
+* afc: remove com.apple.afc dependency
+* afc: add password dialog
+* ftp: fix undeclared variable
+* ssh: improve password dialog
+
 Major changes in 1.6.1
 ======================
 * Translation updates
