@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs-master-po-gl-70600.merged\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-07 18:17+0200\n"
-"PO-Revision-Date: 2010-07-07 18:17+0200\n"
+"POT-Creation-Date: 2010-07-20 13:56+0200\n"
+"PO-Revision-Date: 2010-07-20 13:56+0200\n"
 "Last-Translator: Fran Diéguez <frandieguez@ubuntu.com>\n"
-"Language-Team: Galician <gnome@g11n.net>\n"
+"Language-Team: Galician <gnome-gl-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -179,7 +179,7 @@ msgstr "Produciuse un erro ao crear o resolvedor Avahi: %s"
 #: ../common/gvfsdnssdresolver.c:1100
 #, c-format
 msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr "Produciuse un erro ao resolver \"%s\" servizo \"%s\" no dominio \"%s\""
+msgstr "Produciuse un erro ao resolver «%s» servizo «%s» no dominio «%s»"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -193,8 +193,8 @@ msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
 msgstr ""
-"Produciuse un erro ao resolver \"%s\" o servizo \"%s\" no dominio \"%s\". "
-"Falta un ou máis rexistros TXT. Requírense as chaves: \"%s\"."
+"Produciuse un erro ao resolver «%s» o servizo «%s» no dominio «%s». Falta un ou "
+"máis rexistros TXT. Requírense as chaves: «%s»."
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -204,15 +204,13 @@ msgstr ""
 #: ../common/gvfsdnssdresolver.c:1143
 #, c-format
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr ""
-"Excedeuse o tempo de espera resolvendo \"%s\" servizo \"%s\" no dominio \"%s"
-"\""
+msgstr "Excedeuse o tempo de espera resolvendo «%s» servizo «%s» no dominio «%s»"
 
 #: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
 #, c-format
 msgid "Malformed dns-sd encoded_triple '%s'"
-msgstr "'%s' dns-sd encoded_triple formado incorrectamente"
+msgstr "«%s» dns-sd encoded_triple formado incorrectamente"
 
 #: ../common/gvfsicon.c:250
 #, c-format
@@ -905,12 +903,12 @@ msgstr "Produciuse un erro ao obter os datos do ficheiro"
 #: ../daemon/gvfsbackendgphoto2.c:1985
 #, c-format
 msgid "Malformed icon identifier '%s'"
-msgstr "Identificador de iconas '%s' malformado"
+msgstr "Identificador de iconas «%s» malformado"
 
 #: ../daemon/gvfsbackendgphoto2.c:2061 ../daemon/gvfsbackendgphoto2.c:3250
 #, c-format
 msgid "Error seeking in stream on camera %s"
-msgstr "Produciuse un erro ao buscar no fluxo na cámara '%s'"
+msgstr "Produciuse un erro ao buscar no fluxo na cámara «%s»"
 
 #: ../daemon/gvfsbackendgphoto2.c:2201 ../daemon/gvfsbackendsftp.c:2952
 #: ../daemon/gvfsbackendsmbbrowse.c:1390
@@ -948,7 +946,7 @@ msgstr "Produciuse un erro ao renomear o ficheiro"
 #: ../daemon/gvfsbackendgphoto2.c:2899
 #, c-format
 msgid "Directory '%s' is not empty"
-msgstr "O cartafol non '%s' está baleiro"
+msgstr "O cartafol non «%s» está baleiro"
 
 #: ../daemon/gvfsbackendgphoto2.c:2910
 msgid "Error deleting directory"
@@ -1184,7 +1182,7 @@ msgstr "Fallo"
 #: ../daemon/gvfsbackendsftp.c:2450
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
-msgstr "icon_id '%s' non correcta en OpenIconForRead"
+msgstr "icon_id «%s» non correcta en OpenIconForRead"
 
 #: ../daemon/gvfsbackendsftp.c:2746
 #, c-format
@@ -1511,7 +1509,7 @@ msgstr "Non foi posíbel obter o escravo LUKS en texto claro"
 #: ../monitor/gdu/ggdumount.c:1006
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
-msgstr "Non foi posíbel obter o escravo LUKS en texto claro no camiño '%s'"
+msgstr "Non foi posíbel obter o escravo LUKS en texto claro no camiño «%s»"
 
 #: ../monitor/gdu/ggduvolume.c:325
 msgid "Floppy Disk"
@@ -1524,7 +1522,7 @@ msgid ""
 "The device \"%s\" contains encrypted data on partition %d."
 msgstr ""
 "Introduza un contrasinal para desbloquear  o volume\n"
-"O dispositivo \"%s\" contén datos cifrados na partición %d."
+"O dispositivo «%s» contén datos cifrados na partición %d."
 
 #: ../monitor/gdu/ggduvolume.c:1082
 #, c-format
@@ -1533,7 +1531,7 @@ msgid ""
 "The device \"%s\" contains encrypted data."
 msgstr ""
 "Introduza un contrasinal para desbloquear o volume\n"
-"O dispositivo \"%s\" contén datos cifrados."
+"O dispositivo «%s» contén datos cifrados."
 
 #: ../monitor/gdu/ggduvolume.c:1089
 #, c-format
@@ -2353,6 +2351,3 @@ msgstr "Seguir as ligazóns simbólicas, montaxes e atallos coma cartafoles"
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
 msgstr "- listar contidos dos cartafoles no formato en árbore"
-
-#~ msgid "Enter password"
-#~ msgstr "Introduza o contrasinal"
