@@ -1,4 +1,4 @@
-# Slovenian translation of gvfs.
+# Slovenian translations for gvfs.
 # Copyright (C) 2005-2006 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gvfs package.
 #
@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs\n"
+"Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
 "POT-Creation-Date: 2010-07-02 11:28+0000\n"
-"PO-Revision-Date: 2010-07-05 07:18+0100\n"
+"PO-Revision-Date: 2010-08-13 21:27+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -312,7 +312,7 @@ msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
 msgstr ""
-"Pogon je zaseden\n"
+"Pogon je zaseden.\n"
 "En ali več programov ohranjajo pogon zaposlen."
 
 #: ../daemon/gvfsbackendafc.c:150
@@ -589,7 +589,7 @@ msgstr "Datoteka obstaja"
 #: ../monitor/gdu/ggdumount.c:1257
 #: ../monitor/gdu/ggduvolume.c:1595
 msgid "Operation not supported by backend"
-msgstr "Hrbtenica ne podpira dejanja"
+msgstr "Zaledje ne podpira dejanja"
 
 #: ../daemon/gvfsbackendburn.c:853
 msgid "No such file or directory in target path"
@@ -1379,7 +1379,7 @@ msgstr "Notranja napaka (%s)"
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:611
 msgid "Failed to mount Windows share"
-msgstr "Napaka med priklapljanjem souporabne mape z Windows sistemom"
+msgstr "Napaka med priklapljanjem mape souporabe z Windows sistemom"
 
 #: ../daemon/gvfsbackendsmb.c:772
 #: ../daemon/gvfsbackendsmb.c:1268
@@ -2115,7 +2115,7 @@ msgstr "Združevanje datotek na mestih in pri tiskanju preko standardnega odvoda
 
 #: ../programs/gvfs-cat.c:148
 msgid "Note: just pipe through cat if you need its formatting option like -n, -T or other."
-msgstr "Opomba: uporaba cevi z ukazom cat je koristna, kadae potrebujete možnosti oblikovanja kot so -n, -T in druge."
+msgstr "Opomba: uporaba cevi z ukazom cat je koristna, kadar potrebujete možnosti oblikovanja kot so -n, -T in druge."
 
 #: ../programs/gvfs-cat.c:161
 #: ../programs/gvfs-copy.c:121
@@ -2185,7 +2185,7 @@ msgstr "Manjkajoči operand\n"
 #: ../programs/gvfs-copy.c:140
 #: ../programs/gvfs-move.c:128
 msgid "Too many arguments\n"
-msgstr "Rreveč argumentov\n"
+msgstr "Preveč argumentov\n"
 
 #: ../programs/gvfs-copy.c:149
 #: ../programs/gvfs-move.c:137
@@ -2291,7 +2291,7 @@ msgstr "skrito\n"
 
 #: ../programs/gvfs-info.c:266
 msgid "Copy with file"
-msgstr "Kopirj z datoteko"
+msgstr "Kopiraj z datoteko"
 
 #: ../programs/gvfs-info.c:270
 msgid "Keep with file when moved"
@@ -2491,7 +2491,7 @@ msgstr "Pripni na konec datoteke"
 
 #: ../programs/gvfs-save.c:46
 msgid "When creating a file, restrict access to the current user only"
-msgstr "Ob ustvarjanju datoteke, omogoči dostop le trenutnemu uporabniku"
+msgstr "Med ustvarjanjem datoteke, omogoči dostop le trenutnemu uporabniku"
 
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
@@ -2574,65 +2574,3 @@ msgstr "Sledi simbolnim povezavam, priklopom in bližnjicam map"
 msgid "- list contents of directories in a tree-like format"
 msgstr "- izpiši vsebino map v drevesni obliki"
 
-#~ msgid "Enter password"
-#~ msgstr "Vnos gesla"
-
-#~ msgid "- output files at <location>"
-#~ msgstr "- odvod datotek na <mesto>"
-
-#~ msgid "Invalid return value from get_info"
-#~ msgstr "Vrnjena neveljavna vrednost get_info"
-
-#~ msgid "Invalid return value from query_info"
-#~ msgstr "Vrnjena neveljavna vrednost query_info"
-
-#~ msgid "Invalid return value from call"
-#~ msgstr "Vrnjena neveljavna vrednost call"
-
-#~ msgid "Invalid return value from get_filesystem_info"
-#~ msgstr "Vrnjena neveljavna vrednost get_filesystem_info"
-
-#~ msgid "Invalid return value from query_filesystem_info"
-#~ msgstr "Vrnjena neveljavna vrednost query_filesystem_info"
-
-#~ msgid "Invalid return value from monitor_dir"
-#~ msgstr "Vrnjena neveljavna vrednost monitor_dir"
-
-#~ msgid "Invalid return value from monitor_file"
-#~ msgstr "Vrnjena neveljavna vrednost monitor_file"
-
-#~ msgid "Invalid return value from open_icon_for_read"
-#~ msgstr "Vrnjena neveljavna vrednost open_icon_for_read"
-
-#~ msgid "The query info operation is not supported"
-#~ msgstr "Dejanje info poizvedbe ni podprto"
-
-#~ msgid "Query info not supported on stream"
-#~ msgstr "Poizvedba podrobnosti na pretoku ni podprta"
-
-#~ msgid "broken transmission"
-#~ msgstr "prekinjeno oddajanje"
-
-#~ msgid "Could not connect to host"
-#~ msgstr "Ni se mogoče povezati z gostiteljem"
-
-#~ msgid "filename too long"
-#~ msgstr "ime datoteke je predolgo"
-
-#~ msgid "Invalid destination filename"
-#~ msgstr "Neveljavno ciljno ime datoteke"
-
-#~ msgid "Can't delete trash"
-#~ msgstr "Ni mogoče izbrisati smeti"
-
-#~ msgid "Can't pull trash"
-#~ msgstr "No mogoče povleči smeti"
-
-#~ msgid "dns-sd"
-#~ msgstr "dns-sd"
-
-#~ msgid "%s (in trash)"
-#~ msgstr "%s (v smeteh)"
-
-#~ msgid "Trash directory notification not supported"
-#~ msgstr "Opozorila mape smeti niso podprta"
