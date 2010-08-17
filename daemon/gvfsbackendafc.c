@@ -43,6 +43,14 @@ int g_blocksize = 4096; /* assume this is the default block size */
 #define AFC_E_INVALID_ARG AFC_E_INVALID_ARGUMENT
 #endif /* !AFC_E_INVALID_ARG */
 
+typedef enum {
+  IOS_UNKNOWN = 0,
+  IOS1,
+  IOS2,
+  IOS3,
+  IOS4
+} HostOSVersion;
+
 struct _GVfsBackendAfc {
   GVfsBackend backend;
 
@@ -50,6 +58,7 @@ struct _GVfsBackendAfc {
   char *service;
   char *model;
   gboolean connected;
+  HostOSVersion version;
 
   idevice_t dev;
   afc_client_t afc_cli;
@@ -389,6 +398,42 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   else
     {
       g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "phone-apple-iphone");
+    }
+
+  /* Get the major OS version */
+  value = NULL;
+  self->version = IOS_UNKNOWN;
+  if (G_LIKELY(g_vfs_backend_lockdownd_check (lockdownd_get_value (lockdown_cli, NULL, "ProductVersion", &value), G_VFS_JOB(job)) == 0))
+    {
+      if (plist_get_node_type(value) == PLIST_STRING)
+        {
+          char *version_string = NULL;
+
+          plist_get_string_val(value, &version_string);
+          if (version_string)
+            {
+              /* parse version */
+              int maj = 0;
+              int min = 0;
+              int rev = 0;
+
+              sscanf(version_string, "%d.%d.%d", &maj, &min, &rev);
+              free(version_string);
+
+              switch (maj)
+                {
+                case 2:
+                  self->version = IOS2;
+                  break;
+                case 3:
+                  self->version = IOS3;
+                  break;
+                case 4:
+                  self->version = IOS4;
+                  break;
+                }
+            }
+        }
     }
 
   lockdownd_client_free (lockdown_cli);
@@ -1026,33 +1071,98 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
       strlen (basename) > 4 &&
       basename[strlen(basename) - 4] == '.')
     {
-      char *thumb_uri, *thumb_base, *thumb_path;
-      char *parent, *ptr, *no_suffix;
+      char *thumb_uri, *thumb_path;
+      char *no_suffix;
       char **thumb_afcinfo;
       GFile *thumb_file;
+      const char *suffix;
 
       GMountSpec *mount_spec;
       const char *port;
 
-      /* Parent directory */
-      ptr = strrchr (path, '/');
-      if (ptr == NULL)
-        return;
-      parent = g_strndup (path, ptr - path);
+      /* Handle thumbnails for movies as well */
+      if (g_str_has_suffix (path, ".MOV"))
+        suffix = "JPG";
+      else
+        suffix = "THM";
 
-      /* Basename with suffix replaced */
-      no_suffix = g_strndup (basename, strlen (basename) - 3);
-      thumb_base = g_strdup_printf ("%s%s", no_suffix, "THM");
-      g_free (no_suffix);
+      if (self->version == IOS2)
+        {
+          /* The thumbnails are side-by-side with the
+           * THM files in iOS2 */
 
-      /* Full thumbnail path */
-      thumb_path = g_build_filename (parent, ".MISC", thumb_base, NULL);
+          /* Remove the suffix */
+          no_suffix = g_strndup (path, strlen (path) - 3);
+          /* Replace with THM */
+          thumb_path = g_strdup_printf ("%s%s", no_suffix, suffix);
+          g_free (no_suffix);
+        }
+      else if (self->version == IOS3)
+        {
+          char *parent, *ptr;
+          char *thumb_base;
 
-      g_free (parent);
-      g_free (thumb_base);
+          /* The thumbnails are in the .MISC sub-directory, relative to the
+           * image itself, so:
+           * afc://xxx/DCIM/100APPLE/IMG_0001.JPG
+           * =>
+           * afc://xxx/DCIM/100APPLE/.MISC/IMG_0001.THM
+           */
+
+          /* Parent directory */
+          ptr = strrchr (path, '/');
+          if (ptr == NULL)
+                return;
+          parent = g_strndup (path, ptr - path);
+
+          /* Basename with suffix replaced */
+          no_suffix = g_strndup (basename, strlen (basename) - 3);
+          thumb_base = g_strdup_printf ("%s%s", no_suffix, suffix);
+          g_free (no_suffix);
+
+          /* Full thumbnail path */
+          thumb_path = g_build_filename (parent, ".MISC", thumb_base, NULL);
+
+          g_free (parent);
+          g_free (thumb_base);
+        }
+      else if (self->version == IOS4)
+        {
+          char **components;
+
+          /* The thumbnails are in the PhotoData/ so:
+           * afc://xxx/DCIM/100APPLE/IMG_0001.JPG
+           * =>
+           * afc://xxx/PhotoData/100APPLE/IMG_0001.THM
+           */
+
+          /* Replace the JPG by THM */
+          no_suffix = g_strndup (path, strlen (path) - 3);
+          thumb_path = g_strdup_printf ("%s%s", no_suffix, suffix);
+          g_free (no_suffix);
+
+          /* Replace DCIM with PhotoData */
+          components = g_strsplit (thumb_path, "/", -1);
+          g_free (thumb_path);
+          for (i = 0; components[i] != NULL; i++)
+            {
+              if (g_str_equal (components[i], "DCIM"))
+                {
+                  g_free (components[i]);
+                  components[i] = g_strdup ("PhotoData");
+                }
+            }
+          thumb_path = g_strjoinv ("/", components);
+          g_strfreev (components);
+        }
+      else
+        {
+          thumb_path = NULL;
+        }
 
       thumb_afcinfo = NULL;
-      if (afc_get_file_info (self->afc_cli, thumb_path, &thumb_afcinfo) != 0)
+      if (thumb_path == NULL ||
+          afc_get_file_info (self->afc_cli, thumb_path, &thumb_afcinfo) != 0)
         {
           g_strfreev (thumb_afcinfo);
           g_free (thumb_path);
@@ -1064,6 +1174,7 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
       mount_spec = g_vfs_backend_get_mount_spec (G_VFS_BACKEND (self));
       port = g_mount_spec_get (mount_spec, "port");
       thumb_uri = g_strdup_printf ("afc://%s%s%s", self->uuid, port ? port : "", thumb_path);
+      g_free (thumb_path);
       thumb_file = g_file_new_for_uri (thumb_uri);
       g_free (thumb_uri);
 
