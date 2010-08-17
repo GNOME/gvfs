@@ -1022,6 +1022,7 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
       mount_spec = g_vfs_backend_get_mount_spec (G_VFS_BACKEND (self));
       port = g_mount_spec_get (mount_spec, "port");
       thumb_uri = g_strdup_printf ("afc://%s%s%s", self->uuid, port ? port : "", thumb_path);
+      g_free (thumb_path);
       thumb_file = g_file_new_for_uri (thumb_uri);
       g_free (thumb_uri);
 
