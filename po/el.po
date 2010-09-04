@@ -7,10 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: el\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-18 00:43+0200\n"
-"PO-Revision-Date: 2010-03-17 23:08+0200\n"
-"Last-Translator: Nikos Bakaoukas <nikolaosx1@gmail.com>\n"
+"POT-Creation-Date: 2010-09-04 18:46+0300\n"
+"PO-Revision-Date: 2010-09-04 18:48+0200\n"
+"Last-Translator: Kostas Papadimas <pkst@gnome.org>\n"
 "Language-Team: Greek <team@gnome.gr>\n"
+"Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,36 +20,49 @@ msgstr ""
 "X-Poedit-Language: Greek\n"
 "X-Poedit-Country: GREECE\n"
 
-#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2376
+#: ../client/gdaemonfile.c:498
+#: ../client/gdaemonfile.c:2376
 msgid "Operation not supported, files on different mounts"
-msgstr ""
-"Η λειτουργία δεν υποστηρίζεται διότι τα αρχεία βρίσκονται σε διαφορετικές "
-"προσαρτήσεις"
+msgstr "Η λειτουργία δεν υποστηρίζεται διότι τα αρχεία βρίσκονται σε διαφορετικές προσαρτήσεις"
 
 #. Translators: %s is the name of a programming function
-#: ../client/gdaemonfile.c:868 ../client/gdaemonfile.c:902
-#: ../client/gdaemonfile.c:1017 ../client/gdaemonfile.c:1096
-#: ../client/gdaemonfile.c:1159 ../client/gdaemonfile.c:1222
-#: ../client/gdaemonfile.c:1288 ../client/gdaemonfile.c:1350
-#: ../client/gdaemonfile.c:1367 ../client/gdaemonfile.c:1851
-#: ../client/gdaemonfile.c:1880 ../client/gdaemonfile.c:2036
-#: ../client/gdaemonfile.c:2536 ../client/gdaemonfile.c:2585
-#: ../client/gdaemonfile.c:2649 ../client/gdaemonfile.c:2733
-#: ../client/gdaemonfile.c:2808 ../client/gdaemonfile.c:2996
-#: ../client/gdaemonfile.c:3076 ../client/gvfsiconloadable.c:145
+#: ../client/gdaemonfile.c:868
+#: ../client/gdaemonfile.c:902
+#: ../client/gdaemonfile.c:1017
+#: ../client/gdaemonfile.c:1096
+#: ../client/gdaemonfile.c:1159
+#: ../client/gdaemonfile.c:1222
+#: ../client/gdaemonfile.c:1288
+#: ../client/gdaemonfile.c:1350
+#: ../client/gdaemonfile.c:1367
+#: ../client/gdaemonfile.c:1851
+#: ../client/gdaemonfile.c:1880
+#: ../client/gdaemonfile.c:2036
+#: ../client/gdaemonfile.c:2536
+#: ../client/gdaemonfile.c:2585
+#: ../client/gdaemonfile.c:2649
+#: ../client/gdaemonfile.c:2733
+#: ../client/gdaemonfile.c:2808
+#: ../client/gdaemonfile.c:2996
+#: ../client/gdaemonfile.c:3076
+#: ../client/gvfsiconloadable.c:145
 #: ../client/gvfsiconloadable.c:374
 #, c-format
 msgid "Invalid return value from %s"
 msgstr "Μη έγκυρη επιστρεφόμενη τιμή από %s"
 
-#: ../client/gdaemonfile.c:985 ../client/gvfsiconloadable.c:339
+#: ../client/gdaemonfile.c:985
+#: ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
 msgstr "Αδύνατη η λήψη περιγραφέα αρχείου stream"
 
 #
-#: ../client/gdaemonfile.c:1106 ../client/gdaemonfile.c:1169
-#: ../client/gdaemonfile.c:1232 ../client/gdaemonfile.c:1298
-#: ../client/gdaemonfile.c:2615 ../client/gvfsiconloadable.c:155
+#: ../client/gdaemonfile.c:1106
+#: ../client/gdaemonfile.c:1169
+#: ../client/gdaemonfile.c:1232
+#: ../client/gdaemonfile.c:1298
+#: ../client/gdaemonfile.c:2615
+#: ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "Αδύνατη η λήψη περιγραφέα αρχείου stream"
 
@@ -63,17 +77,22 @@ msgstr "Αδυναμία εύρεσης εσώκλειστης προσάρτη�
 msgid "Invalid filename %s"
 msgstr "Ακατάλληλο όνομα αρχείου %s"
 
-#: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1200
-#: ../client/gdaemonvfs.c:1335 ../client/gdaemonvfs.c:1388
+#: ../client/gdaemonfile.c:2232
+#: ../client/gdaemonvfs.c:1200
+#: ../client/gdaemonvfs.c:1335
+#: ../client/gdaemonvfs.c:1388
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Σφάλμα στον ορισμό μεταδεδομένων αρχείου: %s"
 
-#: ../client/gdaemonfile.c:2233 ../client/gdaemonvfs.c:1389
+#: ../client/gdaemonfile.c:2233
+#: ../client/gdaemonvfs.c:1389
 msgid "values must be string or list of strings"
 msgstr "οι τιμές πρέπει να είναι αλφαριθμητικά ή λίστες αλφαριθμητικών"
 
-#: ../client/gdaemonfileenumerator.c:448
+#: ../client/gdaemonfileenumerator.c:466
+#: ../client/gdaemonfileenumerator.c:549
+#: ../client/gdaemonfileenumerator.c:600
 #: ../client/gdaemonfileinputstream.c:630
 #: ../client/gdaemonfileinputstream.c:783
 #: ../client/gdaemonfileinputstream.c:901
@@ -82,22 +101,38 @@ msgstr "οι τιμές πρέπει να είναι αλφαριθμητικά 
 #: ../client/gdaemonfileoutputstream.c:506
 #: ../client/gdaemonfileoutputstream.c:681
 #: ../client/gdaemonfileoutputstream.c:873
-#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1048
-#: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1106
-#: ../daemon/gvfsbackendobexftp.c:1225 ../daemon/gvfsbackendobexftp.c:1362
-#: ../daemon/gvfsbackendobexftp.c:1426 ../daemon/gvfsbackendobexftp.c:1628
-#: ../daemon/gvfsbackendobexftp.c:1735 ../daemon/gvfsbackendobexftp.c:1897
-#: ../daemon/gvfsbackendobexftp.c:1924 ../daemon/gvfsbackendobexftp.c:1983
-#: ../daemon/gvfsbackendobexftp.c:2005 ../daemon/gvfsbackendobexftp.c:2068
-#: ../daemon/gvfsbackendobexftp.c:2087 ../daemon/gvfsbackendsmb.c:1163
-#: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
-#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1069
-#: ../monitor/proxy/gproxydrive.c:514 ../monitor/proxy/gproxydrive.c:602
-#: ../monitor/proxy/gproxydrive.c:750 ../monitor/proxy/gproxydrive.c:885
-#: ../monitor/proxy/gproxydrive.c:936 ../monitor/proxy/gproxydrive.c:1060
-#: ../monitor/proxy/gproxymount.c:471 ../monitor/proxy/gproxymount.c:556
-#: ../monitor/proxy/gproxyvolume.c:807 ../monitor/proxy/gproxyvolume.c:884
+#: ../client/gdaemonfileoutputstream.c:1052
+#: ../client/gvfsdaemondbus.c:1048
+#: ../daemon/gvfsbackendobexftp.c:1085
+#: ../daemon/gvfsbackendobexftp.c:1106
+#: ../daemon/gvfsbackendobexftp.c:1225
+#: ../daemon/gvfsbackendobexftp.c:1362
+#: ../daemon/gvfsbackendobexftp.c:1426
+#: ../daemon/gvfsbackendobexftp.c:1628
+#: ../daemon/gvfsbackendobexftp.c:1735
+#: ../daemon/gvfsbackendobexftp.c:1897
+#: ../daemon/gvfsbackendobexftp.c:1924
+#: ../daemon/gvfsbackendobexftp.c:1983
+#: ../daemon/gvfsbackendobexftp.c:2005
+#: ../daemon/gvfsbackendobexftp.c:2068
+#: ../daemon/gvfsbackendobexftp.c:2087
+#: ../daemon/gvfsbackendsmb.c:1163
+#: ../daemon/gvfsbackendtest.c:91
+#: ../daemon/gvfsbackendtest.c:124
+#: ../daemon/gvfsbackendtest.c:187
+#: ../daemon/gvfschannel.c:319
+#: ../daemon/gvfsftptask.c:202
+#: ../monitor/gdu/ggdumount.c:1069
+#: ../monitor/proxy/gproxydrive.c:514
+#: ../monitor/proxy/gproxydrive.c:602
+#: ../monitor/proxy/gproxydrive.c:750
+#: ../monitor/proxy/gproxydrive.c:885
+#: ../monitor/proxy/gproxydrive.c:936
+#: ../monitor/proxy/gproxydrive.c:1060
+#: ../monitor/proxy/gproxymount.c:471
+#: ../monitor/proxy/gproxymount.c:556
+#: ../monitor/proxy/gproxyvolume.c:807
+#: ../monitor/proxy/gproxyvolume.c:884
 msgid "Operation was cancelled"
 msgstr "Η λειτουργία ακυρώθηκε"
 
@@ -135,7 +170,8 @@ msgstr "Σφάλμα στην λήψη mount info: %s"
 msgid "Can't contact session bus"
 msgstr "Αδυναμία επικοινωνίας με τον δίαυλο συστήματος"
 
-#: ../client/gvfsdaemondbus.c:570 ../client/gvfsdaemondbus.c:1002
+#: ../client/gvfsdaemondbus.c:570
+#: ../client/gvfsdaemondbus.c:1002
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "Σφάλμα κατά τη σύνδεση με την υπηρεσία: %s"
@@ -155,7 +191,7 @@ msgstr "Σφάλμα κατά τη σύνδεση με υποδοχέα: %s"
 msgid "Invalid file info format"
 msgstr "Μη έγκυρος τύπος πληροφοριών αρχείου"
 
-#: ../common/gvfsdaemonprotocol.c:538
+#: ../common/gvfsdaemonprotocol.c:539
 msgid "Invalid attribute info list content"
 msgstr "Μη έγκυρο γνώρισμα περιεχόμενου λίστας πληροφοριών"
 
@@ -178,9 +214,7 @@ msgstr "Σφάλμα δημιουργίας Avahi resolver: %s"
 #: ../common/gvfsdnssdresolver.c:1100
 #, c-format
 msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr ""
-"Σφάλμα κατά την επεξεργασία \"%s\" της υπηρεσίας \"%s\" στον υπολογιστή \"%s"
-"\""
+msgstr "Σφάλμα κατά την επεξεργασία \"%s\" της υπηρεσίας \"%s\" στον υπολογιστή \"%s\""
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -190,12 +224,8 @@ msgstr ""
 #.
 #: ../common/gvfsdnssdresolver.c:1126
 #, c-format
-msgid ""
-"Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
-"records are missing. Keys required: \"%s\"."
-msgstr ""
-"Σφάλμα κατά την επεξεργασία \"%s\" της υπηρεσίας \"%s\" στον υπολογιστή \"%s"
-"\". Μια ή περισσότερες εγγραφές TXT λείπουν. Απαιτούμενα κλειδιά: \"%s\"."
+msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT records are missing. Keys required: \"%s\"."
+msgstr "Σφάλμα κατά την επεξεργασία \"%s\" της υπηρεσίας \"%s\" στον υπολογιστή \"%s\". Μια ή περισσότερες εγγραφές TXT λείπουν. Απαιτούμενα κλειδιά: \"%s\"."
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -205,10 +235,10 @@ msgstr ""
 #: ../common/gvfsdnssdresolver.c:1143
 #, c-format
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr ""
-"Λήξη χρόνου επεξεργασίας \"%s\" της υπηρεσίας \"%s\" στον υπολογιστή \"%s\""
+msgstr "Λήξη χρόνου επεξεργασίας \"%s\" της υπηρεσίας \"%s\" στον υπολογιστή \"%s\""
 
-#: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
+#: ../common/gvfsdnssdutils.c:233
+#: ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
 #, c-format
 msgid "Malformed dns-sd encoded_triple '%s'"
@@ -223,7 +253,8 @@ msgstr "Αδυναμία χειρισμού της έκδοσης %d της κω
 msgid "Malformed input data for GVfsIcon"
 msgstr "Κακοσχηματισμένα δεδομένα εισόδου στο GVfsIcon"
 
-#: ../daemon/daemon-main.c:76 ../daemon/daemon-main.c:230
+#: ../daemon/daemon-main.c:76
+#: ../daemon/daemon-main.c:230
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "Σφάλμα κατά τη σύνδεση με το D-Bus: %s"
@@ -235,7 +266,8 @@ msgstr "Σφάλμα κατά τη σύνδεση με το D-Bus: %s"
 msgid "%s Filesystem Service"
 msgstr "Υπηρεσία συστήματος αρχείων %s"
 
-#: ../daemon/daemon-main.c:110 ../programs/gvfs-copy.c:90
+#: ../daemon/daemon-main.c:110
+#: ../programs/gvfs-copy.c:90
 #: ../programs/gvfs-move.c:78
 #, c-format
 msgid "Error: %s"
@@ -246,7 +278,8 @@ msgstr "Σφάλμα: %s"
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "Χρήση: %s --spawner dbus-id object_path"
 
-#: ../daemon/daemon-main.c:179 ../daemon/daemon-main.c:197
+#: ../daemon/daemon-main.c:179
+#: ../daemon/daemon-main.c:197
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "Χρήση: %s key=value key=value ..."
@@ -265,16 +298,20 @@ msgstr "το σημείο προσάρτησης για το %s εκτελείτ
 msgid "error starting mount daemon"
 msgstr "Σφάλμα εκκίνησης mount daemon"
 
-#: ../daemon/gvfsbackend.c:933 ../monitor/gdu/ggdumount.c:921
+#: ../daemon/gvfsbackend.c:933
+#: ../monitor/gdu/ggdumount.c:921
 msgid "Unmount Anyway"
 msgstr "Αποσύνδεση οπωσδήποτε"
 
-#: ../daemon/gvfsbackend.c:934 ../monitor/gdu/ggdudrive.c:1022
+#: ../daemon/gvfsbackend.c:934
+#: ../daemon/gvfsbackendafc.c:281
+#: ../monitor/gdu/ggdudrive.c:1022
 #: ../monitor/gdu/ggdumount.c:922
 msgid "Cancel"
 msgstr "Ακύρωση"
 
-#: ../daemon/gvfsbackend.c:936 ../monitor/gdu/ggdumount.c:923
+#: ../daemon/gvfsbackend.c:936
+#: ../monitor/gdu/ggdumount.c:923
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -282,119 +319,151 @@ msgstr ""
 "Η μονάδα δίσκου είναι απασχολημένη\n"
 "Μία ή περισσότερες εφαρμογές κρατούν την μονάδα δίσκου απασχολημένη."
 
-#: ../daemon/gvfsbackendafc.c:145
+#: ../daemon/gvfsbackendafc.c:159
 msgid "Internal Apple File Control error"
 msgstr "Εσωτερικό σφάλμα του Apple File Control "
 
 #
-#: ../daemon/gvfsbackendafc.c:149 ../daemon/gvfsbackendftp.c:633
+#: ../daemon/gvfsbackendafc.c:163
+#: ../daemon/gvfsbackendftp.c:669
 msgid "File does not exist"
 msgstr "Το αρχείο δεν υπάρχει"
 
-#: ../daemon/gvfsbackendafc.c:152
+#: ../daemon/gvfsbackendafc.c:166
 msgid "The directory is not empty"
 msgstr "Ο κατάλογος δεν είναι άδειος"
 
-#: ../daemon/gvfsbackendafc.c:156
+#: ../daemon/gvfsbackendafc.c:170
 msgid "The device did not respond"
 msgstr "Η συσκευή δεν αποκρίνεται"
 
-#: ../daemon/gvfsbackendafc.c:160
+#: ../daemon/gvfsbackendafc.c:174
 msgid "The connection was interrupted"
 msgstr "Η σύνδεση διακόπηκε"
 
-#: ../daemon/gvfsbackendafc.c:164
+#: ../daemon/gvfsbackendafc.c:178
 msgid "Invalid Apple File Control data received"
 msgstr "Ελήφθησαν μη έγκυρα στοιχεία Apple File Control"
 
-#: ../daemon/gvfsbackendafc.c:168
+#: ../daemon/gvfsbackendafc.c:182
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "Ανεπίλυτο Apple File Control σφάλμα (%d)"
 
-#: ../daemon/gvfsbackendafc.c:185
+#: ../daemon/gvfsbackendafc.c:199
 msgid "Lockdown Error: Invalid Argument"
 msgstr "Σφάλμα αποκλεισμού: Μη έγκυρο όρισμα"
 
-#: ../daemon/gvfsbackendafc.c:189
+#: ../daemon/gvfsbackendafc.c:203
+#: ../daemon/gvfsbackendsftp.c:309
+#: ../daemon/gvfsbackendsftp.c:1836
+#: ../daemon/gvfsftptask.c:400
+msgid "Permission denied"
+msgstr "Δεν επιτρέπεται η πρόσβαση"
+
+#: ../daemon/gvfsbackendafc.c:206
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "Ανεπίλυτο σφάλμα αποκλεισμού (%d)"
 
-#: ../daemon/gvfsbackendafc.c:206
+#: ../daemon/gvfsbackendafc.c:223
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "Σφάλμα libimobiledevice: Μη έγκυρο όρισμα"
 
-#: ../daemon/gvfsbackendafc.c:210
-msgid ""
-"libimobiledevice Error: No device found. Make sure usbmuxd is set up "
-"correctly."
-msgstr ""
-"Σφάλμα libimobiledevice: Δεν βρέθηκε η συσκευή. Σιγουρευτείτε ότι το usbmuxd "
-"είναι ρυθμισμένο σωστά."
+#: ../daemon/gvfsbackendafc.c:227
+msgid "libimobiledevice Error: No device found. Make sure usbmuxd is set up correctly."
+msgstr "Σφάλμα libimobiledevice: Δεν βρέθηκε η συσκευή. Σιγουρευτείτε ότι το usbmuxd είναι ρυθμισμένο σωστά."
 
-#: ../daemon/gvfsbackendafc.c:213
+#: ../daemon/gvfsbackendafc.c:230
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Ανεπίλυτο σφάλμα libimobiledevice (%d)"
 
-#: ../daemon/gvfsbackendafc.c:275 ../daemon/gvfsbackendarchive.c:536
-#: ../daemon/gvfsbackendarchive.c:565 ../daemon/gvfsbackenddav.c:1631
-#: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:861
-#: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendobexftp.c:896
+#: ../daemon/gvfsbackendafc.c:281
+msgid "Try again"
+msgstr "Προσπαθήστε ξανά"
+
+#: ../daemon/gvfsbackendafc.c:299
+#: ../daemon/gvfsbackendarchive.c:536
+#: ../daemon/gvfsbackendarchive.c:565
+#: ../daemon/gvfsbackenddav.c:1631
+#: ../daemon/gvfsbackendhttp.c:315
+#: ../daemon/gvfsbackendobexftp.c:861
+#: ../daemon/gvfsbackendobexftp.c:877
+#: ../daemon/gvfsbackendobexftp.c:896
 #: ../daemon/gvfsbackendsmb.c:648
 msgid "Invalid mount spec"
 msgstr "Μη έγκυρη προδιαγραφή προσάρτησης"
 
-#: ../daemon/gvfsbackendafc.c:281
+#: ../daemon/gvfsbackendafc.c:305
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
-msgstr ""
-"Μη έγκυρη τοποθεσία AFC: Πρέπει να είναι της μορφής afc://uuid:αριθμός-πόρτας"
+msgstr "Μη έγκυρη τοποθεσία AFC: Πρέπει να είναι της μορφής afc://uuid:αριθμός-πόρτας"
 
-#: ../daemon/gvfsbackendafc.c:296
+#: ../daemon/gvfsbackendafc.c:320
 #, c-format
 msgid "Service %d on Apple Mobile Device"
 msgstr "Υπηρεσία %d στο Apple Mobile Device"
 
-#: ../daemon/gvfsbackendafc.c:302
+#: ../daemon/gvfsbackendafc.c:326
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Apple Mobile Device"
 
-#: ../daemon/gvfsbackendafc.c:353
+#: ../daemon/gvfsbackendafc.c:375
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
 
-#: ../daemon/gvfsbackendafc.c:486 ../daemon/gvfsbackendarchive.c:632
-#: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1886
-#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:702
+#. translators:
+#. * %s is the device name. 'Try again' is the caption of the button
+#. * shown in the dialog which is defined above.
+#: ../daemon/gvfsbackendafc.c:455
+#, c-format
+msgid "Device '%s' is password protected. Enter the password on the device and click 'Try again'."
+msgstr "Η συσκευή '%s' προστατεύεται με κωδικό. Εισάγετε τον κωδικό στη συσκευή και πατήστε το 'Προσπαθήστε ξανά'."
+
+#: ../daemon/gvfsbackendafc.c:585
+#: ../daemon/gvfsbackendarchive.c:632
+#: ../daemon/gvfsbackendcomputer.c:645
+#: ../daemon/gvfsbackendgphoto2.c:1886
+#: ../daemon/gvfsbackendobexftp.c:1071
+#: ../daemon/gvfsbackendsmb.c:702
 #: ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "Αδυναμία ανοίγματος καταλόγου"
 
 #
-#: ../daemon/gvfsbackendafc.c:494 ../daemon/gvfsbackendarchive.c:624
-#: ../daemon/gvfsbackendarchive.c:668 ../daemon/gvfsbackendarchive.c:720
-#: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendcdda.c:986
-#: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:392
-#: ../daemon/gvfsbackendftp.c:964 ../daemon/gvfsbackendnetwork.c:646
-#: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
-#: ../daemon/gvfsbackendsmbbrowse.c:1324 ../daemon/gvfsbackendsmbbrowse.c:1394
+#: ../daemon/gvfsbackendafc.c:593
+#: ../daemon/gvfsbackendarchive.c:624
+#: ../daemon/gvfsbackendarchive.c:668
+#: ../daemon/gvfsbackendarchive.c:720
+#: ../daemon/gvfsbackendarchive.c:749
+#: ../daemon/gvfsbackendcdda.c:986
+#: ../daemon/gvfsbackendcomputer.c:627
+#: ../daemon/gvfsbackenddnssd.c:392
+#: ../daemon/gvfsbackendftp.c:1000
+#: ../daemon/gvfsbackendnetwork.c:646
+#: ../daemon/gvfsbackendsmbbrowse.c:1085
+#: ../daemon/gvfsbackendsmbbrowse.c:1152
+#: ../daemon/gvfsbackendsmbbrowse.c:1324
+#: ../daemon/gvfsbackendsmbbrowse.c:1394
 #, c-format
 msgid "File doesn't exist"
 msgstr "Το αρχείο δεν υπάρχει"
 
-#: ../daemon/gvfsbackendafc.c:602 ../daemon/gvfsbackendafc.c:1341
+#: ../daemon/gvfsbackendafc.c:701
+#: ../daemon/gvfsbackendafc.c:1506
 msgid "Backups are not yet supported."
 msgstr "Τα αντίγραφα ασφαλείας δεν υποστηρίζονται ακόμα"
 
-#: ../daemon/gvfsbackendafc.c:740
+#: ../daemon/gvfsbackendafc.c:839
 msgid "Invalid seek type"
 msgstr "Μη έγκυρος τύπος αναζήτησης"
 
-#: ../daemon/gvfsbackendafc.c:1260 ../daemon/gvfsbackendsftp.c:1820
-#: ../daemon/gvfsbackendsftp.c:4625 ../daemon/gvfsbackendsmb.c:1702
+#: ../daemon/gvfsbackendafc.c:1425
+#: ../daemon/gvfsbackendsftp.c:1834
+#: ../daemon/gvfsbackendsftp.c:4639
+#: ../daemon/gvfsbackendsmb.c:1702
 #: ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
 msgstr "Δεν υποστηρίζεται η λειτουργία"
@@ -402,21 +471,27 @@ msgstr "Δεν υποστηρίζεται η λειτουργία"
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:323 ../daemon/gvfsbackendsftp.c:2257
+#: ../daemon/gvfsbackendarchive.c:323
+#: ../daemon/gvfsbackendsftp.c:2271
 #: ../daemon/gvfsftpdircache.c:428
 #, c-format
 msgid "/ on %s"
 msgstr "/ στο %s"
 
-#: ../daemon/gvfsbackendarchive.c:525 ../daemon/gvfsbackendftp.c:564
-#: ../daemon/gvfsbackendsftp.c:1733
+#: ../daemon/gvfsbackendarchive.c:525
+#: ../daemon/gvfsbackendftp.c:600
+#: ../daemon/gvfsbackendsftp.c:1747
 msgid "No hostname specified"
 msgstr "Δεν έχει οριστεί όνομα συστήματος"
 
-#: ../daemon/gvfsbackendarchive.c:758 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
-#: ../daemon/gvfsbackendftp.c:258 ../daemon/gvfsbackendnetwork.c:693
-#: ../daemon/gvfsbackendsftp.c:3871 ../daemon/gvfsftpdircache.c:154
+#: ../daemon/gvfsbackendarchive.c:758
+#: ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:714
+#: ../daemon/gvfsbackenddnssd.c:439
+#: ../daemon/gvfsbackendftp.c:294
+#: ../daemon/gvfsbackendnetwork.c:693
+#: ../daemon/gvfsbackendsftp.c:3885
+#: ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
 msgstr "Το αρχείο δεν είναι κατάλογος"
 
@@ -429,25 +504,36 @@ msgstr "Εγγραφή"
 msgid "Unable to create temporary directory"
 msgstr "Αποτυχία δημιουργίας προσωρινού καταλόγου"
 
-#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
-#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
-#: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
-#: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:690
-#: ../daemon/gvfsbackendgphoto2.c:1207 ../daemon/gvfsbackendgphoto2.c:2207
-#: ../daemon/gvfsbackendgphoto2.c:2926 ../daemon/gvfsbackendsftp.c:1824
-#: ../daemon/gvfsbackendsftp.c:2937 ../daemon/gvfsbackendsftp.c:2950
-#: ../daemon/gvfsbackendsftp.c:2970 ../daemon/gvfsbackendtrash.c:216
+#: ../daemon/gvfsbackendburn.c:405
+#: ../daemon/gvfsbackendburn.c:416
+#: ../daemon/gvfsbackendburn.c:451
+#: ../daemon/gvfsbackendburn.c:672
+#: ../daemon/gvfsbackendburn.c:717
+#: ../daemon/gvfsbackendburn.c:743
+#: ../daemon/gvfsbackendburn.c:781
+#: ../daemon/gvfsbackendburn.c:972
+#: ../daemon/gvfsbackendburn.c:1008
+#: ../daemon/gvfsbackendftp.c:726
+#: ../daemon/gvfsbackendgphoto2.c:1207
+#: ../daemon/gvfsbackendgphoto2.c:2207
+#: ../daemon/gvfsbackendgphoto2.c:2926
+#: ../daemon/gvfsbackendsftp.c:1838
+#: ../daemon/gvfsbackendsftp.c:2951
+#: ../daemon/gvfsbackendsftp.c:2964
+#: ../daemon/gvfsbackendsftp.c:2984
+#: ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
 msgstr "Δεν υπάρχει τέτοιο αρχείο ή κατάλογος"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2223
-#: ../daemon/gvfsbackendsftp.c:1816
+#: ../daemon/gvfsbackendburn.c:425
+#: ../daemon/gvfsbackenddav.c:2223
+#: ../daemon/gvfsbackendsftp.c:1830
 msgid "Directory not empty"
 msgstr "Ο κατάλογος δεν είναι άδειος"
 
-#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
+#: ../daemon/gvfsbackendburn.c:459
+#: ../daemon/gvfsbackendburn.c:904
 #: ../daemon/gvfsbackendobexftp.c:1810
 msgid "Can't copy file over directory"
 msgstr "Αδυναμία αντιγραφής αρχείου πάνω σε  κατάλογο"
@@ -457,33 +543,56 @@ msgstr "Αδυναμία αντιγραφής αρχείου πάνω σε  κα
 msgid "CD/DVD Creator"
 msgstr "Δημιουργός CD/DVD"
 
-#: ../daemon/gvfsbackendburn.c:753 ../daemon/gvfsbackendburn.c:789
-#: ../daemon/gvfsbackendburn.c:924 ../daemon/gvfsbackendburn.c:986
-#: ../daemon/gvfsbackendburn.c:990 ../daemon/gvfsbackendburn.c:1000
+#: ../daemon/gvfsbackendburn.c:753
+#: ../daemon/gvfsbackendburn.c:789
+#: ../daemon/gvfsbackendburn.c:924
+#: ../daemon/gvfsbackendburn.c:986
+#: ../daemon/gvfsbackendburn.c:990
+#: ../daemon/gvfsbackendburn.c:1000
 #: ../daemon/gvfsbackendgphoto2.c:3000
 msgid "File exists"
 msgstr "Το αρχείο υπάρχει"
 
-#: ../daemon/gvfsbackendburn.c:828 ../daemon/gvfsjobcloseread.c:112
-#: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:169
-#: ../daemon/gvfsjobcreatemonitor.c:140 ../daemon/gvfsjobcreatemonitor.c:151
-#: ../daemon/gvfsjobcreatemonitor.c:174 ../daemon/gvfsjobcreatemonitor.c:192
-#: ../daemon/gvfsjobdelete.c:122 ../daemon/gvfsjobenumerate.c:256
-#: ../daemon/gvfsjobmakedirectory.c:122 ../daemon/gvfsjobmount.c:109
-#: ../daemon/gvfsjobmountmountable.c:156 ../daemon/gvfsjobmove.c:168
-#: ../daemon/gvfsjobopenforread.c:133 ../daemon/gvfsjobopenforwrite.c:151
-#: ../daemon/gvfsjobopenforwrite.c:165 ../daemon/gvfsjobopenforwrite.c:179
-#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpollmountable.c:125
-#: ../daemon/gvfsjobpull.c:175 ../daemon/gvfsjobpush.c:175
-#: ../daemon/gvfsjobqueryattributes.c:135 ../daemon/gvfsjobqueryfsinfo.c:131
-#: ../daemon/gvfsjobqueryinfo.c:149 ../daemon/gvfsjobqueryinforead.c:119
-#: ../daemon/gvfsjobqueryinfowrite.c:119 ../daemon/gvfsjobread.c:120
-#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
-#: ../daemon/gvfsjobsetattribute.c:150 ../daemon/gvfsjobsetdisplayname.c:127
-#: ../daemon/gvfsjobstartmountable.c:132 ../daemon/gvfsjobstopmountable.c:135
-#: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
-#: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
-#: ../monitor/gdu/ggdumount.c:1173 ../monitor/gdu/ggdumount.c:1257
+#: ../daemon/gvfsbackendburn.c:828
+#: ../daemon/gvfsjobcloseread.c:112
+#: ../daemon/gvfsjobclosewrite.c:120
+#: ../daemon/gvfsjobcopy.c:169
+#: ../daemon/gvfsjobcreatemonitor.c:140
+#: ../daemon/gvfsjobcreatemonitor.c:151
+#: ../daemon/gvfsjobcreatemonitor.c:174
+#: ../daemon/gvfsjobcreatemonitor.c:192
+#: ../daemon/gvfsjobdelete.c:122
+#: ../daemon/gvfsjobenumerate.c:256
+#: ../daemon/gvfsjobmakedirectory.c:122
+#: ../daemon/gvfsjobmount.c:109
+#: ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobmove.c:168
+#: ../daemon/gvfsjobopenforread.c:133
+#: ../daemon/gvfsjobopenforwrite.c:151
+#: ../daemon/gvfsjobopenforwrite.c:165
+#: ../daemon/gvfsjobopenforwrite.c:179
+#: ../daemon/gvfsjobopeniconforread.c:120
+#: ../daemon/gvfsjobpollmountable.c:125
+#: ../daemon/gvfsjobpull.c:175
+#: ../daemon/gvfsjobpush.c:175
+#: ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131
+#: ../daemon/gvfsjobqueryinfo.c:149
+#: ../daemon/gvfsjobqueryinforead.c:119
+#: ../daemon/gvfsjobqueryinfowrite.c:119
+#: ../daemon/gvfsjobread.c:120
+#: ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobsetattribute.c:150
+#: ../daemon/gvfsjobsetdisplayname.c:127
+#: ../daemon/gvfsjobstartmountable.c:132
+#: ../daemon/gvfsjobstopmountable.c:135
+#: ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobunmountmountable.c:139
+#: ../daemon/gvfsjobunmountmountable.c:154
+#: ../daemon/gvfsjobwrite.c:120
+#: ../monitor/gdu/ggdumount.c:1173
+#: ../monitor/gdu/ggdumount.c:1257
 #: ../monitor/gdu/ggduvolume.c:1595
 msgid "Operation not supported by backend"
 msgstr "Δεν υποστηρίζεται η λειτουργία από το backend"
@@ -492,45 +601,57 @@ msgstr "Δεν υποστηρίζεται η λειτουργία από το ba
 msgid "No such file or directory in target path"
 msgstr "Δεν υπάρχει τέτοιο αρχείο ή κατάλογος στη διαδρομή προορισμού"
 
-#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1350
+#: ../daemon/gvfsbackendburn.c:876
+#: ../daemon/gvfsbackendftp.c:1386
 #: ../daemon/gvfsbackendobexftp.c:1779
 msgid "Can't copy directory over directory"
 msgstr "Δεν είναι δυνατή η αντιγραφή καταλόγου πάνω σε κατάλογο"
 
-#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1787
-#: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1818
-#: ../daemon/gvfsbackendsftp.c:4433
+#: ../daemon/gvfsbackendburn.c:885
+#: ../daemon/gvfsbackendobexftp.c:1787
+#: ../daemon/gvfsbackendobexftp.c:1818
+#: ../daemon/gvfsbackendsftp.c:1832
+#: ../daemon/gvfsbackendsftp.c:4447
 msgid "Target file exists"
 msgstr "Το τελικό αρχείο υπάρχει ήδη"
 
-#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1373
+#: ../daemon/gvfsbackendburn.c:892
+#: ../daemon/gvfsbackendftp.c:1409
 #: ../daemon/gvfsbackendobexftp.c:1794
 msgid "Can't recursively copy directory"
 msgstr "Δεν είναι δυνατή η αντιγραφή καταλόγου αναδρομικά"
 
-#: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
-#: ../daemon/gvfsbackendgphoto2.c:2580 ../daemon/gvfsbackendgphoto2.c:2789
-#: ../daemon/gvfsbackendgphoto2.c:2886 ../daemon/gvfsbackendgphoto2.c:2979
+#: ../daemon/gvfsbackendburn.c:950
+#: ../daemon/gvfsbackendcomputer.c:794
+#: ../daemon/gvfsbackendgphoto2.c:2580
+#: ../daemon/gvfsbackendgphoto2.c:2789
+#: ../daemon/gvfsbackendgphoto2.c:2886
+#: ../daemon/gvfsbackendgphoto2.c:2979
 msgid "Not supported"
 msgstr "Δεν υποστηρίζεται"
 
-#: ../daemon/gvfsbackendcdda.c:332 ../daemon/gvfsbackendgphoto2.c:1510
+#: ../daemon/gvfsbackendcdda.c:332
+#: ../daemon/gvfsbackendgphoto2.c:1510
 msgid "Cannot create gudev client"
 msgstr "Αδυναμία δημιουργίας πελάτη τύπου gudev"
 
-#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1528
+#: ../daemon/gvfsbackendcdda.c:352
+#: ../daemon/gvfsbackendgphoto2.c:1528
 msgid "Cannot connect to the system bus"
 msgstr "Αδυναμία σύνδεσης στο διάδρομο συστήματος"
 
-#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1540
+#: ../daemon/gvfsbackendcdda.c:363
+#: ../daemon/gvfsbackendgphoto2.c:1540
 msgid "Cannot create libhal context"
 msgstr "Αδυναμία δημιουργίας περιεχομένου libhal"
 
-#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1553
+#: ../daemon/gvfsbackendcdda.c:377
+#: ../daemon/gvfsbackendgphoto2.c:1553
 msgid "Cannot initialize libhal"
 msgstr "Αδυναμία αρχικοποίησης libhal"
 
-#: ../daemon/gvfsbackendcdda.c:393 ../daemon/gvfsbackendcdda.c:477
+#: ../daemon/gvfsbackendcdda.c:393
+#: ../daemon/gvfsbackendcdda.c:477
 msgid "No drive specified"
 msgstr "Δεν έχει καθορισθεί συσκευή"
 
@@ -551,9 +672,12 @@ msgstr "Η συσκευή '%s' δεν περιέχει αρχεία ήχου"
 msgid "cdda mount on %s"
 msgstr "προσάρτηση cdda  σε %s"
 
-#: ../daemon/gvfsbackendcdda.c:440 ../daemon/gvfsbackendcdda.c:960
-#: ../monitor/gdu/ggduvolume.c:337 ../monitor/hal/ghalmount.c:325
-#: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
+#: ../daemon/gvfsbackendcdda.c:440
+#: ../daemon/gvfsbackendcdda.c:960
+#: ../monitor/gdu/ggduvolume.c:337
+#: ../monitor/hal/ghalmount.c:325
+#: ../monitor/hal/ghalvolume.c:225
+#: ../monitor/hal/ghalvolume.c:246
 #, c-format
 msgid "Audio Disc"
 msgstr "Δίσκος ήχου"
@@ -582,7 +706,8 @@ msgstr "Σφάλμα από 'paranoia' στο δίσκο %s"
 msgid "Error seeking in stream on drive %s"
 msgstr "Σφάλμα αναζήτησης ροής στο δίσκο %s"
 
-#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1894
+#: ../daemon/gvfsbackendcdda.c:979
+#: ../daemon/gvfsbackendgphoto2.c:1894
 #, c-format
 msgid "No such file"
 msgstr "Δεν υπάρχει τέτοιο αρχείο"
@@ -596,7 +721,8 @@ msgstr "Το αρχείο δεν υπάρχει ή δεν είναι ένα ηχ
 msgid "Audio CD Filesystem Service"
 msgstr "Υπηρεσία συστήματος αρχείων CD ήχου"
 
-#: ../daemon/gvfsbackendcomputer.c:192 ../daemon/gvfsbackendcomputer.c:756
+#: ../daemon/gvfsbackendcomputer.c:192
+#: ../daemon/gvfsbackendcomputer.c:756
 msgid "Computer"
 msgstr "Υπολογιστής"
 
@@ -608,13 +734,15 @@ msgstr "Σύστημα αρχείων"
 msgid "Can't open mountable file"
 msgstr "Αδυναμία ανοίγματος του προσαρτημένου αρχείου "
 
-#: ../daemon/gvfsbackendcomputer.c:840 ../daemon/gvfsbackendsftp.c:1151
+#: ../daemon/gvfsbackendcomputer.c:840
+#: ../daemon/gvfsbackendsftp.c:1165
 #, c-format
 msgid "Internal error: %s"
 msgstr "Εσωτερικό σφάλμα: %s"
 
 # gconf/gconf-internals.c:2404
-#: ../daemon/gvfsbackendcomputer.c:872 ../daemon/gvfsbackendcomputer.c:991
+#: ../daemon/gvfsbackendcomputer.c:872
+#: ../daemon/gvfsbackendcomputer.c:991
 msgid "Can't mount file"
 msgstr "Αδυναμία προσάρτησης αρχείου"
 
@@ -622,9 +750,12 @@ msgstr "Αδυναμία προσάρτησης αρχείου"
 msgid "No media in the drive"
 msgstr "Δεν υπάρχει μέσο στη συσσκευή"
 
-#: ../daemon/gvfsbackendcomputer.c:941 ../daemon/gvfsbackendcomputer.c:1036
-#: ../daemon/gvfsbackendcomputer.c:1142 ../daemon/gvfsbackendcomputer.c:1232
-#: ../daemon/gvfsbackendcomputer.c:1305 ../daemon/gvfsbackendcomputer.c:1374
+#: ../daemon/gvfsbackendcomputer.c:941
+#: ../daemon/gvfsbackendcomputer.c:1036
+#: ../daemon/gvfsbackendcomputer.c:1142
+#: ../daemon/gvfsbackendcomputer.c:1232
+#: ../daemon/gvfsbackendcomputer.c:1305
+#: ../daemon/gvfsbackendcomputer.c:1374
 msgid "Not a mountable file"
 msgstr "Δεν είναι προσαρτήσιμο αρχείο"
 
@@ -638,21 +769,25 @@ msgid "Can't eject file"
 msgstr "Αδυναμία αποβολής αρχείου"
 
 # gconf/gconf-internals.c:2404
-#: ../daemon/gvfsbackendcomputer.c:1252 ../daemon/gvfsbackendcomputer.c:1259
+#: ../daemon/gvfsbackendcomputer.c:1252
+#: ../daemon/gvfsbackendcomputer.c:1259
 msgid "Can't start file"
 msgstr "Αδυναμία έναρξης αρχείου"
 
 # gconf/gconf-internals.c:2404
-#: ../daemon/gvfsbackendcomputer.c:1325 ../daemon/gvfsbackendcomputer.c:1332
+#: ../daemon/gvfsbackendcomputer.c:1325
+#: ../daemon/gvfsbackendcomputer.c:1332
 msgid "Can't stop file"
 msgstr "Αδυναμία τερματισμού αρχείου"
 
 # gconf/gconf-internals.c:2404
-#: ../daemon/gvfsbackendcomputer.c:1389 ../daemon/gvfsbackendcomputer.c:1396
+#: ../daemon/gvfsbackendcomputer.c:1389
+#: ../daemon/gvfsbackendcomputer.c:1396
 msgid "Can't poll file"
 msgstr "Αδυναμία σταθμοσκόπησης αρχείου"
 
-#: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1698
+#: ../daemon/gvfsbackenddav.c:561
+#: ../daemon/gvfsbackenddav.c:1698
 #: ../daemon/gvfsbackendhttp.c:261
 #, c-format
 msgid "HTTP Error: %s"
@@ -670,14 +805,15 @@ msgstr "Κενή απόκριση"
 msgid "Unexpected reply from server"
 msgstr "Απροσδόκητη απάντηση από διακομιστή"
 
-#: ../daemon/gvfsbackenddav.c:1214 ../daemon/gvfsbackenddav.c:1838
+#: ../daemon/gvfsbackenddav.c:1214
+#: ../daemon/gvfsbackenddav.c:1838
 msgid "Response invalid"
 msgstr "Μη έγκυρη απόκριση"
 
 #
 #: ../daemon/gvfsbackenddav.c:1357
 msgid "WebDAV share"
-msgstr "Διαμοίρασμα WebDAV"
+msgstr "Κοινή χρήση WebDAV"
 
 #: ../daemon/gvfsbackenddav.c:1359
 #, c-format
@@ -689,9 +825,10 @@ msgstr "Εισάγετε κωδικό για %s"
 msgid "Please enter proxy password"
 msgstr "Παρακαλώ εισάγετε τον κωδικό διαμεσολαβητή"
 
-#: ../daemon/gvfsbackenddav.c:1702 ../daemon/gvfsbackenddav.c:1706
+#: ../daemon/gvfsbackenddav.c:1702
+#: ../daemon/gvfsbackenddav.c:1706
 msgid "Not a WebDAV enabled share"
-msgstr "Δεν είναι μια ενεργοποιημένη WebDAV share"
+msgstr "Δεν είναι μια ενεργοποιημένη κοινόχρηστη WebDAV "
 
 #
 #: ../daemon/gvfsbackenddav.c:1734
@@ -699,34 +836,43 @@ msgstr "Δεν είναι μια ενεργοποιημένη WebDAV share"
 msgid "WebDAV on %s"
 msgstr "WebDAV στο %s"
 
-#: ../daemon/gvfsbackenddav.c:1794 ../daemon/gvfsbackenddav.c:1867
+#: ../daemon/gvfsbackenddav.c:1794
+#: ../daemon/gvfsbackenddav.c:1867
 msgid "Could not create request"
 msgstr "Δεν ήταν δυνατή η δημιουργία αίτησης"
 
-#: ../daemon/gvfsbackenddav.c:1930 ../daemon/gvfsbackenddav.c:2183
-#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:649
-#: ../daemon/gvfsbackendftp.c:830 ../daemon/gvfsbackendftp.c:1180
-#: ../daemon/gvfsbackendftp.c:1358 ../daemon/gvfsbackendsftp.c:4277
+#: ../daemon/gvfsbackenddav.c:1930
+#: ../daemon/gvfsbackenddav.c:2183
+#: ../daemon/gvfsbackenddav.c:2294
+#: ../daemon/gvfsbackendftp.c:685
+#: ../daemon/gvfsbackendftp.c:866
+#: ../daemon/gvfsbackendftp.c:1216
+#: ../daemon/gvfsbackendftp.c:1394
+#: ../daemon/gvfsbackendsftp.c:4291
 #: ../daemon/gvfsbackendsmb.c:2038
 msgid "Target file already exists"
 msgstr "Το αρχείο προορισμού υπάρχει ήδη"
 
-#: ../daemon/gvfsbackenddav.c:2003 ../daemon/gvfsbackendsftp.c:3411
+#: ../daemon/gvfsbackenddav.c:2003
+#: ../daemon/gvfsbackendsftp.c:3425
 #: ../daemon/gvfsbackendsmb.c:1132
 msgid "The file was externally modified"
 msgstr "Το αρχείο τροποποιήθηκε εξωτερικά"
 
-#: ../daemon/gvfsbackenddav.c:2034 ../daemon/gvfsbackendsmb.c:1168
+#: ../daemon/gvfsbackenddav.c:2034
+#: ../daemon/gvfsbackendsmb.c:1168
 #: ../daemon/gvfsbackendsmb.c:2055
 msgid "Backup file creation failed"
 msgstr "Απέτυχε η δημιουργία αντιγράφου ασφαλείας"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:486 ../daemon/gvfsbackendnetwork.c:393
+#: ../daemon/gvfsbackenddnssd.c:486
+#: ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "Τοπικό δίκτυο"
 
-#: ../daemon/gvfsbackenddnssd.c:730 ../daemon/gvfsbackendnetwork.c:797
+#: ../daemon/gvfsbackenddnssd.c:730
+#: ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
 msgstr "Αδυναμία παρακολούθησης αρχείου ή καταλόγου."
 
@@ -735,53 +881,60 @@ msgstr "Αδυναμία παρακολούθησης αρχείου ή κατα
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:749 ../daemon/gvfsbackendnetwork.c:732
-#: ../daemon/gvfsbackendnetwork.c:882 ../daemon/gvfsbackendnetwork.c:883
+#: ../daemon/gvfsbackenddnssd.c:749
+#: ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackendnetwork.c:882
+#: ../daemon/gvfsbackendnetwork.c:883
 msgid "Network"
 msgstr "Δίκτυο"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:387
+#: ../daemon/gvfsbackendftp.c:423
 #, c-format
 msgid "Enter password for ftp as %s on %s"
 msgstr "Εισάγετε κωδικό πρόσβασης για ftp ως %s στο %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:390
+#: ../daemon/gvfsbackendftp.c:426
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Εισάγετε κωδικό για ftp σε %s"
 
 # #-#-#-#-#  gdm.gnome-2-20.el.po (el)  #-#-#-#-#
 #
-#: ../daemon/gvfsbackendftp.c:417 ../daemon/gvfsbackendsftp.c:974
-#: ../daemon/gvfsbackendsmb.c:606 ../daemon/gvfsbackendsmbbrowse.c:986
+#: ../daemon/gvfsbackendftp.c:453
+#: ../daemon/gvfsbackendsftp.c:987
+#: ../daemon/gvfsbackendsmb.c:606
+#: ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
 msgstr "Ο διάλογος κωδικού ακυρώθηκε"
 
-#: ../daemon/gvfsbackendftp.c:527
+#: ../daemon/gvfsbackendftp.c:563
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp στο %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:531
+#: ../daemon/gvfsbackendftp.c:567
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "ftp ως %s στο %s"
 
-#: ../daemon/gvfsbackendftp.c:624
+#: ../daemon/gvfsbackendftp.c:660
 msgid "Insufficient permissions"
 msgstr "Μη επαρκή δικαιώματα"
 
-#: ../daemon/gvfsbackendftp.c:670 ../daemon/gvfsbackendsftp.c:2321
-#: ../daemon/gvfsbackendsftp.c:3057 ../daemon/gvfsbackendsftp.c:3398
-#: ../daemon/gvfsbackendsftp.c:4268
+#: ../daemon/gvfsbackendftp.c:706
+#: ../daemon/gvfsbackendsftp.c:2335
+#: ../daemon/gvfsbackendsftp.c:3071
+#: ../daemon/gvfsbackendsftp.c:3412
+#: ../daemon/gvfsbackendsftp.c:4282
 msgid "File is directory"
 msgstr "Το αρχείο είναι κατάλογος"
 
-#: ../daemon/gvfsbackendftp.c:878 ../daemon/gvfsbackendftp.c:1143
-#: ../daemon/gvfsbackendsftp.c:3264
+#: ../daemon/gvfsbackendftp.c:914
+#: ../daemon/gvfsbackendftp.c:1179
+#: ../daemon/gvfsbackendsftp.c:3278
 msgid "backups not supported yet"
 msgstr "τα αντίγραφα ασφαλείας δεν υποστηρίζονται ακόμα"
 
@@ -807,7 +960,8 @@ msgid "%s: %d: Not Supported"
 msgstr "%s: %d: Δεν υποστηρίζεται"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:720 ../daemon/gvfsbackendgphoto2.c:726
+#: ../daemon/gvfsbackendgphoto2.c:720
+#: ../daemon/gvfsbackendgphoto2.c:726
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Ψηφιακή κάμερα (%s)"
@@ -818,7 +972,8 @@ msgstr "Ψηφιακή κάμερα (%s)"
 # 48x48/emblems/emblem-camera.icon.in.h:1
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:949 ../monitor/gphoto2/ggphoto2volume.c:197
+#: ../daemon/gvfsbackendgphoto2.c:949
+#: ../monitor/gphoto2/ggphoto2volume.c:197
 #: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
 msgid "%s Camera"
@@ -826,7 +981,8 @@ msgstr "Φωτογραφική μηχανή %s"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:952 ../monitor/gphoto2/ggphoto2volume.c:192
+#: ../daemon/gvfsbackendgphoto2.c:952
+#: ../monitor/gphoto2/ggphoto2volume.c:192
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
@@ -836,12 +992,14 @@ msgstr "%s Audio Player"
 # 48x48/emblems/emblem-camera.icon.in.h:1
 # 48x48/emblems/emblem-camera.icon.in.h:1
 # 48x48/emblems/emblem-camera.icon.in.h:1
-#: ../daemon/gvfsbackendgphoto2.c:961 ../monitor/gphoto2/ggphoto2volume.c:203
+#: ../daemon/gvfsbackendgphoto2.c:961
+#: ../monitor/gphoto2/ggphoto2volume.c:203
 #: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "Φωτογραφική μηχανή"
 
-#: ../daemon/gvfsbackendgphoto2.c:963 ../monitor/gphoto2/ggphoto2volume.c:306
+#: ../daemon/gvfsbackendgphoto2.c:963
+#: ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "Audio Player"
 
@@ -858,7 +1016,8 @@ msgstr "Αδυναμία δημιουργίας περιεχομένου gphoto2
 msgid "Error creating camera"
 msgstr "Σφάλμα δημιουργίας κάμερας"
 
-#: ../daemon/gvfsbackendgphoto2.c:1613 ../daemon/gvfsbackendgphoto2.c:1623
+#: ../daemon/gvfsbackendgphoto2.c:1613
+#: ../daemon/gvfsbackendgphoto2.c:1623
 msgid "Error loading device information"
 msgstr "Σφάλμα φόρτωσης πληροφοριών συσκευής"
 
@@ -888,7 +1047,8 @@ msgstr "προσάρτηση gphoto2 σε %s"
 msgid "No camera specified"
 msgstr "Δεν έχει καθοριστεί κάμερα"
 
-#: ../daemon/gvfsbackendgphoto2.c:1806 ../daemon/gvfsbackendgphoto2.c:1832
+#: ../daemon/gvfsbackendgphoto2.c:1806
+#: ../daemon/gvfsbackendgphoto2.c:1832
 #, c-format
 msgid "Filesystem is busy"
 msgstr "Το σύστημα αρχείων είναι απασχολημένο"
@@ -913,12 +1073,14 @@ msgid "Malformed icon identifier '%s'"
 msgstr "Κακοσχηματισμένο αναγνωριστικό εικονιδίου '%s'"
 
 #
-#: ../daemon/gvfsbackendgphoto2.c:2061 ../daemon/gvfsbackendgphoto2.c:3250
+#: ../daemon/gvfsbackendgphoto2.c:2061
+#: ../daemon/gvfsbackendgphoto2.c:3250
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Σφάλμα αναζήτησης στη ροή δεδομένων της κάμερας %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2201 ../daemon/gvfsbackendsftp.c:2940
+#: ../daemon/gvfsbackendgphoto2.c:2201
+#: ../daemon/gvfsbackendsftp.c:2954
 #: ../daemon/gvfsbackendsmbbrowse.c:1390
 msgid "Not a directory"
 msgstr "Δεν είναι κατάλογος"
@@ -941,17 +1103,20 @@ msgstr "Σφάλμα δημιουργίας καταλόγου"
 msgid "Name already exists"
 msgstr "Το όνομα υπάρχει ήδη"
 
-#: ../daemon/gvfsbackendgphoto2.c:2812 ../daemon/gvfsbackendgphoto2.c:3441
+#: ../daemon/gvfsbackendgphoto2.c:2812
+#: ../daemon/gvfsbackendgphoto2.c:3441
 msgid "New name too long"
 msgstr "Το νέο όνομα είναι πολύ μακρύ"
 
 # gconf/gconftool.c:982 gconf/gconftool.c:1084
-#: ../daemon/gvfsbackendgphoto2.c:2822 ../daemon/gvfsbackendgphoto2.c:3452
+#: ../daemon/gvfsbackendgphoto2.c:2822
+#: ../daemon/gvfsbackendgphoto2.c:3452
 msgid "Error renaming dir"
 msgstr "Σφάλμα μετονομασίας καταλόγου"
 
 #
-#: ../daemon/gvfsbackendgphoto2.c:2835 ../daemon/gvfsbackendgphoto2.c:3465
+#: ../daemon/gvfsbackendgphoto2.c:2835
+#: ../daemon/gvfsbackendgphoto2.c:3465
 msgid "Error renaming file"
 msgstr "Σφάλμα μετονομασίας αρχείου"
 
@@ -1015,7 +1180,8 @@ msgid "Directory notification not supported"
 msgstr "Η ειδοποίηση καταλόγου δεν υποστηρίζεται"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:269 ../daemon/gvfsbackendsmbbrowse.c:885
+#: ../daemon/gvfsbackendnetwork.c:269
+#: ../daemon/gvfsbackendsmbbrowse.c:885
 msgid "Windows Network"
 msgstr "Δίκτυο windows"
 
@@ -1031,7 +1197,8 @@ msgstr "Παρακολούθηση τοποθεσίας δικτύου"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:681 ../daemon/gvfsbackendsmb.c:545
+#: ../daemon/gvfsbackendobexftp.c:681
+#: ../daemon/gvfsbackendsmb.c:545
 #: ../daemon/gvfsbackendsmb.c:1417
 #, c-format
 msgid "%s on %s"
@@ -1039,9 +1206,7 @@ msgstr "%s σε %s"
 
 #: ../daemon/gvfsbackendobexftp.c:890
 msgid "USB support missing. Please contact your software vendor"
-msgstr ""
-"Έλλειψη υποστήριξης USB. Παρακαλώ επικοινωνήστε με τον κατασκευαστή του "
-"λογισμικού σας"
+msgstr "Έλλειψη υποστήριξης USB. Παρακαλώ επικοινωνήστε με τον κατασκευαστή του λογισμικού σας"
 
 #: ../daemon/gvfsbackendobexftp.c:1010
 msgid "Connection to the device lost"
@@ -1051,19 +1216,16 @@ msgstr "Η σύνδεση στη συσκευή χάθηκε"
 msgid "Device requires a software update"
 msgstr "Η συσκευή χρειάζεται μια ενημέρωση του λογισμικού"
 
-#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1929
+#: ../daemon/gvfsbackendobexftp.c:1855
+#: ../daemon/gvfsbackendsmb.c:1929
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Σφάλμα διαγραφής αρχείου: %s"
 
-#: ../daemon/gvfsbackendsftp.c:301 ../daemon/gvfsbackendsftp.c:657
+#: ../daemon/gvfsbackendsftp.c:301
+#: ../daemon/gvfsbackendsftp.c:657
 msgid "ssh program unexpectedly exited"
 msgstr "απρόσμενη έξοδος προγράμματος ssh"
-
-#: ../daemon/gvfsbackendsftp.c:309 ../daemon/gvfsbackendsftp.c:1822
-#: ../daemon/gvfsftptask.c:400
-msgid "Permission denied"
-msgstr "Δεν επιτρέπεται η πρόσβαση"
 
 #: ../daemon/gvfsbackendsftp.c:316
 msgid "Hostname not known"
@@ -1090,121 +1252,155 @@ msgstr "Αδυναμία spawn προγράμματος ssh"
 msgid "Unable to spawn ssh program: %s"
 msgstr "Αδυναμία spawn προγράμματος ssh: %s"
 
-#: ../daemon/gvfsbackendsftp.c:619 ../daemon/gvfsbackendsftp.c:879
+#: ../daemon/gvfsbackendsftp.c:619
+#: ../daemon/gvfsbackendsftp.c:880
 msgid "Timed out when logging in"
 msgstr "Λήξη χρόνου στην είσοδο"
 
-#: ../daemon/gvfsbackendsftp.c:958
-msgid "Enter passphrase for key"
-msgstr "Εισαγωγή συνθηματικού για  κλειδί"
-
+#. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendsftp.c:960
-msgid "Enter password"
-msgstr "Εισαγωγή κωδικού"
+#, c-format
+msgid "Enter passphrase for key for ssh as %s on %s"
+msgstr "Εισάγετε τη συνθηματική φράση για το κλειδί για ssh ως %s στο %s"
 
-#: ../daemon/gvfsbackendsftp.c:1036
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendsftp.c:963
+#, c-format
+msgid "Enter password for ssh as %s on %s"
+msgstr "Εισάγετε κωδικό πρόσβασης για ssh ως %s στο %s"
+
+#. Translators: %s is the hostname
+#: ../daemon/gvfsbackendsftp.c:967
+#, c-format
+msgid "Enter passphrase for key for ssh on %s"
+msgstr "Εισαγωγή συνθηματικού για κλειδί για ssh στο %s"
+
+#. Translators: %s is the hostname
+#: ../daemon/gvfsbackendsftp.c:970
+#, c-format
+msgid "Enter password for ssh on %s"
+msgstr "Εισάγετε κωδικό για ssh σε %s"
+
+#: ../daemon/gvfsbackendsftp.c:1050
 msgid "Can't send password"
 msgstr "Αδυναμία αποστολής κωδικού"
 
-#: ../daemon/gvfsbackendsftp.c:1044
+#: ../daemon/gvfsbackendsftp.c:1058
 msgid "Log In Anyway"
 msgstr "Είσοδος οπωσδήποτε"
 
-#: ../daemon/gvfsbackendsftp.c:1044
+#: ../daemon/gvfsbackendsftp.c:1058
 msgid "Cancel Login"
 msgstr "Ακύρωση εισόδου"
 
-#: ../daemon/gvfsbackendsftp.c:1053
+#: ../daemon/gvfsbackendsftp.c:1067
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
 "This happens when you log in to a computer the first time.\n"
 "\n"
-"The identity sent by the remote computer is %s. If you want to be absolutely "
-"sure it is safe to continue, contact the system administrator."
+"The identity sent by the remote computer is %s. If you want to be absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
 "Η ταυτότητα του απομακρυσμένου υπολογιστή (%s) είναι άγνωστη.\n"
 "Αυτό συμβαίνει όταν συνδέεστε για πρώτη φορά σε έναν υπολογιστή.\n"
 "\n"
-"Η ταυτότητα που στάλθηκε από τον απομακρυσμένο υπολογιστή είναι %s.Αν είστε "
-"απόλυτα σίγουροι ότι είναι ασφαλές να συνεχίσετε, επικοινωνήστε με τον "
-"διαχειριστή του συστήματος."
+"Η ταυτότητα που στάλθηκε από τον απομακρυσμένο υπολογιστή είναι %s.Αν είστε απόλυτα σίγουροι ότι είναι ασφαλές να συνεχίσετε, επικοινωνήστε με τον διαχειριστή του συστήματος."
 
 # #-#-#-#-#  gdm.gnome-2-20.el.po (el)  #-#-#-#-#
 #
-#: ../daemon/gvfsbackendsftp.c:1073
+#: ../daemon/gvfsbackendsftp.c:1087
 msgid "Login dialog cancelled"
 msgstr "Ο διάλογος εισόδου ακυρώθηκε"
 
-#: ../daemon/gvfsbackendsftp.c:1093
+#: ../daemon/gvfsbackendsftp.c:1107
 msgid "Can't send host identity confirmation"
 msgstr "Αδυναμία αποστολής επιβεβαίωσης ταυτότητας συστήματος"
 
-#: ../daemon/gvfsbackendsftp.c:1631 ../daemon/gvfsbackendsftp.c:1654
+#: ../daemon/gvfsbackendsftp.c:1645
+#: ../daemon/gvfsbackendsftp.c:1668
 msgid "Protocol error"
 msgstr "Σφάλμα πρωτοκόλου"
 
 #. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1679
+#: ../daemon/gvfsbackendsftp.c:1693
 #, c-format
 msgid "sftp for %s on %s"
 msgstr "sftp για %s στο %s"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1682
+#: ../daemon/gvfsbackendsftp.c:1696
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp στο %s"
 
-#: ../daemon/gvfsbackendsftp.c:1723
+#: ../daemon/gvfsbackendsftp.c:1737
 msgid "Unable to find supported ssh command"
 msgstr "Αδυναμία εύρεσης υποστηριζόμενης εντολής ssh"
 
-#: ../daemon/gvfsbackendsftp.c:1997 ../daemon/gvfsbackendsftp.c:2386
-#: ../daemon/gvfsbackendsftp.c:2465 ../daemon/gvfsbackendsftp.c:2476
-#: ../daemon/gvfsbackendsftp.c:2532 ../daemon/gvfsbackendsftp.c:2618
-#: ../daemon/gvfsbackendsftp.c:2668 ../daemon/gvfsbackendsftp.c:2714
-#: ../daemon/gvfsbackendsftp.c:2789 ../daemon/gvfsbackendsftp.c:2896
-#: ../daemon/gvfsbackendsftp.c:3013 ../daemon/gvfsbackendsftp.c:3094
-#: ../daemon/gvfsbackendsftp.c:3166 ../daemon/gvfsbackendsftp.c:3178
-#: ../daemon/gvfsbackendsftp.c:3236 ../daemon/gvfsbackendsftp.c:3278
-#: ../daemon/gvfsbackendsftp.c:3463 ../daemon/gvfsbackendsftp.c:3495
-#: ../daemon/gvfsbackendsftp.c:3550 ../daemon/gvfsbackendsftp.c:3607
-#: ../daemon/gvfsbackendsftp.c:3904 ../daemon/gvfsbackendsftp.c:3971
-#: ../daemon/gvfsbackendsftp.c:4106 ../daemon/gvfsbackendsftp.c:4166
-#: ../daemon/gvfsbackendsftp.c:4201 ../daemon/gvfsbackendsftp.c:4229
-#: ../daemon/gvfsbackendsftp.c:4337 ../daemon/gvfsbackendsftp.c:4391
-#: ../daemon/gvfsbackendsftp.c:4430 ../daemon/gvfsbackendsftp.c:4464
-#: ../daemon/gvfsbackendsftp.c:4498 ../daemon/gvfsbackendsftp.c:4513
-#: ../daemon/gvfsbackendsftp.c:4528 ../daemon/gvfsbackendsftp.c:4606
+#: ../daemon/gvfsbackendsftp.c:2011
+#: ../daemon/gvfsbackendsftp.c:2400
+#: ../daemon/gvfsbackendsftp.c:2479
+#: ../daemon/gvfsbackendsftp.c:2490
+#: ../daemon/gvfsbackendsftp.c:2546
+#: ../daemon/gvfsbackendsftp.c:2632
+#: ../daemon/gvfsbackendsftp.c:2682
+#: ../daemon/gvfsbackendsftp.c:2728
+#: ../daemon/gvfsbackendsftp.c:2803
+#: ../daemon/gvfsbackendsftp.c:2910
+#: ../daemon/gvfsbackendsftp.c:3027
+#: ../daemon/gvfsbackendsftp.c:3108
+#: ../daemon/gvfsbackendsftp.c:3180
+#: ../daemon/gvfsbackendsftp.c:3192
+#: ../daemon/gvfsbackendsftp.c:3250
+#: ../daemon/gvfsbackendsftp.c:3292
+#: ../daemon/gvfsbackendsftp.c:3477
+#: ../daemon/gvfsbackendsftp.c:3509
+#: ../daemon/gvfsbackendsftp.c:3564
+#: ../daemon/gvfsbackendsftp.c:3621
+#: ../daemon/gvfsbackendsftp.c:3918
+#: ../daemon/gvfsbackendsftp.c:3985
+#: ../daemon/gvfsbackendsftp.c:4120
+#: ../daemon/gvfsbackendsftp.c:4180
+#: ../daemon/gvfsbackendsftp.c:4215
+#: ../daemon/gvfsbackendsftp.c:4243
+#: ../daemon/gvfsbackendsftp.c:4351
+#: ../daemon/gvfsbackendsftp.c:4405
+#: ../daemon/gvfsbackendsftp.c:4444
+#: ../daemon/gvfsbackendsftp.c:4478
+#: ../daemon/gvfsbackendsftp.c:4512
+#: ../daemon/gvfsbackendsftp.c:4527
+#: ../daemon/gvfsbackendsftp.c:4542
+#: ../daemon/gvfsbackendsftp.c:4620
 msgid "Invalid reply received"
 msgstr "Λήφθηκε μη έγκυρη απάντηση"
 
-#: ../daemon/gvfsbackendsftp.c:2245 ../daemon/gvfsbackendsmb.c:1424
+#: ../daemon/gvfsbackendsftp.c:2259
+#: ../daemon/gvfsbackendsmb.c:1424
 #: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr " (μη έγκυρη κωδικοποίηση)"
 
-#: ../daemon/gvfsbackendsftp.c:2330
+#: ../daemon/gvfsbackendsftp.c:2344
 msgid "Failure"
 msgstr "Αποτυχία"
 
-#: ../daemon/gvfsbackendsftp.c:2438
+#: ../daemon/gvfsbackendsftp.c:2452
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
 msgstr "Μη έγκυρο icon_id '%s' στο OpenIconForRead"
 
 # gconf/gconftool.c:1181
-#: ../daemon/gvfsbackendsftp.c:2734
+#: ../daemon/gvfsbackendsftp.c:2748
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Σφάλμα δημιουργίας αντιγράφου ασφαλείας: %s"
 
-#: ../daemon/gvfsbackendsftp.c:3340
+#: ../daemon/gvfsbackendsftp.c:3354
 msgid "Unable to create temporary file"
 msgstr "Αδυναμία δημιουργίας προσωρινού φακέλου"
 
-#: ../daemon/gvfsbackendsftp.c:4263 ../daemon/gvfsbackendsmb.c:2027
+#: ../daemon/gvfsbackendsftp.c:4277
+#: ../daemon/gvfsbackendsmb.c:2027
 msgid "Can't move directory over directory"
 msgstr "Δεν είναι δυνατή η μετακίνηση καταλόγου σε κατάλογο"
 
@@ -1214,7 +1410,8 @@ msgstr "Δεν είναι δυνατή η μετακίνηση καταλόγο�
 msgid "Password required for share %s on %s"
 msgstr "Απαιτείται κωδικός για το κοινόχρηστο %s σε %s"
 
-#: ../daemon/gvfsbackendsmb.c:485 ../daemon/gvfsbackendsmb.c:531
+#: ../daemon/gvfsbackendsmb.c:485
+#: ../daemon/gvfsbackendsmb.c:531
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
@@ -1223,9 +1420,10 @@ msgstr "Εσωτερικό σφάλμα (%s)"
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:611
 msgid "Failed to mount Windows share"
-msgstr "Αποτυχία προσάρτησης διαμοιραζόμενου Windows"
+msgstr "Αποτυχία προσάρτησης κοινόχρηστου καταλόγου Windows"
 
-#: ../daemon/gvfsbackendsmb.c:772 ../daemon/gvfsbackendsmb.c:1268
+#: ../daemon/gvfsbackendsmb.c:772
+#: ../daemon/gvfsbackendsmb.c:1268
 msgid "Unsupported seek type"
 msgstr "Μη υποστηριζόμενος τύπος seek"
 
@@ -1265,15 +1463,15 @@ msgstr "Απαιτείται κωδικός για το %s"
 #: ../daemon/gvfsbackendsmbbrowse.c:893
 #, c-format
 msgid "Windows shares on %s"
-msgstr "Διαμοιραζόμενοι πόροι Windows στο %s"
+msgstr "Κοινόχρηστοι πόροι Windows στο %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmbbrowse.c:992
 msgid "Failed to retrieve share list from server"
-msgstr ""
-"Αδυναμία ανάκτησης λίστας διαμοιρασμένων αντικειμένων από τον εξυπηρετητή"
+msgstr "Αδυναμία ανάκτησης λίστας κοινόχρηστων αντικειμένων από τον εξυπηρετητή"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1080 ../daemon/gvfsbackendsmbbrowse.c:1126
+#: ../daemon/gvfsbackendsmbbrowse.c:1080
+#: ../daemon/gvfsbackendsmbbrowse.c:1126
 msgid "The file is not a mountable"
 msgstr "Το αρχείο δε μπορεί να προσαρτηθεί"
 
@@ -1285,11 +1483,13 @@ msgstr "Δεν είναι τυπικό αρχείο"
 msgid "Windows Network Filesystem Service"
 msgstr "Υπηρεσία συστήματος αρχείων δκτύου Windows"
 
-#: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
+#: ../daemon/gvfsbackendtrash.c:370
+#: ../daemon/gvfsbackendtrash.c:426
 msgid "The trash folder may not be deleted"
 msgstr "Ο κάδος απορριμάτων δεν μπορεί να διαγραφεί"
 
-#: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
+#: ../daemon/gvfsbackendtrash.c:387
+#: ../daemon/gvfsbackendtrash.c:440
 msgid "Items in the trash may not be modified"
 msgstr "Αντικείμενα του κάδου απορριμάτων δεν μπορούν αν τροποποιηθούν"
 
@@ -1298,7 +1498,8 @@ msgstr "Αντικείμενα του κάδου απορριμάτων δεν �
 # #-#-#-#-#  nautilus.HEAD.el.po (el)  #-#-#-#-#
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:742 ../daemon/gvfsbackendtrash.c:850
+#: ../daemon/gvfsbackendtrash.c:742
+#: ../daemon/gvfsbackendtrash.c:850
 msgid "Trash"
 msgstr "Απορρίμματα"
 
@@ -1316,18 +1517,16 @@ msgstr "Σφάλμα αποστολής fd: %s"
 msgid "Unexpected end of stream"
 msgstr "Αναπάντεχο τέλος της ροής stream"
 
-#: ../daemon/gvfsftpconnection.c:196 ../daemon/gvfsftpconnection.c:209
-#: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
+#: ../daemon/gvfsftpconnection.c:196
+#: ../daemon/gvfsftpconnection.c:209
+#: ../daemon/gvfsftptask.c:412
+#: ../daemon/gvfsftptask.c:840
 msgid "Invalid reply"
 msgstr "Μη έγκυρη απάντηση"
 
 #: ../daemon/gvfsftpconnection.c:392
-msgid ""
-"Failed to create active FTP connection. Maybe your router does not support "
-"this?"
-msgstr ""
-"Αδυναμία δημιουργίας ενεργής σύνδεσης FTP. Μήπως ο δρομολογητής σας δεν "
-"υποστηρίζει την υπηρεσία;"
+msgid "Failed to create active FTP connection. Maybe your router does not support this?"
+msgstr "Αδυναμία δημιουργίας ενεργής σύνδεσης FTP. Μήπως ο δρομολογητής σας δεν υποστηρίζει την υπηρεσία;"
 
 #: ../daemon/gvfsftpconnection.c:399
 msgid "Failed to create active FTP connection."
@@ -1351,14 +1550,14 @@ msgstr "Το σύστημα έκλεισε τη σύνδεση"
 
 #: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
-msgstr ""
-"Αδυναμία ανοίγματος σύνδεσης δεδομένων. Μήπως ο firewall σας την εμποδίζει;"
+msgstr "Αδυναμία ανοίγματος σύνδεσης δεδομένων. Μήπως ο firewall σας την εμποδίζει;"
 
 #: ../daemon/gvfsftptask.c:368
 msgid "Data connection closed"
 msgstr "Η σύνδεση δεδομένων έκλεισε"
 
-#: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
+#: ../daemon/gvfsftptask.c:375
+#: ../daemon/gvfsftptask.c:379
 msgid "Operation failed"
 msgstr "Αποτυχία λειτουργίας"
 
@@ -1387,7 +1586,8 @@ msgid "Invalid dbus message"
 msgstr "Μη έγκυρο μήνυμα dbus"
 
 #
-#: ../daemon/main.c:45 ../metadata/meta-daemon.c:694
+#: ../daemon/main.c:45
+#: ../metadata/meta-daemon.c:694
 msgid "Replace old daemon."
 msgstr "Αντικατάσταση παλιάς υπηρεσίας."
 
@@ -1406,18 +1606,26 @@ msgstr "Κύρια υπηρεσία για GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:76 ../metadata/meta-daemon.c:718
+#: ../daemon/main.c:76
+#: ../metadata/meta-daemon.c:718
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
-#: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:123 ../programs/gvfs-info.c:371
-#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:60
-#: ../programs/gvfs-move.c:111 ../programs/gvfs-open.c:140
-#: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
-#: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
+#: ../daemon/main.c:78
+#: ../metadata/meta-daemon.c:720
+#: ../programs/gvfs-cat.c:163
+#: ../programs/gvfs-cat.c:176
+#: ../programs/gvfs-copy.c:123
+#: ../programs/gvfs-info.c:371
+#: ../programs/gvfs-ls.c:392
+#: ../programs/gvfs-mkdir.c:60
+#: ../programs/gvfs-move.c:111
+#: ../programs/gvfs-open.c:140
+#: ../programs/gvfs-open.c:153
+#: ../programs/gvfs-save.c:165
+#: ../programs/gvfs-set-attribute.c:128
+#: ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "Εκτελέστε \"%s --help\" για περισσότερες πληροφορίες."
@@ -1431,7 +1639,8 @@ msgstr "Μη έγκυρες παράμετροι από spawned child"
 msgid "Automount failed: %s"
 msgstr "Αποτυχία αυτόματης προσάρτησης: %s"
 
-#: ../daemon/mount.c:824 ../daemon/mount.c:898
+#: ../daemon/mount.c:824
+#: ../daemon/mount.c:898
 msgid "The specified location is not mounted"
 msgstr "Η καθορισμένη τοποθεσία δεν έχει προσαρτηθεί"
 
@@ -1448,18 +1657,22 @@ msgid "Location is not mountable"
 msgstr "Η τοποθεσία δεν μπορεί να προσαρτηθεί"
 
 # backends/xml-backend.c:315
-#: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
-#: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
+#: ../metadata/meta-daemon.c:130
+#: ../metadata/meta-daemon.c:336
+#: ../metadata/meta-daemon.c:390
+#: ../metadata/meta-daemon.c:419
 #: ../metadata/meta-daemon.c:449
 #, c-format
 msgid "Can't find metadata file %s"
 msgstr "Αδυναμία εντοπισμού αρχείου μεταδεδομένων %s"
 
-#: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
+#: ../metadata/meta-daemon.c:160
+#: ../metadata/meta-daemon.c:179
 msgid "Unable to set metadata key"
 msgstr "Αδυναμία ορισμού κλειδιού μεταδεδομένων"
 
-#: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:399
+#: ../metadata/meta-daemon.c:197
+#: ../metadata/meta-daemon.c:399
 msgid "Unable to unset metadata key"
 msgstr "Αδυναμία μηδενισμού του κλειδιού μεταδεδομένων"
 
@@ -1484,7 +1697,8 @@ msgstr "Δαίμονας μεταδεδομένων για το GVFS"
 msgid "GVfs GDU Volume Monitor"
 msgstr "GVfs GDU παρακολούθηση μονάδας δίσκου"
 
-#: ../monitor/gdu/ggdudrive.c:168 ../monitor/hal/ghaldrive.c:179
+#: ../monitor/gdu/ggdudrive.c:168
+#: ../monitor/hal/ghaldrive.c:179
 msgid "Floppy Drive"
 msgstr "Συσκευή δισκέτας"
 
@@ -1497,7 +1711,8 @@ msgstr "Ανώνυμος οδηγός (%s)"
 msgid "Unnamed Drive"
 msgstr "Ανώνυμη συσκευή"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/hal/ghaldrive.c:662
+#: ../monitor/gdu/ggdudrive.c:561
+#: ../monitor/hal/ghaldrive.c:662
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr "Αποτυχία αποβολής μέσου. Ένας ή περισσότεροι τόμοι είναι απασχολημένοι"
@@ -1505,13 +1720,10 @@ msgstr "Αποτυχία αποβολής μέσου. Ένας ή περισσό
 #: ../monitor/gdu/ggdudrive.c:1015
 msgid ""
 "Start drive in degraded mode?\n"
-"Starting a drive in degraded mode means that the drive is no longer tolerant "
-"to failures. Data on the drive may be irrevocably lost if a component fails."
+"Starting a drive in degraded mode means that the drive is no longer tolerant to failures. Data on the drive may be irrevocably lost if a component fails."
 msgstr ""
 "Έναρξη του δίσκου σε υποβιβασμένη κατάσταση;\n"
-"Η έναρξη του δίσκου σε υποβιβασμένη κατάσταση σημαίνει ότι ο δίσκος δεν "
-"είναι ανεκτικός στα λάθη. Τα δεδομένα στον δίσκο μπορεί να χαθούν οριστικά "
-"εάν μία συνιστώσα του δίσκου αποτύχει."
+"Η έναρξη του δίσκου σε υποβιβασμένη κατάσταση σημαίνει ότι ο δίσκος δεν είναι ανεκτικός στα λάθη. Τα δεδομένα στον δίσκο μπορεί να χαθούν οριστικά εάν μία συνιστώσα του δίσκου αποτύχει."
 
 #: ../monitor/gdu/ggdudrive.c:1021
 msgid "Start Anyway"
@@ -1561,141 +1773,177 @@ msgstr ""
 "Εισάγετε τον κωδικό πρόσβασης για να ξεκλειδώσετε την μονάδα δίσκου\n"
 "Η συσκευή %s περιέχει κρυπτογραφημένα δεδομένα."
 
-#: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
+#: ../monitor/gphoto2/hal-utils.c:40
+#: ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
 msgstr "Δίσκος CD-ROM"
 
-#: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
+#: ../monitor/gphoto2/hal-utils.c:40
+#: ../monitor/hal/hal-utils.c:40
 msgid "Blank CD-ROM Disc"
 msgstr "Κενός δίσκος CD-ROM"
 
-#: ../monitor/gphoto2/hal-utils.c:41 ../monitor/hal/hal-utils.c:41
+#: ../monitor/gphoto2/hal-utils.c:41
+#: ../monitor/hal/hal-utils.c:41
 msgid "CD-R Disc"
 msgstr "Δίσκος CD-R"
 
-#: ../monitor/gphoto2/hal-utils.c:41 ../monitor/hal/hal-utils.c:41
+#: ../monitor/gphoto2/hal-utils.c:41
+#: ../monitor/hal/hal-utils.c:41
 msgid "Blank CD-R Disc"
 msgstr "Κενός δίσκος CD-R"
 
-#: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
+#: ../monitor/gphoto2/hal-utils.c:42
+#: ../monitor/hal/hal-utils.c:42
 msgid "CD-RW Disc"
 msgstr "Δίσκος CD-RW"
 
-#: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
+#: ../monitor/gphoto2/hal-utils.c:42
+#: ../monitor/hal/hal-utils.c:42
 msgid "Blank CD-RW Disc"
 msgstr "Κενός δίσκος CD-RW"
 
-#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
-#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+#: ../monitor/gphoto2/hal-utils.c:43
+#: ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43
+#: ../monitor/hal/hal-utils.c:45
 msgid "DVD-ROM Disc"
 msgstr "Δίσκος DVD-ROM"
 
-#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
-#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+#: ../monitor/gphoto2/hal-utils.c:43
+#: ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43
+#: ../monitor/hal/hal-utils.c:45
 msgid "Blank DVD-ROM Disc"
 msgstr "Κενός δίσκος DVD-ROM"
 
-#: ../monitor/gphoto2/hal-utils.c:44 ../monitor/hal/hal-utils.c:44
+#: ../monitor/gphoto2/hal-utils.c:44
+#: ../monitor/hal/hal-utils.c:44
 msgid "DVD-RAM Disc"
 msgstr "Δίσκος DVD-RAM"
 
-#: ../monitor/gphoto2/hal-utils.c:44 ../monitor/hal/hal-utils.c:44
+#: ../monitor/gphoto2/hal-utils.c:44
+#: ../monitor/hal/hal-utils.c:44
 msgid "Blank DVD-RAM Disc"
 msgstr "Κενός δίσκος DVD-RAM"
 
-#: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
+#: ../monitor/gphoto2/hal-utils.c:46
+#: ../monitor/hal/hal-utils.c:46
 msgid "DVD-RW Disc"
 msgstr "Δίσκος DVD-RW"
 
-#: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
+#: ../monitor/gphoto2/hal-utils.c:46
+#: ../monitor/hal/hal-utils.c:46
 msgid "Blank DVD-RW Disc"
 msgstr "Κενός δίσκος DVD-RW"
 
-#: ../monitor/gphoto2/hal-utils.c:47 ../monitor/hal/hal-utils.c:47
+#: ../monitor/gphoto2/hal-utils.c:47
+#: ../monitor/hal/hal-utils.c:47
 msgid "DVD+R Disc"
 msgstr "Δίσκος DVD+R"
 
-#: ../monitor/gphoto2/hal-utils.c:47 ../monitor/hal/hal-utils.c:47
+#: ../monitor/gphoto2/hal-utils.c:47
+#: ../monitor/hal/hal-utils.c:47
 msgid "Blank DVD+R Disc"
 msgstr "Κενός δίσκος DVD+R"
 
-#: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
+#: ../monitor/gphoto2/hal-utils.c:48
+#: ../monitor/hal/hal-utils.c:48
 msgid "DVD+RW Disc"
 msgstr "Δίσκος DVD+RW"
 
-#: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
+#: ../monitor/gphoto2/hal-utils.c:48
+#: ../monitor/hal/hal-utils.c:48
 msgid "Blank DVD+RW Disc"
 msgstr "Κενός δίσκος DVD+RW"
 
-#: ../monitor/gphoto2/hal-utils.c:49 ../monitor/hal/hal-utils.c:49
+#: ../monitor/gphoto2/hal-utils.c:49
+#: ../monitor/hal/hal-utils.c:49
 msgid "DVD+R DL Disc"
 msgstr "Δίσκος DVD+R DL"
 
-#: ../monitor/gphoto2/hal-utils.c:49 ../monitor/hal/hal-utils.c:49
+#: ../monitor/gphoto2/hal-utils.c:49
+#: ../monitor/hal/hal-utils.c:49
 msgid "Blank DVD+R DL Disc"
 msgstr "Κενός δίσκος DVD+R DL"
 
-#: ../monitor/gphoto2/hal-utils.c:50 ../monitor/hal/hal-utils.c:50
+#: ../monitor/gphoto2/hal-utils.c:50
+#: ../monitor/hal/hal-utils.c:50
 msgid "Blu-Ray Disc"
 msgstr "Δίσκος Blu-Ray"
 
-#: ../monitor/gphoto2/hal-utils.c:50 ../monitor/hal/hal-utils.c:50
+#: ../monitor/gphoto2/hal-utils.c:50
+#: ../monitor/hal/hal-utils.c:50
 msgid "Blank Blu-Ray Disc"
 msgstr "Κενός δίσκος Blu-Ray"
 
-#: ../monitor/gphoto2/hal-utils.c:51 ../monitor/hal/hal-utils.c:51
+#: ../monitor/gphoto2/hal-utils.c:51
+#: ../monitor/hal/hal-utils.c:51
 msgid "Blu-Ray R Disc"
 msgstr "Δίσκος Blu-Ray R"
 
-#: ../monitor/gphoto2/hal-utils.c:51 ../monitor/hal/hal-utils.c:51
+#: ../monitor/gphoto2/hal-utils.c:51
+#: ../monitor/hal/hal-utils.c:51
 msgid "Blank Blu-Ray R Disc"
 msgstr "Κενός δίσκος Blu-Ray R"
 
-#: ../monitor/gphoto2/hal-utils.c:52 ../monitor/hal/hal-utils.c:52
+#: ../monitor/gphoto2/hal-utils.c:52
+#: ../monitor/hal/hal-utils.c:52
 msgid "Blu-Ray RW Disc"
 msgstr "Δίσκος Blu-Ray RW"
 
-#: ../monitor/gphoto2/hal-utils.c:52 ../monitor/hal/hal-utils.c:52
+#: ../monitor/gphoto2/hal-utils.c:52
+#: ../monitor/hal/hal-utils.c:52
 msgid "Blank Blu-Ray RW Disc"
 msgstr "Κενός δίσκος Blu-Ray RW"
 
-#: ../monitor/gphoto2/hal-utils.c:53 ../monitor/hal/hal-utils.c:53
+#: ../monitor/gphoto2/hal-utils.c:53
+#: ../monitor/hal/hal-utils.c:53
 msgid "HD DVD Disc"
 msgstr "Δίσκος HD DVD"
 
-#: ../monitor/gphoto2/hal-utils.c:53 ../monitor/hal/hal-utils.c:53
+#: ../monitor/gphoto2/hal-utils.c:53
+#: ../monitor/hal/hal-utils.c:53
 msgid "Blank HD DVD Disc"
 msgstr "Κενός δίσκος HD DVD"
 
-#: ../monitor/gphoto2/hal-utils.c:54 ../monitor/hal/hal-utils.c:54
+#: ../monitor/gphoto2/hal-utils.c:54
+#: ../monitor/hal/hal-utils.c:54
 msgid "HD DVD-R Disc"
 msgstr "Δίσκος HD DVD-R"
 
-#: ../monitor/gphoto2/hal-utils.c:54 ../monitor/hal/hal-utils.c:54
+#: ../monitor/gphoto2/hal-utils.c:54
+#: ../monitor/hal/hal-utils.c:54
 msgid "Blank HD DVD-R Disc"
 msgstr "Κενός δίσκος HD DVD-R"
 
-#: ../monitor/gphoto2/hal-utils.c:55 ../monitor/hal/hal-utils.c:55
+#: ../monitor/gphoto2/hal-utils.c:55
+#: ../monitor/hal/hal-utils.c:55
 msgid "HD DVD-RW Disc"
 msgstr "Δίσκος HD DVD-RW"
 
-#: ../monitor/gphoto2/hal-utils.c:55 ../monitor/hal/hal-utils.c:55
+#: ../monitor/gphoto2/hal-utils.c:55
+#: ../monitor/hal/hal-utils.c:55
 msgid "Blank HD DVD-RW Disc"
 msgstr "Κενός δίσκος HD DVD-RW"
 
-#: ../monitor/gphoto2/hal-utils.c:56 ../monitor/hal/hal-utils.c:56
+#: ../monitor/gphoto2/hal-utils.c:56
+#: ../monitor/hal/hal-utils.c:56
 msgid "MO Disc"
 msgstr "Δίσκος ΜΟ"
 
-#: ../monitor/gphoto2/hal-utils.c:56 ../monitor/hal/hal-utils.c:56
+#: ../monitor/gphoto2/hal-utils.c:56
+#: ../monitor/hal/hal-utils.c:56
 msgid "Blank MO Disc"
 msgstr "Κενός δίσκος ΜΟ"
 
-#: ../monitor/gphoto2/hal-utils.c:57 ../monitor/hal/hal-utils.c:57
+#: ../monitor/gphoto2/hal-utils.c:57
+#: ../monitor/hal/hal-utils.c:57
 msgid "Disc"
 msgstr "Δίσκος"
 
-#: ../monitor/gphoto2/hal-utils.c:57 ../monitor/hal/hal-utils.c:57
+#: ../monitor/gphoto2/hal-utils.c:57
+#: ../monitor/hal/hal-utils.c:57
 msgid "Blank Disc"
 msgstr "Κενός δίσκος"
 
@@ -1837,28 +2085,33 @@ msgstr "Συσκευή Thumb"
 msgid "Mass Storage Drive"
 msgstr "Συσκευή μαζικής αποθήκευσης"
 
-#: ../monitor/hal/ghalmount.c:159 ../monitor/hal/ghalvolume.c:163
+#: ../monitor/hal/ghalmount.c:159
+#: ../monitor/hal/ghalvolume.c:163
 #, c-format
 msgid "%.1f kB"
 msgstr "%.1f kB"
 
-#: ../monitor/hal/ghalmount.c:164 ../monitor/hal/ghalvolume.c:168
+#: ../monitor/hal/ghalmount.c:164
+#: ../monitor/hal/ghalvolume.c:168
 #, c-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: ../monitor/hal/ghalmount.c:169 ../monitor/hal/ghalvolume.c:173
+#: ../monitor/hal/ghalmount.c:169
+#: ../monitor/hal/ghalvolume.c:173
 #, c-format
 msgid "%.1f GB"
 msgstr "%.1f GΒ"
 
-#: ../monitor/hal/ghalmount.c:323 ../monitor/hal/ghalvolume.c:244
+#: ../monitor/hal/ghalmount.c:323
+#: ../monitor/hal/ghalvolume.c:244
 msgid "Mixed Audio/Data Disc"
 msgstr "Μικτός δίσκος ήχου/δεδομένων"
 
 #. Translators: %s is the size of the mount (e.g. 512 MB)
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../monitor/hal/ghalmount.c:336 ../monitor/hal/ghalvolume.c:255
+#: ../monitor/hal/ghalmount.c:336
+#: ../monitor/hal/ghalvolume.c:255
 #, c-format
 msgid "%s Media"
 msgstr "Δεδομένα %s"
@@ -1910,50 +2163,47 @@ msgstr "LOCATION... - σύνδεση ΤΟΠΟΘΕΣΙΩΝ στην στάντα�
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
 #: ../programs/gvfs-cat.c:141
-msgid ""
-"Concatenate files at locations and print to the standard output. Works just "
-"like the traditional cat utility, but using gvfs location instead local "
-"files: for example you can use something like smb://server/resource/file.txt "
-"as location to concatenate."
-msgstr ""
-"Σύνδεση αρχείων σε τοποθεσίες και εκτύπωση στην στάνταρ έξοδο. Λειτουργεί "
-"όπως το παραδοσιακό εργαλείο Cat, αλλά χρησιμοποιεί την τοποθεσία gvfs αντί "
-"για τα τοπικά αρχεία: Για παράδειγμα μπορείτε να χρησιμοποιήσετε κάτι σαν "
-"smb://server/resource/file.txt ως τοποθεσία για σύνδεση."
+msgid "Concatenate files at locations and print to the standard output. Works just like the traditional cat utility, but using gvfs location instead local files: for example you can use something like smb://server/resource/file.txt as location to concatenate."
+msgstr "Σύνδεση αρχείων σε τοποθεσίες και εκτύπωση στην στάνταρ έξοδο. Λειτουργεί όπως το παραδοσιακό εργαλείο Cat, αλλά χρησιμοποιεί την τοποθεσία gvfs αντί για τα τοπικά αρχεία: Για παράδειγμα μπορείτε να χρησιμοποιήσετε κάτι σαν smb://server/resource/file.txt ως τοποθεσία για σύνδεση."
 
 #: ../programs/gvfs-cat.c:148
-msgid ""
-"Note: just pipe through cat if you need its formatting option like -n, -T or "
-"other."
-msgstr ""
-"Σημείωση: απλά διασωληνώστε μέσω της cat αν χρειάζεστε δυνατότητα "
-"μορφοποίησης όπως  -n, -T ή κάποια άλλη."
+msgid "Note: just pipe through cat if you need its formatting option like -n, -T or other."
+msgstr "Σημείωση: απλά διασωληνώστε μέσω της cat αν χρειάζεστε δυνατότητα μορφοποίησης όπως  -n, -T ή κάποια άλλη."
 
-#: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:121
-#: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
-#: ../programs/gvfs-mkdir.c:58 ../programs/gvfs-move.c:109
-#: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
-#: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
+#: ../programs/gvfs-cat.c:161
+#: ../programs/gvfs-copy.c:121
+#: ../programs/gvfs-info.c:369
+#: ../programs/gvfs-ls.c:390
+#: ../programs/gvfs-mkdir.c:58
+#: ../programs/gvfs-move.c:109
+#: ../programs/gvfs-open.c:138
+#: ../programs/gvfs-save.c:163
+#: ../programs/gvfs-set-attribute.c:126
+#: ../programs/gvfs-tree.c:249
 #, c-format
 msgid "Error parsing commandline options: %s\n"
 msgstr "Σφάλμα ανάλυσης των παραμέτρων της γραμμής εντολών: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:151
+#: ../programs/gvfs-cat.c:174
+#: ../programs/gvfs-open.c:151
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: λείπουν τοποθεσίες"
 
-#: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
+#: ../programs/gvfs-copy.c:44
+#: ../programs/gvfs-move.c:42
 msgid "no target directory"
 msgstr "Δεν υπάρχει κατάλογος προορισμού"
 
-#: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
+#: ../programs/gvfs-copy.c:45
+#: ../programs/gvfs-move.c:43
 msgid "show progress"
 msgstr "εμφάνιση προόδου"
 
-#: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
+#: ../programs/gvfs-copy.c:46
+#: ../programs/gvfs-move.c:44
 msgid "prompt before overwrite"
 msgstr "ερώτηση πριν την αντικατάσταση"
 
@@ -1961,7 +2211,8 @@ msgstr "ερώτηση πριν την αντικατάσταση"
 msgid "preserve all attributes"
 msgstr "διατήρηση όλων των ιδιοτήτων"
 
-#: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
+#: ../programs/gvfs-copy.c:48
+#: ../programs/gvfs-move.c:45
 msgid "backup existing destination files"
 msgstr "Δημιουργία αντιγράφων ασφαλείας για την υπάρχουσα διαδρομή αρχείων"
 
@@ -1969,7 +2220,8 @@ msgstr "Δημιουργία αντιγράφων ασφαλείας για τη
 msgid "never follow symbolic links"
 msgstr "Ποτέ μην ακολουθείς τους συμβολικούς συνδέσμους"
 
-#: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
+#: ../programs/gvfs-copy.c:78
+#: ../programs/gvfs-move.c:67
 #, c-format
 msgid "progress"
 msgstr "πρόοδος"
@@ -1978,15 +2230,18 @@ msgstr "πρόοδος"
 msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
 msgstr "ΠΗΓΗ... ΠΡΟΟΡΙΣΜΟΣ - αντιγραφή αρχείου(α) από ΠΗΓΗ στο ΠΡΟΟΡΙΣΜΟΣ"
 
-#: ../programs/gvfs-copy.c:132 ../programs/gvfs-move.c:120
+#: ../programs/gvfs-copy.c:132
+#: ../programs/gvfs-move.c:120
 msgid "Missing operand\n"
 msgstr "Παράληψη τελεστέου\n"
 
-#: ../programs/gvfs-copy.c:140 ../programs/gvfs-move.c:128
+#: ../programs/gvfs-copy.c:140
+#: ../programs/gvfs-move.c:128
 msgid "Too many arguments\n"
 msgstr "Πάρα πολλά ορίσματα\n"
 
-#: ../programs/gvfs-copy.c:149 ../programs/gvfs-move.c:137
+#: ../programs/gvfs-copy.c:149
+#: ../programs/gvfs-move.c:137
 #, c-format
 msgid "Target %s is not a directory\n"
 msgstr "Ο προορισμός %s δεν είναι κατάλογος\n"
@@ -2010,11 +2265,13 @@ msgstr "Ιδιότητες εγγραφής λίστας"
 msgid "Get filesystem info"
 msgstr " Λήψη πληροφοριών συστήματος αρχείων"
 
-#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
+#: ../programs/gvfs-info.c:39
+#: ../programs/gvfs-ls.c:39
 msgid "The attributes to get"
 msgstr "Οι Ιδιότητες για ανάκτηση"
 
-#: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
+#: ../programs/gvfs-info.c:40
+#: ../programs/gvfs-ls.c:43
 #: ../programs/gvfs-set-attribute.c:37
 msgid "Don't follow symlinks"
 msgstr "Μην ακλουθείς τους συμβολικούς συνδέσμους"
@@ -2113,7 +2370,8 @@ msgstr "Εγγράψιμη ιδιότητα namespaces:\n"
 msgid "- show info for <location>"
 msgstr "- προβολή πληροφοριών για το <location>"
 
-#: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
+#: ../programs/gvfs-ls.c:40
+#: ../programs/gvfs-tree.c:36
 msgid "Show hidden files"
 msgstr "Εμφάνιση κρυφών αρχείων"
 
@@ -2125,7 +2383,8 @@ msgstr "Χρήση μορφοποίησης μεγάλης λίστας"
 msgid "Show completions"
 msgstr "Παρουσίαση ολοκληρωμένων ενεργειών"
 
-#: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
+#: ../programs/gvfs-ls.c:164
+#: ../programs/gvfs-ls.c:171
 #: ../programs/gvfs-rename.c:69
 #, c-format
 msgid "Error: %s\n"
@@ -2144,12 +2403,14 @@ msgid "- create directories"
 msgstr "- δημιουργία καταλόγων"
 
 # gconf/gconfd.c:1676
-#: ../programs/gvfs-mkdir.c:79 ../programs/gvfs-mkdir.c:88
+#: ../programs/gvfs-mkdir.c:79
+#: ../programs/gvfs-mkdir.c:88
 #, c-format
 msgid "Error creating directory: %s\n"
 msgstr "Σφάλμα δημιουργίας καταλόγου: %s\n"
 
-#: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
+#: ../programs/gvfs-monitor-dir.c:38
+#: ../programs/gvfs-monitor-file.c:38
 msgid "Don't send single MOVED events."
 msgstr "Άρνηση αποστολής μεμονωμένων γεγονότων  MOVED."
 
@@ -2181,7 +2442,8 @@ msgstr "Προβολή πρόσθετων πληροφοριών για την �
 msgid "Monitor events"
 msgstr "Παρακολούθηση γεγονότων"
 
-#: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
+#: ../programs/gvfs-mount.c:163
+#: ../programs/gvfs-mount.c:184
 #, c-format
 msgid "Error mounting location: %s\n"
 msgstr "Σφάλμα προσάρτησης τοποθεσίας: %s\n"
@@ -2252,12 +2514,8 @@ msgstr "FILES... - άνοιγμα ΑΡΧΕΙΩΝ με την καθορισμέ�
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
 #: ../programs/gvfs-open.c:126
-msgid ""
-"Opens the file(s) with the default application registered to handle the type "
-"of the file."
-msgstr ""
-"Ανοίγει τα αρχεία με την προεπιλεγμένη εφαρμογή που έχει ορισθεί να "
-"χειρίζεται αυτούς τους τύπους αρχείων."
+msgid "Opens the file(s) with the default application registered to handle the type of the file."
+msgstr "Ανοίγει τα αρχεία με την προεπιλεγμένη εφαρμογή που έχει ορισθεί να χειρίζεται αυτούς τους τύπους αρχείων."
 
 #
 #: ../programs/gvfs-rename.c:50
@@ -2269,7 +2527,8 @@ msgstr "- μετονομασία αρχείου"
 msgid "Rename successful. New uri: %s\n"
 msgstr "Επιτυχής μετονομασία. Νέα uri: %s\n"
 
-#: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
+#: ../programs/gvfs-rm.c:35
+#: ../programs/gvfs-trash.c:35
 msgid "ignore nonexistent files, never prompt"
 msgstr "Αγνόηση ανύπαρκτων αρχείων, να μην εμφανίζεται ποτέ μήνυμα"
 
@@ -2291,8 +2550,7 @@ msgstr "Επισύναψη στο τέλος του αρχείου"
 
 #: ../programs/gvfs-save.c:46
 msgid "When creating a file, restrict access to the current user only"
-msgstr ""
-"Όταν δημιουργείτε ένα αρχείο, περιόρισε την πρόσβαση στον τρέχον χρήστη μόνο"
+msgstr "Όταν δημιουργείτε ένα αρχείο, περιόρισε την πρόσβαση στον τρέχον χρήστη μόνο"
 
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
@@ -2326,16 +2584,11 @@ msgstr "Το Etag δεν είναι διαθέσιμο\n"
 
 #: ../programs/gvfs-save.c:156
 msgid "DEST - read from standard input and save to DEST"
-msgstr ""
-"DEST - ανάγνωση από την πρότυπη συσκευή εισόδου και αποθήκευση στο DEST"
+msgstr "DEST - ανάγνωση από την πρότυπη συσκευή εισόδου και αποθήκευση στο DEST"
 
 #: ../programs/gvfs-set-attribute.c:36
-msgid ""
-"attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
-"stringv]"
-msgstr ""
-"Τύποι ιδιοτήτων [string, bytestring, boolean, uint32, int32, uint64, int64, "
-"stringv]"
+msgid "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, stringv, unset]"
+msgstr "τύπος ιδιότητας [string, bytestring, boolean, uint32, int32, uint64, int64, stringv, unset]"
 
 #: ../programs/gvfs-set-attribute.c:119
 msgid " <location> <attribute> <values> - set attribute"
@@ -2351,12 +2604,17 @@ msgstr "Δεν καθορίστηκε τοποθεσία\n"
 msgid "Attribute not specified\n"
 msgstr "Η ιδιότητα δεν ορίστηκε\n"
 
-#: ../programs/gvfs-set-attribute.c:189
+#: ../programs/gvfs-set-attribute.c:154
+#, c-format
+msgid "Value not specified\n"
+msgstr "Δεν ορίστηκε τιμή\n"
+
+#: ../programs/gvfs-set-attribute.c:195
 #, c-format
 msgid "Invalid attribute type %s\n"
 msgstr "Μη έγκυρος τύπος ιδιότητας %s\n"
 
-#: ../programs/gvfs-set-attribute.c:199
+#: ../programs/gvfs-set-attribute.c:205
 #, c-format
 msgid "Error setting attribute: %s\n"
 msgstr "Σφάλμα στον ορισμό ιδιότητας: %s\n"
@@ -2372,13 +2630,14 @@ msgstr "Σφάλμα διαγραφής αρχείου: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symlinks, mounts and shortcuts like dirs"
-msgstr ""
-"Να ακλουθείς τους συμβολικούς συνδέσμους, προσαρτήσεις και συντομεύσεις σαν "
-"καταλόγους"
+msgstr "Να ακλουθείς τους συμβολικούς συνδέσμους, προσαρτήσεις και συντομεύσεις σαν καταλόγους"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
 msgstr "- περιεχόμενο λίστας των καταλόγων σε μορφή δέντρου"
+
+#~ msgid "Enter password"
+#~ msgstr "Εισαγωγή κωδικού"
 
 #~ msgid "Invalid return value from get_info"
 #~ msgstr "Μη έγκυρη απάντηση από get_info"
