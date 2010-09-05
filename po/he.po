@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-17 02:34+0300\n"
-"PO-Revision-Date: 2010-08-27 16:14+0200\n"
+"POT-Creation-Date: 2010-09-05 18:07+0300\n"
+"PO-Revision-Date: 2010-09-05 18:09+0200\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: he\n"
 "MIME-Version: 1.0\n"
@@ -258,7 +258,7 @@ msgstr "error starting mount daemon"
 msgid "Unmount Anyway"
 msgstr "ניתוק בכול זאת"
 
-#: ../daemon/gvfsbackend.c:934 ../daemon/gvfsbackendafc.c:272
+#: ../daemon/gvfsbackend.c:934 ../daemon/gvfsbackendafc.c:281
 #: ../monitor/gdu/ggdudrive.c:1022 ../monitor/gdu/ggdumount.c:922
 msgid "Cancel"
 msgstr "ביטול"
@@ -271,69 +271,69 @@ msgstr ""
 "הכרך עסוק\n"
 "תכנה אחת או יותר מעסיקות את הכרך."
 
-#: ../daemon/gvfsbackendafc.c:150
+#: ../daemon/gvfsbackendafc.c:159
 msgid "Internal Apple File Control error"
 msgstr "שגיאת פנימית בבקרת קובץ Apple"
 
-#: ../daemon/gvfsbackendafc.c:154 ../daemon/gvfsbackendftp.c:669
+#: ../daemon/gvfsbackendafc.c:163 ../daemon/gvfsbackendftp.c:669
 msgid "File does not exist"
 msgstr "הקובץ אינו קיים."
 
-#: ../daemon/gvfsbackendafc.c:157
+#: ../daemon/gvfsbackendafc.c:166
 msgid "The directory is not empty"
 msgstr "התיקייה אינה ריקה"
 
-#: ../daemon/gvfsbackendafc.c:161
+#: ../daemon/gvfsbackendafc.c:170
 msgid "The device did not respond"
 msgstr "ההתקן לא הגיב"
 
-#: ../daemon/gvfsbackendafc.c:165
+#: ../daemon/gvfsbackendafc.c:174
 msgid "The connection was interrupted"
 msgstr "החיבור נקטע"
 
-#: ../daemon/gvfsbackendafc.c:169
+#: ../daemon/gvfsbackendafc.c:178
 msgid "Invalid Apple File Control data received"
 msgstr ""
 
-#: ../daemon/gvfsbackendafc.c:173
+#: ../daemon/gvfsbackendafc.c:182
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "שגיאה בלתי מטופלת בבקרת קובץ Apple (%d)"
 
-#: ../daemon/gvfsbackendafc.c:190
+#: ../daemon/gvfsbackendafc.c:199
 msgid "Lockdown Error: Invalid Argument"
 msgstr "שגיאת נעילה: הארגומנט שגוי"
 
-#: ../daemon/gvfsbackendafc.c:194 ../daemon/gvfsbackendsftp.c:309
+#: ../daemon/gvfsbackendafc.c:203 ../daemon/gvfsbackendsftp.c:309
 #: ../daemon/gvfsbackendsftp.c:1836 ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "ההרשאה נדחתה"
 
-#: ../daemon/gvfsbackendafc.c:197
+#: ../daemon/gvfsbackendafc.c:206
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "שגיאת נעילה בלתי מטופלת (%d)"
 
-#: ../daemon/gvfsbackendafc.c:214
+#: ../daemon/gvfsbackendafc.c:223
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "שגיאת libimobiledevice: ארגומנט שגוי"
 
-#: ../daemon/gvfsbackendafc.c:218
+#: ../daemon/gvfsbackendafc.c:227
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
 msgstr "שגיאת libimobiledevice: לא נמצא התקן. נא לוודא ש־usbmuxd מותקן כראוי."
 
-#: ../daemon/gvfsbackendafc.c:221
+#: ../daemon/gvfsbackendafc.c:230
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "שגיאת libimobiledevice בלתי מטופלת (%d)"
 
-#: ../daemon/gvfsbackendafc.c:272
+#: ../daemon/gvfsbackendafc.c:281
 msgid "Try again"
 msgstr "ניסיון חוזר"
 
-#: ../daemon/gvfsbackendafc.c:290 ../daemon/gvfsbackendarchive.c:536
+#: ../daemon/gvfsbackendafc.c:299 ../daemon/gvfsbackendarchive.c:536
 #: ../daemon/gvfsbackendarchive.c:565 ../daemon/gvfsbackenddav.c:1631
 #: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:861
 #: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendobexftp.c:896
@@ -341,21 +341,21 @@ msgstr "ניסיון חוזר"
 msgid "Invalid mount spec"
 msgstr "הגדרת עיגון שגויה"
 
-#: ../daemon/gvfsbackendafc.c:296
+#: ../daemon/gvfsbackendafc.c:305
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "מיקום ה־AFC שגוי: חייב להיות בצורה afc://uuid:port-number"
 
-#: ../daemon/gvfsbackendafc.c:311
+#: ../daemon/gvfsbackendafc.c:320
 #, c-format
 msgid "Service %d on Apple Mobile Device"
 msgstr "שירות %d בהתקן נייד של Apple"
 
-#: ../daemon/gvfsbackendafc.c:317
+#: ../daemon/gvfsbackendafc.c:326
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "התקן נייד של Apple"
 
-#: ../daemon/gvfsbackendafc.c:366
+#: ../daemon/gvfsbackendafc.c:375
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
@@ -363,7 +363,7 @@ msgstr "%s (%s)"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:410
+#: ../daemon/gvfsbackendafc.c:455
 #, c-format
 msgid ""
 "Device '%s' is password protected. Enter the password on the device and "
@@ -371,14 +371,14 @@ msgid ""
 msgstr ""
 "ההתקן '%s' מוגן בססמה. יש להזין את הססמה בהתקן וללחוץ על 'ניסיון חוזר'."
 
-#: ../daemon/gvfsbackendafc.c:540 ../daemon/gvfsbackendarchive.c:632
+#: ../daemon/gvfsbackendafc.c:585 ../daemon/gvfsbackendarchive.c:632
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1886
 #: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:702
 #: ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "לא ניתן לפתוח ספרייה"
 
-#: ../daemon/gvfsbackendafc.c:548 ../daemon/gvfsbackendarchive.c:624
+#: ../daemon/gvfsbackendafc.c:593 ../daemon/gvfsbackendarchive.c:624
 #: ../daemon/gvfsbackendarchive.c:668 ../daemon/gvfsbackendarchive.c:720
 #: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendcdda.c:986
 #: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:392
@@ -389,15 +389,15 @@ msgstr "לא ניתן לפתוח ספרייה"
 msgid "File doesn't exist"
 msgstr "קובץ לא קיים"
 
-#: ../daemon/gvfsbackendafc.c:656 ../daemon/gvfsbackendafc.c:1395
+#: ../daemon/gvfsbackendafc.c:701 ../daemon/gvfsbackendafc.c:1506
 msgid "Backups are not yet supported."
 msgstr "גיבויים עדיין לא נתמכים."
 
-#: ../daemon/gvfsbackendafc.c:794
+#: ../daemon/gvfsbackendafc.c:839
 msgid "Invalid seek type"
 msgstr "סוג החיפוש בלתי תקין"
 
-#: ../daemon/gvfsbackendafc.c:1314 ../daemon/gvfsbackendsftp.c:1834
+#: ../daemon/gvfsbackendafc.c:1425 ../daemon/gvfsbackendsftp.c:1834
 #: ../daemon/gvfsbackendsftp.c:4639 ../daemon/gvfsbackendsmb.c:1702
 #: ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
@@ -1505,6 +1505,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data on partition %d."
 msgstr ""
+"יש להזין ססמה כדי לשחרר את הכרך\n"
+"ההתקן \"%s\" מכיל נתונים מוצפנים במחיצה %d."
 
 #: ../monitor/gdu/ggduvolume.c:1082
 #, c-format
@@ -1512,6 +1514,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data."
 msgstr ""
+"יש להזין ססמה כדי לשחרר את הכרך\n"
+"ההתקן \"%s\" מכיל נתונים מוצפנים."
 
 #: ../monitor/gdu/ggduvolume.c:1089
 #, c-format
@@ -1519,6 +1523,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device %s contains encrypted data."
 msgstr ""
+"יש להזין ססמה כדי לשחרר את הכרך\n"
+"ההתקן %s מכיל נתונים מוצפנים."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
