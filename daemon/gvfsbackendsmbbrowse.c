@@ -247,11 +247,35 @@ g_vfs_backend_smb_browse_finalize (GObject *object)
 static void
 g_vfs_backend_smb_browse_init (GVfsBackendSmbBrowse *backend)
 {
+#ifdef HAVE_GCONF
+  GConfClient *gclient;
+#endif
+
   backend->entries_lock = g_mutex_new ();
   backend->update_cache_lock = g_mutex_new ();
 
   if (mount_tracker == NULL)
     mount_tracker = g_mount_tracker_new (NULL);
+
+#ifdef HAVE_GCONF
+  gclient = gconf_client_get_default ();
+  if (gclient)
+    {
+      char *workgroup;
+
+      workgroup = gconf_client_get_string (gclient,
+					   PATH_GCONF_GNOME_VFS_SMB_WORKGROUP, NULL);
+
+      if (workgroup && workgroup[0])
+	default_workgroup = workgroup;
+      else
+	g_free (workgroup);
+
+      g_object_unref (gclient);
+    }
+#endif
+
+  DEBUG ("g_vfs_backend_smb_browse_init: default workgroup = '%s'\n", default_workgroup ? default_workgroup : "NULL");
 }
 
 /**
@@ -1456,9 +1480,6 @@ g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
-#ifdef HAVE_GCONF
-  GConfClient *gclient;
-#endif
   
   gobject_class->finalize = g_vfs_backend_smb_browse_finalize;
 
@@ -1475,26 +1496,6 @@ g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
   backend_class->try_query_info = try_query_info;
   backend_class->enumerate = do_enumerate;
   backend_class->try_enumerate = try_enumerate;
-
-#ifdef HAVE_GCONF
-  gclient = gconf_client_get_default ();
-  if (gclient)
-    {
-      char *workgroup;
-      
-      workgroup = gconf_client_get_string (gclient, 
-					   PATH_GCONF_GNOME_VFS_SMB_WORKGROUP, NULL);
-
-      if (workgroup && workgroup[0])
-	default_workgroup = workgroup;
-      else
-	g_free (workgroup);
-      
-      g_object_unref (gclient);
-    }
-#endif
-
-  DEBUG ("g_vfs_backend_smb_browse_class_init - default workgroup = '%s'\n", default_workgroup ? default_workgroup : "NULL");
 }
 
 void

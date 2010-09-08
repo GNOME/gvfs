@@ -121,6 +121,27 @@ g_vfs_backend_smb_finalize (GObject *object)
 static void
 g_vfs_backend_smb_init (GVfsBackendSmb *backend)
 {
+#ifdef HAVE_GCONF
+  GConfClient *gclient;
+#endif
+
+#ifdef HAVE_GCONF
+  gclient = gconf_client_get_default ();
+  if (gclient)
+    {
+      char *workgroup;
+
+      workgroup = gconf_client_get_string (gclient,
+					   PATH_GCONF_GNOME_VFS_SMB_WORKGROUP, NULL);
+
+      if (workgroup && workgroup[0])
+	default_workgroup = workgroup;
+      else
+	g_free (workgroup);
+
+      g_object_unref (gclient);
+    }
+#endif
 }
 
 /**
@@ -2109,9 +2130,6 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
-#ifdef HAVE_GCONF
-  GConfClient *gclient;
-#endif
   
   gobject_class->finalize = g_vfs_backend_smb_finalize;
 
@@ -2138,25 +2156,6 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->move = do_move;
   backend_class->try_query_settable_attributes = try_query_settable_attributes;
   backend_class->set_attribute = do_set_attribute;
-
-#ifdef HAVE_GCONF
-  gclient = gconf_client_get_default ();
-  if (gclient)
-    {
-      char *workgroup;
-      
-      workgroup = gconf_client_get_string (gclient, 
-					   PATH_GCONF_GNOME_VFS_SMB_WORKGROUP, NULL);
-
-      if (workgroup && workgroup[0])
-	default_workgroup = workgroup;
-      else
-	g_free (workgroup);
-      
-      g_object_unref (gclient);
-    }
-#endif
-
 }
 
 void
