@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2010-09-16 21:51+0000\n"
+"POT-Creation-Date: 2010-09-23 13:05+0000\n"
 "PO-Revision-Date: 2010-09-19 01:33+0900\n"
 "Last-Translator: Takayuki KUSANO <AE5T-KSN@asahi-net.or.jp>\n"
 "Language-Team: Japanese <takeshi.aihana@gmail.com>\n"
@@ -1364,7 +1364,7 @@ msgstr "ファイル名が間違っています"
 
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
-msgstr "バックエンドはシンボリック・リンクをサポートしていません"
+msgstr "バックエンドはシンボリックリンクをサポートしていません"
 
 #: ../daemon/gvfsjobsetattribute.c:120
 msgid "Invalid dbus message"
@@ -1947,7 +1947,7 @@ msgstr "既存の対象ファイルをバックアップ"
 
 #: ../programs/gvfs-copy.c:49
 msgid "never follow symbolic links"
-msgstr "シンボリック・リンクをたどらない"
+msgstr "シンボリックリンクをたどらない"
 
 #: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
 #, c-format
@@ -1996,7 +1996,7 @@ msgstr "取得する属性"
 #: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
 #: ../programs/gvfs-set-attribute.c:37
 msgid "Don't follow symlinks"
-msgstr "シンボリック・リンクをたどらない"
+msgstr "シンボリックリンクをたどらない"
 
 #: ../programs/gvfs-info.c:50
 msgid "invalid type"
@@ -2016,7 +2016,7 @@ msgstr "ディレクトリ"
 
 #: ../programs/gvfs-info.c:62
 msgid "symlink"
-msgstr "シンボリック・リンク"
+msgstr "シンボリックリンク"
 
 #: ../programs/gvfs-info.c:65
 msgid "special"
@@ -2346,8 +2346,7 @@ msgstr "ファイルを削除する際にエラー: %s\n"
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symlinks, mounts and shortcuts like dirs"
 msgstr ""
-"ディレクトリのようにシンボリック・リンクやマウントやショートカットをたどりま"
-"す"
+"ディレクトリのようにシンボリックリンクやマウントやショートカットをたどります"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
