@@ -24,6 +24,7 @@
 #include <config.h>
 
 #include <stdlib.h>
+#include <sys/poll.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -837,10 +838,9 @@ handle_login (GVfsBackend *backend,
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GInputStream *prompt_stream;
   GOutputStream *reply_stream;
-  fd_set ifds;
-  struct timeval tv;
   int ret;
   int prompt_fd;
+  struct pollfd fds[2];
   char buffer[1024];
   gsize len;
   gboolean aborted = FALSE;
@@ -864,14 +864,12 @@ handle_login (GVfsBackend *backend,
   ret_val = TRUE;
   while (1)
     {
-      FD_ZERO (&ifds);
-      FD_SET (stdout_fd, &ifds);
-      FD_SET (prompt_fd, &ifds);
+      fds[0].fd = stdout_fd;
+      fds[0].events = POLLIN;
+      fds[1].fd = prompt_fd;
+      fds[1].events = POLLIN;
       
-      tv.tv_sec = SFTP_READ_TIMEOUT;
-      tv.tv_usec = 0;
-      
-      ret = select (MAX (stdout_fd, prompt_fd)+1, &ifds, NULL, NULL, &tv);
+      ret = poll(fds, 2, SFTP_READ_TIMEOUT);
       
       if (ret <= 0)
         {
@@ -882,11 +880,11 @@ handle_login (GVfsBackend *backend,
           break;
         }
       
-      if (FD_ISSET (stdout_fd, &ifds))
+      if (fds[0].revents)
         break; /* Got reply to initial INIT request */
       
-      g_assert (FD_ISSET (prompt_fd, &ifds));
-      
+      if (!(fds[1].revents & POLLIN))
+        continue;
       
       len = g_input_stream_read (prompt_stream,
                                  buffer, sizeof (buffer) - 1,
