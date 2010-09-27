@@ -128,6 +128,7 @@ _g_dbus_attribute_as_pointer (GFileAttributeType type,
   case G_FILE_ATTRIBUTE_TYPE_STRING:
   case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
   case G_FILE_ATTRIBUTE_TYPE_OBJECT:
+  case G_FILE_ATTRIBUTE_TYPE_STRINGV:
     return value->ptr;
   default:
     return (gpointer) value;
@@ -372,7 +373,7 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
 	{
 	  char **strv;
 	  int n_elements;
-	  if (!_g_dbus_message_iter_get_args (iter, NULL,
+	  if (!_g_dbus_message_iter_get_args (&variant_iter, NULL,
 					      DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &strv, &n_elements,
 					      0))
 	    goto error;
