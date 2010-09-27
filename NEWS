@@ -1,3 +1,10 @@
+Major changes in 1.6.4
+======================
+* Lots of translation updates
+* afc: Add support for photo thumbnails on iOS4
+* daemons: Move GConf initialization from backend constructor
+* sftp: Use poll() to cope with openssh-5.6 changes
+
 Major changes in 1.6.3
 ======================
 * translation updates
