@@ -869,7 +869,7 @@ handle_login (GVfsBackend *backend,
       fds[1].fd = prompt_fd;
       fds[1].events = POLLIN;
       
-      ret = poll(fds, 2, SFTP_READ_TIMEOUT);
+      ret = poll(fds, 2, SFTP_READ_TIMEOUT * 1000);
       
       if (ret <= 0)
         {
