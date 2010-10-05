@@ -6,7 +6,6 @@ SUBDIRS = \
 	client \
 	daemon \
 	monitor \
-	gconf \
 	po   \
 	programs \
 	test \

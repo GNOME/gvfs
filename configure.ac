@@ -704,7 +704,6 @@ monitor/hal/Makefile
 monitor/gdu/Makefile
 monitor/gphoto2/Makefile
 monitor/afc/Makefile
-gconf/Makefile
 programs/Makefile
 test/Makefile
 po/Makefile.in
