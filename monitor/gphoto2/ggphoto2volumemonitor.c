@@ -83,7 +83,7 @@ static void update_cameras           (GGPhoto2VolumeMonitor *monitor,
                                       GList **removed_volumes);
 #endif
 
-static GList* get_stores_for_camera (int bus_num, int device_num);
+static GList* get_stores_for_camera (const char *bus_num, const char *device_num);
 
 G_DEFINE_TYPE (GGPhoto2VolumeMonitor, g_gphoto2_volume_monitor, G_TYPE_VOLUME_MONITOR)
 
@@ -195,9 +195,7 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
     GGPhoto2Volume *volume;
     GList *store_heads, *l;
     guint num_store_heads;
-    const char *property;
-    int usb_bus_num;
-    int usb_device_num;
+    const char *usb_bus_num, *usb_device_num;
 
   /* For iPhones and iPod Touches, don't mount gphoto mounts,
    * we already have access through AFC */
@@ -209,19 +207,17 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
       }
 #endif /* HAVE_AFC */
 
-    property = g_udev_device_get_property (device, "BUSNUM");
-    if (property == NULL) {
+    usb_bus_num = g_udev_device_get_property (device, "BUSNUM");
+    if (usb_bus_num == NULL) {
 	g_warning("device %s has no BUSNUM property, ignoring", g_udev_device_get_device_file (device));
 	return;
     }
-    usb_bus_num = atoi (property);
 
-    property = g_udev_device_get_property (device, "DEVNUM");
-    if (property == NULL) {
+    usb_device_num = g_udev_device_get_property (device, "DEVNUM");
+    if (usb_device_num == NULL) {
 	g_warning("device %s has no DEVNUM property, ignoring", g_udev_device_get_device_file (device));
 	return;
     }
-    usb_device_num = atoi (property);
 
     /* g_debug ("gudev_add_camera: camera device %s (bus: %i, device: %i)", 
              g_udev_device_get_device_file (device),
@@ -241,11 +237,11 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
          */
         if (num_store_heads == 1)
           {
-            uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]", usb_bus_num, usb_device_num);
+            uri = g_strdup_printf ("gphoto2://[usb:%s,%s]", usb_bus_num, usb_device_num);
           }
         else
           {
-            uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]/%s", usb_bus_num, usb_device_num,
+            uri = g_strdup_printf ("gphoto2://[usb:%s,%s]/%s", usb_bus_num, usb_device_num,
                                    store_path[0] == '/' ? store_path + 1 : store_path);
           }
         /* g_debug ("gudev_add_camera: ... adding URI for storage head: %s", uri); */
@@ -608,7 +604,7 @@ update_all (GGPhoto2VolumeMonitor *monitor,
 #endif
 
 static GList *
-get_stores_for_camera (int bus_num, int device_num)
+get_stores_for_camera (const char *bus_num, const char *device_num)
 {
   GList *l;
   CameraStorageInformation *storage_info;
@@ -624,7 +620,7 @@ get_stores_for_camera (int bus_num, int device_num)
   camera = NULL;
   context = NULL;
   l = NULL;
-  port = g_strdup_printf ("usb:%d,%d", bus_num, device_num);
+  port = g_strdup_printf ("usb:%s,%s", bus_num, device_num);
 
   /* Connect to the camera */
   context = gp_context_new ();
@@ -686,6 +682,21 @@ out:
 }
 
 #ifndef HAVE_GUDEV
+static GList *
+get_stores_for_camera_int (int bus_num, int device_num)
+{
+	GList *ret;
+	char *bus_num_str, *device_num_str;
+
+	bus_num_str = g_strdup_printf ("%d", bus_num);
+	device_num_str = g_strdup_printf ("%d", device_num);
+	ret = get_stores_for_camera (bus_num_str, device_num_str);
+	g_free (bus_num_str);
+	g_free (device_num_str);
+
+	return ret;
+}
+
 static void
 update_cameras (GGPhoto2VolumeMonitor *monitor,
                 GList **added_volumes,
@@ -781,7 +792,7 @@ update_cameras (GGPhoto2VolumeMonitor *monitor,
 # error "Need OS specific tweaks"
 #endif
 
-      store_heads = get_stores_for_camera (usb_bus_num, usb_device_num);
+      store_heads = get_stores_for_camera_int (usb_bus_num, usb_device_num);
       num_store_heads = g_list_length (store_heads);
       for (l = store_heads ; l != NULL; l = l->next)
         {
