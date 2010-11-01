@@ -1,3 +1,9 @@
+Major changes in 1.6.5
+======================
+* Remove app lookup extension (now handled internally in GIO)
+* gphoto: Use correct address for GPhoto mounts with gudev
+* sftp: Fix poll() timeout
+
 Major changes in 1.6.4
 ======================
 * Lots of translation updates
