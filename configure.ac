@@ -26,6 +26,8 @@ AC_TYPE_SIGNAL
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 
+GLIB_GSETTINGS
+
 AH_VERBATIM([_GNU_SOURCE],
 [/* Enable GNU extensions on systems that have them.  */
 #ifndef _GNU_SOURCE

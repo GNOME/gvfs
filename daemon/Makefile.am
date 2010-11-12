@@ -26,6 +26,9 @@ libraries =						\
 	$(top_builddir)/common/libgvfscommon.la		\
 	$(GLIB_LIBS) $(DBUS_LIBS) $(KEYRING_LIBS)
 
+gvfs_gschemas =
+gvfs_gschemas_convert =
+
 # D-BUS service file
 %.service: %.service.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
@@ -55,6 +58,8 @@ mount_in_files += smb.mount.in smb-browse.mount.in
 if HAVE_SAMBA
 mount_DATA += smb.mount smb-browse.mount
 libexec_PROGRAMS += gvfsd-smb-browse gvfsd-smb
+gvfs_gschemas += org.gnome.system.smb.gschema.xml
+gvfs_gschemas_convert += gvfs-smb.convert
 endif
 
 mount_in_files += cdda.mount.in
@@ -93,6 +98,8 @@ mount_in_files += dns-sd.mount.in
 if HAVE_AVAHI
 mount_DATA += dns-sd.mount
 libexec_PROGRAMS += gvfsd-dnssd
+gvfs_gschemas += org.gnome.system.dns_sd.gschema.xml
+gvfs_gschemas_convert += gvfs-dns-sd.convert
 endif
 
 mount_in_files += archive.mount.in
@@ -107,10 +114,19 @@ mount_DATA += afc.mount
 libexec_PROGRAMS += gvfsd-afc
 endif
 
-EXTRA_DIST = gvfs-daemon.service.in $(mount_in_files) obexftp-marshal.list
+EXTRA_DIST = 				\
+	gvfs-daemon.service.in		\
+	$(mount_in_files)		\
+	obexftp-marshal.list		\
+	$(gvfs_gschemas)		\
+	$(convert_DATA)			\
+	$(NULL)
 
 DISTCLEANFILES = gvfs-daemon.service $(mount_DATA)
 
+CLEANFILES =					\
+	$(gsettings__enum_file)			\
+	*.gschema.valid
 
 noinst_PROGRAMS =				\
 	gvfsd-test			\
@@ -465,3 +481,14 @@ gvfsd_afc_LDADD = \
 	$(libraries) \
 	$(AFC_LIBS)
 
+
+# GSettings stuff
+gsettings_ENUM_NAMESPACE = org.gnome.system.gvfs
+gsettings_ENUM_FILES = gvfs-enums.h
+
+gsettings_SCHEMAS = $(gvfs_gschemas)
+
+@GSETTINGS_RULES@
+
+gvfs_gschemas_convertdir = $(datadir)/GConf/gsettings
+gvfs_gschemas_convert_DATA = $(gvfs_gschemas_convert)

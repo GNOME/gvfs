@@ -1,0 +1,2 @@
+[org.gnome.system.smb]
+workgroup = /system/smb/workgroup

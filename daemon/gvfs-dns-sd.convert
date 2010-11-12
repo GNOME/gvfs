@@ -1,0 +1,3 @@
+[org.gnome.system.dns_sd]
+display-local = /system/dns_sd/display_local
+extra-domains = /system/dns_sd/extra_domains
