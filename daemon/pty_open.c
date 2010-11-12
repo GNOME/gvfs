@@ -448,6 +448,7 @@ _pty_fork_on_pty_name(const char *path, int parent_fd, char **env_add,
 		break;
 	case 0:
 		/* Child. Close the parent's ends of the pipes. */
+		close(parent_fd);
 		close(ready_a[0]);
 		close(ready_b[1]);
 	
