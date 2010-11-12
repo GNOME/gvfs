@@ -948,7 +948,7 @@ setup_input_stream (GFile *file, FileHandle *fh)
 }
 
 static gint
-setup_output_stream (GFile *file, FileHandle *fh)
+setup_output_stream (GFile *file, FileHandle *fh, int flags)
 {
   GError *error  = NULL;
   gint    result = 0;
@@ -968,7 +968,10 @@ setup_output_stream (GFile *file, FileHandle *fh)
 
   if (!fh->stream)
     {
-      fh->stream = g_file_append_to (file, 0, NULL, &error);
+      if (flags & O_TRUNC)
+        fh->stream = g_file_replace (file, NULL, FALSE, 0, NULL, &error);
+      else
+        fh->stream = g_file_append_to (file, 0, NULL, &error);
       if (fh->stream)
         fh->pos = g_seekable_tell (G_SEEKABLE (fh->stream));
     }
@@ -1024,7 +1027,7 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
               set_pid_for_file (file);
 
               if (fi->flags & O_WRONLY || fi->flags & O_RDWR)
-                result = setup_output_stream (file, fh);
+                result = setup_output_stream (file, fh, fi->flags);
               else
                 result = setup_input_stream (file, fh);
 
@@ -1406,7 +1409,7 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
         {
           g_mutex_lock (fh->mutex);
 
-          result = setup_output_stream (file, fh);
+          result = setup_output_stream (file, fh, 0);
           if (result == 0)
             {
               result = write_stream (fh, buf, len, offset);
@@ -1857,7 +1860,7 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
         {
           g_mutex_lock (fh->mutex);
 
-          result = setup_output_stream (file, fh);
+          result = setup_output_stream (file, fh, 0);
 
           if (result == 0)
             {
@@ -2335,6 +2338,9 @@ vfs_init (struct fuse_conn_info *conn)
   
   subthread_main_loop = g_main_loop_new (NULL, FALSE);
   subthread = g_thread_create ((GThreadFunc) subthread_main, NULL, FALSE, NULL);
+
+  /* Indicate O_TRUNC support for open() */
+  conn->want |= FUSE_CAP_ATOMIC_O_TRUNC;
 
   return NULL;
 }
