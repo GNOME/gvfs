@@ -113,7 +113,8 @@ EXTRA_DIST = 				\
 	$(mount_in_files)		\
 	obexftp-marshal.list		\
 	$(gvfs_gschemas)		\
-	$(convert_DATA)			\
+	$(gvfs_gschemas_convert_DATA)	\
+	$(gsettings_ENUM_FILES)		\
 	$(NULL)
 
 DISTCLEANFILES = gvfs-daemon.service $(mount_DATA)
@@ -475,7 +476,7 @@ gvfsd_afc_LDADD = \
 
 # GSettings stuff
 gsettings_ENUM_NAMESPACE = org.gnome.system.gvfs
-gsettings_ENUM_FILES = gvfs-enums.h
+gsettings_ENUM_FILES = $(top_srcdir)/daemon/gvfs-enums.h
 
 gsettings_SCHEMAS = $(gvfs_gschemas)
 
