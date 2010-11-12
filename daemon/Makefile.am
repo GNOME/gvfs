@@ -40,10 +40,10 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp
+libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp gvfsd-network
 
-mount_in_files = sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in
-mount_DATA =  sftp.mount trash.mount computer.mount burn.mount localtest.mount
+mount_in_files = sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in
+mount_DATA =  sftp.mount trash.mount computer.mount burn.mount localtest.mount network.mount
 
 mount_in_files += http.mount.in dav.mount.in dav+sd.mount.in ftp.mount.in 
 if HAVE_HTTP
@@ -72,12 +72,6 @@ mount_in_files += gphoto2.mount.in
 if USE_GPHOTO2
 mount_DATA += gphoto2.mount
 libexec_PROGRAMS += gvfsd-gphoto2
-endif
-
-mount_in_files += network.mount.in
-if USE_GCONF
-mount_DATA += network.mount
-libexec_PROGRAMS += gvfsd-network
 endif
 
 mount_in_files += obexftp.mount.in
@@ -219,10 +213,9 @@ gvfsd_smb_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendsmb.h \
 	-DDEFAULT_BACKEND_TYPE=smb-share \
 	-DMAX_JOB_THREADS=1 \
-	$(GCONF_CFLAGS) \
 	-DBACKEND_TYPES='"smb-share", G_VFS_TYPE_BACKEND_SMB,'
 
-gvfsd_smb_LDADD = $(SAMBA_LIBS) $(GCONF_LIBS) $(libraries)
+gvfsd_smb_LDADD = $(SAMBA_LIBS) $(libraries)
 
 gvfsd_smb_browse_SOURCES = \
 	gvfsbackendsmbbrowse.c gvfsbackendsmbbrowse.h \
@@ -233,10 +226,9 @@ gvfsd_smb_browse_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendsmbbrowse.h \
 	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint.smb_browse \
 	-DMAX_JOB_THREADS=1 \
-	$(GCONF_CFLAGS) \
 	-DBACKEND_TYPES='"smb-network", G_VFS_TYPE_BACKEND_SMB_BROWSE,"smb-server", G_VFS_TYPE_BACKEND_SMB_BROWSE,'
 
-gvfsd_smb_browse_LDADD = $(SAMBA_LIBS)  $(GCONF_LIBS) $(libraries)
+gvfsd_smb_browse_LDADD = $(SAMBA_LIBS) $(libraries)
 
 gvfsd_obexftp_SOURCES = \
 	gvfsbackendobexftp.c gvfsbackendobexftp.h \
@@ -330,10 +322,9 @@ gvfsd_network_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendnetwork.h \
 	-DDEFAULT_BACKEND_TYPE=network \
 	-DMAX_JOB_THREADS=1 \
-	$(GCONF_CFLAGS) \
 	-DBACKEND_TYPES='"network", G_VFS_TYPE_BACKEND_NETWORK,'
 
-gvfsd_network_LDADD = $(libraries) $(GCONF_LIBS)
+gvfsd_network_LDADD = $(libraries)
 
 gvfsd_dnssd_SOURCES = \
 	gvfsbackenddnssd.c gvfsbackenddnssd.h \

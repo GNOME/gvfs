@@ -196,25 +196,6 @@ fi
 
 AM_CONDITIONAL(USE_FUSE, [test "$msg_fuse" = "yes"])
 
-dnl **********************
-dnl *** Check for GConf ***
-dnl **********************
-AC_ARG_ENABLE(gconf, AS_HELP_STRING([--disable-gconf],[build without GConf support]))
-msg_gconf=no
-GCONF_LIBS=
-GCONF_CFLAGS=
-
-if test "x$enable_gconf" != "xno"; then
-  PKG_CHECK_EXISTS(gconf-2.0, msg_gconf=yes)
-
-  if test "x$msg_gconf" = "xyes"; then
-    PKG_CHECK_MODULES(GCONF, gconf-2.0)
-    AC_DEFINE(HAVE_GCONF, 1, [Define to 1 if GConf is available])
-  fi
-fi
-
-AM_CONDITIONAL(USE_GCONF, [test "$msg_gconf" = "yes"])
-
 dnl ********************************************
 dnl *** Check for expat (for obexftp and gdu ***
 dnl ********************************************
@@ -726,7 +707,6 @@ echo "
         Gphoto2 support:              $msg_gphoto2
 	archive support:              $msg_archive
 	AFC support:                  $msg_afc
-        GConf support:                $msg_gconf
         DNS-SD support:               $msg_avahi
 	Build HAL volume monitor:     $msg_hal (with fast init path: $have_hal_fast_init)
 	Build GDU volume monitor:     $msg_gdu
