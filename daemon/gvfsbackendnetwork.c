@@ -28,7 +28,6 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
-#include <gconf/gconf-client.h>
 
 #include "gvfsbackendnetwork.h"
 
@@ -37,14 +36,9 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsjobqueryinfo.h"
 #include "gvfsmonitor.h"
+#include "gvfs-enums.h"
 
-#define PATH_GCONF_GVFS_SMB "/system/smb"
-#define PATH_GCONF_GVFS_SMB_WORKGROUP "/system/smb/workgroup"
 #define DEFAULT_WORKGROUP_NAME "X-GNOME-DEFAULT-WORKGROUP"
-
-#define PATH_GCONF_GVFS_DNS_SD "/system/dns_sd"
-#define PATH_GCONF_GVFS_DNS_SD_DISPLAY_LOCAL "/system/dns_sd/display_local"
-#define PATH_GCONF_GVFS_DNS_SD_EXTRA_DOMAINS "/system/dns_sd/extra_domains"
 
 #define NETWORK_FILE_ATTRIBUTES "standard::name,standard::display-name,standard::target-uri"
 
@@ -57,12 +51,6 @@ typedef struct {
 
 static NetworkFile root = { "/" };
 
-typedef enum {
-	NETWORK_LOCAL_DISABLED,
-	NETWORK_LOCAL_MERGED,
-	NETWORK_LOCAL_SEPARATE
-} NetworkLocalSetting;
-
 struct _GVfsBackendNetwork
 {
   GVfsBackend parent_instance;
@@ -70,6 +58,8 @@ struct _GVfsBackendNetwork
   GMountSpec *mount_spec;
   GList *files; /* list of NetworkFiles */
   int idle_tag;
+  GSettings *smb_settings;
+  GSettings *dnssd_settings;
 
   /* SMB Stuff */
   gboolean have_smb;
@@ -80,7 +70,7 @@ struct _GVfsBackendNetwork
 
   /* DNS-SD Stuff */
   gboolean have_dnssd;
-  NetworkLocalSetting local_setting;
+  GDnsSdDisplayMode local_setting;
   char *extra_domains;
   GFileMonitor *dnssd_monitor;
 
@@ -148,18 +138,6 @@ static int
 sort_file_by_file_name (NetworkFile *a, NetworkFile *b)
 {
   return strcmp (a->file_name, b->file_name);
-}
-
-static NetworkLocalSetting
-parse_network_local_setting (const char *setting)
-{
-  if (setting == NULL)
-    return NETWORK_LOCAL_DISABLED;
-  if (strcmp (setting, "separate") == 0)
-    return NETWORK_LOCAL_SEPARATE;
-  if (strcmp (setting, "merged") == 0)
-    return NETWORK_LOCAL_MERGED;
-  return NETWORK_LOCAL_DISABLED;
 }
 
 static void
@@ -356,7 +334,7 @@ recompute_files (GVfsBackendNetwork *backend)
 	    }
 	}
       
-      if (backend->local_setting == NETWORK_LOCAL_MERGED)
+      if (backend->local_setting == G_DNS_SD_DISPLAY_MODE_MERGED)
         {
           /* "merged": add local domains to network:/// */
           enumer = g_file_enumerate_children (server_file, 
@@ -397,7 +375,7 @@ recompute_files (GVfsBackendNetwork *backend)
       
       g_object_unref (server_file);
       
-      /* If gconf setting "/system/dns_sd/extra_domains" is set to a list of domains:
+      /* If gsettings key "extra-domains" (org.gnome.system.dns_sd) is set to a list of domains:
        * links to dns-sd://$domain/ */
       if (backend->extra_domains != NULL &&
 	  backend->extra_domains[0] != 0)
@@ -545,59 +523,35 @@ notify_dnssd_local_changed (GFileMonitor *monitor, GFile *file, GFile *other_fil
     }
 }
 
-static void
-notify_gconf_dnssd_domains_changed (GConfClient *client,
-				    guint        cnxn_id,
-				    GConfEntry  *entry,
-				    gpointer     data)
+static gboolean
+dnssd_settings_change_event_cb (GSettings *settings,
+                                gpointer   keys,
+                                gint       n_keys,
+                                gpointer   user_data)
 {
-  GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(data);
-  char *extra_domains;
-  extra_domains = gconf_client_get_string (client, 
-                                           PATH_GCONF_GVFS_DNS_SD_EXTRA_DOMAINS, NULL);
+  GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(user_data);
 
   g_free (backend->extra_domains);
-  backend->extra_domains = extra_domains;
+  backend->extra_domains = g_settings_get_string (settings, "extra-domains");
+  backend->local_setting = g_settings_get_enum (settings, "display-local");
 
   /* don't re-issue recomputes if we've already queued one. */
   if (backend->idle_tag == 0)
     backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+
+  return FALSE;
 }
 
-static void
-notify_gconf_dnssd_display_local_changed (GConfClient *client,
-                                          guint        cnxn_id,
-                                          GConfEntry  *entry,
-                                          gpointer     data)
+static gboolean
+smb_settings_change_event_cb (GSettings *settings,
+                              gpointer   keys,
+                              gint       n_keys,
+                              gpointer   user_data)
 {
-  GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(data);
-  char *display_local;
- 
-  display_local = gconf_client_get_string (client, 
-                                           PATH_GCONF_GVFS_DNS_SD_DISPLAY_LOCAL, NULL);
-
-  backend->local_setting = parse_network_local_setting (display_local);
-  g_free (display_local);
-
-  /* don't re-issue recomputes if we've already queued one. */
-  if (backend->idle_tag == 0)
-    backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
-}
-
-static void
-notify_gconf_smb_workgroup_changed (GConfClient *client,
-				    guint        cnxn_id,
-				    GConfEntry  *entry,
-				    gpointer     data)
-{
-  GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(data);
-  char *current_workgroup;
-
-  current_workgroup = gconf_client_get_string (client,
-					       PATH_GCONF_GVFS_SMB_WORKGROUP, NULL);
+  GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(user_data);
 
   g_free (backend->current_workgroup);
-  backend->current_workgroup = current_workgroup;
+  backend->current_workgroup = g_settings_get_string (settings, "workgroup");
 
   /* cancel the smb monitor */
   if (backend->smb_monitor)
@@ -608,9 +562,11 @@ notify_gconf_smb_workgroup_changed (GConfClient *client,
       g_file_monitor_cancel (backend->smb_monitor);
       g_object_unref (backend->smb_monitor);
       backend->smb_monitor = NULL;
-    }  
+    }
 
   remount_smb (backend, NULL);
+
+  return FALSE;
 }
 
 static NetworkFile *
@@ -809,8 +765,6 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
 {
   GVfsBackend *backend = G_VFS_BACKEND (network_backend);
   GMountSpec *mount_spec;
-  GConfClient *gconf_client;
-  char *display_local, *extra_domains;
   char *current_workgroup;
   const char * const* supported_vfs;
   int i;
@@ -830,15 +784,11 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
         network_backend->have_dnssd = TRUE;
     }
 
-  gconf_client = gconf_client_get_default ();
-
-  if (network_backend->have_smb) 
+  if (network_backend->have_smb)
     {
-      gconf_client_add_dir (gconf_client, PATH_GCONF_GVFS_SMB, 
-                            GCONF_CLIENT_PRELOAD_ONELEVEL, NULL);
+      network_backend->smb_settings = g_settings_new ("org.gnome.system.smb");
 
-      current_workgroup = gconf_client_get_string (gconf_client, 
-                                                   PATH_GCONF_GVFS_SMB_WORKGROUP, NULL);
+      current_workgroup = g_settings_get_string (network_backend->smb_settings, "workgroup");
 
       if (current_workgroup == NULL ||
           current_workgroup[0] == 0) 
@@ -848,36 +798,24 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
       else 
         network_backend->current_workgroup = current_workgroup;
 
-      gconf_client_notify_add (gconf_client, PATH_GCONF_GVFS_SMB_WORKGROUP, 
-                               notify_gconf_smb_workgroup_changed, network_backend, NULL, NULL);
-
-     }
+      g_signal_connect (network_backend->smb_settings,
+                        "change-event",
+                        G_CALLBACK (smb_settings_change_event_cb),
+                        network_backend);
+    }
 
   if (network_backend->have_dnssd) 
     {
-      gconf_client_add_dir (gconf_client, PATH_GCONF_GVFS_DNS_SD, 
-                            GCONF_CLIENT_PRELOAD_ONELEVEL, NULL);
+      network_backend->dnssd_settings = g_settings_new ("org.gnome.system.dns_sd");
 
-      display_local = gconf_client_get_string (gconf_client, 
-                                               PATH_GCONF_GVFS_DNS_SD_DISPLAY_LOCAL, NULL);
-      extra_domains = gconf_client_get_string (gconf_client, 
-                                               PATH_GCONF_GVFS_DNS_SD_EXTRA_DOMAINS, NULL);
-      
-      if (display_local != NULL && display_local[0] != 0)
-         network_backend->local_setting = parse_network_local_setting (display_local);
+      network_backend->local_setting = g_settings_get_enum (network_backend->dnssd_settings, "display-local");
+      network_backend->extra_domains = g_settings_get_string (network_backend->dnssd_settings, "extra-domains");
 
-      g_free (display_local);
-      network_backend->extra_domains = extra_domains;
-
-      gconf_client_notify_add (gconf_client, PATH_GCONF_GVFS_DNS_SD_EXTRA_DOMAINS, 
-                               notify_gconf_dnssd_domains_changed, network_backend, NULL, NULL);
-     
-      gconf_client_notify_add (gconf_client, PATH_GCONF_GVFS_DNS_SD_DISPLAY_LOCAL, 
-                               notify_gconf_dnssd_display_local_changed, network_backend, NULL, NULL);
-
+      g_signal_connect (network_backend->dnssd_settings,
+                        "change-event",
+                        G_CALLBACK (dnssd_settings_change_event_cb),
+                        network_backend);
     }
-
-  g_object_unref (gconf_client);
 
   g_vfs_backend_set_display_name (backend, _("Network"));
   g_vfs_backend_set_stable_name (backend, _("Network"));
@@ -903,7 +841,11 @@ g_vfs_backend_network_finalize (GObject *object)
   g_object_unref (backend->root_monitor);
   g_object_unref (backend->workgroup_icon);
   g_object_unref (backend->server_icon);
-  
+  if (backend->smb_settings)
+    g_object_unref (backend->smb_settings);
+  if (backend->dnssd_settings)
+    g_object_unref (backend->dnssd_settings);
+
   if (G_OBJECT_CLASS (g_vfs_backend_network_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_network_parent_class)->finalize) (object);
 }

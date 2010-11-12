@@ -48,13 +48,6 @@
 #include <libsmbclient.h>
 #include "libsmb-compat.h"
 
-#ifdef HAVE_GCONF
-#include <gconf/gconf-client.h>
-#endif
-
-/* We load a default workgroup from gconf */
-#define PATH_GCONF_GNOME_VFS_SMB_WORKGROUP "/system/smb/workgroup"
-
 /* The magic "default workgroup" hostname */
 #define DEFAULT_WORKGROUP_NAME "X-GNOME-DEFAULT-WORKGROUP"
 
@@ -86,6 +79,7 @@ struct _GVfsBackendSmbBrowse
   char *domain;
   char *server;
   char *mounted_server; /* server or DEFAULT_WORKGROUP_NAME */
+  char *default_workgroup;
   SMBCCTX *smb_context;
 
   char *last_user;
@@ -107,7 +101,6 @@ struct _GVfsBackendSmbBrowse
   int entry_errno;
 };
 
-static char *default_workgroup = NULL;
 
 static GHashTable *server_cache = NULL;
 static GMountTracker *mount_tracker = NULL;
@@ -231,6 +224,7 @@ g_vfs_backend_smb_browse_finalize (GObject *object)
   g_free (backend->domain);
   g_free (backend->mounted_server);
   g_free (backend->server);
+  g_free (backend->default_workgroup);
   
   g_mutex_free (backend->entries_lock);
   g_mutex_free (backend->update_cache_lock);
@@ -247,9 +241,8 @@ g_vfs_backend_smb_browse_finalize (GObject *object)
 static void
 g_vfs_backend_smb_browse_init (GVfsBackendSmbBrowse *backend)
 {
-#ifdef HAVE_GCONF
-  GConfClient *gclient;
-#endif
+  char *workgroup;
+  GSettings *settings;
 
   backend->entries_lock = g_mutex_new ();
   backend->update_cache_lock = g_mutex_new ();
@@ -257,25 +250,18 @@ g_vfs_backend_smb_browse_init (GVfsBackendSmbBrowse *backend)
   if (mount_tracker == NULL)
     mount_tracker = g_mount_tracker_new (NULL);
 
-#ifdef HAVE_GCONF
-  gclient = gconf_client_get_default ();
-  if (gclient)
-    {
-      char *workgroup;
+  /* Get default workgroup name */
+  settings = g_settings_new ("org.gnome.system.smb");
 
-      workgroup = gconf_client_get_string (gclient,
-					   PATH_GCONF_GNOME_VFS_SMB_WORKGROUP, NULL);
+  workgroup = g_settings_get_string (settings, "workgroup");
+  if (workgroup && workgroup[0])
+    backend->default_workgroup = workgroup;
+  else
+    g_free (workgroup);
 
-      if (workgroup && workgroup[0])
-	default_workgroup = workgroup;
-      else
-	g_free (workgroup);
+  g_object_unref (settings);
 
-      g_object_unref (gclient);
-    }
-#endif
-
-  DEBUG ("g_vfs_backend_smb_browse_init: default workgroup = '%s'\n", default_workgroup ? default_workgroup : "NULL");
+  DEBUG ("g_vfs_backend_smb_browse_init: default workgroup = '%s'\n", backend->default_workgroup ? backend->default_workgroup : "NULL");
 }
 
 /**
@@ -865,9 +851,8 @@ do_mount (GVfsBackend *backend,
   smbc_setFunctionRemoveCachedServer (smb_context, remove_cached_server);
   smbc_setFunctionPurgeCachedServers (smb_context, purge_cached);
   
-  /* FIXME: is strdup() still needed here? -- removed */
-  if (default_workgroup != NULL)
-    smbc_setWorkgroup (smb_context, default_workgroup);
+  if (op_backend->default_workgroup != NULL)
+    smbc_setWorkgroup (smb_context, op_backend->default_workgroup);
 
 #ifndef DEPRECATED_SMBC_INTERFACE
   smb_context->flags = 0;

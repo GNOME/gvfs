@@ -50,13 +50,6 @@
 #include "gvfsdaemonprotocol.h"
 #include "gvfskeyring.h"
 
-#ifdef HAVE_GCONF
-#include <gconf/gconf-client.h>
-#endif
-
-/* We load a default workgroup from gconf */
-#define PATH_GCONF_GNOME_VFS_SMB_WORKGROUP "/system/smb/workgroup"
-
 #include <libsmbclient.h>
 #include "libsmb-compat.h"
 
@@ -68,6 +61,7 @@ struct _GVfsBackendSmb
   char *share;
   char *user;
   char *domain;
+  char *default_workgroup;
   
   SMBCCTX *smb_context;
 
@@ -91,7 +85,6 @@ struct _GVfsBackendSmb
   SMBCSRV *cached_server;
 };
 
-static char *default_workgroup = NULL;
 
 G_DEFINE_TYPE (GVfsBackendSmb, g_vfs_backend_smb, G_VFS_TYPE_BACKEND)
 
@@ -113,6 +106,7 @@ g_vfs_backend_smb_finalize (GObject *object)
   g_free (backend->server);
   g_free (backend->user);
   g_free (backend->domain);
+  g_free (backend->default_workgroup);
   
   if (G_OBJECT_CLASS (g_vfs_backend_smb_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_smb_parent_class)->finalize) (object);
@@ -121,27 +115,19 @@ g_vfs_backend_smb_finalize (GObject *object)
 static void
 g_vfs_backend_smb_init (GVfsBackendSmb *backend)
 {
-#ifdef HAVE_GCONF
-  GConfClient *gclient;
-#endif
+  char *workgroup;
+  GSettings *settings;
 
-#ifdef HAVE_GCONF
-  gclient = gconf_client_get_default ();
-  if (gclient)
-    {
-      char *workgroup;
+  /* Get default workgroup name */
+  settings = g_settings_new ("org.gnome.system.smb");
 
-      workgroup = gconf_client_get_string (gclient,
-					   PATH_GCONF_GNOME_VFS_SMB_WORKGROUP, NULL);
+  workgroup = g_settings_get_string (settings, "workgroup");
+  if (workgroup && workgroup[0])
+    backend->default_workgroup = workgroup;
+  else
+    g_free (workgroup);
 
-      if (workgroup && workgroup[0])
-	default_workgroup = workgroup;
-      else
-	g_free (workgroup);
-
-      g_object_unref (gclient);
-    }
-#endif
+  g_object_unref (settings);
 }
 
 /**
@@ -523,8 +509,8 @@ do_mount (GVfsBackend *backend,
   smbc_setFunctionPurgeCachedServers (smb_context, purge_cached);
 
   /* FIXME: is strdup() still needed here? -- removed */
-  if (default_workgroup != NULL)
-    smbc_setWorkgroup (smb_context, default_workgroup);
+  if (op_backend->default_workgroup != NULL)
+    smbc_setWorkgroup (smb_context, op_backend->default_workgroup);
 
 #ifndef DEPRECATED_SMBC_INTERFACE
   smb_context->flags = 0;
