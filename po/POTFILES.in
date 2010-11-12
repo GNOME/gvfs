@@ -78,6 +78,7 @@ daemon/gvfsjobwrite.c
 daemon/main.c
 daemon/mount.c
 metadata/meta-daemon.c
+monitor/afc/afcvolume.c
 monitor/gdu/gdu-volume-monitor-daemon.c
 monitor/gdu/ggdudrive.c
 monitor/gdu/ggdumount.c

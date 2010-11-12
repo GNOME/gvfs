@@ -29,7 +29,15 @@ g_vfs_afc_monitor_create_volume (GVfsAfcVolumeMonitor *self,
 
   g_print ("creating volume for device uuid '%s'\n", uuid);
 
-  volume = g_vfs_afc_volume_new (G_VOLUME_MONITOR (self), uuid);
+  volume = g_vfs_afc_volume_new (G_VOLUME_MONITOR (self), uuid, NULL);
+  if (volume != NULL)
+    {
+      self->volumes = g_list_prepend (self->volumes, volume);
+      g_signal_emit_by_name (self, "volume-added", volume);
+    }
+
+  /* The house arrest service */
+  volume = g_vfs_afc_volume_new (G_VOLUME_MONITOR (self), uuid, HOUSE_ARREST_SERVICE_PORT);
   if (volume != NULL)
     {
       self->volumes = g_list_prepend (self->volumes, volume);
@@ -60,12 +68,14 @@ g_vfs_afc_monitor_remove_volume (GVfsAfcVolumeMonitor *self,
   GVfsAfcVolume *volume = NULL;
 
   volume = find_volume_by_uuid (self, uuid);
-  if (volume != NULL)
+  while (volume != NULL)
     {
       g_print ("removing volume for device uuid '%s'\n", uuid);
       self->volumes = g_list_remove (self->volumes, volume);
       g_signal_emit_by_name (self, "volume-removed", volume);
       g_object_unref (volume);
+
+      volume = find_volume_by_uuid (self, uuid);
     }
 }
 

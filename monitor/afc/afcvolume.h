@@ -21,6 +21,8 @@ G_BEGIN_DECLS
 #define G_VFS_IS_AFC_VOLUME_CLASS(k) ((G_TYPE_CHECK_CLASS_TYPE((k), G_VFS_TYPE_AFC_VOLUME))
 #define G_VFS_AFC_VOLUME_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS((o), G_VFS_TYPE_AFC_VOLUME, GVfsAfcVolumeClass))
 
+#define HOUSE_ARREST_SERVICE_PORT "3"
+
 typedef struct _GVfsAfcVolume GVfsAfcVolume;
 typedef struct _GVfsAfcVolumeClass GVfsAfcVolumeClass;
 
@@ -31,7 +33,8 @@ struct _GVfsAfcVolumeClass {
 GType g_vfs_afc_volume_get_type (void) G_GNUC_CONST;
 
 GVfsAfcVolume *g_vfs_afc_volume_new (GVolumeMonitor *monitor,
-                                     const char     *uuid);
+                                     const char     *uuid,
+                                     const char     *service);
 
 gboolean g_vfs_afc_volume_has_uuid (GVfsAfcVolume *volume, const char *uuid);
 

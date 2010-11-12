@@ -8,6 +8,7 @@
 #include <string.h>
 #include <glib.h>
 #include <gio/gio.h>
+#include <glib/gi18n.h>
 
 #include <libimobiledevice/libimobiledevice.h>
 #include <libimobiledevice/lockdown.h>
@@ -20,6 +21,7 @@ struct _GVfsAfcVolume {
   GVolumeMonitor *monitor;
 
   char *uuid;
+  char *service;
 
   char *name;
   char *icon;
@@ -39,6 +41,7 @@ g_vfs_afc_volume_finalize (GObject *object)
   self = G_VFS_AFC_VOLUME(object);
 
   g_free (self->uuid);
+  g_free (self->service);
 
   g_free (self->name);
   g_free (self->icon);
@@ -86,17 +89,43 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
   if (err != IDEVICE_E_SUCCESS)
     return 0;
 
-  if (lockdownd_client_new (dev, &lockdown_cli, "gvfs-afc-volume-monitor") != LOCKDOWN_E_SUCCESS)
+  if (self->service != NULL)
     {
-      idevice_free (dev);
-      return 0;
+      guint16 port;
+
+      if (lockdownd_client_new_with_handshake (dev, &lockdown_cli, "gvfs-afc-volume-monitor") != LOCKDOWN_E_SUCCESS)
+        {
+          idevice_free (dev);
+          return 0;
+        }
+      if (lockdownd_start_service(lockdown_cli, "com.apple.mobile.house_arrest", &port) != LOCKDOWN_E_SUCCESS)
+        {
+          idevice_free (dev);
+          return 0;
+        }
+    }
+  else
+    {
+      if (lockdownd_client_new (dev, &lockdown_cli, "gvfs-afc-volume-monitor") != LOCKDOWN_E_SUCCESS)
+        {
+          idevice_free (dev);
+          return 0;
+        }
     }
 
   /* try to use pretty device name */
   if (lockdownd_get_device_name (lockdown_cli, &display_name) == LOCKDOWN_E_SUCCESS)
     {
       g_free (self->name);
-      self->name = display_name;
+      if (g_strcmp0 (self->service, HOUSE_ARREST_SERVICE_PORT) == 0)
+        {
+          /* translators:
+           * This is "Documents on foo" where foo is the device name, eg.:
+           * Documents on Alan Smithee's iPhone */
+          self->name = g_strdup_printf (_("Documents on %s"), display_name);
+        }
+      else
+        self->name = display_name;
     }
 
   value = NULL;
@@ -127,7 +156,8 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
 
 GVfsAfcVolume *
 g_vfs_afc_volume_new (GVolumeMonitor *monitor,
-                      const char     *uuid)
+                      const char     *uuid,
+                      const char     *service)
 {
   GVfsAfcVolume *self;
   GFile *root;
@@ -136,8 +166,13 @@ g_vfs_afc_volume_new (GVolumeMonitor *monitor,
   self = G_VFS_AFC_VOLUME(g_object_new (G_VFS_TYPE_AFC_VOLUME, NULL));
   self->monitor = monitor;
   self->uuid = g_strdup (uuid);
+  self->service = g_strdup (service);
 
-  uri = g_strdup_printf ("afc://%s", self->uuid);
+  if (service == NULL)
+    uri = g_strdup_printf ("afc://%s", self->uuid);
+  else
+    uri = g_strdup_printf ("afc://%s:%s", self->uuid, service);
+
   root = g_file_new_for_uri (uri);
   g_free (uri);
 
