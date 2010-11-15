@@ -9,10 +9,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs MASTER\n"
+"Project-Id-Version: gvfs 2.32\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2010-07-01 10:56+0000\n"
+"POT-Creation-Date: 2010-11-12 19:26+0000\n"
 "PO-Revision-Date: 2010-07-09 17:25+0300\n"
 "Last-Translator: Ivar Smolin <okul@linux.ee>\n"
 "Language-Team: Estonian <gnome-et@linux.ee>\n"
@@ -744,18 +744,22 @@ msgstr "ssh-programmi pole võimalik käivitada: %s"
 msgid "Timed out when logging in"
 msgstr "Sisselogimine ületas ajapiirangu"
 
+#. Translators: the first %s is the username, the second the host name
 #, c-format
 msgid "Enter passphrase for key for ssh as %s on %s"
 msgstr "Sisesta kasutaja %s ssh-võtme parool hostil %s"
 
+#. Translators: the first %s is the username, the second the host name
 #, c-format
 msgid "Enter password for ssh as %s on %s"
 msgstr "Sisesta kasutaja %s ssh-parool hostil %s"
 
+#. Translators: %s is the hostname
 #, c-format
 msgid "Enter passphrase for key for ssh on %s"
 msgstr "Sisesta hosti %s ssh-võtme parool"
 
+#. Translators: %s is the hostname
 #, c-format
 msgid "Enter password for ssh on %s"
 msgstr "Sisesta hosti %s ssh-parool"
@@ -1713,6 +1717,3 @@ msgstr "Sümbolviitade, haakepunktide ja kaustalaadsete otseteede järgimine"
 
 msgid "- list contents of directories in a tree-like format"
 msgstr "- kataloogide sisuloetelu puu"
-
-#~ msgid "Enter password"
-#~ msgstr "Sisesta parool"
