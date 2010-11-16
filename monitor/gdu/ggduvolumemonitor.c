@@ -638,6 +638,10 @@ _g_unix_mount_point_guess_should_display (GUnixMountPoint *mount_point)
   if (g_unix_is_mount_path_system_internal (mount_path))
     return FALSE;
 
+  /* Hide mounts within a dot path, suppose it was a purpose to hide this mount */
+  if (g_strstr_len (mount_path, -1, "/.") != NULL)
+    return FALSE;
+
   /* Only display things in /media (which are generally user mountable)
      and home dir (fuse stuff) */
   if (g_str_has_prefix (mount_path, "/media/"))
