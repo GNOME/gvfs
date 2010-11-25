@@ -244,7 +244,7 @@ outstanding_fd_free (OutstandingFD *outstanding)
   g_free (outstanding);
 }
 
-static void
+static gboolean
 async_connection_accept_new_fd (VfsConnectionData *data,
 				GIOCondition condition,
 				int fd)
@@ -260,7 +260,7 @@ async_connection_accept_new_fd (VfsConnectionData *data,
       g_source_destroy (data->extra_fd_source);
       g_source_unref (data->extra_fd_source);
       data->extra_fd_source = NULL;
-      return;
+      return FALSE;
     }
   
   fd_id = data->extra_fd_count;
@@ -287,6 +287,8 @@ async_connection_accept_new_fd (VfsConnectionData *data,
 			       outstanding_fd);
 	}
     }
+
+  return TRUE;
 }
 
 static void
