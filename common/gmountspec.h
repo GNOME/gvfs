@@ -24,6 +24,7 @@
 #define __G_MOUNT_SPEC_H__
 
 #include <glib.h>
+#include <glib-object.h>
 #include <dbus/dbus.h>
 
 G_BEGIN_DECLS
