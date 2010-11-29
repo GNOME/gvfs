@@ -1,3 +1,12 @@
+Major changes in 1.7.0
+======================
+* sftp: Close pty master in child process to prevent SELinux denial
+* fuse: Add proper truncate support for open()
+* Port to GSettings
+* gdu: Treat mounts as hidden if they have a path element
+  that starts with a dot
+* Translation updates (ug, th)
+
 Major changes in 1.6.5
 ======================
 * Remove app lookup extension (now handled internally in GIO)
