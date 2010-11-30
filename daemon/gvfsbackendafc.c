@@ -2,6 +2,7 @@
  * gvfs/daemon/gvfsbackendafc.c
  *
  * Copyright (c) 2008 Patrick Walton <pcwalton@cs.ucla.edu>
+ * Copyright (c) 2010 Bastien Nocera <hadess@hadess.net>
  */
 
 #include <config.h>
@@ -19,6 +20,9 @@
 #include <libimobiledevice/libimobiledevice.h>
 #include <libimobiledevice/lockdown.h>
 #include <libimobiledevice/afc.h>
+#include <libimobiledevice/house_arrest.h>
+#include <libimobiledevice/installation_proxy.h>
+#include <libimobiledevice/sbservices.h>
 
 #include "gvfsbackendafc.h"
 #include "gvfsjobopenforread.h"
@@ -38,11 +42,6 @@
 #define G_VFS_BACKEND_AFC_MAX_FILE_SIZE G_MAXINT64
 int g_blocksize = 4096; /* assume this is the default block size */
 
-/* AFC_E_INVALID_ARGUMENT was renamed between 0.9.7 and 1.0.0 */
-#ifndef AFC_E_INVALID_ARG
-#define AFC_E_INVALID_ARG AFC_E_INVALID_ARGUMENT
-#endif /* !AFC_E_INVALID_ARG */
-
 typedef enum {
   IOS_UNKNOWN = 0,
   IOS1,
@@ -51,6 +50,26 @@ typedef enum {
   IOS4
 } HostOSVersion;
 
+typedef enum {
+  ACCESS_MODE_UNDEFINED = 0,
+  ACCESS_MODE_AFC,
+  ACCESS_MODE_HOUSE_ARREST
+} AccessMode;
+
+typedef struct {
+  guint64 fd;
+  afc_client_t afc_cli;
+} FileHandle;
+
+typedef struct {
+  char *display_name;
+  char *id;
+  char *icon_path;
+  gboolean hidden;
+  house_arrest_client_t house_arrest;
+  afc_client_t afc_cli;
+} AppInfo;
+
 struct _GVfsBackendAfc {
   GVfsBackend backend;
 
@@ -58,10 +77,17 @@ struct _GVfsBackendAfc {
   char *service;
   char *model;
   gboolean connected;
+  AccessMode mode;
   HostOSVersion version;
 
   idevice_t dev;
-  afc_client_t afc_cli;
+  afc_client_t afc_cli; /* for ACCESS_MODE_AFC */
+
+  /* for ACCESS_MODE_HOUSE_ARREST */
+  GHashTable *apps; /* hash table of AppInfo */
+  instproxy_client_t inst;
+  sbservices_client_t sbs;
+  GMutex *apps_lock;
 };
 
 struct afc_error_mapping {
@@ -123,7 +149,7 @@ g_io_error_from_afc_error (afc_error_t error)
     }
 
   if (!found)
-    g_warning ("Unknown AFC error (%d).\n", error);
+    g_message ("Unknown AFC error (%d).\n", error);
 
   return res;
 }
@@ -135,10 +161,37 @@ g_vfs_backend_afc_close_connection (GVfsBackendAfc *self)
 {
   if (self->connected)
     {
-      afc_client_free (self->afc_cli);
+      if (self->mode == ACCESS_MODE_AFC)
+        {
+          afc_client_free (self->afc_cli);
+        }
+      else
+        {
+          if (self->apps != NULL)
+            {
+              g_hash_table_destroy (self->apps);
+              self->apps = NULL;
+            }
+          if (self->inst)
+            {
+              instproxy_client_free (self->inst);
+              self->inst = NULL;
+            }
+          if (self->sbs)
+            {
+              sbservices_client_free (self->sbs);
+              self->sbs = NULL;
+            }
+          if (self->apps_lock)
+            {
+              g_mutex_free (self->apps_lock);
+              self->apps_lock = NULL;
+            }
+        }
       g_free (self->model);
       self->model = NULL;
       idevice_free (self->dev);
+      self->dev = NULL;
     }
   self->connected = FALSE;
 }
@@ -180,6 +233,44 @@ g_vfs_backend_afc_check (afc_error_t cond, GVfsJob *job)
     default:
       g_vfs_job_failed (job, G_IO_ERROR, error,
                         _("Unhandled Apple File Control error (%d)"), cond);
+      break;
+    }
+
+  return 1;
+}
+
+static int
+g_vfs_backend_inst_check (instproxy_error_t cond, GVfsJob *job)
+{
+  if (G_LIKELY(cond == INSTPROXY_E_SUCCESS))
+    {
+      return 0;
+    }
+
+  switch (cond)
+    {
+    default:
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Unhandled Inst proxy error (%d)"), cond);
+      break;
+    }
+
+  return 1;
+}
+
+static int
+g_vfs_backend_sbs_check (sbservices_error_t cond, GVfsJob *job)
+{
+  if (G_LIKELY(cond == INSTPROXY_E_SUCCESS))
+    {
+      return 0;
+    }
+
+  switch (cond)
+    {
+    default:
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Unhandled SBServices proxy error (%d)"), cond);
       break;
     }
 
@@ -232,6 +323,22 @@ g_vfs_backend_idevice_check (idevice_error_t cond, GVfsJob *job)
     }
 
   return 1;
+}
+
+static void
+app_info_free (AppInfo *info)
+{
+  /* Note, those are allocated by the plist parser, so we use free(), not g_free() */
+  free (info->display_name);
+  free (info->id);
+
+  g_free (info->icon_path);
+  if (info->house_arrest)
+    house_arrest_client_free (info->house_arrest);
+  if (info->afc_cli)
+    afc_client_free (info->afc_cli);
+
+  g_free (info);
 }
 
 static void
@@ -314,17 +421,29 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
     virtual_port = atoi (str);
 
   /* set a generic display name */
-  if (virtual_port >= 2)
-    {
+  switch (virtual_port) {
+    case 1:
+      self->mode = ACCESS_MODE_AFC;
+      self->service = g_strdup ("com.apple.afc");
+      display_name = g_strdup_printf (_("Apple Mobile Device"));
+      break;
+    case 2:
+      self->mode = ACCESS_MODE_AFC;
       self->service = g_strdup_printf ("com.apple.afc%d", virtual_port);
       display_name = g_strdup_printf (_("Service %d on Apple Mobile Device"),
                                       virtual_port);
-    }
-  else
-    {
-      self->service = g_strdup ("com.apple.afc");
-      display_name = g_strdup_printf (_("Apple Mobile Device"));
-    }
+      break;
+    case 3:
+      self->mode = ACCESS_MODE_HOUSE_ARREST;
+      self->service = g_strdup ("com.apple.mobile.house_arrest");
+      display_name = g_strdup_printf (_("Documents on Apple Mobile Device"));
+      break;
+    default:
+      g_vfs_job_failed (G_VFS_JOB(job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid AFC location: must be in the form of "
+                          "afc://uuid:port-number"));
+      return;
+  }
 
   g_vfs_backend_set_display_name (G_VFS_BACKEND(self), display_name);
   g_free (display_name);
@@ -366,22 +485,31 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
     {
       if (display_name)
         {
-          if (virtual_port >= 2)
-            {
+          switch (virtual_port) {
+            case 1:
+              g_vfs_backend_set_display_name (G_VFS_BACKEND(self), display_name);
+              break;
+            case 2:
               /* translators:
                * This is the device name, with the service being browsed in brackets, eg.:
-               * Alan Smithee's iPhone (Service 2 on Apple Mobile Device */
+               * Alan Smithee's iPhone (jailbreak) */
               g_vfs_backend_set_display_name (G_VFS_BACKEND(self),
-                                              g_strdup_printf (_("%s (%s)"), display_name, self->service));
-            }
-          else
-            {
-              g_vfs_backend_set_display_name (G_VFS_BACKEND(self), display_name);
-            }
+                                              g_strdup_printf (_("%s (jailbreak)"), display_name));
+              break;
+            case 3:
+              /* translators:
+               * This is "Documents on foo" where foo is the device name, eg.:
+               * Documents on Alan Smithee's iPhone */
+              g_vfs_backend_set_display_name (G_VFS_BACKEND(self),
+                                              g_strdup_printf (_("Documents on %s"), display_name));
+              break;
+            default:
+              g_assert_not_reached ();
+          }
         }
     }
 
-  /* set correct fd icon spec name depending on device model */
+  /* set correct freedesktop icon spec name depending on device model */
   value = NULL;
   if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_get_value (lockdown_cli, NULL, "DeviceClass", &value), G_VFS_JOB(job))))
     goto out_destroy_lockdown;
@@ -471,24 +599,70 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
     goto out_destroy_dev;
 
-  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_start_service (lockdown_cli,
-                                                                         self->service, &port),
-                                                G_VFS_JOB(job))))
-    {
-      goto out_destroy_lockdown;
-    }
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_client_new (self->dev,
-                                                          port, &self->afc_cli),
-                                          G_VFS_JOB(job))))
-    {
-      goto out_destroy_lockdown;
-    }
+  switch (self->mode) {
+    case ACCESS_MODE_AFC:
+      if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_start_service (lockdown_cli,
+                                                                             self->service, &port),
+                                                    G_VFS_JOB(job))))
+        {
+          goto out_destroy_lockdown;
+        }
+      if (G_UNLIKELY(g_vfs_backend_afc_check (afc_client_new (self->dev,
+                                                              port, &self->afc_cli),
+                                              G_VFS_JOB(job))))
+        {
+          goto out_destroy_lockdown;
+        }
+      break;
+    case ACCESS_MODE_HOUSE_ARREST:
+      if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_start_service (lockdown_cli,
+                                                                             "com.apple.mobile.installation_proxy", &port),
+                                                    G_VFS_JOB(job))))
+        {
+          g_warning ("couldn't start inst proxy");
+          goto out_destroy_lockdown;
+        }
+      if (G_UNLIKELY(g_vfs_backend_inst_check (instproxy_client_new (self->dev,
+                                                                     port, &self->inst),
+                                               G_VFS_JOB(job))))
+        {
+          g_warning ("couldn't create inst proxy instance");
+          goto out_destroy_lockdown;
+        }
+      if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_start_service (lockdown_cli,
+                                                                             "com.apple.springboardservices", &port),
+                                                    G_VFS_JOB(job))))
+        {
+          g_warning ("couldn't start SBServices proxy");
+          goto out_destroy_lockdown;
+        }
+      if (G_UNLIKELY(g_vfs_backend_sbs_check (sbservices_client_new (self->dev,
+                                                                     port, &self->sbs),
+                                              G_VFS_JOB(job))))
+        {
+          g_warning ("couldn't create SBServices proxy instance");
+          goto out_destroy_lockdown;
+        }
+      /* Create directory for the icon cache */
+        {
+          char *path;
+
+          path = g_build_filename (g_get_user_cache_dir (),
+                                   "libimobiledevice",
+                                   "icons", NULL);
+          g_mkdir_with_parents (path, 0755);
+          g_free (path);
+        }
+      break;
+    default:
+      g_assert_not_reached ();
+  }
 
   /* lockdown connection is not needed anymore */
   lockdownd_client_free (lockdown_cli);
 
   /* Add camera item if necessary */
-  if (virtual_port < 2)
+  if (self->mode == ACCESS_MODE_AFC)
     {
       dcim_afcinfo = NULL;
       if (afc_get_file_info (self->afc_cli, "/DCIM", &dcim_afcinfo) == AFC_E_SUCCESS)
@@ -525,20 +699,22 @@ g_vfs_backend_afc_unmount (GVfsBackend *backend,
   /* FIXME: check on G_MOUNT_UNMOUNT_FORCE flag */
   self = G_VFS_BACKEND_AFC (backend);
   g_vfs_backend_afc_close_connection (self);
+
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
 
-static gboolean file_get_info (GVfsBackendAfc *backend, const char *path, GFileInfo *info);
+static gboolean file_get_info (GVfsBackendAfc *backend, afc_client_t afc_cli, const char *path, GFileInfo *info);
 
 static gboolean
 is_directory (GVfsBackendAfc *backend,
+              afc_client_t afc_cli,
               const char *path)
 {
   gboolean result = FALSE;
   GFileInfo *info;
 
   info = g_file_info_new();
-  if (file_get_info (backend, path, info))
+  if (file_get_info (backend, afc_cli, path, info))
     {
       if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
         result = TRUE;
@@ -550,13 +726,14 @@ is_directory (GVfsBackendAfc *backend,
 
 static gboolean
 is_regular (GVfsBackendAfc *backend,
+            afc_client_t afc_cli,
             const char *path)
 {
   gboolean result = FALSE;
   GFileInfo *info;
 
   info = g_file_info_new();
-  if (file_get_info (backend, path, info))
+  if (file_get_info (backend, afc_cli, path, info))
     {
       if (g_file_info_get_file_type (info) == G_FILE_TYPE_REGULAR)
 	result = TRUE;
@@ -564,6 +741,135 @@ is_regular (GVfsBackendAfc *backend,
 
   g_object_unref (info);
   return result;
+}
+
+static void
+g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
+                                 const char     *id)
+{
+  AppInfo *info;
+  lockdownd_client_t lockdown_cli;
+  guint16 port;
+  house_arrest_client_t house_arrest;
+  afc_client_t afc;
+  plist_t dict, error;
+
+  info = g_hash_table_lookup (self->apps, id);
+
+  if (info == NULL ||
+      info->afc_cli != NULL)
+    return;
+
+  /* Load house arrest and afc now! */
+  lockdown_cli = NULL;
+  if (lockdownd_client_new_with_handshake (self->dev, &lockdown_cli, "gvfsd-afc") != LOCKDOWN_E_SUCCESS)
+    {
+      g_warning ("Failed to get a lockdown to start house arrest for app %s", info->id);
+      return;
+    }
+  if (lockdownd_start_service (lockdown_cli, "com.apple.mobile.house_arrest", &port) != LOCKDOWN_E_SUCCESS)
+    {
+      lockdownd_client_free (lockdown_cli);
+      g_warning ("Failed to start house arrest for app %s", info->id);
+      return;
+    }
+
+  house_arrest = NULL;
+  house_arrest_client_new (self->dev, port, &house_arrest);
+  if (house_arrest == NULL)
+    {
+      g_warning ("Failed to start house arrest for app %s", info->id);
+      lockdownd_client_free (lockdown_cli);
+      return;
+    }
+
+  dict = NULL;
+  if (house_arrest_send_command (house_arrest, "VendContainer", info->id) != HOUSE_ARREST_E_SUCCESS ||
+      house_arrest_get_result (house_arrest, &dict) != HOUSE_ARREST_E_SUCCESS)
+    {
+      g_warning ("Failed to set up house arrest for app %s", info->id);
+      house_arrest_client_free (house_arrest);
+      lockdownd_client_free (lockdown_cli);
+      return;
+    }
+  error = plist_dict_get_item (dict, "Error");
+  if (error != NULL)
+    {
+      char *str;
+
+      plist_get_string_val (error, &str);
+      g_warning ("Failed to set up house arrest for app %s: %s", info->id, str);
+      free (str);
+      plist_free (dict);
+
+      house_arrest_client_free (house_arrest);
+      lockdownd_client_free (lockdown_cli);
+      return;
+    }
+  plist_free (dict);
+
+  lockdownd_client_free (lockdown_cli);
+
+  afc = NULL;
+  afc_client_new_from_house_arrest_client(house_arrest, &afc);
+  if (afc == NULL)
+    {
+      g_warning ("Failed to set up afc client for app %s", info->id);
+      house_arrest_client_free (house_arrest);
+
+      return;
+    }
+
+  info->house_arrest = house_arrest;
+  info->afc_cli = afc;
+}
+
+/* If force_afc_mount is TRUE, then we'll try to mount
+ * the app if there's one in the path, otherwise, we'll hold on */
+static char *
+g_vfs_backend_parse_house_arrest_path (GVfsBackendAfc *self,
+                                       gboolean        force_afc_mount,
+                                       const char     *path,
+                                       char          **new_path)
+{
+  char **comps;
+  char *s;
+  char *app;
+  gboolean setup_afc;
+
+  if (path == NULL || *path == '\0' || g_str_equal (path, "/"))
+    {
+      *new_path = NULL;
+      return NULL;
+    }
+
+  if (*path != '/')
+    comps = g_strsplit (path, "/", -1);
+  else
+    comps = g_strsplit (path + 1, "/", -1);
+
+  setup_afc = force_afc_mount;
+  app = g_strdup (comps[0]);
+  s = g_strjoinv ("/", comps + 1);
+  if (*s == '\0')
+    {
+      g_free (s);
+      *new_path = g_strdup ("/");
+    }
+  else
+    {
+      *new_path = s;
+      setup_afc = TRUE;
+    }
+  g_strfreev (comps);
+
+  if (app != NULL &&
+      setup_afc)
+    {
+      g_vfs_backend_setup_afc_for_app (self, app);
+    }
+
+  return app;
 }
 
 /* Callback to open an existing file for reading. */
@@ -574,34 +880,71 @@ g_vfs_backend_afc_open_for_read (GVfsBackend *backend,
 {
   uint64_t fd = 0;
   GVfsBackendAfc *self;
+  char *new_path;
+  afc_client_t afc_cli;
+  FileHandle *handle;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
-  if (is_directory (self, path))
+  if (self->mode == ACCESS_MODE_HOUSE_ARREST)
     {
+      char *app;
+      AppInfo *info;
+
+      new_path = NULL;
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, &new_path);
+      if (app == NULL)
+        goto is_dir_bail;
+
+      if (g_str_equal (new_path, "/"))
+        goto is_dir_bail;
+
+      info = g_hash_table_lookup (self->apps, app);
+      if (info == NULL)
+        goto not_found_bail;
+
+      afc_cli = info->afc_cli;
+      g_free (app);
+    }
+  else
+    {
+      afc_cli = self->afc_cli;
+      new_path = NULL;
+    }
+
+  if (is_directory (self, afc_cli, new_path ? new_path : path))
+    {
+is_dir_bail:
+      g_free (new_path);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_IS_DIRECTORY,
                         _("Can't open directory"));
       return;
     }
 
-  if (!is_regular (self, path))
+  if (!is_regular (self, afc_cli, new_path ? new_path : path))
     {
+not_found_bail:
+      g_free (new_path);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_FOUND,
                         _("File doesn't exist"));
       return;
     }
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_open (self->afc_cli,
-                                                         path, AFC_FOPEN_RDONLY, &fd),
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_open (afc_cli,
+                                                         new_path ? new_path : path, AFC_FOPEN_RDONLY, &fd),
                                           G_VFS_JOB(job))))
     {
       return;
     }
 
-  g_vfs_job_open_for_read_set_handle (job, GUINT_TO_POINTER((gulong) fd));
+  handle = g_new0 (FileHandle, 1);
+  handle->fd = fd;
+  handle->afc_cli = afc_cli;
+
+  g_vfs_job_open_for_read_set_handle (job, handle);
   g_vfs_job_open_for_read_set_can_seek (job, TRUE);
   g_vfs_job_succeeded (G_VFS_JOB(job));
 
@@ -617,18 +960,55 @@ g_vfs_backend_afc_create (GVfsBackend *backend,
 {
   uint64_t fd = 0;
   GVfsBackendAfc *self;
+  char *new_path, *app;
+  afc_client_t afc_cli;
+  FileHandle *fh;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_open (self->afc_cli,
-                                                         path, AFC_FOPEN_RW, &fd),
+  new_path = NULL;
+
+  if (self->mode == ACCESS_MODE_HOUSE_ARREST)
+    {
+      AppInfo *info;
+
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, &new_path);
+      if (app == NULL)
+        {
+          g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB(job));
+          return;
+        }
+      info = g_hash_table_lookup (self->apps, app);
+      if (info == NULL)
+        {
+          g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
+          return;
+        }
+      afc_cli = info->afc_cli;
+      g_free (app);
+    }
+  else
+    {
+      afc_cli = self->afc_cli;
+      new_path = NULL;
+    }
+
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_open (afc_cli,
+                                                         new_path ? new_path : path, AFC_FOPEN_RW, &fd),
                                           G_VFS_JOB(job))))
     {
+      g_free (new_path);
       return;
     }
 
-  g_vfs_job_open_for_write_set_handle (job, GUINT_TO_POINTER((gulong)fd));
+  g_free (new_path);
+
+  fh = g_new0 (FileHandle, 1);
+  fh->fd = fd;
+  fh->afc_cli = afc_cli;
+
+  g_vfs_job_open_for_write_set_handle (job, fh);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
   g_vfs_job_succeeded (G_VFS_JOB(job));
 
@@ -645,32 +1025,71 @@ g_vfs_backend_afc_append_to (GVfsBackend *backend,
   uint64_t fd = 0;
   uint64_t off = 0;
   GVfsBackendAfc *self;
+  char *new_path, *app;
+  afc_client_t afc_cli;
+  FileHandle *fh;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_open (self->afc_cli,
-                                                         path, AFC_FOPEN_RW, &fd),
+  new_path = NULL;
+
+  if (self->mode == ACCESS_MODE_HOUSE_ARREST)
+    {
+      AppInfo *info;
+
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, &new_path);
+      if (app == NULL)
+        {
+          g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB(job));
+          return;
+        }
+      info = g_hash_table_lookup (self->apps, app);
+      if (info == NULL)
+        {
+          g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
+          return;
+        }
+      afc_cli = info->afc_cli;
+      g_free (app);
+    }
+  else
+    {
+      afc_cli = self->afc_cli;
+      new_path = NULL;
+    }
+
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_open (afc_cli,
+                                                         new_path ? new_path : path, AFC_FOPEN_RW, &fd),
                                           G_VFS_JOB(job))))
     {
+      g_free (new_path);
       return;
     }
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_seek (self->afc_cli,
+  g_free (new_path);
+
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_seek (afc_cli,
                                                          fd, 0, SEEK_END),
                                           G_VFS_JOB(job))))
     {
+      afc_file_close (afc_cli, fd);
       return;
     }
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_tell (self->afc_cli,
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_tell (afc_cli,
                                                          fd, &off),
                                           G_VFS_JOB(job))))
     {
+      afc_file_close (afc_cli, fd);
       return;
     }
 
-  g_vfs_job_open_for_write_set_handle (job, GUINT_TO_POINTER((gulong)fd));
+  fh = g_new0 (FileHandle, 1);
+  fh->fd = fd;
+  fh->afc_cli = afc_cli;
+
+  g_vfs_job_open_for_write_set_handle (job, fh);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
   g_vfs_job_open_for_write_set_initial_offset (job, off);
   g_vfs_job_succeeded (G_VFS_JOB(job));
@@ -688,6 +1107,9 @@ g_vfs_backend_afc_replace (GVfsBackend *backend,
 {
   uint64_t fd = 0;
   GVfsBackendAfc *self;
+  char *new_path, *app;
+  afc_client_t afc_cli;
+  FileHandle *fh;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail(self->connected);
@@ -702,14 +1124,48 @@ g_vfs_backend_afc_replace (GVfsBackend *backend,
       return;
     }
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_open (self->afc_cli,
-                                                         filename, AFC_FOPEN_WR, &fd),
+  new_path = NULL;
+
+  if (self->mode == ACCESS_MODE_HOUSE_ARREST)
+    {
+      AppInfo *info;
+
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &new_path);
+      if (app == NULL)
+        {
+          g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB(job));
+          return;
+        }
+      info = g_hash_table_lookup (self->apps, app);
+      if (info == NULL)
+        {
+          g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
+          return;
+        }
+      afc_cli = info->afc_cli;
+      g_free (app);
+    }
+  else
+    {
+      afc_cli = self->afc_cli;
+      new_path = NULL;
+    }
+
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_open (afc_cli,
+                                                         new_path ? new_path : filename, AFC_FOPEN_WR, &fd),
                                           G_VFS_JOB(job))))
     {
+      g_free (new_path);
       return;
     }
 
-  g_vfs_job_open_for_write_set_handle (job, GUINT_TO_POINTER((gulong)fd));
+  g_free (new_path);
+
+  fh = g_new0 (FileHandle, 1);
+  fh->fd = fd;
+  fh->afc_cli = afc_cli;
+
+  g_vfs_job_open_for_write_set_handle (job, fh);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
   g_vfs_job_succeeded (G_VFS_JOB(job));
 
@@ -723,15 +1179,16 @@ g_vfs_backend_afc_close_read (GVfsBackend *backend,
                               GVfsBackendHandle handle)
 {
   GVfsBackendAfc *self;
-  uint64_t fd = 0;
+  FileHandle *fh;
 
-  fd = GPOINTER_TO_UINT(handle);
-  g_return_if_fail (fd != 0);
+  fh = (FileHandle *) handle;
 
   self = G_VFS_BACKEND_AFC(backend);
 
   if (self->connected)
-    afc_file_close (self->afc_cli, fd);
+    afc_file_close (fh->afc_cli, fh->fd);
+
+  g_free (fh);
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
@@ -742,15 +1199,16 @@ g_vfs_backend_afc_close_write (GVfsBackend *backend,
                                GVfsBackendHandle handle)
 {
   GVfsBackendAfc *self;
-  uint64_t fd = 0;
+  FileHandle *fh;
 
-  fd = GPOINTER_TO_UINT(handle);
-  g_return_if_fail (fd != 0);
+  fh = (FileHandle *) handle;
 
   self = G_VFS_BACKEND_AFC(backend);
 
   if (self->connected)
-    afc_file_close(self->afc_cli, fd);
+    afc_file_close(fh->afc_cli, fh->fd);
+
+  g_free (fh);
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
@@ -764,17 +1222,16 @@ g_vfs_backend_afc_read (GVfsBackend *backend,
 {
   guint32 nread = 0;
   GVfsBackendAfc *self;
-  uint64_t fd = 0;
+  FileHandle *fh;
 
-  fd = GPOINTER_TO_UINT(handle);
-  g_return_if_fail (fd != 0);
+  fh = (FileHandle *) handle;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
   if (req > 0 &&
-      G_UNLIKELY(g_vfs_backend_afc_check (afc_file_read (self->afc_cli,
-                                                         fd, buffer, req, &nread),
+      G_UNLIKELY(g_vfs_backend_afc_check (afc_file_read (fh->afc_cli,
+                                                         fh->fd, buffer, req, &nread),
                                           G_VFS_JOB(job))))
     {
       return;
@@ -793,17 +1250,16 @@ g_vfs_backend_afc_write (GVfsBackend *backend,
 {
   guint32 nwritten = 0;
   GVfsBackendAfc *self;
-  uint64_t fd = 0;
+  FileHandle *fh;
 
-  fd = GPOINTER_TO_UINT(handle);
-  g_return_if_fail (fd != 0);
+  fh = (FileHandle *) handle;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
   if (sz > 0 &&
-      G_UNLIKELY(g_vfs_backend_afc_check(afc_file_write (self->afc_cli,
-                                                         fd, buffer, sz, &nwritten),
+      G_UNLIKELY(g_vfs_backend_afc_check(afc_file_write (fh->afc_cli,
+                                                         fh->fd, buffer, sz, &nwritten),
                                          G_VFS_JOB(job))))
     {
       return;
@@ -821,7 +1277,7 @@ g_vfs_backend_afc_seek (GVfsBackendAfc *self,
                         GSeekType type)
 {
   int afc_seek_type;
-  uint64_t fd = 0;
+  FileHandle *fh;
 
   switch (type)
     {
@@ -840,10 +1296,10 @@ g_vfs_backend_afc_seek (GVfsBackendAfc *self,
       return 1;
     }
 
-  fd = GPOINTER_TO_UINT(handle);
+  fh = (FileHandle *) handle;
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_seek (self->afc_cli,
-                                                         fd, offset, afc_seek_type),
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_seek (fh->afc_cli,
+                                                         fh->fd, offset, afc_seek_type),
                                           job)))
     {
       return 1;
@@ -1023,7 +1479,8 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
   g_free (content_type);
 
   /* for symlinks to work we need to return GFileInfo for the linktarget */
-  if ((flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS) == 0)
+  if ((flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS) == 0 &&
+      self->mode == ACCESS_MODE_AFC)
     {
       if (type == G_FILE_TYPE_SYMBOLIC_LINK)
         {
@@ -1062,6 +1519,7 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
 
   /* Check for matching thumbnail in .MISC directory */
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_PREVIEW_ICON) &&
+      self->mode == ACCESS_MODE_AFC &&
       path != NULL &&
       g_str_has_prefix (path, "/DCIM/") &&
       hidden == FALSE &&
@@ -1188,8 +1646,60 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
     }
 }
 
+static void
+g_vfs_backend_afc_set_info_from_app (GVfsBackendAfc *self,
+                                     GFileInfo *info,
+                                     AppInfo *app_info)
+{
+  GIcon *icon;
+
+  /* content-type */
+  g_file_info_set_content_type (info, "inode/directory");
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
+  g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
+
+  /* icon */
+  if (app_info == NULL || app_info->icon_path == NULL)
+    {
+      icon = g_themed_icon_new ("folder");
+      g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
+    }
+  else
+    {
+      GFile *file;
+
+      file = g_file_new_for_path (app_info->icon_path);
+      icon = g_file_icon_new (file);
+      g_object_unref (file);
+      g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
+    }
+
+  /* hidden ? */
+  if (app_info && app_info->hidden)
+    g_file_info_set_is_hidden (info, TRUE);
+
+  /* name */
+  if (app_info != NULL)
+    {
+      g_file_info_set_name(info, app_info->id);
+      g_file_info_set_display_name (info, app_info->display_name);
+    }
+  else
+    {
+      g_file_info_set_name(info, "/");
+      g_file_info_set_display_name (info, g_vfs_backend_get_display_name (G_VFS_BACKEND(self)));
+    }
+
+  /* owner */
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, getuid ());
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, getgid ());
+}
+
 static gboolean
 file_get_info (GVfsBackendAfc *backend,
+               afc_client_t afc_cli,
                const char *path,
                GFileInfo *info)
 {
@@ -1200,7 +1710,7 @@ file_get_info (GVfsBackendAfc *backend,
   g_return_val_if_fail (backend->connected, result);
   g_return_val_if_fail (info, result);
 
-  if (G_LIKELY(afc_get_file_info (backend->afc_cli, path, &afcinfo) == AFC_E_SUCCESS))
+  if (G_LIKELY(afc_get_file_info (afc_cli, path, &afcinfo) == AFC_E_SUCCESS))
     {
       ptr = strrchr (path, '/');
       if (ptr && ptr[1] != '\0')
@@ -1218,6 +1728,158 @@ file_get_info (GVfsBackendAfc *backend,
   return result;
 }
 
+static char *
+g_vfs_backend_load_icon (sbservices_client_t sbs,
+                         const char         *id)
+{
+  char *path;
+  char *filename;
+  char *data;
+  guint64 len;
+
+  filename = g_strdup_printf ("%s.png", id);
+  path = g_build_filename (g_get_user_cache_dir (),
+                           "libimobiledevice",
+                           "icons",
+                           filename, NULL);
+  g_free (filename);
+
+  if (g_file_test (path, G_FILE_TEST_IS_REGULAR))
+    return path;
+
+  data = NULL;
+  len = 0;
+  if (sbservices_get_icon_pngdata (sbs, id, &data, &len) != SBSERVICES_E_SUCCESS ||
+      data == NULL || len == 0)
+    {
+      if (data != NULL)
+        free (data);
+      g_free (path);
+      return NULL;
+    }
+
+  if (g_file_set_contents (path, data, len, NULL) == FALSE)
+    {
+      free (data);
+      g_free (path);
+      return NULL;
+    }
+  free (data);
+
+  return path;
+}
+
+
+/* apps_lock needs to be locked before calling this */
+static gboolean
+g_vfs_backend_load_apps (GVfsBackendAfc *self)
+{
+  plist_t client_opts;
+  guint num_apps, i;
+  plist_t apps = NULL;
+  instproxy_error_t err;
+
+  g_assert (self->mode == ACCESS_MODE_HOUSE_ARREST);
+
+  if (self->apps != NULL)
+    {
+      return TRUE;
+    }
+
+  client_opts = instproxy_client_options_new ();
+  instproxy_client_options_add (client_opts, "ApplicationType", "User", NULL);
+
+  err = instproxy_browse (self->inst, client_opts, &apps);
+  instproxy_client_options_free (client_opts);
+
+  if (err != INSTPROXY_E_SUCCESS)
+    {
+      return FALSE;
+    }
+
+  self->apps = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                      (GDestroyNotify) g_free,
+                                      (GDestroyNotify) app_info_free);
+
+  num_apps = plist_array_get_size(apps);
+  for (i = 0; i < num_apps; i++)
+    {
+      plist_t app;
+      plist_t p_appid;
+      plist_t p_doctypes;
+      plist_t p_name;
+      plist_t p_sharing;
+      char *s_appid;
+      char *s_name;
+      guint8 b_sharing;
+      gboolean hidden;
+      AppInfo *info;
+
+      app = plist_array_get_item(apps, i);
+      p_appid = plist_dict_get_item (app, "CFBundleIdentifier");
+      p_name = plist_dict_get_item (app, "CFBundleDisplayName");
+      p_doctypes = plist_dict_get_item (app, "CFBundleDocumentTypes");
+      if (plist_array_get_size (p_doctypes) == 0)
+        p_doctypes = NULL;
+      p_sharing = plist_dict_get_item (app, "UIFileSharingEnabled");
+      b_sharing = FALSE;
+      hidden = FALSE;
+      if (p_sharing)
+        {
+          if (plist_get_node_type (p_sharing) == PLIST_BOOLEAN)
+            {
+              plist_get_bool_val (p_sharing, &b_sharing);
+            }
+          else if (plist_get_node_type (p_sharing) == PLIST_STRING)
+            {
+              char *p_sharing_val = NULL;
+
+              plist_get_string_val (p_sharing, &p_sharing_val);
+              if (p_sharing_val)
+                {
+                  if ((g_ascii_strcasecmp (p_sharing_val, "YES") == 0) || (g_ascii_strcasecmp (p_sharing_val, "true") == 0))
+                    b_sharing = TRUE;
+                  free (p_sharing_val);
+                }
+            }
+        }
+
+      /* Doesn't support documents, or missing metadata? */
+      if (p_doctypes == NULL && !b_sharing)
+        hidden = TRUE;
+      if (p_appid == NULL || p_name == NULL)
+        {
+          continue;
+        }
+
+      s_appid = s_name = NULL;
+      plist_get_string_val (p_appid, &s_appid);
+      if (s_appid == NULL)
+        {
+          continue;
+        }
+      plist_get_string_val (p_name, &s_name);
+      if (s_name == NULL)
+        {
+          free (s_appid);
+          continue;
+        }
+
+      info = g_new0 (AppInfo, 1);
+      info->display_name = s_name;
+      info->id = s_appid;
+      info->hidden = hidden;
+
+      info->icon_path = g_vfs_backend_load_icon (self->sbs, info->id);
+
+      g_hash_table_insert (self->apps, g_strdup (s_appid), info);
+    }
+
+  plist_free (apps);
+
+  return TRUE;
+}
+
 /* Callback for iterating over a directory. */
 static void
 g_vfs_backend_afc_enumerate (GVfsBackend *backend,
@@ -1232,17 +1894,81 @@ g_vfs_backend_afc_enumerate (GVfsBackend *backend,
   gchar *file_path;
   char **ptr, **list = NULL;
   char **afcinfo = NULL;
+  char *new_path = NULL;
+  afc_client_t afc_cli;
+  gboolean hide_non_docs = FALSE;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_read_directory (self->afc_cli, path, &list),
-                                          G_VFS_JOB(job))))
+  if (self->mode == ACCESS_MODE_AFC)
     {
-      return;
+      afc_cli = self->afc_cli;
+      if (G_UNLIKELY(g_vfs_backend_afc_check (afc_read_directory (self->afc_cli, path, &list),
+                                              G_VFS_JOB(job))))
+        {
+          return;
+        }
+    }
+  else
+    {
+      char *app;
+
+      g_mutex_lock (self->apps_lock);
+      if (g_vfs_backend_load_apps (self) == FALSE)
+        {
+          g_vfs_backend_afc_check (AFC_E_INTERNAL_ERROR, G_VFS_JOB (job));
+          g_mutex_unlock (self->apps_lock);
+          return;
+        }
+      g_mutex_unlock (self->apps_lock);
+
+      app = g_vfs_backend_parse_house_arrest_path (self, TRUE, path, &new_path);
+
+      if (app == NULL)
+        {
+          GList *apps, *l;
+
+          apps = g_hash_table_get_values (self->apps);
+          for (l = apps; l != NULL; l = l->next)
+            {
+              AppInfo *app_info = l->data;
+              info = g_file_info_new ();
+              g_vfs_backend_afc_set_info_from_app (self, info, app_info);
+              g_vfs_job_enumerate_add_info (job, info);
+              g_object_unref (G_OBJECT(info));
+            }
+          g_list_free (apps);
+          g_vfs_job_enumerate_done (job);
+          g_vfs_job_succeeded (G_VFS_JOB(job));
+          return;
+        }
+      else
+        {
+          AppInfo *app_info;
+
+          app_info = g_hash_table_lookup (self->apps, app);
+          if (app_info == NULL)
+            {
+              g_free (app);
+              g_free (new_path);
+              g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
+              return;
+            }
+          g_free (app);
+          afc_cli = app_info->afc_cli;
+          if (G_UNLIKELY(g_vfs_backend_afc_check (afc_read_directory (afc_cli, new_path, &list),
+                                                  G_VFS_JOB(job))))
+            {
+              g_free (new_path);
+              return;
+            }
+          if (g_str_equal (new_path, "/"))
+            hide_non_docs = TRUE;
+        }
     }
 
-  trailing_slash = g_str_has_suffix (path, "/");
+  trailing_slash = g_str_has_suffix (new_path ? new_path : path, "/");
 
   for (ptr = list; *ptr; ptr++)
     {
@@ -1250,19 +1976,26 @@ g_vfs_backend_afc_enumerate (GVfsBackend *backend,
         continue;
 
       if (!trailing_slash)
-        file_path = g_strdup_printf ("%s/%s", path, *ptr);
+        file_path = g_strdup_printf ("%s/%s", new_path ? new_path : path, *ptr);
       else
-        file_path = g_strdup_printf ("%s%s", path, *ptr);
+        file_path = g_strdup_printf ("%s%s", new_path ? new_path : path, *ptr);
 
       /*
        * This call might fail if the file in question is removed while we're
        * iterating over the directory list. In that case, just don't include
        * it in the list.
        */
-      if (G_LIKELY(afc_get_file_info(self->afc_cli, file_path, &afcinfo) == AFC_E_SUCCESS))
+      if (G_LIKELY(afc_get_file_info(afc_cli, file_path, &afcinfo) == AFC_E_SUCCESS))
         {
           info = g_file_info_new ();
           g_vfs_backend_afc_set_info_from_afcinfo (self, info, afcinfo, *ptr, file_path, matcher, flags);
+
+          if (hide_non_docs &&
+              g_str_equal (file_path, "/Documents") == FALSE)
+            {
+              g_file_info_set_is_hidden (info, TRUE);
+            }
+
           g_vfs_job_enumerate_add_info (job, info);
           g_object_unref (G_OBJECT(info));
           g_strfreev (afcinfo);
@@ -1271,6 +2004,7 @@ g_vfs_backend_afc_enumerate (GVfsBackend *backend,
       g_free (file_path);
     }
 
+  g_free (new_path);
   g_strfreev (list);
 
   g_vfs_job_enumerate_done (job);
@@ -1288,27 +2022,90 @@ g_vfs_backend_afc_query_info (GVfsBackend *backend,
   GVfsBackendAfc *self;
   const char *basename, *ptr;
   char **afcinfo = NULL;
+  char *new_path;
+  gboolean hide_non_docs = FALSE;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
+  new_path = NULL;
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_get_file_info (self->afc_cli, path, &afcinfo),
-                                          G_VFS_JOB(job))))
+  if (self->mode == ACCESS_MODE_AFC)
     {
-      if (afcinfo)
-        g_strfreev(afcinfo);
-      return;
+      if (G_UNLIKELY(g_vfs_backend_afc_check (afc_get_file_info (self->afc_cli, path, &afcinfo),
+                                              G_VFS_JOB(job))))
+        {
+          if (afcinfo)
+                g_strfreev(afcinfo);
+          return;
+        }
+    }
+  else
+    {
+      char *app;
+
+      g_mutex_lock (self->apps_lock);
+      if (g_vfs_backend_load_apps (self) == FALSE)
+        {
+          g_vfs_backend_afc_check (AFC_E_INTERNAL_ERROR, G_VFS_JOB (job));
+          g_mutex_unlock (self->apps_lock);
+          return;
+        }
+      g_mutex_unlock (self->apps_lock);
+
+      app = g_vfs_backend_parse_house_arrest_path (self, TRUE, path, &new_path);
+
+      if (app == NULL)
+        {
+          g_vfs_backend_afc_set_info_from_app (self, info, NULL);
+          g_vfs_job_succeeded (G_VFS_JOB(job));
+          return;
+        }
+      else
+        {
+          AppInfo *app_info;
+
+          app_info = g_hash_table_lookup (self->apps, app);
+          g_free (app);
+          if (app_info == NULL)
+            {
+              g_free (new_path);
+              g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
+              return;
+            }
+          if (g_str_equal (new_path, "/"))
+            {
+              g_free (new_path);
+              g_vfs_backend_afc_set_info_from_app (self, info, app_info);
+              g_vfs_job_succeeded (G_VFS_JOB(job));
+              return;
+            }
+          hide_non_docs = TRUE;
+          if (G_UNLIKELY(g_vfs_backend_afc_check (afc_get_file_info (app_info->afc_cli, new_path, &afcinfo),
+                                                  G_VFS_JOB(job))))
+            {
+              g_free (new_path);
+              return;
+            }
+        }
     }
 
-  ptr = strrchr (path, '/');
+  ptr = strrchr (new_path ? new_path : path, '/');
   if (ptr && ptr[1] != '\0')
     basename = ptr + 1;
   else
-    basename = path;
+    basename = new_path ? new_path : path;
 
-  g_vfs_backend_afc_set_info_from_afcinfo (self, info, afcinfo, basename, path, matcher, flags);
+  g_vfs_backend_afc_set_info_from_afcinfo (self, info, afcinfo, basename, new_path ? new_path : path, matcher, flags);
   if (afcinfo)
     g_strfreev (afcinfo);
+  if (hide_non_docs &&
+      (g_str_equal (new_path, "Documents") ||
+       g_str_has_prefix (new_path, "Documents/")))
+    {
+      g_file_info_set_is_hidden (info, TRUE);
+    }
+
+  g_free (new_path);
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
@@ -1331,50 +2128,84 @@ g_vfs_backend_afc_query_fs_info (GVfsBackend *backend,
   char **kvps, **ptr;
   uint64_t totalspace = 0, freespace = 0;
   int blocksize = 0;
+  afc_client_t afc_cli;
 
   self = G_VFS_BACKEND_AFC(backend);
 
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "afc");
 
-  if (self->connected)
+  if (!self->connected)
     {
-      if (G_UNLIKELY(g_vfs_backend_afc_check (afc_get_device_info (self->afc_cli, &kvps), G_VFS_JOB(job))))
-        return;
+      g_vfs_job_succeeded (G_VFS_JOB(job));
+      return;
+    }
 
-      for (ptr = kvps; *ptr; ptr++)
+  if (self->mode == ACCESS_MODE_HOUSE_ARREST)
+    {
+      char *app, *new_path;
+      AppInfo *info;
+
+      new_path = NULL;
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, &new_path);
+      if (app == NULL)
         {
-          if (g_str_equal (*ptr, "FSTotalBytes"))
-            {
-              totalspace = g_ascii_strtoull (*(ptr+1), (char **) NULL, 10);
-            }
-          else if (g_str_equal (*ptr, "FSFreeBytes"))
-            {
-              freespace = g_ascii_strtoull (*(ptr+1), (char **) NULL, 10);
-            }
-          else if (g_str_equal (*ptr, "FSBlockSize"))
-            {
-              blocksize = atoi (*(ptr+1));
-            }
+          g_vfs_backend_afc_check (AFC_E_OP_NOT_SUPPORTED, G_VFS_JOB(job));
+          return;
+        }
+      g_free (new_path);
+
+      info = g_hash_table_lookup (self->apps, app);
+      if (info == NULL)
+        {
+          g_free (app);
+          g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
+          return;
         }
 
-      g_strfreev (kvps);
-
-      g_file_info_set_attribute_uint32 (info,
-                                        G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE,
-                                        (guint32) blocksize);
-      g_file_info_set_attribute_uint64 (info,
-                                        G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,
-                                        (guint64) totalspace);
-      g_file_info_set_attribute_uint64 (info,
-                                        G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
-                                        (guint64) freespace);
-      g_file_info_set_attribute_boolean (info,
-                                         G_FILE_ATTRIBUTE_FILESYSTEM_READONLY,
-                                         FALSE);
-      g_file_info_set_attribute_uint32 (info,
-                                        G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW,
-                                        G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL);
+      afc_cli = info->afc_cli;
+      g_free (app);
     }
+  else
+    {
+      afc_cli = self->afc_cli;
+    }
+
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_get_device_info (afc_cli, &kvps), G_VFS_JOB(job))))
+    return;
+
+  for (ptr = kvps; *ptr; ptr++)
+    {
+      if (g_str_equal (*ptr, "FSTotalBytes"))
+        {
+          totalspace = g_ascii_strtoull (*(ptr+1), (char **) NULL, 10);
+        }
+      else if (g_str_equal (*ptr, "FSFreeBytes"))
+        {
+          freespace = g_ascii_strtoull (*(ptr+1), (char **) NULL, 10);
+        }
+      else if (g_str_equal (*ptr, "FSBlockSize"))
+        {
+          blocksize = atoi (*(ptr+1));
+        }
+    }
+
+  g_strfreev (kvps);
+
+  g_file_info_set_attribute_uint32 (info,
+                                    G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE,
+                                    (guint32) blocksize);
+  g_file_info_set_attribute_uint64 (info,
+                                    G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,
+                                    (guint64) totalspace);
+  g_file_info_set_attribute_uint64 (info,
+                                    G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                    (guint64) freespace);
+  g_file_info_set_attribute_boolean (info,
+                                     G_FILE_ATTRIBUTE_FILESYSTEM_READONLY,
+                                     FALSE);
+  g_file_info_set_attribute_uint32 (info,
+                                    G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW,
+                                    G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL);
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
@@ -1386,18 +2217,55 @@ g_vfs_backend_afc_set_display_name (GVfsBackend *backend,
                                     const char *display_name)
 {
   GVfsBackendAfc *self;
+  char *new_path;
+  afc_client_t afc_cli;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_rename_path (self->afc_cli,
-                                                           filename, display_name),
+  if (self->mode == ACCESS_MODE_HOUSE_ARREST)
+    {
+      char *app;
+      AppInfo *info;
+
+      new_path = NULL;
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &new_path);
+      if (app == NULL || g_str_equal (new_path, "/"))
+        {
+          g_free (app);
+          g_free (new_path);
+          g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB (job));
+          return;
+        }
+
+      info = g_hash_table_lookup (self->apps, app);
+      if (info == NULL)
+        {
+          g_free (app);
+          g_free (new_path);
+          g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB (job));
+          return;
+        }
+
+      afc_cli = info->afc_cli;
+      g_free (app);
+    }
+  else
+    {
+      afc_cli = self->afc_cli;
+      new_path = NULL;
+    }
+
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_rename_path (afc_cli,
+                                                           new_path ? new_path : filename, display_name),
                                           G_VFS_JOB(job))))
     {
+      g_free (new_path);
       return;
     }
 
   g_vfs_job_set_display_name_set_new_path (job, display_name);
+  g_free (new_path);
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
@@ -1414,6 +2282,8 @@ g_vfs_backend_afc_set_attribute (GVfsBackend *backend,
   GVfsBackendAfc *self;
   uint64_t mtime = 0;
   afc_error_t err;
+  char *new_path;
+  afc_client_t afc_cli;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail(self->connected);
@@ -1426,9 +2296,44 @@ g_vfs_backend_afc_set_attribute (GVfsBackend *backend,
       return;
     }
 
+  if (self->mode == ACCESS_MODE_HOUSE_ARREST)
+    {
+      char *app;
+      AppInfo *info;
+
+      new_path = NULL;
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &new_path);
+      if (app == NULL || g_str_equal (new_path, "/"))
+        {
+          g_free (app);
+          g_free (new_path);
+          g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB (job));
+          return;
+        }
+
+      info = g_hash_table_lookup (self->apps, app);
+      if (info == NULL)
+        {
+          g_free (app);
+          g_free (new_path);
+          g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB (job));
+          return;
+        }
+
+      afc_cli = info->afc_cli;
+      g_free (app);
+    }
+  else
+    {
+      afc_cli = self->afc_cli;
+      new_path = NULL;
+    }
+
   mtime = *(guint64*)(value_p) * (guint64)1000000000;
 
-  err = afc_set_file_time (self->afc_cli, filename, mtime);
+  err = afc_set_file_time (afc_cli, new_path ? new_path : filename, mtime);
+  g_free (new_path);
+
   if (err == AFC_E_UNKNOWN_PACKET_TYPE)
     {
       /* ignore error for pre-3.1 devices as the do not support setting file modification times */
@@ -1448,17 +2353,54 @@ g_vfs_backend_afc_make_directory (GVfsBackend *backend,
                                   const char *path)
 {
   GVfsBackendAfc *self;
+  char *new_path;
+  afc_client_t afc_cli;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail(self->connected);
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_make_directory (self->afc_cli,
-                                                              path),
+  if (self->mode == ACCESS_MODE_HOUSE_ARREST)
+    {
+      char *app;
+      AppInfo *info;
+
+      new_path = NULL;
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, &new_path);
+      if (app == NULL)
+        {
+          g_free (app);
+          g_free (new_path);
+          g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB (job));
+          return;
+        }
+
+      info = g_hash_table_lookup (self->apps, app);
+      if (info == NULL)
+        {
+          g_free (app);
+          g_free (new_path);
+          g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB (job));
+          return;
+        }
+
+      afc_cli = info->afc_cli;
+      g_free (app);
+    }
+  else
+    {
+      afc_cli = self->afc_cli;
+      new_path = NULL;
+    }
+
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_make_directory (afc_cli,
+                                                              new_path ? new_path : path),
                                           G_VFS_JOB(job))))
     {
+      g_free (new_path);
       return;
     }
 
+  g_free (new_path);
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
 
@@ -1472,6 +2414,13 @@ g_vfs_backend_afc_make_symlink (GVfsBackend *backend,
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
+
+  /* Not bothering with symlink creation support in house arrest */
+  if (self->mode == ACCESS_MODE_HOUSE_ARREST)
+    {
+      g_vfs_backend_afc_check (AFC_E_OP_NOT_SUPPORTED, G_VFS_JOB (job));
+      return;
+    }
 
   if (G_UNLIKELY(g_vfs_backend_afc_check (afc_make_link (self->afc_cli,
                                                          AFC_SYMLINK, symlink_value, filename),
@@ -1493,6 +2442,9 @@ g_vfs_backend_afc_move (GVfsBackend *backend,
                         gpointer progress_callback_data)
 {
   GVfsBackendAfc *self;
+  char *new_src;
+  char *new_dst;
+  afc_client_t afc_cli;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail(self->connected);
@@ -1507,13 +2459,66 @@ g_vfs_backend_afc_move (GVfsBackend *backend,
       return;
     }
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_rename_path (self->afc_cli,
-                                                           source, destination),
+  if (self->mode == ACCESS_MODE_HOUSE_ARREST)
+    {
+      AppInfo *info;
+      char *app_src, *app_dst;
+
+      app_src = g_vfs_backend_parse_house_arrest_path (self, FALSE, source, &new_src);
+      if (app_src == NULL || g_str_equal (new_src, "/"))
+        {
+          g_free (app_src);
+          g_free (new_src);
+          g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB(job));
+          return;
+        }
+      app_dst = g_vfs_backend_parse_house_arrest_path (self, FALSE, destination, &new_dst);
+      if (app_dst == NULL || g_str_equal (new_dst, "/"))
+        {
+          g_free (app_src);
+          g_free (new_src);
+          g_free (app_dst);
+          g_free (new_dst);
+          g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB(job));
+          return;
+        }
+      if (!g_str_equal (app_dst, app_src))
+        {
+          g_free (app_src);
+          g_free (new_src);
+          g_free (app_dst);
+          g_free (new_dst);
+          g_vfs_backend_afc_check (AFC_E_OP_NOT_SUPPORTED, G_VFS_JOB(job));
+          return;
+        }
+      g_free (app_dst);
+      info = g_hash_table_lookup (self->apps, app_src);
+      if (info == NULL)
+        {
+          g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
+          return;
+        }
+      afc_cli = info->afc_cli;
+      g_free (app_src);
+    }
+  else
+    {
+      afc_cli = self->afc_cli;
+      new_src = new_dst = NULL;
+    }
+
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_rename_path (afc_cli,
+                                                           new_src ? new_src : source,
+                                                           new_dst ? new_dst : destination),
                                           G_VFS_JOB(job))))
     {
+      g_free (new_src);
+      g_free (new_dst);
       return;
     }
 
+  g_free (new_src);
+  g_free (new_dst);
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
 
@@ -1523,17 +2528,54 @@ g_vfs_backend_afc_delete (GVfsBackend *backend,
                           const char *filename)
 {
   GVfsBackendAfc *self;
+  char *new_path;
+  afc_client_t afc_cli;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_remove_path (self->afc_cli,
-                                                           filename),
+  if (self->mode == ACCESS_MODE_HOUSE_ARREST)
+    {
+      char *app;
+      AppInfo *info;
+
+      new_path = NULL;
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &new_path);
+      if (app == NULL || g_str_equal (new_path, "/"))
+        {
+          g_free (app);
+          g_free (new_path);
+          g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB(job));
+          return;
+        }
+
+      info = g_hash_table_lookup (self->apps, app);
+      if (info == NULL)
+        {
+          g_free (app);
+          g_free (new_path);
+          g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
+          return;
+        }
+
+      afc_cli = info->afc_cli;
+      g_free (app);
+    }
+  else
+    {
+      afc_cli = self->afc_cli;
+      new_path = NULL;
+    }
+
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_remove_path (afc_cli,
+                                                           new_path ? new_path : filename),
                                           G_VFS_JOB(job))))
     {
+      g_free (new_path);
       return;
     }
 
+  g_free (new_path);
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
 
@@ -1558,6 +2600,8 @@ g_vfs_backend_afc_init (GVfsBackendAfc *self)
       /* enable full debugging */
       idevice_set_debug_level (1);
     }
+
+  self->apps_lock = g_mutex_new ();
 }
 
 static void
