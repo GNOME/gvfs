@@ -270,6 +270,7 @@ _get_bluetooth_device_properties (const char *bdaddr, char **icon_name)
   return name;
 }
 
+#ifdef HAVE_HAL
 static gboolean
 _is_same_path (const char *path, int usb_bus_num, int usb_device_num, int usb_intf_num)
 {
@@ -323,22 +324,23 @@ _find_ods_usb_intfnum (DBusGProxy *obex_manager, int device_usb_bus_num, int dev
     }
   return -1;
 }
+#endif
 
 static gint
 _get_usb_intfnum_and_properties (DBusGProxy *obex_manager, const char *device, char **display_name, char **icon_name)
 {
-  char **obex_devices;
-  int num_obex_devices;
   int usb_bus_num;
   int usb_device_num;
   int usb_intf_num;
 #ifdef HAVE_HAL
+  char **obex_devices;
+  int num_obex_devices;
+  int n;
   DBusError dbus_error;
   DBusConnection *dbus_connection;
   LibHalContext *hal_ctx;
 #endif
   int ods_intf_num = 1;
-  int n;
 
   /* Parse the [usb:1,41,3] string */
   if (!g_str_has_prefix (device, "[usb:"))
