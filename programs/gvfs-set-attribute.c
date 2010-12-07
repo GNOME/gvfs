@@ -189,7 +189,6 @@ main (int argc, char *argv[])
     case G_FILE_ATTRIBUTE_TYPE_INVALID:
       value = NULL;
       break;
-    case -1:
     case G_FILE_ATTRIBUTE_TYPE_OBJECT:
     default:
       g_printerr (_("Invalid attribute type %s\n"), attr_type);
