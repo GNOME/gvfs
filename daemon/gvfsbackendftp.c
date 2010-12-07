@@ -102,6 +102,8 @@ gvfs_backend_ftp_determine_features (GVfsFtpTask *task)
     { "EPRT", G_VFS_FTP_FEATURE_EPRT },
     { "EPSV", G_VFS_FTP_FEATURE_EPSV },
     { "UTF8", G_VFS_FTP_FEATURE_UTF8 },
+    { "AUTH TLS", G_VFS_FTP_FEATURE_AUTH_TLS },
+    { "AUTH SSL", G_VFS_FTP_FEATURE_AUTH_SSL },
   };
   guint i, j;
   char **reply;
