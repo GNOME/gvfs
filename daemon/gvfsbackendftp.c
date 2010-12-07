@@ -380,6 +380,7 @@ do_mount (GVfsBackend *backend,
     }
 
   addr = G_NETWORK_ADDRESS (ftp->addr);
+  g_object_ref (addr);
   port = g_network_address_get_port (addr);
   username = NULL;
   password = NULL;
@@ -514,6 +515,7 @@ try_login:
    */
   if (!g_vfs_ftp_task_is_in_error (&task))
     {
+      g_object_unref (ftp->addr);
       ftp->addr = G_SOCKET_CONNECTABLE (g_vfs_ftp_connection_get_address (task.conn, &task.error));
       if (ftp->addr == NULL)
         {
