@@ -73,7 +73,7 @@ gvfs_fuse_daemon_CFLAGS = \
 	-I$(top_srcdir) \
         -I$(top_srcdir)/common \
         $(GLIB_CFLAGS) $(DBUS_CFLAGS) $(FUSE_CFLAGS) \
-        -DG_LOG_DOMAIN=\"GVFS-FUSE\" -DG_DISABLE_DEPRECATED \
+        -UG_LOG_DOMAIN -DG_LOG_DOMAIN=\"GVFS-FUSE\" -DG_DISABLE_DEPRECATED \
         -DDBUS_API_SUBJECT_TO_CHANGE
 
 gvfs_fuse_daemon_LDADD = \
