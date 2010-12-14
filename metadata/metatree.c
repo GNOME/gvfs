@@ -2800,6 +2800,55 @@ get_tree_from_udev (MetaLookupCache *cache,
 
   return res;
 }
+
+static char *
+get_device_file_from_udev (const char *treename)
+{
+  struct udev_device *dev;
+  struct udev_enumerate *enumerator;
+  struct udev_list_entry *entry;
+  char *device_file;
+
+  G_LOCK (udev);
+
+  if (udev == NULL)
+    udev = udev_new ();
+
+  device_file = NULL;
+  
+  /* Can't get device by UUID directly, hence use enumerator */
+  enumerator = udev_enumerate_new (udev);
+  if (g_str_has_prefix (treename, "uuid-")) 
+    udev_enumerate_add_match_property (enumerator, "ID_FS_UUID_ENC", treename + 5);
+  else
+  if (g_str_has_prefix (treename, "label-")) 
+    udev_enumerate_add_match_property (enumerator, "ID_FS_LABEL_ENC", treename + 6);
+  else
+    goto out;
+  
+  if (udev_enumerate_scan_devices (enumerator))
+    goto out;
+
+  entry = udev_enumerate_get_list_entry (enumerator);
+  while (entry) 
+    {
+      dev = udev_device_new_from_syspath (udev, udev_list_entry_get_name (entry));
+      device_file = g_strdup (udev_device_get_property_value (dev, "DEVNAME"));
+      
+      udev_device_unref (dev);
+      if (device_file)
+        break;
+
+      entry = udev_list_entry_get_next (entry);
+    }
+  
+out:
+  udev_enumerate_unref (enumerator);
+  G_UNLOCK (udev);
+
+  return device_file;
+}
+
 #endif
 
 static const char *
@@ -2825,6 +2874,8 @@ get_tree_for_device (MetaLookupCache *cache,
 typedef struct {
   char *mountpoint;
   char *root;
+  char *device;
+  gboolean outside_root;
 } MountinfoEntry;
 
 static gboolean mountinfo_initialized = FALSE;
@@ -2920,6 +2971,7 @@ parse_mountinfo (const char *contents)
   const char *line;
   const char *line_root;
   const char *line_mountpoint;
+  const char *line_device;
 
   a = g_array_new (TRUE, TRUE, sizeof (MountinfoEntry));
 
@@ -2943,16 +2995,39 @@ parse_mountinfo (const char *contents)
 		  /* mountpoint */
 		  line = strchr (line+1, ' ');
 		  line_mountpoint = line + 1;
+                  if (line)
+	            {
+                      /* mount options */
+                      line = strchr (line+1, ' ');
+                      if (line)
+                        {
+                          /* dash */
+                          line = strchr (line+1, ' ');
+                          if (line)
+                            {
+                              /* fstype */
+                              line = strchr (line+1, ' ');
+                              if (line)
+                                {
+                                  /* device */
+                                  line = strchr (line+1, ' ');
+                                  line_device = line + 1;
+                                }
+                            }
+                        }
+	            }
 		}
 	    }
 	}
 
-      if (line_mountpoint && !(line_root[0] == '/' && line_root[1] == ' '))
+      if (line_mountpoint)
 	{
 	  MountinfoEntry new_entry;
 
 	  new_entry.mountpoint = mountinfo_unescape (line_mountpoint);
 	  new_entry.root = mountinfo_unescape (line_root);
+          new_entry.device = mountinfo_unescape (line_device);
+          new_entry.outside_root = !(line_root[0] == '/' && line_root[1] == ' '); 
 
 	  g_array_append_val (a, new_entry);
 	}
@@ -3037,12 +3112,42 @@ find_mountinfo_root_for_mountpoint (const char *mountpoint)
     {
       for (i = 0; mountinfo_roots[i].mountpoint != NULL; i++)
 	{
-	  if (strcmp (mountinfo_roots[i].mountpoint, mountpoint) == 0)
+	  if (mountinfo_roots[i].outside_root && 
+	      strcmp (mountinfo_roots[i].mountpoint, mountpoint) == 0)
 	    {
 	      res = g_strdup (mountinfo_roots[i].root);
 	      break;
 	    }
 	}
+    }
+
+  G_UNLOCK (mountinfo);
+
+  return res;
+}
+
+static char *
+find_mountinfo_root_for_device_file (const char *device_file)
+{
+  char *res;
+  int i;
+
+  res = NULL;
+
+  G_LOCK (mountinfo);
+
+  update_mountinfo ();
+
+  if (mountinfo_roots)
+    {
+      for (i = 0; mountinfo_roots[i].mountpoint != NULL; i++)
+        {
+          if (strcmp (mountinfo_roots[i].device, device_file) == 0)
+            {
+              res = g_strdup (mountinfo_roots[i].mountpoint);
+              break;
+            }
+        }
     }
 
   G_UNLOCK (mountinfo);
@@ -3342,4 +3447,47 @@ meta_lookup_cache_lookup_path (MetaLookupCache *cache,
 
   g_free (prefix);
   return NULL;
+}
+
+char *
+meta_tree_get_real_path (MetaTree   *tree,
+                         const char *path)
+{
+  const char *treefile;
+  char *metadata_dir;
+  char *filename;
+  char *device_file;
+  char *mount_path;
+  char *real_path;
+  
+  treefile = meta_tree_get_filename (tree);
+  
+  if (treefile == NULL)
+    return NULL;
+        
+  real_path = NULL;
+  filename = NULL;
+
+  metadata_dir = g_build_path (G_DIR_SEPARATOR_S, g_get_user_data_dir (), "gvfs-metadata", G_DIR_SEPARATOR_S, NULL);
+  if (path_has_prefix (treefile, metadata_dir))
+    filename = g_strdup (treefile + strlen (metadata_dir));
+  g_free (metadata_dir);
+
+  if (g_strcmp0 ("root", filename) == 0)
+    mount_path = g_strdup ("/");
+  else
+  if (g_strcmp0 ("home", filename) == 0)
+    mount_path = g_strdup (g_get_home_dir());
+  else
+    {
+      device_file = get_device_file_from_udev (filename);
+      mount_path = find_mountinfo_root_for_device_file (device_file);
+      g_free (device_file);
+    }
+  
+  if (mount_path)
+    real_path = g_build_filename (mount_path, path, NULL);
+  g_free (mount_path);
+
+  return real_path;
 }
