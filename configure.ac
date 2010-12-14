@@ -539,6 +539,29 @@ AM_CONDITIONAL(HAVE_ARCHIVE, test "$msg_archive" = "yes")
 AC_SUBST(ARCHIVE_CFLAGS)
 AC_SUBST(ARCHIVE_LIBS)
 
+dnl **************************
+dnl *** Check for Tracker  ***
+dnl **************************
+
+AC_ARG_ENABLE(tracker, AS_HELP_STRING([--disable-tracker],[build without Tracker support]))
+msg_tracker=no
+TRACKER_LIBS=
+TRACKER_CFLAGS=
+
+if test "x$enable_tracker" != "xno"; then
+  PKG_CHECK_EXISTS(tracker-sparql-0.9 >= 0.9.27, msg_tracker=yes)
+
+  if test "x$msg_tracker" = "xyes"; then
+    PKG_CHECK_MODULES(TRACKER, tracker-sparql-0.9 >= 0.9.27)
+    AC_DEFINE(HAVE_TRACKER, 1, [Define to 1 if Tracker is available])
+    AM_CONDITIONAL(HAVE_TRACKER, true)
+  fi
+fi
+
+AM_CONDITIONAL(USE_TRACKER, [test "$msg_tracker" = "yes"])
+
+dnl ==========================================================================
+
 dnl Install bash-completion file?
 AC_ARG_ENABLE([bash-completion],
 	      AC_HELP_STRING([--disable-bash-completion],
@@ -711,6 +734,7 @@ echo "
 	Build HAL volume monitor:     $msg_hal (with fast init path: $have_hal_fast_init)
 	Build GDU volume monitor:     $msg_gdu
 	GNOME Keyring support:        $msg_keyring
+	Tracker support:              $msg_tracker
 	Bash-completion support:      $msg_bash_completion
 "
 
