@@ -21,7 +21,7 @@ libexec_PROGRAMS =\
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/common \
 	$(LIBXML_CFLAGS) $(GLIB_CFLAGS) $(DBUS_CFLAGS) \
-	$(UDEV_CFLAGS) \
+	$(UDEV_CFLAGS) $(TRACKER_CFLAGS) \
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"     \
 	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED \
 	-DDBUS_API_SUBJECT_TO_CHANGE
@@ -51,6 +51,11 @@ convert_nautilus_metadata_SOURCES = metadata-nautilus.c
 
 gvfsd_metadata_LDADD = libmetadata.la $(DBUS_LIBS) ../common/libgvfscommon.la
 gvfsd_metadata_SOURCES = meta-daemon.c
+
+if HAVE_TRACKER
+gvfsd_metadata_LDADD += $(TRACKER_LIBS)
+gvfsd_metadata_SOURCES += metadata-tracker-miner.c metadata-tracker-miner.h
+endif
 
 # D-BUS service file
 %.service: %.service.in ../config.log

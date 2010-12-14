@@ -32,7 +32,16 @@
 #include "metatree.h"
 #include "gvfsdaemonprotocol.h"
 
+#ifdef HAVE_TRACKER
+#  include "metadata-tracker-miner.h"
+#endif
+
 #define WRITEOUT_TIMEOUT_SECS 60
+
+#ifdef HAVE_TRACKER
+static MetadataTrackerMiner *tracker_miner;
+#endif
+
 
 typedef struct {
   char *filename;
@@ -160,6 +169,9 @@ metadata_set (const char *treefile,
 			      _("Unable to set metadata key"));
 	      res = FALSE;
 	    }
+#ifdef HAVE_TRACKER
+	  metadata_tracker_miner_set_stringv (tracker_miner, info->tree, path, key, strv);
+#endif
 	  g_strfreev (strv);
 	}
       else if (dbus_message_iter_get_arg_type (iter) == DBUS_TYPE_STRING)
@@ -179,6 +191,9 @@ metadata_set (const char *treefile,
 			      _("Unable to set metadata key"));
 	      res = FALSE;
 	    }
+#ifdef HAVE_TRACKER
+          metadata_tracker_miner_set_string (tracker_miner, info->tree, path, key, str);
+#endif
 	}
       else if (dbus_message_iter_get_arg_type (iter) == DBUS_TYPE_BYTE)
 	{
@@ -197,6 +212,9 @@ metadata_set (const char *treefile,
 			      _("Unable to unset metadata key"));
 	      res = FALSE;
 	    }
+#ifdef HAVE_TRACKER
+          metadata_tracker_miner_unset (tracker_miner, info->tree, path, key);
+#endif
 	}
     }
 
@@ -428,6 +446,10 @@ metadata_remove (const char *treefile,
 		      _("Unable to remove metadata keys"));
       return FALSE;
     }
+
+#ifdef HAVE_TRACKER
+  metadata_tracker_miner_remove (tracker_miner, info->tree, path);
+#endif
 
   tree_info_schedule_writeout (info);
   return TRUE;
@@ -780,7 +802,15 @@ main (int argc, char *argv[])
 				      NULL,
 				      (GDestroyNotify)tree_info_free);
 
+#ifdef HAVE_TRACKER
+  tracker_miner = metadata_tracker_miner_new ();
+#endif
+  
   g_main_loop_run (loop);
+
+#ifdef HAVE_TRACKER
+  g_object_unref (tracker_miner);
+#endif
 
   return 0;
 }
