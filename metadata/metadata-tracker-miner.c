@@ -44,6 +44,7 @@
 struct MetadataTrackerMinerPrivate
 {
   TrackerSparqlConnection *connection;
+  guint running_connection_attempt;
   
   GQueue *queue;
   guint running_queue_id;
@@ -269,6 +270,8 @@ typedef struct {
 } MetadataTrackerMinerEntry;
 
 static gboolean process_queue (MetadataTrackerMiner *miner);
+static void schedule_queue_pickup (MetadataTrackerMiner *miner);
+
 
 static void
 push_to_tracker_cb (GObject      *source,
@@ -298,6 +301,8 @@ process_queue (MetadataTrackerMiner *miner)
   GFile *file;
   char *data;
 
+  g_return_val_if_fail (miner->priv->connection != NULL, FALSE);
+  
   g_print ("process_queue: Picking up queue\n");
   
   entry = g_queue_pop_head (miner->priv->queue);
@@ -429,11 +434,60 @@ queue_push_data_to_tracker (MetadataTrackerMiner *miner,
   
   /* FIXME: mutex? */
   g_queue_push_head (miner->priv->queue, entry);
-  
-  /* FIXME: mutex? */
-  if (miner->priv->connection != NULL && miner->priv->running_queue_id == 0)
-    miner->priv->running_queue_id = g_idle_add ((GSourceFunc) process_queue, miner);
+  schedule_queue_pickup (miner);
 }
+
+static void
+create_connection_cb (GObject *source_object,
+                      GAsyncResult *res,
+                      gpointer user_data)
+{
+  TrackerSparqlConnection *connection;
+  MetadataTrackerMiner *miner;
+  GError *error;
+
+  miner = user_data;
+  error = NULL;
+  
+  connection = tracker_sparql_connection_get_finish (res, &error);
+  if (error != NULL)
+    {
+      g_critical ("Could not initialize Tracker: %s", error->message);
+      g_error_free (error);
+    }
+  miner->priv->connection = connection;
+  miner->priv->running_connection_attempt = 0;
+  g_print ("create_connection_cb: Initialized.\n");
+ 
+  schedule_queue_pickup (miner);
+}
+
+static gboolean
+create_connection_timeout (MetadataTrackerMiner *miner)
+{
+  tracker_sparql_connection_get_async (NULL, create_connection_cb, miner);
+
+  return FALSE;
+}
+
+static void
+schedule_queue_pickup (MetadataTrackerMiner *miner)
+{
+  if (miner->priv->connection != NULL)
+    {
+      /* FIXME: mutex? */
+      if (miner->priv->running_queue_id == 0)
+        miner->priv->running_queue_id = g_idle_add ((GSourceFunc) process_queue, miner);
+    }
+  else
+    {
+      if (miner->priv->running_connection_attempt == 0)
+        miner->priv->running_connection_attempt = g_timeout_add_seconds (5, (GSourceFunc) create_connection_timeout, miner);
+    }
+}
+
+
+
 
 
 
@@ -466,42 +520,18 @@ metadata_tracker_miner_class_init (MetadataTrackerMinerClass *klass)
   g_type_class_add_private (object_class, sizeof (MetadataTrackerMinerPrivate));
 }
 
-static void                
-create_connection_cb (GObject *source_object,
-                      GAsyncResult *res,
-                      gpointer user_data)
-{
-  TrackerSparqlConnection *connection;
-  MetadataTrackerMiner *miner;
-  GError *error;
-
-  miner = user_data;
-  error = NULL;
-  
-  connection = tracker_sparql_connection_get_finish (res, &error);
-  if (error != NULL)
-    {
-      g_critical ("Could not initialize Tracker: %s", error->message);
-      g_error_free (error);
-    }
-  miner->priv->connection = connection;
-  g_print ("create_connection_cb: Initialized.\n");
-
-  /* Process queue */
-  if (connection != NULL && miner->priv->running_queue_id == 0)
-    miner->priv->running_queue_id = g_idle_add ((GSourceFunc) process_queue, miner);
-}
-
 static void
 metadata_tracker_miner_init (MetadataTrackerMiner *object)
 {
   object->priv = METADATA_TRACKER_MINER_GET_PRIVATE (object);
 
   object->priv->running_queue_id = 0;
+  
+  object->priv->queue = g_queue_new ();
 
+  object->priv->running_connection_attempt = 1;  /* spawn manually now */
   /* FIXME: do we need cancellable? */
   tracker_sparql_connection_get_async (NULL, create_connection_cb, object);
-  object->priv->queue = g_queue_new ();
 }
 
 MetadataTrackerMiner *
