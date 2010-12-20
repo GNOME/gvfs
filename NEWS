@@ -1,3 +1,14 @@
+Major changes in 1.7.1
+======================
+* Various build issues fixed
+* Fix gvfs client code on ARM platform
+* ftp: Fix refcounting of addresses when connecting
+* ftp: Detect TLS and SSL support
+* afc: Add ability to mount the house-arrest service
+* afc: Add support for House Arrest protocol to access
+       the Documents/ folder within applications
+* Translation updates (nb, es, he, et)
+
 Major changes in 1.7.0
 ======================
 * sftp: Close pty master in child process to prevent SELinux denial
