@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
-"POT-Creation-Date: 2010-11-16 13:43+0000\n"
+"POT-Creation-Date: 2010-12-17 11:37+0000\n"
 "PO-Revision-Date: 2010-08-19 08:26+0600\n"
 "Last-Translator: Sahran <sahran@live.com>\n"
 "Language-Team: Uyghur Computer Science Association <UKIJ@yahoogroups.com>\n"
@@ -77,14 +77,14 @@ msgstr "قىممىتى ھەرپ بەلگە ياكى ھەرپ بەلگە تىزم
 #: ../client/gdaemonfileoutputstream.c:506
 #: ../client/gdaemonfileoutputstream.c:681
 #: ../client/gdaemonfileoutputstream.c:873
-#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1048
-#: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1106
-#: ../daemon/gvfsbackendobexftp.c:1225 ../daemon/gvfsbackendobexftp.c:1362
-#: ../daemon/gvfsbackendobexftp.c:1426 ../daemon/gvfsbackendobexftp.c:1628
-#: ../daemon/gvfsbackendobexftp.c:1735 ../daemon/gvfsbackendobexftp.c:1897
-#: ../daemon/gvfsbackendobexftp.c:1924 ../daemon/gvfsbackendobexftp.c:1983
-#: ../daemon/gvfsbackendobexftp.c:2005 ../daemon/gvfsbackendobexftp.c:2068
-#: ../daemon/gvfsbackendobexftp.c:2087 ../daemon/gvfsbackendsmb.c:1170
+#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1050
+#: ../daemon/gvfsbackendobexftp.c:1087 ../daemon/gvfsbackendobexftp.c:1108
+#: ../daemon/gvfsbackendobexftp.c:1227 ../daemon/gvfsbackendobexftp.c:1364
+#: ../daemon/gvfsbackendobexftp.c:1428 ../daemon/gvfsbackendobexftp.c:1630
+#: ../daemon/gvfsbackendobexftp.c:1737 ../daemon/gvfsbackendobexftp.c:1899
+#: ../daemon/gvfsbackendobexftp.c:1926 ../daemon/gvfsbackendobexftp.c:1985
+#: ../daemon/gvfsbackendobexftp.c:2007 ../daemon/gvfsbackendobexftp.c:2070
+#: ../daemon/gvfsbackendobexftp.c:2089 ../daemon/gvfsbackendsmb.c:1170
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1069
@@ -129,7 +129,7 @@ msgstr "ئېگەر ئۇچۇرىغا ئېرىشىشتە خاتالىق كۆرۈل
 msgid "Can't contact session bus"
 msgstr "ئەڭگىمە لىنىيىسى بىلەن ئالاقىلىشەلمىدى"
 
-#: ../client/gvfsdaemondbus.c:570 ../client/gvfsdaemondbus.c:1002
+#: ../client/gvfsdaemondbus.c:572 ../client/gvfsdaemondbus.c:1004
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "مۇھاپىزەت جەريانىغا ئۇلىنىشتا خاتالىق كۆرۈلدى: %s"
@@ -256,7 +256,7 @@ msgstr "ئېگەرلەش daemon نى قوزغىتىشتا خاتالىق كۆر�
 msgid "Unmount Anyway"
 msgstr "ئېگەرسىزلەۋەر"
 
-#: ../daemon/gvfsbackend.c:934 ../daemon/gvfsbackendafc.c:281
+#: ../daemon/gvfsbackend.c:934 ../daemon/gvfsbackendafc.c:388
 #: ../monitor/gdu/ggdudrive.c:1022 ../monitor/gdu/ggdumount.c:922
 msgid "Cancel"
 msgstr "ۋاز كەچ"
@@ -268,132 +268,159 @@ msgid ""
 msgstr "دىسكا ئالدىراش\n"
 "بىر ياكى بىر قانچە پروگرامما دىسكىنى ئىگىلىۋالغان."
 
-#: ../daemon/gvfsbackendafc.c:159
+#: ../daemon/gvfsbackendafc.c:212
 msgid "Internal Apple File Control error"
 msgstr "ئالما ئىچكى ھۆججەت باشقۇرۇش ئۇچۇرى خاتالىقى"
 
-#: ../daemon/gvfsbackendafc.c:163 ../daemon/gvfsbackendftp.c:669
+#: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:673
 msgid "File does not exist"
 msgstr "ھۆججەت مەۋجۇت ئەمەس"
 
-#: ../daemon/gvfsbackendafc.c:166
+#: ../daemon/gvfsbackendafc.c:219
 msgid "The directory is not empty"
 msgstr "مۇندەرىجە بوش ئەمەس"
 
-#: ../daemon/gvfsbackendafc.c:170
+#: ../daemon/gvfsbackendafc.c:223
 msgid "The device did not respond"
 msgstr "ئۈسكۈنىدە ئىنكاس يوق"
 
-#: ../daemon/gvfsbackendafc.c:174
+#: ../daemon/gvfsbackendafc.c:227
 msgid "The connection was interrupted"
 msgstr "ئۇلىنىش ئۈزۈلدى"
 
-#: ../daemon/gvfsbackendafc.c:178
+#: ../daemon/gvfsbackendafc.c:231
 msgid "Invalid Apple File Control data received"
 msgstr "ئىناۋەتسىز ئالما ھۆججەت باشقۇرۇش ئۇچۇرى تاپشۇرۇۋالدى"
 
-#: ../daemon/gvfsbackendafc.c:182
+#: ../daemon/gvfsbackendafc.c:235
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "تۇتقۇسىز ئالما ھۆججەت باشقۇرۇش ئۇچۇرى خاتالىقى (%d)"
 
-#: ../daemon/gvfsbackendafc.c:199
+#: ../daemon/gvfsbackendafc.c:254
+#, c-format
+#| msgid "Unhandled Lockdown error (%d)"
+msgid "Unhandled Inst proxy error (%d)"
+msgstr ""
+
+#: ../daemon/gvfsbackendafc.c:273
+#, c-format
+#| msgid "Unhandled Apple File Control error (%d)"
+msgid "Unhandled SBServices proxy error (%d)"
+msgstr ""
+
+#: ../daemon/gvfsbackendafc.c:290
 msgid "Lockdown Error: Invalid Argument"
 msgstr "قۇلۇپلاش خاتالىقى: ئىناۋەتسىز ئۆزگەرگۈچى مىقدار"
 
-#: ../daemon/gvfsbackendafc.c:203 ../daemon/gvfsbackendsftp.c:310
+#: ../daemon/gvfsbackendafc.c:294 ../daemon/gvfsbackendsftp.c:310
 #: ../daemon/gvfsbackendsftp.c:1834 ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "ھوقۇقىڭىز يەتمىدى"
 
-#: ../daemon/gvfsbackendafc.c:206
+#: ../daemon/gvfsbackendafc.c:297
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "تۇتقۇسىز قۇلۇپلانغان خاتالىق (%d)"
 
-#: ../daemon/gvfsbackendafc.c:223
+#: ../daemon/gvfsbackendafc.c:314
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "libimobiledevice خاتالىقى: ئىناۋەتسىز ئۆزگەرگۈچى مىقدار"
 
-#: ../daemon/gvfsbackendafc.c:227
+#: ../daemon/gvfsbackendafc.c:318
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
 msgstr "libimobiledevice خاتالىقى: ئۈسكۈنە تېپىلمىدى. usbmuxd راستىنىلا توغرا سەپلەنگەنمۇ."
 
-#: ../daemon/gvfsbackendafc.c:230
+#: ../daemon/gvfsbackendafc.c:321
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "تۇتقۇسىز libimobiledevice خاتالىقى (%d)"
 
-#: ../daemon/gvfsbackendafc.c:281
+#: ../daemon/gvfsbackendafc.c:388
 msgid "Try again"
 msgstr "قايتا سىنا"
 
-#: ../daemon/gvfsbackendafc.c:299 ../daemon/gvfsbackendarchive.c:536
+#: ../daemon/gvfsbackendafc.c:406 ../daemon/gvfsbackendarchive.c:536
 #: ../daemon/gvfsbackendarchive.c:565 ../daemon/gvfsbackenddav.c:1631
-#: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:861
-#: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendobexftp.c:896
+#: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:863
+#: ../daemon/gvfsbackendobexftp.c:879 ../daemon/gvfsbackendobexftp.c:898
 #: ../daemon/gvfsbackendsmb.c:655
 msgid "Invalid mount spec"
 msgstr "ئىناۋەتسىز ئېگەرلەش چۈشەندۈرۈشى"
 
-#: ../daemon/gvfsbackendafc.c:305
+#: ../daemon/gvfsbackendafc.c:412 ../daemon/gvfsbackendafc.c:443
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "AFC ئورنى ئىناۋەتسىز: ئىپادە afc://uuid:port-number بولۇشى لازىم"
 
-#: ../daemon/gvfsbackendafc.c:320
-#, c-format
-msgid "Service %d on Apple Mobile Device"
-msgstr "ئالما كۆچمە ئۈسكۈنىدىكى %d مۇلازىمەت"
-
-#: ../daemon/gvfsbackendafc.c:326
+#: ../daemon/gvfsbackendafc.c:428
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "ئالما كۆچمە ئۈسكۈنىسى"
 
-#: ../daemon/gvfsbackendafc.c:375
+#: ../daemon/gvfsbackendafc.c:433
 #, c-format
-msgid "%s (%s)"
-msgstr "%s (%s)"
+msgid "Service %d on Apple Mobile Device"
+msgstr "ئالما كۆچمە ئۈسكۈنىدىكى %d مۇلازىمەت"
+
+#: ../daemon/gvfsbackendafc.c:439
+#, c-format
+#| msgid "Service %d on Apple Mobile Device"
+msgid "Documents on Apple Mobile Device"
+msgstr ""
+
+#: ../daemon/gvfsbackendafc.c:497
+#, c-format
+msgid "%s (jailbreak)"
+msgstr ""
+
+#. translators:
+#. * This is "Documents on foo" where foo is the device name, eg.:
+#. * Documents on Alan Smithee's iPhone
+#: ../daemon/gvfsbackendafc.c:504 ../monitor/afc/afcvolume.c:125
+#, c-format
+#| msgid "cdda mount on %s"
+msgid "Documents on %s"
+msgstr ""
 
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:455
+#: ../daemon/gvfsbackendafc.c:583
 #, c-format
 msgid ""
 "Device '%s' is password protected. Enter the password on the device and "
 "click 'Try again'."
 msgstr "'%s' ئۈسكۈنە ئىم بىلەن قوغدالغان. ئۈسكۈنىنىڭ ئىمنى كىرگۈزۈپ، «قايتا سىنا»نى چېكىڭ."
 
-#: ../daemon/gvfsbackendafc.c:585 ../daemon/gvfsbackendarchive.c:632
+#: ../daemon/gvfsbackendafc.c:922 ../daemon/gvfsbackendarchive.c:632
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1886
-#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:709
+#: ../daemon/gvfsbackendobexftp.c:1073 ../daemon/gvfsbackendsmb.c:709
 #: ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "مۇندەرىجە ئاچالمىدى"
 
-#: ../daemon/gvfsbackendafc.c:593 ../daemon/gvfsbackendarchive.c:624
+#: ../daemon/gvfsbackendafc.c:932 ../daemon/gvfsbackendarchive.c:624
 #: ../daemon/gvfsbackendarchive.c:668 ../daemon/gvfsbackendarchive.c:720
 #: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendcdda.c:986
 #: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:392
-#: ../daemon/gvfsbackendftp.c:1000 ../daemon/gvfsbackendnetwork.c:602
+#: ../daemon/gvfsbackendftp.c:1004 ../daemon/gvfsbackendnetwork.c:602
 #: ../daemon/gvfsbackendsmbbrowse.c:1094 ../daemon/gvfsbackendsmbbrowse.c:1161
 #: ../daemon/gvfsbackendsmbbrowse.c:1333 ../daemon/gvfsbackendsmbbrowse.c:1403
 #, c-format
 msgid "File doesn't exist"
 msgstr "ھۆججەت مەۋجۇت ئەمەس"
 
-#: ../daemon/gvfsbackendafc.c:701 ../daemon/gvfsbackendafc.c:1506
+#: ../daemon/gvfsbackendafc.c:1123 ../daemon/gvfsbackendafc.c:2458
 msgid "Backups are not yet supported."
 msgstr "زاپاسلاشنى تېخى قوللىمايدۇ."
 
-#: ../daemon/gvfsbackendafc.c:839
+#: ../daemon/gvfsbackendafc.c:1295
 msgid "Invalid seek type"
 msgstr "نامەلۇم ئىزدەش تىپى"
 
-#: ../daemon/gvfsbackendafc.c:1425 ../daemon/gvfsbackendsftp.c:1832
+#: ../daemon/gvfsbackendafc.c:2295 ../daemon/gvfsbackendsftp.c:1832
 #: ../daemon/gvfsbackendsftp.c:4637 ../daemon/gvfsbackendsmb.c:1709
 #: ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
@@ -408,14 +435,14 @@ msgstr "بۇ مەشغۇلاتنى قوللىمايدۇ"
 msgid "/ on %s"
 msgstr "/ %s دىكى"
 
-#: ../daemon/gvfsbackendarchive.c:525 ../daemon/gvfsbackendftp.c:600
+#: ../daemon/gvfsbackendarchive.c:525 ../daemon/gvfsbackendftp.c:604
 #: ../daemon/gvfsbackendsftp.c:1745
 msgid "No hostname specified"
 msgstr "باش ئاپپارات بەلگىلەنمىگەن"
 
 #: ../daemon/gvfsbackendarchive.c:758 ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
-#: ../daemon/gvfsbackendftp.c:294 ../daemon/gvfsbackendnetwork.c:649
+#: ../daemon/gvfsbackendftp.c:296 ../daemon/gvfsbackendnetwork.c:649
 #: ../daemon/gvfsbackendsftp.c:3883 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
 msgstr "بۇ ھۆججەت مۇندەرىجە ئەمەس"
@@ -433,7 +460,7 @@ msgstr "ۋاقىتلىق مۇندەرىجە قۇرالمىدى"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
 #: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:726
+#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:730
 #: ../daemon/gvfsbackendgphoto2.c:1207 ../daemon/gvfsbackendgphoto2.c:2207
 #: ../daemon/gvfsbackendgphoto2.c:2926 ../daemon/gvfsbackendsftp.c:1836
 #: ../daemon/gvfsbackendsftp.c:2949 ../daemon/gvfsbackendsftp.c:2962
@@ -445,10 +472,10 @@ msgstr "بۇنداق ھۆججەت ياكى مۇندەرىجە يوق"
 #: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2223
 #: ../daemon/gvfsbackendsftp.c:1828
 msgid "Directory not empty"
-msgstr "مۇندەرىجە بوش ئەمەس"
+msgstr "مۇندەرىجە قۇرۇق ئەمەس"
 
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
-#: ../daemon/gvfsbackendobexftp.c:1810
+#: ../daemon/gvfsbackendobexftp.c:1812
 msgid "Can't copy file over directory"
 msgstr "ھۆججەتنى مۇندەرىجىگە كۆچۈرەلمىدى"
 
@@ -492,19 +519,19 @@ msgstr "ئارقا ئۇچى قوللىمايدىغان مەشغۇلات"
 msgid "No such file or directory in target path"
 msgstr "نىشان يولدا بۇنداق ھۆججەت ياكى مۇندەرىجە يوق"
 
-#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1386
-#: ../daemon/gvfsbackendobexftp.c:1779
+#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1390
+#: ../daemon/gvfsbackendobexftp.c:1781
 msgid "Can't copy directory over directory"
 msgstr "مۇندەرىجىنى مۇندەرىجىگە كۆچۈرەلمىدى"
 
-#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1787
-#: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1830
+#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1789
+#: ../daemon/gvfsbackendobexftp.c:1820 ../daemon/gvfsbackendsftp.c:1830
 #: ../daemon/gvfsbackendsftp.c:4445
 msgid "Target file exists"
 msgstr "نىشان ھۆججەت مەۋجۇت"
 
-#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1409
-#: ../daemon/gvfsbackendobexftp.c:1794
+#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1413
+#: ../daemon/gvfsbackendobexftp.c:1796
 msgid "Can't recursively copy directory"
 msgstr "مۇندەرىجىنى قايتىلانما كۆچۈرەلمەيدۇ"
 
@@ -693,9 +720,9 @@ msgid "Could not create request"
 msgstr "ئىلتىماس قۇرالمىدى"
 
 #: ../daemon/gvfsbackenddav.c:1930 ../daemon/gvfsbackenddav.c:2183
-#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:685
-#: ../daemon/gvfsbackendftp.c:866 ../daemon/gvfsbackendftp.c:1216
-#: ../daemon/gvfsbackendftp.c:1394 ../daemon/gvfsbackendsftp.c:4289
+#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:689
+#: ../daemon/gvfsbackendftp.c:870 ../daemon/gvfsbackendftp.c:1220
+#: ../daemon/gvfsbackendftp.c:1398 ../daemon/gvfsbackendsftp.c:4289
 #: ../daemon/gvfsbackendsmb.c:2045
 msgid "Target file already exists"
 msgstr "نىشان ھۆججەت مەۋجۇت"
@@ -730,44 +757,44 @@ msgid "Network"
 msgstr "تور"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:423
+#: ../daemon/gvfsbackendftp.c:426
 #, c-format
 msgid "Enter password for ftp as %s on %s"
 msgstr "%2$s دىكى %1$s نىڭ ftp ئىمنى كىرگۈزۈڭ"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:426
+#: ../daemon/gvfsbackendftp.c:429
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "%s دىكى ftp ئىمنى كىرگۈزۈڭ"
 
-#: ../daemon/gvfsbackendftp.c:453 ../daemon/gvfsbackendsftp.c:985
+#: ../daemon/gvfsbackendftp.c:456 ../daemon/gvfsbackendsftp.c:985
 #: ../daemon/gvfsbackendsmb.c:613 ../daemon/gvfsbackendsmbbrowse.c:995
 msgid "Password dialog cancelled"
 msgstr "ئىم سۆزلەشكۈ ۋاز كېچىلدى"
 
-#: ../daemon/gvfsbackendftp.c:563
+#: ../daemon/gvfsbackendftp.c:567
 #, c-format
 msgid "ftp on %s"
 msgstr "%s دىكى ftp"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:567
+#: ../daemon/gvfsbackendftp.c:571
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "%2$s دىكى %1$s نىڭ ftp"
 
-#: ../daemon/gvfsbackendftp.c:660
+#: ../daemon/gvfsbackendftp.c:664
 msgid "Insufficient permissions"
 msgstr "ھوقۇق يەتمىدى"
 
-#: ../daemon/gvfsbackendftp.c:706 ../daemon/gvfsbackendsftp.c:2333
+#: ../daemon/gvfsbackendftp.c:710 ../daemon/gvfsbackendsftp.c:2333
 #: ../daemon/gvfsbackendsftp.c:3069 ../daemon/gvfsbackendsftp.c:3410
 #: ../daemon/gvfsbackendsftp.c:4280
 msgid "File is directory"
 msgstr "ھۆججەت مۇندەرىجە"
 
-#: ../daemon/gvfsbackendftp.c:914 ../daemon/gvfsbackendftp.c:1179
+#: ../daemon/gvfsbackendftp.c:918 ../daemon/gvfsbackendftp.c:1183
 #: ../daemon/gvfsbackendsftp.c:3276
 msgid "backups not supported yet"
 msgstr "تېخى زاپاسلاشنى قوللىمايدۇ"
@@ -817,7 +844,7 @@ msgstr "%s ئۈن قويغۇچ"
 #: ../daemon/gvfsbackendgphoto2.c:961 ../monitor/gphoto2/ggphoto2volume.c:203
 #: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
-msgstr "فوتو ئاپپارات"
+msgstr "كامېرا"
 
 #: ../daemon/gvfsbackendgphoto2.c:963 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
@@ -1000,25 +1027,25 @@ msgstr "تور ئورنى كۆزەتكۈچ"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:681 ../daemon/gvfsbackendsmb.c:552
+#: ../daemon/gvfsbackendobexftp.c:683 ../daemon/gvfsbackendsmb.c:552
 #: ../daemon/gvfsbackendsmb.c:1424
 #, c-format
 msgid "%s on %s"
 msgstr "‫%2$s دىكى %1$s"
 
-#: ../daemon/gvfsbackendobexftp.c:890
+#: ../daemon/gvfsbackendobexftp.c:892
 msgid "USB support missing. Please contact your software vendor"
 msgstr "USB قوللىمايدۇ. يۇمشاق دېتال تەمىنلىگۈچى بىلەن ئالاقىلىشىڭ"
 
-#: ../daemon/gvfsbackendobexftp.c:1010
+#: ../daemon/gvfsbackendobexftp.c:1012
 msgid "Connection to the device lost"
 msgstr "ئۈسكۈنە ئۇلىنىشى ئۈزۈلدى"
 
-#: ../daemon/gvfsbackendobexftp.c:1507
+#: ../daemon/gvfsbackendobexftp.c:1509
 msgid "Device requires a software update"
 msgstr "ئۈسكۈنە بىر يۇمشاق دېتالنى يېڭىلىشى زۆرۈر"
 
-#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1936
+#: ../daemon/gvfsbackendobexftp.c:1857 ../daemon/gvfsbackendsmb.c:1936
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "ھۆججەت ئۆچۈرگەندە خاتالىق كۆرۈلدى: %s"
@@ -1524,7 +1551,7 @@ msgstr "CD-R دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:41 ../monitor/hal/hal-utils.c:41
 msgid "Blank CD-R Disc"
-msgstr "بوش CD-R دىسكا"
+msgstr "قۇرۇق CD-R دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
 msgid "CD-RW Disc"
@@ -1532,7 +1559,7 @@ msgstr "CD-RW دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
 msgid "Blank CD-RW Disc"
-msgstr "بوش CD-RW دىسكا"
+msgstr "قۇرۇق CD-RW دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
 #: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
@@ -1550,7 +1577,7 @@ msgstr "DVD-RAM دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:44 ../monitor/hal/hal-utils.c:44
 msgid "Blank DVD-RAM Disc"
-msgstr "بوش DVD-RAM دىسكا"
+msgstr "قۇرۇق DVD-RAM دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
 msgid "DVD-RW Disc"
@@ -1558,7 +1585,7 @@ msgstr "DVD-RW دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
 msgid "Blank DVD-RW Disc"
-msgstr "بوش DVD-RW دىسكا"
+msgstr "قۇرۇق DVD-RW دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:47 ../monitor/hal/hal-utils.c:47
 msgid "DVD+R Disc"
@@ -1566,7 +1593,7 @@ msgstr "DVD+R دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:47 ../monitor/hal/hal-utils.c:47
 msgid "Blank DVD+R Disc"
-msgstr "بوش DVD+R دىسكا"
+msgstr "قۇرۇق DVD+R دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
 msgid "DVD+RW Disc"
@@ -1574,7 +1601,7 @@ msgstr "DVD+RW دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
 msgid "Blank DVD+RW Disc"
-msgstr "بوش DVD+RW دىسكا"
+msgstr "قۇرۇق DVD+RW دىسكا"
 
 #: ../monitor/gphoto2/hal-utils.c:49 ../monitor/hal/hal-utils.c:49
 msgid "DVD+R DL Disc"
@@ -2282,12 +2309,12 @@ msgstr "خاسلىق بەلگىلەنمىگەن\n"
 msgid "Value not specified\n"
 msgstr "قىممەت بەلگىلەنمىگەن\n"
 
-#: ../programs/gvfs-set-attribute.c:195
+#: ../programs/gvfs-set-attribute.c:194
 #, c-format
 msgid "Invalid attribute type %s\n"
 msgstr "ئىناۋەتسىز خاسلىق تىپى %s\n"
 
-#: ../programs/gvfs-set-attribute.c:205
+#: ../programs/gvfs-set-attribute.c:204
 #, c-format
 msgid "Error setting attribute: %s\n"
 msgstr "خاسلىق تەڭشەش خاتالىقى: %s\n"
@@ -2308,3 +2335,6 @@ msgstr "بەلگە ئۇلىنىش، ئېگەرلەش ۋە قىسقا يولغا 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
 msgstr "- مۇندەرىجە مەزمۇنىنى دەرەخسىمان ھالەتتە كۆرسىتىدۇ"
+
+#~ msgid "%s (%s)"
+#~ msgstr "%s (%s)"
