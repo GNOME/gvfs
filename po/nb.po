@@ -1,20 +1,23 @@
 # Norwegian translation of gvfs (bokmål dialect).
 # Copyright (C) 1999-2003 Free Software Foundation, Inc.
-# Kjartan Maraas <kmaraas@gnome.org>, 1999-2010.
 #
+# Kjartan Maraas <kmaraas@gnome.org>, 1999-2010.
+# Torstein Adolf Winterseth <kvikende@fsfe.org>, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.3.x\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-17 14:23+0100\n"
-"PO-Revision-Date: 2010-12-17 14:25+0100\n"
-"Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug."
+"cgi?product=gvfs&component=general\n"
+"POT-Creation-Date: 2010-12-17 13:25+0000\n"
+"PO-Revision-Date: 2010-12-30 20:40+0100\n"
+"Last-Translator: Torstein Adolf Winterseth <kvikende@fsfe.org>\n"
 "Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 1.1\n"
 
 #: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2376
 msgid "Operation not supported, files on different mounts"
@@ -184,8 +187,8 @@ msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
 msgstr ""
-"Feil ved oppslag av «%s»-tjeneste «%s» i domene «%s». En eller flere TXT-"
-"poster mangler. Nøkler som kreves: «%s»."
+"Feil ved oppslag av «%s»-tjeneste «%s» i domene «%s». En eller flere TXT-poster "
+"mangler. Nøkler som kreves: «%s»."
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -238,7 +241,7 @@ msgstr "Bruk %s --spawner dbus-id objekt_sti"
 #: ../daemon/daemon-main.c:179 ../daemon/daemon-main.c:197
 #, c-format
 msgid "Usage: %s key=value key=value ..."
-msgstr "Bruk: %s key=verdi key=verdi..."
+msgstr "Bruk: %s key=verdi key=verdi …"
 
 #: ../daemon/daemon-main.c:195
 #, c-format
@@ -355,7 +358,7 @@ msgstr "Ugyldige monteringsspesifikasjon"
 
 #: ../daemon/gvfsbackendafc.c:412 ../daemon/gvfsbackendafc.c:443
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
-msgstr "Ugyldig AFC-lokasjon: må være på formen afc://uuid:port-nummer"
+msgstr "Ugyldig AFC-adresse: må være på formen afc://uuid:port-nummer"
 
 #: ../daemon/gvfsbackendafc.c:428
 #, c-format
@@ -1023,7 +1026,7 @@ msgstr "Windows nettverk"
 #. * shows computers in your local network.
 #: ../daemon/gvfsbackendnetwork.c:873
 msgid "Network Location Monitor"
-msgstr "Vis nettverkslokasjoner"
+msgstr "Vis nettverksadresser"
 
 #. Set the mountspec according to original uri, no matter whether user changes
 #. credentials during mount loop. Nautilus and other gio clients depend
@@ -1324,8 +1327,7 @@ msgstr "Ugyldig svar"
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
-msgstr ""
-"Kan ikke åpne aktiv FTP-tilkobling. Kanskje din ruter ikke støtter dette?"
+msgstr "Kan ikke åpne aktiv FTP-tilkobling. Kanskje din ruter ikke støtter dette?"
 
 #: ../daemon/gvfsftpconnection.c:399
 msgid "Failed to create active FTP connection."
@@ -1428,19 +1430,19 @@ msgstr "Automatisk montering feilet: %s"
 
 #: ../daemon/mount.c:824 ../daemon/mount.c:898
 msgid "The specified location is not mounted"
-msgstr "Spesifisert lokasjon er ikke montert"
+msgstr "Spesifisert adresse er ikke montert"
 
 #: ../daemon/mount.c:829
 msgid "The specified location is not supported"
-msgstr "Spesifisert lokasjon er ikke støttet"
+msgstr "Spesifisert adresse er ikke støttet"
 
 #: ../daemon/mount.c:1036
 msgid "Location is already mounted"
-msgstr "Lokasjonen er allerede montert"
+msgstr "Adressen er allerede montert"
 
 #: ../daemon/mount.c:1044
 msgid "Location is not mountable"
-msgstr "Lokasjonen kan ikke monteres"
+msgstr "Adressen kan ikke monteres"
 
 #: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
 #: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
@@ -1493,8 +1495,7 @@ msgstr "Stasjon uten navn"
 #: ../monitor/gdu/ggdudrive.c:561 ../monitor/hal/ghaldrive.c:662
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr ""
-"Klarte ikke å løse ut medie. Ett eller flere volum på mediet er opptatt."
+msgstr "Klarte ikke å løse ut medie. Ett eller flere volum på mediet er opptatt."
 
 #: ../monitor/gdu/ggdudrive.c:1015
 msgid ""
@@ -1865,7 +1866,7 @@ msgstr "%s krypterte data"
 
 #: ../programs/gvfs-cat.c:37
 msgid "locations"
-msgstr "lokasjoner"
+msgstr "adresser"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1897,7 +1898,7 @@ msgstr "%s: %s: feil ved lukking: %s\n"
 
 #: ../programs/gvfs-cat.c:136
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
-msgstr "LOKASJON... - slå sammen LOKASJONER til standard utdata."
+msgstr "ADRESSE … - slå sammen ADRESSER til standard utdata."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1908,10 +1909,10 @@ msgid ""
 "files: for example you can use something like smb://server/resource/file.txt "
 "as location to concatenate."
 msgstr ""
-"Slå sammen filer ved lokasjoner og skriv ut til standard utdata. Fungerer "
-"som det vanlige cat-verktøyet, men bruker gvfs lokasjoner i stedet for "
+"Slå sammen filer ved adresser og skriv ut til standard utdata. Fungerer "
+"som det vanlige cat-verktøyet, men bruker gvfs-adresser i stedet for "
 "lokale filer. Du kan for eksempel bruke smb://tjener/ressurs/fil.txt som en "
-"lokasjon som skal vises."
+"adresse som skal vises."
 
 #: ../programs/gvfs-cat.c:148
 msgid ""
@@ -1935,7 +1936,7 @@ msgstr "Feil ved lesing av kommandolinjeflagg: %s\n"
 #: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:151
 #, c-format
 msgid "%s: missing locations"
-msgstr "%s: mangler lokasjoner"
+msgstr "%s: mangler adresser"
 
 #: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
 msgid "no target directory"
@@ -1968,7 +1969,7 @@ msgstr "fremdrift"
 
 #: ../programs/gvfs-copy.c:115
 msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
-msgstr "KILDE... MÅL - kopier fil(er) fra KILDE til MÅL"
+msgstr "KILDE … MÅL - kopier fil(er) fra KILDE til MÅL"
 
 #: ../programs/gvfs-copy.c:132 ../programs/gvfs-move.c:120
 msgid "Missing operand\n"
@@ -2102,7 +2103,7 @@ msgstr "Navneområder for skrivbare attributter:\n"
 
 #: ../programs/gvfs-info.c:362
 msgid "- show info for <location>"
-msgstr "- vis info for <lokasjon>"
+msgstr "- vis info for <adresse>"
 
 #: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
 msgid "Show hidden files"
@@ -2124,7 +2125,7 @@ msgstr "Feil: %s\n"
 
 #: ../programs/gvfs-ls.c:383
 msgid "- list files at <location>"
-msgstr "- list filer i <lokasjon>"
+msgstr "- list filer i <adresse>"
 
 #: ../programs/gvfs-mkdir.c:33
 msgid "create parent directories"
@@ -2174,7 +2175,7 @@ msgstr "Overvåk hendelser"
 #: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
 #, c-format
 msgid "Error mounting location: %s\n"
-msgstr "Feil under montering av lokasjon: %s\n"
+msgstr "Feil under montering av adresse: %s\n"
 
 #: ../programs/gvfs-mount.c:241
 #, c-format
@@ -2203,11 +2204,11 @@ msgstr "Ingen volum for enhetsfil %s\n"
 
 #: ../programs/gvfs-mount.c:938
 msgid "- mount <location>"
-msgstr "- monter <lokasjon>"
+msgstr "- monter <adresse>"
 
 #: ../programs/gvfs-move.c:103
 msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
-msgstr "KILDE... MÅL - flytt fil(er) fra KILDE til MÅL"
+msgstr "KILDE … MÅL - flytt fil(er) fra KILDE til MÅL"
 
 #: ../programs/gvfs-move.c:189
 #, c-format
@@ -2223,7 +2224,7 @@ msgstr "filer"
 #: ../programs/gvfs-open.c:65
 #, c-format
 msgid "%s: %s: error opening location: %s\n"
-msgstr "%s: %s: feil under åpning av lokasjon: %s\n"
+msgstr "%s: %s: feil under åpning av adresse: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -2234,7 +2235,7 @@ msgstr "%s: %s: feil under start av program: %s\n"
 
 #: ../programs/gvfs-open.c:122
 msgid "FILES... - open FILES with registered application."
-msgstr "FILER... - åpne FILER med registrert program."
+msgstr "FILER … - åpne FILER med registrert program."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -2320,12 +2321,12 @@ msgstr ""
 
 #: ../programs/gvfs-set-attribute.c:119
 msgid " <location> <attribute> <values> - set attribute"
-msgstr " <lokasjon> <attributt> <verdier> - sett attributt"
+msgstr " <adresse> <attributt> <verdier> - sett attributt"
 
 #: ../programs/gvfs-set-attribute.c:137
 #, c-format
 msgid "Location not specified\n"
-msgstr "Lokasjon ikke oppgitt\n"
+msgstr "Adresse ikke oppgitt\n"
 
 #: ../programs/gvfs-set-attribute.c:145
 #, c-format
@@ -2363,3 +2364,5 @@ msgstr "Følg symbolske lenker, monteringspunkter og snarveier som kataloger"
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
 msgstr "- vis innhold i kataloger i et trelignende format"
+
+
