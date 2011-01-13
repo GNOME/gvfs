@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-19 09:10+0200\n"
-"PO-Revision-Date: 2010-12-19 09:11+0200\n"
+"POT-Creation-Date: 2011-01-13 10:26+0200\n"
+"PO-Revision-Date: 2011-01-13 10:41+0200\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: he\n"
 "MIME-Version: 1.0\n"
@@ -34,7 +34,7 @@ msgstr "Operation not supported, files on different mounts"
 #: ../client/gvfsiconloadable.c:374
 #, c-format
 msgid "Invalid return value from %s"
-msgstr "ערך החזרה בלתי תקני מ־%s"
+msgstr "Invalid return value from %s"
 
 #: ../client/gdaemonfile.c:985 ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
@@ -61,11 +61,11 @@ msgstr "Invalid filename %s"
 #: ../client/gdaemonvfs.c:1335 ../client/gdaemonvfs.c:1388
 #, c-format
 msgid "Error setting file metadata: %s"
-msgstr "שגיאה בהגדרת נתוני העל לקובץ: %s"
+msgstr "Error setting file metadata: %s"
 
 #: ../client/gdaemonfile.c:2233 ../client/gdaemonvfs.c:1389
 msgid "values must be string or list of strings"
-msgstr "על הערכים להיות מחרוזת או רשימה של מחרוזות"
+msgstr "values must be string or list of strings"
 
 #: ../client/gdaemonfileenumerator.c:466 ../client/gdaemonfileenumerator.c:549
 #: ../client/gdaemonfileenumerator.c:600
@@ -94,7 +94,7 @@ msgstr "על הערכים להיות מחרוזת או רשימה של מחרו�
 #: ../monitor/proxy/gproxymount.c:471 ../monitor/proxy/gproxymount.c:556
 #: ../monitor/proxy/gproxyvolume.c:807 ../monitor/proxy/gproxyvolume.c:884
 msgid "Operation was cancelled"
-msgstr "הפעולה בוטלה"
+msgstr "Operation was cancelled"
 
 #: ../client/gdaemonfileinputstream.c:527
 #: ../client/gdaemonfileinputstream.c:535
@@ -127,7 +127,7 @@ msgstr "Error while getting mount info: %s"
 
 #: ../client/gdaemonvfs.c:1201
 msgid "Can't contact session bus"
-msgstr "לא ניתן ליצור קשר עם אפיק ההפעלות"
+msgstr "Can't contact session bus"
 
 #: ../client/gvfsdaemondbus.c:572 ../client/gvfsdaemondbus.c:1004
 #, c-format
@@ -1510,13 +1510,14 @@ msgid "One or more programs are preventing the unmount operation."
 msgstr "תכנית אחת או יותר מונעים את פעולת הניתוק."
 
 #: ../monitor/gdu/ggdumount.c:984
+#, fuzzy
 msgid "Cannot get LUKS cleartext slave"
-msgstr ""
+msgstr "לא ניתן לקבל טקסט ברור משני מ־LUKS"
 
 #: ../monitor/gdu/ggdumount.c:1006
-#, c-format
+#, fuzzy, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
-msgstr ""
+msgstr "לא ניתן לקבל טקסט ברור משני מ־LUKS מהנתיב ׳%s'"
 
 #: ../monitor/gdu/ggduvolume.c:325
 msgid "Floppy Disk"
@@ -1677,7 +1678,7 @@ msgstr "תקליטור MO"
 
 #: ../monitor/gphoto2/hal-utils.c:56 ../monitor/hal/hal-utils.c:56
 msgid "Blank MO Disc"
-msgstr "תקליטוק MO ריק"
+msgstr "תקליטור MO ריק"
 
 #: ../monitor/gphoto2/hal-utils.c:57 ../monitor/hal/hal-utils.c:57
 msgid "Disc"
@@ -1685,7 +1686,7 @@ msgstr "תקליטור"
 
 #: ../monitor/gphoto2/hal-utils.c:57 ../monitor/hal/hal-utils.c:57
 msgid "Blank Disc"
-msgstr "תקליטורכ ריק"
+msgstr "תקליטור ריק"
 
 #: ../monitor/hal/ghaldrive.c:127
 msgid "CD-ROM"
@@ -1771,7 +1772,7 @@ msgstr "כונן %s"
 
 #: ../monitor/hal/ghaldrive.c:185
 msgid "Software RAID Drive"
-msgstr "כונן RAID בתוכנה"
+msgstr "כונן RAID בתכנה"
 
 #: ../monitor/hal/ghaldrive.c:187
 msgid "USB Drive"
@@ -2006,7 +2007,7 @@ msgstr "Don't follow symlinks"
 
 #: ../programs/gvfs-info.c:50
 msgid "invalid type"
-msgstr "סוג בלתי תקין"
+msgstr "invalid type"
 
 #: ../programs/gvfs-info.c:53
 msgid "unknown"
@@ -2018,7 +2019,7 @@ msgstr "regular"
 
 #: ../programs/gvfs-info.c:59
 msgid "directory"
-msgstr "תיקייה"
+msgstr "directory"
 
 #: ../programs/gvfs-info.c:62
 msgid "symlink"
@@ -2034,7 +2035,7 @@ msgstr "shortcut"
 
 #: ../programs/gvfs-info.c:71
 msgid "mountable"
-msgstr "ניתן לעיגון"
+msgstr "mountable"
 
 #: ../programs/gvfs-info.c:109
 #, c-format
@@ -2049,12 +2050,12 @@ msgstr "display name: %s\n"
 #: ../programs/gvfs-info.c:159
 #, c-format
 msgid "edit name: %s\n"
-msgstr "עריכת שם: %s\n"
+msgstr "edit name: %s\n"
 
 #: ../programs/gvfs-info.c:165
 #, c-format
 msgid "name: %s\n"
-msgstr "שם: %s\n"
+msgstr "name: %s\n"
 
 #: ../programs/gvfs-info.c:172
 #, c-format
@@ -2092,7 +2093,7 @@ msgstr "מאפיינים הניתנים להגדרה:\n"
 #: ../programs/gvfs-info.c:335
 #, c-format
 msgid "Writable attribute namespaces:\n"
-msgstr ""
+msgstr "מרחבי שם של מאפיינים הניתנים לכתיבה:\n"
 
 #: ../programs/gvfs-info.c:362
 msgid "- show info for <location>"
@@ -2178,7 +2179,7 @@ msgstr "שגיאה בניתוק העיגון: %s\n"
 #: ../programs/gvfs-mount.c:262
 #, c-format
 msgid "Error finding enclosing mount: %s\n"
-msgstr ""
+msgstr "שגיאה במציאת העיגון העוטף: %s\n"
 
 #: ../programs/gvfs-mount.c:682
 #, c-format
