@@ -142,6 +142,61 @@ gvfs_backend_ftp_determine_features (GVfsFtpTask *task)
 }
 
 static void
+gvfs_backend_ftp_determine_site_features (GVfsFtpTask *task)
+{
+  const struct {
+    const char *        name;        	/* name of feature */
+    GVfsFtpFeature      enable;         /* flags to enable with this feature */
+  } features[] = {
+    { "CHMOD", G_VFS_FTP_FEATURE_CHMOD },
+    { "CHGRP", G_VFS_FTP_FEATURE_CHGRP },
+  };
+  guint i, j;
+  char **reply;
+
+  if (g_vfs_ftp_task_is_in_error (task))
+    return;
+
+  if (!g_vfs_ftp_task_send_and_check (task, 0, NULL, NULL, &reply, "SITE HELP"))
+    {
+      g_vfs_ftp_task_clear_error (task);
+      return;
+    }
+
+  if (g_strv_length (reply) == 1)
+    {
+      /* vsftpd returns just a single string, so we split it into multiple
+       * and then treat it like a regular reply */
+      char **split;
+
+      split = g_strsplit (reply[0], " ", -1);
+      g_strfreev (reply);
+      reply = split;
+    }
+
+  for (i = 1; reply[i]; i++)
+    {
+      char *feature = reply[i];
+
+      while (g_ascii_isspace (feature[0]))
+        feature++;
+
+      for (j = 0; j < G_N_ELEMENTS (features); j++)
+        {
+          if (g_ascii_strcasecmp (feature, features[j].name) == 0)
+            {
+              g_debug ("# site feature %s supported\n", features[j].name);
+              task->backend->features |= 1 << features[j].enable;
+            }
+        }
+    }
+
+  g_strfreev (reply);
+
+  return;
+}
+
+static void
 gvfs_backend_ftp_determine_system (GVfsFtpTask *task)
 {
   static const struct {
@@ -507,6 +562,7 @@ try_login:
     }
   g_vfs_ftp_task_setup_connection (&task);
   gvfs_backend_ftp_determine_system (&task);
+  gvfs_backend_ftp_determine_site_features (&task);
   gvfs_backend_ftp_setup_directory_cache (ftp);
   gvfs_backend_ftp_determine_default_location (&task);
 
