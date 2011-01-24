@@ -4638,6 +4638,15 @@ try_set_attribute (GVfsBackend *backend,
       return TRUE;
     }
 
+  if (type != G_FILE_ATTRIBUTE_TYPE_UINT32) 
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,
+                        G_IO_ERROR_INVALID_ARGUMENT,
+                        "%s",
+                        _("Invalid attribute type (uint32 expected)"));
+    }
+
   command = new_command_stream (op_backend,
                                 SSH_FXP_SETSTAT);
   put_string (command, filename);
