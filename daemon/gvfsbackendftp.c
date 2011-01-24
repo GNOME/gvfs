@@ -1064,6 +1064,95 @@ do_query_info (GVfsBackend *backend,
   g_vfs_ftp_file_free (file);
 }
 
+static gboolean
+try_query_settable_attributes (GVfsBackend *backend,
+			       GVfsJobQueryAttributes *job,
+			       const char *filename)
+{
+  GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
+  GFileAttributeInfoList *list;
+
+  if (!g_vfs_backend_ftp_has_feature (ftp, G_VFS_FTP_FEATURE_CHMOD))
+    {    
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        _("Operation unsupported"));
+      return FALSE;
+    }    
+
+  list = g_file_attribute_info_list_new ();
+
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_UNIX_MODE,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32,
+				  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+  
+  g_vfs_job_query_attributes_set_list (job, list);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_file_attribute_info_list_unref (list);
+  
+  return TRUE;
+}
+
+static void
+do_set_attribute (GVfsBackend *backend,
+                  GVfsJobSetAttribute *job,
+                  const char *filename,
+                  const char *attribute,
+                  GFileAttributeType type,
+                  gpointer value_p,
+                  GFileQueryInfoFlags flags)
+{
+  GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
+  GVfsFtpFile *file;
+
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+
+  if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0)
+    {
+      if (type != G_FILE_ATTRIBUTE_TYPE_UINT32) 
+        {
+          g_set_error_literal (&task.error,
+                               G_IO_ERROR,
+                               G_IO_ERROR_INVALID_ARGUMENT,
+                               _("Invalid attribute type (uint32 expected)"));
+        }
+      else if (!g_vfs_backend_ftp_has_feature (ftp, G_VFS_FTP_FEATURE_CHMOD))
+        {
+          g_set_error_literal (&task.error,
+                               G_IO_ERROR,
+                               G_IO_ERROR_NOT_SUPPORTED,
+                               _("Operation unsupported"));
+        }
+      else
+        {
+          guint mode = *(guint32 *)value_p;
+
+          if (g_vfs_ftp_task_send (&task,
+                                   0,
+                                   "SITE CHMOD %04o %s",
+                                   mode,
+                                   g_vfs_ftp_file_get_ftp_path (file)))
+            {
+              g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
+            }
+        }
+    }
+  else
+    {
+      g_set_error_literal (&task.error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation unsupported"));
+    }
+
+  g_vfs_ftp_task_done (&task);
+  g_vfs_ftp_file_free (file);
+}
+
 static void
 do_enumerate (GVfsBackend *backend,
               GVfsJobEnumerate *job,
@@ -1587,6 +1676,8 @@ g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
   backend_class->delete = do_delete;
   backend_class->make_directory = do_make_directory;
   backend_class->move = do_move;
+  backend_class->try_query_settable_attributes = try_query_settable_attributes;
+  backend_class->set_attribute = do_set_attribute;
   backend_class->pull = do_pull;
 }
 
