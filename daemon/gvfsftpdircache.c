@@ -20,6 +20,9 @@
  * Author: Benjamin Otte <otte@gnome.org>
  */
 
+#include <stdio.h>
+#include <sys/stat.h>
+
 #include <config.h>
 
 #include <glib/gi18n.h>
@@ -503,6 +506,82 @@ g_vfs_ftp_dir_cache_funcs_lookup_uncached (GVfsFtpTask *      task,
 }
 
 static gboolean
+g_vfs_ftp_parse_mode (char       file_mode[10],
+                      guint32   *mode,
+                      GFileType *file_type)
+{
+  /* File type */
+  switch (file_mode[0])
+    {
+    case '-': /* Regular file */
+      *mode = S_IFREG;
+      *file_type = G_FILE_TYPE_REGULAR;
+      break;
+    case 'b': /* Block special file */
+      *mode = S_IFBLK;
+      *file_type = G_FILE_TYPE_SPECIAL;
+      break;
+    case 'c': /* Character special */
+      *mode = S_IFCHR;
+      *file_type = G_FILE_TYPE_SPECIAL;
+      break;
+    case 'd': /* Directory */
+      *mode = S_IFDIR;
+      *file_type = G_FILE_TYPE_DIRECTORY;
+      break;
+    case 'l': /* Symbolic link */
+      *mode = S_IFLNK;
+      *file_type = G_FILE_TYPE_SYMBOLIC_LINK;
+      break;
+    case 'p': /* FIFO */
+      *mode = S_IFIFO;
+      *file_type = G_FILE_TYPE_SPECIAL;
+      break;
+    default:
+      g_debug ("# couldn't parse file type from mode %.10s\n", file_mode);
+      *mode = 0;
+      *file_type = G_FILE_TYPE_UNKNOWN;
+      return FALSE;
+    }
+
+  /* Permissions */
+  if (file_mode[1] == 'r')
+    *mode |= S_IRUSR;
+  if (file_mode[2] == 'w')
+    *mode |= S_IWUSR;
+  switch (file_mode[3])
+    {
+    case 'x': *mode |= S_IXUSR; break;
+    case 'S': *mode |= S_ISUID; break;
+    case 's': *mode |= S_ISUID | S_IXUSR; break;
+    }
+
+  if (file_mode[4] == 'r')
+    *mode |= S_IRGRP;
+  if (file_mode[5] == 'w')
+    *mode |= S_IWGRP;
+  switch (file_mode[6])
+    {
+    case 'x': *mode |= S_IXGRP; break;
+    case 'S': *mode |= S_ISGID; break;
+    case 's': *mode |= S_ISGID | S_IXGRP; break;
+    }
+
+  if (file_mode[7] == 'r')
+    *mode |= S_IROTH;
+  if (file_mode[8] == 'w')
+    *mode |= S_IWOTH;
+  switch (file_mode[9])
+    {
+    case 'x': *mode |= S_IXOTH; break;
+    case 'T': *mode |= S_ISVTX; break;
+    case 't': *mode |= S_ISVTX | S_IXOTH; break;
+    }
+
+  return TRUE;
+}
+
+static gboolean
 g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
                                    int                   debug_id,
                                    const GVfsFtpFile *   dir,
@@ -529,6 +608,7 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
   while ((line = g_data_input_stream_read_line (data, &length, cancellable, error)))
     {
       struct list_result result = { 0, };
+      GFileType file_type = G_FILE_TYPE_UNKNOWN;
       GTimeVal tv = { 0, 0 };
 
       /* strip trailing \r - ParseFTPList only removes it if the line ends in \r\n,
@@ -590,10 +670,36 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
 
       g_file_info_set_size (info, g_ascii_strtoull (result.fe_size, NULL, 10));
 
-      gvfs_file_info_populate_default (info, g_vfs_ftp_file_get_gvfs_path (file),
-                                       type == 'f' ? G_FILE_TYPE_REGULAR :
-                                       type == 'l' ? G_FILE_TYPE_SYMBOLIC_LINK :
-                                       G_FILE_TYPE_DIRECTORY);
+      /* If unix format then parse the attributes */
+      if (state.lstyle == 'U')
+        {
+          char file_mode[10], uid[64], gid[64];
+          guint32 mode;
+
+          /* POSIX ls -l form: mode, links, owner, group */
+          if (sscanf(line, "%10c %*u %63s %63s", file_mode, uid, gid) == 3)
+            {
+              if (g_vfs_ftp_parse_mode (file_mode, &mode, &file_type))
+                {
+                  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, mode);
+                  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_USER, uid);
+                  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_GROUP, gid);
+                }
+            }
+          else
+            g_debug ("# unknown listing format\n");
+        }
+
+      if (file_type == G_FILE_TYPE_UNKNOWN)
+        {
+          file_type = type == 'f' ? G_FILE_TYPE_REGULAR :
+                      type == 'l' ? G_FILE_TYPE_SYMBOLIC_LINK :
+                      G_FILE_TYPE_DIRECTORY;
+        }
+
+      gvfs_file_info_populate_default (info,
+                                       g_vfs_ftp_file_get_gvfs_path (file),
+                                       file_type);
 
       if (is_unix)
         g_file_info_set_is_hidden (info, result.fe_fnlen > 0 &&
