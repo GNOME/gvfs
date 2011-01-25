@@ -1,21 +1,20 @@
 # Norwegian translation of gvfs (bokmål dialect).
 # Copyright (C) 1999-2003 Free Software Foundation, Inc.
 #
-# Kjartan Maraas <kmaraas@gnome.org>, 1999-2010.
+# Kjartan Maraas <kmaraas@gnome.org>, 1999-2011.
 # Torstein Adolf Winterseth <kvikende@fsfe.org>, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs 1.3.x\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug."
-"cgi?product=gvfs&component=general\n"
-"POT-Creation-Date: 2010-12-17 13:25+0000\n"
-"PO-Revision-Date: 2010-12-30 20:40+0100\n"
+"Project-Id-Version: gvfs 1.7.x\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-01-25 21:08+0100\n"
+"PO-Revision-Date: 2011-01-25 21:10+0100\n"
 "Last-Translator: Torstein Adolf Winterseth <kvikende@fsfe.org>\n"
 "Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Lokalize 1.1\n"
 
@@ -187,8 +186,8 @@ msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
 msgstr ""
-"Feil ved oppslag av «%s»-tjeneste «%s» i domene «%s». En eller flere TXT-poster "
-"mangler. Nøkler som kreves: «%s»."
+"Feil ved oppslag av «%s»-tjeneste «%s» i domene «%s». En eller flere TXT-"
+"poster mangler. Nøkler som kreves: «%s»."
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -278,7 +277,7 @@ msgstr ""
 msgid "Internal Apple File Control error"
 msgstr "Intern Apple File Control feil"
 
-#: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:673
+#: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:729
 msgid "File does not exist"
 msgstr "Filen eksisterer ikke"
 
@@ -411,7 +410,7 @@ msgstr "Kan ikke åpne katalog"
 #: ../daemon/gvfsbackendarchive.c:668 ../daemon/gvfsbackendarchive.c:720
 #: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendcdda.c:986
 #: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:392
-#: ../daemon/gvfsbackendftp.c:1004 ../daemon/gvfsbackendnetwork.c:602
+#: ../daemon/gvfsbackendftp.c:1060 ../daemon/gvfsbackendnetwork.c:602
 #: ../daemon/gvfsbackendsmbbrowse.c:1094 ../daemon/gvfsbackendsmbbrowse.c:1161
 #: ../daemon/gvfsbackendsmbbrowse.c:1333 ../daemon/gvfsbackendsmbbrowse.c:1403
 #, c-format
@@ -426,9 +425,10 @@ msgstr "Sikkerhetskopier er ikke støttet ennå."
 msgid "Invalid seek type"
 msgstr "Ugyldig type søk"
 
-#: ../daemon/gvfsbackendafc.c:2295 ../daemon/gvfsbackendsftp.c:1832
-#: ../daemon/gvfsbackendsftp.c:4637 ../daemon/gvfsbackendsmb.c:1709
-#: ../daemon/gvfsftptask.c:392
+#: ../daemon/gvfsbackendafc.c:2295 ../daemon/gvfsbackendftp.c:1080
+#: ../daemon/gvfsbackendftp.c:1128 ../daemon/gvfsbackendftp.c:1149
+#: ../daemon/gvfsbackendsftp.c:1832 ../daemon/gvfsbackendsftp.c:4637
+#: ../daemon/gvfsbackendsmb.c:1709 ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
 msgstr "Operasjonen støttes ikke"
 
@@ -436,20 +436,20 @@ msgstr "Operasjonen støttes ikke"
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
 #: ../daemon/gvfsbackendarchive.c:323 ../daemon/gvfsbackendsftp.c:2269
-#: ../daemon/gvfsftpdircache.c:428
+#: ../daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
 msgstr "/ på %s"
 
-#: ../daemon/gvfsbackendarchive.c:525 ../daemon/gvfsbackendftp.c:604
+#: ../daemon/gvfsbackendarchive.c:525 ../daemon/gvfsbackendftp.c:660
 #: ../daemon/gvfsbackendsftp.c:1745
 msgid "No hostname specified"
 msgstr "Ingen vertsnavn oppgitt"
 
 #: ../daemon/gvfsbackendarchive.c:758 ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
-#: ../daemon/gvfsbackendftp.c:296 ../daemon/gvfsbackendnetwork.c:649
-#: ../daemon/gvfsbackendsftp.c:3883 ../daemon/gvfsftpdircache.c:154
+#: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:649
+#: ../daemon/gvfsbackendsftp.c:3883 ../daemon/gvfsftpdircache.c:157
 msgid "The file is not a directory"
 msgstr "Filen er ikke en katalog"
 
@@ -466,7 +466,7 @@ msgstr "Kan ikke opprette midlertidig katalog"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
 #: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:730
+#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:786
 #: ../daemon/gvfsbackendgphoto2.c:1207 ../daemon/gvfsbackendgphoto2.c:2207
 #: ../daemon/gvfsbackendgphoto2.c:2926 ../daemon/gvfsbackendsftp.c:1836
 #: ../daemon/gvfsbackendsftp.c:2949 ../daemon/gvfsbackendsftp.c:2962
@@ -525,7 +525,7 @@ msgstr "Operasjonen ikke tillatt av motoren"
 msgid "No such file or directory in target path"
 msgstr "Fil eller katalog finnes ikke i målsti"
 
-#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1390
+#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1535
 #: ../daemon/gvfsbackendobexftp.c:1781
 msgid "Can't copy directory over directory"
 msgstr "Kan ikke kopiere katalog over katalog"
@@ -536,7 +536,7 @@ msgstr "Kan ikke kopiere katalog over katalog"
 msgid "Target file exists"
 msgstr "Målfilen eksisterer"
 
-#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1413
+#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1558
 #: ../daemon/gvfsbackendobexftp.c:1796
 msgid "Can't recursively copy directory"
 msgstr "Kan ikke kopiere katalog rekursivt"
@@ -727,10 +727,10 @@ msgid "Could not create request"
 msgstr "Kan ikke opprette forespørsel"
 
 #: ../daemon/gvfsbackenddav.c:1930 ../daemon/gvfsbackenddav.c:2183
-#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:689
-#: ../daemon/gvfsbackendftp.c:870 ../daemon/gvfsbackendftp.c:1220
-#: ../daemon/gvfsbackendftp.c:1398 ../daemon/gvfsbackendsftp.c:4289
-#: ../daemon/gvfsbackendsmb.c:2045
+#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:745
+#: ../daemon/gvfsbackendftp.c:926 ../daemon/gvfsbackendftp.c:1365
+#: ../daemon/gvfsbackendftp.c:1543 ../daemon/gvfsbackendsftp.c:4289
+#: ../daemon/gvfsbackendsmb.c:2054
 msgid "Target file already exists"
 msgstr "Målfilen eksisterer allerede"
 
@@ -740,7 +740,7 @@ msgid "The file was externally modified"
 msgstr "Filen er endret eksternt"
 
 #: ../daemon/gvfsbackenddav.c:2034 ../daemon/gvfsbackendsmb.c:1175
-#: ../daemon/gvfsbackendsmb.c:2062
+#: ../daemon/gvfsbackendsmb.c:2071
 msgid "Backup file creation failed"
 msgstr "Oppretting av sikkerhetskopi feilet"
 
@@ -764,47 +764,51 @@ msgid "Network"
 msgstr "Nettverk"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:426
+#: ../daemon/gvfsbackendftp.c:481
 #, c-format
 msgid "Enter password for ftp as %s on %s"
 msgstr "Skriv inn passord for ftp som %s på %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:429
+#: ../daemon/gvfsbackendftp.c:484
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Skriv inn passord for ftp på %s"
 
-#: ../daemon/gvfsbackendftp.c:456 ../daemon/gvfsbackendsftp.c:985
+#: ../daemon/gvfsbackendftp.c:511 ../daemon/gvfsbackendsftp.c:985
 #: ../daemon/gvfsbackendsmb.c:613 ../daemon/gvfsbackendsmbbrowse.c:995
 msgid "Password dialog cancelled"
 msgstr "Passorddialog avbrutt"
 
-#: ../daemon/gvfsbackendftp.c:567
+#: ../daemon/gvfsbackendftp.c:623
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp på %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:571
+#: ../daemon/gvfsbackendftp.c:627
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "ftp som %s på %s"
 
-#: ../daemon/gvfsbackendftp.c:664
+#: ../daemon/gvfsbackendftp.c:720
 msgid "Insufficient permissions"
 msgstr "Ikke nok rettigheter"
 
-#: ../daemon/gvfsbackendftp.c:710 ../daemon/gvfsbackendsftp.c:2333
+#: ../daemon/gvfsbackendftp.c:766 ../daemon/gvfsbackendsftp.c:2333
 #: ../daemon/gvfsbackendsftp.c:3069 ../daemon/gvfsbackendsftp.c:3410
 #: ../daemon/gvfsbackendsftp.c:4280
 msgid "File is directory"
 msgstr "Filen er en katalog"
 
-#: ../daemon/gvfsbackendftp.c:918 ../daemon/gvfsbackendftp.c:1183
+#: ../daemon/gvfsbackendftp.c:974 ../daemon/gvfsbackendftp.c:1328
 #: ../daemon/gvfsbackendsftp.c:3276
 msgid "backups not supported yet"
 msgstr "sikkerhetskopier er ikke støttet ennå"
+
+#: ../daemon/gvfsbackendftp.c:1121 ../daemon/gvfsbackendsftp.c:4647
+msgid "Invalid attribute type (uint32 expected)"
+msgstr "Ugyldig type attributt (uint32 forventet)"
 
 #: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
@@ -1052,7 +1056,7 @@ msgstr "Mistet forbindelsen til enheten"
 msgid "Device requires a software update"
 msgstr "Enheten krever en programvareoppdatering"
 
-#: ../daemon/gvfsbackendobexftp.c:1857 ../daemon/gvfsbackendsmb.c:1936
+#: ../daemon/gvfsbackendobexftp.c:1857 ../daemon/gvfsbackendsmb.c:1945
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Feil under sletting av fil: %s"
@@ -1213,7 +1217,7 @@ msgstr "Feil under oppretting av sikkerhetskopi: %s"
 msgid "Unable to create temporary file"
 msgstr "Kan ikke opprette midlertidig fil"
 
-#: ../daemon/gvfsbackendsftp.c:4275 ../daemon/gvfsbackendsmb.c:2034
+#: ../daemon/gvfsbackendsftp.c:4275 ../daemon/gvfsbackendsmb.c:2043
 msgid "Can't move directory over directory"
 msgstr "Kan ikke flytte katalog over katalog"
 
@@ -1243,21 +1247,25 @@ msgstr "Søketype ikke støttet"
 msgid "Backup file creation failed: %s"
 msgstr "Oppretting av sikkerhetskopi feilet: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2010
+#: ../daemon/gvfsbackendsmb.c:1724
+msgid "Invalid attribute type (uint64 expected)"
+msgstr "Ugyldig type attributt (uint64 forventet)"
+
+#: ../daemon/gvfsbackendsmb.c:2019
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Feil under flytting av fil: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2082
+#: ../daemon/gvfsbackendsmb.c:2091
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Feil under fjerning av målfil: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2106
+#: ../daemon/gvfsbackendsmb.c:2115
 msgid "Can't recursively move directory"
 msgstr "Kan ikke flytte katalog rekursivt"
 
-#: ../daemon/gvfsbackendsmb.c:2150
+#: ../daemon/gvfsbackendsmb.c:2159
 msgid "Windows Shares Filesystem Service"
 msgstr "Filsystemtjeneste for delte Windows-ressurser"
 
@@ -1327,7 +1335,8 @@ msgstr "Ugyldig svar"
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
-msgstr "Kan ikke åpne aktiv FTP-tilkobling. Kanskje din ruter ikke støtter dette?"
+msgstr ""
+"Kan ikke åpne aktiv FTP-tilkobling. Kanskje din ruter ikke støtter dette?"
 
 #: ../daemon/gvfsftpconnection.c:399
 msgid "Failed to create active FTP connection."
@@ -1495,7 +1504,8 @@ msgstr "Stasjon uten navn"
 #: ../monitor/gdu/ggdudrive.c:561 ../monitor/hal/ghaldrive.c:662
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr "Klarte ikke å løse ut medie. Ett eller flere volum på mediet er opptatt."
+msgstr ""
+"Klarte ikke å løse ut medie. Ett eller flere volum på mediet er opptatt."
 
 #: ../monitor/gdu/ggdudrive.c:1015
 msgid ""
@@ -1909,10 +1919,10 @@ msgid ""
 "files: for example you can use something like smb://server/resource/file.txt "
 "as location to concatenate."
 msgstr ""
-"Slå sammen filer ved adresser og skriv ut til standard utdata. Fungerer "
-"som det vanlige cat-verktøyet, men bruker gvfs-adresser i stedet for "
-"lokale filer. Du kan for eksempel bruke smb://tjener/ressurs/fil.txt som en "
-"adresse som skal vises."
+"Slå sammen filer ved adresser og skriv ut til standard utdata. Fungerer som "
+"det vanlige cat-verktøyet, men bruker gvfs-adresser i stedet for lokale "
+"filer. Du kan for eksempel bruke smb://tjener/ressurs/fil.txt som en adresse "
+"som skal vises."
 
 #: ../programs/gvfs-cat.c:148
 msgid ""
@@ -2364,5 +2374,3 @@ msgstr "Følg symbolske lenker, monteringspunkter og snarveier som kataloger"
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
 msgstr "- vis innhold i kataloger i et trelignende format"
-
-
