@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs-master-po-gl-70600.merged\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-09 17:16+0100\n"
-"PO-Revision-Date: 2011-01-09 17:17+0100\n"
+"POT-Creation-Date: 2011-01-27 01:00+0100\n"
+"PO-Revision-Date: 2011-01-26 15:25+0100\n"
 "Last-Translator: Fran Diéguez <frandieguez@ubuntu.com>\n"
 "Language-Team: Galician <gnome-gl-list@gnome.org>\n"
 "Language: gl\n"
@@ -43,7 +43,7 @@ msgstr ""
 #: ../client/gvfsiconloadable.c:374
 #, c-format
 msgid "Invalid return value from %s"
-msgstr "Valor de retorno non correcto desde %s"
+msgstr "O valor de retorno desde %s incorrecto"
 
 #: ../client/gdaemonfile.c:985 ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
@@ -59,12 +59,12 @@ msgstr "Non se obtivo o descritor do ficheiro de fluxo"
 #. corresponding to a particular path/uri
 #: ../client/gdaemonfile.c:1964
 msgid "Could not find enclosing mount"
-msgstr "Non foi posíbel encontrar un punto de montaxe incluído"
+msgstr "Non foi posíbel atopar un punto de montaxe incluído"
 
 #: ../client/gdaemonfile.c:1994
 #, c-format
 msgid "Invalid filename %s"
-msgstr "O nome de ficheiro %s non é correcto"
+msgstr "O nome de ficheiro %s non é válido"
 
 #: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1200
 #: ../client/gdaemonvfs.c:1335 ../client/gdaemonvfs.c:1388
@@ -155,11 +155,11 @@ msgstr "Produciuse un erro ao conectarse co conector: %s"
 
 #: ../common/gvfsdaemonprotocol.c:522
 msgid "Invalid file info format"
-msgstr "O formato de información de ficheiro non é correcto"
+msgstr "O formato de información de ficheiro non é válido"
 
 #: ../common/gvfsdaemonprotocol.c:540
 msgid "Invalid attribute info list content"
-msgstr "O contido da lista de información de atributos non é correcto"
+msgstr "O contido da lista de información de atributos non é válido"
 
 #: ../common/gvfsdnssdresolver.c:209
 #, c-format
@@ -248,7 +248,7 @@ msgstr "Uso: %s --spawner dbus-id object_path"
 #: ../daemon/daemon-main.c:179 ../daemon/daemon-main.c:197
 #, c-format
 msgid "Usage: %s key=value key=value ..."
-msgstr "Uso: %s key=value key=value ..."
+msgstr "Uso: %s key=value key=value …"
 
 #: ../daemon/daemon-main.c:195
 #, c-format
@@ -343,7 +343,7 @@ msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
 msgstr ""
-"Produciuse un erro no libimobiledevice: Non foi posíbel encontrar o "
+"Produciuse un erro no libimobiledevice: Non foi posíbel atopar o "
 "dispositivo. Asegúrese que usbmuxd está configurado correctamente."
 
 #: ../daemon/gvfsbackendafc.c:321
@@ -361,7 +361,7 @@ msgstr "Tentar de novo"
 #: ../daemon/gvfsbackendobexftp.c:879 ../daemon/gvfsbackendobexftp.c:898
 #: ../daemon/gvfsbackendsmb.c:655
 msgid "Invalid mount spec"
-msgstr "A especificación de montaxe non é correcta"
+msgstr "A especificación de montaxe non é válida"
 
 #: ../daemon/gvfsbackendafc.c:412 ../daemon/gvfsbackendafc.c:443
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
@@ -531,7 +531,7 @@ msgstr "O backend non admite a operación"
 
 #: ../daemon/gvfsbackendburn.c:853
 msgid "No such file or directory in target path"
-msgstr "Non existe ese ficheiro ou cartafol no camiño de destino"
+msgstr "Non existe ese ficheiro ou cartafol na ruta de destino"
 
 #: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1390
 #: ../daemon/gvfsbackendobexftp.c:1781
@@ -578,7 +578,7 @@ msgstr "Non se especificou ningún dispositivo"
 #: ../daemon/gvfsbackendcdda.c:417
 #, c-format
 msgid "Cannot find drive %s"
-msgstr "Non é posíbel encontrar o dispositivo %s"
+msgstr "Non é posíbel atopar o dispositivo %s"
 
 #: ../daemon/gvfsbackendcdda.c:430
 #, c-format
@@ -827,7 +827,7 @@ msgstr "%s: %d: Non existe ese ficheiro ou cartafol"
 #: ../daemon/gvfsbackendgphoto2.c:519
 #, c-format
 msgid "%s: %d: Invalid filename"
-msgstr "%s: %d: O nome de ficheiro non é correcto"
+msgstr "%s: %d: O nome de ficheiro non é válido"
 
 #: ../daemon/gvfsbackendgphoto2.c:525
 #, c-format
@@ -1176,7 +1176,7 @@ msgstr "sftp en %s"
 
 #: ../daemon/gvfsbackendsftp.c:1735
 msgid "Unable to find supported ssh command"
-msgstr "Non é posíbel encontrar unha orde shh"
+msgstr "Non é posíbel atopar unha orde shh"
 
 #: ../daemon/gvfsbackendsftp.c:2009 ../daemon/gvfsbackendsftp.c:2398
 #: ../daemon/gvfsbackendsftp.c:2477 ../daemon/gvfsbackendsftp.c:2488
@@ -1196,12 +1196,12 @@ msgstr "Non é posíbel encontrar unha orde shh"
 #: ../daemon/gvfsbackendsftp.c:4510 ../daemon/gvfsbackendsftp.c:4525
 #: ../daemon/gvfsbackendsftp.c:4540 ../daemon/gvfsbackendsftp.c:4618
 msgid "Invalid reply received"
-msgstr "Recibiuse unha resposta non correcta"
+msgstr "Recibiuse unha resposta incorrecta"
 
 #: ../daemon/gvfsbackendsftp.c:2257 ../daemon/gvfsbackendsmb.c:1431
 #: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
-msgstr " (a codificación non é correcta)"
+msgstr " (a codificación non é válida)"
 
 #: ../daemon/gvfsbackendsftp.c:2342
 msgid "Failure"
@@ -1210,7 +1210,7 @@ msgstr "Fallo"
 #: ../daemon/gvfsbackendsftp.c:2450
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
-msgstr "icon_id «%s» non correcta en OpenIconForRead"
+msgstr "icon_id «%s» incorrecta en OpenIconForRead"
 
 #: ../daemon/gvfsbackendsftp.c:2746
 #, c-format
@@ -1315,7 +1315,7 @@ msgstr "Lixo"
 
 #: ../daemon/gvfsdaemon.c:1056
 msgid "Invalid backend type"
-msgstr "O tipo de backend non é correcto"
+msgstr "O tipo de backend non é válido"
 
 #: ../daemon/gvfsdaemonutils.c:104
 #, c-format
@@ -1387,7 +1387,7 @@ msgstr "Tipo de páxina descoñecido"
 
 #: ../daemon/gvfsftptask.c:408
 msgid "Invalid filename"
-msgstr "O nome de ficheiro non é correcto"
+msgstr "O nome de ficheiro non é válido"
 
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
@@ -1395,7 +1395,7 @@ msgstr "O backend non é compatíbel co symlinks"
 
 #: ../daemon/gvfsjobsetattribute.c:120
 msgid "Invalid dbus message"
-msgstr "A mensaxe dbus non é correcta"
+msgstr "A mensaxe dbus non é válida"
 
 #: ../daemon/main.c:45 ../metadata/meta-daemon.c:694
 msgid "Replace old daemon."
@@ -1461,7 +1461,7 @@ msgstr "A localización non é montábel"
 #: ../metadata/meta-daemon.c:449
 #, c-format
 msgid "Can't find metadata file %s"
-msgstr "Non é posíbel encontrar o ficheiro de metadatos %s"
+msgstr "Non é posíbel atopar o ficheiro de metadatos %s"
 
 #: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
 msgid "Unable to set metadata key"
@@ -1537,7 +1537,7 @@ msgstr "Non foi posíbel obter o escravo LUKS en texto claro"
 #: ../monitor/gdu/ggdumount.c:1006
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
-msgstr "Non foi posíbel obter o escravo LUKS en texto claro no camiño «%s»"
+msgstr "Non foi posíbel obter o escravo LUKS en texto claro na ruta «%s»"
 
 #: ../monitor/gdu/ggduvolume.c:325
 msgid "Floppy Disk"
@@ -1912,8 +1912,7 @@ msgstr "%s: %s:erro ao pechar: %s\n"
 
 #: ../programs/gvfs-cat.c:136
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
-msgstr ""
-"LOCALIZACIÓN... - concatenar as LOCALIZACIÓNS para unha saída estándar."
+msgstr "LOCALIZACIÓN… - concatenar as LOCALIZACIÓNS para unha saída estándar."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1984,7 +1983,7 @@ msgstr "progreso"
 
 #: ../programs/gvfs-copy.c:115
 msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
-msgstr "ORIXE... DESTINO - copiar o(s) fichero(s) desde ORIXE a DESTINO"
+msgstr "ORIXE… DESTINO - copiar o(s) fichero(s) desde ORIXE a DESTINO"
 
 #: ../programs/gvfs-copy.c:132 ../programs/gvfs-move.c:120
 msgid "Missing operand\n"
@@ -2223,7 +2222,7 @@ msgstr "- monta <localización>"
 
 #: ../programs/gvfs-move.c:103
 msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
-msgstr "ORIXE... DESTINO - mover o(s) fichero(s) desde ORIXE a DESTINO"
+msgstr "ORIXE… DESTINO - mover o(s) fichero(s) desde ORIXE a DESTINO"
 
 #: ../programs/gvfs-move.c:189
 #, c-format
@@ -2250,7 +2249,7 @@ msgstr "%s: %s: erro ao executar o aplicativo: %s\n"
 
 #: ../programs/gvfs-open.c:122
 msgid "FILES... - open FILES with registered application."
-msgstr "FICHEIROS... - abrir FICHEIROS co aplicativo rexistrado."
+msgstr "FICHEIROS… - abrir FICHEIROS co aplicativo rexistrado."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -2259,8 +2258,8 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr ""
-"Abre os ficheiros co aplicativo predefinido rexistrado para manexar o tipo "
-"de ficheiro."
+"Abre os ficheiros co aplicativo predeterminado rexistrado para manexar o "
+"tipo de ficheiro."
 
 #: ../programs/gvfs-rename.c:50
 msgid "- rename file"
@@ -2356,7 +2355,7 @@ msgstr "Non se especificou ningún atributo\n"
 #: ../programs/gvfs-set-attribute.c:194
 #, c-format
 msgid "Invalid attribute type %s\n"
-msgstr "O tipo de atributo %s non é correcto\n"
+msgstr "O tipo de atributo %s non é válido\n"
 
 #: ../programs/gvfs-set-attribute.c:204
 #, c-format
