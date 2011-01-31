@@ -1,3 +1,11 @@
+Major changes in 1.7.2
+======================
+* ftp: Parse mode, user and group for unix listings
+* ftp: Implement chmod
+* sftp: Catch invalid argument type for chmod command
+* smb: Catch invalid argument type when setting mtime
+* Translation updates
+
 Major changes in 1.7.1
 ======================
 * Various build issues fixed
