@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
 "POT-Creation-Date: 2010-07-01 10:56+0000\n"
-"PO-Revision-Date: 2010-08-05 23:18+0200\n"
+"PO-Revision-Date: 2011-02-10 19:26+0100\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -755,7 +755,7 @@ msgstr "Réseau"
 #: ../daemon/gvfsbackendftp.c:423
 #, c-format
 msgid "Enter password for ftp as %s on %s"
-msgstr "Saisissez le mot de passe pour l'accès ftp sur %2s en tant que %1s"
+msgstr "Saisissez le mot de passe pour l'accès ftp sur %2$s en tant que %1$s"
 
 #. translators: %s here is the hostname
 #: ../daemon/gvfsbackendftp.c:426
@@ -1090,12 +1090,12 @@ msgstr "Délai d'attente expiré lors de la connexion"
 #: ../daemon/gvfsbackendsftp.c:960
 #, c-format
 msgid "Enter passphrase for key for ssh as %s on %s"
-msgstr "Saisissez la phrase de passe de la clé SSH pour l'accès à %2s en tant que %1s"
+msgstr "Saisissez la phrase de passe de la clé SSH pour l'accès à %2$s en tant que %1$s"
 
 #: ../daemon/gvfsbackendsftp.c:962
 #, c-format
 msgid "Enter password for ssh as %s on %s"
-msgstr "Saisissez le mot de passe pour l'accès SSH sur %2s en tant que %1s"
+msgstr "Saisissez le mot de passe pour l'accès SSH sur %2$s en tant que %1$s"
 
 #: ../daemon/gvfsbackendsftp.c:966
 #, c-format
