@@ -5,7 +5,7 @@
 # This file is distributed under the same license as the gvfs package.
 #
 # Ivar Smolin <okul linue ee>, 2008–2011.
-# Mattias Põldaru <mahfiaz gmail com>, 2009.
+# Mattias Põldaru <mahfiaz gmail com>, 2009–2011.
 #
 msgid ""
 msgstr ""
@@ -90,7 +90,7 @@ msgid "Invalid file info format"
 msgstr "Vigane failiandmete vorming"
 
 msgid "Invalid attribute info list content"
-msgstr "Vigane rekvisiiditeabe nimekirja sisu"
+msgstr "Vigane atribuuditeabe nimekirja sisu"
 
 #, c-format
 msgid "Error initializing Avahi: %s"
@@ -547,7 +547,7 @@ msgid "backups not supported yet"
 msgstr "varukoopiad pole veel toetatud"
 
 msgid "Invalid attribute type (uint32 expected)"
-msgstr "Vigane rekvisiidi liik (polnud uint32)"
+msgstr "Vigane atribuudi liik (polnud uint32)"
 
 #, c-format
 msgid "%s: %d: Directory or file exists"
@@ -876,7 +876,7 @@ msgid "Backup file creation failed: %s"
 msgstr "Tõrge varufaili loomisel: %s"
 
 msgid "Invalid attribute type (uint64 expected)"
-msgstr "Vigane rekvisiidi liik (polnud uint64)"
+msgstr "Vigane atribuudi liik (polnud uint64)"
 
 #, c-format
 msgid "Error moving file: %s"
@@ -1422,7 +1422,7 @@ msgid "prompt before overwrite"
 msgstr "enne ülekirjutamist küsitakse"
 
 msgid "preserve all attributes"
-msgstr "säilitatakse kõik rekvisiidid"
+msgstr "säilitatakse kõik atribuudid"
 
 msgid "backup existing destination files"
 msgstr "olemasolevad sihtfailid varundatakse"
@@ -1456,13 +1456,13 @@ msgid "Error copying file %s: %s\n"
 msgstr "Viga faili %s kopeerimisel: %s\n"
 
 msgid "List writable attributes"
-msgstr "Kirjutatavate rekvisiitide loend"
+msgstr "Kirjutatavate atribuutide loend"
 
 msgid "Get filesystem info"
 msgstr "Failisüsteemi andmete hankimine"
 
 msgid "The attributes to get"
-msgstr "Rekvisiidid, mida hankida"
+msgstr "Atribuudid, mida hankida"
 
 msgid "Don't follow symlinks"
 msgstr "Sümbolviitasid ei järgita"
@@ -1493,7 +1493,7 @@ msgstr "haagitav"
 
 #, c-format
 msgid "attributes:\n"
-msgstr "rekvisiidid:\n"
+msgstr "atribuudid:\n"
 
 #, c-format
 msgid "display name: %s\n"
@@ -1527,15 +1527,15 @@ msgstr "Hoitakse ümbertõstmisel koos failiga"
 
 #, c-format
 msgid "Error getting writable attributes: %s\n"
-msgstr "Viga kirjutatavate rekvisiitide hankimisel: %s\n"
+msgstr "Viga kirjutatavate atribuutide hankimisel: %s\n"
 
 #, c-format
 msgid "Settable attributes:\n"
-msgstr "Määratavad rekvisiidid:\n"
+msgstr "Määratavad atribuudid:\n"
 
 #, c-format
 msgid "Writable attribute namespaces:\n"
-msgstr "Kirjutatavad rekvisiitide nimeruumid:\n"
+msgstr "Kirjutatavad atribuutide nimeruumid:\n"
 
 msgid "- show info for <location>"
 msgstr "- info kuvamine <asukoha> kohta"
@@ -1709,7 +1709,7 @@ msgstr ""
 "stringv, unset]"
 
 msgid " <location> <attribute> <values> - set attribute"
-msgstr " <asukoht> <rekvisiit> <väärtused> - rekvisiidi määramine"
+msgstr " <asukoht> <atribuut> <väärtused> - atribuudi määramine"
 
 #, c-format
 msgid "Location not specified\n"
@@ -1717,7 +1717,7 @@ msgstr "Asukoht on määramata\n"
 
 #, c-format
 msgid "Attribute not specified\n"
-msgstr "Rekvisiit on määramata\n"
+msgstr "Atribuut on määramata\n"
 
 #, c-format
 msgid "Value not specified\n"
@@ -1725,11 +1725,11 @@ msgstr "Väärtus on määramata\n"
 
 #, c-format
 msgid "Invalid attribute type %s\n"
-msgstr "Vigane rekvisiidi liik %s\n"
+msgstr "Vigane atribuudi liik %s\n"
 
 #, c-format
 msgid "Error setting attribute: %s\n"
-msgstr "Viga rekvisiidi määramisel: %s\n"
+msgstr "Viga atribuudi määramisel: %s\n"
 
 msgid "- move files to trash"
 msgstr "- failide viskamine prügikasti"
