@@ -11,6 +11,8 @@ SUBDIRS = \
 	test \
 	$(NULL)
 
+ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
+
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 EXTRA_DIST = \
