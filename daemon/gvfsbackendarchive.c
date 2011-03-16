@@ -73,6 +73,8 @@ struct _GVfsBackendArchive
 
 G_DEFINE_TYPE (GVfsBackendArchive, g_vfs_backend_archive, G_VFS_TYPE_BACKEND)
 
+static void backend_unmount (GVfsBackendArchive *ba);
+
 /*** AN ARCHIVE WE CAN OPERATE ON ***/
 
 typedef struct {
@@ -237,7 +239,7 @@ g_vfs_backend_archive_finalize (GObject *object)
 {
   GVfsBackendArchive *archive = G_VFS_BACKEND_ARCHIVE (object);
 
-  g_assert (archive->file == NULL);
+  backend_unmount (archive);
 
   if (G_OBJECT_CLASS (g_vfs_backend_archive_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_archive_parent_class)->finalize) (object);
@@ -589,17 +591,27 @@ do_mount (GVfsBackend *backend,
 }
 
 static void
+backend_unmount (GVfsBackendArchive *ba)
+{
+  if (ba->file)
+    {
+      g_object_unref (ba->file);
+      ba->file = NULL;
+    }
+  if (ba->files)
+    {
+      archive_file_free (ba->files);
+      ba->files = NULL;
+    }
+}
+
+static void
 do_unmount (GVfsBackend *backend,
 	    GVfsJobUnmount *job,
             GMountUnmountFlags flags,
             GMountSource *mount_source)
 {
-  GVfsBackendArchive *ba = G_VFS_BACKEND_ARCHIVE (backend);
-
-  g_object_unref (ba->file);
-  ba->file = NULL;
-  archive_file_free (ba->files);
-  ba->files = NULL;
+  backend_unmount (G_VFS_BACKEND_ARCHIVE (backend));
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
