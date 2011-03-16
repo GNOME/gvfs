@@ -926,8 +926,8 @@ _g_dbus_connection_get_sync (const char *dbus_id,
 	    return local->session_bus;
 
 	  /* Session bus was disconnected, re-connect */
-	  local->session_bus = NULL;
 	  dbus_connection_unref (local->session_bus);
+	  local->session_bus = NULL;
 	}
     }
   else
