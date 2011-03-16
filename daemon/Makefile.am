@@ -417,7 +417,6 @@ endif
 
 gvfsd_http_SOURCES = \
 	soup-input-stream.c soup-input-stream.h \
-	soup-output-stream.c soup-output-stream.h \
 	gvfsbackendhttp.c gvfsbackendhttp.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
