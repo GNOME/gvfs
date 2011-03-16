@@ -187,7 +187,7 @@ if test "x$enable_fuse" != "xno"; then
   PKG_CHECK_EXISTS(fuse, msg_fuse=yes)
 
   if test "x$msg_fuse" = "xyes"; then
-    PKG_CHECK_MODULES(FUSE, fuse)
+    PKG_CHECK_MODULES(FUSE, fuse >= 2.8.0)
     AC_DEFINE(HAVE_FUSE, 1, [Define to 1 if FUSE is available])
   fi
 fi
