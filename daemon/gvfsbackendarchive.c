@@ -350,7 +350,8 @@ create_root_file (GVfsBackendArchive *ba)
 
 static void
 archive_file_set_info_from_entry (ArchiveFile *	        file, 
-				  struct archive_entry *entry)
+				  struct archive_entry *entry,
+				  guint64               entry_index)
 {
   GFileInfo *info = g_file_info_new ();
   GFileType type;
@@ -415,6 +416,12 @@ archive_file_set_info_from_entry (ArchiveFile *	        file,
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE);
 
+  /* Set inode number to reflect absolute position in the archive. */
+  g_file_info_set_attribute_uint64 (info,
+				    G_FILE_ATTRIBUTE_UNIX_INODE,
+				    entry_index);
+
+
   /* FIXME: add info for these
 dev_t			 archive_entry_dev(struct archive_entry *);
 dev_t			 archive_entry_devmajor(struct archive_entry *);
@@ -425,7 +432,6 @@ const char		*archive_entry_fflags_text(struct archive_entry *);
 gid_t			 archive_entry_gid(struct archive_entry *);
 const char		*archive_entry_gname(struct archive_entry *);
 const char		*archive_entry_hardlink(struct archive_entry *);
-ino_t			 archive_entry_ino(struct archive_entry *);
 mode_t			 archive_entry_mode(struct archive_entry *);
 unsigned int		 archive_entry_nlink(struct archive_entry *);
 dev_t			 archive_entry_rdev(struct archive_entry *);
@@ -464,6 +470,7 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
   GVfsArchive *archive;
   struct archive_entry *entry;
   int result;
+  guint64 entry_index = 0;
 
   archive = gvfs_archive_new (ba, job);
 
@@ -485,8 +492,9 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
 							  TRUE);
           /* Don't set info for root */
           if (file != ba->files)
-            archive_file_set_info_from_entry (file, entry);
+            archive_file_set_info_from_entry (file, entry, entry_index);
 	  archive_read_data_skip (archive->archive);
+	  entry_index++;
 	}
     }
   while (result != ARCHIVE_FATAL && result != ARCHIVE_EOF);
