@@ -36,3 +36,5 @@ gtk-doc.make
 *.pc
 *.service
 *-marshal.[ch]
+*.gschema.valid
+*.enums.xml
