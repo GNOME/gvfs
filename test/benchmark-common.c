@@ -63,8 +63,8 @@ BenchmarkDataPlot;
 
 static gint benchmark_run (gint argc, gchar *argv []);
 
-GList    *benchmark_data_plots = NULL;
-gboolean  benchmark_is_running = FALSE;
+static GList    *benchmark_data_plots = NULL;
+static gboolean  benchmark_is_running = FALSE;
 
 #if 0
 static void

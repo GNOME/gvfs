@@ -917,12 +917,11 @@ handle_mount_op_reply (DBusConnection *connection, DBusMessage *message)
   dbus_bool_t anonymous;
   DBusError dbus_error;
   DBusHandlerResult ret;
-  GList *volumes, *l;
+  GList *l;
   DBusMessage *reply;
   GMountOperation *mount_operation;
   const gchar *sender;
 
-  volumes = NULL;
   decoded_password = NULL;
   ret = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
@@ -1808,10 +1807,8 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
             {
               GMountOperation *op = G_MOUNT_OPERATION (l->data);
               const gchar *owner;
-              const gchar *id;
 
               owner = g_object_get_data (G_OBJECT (op), "mount_op_owner");
-              id = g_object_get_data (G_OBJECT (op), "mount_op_id");
               if (g_strcmp0 (owner, name) == 0)
                 {
                   print_debug ("****** name `%s' has an outstanding mount operation object, aborting it",
@@ -2066,7 +2063,7 @@ g_vfs_proxy_volume_monitor_daemon_main (int argc,
                                         const char *dbus_name,
                                         GType volume_monitor_type)
 {
-  int rc;
+  int rc G_GNUC_UNUSED;
   int ret;
   GMainLoop *loop;
   DBusError dbus_error;

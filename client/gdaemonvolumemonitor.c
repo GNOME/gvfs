@@ -249,10 +249,6 @@ g_daemon_volume_monitor_finalize (GObject *object)
 static void
 g_daemon_volume_monitor_dispose (GObject *object)
 {
-  GDaemonVolumeMonitor *monitor;
-  
-  monitor = G_DAEMON_VOLUME_MONITOR (object);
-
   G_LOCK (daemon_vm);
   _the_daemon_volume_monitor = NULL;
   G_UNLOCK (daemon_vm);

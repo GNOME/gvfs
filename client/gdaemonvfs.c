@@ -614,7 +614,7 @@ fill_mountable_info (GDaemonVfs *vfs)
   DBusMessageIter iter, array_iter, struct_iter;
   MountableInfo *info;
   GPtrArray *infos, *uri_schemes;
-  gint i, count;
+  gint i;
 
   message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
                                           G_VFS_DBUS_MOUNTTRACKER_PATH,
@@ -649,7 +649,6 @@ fill_mountable_info (GDaemonVfs *vfs)
   infos = g_ptr_array_new ();
   uri_schemes = g_ptr_array_new ();
   g_ptr_array_add (uri_schemes, g_strdup ("file"));
-  count = 0;
   do
     {
       char *type, *scheme, **scheme_aliases;

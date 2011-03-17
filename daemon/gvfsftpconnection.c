@@ -291,7 +291,7 @@ g_vfs_ftp_connection_listen_data_connection (GVfsFtpConnection *conn,
   GSocketAddress *local, *addr;
 
   g_return_val_if_fail (conn != NULL, NULL);
-  g_return_val_if_fail (conn->data == NULL, FALSE);
+  g_return_val_if_fail (conn->data == NULL, NULL);
 
   g_vfs_ftp_connection_stop_listening (conn);
 

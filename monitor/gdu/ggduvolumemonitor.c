@@ -106,10 +106,6 @@ list_free (GList *objects)
 static void
 g_gdu_volume_monitor_dispose (GObject *object)
 {
-  GGduVolumeMonitor *monitor;
-
-  monitor = G_GDU_VOLUME_MONITOR (object);
-
   the_volume_monitor = NULL;
 
   if (G_OBJECT_CLASS (g_gdu_volume_monitor_parent_class)->dispose)
@@ -1431,7 +1427,7 @@ update_fstab_volumes (GGduVolumeMonitor *monitor,
           GduDevice *device;
 
           /* doesn't exist */
-          if (realpath (device_file, resolved_path) != 0)
+          if (realpath (device_file, resolved_path) != NULL)
             continue;
 
           /* is handled by DKD */
@@ -1581,7 +1577,7 @@ update_discs (GGduVolumeMonitor *monitor,
   GList *new_discs;
   GList *removed, *added;
   GList *l, *ll;
-  GGduDrive *drive;
+  GGduDrive *drive = NULL;
   GGduVolume *volume;
   GGduMount *mount;
 

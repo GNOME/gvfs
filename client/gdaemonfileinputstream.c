@@ -2035,14 +2035,11 @@ async_query_done (GInputStream *stream,
                   GCancellable *cancellable,
 		  GError *io_error)
 {
-  GDaemonFileInputStream *file;
   GSimpleAsyncResult *simple;
   QueryOperation *op;
   GFileInfo *info;
   GError *error;
 
-  file = G_DAEMON_FILE_INPUT_STREAM (stream);
-  
   op = op_data;
 
   if (io_error)

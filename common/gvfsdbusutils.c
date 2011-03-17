@@ -289,12 +289,9 @@ _g_dbus_message_append_args_valist (DBusMessage *message,
 				    int          first_arg_type,
 				    va_list      var_args)
 {
-  int type;
   DBusMessageIter iter;
 
   g_return_if_fail (message != NULL);
-
-  type = first_arg_type;
 
   dbus_message_iter_init_append (message, &iter);
 

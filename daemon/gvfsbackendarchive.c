@@ -526,7 +526,6 @@ do_mount (GVfsBackend *backend,
   GVfsBackendArchive *archive = G_VFS_BACKEND_ARCHIVE (backend);
   const char *host, *file;
   GFileInfo *info;
-  GIcon *icon;
   char *filename, *s;
   GError *error = NULL;
 
@@ -593,8 +592,6 @@ do_mount (GVfsBackend *backend,
   g_mount_spec_unref (mount_spec);
 
   g_vfs_backend_set_display_name (backend, g_file_info_get_display_name (info));
-
-  icon = g_file_info_get_icon (info);
 
   g_vfs_backend_set_icon_name (backend, MOUNT_ICON_NAME);
 

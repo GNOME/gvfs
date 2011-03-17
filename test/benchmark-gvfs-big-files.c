@@ -72,7 +72,7 @@ create_file (GFile *base_dir)
   if (!scratch_file)
     return NULL;
 
-  output_stream = G_OUTPUT_STREAM (g_file_replace (scratch_file, 0, FALSE, G_FILE_CREATE_NONE, NULL, &error));
+  output_stream = G_OUTPUT_STREAM (g_file_replace (scratch_file, NULL, FALSE, G_FILE_CREATE_NONE, NULL, &error));
   if (!output_stream)
     {
       g_printerr ("Failed to create scratch file: %s\n", error->message);

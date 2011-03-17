@@ -50,7 +50,6 @@
 #include "metabuilder.h"
 #include <glib.h>
 #include <glib/gstdio.h>
-#include <errno.h>
 #include "crc32.h"
 
 #ifdef HAVE_LIBUDEV
@@ -592,9 +591,7 @@ meta_tree_lookup_by_name (const char *name,
 MetaTree *
 meta_tree_ref (MetaTree *tree)
 {
-  gint old_val;
-
-  old_val = g_atomic_int_exchange_and_add ((int *)&tree->ref_count, 1);
+  g_atomic_int_exchange_and_add ((int *)&tree->ref_count, 1);
   return tree;
 }
 
@@ -1444,7 +1441,7 @@ meta_journal_reverse_map_path_and_key (MetaJournal *journal,
 				       guint64 *mtime,
 				       gpointer *value)
 {
-  PathKeyData data = {0};
+  PathKeyData data = {NULL};
   char *res_path;
 
   data.key = key;
@@ -1699,7 +1696,7 @@ get_child_info (EnumDirData *data,
   char *name;
 
   slash = strchr (remainder, '/');
-  if (slash != 0)
+  if (slash != NULL)
     name = g_strndup (remainder, slash - remainder);
   else
     name = g_strdup (remainder);
@@ -2762,7 +2759,7 @@ struct _MetaLookupCache {
 
 #ifdef HAVE_LIBUDEV
 
-struct udev *udev;
+static struct udev *udev;
 G_LOCK_DEFINE_STATIC (udev);
 
 static char *
@@ -3084,7 +3081,7 @@ find_mountpoint_for (MetaLookupCache *cache,
 {
   char *first_dir, *dir, *last;
   const char *prefix;
-  dev_t dir_dev;
+  dev_t dir_dev = 0;
 
   first_dir = get_dirname (file);
   if (first_dir == NULL)
@@ -3105,8 +3102,7 @@ find_mountpoint_for (MetaLookupCache *cache,
     {
       if (dir)
 	dir_dev = get_devnum (dir);
-      if (dir == NULL ||
-	  dev != dir_dev)
+      if (dir == NULL || dev != dir_dev)
 	{
 	  g_free (dir);
 	  cache->last_parent_mountpoint = last;

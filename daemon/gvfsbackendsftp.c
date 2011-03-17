@@ -3209,9 +3209,7 @@ replace_truncate_original (GVfsBackendSftp *backend,
 {
   GVfsJobOpenForWrite *op_job;
   GDataOutputStream *command;
-  ReplaceData *data;
 
-  data = job->backend_data;
   op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
   
   command = new_command_stream (backend,
@@ -4031,9 +4029,7 @@ query_info_reply (GVfsBackendSftp *backend,
       if (reply->type == SSH_FXP_NAME)
         {
           char *symlink_target;
-          guint32 count;
           
-          count = g_data_input_stream_read_uint32 (reply->data, NULL, NULL);
           symlink_target = read_string (reply->data, NULL);
           g_file_info_set_symlink_target (op_job->file_info, symlink_target);
           g_free (symlink_target);

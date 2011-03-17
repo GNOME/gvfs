@@ -36,7 +36,6 @@
 #include "ggphoto2volume.h"
 
 #ifdef HAVE_GUDEV
-#include <gio/gio.h>
 #include <gio/gunixmounts.h>
 #else
 #include "hal-pool.h"
@@ -110,10 +109,6 @@ get_hal_pool (void)
 static void
 g_gphoto2_volume_monitor_dispose (GObject *object)
 {
-  GGPhoto2VolumeMonitor *monitor;
-
-  monitor = G_GPHOTO2_VOLUME_MONITOR (object);
-
   G_LOCK (hal_vm);
   the_volume_monitor = NULL;
   G_UNLOCK (hal_vm);

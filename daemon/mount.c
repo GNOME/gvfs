@@ -1190,7 +1190,7 @@ dbus_message_function (DBusConnection  *connection,
   return res;
 }
 
-struct DBusObjectPathVTable tracker_dbus_vtable = {
+static struct DBusObjectPathVTable tracker_dbus_vtable = {
   NULL,
   dbus_message_function
 };

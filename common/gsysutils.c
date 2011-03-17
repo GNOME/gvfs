@@ -89,7 +89,7 @@ _g_socket_receive_fd (int socket_fd)
 
   iov[0].iov_base = buf;
   iov[0].iov_len = 1;
-  msg.msg_name = 0;
+  msg.msg_name = NULL;
   msg.msg_namelen = 0;
   msg.msg_iov = iov;
   msg.msg_iovlen = 1;
@@ -165,7 +165,7 @@ _g_socket_connect (const char *address,
       strncpy (addr.sun_path, path, path_len);
     }
   
-  if (connect (fd, (struct sockaddr*) &addr, G_STRUCT_OFFSET (struct sockaddr_un, sun_path) + path_len) < 0)
+  if (connect (fd, (const struct sockaddr*) &addr, G_STRUCT_OFFSET (struct sockaddr_un, sun_path) + path_len) < 0)
     {      
       int errsv = errno;
 

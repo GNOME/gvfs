@@ -43,10 +43,6 @@ static gboolean     try          (GVfsJob        *job);
 static void
 g_vfs_job_open_icon_for_read_finalize (GObject *object)
 {
-  GVfsJobOpenIconForRead *job;
-
-  job = G_VFS_JOB_OPEN_ICON_FOR_READ (object);
-
   if (G_OBJECT_CLASS (g_vfs_job_open_icon_for_read_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_open_icon_for_read_parent_class)->finalize) (object);
 }

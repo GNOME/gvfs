@@ -199,7 +199,7 @@ main (int argc, char *argv[])
 			     attribute,
 			     type,
 			     value,
-			     0, 0, &error))
+			     0, NULL, &error))
     {
       g_printerr (_("Error setting attribute: %s\n"), error->message);
       g_error_free (error);

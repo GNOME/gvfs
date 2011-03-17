@@ -730,13 +730,11 @@ static gboolean
 ms_response_is_target (MsResponse *response)
 {
   const char *text;
-  const char *path;
   SoupURI    *target;
   SoupURI    *uri;
   gboolean    res;
 
   uri    = NULL;
-  path   = NULL;
   target = response->multistatus->target;
   text   = node_get_content (response->href);
 

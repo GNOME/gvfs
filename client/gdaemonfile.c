@@ -1684,7 +1684,7 @@ g_daemon_file_poll_mountable (GFile               *file,
 		      callback, user_data,
 		      poll_mountable_async_cb,
 		      NULL,
-		      0,
+		      NULL,
                       0);
 }
 
