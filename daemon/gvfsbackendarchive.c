@@ -256,10 +256,15 @@ g_vfs_backend_archive_init (GVfsBackendArchive *archive)
 static ArchiveFile *
 archive_file_get_from_path (ArchiveFile *file, const char *filename, gboolean add)
 {
-  char **names = g_strsplit (filename, "/", -1);
+  char **names;
   ArchiveFile *cur;
   GSList *walk;
   guint i;
+
+  /* libarchive reports paths starting with ./ for some archive types */
+  if (g_str_has_prefix (filename, "./"))
+    filename += 2;
+  names = g_strsplit (filename, "/", -1);
 
   DEBUG ("%s %s\n", add ? "add" : "find", filename);
   for (i = 0; file && names[i] != NULL; i++)
@@ -626,6 +631,7 @@ do_open_for_read (GVfsBackend *       backend,
   struct archive_entry *entry;
   int result;
   ArchiveFile *file;
+  const char *entry_pathname;
 
   file = archive_file_find (ba, filename);
   if (file == NULL)
@@ -657,8 +663,12 @@ do_open_for_read (GVfsBackend *       backend,
 	    archive_set_error (archive->archive, ARCHIVE_OK, "No error");
 	    archive_clear_error (archive->archive);
 	  }
-                              
-          if (g_str_equal (archive_entry_pathname (entry), filename + 1))
+
+          entry_pathname = archive_entry_pathname (entry);
+          /* skip leading garbage if present */
+          if (g_str_has_prefix (entry_pathname, "./"))
+            entry_pathname += 2;
+          if (g_str_equal (entry_pathname, filename + 1))
             {
               /* SUCCESS */
               g_vfs_job_open_for_read_set_handle (job, archive);
