@@ -61,6 +61,7 @@ struct _GVfsBackendSmb
   char *share;
   char *user;
   char *domain;
+  char *path;
   char *default_workgroup;
   
   SMBCCTX *smb_context;
@@ -106,6 +107,7 @@ g_vfs_backend_smb_finalize (GObject *object)
   g_free (backend->server);
   g_free (backend->user);
   g_free (backend->domain);
+  g_free (backend->path);
   g_free (backend->default_workgroup);
   
   if (G_OBJECT_CLASS (g_vfs_backend_smb_parent_class)->finalize)
@@ -565,7 +567,11 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_mount_spec (backend, smb_mount_spec);
   g_mount_spec_unref (smb_mount_spec);
 
-  uri = create_smb_uri (op_backend->server, op_backend->share, NULL);
+  /* FIXME: we're stat()-ing user-specified path here, not the root. Ideally we
+            would like to fallback to root when first mount attempt fails, though
+            it would be tough to actually say if it was an authentication failure
+            or the particular path problem. */
+  uri = create_smb_uri (op_backend->server, op_backend->share, op_backend->path);
 
 
   /*  Samba mount loop  */
@@ -622,6 +628,7 @@ do_mount (GVfsBackend *backend,
 
   /* Mount was successful */
 
+  g_vfs_backend_set_default_location (backend, op_backend->path);
   g_vfs_keyring_save_password (op_backend->last_user,
 			       op_backend->server,
 			       op_backend->last_domain,
@@ -643,7 +650,7 @@ try_mount (GVfsBackend *backend,
 	   gboolean is_automount)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  const char *server, *share, *user, *domain;
+  const char *server, *share, *user, *domain, *path;
 
   server = g_mount_spec_get (mount_spec, "server");
   share = g_mount_spec_get (mount_spec, "share");
@@ -658,11 +665,13 @@ try_mount (GVfsBackend *backend,
 
   user = g_mount_spec_get (mount_spec, "user");
   domain = g_mount_spec_get (mount_spec, "domain");
+  path = mount_spec->mount_prefix;
   
   op_backend->server = g_strdup (server);
   op_backend->share = g_strdup (share);
   op_backend->user = g_strdup (user);
   op_backend->domain = g_strdup (domain);
+  op_backend->path = g_strdup (path);
   
   return FALSE;
 }
