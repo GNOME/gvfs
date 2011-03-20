@@ -4,889 +4,1021 @@
 #
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
 # Raivis Dejus <orvils@gmail.com>, 2009.
+# Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug."
 "cgi?product=gvfs&component=general\n"
-"POT-Creation-Date: 2008-12-30 21:27+0000\n"
-"PO-Revision-Date: 2009-01-04 17:38+0200\n"
-"Last-Translator: Raivis Dejus <orvils@gmail.com>\n"
-"Language-Team: en_US <locale@laka.lv>\n"
+"POT-Creation-Date: 2010-11-12 19:26+0000\n"
+"PO-Revision-Date: 2011-03-10 18:13+0200\n"
+"Last-Translator: Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>\n"
+"Language-Team: Latvian <lata-l10n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2;\n"
 "X-Launchpad-Export-Date: 2009-01-04 12:48+0000\n"
-"X-Generator: Lokalize 0.2\n"
+"X-Generator: Lokalize 1.1\n"
 
-#: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1984
+#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2376
 msgid "Operation not supported, files on different mounts"
 msgstr "Darbība nav atbalstīta, faili atrodas dažādos montējumos"
 
-#: ../client/gdaemonfile.c:787
-msgid "Invalid return value from get_info"
-msgstr "Nederīga get_info atgrieztā vērtība"
+#. Translators: %s is the name of a programming function
+#: ../client/gdaemonfile.c:868 ../client/gdaemonfile.c:902
+#: ../client/gdaemonfile.c:1017 ../client/gdaemonfile.c:1096
+#: ../client/gdaemonfile.c:1159 ../client/gdaemonfile.c:1222
+#: ../client/gdaemonfile.c:1288 ../client/gdaemonfile.c:1350
+#: ../client/gdaemonfile.c:1367 ../client/gdaemonfile.c:1851
+#: ../client/gdaemonfile.c:1880 ../client/gdaemonfile.c:2036
+#: ../client/gdaemonfile.c:2536 ../client/gdaemonfile.c:2585
+#: ../client/gdaemonfile.c:2649 ../client/gdaemonfile.c:2733
+#: ../client/gdaemonfile.c:2808 ../client/gdaemonfile.c:2996
+#: ../client/gdaemonfile.c:3076 ../client/gvfsiconloadable.c:145
+#: ../client/gvfsiconloadable.c:374
+#, c-format
+#| msgid "Invalid return value from open"
+msgid "Invalid return value from %s"
+msgstr "Nederīga atgrieztā vērtība no %s"
 
-#: ../client/gdaemonfile.c:816 ../client/gdaemonfile.c:1563
-msgid "Invalid return value from query_info"
-msgstr "Nederīga query_info atgrieztā vērtība"
-
-#: ../client/gdaemonfile.c:894 ../client/gvfsiconloadable.c:338
+#: ../client/gdaemonfile.c:985 ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
-msgstr "Nevar iegūt straumes faila aprakstītāju"
+msgstr "Nevarēja saņemt straumes faila aprakstītāju"
 
-#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
-#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
-#: ../client/gdaemonfile.c:1176 ../client/gdaemonfile.c:2252
-#: ../client/gdaemonfile.c:2330 ../client/gdaemonfile.c:2589
-#: ../client/gvfsiconloadable.c:370
-msgid "Invalid return value from open"
-msgstr "Nederīga open atgrieztā vērtība"
-
-#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
-#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
-#: ../client/gdaemonfile.c:2220 ../client/gvfsiconloadable.c:155
+#: ../client/gdaemonfile.c:1106 ../client/gdaemonfile.c:1169
+#: ../client/gdaemonfile.c:1232 ../client/gdaemonfile.c:1298
+#: ../client/gdaemonfile.c:2615 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "Netika iegūts straumes faila aprakstītājs"
 
-#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
-msgid "Invalid return value from call"
-msgstr "Nederīga call atgrieztā vērtība"
-
-#: ../client/gdaemonfile.c:1534
-msgid "Invalid return value from get_filesystem_info"
-msgstr "Nederīga get_filesystem_info atgrieztā vērtība"
-
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1647
+#: ../client/gdaemonfile.c:1964
 msgid "Could not find enclosing mount"
 msgstr "Nevarēja atrast ietverošo montējumu"
 
-#: ../client/gdaemonfile.c:1677
+#: ../client/gdaemonfile.c:1994
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Nederīgs faila nosaukums %s"
 
-#: ../client/gdaemonfile.c:1719
-msgid "Invalid return value from query_filesystem_info"
-msgstr "Nederīga query_filesystem_info atgrieztā vērtība"
+#: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1200
+#: ../client/gdaemonvfs.c:1335 ../client/gdaemonvfs.c:1388
+#, c-format
+msgid "Error setting file metadata: %s"
+msgstr "Kļūda, iestatot faila metadatus: %s"
 
-#: ../client/gdaemonfile.c:2142
-msgid "Invalid return value from monitor_dir"
-msgstr ""
+#: ../client/gdaemonfile.c:2233 ../client/gdaemonvfs.c:1389
+msgid "values must be string or list of strings"
+msgstr "vērtībai ir jābūt virknei vai virkņu sarakstam"
 
-#: ../client/gdaemonfile.c:2191
-msgid "Invalid return value from monitor_file"
-msgstr ""
-
-#: ../client/gdaemonfileenumerator.c:351
-#: ../client/gdaemonfileinputstream.c:518
-#: ../client/gdaemonfileinputstream.c:674
-#: ../client/gdaemonfileinputstream.c:782
-#: ../client/gdaemonfileinputstream.c:1032
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:636
-#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:741
-#: ../daemon/gvfsbackendobexftp.c:762 ../daemon/gvfsbackendobexftp.c:881
-#: ../daemon/gvfsbackendobexftp.c:1018 ../daemon/gvfsbackendobexftp.c:1082
-#: ../daemon/gvfsbackendobexftp.c:1219 ../daemon/gvfsbackendobexftp.c:1246
-#: ../daemon/gvfsbackendobexftp.c:1305 ../daemon/gvfsbackendobexftp.c:1327
-#: ../daemon/gvfsbackendobexftp.c:1387 ../daemon/gvfsbackendobexftp.c:1406
-#: ../daemon/gvfsbackendsmb.c:1105 ../daemon/gvfsbackendtest.c:87
-#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
-#: ../daemon/gvfschannel.c:298
+#: ../client/gdaemonfileenumerator.c:466 ../client/gdaemonfileenumerator.c:549
+#: ../client/gdaemonfileenumerator.c:600
+#: ../client/gdaemonfileinputstream.c:630
+#: ../client/gdaemonfileinputstream.c:783
+#: ../client/gdaemonfileinputstream.c:901
+#: ../client/gdaemonfileinputstream.c:1149
+#: ../client/gdaemonfileinputstream.c:1391
+#: ../client/gdaemonfileoutputstream.c:506
+#: ../client/gdaemonfileoutputstream.c:681
+#: ../client/gdaemonfileoutputstream.c:873
+#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1048
+#: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1106
+#: ../daemon/gvfsbackendobexftp.c:1225 ../daemon/gvfsbackendobexftp.c:1362
+#: ../daemon/gvfsbackendobexftp.c:1426 ../daemon/gvfsbackendobexftp.c:1628
+#: ../daemon/gvfsbackendobexftp.c:1735 ../daemon/gvfsbackendobexftp.c:1897
+#: ../daemon/gvfsbackendobexftp.c:1924 ../daemon/gvfsbackendobexftp.c:1983
+#: ../daemon/gvfsbackendobexftp.c:2005 ../daemon/gvfsbackendobexftp.c:2068
+#: ../daemon/gvfsbackendobexftp.c:2087 ../daemon/gvfsbackendsmb.c:1184
+#: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1069
+#: ../monitor/proxy/gproxydrive.c:514 ../monitor/proxy/gproxydrive.c:602
+#: ../monitor/proxy/gproxydrive.c:750 ../monitor/proxy/gproxydrive.c:885
+#: ../monitor/proxy/gproxydrive.c:936 ../monitor/proxy/gproxydrive.c:1060
+#: ../monitor/proxy/gproxymount.c:471 ../monitor/proxy/gproxymount.c:556
+#: ../monitor/proxy/gproxyvolume.c:807 ../monitor/proxy/gproxyvolume.c:884
 msgid "Operation was cancelled"
 msgstr "Darbība tika atcelta"
 
-#: ../client/gdaemonfileinputstream.c:450
-#: ../client/gdaemonfileinputstream.c:458
-#: ../client/gdaemonfileinputstream.c:1300
-#: ../client/gdaemonfileinputstream.c:1310
-#: ../client/gdaemonfileoutputstream.c:402
-#: ../client/gdaemonfileoutputstream.c:410
-#: ../client/gdaemonfileoutputstream.c:1054
-#: ../client/gdaemonfileoutputstream.c:1064
+#: ../client/gdaemonfileinputstream.c:527
+#: ../client/gdaemonfileinputstream.c:535
+#: ../client/gdaemonfileinputstream.c:1684
+#: ../client/gdaemonfileinputstream.c:1694
+#: ../client/gdaemonfileoutputstream.c:450
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:1236
+#: ../client/gdaemonfileoutputstream.c:1246
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "Kļūda plūsmas protokolā: %s"
 
-#: ../client/gdaemonfileinputstream.c:458
-#: ../client/gdaemonfileinputstream.c:1310
-#: ../client/gdaemonfileoutputstream.c:410
-#: ../client/gdaemonfileoutputstream.c:1064
+#: ../client/gdaemonfileinputstream.c:535
+#: ../client/gdaemonfileinputstream.c:1694
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:1246
 msgid "End of stream"
 msgstr "Plūsmas beigas"
 
-#: ../client/gdaemonfileinputstream.c:1207
-#: ../client/gdaemonfileoutputstream.c:942
+#: ../client/gdaemonfileinputstream.c:1330
+#: ../client/gdaemonfileoutputstream.c:981
 msgid "Seek not supported on stream"
-msgstr "Meklešana plūsmā nav atbalstīta"
+msgstr "Meklēšana plūsmā nav atbalstīta"
 
-#: ../client/gdaemonfileinputstream.c:1237
-msgid "The query info operation is not supported"
-msgstr ""
-
-#: ../client/gdaemonfileoutputstream.c:991
-#, c-format
-msgid "Query info not supported on stream"
-msgstr ""
-
-#: ../client/gdaemonvfs.c:830
+#: ../client/gdaemonvfs.c:832
 #, c-format
 msgid "Error while getting mount info: %s"
-msgstr ""
+msgstr "Kļūda, saņemot informāciju par montējumu: %s"
 
-#: ../client/gvfsdaemondbus.c:568 ../client/gvfsdaemondbus.c:999
+#: ../client/gdaemonvfs.c:1201
+msgid "Can't contact session bus"
+msgstr "Nevar sazināties ar sesijas kopni"
+
+#: ../client/gvfsdaemondbus.c:570 ../client/gvfsdaemondbus.c:1002
 #, c-format
 msgid "Error connecting to daemon: %s"
-msgstr ""
-
-#: ../client/gvfsiconloadable.c:145
-msgid "Invalid return value from open_icon_for_read"
-msgstr "Nederīga open_icon_for_read atgrieztā vērtība"
+msgstr "Kļūda, savienojoties ar dēmonu: %s"
 
 #: ../common/gsysutils.c:136
 #, c-format
 msgid "Error creating socket: %s"
-msgstr ""
+msgstr "Kļūda, izveidojot ligzdu: %s"
 
 #: ../common/gsysutils.c:174
 #, c-format
 msgid "Error connecting to socket: %s"
-msgstr ""
+msgstr "Kļūda, savienojoties ar ligzdu: %s"
 
-#: ../common/gvfsdaemonprotocol.c:454
+#: ../common/gvfsdaemonprotocol.c:522
 msgid "Invalid file info format"
-msgstr ""
+msgstr "Nederīgs faila informācijas formāts"
 
-#: ../common/gvfsdaemonprotocol.c:471
+#: ../common/gvfsdaemonprotocol.c:540
 msgid "Invalid attribute info list content"
-msgstr ""
+msgstr "Nederīgs atribūtu informācijas saraksta saturs"
 
-#: ../common/gvfsdnssdresolver.c:208
+#: ../common/gvfsdnssdresolver.c:209
 #, c-format
 msgid "Error initializing Avahi: %s"
-msgstr ""
+msgstr "Kļūda, inicializējot Avahi: %s"
 
-#: ../common/gvfsdnssdresolver.c:254
+#: ../common/gvfsdnssdresolver.c:255
 #, c-format
 msgid "Error creating Avahi resolver: %s"
-msgstr ""
+msgstr "Kļūda, izveidojot Avahi atrisinātāju: %s"
 
-#: ../common/gvfsdnssdresolver.c:1094
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#.
+#: ../common/gvfsdnssdresolver.c:1100
 #, c-format
 msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr ""
+msgstr "Kļūda, risinot \"%s\" servisu \"%s\" domēnā \"%s\""
 
-#: ../common/gvfsdnssdresolver.c:1114
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#. * - the fourth %s refers to the required TXT keys
+#.
+#: ../common/gvfsdnssdresolver.c:1126
 #, c-format
 msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
 msgstr ""
+"Kļūda, risinot \"%s\" servisu \"%s\" domēnā \"%s\". Trūkst viens vai vairāki "
+"TXT ieraksti. Nepieciešamās atslēgas: \"%s\"."
 
-#: ../common/gvfsdnssdresolver.c:1126
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#.
+#: ../common/gvfsdnssdresolver.c:1143
 #, c-format
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr ""
+msgstr "Iestājās noildze, risinot \"%s\" servisu \"%s\" domēnā \"%s\""
 
 #: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
 #, c-format
 msgid "Malformed dns-sd encoded_triple '%s'"
-msgstr ""
+msgstr "Slikti noformēts dns-sd encoded_triple '%s'"
 
 #: ../common/gvfsicon.c:250
 #, c-format
 msgid "Can't handle version %d of GVfsIcon encoding"
-msgstr ""
+msgstr "Nevar apstrādāt GVfsIcon versijas %d kodējumu"
 
 #: ../common/gvfsicon.c:260
 msgid "Malformed input data for GVfsIcon"
-msgstr ""
+msgstr "Slikti formēti GVfsIcon ievades dati"
 
-#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:206
+#: ../daemon/daemon-main.c:76 ../daemon/daemon-main.c:230
 #, c-format
 msgid "Error connecting to D-Bus: %s"
-msgstr ""
+msgstr "Kļūda, savienojoties ar D-Bus: %s"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "ftp"
-#: ../daemon/daemon-main.c:78
+#: ../daemon/daemon-main.c:91
 #, c-format
 msgid "%s Filesystem Service"
-msgstr ""
+msgstr "%s failu sistēmas serviss"
 
-#: ../daemon/daemon-main.c:97
+#: ../daemon/daemon-main.c:110 ../programs/gvfs-copy.c:90
+#: ../programs/gvfs-move.c:78
 #, c-format
 msgid "Error: %s"
 msgstr "Kļūda: %s"
 
-#: ../daemon/daemon-main.c:131
+#: ../daemon/daemon-main.c:155
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
-msgstr ""
+msgstr "Lietojums: %s --spawner dbus-id objekta_ceļš"
 
-#: ../daemon/daemon-main.c:155 ../daemon/daemon-main.c:173
+#: ../daemon/daemon-main.c:179 ../daemon/daemon-main.c:197
 #, c-format
 msgid "Usage: %s key=value key=value ..."
-msgstr ""
+msgstr "Lietojums: %s key=vērtība key=vērtība ..."
 
-#: ../daemon/daemon-main.c:171
+#: ../daemon/daemon-main.c:195
 #, c-format
 msgid "No mount type specified"
-msgstr ""
+msgstr "Nav norādīts montējuma tips"
 
-#: ../daemon/daemon-main.c:241
+#: ../daemon/daemon-main.c:265
 #, c-format
 msgid "mountpoint for %s already running"
-msgstr ""
+msgstr "%s montējuma punkts jau darbojas"
 
-#: ../daemon/daemon-main.c:252
+#: ../daemon/daemon-main.c:276
 msgid "error starting mount daemon"
-msgstr ""
+msgstr "kļūda, startējot montēšanas dēmonu"
 
-#. FIXME: this should really be "/ in %s", but can't change
-#. due to string freeze.
-#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:315 ../daemon/gvfsbackendftp.c:1094
-#: ../daemon/gvfsbackendsftp.c:1903
+#: ../daemon/gvfsbackend.c:933 ../monitor/gdu/ggdumount.c:921
+#| msgid "Log In Anyway"
+msgid "Unmount Anyway"
+msgstr "Tomēr atmontēt"
+
+#: ../daemon/gvfsbackend.c:934 ../daemon/gvfsbackendafc.c:281
+#: ../monitor/gdu/ggdudrive.c:1022 ../monitor/gdu/ggdumount.c:922
+#| msgid "Cancel Login"
+msgid "Cancel"
+msgstr "Atcelt"
+
+#: ../daemon/gvfsbackend.c:936 ../monitor/gdu/ggdumount.c:923
+msgid ""
+"Volume is busy\n"
+"One or more applications are keeping the volume busy."
+msgstr ""
+"Sējums ir aizņemts\n"
+"Viena vai vairākas lietotnes izmanto šo sējumu."
+
+#: ../daemon/gvfsbackendafc.c:159
+msgid "Internal Apple File Control error"
+msgstr "Iekšēja Apple File Control kļūda"
+
+#: ../daemon/gvfsbackendafc.c:163 ../daemon/gvfsbackendftp.c:669
+#| msgid "File doesn't exist"
+msgid "File does not exist"
+msgstr "Fails neeksistē"
+
+#: ../daemon/gvfsbackendafc.c:166
+#| msgid "Directory not empty"
+msgid "The directory is not empty"
+msgstr "Mape nav tukša"
+
+#: ../daemon/gvfsbackendafc.c:170
+#| msgid "The file is not a directory"
+msgid "The device did not respond"
+msgstr "Ierīce neatbild"
+
+#: ../daemon/gvfsbackendafc.c:174
+msgid "The connection was interrupted"
+msgstr "Savienojums tika pārtraukts"
+
+#: ../daemon/gvfsbackendafc.c:178
+msgid "Invalid Apple File Control data received"
+msgstr "Saņemti nederīgi Apple File Control dati"
+
+#: ../daemon/gvfsbackendafc.c:182
 #, c-format
-msgid "/ on %s"
-msgstr ""
+msgid "Unhandled Apple File Control error (%d)"
+msgstr "Neapstrādāta Apple File Control kļūda (%d)"
 
-#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1640
-#: ../daemon/gvfsbackendsftp.c:1566
-msgid "No hostname specified"
-msgstr ""
+#: ../daemon/gvfsbackendafc.c:199
+msgid "Lockdown Error: Invalid Argument"
+msgstr "Noslēgšanas kļūda: nederīgs parametrs"
 
-#: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1591 ../daemon/gvfsbackendhttp.c:306
-#: ../daemon/gvfsbackendobexftp.c:561 ../daemon/gvfsbackendobexftp.c:572
-#: ../daemon/gvfsbackendsmb.c:641
+#: ../daemon/gvfsbackendafc.c:203 ../daemon/gvfsbackendsftp.c:310
+#: ../daemon/gvfsbackendsftp.c:1834 ../daemon/gvfsftptask.c:400
+msgid "Permission denied"
+msgstr "Pieeja liegta"
+
+#: ../daemon/gvfsbackendafc.c:206
+#, c-format
+msgid "Unhandled Lockdown error (%d)"
+msgstr "Neapstrādāta noslēgšanas kļūda (%d)"
+
+#: ../daemon/gvfsbackendafc.c:223
+msgid "libimobiledevice Error: Invalid Argument"
+msgstr "libimobiledevice kļūda: nederīgs parametrs"
+
+#: ../daemon/gvfsbackendafc.c:227
+msgid ""
+"libimobiledevice Error: No device found. Make sure usbmuxd is set up "
+"correctly."
+msgstr ""
+"libimobiledevice kļūda: nav atrastu ierīču. Pārliecinieties, ka usbmuxd ir "
+"uzstādīts pareizi."
+
+#: ../daemon/gvfsbackendafc.c:230
+#, c-format
+msgid "Unhandled libimobiledevice error (%d)"
+msgstr "Neapstrādātā libimobiledevice kļūda (%d)"
+
+#: ../daemon/gvfsbackendafc.c:281
+msgid "Try again"
+msgstr "Mēģināt vēlreiz"
+
+#: ../daemon/gvfsbackendafc.c:299 ../daemon/gvfsbackendarchive.c:536
+#: ../daemon/gvfsbackendarchive.c:565 ../daemon/gvfsbackenddav.c:1631
+#: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:861
+#: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendobexftp.c:896
+#: ../daemon/gvfsbackendsmb.c:669
 msgid "Invalid mount spec"
-msgstr ""
+msgstr "Nederīga montēšanas specifikācija"
 
-#: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
-#: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:921
-#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:393
-#: ../daemon/gvfsbackendftp.c:2262 ../daemon/gvfsbackendnetwork.c:590
-#: ../daemon/gvfsbackendsmbbrowse.c:804 ../daemon/gvfsbackendsmbbrowse.c:871
-#: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmbbrowse.c:1111
+#: ../daemon/gvfsbackendafc.c:305
+msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
+msgstr "Nederīga AFC vieta: tai ir jābūt formā afc://uuid:porta-numurs"
+
+#: ../daemon/gvfsbackendafc.c:320
+#, c-format
+msgid "Service %d on Apple Mobile Device"
+msgstr "Serviss %d uz Apple Mobile Device"
+
+#: ../daemon/gvfsbackendafc.c:326
+#, c-format
+msgid "Apple Mobile Device"
+msgstr "Apple Mobile Device"
+
+#: ../daemon/gvfsbackendafc.c:375
+#, c-format
+#| msgid "%s: %s"
+msgid "%s (%s)"
+msgstr "%s (%s)"
+
+#. translators:
+#. * %s is the device name. 'Try again' is the caption of the button
+#. * shown in the dialog which is defined above.
+#: ../daemon/gvfsbackendafc.c:455
+#, c-format
+msgid ""
+"Device '%s' is password protected. Enter the password on the device and "
+"click 'Try again'."
+msgstr ""
+"Ierīce '%s' ir aizsargāta ar paroli. Ievadiet ierīces paroli un spiediet "
+"'Mēģināt vēlreiz'."
+
+#: ../daemon/gvfsbackendafc.c:585 ../daemon/gvfsbackendarchive.c:632
+#: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1886
+#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:723
+#: ../daemon/gvfsbackendtrash.c:232
+msgid "Can't open directory"
+msgstr "Nevar atvērt mapi"
+
+#: ../daemon/gvfsbackendafc.c:593 ../daemon/gvfsbackendarchive.c:624
+#: ../daemon/gvfsbackendarchive.c:668 ../daemon/gvfsbackendarchive.c:720
+#: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendcdda.c:986
+#: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:392
+#: ../daemon/gvfsbackendftp.c:1000 ../daemon/gvfsbackendnetwork.c:646
+#: ../daemon/gvfsbackendsmbbrowse.c:1109 ../daemon/gvfsbackendsmbbrowse.c:1176
+#: ../daemon/gvfsbackendsmbbrowse.c:1348 ../daemon/gvfsbackendsmbbrowse.c:1418
 #, c-format
 msgid "File doesn't exist"
 msgstr "Fails neeksistē"
 
-#: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:440
-#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:637
+#: ../daemon/gvfsbackendafc.c:701 ../daemon/gvfsbackendafc.c:1506
+#| msgid "backups not supported yet"
+msgid "Backups are not yet supported."
+msgstr "Rezerves kopijas vēl netiek atbalstītas."
+
+#: ../daemon/gvfsbackendafc.c:839
+#| msgid "Invalid filename %s"
+msgid "Invalid seek type"
+msgstr "Nederīgs meklēšanas tips"
+
+#: ../daemon/gvfsbackendafc.c:1425 ../daemon/gvfsbackendsftp.c:1832
+#: ../daemon/gvfsbackendsftp.c:4637 ../daemon/gvfsbackendsmb.c:1723
+#: ../daemon/gvfsftptask.c:392
+msgid "Operation unsupported"
+msgstr "Neatbalstīta darbība"
+
+#. FIXME: this should really be "/ in %s", but can't change
+#. due to string freeze.
+#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#: ../daemon/gvfsbackendarchive.c:323 ../daemon/gvfsbackendsftp.c:2269
+#: ../daemon/gvfsftpdircache.c:428
+#, c-format
+msgid "/ on %s"
+msgstr "/ uz %s"
+
+#: ../daemon/gvfsbackendarchive.c:525 ../daemon/gvfsbackendftp.c:600
+#: ../daemon/gvfsbackendsftp.c:1745
+msgid "No hostname specified"
+msgstr "Nav norādīts datora nosaukums"
+
+#: ../daemon/gvfsbackendarchive.c:758 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
+#: ../daemon/gvfsbackendftp.c:294 ../daemon/gvfsbackendnetwork.c:693
+#: ../daemon/gvfsbackendsftp.c:3883 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
-msgstr "Fails nav direktorija"
+msgstr "Fails nav mape"
 
 #. Translators: This is the name of the backend
 #: ../daemon/gvfsbackendburn.c:346
 msgid "Burn"
-msgstr ""
+msgstr "Rakstīt"
 
 #: ../daemon/gvfsbackendburn.c:376
 msgid "Unable to create temporary directory"
-msgstr "Neizdevās izveidot pagaidu direktoriju"
+msgstr "Neizdevās izveidot pagaidu mapi"
 
 #: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
-#: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
-#: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1063
-#: ../daemon/gvfsbackendgphoto2.c:1916 ../daemon/gvfsbackendgphoto2.c:2626
-#: ../daemon/gvfsbackendtrash.c:214
+#: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
+#: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
+#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:726
+#: ../daemon/gvfsbackendgphoto2.c:1207 ../daemon/gvfsbackendgphoto2.c:2207
+#: ../daemon/gvfsbackendgphoto2.c:2926 ../daemon/gvfsbackendsftp.c:1836
+#: ../daemon/gvfsbackendsftp.c:2949 ../daemon/gvfsbackendsftp.c:2962
+#: ../daemon/gvfsbackendsftp.c:2982 ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
-msgstr "Nav tāda faila vai direktorijas"
+msgstr "Nav tāda faila vai mapes"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2183
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2223
+#: ../daemon/gvfsbackendsftp.c:1828
 msgid "Directory not empty"
-msgstr "Direktorija nav tukša"
+msgstr "Mape nav tukša"
 
-#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:906
+#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
+#: ../daemon/gvfsbackendobexftp.c:1810
 msgid "Can't copy file over directory"
-msgstr ""
+msgstr "Nevar nokopēt failu pāri mapei"
 
 #. Translators: this is the display name of the backend
 #: ../daemon/gvfsbackendburn.c:651
 msgid "CD/DVD Creator"
 msgstr "CD/DVD veidotājs"
 
-#: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:926 ../daemon/gvfsbackendgphoto2.c:2700
+#: ../daemon/gvfsbackendburn.c:753 ../daemon/gvfsbackendburn.c:789
+#: ../daemon/gvfsbackendburn.c:924 ../daemon/gvfsbackendburn.c:986
+#: ../daemon/gvfsbackendburn.c:990 ../daemon/gvfsbackendburn.c:1000
+#: ../daemon/gvfsbackendgphoto2.c:3000
 msgid "File exists"
-msgstr "Fails jau eksistē"
+msgstr "Fails eksistē"
 
-#: ../daemon/gvfsbackendburn.c:829 ../daemon/gvfsjobcloseread.c:112
+#: ../daemon/gvfsbackendburn.c:828 ../daemon/gvfsjobcloseread.c:112
 #: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:169
 #: ../daemon/gvfsjobcreatemonitor.c:140 ../daemon/gvfsjobcreatemonitor.c:151
 #: ../daemon/gvfsjobcreatemonitor.c:174 ../daemon/gvfsjobcreatemonitor.c:192
 #: ../daemon/gvfsjobdelete.c:122 ../daemon/gvfsjobenumerate.c:256
 #: ../daemon/gvfsjobmakedirectory.c:122 ../daemon/gvfsjobmount.c:109
 #: ../daemon/gvfsjobmountmountable.c:156 ../daemon/gvfsjobmove.c:168
-#: ../daemon/gvfsjobopenforread.c:130 ../daemon/gvfsjobopenforwrite.c:148
-#: ../daemon/gvfsjobopenforwrite.c:162 ../daemon/gvfsjobopenforwrite.c:176
-#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpull.c:173
-#: ../daemon/gvfsjobpush.c:173 ../daemon/gvfsjobqueryattributes.c:135
-#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
-#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
-#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:150
-#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
-#: ../daemon/gvfsjobunmountmountable.c:132
-#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobwrite.c:120
+#: ../daemon/gvfsjobopenforread.c:133 ../daemon/gvfsjobopenforwrite.c:151
+#: ../daemon/gvfsjobopenforwrite.c:165 ../daemon/gvfsjobopenforwrite.c:179
+#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpollmountable.c:125
+#: ../daemon/gvfsjobpull.c:175 ../daemon/gvfsjobpush.c:175
+#: ../daemon/gvfsjobqueryattributes.c:135 ../daemon/gvfsjobqueryfsinfo.c:131
+#: ../daemon/gvfsjobqueryinfo.c:149 ../daemon/gvfsjobqueryinforead.c:119
+#: ../daemon/gvfsjobqueryinfowrite.c:119 ../daemon/gvfsjobread.c:120
+#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobsetattribute.c:150 ../daemon/gvfsjobsetdisplayname.c:127
+#: ../daemon/gvfsjobstartmountable.c:132 ../daemon/gvfsjobstopmountable.c:135
+#: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
+#: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
+#: ../monitor/gdu/ggdumount.c:1173 ../monitor/gdu/ggdumount.c:1257
+#: ../monitor/gdu/ggduvolume.c:1595
 msgid "Operation not supported by backend"
-msgstr ""
+msgstr "Aizmugure neatbalsta šo darbību"
 
-#: ../daemon/gvfsbackendburn.c:854
+#: ../daemon/gvfsbackendburn.c:853
 msgid "No such file or directory in target path"
-msgstr ""
+msgstr "Mērķa ceļā nav tāda faila vai mapes"
 
-#: ../daemon/gvfsbackendburn.c:877
+#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1386
+#: ../daemon/gvfsbackendobexftp.c:1779
 msgid "Can't copy directory over directory"
-msgstr ""
+msgstr "Nevar uzkopēt mapi virsū mapei"
 
-#: ../daemon/gvfsbackendburn.c:886
+#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1787
+#: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1830
+#: ../daemon/gvfsbackendsftp.c:4445
 msgid "Target file exists"
 msgstr "Mērķa fails eksistē"
 
-#: ../daemon/gvfsbackendburn.c:893
+#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1409
+#: ../daemon/gvfsbackendobexftp.c:1794
 msgid "Can't recursively copy directory"
-msgstr ""
+msgstr "Nevar rekursīvi kopēt mapi"
 
-#: ../daemon/gvfsbackendburn.c:952 ../daemon/gvfsbackendcomputer.c:731
-#: ../daemon/gvfsbackendgphoto2.c:2281 ../daemon/gvfsbackendgphoto2.c:2490
-#: ../daemon/gvfsbackendgphoto2.c:2587 ../daemon/gvfsbackendgphoto2.c:2679
+#: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
+#: ../daemon/gvfsbackendgphoto2.c:2580 ../daemon/gvfsbackendgphoto2.c:2789
+#: ../daemon/gvfsbackendgphoto2.c:2886 ../daemon/gvfsbackendgphoto2.c:2979
 msgid "Not supported"
 msgstr "Nav atbalstīts"
 
-#: ../daemon/gvfsbackendcdda.c:299 ../daemon/gvfsbackendgphoto2.c:1303
+#: ../daemon/gvfsbackendcdda.c:332 ../daemon/gvfsbackendgphoto2.c:1510
+msgid "Cannot create gudev client"
+msgstr "Nevar izveidot gudev klientu"
+
+#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1528
 msgid "Cannot connect to the system bus"
-msgstr ""
+msgstr "Nevar savienoties ar sistēmas kopni"
 
-#: ../daemon/gvfsbackendcdda.c:310 ../daemon/gvfsbackendgphoto2.c:1315
+#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1540
 msgid "Cannot create libhal context"
-msgstr ""
+msgstr "Nevar izveidot libhal kontekstu"
 
-#: ../daemon/gvfsbackendcdda.c:324 ../daemon/gvfsbackendgphoto2.c:1328
+#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1553
 msgid "Cannot initialize libhal"
-msgstr ""
+msgstr "Nevar inicializēt libhal"
 
-#: ../daemon/gvfsbackendcdda.c:339 ../daemon/gvfsbackendcdda.c:415
+#: ../daemon/gvfsbackendcdda.c:393 ../daemon/gvfsbackendcdda.c:477
 msgid "No drive specified"
-msgstr ""
+msgstr "Nav norādīts dzinis"
 
-#: ../daemon/gvfsbackendcdda.c:355
+#: ../daemon/gvfsbackendcdda.c:417
 #, c-format
 msgid "Cannot find drive %s"
-msgstr ""
+msgstr "Nevar atrast dzini %s"
 
-#: ../daemon/gvfsbackendcdda.c:368
+#: ../daemon/gvfsbackendcdda.c:430
 #, c-format
 msgid "Drive %s does not contain audio files"
-msgstr ""
+msgstr "Dzinis %s nesatur audio failus"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:377
+#: ../daemon/gvfsbackendcdda.c:439
 #, c-format
 msgid "cdda mount on %s"
-msgstr ""
+msgstr "cdda montēts uz %s"
 
-#: ../daemon/gvfsbackendcdda.c:378 ../daemon/gvfsbackendcdda.c:895
-#: ../monitor/hal/ghalmount.c:435 ../monitor/hal/ghalvolume.c:233
-#: ../monitor/hal/ghalvolume.c:254
+#: ../daemon/gvfsbackendcdda.c:440 ../daemon/gvfsbackendcdda.c:960
+#: ../monitor/gdu/ggduvolume.c:337 ../monitor/hal/ghalmount.c:325
+#: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #, c-format
 msgid "Audio Disc"
 msgstr "Audio disks"
 
-#: ../daemon/gvfsbackendcdda.c:439 ../daemon/gvfsbackendgphoto2.c:1550
+#: ../daemon/gvfsbackendcdda.c:503
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Failu sistēma ir aizņemta: %d atvērts fails"
+msgstr[1] "Failu sistēma ir aizņemta: %d atvērti faili"
+msgstr[2] "Failu sistēma ir aizņemta: %d atvērtu failu"
 
-#: ../daemon/gvfsbackendcdda.c:630
+#: ../daemon/gvfsbackendcdda.c:695
 #, c-format
 msgid "No such file %s on drive %s"
-msgstr ""
+msgstr "Nav tāda faila %s uz dziņa %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:739
+#: ../daemon/gvfsbackendcdda.c:804
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
-msgstr ""
+msgstr "Kļūda no 'paranoia' uz dziņa %s"
 
-#: ../daemon/gvfsbackendcdda.c:802
+#: ../daemon/gvfsbackendcdda.c:867
 #, c-format
 msgid "Error seeking in stream on drive %s"
-msgstr ""
+msgstr "Kļūda, meklējot plūsmā uz dziņa: %s"
 
-#: ../daemon/gvfsbackendcdda.c:914 ../daemon/gvfsbackendgphoto2.c:1606
+#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1894
 #, c-format
 msgid "No such file"
 msgstr "Nav tāda faila"
 
-#: ../daemon/gvfsbackendcdda.c:928
+#: ../daemon/gvfsbackendcdda.c:993
 #, c-format
 msgid "The file does not exist or isn't an audio track"
-msgstr ""
+msgstr "Fails neeksistē, vai arī tas nav audio celiņš"
 
-#: ../daemon/gvfsbackendcdda.c:1034
+#: ../daemon/gvfsbackendcdda.c:1099
 msgid "Audio CD Filesystem Service"
-msgstr ""
+msgstr "Audio CD failu sistēmas serviss"
 
-#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:693
+#: ../daemon/gvfsbackendcomputer.c:192 ../daemon/gvfsbackendcomputer.c:756
 msgid "Computer"
 msgstr "Dators"
 
-#: ../daemon/gvfsbackendcomputer.c:466
-msgid "Filesystem"
+#: ../daemon/gvfsbackendcomputer.c:521
+#| msgid "Filesystem"
+msgid "File System"
 msgstr "Failu sistēma"
 
-#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1598
-#: ../daemon/gvfsbackendobexftp.c:727 ../daemon/gvfsbackendsmb.c:684
-#: ../daemon/gvfsbackendtrash.c:230
-#, c-format
-msgid "Can't open directory"
-msgstr "Nevar atvērt direktoriju"
-
-#: ../daemon/gvfsbackendcomputer.c:594
+#: ../daemon/gvfsbackendcomputer.c:649
 msgid "Can't open mountable file"
-msgstr ""
+msgstr "Nevar atvērt montējamus failus"
 
-#: ../daemon/gvfsbackendcomputer.c:779 ../daemon/gvfsbackendsftp.c:1044
+#: ../daemon/gvfsbackendcomputer.c:840 ../daemon/gvfsbackendsftp.c:1163
 #, c-format
 msgid "Internal error: %s"
 msgstr "Iekšēja kļūda: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:811 ../daemon/gvfsbackendcomputer.c:928
+#: ../daemon/gvfsbackendcomputer.c:872 ../daemon/gvfsbackendcomputer.c:991
 msgid "Can't mount file"
-msgstr ""
+msgstr "Nevar montēt failu"
 
-#: ../daemon/gvfsbackendcomputer.c:823
+#: ../daemon/gvfsbackendcomputer.c:884
 msgid "No media in the drive"
-msgstr ""
+msgstr "Dzinī nav datu nesēja"
 
-#: ../daemon/gvfsbackendcomputer.c:880 ../daemon/gvfsbackendcomputer.c:971
-#: ../daemon/gvfsbackendcomputer.c:1071
+#: ../daemon/gvfsbackendcomputer.c:941 ../daemon/gvfsbackendcomputer.c:1036
+#: ../daemon/gvfsbackendcomputer.c:1142 ../daemon/gvfsbackendcomputer.c:1232
+#: ../daemon/gvfsbackendcomputer.c:1305 ../daemon/gvfsbackendcomputer.c:1374
 msgid "Not a mountable file"
-msgstr ""
+msgstr "Nav montējams fails"
 
-#: ../daemon/gvfsbackendcomputer.c:986
+#: ../daemon/gvfsbackendcomputer.c:1055
 msgid "Can't unmount file"
-msgstr ""
+msgstr "Nevar atmontēt failu"
 
-#: ../daemon/gvfsbackendcomputer.c:1102
+#: ../daemon/gvfsbackendcomputer.c:1185
 msgid "Can't eject file"
-msgstr ""
+msgstr "Nevar izgrūst failu"
 
-#: ../daemon/gvfsbackenddav.c:526 ../daemon/gvfsbackenddav.c:1658
-#: ../daemon/gvfsbackendhttp.c:252
+#: ../daemon/gvfsbackendcomputer.c:1252 ../daemon/gvfsbackendcomputer.c:1259
+msgid "Can't start file"
+msgstr "Nevar startēt failu"
+
+#: ../daemon/gvfsbackendcomputer.c:1325 ../daemon/gvfsbackendcomputer.c:1332
+#| msgid "Can't open directory"
+msgid "Can't stop file"
+msgstr "Nevar apturēt failu"
+
+#: ../daemon/gvfsbackendcomputer.c:1389 ../daemon/gvfsbackendcomputer.c:1396
+msgid "Can't poll file"
+msgstr "Nevar vaicāt failu"
+
+#: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1698
+#: ../daemon/gvfsbackendhttp.c:261
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP kļūda: %s"
 
-#: ../daemon/gvfsbackenddav.c:543
+#: ../daemon/gvfsbackenddav.c:578
 msgid "Could not parse response"
-msgstr ""
+msgstr "Nevarēja noparsēt atbildi"
 
-#: ../daemon/gvfsbackenddav.c:552
+#: ../daemon/gvfsbackenddav.c:587
 msgid "Empty response"
 msgstr "Tukša atbilde"
 
-#: ../daemon/gvfsbackenddav.c:560
+#: ../daemon/gvfsbackenddav.c:595
 msgid "Unexpected reply from server"
-msgstr ""
+msgstr "Negaidīta atbilde no servera"
 
-#: ../daemon/gvfsbackenddav.c:1179 ../daemon/gvfsbackenddav.c:1798
+#: ../daemon/gvfsbackenddav.c:1214 ../daemon/gvfsbackenddav.c:1838
 msgid "Response invalid"
 msgstr "Nederīga atbilde"
 
-#: ../daemon/gvfsbackenddav.c:1322
+#: ../daemon/gvfsbackenddav.c:1357
 msgid "WebDAV share"
-msgstr ""
+msgstr "WebDAV koplietojums"
 
-#: ../daemon/gvfsbackenddav.c:1324
+#: ../daemon/gvfsbackenddav.c:1359
 #, c-format
 msgid "Enter password for %s"
 msgstr "Ievadiet %s paroli"
 
-#: ../daemon/gvfsbackenddav.c:1327
+#: ../daemon/gvfsbackenddav.c:1362
 msgid "Please enter proxy password"
-msgstr ""
+msgstr "Lūdzu, ievadiet starpnieka paroli"
 
-#: ../daemon/gvfsbackenddav.c:1662 ../daemon/gvfsbackenddav.c:1666
+#: ../daemon/gvfsbackenddav.c:1702 ../daemon/gvfsbackenddav.c:1706
 msgid "Not a WebDAV enabled share"
-msgstr ""
+msgstr "Nav WebDAV aktivēta koplietojums"
 
-#: ../daemon/gvfsbackenddav.c:1694
+#: ../daemon/gvfsbackenddav.c:1734
 #, c-format
 msgid "WebDAV on %s"
-msgstr ""
+msgstr "WebDAV uz %s"
 
-#: ../daemon/gvfsbackenddav.c:1754 ../daemon/gvfsbackenddav.c:1827
+#: ../daemon/gvfsbackenddav.c:1794 ../daemon/gvfsbackenddav.c:1867
 msgid "Could not create request"
-msgstr ""
+msgstr "Nevarēja izveidot pieprasījumu"
 
-#: ../daemon/gvfsbackenddav.c:1890 ../daemon/gvfsbackenddav.c:2143
-#: ../daemon/gvfsbackenddav.c:2254 ../daemon/gvfsbackendftp.c:1860
-#: ../daemon/gvfsbackendftp.c:2526 ../daemon/gvfsbackendsftp.c:3588
-#: ../daemon/gvfsbackendsmb.c:1912
+#: ../daemon/gvfsbackenddav.c:1930 ../daemon/gvfsbackenddav.c:2183
+#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:685
+#: ../daemon/gvfsbackendftp.c:866 ../daemon/gvfsbackendftp.c:1216
+#: ../daemon/gvfsbackendftp.c:1394 ../daemon/gvfsbackendsftp.c:4289
+#: ../daemon/gvfsbackendsmb.c:2059
 msgid "Target file already exists"
 msgstr "Mērķa fails jau eksistē"
 
-#: ../daemon/gvfsbackenddav.c:1963 ../daemon/gvfsbackendsftp.c:2836
-#: ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackenddav.c:2003 ../daemon/gvfsbackendsftp.c:3423
+#: ../daemon/gvfsbackendsmb.c:1153
 msgid "The file was externally modified"
-msgstr ""
+msgstr "Fails tika mainīts no ārpuses"
 
-#: ../daemon/gvfsbackenddav.c:1994 ../daemon/gvfsbackendsmb.c:1110
-#: ../daemon/gvfsbackendsmb.c:1929
+#: ../daemon/gvfsbackenddav.c:2034 ../daemon/gvfsbackendsmb.c:1189
+#: ../daemon/gvfsbackendsmb.c:2076
 msgid "Backup file creation failed"
-msgstr ""
+msgstr "Neizdevās izveidot rezerves kopijas failu"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:487 ../daemon/gvfsbackendnetwork.c:392
+#: ../daemon/gvfsbackenddnssd.c:486 ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "Lokālais tīkls"
 
-#: ../daemon/gvfsbackenddnssd.c:731 ../daemon/gvfsbackendnetwork.c:731
+#: ../daemon/gvfsbackenddnssd.c:730 ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
-msgstr ""
+msgstr "Nevar uzraudzīt failu vai mapi."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:749
+#: ../daemon/gvfsbackenddnssd.c:748
 msgid "Dns-SD"
-msgstr ""
+msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:750 ../daemon/gvfsbackendnetwork.c:676
-#: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
+#: ../daemon/gvfsbackenddnssd.c:749 ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackendnetwork.c:882 ../daemon/gvfsbackendnetwork.c:883
 msgid "Network"
 msgstr "Tīkls"
 
-#: ../daemon/gvfsbackendftp.c:252
-msgid "Accounts are unsupported"
-msgstr ""
-
-#: ../daemon/gvfsbackendftp.c:256
-msgid "Host closed connection"
-msgstr ""
-
-#: ../daemon/gvfsbackendftp.c:260
-msgid "Cannot open data connection. Maybe your firewall prevents this?"
-msgstr ""
-
-#: ../daemon/gvfsbackendftp.c:264
-msgid "Data connection closed"
-msgstr "Datu savienojums slēgts"
-
-#: ../daemon/gvfsbackendftp.c:271 ../daemon/gvfsbackendftp.c:275
-msgid "Operation failed"
-msgstr "Operācija neizdevas"
-
-#: ../daemon/gvfsbackendftp.c:280
-msgid "No space left on server"
-msgstr "Uz servera vairs nav brīvas vietas"
-
-#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendsftp.c:3897
-#: ../daemon/gvfsbackendsmb.c:1576
-msgid "Operation unsupported"
-msgstr "Neatbalstīta operācija"
-
-#: ../daemon/gvfsbackendftp.c:292 ../daemon/gvfsbackendsftp.c:296
-msgid "Permission denied"
-msgstr ""
-
-#: ../daemon/gvfsbackendftp.c:296
-msgid "Page type unknown"
-msgstr "Nezināms lapas tips"
-
-#: ../daemon/gvfsbackendftp.c:300 ../daemon/gvfsbackendftp.c:2372
-msgid "Invalid filename"
-msgstr "Nederīgs faila nosaukums"
-
-#: ../daemon/gvfsbackendftp.c:304 ../daemon/gvfsbackendftp.c:380
-#: ../daemon/gvfsbackendftp.c:409 ../daemon/gvfsbackendftp.c:428
-#: ../daemon/gvfsbackendftp.c:441 ../daemon/gvfsbackendftp.c:929
-msgid "Invalid reply"
-msgstr ""
-
-#: ../daemon/gvfsbackendftp.c:548
-msgid "broken transmission"
-msgstr ""
-
-#: ../daemon/gvfsbackendftp.c:710 ../daemon/gvfsbackendftp.c:851
-msgid "Could not connect to host"
-msgstr ""
-
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1494
+#: ../daemon/gvfsbackendftp.c:423
 #, c-format
 msgid "Enter password for ftp as %s on %s"
-msgstr ""
+msgstr "Ievadiet %s ftp paroli uz %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:1497
+#: ../daemon/gvfsbackendftp.c:426
 #, c-format
 msgid "Enter password for ftp on %s"
-msgstr ""
+msgstr "Ievadiet ftp paroli uz %s"
 
-#: ../daemon/gvfsbackendftp.c:1523 ../daemon/gvfsbackendsftp.c:881
-#: ../daemon/gvfsbackendsmb.c:599
+#: ../daemon/gvfsbackendftp.c:453 ../daemon/gvfsbackendsftp.c:985
+#: ../daemon/gvfsbackendsmb.c:627 ../daemon/gvfsbackendsmbbrowse.c:1010
 msgid "Password dialog cancelled"
-msgstr ""
+msgstr "Paroles dialogs atsaukts"
 
-#: ../daemon/gvfsbackendftp.c:1602
+#: ../daemon/gvfsbackendftp.c:563
 #, c-format
 msgid "ftp on %s"
-msgstr ""
+msgstr "ftp uz %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1606
+#: ../daemon/gvfsbackendftp.c:567
 #, c-format
 msgid "ftp as %s on %s"
-msgstr ""
+msgstr "ftp kā %s uz %s"
 
-#: ../daemon/gvfsbackendftp.c:1690 ../daemon/gvfsbackendsftp.c:1967
-#: ../daemon/gvfsbackendsftp.c:3579
+#: ../daemon/gvfsbackendftp.c:660
+msgid "Insufficient permissions"
+msgstr "Nepietiekamas atļaujas"
+
+#: ../daemon/gvfsbackendftp.c:706 ../daemon/gvfsbackendsftp.c:2333
+#: ../daemon/gvfsbackendsftp.c:3069 ../daemon/gvfsbackendsftp.c:3410
+#: ../daemon/gvfsbackendsftp.c:4280
 msgid "File is directory"
-msgstr "Fails ir direktorija"
+msgstr "Fails ir mape"
 
-#: ../daemon/gvfsbackendftp.c:1912 ../daemon/gvfsbackendftp.c:2487
+#: ../daemon/gvfsbackendftp.c:914 ../daemon/gvfsbackendftp.c:1179
+#: ../daemon/gvfsbackendsftp.c:3276
 msgid "backups not supported yet"
 msgstr "rezerves kopijas vēl netiek atbalstītas"
 
-#: ../daemon/gvfsbackendftp.c:1989
-msgid "filename too long"
-msgstr "faila nosaukums par garu"
-
-#: ../daemon/gvfsbackendftp.c:2506
-msgid "Invalid destination filename"
-msgstr ""
-
-#: ../daemon/gvfsbackendgphoto2.c:486
+#: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
 msgid "%s: %d: Directory or file exists"
-msgstr ""
+msgstr "%s: %d: Mape vai fails eksistē"
 
-#: ../daemon/gvfsbackendgphoto2.c:493
+#: ../daemon/gvfsbackendgphoto2.c:513
 #, c-format
 msgid "%s: %d: No such file or directory"
-msgstr ""
+msgstr "%s: %d: Nav tāda faila vai mapes"
 
-#: ../daemon/gvfsbackendgphoto2.c:499
+#: ../daemon/gvfsbackendgphoto2.c:519
 #, c-format
 msgid "%s: %d: Invalid filename"
-msgstr ""
+msgstr "%s: %d: Nederīgs faila nosaukums"
 
-#: ../daemon/gvfsbackendgphoto2.c:505
+#: ../daemon/gvfsbackendgphoto2.c:525
 #, c-format
 msgid "%s: %d: Not Supported"
-msgstr ""
+msgstr "%s: %d: Netiek atbalstīts"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:675
+#: ../daemon/gvfsbackendgphoto2.c:720 ../daemon/gvfsbackendgphoto2.c:726
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Digitālā fotokamera (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:823 ../monitor/gphoto2/ggphoto2volume.c:183
+#: ../daemon/gvfsbackendgphoto2.c:949 ../monitor/gphoto2/ggphoto2volume.c:197
+#: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
 msgid "%s Camera"
 msgstr "%s fotokamera"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:826 ../monitor/gphoto2/ggphoto2volume.c:178
+#: ../daemon/gvfsbackendgphoto2.c:952 ../monitor/gphoto2/ggphoto2volume.c:192
+#: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
-msgstr ""
+msgstr "%s mūzikas atskaņotājs"
 
-#: ../daemon/gvfsbackendgphoto2.c:835 ../monitor/gphoto2/ggphoto2volume.c:192
+#: ../daemon/gvfsbackendgphoto2.c:961 ../monitor/gphoto2/ggphoto2volume.c:203
+#: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "Fotokamera"
 
-#: ../daemon/gvfsbackendgphoto2.c:837 ../monitor/gphoto2/ggphoto2volume.c:190
+#: ../daemon/gvfsbackendgphoto2.c:963 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
-msgstr ""
+msgstr "Mūzikas atskaņotājs"
 
-#: ../daemon/gvfsbackendgphoto2.c:1343
+#: ../daemon/gvfsbackendgphoto2.c:1569
 msgid "No device specified"
-msgstr ""
+msgstr "Nav norādīta ierīce"
 
-#: ../daemon/gvfsbackendgphoto2.c:1360
+#: ../daemon/gvfsbackendgphoto2.c:1590
 msgid "Cannot create gphoto2 context"
-msgstr ""
+msgstr "Nevar izveidot gphoto2 kontekstu"
 
-#: ../daemon/gvfsbackendgphoto2.c:1370
+#: ../daemon/gvfsbackendgphoto2.c:1600
 msgid "Error creating camera"
-msgstr ""
+msgstr "Kļūda, veidojot fotokameru"
 
-#: ../daemon/gvfsbackendgphoto2.c:1383 ../daemon/gvfsbackendgphoto2.c:1393
+#: ../daemon/gvfsbackendgphoto2.c:1613 ../daemon/gvfsbackendgphoto2.c:1623
 msgid "Error loading device information"
-msgstr ""
+msgstr "Kļūda, ielādējot ierīces informāciju"
 
-#: ../daemon/gvfsbackendgphoto2.c:1405
+#: ../daemon/gvfsbackendgphoto2.c:1635
 msgid "Error looking up device information"
-msgstr ""
+msgstr "Kļūda, uzmeklējot ierīces informāciju"
 
-#: ../daemon/gvfsbackendgphoto2.c:1415
+#: ../daemon/gvfsbackendgphoto2.c:1645
 msgid "Error getting device information"
-msgstr ""
+msgstr "Kļūda, saņemot ierīces informāciju"
 
-#: ../daemon/gvfsbackendgphoto2.c:1428
+#: ../daemon/gvfsbackendgphoto2.c:1658
 msgid "Error setting up camera communications port"
-msgstr ""
+msgstr "Kļūda, iestatot fotokameras komunikācijas portu"
 
-#: ../daemon/gvfsbackendgphoto2.c:1439
+#: ../daemon/gvfsbackendgphoto2.c:1669
 msgid "Error initializing camera"
-msgstr ""
+msgstr "Kļūda, inicializējot fotokameru"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1447
+#: ../daemon/gvfsbackendgphoto2.c:1683
 #, c-format
 msgid "gphoto2 mount on %s"
-msgstr ""
+msgstr "gphoto2 montēts uz %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1522
+#: ../daemon/gvfsbackendgphoto2.c:1765
 msgid "No camera specified"
-msgstr ""
+msgstr "Nav norādītā fotokamera"
 
-#: ../daemon/gvfsbackendgphoto2.c:1614
+#: ../daemon/gvfsbackendgphoto2.c:1806 ../daemon/gvfsbackendgphoto2.c:1832
+#, c-format
+#| msgid "Filesystem"
+msgid "Filesystem is busy"
+msgstr "Failu sistēma ir aizņemta"
+
+#: ../daemon/gvfsbackendgphoto2.c:1902
 msgid "Error creating file object"
-msgstr ""
+msgstr "Kļūda, izveidojot faila objektu"
 
-#: ../daemon/gvfsbackendgphoto2.c:1629
+#: ../daemon/gvfsbackendgphoto2.c:1917
 msgid "Error getting file"
-msgstr ""
+msgstr "Kļūda, saņemot failu"
 
-#: ../daemon/gvfsbackendgphoto2.c:1639
+#: ../daemon/gvfsbackendgphoto2.c:1927
 msgid "Error getting data from file"
-msgstr ""
+msgstr "Kļūda, saņemot datus no faila"
 
-#: ../daemon/gvfsbackendgphoto2.c:1696
+#: ../daemon/gvfsbackendgphoto2.c:1985
 #, c-format
 msgid "Malformed icon identifier '%s'"
-msgstr ""
+msgstr "Slikti noformēts ikonas identifikators '%s'"
 
-#: ../daemon/gvfsbackendgphoto2.c:1772 ../daemon/gvfsbackendgphoto2.c:2950
+#: ../daemon/gvfsbackendgphoto2.c:2061 ../daemon/gvfsbackendgphoto2.c:3250
 #, c-format
 msgid "Error seeking in stream on camera %s"
-msgstr ""
+msgstr "Kļūda, meklējot plūsmā fotokamerā: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1910 ../daemon/gvfsbackendsmbbrowse.c:1107
+#: ../daemon/gvfsbackendgphoto2.c:2201 ../daemon/gvfsbackendsftp.c:2952
+#: ../daemon/gvfsbackendsmbbrowse.c:1414
 msgid "Not a directory"
-msgstr "Nav direktorija"
+msgstr "Nav mape"
 
-#: ../daemon/gvfsbackendgphoto2.c:1943
+#: ../daemon/gvfsbackendgphoto2.c:2234
 msgid "Failed to get folder list"
-msgstr ""
+msgstr "Neizdevās iegūt mapju sarakstu"
 
-#: ../daemon/gvfsbackendgphoto2.c:2008
+#: ../daemon/gvfsbackendgphoto2.c:2300
 msgid "Failed to get file list"
-msgstr ""
+msgstr "Neizdevās iegūt failu sarakstu"
 
-#: ../daemon/gvfsbackendgphoto2.c:2293
+#: ../daemon/gvfsbackendgphoto2.c:2592
 msgid "Error creating directory"
-msgstr ""
+msgstr "Kļūda, izveidojot mapi"
 
-#: ../daemon/gvfsbackendgphoto2.c:2502
+#: ../daemon/gvfsbackendgphoto2.c:2801
 msgid "Name already exists"
-msgstr ""
+msgstr "Nosaukums jau eksistē"
 
-#: ../daemon/gvfsbackendgphoto2.c:2513 ../daemon/gvfsbackendgphoto2.c:3141
+#: ../daemon/gvfsbackendgphoto2.c:2812 ../daemon/gvfsbackendgphoto2.c:3441
 msgid "New name too long"
-msgstr ""
+msgstr "Nosaukums par garu"
 
-#: ../daemon/gvfsbackendgphoto2.c:2523 ../daemon/gvfsbackendgphoto2.c:3152
+#: ../daemon/gvfsbackendgphoto2.c:2822 ../daemon/gvfsbackendgphoto2.c:3452
 msgid "Error renaming dir"
-msgstr ""
+msgstr "Kļūda pārsaucot mapi"
 
-#: ../daemon/gvfsbackendgphoto2.c:2536 ../daemon/gvfsbackendgphoto2.c:3165
+#: ../daemon/gvfsbackendgphoto2.c:2835 ../daemon/gvfsbackendgphoto2.c:3465
 msgid "Error renaming file"
-msgstr ""
+msgstr "Kļūda, pārsaucot failu"
 
-#: ../daemon/gvfsbackendgphoto2.c:2599
+#: ../daemon/gvfsbackendgphoto2.c:2899
 #, c-format
 msgid "Directory '%s' is not empty"
-msgstr ""
+msgstr "Mape '%s' nav tukša"
 
-#: ../daemon/gvfsbackendgphoto2.c:2610
+#: ../daemon/gvfsbackendgphoto2.c:2910
 msgid "Error deleting directory"
-msgstr ""
+msgstr "Kļūda, dzēšot mapi"
 
-#: ../daemon/gvfsbackendgphoto2.c:2636
+#: ../daemon/gvfsbackendgphoto2.c:2936
 msgid "Error deleting file"
-msgstr ""
+msgstr "Kļūda, dzēšot failu"
 
-#: ../daemon/gvfsbackendgphoto2.c:2689
+#: ../daemon/gvfsbackendgphoto2.c:2989
 msgid "Can't write to directory"
-msgstr ""
+msgstr "Nevar rakstīt mapē"
 
-#: ../daemon/gvfsbackendgphoto2.c:2736
+#: ../daemon/gvfsbackendgphoto2.c:3036
 msgid "Cannot allocate new file to append to"
-msgstr ""
+msgstr "Nevar piešķirt jaunu failu, pie kura pievienot"
 
-#: ../daemon/gvfsbackendgphoto2.c:2751
+#: ../daemon/gvfsbackendgphoto2.c:3051
 msgid "Cannot read file to append to"
-msgstr ""
+msgstr "Nevar nolasīt failu, pie kura pievienot"
 
-#: ../daemon/gvfsbackendgphoto2.c:2762
+#: ../daemon/gvfsbackendgphoto2.c:3062
 msgid "Cannot get data of file to append to"
-msgstr ""
+msgstr "Nevar saņemt datus par failu, pie kura pievienot"
 
-#: ../daemon/gvfsbackendgphoto2.c:3049
+#: ../daemon/gvfsbackendgphoto2.c:3349
 msgid "Error writing file"
-msgstr ""
+msgstr "Kļūda, rakstot failā"
 
-#: ../daemon/gvfsbackendgphoto2.c:3097
+#: ../daemon/gvfsbackendgphoto2.c:3397
 msgid "Not supported (not same directory)"
-msgstr ""
+msgstr "Nav atbalstīts (nav tā pati mape)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3109
+#: ../daemon/gvfsbackendgphoto2.c:3409
 msgid "Not supported (src is dir, dst is dir)"
-msgstr ""
+msgstr "Nav atbalstīts (avots ir mape, mērķis ir mape)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3117
+#: ../daemon/gvfsbackendgphoto2.c:3417
 msgid "Not supported (src is dir, dst is existing file)"
-msgstr ""
+msgstr "Nav atbalstīts (avots ir mape, mērķis ir esošs fails)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3129
+#: ../daemon/gvfsbackendgphoto2.c:3429
 msgid "Not supported (src is file, dst is dir)"
-msgstr ""
+msgstr "Nav atbalstīts (avots ir fails, mērķis ir mape)"
 
-#: ../daemon/gvfsbackendhttp.c:248
+#: ../daemon/gvfsbackendhttp.c:257
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "HTTP klienta kļūda: %s"
 
-#: ../daemon/gvfsbackendhttp.c:570 ../daemon/gvfsbackendsftp.c:1891
-#: ../daemon/gvfsbackendsmb.c:1337 ../daemon/gvfsdaemonutils.c:211
-msgid " (invalid encoding)"
-msgstr " (nederīgs kodējums)"
-
-#: ../daemon/gvfsbackendlocaltest.c:853
+#: ../daemon/gvfsbackendlocaltest.c:855
 msgid "Directory notification not supported"
-msgstr ""
+msgstr "Mapes paziņojumi nav atbalstīti"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:699
+#: ../daemon/gvfsbackendnetwork.c:269 ../daemon/gvfsbackendsmbbrowse.c:909
 msgid "Windows Network"
 msgstr "Windows tīkls"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:862
+#: ../daemon/gvfsbackendnetwork.c:931
 msgid "Network Location Monitor"
-msgstr ""
+msgstr "Lokālā tīkla uzraugs"
 
 #. Set the mountspec according to original uri, no matter whether user changes
 #. credentials during mount loop. Nautilus and other gio clients depend
@@ -894,74 +1026,102 @@ msgstr ""
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:387 ../daemon/gvfsbackendsmb.c:538
-#: ../daemon/gvfsbackendsmb.c:1330
+#: ../daemon/gvfsbackendobexftp.c:681 ../daemon/gvfsbackendsmb.c:566
+#: ../daemon/gvfsbackendsmb.c:1438
 #, c-format
 msgid "%s on %s"
 msgstr "%s uz %s"
 
-#: ../daemon/gvfsbackendobexftp.c:666
+#: ../daemon/gvfsbackendobexftp.c:890
+msgid "USB support missing. Please contact your software vendor"
+msgstr "Nav USB atbalsta. Lūdzu, sazinieties ar programmatūras ražotāju"
+
+#: ../daemon/gvfsbackendobexftp.c:1010
 msgid "Connection to the device lost"
-msgstr ""
+msgstr "Pārtrūka savienojums ar ierīci"
 
-#: ../daemon/gvfsbackendobexftp.c:1163
+#: ../daemon/gvfsbackendobexftp.c:1507
 msgid "Device requires a software update"
-msgstr ""
+msgstr "Ierīcei nepieciešams programmatūras atjaunināšana"
 
-#: ../daemon/gvfsbackendsftp.c:288
+#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1950
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "Kļūda, dzēšot failu: %s"
+
+#: ../daemon/gvfsbackendsftp.c:302 ../daemon/gvfsbackendsftp.c:658
 msgid "ssh program unexpectedly exited"
-msgstr ""
-
-#: ../daemon/gvfsbackendsftp.c:303
-msgid "Hostname not known"
-msgstr ""
-
-#: ../daemon/gvfsbackendsftp.c:310
-msgid "No route to host"
-msgstr ""
+msgstr "ssh programma negaidīti aizvērās"
 
 #: ../daemon/gvfsbackendsftp.c:317
-msgid "Connection refused by server"
-msgstr ""
+msgid "Hostname not known"
+msgstr "Datora nosaukums nav zināms"
 
 #: ../daemon/gvfsbackendsftp.c:324
+msgid "No route to host"
+msgstr "Nav maršruta uz datoru"
+
+#: ../daemon/gvfsbackendsftp.c:331
+msgid "Connection refused by server"
+msgstr "Serveris noraidīja savienojumu"
+
+#: ../daemon/gvfsbackendsftp.c:338
 msgid "Host key verification failed"
-msgstr ""
+msgstr "Datora atslēgas pārbaude neizdevās"
 
-#: ../daemon/gvfsbackendsftp.c:407
+#: ../daemon/gvfsbackendsftp.c:502
 msgid "Unable to spawn ssh program"
-msgstr ""
+msgstr "Neizdevās palaist ssh programmu"
 
-#: ../daemon/gvfsbackendsftp.c:423
+#: ../daemon/gvfsbackendsftp.c:518
 #, c-format
 msgid "Unable to spawn ssh program: %s"
-msgstr ""
+msgstr "Neizdevās palaist ssh programmu: %s"
 
-#: ../daemon/gvfsbackendsftp.c:535 ../daemon/gvfsbackendsftp.c:787
+#: ../daemon/gvfsbackendsftp.c:620 ../daemon/gvfsbackendsftp.c:878
 msgid "Timed out when logging in"
-msgstr ""
+msgstr "Piesakoties iestājās savienojuma noildze"
 
-#: ../daemon/gvfsbackendsftp.c:865
-msgid "Enter passphrase for key"
-msgstr ""
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendsftp.c:958
+#, c-format
+msgid "Enter passphrase for key for ssh as %s on %s"
+msgstr "Ievadiet ssh atslēgas paroli lietotājam %s uz %s"
 
-#: ../daemon/gvfsbackendsftp.c:867
-msgid "Enter password"
-msgstr "Ievadiet paroli"
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendsftp.c:961
+#, c-format
+#| msgid "Enter password for %s"
+msgid "Enter password for ssh as %s on %s"
+msgstr "Ievadiet %s ssh paroli uz %s"
 
-#: ../daemon/gvfsbackendsftp.c:928
+#. Translators: %s is the hostname
+#: ../daemon/gvfsbackendsftp.c:965
+#, c-format
+#| msgid "Enter password for %s"
+msgid "Enter passphrase for key for ssh on %s"
+msgstr "Ievadiet ssh atslēgas paroli uz %s"
+
+#. Translators: %s is the hostname
+#: ../daemon/gvfsbackendsftp.c:968
+#, c-format
+#| msgid "Enter password for %s"
+msgid "Enter password for ssh on %s"
+msgstr "Ievadiet ssh paroli uz %s"
+
+#: ../daemon/gvfsbackendsftp.c:1048
 msgid "Can't send password"
-msgstr ""
+msgstr "Nevar nosūtīt paroli"
 
-#: ../daemon/gvfsbackendsftp.c:936
+#: ../daemon/gvfsbackendsftp.c:1056
 msgid "Log In Anyway"
-msgstr "Tomēr pieslēgties"
+msgstr "Tomēr pieteikties"
 
-#: ../daemon/gvfsbackendsftp.c:936
+#: ../daemon/gvfsbackendsftp.c:1056
 msgid "Cancel Login"
-msgstr "Atcelt pieslēgšanos"
+msgstr "Atcelt pieteikšanos"
 
-#: ../daemon/gvfsbackendsftp.c:946
+#: ../daemon/gvfsbackendsftp.c:1065
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -970,238 +1130,433 @@ msgid ""
 "The identity sent by the remote computer is %s. If you want to be absolutely "
 "sure it is safe to continue, contact the system administrator."
 msgstr ""
+"Attālinātā datora (%s) identitāte ir nezināma.\n"
+"Tas parasti notiek pirmo reizi piesakoties attālinātā datora sistēmā.\n"
+"\n"
+"Identitāte, kas tika nosūtīta uz attālināto datoru ir %s. Ja jūs vēlaties "
+"pilnībā pārliecināties, ka ir droši turpināt, sazinieties ar sistēmas "
+"administratoru."
 
-#: ../daemon/gvfsbackendsftp.c:966
+#: ../daemon/gvfsbackendsftp.c:1085
 msgid "Login dialog cancelled"
-msgstr ""
+msgstr "Pieteikšanās dialogs atsaukts"
 
-#: ../daemon/gvfsbackendsftp.c:986
+#: ../daemon/gvfsbackendsftp.c:1105
 msgid "Can't send host identity confirmation"
-msgstr ""
+msgstr "Neizdodas nosūtīt datoram identitātes apstiprinājumu"
 
-#: ../daemon/gvfsbackendsftp.c:1479 ../daemon/gvfsbackendsftp.c:1502
+#: ../daemon/gvfsbackendsftp.c:1643 ../daemon/gvfsbackendsftp.c:1666
 msgid "Protocol error"
 msgstr "Protokola kļūda"
 
 #. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1527
+#: ../daemon/gvfsbackendsftp.c:1691
 #, c-format
 msgid "sftp for %s on %s"
-msgstr "%s sftp uz %s"
+msgstr "sftp lietotājs %s uz %s"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1530
+#: ../daemon/gvfsbackendsftp.c:1694
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp uz %s"
 
-#: ../daemon/gvfsbackendsftp.c:1556
+#: ../daemon/gvfsbackendsftp.c:1735
 msgid "Unable to find supported ssh command"
-msgstr ""
+msgstr "Neizdevās atrast atbalstītu ssh komandu"
 
-#: ../daemon/gvfsbackendsftp.c:1976
-msgid "Failure"
-msgstr ""
-
-#: ../daemon/gvfsbackendsftp.c:2032 ../daemon/gvfsbackendsftp.c:2111
-#: ../daemon/gvfsbackendsftp.c:2122 ../daemon/gvfsbackendsftp.c:2178
-#: ../daemon/gvfsbackendsftp.c:2264 ../daemon/gvfsbackendsftp.c:2314
-#: ../daemon/gvfsbackendsftp.c:2360 ../daemon/gvfsbackendsftp.c:2435
-#: ../daemon/gvfsbackendsftp.c:2542 ../daemon/gvfsbackendsftp.c:2582
-#: ../daemon/gvfsbackendsftp.c:2632 ../daemon/gvfsbackendsftp.c:2701
-#: ../daemon/gvfsbackendsftp.c:2721 ../daemon/gvfsbackendsftp.c:2873
-#: ../daemon/gvfsbackendsftp.c:2898 ../daemon/gvfsbackendsftp.c:2953
-#: ../daemon/gvfsbackendsftp.c:3010 ../daemon/gvfsbackendsftp.c:3281
-#: ../daemon/gvfsbackendsftp.c:3348 ../daemon/gvfsbackendsftp.c:3477
-#: ../daemon/gvfsbackendsftp.c:3512 ../daemon/gvfsbackendsftp.c:3540
-#: ../daemon/gvfsbackendsftp.c:3648 ../daemon/gvfsbackendsftp.c:3702
-#: ../daemon/gvfsbackendsftp.c:3736 ../daemon/gvfsbackendsftp.c:3770
-#: ../daemon/gvfsbackendsftp.c:3785 ../daemon/gvfsbackendsftp.c:3800
-#: ../daemon/gvfsbackendsftp.c:3878
+#: ../daemon/gvfsbackendsftp.c:2009 ../daemon/gvfsbackendsftp.c:2398
+#: ../daemon/gvfsbackendsftp.c:2477 ../daemon/gvfsbackendsftp.c:2488
+#: ../daemon/gvfsbackendsftp.c:2544 ../daemon/gvfsbackendsftp.c:2630
+#: ../daemon/gvfsbackendsftp.c:2680 ../daemon/gvfsbackendsftp.c:2726
+#: ../daemon/gvfsbackendsftp.c:2801 ../daemon/gvfsbackendsftp.c:2908
+#: ../daemon/gvfsbackendsftp.c:3025 ../daemon/gvfsbackendsftp.c:3106
+#: ../daemon/gvfsbackendsftp.c:3178 ../daemon/gvfsbackendsftp.c:3190
+#: ../daemon/gvfsbackendsftp.c:3248 ../daemon/gvfsbackendsftp.c:3290
+#: ../daemon/gvfsbackendsftp.c:3475 ../daemon/gvfsbackendsftp.c:3507
+#: ../daemon/gvfsbackendsftp.c:3562 ../daemon/gvfsbackendsftp.c:3619
+#: ../daemon/gvfsbackendsftp.c:3916 ../daemon/gvfsbackendsftp.c:3983
+#: ../daemon/gvfsbackendsftp.c:4118 ../daemon/gvfsbackendsftp.c:4178
+#: ../daemon/gvfsbackendsftp.c:4213 ../daemon/gvfsbackendsftp.c:4241
+#: ../daemon/gvfsbackendsftp.c:4349 ../daemon/gvfsbackendsftp.c:4403
+#: ../daemon/gvfsbackendsftp.c:4442 ../daemon/gvfsbackendsftp.c:4476
+#: ../daemon/gvfsbackendsftp.c:4510 ../daemon/gvfsbackendsftp.c:4525
+#: ../daemon/gvfsbackendsftp.c:4540 ../daemon/gvfsbackendsftp.c:4618
 msgid "Invalid reply received"
-msgstr ""
+msgstr "Saņemta nederīga atbilde"
 
-#: ../daemon/gvfsbackendsftp.c:2084
+#: ../daemon/gvfsbackendsftp.c:2257 ../daemon/gvfsbackendsmb.c:1445
+#: ../daemon/gvfsdaemonutils.c:211
+msgid " (invalid encoding)"
+msgstr " (nederīgs kodējums)"
+
+#: ../daemon/gvfsbackendsftp.c:2342
+msgid "Failure"
+msgstr "Kļūme"
+
+#: ../daemon/gvfsbackendsftp.c:2450
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
-msgstr ""
+msgstr "Nederīgs icon_id '%s' iekš OpenIconForRead"
 
-#: ../daemon/gvfsbackendsftp.c:2380
+#: ../daemon/gvfsbackendsftp.c:2746
 #, c-format
 msgid "Error creating backup file: %s"
-msgstr ""
+msgstr "Kļūda, veidojot faila rezerves kopiju: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2783
+#: ../daemon/gvfsbackendsftp.c:3352
 msgid "Unable to create temporary file"
-msgstr "Nav iespējams izveidot pagaidu failu"
+msgstr "Neizdevās izveidot pagaidu failu"
 
-#: ../daemon/gvfsbackendsftp.c:3574 ../daemon/gvfsbackendsmb.c:1901
+#: ../daemon/gvfsbackendsftp.c:4275 ../daemon/gvfsbackendsmb.c:2048
 msgid "Can't move directory over directory"
-msgstr ""
+msgstr "Nevar pārvietot mapi virsū mapei"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:222
+#: ../daemon/gvfsbackendsmb.c:250
 #, c-format
 msgid "Password required for share %s on %s"
-msgstr ""
+msgstr "Nepieciešama parole koplietojumam %s uz %s"
 
-#: ../daemon/gvfsbackendsmb.c:478 ../daemon/gvfsbackendsmb.c:524
+#: ../daemon/gvfsbackendsmb.c:506 ../daemon/gvfsbackendsmb.c:552
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
-msgstr ""
+msgstr "Iekšēja kļūda (%s)"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:604
+#: ../daemon/gvfsbackendsmb.c:632
 msgid "Failed to mount Windows share"
-msgstr ""
+msgstr "Neizdevās piemontēt Windows koplietojumu"
 
-#: ../daemon/gvfsbackendsmb.c:753 ../daemon/gvfsbackendsmb.c:1209
+#: ../daemon/gvfsbackendsmb.c:793 ../daemon/gvfsbackendsmb.c:1289
 msgid "Unsupported seek type"
-msgstr ""
+msgstr "Neatbalstīts meklēšanas veids"
 
-#: ../daemon/gvfsbackendsmb.c:1273
+#: ../daemon/gvfsbackendsmb.c:1381
 #, c-format
 msgid "Backup file creation failed: %s"
-msgstr ""
+msgstr "Neizdevās izveidot rezerves kopijas failu: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1803
-#, c-format
-msgid "Error deleting file: %s"
-msgstr ""
-
-#: ../daemon/gvfsbackendsmb.c:1877
+#: ../daemon/gvfsbackendsmb.c:2024
 #, c-format
 msgid "Error moving file: %s"
-msgstr ""
+msgstr "Kļūda, pārvietojot failu: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1949
+#: ../daemon/gvfsbackendsmb.c:2096
 #, c-format
 msgid "Error removing target file: %s"
-msgstr ""
+msgstr "Kļūda, dzēšot mērķa failu: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1973
+#: ../daemon/gvfsbackendsmb.c:2120
 msgid "Can't recursively move directory"
-msgstr ""
+msgstr "Nevar rekursīvi pārvietot mapi"
 
-#: ../daemon/gvfsbackendsmb.c:2037
+#: ../daemon/gvfsbackendsmb.c:2164
 msgid "Windows Shares Filesystem Service"
-msgstr ""
+msgstr "Windows koplietojumu failu sistēmas serviss"
+
+#. translators: %s is a server name
+#: ../daemon/gvfsbackendsmbbrowse.c:389
+#, c-format
+#| msgid "Enter password for %s"
+msgid "Password required for %s"
+msgstr "Nepieciešama parole serverim %s"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:707
+#: ../daemon/gvfsbackendsmbbrowse.c:917
 #, c-format
 msgid "Windows shares on %s"
-msgstr ""
+msgstr "Windows koplietojumi uz %s"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:845
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmbbrowse.c:1016
+msgid "Failed to retrieve share list from server"
+msgstr "Neizdevās saņemt koplietojumu sarakstu no servera"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1104 ../daemon/gvfsbackendsmbbrowse.c:1150
 msgid "The file is not a mountable"
-msgstr ""
+msgstr "Fails nav montējams"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:867
+#: ../daemon/gvfsbackendsmbbrowse.c:1172
 msgid "Not a regular file"
-msgstr ""
+msgstr "Nav parasts fails"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1219
+#: ../daemon/gvfsbackendsmbbrowse.c:1504
 msgid "Windows Network Filesystem Service"
-msgstr ""
+msgstr "Windows tīkla failu sistēmas serviss"
 
-#: ../daemon/gvfsbackendtrash.c:344
-#, c-format
-msgid "Can't delete trash"
-msgstr ""
+#: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
+msgid "The trash folder may not be deleted"
+msgstr "Miskastes mapi nevar izdzēst"
 
-#: ../daemon/gvfsbackendtrash.c:361 ../daemon/gvfsbackendtrash.c:413
-#, c-format
+#: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
 msgid "Items in the trash may not be modified"
-msgstr ""
-
-#: ../daemon/gvfsbackendtrash.c:399
-#, c-format
-msgid "Can't pull trash"
-msgstr ""
+msgstr "Miskastē esošos failus nevar modificēt"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:708 ../daemon/gvfsbackendtrash.c:816
+#: ../daemon/gvfsbackendtrash.c:742 ../daemon/gvfsbackendtrash.c:850
 msgid "Trash"
 msgstr "Miskaste"
 
-#: ../daemon/gvfsdaemon.c:1032
+#: ../daemon/gvfsdaemon.c:1056
 msgid "Invalid backend type"
-msgstr ""
+msgstr "Nederīgs aizmugures veids"
 
 #: ../daemon/gvfsdaemonutils.c:104
 #, c-format
 msgid "Error sending fd: %s"
+msgstr "Kļūda, sūtot fd: %s"
+
+#: ../daemon/gvfsftpconnection.c:180
+#| msgid "End of stream"
+msgid "Unexpected end of stream"
+msgstr "Negaidītas plūsmas beigas"
+
+#: ../daemon/gvfsftpconnection.c:196 ../daemon/gvfsftpconnection.c:209
+#: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
+msgid "Invalid reply"
+msgstr "Nederīga atbilde"
+
+#: ../daemon/gvfsftpconnection.c:392
+msgid ""
+"Failed to create active FTP connection. Maybe your router does not support "
+"this?"
 msgstr ""
+"Neizdevās izveidot aktīvo FTP savienojumu. Varbūt jūsu maršrutētājs to "
+"neatbalsta?"
+
+#: ../daemon/gvfsftpconnection.c:399
+msgid "Failed to create active FTP connection."
+msgstr "Neizdevās izveidot aktīvo FTP savienojumu."
+
+#: ../daemon/gvfsftpfile.c:170
+msgid "Filename contains invalid characters."
+msgstr "Failu nosaukums satur nederīgas rakstzīmes."
+
+#: ../daemon/gvfsftptask.c:262
+msgid "The FTP server is busy. Try again later"
+msgstr "FTP serveris ir aizņemts. Mēģiniet vēlreiz vēlāk"
+
+#: ../daemon/gvfsftptask.c:356
+msgid "Accounts are unsupported"
+msgstr "Konti nav atbalstīti"
+
+#: ../daemon/gvfsftptask.c:360
+msgid "Host closed connection"
+msgstr "Serveris aizvēra savienojumu"
+
+#: ../daemon/gvfsftptask.c:364
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "Nevar atvērt datu savienojumu. Vai to bloķē ugunsmūris?"
+
+#: ../daemon/gvfsftptask.c:368
+msgid "Data connection closed"
+msgstr "Datu savienojums slēgts"
+
+#: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
+msgid "Operation failed"
+msgstr "Darbība neizdevās"
+
+#: ../daemon/gvfsftptask.c:384
+msgid "No space left on server"
+msgstr "Uz servera vairs nav brīvas vietas"
+
+#: ../daemon/gvfsftptask.c:396
+msgid "Unsupported network protocol"
+msgstr "Neatbalstīts tīkla protokols"
+
+#: ../daemon/gvfsftptask.c:404
+msgid "Page type unknown"
+msgstr "Nezināms lapas tips"
+
+#: ../daemon/gvfsftptask.c:408
+msgid "Invalid filename"
+msgstr "Nederīgs faila nosaukums"
 
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
-msgstr ""
+msgstr "Aizmugure neatbalstīta simboliskās saites"
 
 #: ../daemon/gvfsjobsetattribute.c:120
 msgid "Invalid dbus message"
-msgstr ""
+msgstr "Nederīgs dbus ziņojums"
 
-#: ../daemon/main.c:45
+#: ../daemon/main.c:45 ../metadata/meta-daemon.c:694
 msgid "Replace old daemon."
-msgstr ""
+msgstr "Aizvieto veco dēmonu."
 
 #: ../daemon/main.c:46
 msgid "Don't start fuse."
-msgstr ""
+msgstr "Nestartēt fuse."
 
 #: ../daemon/main.c:58
 msgid "GVFS Daemon"
-msgstr ""
+msgstr "GVFS dēmons"
 
 #: ../daemon/main.c:61
 msgid "Main daemon for GVFS"
-msgstr ""
+msgstr "Galvenais GVFS dēmons"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:76
+#: ../daemon/main.c:76 ../metadata/meta-daemon.c:718
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:364
-#: ../programs/gvfs-ls.c:386 ../programs/gvfs-mkdir.c:59
-#: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:131
-#: ../programs/gvfs-open.c:144 ../programs/gvfs-save.c:165
-#: ../programs/gvfs-tree.c:251
+#: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
+#: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
+#: ../programs/gvfs-copy.c:123 ../programs/gvfs-info.c:371
+#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:60
+#: ../programs/gvfs-move.c:111 ../programs/gvfs-open.c:140
+#: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
+#: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
-msgstr "Pamēģiniet \"%s --help\", lai iegūtu vairāk informācijas."
+msgstr "Mēģiniet \"%s --help\", lai iegūtu vairāk informācijas."
 
-#: ../daemon/mount.c:456
+#: ../daemon/mount.c:459
 msgid "Invalid arguments from spawned child"
-msgstr ""
+msgstr "Nederīgi parametri no izveidotā bērna"
 
-#: ../daemon/mount.c:767
+#: ../daemon/mount.c:779
 #, c-format
 msgid "Automount failed: %s"
-msgstr ""
+msgstr "Automātiskā montēšana neizdevās: %s"
 
-#: ../daemon/mount.c:812 ../daemon/mount.c:886
+#: ../daemon/mount.c:824 ../daemon/mount.c:898
 msgid "The specified location is not mounted"
-msgstr ""
+msgstr "Norādītā atrašanās vieta nav montēta"
 
-#: ../daemon/mount.c:817
+#: ../daemon/mount.c:829
 msgid "The specified location is not supported"
-msgstr ""
+msgstr "Norādītā atrašanās vieta nav atbalstīta"
 
-#: ../daemon/mount.c:1023
+#: ../daemon/mount.c:1036
 msgid "Location is already mounted"
-msgstr ""
+msgstr "Vieta jau ir montēta"
 
-#: ../daemon/mount.c:1031
+#: ../daemon/mount.c:1044
 msgid "Location is not mountable"
+msgstr "Vieta nav montējama"
+
+#: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
+#: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
+#: ../metadata/meta-daemon.c:449
+#, c-format
+msgid "Can't find metadata file %s"
+msgstr "Nevar atrast metadatu failu %s"
+
+#: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
+msgid "Unable to set metadata key"
+msgstr "Nevar iestatīt metadatu atslēgu"
+
+#: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:399
+msgid "Unable to unset metadata key"
+msgstr "Nevar atstatīt metadatu atslēgu"
+
+#: ../metadata/meta-daemon.c:428
+msgid "Unable to remove metadata keys"
+msgstr "Nevar izņemt metadatu atslēgas"
+
+#: ../metadata/meta-daemon.c:459
+msgid "Unable to move metadata keys"
+msgstr "Nevar pārvietot metadatu atslēgas"
+
+#: ../metadata/meta-daemon.c:704
+msgid "GVFS Metadata Daemon"
+msgstr "GVFS metadatu dēmons"
+
+#: ../metadata/meta-daemon.c:707
+msgid "Metadata daemon for GVFS"
+msgstr "GVFS metadatu dēmons"
+
+#: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
+msgid "GVfs GDU Volume Monitor"
+msgstr "GVfs GDU sējumu uzraugs"
+
+#: ../monitor/gdu/ggdudrive.c:168 ../monitor/hal/ghaldrive.c:179
+msgid "Floppy Drive"
+msgstr "Diskešu dzinis"
+
+#: ../monitor/gdu/ggdudrive.c:258
+#, c-format
+msgid "Unnamed Drive (%s)"
+msgstr "Nenosaukts dzinis (%s)"
+
+#: ../monitor/gdu/ggdudrive.c:260
+#| msgid "Tape Drive"
+msgid "Unnamed Drive"
+msgstr "Nenosaukts dzinis"
+
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/hal/ghaldrive.c:662
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr ""
+"Neizdevās izgrūst datu nesēju; viens vai vairāki sējumi uz datu nesēja ir "
+"aizņemti."
+
+#: ../monitor/gdu/ggdudrive.c:1015
+msgid ""
+"Start drive in degraded mode?\n"
+"Starting a drive in degraded mode means that the drive is no longer tolerant "
+"to failures. Data on the drive may be irrevocably lost if a component fails."
+msgstr ""
+"Startēt dzini degradētā režīmā?\n"
+"Dziņa startēšana degradētā režīmā, nozīmē, ka dzinis vairs neizturēs kļūmes. "
+"Ja kāda sastāvdaļa nobeigsies, datu uz diskiem var neatgriezeniski pazust."
+
+#: ../monitor/gdu/ggdudrive.c:1021
+msgid "Start Anyway"
+msgstr "Tomēr startēt"
+
+#: ../monitor/gdu/ggdumount.c:856
+msgid "One or more programs are preventing the unmount operation."
+msgstr "Viena vai vairākas programmas neļauj veikt nomontēšanu."
+
+#: ../monitor/gdu/ggdumount.c:984
+msgid "Cannot get LUKS cleartext slave"
+msgstr "Nevar dabūt LUKS cleartext sekotāju"
+
+#: ../monitor/gdu/ggdumount.c:1006
+#, c-format
+msgid "Cannot get LUKS cleartext slave from path `%s'"
+msgstr "Nevar dabūt LUKS cleartext sekotāju no ceļa '%s'"
+
+#: ../monitor/gdu/ggduvolume.c:325
+#| msgid "Floppy Drive"
+msgid "Floppy Disk"
+msgstr "Diskete"
+
+#: ../monitor/gdu/ggduvolume.c:1075
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data on partition %d."
+msgstr ""
+"Ievadiet paroli, lai atslēgtu sējumu\n"
+"Ierīce \"%s\" satur šifrētus datus uz sadaļas %d."
+
+#: ../monitor/gdu/ggduvolume.c:1082
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data."
+msgstr ""
+"Ievadiet paroli, lai atslēgtu sējumu\n"
+"Ierīce \"%s\" satur šifrētus datus."
+
+#: ../monitor/gdu/ggduvolume.c:1089
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device %s contains encrypted data."
+msgstr ""
+"Ievadiet paroli, lai atslēgtu sējumu\n"
+"Ierīce %s satur šifrētus datus."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
@@ -1341,216 +1696,211 @@ msgstr "Disks"
 msgid "Blank Disc"
 msgstr "Tukšs disks"
 
-#: ../monitor/hal/ghaldrive.c:130
+#: ../monitor/hal/ghaldrive.c:127
 msgid "CD-ROM"
 msgstr "CD-ROM"
 
-#: ../monitor/hal/ghaldrive.c:132
+#: ../monitor/hal/ghaldrive.c:129
 msgid "CD-R"
 msgstr "CD-R"
 
-#: ../monitor/hal/ghaldrive.c:134
+#: ../monitor/hal/ghaldrive.c:131
 msgid "CD-RW"
 msgstr "CD-RW"
 
-#: ../monitor/hal/ghaldrive.c:138
+#: ../monitor/hal/ghaldrive.c:135
 msgid "DVD-ROM"
 msgstr "DVD-ROM"
 
-#: ../monitor/hal/ghaldrive.c:140
+#: ../monitor/hal/ghaldrive.c:137
 msgid "DVD+R"
 msgstr "DVD+R"
 
-#: ../monitor/hal/ghaldrive.c:142
+#: ../monitor/hal/ghaldrive.c:139
 msgid "DVD+RW"
 msgstr "DVD+RW"
 
-#: ../monitor/hal/ghaldrive.c:144
+#: ../monitor/hal/ghaldrive.c:141
 msgid "DVD-R"
 msgstr "DVD-R"
 
-#: ../monitor/hal/ghaldrive.c:146
+#: ../monitor/hal/ghaldrive.c:143
 msgid "DVD-RW"
 msgstr "DVD-RW"
 
-#: ../monitor/hal/ghaldrive.c:148
+#: ../monitor/hal/ghaldrive.c:145
 msgid "DVD-RAM"
 msgstr "DVD-RAM"
 
-#: ../monitor/hal/ghaldrive.c:151
+#: ../monitor/hal/ghaldrive.c:148
 msgid "DVD±R"
 msgstr "DVD±R"
 
-#: ../monitor/hal/ghaldrive.c:154
+#: ../monitor/hal/ghaldrive.c:151
 msgid "DVD±RW"
 msgstr "DVD±RW"
 
-#: ../monitor/hal/ghaldrive.c:156
+#: ../monitor/hal/ghaldrive.c:153
 msgid "HDDVD"
 msgstr "HDDVD"
 
-#: ../monitor/hal/ghaldrive.c:158
+#: ../monitor/hal/ghaldrive.c:155
 msgid "HDDVD-r"
 msgstr "HDDVD-r"
 
-#: ../monitor/hal/ghaldrive.c:160
+#: ../monitor/hal/ghaldrive.c:157
 msgid "HDDVD-RW"
 msgstr "HDDVD-RW"
 
-#: ../monitor/hal/ghaldrive.c:162
+#: ../monitor/hal/ghaldrive.c:159
 msgid "Blu-ray"
 msgstr "Blu-ray"
 
-#: ../monitor/hal/ghaldrive.c:164
+#: ../monitor/hal/ghaldrive.c:161
 msgid "Blu-ray-R"
 msgstr "Blu-ray-R"
 
-#: ../monitor/hal/ghaldrive.c:166
+#: ../monitor/hal/ghaldrive.c:163
 msgid "Blu-ray-RE"
 msgstr "Blu-ray-RE"
 
 #. translators: This wis something like "CD-ROM/DVD Drive" or
 #. "CD-RW/Blue-ray Drive" depending on the properties of the drive
-#: ../monitor/hal/ghaldrive.c:172
+#: ../monitor/hal/ghaldrive.c:169
 #, c-format
 msgid "%s/%s Drive"
 msgstr "%s/%s dzinis"
 
 #. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
 #. depending on the properties of the drive
-#: ../monitor/hal/ghaldrive.c:178
+#: ../monitor/hal/ghaldrive.c:175
 #, c-format
 msgid "%s Drive"
 msgstr "%s dzinis"
 
-#: ../monitor/hal/ghaldrive.c:182
-msgid "Floppy Drive"
-msgstr "Diskešu dzinis"
-
-#: ../monitor/hal/ghaldrive.c:188
+#: ../monitor/hal/ghaldrive.c:185
 msgid "Software RAID Drive"
-msgstr ""
+msgstr "Programmatūras RAID dzinis"
 
-#: ../monitor/hal/ghaldrive.c:190
+#: ../monitor/hal/ghaldrive.c:187
 msgid "USB Drive"
 msgstr "USB dzinis"
 
-#: ../monitor/hal/ghaldrive.c:192
+#: ../monitor/hal/ghaldrive.c:189
 msgid "ATA Drive"
 msgstr "ATA dzinis"
 
-#: ../monitor/hal/ghaldrive.c:194
+#: ../monitor/hal/ghaldrive.c:191
 msgid "SCSI Drive"
 msgstr "SCSI dzinis"
 
-#: ../monitor/hal/ghaldrive.c:196
+#: ../monitor/hal/ghaldrive.c:193
 msgid "FireWire Drive"
 msgstr "FireWire dzinis"
 
-#: ../monitor/hal/ghaldrive.c:200
+#: ../monitor/hal/ghaldrive.c:197
 msgid "Tape Drive"
 msgstr "Lenšdzinis"
 
-#: ../monitor/hal/ghaldrive.c:202
+#: ../monitor/hal/ghaldrive.c:199
 msgid "CompactFlash Drive"
 msgstr "CompactFlash dzinis"
 
-#: ../monitor/hal/ghaldrive.c:204
+#: ../monitor/hal/ghaldrive.c:201
 msgid "MemoryStick Drive"
 msgstr "MemoryStick dzinis"
 
-#: ../monitor/hal/ghaldrive.c:206
+#: ../monitor/hal/ghaldrive.c:203
 msgid "SmartMedia Drive"
 msgstr "SmartMedia dzinis"
 
-#: ../monitor/hal/ghaldrive.c:208
+#: ../monitor/hal/ghaldrive.c:205
 msgid "SD/MMC Drive"
 msgstr "SD/MMC dzinis"
 
-#: ../monitor/hal/ghaldrive.c:210
+#: ../monitor/hal/ghaldrive.c:207
 msgid "Zip Drive"
 msgstr "Zip dzinis"
 
-#: ../monitor/hal/ghaldrive.c:212
+#: ../monitor/hal/ghaldrive.c:209
 msgid "Jaz Drive"
 msgstr "Jaz dzinis"
 
-#: ../monitor/hal/ghaldrive.c:214
+#: ../monitor/hal/ghaldrive.c:211
 msgid "Thumb Drive"
-msgstr ""
+msgstr "Zibatmiņa"
 
-#: ../monitor/hal/ghaldrive.c:217
+#: ../monitor/hal/ghaldrive.c:214
 msgid "Mass Storage Drive"
-msgstr ""
+msgstr "Lielapjoma atmiņas ierīce"
 
-#: ../monitor/hal/ghaldrive.c:723
-#, c-format
-msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr ""
-
-#: ../monitor/hal/ghalmount.c:301 ../monitor/hal/ghalvolume.c:171
+#: ../monitor/hal/ghalmount.c:159 ../monitor/hal/ghalvolume.c:163
 #, c-format
 msgid "%.1f kB"
 msgstr "%.1f kB"
 
-#: ../monitor/hal/ghalmount.c:306 ../monitor/hal/ghalvolume.c:176
+#: ../monitor/hal/ghalmount.c:164 ../monitor/hal/ghalvolume.c:168
 #, c-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: ../monitor/hal/ghalmount.c:311 ../monitor/hal/ghalvolume.c:181
+#: ../monitor/hal/ghalmount.c:169 ../monitor/hal/ghalvolume.c:173
 #, c-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: ../monitor/hal/ghalmount.c:433 ../monitor/hal/ghalvolume.c:252
+#: ../monitor/hal/ghalmount.c:323 ../monitor/hal/ghalvolume.c:244
 msgid "Mixed Audio/Data Disc"
-msgstr ""
+msgstr "Jaukts audio/datu disks"
 
 #. Translators: %s is the size of the mount (e.g. 512 MB)
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../monitor/hal/ghalmount.c:446 ../monitor/hal/ghalvolume.c:263
+#: ../monitor/hal/ghalmount.c:336 ../monitor/hal/ghalvolume.c:255
 #, c-format
 msgid "%s Media"
-msgstr "%s nesējs"
+msgstr "%s datu nesējs"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../monitor/hal/ghalvolume.c:240
+#: ../monitor/hal/ghalvolume.c:232
 #, c-format
 msgid "%s Encrypted Data"
-msgstr ""
+msgstr "%s šifrēti dati"
+
+#: ../programs/gvfs-cat.c:37
+msgid "locations"
+msgstr "vietas"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:57
 #, c-format
 msgid "%s: %s: error opening file: %s\n"
-msgstr ""
+msgstr "%s: %s: kļūda, atverot failu: %s\n"
 
 #. Translators: the first %s is the program name, the
 #. second one is the URI of the file.
 #: ../programs/gvfs-cat.c:80
 #, c-format
 msgid "%s: %s, error writing to stdout"
-msgstr ""
+msgstr "%s: %s, kļūda, rakstot uz stdout"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:92
 #, c-format
 msgid "%s: %s: error reading: %s\n"
-msgstr ""
+msgstr "%s: %s: kļūda lasot: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:110
 #, c-format
 msgid "%s: %s:error closing: %s\n"
-msgstr ""
+msgstr "%s: %s: kļūda aizverot: %s\n"
 
 #: ../programs/gvfs-cat.c:136
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
-msgstr ""
+msgstr "VIETA... - savieno VIETAS standart izvadā."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1561,43 +1911,491 @@ msgid ""
 "files: for example you can use something like smb://server/resource/file.txt "
 "as location to concatenate."
 msgstr ""
+"Savieno failus atrašanās vietās un izdrukā tos standart izvadē. Darbojas "
+"tāpat kā ierastā cat utilītprogramma, bet izmanto gvfs vietas, nevis lokālos "
+"failus: piemēram, jūs varat izmantot kaut ko līdzīgu "
+"smb://server/resource/file.txt un to savienot."
 
 #: ../programs/gvfs-cat.c:148
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
 msgstr ""
+"Piezīme: sūtiet caur konveijeru uz cat, ja vajag tās formatēšanas opcijas, "
+"piemēram -n, -T vai citu."
+
+#: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:121
+#: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
+#: ../programs/gvfs-mkdir.c:58 ../programs/gvfs-move.c:109
+#: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
+#: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
+#, c-format
+msgid "Error parsing commandline options: %s\n"
+msgstr "Kļūda, parsējot komandrindas opcijas: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:142
+#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:151
 #, c-format
 msgid "%s: missing locations"
-msgstr ""
+msgstr "%s: trūkst atrašanās vietas"
+
+#: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
+#| msgid "Not a directory"
+msgid "no target directory"
+msgstr "nav mērķa mapes"
+
+#: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
+msgid "show progress"
+msgstr "rādīt progresu"
+
+#: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
+msgid "prompt before overwrite"
+msgstr "vaicāt, pirms pārrakstīt"
+
+#: ../programs/gvfs-copy.c:47
+msgid "preserve all attributes"
+msgstr "saglabāt visus atribūtus"
+
+#: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
+msgid "backup existing destination files"
+msgstr "veidot rezerves kopijas esošajiem mērķa failiem"
+
+#: ../programs/gvfs-copy.c:49
+msgid "never follow symbolic links"
+msgstr "nekad nesekot simboliskajām saitēm"
+
+#: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
+#, c-format
+msgid "progress"
+msgstr "progress"
+
+#: ../programs/gvfs-copy.c:115
+msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
+msgstr "AVOTS... MĒRĶIS - kopē failu(-s) no AVOTS uz MĒRĶIS"
+
+#: ../programs/gvfs-copy.c:132 ../programs/gvfs-move.c:120
+msgid "Missing operand\n"
+msgstr "Trūkst operanda\n"
+
+#: ../programs/gvfs-copy.c:140 ../programs/gvfs-move.c:128
+msgid "Too many arguments\n"
+msgstr "Pārāk daudz parametru\n"
+
+#: ../programs/gvfs-copy.c:149 ../programs/gvfs-move.c:137
+#, c-format
+#| msgid "The file is not a directory"
+msgid "Target %s is not a directory\n"
+msgstr "Mērķis %s nav mape\n"
+
+#: ../programs/gvfs-copy.c:193
+#, c-format
+msgid "overwrite %s?"
+msgstr "pārrakstīt %s?"
+
+#: ../programs/gvfs-copy.c:207
+#, c-format
+msgid "Error copying file %s: %s\n"
+msgstr "Kļūda, kopējot failu %s: %s\n"
+
+#: ../programs/gvfs-info.c:37
+msgid "List writable attributes"
+msgstr "Uzskaitīt rakstāmos atribūtus"
+
+#: ../programs/gvfs-info.c:38
+#| msgid "Filesystem"
+msgid "Get filesystem info"
+msgstr "Saņemt failu sistēmas informāciju"
+
+#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
+msgid "The attributes to get"
+msgstr "Atribūti, ko saņemt"
+
+#: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
+#: ../programs/gvfs-set-attribute.c:37
+msgid "Don't follow symlinks"
+msgstr "Nesekot simboliskajām saitēm"
+
+#: ../programs/gvfs-info.c:50
+msgid "invalid type"
+msgstr "nederīgs tips"
+
+#: ../programs/gvfs-info.c:53
+msgid "unknown"
+msgstr "nezināms"
+
+#: ../programs/gvfs-info.c:56
+msgid "regular"
+msgstr "parasts"
+
+#: ../programs/gvfs-info.c:59
+#| msgid "Not a directory"
+msgid "directory"
+msgstr "mape"
+
+#: ../programs/gvfs-info.c:62
+msgid "symlink"
+msgstr "simboliskā saite"
+
+#: ../programs/gvfs-info.c:65
+msgid "special"
+msgstr "īpašs"
+
+#: ../programs/gvfs-info.c:68
+msgid "shortcut"
+msgstr "īsceļš"
+
+#: ../programs/gvfs-info.c:71
+msgid "mountable"
+msgstr "montējams"
+
+#: ../programs/gvfs-info.c:109
+#, c-format
+msgid "attributes:\n"
+msgstr "atribūti:\n"
+
+#: ../programs/gvfs-info.c:155
+#, c-format
+msgid "display name: %s\n"
+msgstr "ekrāna nosaukums: %s\n"
+
+#: ../programs/gvfs-info.c:159
+#, c-format
+msgid "edit name: %s\n"
+msgstr "rediģēt nosaukumu: %s\n"
+
+#: ../programs/gvfs-info.c:165
+#, c-format
+msgid "name: %s\n"
+msgstr "nosaukums: %s\n"
+
+#: ../programs/gvfs-info.c:172
+#, c-format
+msgid "type: %s\n"
+msgstr "tips: %s\n"
+
+#: ../programs/gvfs-info.c:178
+#, c-format
+msgid "size: "
+msgstr "izmērs: "
+
+#: ../programs/gvfs-info.c:183
+#, c-format
+msgid "hidden\n"
+msgstr "slēpts\n"
+
+#: ../programs/gvfs-info.c:266
+#| msgid "No such file"
+msgid "Copy with file"
+msgstr "Kopēt ar failu"
+
+#: ../programs/gvfs-info.c:270
+msgid "Keep with file when moved"
+msgstr "Paturēt failu, kad pārvietots"
+
+#: ../programs/gvfs-info.c:307
+#, c-format
+msgid "Error getting writable attributes: %s\n"
+msgstr "Kļūda, saņemot rakstāmus atribūtus: %s\n"
+
+#: ../programs/gvfs-info.c:312
+#, c-format
+msgid "Settable attributes:\n"
+msgstr "Iestatāmi atribūti:\n"
+
+#: ../programs/gvfs-info.c:335
+#, c-format
+msgid "Writable attribute namespaces:\n"
+msgstr "Rakstāmi atribūti vārdtelpā:\n"
+
+#: ../programs/gvfs-info.c:362
+msgid "- show info for <location>"
+msgstr "- rādīt <vietas> informāciju"
+
+#: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
+msgid "Show hidden files"
+msgstr "Rādīt slēptus failus"
+
+#: ../programs/gvfs-ls.c:41
+msgid "Use a long listing format"
+msgstr "Izmantot garās uzskaites formātu"
+
+#: ../programs/gvfs-ls.c:42
+msgid "Show completions"
+msgstr "Rādīt pabeigšanas"
+
+#: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
+#: ../programs/gvfs-rename.c:69
+#, c-format
+#| msgid "Error: %s"
+msgid "Error: %s\n"
+msgstr "Kļūda: %s\n"
+
+#: ../programs/gvfs-ls.c:383
+msgid "- list files at <location>"
+msgstr "- uzskaitīt failus no <vietas>"
+
+#: ../programs/gvfs-mkdir.c:33
+#| msgid "Can't open directory"
+msgid "create parent directories"
+msgstr "izveidot vecāka mapes"
+
+#: ../programs/gvfs-mkdir.c:51
+#| msgid "Not a directory"
+msgid "- create directories"
+msgstr "- izveidot mapes"
+
+#: ../programs/gvfs-mkdir.c:79 ../programs/gvfs-mkdir.c:88
+#, c-format
+msgid "Error creating directory: %s\n"
+msgstr "Kļūda, izveidojot mapi: %s\n"
+
+#: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
+msgid "Don't send single MOVED events."
+msgstr "Nesūtīt vienu PĀRVIETOTS notikumu."
+
+#: ../programs/gvfs-mount.c:54
+msgid "Mount as mountable"
+msgstr "Montēt kā montējamus"
+
+#: ../programs/gvfs-mount.c:55
+msgid "Mount volume with device file"
+msgstr "Montēt sējumu ar ierīces failu"
+
+#: ../programs/gvfs-mount.c:56
+msgid "Unmount"
+msgstr "Atmontēt"
+
+#: ../programs/gvfs-mount.c:57
+msgid "Unmount all mounts with the given scheme"
+msgstr "Atmontēt visus montējumus ar doto shēmu"
+
+#: ../programs/gvfs-mount.c:58
+msgid "List"
+msgstr "Saraksts"
+
+#: ../programs/gvfs-mount.c:59
+msgid "Show extra information for List and Monitor"
+msgstr "Rādīt papildu informāciju par sarakstiem un uzraugiem"
+
+#: ../programs/gvfs-mount.c:60
+msgid "Monitor events"
+msgstr "Uzrauga notikumi"
+
+#: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
+#, c-format
+msgid "Error mounting location: %s\n"
+msgstr "Kļūda, montējot vietu: %s\n"
+
+#: ../programs/gvfs-mount.c:241
+#, c-format
+msgid "Error unmounting mount: %s\n"
+msgstr "Kļūda, atmontējot vietu: %s\n"
+
+#: ../programs/gvfs-mount.c:262
+#, c-format
+#| msgid "Could not find enclosing mount"
+msgid "Error finding enclosing mount: %s\n"
+msgstr "Kļūda, meklējot ietverošo montējumu: %s\n"
+
+#: ../programs/gvfs-mount.c:682
+#, c-format
+msgid "Error mounting %s: %s\n"
+msgstr "Kļūda, montējot %s: %s\n"
+
+#: ../programs/gvfs-mount.c:696
+#, c-format
+msgid "Mounted %s at %s\n"
+msgstr "Montēts %s uz %s\n"
+
+#: ../programs/gvfs-mount.c:747
+#, c-format
+msgid "No volume for device file %s\n"
+msgstr "Ierīces failam %s nav sējuma\n"
+
+#: ../programs/gvfs-mount.c:938
+msgid "- mount <location>"
+msgstr "- montēt <vietu>"
+
+#: ../programs/gvfs-move.c:103
+msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
+msgstr "AVOTS... MĒRĶIS - pārvieto failu(-s) no AVOTS uz MĒRĶIS"
+
+#: ../programs/gvfs-move.c:189
+#, c-format
+msgid "Error moving file %s: %s\n"
+msgstr "Kļūda, pārvietojot failu %s: %s\n"
+
+#: ../programs/gvfs-open.c:37
+msgid "files"
+msgstr "faili"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:56
+#: ../programs/gvfs-open.c:65
 #, c-format
 msgid "%s: %s: error opening location: %s\n"
-msgstr ""
+msgstr "%s: %s: kļūda, atverot vietu: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:83
+#: ../programs/gvfs-open.c:92
 #, c-format
 msgid "%s: %s: error launching application: %s\n"
-msgstr ""
+msgstr "%s: %s: kļūda, palaižot lietotni: %s\n"
 
-#: ../programs/gvfs-open.c:113
+#: ../programs/gvfs-open.c:122
 msgid "FILES... - open FILES with registered application."
-msgstr ""
+msgstr "FAILI... - atver FAILI ar reģistrētu lietotni."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-open.c:117
+#: ../programs/gvfs-open.c:126
 msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
-msgstr ""
+msgstr "Atver failu(-s) ar noklusēto lietotni, kas reģistrēta šim failu tipam."
 
+#: ../programs/gvfs-rename.c:50
+msgid "- rename file"
+msgstr "- pārsaukt failu"
+
+#: ../programs/gvfs-rename.c:76
+#, c-format
+msgid "Rename successful. New uri: %s\n"
+msgstr "Pārsaukšana veiksmīga. Jaunais uri: %s\n"
+
+#: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
+msgid "ignore nonexistent files, never prompt"
+msgstr "ignorēt neeksistējošus failus, nekad nevaicāt"
+
+#: ../programs/gvfs-rm.c:53
+msgid "- delete files"
+msgstr "- dzēst failus"
+
+#: ../programs/gvfs-save.c:43
+msgid "Create backup"
+msgstr "Izveidot rezerves kopijas"
+
+#: ../programs/gvfs-save.c:44
+msgid "Only create if not existing"
+msgstr "Izveidot tikai, ja neeksistē"
+
+#: ../programs/gvfs-save.c:45
+msgid "Append to end of file"
+msgstr "Pievienot faila beigām"
+
+#: ../programs/gvfs-save.c:46
+msgid "When creating a file, restrict access to the current user only"
+msgstr "Kad veido failu, ierobežot pieeju tikai pašreizējam lietotājam"
+
+#: ../programs/gvfs-save.c:47
+msgid "Print new etag at end"
+msgstr "Drukāt jaunu etag beigās"
+
+#: ../programs/gvfs-save.c:48
+msgid "The etag of the file being overwritten"
+msgstr "etag failam, ko pārraksta"
+
+#: ../programs/gvfs-save.c:76
+#, c-format
+msgid "Error opening file: %s\n"
+msgstr "Kļūda, atverot failu: %s\n"
+
+#: ../programs/gvfs-save.c:109
+msgid "Error reading stdin"
+msgstr "Kļūda, nolasot stdin"
+
+#: ../programs/gvfs-save.c:122
+#, c-format
+#| msgid "Error: %s"
+msgid "Error closing: %s\n"
+msgstr "Kļūda aizverot: %s\n"
+
+#: ../programs/gvfs-save.c:134
+#, c-format
+msgid "Etag not available\n"
+msgstr "Etag nav pieejams\n"
+
+#: ../programs/gvfs-save.c:156
+msgid "DEST - read from standard input and save to DEST"
+msgstr "MĒRĶIS - ielasīt no standarta ievades un saglabāt uz MĒRĶA"
+
+#: ../programs/gvfs-set-attribute.c:36
+msgid ""
+"attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv, unset]"
+msgstr ""
+"atribūta tips [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv, unset]"
+
+#: ../programs/gvfs-set-attribute.c:119
+msgid " <location> <attribute> <values> - set attribute"
+msgstr " <vieta> <atribūts> <vērtības> - iestatīt atribūtu"
+
+#: ../programs/gvfs-set-attribute.c:137
+#, c-format
+msgid "Location not specified\n"
+msgstr "Vieta nav norādīta\n"
+
+#: ../programs/gvfs-set-attribute.c:145
+#, c-format
+msgid "Attribute not specified\n"
+msgstr "Atribūts nav norādīts\n"
+
+#: ../programs/gvfs-set-attribute.c:154
+#, c-format
+msgid "Value not specified\n"
+msgstr "Vērtība nav norādīta\n"
+
+#: ../programs/gvfs-set-attribute.c:195
+#, c-format
+#| msgid "Invalid filename %s"
+msgid "Invalid attribute type %s\n"
+msgstr "Nederīgs atribūta tips %s\n"
+
+#: ../programs/gvfs-set-attribute.c:205
+#, c-format
+msgid "Error setting attribute: %s\n"
+msgstr "Kļūda, iestatot atribūtu: %s\n"
+
+#: ../programs/gvfs-trash.c:52
+msgid "- move files to trash"
+msgstr "- pārvietot failus uz miskasti"
+
+#: ../programs/gvfs-trash.c:69
+#, c-format
+msgid "Error trashing file: %s\n"
+msgstr "Kļūda, izmetot failu miskastē: %s\n"
+
+#: ../programs/gvfs-tree.c:37
+msgid "Follow symlinks, mounts and shortcuts like dirs"
+msgstr "Sekot simboliskajām saitēm, montējumiem un īsinājumiem kā mapēm"
+
+#: ../programs/gvfs-tree.c:242
+msgid "- list contents of directories in a tree-like format"
+msgstr " - uzskaitīt mapju saturu koka formā"
+
+#~ msgid "Invalid return value from get_info"
+#~ msgstr "Nederīga get_info atgrieztā vērtība"
+
+#~ msgid "Invalid return value from query_info"
+#~ msgstr "Nederīga query_info atgrieztā vērtība"
+
+#~ msgid "Invalid return value from call"
+#~ msgstr "Nederīga call atgrieztā vērtība"
+
+#~ msgid "Invalid return value from get_filesystem_info"
+#~ msgstr "Nederīga get_filesystem_info atgrieztā vērtība"
+
+#~ msgid "Invalid return value from query_filesystem_info"
+#~ msgstr "Nederīga query_filesystem_info atgrieztā vērtība"
+
+#~ msgid "Invalid return value from open_icon_for_read"
+#~ msgstr "Nederīga open_icon_for_read atgrieztā vērtība"
+
+#~ msgid "filename too long"
+#~ msgstr "faila nosaukums par garu"
+
+#~ msgid "Enter password"
+#~ msgstr "Ievadiet paroli"
