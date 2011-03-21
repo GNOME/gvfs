@@ -213,6 +213,14 @@ fi
 
 AM_CONDITIONAL(USE_GCONF, [test "$msg_gconf" = "yes"])
 
+dnl *************************************************************
+dnl *** Check if we can build gconf-based gio extension point ***
+dnl *************************************************************
+
+msg_gconf_gio=no
+PKG_CHECK_EXISTS(gio-2.0 <= 2.27.1, msg_gconf_gio=yes)
+AM_CONDITIONAL(USE_GCONF_GIO, [test "$msg_gconf_gio" = "yes"])
+
 dnl ********************************************
 dnl *** Check for expat (for obexftp and gdu ***
 dnl ********************************************
@@ -726,6 +734,7 @@ echo "
 	archive support:              $msg_archive
 	AFC support:                  $msg_afc
         GConf support:                $msg_gconf
+        GConf-based GIO extension:    $msg_gconf_gio
         DNS-SD support:               $msg_avahi
 	Build HAL volume monitor:     $msg_hal (with fast init path: $have_hal_fast_init)
 	Build GDU volume monitor:     $msg_gdu
