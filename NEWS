@@ -1,3 +1,16 @@
+Major changes in 1.7.3
+======================
+* build: Bump fuse requirement for ATOMIC_O_TRUNC support
+* build: Honor ACLOCAL_FLAGS
+* build: Don't link http backend with SoupOutputStream
+* build: Cleanups and fixes for compiler warnings
+* client: Fix wrong assignment before dbus_connection_unref()
+* archive: Prevent assertion failure on duplicate mount
+* archive: Skip leading "./" from pathnames if present
+* archive: Propagate entry index as inode no. for files
+* smb: Add support for default location
+* Translation updates
+
 Major changes in 1.7.2
 ======================
 * ftp: Parse mode, user and group for unix listings
