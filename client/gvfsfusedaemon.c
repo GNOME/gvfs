@@ -991,6 +991,34 @@ setup_output_stream (GFile *file, FileHandle *fh, int flags)
 }
 
 static gint
+open_common (const gchar *path, struct fuse_file_info *fi, GFile *file, int output_flags)
+{
+  gint        result;
+  FileHandle *fh = get_or_create_file_handle_for_path (path);
+
+  g_mutex_lock (fh->mutex);
+
+  /* File exists */
+
+  SET_FILE_HANDLE (fi, fh);
+
+  debug_print ("open_common: flags=%o\n", fi->flags);
+
+  /* Set up a stream here, so we can check for errors */
+  set_pid_for_file (file);
+
+  if (fi->flags & O_WRONLY || fi->flags & O_RDWR)
+    result = setup_output_stream (file, fh, fi->flags | output_flags);
+  else
+    result = setup_input_stream (file, fh);
+
+  g_mutex_unlock (fh->mutex);
+
+  /* The added reference to the file handle is released in vfs_release() */
+  return result;
+}
+
+static gint
 vfs_open (const gchar *path, struct fuse_file_info *fi)
 {
   GFile *file;
@@ -1013,27 +1041,7 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
 
           if (file_type == G_FILE_TYPE_REGULAR)
             {
-              FileHandle *fh = get_or_create_file_handle_for_path (path);
-
-              g_mutex_lock (fh->mutex);
-
-              /* File exists */
-
-              SET_FILE_HANDLE (fi, fh);
-
-              debug_print ("vfs_open: flags=%o\n", fi->flags);
-
-              /* Set up a stream here, so we can check for errors */
-              set_pid_for_file (file);
-
-              if (fi->flags & O_WRONLY || fi->flags & O_RDWR)
-                result = setup_output_stream (file, fh, fi->flags);
-              else
-                result = setup_input_stream (file, fh);
-
-              g_mutex_unlock (fh->mutex);
-
-              /* The added reference to the file handle is released in vfs_release() */
+              result = open_common (path, fi, file, 0);
             }
           else if (file_type == G_FILE_TYPE_DIRECTORY)
             {
@@ -1108,24 +1116,11 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
             }
 
           file_output_stream = g_file_create (file, 0, NULL, &error);
-          set_pid_for_file (file);
           if (file_output_stream)
             {
-              FileHandle *fh = get_or_create_file_handle_for_path (path);
-
-              /* Success */
-
-              g_mutex_lock (fh->mutex);
-
-              SET_FILE_HANDLE (fi, fh);
-
-              file_handle_close_stream (fh);
-              fh->stream = file_output_stream;
-              fh->op = FILE_OP_WRITE;
-
-              g_mutex_unlock (fh->mutex);
-
-              /* The added reference to the file handle is released in vfs_release() */
+              g_output_stream_close (G_OUTPUT_STREAM (file_output_stream), NULL, NULL);
+              g_object_unref (file_output_stream);
+              result = open_common (path, fi, file, O_TRUNC);
             }
           else
             {
