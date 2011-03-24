@@ -2217,7 +2217,9 @@ g_vfs_backend_afc_set_display_name (GVfsBackend *backend,
                                     const char *display_name)
 {
   GVfsBackendAfc *self;
+  char *afc_path;
   char *new_path;
+  char *dirname;
   afc_client_t afc_cli;
 
   self = G_VFS_BACKEND_AFC(backend);
@@ -2229,11 +2231,11 @@ g_vfs_backend_afc_set_display_name (GVfsBackend *backend,
       AppInfo *info;
 
       new_path = NULL;
-      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &new_path);
-      if (app == NULL || g_str_equal (new_path, "/"))
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &afc_path);
+      if (app == NULL || g_str_equal (afc_path, "/"))
         {
           g_free (app);
-          g_free (new_path);
+          g_free (afc_path);
           g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB (job));
           return;
         }
@@ -2242,7 +2244,7 @@ g_vfs_backend_afc_set_display_name (GVfsBackend *backend,
       if (info == NULL)
         {
           g_free (app);
-          g_free (new_path);
+          g_free (afc_path);
           g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB (job));
           return;
         }
@@ -2253,18 +2255,24 @@ g_vfs_backend_afc_set_display_name (GVfsBackend *backend,
   else
     {
       afc_cli = self->afc_cli;
-      new_path = NULL;
+      afc_path = NULL;
     }
 
+  dirname = g_path_get_dirname (afc_path ? afc_path : filename);
+  new_path = g_build_filename (dirname, display_name, NULL);
+  g_free (dirname);
+
   if (G_UNLIKELY(g_vfs_backend_afc_check (afc_rename_path (afc_cli,
-                                                           new_path ? new_path : filename, display_name),
+                                                           afc_path ? afc_path : filename, new_path),
                                           G_VFS_JOB(job))))
     {
+      g_free (afc_path);
       g_free (new_path);
       return;
     }
 
-  g_vfs_job_set_display_name_set_new_path (job, display_name);
+  g_vfs_job_set_display_name_set_new_path (job, new_path);
+  g_free (afc_path);
   g_free (new_path);
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
