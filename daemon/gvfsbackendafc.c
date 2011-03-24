@@ -1386,18 +1386,27 @@ g_vfs_backend_afc_set_display_name (GVfsBackend *backend,
                                     const char *display_name)
 {
   GVfsBackendAfc *self;
+  char *new_path;
+  char *dirname;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
+  dirname = g_path_get_dirname (filename);
+  new_path = g_build_filename (dirname, display_name, NULL);
+  g_free (dirname);
+
   if (G_UNLIKELY(g_vfs_backend_afc_check (afc_rename_path (self->afc_cli,
-                                                           filename, display_name),
+                                                           filename, new_path),
                                           G_VFS_JOB(job))))
     {
+      g_free (new_path);
       return;
     }
 
   g_vfs_job_set_display_name_set_new_path (job, display_name);
+
+  g_free (new_path);
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
