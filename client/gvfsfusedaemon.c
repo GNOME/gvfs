@@ -2304,7 +2304,7 @@ dbus_filter_func (DBusConnection *connection,
                   DBusMessage    *message,
                   void           *data)
 {
-	if (dbus_message_is_signal (message,
+  if (dbus_message_is_signal (message,
                               DBUS_INTERFACE_DBUS,
                               "NameOwnerChanged"))
     {
@@ -2333,8 +2333,8 @@ dbus_filter_func (DBusConnection *connection,
       /* Session bus died, unmount */
       g_main_loop_quit (subthread_main_loop);
     }
-	
-	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+
+  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
 
 static gpointer
@@ -2354,9 +2354,9 @@ vfs_init (struct fuse_conn_info *conn)
   global_active_fh_map = g_hash_table_new_full (g_direct_hash, g_direct_equal,
                                                 NULL, NULL);
 
-	dbus_error_init (&error);
+  dbus_error_init (&error);
 
-	dbus_conn = dbus_bus_get (DBUS_BUS_SESSION, &error);
+  dbus_conn = dbus_bus_get (DBUS_BUS_SESSION, &error);
   if (dbus_conn == NULL)
     {
       g_printerr ("Failed to connect to the D-BUS daemon: %s\n",
@@ -2369,13 +2369,13 @@ vfs_init (struct fuse_conn_info *conn)
 
   _g_dbus_connection_integrate_with_main (dbus_conn);
 
-	dbus_bus_add_match (dbus_conn,
+  dbus_bus_add_match (dbus_conn,
                       "type='signal',sender='" DBUS_SERVICE_DBUS "',"
                       "interface='" DBUS_INTERFACE_DBUS "',"
                       "member='NameOwnerChanged',"
                       "arg0='"G_VFS_DBUS_DAEMON_NAME"'",
                       NULL);
-	dbus_connection_add_filter (dbus_conn,
+  dbus_connection_add_filter (dbus_conn,
                               dbus_filter_func,
                               NULL,
                               NULL);
