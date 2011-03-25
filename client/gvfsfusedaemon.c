@@ -998,8 +998,6 @@ open_common (const gchar *path, struct fuse_file_info *fi, GFile *file, int outp
 
   g_mutex_lock (fh->mutex);
 
-  /* File exists */
-
   SET_FILE_HANDLE (fi, fh);
 
   debug_print ("open_common: flags=%o\n", fi->flags);
