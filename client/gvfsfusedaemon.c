@@ -837,6 +837,18 @@ getattr_for_file (GFile *file, struct stat *sbuf)
   return result;
 }
 
+static void
+getattr_for_file_handle (FileHandle *fh, struct stat *sbuf)
+{
+  sbuf->st_mode = S_IFREG | S_IRUSR | S_IWUSR | S_IXUSR;
+  sbuf->st_uid = daemon_uid;
+  sbuf->st_gid = daemon_gid;
+  sbuf->st_nlink = 1;
+  sbuf->st_size = fh->pos;
+  sbuf->st_blksize = 512;
+  sbuf->st_blocks = (sbuf->st_size + 511) / 512;
+}
+
 static gint
 vfs_getattr (const gchar *path, struct stat *sbuf)
 {
@@ -876,6 +888,26 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
       /* Submount */
 
       result = getattr_for_file (file, sbuf);
+
+      if (result != 0)
+        {
+          FileHandle *fh = get_file_handle_for_path (path);
+
+          /* Some backends don't create new files until their stream has
+           * been closed. So, if the path doesn't exist, but we have a stream
+           * associated with it, pretend it's there. */
+
+          if (fh != NULL)
+            {
+              g_mutex_lock (fh->mutex);
+              getattr_for_file_handle (fh, sbuf);
+              g_mutex_unlock (fh->mutex);
+
+              file_handle_unref (fh);
+              result = 0;
+            }
+        }
+
       g_object_unref (file);
     }
   else
@@ -1096,6 +1128,8 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
       GFileInfo *file_info;
       GError    *error = NULL;
 
+      set_pid_for_file (file);
+
       file_info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_TYPE, 0, NULL, &error);
 
       if (file_info)
@@ -1116,9 +1150,21 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
           file_output_stream = g_file_create (file, 0, NULL, &error);
           if (file_output_stream)
             {
-              g_output_stream_close (G_OUTPUT_STREAM (file_output_stream), NULL, NULL);
-              g_object_unref (file_output_stream);
-              result = open_common (path, fi, file, O_TRUNC);
+              FileHandle *fh = get_or_create_file_handle_for_path (path);
+
+              /* Success */
+
+              g_mutex_lock (fh->mutex);
+
+              SET_FILE_HANDLE (fi, fh);
+
+              file_handle_close_stream (fh);
+              fh->stream = file_output_stream;
+              fh->op = FILE_OP_WRITE;
+
+              g_mutex_unlock (fh->mutex);
+
+              /* The reference added to the file handle is released in vfs_release() */
             }
           else
             {
@@ -2049,6 +2095,23 @@ vfs_access (const gchar *path, gint mode)
       else
         {
           result = -EIO;
+        }
+
+      if (result != 0)
+        {
+          FileHandle *fh = get_file_handle_for_path (path);
+
+          /* Some backends don't create new files until their stream has
+           * been closed. So, if the path doesn't exist, but we have a stream
+           * associated with it, pretend it's there. */
+
+          if (fh != NULL)
+            {
+              file_handle_unref (fh);
+
+              /* The file was presumably created by us, so indicate full access. */
+              result = 0;
+            }
         }
 
       g_object_unref (file);
