@@ -430,8 +430,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
     case 2:
       self->mode = ACCESS_MODE_AFC;
       self->service = g_strdup_printf ("com.apple.afc%d", virtual_port);
-      display_name = g_strdup_printf (_("Service %d on Apple Mobile Device"),
-                                      virtual_port);
+      display_name = g_strdup_printf (_("Apple Mobile Device, Jailbroken"));
       break;
     case 3:
       self->mode = ACCESS_MODE_HOUSE_ARREST;
