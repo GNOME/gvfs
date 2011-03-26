@@ -1,15 +1,15 @@
 # Vietnamese translation for GVFS.
 # Copyright © 2009 GNOME i18n Project for Vietnamese.
 # Clytie Siddall <clytie@riverland.net.au>, 2008-2009.
-#
+# Nguyễn Thái Ngọc Duy <pclouds@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.1.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2011-03-24 19:14+0000\n"
-"PO-Revision-Date: 2009-02-07 17:29+0930\n"
-"Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
+"PO-Revision-Date: 2011-03-27 01:12+0700\n"
+"Last-Translator: Nguyễn Thái Ngọc Duy <pclouds@gmail.com>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,10 +33,10 @@ msgstr "Thao tác không được hỗ trợ, vì tập tin nằm ở điểm g�
 #: ../client/gdaemonfile.c:2808 ../client/gdaemonfile.c:2996
 #: ../client/gdaemonfile.c:3076 ../client/gvfsiconloadable.c:145
 #: ../client/gvfsiconloadable.c:374
-#, fuzzy, c-format
+#, c-format
 #| msgid "Invalid return value from open"
 msgid "Invalid return value from %s"
-msgstr "Giá trị đáp ứng không hợp lệ từ hàm mở (open)"
+msgstr "Giá trị đáp ứng không hợp lệ từ %s"
 
 #: ../client/gdaemonfile.c:985 ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
@@ -61,14 +61,14 @@ msgstr "Tên tập tin không hợp lệ %s"
 
 #: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1199
 #: ../client/gdaemonvfs.c:1334 ../client/gdaemonvfs.c:1387
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error deleting file: %s"
 msgid "Error setting file metadata: %s"
-msgstr "Gặp lỗi khi xoá tập tin: %s"
+msgstr "Gặp lỗi đặt metadata cho tập tin: %s"
 
 #: ../client/gdaemonfile.c:2233 ../client/gdaemonvfs.c:1388
 msgid "values must be string or list of strings"
-msgstr ""
+msgstr "giá trị phải là chuỗi hoặc danh sách chuỗi"
 
 #: ../client/gdaemonfileenumerator.c:466 ../client/gdaemonfileenumerator.c:549
 #: ../client/gdaemonfileenumerator.c:600
@@ -129,10 +129,9 @@ msgid "Error while getting mount info: %s"
 msgstr "Gặp lỗi khi lấy thông tin về điểm gắn kết: %s"
 
 #: ../client/gdaemonvfs.c:1200
-#, fuzzy
 #| msgid "Cannot connect to the system bus"
 msgid "Can't contact session bus"
-msgstr "Không thể kết nối tới mạch hệ thống"
+msgstr "Không thể liên lạc mạch hệ thống"
 
 #: ../client/gvfsdaemondbus.c:572 ../client/gvfsdaemondbus.c:1004
 #, c-format
@@ -260,76 +259,71 @@ msgid "error starting mount daemon"
 msgstr "gặp lỗi khi khởi chạy trình nền gắn kết"
 
 #: ../daemon/gvfsbackend.c:933 ../monitor/gdu/ggdumount.c:921
-#, fuzzy
 #| msgid "Log In Anyway"
 msgid "Unmount Anyway"
-msgstr "Vẫn đăng nhập"
+msgstr "Vẫn bỏ gắn kết"
 
 #: ../daemon/gvfsbackend.c:934 ../daemon/gvfsbackendafc.c:388
 #: ../monitor/gdu/ggdudrive.c:1022 ../monitor/gdu/ggdumount.c:922
-#, fuzzy
 #| msgid "Cancel Login"
 msgid "Cancel"
-msgstr "Thôi đăng nhập"
+msgstr "Thôi"
 
 #: ../daemon/gvfsbackend.c:936 ../monitor/gdu/ggdumount.c:923
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
 msgstr ""
+"Khối tin đang bận\n"
+"Ứng dụng nào đó đang làm việc với khối tin."
 
 #: ../daemon/gvfsbackendafc.c:212
 msgid "Internal Apple File Control error"
-msgstr ""
+msgstr "Lỗi Apple File Control nội bộ"
 
 #: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:729
-#, fuzzy
 #| msgid "File doesn't exist"
 msgid "File does not exist"
 msgstr "Tập tin không tồn tại"
 
 #: ../daemon/gvfsbackendafc.c:219
-#, fuzzy
 #| msgid "Directory not empty"
 msgid "The directory is not empty"
 msgstr "Thư mục không rỗng"
 
 #: ../daemon/gvfsbackendafc.c:223
-#, fuzzy
 #| msgid "The file is not a directory"
 msgid "The device did not respond"
-msgstr "Tập tin không phải là một thư mục"
+msgstr "Thiết bị không trả lời"
 
 #: ../daemon/gvfsbackendafc.c:227
-#, fuzzy
 #| msgid "The specified location is not supported"
 msgid "The connection was interrupted"
-msgstr "Vị trí đã ghi rõ không được hỗ trợ"
+msgstr "Kết nối bị ngắt"
 
 #: ../daemon/gvfsbackendafc.c:231
-#, fuzzy
 #| msgid "Invalid reply received"
 msgid "Invalid Apple File Control data received"
-msgstr "Nhận được đáp ứng không hợp lệ"
+msgstr "Nhận dữ liệu Apple File Control không hợp lệ"
 
 #: ../daemon/gvfsbackendafc.c:235
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
-msgstr ""
+msgstr "Lỗi Apple File Control không được xử lý (%d)"
 
 #: ../daemon/gvfsbackendafc.c:254
 #, c-format
 msgid "Unhandled Inst proxy error (%d)"
-msgstr ""
+msgstr "Lỗi uỷ nhiện Inst không được xử lý (%d)"
 
 #: ../daemon/gvfsbackendafc.c:273
 #, c-format
 msgid "Unhandled SBServices proxy error (%d)"
-msgstr ""
+msgstr "Lỗi uỷ nhiện SBServices không được xử lý (%d)"
 
 #: ../daemon/gvfsbackendafc.c:290
 msgid "Lockdown Error: Invalid Argument"
-msgstr ""
+msgstr "Lỗi lockdown: đối số không hợp lệ"
 
 #: ../daemon/gvfsbackendafc.c:294 ../daemon/gvfsbackendsftp.c:310
 #: ../daemon/gvfsbackendsftp.c:1834 ../daemon/gvfsftptask.c:400
@@ -339,26 +333,28 @@ msgstr "Không đủ quyền truy cập"
 #: ../daemon/gvfsbackendafc.c:297
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
-msgstr ""
+msgstr "Lỗi lockdown không xử lý (%d)"
 
 #: ../daemon/gvfsbackendafc.c:314
 msgid "libimobiledevice Error: Invalid Argument"
-msgstr ""
+msgstr "Lỗi libimobiledevice: đối số không hợp lệ"
 
 #: ../daemon/gvfsbackendafc.c:318
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
 msgstr ""
+"Lỗi libimobiledevice: Không có thiết bị. Nhớ bảo đảm usbmuxd được thiết lập "
+"đúng."
 
 #: ../daemon/gvfsbackendafc.c:321
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
-msgstr ""
+msgstr "Lỗi libimobiledevice không xử lý (%d)"
 
 #: ../daemon/gvfsbackendafc.c:388
 msgid "Try again"
-msgstr ""
+msgstr "Thử lại"
 
 #: ../daemon/gvfsbackendafc.c:406 ../daemon/gvfsbackendarchive.c:550
 #: ../daemon/gvfsbackendarchive.c:579 ../daemon/gvfsbackenddav.c:1629
@@ -370,36 +366,36 @@ msgstr "đặc tả gắn kết không hợp lệ"
 
 #: ../daemon/gvfsbackendafc.c:412 ../daemon/gvfsbackendafc.c:443
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
-msgstr ""
+msgstr "Vị trí AFC không hợp lệ: phải theo dạng afc://uuid:số-port"
 
 #: ../daemon/gvfsbackendafc.c:428
 #, c-format
 msgid "Apple Mobile Device"
-msgstr ""
+msgstr "Thiết bị di động Apple"
 
 #: ../daemon/gvfsbackendafc.c:433
 #, c-format
 msgid "Service %d on Apple Mobile Device"
-msgstr ""
+msgstr "Dịch vụ %d trên thiết bị di động Apple"
 
 #: ../daemon/gvfsbackendafc.c:439
 #, c-format
 msgid "Documents on Apple Mobile Device"
-msgstr ""
+msgstr "Tài liệu trên thiết bị di động Apple"
 
 #: ../daemon/gvfsbackendafc.c:497
 #, c-format
 msgid "%s (jailbreak)"
-msgstr ""
+msgstr "%s (phá ngục)"
 
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
 #: ../daemon/gvfsbackendafc.c:504 ../monitor/afc/afcvolume.c:125
-#, fuzzy, c-format
+#, c-format
 #| msgid "cdda mount on %s"
 msgid "Documents on %s"
-msgstr "điểm gắn kết cdda trên %s"
+msgstr "Tài liệu trên %s"
 
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
@@ -410,6 +406,8 @@ msgid ""
 "Device '%s' is password protected. Enter the password on the device and "
 "click 'Try again'."
 msgstr ""
+"Thiết bị '%s' được bảo vệ bằng mật khẩu. Nhập mật khẩu cho thiết bị và nhấn "
+"'Thử lại'."
 
 #: ../daemon/gvfsbackendafc.c:922 ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1886
@@ -430,16 +428,14 @@ msgid "File doesn't exist"
 msgstr "Tập tin không tồn tại"
 
 #: ../daemon/gvfsbackendafc.c:1123 ../daemon/gvfsbackendafc.c:2458
-#, fuzzy
 #| msgid "backups not supported yet"
 msgid "Backups are not yet supported."
-msgstr "chưa hỗ trợ chức năng sao lưu"
+msgstr "Chưa hỗ trợ sao lưu."
 
 #: ../daemon/gvfsbackendafc.c:1295
-#, fuzzy
 #| msgid "Invalid backend type"
 msgid "Invalid seek type"
-msgstr "Kiểu hậu phương không hợp lệ"
+msgstr "Kiểu dịch chuyển không hợp lệ"
 
 #: ../daemon/gvfsbackendafc.c:2295 ../daemon/gvfsbackendftp.c:1080
 #: ../daemon/gvfsbackendftp.c:1128 ../daemon/gvfsbackendftp.c:1149
@@ -564,10 +560,9 @@ msgid "Not supported"
 msgstr "Không được hỗ trợ"
 
 #: ../daemon/gvfsbackendcdda.c:332 ../daemon/gvfsbackendgphoto2.c:1510
-#, fuzzy
 #| msgid "Cannot create gphoto2 context"
 msgid "Cannot create gudev client"
-msgstr "Không thể tạo ngữ cảnh gphoto2"
+msgstr "Không thể tạo gudev client"
 
 #: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1528
 msgid "Cannot connect to the system bus"
@@ -649,10 +644,9 @@ msgid "Computer"
 msgstr "Máy tính"
 
 #: ../daemon/gvfsbackendcomputer.c:521
-#, fuzzy
 #| msgid "Filesystem"
 msgid "File System"
-msgstr "Hệ thống tập tin"
+msgstr "Hệ tập tin"
 
 #: ../daemon/gvfsbackendcomputer.c:649
 msgid "Can't open mountable file"
@@ -686,22 +680,19 @@ msgid "Can't eject file"
 msgstr "Không thể đẩy tập tin ra"
 
 #: ../daemon/gvfsbackendcomputer.c:1252 ../daemon/gvfsbackendcomputer.c:1259
-#, fuzzy
 #| msgid "Can't mount file"
 msgid "Can't start file"
-msgstr "Không thể gắn kết tập tin"
+msgstr "Không thể bắt đầu tập tin"
 
 #: ../daemon/gvfsbackendcomputer.c:1325 ../daemon/gvfsbackendcomputer.c:1332
-#, fuzzy
 #| msgid "Can't mount file"
 msgid "Can't stop file"
-msgstr "Không thể gắn kết tập tin"
+msgstr "Không thể dừng tập tin"
 
 #: ../daemon/gvfsbackendcomputer.c:1389 ../daemon/gvfsbackendcomputer.c:1396
-#, fuzzy
 #| msgid "Can't mount file"
 msgid "Can't poll file"
-msgstr "Không thể gắn kết tập tin"
+msgstr "Không thể dò (poll) tập tin"
 
 #: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1696
 #: ../daemon/gvfsbackendhttp.c:261
@@ -818,7 +809,7 @@ msgstr "FTP dưới %s trên %s"
 
 #: ../daemon/gvfsbackendftp.c:720
 msgid "Insufficient permissions"
-msgstr ""
+msgstr "Không đủ quyền"
 
 #: ../daemon/gvfsbackendftp.c:766 ../daemon/gvfsbackendsftp.c:2333
 #: ../daemon/gvfsbackendsftp.c:3069 ../daemon/gvfsbackendsftp.c:3408
@@ -832,10 +823,9 @@ msgid "backups not supported yet"
 msgstr "chưa hỗ trợ chức năng sao lưu"
 
 #: ../daemon/gvfsbackendftp.c:1121 ../daemon/gvfsbackendsftp.c:4643
-#, fuzzy
 #| msgid "Invalid attribute info list content"
 msgid "Invalid attribute type (uint32 expected)"
-msgstr "Nội dung danh sách thông tin thuộc tính không hợp lệ"
+msgstr "Loại thuộc tính không hợp lệ (cần uint32)"
 
 #: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
@@ -931,10 +921,10 @@ msgid "No camera specified"
 msgstr "Chưa xác định máy quay"
 
 #: ../daemon/gvfsbackendgphoto2.c:1806 ../daemon/gvfsbackendgphoto2.c:1832
-#, fuzzy, c-format
+#, c-format
 #| msgid "Filesystem"
 msgid "Filesystem is busy"
-msgstr "Hệ thống tập tin"
+msgstr "Hệ tập tin đang bận"
 
 #: ../daemon/gvfsbackendgphoto2.c:1902
 msgid "Error creating file object"
@@ -1124,31 +1114,31 @@ msgstr "Quá hạn trong khi đăng nhập"
 
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendsftp.c:958
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter password for ftp as %s on %s"
 msgid "Enter passphrase for key for ssh as %s on %s"
-msgstr "Nhập mật khẩu cho dịch vụ FTP dưới %s trên %s"
+msgstr "Nhập mật khẩu cho khoá ssh của %s trên %s"
 
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendsftp.c:961
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter password for ftp as %s on %s"
 msgid "Enter password for ssh as %s on %s"
-msgstr "Nhập mật khẩu cho dịch vụ FTP dưới %s trên %s"
+msgstr "Nhập mật khẩu cho ssh của %s trên %s"
 
 #. Translators: %s is the hostname
 #: ../daemon/gvfsbackendsftp.c:965
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter passphrase for key"
 msgid "Enter passphrase for key for ssh on %s"
-msgstr "Gõ cụm từ mật khẩu cho khoá"
+msgstr "Nhập mật khẩu cho khoá ssh trên %s"
 
 #. Translators: %s is the hostname
 #: ../daemon/gvfsbackendsftp.c:968
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter password for ftp on %s"
 msgid "Enter password for ssh on %s"
-msgstr "Nhập mật khẩu cho dịch vụ FTP trên %s"
+msgstr "Nhập mật khẩu cho ssh trên %s"
 
 #: ../daemon/gvfsbackendsftp.c:1048
 msgid "Can't send password"
@@ -1279,10 +1269,9 @@ msgid "Backup file creation failed: %s"
 msgstr "Gặp lỗi khi tạo tập tin sao lưu : %s"
 
 #: ../daemon/gvfsbackendsmb.c:1733
-#, fuzzy
 #| msgid "Invalid attribute info list content"
 msgid "Invalid attribute type (uint64 expected)"
-msgstr "Nội dung danh sách thông tin thuộc tính không hợp lệ"
+msgstr "Loại thuộc tính không hợp lệ (cần uint64)"
 
 #: ../daemon/gvfsbackendsmb.c:2028
 #, c-format
@@ -1356,10 +1345,9 @@ msgid "Error sending fd: %s"
 msgstr "Gặp lỗi khi gửi bộ mô tả tập tin: %s"
 
 #: ../daemon/gvfsftpconnection.c:180
-#, fuzzy
 #| msgid "Unexpected reply from server"
 msgid "Unexpected end of stream"
-msgstr "Gặp đáp ứng bất thường từ máy phục vụ"
+msgstr "Luồng bị kết thúc bất ngờ"
 
 #: ../daemon/gvfsftpconnection.c:196 ../daemon/gvfsftpconnection.c:209
 #: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
@@ -1367,24 +1355,25 @@ msgid "Invalid reply"
 msgstr "Đáp ứng không hợp lệ"
 
 #: ../daemon/gvfsftpconnection.c:392
-#, fuzzy
 #| msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
-msgstr "Không thể mở kết nối dữ liệu. Có thể bức tường lửa ngăn cản ?"
+msgstr ""
+"Không thể tạo kết nối FTP tích cực. Có thể bộ định tuyến của bạn không hỗ "
+"trợ?"
 
 #: ../daemon/gvfsftpconnection.c:399
 msgid "Failed to create active FTP connection."
-msgstr ""
+msgstr "Lỗi tạo kết nối FTP tích cực."
 
 #: ../daemon/gvfsftpfile.c:170
 msgid "Filename contains invalid characters."
-msgstr ""
+msgstr "Tập tin chứa ký tự không hợp lệ."
 
 #: ../daemon/gvfsftptask.c:262
 msgid "The FTP server is busy. Try again later"
-msgstr ""
+msgstr "Máy chủ FTP đang bận. Thử lại sau"
 
 #: ../daemon/gvfsftptask.c:356
 msgid "Accounts are unsupported"
@@ -1411,10 +1400,9 @@ msgid "No space left on server"
 msgstr "Không có sức chứa còn rảnh trên máy phục vụ"
 
 #: ../daemon/gvfsftptask.c:396
-#, fuzzy
 #| msgid "Unsupported seek type"
 msgid "Unsupported network protocol"
-msgstr "Cách tìm nơi không được hỗ trợ"
+msgstr "Giao thức mạng không hỗ trợ"
 
 #: ../daemon/gvfsftptask.c:404
 msgid "Page type unknown"
@@ -1494,42 +1482,40 @@ msgstr "Vị trí không có khả năng gắn kết"
 #: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
 #: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
 #: ../metadata/meta-daemon.c:449
-#, fuzzy, c-format
+#, c-format
 #| msgid "Cannot find drive %s"
 msgid "Can't find metadata file %s"
-msgstr "Không thể tìm ổ đĩa %s."
+msgstr "Không thể tìm tập tin metadata %s"
 
 #: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
 msgid "Unable to set metadata key"
-msgstr ""
+msgstr "Không thể đặt khoá metadata"
 
 #: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:399
 msgid "Unable to unset metadata key"
-msgstr ""
+msgstr "Không thể bỏ khoá metadata"
 
 #: ../metadata/meta-daemon.c:428
 msgid "Unable to remove metadata keys"
-msgstr ""
+msgstr "Không thể xoá khoá metadata"
 
 #: ../metadata/meta-daemon.c:459
 msgid "Unable to move metadata keys"
-msgstr ""
+msgstr "Không thể di chuyển khoá metadata"
 
 #: ../metadata/meta-daemon.c:704
-#, fuzzy
 #| msgid "GVFS Daemon"
 msgid "GVFS Metadata Daemon"
-msgstr "Trình nền GVFS"
+msgstr "Trình nền Metadata GVFS"
 
 #: ../metadata/meta-daemon.c:707
-#, fuzzy
 #| msgid "Main daemon for GVFS"
 msgid "Metadata daemon for GVFS"
-msgstr "Trình nền chính cho GVFS"
+msgstr "Trình nền metadata cho GVFS"
 
 #: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
 msgid "GVfs GDU Volume Monitor"
-msgstr ""
+msgstr "Trình theo dõi khối tin GDU GVfs"
 
 #: ../monitor/gdu/ggdudrive.c:168 ../monitor/hal/ghaldrive.c:179
 msgid "Floppy Drive"
@@ -1538,13 +1524,12 @@ msgstr "Ổ đĩa mềm"
 #: ../monitor/gdu/ggdudrive.c:258
 #, c-format
 msgid "Unnamed Drive (%s)"
-msgstr ""
+msgstr "Ổ không tên (%s)"
 
 #: ../monitor/gdu/ggdudrive.c:260
-#, fuzzy
 #| msgid "Tape Drive"
 msgid "Unnamed Drive"
-msgstr "Ổ băng từ"
+msgstr "Ổ không tên"
 
 #: ../monitor/gdu/ggdudrive.c:561 ../monitor/hal/ghaldrive.c:662
 #, c-format
@@ -1557,29 +1542,31 @@ msgid ""
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
 "to failures. Data on the drive may be irrevocably lost if a component fails."
 msgstr ""
+"Khởi động đĩa trong chế độ giảm sút?\n"
+"Khởi động ổ đĩa trong chế độ giảm sút nghĩa là ổ đĩa không còn khả năng chịu "
+"lỗi. Dữ liệu trên ổ đĩa có thể bị mất vĩnh viễn nếu một thành phần bị hư."
 
 #: ../monitor/gdu/ggdudrive.c:1021
 msgid "Start Anyway"
-msgstr ""
+msgstr "Vẫn khởi động"
 
 #: ../monitor/gdu/ggdumount.c:856
 msgid "One or more programs are preventing the unmount operation."
-msgstr ""
+msgstr "Một vài chương trình ngăn không cho bỏ gắn kết."
 
 #: ../monitor/gdu/ggdumount.c:984
 msgid "Cannot get LUKS cleartext slave"
-msgstr ""
+msgstr "Không thể lấy LUKS cleartext slave"
 
 #: ../monitor/gdu/ggdumount.c:1006
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
-msgstr ""
+msgstr "Không thể lấy LUKS cleartext slave từ đường dẫn `%s'"
 
 #: ../monitor/gdu/ggduvolume.c:325
-#, fuzzy
 #| msgid "Floppy Drive"
 msgid "Floppy Disk"
-msgstr "Ổ đĩa mềm"
+msgstr "Đĩa mềm"
 
 #: ../monitor/gdu/ggduvolume.c:1075
 #, c-format
@@ -1587,6 +1574,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data on partition %d."
 msgstr ""
+"Nhập mật khẩu để mở khoá khối tin\n"
+"Thiết bị \"%s\" chứa dữ liệu đã mã hoá trên phân vùng %d."
 
 #: ../monitor/gdu/ggduvolume.c:1082
 #, c-format
@@ -1594,6 +1583,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data."
 msgstr ""
+"Nhập mật khẩu để mở khoá khối tin\n"
+"Thiết bị \"%s\" chứa dữ liệu đã mã hoá."
 
 #: ../monitor/gdu/ggduvolume.c:1089
 #, c-format
@@ -1601,6 +1592,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device %s contains encrypted data."
 msgstr ""
+"Nhập mật khẩu để mở khoá khối tin\n"
+"Thiết bị %s chứa dữ liệu đã mã hoá."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
@@ -1911,10 +1904,9 @@ msgid "%s Encrypted Data"
 msgstr "Dữ liệu mật mã %s"
 
 #: ../programs/gvfs-cat.c:37
-#, fuzzy
 #| msgid "%s: missing locations"
 msgid "locations"
-msgstr "%s: thiếu vị trí"
+msgstr "vị trí"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1977,7 +1969,7 @@ msgstr ""
 #: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
 #, c-format
 msgid "Error parsing commandline options: %s\n"
-msgstr ""
+msgstr "Lỗi phân tích tuỳ chọn dòng lệnh: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -1987,317 +1979,306 @@ msgid "%s: missing locations"
 msgstr "%s: thiếu vị trí"
 
 #: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
-#, fuzzy
 #| msgid "Not a directory"
 msgid "no target directory"
-msgstr "Không phải là một thư mục"
+msgstr "không thư mục đích"
 
 #: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
 msgid "show progress"
-msgstr ""
+msgstr "hiện tiến độ"
 
 #: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
 msgid "prompt before overwrite"
-msgstr ""
+msgstr "hỏi trước khi ghi đè"
 
 #: ../programs/gvfs-copy.c:47
 msgid "preserve all attributes"
-msgstr ""
+msgstr "bảo toàn mọi thuộc  tính"
 
 #: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
-#, fuzzy
 #| msgid "Backup file creation failed"
 msgid "backup existing destination files"
-msgstr "Lỗi tạo tập tin sao lưu"
+msgstr "sao lưu tập tin đích hiện có"
 
 #: ../programs/gvfs-copy.c:49
 msgid "never follow symbolic links"
-msgstr ""
+msgstr "không bao giờ theo liên kết biểu tượng"
 
 #: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
 #, c-format
 msgid "progress"
-msgstr ""
+msgstr "tiến độ"
 
 #: ../programs/gvfs-copy.c:115
 msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
-msgstr ""
+msgstr "NGUỒN... ĐÍCH - chép tập tin từ NGUỒN sang ĐÍCH"
 
 #: ../programs/gvfs-copy.c:132 ../programs/gvfs-move.c:120
 msgid "Missing operand\n"
-msgstr ""
+msgstr "Thiếu thao tác\n"
 
 #: ../programs/gvfs-copy.c:140 ../programs/gvfs-move.c:128
 msgid "Too many arguments\n"
-msgstr ""
+msgstr "Quá nhiều đối số\n"
 
 #: ../programs/gvfs-copy.c:149 ../programs/gvfs-move.c:137
-#, fuzzy, c-format
+#, c-format
 #| msgid "The file is not a directory"
 msgid "Target %s is not a directory\n"
-msgstr "Tập tin không phải là một thư mục"
+msgstr "Đích %s không phải là một thư mục\n"
 
 #: ../programs/gvfs-copy.c:193
 #, c-format
 msgid "overwrite %s?"
-msgstr ""
+msgstr "ghi đè %s?"
 
 #: ../programs/gvfs-copy.c:207
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error moving file: %s"
 msgid "Error copying file %s: %s\n"
-msgstr "Gặp lỗi khi di chuyển tập tin: %s"
+msgstr "Lỗi chép tập tin %s: %s\n"
 
 #: ../programs/gvfs-info.c:37
 msgid "List writable attributes"
-msgstr ""
+msgstr "Danh sách thuộc tính có thể ghi"
 
 #: ../programs/gvfs-info.c:38
-#, fuzzy
 #| msgid "Filesystem"
 msgid "Get filesystem info"
-msgstr "Hệ thống tập tin"
+msgstr "Lấy thông tin hệ tập tin"
 
 #: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
 msgid "The attributes to get"
-msgstr ""
+msgstr "Thuộc tính cần lấy"
 
 #: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
 #: ../programs/gvfs-set-attribute.c:37
 msgid "Don't follow symlinks"
-msgstr ""
+msgstr "Không theo liên kết biểu tượng"
 
 #: ../programs/gvfs-info.c:50
-#, fuzzy
 #| msgid "Invalid backend type"
 msgid "invalid type"
-msgstr "Kiểu hậu phương không hợp lệ"
+msgstr "kiểu không hợp lệ"
 
 #: ../programs/gvfs-info.c:53
 msgid "unknown"
-msgstr ""
+msgstr "không rõ"
 
 #: ../programs/gvfs-info.c:56
 msgid "regular"
-msgstr ""
+msgstr "thường"
 
 #: ../programs/gvfs-info.c:59
-#, fuzzy
 #| msgid "Not a directory"
 msgid "directory"
-msgstr "Không phải là một thư mục"
+msgstr "thư mục"
 
 #: ../programs/gvfs-info.c:62
 msgid "symlink"
-msgstr ""
+msgstr "liên kết biểu tượng"
 
 #: ../programs/gvfs-info.c:65
 msgid "special"
-msgstr ""
+msgstr "đặc biệt"
 
 #: ../programs/gvfs-info.c:68
 msgid "shortcut"
-msgstr ""
+msgstr "đường tắt"
 
 #: ../programs/gvfs-info.c:71
-#, fuzzy
 #| msgid "Not a mountable file"
 msgid "mountable"
-msgstr "Không phải là một tập tin có khả năng gắn kết"
+msgstr "gắn kết được"
 
 #: ../programs/gvfs-info.c:109
 #, c-format
 msgid "attributes:\n"
-msgstr ""
+msgstr "thuộc tính:\n"
 
 #: ../programs/gvfs-info.c:155
 #, c-format
 msgid "display name: %s\n"
-msgstr ""
+msgstr "tên hiển thị: %s\n"
 
 #: ../programs/gvfs-info.c:159
 #, c-format
 msgid "edit name: %s\n"
-msgstr ""
+msgstr "tên sửa: %s\n"
 
 #: ../programs/gvfs-info.c:165
 #, c-format
 msgid "name: %s\n"
-msgstr ""
+msgstr "tên: %s\n"
 
 #: ../programs/gvfs-info.c:172
 #, c-format
 msgid "type: %s\n"
-msgstr ""
+msgstr "loại: %s\n"
 
 #: ../programs/gvfs-info.c:178
 #, c-format
 msgid "size: "
-msgstr ""
+msgstr "kích thước: "
 
 #: ../programs/gvfs-info.c:183
 #, c-format
 msgid "hidden\n"
-msgstr ""
+msgstr "ẩn\n"
 
 #: ../programs/gvfs-info.c:266
-#, fuzzy
 #| msgid "Error writing file"
 msgid "Copy with file"
-msgstr "Lỗi xoá tập tin"
+msgstr "Chép kèm tập tin"
 
 #: ../programs/gvfs-info.c:270
 msgid "Keep with file when moved"
-msgstr ""
+msgstr "Giữ tập tin khi di chuyển"
 
 #: ../programs/gvfs-info.c:307
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error deleting file: %s"
 msgid "Error getting writable attributes: %s\n"
-msgstr "Gặp lỗi khi xoá tập tin: %s"
+msgstr "Lỗi lấy thuộc tính ghi được: %s\n"
 
 #: ../programs/gvfs-info.c:312
 #, c-format
 msgid "Settable attributes:\n"
-msgstr ""
+msgstr "Thuộc tính ghi được:\n"
 
 #: ../programs/gvfs-info.c:335
 #, c-format
 msgid "Writable attribute namespaces:\n"
-msgstr ""
+msgstr "Vùng thuộc tính ghi:\n"
 
 #: ../programs/gvfs-info.c:362
 msgid "- show info for <location>"
-msgstr ""
+msgstr "- hiện thông tin cho <vị trí>"
 
 #: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
 msgid "Show hidden files"
-msgstr ""
+msgstr "Hiện tập tin ẩn"
 
 #: ../programs/gvfs-ls.c:41
 msgid "Use a long listing format"
-msgstr ""
+msgstr "Dùng định dạng danh sách chi tiết"
 
 #: ../programs/gvfs-ls.c:42
 msgid "Show completions"
-msgstr ""
+msgstr "Hiện hoàn chỉnh"
 
 #: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
 #: ../programs/gvfs-rename.c:69
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error: %s"
 msgid "Error: %s\n"
-msgstr "Lỗi: %s"
+msgstr "Lỗi: %s\n"
 
 #: ../programs/gvfs-ls.c:383
 msgid "- list files at <location>"
-msgstr ""
+msgstr "- liệt kê tập tin tại <vị trí>"
 
 #: ../programs/gvfs-mkdir.c:33
-#, fuzzy
 #| msgid "Can't open directory"
 msgid "create parent directories"
-msgstr "Không thể mở thư mục"
+msgstr "tạo thư mục cha"
 
 #: ../programs/gvfs-mkdir.c:51
-#, fuzzy
 #| msgid "Error creating directory"
 msgid "- create directories"
-msgstr "Lỗi tạo thư mục"
+msgstr "- tạo thư mục"
 
 #: ../programs/gvfs-mkdir.c:79 ../programs/gvfs-mkdir.c:88
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error creating directory"
 msgid "Error creating directory: %s\n"
-msgstr "Lỗi tạo thư mục"
+msgstr "Lỗi tạo thư mục: %s\n"
 
 #: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
 msgid "Don't send single MOVED events."
-msgstr ""
+msgstr "Không gửi sự kiện MOVED đơn lẻ."
 
 #: ../programs/gvfs-mount.c:54
-#, fuzzy
 #| msgid "Not a mountable file"
 msgid "Mount as mountable"
-msgstr "Không phải là một tập tin có khả năng gắn kết"
+msgstr "Gắn kết dạng gắn kết được"
 
 #: ../programs/gvfs-mount.c:55
 msgid "Mount volume with device file"
-msgstr ""
+msgstr "Gắn kết khối tin với tập tin thiết bị"
 
 #: ../programs/gvfs-mount.c:56
 msgid "Unmount"
-msgstr ""
+msgstr "Bỏ gắn kết"
 
 #: ../programs/gvfs-mount.c:57
 msgid "Unmount all mounts with the given scheme"
-msgstr ""
+msgstr "Bỏ mọi gắn kết theo kế hoạch đã cho"
 
 #: ../programs/gvfs-mount.c:58
 msgid "List"
-msgstr ""
+msgstr "Danh sách"
 
 #: ../programs/gvfs-mount.c:59
 msgid "Show extra information for List and Monitor"
-msgstr ""
+msgstr "Hiện thông tin bổ sung cho Liệt kê và theo dõi"
 
 #: ../programs/gvfs-mount.c:60
 msgid "Monitor events"
-msgstr ""
+msgstr "Theo dõi sự kiện"
 
 #: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
-#, fuzzy, c-format
+#, c-format
 #| msgid "%s: %s: error opening location: %s\n"
 msgid "Error mounting location: %s\n"
-msgstr "%s: %s: gặp lỗi khi mở vị trí: %s\n"
+msgstr "Lỗi gắn kết vị trí: %s\n"
 
 #: ../programs/gvfs-mount.c:241
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error connecting to daemon: %s"
 msgid "Error unmounting mount: %s\n"
-msgstr "Gặp lỗi khi kết nối tới trình nền: %s"
+msgstr "Lỗi bỏ gắn kết vị trí: %s\n"
 
 #: ../programs/gvfs-mount.c:262
-#, fuzzy, c-format
+#, c-format
 #| msgid "Could not find enclosing mount"
 msgid "Error finding enclosing mount: %s\n"
-msgstr "Không thể tìm thấy điểm gắn kết bao bọc"
+msgstr "Lỗi tìm đầu gắn kết: %s\n"
 
 #: ../programs/gvfs-mount.c:682
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error moving file: %s"
 msgid "Error mounting %s: %s\n"
-msgstr "Gặp lỗi khi di chuyển tập tin: %s"
+msgstr "Lỗi gắn kết %s: %s\n"
 
 #: ../programs/gvfs-mount.c:696
 #, c-format
 msgid "Mounted %s at %s\n"
-msgstr ""
+msgstr "Đã gắn %s vào %s\n"
 
 #: ../programs/gvfs-mount.c:747
 #, c-format
 msgid "No volume for device file %s\n"
-msgstr ""
+msgstr "Không có khối tin cho thiết bị %s\n"
 
 #: ../programs/gvfs-mount.c:938
-#, fuzzy
 #| msgid "%s: missing locations"
 msgid "- mount <location>"
-msgstr "%s: thiếu vị trí"
+msgstr "- gắn kết <vị trí>"
 
 #: ../programs/gvfs-move.c:103
 msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
-msgstr ""
+msgstr "NGUỒN... ĐÍCH - di chuyển tập tin từ NGUỒN sang ĐÍCH"
 
 #: ../programs/gvfs-move.c:189
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error moving file: %s"
 msgid "Error moving file %s: %s\n"
-msgstr "Gặp lỗi khi di chuyển tập tin: %s"
+msgstr "Lỗi di chuyển tập tin %s: %s\n"
 
 #: ../programs/gvfs-open.c:37
 msgid "files"
-msgstr ""
+msgstr "tập tin"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -2328,134 +2309,133 @@ msgstr ""
 "đó."
 
 #: ../programs/gvfs-rename.c:50
-#, fuzzy
 #| msgid "Error renaming file"
 msgid "- rename file"
-msgstr "Lỗi đổi tên tập tin"
+msgstr "- đổi tên tập tin"
 
 #: ../programs/gvfs-rename.c:76
 #, c-format
 msgid "Rename successful. New uri: %s\n"
-msgstr ""
+msgstr "Đổi tên thành công. URI mới: %s\n"
 
 #: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
 msgid "ignore nonexistent files, never prompt"
-msgstr ""
+msgstr "bỏ qua tập tin không tồn tại, không bao giờ hỏi"
 
 #: ../programs/gvfs-rm.c:53
-#, fuzzy
 #| msgid "Error deleting file"
 msgid "- delete files"
-msgstr "Lỗi xoá tập tin"
+msgstr "- xoá tập tin"
 
 #: ../programs/gvfs-save.c:43
 msgid "Create backup"
-msgstr ""
+msgstr "Tạo sao lưu"
 
 #: ../programs/gvfs-save.c:44
 msgid "Only create if not existing"
-msgstr ""
+msgstr "Chỉ tạo nếu không tồn tại"
 
 #: ../programs/gvfs-save.c:45
 msgid "Append to end of file"
-msgstr ""
+msgstr "Nối vào cuối tập tin"
 
 #: ../programs/gvfs-save.c:46
 msgid "When creating a file, restrict access to the current user only"
-msgstr ""
+msgstr "Khi tạo tập tin, giới hạn truy cập cho chỉ người dùng hiện tại"
 
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
-msgstr ""
+msgstr "In etag mới ở cuối"
 
 #: ../programs/gvfs-save.c:48
 msgid "The etag of the file being overwritten"
-msgstr ""
+msgstr "Ghi đè etag của tập tin"
 
 #: ../programs/gvfs-save.c:76
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error moving file: %s"
 msgid "Error opening file: %s\n"
-msgstr "Gặp lỗi khi di chuyển tập tin: %s"
+msgstr "Lỗi mở tập tin: %s\n"
 
 #: ../programs/gvfs-save.c:109
-#, fuzzy
 #| msgid "Error renaming dir"
 msgid "Error reading stdin"
-msgstr "Lỗi đổi tên thư mục"
+msgstr "Lỗi đọc stdin"
 
 #: ../programs/gvfs-save.c:122
-#, fuzzy, c-format
+#, c-format
 #| msgid "%s: %s:error closing: %s\n"
 msgid "Error closing: %s\n"
-msgstr "%s: %s: lỗi đóng: %s\n"
+msgstr "Lỗi đóng: %s\n"
 
 #: ../programs/gvfs-save.c:134
 #, c-format
 msgid "Etag not available\n"
-msgstr ""
+msgstr "Không có etag\n"
 
 #: ../programs/gvfs-save.c:156
 msgid "DEST - read from standard input and save to DEST"
-msgstr ""
+msgstr "ĐÍCH - đọc từ đầu nhập chuẩn và lưu vào ĐÍCH"
 
 #: ../programs/gvfs-set-attribute.c:36
 msgid ""
 "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
 "stringv, unset]"
 msgstr ""
+"loại thuộc tính [chuỗi (string), chuỗi byte (bytestring), luận lý (boolean), "
+"uint32, int32, uint64, int64, stringv, bỏ (unset)]"
 
 #: ../programs/gvfs-set-attribute.c:119
 msgid " <location> <attribute> <values> - set attribute"
-msgstr ""
+msgstr " <vị trí> <thuộc tính> <giá trị> - đặt thuộc tính"
 
 #: ../programs/gvfs-set-attribute.c:137
-#, fuzzy, c-format
+#, c-format
 #| msgid "No mount type specified"
 msgid "Location not specified\n"
-msgstr "Chưa xác định kiểu điểm gắn kết"
+msgstr "Chưa xác định vị trí\n"
 
 #: ../programs/gvfs-set-attribute.c:145
-#, fuzzy, c-format
+#, c-format
 #| msgid "No drive specified"
 msgid "Attribute not specified\n"
-msgstr "Chưa ghi rõ ổ đĩa"
+msgstr "Chưa xác định thuộc tính\n"
 
 #: ../programs/gvfs-set-attribute.c:154
-#, fuzzy, c-format
+#, c-format
 #| msgid "No hostname specified"
 msgid "Value not specified\n"
-msgstr "Chưa chỉ ra tên máy"
+msgstr "Chưa xác định giá trị\n"
 
 #: ../programs/gvfs-set-attribute.c:194
-#, fuzzy, c-format
+#, c-format
 #| msgid "Invalid attribute info list content"
 msgid "Invalid attribute type %s\n"
-msgstr "Nội dung danh sách thông tin thuộc tính không hợp lệ"
+msgstr "Loại thuộc tính không hợp lệ %s\n"
 
 #: ../programs/gvfs-set-attribute.c:204
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error deleting file: %s"
 msgid "Error setting attribute: %s\n"
-msgstr "Gặp lỗi khi xoá tập tin: %s"
+msgstr "Lỗi đặt thuộc tính: %s\n"
 
 #: ../programs/gvfs-trash.c:52
 msgid "- move files to trash"
-msgstr ""
+msgstr "- chuyển vào sọt rác"
 
 #: ../programs/gvfs-trash.c:69
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error deleting file: %s"
 msgid "Error trashing file: %s\n"
-msgstr "Gặp lỗi khi xoá tập tin: %s"
+msgstr "Lỗi chuyển tập tin vào sọt rác: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symlinks, mounts and shortcuts like dirs"
-msgstr ""
+msgstr "Theo liên kết biểu tượng, gắn kết và đường tắt như theo thư mục"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
-msgstr ""
+msgstr "- liệt kê nội dung thư mục dạng cây"
 
 #~ msgid "Invalid return value from get_info"
 #~ msgstr "Giá trị đáp ứng không hợp lệ từ hàm lấy thông tin (get_info)"
