@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-03 00:21+0100\n"
-"PO-Revision-Date: 2011-02-20 21:00+0100\n"
+"PO-Revision-Date: 2011-04-04 21:59+0200\n"
 "Last-Translator: Gil Forcada <gilforcada@guifi.net>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "Language: ca\n"
@@ -341,7 +341,7 @@ msgid ""
 "correctly."
 msgstr ""
 "S'ha produït un error de la libimobiledevice: no s'ha trobat cap dispositiu. "
-"Assegureu-vos que el usbmuxd és configurat correctament."
+"Assegureu-vos que l'usbmuxd és configurat correctament."
 
 #: ../daemon/gvfsbackendafc.c:321
 #, c-format
@@ -998,7 +998,7 @@ msgstr "No es pot llegir el fitxer al que afegir"
 
 #: ../daemon/gvfsbackendgphoto2.c:3062
 msgid "Cannot get data of file to append to"
-msgstr "No es pot obtenir dades del fitxer al que afegir"
+msgstr "No es poden obtenir dades del fitxer al que afegir"
 
 #: ../daemon/gvfsbackendgphoto2.c:3349
 msgid "Error writing file"
