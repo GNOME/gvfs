@@ -1,3 +1,8 @@
+Major changes in 1.8.0
+======================
+* afc: Fix renaming files moving them to the root dir
+* Translation updates
+
 Major changes in 1.7.3
 ======================
 * build: Bump fuse requirement for ATOMIC_O_TRUNC support
