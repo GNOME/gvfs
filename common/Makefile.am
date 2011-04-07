@@ -4,7 +4,7 @@ lib_LTLIBRARIES=libgvfscommon.la
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-I$(top_srcdir)/daemon \
-	$(GLIB_CFLAGS) $(DBUS_CFLAGS) $(EXPAT_CFLAGS) \
+	$(GLIB_CFLAGS) $(DBUS_CFLAGS) $(BLURAY_CFLAGS) \
 	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED \
 	-DDBUS_API_SUBJECT_TO_CHANGE
 
@@ -19,6 +19,7 @@ libgvfscommon_la_SOURCES = 	\
 	gvfsicon.h gvfsicon.c \
 	gvfsmountinfo.h gvfsmountinfo.c \
 	gvfsfileinfo.c gvfsfileinfo.h \
+	meta_data.h \
 	$(NULL)
 
 # needed by cygwin (see bug #564003)
@@ -27,7 +28,7 @@ libgvfscommon_la_LDFLAGS = -no-undefined
 libgvfscommon_la_LIBADD =	\
 	$(DBUS_LIBS) 		\
 	$(GLIB_LIBS)		\
-	$(EXPAT_LIBS)
+	$(BLURAY_LIBS)
 
 if HAVE_AVAHI
 lib_LTLIBRARIES += libgvfscommon-dnssd.la

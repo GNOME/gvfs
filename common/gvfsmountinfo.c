@@ -25,9 +25,11 @@
 #include <string.h>
 #include <glib/gi18n-lib.h>
 
-#ifdef HAVE_EXPAT
-#include <expat.h>
-#endif
+#ifdef HAVE_BLURAY
+#include <langinfo.h>
+#include <libbluray/bluray.h>
+#include "meta_data.h"
+#endif /* HAVE_BLURAY */
 
 #include "gvfsmountinfo.h"
 
@@ -423,186 +425,141 @@ GIcon *g_vfs_mount_info_query_xdg_volume_info_finish (GFile          *directory,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-#ifdef HAVE_EXPAT
-
-typedef struct {
-  gboolean in_name;
-  char *name;
-  const char *icon_path;
-  gboolean image_is_small;
-} BdmvParseData;
-
-static void
-bdmt_parse_start_tag (void                *data,
-                      const gchar         *element_name,
-                      const gchar        **attr)
+#ifdef HAVE_BLURAY
+static const char *
+get_iso_639_3_for_locale (void)
 {
-  BdmvParseData *bdata = (BdmvParseData *) data;
-  const char *image;
-  gboolean image_small;
-  gint i;
+  const char *lang;
 
-  if (g_str_equal (element_name, "di:name"))
+  lang = nl_langinfo (_NL_ADDRESS_LANG_TERM);
+  if (lang == NULL || *lang == '\0')
     {
-      bdata->in_name = TRUE;
-      return;
+      lang = nl_langinfo (_NL_ADDRESS_COUNTRY_AB3);
+      if (lang == NULL || *lang == '\0')
+        return NULL;
     }
 
-  if (g_str_equal (element_name, "di:thumbnail") == FALSE)
-    return;
+  return lang;
+}
 
-  image = NULL;
-  image_small = FALSE;
+static const char *
+get_icon (META_DL *meta)
+{
+  const char *icon;
+  guint i;
+  guint size;
 
-  for (i = 0; attr[i]; ++i)
+  icon = NULL;
+  size = 0;
+
+  for (i = 0; i < meta->thumb_count; i++)
     {
-      const char *name;
-      const char *value;
-
-      name = attr[i];
-      value = attr[++i];
-
-      if (g_str_equal (name, "href"))
+      if (meta->thumbnails[i].xres > size)
         {
-          image = value;
-        }
-      else if (g_str_equal (name, "size") && value)
-        {
-          image_small = g_str_equal (value, "416x240");
+          icon = meta->thumbnails[i].path;
+          size = meta->thumbnails[i].xres;
         }
     }
 
-  if (bdata->icon_path == NULL)
-    {
-      bdata->icon_path = image;
-      bdata->image_is_small = image_small;
-      return;
-    }
-
-  if (image != NULL &&
-      bdata->icon_path != NULL &&
-      bdata->image_is_small != FALSE)
-    {
-      bdata->icon_path = image;
-      bdata->image_is_small = image_small;
-    }
+  return icon;
 }
 
 static void
-bdmt_parse_end_tag (void                *data,
-                    const gchar         *element_name)
+bdmv_metadata_thread (GSimpleAsyncResult *result,
+                      GObject *object,
+                      GCancellable *cancellable)
 {
-  BdmvParseData *bdata = (BdmvParseData *) data;
-
-  if (g_str_equal (element_name, "di:name"))
-    bdata->in_name = FALSE;
-}
-
-static void
-bdmt_parse_text (void                *data,
-                 const XML_Char      *text,
-                 int                  text_len)
-{
-  BdmvParseData *bdata = (BdmvParseData *) data;
-
-  if (bdata->in_name == FALSE)
-    return;
-
-  bdata->name = g_strndup (text, text_len);
-}
-
-static void
-on_bdmv_volume_info_loaded (GObject      *source_object,
-                            GAsyncResult *res,
-                            gpointer      user_data)
-{
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
-  GFile *bdmt_volume_info_file;
-  gchar *content;
-  gsize content_length;
+  BLURAY *bd;
+  META_DL *meta;
   GError *error;
-  BdmvParseData data;
-  XML_Parser parser;
-  const gchar *icon_file;
-  GIcon *icon;
+  GFile *file;
+  char *disc_root;
+  char *icon;
+  char *name;
+  const char *lang;
 
-  content = NULL;
-  parser = NULL;
-  icon_file = NULL;
-  memset (&data, 0, sizeof (data));
+  file = G_FILE (object);
 
-  bdmt_volume_info_file = G_FILE (source_object);
+  disc_root = g_file_get_path (file);
+  bd = bd_open (disc_root, NULL);
+  g_free (disc_root);
 
-  error = NULL;
-  if (g_file_load_contents_finish (bdmt_volume_info_file,
-                                   res,
-                                   &content,
-                                   &content_length,
-                                   NULL,
-                                   &error))
+  if (bd == NULL)
     {
-      data.name = NULL;
-
-      parser = XML_ParserCreate (NULL);
-      XML_SetElementHandler (parser,
-                                   (XML_StartElementHandler) bdmt_parse_start_tag,
-                                   (XML_EndElementHandler) bdmt_parse_end_tag);
-      XML_SetCharacterDataHandler (parser,
-                                         (XML_CharacterDataHandler) bdmt_parse_text);
-      XML_SetUserData (parser, &data);
-      if (XML_Parse (parser, content, content_length, TRUE) == 0)
-        {
-          g_warning ("Failed to parse bdmt file");
-          goto out;
-        }
-      g_message ("icon file: %s", data.icon_path);
-      g_message ("name: %s", data.name);
-      icon_file = data.icon_path;
-
-      icon = NULL;
-
-      if (icon_file != NULL)
-        {
-          GFile *dir, *f;
-
-          dir = g_file_get_parent (bdmt_volume_info_file);
-          if (dir)
-            {
-              f = g_file_resolve_relative_path (dir, icon_file);
-              if (f)
-                {
-                  icon = g_file_icon_new (f);
-                  g_object_unref (f);
-                }
-
-              g_object_unref (dir);
-            }
-        }
-
-      g_simple_async_result_set_op_res_gpointer (simple, icon, NULL);
-      if (data.name != NULL)
-        g_object_set_data_full (G_OBJECT (simple), "name", data.name, g_free);
-      data.name = NULL; /* steals name */
-      g_simple_async_result_complete_in_idle (simple);
-      g_object_unref (simple);
+      error = g_error_new_literal (G_IO_ERROR,
+                                   G_IO_ERROR_FAILED,
+                                   "Device is not a Blu-Ray disc");
+      goto error;
     }
 
- out:
+  lang = get_iso_639_3_for_locale ();
+  if (lang != NULL)
+    bd_set_player_setting_str (bd, BLURAY_PLAYER_SETTING_MENU_LANG, lang);
 
-  if (error != NULL)
+  meta = bd_get_meta (bd);
+  if (meta == NULL)
     {
-      g_simple_async_result_set_from_error (simple, error);
-      g_simple_async_result_complete_in_idle (simple);
-      g_object_unref (simple);
-      g_error_free (error);
+      error = g_error_new_literal (G_IO_ERROR,
+                                   G_IO_ERROR_FAILED,
+                                   "Device is not a Blu-Ray disc, or has no metadata");
+      bd_close (bd);
+      goto error;
+    }
+  name = icon = NULL;
+
+  if (meta != NULL)
+    {
+      if (meta->di_name && *meta->di_name)
+        name = g_strdup (meta->di_name);
+      icon = g_strdup (get_icon (meta));
     }
 
-  if (parser != NULL)
-    XML_ParserFree (parser);
-  g_free (data.name);
-  g_free (content);
+  /* We're missing either an icon, or the name */
+  if (!name || !icon)
+    {
+      bd_set_player_setting_str (bd, BLURAY_PLAYER_SETTING_MENU_LANG, "eng");
+      meta = bd_get_meta (bd);
+
+      if (meta != NULL && name == NULL && meta->di_name && *meta->di_name)
+        name = meta->di_name;
+
+      if (meta != NULL && icon == NULL)
+        icon = g_strdup (get_icon (meta));
+    }
+
+  /* Set the results */
+  if (icon != NULL)
+    {
+      char *icon_path;
+      GFile *icon_file;
+
+      icon_path = g_strdup_printf ("BDMV/META/DL/%s", icon);
+      g_free (icon);
+      icon_file = g_file_resolve_relative_path (file, icon_path);
+      g_free (icon_path);
+
+      g_simple_async_result_set_op_res_gpointer (result,
+                                                 g_file_icon_new (icon_file),
+                                                 NULL);
+    }
+  else
+    {
+      g_simple_async_result_set_op_res_gpointer (result, NULL, NULL);
+    }
+
+  if (name != NULL)
+    g_object_set_data_full (G_OBJECT (result), "name", name, g_free);
+
+  bd_close (bd);
+
+  return;
+
+error:
+  g_simple_async_result_set_from_error (result, error);
+  g_simple_async_result_set_op_res_gpointer (result, NULL, NULL);
+  g_error_free (error);
 }
-#endif /* HAVE_EXPAT */
+#endif /* HAVE_BLURAY */
 
 void
 g_vfs_mount_info_query_bdmv_volume_info (GFile               *directory,
@@ -610,28 +567,21 @@ g_vfs_mount_info_query_bdmv_volume_info (GFile               *directory,
                                          GAsyncReadyCallback  callback,
                                          gpointer             user_data)
 {
-#ifdef HAVE_EXPAT
+#ifdef HAVE_BLURAY
   GSimpleAsyncResult *simple;
-  GFile *file;
 
   simple = g_simple_async_result_new (G_OBJECT (directory),
                                       callback,
                                       user_data,
                                       g_vfs_mount_info_query_bdmv_volume_info);
-
-  /* FIXME: handle other languages:
-   * Check the current locale
-   * Get 3 letter-code from 2 letter locale using /usr/share/xml/iso-codes/iso_639_3.xml
-   * load bdmt_<code>.xml
-   * Fall-back to bdmt_eng.xml if it fails */
-  file = g_file_resolve_relative_path (directory, "BDMV/META/DL/bdmt_eng.xml");
-  g_file_load_contents_async (file,
-                              cancellable,
-                              on_bdmv_volume_info_loaded,
-                              simple);
-  g_object_unref (file);
+  g_simple_async_result_run_in_thread (simple,
+                                       (GSimpleAsyncThreadFunc) bdmv_metadata_thread,
+                                       G_PRIORITY_DEFAULT,
+                                       cancellable);
+  g_object_unref (simple);
 #else
   GSimpleAsyncResult *simple;
+
   simple = g_simple_async_result_new (G_OBJECT (directory),
                                       callback,
                                       user_data,
@@ -640,7 +590,8 @@ g_vfs_mount_info_query_bdmv_volume_info (GFile               *directory,
                                    G_IO_ERROR,
                                    G_IO_ERROR_NOT_SUPPORTED,
                                    "gvfs built without Expat support, no BDMV support");
-#endif /* HAVE_EXPAT */
+  g_object_unref (simple);
+#endif /* HAVE_BLURAY */
 }
 
 GIcon *g_vfs_mount_info_query_bdmv_volume_info_finish (GFile          *directory,

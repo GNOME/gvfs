@@ -196,22 +196,6 @@ fi
 
 AM_CONDITIONAL(USE_FUSE, [test "$msg_fuse" = "yes"])
 
-dnl ********************************************
-dnl *** Check for expat (for obexftp and gdu ***
-dnl ********************************************
-
-dnl Make sure we have expat
-AC_CHECK_LIB(expat, XML_ParserCreate_MM,
-             [ AC_CHECK_HEADERS(expat.h, have_expat=true, have_expat=false) ],
-             have_expat=false)
-if test "x$have_expat" = "xtrue"; then
-  EXPAT_CFLAGS=""
-  EXPAT_LIBS="-lexpat"
-  AC_DEFINE(HAVE_EXPAT,, [Define to 1 if you have expat available])
-fi
-AC_SUBST(EXPAT_CFLAGS)
-AC_SUBST(EXPAT_LIBS)
-
 dnl ************************************
 dnl *** Check for gnome-disk-utility ***
 dnl ************************************
@@ -340,6 +324,11 @@ OBEXFTP_CFLAGS=
 if test "x$enable_obexftp" != "xno";  then
   PKG_CHECK_EXISTS(dbus-glib-1 bluez >= 4.0, msg_obexftp=yes)
 
+  dnl Make sure we have expat
+  AC_CHECK_LIB(expat, XML_ParserCreate_MM,
+               [ AC_CHECK_HEADERS(expat.h, have_expat=true, have_expat=false) ],
+               have_expat=false)
+
   if test "x$msg_obexftp" = "xyes" -a "x$have_expat" = "xtrue"; then
     PKG_CHECK_MODULES(OBEXFTP, dbus-glib-1 bluez >= 4.0)
     AC_SUBST(OBEXFTP_LIBS)
@@ -347,11 +336,15 @@ if test "x$enable_obexftp" != "xno";  then
 
     msg_obexftp=yes
     AC_DEFINE(HAVE_OBEXFTP, 1, [Define to 1 if ObexFTP is going to be built])
+    EXPAT_CFLAGS=""
+    EXPAT_LIBS="-lexpat"
   else
     msg_obexftp=no
   fi
 fi
 
+AC_SUBST(EXPAT_CFLAGS)
+AC_SUBST(EXPAT_LIBS)
 AM_CONDITIONAL(USE_OBEXFTP, [test "$msg_obexftp" = "yes"])
 
 dnl *************************
@@ -406,6 +399,27 @@ if test "x$enable_keyring" != "xno"; then
 fi
 
 AM_CONDITIONAL(USE_KEYRING, [test "$msg_keyring" = "yes"])
+
+dnl ***********************************************
+dnl *** Check if we should build with libbluray ***
+dnl ***********************************************
+AC_ARG_ENABLE(bluray, AS_HELP_STRING([--disable-bluray],[build without bluray metadata support]))
+msg_bluray=no
+BLURAY_CFLAGS=
+BLURAY_LIBS=
+
+if test "x$enable_bluray" != "xno"; then
+  PKG_CHECK_EXISTS(libbluray, msg_bluray=yes)
+
+  if test "x$msg_bluray" = "xyes"; then
+    PKG_CHECK_MODULES(BLURAY, libbluray)
+    AC_DEFINE(HAVE_BLURAY, 1, [Define to 1 if bluray metadata is going to be built])
+  fi
+fi
+
+AC_SUBST(BLURAY_CFLAGS)
+AC_SUBST(BLURAY_LIBS)
+AM_CONDITIONAL(HAVE_BLURAY, [test "$msg_bluray" = "yes"])
 
 dnl ==========================================================================
 dnl Samba 3.0
@@ -699,7 +713,8 @@ echo "
 
         hotplug backend:              $msg_hotplug_backend
 
-        FTP/HTTP/WebDAV support       $msg_http
+	Blu-ray metadata support:     $msg_bluray
+        FTP/HTTP/WebDAV support:      $msg_http
         ObexFTP support               $msg_obexftp
 	Samba support:	              $msg_samba
 	FUSE support:                 $msg_fuse
