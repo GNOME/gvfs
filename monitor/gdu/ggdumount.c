@@ -230,7 +230,7 @@ update_mount (GGduMount *mount)
       /* order of preference : bdmv, xdg, probed */
       if (mount->bdmv_volume_info_name != NULL)
         mount->name = g_strdup (mount->bdmv_volume_info_name);
-      if (mount->xdg_volume_info_name != NULL)
+      else if (mount->xdg_volume_info_name != NULL)
         mount->name = g_strdup (mount->xdg_volume_info_name);
       else
         mount->name = g_volume_get_name (G_VOLUME (mount->volume));
