@@ -19,7 +19,6 @@ libgvfscommon_la_SOURCES = 	\
 	gvfsicon.h gvfsicon.c \
 	gvfsmountinfo.h gvfsmountinfo.c \
 	gvfsfileinfo.c gvfsfileinfo.h \
-	meta_data.h \
 	$(NULL)
 
 # needed by cygwin (see bug #564003)

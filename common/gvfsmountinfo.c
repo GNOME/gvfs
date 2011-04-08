@@ -28,7 +28,7 @@
 #ifdef HAVE_BLURAY
 #include <langinfo.h>
 #include <libbluray/bluray.h>
-#include "meta_data.h"
+#include <libbluray/meta_data.h>
 #endif /* HAVE_BLURAY */
 
 #include "gvfsmountinfo.h"
