@@ -106,6 +106,7 @@ g_vfs_job_open_for_read_new (DBusConnection *connection,
       dbus_error_free (&derror);
 
       dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
       return NULL;
     }
 
