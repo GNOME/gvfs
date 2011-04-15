@@ -1427,7 +1427,7 @@ update_fstab_volumes (GGduVolumeMonitor *monitor,
           GduDevice *device;
 
           /* doesn't exist */
-          if (realpath (device_file, resolved_path) != NULL)
+          if (realpath (device_file, resolved_path) == NULL)
             continue;
 
           /* is handled by DKD */
