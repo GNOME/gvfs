@@ -61,6 +61,7 @@ typedef struct
 {
   GVfsChannel *channel;
   GInputStream *command_stream;
+  GCancellable *cancellable;
   char buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE];
   int buffer_size;
   char *data;
@@ -84,6 +85,7 @@ struct _GVfsChannelPrivate
   GVfsBackend *backend;
   gboolean connection_closed;
   GInputStream *command_stream;
+  GCancellable *cancellable;
   GOutputStream *reply_stream;
   int remote_fd;
   GPid actual_consumer;
@@ -93,8 +95,6 @@ struct _GVfsChannelPrivate
   guint32 current_job_seq_nr;
 
   GList *queued_requests;
-  
-  RequestReader *request_reader;
   
   char reply_buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE];
   int reply_buffer_pos;
@@ -130,13 +130,13 @@ g_vfs_channel_finalize (GObject *object)
     g_object_unref (channel->priv->reply_stream);
   channel->priv->reply_stream = NULL;
 
-  if (channel->priv->request_reader)
-    channel->priv->request_reader->channel = NULL;
-  channel->priv->request_reader = NULL;
-
   if (channel->priv->command_stream)
     g_object_unref (channel->priv->command_stream);
   channel->priv->command_stream = NULL;
+
+  if (channel->priv->cancellable)
+    g_object_unref (channel->priv->cancellable);
+  channel->priv->cancellable = NULL;
   
   if (channel->priv->remote_fd != -1)
     close (channel->priv->remote_fd);
@@ -204,6 +204,7 @@ g_vfs_channel_init (GVfsChannel *channel)
   else
     {
       channel->priv->command_stream = g_unix_input_stream_new (socket_fds[0], TRUE);
+      channel->priv->cancellable = g_cancellable_new ();
       channel->priv->reply_stream = g_unix_output_stream_new (socket_fds[0], FALSE);
       channel->priv->remote_fd = socket_fds[1];
       
@@ -284,6 +285,8 @@ static void
 request_reader_free (RequestReader *reader)
 {
   g_object_unref (reader->command_stream);
+  g_object_unref (reader->cancellable);
+  g_object_unref (reader->channel);
   g_free (reader->data);
   g_free (reader);
 }
@@ -426,7 +429,7 @@ finish_request (RequestReader *reader)
   g_input_stream_read_async (reader->command_stream,
 			     reader->buffer + reader->buffer_size,
 			     G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - reader->buffer_size,
-			     0, NULL,
+			     0, reader->cancellable,
 			     command_read_cb,
 			     reader);
 }
@@ -440,18 +443,10 @@ data_read_cb (GObject *source_object,
   GInputStream *stream = G_INPUT_STREAM (source_object);
   gssize count_read;
 
-  if (reader->channel == NULL)
-    {
-      /* Channel was finalized */
-      request_reader_free (reader);
-      return;
-    }
-
   count_read = g_input_stream_read_finish (stream, res, NULL);
   
   if (count_read <= 0)
     {
-      reader->channel->priv->request_reader = NULL;
       g_vfs_channel_connection_closed (reader->channel);
       request_reader_free (reader);
       return;
@@ -464,7 +459,7 @@ data_read_cb (GObject *source_object,
       g_input_stream_read_async (reader->command_stream,
 				 reader->data + reader->data_pos,
 				 reader->data_len - reader->data_pos,
-				 0, NULL,
+				 0, reader->cancellable,
 				 data_read_cb, reader);
       return;
     }
@@ -484,18 +479,10 @@ command_read_cb (GObject *source_object,
   guint32 data_len;
   gssize count_read;
 
-  if (reader->channel == NULL)
-    {
-      /* Channel was finalized */
-      request_reader_free (reader);
-      return;
-    }
-
   count_read = g_input_stream_read_finish (stream, res, NULL);
   
   if (count_read <= 0)
     {
-      reader->channel->priv->request_reader = NULL;
       g_vfs_channel_connection_closed (reader->channel);
       request_reader_free (reader);
       return;
@@ -508,7 +495,7 @@ command_read_cb (GObject *source_object,
       g_input_stream_read_async (reader->command_stream,
 				 reader->buffer + reader->buffer_size,
 				 G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - reader->buffer_size,
-				 0, NULL, 
+				 0, reader->cancellable,
 				 command_read_cb, reader);
       return;
     }
@@ -525,7 +512,7 @@ command_read_cb (GObject *source_object,
       g_input_stream_read_async (reader->command_stream,
 				 reader->data + reader->data_pos,
 				 reader->data_len - reader->data_pos,
-				 0, NULL,
+				 0, reader->cancellable,
 				 data_read_cb, reader);
       return;
     }
@@ -539,16 +526,15 @@ start_request_reader (GVfsChannel *channel)
   RequestReader *reader;
 
   reader = g_new0 (RequestReader, 1);
-  reader->channel = channel;
+  reader->channel = g_object_ref (channel);
+  reader->cancellable = g_object_ref (channel->priv->cancellable);
   reader->command_stream = g_object_ref (channel->priv->command_stream);
   
   g_input_stream_read_async (reader->command_stream,
 			     reader->buffer + reader->buffer_size,
 			     G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - reader->buffer_size,
-			     0, NULL,
+			     0, reader->cancellable,
 			     command_read_cb, reader);
-
-  channel->priv->request_reader = reader;
 }
 
 static void
@@ -615,6 +601,8 @@ send_reply_cb (GObject *source_object,
   if (G_VFS_IS_JOB_CLOSE_READ (job) ||
       G_VFS_IS_JOB_CLOSE_WRITE (job))
     {
+      /* Cancel the reader */
+      g_cancellable_cancel (channel->priv->cancellable);
       g_vfs_job_source_closed (G_VFS_JOB_SOURCE (channel));
       channel->priv->backend_handle = NULL;
     }
