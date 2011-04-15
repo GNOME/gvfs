@@ -120,6 +120,7 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
                                       _("Invalid dbus message"));
 
       dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
       return NULL;
     }
 

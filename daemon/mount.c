@@ -757,6 +757,7 @@ register_mount (DBusConnection *connection,
     _g_dbus_oom ();
   
   dbus_connection_send (connection, reply, NULL);
+  dbus_message_unref (reply);
 }
 
 typedef struct {
@@ -778,6 +779,7 @@ automount_done (VfsMountable *mountable,
 					G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
 					_("Automount failed: %s"), error->message);
       dbus_connection_send (data->connection, reply, NULL);
+      dbus_message_unref (reply);
     }
   else
     lookup_mount (data->connection,
@@ -870,7 +872,10 @@ lookup_mount (DBusConnection *connection,
   
   g_mount_spec_unref (spec);
   if (reply != NULL)
-    dbus_connection_send (connection, reply, NULL);
+    {
+      dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
+    }
 }
 
 static void
@@ -910,9 +915,12 @@ lookup_mount_by_fuse_path (DBusConnection *connection,
     reply = dbus_message_new_error (message,
 				    DBUS_ERROR_INVALID_ARGS,
 				    "Invalid arguments");
-  
+
   if (reply != NULL)
-    dbus_connection_send (connection, reply, NULL);
+    {
+      dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
+    }
 }
 
 static void
@@ -958,8 +966,9 @@ list_mounts (DBusConnection *connection,
 
   if (!dbus_message_iter_close_container (&iter, &array_iter))
     _g_dbus_oom ();
-  
+
   dbus_connection_send (connection, reply, NULL);
+  dbus_message_unref (reply);
 }
 
 static void
@@ -1047,7 +1056,10 @@ mount_location (DBusConnection *connection,
     }
   
   if (reply)
-    dbus_connection_send (connection, reply, NULL);
+    {
+      dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
+    }
   else
     {
       GMountSource *source;
@@ -1099,8 +1111,9 @@ list_mount_types (DBusConnection *connection,
 
   if (!dbus_message_iter_close_container (&iter, &array_iter))
     _g_dbus_oom ();
-  
+
   dbus_connection_send (connection, reply, NULL);
+  dbus_message_unref (reply);
 }
 
 static void
@@ -1140,8 +1153,9 @@ list_mountable_info (DBusConnection *connection,
 
   if (!dbus_message_iter_close_container (&iter, &array_iter))
     _g_dbus_oom ();
-  
+
   dbus_connection_send (connection, reply, NULL);
+  dbus_message_unref (reply);
 }
 
 static DBusHandlerResult

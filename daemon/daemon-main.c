@@ -127,6 +127,7 @@ send_spawned (DBusConnection *connection, gboolean succeeded, char *error_messag
     _g_dbus_oom ();
     
   dbus_connection_send (connection, message, NULL);
+  dbus_message_unref (message);
   /* Make sure the message is sent */
   dbus_connection_flush (connection);
 }

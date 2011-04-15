@@ -184,8 +184,9 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 					  derror.name,
 					  derror.message);
 	  dbus_error_free (&derror);
-	  
+
 	  dbus_connection_send (connection, reply, NULL);
+	  dbus_message_unref (reply);
 	}
       else
 	{
@@ -199,8 +200,9 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 
 	  reply = dbus_message_new_method_return (message);
 	  dbus_connection_send (connection, reply, NULL);
+	  dbus_message_unref (reply);
 	}
-      
+
       return DBUS_HANDLER_RESULT_HANDLED;
     }
   else if (dbus_message_is_method_call (message,
@@ -216,8 +218,9 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 					  derror.name,
 					  derror.message);
 	  dbus_error_free (&derror);
-	  
+
 	  dbus_connection_send (connection, reply, NULL);
+	  dbus_message_unref (reply);
 	}
       else
 	{
@@ -235,9 +238,10 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 		  break;
 		}
 	    }
-	  
+
 	  reply = dbus_message_new_method_return (message);
 	  dbus_connection_send (connection, reply, NULL);
+	  dbus_message_unref (reply);
 
 	  g_object_unref (monitor);
 	}
