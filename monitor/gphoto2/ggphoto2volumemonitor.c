@@ -606,7 +606,7 @@ get_stores_for_camera (const char *bus_num, const char *device_num)
   GPContext *context;
   GPPortInfo info;
   GPPortInfoList *il;
-  int num_storage_info, n;
+  int num_storage_info, n, rc;
   Camera *camera;
   char *port;
   guint i;
@@ -638,8 +638,14 @@ get_stores_for_camera (const char *bus_num, const char *device_num)
     goto out;
 
   /* Get information about the storage heads */
-  if (gp_camera_get_storageinfo (camera, &storage_info, &num_storage_info, context) != 0)
+  rc = gp_camera_get_storageinfo (camera, &storage_info, &num_storage_info, context);
+  if (rc != 0) {
+    /* Not all gphoto drivers implement get storage info (drivers for proprietary
+       protocols often don't) */
+    if (rc == GP_ERROR_NOT_SUPPORTED)
+      l = g_list_prepend (l, g_strdup ("/"));
     goto out;
+  }
 
   /* Append the data to the list */
   for (i = 0; i < num_storage_info; i++)
