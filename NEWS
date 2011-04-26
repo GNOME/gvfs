@@ -1,3 +1,11 @@
+Major changes in 1.8.1
+======================
+* Fix threadsafety of closing channels
+* Don't leak dbus messages
+* gdu: Fix setting the BDMV name
+* gdu: Fix check for symlinks in /dev, was reversed
+* Translation updates
+
 Major changes in 1.8.0
 ======================
 * afc: Fix renaming files moving them to the root dir
