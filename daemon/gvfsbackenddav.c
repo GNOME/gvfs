@@ -1909,6 +1909,84 @@ do_enumerate (GVfsBackend           *backend,
 /* ************************************************************************* */
 /*  */
 
+/* *** open () *** */
+static void
+try_open_stat_done (SoupSession *session,
+		    SoupMessage *msg,
+		    gpointer     user_data)
+{
+  GVfsJob         *job = G_VFS_JOB (user_data);
+  GVfsBackend     *backend = job->backend_data;
+  GFileType        target_type;
+  SoupURI         *uri;
+  gboolean         res;
+  guint            status;
+
+  status = msg->status_code;
+
+  if (status != 207)
+    {
+      g_vfs_job_failed_literal (job,
+				G_IO_ERROR,
+				http_error_code_from_status (status),
+				msg->reason_phrase);
+      return;
+    }
+
+  res = stat_location_finish (msg, &target_type, NULL);
+
+  if (res == FALSE)
+    {
+      g_vfs_job_failed (job,
+			G_IO_ERROR, G_IO_ERROR_FAILED,
+			_("Response invalid"));
+      return;
+    }
+
+  if (target_type == G_FILE_TYPE_DIRECTORY)
+    {
+      g_vfs_job_failed (job,
+			G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+			_("File is directory"));
+      return;
+    }
+
+  uri = soup_message_get_uri (msg);
+
+  http_backend_open_for_read (backend, job, uri);
+}
+
+
+static gboolean
+try_open_for_read (GVfsBackend        *backend,
+                   GVfsJobOpenForRead *job,
+                   const char         *filename)
+{
+  SoupMessage     *msg;
+  SoupURI         *uri;
+
+  uri = http_backend_uri_for_filename (backend, filename, FALSE);
+  msg = stat_location_begin (uri, FALSE);
+  soup_uri_free (uri);
+
+  if (msg == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Could not create request"));
+
+      return FALSE;
+    }
+
+  g_vfs_job_set_backend_data (G_VFS_JOB (job), backend, NULL);
+  http_backend_queue_message (backend, msg, try_open_stat_done, job);
+
+  return TRUE;
+}
+
+
+
+
 /* *** create () *** */
 static void
 try_create_tested_existence (SoupSession *session, SoupMessage *msg,
@@ -2329,6 +2407,7 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
   backend_class->try_query_info    = NULL;
   backend_class->query_info        = do_query_info;
   backend_class->enumerate         = do_enumerate;
+  backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_create        = try_create;
   backend_class->try_replace       = try_replace;
   backend_class->try_write         = try_write;

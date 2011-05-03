@@ -373,20 +373,33 @@ open_for_read_ready (GObject      *source_object,
   g_vfs_job_succeeded (job);
 }
 
-static gboolean 
+static gboolean
 try_open_for_read (GVfsBackend        *backend,
                    GVfsJobOpenForRead *job,
                    const char         *filename)
 {
+  SoupURI *uri;
+
+  uri = http_backend_uri_for_filename (backend, filename, FALSE);
+
+  http_backend_open_for_read (backend, G_VFS_JOB (job), uri);
+  soup_uri_free (uri);
+
+  return TRUE;
+}
+
+void
+http_backend_open_for_read (GVfsBackend *backend,
+			    GVfsJob     *job,
+			    SoupURI     *uri)
+{
   GVfsBackendHttp *op_backend;
   GInputStream    *stream;
   SoupMessage     *msg;
-  SoupURI         *uri;
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
-  uri = http_backend_uri_for_filename (backend, filename, FALSE);
+
   msg = soup_message_new_from_uri (SOUP_METHOD_GET, uri);
-  soup_uri_free (uri);
 
   soup_message_body_set_accumulate (msg->response_body, FALSE);
 
@@ -395,10 +408,9 @@ try_open_for_read (GVfsBackend        *backend,
 
   soup_input_stream_send_async (stream,
                                 G_PRIORITY_DEFAULT,
-                                G_VFS_JOB (job)->cancellable,
+                                job->cancellable,
                                 open_for_read_ready,
                                 job);
-  return TRUE;
 }
 
 /* *** read () *** */
