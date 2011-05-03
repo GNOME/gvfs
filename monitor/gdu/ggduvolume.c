@@ -103,6 +103,18 @@ static void gdu_cleartext_volume_job_changed (GduPresentable *presentable,
 
 static void mount_with_mount_operation (MountOpData *data);
 
+static gboolean
+g_gdu_drive_device_is_flash(GduDevice *drive_device)
+{
+  const gchar *drive_media;
+  
+  if (drive_device == NULL)
+    return FALSE;
+  
+  drive_media = gdu_device_drive_get_media (drive_device);
+  return g_str_has_prefix (drive_media, "flash");
+}
+
 static void
 g_gdu_volume_finalize (GObject *object)
 {
@@ -388,6 +400,7 @@ update_volume (GGduVolume *volume)
                       if (g_strcmp0 (connection_interface, "usb") == 0 ||
                           g_strcmp0 (connection_interface, "firewire") == 0 ||
                           g_strcmp0 (connection_interface, "sdio") == 0 ||
+                          g_gdu_drive_device_is_flash (drive_device) ||
                           gdu_device_is_optical_disc (drive_device))
                         {
                           volume->should_automount = TRUE;
