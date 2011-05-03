@@ -74,6 +74,10 @@ void          http_backend_queue_message     (GVfsBackend         *backend,
                                               SoupSessionCallback  callback,
                                               gpointer             user_data);
 
+void          http_backend_open_for_read     (GVfsBackend         *backend,
+					      GVfsJob             *job,
+					      SoupURI             *uri);
+
 G_END_DECLS
 
 #endif /* __G_VFS_BACKEND_HTTP_H__ */
