@@ -107,6 +107,10 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   soup_session_add_feature (backend->session_async, cookie_jar);
   g_object_unref (cookie_jar);
 
+  /* Send Accept-Language header (see bug 166795) */
+  g_object_set (backend->session, "accept-language-auto", TRUE, NULL);
+  g_object_set (backend->session_async, "accept-language-auto", TRUE, NULL);
+
   /* Logging */
   debug = g_getenv ("GVFS_HTTP_DEBUG");
   if (debug)
