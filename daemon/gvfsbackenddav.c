@@ -250,16 +250,15 @@ path_equal (const char *a, const char *b, gboolean relax)
 static gboolean
 dav_uri_match (SoupURI *a, SoupURI *b, gboolean relax)
 {
-  if (a->scheme != b->scheme ||
-      a->port != b->port     ||
-      ! str_equal (a->user, b->user, FALSE)         ||
-      ! str_equal (a->password, b->password, FALSE) ||
-      ! str_equal (a->host, b->host, TRUE)          ||
-      ! path_equal (a->path, b->path, relax)        ||
-      ! str_equal (a->query, b->query, FALSE)       ||
-      ! str_equal (a->fragment, b->fragment, FALSE))
-    return FALSE;
-  return TRUE;
+  gboolean diff;
+
+  diff = a->scheme != b->scheme || a->port != b->port  ||
+    ! str_equal (a->host, b->host, TRUE)               ||
+    ! path_equal (a->path, b->path, relax)             ||
+    ! str_equal (a->query, b->query, FALSE)            ||
+    ! str_equal (a->fragment, b->fragment, FALSE);
+
+  return !diff;
 }
 
 static gboolean
