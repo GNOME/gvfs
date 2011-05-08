@@ -558,13 +558,33 @@ file_info_from_message (SoupMessage *msg,
                         GFileInfo *info,
                         GFileAttributeMatcher *matcher)
 {
-  const SoupURI *uri;
-  const char    *text;
-  char          *basename;
-  char          *ed_name = NULL;
+  const char *text;
+  GHashTable *params;
+  char       *basename;
+  char       *ed_name;
 
-  uri = soup_message_get_uri (msg);
-  basename = http_uri_get_basename (uri->path);
+  basename = ed_name = NULL;
+
+  /* prefer the filename from the Content-Disposition (rfc2183) header
+     if one if present. See bug 551298. */
+  if (soup_message_headers_get_content_disposition (msg->response_headers,
+                                                    NULL, &params))
+    {
+      const char *name = g_hash_table_lookup (params, "filename");
+
+      if (name)
+        basename = g_strdup (name);
+
+      g_hash_table_destroy (params);
+    }
+
+  if (basename == NULL)
+    {
+      const SoupURI *uri;
+
+      uri = soup_message_get_uri (msg);
+      basename = http_uri_get_basename (uri->path);
+    }
 
   g_debug ("basename:%s\n", basename);
 
