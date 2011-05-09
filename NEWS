@@ -1,3 +1,22 @@
+Major changes in 1.9.0
+======================
+* fuse: Make created files visible immediately on WebDAV
+* fuse: Pretend created file exists even if backend didn't create it
+* afc: Fix renaming files moving them to the root dir
+* afc: Use a better display name for jailbroken device access
+* common: Use libbluray to get Blu-Ray metadata
+* daemon: Fix threadsafety of closing channels
+* daemon: Don't leak dbus messages
+* gdu volume monitor: Fix setting the BDMV name
+* gdu volume monitor: Fix check for symlinks in /dev
+* gdu volume monitor: Automount flash card readers
+* gphoto2: Recognize cameras which don't implement get storageinfo
+* dav: Fix copying of remote folders to disk
+* dav: Correctly handle usernames supplied in the url
+* http/dav: Send Accept-Language header
+* http: Use Content-Disposition filename if available
+* Translation updates
+
 Major changes in 1.7.3
 ======================
 * build: Bump fuse requirement for ATOMIC_O_TRUNC support
