@@ -73,6 +73,8 @@ GMountInfo *g_mount_info_dup          (GMountInfo *info);
 void        g_mount_info_unref        (GMountInfo *info);
 const char *g_mount_info_resolve_path (GMountInfo *info,
 				       const char *path);
+void        g_mount_info_apply_prefix (GMountInfo *info,
+                                       char      **path);
 
 GMountInfo * g_mount_info_from_dbus (DBusMessageIter *iter);
 
