@@ -143,41 +143,6 @@ http_backend_get_mount_base (GVfsBackend *backend)
   return  G_VFS_BACKEND_HTTP (backend)->mount_base;
 }
 
-SoupURI *
-http_backend_uri_for_filename (GVfsBackend *backend,
-                               const char  *filename,
-                               gboolean     is_dir)
-{
-  GVfsBackendHttp *op_backend;
-  SoupURI         *uri;
-  char            *path;
-
-  op_backend = G_VFS_BACKEND_HTTP (backend);
-  uri = soup_uri_copy (op_backend->mount_base);
-
-  /* "/" means "whatever mount_base is" */
-  if (!strcmp (filename, "/"))
-    return uri;
-
-  /* Otherwise, we append filename to mount_base (which is assumed to
-   * be a directory in this case).
-   *
-   * Add a "/" in cases where it is likely that the url is going
-   * to be a directory to avoid redirections
-   */
-  if (is_dir == FALSE || g_str_has_suffix (filename, "/"))
-    path = g_build_path ("/", uri->path, filename, NULL);
-  else
-    path = g_build_path ("/", uri->path, filename, "/", NULL);
-
-  g_free (uri->path);
-  uri->path = g_uri_escape_string (path, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH,
-                                   FALSE);
-  g_free (path);
-
-  return uri;
-}
-
 char *
 http_uri_get_basename (const char *uri_str)
 {

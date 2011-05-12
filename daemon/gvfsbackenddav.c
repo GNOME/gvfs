@@ -275,6 +275,42 @@ message_should_apply_redir_ref (SoupMessage *msg)
   return TRUE;
 }
 
+
+static SoupURI *
+g_vfs_backend_dav_uri_for_path (GVfsBackend *backend,
+                               const char  *filename,
+                               gboolean     is_dir)
+{
+  SoupURI *mount_base;
+  SoupURI *uri;
+  char    *path;
+
+  mount_base = http_backend_get_mount_base (backend);
+  uri = soup_uri_copy (mount_base);
+
+  /* "/" means "whatever mount_base is" */
+  if (!strcmp (filename, "/"))
+    return uri;
+
+  /* Otherwise, we append filename to mount_base (which is assumed to
+   * be a directory in this case).
+   *
+   * Add a "/" in cases where it is likely that the url is going
+   * to be a directory to avoid redirections
+   */
+  if (is_dir == FALSE || g_str_has_suffix (filename, "/"))
+    path = g_build_path ("/", uri->path, filename, NULL);
+  else
+    path = g_build_path ("/", uri->path, filename, "/", NULL);
+
+  g_free (uri->path);
+  uri->path = g_uri_escape_string (path, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH,
+                                   FALSE);
+  g_free (path);
+
+  return uri;
+}
+
 /* redirection */
 static void
 redirect_handler (SoupMessage *msg, gpointer user_data)
@@ -1040,7 +1076,7 @@ propfind_request_new (GVfsBackend     *backend,
   const char  *header_depth;
   GString     *body;
 
-  uri = http_backend_uri_for_filename (backend, filename, depth > 0);
+  uri = g_vfs_backend_dav_uri_for_path (backend, filename, depth > 0);
   msg = soup_message_new_from_uri (SOUP_METHOD_PROPFIND, uri);
   soup_uri_free (uri);
 
@@ -1964,7 +2000,7 @@ try_open_for_read (GVfsBackend        *backend,
   SoupMessage     *msg;
   SoupURI         *uri;
 
-  uri = http_backend_uri_for_filename (backend, filename, FALSE);
+  uri = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
   msg = stat_location_begin (uri, FALSE);
   soup_uri_free (uri);
 
@@ -2033,7 +2069,7 @@ try_create (GVfsBackend *backend,
   /* TODO: if SoupOutputStream supported chunked requests, we could
    * use a PUT with "If-None-Match: *" and "Expect: 100-continue"
    */
-  uri = http_backend_uri_for_filename (backend, filename, FALSE);
+  uri = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
   msg = soup_message_new_from_uri (SOUP_METHOD_HEAD, uri);
   soup_uri_free (uri);
 
@@ -2112,7 +2148,7 @@ try_replace (GVfsBackend *backend,
 
 
 
-  uri = http_backend_uri_for_filename (backend, filename, FALSE);
+  uri = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
 
   if (etag)
     {
@@ -2245,7 +2281,7 @@ do_make_directory (GVfsBackend          *backend,
   SoupURI     *uri;
   guint        status;
 
-  uri = http_backend_uri_for_filename (backend, filename, TRUE);
+  uri = g_vfs_backend_dav_uri_for_path (backend, filename, TRUE);
   msg = soup_message_new_from_uri (SOUP_METHOD_MKCOL, uri);
   soup_uri_free (uri);
 
@@ -2281,7 +2317,7 @@ do_delete (GVfsBackend   *backend,
 
   error = NULL;
 
-  uri = http_backend_uri_for_filename (backend, filename, FALSE);
+  uri = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
   res = stat_location (backend, uri, &file_type, &num_children, &error);
 
   if (res == FALSE)
@@ -2328,12 +2364,12 @@ do_set_display_name (GVfsBackend           *backend,
   char        *dirname;
   guint        status;
 
-  source = http_backend_uri_for_filename (backend, filename, FALSE);
+  source = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
   msg = soup_message_new_from_uri (SOUP_METHOD_MOVE, source);
 
   dirname = g_path_get_dirname (filename);
   target_path = g_build_filename (dirname, display_name, NULL);
-  target = http_backend_uri_for_filename (backend, target_path, FALSE);
+  target = g_vfs_backend_dav_uri_for_path (backend, target_path, FALSE);
 
   message_add_destination_header (msg, target);
   message_add_overwrite_header (msg, FALSE);

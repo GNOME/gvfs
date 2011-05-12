@@ -57,11 +57,6 @@ struct _GVfsBackendHttp
 
 GType         g_vfs_backend_http_get_type    (void) G_GNUC_CONST;
 
-SoupURI *     http_backend_uri_for_filename  (GVfsBackend *backend,
-                                              const char  *filename,
-                                              gboolean     is_dir);
-
-
 char *        http_uri_get_basename          (const char *uri_str);
 
 guint         http_error_code_from_status    (guint status);
