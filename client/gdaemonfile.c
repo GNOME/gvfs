@@ -2028,21 +2028,26 @@ g_daemon_file_set_display_name (GFile *file,
 				GError **error)
 {
   GDaemonFile *daemon_file;
+  GMountInfo  *mount_info;
   DBusMessage *reply;
   DBusMessageIter iter;
   char *new_path;
 
   daemon_file = G_DAEMON_FILE (file);
-  
+
+  mount_info = NULL;
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME,
-			     NULL, NULL,
+			     &mount_info, NULL,
 			     cancellable, error,
 			     DBUS_TYPE_STRING, &display_name,
 			     0);
   if (reply == NULL)
-    return NULL;
-
+    {
+      if (mount_info)
+        g_mount_info_unref (mount_info);
+      return NULL;
+    }
 
   if (!dbus_message_iter_init (reply, &iter) ||
       !_g_dbus_message_iter_get_args (&iter, NULL,
@@ -2054,10 +2059,12 @@ g_daemon_file_set_display_name (GFile *file,
       goto out;
     }
 
+  g_mount_info_apply_prefix (mount_info, &new_path);
   file = new_file_for_new_path (daemon_file, new_path);
   g_free (new_path);
 
  out:
+  g_mount_info_unref (mount_info);
   dbus_message_unref (reply);
   return file;
 }
@@ -3099,7 +3106,9 @@ set_display_name_async_cb (DBusMessage *reply,
       goto out;
     }
 
+  g_mount_info_apply_prefix (mount_info, &new_path);
   file = new_file_for_new_path (daemon_file, new_path);
+
   g_free (new_path);
 
   g_simple_async_result_set_op_res_gpointer (result, file, g_object_unref);
