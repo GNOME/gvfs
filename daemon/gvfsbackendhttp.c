@@ -390,10 +390,8 @@ try_open_for_read (GVfsBackend        *backend,
 {
   SoupURI *uri;
 
-  uri = http_backend_uri_for_filename (backend, filename, FALSE);
-
+  uri = http_backend_get_mount_base (backend);
   http_backend_open_for_read (backend, G_VFS_JOB (job), uri);
-  soup_uri_free (uri);
 
   return TRUE;
 }
@@ -691,9 +689,8 @@ try_query_info (GVfsBackend           *backend,
   SoupMessage *msg;
   SoupURI     *uri;
 
-  uri = http_backend_uri_for_filename (backend, filename, FALSE);
+  uri = http_backend_get_mount_base (backend);
   msg = soup_message_new_from_uri (SOUP_METHOD_HEAD, uri);
-  soup_uri_free (uri);
 
   http_backend_queue_message (backend, msg, query_info_ready, job);
 
