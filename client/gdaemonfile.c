@@ -551,6 +551,7 @@ do_sync_2_path_call (GFile *file1,
 
 typedef void (*AsyncPathCallCallback) (DBusMessage *reply,
 				       DBusConnection *connection,
+				       GMountInfo *mount_info,
 				       GSimpleAsyncResult *result,
 				       GCancellable *cancellable,
 				       gpointer callback_data);
@@ -565,6 +566,7 @@ typedef struct {
   AsyncPathCallCallback callback;
   gpointer callback_data;
   GDestroyNotify notify;
+  GMountInfo *mount_info;
 } AsyncPathCall;
 
 static void
@@ -581,6 +583,8 @@ async_path_call_free (AsyncPathCall *data)
     g_object_unref (data->cancellable);
   if (data->args)
     dbus_message_unref (data->args);
+  if (data->mount_info)
+    g_mount_info_unref (data->mount_info);
   g_free (data);
 }
 
@@ -605,7 +609,9 @@ async_path_call_done (DBusMessage *reply,
       g_object_weak_ref (G_OBJECT (result), (GWeakNotify)async_path_call_free, data);
       data->result = NULL;
       
-      data->callback (reply, connection,
+      data->callback (reply,
+                      connection,
+                      data->mount_info,
 		      result,
 		      data->cancellable,
 		      data->callback_data);
@@ -633,6 +639,8 @@ do_async_path_call_callback (GMountInfo *mount_info,
       async_path_call_free (data);
       return;
     }
+
+  data->mount_info = g_mount_info_ref (mount_info);
 
   message =
     dbus_message_new_method_call (mount_info->dbus_id,
@@ -882,6 +890,7 @@ g_daemon_file_query_info (GFile                *file,
 static void
 query_info_async_cb (DBusMessage *reply,
 		     DBusConnection *connection,
+                     GMountInfo *mount_info,
 		     GSimpleAsyncResult *result,
 		     GCancellable *cancellable,
 		     gpointer callback_data)
@@ -999,6 +1008,7 @@ read_async_get_fd_cb (int fd,
 static void
 read_async_cb (DBusMessage *reply,
 	       DBusConnection *connection,
+               GMountInfo *mount_info,
 	       GSimpleAsyncResult *result,
 	       GCancellable *cancellable,
 	       gpointer callback_data)
@@ -1324,6 +1334,7 @@ mount_mountable_location_mounted_cb (GObject *source_object,
 static void
 mount_mountable_async_cb (DBusMessage *reply,
 			  DBusConnection *connection,
+                          GMountInfo *mount_info,
 			  GSimpleAsyncResult *result,
 			  GCancellable *cancellable,
 			  gpointer callback_data)
@@ -1440,6 +1451,7 @@ g_daemon_file_mount_mountable_finish (GFile               *file,
 static void
 start_mountable_async_cb (DBusMessage *reply,
 			  DBusConnection *connection,
+                          GMountInfo *mount_info,
 			  GSimpleAsyncResult *result,
 			  GCancellable *cancellable,
 			  gpointer callback_data)
@@ -1490,6 +1502,7 @@ g_daemon_file_start_mountable_finish (GFile               *file,
 static void
 stop_mountable_async_cb (DBusMessage *reply,
                          DBusConnection *connection,
+                         GMountInfo *mount_info,
                          GSimpleAsyncResult *result,
                          GCancellable *cancellable,
                          gpointer callback_data)
@@ -1543,6 +1556,7 @@ g_daemon_file_stop_mountable_finish (GFile               *file,
 static void
 eject_mountable_async_cb (DBusMessage *reply,
 			  DBusConnection *connection,
+                          GMountInfo *mount_info,
 			  GSimpleAsyncResult *result,
 			  GCancellable *cancellable,
 			  gpointer callback_data)
@@ -1613,6 +1627,7 @@ g_daemon_file_eject_mountable_finish (GFile               *file,
 static void
 unmount_mountable_async_cb (DBusMessage *reply,
 			    DBusConnection *connection,
+                            GMountInfo *mount_info,
 			    GSimpleAsyncResult *result,
 			    GCancellable *cancellable,
 			    gpointer callback_data)
@@ -1665,6 +1680,7 @@ g_daemon_file_unmount_mountable_with_operation_finish (GFile               *file
 static void
 poll_mountable_async_cb (DBusMessage *reply,
                          DBusConnection *connection,
+                         GMountInfo *mount_info,
                          GSimpleAsyncResult *result,
                          GCancellable *cancellable,
                          gpointer callback_data)
@@ -1862,6 +1878,7 @@ g_daemon_file_query_filesystem_info (GFile                *file,
 static void
 query_fs_info_async_cb (DBusMessage *reply,
 			DBusConnection *connection,
+                        GMountInfo *mount_info,
 			GSimpleAsyncResult *result,
 			GCancellable *cancellable,
 			gpointer callback_data)
@@ -2630,6 +2647,7 @@ out:
 static void
 append_to_async_cb (DBusMessage *reply,
                     DBusConnection *connection,
+                    GMountInfo *mount_info,
                     GSimpleAsyncResult *result,
                     GCancellable *cancellable,
                     gpointer callback_data)
@@ -2714,6 +2732,7 @@ g_daemon_file_append_to_finish (GFile                      *file,
 static void
 create_async_cb (DBusMessage *reply,
                  DBusConnection *connection,
+                 GMountInfo *mount_info,
                  GSimpleAsyncResult *result,
                  GCancellable *cancellable,
                  gpointer callback_data)
@@ -2796,6 +2815,7 @@ g_daemon_file_create_finish (GFile                      *file,
 static void
 enumerate_children_async_cb (DBusMessage *reply,
                              DBusConnection *connection,
+                             GMountInfo *mount_info,
                              GSimpleAsyncResult *result,
                              GCancellable *cancellable,
                              gpointer callback_data)
@@ -2977,6 +2997,7 @@ g_daemon_file_find_enclosing_mount_finish (GFile              *file,
 static void
 replace_async_cb (DBusMessage *reply,
                   DBusConnection *connection,
+                  GMountInfo *mount_info,
                   GSimpleAsyncResult *result,
                   GCancellable *cancellable,
                   gpointer callback_data)
@@ -3058,6 +3079,7 @@ g_daemon_file_replace_finish (GFile                      *file,
 static void
 set_display_name_async_cb (DBusMessage *reply,
                            DBusConnection *connection,
+                           GMountInfo *mount_info,
                            GSimpleAsyncResult *result,
                            GCancellable *cancellable,
                            gpointer callback_data)
