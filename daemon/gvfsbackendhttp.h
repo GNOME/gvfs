@@ -66,6 +66,8 @@ char *        http_uri_get_basename          (const char *uri_str);
 
 guint         http_error_code_from_status    (guint status);
 
+SoupURI *     http_backend_get_mount_base    (GVfsBackend *backend);
+
 guint         http_backend_send_message      (GVfsBackend *backend,
                                               SoupMessage *msg);
 

@@ -138,6 +138,12 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
 /* public utility functions */
 
 SoupURI *
+http_backend_get_mount_base (GVfsBackend *backend)
+{
+  return  G_VFS_BACKEND_HTTP (backend)->mount_base;
+}
+
+SoupURI *
 http_backend_uri_for_filename (GVfsBackend *backend,
                                const char  *filename,
                                gboolean     is_dir)
