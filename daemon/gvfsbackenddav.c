@@ -261,6 +261,19 @@ dav_uri_match (SoupURI *a, SoupURI *b, gboolean relax)
   return !diff;
 }
 
+static char *
+dav_uri_encode (const char *path_to_encode)
+{
+  char *path;
+  static const char *allowed_reserved_chars = "/";
+
+  path = g_uri_escape_string (path_to_encode,
+                              allowed_reserved_chars,
+                              FALSE);
+
+  return path;
+}
+
 static gboolean
 message_should_apply_redir_ref (SoupMessage *msg)
 {
@@ -278,19 +291,24 @@ message_should_apply_redir_ref (SoupMessage *msg)
 
 static SoupURI *
 g_vfs_backend_dav_uri_for_path (GVfsBackend *backend,
-                               const char  *filename,
-                               gboolean     is_dir)
+                                const char  *path,
+                                gboolean     is_dir)
 {
   SoupURI *mount_base;
   SoupURI *uri;
-  char    *path;
+  char    *fn_encoded;
+  char    *new_path;
 
   mount_base = http_backend_get_mount_base (backend);
   uri = soup_uri_copy (mount_base);
 
   /* "/" means "whatever mount_base is" */
-  if (!strcmp (filename, "/"))
+  if (!strcmp (path, "/"))
     return uri;
+
+  /* The mount_base path is escaped already so we need to
+     escape the new path as well */
+  fn_encoded = dav_uri_encode (path);
 
   /* Otherwise, we append filename to mount_base (which is assumed to
    * be a directory in this case).
@@ -298,15 +316,14 @@ g_vfs_backend_dav_uri_for_path (GVfsBackend *backend,
    * Add a "/" in cases where it is likely that the url is going
    * to be a directory to avoid redirections
    */
-  if (is_dir == FALSE || g_str_has_suffix (filename, "/"))
-    path = g_build_path ("/", uri->path, filename, NULL);
+  if (is_dir == FALSE || g_str_has_suffix (path, "/"))
+    new_path = g_build_path ("/", uri->path, fn_encoded, NULL);
   else
-    path = g_build_path ("/", uri->path, filename, "/", NULL);
+    new_path = g_build_path ("/", uri->path, fn_encoded, "/", NULL);
 
+  g_free (fn_encoded);
   g_free (uri->path);
-  uri->path = g_uri_escape_string (path, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH,
-                                   FALSE);
-  g_free (path);
+  uri->path = new_path;
 
   return uri;
 }
@@ -1459,12 +1476,14 @@ g_mount_spec_to_dav_uri (GMountSpec *spec)
   const char     *user;
   const char     *port;
   const char     *ssl;
+  const char     *path;
   gint            port_num;
 
   host = g_mount_spec_get (spec, "host");
   user = g_mount_spec_get (spec, "user");
   port = g_mount_spec_get (spec, "port");
   ssl  = g_mount_spec_get (spec, "ssl");
+  path = spec->mount_prefix;
 
   if (host == NULL || *host == 0)
     return NULL;
@@ -1477,12 +1496,13 @@ g_mount_spec_to_dav_uri (GMountSpec *spec)
     soup_uri_set_scheme (uri, SOUP_URI_SCHEME_HTTP);
 
   soup_uri_set_user (uri, user);
+  soup_uri_set_host (uri, host);
 
   if (port && (port_num = atoi (port)))
     soup_uri_set_port (uri, port_num);
 
-  soup_uri_set_host (uri, host);
-  soup_uri_set_path (uri, spec->mount_prefix);
+  g_free (uri->path);
+  uri->path = dav_uri_encode (path);
 
   return uri;
 }
