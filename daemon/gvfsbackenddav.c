@@ -1513,6 +1513,7 @@ g_mount_spec_from_dav_uri (GVfsBackendDav *dav_backend,
 {
   GMountSpec *spec;
   const char *ssl;
+  char       *local_path;
 
 #ifdef HAVE_AVAHI
   if (dav_backend->resolver != NULL)
@@ -1555,7 +1556,11 @@ g_mount_spec_from_dav_uri (GVfsBackendDav *dav_backend,
       g_free (port);
     }
 
-  g_mount_spec_set_mount_prefix (spec, uri->path);
+  /* There must not be any illegal characters in the
+     URL at this point */
+  local_path = g_uri_unescape_string (uri->path, "/");
+  g_mount_spec_set_mount_prefix (spec, local_path);
+  g_free (local_path);
 
   return spec;
 }
