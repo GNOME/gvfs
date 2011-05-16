@@ -443,6 +443,50 @@ redirect_handler (SoupMessage *msg, gpointer user_data)
     soup_uri_free (new_uri);
 }
 
+static void
+g_vfs_backend_dav_setup_display_name (GVfsBackend *backend)
+{
+  GVfsBackendDav *dav_backend;
+  SoupURI        *mount_base;
+  char           *display_name;
+  char            port[7] = {0, };
+
+  dav_backend = G_VFS_BACKEND_DAV (backend);
+
+#ifdef HAVE_AVAHI
+  if (dav_backend->resolver != NULL)
+    {
+      const char *name;
+      name = g_vfs_dns_sd_resolver_get_service_name (dav_backend->resolver);
+      g_vfs_backend_set_display_name (backend, name);
+      return;
+    }
+#endif
+
+  mount_base = http_backend_get_mount_base (backend);
+
+  if (! soup_uri_uses_default_port (mount_base))
+    g_snprintf (port, sizeof (port), ":%u", mount_base->port);
+
+  if (mount_base->user != NULL)
+    /* Translators: This is the name of the WebDAV share constructed as
+       "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
+       the second %s and only shown if it is not the default http(s) port. */
+    display_name = g_strdup_printf (_("WebDAV as %s on %s%s"),
+				    mount_base->user,
+				    mount_base->host,
+				    port);
+  else
+    /* Translators: This is the name of the WebDAV share constructed as
+       "WebDAV on <hostname>:<port>"; The ":port" part is again the second
+       %s and it is only shown if it is not the default http(s) port. */
+    display_name = g_strdup_printf (_("WebDAV on %s%s"),
+				    mount_base->host,
+				    port);
+
+  g_vfs_backend_set_display_name (backend, display_name);
+}
+
 static guint
 g_vfs_backend_dav_send_message (GVfsBackend *backend, SoupMessage *message)
 {
@@ -1643,7 +1687,6 @@ do_mount (GVfsBackend  *backend,
   gboolean        is_webdav;
   gboolean        res;
   char           *last_good_path;
-  char           *display_name;
   const char     *host;
   const char     *type;
 
@@ -1784,14 +1827,7 @@ do_mount (GVfsBackend  *backend,
   g_vfs_backend_set_mount_spec (backend, mount_spec);
   g_vfs_backend_set_icon_name (backend, "folder-remote");
   
-#ifdef HAVE_AVAHI
-  if (dav_backend->resolver != NULL)
-    display_name = g_strdup (g_vfs_dns_sd_resolver_get_service_name (dav_backend->resolver));
-  else
-#endif
-    display_name = g_strdup_printf (_("WebDAV on %s"), mount_base->host);
-  g_vfs_backend_set_display_name (backend, display_name);
-  g_free (display_name);
+  g_vfs_backend_dav_setup_display_name (backend);
   
   /* cleanup */
   g_mount_spec_unref (mount_spec);
