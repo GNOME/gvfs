@@ -709,15 +709,17 @@ struct _Multistatus {
   xmlNodePtr root;
 
   SoupURI *target;
+  char    *path;
 
 };
 
 struct _MsResponse {
 
   Multistatus *multistatus;
+  char        *path;
+  gboolean     is_target;
+  xmlNodePtr   first_propstat;
 
-  xmlNodePtr  href;
-  xmlNodePtr  first_propstat;
 };
 
 struct _MsPropstat {
@@ -733,17 +735,21 @@ struct _MsPropstat {
 static gboolean
 multistatus_parse (SoupMessage *msg, Multistatus *multistatus, GError **error)
 {
-  xmlDocPtr  doc;
-  xmlNodePtr root;
+  xmlDocPtr   doc;
+  xmlNodePtr  root;
+  SoupURI    *uri;
 
   doc = parse_xml (msg, &root, "multistatus", error);
 
   if (doc == NULL)
     return FALSE;
 
+  uri = soup_message_get_uri (msg);
+
   multistatus->doc = doc;
   multistatus->root = root;
-  multistatus->target = soup_message_get_uri (msg);
+  multistatus->target = uri;
+  multistatus->path = g_uri_unescape_string (uri->path, "/");
 
   return TRUE;
 }
@@ -752,6 +758,7 @@ static void
 multistatus_free (Multistatus *multistatus)
 {
   xmlFreeDoc (multistatus->doc);
+  g_free (multistatus->path);
 }
 
 static void
@@ -772,6 +779,9 @@ multistatus_get_response (xmlNodeIter *resp_iter, MsResponse *response)
   xmlNodePtr   iter;
   xmlNodePtr   href;
   xmlNodePtr   propstat;
+  SoupURI     *uri;
+  const char  *text;
+  char        *path;
 
   multistatus = xml_node_iter_get_user_data (resp_iter);
   resp_node = xml_node_iter_get_current (resp_iter);
@@ -805,48 +815,37 @@ multistatus_get_response (xmlNodeIter *resp_iter, MsResponse *response)
   if (href == NULL)
     return FALSE;
 
-  response->href = href;
+  text = node_get_content (href);
+
+  if (text == NULL)
+    return FALSE;
+
+  uri = soup_uri_new_with_base (multistatus->target, text);
+
+  if (uri == NULL)
+    return FALSE;
+
+  path = g_uri_unescape_string (uri->path, "/");
+  soup_uri_free (uri);
+
+  response->path = path;
+  response->is_target = path_equal (path, multistatus->path, TRUE);
   response->multistatus = multistatus;
   response->first_propstat = propstat;
 
   return resp_node != NULL;
 }
 
+static void
+ms_response_clear (MsResponse *response)
+{
+  g_free (response->path);
+}
+
 static char *
 ms_response_get_basename (MsResponse *response)
 {
-  const char *text;
-  text = node_get_content (response->href);
-
-  return http_uri_get_basename (text);
-
-}
-
-static gboolean
-ms_response_is_target (MsResponse *response)
-{
-  const char *text;
-  SoupURI    *target;
-  SoupURI    *uri;
-  gboolean    res;
-
-  uri    = NULL;
-  target = response->multistatus->target;
-  text   = node_get_content (response->href);
-
-  if (text == NULL)
-    return FALSE;
-
-  uri = soup_uri_new_with_base (target, text);
-
-  if (uri == NULL)
-    return FALSE;
-
-  res = dav_uri_match (uri, target, TRUE);
-
-  soup_uri_free (uri);
-  
-  return res;
+  return http_path_get_basename (response->path);
 }
 
 static void
@@ -1248,13 +1247,15 @@ stat_location_finish (SoupMessage *msg,
       if (! multistatus_get_response (&iter, &response))
         continue;
 
-      if (ms_response_is_target (&response))
+      if (response.is_target)
         {
           file_type = ms_response_to_file_type (&response);
           res = TRUE;
         }
       else
         child_count++;
+
+      ms_response_clear (&response);
     }
 
   if (res)
@@ -1914,11 +1915,13 @@ do_query_info (GVfsBackend           *backend,
       if (! multistatus_get_response (&iter, &response))
         continue;
 
-      if (ms_response_is_target (&response))
+      if (response.is_target)
         {
           ms_response_to_file_info (&response, job->file_info);
           res = TRUE;
         }
+
+      ms_response_clear (&response);
     }
 
   multistatus_free (&ms);
@@ -1987,12 +1990,14 @@ do_enumerate (GVfsBackend           *backend,
       if (! multistatus_get_response (&iter, &response))
         continue;
 
-      if (ms_response_is_target (&response))
-        continue;
+      if (response.is_target == FALSE)
+	{
+	  info = g_file_info_new ();
+	  ms_response_to_file_info (&response, info);
+	  g_vfs_job_enumerate_add_info (job, info);
+	}
 
-      info = g_file_info_new ();
-      ms_response_to_file_info (&response, info);
-      g_vfs_job_enumerate_add_info (job, info);
+      ms_response_clear (&response);
     }
 
   multistatus_free (&ms);
