@@ -698,7 +698,7 @@ msgstr "WebDAV como %s en %s%s"
 #, c-format
 #| msgid "WebDAV on %s"
 msgid "WebDAV on %s%s"
-msgstr "WebDAV en %s"
+msgstr "WebDAV en %s%s"
 
 #: ../daemon/gvfsbackenddav.c:657 ../daemon/gvfsbackenddav.c:1799
 #: ../daemon/gvfsbackendhttp.c:236
