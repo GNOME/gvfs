@@ -144,46 +144,58 @@ http_backend_get_mount_base (GVfsBackend *backend)
 }
 
 char *
+http_path_get_basename (const char *path)
+{
+  const char *parent;
+  char       *basename;
+  size_t      len;
+
+  if (path == NULL || *path == '\0')
+    return NULL;
+
+  /* remove any leading slashes */
+  while (*path != '\0' && (*path == '/' || *path == ' '))
+    path++;
+
+  len = strlen (path);
+  if (len == 0)
+    return g_strdup ("/");
+
+  /* remove any trailing slashes */
+  while (len)
+    {
+      char c = path[len - 1];
+      if (!g_ascii_isspace (c) && c != '/')
+	break;
+
+      len--;
+    }
+
+  parent = g_strrstr_len (path, len, "/");
+
+  if (parent)
+    {
+      parent++; /* skip the found / char */
+      basename = g_strndup (parent, (len - (parent - path)));
+    }
+  else
+    basename = g_strndup (path, len);
+
+  return basename;
+}
+
+char *
 http_uri_get_basename (const char *uri_str)
 {
-    const char *parent;
-    const char *path;
-    char       *to_free;
-    char       *basename;
-    size_t      len;
+  char *decoded;
+  char *basename;
 
-    if (uri_str == NULL || *uri_str == '\0')
-      return NULL;
+  basename = http_path_get_basename (uri_str);
 
-    path =  uri_str;
+  decoded = soup_uri_decode (basename);
+  g_free (basename);
 
-    /* remove any leading slashes */
-    while (*path == '/' || *path == ' ')
-        path++;
-
-    len = strlen (path);
-
-    if (len == 0)
-      return g_strdup ("/");
-
-    /* remove any trailing slashes */
-    while (path[len - 1] == '/' || path[len - 1] == ' ')
-        len--;
-
-    parent = g_strrstr_len (path, len, "/");
-
-    if (parent)
-      {
-        parent++; /* skip the found / char */
-        to_free = g_strndup (parent, (len - (parent - path)));
-      }
-    else
-      to_free = g_strndup (path, len);
-
-    basename = soup_uri_decode (to_free);
-    g_free (to_free);
-
-    return basename;
+  return decoded;
 }
 
 guint
