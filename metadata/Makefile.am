@@ -1,5 +1,16 @@
 NULL =
 
+dbus_built_sources = metadata-dbus.c metadata-dbus.h
+BUILT_SOURCES = $(dbus_built_sources)
+
+$(dbus_built_sources) : Makefile.am dbus-interface.xml
+	gdbus-codegen						\
+		--interface-prefix org.gtk.vfs.			\
+		--c-namespace GVfs				\
+		--generate-c-code metadata-dbus			\
+		dbus-interface.xml				\
+		$(NULL)
+
 noinst_LTLIBRARIES=libmetadata.la
 
 APPS = 	\
@@ -30,6 +41,7 @@ libmetadata_la_SOURCES = 		\
 	metatree.c metatree.h		\
 	metabuilder.c metabuilder.h 	\
 	crc32.c crc32.h			\
+	$(dbus_built_sources)		\
 	$(NULL)
 
 libmetadata_la_LIBADD = $(GLIB_LIBS) $(UDEV_LIBS)
@@ -37,7 +49,7 @@ libmetadata_la_LIBADD = $(GLIB_LIBS) $(UDEV_LIBS)
 meta_ls_LDADD = libmetadata.la
 meta_ls_SOURCES = meta-ls.c
 
-meta_set_LDADD = libmetadata.la $(DBUS_LIBS) ../common/libgvfscommon.la
+meta_set_LDADD = libmetadata.la ../common/libgvfscommon.la
 meta_set_SOURCES = meta-set.c
 
 meta_get_LDADD = libmetadata.la
@@ -49,7 +61,7 @@ meta_get_tree_SOURCES = meta-get-tree.c
 convert_nautilus_metadata_LDADD = libmetadata.la $(LIBXML_LIBS)
 convert_nautilus_metadata_SOURCES = metadata-nautilus.c
 
-gvfsd_metadata_LDADD = libmetadata.la $(DBUS_LIBS) ../common/libgvfscommon.la
+gvfsd_metadata_LDADD = libmetadata.la ../common/libgvfscommon.la
 gvfsd_metadata_SOURCES = meta-daemon.c
 
 # D-BUS service file
@@ -60,7 +72,14 @@ servicedir = $(DBUS_SERVICE_DIR)
 service_in_files = gvfs-metadata.service.in
 service_DATA = gvfs-metadata.service
 
-EXTRA_DIST = gvfs-metadata.service.in
+EXTRA_DIST =				\
+	gvfs-metadata.service.in	\
+	dbus-interface.xml		\
+	$(NULL)
 
 clean-local:
 	rm -f gvfs-metadata.service
+
+CLEANFILES =				\
+	$(dbus_built_sources)		\
+	$(NULL)

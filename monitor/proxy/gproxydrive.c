@@ -30,12 +30,11 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
-#include <gvfsdbusutils.h>
-
 #include "gproxyvolumemonitor.h"
 #include "gproxydrive.h"
 #include "gproxyvolume.h"
 #include "gproxymountoperation.h"
+#include "gvfsvolumemonitordbus.h"
 
 /* Protects all fields of GProxyDrive that can change */
 G_LOCK_DEFINE_STATIC(proxy_drive);
@@ -139,80 +138,52 @@ g_proxy_drive_new (GProxyVolumeMonitor *volume_monitor)
  * string               sort_key
  * a{sv}                expansion
  */
-#define DRIVE_STRUCT_TYPE "(sssbbbbbbbbuasa{ss}sa{sv})"
+#define DRIVE_STRUCT_TYPE "(&s&s&sbbbbbbbbuasa{ss}&sa{sv})"
 
 void
-g_proxy_drive_update (GProxyDrive         *drive,
-                      DBusMessageIter     *iter)
+g_proxy_drive_update (GProxyDrive  *drive,
+                      GVariant     *iter)
 {
-  DBusMessageIter iter_struct;
-  DBusMessageIter iter_volume_ids_iter;
   const char *id;
   const char *name;
   const char *gicon_data;
-  dbus_bool_t can_eject;
-  dbus_bool_t can_poll_for_media;
-  dbus_bool_t has_media;
-  dbus_bool_t is_media_removable;
-  dbus_bool_t is_media_check_automatic;
-  dbus_bool_t can_start;
-  dbus_bool_t can_start_degraded;
-  dbus_bool_t can_stop;
-  dbus_uint32_t start_stop_type;
+  gboolean can_eject;
+  gboolean can_poll_for_media;
+  gboolean has_media;
+  gboolean is_media_removable;
+  gboolean is_media_check_automatic;
+  gboolean can_start;
+  gboolean can_start_degraded;
+  gboolean can_stop;
+  guint32 start_stop_type;
   GPtrArray *volume_ids;
   GHashTable *identifiers;
   const char *sort_key;
+  const gchar *volume_id;
+  GVariantIter *iter_volume_ids;
+  GVariantIter *iter_identifiers;
+  GVariantIter *iter_expansion;
 
-  dbus_message_iter_recurse (iter, &iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &id);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &name);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &gicon_data);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &can_eject);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &can_poll_for_media);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &has_media);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &is_media_removable);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &is_media_check_automatic);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &can_start);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &can_start_degraded);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &can_stop);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &start_stop_type);
-  dbus_message_iter_next (&iter_struct);
+
+  sort_key = NULL;
+  g_variant_get (iter, DRIVE_STRUCT_TYPE,
+                 &id, &name, &gicon_data,
+                 &can_eject, &can_poll_for_media,
+                 &has_media, &is_media_removable,
+                 &is_media_check_automatic,
+                 &can_start, &can_start_degraded,
+                 &can_stop, &start_stop_type,
+                 &iter_volume_ids,
+                 &iter_identifiers,
+                 &sort_key,
+                 &iter_expansion);
 
   volume_ids = g_ptr_array_new ();
-  dbus_message_iter_recurse (&iter_struct, &iter_volume_ids_iter);
-  while (dbus_message_iter_get_arg_type (&iter_volume_ids_iter) != DBUS_TYPE_INVALID)
-    {
-      const char *volume_id;
-      dbus_message_iter_get_basic (&iter_volume_ids_iter, &volume_id);
-      dbus_message_iter_next (&iter_volume_ids_iter);
-      g_ptr_array_add (volume_ids, (gpointer) volume_id);
-    }
+  while (g_variant_iter_loop (iter_volume_ids, "&s", &volume_id))
+    g_ptr_array_add (volume_ids, (gpointer) volume_id);
   g_ptr_array_add (volume_ids, NULL);
-  dbus_message_iter_next (&iter_struct);
 
-  identifiers = _get_identifiers (&iter_struct);
-  dbus_message_iter_next (&iter_struct);
-
-  /* make sure we are backwards compat with old daemon instance */
-  sort_key = NULL;
-  if (dbus_message_iter_has_next (&iter_struct))
-    {
-      dbus_message_iter_get_basic (&iter_struct, &sort_key);
-      dbus_message_iter_next (&iter_struct);
-      /* TODO: decode expansion, once used */
-    }
-
+  identifiers = _get_identifiers (iter_identifiers);
   if (drive->id != NULL && strcmp (drive->id, id) != 0)
     {
       g_warning ("id mismatch during update of drive");
@@ -255,7 +226,12 @@ g_proxy_drive_update (GProxyDrive         *drive,
   drive->volume_ids = g_strdupv ((char **) volume_ids->pdata);
   drive->sort_key = g_strdup (sort_key);
 
+  /* TODO: decode expansion, once used */
+
  out:
+  g_variant_iter_free (iter_volume_ids);
+  g_variant_iter_free (iter_identifiers);
+  g_variant_iter_free (iter_expansion);
   g_ptr_array_free (volume_ids, TRUE);
   g_hash_table_unref (identifiers);
 }
@@ -511,13 +487,20 @@ typedef struct {
 } DBusOp;
 
 static void
-cancel_operation_reply_cb (DBusMessage *reply,
-                           GError      *error,
-                           gpointer     user_data)
+cancel_operation_reply_cb (GVfsRemoteVolumeMonitor *proxy,
+                           GAsyncResult *res,
+                           gpointer user_data)
 {
-  if (error != NULL)
+  gboolean out_WasCancelled;
+  GError *error = NULL;
+  
+  if (!gvfs_remote_volume_monitor_call_cancel_operation_finish (proxy,
+                                                                &out_WasCancelled,
+                                                                res,
+                                                                &error))
     {
       g_warning ("Error from CancelOperation(): %s", error->message);
+      g_error_free (error);
     }
 }
 
@@ -527,9 +510,7 @@ operation_cancelled (GCancellable *cancellable,
 {
   DBusOp *data = user_data;
   GSimpleAsyncResult *simple;
-  DBusConnection *connection;
-  DBusMessage *message;
-  const char *name;
+  GVfsRemoteVolumeMonitor *proxy;
 
   G_LOCK (proxy_drive);
 
@@ -543,35 +524,31 @@ operation_cancelled (GCancellable *cancellable,
   g_object_unref (simple);
 
   /* Now tell the remote volume monitor that the op has been cancelled */
-  connection = g_proxy_volume_monitor_get_dbus_connection (data->drive->volume_monitor);
-  name = g_proxy_volume_monitor_get_dbus_name (data->drive->volume_monitor);
-  message = dbus_message_new_method_call (name,
-                                          "/org/gtk/Private/RemoteVolumeMonitor",
-                                          "org.gtk.Private.RemoteVolumeMonitor",
-                                          "CancelOperation");
-  dbus_message_append_args (message,
-                            DBUS_TYPE_STRING,
-                            &(data->cancellation_id),
-                            DBUS_TYPE_INVALID);
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->drive->volume_monitor);
+  gvfs_remote_volume_monitor_call_cancel_operation (proxy,
+                                                    data->cancellation_id,
+                                                    NULL,
+                                                    (GAsyncReadyCallback) cancel_operation_reply_cb,
+                                                    NULL);
+  g_object_unref (proxy);
 
   G_UNLOCK (proxy_drive);
-
-  _g_dbus_connection_call_async (connection,
-                                 message,
-                                 -1,
-                                 (GAsyncDBusCallback) cancel_operation_reply_cb,
-                                 NULL);
-  dbus_message_unref (message);
-  dbus_connection_unref (connection);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-eject_cb (DBusMessage *reply,
-          GError *error,
-          DBusOp *data)
+eject_cb (GVfsRemoteVolumeMonitor *proxy,
+          GAsyncResult *res,
+          gpointer user_data)
 {
+  DBusOp *data = user_data;
+  GError *error = NULL;
+ 
+  gvfs_remote_volume_monitor_call_drive_eject_finish (proxy, 
+                                                      res, 
+                                                      &error);
+
   if (data->cancelled_handler_id > 0)
     g_signal_handler_disconnect (data->cancellable, data->cancelled_handler_id);
 
@@ -580,15 +557,20 @@ eject_cb (DBusMessage *reply,
       GSimpleAsyncResult *simple;
 
       if (error != NULL)
-        simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
-                                                       data->callback,
-                                                       data->user_data,
-                                                       error);
+        {
+          g_dbus_error_strip_remote_error (error);
+          simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
+                                                         data->callback,
+                                                         data->user_data,
+                                                         error);
+        }
       else
-        simple = g_simple_async_result_new (G_OBJECT (data->drive),
-                                            data->callback,
-                                            data->user_data,
-                                            NULL);
+        {
+          simple = g_simple_async_result_new (G_OBJECT (data->drive),
+                                              data->callback,
+                                              data->user_data,
+                                              NULL);
+        }
       g_simple_async_result_complete (simple);
       g_object_unref (simple);
     }
@@ -599,6 +581,8 @@ eject_cb (DBusMessage *reply,
   if (data->cancellable != NULL)
     g_object_unref (data->cancellable);
   g_free (data);
+  if (error != NULL)
+    g_error_free (error);
 }
 
 static void
@@ -610,11 +594,8 @@ g_proxy_drive_eject_with_operation (GDrive              *drive,
                                     gpointer             user_data)
 {
   GProxyDrive *proxy_drive = G_PROXY_DRIVE (drive);
-  DBusConnection *connection;
-  const char *name;
-  DBusMessage *message;
   DBusOp *data;
-  dbus_uint32_t _flags = flags;
+  GVfsRemoteVolumeMonitor *proxy;
 
   G_LOCK (proxy_drive);
 
@@ -653,32 +634,23 @@ g_proxy_drive_eject_with_operation (GDrive              *drive,
       data->cancellation_id = g_strdup ("");
     }
 
-  connection = g_proxy_volume_monitor_get_dbus_connection (proxy_drive->volume_monitor);
-  name = g_proxy_volume_monitor_get_dbus_name (proxy_drive->volume_monitor);
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->drive->volume_monitor);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT);  /* 30 minute timeout */
+  
+  gvfs_remote_volume_monitor_call_drive_eject (proxy,
+                                               proxy_drive->id,
+                                               data->cancellation_id,
+                                               flags,
+                                               data->mount_op_id,
+                                               NULL,
+                                               (GAsyncReadyCallback) eject_cb,
+                                               data);
 
-  message = dbus_message_new_method_call (name,
-                                          "/org/gtk/Private/RemoteVolumeMonitor",
-                                          "org.gtk.Private.RemoteVolumeMonitor",
-                                          "DriveEject");
-  dbus_message_append_args (message,
-                            DBUS_TYPE_STRING,
-                            &(proxy_drive->id),
-                            DBUS_TYPE_STRING,
-                            &(data->cancellation_id),
-                            DBUS_TYPE_UINT32,
-                            &_flags,
-                            DBUS_TYPE_STRING,
-                            &(data->mount_op_id),
-                            DBUS_TYPE_INVALID);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), -1);
+  g_object_unref (proxy);
+
   G_UNLOCK (proxy_drive);
 
-  _g_dbus_connection_call_async (connection,
-                                 message,
-                                 G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT, /* 30 minute timeout */
-                                 (GAsyncDBusCallback) eject_cb,
-                                 data);
-  dbus_connection_unref (connection);
-  dbus_message_unref (message);
  out:
   ;
 }
@@ -716,10 +688,17 @@ g_proxy_drive_eject_finish (GDrive        *drive,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-stop_cb (DBusMessage *reply,
-          GError *error,
-          DBusOp *data)
+stop_cb (GVfsRemoteVolumeMonitor *proxy,
+         GAsyncResult *res,
+         gpointer user_data)
 {
+  DBusOp *data = user_data;
+  GError *error = NULL;
+
+  gvfs_remote_volume_monitor_call_drive_stop_finish (proxy, 
+                                                     res, 
+                                                     &error);
+
   if (data->cancelled_handler_id > 0)
     g_signal_handler_disconnect (data->cancellable, data->cancelled_handler_id);
 
@@ -728,15 +707,20 @@ stop_cb (DBusMessage *reply,
       GSimpleAsyncResult *simple;
 
       if (error != NULL)
-        simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
-                                                       data->callback,
-                                                       data->user_data,
-                                                       error);
+        {
+          g_dbus_error_strip_remote_error (error);
+          simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
+                                                         data->callback,
+                                                         data->user_data,
+                                                         error);
+        }
       else
-        simple = g_simple_async_result_new (G_OBJECT (data->drive),
-                                            data->callback,
-                                            data->user_data,
-                                            NULL);
+        {
+          simple = g_simple_async_result_new (G_OBJECT (data->drive),
+                                              data->callback,
+                                              data->user_data,
+                                              NULL);
+        }
       g_simple_async_result_complete (simple);
       g_object_unref (simple);
     }
@@ -747,6 +731,8 @@ stop_cb (DBusMessage *reply,
   if (data->cancellable != NULL)
     g_object_unref (data->cancellable);
   g_free (data);
+  if (error != NULL)
+    g_error_free (error);
 }
 
 static void
@@ -758,11 +744,8 @@ g_proxy_drive_stop (GDrive              *drive,
                     gpointer             user_data)
 {
   GProxyDrive *proxy_drive = G_PROXY_DRIVE (drive);
-  DBusConnection *connection;
-  const char *name;
-  DBusMessage *message;
   DBusOp *data;
-  dbus_uint32_t _flags = flags;
+  GVfsRemoteVolumeMonitor *proxy;
 
   G_LOCK (proxy_drive);
 
@@ -801,32 +784,23 @@ g_proxy_drive_stop (GDrive              *drive,
       data->cancellation_id = g_strdup ("");
     }
 
-  connection = g_proxy_volume_monitor_get_dbus_connection (proxy_drive->volume_monitor);
-  name = g_proxy_volume_monitor_get_dbus_name (proxy_drive->volume_monitor);
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->drive->volume_monitor);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT);  /* 30 minute timeout */
 
-  message = dbus_message_new_method_call (name,
-                                          "/org/gtk/Private/RemoteVolumeMonitor",
-                                          "org.gtk.Private.RemoteVolumeMonitor",
-                                          "DriveStop");
-  dbus_message_append_args (message,
-                            DBUS_TYPE_STRING,
-                            &(proxy_drive->id),
-                            DBUS_TYPE_STRING,
-                            &(data->cancellation_id),
-                            DBUS_TYPE_UINT32,
-                            &_flags,
-                            DBUS_TYPE_STRING,
-                            &(data->mount_op_id),
-                            DBUS_TYPE_INVALID);
+  gvfs_remote_volume_monitor_call_drive_stop (proxy,
+                                              proxy_drive->id,
+                                              data->cancellation_id,
+                                              flags,
+                                              data->mount_op_id,
+                                              NULL,
+                                              (GAsyncReadyCallback) stop_cb,
+                                              data);
+  
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), -1);
+  g_object_unref (proxy);
+
   G_UNLOCK (proxy_drive);
 
-  _g_dbus_connection_call_async (connection,
-                                 message,
-                                 G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT, /* 30 minute timeout */
-                                 (GAsyncDBusCallback) stop_cb,
-                                 data);
-  dbus_connection_unref (connection);
-  dbus_message_unref (message);
  out:
   ;
 }
@@ -856,11 +830,18 @@ typedef struct {
 } DBusStartOp;
 
 static void
-start_cb (DBusMessage  *reply,
-          GError       *error,
-          DBusStartOp  *data)
+start_cb (GVfsRemoteVolumeMonitor *proxy,
+          GAsyncResult *res,
+          gpointer user_data)
 {
-  if (data->cancelled_handler_id > 0)
+  DBusStartOp *data = user_data;
+  GError *error = NULL;
+
+  gvfs_remote_volume_monitor_call_drive_start_finish (proxy, 
+                                                      res, 
+                                                      &error);
+
+if (data->cancelled_handler_id > 0)
     g_signal_handler_disconnect (data->cancellable, data->cancelled_handler_id);
 
   if (!g_cancellable_is_cancelled (data->cancellable))
@@ -868,15 +849,20 @@ start_cb (DBusMessage  *reply,
       GSimpleAsyncResult *simple;
 
       if (error != NULL)
-        simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
-                                                       data->callback,
-                                                       data->user_data,
-                                                       error);
+        {
+          g_dbus_error_strip_remote_error (error);
+          simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
+                                                         data->callback,
+                                                         data->user_data,
+                                                         error);
+        }
       else
-        simple = g_simple_async_result_new (G_OBJECT (data->drive),
-                                            data->callback,
-                                            data->user_data,
-                                            NULL);
+        {
+          simple = g_simple_async_result_new (G_OBJECT (data->drive),
+                                              data->callback,
+                                              data->user_data,
+                                              NULL);
+        }
       g_simple_async_result_complete_in_idle (simple);
       g_object_unref (simple);
     }
@@ -890,6 +876,8 @@ start_cb (DBusMessage  *reply,
     g_object_unref (data->cancellable);
 
   g_free (data);
+  if (error != NULL)
+    g_error_free (error);
 }
 
 static void
@@ -898,9 +886,7 @@ start_cancelled (GCancellable *cancellable,
 {
   DBusStartOp *data = user_data;
   GSimpleAsyncResult *simple;
-  DBusConnection *connection;
-  DBusMessage *message;
-  const char *name;
+  GVfsRemoteVolumeMonitor *proxy;
 
   G_LOCK (proxy_drive);
 
@@ -914,26 +900,15 @@ start_cancelled (GCancellable *cancellable,
   g_object_unref (simple);
 
   /* Now tell the remote drive monitor that the op has been cancelled */
-  connection = g_proxy_volume_monitor_get_dbus_connection (data->drive->volume_monitor);
-  name = g_proxy_volume_monitor_get_dbus_name (data->drive->volume_monitor);
-  message = dbus_message_new_method_call (name,
-                                          "/org/gtk/Private/RemoteVolumeMonitor",
-                                          "org.gtk.Private.RemoteVolumeMonitor",
-                                          "CancelOperation");
-  dbus_message_append_args (message,
-                            DBUS_TYPE_STRING,
-                            &(data->cancellation_id),
-                            DBUS_TYPE_INVALID);
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->drive->volume_monitor);
+  gvfs_remote_volume_monitor_call_cancel_operation (proxy,
+                                                    data->cancellation_id,
+                                                    NULL,
+                                                    (GAsyncReadyCallback) cancel_operation_reply_cb,
+                                                    NULL);
+  g_object_unref (proxy);
 
   G_UNLOCK (proxy_drive);
-
-  _g_dbus_connection_call_async (connection,
-                                 message,
-                                 -1,
-                                 (GAsyncDBusCallback) cancel_operation_reply_cb,
-                                 NULL);
-  dbus_message_unref (message);
-  dbus_connection_unref (connection);
 }
 
 static void
@@ -946,9 +921,7 @@ g_proxy_drive_start (GDrive              *drive,
 {
   GProxyDrive *proxy_drive = G_PROXY_DRIVE (drive);
   DBusStartOp *data;
-  DBusConnection *connection;
-  const char *name;
-  DBusMessage *message;
+  GVfsRemoteVolumeMonitor *proxy;
 
   G_LOCK (proxy_drive);
 
@@ -987,33 +960,22 @@ g_proxy_drive_start (GDrive              *drive,
 
   data->mount_op_id = g_proxy_mount_operation_wrap (mount_operation, proxy_drive->volume_monitor);
 
-  connection = g_proxy_volume_monitor_get_dbus_connection (proxy_drive->volume_monitor);
-  name = g_proxy_volume_monitor_get_dbus_name (proxy_drive->volume_monitor);
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->drive->volume_monitor);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT);  /* 30 minute timeout */
 
-  message = dbus_message_new_method_call (name,
-                                          "/org/gtk/Private/RemoteVolumeMonitor",
-                                          "org.gtk.Private.RemoteVolumeMonitor",
-                                          "DriveStart");
-  dbus_message_append_args (message,
-                            DBUS_TYPE_STRING,
-                            &(proxy_drive->id),
-                            DBUS_TYPE_STRING,
-                            &(data->cancellation_id),
-                            DBUS_TYPE_UINT32,
-                            &(flags),
-                            DBUS_TYPE_STRING,
-                            &(data->mount_op_id),
-                            DBUS_TYPE_INVALID);
+  gvfs_remote_volume_monitor_call_drive_start (proxy,
+                                               proxy_drive->id,
+                                               data->cancellation_id,
+                                               flags,
+                                               data->mount_op_id,
+                                               NULL,
+                                               (GAsyncReadyCallback) start_cb,
+                                               data);
+
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), -1);
+  g_object_unref (proxy);
+
   G_UNLOCK (proxy_drive);
-
-  _g_dbus_connection_call_async (connection,
-                                 message,
-                                 G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT,
-                                 (GAsyncDBusCallback) start_cb,
-                                 data);
-  dbus_message_unref (message);
-  dbus_connection_unref (connection);
-
  out:
   ;
 }
@@ -1031,24 +993,36 @@ g_proxy_drive_start_finish (GDrive        *drive,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-poll_for_media_cb (DBusMessage *reply,
-                   GError *error,
-                   DBusOp *data)
+poll_for_media_cb (GVfsRemoteVolumeMonitor *proxy,
+                   GAsyncResult *res,
+                   gpointer user_data)
 {
+  DBusOp *data = user_data;
+  GError *error = NULL;
+
+  gvfs_remote_volume_monitor_call_drive_poll_for_media_finish (proxy, 
+                                                               res, 
+                                                               &error);
+
   if (!g_cancellable_is_cancelled (data->cancellable))
     {
       GSimpleAsyncResult *simple;
 
       if (error != NULL)
-        simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
-                                                       data->callback,
-                                                       data->user_data,
-                                                       error);
+        {
+          g_dbus_error_strip_remote_error (error);
+          simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
+                                                         data->callback,
+                                                         data->user_data,
+                                                         error);
+        }
       else
-        simple = g_simple_async_result_new (G_OBJECT (data->drive),
-                                            data->callback,
-                                            data->user_data,
-                                            NULL);
+        {
+          simple = g_simple_async_result_new (G_OBJECT (data->drive),
+                                              data->callback,
+                                              data->user_data,
+                                              NULL);
+        }
       g_simple_async_result_complete (simple);
       g_object_unref (simple);
     }
@@ -1060,6 +1034,8 @@ poll_for_media_cb (DBusMessage *reply,
   if (data->cancellable != NULL)
     g_object_unref (data->cancellable);
   g_free (data);
+  if (error != NULL)
+    g_error_free (error);
 }
 
 static void
@@ -1069,10 +1045,8 @@ g_proxy_drive_poll_for_media (GDrive              *drive,
                               gpointer             user_data)
 {
   GProxyDrive *proxy_drive = G_PROXY_DRIVE (drive);
-  DBusConnection *connection;
-  const char *name;
-  DBusMessage *message;
   DBusOp *data;
+  GVfsRemoteVolumeMonitor *proxy;
 
   G_LOCK (proxy_drive);
 
@@ -1109,29 +1083,17 @@ g_proxy_drive_poll_for_media (GDrive              *drive,
     {
       data->cancellation_id = g_strdup ("");
     }
+  
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->drive->volume_monitor);
+  gvfs_remote_volume_monitor_call_drive_poll_for_media (proxy,
+                                                        proxy_drive->id,
+                                                        data->cancellation_id,
+                                                        NULL,
+                                                        (GAsyncReadyCallback) poll_for_media_cb,
+                                                        data);
+  g_object_unref (proxy);
 
-  connection = g_proxy_volume_monitor_get_dbus_connection (proxy_drive->volume_monitor);
-  name = g_proxy_volume_monitor_get_dbus_name (proxy_drive->volume_monitor);
-
-  message = dbus_message_new_method_call (name,
-                                          "/org/gtk/Private/RemoteVolumeMonitor",
-                                          "org.gtk.Private.RemoteVolumeMonitor",
-                                          "DrivePollForMedia");
-  dbus_message_append_args (message,
-                            DBUS_TYPE_STRING,
-                            &(proxy_drive->id),
-                            DBUS_TYPE_STRING,
-                            &(data->cancellation_id),
-                            DBUS_TYPE_INVALID);
   G_UNLOCK (proxy_drive);
-
-  _g_dbus_connection_call_async (connection,
-                                 message,
-                                 -1,
-                                 (GAsyncDBusCallback) poll_for_media_cb,
-                                 data);
-  dbus_connection_unref (connection);
-  dbus_message_unref (message);
  out:
   ;
 }

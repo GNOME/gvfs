@@ -1,9 +1,10 @@
 #include "config.h"
 #include "metatree.h"
 #include <glib/gstdio.h>
+/*  TODO: remove + remove traces in Makefile.am  */
 #include <dbus/dbus.h>
 #include "gvfsdaemonprotocol.h"
-#include "gvfsdbusutils.h"
+#include "metadata-dbus.h"
 
 static gboolean unset = FALSE;
 static gboolean list = FALSE;
@@ -28,12 +29,12 @@ main (int argc,
   MetaLookupCache *lookup;
   struct stat statbuf;
   const char *path, *key;
-  DBusConnection *connection;
-  DBusMessage *message, *reply;
   const char *metatreefile;
-  DBusError derror;
   char *tree_path;
-
+  GVfsMetadata *proxy;
+  
+  g_type_init();
+  
   context = g_option_context_new ("<path> <key> <value> - set metadata");
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   if (!g_option_context_parse (context, &argc, &argv, &error))
@@ -96,39 +97,42 @@ main (int argc,
 	}
     }
 
-  connection = NULL;
+  proxy = NULL;
   if (use_dbus)
     {
-      dbus_error_init (&derror);
-      connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
-      if (connection == NULL)
+      proxy = gvfs_metadata_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                                    G_DBUS_PROXY_FLAGS_NONE,
+                                                    G_VFS_DBUS_METADATA_NAME,
+                                                    G_VFS_DBUS_METADATA_PATH,
+                                                    NULL,
+                                                    &error);
+      
+      if (proxy == NULL)
 	{
-	  g_printerr ("Unable to connect to dbus: %s\n", derror.message);
-	  dbus_error_free (&derror);
+	  g_printerr ("Unable to connect to dbus: %s (%s, %d)\n",
+                      error->message, g_quark_to_string (error->domain), error->code);
+	  g_error_free (error);
 	  return 1;
 	}
+      
+      g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), 1000*30);
     }
 
   if (unset)
     {
       if (use_dbus)
 	{
-	  message =
-	    dbus_message_new_method_call (G_VFS_DBUS_METADATA_NAME,
-					  G_VFS_DBUS_METADATA_PATH,
-					  G_VFS_DBUS_METADATA_INTERFACE,
-					  G_VFS_DBUS_METADATA_OP_UNSET);
-	  metatreefile = meta_tree_get_filename (tree);
-	  _g_dbus_message_append_args (message,
-				       G_DBUS_TYPE_CSTRING, &metatreefile,
-				       G_DBUS_TYPE_CSTRING, &tree_path,
-				       DBUS_TYPE_STRING, &key,
-				       0);
-	  reply = dbus_connection_send_with_reply_and_block (connection, message, 1000*30,
-							     &derror);
-	  if (reply == NULL)
+          metatreefile = meta_tree_get_filename (tree);
+
+          if (! gvfs_metadata_call_unset_sync (proxy,
+                                               metatreefile,
+                                               tree_path,
+                                               key,
+                                               NULL,
+                                               &error))
 	    {
-	      g_printerr ("Unset error: %s\n", derror.message);
+	      g_printerr ("Unset error: %s (%s, %d)\n",
+                           error->message, g_quark_to_string (error->domain), error->code);
 	      return 1;
 	    }
 	}
@@ -146,26 +150,27 @@ main (int argc,
       if (use_dbus)
 	{
 	  char **strv;
-	  message =
-	    dbus_message_new_method_call (G_VFS_DBUS_METADATA_NAME,
-					  G_VFS_DBUS_METADATA_PATH,
-					  G_VFS_DBUS_METADATA_INTERFACE,
-					  G_VFS_DBUS_METADATA_OP_SET);
-	  metatreefile = meta_tree_get_filename (tree);
-	  strv = &argv[3];
-	  _g_dbus_message_append_args (message,
-				       G_DBUS_TYPE_CSTRING, &metatreefile,
-				       G_DBUS_TYPE_CSTRING, &tree_path,
-				       DBUS_TYPE_STRING, &key,
-				       DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &strv, argc - 3,
-				       0);
-	  reply = dbus_connection_send_with_reply_and_block (connection, message, 1000*30,
-							     &derror);
-	  if (reply == NULL)
-	    {
-	      g_printerr ("SetStringv error: %s\n", derror.message);
-	      return 1;
-	    }
+	  GVariantBuilder *builder;
+
+          metatreefile = meta_tree_get_filename (tree);
+          strv = &argv[3];
+
+          builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
+          g_variant_builder_add (builder, "{sv}", key, g_variant_new_strv ((const gchar * const  *) strv, -1));
+
+          if (! gvfs_metadata_call_set_sync (proxy,
+                                             metatreefile,
+                                             tree_path,
+                                             g_variant_builder_end (builder),
+                                             NULL,
+                                             &error))
+            {
+              g_printerr ("SetStringv error: %s (%s, %d)\n",
+                           error->message, g_quark_to_string (error->domain), error->code);
+              return 1;
+            }
+          
+          g_variant_builder_unref (builder);
 	}
       else
 	{
@@ -180,25 +185,26 @@ main (int argc,
     {
       if (use_dbus)
 	{
-	  message =
-	    dbus_message_new_method_call (G_VFS_DBUS_METADATA_NAME,
-					  G_VFS_DBUS_METADATA_PATH,
-					  G_VFS_DBUS_METADATA_INTERFACE,
-					  G_VFS_DBUS_METADATA_OP_SET);
-	  metatreefile = meta_tree_get_filename (tree);
-	  _g_dbus_message_append_args (message,
-				       G_DBUS_TYPE_CSTRING, &metatreefile,
-				       G_DBUS_TYPE_CSTRING, &tree_path,
-				       DBUS_TYPE_STRING, &key,
-				       DBUS_TYPE_STRING, &argv[3],
-				       0);
-	  reply = dbus_connection_send_with_reply_and_block (connection, message, 1000*30,
-							     &derror);
-	  if (reply == NULL)
-	    {
-	      g_printerr ("SetString error: %s\n", derror.message);
-	      return 1;
-	    }
+          GVariantBuilder *builder;
+
+          metatreefile = meta_tree_get_filename (tree);
+          
+          builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
+          g_variant_builder_add (builder, "{sv}", key, g_variant_new_string (argv[3]));
+
+          if (! gvfs_metadata_call_set_sync (proxy,
+                                             metatreefile,
+                                             tree_path,
+                                             g_variant_builder_end (builder),
+                                             NULL,
+                                             &error))
+            {
+              g_printerr ("SetString error: %s (%s, %d)\n",
+                           error->message, g_quark_to_string (error->domain), error->code);
+              return 1;
+            }
+          
+          g_variant_builder_unref (builder);
 	}
       else
 	{
@@ -210,5 +216,8 @@ main (int argc,
 	}
     }
 
+  if (proxy)
+    g_object_unref (proxy);
+    
   return 0;
 }

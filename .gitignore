@@ -38,3 +38,5 @@ gtk-doc.make
 *-marshal.[ch]
 *.gschema.valid
 *.enums.xml
+monitor/proxy/gvfsvolumemonitordbus.*
+metadata/metadata-dbus.*

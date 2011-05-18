@@ -77,6 +77,9 @@ G_DEFINE_DYNAMIC_TYPE (GDaemonVfs, g_daemon_vfs, G_TYPE_VFS)
 
 static GDaemonVfs *the_vfs = NULL;
 
+G_LOCK_DEFINE_STATIC (metadata_proxy);
+static GVfsMetadata *metadata_proxy = NULL;
+
 G_LOCK_DEFINE_STATIC(mount_cache);
 
 
@@ -1170,19 +1173,6 @@ g_daemon_vfs_add_writable_namespaces (GVfs       *vfs,
 				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
 }
 
-static void
-send_message_oneway (DBusMessage *message)
-{
-  DBusConnection *connection;
-
-  connection = _g_dbus_connection_get_sync (NULL, NULL);
-  if (connection == NULL)
-    return;
-
-  dbus_connection_send (connection, message, NULL);
-  dbus_connection_flush (connection);
-}
-
 /* Sends a message on the session bus and blocks for the reply,
    using the thread local connection */
 gboolean
@@ -1239,7 +1229,7 @@ strv_equal (char **a, char **b)
 
 /* -1 => error, otherwise number of added items */
 int
-_g_daemon_vfs_append_metadata_for_set (DBusMessage *message,
+_g_daemon_vfs_append_metadata_for_set (GVariantBuilder *builder,
 				       MetaTree *tree,
 				       const char *path,
 				       const char *attribute,
@@ -1261,10 +1251,7 @@ _g_daemon_vfs_append_metadata_for_set (DBusMessage *message,
       if (current == NULL || strcmp (current, val) != 0)
 	{
 	  res = 1;
-	  _g_dbus_message_append_args (message,
-				       DBUS_TYPE_STRING, &key,
-				       DBUS_TYPE_STRING, &val,
-				       0);
+	  g_variant_builder_add (builder, "{sv}", key, g_variant_new_string (val));
 	}
       g_free (current);
     }
@@ -1276,10 +1263,7 @@ _g_daemon_vfs_append_metadata_for_set (DBusMessage *message,
       if (current == NULL || !strv_equal (current, val))
 	{
 	  res = 1;
-	  _g_dbus_message_append_args (message,
-				       DBUS_TYPE_STRING, &key,
-				       DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &val, g_strv_length (val),
-				       0);
+	  g_variant_builder_add (builder, "{sv}", key, g_variant_new_strv ((const gchar * const  *) val, -1));
 	}
       g_strfreev (current);
     }
@@ -1290,16 +1274,69 @@ _g_daemon_vfs_append_metadata_for_set (DBusMessage *message,
 	  char c = 0;
 	  res = 1;
 	  /* Byte => unset */
-	  _g_dbus_message_append_args (message,
-				       DBUS_TYPE_STRING, &key,
-				       DBUS_TYPE_BYTE, &c,
-				       0);
+	  g_variant_builder_add (builder, "{sv}", key, g_variant_new_byte (c));
 	}
     }
   else
     res = -1;
 
   return res;
+}
+
+static void
+metadata_daemon_vanished (GDBusConnection *connection,
+                          const gchar *name,
+                          gpointer user_data)
+{
+  guint *watcher_id = user_data;
+
+  G_LOCK (metadata_proxy);
+  g_clear_object (&metadata_proxy);
+  G_UNLOCK (metadata_proxy);
+
+  if (*watcher_id > 0)
+    g_bus_unwatch_name (*watcher_id);
+}
+
+GVfsMetadata *
+_g_daemon_vfs_get_metadata_proxy (GCancellable *cancellable, GError **error)
+{
+  GVfsMetadata *proxy;
+  guint *watcher_id;
+
+  G_LOCK (metadata_proxy);
+
+  proxy = NULL;
+  if (metadata_proxy == NULL)
+    {
+      metadata_proxy = gvfs_metadata_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                                             G_DBUS_PROXY_FLAGS_NONE,
+                                                             G_VFS_DBUS_METADATA_NAME,
+                                                             G_VFS_DBUS_METADATA_PATH,
+                                                             cancellable,
+                                                             error);
+
+      if (proxy != NULL)
+        {
+          /* a place in memory to store the returned ID in */
+          watcher_id = g_malloc0 (sizeof (guint));
+          *watcher_id = g_bus_watch_name_on_connection (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)),
+                                                        G_VFS_DBUS_METADATA_NAME,
+                                                        G_BUS_NAME_WATCHER_FLAGS_AUTO_START,
+                                                        NULL,
+                                                        metadata_daemon_vanished,
+                                                        watcher_id,
+                                                        g_free);
+        }
+    }
+
+  if (metadata_proxy != NULL)
+    /* take the reference so that we don't need to protect returned object against racy metadata_daemon_vanished() */
+    proxy = g_object_ref (metadata_proxy);
+
+  G_UNLOCK (metadata_proxy);
+
+  return proxy;
 }
 
 static gboolean
@@ -1319,10 +1356,11 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
   MetaTree *tree;
   int errsv;
   int i, num_set;
-  DBusMessage *message;
   gboolean res;
   int appended;
   gpointer value;
+  GVfsMetadata *proxy;
+  GVariantBuilder *builder;
 
   res = TRUE;
   if (g_file_info_has_namespace (info, "metadata"))
@@ -1352,65 +1390,71 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
 						statbuf.st_dev,
 						FALSE,
 						&tree_path);
-	  message =
-	    dbus_message_new_method_call (G_VFS_DBUS_METADATA_NAME,
-					  G_VFS_DBUS_METADATA_PATH,
-					  G_VFS_DBUS_METADATA_INTERFACE,
-					  G_VFS_DBUS_METADATA_OP_SET);
-	  g_assert (message != NULL);
-	  metatreefile = meta_tree_get_filename (tree);
-	  _g_dbus_message_append_args (message,
-				       G_DBUS_TYPE_CSTRING, &metatreefile,
-				       G_DBUS_TYPE_CSTRING, &tree_path,
-				       0);
-	  meta_lookup_cache_free (cache);
-
-	  num_set = 0;
-	  for (i = 0; attributes[i] != NULL; i++)
-	    {
-	      if (g_file_info_get_attribute_data (info, attributes[i], &type, &value, NULL))
-		{
-		  appended = _g_daemon_vfs_append_metadata_for_set (message,
-								    tree,
-								    tree_path,
-								    attributes[i],
-								    type,
-								    value);
-		  if (appended != -1)
-		    {
-		      num_set += appended;
-		      g_file_info_set_attribute_status (info, attributes[i],
-							G_FILE_ATTRIBUTE_STATUS_SET);
-		    }
-		  else
-		    {
-		      res = FALSE;
-		      g_set_error (error, G_IO_ERROR,
-				   G_IO_ERROR_INVALID_ARGUMENT,
-				   _("Error setting file metadata: %s"),
-				   _("values must be string or list of strings"));
-		      error = NULL; /* Don't set further errors */
-		      g_file_info_set_attribute_status (info, attributes[i],
-							G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
-		    }
-		}
-	    }
-
-	  meta_tree_unref (tree);
-	  g_free (tree_path);
-
-	  if (num_set > 0 &&
-	      !_g_daemon_vfs_send_message_sync (message,
-						cancellable, error))
+	  
+	  proxy = _g_daemon_vfs_get_metadata_proxy (NULL, error);
+	  if (proxy == NULL)
 	    {
 	      res = FALSE;
-	      error = NULL; /* Don't set further errors */
-	      for (i = 0; attributes[i] != NULL; i++)
-		g_file_info_set_attribute_status (info, attributes[i],
-						  G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
+              error = NULL; /* Don't set further errors */
 	    }
+	  else
+	    {
+              builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
+	      metatreefile = meta_tree_get_filename (tree);
+              num_set = 0;
 
-	  dbus_message_unref (message);
+              for (i = 0; attributes[i] != NULL; i++)
+                {
+                  if (g_file_info_get_attribute_data (info, attributes[i], &type, &value, NULL))
+                    {
+                      appended = _g_daemon_vfs_append_metadata_for_set (builder,
+                                                                        tree,
+                                                                        tree_path,
+                                                                        attributes[i],
+                                                                        type,
+                                                                        value);
+                      if (appended != -1)
+                        {
+                          num_set += appended;
+                          g_file_info_set_attribute_status (info, attributes[i],
+                                                            G_FILE_ATTRIBUTE_STATUS_SET);
+                        }
+                      else
+                        {
+                          res = FALSE;
+                          g_set_error (error, G_IO_ERROR,
+                                       G_IO_ERROR_INVALID_ARGUMENT,
+                                       _("Error setting file metadata: %s"),
+                                       _("values must be string or list of strings"));
+                          error = NULL; /* Don't set further errors */
+                          g_file_info_set_attribute_status (info, attributes[i],
+                                                            G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
+                        }
+                    }
+                }
+	      
+	      if (num_set > 0 &&
+	          ! gvfs_metadata_call_set_sync (proxy,
+	                                         metatreefile,
+	                                         tree_path,
+	                                         g_variant_builder_end (builder),
+	                                         NULL,
+	                                         error))
+                {
+	          res = FALSE;
+                  error = NULL; /* Don't set further errors */
+                  for (i = 0; attributes[i] != NULL; i++)
+                    g_file_info_set_attribute_status (info, attributes[i],
+                                                      G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
+                }
+
+	      g_variant_builder_unref (builder);
+	      
+              meta_lookup_cache_free (cache);
+              meta_tree_unref (tree);
+              g_free (tree_path);
+              g_object_unref (proxy);
+	    }
 	}
 
       g_strfreev (attributes);
@@ -1424,10 +1468,10 @@ g_daemon_vfs_local_file_removed (GVfs       *vfs,
 				 const char *filename)
 {
   MetaLookupCache *cache;
-  DBusMessage *message;
   const char *metatreefile;
   MetaTree *tree;
   char *tree_path;
+  GVfsMetadata *proxy;
 
   cache = meta_lookup_cache_new ();
   tree = meta_lookup_cache_lookup_path (cache,
@@ -1437,19 +1481,23 @@ g_daemon_vfs_local_file_removed (GVfs       *vfs,
 					&tree_path);
   if (tree)
     {
-      message =
-	dbus_message_new_method_call (G_VFS_DBUS_METADATA_NAME,
-				      G_VFS_DBUS_METADATA_PATH,
-				      G_VFS_DBUS_METADATA_INTERFACE,
-				      G_VFS_DBUS_METADATA_OP_REMOVE);
-      g_assert (message != NULL);
-      metatreefile = meta_tree_get_filename (tree);
-      _g_dbus_message_append_args (message,
-				   G_DBUS_TYPE_CSTRING, &metatreefile,
-				   G_DBUS_TYPE_CSTRING, &tree_path,
-				   0);
-      send_message_oneway (message);
-      dbus_message_unref (message);
+      proxy = _g_daemon_vfs_get_metadata_proxy (NULL, NULL);
+      if (proxy)
+        {
+          metatreefile = meta_tree_get_filename (tree);
+          /* we don't care about the result, let's queue the call and don't block */
+          gvfs_metadata_call_remove (proxy,
+                                     metatreefile,
+                                     tree_path,
+                                     NULL,
+                                     NULL, /* callback */
+                                     NULL);
+          /* flush the call with the expense of sending all queued messages on the connection */
+          g_dbus_connection_flush_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)),
+                                        NULL, NULL);
+          g_object_unref (proxy);
+        }
+      
       meta_tree_unref (tree);
       g_free (tree_path);
     }
@@ -1463,10 +1511,10 @@ g_daemon_vfs_local_file_moved (GVfs       *vfs,
 			       const char *dest)
 {
   MetaLookupCache *cache;
-  DBusMessage *message;
   const char *metatreefile;
   MetaTree *tree1, *tree2;
   char *tree_path1, *tree_path2;
+  GVfsMetadata *proxy;
 
   cache = meta_lookup_cache_new ();
   tree1 = meta_lookup_cache_lookup_path (cache,
@@ -1481,20 +1529,23 @@ g_daemon_vfs_local_file_moved (GVfs       *vfs,
 					 &tree_path2);
   if (tree1 && tree2 && tree1 == tree2)
     {
-      message =
-	dbus_message_new_method_call (G_VFS_DBUS_METADATA_NAME,
-				      G_VFS_DBUS_METADATA_PATH,
-				      G_VFS_DBUS_METADATA_INTERFACE,
-				      G_VFS_DBUS_METADATA_OP_MOVE);
-      g_assert (message != NULL);
-      metatreefile = meta_tree_get_filename (tree1);
-      _g_dbus_message_append_args (message,
-				   G_DBUS_TYPE_CSTRING, &metatreefile,
-				   G_DBUS_TYPE_CSTRING, &tree_path1,
-				   G_DBUS_TYPE_CSTRING, &tree_path2,
-				   0);
-      send_message_oneway (message);
-      dbus_message_unref (message);
+      proxy = _g_daemon_vfs_get_metadata_proxy (NULL, NULL);
+      if (proxy)
+        {
+          metatreefile = meta_tree_get_filename (tree1);
+          /* we don't care about the result, let's queue the call and don't block */
+          gvfs_metadata_call_move (proxy,
+                                   metatreefile,
+                                   tree_path1,
+                                   tree_path2,
+                                   NULL,
+                                   NULL, /* callback */
+                                   NULL);
+          /* flush the call with the expense of sending all queued messages on the connection */
+          g_dbus_connection_flush_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)),
+                                        NULL, NULL);
+          g_object_unref (proxy);
+        }
     }
 
   if (tree1)

@@ -29,6 +29,7 @@
 #include <sys/socket.h>
 
 #include "gdaemonfile.h"
+#include "gdaemonvfs.h"
 #include "gvfsdaemondbus.h"
 #include "gdaemonmount.h"
 #include <gvfsdaemonprotocol.h>
@@ -41,6 +42,7 @@
 #include "gmountoperationdbus.h"
 #include <gio/gio.h>
 #include "metatree.h"
+#include <metadata-dbus.h>
 
 static void g_daemon_file_file_iface_init (GFileIface       *iface);
 
@@ -2215,53 +2217,57 @@ set_metadata_attribute (GFile *file,
 			GError **error)
 {
   GDaemonFile *daemon_file;
-  DBusMessage *message;
   char *treename;
   const char *metatreefile;
   MetaTree *tree;
   int appended;
   gboolean res;
+  GVfsMetadata *proxy;
+  GVariantBuilder *builder;
 
   daemon_file = G_DAEMON_FILE (file);
 
   treename = g_mount_spec_to_string (daemon_file->mount_spec);
   tree = meta_tree_lookup_by_name (treename, FALSE);
   g_free (treename);
+  
+  res = FALSE;
+  proxy = _g_daemon_vfs_get_metadata_proxy (cancellable, error);
 
-  message =
-    dbus_message_new_method_call (G_VFS_DBUS_METADATA_NAME,
-				  G_VFS_DBUS_METADATA_PATH,
-				  G_VFS_DBUS_METADATA_INTERFACE,
-				  G_VFS_DBUS_METADATA_OP_SET);
-  g_assert (message != NULL);
-  metatreefile = meta_tree_get_filename (tree);
-  _g_dbus_message_append_args (message,
-			       G_DBUS_TYPE_CSTRING, &metatreefile,
-			       G_DBUS_TYPE_CSTRING, &daemon_file->path,
-			       0);
-
-  appended = _g_daemon_vfs_append_metadata_for_set (message,
-						    tree,
-						    daemon_file->path,
-						    attribute,
-						    type,
-						    value);
-
-  res = TRUE;
-  if (appended == -1)
+  if (proxy)
     {
-      res = FALSE;
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_INVALID_ARGUMENT,
-		   _("Error setting file metadata: %s"),
-		   _("values must be string or list of strings"));
-    }
-  else if (appended > 0 &&
-      !_g_daemon_vfs_send_message_sync (message,
-					cancellable, error))
-    res = FALSE;
+      builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
 
-  dbus_message_unref (message);
+      metatreefile = meta_tree_get_filename (tree);
+
+      appended = _g_daemon_vfs_append_metadata_for_set (builder,
+                                                        tree,
+                                                        daemon_file->path,
+                                                        attribute,
+                                                        type,
+                                                        value);
+    
+      res = TRUE;
+      if (appended == -1)
+        {
+          res = FALSE;
+          g_set_error (error, G_IO_ERROR,
+                       G_IO_ERROR_INVALID_ARGUMENT,
+                       _("Error setting file metadata: %s"),
+                       _("values must be string or list of strings"));
+        }
+      else if (appended > 0 &&
+               !gvfs_metadata_call_set_sync (proxy,
+                                             metatreefile,
+                                             daemon_file->path,
+                                             g_variant_builder_end (builder),
+                                             cancellable,
+                                             error))
+        res = FALSE;
+
+      g_variant_builder_unref (builder);
+      g_object_unref (proxy);
+    }
 
   meta_tree_unref (tree);
 

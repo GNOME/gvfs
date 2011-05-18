@@ -27,7 +27,8 @@
 #include <glib-object.h>
 #include <gio/gio.h>
 #include <gio/gunixmounts.h>
-#include <dbus/dbus.h>
+
+#include "gvfsvolumemonitordbus.h"
 
 G_BEGIN_DECLS
 
@@ -64,21 +65,19 @@ struct _GProxyVolumeMonitorClass {
 
 GType g_proxy_volume_monitor_get_type (void) G_GNUC_CONST;
 
-void            g_proxy_volume_monitor_register          (GIOModule           *module);
-GProxyDrive    *g_proxy_volume_monitor_get_drive_for_id  (GProxyVolumeMonitor *volume_monitor,
+void             g_proxy_volume_monitor_register          (GIOModule           *module);
+GProxyDrive     *g_proxy_volume_monitor_get_drive_for_id  (GProxyVolumeMonitor *volume_monitor,
                                                           const char          *id);
-GProxyVolume   *g_proxy_volume_monitor_get_volume_for_id (GProxyVolumeMonitor *volume_monitor,
+GProxyVolume    *g_proxy_volume_monitor_get_volume_for_id (GProxyVolumeMonitor *volume_monitor,
                                                           const char          *id);
-GProxyMount    *g_proxy_volume_monitor_get_mount_for_id  (GProxyVolumeMonitor *volume_monitor,
+GProxyMount     *g_proxy_volume_monitor_get_mount_for_id  (GProxyVolumeMonitor *volume_monitor,
                                                           const char          *id);
-DBusConnection *g_proxy_volume_monitor_get_dbus_connection (GProxyVolumeMonitor *volume_monitor);
-const char     *g_proxy_volume_monitor_get_dbus_name       (GProxyVolumeMonitor *volume_monitor);
+GVfsRemoteVolumeMonitor *g_proxy_volume_monitor_get_dbus_proxy (GProxyVolumeMonitor *volume_monitor);
 
-gboolean g_proxy_volume_monitor_setup_session_bus_connection (gboolean need_integration);
 void g_proxy_volume_monitor_teardown_session_bus_connection (void);
 
 
-GHashTable *_get_identifiers (DBusMessageIter *iter);
+GHashTable *_get_identifiers (GVariantIter *identifiers);
 
 G_END_DECLS
 

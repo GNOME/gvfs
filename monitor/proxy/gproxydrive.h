@@ -47,17 +47,17 @@ GType         g_proxy_drive_get_type     (void) G_GNUC_CONST;
 void          g_proxy_drive_register     (GIOModule           *module);
 GProxyDrive  *g_proxy_drive_new          (GProxyVolumeMonitor *volume_monitor);
 void          g_proxy_drive_update       (GProxyDrive         *drive,
-                                          DBusMessageIter     *iter);
+                                          GVariant            *iter);
 const char   *g_proxy_drive_get_id       (GProxyDrive         *drive);
 
-void          g_proxy_drive_handle_start_op_ask_password (GProxyDrive        *drive,
-                                                          DBusMessageIter    *iter);
+void          g_proxy_drive_handle_start_op_ask_password (GProxyDrive  *drive,
+                                                          GVariant     *iter);
 
-void          g_proxy_drive_handle_start_op_ask_question (GProxyDrive        *drive,
-                                                          DBusMessageIter    *iter);
+void          g_proxy_drive_handle_start_op_ask_question (GProxyDrive  *drive,
+                                                          GVariant     *iter);
 
-void          g_proxy_drive_handle_start_op_aborted      (GProxyDrive        *drive,
-                                                          DBusMessageIter    *iter);
+void          g_proxy_drive_handle_start_op_aborted      (GProxyDrive  *drive,
+                                                          GVariant     *iter);
 
 G_END_DECLS
 

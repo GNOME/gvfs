@@ -47,7 +47,7 @@ struct _GProxyVolumeClass {
 GType         g_proxy_volume_get_type            (void) G_GNUC_CONST;
 GProxyVolume *g_proxy_volume_new                 (GProxyVolumeMonitor *volume_monitor);
 void          g_proxy_volume_update              (GProxyVolume        *volume,
-                                                  DBusMessageIter     *iter);
+                                                  GVariant            *iter);
 const char   *g_proxy_volume_get_id              (GProxyVolume        *volume);
 void          g_proxy_volume_register            (GIOModule           *module);
 

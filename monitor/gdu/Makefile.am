@@ -19,7 +19,6 @@ gvfs_gdu_volume_monitor_CFLAGS =		\
 	$(GLIB_CFLAGS)                          \
 	$(GDU_CFLAGS)                           \
 	$(GUDEV_CFLAGS)                         \
-	$(DBUS_CFLAGS)                          \
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
 	-DGDU_API_IS_SUBJECT_TO_CHANGE		\
@@ -32,7 +31,6 @@ gvfs_gdu_volume_monitor_LDADD  =		     			      	\
 	$(GLIB_LIBS)                                 			      	\
 	$(GDU_LIBS)                                  			      	\
 	$(GUDEV_LIBS)                                  			      	\
-	$(DBUS_LIBS)                                 				\
 	$(top_builddir)/common/libgvfscommon.la 			      	\
 	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la 	\
 	$(NULL)

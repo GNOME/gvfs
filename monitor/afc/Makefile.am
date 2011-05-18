@@ -23,7 +23,6 @@ gvfs_afc_volume_monitor_CFLAGS = \
 
 gvfs_afc_volume_monitor_LDADD = \
 	$(GLIB_LIBS) \
-	$(DBUS_LIBS) \
 	$(AFC_LIBS) \
 	$(top_builddir)/common/libgvfscommon.la \
 	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la \

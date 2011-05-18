@@ -31,8 +31,6 @@
 #include <glib/gi18n-lib.h>
 #include <gio/gio.h>
 
-#include <gvfsdbusutils.h>
-
 #include "gproxyvolumemonitor.h"
 #include "gproxyshadowmount.h"
 #include "gproxyvolume.h"

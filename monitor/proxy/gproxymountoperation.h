@@ -34,17 +34,22 @@ G_BEGIN_DECLS
 const gchar *g_proxy_mount_operation_wrap                (GMountOperation     *op,
                                                           GProxyVolumeMonitor *monitor);
 
-void  g_proxy_mount_operation_handle_ask_password   (const gchar      *wrapped_id,
-                                                     DBusMessageIter  *iter);
+void  g_proxy_mount_operation_handle_ask_password   (const gchar        *wrapped_id,
+                                                     const gchar        *message,
+                                                     const gchar        *default_user,
+                                                     const gchar        *default_domain,
+                                                     guint              flags);
 
-void  g_proxy_mount_operation_handle_ask_question   (const gchar      *wrapped_id,
-                                                     DBusMessageIter  *iter);
+void  g_proxy_mount_operation_handle_ask_question   (const gchar        *wrapped_id,
+                                                     const gchar        *message,
+                                                     const gchar *const *choices);
 
-void  g_proxy_mount_operation_handle_show_processes (const gchar      *wrapped_id,
-                                                     DBusMessageIter  *iter);
+void  g_proxy_mount_operation_handle_show_processes (const gchar        *wrapped_id,
+                                                     const gchar        *message,
+                                                     GVariant           *pids,
+                                                     const gchar *const *choices);
 
-void  g_proxy_mount_operation_handle_aborted        (const gchar      *wrapped_id,
-                                                     DBusMessageIter  *iter);
+void  g_proxy_mount_operation_handle_aborted        (const gchar      *wrapped_id);
 
 void  g_proxy_mount_operation_destroy               (const gchar      *wrapped_id);
 

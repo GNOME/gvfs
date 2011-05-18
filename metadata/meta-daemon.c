@@ -27,10 +27,11 @@
 #include <glib/gstdio.h>
 #include <locale.h>
 #include <stdlib.h>
+/*  TODO: remove + remove traces in Makefile.am  */
 #include <dbus/dbus.h>
-#include "gvfsdbusutils.h"
 #include "metatree.h"
 #include "gvfsdaemonprotocol.h"
+#include "metadata-dbus.h"
 
 #define WRITEOUT_TIMEOUT_SECS 60
 
@@ -41,6 +42,7 @@ typedef struct {
 } TreeInfo;
 
 static GHashTable *tree_infos = NULL;
+static GVfsMetadata *skeleton = NULL;
 
 static void
 tree_info_free (TreeInfo *info)
@@ -109,174 +111,90 @@ tree_info_lookup (const char *filename)
 }
 
 static gboolean
-metadata_set (const char *treefile,
-	      const char *path,
-	      DBusMessageIter *iter,
-	      DBusError *derror)
+handle_set (GVfsMetadata *object,
+            GDBusMethodInvocation *invocation,
+            const gchar *arg_treefile,
+            const gchar *arg_path,
+            GVariant *arg_data,
+            GVfsMetadata *daemon)
 {
   TreeInfo *info;
-  const char *str;
-  char **strv;
-  gboolean res;
-  const char *key;
-  int n_elements;
-  char c;
+  const gchar *str;
+  const gchar **strv;
+  const gchar *key;
+  GError *error;
+  GVariantIter iter;
+  GVariant *value;
 
-  info = tree_info_lookup (treefile);
+  info = tree_info_lookup (arg_treefile);
   if (info == NULL)
     {
-      dbus_set_error (derror,
-		      DBUS_ERROR_FILE_NOT_FOUND,
-		      _("Can't find metadata file %s"),
-		      treefile);
-      return FALSE;
+      g_dbus_method_invocation_return_error (invocation,
+                                             G_IO_ERROR,
+                                             G_IO_ERROR_NOT_FOUND,
+                                             _("Can't find metadata file %s"),
+                                             arg_treefile);
+      return TRUE;
     }
 
-  res = TRUE;
-  while (dbus_message_iter_get_arg_type (iter) != 0)
-    {
-      if (!_g_dbus_message_iter_get_args (iter, derror,
-					  DBUS_TYPE_STRING, &key,
-					  0))
-	{
-	  res = FALSE;
-	  break;
-	}
+  error = NULL;
 
-      if (dbus_message_iter_get_arg_type (iter) == DBUS_TYPE_ARRAY)
+  g_variant_iter_init (&iter, arg_data);
+  while (g_variant_iter_next (&iter, "{&sv}", &key, &value))
+    {
+      if (g_variant_is_of_type (value, G_VARIANT_TYPE_STRING_ARRAY))
 	{
 	  /* stringv */
-	  if (!_g_dbus_message_iter_get_args (iter, derror,
-					      DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &strv, &n_elements,
-					      0))
+          strv = g_variant_get_strv (value, NULL);
+	  if (!meta_tree_set_stringv (info->tree, arg_path, key, (gchar **) strv))
 	    {
-	      res = FALSE;
-	      break;
+	      g_set_error_literal (&error, G_IO_ERROR,
+                                   G_IO_ERROR_FAILED,
+                                  _("Unable to set metadata key"));
 	    }
-	  if (!meta_tree_set_stringv (info->tree, path, key, strv))
-	    {
-	      dbus_set_error (derror,
-			      DBUS_ERROR_FAILED,
-			      _("Unable to set metadata key"));
-	      res = FALSE;
-	    }
-	  g_strfreev (strv);
+	  g_free (strv);
 	}
-      else if (dbus_message_iter_get_arg_type (iter) == DBUS_TYPE_STRING)
+      else if (g_variant_is_of_type (value, G_VARIANT_TYPE_STRING))
 	{
 	  /* string */
-	  if (!_g_dbus_message_iter_get_args (iter, derror,
-					      DBUS_TYPE_STRING, &str,
-					      0))
+          str = g_variant_get_string (value, NULL);
+	  if (!meta_tree_set_string (info->tree, arg_path, key, str))
 	    {
-	      res = FALSE;
-	      break;
-	    }
-	  if (!meta_tree_set_string (info->tree, path, key, str))
-	    {
-	      dbus_set_error (derror,
-			      DBUS_ERROR_FAILED,
-			      _("Unable to set metadata key"));
-	      res = FALSE;
+              g_set_error_literal (&error, G_IO_ERROR,
+                                   G_IO_ERROR_FAILED,
+                                   _("Unable to set metadata key"));
 	    }
 	}
-      else if (dbus_message_iter_get_arg_type (iter) == DBUS_TYPE_BYTE)
+      else if (g_variant_is_of_type (value, G_VARIANT_TYPE_BYTE))
 	{
 	  /* Unset */
-	  if (!_g_dbus_message_iter_get_args (iter, derror,
-					      DBUS_TYPE_BYTE, &c,
-					      0))
+	  if (!meta_tree_unset (info->tree, arg_path, key))
 	    {
-	      res = FALSE;
-	      break;
-	    }
-	  if (!meta_tree_unset (info->tree, path, key))
-	    {
-	      dbus_set_error (derror,
-			      DBUS_ERROR_FAILED,
-			      _("Unable to unset metadata key"));
-	      res = FALSE;
+              g_set_error_literal (&error, G_IO_ERROR,
+                                   G_IO_ERROR_FAILED,
+                                   _("Unable to unset metadata key"));
 	    }
 	}
+      g_variant_unref (value);
     }
 
   tree_info_schedule_writeout (info);
 
-  return res;
+  if (error)
+    {
+      g_dbus_method_invocation_return_gerror (invocation, error);
+      g_error_free (error);
+    }
+  else
+    {
+      gvfs_metadata_complete_set (object, invocation);
+    }
+  
+  return TRUE;
 }
 
 static void
-append_string (DBusMessageIter *iter,
-	       const char *key,
-	       const char *string)
-{
-  DBusMessageIter variant_iter, struct_iter;
-
-  if (!dbus_message_iter_open_container (iter,
-					 DBUS_TYPE_STRUCT,
-					 NULL,
-					 &struct_iter))
-    _g_dbus_oom ();
-
-  if (!dbus_message_iter_append_basic (&struct_iter,
-				       DBUS_TYPE_STRING,
-				       &key))
-    _g_dbus_oom ();
-
-  if (!dbus_message_iter_open_container (&struct_iter,
-					 DBUS_TYPE_VARIANT,
-					 DBUS_TYPE_STRING_AS_STRING,
-					 &variant_iter))
-    _g_dbus_oom ();
-
-  if (!dbus_message_iter_append_basic (&variant_iter,
-				       DBUS_TYPE_STRING, &string))
-    _g_dbus_oom ();
-
-  if (!dbus_message_iter_close_container (&struct_iter, &variant_iter))
-    _g_dbus_oom ();
-
-  if (!dbus_message_iter_close_container (iter, &struct_iter))
-    _g_dbus_oom ();
-}
-
-static void
-append_stringv (DBusMessageIter *iter,
-		const char *key,
-		char **stringv)
-{
-  DBusMessageIter variant_iter, struct_iter;
-
-  if (!dbus_message_iter_open_container (iter,
-					 DBUS_TYPE_STRUCT,
-					 NULL,
-					 &struct_iter))
-    _g_dbus_oom ();
-
-  if (!dbus_message_iter_append_basic (&struct_iter,
-				       DBUS_TYPE_STRING,
-				       &key))
-    _g_dbus_oom ();
-
-  if (!dbus_message_iter_open_container (&struct_iter,
-					 DBUS_TYPE_VARIANT,
-					 DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_STRING_AS_STRING,
-					 &variant_iter))
-    _g_dbus_oom ();
-
-  _g_dbus_message_iter_append_args (&variant_iter,
-				    DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &stringv, g_strv_length (stringv),
-				    0);
-
-  if (!dbus_message_iter_close_container (&struct_iter, &variant_iter))
-    _g_dbus_oom ();
-
-  if (!dbus_message_iter_close_container (iter, &struct_iter))
-    _g_dbus_oom ();
-}
-
-static void
-append_key (DBusMessageIter *iter,
+append_key (GVariantBuilder *builder,
 	    MetaTree *tree,
 	    const char *path,
 	    const char *key)
@@ -290,13 +208,13 @@ append_key (DBusMessageIter *iter,
   if (keytype == META_KEY_TYPE_STRING)
     {
       str = meta_tree_lookup_string (tree, path, key);
-      append_string (iter, key, str);
+      g_variant_builder_add (builder, "{sv}", key, g_variant_new_string (str));
       g_free (str);
     }
   else if (keytype == META_KEY_TYPE_STRINGV)
     {
       strv = meta_tree_lookup_stringv (tree, path, key);
-      append_stringv (iter, key, strv);
+      g_variant_builder_add (builder, "{sv}", key, g_variant_new_strv ((const gchar * const  *) strv, -1));
       g_strfreev (strv);
     }
 }
@@ -313,382 +231,217 @@ enum_keys (const char *key,
   return TRUE;
 }
 
-static DBusMessage *
-metadata_get (const char *treefile,
-	      const char *path,
-	      DBusMessage *message,
-	      DBusMessageIter *iter,
-	      DBusError *derror)
+static gboolean
+handle_get (GVfsMetadata *object,
+            GDBusMethodInvocation *invocation,
+            const gchar *arg_treefile,
+            const gchar *arg_path,
+            const gchar *const *arg_keys,
+            GVfsMetadata *daemon)
 {
   TreeInfo *info;
-  char *key;
-  DBusMessage *reply;
-  DBusMessageIter reply_iter;
-  GPtrArray *keys;
-  int i;
+  GPtrArray *meta_keys;
   gboolean free_keys;
+  gchar **iter_keys;
+  gchar **i;
+  GVariantBuilder *builder;
 
-  info = tree_info_lookup (treefile);
+  info = tree_info_lookup (arg_treefile);
   if (info == NULL)
     {
-      dbus_set_error (derror,
-		      DBUS_ERROR_FILE_NOT_FOUND,
-		      _("Can't find metadata file %s"),
-		      treefile);
-      return NULL;
+      g_dbus_method_invocation_return_error (invocation,
+                                             G_IO_ERROR,
+                                             G_IO_ERROR_NOT_FOUND,
+                                             _("Can't find metadata file %s"),
+                                             arg_treefile);
+      return TRUE;
     }
 
-  reply = dbus_message_new_method_return (message);
-  dbus_message_iter_init_append (reply, &reply_iter);
-
-  keys = g_ptr_array_new ();
-  if (dbus_message_iter_get_arg_type (iter) == 0)
+  if (arg_keys == NULL)
     {
       /* Get all keys */
       free_keys = TRUE;
-      meta_tree_enumerate_keys (info->tree, path, enum_keys, keys);
+      meta_keys = g_ptr_array_new ();
+      meta_tree_enumerate_keys (info->tree, arg_path, enum_keys, meta_keys);
+      iter_keys = (gchar **) g_ptr_array_free (meta_keys, FALSE);
     }
   else
     {
       free_keys = FALSE;
-      while (dbus_message_iter_get_arg_type (iter) != 0)
-	{
-	  if (!_g_dbus_message_iter_get_args (iter, derror,
-					      DBUS_TYPE_STRING, &key,
-					      0))
-	    break;
-
-	  g_ptr_array_add (keys, key);
-	}
+      iter_keys = (gchar **) arg_keys;
     }
 
-  for (i = 0; i < keys->len; i++)
-    {
-      key = g_ptr_array_index (keys, i);
-      append_key (&reply_iter, info->tree, path, key);
-      if (free_keys)
-	g_free (key);
-    }
-  g_ptr_array_free (keys, TRUE);
+  builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
 
-  return reply;
-}
+  for (i = iter_keys; *i; i++)
+    append_key (builder, info->tree, arg_path, *i);
+  if (free_keys)
+    g_strfreev (iter_keys);
+  
+  gvfs_metadata_complete_get (object, invocation,
+                              g_variant_builder_end (builder));
+  g_variant_builder_unref (builder);
 
-static gboolean
-metadata_unset (const char *treefile,
-		const char *path,
-		const char *key,
-		DBusError *derror)
-{
-  TreeInfo *info;
-
-  info = tree_info_lookup (treefile);
-  if (info == NULL)
-    {
-      dbus_set_error (derror,
-		      DBUS_ERROR_FILE_NOT_FOUND,
-		      _("Can't find metadata file %s"),
-		      treefile);
-      return FALSE;
-    }
-
-  if (!meta_tree_unset (info->tree, path, key))
-    {
-      dbus_set_error (derror,
-		      DBUS_ERROR_FAILED,
-		      _("Unable to unset metadata key"));
-      return FALSE;
-    }
-
-  tree_info_schedule_writeout (info);
   return TRUE;
 }
 
 static gboolean
-metadata_remove (const char *treefile,
-		 const char *path,
-		 DBusError *derror)
+handle_unset (GVfsMetadata *object,
+              GDBusMethodInvocation *invocation,
+              const gchar *arg_treefile,
+              const gchar *arg_path,
+              const gchar *arg_key,
+              GVfsMetadata *daemon)
 {
   TreeInfo *info;
 
-  info = tree_info_lookup (treefile);
+  info = tree_info_lookup (arg_treefile);
   if (info == NULL)
     {
-      dbus_set_error (derror,
-		      DBUS_ERROR_FILE_NOT_FOUND,
-		      _("Can't find metadata file %s"),
-		      treefile);
-      return FALSE;
+      g_dbus_method_invocation_return_error (invocation,
+                                             G_IO_ERROR,
+                                             G_IO_ERROR_NOT_FOUND,
+                                             _("Can't find metadata file %s"),
+                                             arg_treefile);
+      return TRUE;
     }
 
-  if (!meta_tree_remove (info->tree, path))
+  if (!meta_tree_unset (info->tree, arg_path, arg_key))
     {
-      dbus_set_error (derror,
-		      DBUS_ERROR_FAILED,
-		      _("Unable to remove metadata keys"));
-      return FALSE;
+      g_dbus_method_invocation_return_error_literal (invocation,
+                                                     G_IO_ERROR,
+                                                     G_IO_ERROR_FAILED,
+                                                     _("Unable to unset metadata key"));
+      return TRUE;
     }
 
   tree_info_schedule_writeout (info);
+  gvfs_metadata_complete_unset (object, invocation);
+
   return TRUE;
 }
 
 static gboolean
-metadata_move (const char *treefile,
-	       const char *src_path,
-	       const char *dest_path,
-	       DBusError *derror)
+handle_remove (GVfsMetadata *object,
+               GDBusMethodInvocation *invocation,
+               const gchar *arg_treefile,
+               const gchar *arg_path,
+               GVfsMetadata *daemon)
 {
   TreeInfo *info;
 
-  info = tree_info_lookup (treefile);
+  info = tree_info_lookup (arg_treefile);
   if (info == NULL)
     {
-      dbus_set_error (derror,
-		      DBUS_ERROR_FILE_NOT_FOUND,
-		      _("Can't find metadata file %s"),
-		      treefile);
-      return FALSE;
+      g_dbus_method_invocation_return_error (invocation,
+                                             G_IO_ERROR,
+                                             G_IO_ERROR_NOT_FOUND,
+                                             _("Can't find metadata file %s"),
+                                             arg_treefile);
+      return TRUE;
+    }
+
+  if (!meta_tree_remove (info->tree, arg_path))
+    {
+      g_dbus_method_invocation_return_error_literal (invocation,
+                                                     G_IO_ERROR,
+                                                     G_IO_ERROR_FAILED,
+                                                     _("Unable to remove metadata keys"));
+      return TRUE;
+    }
+
+  tree_info_schedule_writeout (info);
+  gvfs_metadata_complete_remove (object, invocation);
+  
+  return TRUE;
+}
+
+static gboolean
+handle_move (GVfsMetadata *object,
+             GDBusMethodInvocation *invocation,
+             const gchar *arg_treefile,
+             const gchar *arg_path,
+             const gchar *arg_dest_path,
+             GVfsMetadata *daemon)
+{
+  TreeInfo *info;
+
+  info = tree_info_lookup (arg_treefile);
+  if (info == NULL)
+    {
+      g_dbus_method_invocation_return_error (invocation,
+                                             G_IO_ERROR,
+                                             G_IO_ERROR_NOT_FOUND,
+                                             _("Can't find metadata file %s"),
+                                             arg_treefile);
+      return TRUE;
     }
 
   /* Overwrites any dest */
-  if (!meta_tree_copy (info->tree, src_path, dest_path))
+  if (!meta_tree_copy (info->tree, arg_path, arg_dest_path))
     {
-      dbus_set_error (derror,
-		      DBUS_ERROR_FAILED,
-		      _("Unable to move metadata keys"));
-      return FALSE;
+      g_dbus_method_invocation_return_error_literal (invocation,
+                                                     G_IO_ERROR,
+                                                     G_IO_ERROR_FAILED,
+                                                     _("Unable to move metadata keys"));
+      return TRUE;
     }
 
   /* Remove source if copy succeeded (ignoring errors) */
-  meta_tree_remove (info->tree, src_path);
+  meta_tree_remove (info->tree, arg_path);
 
   tree_info_schedule_writeout (info);
+  gvfs_metadata_complete_move (object, invocation);
+  
   return TRUE;
-}
-
-static gboolean
-register_name (DBusConnection *conn,
-	       gboolean replace)
-{
-  DBusError error;
-  unsigned int flags;
-  int ret;
-
-  flags = DBUS_NAME_FLAG_ALLOW_REPLACEMENT | DBUS_NAME_FLAG_DO_NOT_QUEUE;
-  if (replace)
-    flags |= DBUS_NAME_FLAG_REPLACE_EXISTING;
-
-  dbus_error_init (&error);
-  ret = dbus_bus_request_name (conn, G_VFS_DBUS_METADATA_NAME, flags, &error);
-  if (ret == -1)
-    {
-      g_printerr ("Failed to acquire daemon name: %s", error.message);
-      dbus_error_free (&error);
-      return FALSE;
-    }
-  else if (ret == DBUS_REQUEST_NAME_REPLY_EXISTS)
-    {
-      g_printerr ("Metadata daemon already running, exiting.\n");
-      return FALSE;
-    }
-  else if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
-    {
-      g_printerr ("Not primary owner of the service, exiting.\n");
-      return FALSE;
-    }
-  return TRUE;
-}
-
-static DBusHandlerResult
-dbus_message_filter_func (DBusConnection *conn,
-			  DBusMessage    *message,
-			  gpointer        data)
-{
-  char *name;
-
-  if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameLost"))
-    {
-      if (dbus_message_get_args (message, NULL,
-				 DBUS_TYPE_STRING, &name,
-				 DBUS_TYPE_INVALID) &&
-	  strcmp (name, G_VFS_DBUS_METADATA_NAME) == 0)
-	{
-	  /* Someone else got the name (i.e. someone used --replace), exit */
-	  exit (1);
-	}
-    }
-
-  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
 
 static void
-metadata_unregistered (DBusConnection  *connection,
-		       void            *user_data)
+on_name_acquired (GDBusConnection *connection,
+                  const gchar     *name,
+                  gpointer         user_data)
 {
+  GError *error;
+  
+  skeleton = gvfs_metadata_skeleton_new ();
+  
+  g_signal_connect (skeleton, "handle-set", G_CALLBACK (handle_set), skeleton);
+  g_signal_connect (skeleton, "handle-unset", G_CALLBACK (handle_unset), skeleton);
+  g_signal_connect (skeleton, "handle-get", G_CALLBACK (handle_get), skeleton);
+  g_signal_connect (skeleton, "handle-remove", G_CALLBACK (handle_remove), skeleton);
+  g_signal_connect (skeleton, "handle-move", G_CALLBACK (handle_move), skeleton);
+
+  error = NULL;
+  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (skeleton), connection,
+                                         G_VFS_DBUS_METADATA_PATH, &error))
+    {
+      g_printerr ("Error exporting volume monitor: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
 }
 
-static DBusHandlerResult
-metadata_message (DBusConnection  *connection,
-		  DBusMessage     *message,
-		  void            *user_data)
+static void
+on_name_lost (GDBusConnection *connection,
+              const gchar     *name,
+              gpointer         user_data)
 {
-  DBusMessageIter iter;
-  DBusError derror;
-  DBusMessage *reply;
-  char *treefile;
-  char *path, *dest_path;
-  const char *key;
+  GMainLoop *loop = user_data;
 
-  reply = NULL;
-  dbus_message_iter_init (message, &iter);
-  dbus_error_init (&derror);
-
-  if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_METADATA_INTERFACE,
-				   G_VFS_DBUS_METADATA_OP_SET))
-    {
-      treefile = NULL;
-      path = NULL;
-      if (!_g_dbus_message_iter_get_args (&iter, &derror,
-					  G_DBUS_TYPE_CSTRING, &treefile,
-					  G_DBUS_TYPE_CSTRING, &path,
-					  0) ||
-	  !metadata_set (treefile, path, &iter, &derror))
-	{
-	  reply = dbus_message_new_error (message,
-					  derror.name,
-					  derror.message);
-	  dbus_error_free (&derror);
-	}
-      else
-	reply = dbus_message_new_method_return (message);
-
-      g_free (treefile);
-      g_free (path);
-    }
-
-  else if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_METADATA_INTERFACE,
-				   G_VFS_DBUS_METADATA_OP_UNSET))
-    {
-      treefile = NULL;
-      path = NULL;
-      if (!_g_dbus_message_iter_get_args (&iter, &derror,
-					  G_DBUS_TYPE_CSTRING, &treefile,
-					  G_DBUS_TYPE_CSTRING, &path,
-					  DBUS_TYPE_STRING, &key,
-					  0) ||
-	  !metadata_unset (treefile, path, key, &derror))
-	{
-	  reply = dbus_message_new_error (message,
-					  derror.name,
-					  derror.message);
-	  dbus_error_free (&derror);
-	}
-      else
-	reply = dbus_message_new_method_return (message);
-
-      g_free (treefile);
-      g_free (path);
-    }
-
-  if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_METADATA_INTERFACE,
-				   G_VFS_DBUS_METADATA_OP_GET))
-    {
-      treefile = NULL;
-      path = NULL;
-      if (!_g_dbus_message_iter_get_args (&iter, &derror,
-					  G_DBUS_TYPE_CSTRING, &treefile,
-					  G_DBUS_TYPE_CSTRING, &path,
-					  0) ||
-	  (reply = metadata_get (treefile, path, message, &iter, &derror)) == NULL)
-	{
-	  reply = dbus_message_new_error (message,
-					  derror.name,
-					  derror.message);
-	  dbus_error_free (&derror);
-	}
-
-      g_free (treefile);
-      g_free (path);
-    }
-
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_METADATA_INTERFACE,
-					G_VFS_DBUS_METADATA_OP_REMOVE))
-    {
-      treefile = NULL;
-      path = NULL;
-      if (!_g_dbus_message_iter_get_args (&iter, &derror,
-					  G_DBUS_TYPE_CSTRING, &treefile,
-					  G_DBUS_TYPE_CSTRING, &path,
-					  0) ||
-	  !metadata_remove (treefile, path, &derror))
-	{
-	  reply = dbus_message_new_error (message,
-					  derror.name,
-					  derror.message);
-	  dbus_error_free (&derror);
-	}
-      else
-	reply = dbus_message_new_method_return (message);
-
-      g_free (treefile);
-      g_free (path);
-    }
-
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_METADATA_INTERFACE,
-					G_VFS_DBUS_METADATA_OP_MOVE))
-    {
-      treefile = NULL;
-      path = NULL;
-      dest_path = NULL;
-      if (!_g_dbus_message_iter_get_args (&iter, &derror,
-					  G_DBUS_TYPE_CSTRING, &treefile,
-					  G_DBUS_TYPE_CSTRING, &path,
-					  G_DBUS_TYPE_CSTRING, &dest_path,
-					  0) ||
-	  !metadata_move (treefile, path, dest_path, &derror))
-	{
-	  reply = dbus_message_new_error (message,
-					  derror.name,
-					  derror.message);
-	  dbus_error_free (&derror);
-	}
-      else
-	reply = dbus_message_new_method_return (message);
-
-      g_free (treefile);
-      g_free (path);
-      g_free (dest_path);
-    }
-
-  if (reply)
-    {
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return DBUS_HANDLER_RESULT_HANDLED;
-    }
-  else
-    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+  /* means that someone has claimed our name (we allow replacement) */
+  g_main_loop_quit (loop);
 }
 
-static struct DBusObjectPathVTable metadata_dbus_vtable = {
-  metadata_unregistered,
-  metadata_message
-};
 
 int
 main (int argc, char *argv[])
 {
   GMainLoop *loop;
-  DBusConnection *conn;
+  GDBusConnection *conn;
   gboolean replace;
   GError *error;
-  DBusError derror;
+  guint name_owner_id;
+  GBusNameOwnerFlags flags;
   GOptionContext *context;
   const GOptionEntry options[] = {
     { "replace", 'r', 0, G_OPTION_ARG_NONE, &replace,  N_("Replace old daemon."), NULL },
@@ -709,6 +462,7 @@ main (int argc, char *argv[])
   g_option_context_add_main_entries (context, options, GETTEXT_PACKAGE);
 
   replace = FALSE;
+  name_owner_id = 0;
 
   error = NULL;
   if (!g_option_context_parse (context, &argc, &argv, &error))
@@ -731,56 +485,43 @@ main (int argc, char *argv[])
 
   loop = g_main_loop_new (NULL, FALSE);
 
-  dbus_error_init (&derror);
-  conn = dbus_bus_get (DBUS_BUS_SESSION, &derror);
+  error = NULL;
+  conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   if (!conn)
     {
-      g_printerr ("Failed to connect to the D-BUS daemon: %s\n",
-		  derror.message);
-
-      dbus_error_free (&derror);
+      g_printerr ("Failed to connect to the D-BUS daemon: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
       return 1;
     }
+  
+  flags = G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT;
+  if (replace)
+    flags |= G_BUS_NAME_OWNER_FLAGS_REPLACE;
 
-  dbus_bus_add_match (conn,
-		      "type='signal',"
-		      "interface='org.freedesktop.DBus',"
-		      "member='NameOwnerChanged',"
-		      "arg0='"G_VFS_DBUS_METADATA_NAME"'",
-		      &derror);
-  if (dbus_error_is_set (&derror))
-    {
-      g_printerr ("Failed to add dbus match: %s\n", derror.message);
-      dbus_error_free (&derror);
-      return 1;
-    }
-
-  if (!dbus_connection_add_filter (conn,
-				   dbus_message_filter_func, NULL, NULL))
-    {
-      g_printerr ("Failed to add dbus filter\n");
-      return 1;
-    }
-
-  if (!dbus_connection_register_object_path (conn,
-					     G_VFS_DBUS_METADATA_PATH,
-					     &metadata_dbus_vtable, NULL))
-    {
-      g_printerr ("Failed to register object path\n");
-      return 1;
-    }
-
-  if (!register_name (conn, replace))
-    return 1;
-
-  _g_dbus_connection_integrate_with_main (conn);
-
+  name_owner_id = g_bus_own_name_on_connection (conn,
+                                                G_VFS_DBUS_METADATA_NAME,
+                                                flags,
+                                                on_name_acquired,
+                                                on_name_lost,
+                                                loop,
+                                                NULL);
+  
   tree_infos = g_hash_table_new_full (g_str_hash,
 				      g_str_equal,
 				      NULL,
 				      (GDestroyNotify)tree_info_free);
 
   g_main_loop_run (loop);
+  
+  if (skeleton)
+    g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (skeleton));
+  if (name_owner_id != 0)
+    g_bus_unown_name (name_owner_id);
+  if (conn)
+    g_object_unref (conn);
+  if (loop != NULL)
+    g_main_loop_unref (loop);
 
   return 0;
 }

@@ -27,8 +27,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <gvfsdbusutils.h>
-
 #include "gproxymountoperation.h"
 
 /* for protecting the id_to_op and id_count */
@@ -109,13 +107,18 @@ g_proxy_mount_operation_wrap (GMountOperation *op,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-mount_op_reply_cb (DBusMessage *reply,
-                   GError      *error,
-                   gpointer     user_data)
+mount_op_reply_cb (GVfsRemoteVolumeMonitor *proxy,
+                   GAsyncResult *res,
+                   gpointer user_data)
 {
-  if (error != NULL)
+  GError *error = NULL;
+  
+  if (!gvfs_remote_volume_monitor_call_mount_op_reply_finish (proxy,
+                                                              res,
+                                                              &error))
     {
       g_warning ("Error from MountOpReply(): %s", error->message);
+      g_error_free (error);
     }
 }
 
@@ -125,20 +128,15 @@ mount_operation_reply (GMountOperation        *mount_operation,
                        gpointer               user_data)
 {
   ProxyMountOpData *data = user_data;
-  DBusConnection *connection;
-  const gchar *name;
-  DBusMessage *message;
+  GVfsRemoteVolumeMonitor *proxy;
   const gchar *user_name;
   const gchar *domain;
   const gchar *password;
   gchar *encoded_password;
-  dbus_uint32_t password_save;
-  dbus_uint32_t choice;
-  dbus_bool_t anonymous;
-
-  connection = g_proxy_volume_monitor_get_dbus_connection (data->monitor);
-  name = g_proxy_volume_monitor_get_dbus_name (data->monitor);
-
+  gint password_save;
+  gint choice;
+  gboolean anonymous;
+  
   user_name     = g_mount_operation_get_username (mount_operation);
   domain        = g_mount_operation_get_domain (mount_operation);
   password      = g_mount_operation_get_password (mount_operation);
@@ -158,79 +156,46 @@ mount_operation_reply (GMountOperation        *mount_operation,
    */
   encoded_password = g_base64_encode ((const guchar *) password, (gsize) (strlen (password) + 1));
 
-  message = dbus_message_new_method_call (name,
-                                          "/org/gtk/Private/RemoteVolumeMonitor",
-                                          "org.gtk.Private.RemoteVolumeMonitor",
-                                          "MountOpReply");
-  dbus_message_append_args (message,
-                            DBUS_TYPE_STRING,
-                            &(data->id),
-                            DBUS_TYPE_INT32,
-                            &result,
-                            DBUS_TYPE_STRING,
-                            &user_name,
-                            DBUS_TYPE_STRING,
-                            &domain,
-                            DBUS_TYPE_STRING,
-                            &encoded_password,
-                            DBUS_TYPE_INT32,
-                            &password_save,
-                            DBUS_TYPE_INT32,
-                            &choice,
-                            DBUS_TYPE_BOOLEAN,
-                            &anonymous,
-                            DBUS_TYPE_INVALID);
-
-  _g_dbus_connection_call_async (connection,
-                                 message,
-                                 -1,
-                                 (GAsyncDBusCallback) mount_op_reply_cb,
-                                 data);
-
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->monitor);
+  gvfs_remote_volume_monitor_call_mount_op_reply (proxy,
+                                                  data->id,
+                                                  result,
+                                                  user_name,
+                                                  domain,
+                                                  encoded_password,
+                                                  password_save,
+                                                  choice,
+                                                  anonymous,
+                                                  NULL,
+                                                  (GAsyncReadyCallback) mount_op_reply_cb,
+                                                  data);
+  g_object_unref (proxy);
   g_free (encoded_password);
-  dbus_message_unref (message);
-  dbus_connection_unref (connection);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 void
-g_proxy_mount_operation_handle_ask_password (const gchar      *wrapped_id,
-                                             DBusMessageIter  *iter)
+g_proxy_mount_operation_handle_ask_password (const gchar  *wrapped_id,
+                                             const gchar  *message,
+                                             const gchar  *default_user,
+                                             const gchar  *default_domain,
+                                             guint         flags)
 {
   ProxyMountOpData *data;
-  const gchar *message;
-  const gchar *default_user;
-  const gchar *default_domain;
-  dbus_int32_t flags;
 
   g_return_if_fail (wrapped_id != NULL);
-  g_return_if_fail (iter != NULL);
 
+  if (id_to_op == NULL)
+    goto out;
+  
   G_LOCK (proxy_op);
   data = g_hash_table_lookup (id_to_op, wrapped_id);
   G_UNLOCK (proxy_op);
 
   if (data == NULL)
-    {
-      g_warning ("%s: No GMountOperation for id `%s'",
-                 G_STRFUNC,
-                 wrapped_id);
-      goto out;
-    }
-
-  dbus_message_iter_get_basic (iter, &message);
-  dbus_message_iter_next (iter);
-
-  dbus_message_iter_get_basic (iter, &default_user);
-  dbus_message_iter_next (iter);
-
-  dbus_message_iter_get_basic (iter, &default_domain);
-  dbus_message_iter_next (iter);
-
-  dbus_message_iter_get_basic (iter, &flags);
-  dbus_message_iter_next (iter);
-
+    goto out;
+  
   if (data->reply_handler_id == 0)
     {
       data->reply_handler_id = g_signal_connect (data->op,
@@ -253,45 +218,23 @@ g_proxy_mount_operation_handle_ask_password (const gchar      *wrapped_id,
 /* ---------------------------------------------------------------------------------------------------- */
 
 void
-g_proxy_mount_operation_handle_ask_question (const gchar      *wrapped_id,
-                                             DBusMessageIter  *iter)
+g_proxy_mount_operation_handle_ask_question (const gchar        *wrapped_id,
+                                             const gchar        *message,
+                                             const gchar *const *choices)
 {
   ProxyMountOpData *data;
-  const gchar *message;
-  GPtrArray *choices;
-  DBusMessageIter iter_array;
 
   g_return_if_fail (wrapped_id != NULL);
-  g_return_if_fail (iter != NULL);
 
-  choices = NULL;
-
+  if (id_to_op == NULL)
+    goto out;
+  
   G_LOCK (proxy_op);
   data = g_hash_table_lookup (id_to_op, wrapped_id);
   G_UNLOCK (proxy_op);
 
   if (data == NULL)
-    {
-      g_warning ("%s: No GMountOperation for id `%s'",
-                 G_STRFUNC,
-                 wrapped_id);
-      goto out;
-    }
-
-  dbus_message_iter_get_basic (iter, &message);
-  dbus_message_iter_next (iter);
-
-  choices = g_ptr_array_new ();
-  dbus_message_iter_recurse (iter, &iter_array);
-  while (dbus_message_iter_get_arg_type (&iter_array) != DBUS_TYPE_INVALID)
-    {
-      const gchar *choice;
-      dbus_message_iter_get_basic (&iter_array, &choice);
-      dbus_message_iter_next (&iter_array);
-
-      g_ptr_array_add (choices, g_strdup (choice));
-    }
-  g_ptr_array_add (choices, NULL);
+    goto out;
 
   if (data->reply_handler_id == 0)
     {
@@ -304,70 +247,44 @@ g_proxy_mount_operation_handle_ask_question (const gchar      *wrapped_id,
   g_signal_emit_by_name (data->op,
                          "ask-question",
                          message,
-                         choices->pdata);
+                         choices);
 
  out:
-  g_ptr_array_free (choices, TRUE);
+   ;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 void
-g_proxy_mount_operation_handle_show_processes (const gchar      *wrapped_id,
-                                               DBusMessageIter  *iter)
+g_proxy_mount_operation_handle_show_processes (const gchar        *wrapped_id,
+                                               const gchar        *message,
+                                               GVariant           *pids,
+                                               const gchar *const *choices)
 {
   ProxyMountOpData *data;
-  const gchar *message;
-  GPtrArray *choices;
   GArray *processes;
-  DBusMessageIter iter_array;
+  GVariantIter iter;
+  GPid pid;
 
   g_return_if_fail (wrapped_id != NULL);
-  g_return_if_fail (iter != NULL);
 
-  choices = NULL;
   processes = NULL;
 
+  if (id_to_op == NULL)
+    goto out;
+  
   G_LOCK (proxy_op);
   data = g_hash_table_lookup (id_to_op, wrapped_id);
   G_UNLOCK (proxy_op);
 
   if (data == NULL)
-    {
-      g_warning ("%s: No GMountOperation for id `%s'",
-                 G_STRFUNC,
-                 wrapped_id);
-      goto out;
-    }
-
-  dbus_message_iter_get_basic (iter, &message);
-  dbus_message_iter_next (iter);
-
+    goto out;
+  
   processes = g_array_new (FALSE, FALSE, sizeof (GPid));
-  dbus_message_iter_recurse (iter, &iter_array);
-  while (dbus_message_iter_get_arg_type (&iter_array) != DBUS_TYPE_INVALID)
-    {
-      GPid pid;
-
-      dbus_message_iter_get_basic (&iter_array, &pid);
-      dbus_message_iter_next (&iter_array);
-      g_array_append_val (processes, pid);
-    }
-
-  dbus_message_iter_next (iter);
-
-  choices = g_ptr_array_new ();
-  dbus_message_iter_recurse (iter, &iter_array);
-  while (dbus_message_iter_get_arg_type (&iter_array) != DBUS_TYPE_INVALID)
-    {
-      const gchar *choice;
-      dbus_message_iter_get_basic (&iter_array, &choice);
-      dbus_message_iter_next (&iter_array);
-
-      g_ptr_array_add (choices, g_strdup (choice));
-    }
-  g_ptr_array_add (choices, NULL);
-
+  g_variant_iter_init (&iter, pids);
+  while (g_variant_iter_loop (&iter, "i", &pid))
+    g_array_append_val (processes, pid);
+ 
   if (data->reply_handler_id == 0)
     {
       data->reply_handler_id = g_signal_connect (data->op,
@@ -380,11 +297,9 @@ g_proxy_mount_operation_handle_show_processes (const gchar      *wrapped_id,
                          "show-processes",
                          message,
                          processes,
-                         choices->pdata);
+                         choices);
 
  out:
-  if (choices)
-    g_ptr_array_free (choices, TRUE);
   if (processes)
     g_array_unref (processes);
 }
@@ -392,25 +307,21 @@ g_proxy_mount_operation_handle_show_processes (const gchar      *wrapped_id,
 /* ---------------------------------------------------------------------------------------------------- */
 
 void
-g_proxy_mount_operation_handle_aborted (const gchar      *wrapped_id,
-                                        DBusMessageIter  *iter)
+g_proxy_mount_operation_handle_aborted (const gchar *wrapped_id)
 {
   ProxyMountOpData *data;
 
   g_return_if_fail (wrapped_id != NULL);
-  g_return_if_fail (iter != NULL);
+
+  if (id_to_op == NULL)
+    goto out;
 
   G_LOCK (proxy_op);
   data = g_hash_table_lookup (id_to_op, wrapped_id);
   G_UNLOCK (proxy_op);
 
   if (data == NULL)
-    {
-      g_warning ("%s: No GMountOperation for id `%s'",
-                 G_STRFUNC,
-                 wrapped_id);
-      goto out;
-    }
+    goto out;
 
   g_signal_emit_by_name (data->op, "aborted");
 
@@ -428,13 +339,11 @@ g_proxy_mount_operation_destroy (const gchar *wrapped_id)
   if (strlen (wrapped_id) == 0)
     return;
 
+  if (id_to_op == NULL)
+    return;
+
   G_LOCK (proxy_op);
-  if (!g_hash_table_remove (id_to_op, wrapped_id))
-    {
-      g_warning ("%s: No GMountOperation for id `%s'",
-                 G_STRFUNC,
-                 wrapped_id);
-    }
+  g_hash_table_remove (id_to_op, wrapped_id);
   G_UNLOCK (proxy_op);
 }
 

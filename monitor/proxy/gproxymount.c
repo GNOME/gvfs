@@ -31,8 +31,6 @@
 #include <glib/gi18n-lib.h>
 #include <gio/gio.h>
 
-#include <gvfsdbusutils.h>
-
 #include "gproxyvolumemonitor.h"
 #include "gproxymount.h"
 #include "gproxyvolume.h"
@@ -145,58 +143,38 @@ g_proxy_mount_has_mount_path (GProxyMount *mount, const char *mount_path)
  * array:string         x-content-types
  */
 
+#define MOUNT_STRUCT_TYPE "(&s&s&s&s&sb&sas&sa{sv})"
+
 void
 g_proxy_mount_update (GProxyMount         *mount,
-                      DBusMessageIter     *iter)
+                      GVariant            *iter)
 {
-  DBusMessageIter iter_struct;
-  DBusMessageIter iter_x_content_types;
   const char *id;
   const char *name;
   const char *gicon_data;
   const char *uuid;
   const char *root_uri;
-  dbus_bool_t can_unmount;
+  gboolean can_unmount;
   const char *volume_id;
   GPtrArray *x_content_types;
   const gchar *sort_key;
+  const char *x_content_type;
+  GVariantIter *iter_content_types;
+  GVariantIter *iter_expansion;
 
-  dbus_message_iter_recurse (iter, &iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &id);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &name);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &gicon_data);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &uuid);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &root_uri);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &can_unmount);
-  dbus_message_iter_next (&iter_struct);
-  dbus_message_iter_get_basic (&iter_struct, &volume_id);
-  dbus_message_iter_next (&iter_struct);
+  sort_key = NULL;
+  g_variant_get (iter, MOUNT_STRUCT_TYPE,
+                 &id, &name, &gicon_data,
+                 &uuid, &root_uri,
+                 &can_unmount, &volume_id,
+                 &iter_content_types,
+                 &sort_key,
+                 &iter_expansion);
 
   x_content_types = g_ptr_array_new ();
-  dbus_message_iter_recurse (&iter_struct, &iter_x_content_types);
-  while (dbus_message_iter_get_arg_type (&iter_x_content_types) != DBUS_TYPE_INVALID)
-    {
-      const char *x_content_type;
-      dbus_message_iter_get_basic (&iter_x_content_types, &x_content_type);
-      dbus_message_iter_next (&iter_x_content_types);
-      g_ptr_array_add (x_content_types, (gpointer) x_content_type);
-    }
+  while (g_variant_iter_loop (iter_content_types, "&s", &x_content_type))
+    g_ptr_array_add (x_content_types, (gpointer) x_content_type);
   g_ptr_array_add (x_content_types, NULL);
-  dbus_message_iter_next (&iter_struct);
-
-  /* make sure we are backwards compat with old daemon instance */
-  sort_key = NULL;
-  if (dbus_message_iter_has_next (&iter_struct))
-    {
-      dbus_message_iter_get_basic (&iter_struct, &sort_key);
-      dbus_message_iter_next (&iter_struct);
-      /* TODO: decode expansion, once used */
-    }
 
   if (mount->id != NULL && strcmp (mount->id, id) != 0)
     {
@@ -237,7 +215,11 @@ g_proxy_mount_update (GProxyMount         *mount,
   mount->x_content_types = g_strdupv ((char **) x_content_types->pdata);
   mount->sort_key = g_strdup (sort_key);
 
+  /* TODO: decode expansion, once used */
+
  out:
+  g_variant_iter_free (iter_content_types);
+  g_variant_iter_free (iter_expansion);
   g_ptr_array_free (x_content_types, TRUE);
 }
 
@@ -458,13 +440,20 @@ typedef struct {
 } DBusOp;
 
 static void
-cancel_operation_reply_cb (DBusMessage *reply,
-                           GError      *error,
-                           gpointer     user_data)
+cancel_operation_reply_cb (GVfsRemoteVolumeMonitor *proxy,
+                           GAsyncResult *res,
+                           gpointer user_data)
 {
-  if (error != NULL)
+  gboolean out_WasCancelled;
+  GError *error = NULL;
+  
+  if (!gvfs_remote_volume_monitor_call_cancel_operation_finish (proxy,
+                                                                &out_WasCancelled,
+                                                                res,
+                                                                &error))
     {
       g_warning ("Error from CancelOperation(): %s", error->message);
+      g_error_free (error);
     }
 }
 
@@ -474,9 +463,7 @@ operation_cancelled (GCancellable *cancellable,
 {
   DBusOp *data = user_data;
   GSimpleAsyncResult *simple;
-  DBusConnection *connection;
-  DBusMessage *message;
-  const char *name;
+  GVfsRemoteVolumeMonitor *proxy;
 
   G_LOCK (proxy_mount);
 
@@ -490,33 +477,29 @@ operation_cancelled (GCancellable *cancellable,
   g_object_unref (simple);
 
   /* Now tell the remote volume monitor that the op has been cancelled */
-  connection = g_proxy_volume_monitor_get_dbus_connection (data->mount->volume_monitor);
-  name = g_proxy_volume_monitor_get_dbus_name (data->mount->volume_monitor);
-  message = dbus_message_new_method_call (name,
-                                          "/org/gtk/Private/RemoteVolumeMonitor",
-                                          "org.gtk.Private.RemoteVolumeMonitor",
-                                          "CancelOperation");
-  dbus_message_append_args (message,
-                            DBUS_TYPE_STRING,
-                            &(data->cancellation_id),
-                            DBUS_TYPE_INVALID);
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->mount->volume_monitor);
+  gvfs_remote_volume_monitor_call_cancel_operation (proxy,
+                                                    data->cancellation_id,
+                                                    NULL,
+                                                    (GAsyncReadyCallback) cancel_operation_reply_cb,
+                                                    NULL);
+  g_object_unref (proxy);
 
   G_UNLOCK (proxy_mount);
-
-  _g_dbus_connection_call_async (connection,
-                                 message,
-                                 -1,
-                                 (GAsyncDBusCallback) cancel_operation_reply_cb,
-                                 NULL);
-  dbus_message_unref (message);
-  dbus_connection_unref (connection);
 }
 
 static void
-unmount_cb (DBusMessage *reply,
-            GError *error,
-            DBusOp *data)
+unmount_cb (GVfsRemoteVolumeMonitor *proxy,
+            GAsyncResult *res,
+            gpointer user_data)
 {
+  DBusOp *data = user_data;
+  GError *error = NULL;
+
+  gvfs_remote_volume_monitor_call_mount_unmount_finish (proxy, 
+                                                        res, 
+                                                        &error);
+
   if (data->cancelled_handler_id > 0)
     g_signal_handler_disconnect (data->cancellable, data->cancelled_handler_id);
 
@@ -524,15 +507,20 @@ unmount_cb (DBusMessage *reply,
     {
       GSimpleAsyncResult *simple;
       if (error != NULL)
-        simple = g_simple_async_result_new_from_error (G_OBJECT (data->mount),
-                                                       data->callback,
-                                                       data->user_data,
-                                                       error);
+        {
+          g_dbus_error_strip_remote_error (error);
+          simple = g_simple_async_result_new_from_error (G_OBJECT (data->mount),
+                                                         data->callback,
+                                                         data->user_data,
+                                                         error);
+        }
       else
-        simple = g_simple_async_result_new (G_OBJECT (data->mount),
-                                            data->callback,
-                                            data->user_data,
-                                            NULL);
+        {
+          simple = g_simple_async_result_new (G_OBJECT (data->mount),
+                                              data->callback,
+                                              data->user_data,
+                                              NULL);
+        }
       g_simple_async_result_complete (simple);
       g_object_unref (simple);
     }
@@ -543,6 +531,8 @@ unmount_cb (DBusMessage *reply,
   if (data->cancellable != NULL)
     g_object_unref (data->cancellable);
   g_free (data);
+  if (error != NULL)
+    g_error_free (error);
 }
 
 static void
@@ -554,11 +544,8 @@ g_proxy_mount_unmount_with_operation (GMount              *mount,
                                       gpointer             user_data)
 {
   GProxyMount *proxy_mount = G_PROXY_MOUNT (mount);
-  DBusConnection *connection;
-  const char *name;
-  DBusMessage *message;
   DBusOp *data;
-  dbus_uint32_t _flags = flags;
+  GVfsRemoteVolumeMonitor *proxy;
 
   G_LOCK (proxy_mount);
 
@@ -596,34 +583,23 @@ g_proxy_mount_unmount_with_operation (GMount              *mount,
     {
       data->cancellation_id = g_strdup ("");
     }
+  
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (proxy_mount->volume_monitor);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT);  /* 30 minute timeout */
 
-  connection = g_proxy_volume_monitor_get_dbus_connection (proxy_mount->volume_monitor);
-  name = g_proxy_volume_monitor_get_dbus_name (proxy_mount->volume_monitor);
+  gvfs_remote_volume_monitor_call_mount_unmount (proxy,
+                                                 proxy_mount->id,
+                                                 data->cancellation_id,
+                                                 flags,
+                                                 data->mount_op_id,
+                                                 NULL,
+                                                 (GAsyncReadyCallback) unmount_cb,
+                                                 data);
 
-  message = dbus_message_new_method_call (name,
-                                          "/org/gtk/Private/RemoteVolumeMonitor",
-                                          "org.gtk.Private.RemoteVolumeMonitor",
-                                          "MountUnmount");
-  dbus_message_append_args (message,
-                            DBUS_TYPE_STRING,
-                            &(proxy_mount->id),
-                            DBUS_TYPE_STRING,
-                            &(data->cancellation_id),
-                            DBUS_TYPE_UINT32,
-                            &_flags,
-                            DBUS_TYPE_STRING,
-                            &(data->mount_op_id),
-                            DBUS_TYPE_INVALID);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), -1);
+  g_object_unref (proxy);
+
   G_UNLOCK (proxy_mount);
-
-  _g_dbus_connection_call_async (connection,
-                                 message,
-                                 G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT, /* 30 minute timeout */
-                                 (GAsyncDBusCallback) unmount_cb,
-                                 data);
-
-  dbus_message_unref (message);
-  dbus_connection_unref (connection);
  out:
   ;
 }
