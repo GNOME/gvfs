@@ -140,6 +140,16 @@ g_vfs_backend_dav_init (GVfsBackendDav *backend)
 /* ************************************************************************* */
 /* Small utility functions */
 
+static gboolean
+string_to_uint64 (const char *str, guint64 *value)
+{
+  char *endptr;
+
+  *value = g_ascii_strtoull (str, &endptr, 10);
+
+  return endptr != str;
+}
+
 static inline gboolean
 sm_has_header (SoupMessage *msg, const char *header)
 {
@@ -1069,6 +1079,59 @@ ms_response_to_file_info (MsResponse *response,
 
 }
 
+static void
+ms_response_to_fs_info (MsResponse *response,
+                        GFileInfo  *info)
+{
+  xmlNodeIter iter;
+  MsPropstat  propstat;
+  xmlNodePtr  node;
+  guint       status;
+  const char *text;
+
+  ms_response_get_propstat_iter (response, &iter);
+  while (xml_node_iter_next (&iter))
+    {
+      status = ms_response_get_propstat (&iter, &propstat);
+
+      if (! SOUP_STATUS_IS_SUCCESSFUL (status))
+        continue;
+
+      for (node = propstat.prop_node->children; node; node = node->next)
+        {
+          if (! node_is_element (node))
+            continue;
+
+          text = node_get_content (node);
+          if (text == NULL)
+            continue;
+
+          if (node_has_name (node, "quota-available-bytes"))
+            {
+              guint64 size;
+
+              if (! string_to_uint64 (text, &size))
+                continue;
+
+              g_file_info_set_attribute_uint64 (info,
+                                                G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,
+                                                size);
+            }
+          else if (node_has_name (node, "quota-used-bytes"))
+            {
+              guint64 size;
+
+              if (! string_to_uint64 (text, &size))
+                continue;
+
+              g_file_info_set_attribute_uint64 (info,
+                                                G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                                size);
+            }
+        }
+    }
+}
+
 static GFileType
 ms_response_to_file_type (MsResponse *response)
 {
@@ -1936,6 +1999,92 @@ do_query_info (GVfsBackend           *backend,
 
 }
 
+static PropName fs_info_propnames[] = {
+  {"quota-available-bytes", NULL},
+  {"quota-used-bytes",      NULL},
+  {NULL,                    NULL}
+};
+
+static void
+do_query_fs_info (GVfsBackend           *backend,
+                  GVfsJobQueryFsInfo    *job,
+                  const char            *filename,
+                  GFileInfo             *info,
+                  GFileAttributeMatcher *attribute_matcher)
+{
+  SoupMessage *msg;
+  Multistatus  ms;
+  xmlNodeIter  iter;
+  gboolean     res;
+  GError      *error;
+
+  g_file_info_set_attribute_string (info,
+                                    G_FILE_ATTRIBUTE_FILESYSTEM_TYPE,
+                                    "webdav");
+
+  if (! (g_file_attribute_matcher_matches (attribute_matcher,
+                                           G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||
+         g_file_attribute_matcher_matches (attribute_matcher,
+                                           G_FILE_ATTRIBUTE_FILESYSTEM_FREE)))
+    {
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+      return;
+    }
+
+  msg = propfind_request_new (backend, filename, 0, fs_info_propnames);
+
+  if (msg == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Could not create request"));
+
+      return;
+    }
+
+  g_vfs_backend_dav_send_message (backend, msg);
+
+  error = NULL;
+  res = multistatus_parse (msg, &ms, &error);
+
+  if (res == FALSE)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      g_object_unref (msg);
+      return;
+    }
+
+  res = FALSE;
+  multistatus_get_response_iter (&ms, &iter);
+
+  while (xml_node_iter_next (&iter))
+    {
+      MsResponse response;
+
+      if (! multistatus_get_response (&iter, &response))
+        continue;
+
+      if (response.is_target)
+        {
+          ms_response_to_fs_info (&response, info);
+          res = TRUE;
+        }
+
+      ms_response_clear (&response);
+    }
+
+  multistatus_free (&ms);
+  g_object_unref (msg);
+
+  if (res)
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+  else
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Response invalid"));
+
+}
 
 /* *** enumerate *** */
 static void
@@ -2507,6 +2656,7 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
   backend_class->mount             = do_mount;
   backend_class->try_query_info    = NULL;
   backend_class->query_info        = do_query_info;
+  backend_class->query_fs_info     = do_query_fs_info;
   backend_class->enumerate         = do_enumerate;
   backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_create        = try_create;
