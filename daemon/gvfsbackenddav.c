@@ -997,7 +997,7 @@ ms_response_to_file_info (MsResponse *response,
               file_type = parse_resourcetype (node);
               g_file_info_set_file_type (info, file_type);
             }
-          else if (node_has_name (node, "displayname"))
+          else if (node_has_name (node, "displayname") && text)
             {
               g_file_info_set_display_name (info, text);
               have_display_name = TRUE;
