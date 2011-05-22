@@ -1,0 +1,8 @@
+[Mount]
+Type=ftp
+Exec=@libexecdir@/gvfsd-afp
+AutoMount=false
+Scheme=afp
+DefaultPort=548
+HostnameIsInetAddress=true
+

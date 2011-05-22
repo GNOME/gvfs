@@ -40,10 +40,10 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp gvfsd-network
+libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp gvfsd-network gvfsd-afp
 
-mount_in_files = sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in
-mount_DATA =  sftp.mount trash.mount computer.mount burn.mount localtest.mount network.mount
+mount_in_files = sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in afp.mount.in
+mount_DATA =  sftp.mount trash.mount computer.mount burn.mount localtest.mount network.mount afp.mount.in
 
 mount_in_files += http.mount.in dav.mount.in dav+sd.mount.in ftp.mount.in 
 if HAVE_HTTP
@@ -472,6 +472,21 @@ gvfsd_afc_LDADD = \
 	$(libraries) \
 	$(AFC_LIBS)
 
+gvfsd_afp_SOURCES = \
+	gvfsbackendafp.c gvfsbackendafp.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c
+
+gvfsd_afp_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendafp.h \
+	-DDEFAULT_BACKEND_TYPE=afp \
+	-DMAX_JOB_THREADS=1 \
+	$(AFC_CFLAGS) \
+	-DBACKEND_TYPES='"afp", G_VFS_TYPE_BACKEND_AFP,'
+
+gvfsd_afp_LDADD = \
+	$(libraries) \
+	$(AFC_LIBS)
 
 # GSettings stuff
 gsettings_ENUM_NAMESPACE = org.gnome.system.gvfs
