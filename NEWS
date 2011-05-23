@@ -1,3 +1,9 @@
+Major changes in 1.8.2
+======================
+* dav: Fix copying of remote folders to disk
+* dav: Correctly handle usernames supplied in the URL
+* daemonfile: Re-root the path in set_display_name ()
+
 Major changes in 1.8.1
 ======================
 * Fix threadsafety of closing channels
