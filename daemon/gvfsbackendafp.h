@@ -28,11 +28,11 @@
 G_BEGIN_DECLS
 
 #define G_VFS_TYPE_BACKEND_AFP             (g_vfs_backend_afp_get_type ())
-#define G_VFS_BACKEND_AFP(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_VFS_BACKEND_AFP, GVfsBackendAfp))
-#define G_VFS_BACKEND_AFP_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), G_TYPE_VFS_BACKEND_AFP, GVfsBackendAfpClass))
-#define G_IS_VFS_BACKEND_AFP(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_VFS_BACKEND_AFP))
-#define G_IS_VFS_BACKEND_AFP_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), G_TYPE_VFS_BACKEND_AFP))
-#define G_VFS_BACKEND_AFP_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), G_TYPE_VFS_BACKEND_AFP, GVfsBackendAfpClass))
+#define G_VFS_BACKEND_AFP(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_VFS_TYPE_BACKEND_AFP, GVfsBackendAfp))
+#define G_VFS_BACKEND_AFP_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), G_VFS_TYPE_BACKEND_AFP, GVfsBackendAfpClass))
+#define G_IS_VFS_BACKEND_AFP(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_VFS_TYPE_BACKEND_AFP))
+#define G_IS_VFS_BACKEND_AFP_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), G_VFS_TYPE_BACKEND_AFP))
+#define G_VFS_BACKEND_AFP_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), G_VFS_TYPE_BACKEND_AFP, GVfsBackendAfpClass))
 
 typedef struct _GVfsBackendAfpClass GVfsBackendAfpClass;
 typedef struct _GVfsBackendAfp GVfsBackendAfp;
@@ -45,6 +45,9 @@ struct _GVfsBackendAfpClass
 struct _GVfsBackendAfp
 {
 	GVfsBackend parent_instance;
+
+	GSocketConnectable *addr;
+	char               *user;
 };
 
 GType g_vfs_backend_afp_get_type (void) G_GNUC_CONST;
