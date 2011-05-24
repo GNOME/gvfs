@@ -435,7 +435,8 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
-  /* Translator: %s is the device the disc is inserted into */
+  /* Translator: %s is the device the disc is inserted into. 'cdda' is the name
+     name of the backend and shouldn't be translated. */
   fuse_name = g_strdup_printf (_("cdda mount on %s"), host);
   display_name = g_strdup_printf (_("Audio Disc"));
   g_vfs_backend_set_stable_name (backend, fuse_name);

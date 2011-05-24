@@ -1679,7 +1679,8 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
-  /* Translator: %s represents the device, e.g. usb:001,042  */
+  /* Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
+     backend and shouldn't be translated. */
   fuse_name = g_strdup_printf (_("gphoto2 mount on %s"), gphoto2_backend->gphoto2_port);
   icon_name = compute_icon_name (gphoto2_backend);
   display_name = compute_display_name (gphoto2_backend);
