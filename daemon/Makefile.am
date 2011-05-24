@@ -481,12 +481,9 @@ gvfsd_afp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendafp.h \
 	-DDEFAULT_BACKEND_TYPE=afp \
 	-DMAX_JOB_THREADS=1 \
-	$(AFC_CFLAGS) \
 	-DBACKEND_TYPES='"afp", G_VFS_TYPE_BACKEND_AFP,'
 
-gvfsd_afp_LDADD = \
-	$(libraries) \
-	$(AFC_LIBS)
+gvfsd_afp_LDADD = $(libraries)
 
 # GSettings stuff
 gsettings_ENUM_NAMESPACE = org.gnome.system.gvfs
