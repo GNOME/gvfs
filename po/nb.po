@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.7.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-24 09:21+0200\n"
+"POT-Creation-Date: 2011-05-24 09:28+0200\n"
 "PO-Revision-Date: 2011-05-24 09:19+0200\n"
 "Last-Translator: Torstein Adolf Winterseth <kvikende@fsfe.org>\n"
 "Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
@@ -2185,49 +2185,50 @@ msgstr "Avmonter"
 msgid "Unmount all mounts with the given scheme"
 msgstr "Avmonter alle monteringspunkter med gitt schema"
 
-#: ../programs/gvfs-mount.c:58
-msgid "List"
-msgstr "Liste"
-
+#. Translator: List here is a verb as in 'List all mounts'
 #: ../programs/gvfs-mount.c:59
-msgid "Show extra information for List and Monitor"
-msgstr "Vis ekstra informasjon for liste og overvåking"
+msgid "List"
+msgstr "Vis liste"
 
 #: ../programs/gvfs-mount.c:60
+msgid "Show extra information for List and Monitor"
+msgstr "Vis ekstra informasjon for listevisning og overvåking"
+
+#: ../programs/gvfs-mount.c:61
 msgid "Monitor events"
 msgstr "Overvåk hendelser"
 
-#: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
+#: ../programs/gvfs-mount.c:164 ../programs/gvfs-mount.c:185
 #, c-format
 msgid "Error mounting location: %s\n"
 msgstr "Feil under montering av adresse: %s\n"
 
-#: ../programs/gvfs-mount.c:241
+#: ../programs/gvfs-mount.c:242
 #, c-format
 msgid "Error unmounting mount: %s\n"
 msgstr "Feil ved avmontering av monteringspunkt: %s\n"
 
-#: ../programs/gvfs-mount.c:262
+#: ../programs/gvfs-mount.c:263
 #, c-format
 msgid "Error finding enclosing mount: %s\n"
 msgstr "Kan ikke finne omsluttende montering: %s\n"
 
-#: ../programs/gvfs-mount.c:682
+#: ../programs/gvfs-mount.c:683
 #, c-format
 msgid "Error mounting %s: %s\n"
 msgstr "Feil under montering av %s: %s\n"
 
-#: ../programs/gvfs-mount.c:696
+#: ../programs/gvfs-mount.c:697
 #, c-format
 msgid "Mounted %s at %s\n"
 msgstr "Monterte %s i %s\n"
 
-#: ../programs/gvfs-mount.c:747
+#: ../programs/gvfs-mount.c:748
 #, c-format
 msgid "No volume for device file %s\n"
 msgstr "Ingen volum for enhetsfil %s\n"
 
-#: ../programs/gvfs-mount.c:938
+#: ../programs/gvfs-mount.c:939
 msgid "- mount <location>"
 msgstr "- monter <adresse>"
 
