@@ -33,7 +33,6 @@
 #include "gmountoperationdbus.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfsdbusutils.h"
-#include <glib.h>
 #include <gio/gio.h>
 
 typedef struct {
