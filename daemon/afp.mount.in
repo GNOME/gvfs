@@ -1,5 +1,5 @@
 [Mount]
-Type=ftp
+Type=afp
 Exec=@libexecdir@/gvfsd-afp
 AutoMount=false
 Scheme=afp
