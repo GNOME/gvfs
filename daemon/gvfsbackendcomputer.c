@@ -881,7 +881,7 @@ report_no_media_error (GVfsJob *job)
 {
   g_vfs_job_failed (job, G_IO_ERROR,
                     G_IO_ERROR_NOT_SUPPORTED,
-                    _("No media in the drive"));
+                    _("No medium in the drive"));
 }
 
 typedef struct {

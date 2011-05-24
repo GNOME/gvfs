@@ -558,7 +558,7 @@ unmount_mounts_cb (GObject *source_object,
         {
           g_error_free (error);
           error = g_error_new (G_IO_ERROR, G_IO_ERROR_BUSY,
-                               _("Failed to eject media; one or more volumes on the media are busy."));
+                               _("Failed to eject medium; one or more volumes on the medium are busy."));
         }
 
       /* unmount failed; need to fail the whole eject operation */

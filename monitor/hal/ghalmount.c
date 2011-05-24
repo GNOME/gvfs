@@ -333,7 +333,7 @@ do_update_from_hal (GHalMount *m)
 
       size = format_size_for_display (volume_size);  
       /* Translators: %s is the size of the mount (e.g. 512 MB) */
-      name = g_strdup_printf (_("%s Media"), size);
+      name = g_strdup_printf (_("%s Medium"), size);
       g_free (size);
     }
 
