@@ -80,6 +80,7 @@ struct _GVfsBackendPrivate
   gboolean user_visible;
   char *default_location;
   GMountSpec *mount_spec;
+  gboolean block_requests;
 };
 
 
@@ -509,6 +510,12 @@ g_vfs_backend_add_auto_info (GVfsBackend *backend,
   
 }
 
+void
+g_vfs_backend_set_block_requests (GVfsBackend *backend)
+{
+  backend->priv->block_requests = TRUE;
+}
+
 static DBusHandlerResult
 backend_dbus_handler (DBusConnection  *connection,
 		      DBusMessage     *message,
@@ -522,6 +529,21 @@ backend_dbus_handler (DBusConnection  *connection,
   g_debug ("backend_dbus_handler %s:%s\n",
 	   dbus_message_get_interface (message),
 	   dbus_message_get_member (message));
+
+  if (backend->priv->block_requests)
+    {
+      DBusMessage *reply;
+
+      reply = _dbus_message_new_gerror (message,
+					G_IO_ERROR,
+					G_IO_ERROR_NOT_MOUNTED,
+					"%s", "Backend currently unmounting");
+
+      g_assert (reply != NULL);
+
+      dbus_connection_send (connection, reply, NULL);
+      return DBUS_HANDLER_RESULT_HANDLED;
+    }
   
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_MOUNT_INTERFACE,
