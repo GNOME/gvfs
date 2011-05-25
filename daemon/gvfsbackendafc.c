@@ -247,13 +247,10 @@ g_vfs_backend_inst_check (instproxy_error_t cond, GVfsJob *job)
       return 0;
     }
 
-  switch (cond)
-    {
-    default:
-      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-                        _("Unhandled Inst proxy error (%d)"), cond);
-      break;
-    }
+  g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                    _("Listing applications installed on device failed"));
+
+  g_message ("Instproxy not available (err = %d)", cond);
 
   return 1;
 }
@@ -266,13 +263,10 @@ g_vfs_backend_sbs_check (sbservices_error_t cond, GVfsJob *job)
       return 0;
     }
 
-  switch (cond)
-    {
-    default:
-      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-                        _("Unhandled SBServices proxy error (%d)"), cond);
-      break;
-    }
+  g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                    _("Accessing application icons on device failed"));
+
+  g_message ("SBServices not available (err = %d)", cond);
 
   return 1;
 }
