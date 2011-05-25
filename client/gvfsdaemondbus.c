@@ -765,6 +765,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
 	  if (poll_ret == -1)
 	    {
 	      dbus_pending_call_unref (pending);
+	      g_cancellable_release_fd (cancellable);
 	      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			   "Error while getting peer-to-peer dbus connection: %s",
 			   "poll error");
