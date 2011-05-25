@@ -770,6 +770,14 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
 			   "poll error");
 	      goto out;
 	    }
+
+	  if (poll_fds[0].revents & (G_IO_NVAL |  G_IO_ERR | G_IO_HUP))
+	    {
+	      dbus_pending_call_unref (pending);
+	      g_cancellable_release_fd (cancellable);
+	      invalidate_local_connection (dbus_id, error);
+	      goto out;
+	    }
 	  
 	  if (!sent_cancel && g_cancellable_is_cancelled (cancellable))
 	    {
