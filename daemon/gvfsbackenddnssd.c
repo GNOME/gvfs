@@ -79,6 +79,12 @@ static struct {
 	  FALSE,
 	  "network-server"
 	},
+	{
+		"_afpovertcp._tcp",
+		"afp",
+		FALSE,
+		"network-server-afp"
+	}
 };
 
 static AvahiClient *global_client = NULL;
