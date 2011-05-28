@@ -475,7 +475,9 @@ gvfsd_afc_LDADD = \
 gvfsd_afp_SOURCES = \
 	gvfsbackendafp.c gvfsbackendafp.h \
 	daemon-main.c daemon-main.h \
-	daemon-main-generic.c
+	daemon-main-generic.c \
+	gvfsafpconnection.h \
+	gvfsafpconnection.c
 
 gvfsd_afp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendafp.h \

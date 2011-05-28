@@ -25,6 +25,8 @@
 
 #include <gvfsbackend.h>
 
+#include "gvfsafpconnection.h"
+
 G_BEGIN_DECLS
 
 #define G_VFS_TYPE_BACKEND_AFP             (g_vfs_backend_afp_get_type ())
@@ -48,6 +50,8 @@ struct _GVfsBackendAfp
 
 	GSocketConnectable *addr;
 	char               *user;
+
+  GVfsAfpConnection  *conn;
 };
 
 GType g_vfs_backend_afp_get_type (void) G_GNUC_CONST;

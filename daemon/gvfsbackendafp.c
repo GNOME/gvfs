@@ -35,6 +35,39 @@
 
 G_DEFINE_TYPE (GVfsBackendAfp, g_vfs_backend_afp, G_VFS_TYPE_BACKEND);
 
+static void
+do_unmount (GVfsBackend *   backend,
+            GVfsJobUnmount *job,
+            GMountUnmountFlags flags,
+            GMountSource *mount_source)
+{
+  GVfsBackendAfp *afp = G_VFS_BACKEND_AFP (backend);
+
+  g_object_unref (afp->conn);
+}
+
+static void
+do_mount (GVfsBackend *backend,
+          GVfsJobMount *job,
+          GMountSpec *mount_spec,
+          GMountSource *mount_source,
+          gboolean is_automount)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+
+  GError *err;
+
+  err = NULL;
+  afp_backend->conn = g_vfs_afp_connection_new (afp_backend->addr,
+                                                G_VFS_JOB (job)->cancellable,
+                                                &err);
+  if (!afp_backend->conn)
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  
+}
+  
 static gboolean
 try_mount (GVfsBackend *backend,
            GVfsJobMount *job,
@@ -93,5 +126,7 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
 	object_class->finalize = g_vfs_backend_afp_finalize;
 
 	backend_class->try_mount = try_mount;
+  backend_class->mount = do_mount;
+  backend_class->unmount = do_unmount;
 }
 
