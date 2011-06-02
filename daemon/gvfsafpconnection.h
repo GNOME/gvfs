@@ -30,6 +30,7 @@ G_BEGIN_DECLS
 typedef enum
 {
   AFP_COMMAND_GET_SRVR_INFO = 15,
+  AFP_COMMAND_GET_SRVR_PARMS = 16,
   AFP_COMMAND_LOGIN = 18,
   AFP_COMMAND_WRITE = 33,
   AFP_COMMAND_WRITE_EXT = 61
@@ -38,6 +39,7 @@ typedef enum
 typedef enum
 {
   AFP_ERROR_NONE = 0,
+  AFP_ERROR_USER_NOT_AUTH = -5023,
   AFP_ERROR_NO_MORE_SESSIONS = -1068
 } AfpErrorCode;
 
@@ -76,10 +78,13 @@ typedef struct _GVfsAfpCommandClass GVfsAfpCommandClass;
 typedef struct _GVfsAfpCommand GVfsAfpCommand;
 
 
-GVfsAfpCommand* g_vfs_afp_command_new        (AfpCommandType type);
+GVfsAfpCommand* g_vfs_afp_command_new         (AfpCommandType type);
 
-void            g_vfs_afp_command_put_pascal (GVfsAfpCommand *command, char *str);
+void            g_vfs_afp_command_put_pascal  (GVfsAfpCommand *command, const char *str);
+void            g_vfs_afp_command_pad_to_even (GVfsAfpCommand *command);
 
+gsize           g_vfs_afp_command_get_size    (GVfsAfpCommand *command);
+char*           g_vfs_afp_command_get_data    (GVfsAfpCommand *command);
 
 GType           g_vfs_afp_command_get_type (void) G_GNUC_CONST;
 
@@ -90,11 +95,11 @@ GType           g_vfs_afp_command_get_type (void) G_GNUC_CONST;
  * GVfsAfpConnection
  */
 #define G_VFS_TYPE_AFP_CONNECTION             (g_vfs_afp_connection_get_type ())
-#define G_VFS_AFP_CONNECTION(obj)             (G_VFS_TYPE_CHECK_INSTANCE_CAST ((obj), G_VFS_TYPE_VFS_AFP_CONNECTION, GVfsAfpConnection))
-#define G_VFS_AFP_CONNECTION_CLASS(klass)     (G_VFS_TYPE_CHECK_CLASS_CAST ((klass), G_VFS_TYPE_VFS_AFP_CONNECTION, GVfsAfpConnectionClass))
-#define G_IS_VFS_AFP_CONNECTION(obj)          (G_VFS_TYPE_CHECK_INSTANCE_TYPE ((obj), G_VFS_TYPE_VFS_AFP_CONNECTION))
-#define G_IS_VFS_AFP_CONNECTION_CLASS(klass)  (G_VFS_TYPE_CHECK_CLASS_TYPE ((klass), G_VFS_TYPE_VFS_AFP_CONNECTION))
-#define G_VFS_AFP_CONNECTION_GET_CLASS(obj)   (G_VFS_TYPE_INSTANCE_GET_CLASS ((obj), G_VFS_TYPE_VFS_AFP_CONNECTION, GVfsAfpConnectionClass))
+#define G_VFS_AFP_CONNECTION(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_VFS_TYPE_AFP_CONNECTION, GVfsAfpConnection))
+#define G_VFS_AFP_CONNECTION_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), G_VFS_TYPE_AFP_CONNECTION, GVfsAfpConnectionClass))
+#define G_IS_VFS_AFP_CONNECTION(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_VFS_TYPE_AFP_CONNECTION))
+#define G_IS_VFS_AFP_CONNECTION_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), G_VFS_TYPE_AFP_CONNECTION))
+#define G_VFS_AFP_CONNECTION_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), G_VFS_TYPE_AFP_CONNECTION, GVfsAfpConnectionClass))
 
 typedef struct _GVfsAfpConnectionClass GVfsAfpConnectionClass;
 typedef struct _GVfsAfpConnection GVfsAfpConnection;
@@ -111,12 +116,24 @@ struct _GVfsAfpConnection
 
   GVfsAfpConnectionPrivate *priv;
 };
-  
+
+typedef void (*GVfsAfpConnectionReplyCallback) (GVfsAfpConnection *afp_connection,
+                                                GVfsAfpReply      *reply,
+                                                GError            *error,
+                                                gpointer           user_data);
+
+
 GType g_vfs_afp_connection_get_type (void) G_GNUC_CONST;
 
-GVfsAfpConnection* g_vfs_afp_connection_new               (GSocketConnectable *addr,
-                                                           GCancellable       *cancellable,
-                                                           GError             **error);
+GVfsAfpConnection* g_vfs_afp_connection_new               (GSocketConnectable *addr);
+
+GVfsAfpReply*      g_vfs_afp_connection_get_server_info   (GVfsAfpConnection *afp_connection,
+                                                           GCancellable *cancellable,
+                                                           GError **error);
+
+gboolean           g_vfs_afp_connection_open              (GVfsAfpConnection *afp_connection,
+                                                           GCancellable      *cancellable,
+                                                           GError            **error);
 
 gboolean           g_vfs_afp_connection_send_command_sync (GVfsAfpConnection *afp_connection,
                                                            GVfsAfpCommand    *afp_command,
@@ -126,6 +143,12 @@ gboolean           g_vfs_afp_connection_send_command_sync (GVfsAfpConnection *af
 GVfsAfpReply*      g_vfs_afp_connection_read_reply_sync   (GVfsAfpConnection *afp_connection,
                                                            GCancellable *cancellable,
                                                            GError **error);
+
+void               g_vfs_afp_connection_queue_command     (GVfsAfpConnection *afp_connection,
+                                                           GVfsAfpCommand    *command,
+                                                           GVfsAfpConnectionReplyCallback reply_cb,
+                                                           GCancellable      *cancellable,                                                           
+                                                           gpointer user_data);
 G_END_DECLS
 
 #endif /* _GVFSAFPCONNECTION_H_ */

@@ -25,9 +25,20 @@
 
 #include <gvfsbackend.h>
 
+#include "gmounttracker.h"
+
 #include "gvfsafpconnection.h"
 
 G_BEGIN_DECLS
+
+typedef enum
+{
+  AFP_VERSION_INVALID,
+  AFP_VERSION_3_0,
+  AFP_VERSIOM_3_1,
+  AFP_VERSION_3_2,
+  AFP_VERSION_3_3
+} AfpVersion;
 
 #define G_VFS_TYPE_BACKEND_AFP             (g_vfs_backend_afp_get_type ())
 #define G_VFS_BACKEND_AFP(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_VFS_TYPE_BACKEND_AFP, GVfsBackendAfp))
@@ -51,7 +62,12 @@ struct _GVfsBackendAfp
 	GSocketConnectable *addr;
 	char               *user;
 
+  GMountTracker      *mount_tracker;
   GVfsAfpConnection  *conn;
+
+  char                *server_name;
+  GSList              *uams;
+  AfpVersion          version;
 };
 
 GType g_vfs_backend_afp_get_type (void) G_GNUC_CONST;
