@@ -516,6 +516,13 @@ g_vfs_backend_set_block_requests (GVfsBackend *backend)
   backend->priv->block_requests = TRUE;
 }
 
+gboolean
+g_vfs_backend_get_block_requests (GVfsBackend *backend)
+{
+  return backend->priv->block_requests;
+}
+
+
 static DBusHandlerResult
 backend_dbus_handler (DBusConnection  *connection,
 		      DBusMessage     *message,

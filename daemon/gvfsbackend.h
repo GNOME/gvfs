@@ -499,6 +499,7 @@ void        g_vfs_backend_add_auto_info                  (GVfsBackend           
 							  const char            *uri);
 
 void        g_vfs_backend_set_block_requests             (GVfsBackend           *backend);
+gboolean    g_vfs_backend_get_block_requests             (GVfsBackend           *backend);
 
 gboolean    g_vfs_backend_has_blocking_processes         (GVfsBackend           *backend);
 
