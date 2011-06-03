@@ -292,21 +292,27 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
 
   RequestData *req_data;
 
-  g_debug ("DISPATCH!!!\n");
-  req_data = g_hash_table_lookup (priv->request_hash,
-                                  GUINT_TO_POINTER (priv->read_dsi_header.requestID));
-  if (req_data)
+  if (priv->read_dsi_header.command == DSI_TICKLE)
   {
-    GVfsAfpReply *reply;
-    
-    reply = g_vfs_afp_reply_new (priv->read_dsi_header.errorCode, priv->data,
-                                 priv->read_dsi_header.totalDataLength);
-    req_data->reply_cb (afp_connection, reply, NULL, req_data->user_data);
-    g_hash_table_remove (priv->request_hash, GUINT_TO_POINTER (priv->read_dsi_header.requestID));
-    return;
+    /* TODO: should send back a DSI_TICKLE command */
   }
+  
+  else if (priv->read_dsi_header.command == DSI_COMMAND)
+  {
+    req_data = g_hash_table_lookup (priv->request_hash,
+                                    GUINT_TO_POINTER (priv->read_dsi_header.requestID));
+    if (req_data)
+    {
+      GVfsAfpReply *reply;
 
-  g_free (priv->data);
+      reply = g_vfs_afp_reply_new (priv->read_dsi_header.errorCode, priv->data,
+                                   priv->read_dsi_header.totalDataLength);
+      req_data->reply_cb (afp_connection, reply, NULL, req_data->user_data);
+      g_hash_table_remove (priv->request_hash, GUINT_TO_POINTER (priv->read_dsi_header.requestID));
+    }
+  }
+  else
+    g_free (priv->data);
 }
 
 static void read_reply (GVfsAfpConnection *afp_connection);
@@ -367,6 +373,10 @@ read_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     return;
   }
 
+  priv->read_dsi_header.requestID = GUINT16_FROM_BE (priv->read_dsi_header.requestID);
+  priv->read_dsi_header.errorCode = GUINT32_FROM_BE (priv->read_dsi_header.errorCode);
+  priv->read_dsi_header.totalDataLength = GUINT32_FROM_BE (priv->read_dsi_header.totalDataLength);
+  
   if (priv->read_dsi_header.totalDataLength > 0)
   {
     priv->data = g_malloc (priv->read_dsi_header.totalDataLength);
@@ -388,7 +398,7 @@ read_reply (GVfsAfpConnection *afp_connection)
   GInputStream *input;
 
   input = g_io_stream_get_input_stream (priv->conn);
-
+  
   priv->bytes_read = 0;
   priv->data = NULL;
   g_input_stream_read_async (input, &priv->read_dsi_header, sizeof (DSIHeader), 0, NULL,
@@ -406,8 +416,6 @@ write_command_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   
   gssize bytes_written;
   GError *err = NULL;
-
-  char *data;
   gsize size;
   
   bytes_written = g_output_stream_write_finish (output, res, &err);
@@ -418,12 +426,16 @@ write_command_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     g_error_free (err);
   }
 
-  data = g_vfs_afp_command_get_data (request_data->command);
   size = g_vfs_afp_command_get_size (request_data->command);
   
   priv->bytes_written += bytes_written;
   if (priv->bytes_written < size)
   {
+    char *data;
+    
+    data = g_vfs_afp_command_get_data (request_data->command);
+    
+    
     g_output_stream_write_async (output, data + priv->bytes_written,
                                  size - priv->bytes_written, 0, NULL,
                                  write_command_cb, request_data);
@@ -431,7 +443,7 @@ write_command_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   }
 
   g_hash_table_insert (priv->request_hash,
-                       GUINT_TO_POINTER (priv->write_dsi_header.requestID),
+                       GUINT_TO_POINTER (GUINT16_FROM_BE (priv->write_dsi_header.requestID)),
                        request_data);
 
   send_request (request_data->conn);
@@ -451,7 +463,6 @@ write_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   gsize size;
   
   bytes_written = g_output_stream_write_finish (output, res, &err);
-  g_debug ("Bytes written:%d\n", bytes_written);
   if (bytes_written == -1)
   {
     request_data->reply_cb (request_data->conn, NULL, err, request_data->user_data);
@@ -511,9 +522,9 @@ send_request (GVfsAfpConnection *afp_connection)
   
   priv->write_dsi_header.flags = 0x00;
   priv->write_dsi_header.command = dsi_command;
-  priv->write_dsi_header.requestID = get_request_id (afp_connection);
-  priv->write_dsi_header.writeOffset = writeOffset;
-  priv->write_dsi_header.totalDataLength = g_vfs_afp_command_get_size (request_data->command);
+  priv->write_dsi_header.requestID = GUINT16_TO_BE (get_request_id (afp_connection));
+  priv->write_dsi_header.writeOffset = GUINT32_TO_BE (writeOffset);
+  priv->write_dsi_header.totalDataLength = GUINT32_TO_BE (g_vfs_afp_command_get_size (request_data->command));
   priv->write_dsi_header.reserved = 0;
 
   priv->bytes_written = 0;
@@ -805,6 +816,8 @@ g_vfs_afp_connection_get_server_info (GVfsAfpConnection *afp_connection,
     return NULL;
   }
 
+  g_object_unref (conn);
+  
   return g_vfs_afp_reply_new (dsi_header.errorCode, data,
                               dsi_header.totalDataLength);
 }
