@@ -362,6 +362,22 @@ got_request (GVfsChannel *channel,
   guint32 command, arg1;
   GList *l;
 
+  if (g_vfs_backend_get_block_requests (channel->priv->backend))
+    {
+      char   *data;
+      gsize   data_len;
+      GError *err = NULL;
+      guint32 seq_nr;
+
+      g_set_error_literal (&err, G_IO_ERROR, G_IO_ERROR_CLOSED,
+			   "Channel blocked");
+      seq_nr = g_ntohl (request->seq_nr);
+      data = g_error_to_daemon_reply (err, seq_nr, &data_len);
+      g_vfs_channel_send_reply (channel, NULL, data, data_len);
+      g_error_free (err);
+      return;
+    }
+
   command = g_ntohl (request->command);
   arg1 = g_ntohl (request->arg1);
 
