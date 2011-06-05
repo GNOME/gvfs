@@ -750,3 +750,32 @@ g_vfs_channel_get_actual_consumer (GVfsChannel *channel)
   return channel->priv->actual_consumer;
 }
 
+static void
+free_queued_requests (gpointer data)
+{
+  Request *req = (Request *) data;
+
+  g_free (req->data);
+  g_free (req);
+}
+
+void
+g_vfs_channel_force_close (GVfsChannel *channel)
+{
+  GVfsJob *job;
+  gint     fd;
+
+  fd = g_unix_input_stream_get_fd (G_UNIX_INPUT_STREAM (channel->priv->command_stream));
+
+  shutdown (fd, SHUT_RDWR);
+
+  job = channel->priv->current_job;
+
+  if (job)
+    g_vfs_job_cancel (job);
+
+  g_list_free_full (channel->priv->queued_requests, free_queued_requests);
+  channel->priv->queued_requests = NULL;
+
+  g_vfs_job_source_closed (G_VFS_JOB_SOURCE (channel));
+}

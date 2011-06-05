@@ -84,7 +84,7 @@ void              g_vfs_channel_send_reply         (GVfsChannel                 
 						    gsize                          data_len);
 guint32           g_vfs_channel_get_current_seq_nr (GVfsChannel                   *channel);
 GPid              g_vfs_channel_get_actual_consumer (GVfsChannel                  *channel);
-
+void              g_vfs_channel_force_close        (GVfsChannel                   *channel);
 /* TODO: i/o priority? */
 
 G_END_DECLS

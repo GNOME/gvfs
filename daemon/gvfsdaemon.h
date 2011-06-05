@@ -73,7 +73,7 @@ void        g_vfs_daemon_initiate_mount  (GVfsDaemon                    *daemon,
 GArray     *g_vfs_daemon_get_blocking_processes (GVfsDaemon             *daemon);
 void        g_vfs_daemon_run_job_in_thread      (GVfsDaemon             *daemon,
 						 GVfsJob                *job);
-
+void       g_vfs_daemon_close_active_channels (GVfsDaemon                *daemon);
 
 G_END_DECLS
 
