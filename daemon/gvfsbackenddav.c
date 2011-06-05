@@ -2630,15 +2630,6 @@ do_set_display_name (GVfsBackend           *backend,
   soup_uri_free (source);
 }
 
-static gboolean
-try_unmount (GVfsBackend    *backend,
-             GVfsJobUnmount *job,
-             GMountUnmountFlags flags,
-             GMountSource *mount_source)
-{
-  _exit (0);
-}
-
 /* ************************************************************************* */
 /*  */
 static void
@@ -2666,5 +2657,4 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
   backend_class->make_directory    = do_make_directory;
   backend_class->delete            = do_delete;
   backend_class->set_display_name  = do_set_display_name;
-  backend_class->try_unmount       = try_unmount;
 }
