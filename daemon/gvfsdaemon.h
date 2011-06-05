@@ -71,6 +71,9 @@ void        g_vfs_daemon_initiate_mount  (GVfsDaemon                    *daemon,
 					  gboolean                       is_automount,
 					  DBusMessage                   *request);
 GArray     *g_vfs_daemon_get_blocking_processes (GVfsDaemon             *daemon);
+void        g_vfs_daemon_run_job_in_thread      (GVfsDaemon             *daemon,
+						 GVfsJob                *job);
+
 
 G_END_DECLS
 

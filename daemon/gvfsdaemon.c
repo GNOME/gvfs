@@ -1113,3 +1113,9 @@ g_vfs_daemon_get_blocking_processes (GVfsDaemon *daemon)
   return processes;
 }
 
+void
+g_vfs_daemon_run_job_in_thread (GVfsDaemon *daemon,
+				GVfsJob    *job)
+{
+  g_thread_pool_push (daemon->thread_pool, job, NULL); /* TODO: Check error */
+}
