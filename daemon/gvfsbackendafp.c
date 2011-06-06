@@ -402,7 +402,7 @@ do_mount (GVfsBackend *backend,
     goto error;
 
   /* set mount info */
-  afp_mount_spec = g_mount_spec_new ("afp");
+  afp_mount_spec = g_mount_spec_new ("afp-server");
   g_mount_spec_set (afp_mount_spec, "host",
                     g_network_address_get_hostname (G_NETWORK_ADDRESS (afp_backend->addr)));
   if (afp_backend->user)
@@ -416,6 +416,7 @@ do_mount (GVfsBackend *backend,
   g_free (display_name);
 
   g_vfs_backend_set_icon_name (backend, "network-server");
+  g_vfs_backend_set_user_visible (backend, FALSE);
 
     
   g_vfs_job_succeeded (G_VFS_JOB (job));

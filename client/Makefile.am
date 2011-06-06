@@ -22,6 +22,7 @@ gvfsclientinclude_HEADERS = \
 URI_PARSER_SOURCES = \
 	smburi.c \
 	httpuri.c \
+	afpuri.c \
 	$(NULL)
 
 vfssources = \

@@ -483,7 +483,7 @@ gvfsd_afp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendafp.h \
 	-DDEFAULT_BACKEND_TYPE=afp \
 	-DMAX_JOB_THREADS=1 \
-	-DBACKEND_TYPES='"afp", G_VFS_TYPE_BACKEND_AFP,'
+	-DBACKEND_TYPES='"afp-server", G_VFS_TYPE_BACKEND_AFP,'
 
 gvfsd_afp_LDADD = $(libraries)
 
