@@ -1779,81 +1779,6 @@ try_mount (GVfsBackend *backend,
 /* ------------------------------------------------------------------------------------------------- */
 
 static void
-unmount_with_op_cb (GVfsBackend  *backend,
-                    GAsyncResult *res,
-                    gpointer      user_data)
-{
-  GVfsJobUnmount *job = G_VFS_JOB_UNMOUNT (user_data);
-  gboolean should_unmount;
-
-  DEBUG ("In unmount_with_op_cb");
-
-  should_unmount = g_vfs_backend_unmount_with_operation_finish (backend,
-                                                                res);
-
-  DEBUG ("should_unmount=%d", should_unmount);
-
-  if (should_unmount)
-    {
-
-      DEBUG ("unmounted %p", backend);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-  else
-    {
-      GError *error;
-      error = g_error_new (G_IO_ERROR,
-                           G_IO_ERROR_FAILED_HANDLED,
-                           _("Filesystem is busy"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-    }
-}
-
-static gboolean
-try_unmount (GVfsBackend        *backend,
-             GVfsJobUnmount     *job,
-             GMountUnmountFlags  flags,
-             GMountSource       *mount_source)
-{
-  DEBUG ("In try_unmount, unmount_flags=%d", flags, mount_source);
-
-  if (flags & G_MOUNT_UNMOUNT_FORCE)
-    {
-      DEBUG ("forcibly unmounted %p", backend);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-  else if (g_mount_source_is_dummy (mount_source))
-    {
-      if (g_vfs_backend_has_blocking_processes (backend))
-        {
-          GError *error;
-          error = g_error_new (G_IO_ERROR,
-                               G_IO_ERROR_BUSY,
-                               _("Filesystem is busy"));
-          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-          g_error_free (error);
-        }
-      else
-        {
-          DEBUG ("unmounted %p", backend);
-          g_vfs_job_succeeded (G_VFS_JOB (job));
-        }
-    }
-  else
-    {
-      g_vfs_backend_unmount_with_operation (backend,
-                                            mount_source,
-                                            (GAsyncReadyCallback) unmount_with_op_cb,
-                                            job);
-    }
-
-  return TRUE;
-}
-
-/* ------------------------------------------------------------------------------------------------- */
-
-static void
 free_read_handle (ReadHandle *read_handle)
 {
   if (read_handle->file != NULL)
@@ -3597,8 +3522,7 @@ g_vfs_backend_gphoto2_class_init (GVfsBackendGphoto2Class *klass)
 
   backend_class->try_mount = try_mount;
   backend_class->mount = do_mount;
-  backend_class->try_unmount = try_unmount;
-  backend_class->open_icon_for_read = do_open_icon_for_read;
+   backend_class->open_icon_for_read = do_open_icon_for_read;
   backend_class->open_for_read = do_open_for_read;
   backend_class->try_read = try_read;
   backend_class->try_seek_on_read = try_seek_on_read;
