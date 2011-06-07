@@ -29,6 +29,7 @@
 
 #include "gvfsjobmount.h"
 #include "gvfsjobenumerate.h"
+#include "gvfskeyring.h"
 
 
 #include "gvfsbackendafp.h"
@@ -234,11 +235,12 @@ static gboolean
 do_login (GVfsBackendAfp *afp_backend,
           const char *username,
           const char *password,
+          gboolean anonymous,
           GCancellable *cancellable,
           GError **error)
 {
   /* anonymous login */
-  if (!username)
+  if (anonymous)
   {
     GVfsAfpCommand *comm;
     GVfsAfpReply *reply;
@@ -307,7 +309,157 @@ do_login (GVfsBackendAfp *afp_backend,
                    afp_backend->server_name);
       return FALSE;
     }
+
+    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                         "Non anonymous login not implemented yet");
+    return FALSE;
+    
   }
+
+  return TRUE;
+}
+
+static gboolean
+g_vfs_afp_server_login (GVfsBackendAfp *afp_backend,
+                        char           *initial_user,
+                        GMountSource   *mount_source,
+                        GCancellable   *cancellable,
+                        GError         **error)
+{
+  GNetworkAddress *addr;
+  char *user, *olduser;
+  char *password;
+  gboolean anonymous;
+  GPasswordSave password_save;
+  char *prompt = NULL;
+  GError *err = NULL;
+
+  addr = G_NETWORK_ADDRESS (afp_backend->addr);
+
+  olduser = g_strdup (initial_user);
+
+  if (initial_user)
+  {
+    if (g_str_equal (initial_user, "anonymous"))
+    {
+      user = NULL;
+      password = NULL;
+      anonymous = TRUE;
+      goto try_login;
+    }
+
+    else if (g_vfs_keyring_lookup_password (initial_user,
+                                            g_network_address_get_hostname (addr),
+                                            NULL,
+                                            "afp",
+                                            NULL,
+                                            NULL,
+                                            g_network_address_get_port (addr),
+                                            &user,
+                                            NULL,
+                                            &password) &&
+             user != NULL &&
+             password != NULL)
+    {
+      anonymous = FALSE;
+      goto try_login;
+    }
+  }
+  
+  while (TRUE)
+  {
+    GAskPasswordFlags flags;
+    gboolean aborted;
+    gboolean res;
+
+    if (prompt == NULL)
+    {
+      /* create prompt */
+      if (initial_user)
+        /* Translators: the first %s is the username, the second the host name */
+        prompt = g_strdup_printf (_("Enter password for afp as %s on %s"), initial_user, afp_backend->server_name);
+      else
+        /* translators: %s here is the hostname */
+        prompt = g_strdup_printf (_("Enter password for ftp on %s"), afp_backend->server_name);
+    }
+    
+    flags = G_ASK_PASSWORD_NEED_PASSWORD;
+
+    if (!initial_user)
+      flags |= G_ASK_PASSWORD_NEED_USERNAME | G_ASK_PASSWORD_ANONYMOUS_SUPPORTED;
+
+    if (g_vfs_keyring_is_available ())
+      flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
+
+    if (!g_mount_source_ask_password (mount_source,
+                                      prompt,
+                                      olduser,
+                                      NULL,
+                                      flags,
+                                      &aborted,
+                                      &password,
+                                      &user,
+                                      NULL,
+                                      &anonymous,
+                                      &password_save) ||
+        aborted)
+    {
+      g_set_error_literal (&err, G_IO_ERROR,
+                           aborted ? G_IO_ERROR_FAILED_HANDLED : G_IO_ERROR_PERMISSION_DENIED,
+                           _("Password dialog cancelled"));
+      break;
+    }
+
+try_login:
+
+    res = do_login (afp_backend, user, password, anonymous,
+                    cancellable, &err);
+    if (!res)
+    {
+      if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
+        g_clear_error (&err);
+      else
+        break;
+    }
+    else
+      break;
+
+      
+    g_free (olduser);
+    olduser = user;
+
+
+    g_free (password);
+  }
+
+  g_free (olduser);
+
+  if (err != NULL)
+  {
+    g_free (user);
+    g_free (password);
+    
+    g_propagate_error (error, err);
+    return FALSE;
+  }
+
+  if (prompt && !anonymous)
+  {
+    /* a prompt was created, so we have to save the password */
+    g_vfs_keyring_save_password (user,
+                                 g_network_address_get_hostname (addr),
+                                 NULL,
+                                 "afp",
+                                 NULL,
+                                 NULL,
+                                 g_network_address_get_port (addr),
+                                 password,
+                                 password_save);
+    g_free (prompt);
+  }
+
+  g_free (user);
+  g_free (password);
 
   return TRUE;
 }
@@ -334,13 +486,13 @@ do_mount (GVfsBackend *backend,
   char       *display_name;
 
   afp_backend->conn = g_vfs_afp_connection_new (afp_backend->addr);
-  
+
   reply = g_vfs_afp_connection_get_server_info (afp_backend->conn,
                                                 G_VFS_JOB (job)->cancellable,
                                                 &err);
   if (!reply)
     goto error;
-  
+
   MachineType_offset =
     g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
   AFPVersionCount_offset = 
@@ -396,11 +548,11 @@ do_mount (GVfsBackend *backend,
   if (!res)
     goto error;
 
-  res = do_login (afp_backend, NULL, NULL, G_VFS_JOB (job)->cancellable,
-                  &err);
+  res = g_vfs_afp_server_login (afp_backend, afp_backend->user, mount_source,
+                                G_VFS_JOB (job)->cancellable, &err);
   if (!res)
     goto error;
-
+  
   /* set mount info */
   afp_mount_spec = g_mount_spec_new ("afp-server");
   g_mount_spec_set (afp_mount_spec, "host",
