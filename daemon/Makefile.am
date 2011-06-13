@@ -477,7 +477,9 @@ gvfsd_afp_SOURCES = \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c \
 	gvfsafpconnection.h \
-	gvfsafpconnection.c
+	gvfsafpconnection.c \
+	gvfsafpserver.h \
+	gvfsafpserver.c
 
 gvfsd_afp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendafp.h \
