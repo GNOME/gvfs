@@ -1,3 +1,25 @@
+Major changes in 1.9.1
+======================
+* client: Handle error events when polling _g_vfs_daemon_call_sync ()
+* client: Don't leak the GCancellable's fd in case of an g_poll error
+* daemon: New logic to the backend to block requests
+* daemon: Add logic to force close active channels
+* daemon: Implement auto-busy on unmount
+* daemonfile: Re-root the path in set_display_name ()
+* http: Add http_backend_get_mount_base ()
+* http: Get rid of unnecessary calls to uri_for_filename ()
+* dav: Correctly encode URLs
+* dav: Unescape the path when setting the mount_prefix of the GMountSpec
+* dav: Include username and/or port in the backend's display-name
+* dav: Decode the paths of the multistatus response before comparing them
+* dav: Check for empty but present displayname dav-property
+* dav: Implement query_fs_info and report used and free space
+* dav: Use default unmount logic
+* afc: Better error messages
+* gphoto2: Use new default auto-busy code
+* build: Change default tarball compression format to xz
+* Translation updates
+
 Major changes in 1.9.0
 ======================
 * fuse: Make created files visible immediately on WebDAV
