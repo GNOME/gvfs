@@ -554,6 +554,21 @@ AM_CONDITIONAL(HAVE_ARCHIVE, test "$msg_archive" = "yes")
 AC_SUBST(ARCHIVE_CFLAGS)
 AC_SUBST(ARCHIVE_LIBS)
 
+dnl ***************************
+dnl *** Check for libgcrypt ***
+dnl ***************************
+GCRYPT_VERSION=1.2.2
+GCRYPT_LIBVER=1
+
+AM_PATH_LIBGCRYPT($GCRYPT_LIBVER:$GCRYPT_VERSION, have_gcrypt="yes",
+	      have_gcrypt="no")
+
+if test "x$have_gcrypt" != "xno"; then
+  AC_DEFINE(HAVE_GCRYPT, 1, [Define to 1 if libgcrypt is available])
+fi
+AC_SUBST([LIBGCRYPT_CFLAGS])
+AC_SUBST([LIBGCRYPT_LIBS])
+
 dnl Install bash-completion file?
 AC_ARG_ENABLE([bash-completion],
 	      AC_HELP_STRING([--disable-bash-completion],

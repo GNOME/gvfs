@@ -32,16 +32,18 @@ typedef enum
   AFP_COMMAND_GET_SRVR_INFO = 15,
   AFP_COMMAND_GET_SRVR_PARMS = 16,
   AFP_COMMAND_LOGIN = 18,
+  AFP_COMMAND_LOGIN_CONT = 19,
   AFP_COMMAND_WRITE = 33,
   AFP_COMMAND_WRITE_EXT = 61
 } AfpCommandType;
 
 typedef enum
 {
-  AFP_ERROR_NONE = 0,
-  AFP_ERROR_USER_NOT_AUTH = -5023,
-  AFP_ERROR_NO_MORE_SESSIONS = -1068
-} AfpErrorCode;
+  AFP_RESULT_NO_ERROR = 0,
+  AFP_RESULT_USER_NOT_AUTH = -5023,
+  AFP_RESULT_AUTH_CONTINUE = -5001,
+  AFP_RESULT_NO_MORE_SESSIONS = -1068
+} AfpResultCode;
 
 /*
  * GVfsAfpReply
@@ -59,7 +61,7 @@ typedef struct _GVfsAfpReply      GVfsAfpReply;
 char *          g_vfs_afp_reply_read_pascal      (GVfsAfpReply *reply);
 gboolean        g_vfs_afp_reply_seek             (GVfsAfpReply *reply, goffset offset, GSeekType type);
 
-AfpErrorCode    g_vfs_afp_reply_get_error_code   (GVfsAfpReply *reply);
+AfpResultCode   g_vfs_afp_reply_get_result_code   (GVfsAfpReply *reply);
 
 GType           g_vfs_afp_reply_get_type         (void) G_GNUC_CONST;
 
@@ -132,6 +134,10 @@ GVfsAfpReply*      g_vfs_afp_connection_get_server_info   (GVfsAfpConnection *af
                                                            GError **error);
 
 gboolean           g_vfs_afp_connection_open              (GVfsAfpConnection *afp_connection,
+                                                           GCancellable      *cancellable,
+                                                           GError            **error);
+
+gboolean           g_vfs_afp_connection_close             (GVfsAfpConnection *afp_connection,
                                                            GCancellable      *cancellable,
                                                            GError            **error);
 

@@ -21,6 +21,7 @@
  */
 
 #include <string.h>
+#include <glib/gi18n.h>
 
 
 #include "gvfsafpconnection.h"
@@ -38,7 +39,7 @@ struct _GVfsAfpReply
 {
 	GDataInputStream parent_instance;
 
-  AfpErrorCode error_code;
+  AfpResultCode result_code;
 };
 
 G_DEFINE_TYPE (GVfsAfpReply, g_vfs_afp_reply, G_TYPE_DATA_INPUT_STREAM);
@@ -54,7 +55,7 @@ g_vfs_afp_reply_class_init (GVfsAfpReplyClass *klass)
 }
 
 static GVfsAfpReply *
-g_vfs_afp_reply_new (AfpErrorCode error_code, const char *data, gsize len)
+g_vfs_afp_reply_new (AfpResultCode result_code, const char *data, gsize len)
 {
   GVfsAfpReply *reply;
 
@@ -67,7 +68,7 @@ g_vfs_afp_reply_new (AfpErrorCode error_code, const char *data, gsize len)
                           g_memory_input_stream_new (), NULL);
   
 
-  reply->error_code = error_code;
+  reply->result_code = result_code;
   
   return reply;
 }
@@ -117,10 +118,10 @@ g_vfs_afp_reply_seek (GVfsAfpReply *reply, goffset offset, GSeekType type)
   return g_seekable_seek (G_SEEKABLE (mem_stream), offset, type, NULL, NULL);
 }
 
-AfpErrorCode
-g_vfs_afp_reply_get_error_code (GVfsAfpReply *reply)
+AfpResultCode
+g_vfs_afp_reply_get_result_code (GVfsAfpReply *reply)
 {
-  return reply->error_code;
+  return reply->result_code;
 }
 
 /*
@@ -588,8 +589,15 @@ read_reply_sync (GInputStream      *input,
   read_count = sizeof (DSIHeader);
   res = g_input_stream_read_all (input, dsi_header, read_count, &bytes_read,
                                  cancellable, error);
-  if (!res || bytes_read < read_count)
+  if (!res)
     return FALSE;
+
+  if (bytes_read < read_count)
+  {
+    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                         _("Got EOS"));
+    return FALSE;
+  }
 
   dsi_header->requestID = GUINT16_FROM_BE (dsi_header->requestID);
   dsi_header->errorCode = GUINT32_FROM_BE (dsi_header->errorCode);
@@ -605,9 +613,16 @@ read_reply_sync (GInputStream      *input,
   read_count = dsi_header->totalDataLength;
 
   res = g_input_stream_read_all (input, *data, read_count, &bytes_read, cancellable, error);
-  if (!res || bytes_read < read_count)
+  if (!res)
   {
     g_free (*data);
+    return FALSE;
+  }
+  if (bytes_read < read_count)
+  {
+    g_free (*data);
+    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                         _("Got EOS"));
     return FALSE;
   }
 
@@ -639,7 +654,7 @@ send_request_sync (GOutputStream     *output,
                    guint16           request_id,
                    guint32           writeOffset,
                    gsize             len,
-                   char              *data,
+                   const char        *data,
                    GCancellable      *cancellable,
                    GError            **error)
 {
@@ -657,7 +672,7 @@ send_request_sync (GOutputStream     *output,
   write_count = sizeof (DSIHeader);
   res = g_output_stream_write_all (output, &dsi_header, write_count,
                                    &bytes_written, cancellable, error);
-  if (!res || bytes_written < write_count)
+  if (!res)
     return FALSE;
 
   if (data == NULL)
@@ -666,7 +681,7 @@ send_request_sync (GOutputStream     *output,
   write_count = len;
   res = g_output_stream_write_all (output, data, write_count, &bytes_written,
                                    cancellable, error);
-  if (!res || bytes_written < write_count)
+  if (!res)
     return FALSE;
 
   return TRUE;
@@ -708,6 +723,34 @@ g_vfs_afp_connection_send_command_sync (GVfsAfpConnection *afp_connection,
                             g_vfs_afp_command_get_size (afp_command),
                             g_vfs_afp_command_get_data (afp_command),
                             cancellable, error);
+}
+
+gboolean
+g_vfs_afp_connection_close (GVfsAfpConnection *afp_connection,
+                            GCancellable      *cancellable,
+                            GError            **error)
+{
+  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
+  
+  guint16 req_id;
+  gboolean res;
+  
+  /* close DSI session */
+  req_id = get_request_id (afp_connection);
+  res = send_request_sync (g_io_stream_get_output_stream (priv->conn),
+                           DSI_CLOSE_SESSION, req_id, 0, 0, NULL,
+                           cancellable, error);
+  if (!res)
+  {
+    g_io_stream_close (priv->conn, cancellable, NULL);
+    g_object_unref (priv->conn);
+    return FALSE;
+  }
+
+  res = g_io_stream_close (priv->conn, cancellable, error);
+  g_object_unref (priv->conn);
+  
+  return res;
 }
 
 gboolean
