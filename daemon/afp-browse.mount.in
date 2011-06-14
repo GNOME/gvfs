@@ -1,6 +1,6 @@
 [Mount]
 Type=afp-server
-Exec=@libexecdir@/gvfsd-afp
+Exec=@libexecdir@/gvfsd-afp-browse
 AutoMount=false
 Scheme=afp
 DefaultPort=548

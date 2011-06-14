@@ -38,14 +38,14 @@
 #include "gvfsafpserver.h"
 #include "gvfsafpconnection.h"
 
-#include "gvfsbackendafp.h"
+#include "gvfsbackendafpbrowse.h"
 
-struct _GVfsBackendAfpClass
+struct _GVfsBackendAfpBrowseClass
 {
 	GVfsBackendClass parent_class;
 };
 
-struct _GVfsBackendAfp
+struct _GVfsBackendAfpBrowse
 {
 	GVfsBackend parent_instance;
 
@@ -57,7 +57,7 @@ struct _GVfsBackendAfp
 };
 
 
-G_DEFINE_TYPE (GVfsBackendAfp, g_vfs_backend_afp, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendAfpBrowse, g_vfs_backend_afp_browse, G_VFS_TYPE_BACKEND);
 
 
 static void
@@ -67,7 +67,7 @@ get_srvr_parms_cb (GVfsAfpConnection *afp_connection,
                    gpointer           user_data)
 {
   GVfsJobEnumerate *job = G_VFS_JOB_ENUMERATE (user_data);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (job->backend);
 
   AfpResultCode res_code;
   guint8 num_volumes, i;
@@ -173,7 +173,7 @@ try_enumerate (GVfsBackend *backend,
                GFileAttributeMatcher *attribute_matcher,
                GFileQueryInfoFlags flags)
 {
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (backend);
 
   GVfsAfpCommand *comm;
   
@@ -231,7 +231,7 @@ do_mount (GVfsBackend *backend,
           GMountSource *mount_source,
           gboolean is_automount)
 {
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (backend);
 
   gboolean res;
   GError *err = NULL;
@@ -278,7 +278,7 @@ try_mount (GVfsBackend *backend,
            GMountSource *mount_source,
            gboolean is_automount)
 {
-	GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+	GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (backend);
 	
 	const char *host, *portstr, *user;
 	guint16 port = 548;
@@ -307,30 +307,30 @@ try_mount (GVfsBackend *backend,
 }
 
 static void
-g_vfs_backend_afp_init (GVfsBackendAfp *object)
+g_vfs_backend_afp_browse_init (GVfsBackendAfpBrowse *object)
 {
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (object);
+  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (object);
 
   afp_backend->mount_tracker = g_mount_tracker_new (NULL);
 }
 
 static void
-g_vfs_backend_afp_finalize (GObject *object)
+g_vfs_backend_afp_browse_finalize (GObject *object)
 {
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (object);
+  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (object);
 
   g_object_unref (afp_backend->mount_tracker);
   
-	G_OBJECT_CLASS (g_vfs_backend_afp_parent_class)->finalize (object);
+	G_OBJECT_CLASS (g_vfs_backend_afp_browse_parent_class)->finalize (object);
 }
 
 static void
-g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
+g_vfs_backend_afp_browse_class_init (GVfsBackendAfpBrowseClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
 
-	object_class->finalize = g_vfs_backend_afp_finalize;
+	object_class->finalize = g_vfs_backend_afp_browse_finalize;
 
 	backend_class->try_mount = try_mount;
   backend_class->mount = do_mount;
@@ -339,7 +339,7 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
 }
 
 void
-g_vfs_afp_daemon_init (void)
+g_vfs_afp_browse_daemon_init (void)
 {
   g_set_application_name (_("Apple Filing Protocol Service"));
 

@@ -27,20 +27,20 @@
 
 G_BEGIN_DECLS
 
-#define G_VFS_TYPE_BACKEND_AFP             (g_vfs_backend_afp_get_type ())
-#define G_VFS_BACKEND_AFP(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_VFS_TYPE_BACKEND_AFP, GVfsBackendAfp))
-#define G_VFS_BACKEND_AFP_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), G_VFS_TYPE_BACKEND_AFP, GVfsBackendAfpClass))
-#define G_IS_VFS_BACKEND_AFP(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_VFS_TYPE_BACKEND_AFP))
-#define G_IS_VFS_BACKEND_AFP_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), G_VFS_TYPE_BACKEND_AFP))
-#define G_VFS_BACKEND_AFP_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), G_VFS_TYPE_BACKEND_AFP, GVfsBackendAfpClass))
+#define G_VFS_TYPE_BACKEND_AFP_BROWSE             (g_vfs_backend_afp_browse_get_type ())
+#define G_VFS_BACKEND_AFP_BROWSE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_VFS_TYPE_BACKEND_AFP_BROWSE, GVfsBackendAfpBrowse))
+#define G_VFS_BACKEND_AFP_BROWSE_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), G_VFS_TYPE_BACKEND_AFP_BROWSE, GVfsBackendAfpBrowseClass))
+#define G_IS_VFS_BACKEND_AFP_BROWSE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_VFS_TYPE_BACKEND_AFP_BROWSE))
+#define G_IS_VFS_BACKEND_AFP_BROWSE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), G_VFS_TYPE_BACKEND_AFP_BROWSE))
+#define G_VFS_BACKEND_AFP_BROWSE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), G_VFS_TYPE_BACKEND_AFP_BROWSE, GVfsBackendAfpBrowseClass))
 
-typedef struct _GVfsBackendAfpClass GVfsBackendAfpClass;
-typedef struct _GVfsBackendAfp GVfsBackendAfp;
+typedef struct _GVfsBackendAfpBrowseClass GVfsBackendAfpBrowseClass;
+typedef struct _GVfsBackendAfpBrowse GVfsBackendAfpBrowse;
 
-GType g_vfs_backend_afp_get_type (void) G_GNUC_CONST;
+GType g_vfs_backend_afp_browse_get_type (void) G_GNUC_CONST;
 
-#define BACKEND_SETUP_FUNC g_vfs_afp_daemon_init
-void g_vfs_afp_daemon_init (void);
+#define BACKEND_SETUP_FUNC g_vfs_afp_browse_daemon_init
+void g_vfs_afp_browse_daemon_init (void);
 
 G_END_DECLS
 
