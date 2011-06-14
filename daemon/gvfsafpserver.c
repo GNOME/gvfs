@@ -464,7 +464,8 @@ g_vfs_afp_server_login (GVfsAfpServer *afp_serv,
 
   if (initial_user)
   {
-    if (g_str_equal (initial_user, "anonymous"))
+    if (g_str_equal (initial_user, "anonymous") &&
+        g_slist_find_custom (afp_serv->uams, AFP_UAM_NO_USER, g_str_equal))
     {
       user = NULL;
       password = NULL;
@@ -509,7 +510,12 @@ g_vfs_afp_server_login (GVfsAfpServer *afp_serv,
     flags = G_ASK_PASSWORD_NEED_PASSWORD;
 
     if (!initial_user)
-      flags |= G_ASK_PASSWORD_NEED_USERNAME | G_ASK_PASSWORD_ANONYMOUS_SUPPORTED;
+    {
+      flags |= G_ASK_PASSWORD_NEED_USERNAME;
+      
+      if (g_slist_find_custom (afp_serv->uams, AFP_UAM_NO_USER, g_str_equal))
+        flags |= G_ASK_PASSWORD_ANONYMOUS_SUPPORTED;
+    }
 
     if (g_vfs_keyring_is_available ())
       flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
