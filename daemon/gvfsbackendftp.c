@@ -417,6 +417,7 @@ do_mount (GVfsBackend *backend,
   GNetworkAddress *addr;
   guint port;
 
+restart:
   task.conn = g_vfs_ftp_connection_new (ftp->addr, task.cancellable, &task.error);
   /* fail fast here. No need to ask for a password if we know the hostname
    * doesn't exist or the given host/port doesn't have an ftp server running.
@@ -429,11 +430,17 @@ do_mount (GVfsBackend *backend,
 
   /* send pre-login commands */
   g_vfs_ftp_task_receive (&task, 0, NULL);
-  if (!gvfs_backend_ftp_determine_features (&task))
+  if (!g_vfs_backend_ftp_uses_workaround (ftp, G_VFS_FTP_WORKAROUND_FEAT_AFTER_LOGIN) &&
+      !gvfs_backend_ftp_determine_features (&task))
     {
-      g_vfs_ftp_task_clear_error (&task);
       g_vfs_backend_ftp_use_workaround (ftp, G_VFS_FTP_WORKAROUND_FEAT_AFTER_LOGIN);
       ftp->features = 0;
+      g_vfs_ftp_task_clear_error (&task);
+      if (!g_vfs_ftp_connection_is_usable (task.conn))
+        {
+          g_vfs_ftp_connection_free (task.conn);
+          goto restart;
+        }
     }
 
   addr = G_NETWORK_ADDRESS (ftp->addr);
