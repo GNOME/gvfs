@@ -4016,6 +4016,8 @@ query_info_reply (GVfsBackendSftp *backend,
         {
           char *symlink_target;
           
+          /* Skip count (always 1 for replies to SSH_FXP_READLINK) */
+          g_data_input_stream_read_uint32 (reply->data, NULL, NULL);
           symlink_target = read_string (reply->data, NULL);
           g_file_info_set_symlink_target (op_job->file_info, symlink_target);
           g_free (symlink_target);
