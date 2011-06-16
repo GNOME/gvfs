@@ -66,6 +66,304 @@ string_to_afp_version (const char *str)
 
 #ifdef HAVE_GCRYPT
 static gboolean
+dhx2_login (GVfsAfpServer *afp_serv,
+            const char *username,
+            const char *password,
+            GCancellable *cancellable,
+            GError **error)
+{
+  gboolean res;
+  gcry_error_t gcry_err;
+  GVfsAfpCommand *comm;
+  GVfsAfpReply   *reply;
+  AfpResultCode res_code;
+
+  guint8 C2SIV[] = { 0x4c, 0x57, 0x61, 0x6c, 0x6c, 0x61, 0x63, 0x65  };
+  guint8 S2CIV[] = { 0x43, 0x4a, 0x61, 0x6c, 0x62, 0x65, 0x72, 0x74  };
+
+  /* reply 1 */
+  guint16 id;
+  guint8 g_buf[4];
+  guint16 len;
+  guint32 bits;
+  guint8 *buf;
+
+  gcry_mpi_t g, p, Ma, Mb, Ra, key;
+  gcry_cipher_hd_t cipher;
+  
+  gcry_mpi_t clientNonce;
+  guint8 clientNonce_buf[16];
+  guint8 key_md5_buf[16];
+
+  /* reply 2 */
+  guint8 reply2_buf[32];
+  gcry_mpi_t clientNonce1, serverNonce;
+
+  /* request 3 */
+  guint8 answer_buf[272] = {0};
+  size_t nonce_len;
+  
+  /* initialize for easy cleanup */
+  g = NULL,
+  p = NULL;
+  Ma = NULL;
+  Mb = NULL;
+  Ra = NULL;
+  key = NULL;
+  clientNonce = NULL;
+  clientNonce1 = NULL;
+  serverNonce = NULL;
+  buf = NULL;
+  
+  /* setup cipher */
+  gcry_err = gcry_cipher_open (&cipher, GCRY_CIPHER_CAST5, GCRY_CIPHER_MODE_CBC,
+                               0);
+  g_assert (gcry_err == 0);
+
+  
+  if (strlen (password) > 256)
+  {
+    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                         _("Server doesn't support passwords longer than 256 characters"));
+    goto error;
+  }
+
+  /* Request 1 */
+  comm = g_vfs_afp_command_new (AFP_COMMAND_LOGIN);
+  g_vfs_afp_command_put_pascal (comm, afp_version_to_string (afp_serv->version));
+  g_vfs_afp_command_put_pascal (comm, AFP_UAM_DHX2);
+  g_vfs_afp_command_put_pascal (comm, username);
+  g_vfs_afp_command_pad_to_even (comm);
+
+  res = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+                                                cancellable, error);
+  g_object_unref (comm);
+  if (!res)
+    goto error;
+
+  reply = g_vfs_afp_connection_read_reply_sync (afp_serv->conn, cancellable, error);
+  if (!reply)
+    goto error;
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_AUTH_CONTINUE)
+  {
+    g_object_unref (reply);
+    if (res_code == AFP_RESULT_USER_NOT_AUTH)
+    {
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                           _("An invalid username was provided"));
+      goto error;
+    }
+    else
+      goto generic_error;
+  }
+  
+  /* Get data from reply */
+  id = g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+
+  /* read g */
+  g_input_stream_read_all (G_INPUT_STREAM (reply), &g_buf, 4, NULL, NULL, NULL);
+  gcry_err = gcry_mpi_scan (&g, GCRYMPI_FMT_USG, &g_buf, 4, NULL);
+  g_assert (gcry_err == 0);
+
+  len = g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  bits = len * 8;
+  buf = g_malloc (len);
+
+  /* read p */
+  g_input_stream_read_all (G_INPUT_STREAM (reply), buf, len, NULL, NULL, NULL);
+  gcry_err = gcry_mpi_scan (&p, GCRYMPI_FMT_USG, buf, len, NULL);
+  g_assert (gcry_err == 0);
+
+  /* read Mb */
+  g_input_stream_read_all (G_INPUT_STREAM (reply), buf, len, NULL, NULL, NULL);
+  gcry_err = gcry_mpi_scan (&Mb, GCRYMPI_FMT_USG, buf, len, NULL);
+  g_assert (gcry_err == 0);
+
+  g_object_unref (reply);
+  
+  /* generate random number Ra != 0 */
+  Ra = gcry_mpi_new (bits);
+  while (gcry_mpi_cmp_ui (Ra, 0) == 0)
+    gcry_mpi_randomize (Ra, bits, GCRY_STRONG_RANDOM);
+
+  /* Secret key value must be less than half of prime */
+  if (gcry_mpi_get_nbits (Ra) > bits - 1)
+    gcry_mpi_clear_highbit (Ra, bits - 1);
+
+  /* generate Ma */
+  Ma = gcry_mpi_new (bits);
+  gcry_mpi_powm (Ma, g, Ra, p);
+
+  /* derive Key */
+  key = gcry_mpi_new (bits);
+  gcry_mpi_powm (key, Mb, Ra, p);
+
+  gcry_err = gcry_mpi_print (GCRYMPI_FMT_USG, buf, len, NULL,
+                             key);
+  g_assert (gcry_err == 0);
+  gcry_md_hash_buffer (GCRY_MD_MD5, key_md5_buf, buf, len);
+
+  /* generate random clientNonce != 0 */
+  clientNonce = gcry_mpi_new (128);
+  while (gcry_mpi_cmp_ui (clientNonce, 0) == 0)
+    gcry_mpi_randomize (clientNonce, 128, GCRY_STRONG_RANDOM);
+
+  gcry_err = gcry_mpi_print (GCRYMPI_FMT_USG, clientNonce_buf, 16, &nonce_len,
+                             clientNonce);
+  g_assert (gcry_err == 0);
+  if (nonce_len < 16)
+  {
+    memmove(clientNonce_buf + 16 - nonce_len, clientNonce_buf, nonce_len);
+    memset(clientNonce_buf, 0, 16 - nonce_len);
+  }
+
+  gcry_cipher_setiv (cipher, C2SIV, G_N_ELEMENTS (C2SIV));
+  gcry_cipher_setkey (cipher, key_md5_buf, 16);
+
+  gcry_err = gcry_cipher_encrypt (cipher, clientNonce_buf, 16,
+                                  NULL, 0);
+  g_assert (gcry_err == 0);
+
+
+  /* Create Request 2 */
+  comm = g_vfs_afp_command_new (AFP_COMMAND_LOGIN_CONT);
+  
+  /* pad byte */
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  /* Id */
+  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), id, NULL, NULL);
+  /* Ma */
+  memset (buf, 0, len);
+  gcry_err = gcry_mpi_print (GCRYMPI_FMT_USG, buf, len, NULL,
+                             Ma);
+  g_assert (gcry_err == 0);
+  g_output_stream_write_all (G_OUTPUT_STREAM (comm), buf, len, NULL, NULL, NULL);
+  /* clientNonce */
+  g_output_stream_write_all (G_OUTPUT_STREAM (comm), clientNonce_buf, 16, NULL, NULL, NULL);
+
+  res = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+                                                cancellable, error);
+  g_object_unref (comm);
+  if (!res)
+    goto error;
+
+  
+  reply = g_vfs_afp_connection_read_reply_sync (afp_serv->conn, cancellable, error);
+  if (!reply)
+    goto error;
+
+  
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_AUTH_CONTINUE)
+  {
+    g_object_unref (reply);
+    goto generic_error;
+  }
+
+  /* read data from reply 2 */
+  id = g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+
+  g_input_stream_read_all (G_INPUT_STREAM (reply), reply2_buf, 32, NULL, NULL, NULL);
+
+  g_object_unref (reply);
+  
+  /* decrypt */
+  gcry_cipher_setiv (cipher, S2CIV, G_N_ELEMENTS (S2CIV));
+  gcry_err = gcry_cipher_decrypt (cipher, reply2_buf, 32, NULL, 0);
+  g_assert (gcry_err == 0);
+
+  /* check clientNonce + 1 */
+  gcry_err = gcry_mpi_scan (&clientNonce1, GCRYMPI_FMT_USG, reply2_buf, 16, NULL);
+  g_assert (gcry_err == 0);
+  gcry_mpi_add_ui (clientNonce, clientNonce, 1);
+  if (gcry_mpi_cmp (clientNonce, clientNonce1) != 0)
+    goto generic_error;
+
+  gcry_err = gcry_mpi_scan (&serverNonce, GCRYMPI_FMT_USG, reply2_buf + 16, 16, NULL);
+  g_assert (gcry_err == 0);
+  gcry_mpi_add_ui (serverNonce, serverNonce, 1);
+
+  /* create encrypted answer */
+  gcry_err = gcry_mpi_print (GCRYMPI_FMT_USG, answer_buf, 16, &nonce_len, serverNonce);
+  g_assert (gcry_err == 0);
+
+  if (nonce_len < 16)
+  {
+    memmove(answer_buf + 16 - nonce_len, answer_buf, nonce_len);
+    memset(answer_buf, 0, 16 - nonce_len);
+  }
+
+  memcpy (answer_buf + 16, password, strlen (password));
+
+  gcry_cipher_setiv (cipher, C2SIV, G_N_ELEMENTS (C2SIV));
+  gcry_err = gcry_cipher_encrypt (cipher, answer_buf, G_N_ELEMENTS (answer_buf),
+                                  NULL, 0);
+  g_assert (gcry_err == 0);
+  
+  /* Create request 3 */
+  comm = g_vfs_afp_command_new (AFP_COMMAND_LOGIN_CONT);
+  
+  /* pad byte */
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  /* id */
+  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), id, NULL, NULL);
+  g_output_stream_write_all (G_OUTPUT_STREAM (comm), answer_buf,
+                             G_N_ELEMENTS (answer_buf), NULL, NULL, NULL);
+
+
+  res = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+                                                cancellable, error);
+  if (!res)
+    goto error;
+  
+  reply = g_vfs_afp_connection_read_reply_sync (afp_serv->conn, cancellable, error);
+  if (!reply)
+    goto error;
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    if (res_code == AFP_RESULT_USER_NOT_AUTH)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                   _("Server \"%s\" declined the submitted password"),
+                   afp_serv->server_name);
+      goto error;
+    }
+    else
+      goto generic_error;
+  }
+
+  res = TRUE;
+  
+cleanup:
+  gcry_mpi_release (g);
+  gcry_mpi_release (p);
+  gcry_mpi_release (Ma);
+  gcry_mpi_release (Mb);
+  gcry_mpi_release (key);
+  gcry_mpi_release (clientNonce);
+  gcry_mpi_release (clientNonce1);
+  gcry_mpi_release (serverNonce);
+  gcry_cipher_close (cipher);
+  g_free (buf);
+
+  return res;
+
+error:
+  res = FALSE;
+  goto cleanup;
+  
+generic_error:
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+               _("Login to server \"%s\" failed"), afp_serv->server_name);
+  goto error;
+}
+
+static gboolean
 dhx_login (GVfsAfpServer *afp_serv,
            const char *username,
            const char *password,
@@ -236,7 +534,7 @@ dhx_login (GVfsAfpServer *afp_serv,
   gcry_err = gcry_cipher_encrypt (cipher, answer_buf, G_N_ELEMENTS (answer_buf),
                                   NULL, 0);
   g_assert (gcry_err == 0);
-
+  gcry_cipher_close (cipher);
 
   /* Create Login Continue command */
   comm = g_vfs_afp_command_new (AFP_COMMAND_LOGIN_CONT);
@@ -355,6 +653,10 @@ do_login (GVfsAfpServer *afp_serv,
   else {
 
 #ifdef HAVE_GCRYPT
+    /* Diffie-Hellman 2 */
+    if (g_slist_find_custom (afp_serv->uams, AFP_UAM_DHX2, g_str_equal))
+      return dhx2_login (afp_serv, username, password, cancellable, error);
+    
     /* Diffie-Hellman */
     if (g_slist_find_custom (afp_serv->uams, AFP_UAM_DHX, g_str_equal))
       return dhx_login (afp_serv, username, password, cancellable, error); 
