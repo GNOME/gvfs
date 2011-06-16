@@ -329,7 +329,7 @@ dhx2_login (GVfsAfpServer *afp_serv,
     if (res_code == AFP_RESULT_USER_NOT_AUTH)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                   _("Server \"%s\" declined the submitted password"),
+                   _("AFP server %s declined the submitted password"),
                    afp_serv->server_name);
       goto error;
     }
@@ -359,7 +359,7 @@ error:
   
 generic_error:
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               _("Login to server \"%s\" failed"), afp_serv->server_name);
+               _("Login to AFP server %s failed"), afp_serv->server_name);
   goto error;
 }
 
@@ -561,7 +561,7 @@ dhx_login (GVfsAfpServer *afp_serv,
     if (res_code == AFP_RESULT_USER_NOT_AUTH)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                   _("Server \"%s\" declined the submitted password"),
+                   _("AFP server %s declined the submitted password"),
                    afp_serv->server_name);
       goto error;
     }
@@ -583,7 +583,7 @@ error:
   
 generic_error:
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               _("Login to server \"%s\" failed"), afp_serv->server_name);
+               _("Login to AFP server %s failed"), afp_serv->server_name);
   res = FALSE;
   goto done;
 }
@@ -608,7 +608,7 @@ do_login (GVfsAfpServer *afp_serv,
     if (!g_slist_find_custom (afp_serv->uams, AFP_UAM_NO_USER, g_str_equal))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                           _("Server \"%s\" doesn't support anonymous login"),
+                           _("AFP server %s doesn't support anonymous login"),
                    afp_serv->server_name);
       return FALSE;
     }
@@ -635,14 +635,14 @@ do_login (GVfsAfpServer *afp_serv,
       if (res_code == AFP_RESULT_USER_NOT_AUTH)
       {
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                     _("Anonymous login on server \"%s\" failed"),
+                     _("AFP server %s declined anonymous login"),
                      afp_serv->server_name);
         return FALSE;
       }
       else
       {
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                     _("Login to server \"%s\" failed"), afp_serv->server_name);
+                     _("Anonymous login to AFP server %s failed"), afp_serv->server_name);
         return FALSE;
       }
     }
@@ -663,7 +663,7 @@ do_login (GVfsAfpServer *afp_serv,
 #endif
 
 	g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-	             _("Login to server \"%s\" failed, no suitable authentication mechanism found"),
+	             _("Login to AFP server %s failed (no suitable authentication mechanism found)"),
 	             afp_serv->server_name);
 	return FALSE;
   }
