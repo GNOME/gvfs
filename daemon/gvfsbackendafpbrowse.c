@@ -277,6 +277,8 @@ get_srvr_parms_cb (GVfsAfpConnection *afp_connection,
 
     g_vfs_job_enumerate_add_info (job, info);
     g_object_unref (info);
+
+    g_free (vol_name);
   }
 
   g_vfs_job_enumerate_done (job);
@@ -371,8 +373,13 @@ do_mount (GVfsBackend *backend,
 
   g_vfs_backend_set_mount_spec (backend, afp_mount_spec);
   g_mount_spec_unref (afp_mount_spec);
-  
-  display_name = g_strdup_printf (_("AFP shares on %s"), afp_backend->server->server_name);
+
+  if (afp_backend->user)
+    display_name = g_strdup_printf (_("AFP shares for %s on %s"), afp_backend->user,
+                                    afp_backend->server->server_name);
+  else
+    display_name = g_strdup_printf (_("AFP shares on %s"),
+                                    afp_backend->server->server_name);
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
 
@@ -428,6 +435,9 @@ g_vfs_backend_afp_browse_init (GVfsBackendAfpBrowse *object)
   GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (object);
 
   afp_backend->mount_tracker = g_mount_tracker_new (NULL);
+
+  afp_backend->addr = NULL;
+  afp_backend->user = NULL;
 }
 
 static void
@@ -436,6 +446,11 @@ g_vfs_backend_afp_browse_finalize (GObject *object)
   GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (object);
 
   g_object_unref (afp_backend->mount_tracker);
+
+  if (afp_backend->addr)
+    g_object_unref (afp_backend->addr);
+  
+  g_free (afp_backend->user);
   
 	G_OBJECT_CLASS (g_vfs_backend_afp_browse_parent_class)->finalize (object);
 }

@@ -40,10 +40,10 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp gvfsd-network gvfsd-afp-browse
+libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp gvfsd-network gvfsd-afp-browse gvfsd-afp
 
-mount_in_files = sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in afp-browse.mount.in
-mount_DATA =  sftp.mount trash.mount computer.mount burn.mount localtest.mount network.mount afp-browse.mount
+mount_in_files = sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in afp-browse.mount.in afp.mount.in
+mount_DATA =  sftp.mount trash.mount computer.mount burn.mount localtest.mount network.mount afp-browse.mount afp.mount
 
 mount_in_files += http.mount.in dav.mount.in dav+sd.mount.in ftp.mount.in 
 if HAVE_HTTP
@@ -488,6 +488,25 @@ gvfsd_afp_browse_CPPFLAGS = \
 	$(LIBGCRYPT_CFLAGS)
 
 gvfsd_afp_browse_LDADD = \
+	$(libraries) \
+	$(LIBGCRYPT_LIBS)
+	
+gvfsd_afp_SOURCES = \
+	gvfsbackendafp.c gvfsbackendafp.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c \
+	gvfsafpconnection.h \
+	gvfsafpconnection.c \
+	gvfsafpserver.h \
+	gvfsafpserver.c
+
+gvfsd_afp_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendafp.h \
+	-DMAX_JOB_THREADS=1 \
+	-DBACKEND_TYPES='"afp-volume", G_VFS_TYPE_BACKEND_AFP,' \
+	$(LIBGCRYPT_CFLAGS)
+
+gvfsd_afp_LDADD = \
 	$(libraries) \
 	$(LIBGCRYPT_LIBS)
 
