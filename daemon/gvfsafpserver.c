@@ -795,19 +795,29 @@ g_vfs_afp_server_login (GVfsAfpServer *afp_serv,
 
   while (TRUE)
   {
+    GString *str;
     GAskPasswordFlags flags;
     gboolean aborted;
 
-    if (prompt == NULL)
+    g_free (prompt);
+
+    str = g_string_new (NULL);
+
+    if (err)
     {
-      /* create prompt */
-      if (initial_user)
-        /* Translators: the first %s is the username, the second the host name */
-        prompt = g_strdup_printf (_("Enter password for afp as %s on %s"), initial_user, afp_serv->server_name);
-      else
-        /* translators: %s here is the hostname */
-        prompt = g_strdup_printf (_("Enter password for afp on %s"), afp_serv->server_name);
+      g_string_append_printf (str, "%s\n", err->message);
+      g_clear_error (&err);
     }
+    
+    /* create prompt */
+    if (initial_user)
+      /* Translators: the first %s is the username, the second the host name */
+      g_string_append_printf (str, _("Enter password for afp as %s on %s"), initial_user, afp_serv->server_name);
+    else
+      /* translators: %s here is the hostname */
+      g_string_append_printf (str, _("Enter password for afp on %s"), afp_serv->server_name);
+
+    prompt = g_string_free (str, FALSE);
 
     flags = G_ASK_PASSWORD_NEED_PASSWORD;
 
@@ -855,9 +865,7 @@ try_login:
     {
       g_vfs_afp_connection_close (afp_serv->conn, cancellable, NULL);
 
-      if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
-        g_clear_error (&err);
-      else
+      if (!g_error_matches (err, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
         break;
     }
     else

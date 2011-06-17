@@ -321,7 +321,7 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
     RequestData *req_data;
 
     /* Send back a tickle message */
-    req_data = g_slice_new (RequestData);
+    req_data = g_slice_new0 (RequestData);
     req_data->tickle = TRUE;
 
     g_queue_push_head (priv->request_queue, req_data);

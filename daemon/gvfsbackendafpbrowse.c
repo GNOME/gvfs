@@ -32,6 +32,7 @@
 #endif
 
 #include "gvfsjobmount.h"
+#include "gvfsjobqueryinfo.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsjobmountmountable.h"
 #include "gmounttracker.h"
@@ -55,11 +56,26 @@ struct _GVfsBackendAfpBrowse
 
   GMountTracker      *mount_tracker;
   GVfsAfpServer      *server;
+
+  GSList *volumes;
 };
 
 
 G_DEFINE_TYPE (GVfsBackendAfpBrowse, g_vfs_backend_afp_browse, G_VFS_TYPE_BACKEND);
 
+
+typedef struct
+{
+  char *name;
+  guint16 flags;
+} VolumeData;
+
+static void
+volume_data_free (VolumeData *vol_data)
+{
+  g_free (vol_data->name);
+  g_slice_free (VolumeData, vol_data);
+}
 
 static gboolean
 is_root (const char *filename)
@@ -72,37 +88,109 @@ is_root (const char *filename)
 
   return *p == 0;
 }
+typedef void (*UpdateCacheCb) (GVfsBackendAfpBrowse *afp_backend,
+                                 GError               *error,
+                                 gpointer              user_data);
+
+typedef struct
+{
+  GVfsBackendAfpBrowse *afp_backend;
+  gpointer user_data;
+  UpdateCacheCb cb;
+} UpdateCacheData;
 
 static void
-mount_get_srvr_parms_cb (GVfsAfpConnection *afp_connection,
-                         GVfsAfpReply      *reply,
-                         GError            *error,
-                         gpointer           user_data)
+get_srvr_parms_cb (GVfsAfpConnection *afp_connection,
+                   GVfsAfpReply      *reply,
+                   GError            *error,
+                   gpointer           user_data)
 {
-  GVfsJobMountMountable *job = G_VFS_JOB_MOUNT_MOUNTABLE (user_data);
-  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (job->backend);
+  UpdateCacheData *data = (UpdateCacheData *)user_data;
 
   AfpResultCode res_code;
-  char *filename, *end;
-  guint len;
   guint8 num_volumes, i;
 
   if (!reply)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    data->cb (data->afp_backend, error, data->user_data);
+    g_slice_free (UpdateCacheData, data);
     return;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
   if (res_code != AFP_RESULT_NO_ERROR)
   {
-    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
-                              G_IO_ERROR_FAILED, _("Volume enumeration failed"));
+    GError *err;
+
+    err = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_FAILED,
+                               _("Retrieval of server parameters failed"));
+    data->cb (data->afp_backend, err, data->user_data);
+
+    g_error_free (err);
+    g_slice_free (UpdateCacheData, data);
     return;
   }
-
-  filename = job->filename;
   
+  /* server time */
+  (void)g_data_input_stream_read_int32 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+
+  g_slist_free_full (data->afp_backend->volumes, (GDestroyNotify) volume_data_free);
+  data->afp_backend->volumes = NULL;
+  
+  num_volumes = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  for (i = 0; i < num_volumes; i++)
+  {
+    guint8 flags;
+    char *vol_name;
+
+    VolumeData *volume_data;
+
+    flags = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+    vol_name = g_vfs_afp_reply_read_pascal (reply);
+    if (!vol_name)
+      continue;
+
+    volume_data = g_slice_new (VolumeData);
+    volume_data->flags = flags;
+    volume_data->name = vol_name;
+
+    data->afp_backend->volumes = g_slist_prepend (data->afp_backend->volumes, volume_data);
+  }
+
+  data->cb (data->afp_backend, NULL, data->user_data);
+  g_slice_free (UpdateCacheData, data);
+}
+
+static void
+update_cache (GVfsBackendAfpBrowse *afp_backend, GCancellable *cancellable,
+              UpdateCacheCb cb, gpointer user_data)
+{
+  GVfsAfpCommand *comm;
+  UpdateCacheData *data;
+
+  data = g_slice_new (UpdateCacheData);
+  data->afp_backend = afp_backend;
+  data->cb = cb;
+  data->user_data = user_data;
+  
+  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
+  /* pad byte */
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  
+  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+                                      get_srvr_parms_cb,
+                                      cancellable, data);
+  g_object_unref (comm); 
+}
+
+static VolumeData *
+find_volume (GVfsBackendAfpBrowse *afp_backend,
+             char *filename)
+{
+  char *end;
+  guint len;
+  GSList *l;
+
   while (*filename == '/')
     filename++;
 
@@ -115,59 +203,63 @@ mount_get_srvr_parms_cb (GVfsAfpConnection *afp_connection,
       end++;
 
     if (*end != 0)
-      return;
+      return NULL;
   }
   else
     len = strlen (filename);
-  
-  /* server time */
-  (void)g_data_input_stream_read_int32 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
 
-  num_volumes = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (reply), NULL, NULL);
-  for (i = 0; i < num_volumes; i++)
+  for (l = afp_backend->volumes; l; l = g_slist_next (l))
   {
-    char *vol_name;
+    VolumeData *vol_data = (VolumeData *)l->data;
 
-    /* flags*/
-    g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (reply), NULL, NULL);
-    
-    vol_name = g_vfs_afp_reply_read_pascal (reply);
-    if (!vol_name)
-      continue;
-
-    if (strlen (vol_name) == len && strncmp (vol_name, filename, len) == 0)
-    {
-      GMountSpec *mount_spec;
-      
-      mount_spec = g_mount_spec_new ("afp-volume");
-      g_mount_spec_set (mount_spec, "host",
-                        g_network_address_get_hostname (G_NETWORK_ADDRESS (afp_backend->addr)));
-      g_mount_spec_set (mount_spec, "volume", vol_name);
-
-      g_vfs_job_mount_mountable_set_target (job, mount_spec, "/", TRUE);
-      g_mount_spec_unref (mount_spec);
-      
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-
-      g_free (vol_name);
-      return;
-    }
-
-    g_free (vol_name);
+    if (strlen (vol_data->name) == len && strncmp (vol_data->name, filename, len) == 0)
+      return vol_data;
   }
 
-  g_vfs_job_failed (G_VFS_JOB (job),  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-			 _("File doesn't exist"));
+  return NULL;
+}
+static void
+mount_mountable_cb (GVfsBackendAfpBrowse *afp_backend,
+                    GError *error,
+                    gpointer user_data)
+{
+  GVfsJobMountMountable *job = G_VFS_JOB_MOUNT_MOUNTABLE (user_data);
+
+  VolumeData *vol_data;
+  GMountSpec *mount_spec;
+  
+  if (error != NULL)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    return;
+  }
+
+  vol_data = find_volume (afp_backend, job->filename);
+  if (!vol_data)
+  {
+    g_vfs_job_failed (G_VFS_JOB (job),  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                      _("File doesn't exist"));
+    return;
+  }
+
+  mount_spec = g_mount_spec_new ("afp-volume");
+  g_mount_spec_set (mount_spec, "host",
+                    g_network_address_get_hostname (G_NETWORK_ADDRESS (afp_backend->addr)));
+  g_mount_spec_set (mount_spec, "volume", vol_data->name);
+
+  g_vfs_job_mount_mountable_set_target (job, mount_spec, "/", TRUE);
+  g_mount_spec_unref (mount_spec);
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static gboolean
 try_mount_mountable (GVfsBackend *backend,
-		     GVfsJobMountMountable *job,
-		     const char *filename,
-		     GMountSource *mount_source)
+                     GVfsJobMountMountable *job,
+                     const char *filename,
+                     GMountSource *mount_source)
 {
   GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (backend);
-  GVfsAfpCommand *comm;
   
   if (is_root (filename))
   {
@@ -177,108 +269,85 @@ try_mount_mountable (GVfsBackend *backend,
     return TRUE;
   }
 
-  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
-  /* pad byte */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
-
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
-                                      mount_get_srvr_parms_cb,
-                                      G_VFS_JOB (job)->cancellable, job);
+  update_cache (afp_backend, G_VFS_JOB (job)->cancellable, mount_mountable_cb, job);
 
   return TRUE;
                                       
 }
 
 static void
-get_srvr_parms_cb (GVfsAfpConnection *afp_connection,
-                   GVfsAfpReply      *reply,
-                   GError            *error,
-                   gpointer           user_data)
+fill_info (GFileInfo *info, VolumeData *vol_data, GVfsBackendAfpBrowse *afp_backend)
+{
+  GIcon *icon;
+  GMountSpec *mount_spec;
+  char *uri;
+
+  g_file_info_set_name (info, vol_data->name);
+  g_file_info_set_display_name (info, vol_data->name);
+  g_file_info_set_edit_name (info, vol_data->name);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_VIRTUAL, TRUE);
+  g_file_info_set_content_type (info, "inode/directory");
+  g_file_info_set_file_type (info, G_FILE_TYPE_MOUNTABLE);
+
+  g_file_info_set_attribute_boolean (info, "afp::volume-password-protected", (vol_data->flags & 0x01));
+
+  icon = g_themed_icon_new_with_default_fallbacks ("folder-remote-afp");
+  g_file_info_set_icon (info, icon);
+  g_object_unref (icon);
+
+  mount_spec = g_mount_spec_new ("afp-volume");
+  g_mount_spec_set (mount_spec, "host",
+                    g_network_address_get_hostname (G_NETWORK_ADDRESS (afp_backend->addr)));
+  g_mount_spec_set (mount_spec, "volume", vol_data->name);
+
+  if (g_mount_tracker_has_mount_spec (afp_backend->mount_tracker, mount_spec))
+  {
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, FALSE);
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, TRUE);
+  }
+  else
+  {
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, TRUE);
+    g_file_info_set_attribute_boolean(info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, FALSE);
+  }
+  g_mount_spec_unref (mount_spec);
+
+  uri = g_strdup_printf ("afp://%s/%s",
+                         g_network_address_get_hostname (G_NETWORK_ADDRESS (afp_backend->addr)),
+                         vol_data->name);
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI,
+                                    uri);
+  g_free (uri);
+}
+
+static void
+enumerate_cache_updated_cb (GVfsBackendAfpBrowse *afp_backend,
+                            GError *error,
+                            gpointer user_data)
 {
   GVfsJobEnumerate *job = G_VFS_JOB_ENUMERATE (user_data);
-  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (job->backend);
 
-  AfpResultCode res_code;
-  guint8 num_volumes, i;
+  GSList *l;
 
-  if (!reply)
+  if (error != NULL)
   {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
     return;
   }
 
-  res_code = g_vfs_afp_reply_get_result_code (reply);
-  if (res_code != AFP_RESULT_NO_ERROR)
-  {
-    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
-                              G_IO_ERROR_FAILED, _("Volume enumeration failed"));
-    return;
-  }
-
   g_vfs_job_succeeded (G_VFS_JOB (job));
   
-  /* server time */
-  (void)g_data_input_stream_read_int32 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
-
-  num_volumes = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (reply), NULL, NULL);
-  for (i = 0; i < num_volumes; i++)
+  for (l = afp_backend->volumes; l; l = l->next)
   {
-    guint8 flags;
-    char *vol_name;
-
+    VolumeData *vol_data = l->data;
+    
     GFileInfo *info;
-    GIcon *icon;
-    GMountSpec *mount_spec;
-    char *uri;
 
-    flags = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (reply), NULL, NULL);
-    vol_name = g_vfs_afp_reply_read_pascal (reply);
-    if (!vol_name)
-      continue;
-    
     info = g_file_info_new ();
-    
-    g_file_info_set_name (info, vol_name);
-    g_file_info_set_display_name (info, vol_name);
-    g_file_info_set_edit_name (info, vol_name);
-    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_VIRTUAL, TRUE);
-    g_file_info_set_content_type (info, "inode/directory");
-    g_file_info_set_file_type (info, G_FILE_TYPE_MOUNTABLE);
-
-    g_file_info_set_attribute_boolean (info, "afp::volume-password-protected", (flags & 0x01));
-
-    icon = g_themed_icon_new_with_default_fallbacks ("folder-remote-afp");
-    g_file_info_set_icon (info, icon);
-    g_object_unref (icon);
-    
-    mount_spec = g_mount_spec_new ("afp-volume");
-    g_mount_spec_set (mount_spec, "host",
-                      g_network_address_get_hostname (G_NETWORK_ADDRESS (afp_backend->addr)));
-    g_mount_spec_set (mount_spec, "volume", vol_name);
-
-    if (g_mount_tracker_has_mount_spec (afp_backend->mount_tracker, mount_spec))
-    {
-      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, FALSE);
-      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, TRUE);
-    }
-    else
-    {
-      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, TRUE);
-      g_file_info_set_attribute_boolean(info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, FALSE);
-    }
-    g_mount_spec_unref (mount_spec);
-
-    uri = g_strdup_printf ("afp://%s/%s",
-                           g_network_address_get_hostname (G_NETWORK_ADDRESS (afp_backend->addr)),
-                           vol_name);
-    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI,
-                                      uri);
-    g_free (uri);
-
+    fill_info (info, vol_data, afp_backend);
     g_vfs_job_enumerate_add_info (job, info);
+    
     g_object_unref (info);
-
-    g_free (vol_name);
   }
 
   g_vfs_job_enumerate_done (job);
@@ -293,8 +362,6 @@ try_enumerate (GVfsBackend *backend,
 {
   GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (backend);
 
-  GVfsAfpCommand *comm;
-  
   if (!is_root(filename))
   {
     g_vfs_job_failed (G_VFS_JOB (job),
@@ -303,16 +370,37 @@ try_enumerate (GVfsBackend *backend,
     return TRUE;
   }
 
-  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
-  /* pad byte */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
-
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
-                                      get_srvr_parms_cb,
-                                      G_VFS_JOB (job)->cancellable, job);
-  g_object_unref (comm);
-
+  update_cache (afp_backend, G_VFS_JOB (job)->cancellable,
+                enumerate_cache_updated_cb, job);
+  
   return TRUE;
+}
+
+static void
+query_info_cb (GVfsBackendAfpBrowse *afp_backend,
+               GError *error,
+               gpointer user_data)
+{
+  GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
+
+  VolumeData *vol_data;
+
+  if (error != NULL)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    return;
+  }
+
+  vol_data = find_volume (afp_backend, job->filename);
+  if (!vol_data)
+  {
+    g_vfs_job_failed (G_VFS_JOB (job),  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                      _("File doesn't exist"));
+    return;
+  }
+
+  fill_info (job->file_info, vol_data, afp_backend);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static gboolean
@@ -337,7 +425,8 @@ try_query_info (GVfsBackend *backend,
     g_vfs_job_succeeded (G_VFS_JOB (job));
   }
   else
-    g_vfs_job_succeeded (G_VFS_JOB (job));
+    update_cache (G_VFS_BACKEND_AFP_BROWSE (backend), G_VFS_JOB (job)->cancellable,
+                  query_info_cb, job);
   
   return TRUE;
 }
@@ -438,6 +527,8 @@ g_vfs_backend_afp_browse_init (GVfsBackendAfpBrowse *object)
 
   afp_backend->addr = NULL;
   afp_backend->user = NULL;
+
+  afp_backend->volumes = NULL;
 }
 
 static void
@@ -451,6 +542,8 @@ g_vfs_backend_afp_browse_finalize (GObject *object)
     g_object_unref (afp_backend->addr);
   
   g_free (afp_backend->user);
+
+  g_slist_free_full (afp_backend->volumes, (GDestroyNotify)volume_data_free);
   
 	G_OBJECT_CLASS (g_vfs_backend_afp_browse_parent_class)->finalize (object);
 }

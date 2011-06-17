@@ -33,8 +33,7 @@
 
 #include "gvfsjobmount.h"
 #include "gvfsjobenumerate.h"
-#include "gvfsjobmountmountable.h"
-#include "gmounttracker.h"
+#include "gvfsjobqueryinfo.h"
 
 #include "gvfsafpserver.h"
 #include "gvfsafpconnection.h"
@@ -55,10 +54,124 @@ struct _GVfsBackendAfp
 	char               *user;
 
   GVfsAfpServer      *server;
+
+  guint32 volume_id;
 };
 
 
 G_DEFINE_TYPE (GVfsBackendAfp, g_vfs_backend_afp, G_VFS_TYPE_BACKEND);
+
+static gboolean
+is_root (const char *filename)
+{
+  const char *p;
+
+  p = filename;
+  while (*p == '/')
+    p++;
+
+  return *p == 0;
+}
+
+static void
+get_vol_parms_cb (GVfsAfpConnection *afp_connection,
+                  GVfsAfpReply      *reply,
+                  GError            *error,
+                  gpointer           user_data)
+{
+  GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+
+  AfpResultCode res_code;
+  GFileInfo *info;
+  guint32 create_date, mod_date;
+  
+  if (!reply)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                              G_IO_ERROR_FAILED, _("Fetching of volume parameters failed"));
+    return;
+  }
+
+  info = job->file_info;
+
+  g_file_info_set_name (info, afp_backend->volume);
+  
+  /* CreateDate is in apple time e.g. seconds since Januari 1 1904 */
+  create_date = g_data_input_stream_read_uint32 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
+                                    create_date - 2082844800);
+
+  /* ModDate is in apple time e.g. seconds since Januari 1 1904 */
+  mod_date = g_data_input_stream_read_uint32 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                    mod_date - 2082844800);
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static gboolean
+try_query_info (GVfsBackend *backend,
+                GVfsJobQueryInfo *job,
+                const char *filename,
+                GFileQueryInfoFlags flags,
+                GFileInfo *info,
+                GFileAttributeMatcher *matcher)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  
+  g_debug ("filename: %s\n", filename);
+  
+  if (is_root (filename))
+  {
+    GIcon *icon;
+
+    g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
+    g_file_info_set_name (info, "/");
+    g_file_info_set_display_name (info, g_vfs_backend_get_display_name (backend));
+    g_file_info_set_content_type (info, "inode/directory");
+    icon = g_vfs_backend_get_icon (backend);
+    if (icon != NULL)
+      g_file_info_set_icon (info, icon);
+
+    if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_CREATED) ||
+        g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_MODIFIED))
+    {
+      GVfsAfpCommand *comm;
+      AfpVolumeBitmap bitmap;
+      
+      comm = g_vfs_afp_command_new (AFP_COMMAND_GET_VOL_PARMS);
+      /* pad byte */
+      g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+      /* Volume ID */
+      g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),
+                                       afp_backend->volume_id, NULL, NULL);
+
+      bitmap = AFP_VOLUME_BITMAP_CREATE_DATE_BIT | AFP_VOLUME_BITMAP_MOD_DATE_BIT;
+      g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), bitmap, NULL, NULL);
+
+      g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+                                          get_vol_parms_cb, G_VFS_JOB (job)->cancellable,
+                                          job);
+      return TRUE;
+    }
+
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+    return TRUE;
+  }
+  else {
+    /* TODO: query info for files */
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+    return TRUE;
+  }
+}
 
 static void
 do_mount (GVfsBackend *backend,
@@ -93,9 +206,7 @@ do_mount (GVfsBackend *backend,
   g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
   
   /* Volume Bitmap */
-  vol_bitmap = AFP_VOLUME_BITMAP_VOL_ID_BIT | AFP_VOLUME_BITMAP_CREATE_DATE_BIT |
-    AFP_VOLUME_BITMAP_MOD_DATE_BIT | AFP_VOLUME_BITMAP_EXT_BYTES_FREE_BIT |
-    AFP_VOLUME_BITMAP_EXT_BYTES_TOTAL_BIT;
+  vol_bitmap = AFP_VOLUME_BITMAP_VOL_ID_BIT;
   g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), vol_bitmap,
                                    NULL, NULL);
 
@@ -125,7 +236,10 @@ do_mount (GVfsBackend *backend,
   /* Volume Bitmap */
   g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
 
-  /* TODO: get ID etc. */
+  afp_backend->volume_id =
+    g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_debug ("volume_id: %d", afp_backend->volume_id);
+  
   g_object_unref (reply);
   
   /* set mount info */
@@ -215,7 +329,8 @@ try_mount (GVfsBackend *backend,
 static void
 g_vfs_backend_afp_init (GVfsBackendAfp *object)
 {
-   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (object);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (object);
+  
   afp_backend->volume = NULL;
   afp_backend->user = NULL;
 
@@ -246,6 +361,7 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
 
 	backend_class->try_mount = try_mount;
   backend_class->mount = do_mount;
+  backend_class->try_query_info = try_query_info;
 }
 
 void
