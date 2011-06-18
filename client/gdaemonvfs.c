@@ -1558,6 +1558,7 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
 void g_vfs_uri_mapper_smb_register (GIOModule *module);
 void g_vfs_uri_mapper_http_register (GIOModule *module);
 void g_vfs_uri_mapper_sftp_register (GIOModule *module);
+void g_vfs_uri_mapper_afp_register (GIOModule *module);
 
 void
 g_io_module_load (GIOModule *module)
@@ -1592,6 +1593,7 @@ g_io_module_load (GIOModule *module)
   g_vfs_uri_mapper_register (module);
   g_vfs_uri_mapper_smb_register (module);
   g_vfs_uri_mapper_http_register (module);
+  g_vfs_uri_mapper_afp_register (module);
 }
 
 void
