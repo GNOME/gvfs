@@ -83,10 +83,9 @@ dhx2_login (GVfsAfpServer *afp_serv,
 
   /* reply 1 */
   guint16 id;
-  guint8 g_buf[4];
   guint16 len;
   guint32 bits;
-  guint8 *buf;
+  guint8 *tmp_buf, *buf;
 
   gcry_mpi_t g, p, Ma, Mb, Ra, key;
   gcry_cipher_hd_t cipher;
@@ -160,25 +159,24 @@ dhx2_login (GVfsAfpServer *afp_serv,
   }
   
   /* Get data from reply */
-  id = g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_uint16 (reply, &id);
 
   /* read g */
-  g_input_stream_read_all (G_INPUT_STREAM (reply), &g_buf, 4, NULL, NULL, NULL);
-  gcry_err = gcry_mpi_scan (&g, GCRYMPI_FMT_USG, &g_buf, 4, NULL);
+  g_vfs_afp_reply_get_data (reply, 4, &tmp_buf);
+  gcry_err = gcry_mpi_scan (&g, GCRYMPI_FMT_USG, tmp_buf, 4, NULL);
   g_assert (gcry_err == 0);
 
-  len = g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_uint16 (reply, &len);
   bits = len * 8;
-  buf = g_malloc (len);
 
   /* read p */
-  g_input_stream_read_all (G_INPUT_STREAM (reply), buf, len, NULL, NULL, NULL);
-  gcry_err = gcry_mpi_scan (&p, GCRYMPI_FMT_USG, buf, len, NULL);
+  g_vfs_afp_reply_get_data (reply, len, &tmp_buf);
+  gcry_err = gcry_mpi_scan (&p, GCRYMPI_FMT_USG, tmp_buf, len, NULL);
   g_assert (gcry_err == 0);
 
   /* read Mb */
-  g_input_stream_read_all (G_INPUT_STREAM (reply), buf, len, NULL, NULL, NULL);
-  gcry_err = gcry_mpi_scan (&Mb, GCRYMPI_FMT_USG, buf, len, NULL);
+  g_vfs_afp_reply_get_data (reply, len, &tmp_buf);
+  gcry_err = gcry_mpi_scan (&Mb, GCRYMPI_FMT_USG, tmp_buf, len, NULL);
   g_assert (gcry_err == 0);
 
   g_object_unref (reply);
@@ -200,6 +198,7 @@ dhx2_login (GVfsAfpServer *afp_serv,
   key = gcry_mpi_new (bits);
   gcry_mpi_powm (key, Mb, Ra, p);
 
+  buf = g_malloc0 (len);
   gcry_err = gcry_mpi_print (GCRYMPI_FMT_USG, buf, len, NULL,
                              key);
   g_assert (gcry_err == 0);
@@ -263,9 +262,10 @@ dhx2_login (GVfsAfpServer *afp_serv,
   }
 
   /* read data from reply 2 */
-  id = g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_uint16 (reply, &id);
 
-  g_input_stream_read_all (G_INPUT_STREAM (reply), reply2_buf, 32, NULL, NULL, NULL);
+  g_vfs_afp_reply_get_data (reply, 32, &tmp_buf);
+  memcpy (reply2_buf, tmp_buf, 32);
 
   g_object_unref (reply);
   
@@ -383,14 +383,14 @@ dhx_login (GVfsAfpServer *afp_serv,
   AfpResultCode res_code;
   gboolean res;
   guint16 id;
+  guint8 *tmp_buf;
 
   /* Mb */
-  guint8 mb_buf[16];
   gcry_mpi_t mb;
 
   /* Nonce */
   guint8 nonce_buf[32];
-  gcry_mpi_t nonce, nonce1;
+  gcry_mpi_t nonce;
 
   /* Key */
   gcry_mpi_t key;
@@ -470,18 +470,16 @@ dhx_login (GVfsAfpServer *afp_serv,
       goto generic_error;
   }
 
-  id = g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply),
-                                        NULL, NULL);
+  g_vfs_afp_reply_read_uint16 (reply, &id);
 
   /* read Mb */
-  g_input_stream_read_all (G_INPUT_STREAM (reply), mb_buf, G_N_ELEMENTS (mb_buf),
-                           NULL, NULL, NULL);
-  gcry_err = gcry_mpi_scan (&mb, GCRYMPI_FMT_USG, mb_buf, G_N_ELEMENTS (mb_buf), NULL);
+  g_vfs_afp_reply_get_data (reply, 16, &tmp_buf);
+  gcry_err = gcry_mpi_scan (&mb, GCRYMPI_FMT_USG, tmp_buf, 16, NULL);
   g_assert (gcry_err == 0);
 
   /* read Nonce */
-  g_input_stream_read_all (G_INPUT_STREAM (reply), nonce_buf, G_N_ELEMENTS (nonce_buf),
-                           NULL, NULL, NULL);
+  g_vfs_afp_reply_get_data (reply, 32, &tmp_buf);
+  memcpy (nonce_buf, tmp_buf, 32);
 
   g_object_unref (reply);
 
@@ -511,17 +509,15 @@ dhx_login (GVfsAfpServer *afp_serv,
   g_assert (gcry_err == 0);
 
   /* add one to nonce */
-  nonce1 = gcry_mpi_new (128);
-  gcry_mpi_add_ui (nonce1, nonce, 1);
-  gcry_mpi_release (nonce);
+  gcry_mpi_add_ui (nonce, nonce, 1);
 
   /* set client->server initialization vector */
   gcry_cipher_setiv (cipher, C2SIV, G_N_ELEMENTS (C2SIV));
   
   /* create encrypted answer */
-  gcry_err = gcry_mpi_print (GCRYMPI_FMT_USG, answer_buf, 16, &len, nonce1);
+  gcry_err = gcry_mpi_print (GCRYMPI_FMT_USG, answer_buf, 16, &len, nonce);
   g_assert (gcry_err == 0);
-  gcry_mpi_release (nonce1);
+  gcry_mpi_release (nonce);
 
   if (len < 16)
   {
@@ -675,44 +671,40 @@ get_server_info (GVfsAfpServer *afp_serv,
                  GError **error)
 {
   GVfsAfpReply *reply;
-  GError *err = NULL;
 
   guint16 MachineType_offset, AFPVersionCount_offset, UAMCount_offset;
   guint8 count;
   guint i;
 
   reply = g_vfs_afp_connection_get_server_info (afp_serv->conn, cancellable,
-                                                &err);
+                                                error);
   if (!reply)
     return FALSE;
 
-  MachineType_offset =
-    g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
-  AFPVersionCount_offset = 
-    g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
-  UAMCount_offset =
-    g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_uint16 (reply, &MachineType_offset);
+  g_vfs_afp_reply_read_uint16 (reply, &AFPVersionCount_offset);
+  g_vfs_afp_reply_read_uint16 (reply, &UAMCount_offset);
   /* VolumeIconAndMask_offset */
-  (void)g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_uint16 (reply, NULL);
 
-  afp_serv->flags =
-    g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_uint16 (reply, &afp_serv->flags);
 
-  afp_serv->server_name = g_vfs_afp_reply_read_pascal (reply);
-
+  g_vfs_afp_reply_read_pascal (reply, &afp_serv->server_name);
+  
   /* Parse MachineType */
   g_vfs_afp_reply_seek (reply, MachineType_offset, G_SEEK_SET);
-  afp_serv->machine_type = g_vfs_afp_reply_read_pascal (reply);
-
+  g_vfs_afp_reply_read_pascal (reply, &afp_serv->machine_type);
+  
   /* Parse Versions */
   g_vfs_afp_reply_seek (reply, AFPVersionCount_offset, G_SEEK_SET);
-  count = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_byte (reply, &count);
   for (i = 0; i < count; i++)
   {
     char *version;
     AfpVersion afp_version;
 
-    version = g_vfs_afp_reply_read_pascal (reply);
+    g_vfs_afp_reply_read_pascal (reply, &version);
+    g_debug ("version: %s\n", version);
     afp_version = string_to_afp_version (version);
     if (afp_version > afp_serv->version)
       afp_serv->version = afp_version;
@@ -729,12 +721,12 @@ get_server_info (GVfsAfpServer *afp_serv,
 
   /* Parse UAMs */
   g_vfs_afp_reply_seek (reply, UAMCount_offset, G_SEEK_SET);
-  count = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_byte (reply, &count);
   for (i = 0; i < count; i++)
   {
     char *uam;
 
-    uam = g_vfs_afp_reply_read_pascal (reply);
+    g_vfs_afp_reply_read_pascal (reply, &uam);
     afp_serv->uams = g_slist_prepend (afp_serv->uams, uam);
   }
 
@@ -884,7 +876,9 @@ try_login:
     g_free (user);
     g_free (password);
 
+    g_debug ("ASDASD!!!\n");
     g_propagate_error (error, err);
+    g_debug ("ASDASD2!!!\n");
     return FALSE;
   }
 
@@ -927,6 +921,7 @@ g_vfs_afp_server_init (GVfsAfpServer *afp_serv)
 {
   afp_serv->machine_type = NULL;
   afp_serv->server_name = NULL;
+  afp_serv->utf8_server_name = NULL;
   afp_serv->uams = NULL;
   afp_serv->version = AFP_VERSION_INVALID;
 }

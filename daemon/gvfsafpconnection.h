@@ -29,6 +29,46 @@ G_BEGIN_DECLS
 
 typedef enum
 {
+  AFP_DIR_BITMAP_ATTRIBUTE_BIT          = 0x1,
+  AFP_DIR_BITMAP_PARENT_DIR_ID_BIT      = 0x2,
+  AFP_DIR_BITMAP_CREATE_DATE_BIT        = 0x4,
+  AFP_DIR_BITMAP_MOD_DATE_BIT           = 0x8,
+  AFP_DIR_BITMAP_BACKUP_DATE_BIT        = 0x10,
+  AFP_DIR_BITMAP_FINDER_INFO_BIT        = 0x20,
+  AFP_DIR_BITMAP_LONG_NAME_BIT          = 0x40,
+  AFP_DIR_BITMAP_SHORT_NAME_BIT         = 0x80,
+  AFP_DIR_BITMAP_NODE_ID_BIT            = 0x100,
+  AFP_DIR_BITMAP_OFFSPRING_COUNT_BIT    = 0x0200,
+  AFP_DIR_BITMAP_OWNER_ID_BIT           = 0x0400,
+  AFP_DIR_BITMAP_GROUP_ID_BIT           = 0x0800,
+  AFP_DIR_BITMAP_ACCESS_RIGHTS_BIT      = 0x1000,
+  AFP_DIR_BITMAP_UTF8_NAME_BIT          = 0x2000,
+  AFP_DIR_BITMAP_UNIX_PRIVS_BIT         = 0x8000,
+  AFP_DIR_BITMAP_UUID_BIT               = 0x10000 // AFP version 3.2 and later (with ACL support)
+} AfpDirBitmap;
+
+typedef enum
+{
+  AFP_FILE_BITMAP_ATTRIBUTE_BIT          = 0x1,
+  AFP_FILE_BITMAP_PARENT_DIR_ID_BIT      = 0x2,
+  AFP_FILE_BITMAP_CREATE_DATE_BIT        = 0x4,
+  AFP_FILE_BITMAP_MOD_DATE_BIT           = 0x8,
+  AFP_FILE_BITMAP_BACKUP_DATE_BIT        = 0x10,
+  AFP_FILE_BITMAP_FINDER_INFO_BIT        = 0x20,
+  AFP_FILE_BITMAP_LONG_NAME_BIT          = 0x40,
+  AFP_FILE_BITMAP_SHORT_NAME_BIT         = 0x80,
+  AFP_FILE_BITMAP_NODE_ID_BIT            = 0x100,
+  AFP_FILE_BITMAP_DATA_FORK_LEN_BIT      = 0x0200,
+  AFP_FILE_BITMAP_RSRC_FORK_LEN_BI       = 0x0400,
+  AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT  = 0x0800,
+  AFP_FILE_BITMAP_LAUNCH_LIMIT_BIT       = 0x1000,
+  AFP_FILE_BITMAP_UTF8_NAME_BIT          = 0x2000,
+  AFP_FILE_BITMAP_EXT_RSRC_FORK_LEN_BIT  = 0x4000,
+  AFP_FILE_BITMAP_UNIX_PRIVS_BIT         = 0x8000
+} AfpFileBitmap;
+
+typedef enum
+{
   AFP_VOLUME_BITMAP_ATTRIBUTE_BIT       = 0x1,
   AFP_VOLUME_BITMAP_SIGNATURE_BIT       = 0x2,
   AFP_VOLUME_BITMAP_CREATE_DATE_BIT     = 0x4,
@@ -52,7 +92,9 @@ typedef enum
   AFP_COMMAND_LOGIN_CONT = 19,
   AFP_COMMAND_OPEN_VOL = 24,
   AFP_COMMAND_WRITE = 33,
-  AFP_COMMAND_WRITE_EXT = 61
+  AFP_COMMAND_WRITE_EXT = 61,
+  AFP_COMMAND_ENUMERATE_EXT = 66,
+  AFP_COMMAND_ENUMERATE_EXT2 = 68
 } AfpCommandType;
 
 typedef enum
@@ -76,8 +118,20 @@ typedef enum
 typedef struct _GVfsAfpReplyClass GVfsAfpReplyClass;
 typedef struct _GVfsAfpReply      GVfsAfpReply;
 
-char *          g_vfs_afp_reply_read_pascal      (GVfsAfpReply *reply);
-gboolean        g_vfs_afp_reply_seek             (GVfsAfpReply *reply, goffset offset, GSeekType type);
+gboolean        g_vfs_afp_reply_read_byte         (GVfsAfpReply *reply, guint8 *byte);
+
+gboolean        g_vfs_afp_reply_read_int32        (GVfsAfpReply *reply, gint32 *val);
+gboolean        g_vfs_afp_reply_read_int16        (GVfsAfpReply *reply, gint16 *val);
+
+gboolean        g_vfs_afp_reply_read_uint32       (GVfsAfpReply *reply, guint32 *val);
+gboolean        g_vfs_afp_reply_read_uint16       (GVfsAfpReply *reply, guint16 *val);
+
+gboolean        g_vfs_afp_reply_get_data         (GVfsAfpReply *reply, guint size, guint8 **data);
+gboolean        g_vfs_afp_reply_dup_data          (GVfsAfpReply *reply, guint size, guint8 **data);
+
+gboolean        g_vfs_afp_reply_read_pascal       (GVfsAfpReply *reply, char **str);
+gboolean        g_vfs_afp_reply_seek              (GVfsAfpReply *reply, gint offset, GSeekType type);
+gboolean        g_vfs_afp_reply_skip_to_even      (GVfsAfpReply *reply);
 
 AfpResultCode   g_vfs_afp_reply_get_result_code   (GVfsAfpReply *reply);
 

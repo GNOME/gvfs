@@ -132,12 +132,12 @@ get_srvr_parms_cb (GVfsAfpConnection *afp_connection,
   }
   
   /* server time */
-  (void)g_data_input_stream_read_int32 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_int32 (reply, NULL);
 
   g_slist_free_full (data->afp_backend->volumes, (GDestroyNotify) volume_data_free);
   data->afp_backend->volumes = NULL;
-  
-  num_volumes = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+
+  g_vfs_afp_reply_read_byte (reply, &num_volumes);
   for (i = 0; i < num_volumes; i++)
   {
     guint8 flags;
@@ -145,8 +145,8 @@ get_srvr_parms_cb (GVfsAfpConnection *afp_connection,
 
     VolumeData *volume_data;
 
-    flags = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (reply), NULL, NULL);
-    vol_name = g_vfs_afp_reply_read_pascal (reply);
+    g_vfs_afp_reply_read_byte (reply, &flags);
+    g_vfs_afp_reply_read_pascal (reply, &vol_name);
     if (!vol_name)
       continue;
 

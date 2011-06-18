@@ -40,13 +40,21 @@ struct _GVfsAfpReply
 	GDataInputStream parent_instance;
 
   AfpResultCode result_code;
+
+  char *data;
+  guint len;
+
+  gint pos;
 };
 
-G_DEFINE_TYPE (GVfsAfpReply, g_vfs_afp_reply, G_TYPE_DATA_INPUT_STREAM);
+G_DEFINE_TYPE (GVfsAfpReply, g_vfs_afp_reply, G_TYPE_OBJECT);
 
 static void
-g_vfs_afp_reply_init (GVfsAfpReply *object)
+g_vfs_afp_reply_init (GVfsAfpReply *reply)
 {
+  reply->data = NULL;
+  reply->len = 0;
+  reply->pos = 0;
 }
 
 static void
@@ -55,67 +63,188 @@ g_vfs_afp_reply_class_init (GVfsAfpReplyClass *klass)
 }
 
 static GVfsAfpReply *
-g_vfs_afp_reply_new (AfpResultCode result_code, const char *data, gsize len)
+g_vfs_afp_reply_new (AfpResultCode result_code, char *data, gsize len)
 {
   GVfsAfpReply *reply;
 
-  if (data)
-    reply = g_object_new (G_VFS_TYPE_AFP_REPLY, "base-stream",
-                          g_memory_input_stream_new_from_data (data, len, g_free), 
-                          NULL);
-  else
-    reply = g_object_new (G_VFS_TYPE_AFP_REPLY, "base-stream",
-                          g_memory_input_stream_new (), NULL);
-  
+  reply = g_object_new (G_VFS_TYPE_AFP_REPLY, NULL);
 
   reply->result_code = result_code;
+  reply->len = len;
+  reply->data = data;
   
   return reply;
 }
 
-char *
-g_vfs_afp_reply_read_pascal (GVfsAfpReply *reply)
+gboolean
+g_vfs_afp_reply_read_byte (GVfsAfpReply *reply, guint8 *byte)
 {
-  GError *err;
-  guint8 strsize;
-  char *str;
-  gboolean res;  
-  gsize bytes_read;
+  if ((reply->len - reply->pos) < 1)
+    return FALSE;
 
-  err = NULL;
-  strsize = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (reply), NULL, &err);
-  if (err != NULL)
-  {
-    g_error_free (err);
-    return NULL;
-  }
+  if (byte)
+    *byte = reply->data[reply->pos];
 
-  str = g_malloc (strsize + 1);
-  res = g_input_stream_read_all (G_INPUT_STREAM (reply), str, strsize,
-                                 &bytes_read, NULL, NULL);
-  if (!res ||  (bytes_read < strsize))
-  {
-    g_free (str);
-    return NULL;
-  }
+  reply->pos++;
 
-  str[strsize] = '\0';
-  return str;
+  return TRUE;
 }
 
 gboolean
-g_vfs_afp_reply_seek (GVfsAfpReply *reply, goffset offset, GSeekType type)
+g_vfs_afp_reply_read_int32 (GVfsAfpReply *reply, gint32 *val)
 {
-  gsize avail;
-  GMemoryInputStream *mem_stream;
+  if ((reply->len - reply->pos) < 4)
+    return FALSE;
 
-  /* flush buffered data */
-  avail = g_buffered_input_stream_get_available (G_BUFFERED_INPUT_STREAM (reply));
-  g_input_stream_skip (G_INPUT_STREAM (reply), avail, NULL, NULL);
+  if (val)
+    *val = GINT32_FROM_BE (*((gint32 *)(reply->data + reply->pos)));
+
+  reply->pos += 4;
   
-  g_object_get (reply, "base-stream", &mem_stream, NULL);
+  return TRUE;
+}
+
+gboolean
+g_vfs_afp_reply_read_int16 (GVfsAfpReply *reply, gint16 *val)
+{
+  if ((reply->len - reply->pos) < 2)
+    return FALSE;
+
+  if (val)
+    *val = GINT16_FROM_BE (*((gint16 *)(reply->data + reply->pos)));
+
+  reply->pos += 2;
   
-  return g_seekable_seek (G_SEEKABLE (mem_stream), offset, type, NULL, NULL);
+  return TRUE;
+}
+
+gboolean
+g_vfs_afp_reply_read_uint32 (GVfsAfpReply *reply, guint32 *val)
+{
+  if ((reply->len - reply->pos) < 4)
+    return FALSE;
+
+  if (val)
+    *val = GUINT32_FROM_BE (*((guint32 *)(reply->data + reply->pos)));
+
+  reply->pos += 4;
+  
+  return TRUE;
+}
+
+gboolean
+g_vfs_afp_reply_read_uint16 (GVfsAfpReply *reply, guint16 *val)
+{
+  if ((reply->len - reply->pos) < 2)
+    return FALSE;
+
+  if (val)
+    *val = GUINT16_FROM_BE (*((guint16 *)(reply->data + reply->pos)));
+
+  reply->pos += 2;
+  
+  return TRUE;
+}
+
+gboolean
+g_vfs_afp_reply_get_data (GVfsAfpReply *reply, guint size, guint8 **data)
+{
+  if ((reply->len - reply->pos) < size)
+    return FALSE;
+
+  if (data)
+    *data = (guint8 *)(reply->data + reply->pos);
+
+  reply->pos += size;
+
+  return TRUE;
+}
+
+gboolean
+g_vfs_afp_reply_dup_data (GVfsAfpReply *reply, guint size, guint8 **data)
+{
+  if ((reply->len - reply->pos) < size)
+    return FALSE;
+
+  if (data)
+  {
+    *data = g_malloc (size);
+    memcpy (*data, reply->data + reply->pos, size);
+  }
+
+  reply->pos += size;
+
+  return TRUE;
+}
+
+gboolean
+g_vfs_afp_reply_read_pascal (GVfsAfpReply *reply, char **str)
+{
+  guint8 strsize;
+  
+  if (!g_vfs_afp_reply_read_byte (reply, &strsize))
+    return FALSE;
+
+  if (strsize > (reply->len - reply->pos))
+  {
+    reply->pos--;
+    return FALSE;
+  }
+
+  if (str)
+  {
+    *str = g_malloc (strsize + 1);
+    memcpy (*str, reply->data + reply->pos, strsize);
+    (*str)[strsize] = '\0';
+  }
+
+  reply->pos += strsize;
+  
+  return TRUE;
+}
+
+gboolean
+g_vfs_afp_reply_seek (GVfsAfpReply *reply, gint offset, GSeekType type)
+{
+  gint absolute;
+  
+  switch (type)
+  {
+    case G_SEEK_CUR:
+      absolute = reply->pos + offset;
+      break;
+
+    case G_SEEK_SET:
+      absolute = offset;
+      break;
+      
+    case G_SEEK_END:
+      absolute = reply->len + offset;
+      break;
+
+    default:
+      return FALSE;
+  }
+
+  if (absolute < 0 || absolute >= reply->len)
+    return FALSE;
+
+  reply->pos = absolute;
+  return TRUE;
+}
+
+gboolean
+g_vfs_afp_reply_skip_to_even (GVfsAfpReply *reply)
+{
+  if ((reply->pos % 2) == 0)
+    return TRUE;
+
+  if ((reply->len - reply->pos) < 1)
+    return FALSE;
+
+  reply->pos++;
+
+  return TRUE;
 }
 
 AfpResultCode
@@ -871,7 +1000,7 @@ g_vfs_afp_connection_get_server_info (GVfsAfpConnection *afp_connection,
 
   if (!conn)
     return NULL;
-  
+
   res = send_request_sync (g_io_stream_get_output_stream (conn), DSI_GET_STATUS,
                            0, 0, 0, NULL, cancellable, error);
   if (!res)

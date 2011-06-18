@@ -64,6 +64,7 @@ struct _GVfsAfpServer
   guint16             flags;
   char                *machine_type;
   char                *server_name;
+  char                *utf8_server_name;
   GSList              *uams;
   AfpVersion          version;
 };

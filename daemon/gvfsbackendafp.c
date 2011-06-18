@@ -73,6 +73,36 @@ is_root (const char *filename)
   return *p == 0;
 }
 
+# if 0
+static GString *
+filename_to_afp_pathname (const char *filename)
+{
+  GString *pathname;
+
+  pathname = g_string_new (NULL);
+  
+  while (filename && *filename == '/')
+      filename++;
+  
+  while (filename)
+  {
+    char *end;
+
+    end = strchr (filename, '/');
+    if (!end)
+      end = filename + strlen (filename);
+
+    g_string_append_c (pathname, 0);
+    g_string_append_len (pathname, filename, end - filename);
+
+    while (filename && *filename == '/')
+      filename++;
+  }
+
+  return pathname;
+}
+#endif
+
 static void
 get_vol_parms_cb (GVfsAfpConnection *afp_connection,
                   GVfsAfpReply      *reply,
@@ -105,12 +135,12 @@ get_vol_parms_cb (GVfsAfpConnection *afp_connection,
   g_file_info_set_name (info, afp_backend->volume);
   
   /* CreateDate is in apple time e.g. seconds since Januari 1 1904 */
-  create_date = g_data_input_stream_read_uint32 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_uint32 (reply, &create_date);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
                                     create_date - 2082844800);
 
   /* ModDate is in apple time e.g. seconds since Januari 1 1904 */
-  mod_date = g_data_input_stream_read_uint32 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_uint32 (reply, &mod_date);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
                                     mod_date - 2082844800);
 
@@ -234,11 +264,10 @@ do_mount (GVfsBackend *backend,
   }
   
   /* Volume Bitmap */
-  g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
+  g_vfs_afp_reply_read_uint16 (reply, NULL);
 
-  afp_backend->volume_id =
-    g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (reply), NULL, NULL);
-  g_debug ("volume_id: %d", afp_backend->volume_id);
+  /* Volume ID */
+  g_vfs_afp_reply_read_uint16 (reply, &afp_backend->volume_id);
   
   g_object_unref (reply);
   
