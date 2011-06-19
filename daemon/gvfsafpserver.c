@@ -673,6 +673,7 @@ get_server_info (GVfsAfpServer *afp_serv,
   GVfsAfpReply *reply;
 
   guint16 MachineType_offset, AFPVersionCount_offset, UAMCount_offset;
+  
   guint8 count;
   guint i;
 
@@ -690,7 +691,19 @@ get_server_info (GVfsAfpServer *afp_serv,
   g_vfs_afp_reply_read_uint16 (reply, &afp_serv->flags);
 
   g_vfs_afp_reply_read_pascal (reply, &afp_serv->server_name);
-  
+
+  /* Parse UTF-8 ServerName */
+  if (afp_serv->flags & (0x1 << 8)) {
+    guint16 UTF8ServerName_offset;
+
+    g_vfs_afp_reply_skip_to_even (reply);
+    g_vfs_afp_reply_seek (reply, 6, G_SEEK_CUR);
+    g_vfs_afp_reply_read_uint16 (reply, &UTF8ServerName_offset);
+
+    g_vfs_afp_reply_seek (reply, UTF8ServerName_offset, G_SEEK_SET);
+    g_vfs_afp_reply_read_afp_name (reply, FALSE, &afp_serv->utf8_server_name);
+  }
+    
   /* Parse MachineType */
   g_vfs_afp_reply_seek (reply, MachineType_offset, G_SEEK_SET);
   g_vfs_afp_reply_read_pascal (reply, &afp_serv->machine_type);
@@ -704,7 +717,6 @@ get_server_info (GVfsAfpServer *afp_serv,
     AfpVersion afp_version;
 
     g_vfs_afp_reply_read_pascal (reply, &version);
-    g_debug ("version: %s\n", version);
     afp_version = string_to_afp_version (version);
     if (afp_version > afp_serv->version)
       afp_serv->version = afp_version;
@@ -730,8 +742,7 @@ get_server_info (GVfsAfpServer *afp_serv,
     afp_serv->uams = g_slist_prepend (afp_serv->uams, uam);
   }
 
-  g_object_unref (reply);
-
+  
   return TRUE;
 }
 
@@ -876,9 +887,7 @@ try_login:
     g_free (user);
     g_free (password);
 
-    g_debug ("ASDASD!!!\n");
     g_propagate_error (error, err);
-    g_debug ("ASDASD2!!!\n");
     return FALSE;
   }
 
@@ -933,6 +942,9 @@ g_vfs_afp_server_finalize (GObject *object)
   
   g_free (afp_serv->machine_type);
   g_free (afp_serv->server_name);
+  if (afp_serv->utf8_server_name)
+    g_vfs_afp_name_unref (afp_serv->utf8_server_name);
+  
   g_slist_free_full (afp_serv->uams, g_free);
 
   G_OBJECT_CLASS (g_vfs_afp_server_parent_class)->finalize (object);

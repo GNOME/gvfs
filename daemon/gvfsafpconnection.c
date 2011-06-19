@@ -26,6 +26,64 @@
 
 #include "gvfsafpconnection.h"
 
+/*
+ * GVfsAfpName
+ */
+
+static void
+_g_vfs_afp_name_free (GVfsAfpName *afp_name)
+{
+  g_free (afp_name->str);
+  g_slice_free (GVfsAfpName, afp_name);
+}
+
+void
+g_vfs_afp_name_unref (GVfsAfpName *afp_name)
+{
+  if (g_atomic_int_dec_and_test (&afp_name->ref_count))
+    _g_vfs_afp_name_free (afp_name);
+}
+
+void
+g_vfs_afp_name_ref (GVfsAfpName *afp_name)
+{
+  g_atomic_int_inc (&afp_name->ref_count);
+}
+
+GVfsAfpName *
+g_vfs_afp_name_new (guint32 text_encoding, const gchar *str, gsize len)
+{
+  GVfsAfpName *afp_name;
+
+  afp_name = g_slice_new (GVfsAfpName);
+  afp_name->ref_count = 1;
+  
+  afp_name->text_encoding = text_encoding;
+  
+  afp_name->str = g_malloc (len);
+  memcpy (afp_name->str, str, len);
+  
+  afp_name->len = len;
+
+  return afp_name;
+}
+
+GVfsAfpName *
+g_vfs_afp_name_new_from_gstring (guint32 text_encoding, GString *string)
+{
+  GVfsAfpName *afp_name;
+
+  afp_name = g_slice_new (GVfsAfpName);
+  afp_name->ref_count = 1;
+  
+  afp_name->text_encoding = text_encoding;
+  afp_name->str = string->str;
+  afp_name->len = string->len;
+
+  g_string_free (string, FALSE);
+  
+  return afp_name;
+}
 
 /*
  * GVfsAfpReply
@@ -201,6 +259,45 @@ g_vfs_afp_reply_read_pascal (GVfsAfpReply *reply, char **str)
   reply->pos += strsize;
   
   return TRUE;
+}
+
+gboolean
+g_vfs_afp_reply_read_afp_name (GVfsAfpReply *reply, gboolean read_text_encoding,
+                               GVfsAfpName **afp_name)
+{
+  gint old_pos;
+  
+  guint32 text_encoding;
+  guint16 len;
+  gchar *str;
+
+  old_pos = reply->pos;
+  
+  if (read_text_encoding)
+  {
+    if (!g_vfs_afp_reply_read_uint32 (reply, &text_encoding))
+      return FALSE;
+  }
+  else
+    text_encoding = kTextEncodingUnicodeDefault;
+  
+  if (!g_vfs_afp_reply_read_uint16 (reply, &len))
+  {
+    reply->pos = old_pos;
+    return FALSE;
+  }  
+  
+  if (!g_vfs_afp_reply_get_data (reply, len, (guint8 **)&str))
+  {
+    reply->pos = old_pos;
+    return FALSE;
+  }
+
+  if (afp_name)
+    *afp_name = g_vfs_afp_name_new (text_encoding, str, len);
+
+  return TRUE;
+    
 }
 
 gboolean
