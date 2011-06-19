@@ -55,7 +55,7 @@ struct _GVfsBackendAfp
 
   GVfsAfpServer      *server;
 
-  guint32 volume_id;
+  guint16 volume_id;
 };
 
 
