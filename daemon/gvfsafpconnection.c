@@ -50,6 +50,18 @@ g_vfs_afp_name_ref (GVfsAfpName *afp_name)
   g_atomic_int_inc (&afp_name->ref_count);
 }
 
+char *
+g_vfs_afp_name_get_string (GVfsAfpName *afp_name)
+{
+  char *str;
+
+  str = g_malloc (afp_name->len + 1);
+  memcpy (str, afp_name->str, afp_name->len);
+  str[afp_name->len] = 0;
+
+  return str;
+}
+
 GVfsAfpName *
 g_vfs_afp_name_new (guint32 text_encoding, const gchar *str, gsize len)
 {

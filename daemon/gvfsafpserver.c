@@ -695,13 +695,16 @@ get_server_info (GVfsAfpServer *afp_serv,
   /* Parse UTF-8 ServerName */
   if (afp_serv->flags & (0x1 << 8)) {
     guint16 UTF8ServerName_offset;
+    GVfsAfpName *utf8_server_name;
 
     g_vfs_afp_reply_skip_to_even (reply);
     g_vfs_afp_reply_seek (reply, 6, G_SEEK_CUR);
     g_vfs_afp_reply_read_uint16 (reply, &UTF8ServerName_offset);
 
     g_vfs_afp_reply_seek (reply, UTF8ServerName_offset, G_SEEK_SET);
-    g_vfs_afp_reply_read_afp_name (reply, FALSE, &afp_serv->utf8_server_name);
+    g_vfs_afp_reply_read_afp_name (reply, FALSE, &utf8_server_name);
+    afp_serv->utf8_server_name = g_vfs_afp_name_get_string (utf8_server_name);
+    g_vfs_afp_name_unref (utf8_server_name);
   }
     
   /* Parse MachineType */
@@ -942,8 +945,7 @@ g_vfs_afp_server_finalize (GObject *object)
   
   g_free (afp_serv->machine_type);
   g_free (afp_serv->server_name);
-  if (afp_serv->utf8_server_name)
-    g_vfs_afp_name_unref (afp_serv->utf8_server_name);
+  g_free (afp_serv->utf8_server_name);
   
   g_slist_free_full (afp_serv->uams, g_free);
 

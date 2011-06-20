@@ -222,6 +222,7 @@ do_mount (GVfsBackend *backend,
   AfpResultCode res_code;
   
   GMountSpec *afp_mount_spec;
+  char       *server_name;
   char       *display_name;
 
   afp_backend->server = g_vfs_afp_server_new (afp_backend->addr);
@@ -282,13 +283,18 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_mount_spec (backend, afp_mount_spec);
   g_mount_spec_unref (afp_mount_spec);
 
+  if (afp_backend->server->utf8_server_name)
+    server_name = afp_backend->server->utf8_server_name;
+  else
+    server_name = afp_backend->server->server_name;
+  
   if (afp_backend->user)
     display_name = g_strdup_printf (_("AFP volume %s for %s on %s"), 
                                     afp_backend->volume, afp_backend->user,
-                                    afp_backend->server->server_name);
+                                    server_name);
   else
     display_name = g_strdup_printf (_("AFP volume %s on %s"),
-                                    afp_backend->volume, afp_backend->server->server_name);
+                                    afp_backend->volume, server_name);
   
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);

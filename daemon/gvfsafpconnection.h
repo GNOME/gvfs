@@ -229,6 +229,8 @@ GVfsAfpName* g_vfs_afp_name_new_from_gstring (guint32 text_encoding, GString *st
 void         g_vfs_afp_name_unref            (GVfsAfpName *afp_name);
 void         g_vfs_afp_name_ref              (GVfsAfpName *afp_name);
 
+char*        g_vfs_afp_name_get_string       (GVfsAfpName *afp_name);
+
 /*
  * GVfsAfpReply
  */
