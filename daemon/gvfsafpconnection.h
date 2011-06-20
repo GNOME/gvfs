@@ -133,6 +133,13 @@ enum {
 
 typedef enum
 {
+  AFP_PATH_TYPE_SHORT_NAME = 1,
+  AFP_PATH_TYPE_LONG_NAME  = 2,
+  AFP_PATH_TYPE_UTF8_NAME  = 3
+} AfpPathType;
+
+typedef enum
+{
   AFP_DIR_BITMAP_ATTRIBUTE_BIT          = 0x1,
   AFP_DIR_BITMAP_PARENT_DIR_ID_BIT      = 0x2,
   AFP_DIR_BITMAP_CREATE_DATE_BIT        = 0x4,
@@ -203,10 +210,13 @@ typedef enum
 
 typedef enum
 {
-  AFP_RESULT_NO_ERROR = 0,
-  AFP_RESULT_USER_NOT_AUTH = -5023,
-  AFP_RESULT_AUTH_CONTINUE = -5001,
-  AFP_RESULT_NO_MORE_SESSIONS = -1068
+  AFP_RESULT_NO_ERROR         = 0,
+  AFP_RESULT_NO_MORE_SESSIONS = -1068,
+  AFP_RESULT_ACCESS_DENIED    = -5000, 
+  AFP_RESULT_AUTH_CONTINUE    = -5001,
+  AFP_RESULT_OBJECT_NOT_FOUND = -5018,
+  AFP_RESULT_PARAM_ERR        = -5019,
+  AFP_RESULT_USER_NOT_AUTH    = -5023
 } AfpResultCode;
 
 /*
@@ -262,6 +272,7 @@ gboolean        g_vfs_afp_reply_seek              (GVfsAfpReply *reply, gint off
 gboolean        g_vfs_afp_reply_skip_to_even      (GVfsAfpReply *reply);
 
 AfpResultCode   g_vfs_afp_reply_get_result_code   (GVfsAfpReply *reply);
+gint            g_vfs_afp_reply_get_pos           (GVfsAfpReply *reply);
 
 GType           g_vfs_afp_reply_get_type         (void) G_GNUC_CONST;
 
@@ -280,13 +291,15 @@ typedef struct _GVfsAfpCommandClass GVfsAfpCommandClass;
 typedef struct _GVfsAfpCommand GVfsAfpCommand;
 
 
-GVfsAfpCommand* g_vfs_afp_command_new         (AfpCommandType type);
+GVfsAfpCommand* g_vfs_afp_command_new          (AfpCommandType type);
 
-void            g_vfs_afp_command_put_pascal  (GVfsAfpCommand *command, const char *str);
-void            g_vfs_afp_command_pad_to_even (GVfsAfpCommand *command);
+void            g_vfs_afp_command_put_pascal   (GVfsAfpCommand *command, const char *str);
+void            g_vfs_afp_command_put_afp_name (GVfsAfpCommand *command, GVfsAfpName *afp_name);
 
-gsize           g_vfs_afp_command_get_size    (GVfsAfpCommand *command);
-char*           g_vfs_afp_command_get_data    (GVfsAfpCommand *command);
+void            g_vfs_afp_command_pad_to_even  (GVfsAfpCommand *command);
+
+gsize           g_vfs_afp_command_get_size     (GVfsAfpCommand *command);
+char*           g_vfs_afp_command_get_data     (GVfsAfpCommand *command);
 
 GType           g_vfs_afp_command_get_type (void) G_GNUC_CONST;
 

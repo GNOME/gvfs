@@ -315,6 +315,7 @@ dhx2_login (GVfsAfpServer *afp_serv,
 
   res = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
                                                 cancellable, error);
+  g_object_unref (comm);
   if (!res)
     goto error;
   

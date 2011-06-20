@@ -53,13 +53,7 @@ g_vfs_afp_name_ref (GVfsAfpName *afp_name)
 char *
 g_vfs_afp_name_get_string (GVfsAfpName *afp_name)
 {
-  char *str;
-
-  str = g_malloc (afp_name->len + 1);
-  memcpy (str, afp_name->str, afp_name->len);
-  str[afp_name->len] = 0;
-
-  return str;
+  return g_strndup (afp_name->str, afp_name->len);
 }
 
 GVfsAfpName *
@@ -102,12 +96,12 @@ g_vfs_afp_name_new_from_gstring (guint32 text_encoding, GString *string)
  */
 struct _GVfsAfpReplyClass
 {
-	GDataInputStreamClass parent_class;
+	GObjectClass parent_class;
 };
 
 struct _GVfsAfpReply
 {
-	GDataInputStream parent_instance;
+	GObject parent_instance;
 
   AfpResultCode result_code;
 
@@ -262,11 +256,7 @@ g_vfs_afp_reply_read_pascal (GVfsAfpReply *reply, char **str)
   }
 
   if (str)
-  {
-    *str = g_malloc (strsize + 1);
-    memcpy (*str, reply->data + reply->pos, strsize);
-    (*str)[strsize] = '\0';
-  }
+    *str = g_strndup (reply->data + reply->pos, strsize);
 
   reply->pos += strsize;
   
@@ -356,6 +346,12 @@ g_vfs_afp_reply_skip_to_even (GVfsAfpReply *reply)
   return TRUE;
 }
 
+gint
+g_vfs_afp_reply_get_pos (GVfsAfpReply *reply)
+{
+  return reply->pos;
+}
+
 AfpResultCode
 g_vfs_afp_reply_get_result_code (GVfsAfpReply *reply)
 {
@@ -410,11 +406,25 @@ g_vfs_afp_command_put_pascal (GVfsAfpCommand *command, const char *str)
 {
   size_t len;
 
-  len = strlen (str);
-  len = (len <= 256) ? len : 256;
+  len = MIN (strlen (str), 256);
 
   g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (command), len, NULL, NULL);
   g_output_stream_write (G_OUTPUT_STREAM (command), str, len, NULL, NULL);
+}
+
+void
+g_vfs_afp_command_put_afp_name (GVfsAfpCommand *command, GVfsAfpName *afp_name)
+{
+#if 0
+  g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (command),
+                                   afp_name->text_encoding, NULL, NULL);
+#endif
+  
+  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (command),
+                                   afp_name->len, NULL, NULL);
+
+  g_output_stream_write_all (G_OUTPUT_STREAM (command), afp_name->str,
+                             afp_name->len, NULL, NULL, NULL);
 }
 
 void

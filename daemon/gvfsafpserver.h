@@ -34,7 +34,7 @@ typedef enum
 {
   AFP_VERSION_INVALID,
   AFP_VERSION_3_0,
-  AFP_VERSIOM_3_1,
+  AFP_VERSION_3_1,
   AFP_VERSION_3_2,
   AFP_VERSION_3_3
 } AfpVersion;
