@@ -138,6 +138,21 @@ typedef enum
   AFP_PATH_TYPE_UTF8_NAME  = 3
 } AfpPathType;
 
+enum
+{
+  AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT          = 0x1,
+  AFP_FILEDIR_BITMAP_PARENT_DIR_ID_BIT      = 0x2,
+  AFP_FILEDIR_BITMAP_CREATE_DATE_BIT        = 0x4,
+  AFP_FILEDIR_BITMAP_MOD_DATE_BIT           = 0x8,
+  AFP_FILEDIR_BITMAP_BACKUP_DATE_BIT        = 0x10,
+  AFP_FILEDIR_BITMAP_FINDER_INFO_BIT        = 0x20,
+  AFP_FILEDIR_BITMAP_LONG_NAME_BIT          = 0x40,
+  AFP_FILEDIR_BITMAP_SHORT_NAME_BIT         = 0x80,
+  AFP_FILEDIR_BITMAP_NODE_ID_BIT            = 0x100,
+  AFP_FILEDIR_BITMAP_UTF8_NAME_BIT          = 0x2000,
+  AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT         = 0x8000,
+};
+
 typedef enum
 {
   AFP_DIR_BITMAP_ATTRIBUTE_BIT          = 0x1,
@@ -196,16 +211,17 @@ typedef enum
 
 typedef enum
 {
-  AFP_COMMAND_GET_SRVR_INFO = 15,
-  AFP_COMMAND_GET_SRVR_PARMS = 16,
-  AFP_COMMAND_GET_VOL_PARMS = 17,
-  AFP_COMMAND_LOGIN = 18,
-  AFP_COMMAND_LOGIN_CONT = 19,
-  AFP_COMMAND_OPEN_VOL = 24,
-  AFP_COMMAND_WRITE = 33,
-  AFP_COMMAND_WRITE_EXT = 61,
-  AFP_COMMAND_ENUMERATE_EXT = 66,
-  AFP_COMMAND_ENUMERATE_EXT2 = 68
+  AFP_COMMAND_GET_SRVR_INFO      = 15,
+  AFP_COMMAND_GET_SRVR_PARMS     = 16,
+  AFP_COMMAND_GET_VOL_PARMS      = 17,
+  AFP_COMMAND_LOGIN              = 18,
+  AFP_COMMAND_LOGIN_CONT         = 19,
+  AFP_COMMAND_OPEN_VOL           = 24,
+  AFP_COMMAND_WRITE              = 33,
+  AFP_COMMAND_GET_FILE_DIR_PARMS = 34,
+  AFP_COMMAND_WRITE_EXT          = 61,
+  AFP_COMMAND_ENUMERATE_EXT      = 66,
+  AFP_COMMAND_ENUMERATE_EXT2     = 68
 } AfpCommandType;
 
 typedef enum
@@ -233,8 +249,7 @@ struct _GVfsAfpName
   gint ref_count;
 };
 
-GVfsAfpName* g_vfs_afp_name_new              (guint32 text_encoding, const gchar *str, gsize len);
-GVfsAfpName* g_vfs_afp_name_new_from_gstring (guint32 text_encoding, GString *string);
+GVfsAfpName* g_vfs_afp_name_new              (guint32 text_encoding, gchar *str, gsize len);
 
 void         g_vfs_afp_name_unref            (GVfsAfpName *afp_name);
 void         g_vfs_afp_name_ref              (GVfsAfpName *afp_name);

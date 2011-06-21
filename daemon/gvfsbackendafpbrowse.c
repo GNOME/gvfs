@@ -394,8 +394,8 @@ query_info_cb (GVfsBackendAfpBrowse *afp_backend,
   vol_data = find_volume (afp_backend, job->filename);
   if (!vol_data)
   {
-    g_vfs_job_failed (G_VFS_JOB (job),  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      _("File doesn't exist"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("File doesn't exist"));
     return;
   }
 

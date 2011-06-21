@@ -57,7 +57,7 @@ g_vfs_afp_name_get_string (GVfsAfpName *afp_name)
 }
 
 GVfsAfpName *
-g_vfs_afp_name_new (guint32 text_encoding, const gchar *str, gsize len)
+g_vfs_afp_name_new (guint32 text_encoding, gchar *str, gsize len)
 {
   GVfsAfpName *afp_name;
 
@@ -65,29 +65,10 @@ g_vfs_afp_name_new (guint32 text_encoding, const gchar *str, gsize len)
   afp_name->ref_count = 1;
   
   afp_name->text_encoding = text_encoding;
-  
-  afp_name->str = g_malloc (len);
-  memcpy (afp_name->str, str, len);
-  
+
+  afp_name->str = str;
   afp_name->len = len;
 
-  return afp_name;
-}
-
-GVfsAfpName *
-g_vfs_afp_name_new_from_gstring (guint32 text_encoding, GString *string)
-{
-  GVfsAfpName *afp_name;
-
-  afp_name = g_slice_new (GVfsAfpName);
-  afp_name->ref_count = 1;
-  
-  afp_name->text_encoding = text_encoding;
-  afp_name->str = string->str;
-  afp_name->len = string->len;
-
-  g_string_free (string, FALSE);
-  
   return afp_name;
 }
 
@@ -281,7 +262,7 @@ g_vfs_afp_reply_read_afp_name (GVfsAfpReply *reply, gboolean read_text_encoding,
       return FALSE;
   }
   else
-    text_encoding = kTextEncodingUnicodeDefault;
+    text_encoding = kTextEncodingMacRoman;
   
   if (!g_vfs_afp_reply_read_uint16 (reply, &len))
   {
@@ -296,7 +277,7 @@ g_vfs_afp_reply_read_afp_name (GVfsAfpReply *reply, gboolean read_text_encoding,
   }
 
   if (afp_name)
-    *afp_name = g_vfs_afp_name_new (text_encoding, str, len);
+    *afp_name = g_vfs_afp_name_new (text_encoding, g_strndup (str, len), len);
 
   return TRUE;
     
@@ -415,10 +396,8 @@ g_vfs_afp_command_put_pascal (GVfsAfpCommand *command, const char *str)
 void
 g_vfs_afp_command_put_afp_name (GVfsAfpCommand *command, GVfsAfpName *afp_name)
 {
-#if 0
   g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (command),
                                    afp_name->text_encoding, NULL, NULL);
-#endif
   
   g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (command),
                                    afp_name->len, NULL, NULL);
