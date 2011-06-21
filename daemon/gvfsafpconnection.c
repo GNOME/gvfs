@@ -550,6 +550,7 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
     /* Send back a tickle message */
     req_data = g_slice_new0 (RequestData);
     req_data->tickle = TRUE;
+    req_data->conn = afp_connection;
 
     g_queue_push_head (priv->request_queue, req_data);
     run_loop (afp_connection);
@@ -719,7 +720,9 @@ write_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   bytes_written = g_output_stream_write_finish (output, res, &err);
   if (bytes_written == -1)
   {
-    request_data->reply_cb (request_data->conn, NULL, err, request_data->user_data);
+    if (request_data->reply_cb)
+      request_data->reply_cb (request_data->conn, NULL, err, request_data->user_data);
+    
     free_request_data (request_data);
     g_error_free (err);
   }
