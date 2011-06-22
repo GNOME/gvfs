@@ -58,7 +58,8 @@ struct _GVfsBackendAfp
 
   GVfsAfpServer      *server;
 
-  guint16 volume_id;
+  gint32              time_diff;
+  guint16             volume_id;
 };
 
 
@@ -110,6 +111,12 @@ create_filedir_bitmap (GFileAttributeMatcher *matcher)
 
   bitmap = AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT | AFP_FILEDIR_BITMAP_UTF8_NAME_BIT;
 
+  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_CREATED))
+    bitmap |= AFP_FILEDIR_BITMAP_CREATE_DATE_BIT;
+  
+  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_MODIFIED))
+    bitmap |= AFP_FILEDIR_BITMAP_MOD_DATE_BIT;
+  
   return bitmap;
 }
 static guint16
@@ -132,7 +139,8 @@ create_dir_bitmap (GFileAttributeMatcher *matcher)
   return dir_bitmap;
 }
 
-static void fill_info (GFileInfo *info, GVfsAfpReply *reply,
+static void fill_info (GVfsBackendAfp *afp_backend,
+                       GFileInfo *info, GVfsAfpReply *reply,
                        gboolean directory, guint16 bitmap)
 {
   gint start_pos;
@@ -164,6 +172,24 @@ static void fill_info (GFileInfo *info, GVfsAfpReply *reply,
       g_file_info_set_is_hidden (info, TRUE);
     else
       g_file_info_set_is_hidden (info, FALSE);
+  }
+
+  if (bitmap & AFP_FILEDIR_BITMAP_CREATE_DATE_BIT)
+  {
+    gint32 create_date;
+
+    g_vfs_afp_reply_read_int32 (reply, &create_date);
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
+                                      create_date + afp_backend->time_diff);
+  }
+
+  if (bitmap & AFP_FILEDIR_BITMAP_MOD_DATE_BIT)
+  {
+    gint32 mod_date;
+
+    g_vfs_afp_reply_read_int32 (reply, &mod_date);
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                      mod_date + afp_backend->time_diff);
   }
   
   if (bitmap & AFP_FILEDIR_BITMAP_UTF8_NAME_BIT)
@@ -202,6 +228,7 @@ enumerate_ext2_cb (GVfsAfpConnection *afp_connection,
                    gpointer           user_data)
 {
   GVfsJobEnumerate *job = G_VFS_JOB_ENUMERATE (user_data);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
 
   AfpResultCode res_code;
   guint16 file_bitmap;
@@ -255,7 +282,7 @@ enumerate_ext2_cb (GVfsAfpConnection *afp_connection,
     bitmap =  directory ? dir_bitmap : file_bitmap;
     
     info = g_file_info_new ();
-    fill_info (info, reply, directory, bitmap);
+    fill_info (afp_backend, info, reply, directory, bitmap);
     g_vfs_job_enumerate_add_info (job, info);
     g_object_unref (info);
 
@@ -360,6 +387,7 @@ get_filedir_parms_cb (GVfsAfpConnection *afp_connection,
                       gpointer           user_data)
 {
   GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
 
   AfpResultCode res_code;
   guint16 file_bitmap, dir_bitmap, bitmap;
@@ -399,7 +427,7 @@ get_filedir_parms_cb (GVfsAfpConnection *afp_connection,
   directory = (FileDir & 0x80); 
   bitmap =  directory ? dir_bitmap : file_bitmap;
 
-  fill_info (job->file_info, reply, directory, bitmap);
+  fill_info (afp_backend, job->file_info, reply, directory, bitmap);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
@@ -415,7 +443,7 @@ get_vol_parms_cb (GVfsAfpConnection *afp_connection,
 
   AfpResultCode res_code;
   GFileInfo *info;
-  guint32 create_date, mod_date;
+  guint16 vol_bitmap;
   
   if (!reply)
   {
@@ -433,17 +461,25 @@ get_vol_parms_cb (GVfsAfpConnection *afp_connection,
 
   info = job->file_info;
 
-  g_file_info_set_name (info, afp_backend->volume);
+  g_vfs_afp_reply_read_uint16 (reply, &vol_bitmap);
   
-  /* CreateDate is in apple time e.g. seconds since Januari 1 1904 */
-  g_vfs_afp_reply_read_uint32 (reply, &create_date);
-  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
-                                    create_date - 2082844800);
+  if (vol_bitmap & AFP_VOLUME_BITMAP_CREATE_DATE_BIT)
+  {
+    gint32 create_date;
 
-  /* ModDate is in apple time e.g. seconds since Januari 1 1904 */
-  g_vfs_afp_reply_read_uint32 (reply, &mod_date);
-  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
-                                    mod_date - 2082844800);
+    g_vfs_afp_reply_read_int32 (reply, &create_date);
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
+                                      create_date + afp_backend->time_diff);
+  }
+
+  if (vol_bitmap & AFP_VOLUME_BITMAP_MOD_DATE_BIT)
+  {
+    gint32 mod_date;
+
+    g_vfs_afp_reply_read_int32 (reply, &mod_date);
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
+                                      mod_date + afp_backend->time_diff);
+  }
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
@@ -458,11 +494,10 @@ try_query_info (GVfsBackend *backend,
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
 
-  g_debug ("filename: %s\n", filename);
-  
   if (is_root (filename))
   {
     GIcon *icon;
+    guint16 vol_bitmap = 0;
 
     g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
     g_file_info_set_name (info, "/");
@@ -472,11 +507,16 @@ try_query_info (GVfsBackend *backend,
     if (icon != NULL)
       g_file_info_set_icon (info, icon);
 
-    if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_CREATED) ||
-        g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_MODIFIED))
+    if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_CREATED))
+        vol_bitmap |= AFP_VOLUME_BITMAP_CREATE_DATE_BIT;
+
+    if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_MODIFIED))
+      vol_bitmap |= AFP_VOLUME_BITMAP_MOD_DATE_BIT;
+
+
+    if (vol_bitmap != 0)
     {
       GVfsAfpCommand *comm;
-      AfpVolumeBitmap bitmap;
       
       comm = g_vfs_afp_command_new (AFP_COMMAND_GET_VOL_PARMS);
       /* pad byte */
@@ -485,8 +525,7 @@ try_query_info (GVfsBackend *backend,
       g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),
                                        afp_backend->volume_id, NULL, NULL);
 
-      bitmap = AFP_VOLUME_BITMAP_CREATE_DATE_BIT | AFP_VOLUME_BITMAP_MOD_DATE_BIT;
-      g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), bitmap, NULL, NULL);
+      g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), vol_bitmap, NULL, NULL);
 
       g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
                                           get_vol_parms_cb, G_VFS_JOB (job)->cancellable,
@@ -502,7 +541,7 @@ try_query_info (GVfsBackend *backend,
     GVfsAfpCommand *comm;
 
     guint16 file_bitmap, dir_bitmap;
-    GVfsAfpName *Pathname;
+    GVfsAfpName *pathname;
     
     comm = g_vfs_afp_command_new (AFP_COMMAND_GET_FILE_DIR_PARMS);
     /* pad byte */
@@ -524,9 +563,9 @@ try_query_info (GVfsBackend *backend,
     g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), AFP_PATH_TYPE_UTF8_NAME,
                                    NULL, NULL);
 
-    Pathname = filename_to_afp_pathname (filename);
-    g_vfs_afp_command_put_afp_name (comm, Pathname);
-    g_vfs_afp_name_unref (Pathname);
+    pathname = filename_to_afp_pathname (filename);
+    g_vfs_afp_command_put_afp_name (comm, pathname);
+    g_vfs_afp_name_unref (pathname);
 
     g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
                                         get_filedir_parms_cb,
@@ -553,6 +592,7 @@ do_mount (GVfsBackend *backend,
   
   GVfsAfpReply *reply;
   AfpResultCode res_code;
+  gint32 server_time;
   
   GMountSpec *afp_mount_spec;
   char       *server_name;
@@ -565,6 +605,38 @@ do_mount (GVfsBackend *backend,
   if (!res)
     goto error;
 
+  /* Get Server Parameters */
+  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
+  /* pad byte */
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+
+  res = g_vfs_afp_connection_send_command_sync (afp_backend->server->conn,
+                                                comm, G_VFS_JOB (job)->cancellable,
+                                                &err);
+  g_object_unref (comm);
+  if (!res)
+    goto error;
+
+  reply = g_vfs_afp_connection_read_reply_sync (afp_backend->server->conn,
+                                                G_VFS_JOB (job)->cancellable, &err);
+  if (!reply)
+    goto error;
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_object_unref (reply);
+    goto error;
+  }
+
+  /* server time */
+  g_vfs_afp_reply_read_int32 (reply, &server_time);
+  afp_backend->time_diff = (g_get_real_time () / G_USEC_PER_SEC) - server_time;
+
+  g_object_unref (reply);
+
+
+  /* Open Volume */
   comm = g_vfs_afp_command_new (AFP_COMMAND_OPEN_VOL);
   /* pad byte */
   g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
