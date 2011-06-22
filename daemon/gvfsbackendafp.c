@@ -170,8 +170,6 @@ static void fill_info (GVfsBackendAfp *afp_backend,
     
     if (attributes & AFP_FILEDIR_ATTRIBUTES_BITMAP_INVISIBLE_BIT)
       g_file_info_set_is_hidden (info, TRUE);
-    else
-      g_file_info_set_is_hidden (info, FALSE);
   }
 
   if (bitmap & AFP_FILEDIR_BITMAP_CREATE_DATE_BIT)
@@ -211,6 +209,11 @@ static void fill_info (GVfsBackendAfp *afp_backend,
     g_file_info_set_name (info, utf8_name);
     g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
                                       utf8_name);
+
+    /* Set file as hidden if it begins with a dot */
+    if (utf8_name[0] == '.')
+      g_file_info_set_is_hidden (info, TRUE);
+    
     g_free (utf8_name);
 
     g_vfs_afp_reply_seek (reply, old_pos, G_SEEK_SET);
