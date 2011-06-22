@@ -487,7 +487,8 @@ typedef enum
   DSI_GET_STATUS    = 3,
   DSI_OPEN_SESSION  = 4,
   DSI_TICKLE        = 5,
-  DSI_WRITE         = 6
+  DSI_WRITE         = 6,
+  DSI_ATTENTION     = 8
 } DsiCommand;
 
 static void read_reply (GVfsAfpConnection *afp_connection);
@@ -543,10 +544,11 @@ static void
 dispatch_reply (GVfsAfpConnection *afp_connection)
 {
   GVfsAfpConnectionPrivate *priv = afp_connection->priv;
-
+  DSIHeader *dsi_header = &priv->read_dsi_header;
+  
   RequestData *req_data;
 
-  if (priv->read_dsi_header.command == DSI_TICKLE)
+  if (dsi_header->command == DSI_TICKLE)
   {
     RequestData *req_data;
 
@@ -558,8 +560,41 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
     g_queue_push_head (priv->request_queue, req_data);
     run_loop (afp_connection);
   }
+
+  else if (dsi_header->command == DSI_ATTENTION)
+  {
+    enum
+    {
+      AFP_ATTENTION_CODE_MESSAGE_AVAILABLE     = 0x2,
+      AFP_ATTENTION_CODE_IMMEDIATE_SHUTDOWN    = 0x4,
+      AFP_ATTENTION_CODE_SHUTDOWN_NO_MESSAGE   = 0x8,
+      AFP_ATTENTION_CODE_DISCONNECT_NO_MESSAGE = 0x9,
+      AFP_ATTENTION_CODE_SHUTDOWN_MESSAGE      = 0xA,
+      AFP_ATTENTION_CODE_DISCONNECT_MESSAGE    = 0xB
+    };
+
+    enum
+    {
+      AFP_ATTENTION_MASK_DONT_RECONNECT_BIT = 0x1,
+      AFP_ATTENTION_MASK_SERVER_MESSAGE_BIT = 0x2,
+      AFP_ATTENTION_MASK_SERVER_CRASH_BIT   = 0x4,
+      AFP_ATTENTION_MASK_SHUTDOWN_BIT       = 0x8
+    };
+    
+    guint8 attention_code;
+
+    attention_code = priv->data[0] >> 4;
+
+    if (attention_code & AFP_ATTENTION_MASK_SERVER_CRASH_BIT)
+      g_debug ("Server Crash!!!\n");
+
+    else if (attention_code & AFP_ATTENTION_MASK_SHUTDOWN_BIT)
+      g_debug ("Server is shutting down!\n");
+    
+    g_free (priv->data);
+  }
   
-  else if (priv->read_dsi_header.command == DSI_COMMAND)
+  else if (dsi_header->command == DSI_COMMAND)
   {
     req_data = g_hash_table_lookup (priv->request_hash,
                                     GUINT_TO_POINTER (priv->read_dsi_header.requestID));
@@ -728,6 +763,7 @@ write_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     
     free_request_data (request_data);
     g_error_free (err);
+    return;
   }
 
   priv->bytes_written += bytes_written;
@@ -739,15 +775,15 @@ write_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     return;
   }
 
-  if (request_data->tickle)
+  if (!request_data->command)
   {
     free_request_data (request_data);
     return;
   }
-  
+
   data = g_vfs_afp_command_get_data (request_data->command);
   size = g_vfs_afp_command_get_size (request_data->command);
-  
+
   priv->bytes_written = 0;
   g_output_stream_write_async (output, data, size, 0,
                                NULL, write_command_cb, request_data);
