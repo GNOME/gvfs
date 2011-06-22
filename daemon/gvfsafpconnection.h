@@ -72,9 +72,9 @@ enum
   AFP_DIR_BITMAP_LONG_NAME_BIT          = 0x40,
   AFP_DIR_BITMAP_SHORT_NAME_BIT         = 0x80,
   AFP_DIR_BITMAP_NODE_ID_BIT            = 0x100,
-  AFP_DIR_BITMAP_OFFSPRING_COUNT_BIT    = 0x0200,
-  AFP_DIR_BITMAP_OWNER_ID_BIT           = 0x0400,
-  AFP_DIR_BITMAP_GROUP_ID_BIT           = 0x0800,
+  AFP_DIR_BITMAP_OFFSPRING_COUNT_BIT    = 0x200,
+  AFP_DIR_BITMAP_OWNER_ID_BIT           = 0x400,
+  AFP_DIR_BITMAP_GROUP_ID_BIT           = 0x800,
   AFP_DIR_BITMAP_ACCESS_RIGHTS_BIT      = 0x1000,
   AFP_DIR_BITMAP_UTF8_NAME_BIT          = 0x2000,
   AFP_DIR_BITMAP_UNIX_PRIVS_BIT         = 0x8000,
@@ -92,9 +92,9 @@ enum
   AFP_FILE_BITMAP_LONG_NAME_BIT          = 0x40,
   AFP_FILE_BITMAP_SHORT_NAME_BIT         = 0x80,
   AFP_FILE_BITMAP_NODE_ID_BIT            = 0x100,
-  AFP_FILE_BITMAP_DATA_FORK_LEN_BIT      = 0x0200,
-  AFP_FILE_BITMAP_RSRC_FORK_LEN_BIT      = 0x0400,
-  AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT  = 0x0800,
+  AFP_FILE_BITMAP_DATA_FORK_LEN_BIT      = 0x200,
+  AFP_FILE_BITMAP_RSRC_FORK_LEN_BIT      = 0x400,
+  AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT  = 0x800,
   AFP_FILE_BITMAP_LAUNCH_LIMIT_BIT       = 0x1000,
   AFP_FILE_BITMAP_UTF8_NAME_BIT          = 0x2000,
   AFP_FILE_BITMAP_EXT_RSRC_FORK_LEN_BIT  = 0x4000,
@@ -179,9 +179,11 @@ typedef struct _GVfsAfpReply      GVfsAfpReply;
 
 gboolean        g_vfs_afp_reply_read_byte         (GVfsAfpReply *reply, guint8 *byte);
 
+gboolean        g_vfs_afp_reply_read_int64        (GVfsAfpReply *reply, gint64 *val);
 gboolean        g_vfs_afp_reply_read_int32        (GVfsAfpReply *reply, gint32 *val);
 gboolean        g_vfs_afp_reply_read_int16        (GVfsAfpReply *reply, gint16 *val);
 
+gboolean        g_vfs_afp_reply_read_uint64       (GVfsAfpReply *reply, guint64 *val);
 gboolean        g_vfs_afp_reply_read_uint32       (GVfsAfpReply *reply, guint32 *val);
 gboolean        g_vfs_afp_reply_read_uint16       (GVfsAfpReply *reply, guint16 *val);
 

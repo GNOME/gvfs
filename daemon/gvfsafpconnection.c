@@ -136,6 +136,20 @@ g_vfs_afp_reply_read_byte (GVfsAfpReply *reply, guint8 *byte)
 }
 
 gboolean
+g_vfs_afp_reply_read_int64 (GVfsAfpReply *reply, gint64 *val)
+{
+  if ((reply->len - reply->pos) < 8)
+    return FALSE;
+
+  if (val)
+    *val = GINT64_FROM_BE (*((gint64 *)(reply->data + reply->pos)));
+
+  reply->pos += 8;
+  
+  return TRUE;
+}
+
+gboolean
 g_vfs_afp_reply_read_int32 (GVfsAfpReply *reply, gint32 *val)
 {
   if ((reply->len - reply->pos) < 4)
@@ -159,6 +173,20 @@ g_vfs_afp_reply_read_int16 (GVfsAfpReply *reply, gint16 *val)
     *val = GINT16_FROM_BE (*((gint16 *)(reply->data + reply->pos)));
 
   reply->pos += 2;
+  
+  return TRUE;
+}
+
+gboolean
+g_vfs_afp_reply_read_uint64 (GVfsAfpReply *reply, guint64 *val)
+{
+  if ((reply->len - reply->pos) < 8)
+    return FALSE;
+
+  if (val)
+    *val = GUINT64_FROM_BE (*((guint64 *)(reply->data + reply->pos)));
+
+  reply->pos += 8;
   
   return TRUE;
 }
