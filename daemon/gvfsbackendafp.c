@@ -125,6 +125,9 @@ create_file_bitmap (GFileAttributeMatcher *matcher)
   guint16 file_bitmap;
   
   file_bitmap = create_filedir_bitmap (matcher);
+
+  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STANDARD_SIZE))
+    file_bitmap |= AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT;
   
   return file_bitmap;
 }
@@ -188,6 +191,19 @@ static void fill_info (GVfsBackendAfp *afp_backend,
     g_vfs_afp_reply_read_int32 (reply, &mod_date);
     g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
                                       mod_date + afp_backend->time_diff);
+  }
+
+  /* File specific attributes */
+  if (!directory)
+  {
+    if (bitmap & AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT)
+    {
+      guint64 fork_len;
+
+      g_vfs_afp_reply_read_uint64 (reply, &fork_len);
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE,
+                                        fork_len);
+    }
   }
   
   if (bitmap & AFP_FILEDIR_BITMAP_UTF8_NAME_BIT)
