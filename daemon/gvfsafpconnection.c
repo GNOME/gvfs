@@ -262,7 +262,7 @@ g_vfs_afp_reply_read_afp_name (GVfsAfpReply *reply, gboolean read_text_encoding,
       return FALSE;
   }
   else
-    text_encoding = kTextEncodingMacRoman;
+    text_encoding = 0;
   
   if (!g_vfs_afp_reply_read_uint16 (reply, &len))
   {

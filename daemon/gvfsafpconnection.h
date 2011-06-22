@@ -27,110 +27,6 @@
 
 G_BEGIN_DECLS
 
-enum {
-  kTextEncodingMacRoman = 0,
-  kTextEncodingMacJapanese = 1,
-  kTextEncodingMacChineseTrad = 2,
-  kTextEncodingMacKorean = 3,
-  kTextEncodingMacArabic = 4,
-  kTextEncodingMacHebrew = 5,
-  kTextEncodingMacGreek = 6,
-  kTextEncodingMacCyrillic = 7,
-  kTextEncodingMacDevanagari = 9,
-  kTextEncodingMacGurmukhi = 10,
-  kTextEncodingMacGujarati = 11,
-  kTextEncodingMacOriya = 12,
-  kTextEncodingMacBengali = 13,
-  kTextEncodingMacTamil = 14,
-  kTextEncodingMacTelugu = 15,
-  kTextEncodingMacKannada = 16,
-  kTextEncodingMacMalayalam = 17,
-  kTextEncodingMacSinhalese = 18,
-  kTextEncodingMacBurmese = 19,
-  kTextEncodingMacKhmer = 20,
-  kTextEncodingMacThai = 21,
-  kTextEncodingMacLaotian = 22,
-  kTextEncodingMacGeorgian = 23,
-  kTextEncodingMacArmenian = 24,
-  kTextEncodingMacChineseSimp = 25,
-  kTextEncodingMacTibetan = 26,
-  kTextEncodingMacMongolian = 27,
-  kTextEncodingMacEthiopic = 28,
-  kTextEncodingMacCentralEurRoman = 29,
-  kTextEncodingMacVietnamese = 30,
-  kTextEncodingMacExtArabic = 31,
-  kTextEncodingMacSymbol = 33,
-  kTextEncodingMacDingbats = 34,
-  kTextEncodingMacTurkish = 35,
-  kTextEncodingMacCroatian = 36,
-  kTextEncodingMacIcelandic = 37,
-  kTextEncodingMacRomanian = 38,
-  kTextEncodingMacCeltic = 39,
-  kTextEncodingMacGaelic = 40,
-  kTextEncodingMacKeyboardGlyphs = 41,
-  kTextEncodingMacUnicode = 126,
-  kTextEncodingMacFarsi = 140,
-  kTextEncodingMacUkrainian = 152,
-  kTextEncodingMacInuit = 236,
-  kTextEncodingMacVT100 = 252,
-  kTextEncodingMacHFS = 255,
-  kTextEncodingUnicodeDefault = 256,
-  kTextEncodingUnicodeV1_1 = 257,
-  kTextEncodingISO10646_1993 = 257,
-  kTextEncodingUnicodeV2_0 = 259,
-  kTextEncodingUnicodeV2_1 = 259,
-  kTextEncodingUnicodeV3_0 = 260,
-  kTextEncodingISOLatin1 = 513,
-  kTextEncodingISOLatin2 = 514,
-  kTextEncodingISOLatin3 = 515,
-  kTextEncodingISOLatin4 = 516,
-  kTextEncodingISOLatinCyrillic = 517,
-  kTextEncodingISOLatinArabic = 518,
-  kTextEncodingISOLatinGreek = 519,
-  kTextEncodingISOLatinHebrew = 520,
-  kTextEncodingISOLatin5 = 521,
-  kTextEncodingISOLatin6 = 522,
-  kTextEncodingISOLatin7 = 525,
-  kTextEncodingISOLatin8 = 526,
-  kTextEncodingISOLatin9 = 527,
-  kTextEncodingDOSLatinUS = 1024,
-  kTextEncodingDOSGreek = 1029,
-  kTextEncodingDOSBalticRim = 1030,
-  kTextEncodingDOSLatin1 = 1040,
-  kTextEncodingDOSGreek1 = 1041,
-  kTextEncodingDOSLatin2 = 1042,
-  kTextEncodingDOSCyrillic = 1043,
-  kTextEncodingDOSTurkish = 1044,
-  kTextEncodingDOSPortuguese = 1045,
-  kTextEncodingDOSIcelandic = 1046,
-  kTextEncodingDOSHebrew = 1047,
-  kTextEncodingDOSCanadianFrench = 1048,
-  kTextEncodingDOSArabic = 1049,
-  kTextEncodingDOSNordic = 1050,
-  kTextEncodingDOSRussian = 1051,
-  kTextEncodingDOSGreek2 = 1052,
-  kTextEncodingDOSThai = 1053,
-  kTextEncodingDOSJapanese = 1056,
-  kTextEncodingDOSChineseSimplif = 1057,
-  kTextEncodingDOSKorean = 1058,
-  kTextEncodingDOSChineseTrad = 1059,
-  kTextEncodingWindowsLatin1 = 1280,
-  kTextEncodingWindowsANSI = 1280,
-  kTextEncodingWindowsLatin2 = 1281,
-  kTextEncodingWindowsCyrillic = 1282,
-  kTextEncodingWindowsGreek = 1283,
-  kTextEncodingWindowsLatin5 = 1284,
-  kTextEncodingWindowsHebrew = 1285,
-  kTextEncodingWindowsArabic = 1286,
-  kTextEncodingWindowsBalticRim = 1287,
-  kTextEncodingWindowsVietnamese = 1288,
-  kTextEncodingWindowsKoreanJohab = 1296,
-  kTextEncodingUS_ASCII = 1536,
-  kTextEncodingJIS_X0201_76 = 1568,
-  kTextEncodingJIS_X0208_83 = 1569,
-  kTextEncodingJIS_X0208_90 = 1570
-};
-
 typedef enum
 {
   AFP_PATH_TYPE_SHORT_NAME = 1,
@@ -165,7 +61,7 @@ enum
   AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT         = 0x8000,
 };
 
-typedef enum
+enum
 {
   AFP_DIR_BITMAP_ATTRIBUTE_BIT          = 0x1,
   AFP_DIR_BITMAP_PARENT_DIR_ID_BIT      = 0x2,
@@ -183,9 +79,9 @@ typedef enum
   AFP_DIR_BITMAP_UTF8_NAME_BIT          = 0x2000,
   AFP_DIR_BITMAP_UNIX_PRIVS_BIT         = 0x8000,
   AFP_DIR_BITMAP_UUID_BIT               = 0x10000 // AFP version 3.2 and later (with ACL support)
-} AfpDirBitmap;
+};
 
-typedef enum
+enum
 {
   AFP_FILE_BITMAP_ATTRIBUTE_BIT          = 0x1,
   AFP_FILE_BITMAP_PARENT_DIR_ID_BIT      = 0x2,
@@ -203,9 +99,9 @@ typedef enum
   AFP_FILE_BITMAP_UTF8_NAME_BIT          = 0x2000,
   AFP_FILE_BITMAP_EXT_RSRC_FORK_LEN_BIT  = 0x4000,
   AFP_FILE_BITMAP_UNIX_PRIVS_BIT         = 0x8000
-} AfpFileBitmap;
+};
 
-typedef enum
+enum
 {
   AFP_VOLUME_BITMAP_ATTRIBUTE_BIT       = 0x1,
   AFP_VOLUME_BITMAP_SIGNATURE_BIT       = 0x2,
@@ -219,7 +115,7 @@ typedef enum
   AFP_VOLUME_BITMAP_EXT_BYTES_FREE_BIT  = 0x200,
   AFP_VOLUME_BITMAP_EXT_BYTES_TOTAL_BIT = 0x400,
   AFP_VOLUME_BITMAP_BLOCK_SIZE_BIT      = 0x800  
-} AfpVolumeBitmap;
+};
 
 typedef enum
 {

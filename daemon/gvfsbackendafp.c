@@ -591,7 +591,7 @@ do_mount (GVfsBackend *backend,
   GError *err = NULL;
 
   GVfsAfpCommand *comm;
-  AfpVolumeBitmap vol_bitmap;
+  guint16 vol_bitmap;
   
   GVfsAfpReply *reply;
   AfpResultCode res_code;
