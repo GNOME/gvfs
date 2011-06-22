@@ -229,6 +229,17 @@ static void fill_info (GVfsBackendAfp *afp_backend,
     /* Set file as hidden if it begins with a dot */
     if (utf8_name[0] == '.')
       g_file_info_set_is_hidden (info, TRUE);
+
+    if (!directory)
+    {
+      char *content_type;
+
+      content_type = g_content_type_guess (utf8_name, NULL, 0, NULL);
+      g_file_info_set_content_type (info, content_type);
+      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
+                                        content_type);
+      g_free (content_type);
+    }
     
     g_free (utf8_name);
 
