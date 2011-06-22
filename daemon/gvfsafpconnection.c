@@ -402,8 +402,11 @@ g_vfs_afp_command_put_afp_name (GVfsAfpCommand *command, GVfsAfpName *afp_name)
   g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (command),
                                    afp_name->len, NULL, NULL);
 
-  g_output_stream_write_all (G_OUTPUT_STREAM (command), afp_name->str,
-                             afp_name->len, NULL, NULL, NULL);
+  if (afp_name->len > 0)
+  {
+    g_output_stream_write_all (G_OUTPUT_STREAM (command), afp_name->str,
+                               afp_name->len, NULL, NULL, NULL);
+  }
 }
 
 void
