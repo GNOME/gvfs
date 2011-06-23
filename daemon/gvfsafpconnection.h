@@ -36,6 +36,14 @@ typedef enum
 
 enum
 {
+  AFP_ACCESS_MODE_READ_BIT       = (1 << 0),
+  AFP_ACCESS_MODE_WRITE_BIT      = (1 << 1),
+  AFP_ACCESS_MODE_DENY_READ_BIT  = (1 << 4),
+  AFP_ACCESS_MODE_DENY_WRITE_BIT = (1 << 5)
+};
+
+enum
+{
   AFP_FILEDIR_ATTRIBUTES_BITMAP_INVISIBLE_BIT      = 0x1,
   AFP_FILEDIR_ATTRIBUTES_BITMAP_SYSTEM_BIT         = 0x4,
   AFP_FILEDIR_ATTRIBUTES_BITMAP_WRITE_INHIBIT_BIT  = 0x20,
@@ -119,14 +127,17 @@ enum
 
 typedef enum
 {
+  AFP_COMMAND_CLOSE_FORK         = 4,
   AFP_COMMAND_GET_SRVR_INFO      = 15,
   AFP_COMMAND_GET_SRVR_PARMS     = 16,
   AFP_COMMAND_GET_VOL_PARMS      = 17,
   AFP_COMMAND_LOGIN              = 18,
   AFP_COMMAND_LOGIN_CONT         = 19,
   AFP_COMMAND_OPEN_VOL           = 24,
+  AFP_COMMAND_OPEN_FORK          = 26,
   AFP_COMMAND_WRITE              = 33,
   AFP_COMMAND_GET_FILE_DIR_PARMS = 34,
+  AFP_COMMAND_READ_EXT           = 60,
   AFP_COMMAND_WRITE_EXT          = 61,
   AFP_COMMAND_ENUMERATE_EXT      = 66,
   AFP_COMMAND_ENUMERATE_EXT2     = 68
@@ -134,13 +145,17 @@ typedef enum
 
 typedef enum
 {
-  AFP_RESULT_NO_ERROR         = 0,
-  AFP_RESULT_NO_MORE_SESSIONS = -1068,
-  AFP_RESULT_ACCESS_DENIED    = -5000, 
-  AFP_RESULT_AUTH_CONTINUE    = -5001,
-  AFP_RESULT_OBJECT_NOT_FOUND = -5018,
-  AFP_RESULT_PARAM_ERR        = -5019,
-  AFP_RESULT_USER_NOT_AUTH    = -5023
+  AFP_RESULT_NO_ERROR            = 0,
+  AFP_RESULT_NO_MORE_SESSIONS    = -1068,
+  AFP_RESULT_ACCESS_DENIED       = -5000, 
+  AFP_RESULT_AUTH_CONTINUE       = -5001,
+  AFP_RESULT_EOF_ERR             = -5009,
+  AFP_RESULT_LOCK_ERR            = -5013,
+  AFP_RESULT_OBJECT_NOT_FOUND    = -5018,
+  AFP_RESULT_PARAM_ERR           = -5019,
+  AFP_RESULT_USER_NOT_AUTH       = -5023,
+  AFP_RESULT_OBJECT_TYPE_ERR     = -5025,
+  AFP_RESULT_TOO_MANY_FILES_OPEN = -5026
 } AfpResultCode;
 
 /*
@@ -187,8 +202,8 @@ gboolean        g_vfs_afp_reply_read_uint64       (GVfsAfpReply *reply, guint64 
 gboolean        g_vfs_afp_reply_read_uint32       (GVfsAfpReply *reply, guint32 *val);
 gboolean        g_vfs_afp_reply_read_uint16       (GVfsAfpReply *reply, guint16 *val);
 
-gboolean        g_vfs_afp_reply_get_data          (GVfsAfpReply *reply, guint size, guint8 **data);
-gboolean        g_vfs_afp_reply_dup_data          (GVfsAfpReply *reply, guint size, guint8 **data);
+gboolean        g_vfs_afp_reply_get_data          (GVfsAfpReply *reply, gsize size, guint8 **data);
+gboolean        g_vfs_afp_reply_dup_data          (GVfsAfpReply *reply, gsize size, guint8 **data);
 
 gboolean        g_vfs_afp_reply_read_pascal       (GVfsAfpReply *reply, char **str);
 gboolean        g_vfs_afp_reply_read_afp_name     (GVfsAfpReply *reply, gboolean read_text_encoding, GVfsAfpName **afp_name);
@@ -197,7 +212,8 @@ gboolean        g_vfs_afp_reply_seek              (GVfsAfpReply *reply, gint off
 gboolean        g_vfs_afp_reply_skip_to_even      (GVfsAfpReply *reply);
 
 AfpResultCode   g_vfs_afp_reply_get_result_code   (GVfsAfpReply *reply);
-gint            g_vfs_afp_reply_get_pos           (GVfsAfpReply *reply);
+goffset         g_vfs_afp_reply_get_pos           (GVfsAfpReply *reply);
+gsize           g_vfs_afp_reply_get_size          (GVfsAfpReply *reply);
 
 GType           g_vfs_afp_reply_get_type         (void) G_GNUC_CONST;
 

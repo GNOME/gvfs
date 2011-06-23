@@ -34,6 +34,9 @@
 #include "gvfsjobmount.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsjobqueryinfo.h"
+#include "gvfsjobopenforread.h"
+#include "gvfsjobcloseread.h"
+#include "gvfsjobread.h"
 
 #include "gvfsafpserver.h"
 #include "gvfsafpconnection.h"
@@ -104,6 +107,293 @@ filename_to_afp_pathname (const char *filename)
   return g_vfs_afp_name_new (0x08000103, str, len);
 }
 
+typedef struct
+{
+  gint16 fork_refnum;
+  gint64 offset;
+} AfpHandle;
+
+static AfpHandle *
+afp_handle_new (gint16 fork_refnum)
+{
+  AfpHandle *afp_handle;
+
+  afp_handle = g_slice_new0 (AfpHandle);
+  afp_handle->fork_refnum = fork_refnum;
+
+  return afp_handle;
+}
+
+static void
+afp_handle_free (AfpHandle *afp_handle)
+{
+  g_slice_free (AfpHandle, afp_handle);
+}
+
+static void
+read_ext_cb (GVfsAfpConnection *afp_connection,
+             GVfsAfpReply      *reply,
+             GError            *error,
+             gpointer           user_data)
+{
+  GVfsJobRead *job = G_VFS_JOB_READ (user_data);
+  AfpHandle *afp_handle = (AfpHandle *)job->handle;
+
+  AfpResultCode res_code;
+  gsize size;
+  char *data;
+
+  if (!reply)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (!(res_code == AFP_RESULT_NO_ERROR || res_code == AFP_RESULT_EOF_ERR
+        || res_code == AFP_RESULT_LOCK_ERR))
+  {
+    g_object_unref (reply);
+
+    if (res_code == AFP_RESULT_ACCESS_DENIED)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                                _("File is not open for read access"));
+    }
+    else
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                                _("Got error from server"));
+    }
+    return;
+  }
+
+  size = g_vfs_afp_reply_get_size (reply);
+
+  /* TODO: Read directly into the data buffer */
+  g_vfs_afp_reply_get_data (reply, size, (guint8 **)&data);
+  memcpy (job->buffer, data, size);
+
+  afp_handle->offset += size;
+  g_vfs_job_read_set_size (job, size);
+
+  g_object_unref (reply);
+  
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static gboolean 
+try_read (GVfsBackend *backend,
+          GVfsJobRead *job,
+          GVfsBackendHandle handle,
+          char *buffer,
+          gsize bytes_requested)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  AfpHandle *afp_handle = (AfpHandle *)handle;
+  
+  GVfsAfpCommand *comm;
+  guint32 req_count;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_READ_EXT);
+  /* pad byte */
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+
+  /* OForkRefNum */
+  g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (comm),
+                                  afp_handle->fork_refnum, NULL, NULL);
+  /* Offset */
+  g_data_output_stream_put_int64 (G_DATA_OUTPUT_STREAM (comm),
+                                  afp_handle->offset, NULL, NULL);
+  /* ReqCount */
+  req_count = MIN (bytes_requested, G_MAXUINT32);
+  g_data_output_stream_put_int64 (G_DATA_OUTPUT_STREAM (comm),
+                                  req_count, NULL, NULL);
+
+  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+                                      read_ext_cb, G_VFS_JOB (job)->cancellable,
+                                      job);
+  g_object_unref (comm);
+
+  return TRUE;
+}
+
+static void
+close_fork_cb (GVfsAfpConnection *afp_connection,
+               GVfsAfpReply      *reply,
+               GError            *error,
+               gpointer           user_data)
+{
+  GVfsJobCloseRead *job = G_VFS_JOB_CLOSE_READ (user_data);
+  AfpHandle *afp_handle = (AfpHandle *)job->handle;
+
+  AfpResultCode res_code;
+  
+  if (!reply)
+  {
+    afp_handle_free (afp_handle);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Got error from server"));
+  }
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  afp_handle_free (afp_handle);
+}
+
+static gboolean
+try_close_read (GVfsBackend *backend,
+                GVfsJobCloseRead *job,
+                GVfsBackendHandle handle)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  AfpHandle *afp_handle = (AfpHandle *)handle;
+
+  GVfsAfpCommand *comm;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_CLOSE_FORK);
+  /* pad byte */
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+
+  g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (comm), afp_handle->fork_refnum,
+                                  NULL, NULL);
+
+  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+                                      close_fork_cb, G_VFS_JOB (job)->cancellable,
+                                      job);
+  g_object_unref (comm);
+
+  return TRUE;
+}
+
+static void
+open_for_read_cb (GVfsAfpConnection *afp_connection,
+                  GVfsAfpReply      *reply,
+                  GError            *error,
+                  gpointer           user_data)
+{
+  GVfsJobOpenForRead *job = G_VFS_JOB_OPEN_FOR_READ (user_data);
+
+  AfpResultCode res_code;
+  guint16 file_bitmap;
+  gint16 fork_refnum;
+  AfpHandle *afp_handle;
+  
+  if (!reply)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_object_unref (reply);
+    
+    if (res_code == AFP_RESULT_ACCESS_DENIED)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                _("Access denied"));
+    }
+    else if (res_code == AFP_RESULT_OBJECT_NOT_FOUND)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                _("File doesn't exist"));
+    }
+    else if (res_code == AFP_RESULT_OBJECT_TYPE_ERR)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+                                _("File is a directory"));
+    }
+    else if (res_code == AFP_RESULT_TOO_MANY_FILES_OPEN)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_TOO_MANY_OPEN_FILES,
+                                _("Too many files open"));
+    }
+    else
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                                _("Got error from server"));
+    }
+    return;
+  }
+
+  g_vfs_afp_reply_read_uint16 (reply, &file_bitmap);
+  g_vfs_afp_reply_read_int16  (reply, &fork_refnum);
+
+  g_object_unref (reply);
+  
+  afp_handle = afp_handle_new (fork_refnum);
+  g_vfs_job_open_for_read_set_handle (job, afp_handle);
+
+  g_vfs_job_open_for_read_set_can_seek (job, TRUE);
+  
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static gboolean
+try_open_for_read (GVfsBackend *backend,
+                   GVfsJobOpenForRead *job,
+                   const char *filename)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+
+  GVfsAfpCommand *comm;
+  guint16 access_mode;
+  GVfsAfpName *pathname;
+  
+  if (is_root (filename))
+  {
+    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                              G_IO_ERROR_NOT_REGULAR_FILE,
+                              _("File is a directory"));
+    return TRUE;
+  }
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_OPEN_FORK);
+  /* data fork */
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+
+  /* Volume ID */
+  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),
+                                   afp_backend->volume_id, NULL, NULL);
+  /* Directory ID */
+  g_data_output_stream_put_int32 (G_DATA_OUTPUT_STREAM (comm), 2, NULL, NULL);
+
+  /* Bitmap */
+  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  
+  /* AccessMode */
+  access_mode = AFP_ACCESS_MODE_READ_BIT;
+  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), access_mode,
+                                   NULL, NULL);
+
+  /* PathType */
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), AFP_PATH_TYPE_UTF8_NAME,
+                                 NULL, NULL);
+
+  pathname = filename_to_afp_pathname (filename);
+  g_vfs_afp_command_put_afp_name (comm, pathname);
+  g_vfs_afp_name_unref (pathname);
+
+  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+                                      open_for_read_cb,
+                                      G_VFS_JOB (job)->cancellable, job);
+  g_object_unref (comm);
+
+  return TRUE;
+}
+
+
 static guint16
 create_filedir_bitmap (GFileAttributeMatcher *matcher)
 {
@@ -146,7 +436,7 @@ static void fill_info (GVfsBackendAfp *afp_backend,
                        GFileInfo *info, GVfsAfpReply *reply,
                        gboolean directory, guint16 bitmap)
 {
-  gint start_pos;
+  goffset start_pos;
 
   if (directory)
   {
@@ -209,7 +499,7 @@ static void fill_info (GVfsBackendAfp *afp_backend,
   if (bitmap & AFP_FILEDIR_BITMAP_UTF8_NAME_BIT)
   {
     guint16 UTF8Name_offset;
-    gint old_pos;
+    goffset old_pos;
     GVfsAfpName *afp_name;
     char *utf8_name;
 
@@ -293,7 +583,7 @@ enumerate_ext2_cb (GVfsAfpConnection *afp_connection,
   g_vfs_afp_reply_read_int16 (reply, &count);
   for (i = 0; i < count; i++)
   {
-    gint start_pos;
+    goffset start_pos;
     guint16 struct_length;
     guint8 FileDir;
     
@@ -339,7 +629,7 @@ enumerate_ext2 (GVfsJobEnumerate *job,
   
   GVfsAfpCommand *comm;
   guint16 file_bitmap, dir_bitmap;
-  GVfsAfpName *Pathname;
+  GVfsAfpName *pathname;
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_ENUMERATE_EXT2);
   /* pad byte */
@@ -376,9 +666,9 @@ enumerate_ext2 (GVfsJobEnumerate *job,
   g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), AFP_PATH_TYPE_UTF8_NAME,
                                  NULL, NULL);
 
-  Pathname = filename_to_afp_pathname (filename);
-  g_vfs_afp_command_put_afp_name (comm, Pathname);
-  g_vfs_afp_name_unref (Pathname);
+  pathname = filename_to_afp_pathname (filename);
+  g_vfs_afp_command_put_afp_name (comm, pathname);
+  g_vfs_afp_name_unref (pathname);
 
   g_vfs_afp_connection_queue_command (conn, comm, enumerate_ext2_cb,
                                       G_VFS_JOB (job)->cancellable, job);
@@ -834,6 +1124,9 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
   backend_class->mount = do_mount;
   backend_class->try_query_info = try_query_info;
   backend_class->try_enumerate = try_enumerate;
+  backend_class->try_open_for_read = try_open_for_read;
+  backend_class->try_close_read = try_close_read;
+  backend_class->try_read = try_read;
 }
 
 void

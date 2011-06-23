@@ -87,9 +87,9 @@ struct _GVfsAfpReply
   AfpResultCode result_code;
 
   char *data;
-  guint len;
+  gsize len;
 
-  gint pos;
+  goffset pos;
 };
 
 G_DEFINE_TYPE (GVfsAfpReply, g_vfs_afp_reply, G_TYPE_OBJECT);
@@ -220,7 +220,7 @@ g_vfs_afp_reply_read_uint16 (GVfsAfpReply *reply, guint16 *val)
 }
 
 gboolean
-g_vfs_afp_reply_get_data (GVfsAfpReply *reply, guint size, guint8 **data)
+g_vfs_afp_reply_get_data (GVfsAfpReply *reply, gsize size, guint8 **data)
 {
   if ((reply->len - reply->pos) < size)
     return FALSE;
@@ -234,7 +234,7 @@ g_vfs_afp_reply_get_data (GVfsAfpReply *reply, guint size, guint8 **data)
 }
 
 gboolean
-g_vfs_afp_reply_dup_data (GVfsAfpReply *reply, guint size, guint8 **data)
+g_vfs_afp_reply_dup_data (GVfsAfpReply *reply, gsize size, guint8 **data)
 {
   if ((reply->len - reply->pos) < size)
     return FALSE;
@@ -355,10 +355,16 @@ g_vfs_afp_reply_skip_to_even (GVfsAfpReply *reply)
   return TRUE;
 }
 
-gint
+goffset
 g_vfs_afp_reply_get_pos (GVfsAfpReply *reply)
 {
   return reply->pos;
+}
+
+gsize
+g_vfs_afp_reply_get_size (GVfsAfpReply *reply)
+{
+  return reply->len;
 }
 
 AfpResultCode
