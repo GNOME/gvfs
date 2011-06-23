@@ -234,11 +234,17 @@ static void fill_info (GVfsBackendAfp *afp_backend,
     if (!directory)
     {
       char *content_type;
+      GIcon *icon;
 
       content_type = g_content_type_guess (utf8_name, NULL, 0, NULL);
       g_file_info_set_content_type (info, content_type);
       g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
                                         content_type);
+
+      icon = g_content_type_get_icon (content_type);
+      g_file_info_set_icon (info, icon);
+
+      g_object_unref (icon);
       g_free (content_type);
     }
     
