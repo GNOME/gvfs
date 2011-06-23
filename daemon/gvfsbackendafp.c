@@ -182,8 +182,20 @@ static void fill_info (GVfsBackendAfp *afp_backend,
                                       mod_date + afp_backend->time_diff);
   }
 
+  /* Directory specific attributes */
+  if (directory)
+  {
+    if (bitmap & AFP_DIR_BITMAP_OFFSPRING_COUNT_BIT)
+    {
+      guint32 offspring_count;
+
+      g_vfs_afp_reply_read_uint32 (reply, &offspring_count);
+      g_file_info_set_attribute_uint32 (info, "afp::children-count", offspring_count);
+    }
+  }
+  
   /* File specific attributes */
-  if (!directory)
+  else
   {
     if (bitmap & AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT)
     {
@@ -630,6 +642,9 @@ create_dir_bitmap (GFileAttributeMatcher *matcher)
   guint16 dir_bitmap;
   
   dir_bitmap = create_filedir_bitmap (matcher);
+
+  if (g_file_attribute_matcher_matches (matcher, "afp::children-count"))
+    dir_bitmap |= AFP_DIR_BITMAP_OFFSPRING_COUNT_BIT;
   
   return dir_bitmap;
 }
