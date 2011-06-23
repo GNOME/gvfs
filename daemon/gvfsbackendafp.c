@@ -37,6 +37,7 @@
 #include "gvfsjobopenforread.h"
 #include "gvfsjobcloseread.h"
 #include "gvfsjobread.h"
+#include "gvfsjobseekread.h"
 
 #include "gvfsafpserver.h"
 #include "gvfsafpconnection.h"
@@ -128,6 +129,207 @@ static void
 afp_handle_free (AfpHandle *afp_handle)
 {
   g_slice_free (AfpHandle, afp_handle);
+}
+
+static void fill_info (GVfsBackendAfp *afp_backend,
+                       GFileInfo *info, GVfsAfpReply *reply,
+                       gboolean directory, guint16 bitmap)
+{
+  goffset start_pos;
+
+  if (directory)
+  {
+    GIcon *icon;
+    
+    g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
+    g_file_info_set_content_type (info, "inode/directory");
+
+    icon = g_themed_icon_new ("folder");
+    g_file_info_set_icon (info, icon);
+    g_object_unref (icon);
+  }
+  else
+    g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
+
+  
+  start_pos = g_vfs_afp_reply_get_pos (reply);
+
+  if (bitmap & AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT)
+  {
+    guint16 attributes;
+
+    g_vfs_afp_reply_read_uint16 (reply, &attributes);
+    
+    if (attributes & AFP_FILEDIR_ATTRIBUTES_BITMAP_INVISIBLE_BIT)
+      g_file_info_set_is_hidden (info, TRUE);
+  }
+
+  if (bitmap & AFP_FILEDIR_BITMAP_CREATE_DATE_BIT)
+  {
+    gint32 create_date;
+
+    g_vfs_afp_reply_read_int32 (reply, &create_date);
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
+                                      create_date + afp_backend->time_diff);
+  }
+
+  if (bitmap & AFP_FILEDIR_BITMAP_MOD_DATE_BIT)
+  {
+    gint32 mod_date;
+
+    g_vfs_afp_reply_read_int32 (reply, &mod_date);
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                      mod_date + afp_backend->time_diff);
+  }
+
+  /* File specific attributes */
+  if (!directory)
+  {
+    if (bitmap & AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT)
+    {
+      guint64 fork_len;
+
+      g_vfs_afp_reply_read_uint64 (reply, &fork_len);
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE,
+                                        fork_len);
+    }
+  }
+  
+  if (bitmap & AFP_FILEDIR_BITMAP_UTF8_NAME_BIT)
+  {
+    guint16 UTF8Name_offset;
+    goffset old_pos;
+    GVfsAfpName *afp_name;
+    char *utf8_name;
+
+    g_vfs_afp_reply_read_uint16 (reply, &UTF8Name_offset);
+
+    old_pos = g_vfs_afp_reply_get_pos (reply);
+    g_vfs_afp_reply_seek (reply, start_pos + UTF8Name_offset, G_SEEK_SET);
+
+    g_vfs_afp_reply_read_afp_name (reply, TRUE, &afp_name);
+    utf8_name = g_vfs_afp_name_get_string (afp_name);    
+    g_vfs_afp_name_unref (afp_name);
+
+    g_file_info_set_name (info, utf8_name);
+    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
+                                      utf8_name);
+
+    /* Set file as hidden if it begins with a dot */
+    if (utf8_name[0] == '.')
+      g_file_info_set_is_hidden (info, TRUE);
+
+    if (!directory)
+    {
+      char *content_type;
+
+      content_type = g_content_type_guess (utf8_name, NULL, 0, NULL);
+      g_file_info_set_content_type (info, content_type);
+      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
+                                        content_type);
+      g_free (content_type);
+    }
+    
+    g_free (utf8_name);
+
+    g_vfs_afp_reply_seek (reply, old_pos, G_SEEK_SET);
+  }
+}
+
+static void
+seek_on_read_cb (GVfsAfpConnection *afp_connection,
+                 GVfsAfpReply      *reply,
+                 GError            *error,
+                 gpointer           user_data)
+{
+  GVfsJobSeekRead *job = G_VFS_JOB_SEEK_READ (user_data);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  AfpHandle *afp_handle = (AfpHandle *)job->handle;
+
+  AfpResultCode res_code;
+  guint16 file_bitmap;
+  GFileInfo *info;
+  gsize size;
+  
+  if (!reply)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_object_unref (reply);
+    
+    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                              G_IO_ERROR_FAILED, _("Got error from server"));
+    return;
+  }
+
+  g_vfs_afp_reply_read_uint16 (reply, &file_bitmap);
+
+  info = g_file_info_new ();
+  fill_info (afp_backend, info, reply, FALSE, file_bitmap);
+
+  size = g_file_info_get_size (info);
+  g_object_unref (info);
+
+  switch (job->seek_type)
+  {
+    case G_SEEK_CUR:
+      afp_handle->offset += job->requested_offset;
+      break;
+    case G_SEEK_SET:
+      afp_handle->offset = job->requested_offset;
+      break;
+    case G_SEEK_END:
+      afp_handle->offset = size + job->requested_offset;
+      break;
+  }
+
+  if (afp_handle->offset < 0)
+    afp_handle->offset = 0;
+  else if (afp_handle->offset > size)
+    afp_handle->offset = size;
+
+  g_vfs_job_seek_read_set_offset (job, afp_handle->offset);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+  
+static gboolean
+try_seek_on_read (GVfsBackend *backend,
+                  GVfsJobSeekRead *job,
+                  GVfsBackendHandle handle,
+                  goffset    offset,
+                  GSeekType  type)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  AfpHandle *afp_handle = (AfpHandle *)handle;
+
+  GVfsAfpCommand *comm;
+  guint16 file_bitmap;
+  
+  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_FORK_PARMS);
+  /* pad byte */
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+
+  /* OForkRefNum */
+  g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (comm), afp_handle->fork_refnum,
+                                  NULL, NULL);
+
+  /* Bitmap */
+  file_bitmap = AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT;
+  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), file_bitmap,
+                                   NULL, NULL);
+  
+  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+                                      seek_on_read_cb, G_VFS_JOB (job)->cancellable,
+                                      job);
+  g_object_unref (comm);
+
+  return TRUE;
 }
 
 static void
@@ -430,111 +632,6 @@ create_dir_bitmap (GFileAttributeMatcher *matcher)
   dir_bitmap = create_filedir_bitmap (matcher);
   
   return dir_bitmap;
-}
-
-static void fill_info (GVfsBackendAfp *afp_backend,
-                       GFileInfo *info, GVfsAfpReply *reply,
-                       gboolean directory, guint16 bitmap)
-{
-  goffset start_pos;
-
-  if (directory)
-  {
-    GIcon *icon;
-    
-    g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-    g_file_info_set_content_type (info, "inode/directory");
-
-    icon = g_themed_icon_new ("folder");
-    g_file_info_set_icon (info, icon);
-    g_object_unref (icon);
-  }
-  else
-    g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
-
-  
-  start_pos = g_vfs_afp_reply_get_pos (reply);
-
-  if (bitmap & AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT)
-  {
-    guint16 attributes;
-
-    g_vfs_afp_reply_read_uint16 (reply, &attributes);
-    
-    if (attributes & AFP_FILEDIR_ATTRIBUTES_BITMAP_INVISIBLE_BIT)
-      g_file_info_set_is_hidden (info, TRUE);
-  }
-
-  if (bitmap & AFP_FILEDIR_BITMAP_CREATE_DATE_BIT)
-  {
-    gint32 create_date;
-
-    g_vfs_afp_reply_read_int32 (reply, &create_date);
-    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
-                                      create_date + afp_backend->time_diff);
-  }
-
-  if (bitmap & AFP_FILEDIR_BITMAP_MOD_DATE_BIT)
-  {
-    gint32 mod_date;
-
-    g_vfs_afp_reply_read_int32 (reply, &mod_date);
-    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
-                                      mod_date + afp_backend->time_diff);
-  }
-
-  /* File specific attributes */
-  if (!directory)
-  {
-    if (bitmap & AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT)
-    {
-      guint64 fork_len;
-
-      g_vfs_afp_reply_read_uint64 (reply, &fork_len);
-      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE,
-                                        fork_len);
-    }
-  }
-  
-  if (bitmap & AFP_FILEDIR_BITMAP_UTF8_NAME_BIT)
-  {
-    guint16 UTF8Name_offset;
-    goffset old_pos;
-    GVfsAfpName *afp_name;
-    char *utf8_name;
-
-    g_vfs_afp_reply_read_uint16 (reply, &UTF8Name_offset);
-
-    old_pos = g_vfs_afp_reply_get_pos (reply);
-    g_vfs_afp_reply_seek (reply, start_pos + UTF8Name_offset, G_SEEK_SET);
-
-    g_vfs_afp_reply_read_afp_name (reply, TRUE, &afp_name);
-    utf8_name = g_vfs_afp_name_get_string (afp_name);    
-    g_vfs_afp_name_unref (afp_name);
-
-    g_file_info_set_name (info, utf8_name);
-    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
-                                      utf8_name);
-
-    /* Set file as hidden if it begins with a dot */
-    if (utf8_name[0] == '.')
-      g_file_info_set_is_hidden (info, TRUE);
-
-    if (!directory)
-    {
-      char *content_type;
-
-      content_type = g_content_type_guess (utf8_name, NULL, 0, NULL);
-      g_file_info_set_content_type (info, content_type);
-      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
-                                        content_type);
-      g_free (content_type);
-    }
-    
-    g_free (utf8_name);
-
-    g_vfs_afp_reply_seek (reply, old_pos, G_SEEK_SET);
-  }
 }
 
 static void
@@ -1127,6 +1224,7 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
   backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_close_read = try_close_read;
   backend_class->try_read = try_read;
+  backend_class->try_seek_on_read = try_seek_on_read;
 }
 
 void
