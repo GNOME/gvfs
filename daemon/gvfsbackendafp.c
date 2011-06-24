@@ -1167,19 +1167,19 @@ try_mount (GVfsBackend *backend,
            GMountSource *mount_source,
            gboolean is_automount)
 {
-	GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
-	
-	const char *host, *volume, *portstr, *user;
-	guint16 port = 548;
-	
-	host = g_mount_spec_get (mount_spec, "host");
-	if (host == NULL)
-		{
-			g_vfs_job_failed (G_VFS_JOB (job),
-			                  G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-			                  _("No hostname specified"));
-			return TRUE;
-    }
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+
+  const char *host, *volume, *portstr, *user;
+  guint16 port = 548;
+
+  host = g_mount_spec_get (mount_spec, "host");
+  if (host == NULL)
+  {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                      _("No hostname specified"));
+    return TRUE;
+  }
 
   volume = g_mount_spec_get (mount_spec, "volume");
   if (volume == NULL)
@@ -1190,19 +1190,19 @@ try_mount (GVfsBackend *backend,
     return TRUE;
   }
   afp_backend->volume = g_strdup (volume);
-  
-	portstr = g_mount_spec_get (mount_spec, "port");
-	if (portstr != NULL)
-		{
-			port = atoi (portstr);
-		}
 
-	afp_backend->addr = G_NETWORK_ADDRESS (g_network_address_new (host, port));
-	
-	user = g_mount_spec_get (mount_spec, "user");
-	afp_backend->user = g_strdup (user);
-	
-	return FALSE;
+  portstr = g_mount_spec_get (mount_spec, "port");
+  if (portstr != NULL)
+  {
+    port = atoi (portstr);
+  }
+
+  afp_backend->addr = G_NETWORK_ADDRESS (g_network_address_new (host, port));
+
+  user = g_mount_spec_get (mount_spec, "user");
+  afp_backend->user = g_strdup (user);
+
+  return FALSE;
 }
 
 static void
@@ -1233,12 +1233,12 @@ g_vfs_backend_afp_finalize (GObject *object)
 static void
 g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
 {
-	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-	GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
 
-	object_class->finalize = g_vfs_backend_afp_finalize;
+  object_class->finalize = g_vfs_backend_afp_finalize;
 
-	backend_class->try_mount = try_mount;
+  backend_class->try_mount = try_mount;
   backend_class->mount = do_mount;
   backend_class->try_query_info = try_query_info;
   backend_class->try_enumerate = try_enumerate;

@@ -1247,16 +1247,16 @@ g_vfs_afp_connection_finalize (GObject *object)
   if (priv->conn)
     g_object_unref (priv->conn);
 
-	G_OBJECT_CLASS (g_vfs_afp_connection_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_vfs_afp_connection_parent_class)->finalize (object);
 }
 
 static void
 g_vfs_afp_connection_class_init (GVfsAfpConnectionClass *klass)
 {
-	GObjectClass* object_class = G_OBJECT_CLASS (klass);
+  GObjectClass* object_class = G_OBJECT_CLASS (klass);
 
   g_type_class_add_private (klass, sizeof (GVfsAfpConnectionPrivate));
-  
-	object_class->finalize = g_vfs_afp_connection_finalize;
+
+  object_class->finalize = g_vfs_afp_connection_finalize;
 }
 

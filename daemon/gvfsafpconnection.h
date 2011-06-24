@@ -173,7 +173,9 @@ struct _GVfsAfpName
   gint ref_count;
 };
 
-GVfsAfpName* g_vfs_afp_name_new              (guint32 text_encoding, gchar *str, gsize len);
+GVfsAfpName* g_vfs_afp_name_new              (guint32 text_encoding,
+                                              gchar *str,
+                                              gsize len);
 
 void         g_vfs_afp_name_unref            (GVfsAfpName *afp_name);
 void         g_vfs_afp_name_ref              (GVfsAfpName *afp_name);
@@ -264,12 +266,12 @@ typedef struct _GVfsAfpConnectionPrivate GVfsAfpConnectionPrivate;
 
 struct _GVfsAfpConnectionClass
 {
-	GObjectClass parent_class;
+  GObjectClass parent_class;
 };
 
 struct _GVfsAfpConnection
 {
-	GObject parent_instance;
+  GObject parent_instance;
 
   GVfsAfpConnectionPrivate *priv;
 };

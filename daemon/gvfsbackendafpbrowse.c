@@ -49,10 +49,10 @@ struct _GVfsBackendAfpBrowseClass
 
 struct _GVfsBackendAfpBrowse
 {
-	GVfsBackend parent_instance;
+  GVfsBackend parent_instance;
 
-	GNetworkAddress    *addr;
-	char               *user;
+  GNetworkAddress    *addr;
+  char               *user;
 
   GMountTracker      *mount_tracker;
   GVfsAfpServer      *server;
@@ -496,32 +496,32 @@ try_mount (GVfsBackend *backend,
            GMountSource *mount_source,
            gboolean is_automount)
 {
-	GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (backend);
-	
-	const char *host, *portstr, *user;
-	guint16 port = 548;
-	
-	host = g_mount_spec_get (mount_spec, "host");
-	if (host == NULL)
-		{
-			g_vfs_job_failed (G_VFS_JOB (job),
-			                  G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-			                  _("No hostname specified"));
-			return TRUE;
-		}
+  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (backend);
 
-	portstr = g_mount_spec_get (mount_spec, "port");
-	if (portstr != NULL)
-		{
-			port = atoi (portstr);
-		}
+  const char *host, *portstr, *user;
+  guint16 port = 548;
 
-	afp_backend->addr = G_NETWORK_ADDRESS (g_network_address_new (host, port));
-	
-	user = g_mount_spec_get (mount_spec, "user");
-	afp_backend->user = g_strdup (user);
-	
-	return FALSE;
+  host = g_mount_spec_get (mount_spec, "host");
+  if (host == NULL)
+  {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                      _("No hostname specified"));
+    return TRUE;
+  }
+
+  portstr = g_mount_spec_get (mount_spec, "port");
+  if (portstr != NULL)
+  {
+    port = atoi (portstr);
+  }
+
+  afp_backend->addr = G_NETWORK_ADDRESS (g_network_address_new (host, port));
+
+  user = g_mount_spec_get (mount_spec, "user");
+  afp_backend->user = g_strdup (user);
+
+  return FALSE;
 }
 
 static void
@@ -550,19 +550,19 @@ g_vfs_backend_afp_browse_finalize (GObject *object)
   g_free (afp_backend->user);
 
   g_slist_free_full (afp_backend->volumes, (GDestroyNotify)volume_data_free);
-  
-	G_OBJECT_CLASS (g_vfs_backend_afp_browse_parent_class)->finalize (object);
+
+  G_OBJECT_CLASS (g_vfs_backend_afp_browse_parent_class)->finalize (object);
 }
 
 static void
 g_vfs_backend_afp_browse_class_init (GVfsBackendAfpBrowseClass *klass)
 {
-	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-	GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
 
-	object_class->finalize = g_vfs_backend_afp_browse_finalize;
+  object_class->finalize = g_vfs_backend_afp_browse_finalize;
 
-	backend_class->try_mount = try_mount;
+  backend_class->try_mount = try_mount;
   backend_class->mount = do_mount;
   backend_class->try_query_info = try_query_info;
   backend_class->try_enumerate = try_enumerate;
