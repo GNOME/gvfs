@@ -204,7 +204,7 @@ msgstr "Хібны dns-sd encoded_triple '%s'"
 #: ../common/gvfsicon.c:250
 #, c-format
 msgid "Can't handle version %d of GVfsIcon encoding"
-msgstr "Немагчыма абслужыць версію %d GVfsIcon-кадавання"
+msgstr "Не ўдалося апрацаваць версію %d GVfsIcon-кадавання"
 
 #: ../common/gvfsicon.c:260
 msgid "Malformed input data for GVfsIcon"
@@ -296,7 +296,7 @@ msgstr "Атрыманыя хібныя даныя Apple File Control"
 #: ../daemon/gvfsbackendafc.c:235
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
-msgstr "Неабслужаная памылка пратакола Apple File Control (%d)"
+msgstr "Неапрацаваная памылка пратакола Apple File Control (%d)"
 
 #: ../daemon/gvfsbackendafc.c:251
 msgid "Listing applications installed on device failed"
@@ -319,7 +319,7 @@ msgstr "Дазвол не дадзены"
 #: ../daemon/gvfsbackendafc.c:291
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
-msgstr "Неабслужаная памылка службы Lockdown (%d)"
+msgstr "Неапрацаваная памылка службы Lockdown (%d)"
 
 #: ../daemon/gvfsbackendafc.c:308
 msgid "libimobiledevice Error: Invalid Argument"
@@ -336,7 +336,7 @@ msgstr ""
 #: ../daemon/gvfsbackendafc.c:315
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
-msgstr "Неабслужаная памылка libimobiledevice (%d)"
+msgstr "Неапрацаваная памылка libimobiledevice (%d)"
 
 #: ../daemon/gvfsbackendafc.c:382
 msgid "Try again"
@@ -1359,17 +1359,17 @@ msgstr "Конты не абслугоўваюцца"
 
 #: ../daemon/gvfsftptask.c:360
 msgid "Host closed connection"
-msgstr "Машына закрыла злучэнне"
+msgstr "Машына зачыніла злучэнне"
 
 #: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
-"Не ўдалося адкрыць злучэнне для даных. Магчыма, гэтую аперацыю забараніў ваш "
+"Не ўдалося адчыніць злучэнне для даных. Магчыма, гэтую аперацыю забараніў ваш "
 "фаервол?"
 
 #: ../daemon/gvfsftptask.c:368
 msgid "Data connection closed"
-msgstr "Злучэнне для даных закрыта"
+msgstr "Злучэнне для даных зачынена"
 
 #: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
 msgid "Operation failed"
@@ -2270,7 +2270,7 @@ msgid ""
 "of the file."
 msgstr ""
 "Адчыняе файл(ы) з дапамогай прадвызначанай праграмы, зарэгістраванай для "
-"абслугоўвання файлаў адпаведнага тыпу."
+"апрацавання файлаў адпаведнага тыпу."
 
 #: ../programs/gvfs-rename.c:50
 msgid "- rename file"
@@ -2394,11 +2394,3 @@ msgstr ""
 msgid "- list contents of directories in a tree-like format"
 msgstr "- вывесці змест каталогаў у выглядзе дрэва"
 
-#~ msgid "Unhandled SBServices proxy error (%d)"
-#~ msgstr "Неабслужаная памылка SBServices proxy (%d)"
-
-#~ msgid "Service %d on Apple Mobile Device"
-#~ msgstr "Служба %d на мабільным прыстасаванні Apple"
-
-#~ msgid "Unhandled Inst proxy error (%d)"
-#~ msgstr "Неабслужаная памылка Inst proxy (%d)"
