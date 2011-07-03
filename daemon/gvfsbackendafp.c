@@ -39,6 +39,7 @@
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
 #include "gvfsjobopenforwrite.h"
+#include "gvfsjobdelete.h"
 
 #include "gvfsafpserver.h"
 #include "gvfsafpconnection.h"
@@ -253,6 +254,97 @@ static void fill_info (GVfsBackendAfp *afp_backend,
 
     g_vfs_afp_reply_seek (reply, old_pos, G_SEEK_SET);
   }
+}
+
+static void
+delete_cb (GVfsAfpConnection *afp_connection,
+           GVfsAfpReply      *reply,
+           GError            *error,
+           gpointer           user_data)
+{
+  GVfsJobDelete *job = G_VFS_JOB_DELETE (user_data);
+
+  AfpResultCode res_code;
+  
+  if (!reply)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_object_unref (reply);
+
+    if (res_code == AFP_RESULT_ACCESS_DENIED)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                _("Access denied"));
+    }
+    else if (res_code == AFP_RESULT_DIR_NOT_EMPTY)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
+                                _("Directory not empty"));
+    }
+    else if (res_code == AFP_RESULT_OBJECT_LOCKED)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                                _("Target object is marked as DeleteInhibit"));
+    }
+    else if (res_code == AFP_RESULT_OBJECT_NOT_FOUND)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                _("Target object doesn't exist"));
+    }
+    else if (res_code == AFP_RESULT_VOL_LOCKED)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                _("Volume is read-only"));
+    }
+    else
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Got error code: %d from server"), res_code);
+    }
+    return;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static gboolean 
+try_delete (GVfsBackend *backend,
+            GVfsJobDelete *job,
+            const char *filename)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+
+  GVfsAfpCommand *comm;
+  GVfsAfpName *pathname;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_DELETE);
+  /* pad byte */
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  /* Volume ID */
+  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),
+                                   afp_backend->volume_id, NULL, NULL);
+  /* Directory ID 2 == / */
+  g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (comm), 2, NULL, NULL);
+  /* PathType */
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), AFP_PATH_TYPE_UTF8_NAME,
+                                 NULL, NULL);
+
+  /* Pathname */
+  pathname = filename_to_afp_pathname (filename);
+  g_vfs_afp_command_put_afp_name (comm, pathname);
+  g_vfs_afp_name_unref (pathname);
+
+  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm, delete_cb,
+                                      G_VFS_JOB (job)->cancellable, job);
+  g_object_unref (comm);
+
+  return TRUE;
 }
 
 static void
@@ -1392,6 +1484,7 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
   backend_class->try_read = try_read;
   backend_class->try_seek_on_read = try_seek_on_read;
   backend_class->try_create = try_create;
+  backend_class->try_delete = try_delete;
 }
 
 void
