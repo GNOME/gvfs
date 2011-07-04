@@ -426,7 +426,6 @@ try_delete (GVfsBackend *backend,
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
 
   GVfsAfpCommand *comm;
-  GVfsAfpName *pathname;
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_DELETE);
   /* pad byte */
@@ -436,14 +435,9 @@ try_delete (GVfsBackend *backend,
                                    afp_backend->volume_id, NULL, NULL);
   /* Directory ID 2 == / */
   g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (comm), 2, NULL, NULL);
-  /* PathType */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), AFP_PATH_TYPE_UTF8_NAME,
-                                 NULL, NULL);
 
   /* Pathname */
-  pathname = filename_to_afp_pathname (filename);
-  g_vfs_afp_command_put_afp_name (comm, pathname);
-  g_vfs_afp_name_unref (pathname);
+  put_pathname (comm, filename);
 
   g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm, delete_cb,
                                       G_VFS_JOB (job)->cancellable, job);
@@ -769,7 +763,6 @@ open_fork (GVfsBackendAfp  *afp_backend,
            OpenForkCallback cb)
 {
   GVfsAfpCommand *comm;
-  GVfsAfpName *pathname;
 
   if (is_root (filename))
   {
@@ -796,13 +789,8 @@ open_fork (GVfsBackendAfp  *afp_backend,
   g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), access_mode,
                                    NULL, NULL);
 
-  /* PathType */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), AFP_PATH_TYPE_UTF8_NAME,
-                                 NULL, NULL);
-
-  pathname = filename_to_afp_pathname (filename);
-  g_vfs_afp_command_put_afp_name (comm, pathname);
-  g_vfs_afp_name_unref (pathname);
+  /* Pathname */
+  put_pathname (comm, filename);
 
   g_object_set_data (G_OBJECT (job), "OpenForkCallback", cb);
   
@@ -902,7 +890,6 @@ try_create (GVfsBackend *backend,
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
 
   GVfsAfpCommand *comm;
-  GVfsAfpName *pathname;
   
   comm = g_vfs_afp_command_new (AFP_COMMAND_CREATE_FILE);
   /* soft create */
@@ -913,13 +900,8 @@ try_create (GVfsBackend *backend,
   /* Directory ID 2 == / */
   g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (comm), 2, NULL, NULL);
 
-  /* PathType */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), AFP_PATH_TYPE_UTF8_NAME,
-                                 NULL, NULL);
-
-  pathname = filename_to_afp_pathname (filename);
-  g_vfs_afp_command_put_afp_name (comm, pathname);
-  g_vfs_afp_name_unref (pathname);
+  /* Pathname */
+  put_pathname (comm, filename);
 
   g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm, create_cb,
                                       G_VFS_JOB (job)->cancellable, job);
@@ -1089,7 +1071,6 @@ enumerate_ext2 (GVfsJobEnumerate *job,
   
   GVfsAfpCommand *comm;
   guint16 file_bitmap, dir_bitmap;
-  GVfsAfpName *pathname;
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_ENUMERATE_EXT2);
   /* pad byte */
@@ -1122,13 +1103,8 @@ enumerate_ext2 (GVfsJobEnumerate *job,
                                   ENUMERATE_MAX_REPLY_SIZE, NULL, NULL);
 
 
-  /* PathType */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), AFP_PATH_TYPE_UTF8_NAME,
-                                 NULL, NULL);
-
-  pathname = filename_to_afp_pathname (filename);
-  g_vfs_afp_command_put_afp_name (comm, pathname);
-  g_vfs_afp_name_unref (pathname);
+  /* Pathname */
+  put_pathname (comm, filename);
 
   g_vfs_afp_connection_queue_command (conn, comm, enumerate_ext2_cb,
                                       G_VFS_JOB (job)->cancellable, job);
@@ -1321,7 +1297,6 @@ try_query_info (GVfsBackend *backend,
     GVfsAfpCommand *comm;
 
     guint16 file_bitmap, dir_bitmap;
-    GVfsAfpName *pathname;
     
     comm = g_vfs_afp_command_new (AFP_COMMAND_GET_FILE_DIR_PARMS);
     /* pad byte */
@@ -1339,13 +1314,8 @@ try_query_info (GVfsBackend *backend,
     g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (comm), dir_bitmap,
                                     NULL, NULL);
 
-    /* PathType */
-    g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), AFP_PATH_TYPE_UTF8_NAME,
-                                   NULL, NULL);
-
-    pathname = filename_to_afp_pathname (filename);
-    g_vfs_afp_command_put_afp_name (comm, pathname);
-    g_vfs_afp_name_unref (pathname);
+    /* Pathname */
+    put_pathname (comm, filename);
 
     g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
                                         get_filedir_parms_cb,
