@@ -392,7 +392,7 @@ G_DEFINE_TYPE (GVfsAfpCommand, g_vfs_afp_command, G_TYPE_DATA_OUTPUT_STREAM);
 
 
 static void
-g_vfs_afp_command_init (GVfsAfpCommand *command)
+g_vfs_afp_command_init (GVfsAfpCommand *comm)
 {
 }
 
@@ -404,70 +404,109 @@ g_vfs_afp_command_class_init (GVfsAfpCommandClass *klass)
 GVfsAfpCommand *
 g_vfs_afp_command_new (AfpCommandType type)
 {
-  GVfsAfpCommand *command;
+  GVfsAfpCommand *comm;
 
-  command = g_object_new (G_VFS_TYPE_AFP_COMMAND,
-                          "base-stream", g_memory_output_stream_new (NULL, 0, g_realloc, g_free),
-                          NULL);
+  comm = g_object_new (G_VFS_TYPE_AFP_COMMAND,
+                       "base-stream", g_memory_output_stream_new (NULL, 0, g_realloc, g_free),
+                       NULL);
+  
+  comm->type = type;
+  g_vfs_afp_command_put_byte (comm, type);
 
-  command->type = type;
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (command), type, NULL, NULL);
-
-  return command;
+  return comm;
 }
 
 void
-g_vfs_afp_command_put_pascal (GVfsAfpCommand *command, const char *str)
+g_vfs_afp_command_put_byte (GVfsAfpCommand *comm, guint8 byte)
+{
+  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), byte, NULL, NULL);
+}
+
+void
+g_vfs_afp_command_put_int16 (GVfsAfpCommand *comm, gint16 val)
+{
+  g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (comm), val, NULL, NULL);
+}
+
+void
+g_vfs_afp_command_put_int32 (GVfsAfpCommand *comm, gint32 val)
+{
+  g_data_output_stream_put_int32 (G_DATA_OUTPUT_STREAM (comm), val, NULL, NULL);
+}
+
+void
+g_vfs_afp_command_put_int64 (GVfsAfpCommand *comm, gint64 val)
+{
+  g_data_output_stream_put_int64 (G_DATA_OUTPUT_STREAM (comm), val, NULL, NULL);
+}
+
+void
+g_vfs_afp_command_put_uint16 (GVfsAfpCommand *comm, guint16 val)
+{
+  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), val, NULL, NULL);
+}
+
+void
+g_vfs_afp_command_put_uint32 (GVfsAfpCommand *comm, guint32 val)
+{
+  g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (comm), val, NULL, NULL);
+}
+
+void
+g_vfs_afp_command_put_uint64 (GVfsAfpCommand *comm, guint64 val)
+{
+  g_data_output_stream_put_uint64 (G_DATA_OUTPUT_STREAM (comm), val, NULL, NULL);
+}
+
+void
+g_vfs_afp_command_put_pascal (GVfsAfpCommand *comm, const char *str)
 {
   size_t len;
 
   len = MIN (strlen (str), 256);
 
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (command), len, NULL, NULL);
-  g_output_stream_write (G_OUTPUT_STREAM (command), str, len, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, len);
+  g_output_stream_write (G_OUTPUT_STREAM (comm), str, len, NULL, NULL);
 }
 
 void
-g_vfs_afp_command_put_afp_name (GVfsAfpCommand *command, GVfsAfpName *afp_name)
+g_vfs_afp_command_put_afp_name (GVfsAfpCommand *comm, GVfsAfpName *afp_name)
 {
-  g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (command),
-                                   afp_name->text_encoding, NULL, NULL);
-  
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (command),
-                                   afp_name->len, NULL, NULL);
+  g_vfs_afp_command_put_uint32 (comm, afp_name->text_encoding);
+  g_vfs_afp_command_put_uint16 (comm, afp_name->len);
 
   if (afp_name->len > 0)
   {
-    g_output_stream_write_all (G_OUTPUT_STREAM (command), afp_name->str,
+    g_output_stream_write_all (G_OUTPUT_STREAM (comm), afp_name->str,
                                afp_name->len, NULL, NULL, NULL);
   }
 }
 
 void
-g_vfs_afp_command_pad_to_even (GVfsAfpCommand *command)
+g_vfs_afp_command_pad_to_even (GVfsAfpCommand *comm)
 { 
-  if (g_vfs_afp_command_get_size (command) % 2 == 1)
-    g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (command), 0, NULL, NULL);
+  if (g_vfs_afp_command_get_size (comm) % 2 == 1)
+    g_vfs_afp_command_put_byte (comm, 0);
 }
 
 gsize
-g_vfs_afp_command_get_size (GVfsAfpCommand *command)
+g_vfs_afp_command_get_size (GVfsAfpCommand *comm)
 {
   GMemoryOutputStream *mem_stream;
 
   mem_stream =
-    G_MEMORY_OUTPUT_STREAM (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (command)));
+    G_MEMORY_OUTPUT_STREAM (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (comm)));
 
   return g_memory_output_stream_get_data_size (mem_stream);
 }
 
 char *
-g_vfs_afp_command_get_data (GVfsAfpCommand *command)
+g_vfs_afp_command_get_data (GVfsAfpCommand *comm)
 {
   GMemoryOutputStream *mem_stream;
 
   mem_stream =
-    G_MEMORY_OUTPUT_STREAM (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (command)));
+    G_MEMORY_OUTPUT_STREAM (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (comm)));
 
   return g_memory_output_stream_get_data (mem_stream);
 }

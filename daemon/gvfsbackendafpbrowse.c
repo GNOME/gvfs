@@ -175,7 +175,7 @@ update_cache (GVfsBackendAfpBrowse *afp_backend, GCancellable *cancellable,
   
   comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
   /* pad byte */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, 0);
   
   g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
                                       get_srvr_parms_cb,

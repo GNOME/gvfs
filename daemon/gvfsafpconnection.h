@@ -247,13 +247,23 @@ typedef struct _GVfsAfpCommand GVfsAfpCommand;
 
 GVfsAfpCommand* g_vfs_afp_command_new          (AfpCommandType type);
 
-void            g_vfs_afp_command_put_pascal   (GVfsAfpCommand *command, const char *str);
-void            g_vfs_afp_command_put_afp_name (GVfsAfpCommand *command, GVfsAfpName *afp_name);
+void            g_vfs_afp_command_put_byte     (GVfsAfpCommand *comm, guint8 byte);
 
-void            g_vfs_afp_command_pad_to_even  (GVfsAfpCommand *command);
+void            g_vfs_afp_command_put_int16     (GVfsAfpCommand *comm, gint16 val);
+void            g_vfs_afp_command_put_int32     (GVfsAfpCommand *comm, gint32 val);
+void            g_vfs_afp_command_put_int64     (GVfsAfpCommand *comm, gint64 val);
 
-gsize           g_vfs_afp_command_get_size     (GVfsAfpCommand *command);
-char*           g_vfs_afp_command_get_data     (GVfsAfpCommand *command);
+void            g_vfs_afp_command_put_uint16    (GVfsAfpCommand *comm, guint16 val);
+void            g_vfs_afp_command_put_uint32    (GVfsAfpCommand *comm, guint32 val);
+void            g_vfs_afp_command_put_uint64    (GVfsAfpCommand *comm, guint64 val);
+
+void            g_vfs_afp_command_put_pascal   (GVfsAfpCommand *comm, const char *str);
+void            g_vfs_afp_command_put_afp_name (GVfsAfpCommand *comm, GVfsAfpName *afp_name);
+
+void            g_vfs_afp_command_pad_to_even  (GVfsAfpCommand *comm);
+
+gsize           g_vfs_afp_command_get_size     (GVfsAfpCommand *comm);
+char*           g_vfs_afp_command_get_data     (GVfsAfpCommand *comm);
 
 GType           g_vfs_afp_command_get_type (void) G_GNUC_CONST;
 

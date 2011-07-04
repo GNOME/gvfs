@@ -117,8 +117,7 @@ put_pathname (GVfsAfpCommand *comm, const char *filename)
   GVfsAfpName *pathname;
   
   /* PathType */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), AFP_PATH_TYPE_UTF8_NAME,
-                                 NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, AFP_PATH_TYPE_UTF8_NAME);
 
   /* Pathname */
   pathname = filename_to_afp_pathname (filename);
@@ -345,12 +344,11 @@ try_make_directory (GVfsBackend *backend,
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_CREATE_DIR);
   /* pad byte */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, 0);
   /* Volume ID */
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),
-                                   afp_backend->volume_id, NULL, NULL);
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
   /* Directory ID 2 == / */
-  g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (comm), 2, NULL, NULL);
+  g_vfs_afp_command_put_uint32 (comm, 2);
   /* Pathname */
   put_pathname (comm, filename);
 
@@ -429,12 +427,11 @@ try_delete (GVfsBackend *backend,
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_DELETE);
   /* pad byte */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, 0);
   /* Volume ID */
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),
-                                   afp_backend->volume_id, NULL, NULL);
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
   /* Directory ID 2 == / */
-  g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (comm), 2, NULL, NULL);
+  g_vfs_afp_command_put_uint32 (comm, 2);
 
   /* Pathname */
   put_pathname (comm, filename);
@@ -523,16 +520,14 @@ try_seek_on_read (GVfsBackend *backend,
   
   comm = g_vfs_afp_command_new (AFP_COMMAND_GET_FORK_PARMS);
   /* pad byte */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, 0);
 
   /* OForkRefNum */
-  g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (comm), afp_handle->fork_refnum,
-                                  NULL, NULL);
+  g_vfs_afp_command_put_int16 (comm, afp_handle->fork_refnum);
 
   /* Bitmap */
   file_bitmap = AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT;
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), file_bitmap,
-                                   NULL, NULL);
+  g_vfs_afp_command_put_uint16 (comm, file_bitmap);
   
   g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
                                       seek_on_read_cb, G_VFS_JOB (job)->cancellable,
@@ -609,18 +604,15 @@ try_read (GVfsBackend *backend,
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_READ_EXT);
   /* pad byte */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, 0);
 
   /* OForkRefNum */
-  g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (comm),
-                                  afp_handle->fork_refnum, NULL, NULL);
+  g_vfs_afp_command_put_int16 (comm, afp_handle->fork_refnum);
   /* Offset */
-  g_data_output_stream_put_int64 (G_DATA_OUTPUT_STREAM (comm),
-                                  afp_handle->offset, NULL, NULL);
+  g_vfs_afp_command_put_int64 (comm, afp_handle->offset);
   /* ReqCount */
   req_count = MIN (bytes_requested, G_MAXUINT32);
-  g_data_output_stream_put_int64 (G_DATA_OUTPUT_STREAM (comm),
-                                  req_count, NULL, NULL);
+  g_vfs_afp_command_put_int64 (comm, req_count);
 
   g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
                                       read_ext_cb, G_VFS_JOB (job)->cancellable,
@@ -674,10 +666,10 @@ try_close_read (GVfsBackend *backend,
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_CLOSE_FORK);
   /* pad byte */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, 0);
 
-  g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (comm), afp_handle->fork_refnum,
-                                  NULL, NULL);
+  /* OForkRefNum */
+  g_vfs_afp_command_put_int16 (comm, afp_handle->fork_refnum);
 
   g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
                                       close_fork_cb, G_VFS_JOB (job)->cancellable,
@@ -774,20 +766,18 @@ open_fork (GVfsBackendAfp  *afp_backend,
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_OPEN_FORK);
   /* data fork */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, 0);
 
   /* Volume ID */
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),
-                                   afp_backend->volume_id, NULL, NULL);
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
   /* Directory ID */
-  g_data_output_stream_put_int32 (G_DATA_OUTPUT_STREAM (comm), 2, NULL, NULL);
+  g_vfs_afp_command_put_uint32 (comm, 2);
 
   /* Bitmap */
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  g_vfs_afp_command_put_uint16 (comm, 0);
 
   /* AccessMode */
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), access_mode,
-                                   NULL, NULL);
+  g_vfs_afp_command_put_uint16 (comm, access_mode);
 
   /* Pathname */
   put_pathname (comm, filename);
@@ -893,12 +883,11 @@ try_create (GVfsBackend *backend,
   
   comm = g_vfs_afp_command_new (AFP_COMMAND_CREATE_FILE);
   /* soft create */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
-   /* Volume ID */
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),
-                                   afp_backend->volume_id, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, 0);
+  /* Volume ID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
   /* Directory ID 2 == / */
-  g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (comm), 2, NULL, NULL);
+  g_vfs_afp_command_put_uint32 (comm, 2);
 
   /* Pathname */
   put_pathname (comm, filename);
@@ -1074,34 +1063,29 @@ enumerate_ext2 (GVfsJobEnumerate *job,
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_ENUMERATE_EXT2);
   /* pad byte */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, 0);
 
   /* Volume ID */
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),
-                                   afp_backend->volume_id, NULL, NULL);
-
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
   /* Directory ID 2 == / */
-  g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (comm), 2, NULL, NULL);
+  g_vfs_afp_command_put_uint32 (comm, 2);
 
   /* File Bitmap */
   file_bitmap = create_file_bitmap (matcher);
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),  file_bitmap,
-                                   NULL, NULL);
+  g_vfs_afp_command_put_uint16 (comm, file_bitmap);
+  
   /* Dir Bitmap */
   dir_bitmap = create_dir_bitmap (matcher);
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),  dir_bitmap,
-                                   NULL, NULL);
+  g_vfs_afp_command_put_uint16 (comm, dir_bitmap);
 
   /* Req Count */
-  g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (comm),  ENUMERATE_REQ_COUNT,
-                                  NULL, NULL);
+  g_vfs_afp_command_put_int16 (comm, ENUMERATE_REQ_COUNT);
+  
   /* StartIndex */
-  g_data_output_stream_put_int32 (G_DATA_OUTPUT_STREAM (comm),  start_index,
-                                  NULL, NULL);
+  g_vfs_afp_command_put_int32 (comm, start_index);
+  
   /* MaxReplySize */
-  g_data_output_stream_put_int32 (G_DATA_OUTPUT_STREAM (comm),
-                                  ENUMERATE_MAX_REPLY_SIZE, NULL, NULL);
-
+  g_vfs_afp_command_put_int32 (comm, ENUMERATE_MAX_REPLY_SIZE);
 
   /* Pathname */
   put_pathname (comm, filename);
@@ -1276,12 +1260,11 @@ try_query_info (GVfsBackend *backend,
       
       comm = g_vfs_afp_command_new (AFP_COMMAND_GET_VOL_PARMS);
       /* pad byte */
-      g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+      g_vfs_afp_command_put_byte (comm, 0);
       /* Volume ID */
-      g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm),
-                                       afp_backend->volume_id, NULL, NULL);
-
-      g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), vol_bitmap, NULL, NULL);
+      g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+      /* Volume Bitmap */
+      g_vfs_afp_command_put_uint16 (comm, vol_bitmap);
 
       g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
                                           get_vol_parms_cb, G_VFS_JOB (job)->cancellable,
@@ -1300,19 +1283,17 @@ try_query_info (GVfsBackend *backend,
     
     comm = g_vfs_afp_command_new (AFP_COMMAND_GET_FILE_DIR_PARMS);
     /* pad byte */
-    g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+    g_vfs_afp_command_put_byte (comm, 0);
     /* Volume ID */
-    g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), afp_backend->volume_id, NULL, NULL);
+    g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
     /* Directory ID */
-    g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (comm), 2, NULL, NULL);
+    g_vfs_afp_command_put_uint32 (comm, 2);
 
     file_bitmap = create_file_bitmap (matcher);
-    g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (comm), file_bitmap,
-                                    NULL, NULL);
+    g_vfs_afp_command_put_uint16 (comm, file_bitmap);
 
     dir_bitmap = create_dir_bitmap (matcher);
-    g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (comm), dir_bitmap,
-                                    NULL, NULL);
+    g_vfs_afp_command_put_uint16 (comm, dir_bitmap);
 
     /* Pathname */
     put_pathname (comm, filename);
@@ -1358,7 +1339,7 @@ do_mount (GVfsBackend *backend,
   /* Get Server Parameters */
   comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
   /* pad byte */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, 0);
 
   res = g_vfs_afp_connection_send_command_sync (afp_backend->server->conn,
                                                 comm, G_VFS_JOB (job)->cancellable,
@@ -1389,12 +1370,11 @@ do_mount (GVfsBackend *backend,
   /* Open Volume */
   comm = g_vfs_afp_command_new (AFP_COMMAND_OPEN_VOL);
   /* pad byte */
-  g_data_output_stream_put_byte (G_DATA_OUTPUT_STREAM (comm), 0, NULL, NULL);
+  g_vfs_afp_command_put_byte (comm, 0);
   
   /* Volume Bitmap */
   vol_bitmap = AFP_VOLUME_BITMAP_VOL_ID_BIT;
-  g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (comm), vol_bitmap,
-                                   NULL, NULL);
+  g_vfs_afp_command_put_uint16 (comm, vol_bitmap);
 
   /* VolumeName */
   g_vfs_afp_command_put_pascal (comm, afp_backend->volume);
