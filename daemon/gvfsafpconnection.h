@@ -139,6 +139,7 @@ typedef enum
   AFP_COMMAND_LOGIN_CONT         = 19,
   AFP_COMMAND_OPEN_VOL           = 24,
   AFP_COMMAND_OPEN_FORK          = 26,
+  AFP_COMMAND_RENAME             = 28,
   AFP_COMMAND_WRITE              = 33,
   AFP_COMMAND_GET_FILE_DIR_PARMS = 34,
   AFP_COMMAND_READ_EXT           = 60,
@@ -165,6 +166,7 @@ typedef enum
   AFP_RESULT_USER_NOT_AUTH       = -5023,
   AFP_RESULT_OBJECT_TYPE_ERR     = -5025,
   AFP_RESULT_TOO_MANY_FILES_OPEN = -5026,
+  AFP_RESULT_CANT_RENAME         = -5028,
   AFP_RESULT_VOL_LOCKED          = -5031,
   AFP_RESULT_OBJECT_LOCKED       = -5032
 } AfpResultCode;

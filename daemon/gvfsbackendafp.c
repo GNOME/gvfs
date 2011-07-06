@@ -41,6 +41,7 @@
 #include "gvfsjobopenforwrite.h"
 #include "gvfsjobdelete.h"
 #include "gvfsjobmakedirectory.h"
+#include "gvfsjobsetdisplayname.h"
 
 #include "gvfsafpserver.h"
 #include "gvfsafpconnection.h"
@@ -269,6 +270,116 @@ static void fill_info (GVfsBackendAfp *afp_backend,
 
     g_vfs_afp_reply_seek (reply, old_pos, G_SEEK_SET);
   }
+}
+
+static void
+rename_cb (GVfsAfpConnection *afp_connection,
+           GVfsAfpReply      *reply,
+           GError            *error,
+           gpointer           user_data)
+{
+  GVfsJobSetDisplayName *job = G_VFS_JOB_SET_DISPLAY_NAME (user_data);
+
+  AfpResultCode res_code;
+  char *dirname, *newpath;
+  
+  if (!reply)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    switch (res_code)
+    {
+      case AFP_RESULT_ACCESS_DENIED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Access denied"));
+        break;
+      case AFP_RESULT_CANT_RENAME:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
+                                  _("Can't rename volume"));
+        break;
+      case AFP_RESULT_OBJECT_EXISTS:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                  _("Object with that name already exists"));
+        break;
+      case AFP_RESULT_OBJECT_LOCKED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                                  _("Target object is marked as RenameInhibit"));
+        break;
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("Target object doesn't exist"));
+        break;
+      case AFP_RESULT_VOL_LOCKED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Volume is read-only"));
+        break;
+      default:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Got error code: %d from server"), res_code);
+        break;
+    }
+    return;
+  }
+
+  dirname = g_path_get_dirname (job->filename);
+  newpath = g_build_filename (dirname, job->display_name, NULL);
+  g_vfs_job_set_display_name_set_new_path (job, newpath);
+
+  g_free (dirname);
+  g_free (newpath);
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static gboolean
+try_set_display_name (GVfsBackend *backend,
+                      GVfsJobSetDisplayName *job,
+                      const char *filename,
+                      const char *display_name)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+
+  GVfsAfpCommand *comm;
+  char *dirname, *newname;
+  
+  if (is_root (filename))
+  {
+    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
+                              _("Can't rename volume"));
+    return TRUE;
+  }
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_RENAME);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+  /* Volume ID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+  /* Directory ID 2 == / */
+  g_vfs_afp_command_put_uint32 (comm, 2);
+
+  /* Pathname */
+  put_pathname (comm, filename);
+
+  /* NewName */
+  dirname = g_path_get_dirname (filename);
+  newname = g_build_filename (dirname, display_name, NULL);
+  put_pathname (comm, newname);
+
+  g_free (dirname);
+  g_free (newname);
+
+  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm, rename_cb,
+                                      G_VFS_JOB (job)->cancellable, job);
+  g_object_unref (comm);
+
+  return TRUE;
 }
 
 static void
@@ -1541,6 +1652,7 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
   backend_class->try_create = try_create;
   backend_class->try_delete = try_delete;
   backend_class->try_make_directory = try_make_directory;
+  backend_class->try_set_display_name = try_set_display_name;
 }
 
 void
