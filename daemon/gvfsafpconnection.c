@@ -53,7 +53,7 @@ g_vfs_afp_name_ref (GVfsAfpName *afp_name)
 char *
 g_vfs_afp_name_get_string (GVfsAfpName *afp_name)
 {
-  return g_strndup (afp_name->str, afp_name->len);
+  return g_utf8_normalize (afp_name->str, afp_name->len, G_NORMALIZE_DEFAULT_COMPOSE);
 }
 
 GVfsAfpName *
