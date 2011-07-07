@@ -39,6 +39,8 @@
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
 #include "gvfsjobopenforwrite.h"
+#include "gvfsjobwrite.h"
+#include "gvfsjobclosewrite.h"
 #include "gvfsjobdelete.h"
 #include "gvfsjobmakedirectory.h"
 #include "gvfsjobsetdisplayname.h"
@@ -97,8 +99,8 @@ filename_to_afp_pathname (const char *filename)
     filename++;
   
   len = strlen (filename);
-
-  str = g_malloc (len);
+  
+  str = g_malloc (len); 
 
   for (i = 0; i < len; i++)
   {
@@ -555,6 +557,95 @@ try_delete (GVfsBackend *backend,
 }
 
 static void
+write_ext_cb (GVfsAfpConnection *afp_connection,
+              GVfsAfpReply      *reply,
+              GError            *error,
+              gpointer           user_data)
+{
+  GVfsJobWrite *job = G_VFS_JOB_WRITE (user_data);
+  AfpHandle *afp_handle = (AfpHandle *)job->handle;
+
+  AfpResultCode res_code;
+  gint64 last_written;
+  gsize written_size;
+
+  if (!reply)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (!(res_code == AFP_RESULT_NO_ERROR || res_code == AFP_RESULT_LOCK_ERR))
+  {
+    g_object_unref (reply);
+
+    switch (res_code)
+    {
+      case AFP_RESULT_ACCESS_DENIED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                                  _("File is not open for write access"));
+        break;
+      case AFP_RESULT_DISK_FULL:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NO_SPACE,
+                                  _("Not enough space on volume"));
+        break;
+      default:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Got error code: %d from server"), res_code);
+        break;
+    }
+    return;
+  }
+
+  g_vfs_afp_reply_read_int64 (reply, &last_written);
+  g_object_unref (reply);
+
+  written_size = last_written - afp_handle->offset;
+  afp_handle->offset = last_written;
+  
+  g_vfs_job_write_set_written_size (job, written_size); 
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static gboolean
+try_write (GVfsBackend *backend,
+           GVfsJobWrite *job,
+           GVfsBackendHandle handle,
+           char *buffer,
+           gsize buffer_size)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  AfpHandle *afp_handle = (AfpHandle *)handle;
+
+  GVfsAfpCommand *comm;
+  guint32 req_count;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_WRITE_EXT);
+  /* StartEndFlag = 0 */
+  g_vfs_afp_command_put_byte (comm, 0);
+
+  /* OForkRefNum */
+  g_vfs_afp_command_put_int16 (comm, afp_handle->fork_refnum);
+  /* Offset */
+  g_vfs_afp_command_put_int64 (comm, afp_handle->offset);
+  /* ReqCount */
+  req_count = MIN (buffer_size, G_MAXUINT32);
+  g_vfs_afp_command_put_int64 (comm, req_count);
+
+  /* TODO: don't copy buffer here  */
+  g_output_stream_write_all (G_OUTPUT_STREAM (comm), buffer, req_count, NULL,
+                             NULL, NULL);
+
+  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+                                      write_ext_cb, G_VFS_JOB (job)->cancellable,
+                                      job);
+  g_object_unref (comm);
+
+  return TRUE;
+}
+
+static void
 seek_on_read_cb (GVfsAfpConnection *afp_connection,
                  GVfsAfpReply      *reply,
                  GError            *error,
@@ -734,7 +825,64 @@ try_read (GVfsBackend *backend,
 }
 
 static void
-close_fork_cb (GVfsAfpConnection *afp_connection,
+close_write_cb (GVfsAfpConnection *afp_connection,
+                GVfsAfpReply      *reply,
+                GError            *error,
+                gpointer           user_data)
+{
+  GVfsJobCloseWrite *job = G_VFS_JOB_CLOSE_WRITE (user_data);
+  AfpHandle *afp_handle = (AfpHandle *)job->handle;
+
+  AfpResultCode res_code;
+  
+  if (!reply)
+  {
+    afp_handle_free (afp_handle);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Got error code: %d from server"), res_code);
+  }
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  afp_handle_free (afp_handle);
+}
+
+static gboolean
+try_close_write (GVfsBackend *backend,
+                 GVfsJobCloseWrite *job,
+                 GVfsBackendHandle handle)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  AfpHandle *afp_handle = (AfpHandle *)handle;
+
+  GVfsAfpCommand *comm;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_CLOSE_FORK);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+
+  /* OForkRefNum */
+  g_vfs_afp_command_put_int16 (comm, afp_handle->fork_refnum);
+
+  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+                                      close_write_cb, G_VFS_JOB (job)->cancellable,
+                                      job);
+  g_object_unref (comm);
+
+  return TRUE;
+}
+
+static void
+close_read_cb (GVfsAfpConnection *afp_connection,
                GVfsAfpReply      *reply,
                GError            *error,
                gpointer           user_data)
@@ -783,7 +931,7 @@ try_close_read (GVfsBackend *backend,
   g_vfs_afp_command_put_int16 (comm, afp_handle->fork_refnum);
 
   g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
-                                      close_fork_cb, G_VFS_JOB (job)->cancellable,
+                                      close_read_cb, G_VFS_JOB (job)->cancellable,
                                       job);
   g_object_unref (comm);
 
@@ -1650,6 +1798,8 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
   backend_class->try_read = try_read;
   backend_class->try_seek_on_read = try_seek_on_read;
   backend_class->try_create = try_create;
+  backend_class->try_write = try_write;
+  backend_class->try_close_write = try_close_write;
   backend_class->try_delete = try_delete;
   backend_class->try_make_directory = try_make_directory;
   backend_class->try_set_display_name = try_set_display_name;
