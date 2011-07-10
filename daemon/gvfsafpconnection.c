@@ -667,7 +667,7 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
     g_free (priv->data);
   }
   
-  else if (dsi_header->command == DSI_COMMAND)
+  else if (dsi_header->command == DSI_COMMAND || dsi_header->command == DSI_WRITE)
   {
     req_data = g_hash_table_lookup (priv->request_hash,
                                     GUINT_TO_POINTER (priv->read_dsi_header.requestID));
