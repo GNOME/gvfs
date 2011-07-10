@@ -405,40 +405,36 @@ make_directory_cb (GVfsAfpConnection *afp_connection,
   {
     g_object_unref (reply);
 
-    if (res_code == AFP_RESULT_ACCESS_DENIED)
+    switch (res_code)
     {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                _("Access denied"));
-    }
-    else if (res_code == AFP_RESULT_DISK_FULL)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NO_SPACE,
-                                _("Not enough space on volume"));
-    }
-    else if (res_code == AFP_RESULT_FLAT_VOL)
-    {
-            g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                                _("Volume is flat and doesn't support directories"));
-    }
-    else if (res_code == AFP_RESULT_OBJECT_NOT_FOUND)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                _("Ancestor directory doesn't exist"));
-    }
-    else if (res_code == AFP_RESULT_OBJECT_EXISTS)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
-                                _("Target directory already exists"));
-    }
-    else if (res_code == AFP_RESULT_VOL_LOCKED)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                _("Volume is read-only"));
-    }
-    else
-    {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                        _("Got error code: %d from server"), res_code);
+      case AFP_RESULT_ACCESS_DENIED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Access denied"));
+        break;
+      case AFP_RESULT_DISK_FULL:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NO_SPACE,
+                                  _("Not enough space on volume"));
+        break;
+      case AFP_RESULT_FLAT_VOL:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                                  _("Volume is flat and doesn't support directories"));
+        break;
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("Ancestor directory doesn't exist"));
+        break;
+      case AFP_RESULT_OBJECT_EXISTS:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                  _("Target directory already exists"));
+        break;
+      case AFP_RESULT_VOL_LOCKED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Volume is read-only"));
+        break;
+      default:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Got error code: %d from server"), res_code);
+        break;
     }
     return;
   }
@@ -493,35 +489,32 @@ delete_cb (GVfsAfpConnection *afp_connection,
   {
     g_object_unref (reply);
 
-    if (res_code == AFP_RESULT_ACCESS_DENIED)
+    switch (res_code)
     {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                _("Access denied"));
-    }
-    else if (res_code == AFP_RESULT_DIR_NOT_EMPTY)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
-                                _("Directory not empty"));
-    }
-    else if (res_code == AFP_RESULT_OBJECT_LOCKED)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                                _("Target object is marked as DeleteInhibit"));
-    }
-    else if (res_code == AFP_RESULT_OBJECT_NOT_FOUND)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                _("Target object doesn't exist"));
-    }
-    else if (res_code == AFP_RESULT_VOL_LOCKED)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                _("Volume is read-only"));
-    }
-    else
-    {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                        _("Got error code: %d from server"), res_code);
+      case AFP_RESULT_ACCESS_DENIED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Access denied"));
+        break;
+      case AFP_RESULT_DIR_NOT_EMPTY:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
+                                  _("Directory not empty"));
+        break;
+      case AFP_RESULT_OBJECT_LOCKED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                                  _("Target object is marked as DeleteInhibit"));
+        break;
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("Target object doesn't exist"));
+        break;
+      case AFP_RESULT_VOL_LOCKED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Volume is read-only"));
+        break;
+      default:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Got error code: %d from server"), res_code);
+        break;
     }
     return;
   }
@@ -764,16 +757,18 @@ read_ext_cb (GVfsAfpConnection *afp_connection,
   {
     g_object_unref (reply);
 
-    if (res_code == AFP_RESULT_ACCESS_DENIED)
+    switch (res_code)
     {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                                _("File is not open for read access"));
+      case AFP_RESULT_ACCESS_DENIED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                                  _("File is not open for read access"));
+        break;
+      default:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Got error code: %d from server"), res_code);
+        break;
     }
-    else
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                                _("Got error from server"));
-    }
+    
     return;
   }
 
@@ -966,31 +961,29 @@ open_fork_cb (GVfsAfpConnection *afp_connection,
   if (res_code != AFP_RESULT_NO_ERROR)
   {
     g_object_unref (reply);
-    
-    if (res_code == AFP_RESULT_ACCESS_DENIED)
+
+    switch (res_code)
     {
-      g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                _("Access denied"));
-    }
-    else if (res_code == AFP_RESULT_OBJECT_NOT_FOUND)
-    {
-      g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                _("File doesn't exist"));
-    }
-    else if (res_code == AFP_RESULT_OBJECT_TYPE_ERR)
-    {
-      g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
-                                _("File is a directory"));
-    }
-    else if (res_code == AFP_RESULT_TOO_MANY_FILES_OPEN)
-    {
-      g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_TOO_MANY_OPEN_FILES,
-                                _("Too many files open"));
-    }
-    else
-    {
-      g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                _("Got error from server"));
+      case AFP_RESULT_ACCESS_DENIED:
+        g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Access denied"));
+        break;
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("File doesn't exist"));
+        break;
+      case AFP_RESULT_OBJECT_TYPE_ERR:
+        g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+                                  _("File is a directory"));
+        break;
+      case AFP_RESULT_TOO_MANY_FILES_OPEN:
+        g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_TOO_MANY_OPEN_FILES,
+                                  _("Too many files open"));
+        break;
+      default:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Got error code: %d from server"), res_code);
+        break;
     }
     return;
   }
@@ -1087,40 +1080,36 @@ create_cb (GVfsAfpConnection *afp_connection,
   {
     g_object_unref (reply);
 
-    if (res_code == AFP_RESULT_ACCESS_DENIED)
+    switch (res_code)
     {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                _("Access denied"));
-    }
-    else if (res_code == AFP_RESULT_DISK_FULL)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NO_SPACE,
-                                _("Not enough space on volume"));
-    }
-    else if (res_code == AFP_RESULT_FILE_BUSY)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
-                                _("Target file is open"));
-    }
-    else if (res_code == AFP_RESULT_OBJECT_EXISTS)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
-                                _("Target file already exists"));
-    }
-    else if (res_code == AFP_RESULT_OBJECT_NOT_FOUND)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                _("Ancestor directory doesn't exist"));
-    }
-    else if (res_code == AFP_RESULT_VOL_LOCKED)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                _("Volume is read-only"));
-    }
-    else
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                                _("Got error from server"));
+      case AFP_RESULT_ACCESS_DENIED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Access denied"));
+        break;
+      case AFP_RESULT_DISK_FULL:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NO_SPACE,
+                                  _("Not enough space on volume"));
+        break;
+      case AFP_RESULT_FILE_BUSY:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                  _("Target file is open"));
+        break;
+      case AFP_RESULT_OBJECT_EXISTS:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                  _("Target file already exists"));
+        break;
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("Ancestor directory doesn't exist"));
+        break;
+      case AFP_RESULT_VOL_LOCKED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Volume is read-only"));
+        break;
+      default:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Got error code: %d from server"), res_code);
+        break;
     }
     return;
   }
