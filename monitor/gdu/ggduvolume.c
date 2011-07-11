@@ -429,6 +429,15 @@ update_volume (GGduVolume *volume)
       g_free (activation_uri);
     }
 
+  /* if there's an automount hint, use it */
+  if (device != NULL)
+    {
+      if (g_strcmp0 (gdu_device_get_automount_hint (device), "always") == 0)
+        volume->should_automount = TRUE;
+      else if (g_strcmp0 (gdu_device_get_automount_hint (device), "never") == 0)
+        volume->should_automount = FALSE;
+    }
+
   if (pool != NULL)
     g_object_unref (pool);
   if (device != NULL)
