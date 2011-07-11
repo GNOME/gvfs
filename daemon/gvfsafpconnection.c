@@ -658,11 +658,14 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
                                     GUINT_TO_POINTER (priv->read_dsi_header.requestID));
     if (req_data)
     {
-      GVfsAfpReply *reply;
+      if (req_data->reply_cb)
+      {
+        GVfsAfpReply *reply;
 
-      reply = g_vfs_afp_reply_new (priv->read_dsi_header.errorCode, priv->data,
-                                   priv->read_dsi_header.totalDataLength);
-      req_data->reply_cb (afp_connection, reply, NULL, req_data->user_data);
+        reply = g_vfs_afp_reply_new (priv->read_dsi_header.errorCode, priv->data,
+                                     priv->read_dsi_header.totalDataLength);
+        req_data->reply_cb (afp_connection, reply, NULL, req_data->user_data);
+      }
       g_hash_table_remove (priv->request_hash, GUINT_TO_POINTER (priv->read_dsi_header.requestID));
     }
   }

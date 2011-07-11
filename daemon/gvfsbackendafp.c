@@ -456,8 +456,6 @@ close_fork (GVfsBackendAfp    *afp_backend,
                                       close_fork_cb, G_VFS_JOB (job)->cancellable,
                                       job);
   g_object_unref (comm);
-
-  afp_handle_free (afp_handle);
 }
             
 typedef void (*CreateFileCallback) (GVfsJob *job);
@@ -1095,6 +1093,36 @@ try_read (GVfsBackend *backend,
 }
 
 static void
+close_replace_close_fork_cb (GVfsJob *job)
+{
+  GVfsJobCloseWrite *cwjob = G_VFS_JOB_CLOSE_WRITE (job);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (cwjob->backend);
+  AfpHandle *afp_handle = (AfpHandle *)cwjob->handle;
+
+  GVfsAfpCommand *comm;
+  
+  /* Delete temporary file */
+  comm = g_vfs_afp_command_new (AFP_COMMAND_DELETE);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+  /* Volume ID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+  /* Directory ID 2 == / */
+  g_vfs_afp_command_put_uint32 (comm, 2);
+
+  /* Pathname */
+  put_pathname (comm, afp_handle->tmp_filename);
+
+  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm, NULL,
+                                      NULL, NULL);
+  g_object_unref (comm);
+
+
+  afp_handle_free (afp_handle);  
+  g_vfs_job_succeeded (job);
+}
+
+static void
 close_replace_exchange_files_cb (GVfsAfpConnection *afp_connection,
                                  GVfsAfpReply      *reply,
                                  GError            *error,
@@ -1126,11 +1154,13 @@ close_replace_exchange_files_cb (GVfsAfpConnection *afp_connection,
         g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
                           _("Got error code: %d from server"), res_code);
         break;
-    }
+
+    }   
     return;
   }
 
-  close_fork (afp_backend, G_VFS_JOB (job), (AfpHandle *)job->handle, NULL);
+  close_fork (afp_backend, G_VFS_JOB (job), (AfpHandle *)job->handle,
+              close_replace_close_fork_cb);
 }
 
 static gboolean
@@ -1167,7 +1197,10 @@ try_close_write (GVfsBackend *backend,
     g_object_unref (comm);
   }
   else
+  {
     close_fork (afp_backend, G_VFS_JOB (job), afp_handle, NULL);
+    afp_handle_free (afp_handle);
+  }
   
   return TRUE;
 }
