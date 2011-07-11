@@ -514,6 +514,14 @@ g_vfs_afp_command_get_data (GVfsAfpCommand *comm)
 /*
  * GVfsAfpConnection
  */
+
+enum {
+  ATTENTION,
+  LAST_SIGNAL
+};
+
+static guint signals[LAST_SIGNAL] = {0,};
+
 G_DEFINE_TYPE (GVfsAfpConnection, g_vfs_afp_connection, G_TYPE_OBJECT);
 
 typedef struct {
@@ -635,35 +643,12 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
   }
 
   else if (dsi_header->command == DSI_ATTENTION)
-  {
-    enum
-    {
-      AFP_ATTENTION_CODE_MESSAGE_AVAILABLE     = 0x2,
-      AFP_ATTENTION_CODE_IMMEDIATE_SHUTDOWN    = 0x4,
-      AFP_ATTENTION_CODE_SHUTDOWN_NO_MESSAGE   = 0x8,
-      AFP_ATTENTION_CODE_DISCONNECT_NO_MESSAGE = 0x9,
-      AFP_ATTENTION_CODE_SHUTDOWN_MESSAGE      = 0xA,
-      AFP_ATTENTION_CODE_DISCONNECT_MESSAGE    = 0xB
-    };
-
-    enum
-    {
-      AFP_ATTENTION_MASK_DONT_RECONNECT_BIT = 0x1,
-      AFP_ATTENTION_MASK_SERVER_MESSAGE_BIT = 0x2,
-      AFP_ATTENTION_MASK_SERVER_CRASH_BIT   = 0x4,
-      AFP_ATTENTION_MASK_SHUTDOWN_BIT       = 0x8
-    };
-    
+  { 
     guint8 attention_code;
 
     attention_code = priv->data[0] >> 4;
 
-    if (attention_code & AFP_ATTENTION_MASK_SERVER_CRASH_BIT)
-      g_debug ("Server Crash!!!\n");
-
-    else if (attention_code & AFP_ATTENTION_MASK_SHUTDOWN_BIT)
-      g_debug ("Server is shutting down!\n");
-    
+    g_signal_emit (afp_connection, signals[ATTENTION], 0, attention_code);
     g_free (priv->data);
   }
   
@@ -936,7 +921,8 @@ g_vfs_afp_connection_queue_command (GVfsAfpConnection *afp_connection,
   request_data->tickle = FALSE;
   request_data->command = g_object_ref (command);
   request_data->reply_cb = reply_cb;
-  request_data->cancellable = g_object_ref (cancellable);
+  if (cancellable)
+    request_data->cancellable = g_object_ref (cancellable);
   request_data->user_data = user_data;
   request_data->conn = afp_connection;
 
@@ -1297,5 +1283,12 @@ g_vfs_afp_connection_class_init (GVfsAfpConnectionClass *klass)
   g_type_class_add_private (klass, sizeof (GVfsAfpConnectionPrivate));
 
   object_class->finalize = g_vfs_afp_connection_finalize;
+
+  signals[ATTENTION] =
+    g_signal_new ("attention",
+                  G_TYPE_FROM_CLASS (object_class),
+                  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                  0, NULL, NULL, g_cclosure_marshal_VOID__UINT,
+                  G_TYPE_NONE, 1, G_TYPE_UINT);
 }
 

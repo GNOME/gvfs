@@ -40,6 +40,68 @@ G_DEFINE_TYPE (GVfsAfpServer, g_vfs_afp_server, G_TYPE_OBJECT);
 #define AFP_UAM_DHX       "DHCAST128"
 #define AFP_UAM_DHX2      "DHX2"
 
+static void
+get_srvr_msg_cb (GVfsAfpConnection *conn, GVfsAfpReply *reply, GError *error,
+                 gpointer user_data)
+{
+  gint16 message_bitmap;
+  
+  if (!reply)
+    return;
+
+  /* MessageType */
+  g_vfs_afp_reply_read_int16 (reply, NULL);
+  /* MessageBitmap */
+  g_vfs_afp_reply_read_int16 (reply, &message_bitmap);
+
+  if (message_bitmap == 0x1)
+  {
+    char *str;
+
+    g_vfs_afp_reply_read_pascal (reply, &str);
+
+    g_debug ("Server message: %s\n", str);
+    g_free (str);
+  }
+  else if (message_bitmap == 0x2)
+  {
+    GVfsAfpName *afp_name;
+    char *str;
+    
+    g_vfs_afp_reply_read_afp_name (reply, TRUE, &afp_name);
+    str = g_vfs_afp_name_get_string (afp_name);
+    g_vfs_afp_name_unref (afp_name);
+
+    g_debug ("Server message: %s\n", str);
+    g_free (str);
+  }
+
+  g_object_unref (reply);
+}
+
+static void
+attention_cb (GVfsAfpConnection *conn, guint attention_code, gpointer user_data)
+{
+  GVfsAfpServer *afp_serv = G_VFS_AFP_SERVER (user_data);
+
+  if (attention_code & AFP_ATTENTION_MASK_SERVER_MESSAGE_BIT)
+  {
+    GVfsAfpCommand *comm;
+
+    comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_MSG);
+    /* pad byte */
+    g_vfs_afp_command_put_byte (comm, 0);
+    /* MessageType */
+    g_vfs_afp_command_put_int16 (comm, 1);
+    /* MessageBitmap */
+    g_vfs_afp_command_put_int16 (comm, 1);
+
+    g_vfs_afp_connection_queue_command (afp_serv->conn, comm, get_srvr_msg_cb,
+                                        NULL, afp_serv);
+    g_object_unref (comm);
+  }
+}
+
 static const char *
 afp_version_to_string (AfpVersion afp_version)
 {
@@ -926,6 +988,9 @@ g_vfs_afp_server_new (GNetworkAddress *addr)
   afp_serv->addr = addr;
   afp_serv->conn = g_vfs_afp_connection_new (G_SOCKET_CONNECTABLE (addr));
 
+  g_signal_connect (afp_serv->conn, "attention", G_CALLBACK (attention_cb),
+                    afp_serv);
+  
   return afp_serv;
 }
 
