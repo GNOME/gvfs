@@ -38,6 +38,7 @@
 #include "gvfsjobcloseread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
+#include "gvfsjobseekwrite.h"
 #include "gvfsjobopenforwrite.h"
 #include "gvfsjobwrite.h"
 #include "gvfsjobclosewrite.h"
@@ -457,7 +458,96 @@ close_fork (GVfsBackendAfp    *afp_backend,
                                       job);
   g_object_unref (comm);
 }
-            
+
+static void
+get_fork_parms_cb (GVfsAfpConnection *afp_connection,
+                   GVfsAfpReply      *reply,
+                   GError            *error,
+                   gpointer           user_data)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
+
+  AfpResultCode res_code;
+  guint16 file_bitmap;
+  GFileInfo *info;
+  
+  if (!reply)
+  {
+    g_simple_async_result_set_from_error (simple, error);
+    g_simple_async_result_complete (simple);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_object_unref (reply);
+
+    g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Got error code: %d from server"), res_code);
+    g_simple_async_result_complete (simple);
+    return;
+  }
+
+  g_vfs_afp_reply_read_uint16 (reply, &file_bitmap);
+
+  info = g_file_info_new ();
+  fill_info (afp_backend, info, reply, FALSE, file_bitmap);
+
+  g_simple_async_result_set_op_res_gpointer (simple, info, g_object_unref);
+  g_simple_async_result_complete (simple);
+}
+
+static void
+get_fork_parms (GVfsBackendAfp      *afp_backend,
+                gint16               fork_refnum,
+                guint16              file_bitmap,
+                GCancellable        *cancellable,
+                GAsyncReadyCallback  callback,
+                gpointer             user_data)
+{
+  GVfsAfpCommand *comm;
+  GSimpleAsyncResult *simple;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_FORK_PARMS);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+  /* OForkRefNum */
+  g_vfs_afp_command_put_int16 (comm, fork_refnum);
+  /* Bitmap */  
+  g_vfs_afp_command_put_uint16 (comm, file_bitmap);
+
+  simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback, user_data,
+                                      get_fork_parms);
+                                      
+  
+  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+                                      get_fork_parms_cb, cancellable,
+                                      simple);
+  g_object_unref (comm);
+}
+
+static GFileInfo *
+get_fork_parms_finish (GVfsBackendAfp *afp_backend,
+                       GAsyncResult   *result,
+                       GError         **error)
+{
+  GSimpleAsyncResult *simple;
+  
+  g_return_val_if_fail (g_simple_async_result_is_valid (result,
+                                                        G_OBJECT (afp_backend),
+                                                        get_fork_parms),
+                        NULL);
+
+  simple = (GSimpleAsyncResult *)result;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    return NULL;
+
+  return g_object_ref (g_simple_async_result_get_op_res_gpointer (simple));
+}
+
 typedef void (*CreateFileCallback) (GVfsJob *job);
 
 static void
@@ -912,41 +1002,85 @@ try_write (GVfsBackend *backend,
 }
 
 static void
-seek_on_read_cb (GVfsAfpConnection *afp_connection,
-                 GVfsAfpReply      *reply,
-                 GError            *error,
-                 gpointer           user_data)
+seek_on_write_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsJobSeekRead *job = G_VFS_JOB_SEEK_READ (user_data);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobSeekWrite *job = G_VFS_JOB_SEEK_WRITE (user_data);
   AfpHandle *afp_handle = (AfpHandle *)job->handle;
 
-  AfpResultCode res_code;
-  guint16 file_bitmap;
+  GError *err = NULL;
   GFileInfo *info;
   gsize size;
+
+  info = get_fork_parms_finish (afp_backend, res, &err);
+  if (!info)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
   
-  if (!reply)
+  size = g_file_info_get_size (info);
+  g_object_unref (info);
+
+  switch (job->seek_type)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-    return;
+    case G_SEEK_CUR:
+      afp_handle->offset += job->requested_offset;
+      break;
+    case G_SEEK_SET:
+      afp_handle->offset = job->requested_offset;
+      break;
+    case G_SEEK_END:
+      afp_handle->offset = size + job->requested_offset;
+      break;
   }
 
-  res_code = g_vfs_afp_reply_get_result_code (reply);
-  if (res_code != AFP_RESULT_NO_ERROR)
+  if (afp_handle->offset < 0)
+    afp_handle->offset = 0;
+  else if (afp_handle->offset > size)
+    afp_handle->offset = size;
+
+  g_vfs_job_seek_write_set_offset (job, afp_handle->offset);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static gboolean
+try_seek_on_write (GVfsBackend *backend,
+                   GVfsJobSeekRead *job,
+                   GVfsBackendHandle handle,
+                   goffset    offset,
+                   GSeekType  type)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  AfpHandle *afp_handle = (AfpHandle *)handle;
+  
+  get_fork_parms (afp_backend, afp_handle->fork_refnum,
+                  AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT,
+                  G_VFS_JOB (job)->cancellable, seek_on_write_cb, job);
+
+  return TRUE;
+}
+
+static void
+seek_on_read_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobSeekRead *job = G_VFS_JOB_SEEK_READ (user_data);
+  AfpHandle *afp_handle = (AfpHandle *)job->handle;
+
+  GError *err = NULL;
+  GFileInfo *info;
+  gsize size;
+
+  info = get_fork_parms_finish (afp_backend, res, &err);
+  if (!info)
   {
-    g_object_unref (reply);
-    
-    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
-                              G_IO_ERROR_FAILED, _("Got error from server"));
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
-
-  g_vfs_afp_reply_read_uint16 (reply, &file_bitmap);
-
-  info = g_file_info_new ();
-  fill_info (afp_backend, info, reply, FALSE, file_bitmap);
-
+  
   size = g_file_info_get_size (info);
   g_object_unref (info);
 
@@ -972,7 +1106,6 @@ seek_on_read_cb (GVfsAfpConnection *afp_connection,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
-  
 static gboolean
 try_seek_on_read (GVfsBackend *backend,
                   GVfsJobSeekRead *job,
@@ -983,25 +1116,10 @@ try_seek_on_read (GVfsBackend *backend,
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
   AfpHandle *afp_handle = (AfpHandle *)handle;
 
-  GVfsAfpCommand *comm;
-  guint16 file_bitmap;
+  get_fork_parms (afp_backend, afp_handle->fork_refnum,
+                  AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT,
+                  G_VFS_JOB (job)->cancellable, seek_on_read_cb, job);
   
-  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_FORK_PARMS);
-  /* pad byte */
-  g_vfs_afp_command_put_byte (comm, 0);
-
-  /* OForkRefNum */
-  g_vfs_afp_command_put_int16 (comm, afp_handle->fork_refnum);
-
-  /* Bitmap */
-  file_bitmap = AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT;
-  g_vfs_afp_command_put_uint16 (comm, file_bitmap);
-  
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
-                                      seek_on_read_cb, G_VFS_JOB (job)->cancellable,
-                                      job);
-  g_object_unref (comm);
-
   return TRUE;
 }
 
@@ -1963,6 +2081,7 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
   backend_class->try_create = try_create;
   backend_class->try_replace = try_replace;
   backend_class->try_write = try_write;
+  backend_class->try_seek_on_write = try_seek_on_write;
   backend_class->try_close_write = try_close_write;
   backend_class->try_delete = try_delete;
   backend_class->try_make_directory = try_make_directory;
