@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-06-25 21:40+0300\n"
-"PO-Revision-Date: 2011-04-23 23:48+0200\n"
+"POT-Creation-Date: 2011-07-14 00:19+0300\n"
+"PO-Revision-Date: 2011-07-14 00:18+0300\n"
 "Last-Translator: Ігар Грачышка <ihar.hrachyshka@gmail.com>\n"
 "Language-Team: Belarusian <i18n-bel-gnome@googlegroups.com>\n"
 "Language: be\n"
@@ -512,7 +512,7 @@ msgstr "Файл існуе"
 #: ../daemon/gvfsjobtrash.c:123 ../daemon/gvfsjobunmountmountable.c:140
 #: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1173 ../monitor/gdu/ggdumount.c:1257
-#: ../monitor/gdu/ggduvolume.c:1608
+#: ../monitor/gdu/ggduvolume.c:1617
 msgid "Operation not supported by backend"
 msgstr ""
 
@@ -1347,7 +1347,7 @@ msgstr "Не ўдалося ўсталяваць дзейнае FTP-злучэн
 
 #: ../daemon/gvfsftpfile.c:170
 msgid "Filename contains invalid characters."
-msgstr "Назва файла ўтрымлівае хібныя знакі."
+msgstr "Назва файла змяшчае хібныя знакі."
 
 #: ../daemon/gvfsftptask.c:262
 msgid "The FTP server is busy. Try again later"
@@ -1364,8 +1364,8 @@ msgstr "Машына зачыніла злучэнне"
 #: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
-"Не ўдалося адчыніць злучэнне для даных. Магчыма, гэтую аперацыю забараніў ваш "
-"фаервол?"
+"Не ўдалося адчыніць злучэнне для даных. Магчыма, гэтую аперацыю забараніў "
+"ваш фаервол?"
 
 #: ../daemon/gvfsftptask.c:368
 msgid "Data connection closed"
@@ -1543,7 +1543,7 @@ msgstr ""
 msgid "Floppy Disk"
 msgstr "Дыскета"
 
-#: ../monitor/gdu/ggduvolume.c:1088
+#: ../monitor/gdu/ggduvolume.c:1097
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1552,7 +1552,7 @@ msgstr ""
 "Увядзіце пароль для дыскавага тома.\n"
 "Прыстасаванне \"%s\" змяшчае зашыфраваныя даныя на раздзеле %d."
 
-#: ../monitor/gdu/ggduvolume.c:1095
+#: ../monitor/gdu/ggduvolume.c:1104
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1561,7 +1561,7 @@ msgstr ""
 "Увядзіце пароль для дыскавага тома.\n"
 "Прыстасаванне \"%s\" змяшчае зашыфраваныя даныя."
 
-#: ../monitor/gdu/ggduvolume.c:1102
+#: ../monitor/gdu/ggduvolume.c:1111
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -2393,4 +2393,3 @@ msgstr ""
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
 msgstr "- вывесці змест каталогаў у выглядзе дрэва"
-
