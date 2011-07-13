@@ -611,13 +611,13 @@ run_loop (GVfsAfpConnection *afp_connection)
 
   if (!priv->send_loop_running)
   {
-    send_request (afp_connection);
     priv->send_loop_running = TRUE;
+    send_request (afp_connection);
   }
   if (!priv->read_loop_running)
   {
-    read_reply (afp_connection);
     priv->read_loop_running = TRUE;
+    read_reply (afp_connection);
   }
 }
 
@@ -920,7 +920,7 @@ g_vfs_afp_connection_queue_command (GVfsAfpConnection *afp_connection,
 
   RequestData *request_data;
   
-  request_data = g_slice_new (RequestData);
+  request_data = g_slice_new0 (RequestData);
   request_data->tickle = FALSE;
   request_data->command = g_object_ref (command);
   request_data->reply_cb = reply_cb;
