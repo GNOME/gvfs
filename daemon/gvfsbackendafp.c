@@ -1436,8 +1436,10 @@ replace_open_fork_cb (GVfsJob        *job,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
+static void replace_create_tmp_file (GVfsBackendAfp *afp_backend, GVfsJobOpenForWrite *job);
+
 static void
-replace_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+replace_create_tmp_file_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
   GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
@@ -1448,8 +1450,14 @@ replace_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 
   if (!create_file_finish (afp_backend, res, &err))
   {
-    g_vfs_job_failed (G_VFS_JOB (job), err->domain, err->code,
-                      _("Couldn't create temporary file (%s)"), err->message);
+    if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_EXISTS))
+      replace_create_tmp_file (afp_backend, job);
+
+    else
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), err->domain, err->code,
+                        _("Couldn't create temporary file (%s)"), err->message);
+    }
     g_error_free (err);
     return;
   }
@@ -1458,6 +1466,33 @@ replace_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   tmp_filename = g_object_get_data (G_OBJECT (job), "TempFilename");
   open_fork (afp_backend, G_VFS_JOB (job), tmp_filename, access_mode,
              replace_open_fork_cb);
+}
+
+static void
+random_chars (char *str, int len)
+{
+  int i;
+  const char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+  for (i = 0; i < len; i++)
+    str[i] = chars[g_random_int_range (0, strlen(chars))];
+}
+
+static void
+replace_create_tmp_file (GVfsBackendAfp *afp_backend, GVfsJobOpenForWrite *job)
+{
+  char basename[] = "~gvfXXXX.tmp";
+  char *dir, *tmp_filename;
+
+  random_chars (basename + 4, 4);
+  dir = g_path_get_dirname (job->filename);
+
+  tmp_filename = g_build_filename (dir, basename, NULL);
+  g_free (dir);
+
+  g_object_set_data_full (G_OBJECT (job), "TempFilename", tmp_filename, g_free);
+  create_file (afp_backend, tmp_filename, FALSE, G_VFS_JOB (job)->cancellable,
+               replace_create_tmp_file_cb, job);
 }
 
 static gboolean
@@ -1470,8 +1505,6 @@ try_replace (GVfsBackend *backend,
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
 
-  char *tmp_filename;
-  
   if (make_backup)
   { 
     /* FIXME: implement! */
@@ -1481,10 +1514,7 @@ try_replace (GVfsBackend *backend,
     return TRUE;
   }
 
-  tmp_filename = g_strdup_printf ("%s.tmp", filename);
-  g_object_set_data_full (G_OBJECT (job), "TempFilename", tmp_filename, g_free); 
-  create_file (afp_backend, tmp_filename, TRUE, G_VFS_JOB (job)->cancellable,
-               replace_cb, job);
+  replace_create_tmp_file (afp_backend, job);
 
   return TRUE;
 }
