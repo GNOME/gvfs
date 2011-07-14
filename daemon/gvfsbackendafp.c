@@ -76,6 +76,10 @@ struct _GVfsBackendAfp
 
 G_DEFINE_TYPE (GVfsBackendAfp, g_vfs_backend_afp, G_VFS_TYPE_BACKEND);
 
+
+/*
+ * Utility functions
+ */
 static gboolean
 is_root (const char *filename)
 {
@@ -400,49 +404,42 @@ open_fork (GVfsBackendAfp  *afp_backend,
   return;
 }
 
-typedef void (*CloseForkCallback) (GVfsJob *job);
-
 static void
 close_fork_cb (GVfsAfpConnection *afp_connection,
                GVfsAfpReply      *reply,
                GError            *error,
                gpointer           user_data)
 {
-  GVfsJob *job = G_VFS_JOB (user_data);
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
   AfpResultCode res_code;
-  CloseForkCallback cb;
   
   if (!reply)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_simple_async_result_set_from_error (simple, error);
+    g_simple_async_result_complete (simple);
     return;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
-  g_object_unref (reply);
-
   if (res_code != AFP_RESULT_NO_ERROR)
   {
-    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("Got error code: %d from server"), res_code);
-    return;
+    g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                     _("Got error code: %d from server"), res_code);
   }
 
-  cb = g_object_get_data (G_OBJECT (job), "CloseForkCallback");
-  if (cb != NULL)
-    cb (job);
-  else
-    g_vfs_job_succeeded (job);
+  g_simple_async_result_complete (simple);
 }
 
 static void
 close_fork (GVfsBackendAfp    *afp_backend,
-            GVfsJob           *job,
             AfpHandle         *afp_handle,
-            CloseForkCallback cb)
+            GCancellable        *cancellable,
+            GAsyncReadyCallback  callback,
+            gpointer             user_data)
 {
   GVfsAfpCommand *comm;
+  GSimpleAsyncResult *simple;
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_CLOSE_FORK);
   /* pad byte */
@@ -451,12 +448,33 @@ close_fork (GVfsBackendAfp    *afp_backend,
   /* OForkRefNum */
   g_vfs_afp_command_put_int16 (comm, afp_handle->fork_refnum);
 
-  g_object_set_data (G_OBJECT (job), "CloseForkCallback", cb);
+  simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback, user_data,
+                                      close_fork);
   
   g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
-                                      close_fork_cb, G_VFS_JOB (job)->cancellable,
-                                      job);
+                                      close_fork_cb, cancellable,
+                                      simple);
   g_object_unref (comm);
+}
+
+static gboolean
+close_fork_finish (GVfsBackendAfp *afp_backend,
+                   GAsyncResult   *result,
+                   GError         **error)
+{
+  GSimpleAsyncResult *simple;
+  
+  g_return_val_if_fail (g_simple_async_result_is_valid (result,
+                                                        G_OBJECT (afp_backend),
+                                                        close_fork),
+                        FALSE);
+
+  simple = (GSimpleAsyncResult *)result;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    return FALSE;
+
+  return TRUE;
 }
 
 static void
@@ -548,6 +566,12 @@ get_fork_parms_finish (GVfsBackendAfp *afp_backend,
   return g_object_ref (g_simple_async_result_get_op_res_gpointer (simple));
 }
 
+
+
+
+/*
+ * Backend code
+ */
 static void
 create_file_cb (GVfsAfpConnection *afp_connection,
                 GVfsAfpReply      *reply,
@@ -1230,14 +1254,13 @@ try_read (GVfsBackend *backend,
 }
 
 static void
-close_replace_close_fork_cb (GVfsJob *job)
+close_replace_close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsJobCloseWrite *cwjob = G_VFS_JOB_CLOSE_WRITE (job);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (cwjob->backend);
-  AfpHandle *afp_handle = (AfpHandle *)cwjob->handle;
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  AfpHandle *afp_handle = (AfpHandle *)user_data;
 
   GVfsAfpCommand *comm;
-  
+
   /* Delete temporary file */
   comm = g_vfs_afp_command_new (AFP_COMMAND_DELETE);
   /* pad byte */
@@ -1255,8 +1278,7 @@ close_replace_close_fork_cb (GVfsJob *job)
   g_object_unref (comm);
 
 
-  afp_handle_free (afp_handle);  
-  g_vfs_job_succeeded (job);
+  afp_handle_free (afp_handle);
 }
 
 static void
@@ -1276,6 +1298,10 @@ close_replace_exchange_files_cb (GVfsAfpConnection *afp_connection,
     return;
   }
 
+  /* Close fork and remove the temporary file even if the exchange failed */
+  close_fork (afp_backend, (AfpHandle *)job->handle, G_VFS_JOB (job)->cancellable,
+              close_replace_close_fork_cb, job->handle);
+  
   res_code = g_vfs_afp_reply_get_result_code (reply);
   if (res_code != AFP_RESULT_NO_ERROR)
   {
@@ -1296,8 +1322,25 @@ close_replace_exchange_files_cb (GVfsAfpConnection *afp_connection,
     return;
   }
 
-  close_fork (afp_backend, G_VFS_JOB (job), (AfpHandle *)job->handle,
-              close_replace_close_fork_cb);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
+close_write_close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobCloseWrite *job = G_VFS_JOB_CLOSE_WRITE (user_data);
+
+  GError *err = NULL;
+
+  if (!close_fork_finish (afp_backend, res, &err))
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static gboolean
@@ -1335,11 +1378,30 @@ try_close_write (GVfsBackend *backend,
   }
   else
   {
-    close_fork (afp_backend, G_VFS_JOB (job), afp_handle, NULL);
+    close_fork (afp_backend, afp_handle, G_VFS_JOB (job)->cancellable,
+                close_write_close_fork_cb, job);
     afp_handle_free (afp_handle);
   }
   
   return TRUE;
+}
+
+static void
+close_read_close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobCloseRead *job = G_VFS_JOB_CLOSE_READ (user_data);
+
+  GError *err = NULL;
+  
+  if (!close_fork_finish (afp_backend, res, &err))
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static gboolean
@@ -1350,8 +1412,10 @@ try_close_read (GVfsBackend *backend,
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
   AfpHandle *afp_handle = (AfpHandle *)handle;
 
-  close_fork (afp_backend, G_VFS_JOB (job), afp_handle, NULL);
-
+  close_fork (afp_backend, afp_handle, G_VFS_JOB (job)->cancellable,
+              close_read_close_fork_cb, job);
+  afp_handle_free ((AfpHandle *)job->handle);
+  
   return TRUE;
 }
 
