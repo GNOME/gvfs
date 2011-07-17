@@ -794,8 +794,11 @@ write_command_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   bytes_written = g_output_stream_write_finish (output, res, &err);
   if (bytes_written == -1)
   {
-    g_simple_async_result_set_from_error (req_data->simple, err);
-    g_simple_async_result_complete (req_data->simple);
+    if (req_data->simple)
+    {
+      g_simple_async_result_set_from_error (req_data->simple, err);
+      g_simple_async_result_complete (req_data->simple);
+    }
 
     free_request_data (req_data);
     g_error_free (err);
@@ -812,7 +815,6 @@ write_command_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     char *data;
     
     data = g_vfs_afp_command_get_data (req_data->command);
-    
     
     g_output_stream_write_async (output, data + priv->bytes_written,
                                  size - priv->bytes_written, 0, NULL,
@@ -847,8 +849,11 @@ write_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   bytes_written = g_output_stream_write_finish (output, res, &err);
   if (bytes_written == -1)
   {
-    g_simple_async_result_set_from_error (req_data->simple, err);
-    g_simple_async_result_complete (req_data->simple);
+    if (req_data->simple)
+    {
+      g_simple_async_result_set_from_error (req_data->simple, err);
+      g_simple_async_result_complete (req_data->simple);
+    }
 
     remove_first (priv->request_queue);
     g_error_free (err);
@@ -889,7 +894,23 @@ send_request (GVfsAfpConnection *afp_connection)
   guint32 writeOffset;
   guint8 dsi_command;
 
-  req_data = g_queue_peek_head (priv->request_queue);
+  while ((req_data = g_queue_peek_head (priv->request_queue)))
+  {
+    if (req_data->cancellable && g_cancellable_is_cancelled (req_data->cancellable))
+    {
+      if (req_data->simple)
+      {
+        GError *err = NULL;
+
+        g_cancellable_set_error_if_cancelled (req_data->cancellable, &err);
+        g_simple_async_result_take_error (req_data->simple, err);
+        g_simple_async_result_complete (req_data->simple);
+      }
+      remove_first (priv->request_queue);
+    }
+    else
+      break;
+  }
 
   if (!req_data) {
     priv->send_loop_running = FALSE;
