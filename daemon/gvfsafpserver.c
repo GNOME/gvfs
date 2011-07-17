@@ -41,14 +41,26 @@ G_DEFINE_TYPE (GVfsAfpServer, g_vfs_afp_server, G_TYPE_OBJECT);
 #define AFP_UAM_DHX2      "DHX2"
 
 static void
-get_srvr_msg_cb (GVfsAfpConnection *conn, GVfsAfpReply *reply, GError *error,
-                 gpointer user_data)
+get_srvr_msg_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  gint16 message_bitmap;
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   
+  GVfsAfpReply *reply;
+  AfpResultCode res_code;
+  
+  gint16 message_bitmap;
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, NULL);
   if (!reply)
     return;
 
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_object_unref (reply);
+    return;
+  }
+  
   /* MessageType */
   g_vfs_afp_reply_read_int16 (reply, NULL);
   /* MessageBitmap */
@@ -96,8 +108,8 @@ attention_cb (GVfsAfpConnection *conn, guint attention_code, gpointer user_data)
     /* MessageBitmap */
     g_vfs_afp_command_put_int16 (comm, 1);
 
-    g_vfs_afp_connection_queue_command (afp_serv->conn, comm, get_srvr_msg_cb,
-                                        NULL, afp_serv);
+    g_vfs_afp_connection_send_command (afp_serv->conn, comm, get_srvr_msg_cb,
+                                       NULL, afp_serv);
     g_object_unref (comm);
   }
 }

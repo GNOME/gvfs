@@ -100,19 +100,23 @@ typedef struct
 } UpdateCacheData;
 
 static void
-get_srvr_parms_cb (GVfsAfpConnection *afp_connection,
-                   GVfsAfpReply      *reply,
-                   GError            *error,
-                   gpointer           user_data)
+get_srvr_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   UpdateCacheData *data = (UpdateCacheData *)user_data;
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
+  
   guint8 num_volumes, i;
 
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    data->cb (data->afp_backend, error, data->user_data);
+    data->cb (data->afp_backend, err, data->user_data);
+
+    g_error_free (err);
     g_slice_free (UpdateCacheData, data);
     return;
   }
@@ -120,10 +124,10 @@ get_srvr_parms_cb (GVfsAfpConnection *afp_connection,
   res_code = g_vfs_afp_reply_get_result_code (reply);
   if (res_code != AFP_RESULT_NO_ERROR)
   {
-    GError *err;
-
-    err = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_FAILED,
-                               _("Retrieval of server parameters failed"));
+    g_object_unref (reply);
+    
+    err = g_error_new (G_IO_ERROR, G_IO_ERROR_FAILED,
+                       _("Got error code: %d from server"), res_code);
     data->cb (data->afp_backend, err, data->user_data);
 
     g_error_free (err);
@@ -156,6 +160,7 @@ get_srvr_parms_cb (GVfsAfpConnection *afp_connection,
 
     data->afp_backend->volumes = g_slist_prepend (data->afp_backend->volumes, volume_data);
   }
+  g_object_unref (reply);
 
   data->cb (data->afp_backend, NULL, data->user_data);
   g_slice_free (UpdateCacheData, data);
@@ -177,9 +182,9 @@ update_cache (GVfsBackendAfpBrowse *afp_backend, GCancellable *cancellable,
   /* pad byte */
   g_vfs_afp_command_put_byte (comm, 0);
   
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
-                                      get_srvr_parms_cb,
-                                      cancellable, data);
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+                                     get_srvr_parms_cb,
+                                     cancellable, data);
   g_object_unref (comm); 
 }
 

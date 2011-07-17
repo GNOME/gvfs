@@ -314,20 +314,22 @@ static void fill_info (GVfsBackendAfp *afp_backend,
 }
 
 static void
-open_fork_cb (GVfsAfpConnection *afp_connection,
-              GVfsAfpReply      *reply,
-              GError            *error,
-              gpointer           user_data)
+open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
+  
   guint16 file_bitmap;
   gint16 fork_refnum;
-  
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_simple_async_result_set_from_error (simple, error);
+    g_simple_async_result_take_error (simple, err);
     g_simple_async_result_complete (simple);
     return;
   }
@@ -414,8 +416,8 @@ open_fork (GVfsBackendAfp     *afp_backend,
   simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
                                       user_data, open_fork);
   
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
-                                      open_fork_cb, cancellable, simple);
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+                                     open_fork_cb, cancellable, simple);
   g_object_unref (comm);
 }
 
@@ -442,23 +444,26 @@ open_fork_finish (GVfsBackendAfp *afp_backend,
 }
 
 static void
-close_fork_cb (GVfsAfpConnection *afp_connection,
-               GVfsAfpReply      *reply,
-               GError            *error,
-               gpointer           user_data)
+close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
-  
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_simple_async_result_set_from_error (simple, error);
+    g_simple_async_result_take_error (simple, err);
     g_simple_async_result_complete (simple);
     return;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+  
   if (res_code != AFP_RESULT_NO_ERROR)
   {
     g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -488,7 +493,7 @@ close_fork (GVfsBackendAfp    *afp_backend,
   simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback, user_data,
                                       close_fork);
   
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
                                       close_fork_cb, cancellable,
                                       simple);
   g_object_unref (comm);
@@ -515,21 +520,23 @@ close_fork_finish (GVfsBackendAfp *afp_backend,
 }
 
 static void
-get_fork_parms_cb (GVfsAfpConnection *afp_connection,
-                   GVfsAfpReply      *reply,
-                   GError            *error,
-                   gpointer           user_data)
+get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
+
   guint16 file_bitmap;
   GFileInfo *info;
-  
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_simple_async_result_set_from_error (simple, error);
+    g_simple_async_result_take_error (simple, err);
     g_simple_async_result_complete (simple);
     return;
   }
@@ -549,6 +556,8 @@ get_fork_parms_cb (GVfsAfpConnection *afp_connection,
 
   info = g_file_info_new ();
   fill_info (afp_backend, info, reply, FALSE, file_bitmap);
+
+  g_object_unref (reply);
 
   g_simple_async_result_set_op_res_gpointer (simple, info, g_object_unref);
   g_simple_async_result_complete (simple);
@@ -577,7 +586,7 @@ get_fork_parms (GVfsBackendAfp      *afp_backend,
                                       get_fork_parms);
                                       
   
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
                                       get_fork_parms_cb, cancellable,
                                       simple);
   g_object_unref (comm);
@@ -603,23 +612,24 @@ get_fork_parms_finish (GVfsBackendAfp *afp_backend,
   return g_object_ref (g_simple_async_result_get_op_res_gpointer (simple));
 }
 
-
 static void
-get_vol_parms_cb (GVfsAfpConnection *afp_connection,
-                  GVfsAfpReply      *reply,
-                  GError            *error,
-                  gpointer           user_data)
+get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
+  
   guint16 vol_bitmap;
   GFileInfo *info;
-  
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_simple_async_result_set_from_error (simple, error);
+    g_simple_async_result_take_error (simple, err);
     g_simple_async_result_complete (simple);
     return;
   }
@@ -684,6 +694,8 @@ get_vol_parms_cb (GVfsAfpConnection *afp_connection,
     g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,
                                       bytes_total);
   }
+
+  g_object_unref (reply);
   
   g_simple_async_result_set_op_res_gpointer (simple, info, g_object_unref);
   g_simple_async_result_complete (simple);
@@ -711,7 +723,7 @@ get_vol_parms (GVfsBackendAfp      *afp_backend,
                                       get_vol_parms);
                                       
   
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
                                       get_vol_parms_cb, cancellable,
                                       simple);
   g_object_unref (comm);
@@ -741,27 +753,27 @@ get_vol_parms_finish (GVfsBackendAfp *afp_backend,
  * Backend code
  */
 static void
-create_file_cb (GVfsAfpConnection *afp_connection,
-                GVfsAfpReply      *reply,
-                GError            *error,
-                gpointer           user_data)
+create_file_cb (GObject *object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
-  
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_simple_async_result_set_from_error (simple, error);
+    g_simple_async_result_take_error (simple, err);
     g_simple_async_result_complete (simple);
     return;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
   if (res_code != AFP_RESULT_NO_ERROR)
   {
-    g_object_unref (reply);
-
     switch (res_code)
     {
       case AFP_RESULT_ACCESS_DENIED:
@@ -796,6 +808,7 @@ create_file_cb (GVfsAfpConnection *afp_connection,
   }
 
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 static void
@@ -823,8 +836,8 @@ create_file (GVfsBackendAfp     *afp_backend,
   simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback, user_data,
                                       create_file);
   
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm, create_file_cb,
-                                      cancellable, simple);
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, create_file_cb,
+                                     cancellable, simple);
   g_object_unref (comm);
 }
 
@@ -849,19 +862,21 @@ create_file_finish (GVfsBackendAfp *afp_backend,
 }
 
 static void
-rename_cb (GVfsAfpConnection *afp_connection,
-           GVfsAfpReply      *reply,
-           GError            *error,
-           gpointer           user_data)
+rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GVfsJobSetDisplayName *job = G_VFS_JOB_SET_DISPLAY_NAME (user_data);
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
   char *dirname, *newpath;
-  
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
 
@@ -951,7 +966,7 @@ try_set_display_name (GVfsBackend *backend,
   g_free (dirname);
   g_free (newname);
 
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm, rename_cb,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, rename_cb,
                                       G_VFS_JOB (job)->cancellable, job);
   g_object_unref (comm);
 
@@ -959,26 +974,28 @@ try_set_display_name (GVfsBackend *backend,
 }
 
 static void
-make_directory_cb (GVfsAfpConnection *afp_connection,
-                   GVfsAfpReply      *reply,
-                   GError            *error,
-                   gpointer           user_data)
+make_directory_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GVfsJobMakeDirectory *job = G_VFS_JOB_MAKE_DIRECTORY (user_data);
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
-  
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+
   if (res_code != AFP_RESULT_NO_ERROR)
   {
-    g_object_unref (reply);
-
     switch (res_code)
     {
       case AFP_RESULT_ACCESS_DENIED:
@@ -1035,34 +1052,36 @@ try_make_directory (GVfsBackend *backend,
   /* Pathname */
   put_pathname (comm, filename);
 
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm, make_directory_cb,
-                                      G_VFS_JOB (job)->cancellable, job);
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, make_directory_cb,
+                                     G_VFS_JOB (job)->cancellable, job);
   g_object_unref (comm);
 
   return TRUE;
 }
 
 static void
-delete_cb (GVfsAfpConnection *afp_connection,
-           GVfsAfpReply      *reply,
-           GError            *error,
-           gpointer           user_data)
+delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GVfsJobDelete *job = G_VFS_JOB_DELETE (user_data);
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
-  
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+  
   if (res_code != AFP_RESULT_NO_ERROR)
   {
-    g_object_unref (reply);
-
     switch (res_code)
     {
       case AFP_RESULT_ACCESS_DENIED:
@@ -1116,7 +1135,7 @@ try_delete (GVfsBackend *backend,
   /* Pathname */
   put_pathname (comm, filename);
 
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm, delete_cb,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, delete_cb,
                                       G_VFS_JOB (job)->cancellable, job);
   g_object_unref (comm);
 
@@ -1124,21 +1143,23 @@ try_delete (GVfsBackend *backend,
 }
 
 static void
-write_ext_cb (GVfsAfpConnection *afp_connection,
-              GVfsAfpReply      *reply,
-              GError            *error,
-              gpointer           user_data)
+write_ext_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GVfsJobWrite *job = G_VFS_JOB_WRITE (user_data);
   AfpHandle *afp_handle = (AfpHandle *)job->handle;
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
   gint64 last_written;
   gsize written_size;
 
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
 
@@ -1204,9 +1225,9 @@ try_write (GVfsBackend *backend,
   g_output_stream_write_all (G_OUTPUT_STREAM (comm), buffer, req_count, NULL,
                              NULL, NULL);
 
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
-                                      write_ext_cb, G_VFS_JOB (job)->cancellable,
-                                      job);
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+                                     write_ext_cb, G_VFS_JOB (job)->cancellable,
+                                     job);
   g_object_unref (comm);
 
   return TRUE;
@@ -1335,21 +1356,23 @@ try_seek_on_read (GVfsBackend *backend,
 }
 
 static void
-read_ext_cb (GVfsAfpConnection *afp_connection,
-             GVfsAfpReply      *reply,
-             GError            *error,
-             gpointer           user_data)
+read_ext_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GVfsJobRead *job = G_VFS_JOB_READ (user_data);
   AfpHandle *afp_handle = (AfpHandle *)job->handle;
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
   gsize size;
   char *data;
 
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
 
@@ -1413,7 +1436,7 @@ try_read (GVfsBackend *backend,
   req_count = MIN (bytes_requested, G_MAXUINT32);
   g_vfs_afp_command_put_int64 (comm, req_count);
 
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
                                       read_ext_cb, G_VFS_JOB (job)->cancellable,
                                       job);
   g_object_unref (comm);
@@ -1441,7 +1464,7 @@ close_replace_close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer
   /* Pathname */
   put_pathname (comm, afp_handle->tmp_filename);
 
-  g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                       NULL, NULL);
   g_object_unref (comm);
 
@@ -1450,19 +1473,21 @@ close_replace_close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer
 }
 
 static void
-close_replace_exchange_files_cb (GVfsAfpConnection *afp_connection,
-                                 GVfsAfpReply      *reply,
-                                 GError            *error,
-                                 gpointer           user_data)
+close_replace_exchange_files_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GVfsJobCloseWrite *job = G_VFS_JOB_CLOSE_WRITE (user_data);
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
 
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
 
@@ -1471,10 +1496,10 @@ close_replace_exchange_files_cb (GVfsAfpConnection *afp_connection,
               close_replace_close_fork_cb, job->handle);
   
   res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+  
   if (res_code != AFP_RESULT_NO_ERROR)
   {
-    g_object_unref (reply);
-
     switch (res_code)
     {
       case AFP_RESULT_ACCESS_DENIED:
@@ -1539,9 +1564,9 @@ try_close_write (GVfsBackend *backend,
     /* DestPath */
     put_pathname (comm, afp_handle->tmp_filename);
 
-    g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
-                                        close_replace_exchange_files_cb,
-                                        G_VFS_JOB (job)->cancellable, job);
+    g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+                                       close_replace_exchange_files_cb,
+                                       G_VFS_JOB (job)->cancellable, job);
     g_object_unref (comm);
   }
   else
@@ -1914,38 +1939,46 @@ enumerate_ext2 (GVfsJobEnumerate *job,
                 gint32 start_index);
 
 static void
-enumerate_ext2_cb (GVfsAfpConnection *afp_connection,
-                   GVfsAfpReply      *reply,
-                   GError            *error,
-                   gpointer           user_data)
+enumerate_ext2_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GVfsJobEnumerate *job = G_VFS_JOB_ENUMERATE (user_data);
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
+  
   guint16 file_bitmap;
   guint16  dir_bitmap;
   gint16 count, i;
 
   gint start_index;
-  
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
-  if (res_code == AFP_RESULT_OBJECT_NOT_FOUND)
+  if (res_code != AFP_RESULT_NO_ERROR)
   {
-    g_vfs_job_succeeded (G_VFS_JOB (job));
-    g_vfs_job_enumerate_done (job);
-    return;
-  }
-  else if (res_code != AFP_RESULT_NO_ERROR)
-  {
-    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
-                              G_IO_ERROR_FAILED, _("Enumeration of files failed"));
+    g_object_unref (reply);
+    
+    switch (res_code)
+    {
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_vfs_job_succeeded (G_VFS_JOB (job));
+        g_vfs_job_enumerate_done (job);
+        break;
+      default:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Got error code: %d from server"), res_code);
+        break;
+    }
     return;
   }
 
@@ -1980,6 +2013,7 @@ enumerate_ext2_cb (GVfsAfpConnection *afp_connection,
 
     g_vfs_afp_reply_seek (reply, start_pos + struct_length, G_SEEK_SET);
   }
+  g_object_unref (reply);
 
   start_index = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (job),
                                                     "start-index"));
@@ -2031,7 +2065,7 @@ enumerate_ext2 (GVfsJobEnumerate *job,
   /* Pathname */
   put_pathname (comm, filename);
 
-  g_vfs_afp_connection_queue_command (conn, comm, enumerate_ext2_cb,
+  g_vfs_afp_connection_send_command (conn, comm, enumerate_ext2_cb,
                                       G_VFS_JOB (job)->cancellable, job);
   g_object_unref (comm);
 }
@@ -2119,39 +2153,44 @@ try_query_fs_info (GVfsBackend *backend,
 }
 
 static void
-get_filedir_parms_cb (GVfsAfpConnection *afp_connection,
-                      GVfsAfpReply      *reply,
-                      GError            *error,
-                      gpointer           user_data)
+get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
 
+  GVfsAfpReply *reply;
+  GError *err = NULL;
   AfpResultCode res_code;
+  
   guint16 file_bitmap, dir_bitmap, bitmap;
   guint8 FileDir;
   gboolean directory;
-  
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
-  if (res_code == AFP_RESULT_OBJECT_NOT_FOUND)
+  if (res_code != AFP_RESULT_NO_ERROR)
   {
     g_object_unref (reply);
-    g_vfs_job_failed_literal (G_VFS_JOB (job),  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File doesn't exist"));
-    return;
-  }
-
-  else if (res_code != AFP_RESULT_NO_ERROR)
-  {
-    g_object_unref (reply);
-    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
-                              G_IO_ERROR_FAILED, _("Retrieval of file/directory parameters failed"));
+    
+    switch (res_code)
+    {
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_vfs_job_failed_literal (G_VFS_JOB (job),  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("File doesn't exist"));
+        break;
+      default:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Got error code: %d from server"), res_code);
+        break;
+    }
     return;
   }
 
@@ -2254,7 +2293,7 @@ try_query_info (GVfsBackend *backend,
     /* Pathname */
     put_pathname (comm, filename);
 
-    g_vfs_afp_connection_queue_command (afp_backend->server->conn, comm,
+    g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
                                         get_filedir_parms_cb,
                                         G_VFS_JOB (job)->cancellable, job);
   }

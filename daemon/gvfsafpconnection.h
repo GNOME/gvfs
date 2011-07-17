@@ -337,11 +337,6 @@ struct _GVfsAfpConnection
   GVfsAfpConnectionPrivate *priv;
 };
 
-typedef void (*GVfsAfpConnectionReplyCallback) (GVfsAfpConnection *afp_connection,
-                                                GVfsAfpReply      *reply,
-                                                GError            *error,
-                                                gpointer           user_data);
-
 
 GType g_vfs_afp_connection_get_type (void) G_GNUC_CONST;
 
@@ -368,11 +363,15 @@ GVfsAfpReply*      g_vfs_afp_connection_read_reply_sync   (GVfsAfpConnection *af
                                                            GCancellable *cancellable,
                                                            GError **error);
 
-void               g_vfs_afp_connection_queue_command     (GVfsAfpConnection *afp_connection,
-                                                           GVfsAfpCommand    *command,
-                                                           GVfsAfpConnectionReplyCallback reply_cb,
-                                                           GCancellable      *cancellable,                                                           
-                                                           gpointer user_data);
+GVfsAfpReply*      g_vfs_afp_connection_send_command_finish (GVfsAfpConnection *afp_connnection,
+                                                             GAsyncResult      *res,
+                                                             GError           **error);
+
+void               g_vfs_afp_connection_send_command     (GVfsAfpConnection   *afp_connection,
+                                                          GVfsAfpCommand      *command,
+                                                          GAsyncReadyCallback  callback,
+                                                          GCancellable        *cancellable,                                                           
+                                                          gpointer             user_data);
 G_END_DECLS
 
 #endif /* _GVFSAFPCONNECTION_H_ */
