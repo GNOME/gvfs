@@ -72,6 +72,7 @@ struct _GVfsAfpServer
 gboolean           g_vfs_afp_server_login           (GVfsAfpServer *afp_serv,
                                                      const char     *initial_user,
                                                      GMountSource   *mount_source,
+                                                     char           **logged_in_user,
                                                      GCancellable   *cancellable,
                                                      GError         **error);
 

@@ -455,7 +455,7 @@ do_mount (GVfsBackend *backend,
   afp_backend->server = g_vfs_afp_server_new (afp_backend->addr);
 
   res = g_vfs_afp_server_login (afp_backend->server, afp_backend->user, mount_source,
-                                G_VFS_JOB (job)->cancellable, &err);
+                                NULL, G_VFS_JOB (job)->cancellable, &err);
   if (!res)
     goto error;
   

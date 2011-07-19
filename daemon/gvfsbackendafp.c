@@ -70,6 +70,9 @@ struct _GVfsBackendAfp
 
   GVfsAfpServer      *server;
 
+  char               *logged_in_user;
+  gint32              logged_in_user_id;
+  
   gint32              time_diff;
   guint16             volume_id;
 };
@@ -2314,10 +2317,9 @@ do_mount (GVfsBackend *backend,
   GError *err = NULL;
 
   GVfsAfpCommand *comm;
-  guint16 vol_bitmap;
-  
   GVfsAfpReply *reply;
   AfpResultCode res_code;
+  
   gint32 server_time;
   
   GMountSpec *afp_mount_spec;
@@ -2327,10 +2329,45 @@ do_mount (GVfsBackend *backend,
   afp_backend->server = g_vfs_afp_server_new (afp_backend->addr);
 
   res = g_vfs_afp_server_login (afp_backend->server, afp_backend->user, mount_source,
+                                &afp_backend->logged_in_user,
                                 G_VFS_JOB (job)->cancellable, &err);
   if (!res)
     goto error;
 
+  /* Get UserID */
+  if (afp_backend->logged_in_user)
+  {
+    comm = g_vfs_afp_command_new (AFP_COMMAND_MAP_NAME);
+    /* SubFunction */
+    g_vfs_afp_command_put_byte (comm, AFP_MAP_NAME_FUNCTION_NAME_TO_USER_ID);
+    /* Name */
+    g_vfs_afp_command_put_pascal (comm, afp_backend->logged_in_user);
+
+    res = g_vfs_afp_connection_send_command_sync (afp_backend->server->conn,
+                                                  comm, G_VFS_JOB (job)->cancellable,
+                                                  &err);
+    g_object_unref (comm);
+    if (!res)
+      goto error;
+
+    reply = g_vfs_afp_connection_read_reply_sync (afp_backend->server->conn,
+                                                  G_VFS_JOB (job)->cancellable,
+                                                  &err);
+    if (!reply)
+      goto error;
+
+    res_code = g_vfs_afp_reply_get_result_code (reply);
+    if (res_code != AFP_RESULT_NO_ERROR)
+    {
+      g_object_unref (reply);
+      goto generic_error;
+    }
+
+    g_vfs_afp_reply_read_int32 (reply, &afp_backend->logged_in_user_id);
+    g_object_unref (reply);
+  }
+
+    
   /* Get Server Parameters */
   comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
   /* pad byte */
@@ -2352,7 +2389,7 @@ do_mount (GVfsBackend *backend,
   if (res_code != AFP_RESULT_NO_ERROR)
   {
     g_object_unref (reply);
-    goto error;
+    goto generic_error;
   }
 
   /* server time */
@@ -2366,10 +2403,8 @@ do_mount (GVfsBackend *backend,
   comm = g_vfs_afp_command_new (AFP_COMMAND_OPEN_VOL);
   /* pad byte */
   g_vfs_afp_command_put_byte (comm, 0);
-  
   /* Volume Bitmap */
-  vol_bitmap = AFP_VOLUME_BITMAP_VOL_ID_BIT;
-  g_vfs_afp_command_put_uint16 (comm, vol_bitmap);
+  g_vfs_afp_command_put_uint16 (comm, AFP_VOLUME_BITMAP_VOL_ID_BIT);
 
   /* VolumeName */
   g_vfs_afp_command_put_pascal (comm, afp_backend->volume);
@@ -2500,6 +2535,8 @@ g_vfs_backend_afp_init (GVfsBackendAfp *object)
   afp_backend->volume = NULL;
   afp_backend->user = NULL;
 
+  afp_backend->logged_in_user = NULL;
+  
   afp_backend->addr = NULL;
 }
 
@@ -2511,6 +2548,8 @@ g_vfs_backend_afp_finalize (GObject *object)
   g_free (afp_backend->volume);
   g_free (afp_backend->user);
 
+  g_free (afp_backend->logged_in_user);
+  
   if (afp_backend->addr)
     g_object_unref (afp_backend->addr);
   

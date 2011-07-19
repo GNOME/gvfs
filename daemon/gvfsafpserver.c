@@ -828,6 +828,7 @@ gboolean
 g_vfs_afp_server_login (GVfsAfpServer *afp_serv,
                         const char     *initial_user,
                         GMountSource   *mount_source,
+                        char           **logged_in_user,
                         GCancellable   *cancellable,
                         GError         **error)
 {
@@ -984,7 +985,11 @@ try_login:
     g_free (prompt);
   }
 
-  g_free (user);
+  if (logged_in_user)
+    *logged_in_user = user;
+  else
+    g_free (user);
+  
   g_free (password);
 
   return TRUE;
@@ -1020,7 +1025,7 @@ static void
 g_vfs_afp_server_finalize (GObject *object)
 {
   GVfsAfpServer *afp_serv = G_VFS_AFP_SERVER (object);
-  
+
   g_free (afp_serv->machine_type);
   g_free (afp_serv->server_name);
   g_free (afp_serv->utf8_server_name);
