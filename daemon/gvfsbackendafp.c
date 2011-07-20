@@ -74,6 +74,7 @@ struct _GVfsBackendAfp
   gint32              logged_in_user_id;
   
   gint32              time_diff;
+  guint16             vol_attrs_bitmap;
   guint16             volume_id;
 };
 
@@ -313,6 +314,21 @@ static void fill_info (GVfsBackendAfp *afp_backend,
     g_free (utf8_name);
 
     g_vfs_afp_reply_seek (reply, old_pos, G_SEEK_SET);
+  }
+
+  if (bitmap & AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT)
+  {
+    guint32 uid, gid, permissions;
+
+    g_vfs_afp_reply_read_uint32 (reply, &uid);
+    g_vfs_afp_reply_read_uint32 (reply, &gid);
+    g_vfs_afp_reply_read_uint32 (reply, &permissions);
+    /* ua_permissions */
+    g_vfs_afp_reply_read_uint32 (reply, NULL);
+
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, permissions);
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, uid);
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, gid);
   }
 }
 
@@ -1896,7 +1912,7 @@ try_open_for_read (GVfsBackend *backend,
 }
 
 static guint16
-create_filedir_bitmap (GFileAttributeMatcher *matcher)
+create_filedir_bitmap (GVfsBackendAfp *afp_backend, GFileAttributeMatcher *matcher)
 {
   guint16 bitmap;
 
@@ -1907,16 +1923,24 @@ create_filedir_bitmap (GFileAttributeMatcher *matcher)
   
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_MODIFIED))
     bitmap |= AFP_FILEDIR_BITMAP_MOD_DATE_BIT;
-  
+
+  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_UNIX_MODE) ||
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_UNIX_UID) ||
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_UNIX_GID))
+  {
+    if (afp_backend->vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_SUPPORTS_UNIX_PRIVS)
+      bitmap |= AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT;
+  }
+      
   return bitmap;
 }
 
 static guint16
-create_file_bitmap (GFileAttributeMatcher *matcher)
+create_file_bitmap (GVfsBackendAfp *afp_backend, GFileAttributeMatcher *matcher)
 {
   guint16 file_bitmap;
   
-  file_bitmap = create_filedir_bitmap (matcher);
+  file_bitmap = create_filedir_bitmap (afp_backend, matcher);
 
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STANDARD_SIZE))
     file_bitmap |= AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT;
@@ -1925,11 +1949,11 @@ create_file_bitmap (GFileAttributeMatcher *matcher)
 }
 
 static guint16
-create_dir_bitmap (GFileAttributeMatcher *matcher)
+create_dir_bitmap (GVfsBackendAfp *afp_backend, GFileAttributeMatcher *matcher)
 {
   guint16 dir_bitmap;
   
-  dir_bitmap = create_filedir_bitmap (matcher);
+  dir_bitmap = create_filedir_bitmap (afp_backend, matcher);
 
   if (g_file_attribute_matcher_matches (matcher, "afp::children-count"))
     dir_bitmap |= AFP_DIR_BITMAP_OFFSPRING_COUNT_BIT;
@@ -2049,11 +2073,11 @@ enumerate_ext2 (GVfsJobEnumerate *job,
   g_vfs_afp_command_put_uint32 (comm, 2);
 
   /* File Bitmap */
-  file_bitmap = create_file_bitmap (matcher);
+  file_bitmap = create_file_bitmap (afp_backend, matcher);
   g_vfs_afp_command_put_uint16 (comm, file_bitmap);
   
   /* Dir Bitmap */
-  dir_bitmap = create_dir_bitmap (matcher);
+  dir_bitmap = create_dir_bitmap (afp_backend, matcher);
   g_vfs_afp_command_put_uint16 (comm, dir_bitmap);
 
   /* Req Count */
@@ -2287,10 +2311,10 @@ try_query_info (GVfsBackend *backend,
     /* Directory ID */
     g_vfs_afp_command_put_uint32 (comm, 2);
 
-    file_bitmap = create_file_bitmap (matcher);
+    file_bitmap = create_file_bitmap (afp_backend, matcher);
     g_vfs_afp_command_put_uint16 (comm, file_bitmap);
 
-    dir_bitmap = create_dir_bitmap (matcher);
+    dir_bitmap = create_dir_bitmap (afp_backend, matcher);
     g_vfs_afp_command_put_uint16 (comm, dir_bitmap);
 
     /* Pathname */
@@ -2404,7 +2428,7 @@ do_mount (GVfsBackend *backend,
   /* pad byte */
   g_vfs_afp_command_put_byte (comm, 0);
   /* Volume Bitmap */
-  g_vfs_afp_command_put_uint16 (comm, AFP_VOLUME_BITMAP_VOL_ID_BIT);
+  g_vfs_afp_command_put_uint16 (comm, AFP_VOLUME_BITMAP_VOL_ID_BIT | AFP_VOLUME_BITMAP_ATTRIBUTE_BIT);
 
   /* VolumeName */
   g_vfs_afp_command_put_pascal (comm, afp_backend->volume);
@@ -2432,7 +2456,8 @@ do_mount (GVfsBackend *backend,
   
   /* Volume Bitmap */
   g_vfs_afp_reply_read_uint16 (reply, NULL);
-
+  /* Volume Attributes Bitmap */
+  g_vfs_afp_reply_read_uint16 (reply, &afp_backend->vol_attrs_bitmap);
   /* Volume ID */
   g_vfs_afp_reply_read_uint16 (reply, &afp_backend->volume_id);
   
