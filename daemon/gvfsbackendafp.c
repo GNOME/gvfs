@@ -245,6 +245,14 @@ static void fill_info (GVfsBackendAfp *afp_backend,
                                       mod_date + afp_backend->time_diff);
   }
 
+  if (bitmap & AFP_FILEDIR_BITMAP_NODE_ID_BIT)
+  {
+    guint32 node_id;
+
+    g_vfs_afp_reply_read_uint32 (reply, &node_id);
+    g_file_info_set_attribute_uint32 (info, "afp::node-id", node_id);
+  }
+  
   /* Directory specific attributes */
   if (directory)
   {
