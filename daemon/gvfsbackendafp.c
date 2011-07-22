@@ -1240,6 +1240,48 @@ make_directory_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
+static void
+make_directory_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobMakeDirectory *job = G_VFS_JOB_MAKE_DIRECTORY (user_data);
+
+  GFileInfo *info;
+  GError *err = NULL;
+
+  guint32 dir_id;
+  char *basename;
+  GVfsAfpCommand *comm;
+  
+  info = get_filedir_parms_finish (afp_backend, res, &err);
+  if (!info)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  dir_id = g_file_info_get_attribute_uint32 (info, "afp::node-id");
+  g_object_unref (info);
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_CREATE_DIR);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+  /* Volume ID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+  /* Directory ID */
+  g_vfs_afp_command_put_uint32 (comm, dir_id);
+
+  /* Pathname */
+  basename = g_path_get_basename (job->filename);
+  put_pathname (comm, basename);
+  g_free (basename);
+
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, make_directory_cb,
+                                     G_VFS_JOB (job)->cancellable, job);
+  g_object_unref (comm);
+}
+
 static gboolean 
 try_make_directory (GVfsBackend *backend,
                     GVfsJobMakeDirectory *job,
@@ -1247,22 +1289,14 @@ try_make_directory (GVfsBackend *backend,
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
 
-  GVfsAfpCommand *comm;
-
-  comm = g_vfs_afp_command_new (AFP_COMMAND_CREATE_DIR);
-  /* pad byte */
-  g_vfs_afp_command_put_byte (comm, 0);
-  /* Volume ID */
-  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
-  /* Directory ID 2 == / */
-  g_vfs_afp_command_put_uint32 (comm, 2);
-  /* Pathname */
-  put_pathname (comm, filename);
-
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, make_directory_cb,
-                                     G_VFS_JOB (job)->cancellable, job);
-  g_object_unref (comm);
-
+  char *dirname;
+  
+  dirname = g_path_get_dirname (filename);
+  get_filedir_parms (afp_backend, dirname, 0, AFP_DIR_BITMAP_NODE_ID_BIT,
+                     G_VFS_JOB (job)->cancellable, make_directory_get_filedir_parms_cb,
+                     job);
+  g_free (dirname);
+  
   return TRUE;
 }
 
