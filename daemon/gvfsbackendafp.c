@@ -640,6 +640,125 @@ get_fork_parms_finish (GVfsBackendAfp *afp_backend,
 }
 
 static void
+get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
+
+  GVfsAfpReply *reply;
+  GError *err = NULL;
+  AfpResultCode res_code;
+
+  guint16 file_bitmap, dir_bitmap, bitmap;
+  guint8 FileDir;
+  gboolean directory;
+  GFileInfo *info;
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  if (!reply)
+  {
+    g_simple_async_result_take_error (simple, err);
+    g_simple_async_result_complete (simple);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_object_unref (reply);
+    
+    switch (res_code)
+    {
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                         _("File doesn't exist"));
+        break;
+      default:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         _("Got error code: %d from server"), res_code);
+        break;
+    }
+    g_simple_async_result_complete (simple);
+    return;
+  }
+
+  g_vfs_afp_reply_read_uint16 (reply, &file_bitmap);
+  g_vfs_afp_reply_read_uint16 (reply, &dir_bitmap);
+
+  g_vfs_afp_reply_read_byte (reply, &FileDir);
+  /* Pad Byte */
+  g_vfs_afp_reply_read_byte (reply, NULL);
+  
+  directory = (FileDir & 0x80); 
+  bitmap =  directory ? dir_bitmap : file_bitmap;
+
+  info = g_file_info_new ();
+  fill_info (afp_backend, info, reply, directory, bitmap);
+  
+  g_object_unref (reply);
+
+  g_simple_async_result_set_op_res_gpointer (simple, info, g_object_unref);
+  g_simple_async_result_complete (simple);
+}
+
+static void
+get_filedir_parms (GVfsBackendAfp      *afp_backend,
+                   const char          *filename,
+                   guint16              file_bitmap,
+                   guint16              dir_bitmap,
+                   GCancellable        *cancellable,
+                   GAsyncReadyCallback  callback,
+                   gpointer             user_data)
+{
+  GVfsAfpCommand *comm;
+  GSimpleAsyncResult *simple;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_FILE_DIR_PARMS);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+  /* VolumeID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+  /* Directory ID 2 == / */
+  g_vfs_afp_command_put_uint32 (comm, 2);
+  /* FileBitmap */  
+  g_vfs_afp_command_put_uint16 (comm, file_bitmap);
+  /* DirectoryBitmap */  
+  g_vfs_afp_command_put_uint16 (comm, dir_bitmap);
+  /* PathName */
+  put_pathname (comm, filename);
+
+  simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback, user_data,
+                                      get_filedir_parms);
+                                      
+  
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+                                      get_filedir_parms_cb, cancellable,
+                                      simple);
+  g_object_unref (comm);
+}
+
+static GFileInfo *
+get_filedir_parms_finish (GVfsBackendAfp *afp_backend,
+                          GAsyncResult   *result,
+                          GError         **error)
+{
+  GSimpleAsyncResult *simple;
+  
+  g_return_val_if_fail (g_simple_async_result_is_valid (result,
+                                                        G_OBJECT (afp_backend),
+                                                        get_filedir_parms),
+                        NULL);
+
+  simple = (GSimpleAsyncResult *)result;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    return NULL;
+
+  return g_object_ref (g_simple_async_result_get_op_res_gpointer (simple));
+}
+
+static void
 get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
@@ -2188,58 +2307,25 @@ try_query_fs_info (GVfsBackend *backend,
 }
 
 static void
-get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+query_info_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
   GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
-
-  GVfsAfpReply *reply;
-  GError *err = NULL;
-  AfpResultCode res_code;
   
-  guint16 file_bitmap, dir_bitmap, bitmap;
-  guint8 FileDir;
-  gboolean directory;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
-  if (!reply)
+  GFileInfo *info;
+  GError *err = NULL;
+
+  info = get_filedir_parms_finish (afp_backend, res, &err);
+  if (!info)
   {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
     g_error_free (err);
     return;
   }
 
-  res_code = g_vfs_afp_reply_get_result_code (reply);
-  if (res_code != AFP_RESULT_NO_ERROR)
-  {
-    g_object_unref (reply);
-    
-    switch (res_code)
-    {
-      case AFP_RESULT_OBJECT_NOT_FOUND:
-        g_vfs_job_failed_literal (G_VFS_JOB (job),  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                  _("File doesn't exist"));
-        break;
-      default:
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Got error code: %d from server"), res_code);
-        break;
-    }
-    return;
-  }
-
-  g_vfs_afp_reply_read_uint16 (reply, &file_bitmap);
-  g_vfs_afp_reply_read_uint16 (reply, &dir_bitmap);
-
-  g_vfs_afp_reply_read_byte (reply, &FileDir);
-  /* Pad Byte */
-  g_vfs_afp_reply_read_byte (reply, NULL);
-  
-  directory = (FileDir & 0x80); 
-  bitmap =  directory ? dir_bitmap : file_bitmap;
-
-  fill_info (afp_backend, job->file_info, reply, directory, bitmap);
+  copy_file_info_into (info, job->file_info);
+  g_object_unref (info);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
@@ -2250,8 +2336,8 @@ query_info_get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
   GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
 
-  GError *err = NULL;
   GFileInfo *info;
+  GError *err = NULL;
 
   info = get_vol_parms_finish (afp_backend, res, &err);
   if (!info)
@@ -2307,30 +2393,14 @@ try_query_info (GVfsBackend *backend,
   }
   
   else {
-    GVfsAfpCommand *comm;
-
     guint16 file_bitmap, dir_bitmap;
     
-    comm = g_vfs_afp_command_new (AFP_COMMAND_GET_FILE_DIR_PARMS);
-    /* pad byte */
-    g_vfs_afp_command_put_byte (comm, 0);
-    /* Volume ID */
-    g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
-    /* Directory ID */
-    g_vfs_afp_command_put_uint32 (comm, 2);
-
     file_bitmap = create_file_bitmap (afp_backend, matcher);
-    g_vfs_afp_command_put_uint16 (comm, file_bitmap);
-
     dir_bitmap = create_dir_bitmap (afp_backend, matcher);
-    g_vfs_afp_command_put_uint16 (comm, dir_bitmap);
 
-    /* Pathname */
-    put_pathname (comm, filename);
-
-    g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
-                                        get_filedir_parms_cb,
-                                        G_VFS_JOB (job)->cancellable, job);
+    get_filedir_parms (afp_backend, filename, file_bitmap, dir_bitmap,
+                       G_VFS_JOB (job)->cancellable, query_info_get_filedir_parms_cb,
+                       job);
   }
 
   return TRUE;
