@@ -646,8 +646,6 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
     {
       RequestData *req_data;
 
-      g_debug ("Received tickle from server\n");
-      
       /* Send back a tickle message */
       req_data = g_slice_new0 (RequestData);
       req_data->type = REQUEST_TYPE_TICKLE;
@@ -893,6 +891,7 @@ write_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   if (req_data->type == REQUEST_TYPE_TICKLE)
   {
     remove_first (priv->request_queue);
+    send_request (afp_conn);
     return;
   }
 
