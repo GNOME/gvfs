@@ -895,14 +895,30 @@ get_vol_parms_finish (GVfsBackendAfp *afp_backend,
   return g_object_ref (g_simple_async_result_get_op_res_gpointer (simple));
 }
 
-/*
- * Backend code
- */
+typedef struct
+{
+  GSimpleAsyncResult *simple;
+  GCancellable *cancellable;
+  char *filename;
+  gboolean hard_create;
+} CreateFileData;
+
+static void
+free_create_file_data (CreateFileData *cfd)
+{
+  g_object_unref (cfd->simple);
+  if (cfd->cancellable)
+    g_object_unref (cfd->cancellable);
+  g_free (cfd->filename);
+  
+  g_slice_free (CreateFileData, cfd);
+}
+
 static void
 create_file_cb (GObject *object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (object);
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  CreateFileData *cfd = (CreateFileData *)user_data;
 
   GVfsAfpReply *reply;
   GError *err = NULL;
@@ -911,8 +927,10 @@ create_file_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_simple_async_result_take_error (simple, err);
-    g_simple_async_result_complete (simple);
+    g_simple_async_result_take_error (cfd->simple, err);
+    g_simple_async_result_complete (cfd->simple);
+
+    free_create_file_data (cfd);
     return;
   }
 
@@ -923,38 +941,82 @@ create_file_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     switch (res_code)
     {
       case AFP_RESULT_ACCESS_DENIED:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+        g_simple_async_result_set_error (cfd->simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                                   _("Access denied"));
         break;
       case AFP_RESULT_DISK_FULL:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
+        g_simple_async_result_set_error (cfd->simple, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
                                   _("Not enough space on volume"));
         break;
       case AFP_RESULT_FILE_BUSY:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_EXISTS,
+        g_simple_async_result_set_error (cfd->simple, G_IO_ERROR, G_IO_ERROR_EXISTS,
                                   _("Target file is open"));
         break;
       case AFP_RESULT_OBJECT_EXISTS:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_EXISTS,
+        g_simple_async_result_set_error (cfd->simple, G_IO_ERROR, G_IO_ERROR_EXISTS,
                                   _("Target file already exists"));
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+        g_simple_async_result_set_error (cfd->simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
                                   _("Ancestor directory doesn't exist"));
         break;
       case AFP_RESULT_VOL_LOCKED:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+        g_simple_async_result_set_error (cfd->simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                                   _("Volume is read-only"));
         break;
       default:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+        g_simple_async_result_set_error (cfd->simple, G_IO_ERROR, G_IO_ERROR_FAILED,
                                          _("Got error code: %d from server"), res_code);
         break;
     }
   }
 
-  g_simple_async_result_complete (simple);
-  g_object_unref (simple);
+  g_simple_async_result_complete (cfd->simple);
+  free_create_file_data (cfd);
+}
+
+static void
+create_file_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  CreateFileData *cfd = (CreateFileData *)user_data;
+
+  GFileInfo *info;
+  GError *err = NULL;
+
+  guint32 dir_id;
+  char *basename;
+  GVfsAfpCommand *comm;
+
+  info = get_filedir_parms_finish (afp_backend, res, &err);
+  if (!info)
+  {
+    g_simple_async_result_take_error (cfd->simple, err);
+    g_simple_async_result_complete (cfd->simple);
+
+    free_create_file_data (cfd);
+    return;
+  }
+
+  dir_id = g_file_info_get_attribute_uint32 (info, "afp::node-id");
+  g_object_unref (info);
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_CREATE_FILE);
+  /* soft/hard create */
+  g_vfs_afp_command_put_byte (comm, cfd->hard_create ? 0x80 : 0x00);
+  /* Volume ID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+  /* Directory ID */
+  g_vfs_afp_command_put_uint32 (comm, dir_id);
+
+  /* Pathname */
+  basename = g_path_get_basename (cfd->filename);
+  put_pathname (comm, basename);
+  g_free (basename);
+
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, create_file_cb,
+                                     cfd->cancellable, cfd);
+  g_object_unref (comm);
 }
 
 static void
@@ -965,26 +1027,22 @@ create_file (GVfsBackendAfp     *afp_backend,
              GAsyncReadyCallback callback,
              gpointer            user_data)
 {
-  GVfsAfpCommand *comm;
-  GSimpleAsyncResult *simple;
-  
-  comm = g_vfs_afp_command_new (AFP_COMMAND_CREATE_FILE);
-  /* soft/hard create */
-  g_vfs_afp_command_put_byte (comm, hard_create ? 0x80 : 0x00);
-  /* Volume ID */
-  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
-  /* Directory ID 2 == / */
-  g_vfs_afp_command_put_uint32 (comm, 2);
+  CreateFileData *cfd;
+  char *dirname;
 
-  /* Pathname */
-  put_pathname (comm, filename);
-
-  simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback, user_data,
-                                      create_file);
+  cfd = g_slice_new0 (CreateFileData);
+  cfd->filename = g_strdup (filename);
+  cfd->hard_create = hard_create;
   
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, create_file_cb,
-                                     cancellable, simple);
-  g_object_unref (comm);
+  cfd->simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback, user_data,
+                                           create_file);
+  if (cancellable)
+    cfd->cancellable = g_object_ref (cancellable);
+
+  dirname = g_path_get_dirname (filename);
+  get_filedir_parms (afp_backend, dirname, 0, AFP_DIR_BITMAP_NODE_ID_BIT,
+                     cancellable, create_file_get_filedir_parms_cb, cfd);
+  g_free (dirname);
 }
 
 static gboolean
@@ -1007,6 +1065,9 @@ create_file_finish (GVfsBackendAfp *afp_backend,
   return TRUE;
 }
 
+/*
+ * Backend code
+ */
 static void
 rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
