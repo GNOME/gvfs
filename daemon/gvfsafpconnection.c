@@ -871,7 +871,7 @@ write_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     return;
   }
 
-  if (!req_data->command)
+  if (req_data->type == REQUEST_TYPE_TICKLE)
   {
     remove_first (priv->request_queue);
     return;
