@@ -634,50 +634,69 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
   GVfsAfpConnectionPrivate *priv = afp_connection->priv;
   DSIHeader *dsi_header = &priv->read_dsi_header;
   
-  RequestData *req_data;
-
-  if (dsi_header->command == DSI_TICKLE)
+  switch (dsi_header->command)
   {
-    RequestData *req_data;
-
-    /* Send back a tickle message */
-    req_data = g_slice_new0 (RequestData);
-    req_data->type = REQUEST_TYPE_TICKLE;
-
-    g_queue_push_head (priv->request_queue, req_data);
-    run_loop (afp_connection);
-  }
-
-  else if (dsi_header->command == DSI_ATTENTION)
-  { 
-    guint8 attention_code;
-
-    attention_code = priv->data[0] >> 4;
-
-    g_signal_emit (afp_connection, signals[ATTENTION], 0, attention_code);
-    g_free (priv->data);
-  }
-  
-  else if (dsi_header->command == DSI_COMMAND || dsi_header->command == DSI_WRITE)
-  {
-    req_data = g_hash_table_lookup (priv->request_hash,
-                                    GUINT_TO_POINTER (priv->read_dsi_header.requestID));
-    if (req_data)
+    case DSI_CLOSE_SESSION:
     {
-      GVfsAfpReply *reply;
-
-      reply = g_vfs_afp_reply_new (priv->read_dsi_header.errorCode, priv->data,
-                                   priv->read_dsi_header.totalDataLength);
-
-      g_simple_async_result_set_op_res_gpointer (req_data->simple, reply,
-                                                 g_object_unref);
-      g_simple_async_result_complete (req_data->simple);
-      
-      g_hash_table_remove (priv->request_hash, GUINT_TO_POINTER (priv->read_dsi_header.requestID));
+      g_warning ("Server closed session\n");
+      break;
     }
+
+    case DSI_TICKLE:
+    {
+      RequestData *req_data;
+
+      g_debug ("Received tickle from server\n");
+      
+      /* Send back a tickle message */
+      req_data = g_slice_new0 (RequestData);
+      req_data->type = REQUEST_TYPE_TICKLE;
+
+      g_queue_push_head (priv->request_queue, req_data);
+      run_loop (afp_connection);
+      break;
+    }
+
+    case DSI_ATTENTION:
+    {
+      guint8 attention_code;
+
+      attention_code = priv->data[0] >> 4;
+
+      g_signal_emit (afp_connection, signals[ATTENTION], 0, attention_code);
+      g_free (priv->data);
+      break;
+    }
+
+    case DSI_COMMAND:
+    case DSI_WRITE:
+    {
+      RequestData *req_data;
+      
+      req_data = g_hash_table_lookup (priv->request_hash,
+                                      GUINT_TO_POINTER (priv->read_dsi_header.requestID));
+      if (req_data)
+      {
+        GVfsAfpReply *reply;
+
+        reply = g_vfs_afp_reply_new (priv->read_dsi_header.errorCode, priv->data,
+                                     priv->read_dsi_header.totalDataLength);
+
+        g_simple_async_result_set_op_res_gpointer (req_data->simple, reply,
+                                                   g_object_unref);
+        g_simple_async_result_complete (req_data->simple);
+
+        g_hash_table_remove (priv->request_hash, GUINT_TO_POINTER (priv->read_dsi_header.requestID));
+      }
+      else
+        g_free (priv->data);
+      
+      break;
+    }
+
+    default:
+      g_assert_not_reached ();
   }
-  else
-    g_free (priv->data);
 }
 
 static void
