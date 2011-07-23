@@ -187,6 +187,7 @@ typedef enum
   AFP_COMMAND_OPEN_VOL           = 24,
   AFP_COMMAND_OPEN_FORK          = 26,
   AFP_COMMAND_RENAME             = 28,
+  AFP_COMMAND_SET_FORK_PARMS     = 31,
   AFP_COMMAND_WRITE              = 33,
   AFP_COMMAND_GET_FILE_DIR_PARMS = 34,
   AFP_COMMAND_GET_SRVR_MSG       = 35,
