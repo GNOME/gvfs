@@ -367,7 +367,7 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     {
       case AFP_RESULT_ACCESS_DENIED:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                         _("Access denied"));
+                                         _("Permission denied"));
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
@@ -939,7 +939,7 @@ create_file_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     {
       case AFP_RESULT_ACCESS_DENIED:
         g_simple_async_result_set_error (cfd->simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                  _("Access denied"));
+                                  _("Permission denied"));
         break;
       case AFP_RESULT_DISK_FULL:
         g_simple_async_result_set_error (cfd->simple, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
@@ -1093,7 +1093,7 @@ rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     {
       case AFP_RESULT_ACCESS_DENIED:
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                  _("Access denied"));
+                                  _("Permission denied"));
         break;
       case AFP_RESULT_CANT_RENAME:
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
@@ -1204,7 +1204,7 @@ make_directory_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
     {
       case AFP_RESULT_ACCESS_DENIED:
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                  _("Access denied"));
+                                  _("Permission denied"));
         break;
       case AFP_RESULT_DISK_FULL:
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NO_SPACE,
@@ -1324,7 +1324,7 @@ delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     {
       case AFP_RESULT_ACCESS_DENIED:
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                  _("Access denied"));
+                                  _("Permission denied"));
         break;
       case AFP_RESULT_DIR_NOT_EMPTY:
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
@@ -1742,7 +1742,7 @@ close_replace_exchange_files_cb (GObject *source_object, GAsyncResult *res, gpoi
     {
       case AFP_RESULT_ACCESS_DENIED:
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                                  _("Access denied"));
+                                  _("Permission denied"));
         break;
       default:
         g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -2218,7 +2218,7 @@ enumerate_ext2_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
     {
       case AFP_RESULT_ACCESS_DENIED:
         g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                          _("Access denied"));
+                          _("Permission denied"));
         break;
       case AFP_RESULT_DIR_NOT_FOUND:
         g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
