@@ -2016,9 +2016,9 @@ replace_create_tmp_file_cb (GObject *source_object, GAsyncResult *res, gpointer 
      * so we try to write directly to the file */
     else if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
     {
+      g_object_set_data (G_OBJECT (job), "TempFilename", NULL);
       open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT,
                  G_VFS_JOB (job)->cancellable, replace_open_fork_cb, job);
-      g_object_set_data (G_OBJECT (job), "TempFilename", NULL);
     }
                               
     else
@@ -2081,7 +2081,13 @@ try_replace (GVfsBackend *backend,
     return TRUE;
   }
 
-  replace_create_tmp_file (afp_backend, job);
+  if (afp_backend->vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_NO_EXCHANGE_FILES)
+  {
+    open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT,
+               G_VFS_JOB (job)->cancellable, replace_open_fork_cb, job);
+  }
+  else
+    replace_create_tmp_file (afp_backend, job);
 
   return TRUE;
 }
