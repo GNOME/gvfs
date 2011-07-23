@@ -678,7 +678,7 @@ do_login (GVfsAfpServer *afp_serv,
     
     if (!g_slist_find_custom (afp_serv->uams, AFP_UAM_NO_USER, g_str_equal))
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                            _("AFP server %s doesn't support anonymous login"),
                    afp_serv->server_name);
       return FALSE;
@@ -703,19 +703,23 @@ do_login (GVfsAfpServer *afp_serv,
     
     if (res_code != AFP_RESULT_NO_ERROR)
     {
-      if (res_code == AFP_RESULT_USER_NOT_AUTH)
+      switch (res_code)
       {
-        g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                     _("AFP server %s declined anonymous login"),
-                     afp_serv->server_name);
-        return FALSE;
+        case AFP_RESULT_USER_NOT_AUTH:
+        case AFP_RESULT_BAD_UAM:
+          g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                       _("AFP server %s doesn't support anonymous login"),
+                       afp_serv->server_name);
+          break;
+          
+        default:
+          g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                       _("Anonymous login to AFP server %s failed, got error code: %d"),
+                       afp_serv->server_name, res_code);
+          break;
       }
-      else
-      {
-        g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                     _("Anonymous login to AFP server %s failed"), afp_serv->server_name);
-        return FALSE;
-      }
+      
+      return FALSE;
     }
 
     return TRUE;
