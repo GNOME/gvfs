@@ -2219,6 +2219,18 @@ enumerate_ext2_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
     
     switch (res_code)
     {
+      case AFP_RESULT_ACCESS_DENIED:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                          _("Access denied"));
+        break;
+      case AFP_RESULT_DIR_NOT_FOUND:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                          _("Directory doesn't exist"));
+        break;
+      case AFP_RESULT_OBJECT_TYPE_ERR:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY,
+                          _("Target object is not a directory"));
+        break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_vfs_job_succeeded (G_VFS_JOB (job));
         g_vfs_job_enumerate_done (job);
