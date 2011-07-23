@@ -2707,8 +2707,6 @@ g_vfs_backend_afp_init (GVfsBackendAfp *object)
   afp_backend->volume = NULL;
   afp_backend->user = NULL;
 
-  afp_backend->logged_in_user = NULL;
-  
   afp_backend->addr = NULL;
 }
 
@@ -2720,8 +2718,6 @@ g_vfs_backend_afp_finalize (GObject *object)
   g_free (afp_backend->volume);
   g_free (afp_backend->user);
 
-  g_free (afp_backend->logged_in_user);
-  
   if (afp_backend->addr)
     g_object_unref (afp_backend->addr);
   
