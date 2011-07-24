@@ -73,6 +73,9 @@ struct _GVfsBackendAfp
   gint32              time_diff;
   guint16             vol_attrs_bitmap;
   guint16             volume_id;
+
+  guint32             user_id;
+  guint32             group_id;
 };
 
 
@@ -327,7 +330,7 @@ static void fill_info (GVfsBackendAfp *afp_backend,
 
   if (bitmap & AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT)
   {
-    guint32 uid, gid, permissions = 0;
+    guint32 uid, gid, permissions;
 
     g_vfs_afp_reply_read_uint32 (reply, &uid);
     g_vfs_afp_reply_read_uint32 (reply, &gid);
@@ -2643,6 +2646,89 @@ try_query_info (GVfsBackend *backend,
   return TRUE;
 }
 
+static gboolean
+get_userinfo (GVfsBackendAfp *afp_backend,
+              GCancellable *cancellable,
+              GError **error)
+{
+  GVfsAfpCommand *comm;
+  guint16 bitmap;
+  gboolean res;
+
+  GVfsAfpReply *reply;
+  AfpResultCode res_code;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_USER_INFO);
+  /* Flags, ThisUser = 1 */
+  g_vfs_afp_command_put_byte (comm, 0x01);
+  /* UserId */
+  g_vfs_afp_command_put_int32 (comm, 0);
+  /* Bitmap */
+  bitmap = AFP_GET_USER_INFO_BITMAP_GET_UID_BIT | AFP_GET_USER_INFO_BITMAP_GET_GID_BIT;
+  g_vfs_afp_command_put_uint16 (comm, bitmap);
+
+  res = g_vfs_afp_connection_send_command_sync (afp_backend->server->conn,
+                                                comm, cancellable, error);
+  g_object_unref (comm);
+  if (!res)
+    return FALSE;
+
+  reply = g_vfs_afp_connection_read_reply_sync (afp_backend->server->conn,
+                                                cancellable, error);
+  if (!reply)
+    return FALSE;
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    gint code;
+    char *errstr;
+
+    g_object_unref (reply);
+
+    switch (res_code)
+    {
+      case AFP_RESULT_ACCESS_DENIED:
+        code = G_IO_ERROR_PERMISSION_DENIED;
+        errstr = g_strdup (_("Permission denied"));
+        break;
+      case AFP_RESULT_CALL_NOT_SUPPORTED:
+        code = G_IO_ERROR_NOT_SUPPORTED;
+        errstr = g_strdup (_("Command not supported"));
+        break;
+      case AFP_RESULT_PWD_EXPIRED_ERR:
+        code = G_IO_ERROR_PERMISSION_DENIED;
+        errstr = g_strdup (_("User's password has expired"));
+        break;
+      case AFP_RESULT_PWD_NEEDS_CHANGE_ERR:
+        code = G_IO_ERROR_PERMISSION_DENIED;
+        errstr = g_strdup (_("User's password needs to be changed"));
+        break;
+
+      default:
+        code = G_IO_ERROR_FAILED;
+        errstr = g_strdup_printf (_("Got error code: %d from server"), res_code);
+        break;
+    }
+
+    g_set_error (error, G_IO_ERROR, code,
+                 _("FPGetUserInfo failed (%s)"), errstr);
+    g_free (errstr);
+    return FALSE;
+  }
+
+  /* Bitmap */
+  g_vfs_afp_reply_read_uint16 (reply, NULL);
+  /* UID */
+  g_vfs_afp_reply_read_uint32 (reply, &afp_backend->user_id);
+  /* GID */
+  g_vfs_afp_reply_read_uint32 (reply, &afp_backend->group_id);
+
+  g_object_unref (reply);
+  
+  return TRUE;
+}
+
 static void
 do_mount (GVfsBackend *backend,
           GVfsJobMount *job,
@@ -2672,6 +2758,7 @@ do_mount (GVfsBackend *backend,
   if (!res)
     goto error;
   
+
   /* Get Server Parameters */
   comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
   /* pad byte */
@@ -2702,7 +2789,12 @@ do_mount (GVfsBackend *backend,
 
   g_object_unref (reply);
 
-
+  
+  /* Get User Info */
+  if (!get_userinfo (afp_backend, G_VFS_JOB (job)->cancellable, &err))
+    goto error;
+  g_debug ("UID: %d, GID: %d\n", afp_backend->user_id, afp_backend->group_id);
+  
   /* Open Volume */
   comm = g_vfs_afp_command_new (AFP_COMMAND_OPEN_VOL);
   /* pad byte */
