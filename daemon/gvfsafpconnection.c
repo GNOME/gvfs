@@ -312,9 +312,9 @@ g_vfs_afp_reply_read_afp_name (GVfsAfpReply *reply, gboolean read_text_encoding,
 }
 
 gboolean
-g_vfs_afp_reply_seek (GVfsAfpReply *reply, gint offset, GSeekType type)
+g_vfs_afp_reply_seek (GVfsAfpReply *reply, goffset offset, GSeekType type)
 {
-  gint absolute;
+  goffset absolute;
   
   switch (type)
   {

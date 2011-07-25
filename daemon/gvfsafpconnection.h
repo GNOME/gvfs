@@ -286,7 +286,7 @@ gboolean        g_vfs_afp_reply_dup_data          (GVfsAfpReply *reply, gsize si
 gboolean        g_vfs_afp_reply_read_pascal       (GVfsAfpReply *reply, char **str);
 gboolean        g_vfs_afp_reply_read_afp_name     (GVfsAfpReply *reply, gboolean read_text_encoding, GVfsAfpName **afp_name);
 
-gboolean        g_vfs_afp_reply_seek              (GVfsAfpReply *reply, gint offset, GSeekType type);
+gboolean        g_vfs_afp_reply_seek              (GVfsAfpReply *reply, goffset offset, GSeekType type);
 gboolean        g_vfs_afp_reply_skip_to_even      (GVfsAfpReply *reply);
 
 AfpResultCode   g_vfs_afp_reply_get_result_code   (GVfsAfpReply *reply);
