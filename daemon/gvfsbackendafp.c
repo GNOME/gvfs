@@ -3034,7 +3034,6 @@ do_mount (GVfsBackend *backend,
   /* Get User Info */
   if (!get_userinfo (afp_backend, G_VFS_JOB (job)->cancellable, &err))
     goto error;
-  g_debug ("UID: %d, GID: %d\n", afp_backend->user_id, afp_backend->group_id);
   
   /* Open Volume */
   comm = g_vfs_afp_command_new (AFP_COMMAND_OPEN_VOL);
