@@ -23,6 +23,7 @@
 #include <config.h>
 
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
@@ -198,6 +199,36 @@ afp_handle_free (AfpHandle *afp_handle)
   g_slice_free (AfpHandle, afp_handle);
 }
 
+static void
+set_access_attributes_trusted (GFileInfo *info,
+                               guint32 perm)
+{
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ,
+				     perm & 0x4);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
+				     perm & 0x2);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE,
+				     perm & 0x1);
+}
+
+/* For files we don't own we can't trust a negative response to this check, as
+   something else could allow us to do the operation, for instance an ACL
+   or some sticky bit thing */
+static void
+set_access_attributes (GFileInfo *info,
+                       guint32 perm)
+{
+  if (perm & 0x4)
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ,
+				       TRUE);
+  if (perm & 0x2)
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
+				       TRUE);
+  if (perm & 0x1)
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE,
+				       TRUE);
+}
+
 static void fill_info (GVfsBackendAfp *afp_backend,
                        GFileInfo *info, GVfsAfpReply *reply,
                        gboolean directory, guint16 bitmap)
@@ -343,6 +374,13 @@ static void fill_info (GVfsBackendAfp *afp_backend,
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, permissions);
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, uid);
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, gid);
+
+    if (uid == afp_backend->user_id)
+      set_access_attributes_trusted (info, (permissions >> 6) & 0x7);
+    else if (gid == afp_backend->group_id)
+      set_access_attributes (info, (permissions >> 3) & 0x7);
+    else
+      set_access_attributes (info, (permissions >> 0) & 0x7);
   }
 }
 
@@ -2283,7 +2321,11 @@ create_filedir_bitmap (GVfsBackendAfp *afp_backend, GFileAttributeMatcher *match
 
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_UNIX_MODE) ||
       g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_UNIX_UID) ||
-      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_UNIX_GID))
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_UNIX_GID) ||
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_ACCESS_CAN_READ) ||
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE) ||
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))
+      
   {
     if (afp_backend->vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_SUPPORTS_UNIX_PRIVS)
       bitmap |= AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT;
