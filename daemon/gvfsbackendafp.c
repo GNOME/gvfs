@@ -290,6 +290,8 @@ static void fill_info (GVfsBackendAfp *afp_backend,
     char *utf8_name;
 
     g_vfs_afp_reply_read_uint16 (reply, &UTF8Name_offset);
+    /* Pad */
+    g_vfs_afp_reply_read_uint32 (reply, NULL);
 
     old_pos = g_vfs_afp_reply_get_pos (reply);
     g_vfs_afp_reply_seek (reply, start_pos + UTF8Name_offset, G_SEEK_SET);
