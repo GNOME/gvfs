@@ -27,6 +27,7 @@
 #include <gvfsjob.h>
 #include <gvfsjobdbus.h>
 #include <gvfsbackend.h>
+#include <gvfsdaemonprotocol.h>
 
 G_BEGIN_DECLS
 
