@@ -36,6 +36,8 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobqueryfsinfo.h"
+#include "gvfsjobsetattribute.h"
+#include "gvfsjobqueryattributes.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobcloseread.h"
 #include "gvfsjobread.h"
@@ -363,18 +365,20 @@ static void fill_info (GVfsBackendAfp *afp_backend,
 
   if (bitmap & AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT)
   {
-    guint32 uid, gid, permissions;
+    guint32 uid, gid, permissions, ua_permissions;
 
     g_vfs_afp_reply_read_uint32 (reply, &uid);
     g_vfs_afp_reply_read_uint32 (reply, &gid);
     g_vfs_afp_reply_read_uint32 (reply, &permissions);
     /* ua_permissions */
-    g_vfs_afp_reply_read_uint32 (reply, NULL);
+    g_vfs_afp_reply_read_uint32 (reply, &ua_permissions);
 
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, permissions);
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, uid);
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, gid);
 
+    g_file_info_set_attribute_uint32 (info, "afp::ua-permissions", ua_permissions);
+    
     if (uid == afp_backend->user_id)
       set_access_attributes_trusted (info, (permissions >> 6) & 0x7);
     else if (gid == afp_backend->group_id)
@@ -2533,6 +2537,199 @@ try_enumerate (GVfsBackend *backend,
   return TRUE;
 }
 
+static gboolean
+try_query_settable_attributes (GVfsBackend *backend,
+                               GVfsJobQueryAttributes *job,
+                               const char *filename)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  GFileAttributeInfoList *list;
+
+  list = g_file_attribute_info_list_new ();
+
+  if (afp_backend->vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_SUPPORTS_UNIX_PRIVS)
+  {
+    g_file_attribute_info_list_add (list,
+                                    G_FILE_ATTRIBUTE_UNIX_MODE,
+                                    G_FILE_ATTRIBUTE_TYPE_UINT32,
+                                    G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+                                    G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+    g_file_attribute_info_list_add (list,
+                                    G_FILE_ATTRIBUTE_UNIX_UID,
+                                    G_FILE_ATTRIBUTE_TYPE_UINT32,
+                                    G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+                                    G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+    g_file_attribute_info_list_add (list,
+                                    G_FILE_ATTRIBUTE_UNIX_GID,
+                                    G_FILE_ATTRIBUTE_TYPE_UINT32,
+                                    G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+                                    G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+  }
+    
+  g_vfs_job_query_attributes_set_list (job, list);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_file_attribute_info_list_unref (list);
+  
+  return TRUE;
+}
+
+static void
+set_attribute_set_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsJobSetAttribute *job = G_VFS_JOB_SET_ATTRIBUTE (user_data);
+
+  GVfsAfpReply *reply;
+  GError *err = NULL;
+  AfpResultCode res_code;
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  if (!reply)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    switch (res_code)
+    {
+      case AFP_RESULT_ACCESS_DENIED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Permission denied"));
+        break;
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("Target object doesn't exist"));
+        break;
+      case AFP_RESULT_VOL_LOCKED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Volume is read-only"));
+        break;
+      default:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Got error code: %d from server"), res_code);
+        break;
+    }
+    return;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
+set_attribute_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobSetAttribute *job = G_VFS_JOB_SET_ATTRIBUTE (user_data);
+
+  GFileInfo *info;
+  GError *err = NULL;
+
+  guint32 uid, gid, permissions, ua_permissions;
+  GVfsAfpCommand *comm;
+
+  info = get_filedir_parms_finish (afp_backend, res, &err);
+  if (!info)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  uid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID);
+  gid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID);
+  permissions = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE);
+  ua_permissions = g_file_info_get_attribute_uint32 (info, "afp::ua-permissions");
+  g_object_unref (info);
+  
+  comm = g_vfs_afp_command_new (AFP_COMMAND_SET_FILEDIR_PARMS);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+
+  /* VolumeID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+  /* DirectoryID 2 == / */
+  g_vfs_afp_command_put_uint32 (comm, 2);
+  /* Bitmap */
+  g_vfs_afp_command_put_uint16 (comm, AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT);
+  /* Pathname */
+  put_pathname (comm, job->filename);
+  /* pad to even */
+  g_vfs_afp_command_pad_to_even (comm);
+                                    
+  /* UID */
+  if (strcmp (job->attribute, G_FILE_ATTRIBUTE_UNIX_UID) == 0)
+    g_vfs_afp_command_put_uint32 (comm, job->value.uint32);
+  else
+    g_vfs_afp_command_put_uint32 (comm, uid);
+  
+  /* GID */
+  if (strcmp (job->attribute, G_FILE_ATTRIBUTE_UNIX_GID) == 0)
+    g_vfs_afp_command_put_uint32 (comm, job->value.uint32);
+  else
+    g_vfs_afp_command_put_uint32 (comm, gid);
+  
+  /* Permissions */
+  if (strcmp (job->attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0)
+    g_vfs_afp_command_put_uint32 (comm, job->value.uint32);
+  else
+    g_vfs_afp_command_put_uint32 (comm, permissions);
+  
+  /* UAPermissions */
+  g_vfs_afp_command_put_uint32 (comm, ua_permissions);
+
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+                                     set_attribute_set_filedir_parms_cb,
+                                     G_VFS_JOB (job)->cancellable, job);
+  g_object_unref (comm);
+}
+
+static gboolean
+try_set_attribute (GVfsBackend *backend,
+                   GVfsJobSetAttribute *job,
+                   const char *filename,
+                   const char *attribute,
+                   GFileAttributeType type,
+                   gpointer value_p,
+                   GFileQueryInfoFlags flags)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+
+  if ((strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0 ||
+       strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_UID) == 0 ||
+       strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_GID) == 0)
+      && afp_backend->vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_SUPPORTS_UNIX_PRIVS)
+    {
+      if (type != G_FILE_ATTRIBUTE_TYPE_UINT32) 
+      {
+        g_vfs_job_failed (G_VFS_JOB (job),
+                          G_IO_ERROR,
+                          G_IO_ERROR_INVALID_ARGUMENT,
+                          "%s",
+                          _("Invalid attribute type (uint32 expected)"));
+        return TRUE;
+      }
+
+      get_filedir_parms (afp_backend, filename, AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT,
+                         AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT,
+                         G_VFS_JOB (job)->cancellable, set_attribute_get_filedir_parms_cb,
+                         job);
+      return TRUE;
+    }
+
+  else {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                      _("Operation unsupported"));
+    return TRUE;
+  }
+}
+
+
 static void
 query_fs_info_get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
@@ -3005,6 +3202,8 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
   backend_class->mount = do_mount;
   backend_class->try_query_info = try_query_info;
   backend_class->try_query_fs_info = try_query_fs_info;
+  backend_class->try_set_attribute = try_set_attribute;
+  backend_class->try_query_settable_attributes = try_query_settable_attributes;
   backend_class->try_enumerate = try_enumerate;
   backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_close_read = try_close_read;
