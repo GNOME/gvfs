@@ -1,3 +1,10 @@
+Major changes in 1.9.2
+======================
+* ftp: Fix stupid proxy servers disconnecting on FEAT
+* build: Lower AC_PREREQ requirement
+* gdu: Respect UDISKS_AUTOMOUNT_HINT available in recent udisks and gnome-disk-utility
+* Translation updates
+
 Major changes in 1.9.1
 ======================
 * client: Handle error events when polling _g_vfs_daemon_call_sync ()
