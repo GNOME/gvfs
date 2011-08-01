@@ -839,7 +839,6 @@ write_command_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     return;
   }
 
-  g_queue_pop_head (priv->request_queue);
   g_hash_table_insert (priv->request_hash,
                        GUINT_TO_POINTER (GUINT16_FROM_BE (priv->write_dsi_header.requestID)),
                        req_data);
