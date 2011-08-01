@@ -676,7 +676,7 @@ do_login (GVfsAfpServer *afp_serv,
     GVfsAfpReply *reply;
     AfpResultCode res_code;
     
-    if (!g_slist_find_custom (afp_serv->uams, AFP_UAM_NO_USER, g_str_equal))
+    if (!g_slist_find_custom (afp_serv->uams, AFP_UAM_NO_USER, (GCompareFunc)g_strcmp0))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                            _("AFP server %s doesn't support anonymous login"),
@@ -729,11 +729,11 @@ do_login (GVfsAfpServer *afp_serv,
 
 #ifdef HAVE_GCRYPT
     /* Diffie-Hellman 2 */
-    if (g_slist_find_custom (afp_serv->uams, AFP_UAM_DHX2, g_str_equal))
+    if (g_slist_find_custom (afp_serv->uams, AFP_UAM_DHX2, (GCompareFunc)g_strcmp0))
       return dhx2_login (afp_serv, username, password, cancellable, error);
     
     /* Diffie-Hellman */
-    if (g_slist_find_custom (afp_serv->uams, AFP_UAM_DHX, g_str_equal))
+    if (g_slist_find_custom (afp_serv->uams, AFP_UAM_DHX, (GCompareFunc)g_strcmp0))
       return dhx_login (afp_serv, username, password, cancellable, error); 
 #endif
 
@@ -853,7 +853,7 @@ g_vfs_afp_server_login (GVfsAfpServer *afp_serv,
   if (initial_user)
   {
     if (g_str_equal (initial_user, "anonymous") &&
-        g_slist_find_custom (afp_serv->uams, AFP_UAM_NO_USER, g_str_equal))
+        g_slist_find_custom (afp_serv->uams, AFP_UAM_NO_USER, (GCompareFunc)g_strcmp0))
     {
       user = NULL;
       password = NULL;
@@ -911,7 +911,7 @@ g_vfs_afp_server_login (GVfsAfpServer *afp_serv,
     {
       flags |= G_ASK_PASSWORD_NEED_USERNAME;
       
-      if (g_slist_find_custom (afp_serv->uams, AFP_UAM_NO_USER, g_str_equal))
+      if (g_slist_find_custom (afp_serv->uams, AFP_UAM_NO_USER, (GCompareFunc)g_strcmp0))
         flags |= G_ASK_PASSWORD_ANONYMOUS_SUPPORTED;
     }
 
