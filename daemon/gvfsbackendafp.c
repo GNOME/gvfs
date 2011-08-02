@@ -49,6 +49,7 @@
 #include "gvfsjobdelete.h"
 #include "gvfsjobmakedirectory.h"
 #include "gvfsjobsetdisplayname.h"
+#include "gvfsjobmove.h"
 
 #include "gvfsafpserver.h"
 #include "gvfsafpconnection.h"
@@ -794,10 +795,10 @@ get_filedir_parms (GVfsBackendAfp      *afp_backend,
   simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback, user_data,
                                       get_filedir_parms);
                                       
-  
+
   g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
-                                      get_filedir_parms_cb, cancellable,
-                                      simple);
+                                     get_filedir_parms_cb, cancellable,
+                                     simple);
   g_object_unref (comm);
 }
 
@@ -1128,9 +1129,371 @@ create_file_finish (GVfsBackendAfp *afp_backend,
   return TRUE;
 }
 
+static void
+delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+
+  GVfsAfpReply *reply;
+  GError *err = NULL;
+  AfpResultCode res_code;
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  if (!reply)
+  {
+    g_simple_async_result_take_error (simple, err);
+    g_simple_async_result_complete (simple);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+  
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    switch (res_code)
+    {
+      case AFP_RESULT_ACCESS_DENIED:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Permission denied"));
+        break;
+      case AFP_RESULT_DIR_NOT_EMPTY:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
+                                  _("Directory not empty"));
+        break;
+      case AFP_RESULT_OBJECT_LOCKED:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                  _("Target object is marked as DeleteInhibit"));
+        break;
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("Target object doesn't exist"));
+        break;
+      case AFP_RESULT_VOL_LOCKED:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Volume is read-only"));
+        break;
+      default:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         _("Got error code: %d from server"), res_code);
+        break;
+    }
+  }
+
+  g_simple_async_result_complete (simple);
+}
+
+static void
+delete (GVfsBackendAfp      *afp_backend,
+        const char          *filename,
+        GCancellable        *cancellable,
+        GAsyncReadyCallback  callback,
+        gpointer             user_data)
+{
+  GVfsAfpCommand *comm;
+  GSimpleAsyncResult *simple;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_DELETE);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+  /* Volume ID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+  /* Directory ID 2 == / */
+  g_vfs_afp_command_put_uint32 (comm, 2);
+
+  /* Pathname */
+  put_pathname (comm, filename);
+
+  simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
+                                      user_data, delete);
+  
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, delete_cb,
+                                     cancellable, simple);
+  g_object_unref (comm);
+}
+
+static gboolean
+delete_finish (GVfsBackendAfp *afp_backend,
+               GAsyncResult   *result,
+               GError         **error)
+{
+  GSimpleAsyncResult *simple;
+
+  g_return_val_if_fail (g_simple_async_result_is_valid (result,
+                                                        G_OBJECT (afp_backend),
+                                                        delete),
+                        FALSE);
+
+  simple = (GSimpleAsyncResult *)result;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    return FALSE;
+
+  return TRUE;
+}
+
 /*
  * Backend code
  */
+static void
+move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsJobMove *job = G_VFS_JOB_MOVE (user_data);
+
+  GVfsAfpReply *reply;
+  GError *err = NULL;
+
+  AfpResultCode res_code;
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  if (!reply)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+  
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    switch (res_code)
+    {
+      case AFP_RESULT_ACCESS_DENIED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                  _("Permission denied"));
+        break;
+      case AFP_RESULT_CANT_MOVE:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                                  _("Can't move directory into one of it's descendants"));
+        break;
+      case AFP_RESULT_INSIDE_SHARE_ERR:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                                  _("Can't move sharepoint into a shared directory"));
+        break;
+      case AFP_RESULT_INSIDE_TRASH_ERR:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                                  _("Can't move a shared directory into the Trash"));
+        break;
+      case AFP_RESULT_OBJECT_EXISTS:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                  _("Target file already exists"));
+        break;
+      case AFP_RESULT_OBJECT_LOCKED:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("Object being moved is marked as RenameInhibit"));
+        break;
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("Object being moved doesn't exist"));
+        break;
+      default:
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Got error code: %d from server"), res_code);
+        break;
+    }
+    return;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
+move (GVfsBackendAfp *afp_backend, GVfsJobMove *job)
+{
+  GVfsAfpCommand *comm;
+  char *dirname, *basename;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_MOVE_AND_RENAME);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+
+  /* VolumeID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+
+  /* SourceDirectoryID 2 == / */
+  g_vfs_afp_command_put_uint32 (comm, 2);
+  /* DestDirectoryID 2 == / */
+  g_vfs_afp_command_put_uint32 (comm, 2);
+
+  /* SourcePathname */
+  put_pathname (comm, job->source);
+
+  /* DestPathname */
+  dirname = g_path_get_dirname (job->destination);
+  put_pathname (comm, dirname);
+  g_free (dirname);
+
+  /* NewName */
+  basename = g_path_get_basename (job->destination);
+  put_pathname (comm, basename);
+  g_free (basename);
+
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+                                     move_and_rename_cb, G_VFS_JOB (job)->cancellable,
+                                     job);
+  g_object_unref (comm);
+}
+
+static void
+move_delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobMove *job = G_VFS_JOB_MOVE (user_data);
+
+  GError *err = NULL;
+  
+  if (!delete_finish (afp_backend, res, &err))
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  move (afp_backend, job);
+}
+
+typedef struct
+{
+  GVfsJobMove *job;
+  GAsyncResult *source_parms_res;
+  GAsyncResult *dest_parms_res;
+} MoveData;
+
+static void
+do_move (MoveData *move_data)
+{
+  GVfsJobMove *job = move_data->job;
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  
+  GFileInfo *info;
+  GError *err = NULL;
+
+  gboolean source_is_dir;
+  gboolean dest_exists;
+  gboolean dest_is_dir;
+  
+  info = get_filedir_parms_finish (afp_backend, move_data->source_parms_res, &err);
+  if (!info)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    goto done;
+  }
+
+  source_is_dir = g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY ? TRUE : FALSE;
+  g_object_unref (info);
+
+  info = get_filedir_parms_finish (afp_backend, move_data->dest_parms_res, &err);
+  if (!info)
+  {
+    if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+    {
+      g_clear_error (&err);
+      dest_exists = FALSE;
+    }
+    else
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+      g_error_free (err);
+      goto done;
+    }
+  }
+  else
+  {
+    dest_exists = TRUE;
+    dest_is_dir = g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY ? TRUE : FALSE;
+    g_object_unref (info);
+  }
+
+  if (dest_exists)
+  {
+    if ((job->flags & G_FILE_COPY_OVERWRITE))
+    {
+      /* Always fail on dirs, even with overwrite */
+      if (dest_is_dir)
+      {
+        if (source_is_dir)
+          g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
+                                    _("Can't move directory over directory"));
+        else
+          g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                    _("File is directory"));
+        goto done;
+      }
+    }
+    else
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
+                        _("Target file already exists"));
+      goto done;
+    }
+
+    delete (afp_backend, job->destination, G_VFS_JOB (job)->cancellable,
+            move_delete_cb, job);
+  }
+  else
+    move (afp_backend, job);
+
+done:
+  g_object_unref (move_data->source_parms_res);
+  g_object_unref (move_data->dest_parms_res);
+  g_slice_free (MoveData, move_data);
+  return;
+}
+
+static void
+move_get_dest_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  MoveData *move_data = (MoveData *)user_data;
+  
+  move_data->dest_parms_res = g_object_ref (res);
+  if (move_data->source_parms_res)
+    do_move (move_data);
+}
+
+static void
+move_get_source_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  MoveData *move_data = (MoveData *)user_data;
+
+  move_data->source_parms_res = g_object_ref (res);
+  if (move_data->dest_parms_res)
+    do_move (move_data);
+}
+
+static gboolean
+try_move (GVfsBackend *backend,
+          GVfsJobMove *job,
+          const char *source,
+          const char *destination,
+          GFileCopyFlags flags,
+          GFileProgressCallback progress_callback,
+          gpointer progress_callback_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+
+  MoveData *move_data;
+  
+  move_data = g_slice_new0 (MoveData);
+  move_data->job = job;
+  
+  get_filedir_parms (afp_backend, source, AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT,
+                     AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT,
+                     G_VFS_JOB (job)->cancellable, move_get_source_parms_cb,
+                     move_data);
+
+  get_filedir_parms (afp_backend, destination, AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT,
+                     AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT,
+                     G_VFS_JOB (job)->cancellable, move_get_dest_parms_cb,
+                     move_data);  
+
+  return TRUE;
+}
+
 static void
 rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
@@ -1389,55 +1752,17 @@ try_make_directory (GVfsBackend *backend,
 }
 
 static void
-delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+delete_delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
   GVfsJobDelete *job = G_VFS_JOB_DELETE (user_data);
 
-  GVfsAfpReply *reply;
   GError *err = NULL;
-  AfpResultCode res_code;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
-  if (!reply)
+  if (!delete_finish (afp_backend, res, &err))
   {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
     g_error_free (err);
-    return;
-  }
-
-  res_code = g_vfs_afp_reply_get_result_code (reply);
-  g_object_unref (reply);
-  
-  if (res_code != AFP_RESULT_NO_ERROR)
-  {
-    switch (res_code)
-    {
-      case AFP_RESULT_ACCESS_DENIED:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                  _("Permission denied"));
-        break;
-      case AFP_RESULT_DIR_NOT_EMPTY:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
-                                  _("Directory not empty"));
-        break;
-      case AFP_RESULT_OBJECT_LOCKED:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                                  _("Target object is marked as DeleteInhibit"));
-        break;
-      case AFP_RESULT_OBJECT_NOT_FOUND:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                  _("Target object doesn't exist"));
-        break;
-      case AFP_RESULT_VOL_LOCKED:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                  _("Volume is read-only"));
-        break;
-      default:
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Got error code: %d from server"), res_code);
-        break;
-    }
     return;
   }
 
@@ -1451,23 +1776,9 @@ try_delete (GVfsBackend *backend,
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
 
-  GVfsAfpCommand *comm;
-
-  comm = g_vfs_afp_command_new (AFP_COMMAND_DELETE);
-  /* pad byte */
-  g_vfs_afp_command_put_byte (comm, 0);
-  /* Volume ID */
-  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
-  /* Directory ID 2 == / */
-  g_vfs_afp_command_put_uint32 (comm, 2);
-
-  /* Pathname */
-  put_pathname (comm, filename);
-
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, delete_cb,
-                                      G_VFS_JOB (job)->cancellable, job);
-  g_object_unref (comm);
-
+  delete (afp_backend, filename, G_VFS_JOB (job)->cancellable,
+          delete_delete_cb, job);
+  
   return TRUE;
 }
 
@@ -3257,6 +3568,7 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
   backend_class->try_delete = try_delete;
   backend_class->try_make_directory = try_make_directory;
   backend_class->try_set_display_name = try_set_display_name;
+  backend_class->try_move = try_move;
 }
 
 void

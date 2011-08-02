@@ -191,6 +191,7 @@ typedef enum
   AFP_COMMAND_LOGIN              = 18,
   AFP_COMMAND_LOGIN_CONT         = 19,
   AFP_COMMAND_MAP_NAME           = 22,
+  AFP_COMMAND_MOVE_AND_RENAME    = 23,
   AFP_COMMAND_OPEN_VOL           = 24,
   AFP_COMMAND_OPEN_FORK          = 26,
   AFP_COMMAND_RENAME             = 28,
@@ -214,6 +215,7 @@ typedef enum
   AFP_RESULT_ACCESS_DENIED        = -5000, 
   AFP_RESULT_AUTH_CONTINUE        = -5001,
   AFP_RESULT_BAD_UAM              = -5002,
+  AFP_RESULT_CANT_MOVE            = -5005,
   AFP_RESULT_DIR_NOT_EMPTY        = -5007,
   AFP_RESULT_DISK_FULL            = -5008,
   AFP_RESULT_EOF_ERR              = -5009,
@@ -232,6 +234,8 @@ typedef enum
   AFP_RESULT_VOL_LOCKED           = -5031,
   AFP_RESULT_OBJECT_LOCKED        = -5032,
   AFP_RESULT_PWD_EXPIRED_ERR      = -5042,
+  AFP_RESULT_INSIDE_SHARE_ERR     = -5043,
+  AFP_RESULT_INSIDE_TRASH_ERR     = -5044,
   AFP_RESULT_PWD_NEEDS_CHANGE_ERR = -5045
 } AfpResultCode;
 
