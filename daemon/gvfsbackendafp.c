@@ -441,7 +441,7 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
                                          _("File doesn't exist"));
         break;
       case AFP_RESULT_OBJECT_TYPE_ERR:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
                                          _("File is a directory"));
         break;
       case AFP_RESULT_TOO_MANY_FILES_OPEN:
@@ -481,7 +481,7 @@ open_fork (GVfsBackendAfp     *afp_backend,
   if (is_root (filename))
   {
     g_simple_async_report_error_in_idle (G_OBJECT (afp_backend), callback,
-                                         user_data, G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+                                         user_data, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
                                          _("File is a directory"));
     return;
   }
