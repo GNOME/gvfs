@@ -290,10 +290,18 @@ static void fill_info (GVfsBackendAfp *afp_backend,
   if (bitmap & AFP_FILEDIR_BITMAP_MOD_DATE_BIT)
   {
     gint32 mod_date;
+    guint64 mod_date_unix;
+    char *etag;
 
     g_vfs_afp_reply_read_int32 (reply, &mod_date);
+    mod_date_unix = mod_date + afp_backend->time_diff;
+    
     g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
-                                      mod_date + afp_backend->time_diff);
+                                      mod_date_unix);
+
+    etag = g_strdup_printf ("%"G_GUINT64_FORMAT, mod_date_unix);
+    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE, etag);
+    g_free (etag);
   }
 
   if (bitmap & AFP_FILEDIR_BITMAP_NODE_ID_BIT)
@@ -309,9 +317,9 @@ static void fill_info (GVfsBackendAfp *afp_backend,
   {
     if (bitmap & AFP_DIR_BITMAP_OFFSPRING_COUNT_BIT)
     {
-      guint32 offspring_count;
+      guint16 offspring_count;
 
-      g_vfs_afp_reply_read_uint32 (reply, &offspring_count);
+      g_vfs_afp_reply_read_uint16 (reply, &offspring_count);
       g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_CHILDREN_COUNT,
                                         offspring_count);
     }
@@ -2671,7 +2679,8 @@ create_filedir_bitmap (GVfsBackendAfp *afp_backend, GFileAttributeMatcher *match
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_CREATED))
     bitmap |= AFP_FILEDIR_BITMAP_CREATE_DATE_BIT;
   
-  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_MODIFIED))
+  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_MODIFIED) ||
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_ETAG_VALUE))
     bitmap |= AFP_FILEDIR_BITMAP_MOD_DATE_BIT;
 
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_UNIX_MODE) ||
