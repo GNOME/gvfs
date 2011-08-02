@@ -264,6 +264,14 @@ static void fill_info (GVfsBackendAfp *afp_backend,
       g_file_info_set_is_hidden (info, TRUE);
   }
 
+  if (bitmap & AFP_FILEDIR_BITMAP_PARENT_DIR_ID_BIT)
+  {
+    guint32 parent_dir_id;
+
+    g_vfs_afp_reply_read_uint32 (reply, &parent_dir_id);
+    g_file_info_set_attribute_uint32 (info, "afp::parent-dir-id", parent_dir_id);
+  }
+  
   if (bitmap & AFP_FILEDIR_BITMAP_CREATE_DATE_BIT)
   {
     gint32 create_date;
@@ -1184,6 +1192,53 @@ rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
+static void
+set_display_name_get_filedir_parms_cb (GObject      *source_object,
+                                       GAsyncResult *res,
+                                       gpointer      user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobSetDisplayName *job = G_VFS_JOB_SET_DISPLAY_NAME (user_data);
+
+  GFileInfo *info;
+  GError *err = NULL;
+
+  guint32 dir_id;
+  GVfsAfpCommand *comm;
+  char *basename;
+
+  info = get_filedir_parms_finish (afp_backend, res, &err);
+  if (!info)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  dir_id = g_file_info_get_attribute_uint32 (info, "afp::parent-dir-id");
+  g_object_unref (info);
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_RENAME);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+  /* Volume ID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+  /* Directory ID */
+  g_vfs_afp_command_put_uint32 (comm, dir_id);
+
+  /* Pathname */
+  basename = g_path_get_basename (job->filename);
+  put_pathname (comm, basename);
+  g_free (basename);
+
+  /* NewName */
+  put_pathname (comm, job->display_name);
+
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, rename_cb,
+                                     G_VFS_JOB (job)->cancellable, job);
+  g_object_unref (comm);
+}
+  
 static gboolean
 try_set_display_name (GVfsBackend *backend,
                       GVfsJobSetDisplayName *job,
@@ -1191,9 +1246,6 @@ try_set_display_name (GVfsBackend *backend,
                       const char *display_name)
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
-
-  GVfsAfpCommand *comm;
-  char *dirname, *newname;
   
   if (is_root (filename))
   {
@@ -1202,29 +1254,10 @@ try_set_display_name (GVfsBackend *backend,
     return TRUE;
   }
 
-  comm = g_vfs_afp_command_new (AFP_COMMAND_RENAME);
-  /* pad byte */
-  g_vfs_afp_command_put_byte (comm, 0);
-  /* Volume ID */
-  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
-  /* Directory ID 2 == / */
-  g_vfs_afp_command_put_uint32 (comm, 2);
-
-  /* Pathname */
-  put_pathname (comm, filename);
-
-  /* NewName */
-  dirname = g_path_get_dirname (filename);
-  newname = g_build_filename (dirname, display_name, NULL);
-  put_pathname (comm, newname);
-
-  g_free (dirname);
-  g_free (newname);
-
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, rename_cb,
-                                      G_VFS_JOB (job)->cancellable, job);
-  g_object_unref (comm);
-
+  get_filedir_parms (afp_backend, filename, AFP_FILEDIR_BITMAP_PARENT_DIR_ID_BIT,
+                     AFP_FILEDIR_BITMAP_PARENT_DIR_ID_BIT,
+                     G_VFS_JOB (job)->cancellable,
+                     set_display_name_get_filedir_parms_cb, job);
   return TRUE;
 }
 
