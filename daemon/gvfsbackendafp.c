@@ -55,6 +55,11 @@
 
 #include "gvfsbackendafp.h"
 
+#define G_FILE_ATTRIBUTE_AFP_NODE_ID        "afp::node-id"
+#define G_FILE_ATTRIBUTE_AFP_PARENT_DIR_ID  "afp::parent-dir-id"
+#define G_FILE_ATTRIBUTE_AFP_CHILDREN_COUNT "afp::children-count"
+#define G_FILE_ATTRIBUTE_AFP_UA_PERMISSIONS "afp::ua-permisssions"
+
 static const gint16 ENUMERATE_REQ_COUNT      = G_MAXINT16;
 static const gint32 ENUMERATE_MAX_REPLY_SIZE = G_MAXINT32;
 
@@ -295,7 +300,7 @@ static void fill_info (GVfsBackendAfp *afp_backend,
     guint32 node_id;
 
     g_vfs_afp_reply_read_uint32 (reply, &node_id);
-    g_file_info_set_attribute_uint32 (info, "afp::node-id", node_id);
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_NODE_ID, node_id);
   }
   
   /* Directory specific attributes */
@@ -306,7 +311,8 @@ static void fill_info (GVfsBackendAfp *afp_backend,
       guint32 offspring_count;
 
       g_vfs_afp_reply_read_uint32 (reply, &offspring_count);
-      g_file_info_set_attribute_uint32 (info, "afp::children-count", offspring_count);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_CHILDREN_COUNT,
+                                        offspring_count);
     }
   }
   
@@ -385,7 +391,8 @@ static void fill_info (GVfsBackendAfp *afp_backend,
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, uid);
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, gid);
 
-    g_file_info_set_attribute_uint32 (info, "afp::ua-permissions", ua_permissions);
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_UA_PERMISSIONS,
+                                      ua_permissions);
     
     if (uid == afp_backend->user_id)
       set_access_attributes_trusted (info, (permissions >> 6) & 0x7);
@@ -1054,7 +1061,7 @@ create_file_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpo
     return;
   }
 
-  dir_id = g_file_info_get_attribute_uint32 (info, "afp::node-id");
+  dir_id = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_NODE_ID);
   g_object_unref (info);
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_CREATE_FILE);
@@ -1215,7 +1222,7 @@ set_display_name_get_filedir_parms_cb (GObject      *source_object,
     return;
   }
 
-  dir_id = g_file_info_get_attribute_uint32 (info, "afp::parent-dir-id");
+  dir_id = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_PARENT_DIR_ID);
   g_object_unref (info);
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_RENAME);
@@ -1342,7 +1349,7 @@ make_directory_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, 
     return;
   }
 
-  dir_id = g_file_info_get_attribute_uint32 (info, "afp::node-id");
+  dir_id = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_NODE_ID);
   g_object_unref (info);
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_CREATE_DIR);
@@ -2391,7 +2398,7 @@ create_dir_bitmap (GVfsBackendAfp *afp_backend, GFileAttributeMatcher *matcher)
   
   dir_bitmap = create_filedir_bitmap (afp_backend, matcher);
 
-  if (g_file_attribute_matcher_matches (matcher, "afp::children-count"))
+  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_AFP_CHILDREN_COUNT))
     dir_bitmap |= AFP_DIR_BITMAP_OFFSPRING_COUNT_BIT;
   
   return dir_bitmap;
@@ -2676,7 +2683,7 @@ set_attribute_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, g
   uid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID);
   gid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID);
   permissions = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE);
-  ua_permissions = g_file_info_get_attribute_uint32 (info, "afp::ua-permissions");
+  ua_permissions = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_UA_PERMISSIONS);
   g_object_unref (info);
   
   comm = g_vfs_afp_command_new (AFP_COMMAND_SET_FILEDIR_PARMS);
