@@ -66,19 +66,19 @@ static const gint32 ENUMERATE_MAX_REPLY_SIZE = G_MAXINT32;
 
 struct _GVfsBackendAfpClass
 {
-	GVfsBackendClass parent_class;
+  GVfsBackendClass parent_class;
 };
 
 struct _GVfsBackendAfp
 {
-	GVfsBackend parent_instance;
+  GVfsBackend parent_instance;
 
-	GNetworkAddress    *addr;
+  GNetworkAddress    *addr;
   char               *volume;
-	char               *user;
+  char               *user;
 
   GVfsAfpServer      *server;
-  
+
   gint32              time_diff;
   guint16             vol_attrs_bitmap;
   guint16             volume_id;

@@ -44,7 +44,7 @@
 
 struct _GVfsBackendAfpBrowseClass
 {
-	GVfsBackendClass parent_class;
+  GVfsBackendClass parent_class;
 };
 
 struct _GVfsBackendAfpBrowse
