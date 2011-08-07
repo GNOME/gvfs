@@ -3556,8 +3556,8 @@ g_vfs_backend_afp_finalize (GObject *object)
 
   if (afp_backend->addr)
     g_object_unref (afp_backend->addr);
-  
-	G_OBJECT_CLASS (g_vfs_backend_afp_parent_class)->finalize (object);
+
+  G_OBJECT_CLASS (g_vfs_backend_afp_parent_class)->finalize (object);
 }
 
 static void
