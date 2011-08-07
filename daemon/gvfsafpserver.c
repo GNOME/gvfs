@@ -937,6 +937,9 @@ g_vfs_afp_server_login (GVfsAfpServer *afp_serv,
       res = FALSE;
       break;
     }
+    
+    if (!user)
+      user = g_strdup (olduser);
 
 try_login:
 
@@ -990,7 +993,12 @@ try_login:
   }
 
   if (logged_in_user)
-    *logged_in_user = user;
+  {
+    if (anonymous)
+      *logged_in_user = g_strdup ("anonymous");
+    else
+      *logged_in_user = user;
+  }
   else
     g_free (user);
   

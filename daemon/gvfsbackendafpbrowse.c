@@ -57,7 +57,8 @@ struct _GVfsBackendAfpBrowse
   GMountTracker      *mount_tracker;
   GVfsAfpServer      *server;
 
-  GSList *volumes;
+  char               *logged_in_user;
+  GSList             *volumes;
 };
 
 
@@ -251,6 +252,7 @@ mount_mountable_cb (GVfsBackendAfpBrowse *afp_backend,
   g_mount_spec_set (mount_spec, "host",
                     g_network_address_get_hostname (G_NETWORK_ADDRESS (afp_backend->addr)));
   g_mount_spec_set (mount_spec, "volume", vol_data->name);
+  g_mount_spec_set (mount_spec, "user", afp_backend->logged_in_user);
 
   g_vfs_job_mount_mountable_set_target (job, mount_spec, "/", TRUE);
   g_mount_spec_unref (mount_spec);
@@ -304,6 +306,7 @@ fill_info (GFileInfo *info, VolumeData *vol_data, GVfsBackendAfpBrowse *afp_back
   g_mount_spec_set (mount_spec, "host",
                     g_network_address_get_hostname (G_NETWORK_ADDRESS (afp_backend->addr)));
   g_mount_spec_set (mount_spec, "volume", vol_data->name);
+  g_mount_spec_set (mount_spec, "user", afp_backend->logged_in_user);
 
   if (g_mount_tracker_has_mount_spec (afp_backend->mount_tracker, mount_spec))
   {
@@ -455,7 +458,8 @@ do_mount (GVfsBackend *backend,
   afp_backend->server = g_vfs_afp_server_new (afp_backend->addr);
 
   res = g_vfs_afp_server_login (afp_backend->server, afp_backend->user, mount_source,
-                                NULL, G_VFS_JOB (job)->cancellable, &err);
+                                &afp_backend->logged_in_user,
+                                G_VFS_JOB (job)->cancellable, &err);
   if (!res)
     goto error;
   
@@ -539,6 +543,7 @@ g_vfs_backend_afp_browse_init (GVfsBackendAfpBrowse *object)
   afp_backend->addr = NULL;
   afp_backend->user = NULL;
 
+  afp_backend->logged_in_user = NULL;
   afp_backend->volumes = NULL;
 }
 
@@ -554,6 +559,7 @@ g_vfs_backend_afp_browse_finalize (GObject *object)
   
   g_free (afp_backend->user);
 
+  g_free (afp_backend->logged_in_user);
   g_slist_free_full (afp_backend->volumes, (GDestroyNotify)volume_data_free);
 
   G_OBJECT_CLASS (g_vfs_backend_afp_browse_parent_class)->finalize (object);
