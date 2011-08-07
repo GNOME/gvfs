@@ -61,8 +61,9 @@
 #define G_FILE_ATTRIBUTE_AFP_CHILDREN_COUNT "afp::children-count"
 #define G_FILE_ATTRIBUTE_AFP_UA_PERMISSIONS "afp::ua-permisssions"
 
-static const gint16 ENUMERATE_REQ_COUNT      = G_MAXINT16;
-static const gint32 ENUMERATE_MAX_REPLY_SIZE = G_MAXINT32;
+static const gint16 ENUMERATE_REQ_COUNT           = G_MAXINT16;
+static const gint16 ENUMERATE_EXT_MAX_REPLY_SIZE  = G_MAXINT16; 
+static const gint32 ENUMERATE_EXT2_MAX_REPLY_SIZE = G_MAXINT32;
 
 struct _GVfsBackendAfpClass
 {
@@ -470,7 +471,7 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 
   g_object_unref (reply);
 
-  g_simple_async_result_set_op_res_gpointer (simple, GINT_TO_POINTER (fork_refnum),
+  g_simple_async_result_set_op_res_gpointer (simple, GINT_TO_POINTER ((gint)fork_refnum),
                                              NULL);
   g_simple_async_result_complete (simple);
 }
@@ -2725,11 +2726,12 @@ create_dir_bitmap (GVfsBackendAfp *afp_backend, GFileAttributeMatcher *matcher)
 }
 
 static void
-enumerate_ext2 (GVfsJobEnumerate *job,
-                gint32 start_index);
+enumerate (GVfsBackendAfp *afp_backend,
+           GVfsJobEnumerate *job,
+           gint32 start_index);
 
 static void
-enumerate_ext2_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+enumerate_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GVfsJobEnumerate *job = G_VFS_JOB_ENUMERATE (user_data);
@@ -2743,7 +2745,7 @@ enumerate_ext2_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   guint16  dir_bitmap;
   gint16 count, i;
 
-  gint start_index;
+  gint64 start_index, max;
 
   reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
@@ -2816,21 +2818,27 @@ enumerate_ext2_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
     g_vfs_afp_reply_seek (reply, start_pos + struct_length, G_SEEK_SET);
   }
   g_object_unref (reply);
-
+  
   start_index = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (job),
                                                     "start-index"));
   start_index += count;
-  g_object_set_data (G_OBJECT (job), "start-index",
-                     GINT_TO_POINTER (start_index));
 
-  enumerate_ext2 (job, start_index);
+  max = (afp_backend->server->version >= AFP_VERSION_3_1) ? G_MAXINT32 : G_MAXINT16;
+  /* Can't enumerate any more files */
+  if (start_index > max)
+  {
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+    g_vfs_job_enumerate_done (job);
+  }
+
+  enumerate (afp_backend, job, start_index);
 }
 
 static void
-enumerate_ext2 (GVfsJobEnumerate *job,
-                gint32 start_index)
+enumerate (GVfsBackendAfp *afp_backend,
+           GVfsJobEnumerate *job,
+           gint32 start_index)
 {
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
   GVfsAfpConnection *conn = afp_backend->server->conn;
   const char *filename = job->filename;
   GFileAttributeMatcher *matcher = job->attribute_matcher;
@@ -2838,7 +2846,11 @@ enumerate_ext2 (GVfsJobEnumerate *job,
   GVfsAfpCommand *comm;
   guint16 file_bitmap, dir_bitmap;
 
-  comm = g_vfs_afp_command_new (AFP_COMMAND_ENUMERATE_EXT2);
+  if (afp_backend->server->version >= AFP_VERSION_3_1)
+    comm = g_vfs_afp_command_new (AFP_COMMAND_ENUMERATE_EXT2);
+  else
+    comm = g_vfs_afp_command_new (AFP_COMMAND_ENUMERATE_EXT);
+  
   /* pad byte */
   g_vfs_afp_command_put_byte (comm, 0);
 
@@ -2857,18 +2869,28 @@ enumerate_ext2 (GVfsJobEnumerate *job,
 
   /* Req Count */
   g_vfs_afp_command_put_int16 (comm, ENUMERATE_REQ_COUNT);
-  
-  /* StartIndex */
-  g_vfs_afp_command_put_int32 (comm, start_index);
-  
-  /* MaxReplySize */
-  g_vfs_afp_command_put_int32 (comm, ENUMERATE_MAX_REPLY_SIZE);
 
+  
+  /* StartIndex and MaxReplySize */
+  if (afp_backend->server->version >= AFP_VERSION_3_1)
+  {
+    g_vfs_afp_command_put_int32 (comm, start_index);
+    g_vfs_afp_command_put_int32 (comm, ENUMERATE_EXT2_MAX_REPLY_SIZE);
+  }
+  else
+  {
+    g_vfs_afp_command_put_int16 (comm, start_index);
+    g_vfs_afp_command_put_int16 (comm, ENUMERATE_EXT_MAX_REPLY_SIZE);
+  }
+  
   /* Pathname */
   put_pathname (comm, filename);
 
-  g_vfs_afp_connection_send_command (conn, comm, enumerate_ext2_cb,
-                                      G_VFS_JOB (job)->cancellable, job);
+  g_object_set_data (G_OBJECT (job), "start-index",
+                     GINT_TO_POINTER (start_index));
+  
+  g_vfs_afp_connection_send_command (conn, comm, enumerate_cb,
+                                     G_VFS_JOB (job)->cancellable, job);
   g_object_unref (comm);
 }
 
@@ -2881,19 +2903,8 @@ try_enumerate (GVfsBackend *backend,
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
 
-  if (afp_backend->server->version >= AFP_VERSION_3_1)
-  {
-    g_object_set_data (G_OBJECT (job), "start-index",
-                       GINT_TO_POINTER (1));
-    enumerate_ext2 (job, 1);
-  }
-
-  else
-  {
-    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                              "Enumeration not supported for AFP_VERSION_3_0 yet");
-  }
-
+  enumerate (afp_backend, job, 1);
+  
   return TRUE;
 }
 
