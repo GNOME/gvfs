@@ -672,7 +672,7 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
       RequestData *req_data;
       
       req_data = g_hash_table_lookup (priv->request_hash,
-                                      GUINT_TO_POINTER (priv->read_dsi_header.requestID));
+                                      GUINT_TO_POINTER ((guint)priv->read_dsi_header.requestID));
       if (req_data)
       {
         GVfsAfpReply *reply;
@@ -684,7 +684,8 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
                                                    g_object_unref);
         g_simple_async_result_complete (req_data->simple);
 
-        g_hash_table_remove (priv->request_hash, GUINT_TO_POINTER (priv->read_dsi_header.requestID));
+        g_hash_table_remove (priv->request_hash,
+                             GUINT_TO_POINTER ((guint)priv->read_dsi_header.requestID));
       }
       else
         g_free (priv->data);
@@ -840,7 +841,7 @@ write_command_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   }
 
   g_hash_table_insert (priv->request_hash,
-                       GUINT_TO_POINTER (GUINT16_FROM_BE (priv->write_dsi_header.requestID)),
+                       GUINT_TO_POINTER ((guint)GUINT16_FROM_BE (priv->write_dsi_header.requestID)),
                        req_data);
 
   send_request (afp_conn);
