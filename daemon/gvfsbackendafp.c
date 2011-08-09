@@ -1873,9 +1873,7 @@ try_write (GVfsBackend *backend,
   req_count = MIN (buffer_size, G_MAXUINT32);
   g_vfs_afp_command_put_int64 (comm, req_count);
 
-  /* TODO: don't copy buffer here  */
-  g_output_stream_write_all (G_OUTPUT_STREAM (comm), buffer, req_count, NULL,
-                             NULL, NULL);
+  g_vfs_afp_command_set_buffer (comm, buffer, buffer_size);
 
   g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
                                      write_ext_cb, G_VFS_JOB (job)->cancellable,
