@@ -335,7 +335,7 @@ void            g_vfs_afp_command_pad_to_even  (GVfsAfpCommand *comm);
 gsize           g_vfs_afp_command_get_size     (GVfsAfpCommand *comm);
 char*           g_vfs_afp_command_get_data     (GVfsAfpCommand *comm);
 
-void            g_vfs_afp_command_set_buffer   (GVfsAfpCommand *comm, const char *buf, gsize size);
+void            g_vfs_afp_command_set_buffer   (GVfsAfpCommand *comm, char *buf, gsize size);
 
 GType           g_vfs_afp_command_get_type (void) G_GNUC_CONST;
 

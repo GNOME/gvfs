@@ -387,7 +387,7 @@ struct _GVfsAfpCommand
   
   AfpCommandType type;
 
-  const char *buf;
+  char *buf;
   gsize buf_size;
 };
 
@@ -515,7 +515,7 @@ g_vfs_afp_command_get_data (GVfsAfpCommand *comm)
 }
 
 void
-g_vfs_afp_command_set_buffer (GVfsAfpCommand *comm, const char *buf, gsize size)
+g_vfs_afp_command_set_buffer (GVfsAfpCommand *comm, char *buf, gsize size)
 {
   g_return_if_fail (buf != NULL);
   g_return_if_fail (size > 0);
@@ -568,7 +568,6 @@ struct _GVfsAfpConnectionPrivate
 
   /* read loop */
   gboolean read_loop_running;
-  gsize bytes_read;
   DSIHeader read_dsi_header;
   char *data;
 };
@@ -818,6 +817,25 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
 }
 
 static void
+skip_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
+{
+  GInputStream *input = G_INPUT_STREAM (object);
+  GVfsAfpConnection *afp_connection = G_VFS_AFP_CONNECTION (user_data);
+
+  gsize bytes_skipped;
+  GError *err = NULL;
+
+  bytes_skipped = g_input_stream_skip_finish (input, res, &err);
+  if (bytes_skipped == -1)
+  {
+    g_warning ("FAIL!!! \"%s\"\n", err->message);
+    g_error_free (err);
+  }
+
+  read_reply (afp_connection);
+}
+    
+static void
 read_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
 {
   GInputStream *input = G_INPUT_STREAM (object);
@@ -841,11 +859,12 @@ static void
 read_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
 {
   GInputStream *input = G_INPUT_STREAM (object);
-  GVfsAfpConnection *afp_connection = G_VFS_AFP_CONNECTION (user_data);
-  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (user_data);
+  GVfsAfpConnectionPrivate *priv = afp_conn->priv;
   
   gboolean result;
   GError *err = NULL;
+  DSIHeader *dsi_header;
   
   result = read_all_finish (input, res, NULL, &err);
   if (!result)
@@ -854,20 +873,40 @@ read_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     g_error_free (err);
   }
 
-  priv->read_dsi_header.requestID = GUINT16_FROM_BE (priv->read_dsi_header.requestID);
-  priv->read_dsi_header.errorCode = GUINT32_FROM_BE (priv->read_dsi_header.errorCode);
-  priv->read_dsi_header.totalDataLength = GUINT32_FROM_BE (priv->read_dsi_header.totalDataLength);
+  dsi_header = &priv->read_dsi_header;
   
-  if (priv->read_dsi_header.totalDataLength > 0)
+  dsi_header->requestID = GUINT16_FROM_BE (dsi_header->requestID);
+  dsi_header->errorCode = GUINT32_FROM_BE (dsi_header->errorCode);
+  dsi_header->totalDataLength = GUINT32_FROM_BE (dsi_header->totalDataLength);
+  
+  if (dsi_header->totalDataLength > 0)
   {
-    priv->data = g_malloc (priv->read_dsi_header.totalDataLength);
-    read_all_async (input, priv->data, priv->read_dsi_header.totalDataLength,
-                    0, NULL, read_data_cb, afp_connection);
+    RequestData *req_data;
+
+    req_data = g_hash_table_lookup (priv->request_hash,
+                                    GUINT_TO_POINTER ((guint)dsi_header->requestID));
+    if (req_data)
+    {
+      if (req_data->command->type == AFP_COMMAND_READ_EXT && req_data->command->buf)
+        priv->data = req_data->command->buf;
+      else
+        priv->data = g_malloc (dsi_header->totalDataLength);
+
+      read_all_async (input, priv->data, dsi_header->totalDataLength,
+                      0, NULL, read_data_cb, afp_conn);
+    }
+    else
+    {
+      /* TODO: should really do a skip_all */
+      g_input_stream_skip_async (input, dsi_header->totalDataLength, 0, NULL,
+                                 skip_data_cb, afp_conn);
+    }
+    
     return;
   }
 
-  dispatch_reply (afp_connection);
-  read_reply (afp_connection);
+  dispatch_reply (afp_conn);
+  read_reply (afp_conn);
 }
 
 static void
@@ -879,7 +918,6 @@ read_reply (GVfsAfpConnection *afp_connection)
 
   input = g_io_stream_get_input_stream (priv->conn);
   
-  priv->bytes_read = 0;
   priv->data = NULL;
 
   read_all_async (input, &priv->read_dsi_header, sizeof (DSIHeader), 0, NULL,

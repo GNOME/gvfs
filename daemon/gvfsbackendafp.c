@@ -2047,7 +2047,6 @@ read_ext_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   GError *err = NULL;
   AfpResultCode res_code;
   gsize size;
-  char *data;
 
   reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
@@ -2079,10 +2078,6 @@ read_ext_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   }
 
   size = g_vfs_afp_reply_get_size (reply);
-
-  /* TODO: Read directly into the data buffer */
-  g_vfs_afp_reply_get_data (reply, size, (guint8 **)&data);
-  memcpy (job->buffer, data, size);
 
   afp_handle->offset += size;
   g_vfs_job_read_set_size (job, size);
@@ -2117,6 +2112,9 @@ try_read (GVfsBackend *backend,
   req_count = MIN (bytes_requested, G_MAXUINT32);
   g_vfs_afp_command_put_int64 (comm, req_count);
 
+  /* Set buffer to read into */
+  g_vfs_afp_command_set_buffer (comm, buffer, bytes_requested);
+  
   g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
                                       read_ext_cb, G_VFS_JOB (job)->cancellable,
                                       job);
