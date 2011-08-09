@@ -1167,6 +1167,10 @@ delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                                   _("Permission denied"));
         break;
+      case AFP_RESULT_FILE_BUSY:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_BUSY,
+                                         _("Target file is open"));
+        break;                           
       case AFP_RESULT_DIR_NOT_EMPTY:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
                                   _("Directory not empty"));
