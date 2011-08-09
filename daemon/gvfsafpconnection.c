@@ -640,6 +640,113 @@ run_loop (GVfsAfpConnection *afp_connection)
   }
 }
 
+typedef struct
+{
+  void         *buffer;
+  gsize         count;
+  int           io_priority;
+  GCancellable *cancellable;
+  gsize         bytes_read;
+} ReadAllData;
+
+static void
+free_read_all_data (ReadAllData *read_data)
+{
+  if (read_data->cancellable)
+    g_object_unref (read_data->cancellable);
+
+  g_slice_free (ReadAllData, read_data);
+}
+
+static void
+read_all_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GInputStream *stream = G_INPUT_STREAM (source_object);
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+
+  gsize bytes_read;
+  GError *err = NULL;
+  ReadAllData *read_data;
+
+  bytes_read = g_input_stream_read_finish (stream, res, &err);
+  if (bytes_read == -1)
+  {
+    g_simple_async_result_take_error (simple, err);
+    g_simple_async_result_complete (simple);
+    return;
+  }
+
+  read_data = g_simple_async_result_get_op_res_gpointer (simple);
+
+  read_data->bytes_read += bytes_read;
+  if (read_data->bytes_read < read_data->count)
+  {
+    g_input_stream_read_async (stream,
+                               (guint8 *)read_data->buffer + read_data->bytes_read,
+                               read_data->count - read_data->bytes_read, 0,
+                               read_data->cancellable, read_all_cb, simple);
+    return;
+  }
+
+  g_simple_async_result_complete (simple);
+}
+
+static void
+read_all_async (GInputStream        *stream,
+                void                *buffer,
+                gsize                count,
+                int                  io_priority,
+                GCancellable        *cancellable,
+                GAsyncReadyCallback  callback,
+                gpointer             user_data)
+{
+  ReadAllData *read_data;
+  GSimpleAsyncResult *simple;
+
+  read_data = g_slice_new0 (ReadAllData);
+  read_data->buffer = buffer;
+  read_data->count = count;
+  read_data->io_priority = io_priority;
+  if (cancellable)
+    read_data->cancellable = g_object_ref (cancellable);
+  
+  simple = g_simple_async_result_new (G_OBJECT (stream), callback, user_data,
+                                      read_all_async);
+  g_simple_async_result_set_op_res_gpointer (simple, read_data,
+                                             (GDestroyNotify)free_read_all_data);
+
+  g_input_stream_read_async (stream, buffer, count, io_priority, cancellable,
+                             read_all_cb, simple);
+}
+
+static gboolean
+read_all_finish (GInputStream *stream,
+                 GAsyncResult *res,
+                 gsize        *bytes_read,
+                 GError      **error)
+{
+  GSimpleAsyncResult *simple;
+
+  g_return_val_if_fail (g_simple_async_result_is_valid (res, G_OBJECT (stream),
+                                                        read_all_async),
+                        FALSE);
+
+  simple = (GSimpleAsyncResult *)res;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    return FALSE;
+
+  if (bytes_read)
+  {
+    ReadAllData *read_data;
+
+    read_data = g_simple_async_result_get_op_res_gpointer (simple);
+    *bytes_read = read_data->bytes_read;
+  }
+
+  return TRUE;
+}
+
 static void
 dispatch_reply (GVfsAfpConnection *afp_connection)
 {
@@ -715,25 +822,15 @@ read_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
 {
   GInputStream *input = G_INPUT_STREAM (object);
   GVfsAfpConnection *afp_connection = G_VFS_AFP_CONNECTION (user_data);
-  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
-  
-  gssize bytes_read;
+
+  gboolean result;
   GError *err = NULL;
-  
-  bytes_read = g_input_stream_read_finish (input, res, &err);
-  if (bytes_read == -1)
+
+  result = read_all_finish (input, res, NULL, &err);
+  if (!result)
   {
     g_warning ("FAIL!!! \"%s\"\n", err->message);
     g_error_free (err);
-  }
-
-  priv->bytes_read += bytes_read;
-  if (priv->bytes_read < priv->read_dsi_header.totalDataLength)
-  {
-    g_input_stream_read_async (input, priv->data + priv->bytes_read,
-                               priv->read_dsi_header.totalDataLength - priv->bytes_read,
-                               0, NULL, read_data_cb, afp_connection);
-    return;
   }
 
   dispatch_reply (afp_connection);
@@ -747,23 +844,14 @@ read_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   GVfsAfpConnection *afp_connection = G_VFS_AFP_CONNECTION (user_data);
   GVfsAfpConnectionPrivate *priv = afp_connection->priv;
   
-  gssize bytes_read;
+  gboolean result;
   GError *err = NULL;
   
-  bytes_read = g_input_stream_read_finish (input, res, &err);
-  if (bytes_read == -1)
+  result = read_all_finish (input, res, NULL, &err);
+  if (!result)
   {
     g_warning ("FAIL!!! \"%s\"\n", err->message);
     g_error_free (err);
-  }
-
-  priv->bytes_read += bytes_read;
-  if (priv->bytes_read < sizeof (DSIHeader))
-  {
-    g_input_stream_read_async (input, &priv->read_dsi_header + priv->bytes_read,
-                               sizeof (DSIHeader) - priv->bytes_read, 0, NULL,
-                               read_dsi_header_cb, afp_connection);
-    return;
   }
 
   priv->read_dsi_header.requestID = GUINT16_FROM_BE (priv->read_dsi_header.requestID);
@@ -773,9 +861,8 @@ read_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   if (priv->read_dsi_header.totalDataLength > 0)
   {
     priv->data = g_malloc (priv->read_dsi_header.totalDataLength);
-    priv->bytes_read = 0;
-    g_input_stream_read_async (input, priv->data, priv->read_dsi_header.totalDataLength,
-                               0, NULL, read_data_cb, afp_connection);
+    read_all_async (input, priv->data, priv->read_dsi_header.totalDataLength,
+                    0, NULL, read_data_cb, afp_connection);
     return;
   }
 
@@ -794,8 +881,9 @@ read_reply (GVfsAfpConnection *afp_connection)
   
   priv->bytes_read = 0;
   priv->data = NULL;
-  g_input_stream_read_async (input, &priv->read_dsi_header, sizeof (DSIHeader), 0, NULL,
-                             read_dsi_header_cb, afp_connection);
+
+  read_all_async (input, &priv->read_dsi_header, sizeof (DSIHeader), 0, NULL,
+                  read_dsi_header_cb, afp_connection);
 }
 
 typedef struct
