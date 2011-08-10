@@ -3430,8 +3430,23 @@ get_name_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   outstanding_requests = GPOINTER_TO_UINT (G_VFS_JOB (job)->backend_data);
   if (--outstanding_requests == 0)
     g_vfs_job_succeeded (G_VFS_JOB (job));
+  else
+    G_VFS_JOB (job)->backend_data = GUINT_TO_POINTER (outstanding_requests);
+}
 
-  G_VFS_JOB (job)->backend_data = GUINT_TO_POINTER (outstanding_requests);
+static void
+set_root_info (GVfsBackendAfp *afp_backend, GFileInfo *info)
+{
+  GIcon *icon;
+  
+  g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
+  g_file_info_set_name (info, "/");
+  g_file_info_set_display_name (info,
+                                g_vfs_backend_get_display_name (G_VFS_BACKEND (afp_backend)));
+  g_file_info_set_content_type (info, "inode/directory");
+  icon = g_vfs_backend_get_icon (G_VFS_BACKEND (afp_backend));
+  if (icon != NULL)
+    g_file_info_set_icon (info, icon);
 }
 
 static void
@@ -3495,32 +3510,12 @@ query_info_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpoi
   
   copy_file_info_into (info, job->file_info);
   g_object_unref (info);
+
+  if (is_root (job->filename))
+    set_root_info (afp_backend, job->file_info);
   
   if (outstanding_requests == 0)
     g_vfs_job_succeeded (G_VFS_JOB (job));
-}
-
-static void
-query_info_get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
-{
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
-  GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
-
-  GFileInfo *info;
-  GError *err = NULL;
-
-  info = get_vol_parms_finish (afp_backend, res, &err);
-  if (!info)
-  {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
-    g_error_free (err);
-    return;
-  }
-
-  copy_file_info_into (info, job->file_info);
-  g_object_unref (info);
-  
-  g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static gboolean
@@ -3533,33 +3528,26 @@ try_query_info (GVfsBackend *backend,
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
 
+  g_debug ("Filename: %s\n", filename);
+  
   if (is_root (filename))
   {
-    GIcon *icon;
-    guint16 vol_bitmap = 0;
+    guint16 dir_bitmap = 0;
 
-    g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-    g_file_info_set_name (info, "/");
-    g_file_info_set_display_name (info, g_vfs_backend_get_display_name (backend));
-    g_file_info_set_content_type (info, "inode/directory");
-    icon = g_vfs_backend_get_icon (backend);
-    if (icon != NULL)
-      g_file_info_set_icon (info, icon);
-
-    if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_CREATED))
-        vol_bitmap |= AFP_VOLUME_BITMAP_CREATE_DATE_BIT;
-
-    if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_TIME_MODIFIED))
-      vol_bitmap |= AFP_VOLUME_BITMAP_MOD_DATE_BIT;
-
-
-    if (vol_bitmap != 0)
+    dir_bitmap = create_dir_bitmap (afp_backend, matcher);
+    dir_bitmap &= ~AFP_DIR_BITMAP_UTF8_NAME_BIT;
+    
+    if (dir_bitmap != 0)
     {
-      get_vol_parms (afp_backend, vol_bitmap, G_VFS_JOB (job)->cancellable,
-                     query_info_get_vol_parms_cb, job);
+      get_filedir_parms (afp_backend, filename, 0, dir_bitmap,
+                         G_VFS_JOB (job)->cancellable,
+                         query_info_get_filedir_parms_cb, job);
     }
     else
+    {
+      set_root_info (afp_backend, info);
       g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
   }
   
   else {
