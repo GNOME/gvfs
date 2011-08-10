@@ -214,6 +214,7 @@ g_vfs_backend_afc_check (afc_error_t cond, GVfsJob *job)
     case AFC_E_OBJECT_NOT_FOUND:
       g_vfs_job_failed (job, G_IO_ERROR, error,
                         _("File does not exist"));
+      break;
     case AFC_E_DIR_NOT_EMPTY:
       g_vfs_job_failed (job, G_IO_ERROR, error,
                         _("The directory is not empty"));
@@ -286,6 +287,7 @@ g_vfs_backend_lockdownd_check (lockdownd_error_t cond, GVfsJob *job)
     case LOCKDOWN_E_PASSWORD_PROTECTED:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                         _("Permission denied"));
+      break;
     default:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Unhandled Lockdown error (%d)"), cond);
@@ -310,6 +312,7 @@ g_vfs_backend_idevice_check (idevice_error_t cond, GVfsJob *job)
     case IDEVICE_E_NO_DEVICE:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("libimobiledevice Error: No device found. Make sure usbmuxd is set up correctly."));
+      break;
     default:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Unhandled libimobiledevice error (%d)"), cond);
