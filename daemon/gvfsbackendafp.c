@@ -1253,6 +1253,141 @@ delete_finish (GVfsBackendAfp *afp_backend,
   return TRUE;
 }
 
+typedef struct
+{
+  AfpMapIDFunction function;
+  char *name;
+} MapIDData;
+
+static void
+map_id_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+
+  GVfsAfpReply *reply;
+  GError *err = NULL;
+
+  AfpResultCode res_code;
+  MapIDData *map_data;
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  if (!reply)
+  {
+    g_simple_async_result_take_error (simple, err);
+    g_simple_async_result_complete (simple);
+    return;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    switch (res_code)
+    {
+      case AFP_RESULT_ITEM_NOT_FOUND:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         _("ID not found"));
+        break;
+      default:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         _("Got error code: %d from server"), res_code);
+        break;
+    }
+
+    g_simple_async_result_complete (simple);
+    return;
+  }
+
+  map_data = g_simple_async_result_get_op_res_gpointer (simple);
+  
+  if (map_data->function == AFP_MAP_ID_FUNCTION_USER_UUID_TO_UTF8_NAME ||
+      map_data->function == AFP_MAP_ID_FUNCTION_GROUP_UUID_TO_UTF8_NAME)
+  {
+    /* objType */
+    g_vfs_afp_reply_read_uint32 (reply, NULL);
+    /* id */
+    g_vfs_afp_reply_read_uint32 (reply, NULL);
+  }
+
+  if (map_data->function == AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME ||
+      map_data->function == AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME)
+  {
+    g_vfs_afp_reply_read_pascal (reply, &map_data->name);
+  }
+  else
+  {
+    GVfsAfpName *afp_name;
+
+    g_vfs_afp_reply_read_afp_name (reply, FALSE, &afp_name);
+    map_data->name = g_vfs_afp_name_get_string (afp_name);
+    g_vfs_afp_name_unref (afp_name);
+  }
+
+  g_simple_async_result_complete (simple);
+}
+
+static void
+map_id (GVfsBackendAfp      *afp_backend,
+        AfpMapIDFunction     map_function,
+        gint64               id,
+        GCancellable        *cancellable,
+        GAsyncReadyCallback  callback,
+        gpointer             user_data)
+{
+  GVfsAfpCommand *comm;
+  GSimpleAsyncResult *simple;
+  MapIDData *map_data;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_MAP_ID);
+
+  /* SubFunction*/
+  g_vfs_afp_command_put_byte (comm, map_function);
+
+  /* ID */
+  if (map_function == AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME ||
+      map_function == AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME)
+    g_vfs_afp_command_put_int32 (comm, id);
+  else
+    g_vfs_afp_command_put_int64 (comm, id);
+
+  simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
+                                      user_data, map_id);
+
+  map_data = g_new (MapIDData, 1);
+  map_data->function = map_function;
+  g_simple_async_result_set_op_res_gpointer (simple, map_data, g_free);
+  
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, map_id_cb,
+                                     cancellable, simple);
+  g_object_unref (comm);
+}
+
+static char *
+map_id_finish (GVfsBackendAfp   *afp_backend,
+               GAsyncResult     *res,
+               AfpMapIDFunction *map_function,
+               GError          **error)
+{
+  GSimpleAsyncResult *simple;
+  MapIDData *map_data;
+
+  g_return_val_if_fail (g_simple_async_result_is_valid (res, G_OBJECT (afp_backend),
+                                                        map_id),
+                        NULL);
+
+  simple = (GSimpleAsyncResult *)res;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    return NULL;
+
+  map_data = g_simple_async_result_get_op_res_gpointer (simple);
+
+  if (map_function)
+    *map_function = map_data->function;
+  
+  return map_data->name;
+}
+
 /*
  * Backend code
  */
@@ -2784,7 +2919,10 @@ create_filedir_bitmap (GVfsBackendAfp *afp_backend, GFileAttributeMatcher *match
       g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_UNIX_GID) ||
       g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_ACCESS_CAN_READ) ||
       g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE) ||
-      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE)||
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_OWNER_USER) ||
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_OWNER_USER_REAL) ||
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_OWNER_GROUP))
       
   {
     if (afp_backend->vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_SUPPORTS_UNIX_PRIVS)
@@ -3215,7 +3353,8 @@ query_fs_info_get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpoin
 
   copy_file_info_into (info, job->file_info);
   g_object_unref (info);
-  
+
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
@@ -3254,6 +3393,48 @@ try_query_fs_info (GVfsBackend *backend,
 }
 
 static void
+get_name_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
+
+  char *name;
+  AfpMapIDFunction map_function;
+  guint outstanding_requests;
+
+  name = map_id_finish (afp_backend, res, &map_function, NULL);
+  if (name)
+  {
+    switch (map_function)
+    {
+      case AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME:
+        g_file_info_set_attribute_string (job->file_info, G_FILE_ATTRIBUTE_OWNER_USER,
+                                          name);
+        break;
+      case AFP_MAP_ID_FUNCTION_USER_ID_TO_UTF8_NAME:
+        g_file_info_set_attribute_string (job->file_info, G_FILE_ATTRIBUTE_OWNER_USER_REAL,
+                                          name);
+        break;
+      case AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME:
+        g_file_info_set_attribute_string (job->file_info, G_FILE_ATTRIBUTE_OWNER_GROUP,
+                                          name);
+        break;
+
+      default:
+        g_assert_not_reached ();
+    }
+
+    g_free (name);
+  }
+
+  outstanding_requests = GPOINTER_TO_UINT (G_VFS_JOB (job)->backend_data);
+  if (--outstanding_requests == 0)
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  G_VFS_JOB (job)->backend_data = GUINT_TO_POINTER (outstanding_requests);
+}
+
+static void
 query_info_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
@@ -3263,6 +3444,9 @@ query_info_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpoi
   GFileInfo *info;
   GError *err = NULL;
 
+  GFileAttributeMatcher *matcher;
+  guint outstanding_requests;
+  
   info = get_filedir_parms_finish (afp_backend, res, &err);
   if (!info)
   {
@@ -3271,10 +3455,49 @@ query_info_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpoi
     return;
   }
 
+  outstanding_requests = 0;
+  matcher = job->attribute_matcher;
+  
+  if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_UID))  
+  {
+    guint32 uid;
+
+    uid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID);
+
+    if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_OWNER_USER))
+    {
+      map_id (afp_backend, AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME, uid,
+              G_VFS_JOB (job)->cancellable, get_name_cb, job);
+      outstanding_requests++;
+    }
+    
+    if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_OWNER_USER_REAL))
+    {
+      map_id (afp_backend, AFP_MAP_ID_FUNCTION_USER_ID_TO_UTF8_NAME, uid,
+              G_VFS_JOB (job)->cancellable, get_name_cb, job);
+      outstanding_requests++;
+    }
+  }
+
+  if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_GID) &&
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_OWNER_GROUP))  
+  {
+    guint32 gid;
+
+    gid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID);
+
+    map_id (afp_backend, AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME, gid,
+            G_VFS_JOB (job)->cancellable, get_name_cb, job);
+    outstanding_requests++;
+  }
+  
+  G_VFS_JOB (job)->backend_data = GUINT_TO_POINTER (outstanding_requests);
+  
   copy_file_info_into (info, job->file_info);
   g_object_unref (info);
-
-  g_vfs_job_succeeded (G_VFS_JOB (job));
+  
+  if (outstanding_requests == 0)
+    g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static void
