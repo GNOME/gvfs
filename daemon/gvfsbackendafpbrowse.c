@@ -89,36 +89,27 @@ is_root (const char *filename)
 
   return *p == 0;
 }
-typedef void (*UpdateCacheCb) (GVfsBackendAfpBrowse *afp_backend,
-                                 GError               *error,
-                                 gpointer              user_data);
-
-typedef struct
-{
-  GVfsBackendAfpBrowse *afp_backend;
-  gpointer user_data;
-  UpdateCacheCb cb;
-} UpdateCacheData;
 
 static void
 get_srvr_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
-  UpdateCacheData *data = (UpdateCacheData *)user_data;
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
+  GVfsBackendAfpBrowse *afp_backend;
   GVfsAfpReply *reply;
   GError *err = NULL;
   AfpResultCode res_code;
   
   guint8 num_volumes, i;
 
+  afp_backend = G_VFS_BACKEND_AFP_BROWSE (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
+  
   reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    data->cb (data->afp_backend, err, data->user_data);
-
-    g_error_free (err);
-    g_slice_free (UpdateCacheData, data);
+    g_simple_async_result_take_error (simple, err);
+    g_simple_async_result_complete (simple);
     return;
   }
 
@@ -126,21 +117,18 @@ get_srvr_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   if (res_code != AFP_RESULT_NO_ERROR)
   {
     g_object_unref (reply);
-    
-    err = g_error_new (G_IO_ERROR, G_IO_ERROR_FAILED,
-                       _("Got error code: %d from server"), res_code);
-    data->cb (data->afp_backend, err, data->user_data);
 
-    g_error_free (err);
-    g_slice_free (UpdateCacheData, data);
+    g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                     _("Got error code: %d from server"), res_code);
+    g_simple_async_result_complete (simple);
     return;
   }
   
   /* server time */
   g_vfs_afp_reply_read_int32 (reply, NULL);
 
-  g_slist_free_full (data->afp_backend->volumes, (GDestroyNotify) volume_data_free);
-  data->afp_backend->volumes = NULL;
+  g_slist_free_full (afp_backend->volumes, (GDestroyNotify) volume_data_free);
+  afp_backend->volumes = NULL;
 
   g_vfs_afp_reply_read_byte (reply, &num_volumes);
   for (i = 0; i < num_volumes; i++)
@@ -159,34 +147,52 @@ get_srvr_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
     volume_data->flags = flags;
     volume_data->name = vol_name;
 
-    data->afp_backend->volumes = g_slist_prepend (data->afp_backend->volumes, volume_data);
+    afp_backend->volumes = g_slist_prepend (afp_backend->volumes, volume_data);
   }
   g_object_unref (reply);
 
-  data->cb (data->afp_backend, NULL, data->user_data);
-  g_slice_free (UpdateCacheData, data);
+  g_simple_async_result_complete (simple);
 }
 
 static void
-update_cache (GVfsBackendAfpBrowse *afp_backend, GCancellable *cancellable,
-              UpdateCacheCb cb, gpointer user_data)
+update_cache (GVfsBackendAfpBrowse *afp_backend,
+              GCancellable *cancellable,
+              GAsyncReadyCallback callback,
+              gpointer user_data)
 {
   GVfsAfpCommand *comm;
-  UpdateCacheData *data;
-
-  data = g_slice_new (UpdateCacheData);
-  data->afp_backend = afp_backend;
-  data->cb = cb;
-  data->user_data = user_data;
+  GSimpleAsyncResult *simple;
   
   comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
   /* pad byte */
   g_vfs_afp_command_put_byte (comm, 0);
+
+  simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
+                                      user_data, update_cache);
   
   g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
                                      get_srvr_parms_cb,
-                                     cancellable, data);
+                                     cancellable, simple);
   g_object_unref (comm); 
+}
+
+static gboolean
+update_cache_finish (GVfsBackendAfpBrowse *afp_backend,
+                     GAsyncResult         *res,
+                     GError              **error)
+{
+  GSimpleAsyncResult *simple;
+  
+  g_return_val_if_fail (g_simple_async_result_is_valid (res, G_OBJECT (afp_backend),
+                                                        update_cache),
+                        FALSE);
+
+  simple = (GSimpleAsyncResult *)res;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    return FALSE;
+
+  return TRUE;
 }
 
 static VolumeData *
@@ -224,19 +230,23 @@ find_volume (GVfsBackendAfpBrowse *afp_backend,
 
   return NULL;
 }
+
 static void
-mount_mountable_cb (GVfsBackendAfpBrowse *afp_backend,
-                    GError *error,
-                    gpointer user_data)
+mount_mountable_cb (GObject      *source_object,        
+                    GAsyncResult *res,
+                    gpointer      user_data)
 {
+  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (source_object);
   GVfsJobMountMountable *job = G_VFS_JOB_MOUNT_MOUNTABLE (user_data);
 
+  GError *err;
   VolumeData *vol_data;
   GMountSpec *mount_spec;
-  
-  if (error != NULL)
+
+  if (!update_cache_finish (afp_backend, res, &err))
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
 
@@ -329,17 +339,20 @@ fill_info (GFileInfo *info, VolumeData *vol_data, GVfsBackendAfpBrowse *afp_back
 }
 
 static void
-enumerate_cache_updated_cb (GVfsBackendAfpBrowse *afp_backend,
-                            GError *error,
-                            gpointer user_data)
+enumerate_cache_updated_cb (GObject      *source_object,
+                            GAsyncResult *res,
+                            gpointer      user_data)
 {
+  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (source_object);
   GVfsJobEnumerate *job = G_VFS_JOB_ENUMERATE (user_data);
 
+  GError *err = NULL;
   GSList *l;
 
-  if (error != NULL)
+  if (!update_cache_finish (afp_backend, res, &err))
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
 
@@ -385,17 +398,20 @@ try_enumerate (GVfsBackend *backend,
 }
 
 static void
-query_info_cb (GVfsBackendAfpBrowse *afp_backend,
-               GError *error,
-               gpointer user_data)
+query_info_cb (GObject      *source_object,
+               GAsyncResult *res,
+               gpointer      user_data)
 {
+  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (source_object);
   GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
 
+  GError *err = NULL;
   VolumeData *vol_data;
 
-  if (error != NULL)
+  if (!update_cache_finish (afp_backend, res, &err))
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
     return;
   }
 
