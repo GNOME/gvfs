@@ -576,8 +576,8 @@ done:
 }
 
 static void
-close_fork (GVfsBackendAfp    *afp_backend,
-            AfpHandle         *afp_handle,
+close_fork (GVfsBackendAfp      *afp_backend,
+            gint16               fork_refnum,
             GCancellable        *cancellable,
             GAsyncReadyCallback  callback,
             gpointer             user_data)
@@ -590,7 +590,7 @@ close_fork (GVfsBackendAfp    *afp_backend,
   g_vfs_afp_command_put_byte (comm, 0);
 
   /* OForkRefNum */
-  g_vfs_afp_command_put_int16 (comm, afp_handle->fork_refnum);
+  g_vfs_afp_command_put_int16 (comm, fork_refnum);
 
   simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback, user_data,
                                       close_fork);
@@ -2178,7 +2178,7 @@ close_replace_exchange_files_cb (GObject *source_object, GAsyncResult *res, gpoi
   }
 
   /* Close fork and remove the temporary file even if the exchange failed */
-  close_fork (afp_backend, afp_handle, G_VFS_JOB (job)->cancellable,
+  close_fork (afp_backend, afp_handle->fork_refnum, G_VFS_JOB (job)->cancellable,
               close_replace_close_fork_cb, job->handle);
   
   res_code = g_vfs_afp_reply_get_result_code (reply);
@@ -2269,7 +2269,7 @@ close_replace_set_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpoi
     return;
   }
 
-  close_fork (afp_backend, afp_handle, G_VFS_JOB (job)->cancellable,
+  close_fork (afp_backend, afp_handle->fork_refnum, G_VFS_JOB (job)->cancellable,
               close_write_close_fork_cb, job);
   afp_handle_free (afp_handle);
 }
@@ -2329,7 +2329,7 @@ try_close_write (GVfsBackend *backend,
   }
   else
   {
-    close_fork (afp_backend, afp_handle, G_VFS_JOB (job)->cancellable,
+    close_fork (afp_backend, afp_handle->fork_refnum, G_VFS_JOB (job)->cancellable,
                 close_write_close_fork_cb, job);
     afp_handle_free (afp_handle);;
 
@@ -2364,7 +2364,7 @@ try_close_read (GVfsBackend *backend,
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
   AfpHandle *afp_handle = (AfpHandle *)handle;
 
-  close_fork (afp_backend, afp_handle, G_VFS_JOB (job)->cancellable,
+  close_fork (afp_backend, afp_handle->fork_refnum, G_VFS_JOB (job)->cancellable,
               close_read_close_fork_cb, job);
   afp_handle_free ((AfpHandle *)job->handle);
   
