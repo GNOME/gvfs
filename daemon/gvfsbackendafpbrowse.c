@@ -170,7 +170,7 @@ update_cache (GVfsBackendAfpBrowse *afp_backend,
   simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
                                       user_data, update_cache);
   
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                      get_srvr_parms_cb,
                                      cancellable, simple);
   g_object_unref (comm); 

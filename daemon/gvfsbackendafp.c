@@ -517,7 +517,7 @@ open_fork (GVfsBackendAfp     *afp_backend,
   simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
                                       user_data, open_fork);
   
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                      open_fork_cb, cancellable, simple);
   g_object_unref (comm);
 }
@@ -595,7 +595,7 @@ close_fork (GVfsBackendAfp    *afp_backend,
   simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback, user_data,
                                       close_fork);
   
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                       close_fork_cb, cancellable,
                                       simple);
   g_object_unref (comm);
@@ -689,7 +689,7 @@ get_fork_parms (GVfsBackendAfp      *afp_backend,
                                       get_fork_parms);
                                       
   
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                       get_fork_parms_cb, cancellable,
                                       simple);
   g_object_unref (comm);
@@ -809,7 +809,7 @@ get_filedir_parms (GVfsBackendAfp      *afp_backend,
                                       get_filedir_parms);
                                       
 
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                      get_filedir_parms_cb, cancellable,
                                      simple);
   g_object_unref (comm);
@@ -947,7 +947,7 @@ get_vol_parms (GVfsBackendAfp      *afp_backend,
                                       get_vol_parms);
                                       
   
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                       get_vol_parms_cb, cancellable,
                                       simple);
   g_object_unref (comm);
@@ -1090,8 +1090,8 @@ create_file_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpo
   put_pathname (comm, basename);
   g_free (basename);
 
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, create_file_cb,
-                                     cfd->cancellable, cfd);
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
+                                     create_file_cb, cfd->cancellable, cfd);
   g_object_unref (comm);
 }
 
@@ -1225,8 +1225,8 @@ delete (GVfsBackendAfp      *afp_backend,
   simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
                                       user_data, delete);
   
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, delete_cb,
-                                     cancellable, simple);
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
+                                     delete_cb, cancellable, simple);
   g_object_unref (comm);
 }
 
@@ -1349,7 +1349,7 @@ move (GVfsBackendAfp *afp_backend, GVfsJobMove *job)
   put_pathname (comm, basename);
   g_free (basename);
 
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                      move_and_rename_cb, G_VFS_JOB (job)->cancellable,
                                      job);
   g_object_unref (comm);
@@ -1621,8 +1621,8 @@ set_display_name_get_filedir_parms_cb (GObject      *source_object,
   /* NewName */
   put_pathname (comm, job->display_name);
 
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, rename_cb,
-                                     G_VFS_JOB (job)->cancellable, job);
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
+                                     rename_cb, G_VFS_JOB (job)->cancellable, job);
   g_object_unref (comm);
 }
   
@@ -1745,7 +1745,8 @@ make_directory_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, 
   put_pathname (comm, basename);
   g_free (basename);
 
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, make_directory_cb,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
+                                     make_directory_cb,
                                      G_VFS_JOB (job)->cancellable, job);
   g_object_unref (comm);
 }
@@ -1883,7 +1884,7 @@ try_write (GVfsBackend *backend,
 
   g_vfs_afp_command_set_buffer (comm, buffer, buffer_size);
 
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                      write_ext_cb, G_VFS_JOB (job)->cancellable,
                                      job);
   g_object_unref (comm);
@@ -2116,10 +2117,7 @@ try_read (GVfsBackend *backend,
   req_count = MIN (bytes_requested, G_MAXUINT32);
   g_vfs_afp_command_put_int64 (comm, req_count);
 
-  /* Set buffer to read into */
-  g_vfs_afp_command_set_buffer (comm, buffer, bytes_requested);
-  
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, buffer,
                                       read_ext_cb, G_VFS_JOB (job)->cancellable,
                                       job);
   g_object_unref (comm);
@@ -2148,7 +2146,7 @@ close_replace_close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer
   put_pathname (comm, afp_handle->tmp_filename);
 
   g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
-                                      NULL, NULL);
+                                     NULL, NULL, NULL);
   g_object_unref (comm);
   
 
@@ -2301,7 +2299,7 @@ try_close_write (GVfsBackend *backend,
     /* DestPath */
     put_pathname (comm, afp_handle->tmp_filename);
 
-    g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+    g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                        close_replace_exchange_files_cb,
                                        G_VFS_JOB (job)->cancellable, job);
     g_object_unref (comm);
@@ -2321,7 +2319,7 @@ try_close_write (GVfsBackend *backend,
     /* ForkLen */
     g_vfs_afp_command_put_int64 (comm, afp_handle->size);
 
-    g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+    g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                        close_replace_set_fork_parms_cb,
                                        G_VFS_JOB (job)->cancellable, job);
     g_object_unref (comm);
@@ -2893,7 +2891,7 @@ enumerate (GVfsBackendAfp *afp_backend,
   g_object_set_data (G_OBJECT (job), "start-index",
                      GINT_TO_POINTER (start_index));
   
-  g_vfs_afp_connection_send_command (conn, comm, enumerate_cb,
+  g_vfs_afp_connection_send_command (conn, comm, NULL, enumerate_cb,
                                      G_VFS_JOB (job)->cancellable, job);
   g_object_unref (comm);
 }
@@ -3057,7 +3055,7 @@ set_attribute_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, g
   /* UAPermissions */
   g_vfs_afp_command_put_uint32 (comm, ua_permissions);
 
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm,
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
                                      set_attribute_set_filedir_parms_cb,
                                      G_VFS_JOB (job)->cancellable, job);
   g_object_unref (comm);

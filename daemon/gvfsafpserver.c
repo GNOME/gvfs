@@ -108,8 +108,8 @@ attention_cb (GVfsAfpConnection *conn, guint attention_code, gpointer user_data)
     /* MessageBitmap */
     g_vfs_afp_command_put_int16 (comm, 1);
 
-    g_vfs_afp_connection_send_command (afp_serv->conn, comm, get_srvr_msg_cb,
-                                       NULL, afp_serv);
+    g_vfs_afp_connection_send_command (afp_serv->conn, comm, NULL,
+                                       get_srvr_msg_cb, NULL, afp_serv);
     g_object_unref (comm);
   }
 }
@@ -419,6 +419,7 @@ cleanup:
   gcry_mpi_release (p);
   gcry_mpi_release (Ma);
   gcry_mpi_release (Mb);
+  gcry_mpi_release (Ra);
   gcry_mpi_release (key);
   gcry_mpi_release (clientNonce);
   gcry_mpi_release (clientNonce1);
@@ -824,6 +825,7 @@ get_server_info (GVfsAfpServer *afp_serv,
     afp_serv->uams = g_slist_prepend (afp_serv->uams, uam);
   }
 
+  g_object_unref (reply);
   
   return TRUE;
 }

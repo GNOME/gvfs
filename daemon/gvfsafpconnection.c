@@ -88,6 +88,7 @@ struct _GVfsAfpReply
 
   char *data;
   gsize len;
+  gboolean free_data;
 
   goffset pos;
 };
@@ -103,12 +104,24 @@ g_vfs_afp_reply_init (GVfsAfpReply *reply)
 }
 
 static void
+g_vfs_afp_reply_finalize (GObject *object)
+{
+  GVfsAfpReply *reply = (GVfsAfpReply *)object;
+
+  if (reply->free_data)
+    g_free (reply->data);
+}
+
+static void
 g_vfs_afp_reply_class_init (GVfsAfpReplyClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = g_vfs_afp_reply_finalize;
 }
 
 static GVfsAfpReply *
-g_vfs_afp_reply_new (AfpResultCode result_code, char *data, gsize len)
+g_vfs_afp_reply_new (AfpResultCode result_code, char *data, gsize len, gboolean take_data)
 {
   GVfsAfpReply *reply;
 
@@ -117,6 +130,7 @@ g_vfs_afp_reply_new (AfpResultCode result_code, char *data, gsize len)
   reply->result_code = result_code;
   reply->len = len;
   reply->data = data;
+  reply->free_data = take_data;
   
   return reply;
 }
@@ -407,11 +421,15 @@ g_vfs_afp_command_class_init (GVfsAfpCommandClass *klass)
 GVfsAfpCommand *
 g_vfs_afp_command_new (AfpCommandType type)
 {
+  GOutputStream *mem_stream;
   GVfsAfpCommand *comm;
 
+  mem_stream = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
   comm = g_object_new (G_VFS_TYPE_AFP_COMMAND,
-                       "base-stream", g_memory_output_stream_new (NULL, 0, g_realloc, g_free),
+                       "base-stream", mem_stream,
                        NULL);
+
+  g_object_unref (mem_stream);
   
   comm->type = type;
   g_vfs_afp_command_put_byte (comm, type);
@@ -569,7 +587,8 @@ struct _GVfsAfpConnectionPrivate
   /* read loop */
   gboolean read_loop_running;
   DSIHeader read_dsi_header;
-  char *data;
+  char *reply_buf;
+  gboolean free_reply_buf;
 };
 
 typedef enum
@@ -605,6 +624,7 @@ typedef struct
   RequestType type;
   
   GVfsAfpCommand *command;
+  char           *reply_buf;
   GSimpleAsyncResult *simple;
   GCancellable *cancellable;
 } RequestData;
@@ -778,10 +798,9 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
     {
       guint8 attention_code;
 
-      attention_code = priv->data[0] >> 4;
+      attention_code = priv->reply_buf[0] >> 4;
 
       g_signal_emit (afp_connection, signals[ATTENTION], 0, attention_code);
-      g_free (priv->data);
       break;
     }
 
@@ -796,8 +815,9 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
       {
         GVfsAfpReply *reply;
 
-        reply = g_vfs_afp_reply_new (dsi_header->errorCode, priv->data,
-                                     dsi_header->totalDataLength);
+        reply = g_vfs_afp_reply_new (dsi_header->errorCode, priv->reply_buf,
+                                     dsi_header->totalDataLength, priv->free_reply_buf);
+        priv->free_reply_buf = FALSE;
 
         g_simple_async_result_set_op_res_gpointer (req_data->simple, reply,
                                                    g_object_unref);
@@ -806,9 +826,6 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
         g_hash_table_remove (priv->request_hash,
                              GUINT_TO_POINTER ((guint)dsi_header->requestID));
       }
-      else
-        g_free (priv->data);
-      
       break;
     }
 
@@ -816,31 +833,13 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
       g_assert_not_reached ();
   }
 }
-
-static void
-skip_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
-{
-  GInputStream *input = G_INPUT_STREAM (object);
-  GVfsAfpConnection *afp_connection = G_VFS_AFP_CONNECTION (user_data);
-
-  gsize bytes_skipped;
-  GError *err = NULL;
-
-  bytes_skipped = g_input_stream_skip_finish (input, res, &err);
-  if (bytes_skipped == -1)
-  {
-    g_warning ("FAIL!!! \"%s\"\n", err->message);
-    g_error_free (err);
-  }
-
-  read_reply (afp_connection);
-}
     
 static void
 read_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
 {
   GInputStream *input = G_INPUT_STREAM (object);
   GVfsAfpConnection *afp_connection = G_VFS_AFP_CONNECTION (user_data);
+  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
 
   gboolean result;
   GError *err = NULL;
@@ -853,6 +852,10 @@ read_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   }
 
   dispatch_reply (afp_connection);
+
+  if (priv->free_reply_buf)
+    g_free (priv->reply_buf);
+  
   read_reply (afp_connection);
 }
 
@@ -886,22 +889,19 @@ read_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
 
     req_data = g_hash_table_lookup (priv->request_hash,
                                     GUINT_TO_POINTER ((guint)dsi_header->requestID));
-    if (req_data)
+    if (req_data && req_data->reply_buf)
     {
-      if (req_data->command->type == AFP_COMMAND_READ_EXT && req_data->command->buf)
-        priv->data = req_data->command->buf;
-      else
-        priv->data = g_malloc (dsi_header->totalDataLength);
-
-      read_all_async (input, priv->data, dsi_header->totalDataLength,
-                      0, NULL, read_data_cb, afp_conn);
+        priv->reply_buf = req_data->reply_buf;
+        priv->free_reply_buf = FALSE;
     }
     else
     {
-      /* TODO: should really do a skip_all */
-      g_input_stream_skip_async (input, dsi_header->totalDataLength, 0, NULL,
-                                 skip_data_cb, afp_conn);
+      priv->reply_buf = g_malloc (dsi_header->totalDataLength);
+      priv->free_reply_buf = TRUE;
     }
+    
+    read_all_async (input, priv->reply_buf, dsi_header->totalDataLength,
+                    0, NULL, read_data_cb, afp_conn);
     
     return;
   }
@@ -919,8 +919,6 @@ read_reply (GVfsAfpConnection *afp_connection)
 
   input = g_io_stream_get_input_stream (priv->conn);
   
-  priv->data = NULL;
-
   read_all_async (input, &priv->read_dsi_header, sizeof (DSIHeader), 0, NULL,
                   read_dsi_header_cb, afp_connection);
 }
@@ -1236,11 +1234,12 @@ send_request (GVfsAfpConnection *afp_connection)
 }
 
 void
-g_vfs_afp_connection_send_command (GVfsAfpConnection *afp_connection,
-                                   GVfsAfpCommand *command,
-                                   GAsyncReadyCallback callback,
-                                   GCancellable *cancellable,
-                                   gpointer user_data)
+g_vfs_afp_connection_send_command (GVfsAfpConnection   *afp_connection,
+                                   GVfsAfpCommand      *command,
+                                   char                *reply_buf,
+                                   GAsyncReadyCallback  callback,
+                                   GCancellable        *cancellable,
+                                   gpointer             user_data)
 {
   GVfsAfpConnectionPrivate *priv = afp_connection->priv;
 
@@ -1249,6 +1248,7 @@ g_vfs_afp_connection_send_command (GVfsAfpConnection *afp_connection,
   req_data = g_slice_new0 (RequestData);
   req_data->type = REQUEST_TYPE_COMMAND;
   req_data->command = g_object_ref (command);
+  req_data->reply_buf = reply_buf;
 
   req_data->simple = g_simple_async_result_new (G_OBJECT (afp_connection), callback,
                                                 user_data,
@@ -1352,7 +1352,7 @@ g_vfs_afp_connection_read_reply_sync (GVfsAfpConnection *afp_connection,
   if (!res)
     return NULL;
 
-  return g_vfs_afp_reply_new (dsi_header.errorCode, data, dsi_header.totalDataLength);
+  return g_vfs_afp_reply_new (dsi_header.errorCode, data, dsi_header.totalDataLength, TRUE);
 }
 
 static gboolean
@@ -1569,7 +1569,7 @@ g_vfs_afp_connection_get_server_info (GVfsAfpConnection *afp_connection,
   g_object_unref (conn);
   
   return g_vfs_afp_reply_new (dsi_header.errorCode, data,
-                              dsi_header.totalDataLength);
+                              dsi_header.totalDataLength, TRUE);
 }
 
 GVfsAfpConnection *

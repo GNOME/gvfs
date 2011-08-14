@@ -400,6 +400,7 @@ GVfsAfpReply*      g_vfs_afp_connection_send_command_finish (GVfsAfpConnection *
 
 void               g_vfs_afp_connection_send_command     (GVfsAfpConnection   *afp_connection,
                                                           GVfsAfpCommand      *command,
+                                                          char                *reply_buf,
                                                           GAsyncReadyCallback  callback,
                                                           GCancellable        *cancellable,                                                           
                                                           gpointer             user_data);
