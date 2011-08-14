@@ -2551,7 +2551,13 @@ replace_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointe
     return;
   }
 
-  if (g_strcmp0 (g_file_info_get_etag (info), job->etag) != 0)
+  if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+  {
+    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                              _("File is a directory"));
+  }
+  
+  else if (job->etag && g_strcmp0 (g_file_info_get_etag (info), job->etag) != 0)
   {
     g_vfs_job_failed_literal (G_VFS_JOB (job), 
                               G_IO_ERROR, G_IO_ERROR_WRONG_ETAG,
@@ -2582,15 +2588,9 @@ try_replace (GVfsBackend *backend,
     return TRUE;
   }
 
-  if (etag)
-  {
-    get_filedir_parms (afp_backend, filename, AFP_FILE_BITMAP_MOD_DATE_BIT, 0,
-                       G_VFS_JOB (job)->cancellable, replace_get_filedir_parms_cb,
-                       job);
-  }
-  else
-    replace_cont (afp_backend, job);
-
+  get_filedir_parms (afp_backend, filename, AFP_FILE_BITMAP_MOD_DATE_BIT, 0,
+                     G_VFS_JOB (job)->cancellable, replace_get_filedir_parms_cb,
+                     job);
   return TRUE;
 }
 
