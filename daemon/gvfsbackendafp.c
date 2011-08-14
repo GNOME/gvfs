@@ -2129,6 +2129,29 @@ try_read (GVfsBackend *backend,
 }
 
 static void
+close_replace_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobCloseWrite *job = G_VFS_JOB_CLOSE_WRITE (user_data);
+
+  GFileInfo *info;
+  GError *err = NULL;
+
+  info = get_filedir_parms_finish (afp_backend, res, &err);
+  if (!info)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  g_vfs_job_close_write_set_etag (job, g_file_info_get_etag (info));
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  
+  g_object_unref (info);
+}
+  
+static void
 close_replace_close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
@@ -2183,8 +2206,12 @@ close_replace_exchange_files_cb (GObject *source_object, GAsyncResult *res, gpoi
     }
     return;
   }
-  
-  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  /* Get ETAG */
+  get_filedir_parms (afp_backend, afp_handle->filename,
+                     AFP_FILE_BITMAP_MOD_DATE_BIT, 0,
+                     G_VFS_JOB (job)->cancellable,
+                     close_replace_get_filedir_parms_cb, job);
 }
 
 static void
@@ -2205,6 +2232,34 @@ close_write_close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer u
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
+static void
+close_write_get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobCloseWrite *job = G_VFS_JOB_CLOSE_WRITE (user_data);
+
+  AfpHandle *afp_handle = (AfpHandle *)job->handle;
+
+  GError *err = NULL;
+  GFileInfo *info;
+
+  info = get_fork_parms_finish (afp_backend, res, &err);
+  if (!info)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+
+    afp_handle_free (afp_handle);
+    return;
+  }
+
+  g_vfs_job_close_write_set_etag (job, g_file_info_get_etag (info));
+
+  close_fork (afp_backend, afp_handle->fork_refnum, G_VFS_JOB (job)->cancellable,
+              close_write_close_fork_cb, job);
+  afp_handle_free (afp_handle);
+}
+  
 static void
 close_replace_set_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
@@ -2253,9 +2308,10 @@ close_replace_set_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpoi
     return;
   }
 
-  close_fork (afp_backend, afp_handle->fork_refnum, G_VFS_JOB (job)->cancellable,
-              close_write_close_fork_cb, job);
-  afp_handle_free (afp_handle);
+  /* Get ETAG */
+  get_fork_parms (afp_backend, afp_handle->fork_refnum, AFP_FILE_BITMAP_MOD_DATE_BIT,
+                  G_VFS_JOB (job)->cancellable, close_write_get_fork_parms_cb,
+                  job);
 }
 
 static gboolean
@@ -2313,10 +2369,10 @@ try_close_write (GVfsBackend *backend,
   }
   else
   {
-    close_fork (afp_backend, afp_handle->fork_refnum, G_VFS_JOB (job)->cancellable,
-                close_write_close_fork_cb, job);
-    afp_handle_free (afp_handle);;
-
+    /* Get ETAG */
+    get_fork_parms (afp_backend, afp_handle->fork_refnum, AFP_FILE_BITMAP_MOD_DATE_BIT,
+                    G_VFS_JOB (job)->cancellable, close_write_get_fork_parms_cb,
+                    job);
   }
   
   return TRUE;
