@@ -2514,6 +2514,47 @@ replace_create_tmp_file (GVfsBackendAfp *afp_backend, GVfsJobOpenForWrite *job)
                replace_create_tmp_file_cb, job);
 }
 
+static void
+replace_cont (GVfsBackendAfp *afp_backend, GVfsJobOpenForWrite *job)
+{
+  if (afp_backend->vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_NO_EXCHANGE_FILES)
+  {
+    open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT,
+               G_VFS_JOB (job)->cancellable, replace_open_fork_cb, job);
+  }
+  else
+    replace_create_tmp_file (afp_backend, job);
+}
+
+static void
+replace_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
+
+  GError *err = NULL;
+  GFileInfo *info;
+
+  info = get_filedir_parms_finish (afp_backend, res, &err);
+  if (!info)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  if (g_strcmp0 (g_file_info_get_etag (info), job->etag) != 0)
+  {
+    g_vfs_job_failed_literal (G_VFS_JOB (job), 
+                              G_IO_ERROR, G_IO_ERROR_WRONG_ETAG,
+                              _("The file was externally modified"));
+  }
+  else
+    replace_cont (afp_backend, job);
+
+  g_object_unref (info);
+}
+  
 static gboolean
 try_replace (GVfsBackend *backend,
              GVfsJobOpenForWrite *job,
@@ -2533,13 +2574,14 @@ try_replace (GVfsBackend *backend,
     return TRUE;
   }
 
-  if (afp_backend->vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_NO_EXCHANGE_FILES)
+  if (etag)
   {
-    open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT,
-               G_VFS_JOB (job)->cancellable, replace_open_fork_cb, job);
+    get_filedir_parms (afp_backend, filename, AFP_FILE_BITMAP_MOD_DATE_BIT, 0,
+                       G_VFS_JOB (job)->cancellable, replace_get_filedir_parms_cb,
+                       job);
   }
   else
-    replace_create_tmp_file (afp_backend, job);
+    replace_cont (afp_backend, job);
 
   return TRUE;
 }
