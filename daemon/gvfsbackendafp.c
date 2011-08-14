@@ -2134,25 +2134,9 @@ close_replace_close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
   AfpHandle *afp_handle = (AfpHandle *)user_data;
 
-  GVfsAfpCommand *comm;
-
   /* Delete temporary file */
-  comm = g_vfs_afp_command_new (AFP_COMMAND_DELETE);
-  /* pad byte */
-  g_vfs_afp_command_put_byte (comm, 0);
-  /* Volume ID */
-  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
-  /* Directory ID 2 == / */
-  g_vfs_afp_command_put_uint32 (comm, 2);
-
-  /* Pathname */
-  put_pathname (comm, afp_handle->tmp_filename);
-
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
-                                     NULL, NULL, NULL);
-  g_object_unref (comm);
+  delete (afp_backend, afp_handle->tmp_filename, NULL, NULL, NULL);
   
-
   afp_handle_free (afp_handle);
 }
 
