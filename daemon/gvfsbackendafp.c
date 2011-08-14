@@ -2199,6 +2199,14 @@ close_replace_exchange_files_cb (GObject *source_object, GAsyncResult *res, gpoi
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
                                   _("Permission denied"));
         break;
+      case AFP_RESULT_ID_NOT_FOUND:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("File doesn't exist"));
+        break;
+      case AFP_RESULT_OBJECT_TYPE_ERR:
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                  _("File is a directory"));
+        break;   
       default:
         g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
                           _("Got error code: %d from server"), res_code);
