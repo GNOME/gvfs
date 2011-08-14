@@ -738,10 +738,10 @@ do_login (GVfsAfpServer *afp_serv,
       return dhx_login (afp_serv, username, password, cancellable, error); 
 #endif
 
-	g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-	             _("Login to AFP server %s failed (no suitable authentication mechanism found)"),
-	             afp_serv->server_name);
-	return FALSE;
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                 _("Login to AFP server %s failed (no suitable authentication mechanism found)"),
+                 afp_serv->server_name);
+    return FALSE;
   }
 }
 
