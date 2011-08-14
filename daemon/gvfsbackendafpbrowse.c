@@ -109,8 +109,7 @@ get_srvr_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
@@ -120,8 +119,7 @@ get_srvr_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
 
     g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
                                      _("Got error code: %d from server"), res_code);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
   
   /* server time */
@@ -151,7 +149,9 @@ get_srvr_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   }
   g_object_unref (reply);
 
+done:
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 static void

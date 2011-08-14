@@ -430,8 +430,7 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
@@ -462,8 +461,7 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
                                          _("Got error code: %d from server"), res_code);
         break;
     }
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   g_vfs_afp_reply_read_uint16 (reply, &file_bitmap);
@@ -473,7 +471,10 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 
   g_simple_async_result_set_op_res_gpointer (simple, GINT_TO_POINTER ((gint)fork_refnum),
                                              NULL);
+
+done:
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 static void
@@ -557,8 +558,7 @@ close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
@@ -570,7 +570,9 @@ close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
                                      _("Got error code: %d from server"), res_code);
   }
 
+done:
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 static void
@@ -637,8 +639,7 @@ get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
@@ -648,8 +649,7 @@ get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
 
     g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
                       _("Got error code: %d from server"), res_code);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   g_vfs_afp_reply_read_uint16 (reply, &file_bitmap);
@@ -660,7 +660,10 @@ get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   g_object_unref (reply);
 
   g_simple_async_result_set_op_res_gpointer (simple, info, g_object_unref);
+
+done:
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 static void
@@ -732,8 +735,7 @@ get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
@@ -752,8 +754,7 @@ get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
                                          _("Got error code: %d from server"), res_code);
         break;
     }
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   g_vfs_afp_reply_read_uint16 (reply, &file_bitmap);
@@ -772,7 +773,10 @@ get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
   g_object_unref (reply);
 
   g_simple_async_result_set_op_res_gpointer (simple, info, g_object_unref);
+
+done:
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 static void
@@ -849,8 +853,7 @@ get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
@@ -860,8 +863,7 @@ get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 
     g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
                       _("Got error code: %d from server"), res_code);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   g_vfs_afp_reply_read_uint16 (reply, &vol_bitmap);
@@ -917,7 +919,10 @@ get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   g_object_unref (reply);
   
   g_simple_async_result_set_op_res_gpointer (simple, info, g_object_unref);
+
+done:
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 static void
@@ -1001,10 +1006,7 @@ create_file_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   if (!reply)
   {
     g_simple_async_result_take_error (cfd->simple, err);
-    g_simple_async_result_complete (cfd->simple);
-
-    free_create_file_data (cfd);
-    return;
+    goto done;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
@@ -1044,6 +1046,7 @@ create_file_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     }
   }
 
+done:
   g_simple_async_result_complete (cfd->simple);
   free_create_file_data (cfd);
 }
@@ -1152,8 +1155,7 @@ delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
@@ -1194,7 +1196,9 @@ delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     }
   }
 
+done:
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 static void

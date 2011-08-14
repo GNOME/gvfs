@@ -671,8 +671,7 @@ read_all_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   if (bytes_read == -1)
   {
     g_simple_async_result_take_error (simple, err);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
 
   read_data = g_simple_async_result_get_op_res_gpointer (simple);
@@ -687,7 +686,9 @@ read_all_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     return;
   }
 
+done:
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 static void
@@ -958,8 +959,7 @@ write_all_cb (GObject      *source_object,
   if (bytes_written == -1)
   {
     g_simple_async_result_take_error (simple, err);
-    g_simple_async_result_complete (simple);
-    return;
+    goto done;
   }
   
   write_data = g_simple_async_result_get_op_res_gpointer (simple);
@@ -975,7 +975,9 @@ write_all_cb (GObject      *source_object,
     return;
   }
 
+done:
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 static void
