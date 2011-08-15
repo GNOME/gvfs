@@ -1,3 +1,10 @@
+Major changes in 1.9.3
+======================
+* gvfs-copy: Do not use deprecated g_format_size_for_display()
+* fuse: Bring back real statfs()
+* Fixed several obvious programming errors found during code analysis
+* Translation updates
+
 Major changes in 1.9.2
 ======================
 * ftp: Fix stupid proxy servers disconnecting on FEAT
