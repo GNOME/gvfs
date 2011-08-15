@@ -289,7 +289,7 @@ get_volume_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
   found_volume = NULL;
   g_hash_table_iter_init (&hash_iter, monitor->volumes);
   while (g_hash_table_iter_next (&hash_iter, NULL, (gpointer) &volume) &&
-         found_volume != NULL)
+         found_volume == NULL)
     {
       char *_uuid;
       _uuid = g_volume_get_uuid (volume);
@@ -321,7 +321,7 @@ get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
   found_mount = NULL;
   g_hash_table_iter_init (&hash_iter, monitor->mounts);
   while (g_hash_table_iter_next (&hash_iter, NULL, (gpointer) &mount) &&
-         found_mount != NULL)
+         found_mount == NULL)
     {
       char *_uuid;
       _uuid = g_mount_get_uuid (mount);
