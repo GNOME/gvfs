@@ -2954,7 +2954,8 @@ parse_mountinfo (const char *contents)
 	  g_array_append_val (a, new_entry);
 	}
 
-      line = strchr (line, '\n');
+      if (line)
+	line = strchr (line, '\n');
       if (line)
 	line++;
     }
