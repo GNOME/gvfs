@@ -190,7 +190,6 @@ _g_dbus_append_file_attribute (DBusMessageIter *iter,
 {
   DBusMessageIter variant_iter, inner_struct_iter;
   const char *dbus_type;
-  GObject *obj = NULL;
   guint32 dbus_status;
 
   dbus_type = _g_dbus_type_from_file_attribute_type (type);
@@ -256,9 +255,6 @@ _g_dbus_append_file_attribute (DBusMessageIter *iter,
 	_g_dbus_oom ();
     }
 
-  if (obj)
-    g_object_unref (obj);
-      
   if (!dbus_message_iter_close_container (&inner_struct_iter, &variant_iter))
     _g_dbus_oom ();
       
