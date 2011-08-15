@@ -74,7 +74,7 @@ show_progress (goffset current_num_bytes,
 
   g_get_current_time (&tv);
 
-  size = g_format_size_for_display (current_num_bytes / MAX (tv.tv_sec - start_time.tv_sec, 1));
+  size = g_format_size (current_num_bytes / MAX (tv.tv_sec - start_time.tv_sec, 1));
   g_print (_("progress"));
   g_print (" %"G_GINT64_FORMAT"/%"G_GINT64_FORMAT" (%s/s)\n",
 	   current_num_bytes, total_num_bytes, size);
