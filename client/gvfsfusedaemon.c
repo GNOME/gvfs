@@ -634,12 +634,6 @@ file_from_full_path (const gchar *path)
  * VFS functions *
  * ------------- */
 
-#if 0
-
-/* A stat -f <path> on a FUSE mount always results in this function being called with a path
- * of '/'. This means we can't return valid info for the various mounts. Hopefully we can
- * fix this in the future. */
-
 static gint
 vfs_statfs (const gchar *path, struct statvfs *stbuf)
 {
@@ -649,32 +643,35 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
 
   debug_print ("vfs_statfs: %s\n", path);
 
+  memset (stbuf, 0, sizeof (*stbuf));
+
+  /* Fallback case */
+  stbuf->f_bsize = 4096;
+  stbuf->f_frsize = 4096;  /* Ignored by FUSE */
+  stbuf->f_blocks = 0;
+  stbuf->f_bfree = 0;
+  stbuf->f_bavail = 0;
+  stbuf->f_files = 0;
+  stbuf->f_ffree = 0;
+  stbuf->f_favail = 0;  /* Ignored by FUSE */
+  stbuf->f_fsid = 1;  /* Ignored by FUSE */
+  stbuf->f_flag = 0;  /* Ignored by FUSE */
+  stbuf->f_namemax = 1024;
+
   if ((file = file_from_full_path (path)))
     {
       GFileInfo *file_info;
 
-      file_info = g_file_get_filesystem_info (file, "*", NULL, &error);
+      file_info = g_file_query_filesystem_info (file, "filesystem::*", NULL, &error);
 
       if (file_info)
         {
-          memset (stbuf, 0, sizeof (*stbuf));
-
-          stbuf->f_bsize = 4096;
-          stbuf->f_frsize = 4096;  /* Ignored by FUSE */
-          stbuf->f_blocks = 0;
-          stbuf->f_bfree = 0;
-          stbuf->f_bavail = 0;
-          stbuf->f_files = 0;
-          stbuf->f_ffree = 0;
-          stbuf->f_favail = 0;  /* Ignored by FUSE */
-          stbuf->f_fsid = 1;  /* Ignored by FUSE */
-          stbuf->f_flag = 0;  /* Ignored by FUSE */
-          stbuf->f_namemax = 1024;
-
           if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE))
             stbuf->f_blocks = g_file_info_get_attribute_uint64 (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) / 4096;
           if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE))
             stbuf->f_bfree = stbuf->f_bavail = g_file_info_get_attribute_uint64 (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE) / 4096;
+
+          g_object_unref (file_info);
         }
       else if (error)
         {
@@ -688,34 +685,6 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
 
       g_object_unref (file);
     }
-
-  debug_print ("vfs_statfs: -> %s\n", g_strerror (-result));
-
-  return result;
-}
-
-#endif
-
-static gint
-vfs_statfs (const gchar *path, struct statvfs *stbuf)
-{
-  gint result = 0;
-
-  debug_print ("vfs_statfs: %s\n", path);
-
-  memset (stbuf, 0, sizeof (*stbuf));
-
-  stbuf->f_bsize = 4096;
-  stbuf->f_frsize = 4096;  /* Ignored by FUSE */
-  stbuf->f_blocks = 0;
-  stbuf->f_bfree = 0;
-  stbuf->f_bavail = 0;
-  stbuf->f_files = 0;
-  stbuf->f_ffree = 0;
-  stbuf->f_favail = 0;  /* Ignored by FUSE */
-  stbuf->f_fsid = 1;  /* Ignored by FUSE */
-  stbuf->f_flag = 0;  /* Ignored by FUSE */
-  stbuf->f_namemax = 1024;
 
   debug_print ("vfs_statfs: -> %s\n", g_strerror (-result));
 
