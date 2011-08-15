@@ -1442,7 +1442,8 @@ ftp_output_stream_splice (GOutputStream *output,
               g_cancellable_reset (timer_cancel);
               current = cancellable;
               g_clear_error (error);
-              progress_callback (bytes_copied, total_size, progress_callback_data);
+              if (progress_callback)
+                progress_callback (bytes_copied, total_size, progress_callback_data);
               continue;
             }
           else
@@ -1467,7 +1468,8 @@ ftp_output_stream_splice (GOutputStream *output,
                   g_cancellable_reset (timer_cancel);
                   current = cancellable;
                   g_clear_error (error);
-                  progress_callback (bytes_copied, total_size, progress_callback_data);
+                  if (progress_callback)
+                    progress_callback (bytes_copied, total_size, progress_callback_data);
                   continue;
                 }
               else
