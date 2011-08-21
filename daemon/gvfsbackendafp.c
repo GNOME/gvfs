@@ -1517,10 +1517,136 @@ move_and_rename_finish (GVfsBackendAfp *afp_backend,
   return TRUE;
 }
 
+static void
+copy_file_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+
+  GVfsAfpReply *reply;
+  GError *err = NULL;
+
+  AfpResultCode res_code;
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  if (!reply)
+  {
+    g_simple_async_result_take_error (simple, err);
+    goto done;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    switch (res_code)
+    {
+      case AFP_RESULT_ACCESS_DENIED:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                         _("Permission denied"));
+        break;
+      case AFP_RESULT_CALL_NOT_SUPPORTED:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                                         _("Server doesn't support the FPCopyFile operation"));
+        break;
+      case AFP_RESULT_DENY_CONFLICT:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         _("Couldn't open source file as Read/DenyWrite"));
+        break;
+      case AFP_RESULT_DISK_FULL:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
+                                         _("Not enough space on volume"));
+        break;
+      case AFP_RESULT_OBJECT_EXISTS:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                         _("Target file already exists"));
+        break;
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                         _("Source file and/or destination directory doesn't exist"));
+        break;
+      case AFP_RESULT_OBJECT_TYPE_ERR:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                         _("Source file is a directory"));
+        break;
+      default:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         _("Got error code: %d from server"), res_code);
+        break;
+    }
+  }
+        
+done:
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+}
+
+static void
+copy_file (GVfsBackendAfp     *afp_backend,
+           const char         *source,
+           const char         *destination,
+           GCancellable       *cancellable,
+           GAsyncReadyCallback callback,
+           gpointer            user_data)
+{
+  GVfsAfpCommand *comm;
+  char *dirname, *basename;
+  GSimpleAsyncResult *simple;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_COPY_FILE);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+
+  /* VolumeID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+
+  /* SourceDirectoryID 2 == / */
+  g_vfs_afp_command_put_uint32 (comm, 2);
+  /* DestDirectoryID 2 == / */
+  g_vfs_afp_command_put_uint32 (comm, 2);
+
+  /* SourcePathname */
+  put_pathname (comm, source);
+
+  /* DestPathname */
+  dirname = g_path_get_dirname (destination);
+  put_pathname (comm, dirname);
+  g_free (dirname);
+
+  /* NewName */
+  basename = g_path_get_basename (destination);
+  put_pathname (comm, basename);
+  g_free (basename);
+
+  simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
+                                      user_data, copy_file);
+
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
+                                     copy_file_cb, cancellable, simple);
+  g_object_unref (comm);
+}
+
+static gboolean
+copy_file_finish (GVfsBackendAfp *afp_backend, GAsyncResult *res, GError **error)
+{
+  GSimpleAsyncResult *simple;
+
+  g_return_val_if_fail (g_simple_async_result_is_valid (res, G_OBJECT (afp_backend),
+                                                        copy_file),
+                        FALSE);
+
+  simple = (GSimpleAsyncResult *)res;
+  
+  if (g_simple_async_result_propagate_error (simple, error))
+    return FALSE;
+
+  return TRUE;
+}
+
 /*
  * Backend code
  */
-
 static void
 move_move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {

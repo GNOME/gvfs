@@ -191,6 +191,7 @@ enum
 typedef enum
 {
   AFP_COMMAND_CLOSE_FORK         = 4,
+  AFP_COMMAND_COPY_FILE          = 5,
   AFP_COMMAND_CREATE_DIR         = 6,
   AFP_COMMAND_CREATE_FILE        = 7,
   AFP_COMMAND_DELETE             = 8,
@@ -227,6 +228,7 @@ typedef enum
   AFP_RESULT_AUTH_CONTINUE        = -5001,
   AFP_RESULT_BAD_UAM              = -5002,
   AFP_RESULT_CANT_MOVE            = -5005,
+  AFP_RESULT_DENY_CONFLICT        = -5006,
   AFP_RESULT_DIR_NOT_EMPTY        = -5007,
   AFP_RESULT_DISK_FULL            = -5008,
   AFP_RESULT_EOF_ERR              = -5009,
