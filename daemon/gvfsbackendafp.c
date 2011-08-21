@@ -1357,8 +1357,8 @@ map_id (GVfsBackendAfp      *afp_backend,
   map_data->function = map_function;
   g_simple_async_result_set_op_res_gpointer (simple, map_data, g_free);
   
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, map_id_cb,
-                                     cancellable, simple);
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
+                                     map_id_cb, cancellable, simple);
   g_object_unref (comm);
 }
 
@@ -1388,14 +1388,11 @@ map_id_finish (GVfsBackendAfp   *afp_backend,
   return map_data->name;
 }
 
-/*
- * Backend code
- */
 static void
 move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
-  GVfsJobMove *job = G_VFS_JOB_MOVE (user_data);
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
   GVfsAfpReply *reply;
   GError *err = NULL;
@@ -1405,9 +1402,8 @@ move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_dat
   reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
-    g_error_free (err);
-    return;
+    g_simple_async_result_take_error (simple, err);
+    goto done;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
@@ -1418,49 +1414,56 @@ move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_dat
     switch (res_code)
     {
       case AFP_RESULT_ACCESS_DENIED:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                  _("Permission denied"));
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                         _("Permission denied"));
         break;
       case AFP_RESULT_CANT_MOVE:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                                  _("Can't move directory into one of it's descendants"));
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                                         _("Can't move directory into one of it's descendants"));
         break;
       case AFP_RESULT_INSIDE_SHARE_ERR:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                                  _("Can't move sharepoint into a shared directory"));
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         _("Can't move sharepoint into a shared directory"));
         break;
       case AFP_RESULT_INSIDE_TRASH_ERR:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                                  _("Can't move a shared directory into the Trash"));
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         _("Can't move a shared directory into the Trash"));
         break;
       case AFP_RESULT_OBJECT_EXISTS:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
-                                  _("Target file already exists"));
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                         _("Target file already exists"));
         break;
       case AFP_RESULT_OBJECT_LOCKED:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                  _("Object being moved is marked as RenameInhibit"));
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                         _("Object being moved is marked as RenameInhibit"));
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                  _("Object being moved doesn't exist"));
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                         _("Object being moved doesn't exist"));
         break;
       default:
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Got error code: %d from server"), res_code);
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         _("Got error code: %d from server"), res_code);
         break;
     }
-    return;
   }
 
-  g_vfs_job_succeeded (G_VFS_JOB (job));
+done:
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 static void
-move (GVfsBackendAfp *afp_backend, GVfsJobMove *job)
+move_and_rename (GVfsBackendAfp     *afp_backend,
+                 const char         *source,
+                 const char         *destination,
+                 GCancellable       *cancellable,
+                 GAsyncReadyCallback callback,
+                 gpointer            user_data)
 {
   GVfsAfpCommand *comm;
   char *dirname, *basename;
+  GSimpleAsyncResult *simple;
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_MOVE_AND_RENAME);
   /* pad byte */
@@ -1475,22 +1478,65 @@ move (GVfsBackendAfp *afp_backend, GVfsJobMove *job)
   g_vfs_afp_command_put_uint32 (comm, 2);
 
   /* SourcePathname */
-  put_pathname (comm, job->source);
+  put_pathname (comm, source);
 
   /* DestPathname */
-  dirname = g_path_get_dirname (job->destination);
+  dirname = g_path_get_dirname (destination);
   put_pathname (comm, dirname);
   g_free (dirname);
 
   /* NewName */
-  basename = g_path_get_basename (job->destination);
+  basename = g_path_get_basename (destination);
   put_pathname (comm, basename);
   g_free (basename);
 
+  simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
+                                      user_data, move_and_rename);
+  
   g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
-                                     move_and_rename_cb, G_VFS_JOB (job)->cancellable,
-                                     job);
+                                     move_and_rename_cb, cancellable, simple);
   g_object_unref (comm);
+}
+
+static gboolean
+move_and_rename_finish (GVfsBackendAfp *afp_backend,
+                        GAsyncResult   *res,
+                        GError        **error)
+{
+  GSimpleAsyncResult *simple;
+
+  g_return_val_if_fail (g_simple_async_result_is_valid (res, G_OBJECT (afp_backend),
+                                                        move_and_rename),
+                        FALSE);
+
+  simple = (GSimpleAsyncResult *)res;
+  
+  if (g_simple_async_result_propagate_error (simple, error))
+    return FALSE;
+
+  return TRUE;
+}
+
+/*
+ * Backend code
+ */
+
+static void
+move_move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobMove *job = G_VFS_JOB_MOVE (user_data);
+
+  GError *err = NULL;
+  
+  if (!move_and_rename_finish (afp_backend, res, &err))
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static void
@@ -1508,7 +1554,9 @@ move_delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     return;
   }
 
-  move (afp_backend, job);
+  move_and_rename (afp_backend, job->source, job->destination,
+                   G_VFS_JOB (job)->cancellable, move_move_and_rename_cb,
+                   job);
 }
 
 typedef struct
@@ -1591,7 +1639,9 @@ do_move (MoveData *move_data)
             move_delete_cb, job);
   }
   else
-    move (afp_backend, job);
+    move_and_rename (afp_backend, job->source, job->destination,
+                     G_VFS_JOB (job)->cancellable, move_move_and_rename_cb,
+                     job);
 
 done:
   g_object_unref (move_data->source_parms_res);
