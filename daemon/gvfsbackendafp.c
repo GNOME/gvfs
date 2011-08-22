@@ -50,6 +50,7 @@
 #include "gvfsjobmakedirectory.h"
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobmove.h"
+#include "gvfsjobcopy.h"
 
 #include "gvfsafpserver.h"
 #include "gvfsafpconnection.h"
@@ -1598,11 +1599,13 @@ copy_file (GVfsBackendAfp     *afp_backend,
   /* pad byte */
   g_vfs_afp_command_put_byte (comm, 0);
 
-  /* VolumeID */
+  /* SourceVolumeID */
   g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
-
   /* SourceDirectoryID 2 == / */
   g_vfs_afp_command_put_uint32 (comm, 2);
+
+  /* DestVolumeID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
   /* DestDirectoryID 2 == / */
   g_vfs_afp_command_put_uint32 (comm, 2);
 
@@ -1647,6 +1650,208 @@ copy_file_finish (GVfsBackendAfp *afp_backend, GAsyncResult *res, GError **error
 /*
  * Backend code
  */
+
+typedef struct
+{
+  GVfsJobCopy  *job;
+  GAsyncResult *source_parms_res;
+  GAsyncResult *dest_parms_res;
+} CopyData;
+
+static void
+copy_data_free (CopyData *copy_data)
+{
+  g_object_unref (copy_data->source_parms_res);
+  g_object_unref (copy_data->dest_parms_res);
+
+  g_slice_free (CopyData, copy_data);
+}
+
+static void
+copy_copy_file_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobCopy *job = G_VFS_JOB_COPY (user_data);
+
+  GError *err = NULL;
+  
+  if (!copy_file_finish (afp_backend, res, &err))
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
+copy_delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  GVfsJobCopy *job = G_VFS_JOB_COPY (user_data);
+
+  GError *err = NULL;
+  
+  if (!delete_finish (afp_backend, res, &err))
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  copy_file (afp_backend, job->source, job->destination,
+             G_VFS_JOB (job)->cancellable, copy_copy_file_cb, job);
+}
+
+static void
+do_copy (CopyData *copy_data)
+{
+  GVfsJobCopy *job = copy_data->job;
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  
+  GFileInfo *info;
+  GError *err = NULL;
+
+  gboolean source_is_dir;
+  gboolean dest_exists;
+  gboolean dest_is_dir;
+  
+  info = get_filedir_parms_finish (afp_backend, copy_data->source_parms_res, &err);
+  if (!info)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    goto done;
+  }
+
+  /* If the source is a directory, don't fail with WOULD_RECURSE immediately,
+   * as that is less useful to the app. Better check for errors on the
+   * target instead.
+   */
+  source_is_dir = g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY ? TRUE : FALSE;
+  g_object_unref (info);
+
+  info = get_filedir_parms_finish (afp_backend, copy_data->dest_parms_res, &err);
+  if (!info)
+  {
+    if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+    {
+      g_clear_error (&err);
+      dest_exists = FALSE;
+    }
+    else
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+      g_error_free (err);
+      goto done;
+    }
+  }
+  else
+  {
+    dest_exists = TRUE;
+    dest_is_dir = g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY ? TRUE : FALSE;
+    g_object_unref (info);
+  }
+
+  /* Check target errors */
+  if (dest_exists)
+  {
+    if ((job->flags & G_FILE_COPY_OVERWRITE))
+    {
+      /* Always fail on dirs, even with overwrite */
+      if (dest_is_dir)
+      {
+        if (source_is_dir)
+          g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
+                                    _("Can't copy directory over directory"));
+        else
+          g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                    _("File is directory"));
+        goto done;
+      }
+    }
+    else
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
+                        _("Target file already exists"));
+      goto done;
+    }
+  }
+
+  /* Now we fail if the source is a directory */
+  if (source_is_dir)
+  {
+    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                      _("Can't recursively copy directory"));
+    goto done;
+  }
+
+  if (dest_exists)
+  {
+    delete (afp_backend, job->destination, G_VFS_JOB (job)->cancellable,
+            copy_delete_cb, job);
+  }
+  else
+  {
+    copy_file (afp_backend, job->source, job->destination,
+               G_VFS_JOB (job)->cancellable, copy_copy_file_cb, job);
+  }
+  
+done:
+  copy_data_free (copy_data);
+  return;
+}
+
+static void
+copy_get_dest_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  CopyData *copy_data = (CopyData *)user_data;
+  
+  copy_data->dest_parms_res = g_object_ref (res);
+  if (copy_data->source_parms_res)
+    do_copy (copy_data);
+}
+
+static void
+copy_get_source_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  CopyData *copy_data = (CopyData *)user_data;
+
+  copy_data->source_parms_res = g_object_ref (res);
+  if (copy_data->dest_parms_res)
+    do_copy (copy_data);
+}
+
+static gboolean
+try_copy (GVfsBackend *backend,
+          GVfsJobCopy *job,
+          const char *source,
+          const char *destination,
+          GFileCopyFlags flags,
+          GFileProgressCallback progress_callback,
+          gpointer progress_callback_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+
+  CopyData *copy_data;
+
+  copy_data = g_slice_new0 (CopyData);
+  copy_data->job = job;
+
+  get_filedir_parms (afp_backend, source, AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT,
+                     AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT,
+                     G_VFS_JOB (job)->cancellable, copy_get_source_parms_cb,
+                     copy_data);
+
+  get_filedir_parms (afp_backend, destination, AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT,
+                     AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT,
+                     G_VFS_JOB (job)->cancellable, copy_get_dest_parms_cb,
+                     copy_data);  
+
+  return TRUE;
+}
+
 static void
 move_move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
@@ -1691,6 +1896,15 @@ typedef struct
   GAsyncResult *source_parms_res;
   GAsyncResult *dest_parms_res;
 } MoveData;
+
+static void
+free_move_data (MoveData *move_data)
+{
+  g_object_unref (move_data->source_parms_res);
+  g_object_unref (move_data->dest_parms_res);
+
+  g_slice_free (MoveData, move_data);
+}
 
 static void
 do_move (MoveData *move_data)
@@ -1770,9 +1984,7 @@ do_move (MoveData *move_data)
                      job);
 
 done:
-  g_object_unref (move_data->source_parms_res);
-  g_object_unref (move_data->dest_parms_res);
-  g_slice_free (MoveData, move_data);
+  free_move_data (move_data);
   return;
 }
 
@@ -4071,6 +4283,7 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
   backend_class->try_make_directory = try_make_directory;
   backend_class->try_set_display_name = try_set_display_name;
   backend_class->try_move = try_move;
+  backend_class->try_copy = try_copy;
 }
 
 void
