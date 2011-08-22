@@ -213,6 +213,7 @@ ask_password_reply (DBusMessage *reply,
     }
 
   g_simple_async_result_complete (result);
+  g_object_unref (result);
 }
 
 void
@@ -532,6 +533,7 @@ ask_question_reply (DBusMessage *reply,
     }
 
   g_simple_async_result_complete (result);
+  g_object_unref (result);
 }
 
 gboolean
@@ -752,6 +754,7 @@ show_processes_reply (DBusMessage *reply,
     }
 
   g_simple_async_result_complete (result);
+  g_object_unref (result);
 }
 
 void
