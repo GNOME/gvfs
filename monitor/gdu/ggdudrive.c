@@ -912,6 +912,7 @@ start_cb (GduDrive   *drive,
       g_free (assembled_drive_object_path);
     }
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 }
 
 typedef struct
@@ -973,11 +974,12 @@ start_operation_reply (GMountOperation      *op,
       goto out;
     }
 
-  gdu_drive_activate (GDU_DRIVE (data->drive->presentable), start_cb, data->simple);
+  gdu_drive_activate (GDU_DRIVE (data->drive->presentable), start_cb, g_object_ref (data->simple));
 
  out:
   g_object_unref (data->drive);
   g_object_unref (data->start_operation);
+  g_object_unref (data->simple);
   g_free (data);
 }
 

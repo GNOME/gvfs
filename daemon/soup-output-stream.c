@@ -321,6 +321,7 @@ soup_output_stream_write_async (GOutputStream       *stream,
     }
 
   g_simple_async_result_complete_in_idle (result);
+  g_object_unref (result);
 }
 
 static gssize
@@ -362,6 +363,7 @@ close_async_done (GOutputStream *stream)
   soup_output_stream_done_io (stream);
 
   g_simple_async_result_complete (result);
+  g_object_unref (result);
 }
 
 static void
@@ -398,6 +400,7 @@ soup_output_stream_close_async (GOutputStream        *stream,
       g_simple_async_result_set_from_error (result, error);
       g_error_free (error);
       g_simple_async_result_complete_in_idle (result);
+      g_object_unref (result);
       return;
     }
 
