@@ -47,7 +47,7 @@ is_file_uri_with_anchor (char *str)
   return FALSE;
 }
 
-static void
+static gboolean
 open (GFile *file, char *arg_string)
 {
   GAppInfo *app;
@@ -65,7 +65,7 @@ open (GFile *file, char *arg_string)
       g_printerr (_("%s: %s: error opening location: %s\n"),
 		  g_get_prgname (), g_file_get_uri (file), error->message);
       g_error_free (error);
-      return;
+      return FALSE;
     }
 
   if (g_file_is_native (file) && !is_file_uri_with_anchor (arg_string))
@@ -96,7 +96,7 @@ open (GFile *file, char *arg_string)
 
   g_object_unref (app);
 
-  return;
+  return res;
 }
 
 int
@@ -107,6 +107,7 @@ main (int argc, char *argv[])
   GFile *file;
   gchar *summary;
   int i;
+  gint res;
 
   setlocale (LC_ALL, "");
 
@@ -157,14 +158,17 @@ main (int argc, char *argv[])
     }
 
   i = 0;
+  res = 0;
 
   do
     {
       file = g_file_new_for_commandline_arg (locations[i]);
-      open (file, locations[i]);
+      res += !open (file, locations[i]);
       g_object_unref (file);
     }
   while (locations[++i] != NULL);
+  if (res)
+    return 2;
 
   return 0;
 }
