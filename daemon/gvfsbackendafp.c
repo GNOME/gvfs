@@ -1647,6 +1647,119 @@ copy_file_finish (GVfsBackendAfp *afp_backend, GAsyncResult *res, GError **error
   return TRUE;
 }
 
+static void
+set_unix_privs_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+
+  GVfsAfpReply *reply;
+  GError *err = NULL;
+  AfpResultCode res_code;
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  if (!reply)
+  {
+    g_simple_async_result_take_error (simple, err);
+    goto done;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    switch (res_code)
+    {
+      case AFP_RESULT_ACCESS_DENIED:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                         _("Permission denied"));
+        break;
+      case AFP_RESULT_OBJECT_NOT_FOUND:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                         _("Target object doesn't exist"));
+        break;
+      case AFP_RESULT_VOL_LOCKED:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                         _("Volume is read-only"));
+        break;
+      default:
+        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         _("Got error code: %d from server"), res_code);
+        break;
+    }
+    goto done;
+  }
+
+done:
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+}
+
+static void
+set_unix_privs (GVfsBackendAfp      *afp_backend,
+                const char          *filename,
+                guint32              uid,
+                guint32              gid,
+                guint32              permissions,
+                guint32              ua_permissions,
+                GCancellable        *cancellable,
+                GAsyncReadyCallback  callback,
+                gpointer             user_data)
+{
+  GVfsAfpCommand *comm;
+  GSimpleAsyncResult *simple;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_SET_FILEDIR_PARMS);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+
+  /* VolumeID */
+  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
+  /* DirectoryID 2 == / */
+  g_vfs_afp_command_put_uint32 (comm, 2);
+  /* Bitmap */
+  g_vfs_afp_command_put_uint16 (comm, AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT);
+  /* Pathname */
+  put_pathname (comm, filename);
+  /* pad to even */
+  g_vfs_afp_command_pad_to_even (comm);
+
+  /* UID */
+  g_vfs_afp_command_put_uint32 (comm, uid);
+  /* GID */
+  g_vfs_afp_command_put_uint32 (comm, gid);
+  /* Permissions */
+  g_vfs_afp_command_put_uint32 (comm, permissions);
+  /* UAPermissions */
+  g_vfs_afp_command_put_uint32 (comm, ua_permissions);
+
+  simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
+                                      user_data, set_unix_privs);
+
+  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
+                                     set_unix_privs_cb, cancellable, simple);
+  g_object_unref (comm);
+}
+
+static gboolean
+set_unix_privs_finish (GVfsBackendAfp *afp_backend,
+                       GAsyncResult   *res,
+                       GError        **error)
+{
+  GSimpleAsyncResult *simple;
+  
+  g_return_val_if_fail (g_simple_async_result_is_valid (res, G_OBJECT (afp_backend),
+                                                        set_unix_privs),
+                        FALSE);
+
+  simple = (GSimpleAsyncResult *)res;
+  
+  if (g_simple_async_result_propagate_error (simple, error))
+    return FALSE;
+
+  return TRUE;
+}
+
 /*
  * Backend code
  */
@@ -3568,46 +3681,17 @@ try_query_settable_attributes (GVfsBackend *backend,
 }
 
 static void
-set_attribute_set_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+set_attribute_set_unix_privs_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
   GVfsJobSetAttribute *job = G_VFS_JOB_SET_ATTRIBUTE (user_data);
 
-  GVfsAfpReply *reply;
   GError *err = NULL;
-  AfpResultCode res_code;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
-  if (!reply)
+  if (!set_unix_privs_finish (afp_backend, res, &err))
   {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
     g_error_free (err);
-    return;
-  }
-
-  res_code = g_vfs_afp_reply_get_result_code (reply);
-  g_object_unref (reply);
-  if (res_code != AFP_RESULT_NO_ERROR)
-  {
-    switch (res_code)
-    {
-      case AFP_RESULT_ACCESS_DENIED:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                  _("Permission denied"));
-        break;
-      case AFP_RESULT_OBJECT_NOT_FOUND:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                  _("Target object doesn't exist"));
-        break;
-      case AFP_RESULT_VOL_LOCKED:
-        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                                  _("Volume is read-only"));
-        break;
-      default:
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Got error code: %d from server"), res_code);
-        break;
-    }
     return;
   }
 
@@ -3624,7 +3708,6 @@ set_attribute_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, g
   GError *err = NULL;
 
   guint32 uid, gid, permissions, ua_permissions;
-  GVfsAfpCommand *comm;
 
   info = get_filedir_parms_finish (afp_backend, res, &err);
   if (!info)
@@ -3638,48 +3721,21 @@ set_attribute_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, g
   gid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID);
   permissions = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE);
   ua_permissions = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_UA_PERMISSIONS);
+
   g_object_unref (info);
-  
-  comm = g_vfs_afp_command_new (AFP_COMMAND_SET_FILEDIR_PARMS);
-  /* pad byte */
-  g_vfs_afp_command_put_byte (comm, 0);
 
-  /* VolumeID */
-  g_vfs_afp_command_put_uint16 (comm, afp_backend->volume_id);
-  /* DirectoryID 2 == / */
-  g_vfs_afp_command_put_uint32 (comm, 2);
-  /* Bitmap */
-  g_vfs_afp_command_put_uint16 (comm, AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT);
-  /* Pathname */
-  put_pathname (comm, job->filename);
-  /* pad to even */
-  g_vfs_afp_command_pad_to_even (comm);
-                                    
-  /* UID */
+  
   if (strcmp (job->attribute, G_FILE_ATTRIBUTE_UNIX_UID) == 0)
-    g_vfs_afp_command_put_uint32 (comm, job->value.uint32);
-  else
-    g_vfs_afp_command_put_uint32 (comm, uid);
-  
-  /* GID */
-  if (strcmp (job->attribute, G_FILE_ATTRIBUTE_UNIX_GID) == 0)
-    g_vfs_afp_command_put_uint32 (comm, job->value.uint32);
-  else
-    g_vfs_afp_command_put_uint32 (comm, gid);
-  
-  /* Permissions */
-  if (strcmp (job->attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0)
-    g_vfs_afp_command_put_uint32 (comm, job->value.uint32);
-  else
-    g_vfs_afp_command_put_uint32 (comm, permissions);
-  
-  /* UAPermissions */
-  g_vfs_afp_command_put_uint32 (comm, ua_permissions);
+    uid = job->value.uint32;
+  else if (strcmp (job->attribute, G_FILE_ATTRIBUTE_UNIX_GID) == 0)
+    gid = job->value.uint32;
+  else if (strcmp (job->attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0)
+    permissions = job->value.uint32;
 
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
-                                     set_attribute_set_filedir_parms_cb,
-                                     G_VFS_JOB (job)->cancellable, job);
-  g_object_unref (comm);
+  set_unix_privs (afp_backend, job->filename,
+                  uid, gid, permissions, ua_permissions,
+                  G_VFS_JOB (job)->cancellable,
+                  set_attribute_set_unix_privs_cb, job);
 }
 
 static gboolean
