@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.7.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-06-07 22:11+0200\n"
-"PO-Revision-Date: 2011-06-07 22:12+0200\n"
+"POT-Creation-Date: 2011-08-24 22:34+0200\n"
+"PO-Revision-Date: 2011-08-24 22:34+0200\n"
 "Last-Translator: Torstein Adolf Winterseth <kvikende@fsfe.org>\n"
 "Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
 "Language: \n"
@@ -80,13 +80,13 @@ msgstr "verdier må være av type streng eller liste med strenger"
 #: ../client/gdaemonfileoutputstream.c:681
 #: ../client/gdaemonfileoutputstream.c:873
 #: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1059
-#: ../daemon/gvfsbackendobexftp.c:1087 ../daemon/gvfsbackendobexftp.c:1108
-#: ../daemon/gvfsbackendobexftp.c:1227 ../daemon/gvfsbackendobexftp.c:1364
-#: ../daemon/gvfsbackendobexftp.c:1428 ../daemon/gvfsbackendobexftp.c:1630
-#: ../daemon/gvfsbackendobexftp.c:1737 ../daemon/gvfsbackendobexftp.c:1899
-#: ../daemon/gvfsbackendobexftp.c:1926 ../daemon/gvfsbackendobexftp.c:1985
-#: ../daemon/gvfsbackendobexftp.c:2007 ../daemon/gvfsbackendobexftp.c:2070
-#: ../daemon/gvfsbackendobexftp.c:2089 ../daemon/gvfsbackendsmb.c:1179
+#: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1106
+#: ../daemon/gvfsbackendobexftp.c:1225 ../daemon/gvfsbackendobexftp.c:1362
+#: ../daemon/gvfsbackendobexftp.c:1426 ../daemon/gvfsbackendobexftp.c:1628
+#: ../daemon/gvfsbackendobexftp.c:1735 ../daemon/gvfsbackendobexftp.c:1897
+#: ../daemon/gvfsbackendobexftp.c:1924 ../daemon/gvfsbackendobexftp.c:1983
+#: ../daemon/gvfsbackendobexftp.c:2005 ../daemon/gvfsbackendobexftp.c:2068
+#: ../daemon/gvfsbackendobexftp.c:2087 ../daemon/gvfsbackendsmb.c:1179
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1069
@@ -146,11 +146,11 @@ msgstr "Feil ved oppretting av plugg: %s"
 msgid "Error connecting to socket: %s"
 msgstr "Feil ved tilkobling til plugg: %s"
 
-#: ../common/gvfsdaemonprotocol.c:522
+#: ../common/gvfsdaemonprotocol.c:518
 msgid "Invalid file info format"
 msgstr "Ugyldig format for filinformasjon"
 
-#: ../common/gvfsdaemonprotocol.c:540
+#: ../common/gvfsdaemonprotocol.c:536
 msgid "Invalid attribute info list content"
 msgstr "Ugyldig listeinnhold for attributtinformasjon"
 
@@ -220,7 +220,7 @@ msgid "Error connecting to D-Bus: %s"
 msgstr "Feil under tilkobling til D-Bus: %s"
 
 #. translators: This is the default daemon's application name,
-#. * the %s is the type of the backend, like "ftp"
+#. * the %s is the type of the backend, like "FTP"
 #: ../daemon/daemon-main.c:91
 #, c-format
 msgid "%s Filesystem Service"
@@ -260,8 +260,8 @@ msgstr "feil under oppstart av monteringstjenesten"
 msgid "Unmount Anyway"
 msgstr "Avmonter likevel"
 
-#: ../daemon/gvfsbackend.c:963 ../daemon/gvfsbackendafc.c:382
-#: ../monitor/gdu/ggdudrive.c:1022 ../monitor/gdu/ggdumount.c:922
+#: ../daemon/gvfsbackend.c:963 ../daemon/gvfsbackendafc.c:385
+#: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:922
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -277,58 +277,58 @@ msgstr ""
 msgid "Internal Apple File Control error"
 msgstr "Intern Apple File Control feil"
 
-#: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:729
+#: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:736
 msgid "File does not exist"
 msgstr "Filen eksisterer ikke"
 
-#: ../daemon/gvfsbackendafc.c:219
+#: ../daemon/gvfsbackendafc.c:220
 msgid "The directory is not empty"
 msgstr "Katalogen er ikke tom"
 
-#: ../daemon/gvfsbackendafc.c:223
+#: ../daemon/gvfsbackendafc.c:224
 msgid "The device did not respond"
 msgstr "Enheten svarte ikke"
 
-#: ../daemon/gvfsbackendafc.c:227
+#: ../daemon/gvfsbackendafc.c:228
 msgid "The connection was interrupted"
 msgstr "Tilkoblingen ble avbrutt"
 
-#: ../daemon/gvfsbackendafc.c:231
+#: ../daemon/gvfsbackendafc.c:232
 msgid "Invalid Apple File Control data received"
 msgstr "Ugyldig Apple File Control data mottatt"
 
-#: ../daemon/gvfsbackendafc.c:235
+#: ../daemon/gvfsbackendafc.c:236
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "Ikke håndtert Apple File Control feil (%d)"
 
-#: ../daemon/gvfsbackendafc.c:251
+#: ../daemon/gvfsbackendafc.c:252
 msgid "Listing applications installed on device failed"
 msgstr "Listing av programmer som er installert på enheten feilet"
 
-#: ../daemon/gvfsbackendafc.c:267
+#: ../daemon/gvfsbackendafc.c:268
 msgid "Accessing application icons on device failed"
 msgstr "Tilgang til ikoner for programmer på enheten feilet"
 
-#: ../daemon/gvfsbackendafc.c:284
+#: ../daemon/gvfsbackendafc.c:285
 msgid "Lockdown Error: Invalid Argument"
 msgstr "Feil ved nedlåsing: Ugyldig argument"
 
-#: ../daemon/gvfsbackendafc.c:288 ../daemon/gvfsbackendsftp.c:310
+#: ../daemon/gvfsbackendafc.c:289 ../daemon/gvfsbackendsftp.c:310
 #: ../daemon/gvfsbackendsftp.c:1834 ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "Tilgang nektet"
 
-#: ../daemon/gvfsbackendafc.c:291
+#: ../daemon/gvfsbackendafc.c:293
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "Ikke håndtert nedlåsingsfeil (%d)"
 
-#: ../daemon/gvfsbackendafc.c:308
+#: ../daemon/gvfsbackendafc.c:310
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "Feil i libimobiledevice: Ugyldig argument"
 
-#: ../daemon/gvfsbackendafc.c:312
+#: ../daemon/gvfsbackendafc.c:314
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
@@ -336,43 +336,43 @@ msgstr ""
 "Feil i libimobiledevice: Ingen enhet funnet. Sjekk at usbmuxd er satt opp "
 "korrekt."
 
-#: ../daemon/gvfsbackendafc.c:315
+#: ../daemon/gvfsbackendafc.c:318
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Ikke håndtert feil i libimobiledevice (%d)"
 
-#: ../daemon/gvfsbackendafc.c:382
+#: ../daemon/gvfsbackendafc.c:385
 msgid "Try again"
 msgstr "Prøv igjen"
 
-#: ../daemon/gvfsbackendafc.c:400 ../daemon/gvfsbackendarchive.c:550
+#: ../daemon/gvfsbackendafc.c:403 ../daemon/gvfsbackendarchive.c:550
 #: ../daemon/gvfsbackendarchive.c:579 ../daemon/gvfsbackenddav.c:1796
-#: ../daemon/gvfsbackendhttp.c:302 ../daemon/gvfsbackendobexftp.c:863
-#: ../daemon/gvfsbackendobexftp.c:879 ../daemon/gvfsbackendobexftp.c:898
+#: ../daemon/gvfsbackendhttp.c:302 ../daemon/gvfsbackendobexftp.c:861
+#: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendobexftp.c:896
 #: ../daemon/gvfsbackendsmb.c:662
 msgid "Invalid mount spec"
 msgstr "Ugyldige monteringsspesifikasjon"
 
-#: ../daemon/gvfsbackendafc.c:406 ../daemon/gvfsbackendafc.c:436
+#: ../daemon/gvfsbackendafc.c:409 ../daemon/gvfsbackendafc.c:439
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "Ugyldig AFC-adresse: må være på formen afc://uuid:port-nummer"
 
-#: ../daemon/gvfsbackendafc.c:422
+#: ../daemon/gvfsbackendafc.c:425
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Apple mobil enhet"
 
-#: ../daemon/gvfsbackendafc.c:427
+#: ../daemon/gvfsbackendafc.c:430
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Apple mobil enhet, brutt ut av fengsel"
 
-#: ../daemon/gvfsbackendafc.c:432
+#: ../daemon/gvfsbackendafc.c:435
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Dokumenter på mobil enhet fra Apple"
 
-#: ../daemon/gvfsbackendafc.c:490
+#: ../daemon/gvfsbackendafc.c:493
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (fengselsutbrudd)"
@@ -380,7 +380,7 @@ msgstr "%s (fengselsutbrudd)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:497 ../monitor/afc/afcvolume.c:125
+#: ../daemon/gvfsbackendafc.c:500 ../monitor/afc/afcvolume.c:125
 #, c-format
 msgid "Documents on %s"
 msgstr "Dokumenter på %s"
@@ -388,7 +388,7 @@ msgstr "Dokumenter på %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:576
+#: ../daemon/gvfsbackendafc.c:579
 #, c-format
 msgid ""
 "Device '%s' is password protected. Enter the password on the device and "
@@ -397,34 +397,34 @@ msgstr ""
 "Enhet «%s» er passordbeskyttet. Oppgi passord på enheten og klikk på «Prøv "
 "igjen»."
 
-#: ../daemon/gvfsbackendafc.c:915 ../daemon/gvfsbackendarchive.c:655
+#: ../daemon/gvfsbackendafc.c:918 ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1812
-#: ../daemon/gvfsbackendobexftp.c:1073 ../daemon/gvfsbackendsmb.c:718
+#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:718
 #: ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "Kan ikke åpne katalog"
 
-#: ../daemon/gvfsbackendafc.c:925 ../daemon/gvfsbackendarchive.c:647
+#: ../daemon/gvfsbackendafc.c:928 ../daemon/gvfsbackendarchive.c:647
 #: ../daemon/gvfsbackendarchive.c:695 ../daemon/gvfsbackendarchive.c:747
 #: ../daemon/gvfsbackendarchive.c:776 ../daemon/gvfsbackendcdda.c:987
 #: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:392
-#: ../daemon/gvfsbackendftp.c:1060 ../daemon/gvfsbackendnetwork.c:602
+#: ../daemon/gvfsbackendftp.c:1067 ../daemon/gvfsbackendnetwork.c:602
 #: ../daemon/gvfsbackendsmbbrowse.c:1094 ../daemon/gvfsbackendsmbbrowse.c:1161
 #: ../daemon/gvfsbackendsmbbrowse.c:1333 ../daemon/gvfsbackendsmbbrowse.c:1403
 #, c-format
 msgid "File doesn't exist"
 msgstr "Filen eksisterer ikke"
 
-#: ../daemon/gvfsbackendafc.c:1116 ../daemon/gvfsbackendafc.c:2459
+#: ../daemon/gvfsbackendafc.c:1119 ../daemon/gvfsbackendafc.c:2462
 msgid "Backups are not yet supported."
 msgstr "Sikkerhetskopier er ikke støttet ennå."
 
-#: ../daemon/gvfsbackendafc.c:1288
+#: ../daemon/gvfsbackendafc.c:1291
 msgid "Invalid seek type"
 msgstr "Ugyldig type søk"
 
-#: ../daemon/gvfsbackendafc.c:2296 ../daemon/gvfsbackendftp.c:1080
-#: ../daemon/gvfsbackendftp.c:1128 ../daemon/gvfsbackendftp.c:1149
+#: ../daemon/gvfsbackendafc.c:2299 ../daemon/gvfsbackendftp.c:1087
+#: ../daemon/gvfsbackendftp.c:1135 ../daemon/gvfsbackendftp.c:1156
 #: ../daemon/gvfsbackendsftp.c:1832 ../daemon/gvfsbackendsftp.c:4633
 #: ../daemon/gvfsbackendsmb.c:1718 ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
@@ -432,14 +432,14 @@ msgstr "Operasjonen støttes ikke"
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
-#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
 #: ../daemon/gvfsbackendarchive.c:330 ../daemon/gvfsbackendsftp.c:2269
 #: ../daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
 msgstr "/ på %s"
 
-#: ../daemon/gvfsbackendarchive.c:539 ../daemon/gvfsbackendftp.c:660
+#: ../daemon/gvfsbackendarchive.c:539 ../daemon/gvfsbackendftp.c:667
 #: ../daemon/gvfsbackendsftp.c:1745
 msgid "No hostname specified"
 msgstr "Ingen vertsnavn oppgitt"
@@ -464,7 +464,7 @@ msgstr "Kan ikke opprette midlertidig katalog"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
 #: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:786
+#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:793
 #: ../daemon/gvfsbackendgphoto2.c:1207 ../daemon/gvfsbackendgphoto2.c:2133
 #: ../daemon/gvfsbackendgphoto2.c:2852 ../daemon/gvfsbackendsftp.c:1836
 #: ../daemon/gvfsbackendsftp.c:2949 ../daemon/gvfsbackendsftp.c:2962
@@ -479,7 +479,7 @@ msgid "Directory not empty"
 msgstr "Katalogen er ikke tom"
 
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
-#: ../daemon/gvfsbackendobexftp.c:1812
+#: ../daemon/gvfsbackendobexftp.c:1810
 msgid "Can't copy file over directory"
 msgstr "Kan ikke kopiere fil over katalog"
 
@@ -515,7 +515,7 @@ msgstr "Filen eksisterer"
 #: ../daemon/gvfsjobtrash.c:123 ../daemon/gvfsjobunmountmountable.c:140
 #: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1173 ../monitor/gdu/ggdumount.c:1257
-#: ../monitor/gdu/ggduvolume.c:1608
+#: ../monitor/gdu/ggduvolume.c:1617
 msgid "Operation not supported by backend"
 msgstr "Operasjonen ikke tillatt av motoren"
 
@@ -523,19 +523,19 @@ msgstr "Operasjonen ikke tillatt av motoren"
 msgid "No such file or directory in target path"
 msgstr "Fil eller katalog finnes ikke i målsti"
 
-#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1535
-#: ../daemon/gvfsbackendobexftp.c:1781
+#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1544
+#: ../daemon/gvfsbackendobexftp.c:1779
 msgid "Can't copy directory over directory"
 msgstr "Kan ikke kopiere katalog over katalog"
 
-#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1789
-#: ../daemon/gvfsbackendobexftp.c:1820 ../daemon/gvfsbackendsftp.c:1830
+#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1787
+#: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1830
 #: ../daemon/gvfsbackendsftp.c:4441
 msgid "Target file exists"
 msgstr "Målfilen eksisterer"
 
-#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1558
-#: ../daemon/gvfsbackendobexftp.c:1796
+#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1567
+#: ../daemon/gvfsbackendobexftp.c:1794
 msgid "Can't recursively copy directory"
 msgstr "Kan ikke kopiere katalog rekursivt"
 
@@ -738,16 +738,16 @@ msgstr "Ressursen støtter ikke WebDAV"
 msgid "Could not create request"
 msgstr "Kan ikke opprette forespørsel"
 
-#: ../daemon/gvfsbackenddav.c:2200 ../daemon/gvfsbackendftp.c:766
+#: ../daemon/gvfsbackenddav.c:2200 ../daemon/gvfsbackendftp.c:773
 #: ../daemon/gvfsbackendsftp.c:2333 ../daemon/gvfsbackendsftp.c:3069
 #: ../daemon/gvfsbackendsftp.c:3408 ../daemon/gvfsbackendsftp.c:4276
 msgid "File is directory"
 msgstr "Filen er en katalog"
 
 #: ../daemon/gvfsbackenddav.c:2256 ../daemon/gvfsbackenddav.c:2509
-#: ../daemon/gvfsbackenddav.c:2620 ../daemon/gvfsbackendftp.c:745
-#: ../daemon/gvfsbackendftp.c:926 ../daemon/gvfsbackendftp.c:1365
-#: ../daemon/gvfsbackendftp.c:1543 ../daemon/gvfsbackendsftp.c:4285
+#: ../daemon/gvfsbackenddav.c:2620 ../daemon/gvfsbackendftp.c:752
+#: ../daemon/gvfsbackendftp.c:933 ../daemon/gvfsbackendftp.c:1372
+#: ../daemon/gvfsbackendftp.c:1552 ../daemon/gvfsbackendsftp.c:4285
 #: ../daemon/gvfsbackendsmb.c:2063
 msgid "Target file already exists"
 msgstr "Målfilen eksisterer allerede"
@@ -782,43 +782,43 @@ msgid "Network"
 msgstr "Nettverk"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:481
+#: ../daemon/gvfsbackendftp.c:488
 #, c-format
-msgid "Enter password for ftp as %s on %s"
-msgstr "Skriv inn passord for ftp som %s på %s"
+msgid "Enter password for FTP as %s on %s"
+msgstr "Skriv inn passord for FTP som %s på %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:484
+#: ../daemon/gvfsbackendftp.c:491
 #, c-format
-msgid "Enter password for ftp on %s"
-msgstr "Skriv inn passord for ftp på %s"
+msgid "Enter password for FTP on %s"
+msgstr "Skriv inn passord for FTP på %s"
 
-#: ../daemon/gvfsbackendftp.c:511 ../daemon/gvfsbackendsftp.c:985
+#: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:985
 #: ../daemon/gvfsbackendsmb.c:619 ../daemon/gvfsbackendsmbbrowse.c:995
 msgid "Password dialog cancelled"
 msgstr "Passorddialog avbrutt"
 
-#: ../daemon/gvfsbackendftp.c:623
+#: ../daemon/gvfsbackendftp.c:630
 #, c-format
-msgid "ftp on %s"
-msgstr "ftp på %s"
+msgid "FTP on %s"
+msgstr "FTP på %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:627
+#: ../daemon/gvfsbackendftp.c:634
 #, c-format
-msgid "ftp as %s on %s"
-msgstr "ftp som %s på %s"
+msgid "FTP as %s on %s"
+msgstr "FTP som %s på %s"
 
-#: ../daemon/gvfsbackendftp.c:720
+#: ../daemon/gvfsbackendftp.c:727
 msgid "Insufficient permissions"
 msgstr "Ikke nok rettigheter"
 
-#: ../daemon/gvfsbackendftp.c:974 ../daemon/gvfsbackendftp.c:1328
+#: ../daemon/gvfsbackendftp.c:981 ../daemon/gvfsbackendftp.c:1335
 #: ../daemon/gvfsbackendsftp.c:3274
 msgid "backups not supported yet"
 msgstr "sikkerhetskopier er ikke støttet ennå"
 
-#: ../daemon/gvfsbackendftp.c:1121 ../daemon/gvfsbackendsftp.c:4643
+#: ../daemon/gvfsbackendftp.c:1128 ../daemon/gvfsbackendsftp.c:4643
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "Ugyldig type attributt (uint32 forventet)"
 
@@ -1046,25 +1046,25 @@ msgstr "Vis nettverksadresser"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:683 ../daemon/gvfsbackendsmb.c:554
+#: ../daemon/gvfsbackendobexftp.c:681 ../daemon/gvfsbackendsmb.c:554
 #: ../daemon/gvfsbackendsmb.c:1433
 #, c-format
 msgid "%s on %s"
 msgstr "%s på %s"
 
-#: ../daemon/gvfsbackendobexftp.c:892
+#: ../daemon/gvfsbackendobexftp.c:890
 msgid "USB support missing. Please contact your software vendor"
 msgstr "Støtte for USB mangler. Vennligst kontakt din programvareleverandør"
 
-#: ../daemon/gvfsbackendobexftp.c:1012
+#: ../daemon/gvfsbackendobexftp.c:1010
 msgid "Connection to the device lost"
 msgstr "Mistet forbindelsen til enheten"
 
-#: ../daemon/gvfsbackendobexftp.c:1509
+#: ../daemon/gvfsbackendobexftp.c:1507
 msgid "Device requires a software update"
 msgstr "Enheten krever en programvareoppdatering"
 
-#: ../daemon/gvfsbackendobexftp.c:1857 ../daemon/gvfsbackendsmb.c:1954
+#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1954
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Feil under sletting av fil: %s"
@@ -1166,17 +1166,17 @@ msgstr "Kan ikke sende bekreftelse på vertsidentifikasjon"
 msgid "Protocol error"
 msgstr "Feil i protokoll"
 
-#. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
+#. Translators: This is the name of an SFTP share, like "SFTP for <user> on <hostname>"
 #: ../daemon/gvfsbackendsftp.c:1691
 #, c-format
-msgid "sftp for %s on %s"
-msgstr "sftp som %s på %s"
+msgid "SFTP for %s on %s"
+msgstr "SFTP som %s på %s"
 
-#. Translators: This is the name of an sftp share, like "sftp on <hostname>"
+#. Translators: This is the name of an SFTP share, like "SFTP on <hostname>"
 #: ../daemon/gvfsbackendsftp.c:1694
 #, c-format
-msgid "sftp on %s"
-msgstr "sftp på %s"
+msgid "SFTP on %s"
+msgstr "SFTP på %s"
 
 #: ../daemon/gvfsbackendsftp.c:1735
 msgid "Unable to find supported ssh command"
@@ -1433,8 +1433,8 @@ msgstr "%s: %s"
 #: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
 #: ../programs/gvfs-copy.c:123 ../programs/gvfs-info.c:371
 #: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:60
-#: ../programs/gvfs-move.c:111 ../programs/gvfs-open.c:140
-#: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
+#: ../programs/gvfs-move.c:111 ../programs/gvfs-open.c:141
+#: ../programs/gvfs-open.c:154 ../programs/gvfs-save.c:165
 #: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
@@ -1519,7 +1519,7 @@ msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
 "Klarte ikke å løse ut medie. Ett eller flere volum på mediet er opptatt."
 
-#: ../monitor/gdu/ggdudrive.c:1015
+#: ../monitor/gdu/ggdudrive.c:1017
 msgid ""
 "Start drive in degraded mode?\n"
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
@@ -1530,7 +1530,7 @@ msgstr ""
 "lenger er tolerant for feil. Data på stasjonen kan gå tapt hvis en komponent "
 "feiler."
 
-#: ../monitor/gdu/ggdudrive.c:1021
+#: ../monitor/gdu/ggdudrive.c:1023
 msgid "Start Anyway"
 msgstr "Start likevel"
 
@@ -1551,7 +1551,7 @@ msgstr "Kan ikke hente LUKS klartekstslave fra stien «%s»"
 msgid "Floppy Disk"
 msgstr "Diskettstasjon"
 
-#: ../monitor/gdu/ggduvolume.c:1088
+#: ../monitor/gdu/ggduvolume.c:1097
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1560,7 +1560,7 @@ msgstr ""
 "Oppgi et passord for å låse opp volumet\n"
 "Enheten «%s» inneholder krypterte data på partisjon %d."
 
-#: ../monitor/gdu/ggduvolume.c:1095
+#: ../monitor/gdu/ggduvolume.c:1104
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1569,7 +1569,7 @@ msgstr ""
 "Oppgi et passord for å låse opp volumet\n"
 "Enhet «%s» inneholder krypterte data."
 
-#: ../monitor/gdu/ggduvolume.c:1102
+#: ../monitor/gdu/ggduvolume.c:1111
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1958,7 +1958,7 @@ msgstr ""
 #: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:121
 #: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
 #: ../programs/gvfs-mkdir.c:58 ../programs/gvfs-move.c:109
-#: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
+#: ../programs/gvfs-open.c:139 ../programs/gvfs-save.c:163
 #: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
 #, c-format
 msgid "Error parsing commandline options: %s\n"
@@ -1966,7 +1966,7 @@ msgstr "Feil ved lesing av kommandolinjeflagg: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:151
+#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:152
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: mangler adresser"
@@ -2267,13 +2267,13 @@ msgstr "%s: %s: feil under åpning av adresse: %s\n"
 msgid "%s: %s: error launching application: %s\n"
 msgstr "%s: %s: feil under start av program: %s\n"
 
-#: ../programs/gvfs-open.c:122
+#: ../programs/gvfs-open.c:123
 msgid "FILES... - open FILES with registered application."
 msgstr "FILER … - åpne FILER med registrert program."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-open.c:126
+#: ../programs/gvfs-open.c:127
 msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
