@@ -485,10 +485,10 @@ restart:
         {
           if (ftp->has_initial_user)
             /* Translators: the first %s is the username, the second the host name */
-            prompt = g_strdup_printf (_("Enter password for ftp as %s on %s"), ftp->user, ftp->host_display_name);
+            prompt = g_strdup_printf (_("Enter password for FTP as %s on %s"), ftp->user, ftp->host_display_name);
           else
             /* translators: %s here is the hostname */
-            prompt = g_strdup_printf (_("Enter password for ftp on %s"), ftp->host_display_name);
+            prompt = g_strdup_printf (_("Enter password for FTP on %s"), ftp->host_display_name);
         }
          
       flags = G_ASK_PASSWORD_NEED_PASSWORD;
@@ -627,11 +627,11 @@ try_login:
     g_mount_spec_set (mount_spec, "user", ftp->user);
      
   if (g_str_equal (ftp->user, "anonymous"))
-    display_name = g_strdup_printf (_("ftp on %s"), ftp->host_display_name);
+    display_name = g_strdup_printf (_("FTP on %s"), ftp->host_display_name);
   else
     {
       /* Translators: the first %s is the username, the second the host name */
-      display_name = g_strdup_printf (_("ftp as %s on %s"), ftp->user, ftp->host_display_name);
+      display_name = g_strdup_printf (_("FTP as %s on %s"), ftp->user, ftp->host_display_name);
     }
   g_vfs_backend_set_mount_spec (backend, mount_spec);
   g_mount_spec_unref (mount_spec);

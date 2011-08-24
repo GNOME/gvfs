@@ -87,7 +87,7 @@ daemon_setup (void)
 
   up = g_ascii_strup (G_STRINGIFY (DEFAULT_BACKEND_TYPE), -1);
   /* translators: This is the default daemon's application name, 
-   * the %s is the type of the backend, like "ftp" */
+   * the %s is the type of the backend, like "FTP" */
   name = g_strdup_printf (_("%s Filesystem Service"), up);
   g_set_application_name (name);
   g_free (name);
