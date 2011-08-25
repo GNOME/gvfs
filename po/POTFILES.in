@@ -15,10 +15,14 @@ common/gvfsdnssdresolver.c
 common/gvfsdnssdutils.c
 common/gvfsicon.c
 daemon/daemon-main.c
-daemon/gvfsbackend.c
+daemon/gvfsafpconnection.c
+daemon/gvfsafpserver.c
 daemon/gvfsbackendafc.c
+daemon/gvfsbackendafpbrowse.c
+daemon/gvfsbackendafp.c
 daemon/gvfsbackendarchive.c
 daemon/gvfsbackendburn.c
+daemon/gvfsbackend.c
 daemon/gvfsbackendcdda.c
 daemon/gvfsbackendcomputer.c
 daemon/gvfsbackenddav.c
@@ -30,8 +34,8 @@ daemon/gvfsbackendlocaltest.c
 daemon/gvfsbackendnetwork.c
 daemon/gvfsbackendobexftp.c
 daemon/gvfsbackendsftp.c
-daemon/gvfsbackendsmb.c
 daemon/gvfsbackendsmbbrowse.c
+daemon/gvfsbackendsmb.c
 daemon/gvfsbackendtest.c
 daemon/gvfsbackendtrash.c
 daemon/gvfschannel.c
