@@ -4017,7 +4017,6 @@ get_userinfo (GVfsBackendAfp *afp_backend,
 {
   GVfsAfpCommand *comm;
   guint16 bitmap;
-  gboolean res;
 
   GVfsAfpReply *reply;
   AfpResultCode res_code;
@@ -4031,14 +4030,9 @@ get_userinfo (GVfsBackendAfp *afp_backend,
   bitmap = AFP_GET_USER_INFO_BITMAP_GET_UID_BIT | AFP_GET_USER_INFO_BITMAP_GET_GID_BIT;
   g_vfs_afp_command_put_uint16 (comm, bitmap);
 
-  res = g_vfs_afp_connection_send_command_sync (afp_backend->server->conn,
-                                                comm, cancellable, error);
+  reply = g_vfs_afp_connection_send_command_sync (afp_backend->server->conn,
+                                                  comm, cancellable, error);
   g_object_unref (comm);
-  if (!res)
-    return FALSE;
-
-  reply = g_vfs_afp_connection_read_reply_sync (afp_backend->server->conn,
-                                                cancellable, error);
   if (!reply)
     return FALSE;
 
@@ -4128,15 +4122,10 @@ do_mount (GVfsBackend *backend,
   /* pad byte */
   g_vfs_afp_command_put_byte (comm, 0);
 
-  res = g_vfs_afp_connection_send_command_sync (afp_backend->server->conn,
-                                                comm, G_VFS_JOB (job)->cancellable,
-                                                &err);
+  reply = g_vfs_afp_connection_send_command_sync (afp_backend->server->conn,
+                                                  comm, G_VFS_JOB (job)->cancellable,
+                                                  &err);
   g_object_unref (comm);
-  if (!res)
-    goto error;
-
-  reply = g_vfs_afp_connection_read_reply_sync (afp_backend->server->conn,
-                                                G_VFS_JOB (job)->cancellable, &err);
   if (!reply)
     goto error;
 
@@ -4170,15 +4159,10 @@ do_mount (GVfsBackend *backend,
 
   /* TODO: password? */
 
-  res = g_vfs_afp_connection_send_command_sync (afp_backend->server->conn,
-                                                comm, G_VFS_JOB (job)->cancellable,
-                                                &err);
+  reply = g_vfs_afp_connection_send_command_sync (afp_backend->server->conn,
+                                                  comm, G_VFS_JOB (job)->cancellable,
+                                                  &err);
   g_object_unref (comm);
-  if (!res)
-    goto error;
-
-  reply = g_vfs_afp_connection_read_reply_sync (afp_backend->server->conn,
-                                                G_VFS_JOB (job)->cancellable, &err);
   if (!reply)
     goto error;
 

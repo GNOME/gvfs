@@ -1281,6 +1281,76 @@ g_vfs_afp_connection_send_command_finish (GVfsAfpConnection *afp_connection,
   return g_object_ref (g_simple_async_result_get_op_res_gpointer (simple));
 }
 
+typedef struct {
+
+  /* For sync calls */
+  GMutex *mutex;
+  GCond *cond;
+
+  /* results: */
+  GAsyncResult *result;
+} SyncData;
+
+static void
+init_sync_data (SyncData *data)
+{
+  data->mutex = g_mutex_new ();
+  data->cond = g_cond_new ();
+}
+
+static void
+clear_sync_data (SyncData *data)
+{
+  g_mutex_free (data->mutex);
+  g_cond_free (data->cond);
+  g_object_unref (data->result);
+}
+
+static void
+sync_data_wait (SyncData *data)
+{
+  g_mutex_lock (data->mutex);
+  g_cond_wait (data->cond, data->mutex);
+  g_mutex_unlock (data->mutex);
+}
+
+static void
+reply_sync  (GObject *source_object,
+             GAsyncResult *res,
+             gpointer user_data)
+{
+  SyncData *data;
+
+  data = (SyncData *) user_data;
+
+  data->result = g_object_ref (res);
+
+  /* Wake up sync call thread */
+  g_mutex_lock (data->mutex);
+  g_cond_signal (data->cond);
+  g_mutex_unlock (data->mutex);
+}
+
+GVfsAfpReply *
+g_vfs_afp_connection_send_command_sync (GVfsAfpConnection *afp_connection,
+                                        GVfsAfpCommand    *command,
+                                        GCancellable      *cancellable,
+                                        GError            **error)
+{
+  SyncData data;
+  GVfsAfpReply *reply;
+
+  init_sync_data (&data);
+  g_vfs_afp_connection_send_command (afp_connection, command, NULL, reply_sync,
+                                     cancellable, &data);
+  sync_data_wait (&data);
+
+  reply = g_vfs_afp_connection_send_command_finish (afp_connection, data.result,
+                                                    error);
+  clear_sync_data (&data);
+  return reply;
+}
+
 static gboolean
 read_reply_sync (GInputStream      *input,
                  DSIHeader         *dsi_header,
@@ -1336,25 +1406,6 @@ read_reply_sync (GInputStream      *input,
   return TRUE;
 }
 
-GVfsAfpReply *
-g_vfs_afp_connection_read_reply_sync (GVfsAfpConnection *afp_connection,
-                                      GCancellable *cancellable,
-                                      GError **error)
-{
-  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
-  
-  gboolean res;
-  char *data;
-  DSIHeader dsi_header;
-
-  res = read_reply_sync (g_io_stream_get_input_stream (priv->conn), &dsi_header,
-                         &data, cancellable, error);
-  if (!res)
-    return NULL;
-
-  return g_vfs_afp_reply_new (dsi_header.errorCode, data, dsi_header.totalDataLength, TRUE);
-}
-
 static gboolean
 send_request_sync (GOutputStream     *output,
                    DsiCommand        command,
@@ -1392,44 +1443,6 @@ send_request_sync (GOutputStream     *output,
     return FALSE;
 
   return TRUE;
-}
-
-gboolean
-g_vfs_afp_connection_send_command_sync (GVfsAfpConnection *afp_connection,
-                                        GVfsAfpCommand    *afp_command,
-                                        GCancellable      *cancellable,
-                                        GError            **error)
-{
-  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
-  
-  DsiCommand dsi_command;
-  guint16 req_id;
-  guint32 writeOffset;
-
-  /* set dsi_command */
-  switch (afp_command->type)
-  {
-    case AFP_COMMAND_WRITE:
-      writeOffset = 8;
-      dsi_command = DSI_WRITE;
-      break;
-    case AFP_COMMAND_WRITE_EXT:
-      writeOffset = 20;
-      dsi_command = DSI_WRITE;
-      break;
-
-    default:
-      writeOffset = 0;
-      dsi_command = DSI_COMMAND;
-      break;
-  }
-
-  req_id = get_request_id (afp_connection);
-  return send_request_sync (g_io_stream_get_output_stream (priv->conn),
-                            dsi_command, req_id, writeOffset,
-                            g_vfs_afp_command_get_size (afp_command),
-                            g_vfs_afp_command_get_data (afp_command),
-                            cancellable, error);
 }
 
 gboolean
