@@ -414,19 +414,36 @@ static void fill_info (GVfsBackendAfp *afp_backend,
   }
 }
 
+typedef struct
+{
+  gint16 fork_refnum;
+  GFileInfo *info;
+} OpenForkData;
+
+static void
+open_fork_data_free (OpenForkData *data)
+{
+  g_object_unref (data->info);
+
+  g_slice_free (OpenForkData, data);
+}
+
 static void
 open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
-
+  
+  GVfsBackendAfp *afp_backend;
   GVfsAfpReply *reply;
   GError *err = NULL;
   AfpResultCode res_code;
-  
-  guint16 file_bitmap;
-  gint16 fork_refnum;
 
+  OpenForkData *data;
+  guint16 file_bitmap;
+
+  afp_backend = G_VFS_BACKEND_AFP (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
+  
   reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
@@ -465,13 +482,17 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     goto done;
   }
 
+  data = g_slice_new (OpenForkData);
+  
   g_vfs_afp_reply_read_uint16 (reply, &file_bitmap);
-  g_vfs_afp_reply_read_int16  (reply, &fork_refnum);
+  g_vfs_afp_reply_read_int16  (reply, &data->fork_refnum);
 
+  data->info = g_file_info_new ();
+  fill_info (afp_backend, data->info, reply, FALSE, file_bitmap);
   g_object_unref (reply);
 
-  g_simple_async_result_set_op_res_gpointer (simple, GINT_TO_POINTER ((gint)fork_refnum),
-                                             NULL);
+  g_simple_async_result_set_op_res_gpointer (simple, data,
+                                             (GDestroyNotify)open_fork_data_free);
 
 done:
   g_simple_async_result_complete (simple);
@@ -482,6 +503,7 @@ static void
 open_fork (GVfsBackendAfp     *afp_backend,
            const char         *filename,
            guint16             access_mode,
+           guint16             bitmap,
            GCancellable       *cancellable,
            GAsyncReadyCallback callback,
            gpointer            user_data)
@@ -507,7 +529,7 @@ open_fork (GVfsBackendAfp     *afp_backend,
   g_vfs_afp_command_put_uint32 (comm, 2);
 
   /* Bitmap */
-  g_vfs_afp_command_put_uint16 (comm, 0);
+  g_vfs_afp_command_put_uint16 (comm, bitmap);
 
   /* AccessMode */
   g_vfs_afp_command_put_uint16 (comm, access_mode);
@@ -523,13 +545,15 @@ open_fork (GVfsBackendAfp     *afp_backend,
   g_object_unref (comm);
 }
 
-static AfpHandle *
+static gboolean
 open_fork_finish (GVfsBackendAfp *afp_backend,
                   GAsyncResult   *res,
+                  gint16         *fork_refnum,
+                  GFileInfo      **info,
                   GError         **error)
 {
   GSimpleAsyncResult *simple;
-  gint16 fork_refnum;
+  OpenForkData *data;
 
   g_return_val_if_fail (g_simple_async_result_is_valid (res,
                                                         G_OBJECT (afp_backend),
@@ -539,10 +563,15 @@ open_fork_finish (GVfsBackendAfp *afp_backend,
   simple = (GSimpleAsyncResult *)res;
 
   if (g_simple_async_result_propagate_error (simple, error))
-    return NULL;
+    return FALSE;
 
-  fork_refnum = GPOINTER_TO_INT (g_simple_async_result_get_op_res_gpointer (simple));
-  return afp_handle_new (fork_refnum);
+  data = g_simple_async_result_get_op_res_gpointer (simple);
+  if (fork_refnum)
+    *fork_refnum = data->fork_refnum;
+  if (info)
+    *info = g_object_ref (data->info);
+
+  return TRUE;
 }
 
 static void
@@ -3061,17 +3090,18 @@ create_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_da
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
   GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
 
-  AfpHandle *afp_handle;
+  gint16 fork_refnum;
   GError *err = NULL;
-
-  afp_handle = open_fork_finish (afp_backend, res, &err);
-  if (!afp_handle)
+  AfpHandle *afp_handle;
+  
+  if (!open_fork_finish (afp_backend, res, &fork_refnum, NULL, &err))
   {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
     g_error_free (err);
     return;
   }
 
+  afp_handle = afp_handle_new (fork_refnum);
   afp_handle->type = AFP_HANDLE_TYPE_CREATE_FILE;
   
   g_vfs_job_open_for_write_set_handle (job, (GVfsBackendHandle) afp_handle);
@@ -3096,7 +3126,7 @@ create_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     return;
   }
 
-  open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT,
+  open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT, 0,
              G_VFS_JOB (job)->cancellable, create_open_fork_cb, job);
 }
 
@@ -3120,19 +3150,19 @@ replace_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
   GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
 
-  AfpHandle *afp_handle;
+  gint16 fork_refnum;
   GError *err = NULL;
-
+  AfpHandle *afp_handle;
   char *tmp_filename;
-
-  afp_handle = open_fork_finish (afp_backend, res, &err);
-  if (!afp_handle)
+  
+  if (!open_fork_finish (afp_backend, res, &fork_refnum, NULL, &err))
   {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
     g_error_free (err);
     return;
   }
 
+  afp_handle = afp_handle_new (fork_refnum);
   tmp_filename = g_object_get_data (G_OBJECT (job), "TempFilename");
   /* Replace using temporary file */
   if (tmp_filename)
@@ -3172,7 +3202,7 @@ replace_create_tmp_file_cb (GObject *source_object, GAsyncResult *res, gpointer 
     else if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
     {
       g_object_set_data (G_OBJECT (job), "TempFilename", NULL);
-      open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT,
+      open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT, 0,
                  G_VFS_JOB (job)->cancellable, replace_open_fork_cb, job);
     }
                               
@@ -3186,7 +3216,7 @@ replace_create_tmp_file_cb (GObject *source_object, GAsyncResult *res, gpointer 
   }
 
   tmp_filename = g_object_get_data (G_OBJECT (job), "TempFilename");
-  open_fork (afp_backend, tmp_filename, AFP_ACCESS_MODE_WRITE_BIT,
+  open_fork (afp_backend, tmp_filename, AFP_ACCESS_MODE_WRITE_BIT, 0,
              G_VFS_JOB (job)->cancellable, replace_open_fork_cb, job);
 }
 
@@ -3256,7 +3286,7 @@ replace_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointe
   {
     if (afp_backend->vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_NO_EXCHANGE_FILES)
     {
-      open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT,
+      open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT, 0,
                  G_VFS_JOB (job)->cancellable, replace_open_fork_cb, job);
     }
     else
@@ -3327,11 +3357,11 @@ append_to_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
   GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
 
-  AfpHandle *afp_handle;
+  gint16 fork_refnum;
   GError *err = NULL;
+  AfpHandle *afp_handle;
 
-  afp_handle = open_fork_finish (afp_backend, res, &err);
-  if (!afp_handle)
+  if (!open_fork_finish (afp_backend, res, &fork_refnum, NULL, &err))
   {
     /* Create file if it doesn't exist */
     if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
@@ -3344,6 +3374,7 @@ append_to_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user
     return;
   }
 
+  afp_handle = afp_handle_new (fork_refnum);
   afp_handle->type = AFP_HANDLE_TYPE_APPEND_TO_FILE;
   g_vfs_job_open_for_write_set_handle (job, (GVfsBackendHandle) afp_handle);
   
@@ -3361,7 +3392,7 @@ try_append_to (GVfsBackend *backend,
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
 
-  open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT,
+  open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT, 0,
              G_VFS_JOB (job)->cancellable, append_to_open_fork_cb, job);
   return TRUE;
 }
@@ -3372,17 +3403,18 @@ read_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
   GVfsJobOpenForRead *job = G_VFS_JOB_OPEN_FOR_READ (user_data);
 
-  AfpHandle *afp_handle;
   GError *err = NULL;
-
-  afp_handle = open_fork_finish (afp_backend, res, &err);
-  if (!afp_handle)
+  gint16 fork_refnum;
+  AfpHandle *afp_handle;
+  
+  if (!open_fork_finish (afp_backend, res, &fork_refnum, NULL, &err))
   {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
     g_error_free (err);
     return;
   }
 
+  afp_handle = afp_handle_new (fork_refnum);
   afp_handle->type = AFP_HANDLE_TYPE_READ_FILE;
   
   g_vfs_job_open_for_read_set_handle (job, (GVfsBackendHandle) afp_handle);
@@ -3398,7 +3430,7 @@ try_open_for_read (GVfsBackend *backend,
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
 
-  open_fork (afp_backend, filename, AFP_ACCESS_MODE_READ_BIT,
+  open_fork (afp_backend, filename, AFP_ACCESS_MODE_READ_BIT, 0,
              G_VFS_JOB (job)->cancellable, read_open_fork_cb, job);
   return TRUE;
 }
