@@ -569,6 +569,21 @@ fi
 AC_SUBST([LIBGCRYPT_CFLAGS])
 AC_SUBST([LIBGCRYPT_LIBS])
 
+dnl *******************
+dnl *** AFP backend ***
+dnl *******************
+AC_ARG_ENABLE(afp, AS_HELP_STRING([--disable-afp], [build without AFP support]))
+msg_afp="no"
+if test "x$enable_afp" != "xno"; then
+
+  if test "x$have_gcrypt" = "xyes"; then
+    msg_afp="yes"
+  else
+    msg_afp="partial (crypt support missing! Only anonymous logins)"
+  fi
+fi
+AM_CONDITIONAL(USE_AFP, test "x$enable_afp" != "xno")
+
 dnl Install bash-completion file?
 AC_ARG_ENABLE([bash-completion],
 	      AC_HELP_STRING([--disable-bash-completion],
@@ -738,6 +753,7 @@ echo "
         Gphoto2 support:              $msg_gphoto2
 	archive support:              $msg_archive
 	AFC support:                  $msg_afc
+        AFP support:                  $msg_afp
         DNS-SD support:               $msg_avahi
 	Build HAL volume monitor:     $msg_hal (with fast init path: $have_hal_fast_init)
 	Build GDU volume monitor:     $msg_gdu
