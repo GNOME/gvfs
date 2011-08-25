@@ -34,7 +34,7 @@ static gboolean follow_symlinks = FALSE;
 static GOptionEntry entries[] =
 {
   { "hidden", 'h', 0, G_OPTION_ARG_NONE, &show_hidden, N_("Show hidden files"), NULL },
-  { "follow-symlinks", 'l', 0, G_OPTION_ARG_NONE, &follow_symlinks, N_("Follow symlinks, mounts and shortcuts like dirs"), NULL },
+  { "follow-symlinks", 'l', 0, G_OPTION_ARG_NONE, &follow_symlinks, N_("Follow symbolic links, mounts and shortcuts like directories"), NULL },
 };
 
 static gint

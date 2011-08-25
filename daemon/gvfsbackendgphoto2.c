@@ -2745,7 +2745,7 @@ do_set_display_name (GVfsBackend *backend,
       rc = do_dir_rename_in_same_dir (gphoto2_backend, dir, name, display_name);
       if (rc != 0)
         {
-          error = get_error_from_gphoto2 (_("Error renaming dir"), rc);
+          error = get_error_from_gphoto2 (_("Error renaming directory"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
           goto out;
@@ -3332,7 +3332,7 @@ do_move (GVfsBackend *backend,
           DEBUG ("  not supported (src is dir; dst is dir)");
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _("Not supported (src is dir, dst is dir)"));
+                            _("Not supported (the source is a directory, the destination is a directory too)"));
           goto out;
         }
       else if (is_regular (gphoto2_backend, dst_dir, dst_name))
@@ -3340,7 +3340,7 @@ do_move (GVfsBackend *backend,
           DEBUG ("  not supported (src is dir; dst is existing file)");
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _("Not supported (src is dir, dst is existing file)"));
+                            _("Not supported (the source is a directory, but the destination is an existing file)"));
           goto out;
         }
       mv_dir = TRUE;
@@ -3352,7 +3352,7 @@ do_move (GVfsBackend *backend,
           DEBUG ("  not supported (src is file; dst is dir)");
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _("Not supported (src is file, dst is dir)"));
+                            _("Not supported (the source is a file, but the destination is a directory)"));
           goto out;
         }
     }
@@ -3375,7 +3375,7 @@ do_move (GVfsBackend *backend,
       if (rc != 0)
         {
           DEBUG ("  error renaming dir");
-          error = get_error_from_gphoto2 (_("Error renaming dir"), rc);
+          error = get_error_from_gphoto2 (_("Error renaming directory"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
           goto out;

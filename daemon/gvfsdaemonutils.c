@@ -101,7 +101,7 @@ dbus_connection_send_fd (DBusConnection *connection,
 
       g_set_error (error, G_IO_ERROR,
 		   g_io_error_from_errno (errsv),
-		   _("Error sending fd: %s"),
+		   _("Error sending file descriptor: %s"),
 		   g_strerror (errsv));
       g_static_mutex_unlock (&extra_lock);
       return FALSE;
