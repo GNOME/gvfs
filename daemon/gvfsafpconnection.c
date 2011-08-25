@@ -585,7 +585,6 @@ struct _GVfsAfpConnectionPrivate
   DSIHeader write_dsi_header;
 
   /* read loop */
-  gboolean read_loop_running;
   DSIHeader read_dsi_header;
   char *reply_buf;
   gboolean free_reply_buf;
@@ -651,11 +650,6 @@ run_loop (GVfsAfpConnection *afp_connection)
   {
     priv->send_loop_running = TRUE;
     send_request (afp_connection);
-  }
-  if (!priv->read_loop_running)
-  {
-    priv->read_loop_running = TRUE;
-    read_reply (afp_connection);
   }
 }
 
@@ -1540,16 +1534,17 @@ g_vfs_afp_connection_open (GVfsAfpConnection *afp_connection,
   }
   g_free (reply);
 
+  /* Start readloop */
+  read_reply (afp_connection);
+  
   return TRUE;
 }
 
 GVfsAfpReply *
-g_vfs_afp_connection_get_server_info (GVfsAfpConnection *afp_connection,
+g_vfs_afp_connection_get_server_info (GSocketConnectable *addr,
                                       GCancellable *cancellable,
                                       GError **error)
 {
-  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
-  
   GSocketClient *client;
   GIOStream *conn;
   gboolean res;
@@ -1557,7 +1552,7 @@ g_vfs_afp_connection_get_server_info (GVfsAfpConnection *afp_connection,
   char *data;
 
   client = g_socket_client_new ();
-  conn = G_IO_STREAM (g_socket_client_connect (client, priv->addr, cancellable, error));
+  conn = G_IO_STREAM (g_socket_client_connect (client, addr, cancellable, error));
   g_object_unref (client);
 
   if (!conn)
@@ -1620,7 +1615,6 @@ g_vfs_afp_connection_init (GVfsAfpConnection *afp_connection)
                                               NULL, (GDestroyNotify)free_request_data);
 
   priv->send_loop_running = FALSE;
-  priv->read_loop_running = FALSE;
 }
 
 static void
