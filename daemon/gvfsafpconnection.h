@@ -386,11 +386,11 @@ struct _GVfsAfpConnection
 
 GType g_vfs_afp_connection_get_type (void) G_GNUC_CONST;
 
-GVfsAfpReply*      g_vfs_afp_connection_get_server_info   (GSocketConnectable *addr,
+GVfsAfpConnection* g_vfs_afp_connection_new               (GSocketConnectable *addr);
+
+GVfsAfpReply*      g_vfs_afp_connection_get_server_info   (GVfsAfpConnection *afp_connection,
                                                            GCancellable *cancellable,
                                                            GError **error);
-
-GVfsAfpConnection* g_vfs_afp_connection_new               (GSocketConnectable *addr);
 
 gboolean           g_vfs_afp_connection_open              (GVfsAfpConnection *afp_connection,
                                                            GCancellable      *cancellable,
