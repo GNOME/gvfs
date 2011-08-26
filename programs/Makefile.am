@@ -27,6 +27,7 @@ bin_PROGRAMS =					\
 	gvfs-monitor-file			\
 	gvfs-monitor-dir			\
 	gvfs-mkdir				\
+	gvfs-mime				\
 	$(NULL)
 
 bin_SCRIPTS =					\
@@ -85,5 +86,8 @@ gvfs_monitor_file_LDADD = $(libraries)
 
 gvfs_mkdir_SOURCES = gvfs-mkdir.c
 gvfs_mkdir_LDADD = $(libraries)
+
+gvfs_mime_SOURCES = gvfs-mime.c
+gvfs_mime_LDADD = $(libraries)
 
 EXTRA_DIST = gvfs-less gvfs-bash-completion.sh
