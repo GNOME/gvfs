@@ -400,6 +400,15 @@ gboolean           g_vfs_afp_connection_close             (GVfsAfpConnection *af
                                                            GCancellable      *cancellable,
                                                            GError            **error);
 
+gboolean           g_vfs_afp_connection_send_command_sync (GVfsAfpConnection *afp_connection,
+                                                           GVfsAfpCommand    *afp_command,
+                                                           GCancellable      *cancellable,
+                                                           GError            **error);
+
+GVfsAfpReply*      g_vfs_afp_connection_read_reply_sync   (GVfsAfpConnection *afp_connection,
+                                                           GCancellable *cancellable,
+                                                           GError **error);
+
 GVfsAfpReply*      g_vfs_afp_connection_send_command_finish (GVfsAfpConnection *afp_connnection,
                                                              GAsyncResult      *res,
                                                              GError           **error);
@@ -410,11 +419,6 @@ void               g_vfs_afp_connection_send_command     (GVfsAfpConnection   *a
                                                           GAsyncReadyCallback  callback,
                                                           GCancellable        *cancellable,                                                           
                                                           gpointer             user_data);
-
-GVfsAfpReply *     g_vfs_afp_connection_send_command_sync (GVfsAfpConnection *afp_connection,
-                                                           GVfsAfpCommand    *command,
-                                                           GCancellable      *cancellable,
-                                                           GError            **error);
 G_END_DECLS
 
 #endif /* _GVFSAFPCONNECTION_H_ */
