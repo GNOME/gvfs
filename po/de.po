@@ -744,7 +744,7 @@ msgstr "FPGetUserInfo ist gescheitert (%s)"
 #: ../daemon/gvfsbackendafp.c:4250
 #, c-format
 msgid "AFP volume %s for %s on %s"
-msgstr "AFP-Datenträger für %s auf %s"
+msgstr "AFP-Datenträger %s für %s auf %s"
 
 #: ../daemon/gvfsbackendafp.c:4254
 #, c-format
@@ -1006,7 +1006,7 @@ msgstr "Datei kann nicht abgefragt werden"
 #: ../daemon/gvfsbackenddav.c:485
 #, c-format
 msgid "WebDAV as %s on %s%s"
-msgstr "WebDAV als %s auf %s"
+msgstr "WebDAV als %s auf %s%s"
 
 #. Translators: This is the name of the WebDAV share constructed as
 #. "WebDAV on <hostname>:<port>"; The ":port" part is again the second
