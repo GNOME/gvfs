@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs-master-po-gl-70600.merged\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-28 15:46+0200\n"
-"PO-Revision-Date: 2011-08-28 15:45+0200\n"
+"POT-Creation-Date: 2011-08-28 18:07+0200\n"
+"PO-Revision-Date: 2011-08-28 18:08+0200\n"
 "Last-Translator: Fran Diéguez <frandieguez@gnome.org>\n"
 "Language-Team: Galician <gnome-l10n-gl@gnome.org>\n"
 "Language: gl\n"
@@ -691,7 +691,7 @@ msgstr "O ficheiro non está aberto para lectura"
 
 #: ../daemon/gvfsbackendafp.c:2973
 msgid "Range lock conflict exists"
-msgstr ""
+msgstr "Existe un conflito no bloqueo do rango"
 
 #: ../daemon/gvfsbackendafp.c:3212
 #, c-format
