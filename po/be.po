@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-07-14 00:19+0300\n"
-"PO-Revision-Date: 2011-07-14 00:18+0300\n"
+"PO-Revision-Date: 2011-08-28 20:30+0300\n"
 "Last-Translator: Ігар Грачышка <ihar.hrachyshka@gmail.com>\n"
 "Language-Team: Belarusian <i18n-bel-gnome@googlegroups.com>\n"
 "Language: be\n"
@@ -618,7 +618,7 @@ msgstr "Няма такога файла"
 #: ../daemon/gvfsbackendcdda.c:994
 #, c-format
 msgid "The file does not exist or isn't an audio track"
-msgstr "Файл не існуе, або ён не з'яўляецца гукавой сцежкай"
+msgstr "Файл не існуе, або ён не з'яўляецца аўдыятрэкам"
 
 #: ../daemon/gvfsbackendcdda.c:1100
 msgid "Audio CD Filesystem Service"
