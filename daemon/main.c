@@ -54,6 +54,10 @@ main (int argc, char *argv[])
   textdomain (GETTEXT_PACKAGE);
   
   g_thread_init (NULL);
+
+#ifdef SIGPIPE
+  signal (SIGPIPE, SIG_IGN);
+#endif
   
   g_set_application_name (_("GVFS Daemon"));
   context = g_option_context_new ("");

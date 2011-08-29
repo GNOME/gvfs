@@ -68,6 +68,12 @@ daemon_init (void)
 
   g_log_set_handler (NULL, G_LOG_LEVEL_DEBUG, log_debug, NULL);
 
+#ifdef SIGPIPE
+  /* Ignore SIGPIPE to avoid killing daemons on cancelled transfer *
+   * See https://bugzilla.gnome.org/show_bug.cgi?id=649041         *
+   */
+  signal (SIGPIPE, SIG_IGN);
+#endif
   
   dbus_error_init (&derror);
   connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
