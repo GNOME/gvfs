@@ -1,3 +1,14 @@
+Major changes in 1.9.4
+======================
+* Brand new AFP backend written by Carl-Anton Ingmarsson
+* Fixed several leaks of GSimpleAsyncResult objects
+* Added simple gvfs-mime test application
+* daemon: Ignore SIGPIPE signals to avoid process termination on cancelled transfer
+* computer: Use 'drive-harddisk-system' as File System icon
+* ftp: Fix return value of try_get_settable_attributes() on failure
+* gvfs-open: Exit with error code > 0 when open fails
+* String tweaks and translation updates
+
 Major changes in 1.9.3
 ======================
 * gvfs-copy: Do not use deprecated g_format_size_for_display()
