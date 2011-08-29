@@ -1085,7 +1085,7 @@ try_query_settable_attributes (GVfsBackend *backend,
                         G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
                         _("Operation unsupported"));
-      return FALSE;
+      return TRUE;
     }    
 
   list = g_file_attribute_info_list_new ();
