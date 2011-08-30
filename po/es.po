@@ -1,23 +1,24 @@
 # translation of gvfs.master.po to Español
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011.
 # Jorge González <jorgegonz@svn.gnome.org>, 2008, 2009, 2010, 2011.
+# 
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011., 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-08-28 08:30+0000\n"
-"PO-Revision-Date: 2011-08-29 13:03+0200\n"
-"Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
-"Language-Team: Español; Castellano <gnome-es-list@gnome.org>\n"
+"POT-Creation-Date: 2011-08-29 16:39+0000\n"
+"PO-Revision-Date: 2011-08-30 14:52+0200\n"
+"Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
+"Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2400
 msgid "Operation not supported, files on different mounts"
@@ -217,45 +218,45 @@ msgstr "No se puede manejar la versión %d de la codificación GVfsIcon"
 msgid "Malformed input data for GVfsIcon"
 msgstr "Datos de entrada GVfsIcon malformados"
 
-#: ../daemon/daemon-main.c:76 ../daemon/daemon-main.c:231
+#: ../daemon/daemon-main.c:82 ../daemon/daemon-main.c:237
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "Error al conectar con D-Bus: %s"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "FTP"
-#: ../daemon/daemon-main.c:91
+#: ../daemon/daemon-main.c:97
 #, c-format
 msgid "%s Filesystem Service"
 msgstr "Sistema de archivos %s"
 
-#: ../daemon/daemon-main.c:110 ../programs/gvfs-copy.c:90
+#: ../daemon/daemon-main.c:116 ../programs/gvfs-copy.c:90
 #: ../programs/gvfs-move.c:78
 #, c-format
 msgid "Error: %s"
 msgstr "Error: %s"
 
-#: ../daemon/daemon-main.c:156
+#: ../daemon/daemon-main.c:162
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "Uso: %s --spawner dbus-id ruta_del_objeto"
 
-#: ../daemon/daemon-main.c:180 ../daemon/daemon-main.c:198
+#: ../daemon/daemon-main.c:186 ../daemon/daemon-main.c:204
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "Uso: %s clave=valor clave=valor …"
 
-#: ../daemon/daemon-main.c:196
+#: ../daemon/daemon-main.c:202
 #, c-format
 msgid "No mount type specified"
 msgstr "No se especificó el tipo de montaje"
 
-#: ../daemon/daemon-main.c:266
+#: ../daemon/daemon-main.c:272
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "el punto de montaje para %s ya se está usando"
 
-#: ../daemon/daemon-main.c:277
+#: ../daemon/daemon-main.c:283
 msgid "error starting mount daemon"
 msgstr "error al iniciar el demonio de montado"
 
@@ -263,41 +264,41 @@ msgstr "error al iniciar el demonio de montado"
 msgid "Got EOS"
 msgstr "Se obtuvo EOS"
 
-#: ../daemon/gvfsafpserver.c:200
+#: ../daemon/gvfsafpserver.c:127
 msgid "Server doesn't support passwords longer than 256 characters"
 msgstr "El servidor no soporta contraseñas más largas de 256 caracteres"
 
-#: ../daemon/gvfsafpserver.c:228 ../daemon/gvfsafpserver.c:542
+#: ../daemon/gvfsafpserver.c:155 ../daemon/gvfsafpserver.c:469
 msgid "An invalid username was provided"
 msgstr "Se ha proporcionado un nombre de usuario no válido"
 
-#: ../daemon/gvfsafpserver.c:407 ../daemon/gvfsafpserver.c:636
+#: ../daemon/gvfsafpserver.c:334 ../daemon/gvfsafpserver.c:563
 #, c-format
 msgid "AFP server %s declined the submitted password"
 msgstr "El servidor AFP %s rechazó la contraseña enviada"
 
-#: ../daemon/gvfsafpserver.c:438 ../daemon/gvfsafpserver.c:658
+#: ../daemon/gvfsafpserver.c:365 ../daemon/gvfsafpserver.c:585
 #, c-format
 msgid "Login to AFP server %s failed"
 msgstr "Falló el inicio de sesión en el servidor AFP %s"
 
-#: ../daemon/gvfsafpserver.c:487
+#: ../daemon/gvfsafpserver.c:414
 msgid "Server doesn't support passwords longer than 64 characters"
 msgstr "El servidor no soporta contraseñas de más de 64 caracteres"
 
-#: ../daemon/gvfsafpserver.c:683 ../daemon/gvfsafpserver.c:712
+#: ../daemon/gvfsafpserver.c:610 ../daemon/gvfsafpserver.c:639
 #, c-format
 msgid "AFP server %s doesn't support anonymous login"
 msgstr "El servidor AFP %s no soporta inicio de sesión anónimo"
 
-#: ../daemon/gvfsafpserver.c:718
+#: ../daemon/gvfsafpserver.c:645
 #, c-format
 msgid "Anonymous login to AFP server %s failed, got error code: %d"
 msgstr ""
 "Falló el inicio de sesión anónimo en el servidor AFP %s, se obtuvo el código "
 "de error: %d"
 
-#: ../daemon/gvfsafpserver.c:742
+#: ../daemon/gvfsafpserver.c:669
 #, c-format
 msgid ""
 "Login to AFP server %s failed (no suitable authentication mechanism found)"
@@ -305,24 +306,24 @@ msgstr ""
 "Falló al iniciar sesión en el servidor AFP %s (no se encontró un mecanismo "
 "de autenticación apropiado)"
 
-#: ../daemon/gvfsafpserver.c:813
+#: ../daemon/gvfsafpserver.c:740
 #, c-format
 msgid "Failed to connect to server (%s)"
 msgstr "Falló al conectar al servidor (%s)"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsafpserver.c:903
+#: ../daemon/gvfsafpserver.c:830
 #, c-format
 msgid "Enter password for afp as %s on %s"
 msgstr "Introducir la contraseña para AFP como %s en %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:906
+#: ../daemon/gvfsafpserver.c:833
 #, c-format
 msgid "Enter password for afp on %s"
 msgstr "Introducir la contraseña para AFP en %s"
 
-#: ../daemon/gvfsafpserver.c:938 ../daemon/gvfsbackendftp.c:518
+#: ../daemon/gvfsafpserver.c:865 ../daemon/gvfsbackendftp.c:518
 #: ../daemon/gvfsbackendsftp.c:985 ../daemon/gvfsbackendsmbbrowse.c:995
 #: ../daemon/gvfsbackendsmb.c:619
 msgid "Password dialog cancelled"
@@ -587,6 +588,8 @@ msgstr "La carpeta no está vacía"
 #: ../daemon/gvfsbackendafp.c:1215
 msgid "Target object is marked as DeleteInhibit"
 msgstr ""
+"El objeto de destino tiene la marca de eliminación desactivada "
+"(«DeleteInhibit»)"
 
 #: ../daemon/gvfsbackendafp.c:1219 ../daemon/gvfsbackendafp.c:1708
 #: ../daemon/gvfsbackendafp.c:2226
@@ -612,9 +615,10 @@ msgstr "No se puede mover una carpeta compartida a la Papelera"
 #: ../daemon/gvfsbackendafp.c:1468
 msgid "Object being moved is marked as RenameInhibit"
 msgstr ""
+"El objeto que se está moviendo tiene la marca de renombrado desactivada "
+"(«RenameInhibit»)"
 
 #: ../daemon/gvfsbackendafp.c:1472
-#| msgid "File doesn't exist"
 msgid "Object being moved doesn't exist"
 msgstr "El objeto que se está moviendo no existe"
 
@@ -623,7 +627,6 @@ msgid "Server doesn't support the FPCopyFile operation"
 msgstr "El servidor no soporta la operaciónFPCopyFile"
 
 #: ../daemon/gvfsbackendafp.c:1585
-#| msgid "Couldn't get stream file descriptor"
 msgid "Couldn't open source file as Read/DenyWrite"
 msgstr "No se pudo abrir el archivo de origen como Lectura/DenegarEscritura"
 
@@ -668,6 +671,8 @@ msgstr "La existe un objeto con este nombre"
 #: ../daemon/gvfsbackendafp.c:2222
 msgid "Target object is marked as RenameInhibit"
 msgstr ""
+"El objeto de destino tiene la marca de renombrado desactivada "
+"(«RenameInhibit»)"
 
 #: ../daemon/gvfsbackendafp.c:2354
 msgid "Volume is flat and doesn't support directories"
@@ -691,7 +696,6 @@ msgstr "Existe un conflicto de bloqueo de rango"
 
 #: ../daemon/gvfsbackendafp.c:3212
 #, c-format
-#| msgid "Unable to create temporary file"
 msgid "Couldn't create temporary file (%s)"
 msgstr "No se pudo crear el archivo temporal (%s)"
 
@@ -737,13 +741,11 @@ msgstr "Falló FPGetUserInfo (%s)"
 
 #: ../daemon/gvfsbackendafp.c:4250
 #, c-format
-#| msgid "SFTP for %s on %s"
 msgid "AFP volume %s for %s on %s"
 msgstr "El volumen AFP %s para %s en %s"
 
 #: ../daemon/gvfsbackendafp.c:4254
 #, c-format
-#| msgid "SFTP for %s on %s"
 msgid "AFP volume %s on %s"
 msgstr "El volumen %s en %s"
 
@@ -1699,22 +1701,22 @@ msgstr "Reemplace el demonio antiguo."
 msgid "Don't start fuse."
 msgstr "No iniciar fuse."
 
-#: ../daemon/main.c:58
+#: ../daemon/main.c:62
 msgid "GVFS Daemon"
 msgstr "Demonio GVFS"
 
-#: ../daemon/main.c:61
+#: ../daemon/main.c:65
 msgid "Main daemon for GVFS"
 msgstr "Demonio principal para GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:76 ../metadata/meta-daemon.c:718
+#: ../daemon/main.c:80 ../metadata/meta-daemon.c:718
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
+#: ../daemon/main.c:82 ../metadata/meta-daemon.c:720
 #: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
 #: ../programs/gvfs-copy.c:123 ../programs/gvfs-info.c:371
 #: ../programs/gvfs-ls.c:392 ../programs/gvfs-mime.c:87
@@ -2446,7 +2448,7 @@ msgstr "Error: %s\n"
 
 #: ../programs/gvfs-ls.c:383
 msgid "- list files at <location>"
-msgstr "- listar los archivos en <location>"
+msgstr "- listar los archivos en <ubicación>"
 
 #: ../programs/gvfs-mime.c:36
 msgid "Query handler for mime-type"
@@ -2458,7 +2460,7 @@ msgstr "Establecer gestor para tipos MIME"
 
 #: ../programs/gvfs-mime.c:76
 msgid "- get/set handler for <mimetype>"
-msgstr ""
+msgstr "- obtener/establecer el gestor para <tipomime>"
 
 #: ../programs/gvfs-mime.c:85
 msgid "Specify one of --query and --set"
@@ -2472,7 +2474,7 @@ msgstr "Se debe especificar un solo tipo MIME.\n"
 #: ../programs/gvfs-mime.c:105
 #, c-format
 msgid "Must specify the mime-type followed by the default handler.\n"
-msgstr ""
+msgstr "Se debe especificar el tipo MIME seguido del gestor predeterminado.\n"
 
 #: ../programs/gvfs-mime.c:121
 #, c-format
