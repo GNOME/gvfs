@@ -96,6 +96,16 @@ G_DEFINE_TYPE (GVfsBackendAfp, g_vfs_backend_afp, G_VFS_TYPE_BACKEND);
 /*
  * Utility functions
  */
+static void
+job_failed_from_afp_result_code (GVfsJob *job, AfpResultCode res_code)
+{
+  GError *err;
+  
+  err = afp_result_code_to_gerror (res_code);
+  g_vfs_job_failed_from_error (job, err);
+  g_error_free (err);
+}
+
 static gboolean
 is_root (const char *filename)
 {
@@ -475,8 +485,7 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
                                          _("Too many files open"));
         break;
       default:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Got error code: %d from server"), res_code);
+        g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
         break;
     }
     goto done;
@@ -595,10 +604,7 @@ close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   g_object_unref (reply);
   
   if (res_code != AFP_RESULT_NO_ERROR)
-  {
-    g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                     _("Got error code: %d from server"), res_code);
-  }
+    g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
 
 done:
   g_simple_async_result_complete (simple);
@@ -677,8 +683,7 @@ get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   {
     g_object_unref (reply);
 
-    g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("Got error code: %d from server"), res_code);
+    g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
     goto done;
   }
 
@@ -780,8 +785,7 @@ get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
                                          _("File doesn't exist"));
         break;
       default:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Got error code: %d from server"), res_code);
+        g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
         break;
     }
     goto done;
@@ -891,8 +895,7 @@ get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   {
     g_object_unref (reply);
 
-    g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("Got error code: %d from server"), res_code);
+    g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
     goto done;
   }
 
@@ -1069,8 +1072,7 @@ create_file_cb (GObject *object, GAsyncResult *res, gpointer user_data)
                                   _("Volume is read-only"));
         break;
       default:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Got error code: %d from server"), res_code);
+        g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
         break;
     }
   }
@@ -1223,8 +1225,7 @@ delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
                                   _("Volume is read-only"));
         break;
       default:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Got error code: %d from server"), res_code);
+        g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
         break;
     }
   }
@@ -1319,8 +1320,7 @@ map_id_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
                                          _("ID not found"));
         break;
       default:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Got error code: %d from server"), res_code);
+        g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
         break;
     }
 
@@ -1472,8 +1472,7 @@ move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_dat
                                          _("Object being moved doesn't exist"));
         break;
       default:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Got error code: %d from server"), res_code);
+        g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
         break;
     }
   }
@@ -1601,8 +1600,7 @@ copy_file_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
                                          _("Source file is a directory"));
         break;
       default:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Got error code: %d from server"), res_code);
+        g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
         break;
     }
   }
@@ -1712,8 +1710,7 @@ set_unix_privs_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
                                          _("Volume is read-only"));
         break;
       default:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Got error code: %d from server"), res_code);
+        g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
         break;
     }
     goto done;
@@ -2230,8 +2227,7 @@ rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
                                   _("Volume is read-only"));
         break;
       default:
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Got error code: %d from server"), res_code);
+        job_failed_from_afp_result_code (G_VFS_JOB (job), res_code);
         break;
     }
     return;
@@ -2366,8 +2362,7 @@ make_directory_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
                                   _("Volume is read-only"));
         break;
       default:
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Got error code: %d from server"), res_code);
+        job_failed_from_afp_result_code (G_VFS_JOB (job), res_code);
         break;
     }
     return;
@@ -2505,8 +2500,7 @@ write_ext_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
                                   _("Not enough space on volume"));
         break;
       default:
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Got error code: %d from server"), res_code);
+        job_failed_from_afp_result_code (G_VFS_JOB (job), res_code);
         break;
     }
     return;
@@ -2742,8 +2736,7 @@ read_ext_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
                                   _("File is not open for read access"));
         break;
       default:
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Got error code: %d from server"), res_code);
+        job_failed_from_afp_result_code (G_VFS_JOB (job), res_code);
         break;
     }
     
@@ -2873,8 +2866,7 @@ close_replace_exchange_files_cb (GObject *source_object, GAsyncResult *res, gpoi
                                   _("File is a directory"));
         break;   
       default:
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Got error code: %d from server"), res_code);
+        job_failed_from_afp_result_code (G_VFS_JOB (job), res_code);
         break;
     }
     return;
@@ -2973,8 +2965,7 @@ close_replace_set_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpoi
                                   _("Range lock conflict exists"));
         break;
       default:
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Got error code: %d from server"), res_code);
+        job_failed_from_afp_result_code (G_VFS_JOB (job), res_code);
         break;
     }
     afp_handle_free (afp_handle);
@@ -3547,8 +3538,7 @@ enumerate_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         g_vfs_job_enumerate_done (job);
         break;
       default:
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Got error code: %d from server"), res_code);
+        job_failed_from_afp_result_code (G_VFS_JOB (job), res_code);
         break;
     }
     return;
@@ -4077,39 +4067,32 @@ get_userinfo (GVfsBackendAfp *afp_backend,
   res_code = g_vfs_afp_reply_get_result_code (reply);
   if (res_code != AFP_RESULT_NO_ERROR)
   {
-    gint code;
-    char *errstr;
-
     g_object_unref (reply);
 
     switch (res_code)
     {
       case AFP_RESULT_ACCESS_DENIED:
-        code = G_IO_ERROR_PERMISSION_DENIED;
-        errstr = g_strdup (_("Permission denied"));
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                     _("Permission denied"));
+        break;
         break;
       case AFP_RESULT_CALL_NOT_SUPPORTED:
-        code = G_IO_ERROR_NOT_SUPPORTED;
-        errstr = g_strdup (_("Command not supported"));
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                     _("FPGetUserInfo is not supported by server"));
         break;
       case AFP_RESULT_PWD_EXPIRED_ERR:
-        code = G_IO_ERROR_PERMISSION_DENIED;
-        errstr = g_strdup (_("User's password has expired"));
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                     _("User's password has expired"));
         break;
       case AFP_RESULT_PWD_NEEDS_CHANGE_ERR:
-        code = G_IO_ERROR_PERMISSION_DENIED;
-        errstr = g_strdup (_("User's password needs to be changed"));
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                     _("User's password needs to be changed"));
         break;
 
       default:
-        code = G_IO_ERROR_FAILED;
-        errstr = g_strdup_printf (_("Got error code: %d from server"), res_code);
+        g_propagate_error (error, afp_result_code_to_gerror (res_code));
         break;
     }
-
-    g_set_error (error, G_IO_ERROR, code,
-                 _("FPGetUserInfo failed (%s)"), errstr);
-    g_free (errstr);
     return FALSE;
   }
 

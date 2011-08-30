@@ -117,8 +117,7 @@ get_srvr_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   {
     g_object_unref (reply);
 
-    g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                     _("Got error code: %d from server"), res_code);
+    g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
     goto done;
   }
   

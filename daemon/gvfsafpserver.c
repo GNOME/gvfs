@@ -361,8 +361,7 @@ error:
   goto cleanup;
   
 generic_error:
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               _("Login to AFP server %s failed"), afp_serv->server_name);
+  g_propagate_error (error, afp_result_code_to_gerror (res_code));
   goto error;
 }
 
@@ -581,8 +580,7 @@ error:
   goto done;
   
 generic_error:
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               _("Login to AFP server %s failed"), afp_serv->server_name);
+  g_propagate_error (error, afp_result_code_to_gerror (res_code));
   res = FALSE;
   goto done;
 }
@@ -641,9 +639,7 @@ do_login (GVfsAfpServer *afp_serv,
           break;
           
         default:
-          g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                       _("Anonymous login to AFP server %s failed, got error code: %d"),
-                       afp_serv->server_name, res_code);
+          g_propagate_error (error, afp_result_code_to_gerror (res_code));
           break;
       }
       
