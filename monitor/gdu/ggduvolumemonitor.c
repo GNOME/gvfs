@@ -1487,6 +1487,30 @@ update_fstab_volumes (GGduVolumeMonitor *monitor,
   g_list_free (fstab_mount_points);
 }
 
+static gboolean
+unix_mount_is_cleartext (GGduVolumeMonitor *monitor,
+                         GUnixMountEntry *mount_entry)
+{
+  const char *device_file;
+  const char *mount_path;
+  GGduVolume *volume;
+  GduPresentable *presentable;
+
+  device_file = g_unix_mount_get_device_path (mount_entry);
+  mount_path = g_unix_mount_get_mount_path (mount_entry);
+  volume = find_volume_for_device_file (monitor, device_file);
+  if (volume == NULL)
+    volume = find_volume_for_mount_path (monitor, mount_path);
+
+  if (volume != NULL)
+    {
+      presentable = g_gdu_volume_get_presentable_with_cleartext (volume);
+      return presentable != NULL;
+    }
+
+  return FALSE;
+}
+
 static void
 update_mounts (GGduVolumeMonitor *monitor,
                GList **added_mounts,
@@ -1510,8 +1534,10 @@ update_mounts (GGduVolumeMonitor *monitor,
       GUnixMountEntry *mount_entry = l->data;
       ll = l->next;
 
+      /* since we always show crypto volumes, we should also never ignore their mounts */
       /* keep in sync with should_mount_be_ignored() */
-      if (!g_unix_mount_guess_should_display (mount_entry))
+      if (!g_unix_mount_guess_should_display (mount_entry) &&
+          !unix_mount_is_cleartext (monitor, mount_entry))
         {
           g_unix_mount_free (mount_entry);
           new_mounts = g_list_delete_link (new_mounts, l);
