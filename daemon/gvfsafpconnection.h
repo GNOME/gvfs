@@ -227,15 +227,6 @@ typedef enum
  */
 typedef struct _GVfsAfpName GVfsAfpName;
 
-struct _GVfsAfpName
-{
-  guint32 text_encoding;
-  gchar *str;
-  gsize len;
-
-  gint ref_count;
-};
-
 GVfsAfpName* g_vfs_afp_name_new              (guint32 text_encoding,
                                               gchar *str,
                                               gsize len);

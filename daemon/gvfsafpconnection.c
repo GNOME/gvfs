@@ -29,6 +29,14 @@
 /*
  * GVfsAfpName
  */
+struct _GVfsAfpName
+{
+  guint32 text_encoding;
+  gchar *str;
+  gsize len;
+
+  gint ref_count;
+};
 
 static void
 _g_vfs_afp_name_free (GVfsAfpName *afp_name)
