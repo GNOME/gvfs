@@ -1310,7 +1310,7 @@ read_reply_sync (GInputStream      *input,
   if (bytes_read < read_count)
   {
     g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                         _("Got EOS"));
+                         _("Connection unexpectedly went down"));
     return FALSE;
   }
 

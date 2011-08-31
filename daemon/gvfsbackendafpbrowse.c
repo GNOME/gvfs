@@ -494,10 +494,12 @@ do_mount (GVfsBackend *backend,
     server_name = afp_backend->server->server_name;
   
   if (afp_backend->user)
-    display_name = g_strdup_printf (_("AFP shares for %s on %s"), afp_backend->user,
+    /* Translators: first %s is username and second serververname */
+    display_name = g_strdup_printf (_("AFP volumes for %s on %s"), afp_backend->user,
                                     server_name);
   else
-    display_name = g_strdup_printf (_("AFP shares on %s"),
+    /* Translators: %s is the servername */
+    display_name = g_strdup_printf (_("AFP volumes on %s"),
                                     server_name);
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);

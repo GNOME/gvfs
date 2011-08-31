@@ -1214,7 +1214,7 @@ delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         break;
       case AFP_RESULT_OBJECT_LOCKED:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                  _("Target object is marked as DeleteInhibit"));
+                                  _("Target object is marked as not deletable (DeleteInhibit)"));
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
@@ -1465,7 +1465,7 @@ move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_dat
         break;
       case AFP_RESULT_OBJECT_LOCKED:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                         _("Object being moved is marked as RenameInhibit"));
+                                         _("Object being moved is marked as not renameable (RenameInhibit)"));
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
@@ -2216,7 +2216,7 @@ rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         break;
       case AFP_RESULT_OBJECT_LOCKED:
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
-                                  _("Target object is marked as RenameInhibit"));
+                                  _("Target object is marked as not renameable (RenameInhibit)"));
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
@@ -4078,7 +4078,7 @@ get_userinfo (GVfsBackendAfp *afp_backend,
         break;
       case AFP_RESULT_CALL_NOT_SUPPORTED:
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                     _("FPGetUserInfo is not supported by server"));
+                     _("Command is not supported by server"));
         break;
       case AFP_RESULT_PWD_EXPIRED_ERR:
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
@@ -4230,10 +4230,12 @@ do_mount (GVfsBackend *backend,
     server_name = afp_backend->server->server_name;
   
   if (afp_backend->user)
+    /* Translators: first %s is volumename, second username and third servername */ 
     display_name = g_strdup_printf (_("AFP volume %s for %s on %s"), 
                                     afp_backend->volume, afp_backend->user,
                                     server_name);
   else
+    /* Translators: first %s is volumename and second servername */
     display_name = g_strdup_printf (_("AFP volume %s on %s"),
                                     afp_backend->volume, server_name);
   
