@@ -80,8 +80,7 @@ struct _GVfsBackendAfp
   char               *user;
 
   GVfsAfpServer      *server;
-
-  gint32              time_diff;
+  
   guint16             vol_attrs_bitmap;
   guint16             volume_id;
 
@@ -293,10 +292,14 @@ static void fill_info (GVfsBackendAfp *afp_backend,
   if (bitmap & AFP_FILEDIR_BITMAP_CREATE_DATE_BIT)
   {
     gint32 create_date;
+    gint64 create_date_local;
 
     g_vfs_afp_reply_read_int32 (reply, &create_date);
+    
+    create_date_local = g_vfs_afp_server_time_to_local_time (afp_backend->server,
+                                                             create_date);
     g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
-                                      create_date + afp_backend->time_diff);
+                                      create_date_local);
   }
 
   if (bitmap & AFP_FILEDIR_BITMAP_MOD_DATE_BIT)
@@ -306,7 +309,8 @@ static void fill_info (GVfsBackendAfp *afp_backend,
     char *etag;
 
     g_vfs_afp_reply_read_int32 (reply, &mod_date);
-    mod_date_unix = mod_date + afp_backend->time_diff;
+    mod_date_unix = g_vfs_afp_server_time_to_local_time (afp_backend->server,
+                                                         mod_date);
     
     g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
                                       mod_date_unix);
@@ -916,19 +920,27 @@ get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   if (vol_bitmap & AFP_VOLUME_BITMAP_CREATE_DATE_BIT)
   {
     gint32 create_date;
+    gint64 create_date_local;
 
     g_vfs_afp_reply_read_int32 (reply, &create_date);
+
+    create_date_local = g_vfs_afp_server_time_to_local_time (afp_backend->server, 
+                                                             create_date);
     g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
-                                      create_date + afp_backend->time_diff);
+                                      create_date_local);
   }
 
   if (vol_bitmap & AFP_VOLUME_BITMAP_MOD_DATE_BIT)
   {
     gint32 mod_date;
+    gint64 mod_date_local;
 
     g_vfs_afp_reply_read_int32 (reply, &mod_date);
+
+    mod_date_local = g_vfs_afp_server_time_to_local_time (afp_backend->server,
+                                                          mod_date);
     g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
-                                      mod_date + afp_backend->time_diff);
+                                      mod_date_local);
   }
 
   if (vol_bitmap & AFP_VOLUME_BITMAP_EXT_BYTES_FREE_BIT)
@@ -4124,8 +4136,6 @@ do_mount (GVfsBackend *backend,
   GVfsAfpReply *reply;
   AfpResultCode res_code;
   
-  gint32 server_time;
-  
   GMountSpec *afp_mount_spec;
   char       *server_name;
   char       *display_name;
@@ -4136,38 +4146,6 @@ do_mount (GVfsBackend *backend,
                                 NULL, G_VFS_JOB (job)->cancellable, &err);
   if (!res)
     goto error;
-  
-
-  /* Get Server Parameters */
-  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
-  /* pad byte */
-  g_vfs_afp_command_put_byte (comm, 0);
-
-  res = g_vfs_afp_connection_send_command_sync (afp_backend->server->conn,
-                                                comm, G_VFS_JOB (job)->cancellable,
-                                                &err);
-  g_object_unref (comm);
-  if (!res)
-    goto error;
-
-  reply = g_vfs_afp_connection_read_reply_sync (afp_backend->server->conn,
-                                                G_VFS_JOB (job)->cancellable, &err);
-  if (!reply)
-    goto error;
-
-  res_code = g_vfs_afp_reply_get_result_code (reply);
-  if (res_code != AFP_RESULT_NO_ERROR)
-  {
-    g_object_unref (reply);
-    goto generic_error;
-  }
-
-  /* server time */
-  g_vfs_afp_reply_read_int32 (reply, &server_time);
-  afp_backend->time_diff = (g_get_real_time () / G_USEC_PER_SEC) - server_time;
-
-  g_object_unref (reply);
-
   
   /* Get User Info */
   if (!get_userinfo (afp_backend, G_VFS_JOB (job)->cancellable, &err))

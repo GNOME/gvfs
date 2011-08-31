@@ -67,7 +67,13 @@ struct _GVfsAfpServer
   char                *utf8_server_name;
   GSList              *uams;
   AfpVersion          version;
+
+  gint32              time_diff;
 };
+
+GType              g_vfs_afp_server_get_type (void) G_GNUC_CONST;
+
+GVfsAfpServer*     g_vfs_afp_server_new             (GNetworkAddress *addr);
 
 gboolean           g_vfs_afp_server_login           (GVfsAfpServer *afp_serv,
                                                      const char     *initial_user,
@@ -76,9 +82,8 @@ gboolean           g_vfs_afp_server_login           (GVfsAfpServer *afp_serv,
                                                      GCancellable   *cancellable,
                                                      GError         **error);
 
-GVfsAfpServer*     g_vfs_afp_server_new             (GNetworkAddress *addr);
-
-GType g_vfs_afp_server_get_type (void) G_GNUC_CONST;
+gint64             g_vfs_afp_server_time_to_local_time (GVfsAfpServer *afp_serv,
+                                                        gint32         server_time);
 
 G_END_DECLS
 
