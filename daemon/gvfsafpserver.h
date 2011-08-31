@@ -71,19 +71,29 @@ struct _GVfsAfpServer
   gint32              time_diff;
 };
 
-GType              g_vfs_afp_server_get_type (void) G_GNUC_CONST;
+GType              g_vfs_afp_server_get_type             (void) G_GNUC_CONST;
 
-GVfsAfpServer*     g_vfs_afp_server_new             (GNetworkAddress *addr);
+GVfsAfpServer*     g_vfs_afp_server_new                  (GNetworkAddress *addr);
 
-gboolean           g_vfs_afp_server_login           (GVfsAfpServer *afp_serv,
-                                                     const char     *initial_user,
-                                                     GMountSource   *mount_source,
-                                                     char           **logged_in_user,
-                                                     GCancellable   *cancellable,
-                                                     GError         **error);
+gboolean           g_vfs_afp_server_login                (GVfsAfpServer *afp_serv,
+                                                          const char     *initial_user,
+                                                          GMountSource   *mount_source,
+                                                          char           **logged_in_user,
+                                                          GCancellable   *cancellable,
+                                                          GError         **error);
 
-gint64             g_vfs_afp_server_time_to_local_time (GVfsAfpServer *afp_serv,
-                                                        gint32         server_time);
+gint64             g_vfs_afp_server_time_to_local_time   (GVfsAfpServer *afp_serv,
+                                                          gint32         server_time);
+
+void               g_vfs_afp_server_get_vol_parms        (GVfsAfpServer       *server,
+                                                          guint16              volume_id,
+                                                          guint16              vol_bitmap,
+                                                          GCancellable        *cancellable,
+                                                          GAsyncReadyCallback  callback,
+                                                          gpointer             user_data);
+GFileInfo *        g_vfs_afp_server_get_vol_parms_finish (GVfsAfpServer       *server,
+                                                          GAsyncResult        *result,
+                                                          GError             **error);
 
 G_END_DECLS
 

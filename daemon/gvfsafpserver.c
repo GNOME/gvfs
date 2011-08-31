@@ -1038,3 +1038,173 @@ g_vfs_afp_server_time_to_local_time (GVfsAfpServer *server,
 {
   return server_time + server->time_diff;
 }
+
+static void
+get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsAfpConnection *connection = G_VFS_AFP_CONNECTION (source_object);
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GVfsAfpServer *server = G_VFS_AFP_SERVER (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
+
+  GVfsAfpReply *reply;
+  GError *err = NULL;
+  AfpResultCode res_code;
+  
+  guint16 vol_bitmap;
+  GFileInfo *info;
+
+  reply = g_vfs_afp_connection_send_command_finish (connection, res, &err);
+  if (!reply)
+  {
+    g_simple_async_result_take_error (simple, err);
+    goto done;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_object_unref (reply);
+
+    g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
+    goto done;
+  }
+
+  g_vfs_afp_reply_read_uint16 (reply, &vol_bitmap);
+
+  info = g_file_info_new ();
+
+  if (vol_bitmap & AFP_VOLUME_BITMAP_ATTRIBUTE_BIT)
+  {
+    guint16 vol_attrs_bitmap;
+    
+    g_vfs_afp_reply_read_uint16 (reply, &vol_attrs_bitmap);
+    
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY,
+                                       vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_READ_ONLY);
+  }
+
+  if (vol_bitmap & AFP_VOLUME_BITMAP_CREATE_DATE_BIT)
+  {
+    gint32 create_date;
+    gint64 create_date_local;
+
+    g_vfs_afp_reply_read_int32 (reply, &create_date);
+
+    create_date_local = g_vfs_afp_server_time_to_local_time (server, create_date);
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
+                                      create_date_local);
+  }
+
+  if (vol_bitmap & AFP_VOLUME_BITMAP_MOD_DATE_BIT)
+  {
+    gint32 mod_date;
+    gint64 mod_date_local;
+
+    g_vfs_afp_reply_read_int32 (reply, &mod_date);
+
+    mod_date_local = g_vfs_afp_server_time_to_local_time (server, mod_date);
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                      mod_date_local);
+  }
+
+  if (vol_bitmap & AFP_VOLUME_BITMAP_EXT_BYTES_FREE_BIT)
+  {
+    guint64 bytes_free;
+
+    g_vfs_afp_reply_read_uint64 (reply, &bytes_free);
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                      bytes_free);
+  }
+
+  if (vol_bitmap & AFP_VOLUME_BITMAP_EXT_BYTES_TOTAL_BIT)
+  {
+    guint64 bytes_total;
+
+    g_vfs_afp_reply_read_uint64 (reply, &bytes_total);
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,
+                                      bytes_total);
+  }
+
+  g_object_unref (reply);
+  
+  g_simple_async_result_set_op_res_gpointer (simple, info, g_object_unref);
+
+done:
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+}
+
+/*
+ * g_vfs_afp_server_get_vol_parms:
+ * 
+ * @server: a #GVfsAfpServer
+ * @volume_id: id of the volume whose parameters should be received.
+ * @vol_bitmap: bitmap describing the parameters that should be received.
+ * @cancellable: optional #GCancellable object, %NULL to ignore.
+ * @error: a #GError, %NULL to ignore.
+ * @callback: callback to call when the request is satisfied.
+ * @user_data: the data to pass to callback function.
+ * 
+ * Asynchronously retrives the parameters specified by @vol_bitmap of the volume
+ * with id $volume_id.
+ */
+void
+g_vfs_afp_server_get_vol_parms (GVfsAfpServer       *server,
+                                guint16              volume_id,
+                                guint16              vol_bitmap,
+                                GCancellable        *cancellable,
+                                GAsyncReadyCallback  callback,
+                                gpointer             user_data)
+{
+  GVfsAfpCommand *comm;
+  GSimpleAsyncResult *simple;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_VOL_PARMS);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+  /* Volume ID */
+  g_vfs_afp_command_put_uint16 (comm, volume_id);
+  /* Volume Bitmap */
+  g_vfs_afp_command_put_uint16 (comm, vol_bitmap);
+
+  simple = g_simple_async_result_new (G_OBJECT (server), callback, user_data,
+                                      g_vfs_afp_server_get_vol_parms);
+                                      
+  
+  g_vfs_afp_connection_send_command (server->conn, comm, NULL, get_vol_parms_cb,
+                                     cancellable, simple);
+  g_object_unref (comm);
+}
+
+/*
+ * g_vfs_afp_server_get_vol_parms_finish:
+ * 
+ * @server: a #GVfsAfpServer.
+ * @result: a #GAsyncResult.
+ * @error: a #GError, %NULL to ignore.
+ * 
+ * Finalizes the asynchronous operation started by
+ * g_vfs_afp_server_get_vol_parms.
+ * 
+ * Returns: (transfer full): A #GFileInfo with the requested parameters or %NULL
+ * on error.
+ */
+GFileInfo *
+g_vfs_afp_server_get_vol_parms_finish (GVfsAfpServer  *server,
+                                       GAsyncResult   *result,
+                                       GError         **error)
+{
+  GSimpleAsyncResult *simple;
+  
+  g_return_val_if_fail (g_simple_async_result_is_valid (result,
+                                                        G_OBJECT (server),
+                                                        g_vfs_afp_server_get_vol_parms),
+                        NULL);
+
+  simple = (GSimpleAsyncResult *)result;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    return NULL;
+
+  return g_object_ref (g_simple_async_result_get_op_res_gpointer (simple));
+}
