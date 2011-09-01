@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.7.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-28 19:24+0200\n"
-"PO-Revision-Date: 2011-08-28 19:29+0200\n"
+"POT-Creation-Date: 2011-09-01 08:08+0200\n"
+"PO-Revision-Date: 2011-09-01 08:08+0200\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
 "Language: \n"
@@ -213,45 +213,45 @@ msgstr "KAn ikke håndtere versjon %d av GVfsIcon-koding"
 msgid "Malformed input data for GVfsIcon"
 msgstr "Feil inndata for GVfsIcon"
 
-#: ../daemon/daemon-main.c:76 ../daemon/daemon-main.c:231
+#: ../daemon/daemon-main.c:82 ../daemon/daemon-main.c:237
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "Feil under tilkobling til D-Bus: %s"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "FTP"
-#: ../daemon/daemon-main.c:91
+#: ../daemon/daemon-main.c:97
 #, c-format
 msgid "%s Filesystem Service"
 msgstr "Filsystemtjeneste for %s"
 
-#: ../daemon/daemon-main.c:110 ../programs/gvfs-copy.c:90
+#: ../daemon/daemon-main.c:116 ../programs/gvfs-copy.c:90
 #: ../programs/gvfs-move.c:78
 #, c-format
 msgid "Error: %s"
 msgstr "Feil: %s"
 
-#: ../daemon/daemon-main.c:156
+#: ../daemon/daemon-main.c:162
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "Bruk %s --spawner dbus-id objekt_sti"
 
-#: ../daemon/daemon-main.c:180 ../daemon/daemon-main.c:198
+#: ../daemon/daemon-main.c:186 ../daemon/daemon-main.c:204
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "Bruk: %s key=verdi key=verdi …"
 
-#: ../daemon/daemon-main.c:196
+#: ../daemon/daemon-main.c:202
 #, c-format
 msgid "No mount type specified"
 msgstr "Ingen monteringstype oppgitt"
 
-#: ../daemon/daemon-main.c:266
+#: ../daemon/daemon-main.c:272
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "monteringspunkt for %s kjører allerede"
 
-#: ../daemon/daemon-main.c:277
+#: ../daemon/daemon-main.c:283
 msgid "error starting mount daemon"
 msgstr "feil under oppstart av monteringstjenesten"
 
@@ -259,39 +259,39 @@ msgstr "feil under oppstart av monteringstjenesten"
 msgid "Got EOS"
 msgstr "Fikk EOS"
 
-#: ../daemon/gvfsafpserver.c:200
+#: ../daemon/gvfsafpserver.c:127
 msgid "Server doesn't support passwords longer than 256 characters"
 msgstr "Tjener støtter ikke passord som er lenger enn 256 tegn"
 
-#: ../daemon/gvfsafpserver.c:228 ../daemon/gvfsafpserver.c:542
+#: ../daemon/gvfsafpserver.c:155 ../daemon/gvfsafpserver.c:469
 msgid "An invalid username was provided"
 msgstr "Et ugyldig brukernavn ble oppgitt"
 
-#: ../daemon/gvfsafpserver.c:407 ../daemon/gvfsafpserver.c:636
+#: ../daemon/gvfsafpserver.c:334 ../daemon/gvfsafpserver.c:563
 #, c-format
 msgid "AFP server %s declined the submitted password"
 msgstr "AFP-tjener %s nektet innsendt passord"
 
-#: ../daemon/gvfsafpserver.c:438 ../daemon/gvfsafpserver.c:658
+#: ../daemon/gvfsafpserver.c:365 ../daemon/gvfsafpserver.c:585
 #, c-format
 msgid "Login to AFP server %s failed"
 msgstr "Innlogging til AFP-tjener %s feilet"
 
-#: ../daemon/gvfsafpserver.c:487
+#: ../daemon/gvfsafpserver.c:414
 msgid "Server doesn't support passwords longer than 64 characters"
 msgstr "Tjener støtter ikke passord som er lenger enn 64 tegn"
 
-#: ../daemon/gvfsafpserver.c:683 ../daemon/gvfsafpserver.c:712
+#: ../daemon/gvfsafpserver.c:610 ../daemon/gvfsafpserver.c:639
 #, c-format
 msgid "AFP server %s doesn't support anonymous login"
 msgstr "AFP-tjener %s støtter ikke anonym innlogging"
 
-#: ../daemon/gvfsafpserver.c:718
+#: ../daemon/gvfsafpserver.c:645
 #, c-format
 msgid "Anonymous login to AFP server %s failed, got error code: %d"
 msgstr "Anonym innlogging til AFP-tjener %s feilet. Fikk feilkode: %d"
 
-#: ../daemon/gvfsafpserver.c:742
+#: ../daemon/gvfsafpserver.c:669
 #, c-format
 msgid ""
 "Login to AFP server %s failed (no suitable authentication mechanism found)"
@@ -299,24 +299,24 @@ msgstr ""
 "Innlogging til AFP-tjener %s feilet (ingen passende autentiseringsmekanisme "
 "funnet)"
 
-#: ../daemon/gvfsafpserver.c:813
+#: ../daemon/gvfsafpserver.c:740
 #, c-format
 msgid "Failed to connect to server (%s)"
 msgstr "Klarte ikke å koble til gjener (%s)"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsafpserver.c:903
+#: ../daemon/gvfsafpserver.c:830
 #, c-format
 msgid "Enter password for afp as %s on %s"
 msgstr "Skriv inn passord for afp som %s på %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:906
+#: ../daemon/gvfsafpserver.c:833
 #, c-format
 msgid "Enter password for afp on %s"
 msgstr "Skriv inn passord for afp på %s"
 
-#: ../daemon/gvfsafpserver.c:938 ../daemon/gvfsbackendftp.c:518
+#: ../daemon/gvfsafpserver.c:865 ../daemon/gvfsbackendftp.c:518
 #: ../daemon/gvfsbackendsftp.c:985 ../daemon/gvfsbackendsmbbrowse.c:995
 #: ../daemon/gvfsbackendsmb.c:619
 msgid "Password dialog cancelled"
@@ -558,7 +558,7 @@ msgstr "Målfilen er åpen"
 #: ../daemon/gvfsbackenddav.c:2509 ../daemon/gvfsbackenddav.c:2620
 #: ../daemon/gvfsbackendftp.c:752 ../daemon/gvfsbackendftp.c:933
 #: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
-#: ../daemon/gvfsbackendsftp.c:4285 ../daemon/gvfsbackendsmb.c:2063
+#: ../daemon/gvfsbackendsftp.c:4285 ../daemon/gvfsbackendsmb.c:2081
 msgid "Target file already exists"
 msgstr "Målfilen eksisterer allerede"
 
@@ -644,7 +644,7 @@ msgid "Can't recursively copy directory"
 msgstr "Kan ikke kopiere katalog rekursivt"
 
 #: ../daemon/gvfsbackendafp.c:2106 ../daemon/gvfsbackendsftp.c:4271
-#: ../daemon/gvfsbackendsmb.c:2052
+#: ../daemon/gvfsbackendsmb.c:2070
 msgid "Can't move directory over directory"
 msgstr "Kan ikke flytte katalog over katalog"
 
@@ -1045,7 +1045,7 @@ msgid "Could not create request"
 msgstr "Kan ikke opprette forespørsel"
 
 #: ../daemon/gvfsbackenddav.c:2360 ../daemon/gvfsbackendsmb.c:1184
-#: ../daemon/gvfsbackendsmb.c:2080
+#: ../daemon/gvfsbackendsmb.c:2098
 msgid "Backup file creation failed"
 msgstr "Oppretting av sikkerhetskopi feilet"
 
@@ -1341,7 +1341,7 @@ msgstr "Mistet forbindelsen til enheten"
 msgid "Device requires a software update"
 msgstr "Enheten krever en programvareoppdatering"
 
-#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1954
+#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1972
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Feil under sletting av fil: %s"
@@ -1558,21 +1558,25 @@ msgstr "Oppretting av sikkerhetskopi feilet: %s"
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Ugyldig type attributt (uint64 forventet)"
 
-#: ../daemon/gvfsbackendsmb.c:2028
+#: ../daemon/gvfsbackendsmb.c:1921
+msgid "Can't rename file, filename already exists"
+msgstr "Kan ikke bytte navn på fil. Filnavnet eksisterer allerede"
+
+#: ../daemon/gvfsbackendsmb.c:2046
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Feil under flytting av fil: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2100
+#: ../daemon/gvfsbackendsmb.c:2118
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Feil under fjerning av målfil: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2124
+#: ../daemon/gvfsbackendsmb.c:2142
 msgid "Can't recursively move directory"
 msgstr "Kan ikke flytte katalog rekursivt"
 
-#: ../daemon/gvfsbackendsmb.c:2168
+#: ../daemon/gvfsbackendsmb.c:2186
 msgid "Windows Shares Filesystem Service"
 msgstr "Filsystemtjeneste for delte Windows-ressurser"
 
@@ -1683,22 +1687,22 @@ msgstr "Erstatt kjørende tjeneste."
 msgid "Don't start fuse."
 msgstr "Ikke start fuse."
 
-#: ../daemon/main.c:58
+#: ../daemon/main.c:62
 msgid "GVFS Daemon"
 msgstr "GVFS-tjeneste"
 
-#: ../daemon/main.c:61
+#: ../daemon/main.c:65
 msgid "Main daemon for GVFS"
 msgstr "Hovedtjeneste for GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:76 ../metadata/meta-daemon.c:718
+#: ../daemon/main.c:80 ../metadata/meta-daemon.c:718
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
+#: ../daemon/main.c:82 ../metadata/meta-daemon.c:720
 #: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
 #: ../programs/gvfs-copy.c:123 ../programs/gvfs-info.c:371
 #: ../programs/gvfs-ls.c:392 ../programs/gvfs-mime.c:87
