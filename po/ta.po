@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master.ta\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-26 10:26+0530\n"
-"PO-Revision-Date: 2011-09-01 20:18+0530\n"
+"POT-Creation-Date: 2011-09-01 20:56+0530\n"
+"PO-Revision-Date: 2011-09-01 21:08+0530\n"
 "Last-Translator: Dr.T.Vasudevan <agnihot3@gmail.com>\n"
 "Language-Team: American English <kde-i18n-doc@kde.org>\n"
 "Language: \n"
@@ -228,109 +228,110 @@ msgstr "GVfsIcon வடிவுநிலை %d இன் குறியாக�
 msgid "Malformed input data for GVfsIcon"
 msgstr "GVfsIcon க்கு சிதைந்த உள்ளீட்டு தரவு."
 
-#: ../daemon/daemon-main.c:76 ../daemon/daemon-main.c:231
+#: ../daemon/daemon-main.c:82 ../daemon/daemon-main.c:237
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "D-Busஐ இணைக்கும் போது பிழை: %s"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "FTP"
-#: ../daemon/daemon-main.c:91
+#: ../daemon/daemon-main.c:97
 #, c-format
 msgid "%s Filesystem Service"
 msgstr "%s கோப்பு முறைமை சேவை"
 
-#: ../daemon/daemon-main.c:110 ../programs/gvfs-copy.c:90
+#: ../daemon/daemon-main.c:116 ../programs/gvfs-copy.c:90
 #: ../programs/gvfs-move.c:78
 #, c-format
 msgid "Error: %s"
 msgstr "பிழை: %s"
 
-#: ../daemon/daemon-main.c:156
+#: ../daemon/daemon-main.c:162
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "பயன்பாடு: %s --spawner dbus-id object_path"
 
-#: ../daemon/daemon-main.c:180 ../daemon/daemon-main.c:198
+#: ../daemon/daemon-main.c:186 ../daemon/daemon-main.c:204
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "பயன்பாடு: %s key=value key=value ..."
 
-#: ../daemon/daemon-main.c:196
+#: ../daemon/daemon-main.c:202
 #, c-format
 msgid "No mount type specified"
 msgstr "ஏற்ற வகை குறிப்பிடப்படவில்லை"
 
-#: ../daemon/daemon-main.c:266
+#: ../daemon/daemon-main.c:272
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "%s க்கான ஏற்றிப்புள்ளி ஏற்கனவே இயக்கத்திலுள்ளது"
 
-#: ../daemon/daemon-main.c:277
+#: ../daemon/daemon-main.c:283
 msgid "error starting mount daemon"
 msgstr "டீமானை ஏற்றும் போது பிழை"
 
-#: ../daemon/gvfsafpconnection.c:1369 ../daemon/gvfsafpconnection.c:1396
+#: ../daemon/gvfsafpconnection.c:1305 ../daemon/gvfsafpconnection.c:1332
 msgid "Got EOS"
 msgstr "ஈஓஎஸ் உள்ளது"
 
-#: ../daemon/gvfsafpserver.c:200
+#: ../daemon/gvfsafpserver.c:127
 msgid "Server doesn't support passwords longer than 256 characters"
 msgstr "சேவையகம் 256 எழுத்துருக்களுக்கு மேல் உள்ள கடவுச்சொல்லை ஆதரிக்கவில்லை"
 
-#: ../daemon/gvfsafpserver.c:224 ../daemon/gvfsafpserver.c:525
+#: ../daemon/gvfsafpserver.c:155 ../daemon/gvfsafpserver.c:469
 msgid "An invalid username was provided"
 msgstr "செல்லுபடியாகாத பயனர் பெயர் தர்ப்பட்டது"
 
-#: ../daemon/gvfsafpserver.c:394 ../daemon/gvfsafpserver.c:615
+#: ../daemon/gvfsafpserver.c:334 ../daemon/gvfsafpserver.c:563
 #, c-format
 msgid "AFP server %s declined the submitted password"
 msgstr "ஏஎஃப்பி சேவையகம் %s  சமர்ப்பித்த கடவுச்சொல்லை நிராகரித்தது "
 
-#: ../daemon/gvfsafpserver.c:425 ../daemon/gvfsafpserver.c:637
+#: ../daemon/gvfsafpserver.c:365 ../daemon/gvfsafpserver.c:585
 #, c-format
 msgid "Login to AFP server %s failed"
 msgstr "ஏஎஃப்பி சேவையகம் %s  இல் உள்நுழைதல் தோல்வி அடைந்தது"
 
-#: ../daemon/gvfsafpserver.c:474
+#: ../daemon/gvfsafpserver.c:414
 msgid "Server doesn't support passwords longer than 64 characters"
 msgstr "சேவையகம் 64 எழுத்துருக்களுக்கு மேல் உள்ள கடவுச்சொல்லை ஆதரிக்கவில்லை"
 
-#: ../daemon/gvfsafpserver.c:661 ../daemon/gvfsafpserver.c:686
+#: ../daemon/gvfsafpserver.c:610 ../daemon/gvfsafpserver.c:639
 #, c-format
 msgid "AFP server %s doesn't support anonymous login"
 msgstr "ஏஎஃப்பி சேவையகம்  %s  அனானியாக உள்நுழைவதை ஆதரிக்கவில்லை"
 
-#: ../daemon/gvfsafpserver.c:692
+#: ../daemon/gvfsafpserver.c:645
 #, c-format
 msgid "Anonymous login to AFP server %s failed, got error code: %d"
 msgstr ""
 "ஏஎஃப்பி சேவையகம் %s  இல் அனானியாக உள்நுழைதல் தோல்வி அடைந்தது, பிழை கோட் %d பெறப்பட்டது"
 
-#: ../daemon/gvfsafpserver.c:716
+#: ../daemon/gvfsafpserver.c:669
 #, c-format
 msgid "Login to AFP server %s failed (no suitable authentication mechanism found)"
 msgstr ""
-"ஏஎஃப்பி சேவையகம் %s  இல் உள்நுழைதல் தோல்வி அடைந்தது (தோதான உறுதிபடுத்தல் வழி ஏதுமில்லை )"
+"ஏஎஃப்பி சேவையகம் %s  இல் உள்நுழைதல் தோல்வி அடைந்தது (தோதான உறுதிபடுத்தல் வழி "
+"ஏதுமில்லை )"
 
-#: ../daemon/gvfsafpserver.c:787
+#: ../daemon/gvfsafpserver.c:740
 #, c-format
 msgid "Failed to connect to server (%s)"
 msgstr "(%s) சேவையகத்தை  இணைத்தல்  தோல்வியுற்றது"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsafpserver.c:877
+#: ../daemon/gvfsafpserver.c:830
 #, c-format
 msgid "Enter password for afp as %s on %s"
 msgstr "ஏஎஃப்பி கடவுச்சொல்லை %s ஆக %s  இல் உள்ளிடவும்"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:880
+#: ../daemon/gvfsafpserver.c:833
 #, c-format
 msgid "Enter password for afp on %s"
 msgstr "ஏஎஃப்பி கடவுச்சொல்லை %s இல் உள்ளிடவும்"
 
-#: ../daemon/gvfsafpserver.c:912 ../daemon/gvfsbackendftp.c:518
+#: ../daemon/gvfsafpserver.c:865 ../daemon/gvfsbackendftp.c:518
 #: ../daemon/gvfsbackendsftp.c:985 ../daemon/gvfsbackendsmbbrowse.c:995
 #: ../daemon/gvfsbackendsmb.c:619
 msgid "Password dialog cancelled"
@@ -383,7 +384,7 @@ msgstr " பூட்டுதல் பிழை: தவறான மதிப�
 #: ../daemon/gvfsbackendafp.c:1704 ../daemon/gvfsbackendafp.c:2210
 #: ../daemon/gvfsbackendafp.c:2346 ../daemon/gvfsbackendafp.c:2865
 #: ../daemon/gvfsbackendafp.c:2965 ../daemon/gvfsbackendafp.c:3535
-#: ../daemon/gvfsbackendafp.c:4083 ../daemon/gvfsbackendsftp.c:310
+#: ../daemon/gvfsbackendafp.c:4089 ../daemon/gvfsbackendsftp.c:310
 #: ../daemon/gvfsbackendsftp.c:1834 ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "அனுமதி மறுக்கப்பட்டது"
@@ -515,7 +516,7 @@ msgstr "துணைபுரியாத செயல்பாடு"
 #: ../daemon/gvfsbackendafp.c:2234 ../daemon/gvfsbackendafp.c:2370
 #: ../daemon/gvfsbackendafp.c:2509 ../daemon/gvfsbackendafp.c:2746
 #: ../daemon/gvfsbackendafp.c:2877 ../daemon/gvfsbackendafp.c:2977
-#: ../daemon/gvfsbackendafp.c:3551 ../daemon/gvfsbackendafp.c:4100
+#: ../daemon/gvfsbackendafp.c:3551 ../daemon/gvfsbackendafp.c:4106
 #, c-format
 msgid "Got error code: %d from server"
 msgstr "சேவையகத்திலிருந்து பிழை கோட் % d பெறப்பட்டது"
@@ -535,13 +536,13 @@ msgstr "%s க்கு  %s  இல் ஏஎஃப்பி பங்குக�
 msgid "AFP shares on %s"
 msgstr "%s இல் ஏஎஃப்பி பங்குகள் "
 
-#: ../daemon/gvfsbackendafpbrowse.c:534 ../daemon/gvfsbackendafp.c:4278
+#: ../daemon/gvfsbackendafpbrowse.c:534 ../daemon/gvfsbackendafp.c:4294
 #: ../daemon/gvfsbackendarchive.c:539 ../daemon/gvfsbackendftp.c:667
 #: ../daemon/gvfsbackendsftp.c:1745
 msgid "No hostname specified"
 msgstr "புரவலன் பெயர் குறிப்பிடப்படவில்லை"
 
-#: ../daemon/gvfsbackendafpbrowse.c:602 ../daemon/gvfsbackendafp.c:4366
+#: ../daemon/gvfsbackendafpbrowse.c:602 ../daemon/gvfsbackendafp.c:4382
 msgid "Apple Filing Protocol Service"
 msgstr "ஆப்பிள் கோப்பு நெறிமுறை சேவை."
 
@@ -570,7 +571,7 @@ msgstr "இலக்கு கோப்பு திறந்து உள்ள
 #: ../daemon/gvfsbackenddav.c:2509 ../daemon/gvfsbackenddav.c:2620
 #: ../daemon/gvfsbackendftp.c:752 ../daemon/gvfsbackendftp.c:933
 #: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
-#: ../daemon/gvfsbackendsftp.c:4285 ../daemon/gvfsbackendsmb.c:2063
+#: ../daemon/gvfsbackendsftp.c:4285 ../daemon/gvfsbackendsmb.c:2081
 msgid "Target file already exists"
 msgstr "இலக்கில் கோப்பு ஏற்கனவே உள்ளது "
 
@@ -656,7 +657,7 @@ msgid "Can't recursively copy directory"
 msgstr "கோப்பினை நகர்த்த முடியாது"
 
 #: ../daemon/gvfsbackendafp.c:2106 ../daemon/gvfsbackendsftp.c:4271
-#: ../daemon/gvfsbackendsmb.c:2052
+#: ../daemon/gvfsbackendsmb.c:2070
 msgid "Can't move directory over directory"
 msgstr "அடைவை ஒன்றின் மேல் ஒன்றாக நகர்த்த முடியவில்லை"
 
@@ -720,39 +721,39 @@ msgstr "இலக்கு ஒரு அடைவு இல்லை"
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "தவறான அளவுரு வகை (uint32 எதிர்ப்பார்க்கப்பட்டது)"
 
-#: ../daemon/gvfsbackendafp.c:4087
+#: ../daemon/gvfsbackendafp.c:4093
 msgid "Command not supported"
 msgstr "கட்டளைக்கு ஆதரவில்லை"
 
-#: ../daemon/gvfsbackendafp.c:4091
+#: ../daemon/gvfsbackendafp.c:4097
 msgid "User's password has expired"
 msgstr "பயனர் கடவுச்சொல் காலாவதியானது."
 
-#: ../daemon/gvfsbackendafp.c:4095
+#: ../daemon/gvfsbackendafp.c:4101
 msgid "User's password needs to be changed"
 msgstr "பயனர் கடவுச்சொல்லை மாற்ற வேண்டும்"
 
-#: ../daemon/gvfsbackendafp.c:4105
+#: ../daemon/gvfsbackendafp.c:4111
 #, c-format
 msgid "FPGetUserInfo failed (%s)"
 msgstr "FPGetUserInfo தோல்வியடைந்தது  (%s)"
 
-#: ../daemon/gvfsbackendafp.c:4234
+#: ../daemon/gvfsbackendafp.c:4250
 #, c-format
 msgid "AFP volume %s for %s on %s"
 msgstr "ஏஈபி தொகுதி %s, %s க்கு %s  இல்"
 
-#: ../daemon/gvfsbackendafp.c:4238
+#: ../daemon/gvfsbackendafp.c:4254
 #, c-format
 msgid "AFP volume %s on %s"
 msgstr "ஏஈபி தொகுதி %s  %s  இல்"
 
-#: ../daemon/gvfsbackendafp.c:4256
+#: ../daemon/gvfsbackendafp.c:4272
 #, c-format
 msgid "Couldn't mount AFP volume %s on %s"
 msgstr "ஏஈபி தொகுதி %s  %s  இல் ஏற்றமுடியவில்லை"
 
-#: ../daemon/gvfsbackendafp.c:4287
+#: ../daemon/gvfsbackendafp.c:4303
 msgid "No volume specified"
 msgstr "எந்த தொகுதியும் குறிப்பிடப்படவில்லை"
 
@@ -1057,7 +1058,7 @@ msgid "Could not create request"
 msgstr "கோரிக்கையை உருவாக்க முடியவில்லை"
 
 #: ../daemon/gvfsbackenddav.c:2360 ../daemon/gvfsbackendsmb.c:1184
-#: ../daemon/gvfsbackendsmb.c:2080
+#: ../daemon/gvfsbackendsmb.c:2098
 msgid "Backup file creation failed"
 msgstr "பின்சேமிப்பு கோப்பினை உருவாக்க முடியவில்லை"
 
@@ -1351,7 +1352,7 @@ msgstr "சாதனத்துக்கு தொடர்பு அற்ற�
 msgid "Device requires a software update"
 msgstr "சாதனத்துக்கு மென்பொருள் இற்றைப்படுத்தல் அவசியம்."
 
-#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1954
+#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1972
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "கோப்பு அழித்தலில் பிழை: %s"
@@ -1567,21 +1568,25 @@ msgstr "பின்சேமிப்பு கோப்பினை உரு�
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "தவறான அளவுரு வகை (uint64 எதிர்பார்க்கப்பட்டது)"
 
-#: ../daemon/gvfsbackendsmb.c:2028
+#: ../daemon/gvfsbackendsmb.c:1921
+msgid "Can't rename file, filename already exists"
+msgstr "கோப்பை மறுபெயரிட முடியாது; இந்த பெயரில் கோப்பு ஏற்கனவே உள்ளது "
+
+#: ../daemon/gvfsbackendsmb.c:2046
 #, c-format
 msgid "Error moving file: %s"
 msgstr "கோப்பு நகர்த்துவதில் பிழை: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2100
+#: ../daemon/gvfsbackendsmb.c:2118
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "இலக்கு கோப்பினை நீக்க முடியவில்லை: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2124
+#: ../daemon/gvfsbackendsmb.c:2142
 msgid "Can't recursively move directory"
 msgstr "அடைவை நகர்த்த முடியவில்லை"
 
-#: ../daemon/gvfsbackendsmb.c:2168
+#: ../daemon/gvfsbackendsmb.c:2186
 msgid "Windows Shares Filesystem Service"
 msgstr "விண்டோஸ் பங்கீடு கோப்பு முறைமை சேவை"
 
@@ -1691,28 +1696,30 @@ msgstr "பழைய டீமானை மாற்றவும்."
 msgid "Don't start fuse."
 msgstr "fuse ஐ துவக்க வேண்டாம்."
 
-#: ../daemon/main.c:58
+#: ../daemon/main.c:62
 msgid "GVFS Daemon"
 msgstr "GVFS டீமான்"
 
-#: ../daemon/main.c:61
+#: ../daemon/main.c:65
 msgid "Main daemon for GVFS"
 msgstr "GVFSக்கான முக்கியமான டீமான்"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:76 ../metadata/meta-daemon.c:718
+#: ../daemon/main.c:80 ../metadata/meta-daemon.c:718
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
+#: ../daemon/main.c:82 ../metadata/meta-daemon.c:720
 #: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
 #: ../programs/gvfs-copy.c:123 ../programs/gvfs-info.c:371
-#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:60
-#: ../programs/gvfs-move.c:111 ../programs/gvfs-open.c:141
-#: ../programs/gvfs-open.c:154 ../programs/gvfs-save.c:165
-#: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
+#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mime.c:87
+#: ../programs/gvfs-mime.c:98 ../programs/gvfs-mime.c:106
+#: ../programs/gvfs-mkdir.c:60 ../programs/gvfs-move.c:111
+#: ../programs/gvfs-open.c:141 ../programs/gvfs-open.c:154
+#: ../programs/gvfs-save.c:165 ../programs/gvfs-set-attribute.c:128
+#: ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "மேலும் தகவலுக்கு \"%s --help\"ஐ முயற்சிக்கவும்."
@@ -2233,9 +2240,10 @@ msgstr ""
 
 #: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:121
 #: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
-#: ../programs/gvfs-mkdir.c:58 ../programs/gvfs-move.c:109
-#: ../programs/gvfs-open.c:139 ../programs/gvfs-save.c:163
-#: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
+#: ../programs/gvfs-mime.c:84 ../programs/gvfs-mkdir.c:58
+#: ../programs/gvfs-move.c:109 ../programs/gvfs-open.c:139
+#: ../programs/gvfs-save.c:163 ../programs/gvfs-set-attribute.c:126
+#: ../programs/gvfs-tree.c:249
 #, c-format
 msgid "Error parsing commandline options: %s\n"
 msgstr "பிழைப் பகுக்கும் கட்டளைக்கோடு விருப்பங்கள்: %s\n"
@@ -2435,6 +2443,57 @@ msgstr "பிழை: %s\n"
 #: ../programs/gvfs-ls.c:383
 msgid "- list files at <location>"
 msgstr "-கோப்புகளை இதில் பட்டியலிடு <location>"
+
+#: ../programs/gvfs-mime.c:36
+msgid "Query handler for mime-type"
+msgstr "மைம் வகைக்கு விசாரணை கையாளர் "
+
+#: ../programs/gvfs-mime.c:37
+msgid "Set handler for mime-type"
+msgstr "மைம் வகைக்கு செட் கையாளர் "
+
+#: ../programs/gvfs-mime.c:76
+msgid "- get/set handler for <mimetype>"
+msgstr "- get/set <mimetype>  க்கு செட் கையாளர்"
+
+#: ../programs/gvfs-mime.c:85
+msgid "Specify one of --query and --set"
+msgstr "--query அலல்து  --set ஐ குறிப்பிடவும்."
+
+#: ../programs/gvfs-mime.c:97
+#, c-format
+msgid "Must specify a single mime-type.\n"
+msgstr "ஒரு மைம் வகையை குறிப்பிட வேண்டும்.\n"
+
+#: ../programs/gvfs-mime.c:105
+#, c-format
+msgid "Must specify the mime-type followed by the default handler.\n"
+msgstr "மைம் வகையும் தொடர்ந்து முன்னிருப்பு கையாளரையும்  குறிப்பிட வேண்டும்\n"
+
+#: ../programs/gvfs-mime.c:121
+#, c-format
+msgid "No default applications for '%s'\n"
+msgstr "'%s' க்கு முன்னிருப்பு பயன்பாடுகள் இல்லை \n"
+
+#: ../programs/gvfs-mime.c:127
+#, c-format
+msgid "Default application for '%s': %s\n"
+msgstr "'%s' க்கு முன்னிருப்பு பயன்பாடு: %s\n"
+
+#: ../programs/gvfs-mime.c:132
+#, c-format
+msgid "Registered applications:\n"
+msgstr "பதிவு செய்த பயன்பாடுகள்:\n"
+
+#: ../programs/gvfs-mime.c:152
+#, c-format
+msgid "Failed to load info for handler '%s'\n"
+msgstr " '%s' க்கு தகவல் கையாளரை ஏற்ற முடியவில்லை \n"
+
+#: ../programs/gvfs-mime.c:158
+#, c-format
+msgid "Failed to set '%s' as the default handler for '%s': %s\n"
+msgstr " '%s' ஐ  '%s' க்கு முன்னிருப்பு கையாளராக அமைக்க முடியவில்லை: %s\n"
 
 #: ../programs/gvfs-mkdir.c:33
 msgid "create parent directories"
