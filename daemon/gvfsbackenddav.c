@@ -495,6 +495,7 @@ g_vfs_backend_dav_setup_display_name (GVfsBackend *backend)
 				    port);
 
   g_vfs_backend_set_display_name (backend, display_name);
+  g_free (display_name);
 }
 
 static guint
