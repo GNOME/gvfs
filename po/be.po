@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-09-02 21:58+0300\n"
-"PO-Revision-Date: 2011-09-02 21:59+0300\n"
+"POT-Creation-Date: 2011-09-04 19:09+0300\n"
+"PO-Revision-Date: 2011-09-04 19:11+0300\n"
 "Last-Translator: Ігар Грачышка <ihar.hrachyshka@gmail.com>\n"
 "Language-Team: Belarusian <i18n-bel-gnome@googlegroups.com>\n"
 "Language: be\n"
@@ -460,7 +460,7 @@ msgstr ""
 #: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:718
 #: ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
-msgstr "Не ўдалося адчыніць каталог"
+msgstr "Не ўдалося адкрыць каталог"
 
 #: ../daemon/gvfsbackendafc.c:928 ../daemon/gvfsbackendafpbrowse.c:257
 #: ../daemon/gvfsbackendafpbrowse.c:390 ../daemon/gvfsbackendafpbrowse.c:422
@@ -538,7 +538,7 @@ msgstr "Файл з'яўляецца каталогам"
 
 #: ../daemon/gvfsbackendafp.c:475
 msgid "Too many files open"
-msgstr "Надта шмат адчыненых файлаў"
+msgstr "Надта шмат адкрытых файлаў"
 
 #: ../daemon/gvfsbackendafp.c:1053 ../daemon/gvfsbackendafp.c:1589
 #: ../daemon/gvfsbackendafp.c:2350 ../daemon/gvfsbackendafp.c:2505
@@ -548,7 +548,7 @@ msgstr "На дыскавым томе не стае вольнай прасто
 
 #: ../daemon/gvfsbackendafp.c:1057 ../daemon/gvfsbackendafp.c:1207
 msgid "Target file is open"
-msgstr "Мэтавы файл адчынены"
+msgstr "Мэтавы файл адкрыты"
 
 #: ../daemon/gvfsbackendafp.c:1061 ../daemon/gvfsbackendafp.c:1464
 #: ../daemon/gvfsbackendafp.c:1593 ../daemon/gvfsbackendafp.c:1919
@@ -614,7 +614,7 @@ msgstr "Сервер не падтрымліваю аперацыю FPCopyFile"
 
 #: ../daemon/gvfsbackendafp.c:1585
 msgid "Couldn't open source file as Read/DenyWrite"
-msgstr "Не ўдалося адчыніць арыгінальны файл у рэжыме чытання (Read/DenyWrite)"
+msgstr "Не ўдалося адкрыць арыгінальны файл у рэжыме чытання (Read/DenyWrite)"
 
 #: ../daemon/gvfsbackendafp.c:1597
 msgid "Source file and/or destination directory doesn't exist"
@@ -668,11 +668,11 @@ msgstr "Мэтавы каталог ужо існуе"
 
 #: ../daemon/gvfsbackendafp.c:2501
 msgid "File is not open for write access"
-msgstr "Файл не адчынены для запісу"
+msgstr "Файл не адкрыты для запісу"
 
 #: ../daemon/gvfsbackendafp.c:2742
 msgid "File is not open for read access"
-msgstr "Файл не адчынены для чытання"
+msgstr "Файл не адкрыты для чытання"
 
 #: ../daemon/gvfsbackendafp.c:2973
 msgid "Range lock conflict exists"
@@ -897,9 +897,9 @@ msgstr "Гукавы дыск"
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
-msgstr[0] "Файлавая сістэма занятая: %d файл адчынены"
-msgstr[1] "Файлавая сістэма занятая: %d файлы адчыненыя"
-msgstr[2] "Файлавая сістэма занятая: %d файлаў адчыненыя"
+msgstr[0] "Файлавая сістэма занятая: %d файл адкрыты"
+msgstr[1] "Файлавая сістэма занятая: %d файлы адкрытыя"
+msgstr[2] "Файлавая сістэма занятая: %d файлаў адкрытыя"
 
 #: ../daemon/gvfsbackendcdda.c:696
 #, c-format
@@ -941,7 +941,7 @@ msgstr "Файлавая сістэма"
 
 #: ../daemon/gvfsbackendcomputer.c:649
 msgid "Can't open mountable file"
-msgstr "Не ўдалося адчыніць мацавальны файл"
+msgstr "Не ўдалося адкрыць мацавальны файл"
 
 #: ../daemon/gvfsbackendcomputer.c:840 ../daemon/gvfsbackendsftp.c:1163
 #, c-format
@@ -1634,17 +1634,17 @@ msgstr "Конты не абслугоўваюцца"
 
 #: ../daemon/gvfsftptask.c:360
 msgid "Host closed connection"
-msgstr "Машына зачыніла злучэнне"
+msgstr "Машына закрыла злучэнне"
 
 #: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
-"Не ўдалося адчыніць злучэнне для даных. Магчыма, гэтую аперацыю забараніў "
-"ваш фаервол?"
+"Не ўдалося адкрыць злучэнне для даных. Магчыма, гэтую аперацыю забараніў "
+"ваш брандмаўэр?"
 
 #: ../daemon/gvfsftptask.c:368
 msgid "Data connection closed"
-msgstr "Злучэнне для даных зачынена"
+msgstr "Злучэнне для даных закрыта"
 
 #: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
 msgid "Operation failed"
@@ -2174,7 +2174,7 @@ msgstr "адрасы"
 #: ../programs/gvfs-cat.c:57
 #, c-format
 msgid "%s: %s: error opening file: %s\n"
-msgstr "%s: %s: памылка адчынення файла: %s\n"
+msgstr "%s: %s: памылка адкрыцця файла: %s\n"
 
 #. Translators: the first %s is the program name, the
 #. second one is the URI of the file.
@@ -2195,7 +2195,7 @@ msgstr "%s: %s: памылка чытання: %s\n"
 #: ../programs/gvfs-cat.c:110
 #, c-format
 msgid "%s: %s:error closing: %s\n"
-msgstr "%s: %s: памылка зачынення: %s\n"
+msgstr "%s: %s: памылка закрыцця: %s\n"
 
 #: ../programs/gvfs-cat.c:136
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
@@ -2578,7 +2578,7 @@ msgstr "файлы"
 #: ../programs/gvfs-open.c:65
 #, c-format
 msgid "%s: %s: error opening location: %s\n"
-msgstr "%s: %s: памылка адчынення адрасу: %s\n"
+msgstr "%s: %s: памылка адкрыцця адрасу: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -2589,7 +2589,7 @@ msgstr "%s: %s: памылка запуску праграмы: %s\n"
 
 #: ../programs/gvfs-open.c:123
 msgid "FILES... - open FILES with registered application."
-msgstr "ФАЙЛЫ... - адчыніць ФАЙЛЫ з дапамогай зарэгістраванай праграмы."
+msgstr "ФАЙЛЫ... - адкрыць ФАЙЛЫ з дапамогай зарэгістраванай праграмы."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -2598,7 +2598,7 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr ""
-"Адчыняе файл(ы) з дапамогай прадвызначанай праграмы, зарэгістраванай для "
+"Адкрывае файл(ы) з дапамогай прадвызначанай праграмы, зарэгістраванай для "
 "апрацавання файлаў адпаведнага тыпу."
 
 #: ../programs/gvfs-rename.c:50
@@ -2647,7 +2647,7 @@ msgstr "\"Etag\" перапісанага файла"
 #: ../programs/gvfs-save.c:76
 #, c-format
 msgid "Error opening file: %s\n"
-msgstr "Памылка адчынення файла: %s\n"
+msgstr "Памылка адкрыцця файла: %s\n"
 
 #: ../programs/gvfs-save.c:109
 msgid "Error reading stdin"
@@ -2656,7 +2656,7 @@ msgstr "Памылка чытання са стандартнага ўваход
 #: ../programs/gvfs-save.c:122
 #, c-format
 msgid "Error closing: %s\n"
-msgstr "Памылка зачынення: %s\n"
+msgstr "Памылка закрыцця: %s\n"
 
 #: ../programs/gvfs-save.c:134
 #, c-format
