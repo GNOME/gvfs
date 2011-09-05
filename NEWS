@@ -1,3 +1,10 @@
+Major changes in 1.9.5
+======================
+* gdu: Don't ignore fstab mounts belonging to crypto volumes
+* smb: Always check for existing file on rename
+* dav: Fix small memory leak (display_name)
+* Translation updates
+
 Major changes in 1.9.4
 ======================
 * Brand new AFP backend written by Carl-Anton Ingmarsson
