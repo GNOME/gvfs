@@ -1528,8 +1528,9 @@ set_info_from_stat (GVfsBackendSmb *backend,
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_INODE, statbuf->st_ino);
 
   /* If file is dos-readonly, libsmbclient doesn't set S_IWUSR, we use this to
-     trigger ACCESS_WRITE = FALSE: */
-  if (!(statbuf->st_mode & S_IWUSR))
+     trigger ACCESS_WRITE = FALSE. Only set for regular files, see
+     https://bugzilla.gnome.org/show_bug.cgi?id=598206   */
+  if (!(statbuf->st_mode & S_IWUSR) && S_ISREG (statbuf->st_mode))
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
 
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, statbuf->st_atime);
