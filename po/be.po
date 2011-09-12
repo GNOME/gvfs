@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-09-04 19:09+0300\n"
-"PO-Revision-Date: 2011-09-04 19:11+0300\n"
+"POT-Creation-Date: 2011-09-12 12:42+0300\n"
+"PO-Revision-Date: 2011-09-12 12:42+0300\n"
 "Last-Translator: Ігар Грачышка <ihar.hrachyshka@gmail.com>\n"
 "Language-Team: Belarusian <i18n-bel-gnome@googlegroups.com>\n"
 "Language: be\n"
@@ -487,7 +487,7 @@ msgstr "Хібны тып пераносу файлавага курсора"
 #: ../daemon/gvfsbackendafc.c:2299 ../daemon/gvfsbackendafp.c:3809
 #: ../daemon/gvfsbackendftp.c:1087 ../daemon/gvfsbackendftp.c:1135
 #: ../daemon/gvfsbackendftp.c:1156 ../daemon/gvfsbackendsftp.c:1832
-#: ../daemon/gvfsbackendsftp.c:4633 ../daemon/gvfsbackendsmb.c:1718
+#: ../daemon/gvfsbackendsftp.c:4633 ../daemon/gvfsbackendsmb.c:1719
 #: ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
 msgstr "Аперацыя не падтрымліваецца"
@@ -556,7 +556,7 @@ msgstr "Мэтавы файл адкрыты"
 #: ../daemon/gvfsbackenddav.c:2510 ../daemon/gvfsbackenddav.c:2621
 #: ../daemon/gvfsbackendftp.c:752 ../daemon/gvfsbackendftp.c:933
 #: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
-#: ../daemon/gvfsbackendsftp.c:4285 ../daemon/gvfsbackendsmb.c:2081
+#: ../daemon/gvfsbackendsftp.c:4285 ../daemon/gvfsbackendsmb.c:2082
 msgid "Target file already exists"
 msgstr "Мэтавы файл ужо існуе"
 
@@ -642,7 +642,7 @@ msgid "Can't recursively copy directory"
 msgstr "Немагчыма рэкурсіўна скапіраваць каталог"
 
 #: ../daemon/gvfsbackendafp.c:2106 ../daemon/gvfsbackendsftp.c:4271
-#: ../daemon/gvfsbackendsmb.c:2070
+#: ../daemon/gvfsbackendsmb.c:2071
 msgid "Can't move directory over directory"
 msgstr "Немагчыма перамясціць каталог на месца іншага каталога"
 
@@ -1044,7 +1044,7 @@ msgid "Could not create request"
 msgstr "Не ўдалося стварыць запыт"
 
 #: ../daemon/gvfsbackenddav.c:2361 ../daemon/gvfsbackendsmb.c:1184
-#: ../daemon/gvfsbackendsmb.c:2098
+#: ../daemon/gvfsbackendsmb.c:2099
 msgid "Backup file creation failed"
 msgstr "Не ўдалося стварыць запасную копію файла"
 
@@ -1343,7 +1343,7 @@ msgstr "Злучэнне з прыстасаваннем страчана"
 msgid "Device requires a software update"
 msgstr "Прыстасаванне патрабуе абнаўлення апраграмавання"
 
-#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1972
+#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1973
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Памылка сцірання файла: %s"
@@ -1550,29 +1550,29 @@ msgstr "Гэты тып пераносу файлавага курсора не 
 msgid "Backup file creation failed: %s"
 msgstr "Не ўдалося стварыць запасную копію файла: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1733
+#: ../daemon/gvfsbackendsmb.c:1734
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Хібны тып атрыбута (чакаўся uint64)"
 
-#: ../daemon/gvfsbackendsmb.c:1921
+#: ../daemon/gvfsbackendsmb.c:1922
 msgid "Can't rename file, filename already exists"
 msgstr "Не ўдалося пераназваць файл, бо файл з такой назвай ужо існуе"
 
-#: ../daemon/gvfsbackendsmb.c:2046
+#: ../daemon/gvfsbackendsmb.c:2047
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Памылка перамяшчэння файла: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2118
+#: ../daemon/gvfsbackendsmb.c:2119
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Памылка выдалення мэтавага файла: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2142
+#: ../daemon/gvfsbackendsmb.c:2143
 msgid "Can't recursively move directory"
 msgstr "Не ўдалося рэкурсіўна перамясціць каталог"
 
-#: ../daemon/gvfsbackendsmb.c:2186
+#: ../daemon/gvfsbackendsmb.c:2187
 msgid "Windows Shares Filesystem Service"
 msgstr "Файлавая служба супольных Windows-рэсурсаў"
 
@@ -1639,8 +1639,8 @@ msgstr "Машына закрыла злучэнне"
 #: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
-"Не ўдалося адкрыць злучэнне для даных. Магчыма, гэтую аперацыю забараніў "
-"ваш брандмаўэр?"
+"Не ўдалося адкрыць злучэнне для даных. Магчыма, гэтую аперацыю забараніў ваш "
+"брандмаўэр?"
 
 #: ../daemon/gvfsftptask.c:368
 msgid "Data connection closed"
@@ -2069,7 +2069,7 @@ msgstr "Прывод %s"
 
 #: ../monitor/hal/ghaldrive.c:185
 msgid "Software RAID Drive"
-msgstr "Прывод праграмнага RAID-масіва"
+msgstr "Прывод праграмнага RAID-масіву"
 
 #: ../monitor/hal/ghaldrive.c:187
 msgid "USB Drive"
