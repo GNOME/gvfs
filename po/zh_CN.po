@@ -6,69 +6,70 @@
 # FujianWZH <fujianwzh@gmail.com>, 2009.
 # Tao Wei <weitao1979@gmail.com>, 2009.
 # Tao Wang <dancefire@gmail.com>, 2010.
+# YunQiang Su <wzssyqa@gmail.com>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-03-20 12:59+0000\n"
-"PO-Revision-Date: 2011-03-23 22:31+0800\n"
-"Last-Translator: liwei <lw124124@gmail.com>\n"
+"POT-Creation-Date: 2011-09-08 14:35+0000\n"
+"PO-Revision-Date: 2011-09-13 23:20+0800\n"
+"Last-Translator: YunQiang Su <wzssyqa@gmail.com>\n"
 "Language-Team: Chinese (simplified) <i18n-zh@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bits\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2376
+#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2400
 msgid "Operation not supported, files on different mounts"
 msgstr "文件在不同挂载点下，不支持此操作"
 
 #. Translators: %s is the name of a programming function
-#: ../client/gdaemonfile.c:868 ../client/gdaemonfile.c:902
-#: ../client/gdaemonfile.c:1017 ../client/gdaemonfile.c:1096
-#: ../client/gdaemonfile.c:1159 ../client/gdaemonfile.c:1222
-#: ../client/gdaemonfile.c:1288 ../client/gdaemonfile.c:1350
-#: ../client/gdaemonfile.c:1367 ../client/gdaemonfile.c:1851
-#: ../client/gdaemonfile.c:1880 ../client/gdaemonfile.c:2036
-#: ../client/gdaemonfile.c:2536 ../client/gdaemonfile.c:2585
-#: ../client/gdaemonfile.c:2649 ../client/gdaemonfile.c:2733
-#: ../client/gdaemonfile.c:2808 ../client/gdaemonfile.c:2996
-#: ../client/gdaemonfile.c:3076 ../client/gvfsiconloadable.c:145
+#: ../client/gdaemonfile.c:876 ../client/gdaemonfile.c:911
+#: ../client/gdaemonfile.c:1027 ../client/gdaemonfile.c:1106
+#: ../client/gdaemonfile.c:1169 ../client/gdaemonfile.c:1232
+#: ../client/gdaemonfile.c:1298 ../client/gdaemonfile.c:1361
+#: ../client/gdaemonfile.c:1378 ../client/gdaemonfile.c:1867
+#: ../client/gdaemonfile.c:1897 ../client/gdaemonfile.c:2058
+#: ../client/gdaemonfile.c:2560 ../client/gdaemonfile.c:2609
+#: ../client/gdaemonfile.c:2674 ../client/gdaemonfile.c:2759
+#: ../client/gdaemonfile.c:2835 ../client/gdaemonfile.c:3024
+#: ../client/gdaemonfile.c:3105 ../client/gvfsiconloadable.c:145
 #: ../client/gvfsiconloadable.c:374
 #, c-format
 msgid "Invalid return value from %s"
 msgstr "%s 返回无效值"
 
-#: ../client/gdaemonfile.c:985 ../client/gvfsiconloadable.c:339
+#: ../client/gdaemonfile.c:994 ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
 msgstr "无法取得流文件描述符"
 
-#: ../client/gdaemonfile.c:1106 ../client/gdaemonfile.c:1169
-#: ../client/gdaemonfile.c:1232 ../client/gdaemonfile.c:1298
-#: ../client/gdaemonfile.c:2615 ../client/gvfsiconloadable.c:155
+#: ../client/gdaemonfile.c:1116 ../client/gdaemonfile.c:1179
+#: ../client/gdaemonfile.c:1242 ../client/gdaemonfile.c:1308
+#: ../client/gdaemonfile.c:2639 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "未曾取得流文件描述符"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1964
+#: ../client/gdaemonfile.c:1981
 msgid "Could not find enclosing mount"
 msgstr "找不到所属挂载点"
 
-#: ../client/gdaemonfile.c:1994
+#: ../client/gdaemonfile.c:2011
 #, c-format
 msgid "Invalid filename %s"
 msgstr "无效文件名%s"
 
-#: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1199
+#: ../client/gdaemonfile.c:2256 ../client/gdaemonvfs.c:1199
 #: ../client/gdaemonvfs.c:1334 ../client/gdaemonvfs.c:1387
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "设定文件元数据出错：%s"
 
-#: ../client/gdaemonfile.c:2233 ../client/gdaemonvfs.c:1388
+#: ../client/gdaemonfile.c:2257 ../client/gdaemonvfs.c:1388
 msgid "values must be string or list of strings"
 msgstr "值必须是字符串或字符串列表"
 
@@ -82,16 +83,16 @@ msgstr "值必须是字符串或字符串列表"
 #: ../client/gdaemonfileoutputstream.c:506
 #: ../client/gdaemonfileoutputstream.c:681
 #: ../client/gdaemonfileoutputstream.c:873
-#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1050
-#: ../daemon/gvfsbackendobexftp.c:1087 ../daemon/gvfsbackendobexftp.c:1108
-#: ../daemon/gvfsbackendobexftp.c:1227 ../daemon/gvfsbackendobexftp.c:1364
-#: ../daemon/gvfsbackendobexftp.c:1428 ../daemon/gvfsbackendobexftp.c:1630
-#: ../daemon/gvfsbackendobexftp.c:1737 ../daemon/gvfsbackendobexftp.c:1899
-#: ../daemon/gvfsbackendobexftp.c:1926 ../daemon/gvfsbackendobexftp.c:1985
-#: ../daemon/gvfsbackendobexftp.c:2007 ../daemon/gvfsbackendobexftp.c:2070
-#: ../daemon/gvfsbackendobexftp.c:2089 ../daemon/gvfsbackendsmb.c:1179
+#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1059
+#: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1106
+#: ../daemon/gvfsbackendobexftp.c:1225 ../daemon/gvfsbackendobexftp.c:1362
+#: ../daemon/gvfsbackendobexftp.c:1426 ../daemon/gvfsbackendobexftp.c:1628
+#: ../daemon/gvfsbackendobexftp.c:1735 ../daemon/gvfsbackendobexftp.c:1897
+#: ../daemon/gvfsbackendobexftp.c:1924 ../daemon/gvfsbackendobexftp.c:1983
+#: ../daemon/gvfsbackendobexftp.c:2005 ../daemon/gvfsbackendobexftp.c:2068
+#: ../daemon/gvfsbackendobexftp.c:2087 ../daemon/gvfsbackendsmb.c:1179
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1069
 #: ../monitor/proxy/gproxydrive.c:514 ../monitor/proxy/gproxydrive.c:602
 #: ../monitor/proxy/gproxydrive.c:750 ../monitor/proxy/gproxydrive.c:885
@@ -134,7 +135,7 @@ msgstr "获取挂载信息时出错：%s"
 msgid "Can't contact session bus"
 msgstr "无法联系会话总线"
 
-#: ../client/gvfsdaemondbus.c:572 ../client/gvfsdaemondbus.c:1004
+#: ../client/gvfsdaemondbus.c:572 ../client/gvfsdaemondbus.c:1013
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "连接守护进程出错：%s"
@@ -149,11 +150,11 @@ msgstr "建立套接字出错：%s"
 msgid "Error connecting to socket: %s"
 msgstr "连接套接字出错：%s"
 
-#: ../common/gvfsdaemonprotocol.c:522
+#: ../common/gvfsdaemonprotocol.c:518
 msgid "Invalid file info format"
 msgstr "无效的文件信息格式"
 
-#: ../common/gvfsdaemonprotocol.c:540
+#: ../common/gvfsdaemonprotocol.c:536
 msgid "Invalid attribute info list content"
 msgstr "属性信息列表内容无效"
 
@@ -189,8 +190,8 @@ msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
 msgstr ""
-"在“%3$s”域上解析“%1$s”服务“%2$s”时出错。一个或多个 TXT 记录丢失。要求密匙：“%"
-"4$s”"
+"在“%3$s”域上解析“%1$s”服务“%2$s”时出错。一个或多个 TXT 记录丢失。要求密"
+"匙：“%4$s”"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -217,165 +218,222 @@ msgstr "无法处理 GVfsIcon 编码版本 %d"
 msgid "Malformed input data for GVfsIcon"
 msgstr "GVfsIcon 的输入数据格式错误"
 
-#: ../daemon/daemon-main.c:76 ../daemon/daemon-main.c:230
+#: ../daemon/daemon-main.c:82 ../daemon/daemon-main.c:237
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "连接 D-Bus 出错：%s"
 
 #. translators: This is the default daemon's application name,
-#. * the %s is the type of the backend, like "ftp"
-#: ../daemon/daemon-main.c:91
+#. * the %s is the type of the backend, like "FTP"
+#: ../daemon/daemon-main.c:97
 #, c-format
 msgid "%s Filesystem Service"
 msgstr "%s 文件系统服务"
 
-#: ../daemon/daemon-main.c:110 ../programs/gvfs-copy.c:90
+#: ../daemon/daemon-main.c:116 ../programs/gvfs-copy.c:90
 #: ../programs/gvfs-move.c:78
 #, c-format
 msgid "Error: %s"
 msgstr "错误：%s"
 
-#: ../daemon/daemon-main.c:155
+#: ../daemon/daemon-main.c:162
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "用法：%s --spawner dbus-id 对象路径"
 
-#: ../daemon/daemon-main.c:179 ../daemon/daemon-main.c:197
+#: ../daemon/daemon-main.c:186 ../daemon/daemon-main.c:204
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "用法：%s key=value key=value ..."
 
-#: ../daemon/daemon-main.c:195
+#: ../daemon/daemon-main.c:202
 #, c-format
 msgid "No mount type specified"
 msgstr "未指定挂载类型"
 
-#: ../daemon/daemon-main.c:265
+#: ../daemon/daemon-main.c:272
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "%s 的挂载点已在运行"
 
-#: ../daemon/daemon-main.c:276
+#: ../daemon/daemon-main.c:283
 msgid "error starting mount daemon"
 msgstr "启动挂载守护进程失败"
 
-#: ../daemon/gvfsbackend.c:933 ../monitor/gdu/ggdumount.c:921
-msgid "Unmount Anyway"
-msgstr "无论如何卸载"
+#: ../daemon/gvfsafpconnection.c:1305 ../daemon/gvfsafpconnection.c:1332
+msgid "Got EOS"
+msgstr "收到 EOS"
 
-#: ../daemon/gvfsbackend.c:934 ../daemon/gvfsbackendafc.c:388
-#: ../monitor/gdu/ggdudrive.c:1022 ../monitor/gdu/ggdumount.c:922
-msgid "Cancel"
-msgstr "取消"
+#: ../daemon/gvfsafpserver.c:127
+msgid "Server doesn't support passwords longer than 256 characters"
+msgstr "服务器不支持长度超过 256 个字符的密码"
 
-#: ../daemon/gvfsbackend.c:936 ../monitor/gdu/ggdumount.c:923
+#: ../daemon/gvfsafpserver.c:155 ../daemon/gvfsafpserver.c:469
+msgid "An invalid username was provided"
+msgstr "提供了无效的用户名"
+
+#: ../daemon/gvfsafpserver.c:334 ../daemon/gvfsafpserver.c:563
+#, c-format
+msgid "AFP server %s declined the submitted password"
+msgstr "AFP 服务器 %s 驳回了提交的密码"
+
+#: ../daemon/gvfsafpserver.c:365 ../daemon/gvfsafpserver.c:585
+#, c-format
+msgid "Login to AFP server %s failed"
+msgstr "登录 AFP 服务器 %s 失败"
+
+#: ../daemon/gvfsafpserver.c:414
+msgid "Server doesn't support passwords longer than 64 characters"
+msgstr "服务器不支持长度超过 64 个字符的密码"
+
+#: ../daemon/gvfsafpserver.c:610 ../daemon/gvfsafpserver.c:639
+#, c-format
+msgid "AFP server %s doesn't support anonymous login"
+msgstr "AFP 服务器 %s 不支持匿名登录"
+
+#: ../daemon/gvfsafpserver.c:645
+#, c-format
+msgid "Anonymous login to AFP server %s failed, got error code: %d"
+msgstr "匿名登录 AFP 服务器 %s 失败，收到错误码：%d"
+
+#: ../daemon/gvfsafpserver.c:669
+#, c-format
 msgid ""
-"Volume is busy\n"
-"One or more applications are keeping the volume busy."
-msgstr ""
-"卷被占用\n"
-"一个或更多应用程序正在占用卷。"
+"Login to AFP server %s failed (no suitable authentication mechanism found)"
+msgstr "登录 AFP 服务器 %s 失败(没有找到合适的认证机制)"
+
+#: ../daemon/gvfsafpserver.c:740
+#, c-format
+msgid "Failed to connect to server (%s)"
+msgstr "连接服务器失败(%s)"
+
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsafpserver.c:830
+#, c-format
+msgid "Enter password for afp as %s on %s"
+msgstr "输入用户 %s 在 %s 上的 afp 密码"
+
+#. translators: %s here is the hostname
+#: ../daemon/gvfsafpserver.c:833
+#, c-format
+msgid "Enter password for afp on %s"
+msgstr "请输入 %s 上 atp 的密码"
+
+#: ../daemon/gvfsafpserver.c:865 ../daemon/gvfsbackendftp.c:518
+#: ../daemon/gvfsbackendsftp.c:985 ../daemon/gvfsbackendsmbbrowse.c:995
+#: ../daemon/gvfsbackendsmb.c:619
+msgid "Password dialog cancelled"
+msgstr "密码对话框被取消"
 
 #: ../daemon/gvfsbackendafc.c:212
 msgid "Internal Apple File Control error"
 msgstr "内部的苹果文件控制(AFC)错误"
 
-#: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:729
+#: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:736
 msgid "File does not exist"
 msgstr "文件不存在"
 
-#: ../daemon/gvfsbackendafc.c:219
+#: ../daemon/gvfsbackendafc.c:220
 msgid "The directory is not empty"
 msgstr "这个目录不是空的"
 
-#: ../daemon/gvfsbackendafc.c:223
+#: ../daemon/gvfsbackendafc.c:224
 msgid "The device did not respond"
 msgstr "这个设备没有响应"
 
-#: ../daemon/gvfsbackendafc.c:227
+#: ../daemon/gvfsbackendafc.c:228
 msgid "The connection was interrupted"
 msgstr "连接被中断"
 
-#: ../daemon/gvfsbackendafc.c:231
+#: ../daemon/gvfsbackendafc.c:232
 msgid "Invalid Apple File Control data received"
 msgstr "收到了无效的苹果文件控制数据"
 
-#: ../daemon/gvfsbackendafc.c:235
+#: ../daemon/gvfsbackendafc.c:236
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "未处理的苹果文件控制(AFC)错误(%d)"
 
-#: ../daemon/gvfsbackendafc.c:254
-#, fuzzy, c-format
-msgid "Unhandled inst proxy error (%d)"
-msgstr "未处理的研究代理错误(%d)"
+#: ../daemon/gvfsbackendafc.c:252
+msgid "Listing applications installed on device failed"
+msgstr "列出设备上安装的应用失败"
 
-#: ../daemon/gvfsbackendafc.c:273
-#, c-format
-msgid "Unhandled SBServices proxy error (%d)"
-msgstr "未处理的 SBServices 代理错误(%d)"
+#: ../daemon/gvfsbackendafc.c:268
+msgid "Accessing application icons on device failed"
+msgstr "访问设备上的应用图标失败"
 
-#: ../daemon/gvfsbackendafc.c:290
+#: ../daemon/gvfsbackendafc.c:285
 msgid "Lockdown Error: Invalid Argument"
 msgstr "锁定错误：无效的参数"
 
-#: ../daemon/gvfsbackendafc.c:294 ../daemon/gvfsbackendsftp.c:310
+#: ../daemon/gvfsbackendafc.c:289 ../daemon/gvfsbackendafp.c:463
+#: ../daemon/gvfsbackendafp.c:1049 ../daemon/gvfsbackendafp.c:1203
+#: ../daemon/gvfsbackendafp.c:1448 ../daemon/gvfsbackendafp.c:1577
+#: ../daemon/gvfsbackendafp.c:1704 ../daemon/gvfsbackendafp.c:2210
+#: ../daemon/gvfsbackendafp.c:2346 ../daemon/gvfsbackendafp.c:2865
+#: ../daemon/gvfsbackendafp.c:2965 ../daemon/gvfsbackendafp.c:3535
+#: ../daemon/gvfsbackendafp.c:4089 ../daemon/gvfsbackendsftp.c:310
 #: ../daemon/gvfsbackendsftp.c:1834 ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "权限不足"
 
-#: ../daemon/gvfsbackendafc.c:297
+#: ../daemon/gvfsbackendafc.c:293
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "未处理的锁定错误(%d)"
 
-#: ../daemon/gvfsbackendafc.c:314
+#: ../daemon/gvfsbackendafc.c:310
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "libimobiledevice 错误：无效参数"
 
-#: ../daemon/gvfsbackendafc.c:318
+#: ../daemon/gvfsbackendafc.c:314
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
 msgstr "libimobiledevice 错误：没有发现设备。请确认 usbmuxd 已经设置好了。"
 
-#: ../daemon/gvfsbackendafc.c:321
+#: ../daemon/gvfsbackendafc.c:318
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "未处理的 libimobiledevice 错误(%d)"
 
-#: ../daemon/gvfsbackendafc.c:388
+#: ../daemon/gvfsbackendafc.c:385 ../daemon/gvfsbackend.c:963
+#: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:922
+msgid "Cancel"
+msgstr "取消"
+
+#: ../daemon/gvfsbackendafc.c:385
 msgid "Try again"
 msgstr "重试"
 
-#: ../daemon/gvfsbackendafc.c:406 ../daemon/gvfsbackendarchive.c:550
-#: ../daemon/gvfsbackendarchive.c:579 ../daemon/gvfsbackenddav.c:1629
-#: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:863
-#: ../daemon/gvfsbackendobexftp.c:879 ../daemon/gvfsbackendobexftp.c:898
+#: ../daemon/gvfsbackendafc.c:403 ../daemon/gvfsbackendarchive.c:550
+#: ../daemon/gvfsbackendarchive.c:579 ../daemon/gvfsbackenddav.c:1797
+#: ../daemon/gvfsbackendhttp.c:302 ../daemon/gvfsbackendobexftp.c:861
+#: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendobexftp.c:896
 #: ../daemon/gvfsbackendsmb.c:662
 msgid "Invalid mount spec"
 msgstr "无效的挂载描述"
 
-#: ../daemon/gvfsbackendafc.c:412 ../daemon/gvfsbackendafc.c:443
+#: ../daemon/gvfsbackendafc.c:409 ../daemon/gvfsbackendafc.c:439
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "无效的 AFC 位置：必须是 afc://uuid:port-number 的形式。"
 
-#: ../daemon/gvfsbackendafc.c:428
+#: ../daemon/gvfsbackendafc.c:425
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "苹果移动设备"
 
-#: ../daemon/gvfsbackendafc.c:433
+#: ../daemon/gvfsbackendafc.c:430
 #, c-format
-msgid "Service %d on Apple Mobile Device"
-msgstr "苹果移动设备的服务 %d"
+msgid "Apple Mobile Device, Jailbroken"
+msgstr "苹果移动设备，已越狱"
 
-#: ../daemon/gvfsbackendafc.c:439
+#: ../daemon/gvfsbackendafc.c:435
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "苹果移动设备上的文件"
 
-#: ../daemon/gvfsbackendafc.c:497
+#: ../daemon/gvfsbackendafc.c:493
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (越狱)"
@@ -383,7 +441,7 @@ msgstr "%s (越狱)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:504 ../monitor/afc/afcvolume.c:125
+#: ../daemon/gvfsbackendafc.c:500 ../monitor/afc/afcvolume.c:125
 #, c-format
 msgid "Documents on %s"
 msgstr "%s 上的文档"
@@ -391,62 +449,313 @@ msgstr "%s 上的文档"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:583
+#: ../daemon/gvfsbackendafc.c:579
 #, c-format
 msgid ""
 "Device '%s' is password protected. Enter the password on the device and "
 "click 'Try again'."
 msgstr "设备“%s”是被密码保护的。请输入设备上的密码，然后点击“重试”。"
 
-#: ../daemon/gvfsbackendafc.c:922 ../daemon/gvfsbackendarchive.c:655
-#: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1886
-#: ../daemon/gvfsbackendobexftp.c:1073 ../daemon/gvfsbackendsmb.c:718
+#: ../daemon/gvfsbackendafc.c:918 ../daemon/gvfsbackendarchive.c:655
+#: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1812
+#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:718
 #: ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "无法打开目录"
 
-#: ../daemon/gvfsbackendafc.c:932 ../daemon/gvfsbackendarchive.c:647
+#: ../daemon/gvfsbackendafc.c:928 ../daemon/gvfsbackendafpbrowse.c:257
+#: ../daemon/gvfsbackendafpbrowse.c:390 ../daemon/gvfsbackendafpbrowse.c:422
+#: ../daemon/gvfsbackendafp.c:467 ../daemon/gvfsbackendafp.c:780
+#: ../daemon/gvfsbackendafp.c:2869 ../daemon/gvfsbackendarchive.c:647
 #: ../daemon/gvfsbackendarchive.c:695 ../daemon/gvfsbackendarchive.c:747
-#: ../daemon/gvfsbackendarchive.c:776 ../daemon/gvfsbackendcdda.c:986
-#: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:392
-#: ../daemon/gvfsbackendftp.c:1060 ../daemon/gvfsbackendnetwork.c:602
+#: ../daemon/gvfsbackendarchive.c:776 ../daemon/gvfsbackendcdda.c:987
+#: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:398
+#: ../daemon/gvfsbackendftp.c:1067 ../daemon/gvfsbackendnetwork.c:602
 #: ../daemon/gvfsbackendsmbbrowse.c:1094 ../daemon/gvfsbackendsmbbrowse.c:1161
 #: ../daemon/gvfsbackendsmbbrowse.c:1333 ../daemon/gvfsbackendsmbbrowse.c:1403
 #, c-format
 msgid "File doesn't exist"
 msgstr "文件不存在"
 
-#: ../daemon/gvfsbackendafc.c:1123 ../daemon/gvfsbackendafc.c:2458
+#: ../daemon/gvfsbackendafc.c:1119 ../daemon/gvfsbackendafc.c:2462
 msgid "Backups are not yet supported."
 msgstr "尚不支持备份。"
 
-#: ../daemon/gvfsbackendafc.c:1295
+#: ../daemon/gvfsbackendafc.c:1291
 msgid "Invalid seek type"
 msgstr "无效的搜索类型"
 
-#: ../daemon/gvfsbackendafc.c:2295 ../daemon/gvfsbackendftp.c:1080
-#: ../daemon/gvfsbackendftp.c:1128 ../daemon/gvfsbackendftp.c:1149
-#: ../daemon/gvfsbackendsftp.c:1832 ../daemon/gvfsbackendsftp.c:4633
-#: ../daemon/gvfsbackendsmb.c:1718 ../daemon/gvfsftptask.c:392
+#: ../daemon/gvfsbackendafc.c:2299 ../daemon/gvfsbackendafp.c:3809
+#: ../daemon/gvfsbackendftp.c:1087 ../daemon/gvfsbackendftp.c:1135
+#: ../daemon/gvfsbackendftp.c:1156 ../daemon/gvfsbackendsftp.c:1832
+#: ../daemon/gvfsbackendsftp.c:4633 ../daemon/gvfsbackendsmb.c:1719
+#: ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
 msgstr "不支持此操作"
 
+#: ../daemon/gvfsbackendafpbrowse.c:121 ../daemon/gvfsbackendafp.c:479
+#: ../daemon/gvfsbackendafp.c:600 ../daemon/gvfsbackendafp.c:681
+#: ../daemon/gvfsbackendafp.c:784 ../daemon/gvfsbackendafp.c:895
+#: ../daemon/gvfsbackendafp.c:1073 ../daemon/gvfsbackendafp.c:1227
+#: ../daemon/gvfsbackendafp.c:1323 ../daemon/gvfsbackendafp.c:1476
+#: ../daemon/gvfsbackendafp.c:1605 ../daemon/gvfsbackendafp.c:1716
+#: ../daemon/gvfsbackendafp.c:2234 ../daemon/gvfsbackendafp.c:2370
+#: ../daemon/gvfsbackendafp.c:2509 ../daemon/gvfsbackendafp.c:2746
+#: ../daemon/gvfsbackendafp.c:2877 ../daemon/gvfsbackendafp.c:2977
+#: ../daemon/gvfsbackendafp.c:3551 ../daemon/gvfsbackendafp.c:4106
+#, c-format
+msgid "Got error code: %d from server"
+msgstr "收到来自服务器的错误码：%d"
+
+#: ../daemon/gvfsbackendafpbrowse.c:285 ../daemon/gvfsbackendsmbbrowse.c:1089
+#: ../daemon/gvfsbackendsmbbrowse.c:1135
+msgid "The file is not a mountable"
+msgstr "此文件不可挂载"
+
+#: ../daemon/gvfsbackendafpbrowse.c:498
+#, c-format
+msgid "AFP shares for %s on %s"
+msgstr "%2$s 上 %1$s 的 AFP 共享"
+
+#: ../daemon/gvfsbackendafpbrowse.c:501
+#, c-format
+msgid "AFP shares on %s"
+msgstr "%s 上的 AFP 共享"
+
+#: ../daemon/gvfsbackendafpbrowse.c:534 ../daemon/gvfsbackendafp.c:4294
+#: ../daemon/gvfsbackendarchive.c:539 ../daemon/gvfsbackendftp.c:667
+#: ../daemon/gvfsbackendsftp.c:1745
+msgid "No hostname specified"
+msgstr "未指定主机名"
+
+#: ../daemon/gvfsbackendafpbrowse.c:602 ../daemon/gvfsbackendafp.c:4382
+msgid "Apple Filing Protocol Service"
+msgstr "苹果文件传送协议服务"
+
+#: ../daemon/gvfsbackendafp.c:471 ../daemon/gvfsbackendafp.c:518
+#: ../daemon/gvfsbackendafp.c:2873 ../daemon/gvfsbackendafp.c:3276
+msgid "File is a directory"
+msgstr "文件是目录"
+
+#: ../daemon/gvfsbackendafp.c:475
+msgid "Too many files open"
+msgstr "打开的文件过多"
+
+#: ../daemon/gvfsbackendafp.c:1053 ../daemon/gvfsbackendafp.c:1589
+#: ../daemon/gvfsbackendafp.c:2350 ../daemon/gvfsbackendafp.c:2505
+#: ../daemon/gvfsbackendafp.c:2969
+msgid "Not enough space on volume"
+msgstr "卷上空间不足"
+
+#: ../daemon/gvfsbackendafp.c:1057 ../daemon/gvfsbackendafp.c:1207
+msgid "Target file is open"
+msgstr "目标文件已打开"
+
+#: ../daemon/gvfsbackendafp.c:1061 ../daemon/gvfsbackendafp.c:1464
+#: ../daemon/gvfsbackendafp.c:1593 ../daemon/gvfsbackendafp.c:1919
+#: ../daemon/gvfsbackendafp.c:2116 ../daemon/gvfsbackenddav.c:2257
+#: ../daemon/gvfsbackenddav.c:2510 ../daemon/gvfsbackenddav.c:2621
+#: ../daemon/gvfsbackendftp.c:752 ../daemon/gvfsbackendftp.c:933
+#: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
+#: ../daemon/gvfsbackendsftp.c:4285 ../daemon/gvfsbackendsmb.c:2082
+msgid "Target file already exists"
+msgstr "目标文件已存在"
+
+#: ../daemon/gvfsbackendafp.c:1065 ../daemon/gvfsbackendafp.c:2358
+msgid "Ancestor directory doesn't exist"
+msgstr "上级目录不存在"
+
+#: ../daemon/gvfsbackendafp.c:1069 ../daemon/gvfsbackendafp.c:1223
+#: ../daemon/gvfsbackendafp.c:1712 ../daemon/gvfsbackendafp.c:2230
+#: ../daemon/gvfsbackendafp.c:2366
+msgid "Volume is read-only"
+msgstr "卷是只读的"
+
+#: ../daemon/gvfsbackendafp.c:1211 ../daemon/gvfsbackendburn.c:425
+#: ../daemon/gvfsbackenddav.c:2550 ../daemon/gvfsbackendsftp.c:1828
+msgid "Directory not empty"
+msgstr "目录非空"
+
+#: ../daemon/gvfsbackendafp.c:1215
+msgid "Target object is marked as DeleteInhibit"
+msgstr "目标对象被标记为禁止删除"
+
+#: ../daemon/gvfsbackendafp.c:1219 ../daemon/gvfsbackendafp.c:1708
+#: ../daemon/gvfsbackendafp.c:2226
+msgid "Target object doesn't exist"
+msgstr "目标对象不存在"
+
+#: ../daemon/gvfsbackendafp.c:1319
+msgid "ID not found"
+msgstr "找不到 ID"
+
+#: ../daemon/gvfsbackendafp.c:1452
+msgid "Can't move directory into one of it's descendants"
+msgstr "不能将目录移入其子目录"
+
+#: ../daemon/gvfsbackendafp.c:1456
+#, fuzzy
+#| msgid "Can't move directory over directory"
+msgid "Can't move sharepoint into a shared directory"
+msgstr "不能将 sharepoint 目录移入共享目录"
+
+#: ../daemon/gvfsbackendafp.c:1460
+msgid "Can't move a shared directory into the Trash"
+msgstr "不能将共享目录移入回收站"
+
+#: ../daemon/gvfsbackendafp.c:1468
+msgid "Object being moved is marked as RenameInhibit"
+msgstr "所移动的对象被标记为禁止重命名"
+
+#: ../daemon/gvfsbackendafp.c:1472
+msgid "Object being moved doesn't exist"
+msgstr "所移动的对象不存在"
+
+#: ../daemon/gvfsbackendafp.c:1581
+msgid "Server doesn't support the FPCopyFile operation"
+msgstr "服务器不支持 FPCopyFile 操作"
+
+#: ../daemon/gvfsbackendafp.c:1585
+msgid "Couldn't open source file as Read/DenyWrite"
+msgstr "无法以读/写保护状态打开源文件"
+
+#: ../daemon/gvfsbackendafp.c:1597
+msgid "Source file and/or destination directory doesn't exist"
+msgstr "源文件和/或目标目录不存在"
+
+#: ../daemon/gvfsbackendafp.c:1601
+msgid "Source file is a directory"
+msgstr "源文件是一个目录"
+
+#: ../daemon/gvfsbackendafp.c:1909 ../daemon/gvfsbackendburn.c:876
+#: ../daemon/gvfsbackendftp.c:1544 ../daemon/gvfsbackendobexftp.c:1779
+msgid "Can't copy directory over directory"
+msgstr "无法将目录复制到目录"
+
+#: ../daemon/gvfsbackendafp.c:1912 ../daemon/gvfsbackendafp.c:2109
+#: ../daemon/gvfsbackenddav.c:2201 ../daemon/gvfsbackendftp.c:773
+#: ../daemon/gvfsbackendsftp.c:2333 ../daemon/gvfsbackendsftp.c:3069
+#: ../daemon/gvfsbackendsftp.c:3408 ../daemon/gvfsbackendsftp.c:4276
+msgid "File is directory"
+msgstr "文件是目录"
+
+#: ../daemon/gvfsbackendafp.c:1928 ../daemon/gvfsbackendburn.c:892
+#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendobexftp.c:1794
+msgid "Can't recursively copy directory"
+msgstr "无法递归复制目录"
+
+#: ../daemon/gvfsbackendafp.c:2106 ../daemon/gvfsbackendsftp.c:4271
+#: ../daemon/gvfsbackendsmb.c:2071
+msgid "Can't move directory over directory"
+msgstr "不能将目录移动到目录上"
+
+#: ../daemon/gvfsbackendafp.c:2214 ../daemon/gvfsbackendafp.c:2308
+msgid "Can't rename volume"
+msgstr "无法重命名卷"
+
+#: ../daemon/gvfsbackendafp.c:2218
+msgid "Object with that name already exists"
+msgstr "拥有该名字的对象已存在"
+
+#: ../daemon/gvfsbackendafp.c:2222
+msgid "Target object is marked as RenameInhibit"
+msgstr "目标对象被标记为禁止重命名"
+
+#: ../daemon/gvfsbackendafp.c:2354
+msgid "Volume is flat and doesn't support directories"
+msgstr "卷是平的(flat)，不支持目录"
+
+#: ../daemon/gvfsbackendafp.c:2362
+msgid "Target directory already exists"
+msgstr "目标目录已存在"
+
+#: ../daemon/gvfsbackendafp.c:2501
+msgid "File is not open for write access"
+msgstr "文件未以可写的方式打开"
+
+#: ../daemon/gvfsbackendafp.c:2742
+msgid "File is not open for read access"
+msgstr "文件未以可写的方式打开"
+
+#: ../daemon/gvfsbackendafp.c:2973
+msgid "Range lock conflict exists"
+msgstr "存在范围锁冲突"
+
+#: ../daemon/gvfsbackendafp.c:3212
+#, c-format
+msgid "Couldn't create temporary file (%s)"
+msgstr "无法创建临时文件(%s)"
+
+#: ../daemon/gvfsbackendafp.c:3283 ../daemon/gvfsbackenddav.c:2330
+#: ../daemon/gvfsbackendsftp.c:3421 ../daemon/gvfsbackendsmb.c:1148
+msgid "The file was externally modified"
+msgstr "文件被其它程序更改"
+
+#: ../daemon/gvfsbackendafp.c:3314 ../daemon/gvfsbackendftp.c:981
+#: ../daemon/gvfsbackendftp.c:1335 ../daemon/gvfsbackendsftp.c:3274
+msgid "backups not supported yet"
+msgstr "尚不支持备份"
+
+#: ../daemon/gvfsbackendafp.c:3539
+msgid "Directory doesn't exist"
+msgstr "目录不存在"
+
+#: ../daemon/gvfsbackendafp.c:3543
+msgid "Target object is not a directory"
+msgstr "目标对象不是一个目录"
+
+#: ../daemon/gvfsbackendafp.c:3795 ../daemon/gvfsbackendftp.c:1128
+#: ../daemon/gvfsbackendsftp.c:4643
+msgid "Invalid attribute type (uint32 expected)"
+msgstr "无效的属性类型(预期为 uint32)"
+
+#: ../daemon/gvfsbackendafp.c:4093
+msgid "Command not supported"
+msgstr "不支持该命令"
+
+#: ../daemon/gvfsbackendafp.c:4097
+msgid "User's password has expired"
+msgstr "用户的密码已过期"
+
+#: ../daemon/gvfsbackendafp.c:4101
+msgid "User's password needs to be changed"
+msgstr "用户的密码需要更换"
+
+#: ../daemon/gvfsbackendafp.c:4111
+#, c-format
+msgid "FPGetUserInfo failed (%s)"
+msgstr "FPGetUserInfo 失败(%s)"
+
+#: ../daemon/gvfsbackendafp.c:4250
+#, c-format
+msgid "AFP volume %s for %s on %s"
+msgstr "%3$s 上 %2$s 的 AFP 卷 %1$s"
+
+#: ../daemon/gvfsbackendafp.c:4254
+#, c-format
+msgid "AFP volume %s on %s"
+msgstr "%s 上的 AFP 卷 %s"
+
+#: ../daemon/gvfsbackendafp.c:4272
+#, c-format
+msgid "Couldn't mount AFP volume %s on %s"
+msgstr "无法将 AFP 卷 %s 挂载到 %s 上"
+
+#: ../daemon/gvfsbackendafp.c:4303
+msgid "No volume specified"
+msgstr "未指定卷"
+
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
-#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
 #: ../daemon/gvfsbackendarchive.c:330 ../daemon/gvfsbackendsftp.c:2269
 #: ../daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
 msgstr "/ 上的 %s"
 
-#: ../daemon/gvfsbackendarchive.c:539 ../daemon/gvfsbackendftp.c:660
-#: ../daemon/gvfsbackendsftp.c:1745
-msgid "No hostname specified"
-msgstr "未指定主机名"
-
 #: ../daemon/gvfsbackendarchive.c:785 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
+#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:445
 #: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:649
 #: ../daemon/gvfsbackendsftp.c:3881 ../daemon/gvfsftpdircache.c:157
 msgid "The file is not a directory"
@@ -465,22 +774,17 @@ msgstr "无法创建临时目录"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
 #: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:786
-#: ../daemon/gvfsbackendgphoto2.c:1207 ../daemon/gvfsbackendgphoto2.c:2207
-#: ../daemon/gvfsbackendgphoto2.c:2926 ../daemon/gvfsbackendsftp.c:1836
+#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:793
+#: ../daemon/gvfsbackendgphoto2.c:1207 ../daemon/gvfsbackendgphoto2.c:2133
+#: ../daemon/gvfsbackendgphoto2.c:2852 ../daemon/gvfsbackendsftp.c:1836
 #: ../daemon/gvfsbackendsftp.c:2949 ../daemon/gvfsbackendsftp.c:2962
 #: ../daemon/gvfsbackendsftp.c:2982 ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
 msgstr "文件或目录不存在"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2221
-#: ../daemon/gvfsbackendsftp.c:1828
-msgid "Directory not empty"
-msgstr "目录非空"
-
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
-#: ../daemon/gvfsbackendobexftp.c:1812
+#: ../daemon/gvfsbackendobexftp.c:1810
 msgid "Can't copy file over directory"
 msgstr "无法将文件复制到目录上"
 
@@ -492,31 +796,31 @@ msgstr "CD/DVD 生成器"
 #: ../daemon/gvfsbackendburn.c:753 ../daemon/gvfsbackendburn.c:789
 #: ../daemon/gvfsbackendburn.c:924 ../daemon/gvfsbackendburn.c:986
 #: ../daemon/gvfsbackendburn.c:990 ../daemon/gvfsbackendburn.c:1000
-#: ../daemon/gvfsbackendgphoto2.c:3000
+#: ../daemon/gvfsbackendgphoto2.c:2926
 msgid "File exists"
 msgstr "文件已存在"
 
 #: ../daemon/gvfsbackendburn.c:828 ../daemon/gvfsjobcloseread.c:112
-#: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:169
-#: ../daemon/gvfsjobcreatemonitor.c:140 ../daemon/gvfsjobcreatemonitor.c:151
-#: ../daemon/gvfsjobcreatemonitor.c:174 ../daemon/gvfsjobcreatemonitor.c:192
-#: ../daemon/gvfsjobdelete.c:122 ../daemon/gvfsjobenumerate.c:256
-#: ../daemon/gvfsjobmakedirectory.c:122 ../daemon/gvfsjobmount.c:109
-#: ../daemon/gvfsjobmountmountable.c:156 ../daemon/gvfsjobmove.c:168
-#: ../daemon/gvfsjobopenforread.c:133 ../daemon/gvfsjobopenforwrite.c:151
-#: ../daemon/gvfsjobopenforwrite.c:165 ../daemon/gvfsjobopenforwrite.c:179
-#: ../daemon/gvfsjobopeniconforread.c:116 ../daemon/gvfsjobpollmountable.c:125
-#: ../daemon/gvfsjobpull.c:175 ../daemon/gvfsjobpush.c:175
-#: ../daemon/gvfsjobqueryattributes.c:135 ../daemon/gvfsjobqueryfsinfo.c:131
-#: ../daemon/gvfsjobqueryinfo.c:149 ../daemon/gvfsjobqueryinforead.c:119
+#: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:171
+#: ../daemon/gvfsjobcreatemonitor.c:141 ../daemon/gvfsjobcreatemonitor.c:152
+#: ../daemon/gvfsjobcreatemonitor.c:175 ../daemon/gvfsjobcreatemonitor.c:193
+#: ../daemon/gvfsjobdelete.c:123 ../daemon/gvfsjobenumerate.c:257
+#: ../daemon/gvfsjobmakedirectory.c:123 ../daemon/gvfsjobmount.c:109
+#: ../daemon/gvfsjobmountmountable.c:157 ../daemon/gvfsjobmove.c:169
+#: ../daemon/gvfsjobopenforread.c:134 ../daemon/gvfsjobopenforwrite.c:152
+#: ../daemon/gvfsjobopenforwrite.c:166 ../daemon/gvfsjobopenforwrite.c:180
+#: ../daemon/gvfsjobopeniconforread.c:117 ../daemon/gvfsjobpollmountable.c:126
+#: ../daemon/gvfsjobpull.c:176 ../daemon/gvfsjobpush.c:176
+#: ../daemon/gvfsjobqueryattributes.c:136 ../daemon/gvfsjobqueryfsinfo.c:132
+#: ../daemon/gvfsjobqueryinfo.c:150 ../daemon/gvfsjobqueryinforead.c:119
 #: ../daemon/gvfsjobqueryinfowrite.c:119 ../daemon/gvfsjobread.c:120
 #: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
-#: ../daemon/gvfsjobsetattribute.c:150 ../daemon/gvfsjobsetdisplayname.c:127
-#: ../daemon/gvfsjobstartmountable.c:132 ../daemon/gvfsjobstopmountable.c:135
-#: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
-#: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
+#: ../daemon/gvfsjobsetattribute.c:151 ../daemon/gvfsjobsetdisplayname.c:128
+#: ../daemon/gvfsjobstartmountable.c:133 ../daemon/gvfsjobstopmountable.c:136
+#: ../daemon/gvfsjobtrash.c:123 ../daemon/gvfsjobunmountmountable.c:140
+#: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1173 ../monitor/gdu/ggdumount.c:1257
-#: ../monitor/gdu/ggduvolume.c:1595
+#: ../monitor/gdu/ggduvolume.c:1617
 msgid "Operation not supported by backend"
 msgstr "后端不支持的操作"
 
@@ -524,27 +828,29 @@ msgstr "后端不支持的操作"
 msgid "No such file or directory in target path"
 msgstr "目的路径中不存在此文件或目录"
 
-#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1535
-#: ../daemon/gvfsbackendobexftp.c:1781
-msgid "Can't copy directory over directory"
-msgstr "无法将目录复制到目录"
-
-#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1789
-#: ../daemon/gvfsbackendobexftp.c:1820 ../daemon/gvfsbackendsftp.c:1830
+#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1787
+#: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1830
 #: ../daemon/gvfsbackendsftp.c:4441
 msgid "Target file exists"
 msgstr "目标文件已存在"
 
-#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1558
-#: ../daemon/gvfsbackendobexftp.c:1796
-msgid "Can't recursively copy directory"
-msgstr "无法递归复制目录"
-
 #: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
-#: ../daemon/gvfsbackendgphoto2.c:2580 ../daemon/gvfsbackendgphoto2.c:2789
-#: ../daemon/gvfsbackendgphoto2.c:2886 ../daemon/gvfsbackendgphoto2.c:2979
+#: ../daemon/gvfsbackendgphoto2.c:2506 ../daemon/gvfsbackendgphoto2.c:2715
+#: ../daemon/gvfsbackendgphoto2.c:2812 ../daemon/gvfsbackendgphoto2.c:2905
 msgid "Not supported"
 msgstr "不支持"
+
+#: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:921
+msgid "Unmount Anyway"
+msgstr "无论如何卸载"
+
+#: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:923
+msgid ""
+"Volume is busy\n"
+"One or more applications are keeping the volume busy."
+msgstr ""
+"卷被占用\n"
+"一个或更多应用程序正在占用卷。"
 
 #: ../daemon/gvfsbackendcdda.c:332 ../daemon/gvfsbackendgphoto2.c:1510
 msgid "Cannot create gudev client"
@@ -562,7 +868,7 @@ msgstr "无法创建 libhal 上下文"
 msgid "Cannot initialize libhal"
 msgstr "无法初始化 libhal"
 
-#: ../daemon/gvfsbackendcdda.c:393 ../daemon/gvfsbackendcdda.c:477
+#: ../daemon/gvfsbackendcdda.c:393 ../daemon/gvfsbackendcdda.c:478
 msgid "No drive specified"
 msgstr "未指定驱动器"
 
@@ -576,52 +882,53 @@ msgstr "找不到驱动器 %s"
 msgid "Drive %s does not contain audio files"
 msgstr "驱动器 %s 不含音频文件"
 
-#. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:439
+#. Translator: %s is the device the disc is inserted into. 'cdda' is the name
+#. name of the backend and shouldn't be translated.
+#: ../daemon/gvfsbackendcdda.c:440
 #, c-format
 msgid "cdda mount on %s"
 msgstr "%s 上挂载的 cdda"
 
-#: ../daemon/gvfsbackendcdda.c:440 ../daemon/gvfsbackendcdda.c:960
-#: ../monitor/gdu/ggduvolume.c:337 ../monitor/hal/ghalmount.c:325
+#: ../daemon/gvfsbackendcdda.c:441 ../daemon/gvfsbackendcdda.c:961
+#: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #, c-format
 msgid "Audio Disc"
 msgstr "音频光盘"
 
-#: ../daemon/gvfsbackendcdda.c:503
+#: ../daemon/gvfsbackendcdda.c:504
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "文件系统忙：打开了 %d 个文件"
 
-#: ../daemon/gvfsbackendcdda.c:695
+#: ../daemon/gvfsbackendcdda.c:696
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "文件 %s 在驱动器 %s 上不存在"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:804
+#: ../daemon/gvfsbackendcdda.c:805
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "驱动器 %s 上有来自“paranoia”的错误"
 
-#: ../daemon/gvfsbackendcdda.c:867
+#: ../daemon/gvfsbackendcdda.c:868
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "在驱动器 %s 上的流搜索时出错"
 
-#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1894
+#: ../daemon/gvfsbackendcdda.c:980 ../daemon/gvfsbackendgphoto2.c:1820
 #, c-format
 msgid "No such file"
 msgstr "无此文件"
 
-#: ../daemon/gvfsbackendcdda.c:993
+#: ../daemon/gvfsbackendcdda.c:994
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "文件不存在或不是音轨"
 
-#: ../daemon/gvfsbackendcdda.c:1099
+#: ../daemon/gvfsbackendcdda.c:1100
 msgid "Audio CD Filesystem Service"
 msgstr "音频 CD 文件系统服务"
 
@@ -647,7 +954,7 @@ msgid "Can't mount file"
 msgstr "无法挂载文件"
 
 #: ../daemon/gvfsbackendcomputer.c:884
-msgid "No media in the drive"
+msgid "No medium in the drive"
 msgstr "驱动器中没有介质"
 
 #: ../daemon/gvfsbackendcomputer.c:941 ../daemon/gvfsbackendcomputer.c:1036
@@ -676,137 +983,117 @@ msgstr "无法停止文件"
 msgid "Can't poll file"
 msgstr "无法轮询文件"
 
-#: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1696
-#: ../daemon/gvfsbackendhttp.c:261
+#. Translators: This is the name of the WebDAV share constructed as
+#. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
+#. the second %s and only shown if it is not the default http(s) port.
+#: ../daemon/gvfsbackenddav.c:485
+#, c-format
+msgid "WebDAV as %s on %s%s"
+msgstr "%2$s%3$s 上的 %1$s WebDAV 共享"
+
+#. Translators: This is the name of the WebDAV share constructed as
+#. "WebDAV on <hostname>:<port>"; The ":port" part is again the second
+#. %s and it is only shown if it is not the default http(s) port.
+#: ../daemon/gvfsbackenddav.c:493
+#, c-format
+msgid "WebDAV on %s%s"
+msgstr "%s%s 上的 WebDAV 共享"
+
+#: ../daemon/gvfsbackenddav.c:668 ../daemon/gvfsbackenddav.c:1864
+#: ../daemon/gvfsbackendhttp.c:248
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP 错误：%s"
 
-#: ../daemon/gvfsbackenddav.c:578
+#: ../daemon/gvfsbackenddav.c:685
 msgid "Could not parse response"
 msgstr "无法解析响应"
 
-#: ../daemon/gvfsbackenddav.c:587
+#: ../daemon/gvfsbackenddav.c:694
 msgid "Empty response"
 msgstr "空响应"
 
-#: ../daemon/gvfsbackenddav.c:595
+#: ../daemon/gvfsbackenddav.c:702
 msgid "Unexpected reply from server"
 msgstr "服务器给出意外回复"
 
-#: ../daemon/gvfsbackenddav.c:1212 ../daemon/gvfsbackenddav.c:1836
+#: ../daemon/gvfsbackenddav.c:1373 ../daemon/gvfsbackenddav.c:1999
+#: ../daemon/gvfsbackenddav.c:2086 ../daemon/gvfsbackenddav.c:2193
 msgid "Response invalid"
 msgstr "响应无效"
 
-#: ../daemon/gvfsbackenddav.c:1355
+#: ../daemon/gvfsbackenddav.c:1516
 msgid "WebDAV share"
 msgstr "WebDAV 共享"
 
-#: ../daemon/gvfsbackenddav.c:1357
+#: ../daemon/gvfsbackenddav.c:1518
 #, c-format
 msgid "Enter password for %s"
 msgstr "输入 %s 的密码"
 
-#: ../daemon/gvfsbackenddav.c:1360
+#: ../daemon/gvfsbackenddav.c:1521
 msgid "Please enter proxy password"
 msgstr "请输入代理密码"
 
-#: ../daemon/gvfsbackenddav.c:1700 ../daemon/gvfsbackenddav.c:1704
+#: ../daemon/gvfsbackenddav.c:1868 ../daemon/gvfsbackenddav.c:1872
 msgid "Not a WebDAV enabled share"
 msgstr "不是启用了 WebDAV 的共享"
 
-#: ../daemon/gvfsbackenddav.c:1732
-#, c-format
-msgid "WebDAV on %s"
-msgstr "%s 上的 WebDAV 共享"
-
-#: ../daemon/gvfsbackenddav.c:1792 ../daemon/gvfsbackenddav.c:1865
+#: ../daemon/gvfsbackenddav.c:1953 ../daemon/gvfsbackenddav.c:2041
+#: ../daemon/gvfsbackenddav.c:2114 ../daemon/gvfsbackenddav.c:2227
 msgid "Could not create request"
 msgstr "无法创建请求"
 
-#: ../daemon/gvfsbackenddav.c:1928 ../daemon/gvfsbackenddav.c:2181
-#: ../daemon/gvfsbackenddav.c:2292 ../daemon/gvfsbackendftp.c:745
-#: ../daemon/gvfsbackendftp.c:926 ../daemon/gvfsbackendftp.c:1365
-#: ../daemon/gvfsbackendftp.c:1543 ../daemon/gvfsbackendsftp.c:4285
-#: ../daemon/gvfsbackendsmb.c:2063
-msgid "Target file already exists"
-msgstr "目标文件已存在"
-
-#: ../daemon/gvfsbackenddav.c:2001 ../daemon/gvfsbackendsftp.c:3421
-#: ../daemon/gvfsbackendsmb.c:1148
-msgid "The file was externally modified"
-msgstr "文件被其它程序更改"
-
-#: ../daemon/gvfsbackenddav.c:2032 ../daemon/gvfsbackendsmb.c:1184
-#: ../daemon/gvfsbackendsmb.c:2080
+#: ../daemon/gvfsbackenddav.c:2361 ../daemon/gvfsbackendsmb.c:1184
+#: ../daemon/gvfsbackendsmb.c:2099
 msgid "Backup file creation failed"
 msgstr "创建备份文件失败"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:486 ../daemon/gvfsbackendnetwork.c:371
+#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:371
 msgid "Local Network"
 msgstr "局域网"
 
-#: ../daemon/gvfsbackenddnssd.c:730 ../daemon/gvfsbackendnetwork.c:753
+#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:753
 msgid "Can't monitor file or directory."
 msgstr "无法监视文件或目录。"
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:748
+#: ../daemon/gvfsbackenddnssd.c:754
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:749 ../daemon/gvfsbackendnetwork.c:688
+#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:688
 #: ../daemon/gvfsbackendnetwork.c:820 ../daemon/gvfsbackendnetwork.c:821
 msgid "Network"
 msgstr "网络"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:481
+#: ../daemon/gvfsbackendftp.c:488
 #, c-format
-msgid "Enter password for ftp as %s on %s"
-msgstr "请输入 %2$s 上 %1$s 的 ftp 密码"
+msgid "Enter password for FTP as %s on %s"
+msgstr "请输入 %2$s 上 %1$s 的 FTP 密码"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:484
+#: ../daemon/gvfsbackendftp.c:491
 #, c-format
-msgid "Enter password for ftp on %s"
-msgstr "请输入 %s 上 ftp 的密码"
+msgid "Enter password for FTP on %s"
+msgstr "请输入 %s 上 FTP 的密码"
 
-#: ../daemon/gvfsbackendftp.c:511 ../daemon/gvfsbackendsftp.c:985
-#: ../daemon/gvfsbackendsmb.c:619 ../daemon/gvfsbackendsmbbrowse.c:995
-msgid "Password dialog cancelled"
-msgstr "密码对话框被取消"
-
-#: ../daemon/gvfsbackendftp.c:623
+#: ../daemon/gvfsbackendftp.c:630
 #, c-format
-msgid "ftp on %s"
-msgstr "%s 上的 ftp"
+msgid "FTP on %s"
+msgstr "%s 上的 FTP"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:627
+#: ../daemon/gvfsbackendftp.c:634
 #, c-format
-msgid "ftp as %s on %s"
-msgstr "以 %s ftp 到 %s"
+msgid "FTP as %s on %s"
+msgstr "以 %s FTP 到 %s"
 
-#: ../daemon/gvfsbackendftp.c:720
+#: ../daemon/gvfsbackendftp.c:727
 msgid "Insufficient permissions"
 msgstr "权限不足"
-
-#: ../daemon/gvfsbackendftp.c:766 ../daemon/gvfsbackendsftp.c:2333
-#: ../daemon/gvfsbackendsftp.c:3069 ../daemon/gvfsbackendsftp.c:3408
-#: ../daemon/gvfsbackendsftp.c:4276
-msgid "File is directory"
-msgstr "文件是目录"
-
-#: ../daemon/gvfsbackendftp.c:974 ../daemon/gvfsbackendftp.c:1328
-#: ../daemon/gvfsbackendsftp.c:3274
-msgid "backups not supported yet"
-msgstr "尚不支持备份"
-
-#: ../daemon/gvfsbackendftp.c:1121 ../daemon/gvfsbackendsftp.c:4643
-msgid "Invalid attribute type (uint32 expected)"
-msgstr "无效的属性类型(预期为 uint32)"
 
 #: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
@@ -891,126 +1178,126 @@ msgstr "设置照相机通信端口时出错"
 msgid "Error initializing camera"
 msgstr "初始化照相机时出错"
 
-#. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1683
+#. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
+#. backend and shouldn't be translated.
+#: ../daemon/gvfsbackendgphoto2.c:1684
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "%s 上的 gphoto2 挂载"
 
-#: ../daemon/gvfsbackendgphoto2.c:1765
+#: ../daemon/gvfsbackendgphoto2.c:1766
 msgid "No camera specified"
 msgstr "未指定照相机"
 
-#: ../daemon/gvfsbackendgphoto2.c:1806 ../daemon/gvfsbackendgphoto2.c:1832
-#, c-format
-msgid "Filesystem is busy"
-msgstr "文件系统正忙"
-
-#: ../daemon/gvfsbackendgphoto2.c:1902
+#: ../daemon/gvfsbackendgphoto2.c:1828
 msgid "Error creating file object"
 msgstr "创建文件对象时出错"
 
-#: ../daemon/gvfsbackendgphoto2.c:1917
+#: ../daemon/gvfsbackendgphoto2.c:1843
 msgid "Error getting file"
 msgstr "获取文件时出错"
 
-#: ../daemon/gvfsbackendgphoto2.c:1927
+#: ../daemon/gvfsbackendgphoto2.c:1853
 msgid "Error getting data from file"
 msgstr "从文件中获取数据时出错"
 
-#: ../daemon/gvfsbackendgphoto2.c:1985
+#: ../daemon/gvfsbackendgphoto2.c:1911
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "图标识别符“%s”的格式错误"
 
-#: ../daemon/gvfsbackendgphoto2.c:2061 ../daemon/gvfsbackendgphoto2.c:3250
+#: ../daemon/gvfsbackendgphoto2.c:1987 ../daemon/gvfsbackendgphoto2.c:3176
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "在照相机 %s 上的流搜索时出错"
 
-#: ../daemon/gvfsbackendgphoto2.c:2201 ../daemon/gvfsbackendsftp.c:2952
+#: ../daemon/gvfsbackendgphoto2.c:2127 ../daemon/gvfsbackendsftp.c:2952
 #: ../daemon/gvfsbackendsmbbrowse.c:1399
 msgid "Not a directory"
 msgstr "不是目录"
 
-#: ../daemon/gvfsbackendgphoto2.c:2234
+#: ../daemon/gvfsbackendgphoto2.c:2160
 msgid "Failed to get folder list"
 msgstr "无法得到文件夹列表"
 
-#: ../daemon/gvfsbackendgphoto2.c:2300
+#: ../daemon/gvfsbackendgphoto2.c:2226
 msgid "Failed to get file list"
 msgstr "无法得到文件列表"
 
-#: ../daemon/gvfsbackendgphoto2.c:2592
+#: ../daemon/gvfsbackendgphoto2.c:2518
 msgid "Error creating directory"
 msgstr "创建目录时出错"
 
-#: ../daemon/gvfsbackendgphoto2.c:2801
+#: ../daemon/gvfsbackendgphoto2.c:2727
 msgid "Name already exists"
 msgstr "名字已存在"
 
-#: ../daemon/gvfsbackendgphoto2.c:2812 ../daemon/gvfsbackendgphoto2.c:3441
+#: ../daemon/gvfsbackendgphoto2.c:2738 ../daemon/gvfsbackendgphoto2.c:3367
 msgid "New name too long"
 msgstr "新名字过长"
 
-#: ../daemon/gvfsbackendgphoto2.c:2822 ../daemon/gvfsbackendgphoto2.c:3452
-msgid "Error renaming dir"
-msgstr "重命名目录时出错"
+#: ../daemon/gvfsbackendgphoto2.c:2748 ../daemon/gvfsbackendgphoto2.c:3378
+msgid "Error renaming directory"
+msgstr "重命名目录出错"
 
-#: ../daemon/gvfsbackendgphoto2.c:2835 ../daemon/gvfsbackendgphoto2.c:3465
+#: ../daemon/gvfsbackendgphoto2.c:2761 ../daemon/gvfsbackendgphoto2.c:3391
 msgid "Error renaming file"
 msgstr "重命名文件时出错"
 
-#: ../daemon/gvfsbackendgphoto2.c:2899
+#: ../daemon/gvfsbackendgphoto2.c:2825
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "目录“%s”非空"
 
-#: ../daemon/gvfsbackendgphoto2.c:2910
+#: ../daemon/gvfsbackendgphoto2.c:2836
 msgid "Error deleting directory"
 msgstr "删除目录时出错"
 
-#: ../daemon/gvfsbackendgphoto2.c:2936
+#: ../daemon/gvfsbackendgphoto2.c:2862
 msgid "Error deleting file"
 msgstr "删除文件时出错"
 
-#: ../daemon/gvfsbackendgphoto2.c:2989
+#: ../daemon/gvfsbackendgphoto2.c:2915
 msgid "Can't write to directory"
 msgstr "无法写入目录"
 
-#: ../daemon/gvfsbackendgphoto2.c:3036
+#: ../daemon/gvfsbackendgphoto2.c:2962
 msgid "Cannot allocate new file to append to"
 msgstr "无法为要追加的文件分配新文件"
 
-#: ../daemon/gvfsbackendgphoto2.c:3051
+#: ../daemon/gvfsbackendgphoto2.c:2977
 msgid "Cannot read file to append to"
 msgstr "无法读取要追加的文件"
 
-#: ../daemon/gvfsbackendgphoto2.c:3062
+#: ../daemon/gvfsbackendgphoto2.c:2988
 msgid "Cannot get data of file to append to"
 msgstr "无法获得要追加文件的数据"
 
-#: ../daemon/gvfsbackendgphoto2.c:3349
+#: ../daemon/gvfsbackendgphoto2.c:3275
 msgid "Error writing file"
 msgstr "写入文件时出错"
 
-#: ../daemon/gvfsbackendgphoto2.c:3397
+#: ../daemon/gvfsbackendgphoto2.c:3323
 msgid "Not supported (not same directory)"
 msgstr "不支持(不是同一目录)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3409
-msgid "Not supported (src is dir, dst is dir)"
-msgstr "不支持(源为目录，目标地也为目录)"
+#: ../daemon/gvfsbackendgphoto2.c:3335
+msgid ""
+"Not supported (the source is a directory, the destination is a directory too)"
+msgstr "不支持(源为目录，目标也为目录)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3417
-msgid "Not supported (src is dir, dst is existing file)"
-msgstr "不支持(源为目录，目标地为已存在文件)"
+#: ../daemon/gvfsbackendgphoto2.c:3343
+msgid ""
+"Not supported (the source is a directory, but the destination is an existing "
+"file)"
+msgstr "不支持(源为目录，目标却为已存在文件)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3429
-msgid "Not supported (src is file, dst is dir)"
-msgstr "不支持(源为文件，目标地为目录)"
+#: ../daemon/gvfsbackendgphoto2.c:3355
+msgid ""
+"Not supported (the source is a file, but the destination is a directory)"
+msgstr "不支持(源为文件，目标却为目录)"
 
-#: ../daemon/gvfsbackendhttp.c:257
+#: ../daemon/gvfsbackendhttp.c:244
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "HTTP 客户端错误：%s"
@@ -1036,25 +1323,25 @@ msgstr "网络位置监视器"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:683 ../daemon/gvfsbackendsmb.c:554
+#: ../daemon/gvfsbackendobexftp.c:681 ../daemon/gvfsbackendsmb.c:554
 #: ../daemon/gvfsbackendsmb.c:1433
 #, c-format
 msgid "%s on %s"
 msgstr "%2$s 上的 %1$s"
 
-#: ../daemon/gvfsbackendobexftp.c:892
+#: ../daemon/gvfsbackendobexftp.c:890
 msgid "USB support missing. Please contact your software vendor"
 msgstr "不支持 USB。请联系您的软件供应商"
 
-#: ../daemon/gvfsbackendobexftp.c:1012
+#: ../daemon/gvfsbackendobexftp.c:1010
 msgid "Connection to the device lost"
 msgstr "丢失与设备的连接"
 
-#: ../daemon/gvfsbackendobexftp.c:1509
+#: ../daemon/gvfsbackendobexftp.c:1507
 msgid "Device requires a software update"
 msgstr "设备要求一个软件更新"
 
-#: ../daemon/gvfsbackendobexftp.c:1857 ../daemon/gvfsbackendsmb.c:1954
+#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1973
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "删除文件失败：%s"
@@ -1154,17 +1441,17 @@ msgstr "无法发送主机身份确认信息"
 msgid "Protocol error"
 msgstr "协议错误"
 
-#. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
+#. Translators: This is the name of an SFTP share, like "SFTP for <user> on <hostname>"
 #: ../daemon/gvfsbackendsftp.c:1691
 #, c-format
-msgid "sftp for %s on %s"
-msgstr "在 %2$s 上的 %1$s sftp"
+msgid "SFTP for %s on %s"
+msgstr "%2$s 上 %1$s 的 SFTP"
 
-#. Translators: This is the name of an sftp share, like "sftp on <hostname>"
+#. Translators: This is the name of an SFTP share, like "SFTP on <hostname>"
 #: ../daemon/gvfsbackendsftp.c:1694
 #, c-format
-msgid "sftp on %s"
-msgstr "%s 上的 sftp"
+msgid "SFTP on %s"
+msgstr "%s 上的 SFTP"
 
 #: ../daemon/gvfsbackendsftp.c:1735
 msgid "Unable to find supported ssh command"
@@ -1213,9 +1500,31 @@ msgstr "创建备份文件出错：%s"
 msgid "Unable to create temporary file"
 msgstr "无法创建临时文件"
 
-#: ../daemon/gvfsbackendsftp.c:4271 ../daemon/gvfsbackendsmb.c:2052
-msgid "Can't move directory over directory"
-msgstr "不能将目录移动到目录上"
+#. translators: %s is a server name
+#: ../daemon/gvfsbackendsmbbrowse.c:375
+#, c-format
+msgid "Password required for %s"
+msgstr "%s 需要密码"
+
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#: ../daemon/gvfsbackendsmbbrowse.c:902
+#, c-format
+msgid "Windows shares on %s"
+msgstr "%s 上的 Windows 共享"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmbbrowse.c:1001
+msgid "Failed to retrieve share list from server"
+msgstr "从服务器获取共享列表失败"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1157
+msgid "Not a regular file"
+msgstr "非常规文件"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1489
+msgid "Windows Network Filesystem Service"
+msgstr "Windows 网络文件系统服务"
 
 #. translators: First %s is a share name, second is a server name
 #: ../daemon/gvfsbackendsmb.c:238
@@ -1243,57 +1552,31 @@ msgstr "不支持此搜索类型"
 msgid "Backup file creation failed: %s"
 msgstr "创建备份文件失败：%s"
 
-#: ../daemon/gvfsbackendsmb.c:1733
+#: ../daemon/gvfsbackendsmb.c:1734
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "无效的属性类型(预期为 uint64)"
 
-#: ../daemon/gvfsbackendsmb.c:2028
+#: ../daemon/gvfsbackendsmb.c:1922
+msgid "Can't rename file, filename already exists"
+msgstr "无法重命名文件，文件名已存在"
+
+#: ../daemon/gvfsbackendsmb.c:2047
 #, c-format
 msgid "Error moving file: %s"
 msgstr "移动文件失败：%s"
 
-#: ../daemon/gvfsbackendsmb.c:2100
+#: ../daemon/gvfsbackendsmb.c:2119
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "删除目标文件失败：%s"
 
-#: ../daemon/gvfsbackendsmb.c:2124
+#: ../daemon/gvfsbackendsmb.c:2143
 msgid "Can't recursively move directory"
 msgstr "无法递归删除目录"
 
-#: ../daemon/gvfsbackendsmb.c:2168
+#: ../daemon/gvfsbackendsmb.c:2187
 msgid "Windows Shares Filesystem Service"
 msgstr "Windows 共享文件系统服务"
-
-#. translators: %s is a server name
-#: ../daemon/gvfsbackendsmbbrowse.c:375
-#, c-format
-msgid "Password required for %s"
-msgstr "%s 需要密码"
-
-#. translators: Name for the location that lists the smb shares
-#. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:902
-#, c-format
-msgid "Windows shares on %s"
-msgstr "%s 上的 Windows 共享"
-
-#. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmbbrowse.c:1001
-msgid "Failed to retrieve share list from server"
-msgstr "从服务器获取共享列表失败"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:1089 ../daemon/gvfsbackendsmbbrowse.c:1135
-msgid "The file is not a mountable"
-msgstr "此文件不可挂载"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:1157
-msgid "Not a regular file"
-msgstr "非常规文件"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:1489
-msgid "Windows Network Filesystem Service"
-msgstr "Windows 网络文件系统服务"
 
 #: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
 msgid "The trash folder may not be deleted"
@@ -1315,7 +1598,7 @@ msgstr "无效后端类型"
 
 #: ../daemon/gvfsdaemonutils.c:104
 #, c-format
-msgid "Error sending fd: %s"
+msgid "Error sending file descriptor: %s"
 msgstr "发送文件描述符出错：%s"
 
 #: ../daemon/gvfsftpconnection.c:180
@@ -1381,13 +1664,17 @@ msgstr "页面类型未知"
 msgid "Invalid filename"
 msgstr "无效文件名"
 
-#: ../daemon/gvfsjobmakesymlink.c:126
+#: ../daemon/gvfsjobmakesymlink.c:127
 msgid "Symlinks not supported by backend"
 msgstr "后端不支持符号链接"
 
 #: ../daemon/gvfsjobsetattribute.c:120
 msgid "Invalid dbus message"
 msgstr "无效的 dbus 消息"
+
+#: ../daemon/gvfsjobunmount.c:156
+msgid "Filesystem is busy"
+msgstr "文件系统正忙"
 
 #: ../daemon/main.c:45 ../metadata/meta-daemon.c:694
 msgid "Replace old daemon."
@@ -1397,33 +1684,35 @@ msgstr "替换旧守护进程。"
 msgid "Don't start fuse."
 msgstr "不启动 fuse。"
 
-#: ../daemon/main.c:58
+#: ../daemon/main.c:62
 msgid "GVFS Daemon"
 msgstr "GVFS 守护进程"
 
-#: ../daemon/main.c:61
+#: ../daemon/main.c:65
 msgid "Main daemon for GVFS"
 msgstr "GVFS 主守护进程"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:76 ../metadata/meta-daemon.c:718
+#: ../daemon/main.c:80 ../metadata/meta-daemon.c:718
 #, c-format
 msgid "%s: %s"
 msgstr "%s：%s"
 
-#: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
+#: ../daemon/main.c:82 ../metadata/meta-daemon.c:720
 #: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
 #: ../programs/gvfs-copy.c:123 ../programs/gvfs-info.c:371
-#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:60
-#: ../programs/gvfs-move.c:111 ../programs/gvfs-open.c:140
-#: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
-#: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
+#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mime.c:87
+#: ../programs/gvfs-mime.c:98 ../programs/gvfs-mime.c:106
+#: ../programs/gvfs-mkdir.c:60 ../programs/gvfs-move.c:111
+#: ../programs/gvfs-open.c:141 ../programs/gvfs-open.c:154
+#: ../programs/gvfs-save.c:165 ../programs/gvfs-set-attribute.c:128
+#: ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "请用“%s --help”获得更多信息。"
 
-#: ../daemon/mount.c:459
+#: ../daemon/mount.c:458
 msgid "Invalid arguments from spawned child"
 msgstr "来自所调用子进程的参数无效"
 
@@ -1432,19 +1721,19 @@ msgstr "来自所调用子进程的参数无效"
 msgid "Automount failed: %s"
 msgstr "自动挂载失败：%s"
 
-#: ../daemon/mount.c:824 ../daemon/mount.c:898
+#: ../daemon/mount.c:825 ../daemon/mount.c:902
 msgid "The specified location is not mounted"
 msgstr "指定的位置未挂载"
 
-#: ../daemon/mount.c:829
+#: ../daemon/mount.c:830
 msgid "The specified location is not supported"
 msgstr "不支持指定未知"
 
-#: ../daemon/mount.c:1036
+#: ../daemon/mount.c:1044
 msgid "Location is already mounted"
 msgstr "位置已挂载"
 
-#: ../daemon/mount.c:1044
+#: ../daemon/mount.c:1052
 msgid "Location is not mountable"
 msgstr "位置不可挂载"
 
@@ -1496,12 +1785,12 @@ msgstr "未命名驱动器 (%s)"
 msgid "Unnamed Drive"
 msgstr "未命名的驱动器"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/hal/ghaldrive.c:662
+#: ../monitor/gdu/ggdudrive.c:561
 #, c-format
-msgid "Failed to eject media; one or more volumes on the media are busy."
+msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr "弹出介质失败：介质上的一个或多个卷正忙"
 
-#: ../monitor/gdu/ggdudrive.c:1015
+#: ../monitor/gdu/ggdudrive.c:1017
 msgid ""
 "Start drive in degraded mode?\n"
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
@@ -1511,7 +1800,7 @@ msgstr ""
 "以降级模式启动驱动器，意味着驱动器不再容忍故障。如果有一个元件故障，驱动器上"
 "的数据可能会彻底丢失。"
 
-#: ../monitor/gdu/ggdudrive.c:1021
+#: ../monitor/gdu/ggdudrive.c:1023
 msgid "Start Anyway"
 msgstr "无论如何启动"
 
@@ -1528,11 +1817,11 @@ msgstr "无法获取 LUKS 明文从属"
 msgid "Cannot get LUKS cleartext slave from path `%s'"
 msgstr "无法从“%s”路径获取 LUKS 明文从属"
 
-#: ../monitor/gdu/ggduvolume.c:325
+#: ../monitor/gdu/ggduvolume.c:337
 msgid "Floppy Disk"
 msgstr "软盘驱动器"
 
-#: ../monitor/gdu/ggduvolume.c:1075
+#: ../monitor/gdu/ggduvolume.c:1097
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1541,7 +1830,7 @@ msgstr ""
 "输入密码解锁该卷\n"
 "“%s”设备在 %d 分区包含了加密数据。"
 
-#: ../monitor/gdu/ggduvolume.c:1082
+#: ../monitor/gdu/ggduvolume.c:1104
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1550,7 +1839,7 @@ msgstr ""
 "输入密码解锁该卷\n"
 "“%s”设备包含了加密数据。"
 
-#: ../monitor/gdu/ggduvolume.c:1089
+#: ../monitor/gdu/ggduvolume.c:1111
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1835,6 +2124,11 @@ msgstr "Thumb 驱动器"
 msgid "Mass Storage Drive"
 msgstr "大容量存储驱动器"
 
+#: ../monitor/hal/ghaldrive.c:662
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr "弹出介质失败：介质上的一个或多个卷正忙"
+
 #: ../monitor/hal/ghalmount.c:159 ../monitor/hal/ghalvolume.c:163
 #, c-format
 msgid "%.1f kB"
@@ -1855,10 +2149,9 @@ msgid "Mixed Audio/Data Disc"
 msgstr "音频/数据混合盘"
 
 #. Translators: %s is the size of the mount (e.g. 512 MB)
-#. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../monitor/hal/ghalmount.c:336 ../monitor/hal/ghalvolume.c:255
+#: ../monitor/hal/ghalmount.c:336
 #, c-format
-msgid "%s Media"
+msgid "%s Medium"
 msgstr "%s 介质"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
@@ -1866,6 +2159,12 @@ msgstr "%s 介质"
 #, c-format
 msgid "%s Encrypted Data"
 msgstr "%s 加密数据"
+
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../monitor/hal/ghalvolume.c:255
+#, c-format
+msgid "%s Media"
+msgstr "%s 介质"
 
 #: ../programs/gvfs-cat.c:37
 msgid "locations"
@@ -1924,16 +2223,17 @@ msgstr "注意：如需要 cat 的 -n, -T 之类格式化功能，可通过管�
 
 #: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:121
 #: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
-#: ../programs/gvfs-mkdir.c:58 ../programs/gvfs-move.c:109
-#: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
-#: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
+#: ../programs/gvfs-mime.c:84 ../programs/gvfs-mkdir.c:58
+#: ../programs/gvfs-move.c:109 ../programs/gvfs-open.c:139
+#: ../programs/gvfs-save.c:163 ../programs/gvfs-set-attribute.c:126
+#: ../programs/gvfs-tree.c:249
 #, c-format
 msgid "Error parsing commandline options: %s\n"
 msgstr "解析命令行选项出错：%s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:151
+#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:152
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: 位置缺失"
@@ -2127,6 +2427,58 @@ msgstr "错误：%s\n"
 msgid "- list files at <location>"
 msgstr "- 在 <位置> 列出文件"
 
+#: ../programs/gvfs-mime.c:36
+msgid "Query handler for mime-type"
+msgstr "mime 类型的查询处理程序"
+
+#: ../programs/gvfs-mime.c:37
+msgid "Set handler for mime-type"
+msgstr "mime 类型的设置处理程序"
+
+#: ../programs/gvfs-mime.c:76
+#, fuzzy
+msgid "- get/set handler for <mimetype>"
+msgstr "- <mimetype> 的查询/设置程序"
+
+#: ../programs/gvfs-mime.c:85
+msgid "Specify one of --query and --set"
+msgstr "指定 --query 或 --set 之一"
+
+#: ../programs/gvfs-mime.c:97
+#, c-format
+msgid "Must specify a single mime-type.\n"
+msgstr "必须指定惟一的 mime 类型。\n"
+
+#: ../programs/gvfs-mime.c:105
+#, c-format
+msgid "Must specify the mime-type followed by the default handler.\n"
+msgstr "必须指定 mime 类型，跟上默认的处理程序。\n"
+
+#: ../programs/gvfs-mime.c:121
+#, c-format
+msgid "No default applications for '%s'\n"
+msgstr "没有对应“%s”的默认应用程序\n"
+
+#: ../programs/gvfs-mime.c:127
+#, c-format
+msgid "Default application for '%s': %s\n"
+msgstr "对应“%s”的默认应用程序：%s\n"
+
+#: ../programs/gvfs-mime.c:132
+#, c-format
+msgid "Registered applications:\n"
+msgstr "注册的应用程序：\n"
+
+#: ../programs/gvfs-mime.c:152
+#, c-format
+msgid "Failed to load info for handler '%s'\n"
+msgstr "加载处理程序“%s”的信息失败\n"
+
+#: ../programs/gvfs-mime.c:158
+#, c-format
+msgid "Failed to set '%s' as the default handler for '%s': %s\n"
+msgstr "无法将“%s”设为“%s”的默认处理程序：%s\n"
+
 #: ../programs/gvfs-mkdir.c:33
 msgid "create parent directories"
 msgstr "创建父目录"
@@ -2160,49 +2512,50 @@ msgstr "卸载"
 msgid "Unmount all mounts with the given scheme"
 msgstr "卸载指定格式的所有挂载"
 
-#: ../programs/gvfs-mount.c:58
+#. Translator: List here is a verb as in 'List all mounts'
+#: ../programs/gvfs-mount.c:59
 msgid "List"
 msgstr "列表"
 
-#: ../programs/gvfs-mount.c:59
+#: ../programs/gvfs-mount.c:60
 msgid "Show extra information for List and Monitor"
 msgstr "为列表和监视器显示附加的信息"
 
-#: ../programs/gvfs-mount.c:60
+#: ../programs/gvfs-mount.c:61
 msgid "Monitor events"
 msgstr "监视事件"
 
-#: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
+#: ../programs/gvfs-mount.c:164 ../programs/gvfs-mount.c:185
 #, c-format
 msgid "Error mounting location: %s\n"
 msgstr "挂载位置出错：%s\n"
 
-#: ../programs/gvfs-mount.c:241
+#: ../programs/gvfs-mount.c:242
 #, c-format
 msgid "Error unmounting mount: %s\n"
 msgstr "卸载挂载出错：%s\n"
 
-#: ../programs/gvfs-mount.c:262
+#: ../programs/gvfs-mount.c:263
 #, c-format
 msgid "Error finding enclosing mount: %s\n"
 msgstr "查找封闭的挂载出错：%s\n"
 
-#: ../programs/gvfs-mount.c:682
+#: ../programs/gvfs-mount.c:683
 #, c-format
 msgid "Error mounting %s: %s\n"
 msgstr "挂载 %s 出错：%s\n"
 
-#: ../programs/gvfs-mount.c:696
+#: ../programs/gvfs-mount.c:697
 #, c-format
 msgid "Mounted %s at %s\n"
 msgstr "%s 挂载在 %s\n"
 
-#: ../programs/gvfs-mount.c:747
+#: ../programs/gvfs-mount.c:748
 #, c-format
 msgid "No volume for device file %s\n"
 msgstr "没有设备文件 %s 的卷\n"
 
-#: ../programs/gvfs-mount.c:938
+#: ../programs/gvfs-mount.c:939
 msgid "- mount <location>"
 msgstr "- 挂载 <位置>"
 
@@ -2233,13 +2586,13 @@ msgstr "%s: %s: 打开位置出错:  %s\n"
 msgid "%s: %s: error launching application: %s\n"
 msgstr "%s: %s: 启动应用出错:  %s\n"
 
-#: ../programs/gvfs-open.c:122
+#: ../programs/gvfs-open.c:123
 msgid "FILES... - open FILES with registered application."
 msgstr "FILES... - 用注册的应用程序打开 FILES。"
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-open.c:126
+#: ../programs/gvfs-open.c:127
 msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
@@ -2356,12 +2709,31 @@ msgid "Error trashing file: %s\n"
 msgstr "移动文件到回收站出错：%s\n"
 
 #: ../programs/gvfs-tree.c:37
-msgid "Follow symlinks, mounts and shortcuts like dirs"
-msgstr "跟踪符号链接、绑定和像目录的快捷方式"
+msgid "Follow symbolic links, mounts and shortcuts like directories"
+msgstr "跟踪符号链接、挂载项和目录之类的快捷方式"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
 msgstr "- 以树形格式列举目录内容"
+
+#, fuzzy
+#~ msgid "Unhandled inst proxy error (%d)"
+#~ msgstr "未处理的研究代理错误(%d)"
+
+#~ msgid "Unhandled SBServices proxy error (%d)"
+#~ msgstr "未处理的 SBServices 代理错误(%d)"
+
+#~ msgid "Service %d on Apple Mobile Device"
+#~ msgstr "苹果移动设备的服务 %d"
+
+#~ msgid "ftp on %s"
+#~ msgstr "%s 上的 ftp"
+
+#~ msgid "Error renaming dir"
+#~ msgstr "重命名目录时出错"
+
+#~ msgid "sftp on %s"
+#~ msgstr "%s 上的 sftp"
 
 #~ msgid "%s (%s)"
 #~ msgstr "%s (%s)"
