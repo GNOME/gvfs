@@ -34,6 +34,10 @@
 
 #include <gvfsmountinfo.h>
 
+#ifdef HAVE_GUDEV
+#include <gudev/gudev.h>
+#endif
+
 #include "ggduvolumemonitor.h"
 #include "ggdumount.h"
 #include "ggduvolume.h"
@@ -1361,6 +1365,35 @@ g_gdu_mount_guess_content_type_sync (GMount              *_mount,
           g_strfreev (x_content_types);
         }
     }
+
+#ifdef HAVE_GUDEV
+  /* Check if its bootable */
+  if (device != NULL)
+    {
+      const gchar *device_file;
+
+      device_file = gdu_device_get_device_file (device);
+      if (device_file != NULL)
+        {
+          GUdevClient *client;
+          GUdevDevice *gudev_device;
+          const gchar *subsystems[] = {"block", NULL};
+
+          client = g_udev_client_new (subsystems);
+          gudev_device = g_udev_client_query_by_device_file (client, device_file);
+          if (gudev_device != NULL)
+            {
+              if (g_udev_device_get_property_as_boolean (gudev_device,
+                                                         "OSINFO_BOOTABLE"))
+                  g_ptr_array_add (p, g_strdup ("x-content/bootable-media"));
+
+              g_object_unref (gudev_device);
+            }
+
+          g_object_unref (client);
+        }
+    }
+#endif
 
   if (p->len == 0)
     {
