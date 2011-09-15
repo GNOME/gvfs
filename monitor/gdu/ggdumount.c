@@ -1380,7 +1380,12 @@ g_gdu_mount_guess_content_type_sync (GMount              *_mount,
           gudev_device = g_udev_client_query_by_device_file (client, device_file);
           if (gudev_device != NULL)
             {
-              if (g_udev_device_get_property_as_boolean (gudev_device,
+              const gchar *boot_sys_id;
+
+              boot_sys_id = g_udev_device_get_property (gudev_device,
+                                                        "ID_FS_BOOT_SYSTEM_ID");
+              if (boot_sys_id != NULL ||
+                  g_udev_device_get_property_as_boolean (gudev_device,
                                                          "OSINFO_BOOTABLE"))
                   g_ptr_array_add (p, g_strdup ("x-content/bootable-media"));
 
