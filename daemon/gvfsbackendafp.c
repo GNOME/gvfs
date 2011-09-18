@@ -482,7 +482,7 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         break;
       case AFP_RESULT_OBJECT_TYPE_ERR:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                                         _("File is a directory"));
+                                         _("File is directory"));
         break;
       case AFP_RESULT_TOO_MANY_FILES_OPEN:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_TOO_MANY_OPEN_FILES,
@@ -528,7 +528,7 @@ open_fork (GVfsBackendAfp     *afp_backend,
   {
     g_simple_async_report_error_in_idle (G_OBJECT (afp_backend), callback,
                                          user_data, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                                         _("File is a directory"));
+                                         _("File is directory"));
     return;
   }
 
@@ -1316,7 +1316,7 @@ move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_dat
         break;
       case AFP_RESULT_CANT_MOVE:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                                         _("Can't move directory into one of it's descendants"));
+                                         _("Can't move directory into one of its descendants"));
         break;
       case AFP_RESULT_INSIDE_SHARE_ERR:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -1448,7 +1448,7 @@ copy_file_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         break;
       case AFP_RESULT_DENY_CONFLICT:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Couldn't open source file as Read/DenyWrite"));
+                                         _("Unable to open source file for reading"));
         break;
       case AFP_RESULT_DISK_FULL:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
@@ -2730,7 +2730,7 @@ close_replace_exchange_files_cb (GObject *source_object, GAsyncResult *res, gpoi
         break;
       case AFP_RESULT_OBJECT_TYPE_ERR:
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                                  _("File is a directory"));
+                                  _("File is directory"));
         break;   
       default:
         job_failed_from_afp_result_code (G_VFS_JOB (job), res_code);
@@ -3067,7 +3067,7 @@ replace_create_tmp_file_cb (GObject *source_object, GAsyncResult *res, gpointer 
     else
     {
       g_vfs_job_failed (G_VFS_JOB (job), err->domain, err->code,
-                        _("Couldn't create temporary file (%s)"), err->message);
+                        _("Unable to create temporary file (%s)"), err->message);
     }
     g_error_free (err);
     return;
@@ -3131,7 +3131,7 @@ replace_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointe
   if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
   {
     g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                              _("File is a directory"));
+                              _("File is directory"));
   }
   
   else if (job->etag && g_strcmp0 (g_file_info_get_etag (info), job->etag) != 0)
@@ -4087,6 +4087,7 @@ error:
   return;
 
 generic_error:
+  /* Translators: first %s is volumename and second servername */ 
   g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED,
                     _("Couldn't mount AFP volume %s on %s"), afp_backend->volume,
                     afp_backend->server->server_name);

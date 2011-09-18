@@ -167,8 +167,8 @@ dhx2_login (GVfsAfpServer *afp_serv,
   
   if (strlen (password) > 256)
   {
-    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                         _("Server doesn't support passwords longer than 256 characters"));
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                 _("Server doesn't support passwords longer than %d characters"), 256);
     goto error;
   }
 
@@ -453,8 +453,8 @@ dhx_login (GVfsAfpServer *afp_serv,
 
   if (strlen (password) > 64)
   {
-    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                         _("Server doesn't support passwords longer than 64 characters"));
+    g_set_error(error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                _("Server doesn't support passwords longer than %d characters"), 64);
     return FALSE;
   }
   
