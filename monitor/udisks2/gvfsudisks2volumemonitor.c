@@ -131,10 +131,7 @@ gvfs_udisks2_volume_monitor_constructor (GType                  type,
       goto out;
     }
 
-  /*g_warning ("creating gdu vm");*/
-
-  /* Invoke parent constructor. */
-  parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (g_type_class_peek (GVFS_TYPE_UDISKS2_VOLUME_MONITOR)));
+  parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (g_type_class_peek (type)));
   ret = parent_class->constructor (type,
                                    n_construct_properties,
                                    construct_properties);
