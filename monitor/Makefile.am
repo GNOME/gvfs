@@ -9,6 +9,10 @@ if USE_GDU
 SUBDIRS += gdu
 endif
 
+if USE_UDISKS2
+SUBDIRS += udisks2
+endif
+
 if USE_GPHOTO2
 SUBDIRS += gphoto2
 endif

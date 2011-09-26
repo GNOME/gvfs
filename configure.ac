@@ -751,6 +751,7 @@ monitor/Makefile
 monitor/proxy/Makefile
 monitor/hal/Makefile
 monitor/gdu/Makefile
+monitor/udisks2/Makefile
 monitor/gphoto2/Makefile
 monitor/afc/Makefile
 programs/Makefile
