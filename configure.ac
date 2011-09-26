@@ -218,6 +218,27 @@ fi
 
 AM_CONDITIONAL(USE_GDU, [test "$msg_gdu" = "yes"])
 
+dnl *************************
+dnl *** Check for udisks2 ***
+dnl *************************
+
+AC_ARG_ENABLE(udisks2, AS_HELP_STRING([--disable-udisks2],[build without libudisks2]))
+msg_udisks2=no
+UDISKS2_LIBS=
+UDISKS2_CFLAGS=
+UDISKS2_REQUIRED=1.90
+
+if test "x$enable_udisks2" != "xno"; then
+  PKG_CHECK_EXISTS([udisks2 >= $UDISKS2_REQUIRED], msg_udisks2=yes)
+
+  if test "x$msg_udisks2" = "xyes"; then
+    PKG_CHECK_MODULES([UDISKS2],[udisks2 >= $UDISKS2_REQUIRED])
+    AC_DEFINE(HAVE_UDISKS2, 1, [Define to 1 if libudisks2 is available])
+  fi
+fi
+
+AM_CONDITIONAL(USE_UDISKS2, [test "$msg_udisks2" = "yes"])
+
 dnl **********************
 dnl *** Check for HAL ***
 dnl **********************
@@ -757,6 +778,7 @@ echo "
         DNS-SD support:               $msg_avahi
 	Build HAL volume monitor:     $msg_hal (with fast init path: $have_hal_fast_init)
 	Build GDU volume monitor:     $msg_gdu
+	Build udisks2 volume monitor: $msg_udisks2
 	GNOME Keyring support:        $msg_keyring
 	Bash-completion support:      $msg_bash_completion
 "
