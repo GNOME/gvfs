@@ -1,3 +1,9 @@
+Major changes in 1.10.0
+=======================
+* smb: Ignore read-only attribute for directories
+* gdu volume monitor: Mark bootable mounts as such
+* Translation updates
+
 Major changes in 1.9.5
 ======================
 * gdu: Don't ignore fstab mounts belonging to crypto volumes
