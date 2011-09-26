@@ -1,7 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /* gvfs - extensions for gio
  *
- * Copyright (C) 2006-2009 Red Hat, Inc.
+ * Copyright (C) 2011 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,11 @@ struct _GVfsUDisks2VolumeMonitorClass
 struct _GVfsUDisks2VolumeMonitor
 {
   GNativeVolumeMonitor parent;
+
+  UDisksClient *client;
 };
+
+static UDisksClient *get_udisks_client_sync (GError **error);
 
 G_DEFINE_TYPE (GVfsUDisks2VolumeMonitor, gvfs_udisks2_volume_monitor, G_TYPE_NATIVE_VOLUME_MONITOR)
 
@@ -54,41 +58,43 @@ gvfs_udisks2_volume_monitor_dispose (GObject *object)
 {
   the_volume_monitor = NULL;
 
-  if (G_OBJECT_CLASS (gvfs_udisks2_volume_monitor_parent_class)->dispose)
-    (*G_OBJECT_CLASS (gvfs_udisks2_volume_monitor_parent_class)->dispose) (object);
+  if (G_OBJECT_CLASS (gvfs_udisks2_volume_monitor_parent_class)->dispose != NULL)
+    G_OBJECT_CLASS (gvfs_udisks2_volume_monitor_parent_class)->dispose (object);
 }
 
 static void
 gvfs_udisks2_volume_monitor_finalize (GObject *object)
 {
-  /* GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (object); */
+  GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (object);
 
-  (*G_OBJECT_CLASS (gvfs_udisks2_volume_monitor_parent_class)->finalize) (object);
+  g_clear_object (&monitor->client);
+
+  G_OBJECT_CLASS (gvfs_udisks2_volume_monitor_parent_class)->finalize (object);
 }
 
 static GList *
-get_mounts (GVolumeMonitor *volume_monitor)
+get_mounts (GVolumeMonitor *monitor)
 {
   /* TODO */
   return NULL;
 }
 
 static GList *
-get_volumes (GVolumeMonitor *volume_monitor)
+get_volumes (GVolumeMonitor *monitor)
 {
   /* TODO */
   return NULL;
 }
 
 static GList *
-get_connected_drives (GVolumeMonitor *volume_monitor)
+get_connected_drives (GVolumeMonitor *monitor)
 {
   /* TODO */
   return NULL;
 }
 
 static GVolume *
-get_volume_for_uuid (GVolumeMonitor *volume_monitor,
+get_volume_for_uuid (GVolumeMonitor *monitor,
                      const gchar    *uuid)
 {
   /* TODO */
@@ -96,7 +102,7 @@ get_volume_for_uuid (GVolumeMonitor *volume_monitor,
 }
 
 static GMount *
-get_mount_for_uuid (GVolumeMonitor *volume_monitor,
+get_mount_for_uuid (GVolumeMonitor *monitor,
                     const gchar    *uuid)
 {
   /* TODO */
@@ -117,7 +123,6 @@ gvfs_udisks2_volume_monitor_constructor (GType                  type,
                                          GObjectConstructParam *construct_properties)
 {
   GObject *ret = NULL;
-  GVfsUDisks2VolumeMonitor *monitor;
   GObjectClass *parent_class;
 
   if (the_volume_monitor != NULL)
@@ -134,11 +139,7 @@ gvfs_udisks2_volume_monitor_constructor (GType                  type,
                                    n_construct_properties,
                                    construct_properties);
 
-  monitor = GVFS_UDISKS2_VOLUME_MONITOR (ret);
-
-  /* TODO: init monitor */
-
-  the_volume_monitor = monitor;
+  the_volume_monitor = GVFS_UDISKS2_VOLUME_MONITOR (ret);
 
  out:
   return ret;
@@ -147,13 +148,15 @@ gvfs_udisks2_volume_monitor_constructor (GType                  type,
 static void
 gvfs_udisks2_volume_monitor_init (GVfsUDisks2VolumeMonitor *monitor)
 {
+  monitor->client = get_udisks_client_sync (NULL);
 }
 
 static gboolean
 is_supported (void)
 {
-  /* TODO: return FALSE if udisks2 is not available */
-  return TRUE;
+  if (get_udisks_client_sync (NULL) != NULL)
+    return TRUE;
+  return FALSE;
 }
 
 static void
@@ -187,3 +190,26 @@ gvfs_udisks2_volume_monitor_new (void)
 {
   return G_VOLUME_MONITOR (g_object_new (GVFS_TYPE_UDISKS2_VOLUME_MONITOR, NULL));
 }
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+static UDisksClient *
+get_udisks_client_sync (GError **error)
+{
+  static UDisksClient *_client = NULL;
+  static GError *_error = NULL;
+  static volatile gsize initialized = 0;
+
+  if (g_once_init_enter (&initialized))
+    {
+      _client = udisks_client_new_sync (NULL, &_error);
+      g_once_init_leave (&initialized, 1);
+    }
+
+  if (_error != NULL && error != NULL)
+    *error = g_error_copy (_error);
+
+  return _client;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
