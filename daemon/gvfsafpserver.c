@@ -1141,12 +1141,11 @@ done:
  * @volume_id: id of the volume whose parameters should be received.
  * @vol_bitmap: bitmap describing the parameters that should be received.
  * @cancellable: optional #GCancellable object, %NULL to ignore.
- * @error: a #GError, %NULL to ignore.
  * @callback: callback to call when the request is satisfied.
  * @user_data: the data to pass to callback function.
  * 
  * Asynchronously retrives the parameters specified by @vol_bitmap of the volume
- * with id $volume_id.
+ * with id @volume_id.
  */
 void
 g_vfs_afp_server_get_vol_parms (GVfsAfpServer       *server,
@@ -1207,4 +1206,141 @@ g_vfs_afp_server_get_vol_parms_finish (GVfsAfpServer  *server,
     return NULL;
 
   return g_object_ref (g_simple_async_result_get_op_res_gpointer (simple));
+}
+
+static void
+volume_data_free (GVfsAfpVolumeData *vol_data)
+{
+  g_free (vol_data->name);
+  g_slice_free (GVfsAfpVolumeData, vol_data);
+}
+
+
+static void
+get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+
+  GVfsAfpReply *reply;
+  GError *err = NULL;
+  AfpResultCode res_code;
+  
+  guint8 num_volumes, i;
+  GPtrArray *volumes;
+  
+  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  if (!reply)
+  {
+    g_simple_async_result_take_error (simple, err);
+    goto done;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_object_unref (reply);
+
+    g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
+    goto done;
+  }
+  
+  /* server time */
+  g_vfs_afp_reply_read_int32 (reply, NULL);
+
+  /* NumVolStructures */
+  g_vfs_afp_reply_read_byte (reply, &num_volumes);
+  
+  volumes = g_ptr_array_sized_new (num_volumes);
+  g_ptr_array_set_free_func (volumes, (GDestroyNotify)volume_data_free);
+  for (i = 0; i < num_volumes; i++)
+  {
+    guint8 flags;
+    char *vol_name;
+
+    GVfsAfpVolumeData *volume_data;
+
+    g_vfs_afp_reply_read_byte (reply, &flags);
+    g_vfs_afp_reply_read_pascal (reply, &vol_name);
+    if (!vol_name)
+      continue;
+
+    volume_data = g_slice_new (GVfsAfpVolumeData);
+    volume_data->flags = flags;
+    volume_data->name = vol_name;
+
+    g_ptr_array_add (volumes, volume_data);
+  }
+  g_object_unref (reply);
+
+  g_simple_async_result_set_op_res_gpointer (simple, volumes,
+                                             (GDestroyNotify)g_ptr_array_unref);
+done:
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+}
+
+/*
+ * g_vfs_afp_server_get_volumes:
+ * 
+ * @server: a #GVfsAfpServer
+ * @cancellable: optional #GCancellable object, %NULL to ignore.
+ * @callback: callback to call when the request is satisfied.
+ * @user_data: the data to pass to callback function.
+ * 
+ * Asynchronously retrieves the volumes available on @server.
+ */
+void
+g_vfs_afp_server_get_volumes (GVfsAfpServer       *server,
+                              GCancellable        *cancellable,
+                              GAsyncReadyCallback  callback,
+                              gpointer             user_data)
+{
+  GVfsAfpCommand *comm;
+  GSimpleAsyncResult *simple;
+  
+  /* Get Server Parameters */
+  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+
+  simple = g_simple_async_result_new (G_OBJECT (server), callback, user_data,
+                                      g_vfs_afp_server_get_volumes);
+  
+  g_vfs_afp_connection_send_command (server->conn, comm, NULL, get_volumes_cb,
+                                     cancellable, simple);
+}
+
+/*
+ * g_vfs_afp_server_get_vol_parms_finish:
+ * 
+ * @server: a #GVfsAfpServer.
+ * @result: a #GAsyncResult.
+ * @error: a #GError, %NULL to ignore.
+ * 
+ * Finalizes the asynchronous operation started by
+ * g_vfs_afp_server_get_volumes.
+ * 
+ * Returns: A #GPtrArray containing the volumes #GVfsAfpVolumeData structures or
+ * %NULL on error.
+ *                      
+ */
+GPtrArray *
+g_vfs_afp_server_get_volumes_finish (GVfsAfpServer  *server,
+                                     GAsyncResult   *result,
+                                     GError         **error)
+{
+  GSimpleAsyncResult *simple;
+  
+  g_return_val_if_fail (g_simple_async_result_is_valid (result,
+                                                        G_OBJECT (server),
+                                                        g_vfs_afp_server_get_volumes),
+                        NULL);
+
+  simple = (GSimpleAsyncResult *)result;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    return NULL;
+
+  return g_ptr_array_ref ((GPtrArray *)g_simple_async_result_get_op_res_gpointer (simple));
 }

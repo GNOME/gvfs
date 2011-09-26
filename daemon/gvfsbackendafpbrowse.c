@@ -58,25 +58,12 @@ struct _GVfsBackendAfpBrowse
   GVfsAfpServer      *server;
 
   char               *logged_in_user;
-  GSList             *volumes;
+  GPtrArray          *volumes;
 };
 
 
 G_DEFINE_TYPE (GVfsBackendAfpBrowse, g_vfs_backend_afp_browse, G_VFS_TYPE_BACKEND);
 
-
-typedef struct
-{
-  char *name;
-  guint16 flags;
-} VolumeData;
-
-static void
-volume_data_free (VolumeData *vol_data)
-{
-  g_free (vol_data->name);
-  g_slice_free (VolumeData, vol_data);
-}
 
 static gboolean
 is_root (const char *filename)
@@ -91,62 +78,27 @@ is_root (const char *filename)
 }
 
 static void
-get_srvr_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GVfsAfpServer *server = G_VFS_AFP_SERVER (source_object);
+  GSimpleAsyncResult *simple = user_data;
 
   GVfsBackendAfpBrowse *afp_backend;
-  GVfsAfpReply *reply;
+  GPtrArray *volumes;
   GError *err = NULL;
-  AfpResultCode res_code;
   
-  guint8 num_volumes, i;
-
   afp_backend = G_VFS_BACKEND_AFP_BROWSE (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
   
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
-  if (!reply)
+  volumes = g_vfs_afp_server_get_volumes_finish (server, res, &err);
+  if (!volumes)
   {
     g_simple_async_result_take_error (simple, err);
     goto done;
   }
 
-  res_code = g_vfs_afp_reply_get_result_code (reply);
-  if (res_code != AFP_RESULT_NO_ERROR)
-  {
-    g_object_unref (reply);
-
-    g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
-    goto done;
-  }
-  
-  /* server time */
-  g_vfs_afp_reply_read_int32 (reply, NULL);
-
-  g_slist_free_full (afp_backend->volumes, (GDestroyNotify) volume_data_free);
-  afp_backend->volumes = NULL;
-
-  g_vfs_afp_reply_read_byte (reply, &num_volumes);
-  for (i = 0; i < num_volumes; i++)
-  {
-    guint8 flags;
-    char *vol_name;
-
-    VolumeData *volume_data;
-
-    g_vfs_afp_reply_read_byte (reply, &flags);
-    g_vfs_afp_reply_read_pascal (reply, &vol_name);
-    if (!vol_name)
-      continue;
-
-    volume_data = g_slice_new (VolumeData);
-    volume_data->flags = flags;
-    volume_data->name = vol_name;
-
-    afp_backend->volumes = g_slist_prepend (afp_backend->volumes, volume_data);
-  }
-  g_object_unref (reply);
+  if (afp_backend->volumes)
+    g_ptr_array_unref (afp_backend->volumes);
+  afp_backend->volumes = volumes;
 
 done:
   g_simple_async_result_complete (simple);
@@ -159,20 +111,13 @@ update_cache (GVfsBackendAfpBrowse *afp_backend,
               GAsyncReadyCallback callback,
               gpointer user_data)
 {
-  GVfsAfpCommand *comm;
   GSimpleAsyncResult *simple;
   
-  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
-  /* pad byte */
-  g_vfs_afp_command_put_byte (comm, 0);
-
   simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
                                       user_data, update_cache);
-  
-  g_vfs_afp_connection_send_command (afp_backend->server->conn, comm, NULL,
-                                     get_srvr_parms_cb,
-                                     cancellable, simple);
-  g_object_unref (comm); 
+
+  g_vfs_afp_server_get_volumes (afp_backend->server, cancellable, get_volumes_cb,
+                                simple); 
 }
 
 static gboolean
@@ -194,13 +139,13 @@ update_cache_finish (GVfsBackendAfpBrowse *afp_backend,
   return TRUE;
 }
 
-static VolumeData *
+static GVfsAfpVolumeData *
 find_volume (GVfsBackendAfpBrowse *afp_backend,
              char *filename)
 {
   char *end;
   guint len;
-  GSList *l;
+  guint i;
 
   while (*filename == '/')
     filename++;
@@ -219,9 +164,9 @@ find_volume (GVfsBackendAfpBrowse *afp_backend,
   else
     len = strlen (filename);
 
-  for (l = afp_backend->volumes; l; l = g_slist_next (l))
+  for (i = 0; i < afp_backend->volumes->len; i++)
   {
-    VolumeData *vol_data = (VolumeData *)l->data;
+    GVfsAfpVolumeData *vol_data = g_ptr_array_index (afp_backend->volumes, i);
 
     if (strlen (vol_data->name) == len && strncmp (vol_data->name, filename, len) == 0)
       return vol_data;
@@ -239,7 +184,7 @@ mount_mountable_cb (GObject      *source_object,
   GVfsJobMountMountable *job = G_VFS_JOB_MOUNT_MOUNTABLE (user_data);
 
   GError *err;
-  VolumeData *vol_data;
+  GVfsAfpVolumeData *vol_data;
   GMountSpec *mount_spec;
 
   if (!update_cache_finish (afp_backend, res, &err))
@@ -292,7 +237,7 @@ try_mount_mountable (GVfsBackend *backend,
 }
 
 static void
-fill_info (GFileInfo *info, VolumeData *vol_data, GVfsBackendAfpBrowse *afp_backend)
+fill_info (GFileInfo *info, GVfsAfpVolumeData *vol_data, GVfsBackendAfpBrowse *afp_backend)
 {
   GIcon *icon;
   GMountSpec *mount_spec;
@@ -346,7 +291,7 @@ enumerate_cache_updated_cb (GObject      *source_object,
   GVfsJobEnumerate *job = G_VFS_JOB_ENUMERATE (user_data);
 
   GError *err = NULL;
-  GSList *l;
+  guint i;
 
   if (!update_cache_finish (afp_backend, res, &err))
   {
@@ -357,9 +302,9 @@ enumerate_cache_updated_cb (GObject      *source_object,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
   
-  for (l = afp_backend->volumes; l; l = l->next)
+  for (i = 0; i < afp_backend->volumes->len; i++)
   {
-    VolumeData *vol_data = l->data;
+    GVfsAfpVolumeData *vol_data = g_ptr_array_index (afp_backend->volumes, i);
     
     GFileInfo *info;
 
@@ -405,7 +350,7 @@ query_info_cb (GObject      *source_object,
   GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
 
   GError *err = NULL;
-  VolumeData *vol_data;
+  GVfsAfpVolumeData *vol_data;
 
   if (!update_cache_finish (afp_backend, res, &err))
   {
@@ -577,7 +522,8 @@ g_vfs_backend_afp_browse_finalize (GObject *object)
   g_free (afp_backend->user);
 
   g_free (afp_backend->logged_in_user);
-  g_slist_free_full (afp_backend->volumes, (GDestroyNotify)volume_data_free);
+  if (afp_backend->volumes)
+    g_ptr_array_unref (afp_backend->volumes);
 
   G_OBJECT_CLASS (g_vfs_backend_afp_browse_parent_class)->finalize (object);
 }

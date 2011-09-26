@@ -95,6 +95,21 @@ GFileInfo *        g_vfs_afp_server_get_vol_parms_finish (GVfsAfpServer       *s
                                                           GAsyncResult        *result,
                                                           GError             **error);
 
+typedef struct _GVfsAfpVolumeData GVfsAfpVolumeData;
+struct _GVfsAfpVolumeData
+{
+  char *name;
+  guint16 flags;
+};
+
+void               g_vfs_afp_server_get_volumes          (GVfsAfpServer       *server,
+                                                          GCancellable        *cancellable,
+                                                          GAsyncReadyCallback  callback,
+                                                          gpointer             user_data);
+GPtrArray *        g_vfs_afp_server_get_volumes_finish   (GVfsAfpServer  *server,
+                                                          GAsyncResult   *result,
+                                                          GError         **error);
+
 G_END_DECLS
 
 #endif /* _GVFSAFPSERVER_H_ */
