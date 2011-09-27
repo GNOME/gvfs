@@ -3,14 +3,12 @@ NULL =
 
 libexec_PROGRAMS = gvfs-udisks2-volume-monitor
 
-#	gvfsudisks2drive.c		gvfsudisks2drive.h		\
-#	gvfsudisks2volume.c		gvfsudisks2volume.h		\
-#	gvfsudisks2mount.c		gvfsudisks2mount.h		\
-#
-
 gvfs_udisks2_volume_monitor_SOURCES =					\
 	udisks2volumemonitordaemon.c					\
 	gvfsudisks2volumemonitor.c	gvfsudisks2volumemonitor.h	\
+	gvfsudisks2drive.c		gvfsudisks2drive.h		\
+	gvfsudisks2volume.c		gvfsudisks2volume.h		\
+	gvfsudisks2mount.c		gvfsudisks2mount.h		\
 	$(NULL)
 
 gvfs_udisks2_volume_monitor_CFLAGS =		\

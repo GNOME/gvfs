@@ -32,9 +32,9 @@
 
 G_BEGIN_DECLS
 
-#define GVFS_TYPE_UDISKS2_VOLUME_MONITOR (gvfs_udisks2_volume_monitor_get_type ())
-#define GVFS_UDISKS2_VOLUME_MONITOR(o)   (G_TYPE_CHECK_INSTANCE_CAST ((o), GVFS_TYPE_UDISKS2_VOLUME_MONITOR, GVfsUDisks2VolumeMonitor))
-#define G_IS_GDU_VOLUME_MONITOR(o)       (G_TYPE_CHECK_INSTANCE_TYPE ((o), GVFS_TYPE_UDISKS2_VOLUME_MONITOR))
+#define GVFS_TYPE_UDISKS2_VOLUME_MONITOR  (gvfs_udisks2_volume_monitor_get_type ())
+#define GVFS_UDISKS2_VOLUME_MONITOR(o)    (G_TYPE_CHECK_INSTANCE_CAST ((o), GVFS_TYPE_UDISKS2_VOLUME_MONITOR, GVfsUDisks2VolumeMonitor))
+#define GVFS_IS_UDISKS2_VOLUME_MONITOR(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), GVFS_TYPE_UDISKS2_VOLUME_MONITOR))
 
 typedef struct _GVfsUDisks2VolumeMonitor GVfsUDisks2VolumeMonitor;
 
@@ -43,8 +43,9 @@ typedef struct _GVfsUDisks2Drive GVfsUDisks2Drive;
 typedef struct _GVfsUDisks2Volume GVfsUDisks2Volume;
 typedef struct _GVfsUDisks2Mount GVfsUDisks2Mount;
 
-GType           gvfs_udisks2_volume_monitor_get_type (void) G_GNUC_CONST;
-GVolumeMonitor *gvfs_udisks2_volume_monitor_new      (void);
+GType           gvfs_udisks2_volume_monitor_get_type          (void) G_GNUC_CONST;
+GVolumeMonitor *gvfs_udisks2_volume_monitor_new               (void);
+UDisksClient   *gvfs_udisks2_volume_monitor_get_udisks_client (GVfsUDisks2VolumeMonitor *monitor);
 
 G_END_DECLS
 
