@@ -166,7 +166,7 @@ update_drive (GVfsUDisks2Drive *drive)
   if (drive->is_media_removable)
     {
       drive->has_media = (udisks_drive_get_size (drive->udisks_drive) > 0);
-      drive->can_eject = FALSE; // TODO: set to TRUE when eject() has been implemented
+      drive->can_eject = TRUE;
     }
   else
     {
@@ -409,6 +409,269 @@ gvfs_udisks2_drive_enumerate_identifiers (GDrive *_drive)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+typedef void (*UnmountsMountsFunc)  (GDrive              *drive,
+                                     GMountOperation     *mount_operation,
+                                     GCancellable        *cancellable,
+                                     GAsyncReadyCallback  callback,
+                                     gpointer             user_data,
+                                     gpointer             on_all_unmounted_data);
+
+typedef struct {
+  GDrive *drive;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+  GMountOperation *mount_operation;
+  GCancellable *cancellable;
+  GMountUnmountFlags flags;
+
+  GList *pending_mounts;
+
+  UnmountsMountsFunc on_all_unmounted;
+  gpointer on_all_unmounted_data;
+} UnmountMountsOp;
+
+static void
+free_unmount_mounts_op (UnmountMountsOp *data)
+{
+  GList *l;
+  for (l = data->pending_mounts; l != NULL; l = l->next)
+    {
+      GMount *mount = G_MOUNT (l->data);
+      g_object_unref (mount);
+    }
+  g_list_free (data->pending_mounts);
+}
+
+static void
+unmount_mounts_cb (GObject       *source_object,
+                   GAsyncResult  *res,
+                   gpointer       user_data);
+
+static void
+unmount_mounts_do (UnmountMountsOp *data)
+{
+  if (data->pending_mounts == NULL)
+    {
+      data->on_all_unmounted (data->drive,
+                              data->mount_operation,
+                              data->cancellable,
+                              data->callback,
+                              data->user_data,
+                              data->on_all_unmounted_data);
+
+      g_object_unref (data->drive);
+      g_free (data);
+    }
+  else
+    {
+      GMount *mount;
+      mount = data->pending_mounts->data;
+      data->pending_mounts = g_list_remove (data->pending_mounts, mount);
+
+      g_mount_unmount_with_operation (mount,
+                                      data->flags,
+                                      data->mount_operation,
+                                      data->cancellable,
+                                      unmount_mounts_cb,
+                                      data);
+    }
+}
+
+static void
+unmount_mounts_cb (GObject      *source_object,
+                   GAsyncResult *res,
+                   gpointer      user_data)
+{
+  UnmountMountsOp *data = user_data;
+  GMount *mount = G_MOUNT (source_object);
+  GSimpleAsyncResult *simple;
+  GError *error = NULL;
+
+  if (!g_mount_unmount_with_operation_finish (mount, res, &error))
+    {
+      /* make the error dialog more targeted to the drive.. unless the user has already seen a dialog */
+      if (error->code != G_IO_ERROR_FAILED_HANDLED)
+        {
+          g_error_free (error);
+          error = g_error_new (G_IO_ERROR, G_IO_ERROR_BUSY,
+                               _("Failed to eject medium; one or more volumes on the medium are busy."));
+        }
+
+      /* unmount failed; need to fail the whole eject operation */
+      simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
+                                                     data->callback,
+                                                     data->user_data,
+                                                     error);
+      g_error_free (error);
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+
+      free_unmount_mounts_op (data);
+    }
+  else
+    {
+      /* move on to the next mount.. */
+      unmount_mounts_do (data);
+    }
+  g_object_unref (mount);
+}
+
+static void
+unmount_mounts (GVfsUDisks2Drive    *drive,
+                GMountUnmountFlags   flags,
+                GMountOperation     *mount_operation,
+                GCancellable        *cancellable,
+                GAsyncReadyCallback  callback,
+                gpointer             user_data,
+                UnmountsMountsFunc   on_all_unmounted,
+                gpointer             on_all_unmounted_data)
+{
+  GMount *mount;
+  UnmountMountsOp *data;
+  GList *l;
+
+  data = g_new0 (UnmountMountsOp, 1);
+  data->drive = g_object_ref (drive);
+  data->mount_operation = mount_operation;
+  data->cancellable = cancellable;
+  data->callback = callback;
+  data->user_data = user_data;
+  data->flags = flags;
+  data->on_all_unmounted = on_all_unmounted;
+  data->on_all_unmounted_data = on_all_unmounted_data;
+
+  for (l = drive->volumes; l != NULL; l = l->next)
+    {
+      GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (l->data);
+      mount = g_volume_get_mount (G_VOLUME (volume));
+      if (mount != NULL && g_mount_can_unmount (mount))
+        data->pending_mounts = g_list_prepend (data->pending_mounts, g_object_ref (mount));
+    }
+
+  unmount_mounts_do (data);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+typedef struct
+{
+  GSimpleAsyncResult *simple;
+
+  GVfsUDisks2Drive *drive;
+} EjectData;
+
+static void
+eject_data_free (EjectData *data)
+{
+  g_object_unref (data->simple);
+  g_clear_object (&data->drive);
+  g_free (data);
+}
+
+static void
+eject_cb (GObject      *source_object,
+          GAsyncResult *res,
+          gpointer      user_data)
+{
+  EjectData *data = user_data;
+  GError *error;
+
+  error = NULL;
+  if (!udisks_drive_call_eject_finish (UDISKS_DRIVE (source_object), res, &error))
+    {
+      g_simple_async_result_take_error (data->simple, error);
+      g_simple_async_result_complete (data->simple);
+      goto out;
+    }
+
+  g_simple_async_result_complete (data->simple);
+
+ out:
+  eject_data_free (data);
+}
+
+static void
+gvfs_udisks2_drive_eject_on_all_unmounted (GDrive              *_drive,
+                                           GMountOperation     *mount_operation,
+                                           GCancellable        *cancellable,
+                                           GAsyncReadyCallback  callback,
+                                           gpointer             user_data,
+                                           gpointer             on_all_unmounted_data)
+{
+  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+  GVariantBuilder builder;
+  EjectData *data;
+
+  data = g_new0 (EjectData, 1);
+  data->simple = g_simple_async_result_new (G_OBJECT (drive),
+                                            callback,
+                                            user_data,
+                                            gvfs_udisks2_drive_eject_on_all_unmounted);
+  data->drive = g_object_ref (drive);
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
+  if (mount_operation == NULL)
+    {
+      g_variant_builder_add (&builder,
+                             "{sv}",
+                             "auth.no_user_interaction", g_variant_new_boolean (TRUE));
+    }
+  udisks_drive_call_eject (drive->udisks_drive,
+                           g_variant_builder_end (&builder),
+                           cancellable,
+                           eject_cb,
+                           data);
+}
+
+static void
+gvfs_udisks2_drive_eject_with_operation (GDrive              *_drive,
+                                         GMountUnmountFlags   flags,
+                                         GMountOperation     *mount_operation,
+                                         GCancellable        *cancellable,
+                                         GAsyncReadyCallback  callback,
+                                         gpointer             user_data)
+{
+  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+
+  /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
+  unmount_mounts (drive,
+                  flags,
+                  mount_operation,
+                  cancellable,
+                  callback,
+                  user_data,
+                  gvfs_udisks2_drive_eject_on_all_unmounted,
+                  NULL);
+}
+
+static gboolean
+gvfs_udisks2_drive_eject_with_operation_finish (GDrive        *drive,
+                                                GAsyncResult  *result,
+                                                GError       **error)
+{
+  return !g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
+}
+
+static void
+gvfs_udisks2_drive_eject (GDrive              *drive,
+                          GMountUnmountFlags   flags,
+                          GCancellable        *cancellable,
+                          GAsyncReadyCallback  callback,
+                          gpointer             user_data)
+{
+  gvfs_udisks2_drive_eject_with_operation (drive, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
+gvfs_udisks2_drive_eject_finish (GDrive        *drive,
+                                 GAsyncResult  *result,
+                                 GError       **error)
+{
+  return gvfs_udisks2_drive_eject_with_operation_finish (drive, result, error);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static void
 gvfs_udisks2_drive_drive_iface_init (GDriveIface *iface)
 {
@@ -428,11 +691,11 @@ gvfs_udisks2_drive_drive_iface_init (GDriveIface *iface)
   iface->can_start_degraded = gvfs_udisks2_drive_can_start_degraded;
   iface->can_stop = gvfs_udisks2_drive_can_stop;
 
-#if 0
   iface->eject = gvfs_udisks2_drive_eject;
   iface->eject_finish = gvfs_udisks2_drive_eject_finish;
   iface->eject_with_operation = gvfs_udisks2_drive_eject_with_operation;
   iface->eject_with_operation_finish = gvfs_udisks2_drive_eject_with_operation_finish;
+#if 0
   iface->poll_for_media = gvfs_udisks2_drive_poll_for_media;
   iface->poll_for_media_finish = gvfs_udisks2_drive_poll_for_media_finish;
   iface->start = gvfs_udisks2_drive_start;

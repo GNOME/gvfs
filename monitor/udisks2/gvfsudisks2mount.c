@@ -847,6 +847,109 @@ gvfs_udisks2_mount_unmount_finish (GMount        *mount,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+typedef struct
+{
+  GObject *object;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+} EjectWrapperOp;
+
+static void
+eject_wrapper_callback (GObject       *source_object,
+                        GAsyncResult  *res,
+                        gpointer       user_data)
+{
+  EjectWrapperOp *data  = user_data;
+  data->callback (data->object, res, data->user_data);
+  g_object_unref (data->object);
+  g_free (data);
+}
+
+static void
+gvfs_udisks2_mount_eject_with_operation (GMount              *_mount,
+                                         GMountUnmountFlags   flags,
+                                         GMountOperation     *mount_operation,
+                                         GCancellable        *cancellable,
+                                         GAsyncReadyCallback  callback,
+                                         gpointer             user_data)
+{
+  GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
+  GDrive *drive;
+
+  drive = NULL;
+  if (mount->volume != NULL)
+    drive = g_volume_get_drive (G_VOLUME (mount->volume));
+
+  if (drive != NULL)
+    {
+      EjectWrapperOp *data;
+      data = g_new0 (EjectWrapperOp, 1);
+      data->object = g_object_ref (mount);
+      data->callback = callback;
+      data->user_data = user_data;
+      g_drive_eject_with_operation (drive, flags, mount_operation, cancellable, eject_wrapper_callback, data);
+      g_object_unref (drive);
+    }
+  else
+    {
+      GSimpleAsyncResult *simple;
+      simple = g_simple_async_result_new_error (G_OBJECT (mount),
+                                                callback,
+                                                user_data,
+                                                G_IO_ERROR,
+                                                G_IO_ERROR_FAILED,
+                                                _("Operation not supported by backend"));
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+    }
+}
+
+static gboolean
+gvfs_udisks2_mount_eject_with_operation_finish (GMount        *_mount,
+                                                GAsyncResult  *result,
+                                                GError       **error)
+{
+  GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
+  gboolean ret = TRUE;
+  GDrive *drive;
+
+  drive = NULL;
+  if (mount->volume != NULL)
+    drive = g_volume_get_drive (G_VOLUME (mount->volume));
+
+  if (drive != NULL)
+    {
+      ret = g_drive_eject_with_operation_finish (drive, result, error);
+      g_object_unref (drive);
+    }
+  else
+    {
+      g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
+      ret = FALSE;
+    }
+  return ret;
+}
+
+static void
+gvfs_udisks2_mount_eject (GMount              *mount,
+                          GMountUnmountFlags   flags,
+                          GCancellable        *cancellable,
+                          GAsyncReadyCallback  callback,
+                          gpointer             user_data)
+{
+  gvfs_udisks2_mount_eject_with_operation (mount, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
+gvfs_udisks2_mount_eject_finish (GMount        *mount,
+                                 GAsyncResult  *result,
+                                 GError       **error)
+{
+  return gvfs_udisks2_mount_eject_with_operation_finish (mount, result, error);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static void
 gvfs_udisks2_mount_mount_iface_init (GMountIface *iface)
 {
@@ -862,11 +965,11 @@ gvfs_udisks2_mount_mount_iface_init (GMountIface *iface)
   iface->unmount_finish = gvfs_udisks2_mount_unmount_finish;
   iface->unmount_with_operation = gvfs_udisks2_mount_unmount_with_operation;
   iface->unmount_with_operation_finish = gvfs_udisks2_mount_unmount_with_operation_finish;
-#if 0
   iface->eject = gvfs_udisks2_mount_eject;
   iface->eject_finish = gvfs_udisks2_mount_eject_finish;
   iface->eject_with_operation = gvfs_udisks2_mount_eject_with_operation;
   iface->eject_with_operation_finish = gvfs_udisks2_mount_eject_with_operation_finish;
+#if 0
   iface->guess_content_type = gvfs_udisks2_mount_guess_content_type;
   iface->guess_content_type_finish = gvfs_udisks2_mount_guess_content_type_finish;
   iface->guess_content_type_sync = gvfs_udisks2_mount_guess_content_type_sync;

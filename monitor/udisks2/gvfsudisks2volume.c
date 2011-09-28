@@ -636,6 +636,103 @@ gvfs_udisks2_volume_mount_finish (GVolume       *volume,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+typedef struct
+{
+  GObject *object;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+} EjectWrapperOp;
+
+static void
+eject_wrapper_callback (GObject      *source_object,
+                        GAsyncResult *res,
+                        gpointer      user_data)
+{
+  EjectWrapperOp *data  = user_data;
+  data->callback (data->object, res, data->user_data);
+  g_object_unref (data->object);
+  g_free (data);
+}
+
+static void
+gvfs_udisks2_volume_eject_with_operation (GVolume              *_volume,
+                                          GMountUnmountFlags   flags,
+                                          GMountOperation     *mount_operation,
+                                          GCancellable        *cancellable,
+                                          GAsyncReadyCallback  callback,
+                                          gpointer             user_data)
+{
+  GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
+  GVfsUDisks2Drive *drive;
+
+  drive = NULL;
+  if (volume->drive != NULL)
+    drive = g_object_ref (volume->drive);
+
+  if (drive != NULL)
+    {
+      EjectWrapperOp *data;
+      data = g_new0 (EjectWrapperOp, 1);
+      data->object = g_object_ref (volume);
+      data->callback = callback;
+      data->user_data = user_data;
+      g_drive_eject_with_operation (G_DRIVE (drive), flags, mount_operation, cancellable, eject_wrapper_callback, data);
+      g_object_unref (drive);
+    }
+  else
+    {
+      GSimpleAsyncResult *simple;
+      simple = g_simple_async_result_new_error (G_OBJECT (volume),
+                                                callback,
+                                                user_data,
+                                                G_IO_ERROR,
+                                                G_IO_ERROR_FAILED,
+                                                _("Operation not supported by backend"));
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+    }
+}
+
+static gboolean
+gvfs_udisks2_volume_eject_with_operation_finish (GVolume        *_volume,
+                                                 GAsyncResult  *result,
+                                                 GError       **error)
+{
+  GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
+  gboolean ret = TRUE;
+
+  if (volume->drive != NULL)
+    {
+      ret = g_drive_eject_with_operation_finish (G_DRIVE (volume->drive), result, error);
+    }
+  else
+    {
+      g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
+      ret = FALSE;
+    }
+  return ret;
+}
+
+static void
+gvfs_udisks2_volume_eject (GVolume              *volume,
+                           GMountUnmountFlags   flags,
+                           GCancellable        *cancellable,
+                           GAsyncReadyCallback  callback,
+                           gpointer             user_data)
+{
+  gvfs_udisks2_volume_eject_with_operation (volume, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
+gvfs_udisks2_volume_eject_finish (GVolume        *volume,
+                                  GAsyncResult  *result,
+                                  GError       **error)
+{
+  return gvfs_udisks2_volume_eject_with_operation_finish (volume, result, error);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static void
 gvfs_udisks2_volume_volume_iface_init (GVolumeIface *iface)
 {
@@ -653,12 +750,10 @@ gvfs_udisks2_volume_volume_iface_init (GVolumeIface *iface)
 
   iface->mount_fn = gvfs_udisks2_volume_mount;
   iface->mount_finish = gvfs_udisks2_volume_mount_finish;
-#if 0
   iface->eject = gvfs_udisks2_volume_eject;
   iface->eject_finish = gvfs_udisks2_volume_eject_finish;
   iface->eject_with_operation = gvfs_udisks2_volume_eject_with_operation;
   iface->eject_with_operation_finish = gvfs_udisks2_volume_eject_with_operation_finish;
-#endif
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
