@@ -46,6 +46,7 @@ typedef struct _GVfsUDisks2Mount GVfsUDisks2Mount;
 GType           gvfs_udisks2_volume_monitor_get_type          (void) G_GNUC_CONST;
 GVolumeMonitor *gvfs_udisks2_volume_monitor_new               (void);
 UDisksClient   *gvfs_udisks2_volume_monitor_get_udisks_client (GVfsUDisks2VolumeMonitor *monitor);
+void            gvfs_udisks2_volume_monitor_update            (GVfsUDisks2VolumeMonitor *monitor);
 
 G_END_DECLS
 

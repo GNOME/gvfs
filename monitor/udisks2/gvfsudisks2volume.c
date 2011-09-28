@@ -42,6 +42,11 @@ struct _GVfsUDisks2VolumeClass
   GObjectClass parent_class;
 };
 
+struct MountData;
+typedef struct MountData MountData;
+
+static void mount_cancel_pending_op (MountData *data);
+
 struct _GVfsUDisks2Volume
 {
   GObject parent;
@@ -61,6 +66,12 @@ struct _GVfsUDisks2Volume
   gchar *uuid;
   gboolean can_mount;
   gboolean should_automount;
+
+  /* If a mount operation is in progress, then pending_mount_op is != NULL. This
+   * is used to cancel the operation to make possible authentication dialogs go
+   * away.
+   */
+  MountData *mount_pending_op;
 };
 
 static void gvfs_udisks2_volume_volume_iface_init (GVolumeIface *iface);
@@ -120,7 +131,7 @@ static void
 emit_changed (GVfsUDisks2Volume *volume)
 {
   g_signal_emit_by_name (volume, "changed");
-  g_signal_emit_by_name (volume->monitor, "volume_changed", volume);
+  g_signal_emit_by_name (volume->monitor, "volume-changed", volume);
 }
 
 static UDisksDrive *
@@ -299,11 +310,8 @@ gvfs_udisks2_volume_new (GVfsUDisks2VolumeMonitor   *monitor,
 void
 gvfs_udisks2_volume_removed (GVfsUDisks2Volume *volume)
 {
-#if 0
-TODO
-  if (volume->pending_mount_op != NULL)
-    cancel_pending_mount_op (volume->pending_mount_op);
-#endif
+  if (volume->mount_pending_op != NULL)
+    mount_cancel_pending_op (volume->mount_pending_op);
 
   if (volume->mount != NULL)
     {
@@ -491,6 +499,143 @@ gvfs_udisks2_volume_get_activation_root (GVolume *_volume)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+struct MountData
+{
+  GSimpleAsyncResult *simple;
+
+  GVfsUDisks2Volume *volume;
+
+  GCancellable *cancellable;
+
+  GMountOperation *mount_operation;
+};
+
+static void
+mount_data_free (MountData *data)
+{
+  g_object_unref (data->simple);
+
+  g_clear_object (&data->volume);
+  g_clear_object (&data->cancellable);
+  g_clear_object (&data->mount_operation);
+  g_free (data);
+}
+
+static void
+mount_cancel_pending_op (MountData *data)
+{
+  g_debug ("woot, cancelling");
+  /* send an ::aborted signal to make the dialog go away */
+  if (data->mount_operation != NULL)
+    g_signal_emit_by_name (data->mount_operation, "aborted");
+  g_cancellable_cancel (data->cancellable);
+}
+
+static void
+mount_cb (GObject       *source_object,
+          GAsyncResult  *res,
+          gpointer       user_data)
+{
+  MountData *data = user_data;
+  gchar *mount_path;
+  GError *error;
+
+  /* we are no longer pending */
+  data->volume->mount_pending_op = NULL;
+
+  error = NULL;
+  if (!udisks_filesystem_call_mount_finish (UDISKS_FILESYSTEM (source_object),
+                                            &mount_path,
+                                            res,
+                                            &error))
+    {
+      g_simple_async_result_take_error (data->simple, error);
+      g_simple_async_result_complete (data->simple);
+    }
+  else
+    {
+      gvfs_udisks2_volume_monitor_update (data->volume->monitor);
+      g_simple_async_result_complete (data->simple);
+      g_free (mount_path);
+    }
+  mount_data_free (data);
+}
+
+static void
+gvfs_udisks2_volume_mount (GVolume             *_volume,
+                           GMountMountFlags     flags,
+                           GMountOperation     *mount_operation,
+                           GCancellable        *cancellable,
+                           GAsyncReadyCallback  callback,
+                           gpointer             user_data)
+{
+  GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
+  UDisksFilesystem *filesystem;
+  GVariantBuilder builder;
+  MountData *data;
+
+  data = g_new0 (MountData, 1);
+  data->simple = g_simple_async_result_new (G_OBJECT (volume),
+                                            callback,
+                                            user_data,
+                                            gvfs_udisks2_volume_mount);
+  data->volume = g_object_ref (volume);
+
+  if (volume->mount_pending_op != NULL)
+    {
+      g_simple_async_result_set_error (data->simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_FAILED,
+                                       "A mount operation is already pending");
+      g_simple_async_result_complete (data->simple);
+      mount_data_free (data);
+      goto out;
+    }
+
+  filesystem = udisks_object_peek_filesystem (UDISKS_OBJECT (g_dbus_interface_get_object (G_DBUS_INTERFACE (volume->block))));
+  if (filesystem == NULL)
+    {
+      g_simple_async_result_set_error (data->simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_FAILED,
+                                       "No filesystem interface on D-Bus object");
+      g_simple_async_result_complete (data->simple);
+      mount_data_free (data);
+      goto out;
+    }
+
+  data->cancellable = cancellable != NULL ? g_object_ref (cancellable) : NULL;
+  data->mount_operation = mount_operation != NULL ? g_object_ref (mount_operation) : NULL;
+  volume->mount_pending_op = data;
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
+  if (data->mount_operation == NULL)
+    {
+      g_variant_builder_add (&builder,
+                             "{sv}",
+                             "auth.no_user_interaction", g_variant_new_boolean (TRUE));
+    }
+  udisks_filesystem_call_mount (filesystem,
+                                g_variant_builder_end (&builder),
+                                data->cancellable,
+                                mount_cb,
+                                data);
+
+ out:
+  ;
+}
+
+static gboolean
+gvfs_udisks2_volume_mount_finish (GVolume       *volume,
+                                  GAsyncResult  *result,
+                                  GError       **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
+  return !g_simple_async_result_propagate_error (simple, error);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static void
 gvfs_udisks2_volume_volume_iface_init (GVolumeIface *iface)
 {
@@ -506,9 +651,9 @@ gvfs_udisks2_volume_volume_iface_init (GVolumeIface *iface)
   iface->enumerate_identifiers = gvfs_udisks2_volume_enumerate_identifiers;
   iface->get_identifier = gvfs_udisks2_volume_get_identifier;
 
-#if 0
   iface->mount_fn = gvfs_udisks2_volume_mount;
   iface->mount_finish = gvfs_udisks2_volume_mount_finish;
+#if 0
   iface->eject = gvfs_udisks2_volume_eject;
   iface->eject_finish = gvfs_udisks2_volume_eject_finish;
   iface->eject_with_operation = gvfs_udisks2_volume_eject_with_operation;

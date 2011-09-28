@@ -275,7 +275,7 @@ get_mount_for_mount_path (const gchar  *mount_path,
       for (l = monitor->mounts; l != NULL; l = l->next)
         {
           GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (l->data);
-          if (gvfs_udisks2_mount_has_mount_path (mount, mount_path))
+          if (g_strcmp0 (gvfs_udisks2_mount_get_mount_path (mount), mount_path) == 0)
             {
               ret = g_object_ref (mount);
               goto out;
@@ -393,6 +393,16 @@ gvfs_udisks2_volume_monitor_get_udisks_client (GVfsUDisks2VolumeMonitor *monitor
 {
   g_return_val_if_fail (GVFS_IS_UDISKS2_VOLUME_MONITOR (monitor), NULL);
   return monitor->client;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+void
+gvfs_udisks2_volume_monitor_update (GVfsUDisks2VolumeMonitor *monitor)
+{
+  g_return_if_fail (GVFS_IS_UDISKS2_VOLUME_MONITOR (monitor));
+  udisks_client_settle (monitor->client);
+  update_all (monitor, TRUE);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -809,7 +819,7 @@ find_mount_by_mount_path (GVfsUDisks2VolumeMonitor *monitor,
   for (l = monitor->mounts; l != NULL; l = l->next)
     {
       GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (l->data);
-      if (gvfs_udisks2_mount_has_mount_path (mount, mount_path))
+      if (g_strcmp0 (gvfs_udisks2_mount_get_mount_path (mount), mount_path) == 0)
         {
           ret = mount;
           goto out;
@@ -1034,6 +1044,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
           gvfs_udisks2_mount_unmounted (mount);
           monitor->mounts = g_list_remove (monitor->mounts, mount);
           *removed_mounts = g_list_prepend (*removed_mounts, g_object_ref (mount));
+          g_debug ("removed mount at %s", gvfs_udisks2_mount_get_mount_path (mount));
           g_object_unref (mount);
         }
     }
@@ -1050,6 +1061,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
         {
           monitor->mounts = g_list_prepend (monitor->mounts, mount);
           *added_mounts = g_list_prepend (*added_mounts, g_object_ref (mount));
+          g_debug ("added mount at %s for %p", gvfs_udisks2_mount_get_mount_path (mount), volume);
         }
     }
 

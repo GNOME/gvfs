@@ -166,7 +166,7 @@ update_drive (GVfsUDisks2Drive *drive)
   if (drive->is_media_removable)
     {
       drive->has_media = (udisks_drive_get_size (drive->udisks_drive) > 0);
-      drive->can_eject = TRUE;
+      drive->can_eject = FALSE; // TODO: set to TRUE when eject() has been implemented
     }
   else
     {
