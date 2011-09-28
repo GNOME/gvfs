@@ -42,6 +42,7 @@
 #include "gvfsudisks2volumemonitor.h"
 #include "gvfsudisks2mount.h"
 #include "gvfsudisks2volume.h"
+#include "gvfsudisks2utils.h"
 
 #define BUSY_UNMOUNT_NUM_ATTEMPTS              5
 #define BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS 100
@@ -670,13 +671,7 @@ unmount_cb (GObject       *source_object,
                                               res,
                                               &error))
     {
-      /* translate to UDisksError to GIOError and strip D-Bus error information */
-      if (error->domain == UDISKS_ERROR && error->code == UDISKS_ERROR_DEVICE_BUSY)
-        error->code = G_IO_ERROR_BUSY;
-      else
-        error->code = G_IO_ERROR_FAILED;
-      error->domain = G_IO_ERROR;
-      g_dbus_error_strip_remote_error (error);
+      gvfs_udisks2_utils_udisks_error_to_gio_error (error);
 
       /* if the user passed in a GMountOperation, then do the GMountOperation::show-processes dance ... */
       if (error->code == G_IO_ERROR_BUSY && data->mount_operation != NULL)

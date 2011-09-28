@@ -9,6 +9,7 @@ gvfs_udisks2_volume_monitor_SOURCES =					\
 	gvfsudisks2drive.c		gvfsudisks2drive.h		\
 	gvfsudisks2volume.c		gvfsudisks2volume.h		\
 	gvfsudisks2mount.c		gvfsudisks2mount.h		\
+	gvfsudisks2utils.c		gvfsudisks2utils.h		\
 	$(NULL)
 
 gvfs_udisks2_volume_monitor_CFLAGS =		\

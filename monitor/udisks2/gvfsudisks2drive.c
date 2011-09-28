@@ -33,6 +33,7 @@
 #include "gvfsudisks2volumemonitor.h"
 #include "gvfsudisks2drive.h"
 #include "gvfsudisks2volume.h"
+#include "gvfsudisks2utils.h"
 
 typedef struct _GVfsUDisks2DriveClass GVfsUDisks2DriveClass;
 
@@ -490,12 +491,15 @@ unmount_mounts_cb (GObject      *source_object,
   if (!g_mount_unmount_with_operation_finish (mount, res, &error))
     {
       /* make the error dialog more targeted to the drive.. unless the user has already seen a dialog */
-      if (error->code != G_IO_ERROR_FAILED_HANDLED)
+      if (error->domain == G_IO_ERROR && error->code == G_IO_ERROR_BUSY)
         {
           g_error_free (error);
-          error = g_error_new (G_IO_ERROR, G_IO_ERROR_BUSY,
+          error = g_error_new (G_IO_ERROR,
+                               G_IO_ERROR_BUSY,
                                _("Failed to eject medium; one or more volumes on the medium are busy."));
         }
+
+      g_debug ("error: %s (%s, %d)", error->message, g_quark_to_string (error->domain), error->code);
 
       /* unmount failed; need to fail the whole eject operation */
       simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
@@ -579,6 +583,7 @@ eject_cb (GObject      *source_object,
   error = NULL;
   if (!udisks_drive_call_eject_finish (UDISKS_DRIVE (source_object), res, &error))
     {
+      gvfs_udisks2_utils_udisks_error_to_gio_error (error);
       g_simple_async_result_take_error (data->simple, error);
       g_simple_async_result_complete (data->simple);
       goto out;
