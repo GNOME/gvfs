@@ -29,6 +29,7 @@
 #include <gio/gunixmounts.h>
 
 #include <udisks/udisks.h>
+#include <gudev/gudev.h>
 
 G_BEGIN_DECLS
 
@@ -47,6 +48,7 @@ GType           gvfs_udisks2_volume_monitor_get_type          (void) G_GNUC_CONS
 GVolumeMonitor *gvfs_udisks2_volume_monitor_new               (void);
 UDisksClient   *gvfs_udisks2_volume_monitor_get_udisks_client (GVfsUDisks2VolumeMonitor *monitor);
 void            gvfs_udisks2_volume_monitor_update            (GVfsUDisks2VolumeMonitor *monitor);
+GUdevClient    *gvfs_udisks2_volume_monitor_get_gudev_client  (GVfsUDisks2VolumeMonitor *monitor);
 
 G_END_DECLS
 

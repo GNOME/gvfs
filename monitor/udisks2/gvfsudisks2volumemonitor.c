@@ -54,6 +54,7 @@ struct _GVfsUDisks2VolumeMonitor
   GNativeVolumeMonitor parent;
 
   UDisksClient *client;
+  GUdevClient *gudev_client;
 
   GList *last_mounts;
 
@@ -146,6 +147,7 @@ gvfs_udisks2_volume_monitor_finalize (GObject *object)
                                         monitor);
 
   g_clear_object (&monitor->client);
+  g_clear_object (&monitor->gudev_client);
 
   g_list_foreach (monitor->last_mounts, (GFunc) g_unix_mount_free, NULL);
   g_list_free (monitor->last_mounts);
@@ -320,6 +322,7 @@ gvfs_udisks2_volume_monitor_init (GVfsUDisks2VolumeMonitor *monitor)
   GDBusObjectManager *object_manager;
 
   monitor->client = get_udisks_client_sync (NULL);
+  monitor->gudev_client = g_udev_client_new (NULL); /* don't listen to any changes */
 
   object_manager = udisks_client_get_object_manager (monitor->client);
   g_signal_connect (object_manager,
@@ -393,6 +396,15 @@ gvfs_udisks2_volume_monitor_get_udisks_client (GVfsUDisks2VolumeMonitor *monitor
 {
   g_return_val_if_fail (GVFS_IS_UDISKS2_VOLUME_MONITOR (monitor), NULL);
   return monitor->client;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+GUdevClient *
+gvfs_udisks2_volume_monitor_get_gudev_client (GVfsUDisks2VolumeMonitor *monitor)
+{
+  g_return_val_if_fail (GVFS_IS_UDISKS2_VOLUME_MONITOR (monitor), NULL);
+  return monitor->gudev_client;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */

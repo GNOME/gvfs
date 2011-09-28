@@ -950,6 +950,107 @@ gvfs_udisks2_mount_eject_finish (GMount        *mount,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+/* TODO: handle force_rescan */
+static gchar **
+gvfs_udisks2_mount_guess_content_type_sync (GMount        *_mount,
+                                            gboolean       force_rescan,
+                                            GCancellable  *cancellable,
+                                            GError       **error)
+{
+  GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
+  gchar **x_content_types;
+  GPtrArray *p;
+  gchar **ret;
+  guint n;
+
+  p = g_ptr_array_new ();
+
+#if 0
+  // TODO: handle blank discs
+  /* doesn't make sense to probe blank discs - look at the disc type instead */
+  if (device != NULL && gdu_device_optical_disc_get_is_blank (device))
+    {
+      disc_type = gdu_device_drive_get_media (device);
+      if (disc_type != NULL)
+        {
+          if (g_str_has_prefix (disc_type, "optical_dvd"))
+            g_ptr_array_add (p, g_strdup ("x-content/blank-dvd"));
+          else if (g_str_has_prefix (disc_type, "optical_hddvd"))
+            g_ptr_array_add (p, g_strdup ("x-content/blank-hddvd"));
+          else if (g_str_has_prefix (disc_type, "optical_bd"))
+            g_ptr_array_add (p, g_strdup ("x-content/blank-bd"));
+          else
+            g_ptr_array_add (p, g_strdup ("x-content/blank-cd")); /* assume CD */
+        }
+    }
+  else
+#endif
+    {
+      /* sniff content type */
+      x_content_types = g_content_type_guess_for_tree (mount->root);
+      if (x_content_types != NULL)
+        {
+          for (n = 0; x_content_types[n] != NULL; n++)
+            g_ptr_array_add (p, g_strdup (x_content_types[n]));
+          g_strfreev (x_content_types);
+        }
+    }
+
+  /* Check if its bootable */
+  if (mount->device_file != NULL)
+    {
+      GUdevDevice *gudev_device;
+      gudev_device = g_udev_client_query_by_device_file (gvfs_udisks2_volume_monitor_get_gudev_client (mount->monitor),
+                                                         mount->device_file);
+      if (gudev_device != NULL)
+        {
+          if (g_udev_device_get_property_as_boolean (gudev_device, "OSINFO_BOOTABLE"))
+            g_ptr_array_add (p, g_strdup ("x-content/bootable-media"));
+          g_object_unref (gudev_device);
+        }
+    }
+
+  if (p->len == 0)
+    {
+      ret = NULL;
+      g_ptr_array_free (p, TRUE);
+    }
+  else
+    {
+      g_ptr_array_add (p, NULL);
+      ret = (char **) g_ptr_array_free (p, FALSE);
+    }
+  return ret;
+}
+
+/* since we're an out-of-process volume monitor we'll just do this sync */
+static void
+gvfs_udisks2_mount_guess_content_type (GMount              *mount,
+                                       gboolean             force_rescan,
+                                       GCancellable        *cancellable,
+                                       GAsyncReadyCallback  callback,
+                                       gpointer             user_data)
+{
+  GSimpleAsyncResult *simple;
+  /* TODO: handle force_rescan */
+  simple = g_simple_async_result_new (G_OBJECT (mount),
+                                      callback,
+                                      user_data,
+                                      NULL);
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+}
+
+static gchar **
+gvfs_udisks2_mount_guess_content_type_finish (GMount        *mount,
+                                              GAsyncResult  *result,
+                                              GError       **error)
+{
+  return gvfs_udisks2_mount_guess_content_type_sync (mount, FALSE, NULL, error);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static void
 gvfs_udisks2_mount_mount_iface_init (GMountIface *iface)
 {
@@ -969,11 +1070,9 @@ gvfs_udisks2_mount_mount_iface_init (GMountIface *iface)
   iface->eject_finish = gvfs_udisks2_mount_eject_finish;
   iface->eject_with_operation = gvfs_udisks2_mount_eject_with_operation;
   iface->eject_with_operation_finish = gvfs_udisks2_mount_eject_with_operation_finish;
-#if 0
   iface->guess_content_type = gvfs_udisks2_mount_guess_content_type;
   iface->guess_content_type_finish = gvfs_udisks2_mount_guess_content_type_finish;
   iface->guess_content_type_sync = gvfs_udisks2_mount_guess_content_type_sync;
-#endif
 }
 
 gboolean
