@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-09-08 14:35+0000\n"
-"PO-Revision-Date: 2011-09-13 23:20+0800\n"
+"POT-Creation-Date: 2011-09-25 19:31+0000\n"
+"PO-Revision-Date: 2011-09-28 02:12+0800\n"
 "Last-Translator: YunQiang Su <wzssyqa@gmail.com>\n"
 "Language-Team: Chinese (simplified) <i18n-zh@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -93,7 +93,7 @@ msgstr "值必须是字符串或字符串列表"
 #: ../daemon/gvfsbackendobexftp.c:2087 ../daemon/gvfsbackendsmb.c:1179
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
-#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1069
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1073
 #: ../monitor/proxy/gproxydrive.c:514 ../monitor/proxy/gproxydrive.c:602
 #: ../monitor/proxy/gproxydrive.c:750 ../monitor/proxy/gproxydrive.c:885
 #: ../monitor/proxy/gproxydrive.c:936 ../monitor/proxy/gproxydrive.c:1060
@@ -398,7 +398,7 @@ msgid "Unhandled libimobiledevice error (%d)"
 msgstr "未处理的 libimobiledevice 错误(%d)"
 
 #: ../daemon/gvfsbackendafc.c:385 ../daemon/gvfsbackend.c:963
-#: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:922
+#: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:926
 msgid "Cancel"
 msgstr "取消"
 
@@ -594,7 +594,6 @@ msgid "Can't move directory into one of it's descendants"
 msgstr "不能将目录移入其子目录"
 
 #: ../daemon/gvfsbackendafp.c:1456
-#, fuzzy
 #| msgid "Can't move directory over directory"
 msgid "Can't move sharepoint into a shared directory"
 msgstr "不能将 sharepoint 目录移入共享目录"
@@ -819,7 +818,7 @@ msgstr "文件已存在"
 #: ../daemon/gvfsjobstartmountable.c:133 ../daemon/gvfsjobstopmountable.c:136
 #: ../daemon/gvfsjobtrash.c:123 ../daemon/gvfsjobunmountmountable.c:140
 #: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
-#: ../monitor/gdu/ggdumount.c:1173 ../monitor/gdu/ggdumount.c:1257
+#: ../monitor/gdu/ggdumount.c:1177 ../monitor/gdu/ggdumount.c:1261
 #: ../monitor/gdu/ggduvolume.c:1617
 msgid "Operation not supported by backend"
 msgstr "后端不支持的操作"
@@ -840,11 +839,11 @@ msgstr "目标文件已存在"
 msgid "Not supported"
 msgstr "不支持"
 
-#: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:921
+#: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:925
 msgid "Unmount Anyway"
 msgstr "无论如何卸载"
 
-#: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:923
+#: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:927
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -1804,15 +1803,15 @@ msgstr ""
 msgid "Start Anyway"
 msgstr "无论如何启动"
 
-#: ../monitor/gdu/ggdumount.c:856
+#: ../monitor/gdu/ggdumount.c:860
 msgid "One or more programs are preventing the unmount operation."
 msgstr "一个或更多程序阻止卸载操作。"
 
-#: ../monitor/gdu/ggdumount.c:984
+#: ../monitor/gdu/ggdumount.c:988
 msgid "Cannot get LUKS cleartext slave"
 msgstr "无法获取 LUKS 明文从属"
 
-#: ../monitor/gdu/ggdumount.c:1006
+#: ../monitor/gdu/ggdumount.c:1010
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
 msgstr "无法从“%s”路径获取 LUKS 明文从属"
@@ -2436,7 +2435,6 @@ msgid "Set handler for mime-type"
 msgstr "mime 类型的设置处理程序"
 
 #: ../programs/gvfs-mime.c:76
-#, fuzzy
 msgid "- get/set handler for <mimetype>"
 msgstr "- <mimetype> 的查询/设置程序"
 
