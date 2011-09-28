@@ -525,7 +525,6 @@ mount_data_free (MountData *data)
 static void
 mount_cancel_pending_op (MountData *data)
 {
-  g_debug ("woot, cancelling");
   /* send an ::aborted signal to make the dialog go away */
   if (data->mount_operation != NULL)
     g_signal_emit_by_name (data->mount_operation, "aborted");

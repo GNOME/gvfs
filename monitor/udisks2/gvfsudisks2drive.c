@@ -499,8 +499,6 @@ unmount_mounts_cb (GObject      *source_object,
                                _("Failed to eject medium; one or more volumes on the medium are busy."));
         }
 
-      g_debug ("error: %s (%s, %d)", error->message, g_quark_to_string (error->domain), error->code);
-
       /* unmount failed; need to fail the whole eject operation */
       simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
                                                      data->callback,

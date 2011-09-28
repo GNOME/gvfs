@@ -1056,7 +1056,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
           gvfs_udisks2_mount_unmounted (mount);
           monitor->mounts = g_list_remove (monitor->mounts, mount);
           *removed_mounts = g_list_prepend (*removed_mounts, g_object_ref (mount));
-          g_debug ("removed mount at %s", gvfs_udisks2_mount_get_mount_path (mount));
+          /*g_debug ("removed mount at %s", gvfs_udisks2_mount_get_mount_path (mount));*/
           g_object_unref (mount);
         }
     }
@@ -1073,7 +1073,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
         {
           monitor->mounts = g_list_prepend (monitor->mounts, mount);
           *added_mounts = g_list_prepend (*added_mounts, g_object_ref (mount));
-          g_debug ("added mount at %s for %p", gvfs_udisks2_mount_get_mount_path (mount), volume);
+          /*g_debug ("added mount at %s for %p", gvfs_udisks2_mount_get_mount_path (mount), volume);*/
         }
     }
 
