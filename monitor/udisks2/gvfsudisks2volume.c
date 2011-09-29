@@ -135,24 +135,6 @@ emit_changed (GVfsUDisks2Volume *volume)
   g_signal_emit_by_name (volume->monitor, "volume-changed", volume);
 }
 
-static UDisksDrive *
-get_udisks_drive (GVfsUDisks2Volume *volume)
-{
-  UDisksDrive *ret = NULL;
-  UDisksClient *client;
-  UDisksObject *object;
-
-  client = gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor);
-  object = (UDisksObject *) g_dbus_object_manager_get_object (udisks_client_get_object_manager (client),
-                                                              udisks_block_get_drive (volume->block));
-  if (object != NULL)
-    {
-      ret = udisks_object_peek_drive (object);
-      g_object_unref (object);
-    }
-  return ret;
-}
-
 static gboolean
 update_volume (GVfsUDisks2Volume *volume)
 {
@@ -205,7 +187,8 @@ update_volume (GVfsUDisks2Volume *volume)
       g_free (s);
     }
 
-  udisks_drive = get_udisks_drive (volume);
+  udisks_drive = udisks_client_get_drive_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                                    volume->block);
   if (udisks_drive != NULL)
     {
       gchar *drive_desc;
@@ -229,15 +212,25 @@ update_volume (GVfsUDisks2Volume *volume)
           drive_icon = NULL;
         }
 
-      //volume->name = g_strdup (media_desc);
+      /* Override name for blank and audio discs */
+      if (udisks_drive_get_optical_blank (udisks_drive))
+        {
+          g_free (volume->name);
+          volume->name = g_strdup (media_desc);
+        }
+      else if (volume->activation_root != NULL && g_file_has_uri_scheme (volume->activation_root, "cdda"))
+        {
+          g_free (volume->name);
+          volume->name = g_strdup (_("Audio Disc"));
+        }
+
       volume->icon = media_icon != NULL ? g_object_ref (media_icon) : NULL;
 
       g_free (media_desc);
       if (media_icon != NULL)
         g_object_unref (media_icon);
-    }
-  else
-    {
+
+      g_object_unref (udisks_drive);
     }
 
   /* ---------------------------------------------------------------------------------------------------- */

@@ -809,7 +809,16 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
   data->mount_operation = mount_operation != NULL ? g_object_ref (mount_operation) : NULL;
   data->flags = flags;
 
-  unmount_do (data, FALSE);
+  if (mount->is_burn_mount)
+    {
+      /* burn mounts are really never mounted so complete successfully immediately */
+      g_simple_async_result_complete_in_idle (data->simple);
+      unmount_data_free (data);
+    }
+  else
+    {
+      unmount_do (data, FALSE);
+    }
 }
 
 static gboolean
