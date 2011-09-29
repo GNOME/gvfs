@@ -679,7 +679,6 @@ unmount_cb (GObject       *source_object,
           const gchar *choices[3] = {NULL, NULL, NULL};
           const gchar *message;
 
-          /* TODO: get processes */
           processes = get_busy_processes (udisks_filesystem_get_mount_points (filesystem));
 
           if (data->mount_op_reply_handler_id == 0)
@@ -707,6 +706,8 @@ unmount_cb (GObject       *source_object,
                                                                     on_retry_timer_cb,
                                                                     data);
             }
+
+          g_array_free (processes, TRUE);
           goto out;
         }
       else
