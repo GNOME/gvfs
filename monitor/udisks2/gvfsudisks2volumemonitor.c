@@ -55,6 +55,7 @@ struct _GVfsUDisks2VolumeMonitor
 
   UDisksClient *client;
   GUdevClient *gudev_client;
+  GUnixMountMonitor *mount_monitor;
 
   GList *last_mounts;
 
@@ -112,6 +113,12 @@ static void on_interface_proxy_properties_changed (GDBusObjectManagerClient   *m
                                                    const gchar *const         *invalidated_properties,
                                                    gpointer                    user_data);
 
+static void mountpoints_changed      (GUnixMountMonitor  *mount_monitor,
+                                      gpointer            user_data);
+
+static void mounts_changed           (GUnixMountMonitor  *mount_monitor,
+                                      gpointer            user_data);
+
 G_DEFINE_TYPE (GVfsUDisks2VolumeMonitor, gvfs_udisks2_volume_monitor, G_TYPE_NATIVE_VOLUME_MONITOR)
 
 static void
@@ -128,6 +135,10 @@ gvfs_udisks2_volume_monitor_finalize (GObject *object)
 {
   GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (object);
   GDBusObjectManager *object_manager;
+
+  g_signal_handlers_disconnect_by_func (monitor->mount_monitor, mountpoints_changed, monitor);
+  g_signal_handlers_disconnect_by_func (monitor->mount_monitor, mounts_changed, monitor);
+  g_clear_object (&monitor->mount_monitor);
 
   object_manager = udisks_client_get_object_manager (monitor->client);
   g_signal_handlers_disconnect_by_func (object_manager,
@@ -344,6 +355,16 @@ gvfs_udisks2_volume_monitor_init (GVfsUDisks2VolumeMonitor *monitor)
   g_signal_connect (object_manager,
                     "interface-proxy-properties-changed",
                     G_CALLBACK (on_interface_proxy_properties_changed),
+                    monitor);
+
+  monitor->mount_monitor = g_unix_mount_monitor_new ();
+  g_signal_connect (monitor->mount_monitor,
+                    "mounts-changed",
+                    G_CALLBACK (mounts_changed),
+                    monitor);
+  g_signal_connect (monitor->mount_monitor,
+                    "mountpoints-changed",
+                    G_CALLBACK (mountpoints_changed),
                     monitor);
 
   update_all (monitor, FALSE);
@@ -564,6 +585,22 @@ on_interface_proxy_properties_changed (GDBusObjectManagerClient   *manager,
 {
   GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
   // g_debug ("on_interface_proxy_properties_changed %s", g_dbus_object_get_object_path (G_DBUS_OBJECT (object_proxy)));
+  update_all (monitor, TRUE);
+}
+
+static void
+mountpoints_changed (GUnixMountMonitor *mount_monitor,
+                     gpointer           user_data)
+{
+  GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
+  update_all (monitor, TRUE);
+}
+
+static void
+mounts_changed (GUnixMountMonitor *mount_monitor,
+                gpointer           user_data)
+{
+  GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
   update_all (monitor, TRUE);
 }
 

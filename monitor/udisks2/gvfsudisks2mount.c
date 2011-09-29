@@ -57,6 +57,8 @@ struct _GVfsUDisks2Mount
   GObject parent;
 
   GVfsUDisks2VolumeMonitor *monitor; /* owned by volume monitor */
+
+  /* may be NULL */
   GVfsUDisks2Volume        *volume;  /* owned by volume monitor */
 
   /* the following members are set in update_mount() */
@@ -68,7 +70,7 @@ struct _GVfsUDisks2Mount
   gchar *mount_path;
   gboolean can_unmount;
   gchar *mount_entry_name;
-  GIcon *mount_entry_icon;
+  gchar *mount_entry_fs_type;
 
   gboolean is_burn_mount;
 
@@ -115,8 +117,7 @@ gvfs_udisks2_mount_finalize (GObject *object)
   g_free (mount->mount_path);
 
   g_free (mount->mount_entry_name);
-  if (mount->mount_entry_icon != NULL)
-    g_object_unref (mount->mount_entry_icon);
+  g_free (mount->mount_entry_fs_type);
 
   if (mount->autorun_icon != NULL)
     g_object_unref (mount->autorun_icon);
@@ -247,7 +248,20 @@ update_mount (GVfsUDisks2Mount *mount)
       else if (mount->autorun_icon != NULL)
         mount->icon = g_object_ref (mount->autorun_icon);
       else
-        mount->icon = mount->mount_entry_icon != NULL ? g_object_ref (mount->mount_entry_icon) : NULL;
+        {
+          const gchar *icon_name;
+          if (g_strcmp0 (mount->mount_entry_fs_type, "nfs") == 0 ||
+              g_strcmp0 (mount->mount_entry_fs_type, "nfs4") == 0 ||
+              g_strcmp0 (mount->mount_entry_fs_type, "cifs") == 0)
+            {
+              icon_name = "folder-remote";
+            }
+          else
+            {
+              icon_name = "drive-removable-media";
+            }
+          mount->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
+        }
 
       g_free (mount->name);
 
@@ -332,7 +346,7 @@ gvfs_udisks2_mount_new (GVfsUDisks2VolumeMonitor *monitor,
     {
       /* No ref on GUnixMountEntry so save values for later use */
       mount->mount_entry_name = g_unix_mount_guess_name (mount_entry);
-      mount->mount_entry_icon = g_unix_mount_guess_icon (mount_entry);
+      mount->mount_entry_fs_type = g_strdup (g_unix_mount_get_fs_type (mount_entry));
       mount->device_file = g_strdup (g_unix_mount_get_device_path (mount_entry));
       mount->mount_path = g_strdup (g_unix_mount_get_mount_path (mount_entry));
       mount->root = g_file_new_for_path (mount->mount_path);
@@ -446,7 +460,7 @@ gvfs_udisks2_mount_get_volume (GMount *_mount)
   GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
   GVolume *volume = NULL;
 
-  if (mount->volume)
+  if (mount->volume != NULL)
     volume = G_VOLUME (g_object_ref (mount->volume));
   return volume;
 }
@@ -657,6 +671,44 @@ on_mount_op_reply (GMountOperation       *mount_operation,
 }
 
 static void
+unmount_show_busy (UnmountData        *data,
+                   const gchar *const *mount_points)
+{
+  GArray *processes;
+  const gchar *choices[3] = {NULL, NULL, NULL};
+  const gchar *message;
+
+  processes = get_busy_processes (mount_points);
+
+  if (data->mount_op_reply_handler_id == 0)
+    {
+      data->mount_op_reply_handler_id = g_signal_connect (data->mount_operation,
+                                                          "reply",
+                                                          G_CALLBACK (on_mount_op_reply),
+                                                          data);
+    }
+  choices[0] = _("Unmount Anyway");
+  choices[1] = _("Cancel");
+  message = _("Volume is busy\n"
+              "One or more applications are keeping the volume busy.");
+  g_signal_emit_by_name (data->mount_operation,
+                         "show-processes",
+                         message,
+                         processes,
+                         choices);
+  /* set up a timer to try unmounting every two seconds - this will also
+   * update the list of busy processes
+   */
+  if (data->retry_unmount_timer_id == 0)
+    {
+      data->retry_unmount_timer_id = g_timeout_add_seconds (2,
+                                                            on_retry_timer_cb,
+                                                            data);
+    }
+  g_array_free (processes, TRUE);
+}
+
+static void
 unmount_cb (GObject       *source_object,
             GAsyncResult  *res,
             gpointer       user_data)
@@ -675,39 +727,7 @@ unmount_cb (GObject       *source_object,
       /* if the user passed in a GMountOperation, then do the GMountOperation::show-processes dance ... */
       if (error->code == G_IO_ERROR_BUSY && data->mount_operation != NULL)
         {
-          GArray *processes;
-          const gchar *choices[3] = {NULL, NULL, NULL};
-          const gchar *message;
-
-          processes = get_busy_processes (udisks_filesystem_get_mount_points (filesystem));
-
-          if (data->mount_op_reply_handler_id == 0)
-            {
-              data->mount_op_reply_handler_id = g_signal_connect (data->mount_operation,
-                                                                  "reply",
-                                                                  G_CALLBACK (on_mount_op_reply),
-                                                                  data);
-            }
-          choices[0] = _("Unmount Anyway");
-          choices[1] = _("Cancel");
-          message = _("Volume is busy\n"
-                      "One or more applications are keeping the volume busy.");
-          g_signal_emit_by_name (data->mount_operation,
-                                 "show-processes",
-                                 message,
-                                 processes,
-                                 choices);
-          /* set up a timer to try unmounting every two seconds - this will also
-           * update the list of busy processes
-           */
-          if (data->retry_unmount_timer_id == 0)
-            {
-              data->retry_unmount_timer_id = g_timeout_add_seconds (2,
-                                                                    on_retry_timer_cb,
-                                                                    data);
-            }
-
-          g_array_free (processes, TRUE);
+          unmount_show_busy (data, udisks_filesystem_get_mount_points (filesystem));
           goto out;
         }
       else
@@ -728,6 +748,72 @@ unmount_cb (GObject       *source_object,
 }
 
 static void
+unmount_do_command (UnmountData *data,
+                    gboolean     force)
+{
+  GError *error;
+  gint exit_status;
+  gchar *standard_error = NULL;
+  const gchar *umount_argv[4] = {"umount", NULL, NULL, NULL};
+
+  if (force)
+    {
+      umount_argv[1] = "-l";
+      umount_argv[2] = data->mount->mount_path;
+    }
+  else
+    {
+      umount_argv[1] = data->mount->mount_path;
+    }
+
+  /* TODO: we could do this async but it's probably not worth the effort */
+  error = NULL;
+  if (!g_spawn_sync (NULL,            /* working dir */
+                     (gchar **) umount_argv,
+                     NULL,            /* envp */
+                     G_SPAWN_SEARCH_PATH,
+                     NULL,            /* child_setup */
+                     NULL,            /* user_data for child_setup */
+                     NULL,            /* standard_output */
+                     &standard_error, /* standard_error */
+                     &exit_status,
+                     &error))
+    {
+      g_prefix_error (&error, "Error running umount: ");
+      g_simple_async_result_take_error (data->simple, error);
+      g_simple_async_result_complete (data->simple);
+      unmount_data_free (data);
+      goto out;
+    }
+
+  if (WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0)
+    {
+      gvfs_udisks2_volume_monitor_update (data->mount->monitor);
+      g_simple_async_result_complete (data->simple);
+      unmount_data_free (data);
+      goto out;
+    }
+
+  if (standard_error != NULL && strstr (standard_error, "device is busy") != NULL)
+    {
+      const gchar *mount_points[2] = {NULL, NULL};
+      mount_points[0] = data->mount->mount_path;
+      unmount_show_busy (data, mount_points);
+      goto out;
+    }
+
+  g_simple_async_result_set_error (data->simple,
+                                   G_IO_ERROR,
+                                   G_IO_ERROR_FAILED,
+                                   standard_error);
+  g_simple_async_result_complete (data->simple);
+  unmount_data_free (data);
+
+ out:
+  g_free (standard_error);
+}
+
+static void
 unmount_do (UnmountData *data,
             gboolean     force)
 {
@@ -735,21 +821,13 @@ unmount_do (UnmountData *data,
   UDisksFilesystem *filesystem;
   GVariantBuilder builder;
 
-  if (data->mount->volume != NULL)
+  if (data->mount->volume == NULL)
     {
-      block = gvfs_udisks2_volume_get_block (data->mount->volume);
-    }
-  else
-    {
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED,
-                                       "Don't know how to unmount non-udisks object yet (TODO)");
-      g_simple_async_result_complete (data->simple);
-      unmount_data_free (data);
+      unmount_do_command (data, force);
       goto out;
     }
 
+  block = gvfs_udisks2_volume_get_block (data->mount->volume);
   filesystem = udisks_object_peek_filesystem (UDISKS_OBJECT (g_dbus_interface_get_object (G_DBUS_INTERFACE (block))));
   if (filesystem == NULL)
     {
