@@ -61,6 +61,9 @@ struct _GVfsUDisks2Mount
   /* may be NULL */
   GVfsUDisks2Volume        *volume;  /* owned by volume monitor */
 
+  /* may be NULL */
+  GUnixMountEntry *mount_entry;
+
   /* the following members are set in update_mount() */
   GFile *root;
   GIcon *icon;
@@ -117,7 +120,6 @@ gvfs_udisks2_mount_finalize (GObject *object)
   g_free (mount->mount_path);
 
   g_free (mount->mount_entry_name);
-  g_free (mount->mount_entry_fs_type);
 
   if (mount->autorun_icon != NULL)
     g_object_unref (mount->autorun_icon);
@@ -249,18 +251,7 @@ update_mount (GVfsUDisks2Mount *mount)
         mount->icon = g_object_ref (mount->autorun_icon);
       else
         {
-          const gchar *icon_name;
-          if (g_strcmp0 (mount->mount_entry_fs_type, "nfs") == 0 ||
-              g_strcmp0 (mount->mount_entry_fs_type, "nfs4") == 0 ||
-              g_strcmp0 (mount->mount_entry_fs_type, "cifs") == 0)
-            {
-              icon_name = "folder-remote";
-            }
-          else
-            {
-              icon_name = "drive-removable-media";
-            }
-          mount->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
+          mount->icon = gvfs_udisks2_utils_icon_from_fs_type (g_unix_mount_get_fs_type (mount->mount_entry));
         }
 
       g_free (mount->name);
@@ -330,7 +321,7 @@ on_volume_changed (GVolume  *volume,
 
 GVfsUDisks2Mount *
 gvfs_udisks2_mount_new (GVfsUDisks2VolumeMonitor *monitor,
-                        GUnixMountEntry          *mount_entry,
+                        GUnixMountEntry          *mount_entry, /* takes ownership */
                         GVfsUDisks2Volume        *volume)
 {
   GVfsUDisks2Mount *mount = NULL;
@@ -344,9 +335,8 @@ gvfs_udisks2_mount_new (GVfsUDisks2VolumeMonitor *monitor,
 
   if (mount_entry != NULL)
     {
-      /* No ref on GUnixMountEntry so save values for later use */
+      mount->mount_entry = mount_entry; /* takes ownership */
       mount->mount_entry_name = g_unix_mount_guess_name (mount_entry);
-      mount->mount_entry_fs_type = g_strdup (g_unix_mount_get_fs_type (mount_entry));
       mount->device_file = g_strdup (g_unix_mount_get_device_path (mount_entry));
       mount->mount_path = g_strdup (g_unix_mount_get_mount_path (mount_entry));
       mount->root = g_file_new_for_path (mount->mount_path);
@@ -400,6 +390,25 @@ gvfs_udisks2_mount_unset_volume (GVfsUDisks2Mount   *mount,
     }
 }
 
+void
+gvfs_udisks2_mount_set_volume (GVfsUDisks2Mount   *mount,
+                               GVfsUDisks2Volume  *volume)
+{
+  if (mount->volume != volume)
+    {
+      if (mount->volume != NULL)
+        gvfs_udisks2_mount_unset_volume (mount, mount->volume);
+      mount->volume = volume;
+      if (mount->volume != NULL)
+        {
+          gvfs_udisks2_volume_set_mount (volume, mount);
+          /* this is for piggy backing on the name and icon of the associated volume */
+          g_signal_connect (mount->volume, "changed", G_CALLBACK (on_volume_changed), mount);
+        }
+      emit_changed (mount);
+    }
+}
+
 static GFile *
 gvfs_udisks2_mount_get_root (GMount *_mount)
 {
@@ -437,10 +446,16 @@ gvfs_udisks2_mount_has_uuid (GVfsUDisks2Mount *_mount,
 }
 
 const gchar *
-gvfs_udisks2_mount_get_mount_path (GVfsUDisks2Mount *_mount)
+gvfs_udisks2_mount_get_mount_path (GVfsUDisks2Mount *mount)
+{
+  return mount->mount_path;
+}
+
+GUnixMountEntry *
+gvfs_udisks2_mount_get_mount_entry (GVfsUDisks2Mount *_mount)
 {
   GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
-  return mount->mount_path;
+  return mount->mount_entry;
 }
 
 static GDrive *
@@ -828,6 +843,12 @@ unmount_do (UnmountData *data,
     }
 
   block = gvfs_udisks2_volume_get_block (data->mount->volume);
+  if (block == NULL)
+    {
+      unmount_do_command (data, force);
+      goto out;
+    }
+
   filesystem = udisks_object_peek_filesystem (UDISKS_OBJECT (g_dbus_interface_get_object (G_DBUS_INTERFACE (block))));
   if (filesystem == NULL)
     {

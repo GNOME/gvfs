@@ -64,3 +64,20 @@ gvfs_udisks2_utils_udisks_error_to_gio_error (GError *error)
   g_dbus_error_strip_remote_error (error);
 }
 
+
+GIcon *
+gvfs_udisks2_utils_icon_from_fs_type (const gchar *fs_type)
+{
+  const gchar *icon_name;
+  if (g_strcmp0 (fs_type, "nfs") == 0 ||
+      g_strcmp0 (fs_type, "nfs4") == 0 ||
+      g_strcmp0 (fs_type, "cifs") == 0)
+    {
+      icon_name = "folder-remote";
+    }
+  else
+    {
+      icon_name = "drive-removable-media";
+    }
+  return g_themed_icon_new_with_default_fallbacks (icon_name);
+}

@@ -56,7 +56,9 @@ struct _GVfsUDisks2Volume
   GVfsUDisks2Mount         *mount;   /* owned by volume monitor */
   GVfsUDisks2Drive         *drive;   /* owned by volume monitor */
 
+  /* exactly one of these are set */
   UDisksBlock *block;
+  GUnixMountPoint *mount_point;
 
   /* set in update_volume() */
   GIcon *icon;
@@ -99,8 +101,14 @@ gvfs_udisks2_volume_finalize (GObject *object)
       gvfs_udisks2_drive_unset_volume (volume->drive, volume);
     }
 
-  g_signal_handlers_disconnect_by_func (volume->block, G_CALLBACK (on_block_changed), volume);
-  g_object_unref (volume->block);
+  if (volume->block != NULL)
+    {
+      g_signal_handlers_disconnect_by_func (volume->block, G_CALLBACK (on_block_changed), volume);
+      g_object_unref (volume->block);
+    }
+
+  if (volume->mount_point != NULL)
+    g_unix_mount_point_free (volume->mount_point);
 
   if (volume->icon != NULL)
     g_object_unref (volume->icon);
@@ -170,67 +178,75 @@ update_volume (GVfsUDisks2Volume *volume)
   /* ---------------------------------------------------------------------------------------------------- */
   /* in with the new */
 
-  volume->dev = makedev (udisks_block_get_major (volume->block), udisks_block_get_minor (volume->block));
-  volume->device_file = udisks_block_dup_device (volume->block);
-
-  if (strlen (udisks_block_get_id_label (volume->block)) > 0)
+  if (volume->block != NULL)
     {
-      volume->name = g_strdup (udisks_block_get_id_label (volume->block));
+      volume->dev = makedev (udisks_block_get_major (volume->block), udisks_block_get_minor (volume->block));
+      volume->device_file = udisks_block_dup_device (volume->block);
+
+      if (strlen (udisks_block_get_id_label (volume->block)) > 0)
+        {
+          volume->name = g_strdup (udisks_block_get_id_label (volume->block));
+        }
+      else
+        {
+          s = g_format_size (udisks_block_get_size (volume->block));
+          /* Translators: This is used for volume with no filesystem label.
+           *              The first %s is the formatted size (e.g. "42.0 MB").
+           */
+          volume->name = g_strdup_printf (_("%s Volume"), s);
+          g_free (s);
+        }
+
+      udisks_drive = udisks_client_get_drive_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                                    volume->block);
+      if (udisks_drive != NULL)
+        {
+          gchar *drive_desc;
+          GIcon *drive_icon;
+          gchar *media_desc;
+          GIcon *media_icon;
+          udisks_util_get_drive_info (udisks_drive,
+                                      NULL, /* drive_name */
+                                      &drive_desc,
+                                      &drive_icon,
+                                      &media_desc,
+                                      &media_icon);
+          if (media_desc == NULL)
+            {
+              media_desc = drive_desc;
+              drive_desc = NULL;
+            }
+          if (media_icon == NULL)
+            {
+              media_icon = drive_icon;
+              drive_icon = NULL;
+            }
+
+          /* Override name for blank and audio discs */
+          if (udisks_drive_get_optical_blank (udisks_drive))
+            {
+              g_free (volume->name);
+              volume->name = g_strdup (media_desc);
+            }
+          else if (volume->activation_root != NULL && g_file_has_uri_scheme (volume->activation_root, "cdda"))
+            {
+              g_free (volume->name);
+              volume->name = g_strdup (_("Audio Disc"));
+            }
+
+          volume->icon = media_icon != NULL ? g_object_ref (media_icon) : NULL;
+
+          g_free (media_desc);
+          if (media_icon != NULL)
+            g_object_unref (media_icon);
+
+          g_object_unref (udisks_drive);
+        }
     }
   else
     {
-      s = g_format_size (udisks_block_get_size (volume->block));
-      /* Translators: This is used for volume with no filesystem label.
-       *              The first %s is the formatted size (e.g. "42.0 MB").
-       */
-      volume->name = g_strdup_printf (_("%s Volume"), s);
-      g_free (s);
-    }
-
-  udisks_drive = udisks_client_get_drive_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
-                                                    volume->block);
-  if (udisks_drive != NULL)
-    {
-      gchar *drive_desc;
-      GIcon *drive_icon;
-      gchar *media_desc;
-      GIcon *media_icon;
-      udisks_util_get_drive_info (udisks_drive,
-                                  NULL, /* drive_name */
-                                  &drive_desc,
-                                  &drive_icon,
-                                  &media_desc,
-                                  &media_icon);
-      if (media_desc == NULL)
-        {
-          media_desc = drive_desc;
-          drive_desc = NULL;
-        }
-      if (media_icon == NULL)
-        {
-          media_icon = drive_icon;
-          drive_icon = NULL;
-        }
-
-      /* Override name for blank and audio discs */
-      if (udisks_drive_get_optical_blank (udisks_drive))
-        {
-          g_free (volume->name);
-          volume->name = g_strdup (media_desc);
-        }
-      else if (volume->activation_root != NULL && g_file_has_uri_scheme (volume->activation_root, "cdda"))
-        {
-          g_free (volume->name);
-          volume->name = g_strdup (_("Audio Disc"));
-        }
-
-      volume->icon = media_icon != NULL ? g_object_ref (media_icon) : NULL;
-
-      g_free (media_desc);
-      if (media_icon != NULL)
-        g_object_unref (media_icon);
-
-      g_object_unref (udisks_drive);
+      volume->name = g_unix_mount_point_guess_name (volume->mount_point);
+      volume->icon = gvfs_udisks2_utils_icon_from_fs_type (g_unix_mount_point_get_fs_type (volume->mount_point));
     }
 
   /* ---------------------------------------------------------------------------------------------------- */
@@ -276,9 +292,11 @@ on_block_changed (GObject    *object,
     emit_changed (volume);
 }
 
+/* takes ownership of @mount_point if not NULL */
 GVfsUDisks2Volume *
 gvfs_udisks2_volume_new (GVfsUDisks2VolumeMonitor   *monitor,
                          UDisksBlock                *block,
+                         GUnixMountPoint            *mount_point,
                          GVfsUDisks2Drive           *drive,
                          GFile                      *activation_root)
 {
@@ -287,8 +305,19 @@ gvfs_udisks2_volume_new (GVfsUDisks2VolumeMonitor   *monitor,
   volume = g_object_new (GVFS_TYPE_UDISKS2_VOLUME, NULL);
   volume->monitor = monitor;
 
-  volume->block = g_object_ref (block);
-  g_signal_connect (volume->block, "notify", G_CALLBACK (on_block_changed), volume);
+  if (block != NULL)
+    {
+      volume->block = g_object_ref (block);
+      g_signal_connect (volume->block, "notify", G_CALLBACK (on_block_changed), volume);
+    }
+  else if (mount_point != NULL)
+    {
+      volume->mount_point = mount_point;
+    }
+  else
+    {
+      g_assert_not_reached ();
+    }
 
   volume->activation_root = activation_root != NULL ? g_object_ref (activation_root) : NULL;
 
@@ -449,15 +478,18 @@ gvfs_udisks2_volume_get_identifier (GVolume      *_volume,
   const gchar *uuid;
   gchar *ret = NULL;
 
-  label = udisks_block_get_id_label (volume->block);
-  uuid = udisks_block_get_id_uuid (volume->block);
+  if (volume->block != NULL)
+    {
+      label = udisks_block_get_id_label (volume->block);
+      uuid = udisks_block_get_id_uuid (volume->block);
 
-  if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
-    ret = g_strdup (volume->device_file);
-  else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_LABEL) == 0)
-    ret = strlen (label) > 0 ? g_strdup (label) : NULL;
-  else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UUID) == 0)
-    ret = strlen (uuid) > 0 ? g_strdup (uuid) : NULL;
+      if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
+        ret = g_strdup (volume->device_file);
+      else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_LABEL) == 0)
+        ret = strlen (label) > 0 ? g_strdup (label) : NULL;
+      else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UUID) == 0)
+        ret = strlen (uuid) > 0 ? g_strdup (uuid) : NULL;
+    }
 
   return ret;
 }
@@ -466,20 +498,22 @@ static gchar **
 gvfs_udisks2_volume_enumerate_identifiers (GVolume *_volume)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
-  const gchar *label;
-  const gchar *uuid;
   GPtrArray *p;
-
-  label = udisks_block_get_id_label (volume->block);
-  uuid = udisks_block_get_id_uuid (volume->block);
 
   p = g_ptr_array_new ();
   g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE));
-  if (strlen (label) > 0)
-    g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_LABEL));
-  if (strlen (uuid) > 0)
-    g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UUID));
 
+  if (volume->block != NULL)
+    {
+      const gchar *label;
+      const gchar *uuid;
+      label = udisks_block_get_id_label (volume->block);
+      uuid = udisks_block_get_id_uuid (volume->block);
+      if (strlen (label) > 0)
+        g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_LABEL));
+      if (strlen (uuid) > 0)
+        g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UUID));
+    }
   g_ptr_array_add (p, NULL);
   return (gchar **) g_ptr_array_free (p, FALSE);
 }
@@ -522,7 +556,68 @@ mount_cancel_pending_op (MountData *data)
   if (data->mount_operation != NULL)
     g_signal_emit_by_name (data->mount_operation, "aborted");
   g_cancellable_cancel (data->cancellable);
+  data->volume->mount_pending_op = NULL;
 }
+
+/* ------------------------------ */
+
+static void
+do_mount_command (MountData *data)
+{
+  GError *error;
+  gint exit_status;
+  gchar *standard_error = NULL;
+  const gchar *mount_argv[3] = {"mount", NULL, NULL};
+
+  mount_argv[1] = g_unix_mount_point_get_mount_path (data->volume->mount_point);
+
+  /* TODO: we could do this async but it's probably not worth the effort */
+  error = NULL;
+  if (!g_spawn_sync (NULL,            /* working dir */
+                     (gchar **) mount_argv,
+                     NULL,            /* envp */
+                     G_SPAWN_SEARCH_PATH,
+                     NULL,            /* child_setup */
+                     NULL,            /* user_data for child_setup */
+                     NULL,            /* standard_output */
+                     &standard_error, /* standard_error */
+                     &exit_status,
+                     &error))
+    {
+      g_prefix_error (&error, "Error running mount: ");
+      g_simple_async_result_take_error (data->simple, error);
+      g_simple_async_result_complete (data->simple);
+      mount_data_free (data);
+      goto out;
+    }
+
+  /* TODO: for e.g. NFS and CIFS mounts we could do GMountOperation stuff and pipe a
+   * password to mount(8)'s stdin channel
+   */
+
+  /* we are no longer pending */
+  data->volume->mount_pending_op = NULL;
+
+  if (WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0)
+    {
+      gvfs_udisks2_volume_monitor_update (data->volume->monitor);
+      g_simple_async_result_complete (data->simple);
+      mount_data_free (data);
+      goto out;
+    }
+
+  g_simple_async_result_set_error (data->simple,
+                                   G_IO_ERROR,
+                                   G_IO_ERROR_FAILED,
+                                   standard_error);
+  g_simple_async_result_complete (data->simple);
+  mount_data_free (data);
+
+ out:
+  g_free (standard_error);
+}
+
+/* ------------------------------ */
 
 static void
 mount_cb (GObject       *source_object,
@@ -574,6 +669,8 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
                                             user_data,
                                             gvfs_udisks2_volume_mount);
   data->volume = g_object_ref (volume);
+  data->cancellable = cancellable != NULL ? g_object_ref (cancellable) : NULL;
+  data->mount_operation = mount_operation != NULL ? g_object_ref (mount_operation) : NULL;
 
   if (volume->mount_pending_op != NULL)
     {
@@ -583,6 +680,13 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
                                        "A mount operation is already pending");
       g_simple_async_result_complete (data->simple);
       mount_data_free (data);
+      goto out;
+    }
+  volume->mount_pending_op = data;
+
+  if (volume->block == NULL)
+    {
+      do_mount_command (data);
       goto out;
     }
 
@@ -597,10 +701,6 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
       mount_data_free (data);
       goto out;
     }
-
-  data->cancellable = cancellable != NULL ? g_object_ref (cancellable) : NULL;
-  data->mount_operation = mount_operation != NULL ? g_object_ref (mount_operation) : NULL;
-  volume->mount_pending_op = data;
 
   g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
   if (data->mount_operation == NULL)
@@ -757,6 +857,13 @@ gvfs_udisks2_volume_get_block (GVfsUDisks2Volume *volume)
 {
   g_return_val_if_fail (GVFS_IS_UDISKS2_VOLUME (volume), NULL);
   return volume->block;
+}
+
+GUnixMountPoint *
+gvfs_udisks2_volume_get_mount_point (GVfsUDisks2Volume *volume)
+{
+  g_return_val_if_fail (GVFS_IS_UDISKS2_VOLUME (volume), NULL);
+  return volume->mount_point;
 }
 
 dev_t

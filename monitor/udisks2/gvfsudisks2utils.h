@@ -31,7 +31,8 @@
 
 G_BEGIN_DECLS
 
-void gvfs_udisks2_utils_udisks_error_to_gio_error (GError *error);
+void   gvfs_udisks2_utils_udisks_error_to_gio_error (GError *error);
+GIcon *gvfs_udisks2_utils_icon_from_fs_type (const gchar *fs_type);
 
 G_END_DECLS
 

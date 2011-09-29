@@ -45,12 +45,15 @@ void              gvfs_udisks2_mount_unmounted      (GVfsUDisks2Mount         *m
 gboolean          gvfs_udisks2_mount_has_uuid       (GVfsUDisks2Mount         *mount,
                                                      const gchar              *uuid);
 
+void              gvfs_udisks2_mount_set_volume     (GVfsUDisks2Mount         *mount,
+                                                     GVfsUDisks2Volume        *volume);
 void              gvfs_udisks2_mount_unset_volume   (GVfsUDisks2Mount         *mount,
                                                      GVfsUDisks2Volume        *volume);
 gboolean          gvfs_udisks2_mount_has_volume     (GVfsUDisks2Mount         *mount,
                                                      GVfsUDisks2Volume        *volume);
 
-const gchar      *gvfs_udisks2_mount_get_mount_path (GVfsUDisks2Mount         *mount);
+const gchar      *gvfs_udisks2_mount_get_mount_path  (GVfsUDisks2Mount        *mount);
+GUnixMountEntry  *gvfs_udisks2_mount_get_mount_entry (GVfsUDisks2Mount        *mount);
 
 G_END_DECLS
 
