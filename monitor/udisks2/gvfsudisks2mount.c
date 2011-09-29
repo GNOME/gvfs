@@ -35,13 +35,12 @@
 
 #include <gvfsmountinfo.h>
 
-#ifdef HAVE_GUDEV
 #include <gudev/gudev.h>
-#endif
 
 #include "gvfsudisks2volumemonitor.h"
 #include "gvfsudisks2mount.h"
 #include "gvfsudisks2volume.h"
+#include "gvfsudisks2drive.h"
 #include "gvfsudisks2utils.h"
 
 #define BUSY_UNMOUNT_NUM_ATTEMPTS              5
@@ -969,26 +968,30 @@ gvfs_udisks2_mount_guess_content_type_sync (GMount        *_mount,
 
   p = g_ptr_array_new ();
 
-#if 0
-  // TODO: handle blank discs
   /* doesn't make sense to probe blank discs - look at the disc type instead */
-  if (device != NULL && gdu_device_optical_disc_get_is_blank (device))
+  if (mount->is_burn_mount)
     {
-      disc_type = gdu_device_drive_get_media (device);
-      if (disc_type != NULL)
+      GDrive *drive;
+      drive = gvfs_udisks2_mount_get_drive (_mount);
+      if (drive != NULL)
         {
-          if (g_str_has_prefix (disc_type, "optical_dvd"))
-            g_ptr_array_add (p, g_strdup ("x-content/blank-dvd"));
-          else if (g_str_has_prefix (disc_type, "optical_hddvd"))
-            g_ptr_array_add (p, g_strdup ("x-content/blank-hddvd"));
-          else if (g_str_has_prefix (disc_type, "optical_bd"))
-            g_ptr_array_add (p, g_strdup ("x-content/blank-bd"));
-          else
-            g_ptr_array_add (p, g_strdup ("x-content/blank-cd")); /* assume CD */
+          UDisksDrive *udisks_drive = gvfs_udisks2_drive_get_udisks_drive (GVFS_UDISKS2_DRIVE (drive));;
+          const gchar *media = udisks_drive_get_media (udisks_drive);
+          if (media != NULL)
+            {
+              if (g_str_has_prefix (media, "optical_dvd"))
+                g_ptr_array_add (p, g_strdup ("x-content/blank-dvd"));
+              else if (g_str_has_prefix (media, "optical_hddvd"))
+                g_ptr_array_add (p, g_strdup ("x-content/blank-hddvd"));
+              else if (g_str_has_prefix (media, "optical_bd"))
+                g_ptr_array_add (p, g_strdup ("x-content/blank-bd"));
+              else
+                g_ptr_array_add (p, g_strdup ("x-content/blank-cd")); /* assume CD */
+            }
+          g_object_unref (drive);
         }
     }
   else
-#endif
     {
       /* sniff content type */
       x_content_types = g_content_type_guess_for_tree (mount->root);
