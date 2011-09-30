@@ -996,6 +996,10 @@ find_volume_for_device (GVfsUDisks2VolumeMonitor *monitor,
   GList *l;
   struct stat statbuf;
 
+  /* don't consider e.g. network mounts */
+  if (!g_str_has_prefix (device, "/dev/"))
+    goto out;
+
   if (stat (device, &statbuf) != 0)
     goto out;
 
@@ -1220,6 +1224,47 @@ update_volumes (GVfsUDisks2VolumeMonitor  *monitor,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static gboolean
+have_udisks_volume_for_mount_point (GVfsUDisks2VolumeMonitor *monitor,
+                                    GUnixMountPoint          *mount_point)
+{
+  gboolean ret = FALSE;
+
+  if (find_volume_for_device (monitor, g_unix_mount_point_get_device_path (mount_point)) == NULL)
+    goto out;
+
+  ret = TRUE;
+
+ out:
+  return ret;
+}
+
+static gboolean
+mount_point_has_device (GVfsUDisks2VolumeMonitor  *monitor,
+                        GUnixMountPoint          *mount_point)
+{
+  gboolean ret = FALSE;
+  const gchar *device;
+  struct stat statbuf;
+
+  device = g_unix_mount_point_get_device_path (mount_point);
+  if (!g_str_has_prefix (device, "/dev/"))
+    {
+      /* NFS, CIFS and other non-device mounts always have a device */
+      ret = TRUE;
+      goto out;
+    }
+
+  if (stat (device, &statbuf) != 0)
+    goto out;
+
+  if (statbuf.st_rdev != 0)
+    ret = TRUE;
+
+ out:
+  return ret;
+}
+
 static void
 update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
                       GList                    **added_volumes,
@@ -1245,24 +1290,15 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
   for (l = new_mount_points; l != NULL; l = ll)
     {
       GUnixMountPoint *mount_point = l->data;
-      gboolean keep = TRUE;
 
       ll = l->next;
 
-      if (g_unix_is_mount_path_system_internal (g_unix_mount_point_get_mount_path (mount_point)))
+      if (g_unix_is_mount_path_system_internal (g_unix_mount_point_get_mount_path (mount_point)) ||
+          have_udisks_volume_for_mount_point (monitor, mount_point) ||
+          !mount_point_has_device (monitor, mount_point))
         {
-          keep = FALSE;
+          new_mount_points = g_list_remove_link (new_mount_points, l);
         }
-      else
-        {
-          /* TODO: more checks - including not including the
-           * /etc/fstab entry if we've already got a udisks object for
-           * it
-           */
-        }
-
-      if (!keep)
-        new_mount_points = g_list_remove_link (new_mount_points, l);
     }
 
   cur_mount_points = g_list_sort (cur_mount_points, (GCompareFunc) g_unix_mount_point_compare);
