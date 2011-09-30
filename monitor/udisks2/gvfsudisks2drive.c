@@ -175,12 +175,13 @@ update_drive (GVfsUDisks2Drive *drive)
       drive->can_eject = FALSE;
     }
 
-  udisks_util_get_drive_info (drive->udisks_drive,
-                              NULL,         /* drive_name */
-                              &drive->name,
-                              &drive->icon,
-                              NULL,         /* media_desc */
-                              NULL);        /* media_icon */
+  udisks_client_get_drive_info (gvfs_udisks2_volume_monitor_get_udisks_client (drive->monitor),
+                                drive->udisks_drive,
+                                NULL,         /* drive_name */
+                                &drive->name,
+                                &drive->icon,
+                                NULL,         /* media_desc */
+                                NULL);        /* media_icon */
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* fallbacks */

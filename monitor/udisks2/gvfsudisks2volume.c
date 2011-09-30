@@ -231,12 +231,13 @@ update_volume (GVfsUDisks2Volume *volume)
           GIcon *drive_icon;
           gchar *media_desc;
           GIcon *media_icon;
-          udisks_util_get_drive_info (udisks_drive,
-                                      NULL, /* drive_name */
-                                      &drive_desc,
-                                      &drive_icon,
-                                      &media_desc,
-                                      &media_icon);
+          udisks_client_get_drive_info (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                        udisks_drive,
+                                        NULL, /* drive_name */
+                                        &drive_desc,
+                                        &drive_icon,
+                                        &media_desc,
+                                        &media_icon);
           if (media_desc == NULL)
             {
               media_desc = drive_desc;
