@@ -143,6 +143,32 @@ emit_changed (GVfsUDisks2Volume *volume)
   g_signal_emit_by_name (volume->monitor, "volume-changed", volume);
 }
 
+static gchar *
+lookup_mount_option_value (GUnixMountPoint *mount_point,
+                           const gchar     *key)
+{
+  const gchar *options;
+  gchar *ret = NULL;
+
+  options = g_unix_mount_point_get_options (mount_point);
+  if (options != NULL)
+    {
+      const gchar *start;
+      guint n;
+
+      start = strstr (options, key);
+      if (start != NULL)
+        {
+          start += strlen (key);
+          for (n = 0; start[n] != ',' && start[n] != '\0'; n++)
+            ;
+          if (n > 01)
+            ret = g_strndup (start, n);
+        }
+    }
+  return ret;
+}
+
 static gboolean
 update_volume (GVfsUDisks2Volume *volume)
 {
@@ -245,8 +271,21 @@ update_volume (GVfsUDisks2Volume *volume)
     }
   else
     {
-      volume->name = g_unix_mount_point_guess_name (volume->mount_point);
-      volume->icon = gvfs_udisks2_utils_icon_from_fs_type (g_unix_mount_point_get_fs_type (volume->mount_point));
+      gchar *icon_name;
+
+      volume->name = lookup_mount_option_value (volume->mount_point, "comment=gvfs.name=");
+      if (volume->name == NULL)
+        volume->name = g_unix_mount_point_guess_name (volume->mount_point);
+
+      icon_name = lookup_mount_option_value (volume->mount_point, "comment=gvfs.icon_name=");
+      if (icon_name != NULL)
+        {
+          volume->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
+          g_free (icon_name);
+        }
+
+      if (volume->icon == NULL)
+        volume->icon = gvfs_udisks2_utils_icon_from_fs_type (g_unix_mount_point_get_fs_type (volume->mount_point));
     }
 
   /* ---------------------------------------------------------------------------------------------------- */
