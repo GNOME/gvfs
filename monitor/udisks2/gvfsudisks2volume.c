@@ -206,6 +206,8 @@ update_volume (GVfsUDisks2Volume *volume)
 
   if (volume->block != NULL)
     {
+      const gchar *hint;
+
       volume->dev = makedev (udisks_block_get_major (volume->block), udisks_block_get_minor (volume->block));
       volume->device_file = udisks_block_dup_device (volume->block);
 
@@ -268,6 +270,20 @@ update_volume (GVfsUDisks2Volume *volume)
             g_object_unref (media_icon);
 
           g_object_unref (udisks_drive);
+        }
+
+      /* Use hints, if available */
+      hint = udisks_block_get_hint_name (volume->block);
+      if (hint != NULL && strlen (hint) > 0)
+        {
+          g_free (volume->name);
+          volume->name = g_strdup (hint);
+        }
+      hint = udisks_block_get_hint_icon_name (volume->block);
+      if (hint != NULL && strlen (hint) > 0)
+        {
+          g_clear_object (&volume->icon);
+          volume->icon = g_themed_icon_new_with_default_fallbacks (hint);
         }
     }
   else
