@@ -162,8 +162,8 @@ lookup_mount_option_value (GUnixMountPoint *mount_point,
           start += strlen (key);
           for (n = 0; start[n] != ',' && start[n] != '\0'; n++)
             ;
-          if (n > 01)
-            ret = g_strndup (start, n);
+          if (n > 1)
+            ret = g_uri_unescape_segment (start, start + n, NULL);
         }
     }
   return ret;
