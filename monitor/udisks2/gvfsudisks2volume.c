@@ -83,6 +83,9 @@ static void on_block_changed (GObject    *object,
                               GParamSpec *pspec,
                               gpointer    user_data);
 
+static void on_udisks_client_changed (UDisksClient *client,
+                                      gpointer      user_data);
+
 G_DEFINE_TYPE_EXTENDED (GVfsUDisks2Volume, gvfs_udisks2_volume, G_TYPE_OBJECT, 0,
                         G_IMPLEMENT_INTERFACE (G_TYPE_VOLUME, gvfs_udisks2_volume_volume_iface_init))
 
@@ -90,6 +93,10 @@ static void
 gvfs_udisks2_volume_finalize (GObject *object)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (object);
+
+  g_signal_handlers_disconnect_by_func (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                        G_CALLBACK (on_udisks_client_changed),
+                                        volume);
 
   if (volume->mount != NULL)
     {
@@ -207,17 +214,36 @@ update_volume (GVfsUDisks2Volume *volume)
   if (volume->block != NULL)
     {
       const gchar *hint;
+      UDisksBlock *block;
+      UDisksBlock *cleartext_block;
 
-      volume->dev = makedev (udisks_block_get_major (volume->block), udisks_block_get_minor (volume->block));
-      volume->device_file = udisks_block_dup_device (volume->block);
+      /* If unlocked, use the values from the unlocked block device for presentation */
+      cleartext_block = udisks_client_get_cleartext_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                                           volume->block);
+      if (cleartext_block != NULL)
+        block = cleartext_block;
+      else
+        block = volume->block;
 
-      if (strlen (udisks_block_get_id_label (volume->block)) > 0)
+      volume->dev = makedev (udisks_block_get_major (block), udisks_block_get_minor (block));
+      volume->device_file = udisks_block_dup_device (block);
+
+      if (strlen (udisks_block_get_id_label (block)) > 0)
         {
-          volume->name = g_strdup (udisks_block_get_id_label (volume->block));
+          volume->name = g_strdup (udisks_block_get_id_label (block));
+        }
+      else if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_LUKS") == 0)
+        {
+          s = udisks_util_get_size_for_display (udisks_block_get_size (volume->block), FALSE, FALSE);
+          /* Translators: This is used for encrypted volumes.
+           *              The first %s is the formatted size (e.g. "42.0 MB").
+           */
+          volume->name = g_strdup_printf (_("%s Encrypted"), s);
+          g_free (s);
         }
       else
         {
-          s = g_format_size (udisks_block_get_size (volume->block));
+          s = udisks_util_get_size_for_display (udisks_block_get_size (block), FALSE, FALSE);
           /* Translators: This is used for volume with no filesystem label.
            *              The first %s is the formatted size (e.g. "42.0 MB").
            */
@@ -226,7 +252,7 @@ update_volume (GVfsUDisks2Volume *volume)
         }
 
       udisks_drive = udisks_client_get_drive_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
-                                                    volume->block);
+                                                        volume->block);
       if (udisks_drive != NULL)
         {
           gchar *drive_desc;
@@ -285,6 +311,27 @@ update_volume (GVfsUDisks2Volume *volume)
           g_clear_object (&volume->icon);
           volume->icon = g_themed_icon_new_with_default_fallbacks (hint);
         }
+
+      /* Add an emblem, depending on whether the encrypted volume is locked or unlocked */
+      if (g_strcmp0 (udisks_block_get_id_type (volume->block), "crypto_LUKS") == 0 && volume->icon != NULL)
+        {
+          GEmblem *emblem;
+          GIcon *padlock;
+          GIcon *emblemed_icon;
+          if (cleartext_block != NULL)
+            padlock = g_themed_icon_new ("changes-allow");
+          else
+            padlock = g_themed_icon_new ("changes-prevent");
+          emblem = g_emblem_new_with_origin (padlock, G_EMBLEM_ORIGIN_DEVICE);
+          emblemed_icon = g_emblemed_icon_new (volume->icon, emblem);
+          g_object_unref (padlock);
+          g_object_unref (emblem);
+
+          g_object_unref (volume->icon);
+          volume->icon = emblemed_icon;
+        }
+
+      g_clear_object (&cleartext_block);
     }
   else
     {
@@ -338,12 +385,26 @@ update_volume (GVfsUDisks2Volume *volume)
   return changed;
 }
 
+/* ---------------------------------------------------------------------------------------------------- */
+
 static void
 on_block_changed (GObject    *object,
                   GParamSpec *pspec,
                   gpointer    user_data)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (user_data);
+  if (update_volume (volume))
+    emit_changed (volume);
+}
+
+static void
+on_udisks_client_changed (UDisksClient *client,
+                          gpointer      user_data)
+{
+  GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (user_data);
+  /* This is a little too broad - technically we only need to do this if our block
+   * device has gained or lost a cleartext device...
+   */
   if (update_volume (volume))
     emit_changed (volume);
 }
@@ -383,8 +444,19 @@ gvfs_udisks2_volume_new (GVfsUDisks2VolumeMonitor   *monitor,
 
   update_volume (volume);
 
+  /* For LUKS devices, we also need to listen for changes on any possible cleartext device */
+  if (volume->block != NULL && g_strcmp0 (udisks_block_get_id_type (volume->block), "crypto_LUKS") == 0)
+    {
+      g_signal_connect (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                        "changed",
+                        G_CALLBACK (on_udisks_client_changed),
+                        volume);
+    }
+
   return volume;
 }
+
+/* ---------------------------------------------------------------------------------------------------- */
 
 void
 gvfs_udisks2_volume_removed (GVfsUDisks2Volume *volume)
@@ -588,31 +660,53 @@ struct MountData
   GSimpleAsyncResult *simple;
 
   GVfsUDisks2Volume *volume;
-
   GCancellable *cancellable;
 
+  gulong mount_operation_reply_handler_id;
+  gulong mount_operation_aborted_handler_id;
   GMountOperation *mount_operation;
+
+  gchar *passphrase;
+
+  UDisksEncrypted *encrypted_to_unlock;
+  UDisksFilesystem *filesystem_to_mount;
+
 };
 
 static void
 mount_data_free (MountData *data)
 {
+  if (data->volume->mount_pending_op == data)
+    data->volume->mount_pending_op = NULL;
+
   g_object_unref (data->simple);
 
   g_clear_object (&data->volume);
   g_clear_object (&data->cancellable);
-  g_clear_object (&data->mount_operation);
+
+  if (data->mount_operation != NULL)
+    {
+      if (data->mount_operation_reply_handler_id != 0)
+        g_signal_handler_disconnect (data->mount_operation, data->mount_operation_reply_handler_id);
+      if (data->mount_operation_aborted_handler_id != 0)
+        g_signal_handler_disconnect (data->mount_operation, data->mount_operation_aborted_handler_id);
+      g_object_unref (data->mount_operation);
+    }
+
+  g_free (data->passphrase);
+
+  g_clear_object (&data->encrypted_to_unlock);
+  g_clear_object (&data->filesystem_to_mount);
   g_free (data);
 }
 
 static void
 mount_cancel_pending_op (MountData *data)
 {
+  g_cancellable_cancel (data->cancellable);
   /* send an ::aborted signal to make the dialog go away */
   if (data->mount_operation != NULL)
     g_signal_emit_by_name (data->mount_operation, "aborted");
-  g_cancellable_cancel (data->cancellable);
-  data->volume->mount_pending_op = NULL;
 }
 
 /* ------------------------------ */
@@ -649,10 +743,10 @@ do_mount_command (MountData *data)
 
   /* TODO: for e.g. NFS and CIFS mounts we could do GMountOperation stuff and pipe a
    * password to mount(8)'s stdin channel
+   *
+   * TODO: if this fails because the user is not authorized (e.g. EPERM), we could
+   * run it through a polkit-ified setuid root helper
    */
-
-  /* we are no longer pending */
-  data->volume->mount_pending_op = NULL;
 
   if (WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0)
     {
@@ -684,9 +778,6 @@ mount_cb (GObject       *source_object,
   gchar *mount_path;
   GError *error;
 
-  /* we are no longer pending */
-  data->volume->mount_pending_op = NULL;
-
   error = NULL;
   if (!udisks_filesystem_call_mount_finish (UDISKS_FILESYSTEM (source_object),
                                             &mount_path,
@@ -707,6 +798,200 @@ mount_cb (GObject       *source_object,
 }
 
 static void
+do_mount (MountData *data)
+{
+  GVariantBuilder builder;
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
+  if (data->mount_operation == NULL)
+    {
+      g_variant_builder_add (&builder,
+                             "{sv}",
+                             "auth.no_user_interaction", g_variant_new_boolean (TRUE));
+    }
+  udisks_filesystem_call_mount (data->filesystem_to_mount,
+                                g_variant_builder_end (&builder),
+                                data->cancellable,
+                                mount_cb,
+                                data);
+}
+
+/* ------------------------------ */
+
+static void
+unlock_cb (GObject       *source_object,
+           GAsyncResult  *res,
+           gpointer       user_data)
+{
+  MountData *data = user_data;
+  gchar *cleartext_device = NULL;
+  GError *error;
+
+  error = NULL;
+  if (!udisks_encrypted_call_unlock_finish (UDISKS_ENCRYPTED (source_object),
+                                            &cleartext_device,
+                                            res,
+                                            &error))
+    {
+      gvfs_udisks2_utils_udisks_error_to_gio_error (error);
+      g_simple_async_result_take_error (data->simple, error);
+      g_simple_async_result_complete (data->simple);
+      mount_data_free (data);
+      goto out;
+    }
+  else
+    {
+      UDisksObject *object;
+
+      gvfs_udisks2_volume_monitor_update (data->volume->monitor);
+
+      object = udisks_client_peek_object (gvfs_udisks2_volume_monitor_get_udisks_client (data->volume->monitor),
+                                          cleartext_device);
+      data->filesystem_to_mount = object != NULL ? udisks_object_get_filesystem (object) : NULL;
+      if (data->filesystem_to_mount == NULL)
+        {
+          g_simple_async_result_set_error (data->simple,
+                                           G_IO_ERROR,
+                                           G_IO_ERROR_FAILED,
+                                           _("The unlocked device does not have a recognizable filesystem on it"));
+          g_simple_async_result_complete (data->simple);
+          mount_data_free (data);
+          goto out;
+        }
+
+      /* TODO: save in keyring depending on ASK_SAVE */
+
+      /* OK, ready to rock */
+      do_mount (data);
+    }
+
+ out:
+  g_free (cleartext_device);
+}
+
+static void do_unlock (MountData *data);
+
+static void
+on_mount_operation_reply (GMountOperation       *mount_operation,
+                          GMountOperationResult result,
+                          gpointer              user_data)
+{
+  MountData *data = user_data;
+
+  /* we got what we wanted; don't listen to any other signals from the mount operation */
+  if (data->mount_operation_reply_handler_id != 0)
+    {
+      g_signal_handler_disconnect (data->mount_operation, data->mount_operation_reply_handler_id);
+      data->mount_operation_reply_handler_id = 0;
+    }
+  if (data->mount_operation_aborted_handler_id != 0)
+    {
+      g_signal_handler_disconnect (data->mount_operation, data->mount_operation_aborted_handler_id);
+      data->mount_operation_aborted_handler_id = 0;
+    }
+
+  if (result != G_MOUNT_OPERATION_HANDLED)
+    {
+      if (result == G_MOUNT_OPERATION_ABORTED)
+        {
+          /* The user aborted the operation so consider it "handled" */
+          g_simple_async_result_set_error (data->simple,
+                                           G_IO_ERROR,
+                                           G_IO_ERROR_FAILED_HANDLED,
+                                           "Password dialog aborted (user should never see this error since it is G_IO_ERROR_FAILED_HANDLED)");
+        }
+      else
+        {
+          g_simple_async_result_set_error (data->simple,
+                                           G_IO_ERROR,
+                                           G_IO_ERROR_PERMISSION_DENIED,
+                                           "Expected G_MOUNT_OPERATION_HANDLED but got %d", result);
+        }
+      g_simple_async_result_complete (data->simple);
+      mount_data_free (data);
+      goto out;
+    }
+
+  data->passphrase = g_strdup (g_mount_operation_get_password (mount_operation));
+
+  /* TODO: check ASK_SAVE */
+  do_unlock (data);
+
+ out:
+  ;
+}
+
+static void
+on_mount_operation_aborted (GMountOperation       *mount_operation,
+                            gpointer              user_data)
+{
+  on_mount_operation_reply (mount_operation, G_MOUNT_OPERATION_ABORTED, user_data);
+}
+
+static void
+do_unlock (MountData *data)
+{
+  GVariantBuilder builder;
+
+  /* TODO: lookup passphrase in keyring */
+
+  if (data->passphrase == NULL)
+    {
+      gchar *message;
+
+      if (data->mount_operation == NULL)
+        {
+          g_simple_async_result_set_error (data->simple,
+                                           G_IO_ERROR,
+                                           G_IO_ERROR_FAILED,
+                                           _("A passphrase is required to access the volume"));
+          g_simple_async_result_complete (data->simple);
+          mount_data_free (data);
+          goto out;
+        }
+
+      data->mount_operation_reply_handler_id = g_signal_connect (data->mount_operation,
+                                                                 "reply",
+                                                                 G_CALLBACK (on_mount_operation_reply),
+                                                                 data);
+      data->mount_operation_aborted_handler_id = g_signal_connect (data->mount_operation,
+                                                                   "aborted",
+                                                                   G_CALLBACK (on_mount_operation_aborted),
+                                                                   data);
+      message = g_strdup_printf (_("Enter a password to unlock the volume\n"
+                                   "The device %s contains encrypted data."),
+                                 udisks_block_get_device (data->volume->block));
+      g_signal_emit_by_name (data->mount_operation,
+                             "ask-password",
+                             message,
+                             NULL,
+                             NULL,
+                             G_ASK_PASSWORD_NEED_PASSWORD |
+                             0/*G_ASK_PASSWORD_SAVING_SUPPORTED*/);
+      g_free (message);
+      goto out;
+    }
+
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
+  if (data->mount_operation == NULL)
+    {
+      g_variant_builder_add (&builder,
+                             "{sv}",
+                             "auth.no_user_interaction", g_variant_new_boolean (TRUE));
+    }
+  udisks_encrypted_call_unlock (data->encrypted_to_unlock,
+                                data->passphrase,
+                                g_variant_builder_end (&builder),
+                                data->cancellable,
+                                unlock_cb,
+                                data);
+ out:
+  ;
+}
+
+
+static void
 gvfs_udisks2_volume_mount (GVolume             *_volume,
                            GMountMountFlags     flags,
                            GMountOperation     *mount_operation,
@@ -715,8 +1000,9 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
                            gpointer             user_data)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
+  UDisksObject *object;
+  UDisksBlock *block;
   UDisksFilesystem *filesystem;
-  GVariantBuilder builder;
   MountData *data;
 
   data = g_new0 (MountData, 1);
@@ -746,30 +1032,36 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
       goto out;
     }
 
-  filesystem = udisks_object_peek_filesystem (UDISKS_OBJECT (g_dbus_interface_get_object (G_DBUS_INTERFACE (volume->block))));
+  /* if encrypted and already unlocked, just mount the cleartext block device */
+  block = udisks_client_get_cleartext_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                             volume->block);
+  if (block != NULL)
+    g_object_unref (block);
+  else
+    block = volume->block;
+
+  object = UDISKS_OBJECT (g_dbus_interface_get_object (G_DBUS_INTERFACE (block)));
+  filesystem = udisks_object_peek_filesystem (object);
   if (filesystem == NULL)
     {
+      data->encrypted_to_unlock = udisks_object_get_encrypted (object);
+      if (data->encrypted_to_unlock != NULL)
+        {
+          do_unlock (data);
+          goto out;
+        }
+
       g_simple_async_result_set_error (data->simple,
                                        G_IO_ERROR,
                                        G_IO_ERROR_FAILED,
-                                       "No filesystem interface on D-Bus object");
+                                       "No .Filesystem or .Encrypted interface on D-Bus object");
       g_simple_async_result_complete (data->simple);
       mount_data_free (data);
       goto out;
     }
 
-  g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
-  if (data->mount_operation == NULL)
-    {
-      g_variant_builder_add (&builder,
-                             "{sv}",
-                             "auth.no_user_interaction", g_variant_new_boolean (TRUE));
-    }
-  udisks_filesystem_call_mount (filesystem,
-                                g_variant_builder_end (&builder),
-                                data->cancellable,
-                                mount_cb,
-                                data);
+  data->filesystem_to_mount = g_object_ref (filesystem);
+  do_mount (data);
 
  out:
   ;

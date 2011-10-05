@@ -90,30 +90,8 @@ static void update_discs             (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **removed_mounts);
 
 
-static void on_object_added (GDBusObjectManager  *manager,
-                             GDBusObject         *object,
-                             gpointer             user_data);
-
-static void on_object_removed (GDBusObjectManager  *manager,
-                               GDBusObject         *object,
-                               gpointer             user_data);
-
-static void on_interface_added (GDBusObjectManager  *manager,
-                                GDBusObject         *object,
-                                GDBusInterface      *interface,
-                                gpointer             user_data);
-
-static void on_interface_removed (GDBusObjectManager  *manager,
-                                  GDBusObject         *object,
-                                  GDBusInterface      *interface,
-                                  gpointer             user_data);
-
-static void on_interface_proxy_properties_changed (GDBusObjectManagerClient   *manager,
-                                                   GDBusObjectProxy           *object_proxy,
-                                                   GDBusProxy                 *interface_proxy,
-                                                   GVariant                   *changed_properties,
-                                                   const gchar *const         *invalidated_properties,
-                                                   gpointer                    user_data);
+static void on_client_changed (UDisksClient *client,
+                               gpointer      user_data);
 
 static void mountpoints_changed      (GUnixMountMonitor  *mount_monitor,
                                       gpointer            user_data);
@@ -136,27 +114,13 @@ static void
 gvfs_udisks2_volume_monitor_finalize (GObject *object)
 {
   GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (object);
-  GDBusObjectManager *object_manager;
 
   g_signal_handlers_disconnect_by_func (monitor->mount_monitor, mountpoints_changed, monitor);
   g_signal_handlers_disconnect_by_func (monitor->mount_monitor, mounts_changed, monitor);
   g_clear_object (&monitor->mount_monitor);
 
-  object_manager = udisks_client_get_object_manager (monitor->client);
-  g_signal_handlers_disconnect_by_func (object_manager,
-                                        G_CALLBACK (on_object_added),
-                                        monitor);
-  g_signal_handlers_disconnect_by_func (object_manager,
-                                        G_CALLBACK (on_object_removed),
-                                        monitor);
-  g_signal_handlers_disconnect_by_func (object_manager,
-                                        G_CALLBACK (on_interface_added),
-                                        monitor);
-  g_signal_handlers_disconnect_by_func (object_manager,
-                                        G_CALLBACK (on_interface_removed),
-                                        monitor);
-  g_signal_handlers_disconnect_by_func (object_manager,
-                                        G_CALLBACK (on_interface_proxy_properties_changed),
+  g_signal_handlers_disconnect_by_func (monitor->client,
+                                        G_CALLBACK (on_client_changed),
                                         monitor);
 
   g_clear_object (&monitor->client);
@@ -337,31 +301,12 @@ gvfs_udisks2_volume_monitor_constructor (GType                  type,
 static void
 gvfs_udisks2_volume_monitor_init (GVfsUDisks2VolumeMonitor *monitor)
 {
-  GDBusObjectManager *object_manager;
-
-  monitor->client = get_udisks_client_sync (NULL);
   monitor->gudev_client = g_udev_client_new (NULL); /* don't listen to any changes */
 
-  object_manager = udisks_client_get_object_manager (monitor->client);
-  g_signal_connect (object_manager,
-                    "object-added",
-                    G_CALLBACK (on_object_added),
-                    monitor);
-  g_signal_connect (object_manager,
-                    "object-removed",
-                    G_CALLBACK (on_object_removed),
-                    monitor);
-  g_signal_connect (object_manager,
-                    "interface-added",
-                    G_CALLBACK (on_interface_added),
-                    monitor);
-  g_signal_connect (object_manager,
-                    "interface-removed",
-                    G_CALLBACK (on_interface_removed),
-                    monitor);
-  g_signal_connect (object_manager,
-                    "interface-proxy-properties-changed",
-                    G_CALLBACK (on_interface_proxy_properties_changed),
+  monitor->client = get_udisks_client_sync (NULL);
+  g_signal_connect (monitor->client,
+                    "changed",
+                    G_CALLBACK (on_client_changed),
                     monitor);
 
   monitor->mount_monitor = g_unix_mount_monitor_new ();
@@ -541,57 +486,10 @@ object_list_emit (GVfsUDisks2VolumeMonitor *monitor,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-on_object_added (GDBusObjectManager  *manager,
-                 GDBusObject         *object,
-                 gpointer             user_data)
+on_client_changed (UDisksClient  *client,
+                   gpointer       user_data)
 {
   GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
-  // g_debug ("on_object_added %s", g_dbus_object_get_object_path (G_DBUS_OBJECT (object)));
-  update_all (monitor, TRUE);
-}
-
-static void
-on_object_removed (GDBusObjectManager  *manager,
-                   GDBusObject         *object,
-                   gpointer             user_data)
-{
-  GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
-  // g_debug ("on_object_removed %s", g_dbus_object_get_object_path (G_DBUS_OBJECT (object)));
-  update_all (monitor, TRUE);
-}
-
-static void
-on_interface_added (GDBusObjectManager  *manager,
-                    GDBusObject         *object,
-                    GDBusInterface      *interface,
-                    gpointer             user_data)
-{
-  GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
-  // g_debug ("on_interface_added %s", g_dbus_object_get_object_path (G_DBUS_OBJECT (object)));
-  update_all (monitor, TRUE);
-}
-
-static void
-on_interface_removed (GDBusObjectManager  *manager,
-                      GDBusObject         *object,
-                      GDBusInterface      *interface,
-                      gpointer             user_data)
-{
-  GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
-  // g_debug ("on_interface_removed %s", g_dbus_object_get_object_path (G_DBUS_OBJECT (object)));
-  update_all (monitor, TRUE);
-}
-
-static void
-on_interface_proxy_properties_changed (GDBusObjectManagerClient   *manager,
-                                       GDBusObjectProxy           *object_proxy,
-                                       GDBusProxy                 *interface_proxy,
-                                       GVariant                   *changed_properties,
-                                       const gchar *const         *invalidated_properties,
-                                       gpointer                    user_data)
-{
-  GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
-  // g_debug ("on_interface_proxy_properties_changed %s", g_dbus_object_get_object_path (G_DBUS_OBJECT (object_proxy)));
   update_all (monitor, TRUE);
 }
 
@@ -724,9 +622,39 @@ should_include_volume_check_mount_points (GVfsUDisks2VolumeMonitor *monitor,
 
 static gboolean
 should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
-                       UDisksBlock              *block)
+                       UDisksBlock              *block,
+                       gboolean                  allow_encrypted_cleartext)
 {
   gboolean ret = FALSE;
+
+  /* show encrypted volumes... */
+  if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_LUKS") == 0)
+    {
+      UDisksBlock *cleartext_block;
+      /* ... unless the volume is unlocked and we don't want to show the cleartext volume */
+      cleartext_block = udisks_client_get_cleartext_block (monitor->client, block);
+      if (cleartext_block != NULL)
+        {
+          ret = should_include_volume (monitor, cleartext_block, TRUE);
+          g_object_unref (cleartext_block);
+        }
+      else
+        {
+          ret = TRUE;
+        }
+      goto out;
+    }
+
+  if (!allow_encrypted_cleartext)
+    {
+      /* ... but not unlocked volumes (because the volume for the encrypted part morphs
+       * into the cleartext part when unlocked)
+       */
+      if (g_strcmp0 (udisks_block_get_crypto_backing_device (block), "/") != 0)
+        {
+          goto out;
+        }
+    }
 
   /* Check should_include_mount() for all mount points, if any - e.g. if a volume
    * is mounted in a place where the mount is to be ignored, we ignore the volume
@@ -1162,7 +1090,7 @@ update_volumes (GVfsUDisks2VolumeMonitor  *monitor,
       UDisksBlock *block = udisks_object_peek_block (UDISKS_OBJECT (l->data));
       if (block == NULL)
         continue;
-      if (should_include_volume (monitor, block))
+      if (should_include_volume (monitor, block, FALSE))
         new_block_volumes = g_list_prepend (new_block_volumes, block);
     }
 

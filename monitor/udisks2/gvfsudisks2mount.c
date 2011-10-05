@@ -580,6 +580,9 @@ typedef struct
 
   GVfsUDisks2Mount *mount;
 
+  UDisksEncrypted *encrypted;
+  UDisksFilesystem *filesystem;
+
   GCancellable *cancellable;
   gulong cancelled_handler_id;
   gboolean is_cancelled;
@@ -614,6 +617,8 @@ unmount_data_free (UnmountData *data)
     g_signal_handler_disconnect (data->cancellable, data->cancelled_handler_id);
   g_clear_object (&data->cancellable);
   g_clear_object (&data->mount_operation);
+  g_clear_object (&data->encrypted);
+  g_clear_object (&data->filesystem);
 
   g_free (data);
 }
@@ -724,6 +729,24 @@ unmount_show_busy (UnmountData        *data,
 }
 
 static void
+lock_cb (GObject       *source_object,
+         GAsyncResult  *res,
+         gpointer       user_data)
+{
+  UDisksEncrypted *encrypted = UDISKS_ENCRYPTED (source_object);
+  UnmountData *data = user_data;
+  GError *error;
+
+  error = NULL;
+  if (!udisks_encrypted_call_lock_finish (encrypted,
+                                          res,
+                                          &error))
+    g_simple_async_result_take_error (data->simple, error);
+  g_simple_async_result_complete (data->simple);
+  unmount_data_free (data);
+}
+
+static void
 unmount_cb (GObject       *source_object,
             GAsyncResult  *res,
             gpointer       user_data)
@@ -754,7 +777,19 @@ unmount_cb (GObject       *source_object,
   else
     {
       gvfs_udisks2_volume_monitor_update (data->mount->monitor);
-      g_simple_async_result_complete (data->simple);
+      if (data->encrypted != NULL)
+        {
+          udisks_encrypted_call_lock (data->encrypted,
+                                      g_variant_new ("a{sv}", NULL), /* options */
+                                      data->cancellable,
+                                      lock_cb,
+                                      data);
+          goto out;
+        }
+      else
+        {
+          g_simple_async_result_complete (data->simple);
+        }
     }
 
   unmount_data_free (data);
@@ -832,32 +867,11 @@ static void
 unmount_do (UnmountData *data,
             gboolean     force)
 {
-  UDisksBlock *block;
-  UDisksFilesystem *filesystem;
   GVariantBuilder builder;
 
   if (data->mount->volume == NULL)
     {
       unmount_do_command (data, force);
-      goto out;
-    }
-
-  block = gvfs_udisks2_volume_get_block (data->mount->volume);
-  if (block == NULL)
-    {
-      unmount_do_command (data, force);
-      goto out;
-    }
-
-  filesystem = udisks_object_peek_filesystem (UDISKS_OBJECT (g_dbus_interface_get_object (G_DBUS_INTERFACE (block))));
-  if (filesystem == NULL)
-    {
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED,
-                                       "No filesystem interface on D-Bus object");
-      g_simple_async_result_complete (data->simple);
-      unmount_data_free (data);
       goto out;
     }
 
@@ -874,7 +888,7 @@ unmount_do (UnmountData *data,
                              "{sv}",
                              "force", g_variant_new_boolean (TRUE));
     }
-  udisks_filesystem_call_unmount (filesystem,
+  udisks_filesystem_call_unmount (data->filesystem,
                                   g_variant_builder_end (&builder),
                                   data->cancellable,
                                   unmount_cb,
@@ -894,6 +908,8 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
 {
   GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
   UnmountData *data;
+  UDisksBlock *block;
+  UDisksObject *object;
 
   /* first emit the ::mount-pre-unmount signal */
   g_signal_emit_by_name (mount->monitor, "mount-pre-unmount", mount);
@@ -913,11 +929,54 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
       /* burn mounts are really never mounted so complete successfully immediately */
       g_simple_async_result_complete_in_idle (data->simple);
       unmount_data_free (data);
+      goto out;
     }
-  else
+
+  block = gvfs_udisks2_volume_get_block (data->mount->volume);
+  if (block != NULL)
     {
-      unmount_do (data, FALSE);
+      object = UDISKS_OBJECT (g_dbus_interface_get_object (G_DBUS_INTERFACE (block)));
+      data->filesystem = udisks_object_get_filesystem (object);
+      if (data->filesystem == NULL)
+        {
+          UDisksBlock *cleartext_block;
+
+          data->encrypted = udisks_object_get_encrypted (object);
+          if (data->encrypted == NULL)
+            {
+              g_simple_async_result_set_error (data->simple,
+                                               G_IO_ERROR,
+                                               G_IO_ERROR_FAILED,
+                                               "No filesystem or encrypted interface on D-Bus object");
+              g_simple_async_result_complete (data->simple);
+              unmount_data_free (data);
+              goto out;
+            }
+
+          cleartext_block = udisks_client_get_cleartext_block (gvfs_udisks2_volume_monitor_get_udisks_client (mount->monitor),
+                                                               block);
+          if (cleartext_block != NULL)
+            {
+              data->filesystem = udisks_object_get_filesystem (UDISKS_OBJECT (g_dbus_interface_get_object (G_DBUS_INTERFACE (cleartext_block))));
+              g_object_unref (cleartext_block);
+              if (data->filesystem == NULL)
+                {
+                  g_simple_async_result_set_error (data->simple,
+                                                   G_IO_ERROR,
+                                                   G_IO_ERROR_FAILED,
+                                                   "No filesystem interface on D-Bus object for cleartext device");
+                  g_simple_async_result_complete (data->simple);
+                  unmount_data_free (data);
+                  goto out;
+                }
+            }
+        }
+      g_assert (data->filesystem != NULL);
     }
+  unmount_do (data, FALSE /* force */);
+
+ out:
+  ;
 }
 
 static gboolean
