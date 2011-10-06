@@ -934,10 +934,7 @@ find_volume_for_device (GVfsUDisks2VolumeMonitor *monitor,
     goto out;
 
   if (stat (device, &statbuf) != 0)
-    {
-      g_debug ("error statting %s: %m", device);
-      goto out;
-    }
+    goto out;
 
   for (l = monitor->volumes; l != NULL; l = l->next)
     {
