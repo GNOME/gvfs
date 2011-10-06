@@ -418,11 +418,14 @@ diff_sorted_lists (GList         *list1,
                    GList         *list2,
                    GCompareFunc   compare,
                    GList        **added,
-                   GList        **removed)
+                   GList        **removed,
+                   GList        **unchanged)
 {
   int order;
 
   *added = *removed = NULL;
+  if (unchanged != NULL)
+    *unchanged = NULL;
 
   while (list1 != NULL &&
          list2 != NULL)
@@ -440,6 +443,8 @@ diff_sorted_lists (GList         *list1,
         }
       else
         { /* same item */
+          if (unchanged != NULL)
+            *unchanged = g_list_prepend (*unchanged, list1->data);
           list1 = list1->next;
           list2 = list2->next;
         }
@@ -929,7 +934,10 @@ find_volume_for_device (GVfsUDisks2VolumeMonitor *monitor,
     goto out;
 
   if (stat (device, &statbuf) != 0)
-    goto out;
+    {
+      g_debug ("error statting %s: %m", device);
+      goto out;
+    }
 
   for (l = monitor->volumes; l != NULL; l = l->next)
     {
@@ -1017,7 +1025,7 @@ update_drives (GVfsUDisks2VolumeMonitor  *monitor,
   new_udisks_drives = g_list_sort (new_udisks_drives, (GCompareFunc) udisks_drive_compare);
   diff_sorted_lists (cur_udisks_drives,
                      new_udisks_drives, (GCompareFunc) udisks_drive_compare,
-                     &added, &removed);
+                     &added, &removed, NULL);
 
   for (l = removed; l != NULL; l = l->next)
     {
@@ -1098,7 +1106,7 @@ update_volumes (GVfsUDisks2VolumeMonitor  *monitor,
   new_block_volumes = g_list_sort (new_block_volumes, (GCompareFunc) block_compare);
   diff_sorted_lists (cur_block_volumes,
                      new_block_volumes, (GCompareFunc) block_compare,
-                     &added, &removed);
+                     &added, &removed, NULL);
 
   for (l = removed; l != NULL; l = l->next)
     {
@@ -1252,7 +1260,7 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
   new_mount_points = g_list_sort (new_mount_points, (GCompareFunc) g_unix_mount_point_compare);
   diff_sorted_lists (cur_mount_points,
                      new_mount_points, (GCompareFunc) g_unix_mount_point_compare,
-                     &added, &removed);
+                     &added, &removed, NULL);
 
   for (l = removed; l != NULL; l = l->next)
     {
@@ -1313,7 +1321,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
 {
   GList *cur_mounts;
   GList *new_mounts;
-  GList *removed, *added;
+  GList *removed, *added, *unchanged;
   GList *l, *ll;
   GVfsUDisks2Mount *mount;
   GVfsUDisks2Volume *volume;
@@ -1348,7 +1356,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
   new_mounts = g_list_sort (new_mounts, (GCompareFunc) g_unix_mount_compare);
   diff_sorted_lists (cur_mounts,
                      new_mounts, (GCompareFunc) g_unix_mount_compare,
-                     &added, &removed);
+                     &added, &removed, &unchanged);
 
   for (l = removed; l != NULL; l = l->next)
     {
@@ -1367,10 +1375,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
   for (l = added; l != NULL; l = l->next)
     {
       GUnixMountEntry *mount_entry = l->data;
-      const gchar *device_file;
-
-      device_file = g_unix_mount_get_device_path (mount_entry);
-      volume = find_volume_for_device (monitor, device_file);
+      volume = find_volume_for_device (monitor, g_unix_mount_get_device_path (mount_entry));
       if (volume == NULL)
         volume = find_fstab_volume_for_mount_entry (monitor, mount_entry);
       mount = gvfs_udisks2_mount_new (monitor, mount_entry, volume); /* adopts mount_entry */
@@ -1384,8 +1389,39 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
         }
     }
 
+  /* Handle the case where the volume containing the mount appears *after*
+   * the mount.
+   *
+   * This can happen when unlocking+mounting a LUKS device and the two
+   * operations are *right* after each other. In that case we get the
+   * event from GUnixMountMonitor (which monitors /proc/mounts) before
+   * the event from udisks.
+   */
+  for (l = unchanged; l != NULL; l = l->next)
+    {
+      GUnixMountEntry *mount_entry = l->data;
+      mount = find_mount_by_mount_path (monitor, g_unix_mount_get_mount_path (mount_entry));
+      if (mount == NULL)
+        {
+          g_warning ("No mount object for path %s", g_unix_mount_get_mount_path (mount_entry));
+          continue;
+        }
+      if (gvfs_udisks2_mount_get_volume (mount) == NULL)
+        {
+          volume = find_volume_for_device (monitor, g_unix_mount_get_device_path (mount_entry));
+          if (volume == NULL)
+            volume = find_fstab_volume_for_mount_entry (monitor, mount_entry);
+          if (volume != NULL)
+            {
+              g_debug ("late setting volume for %s", g_unix_mount_get_mount_path (mount_entry));
+              gvfs_udisks2_mount_set_volume (mount, volume);
+            }
+        }
+    }
+
   g_list_free (added);
   g_list_free (removed);
+  g_list_free (unchanged);
 
   g_list_foreach (new_mounts, (GFunc) g_unix_mount_free, NULL);
   g_list_free (new_mounts);
@@ -1449,7 +1485,8 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
 
   cur_disc_drives = g_list_sort (cur_disc_drives, (GCompareFunc) udisks_drive_compare);
   new_disc_drives = g_list_sort (new_disc_drives, (GCompareFunc) udisks_drive_compare);
-  diff_sorted_lists (cur_disc_drives, new_disc_drives, (GCompareFunc) udisks_drive_compare, &added, &removed);
+  diff_sorted_lists (cur_disc_drives, new_disc_drives, (GCompareFunc) udisks_drive_compare,
+                     &added, &removed, NULL);
 
   for (l = removed; l != NULL; l = l->next)
     {

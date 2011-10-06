@@ -405,6 +405,7 @@ gvfs_udisks2_mount_set_volume (GVfsUDisks2Mount   *mount,
           /* this is for piggy backing on the name and icon of the associated volume */
           g_signal_connect (mount->volume, "changed", G_CALLBACK (on_volume_changed), mount);
         }
+      update_mount (mount);
       emit_changed (mount);
     }
 }
@@ -470,7 +471,7 @@ gvfs_udisks2_mount_get_drive (GMount *_mount)
 }
 
 static GVolume *
-gvfs_udisks2_mount_get_volume (GMount *_mount)
+gvfs_udisks2_mount_get_volume_ (GMount *_mount)
 {
   GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
   GVolume *volume = NULL;
@@ -1225,7 +1226,7 @@ gvfs_udisks2_mount_mount_iface_init (GMountIface *iface)
   iface->get_icon = gvfs_udisks2_mount_get_icon;
   iface->get_uuid = gvfs_udisks2_mount_get_uuid;
   iface->get_drive = gvfs_udisks2_mount_get_drive;
-  iface->get_volume = gvfs_udisks2_mount_get_volume;
+  iface->get_volume = gvfs_udisks2_mount_get_volume_;
   iface->can_unmount = gvfs_udisks2_mount_can_unmount;
   iface->can_eject = gvfs_udisks2_mount_can_eject;
   iface->unmount = gvfs_udisks2_mount_unmount;
@@ -1246,4 +1247,10 @@ gvfs_udisks2_mount_has_volume (GVfsUDisks2Mount   *mount,
                                GVfsUDisks2Volume  *volume)
 {
   return mount->volume == volume;
+}
+
+GVfsUDisks2Volume *
+gvfs_udisks2_mount_get_volume (GVfsUDisks2Mount *mount)
+{
+  return mount->volume;
 }

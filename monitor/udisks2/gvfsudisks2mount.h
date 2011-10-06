@@ -51,6 +51,7 @@ void              gvfs_udisks2_mount_unset_volume   (GVfsUDisks2Mount         *m
                                                      GVfsUDisks2Volume        *volume);
 gboolean          gvfs_udisks2_mount_has_volume     (GVfsUDisks2Mount         *mount,
                                                      GVfsUDisks2Volume        *volume);
+GVfsUDisks2Volume *gvfs_udisks2_mount_get_volume    (GVfsUDisks2Mount         *mount);
 
 const gchar      *gvfs_udisks2_mount_get_mount_path  (GVfsUDisks2Mount        *mount);
 GUnixMountEntry  *gvfs_udisks2_mount_get_mount_entry (GVfsUDisks2Mount        *mount);
