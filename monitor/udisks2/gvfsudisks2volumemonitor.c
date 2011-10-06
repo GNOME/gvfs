@@ -1412,10 +1412,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
           if (volume == NULL)
             volume = find_fstab_volume_for_mount_entry (monitor, mount_entry);
           if (volume != NULL)
-            {
-              g_debug ("late setting volume for %s", g_unix_mount_get_mount_path (mount_entry));
-              gvfs_udisks2_mount_set_volume (mount, volume);
-            }
+            gvfs_udisks2_mount_set_volume (mount, volume);
         }
     }
 
