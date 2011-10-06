@@ -150,30 +150,26 @@ emit_changed (GVfsUDisks2Volume *volume)
   g_signal_emit_by_name (volume->monitor, "volume-changed", volume);
 }
 
-static gchar *
-lookup_mount_option_value (GUnixMountPoint *mount_point,
-                           const gchar     *key)
+static void
+apply_options_from_fstab (GVfsUDisks2Volume *volume,
+                          const gchar       *fstab_options)
 {
-  const gchar *options;
-  gchar *ret = NULL;
+  gchar *name;
+  gchar *icon_name;
 
-  options = g_unix_mount_point_get_options (mount_point);
-  if (options != NULL)
+  name = gvfs_udisks2_utils_lookup_fstab_options_value (fstab_options, "comment=gvfs.name=");
+  if (name != NULL)
     {
-      const gchar *start;
-      guint n;
-
-      start = strstr (options, key);
-      if (start != NULL)
-        {
-          start += strlen (key);
-          for (n = 0; start[n] != ',' && start[n] != '\0'; n++)
-            ;
-          if (n > 1)
-            ret = g_uri_unescape_segment (start, start + n, NULL);
-        }
+      g_free (volume->name);
+      volume->name = name;
     }
-  return ret;
+
+  icon_name = gvfs_udisks2_utils_lookup_fstab_options_value (fstab_options, "comment=gvfs.icon_name=");
+  if (icon_name != NULL)
+    {
+      volume->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
+      g_free (icon_name);
+    }
 }
 
 static gboolean
@@ -216,6 +212,9 @@ update_volume (GVfsUDisks2Volume *volume)
       const gchar *hint;
       UDisksBlock *block;
       UDisksBlock *cleartext_block;
+      GVariantIter iter;
+      const gchar *configuration_type;
+      GVariant *configuration_value;
 
       /* If unlocked, use the values from the unlocked block device for presentation */
       cleartext_block = udisks_client_get_cleartext_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
@@ -312,6 +311,19 @@ update_volume (GVfsUDisks2Volume *volume)
           volume->icon = g_themed_icon_new_with_default_fallbacks (hint);
         }
 
+      /* Use comment=gvfs.name=The%20Name and comment=gvfs.icon_name=foo-name, if available */
+      g_variant_iter_init (&iter, udisks_block_get_configuration (block));
+      while (g_variant_iter_next (&iter, "(&s@a{sv})", &configuration_type, &configuration_value))
+        {
+          if (g_strcmp0 (configuration_type, "fstab") == 0)
+            {
+              const gchar *fstab_options;
+              if (g_variant_lookup (configuration_value, "opts", "^&ay", &fstab_options))
+                apply_options_from_fstab (volume, fstab_options);
+            }
+          g_variant_unref (configuration_value);
+        }
+
       /* Add an emblem, depending on whether the encrypted volume is locked or unlocked */
       if (g_strcmp0 (udisks_block_get_id_type (volume->block), "crypto_LUKS") == 0 && volume->icon != NULL)
         {
@@ -335,19 +347,9 @@ update_volume (GVfsUDisks2Volume *volume)
     }
   else
     {
-      gchar *icon_name;
-
-      volume->name = lookup_mount_option_value (volume->mount_point, "comment=gvfs.name=");
+      apply_options_from_fstab (volume, g_unix_mount_point_get_options (volume->mount_point));
       if (volume->name == NULL)
         volume->name = g_unix_mount_point_guess_name (volume->mount_point);
-
-      icon_name = lookup_mount_option_value (volume->mount_point, "comment=gvfs.icon_name=");
-      if (icon_name != NULL)
-        {
-          volume->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
-          g_free (icon_name);
-        }
-
       if (volume->icon == NULL)
         volume->icon = gvfs_udisks2_utils_icon_from_fs_type (g_unix_mount_point_get_fs_type (volume->mount_point));
     }

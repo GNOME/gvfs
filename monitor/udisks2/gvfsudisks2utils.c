@@ -81,3 +81,27 @@ gvfs_udisks2_utils_icon_from_fs_type (const gchar *fs_type)
     }
   return g_themed_icon_new_with_default_fallbacks (icon_name);
 }
+
+gchar *
+gvfs_udisks2_utils_lookup_fstab_options_value (const gchar *fstab_options,
+                                               const gchar *key)
+{
+  gchar *ret = NULL;
+
+  if (fstab_options != NULL)
+    {
+      const gchar *start;
+      guint n;
+
+      start = strstr (fstab_options, key);
+      if (start != NULL)
+        {
+          start += strlen (key);
+          for (n = 0; start[n] != ',' && start[n] != '\0'; n++)
+            ;
+          if (n > 1)
+            ret = g_uri_unescape_segment (start, start + n, NULL);
+        }
+    }
+  return ret;
+}
