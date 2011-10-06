@@ -1169,11 +1169,12 @@ have_udisks_volume_for_mount_point (GVfsUDisks2VolumeMonitor *monitor,
 
 static gboolean
 mount_point_has_device (GVfsUDisks2VolumeMonitor  *monitor,
-                        GUnixMountPoint          *mount_point)
+                        GUnixMountPoint           *mount_point)
 {
   gboolean ret = FALSE;
   const gchar *device;
   struct stat statbuf;
+  UDisksBlock *block;
 
   device = g_unix_mount_point_get_device_path (mount_point);
   if (!g_str_has_prefix (device, "/dev/"))
@@ -1186,8 +1187,26 @@ mount_point_has_device (GVfsUDisks2VolumeMonitor  *monitor,
   if (stat (device, &statbuf) != 0)
     goto out;
 
-  if (statbuf.st_rdev != 0)
-    ret = TRUE;
+  if (statbuf.st_rdev == 0)
+    goto out;
+
+  /* assume non-existant if media is not available */
+  block = udisks_client_get_block_for_dev (monitor->client, statbuf.st_rdev);
+  if (block != NULL)
+    {
+      if (udisks_block_get_size (block) == 0)
+        {
+          g_object_unref (block);
+          goto out;
+        }
+      g_object_unref (block);
+    }
+  else
+    {
+      /* not known by udisks, assume media is available */
+    }
+
+  ret = TRUE;
 
  out:
   return ret;
@@ -1253,29 +1272,29 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
       GUnixMountPoint *mount_point = l->data;
 
       volume = find_fstab_volume_for_mount_point (monitor, mount_point);
-      if (volume == NULL)
+      if (volume != NULL)
+        continue;
+
+      volume = gvfs_udisks2_volume_new (monitor,
+                                        NULL,        /* block */
+                                        mount_point,
+                                        NULL,        /* drive */
+                                        NULL);       /* activation_root */
+      if (volume != NULL)
         {
-          volume = gvfs_udisks2_volume_new (monitor,
-                                            NULL,        /* block */
-                                            mount_point,
-                                            NULL,        /* drive */
-                                            NULL);       /* activation_root */
-          if (volume != NULL)
-            {
-              GVfsUDisks2Mount *mount;
+          GVfsUDisks2Mount *mount;
 
-              monitor->fstab_volumes = g_list_prepend (monitor->fstab_volumes, volume);
-              *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
-              /* since @volume takes ownership of @mount_point, don't free it below */
-              new_mount_points = g_list_remove (new_mount_points, mount_point);
+          monitor->fstab_volumes = g_list_prepend (monitor->fstab_volumes, volume);
+          *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
+          /* since @volume takes ownership of @mount_point, don't free it below */
+          new_mount_points = g_list_remove (new_mount_points, mount_point);
 
-              /* Could be there's already a mount for this volume - for example, the
-               * user could just have added it to the /etc/fstab file
-               */
-              mount = find_lonely_mount_for_mount_point (monitor, mount_point);
-              if (mount != NULL)
-                gvfs_udisks2_mount_set_volume (mount, volume);
-            }
+          /* Could be there's already a mount for this volume - for example, the
+           * user could just have added it to the /etc/fstab file
+           */
+          mount = find_lonely_mount_for_mount_point (monitor, mount_point);
+          if (mount != NULL)
+            gvfs_udisks2_mount_set_volume (mount, volume);
         }
     }
 
