@@ -694,8 +694,15 @@ should_include_drive (GVfsUDisks2VolumeMonitor *monitor,
 static gint
 udisks_drive_compare (UDisksDrive *a, UDisksDrive *b)
 {
-  return g_strcmp0 (g_dbus_object_get_object_path (g_dbus_interface_get_object (G_DBUS_INTERFACE (a))),
-                    g_dbus_object_get_object_path (g_dbus_interface_get_object (G_DBUS_INTERFACE (b))));
+  GDBusObject *oa = g_dbus_interface_get_object (G_DBUS_INTERFACE (a));
+  GDBusObject *ob = g_dbus_interface_get_object (G_DBUS_INTERFACE (b));
+  /* Either or both of oa, ob can be NULL for the case where a drive
+   * is removed but we still hold a reference to the drive interface
+   */
+  if (oa != NULL && ob != NULL)
+    return g_strcmp0 (g_dbus_object_get_object_path (oa), g_dbus_object_get_object_path (ob));
+  else
+    return (const gchar*) ob - (const gchar*) oa;
 }
 
 static gint

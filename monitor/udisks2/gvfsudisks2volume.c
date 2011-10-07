@@ -1002,7 +1002,7 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
                            gpointer             user_data)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
-  UDisksObject *object;
+  GDBusObject *object;
   UDisksBlock *block;
   UDisksFilesystem *filesystem;
   MountData *data;
@@ -1042,11 +1042,22 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
   else
     block = volume->block;
 
-  object = UDISKS_OBJECT (g_dbus_interface_get_object (G_DBUS_INTERFACE (block)));
-  filesystem = udisks_object_peek_filesystem (object);
+  object = g_dbus_interface_get_object (G_DBUS_INTERFACE (block));
+  if (object == NULL)
+    {
+      g_simple_async_result_set_error (data->simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_FAILED,
+                                       "No object for D-Bus interface");
+      g_simple_async_result_complete (data->simple);
+      mount_data_free (data);
+      goto out;
+    }
+
+  filesystem = udisks_object_peek_filesystem (UDISKS_OBJECT (object));
   if (filesystem == NULL)
     {
-      data->encrypted_to_unlock = udisks_object_get_encrypted (object);
+      data->encrypted_to_unlock = udisks_object_get_encrypted (UDISKS_OBJECT (object));
       if (data->encrypted_to_unlock != NULL)
         {
           do_unlock (data);

@@ -910,7 +910,6 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
   GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
   UnmountData *data;
   UDisksBlock *block;
-  UDisksObject *object;
 
   /* first emit the ::mount-pre-unmount signal */
   g_signal_emit_by_name (mount->monitor, "mount-pre-unmount", mount);
@@ -936,13 +935,23 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
   block = gvfs_udisks2_volume_get_block (data->mount->volume);
   if (block != NULL)
     {
-      object = UDISKS_OBJECT (g_dbus_interface_get_object (G_DBUS_INTERFACE (block)));
-      data->filesystem = udisks_object_get_filesystem (object);
+      GDBusObject *object;
+      object = g_dbus_interface_get_object (G_DBUS_INTERFACE (block));
+      if (object == NULL)
+        {
+          g_simple_async_result_set_error (data->simple,
+                                           G_IO_ERROR,
+                                           G_IO_ERROR_FAILED,
+                                           "No object for D-Bus interface");
+          g_simple_async_result_complete (data->simple);
+              unmount_data_free (data);
+        }
+      data->filesystem = udisks_object_get_filesystem (UDISKS_OBJECT (object));
       if (data->filesystem == NULL)
         {
           UDisksBlock *cleartext_block;
 
-          data->encrypted = udisks_object_get_encrypted (object);
+          data->encrypted = udisks_object_get_encrypted (UDISKS_OBJECT (object));
           if (data->encrypted == NULL)
             {
               g_simple_async_result_set_error (data->simple,
