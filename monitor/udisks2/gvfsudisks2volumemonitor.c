@@ -631,6 +631,8 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
                        gboolean                  allow_encrypted_cleartext)
 {
   gboolean ret = FALSE;
+  GDBusObject *object;
+  UDisksFilesystem *filesystem;
 
   /* show encrypted volumes... */
   if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_LUKS") == 0)
@@ -668,8 +670,12 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
   if (!should_include_volume_check_mount_points (monitor, block))
     goto out;
 
-  /* TODO: handle crypto, fstab and a bunch of other stuff */
-  if (g_strcmp0 (udisks_block_get_id_usage (block), "filesystem") != 0)
+  object = g_dbus_interface_get_object (G_DBUS_INTERFACE (block));
+  if (object == NULL)
+    goto out;
+
+  filesystem = udisks_object_peek_filesystem (UDISKS_OBJECT (object));
+  if (filesystem == NULL)
     goto out;
 
   ret = TRUE;
@@ -1206,10 +1212,17 @@ mount_point_has_device (GVfsUDisks2VolumeMonitor  *monitor,
   block = udisks_client_get_block_for_dev (monitor->client, statbuf.st_rdev);
   if (block != NULL)
     {
-      if (udisks_block_get_size (block) == 0)
+      UDisksDrive *drive;
+      drive = udisks_client_get_drive_for_block (monitor->client, block);
+      if (drive != NULL)
         {
-          g_object_unref (block);
-          goto out;
+          if (!udisks_drive_get_media_available (drive))
+            {
+              g_object_unref (drive);
+              g_object_unref (block);
+              goto out;
+            }
+          g_object_unref (drive);
         }
       g_object_unref (block);
     }

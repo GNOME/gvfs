@@ -242,12 +242,16 @@ update_volume (GVfsUDisks2Volume *volume)
         }
       else
         {
-          s = udisks_util_get_size_for_display (udisks_block_get_size (block), FALSE, FALSE);
-          /* Translators: This is used for volume with no filesystem label.
-           *              The first %s is the formatted size (e.g. "42.0 MB").
-           */
-          volume->name = g_strdup_printf (_("%s Volume"), s);
-          g_free (s);
+          guint64 size = udisks_block_get_size (block);
+          if (size > 0)
+            {
+              s = udisks_util_get_size_for_display (size, FALSE, FALSE);
+              /* Translators: This is used for volume with no filesystem label.
+               *              The first %s is the formatted size (e.g. "42.0 MB").
+               */
+              volume->name = g_strdup_printf (_("%s Volume"), s);
+              g_free (s);
+            }
         }
 
       udisks_drive = udisks_client_get_drive_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
@@ -289,6 +293,15 @@ update_volume (GVfsUDisks2Volume *volume)
             }
 
           volume->icon = media_icon != NULL ? g_object_ref (media_icon) : NULL;
+
+          /* use media_desc if we haven't figured out a name yet (applies to e.g.
+           * /dev/fd0 since its size is 0)
+           */
+          if (volume->name == NULL)
+            {
+              volume->name = media_desc;
+              media_desc = NULL;
+            }
 
           g_free (media_desc);
           if (media_icon != NULL)
