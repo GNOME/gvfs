@@ -19,7 +19,6 @@ gvfs_afc_volume_monitor_CFLAGS = \
 	$(WARN_CFLAGS) \
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\" \
 	-DGVFS_LOCALEDIR=\"$(localedir)\" \
-	-DG_DISABLE_DEPRECATED \
 	$(NULL)
 
 gvfs_afc_volume_monitor_LDADD = \

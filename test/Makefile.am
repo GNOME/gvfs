@@ -3,8 +3,7 @@ NULL =
 AM_CFLAGS =                       \
 	-I$(top_srcdir)           \
 	-I$(top_builddir)         \
-	$(GLIB_CFLAGS)            \
-	-DG_DISABLE_DEPRECATED
+	$(GLIB_CFLAGS)
 
 AM_LDFLAGS =                           \
 	$(GLIB_LIBS)
