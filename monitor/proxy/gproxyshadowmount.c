@@ -477,6 +477,19 @@ g_proxy_shadow_mount_get_activation_root (GProxyShadowMount *mount)
   return g_object_ref (mount->root);
 }
 
+static const gchar *
+g_proxy_shadow_mount_get_sort_key (GMount *mount)
+{
+  GProxyShadowMount *proxy_shadow_mount = G_PROXY_SHADOW_MOUNT (mount);
+  const gchar *ret;
+
+  G_LOCK (proxy_shadow_mount);
+  ret = g_mount_get_sort_key (proxy_shadow_mount->real_mount);
+  G_UNLOCK (proxy_shadow_mount);
+
+  return ret;
+}
+
 static void
 g_proxy_shadow_mount_mount_iface_init (GMountIface *iface)
 {
@@ -499,6 +512,7 @@ g_proxy_shadow_mount_mount_iface_init (GMountIface *iface)
   iface->guess_content_type = g_proxy_shadow_mount_guess_content_type;
   iface->guess_content_type_finish = g_proxy_shadow_mount_guess_content_type_finish;
   iface->guess_content_type_sync = g_proxy_shadow_mount_guess_content_type_sync;
+  iface->get_sort_key = g_proxy_shadow_mount_get_sort_key;
 }
 
 void

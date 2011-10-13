@@ -135,6 +135,24 @@ g_proxy_volume_monitor_dispose (GObject *object)
    */
 }
 
+static gboolean
+drive_compare (GDrive *a, GDrive *b)
+{
+  return g_strcmp0 (g_drive_get_sort_key (a), g_drive_get_sort_key (b));
+}
+
+static gboolean
+volume_compare (GVolume *a, GVolume *b)
+{
+  return g_strcmp0 (g_volume_get_sort_key (a), g_volume_get_sort_key (b));
+}
+
+static gboolean
+mount_compare (GMount *a, GMount *b)
+{
+  return g_strcmp0 (g_mount_get_sort_key (a), g_mount_get_sort_key (b));
+}
+
 static GList *
 get_mounts (GVolumeMonitor *volume_monitor)
 {
@@ -165,6 +183,8 @@ get_mounts (GVolumeMonitor *volume_monitor)
 
   G_UNLOCK (proxy_vm);
 
+  l = g_list_sort (l, (GCompareFunc) mount_compare);
+
   return l;
 }
 
@@ -187,6 +207,8 @@ get_volumes (GVolumeMonitor *volume_monitor)
 
   G_UNLOCK (proxy_vm);
 
+  l = g_list_sort (l, (GCompareFunc) volume_compare);
+
   return l;
 }
 
@@ -208,6 +230,8 @@ get_connected_drives (GVolumeMonitor *volume_monitor)
     l = g_list_append (l, g_object_ref (drive));
 
   G_UNLOCK (proxy_vm);
+
+  l = g_list_sort (l, (GCompareFunc) drive_compare);
 
   return l;
 }

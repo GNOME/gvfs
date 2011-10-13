@@ -60,6 +60,8 @@ struct _GProxyDrive {
   GDriveStartStopType start_stop_type;
 
   GHashTable *identifiers;
+
+  gchar *sort_key;
 };
 
 static void g_proxy_drive_drive_iface_init (GDriveIface *iface);
@@ -84,6 +86,7 @@ g_proxy_drive_finalize (GObject *object)
   g_strfreev (drive->volume_ids);
   if (drive->identifiers != NULL)
     g_hash_table_unref (drive->identifiers);
+  g_free (drive->sort_key);
 
   if (G_OBJECT_CLASS (g_proxy_drive_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_proxy_drive_parent_class)->finalize) (object);
@@ -133,8 +136,10 @@ g_proxy_drive_new (GProxyVolumeMonitor *volume_monitor)
  * uint32               start-stop-type
  * array:string         volume-ids
  * dict:string->string  identifiers
+ * string               sort_key
+ * a{sv}                expansion
  */
-#define DRIVE_STRUCT_TYPE "(sssbbbbbbbbuasa{ss})"
+#define DRIVE_STRUCT_TYPE "(sssbbbbbbbbuasa{ss}sa{sv})"
 
 void
 g_proxy_drive_update (GProxyDrive         *drive,
@@ -156,6 +161,7 @@ g_proxy_drive_update (GProxyDrive         *drive,
   dbus_uint32_t start_stop_type;
   GPtrArray *volume_ids;
   GHashTable *identifiers;
+  const char *sort_key;
 
   dbus_message_iter_recurse (iter, &iter_struct);
   dbus_message_iter_get_basic (&iter_struct, &id);
@@ -198,6 +204,15 @@ g_proxy_drive_update (GProxyDrive         *drive,
   identifiers = _get_identifiers (&iter_struct);
   dbus_message_iter_next (&iter_struct);
 
+  /* make sure we are backwards compat with old daemon instance */
+  sort_key = NULL;
+  if (dbus_message_iter_has_next (&iter_struct))
+    {
+      dbus_message_iter_get_basic (&iter_struct, &sort_key);
+      dbus_message_iter_next (&iter_struct);
+      /* TODO: decode expansion, once used */
+    }
+
   if (drive->id != NULL && strcmp (drive->id, id) != 0)
     {
       g_warning ("id mismatch during update of drive");
@@ -207,6 +222,9 @@ g_proxy_drive_update (GProxyDrive         *drive,
   if (strlen (name) == 0)
     name = NULL;
 
+  if (sort_key != NULL && strlen (sort_key) == 0)
+    sort_key = NULL;
+
   /* out with the old */
   g_free (drive->id);
   g_free (drive->name);
@@ -215,6 +233,7 @@ g_proxy_drive_update (GProxyDrive         *drive,
   g_strfreev (drive->volume_ids);
   if (drive->identifiers != NULL)
     g_hash_table_unref (drive->identifiers);
+  g_free (drive->sort_key);
 
   /* in with the new */
   drive->id = g_strdup (id);
@@ -223,7 +242,6 @@ g_proxy_drive_update (GProxyDrive         *drive,
     drive->icon = NULL;
   else
     drive->icon = g_icon_new_for_string (gicon_data, NULL);
-
   drive->can_eject = can_eject;
   drive->can_poll_for_media = can_poll_for_media;
   drive->has_media = has_media;
@@ -235,6 +253,7 @@ g_proxy_drive_update (GProxyDrive         *drive,
   drive->start_stop_type = start_stop_type;
   drive->identifiers = identifiers != NULL ? g_hash_table_ref (identifiers) : NULL;
   drive->volume_ids = g_strdupv ((char **) volume_ids->pdata);
+  drive->sort_key = g_strdup (sort_key);
 
  out:
   g_ptr_array_free (volume_ids, TRUE);
@@ -267,6 +286,12 @@ g_proxy_drive_get_name (GDrive *drive)
   return name;
 }
 
+static gboolean
+volume_compare (GVolume *a, GVolume *b)
+{
+  return g_strcmp0 (g_volume_get_sort_key (a), g_volume_get_sort_key (b));
+}
+
 static GList *
 g_proxy_drive_get_volumes (GDrive *drive)
 {
@@ -289,6 +314,8 @@ g_proxy_drive_get_volumes (GDrive *drive)
         }
     }
   G_UNLOCK (proxy_drive);
+
+  l = g_list_sort (l, (GCompareFunc) volume_compare);
 
   return l;
 }
@@ -1121,6 +1148,14 @@ g_proxy_drive_poll_for_media_finish (GDrive        *drive,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static const gchar *
+g_proxy_drive_get_sort_key (GDrive *_drive)
+{
+  GProxyDrive *drive = G_PROXY_DRIVE (_drive);
+  return drive->sort_key;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
 
 static void
 g_proxy_drive_drive_iface_init (GDriveIface *iface)
@@ -1150,6 +1185,7 @@ g_proxy_drive_drive_iface_init (GDriveIface *iface)
   iface->stop = g_proxy_drive_stop;
   iface->stop_finish = g_proxy_drive_stop_finish;
   iface->get_start_stop_type = g_proxy_drive_get_start_stop_type;
+  iface->get_sort_key = g_proxy_drive_get_sort_key;
 }
 
 void

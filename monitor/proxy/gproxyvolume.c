@@ -65,6 +65,8 @@ struct _GProxyVolume {
   gboolean should_automount;
 
   GProxyShadowMount *shadow_mount;
+
+  gchar *sort_key;
 };
 
 static void g_proxy_volume_volume_iface_init (GVolumeIface *iface);
@@ -119,6 +121,7 @@ g_proxy_volume_finalize (GObject *object)
     {
       g_object_unref (volume->volume_monitor);
     }
+  g_free (volume->sort_key);
 
   if (G_OBJECT_CLASS (g_proxy_volume_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_proxy_volume_parent_class)->finalize) (object);
@@ -349,6 +352,8 @@ update_shadow_mount_in_idle (GProxyVolume *volume)
  * string               drive-id
  * string               mount-id
  * dict:string->string  identifiers
+ * string               sort_key
+ * a{sv}                expansion
  */
 
 void g_proxy_volume_update (GProxyVolume    *volume,
@@ -365,6 +370,7 @@ void g_proxy_volume_update (GProxyVolume    *volume,
   dbus_bool_t can_mount;
   dbus_bool_t should_automount;
   GHashTable *identifiers;
+  const gchar *sort_key;
 
   dbus_message_iter_recurse (iter, &iter_struct);
   dbus_message_iter_get_basic (&iter_struct, &id);
@@ -389,6 +395,15 @@ void g_proxy_volume_update (GProxyVolume    *volume,
   identifiers = _get_identifiers (&iter_struct);
   dbus_message_iter_next (&iter_struct);
 
+  /* make sure we are backwards compat with old daemon instance */
+  sort_key = NULL;
+  if (dbus_message_iter_has_next (&iter_struct))
+    {
+      dbus_message_iter_get_basic (&iter_struct, &sort_key);
+      dbus_message_iter_next (&iter_struct);
+      /* TODO: decode expansion, once used */
+    }
+
   if (volume->id != NULL && strcmp (volume->id, id) != 0)
     {
       g_warning ("id mismatch during update of volume");
@@ -401,6 +416,8 @@ void g_proxy_volume_update (GProxyVolume    *volume,
     uuid = NULL;
   if (strlen (activation_uri) == 0)
     activation_uri = NULL;
+  if (sort_key != NULL && strlen (sort_key) == 0)
+    sort_key = NULL;
 
   /* out with the old */
   g_free (volume->id);
@@ -413,6 +430,7 @@ void g_proxy_volume_update (GProxyVolume    *volume,
   g_free (volume->mount_id);
   if (volume->identifiers != NULL)
     g_hash_table_unref (volume->identifiers);
+  g_free (volume->sort_key);
 
   /* in with the new */
   volume->id = g_strdup (id);
@@ -428,6 +446,7 @@ void g_proxy_volume_update (GProxyVolume    *volume,
   volume->can_mount = can_mount;
   volume->should_automount = should_automount;
   volume->identifiers = identifiers != NULL ? g_hash_table_ref (identifiers) : NULL;
+  volume->sort_key = g_strdup (sort_key);
 
   /* this calls into the union monitor; do it in idle to avoid locking issues */
   update_shadow_mount_in_idle (volume);
@@ -960,6 +979,13 @@ g_proxy_volume_get_activation_root (GVolume *volume)
     return g_file_new_for_uri (proxy_volume->activation_uri);
 }
 
+static const gchar *
+g_proxy_volume_get_sort_key (GVolume *_volume)
+{
+  GProxyVolume *volume = G_PROXY_VOLUME (_volume);
+  return volume->sort_key;
+}
+
 static void
 g_proxy_volume_volume_iface_init (GVolumeIface *iface)
 {
@@ -980,6 +1006,7 @@ g_proxy_volume_volume_iface_init (GVolumeIface *iface)
   iface->get_identifier = g_proxy_volume_get_identifier;
   iface->enumerate_identifiers = g_proxy_volume_enumerate_identifiers;
   iface->get_activation_root = g_proxy_volume_get_activation_root;
+  iface->get_sort_key = g_proxy_volume_get_sort_key;
 }
 
 void
