@@ -64,6 +64,7 @@ struct _GVfsUDisks2Volume
   GIcon *icon;
   GFile *activation_root;
   gchar *name;
+  gchar *sort_key;
   gchar *device_file;
   dev_t dev;
   gchar *uuid;
@@ -123,6 +124,7 @@ gvfs_udisks2_volume_finalize (GObject *object)
     g_object_unref (volume->activation_root);
 
   g_free (volume->name);
+  g_free (volume->sort_key);
   g_free (volume->device_file);
   g_free (volume->uuid);
 
@@ -436,6 +438,8 @@ gvfs_udisks2_volume_new (GVfsUDisks2VolumeMonitor   *monitor,
 
   volume = g_object_new (GVFS_TYPE_UDISKS2_VOLUME, NULL);
   volume->monitor = monitor;
+
+  volume->sort_key = g_strdup_printf ("gvfs.time_detected_usec.%" G_GINT64_FORMAT, g_get_real_time ());
 
   if (block != NULL)
     {
@@ -1201,6 +1205,15 @@ gvfs_udisks2_volume_eject_finish (GVolume        *volume,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static const gchar *
+gvfs_udisks2_volume_get_sort_key (GVolume *_volume)
+{
+  GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
+  return volume->sort_key;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static void
 gvfs_udisks2_volume_volume_iface_init (GVolumeIface *iface)
 {
@@ -1222,6 +1235,7 @@ gvfs_udisks2_volume_volume_iface_init (GVolumeIface *iface)
   iface->eject_finish = gvfs_udisks2_volume_eject_finish;
   iface->eject_with_operation = gvfs_udisks2_volume_eject_with_operation;
   iface->eject_with_operation_finish = gvfs_udisks2_volume_eject_with_operation_finish;
+  iface->get_sort_key = gvfs_udisks2_volume_get_sort_key;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */

@@ -53,6 +53,7 @@ struct _GVfsUDisks2Drive
 
   GIcon *icon;
   gchar *name;
+  gchar *sort_key;
   gchar *device_file;
   dev_t dev;
   gboolean is_media_removable;
@@ -90,6 +91,7 @@ gvfs_udisks2_drive_finalize (GObject *object)
   if (drive->icon != NULL)
     g_object_unref (drive->icon);
   g_free (drive->name);
+  g_free (drive->sort_key);
   g_free (drive->device_file);
 
   G_OBJECT_CLASS (gvfs_udisks2_drive_parent_class)->finalize (object);
@@ -122,12 +124,14 @@ update_drive (GVfsUDisks2Drive *drive)
   gboolean changed;
   GIcon *old_icon;
   gchar *old_name;
+  gchar *old_sort_key;
   gchar *old_device_file;
   dev_t old_dev;
   gboolean old_is_media_removable;
   gboolean old_has_media;
   gboolean old_can_eject;
   UDisksBlock *block;
+  gint64 time_detected;
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* save old values */
@@ -137,6 +141,7 @@ update_drive (GVfsUDisks2Drive *drive)
   old_can_eject = drive->can_eject;
 
   old_name = g_strdup (drive->name);
+  old_sort_key = g_strdup (drive->sort_key);
   old_device_file = g_strdup (drive->device_file);
   old_dev = drive->dev;
   old_icon = drive->icon != NULL ? g_object_ref (drive->icon) : NULL;
@@ -146,6 +151,7 @@ update_drive (GVfsUDisks2Drive *drive)
 
   drive->is_media_removable = drive->has_media = drive->can_eject = FALSE;
   g_free (drive->name); drive->name = NULL;
+  g_free (drive->sort_key); drive->sort_key = NULL;
   g_free (drive->device_file); drive->device_file = NULL;
   drive->dev = 0;
   g_clear_object (&drive->icon);
@@ -160,8 +166,14 @@ update_drive (GVfsUDisks2Drive *drive)
     {
       drive->device_file = udisks_block_dup_device (block);
       drive->dev = makedev (udisks_block_get_major (block), udisks_block_get_minor (block));
+
       g_object_unref (block);
     }
+
+  time_detected = udisks_drive_get_time_media_detected (drive->udisks_drive);
+  if (time_detected == 0)
+    udisks_drive_get_time_detected (drive->udisks_drive);
+  drive->sort_key = g_strdup_printf ("gvfs.time_detected_usec.%" G_GINT64_FORMAT, time_detected);
 
   drive->is_media_removable = udisks_drive_get_media_removable (drive->udisks_drive);
   if (drive->is_media_removable)
@@ -207,6 +219,7 @@ update_drive (GVfsUDisks2Drive *drive)
               (old_has_media == drive->has_media) &&
               (old_can_eject == drive->can_eject) &&
               (g_strcmp0 (old_name, drive->name) == 0) &&
+              (g_strcmp0 (old_sort_key, drive->sort_key) == 0) &&
               (g_strcmp0 (old_device_file, drive->device_file) == 0) &&
               (old_dev == drive->dev) &&
               g_icon_equal (old_icon, drive->icon)
@@ -214,6 +227,7 @@ update_drive (GVfsUDisks2Drive *drive)
 
   /* free old values */
   g_free (old_name);
+  g_free (old_sort_key);
   g_free (old_device_file);
   if (old_icon != NULL)
     g_object_unref (old_icon);
@@ -680,6 +694,15 @@ gvfs_udisks2_drive_eject_finish (GDrive        *drive,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static const gchar *
+gvfs_udisks2_drive_get_sort_key (GDrive *_drive)
+{
+  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+  return drive->sort_key;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static void
 gvfs_udisks2_drive_drive_iface_init (GDriveIface *iface)
 {
@@ -698,11 +721,11 @@ gvfs_udisks2_drive_drive_iface_init (GDriveIface *iface)
   iface->can_start = gvfs_udisks2_drive_can_start;
   iface->can_start_degraded = gvfs_udisks2_drive_can_start_degraded;
   iface->can_stop = gvfs_udisks2_drive_can_stop;
-
   iface->eject = gvfs_udisks2_drive_eject;
   iface->eject_finish = gvfs_udisks2_drive_eject_finish;
   iface->eject_with_operation = gvfs_udisks2_drive_eject_with_operation;
   iface->eject_with_operation_finish = gvfs_udisks2_drive_eject_with_operation_finish;
+  iface->get_sort_key = gvfs_udisks2_drive_get_sort_key;
 #if 0
   iface->poll_for_media = gvfs_udisks2_drive_poll_for_media;
   iface->poll_for_media_finish = gvfs_udisks2_drive_poll_for_media_finish;

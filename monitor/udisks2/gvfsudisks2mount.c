@@ -68,6 +68,7 @@ struct _GVfsUDisks2Mount
   GFile *root;
   GIcon *icon;
   gchar *name;
+  gchar *sort_key;
   gchar *uuid;
   gchar *device_file;
   gchar *mount_path;
@@ -115,6 +116,7 @@ gvfs_udisks2_mount_finalize (GObject *object)
   if (mount->icon != NULL)
     g_object_unref (mount->icon);
   g_free (mount->name);
+  g_free (mount->sort_key);
   g_free (mount->uuid);
   g_free (mount->device_file);
   g_free (mount->mount_path);
@@ -207,13 +209,15 @@ update_mount (GVfsUDisks2Mount *mount)
   old_name = g_strdup (mount->name);
   old_icon = mount->icon != NULL ? g_object_ref (mount->icon) : NULL;
 
+  /* reset */
+  mount->can_unmount = FALSE;
+  g_clear_object (&mount->icon);
+  g_free (mount->name); mount->name = NULL;
+
   /* in with the new */
   if (mount->volume != NULL)
     {
       mount->can_unmount = TRUE;
-
-      if (mount->icon != NULL)
-        g_object_unref (mount->icon);
 
       /* icon order of preference: bdmv, xdg, autorun, probed */
       if (mount->bdmv_volume_info_icon != NULL)
@@ -224,8 +228,6 @@ update_mount (GVfsUDisks2Mount *mount)
         mount->icon = g_object_ref (mount->autorun_icon);
       else
         mount->icon = g_volume_get_icon (G_VOLUME (mount->volume));
-
-      g_free (mount->name);
 
       /* name order of preference : bdmv, xdg, probed */
       if (mount->bdmv_volume_info_name != NULL)
@@ -332,6 +334,7 @@ gvfs_udisks2_mount_new (GVfsUDisks2VolumeMonitor *monitor,
 
   mount = g_object_new (GVFS_TYPE_UDISKS2_MOUNT, NULL);
   mount->monitor = monitor;
+  mount->sort_key = g_strdup_printf ("gvfs.time_detected_usec.%" G_GINT64_FORMAT, g_get_real_time ());
 
   if (mount_entry != NULL)
     {
@@ -1224,6 +1227,14 @@ gvfs_udisks2_mount_guess_content_type_finish (GMount        *mount,
 {
   return gvfs_udisks2_mount_guess_content_type_sync (mount, FALSE, NULL, error);
 }
+/* ---------------------------------------------------------------------------------------------------- */
+
+static const gchar *
+gvfs_udisks2_mount_get_sort_key (GMount *_mount)
+{
+  GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
+  return mount->sort_key;
+}
 
 /* ---------------------------------------------------------------------------------------------------- */
 
@@ -1249,6 +1260,7 @@ gvfs_udisks2_mount_mount_iface_init (GMountIface *iface)
   iface->guess_content_type = gvfs_udisks2_mount_guess_content_type;
   iface->guess_content_type_finish = gvfs_udisks2_mount_guess_content_type_finish;
   iface->guess_content_type_sync = gvfs_udisks2_mount_guess_content_type_sync;
+  iface->get_sort_key = gvfs_udisks2_mount_get_sort_key;
 }
 
 gboolean
