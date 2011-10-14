@@ -4,8 +4,7 @@ INCLUDES =					\
 	-I$(top_srcdir)				\
 	-I$(top_builddir)			\
 	$(GLIB_CFLAGS) 				\
-	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
-	-DG_DISABLE_DEPRECATED
+	-DGVFS_LOCALEDIR=\""$(localedir)"\"
 
 libraries =					\
 	$(GLIB_LIBS)

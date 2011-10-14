@@ -22,7 +22,6 @@ gvfs_gdu_volume_monitor_CFLAGS =		\
 	$(DBUS_CFLAGS)                          \
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
-	-DG_DISABLE_DEPRECATED			\
 	-DGDU_API_IS_SUBJECT_TO_CHANGE		\
 	$(NULL)
 

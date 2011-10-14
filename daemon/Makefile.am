@@ -16,8 +16,7 @@ INCLUDES =					\
 	-DG_UDEV_API_IS_SUBJECT_TO_CHANGE	\
 	-DLIBEXEC_DIR=\"$(libexecdir)/\" 	\
 	-DMOUNTABLE_DIR=\"$(mountdir)/\" 	\
-	-DGVFS_LOCALEDIR=\""$(localedir)"\"     \
-	-DG_DISABLE_DEPRECATED
+	-DGVFS_LOCALEDIR=\""$(localedir)"\"
 
 noinst_LTLIBRARIES=libdaemon.la
 
@@ -496,7 +495,7 @@ gvfsd_afp_browse_CPPFLAGS = \
 gvfsd_afp_browse_LDADD = \
 	$(libraries) \
 	$(LIBGCRYPT_LIBS)
-	
+
 gvfsd_afp_SOURCES = \
 	gvfsbackendafp.c gvfsbackendafp.h \
 	daemon-main.c daemon-main.h \

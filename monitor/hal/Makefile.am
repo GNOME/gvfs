@@ -33,7 +33,6 @@ gvfs_hal_volume_monitor_CFLAGS =		\
 	$(HAL_CFLAGS)                           \
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
-	-DG_DISABLE_DEPRECATED			\
 	$(NULL)
 
 gvfs_hal_volume_monitor_LDFLAGS =	\

@@ -5,7 +5,7 @@ lib_LTLIBRARIES=libgvfscommon.la
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-I$(top_srcdir)/daemon \
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) $(BLURAY_CFLAGS) \
-	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED \
+	-DG_LOG_DOMAIN=\"GVFS\" \
 	-DDBUS_API_SUBJECT_TO_CHANGE
 
 libgvfscommon_la_SOURCES = 	\

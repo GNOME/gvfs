@@ -41,8 +41,6 @@
 #include <glib/gprintf.h>
 #include <gio/gio.h>
 
-#include <glib/gurifuncs.h>
-
 /* stuff from common/ */
 #include <gdaemonmount.h>
 #include <gvfsdaemonprotocol.h>

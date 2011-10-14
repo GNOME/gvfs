@@ -25,7 +25,6 @@ libgioremote_volume_monitor_la_CFLAGS =					\
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"				\
 	-DREMOTE_VOLUME_MONITORS_DIR=\"$(remote_volume_monitorsdir)\" 	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"				\
-	-DG_DISABLE_DEPRECATED						\
 	$(NULL)
 
 libgioremote_volume_monitor_la_LDFLAGS = 				\
@@ -53,7 +52,6 @@ libgvfsproxyvolumemonitordaemon_noin_la_CFLAGS =		\
 	$(GDU_CFLAGS)                           		\
 	-DG_LOG_DOMAIN=\"GVFS-RemoteVolumeMonitorDaemon\"	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"			\
-	-DG_DISABLE_DEPRECATED					\
 	$(NULL)
 
 libgvfsproxyvolumemonitordaemon_noin_la_LIBADD  =     		\
