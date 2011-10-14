@@ -935,7 +935,9 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
       goto out;
     }
 
-  block = gvfs_udisks2_volume_get_block (data->mount->volume);
+  block = NULL;
+  if (mount->volume != NULL)
+    block = gvfs_udisks2_volume_get_block (data->mount->volume);
   if (block != NULL)
     {
       GDBusObject *object;
