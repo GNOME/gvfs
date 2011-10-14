@@ -405,13 +405,27 @@ update_volume (GVfsUDisks2Volume *volume)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
+update_volume_on_event (GVfsUDisks2Volume *volume)
+{
+  if (update_volume (volume))
+    {
+      emit_changed (volume);
+      /* It could be that volume->dev changed (cryptotext volume morphing into a cleartext
+       * volume)... since this is used to associated mounts with volumes (see the loop over
+       * @unchanged in gvfsudisks2volumemonitor.c:update_mounts()) we need to over
+       * the volume monitor
+       */
+      gvfs_udisks2_volume_monitor_update (volume->monitor);
+    }
+}
+
+static void
 on_block_changed (GObject    *object,
                   GParamSpec *pspec,
                   gpointer    user_data)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (user_data);
-  if (update_volume (volume))
-    emit_changed (volume);
+  update_volume_on_event (volume);
 }
 
 static void
@@ -419,11 +433,7 @@ on_udisks_client_changed (UDisksClient *client,
                           gpointer      user_data)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (user_data);
-  /* This is a little too broad - technically we only need to do this if our block
-   * device has gained or lost a cleartext device...
-   */
-  if (update_volume (volume))
-    emit_changed (volume);
+  update_volume_on_event (volume);
 }
 
 /* takes ownership of @mount_point if not NULL */
