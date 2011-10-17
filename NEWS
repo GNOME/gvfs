@@ -1,3 +1,8 @@
+Major changes in 1.10.1
+=======================
+* daemon: Fix a crash on unmount, unref'ing a job source
+* Translation updates
+
 Major changes in 1.10.0
 =======================
 * smb: Ignore read-only attribute for directories
