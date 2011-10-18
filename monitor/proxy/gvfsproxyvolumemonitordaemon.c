@@ -412,8 +412,10 @@ static void monitor_try_create (void);
  * uint32               start-stop-type
  * array:string         volume-ids
  * dict:string->string  identifiers
+ * string               sort_key
+ * a{sv}                expansion
  */
-#define DRIVE_STRUCT_TYPE "(sssbbbbbbbbuasa{ss})"
+#define DRIVE_STRUCT_TYPE "(sssbbbbbbbbuasa{ss}sa{sv})"
 
 static void
 append_drive (GDrive *drive, DBusMessageIter *iter_array)
@@ -437,6 +439,8 @@ append_drive (GDrive *drive, DBusMessageIter *iter_array)
   GList *volumes, *l;
   char **identifiers;
   int n;
+  const gchar *sort_key;
+  DBusMessageIter iter_expansion;
 
   dbus_message_iter_open_container (iter_array, DBUS_TYPE_STRUCT, NULL, &iter_struct);
 
@@ -461,6 +465,10 @@ append_drive (GDrive *drive, DBusMessageIter *iter_array)
 
   if (name == NULL)
     name = g_strdup ("");
+
+  sort_key = g_drive_get_sort_key (drive);
+  if (sort_key == NULL)
+    sort_key = "";
 
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &id);
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &name);
@@ -503,6 +511,11 @@ append_drive (GDrive *drive, DBusMessageIter *iter_array)
     }
   dbus_message_iter_close_container (&iter_struct, &iter_identifiers);
 
+  dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &sort_key);
+  dbus_message_iter_open_container (&iter_struct, DBUS_TYPE_ARRAY, "{sv}", &iter_expansion);
+  /* left for future expansion without ABI breaks */
+  dbus_message_iter_close_container (&iter_struct, &iter_expansion);
+
   g_strfreev (identifiers);
   g_list_foreach (volumes, (GFunc) g_object_unref, NULL);
   g_list_free (volumes);
@@ -524,8 +537,10 @@ append_drive (GDrive *drive, DBusMessageIter *iter_array)
  * string               drive-id
  * string               mount-id
  * dict:string->string  identifiers
+ * string               sort_key
+ * a{sv}                expansion
  */
-#define VOLUME_STRUCT_TYPE "(sssssbbssa{ss})"
+#define VOLUME_STRUCT_TYPE "(sssssbbssa{ss}sa{sv})"
 
 static void
 append_volume (GVolume *volume, DBusMessageIter *iter_array)
@@ -547,6 +562,8 @@ append_volume (GVolume *volume, DBusMessageIter *iter_array)
   char *mount_id;
   char **identifiers;
   int n;
+  const gchar *sort_key;
+  DBusMessageIter iter_expansion;
 
   dbus_message_iter_open_container (iter_array, DBUS_TYPE_STRUCT, NULL, &iter_struct);
 
@@ -582,6 +599,10 @@ append_volume (GVolume *volume, DBusMessageIter *iter_array)
   if (uuid == NULL)
     uuid = g_strdup ("");
 
+  sort_key = g_volume_get_sort_key (volume);
+  if (sort_key == NULL)
+    sort_key = "";
+
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &id);
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &name);
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &icon_data);
@@ -611,6 +632,11 @@ append_volume (GVolume *volume, DBusMessageIter *iter_array)
     }
   dbus_message_iter_close_container (&iter_struct, &iter_identifiers);
 
+  dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &sort_key);
+  dbus_message_iter_open_container (&iter_struct, DBUS_TYPE_ARRAY, "{sv}", &iter_expansion);
+  /* left for future expansion without ABI breaks */
+  dbus_message_iter_close_container (&iter_struct, &iter_expansion);
+
   g_strfreev (identifiers);
   g_free (mount_id);
   if (mount != NULL)
@@ -638,8 +664,10 @@ append_volume (GVolume *volume, DBusMessageIter *iter_array)
  * boolean              can-unmount
  * string               volume-id
  * array:string         x-content-types
+ * string               sort_key
+ * a{sv}                expansion
  */
-#define MOUNT_STRUCT_TYPE "(sssssbsas)"
+#define MOUNT_STRUCT_TYPE "(sssssbsassa{sv})"
 
 static void
 append_mount (GMount *mount, DBusMessageIter *iter_array)
@@ -658,6 +686,8 @@ append_mount (GMount *mount, DBusMessageIter *iter_array)
   char *volume_id;
   char **x_content_types;
   int n;
+  const gchar *sort_key;
+  DBusMessageIter iter_expansion;
 
   dbus_message_iter_open_container (iter_array, DBUS_TYPE_STRUCT, NULL, &iter_struct);
 
@@ -683,6 +713,11 @@ append_mount (GMount *mount, DBusMessageIter *iter_array)
   if (uuid == NULL)
     uuid = g_strdup ("");
 
+  sort_key = g_mount_get_sort_key (mount);
+  if (sort_key == NULL)
+    sort_key = "";
+
+
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &id);
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &name);
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &icon_data);
@@ -699,6 +734,11 @@ append_mount (GMount *mount, DBusMessageIter *iter_array)
         dbus_message_iter_append_basic (&iter_x_content_types_array, DBUS_TYPE_STRING, &(x_content_types[n]));
     }
   dbus_message_iter_close_container (&iter_struct, &iter_x_content_types_array);
+
+  dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &sort_key);
+  dbus_message_iter_open_container (&iter_struct, DBUS_TYPE_ARRAY, "{sv}", &iter_expansion);
+  /* left for future expansion without ABI breaks */
+  dbus_message_iter_close_container (&iter_struct, &iter_expansion);
 
   g_free (volume_id);
   if (volume != NULL)

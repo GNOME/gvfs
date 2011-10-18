@@ -54,6 +54,7 @@ struct _GProxyMount {
   char **x_content_types;
   GFile *root;
   GIcon *icon;
+  gchar *sort_key;
 };
 
 static void g_proxy_mount_mount_iface_init (GMountIface *iface);
@@ -81,6 +82,8 @@ g_proxy_mount_finalize (GObject *object)
 
   if (mount->volume_monitor != NULL)
     g_object_unref (mount->volume_monitor);
+
+  g_free (mount->sort_key);
 
   if (G_OBJECT_CLASS (g_proxy_mount_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_proxy_mount_parent_class)->finalize) (object);
@@ -156,6 +159,7 @@ g_proxy_mount_update (GProxyMount         *mount,
   dbus_bool_t can_unmount;
   const char *volume_id;
   GPtrArray *x_content_types;
+  const gchar *sort_key;
 
   dbus_message_iter_recurse (iter, &iter_struct);
   dbus_message_iter_get_basic (&iter_struct, &id);
@@ -185,6 +189,15 @@ g_proxy_mount_update (GProxyMount         *mount,
   g_ptr_array_add (x_content_types, NULL);
   dbus_message_iter_next (&iter_struct);
 
+  /* make sure we are backwards compat with old daemon instance */
+  sort_key = NULL;
+  if (dbus_message_iter_has_next (&iter_struct))
+    {
+      dbus_message_iter_get_basic (&iter_struct, &sort_key);
+      dbus_message_iter_next (&iter_struct);
+      /* TODO: decode expansion, once used */
+    }
+
   if (mount->id != NULL && strcmp (mount->id, id) != 0)
     {
       g_warning ("id mismatch during update of mount");
@@ -195,6 +208,8 @@ g_proxy_mount_update (GProxyMount         *mount,
     name = NULL;
   if (strlen (uuid) == 0)
     uuid = NULL;
+  if (sort_key != NULL && strlen (sort_key) == 0)
+    sort_key = NULL;
 
   /* out with the old */
   g_free (mount->id);
@@ -206,6 +221,7 @@ g_proxy_mount_update (GProxyMount         *mount,
   g_strfreev (mount->x_content_types);
   if (mount->root != NULL)
     g_object_unref (mount->root);
+  g_free (mount->sort_key);
 
   /* in with the new */
   mount->id = g_strdup (id);
@@ -219,6 +235,7 @@ g_proxy_mount_update (GProxyMount         *mount,
   mount->can_unmount = can_unmount;
   mount->volume_id = g_strdup (volume_id);
   mount->x_content_types = g_strdupv ((char **) x_content_types->pdata);
+  mount->sort_key = g_strdup (sort_key);
 
  out:
   g_ptr_array_free (x_content_types, TRUE);
@@ -677,6 +694,14 @@ g_proxy_mount_guess_content_type_sync (GMount              *mount,
   return g_strdupv (proxy_mount->x_content_types);
 }
 
+
+static const gchar *
+g_proxy_mount_get_sort_key (GMount *_mount)
+{
+  GProxyMount *mount = G_PROXY_MOUNT (_mount);
+  return mount->sort_key;
+}
+
 static void
 g_proxy_mount_mount_iface_init (GMountIface *iface)
 {
@@ -699,6 +724,7 @@ g_proxy_mount_mount_iface_init (GMountIface *iface)
   iface->guess_content_type = g_proxy_mount_guess_content_type;
   iface->guess_content_type_finish = g_proxy_mount_guess_content_type_finish;
   iface->guess_content_type_sync = g_proxy_mount_guess_content_type_sync;
+  iface->get_sort_key = g_proxy_mount_get_sort_key;
 }
 
 void

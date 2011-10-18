@@ -364,6 +364,7 @@ list_mounts (GList *mounts,
   GIcon *icon;
   char **x_content_types;
   char *type_name;
+  const gchar *sort_key;
 
   for (c = 0, l = mounts; l != NULL; l = l->next, c++)
     {
@@ -427,6 +428,9 @@ list_mounts (GList *mounts,
           g_print ("%*scan_unmount=%d\n", indent + 2, "", g_mount_can_unmount (mount));
           g_print ("%*scan_eject=%d\n", indent + 2, "", g_mount_can_eject (mount));
           g_print ("%*sis_shadowed=%d\n", indent + 2, "", g_mount_is_shadowed (mount));
+          sort_key = g_mount_get_sort_key (mount);
+          if (sort_key != NULL)
+            g_print ("%*ssort_key=%s\n", indent + 2, "", sort_key);
           g_free (uuid);
         }
 
@@ -452,6 +456,7 @@ list_volumes (GList *volumes,
   char **ids;
   GIcon *icon;
   char *type_name;
+  const gchar *sort_key;
 
   for (c = 0, l = volumes; l != NULL; l = l->next, c++)
     {
@@ -516,6 +521,9 @@ list_volumes (GList *volumes,
           g_print ("%*scan_mount=%d\n", indent + 2, "", g_volume_can_mount (volume));
           g_print ("%*scan_eject=%d\n", indent + 2, "", g_volume_can_eject (volume));
           g_print ("%*sshould_automount=%d\n", indent + 2, "", g_volume_should_automount (volume));
+          sort_key = g_volume_get_sort_key (volume);
+          if (sort_key != NULL)
+            g_print ("%*ssort_key=%s\n", indent + 2, "", sort_key);
           g_free (uuid);
         }
 
@@ -541,6 +549,7 @@ list_drives (GList *drives,
   char **ids;
   GIcon *icon;
   char *type_name;
+  const gchar *sort_key;
 
   for (c = 0, l = drives; l != NULL; l = l->next, c++)
     {
@@ -598,6 +607,10 @@ list_drives (GList *drives,
                        enum_value != NULL ? enum_value->value_nick : "UNKNOWN");
               g_type_class_unref (klass);
             }
+
+          sort_key = g_drive_get_sort_key (drive);
+          if (sort_key != NULL)
+            g_print ("%*ssort_key=%s\n", indent + 2, "", sort_key);
         }
       volumes = g_drive_get_volumes (drive);
       list_volumes (volumes, indent + 2, FALSE);
