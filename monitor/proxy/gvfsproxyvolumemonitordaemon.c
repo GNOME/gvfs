@@ -2050,7 +2050,6 @@ g_vfs_proxy_volume_monitor_daemon_init (void)
   textdomain (GETTEXT_PACKAGE);
 
   dbus_threads_init_default ();
-  g_thread_init (NULL);
   g_type_init ();
 }
 

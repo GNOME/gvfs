@@ -68,7 +68,7 @@
 
 #define KEY_IS_LIST_MASK (1<<31)
 
-static GStaticRWLock metatree_lock = G_STATIC_RW_LOCK_INIT;
+static GRWLock metatree_lock;
 
 typedef enum {
   JOURNAL_OP_SET_KEY,
@@ -591,7 +591,7 @@ meta_tree_lookup_by_name (const char *name,
 MetaTree *
 meta_tree_ref (MetaTree *tree)
 {
-  g_atomic_int_add ((int *)&tree->ref_count, 1);
+  g_atomic_int_inc ((int *)&tree->ref_count);
   return tree;
 }
 
@@ -672,17 +672,17 @@ meta_tree_refresh (MetaTree *tree)
 {
   gboolean needs_refresh;
 
-  g_static_rw_lock_reader_lock (&metatree_lock);
+  g_rw_lock_reader_lock (&metatree_lock);
   needs_refresh =
     meta_tree_needs_rereading (tree) ||
     meta_tree_has_new_journal_entries (tree);
-  g_static_rw_lock_reader_unlock (&metatree_lock);
+  g_rw_lock_reader_unlock (&metatree_lock);
 
   if (needs_refresh)
     {
-      g_static_rw_lock_writer_lock (&metatree_lock);
+      g_rw_lock_writer_lock (&metatree_lock);
       meta_tree_refresh_locked (tree);
-      g_static_rw_lock_writer_unlock (&metatree_lock);
+      g_rw_lock_writer_unlock (&metatree_lock);
     }
 }
 
@@ -1468,7 +1468,7 @@ meta_tree_lookup_key_type  (MetaTree                         *tree,
   MetaKeyType type;
   gpointer value;
 
-  g_static_rw_lock_reader_lock (&metatree_lock);
+  g_rw_lock_reader_lock (&metatree_lock);
 
   new_path = meta_journal_reverse_map_path_and_key (tree->journal,
 						    path,
@@ -1492,7 +1492,7 @@ meta_tree_lookup_key_type  (MetaTree                         *tree,
     type = META_KEY_TYPE_STRING;
 
  out:
-  g_static_rw_lock_reader_unlock (&metatree_lock);
+  g_rw_lock_reader_unlock (&metatree_lock);
   return type;
 }
 
@@ -1506,7 +1506,7 @@ meta_tree_get_last_changed (MetaTree *tree,
   gpointer value;
   guint64 res, mtime;
 
-  g_static_rw_lock_reader_lock (&metatree_lock);
+  g_rw_lock_reader_lock (&metatree_lock);
 
   new_path = meta_journal_reverse_map_path_and_key (tree->journal,
 						    path,
@@ -1526,7 +1526,7 @@ meta_tree_get_last_changed (MetaTree *tree,
   g_free (new_path);
 
  out:
-  g_static_rw_lock_reader_unlock (&metatree_lock);
+  g_rw_lock_reader_unlock (&metatree_lock);
 
   return res;
 }
@@ -1543,7 +1543,7 @@ meta_tree_lookup_string (MetaTree   *tree,
   char *new_path;
   char *res;
 
-  g_static_rw_lock_reader_lock (&metatree_lock);
+  g_rw_lock_reader_lock (&metatree_lock);
 
   new_path = meta_journal_reverse_map_path_and_key (tree->journal,
 						    path,
@@ -1572,7 +1572,7 @@ meta_tree_lookup_string (MetaTree   *tree,
     res = g_strdup (verify_string (tree, ent->value));
 
  out:
-  g_static_rw_lock_reader_unlock (&metatree_lock);
+  g_rw_lock_reader_unlock (&metatree_lock);
 
   return res;
 }
@@ -1621,7 +1621,7 @@ meta_tree_lookup_stringv   (MetaTree                         *tree,
   char **res;
   guint32 num_strings, i;
 
-  g_static_rw_lock_reader_lock (&metatree_lock);
+  g_rw_lock_reader_lock (&metatree_lock);
 
   new_path = meta_journal_reverse_map_path_and_key (tree->journal,
 						    path,
@@ -1658,7 +1658,7 @@ meta_tree_lookup_stringv   (MetaTree                         *tree,
     }
 
  out:
-  g_static_rw_lock_reader_unlock (&metatree_lock);
+  g_rw_lock_reader_unlock (&metatree_lock);
 
   return res;
 }
@@ -1876,7 +1876,7 @@ meta_tree_enumerate_dir (MetaTree                         *tree,
   MetaFileDir *dir;
   char *res_path;
 
-  g_static_rw_lock_reader_lock (&metatree_lock);
+  g_rw_lock_reader_lock (&metatree_lock);
 
   data.children = children =
     g_hash_table_new_full (g_str_hash,
@@ -1922,7 +1922,7 @@ meta_tree_enumerate_dir (MetaTree                         *tree,
  out:
   g_free (res_path);
   g_hash_table_destroy (children);
-  g_static_rw_lock_reader_unlock (&metatree_lock);
+  g_rw_lock_reader_unlock (&metatree_lock);
 }
 
 typedef struct {
@@ -2116,7 +2116,7 @@ meta_tree_enumerate_keys (MetaTree                         *tree,
   GHashTableIter iter;
   char *res_path;
 
-  g_static_rw_lock_reader_lock (&metatree_lock);
+  g_rw_lock_reader_lock (&metatree_lock);
 
   keydata.keys = keys =
     g_hash_table_new_full (g_str_hash,
@@ -2170,7 +2170,7 @@ meta_tree_enumerate_keys (MetaTree                         *tree,
  out:
   g_free (res_path);
   g_hash_table_destroy (keys);
-  g_static_rw_lock_reader_unlock (&metatree_lock);
+  g_rw_lock_reader_unlock (&metatree_lock);
 }
 
 
@@ -2371,9 +2371,9 @@ meta_tree_flush (MetaTree *tree)
 {
   gboolean res;
 
-  g_static_rw_lock_writer_lock (&metatree_lock);
+  g_rw_lock_writer_lock (&metatree_lock);
   res = meta_tree_flush_locked (tree);
-  g_static_rw_lock_writer_unlock (&metatree_lock);
+  g_rw_lock_writer_unlock (&metatree_lock);
   return res;
 }
 
@@ -2386,7 +2386,7 @@ meta_tree_unset (MetaTree                         *tree,
   guint64 mtime;
   gboolean res;
 
-  g_static_rw_lock_writer_lock (&metatree_lock);
+  g_rw_lock_writer_lock (&metatree_lock);
 
   if (tree->journal == NULL ||
       !tree->journal->journal_valid)
@@ -2412,7 +2412,7 @@ meta_tree_unset (MetaTree                         *tree,
   g_string_free (entry, TRUE);
 
  out:
-  g_static_rw_lock_writer_unlock (&metatree_lock);
+  g_rw_lock_writer_unlock (&metatree_lock);
   return res;
 }
 
@@ -2426,7 +2426,7 @@ meta_tree_set_string (MetaTree                         *tree,
   guint64 mtime;
   gboolean res;
 
-  g_static_rw_lock_writer_lock (&metatree_lock);
+  g_rw_lock_writer_lock (&metatree_lock);
 
   if (tree->journal == NULL ||
       !tree->journal->journal_valid)
@@ -2452,7 +2452,7 @@ meta_tree_set_string (MetaTree                         *tree,
   g_string_free (entry, TRUE);
 
  out:
-  g_static_rw_lock_writer_unlock (&metatree_lock);
+  g_rw_lock_writer_unlock (&metatree_lock);
   return res;
 }
 
@@ -2466,7 +2466,7 @@ meta_tree_set_stringv (MetaTree                         *tree,
   guint64 mtime;
   gboolean res;
 
-  g_static_rw_lock_writer_lock (&metatree_lock);
+  g_rw_lock_writer_lock (&metatree_lock);
 
   if (tree->journal == NULL ||
       !tree->journal->journal_valid)
@@ -2492,7 +2492,7 @@ meta_tree_set_stringv (MetaTree                         *tree,
   g_string_free (entry, TRUE);
 
  out:
-  g_static_rw_lock_writer_unlock (&metatree_lock);
+  g_rw_lock_writer_unlock (&metatree_lock);
   return res;
 }
 
@@ -2504,7 +2504,7 @@ meta_tree_remove (MetaTree *tree,
   guint64 mtime;
   gboolean res;
 
-  g_static_rw_lock_writer_lock (&metatree_lock);
+  g_rw_lock_writer_lock (&metatree_lock);
 
   if (tree->journal == NULL ||
       !tree->journal->journal_valid)
@@ -2530,7 +2530,7 @@ meta_tree_remove (MetaTree *tree,
   g_string_free (entry, TRUE);
 
  out:
-  g_static_rw_lock_writer_unlock (&metatree_lock);
+  g_rw_lock_writer_unlock (&metatree_lock);
   return res;
 }
 
@@ -2543,7 +2543,7 @@ meta_tree_copy (MetaTree                         *tree,
   guint64 mtime;
   gboolean res;
 
-  g_static_rw_lock_writer_lock (&metatree_lock);
+  g_rw_lock_writer_lock (&metatree_lock);
 
   if (tree->journal == NULL ||
       !tree->journal->journal_valid)
@@ -2569,7 +2569,7 @@ meta_tree_copy (MetaTree                         *tree,
   g_string_free (entry, TRUE);
 
  out:
-  g_static_rw_lock_writer_unlock (&metatree_lock);
+  g_rw_lock_writer_unlock (&metatree_lock);
   return res;
 }
 

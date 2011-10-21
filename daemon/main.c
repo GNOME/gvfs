@@ -52,8 +52,6 @@ main (int argc, char *argv[])
   bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
-  
-  g_thread_init (NULL);
 
 #ifdef SIGPIPE
   signal (SIGPIPE, SIG_IGN);

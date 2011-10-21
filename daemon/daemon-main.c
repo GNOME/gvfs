@@ -63,7 +63,6 @@ daemon_init (void)
   textdomain (GETTEXT_PACKAGE);
   
   dbus_threads_init_default ();
-  g_thread_init (NULL);
   g_type_init ();
 
   g_log_set_handler (NULL, G_LOG_LEVEL_DEBUG, log_debug, NULL);

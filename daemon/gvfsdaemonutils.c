@@ -41,7 +41,7 @@
 #include "gvfsdaemonprotocol.h"
 
 static gint32 extra_fd_slot = -1;
-static GStaticMutex extra_lock = G_STATIC_MUTEX_INIT;
+static GMutex extra_lock;
 
 typedef struct {
   int extra_fd;
@@ -93,7 +93,7 @@ dbus_connection_send_fd (DBusConnection *connection,
       return FALSE;
     }
 
-  g_static_mutex_lock (&extra_lock);
+  g_mutex_lock (&extra_lock);
 
   if (_g_socket_send_fd (extra->extra_fd, fd) == -1)
     {
@@ -103,13 +103,13 @@ dbus_connection_send_fd (DBusConnection *connection,
 		   g_io_error_from_errno (errsv),
 		   _("Error sending file descriptor: %s"),
 		   g_strerror (errsv));
-      g_static_mutex_unlock (&extra_lock);
+      g_mutex_unlock (&extra_lock);
       return FALSE;
     }
 
   *fd_id = extra->fd_count++;
 
-  g_static_mutex_unlock (&extra_lock);
+  g_mutex_unlock (&extra_lock);
 
   return TRUE;
 }

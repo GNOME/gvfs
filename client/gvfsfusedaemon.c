@@ -2425,7 +2425,6 @@ gint
 main (gint argc, gchar *argv [])
 {
   g_type_init ();
-  g_thread_init (NULL);
 
   return fuse_main (argc, argv, &vfs_oper, NULL /* user data */);
 }
