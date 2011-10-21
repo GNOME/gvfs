@@ -591,7 +591,7 @@ meta_tree_lookup_by_name (const char *name,
 MetaTree *
 meta_tree_ref (MetaTree *tree)
 {
-  g_atomic_int_exchange_and_add ((int *)&tree->ref_count, 1);
+  g_atomic_int_add ((int *)&tree->ref_count, 1);
   return tree;
 }
 

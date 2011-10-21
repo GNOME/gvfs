@@ -129,7 +129,7 @@ g_vfs_monitor_init (GVfsMonitor *monitor)
 					       G_TYPE_VFS_MONITOR,
 					       GVfsMonitorPrivate);
   
-  id = g_atomic_int_exchange_and_add (&path_counter, 1);
+  id = g_atomic_int_add (&path_counter, 1);
   monitor->priv->object_path = g_strdup_printf (OBJ_PATH_PREFIX"%d", id);
 }
 

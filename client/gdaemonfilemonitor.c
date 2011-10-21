@@ -86,7 +86,7 @@ g_daemon_file_monitor_init (GDaemonFileMonitor* daemon_monitor)
 {
   gint id;
   
-  id = g_atomic_int_exchange_and_add (&path_counter, 1);
+  id = g_atomic_int_add (&path_counter, 1);
 
   daemon_monitor->object_path = g_strdup_printf (OBJ_PATH_PREFIX"%d", id);
   

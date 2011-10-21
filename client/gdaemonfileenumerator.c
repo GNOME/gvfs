@@ -144,7 +144,7 @@ g_daemon_file_enumerator_init (GDaemonFileEnumerator *daemon)
 {
   char *path;
   
-  daemon->id = g_atomic_int_exchange_and_add (&path_counter, 1);
+  daemon->id = g_atomic_int_add (&path_counter, 1);
 
   path = g_daemon_file_enumerator_get_object_path (daemon);
   _g_dbus_register_vfs_filter (path, g_daemon_file_enumerator_dbus_filter,
