@@ -873,7 +873,7 @@ unmount_do (UnmountData *data,
 {
   GVariantBuilder builder;
 
-  if (data->mount->volume == NULL)
+  if (data->filesystem == NULL)
     {
       unmount_do_command (data, force);
       goto out;
