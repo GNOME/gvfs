@@ -235,7 +235,8 @@ update_volume (GVfsUDisks2Volume *volume)
         }
       else if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_LUKS") == 0)
         {
-          s = udisks_util_get_size_for_display (udisks_block_get_size (volume->block), FALSE, FALSE);
+          s = udisks_client_get_size_for_display (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                                  udisks_block_get_size (volume->block), FALSE, FALSE);
           /* Translators: This is used for encrypted volumes.
            *              The first %s is the formatted size (e.g. "42.0 MB").
            */
@@ -247,7 +248,8 @@ update_volume (GVfsUDisks2Volume *volume)
           guint64 size = udisks_block_get_size (block);
           if (size > 0)
             {
-              s = udisks_util_get_size_for_display (size, FALSE, FALSE);
+              s = udisks_client_get_size_for_display (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                                      size, FALSE, FALSE);
               /* Translators: This is used for volume with no filesystem label.
                *              The first %s is the formatted size (e.g. "42.0 MB").
                */
