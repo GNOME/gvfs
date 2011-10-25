@@ -207,7 +207,7 @@ struct _GVfsBackendGphoto2
    *
    * Must only be held for very short amounts of time (e.g. no IO).
    */
-  GMutex *lock;
+  GMutex lock;
 
   /* CACHES */
 
@@ -433,7 +433,7 @@ caches_invalidate_all (GVfsBackendGphoto2 *gphoto2_backend)
 {
   DEBUG ("caches_invalidate_all()");
 
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   if (gphoto2_backend->dir_name_cache != NULL)
     g_hash_table_remove_all (gphoto2_backend->dir_name_cache);
   if (gphoto2_backend->file_name_cache != NULL)
@@ -442,7 +442,7 @@ caches_invalidate_all (GVfsBackendGphoto2 *gphoto2_backend)
     g_hash_table_remove_all (gphoto2_backend->info_cache);
   gphoto2_backend->capacity = -1;  
   gphoto2_backend->free_space = -1;  
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -450,9 +450,9 @@ caches_invalidate_all (GVfsBackendGphoto2 *gphoto2_backend)
 static void
 caches_invalidate_free_space (GVfsBackendGphoto2 *gphoto2_backend)
 {
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   gphoto2_backend->free_space = -1;  
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -461,11 +461,11 @@ static void
 caches_invalidate_dir (GVfsBackendGphoto2 *gphoto2_backend, const char *dir)
 {
   DEBUG ("caches_invalidate_dir() for '%s'", dir);
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   g_hash_table_remove (gphoto2_backend->dir_name_cache, dir);
   g_hash_table_remove (gphoto2_backend->file_name_cache, dir);
   g_hash_table_remove (gphoto2_backend->info_cache, dir);
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -477,14 +477,14 @@ caches_invalidate_file (GVfsBackendGphoto2 *gphoto2_backend, const char *dir, co
 
   full_name = g_build_filename (dir, name, NULL);
 
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   /* this is essentially: caches_invalidate_dir (gphoto2_backend, dir); */
   g_hash_table_remove (gphoto2_backend->dir_name_cache, dir);
   g_hash_table_remove (gphoto2_backend->file_name_cache, dir);
   g_hash_table_remove (gphoto2_backend->info_cache, dir);
 
   g_hash_table_remove (gphoto2_backend->info_cache, full_name);
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
 
   DEBUG ("caches_invalidate_file() for '%s'", full_name);
   g_free (full_name);
@@ -618,11 +618,7 @@ release_device (GVfsBackendGphoto2 *gphoto2_backend)
   g_list_free (gphoto2_backend->file_monitor_proxies);
   gphoto2_backend->file_monitor_proxies = NULL;
 
-  if (gphoto2_backend->lock != NULL)
-    {
-      g_mutex_free (gphoto2_backend->lock);
-      gphoto2_backend->lock = NULL;
-    }
+  g_mutex_clear (&gphoto2_backend->lock);
   gphoto2_backend->capacity = -1;
   gphoto2_backend->free_space = -1;
 }
@@ -1099,17 +1095,17 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
 
 
   /* first look up cache */
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   cached_info = g_hash_table_lookup (gphoto2_backend->info_cache, full_path);
   if (cached_info != NULL)
     {
       g_file_info_copy_into (cached_info, info);
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
       DEBUG ("  Using cached info %p for '%s'", cached_info, full_path);
       ret = TRUE;
       goto out;
     }
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
 
   if (try_cache_only)
     goto out;
@@ -1307,9 +1303,9 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
 #ifndef DEBUG_NO_CACHING
       cached_info = g_file_info_dup (info);
       DEBUG ("  Storing cached info %p for '%s'", cached_info, full_path);
-      g_mutex_lock (gphoto2_backend->lock);
+      g_mutex_lock (&gphoto2_backend->lock);
       g_hash_table_insert (gphoto2_backend->info_cache, g_strdup (full_path), cached_info);
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
 #endif
     }
 
@@ -1716,8 +1712,6 @@ do_mount (GVfsBackend *backend,
 
   gphoto2_backend->free_space = -1;
 
-  gphoto2_backend->lock = g_mutex_new ();
-
   gphoto2_mount_spec = g_mount_spec_new ("gphoto2");
   g_mount_spec_set (gphoto2_mount_spec, "host", host);
   g_vfs_backend_set_mount_spec (backend, gphoto2_mount_spec);
@@ -1860,9 +1854,9 @@ do_open_for_read_real (GVfsBackend *backend,
   DEBUG ("  data=%p size=%ld handle=%p get_preview=%d",
          read_handle->data, read_handle->size, read_handle, get_preview);
 
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   gphoto2_backend->open_read_handles = g_list_prepend (gphoto2_backend->open_read_handles, read_handle);
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
       
   read_handle->cursor = 0;
 
@@ -2008,9 +2002,9 @@ do_close_read (GVfsBackend *backend,
 
   DEBUG ("close_read() handle=%p", handle);
 
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   gphoto2_backend->open_read_handles = g_list_remove (gphoto2_backend->open_read_handles, read_handle);
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
 
   free_read_handle (read_handle);
   
@@ -2140,11 +2134,11 @@ do_enumerate (GVfsBackend *backend,
   g_free (as_name);
 
   /* first, list the folders */
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   list = g_hash_table_lookup (gphoto2_backend->dir_name_cache, filename);
   if (list == NULL)
     {
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
 
       ensure_not_dirty (gphoto2_backend);
 
@@ -2169,7 +2163,7 @@ do_enumerate (GVfsBackend *backend,
       DEBUG ("  Using cached dir list for dir '%s'", filename);
       using_cached_dir_list = TRUE;
       gp_list_ref (list);
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
     }
   for (n = 0; n < gp_list_count (list); n++) 
     {
@@ -2193,25 +2187,25 @@ do_enumerate (GVfsBackend *backend,
   if (!using_cached_dir_list)
     {
 #ifndef DEBUG_NO_CACHING
-      g_mutex_lock (gphoto2_backend->lock);
+      g_mutex_lock (&gphoto2_backend->lock);
       g_hash_table_insert (gphoto2_backend->dir_name_cache, g_strdup (filename), list);
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
 #endif
     }
   else
     {
-      g_mutex_lock (gphoto2_backend->lock);
+      g_mutex_lock (&gphoto2_backend->lock);
       gp_list_unref (list);
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
     }
 
 
   /* then list the files in each folder */
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   list = g_hash_table_lookup (gphoto2_backend->file_name_cache, filename);
   if (list == NULL)
     {
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
       ensure_not_dirty (gphoto2_backend);
 
       DEBUG ("  Generating file list for dir '%s'", filename);
@@ -2235,7 +2229,7 @@ do_enumerate (GVfsBackend *backend,
       DEBUG ("  Using cached file list for dir '%s'", filename);
       using_cached_file_list = TRUE;
       gp_list_ref (list);
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
     }
   for (n = 0; n < gp_list_count (list); n++) 
     {
@@ -2260,16 +2254,16 @@ do_enumerate (GVfsBackend *backend,
   if (!using_cached_file_list)
     {
 #ifndef DEBUG_NO_CACHING
-      g_mutex_lock (gphoto2_backend->lock);
+      g_mutex_lock (&gphoto2_backend->lock);
       g_hash_table_insert (gphoto2_backend->file_name_cache, g_strdup (filename), list);
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
 #endif
     }
   else
     {
-      g_mutex_lock (gphoto2_backend->lock);
+      g_mutex_lock (&gphoto2_backend->lock);
       gp_list_unref (list);
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
     }
 
   /* and we're done */
@@ -2307,15 +2301,15 @@ try_enumerate (GVfsBackend *backend,
   DEBUG ("try_enumerate (%s)", given_filename);
 
   /* first, list the folders */
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   list = g_hash_table_lookup (gphoto2_backend->dir_name_cache, filename);
   if (list == NULL)
     {
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
       goto error_not_cached;
     }
   gp_list_ref (list);
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
   for (n = 0; n < gp_list_count (list); n++) 
     {
       gp_list_get_name (list, n, &name);
@@ -2323,27 +2317,27 @@ try_enumerate (GVfsBackend *backend,
       info = g_file_info_new ();
       if (!file_get_info (gphoto2_backend, filename, name, info, &error, TRUE))
         {
-          g_mutex_lock (gphoto2_backend->lock);
+          g_mutex_lock (&gphoto2_backend->lock);
           gp_list_unref (list);
-          g_mutex_unlock (gphoto2_backend->lock);
+          g_mutex_unlock (&gphoto2_backend->lock);
           goto error_not_cached;
         }
       l = g_list_append (l, info);
     }
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   gp_list_unref (list);
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
 
   /* then list the files in each folder */
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   list = g_hash_table_lookup (gphoto2_backend->file_name_cache, filename);
   if (list == NULL)
     {
-      g_mutex_unlock (gphoto2_backend->lock);
+      g_mutex_unlock (&gphoto2_backend->lock);
       goto error_not_cached;
     }
   gp_list_ref (list);
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
   for (n = 0; n < gp_list_count (list); n++) 
     {
       gp_list_get_name (list, n, &name);
@@ -2352,16 +2346,16 @@ try_enumerate (GVfsBackend *backend,
       info = g_file_info_new ();
       if (!file_get_info (gphoto2_backend, filename, name, info, &error, TRUE))
         {
-          g_mutex_lock (gphoto2_backend->lock);
+          g_mutex_lock (&gphoto2_backend->lock);
           gp_list_unref (list);
-          g_mutex_unlock (gphoto2_backend->lock);
+          g_mutex_unlock (&gphoto2_backend->lock);
           goto error_not_cached;
         }
       l = g_list_append (l, info);
     }
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   gp_list_unref (list);
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
 
   /* and we're done */
 
@@ -2412,9 +2406,9 @@ do_query_fs_info (GVfsBackend *backend,
           /* for now we only support a single storage head */
           if (storage_info[0].fields & GP_STORAGEINFO_MAXCAPACITY)
             {
-              g_mutex_lock (gphoto2_backend->lock);
+              g_mutex_lock (&gphoto2_backend->lock);
               gphoto2_backend->capacity = storage_info[0].capacitykbytes * 1024;
-              g_mutex_unlock (gphoto2_backend->lock);
+              g_mutex_unlock (&gphoto2_backend->lock);
               g_file_info_set_attribute_uint64 (info, 
                                                 G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, 
                                                 (guint64) gphoto2_backend->capacity);
@@ -2422,9 +2416,9 @@ do_query_fs_info (GVfsBackend *backend,
 
           if (storage_info[0].fields & GP_STORAGEINFO_FREESPACEKBYTES)
             {
-              g_mutex_lock (gphoto2_backend->lock);
+              g_mutex_lock (&gphoto2_backend->lock);
               gphoto2_backend->free_space = storage_info[0].freekbytes * 1024;
-              g_mutex_unlock (gphoto2_backend->lock);
+              g_mutex_unlock (&gphoto2_backend->lock);
               g_file_info_set_attribute_uint64 (info, 
                                                 G_FILE_ATTRIBUTE_FILESYSTEM_FREE, 
                                                 (guint64) gphoto2_backend->free_space);
@@ -2454,10 +2448,10 @@ try_query_fs_info (GVfsBackend *backend,
 
   ret = FALSE;
 
-  g_mutex_lock (gphoto2_backend->lock);
+  g_mutex_lock (&gphoto2_backend->lock);
   free_space = gphoto2_backend->free_space;
   capacity = gphoto2_backend->capacity;
-  g_mutex_unlock (gphoto2_backend->lock);
+  g_mutex_unlock (&gphoto2_backend->lock);
 
   if (free_space == -1 || capacity == -1)
     {

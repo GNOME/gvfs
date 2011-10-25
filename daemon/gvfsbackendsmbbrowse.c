@@ -94,8 +94,8 @@ struct _GVfsBackendSmbBrowse
   gboolean password_in_keyring;
   GPasswordSave password_save;
 
-  GMutex *entries_lock;
-  GMutex *update_cache_lock;
+  GMutex entries_lock;
+  GMutex update_cache_lock;
   time_t last_entry_update;
   GList *entries;
   int entry_errno;
@@ -226,8 +226,8 @@ g_vfs_backend_smb_browse_finalize (GObject *object)
   g_free (backend->server);
   g_free (backend->default_workgroup);
   
-  g_mutex_free (backend->entries_lock);
-  g_mutex_free (backend->update_cache_lock);
+  g_mutex_clear (&backend->entries_lock);
+  g_mutex_clear (&backend->update_cache_lock);
 
   smbc_free_context (backend->smb_context, TRUE);
   
@@ -243,9 +243,6 @@ g_vfs_backend_smb_browse_init (GVfsBackendSmbBrowse *backend)
 {
   char *workgroup;
   GSettings *settings;
-
-  backend->entries_lock = g_mutex_new ();
-  backend->update_cache_lock = g_mutex_new ();
 
   if (mount_tracker == NULL)
     mount_tracker = g_mount_tracker_new (NULL);
@@ -592,7 +589,7 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
   entry_errno = 0;
   res = -1;
 
-  g_mutex_lock (backend->update_cache_lock);
+  g_mutex_lock (&backend->update_cache_lock);
   
   DEBUG ("update_cache - updating...\n");
   
@@ -665,7 +662,7 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
 
  out:
 
-  g_mutex_lock (backend->entries_lock);
+  g_mutex_lock (&backend->entries_lock);
   
   /* Clear old cache */
   g_list_foreach (backend->entries, (GFunc)browse_entry_free, NULL);
@@ -676,8 +673,8 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
 
   DEBUG ("update_cache - done.\n");
 
-  g_mutex_unlock (backend->entries_lock);
-  g_mutex_unlock (backend->update_cache_lock);
+  g_mutex_unlock (&backend->entries_lock);
+  g_mutex_unlock (&backend->update_cache_lock);
 
   return (res >= 0);
 }
@@ -780,9 +777,9 @@ has_name (GVfsBackendSmbBrowse *backend,
 {
   gboolean res;
   
-  g_mutex_lock (backend->entries_lock);
+  g_mutex_lock (&backend->entries_lock);
   res = (find_entry_unlocked (backend, filename) != NULL);
-  g_mutex_unlock (backend->entries_lock);
+  g_mutex_unlock (&backend->entries_lock);
   return res;
 }
 
@@ -793,11 +790,11 @@ cache_needs_updating (GVfsBackendSmbBrowse *backend)
   gboolean res;
 
   /*  If there's already cache update in progress, lock and wait until update is finished, then recheck  */
-  g_mutex_lock (backend->update_cache_lock);
+  g_mutex_lock (&backend->update_cache_lock);
   now = time (NULL);
   res = now < backend->last_entry_update ||
     (now - backend->last_entry_update) > DEFAULT_CACHE_EXPIRATION_TIME;
-  g_mutex_unlock (backend->update_cache_lock);
+  g_mutex_unlock (&backend->update_cache_lock);
   
   return res; 
 }
@@ -1070,7 +1067,7 @@ run_mount_mountable (GVfsBackendSmbBrowse *backend,
   GError *error = NULL;
   GMountSpec *mount_spec;
 
-  g_mutex_lock (backend->entries_lock);
+  g_mutex_lock (&backend->entries_lock);
   
   entry = find_entry_unlocked (backend, filename);
 
@@ -1093,7 +1090,7 @@ run_mount_mountable (GVfsBackendSmbBrowse *backend,
 			 G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
 			 _("File doesn't exist"));
       
-  g_mutex_unlock (backend->entries_lock);
+  g_mutex_unlock (&backend->entries_lock);
 
   if (error)
     {
@@ -1316,14 +1313,14 @@ run_query_info (GVfsBackendSmbBrowse *backend,
 {
   BrowseEntry *entry;
 
-  g_mutex_lock (backend->entries_lock);
+  g_mutex_lock (&backend->entries_lock);
   
   entry = find_entry_unlocked (backend, filename);
 
   if (entry)
     get_file_info_from_entry (backend, entry, info);
       
-  g_mutex_unlock (backend->entries_lock);
+  g_mutex_unlock (&backend->entries_lock);
 
   if (entry)
     g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1408,7 +1405,7 @@ run_enumerate (GVfsBackendSmbBrowse *backend,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   files = NULL;
-  g_mutex_lock (backend->entries_lock);
+  g_mutex_lock (&backend->entries_lock);
   for (l = backend->entries; l != NULL; l = l->next)
     {
       BrowseEntry *entry = l->data;
@@ -1418,7 +1415,7 @@ run_enumerate (GVfsBackendSmbBrowse *backend,
 
       files = g_list_prepend (files, info);
     }
-  g_mutex_unlock (backend->entries_lock);
+  g_mutex_unlock (&backend->entries_lock);
   
   files = g_list_reverse (files);
 

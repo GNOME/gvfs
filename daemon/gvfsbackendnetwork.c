@@ -65,7 +65,7 @@ struct _GVfsBackendNetwork
   gboolean have_smb;
   char *current_workgroup;
   GFileMonitor *smb_monitor;
-  GMutex *smb_mount_lock;
+  GMutex smb_mount_lock;
   GVfsJobMount *mount_job;
 
   /* DNS-SD Stuff */
@@ -433,7 +433,7 @@ mount_smb_done_cb (GObject *object,
       g_vfs_job_succeeded (G_VFS_JOB (backend->mount_job));
       g_object_unref (backend->mount_job);
     }  
-  g_mutex_unlock (backend->smb_mount_lock);
+  g_mutex_unlock (&backend->smb_mount_lock);
 }
 
 static void
@@ -442,7 +442,7 @@ remount_smb (GVfsBackendNetwork *backend, GVfsJobMount *job)
   GFile *file;
   char *workgroup;
 
-  if (! g_mutex_trylock (backend->smb_mount_lock))
+  if (! g_mutex_trylock (&backend->smb_mount_lock))
     /*  Do nothing when the mount operation is already active  */
     return;
   
@@ -769,8 +769,6 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
   const char * const* supported_vfs;
   int i;
 
-  network_backend->smb_mount_lock = g_mutex_new ();
-
   supported_vfs = g_vfs_get_supported_uri_schemes (g_vfs_get_default ());
 
   network_backend->have_smb = FALSE;
@@ -836,7 +834,7 @@ g_vfs_backend_network_finalize (GObject *object)
   GVfsBackendNetwork *backend;
   backend = G_VFS_BACKEND_NETWORK (object);
 
-  g_mutex_free (backend->smb_mount_lock);
+  g_mutex_clear (&backend->smb_mount_lock);
   g_mount_spec_unref (backend->mount_spec);
   g_object_unref (backend->root_monitor);
   g_object_unref (backend->workgroup_icon);

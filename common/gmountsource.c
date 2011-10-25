@@ -27,6 +27,8 @@
 #include <gio/gio.h>
 #include <gvfsdaemonprotocol.h>
 
+#include <string.h>
+
 struct _GMountSource
 {
   GObject parent_instance;
@@ -137,8 +139,8 @@ typedef struct AskSyncData AskSyncData;
 struct AskSyncData {
 
   /* For sync calls */
-  GMutex *mutex;
-  GCond *cond;
+  GMutex mutex;
+  GCond cond;
 
   /* results: */
   GAsyncResult *result;
@@ -356,9 +358,9 @@ ask_reply_sync  (GObject *source_object,
   data->result = g_object_ref (res);
 
   /* Wake up sync call thread */
-  g_mutex_lock (data->mutex);
-  g_cond_signal (data->cond);
-  g_mutex_unlock (data->mutex);
+  g_mutex_lock (&data->mutex);
+  g_cond_signal (&data->cond);
+  g_mutex_unlock (&data->mutex);
 }
 
 gboolean
@@ -375,12 +377,10 @@ g_mount_source_ask_password (GMountSource *source,
 			     GPasswordSave *password_save_out)
 {
   gboolean handled;
-  AskSyncData data = {NULL};
-  
-  data.mutex = g_mutex_new ();
-  data.cond = g_cond_new ();
+  AskSyncData data;
 
-  g_mutex_lock (data.mutex);
+  memset (&data, 0, sizeof (data));
+  g_mutex_lock (&data.mutex);
 
 
   g_mount_source_ask_password_async (source,
@@ -391,11 +391,11 @@ g_mount_source_ask_password (GMountSource *source,
                                      ask_reply_sync,
                                      &data);
   
-  g_cond_wait(data.cond, data.mutex);
-  g_mutex_unlock (data.mutex);
+  g_cond_wait (&data.cond, &data.mutex);
+  g_mutex_unlock (&data.mutex);
 
-  g_cond_free (data.cond);
-  g_mutex_free (data.mutex);
+  g_cond_clear (&data.cond);
+  g_mutex_clear (&data.mutex);
 
 
   handled = g_mount_source_ask_password_finish (source,
@@ -546,12 +546,10 @@ g_mount_source_ask_question (GMountSource *source,
 {
   gint choice;
   gboolean handled, aborted;
-  AskSyncData data = {NULL};
+  AskSyncData data;
   
-  data.mutex = g_mutex_new ();
-  data.cond = g_cond_new ();
-
-  g_mutex_lock (data.mutex);
+  memset (&data, 0, sizeof (data));
+  g_mutex_lock (&data.mutex);
 
   g_mount_source_ask_question_async (source,
                                      message,
@@ -560,11 +558,11 @@ g_mount_source_ask_question (GMountSource *source,
                                      ask_reply_sync,
                                      &data);
   
-  g_cond_wait(data.cond, data.mutex);
-  g_mutex_unlock (data.mutex);
+  g_cond_wait (&data.cond, &data.mutex);
+  g_mutex_unlock (&data.mutex);
 
-  g_cond_free (data.cond);
-  g_mutex_free (data.mutex);
+  g_cond_clear (&data.cond);
+  g_mutex_clear (&data.mutex);
 
   handled = g_mount_source_ask_question_finish (source,
                                                 data.result,
@@ -841,12 +839,10 @@ g_mount_source_show_processes (GMountSource *source,
 {
   gint choice;
   gboolean handled, aborted;
-  AskSyncData data = {NULL};
+  AskSyncData data;
 
-  data.mutex = g_mutex_new ();
-  data.cond = g_cond_new ();
-
-  g_mutex_lock (data.mutex);
+  memset (&data, 0, sizeof (data));
+  g_mutex_lock (&data.mutex);
 
   g_mount_source_show_processes_async (source,
                                        message,
@@ -856,11 +852,11 @@ g_mount_source_show_processes (GMountSource *source,
                                        ask_reply_sync,
                                        &data);
 
-  g_cond_wait (data.cond, data.mutex);
-  g_mutex_unlock (data.mutex);
+  g_cond_wait (&data.cond, &data.mutex);
+  g_mutex_unlock (&data.mutex);
 
-  g_cond_free (data.cond);
-  g_mutex_free (data.mutex);
+  g_cond_clear (&data.cond);
+  g_mutex_clear (&data.mutex);
 
   handled = g_mount_source_show_processes_finish (source,
                                                   data.result,

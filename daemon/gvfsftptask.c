@@ -180,7 +180,7 @@ static gboolean
 g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
 {
   GVfsBackendFtp *ftp;
-  GTimeVal now;
+  gint64 end_time;
   gulong id;
 
   g_return_val_if_fail (task != NULL, FALSE);
@@ -190,10 +190,10 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
     return FALSE;
 
   ftp = task->backend;
-  g_mutex_lock (ftp->mutex);
+  g_mutex_lock (&ftp->mutex);
   id = g_cancellable_connect (task->cancellable,
         		      G_CALLBACK (do_broadcast),
-        		      ftp->cond, NULL);
+        		      &ftp->cond, NULL);
   while (task->conn == NULL && ftp->queue != NULL)
     {
       if (g_cancellable_is_cancelled (task->cancellable))
@@ -218,7 +218,7 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
 
           ftp->connections++;
           last_thread = g_thread_self ();
-          g_mutex_unlock (ftp->mutex);
+          g_mutex_unlock (&ftp->mutex);
           task->conn = g_vfs_ftp_connection_new (ftp->addr, task->cancellable, &task->error);
           if (G_LIKELY (task->conn != NULL))
             {
@@ -231,7 +231,7 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
 
           g_vfs_ftp_connection_free (task->conn);
           task->conn = NULL;
-          g_mutex_lock (ftp->mutex);
+          g_mutex_lock (&ftp->mutex);
           ftp->connections--;
           /* If this value is still equal to our thread it means there were no races 
            * trying to open connections and the maybe_max_connections value is 
@@ -253,10 +253,9 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
           continue;
         }
 
-      g_get_current_time (&now);
-      g_time_val_add (&now, G_VFS_FTP_TIMEOUT_IN_SECONDS * 1000 * 1000);
+      end_time = g_get_monotonic_time () + G_VFS_FTP_TIMEOUT_IN_SECONDS * G_TIME_SPAN_SECOND;
       if (ftp->busy_connections >= ftp->connections ||
-          !g_cond_timed_wait (ftp->cond, ftp->mutex, &now))
+          !g_cond_wait_until (&ftp->cond, &ftp->mutex, end_time))
         {
           task->error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_BUSY,
         		                     _("The FTP server is busy. Try again later"));
@@ -264,7 +263,7 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
         }
     }
   g_cancellable_disconnect (task->cancellable, id);
-  g_mutex_unlock (ftp->mutex);
+  g_mutex_unlock (&ftp->mutex);
 
   return task->conn != NULL;
 }
@@ -287,18 +286,18 @@ g_vfs_ftp_task_release_connection (GVfsFtpTask *task)
   if (task->conn == NULL)
     return;
 
-  g_mutex_lock (task->backend->mutex);
+  g_mutex_lock (&task->backend->mutex);
   if (task->backend->queue && g_vfs_ftp_connection_is_usable (task->conn))
     {
       g_queue_push_tail (task->backend->queue, task->conn);
-      g_cond_signal (task->backend->cond);
+      g_cond_signal (&task->backend->cond);
     }
   else
     {
       task->backend->connections--;
       g_vfs_ftp_connection_free (task->conn);
     }
-  g_mutex_unlock (task->backend->mutex);
+  g_mutex_unlock (&task->backend->mutex);
   task->conn = NULL;
 }
 
@@ -434,10 +433,10 @@ g_vfs_ftp_task_give_connection (GVfsFtpTask *      task,
 
   task->conn = conn;
   /* this connection is not busy anymore */
-  g_mutex_lock (task->backend->mutex);
+  g_mutex_lock (&task->backend->mutex);
   g_assert (task->backend->busy_connections > 0);
   task->backend->busy_connections--;
-  g_mutex_unlock (task->backend->mutex);
+  g_mutex_unlock (&task->backend->mutex);
 }
 
 /**
@@ -465,13 +464,13 @@ g_vfs_ftp_task_take_connection (GVfsFtpTask *task)
 
   ftp = task->backend;
   /* mark this connection as busy */
-  g_mutex_lock (ftp->mutex);
+  g_mutex_lock (&ftp->mutex);
   ftp->busy_connections++;
   /* if all connections are busy, signal all waiting threads, 
    * so they stop waiting and return BUSY earlier */
   if (ftp->busy_connections >= ftp->connections)
-    g_cond_broadcast (ftp->cond);
-  g_mutex_unlock (ftp->mutex);
+    g_cond_broadcast (&ftp->cond);
+  g_mutex_unlock (&ftp->mutex);
 
   return conn;
 }

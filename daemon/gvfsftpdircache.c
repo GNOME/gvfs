@@ -98,7 +98,7 @@ struct _GVfsFtpDirCache
 {
   GHashTable *          directories;    /* GVfsFtpFile of directory => GVfsFtpDirCacheEntry mapping */
   guint                 stamp;          /* used to identify validity of cache when flushing */
-  GMutex *              lock;           /* mutex for thread safety of stamp and hash table */
+  GMutex                lock;           /* mutex for thread safety of stamp and hash table */
   const GVfsFtpDirFuncs *funcs;         /* functions to call */
 };
 
@@ -114,7 +114,6 @@ g_vfs_ftp_dir_cache_new (const GVfsFtpDirFuncs *funcs)
                                               g_vfs_ftp_file_equal,
                                               (GDestroyNotify) g_vfs_ftp_file_free,
                                               (GDestroyNotify) g_vfs_ftp_dir_cache_entry_unref);
-  cache->lock = g_mutex_new();
   cache->funcs = funcs;
 
   return cache;
@@ -126,7 +125,7 @@ g_vfs_ftp_dir_cache_free (GVfsFtpDirCache *cache)
   g_return_if_fail (cache != NULL);
 
   g_hash_table_destroy (cache->directories);
-  g_mutex_free (cache->lock);
+  g_mutex_clear (&cache->lock);
   g_slice_free (GVfsFtpDirCache, cache);
 }
 
@@ -138,11 +137,11 @@ g_vfs_ftp_dir_cache_lookup_entry (GVfsFtpDirCache *  cache,
 {
   GVfsFtpDirCacheEntry *entry;
 
-  g_mutex_lock (cache->lock);
+  g_mutex_lock (&cache->lock);
   entry = g_hash_table_lookup (cache->directories, dir);
   if (entry)
     g_vfs_ftp_dir_cache_entry_ref (entry);
-  g_mutex_unlock (cache->lock);
+  g_mutex_unlock (&cache->lock);
   if (entry && entry->stamp < stamp)
     g_vfs_ftp_dir_cache_entry_unref (entry);
   else if (entry)
@@ -178,11 +177,11 @@ g_vfs_ftp_dir_cache_lookup_entry (GVfsFtpDirCache *  cache,
       g_vfs_ftp_dir_cache_entry_unref (entry);
       return NULL;
     }
-  g_mutex_lock (cache->lock);
+  g_mutex_lock (&cache->lock);
   g_hash_table_insert (cache->directories,
                        g_vfs_ftp_file_copy (dir),
                        g_vfs_ftp_dir_cache_entry_ref (entry));
-  g_mutex_unlock (cache->lock);
+  g_mutex_unlock (&cache->lock);
   return entry;
 }
 
@@ -357,10 +356,10 @@ g_vfs_ftp_dir_cache_lookup_dir (GVfsFtpDirCache *  cache,
 
   if (flush)
     {
-      g_mutex_lock (cache->lock);
+      g_mutex_lock (&cache->lock);
       g_assert (cache->stamp != G_MAXUINT);
       stamp = ++cache->stamp;
-      g_mutex_unlock (cache->lock);
+      g_mutex_unlock (&cache->lock);
     }
   else
     stamp = 0;
@@ -390,9 +389,9 @@ g_vfs_ftp_dir_cache_purge_dir (GVfsFtpDirCache *  cache,
   g_return_if_fail (cache != NULL);
   g_return_if_fail (dir != NULL);
 
-  g_mutex_lock (cache->lock);
+  g_mutex_lock (&cache->lock);
   g_hash_table_remove (cache->directories, dir);
-  g_mutex_unlock (cache->lock);
+  g_mutex_unlock (&cache->lock);
 }
 
 void

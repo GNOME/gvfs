@@ -87,7 +87,7 @@ struct _GVfsBackendAfc {
   GHashTable *apps; /* hash table of AppInfo */
   instproxy_client_t inst;
   sbservices_client_t sbs;
-  GMutex *apps_lock;
+  GMutex apps_lock;
 };
 
 struct afc_error_mapping {
@@ -182,11 +182,7 @@ g_vfs_backend_afc_close_connection (GVfsBackendAfc *self)
               sbservices_client_free (self->sbs);
               self->sbs = NULL;
             }
-          if (self->apps_lock)
-            {
-              g_mutex_free (self->apps_lock);
-              self->apps_lock = NULL;
-            }
+          g_mutex_clear (&self->apps_lock);
         }
       g_free (self->model);
       self->model = NULL;
@@ -1910,14 +1906,14 @@ g_vfs_backend_afc_enumerate (GVfsBackend *backend,
     {
       char *app;
 
-      g_mutex_lock (self->apps_lock);
+      g_mutex_lock (&self->apps_lock);
       if (g_vfs_backend_load_apps (self) == FALSE)
         {
           g_vfs_backend_afc_check (AFC_E_INTERNAL_ERROR, G_VFS_JOB (job));
-          g_mutex_unlock (self->apps_lock);
+          g_mutex_unlock (&self->apps_lock);
           return;
         }
-      g_mutex_unlock (self->apps_lock);
+      g_mutex_unlock (&self->apps_lock);
 
       app = g_vfs_backend_parse_house_arrest_path (self, TRUE, path, &new_path);
 
@@ -2039,14 +2035,14 @@ g_vfs_backend_afc_query_info (GVfsBackend *backend,
     {
       char *app;
 
-      g_mutex_lock (self->apps_lock);
+      g_mutex_lock (&self->apps_lock);
       if (g_vfs_backend_load_apps (self) == FALSE)
         {
           g_vfs_backend_afc_check (AFC_E_INTERNAL_ERROR, G_VFS_JOB (job));
-          g_mutex_unlock (self->apps_lock);
+          g_mutex_unlock (&self->apps_lock);
           return;
         }
-      g_mutex_unlock (self->apps_lock);
+      g_mutex_unlock (&self->apps_lock);
 
       app = g_vfs_backend_parse_house_arrest_path (self, TRUE, path, &new_path);
 
@@ -2604,8 +2600,6 @@ g_vfs_backend_afc_init (GVfsBackendAfc *self)
       /* enable full debugging */
       idevice_set_debug_level (1);
     }
-
-  self->apps_lock = g_mutex_new ();
 }
 
 static void
