@@ -10,10 +10,10 @@ msgstr ""
 "Project-Id-Version: gvfs.master.te\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-10-17 13:02+0000\n"
+"POT-Creation-Date: 2011-10-22 12:53+0000\n"
 "PO-Revision-Date: 2009-09-17 21:07+0530\n"
 "Last-Translator: veera reddy v <veerared.e@gmail.com>\n"
-"Language-Team: Telugu <en@li.org>\n"
+"Language-Team: Telugu <indlinux-telugu@lists.sourceforge.net>\n"
 "Language: te\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -65,13 +65,13 @@ msgstr "ఎన్‌క్లోసింగ్ మౌంట్ ను కను
 msgid "Invalid filename %s"
 msgstr "సరికాని దస్త్రనామము %s"
 
-#: ../client/gdaemonfile.c:2256 ../client/gdaemonvfs.c:1199
-#: ../client/gdaemonvfs.c:1334 ../client/gdaemonvfs.c:1387
+#: ../client/gdaemonfile.c:2256 ../client/gdaemonvfs.c:1198
+#: ../client/gdaemonvfs.c:1333 ../client/gdaemonvfs.c:1386
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "దస్త్రము మెటాడాటా అమర్చుటలో దోషము: %s"
 
-#: ../client/gdaemonfile.c:2257 ../client/gdaemonvfs.c:1388
+#: ../client/gdaemonfile.c:2257 ../client/gdaemonvfs.c:1387
 msgid "values must be string or list of strings"
 msgstr "విలువలు తప్పక స్ట్రింగు లేదా స్ట్రింగుల జాబితా అయివుండాలి"
 
@@ -85,7 +85,7 @@ msgstr "విలువలు తప్పక స్ట్రింగు లే
 #: ../client/gdaemonfileoutputstream.c:506
 #: ../client/gdaemonfileoutputstream.c:681
 #: ../client/gdaemonfileoutputstream.c:873
-#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1059
+#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1062
 #: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1106
 #: ../daemon/gvfsbackendobexftp.c:1225 ../daemon/gvfsbackendobexftp.c:1362
 #: ../daemon/gvfsbackendobexftp.c:1426 ../daemon/gvfsbackendobexftp.c:1628
@@ -96,11 +96,11 @@ msgstr "విలువలు తప్పక స్ట్రింగు లే
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1073
-#: ../monitor/proxy/gproxydrive.c:514 ../monitor/proxy/gproxydrive.c:602
-#: ../monitor/proxy/gproxydrive.c:750 ../monitor/proxy/gproxydrive.c:885
-#: ../monitor/proxy/gproxydrive.c:936 ../monitor/proxy/gproxydrive.c:1060
-#: ../monitor/proxy/gproxymount.c:471 ../monitor/proxy/gproxymount.c:556
-#: ../monitor/proxy/gproxyvolume.c:807 ../monitor/proxy/gproxyvolume.c:884
+#: ../monitor/proxy/gproxydrive.c:541 ../monitor/proxy/gproxydrive.c:629
+#: ../monitor/proxy/gproxydrive.c:777 ../monitor/proxy/gproxydrive.c:912
+#: ../monitor/proxy/gproxydrive.c:963 ../monitor/proxy/gproxydrive.c:1087
+#: ../monitor/proxy/gproxymount.c:488 ../monitor/proxy/gproxymount.c:573
+#: ../monitor/proxy/gproxyvolume.c:826 ../monitor/proxy/gproxyvolume.c:903
 msgid "Operation was cancelled"
 msgstr "కార్యము రద్దుచేయబడింది"
 
@@ -128,16 +128,16 @@ msgstr "స్ట్రీమ్ యొక్క ముగింపు"
 msgid "Seek not supported on stream"
 msgstr "స్ట్రీమ్ పై సీక్ మద్దతీయబడదు"
 
-#: ../client/gdaemonvfs.c:831
+#: ../client/gdaemonvfs.c:830
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "మౌంట్ సమాచారాన్ని పొందునప్పుడు దోషం: %s"
 
-#: ../client/gdaemonvfs.c:1200
+#: ../client/gdaemonvfs.c:1199
 msgid "Can't contact session bus"
 msgstr "సెషన్ బస్‌ను సంప్రదించలేదు"
 
-#: ../client/gvfsdaemondbus.c:572 ../client/gvfsdaemondbus.c:1013
+#: ../client/gvfsdaemondbus.c:575 ../client/gvfsdaemondbus.c:1016
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "డెమోన్ కు అనుసంధానించబడుతున్నప్పుడు దోషం: %s"
@@ -220,45 +220,45 @@ msgstr "GVfsIcon యెన్కోడింగ్ యొక్క వర్ష�
 msgid "Malformed input data for GVfsIcon"
 msgstr "GVfsIconకు తప్పుగా రూపొందించి యిన్పుట్ డాటా"
 
-#: ../daemon/daemon-main.c:82 ../daemon/daemon-main.c:237
+#: ../daemon/daemon-main.c:81 ../daemon/daemon-main.c:236
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "D-Bus కు అనుసంధానించుటలో దోషం: %s"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "FTP"
-#: ../daemon/daemon-main.c:97
+#: ../daemon/daemon-main.c:96
 #, c-format
 msgid "%s Filesystem Service"
 msgstr "%s ఫైల్‌సిస్టమ్ సేవ"
 
-#: ../daemon/daemon-main.c:116 ../programs/gvfs-copy.c:90
+#: ../daemon/daemon-main.c:115 ../programs/gvfs-copy.c:90
 #: ../programs/gvfs-move.c:78
 #, c-format
 msgid "Error: %s"
 msgstr "దోషం: %s"
 
-#: ../daemon/daemon-main.c:162
+#: ../daemon/daemon-main.c:161
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "ఉపయోగం: %s --స్పానర్ dbus-id object_path"
 
-#: ../daemon/daemon-main.c:186 ../daemon/daemon-main.c:204
+#: ../daemon/daemon-main.c:185 ../daemon/daemon-main.c:203
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "ఉపయోగం: %s key=value key=value ..."
 
-#: ../daemon/daemon-main.c:202
+#: ../daemon/daemon-main.c:201
 #, c-format
 msgid "No mount type specified"
 msgstr "ఏ మౌంట్ రకం తెలుపలేదు"
 
-#: ../daemon/daemon-main.c:272
+#: ../daemon/daemon-main.c:271
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "%s కొరకు మౌంట్‌సూచి ఇప్పటికే నడుస్తోంది"
 
-#: ../daemon/daemon-main.c:283
+#: ../daemon/daemon-main.c:282
 msgid "error starting mount daemon"
 msgstr "మౌంట్ డెమోన్ ను ప్రారంభించుటలో దోషం"
 
@@ -302,7 +302,7 @@ msgstr "AFP సర్వర్% s కు అజ్ఞాత లాగిన్ �
 #, c-format
 msgid ""
 "Login to AFP server %s failed (no suitable authentication mechanism found)"
-msgstr "AFP సర్వర్% లాగిన్ యొక్క (సంఖ్య సరిపోతుంది ప్రమాణీకరణ విధానం కనుగొనబడలేదు) విఫలమైంది"
+msgstr "AFP సర్వర్ %s లాగిన్ అవుట (సంఖ్య సరిపోతుంది ప్రమాణీకరణ విధానం కనుగొనబడలేదు) విఫలమైంది"
 
 #: ../daemon/gvfsafpserver.c:740
 #, c-format
@@ -743,7 +743,7 @@ msgstr "AFP volume %sపై%s"
 #: ../daemon/gvfsbackendafp.c:4272
 #, c-format
 msgid "Couldn't mount AFP volume %s on %s"
-msgstr "% S పై AFP వాల్యూమ్% s మౌంటు సాధ్యం కాలేదు"
+msgstr "%s పై  AFP వాల్యూమ్ %s మౌంటు సాధ్యం కాలేదు"
 
 #: ../daemon/gvfsbackendafp.c:4303
 msgid "No volume specified"
@@ -1690,22 +1690,22 @@ msgstr "ాత డెమోన్ ను పునఃస్థాపించు
 msgid "Don't start fuse."
 msgstr "ఫ్యూజ్ ను ప్రారంభించ వద్దు."
 
-#: ../daemon/main.c:62
+#: ../daemon/main.c:60
 msgid "GVFS Daemon"
 msgstr "GVFS డెమోన్"
 
-#: ../daemon/main.c:65
+#: ../daemon/main.c:63
 msgid "Main daemon for GVFS"
 msgstr "GVFS కొరకు ముఖ్య డెమోన్"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:80 ../metadata/meta-daemon.c:718
+#: ../daemon/main.c:78 ../metadata/meta-daemon.c:718
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:82 ../metadata/meta-daemon.c:720
+#: ../daemon/main.c:80 ../metadata/meta-daemon.c:720
 #: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
 #: ../programs/gvfs-copy.c:123 ../programs/gvfs-info.c:371
 #: ../programs/gvfs-ls.c:392 ../programs/gvfs-mime.c:87
@@ -2545,22 +2545,22 @@ msgstr "మౌంట్‌ను అన్‌మౌంట్ చేయుటల�
 msgid "Error finding enclosing mount: %s\n"
 msgstr "కప్పివుంచిన మౌంట్‌ను కనుగొనుటలో దోషము: %s\n"
 
-#: ../programs/gvfs-mount.c:683
+#: ../programs/gvfs-mount.c:696
 #, c-format
 msgid "Error mounting %s: %s\n"
 msgstr "%s మౌంటు చేయుటలో దోషము: %s\n"
 
-#: ../programs/gvfs-mount.c:697
+#: ../programs/gvfs-mount.c:710
 #, c-format
 msgid "Mounted %s at %s\n"
 msgstr "%sను %s వద్ద మౌంట్‌చేసింది\n"
 
-#: ../programs/gvfs-mount.c:748
+#: ../programs/gvfs-mount.c:761
 #, c-format
 msgid "No volume for device file %s\n"
 msgstr "పరికర ఫైలు %s కొరకు వాల్యూమ్ లేదు\n"
 
-#: ../programs/gvfs-mount.c:939
+#: ../programs/gvfs-mount.c:952
 msgid "- mount <location>"
 msgstr "- మౌంట్ <location>"
 
