@@ -1,3 +1,12 @@
+Major changes in 1.11.0
+=======================
+* volume monitors: Keep remote volume monitor proxies alive forever
+* volume monitors: Support get_sort_key() in out-of-process volume monitors and gvfs-mount(1)
+* daemon: Grab a pointer to the GvfsBackend before unref'ing a job source, preventing a crash
+* build: Purge hardcoded -DG_DISABLE_DEPRECATED
+* Adapt to GLib 2.31.0 deprecations and new API
+* Translation updates
+
 Major changes in 1.10.0
 =======================
 * smb: Ignore read-only attribute for directories
