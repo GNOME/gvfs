@@ -11,8 +11,8 @@
 static gsize trash_expunge_initialised;
 static GHashTable *trash_expunge_queue;
 static gboolean trash_expunge_alive;
-static GMutex *trash_expunge_lock;
-static GCond *trash_expunge_wait;
+static GMutex trash_expunge_lock;
+static GCond trash_expunge_wait;
 
 static void
 trash_expunge_delete_everything_under (GFile *directory)
@@ -66,9 +66,9 @@ just_return_true (gpointer a,
 static gpointer
 trash_expunge_thread (gpointer data)
 {
-  GTimeVal timeval;
+  gint64 end_time;
 
-  g_mutex_lock (trash_expunge_lock);
+  g_mutex_lock (&trash_expunge_lock);
 
   do
     {
@@ -80,23 +80,22 @@ trash_expunge_thread (gpointer data)
                                          just_return_true, NULL);
           g_hash_table_remove (trash_expunge_queue, directory);
 
-          g_mutex_unlock (trash_expunge_lock);
+          g_mutex_unlock (&trash_expunge_lock);
           trash_expunge_delete_everything_under (directory);
-          g_mutex_lock (trash_expunge_lock);
+          g_mutex_lock (&trash_expunge_lock);
 
           g_object_unref (directory);
         }
 
-      g_get_current_time (&timeval);
-      g_time_val_add (&timeval, 60 * 1000000); /* 1min */
+      end_time = g_get_monotonic_time () + 1 * G_TIME_SPAN_MINUTE;
     }
-  while (g_cond_timed_wait (trash_expunge_wait,
-                            trash_expunge_lock,
-                            &timeval));
+  while (g_cond_wait_until (&trash_expunge_wait,
+                            &trash_expunge_lock,
+                            end_time));
 
   trash_expunge_alive = FALSE;
 
-  g_mutex_unlock (trash_expunge_lock);
+  g_mutex_unlock (&trash_expunge_lock);
 
   return NULL;
 }
@@ -108,13 +107,13 @@ trash_expunge (GFile *directory)
     {
       trash_expunge_queue = g_hash_table_new (g_file_hash,
                                               (GEqualFunc) g_file_equal);
-      trash_expunge_lock = g_mutex_new ();
-      trash_expunge_wait = g_cond_new ();
+      g_mutex_init (&trash_expunge_lock);
+      g_cond_init (&trash_expunge_wait);
 
       g_once_init_leave (&trash_expunge_initialised, 1);
     }
 
-  g_mutex_lock (trash_expunge_lock);
+  g_mutex_lock (&trash_expunge_lock);
 
   if (!g_hash_table_lookup (trash_expunge_queue, directory))
     g_hash_table_insert (trash_expunge_queue,
@@ -125,12 +124,12 @@ trash_expunge (GFile *directory)
     {
       GThread *thread;
 
-      thread = g_thread_create (trash_expunge_thread, NULL, FALSE, NULL);
+      thread = g_thread_new ("trash-expunge", trash_expunge_thread, NULL);
       g_assert (thread != NULL);
       trash_expunge_alive = TRUE;
     }
   else
-    g_cond_signal (trash_expunge_wait);
+    g_cond_signal (&trash_expunge_wait);
 
-  g_mutex_unlock (trash_expunge_lock);
+  g_mutex_unlock (&trash_expunge_lock);
 }

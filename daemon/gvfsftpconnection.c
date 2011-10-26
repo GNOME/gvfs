@@ -73,7 +73,7 @@ g_vfs_ftp_connection_new (GSocketConnectable *addr,
 
   conn = g_slice_new0 (GVfsFtpConnection);
   conn->client = g_socket_client_new ();
-  conn->debug_id = g_atomic_int_exchange_and_add (&debug_id, 1);
+  conn->debug_id = g_atomic_int_add (&debug_id, 1);
   conn->commands = G_IO_STREAM (g_socket_client_connect (conn->client,
                                                          addr,
                                                          cancellable,

@@ -100,8 +100,8 @@ struct _GVfsBackendFtp
   GVfsFtpDirCache *     dir_cache;              /* directory cache */
 
   /* connection collection - accessed from gvfsftptask.c */
-  GMutex *              mutex;                  /* mutex protecting the following variables */
-  GCond *               cond;                   /* cond used to signal tasks waiting on the mutex */
+  GMutex                mutex;                  /* mutex protecting the following variables */
+  GCond                 cond;                   /* cond used to signal tasks waiting on the mutex */
   GQueue *              queue;                  /* queue containing the connections */
   guint                	connections;            /* current number of connections */
   guint                 busy_connections;       /* current number of connections being used for reads/writes */

@@ -382,8 +382,8 @@ g_vfs_backend_ftp_finalize (GObject *object)
 
   /* has been cleared on unmount */
   g_assert (ftp->queue == NULL);
-  g_cond_free (ftp->cond);
-  g_mutex_free (ftp->mutex);
+  g_cond_clear (&ftp->cond);
+  g_mutex_clear (&ftp->mutex);
 
   g_free (ftp->user);
   g_free (ftp->password);
@@ -395,8 +395,6 @@ g_vfs_backend_ftp_finalize (GObject *object)
 static void
 g_vfs_backend_ftp_init (GVfsBackendFtp *ftp)
 {
-  ftp->mutex = g_mutex_new ();
-  ftp->cond = g_cond_new ();
 }
 
 static void
@@ -698,7 +696,7 @@ do_unmount (GVfsBackend *   backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpConnection *conn;
 
-  g_mutex_lock (ftp->mutex);
+  g_mutex_lock (&ftp->mutex);
   while ((conn = g_queue_pop_head (ftp->queue)))
     {
       /* FIXME: properly quit */
@@ -706,8 +704,8 @@ do_unmount (GVfsBackend *   backend,
     }
   g_queue_free (ftp->queue);
   ftp->queue = NULL;
-  g_cond_broadcast (ftp->cond);
-  g_mutex_unlock (ftp->mutex);
+  g_cond_broadcast (&ftp->cond);
+  g_mutex_unlock (&ftp->mutex);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 

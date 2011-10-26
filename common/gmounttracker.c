@@ -49,7 +49,7 @@ struct _GMountTracker
 {
   GObject parent_instance;
 
-  GMutex *lock;
+  GMutex lock;
   GList *mounts;
   DBusConnection *connection;
 };
@@ -258,8 +258,7 @@ g_mount_tracker_finalize (GObject *object)
 
   tracker = G_MOUNT_TRACKER (object);
 
-  if (tracker->lock)
-    g_mutex_free (tracker->lock);
+  g_mutex_clear (&tracker->lock);
   
   g_list_foreach (tracker->mounts,
 		  (GFunc)g_mount_info_unref, NULL);
@@ -382,21 +381,18 @@ static void
 g_mount_tracker_add_mount (GMountTracker *tracker,
 			   GMountInfo *info)
 {
-  if (tracker->lock)
-    g_mutex_lock (tracker->lock);
+  g_mutex_lock (&tracker->lock);
   
   /* Don't add multiple times */
   if (g_mount_tracker_find (tracker, info))
     {
-      if (tracker->lock)
-	g_mutex_unlock (tracker->lock);
+      g_mutex_unlock (&tracker->lock);
       return;
     }
 
   tracker->mounts = g_list_prepend (tracker->mounts, g_mount_info_ref (info));
 
-  if (tracker->lock)
-    g_mutex_unlock (tracker->lock);
+  g_mutex_unlock (&tracker->lock);
   
   g_signal_emit (tracker, signals[MOUNTED], 0, info);
 }
@@ -408,16 +404,14 @@ g_mount_tracker_remove_mount (GMountTracker *tracker,
   GList *l;
   GMountInfo *old_info;
 
-  if (tracker->lock)
-    g_mutex_lock (tracker->lock);
+  g_mutex_lock (&tracker->lock);
   
   l = g_mount_tracker_find (tracker, info);
   
   /* Don't remove multiple times */
   if (l == NULL)
     {
-      if (tracker->lock)
-	g_mutex_unlock (tracker->lock);
+      g_mutex_unlock (&tracker->lock);
       return;
     }
 
@@ -425,8 +419,7 @@ g_mount_tracker_remove_mount (GMountTracker *tracker,
   
   tracker->mounts = g_list_delete_link (tracker->mounts, l);
   
-  if (tracker->lock)
-    g_mutex_unlock (tracker->lock);
+  g_mutex_unlock (&tracker->lock);
 
   g_signal_emit (tracker, signals[UNMOUNTED], 0, old_info);
   g_mount_info_unref (old_info);
@@ -548,8 +541,6 @@ init_connection (GMountTracker *tracker)
 static void
 g_mount_tracker_init (GMountTracker *tracker)
 {
-  if (g_thread_supported ())
-    tracker->lock = g_mutex_new ();
 }
 
 
@@ -588,8 +579,7 @@ g_mount_tracker_list_mounts (GMountTracker *tracker)
   GList *res, *l;
   GMountInfo *copy;
 
-  if (tracker->lock)
-    g_mutex_lock (tracker->lock);
+  g_mutex_lock (&tracker->lock);
   
   res = NULL;
   for (l = tracker->mounts; l != NULL; l = l->next)
@@ -598,8 +588,7 @@ g_mount_tracker_list_mounts (GMountTracker *tracker)
       res = g_list_prepend (res, copy);
     }
 
-  if (tracker->lock)
-    g_mutex_unlock (tracker->lock);
+  g_mutex_unlock (&tracker->lock);
   
   return g_list_reverse (res);
 }
@@ -611,8 +600,7 @@ g_mount_tracker_find_by_mount_spec (GMountTracker *tracker,
   GList *l;
   GMountInfo *info, *found;
 
-  if (tracker->lock)
-    g_mutex_lock (tracker->lock);
+  g_mutex_lock (&tracker->lock);
 
   found = NULL;
   for (l = tracker->mounts; l != NULL; l = l->next)
@@ -626,8 +614,7 @@ g_mount_tracker_find_by_mount_spec (GMountTracker *tracker,
 	}
     }
 
-  if (tracker->lock)
-    g_mutex_unlock (tracker->lock);
+  g_mutex_unlock (&tracker->lock);
   
   return found;
 }
@@ -641,8 +628,7 @@ g_mount_tracker_has_mount_spec (GMountTracker *tracker,
   GMountInfo *info;
   gboolean found;
 
-  if (tracker->lock)
-    g_mutex_lock (tracker->lock);
+  g_mutex_lock (&tracker->lock);
 
   found = FALSE;
   for (l = tracker->mounts; l != NULL; l = l->next)
@@ -656,8 +642,7 @@ g_mount_tracker_has_mount_spec (GMountTracker *tracker,
 	}
     }
 
-  if (tracker->lock)
-    g_mutex_unlock (tracker->lock);
+  g_mutex_unlock (&tracker->lock);
   
   return found;
 }

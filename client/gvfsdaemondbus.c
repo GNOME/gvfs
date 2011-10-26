@@ -53,7 +53,10 @@ typedef struct {
 static gint32 vfs_data_slot = -1;
 static GOnce once_init_dbus = G_ONCE_INIT;
 
-static GStaticPrivate local_connections = G_STATIC_PRIVATE_INIT;
+typedef struct _ThreadLocalConnections ThreadLocalConnections;
+static void free_local_connections (ThreadLocalConnections *local);
+
+static GPrivate local_connections = G_PRIVATE_INIT((GDestroyNotify)free_local_connections);
 
 /* dbus id -> async connection */
 static GHashTable *async_map = NULL;
@@ -862,10 +865,10 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
  *               get per-thread synchronous dbus connections             *
  *************************************************************************/
 
-typedef struct {
+struct _ThreadLocalConnections {
   GHashTable *connections;
   DBusConnection *session_bus;
-} ThreadLocalConnections;
+};
 
 static void
 free_mount_connection (DBusConnection *conn)
@@ -891,7 +894,7 @@ invalidate_local_connection (const char *dbus_id,
   
   _g_daemon_vfs_invalidate_dbus_id (dbus_id);
 
-  local = g_static_private_get (&local_connections);
+  local = g_private_get (&local_connections);
   if (local)
     g_hash_table_remove (local->connections, dbus_id);
   
@@ -916,13 +919,13 @@ _g_dbus_connection_get_sync (const char *dbus_id,
 
   g_once (&once_init_dbus, vfs_dbus_init, NULL);
 
-  local = g_static_private_get (&local_connections);
+  local = g_private_get (&local_connections);
   if (local == NULL)
     {
       local = g_new0 (ThreadLocalConnections, 1);
       local->connections = g_hash_table_new_full (g_str_hash, g_str_equal,
 						  g_free, (GDestroyNotify)free_mount_connection);
-      g_static_private_set (&local_connections, local, (GDestroyNotify)free_local_connections);
+      g_private_set (&local_connections, local);
     }
 
   if (dbus_id == NULL)

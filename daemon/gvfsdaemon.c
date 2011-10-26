@@ -58,7 +58,7 @@ struct _GVfsDaemon
 {
   GObject parent_instance;
 
-  GMutex *lock;
+  GMutex lock;
   gboolean main_daemon;
 
   GThreadPool *thread_pool;
@@ -119,7 +119,7 @@ g_vfs_daemon_finalize (GObject *object)
   g_assert (daemon->jobs == NULL);
 
   g_hash_table_destroy (daemon->registered_paths);
-  g_mutex_free (daemon->lock);
+  g_mutex_clear (&daemon->lock);
 
   if (G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize) (object);
@@ -150,7 +150,6 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
   gint max_threads = 1; /* TODO: handle max threads */
   DBusError error;
   
-  daemon->lock = g_mutex_new ();
   daemon->session_bus = dbus_bus_get (DBUS_BUS_SESSION, NULL);
   daemon->thread_pool = g_thread_pool_new (job_handler_callback,
 					   daemon,
@@ -326,7 +325,7 @@ static void
 job_source_closed_callback (GVfsJobSource *job_source,
 			    GVfsDaemon *daemon)
 {
-  g_mutex_lock (daemon->lock);
+  g_mutex_lock (&daemon->lock);
   
   daemon->job_sources = g_list_remove (daemon->job_sources,
 				       job_source);
@@ -343,7 +342,7 @@ job_source_closed_callback (GVfsJobSource *job_source,
   if (daemon->job_sources == NULL)
     daemon_schedule_exit (daemon);
   
-  g_mutex_unlock (daemon->lock);
+  g_mutex_unlock (&daemon->lock);
 }
 
 static void
@@ -351,7 +350,7 @@ g_vfs_daemon_re_register_job_sources (GVfsDaemon *daemon)
 {
   GList *l;
   
-  g_mutex_lock (daemon->lock);
+  g_mutex_lock (&daemon->lock);
 
   for (l = daemon->job_sources; l != NULL; l = l->next)
     {
@@ -366,7 +365,7 @@ g_vfs_daemon_re_register_job_sources (GVfsDaemon *daemon)
 	}
     }
   
-  g_mutex_unlock (daemon->lock);
+  g_mutex_unlock (&daemon->lock);
 }
 
 void
@@ -375,7 +374,7 @@ g_vfs_daemon_add_job_source (GVfsDaemon *daemon,
 {
   g_debug ("Added new job source %p (%s)\n", job_source, g_type_name_from_instance ((gpointer)job_source));
   
-  g_mutex_lock (daemon->lock);
+  g_mutex_lock (&daemon->lock);
 
   daemon_unschedule_exit (daemon);
   
@@ -387,7 +386,7 @@ g_vfs_daemon_add_job_source (GVfsDaemon *daemon,
   g_signal_connect (job_source, "closed",
 		    (GCallback)job_source_closed_callback, daemon);
   
-  g_mutex_unlock (daemon->lock);
+  g_mutex_unlock (&daemon->lock);
 }
 
 /* This registers a dbus callback on *all* connections, client and session bus */
@@ -437,9 +436,9 @@ job_finished_callback (GVfsJob *job,
 					(GCallback)job_finished_callback,
 					daemon);
 
-  g_mutex_lock (daemon->lock);
+  g_mutex_lock (&daemon->lock);
   daemon->jobs = g_list_remove (daemon->jobs, job);
-  g_mutex_unlock (daemon->lock);
+  g_mutex_unlock (&daemon->lock);
   
   g_object_unref (job);
 }
@@ -454,9 +453,9 @@ g_vfs_daemon_queue_job (GVfsDaemon *daemon,
   g_signal_connect (job, "finished", (GCallback)job_finished_callback, daemon);
   g_signal_connect (job, "new_source", (GCallback)job_new_source_callback, daemon);
   
-  g_mutex_lock (daemon->lock);
+  g_mutex_lock (&daemon->lock);
   daemon->jobs = g_list_prepend (daemon->jobs, job);
-  g_mutex_unlock (daemon->lock);
+  g_mutex_unlock (&daemon->lock);
   
   /* Can we start the job immediately / async */
   if (!g_vfs_job_try (job))
@@ -949,7 +948,7 @@ daemon_message_func (DBusConnection *conn,
 				 DBUS_TYPE_UINT32, &serial,
 				 DBUS_TYPE_INVALID))
 	{
-	  g_mutex_lock (daemon->lock);
+	  g_mutex_lock (&daemon->lock);
 	  for (l = daemon->jobs; l != NULL; l = l->next)
 	    {
 	      GVfsJob *job = l->data;
@@ -962,7 +961,7 @@ daemon_message_func (DBusConnection *conn,
 		  break;
 		}
 	    }
-	  g_mutex_unlock (daemon->lock);
+	  g_mutex_unlock (&daemon->lock);
 
 
 	  if (job_to_cancel)
@@ -1007,7 +1006,7 @@ peer_to_peer_filter_func (DBusConnection *conn,
     {
       GList *l;
 
-      g_mutex_lock (daemon->lock);
+      g_mutex_lock (&daemon->lock);
       for (l = daemon->jobs; l != NULL; l = l->next)
         {
           GVfsJob *job = l->data;
@@ -1016,7 +1015,7 @@ peer_to_peer_filter_func (DBusConnection *conn,
               G_VFS_JOB_DBUS (job)->connection == conn)
             g_vfs_job_cancel (job);
         }
-      g_mutex_unlock (daemon->lock);
+      g_mutex_unlock (&daemon->lock);
 
       /* The peer-to-peer connection was disconnected */
       dbus_connection_unref (conn);

@@ -20,7 +20,7 @@ typedef struct
 
 struct OPAQUE_TYPE__TrashRoot
 {
-  GStaticRWLock lock;
+  GRWLock lock;
   GQueue *notifications;
 
   trash_item_notify create_notify;
@@ -297,12 +297,12 @@ trash_root_thaw (TrashRoot *root)
   /* send notifications until we have none */
   while (TRUE)
     {
-      g_static_rw_lock_writer_lock (&root->lock);
+      g_rw_lock_writer_lock (&root->lock);
       if (g_queue_is_empty (root->notifications))
         break;
 
       closure = g_queue_pop_head (root->notifications);
-      g_static_rw_lock_writer_unlock (&root->lock);
+      g_rw_lock_writer_unlock (&root->lock);
 
       trash_item_invoke_closure (closure);
     }
@@ -312,7 +312,7 @@ trash_root_thaw (TrashRoot *root)
   size_changed = root->old_size != size;
   root->old_size = size;
 
-  g_static_rw_lock_writer_unlock (&root->lock);
+  g_rw_lock_writer_unlock (&root->lock);
 
   if (size_changed)
     root->size_change (root->user_data);
@@ -336,7 +336,7 @@ trash_root_new (trash_item_notify create,
   TrashRoot *root;
 
   root = g_slice_new (TrashRoot);
-  g_static_rw_lock_init (&root->lock);
+  g_rw_lock_init (&root->lock);
   root->create_notify = create;
   root->delete_notify = delete;
   root->size_change = size_change;
@@ -376,11 +376,11 @@ trash_root_add_item (TrashRoot *list,
 
   item = trash_item_new (list, file, in_homedir);
 
-  g_static_rw_lock_writer_lock (&list->lock);
+  g_rw_lock_writer_lock (&list->lock);
 
   if (g_hash_table_lookup (list->item_table, item->escaped_name))
     {
-      g_static_rw_lock_writer_unlock (&list->lock);
+      g_rw_lock_writer_unlock (&list->lock);
 
       /* already exists... */
       trash_item_unref (item);
@@ -390,7 +390,7 @@ trash_root_add_item (TrashRoot *list,
   g_hash_table_insert (list->item_table, item->escaped_name, item);
   trash_item_queue_notify (item, item->root->create_notify);
 
-  g_static_rw_lock_writer_unlock (&list->lock);
+  g_rw_lock_writer_unlock (&list->lock);
 }
 
 void
@@ -402,9 +402,9 @@ trash_root_remove_item (TrashRoot *list,
 
   escaped = trash_item_escape_name (file, in_homedir);
 
-  g_static_rw_lock_writer_lock (&list->lock);
+  g_rw_lock_writer_lock (&list->lock);
   g_hash_table_remove (list->item_table, escaped);
-  g_static_rw_lock_writer_unlock (&list->lock);
+  g_rw_lock_writer_unlock (&list->lock);
 
   g_free (escaped);
 }
@@ -414,13 +414,13 @@ trash_root_get_items (TrashRoot *root)
 {
   GList *items, *node;
 
-  g_static_rw_lock_reader_lock (&root->lock);
+  g_rw_lock_reader_lock (&root->lock);
 
   items = g_hash_table_get_values (root->item_table);
   for (node = items; node; node = node->next)
     trash_item_ref (node->data);
 
-  g_static_rw_lock_reader_unlock (&root->lock);
+  g_rw_lock_reader_unlock (&root->lock);
 
   return items;
 }
@@ -441,12 +441,12 @@ trash_root_lookup_item (TrashRoot  *root,
 {
   TrashItem *item;
 
-  g_static_rw_lock_reader_lock (&root->lock);
+  g_rw_lock_reader_lock (&root->lock);
 
   if ((item = g_hash_table_lookup (root->item_table, escaped)))
     trash_item_ref (item);
 
-  g_static_rw_lock_reader_unlock (&root->lock);
+  g_rw_lock_reader_unlock (&root->lock);
 
   return item;
 }
@@ -456,9 +456,9 @@ trash_root_get_n_items (TrashRoot *root)
 {
   int size;
 
-  g_static_rw_lock_reader_lock (&root->lock);
+  g_rw_lock_reader_lock (&root->lock);
   size = g_hash_table_size (root->item_table);
-  g_static_rw_lock_reader_unlock (&root->lock);
+  g_rw_lock_reader_unlock (&root->lock);
 
   return size;
 }
@@ -517,9 +517,9 @@ trash_item_restore (TrashItem  *item,
                    G_FILE_COPY_NO_FALLBACK_FOR_MOVE,
                    NULL, NULL, NULL, error))
     {
-      g_static_rw_lock_writer_lock (&item->root->lock);
+      g_rw_lock_writer_lock (&item->root->lock);
       g_hash_table_remove (item->root->item_table, item->escaped_name);
-      g_static_rw_lock_writer_unlock (&item->root->lock);
+      g_rw_lock_writer_unlock (&item->root->lock);
 
       {
         GFile *trashinfo;

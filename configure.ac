@@ -1,6 +1,6 @@
 AC_PREREQ([2.64])
 
-AC_INIT([gvfs],[1.11.0],[http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs])
+AC_INIT([gvfs],[1.11.1],[http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs])
 AM_INIT_AUTOMAKE([1.11.1 no-dist-gzip dist-xz tar-pax])
 AM_CONFIG_HEADER(config.h)
 
@@ -46,7 +46,7 @@ GTK_DOC_CHECK
 DISTCHECK_CONFIGURE_FLAGS="--enable-gtk-doc"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 
-PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.29.14 gthread-2.0 gobject-2.0 gmodule-no-export-2.0 gio-unix-2.0 gio-2.0 )
+PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.31.0 gobject-2.0 gmodule-no-export-2.0 gio-unix-2.0 gio-2.0 )
 
 PKG_CHECK_MODULES(DBUS, dbus-1)
 

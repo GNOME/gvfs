@@ -85,8 +85,8 @@ struct _GVfsBackendObexftp
   DBusGProxy *session_proxy;
 
   /* Use for the async notifications and errors */
-  GCond *cond;
-  GMutex *mutex;
+  GCond cond;
+  GMutex mutex;
   int status;
   gboolean doing_io;
   GError *error;
@@ -494,8 +494,8 @@ g_vfs_backend_obexftp_finalize (GObject *object)
 
   if (backend->session_proxy != NULL)
         g_object_unref (backend->session_proxy);
-  g_mutex_free (backend->mutex);
-  g_cond_free (backend->cond);
+  g_mutex_clear (&backend->mutex);
+  g_cond_clear (&backend->cond);
 
   if (G_OBJECT_CLASS (g_vfs_backend_obexftp_parent_class)->finalize)
         (*G_OBJECT_CLASS (g_vfs_backend_obexftp_parent_class)->finalize) (object);
@@ -530,8 +530,6 @@ g_vfs_backend_obexftp_init (GVfsBackendObexftp *backend)
       return;
   }
 
-  backend->mutex = g_mutex_new ();
-  backend->cond = g_cond_new ();
   backend->manager_proxy = dbus_g_proxy_new_for_name (backend->connection,
                                                       "org.openobex",
                                                       "/org/openobex",
@@ -759,18 +757,18 @@ error_occurred_cb (DBusGProxy *proxy, const gchar *error_name, const gchar *erro
     }
 
   /* Something is waiting on us */
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
   if (op_backend->doing_io)
     {
       op_backend->status = ASYNC_ERROR;
       op_backend->error = g_error_new_literal (DBUS_GERROR,
                                                DBUS_GERROR_REMOTE_EXCEPTION,
                                                error_message);
-      g_cond_signal (op_backend->cond);
-      g_mutex_unlock (op_backend->mutex);
+      g_cond_signal (&op_backend->cond);
+      g_mutex_unlock (&op_backend->mutex);
       return;
     }
-  g_mutex_unlock (op_backend->mutex);
+  g_mutex_unlock (&op_backend->mutex);
 
   g_message ("Unhandled error, file a bug");
   _exit (1);
@@ -785,13 +783,13 @@ session_connect_error_cb (DBusGProxy *proxy,
 {
   GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (user_data);
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
   op_backend->status = ASYNC_ERROR;
   op_backend->error = g_error_new_literal (DBUS_GERROR,
                                            DBUS_GERROR_REMOTE_EXCEPTION,
                                            error_message);
-  g_cond_signal (op_backend->cond);
-  g_mutex_unlock (op_backend->mutex);
+  g_cond_signal (&op_backend->cond);
+  g_mutex_unlock (&op_backend->mutex);
 }
 
 static void
@@ -801,10 +799,10 @@ session_connected_cb (DBusGProxy *proxy,
 {
   GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (user_data);
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
   op_backend->status = ASYNC_SUCCESS;
-  g_cond_signal (op_backend->cond);
-  g_mutex_unlock (op_backend->mutex);
+  g_cond_signal (&op_backend->cond);
+  g_mutex_unlock (&op_backend->mutex);
 }
 
 static void
@@ -814,10 +812,10 @@ cancelled_cb (DBusGProxy *proxy, gpointer user_data)
 
   g_message ("transfer got cancelled");
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
   op_backend->status = ASYNC_ERROR;
-  g_cond_signal (op_backend->cond);
-  g_mutex_unlock (op_backend->mutex);
+  g_cond_signal (&op_backend->cond);
+  g_mutex_unlock (&op_backend->mutex);
 }
 
 static void
@@ -979,17 +977,16 @@ do_mount (GVfsBackend *backend,
 
   /* Now wait until the device is connected */
   count = 0;
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
 
   while (op_backend->status == ASYNC_PENDING && count < 100) {
-      GTimeVal val;
-      g_get_current_time (&val);
-      g_time_val_add (&val, 100000);
+      gint64 end_time;
+      end_time = g_get_monotonic_time () + 100 * G_TIME_SPAN_MILLISECOND;
       count++;
-      if (g_cond_timed_wait (op_backend->cond, op_backend->mutex, &val) != FALSE)
+      if (g_cond_wait_until (&op_backend->cond, &op_backend->mutex, end_time) != FALSE)
             break;
   }
-  g_mutex_unlock (op_backend->mutex);
+  g_mutex_unlock (&op_backend->mutex);
 
   if (op_backend->status == ASYNC_ERROR || op_backend->status == ASYNC_PENDING)
     {
@@ -1026,10 +1023,10 @@ transfer_started_cb (DBusGProxy *proxy, const gchar *filename,
 
   g_message ("transfer of %s to %s started", filename, local_path);
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
   op_backend->status = ASYNC_SUCCESS;
-  g_cond_signal (op_backend->cond);
-  g_mutex_unlock (op_backend->mutex);
+  g_cond_signal (&op_backend->cond);
+  g_mutex_unlock (&op_backend->mutex);
 }
 
 static void
@@ -1047,7 +1044,7 @@ do_open_for_read (GVfsBackend *backend,
 
   g_debug ("+ do_open_for_read, filename: %s\n", filename);
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
   op_backend->doing_io = TRUE;
 
   /* Change into the directory and cache the file size */
@@ -1055,7 +1052,7 @@ do_open_for_read (GVfsBackend *backend,
   if (_query_file_info_helper (backend, filename, info, &error) == FALSE)
     {
       op_backend->doing_io = FALSE;
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       g_object_unref (info);
@@ -1065,7 +1062,7 @@ do_open_for_read (GVfsBackend *backend,
   if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
     {
       op_backend->doing_io = FALSE;
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_IS_DIRECTORY,
                         _("Can't open directory"));
@@ -1079,7 +1076,7 @@ do_open_for_read (GVfsBackend *backend,
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
       op_backend->doing_io = FALSE;
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_CANCELLED,
                         _("Operation was cancelled"));
@@ -1091,7 +1088,7 @@ do_open_for_read (GVfsBackend *backend,
   if (fd < 0)
     {
       op_backend->doing_io = FALSE;
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -1100,7 +1097,7 @@ do_open_for_read (GVfsBackend *backend,
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
       op_backend->doing_io = FALSE;
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                                    G_IO_ERROR_CANCELLED,
                                    _("Operation was cancelled"));
@@ -1134,13 +1131,13 @@ do_open_for_read (GVfsBackend *backend,
       close (fd);
 
       op_backend->doing_io = FALSE;
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       return;
     }
 
   /* Wait for TransferStarted or ErrorOccurred to have happened */
   while (op_backend->status == ASYNC_PENDING)
-        g_cond_wait (op_backend->cond, op_backend->mutex);
+        g_cond_wait (&op_backend->cond, &op_backend->mutex);
   success = op_backend->status;
   dbus_g_proxy_disconnect_signal(op_backend->session_proxy, "TransferStarted",
                                  G_CALLBACK(transfer_started_cb), op_backend);
@@ -1158,7 +1155,7 @@ do_open_for_read (GVfsBackend *backend,
   if (success == ASYNC_ERROR)
     {
       op_backend->doing_io = FALSE;
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       close (fd);
       g_vfs_job_failed_from_error (G_VFS_JOB (job),
                                    op_backend->error);
@@ -1179,7 +1176,7 @@ do_open_for_read (GVfsBackend *backend,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   op_backend->doing_io = FALSE;
-  g_mutex_unlock (op_backend->mutex);
+  g_mutex_unlock (&op_backend->mutex);
 }
 
 static int
@@ -1266,7 +1263,7 @@ do_close_read (GVfsBackend *backend,
         return;
   }
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
 
   if (busy > 0)
     {
@@ -1276,11 +1273,11 @@ do_close_read (GVfsBackend *backend,
                          G_TYPE_INVALID, G_TYPE_INVALID) != FALSE)
         {
           while (op_backend->status == ASYNC_PENDING)
-                g_cond_wait (op_backend->cond, op_backend->mutex);
+                g_cond_wait (&op_backend->cond, &op_backend->mutex);
         }
     }
 
-  g_mutex_unlock (op_backend->mutex);
+  g_mutex_unlock (&op_backend->mutex);
 
   close (backend_handle->fd);
   g_free (backend_handle->source);
@@ -1304,17 +1301,17 @@ do_query_info (GVfsBackend *backend,
 
   g_debug ("+ do_query_info, filename: %s\n", filename);
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
 
   if (_query_file_info_helper (backend, filename, info, &error) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
     }
 
-  g_mutex_unlock (op_backend->mutex);
+  g_mutex_unlock (&op_backend->mutex);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -1341,14 +1338,14 @@ do_query_fs_info (GVfsBackend *backend,
 
   g_debug ("+ do_query_fs_info, filename: %s\n", filename);
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
 
   /* Get the capabilities */
   if (dbus_g_proxy_call (op_backend->session_proxy, "GetCapability", &error,
                          G_TYPE_INVALID,
                          G_TYPE_STRING, &caps_str, G_TYPE_INVALID) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -1356,7 +1353,7 @@ do_query_fs_info (GVfsBackend *backend,
 
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_CANCELLED,
                         _("Operation was cancelled"));
@@ -1368,7 +1365,7 @@ do_query_fs_info (GVfsBackend *backend,
   if (caps_str == NULL)
     {
       /* Best effort, don't error out */
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_succeeded (G_VFS_JOB (job));
       return;
     }
@@ -1377,7 +1374,7 @@ do_query_fs_info (GVfsBackend *backend,
   g_free (caps_str);
   if (caps == NULL)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -1395,7 +1392,7 @@ do_query_fs_info (GVfsBackend *backend,
     }
   if (has_free_memory == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       /* Best effort, don't error out */
       g_vfs_job_succeeded (G_VFS_JOB (job));
       return;
@@ -1411,7 +1408,7 @@ do_query_fs_info (GVfsBackend *backend,
 
   if (_query_file_info_helper (backend, filename, info, &error) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       ovu_caps_free (caps);
@@ -1420,7 +1417,7 @@ do_query_fs_info (GVfsBackend *backend,
 
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_CANCELLED,
                         _("Operation was cancelled"));
@@ -1457,7 +1454,7 @@ set_info_from_memory:
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  g_mutex_unlock (op_backend->mutex);
+  g_mutex_unlock (&op_backend->mutex);
 
   g_debug ("- do_query_fs_info\n");
 }
@@ -1476,11 +1473,11 @@ do_enumerate (GVfsBackend *backend,
 
   g_debug ("+ do_enumerate, filename: %s\n", filename);
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
 
   if (_change_directory (op_backend, filename, &error) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -1489,7 +1486,7 @@ do_enumerate (GVfsBackend *backend,
   files = NULL;
   if (_retrieve_folder_listing (backend, filename, &files, &error) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -1497,7 +1494,7 @@ do_enumerate (GVfsBackend *backend,
 
   if (gvfsbackendobexftp_fl_parser_parse (files, strlen (files), &elements, &error) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       /* See http://web.archive.org/web/20070826221251/http://docs.kde.org/development/en/extragear-pim/kdebluetooth/components.kio_obex.html#devices
        * for the reasoning */
       if (strstr (files, "SYSTEM\"obex-folder-listing.dtd") != NULL && _is_nokia_3650 (op_backend->bdaddr))
@@ -1525,7 +1522,7 @@ do_enumerate (GVfsBackend *backend,
   g_list_free (elements);
   g_vfs_job_enumerate_done (job);
 
-  g_mutex_unlock (op_backend->mutex);
+  g_mutex_unlock (&op_backend->mutex);
 
   g_debug ("- do_enumerate\n");
 }
@@ -1549,7 +1546,7 @@ push_transfer_started_cb (DBusGProxy *proxy,
 
   g_message ("transfer of %s to %s started", filename, local_path);
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
 
   op_backend->status = ASYNC_RUNNING;
   job_data->total_bytes = (goffset) total_bytes;
@@ -1557,8 +1554,8 @@ push_transfer_started_cb (DBusGProxy *proxy,
     job_data->progress_callback (0, job_data->total_bytes,
                                  job_data->progress_callback_data);
 
-  g_cond_signal (op_backend->cond);
-  g_mutex_unlock (op_backend->mutex);
+  g_cond_signal (&op_backend->cond);
+  g_mutex_unlock (&op_backend->mutex);
 }
 
 static void
@@ -1570,12 +1567,12 @@ push_transfer_completed_cb (DBusGProxy *proxy,
 
   g_message ("transfer completed");
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
 
   op_backend->status = ASYNC_SUCCESS;
 
-  g_cond_signal (op_backend->cond);
-  g_mutex_unlock (op_backend->mutex);
+  g_cond_signal (&op_backend->cond);
+  g_mutex_unlock (&op_backend->mutex);
 }
 
 static void
@@ -1657,7 +1654,7 @@ _push_single_file_helper (GVfsBackendObexftp *op_backend,
 
   /* wait for the TransferStarted or ErrorOccurred signal */
   while (op_backend->status == ASYNC_PENDING)
-    g_cond_wait (op_backend->cond, op_backend->mutex);
+    g_cond_wait (&op_backend->cond, &op_backend->mutex);
 
   dbus_g_proxy_disconnect_signal (op_backend->session_proxy, "TransferStarted",
                                   G_CALLBACK (push_transfer_started_cb), job_data);
@@ -1678,7 +1675,7 @@ _push_single_file_helper (GVfsBackendObexftp *op_backend,
     }
 
   while (op_backend->status == ASYNC_RUNNING)
-    g_cond_wait (op_backend->cond, op_backend->mutex);
+    g_cond_wait (&op_backend->cond, &op_backend->mutex);
 
   dbus_g_proxy_disconnect_signal (op_backend->session_proxy, "TransferCompleted", 
                                   G_CALLBACK (push_transfer_completed_cb), job_data);
@@ -1717,7 +1714,7 @@ do_push (GVfsBackend *backend,
 
   g_debug ("+ do_push, destination: %s, local_path: %s\n", destination, local_path);
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
   op_backend->doing_io = TRUE;
 
   overwrite = (flags & G_FILE_COPY_OVERWRITE);
@@ -1728,7 +1725,7 @@ do_push (GVfsBackend *backend,
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
       op_backend->doing_io = FALSE;
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
 
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_CANCELLED,
@@ -1743,7 +1740,7 @@ do_push (GVfsBackend *backend,
       if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
         {
           op_backend->doing_io = FALSE;
-          g_mutex_unlock (op_backend->mutex);
+          g_mutex_unlock (&op_backend->mutex);
 
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
@@ -1766,7 +1763,7 @@ do_push (GVfsBackend *backend,
   if (is_dir)
     {
       op_backend->doing_io = FALSE;
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
 
       if (target_type != 0)
         {
@@ -1799,7 +1796,7 @@ do_push (GVfsBackend *backend,
       if (target_type != 0)
         {
           op_backend->doing_io = FALSE;
-          g_mutex_unlock (op_backend->mutex);
+          g_mutex_unlock (&op_backend->mutex);
 
           if (overwrite)
             {
@@ -1831,7 +1828,7 @@ do_push (GVfsBackend *backend,
                                 &error, job_data) == FALSE)
     {
       op_backend->doing_io = FALSE;
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       push_data_free (job_data);
 
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1859,7 +1856,7 @@ do_push (GVfsBackend *backend,
     g_vfs_job_succeeded (G_VFS_JOB (job));
 
   op_backend->doing_io = FALSE;
-  g_mutex_unlock (op_backend->mutex);
+  g_mutex_unlock (&op_backend->mutex);
 
   g_debug ("- do_push\n");
 }
@@ -1876,13 +1873,13 @@ do_delete (GVfsBackend *backend,
 
   g_debug ("+ do_delete, filename: %s\n", filename);
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
 
   /* Check whether we have a directory */
   info = g_file_info_new ();
   if (_query_file_info_helper (backend, filename, info, &error) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       g_object_unref (info);
@@ -1891,7 +1888,7 @@ do_delete (GVfsBackend *backend,
 
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_CANCELLED,
                         _("Operation was cancelled"));
@@ -1910,7 +1907,7 @@ do_delete (GVfsBackend *backend,
 
       if (_change_directory (op_backend, filename, &error) == FALSE)
         {
-          g_mutex_unlock (op_backend->mutex);
+          g_mutex_unlock (&op_backend->mutex);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
           return;
@@ -1918,7 +1915,7 @@ do_delete (GVfsBackend *backend,
 
       if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
         {
-          g_mutex_unlock (op_backend->mutex);
+          g_mutex_unlock (&op_backend->mutex);
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_CANCELLED,
                             _("Operation was cancelled"));
@@ -1928,7 +1925,7 @@ do_delete (GVfsBackend *backend,
       files = NULL;
       if (_retrieve_folder_listing (backend, filename, &files, &error) == FALSE)
         {
-          g_mutex_unlock (op_backend->mutex);
+          g_mutex_unlock (&op_backend->mutex);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
           return;
@@ -1936,7 +1933,7 @@ do_delete (GVfsBackend *backend,
 
       if (gvfsbackendobexftp_fl_parser_parse (files, strlen (files), &elements, &error) == FALSE)
         {
-          g_mutex_unlock (op_backend->mutex);
+          g_mutex_unlock (&op_backend->mutex);
           g_message ("gvfsbackendobexftp_fl_parser_parse failed");
           g_free (files);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1951,7 +1948,7 @@ do_delete (GVfsBackend *backend,
 
       if (len != 0)
         {
-          g_mutex_unlock (op_backend->mutex);
+          g_mutex_unlock (&op_backend->mutex);
           g_set_error_literal (&error, G_IO_ERROR,
 	                       G_IO_ERROR_NOT_EMPTY,
         	               g_strerror (ENOTEMPTY));
@@ -1969,7 +1966,7 @@ do_delete (GVfsBackend *backend,
   if (strcmp (basename, G_DIR_SEPARATOR_S) == 0
       || strcmp (basename, ".") == 0)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_free (basename);
       g_vfs_job_failed_from_errno (G_VFS_JOB (job), EPERM);
       return;
@@ -1977,7 +1974,7 @@ do_delete (GVfsBackend *backend,
 
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_CANCELLED,
                         _("Operation was cancelled"));
@@ -1988,7 +1985,7 @@ do_delete (GVfsBackend *backend,
   parent = g_path_get_dirname (filename);
   if (_change_directory (op_backend, parent, &error) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_free (basename);
       g_free (parent);
@@ -1999,7 +1996,7 @@ do_delete (GVfsBackend *backend,
 
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_CANCELLED,
                         _("Operation was cancelled"));
@@ -2011,7 +2008,7 @@ do_delete (GVfsBackend *backend,
                          G_TYPE_STRING, basename, G_TYPE_INVALID,
                          G_TYPE_INVALID) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -2020,7 +2017,7 @@ do_delete (GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  g_mutex_unlock (op_backend->mutex);
+  g_mutex_unlock (&op_backend->mutex);
 
   g_debug ("- do_delete\n");
 }
@@ -2037,13 +2034,13 @@ do_make_directory (GVfsBackend *backend,
 
   g_debug ("+ do_make_directory, filename: %s\n", filename);
 
-  g_mutex_lock (op_backend->mutex);
+  g_mutex_lock (&op_backend->mutex);
 
   /* Check if the folder already exists */
   info = g_file_info_new ();
   if (_query_file_info_helper (backend, filename, info, &error) != FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_object_unref (info);
       g_vfs_job_failed_from_errno (G_VFS_JOB (job), EEXIST);
       return;
@@ -2051,7 +2048,7 @@ do_make_directory (GVfsBackend *backend,
   g_object_unref (info);
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -2062,7 +2059,7 @@ do_make_directory (GVfsBackend *backend,
 
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_CANCELLED,
                         _("Operation was cancelled"));
@@ -2072,7 +2069,7 @@ do_make_directory (GVfsBackend *backend,
   parent = g_path_get_dirname (filename);
   if (_change_directory (op_backend, parent, &error) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -2081,7 +2078,7 @@ do_make_directory (GVfsBackend *backend,
 
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_CANCELLED,
                         _("Operation was cancelled"));
@@ -2093,7 +2090,7 @@ do_make_directory (GVfsBackend *backend,
                          G_TYPE_STRING, basename, G_TYPE_INVALID,
                          G_TYPE_INVALID) == FALSE)
     {
-      g_mutex_unlock (op_backend->mutex);
+      g_mutex_unlock (&op_backend->mutex);
       g_free (basename);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
@@ -2108,7 +2105,7 @@ do_make_directory (GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  g_mutex_unlock (op_backend->mutex);
+  g_mutex_unlock (&op_backend->mutex);
 
   g_debug ("- do_make_directory\n");
 }
