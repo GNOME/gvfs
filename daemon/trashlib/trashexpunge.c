@@ -124,7 +124,7 @@ trash_expunge (GFile *directory)
     {
       GThread *thread;
 
-      thread = g_thread_create (trash_expunge_thread, NULL, FALSE, NULL);
+      thread = g_thread_new ("trash-expunge", trash_expunge_thread, NULL);
       g_assert (thread != NULL);
       trash_expunge_alive = TRUE;
     }

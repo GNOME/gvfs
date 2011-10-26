@@ -2358,7 +2358,7 @@ vfs_init (struct fuse_conn_info *conn)
   volume_monitor = g_object_new (g_type_from_name ("GDaemonVolumeMonitor"), NULL);
   
   subthread_main_loop = g_main_loop_new (NULL, FALSE);
-  subthread = g_thread_create ((GThreadFunc) subthread_main, NULL, FALSE, NULL);
+  subthread = g_thread_new ("gvfs-fuse-sub", (GThreadFunc) subthread_main, NULL);
 
   /* Indicate O_TRUNC support for open() */
   conn->want |= FUSE_CAP_ATOMIC_O_TRUNC;
