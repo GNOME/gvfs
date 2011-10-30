@@ -226,7 +226,7 @@ update_volume (GVfsUDisks2Volume *volume)
       else
         block = volume->block;
 
-      volume->dev = makedev (udisks_block_get_major (block), udisks_block_get_minor (block));
+      volume->dev = udisks_block_get_device_number (block);
       volume->device_file = udisks_block_dup_device (block);
 
       if (strlen (udisks_block_get_id_label (block)) > 0)

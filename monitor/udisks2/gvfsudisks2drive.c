@@ -165,7 +165,7 @@ update_drive (GVfsUDisks2Drive *drive)
   if (block != NULL)
     {
       drive->device_file = udisks_block_dup_device (block);
-      drive->dev = makedev (udisks_block_get_major (block), udisks_block_get_minor (block));
+      drive->dev = udisks_block_get_device_number (block);
 
       g_object_unref (block);
     }
