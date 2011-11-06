@@ -610,17 +610,6 @@ typedef enum
   DSI_ATTENTION     = 8
 } DsiCommand;
 
-static void read_reply (GVfsAfpConnection *afp_connection);
-static void send_request (GVfsAfpConnection *afp_connection);
-
-static guint16
-get_request_id (GVfsAfpConnection *afp_connection)
-{
-  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
-
-  return priv->request_id++;
-}
-
 typedef enum
 {
   REQUEST_TYPE_COMMAND,
@@ -648,6 +637,73 @@ free_request_data (RequestData *req_data)
     g_object_unref (req_data->cancellable);
 
   g_slice_free (RequestData, req_data);
+}
+
+static void
+g_vfs_afp_connection_init (GVfsAfpConnection *afp_connection)
+{
+  GVfsAfpConnectionPrivate *priv;
+  
+  afp_connection->priv = priv =  G_TYPE_INSTANCE_GET_PRIVATE (afp_connection,
+                                                              G_VFS_TYPE_AFP_CONNECTION,
+                                                              GVfsAfpConnectionPrivate);
+
+  priv->addr = NULL;
+  priv->conn = NULL;
+  priv->request_id = 0;
+
+  priv->kRequestQuanta = -1;
+  priv->kServerReplayCacheSize = -1;
+
+  priv->request_queue = g_queue_new ();
+  priv->request_hash = g_hash_table_new_full (g_direct_hash, g_direct_equal,
+                                              NULL, (GDestroyNotify)free_request_data);
+
+  priv->send_loop_running = FALSE;
+  priv->read_loop_running = FALSE;
+}
+
+static void
+g_vfs_afp_connection_finalize (GObject *object)
+{
+  GVfsAfpConnection *afp_connection = (GVfsAfpConnection *)object;
+  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
+
+  if (priv->addr)
+    g_object_unref (priv->addr);
+  
+  if (priv->conn)
+    g_object_unref (priv->conn);
+
+  G_OBJECT_CLASS (g_vfs_afp_connection_parent_class)->finalize (object);
+}
+
+static void
+g_vfs_afp_connection_class_init (GVfsAfpConnectionClass *klass)
+{
+  GObjectClass* object_class = G_OBJECT_CLASS (klass);
+
+  g_type_class_add_private (klass, sizeof (GVfsAfpConnectionPrivate));
+
+  object_class->finalize = g_vfs_afp_connection_finalize;
+
+  signals[ATTENTION] =
+    g_signal_new ("attention",
+                  G_TYPE_FROM_CLASS (object_class),
+                  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                  0, NULL, NULL, g_cclosure_marshal_VOID__UINT,
+                  G_TYPE_NONE, 1, G_TYPE_UINT);
+}
+
+static void read_reply (GVfsAfpConnection *afp_connection);
+static void send_request (GVfsAfpConnection *afp_connection);
+
+static guint16
+get_request_id (GVfsAfpConnection *afp_connection)
+{
+  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
+
+  return priv->request_id++;
 }
 
 static void
@@ -1538,13 +1594,25 @@ g_vfs_afp_connection_open (GVfsAfpConnection *afp_connection,
   return TRUE;
 }
 
-GVfsAfpReply *
-g_vfs_afp_connection_get_server_info (GVfsAfpConnection *afp_connection,
-                                      GCancellable *cancellable,
-                                      GError **error)
+GVfsAfpConnection *
+g_vfs_afp_connection_new (GSocketConnectable *addr)
 {
-  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
-  
+  GVfsAfpConnection        *afp_connection;
+  GVfsAfpConnectionPrivate *priv;
+
+  afp_connection = g_object_new (G_VFS_TYPE_AFP_CONNECTION, NULL);
+  priv = afp_connection->priv;
+
+  priv->addr = g_object_ref (addr);
+
+  return afp_connection;
+}
+
+GVfsAfpReply *
+g_vfs_afp_query_server_info (GSocketConnectable *addr,
+                             GCancellable *cancellable,
+                             GError **error)
+{
   GSocketClient *client;
   GIOStream *conn;
   gboolean res;
@@ -1552,7 +1620,7 @@ g_vfs_afp_connection_get_server_info (GVfsAfpConnection *afp_connection,
   char *data;
 
   client = g_socket_client_new ();
-  conn = G_IO_STREAM (g_socket_client_connect (client, priv->addr, cancellable, error));
+  conn = G_IO_STREAM (g_socket_client_connect (client, addr, cancellable, error));
   g_object_unref (client);
 
   if (!conn)
@@ -1579,74 +1647,3 @@ g_vfs_afp_connection_get_server_info (GVfsAfpConnection *afp_connection,
   return g_vfs_afp_reply_new (dsi_header.errorCode, data,
                               dsi_header.totalDataLength, TRUE);
 }
-
-GVfsAfpConnection *
-g_vfs_afp_connection_new (GSocketConnectable *addr)
-{
-  GVfsAfpConnection        *afp_connection;
-  GVfsAfpConnectionPrivate *priv;
-
-  afp_connection = g_object_new (G_VFS_TYPE_AFP_CONNECTION, NULL);
-  priv = afp_connection->priv;
-
-  priv->addr = g_object_ref (addr);
-
-  return afp_connection;
-}
-
-static void
-g_vfs_afp_connection_init (GVfsAfpConnection *afp_connection)
-{
-  GVfsAfpConnectionPrivate *priv;
-  
-  afp_connection->priv = priv =  G_TYPE_INSTANCE_GET_PRIVATE (afp_connection,
-                                                              G_VFS_TYPE_AFP_CONNECTION,
-                                                              GVfsAfpConnectionPrivate);
-
-  priv->addr = NULL;
-  priv->conn = NULL;
-  priv->request_id = 0;
-
-  priv->kRequestQuanta = -1;
-  priv->kServerReplayCacheSize = -1;
-
-  priv->request_queue = g_queue_new ();
-  priv->request_hash = g_hash_table_new_full (g_direct_hash, g_direct_equal,
-                                              NULL, (GDestroyNotify)free_request_data);
-
-  priv->send_loop_running = FALSE;
-  priv->read_loop_running = FALSE;
-}
-
-static void
-g_vfs_afp_connection_finalize (GObject *object)
-{
-  GVfsAfpConnection *afp_connection = (GVfsAfpConnection *)object;
-  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
-
-  if (priv->addr)
-    g_object_unref (priv->addr);
-  
-  if (priv->conn)
-    g_object_unref (priv->conn);
-
-  G_OBJECT_CLASS (g_vfs_afp_connection_parent_class)->finalize (object);
-}
-
-static void
-g_vfs_afp_connection_class_init (GVfsAfpConnectionClass *klass)
-{
-  GObjectClass* object_class = G_OBJECT_CLASS (klass);
-
-  g_type_class_add_private (klass, sizeof (GVfsAfpConnectionPrivate));
-
-  object_class->finalize = g_vfs_afp_connection_finalize;
-
-  signals[ATTENTION] =
-    g_signal_new ("attention",
-                  G_TYPE_FROM_CLASS (object_class),
-                  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-                  0, NULL, NULL, g_cclosure_marshal_VOID__UINT,
-                  G_TYPE_NONE, 1, G_TYPE_UINT);
-}
-

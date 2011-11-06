@@ -724,8 +724,8 @@ get_server_info (GVfsAfpServer *afp_serv,
   guint8 count;
   guint i;
 
-  reply = g_vfs_afp_connection_get_server_info (afp_serv->conn, cancellable,
-                                                error);
+  reply = g_vfs_afp_query_server_info (G_SOCKET_CONNECTABLE (afp_serv->addr),
+                                       cancellable, error);
   if (!reply)
     return FALSE;
 
