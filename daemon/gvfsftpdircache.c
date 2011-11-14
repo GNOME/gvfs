@@ -114,6 +114,7 @@ g_vfs_ftp_dir_cache_new (const GVfsFtpDirFuncs *funcs)
                                               g_vfs_ftp_file_equal,
                                               (GDestroyNotify) g_vfs_ftp_file_free,
                                               (GDestroyNotify) g_vfs_ftp_dir_cache_entry_unref);
+  g_mutex_init (&cache->lock);
   cache->funcs = funcs;
 
   return cache;

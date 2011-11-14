@@ -769,6 +769,8 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
   const char * const* supported_vfs;
   int i;
 
+  g_mutex_init (&network_backend->smb_mount_lock);
+
   supported_vfs = g_vfs_get_supported_uri_schemes (g_vfs_get_default ());
 
   network_backend->have_smb = FALSE;

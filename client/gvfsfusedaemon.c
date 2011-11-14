@@ -212,6 +212,7 @@ file_handle_new (const gchar *path)
 
   file_handle = g_new0 (FileHandle, 1);
   file_handle->refcount = 1;
+  g_mutex_init (&file_handle->mutex);
   file_handle->op = FILE_OP_NONE;
   file_handle->path = g_strdup (path);
 
@@ -2372,7 +2373,6 @@ vfs_destroy (gpointer param)
   mount_list_free ();
   if (subthread_main_loop != NULL) 
     g_main_loop_quit (subthread_main_loop);
-  g_mutex_clear (&mount_list_mutex);
   g_object_unref (gvfs);
 }
 

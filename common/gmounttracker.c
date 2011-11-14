@@ -541,6 +541,7 @@ init_connection (GMountTracker *tracker)
 static void
 g_mount_tracker_init (GMountTracker *tracker)
 {
+  g_mutex_init (&tracker->lock);
 }
 
 

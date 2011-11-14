@@ -395,6 +395,8 @@ g_vfs_backend_ftp_finalize (GObject *object)
 static void
 g_vfs_backend_ftp_init (GVfsBackendFtp *ftp)
 {
+  g_mutex_init (&ftp->mutex);
+  g_cond_init (&ftp->cond);
 }
 
 static void
