@@ -863,13 +863,14 @@ lookup_mount (DBusConnection *connection,
 	      vfs_mount_to_dbus (mount, &iter);
 	    }
 	}
+
+      g_mount_spec_unref (spec);
     }
   else
     reply = dbus_message_new_error (message,
 				    DBUS_ERROR_INVALID_ARGS,
 				    "Invalid arguments");
   
-  g_mount_spec_unref (spec);
   if (reply != NULL)
     {
       dbus_connection_send (connection, reply, NULL);
