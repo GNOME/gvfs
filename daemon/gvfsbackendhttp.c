@@ -83,6 +83,7 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   const char         *debug;
   SoupSessionFeature *proxy_resolver;
   SoupSessionFeature *cookie_jar;
+  SoupSessionFeature *content_decoder;
 
   g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);  
 
@@ -110,6 +111,12 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   /* Send Accept-Language header (see bug 166795) */
   g_object_set (backend->session, "accept-language-auto", TRUE, NULL);
   g_object_set (backend->session_async, "accept-language-auto", TRUE, NULL);
+
+  /* Handle decompression automatically */
+  content_decoder = g_object_new (SOUP_TYPE_CONTENT_DECODER, NULL);
+  soup_session_add_feature (backend->session, content_decoder);
+  soup_session_add_feature (backend->session_async, content_decoder);
+  g_object_unref (content_decoder);
 
   /* Logging */
   debug = g_getenv ("GVFS_HTTP_DEBUG");
