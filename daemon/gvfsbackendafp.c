@@ -214,6 +214,7 @@ static void
 afp_handle_free (AfpHandle *afp_handle)
 {
   g_free (afp_handle->filename);
+  g_free (afp_handle->tmp_filename);
   
   g_slice_free (AfpHandle, afp_handle);
 }
