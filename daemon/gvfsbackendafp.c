@@ -194,9 +194,11 @@ typedef struct
   
   /* Used if type == AFP_HANDLE_TYPE_REPLACE_FILE_DIRECT */
   gint64 size;
-  
+
+  /* Used if type == AFP_HANDLE_TYPE_REPLACE_FILE_TEMP */
   char *filename;
   char *tmp_filename;
+  gboolean make_backup;
 } AfpHandle;
 
 static AfpHandle *
@@ -2676,17 +2678,46 @@ close_replace_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, g
   
   g_object_unref (info);
 }
+
+static void
+close_replace_delete_backup_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
+  AfpHandle *afp_handle = (AfpHandle *)user_data;
+
+  char *backup_name;
+
+  /* We ignore all errors and just try to rename the temporary file anyway */
+  backup_name = g_strconcat (afp_handle->filename, "~", NULL);
   
+  move_and_rename (afp_backend, afp_handle->tmp_filename, backup_name, NULL,
+                   NULL, NULL);
+  afp_handle_free (afp_handle);
+}
+
 static void
 close_replace_close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (source_object);
   AfpHandle *afp_handle = (AfpHandle *)user_data;
 
-  /* Delete temporary file */
-  delete (afp_backend, afp_handle->tmp_filename, NULL, NULL, NULL);
-  
-  afp_handle_free (afp_handle);
+  if (afp_handle->make_backup)
+  {
+    char *backup_name = g_strconcat (afp_handle->filename, "~", NULL);
+    
+    /* Delete old backup */
+    delete (afp_backend, backup_name, NULL, close_replace_delete_backup_cb,
+            afp_handle);
+    g_free (backup_name);
+  }
+
+  else
+  {
+    /* Delete temporary file */
+    delete (afp_backend, afp_handle->tmp_filename, NULL, NULL, NULL);
+    
+    afp_handle_free (afp_handle);
+  }
 }
 
 static void
@@ -2710,7 +2741,7 @@ close_replace_exchange_files_cb (GObject *source_object, GAsyncResult *res, gpoi
     return;
   }
 
-  /* Close fork and remove the temporary file even if the exchange failed */
+  /* Close fork and remove/rename the temporary file even if the exchange failed */
   close_fork (afp_backend, afp_handle->fork_refnum, G_VFS_JOB (job)->cancellable,
               close_replace_close_fork_cb, job->handle);
   
@@ -3029,6 +3060,7 @@ replace_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
     afp_handle->type = AFP_HANDLE_TYPE_REPLACE_FILE_TEMP;
     afp_handle->filename = g_strdup (job->filename);
     afp_handle->tmp_filename = g_strdup (tmp_filename);
+    afp_handle->make_backup = job->make_backup;
   }
   else
     afp_handle->type = AFP_HANDLE_TYPE_REPLACE_FILE_DIRECT;
@@ -3060,9 +3092,19 @@ replace_create_tmp_file_cb (GObject *source_object, GAsyncResult *res, gpointer 
      * so we try to write directly to the file */
     else if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
     {
-      g_object_set_data (G_OBJECT (job), "TempFilename", NULL);
-      open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT, 0,
-                 G_VFS_JOB (job)->cancellable, replace_open_fork_cb, job);
+      /* FIXME: We don't support making backups when we can't use FPExchangeFiles */
+      if (job->make_backup)
+      {
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                                  G_IO_ERROR_CANT_CREATE_BACKUP,
+                                  _("backups not supported"));
+      }
+      else
+      {
+        g_object_set_data (G_OBJECT (job), "TempFilename", NULL);
+        open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT, 0,
+                   G_VFS_JOB (job)->cancellable, replace_open_fork_cb, job);
+      }
     }
                               
     else
@@ -3145,8 +3187,18 @@ replace_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointe
   {
     if (afp_backend->vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_NO_EXCHANGE_FILES)
     {
-      open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT, 0,
-                 G_VFS_JOB (job)->cancellable, replace_open_fork_cb, job);
+      /* FIXME: We don't support making backups when we can't use FPExchangeFiles */
+      if (job->make_backup)
+      {
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                                  G_IO_ERROR_CANT_CREATE_BACKUP,
+                                  _("backups not supported"));
+      }
+      else
+      {
+        open_fork (afp_backend, job->filename, AFP_ACCESS_MODE_WRITE_BIT, 0,
+                   G_VFS_JOB (job)->cancellable, replace_open_fork_cb, job);
+      }
     }
     else
       replace_create_tmp_file (afp_backend, job);
@@ -3164,15 +3216,6 @@ try_replace (GVfsBackend *backend,
              GFileCreateFlags flags)
 {
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
-
-  if (make_backup)
-  { 
-    /* FIXME: implement! */
-    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
-                              G_IO_ERROR_CANT_CREATE_BACKUP,
-                              _("backups not supported yet"));
-    return TRUE;
-  }
 
   get_filedir_parms (afp_backend, filename, AFP_FILE_BITMAP_MOD_DATE_BIT, 0,
                      G_VFS_JOB (job)->cancellable, replace_get_filedir_parms_cb,
