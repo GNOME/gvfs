@@ -126,3 +126,15 @@ afp_result_code_to_gerror (AfpResultCode res_code)
     return g_error_new (G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Got unknown error code %d from server"), res_code);
 }
+
+gboolean
+is_root (const char *filename)
+{
+  const char *p;
+
+  p = filename;
+  while (*p == '/')
+    p++;
+
+  return *p == 0;
+}

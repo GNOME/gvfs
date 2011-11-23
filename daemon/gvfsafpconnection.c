@@ -511,6 +511,46 @@ g_vfs_afp_command_put_afp_name (GVfsAfpCommand *comm, GVfsAfpName *afp_name)
   }
 }
 
+static GVfsAfpName *
+filename_to_afp_pathname (const char *filename)
+{
+  gsize len;
+  char *str;
+  gint i;
+
+  while (*filename == '/')
+    filename++;
+  
+  len = strlen (filename);
+  
+  str = g_malloc (len); 
+
+  for (i = 0; i < len; i++)
+  {
+    if (filename[i] == '/')
+      str[i] = '\0';
+    else
+      str[i] = filename[i];
+  }
+  
+
+  return g_vfs_afp_name_new (0x08000103, str, len);
+}
+
+void
+g_vfs_afp_command_put_pathname (GVfsAfpCommand *comm, const char *filename)
+{
+  GVfsAfpName *pathname;
+  
+  /* PathType */
+  g_vfs_afp_command_put_byte (comm, AFP_PATH_TYPE_UTF8_NAME);
+
+  /* Pathname */
+  pathname = filename_to_afp_pathname (filename);
+  g_vfs_afp_command_put_afp_name (comm, pathname);
+  g_vfs_afp_name_unref (pathname);
+}
+
 void
 g_vfs_afp_command_pad_to_even (GVfsAfpCommand *comm)
 { 

@@ -303,6 +303,7 @@ void            g_vfs_afp_command_put_uint64    (GVfsAfpCommand *comm, guint64 v
 
 void            g_vfs_afp_command_put_pascal   (GVfsAfpCommand *comm, const char *str);
 void            g_vfs_afp_command_put_afp_name (GVfsAfpCommand *comm, GVfsAfpName *afp_name);
+void            g_vfs_afp_command_put_pathname (GVfsAfpCommand *comm, const char *filename);
 
 void            g_vfs_afp_command_pad_to_even  (GVfsAfpCommand *comm);
 

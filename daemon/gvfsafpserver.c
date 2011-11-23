@@ -841,6 +841,82 @@ get_server_parms (GVfsAfpServer *server,
   return TRUE;
 }
 
+static gboolean
+get_userinfo (GVfsAfpServer *server,
+              GCancellable  *cancellable,
+              GError       **error)
+{
+  GVfsAfpCommand *comm;
+  guint16 bitmap;
+  gboolean res;
+
+  GVfsAfpReply *reply;
+  AfpResultCode res_code;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_USER_INFO);
+  /* Flags, ThisUser = 1 */
+  g_vfs_afp_command_put_byte (comm, 0x01);
+  /* UserId */
+  g_vfs_afp_command_put_int32 (comm, 0);
+  /* Bitmap */
+  bitmap = AFP_GET_USER_INFO_BITMAP_GET_UID_BIT | AFP_GET_USER_INFO_BITMAP_GET_GID_BIT;
+  g_vfs_afp_command_put_uint16 (comm, bitmap);
+
+  res = g_vfs_afp_connection_send_command_sync (server->conn,
+                                                comm, cancellable, error);
+  g_object_unref (comm);
+  if (!res)
+    return FALSE;
+
+  reply = g_vfs_afp_connection_read_reply_sync (server->conn,
+                                                cancellable, error);
+  if (!reply)
+    return FALSE;
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  if (res_code != AFP_RESULT_NO_ERROR)
+  {
+    g_object_unref (reply);
+
+    switch (res_code)
+    {
+      case AFP_RESULT_ACCESS_DENIED:
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                     _("Permission denied"));
+        break;
+        break;
+      case AFP_RESULT_CALL_NOT_SUPPORTED:
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                     _("Command is not supported by server"));
+        break;
+      case AFP_RESULT_PWD_EXPIRED_ERR:
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                     _("User's password has expired"));
+        break;
+      case AFP_RESULT_PWD_NEEDS_CHANGE_ERR:
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                     _("User's password needs to be changed"));
+        break;
+
+      default:
+        g_propagate_error (error, afp_result_code_to_gerror (res_code));
+        break;
+    }
+    return FALSE;
+  }
+
+  /* Bitmap */
+  g_vfs_afp_reply_read_uint16 (reply, NULL);
+  /* UID */
+  g_vfs_afp_reply_read_uint32 (reply, &server->user_id);
+  /* GID */
+  g_vfs_afp_reply_read_uint32 (reply, &server->group_id);
+
+  g_object_unref (reply);
+  
+  return TRUE;
+}
+
 gboolean
 g_vfs_afp_server_login (GVfsAfpServer *server,
                         const char     *initial_user,
@@ -982,14 +1058,16 @@ try_login:
   g_free (olduser);
 
   if (!res)
-  {
-    g_free (user);
-    g_free (password);
+    goto error;
 
-    g_propagate_error (error, err);
-    return FALSE;
-  }
+    /* Get server parms */
+  if (!get_server_parms (server, cancellable, &err))
+    goto error;
 
+  /* Get user info */
+  if (!get_userinfo (server, cancellable, &err))
+    goto error;
+  
   if (prompt && !anonymous)
   {
     /* a prompt was created, so we have to save the password */
@@ -1004,10 +1082,6 @@ try_login:
                                  password_save);
     g_free (prompt);
   }
-
-  /* Get server parms */
-  if (!get_server_parms (server, cancellable, error))
-    return FALSE;
   
   if (logged_in_user)
   {
@@ -1022,6 +1096,12 @@ try_login:
   g_free (password);
 
   return TRUE;
+
+error:
+  g_free (user);
+  g_free (password);
+  g_propagate_error (error, err);
+  return FALSE;
 }
 
 /*
@@ -1039,174 +1119,6 @@ g_vfs_afp_server_time_to_local_time (GVfsAfpServer *server,
   return server_time + server->time_diff;
 }
 
-static void
-get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
-{
-  GVfsAfpConnection *connection = G_VFS_AFP_CONNECTION (source_object);
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
-  GVfsAfpServer *server = G_VFS_AFP_SERVER (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
-
-  GVfsAfpReply *reply;
-  GError *err = NULL;
-  AfpResultCode res_code;
-  
-  guint16 vol_bitmap;
-  GFileInfo *info;
-
-  reply = g_vfs_afp_connection_send_command_finish (connection, res, &err);
-  if (!reply)
-  {
-    g_simple_async_result_take_error (simple, err);
-    goto done;
-  }
-
-  res_code = g_vfs_afp_reply_get_result_code (reply);
-  if (res_code != AFP_RESULT_NO_ERROR)
-  {
-    g_object_unref (reply);
-
-    g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
-    goto done;
-  }
-
-  g_vfs_afp_reply_read_uint16 (reply, &vol_bitmap);
-
-  info = g_file_info_new ();
-
-  if (vol_bitmap & AFP_VOLUME_BITMAP_ATTRIBUTE_BIT)
-  {
-    guint16 vol_attrs_bitmap;
-    
-    g_vfs_afp_reply_read_uint16 (reply, &vol_attrs_bitmap);
-    
-    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY,
-                                       vol_attrs_bitmap & AFP_VOLUME_ATTRIBUTES_BITMAP_READ_ONLY);
-  }
-
-  if (vol_bitmap & AFP_VOLUME_BITMAP_CREATE_DATE_BIT)
-  {
-    gint32 create_date;
-    gint64 create_date_local;
-
-    g_vfs_afp_reply_read_int32 (reply, &create_date);
-
-    create_date_local = g_vfs_afp_server_time_to_local_time (server, create_date);
-    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
-                                      create_date_local);
-  }
-
-  if (vol_bitmap & AFP_VOLUME_BITMAP_MOD_DATE_BIT)
-  {
-    gint32 mod_date;
-    gint64 mod_date_local;
-
-    g_vfs_afp_reply_read_int32 (reply, &mod_date);
-
-    mod_date_local = g_vfs_afp_server_time_to_local_time (server, mod_date);
-    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
-                                      mod_date_local);
-  }
-
-  if (vol_bitmap & AFP_VOLUME_BITMAP_EXT_BYTES_FREE_BIT)
-  {
-    guint64 bytes_free;
-
-    g_vfs_afp_reply_read_uint64 (reply, &bytes_free);
-    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
-                                      bytes_free);
-  }
-
-  if (vol_bitmap & AFP_VOLUME_BITMAP_EXT_BYTES_TOTAL_BIT)
-  {
-    guint64 bytes_total;
-
-    g_vfs_afp_reply_read_uint64 (reply, &bytes_total);
-    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,
-                                      bytes_total);
-  }
-
-  g_object_unref (reply);
-  
-  g_simple_async_result_set_op_res_gpointer (simple, info, g_object_unref);
-
-done:
-  g_simple_async_result_complete (simple);
-  g_object_unref (simple);
-}
-
-/*
- * g_vfs_afp_server_get_vol_parms:
- * 
- * @server: a #GVfsAfpServer
- * @volume_id: id of the volume whose parameters should be received.
- * @vol_bitmap: bitmap describing the parameters that should be received.
- * @cancellable: optional #GCancellable object, %NULL to ignore.
- * @callback: callback to call when the request is satisfied.
- * @user_data: the data to pass to callback function.
- * 
- * Asynchronously retrives the parameters specified by @vol_bitmap of the volume
- * with id @volume_id.
- */
-void
-g_vfs_afp_server_get_vol_parms (GVfsAfpServer       *server,
-                                guint16              volume_id,
-                                guint16              vol_bitmap,
-                                GCancellable        *cancellable,
-                                GAsyncReadyCallback  callback,
-                                gpointer             user_data)
-{
-  GVfsAfpCommand *comm;
-  GSimpleAsyncResult *simple;
-
-  comm = g_vfs_afp_command_new (AFP_COMMAND_GET_VOL_PARMS);
-  /* pad byte */
-  g_vfs_afp_command_put_byte (comm, 0);
-  /* Volume ID */
-  g_vfs_afp_command_put_uint16 (comm, volume_id);
-  /* Volume Bitmap */
-  g_vfs_afp_command_put_uint16 (comm, vol_bitmap);
-
-  simple = g_simple_async_result_new (G_OBJECT (server), callback, user_data,
-                                      g_vfs_afp_server_get_vol_parms);
-                                      
-  
-  g_vfs_afp_connection_send_command (server->conn, comm, NULL, get_vol_parms_cb,
-                                     cancellable, simple);
-  g_object_unref (comm);
-}
-
-/*
- * g_vfs_afp_server_get_vol_parms_finish:
- * 
- * @server: a #GVfsAfpServer.
- * @result: a #GAsyncResult.
- * @error: a #GError, %NULL to ignore.
- * 
- * Finalizes the asynchronous operation started by
- * g_vfs_afp_server_get_vol_parms.
- * 
- * Returns: (transfer full): A #GFileInfo with the requested parameters or %NULL
- * on error.
- */
-GFileInfo *
-g_vfs_afp_server_get_vol_parms_finish (GVfsAfpServer  *server,
-                                       GAsyncResult   *result,
-                                       GError         **error)
-{
-  GSimpleAsyncResult *simple;
-  
-  g_return_val_if_fail (g_simple_async_result_is_valid (result,
-                                                        G_OBJECT (server),
-                                                        g_vfs_afp_server_get_vol_parms),
-                        NULL);
-
-  simple = (GSimpleAsyncResult *)result;
-
-  if (g_simple_async_result_propagate_error (simple, error))
-    return NULL;
-
-  return g_object_ref (g_simple_async_result_get_op_res_gpointer (simple));
-}
 
 static void
 volume_data_free (GVfsAfpVolumeData *vol_data)
@@ -1312,7 +1224,7 @@ g_vfs_afp_server_get_volumes (GVfsAfpServer       *server,
 }
 
 /*
- * g_vfs_afp_server_get_vol_parms_finish:
+ * g_vfs_afp_server_get_volumes_finish:
  * 
  * @server: a #GVfsAfpServer.
  * @result: a #GAsyncResult.
@@ -1343,4 +1255,233 @@ g_vfs_afp_server_get_volumes_finish (GVfsAfpServer  *server,
     return NULL;
 
   return g_ptr_array_ref ((GPtrArray *)g_simple_async_result_get_op_res_gpointer (simple));
+}
+
+GVfsAfpVolume *
+g_vfs_afp_server_mount_volume_sync (GVfsAfpServer *server,
+                                    const char    *volume_name,
+                                    GCancellable  *cancellable,
+                                    GError **error)
+{
+  GVfsAfpVolume *volume;
+
+  volume = g_vfs_afp_volume_new (server);
+  if (!g_vfs_afp_volume_mount_sync (volume, volume_name, cancellable, error))
+  {
+    g_object_unref (volume);
+    return NULL;
+  }
+
+  return volume;
+}
+
+static void
+set_access_attributes_trusted (GFileInfo *info,
+                               guint32 perm)
+{
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ,
+				     perm & 0x4);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
+				     perm & 0x2);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE,
+				     perm & 0x1);
+}
+
+/* For files we don't own we can't trust a negative response to this check, as
+   something else could allow us to do the operation, for instance an ACL
+   or some sticky bit thing */
+static void
+set_access_attributes (GFileInfo *info,
+                       guint32 perm)
+{
+  if (perm & 0x4)
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ,
+				       TRUE);
+  if (perm & 0x2)
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
+				       TRUE);
+  if (perm & 0x1)
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE,
+				       TRUE);
+}
+
+void
+g_vfs_afp_server_fill_info (GVfsAfpServer *server,
+                            GFileInfo     *info,
+                            GVfsAfpReply  *reply,
+                            gboolean       directory,
+                            guint16        bitmap)
+{
+  goffset start_pos;
+
+  if (directory)
+  {
+    GIcon *icon;
+    
+    g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
+    g_file_info_set_content_type (info, "inode/directory");
+
+    icon = g_themed_icon_new ("folder");
+    g_file_info_set_icon (info, icon);
+    g_object_unref (icon);
+  }
+  else
+    g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
+
+  
+  start_pos = g_vfs_afp_reply_get_pos (reply);
+
+  if (bitmap & AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT)
+  {
+    guint16 attributes;
+
+    g_vfs_afp_reply_read_uint16 (reply, &attributes);
+    
+    if (attributes & AFP_FILEDIR_ATTRIBUTES_BITMAP_INVISIBLE_BIT)
+      g_file_info_set_is_hidden (info, TRUE);
+  }
+
+  if (bitmap & AFP_FILEDIR_BITMAP_PARENT_DIR_ID_BIT)
+  {
+    guint32 parent_dir_id;
+
+    g_vfs_afp_reply_read_uint32 (reply, &parent_dir_id);
+    g_file_info_set_attribute_uint32 (info, "afp::parent-dir-id", parent_dir_id);
+  }
+  
+  if (bitmap & AFP_FILEDIR_BITMAP_CREATE_DATE_BIT)
+  {
+    gint32 create_date;
+    gint64 create_date_local;
+
+    g_vfs_afp_reply_read_int32 (reply, &create_date);
+    
+    create_date_local = g_vfs_afp_server_time_to_local_time (server, create_date);
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
+                                      create_date_local);
+  }
+
+  if (bitmap & AFP_FILEDIR_BITMAP_MOD_DATE_BIT)
+  {
+    gint32 mod_date;
+    guint64 mod_date_unix;
+    char *etag;
+
+    g_vfs_afp_reply_read_int32 (reply, &mod_date);
+    mod_date_unix = g_vfs_afp_server_time_to_local_time (server, mod_date);
+    
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                      mod_date_unix);
+
+    etag = g_strdup_printf ("%"G_GUINT64_FORMAT, mod_date_unix);
+    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE, etag);
+    g_free (etag);
+  }
+
+  if (bitmap & AFP_FILEDIR_BITMAP_NODE_ID_BIT)
+  {
+    guint32 node_id;
+
+    g_vfs_afp_reply_read_uint32 (reply, &node_id);
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_NODE_ID, node_id);
+  }
+  
+  /* Directory specific attributes */
+  if (directory)
+  {
+    if (bitmap & AFP_DIR_BITMAP_OFFSPRING_COUNT_BIT)
+    {
+      guint16 offspring_count;
+
+      g_vfs_afp_reply_read_uint16 (reply, &offspring_count);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_CHILDREN_COUNT,
+                                        offspring_count);
+    }
+  }
+  
+  /* File specific attributes */
+  else
+  {
+    if (bitmap & AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT)
+    {
+      guint64 fork_len;
+
+      g_vfs_afp_reply_read_uint64 (reply, &fork_len);
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE,
+                                        fork_len);
+    }
+  }
+  
+  if (bitmap & AFP_FILEDIR_BITMAP_UTF8_NAME_BIT)
+  {
+    guint16 UTF8Name_offset;
+    goffset old_pos;
+    GVfsAfpName *afp_name;
+    char *utf8_name;
+
+    g_vfs_afp_reply_read_uint16 (reply, &UTF8Name_offset);
+    /* Pad */
+    g_vfs_afp_reply_read_uint32 (reply, NULL);
+
+    old_pos = g_vfs_afp_reply_get_pos (reply);
+    g_vfs_afp_reply_seek (reply, start_pos + UTF8Name_offset, G_SEEK_SET);
+
+    g_vfs_afp_reply_read_afp_name (reply, TRUE, &afp_name);
+    utf8_name = g_vfs_afp_name_get_string (afp_name);    
+    g_vfs_afp_name_unref (afp_name);
+
+    g_file_info_set_name (info, utf8_name);
+    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
+                                      utf8_name);
+
+    /* Set file as hidden if it begins with a dot */
+    if (utf8_name[0] == '.')
+      g_file_info_set_is_hidden (info, TRUE);
+
+    if (!directory)
+    {
+      char *content_type;
+      GIcon *icon;
+
+      content_type = g_content_type_guess (utf8_name, NULL, 0, NULL);
+      g_file_info_set_content_type (info, content_type);
+      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
+                                        content_type);
+
+      icon = g_content_type_get_icon (content_type);
+      g_file_info_set_icon (info, icon);
+
+      g_object_unref (icon);
+      g_free (content_type);
+    }
+    
+    g_free (utf8_name);
+
+    g_vfs_afp_reply_seek (reply, old_pos, G_SEEK_SET);
+  }
+
+  if (bitmap & AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT)
+  {
+    guint32 uid, gid, permissions, ua_permissions;
+
+    g_vfs_afp_reply_read_uint32 (reply, &uid);
+    g_vfs_afp_reply_read_uint32 (reply, &gid);
+    g_vfs_afp_reply_read_uint32 (reply, &permissions);
+    /* ua_permissions */
+    g_vfs_afp_reply_read_uint32 (reply, &ua_permissions);
+
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, permissions);
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, uid);
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, gid);
+
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_UA_PERMISSIONS,
+                                      ua_permissions);
+    
+    if (uid == server->user_id)
+      set_access_attributes_trusted (info, (permissions >> 6) & 0x7);
+    else if (gid == server->group_id)
+      set_access_attributes (info, (permissions >> 3) & 0x7);
+    else
+      set_access_attributes (info, (permissions >> 0) & 0x7);
+  }
 }

@@ -485,7 +485,9 @@ gvfsd_afp_browse_SOURCES = \
 	gvfsafpconnection.h \
 	gvfsafpconnection.c \
 	gvfsafpserver.h \
-	gvfsafpserver.c
+	gvfsafpserver.c \
+	gvfsafpvolume.h \
+	gvfsafpvolume.c
 
 gvfsd_afp_browse_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendafpbrowse.h \
@@ -505,7 +507,9 @@ gvfsd_afp_SOURCES = \
 	gvfsafpconnection.h \
 	gvfsafpconnection.c \
 	gvfsafpserver.h \
-	gvfsafpserver.c
+	gvfsafpserver.c \
+	gvfsafpvolume.h \
+	gvfsafpvolume.c
 
 gvfsd_afp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendafp.h \

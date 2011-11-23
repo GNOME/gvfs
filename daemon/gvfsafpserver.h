@@ -27,6 +27,7 @@
 
 #include "gmountsource.h"
 #include "gvfsafpconnection.h"
+#include "gvfsafpvolume.h"
 
 G_BEGIN_DECLS
 
@@ -69,6 +70,9 @@ struct _GVfsAfpServer
   AfpVersion          version;
 
   gint32              time_diff;
+
+  guint32             user_id;
+  guint32             group_id;
 };
 
 GType              g_vfs_afp_server_get_type             (void) G_GNUC_CONST;
@@ -85,16 +89,6 @@ gboolean           g_vfs_afp_server_login                (GVfsAfpServer *afp_ser
 gint64             g_vfs_afp_server_time_to_local_time   (GVfsAfpServer *afp_serv,
                                                           gint32         server_time);
 
-void               g_vfs_afp_server_get_vol_parms        (GVfsAfpServer       *server,
-                                                          guint16              volume_id,
-                                                          guint16              vol_bitmap,
-                                                          GCancellable        *cancellable,
-                                                          GAsyncReadyCallback  callback,
-                                                          gpointer             user_data);
-GFileInfo *        g_vfs_afp_server_get_vol_parms_finish (GVfsAfpServer       *server,
-                                                          GAsyncResult        *result,
-                                                          GError             **error);
-
 typedef struct _GVfsAfpVolumeData GVfsAfpVolumeData;
 struct _GVfsAfpVolumeData
 {
@@ -109,6 +103,17 @@ void               g_vfs_afp_server_get_volumes          (GVfsAfpServer       *s
 GPtrArray *        g_vfs_afp_server_get_volumes_finish   (GVfsAfpServer  *server,
                                                           GAsyncResult   *result,
                                                           GError         **error);
+
+GVfsAfpVolume *    g_vfs_afp_server_mount_volume_sync (GVfsAfpServer *server,
+                                                       const char    *volume_name,
+                                                       GCancellable  *cancellable,
+                                                       GError        **error);
+
+void               g_vfs_afp_server_fill_info         (GVfsAfpServer *server,
+                                                       GFileInfo     *info,
+                                                       GVfsAfpReply  *reply,
+                                                       gboolean       directory,
+                                                       guint16        bitmap);
 
 G_END_DECLS
 

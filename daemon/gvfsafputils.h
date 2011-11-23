@@ -82,8 +82,14 @@ typedef enum
   AFP_RESULT_DISK_QUOTA_EXCEEDED  = -5047
 } AfpResultCode;
 
-GError *
-afp_result_code_to_gerror (AfpResultCode res_code);
+#define G_FILE_ATTRIBUTE_AFP_NODE_ID        "afp::node-id"
+#define G_FILE_ATTRIBUTE_AFP_PARENT_DIR_ID  "afp::parent-dir-id"
+#define G_FILE_ATTRIBUTE_AFP_CHILDREN_COUNT "afp::children-count"
+#define G_FILE_ATTRIBUTE_AFP_UA_PERMISSIONS "afp::ua-permisssions"
+
+GError *afp_result_code_to_gerror (AfpResultCode res_code);
+
+gboolean is_root (const char *filename);
 
 G_END_DECLS
 

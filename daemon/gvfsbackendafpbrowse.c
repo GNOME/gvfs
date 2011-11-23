@@ -65,18 +65,6 @@ struct _GVfsBackendAfpBrowse
 G_DEFINE_TYPE (GVfsBackendAfpBrowse, g_vfs_backend_afp_browse, G_VFS_TYPE_BACKEND);
 
 
-static gboolean
-is_root (const char *filename)
-{
-  const char *p;
-
-  p = filename;
-  while (*p == '/')
-    p++;
-
-  return *p == 0;
-}
-
 static void
 get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
