@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-22 13:19+0200\n"
-"PO-Revision-Date: 2011-10-22 14:52+0200\n"
+"POT-Creation-Date: 2011-10-27 23:25+0200\n"
+"PO-Revision-Date: 2011-10-27 23:27+0200\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Gezer (Hebrew)\n"
 "Language: he\n"
@@ -101,19 +101,19 @@ msgstr "values must be string or list of strings"
 #: ../client/gdaemonfileoutputstream.c:873
 #: ../client/gdaemonfileoutputstream.c:1052
 #: ../client/gvfsdaemondbus.c:1062
-#: ../daemon/gvfsbackendobexftp.c:1085
-#: ../daemon/gvfsbackendobexftp.c:1106
-#: ../daemon/gvfsbackendobexftp.c:1225
-#: ../daemon/gvfsbackendobexftp.c:1362
-#: ../daemon/gvfsbackendobexftp.c:1426
-#: ../daemon/gvfsbackendobexftp.c:1628
-#: ../daemon/gvfsbackendobexftp.c:1735
-#: ../daemon/gvfsbackendobexftp.c:1897
-#: ../daemon/gvfsbackendobexftp.c:1924
-#: ../daemon/gvfsbackendobexftp.c:1983
-#: ../daemon/gvfsbackendobexftp.c:2005
-#: ../daemon/gvfsbackendobexftp.c:2068
-#: ../daemon/gvfsbackendobexftp.c:2087
+#: ../daemon/gvfsbackendobexftp.c:1082
+#: ../daemon/gvfsbackendobexftp.c:1103
+#: ../daemon/gvfsbackendobexftp.c:1222
+#: ../daemon/gvfsbackendobexftp.c:1359
+#: ../daemon/gvfsbackendobexftp.c:1423
+#: ../daemon/gvfsbackendobexftp.c:1625
+#: ../daemon/gvfsbackendobexftp.c:1732
+#: ../daemon/gvfsbackendobexftp.c:1894
+#: ../daemon/gvfsbackendobexftp.c:1921
+#: ../daemon/gvfsbackendobexftp.c:1980
+#: ../daemon/gvfsbackendobexftp.c:2002
+#: ../daemon/gvfsbackendobexftp.c:2065
+#: ../daemon/gvfsbackendobexftp.c:2084
 #: ../daemon/gvfsbackendsmb.c:1179
 #: ../daemon/gvfsbackendtest.c:91
 #: ../daemon/gvfsbackendtest.c:124
@@ -357,56 +357,56 @@ msgid "Enter password for afp on %s"
 msgstr "נא להזין ססמה עבור ה־AFP ב־%s"
 
 #: ../daemon/gvfsafpserver.c:865
-#: ../daemon/gvfsbackendftp.c:518
+#: ../daemon/gvfsbackendftp.c:516
 #: ../daemon/gvfsbackendsftp.c:985
-#: ../daemon/gvfsbackendsmbbrowse.c:995
+#: ../daemon/gvfsbackendsmbbrowse.c:992
 #: ../daemon/gvfsbackendsmb.c:619
 msgid "Password dialog cancelled"
 msgstr "דו־שיח הססמה בוטל"
 
-#: ../daemon/gvfsbackendafc.c:212
+#: ../daemon/gvfsbackendafc.c:208
 msgid "Internal Apple File Control error"
 msgstr "שגיאת פנימית ב־Apple File Control"
 
-#: ../daemon/gvfsbackendafc.c:216
-#: ../daemon/gvfsbackendftp.c:736
+#: ../daemon/gvfsbackendafc.c:212
+#: ../daemon/gvfsbackendftp.c:734
 msgid "File does not exist"
 msgstr "הקובץ אינו קיים."
 
-#: ../daemon/gvfsbackendafc.c:220
+#: ../daemon/gvfsbackendafc.c:216
 msgid "The directory is not empty"
 msgstr "התיקייה אינה ריקה"
 
-#: ../daemon/gvfsbackendafc.c:224
+#: ../daemon/gvfsbackendafc.c:220
 msgid "The device did not respond"
 msgstr "ההתקן לא הגיב"
 
-#: ../daemon/gvfsbackendafc.c:228
+#: ../daemon/gvfsbackendafc.c:224
 msgid "The connection was interrupted"
 msgstr "החיבור נקטע"
 
-#: ../daemon/gvfsbackendafc.c:232
+#: ../daemon/gvfsbackendafc.c:228
 msgid "Invalid Apple File Control data received"
 msgstr "התקבלו נתוני Apple File Control שגויים"
 
-#: ../daemon/gvfsbackendafc.c:236
+#: ../daemon/gvfsbackendafc.c:232
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "שגיאה בלתי מטופלת ב־Apple File Control‏ (%d)"
 
-#: ../daemon/gvfsbackendafc.c:252
+#: ../daemon/gvfsbackendafc.c:248
 msgid "Listing applications installed on device failed"
 msgstr "הצגת היישומים המותקנים בהתקן נכשלה"
 
-#: ../daemon/gvfsbackendafc.c:268
+#: ../daemon/gvfsbackendafc.c:264
 msgid "Accessing application icons on device failed"
 msgstr "הגישה לסמלי היישומים בהתקן נכשלה"
 
-#: ../daemon/gvfsbackendafc.c:285
+#: ../daemon/gvfsbackendafc.c:281
 msgid "Lockdown Error: Invalid Argument"
 msgstr "שגיאת נעילה: הארגומנט שגוי"
 
-#: ../daemon/gvfsbackendafc.c:289
+#: ../daemon/gvfsbackendafc.c:285
 #: ../daemon/gvfsbackendafp.c:463
 #: ../daemon/gvfsbackendafp.c:1049
 #: ../daemon/gvfsbackendafp.c:1203
@@ -421,72 +421,72 @@ msgstr "שגיאת נעילה: הארגומנט שגוי"
 #: ../daemon/gvfsbackendafp.c:4089
 #: ../daemon/gvfsbackendsftp.c:310
 #: ../daemon/gvfsbackendsftp.c:1834
-#: ../daemon/gvfsftptask.c:400
+#: ../daemon/gvfsftptask.c:399
 msgid "Permission denied"
 msgstr "ההרשאה נדחתה"
 
-#: ../daemon/gvfsbackendafc.c:293
+#: ../daemon/gvfsbackendafc.c:289
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "שגיאת נעילה בלתי מטופלת (%d)"
 
-#: ../daemon/gvfsbackendafc.c:310
+#: ../daemon/gvfsbackendafc.c:306
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "שגיאת libimobiledevice: ארגומנט שגוי"
 
-#: ../daemon/gvfsbackendafc.c:314
+#: ../daemon/gvfsbackendafc.c:310
 msgid "libimobiledevice Error: No device found. Make sure usbmuxd is set up correctly."
 msgstr "שגיאת libimobiledevice: לא נמצא התקן. נא לוודא ש־usbmuxd מותקן כראוי."
 
-#: ../daemon/gvfsbackendafc.c:318
+#: ../daemon/gvfsbackendafc.c:314
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "שגיאת libimobiledevice בלתי מטופלת (%d)"
 
-#: ../daemon/gvfsbackendafc.c:385
+#: ../daemon/gvfsbackendafc.c:381
 #: ../daemon/gvfsbackend.c:963
 #: ../monitor/gdu/ggdudrive.c:1024
 #: ../monitor/gdu/ggdumount.c:926
 msgid "Cancel"
 msgstr "ביטול"
 
-#: ../daemon/gvfsbackendafc.c:385
+#: ../daemon/gvfsbackendafc.c:381
 msgid "Try again"
 msgstr "ניסיון חוזר"
 
-#: ../daemon/gvfsbackendafc.c:403
+#: ../daemon/gvfsbackendafc.c:399
 #: ../daemon/gvfsbackendarchive.c:550
 #: ../daemon/gvfsbackendarchive.c:579
 #: ../daemon/gvfsbackenddav.c:1797
 #: ../daemon/gvfsbackendhttp.c:302
-#: ../daemon/gvfsbackendobexftp.c:861
-#: ../daemon/gvfsbackendobexftp.c:877
-#: ../daemon/gvfsbackendobexftp.c:896
+#: ../daemon/gvfsbackendobexftp.c:859
+#: ../daemon/gvfsbackendobexftp.c:875
+#: ../daemon/gvfsbackendobexftp.c:894
 #: ../daemon/gvfsbackendsmb.c:662
 msgid "Invalid mount spec"
 msgstr "הגדרת עיגון שגויה"
 
-#: ../daemon/gvfsbackendafc.c:409
-#: ../daemon/gvfsbackendafc.c:439
+#: ../daemon/gvfsbackendafc.c:405
+#: ../daemon/gvfsbackendafc.c:435
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "מיקום ה־AFC שגוי: חייב להיות בצורה afc://uuid:port-number"
 
-#: ../daemon/gvfsbackendafc.c:425
+#: ../daemon/gvfsbackendafc.c:421
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "התקן נייד של Apple"
 
-#: ../daemon/gvfsbackendafc.c:430
+#: ../daemon/gvfsbackendafc.c:426
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "התקן נייד של Apple, פרוץ (Jailbroken)"
 
-#: ../daemon/gvfsbackendafc.c:435
+#: ../daemon/gvfsbackendafc.c:431
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "מסמכים על התקן נייד של Apple"
 
-#: ../daemon/gvfsbackendafc.c:493
+#: ../daemon/gvfsbackendafc.c:489
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (פרוץ)"
@@ -494,7 +494,7 @@ msgstr "%s (פרוץ)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:500
+#: ../daemon/gvfsbackendafc.c:496
 #: ../monitor/afc/afcvolume.c:125
 #, c-format
 msgid "Documents on %s"
@@ -503,22 +503,22 @@ msgstr "מסמכים על %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:579
+#: ../daemon/gvfsbackendafc.c:575
 #, c-format
 msgid "Device '%s' is password protected. Enter the password on the device and click 'Try again'."
 msgstr "ההתקן '%s' מוגן בססמה. יש להזין את הססמה בהתקן וללחוץ על 'ניסיון חוזר'."
 
-#: ../daemon/gvfsbackendafc.c:918
+#: ../daemon/gvfsbackendafc.c:914
 #: ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645
-#: ../daemon/gvfsbackendgphoto2.c:1812
-#: ../daemon/gvfsbackendobexftp.c:1071
+#: ../daemon/gvfsbackendgphoto2.c:1806
+#: ../daemon/gvfsbackendobexftp.c:1068
 #: ../daemon/gvfsbackendsmb.c:718
 #: ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "לא ניתן לפתוח ספרייה"
 
-#: ../daemon/gvfsbackendafc.c:928
+#: ../daemon/gvfsbackendafc.c:924
 #: ../daemon/gvfsbackendafpbrowse.c:257
 #: ../daemon/gvfsbackendafpbrowse.c:390
 #: ../daemon/gvfsbackendafpbrowse.c:422
@@ -532,34 +532,34 @@ msgstr "לא ניתן לפתוח ספרייה"
 #: ../daemon/gvfsbackendcdda.c:987
 #: ../daemon/gvfsbackendcomputer.c:627
 #: ../daemon/gvfsbackenddnssd.c:398
-#: ../daemon/gvfsbackendftp.c:1067
+#: ../daemon/gvfsbackendftp.c:1065
 #: ../daemon/gvfsbackendnetwork.c:602
-#: ../daemon/gvfsbackendsmbbrowse.c:1094
-#: ../daemon/gvfsbackendsmbbrowse.c:1161
-#: ../daemon/gvfsbackendsmbbrowse.c:1333
-#: ../daemon/gvfsbackendsmbbrowse.c:1403
+#: ../daemon/gvfsbackendsmbbrowse.c:1091
+#: ../daemon/gvfsbackendsmbbrowse.c:1158
+#: ../daemon/gvfsbackendsmbbrowse.c:1330
+#: ../daemon/gvfsbackendsmbbrowse.c:1400
 #, c-format
 msgid "File doesn't exist"
 msgstr "קובץ לא קיים"
 
-#: ../daemon/gvfsbackendafc.c:1119
-#: ../daemon/gvfsbackendafc.c:2462
+#: ../daemon/gvfsbackendafc.c:1115
+#: ../daemon/gvfsbackendafc.c:2458
 msgid "Backups are not yet supported."
 msgstr "גיבויים עדיין לא נתמכים."
 
-#: ../daemon/gvfsbackendafc.c:1291
+#: ../daemon/gvfsbackendafc.c:1287
 msgid "Invalid seek type"
 msgstr "סוג החיפוש בלתי תקין"
 
-#: ../daemon/gvfsbackendafc.c:2299
+#: ../daemon/gvfsbackendafc.c:2295
 #: ../daemon/gvfsbackendafp.c:3809
-#: ../daemon/gvfsbackendftp.c:1087
-#: ../daemon/gvfsbackendftp.c:1135
-#: ../daemon/gvfsbackendftp.c:1156
+#: ../daemon/gvfsbackendftp.c:1085
+#: ../daemon/gvfsbackendftp.c:1133
+#: ../daemon/gvfsbackendftp.c:1154
 #: ../daemon/gvfsbackendsftp.c:1832
 #: ../daemon/gvfsbackendsftp.c:4633
 #: ../daemon/gvfsbackendsmb.c:1719
-#: ../daemon/gvfsftptask.c:392
+#: ../daemon/gvfsftptask.c:391
 msgid "Operation unsupported"
 msgstr "פעולה לא נתמכת"
 
@@ -588,8 +588,8 @@ msgid "Got error code: %d from server"
 msgstr "התקבל קוד השגיאה: %d מהשרת"
 
 #: ../daemon/gvfsbackendafpbrowse.c:285
-#: ../daemon/gvfsbackendsmbbrowse.c:1089
-#: ../daemon/gvfsbackendsmbbrowse.c:1135
+#: ../daemon/gvfsbackendsmbbrowse.c:1086
+#: ../daemon/gvfsbackendsmbbrowse.c:1132
 msgid "The file is not a mountable"
 msgstr "לא ניתן לחבר את הקובץ"
 
@@ -606,7 +606,7 @@ msgstr "שיתוף AFP ב־%s"
 #: ../daemon/gvfsbackendafpbrowse.c:534
 #: ../daemon/gvfsbackendafp.c:4294
 #: ../daemon/gvfsbackendarchive.c:539
-#: ../daemon/gvfsbackendftp.c:667
+#: ../daemon/gvfsbackendftp.c:665
 #: ../daemon/gvfsbackendsftp.c:1745
 msgid "No hostname specified"
 msgstr "לא צויין שם מארח"
@@ -648,10 +648,10 @@ msgstr "קובץ היעד פתוח"
 #: ../daemon/gvfsbackenddav.c:2257
 #: ../daemon/gvfsbackenddav.c:2510
 #: ../daemon/gvfsbackenddav.c:2621
-#: ../daemon/gvfsbackendftp.c:752
-#: ../daemon/gvfsbackendftp.c:933
-#: ../daemon/gvfsbackendftp.c:1372
-#: ../daemon/gvfsbackendftp.c:1552
+#: ../daemon/gvfsbackendftp.c:750
+#: ../daemon/gvfsbackendftp.c:931
+#: ../daemon/gvfsbackendftp.c:1370
+#: ../daemon/gvfsbackendftp.c:1550
 #: ../daemon/gvfsbackendsftp.c:4285
 #: ../daemon/gvfsbackendsmb.c:2082
 msgid "Target file already exists"
@@ -729,15 +729,15 @@ msgstr "קובץ המקור הוא תיקייה"
 
 #: ../daemon/gvfsbackendafp.c:1909
 #: ../daemon/gvfsbackendburn.c:876
-#: ../daemon/gvfsbackendftp.c:1544
-#: ../daemon/gvfsbackendobexftp.c:1779
+#: ../daemon/gvfsbackendftp.c:1542
+#: ../daemon/gvfsbackendobexftp.c:1776
 msgid "Can't copy directory over directory"
 msgstr "לא ניתן להעתיק תיקייה על גבי תיקייה"
 
 #: ../daemon/gvfsbackendafp.c:1912
 #: ../daemon/gvfsbackendafp.c:2109
 #: ../daemon/gvfsbackenddav.c:2201
-#: ../daemon/gvfsbackendftp.c:773
+#: ../daemon/gvfsbackendftp.c:771
 #: ../daemon/gvfsbackendsftp.c:2333
 #: ../daemon/gvfsbackendsftp.c:3069
 #: ../daemon/gvfsbackendsftp.c:3408
@@ -747,8 +747,8 @@ msgstr "הקובץ הוא תיקייה"
 
 #: ../daemon/gvfsbackendafp.c:1928
 #: ../daemon/gvfsbackendburn.c:892
-#: ../daemon/gvfsbackendftp.c:1567
-#: ../daemon/gvfsbackendobexftp.c:1794
+#: ../daemon/gvfsbackendftp.c:1565
+#: ../daemon/gvfsbackendobexftp.c:1791
 msgid "Can't recursively copy directory"
 msgstr "לא ניתן להעתיק תיקייה באופן נסיגתי"
 
@@ -804,8 +804,8 @@ msgid "The file was externally modified"
 msgstr "הקובץ השתנה על ידי גורם חיצוני"
 
 #: ../daemon/gvfsbackendafp.c:3314
-#: ../daemon/gvfsbackendftp.c:981
-#: ../daemon/gvfsbackendftp.c:1335
+#: ../daemon/gvfsbackendftp.c:979
+#: ../daemon/gvfsbackendftp.c:1333
 #: ../daemon/gvfsbackendsftp.c:3274
 msgid "backups not supported yet"
 msgstr "גיבויים עדיין לא נתמכים"
@@ -819,7 +819,7 @@ msgid "Target object is not a directory"
 msgstr "פריט היעד אינו תיקייה"
 
 #: ../daemon/gvfsbackendafp.c:3795
-#: ../daemon/gvfsbackendftp.c:1128
+#: ../daemon/gvfsbackendftp.c:1126
 #: ../daemon/gvfsbackendsftp.c:4643
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "סוג המאפיין בלתי תקין (הציפייה היא ל־uint32)"
@@ -865,7 +865,7 @@ msgstr "לא צוין כרך"
 #. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
 #: ../daemon/gvfsbackendarchive.c:330
 #: ../daemon/gvfsbackendsftp.c:2269
-#: ../daemon/gvfsftpdircache.c:431
+#: ../daemon/gvfsftpdircache.c:430
 #, c-format
 msgid "/ on %s"
 msgstr "/ ב־%s"
@@ -877,7 +877,7 @@ msgstr "/ ב־%s"
 #: ../daemon/gvfsbackendftp.c:351
 #: ../daemon/gvfsbackendnetwork.c:649
 #: ../daemon/gvfsbackendsftp.c:3881
-#: ../daemon/gvfsftpdircache.c:157
+#: ../daemon/gvfsftpdircache.c:156
 msgid "The file is not a directory"
 msgstr "הקובץ אינו ספרייה"
 
@@ -899,10 +899,10 @@ msgstr "לא ניתן ליצור ספרייה זמנית"
 #: ../daemon/gvfsbackendburn.c:781
 #: ../daemon/gvfsbackendburn.c:972
 #: ../daemon/gvfsbackendburn.c:1008
-#: ../daemon/gvfsbackendftp.c:793
-#: ../daemon/gvfsbackendgphoto2.c:1207
-#: ../daemon/gvfsbackendgphoto2.c:2133
-#: ../daemon/gvfsbackendgphoto2.c:2852
+#: ../daemon/gvfsbackendftp.c:791
+#: ../daemon/gvfsbackendgphoto2.c:1203
+#: ../daemon/gvfsbackendgphoto2.c:2127
+#: ../daemon/gvfsbackendgphoto2.c:2846
 #: ../daemon/gvfsbackendsftp.c:1836
 #: ../daemon/gvfsbackendsftp.c:2949
 #: ../daemon/gvfsbackendsftp.c:2962
@@ -914,7 +914,7 @@ msgstr "אין קובץ או תיקייה כאלו"
 
 #: ../daemon/gvfsbackendburn.c:459
 #: ../daemon/gvfsbackendburn.c:904
-#: ../daemon/gvfsbackendobexftp.c:1810
+#: ../daemon/gvfsbackendobexftp.c:1807
 msgid "Can't copy file over directory"
 msgstr "לא ניתן להעתיק קובץ על גבי תיקייה"
 
@@ -929,7 +929,7 @@ msgstr "יוצר CD/DVD"
 #: ../daemon/gvfsbackendburn.c:986
 #: ../daemon/gvfsbackendburn.c:990
 #: ../daemon/gvfsbackendburn.c:1000
-#: ../daemon/gvfsbackendgphoto2.c:2926
+#: ../daemon/gvfsbackendgphoto2.c:2920
 msgid "File exists"
 msgstr "קובץ קיים"
 
@@ -982,8 +982,8 @@ msgid "No such file or directory in target path"
 msgstr "אין כזה קובץ או תיקייה בנתיב היעד"
 
 #: ../daemon/gvfsbackendburn.c:885
-#: ../daemon/gvfsbackendobexftp.c:1787
-#: ../daemon/gvfsbackendobexftp.c:1818
+#: ../daemon/gvfsbackendobexftp.c:1784
+#: ../daemon/gvfsbackendobexftp.c:1815
 #: ../daemon/gvfsbackendsftp.c:1830
 #: ../daemon/gvfsbackendsftp.c:4441
 msgid "Target file exists"
@@ -991,10 +991,10 @@ msgstr "קובץ היעד קיים"
 
 #: ../daemon/gvfsbackendburn.c:950
 #: ../daemon/gvfsbackendcomputer.c:794
-#: ../daemon/gvfsbackendgphoto2.c:2506
-#: ../daemon/gvfsbackendgphoto2.c:2715
-#: ../daemon/gvfsbackendgphoto2.c:2812
-#: ../daemon/gvfsbackendgphoto2.c:2905
+#: ../daemon/gvfsbackendgphoto2.c:2500
+#: ../daemon/gvfsbackendgphoto2.c:2709
+#: ../daemon/gvfsbackendgphoto2.c:2806
+#: ../daemon/gvfsbackendgphoto2.c:2899
 msgid "Not supported"
 msgstr "לא נתמך"
 
@@ -1013,22 +1013,22 @@ msgstr ""
 "תכנה אחת או יותר מעסיקות את הכרך."
 
 #: ../daemon/gvfsbackendcdda.c:332
-#: ../daemon/gvfsbackendgphoto2.c:1510
+#: ../daemon/gvfsbackendgphoto2.c:1506
 msgid "Cannot create gudev client"
 msgstr "לא ניתן ליצור לקוח gudev"
 
 #: ../daemon/gvfsbackendcdda.c:352
-#: ../daemon/gvfsbackendgphoto2.c:1528
+#: ../daemon/gvfsbackendgphoto2.c:1524
 msgid "Cannot connect to the system bus"
 msgstr "Cannot connect to the system bus"
 
 #: ../daemon/gvfsbackendcdda.c:363
-#: ../daemon/gvfsbackendgphoto2.c:1540
+#: ../daemon/gvfsbackendgphoto2.c:1536
 msgid "Cannot create libhal context"
 msgstr "Cannot create libhal context"
 
 #: ../daemon/gvfsbackendcdda.c:377
-#: ../daemon/gvfsbackendgphoto2.c:1553
+#: ../daemon/gvfsbackendgphoto2.c:1549
 msgid "Cannot initialize libhal"
 msgstr "Cannot initialize libhal"
 
@@ -1088,7 +1088,7 @@ msgid "Error seeking in stream on drive %s"
 msgstr "שגיאה באיתור בתזרים שבהתקן %s"
 
 #: ../daemon/gvfsbackendcdda.c:980
-#: ../daemon/gvfsbackendgphoto2.c:1820
+#: ../daemon/gvfsbackendgphoto2.c:1814
 #, c-format
 msgid "No such file"
 msgstr "אין כזה קובץ"
@@ -1253,35 +1253,35 @@ msgstr "Dns-SD"
 
 #: ../daemon/gvfsbackenddnssd.c:755
 #: ../daemon/gvfsbackendnetwork.c:688
-#: ../daemon/gvfsbackendnetwork.c:820
-#: ../daemon/gvfsbackendnetwork.c:821
+#: ../daemon/gvfsbackendnetwork.c:818
+#: ../daemon/gvfsbackendnetwork.c:819
 msgid "Network"
 msgstr "רשת"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:488
+#: ../daemon/gvfsbackendftp.c:486
 #, c-format
 msgid "Enter password for FTP as %s on %s"
 msgstr "נא להזין ססמה עבור ה־FTP כ־%s ב־%s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:491
+#: ../daemon/gvfsbackendftp.c:489
 #, c-format
 msgid "Enter password for FTP on %s"
 msgstr "נא להזין ססמה עבור ה־SFTP ב־%s"
 
-#: ../daemon/gvfsbackendftp.c:630
+#: ../daemon/gvfsbackendftp.c:628
 #, c-format
 msgid "FTP on %s"
 msgstr "‏FTP ב־%s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:634
+#: ../daemon/gvfsbackendftp.c:632
 #, c-format
 msgid "FTP as %s on %s"
 msgstr "‏FTP כ־%s ב־%s"
 
-#: ../daemon/gvfsbackendftp.c:727
+#: ../daemon/gvfsbackendftp.c:725
 msgid "Insufficient permissions"
 msgstr "אין די הרשאות"
 
@@ -1306,15 +1306,15 @@ msgid "%s: %d: Not Supported"
 msgstr "‏%s: ‏%d: לא נתמך"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:720
-#: ../daemon/gvfsbackendgphoto2.c:726
+#: ../daemon/gvfsbackendgphoto2.c:716
+#: ../daemon/gvfsbackendgphoto2.c:722
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "מצלמה דיגיטלית (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:949
+#: ../daemon/gvfsbackendgphoto2.c:945
 #: ../monitor/gphoto2/ggphoto2volume.c:197
 #: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
@@ -1323,175 +1323,175 @@ msgstr "מצלמה של %s"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:952
+#: ../daemon/gvfsbackendgphoto2.c:948
 #: ../monitor/gphoto2/ggphoto2volume.c:192
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "נגן שמע של %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:961
+#: ../daemon/gvfsbackendgphoto2.c:957
 #: ../monitor/gphoto2/ggphoto2volume.c:203
 #: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "מצלמה"
 
-#: ../daemon/gvfsbackendgphoto2.c:963
+#: ../daemon/gvfsbackendgphoto2.c:959
 #: ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "נגן שמע"
 
-#: ../daemon/gvfsbackendgphoto2.c:1569
+#: ../daemon/gvfsbackendgphoto2.c:1565
 msgid "No device specified"
 msgstr "לא צוין התקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1590
+#: ../daemon/gvfsbackendgphoto2.c:1586
 msgid "Cannot create gphoto2 context"
 msgstr "לא ניתן ליצור הקשר gphoto2"
 
-#: ../daemon/gvfsbackendgphoto2.c:1600
+#: ../daemon/gvfsbackendgphoto2.c:1596
 msgid "Error creating camera"
 msgstr "שגיאה ביצירת מצלמה"
 
-#: ../daemon/gvfsbackendgphoto2.c:1613
-#: ../daemon/gvfsbackendgphoto2.c:1623
+#: ../daemon/gvfsbackendgphoto2.c:1609
+#: ../daemon/gvfsbackendgphoto2.c:1619
 msgid "Error loading device information"
 msgstr "שגיאה בטעינת נתוני ההתקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1635
+#: ../daemon/gvfsbackendgphoto2.c:1631
 msgid "Error looking up device information"
 msgstr "שגיאה בחיפוש נתוני ההתקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1645
+#: ../daemon/gvfsbackendgphoto2.c:1641
 msgid "Error getting device information"
 msgstr "שגיאה בקבלת נתוני ההתקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1658
+#: ../daemon/gvfsbackendgphoto2.c:1654
 msgid "Error setting up camera communications port"
 msgstr "שגיאה בהגדרת שער התקשורת של המצלמה"
 
-#: ../daemon/gvfsbackendgphoto2.c:1669
+#: ../daemon/gvfsbackendgphoto2.c:1665
 msgid "Error initializing camera"
 msgstr "שגיאה באתחול המצלמה"
 
 #. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
 #. backend and shouldn't be translated.
-#: ../daemon/gvfsbackendgphoto2.c:1684
+#: ../daemon/gvfsbackendgphoto2.c:1680
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "חיבור gphoto2 על %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1766
+#: ../daemon/gvfsbackendgphoto2.c:1760
 msgid "No camera specified"
 msgstr "לא צויינה מצלמה"
 
-#: ../daemon/gvfsbackendgphoto2.c:1828
+#: ../daemon/gvfsbackendgphoto2.c:1822
 msgid "Error creating file object"
 msgstr "שגיאה ביצירת אובייקט קובץ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1843
+#: ../daemon/gvfsbackendgphoto2.c:1837
 msgid "Error getting file"
 msgstr "שגיאה בקבלת קובץ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1853
+#: ../daemon/gvfsbackendgphoto2.c:1847
 msgid "Error getting data from file"
 msgstr "שגיאה בקבלת נתונים מהקובץ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1911
+#: ../daemon/gvfsbackendgphoto2.c:1905
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "מזהה הסמל '%s' אינו בנוי היטב"
 
-#: ../daemon/gvfsbackendgphoto2.c:1987
-#: ../daemon/gvfsbackendgphoto2.c:3176
+#: ../daemon/gvfsbackendgphoto2.c:1981
+#: ../daemon/gvfsbackendgphoto2.c:3170
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "שגיאה בחיפוש בתזרים המצלמה %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2127
+#: ../daemon/gvfsbackendgphoto2.c:2121
 #: ../daemon/gvfsbackendsftp.c:2952
-#: ../daemon/gvfsbackendsmbbrowse.c:1399
+#: ../daemon/gvfsbackendsmbbrowse.c:1396
 msgid "Not a directory"
 msgstr "לא ספרייה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2160
+#: ../daemon/gvfsbackendgphoto2.c:2154
 msgid "Failed to get folder list"
-msgstr "נכשל בקבלת רשימת תיקיות"
+msgstr "קבלת רשימת התיקיות נכשלה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2226
+#: ../daemon/gvfsbackendgphoto2.c:2220
 msgid "Failed to get file list"
-msgstr "נכשל בקבלת רשימת קבצים"
+msgstr "קבלת רשימת הקבצים נכשלה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2518
+#: ../daemon/gvfsbackendgphoto2.c:2512
 msgid "Error creating directory"
 msgstr "שגיאה ביצירת תיקייה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2727
+#: ../daemon/gvfsbackendgphoto2.c:2721
 msgid "Name already exists"
 msgstr "השם כבר קיים"
 
-#: ../daemon/gvfsbackendgphoto2.c:2738
-#: ../daemon/gvfsbackendgphoto2.c:3367
+#: ../daemon/gvfsbackendgphoto2.c:2732
+#: ../daemon/gvfsbackendgphoto2.c:3361
 msgid "New name too long"
 msgstr "השם החדש ארוך מדי"
 
-#: ../daemon/gvfsbackendgphoto2.c:2748
-#: ../daemon/gvfsbackendgphoto2.c:3378
+#: ../daemon/gvfsbackendgphoto2.c:2742
+#: ../daemon/gvfsbackendgphoto2.c:3372
 msgid "Error renaming directory"
 msgstr "שגיאה בשינוי שם התיקייה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2761
-#: ../daemon/gvfsbackendgphoto2.c:3391
+#: ../daemon/gvfsbackendgphoto2.c:2755
+#: ../daemon/gvfsbackendgphoto2.c:3385
 msgid "Error renaming file"
 msgstr "שגיאה בשינוי שם קובץ"
 
 # c-format
-#: ../daemon/gvfsbackendgphoto2.c:2825
+#: ../daemon/gvfsbackendgphoto2.c:2819
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "הספרייה '%s' אינה ריקה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2836
+#: ../daemon/gvfsbackendgphoto2.c:2830
 msgid "Error deleting directory"
 msgstr "שגיאה במחיקת ספרייה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2862
+#: ../daemon/gvfsbackendgphoto2.c:2856
 msgid "Error deleting file"
 msgstr "שגיאה במחיקת קובץ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2915
+#: ../daemon/gvfsbackendgphoto2.c:2909
 msgid "Can't write to directory"
 msgstr "לא ניתן לכתוב לספרייה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2962
+#: ../daemon/gvfsbackendgphoto2.c:2956
 msgid "Cannot allocate new file to append to"
 msgstr "לא ניתן להקצות קובץ חדש אליו יש להוסיף"
 
-#: ../daemon/gvfsbackendgphoto2.c:2977
+#: ../daemon/gvfsbackendgphoto2.c:2971
 msgid "Cannot read file to append to"
 msgstr "לא ניתן לקרוא את הקובץ אליו יש להוסיף"
 
-#: ../daemon/gvfsbackendgphoto2.c:2988
+#: ../daemon/gvfsbackendgphoto2.c:2982
 msgid "Cannot get data of file to append to"
 msgstr "לא ניתן לקבל נתונים עבור הקובץ אליו יש להוסיף"
 
-#: ../daemon/gvfsbackendgphoto2.c:3275
+#: ../daemon/gvfsbackendgphoto2.c:3269
 msgid "Error writing file"
 msgstr "שגיאה בכתיבת קובץ"
 
-#: ../daemon/gvfsbackendgphoto2.c:3323
+#: ../daemon/gvfsbackendgphoto2.c:3317
 msgid "Not supported (not same directory)"
 msgstr "לא נתמך (לא אותה ספרייה)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3335
+#: ../daemon/gvfsbackendgphoto2.c:3329
 msgid "Not supported (the source is a directory, the destination is a directory too)"
 msgstr "לא נתמך (המקור הוא תיקייה, היעד גם הוא תיקייה)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3343
+#: ../daemon/gvfsbackendgphoto2.c:3337
 msgid "Not supported (the source is a directory, but the destination is an existing file)"
 msgstr "לא נתמך (המקור הוא תיקייה, היעד היא קובץ קיים)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3355
+#: ../daemon/gvfsbackendgphoto2.c:3349
 msgid "Not supported (the source is a file, but the destination is a directory)"
 msgstr "לא נתמך (המקור הוא קובץ, אך היעד הוא תיקייה)"
 
@@ -1506,13 +1506,13 @@ msgstr "הודעות תיקייה לא נתמכות"
 
 #. smb:/// root link
 #: ../daemon/gvfsbackendnetwork.c:247
-#: ../daemon/gvfsbackendsmbbrowse.c:894
+#: ../daemon/gvfsbackendsmbbrowse.c:891
 msgid "Windows Network"
 msgstr "רשת Windows"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:873
+#: ../daemon/gvfsbackendnetwork.c:871
 msgid "Network Location Monitor"
 msgstr "מנטר מיקום הרשת"
 
@@ -1522,26 +1522,26 @@ msgstr "מנטר מיקום הרשת"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:681
+#: ../daemon/gvfsbackendobexftp.c:679
 #: ../daemon/gvfsbackendsmb.c:554
 #: ../daemon/gvfsbackendsmb.c:1433
 #, c-format
 msgid "%s on %s"
 msgstr "%s ב־%s"
 
-#: ../daemon/gvfsbackendobexftp.c:890
+#: ../daemon/gvfsbackendobexftp.c:888
 msgid "USB support missing. Please contact your software vendor"
 msgstr "אין תמיכה ב־USB. נא ליצור קשר עם יצרן החומרה שלך"
 
-#: ../daemon/gvfsbackendobexftp.c:1010
+#: ../daemon/gvfsbackendobexftp.c:1007
 msgid "Connection to the device lost"
 msgstr "החיבור להתקן אבד"
 
-#: ../daemon/gvfsbackendobexftp.c:1507
+#: ../daemon/gvfsbackendobexftp.c:1504
 msgid "Device requires a software update"
 msgstr "ההתקן דורש עדכון תוכנה"
 
-#: ../daemon/gvfsbackendobexftp.c:1855
+#: ../daemon/gvfsbackendobexftp.c:1852
 #: ../daemon/gvfsbackendsmb.c:1973
 #, c-format
 msgid "Error deleting file: %s"
@@ -1722,28 +1722,28 @@ msgid "Unable to create temporary file"
 msgstr "לא ניתן לייצר קובץ זמני"
 
 #. translators: %s is a server name
-#: ../daemon/gvfsbackendsmbbrowse.c:375
+#: ../daemon/gvfsbackendsmbbrowse.c:372
 #, c-format
 msgid "Password required for %s"
 msgstr "נדרשת ססמה עבור %s"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:902
+#: ../daemon/gvfsbackendsmbbrowse.c:899
 #, c-format
 msgid "Windows shares on %s"
 msgstr "שיתוף Windows ב־%s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmbbrowse.c:1001
+#: ../daemon/gvfsbackendsmbbrowse.c:998
 msgid "Failed to retrieve share list from server"
 msgstr "ארע כשל בקבלת רשימת השיתוף מהשרת"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1157
+#: ../daemon/gvfsbackendsmbbrowse.c:1154
 msgid "Not a regular file"
 msgstr "לא קובץ רגיל"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1489
+#: ../daemon/gvfsbackendsmbbrowse.c:1486
 msgid "Windows Network Filesystem Service"
 msgstr "שירות מערכת קבצי רשת Windows"
 
@@ -1818,7 +1818,7 @@ msgstr "לא ניתן לשנות פריטים באשפה"
 msgid "Trash"
 msgstr "אשפה"
 
-#: ../daemon/gvfsdaemon.c:1056
+#: ../daemon/gvfsdaemon.c:1055
 msgid "Invalid backend type"
 msgstr "סוג מנוע שגוי"
 
@@ -1833,8 +1833,8 @@ msgstr "סוף תזרים בלתי צפוי"
 
 #: ../daemon/gvfsftpconnection.c:196
 #: ../daemon/gvfsftpconnection.c:209
-#: ../daemon/gvfsftptask.c:412
-#: ../daemon/gvfsftptask.c:840
+#: ../daemon/gvfsftptask.c:411
+#: ../daemon/gvfsftptask.c:839
 msgid "Invalid reply"
 msgstr "התגובה בלתי תקנית"
 
@@ -1850,44 +1850,44 @@ msgstr "ארע כשל ביצירת חיבור FTP פעיל."
 msgid "Filename contains invalid characters."
 msgstr "שם הקובץ מכיל תווים בלתי תקניים."
 
-#: ../daemon/gvfsftptask.c:262
+#: ../daemon/gvfsftptask.c:261
 msgid "The FTP server is busy. Try again later"
 msgstr "שרת ה־FTP עסוק. נא לנסות שוב מאוחר יותר"
 
-#: ../daemon/gvfsftptask.c:356
+#: ../daemon/gvfsftptask.c:355
 msgid "Accounts are unsupported"
 msgstr "חשבונות לא נתמכים"
 
-#: ../daemon/gvfsftptask.c:360
+#: ../daemon/gvfsftptask.c:359
 msgid "Host closed connection"
 msgstr "המארח סגר את החיבור"
 
-#: ../daemon/gvfsftptask.c:364
+#: ../daemon/gvfsftptask.c:363
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "לא ניתן לפתוח את חיבור הנתונים. יתכן שחומת האש שלך מונעת זאת?"
 
-#: ../daemon/gvfsftptask.c:368
+#: ../daemon/gvfsftptask.c:367
 msgid "Data connection closed"
 msgstr "חיבור המידע נסגר"
 
-#: ../daemon/gvfsftptask.c:375
-#: ../daemon/gvfsftptask.c:379
+#: ../daemon/gvfsftptask.c:374
+#: ../daemon/gvfsftptask.c:378
 msgid "Operation failed"
 msgstr "הפעולה בוטלה"
 
-#: ../daemon/gvfsftptask.c:384
+#: ../daemon/gvfsftptask.c:383
 msgid "No space left on server"
 msgstr "לא נשאר מקום בשרת"
 
-#: ../daemon/gvfsftptask.c:396
+#: ../daemon/gvfsftptask.c:395
 msgid "Unsupported network protocol"
 msgstr "פרוטוקול הרשת אינו נתמך"
 
-#: ../daemon/gvfsftptask.c:404
+#: ../daemon/gvfsftptask.c:403
 msgid "Page type unknown"
 msgstr "סוג הדף לא ידוע"
 
-#: ../daemon/gvfsftptask.c:408
+#: ../daemon/gvfsftptask.c:407
 msgid "Invalid filename"
 msgstr "שם קובץ לא תקין"
 

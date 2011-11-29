@@ -107,9 +107,6 @@ trash_expunge (GFile *directory)
     {
       trash_expunge_queue = g_hash_table_new (g_file_hash,
                                               (GEqualFunc) g_file_equal);
-      g_mutex_init (&trash_expunge_lock);
-      g_cond_init (&trash_expunge_wait);
-
       g_once_init_leave (&trash_expunge_initialised, 1);
     }
 

@@ -380,6 +380,8 @@ g_mount_source_ask_password (GMountSource *source,
   AskSyncData data;
 
   memset (&data, 0, sizeof (data));
+  g_mutex_init (&data.mutex);
+  g_cond_init (&data.cond);
   g_mutex_lock (&data.mutex);
 
 
@@ -549,6 +551,8 @@ g_mount_source_ask_question (GMountSource *source,
   AskSyncData data;
   
   memset (&data, 0, sizeof (data));
+  g_mutex_init (&data.mutex);
+  g_cond_init (&data.cond);
   g_mutex_lock (&data.mutex);
 
   g_mount_source_ask_question_async (source,
@@ -842,6 +846,8 @@ g_mount_source_show_processes (GMountSource *source,
   AskSyncData data;
 
   memset (&data, 0, sizeof (data));
+  g_mutex_init (&data.mutex);
+  g_cond_init (&data.cond);
   g_mutex_lock (&data.mutex);
 
   g_mount_source_show_processes_async (source,

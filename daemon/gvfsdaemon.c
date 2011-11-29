@@ -158,6 +158,8 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
   /* TODO: verify thread_pool != NULL in a nicer way */
   g_assert (daemon->thread_pool != NULL);
 
+  g_mutex_init (&daemon->lock);
+
   daemon->mount_counter = 0;
   
   daemon->jobs = NULL;

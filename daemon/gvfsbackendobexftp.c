@@ -530,6 +530,9 @@ g_vfs_backend_obexftp_init (GVfsBackendObexftp *backend)
       return;
   }
 
+  g_mutex_init (&backend->mutex);
+  g_cond_init (&backend->cond);
+
   backend->manager_proxy = dbus_g_proxy_new_for_name (backend->connection,
                                                       "org.openobex",
                                                       "/org/openobex",

@@ -2423,7 +2423,7 @@ msgstr "Hosszú kiírási formátum használata"
 
 #: ../programs/gvfs-ls.c:42
 msgid "Show completions"
-msgstr "Kiegészítése megjelenítése"
+msgstr "Kiegészítések megjelenítése"
 
 #: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
 #: ../programs/gvfs-rename.c:69

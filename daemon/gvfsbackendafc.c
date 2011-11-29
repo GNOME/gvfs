@@ -2600,6 +2600,8 @@ g_vfs_backend_afc_init (GVfsBackendAfc *self)
       /* enable full debugging */
       idevice_set_debug_level (1);
     }
+
+  g_mutex_init (&self->apps_lock);
 }
 
 static void

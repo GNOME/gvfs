@@ -5,12 +5,17 @@
 # Changwoo Ryu <cwryu@debian.org>, 2009, 2010, 2011.
 # Seong-ho, Cho <darkcircle.0426@gmail.com>, 2011.
 #
+# * 용어 번역
+#  * WebDAV (share) - 웹 공유, 웹 공유 디렉터리
+#  * backup - 예비 파일
+#  * AFP - AFP -- Apple Filing Protocol을 말함
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2011-09-23 11:18+0000\n"
-"PO-Revision-Date: 2011-09-27 06:40+0900\n"
+"PO-Revision-Date: 2011-11-26 17:51+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: GNOME Korea <gnome-kr@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -374,7 +379,7 @@ msgstr "락다운 오류: 인자가 올바르지 않습니다"
 #: ../daemon/gvfsbackendafp.c:4089 ../daemon/gvfsbackendsftp.c:310
 #: ../daemon/gvfsbackendsftp.c:1834 ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
-msgstr "허가권이 거부되었습니다"
+msgstr "권한이 거부되었습니다"
 
 #: ../daemon/gvfsbackendafc.c:293
 #, c-format
@@ -560,7 +565,7 @@ msgstr "대상 파일이 열려 있습니다"
 #: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
 #: ../daemon/gvfsbackendsftp.c:4285 ../daemon/gvfsbackendsmb.c:2082
 msgid "Target file already exists"
-msgstr "해당 파일이 이미 있습니다"
+msgstr "대상 파일이 이미 있습니다"
 
 #: ../daemon/gvfsbackendafp.c:1065 ../daemon/gvfsbackendafp.c:2358
 msgid "Ancestor directory doesn't exist"
@@ -616,7 +621,7 @@ msgstr "서버에서 FPCopyFile 동작을 지원하지 않습니다"
 
 #: ../daemon/gvfsbackendafp.c:1585
 msgid "Couldn't open source file as Read/DenyWrite"
-msgstr "원본 파일을 읽기/쓰기거부 모드로 열 수 없습니다"
+msgstr "원본 파일을 읽기/쓰기거부 방식으로 열 수 없습니다"
 
 #: ../daemon/gvfsbackendafp.c:1597
 msgid "Source file and/or destination directory doesn't exist"
@@ -693,7 +698,7 @@ msgstr "파일이 외부에서 수정되었습니다"
 #: ../daemon/gvfsbackendafp.c:3314 ../daemon/gvfsbackendftp.c:981
 #: ../daemon/gvfsbackendftp.c:1335 ../daemon/gvfsbackendsftp.c:3274
 msgid "backups not supported yet"
-msgstr "백업을 아직 지원하지 않습니다"
+msgstr "예비파일을 아직 지원하지 않습니다"
 
 #: ../daemon/gvfsbackendafp.c:3539
 msgid "Directory doesn't exist"
@@ -825,13 +830,13 @@ msgstr "백엔드에서 지원하는 동작이 아닙니다"
 
 #: ../daemon/gvfsbackendburn.c:853
 msgid "No such file or directory in target path"
-msgstr "해당 경로에 파일이나 디렉터리가 없습니다"
+msgstr "대상 경로에 파일이나 디렉터리가 없습니다"
 
 #: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1787
 #: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1830
 #: ../daemon/gvfsbackendsftp.c:4441
 msgid "Target file exists"
-msgstr "해당 파일이 있습니다"
+msgstr "대상 파일이 있습니다"
 
 #: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
 #: ../daemon/gvfsbackendgphoto2.c:2506 ../daemon/gvfsbackendgphoto2.c:2715
@@ -925,7 +930,7 @@ msgstr "그런 파일이 없습니다"
 #: ../daemon/gvfsbackendcdda.c:994
 #, c-format
 msgid "The file does not exist or isn't an audio track"
-msgstr "파일이 없거나 음악 트랙이 아닙니다."
+msgstr "파일이 없거나 음악 트랙이 아닙니다"
 
 #: ../daemon/gvfsbackendcdda.c:1100
 msgid "Audio CD Filesystem Service"
@@ -988,7 +993,7 @@ msgstr "파일을 감시할 수 없습니다"
 #: ../daemon/gvfsbackenddav.c:485
 #, c-format
 msgid "WebDAV as %s on %s%s"
-msgstr "WebDAV, 사용자 %s, 호스트 %s%s"
+msgstr "웹 공유, 사용자 %s, 호스트 %s%s"
 
 #. Translators: This is the name of the WebDAV share constructed as
 #. "WebDAV on <hostname>:<port>"; The ":port" part is again the second
@@ -996,7 +1001,7 @@ msgstr "WebDAV, 사용자 %s, 호스트 %s%s"
 #: ../daemon/gvfsbackenddav.c:493
 #, c-format
 msgid "WebDAV on %s%s"
-msgstr "WebDAV, %s%s"
+msgstr "웹 공유, %s%s"
 
 #: ../daemon/gvfsbackenddav.c:668 ../daemon/gvfsbackenddav.c:1864
 #: ../daemon/gvfsbackendhttp.c:248
@@ -1019,7 +1024,7 @@ msgstr "서버에서 예측하지 못한 응답"
 #: ../daemon/gvfsbackenddav.c:1373 ../daemon/gvfsbackenddav.c:1999
 #: ../daemon/gvfsbackenddav.c:2086 ../daemon/gvfsbackenddav.c:2193
 msgid "Response invalid"
-msgstr "잘못된 응답"
+msgstr "응답이 잘못됨"
 
 #: ../daemon/gvfsbackenddav.c:1516
 msgid "WebDAV share"
@@ -1036,7 +1041,7 @@ msgstr "프록시 암호를 입력하십시오"
 
 #: ../daemon/gvfsbackenddav.c:1868 ../daemon/gvfsbackenddav.c:1872
 msgid "Not a WebDAV enabled share"
-msgstr "웹 공유 디렉토리가 아닙니다"
+msgstr "웹 공유 디렉터리가 아닙니다"
 
 #: ../daemon/gvfsbackenddav.c:1953 ../daemon/gvfsbackenddav.c:2041
 #: ../daemon/gvfsbackenddav.c:2114 ../daemon/gvfsbackenddav.c:2227
@@ -1046,7 +1051,7 @@ msgstr "요청을 만들 수 없습니다"
 #: ../daemon/gvfsbackenddav.c:2361 ../daemon/gvfsbackendsmb.c:1184
 #: ../daemon/gvfsbackendsmb.c:2099
 msgid "Backup file creation failed"
-msgstr "예비 파일 만드는데 실패했습니다"
+msgstr "예비 파일을 만드는데 실패했습니다"
 
 #. "separate": a link to dns-sd://local/
 #: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:371
@@ -1222,7 +1227,7 @@ msgstr "폴더 목록 얻기 실패"
 
 #: ../daemon/gvfsbackendgphoto2.c:2226
 msgid "Failed to get file list"
-msgstr "파일 목록 얻는 중 오류"
+msgstr "파일 목록 얻기 실패"
 
 #: ../daemon/gvfsbackendgphoto2.c:2518
 msgid "Error creating directory"
@@ -1238,7 +1243,7 @@ msgstr "새 이름이 너무 깁니다"
 
 #: ../daemon/gvfsbackendgphoto2.c:2748 ../daemon/gvfsbackendgphoto2.c:3378
 msgid "Error renaming directory"
-msgstr "디렉터리 이름 바꾸기에 오류"
+msgstr "디렉터리 이름 바꾸는 중 오류"
 
 #: ../daemon/gvfsbackendgphoto2.c:2761 ../daemon/gvfsbackendgphoto2.c:3391
 msgid "Error renaming file"
@@ -1271,7 +1276,7 @@ msgstr "덧붙이려는 파일을 읽을 수 없습니다"
 
 #: ../daemon/gvfsbackendgphoto2.c:2988
 msgid "Cannot get data of file to append to"
-msgstr "덧붙이려는 파일의 데이터를 얻을 수 없습니다"
+msgstr "덧붙이려는 파일의 데이터를 가져올 수 없습니다"
 
 #: ../daemon/gvfsbackendgphoto2.c:3275
 msgid "Error writing file"
@@ -1309,7 +1314,7 @@ msgstr "디렉터리 알림을 지원하지 않습니다"
 #. smb:/// root link
 #: ../daemon/gvfsbackendnetwork.c:247 ../daemon/gvfsbackendsmbbrowse.c:894
 msgid "Windows Network"
-msgstr "윈도 네트워크"
+msgstr "윈도우즈 네트워크"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
@@ -1512,7 +1517,7 @@ msgstr "%s에 연결하려면 암호가 필요합니다"
 #: ../daemon/gvfsbackendsmbbrowse.c:902
 #, c-format
 msgid "Windows shares on %s"
-msgstr "윈도 공유, %s"
+msgstr "윈도우즈 공유, %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmbbrowse.c:1001
@@ -1525,7 +1530,7 @@ msgstr "일반 파일이 아닙니다"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1489
 msgid "Windows Network Filesystem Service"
-msgstr "윈도 네트워크 파일 시스템 서비스"
+msgstr "윈도우즈 네트워크 파일 시스템 서비스"
 
 #. translators: First %s is a share name, second is a server name
 #: ../daemon/gvfsbackendsmb.c:238
@@ -1542,7 +1547,7 @@ msgstr "내부 오류 (%s)"
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:624
 msgid "Failed to mount Windows share"
-msgstr "윈도 공유를 마운트 하는데 실패했습니다"
+msgstr "윈도우즈 공유를 마운트 하는데 실패했습니다"
 
 #: ../daemon/gvfsbackendsmb.c:788 ../daemon/gvfsbackendsmb.c:1284
 msgid "Unsupported seek type"
@@ -1559,7 +1564,7 @@ msgstr "올바르지 않은 속성 종류 (uint64여야 함)"
 
 #: ../daemon/gvfsbackendsmb.c:1922
 msgid "Can't rename file, filename already exists"
-msgstr "해당 파일이 이미 있어, 파일 이름을 바꿀 수 없습니다"
+msgstr "파일 이름이 이미 있어, 파일 이름을 바꿀 수 없습니다"
 
 #: ../daemon/gvfsbackendsmb.c:2047
 #, c-format
@@ -1569,7 +1574,7 @@ msgstr "파일을 옮기는데 오류: %s"
 #: ../daemon/gvfsbackendsmb.c:2119
 #, c-format
 msgid "Error removing target file: %s"
-msgstr "해당 파일을 지우는데 오류: %s"
+msgstr "대상 파일을 제거하는데 오류: %s"
 
 #: ../daemon/gvfsbackendsmb.c:2143
 msgid "Can't recursively move directory"
@@ -1577,7 +1582,7 @@ msgstr "디렉터리를 되풀이해서 옮길 수 없습니다"
 
 #: ../daemon/gvfsbackendsmb.c:2187
 msgid "Windows Shares Filesystem Service"
-msgstr "윈도 공유 파일 시스템 서비스"
+msgstr "윈도우즈 공유 파일 시스템 서비스"
 
 #: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
 msgid "The trash folder may not be deleted"
@@ -1938,7 +1943,7 @@ msgstr "블루레이 R 디스크"
 
 #: ../monitor/gphoto2/hal-utils.c:51 ../monitor/hal/hal-utils.c:51
 msgid "Blank Blu-Ray R Disc"
-msgstr "블루레이 R 디스크"
+msgstr "빈 블루레이 R 디스크"
 
 #: ../monitor/gphoto2/hal-utils.c:52 ../monitor/hal/hal-utils.c:52
 msgid "Blu-Ray RW Disc"
@@ -2433,15 +2438,15 @@ msgstr "- <위치>에 있는 파일을 열거합니다"
 
 #: ../programs/gvfs-mime.c:36
 msgid "Query handler for mime-type"
-msgstr "mime 형식에 대한 핸들러"
+msgstr "mime 형식에 대한 핸들러 요청"
 
 #: ../programs/gvfs-mime.c:37
 msgid "Set handler for mime-type"
-msgstr "mime 형식에 대한 세트 핸들러"
+msgstr "mime 형식에 대해 핸들러 설정"
 
 #: ../programs/gvfs-mime.c:76
 msgid "- get/set handler for <mimetype>"
-msgstr " - <mimetype>에 대한 get/set 핸들러"
+msgstr " - <mimetype>에 대해 핸들러를 읽거나 설정합니다"
 
 #: ../programs/gvfs-mime.c:85
 msgid "Specify one of --query and --set"
@@ -2719,54 +2724,3 @@ msgstr "심볼릭 링크, 마운트, 단축 아이콘을 디렉터리처럼 따�
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
 msgstr "- 디렉터리의 내용을 트리 형식으로 봅니다"
-
-#~ msgid "Unhandled Inst proxy error (%d)"
-#~ msgstr "처리되지 Inst 프록시 오류 (%d)"
-
-#~ msgid "Unhandled SBServices proxy error (%d)"
-#~ msgstr "처리되지 않는 SBServices 프록시 오류 (%d)"
-
-#~ msgid "Service %d on Apple Mobile Device"
-#~ msgstr "애플 휴대 장치의 %d번 서비스"
-
-#~ msgid "ftp on %s"
-#~ msgstr "FTP, 호스트 %s"
-
-#~ msgid "Error renaming dir"
-#~ msgstr "디렉토리 이름 바꾸는 중 오류"
-
-#~ msgid "sftp on %s"
-#~ msgstr "SFTP, 호스트 %s"
-
-#~ msgid "%s (%s)"
-#~ msgstr "%s (%s)"
-
-#~ msgid "Enter password"
-#~ msgstr "암호를 입력하십시오"
-
-#~ msgid "Invalid return value from get_info"
-#~ msgstr "get_info에서 잘못된 반환값"
-
-#~ msgid "Invalid return value from query_info"
-#~ msgstr "query_info에서 잘못된 반환값"
-
-#~ msgid "Invalid return value from call"
-#~ msgstr "호출에서 잘못된 반환값"
-
-#~ msgid "Invalid return value from get_filesystem_info"
-#~ msgstr "get_filesystem_info에서 잘못된 반환값"
-
-#~ msgid "Invalid return value from query_filesystem_info"
-#~ msgstr "query_filesystem_info에서 잘못된 반환값"
-
-#~ msgid "Invalid return value from monitor_dir"
-#~ msgstr "monitor_dir에서 잘못된 반환값"
-
-#~ msgid "Invalid return value from monitor_file"
-#~ msgstr "monitor_file에서 잘못된 반환값"
-
-#~ msgid "Invalid return value from open_icon_for_read"
-#~ msgstr "open_icon_for_read에서 잘못된 반환값"
-
-#~ msgid "- output files at <location>"
-#~ msgstr "- <위치>에 파일을 출력합니다"
