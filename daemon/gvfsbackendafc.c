@@ -378,7 +378,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   char **dcim_afcinfo;
   plist_t value;
   lockdownd_error_t lerr;
-  const gchar *choices[] = {_("Cancel"), _("Try again")};
+  const gchar *choices[] = {_("Try again"), _("Cancel")};
   gboolean aborted = FALSE;
   gchar *message = NULL;
   gint choice;
