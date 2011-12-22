@@ -743,34 +743,14 @@ mount_cancel_pending_op (MountData *data)
 /* ------------------------------ */
 
 static void
-do_mount_command (MountData *data)
+mount_command_cb (GObject       *source_object,
+                  GAsyncResult  *res,
+                  gpointer       user_data)
 {
+  MountData *data = user_data;
   GError *error;
   gint exit_status;
   gchar *standard_error = NULL;
-  const gchar *mount_argv[3] = {"mount", NULL, NULL};
-
-  mount_argv[1] = g_unix_mount_point_get_mount_path (data->volume->mount_point);
-
-  /* TODO: we could do this async but it's probably not worth the effort */
-  error = NULL;
-  if (!g_spawn_sync (NULL,            /* working dir */
-                     (gchar **) mount_argv,
-                     NULL,            /* envp */
-                     G_SPAWN_SEARCH_PATH,
-                     NULL,            /* child_setup */
-                     NULL,            /* user_data for child_setup */
-                     NULL,            /* standard_output */
-                     &standard_error, /* standard_error */
-                     &exit_status,
-                     &error))
-    {
-      g_prefix_error (&error, "Error running mount: ");
-      g_simple_async_result_take_error (data->simple, error);
-      g_simple_async_result_complete (data->simple);
-      mount_data_free (data);
-      goto out;
-    }
 
   /* TODO: for e.g. NFS and CIFS mounts we could do GMountOperation stuff and pipe a
    * password to mount(8)'s stdin channel
@@ -778,6 +758,19 @@ do_mount_command (MountData *data)
    * TODO: if this fails because the user is not authorized (e.g. EPERM), we could
    * run it through a polkit-ified setuid root helper
    */
+
+  error = NULL;
+  if (!gvfs_udisks2_utils_spawn_finish (res,
+                                        &exit_status,
+                                        NULL, /* gchar **out_standard_output */
+                                        &standard_error,
+                                        &error))
+    {
+      g_simple_async_result_take_error (data->simple, error);
+      g_simple_async_result_complete (data->simple);
+      mount_data_free (data);
+      goto out;
+    }
 
   if (WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0)
     {
@@ -1057,9 +1050,17 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
     }
   volume->mount_pending_op = data;
 
+  /* Use the mount(8) command if there is no block device */
   if (volume->block == NULL)
     {
-      do_mount_command (data);
+      gchar *escaped_mount_path;
+      escaped_mount_path = g_strescape (g_unix_mount_point_get_mount_path (data->volume->mount_point), NULL);
+      gvfs_udisks2_utils_spawn (data->cancellable,
+                                mount_command_cb,
+                                data,
+                                "mount \"%s\"",
+                                escaped_mount_path);
+      g_free (escaped_mount_path);
       goto out;
     }
 

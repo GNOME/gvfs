@@ -37,6 +37,19 @@ GIcon *gvfs_udisks2_utils_icon_from_fs_type (const gchar *fs_type);
 gchar *gvfs_udisks2_utils_lookup_fstab_options_value (const gchar *fstab_options,
                                                       const gchar *key);
 
+void     gvfs_udisks2_utils_spawn (GCancellable        *cancellable,
+                                   GAsyncReadyCallback  callback,
+                                   gpointer             user_data,
+                                   const gchar         *command_line_format,
+                                   ...);
+
+gboolean gvfs_udisks2_utils_spawn_finish (GAsyncResult   *res,
+                                          gint           *out_exit_status,
+                                          gchar         **out_standard_output,
+                                          gchar         **out_standard_error,
+                                          GError        **error);
+
+
 G_END_DECLS
 
 #endif /* __GVFS_UDISKS2_UTILS_H__ */
