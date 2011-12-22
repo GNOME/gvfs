@@ -47,7 +47,8 @@ typedef enum {
   IOS1,
   IOS2,
   IOS3,
-  IOS4
+  IOS4,
+  IOS5
 } HostOSVersion;
 
 typedef enum {
@@ -378,7 +379,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   char **dcim_afcinfo;
   plist_t value;
   lockdownd_error_t lerr;
-  const gchar *choices[] = {_("Cancel"), _("Try again")};
+  const gchar *choices[] = {_("Try again"), _("Cancel")};
   gboolean aborted = FALSE;
   gchar *message = NULL;
   gint choice;
@@ -551,6 +552,9 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
                 case 4:
                   self->version = IOS4;
                   break;
+                case 5:
+                  self->version = IOS5;
+                  break;
                 }
             }
         }
@@ -572,7 +576,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
       /* translators:
        * %s is the device name. 'Try again' is the caption of the button
        * shown in the dialog which is defined above. */
-      message = g_strdup_printf (_("Device '%s' is password protected. Enter the password on the device and click 'Try again'."), display_name);
+      message = g_strdup_printf (_("The device '%s' is locked. Enter the passcode on the device and click 'Try again'."), display_name);
 
     ret = g_mount_source_ask_question (src,
                                        message,
@@ -1576,7 +1580,7 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
           g_free (parent);
           g_free (thumb_base);
         }
-      else if (self->version == IOS4)
+      else if (self->version == IOS4 || self->version == IOS5)
         {
           char **components;
 

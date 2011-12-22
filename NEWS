@@ -1,3 +1,12 @@
+Major changes in 1.11.1
+=======================
+* Fixed several crashes from recent mutex API changes
+* http: Automatically decompress gzip'ed streams
+* afc: Invert the choices order for the device passcode dialog
+* afc: Tweak the text used to report a device locked error
+* afc: Add support for iOS5 thumbnails
+* Translation updates
+
 Major changes in 1.11.0
 =======================
 * volume monitors: Keep remote volume monitor proxies alive forever
