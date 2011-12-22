@@ -104,16 +104,23 @@ main (int argc, char *argv[])
   if (!no_fuse)
     {
       char *fuse_path;
-      char *argv2[3];
+      char *argv2[4];
       
       fuse_path = g_build_filename (g_get_home_dir (), ".gvfs", NULL);
       
       if (!g_file_test (fuse_path, G_FILE_TEST_EXISTS))
 	g_mkdir (fuse_path, 0700);
       
+      /* The -f (foreground) option prevent libfuse to call daemon(). */
+      /* First, this is not required as g_spawn_async() already       */
+      /* detach the process. Secondly, calling daemon() and then      */
+      /* pthread_create() produce an undefined result accoring to     */
+      /* Opengroup. On system with the uClibc library this will badly */
+      /* hang the process.                                            */
       argv2[0] = LIBEXEC_DIR "/gvfs-fuse-daemon";
-      argv2[1] = fuse_path;
-      argv2[2] = NULL;
+      argv2[1] = "-f";
+      argv2[2] = fuse_path;
+      argv2[3] = NULL;
       
       g_spawn_async (NULL,
 		     argv2,
