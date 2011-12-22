@@ -129,6 +129,9 @@ typedef struct
   GSource *child_stdout_source;
   GSource *child_stderr_source;
 
+  gboolean timed_out;
+  GSource *timeout_source;
+
   GString *child_stdout;
   GString *child_stderr;
 
@@ -145,6 +148,12 @@ child_watch_from_release_cb (GPid     pid,
 static void
 spawn_data_free (SpawnData *data)
 {
+  if (data->timeout_source != NULL)
+    {
+      g_source_destroy (data->timeout_source);
+      data->timeout_source = NULL;
+    }
+
   /* Nuke the child, if necessary */
   if (data->child_watch_source != NULL)
     {
@@ -312,8 +321,26 @@ child_watch_cb (GPid     pid,
   g_object_unref (data->simple);
 }
 
+static gboolean
+timeout_cb (gpointer user_data)
+{
+  SpawnData *data = user_data;
+
+  data->timed_out = TRUE;
+
+  /* ok, timeout is history, make sure we don't free it in spawn_data_free() */
+  data->timeout_source = NULL;
+
+  /* we're done */
+  g_simple_async_result_complete_in_idle (data->simple);
+  g_object_unref (data->simple);
+
+  return FALSE; /* remove source */
+}
+
 void
-gvfs_udisks2_utils_spawn (GCancellable        *cancellable,
+gvfs_udisks2_utils_spawn (guint                timeout_seconds,
+                          GCancellable        *cancellable,
                           GAsyncReadyCallback  callback,
                           gpointer             user_data,
                           const gchar         *command_line_format,
@@ -404,6 +431,15 @@ gvfs_udisks2_utils_spawn (GCancellable        *cancellable,
       goto out;
     }
 
+  if (timeout_seconds > 0)
+    {
+      data->timeout_source = g_timeout_source_new_seconds (timeout_seconds);
+      g_source_set_priority (data->timeout_source, G_PRIORITY_DEFAULT);
+      g_source_set_callback (data->timeout_source, timeout_cb, data, NULL);
+      g_source_attach (data->timeout_source, data->main_context);
+      g_source_unref (data->timeout_source);
+    }
+
   data->child_watch_source = g_child_watch_source_new (data->child_pid);
   g_source_set_callback (data->child_watch_source, (GSourceFunc) child_watch_cb, data, NULL);
   g_source_attach (data->child_watch_source, data->main_context);
@@ -447,6 +483,16 @@ gvfs_udisks2_utils_spawn_finish (GAsyncResult   *res,
     goto out;
 
   data = g_simple_async_result_get_op_res_gpointer (simple);
+
+  if (data->timed_out)
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_TIMED_OUT,
+                   _("Timed out running command-line `%s'"),
+                   data->command_line);
+      goto out;
+    }
 
   if (out_exit_status != NULL)
     *out_exit_status = data->exit_status;

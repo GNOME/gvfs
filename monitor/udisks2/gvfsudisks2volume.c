@@ -1055,7 +1055,8 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
     {
       gchar *escaped_mount_path;
       escaped_mount_path = g_strescape (g_unix_mount_point_get_mount_path (data->volume->mount_point), NULL);
-      gvfs_udisks2_utils_spawn (data->cancellable,
+      gvfs_udisks2_utils_spawn (10, /* timeout in seconds */
+                                data->cancellable,
                                 mount_command_cb,
                                 data,
                                 "mount \"%s\"",

@@ -736,7 +736,8 @@ unmount_show_busy (UnmountData  *data,
 {
   gchar *escaped_mount_point;
   escaped_mount_point = g_strescape (mount_point, NULL);
-  gvfs_udisks2_utils_spawn (data->cancellable,
+  gvfs_udisks2_utils_spawn (10, /* timeout in seconds */
+                            data->cancellable,
                             lsof_command_cb,
                             unmount_data_ref (data),
                             "lsof -t \"%s\"",
@@ -874,7 +875,8 @@ unmount_do (UnmountData *data,
     {
       gchar *escaped_mount_path;
       escaped_mount_path = g_strescape (data->mount->mount_path, NULL);
-      gvfs_udisks2_utils_spawn (data->cancellable,
+      gvfs_udisks2_utils_spawn (10, /* timeout in seconds */
+                                data->cancellable,
                                 umount_command_cb,
                                 data,
                                 "umount %s \"%s\"",

@@ -37,7 +37,8 @@ GIcon *gvfs_udisks2_utils_icon_from_fs_type (const gchar *fs_type);
 gchar *gvfs_udisks2_utils_lookup_fstab_options_value (const gchar *fstab_options,
                                                       const gchar *key);
 
-void     gvfs_udisks2_utils_spawn (GCancellable        *cancellable,
+void     gvfs_udisks2_utils_spawn (guint                timeout_seconds,
+                                   GCancellable        *cancellable,
                                    GAsyncReadyCallback  callback,
                                    gpointer             user_data,
                                    const gchar         *command_line_format,
