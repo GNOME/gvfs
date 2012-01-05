@@ -939,12 +939,31 @@ find_volume_for_device (GVfsUDisks2VolumeMonitor *monitor,
                         const gchar              *device)
 {
   GVfsUDisks2Volume *ret = NULL;
+  GList *blocks = NULL;
   GList *l;
   struct stat statbuf;
 
   /* don't consider e.g. network mounts */
-  if (!g_str_has_prefix (device, "/dev/"))
-    goto out;
+  if (g_str_has_prefix (device, "LABEL="))
+    {
+      blocks = udisks_client_get_block_for_label (monitor->client, device + 6);
+      if (blocks != NULL)
+        device = udisks_block_get_device (UDISKS_BLOCK (blocks->data));
+      else
+        goto out;
+    }
+  else if (g_str_has_prefix (device, "UUID="))
+    {
+      blocks = udisks_client_get_block_for_uuid (monitor->client, device + 6);
+      if (blocks != NULL)
+        device = udisks_block_get_device (UDISKS_BLOCK (blocks->data));
+      else
+        goto out;
+    }
+  else if (!g_str_has_prefix (device, "/dev/"))
+    {
+      goto out;
+    }
 
   if (stat (device, &statbuf) != 0)
     goto out;
@@ -970,6 +989,8 @@ find_volume_for_device (GVfsUDisks2VolumeMonitor *monitor,
     }
 
  out:
+  g_list_foreach (blocks, (GFunc) g_object_unref, NULL);
+  g_list_free (blocks);
   return ret;
 }
 
@@ -1193,9 +1214,26 @@ mount_point_has_device (GVfsUDisks2VolumeMonitor  *monitor,
   const gchar *device;
   struct stat statbuf;
   UDisksBlock *block;
+  GList *blocks = NULL;
 
   device = g_unix_mount_point_get_device_path (mount_point);
-  if (!g_str_has_prefix (device, "/dev/"))
+  if (g_str_has_prefix (device, "LABEL="))
+    {
+      blocks = udisks_client_get_block_for_label (monitor->client, device + 6);
+      if (blocks != NULL)
+        device = udisks_block_get_device (UDISKS_BLOCK (blocks->data));
+      else
+        goto out;
+    }
+  else if (g_str_has_prefix (device, "UUID="))
+    {
+      blocks = udisks_client_get_block_for_uuid (monitor->client, device + 6);
+      if (blocks != NULL)
+        device = udisks_block_get_device (UDISKS_BLOCK (blocks->data));
+      else
+        goto out;
+    }
+  else if (!g_str_has_prefix (device, "/dev/"))
     {
       /* NFS, CIFS and other non-device mounts always have a device */
       ret = TRUE;
@@ -1234,6 +1272,8 @@ mount_point_has_device (GVfsUDisks2VolumeMonitor  *monitor,
   ret = TRUE;
 
  out:
+  g_list_foreach (blocks, (GFunc) g_object_unref, NULL);
+  g_list_free (blocks);
   return ret;
 }
 
