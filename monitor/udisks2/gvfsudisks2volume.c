@@ -311,6 +311,31 @@ update_volume (GVfsUDisks2Volume *volume)
           if (media_icon != NULL)
             g_object_unref (media_icon);
 
+          /* Only automount filesystems from drives of known types/interconnects:
+           *
+           *  - USB
+           *  - Firewire
+           *  - sdio
+           *  - optical discs
+           *
+           * The mantra here is "be careful" - we really don't want to
+           * automount filesystems from all devices in a SAN etc - We
+           * REALLY need to be CAREFUL here.
+           *
+           * Fortunately udisks provides a property just for this.
+           */
+          if (udisks_drive_get_removable (udisks_drive))
+            {
+              /* Also, if a volume (partition) appear _much later_ than when media was inserted it
+               * can only be because the media was repartitioned. We don't want to automount
+               * such volumes. So only mark volumes appearing just after their drive.
+               */
+              if (g_get_real_time () - udisks_drive_get_time_media_detected (udisks_drive) < 5 * G_USEC_PER_SEC)
+                {
+                  volume->should_automount = TRUE;
+                }
+            }
+
           g_object_unref (udisks_drive);
         }
 
@@ -370,6 +395,9 @@ update_volume (GVfsUDisks2Volume *volume)
       if (volume->icon == NULL)
         volume->icon = gvfs_udisks2_utils_icon_from_fs_type (g_unix_mount_point_get_fs_type (volume->mount_point));
     }
+
+  if (volume->mount == NULL)
+    volume->can_mount = TRUE;
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* fallbacks */
