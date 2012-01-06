@@ -573,12 +573,86 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+/* This is a SIMPLER version of g_unix_mount_guess_should_display()
+ * that does not do call g_access() on the mount point... (to
+ * e.g. return FALSE if the mount point is not accessible to the
+ * calling process).
+ *
+ * Why? Because having non-intuitive rules like the above, makes it
+ * really hard to debug things when the user reports a bug saying "I
+ * plugged in my USB disk but I can't see it"... for example, this can
+ * happen if plugging in an disk with a single ext4 filesystem where
+ * the files are only visible to another uid. In particular, this is
+ * evident with Fedora's recent transition from uid 500 to uid 1000.
+ *
+ * TODO: file a bug and get this change into GIO's
+ * g_unix_mount_guess_should_display() itself.
+ */
+
+static gboolean
+simple_g_unix_mount_guess_should_display (GUnixMountEntry *mount_entry)
+{
+  gboolean ret = FALSE;
+  const gchar *home_dir = NULL;
+  const gchar *mount_path;
+
+  /* Never display internal mountpoints */
+  if (g_unix_mount_is_system_internal (mount_entry))
+    goto out;
+
+  /* Only display things in
+   * - /media; and
+   * - $HOME; and
+   * - $XDG_RUNTIME_DIR
+   */
+  mount_path = g_unix_mount_get_mount_path (mount_entry);
+  if (mount_path == NULL)
+    goto out;
+
+  /* Hide mounts within a subdirectory starting with a "." - suppose it was a purpose to hide this mount */
+  if (g_strstr_len (mount_path, -1, "/.") != NULL)
+    goto out;
+
+  /* Check /media */
+  if (g_str_has_prefix (mount_path, "/media/"))
+    {
+      ret = TRUE;
+      goto out;
+    }
+
+  /* Check home dir */
+  home_dir = g_get_home_dir ();
+  if (home_dir != NULL)
+    {
+      if (g_str_has_prefix (mount_path, home_dir) && mount_path[strlen (home_dir)] == G_DIR_SEPARATOR)
+        {
+          ret = TRUE;
+          goto out;
+        }
+    }
+
+  /* Check runtime dir */
+  if (g_getenv ("XDG_RUNTIME_DIR") != NULL)
+    {
+      const gchar *run_dir = g_get_user_runtime_dir ();
+      if (g_str_has_prefix (mount_path, run_dir) && mount_path[strlen (run_dir)] == G_DIR_SEPARATOR)
+        {
+          ret = TRUE;
+          goto out;
+        }
+    }
+
+ out:
+  return ret;
+
+}
+
 static gboolean
 should_include_mount (GVfsUDisks2VolumeMonitor *monitor,
                       GUnixMountEntry          *mount_entry)
 {
   gboolean ret = FALSE;
-  ret = g_unix_mount_guess_should_display (mount_entry);
+  ret = simple_g_unix_mount_guess_should_display (mount_entry);
   return ret;
 }
 
