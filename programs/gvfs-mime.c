@@ -137,6 +137,17 @@ main (int argc, char *argv[])
 	      g_object_unref (info);
 	    }
 	  g_list_free (list);
+
+	  list = g_app_info_get_recommended_for_type (mimetype);
+	  if (list != NULL)
+            g_print (_("Recommended applications:\n"));
+          for (l = list; l != NULL; l = l->next)
+	    {
+	      info = l->data;
+	      g_print ("\t%s\n", g_app_info_get_id (info));
+	      g_object_unref (info);
+	    }
+	  g_list_free (list);
         }
     }
   else if (set)
