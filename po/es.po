@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-01-06 15:35+0000\n"
-"PO-Revision-Date: 2012-01-06 20:28+0100\n"
+"POT-Creation-Date: 2012-01-09 12:10+0000\n"
+"PO-Revision-Date: 2012-01-09 18:04+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -2495,18 +2495,29 @@ msgstr "Aplicación predeterminada para «%s»: %s\n"
 msgid "Registered applications:\n"
 msgstr "Aplicaciones registradas:\n"
 
-#: ../programs/gvfs-mime.c:143
+#: ../programs/gvfs-mime.c:134
 #, c-format
 #| msgid "Registered applications:\n"
+msgid "No registered applications\n"
+msgstr "No hay aplicaciones registradas\n"
+
+#: ../programs/gvfs-mime.c:145
+#, c-format
 msgid "Recommended applications:\n"
 msgstr "Aplicaciones recomendadas:\n"
 
-#: ../programs/gvfs-mime.c:163
+#: ../programs/gvfs-mime.c:147
+#, c-format
+#| msgid "Recommended applications:\n"
+msgid "No recommended applications\n"
+msgstr "No hay aplicaciones recomendadas\n"
+
+#: ../programs/gvfs-mime.c:167
 #, c-format
 msgid "Failed to load info for handler '%s'\n"
 msgstr "Falló al cargar la información para el gestor «%s»\n"
 
-#: ../programs/gvfs-mime.c:169
+#: ../programs/gvfs-mime.c:173
 #, c-format
 msgid "Failed to set '%s' as the default handler for '%s': %s\n"
 msgstr "falló al establecer «%s» como el gestor predeterminado para «%s»: %s\n"
