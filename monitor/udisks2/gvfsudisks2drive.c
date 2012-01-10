@@ -175,11 +175,7 @@ update_drive (GVfsUDisks2Drive *drive)
   if (drive->is_media_removable)
     {
       drive->has_media = udisks_drive_get_media_available (drive->udisks_drive);
-      /* every drive except PC floppy drives are ejectable */
-      if (g_strcmp0 (udisks_drive_get_media (drive->udisks_drive), "floppy") != 0)
-        {
-          drive->can_eject = TRUE;
-        }
+      drive->can_eject = udisks_drive_get_ejectable (drive->udisks_drive);
     }
   else
     {
