@@ -131,7 +131,6 @@ update_drive (GVfsUDisks2Drive *drive)
   gboolean old_has_media;
   gboolean old_can_eject;
   UDisksBlock *block;
-  gint64 time_detected;
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* save old values */
@@ -170,10 +169,7 @@ update_drive (GVfsUDisks2Drive *drive)
       g_object_unref (block);
     }
 
-  time_detected = udisks_drive_get_time_media_detected (drive->udisks_drive);
-  if (time_detected == 0)
-    udisks_drive_get_time_detected (drive->udisks_drive);
-  drive->sort_key = g_strdup_printf ("gvfs.time_detected_usec.%" G_GINT64_FORMAT, time_detected);
+  drive->sort_key = g_strdup (udisks_drive_get_sort_key (drive->udisks_drive));
 
   drive->is_media_removable = udisks_drive_get_media_removable (drive->udisks_drive);
   if (drive->is_media_removable)
