@@ -2,14 +2,14 @@
 # Copyright (C) 2005-2006 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gvfs package.
 #
-# Matej Urbančič <mateju@svn.gnome.org>, 2008 - 2010.
+# Matej Urbančič <mateju@svn.gnome.org>, 2008 - 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-12-02 17:15+0000\n"
-"PO-Revision-Date: 2011-12-08 22:12+0100\n"
+"POT-Creation-Date: 2012-01-15 01:31+0000\n"
+"PO-Revision-Date: 2012-01-15 13:10+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "Language: \n"
@@ -2762,12 +2762,27 @@ msgstr "Privzet program za '%s': %s\n"
 msgid "Registered applications:\n"
 msgstr "Vpisani programi:\n"
 
-#: ../programs/gvfs-mime.c:152
+#: ../programs/gvfs-mime.c:134
+#, c-format
+msgid "No registered applications\n"
+msgstr "Ni vpisanih programov.\n"
+
+#: ../programs/gvfs-mime.c:145
+#, c-format
+msgid "Recommended applications:\n"
+msgstr "Priporočeni programi:"
+
+#: ../programs/gvfs-mime.c:147
+#, c-format
+msgid "No recommended applications\n"
+msgstr "Ni priporočenih programov.\n"
+
+#: ../programs/gvfs-mime.c:167
 #, c-format
 msgid "Failed to load info for handler '%s'\n"
 msgstr "Nalaganje podrobnosti ročnika '%s' je spodletelo.\n"
 
-#: ../programs/gvfs-mime.c:158
+#: ../programs/gvfs-mime.c:173
 #, c-format
 msgid "Failed to set '%s' as the default handler for '%s': %s\n"
 msgstr "Določanje '%s' kot privzet ročnik za '%s' je spodletelo: %s\n"
