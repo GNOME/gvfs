@@ -2770,7 +2770,7 @@ msgstr "Ni vpisanih programov.\n"
 #: ../programs/gvfs-mime.c:145
 #, c-format
 msgid "Recommended applications:\n"
-msgstr "Priporočeni programi:"
+msgstr "Priporočeni programi:\n"
 
 #: ../programs/gvfs-mime.c:147
 #, c-format
