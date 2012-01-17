@@ -39,6 +39,7 @@
 #include "gvfsudisks2drive.h"
 #include "gvfsudisks2volume.h"
 #include "gvfsudisks2mount.h"
+#include "gvfsudisks2utils.h"
 
 static GVfsUDisks2VolumeMonitor *the_volume_monitor = NULL;
 
@@ -573,52 +574,56 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* This is a SIMPLER version of g_unix_mount_guess_should_display()
- * that does not do call g_access() on the mount point... (to
- * e.g. return FALSE if the mount point is not accessible to the
- * calling process).
- *
- * Why? Because having non-intuitive rules like the above, makes it
- * really hard to debug things when the user reports a bug saying "I
- * plugged in my USB disk but I can't see it"... for example, this can
- * happen if plugging in an disk with a single ext4 filesystem where
- * the files are only visible to another uid. In particular, this is
- * evident with Fedora's recent transition from uid 500 to uid 1000.
- *
- * TODO: file a bug and get this change into GIO's
- * g_unix_mount_guess_should_display() itself.
- */
+static GUnixMountPoint *
+get_mount_point_for_mount (GUnixMountEntry *mount_entry)
+{
+  GUnixMountPoint *ret = NULL;
+  GList *mount_points, *l;
+
+  mount_points = g_unix_mount_points_get (NULL);
+  for (l = mount_points; l != NULL; l = l->next)
+    {
+      GUnixMountPoint *mount_point = l->data;
+      if (g_strcmp0 (g_unix_mount_get_mount_path (mount_entry),
+                     g_unix_mount_point_get_mount_path (mount_point)) == 0)
+        {
+          ret = mount_point;
+          goto out;
+        }
+    }
+
+ out:
+  return ret;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
 
 static gboolean
-simple_g_unix_mount_guess_should_display (GUnixMountEntry *mount_entry)
+should_include (const gchar *mount_path,
+                const gchar *options)
 {
   gboolean ret = FALSE;
   const gchar *home_dir = NULL;
-  const gchar *mount_path;
 
-  /* TODO: Check comment=gvfs-show=<val> override
-   *
-   * It would be nice if the user could override whether a specific mount is displayed
-   * or not, so e.g.
-   *
-   *  # mount /dev/sdc1 /mnt -ocomment=gvfs-show=1
-   *
-   * forces the mount to be visible (would usually be invisible) and
-   *
-   *  # mount /dev/sdc1 /home/user/Somewhere -ocomment=gvfs-show=0
-   *
-   * forces the mount to be invisible (would usually be visible). This
-   * however requires a libmount-based mount(8) command since right
-   * now that information is thrown away. See
-   *
-   *  https://bugzilla.gnome.org/show_bug.cgi?id=668132
-   *
-   * for this.
-   */
+  g_return_val_if_fail (mount_path != NULL, FALSE);
 
+  /* The comment=gvfs-show=<val> trumps everything else */
+  if (options != NULL)
+    {
+      gchar *value = gvfs_udisks2_utils_lookup_fstab_options_value (options, "comment=gvfs-show=");
+      if (value != NULL)
+        {
+          if (g_strcmp0 (value, "1") == 0 || g_ascii_strcasecmp (value, "true") == 0)
+            {
+              ret = TRUE;
+            }
+          g_free (value);
+          goto out;
+        }
+    }
 
   /* Never display internal mountpoints */
-  if (g_unix_mount_is_system_internal (mount_entry))
+  if (g_unix_is_mount_path_system_internal (mount_path))
     goto out;
 
   /* Only display things in
@@ -626,9 +631,6 @@ simple_g_unix_mount_guess_should_display (GUnixMountEntry *mount_entry)
    * - $HOME; and
    * - $XDG_RUNTIME_DIR
    */
-  mount_path = g_unix_mount_get_mount_path (mount_entry);
-  if (mount_path == NULL)
-    goto out;
 
   /* Hide mounts within a subdirectory starting with a "." - suppose it was a purpose to hide this mount */
   if (g_strstr_len (mount_path, -1, "/.") != NULL)
@@ -665,17 +667,43 @@ simple_g_unix_mount_guess_should_display (GUnixMountEntry *mount_entry)
 
  out:
   return ret;
-
 }
+
+/* ---------------------------------------------------------------------------------------------------- */
 
 static gboolean
-should_include_mount (GVfsUDisks2VolumeMonitor *monitor,
-                      GUnixMountEntry          *mount_entry)
+should_include_mount_point (GVfsUDisks2VolumeMonitor  *monitor,
+                            GUnixMountPoint           *mount_point)
 {
-  gboolean ret = FALSE;
-  ret = simple_g_unix_mount_guess_should_display (mount_entry);
+  return should_include (g_unix_mount_point_get_mount_path (mount_point),
+                         g_unix_mount_point_get_options (mount_point));
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+static gboolean
+should_include_mount (GVfsUDisks2VolumeMonitor  *monitor,
+                      GUnixMountEntry           *mount_entry)
+{
+  GUnixMountPoint *mount_point;
+  gboolean ret;
+
+  /* if mounted at the designated mount point, use that info to decide */
+  mount_point = get_mount_point_for_mount (mount_entry);
+  if (mount_point != NULL)
+    {
+      ret = should_include_mount_point (monitor, mount_point);
+      goto out;
+    }
+
+  /* otherwise, use the mount's info */
+  ret = should_include (g_unix_mount_get_mount_path (mount_entry),
+                        NULL); /* no mount options yet - see bug 668132 */
+
+ out:
   return ret;
 }
+
 
 /* ---------------------------------------------------------------------------------------------------- */
 
@@ -721,6 +749,40 @@ should_include_volume_check_mount_points (GVfsUDisks2VolumeMonitor *monitor,
 }
 
 static gboolean
+should_include_volume_check_configuration (GVfsUDisks2VolumeMonitor *monitor,
+                                           UDisksBlock              *block)
+{
+  gboolean ret = TRUE;
+  GVariantIter iter;
+  const gchar *configuration_type;
+  GVariant *configuration_value;
+
+  g_variant_iter_init (&iter, udisks_block_get_configuration (block));
+  while (g_variant_iter_next (&iter, "(&s@a{sv})", &configuration_type, &configuration_value))
+    {
+      if (g_strcmp0 (configuration_type, "fstab") == 0)
+        {
+          const gchar *fstab_dir;
+          const gchar *fstab_options;
+          if (g_variant_lookup (configuration_value, "dir", "^&ay", &fstab_dir) &&
+              g_variant_lookup (configuration_value, "opts", "^&ay", &fstab_options))
+            {
+              if (!should_include (fstab_dir, fstab_options))
+                {
+                  ret = FALSE;
+                  g_variant_unref (configuration_value);
+                  goto out;
+                }
+            }
+        }
+      g_variant_unref (configuration_value);
+    }
+
+ out:
+  return ret;
+}
+
+static gboolean
 should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
                        UDisksBlock              *block,
                        gboolean                  allow_encrypted_cleartext)
@@ -728,6 +790,7 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
   gboolean ret = FALSE;
   GDBusObject *object;
   UDisksFilesystem *filesystem;
+  const gchar* const *mount_points;
 
   /* show encrypted volumes... */
   if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_LUKS") == 0)
@@ -772,6 +835,19 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
   filesystem = udisks_object_peek_filesystem (UDISKS_OBJECT (object));
   if (filesystem == NULL)
     goto out;
+
+  /* If not mounted but the volume is referenced in /etc/fstab and
+   * that configuration indicates the volume should be ignored, then
+   * do so
+   */
+  mount_points = udisks_filesystem_get_mount_points (filesystem);
+  if (mount_points == NULL || g_strv_length ((gchar **) mount_points) == 0)
+    {
+      if (!should_include_volume_check_configuration (monitor, block))
+        goto out;
+    }
+
+  /* otherwise, we're good to go */
 
   ret = TRUE;
 
@@ -1400,7 +1476,7 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
 
       ll = l->next;
 
-      if (g_unix_is_mount_path_system_internal (g_unix_mount_point_get_mount_path (mount_point)) ||
+      if (!should_include_mount_point (monitor, mount_point) ||
           have_udisks_volume_for_mount_point (monitor, mount_point) ||
           !mount_point_has_device (monitor, mount_point))
         {
