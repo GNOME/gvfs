@@ -596,6 +596,27 @@ simple_g_unix_mount_guess_should_display (GUnixMountEntry *mount_entry)
   const gchar *home_dir = NULL;
   const gchar *mount_path;
 
+  /* TODO: Check comment=gvfs-show=<val> override
+   *
+   * It would be nice if the user could override whether a specific mount is displayed
+   * or not, so e.g.
+   *
+   *  # mount /dev/sdc1 /mnt -ocomment=gvfs-show=1
+   *
+   * forces the mount to be visible (would usually be invisible) and
+   *
+   *  # mount /dev/sdc1 /home/user/Somewhere -ocomment=gvfs-show=0
+   *
+   * forces the mount to be invisible (would usually be visible). This
+   * however requires a libmount-based mount(8) command since right
+   * now that information is thrown away. See
+   *
+   *  https://bugzilla.gnome.org/show_bug.cgi?id=668132
+   *
+   * for this.
+   */
+
+
   /* Never display internal mountpoints */
   if (g_unix_mount_is_system_internal (mount_entry))
     goto out;
