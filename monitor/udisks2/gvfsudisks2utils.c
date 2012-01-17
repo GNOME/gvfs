@@ -99,7 +99,7 @@ gvfs_udisks2_utils_lookup_fstab_options_value (const gchar *fstab_options,
           start += strlen (key);
           for (n = 0; start[n] != ',' && start[n] != '\0'; n++)
             ;
-          if (n > 1)
+          if (n >= 1)
             ret = g_uri_unescape_segment (start, start + n, NULL);
         }
     }
