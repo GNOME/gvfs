@@ -5,7 +5,7 @@
 The gvfs-udisks2-volume-monitor process is responsible for the disks,
 media, mounts and fstab entries shown in the desktop user
 interface. In particular, the Desktop Shell (gnome-shell), the Files
-application (nautilus) as well as any other application use the GLib
+application (nautilus) as well as any other application using the GLib
 APIs, is using information from this process.
 
 In general, disks or media with mountable filesystems are shown, as
@@ -13,31 +13,28 @@ are fstab entries. These are collectively referred to as "devices" in
 the following.
 
 A device is either mounted (in which case its directory is known) or
-it's not. If it's not mounted, then its directory is known only if its
-referenced in the /etc/fstab file. Similarly, the options for a device
-is either the options the device is currently mounted with or, if not
-currently mounted, options from its /etc/fstab if one is available.
+it's not. If the device is not mounted, then its directory is known
+only if it's referenced in the /etc/fstab file. Similarly, the options
+for a device is either the options the device is currently mounted
+with, or if not mounted, the options from its /etc/fstab if any.
 
 If the directory for a device is known and outside /media, $HOME
 (typically /home/foo) or $XDG_RUNTIME_DIR (typically /run/user/foo)
-then the device is not shown. Additionally, if any of component
-directories starts with a dot ("."), the device is not shown either.
-This policy may be overriden by use of the options comment=gvfs-show
-and comment=gvfs-hide.
+then the device is not shown in the user interface. Additionally, if
+any of component directories in its directory starts with a dot ("."),
+the device is not shown either. This policy may be overriden by use of
+the options comment=gvfs-show and comment=gvfs-hide.
 
 The name and icon to use for a device is chosen according to certain
 heuristics - for example, if a device has a filesystem label, it is
 used - if not, some other characteristic is used. The options
 comment=gvfs-name=<value> and comment=gvfs-icon=<value> can be used to
 override this policy with <value> being an URL-encoded string. For
-icons, the Icon Naming Specification
+icons, the Icon Naming Specification is used.
 
- http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
-
-is used.
-
-Users are advised to use /dev/disk/* symlinks for /etc/fstab entries
-instead of the kernel names sda, sdb and so on.
+Users are advised to use (stable) symlinks in the /dev/disk/ hierarchy
+for /etc/fstab entries instead of the kernel names sda, sdb and so
+on. See udev(7) for more information about this.
 
 The Disks application provides an user interface to easily edit
 /etc/fstab entries including these options, see
