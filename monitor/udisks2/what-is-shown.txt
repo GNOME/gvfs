@@ -49,7 +49,7 @@ EXAMPLES
 /dev/disk/by-id/ata-HITACHI_HTS723232A7A364_E3834563KRG2HN-part1   /home/davidz/Data  auto  defaults,comment=gvfs-hide 0 0
 
 # forcibly show device in user interface and with name "My Movies"
-/dev/disk/by-uuid/4CAE8E5B5AF47502   /Movies  auto   defaults,comment=gvfs-show,comment=gvfs-name=My%20Movies
+/dev/disk/by-uuid/4CAE8E5B5AF47502   /Movies  auto   defaults,comment=gvfs-show,comment=gvfs-name=My%20Movies  0 0
 
 # forcibly show NFS mount in user interface
 10.200.0.210:/tank/media  /mnt/Filer  nfs4  default,users,noauto,comment=gvfs-show  0 0
