@@ -607,16 +607,21 @@ should_include (const gchar *mount_path,
 
   g_return_val_if_fail (mount_path != NULL, FALSE);
 
-  /* The comment=gvfs-show=<val> trumps everything else */
+  /* The comment=gvfs-show option trumps everything else */
   if (options != NULL)
     {
-      gchar *value = gvfs_udisks2_utils_lookup_fstab_options_value (options, "comment=gvfs-show=");
+      gchar *value;
+      value = gvfs_udisks2_utils_lookup_fstab_options_value (options, "comment=gvfs-show");
       if (value != NULL)
         {
-          if (g_strcmp0 (value, "1") == 0 || g_ascii_strcasecmp (value, "true") == 0)
-            {
-              ret = TRUE;
-            }
+          ret = TRUE;
+          g_free (value);
+          goto out;
+        }
+      value = gvfs_udisks2_utils_lookup_fstab_options_value (options, "comment=gvfs-hide");
+      if (value != NULL)
+        {
+          ret = FALSE;
           g_free (value);
           goto out;
         }
