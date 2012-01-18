@@ -16,7 +16,8 @@ A device is either mounted (in which case its directory is known) or
 it's not. If the device is not mounted, then its directory is known
 only if it's referenced in the /etc/fstab file. Similarly, the options
 for a device is either the options the device is currently mounted
-with, or if not mounted, the options from its /etc/fstab if any.
+with, or if not mounted, the options from its /etc/fstab entry, if
+any.
 
 If the directory for a device is known and outside /media, $HOME
 (typically /home/foo) or $XDG_RUNTIME_DIR (typically /run/user/foo)
