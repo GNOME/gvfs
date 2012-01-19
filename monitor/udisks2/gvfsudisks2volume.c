@@ -980,50 +980,85 @@ on_mount_operation_aborted (GMountOperation       *mount_operation,
   on_mount_operation_reply (mount_operation, G_MOUNT_OPERATION_ABORTED, user_data);
 }
 
+static gboolean
+has_crypttab_passphrase (MountData *data)
+{
+  gboolean ret = FALSE;
+  GVariantIter iter;
+  GVariant *configuration_value;
+  const gchar *configuration_type;
+
+  g_variant_iter_init (&iter, udisks_block_get_configuration (data->volume->block));
+  while (g_variant_iter_next (&iter, "(&s@a{sv})", &configuration_type, &configuration_value))
+    {
+      if (g_strcmp0 (configuration_type, "crypttab") == 0)
+        {
+          const gchar *passphrase_path;
+          if (g_variant_lookup (configuration_value, "passphrase-path", "^&ay", &passphrase_path))
+            {
+              if (passphrase_path != NULL && strlen (passphrase_path) > 0)
+                {
+                  ret = TRUE;
+                  g_variant_unref (configuration_value);
+                  goto out;
+                }
+            }
+        }
+      g_variant_unref (configuration_value);
+    }
+ out:
+  return ret;
+}
+
 static void
 do_unlock (MountData *data)
 {
   GVariantBuilder builder;
 
-  /* TODO: lookup passphrase in keyring */
-
   if (data->passphrase == NULL)
     {
-      gchar *message;
-
-      if (data->mount_operation == NULL)
+      /* If the passphrase is in the crypttab file, no need to ask the user, just use a blank passphrase */
+      if (has_crypttab_passphrase (data))
         {
-          g_simple_async_result_set_error (data->simple,
-                                           G_IO_ERROR,
-                                           G_IO_ERROR_FAILED,
-                                           _("A passphrase is required to access the volume"));
-          g_simple_async_result_complete (data->simple);
-          mount_data_free (data);
+          data->passphrase = g_strdup ("");
+        }
+      else
+        {
+          gchar *message;
+
+          if (data->mount_operation == NULL)
+            {
+              g_simple_async_result_set_error (data->simple,
+                                               G_IO_ERROR,
+                                               G_IO_ERROR_FAILED,
+                                               _("A passphrase is required to access the volume"));
+              g_simple_async_result_complete (data->simple);
+              mount_data_free (data);
+              goto out;
+            }
+
+          data->mount_operation_reply_handler_id = g_signal_connect (data->mount_operation,
+                                                                     "reply",
+                                                                     G_CALLBACK (on_mount_operation_reply),
+                                                                     data);
+          data->mount_operation_aborted_handler_id = g_signal_connect (data->mount_operation,
+                                                                       "aborted",
+                                                                       G_CALLBACK (on_mount_operation_aborted),
+                                                                       data);
+          message = g_strdup_printf (_("Enter a password to unlock the volume\n"
+                                       "The device %s contains encrypted data."),
+                                     udisks_block_get_device (data->volume->block));
+          g_signal_emit_by_name (data->mount_operation,
+                                 "ask-password",
+                                 message,
+                                 NULL,
+                                 NULL,
+                                 G_ASK_PASSWORD_NEED_PASSWORD |
+                                 0/*G_ASK_PASSWORD_SAVING_SUPPORTED*/);
+          g_free (message);
           goto out;
         }
-
-      data->mount_operation_reply_handler_id = g_signal_connect (data->mount_operation,
-                                                                 "reply",
-                                                                 G_CALLBACK (on_mount_operation_reply),
-                                                                 data);
-      data->mount_operation_aborted_handler_id = g_signal_connect (data->mount_operation,
-                                                                   "aborted",
-                                                                   G_CALLBACK (on_mount_operation_aborted),
-                                                                   data);
-      message = g_strdup_printf (_("Enter a password to unlock the volume\n"
-                                   "The device %s contains encrypted data."),
-                                 udisks_block_get_device (data->volume->block));
-      g_signal_emit_by_name (data->mount_operation,
-                             "ask-password",
-                             message,
-                             NULL,
-                             NULL,
-                             G_ASK_PASSWORD_NEED_PASSWORD |
-                             0/*G_ASK_PASSWORD_SAVING_SUPPORTED*/);
-      g_free (message);
-      goto out;
     }
-
 
   g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
   if (data->mount_operation == NULL)
