@@ -797,6 +797,10 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
   UDisksFilesystem *filesystem;
   const gchar* const *mount_points;
 
+  /* Block:Ignore trumps everything */
+  if (udisks_block_get_hint_ignore (block))
+    goto out;
+
   /* show encrypted volumes... */
   if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_LUKS") == 0)
     {
