@@ -1,6 +1,6 @@
 AC_PREREQ([2.64])
 
-AC_INIT([gvfs],[1.11.2],[http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs])
+AC_INIT([gvfs],[1.11.3],[http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs])
 AM_INIT_AUTOMAKE([1.11.1 no-dist-gzip dist-xz tar-pax])
 AM_CONFIG_HEADER(config.h)
 
@@ -100,7 +100,7 @@ dnl ****************************
 dnl *** Checks for pty stuff ***
 dnl ****************************
 
-AC_CHECK_HEADERS(sys/un.h stropts.h termios.h utmp.h sys/uio.h sys/param.h)
+AC_CHECK_HEADERS(sys/un.h stropts.h termios.h util.h utmp.h sys/uio.h sys/param.h)
 
 # Check for PTY handling functions.
 AC_CHECK_FUNCS(getpt posix_openpt grantpt unlockpt ptsname ptsname_r)

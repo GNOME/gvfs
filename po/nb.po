@@ -1,16 +1,16 @@
-# Norwegian translation of gvfs (bokmål dialect).
+# Norwegian bokmål translation of gvfs.
 # Copyright (C) 1999-2003 Free Software Foundation, Inc.
 #
-# Kjartan Maraas <kmaraas@gnome.org>, 1999-2011.
+# Kjartan Maraas <kmaraas@gnome.org>, 1999-2012.
 # Torstein Adolf Winterseth <kvikende@fsfe.org>, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.7.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-14 22:57+0100\n"
-"PO-Revision-Date: 2011-12-14 22:57+0100\n"
+"POT-Creation-Date: 2012-01-16 17:46+0100\n"
+"PO-Revision-Date: 2012-01-16 17:46+0100\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
-"Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
+"Language-Team: Norwegian bokmål <i18n-nb@lister.ping.uio.no>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2475,12 +2475,27 @@ msgstr "Forvalgt program for «%s»: %s\n"
 msgid "Registered applications:\n"
 msgstr "Registrerte programmer:\n"
 
-#: ../programs/gvfs-mime.c:152
+#: ../programs/gvfs-mime.c:134
+#, c-format
+msgid "No registered applications\n"
+msgstr "Ingen registrerte programmer\n"
+
+#: ../programs/gvfs-mime.c:145
+#, c-format
+msgid "Recommended applications:\n"
+msgstr "Anbefalte programmer:\n"
+
+#: ../programs/gvfs-mime.c:147
+#, c-format
+msgid "No recommended applications\n"
+msgstr "Ingen anbefalte programmer\n"
+
+#: ../programs/gvfs-mime.c:167
 #, c-format
 msgid "Failed to load info for handler '%s'\n"
 msgstr "Klarte ikke å laste informasjon for håndterer «%s»\n"
 
-#: ../programs/gvfs-mime.c:158
+#: ../programs/gvfs-mime.c:173
 #, c-format
 msgid "Failed to set '%s' as the default handler for '%s': %s\n"
 msgstr "Klarte ikke å sette «%s» som forvalgt håndterer for «%s»: %s\n"

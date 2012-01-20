@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Jorge González <jorgegonz@svn.gnome.org>, 2008, 2009, 2010, 2011., 2011.
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011., 2011.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011., 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-12-01 20:15+0000\n"
-"PO-Revision-Date: 2011-12-02 18:15+0100\n"
+"POT-Creation-Date: 2012-01-09 12:10+0000\n"
+"PO-Revision-Date: 2012-01-09 18:04+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -329,48 +329,48 @@ msgstr "Introducir la contraseña para AFP en %s"
 msgid "Password dialog cancelled"
 msgstr "Se canceló el diálogo de la contraseña"
 
-#: ../daemon/gvfsbackendafc.c:208
+#: ../daemon/gvfsbackendafc.c:209
 msgid "Internal Apple File Control error"
 msgstr "Error de control de archivos interno de Apple"
 
-#: ../daemon/gvfsbackendafc.c:212 ../daemon/gvfsbackendftp.c:736
+#: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:736
 msgid "File does not exist"
 msgstr "El archivo no existe"
 
-#: ../daemon/gvfsbackendafc.c:216
+#: ../daemon/gvfsbackendafc.c:217
 msgid "The directory is not empty"
 msgstr "La carpeta no está vacía"
 
-#: ../daemon/gvfsbackendafc.c:220
+#: ../daemon/gvfsbackendafc.c:221
 msgid "The device did not respond"
 msgstr "El dispositivo no respondió"
 
-#: ../daemon/gvfsbackendafc.c:224
+#: ../daemon/gvfsbackendafc.c:225
 msgid "The connection was interrupted"
 msgstr "Se interrumpió la conexión"
 
-#: ../daemon/gvfsbackendafc.c:228
+#: ../daemon/gvfsbackendafc.c:229
 msgid "Invalid Apple File Control data received"
 msgstr "Se recibieron datos no válidos del control de archivos de Apple"
 
-#: ../daemon/gvfsbackendafc.c:232
+#: ../daemon/gvfsbackendafc.c:233
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "Error no manejable de control de archivos de Apple (%d)"
 
-#: ../daemon/gvfsbackendafc.c:248
+#: ../daemon/gvfsbackendafc.c:249
 msgid "Listing applications installed on device failed"
 msgstr "Falló al listar las aplicaciones instaladas en el dispositivo"
 
-#: ../daemon/gvfsbackendafc.c:264
+#: ../daemon/gvfsbackendafc.c:265
 msgid "Accessing application icons on device failed"
 msgstr "Falló al acceder a los iconos de aplicación en el dispositivo"
 
-#: ../daemon/gvfsbackendafc.c:281
+#: ../daemon/gvfsbackendafc.c:282
 msgid "Lockdown Error: Invalid Argument"
 msgstr "Error de bloqueo: argumento no válido"
 
-#: ../daemon/gvfsbackendafc.c:285 ../daemon/gvfsbackendafp.c:463
+#: ../daemon/gvfsbackendafc.c:286 ../daemon/gvfsbackendafp.c:463
 #: ../daemon/gvfsbackendafp.c:1049 ../daemon/gvfsbackendafp.c:1203
 #: ../daemon/gvfsbackendafp.c:1448 ../daemon/gvfsbackendafp.c:1577
 #: ../daemon/gvfsbackendafp.c:1704 ../daemon/gvfsbackendafp.c:2210
@@ -381,16 +381,16 @@ msgstr "Error de bloqueo: argumento no válido"
 msgid "Permission denied"
 msgstr "Permiso denegado"
 
-#: ../daemon/gvfsbackendafc.c:289
+#: ../daemon/gvfsbackendafc.c:290
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "Error de bloqueo no manejable (%d)"
 
-#: ../daemon/gvfsbackendafc.c:306
+#: ../daemon/gvfsbackendafc.c:307
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "Error de libimobiledevice: argumento no válido"
 
-#: ../daemon/gvfsbackendafc.c:310
+#: ../daemon/gvfsbackendafc.c:311
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
@@ -398,21 +398,21 @@ msgstr ""
 "Error de libimobiledevice: no se encontró el dispositivo. Asegúrese de que "
 "usbmuxd está configurado correctamente."
 
-#: ../daemon/gvfsbackendafc.c:314
+#: ../daemon/gvfsbackendafc.c:315
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Error no manejable de libimobiledevice (%d)"
 
-#: ../daemon/gvfsbackendafc.c:381
+#: ../daemon/gvfsbackendafc.c:382
 msgid "Try again"
 msgstr "Intentarlo de nuevo"
 
-#: ../daemon/gvfsbackendafc.c:381 ../daemon/gvfsbackend.c:963
+#: ../daemon/gvfsbackendafc.c:382 ../daemon/gvfsbackend.c:963
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:926
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../daemon/gvfsbackendafc.c:399 ../daemon/gvfsbackendarchive.c:550
+#: ../daemon/gvfsbackendafc.c:400 ../daemon/gvfsbackendarchive.c:550
 #: ../daemon/gvfsbackendarchive.c:579 ../daemon/gvfsbackenddav.c:1797
 #: ../daemon/gvfsbackendhttp.c:309 ../daemon/gvfsbackendobexftp.c:862
 #: ../daemon/gvfsbackendobexftp.c:878 ../daemon/gvfsbackendobexftp.c:897
@@ -420,27 +420,27 @@ msgstr "Cancelar"
 msgid "Invalid mount spec"
 msgstr "Especificación de montaje no válida"
 
-#: ../daemon/gvfsbackendafc.c:405 ../daemon/gvfsbackendafc.c:435
+#: ../daemon/gvfsbackendafc.c:406 ../daemon/gvfsbackendafc.c:436
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr ""
 "Ubicación AFC no válida: debe ser de la forma afc://uuid:número-de-puerto"
 
-#: ../daemon/gvfsbackendafc.c:421
+#: ../daemon/gvfsbackendafc.c:422
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Dispositivo móvil de Apple"
 
-#: ../daemon/gvfsbackendafc.c:426
+#: ../daemon/gvfsbackendafc.c:427
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Dispositivo móvil de Apple, desbloqueado"
 
-#: ../daemon/gvfsbackendafc.c:431
+#: ../daemon/gvfsbackendafc.c:432
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Documentos en el dispositivo móvil de Apple"
 
-#: ../daemon/gvfsbackendafc.c:489
+#: ../daemon/gvfsbackendafc.c:490
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s («jailbreak»)"
@@ -448,7 +448,7 @@ msgstr "%s («jailbreak»)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:496 ../monitor/afc/afcvolume.c:125
+#: ../daemon/gvfsbackendafc.c:497 ../monitor/afc/afcvolume.c:125
 #, c-format
 msgid "Documents on %s"
 msgstr "Documentación sobre %s"
@@ -456,11 +456,8 @@ msgstr "Documentación sobre %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:575
+#: ../daemon/gvfsbackendafc.c:579
 #, c-format
-#| msgid ""
-#| "Device '%s' is password protected. Enter the password on the device and "
-#| "click 'Try again'."
 msgid ""
 "The device '%s' is locked. Enter the passcode on the device and click 'Try "
 "again'."
@@ -468,14 +465,14 @@ msgstr ""
 "El dispositivo «%s» está protegido con contraseña. Introduzca la contraseña "
 "en el dispositivo y pulse «Intentarlo de nuevo»."
 
-#: ../daemon/gvfsbackendafc.c:914 ../daemon/gvfsbackendarchive.c:655
+#: ../daemon/gvfsbackendafc.c:918 ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1808
 #: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:718
 #: ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "No se puede abrir la carpeta"
 
-#: ../daemon/gvfsbackendafc.c:924 ../daemon/gvfsbackendafpbrowse.c:257
+#: ../daemon/gvfsbackendafc.c:928 ../daemon/gvfsbackendafpbrowse.c:257
 #: ../daemon/gvfsbackendafpbrowse.c:390 ../daemon/gvfsbackendafpbrowse.c:422
 #: ../daemon/gvfsbackendafp.c:467 ../daemon/gvfsbackendafp.c:780
 #: ../daemon/gvfsbackendafp.c:2869 ../daemon/gvfsbackendarchive.c:647
@@ -489,15 +486,15 @@ msgstr "No se puede abrir la carpeta"
 msgid "File doesn't exist"
 msgstr "El archivo no existe"
 
-#: ../daemon/gvfsbackendafc.c:1115 ../daemon/gvfsbackendafc.c:2458
+#: ../daemon/gvfsbackendafc.c:1119 ../daemon/gvfsbackendafc.c:2462
 msgid "Backups are not yet supported."
 msgstr "Aún no se soportan los respaldos."
 
-#: ../daemon/gvfsbackendafc.c:1287
+#: ../daemon/gvfsbackendafc.c:1291
 msgid "Invalid seek type"
 msgstr "Tipo de búsqueda no soportado"
 
-#: ../daemon/gvfsbackendafc.c:2295 ../daemon/gvfsbackendafp.c:3809
+#: ../daemon/gvfsbackendafc.c:2299 ../daemon/gvfsbackendafp.c:3809
 #: ../daemon/gvfsbackendftp.c:1087 ../daemon/gvfsbackendftp.c:1135
 #: ../daemon/gvfsbackendftp.c:1156 ../daemon/gvfsbackendsftp.c:1832
 #: ../daemon/gvfsbackendsftp.c:4633 ../daemon/gvfsbackendsmb.c:1719
@@ -2498,12 +2495,29 @@ msgstr "Aplicación predeterminada para «%s»: %s\n"
 msgid "Registered applications:\n"
 msgstr "Aplicaciones registradas:\n"
 
-#: ../programs/gvfs-mime.c:152
+#: ../programs/gvfs-mime.c:134
+#, c-format
+#| msgid "Registered applications:\n"
+msgid "No registered applications\n"
+msgstr "No hay aplicaciones registradas\n"
+
+#: ../programs/gvfs-mime.c:145
+#, c-format
+msgid "Recommended applications:\n"
+msgstr "Aplicaciones recomendadas:\n"
+
+#: ../programs/gvfs-mime.c:147
+#, c-format
+#| msgid "Recommended applications:\n"
+msgid "No recommended applications\n"
+msgstr "No hay aplicaciones recomendadas\n"
+
+#: ../programs/gvfs-mime.c:167
 #, c-format
 msgid "Failed to load info for handler '%s'\n"
 msgstr "Falló al cargar la información para el gestor «%s»\n"
 
-#: ../programs/gvfs-mime.c:158
+#: ../programs/gvfs-mime.c:173
 #, c-format
 msgid "Failed to set '%s' as the default handler for '%s': %s\n"
 msgstr "falló al establecer «%s» como el gestor predeterminado para «%s»: %s\n"

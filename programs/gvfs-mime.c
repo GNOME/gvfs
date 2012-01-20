@@ -130,6 +130,21 @@ main (int argc, char *argv[])
           list = g_app_info_get_all_for_type (mimetype);
           if (list != NULL)
             g_print (_("Registered applications:\n"));
+	  else
+	    g_print (_("No registered applications\n"));
+          for (l = list; l != NULL; l = l->next)
+	    {
+	      info = l->data;
+	      g_print ("\t%s\n", g_app_info_get_id (info));
+	      g_object_unref (info);
+	    }
+	  g_list_free (list);
+
+	  list = g_app_info_get_recommended_for_type (mimetype);
+	  if (list != NULL)
+            g_print (_("Recommended applications:\n"));
+	  else
+	    g_print (_("No recommended applications\n"));
           for (l = list; l != NULL; l = l->next)
 	    {
 	      info = l->data;

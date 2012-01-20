@@ -1,3 +1,12 @@
+Major changes in 1.11.2
+=======================
+* gvfs-mime: List recommended applications
+* daemon: Spawn fuse daemon in foreground for uClibc compatibility
+* ftp: Make ftp.mount no longer conditionally built
+* fuse: Remove the unused sys/vfs.h include
+* build: Check for util.h to prevent implicit declaration
+* Translation updates
+
 Major changes in 1.11.1
 =======================
 * Fixed several crashes from recent mutex API changes
