@@ -58,9 +58,12 @@ INFLUENTIAL UDEV PROPERTIES
 ---------------------------
 
 Note that it's also possible to influence what is shown (and if it's
-shown) using udev properties. While the udisks(8) man page is the
-authoritative source for the supported properties, we mention specific
-examples here
+shown) using udev properties. While the udisks(8) man page, see
+
+ http://udisks.freedesktop.org/docs/latest/udisks.8.html
+
+is the authoritative source for the supported properties, we mention
+specific examples here
 
 # Don't automount USB Kingston DataTraveler devices
 SUBSYSTEMS=="usb", ENV{ID_VENDOR}=="*Kingston*", ENV{ID_MODEL}=="*DataTraveler*", ENV{UDISKS_AUTO}="0"
