@@ -98,6 +98,11 @@ monitor/hal/hal-utils.c
 monitor/proxy/gproxydrive.c
 monitor/proxy/gproxymount.c
 monitor/proxy/gproxyvolume.c
+monitor/udisks2/gvfsudisks2drive.c
+monitor/udisks2/gvfsudisks2mount.c
+monitor/udisks2/gvfsudisks2utils.c
+monitor/udisks2/gvfsudisks2volume.c
+monitor/udisks2/udisks2volumemonitordaemon.c
 programs/gvfs-cat.c
 programs/gvfs-copy.c
 programs/gvfs-info.c
@@ -115,4 +120,3 @@ programs/gvfs-save.c
 programs/gvfs-set-attribute.c
 programs/gvfs-trash.c
 programs/gvfs-tree.c
-
