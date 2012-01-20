@@ -53,3 +53,20 @@ EXAMPLES
 
 # forcibly show NFS mount in user interface
 10.200.0.210:/tank/media  /mnt/Filer  nfs4  default,users,noauto,comment=gvfs-show  0 0
+
+INFLUENTIAL UDEV PROPERTIES
+---------------------------
+
+Note that it's also possible to influence what is shown (and if it's
+shown) using udev properties. While the udisks(8) man page is the
+authoritative source for the supported properties, we mention specific
+examples here
+
+ # Don't automount USB Kingston DataTraveler devices
+ SUBSYSTEMS=="usb", ENV{ID_VENDOR}=="*Kingston*", ENV{ID_MODEL}=="*DataTraveler*", ENV{UDISKS_AUTO}="0"
+
+ # Automount this specific hard disk and don't require admin authentication
+ ENV{ID_SERIAL}=="WDC_WD1002FAEX-00Y9A0_WD-WCAW30039835", ENV{UDISKS_AUTO}="1", ENV{UDISKS_SYSTEM}="0"
+
+ # Specify name and icon name for a specific device.
+ ENV{ID_MEDIA_PLAYER}=="apple-ipod", ENV{UDISKS_NAME}="David's iPod", ENV{UDISKS_ICON_NAME}="multimedia-player-ipod"
