@@ -780,10 +780,10 @@ mount_command_cb (GObject       *source_object,
   gint exit_status;
   gchar *standard_error = NULL;
 
-  /* TODO: for e.g. NFS and CIFS mounts we could do GMountOperation stuff and pipe a
+  /* NOTE: for e.g. NFS and CIFS mounts we could do GMountOperation stuff and pipe a
    * password to mount(8)'s stdin channel
    *
-   * TODO: if this fails because the user is not authorized (e.g. EPERM), we could
+   * NOTE: if this fails because the user is not authorized (e.g. EPERM), we could
    * run it through a polkit-ified setuid root helper
    */
 
