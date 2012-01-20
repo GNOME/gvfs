@@ -911,8 +911,6 @@ unlock_cb (GObject       *source_object,
           goto out;
         }
 
-      /* TODO: save in keyring depending on ASK_SAVE */
-
       /* OK, ready to rock */
       do_mount (data);
     }
@@ -966,7 +964,6 @@ on_mount_operation_reply (GMountOperation       *mount_operation,
 
   data->passphrase = g_strdup (g_mount_operation_get_password (mount_operation));
 
-  /* TODO: check ASK_SAVE */
   do_unlock (data);
 
  out:
@@ -1048,6 +1045,22 @@ do_unlock (MountData *data)
           message = g_strdup_printf (_("Enter a password to unlock the volume\n"
                                        "The device %s contains encrypted data."),
                                      udisks_block_get_device (data->volume->block));
+
+          /* NOTE: We (currently) don't offer the user to save the
+           * passphrase in the keyring or /etc/crypttab - compared to
+           * the gdu volume monitor (that used the keyring for this)
+           * this is a "regression" but it's done this way on purpose
+           * because
+           *
+           *  - if the device is encrypted, it was probably the intent
+           *    that the passphrase is to be used every time it's used
+           *
+           *  - supporting both /etc/crypttab and the keyring is confusing
+           *    and leaves the user to wonder where the key is stored.
+           *
+           *  - the user can add an /etc/crypttab entry himself either
+           *    manually or through palimpsest
+           */
           g_signal_emit_by_name (data->mount_operation,
                                  "ask-password",
                                  message,
