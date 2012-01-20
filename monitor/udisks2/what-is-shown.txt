@@ -62,11 +62,14 @@ shown) using udev properties. While the udisks(8) man page is the
 authoritative source for the supported properties, we mention specific
 examples here
 
- # Don't automount USB Kingston DataTraveler devices
- SUBSYSTEMS=="usb", ENV{ID_VENDOR}=="*Kingston*", ENV{ID_MODEL}=="*DataTraveler*", ENV{UDISKS_AUTO}="0"
+# Don't automount USB Kingston DataTraveler devices
+SUBSYSTEMS=="usb", ENV{ID_VENDOR}=="*Kingston*", ENV{ID_MODEL}=="*DataTraveler*", ENV{UDISKS_AUTO}="0"
 
- # Automount this specific hard disk and don't require admin authentication
- ENV{ID_SERIAL}=="WDC_WD1002FAEX-00Y9A0_WD-WCAW30039835", ENV{UDISKS_AUTO}="1", ENV{UDISKS_SYSTEM}="0"
+# Automount this specific hard disk and don't require admin authentication
+ENV{ID_SERIAL}=="WDC_WD1002FAEX-00Y9A0_WD-WCAW30039835", ENV{UDISKS_AUTO}="1", ENV{UDISKS_SYSTEM}="0"
 
- # Specify name and icon name for a specific device.
- ENV{ID_MEDIA_PLAYER}=="apple-ipod", ENV{UDISKS_NAME}="David's iPod", ENV{UDISKS_ICON_NAME}="multimedia-player-ipod"
+# Specify name and icon name for a specific device.
+ENV{ID_MEDIA_PLAYER}=="apple-ipod", ENV{UDISKS_NAME}="David's iPod", ENV{UDISKS_ICON_NAME}="multimedia-player-ipod"
+
+# Make sure this specific hard disk does not appear in the user interface
+ENV{ID_SERIAL}=="HITACHI_HTS723232A7A364_E3834563KRG2HN", ENV{UDISKS_IGNORE}="1"
