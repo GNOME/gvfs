@@ -870,9 +870,17 @@ static gboolean
 should_include_drive (GVfsUDisks2VolumeMonitor *monitor,
                       UDisksDrive              *drive)
 {
-  gboolean ret = TRUE;
-  /* TODO */
-  return ret;
+  /* For now, we just include all detected drives. This is probably
+   * wrong - non-removable drives without anything visible (such
+   * RAID components) should probably not be shown.
+   *
+   * Then again, the GNOME 3 user interface doesn't really show GDrive
+   * instances except for in the computer:/// location in Nautilus.
+   *
+   * TODO: if device is non-removable, maybe only show it, if it has
+   *       more visible devices
+   */
+  return TRUE;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
