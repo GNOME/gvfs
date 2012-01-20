@@ -324,7 +324,7 @@ update_volume (GVfsUDisks2Volume *volume)
            *
            * Fortunately udisks provides a property just for this.
            */
-          if (udisks_drive_get_removable (udisks_drive))
+          if (udisks_block_get_hint_auto (volume->block))
             {
               /* Also, if a volume (partition) appear _much later_ than when media was inserted it
                * can only be because the media was repartitioned. We don't want to automount
