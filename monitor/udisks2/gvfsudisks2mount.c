@@ -1140,7 +1140,6 @@ gvfs_udisks2_mount_eject_finish (GMount        *mount,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* TODO: handle force_rescan */
 static gchar **
 gvfs_udisks2_mount_guess_content_type_sync (GMount        *_mount,
                                             gboolean       force_rescan,
@@ -1226,7 +1225,6 @@ gvfs_udisks2_mount_guess_content_type (GMount              *mount,
                                        gpointer             user_data)
 {
   GSimpleAsyncResult *simple;
-  /* TODO: handle force_rescan */
   simple = g_simple_async_result_new (G_OBJECT (mount),
                                       callback,
                                       user_data,
