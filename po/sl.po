@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-01-15 01:31+0000\n"
-"PO-Revision-Date: 2012-01-15 13:10+0100\n"
+"POT-Creation-Date: 2012-01-21 10:57+0000\n"
+"PO-Revision-Date: 2012-01-21 20:31+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "Language: \n"
@@ -453,6 +453,7 @@ msgstr "Poskusi znova"
 #: ../daemon/gvfsbackend.c:963
 #: ../monitor/gdu/ggdudrive.c:1024
 #: ../monitor/gdu/ggdumount.c:926
+#: ../monitor/udisks2/gvfsudisks2mount.c:709
 msgid "Cancel"
 msgstr "Prekliči"
 
@@ -977,6 +978,8 @@ msgstr "Datoteka obstaja"
 #: ../monitor/gdu/ggdumount.c:1177
 #: ../monitor/gdu/ggdumount.c:1261
 #: ../monitor/gdu/ggduvolume.c:1617
+#: ../monitor/udisks2/gvfsudisks2mount.c:1091
+#: ../monitor/udisks2/gvfsudisks2volume.c:1252
 msgid "Operation not supported by backend"
 msgstr "Zaledje ne podpira dejanja"
 
@@ -1003,11 +1006,13 @@ msgstr "Ni podprto"
 
 #: ../daemon/gvfsbackend.c:962
 #: ../monitor/gdu/ggdumount.c:925
+#: ../monitor/udisks2/gvfsudisks2mount.c:708
 msgid "Unmount Anyway"
 msgstr "Vseeno odklopi"
 
 #: ../daemon/gvfsbackend.c:965
 #: ../monitor/gdu/ggdumount.c:927
+#: ../monitor/udisks2/gvfsudisks2mount.c:710
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -1063,6 +1068,7 @@ msgstr "cdda priklop na %s"
 #: ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225
 #: ../monitor/hal/ghalvolume.c:246
+#: ../monitor/udisks2/gvfsudisks2volume.c:296
 #, c-format
 msgid "Audio Disc"
 msgstr "Glasbeni disk"
@@ -2024,15 +2030,18 @@ msgid "Floppy Drive"
 msgstr "Disketna enota"
 
 #: ../monitor/gdu/ggdudrive.c:258
+#: ../monitor/udisks2/gvfsudisks2drive.c:201
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "Neimenovan pogon (%s)"
 
 #: ../monitor/gdu/ggdudrive.c:260
+#: ../monitor/udisks2/gvfsudisks2drive.c:203
 msgid "Unnamed Drive"
 msgstr "Neimenovan pogon"
 
 #: ../monitor/gdu/ggdudrive.c:561
+#: ../monitor/udisks2/gvfsudisks2drive.c:510
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr "Napaka med odpiranjem nosilca: ena ali več enot nosilcev je zasedenih."
@@ -2050,6 +2059,7 @@ msgid "Start Anyway"
 msgstr "Vseeno zaženi"
 
 #: ../monitor/gdu/ggdumount.c:860
+#: ../monitor/udisks2/gvfsudisks2mount.c:631
 msgid "One or more programs are preventing the unmount operation."
 msgstr "En ali več programov preprečujejo odklop pogona."
 
@@ -2085,6 +2095,7 @@ msgstr ""
 "Naprava \"%s\" vsebuje tudi šifrirane podatke."
 
 #: ../monitor/gdu/ggduvolume.c:1111
+#: ../monitor/udisks2/gvfsudisks2volume.c:1045
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -2450,6 +2461,44 @@ msgstr "%s šifrirani nosilec"
 #, c-format
 msgid "%s Media"
 msgstr "%s nosilec"
+
+#: ../monitor/udisks2/gvfsudisks2utils.c:494
+#, c-format
+msgid "Timed out running command-line `%s'"
+msgstr "Zaganjanje ukaza `%s' je časovno poteklo."
+
+#. Translators: This is used for encrypted volumes.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: ../monitor/udisks2/gvfsudisks2volume.c:243
+#, c-format
+msgid "%s Encrypted"
+msgstr "%s šifrirani razdelek"
+
+#. Translators: This is used for volume with no filesystem label.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: ../monitor/udisks2/gvfsudisks2volume.c:256
+#, c-format
+msgid "%s Volume"
+msgstr "%s nosilec"
+
+#. Translators: Name used for volume
+#: ../monitor/udisks2/gvfsudisks2volume.c:408
+msgid "Volume"
+msgstr "Nosilec"
+
+#: ../monitor/udisks2/gvfsudisks2volume.c:908
+msgid "The unlocked device does not have a recognizable filesystem on it"
+msgstr "Odklenjena naprava ne vsebuje prepoznanega datotečnega sistema."
+
+#: ../monitor/udisks2/gvfsudisks2volume.c:1031
+msgid "A passphrase is required to access the volume"
+msgstr "Za dostop do nosilca je zahtevano šifrirno geslo"
+
+#: ../monitor/udisks2/udisks2volumemonitordaemon.c:40
+msgid "GVfs UDisks2 Volume Monitor"
+msgstr "Nadzornik nosilcev GVfs UDisks2"
 
 #: ../programs/gvfs-cat.c:37
 msgid "locations"
