@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-01-09 12:10+0000\n"
-"PO-Revision-Date: 2012-01-09 18:04+0100\n"
+"POT-Creation-Date: 2012-01-20 21:33+0000\n"
+"PO-Revision-Date: 2012-01-21 11:52+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -409,6 +409,7 @@ msgstr "Intentarlo de nuevo"
 
 #: ../daemon/gvfsbackendafc.c:382 ../daemon/gvfsbackend.c:963
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:926
+#: ../monitor/udisks2/gvfsudisks2mount.c:709
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -833,7 +834,8 @@ msgstr "El archivo ya existe"
 #: ../daemon/gvfsjobtrash.c:123 ../daemon/gvfsjobunmountmountable.c:140
 #: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1177 ../monitor/gdu/ggdumount.c:1261
-#: ../monitor/gdu/ggduvolume.c:1617
+#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1091
+#: ../monitor/udisks2/gvfsudisks2volume.c:1252
 msgid "Operation not supported by backend"
 msgstr "El backend no soporta la operación"
 
@@ -854,10 +856,12 @@ msgid "Not supported"
 msgstr "No soportado"
 
 #: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:925
+#: ../monitor/udisks2/gvfsudisks2mount.c:708
 msgid "Unmount Anyway"
 msgstr "Desmontar de todas formas"
 
 #: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:927
+#: ../monitor/udisks2/gvfsudisks2mount.c:710
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -905,6 +909,7 @@ msgstr "CDDA montado en %s"
 #: ../daemon/gvfsbackendcdda.c:441 ../daemon/gvfsbackendcdda.c:961
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
+#: ../monitor/udisks2/gvfsudisks2volume.c:296
 #, c-format
 msgid "Audio Disc"
 msgstr "Disco de sonido"
@@ -1797,16 +1802,16 @@ msgstr "Monitor de volúmenes GDU de GVfs"
 msgid "Floppy Drive"
 msgstr "Disquete"
 
-#: ../monitor/gdu/ggdudrive.c:258
+#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:201
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "Unidad sin nombre (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:260
+#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:203
 msgid "Unnamed Drive"
 msgstr "Unidad sin nombre"
 
-#: ../monitor/gdu/ggdudrive.c:561
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:510
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
@@ -1827,7 +1832,7 @@ msgstr ""
 msgid "Start Anyway"
 msgstr "Iniciar de todas formas"
 
-#: ../monitor/gdu/ggdumount.c:860
+#: ../monitor/gdu/ggdumount.c:860 ../monitor/udisks2/gvfsudisks2mount.c:631
 msgid "One or more programs are preventing the unmount operation."
 msgstr "Uno o más programas evitan la operación de desmontado."
 
@@ -1863,6 +1868,7 @@ msgstr ""
 "El dispositivo «%s» contiene datos cifrados."
 
 #: ../monitor/gdu/ggduvolume.c:1111
+#: ../monitor/udisks2/gvfsudisks2volume.c:1045
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -2190,6 +2196,47 @@ msgstr "Datos cifrados %s"
 msgid "%s Media"
 msgstr "Soporte %s"
 
+#: ../monitor/udisks2/gvfsudisks2utils.c:494
+#, c-format
+msgid "Timed out running command-line `%s'"
+msgstr "Expiro el tiempo al ejecutar el comando «%s»"
+
+#. Translators: This is used for encrypted volumes.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: ../monitor/udisks2/gvfsudisks2volume.c:243
+#, c-format
+#| msgid "%s Encrypted Data"
+msgid "%s Encrypted"
+msgstr "Cifrados %s"
+
+#. Translators: This is used for volume with no filesystem label.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: ../monitor/udisks2/gvfsudisks2volume.c:256
+#, c-format
+msgid "%s Volume"
+msgstr "Volumen de %s"
+
+#. Translators: Name used for volume
+#: ../monitor/udisks2/gvfsudisks2volume.c:408
+msgid "Volume"
+msgstr "Volumen"
+
+#: ../monitor/udisks2/gvfsudisks2volume.c:908
+msgid "The unlocked device does not have a recognizable filesystem on it"
+msgstr ""
+"El dispositivo desbloqueado no contiene un sistema de archivos reconocible"
+
+#: ../monitor/udisks2/gvfsudisks2volume.c:1031
+msgid "A passphrase is required to access the volume"
+msgstr "Se requiere una contraseña para acceder al volumen"
+
+#: ../monitor/udisks2/udisks2volumemonitordaemon.c:40
+#| msgid "GVfs GDU Volume Monitor"
+msgid "GVfs UDisks2 Volume Monitor"
+msgstr "Monitor de volúmenes UDisks de GVfs"
+
 #: ../programs/gvfs-cat.c:37
 msgid "locations"
 msgstr "ubicaciones"
@@ -2497,7 +2544,6 @@ msgstr "Aplicaciones registradas:\n"
 
 #: ../programs/gvfs-mime.c:134
 #, c-format
-#| msgid "Registered applications:\n"
 msgid "No registered applications\n"
 msgstr "No hay aplicaciones registradas\n"
 
@@ -2508,7 +2554,6 @@ msgstr "Aplicaciones recomendadas:\n"
 
 #: ../programs/gvfs-mime.c:147
 #, c-format
-#| msgid "Recommended applications:\n"
 msgid "No recommended applications\n"
 msgstr "No hay aplicaciones recomendadas\n"
 
