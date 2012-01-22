@@ -2498,7 +2498,8 @@ enumerate_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   }
   g_object_unref (reply);
 
-  g_simple_async_result_set_op_res_gpointer (simple, infos, NULL);
+  g_simple_async_result_set_op_res_gpointer (simple, infos,
+                                             (GDestroyNotify)g_ptr_array_unref);
   
 done:
   g_simple_async_result_complete (simple);
@@ -2624,6 +2625,8 @@ g_vfs_afp_volume_enumerate_finish (GVfsAfpVolume  *volume,
     return FALSE;
 
   *infos = g_simple_async_result_get_op_res_gpointer (simple);
+  if (*infos)
+    g_ptr_array_ref (*infos);
   
   return TRUE;
 }
