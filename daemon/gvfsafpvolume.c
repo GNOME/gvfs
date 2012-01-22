@@ -357,7 +357,7 @@ open_fork_data_free (OpenForkData *data)
 static void
 open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
   
   GVfsAfpVolume *volume;
@@ -372,7 +372,7 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   volume = G_VFS_AFP_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
   priv = volume->priv;
   
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -537,14 +537,14 @@ g_vfs_afp_volume_open_fork_finish (GVfsAfpVolume  *volume,
 static void
 close_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
   GVfsAfpReply *reply;
   GError *err = NULL;
   AfpResultCode res_code;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -638,14 +638,14 @@ g_vfs_afp_volume_close_fork_finish (GVfsAfpVolume  *volume,
 static void
 delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
   GVfsAfpReply *reply;
   GError *err = NULL;
   AfpResultCode res_code;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -985,14 +985,14 @@ create_dir_data_free (CreateDirData *cdd)
 static void
 make_directory_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
   GVfsAfpReply *reply;
   GError *err = NULL;
   AfpResultCode res_code;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -1367,7 +1367,7 @@ g_vfs_afp_volume_rename_finish (GVfsAfpVolume  *volume,
 static void
 move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
   GVfsAfpReply *reply;
@@ -1375,7 +1375,7 @@ move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_dat
 
   AfpResultCode res_code;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -1524,7 +1524,7 @@ g_vfs_afp_volume_move_and_rename_finish (GVfsAfpVolume  *volume,
 static void
 copy_file_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
   GVfsAfpReply *reply;
@@ -1532,7 +1532,7 @@ copy_file_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 
   AfpResultCode res_code;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -1698,7 +1698,7 @@ map_id_data_free (MapIDData *mid)
 static void
 map_id_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
   GVfsAfpReply *reply;
@@ -1707,7 +1707,7 @@ map_id_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   AfpResultCode res_code;
   MapIDData *map_data;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -1859,7 +1859,7 @@ g_vfs_afp_volume_map_id_finish (GVfsAfpVolume   *volume,
 static void
 get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
 
@@ -1872,7 +1872,7 @@ get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
   gboolean directory;
   GFileInfo *info;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -2012,7 +2012,7 @@ g_vfs_afp_volume_get_filedir_parms_finish (GVfsAfpVolume  *volume,
 static void
 get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
   GVfsAfpVolumePrivate *priv = volume->priv;
@@ -2024,7 +2024,7 @@ get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   guint16 file_bitmap;
   GFileInfo *info;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -2263,14 +2263,14 @@ g_vfs_afp_volume_set_fork_size_finish (GVfsAfpVolume  *volume,
 static void
 set_unix_privs_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
+  GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
   GVfsAfpReply *reply;
   GError *err = NULL;
   AfpResultCode res_code;
 
-  reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
