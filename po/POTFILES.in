@@ -17,6 +17,8 @@ common/gvfsicon.c
 daemon/daemon-main.c
 daemon/gvfsafpconnection.c
 daemon/gvfsafpserver.c
+daemon/gvfsafputils.c
+daemon/gvfsafpvolume.c
 daemon/gvfsbackendafc.c
 daemon/gvfsbackendafpbrowse.c
 daemon/gvfsbackendafp.c
