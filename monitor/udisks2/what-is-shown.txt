@@ -24,14 +24,14 @@ If the directory for a device is known and outside /media, $HOME
 then the device is not shown in the user interface. Additionally, if
 any of component directories in its directory starts with a dot ("."),
 the device is not shown either. This policy may be overriden by use of
-the options comment=gvfs-show and comment=gvfs-hide.
+the options x-gvfs-show and x-gvfs-hide.
 
 The name and icon to use for a device is chosen according to certain
 heuristics - for example, if a device has a filesystem label, it is
 used - if not, some other characteristic is used. The options
-comment=gvfs-name=<value> and comment=gvfs-icon=<value> can be used to
-override this policy with <value> being an URL-encoded string. For
-icons, the Icon Naming Specification is used.
+x-gvfs-name=<value> and x-gvfs-icon=<value> can be used to override
+this policy with <value> being an URL-encoded string. For icons, the
+Icon Naming Specification is used.
 
 Users are advised to use (stable) symlinks in the /dev/disk/ hierarchy
 for /etc/fstab entries instead of the kernel names sda, sdb and so
@@ -46,13 +46,13 @@ EXAMPLES
 --------
 
 # forcibly hide device in user interface
-/dev/disk/by-id/ata-HITACHI_HTS723232A7A364_E3834563KRG2HN-part1   /home/davidz/Data  auto  defaults,comment=gvfs-hide 0 0
+/dev/disk/by-id/ata-HITACHI_HTS723232A7A364_E3834563KRG2HN-part1   /home/davidz/Data  auto  defaults,x-gvfs-hide 0 0
 
 # forcibly show device in user interface and with name "My Movies"
-/dev/disk/by-uuid/4CAE8E5B5AF47502   /Movies  auto   defaults,comment=gvfs-show,comment=gvfs-name=My%20Movies  0 0
+/dev/disk/by-uuid/4CAE8E5B5AF47502   /Movies  auto   defaults,x-gvfs-show,x-gvfs-name=My%20Movies  0 0
 
 # forcibly show NFS mount in user interface
-10.200.0.210:/tank/media  /mnt/Filer  nfs4  default,users,noauto,comment=gvfs-show  0 0
+10.200.0.210:/tank/media  /mnt/Filer  nfs4  default,users,noauto,x-gvfs-show  0 0
 
 INFLUENTIAL UDEV PROPERTIES
 ---------------------------

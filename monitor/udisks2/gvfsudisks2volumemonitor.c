@@ -607,18 +607,18 @@ should_include (const gchar *mount_path,
 
   g_return_val_if_fail (mount_path != NULL, FALSE);
 
-  /* The comment=gvfs-show option trumps everything else */
+  /* The x-gvfs-show option trumps everything else */
   if (options != NULL)
     {
       gchar *value;
-      value = gvfs_udisks2_utils_lookup_fstab_options_value (options, "comment=gvfs-show");
+      value = gvfs_udisks2_utils_lookup_fstab_options_value (options, "x-gvfs-show");
       if (value != NULL)
         {
           ret = TRUE;
           g_free (value);
           goto out;
         }
-      value = gvfs_udisks2_utils_lookup_fstab_options_value (options, "comment=gvfs-hide");
+      value = gvfs_udisks2_utils_lookup_fstab_options_value (options, "x-gvfs-hide");
       if (value != NULL)
         {
           ret = FALSE;
