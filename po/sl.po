@@ -307,7 +307,7 @@ msgstr "Pridobljen EOS"
 #: ../daemon/gvfsafpserver.c:457
 #, c-format
 msgid "Server doesn't support passwords longer than %d characters"
-msgstr "Strežnik ne podpira gesel daljših od 256 znakov"
+msgstr "Strežnik ne podpira gesel daljših od %d znakov"
 
 #: ../daemon/gvfsafpserver.c:199
 #: ../daemon/gvfsafpserver.c:512
