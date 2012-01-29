@@ -352,11 +352,11 @@ GVfsAfpReply*      g_vfs_afp_query_server_info            (GSocketConnectable *a
 
 GVfsAfpConnection* g_vfs_afp_connection_new               (GSocketConnectable *addr);
 
-gboolean           g_vfs_afp_connection_open              (GVfsAfpConnection *afp_connection,
+gboolean           g_vfs_afp_connection_open_sync         (GVfsAfpConnection *afp_connection,
                                                            GCancellable      *cancellable,
                                                            GError            **error);
 
-gboolean           g_vfs_afp_connection_close             (GVfsAfpConnection *afp_connection,
+gboolean           g_vfs_afp_connection_close_sync        (GVfsAfpConnection *afp_connection,
                                                            GCancellable      *cancellable,
                                                            GError            **error);
 

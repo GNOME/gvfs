@@ -1540,9 +1540,9 @@ g_vfs_afp_connection_send_command_sync (GVfsAfpConnection *afp_connection,
 }
 
 gboolean
-g_vfs_afp_connection_close (GVfsAfpConnection *afp_connection,
-                            GCancellable      *cancellable,
-                            GError            **error)
+g_vfs_afp_connection_close_sync (GVfsAfpConnection *afp_connection,
+                                 GCancellable      *cancellable,
+                                 GError            **error)
 {
   GVfsAfpConnectionPrivate *priv = afp_connection->priv;
   
@@ -1568,9 +1568,9 @@ g_vfs_afp_connection_close (GVfsAfpConnection *afp_connection,
 }
 
 gboolean
-g_vfs_afp_connection_open (GVfsAfpConnection *afp_connection,
-                           GCancellable      *cancellable,
-                           GError            **error)
+g_vfs_afp_connection_open_sync (GVfsAfpConnection *afp_connection,
+                                GCancellable      *cancellable,
+                                GError            **error)
 {
   GVfsAfpConnectionPrivate *priv = afp_connection->priv;
 
