@@ -48,7 +48,6 @@ g_vfs_afp_server_new (GNetworkAddress *addr)
   afp_serv = g_object_new (G_VFS_TYPE_AFP_SERVER, NULL);
 
   afp_serv->addr = addr;
-  afp_serv->conn = g_vfs_afp_connection_new (G_SOCKET_CONNECTABLE (addr));
   
   return afp_serv;
 }
@@ -180,13 +179,9 @@ dhx2_login (GVfsAfpServer *afp_serv,
   g_vfs_afp_command_put_pascal (comm, username);
   g_vfs_afp_command_pad_to_even (comm);
 
-  res = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
-                                                cancellable, error);
+  reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+                                                  cancellable, error);
   g_object_unref (comm);
-  if (!res)
-    goto error;
-
-  reply = g_vfs_afp_connection_read_reply_sync (afp_serv->conn, cancellable, error);
   if (!reply)
     goto error;
 
@@ -288,17 +283,11 @@ dhx2_login (GVfsAfpServer *afp_serv,
   /* clientNonce */
   g_output_stream_write_all (G_OUTPUT_STREAM (comm), clientNonce_buf, 16, NULL, NULL, NULL);
 
-  res = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+  reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
                                                 cancellable, error);
   g_object_unref (comm);
-  if (!res)
-    goto error;
-
-  
-  reply = g_vfs_afp_connection_read_reply_sync (afp_serv->conn, cancellable, error);
   if (!reply)
     goto error;
-
   
   res_code = g_vfs_afp_reply_get_result_code (reply);
   if (res_code != AFP_RESULT_AUTH_CONTINUE)
@@ -359,13 +348,9 @@ dhx2_login (GVfsAfpServer *afp_serv,
                              G_N_ELEMENTS (answer_buf), NULL, NULL, NULL);
 
 
-  res = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
-                                                cancellable, error);
+  reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+                                                  cancellable, error);
   g_object_unref (comm);
-  if (!res)
-    goto error;
-  
-  reply = g_vfs_afp_connection_read_reply_sync (afp_serv->conn, cancellable, error);
   if (!reply)
     goto error;
 
@@ -493,15 +478,11 @@ dhx_login (GVfsAfpServer *afp_serv,
   g_output_stream_write_all (G_OUTPUT_STREAM(comm), ma_buf, G_N_ELEMENTS (ma_buf),
                              NULL, NULL, NULL);
 
-  res = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
-                                                cancellable, error);
+  reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+                                                  cancellable, error);
   g_object_unref (comm);
-  if (!res)
-    goto done;
-
-  reply = g_vfs_afp_connection_read_reply_sync (afp_serv->conn, cancellable, error);
   if (!reply)
-    goto error;
+    goto error;  
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
   if (res_code != AFP_RESULT_AUTH_CONTINUE)
@@ -587,13 +568,9 @@ dhx_login (GVfsAfpServer *afp_serv,
                              G_N_ELEMENTS (answer_buf), NULL, NULL, NULL);
 
 
-  res = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
-                                                cancellable, error);
+  reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+                                                  cancellable, error);
   g_object_unref (comm);
-  if (!res)
-    goto done;
-
-  reply = g_vfs_afp_connection_read_reply_sync (afp_serv->conn, cancellable, error);
   if (!reply)
     goto error;
 
@@ -643,7 +620,6 @@ do_login (GVfsAfpServer *afp_serv,
   if (anonymous)
   {
     GVfsAfpCommand *comm;
-    gboolean res;
     GVfsAfpReply *reply;
     AfpResultCode res_code;
     
@@ -659,13 +635,9 @@ do_login (GVfsAfpServer *afp_serv,
 
     g_vfs_afp_command_put_pascal (comm, afp_version_to_string (afp_serv->version));
     g_vfs_afp_command_put_pascal (comm, AFP_UAM_NO_USER);
-    res = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
-                                                  cancellable, error);
+    reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+                                                    cancellable, error);
     g_object_unref (comm);
-    if (!res)
-      return FALSE;
-
-    reply = g_vfs_afp_connection_read_reply_sync (afp_serv->conn, cancellable, error);
     if (!reply)
       return FALSE;
 
@@ -805,7 +777,6 @@ get_server_parms (GVfsAfpServer *server,
 {
   GVfsAfpCommand *comm;
   GVfsAfpReply   *reply;
-  gboolean        res;
   AfpResultCode   res_code;
   gint32          server_time;
   
@@ -814,13 +785,9 @@ get_server_parms (GVfsAfpServer *server,
   /* pad byte */
   g_vfs_afp_command_put_byte (comm, 0);
 
-  res = g_vfs_afp_connection_send_command_sync (server->conn, comm, cancellable,
-                                                error);
+  reply = g_vfs_afp_connection_send_command_sync (server->conn, comm, cancellable,
+                                                  error);
   g_object_unref (comm);
-  if (!res)
-    return FALSE;
-
-  reply = g_vfs_afp_connection_read_reply_sync (server->conn, cancellable, error);
   if (!reply)
     return FALSE;
 
@@ -849,7 +816,6 @@ get_userinfo (GVfsAfpServer *server,
 {
   GVfsAfpCommand *comm;
   guint16 bitmap;
-  gboolean res;
 
   GVfsAfpReply *reply;
   AfpResultCode res_code;
@@ -863,14 +829,9 @@ get_userinfo (GVfsAfpServer *server,
   bitmap = AFP_GET_USER_INFO_BITMAP_GET_UID_BIT | AFP_GET_USER_INFO_BITMAP_GET_GID_BIT;
   g_vfs_afp_command_put_uint16 (comm, bitmap);
 
-  res = g_vfs_afp_connection_send_command_sync (server->conn,
+  reply = g_vfs_afp_connection_send_command_sync (server->conn,
                                                 comm, cancellable, error);
   g_object_unref (comm);
-  if (!res)
-    return FALSE;
-
-  reply = g_vfs_afp_connection_read_reply_sync (server->conn,
-                                                cancellable, error);
   if (!reply)
     return FALSE;
 
@@ -1038,6 +999,7 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
 try_login:
 
     /* Open connection */
+    server->conn = g_vfs_afp_connection_new (G_SOCKET_CONNECTABLE (server->addr));
     res = g_vfs_afp_connection_open_sync (server->conn, cancellable, &err);
     if (!res)
       break;
@@ -1047,6 +1009,7 @@ try_login:
     if (!res)
     {
       g_vfs_afp_connection_close_sync (server->conn, cancellable, NULL);
+      g_clear_object (&server->conn);
 
       if (!g_error_matches (err, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
         break;

@@ -360,14 +360,10 @@ gboolean           g_vfs_afp_connection_close_sync        (GVfsAfpConnection *af
                                                            GCancellable      *cancellable,
                                                            GError            **error);
 
-gboolean           g_vfs_afp_connection_send_command_sync (GVfsAfpConnection *afp_connection,
+GVfsAfpReply*      g_vfs_afp_connection_send_command_sync (GVfsAfpConnection *afp_connection,
                                                            GVfsAfpCommand    *afp_command,
                                                            GCancellable      *cancellable,
                                                            GError            **error);
-
-GVfsAfpReply*      g_vfs_afp_connection_read_reply_sync   (GVfsAfpConnection *afp_connection,
-                                                           GCancellable *cancellable,
-                                                           GError **error);
 
 GVfsAfpReply*      g_vfs_afp_connection_send_command_finish (GVfsAfpConnection *afp_connnection,
                                                              GAsyncResult      *res,

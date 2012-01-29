@@ -112,13 +112,9 @@ g_vfs_afp_volume_mount_sync (GVfsAfpVolume *volume,
 
   /* TODO: password? */
 
-  res = g_vfs_afp_connection_send_command_sync (priv->server->conn, comm, cancellable,
-                                                error);
+  reply = g_vfs_afp_connection_send_command_sync (priv->server->conn, comm, cancellable,
+                                                  error);
   g_object_unref (comm);
-  if (!res)
-    return FALSE;
-
-  reply = g_vfs_afp_connection_read_reply_sync (priv->server->conn, cancellable, error);
   if (!reply)
     return FALSE;
 
