@@ -735,7 +735,7 @@ register_mount (DBusConnection *connection,
 	      /* Keep in sync with fuse daemon */
 	      fs_name = g_uri_escape_string (mount->stable_name, "+@#$., ", TRUE);
 	      
-	      mount->fuse_mountpoint = g_build_filename (g_get_home_dir(), ".gvfs", fs_name, NULL);
+	      mount->fuse_mountpoint = g_build_filename (g_get_user_runtime_dir(), "gvfs", fs_name, NULL);
 	    }
 	  
 	  mounts = g_list_prepend (mounts, mount);
