@@ -1,3 +1,11 @@
+Major changes in 1.11.3
+=======================
+* Brand new udisks2 volume monitor by David Zeuthen
+* AFP backend fixes and enhancements
+* User runtime dir is now used for gvfs mounts and the burn backend
+* Fixed backends segfaulting on unmount
+* Translation updates
+
 Major changes in 1.11.2
 =======================
 * gvfs-mime: List recommended applications
