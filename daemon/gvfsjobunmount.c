@@ -130,6 +130,9 @@ run (GVfsJob *job)
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
+  if (class->unmount == NULL)
+    return;
+
   class->unmount (op_job->backend,
 		  op_job,
                   op_job->flags,
@@ -218,11 +221,13 @@ try (GVfsJob *job)
 
   if (job_finish_immediately_if_possible (op_job))
     return TRUE;
-  else
+  else if (class->try_unmount != NULL)
     return class->try_unmount (op_job->backend,
 			       op_job,
 			       op_job->flags,
 			       op_job->mount_source);
+  else
+    return FALSE;
 }
 
 static void
