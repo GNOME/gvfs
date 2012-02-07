@@ -360,24 +360,19 @@ try_mount (GVfsBackend *backend,
            gboolean is_automount)
 {
   GVfsBackendBurn *burn_backend = G_VFS_BACKEND_BURN (backend);
-  char        *tempdir, *filename;
-  char        *dir;
+  char        *filename;
 
-  filename = g_strdup_printf ("virtual-%s.XXXXXX", g_get_user_name ());
-  tempdir = g_build_filename (g_get_tmp_dir (), filename, NULL);
-  g_free (filename);
-
-  dir = mkdtemp (tempdir);
-  if (dir == NULL)
+  filename = g_build_filename (g_get_user_runtime_dir (), "gvfs-burn", NULL);
+  if (g_mkdir_with_parents (filename, 0700) < 0)
     {
-      g_free (tempdir);
+      g_free (filename);
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Unable to create temporary directory"));
       return TRUE;
     }
 
-  burn_backend->tempdir = dir;
+  burn_backend->tempdir = filename;
   burn_backend->root_node =
     virtual_node_new (NULL, VIRTUAL_NODE_DIRECTORY);
   
