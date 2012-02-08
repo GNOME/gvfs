@@ -1089,6 +1089,12 @@ ms_response_to_fs_info (MsResponse *response,
   xmlNodePtr  node;
   guint       status;
   const char *text;
+  guint64     bytes_avail;
+  guint64     bytes_used;
+  gboolean    have_bytes_avail;
+  gboolean    have_bytes_used;
+
+  have_bytes_avail = have_bytes_used = FALSE;
 
   ms_response_get_propstat_iter (response, &iter);
   while (xml_node_iter_next (&iter))
@@ -1109,27 +1115,30 @@ ms_response_to_fs_info (MsResponse *response,
 
           if (node_has_name (node, "quota-available-bytes"))
             {
-              guint64 size;
-
-              if (! string_to_uint64 (text, &size))
+              if (! string_to_uint64 (text, &bytes_avail))
                 continue;
 
-              g_file_info_set_attribute_uint64 (info,
-                                                G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,
-                                                size);
+              have_bytes_avail = TRUE;
             }
           else if (node_has_name (node, "quota-used-bytes"))
             {
-              guint64 size;
-
-              if (! string_to_uint64 (text, &size))
+              if (! string_to_uint64 (text, &bytes_used))
                 continue;
 
-              g_file_info_set_attribute_uint64 (info,
-                                                G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
-                                                size);
+              have_bytes_used = TRUE;
             }
         }
+    }
+
+  if (have_bytes_avail)
+    {
+      g_file_info_set_attribute_uint64 (info,
+                                        G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                        bytes_avail);
+      if (have_bytes_used)
+        g_file_info_set_attribute_uint64 (info,
+                                         G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,
+                                         bytes_avail + bytes_used);
     }
 }
 
