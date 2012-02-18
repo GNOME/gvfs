@@ -663,7 +663,8 @@ should_include (const gchar *mount_path,
   if (g_getenv ("XDG_RUNTIME_DIR") != NULL)
     {
       const gchar *run_dir = g_get_user_runtime_dir ();
-      if (g_str_has_prefix (mount_path, run_dir) && mount_path[strlen (run_dir)] == G_DIR_SEPARATOR)
+      if (g_str_has_prefix (mount_path, run_dir) &&
+          strncmp ("/media/", mount_path + strlen (run_dir), sizeof ("/media/") - 1) == 0)
         {
           ret = TRUE;
           goto out;
