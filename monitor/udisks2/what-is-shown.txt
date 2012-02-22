@@ -20,10 +20,9 @@ with, or if not mounted, the options from its /etc/fstab entry, if
 any.
 
 If the directory for a device is known and outside /media, $HOME
-(typically /home/foo) or $XDG_RUNTIME_DIR/media (typically
-/run/user/foo/media) then the device is not shown in the user
-interface. Additionally, if any of component directories in its
-directory starts with a dot ("."), the device is not shown
+(typically /home/foo) or /run/media/$USER then the device is not shown
+in the user interface. Additionally, if any of component directories
+in its directory starts with a dot ("."), the device is not shown
 either. This policy may be overriden by use of the options x-gvfs-show
 and x-gvfs-hide.
 

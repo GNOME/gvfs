@@ -604,6 +604,8 @@ should_include (const gchar *mount_path,
 {
   gboolean ret = FALSE;
   const gchar *home_dir = NULL;
+  const gchar *user_name;
+  gsize user_name_len;
 
   g_return_val_if_fail (mount_path != NULL, FALSE);
 
@@ -634,7 +636,7 @@ should_include (const gchar *mount_path,
   /* Only display things in
    * - /media; and
    * - $HOME; and
-   * - $XDG_RUNTIME_DIR
+   * - /run/media/$USER
    */
 
   /* Hide mounts within a subdirectory starting with a "." - suppose it was a purpose to hide this mount */
@@ -659,16 +661,15 @@ should_include (const gchar *mount_path,
         }
     }
 
-  /* Check runtime dir */
-  if (g_getenv ("XDG_RUNTIME_DIR") != NULL)
+  /* Check /run/media/$USER/ */
+  user_name = g_get_user_name ();
+  user_name_len = strlen (user_name);
+  if (strncmp (mount_path, "/run/media/", sizeof ("/run/media/") - 1) == 0 &&
+      strncmp (mount_path + sizeof ("/run/media/") - 1, user_name, user_name_len) == 0 &&
+      mount_path[sizeof ("/run/media/") - 1 + user_name_len] == '/')
     {
-      const gchar *run_dir = g_get_user_runtime_dir ();
-      if (g_str_has_prefix (mount_path, run_dir) &&
-          strncmp ("/media/", mount_path + strlen (run_dir), sizeof ("/media/") - 1) == 0)
-        {
-          ret = TRUE;
-          goto out;
-        }
+      ret = TRUE;
+      goto out;
     }
 
  out:
