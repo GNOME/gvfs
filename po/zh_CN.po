@@ -6,6 +6,7 @@
 # FujianWZH <fujianwzh@gmail.com>, 2009.
 # Tao Wei <weitao1979@gmail.com>, 2009.
 # Tao Wang <dancefire@gmail.com>, 2010.
+# YunQiang Su <wzssyqa@gmail.com>, 2011, 2012.
 #
 msgid ""
 msgstr ""
@@ -438,7 +439,7 @@ msgstr "不支持此操作"
 #: ../daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
-msgstr "/ 上的 %s"
+msgstr "%s 上的 /"
 
 #: ../daemon/gvfsbackendarchive.c:539 ../daemon/gvfsbackendftp.c:660
 #: ../daemon/gvfsbackendsftp.c:1745
