@@ -1,3 +1,9 @@
+Major changes in 1.11.4
+=======================
+* dav: Fix free space reporting
+* udisks2: Only show /run/media/$USER mounts instead of $XDG_RUNTIME_DIR
+* Translation updates
+
 Major changes in 1.11.3
 =======================
 * Brand new udisks2 volume monitor by David Zeuthen
