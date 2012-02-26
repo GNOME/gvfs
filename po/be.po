@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-02-15 22:41+0300\n"
-"PO-Revision-Date: 2012-02-15 22:41+0300\n"
+"POT-Creation-Date: 2012-02-26 13:24+0300\n"
+"PO-Revision-Date: 2012-02-26 13:24+0300\n"
 "Last-Translator: Ігар Грачышка <ihar.hrachyshka@gmail.com>\n"
 "Language-Team: Belarusian <i18n-bel-gnome@googlegroups.com>\n"
 "Language: be\n"
@@ -1809,6 +1809,10 @@ msgid ""
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
 "to failures. Data on the drive may be irrevocably lost if a component fails."
 msgstr ""
+"Запусціць прывод у дэградаваным рэжыме?\n"
+"Запуск прывода ў дэградаваным рэжыме азначае, што ён не будзе ўстойлівым "
+"перад магчымымі памылкамі працы. Калі што-небудзь зламаецца, даныя на дыску "
+"могуць быць незваротна страчаныя."
 
 #: ../monitor/gdu/ggdudrive.c:1023
 msgid "Start Anyway"
@@ -1820,12 +1824,13 @@ msgstr "Прынамсі адна праграма не дазваляе вык�
 
 #: ../monitor/gdu/ggdumount.c:988
 msgid "Cannot get LUKS cleartext slave"
-msgstr ""
+msgstr "Не ўдалося атрымаць падначалены cleartext-раздзел LUKS"
 
 #: ../monitor/gdu/ggdumount.c:1010
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
 msgstr ""
+"Не ўдалося атрымаць падначалены cleartext-раздзел LUKS для сцежкі \"%s\""
 
 #: ../monitor/gdu/ggduvolume.c:337
 msgid "Floppy Disk"
