@@ -5,22 +5,22 @@
 # This file is distributed under the same license as the gvfs package.
 #
 # Ivar Smolin <okul linue ee>, 2008–2011.
-# Mattias Põldaru <mahfiaz gmail com>, 2009–2011.
+# Mattias Põldaru <mahfiaz@gmail.com>, 2009–20, 2011, 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs MASTER\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-03-11 07:45+0000\n"
-"PO-Revision-Date: 2011-03-13 02:26+0300\n"
-"Last-Translator: Mattias Põldaru <mahfiaz gmail com>\n"
-"Language-Team: Estonian <gnome-et@linux.ee>\n"
+"POT-Creation-Date: 2012-02-27 11:53+0000\n"
+"PO-Revision-Date: 2012-02-28 20:31+0200\n"
+"Last-Translator: Mattias Põldaru <mahfiaz@gmail.com>\n"
+"Language-Team: Estonian <>\n"
 "Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Content-Transfer-Encoding: 8bits\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 "X-Poedit-Language: Estonian\n"
 "X-Poedit-Country: ESTONIA\n"
 
@@ -148,7 +148,7 @@ msgid "Error connecting to D-Bus: %s"
 msgstr "Viga D-Bus'iga ühendumisel: %s"
 
 #. translators: This is the default daemon's application name,
-#. * the %s is the type of the backend, like "ftp"
+#. * the %s is the type of the backend, like "FTP"
 #, c-format
 msgid "%s Filesystem Service"
 msgstr "%s failisüsteemi teenus"
@@ -176,18 +176,172 @@ msgstr "ühenduspunkt %s on juba töös"
 msgid "error starting mount daemon"
 msgstr "viga ühendamisdeemoni käivitamisel"
 
-msgid "Unmount Anyway"
-msgstr "Haagi ikkagi lahti"
+msgid "Connection unexpectedly went down"
+msgstr "Ühendus katkes ootamatult"
 
-msgid "Cancel"
-msgstr "Katkesta"
+msgid "Got EOS"
+msgstr "Saadi EOS (voolõpp)"
 
+#, c-format
+msgid "Server doesn't support passwords longer than %d characters"
+msgstr "Server ei toeta pikemaid paroole kui %d märki"
+
+msgid "An invalid username was provided"
+msgstr "Sisestati vale kasutajanimi"
+
+#, c-format
+msgid "AFP server %s declined the submitted password"
+msgstr "AFP server %s keeldus saadetud paroolist"
+
+#, c-format
+msgid "AFP server %s doesn't support anonymous login"
+msgstr "AFP server %s ei toeta anonüümset sisselogimist"
+
+#, c-format
 msgid ""
-"Volume is busy\n"
-"One or more applications are keeping the volume busy."
+"Login to AFP server %s failed (no suitable authentication mechanism found)"
 msgstr ""
-"Köide on hõivatud\n"
-"Vähemalt üks rakendus hoiab köidet hõivatuna."
+"Sisselogimine AFP serverisse %s nurjus (sobivat autentimismehhanismi ei "
+"leitud)"
+
+#, c-format
+msgid "Failed to connect to server (%s)"
+msgstr "Serverisse ühendumine nurjus (%s)"
+
+#, c-format
+msgid "Permission denied"
+msgstr "Ligipääs keelatud"
+
+#, c-format
+msgid "Command is not supported by server"
+msgstr "Server ei toeta seda käsku"
+
+#, c-format
+msgid "User's password has expired"
+msgstr "Kasutaja parool on aegunud"
+
+#, c-format
+msgid "User's password needs to be changed"
+msgstr "Kasutaja parool tuleb välja vahetada"
+
+#. Translators: the first %s is the username, the second the host name
+#, c-format
+msgid "Enter password for afp as %s on %s"
+msgstr "Sisesta AFP kasutaja %s parool serveris %s"
+
+#. translators: %s here is the hostname
+#, c-format
+msgid "Enter password for afp on %s"
+msgstr "Sisesta AFP parool serveris %s"
+
+msgid "Password dialog cancelled"
+msgstr "Paroolidialoog tühistati"
+
+#, c-format
+msgid "Got error \"%s\" from server"
+msgstr "Serverist saadi viga \"%s\""
+
+#, c-format
+msgid "Got unknown error code %d from server"
+msgstr "Serverist saadi tundmatu veakood %d"
+
+#, c-format
+msgid "Couldn't mount AFP volume %s on %s"
+msgstr "Pole võimalik haakida AFP köidet %s serveris %s"
+
+#, c-format
+msgid "File doesn't exist"
+msgstr "Faili pole olemas"
+
+msgid "File is directory"
+msgstr "Fail on kataloog"
+
+msgid "Too many files open"
+msgstr "Liiga palju faile on avatud"
+
+msgid "Target file is open"
+msgstr "Sihtfail on juba avatud"
+
+msgid "Directory not empty"
+msgstr "Kataloog pole tühi"
+
+msgid "Target object is marked as not deletable (DeleteInhibit)"
+msgstr "Sihtobjekt on märgitud kustutamatuks (DeleteInhibit)"
+
+msgid "Target object doesn't exist"
+msgstr "Sihtobjekti pole olemas"
+
+msgid "Volume is read-only"
+msgstr "Köide on kirjutuskaitsega"
+
+msgid "Not enough space on volume"
+msgstr "Köitel pole piisavalt ruumi"
+
+msgid "Target file already exists"
+msgstr "Sihtfail on juba olemas"
+
+msgid "Ancestor directory doesn't exist"
+msgstr "Vanemkataloogi pole olemas"
+
+msgid "Volume is flat and doesn't support directories"
+msgstr "Köide ei toeta katalooge"
+
+msgid "Target directory already exists"
+msgstr "Sihtkataloog on juba olemas"
+
+msgid "Can't rename volume"
+msgstr "Köite nime pole võimalik muuta"
+
+msgid "Object with that name already exists"
+msgstr "Sellenimeline objekt on juba olemas"
+
+msgid "Target object is marked as not renameable (RenameInhibit)"
+msgstr "Sihtobjekt on märgitud ümbernimetamatuks (RenameInhibit)"
+
+msgid "Can't move directory into one of its descendants"
+msgstr "Kataloogi pole võimalik iseenda alamkataloogi sisse liigutada"
+
+msgid "Can't move sharepoint into a shared directory"
+msgstr "Jagamispunkti pole võimalik liigutada jagatud kataloogi sisse"
+
+msgid "Can't move a shared directory into the Trash"
+msgstr "Jagatud kataloogi pole võimalik prügikasti liigutada"
+
+msgid "Object being moved is marked as not renameable (RenameInhibit)"
+msgstr "Liigutatav objekt on märgitud ümbernimetamatuks (RenameInhibit)"
+
+msgid "Object being moved doesn't exist"
+msgstr "Liigutatavat objekti pole olemas"
+
+msgid "Server doesn't support the FPCopyFile operation"
+msgstr "Server ei toeta FPCopyFile toimingut"
+
+msgid "Unable to open source file for reading"
+msgstr "Lähtefaili pole võimalik lugemiseks avada"
+
+msgid "Source file and/or destination directory doesn't exist"
+msgstr "Lähtefaili ja/või sihtkataloogi pole olemas"
+
+msgid "Source file is a directory"
+msgstr "Lähtefail on kataloog"
+
+msgid "ID not found"
+msgstr "ID-d ei leitud"
+
+msgid "Range lock conflict exists"
+msgstr "Esines piirkondade lukkude konflikt"
+
+msgid "Directory doesn't exist"
+msgstr "Kataloogi pole olemas"
+
+msgid "Target object is not a directory"
+msgstr "Sihtobjekt pole kataloog"
+
+msgid "File is not open for write access"
+msgstr "Fail ei ole kirjutamiseks avatud"
+
+msgid "File is not open for read access"
+msgstr "Fail ei ole lugemiseks avatud"
 
 msgid "Internal Apple File Control error"
 msgstr "Apple failijuhtimise siseviga"
@@ -211,19 +365,14 @@ msgstr "Saadi vigased Apple failijuhtimise andmed"
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "Käsitlematu Apple failijuhtimise viga (%d)"
 
-#, c-format
-msgid "Unhandled Inst proxy error (%d)"
-msgstr "Inst proksi käsitlematu viga (%d)"
+msgid "Listing applications installed on device failed"
+msgstr "Seadmesse paigaldatud rakenduste loendi hankimine nurjus"
 
-#, c-format
-msgid "Unhandled SBServices proxy error (%d)"
-msgstr "SBServices proksi käsitlematu viga (%d)"
+msgid "Accessing application icons on device failed"
+msgstr "Seadmest rakenduste ikoonide hankimine nurjus"
 
 msgid "Lockdown Error: Invalid Argument"
 msgstr "Lukustuse viga: sobimatu argument"
-
-msgid "Permission denied"
-msgstr "Ligipääs keelatud"
 
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
@@ -246,6 +395,9 @@ msgstr "Käsitlematu libimobiledevice viga (%d)"
 msgid "Try again"
 msgstr "Proovi uuesti"
 
+msgid "Cancel"
+msgstr "Loobu"
+
 msgid "Invalid mount spec"
 msgstr "Vigane ühendamiskirjeldus"
 
@@ -257,8 +409,8 @@ msgid "Apple Mobile Device"
 msgstr "Apple mobiil"
 
 #, c-format
-msgid "Service %d on Apple Mobile Device"
-msgstr "Teenus %d Apple mobiil"
+msgid "Apple Mobile Device, Jailbroken"
+msgstr "Apple mobiil, lahti murtud"
 
 #, c-format
 msgid "Documents on Apple Mobile Device"
@@ -266,7 +418,7 @@ msgstr "Apple mobiilseadmes olevad dokumendid"
 
 #, c-format
 msgid "%s (jailbreak)"
-msgstr "%s (väljamurdmine)"
+msgstr "%s (lahti murtud)"
 
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
@@ -280,18 +432,14 @@ msgstr "Dokumendid seadmes %s"
 #. * shown in the dialog which is defined above.
 #, c-format
 msgid ""
-"Device '%s' is password protected. Enter the password on the device and "
-"click 'Try again'."
+"The device '%s' is locked. Enter the passcode on the device and click 'Try "
+"again'."
 msgstr ""
-"Seade '%s' on parooliga kaitstud. Seadme avamiseks sisesta parool ja vajuta "
-"\"Proovi uuesti\"."
+"Seade '%s' on lukustatud. Seadme avamiseks sisesta parool ja vajuta \"Proovi "
+"uuesti\"."
 
 msgid "Can't open directory"
 msgstr "Kataloogi pole võimalik avada"
-
-#, c-format
-msgid "File doesn't exist"
-msgstr "Faili pole olemas"
 
 msgid "Backups are not yet supported."
 msgstr "Varukoopiad pole veel toetatud."
@@ -302,15 +450,66 @@ msgstr "Sobimatu kerimise liik"
 msgid "Operation unsupported"
 msgstr "Operatsioon pole toetatud"
 
-#. FIXME: this should really be "/ in %s", but can't change
-#. due to string freeze.
-#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+msgid "The file is not a mountable"
+msgstr "Fail pole ühendatav"
+
+#. Translators: first %s is username and second serververname
 #, c-format
-msgid "/ on %s"
-msgstr "hosti %s /"
+msgid "AFP volumes for %s on %s"
+msgstr "%s AFP köited hostil %s"
+
+#. Translators: %s is the servername
+#, c-format
+msgid "AFP volumes on %s"
+msgstr "AFP köited hostil %s"
 
 msgid "No hostname specified"
 msgstr "Hostinimi on määramata"
+
+msgid "Apple Filing Protocol Service"
+msgstr "Apple Filing Protocol (AFP) teenus"
+
+msgid "Can't copy directory over directory"
+msgstr "Kataloogi pole võimalik kataloogi asemele kopeerida"
+
+msgid "Can't recursively copy directory"
+msgstr "Kataloogi pole võimalik rekursiivselt kopeerida"
+
+msgid "Can't move directory over directory"
+msgstr "Kataloogi pole võimalik kataloogi asemele liigutada"
+
+msgid "backups not supported"
+msgstr "varukoopiad pole toetatud"
+
+#, c-format
+msgid "Unable to create temporary file (%s)"
+msgstr "Ajutist faili pole võimalik luua (%s)"
+
+msgid "The file was externally modified"
+msgstr "Faili on mõne teise programmi poolt muudetud"
+
+msgid "Invalid attribute type (uint32 expected)"
+msgstr "Vigane atribuudi liik (polnud uint32)"
+
+#. Translators: first %s is volumename, second username and third servername
+#, c-format
+msgid "AFP volume %s for %s on %s"
+msgstr "AFP köide %s, kasutaja %s hostil %s"
+
+#. Translators: first %s is volumename and second servername
+#, c-format
+msgid "AFP volume %s on %s"
+msgstr "AFP köide, kasutaja %s hostil %s"
+
+msgid "No volume specified"
+msgstr "Köide on määramata"
+
+#. FIXME: this should really be "/ in %s", but can't change
+#. due to string freeze.
+#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
+#, c-format
+msgid "/ on %s"
+msgstr "hosti %s /"
 
 msgid "The file is not a directory"
 msgstr "Fail pole kataloog"
@@ -325,9 +524,6 @@ msgstr "Ajutist kataloogi pole võimalik luua"
 #, c-format
 msgid "No such file or directory"
 msgstr "Sellist faili või kataloogi ei ole"
-
-msgid "Directory not empty"
-msgstr "Kataloog pole tühi"
 
 msgid "Can't copy file over directory"
 msgstr "Faili pole võimalik kataloogi asemele kopeerida"
@@ -345,17 +541,21 @@ msgstr "Operatsioon pole taustaprogrammi poolt toetatud"
 msgid "No such file or directory in target path"
 msgstr "Sihtkohas pole sellist faili ega kataloogi"
 
-msgid "Can't copy directory over directory"
-msgstr "Kataloogi pole võimalik kataloogi asemele kopeerida"
-
 msgid "Target file exists"
 msgstr "Sihtfail on juba olemas"
 
-msgid "Can't recursively copy directory"
-msgstr "Kataloogi pole võimalik rekursiivselt kopeerida"
-
 msgid "Not supported"
 msgstr "Pole toetatud"
+
+msgid "Unmount Anyway"
+msgstr "Haagi ikkagi lahti"
+
+msgid ""
+"Volume is busy\n"
+"One or more applications are keeping the volume busy."
+msgstr ""
+"Köide on hõivatud\n"
+"Vähemalt üks rakendus hoiab köidet hõivatuna."
 
 msgid "Cannot create gudev client"
 msgstr "gudev klienti pole võimalik luua"
@@ -380,7 +580,8 @@ msgstr "Seadet %s pole võimalik leida"
 msgid "Drive %s does not contain audio files"
 msgstr "Seade %s ei sisalda audiofaile"
 
-#. Translator: %s is the device the disc is inserted into
+#. Translator: %s is the device the disc is inserted into. 'cdda' is the name
+#. name of the backend and shouldn't be translated.
 #, c-format
 msgid "cdda mount on %s"
 msgstr "cdda ühendus seadmes %s"
@@ -435,8 +636,8 @@ msgstr "Sisemine viga: %s"
 msgid "Can't mount file"
 msgstr "Faili pole võimalik ühendada"
 
-msgid "No media in the drive"
-msgstr "Seadmes puudub meedium"
+msgid "No medium in the drive"
+msgstr "Lugejas puudub andmekandja"
 
 msgid "Not a mountable file"
 msgstr "Pole ühendatav fail"
@@ -455,6 +656,20 @@ msgstr "Faili pole võimalik lõpetada"
 
 msgid "Can't poll file"
 msgstr "Faili pole võimalik pollida"
+
+#. Translators: This is the name of the WebDAV share constructed as
+#. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
+#. the second %s and only shown if it is not the default http(s) port.
+#, c-format
+msgid "WebDAV as %s on %s%s"
+msgstr "%s WebDAV hostil %s%s"
+
+#. Translators: This is the name of the WebDAV share constructed as
+#. "WebDAV on <hostname>:<port>"; The ":port" part is again the second
+#. %s and it is only shown if it is not the default http(s) port.
+#, c-format
+msgid "WebDAV on %s%s"
+msgstr "WebDAV hostil %s%s"
 
 #, c-format
 msgid "HTTP Error: %s"
@@ -485,18 +700,8 @@ msgstr "Palun sisesta proksi parool"
 msgid "Not a WebDAV enabled share"
 msgstr "Pole WebDAV'i jagatud kataloog"
 
-#, c-format
-msgid "WebDAV on %s"
-msgstr "WebDAV hostil %s"
-
 msgid "Could not create request"
 msgstr "Päringut pole võimalik luua"
-
-msgid "Target file already exists"
-msgstr "Sihtfail on juba olemas"
-
-msgid "The file was externally modified"
-msgstr "Faili on mõne teise programmi poolt muudetud"
 
 msgid "Backup file creation failed"
 msgstr "Tõrge varufaili loomisel"
@@ -517,37 +722,28 @@ msgstr "Võrk"
 
 #. Translators: the first %s is the username, the second the host name
 #, c-format
-msgid "Enter password for ftp as %s on %s"
-msgstr "Sisesta ftp kasutaja %s parool hostil %s"
+msgid "Enter password for FTP as %s on %s"
+msgstr "Sisesta FTP kasutaja %s parool hostil %s"
 
 #. translators: %s here is the hostname
 #, c-format
-msgid "Enter password for ftp on %s"
-msgstr "Sisesta hosti %s ftp-parool"
-
-msgid "Password dialog cancelled"
-msgstr "Paroolidialoog tühistati"
+msgid "Enter password for FTP on %s"
+msgstr "Sisesta hosti %s FTP parool"
 
 #, c-format
-msgid "ftp on %s"
-msgstr "ftp hostil %s"
+msgid "FTP on %s"
+msgstr "FTP hostil %s"
 
 #. Translators: the first %s is the username, the second the host name
 #, c-format
-msgid "ftp as %s on %s"
-msgstr "ftp kasutaja %s hostil %s"
+msgid "FTP as %s on %s"
+msgstr "%s FTP hostil %s"
 
 msgid "Insufficient permissions"
 msgstr "Puuduvad õigused"
 
-msgid "File is directory"
-msgstr "Fail on kataloog"
-
 msgid "backups not supported yet"
 msgstr "varukoopiad pole veel toetatud"
-
-msgid "Invalid attribute type (uint32 expected)"
-msgstr "Vigane atribuudi liik (polnud uint32)"
 
 #, c-format
 msgid "%s: %d: Directory or file exists"
@@ -612,17 +808,14 @@ msgstr "Viga kaamera suhtluspordi andmete seadmisel"
 msgid "Error initializing camera"
 msgstr "Viga kaamera lähtestamisel"
 
-#. Translator: %s represents the device, e.g. usb:001,042
+#. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
+#. backend and shouldn't be translated.
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2 ühendatud ketas %s"
 
 msgid "No camera specified"
 msgstr "Kaamera on määramata"
-
-#, c-format
-msgid "Filesystem is busy"
-msgstr "Failisüsteem on hõivatud"
 
 msgid "Error creating file object"
 msgstr "Viga failiobjekti loomisel"
@@ -659,8 +852,8 @@ msgstr "Nimi on juba olemas"
 msgid "New name too long"
 msgstr "Uus nimi on liiga pikk"
 
-msgid "Error renaming dir"
-msgstr "Viga kataloogi ümbernimetamisel"
+msgid "Error renaming directory"
+msgstr "Viga kataloogi nime muutmisel"
 
 msgid "Error renaming file"
 msgstr "Viga faili ümbernimetamisel"
@@ -693,14 +886,19 @@ msgstr "Viga faili kirjutamisel"
 msgid "Not supported (not same directory)"
 msgstr "Pole toetatud (pole sama kataloog)"
 
-msgid "Not supported (src is dir, dst is dir)"
-msgstr "Pole toetatud (lähtekoht on kataloog, sihtkoht on ka kataloog)"
+msgid ""
+"Not supported (the source is a directory, the destination is a directory too)"
+msgstr "Pole toetatud (lähtekoht on kataloog, sihtkoht on samuti kataloog)"
 
-msgid "Not supported (src is dir, dst is existing file)"
-msgstr "Pole toetatud (lähtekoht on kataloog, sihtkoht on olemasolev fail)"
+msgid ""
+"Not supported (the source is a directory, but the destination is an existing "
+"file)"
+msgstr ""
+"Pole toetatud (lähtekoht on kataloog, kuid sihtkoht on olemasolev fail)"
 
-msgid "Not supported (src is file, dst is dir)"
-msgstr "Pole toetatud (lähtekoht on fail, sihtkoht on kataloog)"
+msgid ""
+"Not supported (the source is a file, but the destination is a directory)"
+msgstr "Pole toetatud (lähtekoht on fail, kuid sihtkoht on kataloog)"
 
 #, c-format
 msgid "HTTP Client Error: %s"
@@ -819,15 +1017,15 @@ msgstr "Hosti identimisandmeid pole võimalik saata"
 msgid "Protocol error"
 msgstr "Protokolli viga"
 
-#. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
+#. Translators: This is the name of an SFTP share, like "SFTP for <user> on <hostname>"
 #, c-format
-msgid "sftp for %s on %s"
-msgstr "sftp kasutaja %s hostil %s"
+msgid "SFTP for %s on %s"
+msgstr "%s SFTP hostil %s"
 
-#. Translators: This is the name of an sftp share, like "sftp on <hostname>"
+#. Translators: This is the name of an SFTP share, like "SFTP on <hostname>"
 #, c-format
-msgid "sftp on %s"
-msgstr "sftp hostil %s"
+msgid "SFTP on %s"
+msgstr "SFTP hostil %s"
 
 msgid "Unable to find supported ssh command"
 msgstr "Toetatud ssh-käsku pole võimalik leida"
@@ -852,8 +1050,26 @@ msgstr "Viga varufaili loomisel: %s"
 msgid "Unable to create temporary file"
 msgstr "Ajutist faili pole võimalik luua"
 
-msgid "Can't move directory over directory"
-msgstr "Kataloogi pole võimalik kataloogi asemele liigutada"
+#. translators: %s is a server name
+#, c-format
+msgid "Password required for %s"
+msgstr "Serveri %s jaoks on vaja parooli"
+
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#, c-format
+msgid "Windows shares on %s"
+msgstr "Windowsi jagatud kataloogid serveris %s"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+msgid "Failed to retrieve share list from server"
+msgstr "Jagatud ressursside loendi hankimine serverist nurjus"
+
+msgid "Not a regular file"
+msgstr "Pole tavaline fail"
+
+msgid "Windows Network Filesystem Service"
+msgstr "Windowsi võrgufailisüsteemi teenus"
 
 #. translators: First %s is a share name, second is a server name
 #, c-format
@@ -878,6 +1094,9 @@ msgstr "Tõrge varufaili loomisel: %s"
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Vigane atribuudi liik (polnud uint64)"
 
+msgid "Can't rename file, filename already exists"
+msgstr "Faili nime pole võimalik muuta, sihtfail on juba olemas"
+
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Viga faili ümbertõstmisel: %s"
@@ -891,30 +1110,6 @@ msgstr "Kataloogi pole võimalik rekursiivselt ümber tõsta"
 
 msgid "Windows Shares Filesystem Service"
 msgstr "Windowsi jagatud failisüsteemi teenus"
-
-#. translators: %s is a server name
-#, c-format
-msgid "Password required for %s"
-msgstr "Serveri %s jaoks on vaja parooli"
-
-#. translators: Name for the location that lists the smb shares
-#. availible on a server (%s is the name of the server)
-#, c-format
-msgid "Windows shares on %s"
-msgstr "Windowsi jagatud kataloogid serveris %s"
-
-#. translators: We tried to mount a windows (samba) share, but failed
-msgid "Failed to retrieve share list from server"
-msgstr "Jagatud ressursside loendi hankimine serverist nurjus"
-
-msgid "The file is not a mountable"
-msgstr "Fail pole ühendatav"
-
-msgid "Not a regular file"
-msgstr "Pole tavaline fail"
-
-msgid "Windows Network Filesystem Service"
-msgstr "Windowsi võrgufailisüsteemi teenus"
 
 msgid "The trash folder may not be deleted"
 msgstr "Prügikasti kausta pole võimalik kustutada"
@@ -931,8 +1126,8 @@ msgid "Invalid backend type"
 msgstr "Vigane taustaprogrammi liik"
 
 #, c-format
-msgid "Error sending fd: %s"
-msgstr "Viga fd saatmisel: %s"
+msgid "Error sending file descriptor: %s"
+msgstr "Viga failideskriptori saatmisel: %s"
 
 msgid "Unexpected end of stream"
 msgstr "Andmevoo ootamatu lõpp"
@@ -988,6 +1183,9 @@ msgstr "Nimeviidad pole taustaprogrammi poolt toetatud"
 
 msgid "Invalid dbus message"
 msgstr "Vigane dbus-sõnum"
+
+msgid "Filesystem is busy"
+msgstr "Failisüsteem on hõivatud"
 
 msgid "Replace old daemon."
 msgstr "Vana deemoni asendamine."
@@ -1066,8 +1264,10 @@ msgid "Unnamed Drive"
 msgstr "Nimetu ajam"
 
 #, c-format
-msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr "Tõrge meediumi väljastamisel, üks või enam meediumit on hõivatud."
+msgid "Failed to eject medium; one or more volumes on the medium are busy."
+msgstr ""
+"Tõrge meediumi väljastamisel, üks või enam köidet sellel meediumil on "
+"hõivatud."
 
 msgid ""
 "Start drive in degraded mode?\n"
@@ -1327,6 +1527,10 @@ msgid "Mass Storage Drive"
 msgstr "Masssalvesti"
 
 #, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr "Tõrge meediumi väljastamisel, üks või enam meediumit on hõivatud."
+
+#, c-format
 msgid "%.1f kB"
 msgstr "%.1f kB"
 
@@ -1342,15 +1546,50 @@ msgid "Mixed Audio/Data Disc"
 msgstr "Audio ja andmete segaplaat"
 
 #. Translators: %s is the size of the mount (e.g. 512 MB)
-#. Translators: %s is the size of the volume (e.g. 512 MB)
 #, c-format
-msgid "%s Media"
+msgid "%s Medium"
 msgstr "%s meedium"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
 #, c-format
 msgid "%s Encrypted Data"
 msgstr "%s krüptitud andmed"
+
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#, c-format
+msgid "%s Media"
+msgstr "%s meedium"
+
+#, c-format
+msgid "Timed out running command-line `%s'"
+msgstr "Käsu '%s' jooksutamisel saabus ajapiirang"
+
+#. Translators: This is used for encrypted volumes.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#, c-format
+msgid "%s Encrypted"
+msgstr "%s krüptitud"
+
+#. Translators: This is used for volume with no filesystem label.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#, c-format
+msgid "%s Volume"
+msgstr "%s köide"
+
+#. Translators: Name used for volume
+msgid "Volume"
+msgstr "Köide"
+
+msgid "The unlocked device does not have a recognizable filesystem on it"
+msgstr "Lukust lahti võetud seadmel ei ole äratuntavat failisüsteemi"
+
+msgid "A passphrase is required to access the volume"
+msgstr "Sellele köitele ligipääsuks on vaja parooli"
+
+msgid "GVfs UDisks2 Volume Monitor"
+msgstr "GVfs UDisks2 köitemonitor"
 
 msgid "locations"
 msgstr "asukohad"
@@ -1556,6 +1795,58 @@ msgstr "Viga: %s\n"
 msgid "- list files at <location>"
 msgstr "- <asukohas> olevate failide loend"
 
+msgid "Query handler for mime-type"
+msgstr "MIME tüübi päringu käitleja"
+
+msgid "Set handler for mime-type"
+msgstr "MIME tüübi käitleja määramine"
+
+msgid "- get/set handler for <mimetype>"
+msgstr "- hangi/määra <mimetype> käitleja"
+
+msgid "Specify one of --query and --set"
+msgstr "Määra kas --query või --set"
+
+#, c-format
+msgid "Must specify a single mime-type.\n"
+msgstr "MIME tüübi määramine on kohustuslik.\n"
+
+#, c-format
+msgid "Must specify the mime-type followed by the default handler.\n"
+msgstr "Tuleb määrata MIME-tüüp, millele järgneb vaikimisi käitleja.\n"
+
+#, c-format
+msgid "No default applications for '%s'\n"
+msgstr "'%s' jaoks puudub vaikimisi rakendus.\n"
+
+#, c-format
+msgid "Default application for '%s': %s\n"
+msgstr "'%s' vaikimisi rakendus: %s\n"
+
+#, c-format
+msgid "Registered applications:\n"
+msgstr "Registreeritud rakendused:\n"
+
+#, c-format
+msgid "No registered applications\n"
+msgstr "Registreeritud rakendusi pole\n"
+
+#, c-format
+msgid "Recommended applications:\n"
+msgstr "Soovitatavad rakendused:\n"
+
+#, c-format
+msgid "No recommended applications\n"
+msgstr "Soovitatavaid rakendusi pole\n"
+
+#, c-format
+msgid "Failed to load info for handler '%s'\n"
+msgstr "Käitleja '%s' jaoks andmete laadimine nurjus\n"
+
+#, c-format
+msgid "Failed to set '%s' as the default handler for '%s': %s\n"
+msgstr "'%s' määramine '%s' vaikimisi käitlejaks nurjus: %s\n"
+
 msgid "create parent directories"
 msgstr "ülemiste kataloogide loomine"
 
@@ -1581,6 +1872,7 @@ msgstr "Haagi lahti"
 msgid "Unmount all mounts with the given scheme"
 msgstr "Kõigi antud skeemiga haagete lahtihaakimine"
 
+#. Translator: List here is a verb as in 'List all mounts'
 msgid "List"
 msgstr "Loend"
 
@@ -1738,11 +2030,8 @@ msgstr "- failide viskamine prügikasti"
 msgid "Error trashing file: %s\n"
 msgstr "Viga faili viskamisel prügikasti: %s\n"
 
-msgid "Follow symlinks, mounts and shortcuts like dirs"
+msgid "Follow symbolic links, mounts and shortcuts like directories"
 msgstr "Sümbolviitade, haakepunktide ja kaustalaadsete otseteede järgimine"
 
 msgid "- list contents of directories in a tree-like format"
 msgstr "- kataloogide sisuloetelu puu"
-
-#~ msgid "Enter password"
-#~ msgstr "Sisesta parool"
