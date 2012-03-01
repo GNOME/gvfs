@@ -656,6 +656,30 @@ gvfs_udisks2_volume_get_mount (GVolume *volume)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static gboolean
+gvfs_udisks2_volume_is_network_class (GVfsUDisks2Volume *volume)
+{
+  gboolean ret = FALSE;
+  if (volume->mount_point != NULL)
+    {
+      const gchar *fstype = g_unix_mount_point_get_fs_type (volume->mount_point);
+      if (g_strcmp0 (fstype, "nfs") == 0 ||
+          g_strcmp0 (fstype, "nfs4") == 0 ||
+          g_strcmp0 (fstype, "cifs") == 0 ||
+          g_strcmp0 (fstype, "smbfs") == 0 ||
+          g_strcmp0 (fstype, "ncpfs") == 0)
+        ret = TRUE;
+    }
+  return ret;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+/* can remove this once we depend on gio >= 2.31.19 */
+#ifndef G_VOLUME_IDENTIFIER_KIND_CLASS
+#define G_VOLUME_IDENTIFIER_KIND_CLASS "class"
+#endif
+
 static gchar *
 gvfs_udisks2_volume_get_identifier (GVolume      *_volume,
                                     const gchar  *kind)
@@ -677,6 +701,8 @@ gvfs_udisks2_volume_get_identifier (GVolume      *_volume,
       else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UUID) == 0)
         ret = strlen (uuid) > 0 ? g_strdup (uuid) : NULL;
     }
+  if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_CLASS) == 0)
+    ret = g_strdup (gvfs_udisks2_volume_is_network_class (volume) ? "network" : "device");
 
   return ret;
 }
@@ -688,14 +714,14 @@ gvfs_udisks2_volume_enumerate_identifiers (GVolume *_volume)
   GPtrArray *p;
 
   p = g_ptr_array_new ();
-  g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE));
-
+  g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_CLASS));
   if (volume->block != NULL)
     {
       const gchar *label;
       const gchar *uuid;
       label = udisks_block_get_id_label (volume->block);
       uuid = udisks_block_get_id_uuid (volume->block);
+      g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE));
       if (strlen (label) > 0)
         g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_LABEL));
       if (strlen (uuid) > 0)
