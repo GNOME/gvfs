@@ -32,6 +32,7 @@
 #endif
 
 #include "gvfsjobmount.h"
+#include "gvfsjobunmount.h"
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsjobmountmountable.h"
@@ -388,6 +389,23 @@ try_query_info (GVfsBackend *backend,
 }
 
 static void
+do_unmount (GVfsBackend *backend,
+            GVfsJobUnmount *job,
+            GMountUnmountFlags flags,
+            GMountSource *mount_source)
+{
+  GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (backend);
+
+  if (!(flags & G_MOUNT_UNMOUNT_FORCE))
+  {
+    g_vfs_afp_server_logout_sync (afp_backend->server, G_VFS_JOB (job)->cancellable,
+                                  NULL);
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
 do_mount (GVfsBackend *backend,
           GVfsJobMount *job,
           GMountSpec *mount_spec,
@@ -526,6 +544,7 @@ g_vfs_backend_afp_browse_class_init (GVfsBackendAfpBrowseClass *klass)
 
   backend_class->try_mount = try_mount;
   backend_class->mount = do_mount;
+  backend_class->unmount = do_unmount;
   backend_class->try_query_info = try_query_info;
   backend_class->try_enumerate = try_enumerate;
   backend_class->try_mount_mountable = try_mount_mountable;

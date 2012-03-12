@@ -67,6 +67,9 @@ g_vfs_afp_server_finalize (GObject *object)
 {
   GVfsAfpServer *afp_serv = G_VFS_AFP_SERVER (object);
 
+  g_clear_object (&afp_serv->addr);
+  g_clear_object (&afp_serv->conn);
+  
   g_free (afp_serv->machine_type);
   g_free (afp_serv->server_name);
   g_free (afp_serv->utf8_server_name);
@@ -1072,6 +1075,41 @@ error:
   return FALSE;
 }
 
+/*
+ * g_vfs_afp_server_logout_sync:
+ * 
+ * Terminates and closes the connection to the server
+ */
+gboolean
+g_vfs_afp_server_logout_sync (GVfsAfpServer *server,
+                              GCancellable  *cancellable,
+                              GError       **error)
+{
+  GVfsAfpCommand *comm;
+  GVfsAfpReply *reply;
+  gint32 res_code;
+
+  comm = g_vfs_afp_command_new (AFP_COMMAND_LOGOUT);
+  /* pad byte */
+  g_vfs_afp_command_put_byte (comm, 0);
+
+  reply = g_vfs_afp_connection_send_command_sync (server->conn, comm, cancellable, error);
+  if (!reply) {
+    g_vfs_afp_connection_close_sync (server->conn, cancellable, NULL);
+    return FALSE;
+  }
+
+  res_code = g_vfs_afp_reply_get_result_code (reply);
+  g_object_unref (reply);
+  if (res_code != AFP_RESULT_NO_ERROR) {
+    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Failed to logout from server"));
+    g_vfs_afp_connection_close_sync (server->conn, cancellable, NULL);
+    return FALSE;
+  }
+
+  return g_vfs_afp_connection_close_sync (server->conn, cancellable, error);
+}
+          
 /*
  * g_vfs_server_time_to_local_time:
  * 

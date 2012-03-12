@@ -203,6 +203,7 @@ typedef enum
   AFP_COMMAND_GET_VOL_PARMS      = 17,
   AFP_COMMAND_LOGIN              = 18,
   AFP_COMMAND_LOGIN_CONT         = 19,
+  AFP_COMMAND_LOGOUT             = 20,
   AFP_COMMAND_MAP_ID             = 21,
   AFP_COMMAND_MAP_NAME           = 22,
   AFP_COMMAND_MOVE_AND_RENAME    = 23,

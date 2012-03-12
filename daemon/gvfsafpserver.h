@@ -85,6 +85,10 @@ gboolean           g_vfs_afp_server_login                (GVfsAfpServer *afp_ser
                                                           GCancellable   *cancellable,
                                                           GError         **error);
 
+gboolean           g_vfs_afp_server_logout_sync          (GVfsAfpServer *server,
+                                                          GCancellable  *cancellable,
+                                                          GError       **error);
+
 gint64             g_vfs_afp_server_time_to_local_time   (GVfsAfpServer *afp_serv,
                                                           gint32         server_time);
 

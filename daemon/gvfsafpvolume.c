@@ -92,7 +92,6 @@ g_vfs_afp_volume_mount_sync (GVfsAfpVolume *volume,
   GVfsAfpVolumePrivate *priv;
   GVfsAfpCommand *comm;
   GVfsAfpReply *reply;
-  gboolean res;
   AfpResultCode res_code;
 
   g_return_val_if_fail (G_VFS_IS_AFP_VOLUME (volume), FALSE);
