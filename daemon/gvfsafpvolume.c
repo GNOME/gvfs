@@ -33,6 +33,7 @@ G_DEFINE_TYPE (GVfsAfpVolume, g_vfs_afp_volume, G_TYPE_OBJECT);
 struct _GVfsAfpVolumePrivate
 {
   GVfsAfpServer *server;
+  GVfsAfpConnection *conn;
   gboolean mounted;
 
   guint16 attributes;
@@ -68,17 +69,19 @@ g_vfs_afp_volume_class_init (GVfsAfpVolumeClass *klass)
 }
 
 GVfsAfpVolume *
-g_vfs_afp_volume_new (GVfsAfpServer *server)
+g_vfs_afp_volume_new (GVfsAfpServer *server, GVfsAfpConnection *conn)
 {
   GVfsAfpVolume *volume;
   GVfsAfpVolumePrivate *priv;
 
   g_return_val_if_fail (G_VFS_IS_AFP_SERVER (server), NULL);
+  g_return_val_if_fail (G_VFS_IS_AFP_CONNECTION (conn), NULL);
   
   volume = g_object_new (G_VFS_TYPE_AFP_VOLUME, NULL);
   priv = volume->priv;
 
   priv->server = server;
+  priv->conn = conn;
 
   return volume;
 }
@@ -111,7 +114,7 @@ g_vfs_afp_volume_mount_sync (GVfsAfpVolume *volume,
 
   /* TODO: password? */
 
-  reply = g_vfs_afp_connection_send_command_sync (priv->server->conn, comm, cancellable,
+  reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm, cancellable,
                                                   error);
   g_object_unref (comm);
   if (!reply)
@@ -140,7 +143,7 @@ generic_error:
   /* Translators: first %s is volumename and second servername */ 
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                _("Couldn't mount AFP volume %s on %s"), volume_name,
-               priv->server->server_name);
+               g_vfs_afp_server_get_info(priv->server)->server_name);
   return FALSE;
 }
 
@@ -297,7 +300,7 @@ g_vfs_afp_volume_get_parms (GVfsAfpVolume       *volume,
                                       g_vfs_afp_volume_get_parms);
                                       
   
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL, get_vol_parms_cb,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL, get_vol_parms_cb,
                                      cancellable, simple);
   g_object_unref (comm);
 }
@@ -481,7 +484,7 @@ g_vfs_afp_volume_open_fork (GVfsAfpVolume      *volume,
   simple = g_simple_async_result_new (G_OBJECT (volume), callback,
                                       user_data, g_vfs_afp_volume_open_fork);
   
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      open_fork_cb, cancellable, simple);
   g_object_unref (comm);
 }
@@ -593,7 +596,7 @@ g_vfs_afp_volume_close_fork (GVfsAfpVolume       *volume,
   simple = g_simple_async_result_new (G_OBJECT (volume), callback, user_data,
                                       g_vfs_afp_volume_close_fork);
   
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      close_fork_cb, cancellable, simple);
   g_object_unref (comm);
 }
@@ -729,7 +732,7 @@ g_vfs_afp_volume_delete (GVfsAfpVolume       *volume,
   simple = g_simple_async_result_new (G_OBJECT (volume), callback,
                                       user_data, g_vfs_afp_volume_delete);
   
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      delete_cb, cancellable, simple);
   g_object_unref (comm);
 }
@@ -883,7 +886,7 @@ create_file_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpo
   g_vfs_afp_command_put_pathname (comm, basename);
   g_free (basename);
 
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      create_file_cb, cfd->cancellable, simple);
   g_object_unref (comm);
 }
@@ -1071,7 +1074,7 @@ create_directory_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res
   /* Pathname */
   g_vfs_afp_command_put_pathname (comm, cdd->basename);
   
-  g_vfs_afp_connection_send_command (volume->priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (volume->priv->conn, comm, NULL,
                                      make_directory_cb, cdd->cancellable, simple);
   g_object_unref (comm);
   return;
@@ -1281,7 +1284,7 @@ rename_get_filedir_parms_cb (GObject      *source_object,
   /* NewName */
   g_vfs_afp_command_put_pathname (comm, rd->new_name);
 
-  g_vfs_afp_connection_send_command (volume->priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (volume->priv->conn, comm, NULL,
                                      rename_cb, rd->cancellable, simple);
   g_object_unref (comm);
 }
@@ -1480,7 +1483,7 @@ g_vfs_afp_volume_move_and_rename (GVfsAfpVolume      *volume,
   simple = g_simple_async_result_new (G_OBJECT (volume), callback,
                                       user_data, g_vfs_afp_volume_move_and_rename);
   
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      move_and_rename_cb, cancellable, simple);
   g_object_unref (comm);
 }
@@ -1640,7 +1643,7 @@ g_vfs_afp_volume_copy_file (GVfsAfpVolume      *volume,
   simple = g_simple_async_result_new (G_OBJECT (volume), callback,
                                       user_data, g_vfs_afp_volume_copy_file);
 
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      copy_file_cb, cancellable, simple);
   g_object_unref (comm);
 }
@@ -1805,7 +1808,7 @@ g_vfs_afp_volume_map_id (GVfsAfpVolume       *volume,
   g_simple_async_result_set_op_res_gpointer (simple, map_data,
                                              (GDestroyNotify)map_id_data_free);
   
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      map_id_cb, cancellable, simple);
   g_object_unref (comm);
 }
@@ -1965,7 +1968,7 @@ g_vfs_afp_volume_get_filedir_parms (GVfsAfpVolume       *volume,
                                       g_vfs_afp_volume_get_filedir_parms);
                                       
 
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      get_filedir_parms_cb, cancellable,
                                      simple);
   g_object_unref (comm);
@@ -2090,7 +2093,7 @@ g_vfs_afp_volume_get_fork_parms (GVfsAfpVolume       *volume,
                                       g_vfs_afp_volume_get_fork_parms);
                                       
 
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      get_fork_parms_cb, cancellable,
                                      simple);
   g_object_unref (comm);
@@ -2218,7 +2221,7 @@ g_vfs_afp_volume_set_fork_size (GVfsAfpVolume       *volume,
   simple = g_simple_async_result_new (G_OBJECT (volume), callback, user_data,
                                       g_vfs_afp_volume_set_fork_size);
   
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      set_fork_parms_cb, cancellable, simple);
   g_object_unref (comm);
 }
@@ -2364,7 +2367,7 @@ g_vfs_afp_volume_set_unix_privs (GVfsAfpVolume       *volume,
   simple = g_simple_async_result_new (G_OBJECT (volume), callback,
                                       user_data, g_vfs_afp_volume_set_unix_privs);
 
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      set_unix_privs_cb, cancellable, simple);
   g_object_unref (comm);
 }
@@ -2523,6 +2526,8 @@ g_vfs_afp_volume_enumerate (GVfsAfpVolume       *volume,
                             gpointer             user_data)
 {
   GVfsAfpVolumePrivate *priv;
+
+  const GVfsAfpServerInfo *info;
   gint32 max;
   
   GVfsAfpCommand *comm;
@@ -2534,8 +2539,10 @@ g_vfs_afp_volume_enumerate (GVfsAfpVolume       *volume,
 
   simple = g_simple_async_result_new (G_OBJECT (volume), callback,
                                       user_data, g_vfs_afp_volume_enumerate);
+
+  info = g_vfs_afp_server_get_info (priv->server);
   
-  max = (priv->server->version >= AFP_VERSION_3_1) ? G_MAXINT32 : G_MAXINT16;
+  max = (info->version >= AFP_VERSION_3_1) ? G_MAXINT32 : G_MAXINT16;
   /* Can't enumerate any more files */
   if (start_index > max)
   {
@@ -2544,7 +2551,7 @@ g_vfs_afp_volume_enumerate (GVfsAfpVolume       *volume,
     return;
   }
   
-  if (priv->server->version >= AFP_VERSION_3_1)
+  if (info->version >= AFP_VERSION_3_1)
     comm = g_vfs_afp_command_new (AFP_COMMAND_ENUMERATE_EXT2);
   else
     comm = g_vfs_afp_command_new (AFP_COMMAND_ENUMERATE_EXT);
@@ -2568,7 +2575,7 @@ g_vfs_afp_volume_enumerate (GVfsAfpVolume       *volume,
 
   
   /* StartIndex and MaxReplySize */
-  if (priv->server->version >= AFP_VERSION_3_1)
+  if (info->version >= AFP_VERSION_3_1)
   {
     g_vfs_afp_command_put_int32 (comm, start_index);
     g_vfs_afp_command_put_int32 (comm, ENUMERATE_EXT2_MAX_REPLY_SIZE);
@@ -2582,7 +2589,7 @@ g_vfs_afp_volume_enumerate (GVfsAfpVolume       *volume,
   /* Pathname */
   g_vfs_afp_command_put_pathname (comm, directory);
   
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      enumerate_cb, cancellable, simple);
   g_object_unref (comm);
 }
@@ -2722,7 +2729,7 @@ g_vfs_afp_volume_exchange_files (GVfsAfpVolume       *volume,
   simple = g_simple_async_result_new (G_OBJECT (volume), callback, user_data,
                                       g_vfs_afp_volume_exchange_files);
   
-  g_vfs_afp_connection_send_command (priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
                                      close_replace_exchange_files_cb,
                                      cancellable, simple);
   g_object_unref (comm); 
@@ -2859,7 +2866,7 @@ g_vfs_afp_volume_write_to_fork (GVfsAfpVolume       *volume,
   simple = g_simple_async_result_new (G_OBJECT (volume), callback, user_data,
                                       g_vfs_afp_volume_write_to_fork);
   
-  g_vfs_afp_connection_send_command (volume->priv->server->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (volume->priv->conn, comm, NULL,
                                      write_ext_cb, cancellable, simple);
   g_object_unref (comm);
 }
@@ -2989,7 +2996,7 @@ g_vfs_afp_volume_read_from_fork (GVfsAfpVolume       *volume,
   simple = g_simple_async_result_new (G_OBJECT (volume), callback, user_data,
                                       g_vfs_afp_volume_read_from_fork);
   
-  g_vfs_afp_connection_send_command (volume->priv->server->conn, comm, buffer,
+  g_vfs_afp_connection_send_command (volume->priv->conn, comm, buffer,
                                      read_ext_cb, cancellable, simple);
   g_object_unref (comm);
 }

@@ -54,7 +54,7 @@ struct _GVfsAfpVolume
 
 GType g_vfs_afp_volume_get_type (void) G_GNUC_CONST;
 
-GVfsAfpVolume *g_vfs_afp_volume_new                 (GVfsAfpServer *server);
+GVfsAfpVolume *g_vfs_afp_volume_new                 (GVfsAfpServer *server, GVfsAfpConnection *conn);
 
 gboolean       g_vfs_afp_volume_mount_sync          (GVfsAfpVolume *volume,
                                                      const char    *volume_name,

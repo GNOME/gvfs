@@ -36,6 +36,18 @@
 
 G_DEFINE_TYPE (GVfsAfpServer, g_vfs_afp_server, G_TYPE_OBJECT);
 
+struct _GvfsAfpServerPrivate
+{
+  GNetworkAddress     *addr;
+  GVfsAfpConnection   *conn;
+
+  GVfsAfpServerInfo   info;
+  gint32              time_diff;
+
+  guint32             user_id;
+  guint32             group_id;
+};
+
 #define AFP_UAM_NO_USER   "No User Authent"
 #define AFP_UAM_DHX       "DHCAST128"
 #define AFP_UAM_DHX2      "DHX2"
@@ -43,38 +55,44 @@ G_DEFINE_TYPE (GVfsAfpServer, g_vfs_afp_server, G_TYPE_OBJECT);
 GVfsAfpServer *
 g_vfs_afp_server_new (GNetworkAddress *addr)
 {
-  GVfsAfpServer *afp_serv;
+  GVfsAfpServer *server;
 
-  afp_serv = g_object_new (G_VFS_TYPE_AFP_SERVER, NULL);
+  server = g_object_new (G_VFS_TYPE_AFP_SERVER, NULL);
 
-  afp_serv->addr = addr;
+  server->priv->addr = addr;
   
-  return afp_serv;
+  return server;
 }
 
 static void
-g_vfs_afp_server_init (GVfsAfpServer *afp_serv)
+g_vfs_afp_server_init (GVfsAfpServer *server)
 {
-  afp_serv->machine_type = NULL;
-  afp_serv->server_name = NULL;
-  afp_serv->utf8_server_name = NULL;
-  afp_serv->uams = NULL;
-  afp_serv->version = AFP_VERSION_INVALID;
+  GVfsAfpServerPrivate *priv;
+  
+  server->priv = priv = G_TYPE_INSTANCE_GET_PRIVATE (server, G_VFS_TYPE_AFP_SERVER,
+                                                     GVfsAfpServerPrivate);
+  
+  priv->info.machine_type = NULL;
+  priv->info.server_name = NULL;
+  priv->info.utf8_server_name = NULL;
+  priv->info.uams = NULL;
+  priv->info.version = AFP_VERSION_INVALID;
 }
 
 static void
 g_vfs_afp_server_finalize (GObject *object)
 {
-  GVfsAfpServer *afp_serv = G_VFS_AFP_SERVER (object);
+  GVfsAfpServer *server = G_VFS_AFP_SERVER (object);
+  GVfsAfpServerPrivate *priv = server->priv;
 
-  g_clear_object (&afp_serv->addr);
-  g_clear_object (&afp_serv->conn);
+  g_clear_object (&priv->addr);
+  g_clear_object (&priv->conn);
   
-  g_free (afp_serv->machine_type);
-  g_free (afp_serv->server_name);
-  g_free (afp_serv->utf8_server_name);
+  g_free (priv->info.machine_type);
+  g_free (priv->info.server_name);
+  g_free (priv->info.utf8_server_name);
   
-  g_slist_free_full (afp_serv->uams, g_free);
+  g_slist_free_full (priv->info.uams, g_free);
 
   G_OBJECT_CLASS (g_vfs_afp_server_parent_class)->finalize (object);
 }
@@ -85,6 +103,8 @@ g_vfs_afp_server_class_init (GVfsAfpServerClass *klass)
   GObjectClass* object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = g_vfs_afp_server_finalize;
+
+  g_type_class_add_private (klass, sizeof (GVfsAfpServerPrivate));
 }
 
 static const char *
@@ -113,12 +133,14 @@ string_to_afp_version (const char *str)
 
 #ifdef HAVE_GCRYPT
 static gboolean
-dhx2_login (GVfsAfpServer *afp_serv,
+dhx2_login (GVfsAfpServer *server,
             const char *username,
             const char *password,
             GCancellable *cancellable,
             GError **error)
 {
+  GVfsAfpServerPrivate *priv = server->priv;
+  
   gboolean res;
   gcry_error_t gcry_err;
   GVfsAfpCommand *comm;
@@ -177,12 +199,12 @@ dhx2_login (GVfsAfpServer *afp_serv,
 
   /* Request 1 */
   comm = g_vfs_afp_command_new (AFP_COMMAND_LOGIN);
-  g_vfs_afp_command_put_pascal (comm, afp_version_to_string (afp_serv->version));
+  g_vfs_afp_command_put_pascal (comm, afp_version_to_string (priv->info.version));
   g_vfs_afp_command_put_pascal (comm, AFP_UAM_DHX2);
   g_vfs_afp_command_put_pascal (comm, username);
   g_vfs_afp_command_pad_to_even (comm);
 
-  reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+  reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm,
                                                   cancellable, error);
   g_object_unref (comm);
   if (!reply)
@@ -286,7 +308,7 @@ dhx2_login (GVfsAfpServer *afp_serv,
   /* clientNonce */
   g_output_stream_write_all (G_OUTPUT_STREAM (comm), clientNonce_buf, 16, NULL, NULL, NULL);
 
-  reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+  reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm,
                                                 cancellable, error);
   g_object_unref (comm);
   if (!reply)
@@ -351,7 +373,7 @@ dhx2_login (GVfsAfpServer *afp_serv,
                              G_N_ELEMENTS (answer_buf), NULL, NULL, NULL);
 
 
-  reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+  reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm,
                                                   cancellable, error);
   g_object_unref (comm);
   if (!reply)
@@ -365,7 +387,7 @@ dhx2_login (GVfsAfpServer *afp_serv,
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                    _("AFP server %s declined the submitted password"),
-                   afp_serv->server_name);
+                   priv->info.server_name);
       goto error;
     }
     else
@@ -399,12 +421,14 @@ generic_error:
 }
 
 static gboolean
-dhx_login (GVfsAfpServer *afp_serv,
+dhx_login (GVfsAfpServer *server,
            const char *username,
            const char *password,
            GCancellable *cancellable,
            GError **error)
 {
+  GVfsAfpServerPrivate *priv = server->priv;
+  
   gcry_error_t gcry_err;
   gcry_mpi_t prime, base;
   gcry_mpi_t ra;
@@ -474,14 +498,14 @@ dhx_login (GVfsAfpServer *afp_serv,
 
   /* Create login command */
   comm = g_vfs_afp_command_new (AFP_COMMAND_LOGIN);
-  g_vfs_afp_command_put_pascal (comm, afp_version_to_string (afp_serv->version));
+  g_vfs_afp_command_put_pascal (comm, afp_version_to_string (priv->info.version));
   g_vfs_afp_command_put_pascal (comm, AFP_UAM_DHX);
   g_vfs_afp_command_put_pascal (comm, username);
   g_vfs_afp_command_pad_to_even (comm);
   g_output_stream_write_all (G_OUTPUT_STREAM(comm), ma_buf, G_N_ELEMENTS (ma_buf),
                              NULL, NULL, NULL);
 
-  reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+  reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm,
                                                   cancellable, error);
   g_object_unref (comm);
   if (!reply)
@@ -571,7 +595,7 @@ dhx_login (GVfsAfpServer *afp_serv,
                              G_N_ELEMENTS (answer_buf), NULL, NULL, NULL);
 
 
-  reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+  reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm,
                                                   cancellable, error);
   g_object_unref (comm);
   if (!reply)
@@ -585,7 +609,7 @@ dhx_login (GVfsAfpServer *afp_serv,
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                    _("AFP server %s declined the submitted password"),
-                   afp_serv->server_name);
+                   priv->info.server_name);
       goto error;
     }
     else
@@ -612,13 +636,15 @@ generic_error:
 #endif
 
 static gboolean
-do_login (GVfsAfpServer *afp_serv,
+do_login (GVfsAfpServer *server,
           const char *username,
           const char *password,
           gboolean anonymous,
           GCancellable *cancellable,
           GError **error)
 {
+  GVfsAfpServerPrivate *priv = server->priv;
+  
   /* anonymous login */
   if (anonymous)
   {
@@ -626,19 +652,19 @@ do_login (GVfsAfpServer *afp_serv,
     GVfsAfpReply *reply;
     AfpResultCode res_code;
     
-    if (!g_slist_find_custom (afp_serv->uams, AFP_UAM_NO_USER, (GCompareFunc)g_strcmp0))
+    if (!g_slist_find_custom (priv->info.uams, AFP_UAM_NO_USER, (GCompareFunc)g_strcmp0))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                            _("AFP server %s doesn't support anonymous login"),
-                   afp_serv->server_name);
+                   priv->info.server_name);
       return FALSE;
     }
 
     comm = g_vfs_afp_command_new (AFP_COMMAND_LOGIN);
 
-    g_vfs_afp_command_put_pascal (comm, afp_version_to_string (afp_serv->version));
+    g_vfs_afp_command_put_pascal (comm, afp_version_to_string (priv->info.version));
     g_vfs_afp_command_put_pascal (comm, AFP_UAM_NO_USER);
-    reply = g_vfs_afp_connection_send_command_sync (afp_serv->conn, comm,
+    reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm,
                                                     cancellable, error);
     g_object_unref (comm);
     if (!reply)
@@ -655,7 +681,7 @@ do_login (GVfsAfpServer *afp_serv,
         case AFP_RESULT_BAD_UAM:
           g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                        _("AFP server %s doesn't support anonymous login"),
-                       afp_serv->server_name);
+                       priv->info.server_name);
           break;
           
         default:
@@ -673,26 +699,28 @@ do_login (GVfsAfpServer *afp_serv,
 
 #ifdef HAVE_GCRYPT
     /* Diffie-Hellman 2 */
-    if (g_slist_find_custom (afp_serv->uams, AFP_UAM_DHX2, (GCompareFunc)g_strcmp0))
-      return dhx2_login (afp_serv, username, password, cancellable, error);
+    if (g_slist_find_custom (priv->info.uams, AFP_UAM_DHX2, (GCompareFunc)g_strcmp0))
+      return dhx2_login (server, username, password, cancellable, error);
     
     /* Diffie-Hellman */
-    if (g_slist_find_custom (afp_serv->uams, AFP_UAM_DHX, (GCompareFunc)g_strcmp0))
-      return dhx_login (afp_serv, username, password, cancellable, error); 
+    if (g_slist_find_custom (priv->info.uams, AFP_UAM_DHX, (GCompareFunc)g_strcmp0))
+      return dhx_login (server, username, password, cancellable, error); 
 #endif
 
     g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                  _("Login to AFP server %s failed (no suitable authentication mechanism found)"),
-                 afp_serv->server_name);
+                 priv->info.server_name);
     return FALSE;
   }
 }
 
 static gboolean
-get_server_info (GVfsAfpServer *afp_serv,
+get_server_info (GVfsAfpServer *server,
                  GCancellable *cancellable,
                  GError **error)
 {
+  GVfsAfpServerPrivate *priv = server->priv;
+  
   GVfsAfpReply *reply;
 
   guint16 MachineType_offset, AFPVersionCount_offset, UAMCount_offset;
@@ -700,7 +728,7 @@ get_server_info (GVfsAfpServer *afp_serv,
   guint8 count;
   guint i;
 
-  reply = g_vfs_afp_query_server_info (G_SOCKET_CONNECTABLE (afp_serv->addr),
+  reply = g_vfs_afp_query_server_info (G_SOCKET_CONNECTABLE (priv->addr),
                                        cancellable, error);
   if (!reply)
     return FALSE;
@@ -711,12 +739,12 @@ get_server_info (GVfsAfpServer *afp_serv,
   /* VolumeIconAndMask_offset */
   g_vfs_afp_reply_read_uint16 (reply, NULL);
 
-  g_vfs_afp_reply_read_uint16 (reply, &afp_serv->flags);
+  g_vfs_afp_reply_read_uint16 (reply, &priv->info.flags);
 
-  g_vfs_afp_reply_read_pascal (reply, &afp_serv->server_name);
+  g_vfs_afp_reply_read_pascal (reply, &priv->info.server_name);
 
   /* Parse UTF-8 ServerName */
-  if (afp_serv->flags & (0x1 << 8)) {
+  if (priv->info.flags & (0x1 << 8)) {
     guint16 UTF8ServerName_offset;
     GVfsAfpName *utf8_server_name;
 
@@ -726,13 +754,13 @@ get_server_info (GVfsAfpServer *afp_serv,
 
     g_vfs_afp_reply_seek (reply, UTF8ServerName_offset, G_SEEK_SET);
     g_vfs_afp_reply_read_afp_name (reply, FALSE, &utf8_server_name);
-    afp_serv->utf8_server_name = g_vfs_afp_name_get_string (utf8_server_name);
+    priv->info.utf8_server_name = g_vfs_afp_name_get_string (utf8_server_name);
     g_vfs_afp_name_unref (utf8_server_name);
   }
     
   /* Parse MachineType */
   g_vfs_afp_reply_seek (reply, MachineType_offset, G_SEEK_SET);
-  g_vfs_afp_reply_read_pascal (reply, &afp_serv->machine_type);
+  g_vfs_afp_reply_read_pascal (reply, &priv->info.machine_type);
   
   /* Parse Versions */
   g_vfs_afp_reply_seek (reply, AFPVersionCount_offset, G_SEEK_SET);
@@ -744,11 +772,11 @@ get_server_info (GVfsAfpServer *afp_serv,
 
     g_vfs_afp_reply_read_pascal (reply, &version);
     afp_version = string_to_afp_version (version);
-    if (afp_version > afp_serv->version)
-      afp_serv->version = afp_version;
+    if (afp_version > priv->info.version)
+      priv->info.version = afp_version;
   }
 
-  if (afp_serv->version == AFP_VERSION_INVALID)
+  if (priv->info.version == AFP_VERSION_INVALID)
   {
     g_object_unref (reply);
     g_set_error (error,
@@ -765,7 +793,7 @@ get_server_info (GVfsAfpServer *afp_serv,
     char *uam;
 
     g_vfs_afp_reply_read_pascal (reply, &uam);
-    afp_serv->uams = g_slist_prepend (afp_serv->uams, uam);
+    priv->info.uams = g_slist_prepend (priv->info.uams, uam);
   }
 
   g_object_unref (reply);
@@ -778,6 +806,8 @@ get_server_parms (GVfsAfpServer *server,
                   GCancellable  *cancellable,
                   GError       **error)
 {
+  GVfsAfpServerPrivate *priv = server->priv;
+  
   GVfsAfpCommand *comm;
   GVfsAfpReply   *reply;
   AfpResultCode   res_code;
@@ -788,7 +818,7 @@ get_server_parms (GVfsAfpServer *server,
   /* pad byte */
   g_vfs_afp_command_put_byte (comm, 0);
 
-  reply = g_vfs_afp_connection_send_command_sync (server->conn, comm, cancellable,
+  reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm, cancellable,
                                                   error);
   g_object_unref (comm);
   if (!reply)
@@ -805,7 +835,7 @@ get_server_parms (GVfsAfpServer *server,
 
   /* server time */
   g_vfs_afp_reply_read_int32 (reply, &server_time);
-  server->time_diff = (g_get_real_time () / G_USEC_PER_SEC) - server_time;
+  priv->time_diff = (g_get_real_time () / G_USEC_PER_SEC) - server_time;
 
   g_object_unref (reply);
 
@@ -817,6 +847,8 @@ get_userinfo (GVfsAfpServer *server,
               GCancellable  *cancellable,
               GError       **error)
 {
+  GVfsAfpServerPrivate *priv = server->priv;
+  
   GVfsAfpCommand *comm;
   guint16 bitmap;
 
@@ -832,8 +864,8 @@ get_userinfo (GVfsAfpServer *server,
   bitmap = AFP_GET_USER_INFO_BITMAP_GET_UID_BIT | AFP_GET_USER_INFO_BITMAP_GET_GID_BIT;
   g_vfs_afp_command_put_uint16 (comm, bitmap);
 
-  reply = g_vfs_afp_connection_send_command_sync (server->conn,
-                                                comm, cancellable, error);
+  reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm, cancellable,
+                                                  error);
   g_object_unref (comm);
   if (!reply)
     return FALSE;
@@ -873,9 +905,9 @@ get_userinfo (GVfsAfpServer *server,
   /* Bitmap */
   g_vfs_afp_reply_read_uint16 (reply, NULL);
   /* UID */
-  g_vfs_afp_reply_read_uint32 (reply, &server->user_id);
+  g_vfs_afp_reply_read_uint32 (reply, &priv->user_id);
   /* GID */
-  g_vfs_afp_reply_read_uint32 (reply, &server->group_id);
+  g_vfs_afp_reply_read_uint32 (reply, &priv->group_id);
 
   g_object_unref (reply);
   
@@ -890,6 +922,8 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
                         GCancellable   *cancellable,
                         GError         **error)
 {
+  GVfsAfpServerPrivate *priv = server->priv;
+  
   gboolean res;
   char *user, *olduser;
   char *password;
@@ -908,7 +942,7 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
   if (initial_user)
   {
     if (g_str_equal (initial_user, "anonymous") &&
-        g_slist_find_custom (server->uams, AFP_UAM_NO_USER, (GCompareFunc)g_strcmp0))
+        g_slist_find_custom (priv->info.uams, AFP_UAM_NO_USER, (GCompareFunc)g_strcmp0))
     {
       user = NULL;
       password = NULL;
@@ -917,12 +951,12 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
     }
 
     else if (g_vfs_keyring_lookup_password (initial_user,
-                                            g_network_address_get_hostname (server->addr),
+                                            g_network_address_get_hostname (priv->addr),
                                             NULL,
                                             "afp",
                                             NULL,
                                             NULL,
-                                            g_network_address_get_port (server->addr),
+                                            g_network_address_get_port (priv->addr),
                                             &user,
                                             NULL,
                                             &password) &&
@@ -935,7 +969,7 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
   }
 
   /* Use utf8_server_name if it exists */
-  server_name = server->utf8_server_name ? server->utf8_server_name : server->server_name;
+  server_name = priv->info.utf8_server_name ? priv->info.utf8_server_name : priv->info.server_name;
   
   while (TRUE)
   {
@@ -969,7 +1003,7 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
     {
       flags |= G_ASK_PASSWORD_NEED_USERNAME;
       
-      if (g_slist_find_custom (server->uams, AFP_UAM_NO_USER, (GCompareFunc)g_strcmp0))
+      if (g_slist_find_custom (priv->info.uams, AFP_UAM_NO_USER, (GCompareFunc)g_strcmp0))
         flags |= G_ASK_PASSWORD_ANONYMOUS_SUPPORTED;
     }
 
@@ -1002,8 +1036,8 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
 try_login:
 
     /* Open connection */
-    server->conn = g_vfs_afp_connection_new (G_SOCKET_CONNECTABLE (server->addr));
-    res = g_vfs_afp_connection_open_sync (server->conn, cancellable, &err);
+    priv->conn = g_vfs_afp_connection_new (G_SOCKET_CONNECTABLE (priv->addr));
+    res = g_vfs_afp_connection_open_sync (priv->conn, cancellable, &err);
     if (!res)
       break;
 
@@ -1011,8 +1045,8 @@ try_login:
                     cancellable, &err);
     if (!res)
     {
-      g_vfs_afp_connection_close_sync (server->conn, cancellable, NULL);
-      g_clear_object (&server->conn);
+      g_vfs_afp_connection_close_sync (priv->conn, cancellable, NULL);
+      g_clear_object (&priv->conn);
 
       if (!g_error_matches (err, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
         break;
@@ -1043,12 +1077,12 @@ try_login:
   {
     /* a prompt was created, so we have to save the password */
     g_vfs_keyring_save_password (user,
-                                 g_network_address_get_hostname (server->addr),
+                                 g_network_address_get_hostname (priv->addr),
                                  NULL,
                                  "afp",
                                  NULL,
                                  NULL,
-                                 g_network_address_get_port (server->addr),
+                                 g_network_address_get_port (priv->addr),
                                  password,
                                  password_save);
     g_free (prompt);
@@ -1085,33 +1119,65 @@ g_vfs_afp_server_logout_sync (GVfsAfpServer *server,
                               GCancellable  *cancellable,
                               GError       **error)
 {
+  GVfsAfpServerPrivate *priv;
   GVfsAfpCommand *comm;
   GVfsAfpReply *reply;
   gint32 res_code;
+  gboolean res = FALSE;
 
+  g_return_val_if_fail (G_VFS_IS_AFP_SERVER (server), FALSE);
+
+  priv = server->priv;
+  
   comm = g_vfs_afp_command_new (AFP_COMMAND_LOGOUT);
   /* pad byte */
   g_vfs_afp_command_put_byte (comm, 0);
 
-  reply = g_vfs_afp_connection_send_command_sync (server->conn, comm, cancellable, error);
+  reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm, cancellable, error);
   if (!reply) {
-    g_vfs_afp_connection_close_sync (server->conn, cancellable, NULL);
-    return FALSE;
+    g_vfs_afp_connection_close_sync (priv->conn, cancellable, NULL);
+    goto done;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
   g_object_unref (reply);
   if (res_code != AFP_RESULT_NO_ERROR) {
     g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Failed to logout from server"));
-    g_vfs_afp_connection_close_sync (server->conn, cancellable, NULL);
-    return FALSE;
+    g_vfs_afp_connection_close_sync (priv->conn, cancellable, NULL);
+    goto done;
   }
 
-  return g_vfs_afp_connection_close_sync (server->conn, cancellable, error);
+  res = g_vfs_afp_connection_close_sync (priv->conn, cancellable, error);
+
+done:
+  g_clear_object (&priv->conn);
+  return res; 
 }
-          
+
 /*
- * g_vfs_server_time_to_local_time:
+ * g_vfs_afp_server_get_info:
+ * 
+ * @server: a #GVfsAfpServer
+ * 
+ * Returns: a #GVfsAfpServerInfo or %NULL if the server is not logged in.
+ */
+const GVfsAfpServerInfo *
+g_vfs_afp_server_get_info (GVfsAfpServer *server)
+{
+  GVfsAfpServerPrivate *priv;
+  
+  g_return_val_if_fail (G_VFS_IS_AFP_SERVER (server), FALSE);
+
+  priv = server->priv;
+
+  if (!priv->conn)
+    return NULL;
+
+  return &priv->info;
+}
+
+/*
+ * g_vfs_afp_server_time_to_local_time:
  * 
  * @server: a #GVfsAfpServer
  * @server_time: a time value in server time
@@ -1121,8 +1187,10 @@ g_vfs_afp_server_logout_sync (GVfsAfpServer *server,
 gint64
 g_vfs_afp_server_time_to_local_time (GVfsAfpServer *server,
                                      gint32         server_time)
-{
-  return server_time + server->time_diff;
+{  
+  g_return_val_if_fail (G_VFS_IS_AFP_SERVER (server), 0);
+
+  return server_time + server->priv->time_diff;
 }
 
 
@@ -1225,7 +1293,7 @@ g_vfs_afp_server_get_volumes (GVfsAfpServer       *server,
   simple = g_simple_async_result_new (G_OBJECT (server), callback, user_data,
                                       g_vfs_afp_server_get_volumes);
   
-  g_vfs_afp_connection_send_command (server->conn, comm, NULL, get_volumes_cb,
+  g_vfs_afp_connection_send_command (server->priv->conn, comm, NULL, get_volumes_cb,
                                      cancellable, simple);
 }
 
@@ -1271,7 +1339,7 @@ g_vfs_afp_server_mount_volume_sync (GVfsAfpServer *server,
 {
   GVfsAfpVolume *volume;
 
-  volume = g_vfs_afp_volume_new (server);
+  volume = g_vfs_afp_volume_new (server, server->priv->conn);
   if (!g_vfs_afp_volume_mount_sync (volume, volume_name, cancellable, error))
   {
     g_object_unref (volume);
@@ -1483,9 +1551,9 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_UA_PERMISSIONS,
                                       ua_permissions);
     
-    if (uid == server->user_id)
+    if (uid == server->priv->user_id)
       set_access_attributes_trusted (info, (permissions >> 6) & 0x7);
-    else if (gid == server->group_id)
+    else if (gid == server->priv->group_id)
       set_access_attributes (info, (permissions >> 3) & 0x7);
     else
       set_access_attributes (info, (permissions >> 0) & 0x7);

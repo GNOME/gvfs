@@ -2023,7 +2023,8 @@ do_mount (GVfsBackend *backend,
 
   gboolean res;
   GError *err = NULL;
-  
+
+  const GVfsAfpServerInfo *info;
   GMountSpec *afp_mount_spec;
   char       *server_name;
   char       *display_name;
@@ -2052,10 +2053,12 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_mount_spec (backend, afp_mount_spec);
   g_mount_spec_unref (afp_mount_spec);
 
-  if (afp_backend->server->utf8_server_name)
-    server_name = afp_backend->server->utf8_server_name;
+  info = g_vfs_afp_server_get_info (afp_backend->server);
+  
+  if (info->utf8_server_name)
+    server_name = info->utf8_server_name;
   else
-    server_name = afp_backend->server->server_name;
+    server_name = info->server_name;
   
   if (afp_backend->user)
     /* Translators: first %s is volumename, second username and third servername */ 
