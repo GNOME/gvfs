@@ -106,7 +106,11 @@ main (int argc, char *argv[])
       char *fuse_path;
       char *argv2[4];
       
-      fuse_path = g_build_filename (g_get_user_runtime_dir (), "gvfs", NULL);
+      /* Use the old .gvfs location as fallback, not .cache/gvfs */
+      if (g_get_user_runtime_dir() == g_get_user_cache_dir ())
+	fuse_path = g_build_filename (g_get_home_dir(), ".gvfs", NULL);
+      else
+	fuse_path = g_build_filename (g_get_user_runtime_dir (), "gvfs", NULL);
       
       if (!g_file_test (fuse_path, G_FILE_TEST_EXISTS))
 	g_mkdir (fuse_path, 0700);

@@ -325,7 +325,11 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   
   vfs->wrapped_vfs = g_vfs_get_local ();
 
-  file = g_build_filename (g_get_user_runtime_dir(), "gvfs", NULL);
+  /* Use the old .gvfs location as fallback, not .cache/gvfs */
+  if (g_get_user_runtime_dir() == g_get_user_cache_dir ())
+    file = g_build_filename (g_get_home_dir(), ".gvfs", NULL);
+  else
+    file = g_build_filename (g_get_user_runtime_dir(), "gvfs", NULL);
   vfs->fuse_root = g_vfs_get_file_for_path (vfs->wrapped_vfs, file);
   g_free (file);
   
