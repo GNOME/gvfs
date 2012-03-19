@@ -1,3 +1,9 @@
+Major changes in 1.11.5
+=======================
+* udisks2: Set G_VOLUME_IDENTIFIER_KIND_CLASS identifier for volumes
+* fuse: Keep using ~/.gvfs as fallback
+* Translation updates
+
 Major changes in 1.11.4
 =======================
 * dav: Fix free space reporting
