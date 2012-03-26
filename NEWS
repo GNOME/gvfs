@@ -1,3 +1,7 @@
+Major changes in 1.12.0
+=======================
+* Translation updates
+
 Major changes in 1.11.5
 =======================
 * udisks2: Set G_VOLUME_IDENTIFIER_KIND_CLASS identifier for volumes
