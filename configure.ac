@@ -1,6 +1,6 @@
 AC_PREREQ([2.64])
 
-AC_INIT([gvfs],[1.12.0],[http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs])
+AC_INIT([gvfs],[1.12.1],[http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs])
 AM_INIT_AUTOMAKE([1.11.1 no-dist-gzip dist-xz tar-pax])
 AM_CONFIG_HEADER(config.h)
 
