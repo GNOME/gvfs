@@ -339,11 +339,19 @@ static void
 _idevice_event_cb (const idevice_event_t *event, void *user_data)
 {
   GVfsBackendAfc *afc_backend = G_VFS_BACKEND_AFC (user_data);
+  gchar *event_udid;
 
   g_return_if_fail (afc_backend->uuid != NULL);
   if (event->event != IDEVICE_DEVICE_REMOVE)
     return;
-  if (g_str_equal (event->uuid, afc_backend->uuid) == FALSE)
+
+#ifdef HAVE_LIBIMOBILEDEVICE_1_1_2
+  event_udid = event->udid;
+#else
+  event_udid = event->uuid;
+#endif
+
+  if (g_str_equal (event_udid, afc_backend->uuid) == FALSE)
     return;
 
   g_print ("Shutting down AFC backend for device uuid %s\n", afc_backend->uuid);
