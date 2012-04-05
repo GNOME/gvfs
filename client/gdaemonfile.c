@@ -446,7 +446,8 @@ create_proxy_for_file2 (GFile *file1,
     *connection_out = connection;
 
  out:
-  g_mount_info_unref (mount_info1);
+  if (mount_info1)
+    g_mount_info_unref (mount_info1);
   if (mount_info2)
     g_mount_info_unref (mount_info2);
  
