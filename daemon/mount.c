@@ -713,8 +713,9 @@ handle_register_mount (GVfsDBusMountTracker *object,
 }
 
 typedef struct {
-  DBusMessage *message;
-  DBusConnection *connection;
+  GVfsDBusMountTracker *object;
+  GDBusMethodInvocation *invocation;
+  GMountSpec *spec;
 } AutoMountData;
 
 static void
