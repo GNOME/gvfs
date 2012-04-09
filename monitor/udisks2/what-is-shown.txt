@@ -38,9 +38,10 @@ for /etc/fstab entries instead of the kernel names sda, sdb and so
 on. See udev(7) for more information about this.
 
 The Disks application provides an user interface to easily edit
-/etc/fstab entries including these options, see
+/etc/fstab entries including these options, see the "Mount and
+encryption options" paragraph in this blog entry
 
- http://people.freedesktop.org/~david/palimpsest-fstab-gvfs-show-option.png
+ http://davidz25.blogspot.com/2012/03/simpler-faster-better.html
 
 EXAMPLES
 --------
