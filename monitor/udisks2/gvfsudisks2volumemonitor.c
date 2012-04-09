@@ -593,6 +593,13 @@ get_mount_point_for_mount (GUnixMountEntry *mount_entry)
     }
 
  out:
+  for (l = mount_points; l != NULL; l = l->next)
+    {
+      GUnixMountPoint *mount_point = l->data;
+      if (G_LIKELY (mount_point != ret))
+        g_unix_mount_point_free (mount_point);
+    }
+  g_list_free (mount_points);
   return ret;
 }
 
@@ -700,6 +707,7 @@ should_include_mount (GVfsUDisks2VolumeMonitor  *monitor,
   if (mount_point != NULL)
     {
       ret = should_include_mount_point (monitor, mount_point);
+      g_unix_mount_point_free (mount_point);
       goto out;
     }
 
@@ -1500,6 +1508,7 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
           !mount_point_has_device (monitor, mount_point))
         {
           new_mount_points = g_list_remove_link (new_mount_points, l);
+          g_unix_mount_point_free (mount_point);
         }
     }
 
