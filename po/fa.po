@@ -824,7 +824,7 @@ msgstr "نوع مشخصه نامعتبر (uint32 مورد انتظار بود)"
 #: ../daemon/gvfsbackendafp.c:2044
 #, c-format
 msgid "AFP volume %s for %s on %s"
-msgstr "جلد AFP با نام %s بر روی %s"
+msgstr "جلد AFP با نام %s برای %s بر روی %s"
 
 #. Translators: first %s is volumename and second servername
 #: ../daemon/gvfsbackendafp.c:2049
