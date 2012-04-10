@@ -2,12 +2,13 @@
 # Copyright (C) 2008, Free Software Foundation Inc.
 # This file is distributed under the same license as the gvfs package.
 # Gil Forcada <gilforcada@guifi.net>, 2008, 2009, 2010, 2011, 2012.
+# Jordi Serratosa <jordis@softcatala.cat>, 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-15 23:49+0100\n"
+"POT-Creation-Date: 2012-04-10 21:14+0200\n"
 "PO-Revision-Date: 2012-03-12 21:32+0100\n"
 "Last-Translator: Gil Forcada <gilforcada@guifi.net>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
@@ -361,7 +362,7 @@ msgid "Couldn't mount AFP volume %s on %s"
 msgstr "No s'ha pogut muntar el volum AFP %s a %s"
 
 #: ../daemon/gvfsafpvolume.c:395 ../daemon/gvfsafpvolume.c:1891
-#: ../daemon/gvfsafpvolume.c:2664 ../daemon/gvfsbackendafc.c:928
+#: ../daemon/gvfsafpvolume.c:2664 ../daemon/gvfsbackendafc.c:936
 #: ../daemon/gvfsbackendafpbrowse.c:189 ../daemon/gvfsbackendafpbrowse.c:322
 #: ../daemon/gvfsbackendafpbrowse.c:354 ../daemon/gvfsbackendarchive.c:647
 #: ../daemon/gvfsbackendarchive.c:695 ../daemon/gvfsbackendarchive.c:747
@@ -451,7 +452,7 @@ msgstr "Ja existeix un objecte amb este nom"
 #: ../daemon/gvfsafpvolume.c:1223
 msgid "Target object is marked as not renameable (RenameInhibit)"
 msgstr ""
-"L'objecte de destinació està marcat com a no renombrable «RenameInhibit»"
+"L'objecte de destinació està marcat com a no reanomenable («RenameInhibit»)"
 
 #: ../daemon/gvfsafpvolume.c:1398
 msgid "Can't move directory into one of its descendants"
@@ -468,7 +469,8 @@ msgstr "No es pot moure el directori compartit a la paperera"
 #: ../daemon/gvfsafpvolume.c:1414
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
 msgstr ""
-"L'objecte que s'està movent està marcat com a no renombrable «RenameInhibit»"
+"L'objecte que s'està movent està marcat com a no reanomenable "
+"(«RenameInhibit»)"
 
 #: ../daemon/gvfsafpvolume.c:1418
 msgid "Object being moved doesn't exist"
@@ -528,7 +530,7 @@ msgstr "El directori no és buit"
 
 #: ../daemon/gvfsbackendafc.c:221
 msgid "The device did not respond"
-msgstr "El dispositiu no ha respòs"
+msgstr "El dispositiu no ha respost"
 
 #: ../daemon/gvfsbackendafc.c:225
 msgid "The connection was interrupted"
@@ -579,17 +581,17 @@ msgstr ""
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "S'ha produït un error de la libimobiledevice no gestionat (%d)"
 
-#: ../daemon/gvfsbackendafc.c:382
+#: ../daemon/gvfsbackendafc.c:390
 msgid "Try again"
 msgstr "Torna-ho a intentar"
 
-#: ../daemon/gvfsbackendafc.c:382 ../daemon/gvfsbackend.c:963
+#: ../daemon/gvfsbackendafc.c:390 ../daemon/gvfsbackend.c:963
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:926
 #: ../monitor/udisks2/gvfsudisks2mount.c:709
 msgid "Cancel"
 msgstr "Cancel·la"
 
-#: ../daemon/gvfsbackendafc.c:400 ../daemon/gvfsbackendarchive.c:550
+#: ../daemon/gvfsbackendafc.c:408 ../daemon/gvfsbackendarchive.c:550
 #: ../daemon/gvfsbackendarchive.c:579 ../daemon/gvfsbackenddav.c:1806
 #: ../daemon/gvfsbackendhttp.c:309 ../daemon/gvfsbackendobexftp.c:862
 #: ../daemon/gvfsbackendobexftp.c:878 ../daemon/gvfsbackendobexftp.c:897
@@ -597,28 +599,28 @@ msgstr "Cancel·la"
 msgid "Invalid mount spec"
 msgstr "Especificació de muntatge no vàlida"
 
-#: ../daemon/gvfsbackendafc.c:406 ../daemon/gvfsbackendafc.c:436
+#: ../daemon/gvfsbackendafc.c:414 ../daemon/gvfsbackendafc.c:444
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr ""
 "La ubicació de l'AFC no és vàlida: s'ha d'expressar en el format afc://uuid:"
 "número-port"
 
-#: ../daemon/gvfsbackendafc.c:422
+#: ../daemon/gvfsbackendafc.c:430
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Dispositiu mòbil Apple"
 
-#: ../daemon/gvfsbackendafc.c:427
+#: ../daemon/gvfsbackendafc.c:435
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Dispositiu mòbil Apple, alliberat"
 
-#: ../daemon/gvfsbackendafc.c:432
+#: ../daemon/gvfsbackendafc.c:440
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Documents en el dispositiu mòbil Apple"
 
-#: ../daemon/gvfsbackendafc.c:490
+#: ../daemon/gvfsbackendafc.c:498
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (alliberat)"
@@ -626,7 +628,7 @@ msgstr "%s (alliberat)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:497 ../monitor/afc/afcvolume.c:125
+#: ../daemon/gvfsbackendafc.c:505 ../monitor/afc/afcvolume.c:125
 #, c-format
 msgid "Documents on %s"
 msgstr "Documents a %s"
@@ -634,7 +636,7 @@ msgstr "Documents a %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:579
+#: ../daemon/gvfsbackendafc.c:587
 #, c-format
 msgid ""
 "The device '%s' is locked. Enter the passcode on the device and click 'Try "
@@ -643,22 +645,22 @@ msgstr ""
 "El dispositiu «%s» està bloquejat. Introduïu la contrasenya en el dispositiu "
 "i feu clic a «Torna-ho a intentar»."
 
-#: ../daemon/gvfsbackendafc.c:918 ../daemon/gvfsbackendarchive.c:655
+#: ../daemon/gvfsbackendafc.c:926 ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1808
 #: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:718
 #: ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "No es pot obrir el directori"
 
-#: ../daemon/gvfsbackendafc.c:1119 ../daemon/gvfsbackendafc.c:2462
+#: ../daemon/gvfsbackendafc.c:1127 ../daemon/gvfsbackendafc.c:2470
 msgid "Backups are not yet supported."
 msgstr "Encara no es poden fer còpies de seguretat."
 
-#: ../daemon/gvfsbackendafc.c:1291
+#: ../daemon/gvfsbackendafc.c:1299
 msgid "Invalid seek type"
 msgstr "Tipus de cerca no vàlida"
 
-#: ../daemon/gvfsbackendafc.c:2299 ../daemon/gvfsbackendafp.c:1755
+#: ../daemon/gvfsbackendafc.c:2307 ../daemon/gvfsbackendafp.c:1755
 #: ../daemon/gvfsbackendftp.c:1087 ../daemon/gvfsbackendftp.c:1135
 #: ../daemon/gvfsbackendftp.c:1156 ../daemon/gvfsbackendsftp.c:1832
 #: ../daemon/gvfsbackendsftp.c:4633 ../daemon/gvfsbackendsmb.c:1719
