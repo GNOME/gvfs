@@ -2,19 +2,21 @@
 # Copyright (C) 2008, Free Software Foundation Inc.
 # This file is distributed under the same license as the gvfs package.
 # Gil Forcada <gilforcada@guifi.net>, 2008, 2009, 2010, 2011, 2012.
+# Jordi Serratosa <jordis@softcatala.cat>, 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-15 23:49+0100\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=gvfs&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2012-03-15 22:49+0000\n"
 "PO-Revision-Date: 2012-03-12 21:32+0100\n"
 "Last-Translator: Gil Forcada <gilforcada@guifi.net>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
-"Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bits\n"
+"Language: ca\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2400
@@ -174,8 +176,7 @@ msgstr "S'ha produït un error en crear el resoledor Avahi: %s"
 #: ../common/gvfsdnssdresolver.c:1100
 #, c-format
 msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr ""
-"S'ha produït un error en resoldre el servei «%s» «%s» en el domini «%s»"
+msgstr "S'ha produït un error en resoldre el servei «%s» «%s» en el domini «%s»"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -189,8 +190,8 @@ msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
 msgstr ""
-"S'ha produït un error en resoldre el servei «%s» «%s» en el domini «%s». "
-"Manca algun registre TXT. Claus necessàries: «%s»."
+"S'ha produït un error en resoldre el servei «%s» «%s» en el domini «%s». Manca "
+"algun registre TXT. Claus necessàries: «%s»."
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -200,8 +201,7 @@ msgstr ""
 #: ../common/gvfsdnssdresolver.c:1143
 #, c-format
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr ""
-"S'ha excedit el temps en resoldre el servei «%s» «%s» en el domini «%s»"
+msgstr "S'ha excedit el temps en resoldre el servei «%s» «%s» en el domini «%s»"
 
 #: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
@@ -398,8 +398,7 @@ msgstr "El directori no és buit"
 
 #: ../daemon/gvfsafpvolume.c:676
 msgid "Target object is marked as not deletable (DeleteInhibit)"
-msgstr ""
-"L'objecte de destinació està marcat com a no suprimible «DeleteInhibit»"
+msgstr "L'objecte de destinació està marcat com a no suprimible «DeleteInhibit»"
 
 #: ../daemon/gvfsafpvolume.c:680 ../daemon/gvfsafpvolume.c:1227
 #: ../daemon/gvfsafpvolume.c:2292
@@ -451,7 +450,7 @@ msgstr "Ja existeix un objecte amb aquest nom"
 #: ../daemon/gvfsafpvolume.c:1223
 msgid "Target object is marked as not renameable (RenameInhibit)"
 msgstr ""
-"L'objecte de destinació està marcat com a no renombrable «RenameInhibit»"
+"L'objecte de destinació està marcat com a no reanomenable («RenameInhibit»)"
 
 #: ../daemon/gvfsafpvolume.c:1398
 msgid "Can't move directory into one of its descendants"
@@ -468,7 +467,7 @@ msgstr "No es pot moure el directori compartit a la paperera"
 #: ../daemon/gvfsafpvolume.c:1414
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
 msgstr ""
-"L'objecte que s'està movent està marcat com a no renombrable «RenameInhibit»"
+"L'objecte que s'està movent està marcat com a no reanomenable («RenameInhibit»)"
 
 #: ../daemon/gvfsafpvolume.c:1418
 msgid "Object being moved doesn't exist"
@@ -528,7 +527,7 @@ msgstr "El directori no és buit"
 
 #: ../daemon/gvfsbackendafc.c:221
 msgid "The device did not respond"
-msgstr "El dispositiu no ha respòs"
+msgstr "El dispositiu no ha respost"
 
 #: ../daemon/gvfsbackendafc.c:225
 msgid "The connection was interrupted"
@@ -2845,8 +2844,8 @@ msgstr "- llista els continguts dels directoris en un format a l'estil arbre"
 
 #~ msgid "Unhandled SBServices proxy error (%d)"
 #~ msgstr ""
-#~ "S'ha produït un error no gestionat del servidor intermediari SBServices "
-#~ "(%d)"
+#~ "S'ha produït un error no gestionat del servidor intermediari SBServices (%"
+#~ "d)"
 
 #~ msgid "Service %d on Apple Mobile Device"
 #~ msgstr "Servei %d al dispositiu mòbil Apple"
