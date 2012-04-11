@@ -659,6 +659,8 @@ g_vfs_backend_gphoto2_init (GVfsBackendGphoto2 *gphoto2_backend)
 
   DEBUG ("initing %p", gphoto2_backend);
 
+  g_mutex_init (&gphoto2_backend->lock);
+
   g_vfs_backend_set_display_name (backend, "gphoto2");
 
   mount_spec = g_mount_spec_new ("gphoto2");
@@ -1711,8 +1713,6 @@ do_mount (GVfsBackend *backend,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   gphoto2_backend->free_space = -1;
-
-  g_mutex_init (&gphoto2_backend->lock);
 
   gphoto2_mount_spec = g_mount_spec_new ("gphoto2");
   g_mount_spec_set (gphoto2_mount_spec, "host", host);
