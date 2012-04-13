@@ -347,5 +347,30 @@
     </method>
   </interface>
 
+  <!--
+      org.gtk.vfs.Monitor
+  -->
+  <interface name='org.gtk.vfs.Monitor'>
+    <method name="Subscribe">
+      <arg type='o' name='object_path' direction='in'/>
+    </method>
+    <method name="Unsubscribe">
+      <arg type='o' name='object_path' direction='in'/>
+    </method>
+  </interface>
+
+  <!--
+      org.gtk.vfs.MonitorClient
+  -->
+  <interface name='org.gtk.vfs.MonitorClient'>
+    <method name="Changed">
+      <arg type='u' name='event_type' direction='in'/>
+      <arg type='(aya{sv})' name='mount_spec' direction='in'/>
+      <arg type='ay' name='file_path' direction='in'/>
+      <arg type='(aya{sv})' name='other_mount_spec' direction='in'/>
+      <arg type='ay' name='other_file_path' direction='in'/>
+    </method>
+  </interface>
+
 </node>
 

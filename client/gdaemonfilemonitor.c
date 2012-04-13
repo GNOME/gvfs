@@ -27,9 +27,9 @@
 #include <gio/gio.h>
 #include <gvfsdaemondbus.h>
 #include <gvfsdaemonprotocol.h>
-#include "gvfsdbusutils.h"
 #include "gmountspec.h"
 #include "gdaemonfile.h"
+#include <gvfsdbus.h>
 
 #define OBJ_PATH_PREFIX "/org/gtk/vfs/client/filemonitor/"
 
@@ -37,9 +37,6 @@
 static volatile gint path_counter = 1;
 
 static gboolean g_daemon_file_monitor_cancel (GFileMonitor* monitor);
-static DBusHandlerResult g_daemon_file_monitor_dbus_filter (DBusConnection     *connection,
-							    DBusMessage        *message,
-							    void               *user_data);
 
 
 struct _GDaemonFileMonitor
@@ -49,6 +46,7 @@ struct _GDaemonFileMonitor
   char *object_path;
   char *remote_obj_path;
   char *remote_id;
+  GDBusConnection *connection;
 };
 
 G_DEFINE_TYPE (GDaemonFileMonitor, g_daemon_file_monitor, G_TYPE_FILE_MONITOR)
@@ -62,6 +60,9 @@ g_daemon_file_monitor_finalize (GObject* object)
 
   _g_dbus_unregister_vfs_filter (daemon_monitor->object_path);
   
+  if (daemon_monitor->connection)
+    g_object_unref (daemon_monitor->connection);
+
   g_free (daemon_monitor->object_path);
   g_free (daemon_monitor->remote_id);
   g_free (daemon_monitor->remote_obj_path);
@@ -81,6 +82,69 @@ g_daemon_file_monitor_class_init (GDaemonFileMonitorClass* klass)
   file_monitor_class->cancel = g_daemon_file_monitor_cancel;
 }
 
+static gboolean
+handle_changed (GVfsDBusMonitorClient *object,
+                GDBusMethodInvocation *invocation,
+                guint arg_event_type,
+                GVariant *arg_mount_spec,
+                const gchar *arg_file_path,
+                GVariant *arg_other_mount_spec,
+                const gchar *arg_other_file_path,
+                gpointer user_data)
+{
+  GDaemonFileMonitor* monitor = user_data;
+  GMountSpec *spec1, *spec2;
+  GFile *file1, *file2;
+
+  g_print ("handle_changed: daemon_monitor = %p\n", monitor);
+
+  spec1 = g_mount_spec_from_dbus (arg_mount_spec);
+  file1 = g_daemon_file_new (spec1, arg_file_path);
+  g_mount_spec_unref (spec1);
+
+  file2 = NULL;
+  
+  if (strlen (arg_other_file_path) > 0)
+    {
+      spec2 = g_mount_spec_from_dbus (arg_other_mount_spec);
+      file2 = g_daemon_file_new (spec2, arg_other_file_path);
+      g_mount_spec_unref (spec2);
+    }
+
+  g_file_monitor_emit_event (G_FILE_MONITOR (monitor),
+                             file1, file2,
+                             arg_event_type);
+  
+  gvfs_dbus_monitor_client_complete_changed (object, invocation);
+  
+  return TRUE;
+}
+
+static GDBusInterfaceSkeleton *
+register_vfs_filter_cb (GDBusConnection *connection,
+                        const char *obj_path,
+                        gpointer callback_data)
+{
+  GError *error;
+  GVfsDBusMonitorClient *skeleton;
+
+  skeleton = gvfs_dbus_monitor_client_skeleton_new ();
+  g_signal_connect (skeleton, "handle-changed", G_CALLBACK (handle_changed), callback_data);
+
+  error = NULL;
+  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (skeleton),
+                                         connection,
+                                         obj_path,
+                                         &error))
+    {
+      g_warning ("Error registering path: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+
+  return G_DBUS_INTERFACE_SKELETON (skeleton);
+}
+
 static void
 g_daemon_file_monitor_init (GDaemonFileMonitor* daemon_monitor)
 {
@@ -89,10 +153,108 @@ g_daemon_file_monitor_init (GDaemonFileMonitor* daemon_monitor)
   id = g_atomic_int_add (&path_counter, 1);
 
   daemon_monitor->object_path = g_strdup_printf (OBJ_PATH_PREFIX"%d", id);
-  
+  g_print ("g_daemon_file_monitor_init: daemon_monitor = %p, object_path = '%s'\n", daemon_monitor, daemon_monitor->object_path);
+
   _g_dbus_register_vfs_filter (daemon_monitor->object_path,
-			       g_daemon_file_monitor_dbus_filter,
+                               register_vfs_filter_cb,
 			       G_OBJECT (daemon_monitor));
+}
+
+
+typedef void (*ProxyCreated) (GVfsDBusMonitor *proxy, gpointer user_data);
+
+typedef struct {
+  GDaemonFileMonitor* monitor;
+  ProxyCreated cb;
+  GDBusConnection *connection;
+} AsyncProxyCreate;
+
+static void
+async_proxy_create_free (AsyncProxyCreate *data)
+{
+  g_object_unref (data->monitor);
+  if (data->connection)
+    g_object_unref (data->connection);
+  g_free (data);
+}
+
+static void
+subscribe_cb (GVfsDBusMonitor *proxy,
+              GAsyncResult *res,
+              AsyncProxyCreate *data)
+{
+  GError *error = NULL;
+
+  g_print ("gdaemonfilemonitor.c: subscribe_cb()\n");
+  if (! gvfs_dbus_monitor_call_subscribe_finish (proxy, res, &error))
+    {
+      g_printerr ("Error calling org.gtk.vfs.Monitor.Subscribe(): %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+  
+  /* monitor subscription successful, let's keep the connection open and listen for the changes */
+  data->monitor->connection = g_object_ref (data->connection);
+  _g_dbus_connect_vfs_filters (data->monitor->connection);
+  
+  async_proxy_create_free (data);
+}
+
+static void
+subscribe_proxy_created_cb (GVfsDBusMonitor *proxy,
+                            gpointer user_data)
+{
+  AsyncProxyCreate *data = user_data;
+
+  gvfs_dbus_monitor_call_subscribe (proxy,
+                                    data->monitor->object_path,
+                                    NULL,
+                                    (GAsyncReadyCallback) subscribe_cb,
+                                    data);
+  
+  g_object_unref (proxy);
+}
+
+static void
+async_proxy_new_cb (GObject *source_object,
+                    GAsyncResult *res,
+                    gpointer user_data)
+{
+  AsyncProxyCreate *data = user_data;
+  GVfsDBusMonitor *proxy;
+  GError *error = NULL;
+
+  proxy = gvfs_dbus_monitor_proxy_new_finish (res, &error);
+  g_print ("gdaemonfilemonitor.c: async_proxy_new_cb, proxy = %p\n", proxy);
+  if (proxy == NULL)
+    {
+      g_printerr ("Error creating proxy: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+      async_proxy_create_free (data);
+      return;
+    }
+  
+  data->cb(proxy, data);
+}
+
+static void
+async_got_connection_cb (GDBusConnection *connection,
+                         GError *io_error,
+                         gpointer callback_data)
+{
+  AsyncProxyCreate *data = callback_data;
+  
+  g_print ("gdaemonfilemonitor.c: async_got_connection_cb, connection = %p\n", connection);
+
+  data->connection = g_object_ref (connection);
+  gvfs_dbus_monitor_proxy_new (connection,
+                               G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                               data->monitor->remote_id,
+                               data->monitor->remote_obj_path,
+                               NULL,
+                               async_proxy_new_cb,
+                               data);
 }
 
 GFileMonitor*
@@ -100,117 +262,73 @@ g_daemon_file_monitor_new (const char *remote_id,
 				const char *remote_obj_path)
 {
   GDaemonFileMonitor* daemon_monitor;
-  DBusMessage *message;
+  AsyncProxyCreate *data;
   
   daemon_monitor = g_object_new (G_TYPE_DAEMON_FILE_MONITOR, NULL);
 
   daemon_monitor->remote_id = g_strdup (remote_id);
   daemon_monitor->remote_obj_path = g_strdup (remote_obj_path);
 
-  message =
-    dbus_message_new_method_call (daemon_monitor->remote_id,
-				  daemon_monitor->remote_obj_path,
-				  G_VFS_DBUS_MONITOR_INTERFACE,
-				  G_VFS_DBUS_MONITOR_OP_SUBSCRIBE);
-
-  _g_dbus_message_append_args (message, DBUS_TYPE_OBJECT_PATH,
-			       &daemon_monitor->object_path, 0);
-
-  _g_vfs_daemon_call_async (message,
-			    NULL, NULL,
-			    NULL);
-
-  dbus_message_unref (message);
+  data = g_new0 (AsyncProxyCreate, 1);
+  data->monitor = g_object_ref (daemon_monitor);
+  data->cb = subscribe_proxy_created_cb;
+  
+  _g_dbus_connection_get_for_async (daemon_monitor->remote_id,
+                                    async_got_connection_cb,
+                                    data,
+                                    NULL);
   
   return G_FILE_MONITOR (daemon_monitor);
 }
 
-static DBusHandlerResult
-g_daemon_file_monitor_dbus_filter (DBusConnection     *connection,
-				   DBusMessage        *message,
-				   void               *user_data)
+static void
+unsubscribe_cb (GVfsDBusMonitor *proxy,
+                GAsyncResult *res,
+                AsyncProxyCreate *data)
 {
-  GDaemonFileMonitor *monitor = G_DAEMON_FILE_MONITOR (user_data);
-  const char *member;
-  guint32 event_type;
-  DBusMessageIter iter;
-  GMountSpec *spec1, *spec2;
-  char *path1, *path2;
-  GFile *file1, *file2;
-  
-  member = dbus_message_get_member (message);
+  GError *error = NULL;
 
-  if (strcmp (member, G_VFS_DBUS_MONITOR_CLIENT_OP_CHANGED) == 0)
+  g_print ("gdaemonfilemonitor.c: unsubscribe_cb()\n");
+  if (! gvfs_dbus_monitor_call_unsubscribe_finish (proxy, res, &error))
     {
-      dbus_message_iter_init (message, &iter);
-      
-      if (!_g_dbus_message_iter_get_args (&iter, NULL,
-					  DBUS_TYPE_UINT32, &event_type,
-					  0))
-	return DBUS_HANDLER_RESULT_HANDLED;
-      
-      spec1 = g_mount_spec_from_dbus (&iter);
-      if (!_g_dbus_message_iter_get_args (&iter, NULL,
-					  G_DBUS_TYPE_CSTRING, &path1,
-					  0))
-	{
-	  g_mount_spec_unref (spec1);
-	  return DBUS_HANDLER_RESULT_HANDLED;
-	}
-
-      file1 = g_daemon_file_new (spec1, path1);
-      
-      g_mount_spec_unref (spec1);
-      g_free (path1);
-
-      file2 = NULL;
-      
-      spec2 = g_mount_spec_from_dbus (&iter);
-      if (spec2) {
-	if (_g_dbus_message_iter_get_args (&iter, NULL,
-					   G_DBUS_TYPE_CSTRING, &path2,
-					   0))
-	  {
-	    file2 = g_daemon_file_new (spec2, path2);
-
-	    g_free (path2);
-	  }
-	
-	g_mount_spec_unref (spec2);
-      }
-
-      g_file_monitor_emit_event (G_FILE_MONITOR (monitor),
-				 file1, file2,
-				 event_type);
-      
-      return DBUS_HANDLER_RESULT_HANDLED;
+      g_printerr ("Error calling org.gtk.vfs.Monitor.Unsubscribe(): %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
     }
-
-  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+  
+  async_proxy_create_free (data);
 }
 
+static void
+unsubscribe_proxy_created_cb (GVfsDBusMonitor *proxy,
+                              gpointer user_data)
+{
+  AsyncProxyCreate *data = user_data;
+
+  gvfs_dbus_monitor_call_unsubscribe (proxy,
+                                      data->monitor->object_path,
+                                      NULL,
+                                      (GAsyncReadyCallback) unsubscribe_cb,
+                                      data);
+  
+  g_object_unref (proxy);
+}
 
 static gboolean
 g_daemon_file_monitor_cancel (GFileMonitor* monitor)
 {
   GDaemonFileMonitor *daemon_monitor = G_DAEMON_FILE_MONITOR (monitor);
-  DBusMessage *message;
+  AsyncProxyCreate *data;
   
-  message =
-    dbus_message_new_method_call (daemon_monitor->remote_id,
-				  daemon_monitor->remote_obj_path,
-				  G_VFS_DBUS_MONITOR_INTERFACE,
-				  G_VFS_DBUS_MONITOR_OP_UNSUBSCRIBE);
+  data = g_new0 (AsyncProxyCreate, 1);
+  data->monitor = g_object_ref (daemon_monitor);
+  data->cb = unsubscribe_proxy_created_cb;
+  
+  _g_dbus_connection_get_for_async (daemon_monitor->remote_id,
+                                    async_got_connection_cb,
+                                    data,
+                                    NULL);
 
-  _g_dbus_message_append_args (message, DBUS_TYPE_OBJECT_PATH,
-			       &daemon_monitor->object_path, 0);
-  
-  _g_vfs_daemon_call_async (message,
-			    NULL, NULL, 
-			    NULL);
-  
-  dbus_message_unref (message);
-  
   return TRUE;
 }
 

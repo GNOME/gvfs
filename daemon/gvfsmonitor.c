@@ -34,23 +34,19 @@
 #include <glib-object.h>
 #include <glib/gi18n.h>
 #include <gvfsmonitor.h>
-#include <gio/gunixinputstream.h>
-#include <gio/gunixoutputstream.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
 #include <gvfsjobcloseread.h>
 #include <gvfsjobclosewrite.h>
+#include <gvfsdbus.h>
 
 #define OBJ_PATH_PREFIX "/org/gtk/vfs/daemon/dirmonitor/"
-
-/* TODO: Real P_() */
-#define P_(_x) (_x)
 
 
 /* TODO: Handle a connection dying and unregister its subscription */
 
 typedef struct {
-  DBusConnection *connection;
+  GDBusConnection *connection;
   char *id;
   char *object_path;
 } Subscriber;
@@ -135,7 +131,7 @@ g_vfs_monitor_init (GVfsMonitor *monitor)
 
 static gboolean
 matches_subscriber (Subscriber *subscriber,
-		    DBusConnection *connection,
+		    GDBusConnection *connection,
 		    const char *object_path,
 		    const char *dbus_id)
 {
@@ -152,105 +148,92 @@ unsubscribe (GVfsMonitor *monitor,
 {
   monitor->priv->subscribers = g_list_remove (monitor->priv->subscribers, subscriber);
   
-  dbus_connection_unref (subscriber->connection);
+  g_object_unref (subscriber->connection);
   g_free (subscriber->id);
   g_free (subscriber->object_path);
   g_free (subscriber);
   g_object_unref (monitor);
 }
 
-static DBusHandlerResult
-vfs_monitor_message_callback (DBusConnection  *connection,
-			      DBusMessage     *message,
-			      void            *user_data)
+static gboolean
+handle_subscribe (GVfsDBusMonitor *object,
+                  GDBusMethodInvocation *invocation,
+                  const gchar *arg_object_path,
+                  GVfsMonitor *monitor)
 {
-  GVfsMonitor *monitor = user_data;
-  char *object_path;
-  DBusError derror;
-  GList *l;
   Subscriber *subscriber;
-  DBusMessage *reply;
+
+  g_print ("handle_subscribe: adding connection %p\n", g_dbus_method_invocation_get_connection (invocation));
   
-  if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_MONITOR_INTERFACE,
-				   G_VFS_DBUS_MONITOR_OP_SUBSCRIBE))
-    {
-      dbus_error_init (&derror);
-      if (!dbus_message_get_args (message, &derror, 
-				  DBUS_TYPE_OBJECT_PATH, &object_path,
-				  0))
-	{
-	  reply = dbus_message_new_error (message,
-					  derror.name,
-					  derror.message);
-	  dbus_error_free (&derror);
+  subscriber = g_new0 (Subscriber, 1);
+  subscriber->connection = g_object_ref (g_dbus_method_invocation_get_connection (invocation));
+  subscriber->id = g_strdup (g_dbus_method_invocation_get_sender (invocation));
+  subscriber->object_path = g_strdup (arg_object_path);
 
-	  dbus_connection_send (connection, reply, NULL);
-	  dbus_message_unref (reply);
-	}
-      else
-	{
-	  subscriber = g_new0 (Subscriber, 1);
-	  subscriber->connection = dbus_connection_ref (connection);
-	  subscriber->id = g_strdup (dbus_message_get_sender (message));
-	  subscriber->object_path = g_strdup (object_path);
-
-	  g_object_ref (monitor);
-	  monitor->priv->subscribers = g_list_prepend (monitor->priv->subscribers, subscriber);
-
-	  reply = dbus_message_new_method_return (message);
-	  dbus_connection_send (connection, reply, NULL);
-	  dbus_message_unref (reply);
-	}
-
-      return DBUS_HANDLER_RESULT_HANDLED;
-    }
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MONITOR_INTERFACE,
-					G_VFS_DBUS_MONITOR_OP_UNSUBSCRIBE))
-    {
-      dbus_error_init (&derror);
-      if (!dbus_message_get_args (message, &derror, 
-				  DBUS_TYPE_OBJECT_PATH, &object_path,
-				  0))
-	{
-	  reply = dbus_message_new_error (message,
-					  derror.name,
-					  derror.message);
-	  dbus_error_free (&derror);
-
-	  dbus_connection_send (connection, reply, NULL);
-	  dbus_message_unref (reply);
-	}
-      else
-	{
-	  g_object_ref (monitor); /* Keep alive during possible last remove */
-	  for (l = monitor->priv->subscribers; l != NULL; l = l->next)
-	    {
-	      subscriber = l->data;
-
-	      if (matches_subscriber (subscriber,
-				      connection,
-				      object_path,
-				      dbus_message_get_sender (message)))
-		{
-		  unsubscribe (monitor, subscriber);
-		  break;
-		}
-	    }
-
-	  reply = dbus_message_new_method_return (message);
-	  dbus_connection_send (connection, reply, NULL);
-	  dbus_message_unref (reply);
-
-	  g_object_unref (monitor);
-	}
-      
-      return DBUS_HANDLER_RESULT_HANDLED;
-    }
-      
-  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+  g_object_ref (monitor);
+  monitor->priv->subscribers = g_list_prepend (monitor->priv->subscribers, subscriber);
   
+  gvfs_dbus_monitor_complete_subscribe (object, invocation);
+  
+  return TRUE;
+}
+
+static gboolean
+handle_unsubscribe (GVfsDBusMonitor *object,
+                    GDBusMethodInvocation *invocation,
+                    const gchar *arg_object_path,
+                    GVfsMonitor *monitor)
+{
+  Subscriber *subscriber;
+  GList *l;
+
+  g_print ("handle_unsubscribe\n");
+
+  g_object_ref (monitor); /* Keep alive during possible last remove */
+  for (l = monitor->priv->subscribers; l != NULL; l = l->next)
+    {
+      subscriber = l->data;
+
+      if (matches_subscriber (subscriber,
+                              g_dbus_method_invocation_get_connection (invocation),
+                              arg_object_path,
+                              g_dbus_method_invocation_get_sender (invocation)))
+        {
+          unsubscribe (monitor, subscriber);
+          break;
+        }
+    }
+  g_object_unref (monitor);
+
+  gvfs_dbus_monitor_complete_unsubscribe (object, invocation);
+
+  return TRUE;
+}
+
+static GDBusInterfaceSkeleton *
+register_path_cb (GDBusConnection *conn,
+                  const char *obj_path,
+                  gpointer data)
+{
+  GError *error;
+  GVfsDBusMonitor *skeleton;
+  
+  skeleton = gvfs_dbus_monitor_skeleton_new ();
+  g_signal_connect (skeleton, "handle-subscribe", G_CALLBACK (handle_subscribe), data);
+  g_signal_connect (skeleton, "handle-unsubscribe", G_CALLBACK (handle_unsubscribe), data);
+  
+  error = NULL;
+  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (skeleton),
+                                         conn,
+                                         obj_path,
+                                         &error))
+    {
+      g_warning ("Error registering path: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+
+  return G_DBUS_INTERFACE_SKELETON (skeleton);
 }
 
 GVfsMonitor *
@@ -271,7 +254,7 @@ g_vfs_monitor_new (GVfsBackend *backend)
 
   g_vfs_daemon_register_path (monitor->priv->daemon,
 			      monitor->priv->object_path,
-			      vfs_monitor_message_callback,
+			      register_path_cb,
 			      monitor);
 
   return monitor;  
@@ -283,6 +266,72 @@ g_vfs_monitor_get_object_path (GVfsMonitor *monitor)
   return monitor->priv->object_path;
 }
 
+
+typedef struct {
+  GVfsMonitor *monitor;
+  GFileMonitorEvent event_type;
+  gchar *file_path;
+  gchar *other_file_path;
+} EmitEventData;
+
+static void
+emit_event_data_free (EmitEventData *data)
+{
+  g_object_unref (data->monitor);
+  g_free (data->file_path);
+  g_free (data->other_file_path);
+  g_free (data);
+}
+
+static void
+changed_cb (GVfsDBusMonitorClient *proxy,
+            GAsyncResult *res,
+            EmitEventData *data)
+{
+  GError *error = NULL;
+
+  g_print ("gvfsmonitor.c: changed_cb()\n");
+  if (! gvfs_dbus_monitor_client_call_changed_finish (proxy, res, &error))
+    {
+      g_printerr ("Error calling org.gtk.vfs.MonitorClient.Changed(): %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+  
+  emit_event_data_free (data);
+}
+
+static void
+got_proxy_cb (GObject *source_object,
+              GAsyncResult *res,
+              EmitEventData *data)
+{
+  GError *error = NULL;
+  GVfsDBusMonitorClient *proxy;
+  
+  g_print ("gvfsmonitor.c: got_proxy_cb()\n");
+  proxy = gvfs_dbus_monitor_client_proxy_new_finish (res, &error);
+  if (proxy == NULL)
+    {
+      g_printerr ("Error creating proxy: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+      emit_event_data_free (data);
+      return;
+    }
+  
+  gvfs_dbus_monitor_client_call_changed (proxy,
+                                         data->event_type,
+                                         g_mount_spec_to_dbus (data->monitor->priv->mount_spec),
+                                         data->file_path,
+                                         g_mount_spec_to_dbus (data->monitor->priv->mount_spec),
+                                         data->other_file_path ? data->other_file_path : "",
+                                         NULL,
+                                         (GAsyncReadyCallback) changed_cb,
+                                         data);
+  g_object_unref (proxy);
+}
+
 void
 g_vfs_monitor_emit_event (GVfsMonitor       *monitor,
 			  GFileMonitorEvent  event_type,
@@ -291,37 +340,29 @@ g_vfs_monitor_emit_event (GVfsMonitor       *monitor,
 {
   GList *l;
   Subscriber *subscriber;
-  DBusMessage *message;
-  DBusMessageIter iter;
-  guint32 event_type_dbus;
   
+  g_print ("g_vfs_monitor_emit_event: file_path = '%s', other_file_path = '%s'\n", file_path, other_file_path);
+
   for (l = monitor->priv->subscribers; l != NULL; l = l->next)
     {
+      EmitEventData *data;
+      
       subscriber = l->data;
 
-      message =
-	dbus_message_new_method_call (subscriber->id,
-				      subscriber->object_path,
-				      G_VFS_DBUS_MONITOR_CLIENT_INTERFACE,
-				      G_VFS_DBUS_MONITOR_CLIENT_OP_CHANGED);
+      data = g_new0 (EmitEventData, 1);
+      data->monitor = g_object_ref (monitor);
+      data->event_type = event_type;
+      data->file_path = g_strdup (file_path);
+      data->other_file_path = g_strdup (other_file_path);
 
-      dbus_message_iter_init_append (message, &iter);
-      event_type_dbus = event_type;
-      dbus_message_iter_append_basic (&iter,
-				      DBUS_TYPE_UINT32,
-				      &event_type_dbus);
-      g_mount_spec_to_dbus (&iter, monitor->priv->mount_spec);
-      _g_dbus_message_iter_append_cstring (&iter, file_path);
-
-      if (other_file_path)
-	{
-	  g_mount_spec_to_dbus (&iter, monitor->priv->mount_spec);
-	  _g_dbus_message_iter_append_cstring (&iter, other_file_path);
-	}
-
-      dbus_message_set_no_reply (message, FALSE);
+      g_print ("  subscriber %p: object_path = '%s', name = '%s'\n", subscriber, subscriber->object_path, subscriber->id);
       
-      dbus_connection_send (subscriber->connection, message, NULL);
-      dbus_message_unref (message);
+      gvfs_dbus_monitor_client_proxy_new (subscriber->connection,
+                                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                                          subscriber->id,
+                                          subscriber->object_path,
+                                          NULL,
+                                          (GAsyncReadyCallback) got_proxy_cb,
+                                          data);
     }
 }
