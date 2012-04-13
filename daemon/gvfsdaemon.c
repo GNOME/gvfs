@@ -48,10 +48,10 @@ enum {
 
 typedef struct {
   char *obj_path;
-  char *name;
   GVfsRegisterPathCallback callback;
   gpointer data;
-  GDBusInterfaceSkeleton *skeleton;
+  GDBusInterfaceSkeleton *session_skeleton;
+  GHashTable *client_skeletons;
 } RegisteredPath;
 
 struct _GVfsDaemon
@@ -63,6 +63,7 @@ struct _GVfsDaemon
 
   GThreadPool *thread_pool;
   GHashTable *registered_paths;
+  GHashTable *client_connections;
   GList *jobs;
   GList *job_sources;
 
@@ -124,13 +125,14 @@ static void
 registered_path_free (RegisteredPath *data)
 {
   g_free (data->obj_path);
-  g_free (data->name);
-  if (data->skeleton)
+  if (data->session_skeleton)
     {
       /* Unexport the interface skeleton on session bus */
-      g_dbus_interface_skeleton_unexport (data->skeleton);
-      g_object_unref (data->skeleton);
+      g_dbus_interface_skeleton_unexport (data->session_skeleton);
+      g_object_unref (data->session_skeleton);
     }
+  g_hash_table_destroy (data->client_skeletons);
+  
   g_free (data);
 }
 
@@ -160,6 +162,7 @@ g_vfs_daemon_finalize (GObject *object)
     g_object_unref (daemon->conn);
   
   g_hash_table_destroy (daemon->registered_paths);
+  g_hash_table_destroy (daemon->client_connections);
   g_mutex_clear (&daemon->lock);
 
   if (G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize)
@@ -239,8 +242,12 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
   daemon->jobs = NULL;
   daemon->registered_paths =
     g_hash_table_new_full (g_str_hash, g_str_equal,
-			   NULL, (GDestroyNotify)registered_path_free);
-  
+			   g_free, (GDestroyNotify)registered_path_free);
+
+  /* This is where we store active client connections so when a new filter is registered,
+   * we re-register them on all active connections */
+  daemon->client_connections =
+    g_hash_table_new_full (g_direct_hash, g_direct_equal, g_object_unref, NULL);
 
   daemon->conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
   g_assert (daemon->conn != NULL);
@@ -462,11 +469,49 @@ g_vfs_daemon_add_job_source (GVfsDaemon *daemon,
   g_mutex_unlock (&daemon->lock);
 }
 
+static void
+unref_skeleton (gpointer object)
+{
+  GDBusInterfaceSkeleton *skeleton = object;
+
+  g_print ("unref_skeleton: unreffing skeleton %p\n", skeleton);
+  g_dbus_interface_skeleton_unexport (skeleton);
+  g_object_unref (skeleton);
+}
+
+static void
+peer_register_skeleton (const gchar *obj_path,
+                        RegisteredPath *reg_path,
+                        GDBusConnection *dbus_conn)
+{
+  GDBusInterfaceSkeleton *skeleton;
+
+  if (! g_hash_table_contains (reg_path->client_skeletons, dbus_conn))
+    {
+      skeleton = reg_path->callback (dbus_conn, obj_path, reg_path->data);
+      g_print ("registering '%s' on the %p connection\n", obj_path, dbus_conn);
+
+      g_hash_table_insert (reg_path->client_skeletons, dbus_conn, skeleton);
+    }
+  else
+    {
+      g_print ("interface skeleton '%s' already registered on the %p connection, skipping\n", obj_path, dbus_conn);
+    }
+}
+
+static void
+client_conn_register_skeleton (GDBusConnection *dbus_conn,
+                               gpointer value,
+                               RegisteredPath *reg_path)
+{
+  peer_register_skeleton (reg_path->obj_path, reg_path, dbus_conn);
+}
+
 /* This registers a dbus interface skeleton on *all* connections, client and session bus */
+/* The object path needs to be unique globally. */
 void
 g_vfs_daemon_register_path (GVfsDaemon *daemon,
                             const char *obj_path,
-                            const char *name,
                             GVfsRegisterPathCallback callback,
                             gpointer user_data)
 {
@@ -476,18 +521,20 @@ g_vfs_daemon_register_path (GVfsDaemon *daemon,
 
   data = g_new0 (RegisteredPath, 1);
   data->obj_path = g_strdup (obj_path);
-  data->name = g_strdup (name);
   data->callback = callback;
   data->data = user_data;
+  data->client_skeletons = g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, (GDestroyNotify)unref_skeleton);
   
-  g_hash_table_insert (daemon->registered_paths, data->obj_path,
-		       data);
+  g_hash_table_insert (daemon->registered_paths, g_strdup (obj_path), data);
   
   /* Export the newly registered interface skeleton on session bus */
   /* TODO: change the way we export skeletons on connections once 
    *       https://bugzilla.gnome.org/show_bug.cgi?id=662718 is in place.
    */ 
-  data->skeleton = callback (daemon->conn, data->obj_path, user_data);
+  data->session_skeleton = callback (daemon->conn, obj_path, user_data);
+  
+  /* Export this newly registered path to all active client connections */
+  g_hash_table_foreach (daemon->client_connections, (GHFunc) client_conn_register_skeleton, data);
 }
 
 void
@@ -565,16 +612,12 @@ new_connection_data_free (void *memory)
 }
 
 static void
-peer_unregister_skeleton (gpointer key,
+peer_unregister_skeleton (const gchar *obj_path,
                           RegisteredPath *reg_path,
                           GDBusConnection *dbus_conn)
 {
-  GDBusInterfaceSkeleton *skeleton;
-
-  g_print ("unregistering '%s' on the %p connection\n", reg_path->name, dbus_conn);
-  
-  skeleton = g_object_get_data (G_OBJECT (dbus_conn), reg_path->name);
-  g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (skeleton));
+  g_print ("unregistering '%s' on the %p connection\n", obj_path, dbus_conn);
+  g_hash_table_remove (reg_path->client_skeletons, dbus_conn);
 }
 
 static void
@@ -606,24 +649,13 @@ peer_connection_closed (GDBusConnection *connection,
   /* daemon_skeleton should be always valid in this case */
   g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (daemon_skeleton));
   
+  g_hash_table_remove (daemon->client_connections, connection);
+
   /* Unexport the registered interface skeletons */
   g_hash_table_foreach (daemon->registered_paths, (GHFunc) peer_unregister_skeleton, connection);
 
   /* The peer-to-peer connection was disconnected */
   g_object_unref (connection);
-}
-
-static void
-peer_register_skeleton (gpointer key,
-                        RegisteredPath *reg_path,
-                        GDBusConnection *dbus_conn)
-{
-  GDBusInterfaceSkeleton *skeleton;
-
-  g_print ("registering '%s' on the %p connection\n", reg_path->name, dbus_conn);
-  
-  skeleton = reg_path->callback (dbus_conn, reg_path->obj_path, reg_path->data);
-  g_object_set_data_full (G_OBJECT (dbus_conn), reg_path->name, skeleton, (GDestroyNotify) g_object_unref);
 }
 
 static void
@@ -666,6 +698,8 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
   
   /* Export registered interface skeletons on this new connection */
   g_hash_table_foreach (daemon->registered_paths, (GHFunc) peer_register_skeleton, dbus_conn);
+  
+  g_hash_table_insert (daemon->client_connections, g_object_ref (dbus_conn), NULL);
   
   g_print ("daemon_peer_connection_setup: interface registration complete.\n");
 

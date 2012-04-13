@@ -65,7 +65,6 @@ void        g_vfs_daemon_queue_job       (GVfsDaemon                    *daemon,
 					  GVfsJob                       *job);
 void        g_vfs_daemon_register_path   (GVfsDaemon                    *daemon,
                                           const char                    *obj_path,
-                                          const char                    *name,
                                           GVfsRegisterPathCallback       callback,
                                           gpointer                       user_data);
 void        g_vfs_daemon_unregister_path (GVfsDaemon                    *daemon,

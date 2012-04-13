@@ -314,7 +314,6 @@ g_vfs_backend_constructor (GType                  type,
   
   g_vfs_daemon_register_path (backend->priv->daemon,
 			      backend->priv->object_path, 
-			      "backend_path",
 			      register_path_cb,
 			      backend);
   
