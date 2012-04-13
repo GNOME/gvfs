@@ -43,12 +43,11 @@
 #define OBJ_PATH_PREFIX "/org/gtk/vfs/daemon/dirmonitor/"
 
 
-/* TODO: Handle a connection dying and unregister its subscription */
-
 typedef struct {
   GDBusConnection *connection;
   char *id;
   char *object_path;
+  GVfsMonitor *monitor;
 } Subscriber;
 
 struct _GVfsMonitorPrivate
@@ -65,8 +64,7 @@ static volatile gint path_counter = 1;
 
 G_DEFINE_TYPE (GVfsMonitor, g_vfs_monitor, G_TYPE_OBJECT)
 
-static void unsubscribe (GVfsMonitor *monitor,
-			 Subscriber *subscriber);
+static void unsubscribe (Subscriber *subscriber);
 
 static void
 backend_died (GVfsMonitor *monitor,
@@ -79,7 +77,7 @@ backend_died (GVfsMonitor *monitor,
   while (monitor->priv->subscribers != NULL)
     {
       subscriber = monitor->priv->subscribers->data;
-      unsubscribe (monitor, subscriber);
+      unsubscribe (subscriber);
     }
 }
 
@@ -143,16 +141,26 @@ matches_subscriber (Subscriber *subscriber,
 }
 
 static void
-unsubscribe (GVfsMonitor *monitor,
-	     Subscriber *subscriber)
+unsubscribe (Subscriber *subscriber)
 {
-  monitor->priv->subscribers = g_list_remove (monitor->priv->subscribers, subscriber);
+  subscriber->monitor->priv->subscribers = g_list_remove (subscriber->monitor->priv->subscribers, subscriber);
   
   g_object_unref (subscriber->connection);
   g_free (subscriber->id);
   g_free (subscriber->object_path);
+  g_object_unref (subscriber->monitor);
   g_free (subscriber);
-  g_object_unref (monitor);
+}
+
+static void
+subscriber_connection_closed (GDBusConnection *connection,
+                              gboolean         remote_peer_vanished,
+                              GError          *error,
+                              Subscriber      *subscriber)
+{
+  g_print ("subscriber_connection_closed, connection = %p\n", connection);
+  
+  unsubscribe (subscriber);
 }
 
 static gboolean
@@ -169,8 +177,10 @@ handle_subscribe (GVfsDBusMonitor *object,
   subscriber->connection = g_object_ref (g_dbus_method_invocation_get_connection (invocation));
   subscriber->id = g_strdup (g_dbus_method_invocation_get_sender (invocation));
   subscriber->object_path = g_strdup (arg_object_path);
+  subscriber->monitor = g_object_ref (monitor);
+  
+  g_signal_connect (subscriber->connection, "closed", G_CALLBACK (subscriber_connection_closed), subscriber);
 
-  g_object_ref (monitor);
   monitor->priv->subscribers = g_list_prepend (monitor->priv->subscribers, subscriber);
   
   gvfs_dbus_monitor_complete_subscribe (object, invocation);
@@ -199,7 +209,7 @@ handle_unsubscribe (GVfsDBusMonitor *object,
                               arg_object_path,
                               g_dbus_method_invocation_get_sender (invocation)))
         {
-          unsubscribe (monitor, subscriber);
+          unsubscribe (subscriber);
           break;
         }
     }
