@@ -48,7 +48,6 @@ typedef enum
 #define G_VFS_AFP_SERVER_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), G_VFS_TYPE_AFP_SERVER, GVfsAfpServerClass))
 
 typedef struct _GVfsAfpServerClass GVfsAfpServerClass;
-typedef struct _GVfsAfpServer GVfsAfpServer;
 
 struct _GVfsAfpServerClass
 {
