@@ -1,3 +1,11 @@
+Major changes in 1.12.1
+=======================
+* udisks2: Fix some memory leaks
+* gphoto2: Initialize mutex early enough
+* afc: Fix building against libimobiledevice-1.1.2
+* afp: Prevent redefinition of GVfsAfpServer
+* Translation updates
+
 Major changes in 1.12.0
 =======================
 * Translation updates
