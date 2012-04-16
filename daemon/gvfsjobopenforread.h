@@ -47,6 +47,7 @@ struct _GVfsJobOpenForRead
   GVfsBackendHandle backend_handle;
   gboolean can_seek;
   GVfsReadChannel *read_channel;
+  gboolean read_icon;
 
   GPid pid;
 };

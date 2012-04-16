@@ -284,6 +284,7 @@ register_path_cb (GDBusConnection *conn,
   g_signal_connect (skeleton, "handle-pull", G_CALLBACK (g_vfs_job_pull_new_handle), data);
   g_signal_connect (skeleton, "handle-create-directory-monitor", G_CALLBACK (g_vfs_job_create_directory_monitor_new_handle), data);
   g_signal_connect (skeleton, "handle-create-file-monitor", G_CALLBACK (g_vfs_job_create_file_monitor_new_handle), data);
+  g_signal_connect (skeleton, "handle-open-icon-for-read", G_CALLBACK (g_vfs_job_open_icon_for_read_new_handle), data);
   
   error = NULL;
   if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (skeleton),

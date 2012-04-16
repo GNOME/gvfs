@@ -319,6 +319,9 @@
       <arg type='a(suu)' name='list' direction='out'/>
     </method>
     <method name="OpenIconForRead">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='u' name='fd_id' direction='out'/>
+      <arg type='b' name='can_seek' direction='out'/>
     </method>
   </interface>
 

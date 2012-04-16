@@ -20,6 +20,8 @@ $(dbus_built_sources) : Makefile.am dbus-interfaces.xml
 		  org.gtk.GDBus.C.UnixFD true		\
 		--annotate "org.gtk.vfs.Mount.OpenForWrite()"	\
 		  org.gtk.GDBus.C.UnixFD true		\
+		--annotate "org.gtk.vfs.Mount.OpenIconForRead()"	\
+		  org.gtk.GDBus.C.UnixFD true		\
 		dbus-interfaces.xml			\
 		$(NULL)
 

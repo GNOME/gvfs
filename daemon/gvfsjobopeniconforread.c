@@ -28,12 +28,10 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
+#include <gio/gunixfdlist.h>
 #include "gvfsreadchannel.h"
 #include "gvfsjobopeniconforread.h"
-#include "gvfsdbusutils.h"
-#include "gvfsdaemonutils.h"
 
 G_DEFINE_TYPE (GVfsJobOpenIconForRead, g_vfs_job_open_icon_for_read, G_VFS_TYPE_JOB_OPEN_FOR_READ)
 
@@ -63,45 +61,36 @@ g_vfs_job_open_icon_for_read_init (GVfsJobOpenIconForRead *job)
 {
 }
 
-GVfsJob *
-g_vfs_job_open_icon_for_read_new (DBusConnection *connection,
-                                  DBusMessage *message,
-                                  GVfsBackend *backend)
+gboolean
+g_vfs_job_open_icon_for_read_new_handle (GVfsDBusMount *object,
+                                         GDBusMethodInvocation *invocation,
+                                         GUnixFDList *fd_list,
+                                         const gchar *arg_path_data,
+                                         GVfsBackend *backend)
 {
   GVfsJobOpenIconForRead *job;
   GVfsJobOpenForRead *job_open_for_read;
-  DBusMessage *reply;
-  DBusError derror;
-  int path_len;
-  const char *path_data;
+  
+  g_print ("called OpenIconForRead()\n");
 
-  dbus_error_init (&derror);
-  if (!dbus_message_get_args (message, &derror,
-			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
-			      &path_data, &path_len,
-			      0))
-    {
-      reply = dbus_message_new_error (message,
-				      derror.name,
-                                      derror.message);
-      dbus_error_free (&derror);
-
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return NULL;
-    }
-
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
+  
   job = g_object_new (G_VFS_TYPE_JOB_OPEN_ICON_FOR_READ,
-		      "message", message,
-		      "connection", connection,
-		      NULL);
-
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
+  
   job_open_for_read = G_VFS_JOB_OPEN_FOR_READ (job);
 
-  job->icon_id = g_strndup (path_data, path_len);
+  job->icon_id = g_strdup (arg_path_data);
   job_open_for_read->backend = backend;
+  job_open_for_read->read_icon = TRUE;
 
-  return G_VFS_JOB (job);
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
 }
 
 static void

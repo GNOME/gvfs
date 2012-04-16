@@ -186,7 +186,10 @@ create_reply (GVfsJob *job,
       g_error_free (error);
     }
 
-  gvfs_dbus_mount_complete_open_for_read (object, invocation, fd_list, fd_id, open_job->can_seek);
+  if (open_job->read_icon)
+    gvfs_dbus_mount_complete_open_icon_for_read (object, invocation, fd_list, fd_id, open_job->can_seek);
+  else
+    gvfs_dbus_mount_complete_open_for_read (object, invocation, fd_list, fd_id, open_job->can_seek);
   
   /* FIXME: this could cause issues as long as fd_list closes all its fd's when it's finalized */
   close (remote_fd);
