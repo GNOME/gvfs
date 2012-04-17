@@ -33,17 +33,14 @@
 #include <errno.h>
 #include <signal.h>
 
-#include <dbus/dbus.h>
-
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <glib/gprintf.h>
 #include <gio/gio.h>
 
 /* stuff from common/ */
-#include <gdaemonmount.h>
 #include <gvfsdaemonprotocol.h>
-#include <gvfsdbusutils.h>
+#include <gvfsdbus.h>
 
 #define FUSE_USE_VERSION 26
 #include <fuse.h>
@@ -92,6 +89,9 @@ static gid_t           daemon_gid;
 static GMutex          global_mutex          = {NULL};
 static GHashTable     *global_path_to_fh_map = NULL;
 static GHashTable     *global_active_fh_map  = NULL;
+
+static GDBusConnection *dbus_conn            = NULL;
+static guint            daemon_name_watcher;
 
 /* ------- *
  * Helpers *
@@ -2297,50 +2297,50 @@ subthread_main (gpointer data)
   return NULL;
 }
 
-static DBusHandlerResult
-dbus_filter_func (DBusConnection *connection,
-                  DBusMessage    *message,
-                  void           *data)
+static void 
+name_vanished_handler (GDBusConnection *connection,
+                       const gchar *name,
+                       gpointer user_data)
 {
-  if (dbus_message_is_signal (message,
-                              DBUS_INTERFACE_DBUS,
-                              "NameOwnerChanged"))
-    {
-      const char *service, *old_owner, *new_owner;
-      
-      dbus_message_get_args (message,
-                             NULL,
-                             DBUS_TYPE_STRING, &service,
-                             DBUS_TYPE_STRING, &old_owner,
-                             DBUS_TYPE_STRING, &new_owner,
-                             DBUS_TYPE_INVALID);
-      
-      /* Handle monitor owner going away */
-      if (service != NULL &&
-          strcmp (G_VFS_DBUS_DAEMON_NAME, service) == 0 &&
-          *new_owner == 0)
-        {
-          /* The daemon died, unmount */
-          g_main_loop_quit (subthread_main_loop);
-        }
-    }
-  else if (dbus_message_is_signal (message,
-                                   DBUS_INTERFACE_LOCAL,
-                                   "Disconnected"))
-    {
-      /* Session bus died, unmount */
-      g_main_loop_quit (subthread_main_loop);
-    }
+  g_print ("name_vanished_handler()\n");
 
-  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+  /* The daemon died, unmount */
+  g_main_loop_quit (subthread_main_loop);
+}
+
+static void
+dbus_connection_closed (GDBusConnection *connection,
+                        gboolean         remote_peer_vanished,
+                        GError          *error,
+                        gpointer user_data)
+{
+  g_print ("dbus_connection_closed\n");
+  
+  /* Session bus died, unmount */
+  g_main_loop_quit (subthread_main_loop);
+}
+
+static void
+register_fuse_cb (GVfsDBusMountTracker *proxy,
+                  GAsyncResult  *res,
+                  gpointer user_data)
+{
+  GError *error = NULL;
+
+  if (! gvfs_dbus_mount_tracker_call_register_fuse_finish (proxy, res, &error))
+    {
+      g_printerr ("register_fuse_cb: Error sending a message: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+  g_print ("register_fuse_cb\n");
 }
 
 static gpointer
 vfs_init (struct fuse_conn_info *conn)
 {
-	DBusConnection *dbus_conn;
-  DBusMessage *message;
-	DBusError error;
+  GVfsDBusMountTracker *proxy;
+  GError *error;
   
   daemon_creation_time = time (NULL);
   daemon_uid = getuid ();
@@ -2351,39 +2351,49 @@ vfs_init (struct fuse_conn_info *conn)
   global_active_fh_map = g_hash_table_new_full (g_direct_hash, g_direct_equal,
                                                 NULL, NULL);
 
-  dbus_error_init (&error);
-
-  dbus_conn = dbus_bus_get (DBUS_BUS_SESSION, &error);
-  if (dbus_conn == NULL)
+  
+  error = NULL;
+  dbus_conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
+  if (! dbus_conn)
     {
-      g_printerr ("Failed to connect to the D-BUS daemon: %s\n",
-                  error.message);
-      dbus_error_free (&error);
+      g_warning ("Failed to connect to the D-BUS daemon: %s (%s, %d)",
+                 error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+      return NULL;
+    }
+  
+  g_dbus_connection_set_exit_on_close (dbus_conn, FALSE);
+  g_signal_connect (dbus_conn, "closed", G_CALLBACK (dbus_connection_closed), NULL);
+
+  proxy = gvfs_dbus_mount_tracker_proxy_new_sync (dbus_conn,
+                                                  G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                                                  G_VFS_DBUS_DAEMON_NAME,
+                                                  G_VFS_DBUS_MOUNTTRACKER_PATH,
+                                                  NULL,
+                                                  &error);
+  if (proxy == NULL)
+    {
+      g_printerr ("vfs_init(): Error creating proxy: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
       return NULL;
     }
 
-  dbus_connection_set_exit_on_disconnect (dbus_conn, FALSE);
+  /* Allow the gvfs daemon autostart */
+  daemon_name_watcher = g_bus_watch_name_on_connection (dbus_conn,
+                                                        G_VFS_DBUS_DAEMON_NAME,
+                                                        G_BUS_NAME_WATCHER_FLAGS_AUTO_START,
+                                                        NULL,
+                                                        name_vanished_handler,
+                                                        NULL,
+                                                        NULL);
+  
+  gvfs_dbus_mount_tracker_call_register_fuse (proxy,
+                                              NULL,
+                                              (GAsyncReadyCallback) register_fuse_cb,
+                                              NULL);
+  g_object_unref (proxy);
 
-  _g_dbus_connection_integrate_with_main (dbus_conn);
-
-  dbus_bus_add_match (dbus_conn,
-                      "type='signal',sender='" DBUS_SERVICE_DBUS "',"
-                      "interface='" DBUS_INTERFACE_DBUS "',"
-                      "member='NameOwnerChanged',"
-                      "arg0='"G_VFS_DBUS_DAEMON_NAME"'",
-                      NULL);
-  dbus_connection_add_filter (dbus_conn,
-                              dbus_filter_func,
-                              NULL,
-                              NULL);
-
-  message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
-                                          G_VFS_DBUS_MOUNTTRACKER_PATH,
-                                          G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-                                          G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_FUSE);
-  dbus_message_set_auto_start (message, TRUE);
-  dbus_connection_send (dbus_conn, message, NULL);
-  dbus_connection_flush (dbus_conn);
   
   gvfs = g_vfs_get_default ();
   
@@ -2401,6 +2411,11 @@ vfs_init (struct fuse_conn_info *conn)
 static void
 vfs_destroy (gpointer param)
 {
+  if (daemon_name_watcher)
+    g_bus_unwatch_name (daemon_name_watcher);
+  if (dbus_conn)
+    g_object_unref (dbus_conn);
+  
   mount_list_free ();
   if (subthread_main_loop != NULL) 
     g_main_loop_quit (subthread_main_loop);
