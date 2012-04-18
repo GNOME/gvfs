@@ -41,7 +41,8 @@ GVfsUDisks2Volume *gvfs_udisks2_volume_new         (GVfsUDisks2VolumeMonitor   *
                                                     UDisksBlock                *block,
                                                     GUnixMountPoint            *mount_point,
                                                     GVfsUDisks2Drive           *drive,
-                                                    GFile                      *activation_root);
+                                                    GFile                      *activation_root,
+                                                    gboolean                    coldplug);
 void               gvfs_udisks2_volume_removed     (GVfsUDisks2Volume          *volume);
 
 UDisksBlock       *gvfs_udisks2_volume_get_block       (GVfsUDisks2Volume      *volume);

@@ -56,6 +56,9 @@ struct _GVfsUDisks2Volume
   GVfsUDisks2Mount         *mount;   /* owned by volume monitor */
   GVfsUDisks2Drive         *drive;   /* owned by volume monitor */
 
+  /* If TRUE, the volume was discovered at coldplug time */
+  gboolean coldplug;
+
   /* exactly one of these are set */
   UDisksBlock *block;
   GUnixMountPoint *mount_point;
@@ -326,14 +329,18 @@ update_volume (GVfsUDisks2Volume *volume)
            */
           if (udisks_block_get_hint_auto (volume->block))
             {
+              gboolean just_plugged_in = FALSE;
               /* Also, if a volume (partition) appear _much later_ than when media was inserted it
                * can only be because the media was repartitioned. We don't want to automount
                * such volumes. So only mark volumes appearing just after their drive.
+               *
+               * There's a catch here - if the volume was discovered at coldplug-time (typically
+               * when the user desktop session started), we can't use this heuristic
                */
               if (g_get_real_time () - udisks_drive_get_time_media_detected (udisks_drive) < 5 * G_USEC_PER_SEC)
-                {
-                  volume->should_automount = TRUE;
-                }
+                just_plugged_in = TRUE;
+              if (volume->coldplug || just_plugged_in)
+                volume->should_automount = TRUE;
             }
 
           g_object_unref (udisks_drive);
@@ -472,12 +479,14 @@ gvfs_udisks2_volume_new (GVfsUDisks2VolumeMonitor   *monitor,
                          UDisksBlock                *block,
                          GUnixMountPoint            *mount_point,
                          GVfsUDisks2Drive           *drive,
-                         GFile                      *activation_root)
+                         GFile                      *activation_root,
+                         gboolean                    coldplug)
 {
   GVfsUDisks2Volume *volume;
 
   volume = g_object_new (GVFS_TYPE_UDISKS2_VOLUME, NULL);
   volume->monitor = monitor;
+  volume->coldplug = coldplug;
 
   volume->sort_key = g_strdup_printf ("gvfs.time_detected_usec.%" G_GINT64_FORMAT, g_get_real_time ());
 

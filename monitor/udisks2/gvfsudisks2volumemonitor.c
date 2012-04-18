@@ -71,24 +71,30 @@ static void object_list_free (GList *objects);
 static UDisksClient *get_udisks_client_sync (GError **error);
 
 static void update_all               (GVfsUDisks2VolumeMonitor  *monitor,
-                                      gboolean                   emit_changes);
+                                      gboolean                   emit_changes,
+                                      gboolean                   coldplug);
 static void update_drives            (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **added_drives,
-                                      GList                    **removed_drives);
+                                      GList                    **removed_drives,
+                                      gboolean                   coldplug);
 static void update_volumes           (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **added_volumes,
-                                      GList                    **removed_volumes);
+                                      GList                    **removed_volumes,
+                                      gboolean                   coldplug);
 static void update_fstab_volumes     (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **added_volumes,
-                                      GList                    **removed_volumes);
+                                      GList                    **removed_volumes,
+                                      gboolean                   coldplug);
 static void update_mounts            (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **added_mounts,
-                                      GList                    **removed_mounts);
+                                      GList                    **removed_mounts,
+                                      gboolean                   coldplug);
 static void update_discs             (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **added_volumes,
                                       GList                    **removed_volumes,
                                       GList                    **added_mounts,
-                                      GList                    **removed_mounts);
+                                      GList                    **removed_mounts,
+                                      gboolean                   coldplug);
 
 
 static void on_client_changed (UDisksClient *client,
@@ -320,7 +326,7 @@ gvfs_udisks2_volume_monitor_init (GVfsUDisks2VolumeMonitor *monitor)
                     G_CALLBACK (mountpoints_changed),
                     monitor);
 
-  update_all (monitor, FALSE);
+  update_all (monitor, FALSE, TRUE);
 }
 
 static gboolean
@@ -388,7 +394,7 @@ gvfs_udisks2_volume_monitor_update (GVfsUDisks2VolumeMonitor *monitor)
 {
   g_return_if_fail (GVFS_IS_UDISKS2_VOLUME_MONITOR (monitor));
   udisks_client_settle (monitor->client);
-  update_all (monitor, TRUE);
+  update_all (monitor, TRUE, FALSE);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -496,7 +502,7 @@ on_client_changed (UDisksClient  *client,
                    gpointer       user_data)
 {
   GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
-  update_all (monitor, TRUE);
+  update_all (monitor, TRUE, FALSE);
 }
 
 static void
@@ -504,7 +510,7 @@ mountpoints_changed (GUnixMountMonitor *mount_monitor,
                      gpointer           user_data)
 {
   GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
-  update_all (monitor, TRUE);
+  update_all (monitor, TRUE, FALSE);
 }
 
 static void
@@ -512,14 +518,15 @@ mounts_changed (GUnixMountMonitor *mount_monitor,
                 gpointer           user_data)
 {
   GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
-  update_all (monitor, TRUE);
+  update_all (monitor, TRUE, FALSE);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
 update_all (GVfsUDisks2VolumeMonitor *monitor,
-            gboolean                  emit_changes)
+            gboolean                  emit_changes,
+            gboolean                  coldplug)
 {
   GList *added_drives, *removed_drives;
   GList *added_volumes, *removed_volumes;
@@ -532,13 +539,14 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
   added_mounts = NULL;
   removed_mounts = NULL;
 
-  update_drives (monitor, &added_drives, &removed_drives);
-  update_volumes (monitor, &added_volumes, &removed_volumes);
-  update_fstab_volumes (monitor, &added_volumes, &removed_volumes);
-  update_mounts (monitor, &added_mounts, &removed_mounts);
+  update_drives (monitor, &added_drives, &removed_drives, coldplug);
+  update_volumes (monitor, &added_volumes, &removed_volumes, coldplug);
+  update_fstab_volumes (monitor, &added_volumes, &removed_volumes, coldplug);
+  update_mounts (monitor, &added_mounts, &removed_mounts, coldplug);
   update_discs (monitor,
                 &added_volumes, &removed_volumes,
-                &added_mounts, &removed_mounts);
+                &added_mounts, &removed_mounts,
+                coldplug);
 
   if (emit_changes)
     {
@@ -1219,7 +1227,8 @@ find_mount_by_mount_path (GVfsUDisks2VolumeMonitor *monitor,
 static void
 update_drives (GVfsUDisks2VolumeMonitor  *monitor,
                GList                    **added_drives,
-               GList                    **removed_drives)
+               GList                    **removed_drives,
+               gboolean                   coldplug)
 {
   GList *cur_udisks_drives;
   GList *new_udisks_drives;
@@ -1303,7 +1312,8 @@ update_drives (GVfsUDisks2VolumeMonitor  *monitor,
 static void
 update_volumes (GVfsUDisks2VolumeMonitor  *monitor,
                 GList                    **added_volumes,
-                GList                    **removed_volumes)
+                GList                    **removed_volumes,
+                gboolean                   coldplug)
 {
   GList *cur_block_volumes;
   GList *new_block_volumes;
@@ -1369,7 +1379,8 @@ update_volumes (GVfsUDisks2VolumeMonitor  *monitor,
                                             block,
                                             NULL, /* mount_point */
                                             drive,
-                                            NULL); /* activation_root */
+                                            NULL, /* activation_root */
+                                            coldplug);
           if (volume != NULL)
             {
               monitor->volumes = g_list_prepend (monitor->volumes, volume);
@@ -1478,7 +1489,8 @@ mount_point_has_device (GVfsUDisks2VolumeMonitor  *monitor,
 static void
 update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
                       GList                    **added_volumes,
-                      GList                    **removed_volumes)
+                      GList                    **removed_volumes,
+                      gboolean                   coldplug)
 {
   GList *cur_mount_points;
   GList *new_mount_points;
@@ -1543,7 +1555,8 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
                                         NULL,        /* block */
                                         mount_point,
                                         NULL,        /* drive */
-                                        NULL);       /* activation_root */
+                                        NULL,        /* activation_root */
+                                        coldplug);
       if (volume != NULL)
         {
           GVfsUDisks2Mount *mount;
@@ -1573,7 +1586,8 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
 static void
 update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
                GList                    **added_mounts,
-               GList                    **removed_mounts)
+               GList                    **removed_mounts,
+               gboolean                   coldplug)
 {
   GList *cur_mounts;
   GList *new_mounts;
@@ -1689,7 +1703,8 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
               GList                    **added_volumes,
               GList                    **removed_volumes,
               GList                    **added_mounts,
-              GList                    **removed_mounts)
+              GList                    **removed_mounts,
+              gboolean                   coldplug)
 {
   GList *objects;
   GList *cur_disc_drives;
@@ -1790,7 +1805,8 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
                                                 block,
                                                 NULL, /* mount_point */
                                                 find_drive_for_udisks_drive (monitor, udisks_drive),
-                                                activation_root);
+                                                activation_root,
+                                                coldplug);
               if (volume != NULL)
                 {
                   monitor->disc_volumes = g_list_prepend (monitor->disc_volumes, volume);
