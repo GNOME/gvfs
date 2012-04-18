@@ -72,7 +72,13 @@ on_name_acquired (GDBusConnection *connection,
   g_warning ("main.c: Acquired the name %s on the session message bus\n", name);
   already_acquired = TRUE;
 
-  mount_init ();
+  if (! mount_init ())
+    {
+      /* we were not able to properly initialize ourselves, bail out */
+      g_main_loop_quit (loop);
+      return;
+    }
+
   
 #ifdef HAVE_FUSE
   if (!no_fuse)
@@ -194,6 +200,7 @@ main (int argc, char *argv[])
 
   g_main_loop_run (loop);
 
+  mount_finalize ();
 #if 0
   /* FIXME: crashing */
   if (daemon != NULL)

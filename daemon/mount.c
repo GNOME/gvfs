@@ -73,6 +73,9 @@ static GList *mounts = NULL;
 
 static gboolean fuse_available;
 
+static GVfsDBusMountTracker *mount_tracker = NULL;
+
+
 static void lookup_mount (GVfsDBusMountTracker *object,
                           GDBusMethodInvocation *invocation,
                           GMountSpec *spec,
@@ -1020,15 +1023,17 @@ reload_pipes_cb (GIOChannel *io,
   return TRUE;
 }
 
-void
+gboolean
 mount_init (void)
 {
   GDBusConnection *conn;
   struct sigaction sa;
   GIOChannel *io;
-  GVfsDBusMountTracker *mount_tracker;
   GError *error;
+  gboolean res;
   
+  res = TRUE;
+
   read_mountable_config ();
 
   if (pipe (reload_pipes) != -1)
@@ -1050,7 +1055,7 @@ mount_init (void)
       g_warning ("Error connecting to session bus: %s (%s, %d)\n",
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
-      return;  /* FIXME: gracefully return */
+      return FALSE;
     }
   
   mount_tracker = gvfs_dbus_mount_tracker_skeleton_new ();
@@ -1072,9 +1077,20 @@ mount_init (void)
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
       g_object_unref (mount_tracker);
+      mount_tracker = NULL;
+      res = FALSE;
     }
   g_object_unref (conn);
   
-  /* TODO: keep reference for 'mount_tracker' */
+  return res;
 }
 
+void
+mount_finalize (void)
+{
+  if (mount_tracker != NULL)
+    {
+      g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (mount_tracker));
+      g_object_unref (mount_tracker);
+    }
+}

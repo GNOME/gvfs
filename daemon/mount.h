@@ -29,7 +29,8 @@
 
 G_BEGIN_DECLS
 
-void       mount_init             (void);
+gboolean   mount_init             (void);
+void       mount_finalize         (void);
 
 G_END_DECLS
 
