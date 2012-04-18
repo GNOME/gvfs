@@ -277,20 +277,16 @@ unregister_mount_callback (GVfsDBusMountTracker *proxy,
 {
   GVfsBackend *backend;
   GVfsDaemon *daemon;
-  GVfsJob *job = G_VFS_JOB (user_data);
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (user_data);
   GError *error = NULL;
 
-  gvfs_dbus_mount_tracker_call_unregister_mount_finish (proxy,
-                                                        res,
-                                                        &error);
-  g_debug ("unregister_mount_callback, error: %p\n", error);
-  
-  if (error != NULL)
+  g_debug ("unregister_mount_callback\n");
+  if (! gvfs_dbus_mount_tracker_call_unregister_mount_finish (proxy,
+                                                              res,
+                                                              &error))
     {
-      /* If we failed before, don't overwrite the error as this one is not that important */ 
-      if (! job->failed)
-        g_vfs_job_failed_from_error (job, error);
+      g_warning ("Error unregistering mount: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
   
