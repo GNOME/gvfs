@@ -282,19 +282,16 @@ dbus_mount_reply (GVfsDBusMountable *proxy,
                                               res,
                                               &error))
     {
-      g_warning ("dbus_mount_reply: Error from org.gtk.vfs.Mountable.mount(): %s", error->message);
-      g_warning ("dbus_mount_reply: TODO handle not spawned");
-
-      /* FIXME: handle NOT_SPAWNED */
-#if 0
-      if ((dbus_message_is_error (reply, DBUS_ERROR_NAME_HAS_NO_OWNER) ||
-           dbus_message_is_error (reply, DBUS_ERROR_SERVICE_UNKNOWN)) &&
-          !data->spawned)
+      if ((g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_NAME_HAS_NO_OWNER) ||
+           g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_SERVICE_UNKNOWN)) &&
+           !data->spawned)
         spawn_mount (data);
-#endif
-      
-      mount_finish (data, error);
-      g_error_free (error);
+      else
+        {
+          g_warning ("dbus_mount_reply: Error from org.gtk.vfs.Mountable.mount(): %s", error->message);
+          mount_finish (data, error);
+          g_error_free (error);
+        }
     }
   else
     {
@@ -326,14 +323,12 @@ mountable_mount_proxy_cb (GObject *source_object,
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), 
                                     G_VFS_DBUS_MOUNT_TIMEOUT_MSECS);
   
-  g_print ("mountable_mount_with_name: before call_mount\n");
   gvfs_dbus_mountable_call_mount (proxy,
                                   g_mount_spec_to_dbus (data->mount_spec),
                                   data->automount,
                                   g_mount_source_to_dbus (data->source),
                                   NULL,
                                   (GAsyncReadyCallback) dbus_mount_reply, data);
-  g_print ("mountable_mount_with_name: after call_mount\n");
 
   g_object_unref (proxy);
 }
