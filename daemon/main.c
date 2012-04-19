@@ -201,11 +201,9 @@ main (int argc, char *argv[])
   g_main_loop_run (loop);
 
   mount_finalize ();
-#if 0
-  /* FIXME: crashing */
+
   if (daemon != NULL)
     g_object_unref (daemon);
-#endif
   if (name_owner_id != 0)
     g_bus_unown_name (name_owner_id);
   if (loop != NULL)
