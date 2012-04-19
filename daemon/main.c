@@ -183,8 +183,6 @@ main (int argc, char *argv[])
   if (daemon == NULL)
     return 1;
 
-  /* FIXME: a message filter??! */
-  /* Request name only after we've installed the message filter */
   flags = G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT;
   if (replace)
     flags |= G_BUS_NAME_OWNER_FLAGS_REPLACE;
