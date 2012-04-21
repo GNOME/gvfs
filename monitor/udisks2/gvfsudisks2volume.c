@@ -36,6 +36,41 @@
 #include "gvfsudisks2mount.h"
 #include "gvfsudisks2utils.h"
 
+
+#if defined(HAVE_LIBSYSTEMD_LOGIN)
+#include <systemd/sd-login.h>
+
+static const gchar *
+get_seat (void)
+{
+  static gsize once = 0;
+  static char *seat = NULL;
+
+  if (g_once_init_enter (&once))
+    {
+      char *session = NULL;
+      if (sd_pid_get_session (getpid (), &session) == 0)
+        {
+          sd_session_get_seat (session, &seat);
+          /* we intentionally leak seat here... */
+        }
+      g_once_init_leave (&once, (gsize) 1);
+    }
+  return seat;
+}
+
+#else
+
+static const gchar *
+get_seat (void)
+{
+  return NULL;
+}
+
+#endif
+
+
+
 typedef struct _GVfsUDisks2VolumeClass GVfsUDisks2VolumeClass;
 
 struct _GVfsUDisks2VolumeClass
@@ -178,6 +213,43 @@ apply_options_from_fstab (GVfsUDisks2Volume *volume,
 }
 
 static gboolean
+drive_is_on_our_seat (UDisksDrive *drive)
+{
+  gboolean ret = FALSE;
+  const gchar *seat;
+  const gchar *drive_seat = NULL;
+
+  /* assume our own seat if we don't have seat-support or it doesn't work */
+  seat = get_seat ();
+  if (seat == NULL)
+    {
+      ret = TRUE;
+      goto out;
+    }
+
+  /* Assume seat0 if a) device is not tagged; or b) udisks does not
+   * have seat-support.
+   *
+   * Note that seat support was added in udisks 1.95.0 (and so was the
+   * UDISKS_CHECK_VERSION macro) - for now, be compatible with older
+   * versions instead of bumping requirement in configure.ac
+   */
+#ifdef UDISKS_CHECK_VERSION
+# if UDISKS_CHECK_VERSION(1,95,0)
+  drive_seat = udisks_drive_get_seat (drive);
+# endif
+#endif
+  if (drive_seat == NULL || strlen (drive_seat) == 0)
+    drive_seat = "seat0";
+
+  if (g_strcmp0 (seat, drive_seat) == 0)
+    ret = TRUE;
+
+ out:
+  return ret;
+}
+
+static gboolean
 update_volume (GVfsUDisks2Volume *volume)
 {
   gboolean changed;
@@ -314,35 +386,38 @@ update_volume (GVfsUDisks2Volume *volume)
           if (media_icon != NULL)
             g_object_unref (media_icon);
 
-          /* Only automount filesystems from drives of known types/interconnects:
-           *
-           *  - USB
-           *  - Firewire
-           *  - sdio
-           *  - optical discs
-           *
-           * The mantra here is "be careful" - we really don't want to
-           * automount filesystems from all devices in a SAN etc - We
-           * REALLY need to be CAREFUL here.
-           *
-           * Fortunately udisks provides a property just for this.
-           */
-          if (udisks_block_get_hint_auto (volume->block))
+          /* Only automount drives attached to the same seat as we're running on */
+          if (drive_is_on_our_seat (udisks_drive))
             {
-              gboolean just_plugged_in = FALSE;
-              /* Also, if a volume (partition) appear _much later_ than when media was inserted it
-               * can only be because the media was repartitioned. We don't want to automount
-               * such volumes. So only mark volumes appearing just after their drive.
+              /* Only automount filesystems from drives of known types/interconnects:
                *
-               * There's a catch here - if the volume was discovered at coldplug-time (typically
-               * when the user desktop session started), we can't use this heuristic
+               *  - USB
+               *  - Firewire
+               *  - sdio
+               *  - optical discs
+               *
+               * The mantra here is "be careful" - we really don't want to
+               * automount filesystems from all devices in a SAN etc - We
+               * REALLY need to be CAREFUL here.
+               *
+               * Fortunately udisks provides a property just for this.
                */
-              if (g_get_real_time () - udisks_drive_get_time_media_detected (udisks_drive) < 5 * G_USEC_PER_SEC)
-                just_plugged_in = TRUE;
-              if (volume->coldplug || just_plugged_in)
-                volume->should_automount = TRUE;
+              if (udisks_block_get_hint_auto (volume->block))
+                {
+                  gboolean just_plugged_in = FALSE;
+                  /* Also, if a volume (partition) appear _much later_ than when media was inserted it
+                   * can only be because the media was repartitioned. We don't want to automount
+                   * such volumes. So only mark volumes appearing just after their drive.
+                   *
+                   * There's a catch here - if the volume was discovered at coldplug-time (typically
+                   * when the user desktop session started), we can't use this heuristic
+                   */
+                  if (g_get_real_time () - udisks_drive_get_time_media_detected (udisks_drive) < 5 * G_USEC_PER_SEC)
+                    just_plugged_in = TRUE;
+                  if (volume->coldplug || just_plugged_in)
+                    volume->should_automount = TRUE;
+                }
             }
-
           g_object_unref (udisks_drive);
         }
 

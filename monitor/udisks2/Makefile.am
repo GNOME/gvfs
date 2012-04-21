@@ -19,6 +19,7 @@ gvfs_udisks2_volume_monitor_CFLAGS =		\
 	$(GLIB_CFLAGS)                          \
 	$(UDISKS2_CFLAGS)                       \
 	$(GUDEV_CFLAGS)                         \
+	$(LIBSYSTEMD_LOGIN_CFLAGS)		\
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
 	-DG_DISABLE_DEPRECATED			\
@@ -32,6 +33,7 @@ gvfs_udisks2_volume_monitor_LDADD  =		     			      	\
 	$(GLIB_LIBS)                                 			      	\
 	$(UDISKS2_LIBS)                                  			\
 	$(GUDEV_LIBS)                                  			      	\
+	$(LIBSYSTEMD_LOGIN_LIBS)						\
 	$(top_builddir)/common/libgvfscommon.la 			      	\
 	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la 	\
 	$(NULL)
