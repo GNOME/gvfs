@@ -928,6 +928,7 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
   gboolean res;
   char *user, *olduser;
   char *password;
+  char *server_name;
   gboolean anonymous;
   GPasswordSave password_save;
   char *prompt = NULL;
@@ -968,6 +969,9 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
     }
   }
 
+  /* Use utf8_server_name if it exists */
+  server_name = server->utf8_server_name ? server->utf8_server_name : server->server_name;
+  
   while (TRUE)
   {
     GString *str;
@@ -987,10 +991,10 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
     /* create prompt */
     if (initial_user)
       /* Translators: the first %s is the username, the second the host name */
-      g_string_append_printf (str, _("Enter password for afp as %s on %s"), initial_user, server->server_name);
+      g_string_append_printf (str, _("Enter password for afp as %s on %s"), initial_user, server_name);
     else
       /* translators: %s here is the hostname */
-      g_string_append_printf (str, _("Enter password for afp on %s"), server->server_name);
+      g_string_append_printf (str, _("Enter password for afp on %s"), server_name);
 
     prompt = g_string_free (str, FALSE);
 
