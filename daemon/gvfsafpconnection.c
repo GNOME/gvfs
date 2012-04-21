@@ -287,7 +287,10 @@ g_vfs_afp_reply_read_pascal (GVfsAfpReply *reply, char **str)
   }
 
   if (str)
-    *str = g_strndup (reply->data + reply->pos, strsize);
+  {
+    *str = g_convert (reply->data + reply->pos, strsize,
+                      "UTF-8", "MACINTOSH", NULL, NULL, NULL);
+  }
 
   reply->pos += strsize;
   
