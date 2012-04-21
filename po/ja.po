@@ -12,9 +12,9 @@ msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-04-11 11:11+0000\n"
-"PO-Revision-Date: 2012-04-16 16:57+0900\n"
-"Last-Translator: Hajime Taira <htaira@redhat.com>\n"
+"POT-Creation-Date: 2012-04-18 21:37+0000\n"
+"PO-Revision-Date: 2012-04-21 22:17+0900\n"
+"Last-Translator: Jiro Matsuzawa <jmatsuzawa@gnome.org>\n"
 "Language-Team: Japanese <gnome-translation@gnome.gr.jp>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -332,7 +332,7 @@ msgstr "ユーザーのパスワードを変更する必要があります"
 #: ../daemon/gvfsafpserver.c:990
 #, c-format
 msgid "Enter password for afp as %s on %s"
-msgstr "%s$2 での %s$1 の afp パスワードを入力してください"
+msgstr "%2$s での %1$s の afp パスワードを入力してください"
 
 #. translators: %s here is the hostname
 #: ../daemon/gvfsafpserver.c:993
@@ -359,7 +359,7 @@ msgstr "サーバーが未知のエラーコードを返しました: %d"
 #: ../daemon/gvfsafpvolume.c:147
 #, c-format
 msgid "Couldn't mount AFP volume %s on %s"
-msgstr "%s$2 上の AFP ボリューム %s$1 をマウントできません"
+msgstr "%2$s 上の AFP ボリューム %1$s をマウントできません"
 
 #: ../daemon/gvfsafpvolume.c:395 ../daemon/gvfsafpvolume.c:1891
 #: ../daemon/gvfsafpvolume.c:2664 ../daemon/gvfsbackendafc.c:936
@@ -730,13 +730,13 @@ msgstr "無効な属性タイプ (uint32 であるべき)"
 #: ../daemon/gvfsbackendafp.c:2044
 #, c-format
 msgid "AFP volume %s for %s on %s"
-msgstr "%s$3 上の %s$2 の AFP ボリューム %s$1"
+msgstr "%3$s 上の %2$s の AFP ボリューム %1$s"
 
 #. Translators: first %s is volumename and second servername
 #: ../daemon/gvfsbackendafp.c:2049
 #, c-format
 msgid "AFP volume %s on %s"
-msgstr "%s$1 上の AFP ボリューム %s$2"
+msgstr "%1$s 上の AFP ボリューム %2$s"
 
 #: ../daemon/gvfsbackendafp.c:2092
 msgid "No volume specified"
@@ -818,7 +818,7 @@ msgstr "ファイルが存在しています"
 #: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1177 ../monitor/gdu/ggdumount.c:1261
 #: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1091
-#: ../monitor/udisks2/gvfsudisks2volume.c:1278
+#: ../monitor/udisks2/gvfsudisks2volume.c:1287
 msgid "Operation not supported by backend"
 msgstr "バックエンドでサポートしていない操作です"
 
@@ -892,7 +892,7 @@ msgstr "cdda が %s にマウントしました"
 #: ../daemon/gvfsbackendcdda.c:441 ../daemon/gvfsbackendcdda.c:961
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:296
+#: ../monitor/udisks2/gvfsudisks2volume.c:299
 #, c-format
 msgid "Audio Disc"
 msgstr "オーディオディスク"
@@ -990,7 +990,7 @@ msgstr "ファイルをpollできません"
 #: ../daemon/gvfsbackenddav.c:485
 #, c-format
 msgid "WebDAV as %s on %s%s"
-msgstr "%s$2%s$3 での %s$1 の WebDAV 共有"
+msgstr "%2$s%3$s での %1$s の WebDAV 共有"
 
 #. Translators: This is the name of the WebDAV share constructed as
 #. "WebDAV on <hostname>:<port>"; The ":port" part is again the second
@@ -1073,7 +1073,7 @@ msgstr "ネットワーク"
 #: ../daemon/gvfsbackendftp.c:488
 #, c-format
 msgid "Enter password for FTP as %s on %s"
-msgstr "%s$2 での %s$1 の FTP パスワードを入力してください"
+msgstr "%2$s での %1$s の FTP パスワードを入力してください"
 
 #. translators: %s here is the hostname
 #: ../daemon/gvfsbackendftp.c:491
@@ -1090,7 +1090,7 @@ msgstr "%s の FTP"
 #: ../daemon/gvfsbackendftp.c:634
 #, c-format
 msgid "FTP as %s on %s"
-msgstr "%s$2 で %s$1 として FTP"
+msgstr "%2$s で %1$s として FTP"
 
 #: ../daemon/gvfsbackendftp.c:727
 msgid "Insufficient permissions"
@@ -1333,7 +1333,7 @@ msgstr "ネットワークの場所の監視"
 #: ../daemon/gvfsbackendsmb.c:1433
 #, c-format
 msgid "%s on %s"
-msgstr "%s$2 上の %s$1"
+msgstr "%2$s 上の %1$s"
 
 #: ../daemon/gvfsbackendobexftp.c:891
 msgid "USB support missing. Please contact your software vendor"
@@ -1453,7 +1453,7 @@ msgstr "プロトコルのエラーです"
 #: ../daemon/gvfsbackendsftp.c:1691
 #, c-format
 msgid "SFTP for %s on %s"
-msgstr "%s$2 で %s$1 として SFTP"
+msgstr "%2$s で %1$s として SFTP"
 
 #. Translators: This is the name of an SFTP share, like "SFTP on <hostname>"
 #: ../daemon/gvfsbackendsftp.c:1694
@@ -1854,7 +1854,7 @@ msgstr ""
 "デバイス \"%s\" には暗号化されたデータが含まれています。"
 
 #: ../monitor/gdu/ggduvolume.c:1111
-#: ../monitor/udisks2/gvfsudisks2volume.c:1071
+#: ../monitor/udisks2/gvfsudisks2volume.c:1080
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -2190,7 +2190,7 @@ msgstr "実行中の次のコマンドラインがタイムアウトしました
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:243
+#: ../monitor/udisks2/gvfsudisks2volume.c:246
 #, c-format
 msgid "%s Encrypted"
 msgstr "%s 暗号済み"
@@ -2198,22 +2198,22 @@ msgstr "%s 暗号済み"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:256
+#: ../monitor/udisks2/gvfsudisks2volume.c:259
 #, c-format
 msgid "%s Volume"
 msgstr "%s ボリューム"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:408
+#: ../monitor/udisks2/gvfsudisks2volume.c:415
 msgid "Volume"
 msgstr "ボリューム"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:934
+#: ../monitor/udisks2/gvfsudisks2volume.c:943
 msgid "The unlocked device does not have a recognizable filesystem on it"
 msgstr ""
 "ロック解除デバイスは、その上に認識できるファイルシステムを持っていません"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1057
+#: ../monitor/udisks2/gvfsudisks2volume.c:1066
 msgid "A passphrase is required to access the volume"
 msgstr "このボリュームにアクセスするにはパスフレーズが必要です"
 
@@ -2801,7 +2801,7 @@ msgstr "- ツリー状フォーマットでディレクトリの中身を一覧�
 #~ msgstr "AFP サーバー %s への匿名ログインが失敗しました。エラーコード: %d"
 
 #~ msgid "AFP shares for %s on %s"
-#~ msgstr "%s$2 上の %s$1 の AFP 共有"
+#~ msgstr "%2$s 上の %1$s の AFP 共有"
 
 #~ msgid "AFP shares on %s"
 #~ msgstr "%s 上の AFP 共有"
