@@ -120,6 +120,29 @@ void               g_vfs_afp_server_fill_info         (GVfsAfpServer *server,
                                                        gboolean       directory,
                                                        guint16        bitmap);
 
+
+typedef enum
+{
+  GVFS_AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME         = 1,
+  GVFS_AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME        = 2,
+  GVFS_AFP_MAP_ID_FUNCTION_USER_ID_TO_UTF8_NAME    = 3,
+  GVFS_AFP_MAP_ID_FUNCTION_GROUP_ID_TO_UTF8_NAME   = 4,
+  GVFS_AFP_MAP_ID_FUNCTION_USER_UUID_TO_UTF8_NAME  = 5,
+  GVFS_AFP_MAP_ID_FUNCTION_GROUP_UUID_TO_UTF8_NAME = 6
+} GVfsAfpMapIDFunction;
+
+void          g_vfs_afp_server_map_id                 (GVfsAfpServer       *server,
+                                                       GVfsAfpMapIDFunction map_function,
+                                                       gint64               id,
+                                                       GCancellable        *cancellable,
+                                                       GAsyncReadyCallback  callback,
+                                                       gpointer             user_data);
+
+char *        g_vfs_afp_server_map_id_finish          (GVfsAfpServer        *server,
+                                                       GAsyncResult         *res,
+                                                       GVfsAfpMapIDFunction *map_function,
+                                                       GError              **error);
+
 G_END_DECLS
 
 #endif /* _GVFSAFPSERVER_H_ */

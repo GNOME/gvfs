@@ -160,18 +160,6 @@ gboolean     g_vfs_afp_volume_move_and_rename_finish (GVfsAfpVolume  *volume,
                                                       GAsyncResult   *res,
                                                       GError        **error);
 
-void          g_vfs_afp_volume_map_id              (GVfsAfpVolume       *volume,
-                                                    AfpMapIDFunction     map_function,
-                                                    gint64               id,
-                                                    GCancellable        *cancellable,
-                                                    GAsyncReadyCallback  callback,
-                                                    gpointer             user_data);
-
-char *        g_vfs_afp_volume_map_id_finish       (GVfsAfpVolume   *volume,
-                                                    GAsyncResult     *res,
-                                                    AfpMapIDFunction *map_function,
-                                                    GError          **error);
-
 void          g_vfs_afp_volume_get_filedir_parms   (GVfsAfpVolume       *volume,
                                                     const char          *filename,
                                                     guint16              file_bitmap,

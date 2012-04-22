@@ -1822,27 +1822,27 @@ try_query_fs_info (GVfsBackend *backend,
 static void
 get_name_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
-  GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
+  GVfsAfpServer *server = G_VFS_AFP_SERVER (source_object);
   GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
 
   char *name;
-  AfpMapIDFunction map_function;
+  GVfsAfpMapIDFunction map_function;
   guint outstanding_requests;
 
-  name = g_vfs_afp_volume_map_id_finish (volume, res, &map_function, NULL);
+  name = g_vfs_afp_server_map_id_finish (server, res, &map_function, NULL);
   if (name)
   {
     switch (map_function)
     {
-      case AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME:
+      case GVFS_AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME:
         g_file_info_set_attribute_string (job->file_info, G_FILE_ATTRIBUTE_OWNER_USER,
                                           name);
         break;
-      case AFP_MAP_ID_FUNCTION_USER_ID_TO_UTF8_NAME:
+      case GVFS_AFP_MAP_ID_FUNCTION_USER_ID_TO_UTF8_NAME:
         g_file_info_set_attribute_string (job->file_info, G_FILE_ATTRIBUTE_OWNER_USER_REAL,
                                           name);
         break;
-      case AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME:
+      case GVFS_AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME:
         g_file_info_set_attribute_string (job->file_info, G_FILE_ATTRIBUTE_OWNER_GROUP,
                                           name);
         break;
@@ -1908,16 +1908,16 @@ query_info_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpoi
 
     if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_OWNER_USER))
     {
-      g_vfs_afp_volume_map_id (volume,
-                               AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME, uid,
+      g_vfs_afp_server_map_id (afp_backend->server,
+                               GVFS_AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME, uid,
                                G_VFS_JOB (job)->cancellable, get_name_cb, job);
       outstanding_requests++;
     }
     
     if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_OWNER_USER_REAL))
     {
-      g_vfs_afp_volume_map_id (volume,
-                               AFP_MAP_ID_FUNCTION_USER_ID_TO_UTF8_NAME, uid,
+      g_vfs_afp_server_map_id (afp_backend->server,
+                               GVFS_AFP_MAP_ID_FUNCTION_USER_ID_TO_UTF8_NAME, uid,
                                G_VFS_JOB (job)->cancellable, get_name_cb, job);
       outstanding_requests++;
     }
@@ -1930,8 +1930,8 @@ query_info_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpoi
 
     gid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID);
 
-    g_vfs_afp_volume_map_id (volume,
-                             AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME, gid,
+    g_vfs_afp_server_map_id (afp_backend->server,
+                             GVFS_AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME, gid,
                              G_VFS_JOB (job)->cancellable, get_name_cb, job);
     outstanding_requests++;
   }
