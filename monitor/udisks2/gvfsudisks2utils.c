@@ -511,3 +511,86 @@ gvfs_udisks2_utils_spawn_finish (GAsyncResult   *res,
   return ret;
 }
 
+/* ---------------------------------------------------------------------------------------------------- */
+
+#if defined(HAVE_LIBSYSTEMD_LOGIN)
+#include <systemd/sd-login.h>
+
+static const gchar *
+get_seat (void)
+{
+  static gsize once = 0;
+  static char *seat = NULL;
+
+  if (g_once_init_enter (&once))
+    {
+      char *session = NULL;
+      if (sd_pid_get_session (getpid (), &session) == 0)
+        {
+          sd_session_get_seat (session, &seat);
+          free (session);
+          /* we intentionally leak seat here... */
+        }
+      g_once_init_leave (&once, (gsize) 1);
+    }
+  return seat;
+}
+
+#else
+
+static const gchar *
+get_seat (void)
+{
+  return NULL;
+}
+
+#endif
+
+gboolean
+gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive)
+{
+  gboolean ret = FALSE;
+  const gchar *seat;
+  const gchar *drive_seat = NULL;
+
+  /* assume our own seat if we don't have seat-support or it doesn't work */
+  seat = get_seat ();
+  if (seat == NULL)
+    {
+      ret = TRUE;
+      goto out;
+    }
+
+  /* If the device is not tagged, assume that udisks does not have
+   * working seat-support... so just assume it's available at our
+   * seat.
+   *
+   * Note that seat support was added in udisks 1.95.0 (and so was the
+   * UDISKS_CHECK_VERSION macro) - for now, be compatible with older
+   * versions instead of bumping requirement in configure.ac
+   */
+#ifdef UDISKS_CHECK_VERSION
+# if UDISKS_CHECK_VERSION(1,95,0)
+  drive_seat = udisks_drive_get_seat (drive);
+# endif
+#endif
+  if (drive_seat == NULL || strlen (drive_seat) == 0)
+    {
+      ret = TRUE;
+      goto out;
+    }
+
+  /* "all" is special, it means the device is available on any seat */
+  if (g_strcmp0 (drive_seat, "all") == 0)
+    {
+      ret = TRUE;
+      goto out;
+    }
+
+  /* Otherwise, check if it's on our seat */
+  if (g_strcmp0 (seat, drive_seat) == 0)
+    ret = TRUE;
+
+ out:
+  return ret;
+}

@@ -805,6 +805,9 @@ should_include_volume_check_configuration (GVfsUDisks2VolumeMonitor *monitor,
   return ret;
 }
 
+static gboolean should_include_drive (GVfsUDisks2VolumeMonitor *monitor,
+                                      UDisksDrive              *drive);
+
 static gboolean
 should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
                        UDisksBlock              *block,
@@ -813,11 +816,22 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
   gboolean ret = FALSE;
   GDBusObject *object;
   UDisksFilesystem *filesystem;
+  UDisksDrive *udisks_drive = NULL;
   const gchar* const *mount_points;
 
   /* Block:Ignore trumps everything */
   if (udisks_block_get_hint_ignore (block))
     goto out;
+
+  /* ignore the volume if the drive is ignored */
+  udisks_drive = udisks_client_get_drive_for_block (monitor->client, block);
+  if (udisks_drive != NULL)
+    {
+      if (!should_include_drive (monitor, udisks_drive))
+        {
+          goto out;
+        }
+    }
 
   /* show encrypted volumes... */
   if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_LUKS") == 0)
@@ -879,6 +893,7 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
   ret = TRUE;
 
  out:
+  g_clear_object (&udisks_drive);
   return ret;
 }
 
@@ -888,17 +903,26 @@ static gboolean
 should_include_drive (GVfsUDisks2VolumeMonitor *monitor,
                       UDisksDrive              *drive)
 {
-  /* NOTE: For now, we just include all detected drives. This is
-   * probably wrong - non-removable drives without anything visible
-   * (such RAID components) should probably not be shown. Then again,
-   * the GNOME 3 user interface doesn't really show GDrive instances
-   * except for in the computer:/// location in Nautilus.
-   *
-   * Therefore, if device is non-removable, maybe only show it, if it
-   * has more visible devices... this is the gdu volume monitor
-   * behavior.
+  gboolean ret = TRUE;
+
+  /* Don't include drives on other seats */
+  if (!gvfs_udisks2_utils_is_drive_on_our_seat (drive))
+    {
+      ret = FALSE;
+      goto out;
+    }
+
+  /* NOTE: For now, we just include a drive no matter its
+   * content. This may be wrong ... for example non-removable drives
+   * without anything visible (such RAID components) should probably
+   * not be shown. Then again, the GNOME 3 user interface doesn't
+   * really show GDrive instances except for in the computer:///
+   * location in Nautilus....
    */
-  return TRUE;
+
+ out:
+
+  return ret;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1741,6 +1765,9 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
     {
       UDisksDrive *udisks_drive = udisks_object_peek_drive (UDISKS_OBJECT (l->data));
       if (udisks_drive == NULL)
+        continue;
+
+      if (!should_include_drive (monitor, udisks_drive))
         continue;
 
       /* only consider blank and audio discs */
