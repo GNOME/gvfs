@@ -54,6 +54,7 @@
 #include "gvfsjobcopy.h"
 
 #include "gvfsafpserver.h"
+#include "gvfsafpvolume.h"
 
 #include "gvfsbackendafp.h"
 

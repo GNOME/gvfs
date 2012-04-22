@@ -31,6 +31,7 @@
 #endif
 
 #include "gvfskeyring.h"
+#include "gvfsafpvolume.h"
 
 #include "gvfsafpserver.h"
 

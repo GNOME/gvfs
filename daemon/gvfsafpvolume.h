@@ -23,11 +23,10 @@
 #ifndef _GVFSAFPVOLUME_H_
 #define _GVFSAFPVOLUME_H_
 
-#include <glib-object.h>
+#include "gvfsafptypes.h"
+#include "gvfsafpconnection.h"
 
 G_BEGIN_DECLS
-
-typedef struct _GVfsAfpServer GVfsAfpServer;
 
 #define G_VFS_TYPE_AFP_VOLUME             (g_vfs_afp_volume_get_type ())
 #define G_VFS_AFP_VOLUME(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_VFS_TYPE_AFP_VOLUME, GVfsAfpVolume))
@@ -37,7 +36,6 @@ typedef struct _GVfsAfpServer GVfsAfpServer;
 #define G_VFS_AFP_VOLUME_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), G_VFS_TYPE_AFP_VOLUME, GVfsAfpVolumeClass))
 
 typedef struct _GVfsAfpVolumeClass GVfsAfpVolumeClass;
-typedef struct _GVfsAfpVolume GVfsAfpVolume;
 typedef struct _GVfsAfpVolumePrivate GVfsAfpVolumePrivate;
 
 struct _GVfsAfpVolumeClass

@@ -27,7 +27,8 @@
 
 #include "gmountsource.h"
 #include "gvfsafpconnection.h"
-#include "gvfsafpvolume.h"
+
+#include "gvfsafptypes.h"
 
 G_BEGIN_DECLS
 

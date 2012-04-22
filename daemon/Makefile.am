@@ -503,6 +503,7 @@ gvfsd_afp_browse_SOURCES = \
 	gvfsbackendafpbrowse.c gvfsbackendafpbrowse.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c \
+	gvfsafptypes.h \
 	gvfsafputils.c gvfsafputils.h \
 	gvfsafpconnection.h \
 	gvfsafpconnection.c \
@@ -525,6 +526,7 @@ gvfsd_afp_SOURCES = \
 	gvfsbackendafp.c gvfsbackendafp.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c \
+	gvfsafptypes.h \
 	gvfsafputils.c gvfsafputils.h \
 	gvfsafpconnection.h \
 	gvfsafpconnection.c \
