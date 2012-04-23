@@ -547,9 +547,11 @@ get_seat (void)
 #endif
 
 gboolean
-gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive)
+gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive,
+                                         gboolean    *out_shared)
 {
   gboolean ret = FALSE;
+  gboolean shared = FALSE;
   const gchar *seat;
   const gchar *drive_seat = NULL;
 
@@ -584,6 +586,7 @@ gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive)
   if (g_strcmp0 (drive_seat, "all") == 0)
     {
       ret = TRUE;
+      shared = TRUE;
       goto out;
     }
 
@@ -592,5 +595,7 @@ gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive)
     ret = TRUE;
 
  out:
+  if (out_shared != NULL)
+    *out_shared = shared;
   return ret;
 }

@@ -906,7 +906,7 @@ should_include_drive (GVfsUDisks2VolumeMonitor *monitor,
   gboolean ret = TRUE;
 
   /* Don't include drives on other seats */
-  if (!gvfs_udisks2_utils_is_drive_on_our_seat (drive))
+  if (!gvfs_udisks2_utils_is_drive_on_our_seat (drive, NULL))
     {
       ret = FALSE;
       goto out;
