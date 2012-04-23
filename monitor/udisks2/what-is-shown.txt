@@ -43,6 +43,10 @@ encryption options" paragraph in this blog entry
 
  http://davidz25.blogspot.com/2012/03/simpler-faster-better.html
 
+In a multi-seat system, only drives assigned to the seat the session
+is running on is shown. Automounting is turned off for drives attached
+to all seats.
+
 EXAMPLES
 --------
 
