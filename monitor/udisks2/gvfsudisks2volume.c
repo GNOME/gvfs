@@ -31,6 +31,10 @@
 #include <glib/gi18n-lib.h>
 #include <gio/gio.h>
 
+#ifdef HAVE_KEYRING
+#include <gnome-keyring.h>
+#endif
+
 #include "gvfsudisks2drive.h"
 #include "gvfsudisks2volume.h"
 #include "gvfsudisks2mount.h"
@@ -756,6 +760,17 @@ gvfs_udisks2_volume_get_activation_root (GVolume *_volume)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+#ifdef HAVE_KEYRING
+static GnomeKeyringPasswordSchema luks_passphrase_schema =
+{
+  GNOME_KEYRING_ITEM_GENERIC_SECRET,
+  {
+    {"gvfs-luks-uuid", GNOME_KEYRING_ATTRIBUTE_TYPE_STRING},
+    {NULL, 0}
+  }
+};
+#endif
+
 struct MountData
 {
   GSimpleAsyncResult *simple;
@@ -769,9 +784,15 @@ struct MountData
 
   gchar *passphrase;
 
+  gchar *passphrase_from_keyring;
+  GPasswordSave password_save;
+
+  gchar *uuid_of_encrypted_to_unlock;
+  gchar *desc_of_encrypted_to_unlock;
   UDisksEncrypted *encrypted_to_unlock;
   UDisksFilesystem *filesystem_to_mount;
 
+  gboolean checked_keyring;
 };
 
 static void
@@ -795,7 +816,10 @@ mount_data_free (MountData *data)
     }
 
   g_free (data->passphrase);
+  g_free (data->passphrase_from_keyring);
 
+  g_free (data->uuid_of_encrypted_to_unlock);
+  g_free (data->desc_of_encrypted_to_unlock);
   g_clear_object (&data->encrypted_to_unlock);
   g_clear_object (&data->filesystem_to_mount);
   g_free (data);
@@ -912,6 +936,62 @@ do_mount (MountData *data)
 
 /* ------------------------------ */
 
+#ifdef HAVE_KEYRING
+static void
+luks_store_passphrase_cb (GnomeKeyringResult result,
+                          gpointer           user_data)
+{
+  MountData *data = user_data;
+  if (result == GNOME_KEYRING_RESULT_OK)
+    {
+      /* everything is good */
+      do_mount (data);
+    }
+  else
+    {
+      /* report failure */
+      g_simple_async_result_set_error (data->simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_FAILED,
+                                       _("Error storing passphrase in keyring (error code %d)"),
+                                       result);
+      g_simple_async_result_complete (data->simple);
+      mount_data_free (data);
+    }
+}
+#endif
+
+
+static void do_unlock (MountData *data);
+
+
+#ifdef HAVE_KEYRING
+static void
+luks_delete_passphrase_cb (GnomeKeyringResult result,
+                           gpointer           user_data)
+{
+  MountData *data = user_data;
+  if (result == GNOME_KEYRING_RESULT_OK)
+    {
+      /* with the bad passphrase out of the way, try again */
+      g_free (data->passphrase);
+      data->passphrase = NULL;
+      do_unlock (data);
+    }
+  else
+    {
+      /* report failure */
+      g_simple_async_result_set_error (data->simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_FAILED,
+                                       _("Error deleting invalid passphrase from keyring (error code %d)"),
+                                       result);
+      g_simple_async_result_complete (data->simple);
+      mount_data_free (data);
+    }
+}
+#endif
+
 static void
 unlock_cb (GObject       *source_object,
            GAsyncResult  *res,
@@ -927,6 +1007,26 @@ unlock_cb (GObject       *source_object,
                                             res,
                                             &error))
     {
+#ifdef HAVE_KEYRING
+      /* If this failed with a passphrase read from the keyring, try again
+       * this time prompting the user...
+       *
+       * TODO: ideally check against something like UDISKS_ERROR_PASSPHRASE_INVALID
+       * when such a thing is available in udisks
+       */
+      if (data->passphrase_from_keyring != NULL &&
+          g_strcmp0 (data->passphrase, data->passphrase_from_keyring) == 0)
+        {
+          /* nuke the invalid passphrase from keyring... */
+          gnome_keyring_delete_password (&luks_passphrase_schema,
+                                         luks_delete_passphrase_cb,
+                                         data,
+                                         NULL, /* GDestroyNotify */
+                                         "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
+                                         NULL); /* sentinel */
+          goto out;
+        }
+#endif
       gvfs_udisks2_utils_udisks_error_to_gio_error (error);
       g_simple_async_result_take_error (data->simple, error);
       g_simple_async_result_complete (data->simple);
@@ -953,6 +1053,42 @@ unlock_cb (GObject       *source_object,
           goto out;
         }
 
+#ifdef HAVE_KEYRING
+      /* passphrase worked - save it in the keyring if requested */
+      if (data->password_save != G_PASSWORD_SAVE_NEVER)
+        {
+          const gchar *keyring;
+          gchar *display_name;
+
+          switch (data->password_save)
+            {
+            case G_PASSWORD_SAVE_NEVER:
+              g_assert_not_reached ();
+              break;
+            case G_PASSWORD_SAVE_FOR_SESSION:
+              keyring = GNOME_KEYRING_SESSION;
+              break;
+            case G_PASSWORD_SAVE_PERMANENTLY:
+              keyring = GNOME_KEYRING_DEFAULT;
+              break;
+            }
+
+          display_name = g_strdup_printf (_("Encryption passphrase for %s"),
+                                          data->desc_of_encrypted_to_unlock);
+
+          gnome_keyring_store_password (&luks_passphrase_schema,
+                                        keyring,
+                                        display_name,
+                                        data->passphrase,
+                                        luks_store_passphrase_cb,
+                                        data,
+                                        NULL, /* GDestroyNotify */
+                                        "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
+                                        NULL); /* sentinel */
+          goto out;
+        }
+#endif
+
       /* OK, ready to rock */
       do_mount (data);
     }
@@ -960,8 +1096,6 @@ unlock_cb (GObject       *source_object,
  out:
   g_free (cleartext_device);
 }
-
-static void do_unlock (MountData *data);
 
 static void
 on_mount_operation_reply (GMountOperation       *mount_operation,
@@ -1005,6 +1139,9 @@ on_mount_operation_reply (GMountOperation       *mount_operation,
     }
 
   data->passphrase = g_strdup (g_mount_operation_get_password (mount_operation));
+  data->password_save = g_mount_operation_get_password_save (mount_operation);
+
+  /* Don't save password in keyring just yet - check if it works first */
 
   do_unlock (data);
 
@@ -1049,6 +1186,27 @@ has_crypttab_passphrase (MountData *data)
   return ret;
 }
 
+#ifdef HAVE_KEYRING
+static void
+luks_find_passphrase_cb (GnomeKeyringResult result,
+                         const gchar       *string,
+                         gpointer           user_data)
+{
+  MountData *data = user_data;
+
+  /* Don't fail if a keyring error occured - just continue and request
+   * the passphrase from the user...
+   */
+  if (result == GNOME_KEYRING_RESULT_OK)
+    {
+      data->passphrase = g_strdup (string);
+      data->passphrase_from_keyring = g_strdup (string);
+    }
+  /* try again */
+  do_unlock (data);
+}
+#endif
+
 static void
 do_unlock (MountData *data)
 {
@@ -1064,6 +1222,21 @@ do_unlock (MountData *data)
       else
         {
           gchar *message;
+
+#ifdef HAVE_KEYRING
+          /* check if the passphrase is in the user's keyring */
+          if (!data->checked_keyring)
+            {
+              data->checked_keyring = TRUE;
+              gnome_keyring_find_password (&luks_passphrase_schema,
+                                           luks_find_passphrase_cb,
+                                           data,
+                                           NULL, /* GDestroyNotify */
+                                           "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
+                                           NULL); /* sentinel */
+              goto out;
+            }
+#endif
 
           if (data->mount_operation == NULL)
             {
@@ -1084,9 +1257,10 @@ do_unlock (MountData *data)
                                                                        "aborted",
                                                                        G_CALLBACK (on_mount_operation_aborted),
                                                                        data);
-          message = g_strdup_printf (_("Enter a password to unlock the volume\n"
-                                       "The device %s contains encrypted data."),
-                                     udisks_block_get_device (data->volume->block));
+          /* Translators: This is the message shown to users */
+          message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
+                                       "The passphrase is needed to access encrypted data on %s."),
+                                     data->desc_of_encrypted_to_unlock);
 
           /* NOTE: We (currently) don't offer the user to save the
            * passphrase in the keyring or /etc/crypttab - compared to
@@ -1109,7 +1283,7 @@ do_unlock (MountData *data)
                                  NULL,
                                  NULL,
                                  G_ASK_PASSWORD_NEED_PASSWORD |
-                                 0/*G_ASK_PASSWORD_SAVING_SUPPORTED*/);
+                                 G_ASK_PASSWORD_SAVING_SUPPORTED);
           g_free (message);
           goto out;
         }
@@ -1209,6 +1383,45 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
       data->encrypted_to_unlock = udisks_object_get_encrypted (UDISKS_OBJECT (object));
       if (data->encrypted_to_unlock != NULL)
         {
+          UDisksDrive *udisks_drive;
+
+          /* This description is used in both the prompt and the display-name of
+           * the key stored in the user's keyring ...
+           *
+           * NOTE: we want a little bit more detail than what g_drive_get_name()
+           * gives us, since this is going to be used to refer to the device even
+           * when not plugged in
+           */
+          udisks_drive = udisks_client_get_drive_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                                            block);
+          if (udisks_drive != NULL)
+            {
+              gchar *drive_name;
+              gchar *drive_desc;
+              udisks_client_get_drive_info (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                            udisks_drive,
+                                            &drive_name,
+                                            &drive_desc,
+                                            NULL,  /* drive_icon */
+                                            NULL,  /* media_desc */
+                                            NULL); /* media_icon */
+              /* Translators: this is used to describe the drive the encrypted media
+               * is on - the first %s is the name (such as 'WD 2500JB External'), the
+               * second %s is the description ('250 GB Hard Disk').
+               */
+              data->desc_of_encrypted_to_unlock = g_strdup_printf (_("%s (%s)"),
+                                                                   drive_name,
+                                                                   drive_desc);
+              g_free (drive_desc);
+              g_free (drive_name);
+              g_object_unref (udisks_drive);
+            }
+          else
+            {
+              data->desc_of_encrypted_to_unlock = udisks_block_dup_preferred_device (block);
+            }
+          data->uuid_of_encrypted_to_unlock = udisks_block_dup_id_uuid (block);
+
           do_unlock (data);
           goto out;
         }
