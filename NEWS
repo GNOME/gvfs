@@ -1,3 +1,10 @@
+Major changes in 1.12.2
+=======================
+* udisks2: Set should_automount correctly when starting up
+* afp: Convert pascal strings into utf-8
+* afp: Use the UTF-8 server name for password dialogs when it's available
+* Translation updates
+
 Major changes in 1.12.1
 =======================
 * udisks2: Fix some memory leaks
