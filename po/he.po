@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-01-28 12:48+0200\n"
-"PO-Revision-Date: 2012-01-28 12:53+0200\n"
+"POT-Creation-Date: 2012-04-27 03:00+0300\n"
+"PO-Revision-Date: 2012-04-27 03:01+0200\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Gezer (Hebrew)\n"
 "Language: he\n"
@@ -76,15 +76,15 @@ msgid "Invalid filename %s"
 msgstr "Invalid filename %s"
 
 #: ../client/gdaemonfile.c:2256
-#: ../client/gdaemonvfs.c:1198
-#: ../client/gdaemonvfs.c:1333
-#: ../client/gdaemonvfs.c:1386
+#: ../client/gdaemonvfs.c:1202
+#: ../client/gdaemonvfs.c:1337
+#: ../client/gdaemonvfs.c:1390
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Error setting file metadata: %s"
 
 #: ../client/gdaemonfile.c:2257
-#: ../client/gdaemonvfs.c:1387
+#: ../client/gdaemonvfs.c:1391
 msgid "values must be string or list of strings"
 msgstr "values must be string or list of strings"
 
@@ -158,12 +158,12 @@ msgstr "End of stream"
 msgid "Seek not supported on stream"
 msgstr "Seek not supported on stream"
 
-#: ../client/gdaemonvfs.c:830
+#: ../client/gdaemonvfs.c:834
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Error while getting mount info: %s"
 
-#: ../client/gdaemonvfs.c:1199
+#: ../client/gdaemonvfs.c:1203
 msgid "Can't contact session bus"
 msgstr "Can't contact session bus"
 
@@ -293,11 +293,11 @@ msgstr "mountpoint for %s already running"
 msgid "error starting mount daemon"
 msgstr "error starting mount daemon"
 
-#: ../daemon/gvfsafpconnection.c:1409
+#: ../daemon/gvfsafpconnection.c:1412
 msgid "Connection unexpectedly went down"
 msgstr "החיבור פסק באופן פתאומי"
 
-#: ../daemon/gvfsafpconnection.c:1436
+#: ../daemon/gvfsafpconnection.c:1439
 msgid "Got EOS"
 msgstr "התקבל אות סיום התשדורת (EOS)"
 
@@ -370,18 +370,18 @@ msgid "User's password needs to be changed"
 msgstr "ססמת המשתמש חייבת להתחלף"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsafpserver.c:990
+#: ../daemon/gvfsafpserver.c:994
 #, c-format
 msgid "Enter password for afp as %s on %s"
 msgstr "נא להזין ססמה עבור ה־AFP עבור %s ב־%s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:993
+#: ../daemon/gvfsafpserver.c:997
 #, c-format
 msgid "Enter password for afp on %s"
 msgstr "נא להזין ססמה עבור ה־AFP ב־%s"
 
-#: ../daemon/gvfsafpserver.c:1025
+#: ../daemon/gvfsafpserver.c:1029
 #: ../daemon/gvfsbackendftp.c:518
 #: ../daemon/gvfsbackendsftp.c:985
 #: ../daemon/gvfsbackendsmbbrowse.c:995
@@ -407,7 +407,7 @@ msgstr "לא ניתן לעגן את כרך ה־AFP‏ %s על גבי %s"
 #: ../daemon/gvfsafpvolume.c:395
 #: ../daemon/gvfsafpvolume.c:1891
 #: ../daemon/gvfsafpvolume.c:2664
-#: ../daemon/gvfsbackendafc.c:928
+#: ../daemon/gvfsbackendafc.c:936
 #: ../daemon/gvfsbackendafpbrowse.c:189
 #: ../daemon/gvfsbackendafpbrowse.c:322
 #: ../daemon/gvfsbackendafpbrowse.c:354
@@ -434,7 +434,7 @@ msgstr "קובץ לא קיים"
 #: ../daemon/gvfsbackendafp.c:275
 #: ../daemon/gvfsbackendafp.c:476
 #: ../daemon/gvfsbackendafp.c:1316
-#: ../daemon/gvfsbackenddav.c:2201
+#: ../daemon/gvfsbackenddav.c:2210
 #: ../daemon/gvfsbackendftp.c:773
 #: ../daemon/gvfsbackendsftp.c:2333
 #: ../daemon/gvfsbackendsftp.c:3069
@@ -453,8 +453,8 @@ msgid "Target file is open"
 msgstr "קובץ היעד פתוח"
 
 #: ../daemon/gvfsafpvolume.c:672
-#: ../daemon/gvfsbackendburn.c:425
-#: ../daemon/gvfsbackenddav.c:2550
+#: ../daemon/gvfsbackendburn.c:420
+#: ../daemon/gvfsbackenddav.c:2559
 #: ../daemon/gvfsbackendsftp.c:1828
 msgid "Directory not empty"
 msgstr "ספרייה לא ריקה"
@@ -490,9 +490,9 @@ msgstr "אין די מקום על הכרך"
 #: ../daemon/gvfsafpvolume.c:1567
 #: ../daemon/gvfsbackendafp.c:282
 #: ../daemon/gvfsbackendafp.c:483
-#: ../daemon/gvfsbackenddav.c:2257
-#: ../daemon/gvfsbackenddav.c:2510
-#: ../daemon/gvfsbackenddav.c:2621
+#: ../daemon/gvfsbackenddav.c:2266
+#: ../daemon/gvfsbackenddav.c:2519
+#: ../daemon/gvfsbackenddav.c:2630
 #: ../daemon/gvfsbackendftp.c:752
 #: ../daemon/gvfsbackendftp.c:933
 #: ../daemon/gvfsbackendftp.c:1372
@@ -648,11 +648,11 @@ msgstr "שגיאת libimobiledevice: לא נמצא התקן. נא לוודא ש�
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "שגיאת libimobiledevice בלתי מטופלת (%d)"
 
-#: ../daemon/gvfsbackendafc.c:382
+#: ../daemon/gvfsbackendafc.c:390
 msgid "Try again"
 msgstr "ניסיון חוזר"
 
-#: ../daemon/gvfsbackendafc.c:382
+#: ../daemon/gvfsbackendafc.c:390
 #: ../daemon/gvfsbackend.c:963
 #: ../monitor/gdu/ggdudrive.c:1024
 #: ../monitor/gdu/ggdumount.c:926
@@ -660,10 +660,10 @@ msgstr "ניסיון חוזר"
 msgid "Cancel"
 msgstr "ביטול"
 
-#: ../daemon/gvfsbackendafc.c:400
+#: ../daemon/gvfsbackendafc.c:408
 #: ../daemon/gvfsbackendarchive.c:550
 #: ../daemon/gvfsbackendarchive.c:579
-#: ../daemon/gvfsbackenddav.c:1797
+#: ../daemon/gvfsbackenddav.c:1806
 #: ../daemon/gvfsbackendhttp.c:309
 #: ../daemon/gvfsbackendobexftp.c:862
 #: ../daemon/gvfsbackendobexftp.c:878
@@ -672,27 +672,27 @@ msgstr "ביטול"
 msgid "Invalid mount spec"
 msgstr "הגדרת עיגון שגויה"
 
-#: ../daemon/gvfsbackendafc.c:406
-#: ../daemon/gvfsbackendafc.c:436
+#: ../daemon/gvfsbackendafc.c:414
+#: ../daemon/gvfsbackendafc.c:444
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "מיקום ה־AFC שגוי: חייב להיות בצורה afc://uuid:port-number"
 
-#: ../daemon/gvfsbackendafc.c:422
+#: ../daemon/gvfsbackendafc.c:430
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "התקן נייד של Apple"
 
-#: ../daemon/gvfsbackendafc.c:427
+#: ../daemon/gvfsbackendafc.c:435
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "התקן נייד של Apple, פרוץ (Jailbroken)"
 
-#: ../daemon/gvfsbackendafc.c:432
+#: ../daemon/gvfsbackendafc.c:440
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "מסמכים על התקן נייד של Apple"
 
-#: ../daemon/gvfsbackendafc.c:490
+#: ../daemon/gvfsbackendafc.c:498
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (פרוץ)"
@@ -700,7 +700,7 @@ msgstr "%s (פרוץ)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:497
+#: ../daemon/gvfsbackendafc.c:505
 #: ../monitor/afc/afcvolume.c:125
 #, c-format
 msgid "Documents on %s"
@@ -709,12 +709,12 @@ msgstr "מסמכים על %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:579
+#: ../daemon/gvfsbackendafc.c:587
 #, c-format
 msgid "The device '%s' is locked. Enter the passcode on the device and click 'Try again'."
 msgstr "ההתקן '%s' נעול. יש להזין את הססמה בהתקן וללחוץ על 'ניסיון חוזר'."
 
-#: ../daemon/gvfsbackendafc.c:918
+#: ../daemon/gvfsbackendafc.c:926
 #: ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645
 #: ../daemon/gvfsbackendgphoto2.c:1808
@@ -724,16 +724,16 @@ msgstr "ההתקן '%s' נעול. יש להזין את הססמה בהתקן ו�
 msgid "Can't open directory"
 msgstr "לא ניתן לפתוח ספרייה"
 
-#: ../daemon/gvfsbackendafc.c:1119
-#: ../daemon/gvfsbackendafc.c:2462
+#: ../daemon/gvfsbackendafc.c:1127
+#: ../daemon/gvfsbackendafc.c:2470
 msgid "Backups are not yet supported."
 msgstr "גיבויים עדיין לא נתמכים."
 
-#: ../daemon/gvfsbackendafc.c:1291
+#: ../daemon/gvfsbackendafc.c:1299
 msgid "Invalid seek type"
 msgstr "סוג החיפוש בלתי תקין"
 
-#: ../daemon/gvfsbackendafc.c:2299
+#: ../daemon/gvfsbackendafc.c:2307
 #: ../daemon/gvfsbackendafp.c:1755
 #: ../daemon/gvfsbackendftp.c:1087
 #: ../daemon/gvfsbackendftp.c:1135
@@ -777,14 +777,14 @@ msgid "Apple Filing Protocol Service"
 msgstr "שירות ניהול הקבצים של Apple"
 
 #: ../daemon/gvfsbackendafp.c:272
-#: ../daemon/gvfsbackendburn.c:876
+#: ../daemon/gvfsbackendburn.c:871
 #: ../daemon/gvfsbackendftp.c:1544
 #: ../daemon/gvfsbackendobexftp.c:1779
 msgid "Can't copy directory over directory"
 msgstr "לא ניתן להעתיק תיקייה על גבי תיקייה"
 
 #: ../daemon/gvfsbackendafp.c:291
-#: ../daemon/gvfsbackendburn.c:892
+#: ../daemon/gvfsbackendburn.c:887
 #: ../daemon/gvfsbackendftp.c:1567
 #: ../daemon/gvfsbackendobexftp.c:1794
 msgid "Can't recursively copy directory"
@@ -807,7 +807,7 @@ msgid "Unable to create temporary file (%s)"
 msgstr "לא ניתן לייצר קובץ זמני (%s)"
 
 #: ../daemon/gvfsbackendafp.c:1323
-#: ../daemon/gvfsbackenddav.c:2330
+#: ../daemon/gvfsbackenddav.c:2339
 #: ../daemon/gvfsbackendsftp.c:3421
 #: ../daemon/gvfsbackendsmb.c:1148
 msgid "The file was externally modified"
@@ -846,7 +846,7 @@ msgid "/ on %s"
 msgstr "/ ב־%s"
 
 #: ../daemon/gvfsbackendarchive.c:785
-#: ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendburn.c:675
 #: ../daemon/gvfsbackendcomputer.c:714
 #: ../daemon/gvfsbackenddnssd.c:445
 #: ../daemon/gvfsbackendftp.c:351
@@ -861,21 +861,21 @@ msgstr "הקובץ אינו ספרייה"
 msgid "Burn"
 msgstr "צרוב"
 
-#: ../daemon/gvfsbackendburn.c:376
+#: ../daemon/gvfsbackendburn.c:371
 msgid "Unable to create temporary directory"
 msgstr "לא ניתן ליצור ספרייה זמנית"
 
-#: ../daemon/gvfsbackendburn.c:405
-#: ../daemon/gvfsbackendburn.c:416
-#: ../daemon/gvfsbackendburn.c:451
-#: ../daemon/gvfsbackendburn.c:672
-#: ../daemon/gvfsbackendburn.c:717
-#: ../daemon/gvfsbackendburn.c:743
-#: ../daemon/gvfsbackendburn.c:781
-#: ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008
+#: ../daemon/gvfsbackendburn.c:400
+#: ../daemon/gvfsbackendburn.c:411
+#: ../daemon/gvfsbackendburn.c:446
+#: ../daemon/gvfsbackendburn.c:667
+#: ../daemon/gvfsbackendburn.c:712
+#: ../daemon/gvfsbackendburn.c:738
+#: ../daemon/gvfsbackendburn.c:776
+#: ../daemon/gvfsbackendburn.c:967
+#: ../daemon/gvfsbackendburn.c:1003
 #: ../daemon/gvfsbackendftp.c:793
-#: ../daemon/gvfsbackendgphoto2.c:1203
+#: ../daemon/gvfsbackendgphoto2.c:1205
 #: ../daemon/gvfsbackendgphoto2.c:2129
 #: ../daemon/gvfsbackendgphoto2.c:2848
 #: ../daemon/gvfsbackendsftp.c:1836
@@ -887,28 +887,28 @@ msgstr "לא ניתן ליצור ספרייה זמנית"
 msgid "No such file or directory"
 msgstr "אין קובץ או תיקייה כאלו"
 
-#: ../daemon/gvfsbackendburn.c:459
-#: ../daemon/gvfsbackendburn.c:904
+#: ../daemon/gvfsbackendburn.c:454
+#: ../daemon/gvfsbackendburn.c:899
 #: ../daemon/gvfsbackendobexftp.c:1810
 msgid "Can't copy file over directory"
 msgstr "לא ניתן להעתיק קובץ על גבי תיקייה"
 
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendburn.c:651
+#: ../daemon/gvfsbackendburn.c:646
 msgid "CD/DVD Creator"
 msgstr "יוצר CD/DVD"
 
-#: ../daemon/gvfsbackendburn.c:753
-#: ../daemon/gvfsbackendburn.c:789
-#: ../daemon/gvfsbackendburn.c:924
-#: ../daemon/gvfsbackendburn.c:986
-#: ../daemon/gvfsbackendburn.c:990
-#: ../daemon/gvfsbackendburn.c:1000
+#: ../daemon/gvfsbackendburn.c:748
+#: ../daemon/gvfsbackendburn.c:784
+#: ../daemon/gvfsbackendburn.c:919
+#: ../daemon/gvfsbackendburn.c:981
+#: ../daemon/gvfsbackendburn.c:985
+#: ../daemon/gvfsbackendburn.c:995
 #: ../daemon/gvfsbackendgphoto2.c:2922
 msgid "File exists"
 msgstr "קובץ קיים"
 
-#: ../daemon/gvfsbackendburn.c:828
+#: ../daemon/gvfsbackendburn.c:823
 #: ../daemon/gvfsjobcloseread.c:112
 #: ../daemon/gvfsjobclosewrite.c:120
 #: ../daemon/gvfsjobcopy.c:171
@@ -950,15 +950,15 @@ msgstr "קובץ קיים"
 #: ../monitor/gdu/ggdumount.c:1261
 #: ../monitor/gdu/ggduvolume.c:1617
 #: ../monitor/udisks2/gvfsudisks2mount.c:1091
-#: ../monitor/udisks2/gvfsudisks2volume.c:1252
+#: ../monitor/udisks2/gvfsudisks2volume.c:1507
 msgid "Operation not supported by backend"
 msgstr "הפעולה לא נתמכת על ידי המנוע"
 
-#: ../daemon/gvfsbackendburn.c:853
+#: ../daemon/gvfsbackendburn.c:848
 msgid "No such file or directory in target path"
 msgstr "אין כזה קובץ או תיקייה בנתיב היעד"
 
-#: ../daemon/gvfsbackendburn.c:885
+#: ../daemon/gvfsbackendburn.c:880
 #: ../daemon/gvfsbackendobexftp.c:1787
 #: ../daemon/gvfsbackendobexftp.c:1818
 #: ../daemon/gvfsbackendsftp.c:1830
@@ -966,7 +966,7 @@ msgstr "אין כזה קובץ או תיקייה בנתיב היעד"
 msgid "Target file exists"
 msgstr "קובץ היעד קיים"
 
-#: ../daemon/gvfsbackendburn.c:950
+#: ../daemon/gvfsbackendburn.c:945
 #: ../daemon/gvfsbackendcomputer.c:794
 #: ../daemon/gvfsbackendgphoto2.c:2502
 #: ../daemon/gvfsbackendgphoto2.c:2711
@@ -992,22 +992,22 @@ msgstr ""
 "תכנה אחת או יותר מעסיקות את הכרך."
 
 #: ../daemon/gvfsbackendcdda.c:332
-#: ../daemon/gvfsbackendgphoto2.c:1506
+#: ../daemon/gvfsbackendgphoto2.c:1508
 msgid "Cannot create gudev client"
 msgstr "לא ניתן ליצור לקוח gudev"
 
 #: ../daemon/gvfsbackendcdda.c:352
-#: ../daemon/gvfsbackendgphoto2.c:1524
+#: ../daemon/gvfsbackendgphoto2.c:1526
 msgid "Cannot connect to the system bus"
 msgstr "Cannot connect to the system bus"
 
 #: ../daemon/gvfsbackendcdda.c:363
-#: ../daemon/gvfsbackendgphoto2.c:1536
+#: ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Cannot create libhal context"
 msgstr "Cannot create libhal context"
 
 #: ../daemon/gvfsbackendcdda.c:377
-#: ../daemon/gvfsbackendgphoto2.c:1549
+#: ../daemon/gvfsbackendgphoto2.c:1551
 msgid "Cannot initialize libhal"
 msgstr "Cannot initialize libhal"
 
@@ -1039,7 +1039,7 @@ msgstr "חיבור cdda על %s"
 #: ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225
 #: ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:296
+#: ../monitor/udisks2/gvfsudisks2volume.c:305
 #, c-format
 msgid "Audio Disc"
 msgstr "תקליטור שמע"
@@ -1159,7 +1159,7 @@ msgid "WebDAV on %s%s"
 msgstr "‏WebDAV ב־%s%s"
 
 #: ../daemon/gvfsbackenddav.c:668
-#: ../daemon/gvfsbackenddav.c:1864
+#: ../daemon/gvfsbackenddav.c:1873
 #: ../daemon/gvfsbackendhttp.c:255
 #, c-format
 msgid "HTTP Error: %s"
@@ -1177,39 +1177,39 @@ msgstr "Empty response"
 msgid "Unexpected reply from server"
 msgstr "Unexpected reply from server"
 
-#: ../daemon/gvfsbackenddav.c:1373
-#: ../daemon/gvfsbackenddav.c:1999
-#: ../daemon/gvfsbackenddav.c:2086
-#: ../daemon/gvfsbackenddav.c:2193
+#: ../daemon/gvfsbackenddav.c:1382
+#: ../daemon/gvfsbackenddav.c:2008
+#: ../daemon/gvfsbackenddav.c:2095
+#: ../daemon/gvfsbackenddav.c:2202
 msgid "Response invalid"
 msgstr "Response invalid"
 
-#: ../daemon/gvfsbackenddav.c:1516
+#: ../daemon/gvfsbackenddav.c:1525
 msgid "WebDAV share"
 msgstr "שיתוף WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1518
+#: ../daemon/gvfsbackenddav.c:1527
 #, c-format
 msgid "Enter password for %s"
 msgstr "הזנת ססמה עבור %s"
 
-#: ../daemon/gvfsbackenddav.c:1521
+#: ../daemon/gvfsbackenddav.c:1530
 msgid "Please enter proxy password"
 msgstr "נא להזין את ססמת המתווך"
 
-#: ../daemon/gvfsbackenddav.c:1868
-#: ../daemon/gvfsbackenddav.c:1872
+#: ../daemon/gvfsbackenddav.c:1877
+#: ../daemon/gvfsbackenddav.c:1881
 msgid "Not a WebDAV enabled share"
 msgstr "שיתוף זה אינו תומך ב־WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1953
-#: ../daemon/gvfsbackenddav.c:2041
-#: ../daemon/gvfsbackenddav.c:2114
-#: ../daemon/gvfsbackenddav.c:2227
+#: ../daemon/gvfsbackenddav.c:1962
+#: ../daemon/gvfsbackenddav.c:2050
+#: ../daemon/gvfsbackenddav.c:2123
+#: ../daemon/gvfsbackenddav.c:2236
 msgid "Could not create request"
 msgstr "לא ניתן ליצור בקשה"
 
-#: ../daemon/gvfsbackenddav.c:2361
+#: ../daemon/gvfsbackenddav.c:2370
 #: ../daemon/gvfsbackendsmb.c:1184
 #: ../daemon/gvfsbackendsmb.c:2099
 msgid "Backup file creation failed"
@@ -1292,15 +1292,15 @@ msgid "%s: %d: Not Supported"
 msgstr "‏%s: ‏%d: לא נתמך"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:716
-#: ../daemon/gvfsbackendgphoto2.c:722
+#: ../daemon/gvfsbackendgphoto2.c:718
+#: ../daemon/gvfsbackendgphoto2.c:724
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "מצלמה דיגיטלית (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:945
+#: ../daemon/gvfsbackendgphoto2.c:947
 #: ../monitor/gphoto2/ggphoto2volume.c:197
 #: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
@@ -1309,60 +1309,60 @@ msgstr "מצלמה של %s"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:948
+#: ../daemon/gvfsbackendgphoto2.c:950
 #: ../monitor/gphoto2/ggphoto2volume.c:192
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "נגן שמע של %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:957
+#: ../daemon/gvfsbackendgphoto2.c:959
 #: ../monitor/gphoto2/ggphoto2volume.c:203
 #: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "מצלמה"
 
-#: ../daemon/gvfsbackendgphoto2.c:959
+#: ../daemon/gvfsbackendgphoto2.c:961
 #: ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "נגן שמע"
 
-#: ../daemon/gvfsbackendgphoto2.c:1565
+#: ../daemon/gvfsbackendgphoto2.c:1567
 msgid "No device specified"
 msgstr "לא צוין התקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1586
+#: ../daemon/gvfsbackendgphoto2.c:1588
 msgid "Cannot create gphoto2 context"
 msgstr "לא ניתן ליצור הקשר gphoto2"
 
-#: ../daemon/gvfsbackendgphoto2.c:1596
+#: ../daemon/gvfsbackendgphoto2.c:1598
 msgid "Error creating camera"
 msgstr "שגיאה ביצירת מצלמה"
 
-#: ../daemon/gvfsbackendgphoto2.c:1609
-#: ../daemon/gvfsbackendgphoto2.c:1619
+#: ../daemon/gvfsbackendgphoto2.c:1611
+#: ../daemon/gvfsbackendgphoto2.c:1621
 msgid "Error loading device information"
 msgstr "שגיאה בטעינת נתוני ההתקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1631
+#: ../daemon/gvfsbackendgphoto2.c:1633
 msgid "Error looking up device information"
 msgstr "שגיאה בחיפוש נתוני ההתקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1641
+#: ../daemon/gvfsbackendgphoto2.c:1643
 msgid "Error getting device information"
 msgstr "שגיאה בקבלת נתוני ההתקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1654
+#: ../daemon/gvfsbackendgphoto2.c:1656
 msgid "Error setting up camera communications port"
 msgstr "שגיאה בהגדרת שער התקשורת של המצלמה"
 
-#: ../daemon/gvfsbackendgphoto2.c:1665
+#: ../daemon/gvfsbackendgphoto2.c:1667
 msgid "Error initializing camera"
 msgstr "שגיאה באתחול המצלמה"
 
 #. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
 #. backend and shouldn't be translated.
-#: ../daemon/gvfsbackendgphoto2.c:1680
+#: ../daemon/gvfsbackendgphoto2.c:1682
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "חיבור gphoto2 על %s"
@@ -1885,7 +1885,7 @@ msgstr "קישורים סימבוליים לא נתמכים על ידי המנו
 msgid "Invalid dbus message"
 msgstr "Invalid dbus message"
 
-#: ../daemon/gvfsjobunmount.c:156
+#: ../daemon/gvfsjobunmount.c:159
 msgid "Filesystem is busy"
 msgstr "מערכת הקבצים עסוקה"
 
@@ -1939,25 +1939,25 @@ msgstr "Try \"%s --help\" for more information."
 msgid "Invalid arguments from spawned child"
 msgstr "ארגומנטים בלתי תקניים מצאצא שהופעל"
 
-#: ../daemon/mount.c:779
+#: ../daemon/mount.c:783
 #, c-format
 msgid "Automount failed: %s"
 msgstr "חיבור אוטומטי נכשל: %s"
 
-#: ../daemon/mount.c:825
-#: ../daemon/mount.c:903
+#: ../daemon/mount.c:829
+#: ../daemon/mount.c:907
 msgid "The specified location is not mounted"
 msgstr "המיקום שצויין אינו מחובר"
 
-#: ../daemon/mount.c:830
+#: ../daemon/mount.c:834
 msgid "The specified location is not supported"
 msgstr "המיקום שצויין אינו נתמך"
 
-#: ../daemon/mount.c:1045
+#: ../daemon/mount.c:1049
 msgid "Location is already mounted"
 msgstr "המיקום כבר מחובר"
 
-#: ../daemon/mount.c:1053
+#: ../daemon/mount.c:1057
 msgid "Location is not mountable"
 msgstr "המיקום אינו מחובר"
 
@@ -2071,7 +2071,6 @@ msgstr ""
 "ההתקן \"%s\" מכיל נתונים מוצפנים."
 
 #: ../monitor/gdu/ggduvolume.c:1111
-#: ../monitor/udisks2/gvfsudisks2volume.c:1045
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -2446,7 +2445,7 @@ msgstr "תם הזמן המוקצב להרצת הפקודה `%s'"
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:243
+#: ../monitor/udisks2/gvfsudisks2volume.c:250
 #, c-format
 msgid "%s Encrypted"
 msgstr "%s מוצפן"
@@ -2454,23 +2453,60 @@ msgstr "%s מוצפן"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:256
+#: ../monitor/udisks2/gvfsudisks2volume.c:263
 #, c-format
 msgid "%s Volume"
 msgstr "כרך %s"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:408
+#: ../monitor/udisks2/gvfsudisks2volume.c:426
 msgid "Volume"
 msgstr "כרך"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:908
+#: ../monitor/udisks2/gvfsudisks2volume.c:956
+#, c-format
+msgid "Error storing passphrase in keyring (error code %d)"
+msgstr "אירעה שגיאה בעת אחסון מילת הצופן בקבוצת המפתחות (קוד שגיאה %d)"
+
+#: ../monitor/udisks2/gvfsudisks2volume.c:987
+#, c-format
+msgid "Error deleting invalid passphrase from keyring (error code %d)"
+msgstr "אירעה שגיאה במחיקת מילת הצופן השגויה מקבוצת המפתחות (קוד שגיאה %d)"
+
+#: ../monitor/udisks2/gvfsudisks2volume.c:1050
 msgid "The unlocked device does not have a recognizable filesystem on it"
 msgstr "לא זוהתה מערכת קבצים על הכונן ששוחרר"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1031
+#: ../monitor/udisks2/gvfsudisks2volume.c:1076
+#, c-format
+msgid "Encryption passphrase for %s"
+msgstr "ססמת הצפנה עבור %s"
+
+#: ../monitor/udisks2/gvfsudisks2volume.c:1246
 msgid "A passphrase is required to access the volume"
 msgstr "נדרשת מילת צופן כדי לגשת לכרך"
+
+#. Translators: This is the message shown to users
+#: ../monitor/udisks2/gvfsudisks2volume.c:1261
+#, c-format
+msgid ""
+"Enter a passphrase to unlock the volume\n"
+"The passphrase is needed to access encrypted data on %s."
+msgstr ""
+"יש להזין ססמה כדי לשחרר את הכרך\n"
+"מילת הצופן נדרשת על מנת לגשת לנתונים המוצפנים שעל גבי %s."
+
+#. drive_icon
+#. media_desc
+#. media_icon
+#. Translators: this is used to describe the drive the encrypted media
+#. * is on - the first %s is the name (such as 'WD 2500JB External'), the
+#. * second %s is the description ('250 GB Hard Disk').
+#.
+#: ../monitor/udisks2/gvfsudisks2volume.c:1412
+#, c-format
+msgid "%s (%s)"
+msgstr "%s (%s)"
 
 #: ../monitor/udisks2/udisks2volumemonitordaemon.c:40
 msgid "GVfs UDisks2 Volume Monitor"
@@ -3088,9 +3124,6 @@ msgstr "— הצגת תכנים של תיקיות בתצוגה דמוית עץ"
 
 #~ msgid "Service %d on Apple Mobile Device"
 #~ msgstr "שירות %d בהתקן נייד של Apple"
-
-#~ msgid "%s (%s)"
-#~ msgstr "%s (%s)"
 
 #~ msgid "Enter password"
 #~ msgstr "הזנת ססמה"
