@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs-master-po-gl-70600.merged\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-01-23 00:00+0100\n"
-"PO-Revision-Date: 2012-01-23 00:04+0100\n"
+"POT-Creation-Date: 2012-04-27 17:01+0200\n"
+"PO-Revision-Date: 2012-04-27 17:03+0200\n"
 "Last-Translator: Fran Dieguez <frandieguez@gnome.org>\n"
 "Language-Team: Galician <gnome-l10n-gl@gnome.org>\n"
 "Language: gl\n"
@@ -66,13 +66,13 @@ msgstr "Non foi posíbel atopar un punto de montaxe incluído"
 msgid "Invalid filename %s"
 msgstr "O nome de ficheiro %s non é válido"
 
-#: ../client/gdaemonfile.c:2256 ../client/gdaemonvfs.c:1198
-#: ../client/gdaemonvfs.c:1333 ../client/gdaemonvfs.c:1386
+#: ../client/gdaemonfile.c:2256 ../client/gdaemonvfs.c:1202
+#: ../client/gdaemonvfs.c:1337 ../client/gdaemonvfs.c:1390
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Produciuse un erro ao estabelecer os metadatos do ficheiro: %s"
 
-#: ../client/gdaemonfile.c:2257 ../client/gdaemonvfs.c:1387
+#: ../client/gdaemonfile.c:2257 ../client/gdaemonvfs.c:1391
 msgid "values must be string or list of strings"
 msgstr "os valores deben ser unha cadea ou unha lista de cadeas"
 
@@ -129,12 +129,12 @@ msgstr "Fin do fluxo"
 msgid "Seek not supported on stream"
 msgstr "O fluxo non admite a busca"
 
-#: ../client/gdaemonvfs.c:830
+#: ../client/gdaemonvfs.c:834
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Produciuse un erro ao obter información de montaxe: %s"
 
-#: ../client/gdaemonvfs.c:1199
+#: ../client/gdaemonvfs.c:1203
 msgid "Can't contact session bus"
 msgstr "Non é posíbel conectar co bus da sesión"
 
@@ -264,11 +264,11 @@ msgstr "o punto de montaxe para %s xa se está executando"
 msgid "error starting mount daemon"
 msgstr "produciuse un erro ao iniciar o daemon de montaxe"
 
-#: ../daemon/gvfsafpconnection.c:1409
+#: ../daemon/gvfsafpconnection.c:1412
 msgid "Connection unexpectedly went down"
 msgstr "Perdeuse a conexión inesperadamente"
 
-#: ../daemon/gvfsafpconnection.c:1436
+#: ../daemon/gvfsafpconnection.c:1439
 msgid "Got EOS"
 msgstr "Obtívose EOS"
 
@@ -332,18 +332,18 @@ msgid "User's password needs to be changed"
 msgstr "O contrasinal do usuario precisa cambiarse"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsafpserver.c:990
+#: ../daemon/gvfsafpserver.c:994
 #, c-format
 msgid "Enter password for afp as %s on %s"
 msgstr "Escriba o contrasinal para o AFP como %s en %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:993
+#: ../daemon/gvfsafpserver.c:997
 #, c-format
 msgid "Enter password for afp on %s"
 msgstr "Escriba o contrasinal para o AFP en %s"
 
-#: ../daemon/gvfsafpserver.c:1025 ../daemon/gvfsbackendftp.c:518
+#: ../daemon/gvfsafpserver.c:1029 ../daemon/gvfsbackendftp.c:518
 #: ../daemon/gvfsbackendsftp.c:985 ../daemon/gvfsbackendsmbbrowse.c:995
 #: ../daemon/gvfsbackendsmb.c:619
 msgid "Password dialog cancelled"
@@ -365,7 +365,7 @@ msgid "Couldn't mount AFP volume %s on %s"
 msgstr "Non é posíbel montar o volume AFP %s en %s"
 
 #: ../daemon/gvfsafpvolume.c:395 ../daemon/gvfsafpvolume.c:1891
-#: ../daemon/gvfsafpvolume.c:2664 ../daemon/gvfsbackendafc.c:928
+#: ../daemon/gvfsafpvolume.c:2664 ../daemon/gvfsbackendafc.c:936
 #: ../daemon/gvfsbackendafpbrowse.c:189 ../daemon/gvfsbackendafpbrowse.c:322
 #: ../daemon/gvfsbackendafpbrowse.c:354 ../daemon/gvfsbackendarchive.c:647
 #: ../daemon/gvfsbackendarchive.c:695 ../daemon/gvfsbackendarchive.c:747
@@ -381,7 +381,7 @@ msgstr "O ficheiro non existe"
 #: ../daemon/gvfsafpvolume.c:399 ../daemon/gvfsafpvolume.c:464
 #: ../daemon/gvfsafpvolume.c:2668 ../daemon/gvfsbackendafp.c:275
 #: ../daemon/gvfsbackendafp.c:476 ../daemon/gvfsbackendafp.c:1316
-#: ../daemon/gvfsbackenddav.c:2201 ../daemon/gvfsbackendftp.c:773
+#: ../daemon/gvfsbackenddav.c:2210 ../daemon/gvfsbackendftp.c:773
 #: ../daemon/gvfsbackendsftp.c:2333 ../daemon/gvfsbackendsftp.c:3069
 #: ../daemon/gvfsbackendsftp.c:3408 ../daemon/gvfsbackendsftp.c:4276
 msgid "File is directory"
@@ -395,8 +395,8 @@ msgstr "Demasiados ficheiros abertos"
 msgid "Target file is open"
 msgstr "O ficheiro de destino está aberto"
 
-#: ../daemon/gvfsafpvolume.c:672 ../daemon/gvfsbackendburn.c:425
-#: ../daemon/gvfsbackenddav.c:2550 ../daemon/gvfsbackendsftp.c:1828
+#: ../daemon/gvfsafpvolume.c:672 ../daemon/gvfsbackendburn.c:420
+#: ../daemon/gvfsbackenddav.c:2559 ../daemon/gvfsbackendsftp.c:1828
 msgid "Directory not empty"
 msgstr "O cartafol non está baleiro"
 
@@ -423,8 +423,8 @@ msgstr "Non hai espazo dabondo no volume"
 
 #: ../daemon/gvfsafpvolume.c:829 ../daemon/gvfsafpvolume.c:1410
 #: ../daemon/gvfsafpvolume.c:1567 ../daemon/gvfsbackendafp.c:282
-#: ../daemon/gvfsbackendafp.c:483 ../daemon/gvfsbackenddav.c:2257
-#: ../daemon/gvfsbackenddav.c:2510 ../daemon/gvfsbackenddav.c:2621
+#: ../daemon/gvfsbackendafp.c:483 ../daemon/gvfsbackenddav.c:2266
+#: ../daemon/gvfsbackenddav.c:2519 ../daemon/gvfsbackenddav.c:2630
 #: ../daemon/gvfsbackendftp.c:752 ../daemon/gvfsbackendftp.c:933
 #: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
 #: ../daemon/gvfsbackendsftp.c:4285 ../daemon/gvfsbackendsmb.c:2082
@@ -582,45 +582,45 @@ msgstr ""
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Produciuse un erro non xestionábel en libimobiledevice (%d)"
 
-#: ../daemon/gvfsbackendafc.c:382
+#: ../daemon/gvfsbackendafc.c:390
 msgid "Try again"
 msgstr "Tentar de novo"
 
-#: ../daemon/gvfsbackendafc.c:382 ../daemon/gvfsbackend.c:963
+#: ../daemon/gvfsbackendafc.c:390 ../daemon/gvfsbackend.c:963
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:926
 #: ../monitor/udisks2/gvfsudisks2mount.c:709
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../daemon/gvfsbackendafc.c:400 ../daemon/gvfsbackendarchive.c:550
-#: ../daemon/gvfsbackendarchive.c:579 ../daemon/gvfsbackenddav.c:1797
+#: ../daemon/gvfsbackendafc.c:408 ../daemon/gvfsbackendarchive.c:550
+#: ../daemon/gvfsbackendarchive.c:579 ../daemon/gvfsbackenddav.c:1806
 #: ../daemon/gvfsbackendhttp.c:309 ../daemon/gvfsbackendobexftp.c:862
 #: ../daemon/gvfsbackendobexftp.c:878 ../daemon/gvfsbackendobexftp.c:897
 #: ../daemon/gvfsbackendsmb.c:662
 msgid "Invalid mount spec"
 msgstr "A especificación de montaxe non é válida"
 
-#: ../daemon/gvfsbackendafc.c:406 ../daemon/gvfsbackendafc.c:436
+#: ../daemon/gvfsbackendafc.c:414 ../daemon/gvfsbackendafc.c:444
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr ""
 "Localización AFC incorrecto: debe ser da forma afc://uuid:número-de-porto"
 
-#: ../daemon/gvfsbackendafc.c:422
+#: ../daemon/gvfsbackendafc.c:430
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Dispositivo móbil de Apple"
 
-#: ../daemon/gvfsbackendafc.c:427
+#: ../daemon/gvfsbackendafc.c:435
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Dispositivo móbil de Apple, desbloqueado"
 
-#: ../daemon/gvfsbackendafc.c:432
+#: ../daemon/gvfsbackendafc.c:440
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Documentos no dispositivo móbil de Apple"
 
-#: ../daemon/gvfsbackendafc.c:490
+#: ../daemon/gvfsbackendafc.c:498
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s («jailbreak»)"
@@ -628,7 +628,7 @@ msgstr "%s («jailbreak»)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:497 ../monitor/afc/afcvolume.c:125
+#: ../daemon/gvfsbackendafc.c:505 ../monitor/afc/afcvolume.c:125
 #, c-format
 msgid "Documents on %s"
 msgstr "Documentación sobre %s"
@@ -636,7 +636,7 @@ msgstr "Documentación sobre %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:579
+#: ../daemon/gvfsbackendafc.c:587
 #, c-format
 msgid ""
 "The device '%s' is locked. Enter the passcode on the device and click 'Try "
@@ -645,22 +645,22 @@ msgstr ""
 "O dispositivo «%s» está bloqueao. Introduza o código de paso no dispositivo "
 "e prema «Tentar de novo»."
 
-#: ../daemon/gvfsbackendafc.c:918 ../daemon/gvfsbackendarchive.c:655
+#: ../daemon/gvfsbackendafc.c:926 ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1808
 #: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:718
 #: ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "Non é posíbel abrir o cartafol"
 
-#: ../daemon/gvfsbackendafc.c:1119 ../daemon/gvfsbackendafc.c:2462
+#: ../daemon/gvfsbackendafc.c:1127 ../daemon/gvfsbackendafc.c:2470
 msgid "Backups are not yet supported."
 msgstr "As copias de seguranza aínda non son compatíbeis."
 
-#: ../daemon/gvfsbackendafc.c:1291
+#: ../daemon/gvfsbackendafc.c:1299
 msgid "Invalid seek type"
 msgstr "Tipo de busca incorrecta"
 
-#: ../daemon/gvfsbackendafc.c:2299 ../daemon/gvfsbackendafp.c:1755
+#: ../daemon/gvfsbackendafc.c:2307 ../daemon/gvfsbackendafp.c:1755
 #: ../daemon/gvfsbackendftp.c:1087 ../daemon/gvfsbackendftp.c:1135
 #: ../daemon/gvfsbackendftp.c:1156 ../daemon/gvfsbackendsftp.c:1832
 #: ../daemon/gvfsbackendsftp.c:4633 ../daemon/gvfsbackendsmb.c:1719
@@ -695,12 +695,12 @@ msgstr "Non se especificou ningún nome de host"
 msgid "Apple Filing Protocol Service"
 msgstr "Servizo do Apple Filing Protocol"
 
-#: ../daemon/gvfsbackendafp.c:272 ../daemon/gvfsbackendburn.c:876
+#: ../daemon/gvfsbackendafp.c:272 ../daemon/gvfsbackendburn.c:871
 #: ../daemon/gvfsbackendftp.c:1544 ../daemon/gvfsbackendobexftp.c:1779
 msgid "Can't copy directory over directory"
 msgstr "Non é posíbel copiar un cartafol sobre outro cartafol"
 
-#: ../daemon/gvfsbackendafp.c:291 ../daemon/gvfsbackendburn.c:892
+#: ../daemon/gvfsbackendafp.c:291 ../daemon/gvfsbackendburn.c:887
 #: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendobexftp.c:1794
 msgid "Can't recursively copy directory"
 msgstr "Non é posíbel copiar un cartafol recursivamente"
@@ -719,7 +719,7 @@ msgstr "copias de seguranza non compatíbeis"
 msgid "Unable to create temporary file (%s)"
 msgstr "Non é posíbel crear un ficheiro temporal (%s)"
 
-#: ../daemon/gvfsbackendafp.c:1323 ../daemon/gvfsbackenddav.c:2330
+#: ../daemon/gvfsbackendafp.c:1323 ../daemon/gvfsbackenddav.c:2339
 #: ../daemon/gvfsbackendsftp.c:3421 ../daemon/gvfsbackendsmb.c:1148
 msgid "The file was externally modified"
 msgstr "O ficheiro foi modificado de forma externa"
@@ -754,7 +754,7 @@ msgstr "Non se especificou ningún volume"
 msgid "/ on %s"
 msgstr "/ en %s"
 
-#: ../daemon/gvfsbackendarchive.c:785 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendarchive.c:785 ../daemon/gvfsbackendburn.c:675
 #: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:445
 #: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:649
 #: ../daemon/gvfsbackendsftp.c:3881 ../daemon/gvfsftpdircache.c:157
@@ -766,16 +766,16 @@ msgstr "O ficheiro non é un cartafol"
 msgid "Burn"
 msgstr "Gravar"
 
-#: ../daemon/gvfsbackendburn.c:376
+#: ../daemon/gvfsbackendburn.c:371
 msgid "Unable to create temporary directory"
 msgstr "Non é posíbel crear un cartafol temporal"
 
-#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
-#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
-#: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
-#: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:793
-#: ../daemon/gvfsbackendgphoto2.c:1203 ../daemon/gvfsbackendgphoto2.c:2129
+#: ../daemon/gvfsbackendburn.c:400 ../daemon/gvfsbackendburn.c:411
+#: ../daemon/gvfsbackendburn.c:446 ../daemon/gvfsbackendburn.c:667
+#: ../daemon/gvfsbackendburn.c:712 ../daemon/gvfsbackendburn.c:738
+#: ../daemon/gvfsbackendburn.c:776 ../daemon/gvfsbackendburn.c:967
+#: ../daemon/gvfsbackendburn.c:1003 ../daemon/gvfsbackendftp.c:793
+#: ../daemon/gvfsbackendgphoto2.c:1205 ../daemon/gvfsbackendgphoto2.c:2129
 #: ../daemon/gvfsbackendgphoto2.c:2848 ../daemon/gvfsbackendsftp.c:1836
 #: ../daemon/gvfsbackendsftp.c:2949 ../daemon/gvfsbackendsftp.c:2962
 #: ../daemon/gvfsbackendsftp.c:2982 ../daemon/gvfsbackendtrash.c:216
@@ -783,24 +783,24 @@ msgstr "Non é posíbel crear un cartafol temporal"
 msgid "No such file or directory"
 msgstr "Non existe ese ficheiro ou cartafol"
 
-#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
+#: ../daemon/gvfsbackendburn.c:454 ../daemon/gvfsbackendburn.c:899
 #: ../daemon/gvfsbackendobexftp.c:1810
 msgid "Can't copy file over directory"
 msgstr "Non é posíbel copiar un ficheiro sobre un cartafol"
 
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendburn.c:651
+#: ../daemon/gvfsbackendburn.c:646
 msgid "CD/DVD Creator"
 msgstr "Creador de CD ou DVD"
 
-#: ../daemon/gvfsbackendburn.c:753 ../daemon/gvfsbackendburn.c:789
-#: ../daemon/gvfsbackendburn.c:924 ../daemon/gvfsbackendburn.c:986
-#: ../daemon/gvfsbackendburn.c:990 ../daemon/gvfsbackendburn.c:1000
+#: ../daemon/gvfsbackendburn.c:748 ../daemon/gvfsbackendburn.c:784
+#: ../daemon/gvfsbackendburn.c:919 ../daemon/gvfsbackendburn.c:981
+#: ../daemon/gvfsbackendburn.c:985 ../daemon/gvfsbackendburn.c:995
 #: ../daemon/gvfsbackendgphoto2.c:2922
 msgid "File exists"
 msgstr "O ficheiro xa existe"
 
-#: ../daemon/gvfsbackendburn.c:828 ../daemon/gvfsjobcloseread.c:112
+#: ../daemon/gvfsbackendburn.c:823 ../daemon/gvfsjobcloseread.c:112
 #: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:171
 #: ../daemon/gvfsjobcreatemonitor.c:141 ../daemon/gvfsjobcreatemonitor.c:152
 #: ../daemon/gvfsjobcreatemonitor.c:175 ../daemon/gvfsjobcreatemonitor.c:193
@@ -821,21 +821,21 @@ msgstr "O ficheiro xa existe"
 #: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1177 ../monitor/gdu/ggdumount.c:1261
 #: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1091
-#: ../monitor/udisks2/gvfsudisks2volume.c:1252
+#: ../monitor/udisks2/gvfsudisks2volume.c:1507
 msgid "Operation not supported by backend"
 msgstr "O backend non admite a operación"
 
-#: ../daemon/gvfsbackendburn.c:853
+#: ../daemon/gvfsbackendburn.c:848
 msgid "No such file or directory in target path"
 msgstr "Non existe ese ficheiro ou cartafol na ruta de destino"
 
-#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1787
+#: ../daemon/gvfsbackendburn.c:880 ../daemon/gvfsbackendobexftp.c:1787
 #: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1830
 #: ../daemon/gvfsbackendsftp.c:4441
 msgid "Target file exists"
 msgstr "O ficheiro de destino existe"
 
-#: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
+#: ../daemon/gvfsbackendburn.c:945 ../daemon/gvfsbackendcomputer.c:794
 #: ../daemon/gvfsbackendgphoto2.c:2502 ../daemon/gvfsbackendgphoto2.c:2711
 #: ../daemon/gvfsbackendgphoto2.c:2808 ../daemon/gvfsbackendgphoto2.c:2901
 msgid "Not supported"
@@ -855,19 +855,19 @@ msgstr ""
 "O volume está ocupado\n"
 "Un ou máis aplicativos manteñen o volume ocupado."
 
-#: ../daemon/gvfsbackendcdda.c:332 ../daemon/gvfsbackendgphoto2.c:1506
+#: ../daemon/gvfsbackendcdda.c:332 ../daemon/gvfsbackendgphoto2.c:1508
 msgid "Cannot create gudev client"
 msgstr "Non é posíbel crear o cliente gudev"
 
-#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1524
+#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1526
 msgid "Cannot connect to the system bus"
 msgstr "Non é posíbel conectar co bus do sistema"
 
-#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1536
+#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Cannot create libhal context"
 msgstr "Non é posíbel crear o contexto libhal"
 
-#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1549
+#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1551
 msgid "Cannot initialize libhal"
 msgstr "Non é posíbel inicializar libhal"
 
@@ -895,7 +895,7 @@ msgstr "CDDA montado en %s"
 #: ../daemon/gvfsbackendcdda.c:441 ../daemon/gvfsbackendcdda.c:961
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:296
+#: ../monitor/udisks2/gvfsudisks2volume.c:305
 #, c-format
 msgid "Audio Disc"
 msgstr "Disco de son"
@@ -1004,7 +1004,7 @@ msgstr "WebDAV como %s en %s%s"
 msgid "WebDAV on %s%s"
 msgstr "WebDAV en %s%s"
 
-#: ../daemon/gvfsbackenddav.c:668 ../daemon/gvfsbackenddav.c:1864
+#: ../daemon/gvfsbackenddav.c:668 ../daemon/gvfsbackenddav.c:1873
 #: ../daemon/gvfsbackendhttp.c:255
 #, c-format
 msgid "HTTP Error: %s"
@@ -1022,34 +1022,34 @@ msgstr "Resposta baleira"
 msgid "Unexpected reply from server"
 msgstr "Resposta inesperada do servidor"
 
-#: ../daemon/gvfsbackenddav.c:1373 ../daemon/gvfsbackenddav.c:1999
-#: ../daemon/gvfsbackenddav.c:2086 ../daemon/gvfsbackenddav.c:2193
+#: ../daemon/gvfsbackenddav.c:1382 ../daemon/gvfsbackenddav.c:2008
+#: ../daemon/gvfsbackenddav.c:2095 ../daemon/gvfsbackenddav.c:2202
 msgid "Response invalid"
 msgstr "A resposta é incorrecta"
 
-#: ../daemon/gvfsbackenddav.c:1516
+#: ../daemon/gvfsbackenddav.c:1525
 msgid "WebDAV share"
 msgstr "Compartido co WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1518
+#: ../daemon/gvfsbackenddav.c:1527
 #, c-format
 msgid "Enter password for %s"
 msgstr "Introducir o constrasinal para %s"
 
-#: ../daemon/gvfsbackenddav.c:1521
+#: ../daemon/gvfsbackenddav.c:1530
 msgid "Please enter proxy password"
 msgstr "Introduza o seu contrasinal proxy"
 
-#: ../daemon/gvfsbackenddav.c:1868 ../daemon/gvfsbackenddav.c:1872
+#: ../daemon/gvfsbackenddav.c:1877 ../daemon/gvfsbackenddav.c:1881
 msgid "Not a WebDAV enabled share"
 msgstr "Non é un cartafol compartido con WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1953 ../daemon/gvfsbackenddav.c:2041
-#: ../daemon/gvfsbackenddav.c:2114 ../daemon/gvfsbackenddav.c:2227
+#: ../daemon/gvfsbackenddav.c:1962 ../daemon/gvfsbackenddav.c:2050
+#: ../daemon/gvfsbackenddav.c:2123 ../daemon/gvfsbackenddav.c:2236
 msgid "Could not create request"
 msgstr "Non foi posíbel crear a petición"
 
-#: ../daemon/gvfsbackenddav.c:2361 ../daemon/gvfsbackendsmb.c:1184
+#: ../daemon/gvfsbackenddav.c:2370 ../daemon/gvfsbackendsmb.c:1184
 #: ../daemon/gvfsbackendsmb.c:2099
 msgid "Backup file creation failed"
 msgstr "Produciuse un fallou a creación do ficheiro de copia de seguranza"
@@ -1126,14 +1126,14 @@ msgid "%s: %d: Not Supported"
 msgstr "%s: %d: Non se admite"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:716 ../daemon/gvfsbackendgphoto2.c:722
+#: ../daemon/gvfsbackendgphoto2.c:718 ../daemon/gvfsbackendgphoto2.c:724
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Cámara dixital (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:945 ../monitor/gphoto2/ggphoto2volume.c:197
+#: ../daemon/gvfsbackendgphoto2.c:947 ../monitor/gphoto2/ggphoto2volume.c:197
 #: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
 msgid "%s Camera"
@@ -1141,56 +1141,56 @@ msgstr "Cámara %s"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:948 ../monitor/gphoto2/ggphoto2volume.c:192
+#: ../daemon/gvfsbackendgphoto2.c:950 ../monitor/gphoto2/ggphoto2volume.c:192
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "Reprodutor de son %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:957 ../monitor/gphoto2/ggphoto2volume.c:203
+#: ../daemon/gvfsbackendgphoto2.c:959 ../monitor/gphoto2/ggphoto2volume.c:203
 #: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "Cámara"
 
-#: ../daemon/gvfsbackendgphoto2.c:959 ../monitor/gphoto2/ggphoto2volume.c:306
+#: ../daemon/gvfsbackendgphoto2.c:961 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "Reprodutor de son"
 
-#: ../daemon/gvfsbackendgphoto2.c:1565
+#: ../daemon/gvfsbackendgphoto2.c:1567
 msgid "No device specified"
 msgstr "Non se especificou ningún dispositvo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1586
+#: ../daemon/gvfsbackendgphoto2.c:1588
 msgid "Cannot create gphoto2 context"
 msgstr "Non é posíbel crear o contexto gphoto2"
 
-#: ../daemon/gvfsbackendgphoto2.c:1596
+#: ../daemon/gvfsbackendgphoto2.c:1598
 msgid "Error creating camera"
 msgstr "Produciuse un erro ao crear a cámara"
 
-#: ../daemon/gvfsbackendgphoto2.c:1609 ../daemon/gvfsbackendgphoto2.c:1619
+#: ../daemon/gvfsbackendgphoto2.c:1611 ../daemon/gvfsbackendgphoto2.c:1621
 msgid "Error loading device information"
 msgstr "Produciuse un erro ao cargar a información do dispositivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1631
+#: ../daemon/gvfsbackendgphoto2.c:1633
 msgid "Error looking up device information"
 msgstr "Produciuse un erro ao buscar a información do dispositivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1641
+#: ../daemon/gvfsbackendgphoto2.c:1643
 msgid "Error getting device information"
 msgstr "Produciuse un erro ao obter a información do dispositivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1654
+#: ../daemon/gvfsbackendgphoto2.c:1656
 msgid "Error setting up camera communications port"
 msgstr "Produciuse un erro ao configurar o porto de comunicacións da cámara"
 
-#: ../daemon/gvfsbackendgphoto2.c:1665
+#: ../daemon/gvfsbackendgphoto2.c:1667
 msgid "Error initializing camera"
 msgstr "Produciuse un erro ao inicializar a cámara"
 
 #. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
 #. backend and shouldn't be translated.
-#: ../daemon/gvfsbackendgphoto2.c:1680
+#: ../daemon/gvfsbackendgphoto2.c:1682
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2 montado en %s"
@@ -1691,7 +1691,7 @@ msgstr "O backend non é compatíbel co symlinks"
 msgid "Invalid dbus message"
 msgstr "A mensaxe dbus non é válida"
 
-#: ../daemon/gvfsjobunmount.c:156
+#: ../daemon/gvfsjobunmount.c:159
 msgid "Filesystem is busy"
 msgstr "O sistema de ficheiros está ocupado"
 
@@ -1735,24 +1735,24 @@ msgstr "Tente \"%s --help\" para máis información."
 msgid "Invalid arguments from spawned child"
 msgstr "Os argumentos do fillo iniciado non son correctos"
 
-#: ../daemon/mount.c:779
+#: ../daemon/mount.c:783
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Fallou a montaxe automática: %s"
 
-#: ../daemon/mount.c:825 ../daemon/mount.c:903
+#: ../daemon/mount.c:829 ../daemon/mount.c:907
 msgid "The specified location is not mounted"
 msgstr "A localización especificada non está montada"
 
-#: ../daemon/mount.c:830
+#: ../daemon/mount.c:834
 msgid "The specified location is not supported"
 msgstr "A localización especificada non é compatíbel"
 
-#: ../daemon/mount.c:1045
+#: ../daemon/mount.c:1049
 msgid "Location is already mounted"
 msgstr "A localización xa está montada"
 
-#: ../daemon/mount.c:1053
+#: ../daemon/mount.c:1057
 msgid "Location is not mountable"
 msgstr "A localización non é montábel"
 
@@ -1862,7 +1862,6 @@ msgstr ""
 "O dispositivo «%s» contén datos cifrados."
 
 #: ../monitor/gdu/ggduvolume.c:1111
-#: ../monitor/udisks2/gvfsudisks2volume.c:1045
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -2199,7 +2198,7 @@ msgstr "Expirou o tempo ao executar a orde «%s»"
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:243
+#: ../monitor/udisks2/gvfsudisks2volume.c:250
 #, c-format
 msgid "%s Encrypted"
 msgstr "Cifrados %s"
@@ -2207,24 +2206,65 @@ msgstr "Cifrados %s"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:256
+#: ../monitor/udisks2/gvfsudisks2volume.c:263
 #, c-format
 msgid "%s Volume"
 msgstr "Volume de %s"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:408
+#: ../monitor/udisks2/gvfsudisks2volume.c:426
 msgid "Volume"
 msgstr "Volume"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:908
+#: ../monitor/udisks2/gvfsudisks2volume.c:956
+#, c-format
+msgid "Error storing passphrase in keyring (error code %d)"
+msgstr ""
+"Produciuse un erro ao almacenar a frase de paso no anel de chaves (código de "
+"erro %d)"
+
+#: ../monitor/udisks2/gvfsudisks2volume.c:987
+#, c-format
+msgid "Error deleting invalid passphrase from keyring (error code %d)"
+msgstr ""
+"Produciuse un erro ao eliminar a frase da paso non válida desde o anel de "
+"chaves (código de erro %d)"
+
+#: ../monitor/udisks2/gvfsudisks2volume.c:1050
 msgid "The unlocked device does not have a recognizable filesystem on it"
 msgstr ""
 "O dispositivo desbloqueado non contén un sistema de ficheiros recoñecíbel"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1031
+#: ../monitor/udisks2/gvfsudisks2volume.c:1076
+#, c-format
+msgid "Encryption passphrase for %s"
+msgstr "Frase de paso do cifrado para %s"
+
+#: ../monitor/udisks2/gvfsudisks2volume.c:1246
 msgid "A passphrase is required to access the volume"
 msgstr "Requírese un contrasinal para acceder ao volume"
+
+#. Translators: This is the message shown to users
+#: ../monitor/udisks2/gvfsudisks2volume.c:1261
+#, c-format
+msgid ""
+"Enter a passphrase to unlock the volume\n"
+"The passphrase is needed to access encrypted data on %s."
+msgstr ""
+"Escriba a frase de paso para desbloquear o volume\n"
+"Precísase a frase de paso para acceder aos datos cifrados en %s."
+
+#. drive_icon
+#. media_desc
+#. media_icon
+#. Translators: this is used to describe the drive the encrypted media
+#. * is on - the first %s is the name (such as 'WD 2500JB External'), the
+#. * second %s is the description ('250 GB Hard Disk').
+#.
+#: ../monitor/udisks2/gvfsudisks2volume.c:1412
+#, c-format
+msgid "%s (%s)"
+msgstr "%s (%s)"
 
 #: ../monitor/udisks2/udisks2volumemonitordaemon.c:40
 msgid "GVfs UDisks2 Volume Monitor"
@@ -2844,6 +2884,3 @@ msgstr "- listar contidos dos cartafoles no formato en árbore"
 
 #~ msgid "Service %d on Apple Mobile Device"
 #~ msgstr "Servizo %d no dispositivo móbil de Apple"
-
-#~ msgid "%s (%s)"
-#~ msgstr "%s (%s)"
