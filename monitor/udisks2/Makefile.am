@@ -53,4 +53,4 @@ $(service_DATA): $(service_in_files) Makefile
 clean-local:
 	rm -f *~ *.loT $(BUILT_SOURCES) $(service_DATA)
 
-EXTRA_DIST = $(service_in_files) udisks2.monitor
+EXTRA_DIST = $(service_in_files) udisks2.monitor what-is-shown.txt
