@@ -804,7 +804,7 @@ echo "
 	Build HAL volume monitor:     $msg_hal (with fast init path: $have_hal_fast_init)
 	Build GDU volume monitor:     $msg_gdu
 	Build udisks2 volume monitor: $msg_udisks2
-        Use libsystem-login:          $msg_libsystemd_login
+        Use libsystemd-login:         $msg_libsystemd_login
 	GNOME Keyring support:        $msg_keyring
 	Bash-completion support:      $msg_bash_completion
 "
