@@ -402,7 +402,7 @@ GPHOTO2_LIBS=
 GPHOTO2_CFLAGS=
 
 if test "x$enable_gphoto2" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" = "xyes" \); then
-  PKG_CHECK_EXISTS(libgphoto2, msg_gphoto2=yes)
+  PKG_CHECK_MODULES(GPHOTO2, libgphoto2 >= 2.4.0, [msg_gphoto2=yes])
 
   # Need OS tweaks in hal volume monitor backend
   case "$host" in
@@ -414,12 +414,19 @@ if test "x$enable_gphoto2" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" 
       ;;
   esac
 
+  if test "x$enable_gphoto2" = "xyes" -a "x$msg_gphoto2" != "xyes"; then
+    AC_MSG_ERROR([gphoto2 support requested but not available])
+  fi
+
   if test "x$msg_gphoto2" = "xyes"; then
     if test "x$use_gphoto2" = "xyes"; then
-      PKG_CHECK_MODULES(GPHOTO2, libgphoto2 >= 2.4.0)
       AC_DEFINE(HAVE_GPHOTO2, 1, [Define to 1 if gphoto2 is available])
     else
-      AC_MSG_WARN([Not building with gphoto2 support. Need OS tweaks in hal volume monitor.])
+      if test "x$enable_gphoto2" = "xyes"; then
+        AC_MSG_ERROR([Cannot build with gphoto2 support. Need OS tweaks in hal volume monitor.])
+      else
+        AC_MSG_WARN([Not building with gphoto2 support. Need OS tweaks in hal volume monitor.])
+      fi
       msg_gphoto2=no
     fi
   fi
