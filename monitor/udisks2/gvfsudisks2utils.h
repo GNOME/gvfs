@@ -50,8 +50,7 @@ gboolean gvfs_udisks2_utils_spawn_finish (GAsyncResult   *res,
                                           gchar         **out_standard_error,
                                           GError        **error);
 
-gboolean gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive,
-                                                  gboolean    *out_shared);
+gboolean gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive);
 
 
 G_END_DECLS

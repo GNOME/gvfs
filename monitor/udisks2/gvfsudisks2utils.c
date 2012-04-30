@@ -547,11 +547,9 @@ get_seat (void)
 #endif
 
 gboolean
-gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive,
-                                         gboolean    *out_shared)
+gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive)
 {
   gboolean ret = FALSE;
-  gboolean shared = FALSE;
   const gchar *seat;
   const gchar *drive_seat = NULL;
 
@@ -582,20 +580,10 @@ gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive,
       goto out;
     }
 
-  /* "all" is special, it means the device is available on any seat */
-  if (g_strcmp0 (drive_seat, "all") == 0)
-    {
-      ret = TRUE;
-      shared = TRUE;
-      goto out;
-    }
-
   /* Otherwise, check if it's on our seat */
   if (g_strcmp0 (seat, drive_seat) == 0)
     ret = TRUE;
 
  out:
-  if (out_shared != NULL)
-    *out_shared = shared;
   return ret;
 }

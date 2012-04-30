@@ -273,7 +273,6 @@ update_volume (GVfsUDisks2Volume *volume)
           GIcon *drive_icon;
           gchar *media_desc;
           GIcon *media_icon;
-          gboolean shared;
 
           udisks_client_get_drive_info (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
                                         udisks_drive,
@@ -321,9 +320,8 @@ update_volume (GVfsUDisks2Volume *volume)
             g_object_unref (media_icon);
 
           /* Only automount drives attached to the same seat as we're running on
-           * and if the drive is NOT shared across all seats
            */
-          if (gvfs_udisks2_utils_is_drive_on_our_seat (udisks_drive, &shared) && !shared)
+          if (gvfs_udisks2_utils_is_drive_on_our_seat (udisks_drive))
             {
               /* Only automount filesystems from drives of known types/interconnects:
                *
