@@ -1082,7 +1082,7 @@ create_directory_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res
   return;
 
 error:
-  g_clear_object (info);
+  g_clear_object (&info);
   g_simple_async_result_take_error (simple, err);
   g_simple_async_result_complete (simple);
   g_object_unref (simple);
