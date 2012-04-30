@@ -1,3 +1,16 @@
+Major changes in 1.13.0
+=======================
+* afp: Convert pascal strings into utf-8
+* afp: Use the UTF-8 server name for password dialogs when it's available
+* udisks2: Don't set should_automount to TRUE for devices on other seats
+* udisks2: Set should_automount correctly when starting up
+* udisks2: Don't show drives from other seats and special-case seat "all"
+* udisks2: Don't automount if drive is shared across all seats
+* udisks2: Support getting/storing LUKS encryption passphrase from keyring
+* build: Include udisks2/what-is-shown.txt in the tarball
+* build: Bail if gphoto support is requested but not available
+* Translation updates
+
 Major changes in 1.12.1
 =======================
 * udisks2: Fix some memory leaks
