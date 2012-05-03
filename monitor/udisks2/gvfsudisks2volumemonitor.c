@@ -818,6 +818,7 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
   UDisksFilesystem *filesystem;
   UDisksDrive *udisks_drive = NULL;
   const gchar* const *mount_points;
+  UDisksLoop *loop;
 
   /* Block:Ignore trumps everything */
   if (udisks_block_get_hint_ignore (block))
@@ -888,8 +889,24 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
         goto out;
     }
 
-  /* otherwise, we're good to go */
+  /* If the device (or if a partition, its containing device) is a
+   * loop device, check the SetupByUid property - we don't want to
+   * show loop devices set up by other users
+   */
+#ifdef UDISKS_CHECK_VERSION
+# if UDISKS_CHECK_VERSION(1,97,0)
+  loop = udisks_client_get_loop_for_block (monitor->client, block);
+  if (loop != NULL)
+    {
+      guint setup_by_uid = udisks_loop_get_setup_by_uid (loop);
+      g_object_unref (loop);
+      if (setup_by_uid != 0 && setup_by_uid != getuid ())
+        goto out;
+    }
+# endif
+#endif
 
+  /* otherwise, we're good to go */
   ret = TRUE;
 
  out:
