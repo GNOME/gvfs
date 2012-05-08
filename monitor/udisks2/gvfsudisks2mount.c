@@ -830,7 +830,6 @@ umount_command_cb (GObject       *source_object,
                                         &error))
     {
       g_simple_async_result_take_error (data->simple, error);
-      g_simple_async_result_take_error (data->simple, error);
       g_simple_async_result_complete (data->simple);
       data->completed = TRUE;
       unmount_data_unref (data);
