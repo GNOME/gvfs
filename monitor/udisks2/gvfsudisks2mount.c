@@ -846,7 +846,9 @@ umount_command_cb (GObject       *source_object,
       goto out;
     }
 
-  if (standard_error != NULL && strstr (standard_error, "device is busy") != NULL)
+  if (standard_error != NULL &&
+      (strstr (standard_error, "device is busy") != NULL ||
+       strstr (standard_error, "target is busy") != NULL))
     {
       unmount_show_busy (data, data->mount->mount_path);
       goto out;
