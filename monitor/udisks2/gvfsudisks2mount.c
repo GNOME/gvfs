@@ -901,6 +901,7 @@ unmount_do (UnmountData *data,
                              "{sv}",
                              "force", g_variant_new_boolean (TRUE));
     }
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (data->filesystem), G_MAXINT);
   udisks_filesystem_call_unmount (data->filesystem,
                                   g_variant_builder_end (&builder),
                                   data->cancellable,
