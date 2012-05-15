@@ -175,13 +175,12 @@ update_drive (GVfsUDisks2Drive *drive)
   if (drive->is_media_removable)
     {
       drive->has_media = udisks_drive_get_media_available (drive->udisks_drive);
-      drive->can_eject = udisks_drive_get_ejectable (drive->udisks_drive);
     }
   else
     {
       drive->has_media = TRUE;
-      drive->can_eject = FALSE;
     }
+  drive->can_eject = udisks_drive_get_ejectable (drive->udisks_drive);
 
   udisks_client_get_drive_info (gvfs_udisks2_volume_monitor_get_udisks_client (drive->monitor),
                                 drive->udisks_drive,
