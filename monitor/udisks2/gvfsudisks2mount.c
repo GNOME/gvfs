@@ -691,6 +691,10 @@ lsof_command_cb (GObject       *source_object,
  out:
   if (!data->completed)
     {
+      gboolean is_eject;
+
+      is_eject = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (data->mount_operation), "x-udisks2-is-eject"));
+
       /* We want to emit the 'show-processes' signal even if launching
        * lsof(1) failed or if it didn't return any PIDs. This is because
        * it won't show e.g. root-owned processes operating on files
@@ -705,7 +709,14 @@ lsof_command_cb (GObject       *source_object,
                                                               G_CALLBACK (on_mount_op_reply),
                                                               data);
         }
-      choices[0] = _("Unmount Anyway");
+      if (is_eject)
+        {
+          choices[0] = _("Eject Anyway");
+        }
+      else
+        {
+          choices[0] = _("Unmount Anyway");
+        }
       choices[1] = _("Cancel");
       message = _("Volume is busy\n"
                   "One or more applications are keeping the volume busy.");

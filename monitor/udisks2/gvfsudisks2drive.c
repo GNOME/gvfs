@@ -646,6 +646,13 @@ gvfs_udisks2_drive_eject_with_operation (GDrive              *_drive,
 {
   GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
 
+  /* This information is needed in GVfsDdisks2Volume when apps have
+   * open files on the device ... we need to know if the button should
+   * be "Unmount Anyway" or "Eject Anyway"
+   */
+  if (mount_operation != NULL)
+    g_object_set_data (G_OBJECT (mount_operation), "x-udisks2-is-eject", GINT_TO_POINTER (1));
+
   /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
   unmount_mounts (drive,
                   flags,
