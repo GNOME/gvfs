@@ -43,6 +43,7 @@ static GMainLoop *main_loop;
 
 static gboolean mount_mountable = FALSE;
 static gboolean mount_unmount = FALSE;
+static gboolean mount_eject = FALSE;
 static gboolean mount_list = FALSE;
 static gboolean extra_detail = FALSE;
 static gboolean mount_monitor = FALSE;
@@ -54,6 +55,7 @@ static const GOptionEntry entries[] =
   { "mountable", 'm', 0, G_OPTION_ARG_NONE, &mount_mountable, N_("Mount as mountable"), NULL },
   { "device", 'd', 0, G_OPTION_ARG_STRING, &mount_device_file, N_("Mount volume with device file"), NULL},
   { "unmount", 'u', 0, G_OPTION_ARG_NONE, &mount_unmount, N_("Unmount"), NULL},
+  { "eject", 'e', 0, G_OPTION_ARG_NONE, &mount_eject, N_("Eject"), NULL},
   { "unmount-scheme", 's', 0, G_OPTION_ARG_STRING, &unmount_scheme, N_("Unmount all mounts with the given scheme"), NULL},
   /* Translator: List here is a verb as in 'List all mounts' */
   { "list", 'l', 0, G_OPTION_ARG_NONE, &mount_list, N_("List"), NULL},
@@ -266,6 +268,51 @@ unmount (GFile *file)
 
   mount_op = new_mount_op ();
   g_mount_unmount_with_operation (mount, 0, mount_op, NULL, unmount_done_cb, NULL);
+  g_object_unref (mount_op);
+
+  outstanding_mounts++;
+}
+
+static void
+eject_done_cb (GObject *object,
+               GAsyncResult *res,
+               gpointer user_data)
+{
+  gboolean succeeded;
+  GError *error = NULL;
+
+  succeeded = g_mount_eject_with_operation_finish (G_MOUNT (object), res, &error);
+
+  g_object_unref (G_MOUNT (object));
+
+  if (!succeeded)
+    g_printerr (_("Error ejecting mount: %s\n"), error->message);
+
+  outstanding_mounts--;
+
+  if (outstanding_mounts == 0)
+    g_main_loop_quit (main_loop);
+}
+
+static void
+eject (GFile *file)
+{
+  GMount *mount;
+  GError *error = NULL;
+  GMountOperation *mount_op;
+
+  if (file == NULL)
+    return;
+
+  mount = g_file_find_enclosing_mount (file, NULL, &error);
+  if (mount == NULL)
+    {
+      g_printerr (_("Error finding enclosing mount: %s\n"), error->message);
+      return;
+    }
+
+  mount_op = new_mount_op ();
+  g_mount_eject_with_operation (mount, 0, mount_op, NULL, eject_done_cb, NULL);
   g_object_unref (mount_op);
 
   outstanding_mounts++;
@@ -978,6 +1025,8 @@ main (int argc, char *argv[])
         file = g_file_new_for_commandline_arg (argv[i]);
         if (mount_unmount)
           unmount (file);
+        else if (mount_eject)
+          eject (file);
         else
           mount (file);
         g_object_unref (file);
