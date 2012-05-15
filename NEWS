@@ -1,3 +1,11 @@
+Major changes in 1.12.3
+=======================
+* build: Include udisks2/what-is-shown.txt in the tarball
+* afp: Use g_clear_object properly
+* udisks2: Also check for umount(8) saying "target is busy"
+* udisks2: Set timeout to INTMAX when unmounting a filesystem
+* udisks2: Set can_eject correctly
+
 Major changes in 1.12.2
 =======================
 * udisks2: Set should_automount correctly when starting up
