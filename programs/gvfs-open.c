@@ -38,76 +38,14 @@ static GOptionEntry entries[] = {
   {NULL}
 };
 
-static gboolean
-is_file_uri_with_anchor (char *str)
-{
-  if (g_ascii_strncasecmp (str, "file:", 5) == 0 &&
-      strchr (str, '#') != NULL)
-    return TRUE;
-  return FALSE;
-}
-
-static gboolean
-open (GFile *file, char *arg_string)
-{
-  GAppInfo *app;
-  GError *error;
-  GList l = {NULL};
-  gboolean res;
-
-  error = NULL;
-  app = g_file_query_default_handler (file, NULL, &error);
-
-  if (app == NULL)
-    {
-      /* Translators: the first %s is the program name, the second one  */
-      /* is the URI of the file, the third is the error message.        */
-      g_printerr (_("%s: %s: error opening location: %s\n"),
-		  g_get_prgname (), g_file_get_uri (file), error->message);
-      g_error_free (error);
-      return FALSE;
-    }
-
-  if (g_file_is_native (file) && !is_file_uri_with_anchor (arg_string))
-    {
-      /* For normal files, pass in the canonicalized GFile as path */
-      l.data = file;
-      res = g_app_info_launch (app, &l,
-			       NULL, &error);
-    }
-  else
-    {
-      /* However, for uris, use the original string, as it might be
-	 modified by passing throught GFile (e.g. mailto: links)
-      */
-      l.data = arg_string;
-      res = g_app_info_launch_uris (app, &l,
-				    NULL, &error);
-    }
-
-  if (!res)
-    {
-      /* Translators: the first %s is the program name, the second one  */
-      /* is the URI of the file, the third is the error message.        */
-      g_printerr (_("%s: %s: error launching application: %s\n"),
-		  g_get_prgname (), g_file_get_uri (file), error->message);
-	  g_error_free (error);
-    }
-
-  g_object_unref (app);
-
-  return res;
-}
-
 int
 main (int argc, char *argv[])
 {
   GError *error = NULL;
   GOptionContext *context = NULL;
-  GFile *file;
   gchar *summary;
   int i;
-  gint res;
+  gboolean success;
 
   setlocale (LC_ALL, "");
 
@@ -158,17 +96,23 @@ main (int argc, char *argv[])
     }
 
   i = 0;
-  res = 0;
+  success = TRUE;
 
   do
     {
-      file = g_file_new_for_commandline_arg (locations[i]);
-      res += !open (file, locations[i]);
-      g_object_unref (file);
+      if (!g_app_info_launch_default_for_uri (locations[i],
+					      NULL,
+					      &error))
+	{
+	  /* Translators: the first %s is the program name, the second one  */
+	  /* is the URI of the file, the third is the error message.        */
+	  g_printerr (_("%s: %s: error opening location: %s\n"),
+		      g_get_prgname (), locations[i], error->message);
+	  g_clear_error (&error);
+	  success = FALSE;
+	}
     }
   while (locations[++i] != NULL);
-  if (res)
-    return 2;
 
-  return 0;
+  return success ? 0 : 2;
 }
