@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs-master-po-gl-70600.merged\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-27 17:01+0200\n"
-"PO-Revision-Date: 2012-04-27 17:03+0200\n"
+"POT-Creation-Date: 2012-05-20 18:05+0200\n"
+"PO-Revision-Date: 2012-05-20 18:06+0200\n"
 "Last-Translator: Fran Dieguez <frandieguez@gnome.org>\n"
 "Language-Team: Galician <gnome-l10n-gl@gnome.org>\n"
 "Language: gl\n"
@@ -588,7 +588,7 @@ msgstr "Tentar de novo"
 
 #: ../daemon/gvfsbackendafc.c:390 ../daemon/gvfsbackend.c:963
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:926
-#: ../monitor/udisks2/gvfsudisks2mount.c:709
+#: ../monitor/udisks2/gvfsudisks2mount.c:720
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -820,8 +820,8 @@ msgstr "O ficheiro xa existe"
 #: ../daemon/gvfsjobtrash.c:123 ../daemon/gvfsjobunmountmountable.c:140
 #: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1177 ../monitor/gdu/ggdumount.c:1261
-#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1091
-#: ../monitor/udisks2/gvfsudisks2volume.c:1507
+#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1104
+#: ../monitor/udisks2/gvfsudisks2volume.c:1505
 msgid "Operation not supported by backend"
 msgstr "O backend non admite a operación"
 
@@ -842,12 +842,12 @@ msgid "Not supported"
 msgstr "Non compatíbel"
 
 #: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:925
-#: ../monitor/udisks2/gvfsudisks2mount.c:708
+#: ../monitor/udisks2/gvfsudisks2mount.c:718
 msgid "Unmount Anyway"
 msgstr "Desmontar de todas formas"
 
 #: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:927
-#: ../monitor/udisks2/gvfsudisks2mount.c:710
+#: ../monitor/udisks2/gvfsudisks2mount.c:721
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -895,7 +895,7 @@ msgstr "CDDA montado en %s"
 #: ../daemon/gvfsbackendcdda.c:441 ../daemon/gvfsbackendcdda.c:961
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:305
+#: ../monitor/udisks2/gvfsudisks2volume.c:304
 #, c-format
 msgid "Audio Disc"
 msgstr "Disco de son"
@@ -1795,16 +1795,16 @@ msgstr "GVfs GDU Monitor de volume"
 msgid "Floppy Drive"
 msgstr "Disqueteira"
 
-#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:201
+#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:200
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "Dispositivo sen nome (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:203
+#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:202
 msgid "Unnamed Drive"
 msgstr "Dispositivo sen nome"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:510
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:509
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
@@ -2190,6 +2190,10 @@ msgstr "Datos codificados %s"
 msgid "%s Media"
 msgstr "Soporte %s"
 
+#: ../monitor/udisks2/gvfsudisks2mount.c:714
+msgid "Eject Anyway"
+msgstr "Expulsar de todas formas"
+
 #: ../monitor/udisks2/gvfsudisks2utils.c:494
 #, c-format
 msgid "Timed out running command-line `%s'"
@@ -2212,40 +2216,40 @@ msgid "%s Volume"
 msgstr "Volume de %s"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:426
+#: ../monitor/udisks2/gvfsudisks2volume.c:424
 msgid "Volume"
 msgstr "Volume"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:956
+#: ../monitor/udisks2/gvfsudisks2volume.c:954
 #, c-format
 msgid "Error storing passphrase in keyring (error code %d)"
 msgstr ""
 "Produciuse un erro ao almacenar a frase de paso no anel de chaves (código de "
 "erro %d)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:987
+#: ../monitor/udisks2/gvfsudisks2volume.c:985
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (error code %d)"
 msgstr ""
 "Produciuse un erro ao eliminar a frase da paso non válida desde o anel de "
 "chaves (código de erro %d)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1050
+#: ../monitor/udisks2/gvfsudisks2volume.c:1048
 msgid "The unlocked device does not have a recognizable filesystem on it"
 msgstr ""
 "O dispositivo desbloqueado non contén un sistema de ficheiros recoñecíbel"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1076
+#: ../monitor/udisks2/gvfsudisks2volume.c:1074
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Frase de paso do cifrado para %s"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1246
+#: ../monitor/udisks2/gvfsudisks2volume.c:1244
 msgid "A passphrase is required to access the volume"
 msgstr "Requírese un contrasinal para acceder ao volume"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1261
+#: ../monitor/udisks2/gvfsudisks2volume.c:1259
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2261,7 +2265,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1412
+#: ../monitor/udisks2/gvfsudisks2volume.c:1410
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
@@ -2619,66 +2623,75 @@ msgstr "Produciuse un erro ao crear o cartafol: %s\n"
 msgid "Don't send single MOVED events."
 msgstr "Non enviar eventos MOVIDOS únicos."
 
-#: ../programs/gvfs-mount.c:54
+#: ../programs/gvfs-mount.c:55
 msgid "Mount as mountable"
 msgstr "Montar como montábel"
 
-#: ../programs/gvfs-mount.c:55
+#: ../programs/gvfs-mount.c:56
 msgid "Mount volume with device file"
 msgstr "Montar volume co ficheiro de dispositivo"
 
-#: ../programs/gvfs-mount.c:56
+#: ../programs/gvfs-mount.c:57
 msgid "Unmount"
 msgstr "Desmontar"
 
-#: ../programs/gvfs-mount.c:57
+#: ../programs/gvfs-mount.c:58
+msgid "Eject"
+msgstr "Expulsar"
+
+#: ../programs/gvfs-mount.c:59
 msgid "Unmount all mounts with the given scheme"
 msgstr "Desmontar todas as montaxes con un esquema dado"
 
 #. Translator: List here is a verb as in 'List all mounts'
-#: ../programs/gvfs-mount.c:59
+#: ../programs/gvfs-mount.c:61
 msgid "List"
 msgstr "Lista"
 
-#: ../programs/gvfs-mount.c:60
+#: ../programs/gvfs-mount.c:62
 msgid "Show extra information for List and Monitor"
 msgstr "Mostrar información adicional para Lista e Monitor"
 
-#: ../programs/gvfs-mount.c:61
+#: ../programs/gvfs-mount.c:63
 msgid "Monitor events"
 msgstr "Monitorizar eventos"
 
-#: ../programs/gvfs-mount.c:164 ../programs/gvfs-mount.c:185
+#: ../programs/gvfs-mount.c:166 ../programs/gvfs-mount.c:187
 #, c-format
 msgid "Error mounting location: %s\n"
 msgstr "Produciuse un erro ao montar a localización: %s\n"
 
-#: ../programs/gvfs-mount.c:242
+#: ../programs/gvfs-mount.c:244
 #, c-format
 msgid "Error unmounting mount: %s\n"
 msgstr "Produciuse un erro ao desmontar o punto de montaxe: %s\n"
 
-#: ../programs/gvfs-mount.c:263
+#: ../programs/gvfs-mount.c:265 ../programs/gvfs-mount.c:310
 #, c-format
 msgid "Error finding enclosing mount: %s\n"
 msgstr "Produciuse un erro ao atopar o punto de montaxe incluído: %s\n"
 
-#: ../programs/gvfs-mount.c:696
+#: ../programs/gvfs-mount.c:289
+#, c-format
+msgid "Error ejecting mount: %s\n"
+msgstr "Produciuse un erro ao explulsar o punto de montaxe: %s\n"
+
+#: ../programs/gvfs-mount.c:743
 #, c-format
 msgid "Error mounting %s: %s\n"
 msgstr "Produciuse un erro ao montar %s: %s\n"
 
-#: ../programs/gvfs-mount.c:710
+#: ../programs/gvfs-mount.c:757
 #, c-format
 msgid "Mounted %s at %s\n"
 msgstr "Montouse %s en %s\n"
 
-#: ../programs/gvfs-mount.c:761
+#: ../programs/gvfs-mount.c:808
 #, c-format
 msgid "No volume for device file %s\n"
 msgstr "Non hai volume para o ficheiro de dispositivo %s\n"
 
-#: ../programs/gvfs-mount.c:952
+#: ../programs/gvfs-mount.c:999
 msgid "- mount <location>"
 msgstr "- monta <localización>"
 
