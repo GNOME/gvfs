@@ -875,7 +875,7 @@ mount_command_cb (GObject       *source_object,
   g_simple_async_result_set_error (data->simple,
                                    G_IO_ERROR,
                                    G_IO_ERROR_FAILED,
-                                   standard_error);
+                                   "%s", standard_error);
   g_simple_async_result_complete (data->simple);
   mount_data_free (data);
 
