@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.7.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-30 11:14+0200\n"
-"PO-Revision-Date: 2012-04-30 11:16+0200\n"
+"POT-Creation-Date: 2012-05-30 17:40+0200\n"
+"PO-Revision-Date: 2012-05-30 17:40+0200\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian bokmål <i18n-nb@lister.ping.uio.no>\n"
 "Language: \n"
@@ -575,7 +575,7 @@ msgstr "Prøv igjen"
 
 #: ../daemon/gvfsbackendafc.c:390 ../daemon/gvfsbackend.c:963
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:926
-#: ../monitor/udisks2/gvfsudisks2mount.c:709
+#: ../monitor/udisks2/gvfsudisks2mount.c:720
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -804,8 +804,8 @@ msgstr "Filen eksisterer"
 #: ../daemon/gvfsjobtrash.c:123 ../daemon/gvfsjobunmountmountable.c:140
 #: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1177 ../monitor/gdu/ggdumount.c:1261
-#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1091
-#: ../monitor/udisks2/gvfsudisks2volume.c:1507
+#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1104
+#: ../monitor/udisks2/gvfsudisks2volume.c:1505
 msgid "Operation not supported by backend"
 msgstr "Operasjonen ikke tillatt av motoren"
 
@@ -826,12 +826,12 @@ msgid "Not supported"
 msgstr "Ikke støttet"
 
 #: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:925
-#: ../monitor/udisks2/gvfsudisks2mount.c:708
+#: ../monitor/udisks2/gvfsudisks2mount.c:718
 msgid "Unmount Anyway"
 msgstr "Avmonter likevel"
 
 #: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:927
-#: ../monitor/udisks2/gvfsudisks2mount.c:710
+#: ../monitor/udisks2/gvfsudisks2mount.c:721
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -879,7 +879,7 @@ msgstr "cdda montert på %s"
 #: ../daemon/gvfsbackendcdda.c:441 ../daemon/gvfsbackendcdda.c:961
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:305
+#: ../monitor/udisks2/gvfsudisks2volume.c:304
 #, c-format
 msgid "Audio Disc"
 msgstr "Lyd-plate"
@@ -1773,16 +1773,16 @@ msgstr "GVfs GDU volumovervåking"
 msgid "Floppy Drive"
 msgstr "Diskettstasjon"
 
-#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:201
+#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:200
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "Stasjon uten navn (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:203
+#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:202
 msgid "Unnamed Drive"
 msgstr "Stasjon uten navn"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:510
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:509
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
@@ -2166,6 +2166,10 @@ msgstr "%s krypterte data"
 msgid "%s Media"
 msgstr "%s medie"
 
+#: ../monitor/udisks2/gvfsudisks2mount.c:714
+msgid "Eject Anyway"
+msgstr "Løs ut likevel"
+
 #: ../monitor/udisks2/gvfsudisks2utils.c:494
 #, c-format
 msgid "Timed out running command-line `%s'"
@@ -2188,35 +2192,35 @@ msgid "%s Volume"
 msgstr "%s volum"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:426
+#: ../monitor/udisks2/gvfsudisks2volume.c:424
 msgid "Volume"
 msgstr "Volum"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:956
+#: ../monitor/udisks2/gvfsudisks2volume.c:954
 #, c-format
 msgid "Error storing passphrase in keyring (error code %d)"
 msgstr "Feil ved lagring av passordfrase på nøkkelring (feilkode %d)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:987
+#: ../monitor/udisks2/gvfsudisks2volume.c:985
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (error code %d)"
 msgstr "Feil ved sletting av ugyldig passordfrase fra nøkkelring (feilkode %d)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1050
+#: ../monitor/udisks2/gvfsudisks2volume.c:1048
 msgid "The unlocked device does not have a recognizable filesystem on it"
 msgstr "Kjenner ikke igjen filsystemet på ulåst enhet"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1076
+#: ../monitor/udisks2/gvfsudisks2volume.c:1074
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Passordfrase for kryptering for %s"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1246
+#: ../monitor/udisks2/gvfsudisks2volume.c:1244
 msgid "A passphrase is required to access the volume"
 msgstr "En passordfrase kreves for å aksessere volumet"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1261
+#: ../monitor/udisks2/gvfsudisks2volume.c:1259
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2232,7 +2236,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1412
+#: ../monitor/udisks2/gvfsudisks2volume.c:1410
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
@@ -2588,66 +2592,75 @@ msgstr "Feil ved oppretting av katalog: %s\n"
 msgid "Don't send single MOVED events."
 msgstr "Ikke send FLYTTET-hendelser enkeltvis."
 
-#: ../programs/gvfs-mount.c:54
+#: ../programs/gvfs-mount.c:55
 msgid "Mount as mountable"
 msgstr "Monter som monterbar"
 
-#: ../programs/gvfs-mount.c:55
+#: ../programs/gvfs-mount.c:56
 msgid "Mount volume with device file"
 msgstr "Monter volum med enhetsfil"
 
-#: ../programs/gvfs-mount.c:56
+#: ../programs/gvfs-mount.c:57
 msgid "Unmount"
 msgstr "Avmonter"
 
-#: ../programs/gvfs-mount.c:57
+#: ../programs/gvfs-mount.c:58
+msgid "Eject"
+msgstr "Løs ut"
+
+#: ../programs/gvfs-mount.c:59
 msgid "Unmount all mounts with the given scheme"
 msgstr "Avmonter alle monteringspunkter med gitt schema"
 
 #. Translator: List here is a verb as in 'List all mounts'
-#: ../programs/gvfs-mount.c:59
+#: ../programs/gvfs-mount.c:61
 msgid "List"
 msgstr "Vis liste"
 
-#: ../programs/gvfs-mount.c:60
+#: ../programs/gvfs-mount.c:62
 msgid "Show extra information for List and Monitor"
 msgstr "Vis ekstra informasjon for listevisning og overvåking"
 
-#: ../programs/gvfs-mount.c:61
+#: ../programs/gvfs-mount.c:63
 msgid "Monitor events"
 msgstr "Overvåk hendelser"
 
-#: ../programs/gvfs-mount.c:164 ../programs/gvfs-mount.c:185
+#: ../programs/gvfs-mount.c:166 ../programs/gvfs-mount.c:187
 #, c-format
 msgid "Error mounting location: %s\n"
 msgstr "Feil under montering av adresse: %s\n"
 
-#: ../programs/gvfs-mount.c:242
+#: ../programs/gvfs-mount.c:244
 #, c-format
 msgid "Error unmounting mount: %s\n"
 msgstr "Feil ved avmontering av monteringspunkt: %s\n"
 
-#: ../programs/gvfs-mount.c:263
+#: ../programs/gvfs-mount.c:265 ../programs/gvfs-mount.c:310
 #, c-format
 msgid "Error finding enclosing mount: %s\n"
 msgstr "Kan ikke finne omsluttende montering: %s\n"
 
-#: ../programs/gvfs-mount.c:696
+#: ../programs/gvfs-mount.c:289
+#, c-format
+msgid "Error ejecting mount: %s\n"
+msgstr "Feil ved utløsing av monteringspunkt: %s\n"
+
+#: ../programs/gvfs-mount.c:743
 #, c-format
 msgid "Error mounting %s: %s\n"
 msgstr "Feil under montering av %s: %s\n"
 
-#: ../programs/gvfs-mount.c:710
+#: ../programs/gvfs-mount.c:757
 #, c-format
 msgid "Mounted %s at %s\n"
 msgstr "Monterte %s i %s\n"
 
-#: ../programs/gvfs-mount.c:761
+#: ../programs/gvfs-mount.c:808
 #, c-format
 msgid "No volume for device file %s\n"
 msgstr "Ingen volum for enhetsfil %s\n"
 
-#: ../programs/gvfs-mount.c:952
+#: ../programs/gvfs-mount.c:999
 msgid "- mount <location>"
 msgstr "- monter <adresse>"
 
