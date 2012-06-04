@@ -1,3 +1,14 @@
+Major changes in 1.13.1
+=======================
+* Volume monitoring and metadata GDBus port
+* Couple of udisks2 multiseat fixes
+* udisks2: Don't call g_simple_async_result_take_error() twice
+* udisks2: Also check for umount(8) saying "target is busy"
+* udisks2: Set timeout to INTMAX when unmounting a filesystem
+* udisks2: Show "Eject Anyway" (not "Unmount Anyway") if ejecting
+* gvfs-mount: Add new -e option to eject a mount
+* Translation updates
+
 Major changes in 1.13.0
 =======================
 * afp: Convert pascal strings into utf-8
