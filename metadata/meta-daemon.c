@@ -27,8 +27,6 @@
 #include <glib/gstdio.h>
 #include <locale.h>
 #include <stdlib.h>
-/*  TODO: remove + remove traces in Makefile.am  */
-#include <dbus/dbus.h>
 #include "metatree.h"
 #include "gvfsdaemonprotocol.h"
 #include "metadata-dbus.h"

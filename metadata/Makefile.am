@@ -31,7 +31,7 @@ libexec_PROGRAMS =\
 	$(NULL)
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/common \
-	$(LIBXML_CFLAGS) $(GLIB_CFLAGS) $(DBUS_CFLAGS) \
+	$(LIBXML_CFLAGS) $(GLIB_CFLAGS) \
 	$(UDEV_CFLAGS) \
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"     \
 	-DG_LOG_DOMAIN=\"GVFS\" \
