@@ -3,6 +3,7 @@ NULL =
 INCLUDES = -I$(top_srcdir) \
 	-I$(top_srcdir)/client \
 	-I$(top_srcdir)/metadata \
+	-I$(top_builddir)/metadata \
 	-I$(top_srcdir)/common \
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) \
 	-DG_LOG_DOMAIN=\"GVFS\" \
