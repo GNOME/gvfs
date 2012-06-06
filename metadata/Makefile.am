@@ -8,7 +8,7 @@ $(dbus_built_sources) : Makefile.am dbus-interface.xml
 		--interface-prefix org.gtk.vfs.			\
 		--c-namespace GVfs				\
 		--generate-c-code metadata-dbus			\
-		dbus-interface.xml				\
+		$(srcdir)/dbus-interface.xml				\
 		$(NULL)
 
 noinst_LTLIBRARIES=libmetadata.la
