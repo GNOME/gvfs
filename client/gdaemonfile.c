@@ -2334,7 +2334,7 @@ g_daemon_file_set_display_name (GFile *file,
 
   res = gvfs_dbus_mount_call_set_display_name_sync (proxy,
                                                     path,
-                                                    display_name,
+                                                    display_name ? display_name : "",
                                                     &new_path,
                                                     cancellable,
                                                     error);
@@ -2454,7 +2454,7 @@ g_daemon_file_make_symbolic_link (GFile *file,
 
   res = gvfs_dbus_mount_call_make_symbolic_link_sync (proxy,
                                                       path,
-                                                      symlink_value,
+                                                      symlink_value ? symlink_value : "",
                                                       cancellable,
                                                       error);
   g_print ("g_daemon_file_make_symbolic_link: done, res = %d\n", res);
@@ -3523,7 +3523,7 @@ set_display_name_async_get_proxy_cb (GVfsDBusMount *proxy,
   
   gvfs_dbus_mount_call_set_display_name (proxy,
                                          path,
-                                         data->display_name,
+                                         data->display_name ? data->display_name : "",
                                          cancellable,
                                          (GAsyncReadyCallback) set_display_name_async_cb,
                                          data);

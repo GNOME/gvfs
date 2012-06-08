@@ -240,7 +240,9 @@ g_mount_spec_from_dbus (GVariant *iter)
   
   spec = g_mount_spec_new (NULL);
   g_free (spec->mount_prefix);
-  spec->mount_prefix = g_strdup (mount_prefix);
+  spec->mount_prefix = NULL;
+  if (mount_prefix && mount_prefix[0])
+    spec->mount_prefix = g_strdup (mount_prefix);
 
   while (g_variant_iter_loop (iter_mount_spec_items, "{&sv}", &key, &value))
     {

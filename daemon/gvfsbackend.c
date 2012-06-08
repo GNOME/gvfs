@@ -685,7 +685,7 @@ register_mount_got_proxy_cb (GObject *source_object,
                                                backend->priv->prefered_filename_encoding,
                                                backend->priv->user_visible,
                                                g_mount_spec_to_dbus (backend->priv->mount_spec),
-                                               backend->priv->default_location,
+                                               backend->priv->default_location ? backend->priv->default_location : "",
                                                NULL,
                                                data->callback, data->callback_data);
 

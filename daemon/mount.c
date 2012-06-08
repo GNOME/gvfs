@@ -216,7 +216,7 @@ vfs_mount_to_dbus (VfsMount *mount)
                         mount->user_visible,
                         (fuse_available && mount->fuse_mountpoint) ? mount->fuse_mountpoint : "",
                         g_mount_spec_to_dbus (mount->mount_spec),
-                        mount->default_location);
+                        mount->default_location ? mount->default_location : "");
 }
 
 static GVariant *

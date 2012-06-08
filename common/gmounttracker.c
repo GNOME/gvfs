@@ -208,6 +208,11 @@ g_mount_info_from_dbus (GVariant *iter)
   if (mount_spec == NULL)
     return NULL;
 
+  if (fuse_mountpoint && fuse_mountpoint[0] == '\0')
+    fuse_mountpoint = NULL;
+  if (default_location && default_location[0] == '\0')
+    default_location = NULL;
+
   if (icon_str == NULL || strlen (icon_str) == 0)
     icon_str = "drive-removable-media";
   error = NULL;
