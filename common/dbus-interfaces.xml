@@ -37,7 +37,7 @@
     <method name="Cancel">
       <arg type='u' name='serial' direction='in'/>
     </method>
-    <method name="mount">
+    <method name="Mount">
       <arg type='b' name='automount' direction='in'/>
       <arg type='s' name='dbus_id' direction='in'/>
       <arg type='o' name='obj_path' direction='in'/>
@@ -52,7 +52,7 @@
       spawned message (with noreply) when it has spawned and gotten a dbus id.
   -->
   <interface name='org.gtk.vfs.Spawner'>
-    <method name="spawned">
+    <method name="Spawned">
       <arg type='b' name='succeeded' direction='in'/>
       <arg type='s' name='error_message' direction='in'/>
     </method>
@@ -64,22 +64,22 @@
       The mount tracking interface in the main daemon.
   -->
   <interface name='org.gtk.vfs.MountTracker'>
-    <method name="lookupMount">
+    <method name="LookupMount">
       <arg type='(aya{sv})' name='mount_spec' direction='in'/>
       <arg type='(sosssssbay(aya{sv})ay)' name='mount' direction='out'/>
     </method>
-    <method name="lookupMountByFusePath">
+    <method name="LookupMountByFusePath">
       <arg type='ay' name='fuse_path' direction='in'/>
       <arg type='(sosssssbay(aya{sv})ay)' name='mount' direction='out'/>
     </method>
-    <method name="mountLocation">
+    <method name="MountLocation">
       <arg type='(aya{sv})' name='mount_spec' direction='in'/>
       <arg type='(so)' name='mount_source' direction='in'/>
     </method>
-    <method name="listMounts">
+    <method name="ListMounts">
       <arg type='a(sosssssbay(aya{sv})ay)' name='mounts' direction='out'/>
     </method>
-    <method name="registerMount">
+    <method name="RegisterMount">
       <arg type='o' name='obj_path' direction='in'/>
       <arg type='s' name='display_name' direction='in'/>
       <arg type='s' name='stable_name' direction='in'/>
@@ -90,21 +90,21 @@
       <arg type='(aya{sv})' name='mount_spec' direction='in'/>
       <arg type='ay' name='default_location' direction='in'/>
     </method>
-    <method name="unregisterMount">
+    <method name="UnregisterMount">
       <arg type='o' name='obj_path' direction='in'/>
     </method>
-    <method name="listMountTypes">
+    <method name="ListMountTypes">
       <arg type='as' name='mount_types' direction='out'/>
     </method>
-    <method name="listMountableInfo">
+    <method name="ListMountableInfo">
       <arg type='a(ssasib)' name='mountables' direction='out'/>
     </method>
-    <method name="registerFuse">
+    <method name="RegisterFuse">
     </method>
-    <signal name="mounted">
+    <signal name="Mounted">
       <arg type='(sosssssbay(aya{sv})ay)' name='mount'/>
     </signal>
-    <signal name="unmounted">
+    <signal name="Unmounted">
       <arg type='(sosssssbay(aya{sv})ay)' name='mount'/>
     </signal>
   </interface>
@@ -116,7 +116,7 @@
       and set the dbus name in the mountable description file.
   -->
   <interface name='org.gtk.vfs.Mountable'>
-    <method name="mount">
+    <method name="Mount">
       <arg type='(aya{sv})' name='mount_spec' direction='in'/>
       <arg type='b' name='automount' direction='in'/>
       <arg type='(so)' name='mount_source' direction='in'/>
@@ -129,7 +129,7 @@
       Used by the dbus-proxying implementation of GMoutOperation.
   -->
   <interface name='org.gtk.vfs.MountOperation'>
-    <method name="askPassword">
+    <method name="AskPassword">
       <arg type='s' name='message_string' direction='in'/>
       <arg type='s' name='default_user' direction='in'/>
       <arg type='s' name='default_domain' direction='in'/>
@@ -142,14 +142,14 @@
       <arg type='b' name='anonymous' direction='out'/>
       <arg type='u' name='password_save' direction='out'/>
     </method>
-    <method name="askQuestion">
+    <method name="AskQuestion">
       <arg type='s' name='message_string' direction='in'/>
       <arg type='as' name='choices' direction='in'/>
       <arg type='b' name='handled' direction='out'/>
       <arg type='b' name='aborted' direction='out'/>
       <arg type='u' name='choice' direction='out'/>
     </method>
-    <method name="showProcesses">
+    <method name="ShowProcesses">
       <arg type='s' name='message_string' direction='in'/>
       <arg type='as' name='choices' direction='in'/>
       <arg type='ai' name='processes' direction='in'/>
@@ -162,7 +162,7 @@
       <arg type='t' name='time_left' direction='in'/>
       <arg type='t' name='bytes_left' direction='in'/>
     </method>
-    <method name="aborted">
+    <method name="Aborted">
     </method>
   </interface>
 
