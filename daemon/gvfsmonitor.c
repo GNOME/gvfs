@@ -145,6 +145,7 @@ unsubscribe (Subscriber *subscriber)
 {
   subscriber->monitor->priv->subscribers = g_list_remove (subscriber->monitor->priv->subscribers, subscriber);
   
+  g_signal_handlers_disconnect_by_data (subscriber->connection, subscriber);
   g_object_unref (subscriber->connection);
   g_free (subscriber->id);
   g_free (subscriber->object_path);
