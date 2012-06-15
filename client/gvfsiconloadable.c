@@ -92,6 +92,7 @@ g_vfs_icon_load (GLoadableIcon  *icon,
   GUnixFDList *fd_list;
   int fd;
   guint32 fd_id;
+  GError *local_error = NULL;
 
   g_print ("gvfsiconloadable.c: g_vfs_icon_load\n");
 
@@ -106,10 +107,17 @@ g_vfs_icon_load (GLoadableIcon  *icon,
                                                       &can_seek,
                                                       &fd_list,
                                                       cancellable,
-                                                      error);
+                                                      &local_error);
   
   g_print ("gvfsiconloadable.c: g_vfs_icon_load: done, res = %d\n", res);
   
+  if (! res)
+    {
+      if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+        _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
+      g_propagate_error (error, local_error);
+    }
+
   g_object_unref (proxy);
 
   if (! res)
@@ -143,6 +151,7 @@ typedef struct {
   GCancellable *cancellable;
   CreateProxyAsyncCallback callback;
   gpointer callback_data;
+  gulong cancelled_tag;
 } AsyncPathCall;
 
 
@@ -308,6 +317,7 @@ open_icon_read_cb (GVfsDBusMount *proxy,
 
 out:
   _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
+  _g_dbus_async_unsubscribe_cancellable (data->cancellable, data->cancelled_tag);
   async_path_call_free (data);
 }
 
@@ -327,6 +337,7 @@ load_async_cb (GVfsDBusMount *proxy,
                                            cancellable,
                                            (GAsyncReadyCallback) open_icon_read_cb,
                                            callback_data);
+  data->cancelled_tag = _g_dbus_async_subscribe_cancellable (data->connection, cancellable);
 }
 
 static void

@@ -182,6 +182,7 @@ typedef struct {
   GMountUnmountFlags flags;
   GDBusConnection *connection;
   GVfsDBusMount *proxy;
+  gulong cancelled_tag;
 } AsyncProxyCreate;
 
 static void
@@ -218,6 +219,7 @@ unmount_reply (GVfsDBusMount *proxy,
     }
   
   _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
+  _g_dbus_async_unsubscribe_cancellable (data->cancellable, data->cancelled_tag);
   async_proxy_create_free (data);
 }
 
@@ -253,6 +255,7 @@ async_proxy_new_cb (GObject *source_object,
                                 data->cancellable,
                                 (GAsyncReadyCallback) unmount_reply,
                                 data);
+  data->cancelled_tag = _g_dbus_async_subscribe_cancellable (data->connection, data->cancellable);
   
   g_object_unref (mount_source);
 }

@@ -254,7 +254,6 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
 
   daemon->daemon_skeleton = gvfs_dbus_daemon_skeleton_new ();
   g_signal_connect (daemon->daemon_skeleton, "handle-get-connection", G_CALLBACK (handle_get_connection), daemon);
-  /* TODO: this might never be called on this side */
   g_signal_connect (daemon->daemon_skeleton, "handle-cancel", G_CALLBACK (handle_cancel), daemon);
   
   error = NULL;

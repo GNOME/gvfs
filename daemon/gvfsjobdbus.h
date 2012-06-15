@@ -60,7 +60,7 @@ GType g_vfs_job_dbus_get_type (void) G_GNUC_CONST;
 
 gboolean g_vfs_job_dbus_is_serial (GVfsJobDBus     *job_dbus,
                                    GDBusConnection *connection,
-                                   guint            serial);
+                                   guint32          serial);
 
 G_END_DECLS
 

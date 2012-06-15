@@ -64,6 +64,12 @@ void        _g_simple_async_result_complete_with_cancellable
                                                         (GSimpleAsyncResult             *result,
                                                          GCancellable                   *cancellable);
 
+gulong          _g_dbus_async_subscribe_cancellable     (GDBusConnection                *connection,
+                                                         GCancellable                   *cancellable);
+void            _g_dbus_async_unsubscribe_cancellable   (GCancellable                   *cancellable,
+                                                         gulong                          cancelled_tag);
+void            _g_dbus_send_cancelled_sync             (GDBusConnection                *connection);
+
 G_END_DECLS
 
 #endif /* __G_VFS_DAEMON_DBUS_H__ */

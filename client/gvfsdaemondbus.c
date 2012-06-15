@@ -492,6 +492,131 @@ _g_dbus_connection_get_for_async (const char *dbus_id,
     }
 }
 
+
+typedef struct {
+  GDBusConnection *connection;
+  guint32 serial;
+} AsyncCallCancelData;
+
+static void
+async_call_cancel_data_free (gpointer _data)
+{
+  AsyncCallCancelData *data = _data;
+
+  g_object_unref (data->connection);
+  g_free (data);
+}
+
+static void
+cancelled_got_proxy (GObject *source_object,
+                     GAsyncResult *res,
+                     gpointer user_data)
+{
+  guint32 serial = GPOINTER_TO_UINT (user_data);
+  GVfsDBusDaemon *proxy;
+  GError *error = NULL;
+
+  proxy = gvfs_dbus_daemon_proxy_new_finish (res, &error);
+  if (! proxy)
+    {
+      g_printerr ("Failed to construct daemon proxy for cancellation: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+      return;
+    }
+
+  gvfs_dbus_daemon_call_cancel (proxy,
+                                serial,
+                                NULL,
+                                NULL,  /* we don't need any reply */
+                                NULL);
+  g_object_unref (proxy);
+}
+
+/* Might be called on another thread */
+static void
+async_call_cancelled_cb (GCancellable *cancellable,
+                         gpointer _data)
+{
+  AsyncCallCancelData *data = _data;
+
+  /* TODO: use shared daemon proxy on private connection if possible */
+  gvfs_dbus_daemon_proxy_new (data->connection,
+                              G_BUS_NAME_OWNER_FLAGS_NONE,
+                              NULL,
+                              G_VFS_DBUS_DAEMON_PATH,
+                              NULL,
+                              cancelled_got_proxy,
+                              GUINT_TO_POINTER (data->serial));  /* not passing "data" in as long it may not exist anymore between async calls */
+}
+
+gulong
+_g_dbus_async_subscribe_cancellable (GDBusConnection *connection, GCancellable *cancellable)
+{
+  AsyncCallCancelData *cancel_data;
+  gulong cancelled_tag = 0;
+
+  if (cancellable)
+    {
+      cancel_data = g_new0 (AsyncCallCancelData, 1);
+      cancel_data->connection = g_object_ref (connection);
+      /* make sure we get the serial *after* the message has been sent, otherwise
+       * it will be 0
+       */
+      cancel_data->serial = g_dbus_connection_get_last_serial (connection);
+      cancelled_tag =
+        g_signal_connect_data (cancellable, "cancelled",
+                               (GCallback)async_call_cancelled_cb,
+                               cancel_data,
+                               (GClosureNotify)async_call_cancel_data_free,
+                               0);
+    }
+
+  return cancelled_tag;
+}
+
+void
+_g_dbus_async_unsubscribe_cancellable (GCancellable *cancellable, gulong cancelled_tag)
+{
+  if (cancelled_tag)
+    {
+      g_assert (cancellable != NULL);
+      g_signal_handler_disconnect (cancellable, cancelled_tag);
+    }
+}
+
+void
+ _g_dbus_send_cancelled_sync (GDBusConnection *connection)
+{
+  guint32 serial;
+  GVfsDBusDaemon *proxy;
+  GError *error = NULL;
+
+  serial = g_dbus_connection_get_last_serial (connection);
+
+  proxy = gvfs_dbus_daemon_proxy_new_sync (connection,
+                                           G_BUS_NAME_OWNER_FLAGS_NONE,
+                                           NULL,
+                                           G_VFS_DBUS_DAEMON_PATH,
+                                           NULL,
+                                           &error);
+  if (! proxy)
+    {
+      g_printerr ("Failed to construct daemon proxy for cancellation: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+      return;
+    }
+
+  gvfs_dbus_daemon_call_cancel (proxy,
+                                serial,
+                                NULL,
+                                NULL,  /* we don't need any reply */
+                                NULL);
+  g_object_unref (proxy);
+}
+
+
 /*************************************************************************
  *               get per-thread synchronous dbus connections             *
  *************************************************************************/
