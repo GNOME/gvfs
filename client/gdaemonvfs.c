@@ -1283,26 +1283,10 @@ _g_daemon_vfs_append_metadata_for_set (GVariantBuilder *builder,
   return res;
 }
 
-static void
-metadata_daemon_vanished (GDBusConnection *connection,
-                          const gchar *name,
-                          gpointer user_data)
-{
-  guint *watcher_id = user_data;
-
-  G_LOCK (metadata_proxy);
-  g_clear_object (&metadata_proxy);
-  G_UNLOCK (metadata_proxy);
-
-  if (*watcher_id > 0)
-    g_bus_unwatch_name (*watcher_id);
-}
-
 GVfsMetadata *
 _g_daemon_vfs_get_metadata_proxy (GCancellable *cancellable, GError **error)
 {
   GVfsMetadata *proxy;
-  guint *watcher_id;
 
   G_LOCK (metadata_proxy);
 
@@ -1315,24 +1299,9 @@ _g_daemon_vfs_get_metadata_proxy (GCancellable *cancellable, GError **error)
                                                              G_VFS_DBUS_METADATA_PATH,
                                                              cancellable,
                                                              error);
-
-      if (proxy != NULL)
-        {
-          /* a place in memory to store the returned ID in */
-          watcher_id = g_malloc0 (sizeof (guint));
-          *watcher_id = g_bus_watch_name_on_connection (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)),
-                                                        G_VFS_DBUS_METADATA_NAME,
-                                                        G_BUS_NAME_WATCHER_FLAGS_AUTO_START,
-                                                        NULL,
-                                                        metadata_daemon_vanished,
-                                                        watcher_id,
-                                                        g_free);
-        }
     }
 
-  if (metadata_proxy != NULL)
-    /* take the reference so that we don't need to protect returned object against racy metadata_daemon_vanished() */
-    proxy = g_object_ref (metadata_proxy);
+  proxy = metadata_proxy;
 
   G_UNLOCK (metadata_proxy);
 
@@ -1453,7 +1422,6 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
               meta_lookup_cache_free (cache);
               meta_tree_unref (tree);
               g_free (tree_path);
-              g_object_unref (proxy);
 	    }
 	}
 
@@ -1495,7 +1463,6 @@ g_daemon_vfs_local_file_removed (GVfs       *vfs,
           /* flush the call with the expense of sending all queued messages on the connection */
           g_dbus_connection_flush_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)),
                                         NULL, NULL);
-          g_object_unref (proxy);
         }
       
       meta_tree_unref (tree);
@@ -1544,7 +1511,6 @@ g_daemon_vfs_local_file_moved (GVfs       *vfs,
           /* flush the call with the expense of sending all queued messages on the connection */
           g_dbus_connection_flush_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)),
                                         NULL, NULL);
-          g_object_unref (proxy);
         }
     }
 

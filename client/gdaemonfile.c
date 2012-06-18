@@ -2266,7 +2266,6 @@ set_metadata_attribute (GFile *file,
         res = FALSE;
 
       g_variant_builder_unref (builder);
-      g_object_unref (proxy);
     }
 
   meta_tree_unref (tree);
