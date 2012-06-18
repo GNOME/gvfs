@@ -581,6 +581,18 @@ node_get_content (xmlNodePtr node)
       }
 }
 
+static gboolean
+node_is_empty (xmlNodePtr node)
+{
+  if (node == NULL)
+    return TRUE;
+
+  if (node->type == XML_TEXT_NODE)
+    return node->content == NULL || node->content[0] == '\0';
+
+  return node->children == NULL;
+}
+
 typedef struct _xmlNodeIter {
 
   xmlNodePtr cur_node;
@@ -998,7 +1010,7 @@ ms_response_to_file_info (MsResponse *response,
 
       for (node = propstat.prop_node->children; node; node = node->next)
         {
-          if (! node_is_element (node))
+          if (! node_is_element (node) || node_is_empty (node))
             continue; /* TODO: check namespace, parse user data nodes*/
 
           text = node_get_content (node);
