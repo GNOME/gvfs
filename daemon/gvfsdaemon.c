@@ -654,6 +654,7 @@ peer_connection_closed (GDBusConnection *connection,
   g_hash_table_foreach (daemon->registered_paths, (GHFunc) peer_unregister_skeleton, connection);
 
   /* The peer-to-peer connection was disconnected */
+  g_signal_handlers_disconnect_by_data (connection, user_data);
   g_object_unref (connection);
 }
 
