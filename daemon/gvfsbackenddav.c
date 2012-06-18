@@ -1771,6 +1771,8 @@ do_mount (GVfsBackend  *backend,
   guint           status;
   gboolean        is_success;
   gboolean        is_webdav;
+  gboolean        is_collection;
+  gboolean        auth_interactive;
   gboolean        res;
   char           *last_good_path;
   const char     *host;
@@ -1831,12 +1833,17 @@ do_mount (GVfsBackend  *backend,
   signal_id = g_signal_connect (session, "authenticate",
                                 G_CALLBACK (soup_authenticate_interactive),
                                 data);
+  auth_interactive = TRUE;
 
   last_good_path = NULL;
   msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
   msg_stat = stat_location_begin (mount_base, FALSE);
 
+
   do {
+    GFileType file_type;
+    SoupURI *cur_uri;
+ 
     status = g_vfs_backend_dav_send_message (backend, msg_opts);
 
     is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
@@ -1845,34 +1852,52 @@ do_mount (GVfsBackend  *backend,
     soup_message_headers_clear (msg_opts->response_headers);
     soup_message_body_truncate (msg_opts->response_body);
 
-    if (is_webdav)
+    if (is_webdav == FALSE)
+      break;
+
+    cur_uri = soup_message_get_uri (msg_opts);
+    soup_message_set_uri (msg_stat, cur_uri);
+
+    g_vfs_backend_dav_send_message (backend, msg_stat);
+    res = stat_location_finish (msg_stat, &file_type, NULL);
+    is_collection = res && file_type == G_FILE_TYPE_DIRECTORY;
+
+    g_debug (" [%s] webdav: %d, collection %d [res: %d]\n",
+              mount_base->path, is_webdav, is_collection, res);
+
+    if (is_collection == FALSE)
+      break;
+    
+    /* we have found a new good root, try the parent ... */
+    g_free (last_good_path);
+    last_good_path = mount_base->path;
+    mount_base->path = path_get_parent_dir (mount_base->path);
+    soup_message_set_uri (msg_opts, mount_base);
+
+    if (auth_interactive)
       {
-        GFileType file_type;
-        SoupURI *cur_uri;
-        
-        cur_uri = soup_message_get_uri (msg_opts);
-        soup_message_set_uri (msg_stat, cur_uri);
+         /* if we have found a root that is good then we assume
+            that we also have obtained to correct credentials
+            and we switch the auth handler. This will prevent us
+            from asking for *different* credentials *again* if the
+            server should response with 401 for some of the parent
+            collections. See also bug #677753 */
 
-        g_vfs_backend_dav_send_message (backend, msg_stat);
-        res = stat_location_finish (msg_stat, &file_type, NULL);
+         g_signal_handler_disconnect (session, signal_id);
+         g_signal_connect (session, "authenticate",
+                           G_CALLBACK (soup_authenticate_from_data),
+                           data);
+         auth_interactive = FALSE;
+       }
 
-        if (res && file_type == G_FILE_TYPE_DIRECTORY)
-          {
-            g_free (last_good_path);
-            last_good_path = mount_base->path;
-          }
+    soup_message_headers_clear (msg_stat->response_headers);
+    soup_message_body_truncate (msg_stat->response_body);
 
-        mount_base->path = path_get_parent_dir (mount_base->path);
-        soup_message_set_uri (msg_opts, mount_base);
+  } while (mount_base->path != NULL);
 
-        soup_message_headers_clear (msg_stat->response_headers);
-        soup_message_body_truncate (msg_stat->response_body);
-      }
-
-  } while (is_webdav && mount_base->path != NULL);
-
-  /* we have reached the end of paths we are allowed to
-   * chdir up to (or couldn't chdir up at all) */
+  /* we either encountered an error or we have
+     reached the end of paths we are allowed to
+     chdir up to (or couldn't chdir up at all) */
 
   /* check if we at all have a good path */
   if (last_good_path == NULL) 
@@ -1919,12 +1944,6 @@ do_mount (GVfsBackend  *backend,
   g_mount_spec_unref (mount_spec);
   g_object_unref (msg_opts);
   g_object_unref (msg_stat);
-
-  /* switch the signal handler */
-  g_signal_handler_disconnect (session, signal_id);
-  g_signal_connect (session, "authenticate",
-                    G_CALLBACK (soup_authenticate_from_data),
-                    data);
 
   /* also auth the workaround async session we need for SoupInputStream */
   g_signal_connect (G_VFS_BACKEND_HTTP (backend)->session_async, "authenticate",
