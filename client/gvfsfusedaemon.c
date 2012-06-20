@@ -1891,10 +1891,23 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
                       fh->stream = NULL;
                     }
                 }
-              else if (file_handle_get_size (fh, &current_size) &&
-		       current_size == size)
-		{
-		  /* Don't have to do anything to succeed */
+              else if (file_handle_get_size (fh, &current_size))
+                {
+                  if (current_size == size)
+                    {
+                      /* Don't have to do anything to succeed */
+                    }
+                  else if ((current_size < size) && g_seekable_can_seek (G_SEEKABLE (fh->stream)))
+                    {
+                      /* If the truncated size is larger than the current size
+                       * then we need to pad out the difference with 0's */
+                     goffset orig_pos = g_seekable_tell (G_SEEKABLE (fh->stream));
+                     gsize buf_size = size - current_size;
+                     gpointer buf = g_malloc0 (buf_size);
+                     write_stream (fh, buf, buf_size, current_size);
+                     g_free (buf);
+                     g_seekable_seek (G_SEEKABLE (fh->stream), orig_pos, G_SEEK_SET, NULL, NULL);
+                    }
 		}
 	      else
 		{
