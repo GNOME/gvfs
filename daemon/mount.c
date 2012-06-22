@@ -537,52 +537,16 @@ re_read_mountable_config (void)
  * Support for keeping track of active mounts                           *
  ************************************************************************/
 
-typedef struct
-{
-  GVariant *mount;
-  gboolean mounted;
-} SignalMountedData;
-
-static void
-mount_tracker_proxy_cb (GObject *source_object,
-                        GAsyncResult *res,
-                        gpointer user_data)
-{
-  GVfsDBusMountTracker *proxy;
-  SignalMountedData *data = user_data;
-  
-  proxy = gvfs_dbus_mount_tracker_proxy_new_for_bus_finish (res, NULL);
-  g_print ("mount_tracker_proxy_cb: signalling %s, proxy = %p\n", data->mounted ? "mount" : "umount", proxy);
-
-  if (proxy != NULL)
-    {
-      if (data->mounted)
-        gvfs_dbus_mount_tracker_emit_mounted (proxy, data->mount);
-      else
-        gvfs_dbus_mount_tracker_emit_unmounted (proxy, data->mount);
-      
-      g_object_unref (proxy);
-      g_free (data);
-    }
-}
-
 static void
 signal_mounted_unmounted (VfsMount *mount,
 			  gboolean mounted)
 {
-  SignalMountedData *data;
-
-  data = g_new0 (SignalMountedData, 1);
-  data->mount = vfs_mount_to_dbus (mount);
-  data->mounted = mounted;
+  g_print ("signal_mounted_unmounted: signalling %s\n", mounted ? "mount" : "umount");
   
-  gvfs_dbus_mount_tracker_proxy_new_for_bus (G_BUS_TYPE_SESSION,
-                                             G_DBUS_PROXY_FLAGS_NONE,
-                                             G_VFS_DBUS_DAEMON_NAME,
-                                             G_VFS_DBUS_MOUNTTRACKER_PATH,
-                                             NULL,
-                                             mount_tracker_proxy_cb,
-                                             data);
+  if (mounted)
+    gvfs_dbus_mount_tracker_emit_mounted (mount_tracker, vfs_mount_to_dbus (mount));
+  else
+    gvfs_dbus_mount_tracker_emit_unmounted (mount_tracker, vfs_mount_to_dbus (mount));
 }
 
 static void
