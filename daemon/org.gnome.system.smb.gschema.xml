@@ -1,5 +1,5 @@
 <schemalist>
-  <schema id="org.gnome.system.smb" path="/system/smb/">
+  <schema id="org.gnome.system.smb" path="/org/gnome/system/smb/">
     <key name="workgroup" type="s">
       <default>''</default>
       <summary>SMB workgroup</summary>

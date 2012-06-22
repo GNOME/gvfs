@@ -1,5 +1,5 @@
 <schemalist>
-  <schema id="org.gnome.system.dns_sd" path="/system/dns-sd/">
+  <schema id="org.gnome.system.dns_sd" path="/org/gnome/system/dns-sd/">
     <key name="display-local" enum="org.gnome.system.gvfs.GDnsSdDisplayMode">
       <default>'merged'</default>
       <summary>How to display local DNS-SD service</summary>
