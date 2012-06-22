@@ -175,7 +175,7 @@ create_reply (GVfsJob *job,
   must_mount = op_job->must_mount_location;
   is_uri = op_job->target_uri != NULL;
 
-  if (! is_uri)
+  if (is_uri)
     fake_mountspec = g_mount_spec_new (NULL);
 
   gvfs_dbus_mount_complete_mount_mountable (object,
