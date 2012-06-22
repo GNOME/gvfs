@@ -649,9 +649,9 @@ AM_CONDITIONAL(ENABLE_BASHCOMP, test "$msg_bash_completion" = "yes")
 
 AC_ARG_WITH([bash-completion-dir],
 	    AC_HELP_STRING([--with-bash-completion-dir=PATH],
-	    		   [choose directory for bash-completion file (default=SYSCONFDIR/profile.d)]),
+	    		   [choose directory for bash-completion file (default=DATADIR/bash-completion/completions)]),
 	    with_bashcomp_dir=$withval,
-	    with_bashcomp_dir=$sysconfdir/profile.d)
+	    with_bashcomp_dir=$datadir/bash-completion/completions)
 BASHCOMP_DIR=$with_bashcomp_dir
 AC_SUBST(BASHCOMP_DIR)
 

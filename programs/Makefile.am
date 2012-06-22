@@ -35,7 +35,7 @@ bin_SCRIPTS =					\
 
 if ENABLE_BASHCOMP
 profiledir = $(BASHCOMP_DIR)
-profile_DATA = gvfs-bash-completion.sh
+profile_DATA = completion/gvfs
 endif
 
 gvfs_cat_SOURCES = gvfs-cat.c
@@ -89,4 +89,4 @@ gvfs_mkdir_LDADD = $(libraries)
 gvfs_mime_SOURCES = gvfs-mime.c
 gvfs_mime_LDADD = $(libraries)
 
-EXTRA_DIST = gvfs-less gvfs-bash-completion.sh
+EXTRA_DIST = gvfs-less completion/gvfs
