@@ -167,6 +167,7 @@ dhx2_login (GVfsAfpServer *afp_serv,
   
   if (strlen (password) > 256)
   {
+    /* Translators: %d is a constant, currently hardcoded to 256 */
     g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                  _("Server doesn't support passwords longer than %d characters"), 256);
     goto error;
