@@ -1845,6 +1845,28 @@ file_handle_get_size (FileHandle *fh,
   return res;
 }
 
+#define PAD_BLOCK_SIZE 65536
+
+static gint
+pad_file (FileHandle *fh, gsize num, goffset current_size)
+{
+  gpointer buf;
+  gsize written;
+  gint res;
+
+  res = 0;
+  buf = g_malloc0 (PAD_BLOCK_SIZE);
+  for (written = 0; written < num; written += PAD_BLOCK_SIZE)
+    {
+      res = write_stream (fh, buf, MIN (num - written, PAD_BLOCK_SIZE), current_size + written);
+      if (res < 0)
+        break;
+    }
+  g_free (buf);
+
+  return (res < 0 ? res : 0);
+}
+
 static gint
 vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
 {
@@ -1902,10 +1924,7 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
                       /* If the truncated size is larger than the current size
                        * then we need to pad out the difference with 0's */
                      goffset orig_pos = g_seekable_tell (G_SEEKABLE (fh->stream));
-                     gsize buf_size = size - current_size;
-                     gpointer buf = g_malloc0 (buf_size);
-                     write_stream (fh, buf, buf_size, current_size);
-                     g_free (buf);
+                     result = pad_file (fh, size - current_size, current_size);
                      g_seekable_seek (G_SEEKABLE (fh->stream), orig_pos, G_SEEK_SET, NULL, NULL);
                     }
 		}
