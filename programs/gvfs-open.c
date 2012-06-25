@@ -46,6 +46,8 @@ main (int argc, char *argv[])
   gchar *summary;
   int i;
   gboolean success;
+  gboolean res;
+  GFile *file;
 
   setlocale (LC_ALL, "");
 
@@ -100,9 +102,22 @@ main (int argc, char *argv[])
 
   do
     {
-      if (!g_app_info_launch_default_for_uri (locations[i],
-					      NULL,
-					      &error))
+      res = g_app_info_launch_default_for_uri (locations[i],
+					       NULL,
+					       &error);
+
+      if (!res && g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+	{
+	  /* g_app_info_launch_default_for_uri() can't properly handle non-URI (local) locations */
+	  g_clear_error (&error);
+	  file = g_file_new_for_commandline_arg (locations[i]);
+	  res = g_app_info_launch_default_for_uri (g_file_get_uri (file),
+						   NULL,
+						   &error);
+	  g_object_unref (file);
+	}
+
+      if (!res)
 	{
 	  /* Translators: the first %s is the program name, the second one  */
 	  /* is the URI of the file, the third is the error message.        */
