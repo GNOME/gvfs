@@ -1,3 +1,14 @@
+Major changes in 1.13.2
+=======================
+* dav: Ignore empty tags in multistatus responses
+* dav: Abort finding the root on error or auth info change
+* fuse: Support ftruncate() where requested size > current size
+* gdbus: Use stable metadata proxy
+* gvfs-open: Use g_app_info_launch_default_for_uri()
+* build: Install bash completion files in /usr/share/
+* Some more build fixes
+* Translation updates
+
 Major changes in 1.13.1
 =======================
 * Volume monitoring and metadata GDBus port
