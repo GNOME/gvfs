@@ -54,8 +54,8 @@ main (int argc, char *argv[])
   g_type_init ();
 
   error = NULL;
-  param = g_strdup_printf ("[%s...]", _("FILE"));
-  summary = _("Move files to the trash.");
+  param = g_strdup_printf ("[%s...]", _("LOCATION"));
+  summary = _("Move files or directories to the trash.");
 
   context = g_option_context_new (param);
   g_option_context_set_summary (context, summary);
