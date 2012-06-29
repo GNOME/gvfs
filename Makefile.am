@@ -8,6 +8,7 @@ SUBDIRS = \
 	monitor \
 	po   \
 	programs \
+	man \
 	test \
 	$(NULL)
 

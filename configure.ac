@@ -19,6 +19,7 @@ AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 AC_PATH_PROG(GIO_QUERYMODULES, gio-querymodules, no)
 AM_PROG_CC_C_O
 AC_PROG_SED
+AC_PATH_PROG(XSLTPROC, xsltproc, no)
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
@@ -786,6 +787,7 @@ monitor/udisks2/Makefile
 monitor/gphoto2/Makefile
 monitor/afc/Makefile
 programs/Makefile
+man/Makefile
 test/Makefile
 po/Makefile.in
 ])
