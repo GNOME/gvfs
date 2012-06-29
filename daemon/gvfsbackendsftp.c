@@ -61,6 +61,7 @@
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsjobmakedirectory.h"
+#include "gvfsjobprogress.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfskeyring.h"
 #include "sftp.h"
@@ -4163,7 +4164,7 @@ move_reply (GVfsBackendSftp *backend,
           /* Succeeded, report file size */
           file_size = job->backend_data;
           if (file_size != NULL) 
-            g_vfs_job_move_progress_callback (*file_size, *file_size, job);
+            g_vfs_job_progress_callback (*file_size, *file_size, job);
           g_vfs_job_succeeded (job);
         }
     }

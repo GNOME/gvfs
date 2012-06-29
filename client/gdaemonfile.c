@@ -2787,25 +2787,39 @@ g_daemon_file_set_attribute (GFile *file,
   return TRUE;
 }
 
-typedef struct {
+
+typedef struct
+{
+  GAsyncResult *res;
+  GMainContext *context;
+  GMainLoop *loop;
   GFileProgressCallback progress_callback;
   gpointer progress_callback_data;
-} ProgressCallbackData;
+} FileTransferSyncData;
 
 static gboolean
 handle_progress (GVfsDBusProgress *object,
                  GDBusMethodInvocation *invocation,
                  guint64 arg_current,
                  guint64 arg_total,
-                 ProgressCallbackData *data)
+                 FileTransferSyncData *data)
 {
-  g_print ("handle_progress\n");
-  
   data->progress_callback (arg_current, arg_total, data->progress_callback_data);
   
   gvfs_dbus_progress_complete_progress (object, invocation);
   
   return TRUE;
+}
+
+static void
+copy_cb (GObject *source_object,
+         GAsyncResult *res,
+         gpointer user_data)
+{
+  FileTransferSyncData *data = user_data;
+
+  data->res = g_object_ref (res);
+  g_main_loop_quit (data->loop);
 }
 
 static gboolean
@@ -2819,7 +2833,7 @@ file_transfer (GFile                  *source,
                GError                **error)
 {
   char *obj_path;
-  ProgressCallbackData data;
+  FileTransferSyncData data = {0, };
   char *local_path = NULL;
   gboolean source_is_daemon;
   gboolean dest_is_daemon;
@@ -2863,13 +2877,10 @@ file_transfer (GFile                  *source,
 
     }
 
-  if (progress_callback)
+  if (send_progress)
     obj_path = g_strdup_printf ("/org/gtk/vfs/callback/%p", &obj_path);
   else
     obj_path = g_strdup ("/org/gtk/vfs/void");
-
-  data.progress_callback = progress_callback;
-  data.progress_callback_data = progress_callback_data;
 
   /* need to create proxy with daemon files only */ 
   if (native_transfer)
@@ -2904,68 +2915,97 @@ retry:
   if (proxy == NULL)
     goto out;
 
-  /* Register progress interface skeleton */
-  progress_skeleton = gvfs_dbus_progress_skeleton_new ();
-  g_dbus_interface_skeleton_set_flags (G_DBUS_INTERFACE_SKELETON (progress_skeleton), G_DBUS_INTERFACE_SKELETON_FLAGS_HANDLE_METHOD_INVOCATIONS_IN_THREAD);
-  g_signal_connect (progress_skeleton, "handle-progress", G_CALLBACK (handle_progress), &data);
+  data.progress_callback = progress_callback;
+  data.progress_callback_data = progress_callback_data;
+  data.context = g_main_context_new ();
+  data.loop = g_main_loop_new (data.context, FALSE);
 
-  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (progress_skeleton),
-                                         connection,
-                                         obj_path,
-                                         &my_error))
-    goto out;
+  g_main_context_push_thread_default (data.context);
+
+  if (send_progress)
+    {
+      /* Register progress interface skeleton */
+      progress_skeleton = gvfs_dbus_progress_skeleton_new ();
+      g_signal_connect (progress_skeleton, "handle-progress", G_CALLBACK (handle_progress), &data);
+
+      if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (progress_skeleton),
+                                             connection,
+                                             obj_path,
+                                             &my_error))
+        goto out;
+    }
 
   if (native_transfer == TRUE)
     {
       if (remove_source == FALSE)
         {
-          res = gvfs_dbus_mount_call_copy_sync (proxy,
-                                                path1, path2,
-                                                flags,
-                                                obj_path,
-                                                cancellable,
-                                                &my_error);
+          gvfs_dbus_mount_call_copy (proxy,
+                                     path1, path2,
+                                     flags,
+                                     obj_path,
+                                     cancellable,
+                                     copy_cb,
+                                     &data);
+          g_main_loop_run (data.loop);
+          res = gvfs_dbus_mount_call_copy_finish (proxy, data.res, &my_error);
         }
       else
         {
-          res = gvfs_dbus_mount_call_move_sync (proxy,
-                                                path1, path2,
-                                                flags,
-                                                obj_path,
-                                                cancellable,
-                                                &my_error);
+          gvfs_dbus_mount_call_move (proxy,
+                                     path1, path2,
+                                     flags,
+                                     obj_path,
+                                     cancellable,
+                                     copy_cb,
+                                     &data);
+          g_main_loop_run (data.loop);
+          res = gvfs_dbus_mount_call_move_finish (proxy, data.res, &my_error);
         }
     }
   else if (dest_is_daemon == TRUE)
     {
-      res = gvfs_dbus_mount_call_push_sync (proxy,
-                                            path1,
-                                            local_path,
-                                            send_progress,
-                                            flags,
-                                            obj_path,
-                                            remove_source,
-                                            cancellable,
-                                            &my_error);
+      gvfs_dbus_mount_call_push (proxy,
+                                 path1,
+                                 local_path,
+                                 send_progress,
+                                 flags,
+                                 obj_path,
+                                 remove_source,
+                                 cancellable,
+                                 copy_cb,
+                                 &data);
+      g_main_loop_run (data.loop);
+      res = gvfs_dbus_mount_call_push_finish (proxy, data.res, &my_error);
     }
   else
     {
-      res = gvfs_dbus_mount_call_pull_sync (proxy,
-                                            path1,
-                                            local_path,
-                                            send_progress,
-                                            flags,
-                                            obj_path,
-                                            remove_source,
-                                            cancellable,
-                                            &my_error);
+      gvfs_dbus_mount_call_pull (proxy,
+                                 path1,
+                                 local_path,
+                                 send_progress,
+                                 flags,
+                                 obj_path,
+                                 remove_source,
+                                 cancellable,
+                                 copy_cb,
+                                 &data);
+      g_main_loop_run (data.loop);
+      res = gvfs_dbus_mount_call_pull_finish (proxy, data.res, &my_error);
     }
+
+  g_object_unref (data.res);
 
  out:
   if (progress_skeleton)
     {
       g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (progress_skeleton));
       g_object_unref (progress_skeleton);
+    }
+  if (data.context)
+    {
+      g_main_context_pop_thread_default (data.context);
+      g_main_context_unref (data.context);
+      g_main_loop_unref (data.loop);
     }
 
   if (! res)

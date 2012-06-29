@@ -27,6 +27,7 @@
 #include <gvfsjob.h>
 #include <gvfsjobdbus.h>
 #include <gvfsbackend.h>
+#include <gvfsjobprogress.h>
 
 G_BEGIN_DECLS
 
@@ -41,19 +42,17 @@ typedef struct _GVfsJobCopyClass   GVfsJobCopyClass;
 
 struct _GVfsJobCopy
 {
-  GVfsJobDBus parent_instance;
+  GVfsJobProgress parent_instance;
 
   GVfsBackend *backend;
   char *source;
   char *destination;
   GFileCopyFlags flags;
-  char *callback_obj_path;
-  
 };
 
 struct _GVfsJobCopyClass
 {
-  GVfsJobDBusClass parent_class;
+  GVfsJobProgressClass parent_class;
 };
 
 GType g_vfs_job_copy_get_type (void) G_GNUC_CONST;
