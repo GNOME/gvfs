@@ -53,13 +53,13 @@ static const char *mount_device_file = NULL;
 static const GOptionEntry entries[] =
 {
   { "mountable", 'm', 0, G_OPTION_ARG_NONE, &mount_mountable, N_("Mount as mountable"), NULL },
-  { "device", 'd', 0, G_OPTION_ARG_STRING, &mount_device_file, N_("Mount volume with device file"), NULL},
+  { "device", 'd', 0, G_OPTION_ARG_STRING, &mount_device_file, N_("Mount volume with device file"), N_("DEVICE") },
   { "unmount", 'u', 0, G_OPTION_ARG_NONE, &mount_unmount, N_("Unmount"), NULL},
   { "eject", 'e', 0, G_OPTION_ARG_NONE, &mount_eject, N_("Eject"), NULL},
-  { "unmount-scheme", 's', 0, G_OPTION_ARG_STRING, &unmount_scheme, N_("Unmount all mounts with the given scheme"), NULL},
+  { "unmount-scheme", 's', 0, G_OPTION_ARG_STRING, &unmount_scheme, N_("Unmount all mounts with the given scheme"), N_("SCHEME") },
   /* Translator: List here is a verb as in 'List all mounts' */
   { "list", 'l', 0, G_OPTION_ARG_NONE, &mount_list, N_("List"), NULL},
-  { "detail", 'i', 0, G_OPTION_ARG_NONE, &extra_detail, N_("Show extra information for List and Monitor"), NULL},
+  { "detail", 'i', 0, G_OPTION_ARG_NONE, &extra_detail, N_("Show extra information"), NULL},
   { "monitor", 'o', 0, G_OPTION_ARG_NONE, &mount_monitor, N_("Monitor events"), NULL},
   { NULL }
 };
@@ -201,7 +201,7 @@ new_mount_op (void)
 
   g_signal_connect (op, "ask_password", G_CALLBACK (ask_password_cb), NULL);
 
-  /* TODO: we *should* also connect to the "aborted" signal but since we the
+  /* TODO: we *should* also connect to the "aborted" signal but since the
    *       main thread is blocked handling input we won't get that signal
    *       anyway...
    */
@@ -990,16 +990,37 @@ main (int argc, char *argv[])
   GOptionContext *context;
   GError *error;
   GFile *file;
+  gchar *param;
+  gchar *summary;
 
   setlocale (LC_ALL, "");
+
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
 
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new (_("- mount <location>"));
+  param = g_strdup_printf ("[%s...]", _("LOCATION"));
+  summary = _("Mount the locations.");
+
+  context = g_option_context_new (param);
+  g_option_context_set_summary (context, summary);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
+  g_free (param);
+
+  if (error != NULL)
+    {
+      g_printerr (_("Error parsing commandline options: %s\n"), error->message);
+      g_printerr ("\n");
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
+      g_printerr ("\n");
+      g_error_free (error);
+      return 1;
+    }
 
   main_loop = g_main_loop_new (NULL, FALSE);
 

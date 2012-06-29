@@ -36,11 +36,11 @@ static char *show_completions = NULL;
 
 static GOptionEntry entries[] =
 {
-  { "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, N_("The attributes to get"), NULL },
+  { "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, N_("The attributes to get"), N_("ATTRIBUTES") },
   { "hidden", 'h', 0, G_OPTION_ARG_NONE, &show_hidden, N_("Show hidden files"), NULL },
   { "long", 'l', 0, G_OPTION_ARG_NONE, &show_long, N_("Use a long listing format"), NULL },
-  { "show-completions", 'c', 0, G_OPTION_ARG_STRING, &show_completions, N_("Show completions"), NULL},
-  { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symlinks"), NULL},
+  { "show-completions", 'c', 0, G_OPTION_ARG_STRING, &show_completions, N_("Show completions"), N_("PREFIX") },
+  { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symbolic links"), NULL},
   { NULL }
 };
 
@@ -374,25 +374,41 @@ main (int argc, char *argv[])
   GError *error;
   GOptionContext *context;
   GFile *file;
+  gchar *param;
+  gchar *summary;
+  gchar *description;
 
   setlocale (LC_ALL, "");
+
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
 
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new (_("- list files at <location>"));
+  param = g_strdup_printf ("[%s...]", _("LOCATION"));
+  summary = _("List the contents of the locations.");
+  description = _("gvfs-ls is similar to the traditional ls utility, but using gvfs\n"
+                  "locations instead of local files: for example you can use something\n"
+                  "like smb://server/resource/file.txt as location. File attributes can\n"
+                  "be specified with their gvfs name, e.g. standard::icon.");
+
+  context = g_option_context_new (param);
+  g_option_context_set_summary (context, summary);
+  g_option_context_set_description (context, description);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
+  g_free (param);
 
   if (error != NULL)
     {
       g_printerr (_("Error parsing commandline options: %s\n"), error->message);
       g_printerr ("\n");
-      g_printerr (_("Try \"%s --help\" for more information."),
-		  g_get_prgname ());
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
       g_printerr ("\n");
-      g_error_free(error);
+      g_error_free (error);
       return 1;
     }
 

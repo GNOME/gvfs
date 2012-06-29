@@ -27,11 +27,19 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 
-static GOptionEntry entries[] =
+static void
+show_help (GOptionContext *context, const char *error)
 {
-  { NULL }
-};
+  char *help;
 
+  if (error)
+    g_printerr (_("Error: %s"), error);
+
+  help = g_option_context_get_help (context, TRUE, NULL);
+  g_printerr ("%s", help);
+  g_free (help);
+  g_option_context_free (context);
+}
 
 int
 main (int argc, char *argv[])
@@ -41,23 +49,43 @@ main (int argc, char *argv[])
   GFile          *file;
   GFile          *new_file;
   int             retval = 0;
+  gchar          *param;
+  gchar          *summary;
 
   setlocale (LC_ALL, "");
+
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
 
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new (_("- rename file"));
-  g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
+  param = g_strdup_printf ("%s %s", _("LOCATION"), _("NEW-NAME"));
+  summary = _("Rename a file.");
+
+  context = g_option_context_new (param);
+  g_option_context_set_summary (context, summary);
   g_option_context_parse (context, &argc, &argv, &error);
-  g_option_context_free (context);
+
+  if (error != NULL)
+    {
+      g_printerr (_("Error parsing commandline options: %s\n"), error->message);
+      g_printerr ("\n");
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
+      g_printerr ("\n");
+      g_error_free (error);
+      return 1;
+    }
 
   if (argc < 3)
     {
-      g_printerr ("Usage: %s location new_name\n",
-		  g_get_prgname ());
+      show_help (context, _("Missing operand\n"));
       return 1;
     }
+
+  g_option_context_free (context);
+  g_free (param);
 
   file = g_file_new_for_commandline_arg (argv[1]);
 

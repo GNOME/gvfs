@@ -34,7 +34,7 @@
 static gchar **locations = NULL;
 
 static GOptionEntry entries[] = {
-  {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &locations, N_("files"), NULL},
+  {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &locations, NULL, NULL },
   {NULL}
 };
 
@@ -43,6 +43,7 @@ main (int argc, char *argv[])
 {
   GError *error = NULL;
   GOptionContext *context = NULL;
+  gchar *param;
   gchar *summary;
   int i;
   gboolean success;
@@ -57,31 +58,26 @@ main (int argc, char *argv[])
 
   g_type_init ();
 
-  /* Translators: this message will appear immediately after the */
-  /* usage string - Usage: COMMAND [OPTION]... <THIS_MESSAGE>    */
-  context =
-    g_option_context_new (_("FILES... - open FILES with registered application."));
-
+  param = g_strdup_printf ("%s...", _("FILE"));
   /* Translators: this message will appear after the usage string */
   /* and before the list of options.                              */
-  summary = _("Opens the file(s) with the default application "
-	      "registered to handle the type of the file.");
+  summary = _("Open files with the default application that\n"
+              "is registered to handle files of this type.");
 
+  context = g_option_context_new (param);
   g_option_context_set_summary (context, summary);
-
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
-
   g_option_context_free (context);
+  g_free (param);
 
   if (error != NULL)
     {
       g_printerr (_("Error parsing commandline options: %s\n"), error->message);
       g_printerr ("\n");
-      g_printerr (_("Try \"%s --help\" for more information."),
-		  g_get_prgname ());
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
       g_printerr ("\n");
-      g_error_free(error);
+      g_error_free (error);
       return 1;
     }
 

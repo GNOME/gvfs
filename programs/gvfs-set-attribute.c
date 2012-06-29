@@ -33,8 +33,8 @@ static gboolean nofollow_symlinks = FALSE;
 
 static GOptionEntry entries[] =
 {
-  { "type", 't', 0, G_OPTION_ARG_STRING, &attr_type, N_("attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, stringv, unset]"), NULL },
-  { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symlinks"), NULL },
+  { "type", 't', 0, G_OPTION_ARG_STRING, &attr_type, N_("Type of the attribute"), N_("TYPE") },
+  { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symbolic links"), NULL },
 	{ NULL }
 };
 
@@ -96,6 +96,20 @@ attribute_type_from_string (const char *str)
   return -1;
 }
 
+static void
+show_help (GOptionContext *context, const char *error)
+{
+  char *help;
+
+  if (error)
+    g_printerr (_("Error: %s"), error);
+
+  help = g_option_context_get_help (context, TRUE, NULL);
+  g_printerr ("%s", help);
+  g_free (help);
+  g_option_context_free (context);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -110,31 +124,39 @@ main (int argc, char *argv[])
   gint32 int32;
   guint64 uint64;
   gint64 int64;
+  gchar *param;
+  gchar *summary;
 
   setlocale (LC_ALL, "");
+
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
 
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new (_(" <location> <attribute> <values> - set attribute"));
+  param = g_strdup_printf ("%s %s %s...", _("LOCATION"), _("ATTRIBUTE"), _("VALUE"));
+  summary = _("Set a file attribute of LOCATION.");
+
+  context = g_option_context_new (param);
+  g_option_context_set_summary (context, summary);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
-  g_option_context_free (context);
 
   if (error != NULL)
     {
       g_printerr (_("Error parsing commandline options: %s\n"), error->message);
       g_printerr ("\n");
-      g_printerr (_("Try \"%s --help\" for more information."),
-		  g_get_prgname ());
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
       g_printerr ("\n");
-      g_error_free(error);
+      g_error_free (error);
       return 1;
     }
 
   if (argc < 2)
     {
-      g_printerr (_("Location not specified\n"));
+      show_help (context, _("Location not specified\n"));
       return 1;
     }
 
@@ -142,7 +164,7 @@ main (int argc, char *argv[])
 
   if (argc < 3)
     {
-      g_printerr (_("Attribute not specified\n"));
+      show_help (context, _("Attribute not specified\n"));
       return 1;
     }
 
@@ -151,9 +173,12 @@ main (int argc, char *argv[])
   type = attribute_type_from_string (attr_type);
   if ((argc < 4) && (type != G_FILE_ATTRIBUTE_TYPE_INVALID))
     {
-      g_printerr (_("Value not specified\n"));
+      show_help (context, _("Value not specified\n"));
       return 1;
     }
+
+  g_option_context_free (context);
+  g_free (param);
 
   switch (type)
     {

@@ -40,12 +40,12 @@ static gboolean print_etag = FALSE;
 
 static GOptionEntry entries[] =
 {
-  { "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, N_("Create backup"), NULL },
+  { "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, N_("Backup existing destination files"), NULL },
   { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Only create if not existing"), NULL },
   { "append", 'a', 0, G_OPTION_ARG_NONE, &append, N_("Append to end of file"), NULL },
-  { "private", 'p', 0, G_OPTION_ARG_NONE, &priv, N_("When creating a file, restrict access to the current user only"), NULL },
+  { "private", 'p', 0, G_OPTION_ARG_NONE, &priv, N_("When creating, restrict access to the current user"), NULL },
   { "print_etag", 'v', 0, G_OPTION_ARG_NONE, &print_etag, N_("Print new etag at end"), NULL },
-  { "etag", 'e', 0, G_OPTION_ARG_STRING, &etag, N_("The etag of the file being overwritten"), NULL },
+  { "etag", 'e', 0, G_OPTION_ARG_STRING, &etag, N_("The etag of the file being overwritten"), N_("ETAG") },
   { NULL }
 };
 
@@ -68,9 +68,9 @@ save (GFile *file)
   if (create)
     out = (GOutputStream *)g_file_create (file, flags, NULL, &error);
   else if (append)
-    out = (GOutputStream *)g_file_append_to  (file, flags, NULL, &error);
+    out = (GOutputStream *)g_file_append_to (file, flags, NULL, &error);
   else
-    out = (GOutputStream *)g_file_replace  (file, etag, backup, flags, NULL, &error);
+    out = (GOutputStream *)g_file_replace (file, etag, backup, flags, NULL, &error);
   if (out == NULL)
     {
       g_printerr (_("Error opening file: %s\n"), error->message);
@@ -147,13 +147,23 @@ main (int argc, char *argv[])
   GOptionContext *context;
   GFile *file;
   gboolean res;
+  gchar *param;
+  gchar *summary;
 
   setlocale (LC_ALL, "");
+
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
 
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new (_("DEST - read from standard input and save to DEST"));
+  param = _("DEST");
+  summary = _("Read from standard input and save to DEST.");
+
+  context = g_option_context_new (param);
+  g_option_context_set_summary (context, summary);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
@@ -162,10 +172,9 @@ main (int argc, char *argv[])
     {
       g_printerr (_("Error parsing commandline options: %s\n"), error->message);
       g_printerr ("\n");
-      g_printerr (_("Try \"%s --help\" for more information."),
-		  g_get_prgname ());
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
       g_printerr ("\n");
-      g_error_free(error);
+      g_error_free (error);
       return 1;
     }
 

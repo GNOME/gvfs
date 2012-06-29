@@ -36,8 +36,8 @@ static GOptionEntry entries[] =
 {
   { "query-writable", 'w', 0, G_OPTION_ARG_NONE, &writable, N_("List writable attributes"), NULL },
   { "filesystem", 'f', 0, G_OPTION_ARG_NONE, &filesystem, N_("Get filesystem info"), NULL },
-  { "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, N_("The attributes to get"), NULL },
-  { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symlinks"), NULL },
+  { "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, N_("The attributes to get"), N_("ATTRIBUTES") },
+  { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symbolic links"), NULL },
   { NULL }
 };
 
@@ -353,25 +353,35 @@ main (int argc, char *argv[])
   GError *error;
   GOptionContext *context;
   GFile *file;
+  gchar *param;
+  gchar *summary;
 
   setlocale (LC_ALL, "");
+
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
 
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new (_("- show info for <location>"));
+  param = g_strdup_printf ("[%s...]", _("LOCATION"));
+  summary = _("Show information about locations.");
+
+  context = g_option_context_new (param);
+  g_option_context_set_summary (context, summary);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
+  g_free (param);
 
   if (error != NULL)
     {
       g_printerr (_("Error parsing commandline options: %s\n"), error->message);
       g_printerr ("\n");
-      g_printerr (_("Try \"%s --help\" for more information."),
-		  g_get_prgname ());
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
       g_printerr ("\n");
-      g_error_free(error);
+      g_error_free (error);
       return 1;
     }
 

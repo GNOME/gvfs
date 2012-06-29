@@ -67,44 +67,51 @@ main (int argc, char *argv[])
   GError *error;
   GOptionContext *context;
   const char *mimetype;
+  gchar *param;
+  gchar *summary;
 
   setlocale (LC_ALL, "");
+
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
 
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new (_("- get/set handler for <mimetype>"));
+  param = g_strdup_printf ("%s [%s]", _("MIMETYPE"), _("HANDLER"));
+  summary = _("Get or set the handler for a mime-type.");
+
+  context = g_option_context_new (param);
+  g_option_context_set_summary (context, summary);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
+  g_free (param);
 
-  if (error != NULL ||
-      query == set)
+  if (error != NULL || query == set)
     {
       g_printerr (_("Error parsing commandline options: %s\n"),
-                  error ? error->message : _("Specify one of --query and --set"));
+                  error ? error->message : _("Specify either --query or --set"));
       g_printerr ("\n");
-      g_printerr (_("Try \"%s --help\" for more information."),
-		  g_get_prgname ());
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
       g_printerr ("\n");
       if (error != NULL)
-        g_error_free(error);
+        g_error_free (error);
       return 1;
     }
 
   if (query && argc != 2)
     {
       g_printerr (_("Must specify a single mime-type.\n"));
-      g_printerr (_("Try \"%s --help\" for more information."),
-		  g_get_prgname ());
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
       g_printerr ("\n");
       return 1;
     }
   else if (set && argc != 3)
     {
       g_printerr (_("Must specify the mime-type followed by the default handler.\n"));
-      g_printerr (_("Try \"%s --help\" for more information."),
-		  g_get_prgname ());
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
       g_printerr ("\n");
       return 1;
     }

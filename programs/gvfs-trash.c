@@ -31,8 +31,7 @@ static gboolean force = FALSE;
 
 static GOptionEntry entries[] =
 {
-  {"force", 'f', 0, G_OPTION_ARG_NONE, &force,
-   N_("ignore nonexistent files, never prompt"), NULL},
+  {"force", 'f', 0, G_OPTION_ARG_NONE, &force, N_("Ignore nonexistent files, never prompt"), NULL},
   { NULL }
 };
 
@@ -43,16 +42,37 @@ main (int argc, char *argv[])
   GOptionContext *context;
   GFile *file;
   int retval = 0;
+  gchar *param;
+  gchar *summary;
 
   setlocale (LC_ALL, "");
+
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
 
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new (_("- move files to trash"));
+  param = g_strdup_printf ("[%s...]", _("FILE"));
+  summary = _("Move files to the trash.");
+
+  context = g_option_context_new (param);
+  g_option_context_set_summary (context, summary);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
+  g_free (param);
+
+  if (error != NULL)
+    {
+      g_printerr (_("Error parsing commandline options: %s\n"), error->message);
+      g_printerr ("\n");
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
+      g_printerr ("\n");
+      g_error_free (error);
+      return 1;
+    }
 
   if (argc > 1)
     {

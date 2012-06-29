@@ -34,8 +34,8 @@
 static gchar **locations = NULL;
 
 static GOptionEntry entries[] = {
-  {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &locations, N_("locations"), NULL},
-  {NULL}
+  { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &locations, NULL, NULL },
+  { NULL }
 };
 
 static void
@@ -55,7 +55,7 @@ cat (GFile * file)
       /* Translators: the first %s is the program name, the second one  */
       /* is the URI of the file, the third is the error message.        */
       g_printerr (_("%s: %s: error opening file: %s\n"),
-		  g_get_prgname (), g_file_get_uri (file), error->message);
+                  g_get_prgname (), g_file_get_uri (file), error->message);
       g_error_free (error);
       return;
     }
@@ -63,41 +63,41 @@ cat (GFile * file)
   while (1)
     {
       res =
-	g_input_stream_read (in, buffer, sizeof (buffer) - 1, NULL, &error);
+        g_input_stream_read (in, buffer, sizeof (buffer) - 1, NULL, &error);
       if (res > 0)
-	{
-	  ssize_t written;
+        {
+          ssize_t written;
 
-	  p = buffer;
-	  while (res > 0)
-	    {
-	      written = write (STDOUT_FILENO, p, res);
+          p = buffer;
+          while (res > 0)
+            {
+              written = write (STDOUT_FILENO, p, res);
 
-	      if (written == -1 && errno != EINTR)
-		{
-		  /* Translators: the first %s is the program name, the */
-		  /* second one is the URI of the file.                 */
-		  g_printerr (_("%s: %s, error writing to stdout"),
-			      g_get_prgname (), g_file_get_uri (file));
-		  goto out;
-		}
-	      res -= written;
-	      p += written;
-	    }
-	}
+              if (written == -1 && errno != EINTR)
+                {
+                  /* Translators: the first %s is the program name, the */
+                  /* second one is the URI of the file.                 */
+                  g_printerr (_("%s: %s, error writing to stdout"),
+                              g_get_prgname (), g_file_get_uri (file));
+                  goto out;
+                }
+              res -= written;
+              p += written;
+            }
+        }
       else if (res < 0)
-	{
-	  /* Translators: the first %s is the program name, the second one  */
-	  /* is the URI of the file, the third is the error message.        */
-	  g_printerr (_("%s: %s: error reading: %s\n"),
-		      g_get_prgname (), g_file_get_uri (file),
-		      error->message);
-	  g_error_free (error);
-	  error = NULL;
-	  break;
-	}
+        {
+          /* Translators: the first %s is the program name, the second one  */
+          /* is the URI of the file, the third is the error message.        */
+          g_printerr (_("%s: %s: error reading: %s\n"),
+                      g_get_prgname (), g_file_get_uri (file),
+                      error->message);
+          g_error_free (error);
+          error = NULL;
+          break;
+        }
       else if (res == 0)
-	break;
+        break;
     }
 
  out:
@@ -108,7 +108,7 @@ cat (GFile * file)
       /* Translators: the first %s is the program name, the second one  */
       /* is the URI of the file, the third is the error message.        */
       g_printerr (_("%s: %s:error closing: %s\n"),
-		  g_get_prgname (), g_file_get_uri (file), error->message);
+                  g_get_prgname (), g_file_get_uri (file), error->message);
       g_error_free (error);
     }
 }
@@ -120,7 +120,9 @@ main (int argc, char *argv[])
   GOptionContext *context = NULL;
   GFile *file;
   gchar *summary;
+  gchar *description;
   int i;
+  gchar *param;
 
   setlocale (LC_ALL, "");
 
@@ -130,40 +132,36 @@ main (int argc, char *argv[])
 
   g_type_init ();
 
-  /* Translators: this message will appear immediately after the */
-  /* usage string - Usage: COMMAND [OPTION]... <THIS_MESSAGE>    */
-  context =
-    g_option_context_new (_("LOCATION... - concatenate LOCATIONS "
-			    "to standard output."));
-
+  param = g_strdup_printf (("%s..."), _("FILE"));
   /* Translators: this message will appear after the usage string */
   /* and before the list of options.                              */
-  summary = g_strconcat (_("Concatenate files at locations and print to the "
-			   "standard output. Works just like the traditional "
-			   "cat utility, but using gvfs location instead "
-			   "local files: for example you can use something "
-			   "like smb://server/resource/file.txt as location "
-			   "to concatenate."),
-			 "\n\n",
-			 _("Note: just pipe through cat if you need its "
-			   "formatting option like -n, -T or other."), NULL);
+  summary = _("Concatenate files and print to the standard output.");
+  description = g_strconcat (_("gvfs-cat works just like the traditional cat utility, but using gvfs\n"
+                               "locations instead of local files: for example you can use something\n"
+                               "like smb://server/resource/file.txt as location."),
+                               "\n\n",
+                             _("Note: just pipe through cat if you need its formatting options\n"
+                               "like -n, -T or other."),
+                             NULL);
 
+  context = g_option_context_new (param);
   g_option_context_set_summary (context, summary);
+  g_option_context_set_description (context, description);
 
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
 
   g_option_context_free (context);
-  g_free (summary);
+  g_free (param);
+  g_free (description);
 
   if (error != NULL)
     {
       g_printerr (_("Error parsing commandline options: %s\n"), error->message);
       g_printerr ("\n");
-      g_printerr (_("Try \"%s --help\" for more information."),
-		  g_get_prgname ());
+      g_printerr (_("Try \"%s --help\" for more information."), g_get_prgname ());
       g_printerr ("\n");
-      g_error_free(error);
+      g_error_free (error);
       return 1;
     }
 
@@ -174,7 +172,7 @@ main (int argc, char *argv[])
       g_printerr (_("%s: missing locations"), g_get_prgname ());
       g_printerr ("\n");
       g_printerr (_("Try \"%s --help\" for more information."),
-		  g_get_prgname ());
+                  g_get_prgname ());
       g_printerr ("\n");
       return 1;
     }
