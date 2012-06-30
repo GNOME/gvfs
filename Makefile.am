@@ -8,9 +8,12 @@ SUBDIRS = \
 	monitor \
 	po   \
 	programs \
-	man \
 	test \
 	$(NULL)
+
+if BUILD_DOCUMENTATION
+SUBDIRS += man
+endif
 
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 

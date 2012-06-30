@@ -19,7 +19,17 @@ AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 AC_PATH_PROG(GIO_QUERYMODULES, gio-querymodules, no)
 AM_PROG_CC_C_O
 AC_PROG_SED
-AC_PATH_PROG(XSLTPROC, xsltproc, no)
+AC_ARG_ENABLE(documentation,
+              AC_HELP_STRING([--enable-documentation],
+                             [build documentation]),,
+              enable_documentation=yes)
+if test x$enable_documentation = xyes; then
+   AC_PATH_PROG([XSLTPROC], [xsltproc])
+   if test x$XSLTPROC = x; then
+      AC_MSG_ERROR([xsltproc is required to build documentation])
+   fi
+fi
+AM_CONDITIONAL(BUILD_DOCUMENTATION, test x$enable_documentation = xyes)
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
