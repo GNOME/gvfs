@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: el\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-06-10 10:28+0000\n"
-"PO-Revision-Date: 2012-06-10 13:35+0200\n"
+"POT-Creation-Date: 2012-06-29 21:45+0000\n"
+"PO-Revision-Date: 2012-07-02 14:35+0200\n"
 "Last-Translator: Tom Tryfonidis <tomtryf@gmail.com>\n"
 "Language-Team: Greek Translation Team\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,7 @@ msgstr ""
 "X-Project-Style: gnome\n"
 
 #: ../client/gdaemonfile.c:500
-#: ../client/gdaemonfile.c:2406
+#: ../client/gdaemonfile.c:2405
 msgid "Operation not supported, files on different mounts"
 msgstr "Η λειτουργία δεν υποστηρίζεται διότι τα αρχεία βρίσκονται σε διαφορετικές προσαρτήσεις"
 
@@ -40,13 +40,13 @@ msgstr "Η λειτουργία δεν υποστηρίζεται διότι τ�
 #: ../client/gdaemonfile.c:1869
 #: ../client/gdaemonfile.c:1899
 #: ../client/gdaemonfile.c:2060
-#: ../client/gdaemonfile.c:2566
-#: ../client/gdaemonfile.c:2615
-#: ../client/gdaemonfile.c:2680
-#: ../client/gdaemonfile.c:2765
-#: ../client/gdaemonfile.c:2841
-#: ../client/gdaemonfile.c:3030
-#: ../client/gdaemonfile.c:3111
+#: ../client/gdaemonfile.c:2565
+#: ../client/gdaemonfile.c:2614
+#: ../client/gdaemonfile.c:2679
+#: ../client/gdaemonfile.c:2764
+#: ../client/gdaemonfile.c:2840
+#: ../client/gdaemonfile.c:3029
+#: ../client/gdaemonfile.c:3110
 #: ../client/gvfsiconloadable.c:145
 #: ../client/gvfsiconloadable.c:374
 #, c-format
@@ -63,7 +63,7 @@ msgstr "Αδύνατη η λήψη περιγραφέα αρχείου stream"
 #: ../client/gdaemonfile.c:1181
 #: ../client/gdaemonfile.c:1244
 #: ../client/gdaemonfile.c:1310
-#: ../client/gdaemonfile.c:2645
+#: ../client/gdaemonfile.c:2644
 #: ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "Αδύνατη η λήψη περιγραφέα αρχείου stream"
@@ -81,14 +81,14 @@ msgstr "Ακατάλληλο όνομα αρχείου %s"
 
 #: ../client/gdaemonfile.c:2256
 #: ../client/gdaemonvfs.c:1192
-#: ../client/gdaemonvfs.c:1375
-#: ../client/gdaemonvfs.c:1427
+#: ../client/gdaemonvfs.c:1344
+#: ../client/gdaemonvfs.c:1396
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Σφάλμα στον ορισμό μεταδεδομένων αρχείου: %s"
 
 #: ../client/gdaemonfile.c:2257
-#: ../client/gdaemonvfs.c:1428
+#: ../client/gdaemonvfs.c:1397
 msgid "values must be string or list of strings"
 msgstr "οι τιμές πρέπει να είναι αλφαριθμητικά ή λίστες αλφαριθμητικών"
 
@@ -271,6 +271,8 @@ msgstr "%s Υπηρεσία αρχείων"
 #: ../daemon/daemon-main.c:115
 #: ../programs/gvfs-copy.c:90
 #: ../programs/gvfs-move.c:78
+#: ../programs/gvfs-rename.c:36
+#: ../programs/gvfs-set-attribute.c:105
 #, c-format
 msgid "Error: %s"
 msgstr "Σφάλμα: %s"
@@ -308,41 +310,41 @@ msgstr "Η σύνδεση διεκόπη απροειδοποίητα"
 msgid "Got EOS"
 msgstr "Ελήφθη EOS"
 
-#: ../daemon/gvfsafpserver.c:171
-#: ../daemon/gvfsafpserver.c:457
+#: ../daemon/gvfsafpserver.c:172
+#: ../daemon/gvfsafpserver.c:458
 #, c-format
 msgid "Server doesn't support passwords longer than %d characters"
 msgstr "Ο διακομιστής δεν υποστηρίζει κωδικούς μεγαλύτερους από %d χαρακτήρες"
 
-#: ../daemon/gvfsafpserver.c:199
-#: ../daemon/gvfsafpserver.c:512
+#: ../daemon/gvfsafpserver.c:200
+#: ../daemon/gvfsafpserver.c:513
 msgid "An invalid username was provided"
 msgstr "Δόθηκε μη έγκυρο όνομα χρήστη"
 
-#: ../daemon/gvfsafpserver.c:378
-#: ../daemon/gvfsafpserver.c:606
+#: ../daemon/gvfsafpserver.c:379
+#: ../daemon/gvfsafpserver.c:607
 #, c-format
 msgid "AFP server %s declined the submitted password"
 msgstr "Ο διακομιστής AFP %s αρνήθηκε τον δοθέντα κωδικό"
 
-#: ../daemon/gvfsafpserver.c:652
-#: ../daemon/gvfsafpserver.c:681
+#: ../daemon/gvfsafpserver.c:653
+#: ../daemon/gvfsafpserver.c:682
 #, c-format
 msgid "AFP server %s doesn't support anonymous login"
 msgstr "Ο διακομιστής AFP %s δεν υποστηρίζει ανώνυμη είσοδο"
 
-#: ../daemon/gvfsafpserver.c:709
+#: ../daemon/gvfsafpserver.c:710
 #, c-format
 msgid "Login to AFP server %s failed (no suitable authentication mechanism found)"
 msgstr "Η είσοδος στον διακομιστή AFP %s απέτυχε (δεν βρέθηκε κατάλληλος μηχανισμός ελέγχου ταυτότητας)"
 
 #
-#: ../daemon/gvfsafpserver.c:780
+#: ../daemon/gvfsafpserver.c:781
 #, c-format
 msgid "Failed to connect to server (%s)"
 msgstr "Αποτυχία σύνδεσης στο διακομιστή (%s)"
 
-#: ../daemon/gvfsafpserver.c:885
+#: ../daemon/gvfsafpserver.c:886
 #: ../daemon/gvfsafpvolume.c:391
 #: ../daemon/gvfsafpvolume.c:664
 #: ../daemon/gvfsafpvolume.c:817
@@ -362,36 +364,36 @@ msgstr "Αποτυχία σύνδεσης στο διακομιστή (%s)"
 msgid "Permission denied"
 msgstr "Δεν επιτρέπεται η πρόσβαση"
 
-#: ../daemon/gvfsafpserver.c:890
+#: ../daemon/gvfsafpserver.c:891
 #, c-format
 msgid "Command is not supported by server"
 msgstr "Η εντολή δεν υποστηρίζεται από το διακομιστή"
 
-#: ../daemon/gvfsafpserver.c:894
+#: ../daemon/gvfsafpserver.c:895
 #, c-format
 msgid "User's password has expired"
 msgstr "Ο κωδικός χρήστη έληξε"
 
-#: ../daemon/gvfsafpserver.c:898
+#: ../daemon/gvfsafpserver.c:899
 #, c-format
 msgid "User's password needs to be changed"
 msgstr "Ο κωδικός χρήστη πρέπει να αλλάξει"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsafpserver.c:994
+#: ../daemon/gvfsafpserver.c:995
 #, c-format
 msgid "Enter password for afp as %s on %s"
 msgstr "Εισάγετε κωδικό πρόσβασης για afp ως %s στο %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:997
+#: ../daemon/gvfsafpserver.c:998
 #, c-format
 msgid "Enter password for afp on %s"
 msgstr "Εισάγετε κωδικό για atp σε %s"
 
 # #-#-#-#-#  gdm.gnome-2-20.el.po (el)  #-#-#-#-#
 #
-#: ../daemon/gvfsafpserver.c:1029
+#: ../daemon/gvfsafpserver.c:1030
 #: ../daemon/gvfsbackendftp.c:518
 #: ../daemon/gvfsbackendsftp.c:985
 #: ../daemon/gvfsbackendsmbbrowse.c:995
@@ -445,7 +447,7 @@ msgstr "Το αρχείο δεν υπάρχει"
 #: ../daemon/gvfsbackendafp.c:275
 #: ../daemon/gvfsbackendafp.c:476
 #: ../daemon/gvfsbackendafp.c:1316
-#: ../daemon/gvfsbackenddav.c:2210
+#: ../daemon/gvfsbackenddav.c:2241
 #: ../daemon/gvfsbackendftp.c:773
 #: ../daemon/gvfsbackendsftp.c:2333
 #: ../daemon/gvfsbackendsftp.c:3069
@@ -465,7 +467,7 @@ msgstr "Το τελικό αρχείο είναι ήδη ανοιχτό"
 
 #: ../daemon/gvfsafpvolume.c:672
 #: ../daemon/gvfsbackendburn.c:420
-#: ../daemon/gvfsbackenddav.c:2559
+#: ../daemon/gvfsbackenddav.c:2590
 #: ../daemon/gvfsbackendsftp.c:1828
 msgid "Directory not empty"
 msgstr "Ο κατάλογος δεν είναι άδειος"
@@ -502,9 +504,9 @@ msgstr "Ανεπαρκής ελεύθερος χώρος στο τόμο"
 #: ../daemon/gvfsafpvolume.c:1567
 #: ../daemon/gvfsbackendafp.c:282
 #: ../daemon/gvfsbackendafp.c:483
-#: ../daemon/gvfsbackenddav.c:2266
-#: ../daemon/gvfsbackenddav.c:2519
-#: ../daemon/gvfsbackenddav.c:2630
+#: ../daemon/gvfsbackenddav.c:2297
+#: ../daemon/gvfsbackenddav.c:2550
+#: ../daemon/gvfsbackenddav.c:2661
 #: ../daemon/gvfsbackendftp.c:752
 #: ../daemon/gvfsbackendftp.c:933
 #: ../daemon/gvfsbackendftp.c:1372
@@ -679,7 +681,7 @@ msgstr "Ακύρωση"
 #: ../daemon/gvfsbackendafc.c:408
 #: ../daemon/gvfsbackendarchive.c:550
 #: ../daemon/gvfsbackendarchive.c:579
-#: ../daemon/gvfsbackenddav.c:1806
+#: ../daemon/gvfsbackenddav.c:1820
 #: ../daemon/gvfsbackendhttp.c:309
 #: ../daemon/gvfsbackendobexftp.c:862
 #: ../daemon/gvfsbackendobexftp.c:878
@@ -823,7 +825,7 @@ msgid "Unable to create temporary file (%s)"
 msgstr "Αδυναμία δημιουργίας του προσωρινού φακέλου (%s)"
 
 #: ../daemon/gvfsbackendafp.c:1323
-#: ../daemon/gvfsbackenddav.c:2339
+#: ../daemon/gvfsbackenddav.c:2370
 #: ../daemon/gvfsbackendsftp.c:3421
 #: ../daemon/gvfsbackendsmb.c:1148
 msgid "The file was externally modified"
@@ -1183,60 +1185,60 @@ msgstr "WebDAV ως %s στο %s%s"
 msgid "WebDAV on %s%s"
 msgstr "WebDAV στο %s%s"
 
-#: ../daemon/gvfsbackenddav.c:668
-#: ../daemon/gvfsbackenddav.c:1873
+#: ../daemon/gvfsbackenddav.c:680
+#: ../daemon/gvfsbackenddav.c:1910
 #: ../daemon/gvfsbackendhttp.c:255
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "Σφάλμα HTTP: %s"
 
-#: ../daemon/gvfsbackenddav.c:685
+#: ../daemon/gvfsbackenddav.c:697
 msgid "Could not parse response"
 msgstr "Αδύνατη η συντακτική ανάλυση απόκρισης"
 
-#: ../daemon/gvfsbackenddav.c:694
+#: ../daemon/gvfsbackenddav.c:706
 msgid "Empty response"
 msgstr "Κενή απόκριση"
 
-#: ../daemon/gvfsbackenddav.c:702
+#: ../daemon/gvfsbackenddav.c:714
 msgid "Unexpected reply from server"
 msgstr "Απροσδόκητη απάντηση από διακομιστή"
 
-#: ../daemon/gvfsbackenddav.c:1382
-#: ../daemon/gvfsbackenddav.c:2008
-#: ../daemon/gvfsbackenddav.c:2095
-#: ../daemon/gvfsbackenddav.c:2202
+#: ../daemon/gvfsbackenddav.c:1394
+#: ../daemon/gvfsbackenddav.c:2039
+#: ../daemon/gvfsbackenddav.c:2126
+#: ../daemon/gvfsbackenddav.c:2233
 msgid "Response invalid"
 msgstr "Μη έγκυρη απόκριση"
 
 #
-#: ../daemon/gvfsbackenddav.c:1525
+#: ../daemon/gvfsbackenddav.c:1537
 msgid "WebDAV share"
 msgstr "Κοινή χρήση WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1527
+#: ../daemon/gvfsbackenddav.c:1539
 #, c-format
 msgid "Enter password for %s"
 msgstr "Εισάγετε κωδικό για %s"
 
 #
-#: ../daemon/gvfsbackenddav.c:1530
+#: ../daemon/gvfsbackenddav.c:1542
 msgid "Please enter proxy password"
 msgstr "Παρακαλώ εισάγετε τον κωδικό διαμεσολαβητή"
 
-#: ../daemon/gvfsbackenddav.c:1877
-#: ../daemon/gvfsbackenddav.c:1881
+#: ../daemon/gvfsbackenddav.c:1914
+#: ../daemon/gvfsbackenddav.c:1918
 msgid "Not a WebDAV enabled share"
 msgstr "Δεν είναι μια ενεργοποιημένη κοινόχρηστη WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1962
-#: ../daemon/gvfsbackenddav.c:2050
-#: ../daemon/gvfsbackenddav.c:2123
-#: ../daemon/gvfsbackenddav.c:2236
+#: ../daemon/gvfsbackenddav.c:1993
+#: ../daemon/gvfsbackenddav.c:2081
+#: ../daemon/gvfsbackenddav.c:2154
+#: ../daemon/gvfsbackenddav.c:2267
 msgid "Could not create request"
 msgstr "Δεν ήταν δυνατή η δημιουργία αίτησης"
 
-#: ../daemon/gvfsbackenddav.c:2370
+#: ../daemon/gvfsbackenddav.c:2401
 #: ../daemon/gvfsbackendsmb.c:1184
 #: ../daemon/gvfsbackendsmb.c:2099
 msgid "Backup file creation failed"
@@ -1971,21 +1973,27 @@ msgstr "%s: %s"
 
 #: ../daemon/main.c:80
 #: ../metadata/meta-daemon.c:474
-#: ../programs/gvfs-cat.c:163
-#: ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:123
-#: ../programs/gvfs-info.c:371
-#: ../programs/gvfs-ls.c:392
-#: ../programs/gvfs-mime.c:87
-#: ../programs/gvfs-mime.c:98
-#: ../programs/gvfs-mime.c:106
-#: ../programs/gvfs-mkdir.c:60
-#: ../programs/gvfs-move.c:111
-#: ../programs/gvfs-open.c:141
-#: ../programs/gvfs-open.c:154
-#: ../programs/gvfs-save.c:165
-#: ../programs/gvfs-set-attribute.c:128
-#: ../programs/gvfs-tree.c:251
+#: ../programs/gvfs-cat.c:162
+#: ../programs/gvfs-cat.c:174
+#: ../programs/gvfs-copy.c:133
+#: ../programs/gvfs-info.c:382
+#: ../programs/gvfs-ls.c:409
+#: ../programs/gvfs-mime.c:97
+#: ../programs/gvfs-mime.c:107
+#: ../programs/gvfs-mime.c:114
+#: ../programs/gvfs-mkdir.c:71
+#: ../programs/gvfs-monitor-dir.c:126
+#: ../programs/gvfs-monitor-file.c:125
+#: ../programs/gvfs-mount.c:1019
+#: ../programs/gvfs-move.c:121
+#: ../programs/gvfs-open.c:78
+#: ../programs/gvfs-open.c:90
+#: ../programs/gvfs-rename.c:75
+#: ../programs/gvfs-rm.c:72
+#: ../programs/gvfs-save.c:175
+#: ../programs/gvfs-set-attribute.c:151
+#: ../programs/gvfs-trash.c:71
+#: ../programs/gvfs-tree.c:262
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "Εκτελέστε \"%s --help\" για περισσότερες πληροφορίες."
@@ -2495,7 +2503,6 @@ msgid "%s Media"
 msgstr "%s Δεδομένων"
 
 #: ../monitor/udisks2/gvfsudisks2mount.c:714
-#| msgid "Start Anyway"
 msgid "Eject Anyway"
 msgstr "Εξαγωγή ούτως ή άλλως"
 
@@ -2541,7 +2548,6 @@ msgstr "Η ξεκλειδωμένη συσκευή δεν διαθέτει έν�
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:1074
 #, c-format
-#| msgid "Enter password for %s"
 msgid "Encryption passphrase for %s"
 msgstr "Κρυπτογράφηση συνθηματικής φράσης για το %s"
 
@@ -2552,9 +2558,6 @@ msgstr "Μια κωδική φράση είναι απαραίτητη για π
 #. Translators: This is the message shown to users
 #: ../monitor/udisks2/gvfsudisks2volume.c:1259
 #, c-format
-#| msgid ""
-#| "Enter a password to unlock the volume\n"
-#| "The device %s contains encrypted data."
 msgid ""
 "Enter a passphrase to unlock the volume\n"
 "The passphrase is needed to access encrypted data on %s."
@@ -2577,10 +2580,6 @@ msgstr "%s (%s)"
 #: ../monitor/udisks2/udisks2volumemonitordaemon.c:40
 msgid "GVfs UDisks2 Volume Monitor"
 msgstr "GVfs UDisks2 παρακολούθηση τόμου"
-
-#: ../programs/gvfs-cat.c:37
-msgid "locations"
-msgstr "τοποθεσίες"
 
 #
 #. Translators: the first %s is the program name, the second one
@@ -2612,70 +2611,108 @@ msgstr "%s: %s: σφάλμα κατά την ανάγνωση: %s\n"
 msgid "%s: %s:error closing: %s\n"
 msgstr "%s: %s:σφάλμα κλεισίματος: %s\n"
 
-#: ../programs/gvfs-cat.c:136
-msgid "LOCATION... - concatenate LOCATIONS to standard output."
-msgstr "LOCATION... - σύνδεση LOCATIONS στην στάνταρ έξοδο."
+#: ../programs/gvfs-cat.c:135
+#: ../programs/gvfs-open.c:61
+#: ../programs/gvfs-rm.c:58
+msgid "FILE"
+msgstr "FILE"
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-cat.c:141
-msgid "Concatenate files at locations and print to the standard output. Works just like the traditional cat utility, but using gvfs location instead local files: for example you can use something like smb://server/resource/file.txt as location to concatenate."
-msgstr "Σύνδεση αρχείων σε τοποθεσίες και εκτύπωση στην στάνταρ έξοδο. Λειτουργεί όπως το παραδοσιακό εργαλείο Cat, αλλά χρησιμοποιεί την τοποθεσία gvfs αντί για τα τοπικά αρχεία: Για παράδειγμα μπορείτε να χρησιμοποιήσετε κάτι σαν smb://server/resource/file.txt ως τοποθεσία για σύνδεση."
+#: ../programs/gvfs-cat.c:138
+#| msgid "LOCATION... - concatenate LOCATIONS to standard output."
+msgid "Concatenate files and print to the standard output."
+msgstr "Σύνδεση αρχείων και εκτύπωση στην στάνταρ έξοδο."
 
-#: ../programs/gvfs-cat.c:148
-msgid "Note: just pipe through cat if you need its formatting option like -n, -T or other."
-msgstr "Σημείωση: απλά διασωληνώστε μέσω της cat αν χρειάζεστε δυνατότητα μορφοποίησης όπως -n, -T ή κάποια άλλη."
+#: ../programs/gvfs-cat.c:139
+#| msgid ""
+#| "Concatenate files at locations and print to the standard output. Works "
+#| "just like the traditional cat utility, but using gvfs location instead "
+#| "local files: for example you can use something like smb://server/resource/"
+#| "file.txt as location to concatenate."
+msgid ""
+"gvfs-cat works just like the traditional cat utility, but using gvfs\n"
+"locations instead of local files: for example you can use something\n"
+"like smb://server/resource/file.txt as location."
+msgstr ""
+"Το gvfs-cat  λειτουργεί όπως το παραδοσιακό εργαλείο cat, αλλά χρησιμοποιεί την τοποθεσία gvfs\n"
+"αντί για τα τοπικά αρχεία: Για παράδειγμα μπορείτε να χρησιμοποιήσετε κάτι\n"
+"σαν smb://server/resource/file.txt ως τοποθεσία για σύνδεση."
 
-#: ../programs/gvfs-cat.c:161
-#: ../programs/gvfs-copy.c:121
-#: ../programs/gvfs-info.c:369
-#: ../programs/gvfs-ls.c:390
-#: ../programs/gvfs-mime.c:84
-#: ../programs/gvfs-mkdir.c:58
-#: ../programs/gvfs-move.c:109
-#: ../programs/gvfs-open.c:139
-#: ../programs/gvfs-save.c:163
-#: ../programs/gvfs-set-attribute.c:126
-#: ../programs/gvfs-tree.c:249
+#: ../programs/gvfs-cat.c:143
+#| msgid ""
+#| "Note: just pipe through cat if you need its formatting option like -n, -T "
+#| "or other."
+msgid ""
+"Note: just pipe through cat if you need its formatting options\n"
+"like -n, -T or other."
+msgstr ""
+"Σημείωση: απλά διασωληνώστε μέσω της cat αν χρειάζεστε δυνατότητα μορφοποίησης\n"
+"όπως -n, -T ή κάποια άλλη."
+
+#: ../programs/gvfs-cat.c:160
+#: ../programs/gvfs-copy.c:131
+#: ../programs/gvfs-info.c:380
+#: ../programs/gvfs-ls.c:407
+#: ../programs/gvfs-mime.c:94
+#: ../programs/gvfs-mkdir.c:69
+#: ../programs/gvfs-monitor-dir.c:124
+#: ../programs/gvfs-monitor-file.c:123
+#: ../programs/gvfs-mount.c:1017
+#: ../programs/gvfs-move.c:119
+#: ../programs/gvfs-open.c:76
+#: ../programs/gvfs-rename.c:73
+#: ../programs/gvfs-rm.c:70
+#: ../programs/gvfs-save.c:173
+#: ../programs/gvfs-set-attribute.c:149
+#: ../programs/gvfs-trash.c:69
+#: ../programs/gvfs-tree.c:260
 #, c-format
 msgid "Error parsing commandline options: %s\n"
 msgstr "Σφάλμα ανάλυσης των παραμέτρων της γραμμής εντολών: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:174
-#: ../programs/gvfs-open.c:152
+#: ../programs/gvfs-cat.c:172
+#: ../programs/gvfs-open.c:88
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: λείπουν τοποθεσίες"
 
 #: ../programs/gvfs-copy.c:44
 #: ../programs/gvfs-move.c:42
-msgid "no target directory"
-msgstr "δεν υπάρχει κατάλογος προορισμού"
+#| msgid "no target directory"
+msgid "No target directory"
+msgstr "Δεν υπάρχει κατάλογος προορισμού"
 
 #: ../programs/gvfs-copy.c:45
 #: ../programs/gvfs-move.c:43
-msgid "show progress"
-msgstr "εμφάνιση προόδου"
+#| msgid "show progress"
+msgid "Show progress"
+msgstr "Εμφάνιση προόδου"
 
 #: ../programs/gvfs-copy.c:46
 #: ../programs/gvfs-move.c:44
-msgid "prompt before overwrite"
-msgstr "ερώτηση πριν την αντικατάσταση"
+#| msgid "prompt before overwrite"
+msgid "Prompt before overwrite"
+msgstr "Ερώτηση πριν την αντικατάσταση"
 
 #: ../programs/gvfs-copy.c:47
-msgid "preserve all attributes"
-msgstr "διατήρηση όλων των ιδιοτήτων"
+#| msgid "preserve all attributes"
+msgid "Preserve all attributes"
+msgstr "Διατήρηση όλων των ιδιοτήτων"
 
 #: ../programs/gvfs-copy.c:48
 #: ../programs/gvfs-move.c:45
-msgid "backup existing destination files"
-msgstr "δημιουργία αντιγράφων ασφαλείας για την υπάρχουσα διαδρομή αρχείων"
+#: ../programs/gvfs-save.c:43
+#| msgid "backup existing destination files"
+msgid "Backup existing destination files"
+msgstr "Δημιουργία αντιγράφων ασφαλείας για την υπάρχουσα διαδρομή αρχείων"
 
 #: ../programs/gvfs-copy.c:49
-msgid "never follow symbolic links"
-msgstr "ποτέ μην ακολουθείς τους συμβολικούς συνδέσμους"
+#| msgid "never follow symbolic links"
+msgid "Never follow symbolic links"
+msgstr "Ποτέ μην ακολουθείς τους συμβολικούς συνδέσμους"
 
 #: ../programs/gvfs-copy.c:78
 #: ../programs/gvfs-move.c:67
@@ -2683,33 +2720,46 @@ msgstr "ποτέ μην ακολουθείς τους συμβολικούς σ�
 msgid "progress"
 msgstr "πρόοδος"
 
-#: ../programs/gvfs-copy.c:115
-msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
-msgstr "ΠΗΓΗ... ΠΡΟΟΡΙΣΜΟΣ - αντιγραφή αρχείου(ων) από ΠΗΓΗ στο ΠΡΟΟΡΙΣΜΟΣ"
+#: ../programs/gvfs-copy.c:121
+#: ../programs/gvfs-move.c:109
+msgid "SOURCE"
+msgstr "SOURCE"
 
-#: ../programs/gvfs-copy.c:132
-#: ../programs/gvfs-move.c:120
+#: ../programs/gvfs-copy.c:121
+#: ../programs/gvfs-move.c:109
+#: ../programs/gvfs-save.c:162
+msgid "DEST"
+msgstr "DEST"
+
+#: ../programs/gvfs-copy.c:122
+#| msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
+msgid "Copy one or more files from SOURCE to DEST."
+msgstr "Αντιγραφή ένα ή περισσότερα αρχεία από SOURCE στο DEST"
+
+#: ../programs/gvfs-copy.c:141
+#: ../programs/gvfs-move.c:129
+#: ../programs/gvfs-rename.c:83
 msgid "Missing operand\n"
 msgstr "Παράληψη τελεστέου\n"
 
-#: ../programs/gvfs-copy.c:140
-#: ../programs/gvfs-move.c:128
+#: ../programs/gvfs-copy.c:149
+#: ../programs/gvfs-move.c:137
 msgid "Too many arguments\n"
 msgstr "Πάρα πολλά ορίσματα\n"
 
-#: ../programs/gvfs-copy.c:149
-#: ../programs/gvfs-move.c:137
+#: ../programs/gvfs-copy.c:158
+#: ../programs/gvfs-move.c:146
 #, c-format
 msgid "Target %s is not a directory\n"
 msgstr "Ο προορισμός %s δεν είναι κατάλογος\n"
 
-#: ../programs/gvfs-copy.c:193
+#: ../programs/gvfs-copy.c:203
 #, c-format
 msgid "overwrite %s?"
 msgstr "αντικατάσταση %s;"
 
 #
-#: ../programs/gvfs-copy.c:207
+#: ../programs/gvfs-copy.c:217
 #, c-format
 msgid "Error copying file %s: %s\n"
 msgstr "Σφάλμα αντιγραφής αρχείου %s: %s\n"
@@ -2727,11 +2777,17 @@ msgstr "Λήψη πληροφοριών συστήματος αρχείων"
 msgid "The attributes to get"
 msgstr "Οι ιδιότητες προς λήψη"
 
+#: ../programs/gvfs-info.c:39
+#: ../programs/gvfs-ls.c:39
+msgid "ATTRIBUTES"
+msgstr "ATTRIBUTES"
+
 #: ../programs/gvfs-info.c:40
 #: ../programs/gvfs-ls.c:43
 #: ../programs/gvfs-set-attribute.c:37
-msgid "Don't follow symlinks"
-msgstr "Μην ακλουθείς τους συμβολικούς συνδέσμους"
+#| msgid "Don't follow symlinks"
+msgid "Don't follow symbolic links"
+msgstr "Μην ακολουθείτε τους συμβολικούς συνδέσμους"
 
 #: ../programs/gvfs-info.c:50
 msgid "invalid type"
@@ -2823,9 +2879,23 @@ msgstr "Ρυθμιζόμενες ιδιότητες:\n"
 msgid "Writable attribute namespaces:\n"
 msgstr "Εγγράψιμη ιδιότητα namespaces:\n"
 
-#: ../programs/gvfs-info.c:362
-msgid "- show info for <location>"
-msgstr "- προβολή πληροφοριών για το <location>"
+#: ../programs/gvfs-info.c:368
+#: ../programs/gvfs-ls.c:390
+#: ../programs/gvfs-mkdir.c:57
+#: ../programs/gvfs-monitor-dir.c:112
+#: ../programs/gvfs-monitor-file.c:111
+#: ../programs/gvfs-mount.c:1005
+#: ../programs/gvfs-rename.c:64
+#: ../programs/gvfs-set-attribute.c:139
+#: ../programs/gvfs-trash.c:57
+#: ../programs/gvfs-tree.c:248
+msgid "LOCATION"
+msgstr "LOCATION"
+
+#: ../programs/gvfs-info.c:369
+#| msgid "- show info for <location>"
+msgid "Show information about locations."
+msgstr "Προβολή πληροφοριών για τις τοποθεσίες."
 
 #: ../programs/gvfs-ls.c:40
 #: ../programs/gvfs-tree.c:36
@@ -2840,16 +2910,37 @@ msgstr "Χρήση μορφοποίησης μεγάλης λίστας"
 msgid "Show completions"
 msgstr "Παρουσίαση ολοκληρωμένων ενεργειών"
 
+#: ../programs/gvfs-ls.c:42
+msgid "PREFIX"
+msgstr "PREFIX"
+
 #: ../programs/gvfs-ls.c:164
 #: ../programs/gvfs-ls.c:171
-#: ../programs/gvfs-rename.c:69
+#: ../programs/gvfs-rename.c:97
 #, c-format
 msgid "Error: %s\n"
 msgstr "Σφάλμα: %s\n"
 
-#: ../programs/gvfs-ls.c:383
-msgid "- list files at <location>"
-msgstr "- εμφάνιση λίστας αρχείων για το <location>"
+#: ../programs/gvfs-ls.c:391
+msgid "List the contents of the locations."
+msgstr "Περιεχόμενο λίστας των τοποθεσιών."
+
+#: ../programs/gvfs-ls.c:392
+#| msgid ""
+#| "Concatenate files at locations and print to the standard output. Works "
+#| "just like the traditional cat utility, but using gvfs location instead "
+#| "local files: for example you can use something like smb://server/resource/"
+#| "file.txt as location to concatenate."
+msgid ""
+"gvfs-ls is similar to the traditional ls utility, but using gvfs\n"
+"locations instead of local files: for example you can use something\n"
+"like smb://server/resource/file.txt as location. File attributes can\n"
+"be specified with their gvfs name, e.g. standard::icon."
+msgstr ""
+"Το gvfs-ls λειτουργεί όπως το παραδοσιακό εργαλείο ls, αλλά χρησιμοποιεί την τοποθεσία gvfs\n"
+"αντί για τα τοπικά αρχεία: Για παράδειγμα μπορείτε να χρησιμοποιήσετε κάτι\n"
+"σαν smb://server/resource/file.txt ως τοποθεσία για σύνδεση. Οι ιδιότητες του αρχείου\n"
+"μπορούν να καθοριστούν με το gvfs ονομά τους, π.χ standard::icon."
 
 #: ../programs/gvfs-mime.c:36
 msgid "Query handler for mime-type"
@@ -2859,83 +2950,104 @@ msgstr "Ερώτημα τελεστή για τον τύπο mime"
 msgid "Set handler for mime-type"
 msgstr "Ορισμός τελεστή για τον τύπο mime"
 
-#: ../programs/gvfs-mime.c:76
-msgid "- get/set handler for <mimetype>"
-msgstr "- λήψη/ορισμός τελεστή για <mimetype>"
+#: ../programs/gvfs-mime.c:82
+msgid "MIMETYPE"
+msgstr "MIMETYPE"
 
-#: ../programs/gvfs-mime.c:85
-msgid "Specify one of --query and --set"
-msgstr "Ορίστε ένα από τα --query και --set"
+#: ../programs/gvfs-mime.c:82
+msgid "HANDLER"
+msgstr "HANDLER"
 
-#: ../programs/gvfs-mime.c:97
+#: ../programs/gvfs-mime.c:83
+#| msgid "Set handler for mime-type"
+msgid "Get or set the handler for a mime-type."
+msgstr "Αποκτήστε ή ορίστε τον τελεστή για ένα τύπο mime."
+
+#: ../programs/gvfs-mime.c:95
+#| msgid "Specify one of --query and --set"
+msgid "Specify either --query or --set"
+msgstr "Καθορίστε είτε --query ή --set"
+
+#: ../programs/gvfs-mime.c:106
 #, c-format
 msgid "Must specify a single mime-type.\n"
 msgstr "Πρέπει να ορισθεί μόνον ένας τύπος mime.\n"
 
-#: ../programs/gvfs-mime.c:105
+#: ../programs/gvfs-mime.c:113
 #, c-format
 msgid "Must specify the mime-type followed by the default handler.\n"
 msgstr "Πρέπει να ορισθεί ο τύπος mime ακολουθούμενος απο τον ορισμένο τελεστή.\n"
 
-#: ../programs/gvfs-mime.c:121
+#: ../programs/gvfs-mime.c:128
 #, c-format
 msgid "No default applications for '%s'\n"
 msgstr "Δεν βρέθηκαν προκαθορισμένες εφαρμογές για το '%s'\n"
 
-#: ../programs/gvfs-mime.c:127
+#: ../programs/gvfs-mime.c:134
 #, c-format
 msgid "Default application for '%s': %s\n"
 msgstr "Προκαθορισμένη εφαρμογή για το '%s': %s\n"
 
-#: ../programs/gvfs-mime.c:132
+#: ../programs/gvfs-mime.c:139
 #, c-format
 msgid "Registered applications:\n"
 msgstr "Καταχωρημένες εφαρμογές:\n"
 
-#: ../programs/gvfs-mime.c:134
+#: ../programs/gvfs-mime.c:141
 #, c-format
 msgid "No registered applications\n"
 msgstr "Μη καταχωρημένες εφαρμογές\n"
 
-#: ../programs/gvfs-mime.c:145
+#: ../programs/gvfs-mime.c:152
 #, c-format
 msgid "Recommended applications:\n"
 msgstr "Προτεινόμενες εφαρμογές:\n"
 
-#: ../programs/gvfs-mime.c:147
+#: ../programs/gvfs-mime.c:154
 #, c-format
 msgid "No recommended applications\n"
 msgstr "Μη προτεινόμενες εφαρμογές\n"
 
-#: ../programs/gvfs-mime.c:167
+#: ../programs/gvfs-mime.c:174
 #, c-format
 msgid "Failed to load info for handler '%s'\n"
 msgstr "Αδυναμία φόρτωσης πληροφοριών για τον τελεστή '%s'\n"
 
-#: ../programs/gvfs-mime.c:173
+#: ../programs/gvfs-mime.c:180
 #, c-format
 msgid "Failed to set '%s' as the default handler for '%s': %s\n"
 msgstr "Αδυναμία ορισμού '%s' ως προκαθορισμένου τελεστή για '%s': %s\n"
 
 #: ../programs/gvfs-mkdir.c:33
-msgid "create parent directories"
-msgstr "δημιουργία γονικών καταλόγων"
+#| msgid "create parent directories"
+msgid "Create parent directories"
+msgstr "Δημιουργία γονικών καταλόγων"
 
-#: ../programs/gvfs-mkdir.c:51
-msgid "- create directories"
-msgstr "- δημιουργία καταλόγων"
+#: ../programs/gvfs-mkdir.c:58
+#| msgid "- create directories"
+msgid "Create directories."
+msgstr "Δημιουργία καταλόγων."
 
 # gconf/gconfd.c:1676
-#: ../programs/gvfs-mkdir.c:79
-#: ../programs/gvfs-mkdir.c:88
+#: ../programs/gvfs-mkdir.c:89
+#: ../programs/gvfs-mkdir.c:98
 #, c-format
 msgid "Error creating directory: %s\n"
 msgstr "Σφάλμα δημιουργίας καταλόγου: %s\n"
 
 #: ../programs/gvfs-monitor-dir.c:38
 #: ../programs/gvfs-monitor-file.c:38
-msgid "Don't send single MOVED events."
-msgstr "Άρνηση αποστολής μεμονωμένων γεγονότων MOVED."
+#| msgid "Don't send single MOVED events."
+msgid "Don't send single MOVED events"
+msgstr "Άρνηση αποστολής μεμονωμένων γεγονότων MOVED"
+
+#: ../programs/gvfs-monitor-dir.c:113
+msgid "Monitor directories for changes."
+msgstr "Παρακολούθηση καταλόγων για αλλαγές."
+
+#: ../programs/gvfs-monitor-file.c:112
+msgid "Monitor files for changes."
+msgstr "Παρακολούθηση αρχείων για αλλαγές."
 
 #: ../programs/gvfs-mount.c:55
 msgid "Mount as mountable"
@@ -2944,6 +3056,10 @@ msgstr "Προσάρτηση ως προσαρτήσιμο"
 #: ../programs/gvfs-mount.c:56
 msgid "Mount volume with device file"
 msgstr "Προσάρτηση μονάδας δίσκου χρησιμοποιώντας το αρχείο συσκευών"
+
+#: ../programs/gvfs-mount.c:56
+msgid "DEVICE"
+msgstr "DEVICE"
 
 #: ../programs/gvfs-mount.c:57
 msgid "Unmount"
@@ -2957,18 +3073,23 @@ msgstr "Εξαγωγή"
 msgid "Unmount all mounts with the given scheme"
 msgstr "Αποσύνδεση όλων των προσαρτήσεων με τα δεδομένο χαρακτηριστικά"
 
+#: ../programs/gvfs-mount.c:59
+msgid "SCHEME"
+msgstr "SCHEME"
+
 #. Translator: List here is a verb as in 'List all mounts'
 #: ../programs/gvfs-mount.c:61
 msgid "List"
 msgstr "Λίστα"
 
 #: ../programs/gvfs-mount.c:62
-msgid "Show extra information for List and Monitor"
-msgstr "Προβολή πρόσθετων πληροφοριών για την Λίστα και την Παρακολούθηση"
-
-#: ../programs/gvfs-mount.c:63
 msgid "Monitor events"
 msgstr "Παρακολούθηση γεγονότων"
+
+#: ../programs/gvfs-mount.c:63
+#| msgid "Show extra information for List and Monitor"
+msgid "Show extra information"
+msgstr "Προβολή πρόσθετων πληροφοριών"
 
 #: ../programs/gvfs-mount.c:166
 #: ../programs/gvfs-mount.c:187
@@ -2989,7 +3110,6 @@ msgstr "Σφάλμα εύρεσης εσώκλειστης προσάρτηση�
 
 #: ../programs/gvfs-mount.c:289
 #, c-format
-#| msgid "Error unmounting mount: %s\n"
 msgid "Error ejecting mount: %s\n"
 msgstr "Σφάλμα κατά την εξαγωγή της προσάρτησης: %s\n"
 
@@ -3009,71 +3129,66 @@ msgstr "Προσάρτηση του %s στο %s\n"
 msgid "No volume for device file %s\n"
 msgstr "Δεν υπάρχει μονάδα δίσκου για το αρχείο συσκευής %s\n"
 
-#: ../programs/gvfs-mount.c:999
-msgid "- mount <location>"
-msgstr "- προσάρτηση <location>"
+#: ../programs/gvfs-mount.c:1006
+#| msgid "- mount <location>"
+msgid "Mount the locations."
+msgstr "Προσάρτηση τοποθεσιών."
 
-#: ../programs/gvfs-move.c:103
-msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
-msgstr "SOURCE... DEST - μετακίνηση αρχείου(α) από SOURCE στο DEST"
+#: ../programs/gvfs-move.c:110
+#| msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
+msgid "Move one or more files from SOURCE to DEST."
+msgstr "Μετακίνηση ένα ή περισσότερα αρχεία από SOURCE στο DEST"
 
 #
-#: ../programs/gvfs-move.c:189
+#: ../programs/gvfs-move.c:199
 #, c-format
 msgid "Error moving file %s: %s\n"
 msgstr "Σφάλμα μετακίνησης αρχείου: %s: %s\n"
 
-#: ../programs/gvfs-open.c:37
-msgid "files"
-msgstr "αρχεία"
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-open.c:64
+#| msgid ""
+#| "Opens the file(s) with the default application registered to handle the "
+#| "type of the file."
+msgid ""
+"Open files with the default application that\n"
+"is registered to handle files of this type."
+msgstr ""
+"Ανοίγει τα αρχεία με την προεπιλεγμένη εφαρμογή\n"
+"που έχει ορισθεί να χειρίζεται αυτούς τους τύπους αρχείων."
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:65
+#: ../programs/gvfs-open.c:120
 #, c-format
 msgid "%s: %s: error opening location: %s\n"
 msgstr "%s: %s: σφάλμα ανοίγματος τοποθεσίας: %s\n"
 
-# gconf/gconftool.c:1181
-#. Translators: the first %s is the program name, the second one
-#. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:92
-#, c-format
-msgid "%s: %s: error launching application: %s\n"
-msgstr "%s: %s: σφάλμα εκκίνησης εφαρμογής: %s\n"
-
-#: ../programs/gvfs-open.c:123
-msgid "FILES... - open FILES with registered application."
-msgstr "FILES... - άνοιγμα ΑΡΧΕΙΩΝ με την καθορισμένη εφαρμογή."
-
-#. Translators: this message will appear after the usage string
-#. and before the list of options.
-#: ../programs/gvfs-open.c:127
-msgid "Opens the file(s) with the default application registered to handle the type of the file."
-msgstr "Ανοίγει τα αρχεία με την προεπιλεγμένη εφαρμογή που έχει ορισθεί να χειρίζεται αυτούς τους τύπους αρχείων."
+#: ../programs/gvfs-rename.c:64
+msgid "NEW-NAME"
+msgstr "NEW-NAME"
 
 #
-#: ../programs/gvfs-rename.c:50
-msgid "- rename file"
-msgstr "- μετονομασία αρχείου"
+#: ../programs/gvfs-rename.c:65
+#| msgid "- rename file"
+msgid "Rename a file."
+msgstr "Mετονομασία αρχείου."
 
-#: ../programs/gvfs-rename.c:76
+#: ../programs/gvfs-rename.c:104
 #, c-format
 msgid "Rename successful. New uri: %s\n"
 msgstr "Επιτυχής μετονομασία. Νέα uri: %s\n"
 
-#: ../programs/gvfs-rm.c:35
-#: ../programs/gvfs-trash.c:35
-msgid "ignore nonexistent files, never prompt"
-msgstr "αγνόηση ανύπαρκτων αρχείων, να μην εμφανίζεται μήνυμα"
+#: ../programs/gvfs-rm.c:34
+#: ../programs/gvfs-trash.c:34
+#| msgid "ignore nonexistent files, never prompt"
+msgid "Ignore nonexistent files, never prompt"
+msgstr "Αγνόηση ανύπαρκτων αρχείων, να μην εμφανίζεται μήνυμα"
 
-#: ../programs/gvfs-rm.c:53
-msgid "- delete files"
-msgstr "- διαγραφή αρχείων"
-
-#: ../programs/gvfs-save.c:43
-msgid "Create backup"
-msgstr "Δημιουργία αντιγράφων ασφαλείας"
+#: ../programs/gvfs-rm.c:59
+msgid "Delete the given files."
+msgstr "Διαγραφή των επιλεγμένων αρχείων."
 
 #: ../programs/gvfs-save.c:44
 msgid "Only create if not existing"
@@ -3084,8 +3199,9 @@ msgid "Append to end of file"
 msgstr "Επισύναψη στο τέλος του αρχείου"
 
 #: ../programs/gvfs-save.c:46
-msgid "When creating a file, restrict access to the current user only"
-msgstr "Όταν δημιουργείτε ένα αρχείο, περιόρισε την πρόσβαση στον τρέχον χρήστη μόνο"
+#| msgid "When creating a file, restrict access to the current user only"
+msgid "When creating, restrict access to the current user"
+msgstr "Όταν δημιουργείτε, περιορίστε την πρόσβαση στον τρέχον χρήστη"
 
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
@@ -3094,6 +3210,10 @@ msgstr "Εκτύπωση νέου etag στο τέλος"
 #: ../programs/gvfs-save.c:48
 msgid "The etag of the file being overwritten"
 msgstr "Το etag του αρχείου αντικαθίσταται"
+
+#: ../programs/gvfs-save.c:48
+msgid "ETAG"
+msgstr "ETAG"
 
 #
 #: ../programs/gvfs-save.c:76
@@ -3117,63 +3237,110 @@ msgstr "Σφάλμα κλεισίματος: %s\n"
 msgid "Etag not available\n"
 msgstr "Το etag δεν είναι διαθέσιμο\n"
 
-#: ../programs/gvfs-save.c:156
-msgid "DEST - read from standard input and save to DEST"
-msgstr "DEST - ανάγνωση από την πρότυπη συσκευή εισόδου και αποθήκευση στο DEST"
+#: ../programs/gvfs-save.c:163
+#| msgid "DEST - read from standard input and save to DEST"
+msgid "Read from standard input and save to DEST."
+msgstr "Ανάγνωση από την πρότυπη συσκευή εισόδου και αποθήκευση στο DEST."
 
 #: ../programs/gvfs-set-attribute.c:36
-msgid "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, stringv, unset]"
-msgstr "τύπος ιδιότητας [string, bytestring, boolean, uint32, int32, uint64, int64, stringv, unset]"
+#| msgid "The attributes to get"
+msgid "Type of the attribute"
+msgstr "Τύπος της ιδιότητας"
 
-#: ../programs/gvfs-set-attribute.c:119
-msgid " <location> <attribute> <values> - set attribute"
-msgstr " <location> <attribute> <values> - ορισμός ιδιοτήτων"
+#: ../programs/gvfs-set-attribute.c:36
+msgid "TYPE"
+msgstr "TYPE"
 
-#: ../programs/gvfs-set-attribute.c:137
-#, c-format
+#: ../programs/gvfs-set-attribute.c:139
+msgid "ATTRIBUTE"
+msgstr "ATTRIBUTE"
+
+#: ../programs/gvfs-set-attribute.c:139
+msgid "VALUE"
+msgstr "VALUE"
+
+#: ../programs/gvfs-set-attribute.c:140
+msgid "Set a file attribute of LOCATION."
+msgstr "Ορίστε μια ιδιότητα αρχείου για LOCATION."
+
+#: ../programs/gvfs-set-attribute.c:159
 msgid "Location not specified\n"
 msgstr "Δεν καθορίστηκε τοποθεσία\n"
 
-#: ../programs/gvfs-set-attribute.c:145
-#, c-format
+#: ../programs/gvfs-set-attribute.c:167
 msgid "Attribute not specified\n"
 msgstr "Η ιδιότητα δεν ορίστηκε\n"
 
-#: ../programs/gvfs-set-attribute.c:154
-#, c-format
+#: ../programs/gvfs-set-attribute.c:176
 msgid "Value not specified\n"
 msgstr "Δεν ορίστηκε τιμή\n"
 
-#: ../programs/gvfs-set-attribute.c:194
+#: ../programs/gvfs-set-attribute.c:219
 #, c-format
 msgid "Invalid attribute type %s\n"
 msgstr "Μη έγκυρος τύπος ιδιότητας %s\n"
 
-#: ../programs/gvfs-set-attribute.c:204
+#: ../programs/gvfs-set-attribute.c:229
 #, c-format
 msgid "Error setting attribute: %s\n"
 msgstr "Σφάλμα στον ορισμό ιδιότητας: %s\n"
 
-#: ../programs/gvfs-trash.c:52
-msgid "- move files to trash"
-msgstr "- μεταφορά αρχείων στο καλάθι αχρήστων"
+#: ../programs/gvfs-trash.c:58
+#| msgid "Can't move a shared directory into the Trash"
+msgid "Move files or directories to the trash."
+msgstr "Μετακίνηση αρχείων ή καταλόγων στα απορρίματα."
 
-#: ../programs/gvfs-trash.c:69
+#: ../programs/gvfs-trash.c:89
 #, c-format
 msgid "Error trashing file: %s\n"
 msgstr "Σφάλμα διαγραφής αρχείου: %s\n"
 
 #: ../programs/gvfs-tree.c:37
-msgid "Follow symbolic links, mounts and shortcuts like directories"
-msgstr "Συμβολικοί σύνδεσμοι, προσαρτούν συντομεύσεις σαν καταλόγους"
+#| msgid "Follow symbolic links, mounts and shortcuts like directories"
+msgid "Follow symbolic links, mounts and shortcuts"
+msgstr "Ακολουθήστε τους συμβολικούς συνδέσμους, τις προσαρτήσεις και συντομεύσεις"
 
-#: ../programs/gvfs-tree.c:242
-msgid "- list contents of directories in a tree-like format"
-msgstr "- περιεχόμενο λίστας των καταλόγων σε μορφή δέντρου"
+#: ../programs/gvfs-tree.c:249
+#| msgid "- list contents of directories in a tree-like format"
+msgid "List contents of directories in a tree-like format."
+msgstr "Περιεχόμενο λίστας των καταλόγων σε μορφή δέντρου"
 
+#~ msgid "locations"
+#~ msgstr "τοποθεσίες"
+
+#~ msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
+#~ msgstr "ΠΗΓΗ... ΠΡΟΟΡΙΣΜΟΣ - αντιγραφή αρχείου(ων) από ΠΗΓΗ στο ΠΡΟΟΡΙΣΜΟΣ"
+
+#~ msgid "- list files at <location>"
+#~ msgstr "- εμφάνιση λίστας αρχείων για το <location>"
+
+#~ msgid "- get/set handler for <mimetype>"
+#~ msgstr "- λήψη/ορισμός τελεστή για <mimetype>"
+
+#~ msgid "files"
+#~ msgstr "αρχεία"
+
+# gconf/gconftool.c:1181
+#~ msgid "%s: %s: error launching application: %s\n"
+#~ msgstr "%s: %s: σφάλμα εκκίνησης εφαρμογής: %s\n"
+#~ msgid "FILES... - open FILES with registered application."
+#~ msgstr "FILES... - άνοιγμα ΑΡΧΕΙΩΝ με την καθορισμένη εφαρμογή."
+#~ msgid "- delete files"
+#~ msgstr "- διαγραφή αρχείων"
+#~ msgid "Create backup"
+#~ msgstr "Δημιουργία αντιγράφων ασφαλείας"
+#~ msgid ""
+#~ "attribute type [string, bytestring, boolean, uint32, int32, uint64, "
+#~ "int64, stringv, unset]"
+#~ msgstr ""
+#~ "τύπος ιδιότητας [string, bytestring, boolean, uint32, int32, uint64, "
+#~ "int64, stringv, unset]"
+#~ msgid " <location> <attribute> <values> - set attribute"
+#~ msgstr " <location> <attribute> <values> - ορισμός ιδιοτήτων"
+#~ msgid "- move files to trash"
+#~ msgstr "- μεταφορά αρχείων στο καλάθι αχρήστων"
 #~ msgid "ftp on %s"
 #~ msgstr "ftp στο %s"
-
 # gconf/gconftool.c:982 gconf/gconftool.c:1084
 #~ msgid "Error renaming dir"
 #~ msgstr "Σφάλμα μετονομασίας καταλόγου"
