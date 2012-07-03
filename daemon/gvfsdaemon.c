@@ -81,12 +81,8 @@ struct _GVfsDaemon
 typedef struct {
   GVfsDaemon *daemon;
   char *socket_dir;
-  guint io_watch;
   GDBusServer *server;
   
-  gboolean got_dbus_connection;
-  gboolean got_fd_connection;
-  int fd;
   GDBusConnection *conn;
 } NewConnectionData;
 
@@ -603,9 +599,6 @@ new_connection_data_free (void *memory)
   if (data->socket_dir) 
     rmdir (data->socket_dir);
 
-  if (data->io_watch)
-    g_source_remove (data->io_watch);
-
   g_free (data->socket_dir);
   g_free (data);
 }
@@ -665,18 +658,6 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
 {
   GVfsDBusDaemon *daemon_skeleton;
   GError *error;
-  
-  /* We wait until we have the extra fd */
-  if (!data->got_fd_connection)
-    return;
-
-  if (data->fd == -1)
-    {
-      /* The fd connection failed, abort the whole thing */
-      g_warning ("Failed to accept client: %s", "accept of extra fd failed");
-      g_object_unref (data->conn);
-      goto error_out;
-    }
 
   daemon_skeleton = gvfs_dbus_daemon_skeleton_new ();
   g_signal_connect (daemon_skeleton, "handle-cancel", G_CALLBACK (handle_cancel), daemon);
@@ -691,7 +672,6 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
                  error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
       g_object_unref (data->conn);
-      close (data->fd);
       goto error_out;
     }
   g_object_set_data_full (G_OBJECT (data->conn), "daemon_skeleton", daemon_skeleton, (GDestroyNotify) g_object_unref);
@@ -808,12 +788,10 @@ create_socket_dir (void)
 #endif
 
 static void
-generate_addresses (char **address1,
-		    char **address2,
-		    char **folder)
+generate_address (char **address,
+		  char **folder)
 {
-  *address1 = NULL;
-  *address2 = NULL;
+  *address = NULL;
   *folder = NULL;
 
 #ifdef USE_ABSTRACT_SOCKETS
@@ -821,18 +799,14 @@ generate_addresses (char **address1,
     gchar  tmp[9];
 
     randomize_string (tmp);
-    *address1 = g_strdup_printf ("unix:abstract=/dbus-vfs-daemon/socket-%s", tmp);
-
-    randomize_string (tmp);
-    *address2 = g_strdup_printf ("unix:abstract=/dbus-vfs-daemon/socket-%s", tmp);
+    *address = g_strdup_printf ("unix:abstract=/dbus-vfs-daemon/socket-%s", tmp);
   }
 #else
   {
     char *dir;
     
     dir = create_socket_dir ();
-    *address1 = g_strdup_printf ("unix:path=%s/socket1", dir);
-    *address2 = g_strdup_printf ("unix:path=%s/socket2", dir);
+    *address = g_strdup_printf ("unix:path=%s/socket", dir);
     *folder = dir;
   }
 #endif
@@ -846,7 +820,6 @@ daemon_new_connection_func (GDBusServer *server,
   NewConnectionData *data;
 
   data = user_data;
-  data->got_dbus_connection = TRUE;
 
   /* Take ownership */
   data->conn = g_object_ref (connection);
@@ -862,94 +835,6 @@ daemon_new_connection_func (GDBusServer *server,
   return TRUE;
 }
 
-static int
-unix_socket_at (const char *address)
-{
-  int fd;
-  const char *path;
-  size_t path_len;
-  struct sockaddr_un addr;
-
-  fd = socket (PF_UNIX, SOCK_STREAM, 0);
-  if (fd == -1)
-    return -1;
-
-#ifdef USE_ABSTRACT_SOCKETS  
-  path = address + strlen ("unix:abstract=");
-#else
-  path = address + strlen ("unix:path=");
-#endif
-    
-  memset (&addr, 0, sizeof (addr));
-  addr.sun_family = AF_UNIX;
-  path_len = strlen (path);
-
-#ifdef USE_ABSTRACT_SOCKETS
-  addr.sun_path[0] = '\0'; /* this is what says "use abstract" */
-  path_len++; /* Account for the extra nul byte added to the start of sun_path */
-
-  strncpy (&addr.sun_path[1], path, path_len);
-#else /* USE_ABSTRACT_SOCKETS */
-  strncpy (addr.sun_path, path, path_len);
-  unlink (path);
-#endif /* ! USE_ABSTRACT_SOCKETS */
-  
-  if (bind (fd, (struct sockaddr*) &addr, 
-	    G_STRUCT_OFFSET (struct sockaddr_un, sun_path) + path_len) < 0)
-    {
-      close (fd);
-      return -1;
-    }
-
-  if (listen (fd, 30 /* backlog */) < 0)
-    {
-      close (fd);
-      return -1;
-    }
-  
-  return fd;
-}
-
-static gboolean
-accept_new_fd_client (GIOChannel  *channel,
-		      GIOCondition cond,
-		      gpointer     callback_data)
-{
-  NewConnectionData *data = callback_data;
-  int fd;
-  int new_fd;
-  struct sockaddr_un addr;
-  socklen_t addrlen;
-
-  g_print ("accept_new_fd_client\n");
-  
-  data->got_fd_connection = TRUE;
-  
-  fd = g_io_channel_unix_get_fd (channel);
-  
-  addrlen = sizeof (addr);
-  new_fd = accept (fd, (struct sockaddr *) &addr, &addrlen);
-
-  data->fd = new_fd;
-  data->io_watch = 0;
-
-  /* Did we already accept the dbus connection, if so, finish it now */
-  if (data->got_dbus_connection)
-    daemon_peer_connection_setup (data->daemon,
-				  data->conn,
-				  data);
-  else if (data->fd == -1)
-    {
-      /* Didn't accept a dbus connection, and there is no need for one now */
-      g_warning ("Failed to accept client: %s", "accept of extra fd failed");
-      g_dbus_server_stop (data->server);
-      g_object_unref (data->server);
-      new_connection_data_free (data);
-    }
-  
-  return FALSE;
-}
-
 static gboolean
 handle_get_connection (GVfsDBusDaemon *object,
                        GDBusMethodInvocation *invocation,
@@ -959,28 +844,18 @@ handle_get_connection (GVfsDBusDaemon *object,
   GDBusServer *server;
   GError *error;
   gchar *address1;
-  gchar *address2;
   NewConnectionData *data;
-  GIOChannel *channel;
   char *socket_dir;
-  int fd;
   gchar *guid;
   
   g_print ("called get_connection()\n");
   
-  generate_addresses (&address1, &address2, &socket_dir);
+  generate_address (&address1, &socket_dir);
 
   data = g_new (NewConnectionData, 1);
   data->daemon = daemon;
   data->socket_dir = socket_dir;
-  data->got_fd_connection = FALSE;
-  data->got_dbus_connection = FALSE;
-  data->fd = -1;
   data->conn = NULL;
-
-  fd = unix_socket_at (address2);
-  if (fd == -1)
-    goto error_out;
 
   guid = g_dbus_generate_guid ();
   error = NULL;
@@ -1006,25 +881,18 @@ handle_get_connection (GVfsDBusDaemon *object,
   g_print ("Server is listening at: %s\n", g_dbus_server_get_client_address (server));
   g_signal_connect (server, "new-connection", G_CALLBACK (daemon_new_connection_func), data);
   
-  channel = g_io_channel_unix_new (fd);
-  g_io_channel_set_close_on_unref (channel, TRUE);
-  data->io_watch = g_io_add_watch (channel, G_IO_IN | G_IO_HUP, accept_new_fd_client, data);
-  g_io_channel_unref (channel);
-
   gvfs_dbus_daemon_complete_get_connection (object,
                                             invocation,
                                             address1,
-                                            address2);
+                                            "");
 
   g_free (address1);
-  g_free (address2);
   return TRUE;
 
  error_out:
   g_print ("handle_get_connection: error_out\n"); 
   g_free (data);
   g_free (address1);
-  g_free (address2);
   if (socket_dir)
     {
       rmdir (socket_dir);

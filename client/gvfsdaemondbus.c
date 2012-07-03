@@ -39,15 +39,9 @@
 #include "gsysutils.h"
 #include <gvfsdbus.h>
 
-/* Extra vfs-specific data for DBusConnections */
+/* Extra vfs-specific data for GDBusConnections */
 typedef struct {
-  int extra_fd;
-  int extra_fd_count;
   char *async_dbus_id;
-  
-  /* Only used for async connections */
-  GHashTable *outstanding_fds;
-  GSource *extra_fd_source;
 } VfsConnectionData;
 
 typedef struct _ThreadLocalConnections ThreadLocalConnections;
@@ -186,20 +180,7 @@ connection_data_free (gpointer p)
 {
   VfsConnectionData *data = p;
 
-  if (data->extra_fd != -1)
-    close (data->extra_fd);
-
-  if (data->extra_fd_source)
-    {
-      g_source_destroy (data->extra_fd_source);
-      g_source_unref (data->extra_fd_source);
-    }
-
-  if (data->outstanding_fds)
-    g_hash_table_destroy (data->outstanding_fds);
-
   g_free (data->async_dbus_id);
-  
   g_free (data);
 }
 
@@ -229,14 +210,11 @@ vfs_connection_closed (GDBusConnection *connection,
 
 static void
 vfs_connection_setup (GDBusConnection *connection,
-		      int extra_fd,
 		      gboolean async)
 {
   VfsConnectionData *connection_data;
 
   connection_data = g_new0 (VfsConnectionData, 1);
-  connection_data->extra_fd = extra_fd;
-  connection_data->extra_fd_count = 0;
   
   g_object_set_data_full (G_OBJECT (connection), "connection_data", connection_data, connection_data_free);
 
@@ -303,7 +281,6 @@ typedef struct {
   const char *dbus_id;
 
   GDBusConnection *connection;
-  int extra_fd;
   GCancellable *cancellable;
 
   GVfsAsyncDBusCallback callback;
@@ -343,14 +320,13 @@ async_got_private_connection_cb (GObject *source_object,
   g_print ("async_got_private_connection_cb, connection = %p\n", connection);
   if (!connection)
     {
-      close (async_call->extra_fd);
       async_call->io_error = g_error_copy (error);
       g_error_free (error);
       async_call_finish (async_call);
       return;
     }
 
-  vfs_connection_setup (connection, async_call->extra_fd, TRUE);
+  vfs_connection_setup (connection, TRUE);
   
   /* Maybe we already had a connection? This happens if we requested
    * the same owner several times in parallel.
@@ -388,28 +364,16 @@ async_get_connection_response (GVfsDBusDaemon *proxy,
 {
   AsyncDBusCall *async_call = user_data;
   GError *error = NULL;
-  gchar *address1, *address2;
+  gchar *address1;
 
   g_print ("async_get_connection_response\n");
 
   if (! gvfs_dbus_daemon_call_get_connection_finish (proxy,
-                                                     &address1, &address2,
+                                                     &address1, NULL,
                                                      res,
                                                      &error))
     {
       async_call->io_error = g_error_copy (error);
-      g_error_free (error);
-      async_call_finish (async_call);
-      return;
-    }
-  
-  /* I don't know of any way to do an async connect */
-  error = NULL;
-  async_call->extra_fd = _g_socket_connect (address2, &error);
-  if (async_call->extra_fd == -1)
-    {
-      g_set_error (&async_call->io_error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Error connecting to daemon: %s"), error->message);
       g_error_free (error);
       async_call_finish (async_call);
       return;
@@ -663,8 +627,7 @@ _g_dbus_connection_get_sync (const char *dbus_id,
   ThreadLocalConnections *local;
   GError *local_error;
   GDBusConnection *connection;
-  gchar *address1, *address2;
-  int extra_fd;
+  gchar *address1;
   GVfsDBusDaemon *daemon_proxy;
   gboolean res;
 
@@ -727,7 +690,7 @@ _g_dbus_connection_get_sync (const char *dbus_id,
 	return bus; /* We actually wanted the session bus, so done */
     }
 
-  address1 = address2 = NULL;
+  address1 = NULL;
   daemon_proxy = gvfs_dbus_daemon_proxy_new_sync (local->session_bus,
                                                   G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                                                   dbus_id,
@@ -739,7 +702,7 @@ _g_dbus_connection_get_sync (const char *dbus_id,
 
   res = gvfs_dbus_daemon_call_get_connection_sync (daemon_proxy,
                                                    &address1,
-                                                   &address2,
+                                                   NULL,
                                                    cancellable,
                                                    error);
   g_object_unref (daemon_proxy);
@@ -748,17 +711,6 @@ _g_dbus_connection_get_sync (const char *dbus_id,
     return NULL;
 
   local_error = NULL;
-  extra_fd = _g_socket_connect (address2, &local_error);
-  if (extra_fd == -1)
-    {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Error connecting to daemon: %s"), local_error->message);
-      g_error_free (local_error);
-      g_free (address1);
-      g_free (address2);
-      return NULL;
-    }
-
   connection = g_dbus_connection_new_for_address_sync (address1,
                                                        G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                                                        NULL, /* GDBusAuthObserver */
@@ -769,14 +721,12 @@ _g_dbus_connection_get_sync (const char *dbus_id,
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   local_error->message);
-      close (extra_fd);
       g_error_free (local_error);
       g_free (address1);
-      g_free (address2);
       return NULL;
     }
 
-  vfs_connection_setup (connection, extra_fd, FALSE);
+  vfs_connection_setup (connection, FALSE);
 
   g_hash_table_insert (local->connections, g_strdup (dbus_id), connection);
 
