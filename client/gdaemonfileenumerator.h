@@ -46,11 +46,12 @@ struct _GDaemonFileEnumeratorClass
 GType g_daemon_file_enumerator_get_type (void) G_GNUC_CONST;
 
 GDaemonFileEnumerator *g_daemon_file_enumerator_new                 (GFile *file,
-								     const char *attributes);
+								     const char *attributes,
+								     gboolean sync);
 char  *                g_daemon_file_enumerator_get_object_path     (GDaemonFileEnumerator *enumerator);
-void                   g_daemon_file_enumerator_set_sync_connection (GDaemonFileEnumerator *enumerator,
-								     GDBusConnection       *connection);
 
+void                   g_daemon_file_enumerator_set_sync_connection (GDaemonFileEnumerator *enumerator,
+                                                                     GDBusConnection       *connection);
 
 G_END_DECLS
 

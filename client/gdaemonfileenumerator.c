@@ -58,6 +58,7 @@ struct _GDaemonFileEnumerator
   guint timeout_tag;
   GSimpleAsyncResult *async_res;
   GMainLoop *next_files_mainloop;
+  GMainContext *next_files_context;
   guint next_files_sync_timeout_tag;
   GMutex next_files_mutex;
 
@@ -122,7 +123,10 @@ g_daemon_file_enumerator_finalize (GObject *object)
 
   if (daemon->sync_connection)
     g_object_unref (daemon->sync_connection);
-  
+
+  if (daemon->next_files_context)
+    g_main_context_unref (daemon->next_files_context);
+
   g_mutex_clear (&daemon->next_files_mutex);
   
   if (G_OBJECT_CLASS (g_daemon_file_enumerator_parent_class)->finalize)
@@ -233,6 +237,10 @@ register_vfs_filter_cb (GDBusConnection *connection,
 {
   GError *error;
   GVfsDBusEnumerator *skeleton;
+  GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (callback_data);
+
+  if (daemon->next_files_context)
+    g_main_context_push_thread_default (daemon->next_files_context);
 
   skeleton = gvfs_dbus_enumerator_skeleton_new ();
   g_signal_connect (skeleton, "handle-done", G_CALLBACK (handle_done), callback_data);
@@ -251,37 +259,43 @@ register_vfs_filter_cb (GDBusConnection *connection,
       g_error_free (error);
     }
 
+  if (daemon->next_files_context)
+    g_main_context_pop_thread_default (daemon->next_files_context);
+
   return G_DBUS_INTERFACE_SKELETON (skeleton);
 }
 
 static void
 g_daemon_file_enumerator_init (GDaemonFileEnumerator *daemon)
 {
-  char *path;
-  
   daemon->id = g_atomic_int_add (&path_counter, 1);
 
   g_mutex_init (&daemon->next_files_mutex);
-  
-  path = g_daemon_file_enumerator_get_object_path (daemon);
-  g_print ("g_daemon_file_enumerator_init: daemon = %p, obj_path = '%s'\n", daemon, path);
-
-  _g_dbus_register_vfs_filter (path, 
-                               register_vfs_filter_cb,
-			       G_OBJECT (daemon));
-  g_free (path);
 }
 
 GDaemonFileEnumerator *
 g_daemon_file_enumerator_new (GFile *file,
-			      const char *attributes)
+			      const char *attributes,
+			      gboolean sync)
 {
   GDaemonFileEnumerator *daemon;
   char *treename;
+  char *path;
 
   daemon = g_object_new (G_TYPE_DAEMON_FILE_ENUMERATOR,
                          "container", file,
                          NULL);
+
+  if (sync)
+    daemon->next_files_context = g_main_context_new ();
+
+  path = g_daemon_file_enumerator_get_object_path (daemon);
+  g_print ("g_daemon_file_enumerator_new: daemon = %p, obj_path = '%s', sync = %d\n", daemon, path, sync);
+
+  _g_dbus_register_vfs_filter (path,
+                               register_vfs_filter_cb,
+                               G_OBJECT (daemon));
+  g_free (path);
 
   daemon->matcher = g_file_attribute_matcher_new (attributes);
   if (g_file_attribute_matcher_enumerate_namespace (daemon->matcher, "metadata") ||
@@ -437,7 +451,7 @@ g_daemon_file_enumerator_get_object_path (GDaemonFileEnumerator *enumerator)
 
 void
 g_daemon_file_enumerator_set_sync_connection (GDaemonFileEnumerator *enumerator,
-					      GDBusConnection       *connection)
+                                              GDBusConnection       *connection)
 {
   enumerator->sync_connection = g_object_ref (connection);
 }
@@ -482,19 +496,22 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
   if (! daemon->infos && ! daemon->done)
     {
       /* Wait for incoming data */
-      daemon->next_files_sync_timeout_tag = g_timeout_add (G_VFS_DBUS_TIMEOUT_MSECS,
-                                                           sync_timeout, daemon);
-
       g_mutex_lock (&daemon->next_files_mutex);
       g_print ("g_daemon_file_enumerator_next_file: starting loop, daemon = %p\n", daemon);
-      daemon->next_files_mainloop = g_main_loop_new (NULL, FALSE);
+      daemon->next_files_mainloop = g_main_loop_new (daemon->next_files_context, FALSE);
+
       g_mutex_unlock (&daemon->next_files_mutex);
       
+      g_main_context_push_thread_default (daemon->next_files_context);
+      daemon->next_files_sync_timeout_tag = g_timeout_add (G_VFS_DBUS_TIMEOUT_MSECS,
+                                                           sync_timeout, daemon);
       g_main_loop_run (daemon->next_files_mainloop);
+      g_main_context_pop_thread_default (daemon->next_files_context);
 
       g_mutex_lock (&daemon->next_files_mutex);
       g_print ("g_daemon_file_enumerator_next_file: loop done.\n");
       g_source_remove (daemon->next_files_sync_timeout_tag);
+
       g_main_loop_unref (daemon->next_files_mainloop);
       daemon->next_files_mainloop = NULL;
       g_mutex_unlock (&daemon->next_files_mutex);

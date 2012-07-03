@@ -694,7 +694,7 @@ g_daemon_file_enumerate_children (GFile      *file,
   
   g_print ("g_daemon_file_enumerate_children\n");
   
-  enumerator = g_daemon_file_enumerator_new (file, attributes);
+  enumerator = g_daemon_file_enumerator_new (file, attributes, TRUE);
 
   proxy = create_proxy_for_file (file, NULL, &path, &connection, cancellable, error);
   if (proxy == NULL)
@@ -3473,7 +3473,7 @@ g_daemon_file_enumerate_children_async (GFile                      *file,
   data->io_priority = io_priority;
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
-  data->enumerator = g_daemon_file_enumerator_new (data->file, data->attributes);
+  data->enumerator = g_daemon_file_enumerator_new (data->file, data->attributes, FALSE);
 
   create_proxy_for_file_async (file,
                                cancellable,
