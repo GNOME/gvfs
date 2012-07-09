@@ -158,6 +158,13 @@ release_metadata (GVfsBackendCdda *cdda_backend)
   cdda_backend->tracks = NULL;
 }
 
+static char *
+cdtext_string_to_utf8 (const char *string)
+{
+  /* CD-text doesn't specify encoding. In case outside ascii, assume latin-1. */
+  return g_convert (string, -1, "UTF-8", "ISO-8859-1", NULL, NULL, NULL);
+}
+
 static void
 fetch_metadata (GVfsBackendCdda *cdda_backend)
 {
@@ -171,9 +178,9 @@ fetch_metadata (GVfsBackendCdda *cdda_backend)
 
   cdtext = cdio_get_cdtext(cdio, 0);
   if (cdtext) {
-    cdda_backend->album_title = g_strdup (cdtext_get (CDTEXT_TITLE, cdtext));
-    cdda_backend->album_artist = g_strdup (cdtext_get (CDTEXT_PERFORMER, cdtext));
-    cdda_backend->genre = g_strdup (cdtext_get (CDTEXT_GENRE, cdtext));
+    cdda_backend->album_title = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_TITLE, cdtext));
+    cdda_backend->album_artist = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_PERFORMER, cdtext));
+    cdda_backend->genre = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_GENRE, cdtext));
   }
 
   cdtrack = cdio_get_first_track_num(cdio);
@@ -184,8 +191,8 @@ fetch_metadata (GVfsBackendCdda *cdda_backend)
     track = g_new0 (GVfsBackendCddaTrack, 1);
     cdtext = cdio_get_cdtext(cdio, cdtrack);
     if (cdtext) {
-      track->title = g_strdup (cdtext_get (CDTEXT_TITLE, cdtext));
-      track->artist = g_strdup (cdtext_get (CDTEXT_PERFORMER, cdtext));
+      track->title = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_TITLE, cdtext));
+      track->artist = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_PERFORMER, cdtext));
     }
     track->duration = cdio_get_track_sec_count (cdio, cdtrack) / CDIO_CD_FRAMES_PER_SEC;
 
@@ -961,8 +968,10 @@ do_query_info (GVfsBackend *backend,
       g_file_info_set_display_name (info, _("Audio Disc")); /* TODO: fill in from metadata */
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_content_type (info, "inode/directory");
-      SET_INFO ("xattr::org.gnome.audio.title", cdda_backend->album_title);
-      SET_INFO ("xattr::org.gnome.audio.artist", cdda_backend->album_artist);
+      if (cdda_backend->album_title)
+        SET_INFO ("xattr::org.gnome.audio.title", cdda_backend->album_title);
+      if (cdda_backend->album_artist)
+        SET_INFO ("xattr::org.gnome.audio.artist", cdda_backend->album_artist);
       SET_INFO ("xattr::org.gnome.audio.genre", cdda_backend->genre);
       g_file_info_set_size (info, 0);
       icon = g_themed_icon_new ("folder");
