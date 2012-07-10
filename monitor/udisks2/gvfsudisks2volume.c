@@ -1069,6 +1069,9 @@ unlock_cb (GObject       *source_object,
             case G_PASSWORD_SAVE_PERMANENTLY:
               keyring = GNOME_KEYRING_DEFAULT;
               break;
+            default:
+              keyring = GNOME_KEYRING_DEFAULT;
+              break;
             }
 
           display_name = g_strdup_printf (_("Encryption passphrase for %s"),
