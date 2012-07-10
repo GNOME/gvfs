@@ -46,6 +46,9 @@ struct _GVfsJobUnmount
   GVfsBackend *backend;
   GMountUnmountFlags flags;
   GMountSource *mount_source;
+
+  guint unmount_progress_id;
+  gboolean unmount_progress_fired;
 };
 
 struct _GVfsJobUnmountClass

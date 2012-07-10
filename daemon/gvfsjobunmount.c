@@ -125,6 +125,60 @@ g_vfs_job_unmount_new (DBusConnection *connection,
 }
 
 static void
+unmount_progress_clear (GVfsJobUnmount *op_job)
+{
+  gchar *message;
+
+  if (op_job->unmount_progress_id > 0)
+    {
+      g_source_remove (op_job->unmount_progress_id);
+      op_job->unmount_progress_id = 0;
+    }
+
+  if (!op_job->unmount_progress_fired)
+    return;
+
+  g_debug ("gvfsjobunmount progress clear");
+
+  message = g_strdup_printf (_("%s has been unmounted\n"),
+                             g_vfs_backend_get_display_name (op_job->backend));
+  g_mount_source_show_unmount_progress (op_job->mount_source,
+                                        message, 0, 0);
+  g_free (message);
+}
+
+static gboolean
+unmount_progress_timeout (gpointer user_data)
+{
+  GVfsJobUnmount *op_job = user_data;
+  gchar *message;
+
+  op_job->unmount_progress_id = 0;
+  op_job->unmount_progress_fired = TRUE;
+
+  g_debug ("gvfsjobunmount progress timeout reached");
+
+  message = g_strdup_printf (_("Unmounting %s\nPlease wait"),
+                             g_vfs_backend_get_display_name (op_job->backend));
+  /* TODO: report estimated bytes and time left */
+  g_mount_source_show_unmount_progress (op_job->mount_source,
+                                        message, -1, -1);
+  g_free (message);
+
+  return FALSE;
+}
+
+static void
+unmount_progress_start (GVfsJobUnmount *op_job)
+{
+  if (op_job->unmount_progress_id > 0)
+    return;
+
+  g_debug ("gvfsjobunmount progress timeout start");
+  op_job->unmount_progress_id = g_timeout_add (1500, unmount_progress_timeout, op_job);
+}
+
+static void
 run (GVfsJob *job)
 {
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
@@ -133,10 +187,14 @@ run (GVfsJob *job)
   if (class->unmount == NULL)
     return;
 
+  unmount_progress_start (op_job);
+
   class->unmount (op_job->backend,
 		  op_job,
                   op_job->flags,
                   op_job->mount_source);
+
+  unmount_progress_clear (op_job);
 }
 
 static gboolean
