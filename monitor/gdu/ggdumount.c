@@ -42,9 +42,6 @@
 #include "ggdumount.h"
 #include "ggduvolume.h"
 
-#define BUSY_UNMOUNT_NUM_ATTEMPTS              5
-#define BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS 100
-
 struct _GGduMount
 {
   GObject parent;

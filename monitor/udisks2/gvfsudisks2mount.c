@@ -43,9 +43,6 @@
 #include "gvfsudisks2drive.h"
 #include "gvfsudisks2utils.h"
 
-#define BUSY_UNMOUNT_NUM_ATTEMPTS              5
-#define BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS 100
-
 typedef struct _GVfsUDisks2MountClass GVfsUDisks2MountClass;
 struct _GVfsUDisks2MountClass
 {
