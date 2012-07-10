@@ -589,13 +589,9 @@ eject_cb (GObject      *source_object,
     {
       gvfs_udisks2_utils_udisks_error_to_gio_error (error);
       g_simple_async_result_take_error (data->simple, error);
-      g_simple_async_result_complete (data->simple);
-      goto out;
     }
 
   g_simple_async_result_complete (data->simple);
-
- out:
   eject_data_free (data);
 }
 
