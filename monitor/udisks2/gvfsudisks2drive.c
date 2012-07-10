@@ -505,6 +505,9 @@ unmount_mounts_cb (GObject      *source_object,
                                _("Failed to eject medium; one or more volumes on the medium are busy."));
         }
 
+      if (data->mount_operation != NULL)
+        gvfs_udisks2_unmount_notify_stop (data->mount_operation);
+
       /* unmount failed; need to fail the whole eject operation */
       simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
                                                      data->callback,
@@ -566,6 +569,7 @@ typedef struct
   GSimpleAsyncResult *simple;
 
   GVfsUDisks2Drive *drive;
+  GMountOperation *mount_operation;
 } EjectData;
 
 static void
@@ -573,6 +577,8 @@ eject_data_free (EjectData *data)
 {
   g_object_unref (data->simple);
   g_clear_object (&data->drive);
+  g_clear_object (&data->mount_operation);
+
   g_free (data);
 }
 
@@ -589,6 +595,15 @@ eject_cb (GObject      *source_object,
     {
       gvfs_udisks2_utils_udisks_error_to_gio_error (error);
       g_simple_async_result_take_error (data->simple, error);
+    }
+
+  if (data->mount_operation != NULL)
+    {
+      /* If we fail send an ::aborted signal to make any notification go away */
+      if (error != NULL)
+        g_signal_emit_by_name (data->mount_operation, "aborted");
+
+      gvfs_udisks2_unmount_notify_stop (data->mount_operation);
     }
 
   g_simple_async_result_complete (data->simple);
@@ -613,6 +628,8 @@ gvfs_udisks2_drive_eject_on_all_unmounted (GDrive              *_drive,
                                             user_data,
                                             gvfs_udisks2_drive_eject_on_all_unmounted);
   data->drive = g_object_ref (drive);
+  if (mount_operation != NULL)
+    data->mount_operation = g_object_ref (mount_operation);
 
   g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
   if (mount_operation == NULL)
@@ -643,7 +660,10 @@ gvfs_udisks2_drive_eject_with_operation (GDrive              *_drive,
    * be "Unmount Anyway" or "Eject Anyway"
    */
   if (mount_operation != NULL)
-    g_object_set_data (G_OBJECT (mount_operation), "x-udisks2-is-eject", GINT_TO_POINTER (1));
+    {
+      g_object_set_data (G_OBJECT (mount_operation), "x-udisks2-is-eject", GINT_TO_POINTER (1));
+      gvfs_udisks2_unmount_notify_start (mount_operation, NULL, _drive, FALSE);
+    }
 
   /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
   unmount_mounts (drive,

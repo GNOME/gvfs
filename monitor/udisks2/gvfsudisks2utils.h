@@ -52,6 +52,11 @@ gboolean gvfs_udisks2_utils_spawn_finish (GAsyncResult   *res,
 
 gboolean gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive);
 
+void     gvfs_udisks2_unmount_notify_start (GMountOperation *op,
+                                            GMount          *mount,
+                                            GDrive          *drive,
+                                            gboolean         generic_text);
+void     gvfs_udisks2_unmount_notify_stop  (GMountOperation *op);
 
 G_END_DECLS
 

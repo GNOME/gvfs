@@ -573,6 +573,10 @@ static void
 unmount_data_complete (UnmountData *data,
                        gboolean     complete_idle)
 {
+  if (data->mount_operation &&
+      !unmount_operation_is_eject (data->mount_operation))
+    gvfs_udisks2_unmount_notify_stop (data->mount_operation);
+
   if (complete_idle)
     g_simple_async_result_complete_in_idle (data->simple);
   else
@@ -883,6 +887,11 @@ unmount_do (UnmountData *data,
             gboolean     force)
 {
   GVariantBuilder builder;
+
+  if (data->mount_operation != NULL)
+    gvfs_udisks2_unmount_notify_start (data->mount_operation, 
+                                       G_MOUNT (data->mount), NULL,
+                                       (data->filesystem == NULL));
 
   /* Use the umount(8) command if there is no block device / filesystem */
   if (data->filesystem == NULL)

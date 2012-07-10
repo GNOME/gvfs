@@ -587,3 +587,231 @@ gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive)
  out:
   return ret;
 }
+
+/* unmount progress notification utilities */
+typedef struct {
+  GMount *mount;
+  GDrive *drive;
+
+  GMountOperation *op;
+  gboolean op_aborted;
+  gboolean generic_text;
+  gboolean show_processes_up;
+
+  guint unmount_timer_id;
+  gboolean unmount_fired;
+} UnmountNotifyData;
+
+static gboolean
+unmount_notify_should_show (UnmountNotifyData *data)
+{
+  GVolume *volume;
+  gchar *identifier = NULL;
+  gboolean retval = TRUE;
+
+  if (data->mount)
+    {
+      volume = g_mount_get_volume (data->mount);
+
+      if (volume)
+        {
+          identifier = g_volume_get_identifier (volume, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
+          g_object_unref (volume);
+        }
+    }
+  else if (data->drive)
+    {
+      identifier = g_drive_get_identifier (data->drive, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
+    }
+
+  if (identifier && g_str_has_prefix (identifier, "/dev/sr"))
+    retval = FALSE;
+
+  g_free (identifier);
+
+  return retval;
+}
+
+static gchar *
+unmount_notify_get_name (UnmountNotifyData *data)
+{
+  if (data->mount)
+    return g_mount_get_name (data->mount);
+  else
+    return g_drive_get_name (data->drive);
+}
+
+static gboolean
+unmount_notify_timer_cb (gpointer user_data)
+{
+  UnmountNotifyData *data = user_data;
+  gchar *message, *name;
+  const gchar *format;
+
+  data->unmount_timer_id = 0;
+
+  if (data->unmount_fired)
+    goto out;
+
+  /* TODO: it would be nice to include and update the time left and
+   * bytes left fields.
+   */
+  data->unmount_fired = TRUE;
+
+  name = unmount_notify_get_name (data);
+  format = data->generic_text ?
+    _("Unmounting %s\nPlease wait") :
+    _("Writing data to %s\nDon't unplug until finished");
+
+  message = g_strdup_printf (format, name);
+  g_signal_emit_by_name (data->op, "show-unmount-progress",
+                         message, -1, -1);
+  g_free (message);
+  g_free (name);
+
+ out:
+  return FALSE;
+}
+
+static void
+unmount_notify_ensure_timer (UnmountNotifyData *data)
+{
+  if (data->unmount_timer_id > 0)
+    return;
+
+  if (!unmount_notify_should_show (data))
+    return;
+
+  data->unmount_timer_id = 
+    g_timeout_add (1500, unmount_notify_timer_cb, data);
+}
+
+static void
+unmount_notify_stop_timer (UnmountNotifyData *data)
+{
+  if (data->unmount_timer_id > 0)
+    {
+      g_source_remove (data->unmount_timer_id);
+      data->unmount_timer_id = 0;
+    }
+}
+
+static void
+unmount_notify_op_show_processes (UnmountNotifyData *data)
+{
+  unmount_notify_stop_timer (data);
+  data->show_processes_up = TRUE;
+}
+
+static void
+unmount_notify_op_aborted (UnmountNotifyData *data)
+{
+  unmount_notify_stop_timer (data);
+  data->op_aborted = TRUE;
+}
+
+static void
+unmount_notify_op_reply (UnmountNotifyData *data,
+                         GMountOperationResult result)
+{
+  gint choice;
+
+  choice = g_mount_operation_get_choice (data->op);
+
+  if ((result == G_MOUNT_OPERATION_HANDLED && data->show_processes_up && choice == 1) ||
+      result == G_MOUNT_OPERATION_ABORTED)
+    unmount_notify_op_aborted (data);
+  else if (result == G_MOUNT_OPERATION_HANDLED)
+    unmount_notify_ensure_timer (data);
+
+  data->show_processes_up = FALSE;
+}
+
+static void
+unmount_notify_data_free (gpointer user_data)
+{
+  UnmountNotifyData *data = user_data;
+
+  unmount_notify_stop_timer (data);
+
+  g_clear_object (&data->mount);
+  g_clear_object (&data->drive);
+
+  g_slice_free (UnmountNotifyData, data);
+}
+
+static UnmountNotifyData *
+unmount_notify_data_for_operation (GMountOperation *op,
+                                   GMount          *mount,
+                                   GDrive          *drive,
+                                   gboolean         generic_text)
+{
+  UnmountNotifyData *data;
+
+  data = g_object_get_data (G_OBJECT (op), "x-udisks2-notify-data");
+  if (data != NULL)
+    return data;
+
+  data = g_slice_new0 (UnmountNotifyData);
+  data->op = op;
+  data->generic_text = generic_text;
+
+  if (mount)
+    data->mount = g_object_ref (mount);
+  if (drive)
+    data->drive = g_object_ref (drive);
+
+  g_object_set_data_full (G_OBJECT (data->op),
+                          "x-udisks2-notify-data", data, 
+                          unmount_notify_data_free);
+
+  g_signal_connect_swapped (data->op, "aborted",
+                            G_CALLBACK (unmount_notify_op_aborted), data);
+  g_signal_connect_swapped (data->op, "show-processes",
+                            G_CALLBACK (unmount_notify_op_show_processes), data);
+  g_signal_connect_swapped (data->op, "reply",
+                            G_CALLBACK (unmount_notify_op_reply), data);
+
+  return data;
+}
+
+void
+gvfs_udisks2_unmount_notify_start (GMountOperation *op,
+                                   GMount          *mount,
+                                   GDrive          *drive,
+                                   gboolean         generic_text)
+{
+  UnmountNotifyData *data;
+
+  data = unmount_notify_data_for_operation (op, mount, drive, generic_text);
+  unmount_notify_ensure_timer (data);
+}
+
+void
+gvfs_udisks2_unmount_notify_stop (GMountOperation *op)
+{
+  gchar *message, *name;
+  const gchar *format;
+  UnmountNotifyData *data = g_object_get_data (G_OBJECT (op), "x-udisks2-notify-data");
+
+  if (data == NULL)
+    return;
+
+  unmount_notify_stop_timer (data);
+
+  if (data->op_aborted)
+    return;
+  if (!data->unmount_fired)
+    return;
+
+  name = unmount_notify_get_name (data);
+  format = data->generic_text ?
+    _("%s has been unmounted\n") : _("You can now unplug %s\n");
+
+  message = g_strdup_printf (format, name);
+  g_signal_emit_by_name (data->op, "show-unmount-progress",
+                         message, 0, 0);
+
+  g_free (message);
+  g_free (name);
+}
