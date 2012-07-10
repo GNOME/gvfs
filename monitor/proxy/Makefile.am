@@ -9,7 +9,7 @@ dbus_built_sources = gvfsvolumemonitordbus.c gvfsvolumemonitordbus.h
 BUILT_SOURCES = $(dbus_built_sources)
 
 $(dbus_built_sources) : Makefile.am dbus-interfaces.xml
-	gdbus-codegen									\
+	$(AM_V_GEN) gdbus-codegen									\
 		--interface-prefix org.gtk.Private.					\
 		--c-namespace GVfs							\
 		--generate-c-code gvfsvolumemonitordbus					\
