@@ -444,13 +444,10 @@ typedef struct {
 static void
 free_unmount_mounts_op (UnmountMountsOp *data)
 {
-  GList *l;
-  for (l = data->pending_mounts; l != NULL; l = l->next)
-    {
-      GMount *mount = G_MOUNT (l->data);
-      g_object_unref (mount);
-    }
-  g_list_free (data->pending_mounts);
+  g_list_free_full (data->pending_mounts, g_object_unref);
+
+  g_object_unref (data->drive);
+  g_free (data);
 }
 
 static void
@@ -470,8 +467,7 @@ unmount_mounts_do (UnmountMountsOp *data)
                               data->user_data,
                               data->on_all_unmounted_data);
 
-      g_object_unref (data->drive);
-      g_free (data);
+      free_unmount_mounts_op (data);
     }
   else
     {
