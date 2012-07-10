@@ -746,14 +746,13 @@ dnl Turn on the additional warnings last, so -Werror doesn't affect other tests.
 AC_ARG_ENABLE(more-warnings,
 AS_HELP_STRING([--enable-more-warnings],[Maximum compiler warnings]),
 set_more_warnings="$enableval",[
-if test -f $srcdir/CVSVERSION; then
-	is_cvs_version=true
+if test -f $srcdir/.git; then
 	set_more_warnings=yes
 else
 	set_more_warnings=no
 fi
 ])
-AC_MSG_CHECKING(for more warnings, including -Werror)
+AC_MSG_CHECKING(for more warnings)
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
 	AC_MSG_RESULT(yes)
 	CFLAGS="\
