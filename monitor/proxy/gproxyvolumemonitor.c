@@ -726,6 +726,34 @@ mount_op_show_processes (GVfsRemoteVolumeMonitor *object,
 }
 
 static void
+mount_op_show_unmount_progress (GVfsRemoteVolumeMonitor *object,
+                                const gchar *arg_dbus_name,
+                                const gchar *arg_id,
+                                const gchar *arg_message_to_show,
+                                guint64      arg_time_left,
+                                guint64      arg_bytes_left,
+                                gpointer user_data)
+{
+  GProxyVolumeMonitor *monitor = G_PROXY_VOLUME_MONITOR (user_data);
+  GProxyVolumeMonitorClass *klass;
+
+  G_LOCK (proxy_vm);
+
+  klass = G_PROXY_VOLUME_MONITOR_CLASS (G_OBJECT_GET_CLASS (monitor));
+
+  if (strcmp (arg_dbus_name, klass->dbus_name) != 0)
+    goto not_for_us;
+  
+  g_proxy_mount_operation_handle_show_unmount_progress (arg_id,
+                                                        arg_message_to_show,
+                                                        arg_time_left,
+                                                        arg_bytes_left);
+
+  not_for_us:
+   G_UNLOCK (proxy_vm);
+}
+
+static void
 volume_added (GVfsRemoteVolumeMonitor *object,
               const gchar *arg_dbus_name,
               const gchar *arg_id,
@@ -962,6 +990,7 @@ g_proxy_volume_monitor_constructor (GType                  type,
   g_signal_connect (monitor->proxy, "mount-op-ask-password", G_CALLBACK (mount_op_ask_password), monitor);
   g_signal_connect (monitor->proxy, "mount-op-ask-question", G_CALLBACK (mount_op_ask_question), monitor);
   g_signal_connect (monitor->proxy, "mount-op-show-processes", G_CALLBACK (mount_op_show_processes), monitor);
+  g_signal_connect (monitor->proxy, "mount-op-show-unmount-progress", G_CALLBACK (mount_op_show_unmount_progress), monitor);
   g_signal_connect (monitor->proxy, "mount-pre-unmount", G_CALLBACK (mount_pre_unmount), monitor);
   g_signal_connect (monitor->proxy, "mount-removed", G_CALLBACK (mount_removed), monitor);
   g_signal_connect (monitor->proxy, "volume-added", G_CALLBACK (volume_added), monitor);

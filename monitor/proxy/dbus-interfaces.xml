@@ -108,6 +108,13 @@
       <arg type='ai' name='pid'/>
       <arg type='as' name='choices'/>
     </signal>
+    <signal name="MountOpShowUnmountProgress">
+      <arg type='s' name='dbus_name'/>
+      <arg type='s' name='id'/>
+      <arg type='s' name='message_to_show'/>
+      <arg type='t' name='time_left'/>
+      <arg type='t' name='bytes_left'/>
+    </signal>
     <signal name="MountOpAborted">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>

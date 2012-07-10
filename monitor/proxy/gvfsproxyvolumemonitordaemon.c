@@ -125,6 +125,15 @@ g_proxy_mount_operation_show_processes (GMountOperation *op,
 }
 
 static void
+g_proxy_mount_operation_show_unmount_progress (GMountOperation *op,
+                                               const gchar     *message,
+                                               guint64          time_left,
+                                               guint64          bytes_left)
+{
+  /* do nothing */
+}
+
+static void
 g_proxy_mount_operation_class_init (GProxyMountOperationClass *klass)
 {
   GMountOperationClass *mount_op_class;
@@ -134,6 +143,7 @@ g_proxy_mount_operation_class_init (GProxyMountOperationClass *klass)
   mount_op_class->ask_password   = g_proxy_mount_operation_ask_password;
   mount_op_class->ask_question   = g_proxy_mount_operation_ask_question;
   mount_op_class->show_processes = g_proxy_mount_operation_show_processes;
+  mount_op_class->show_unmount_progress = g_proxy_mount_operation_show_unmount_progress;
 }
 
 static void
@@ -304,6 +314,51 @@ show_processes_cb (GMountOperation          *mount_operation,
 }
 
 static void
+show_unmount_progress_cb (GMountOperation *mount_operation,
+                          const gchar *message_to_show,
+                          guint64 time_left,
+                          guint64 bytes_left,
+                          GVfsRemoteVolumeMonitor *monitor)
+{
+  const gchar *mount_op_id;
+  const gchar *mount_op_owner;
+  GDBusConnection *connection;
+  GError *error;
+
+  print_debug ("in show_unmount_progress_cb %s", message_to_show);
+
+  mount_op_id = g_object_get_data (G_OBJECT (mount_operation), "mount_op_id");
+  mount_op_owner = g_object_get_data (G_OBJECT (mount_operation), "mount_op_owner");
+
+  print_debug ("  owner =  '%s'", mount_op_owner);
+
+  if (message_to_show == NULL)
+    message_to_show = "";
+
+  connection = g_dbus_interface_skeleton_get_connection (G_DBUS_INTERFACE_SKELETON (monitor));
+  g_assert (connection != NULL);
+  
+  error = NULL;
+  if (!g_dbus_connection_emit_signal (connection,
+                                      mount_op_owner,
+                                      "/org/gtk/Private/RemoteVolumeMonitor",
+                                      "org.gtk.Private.RemoteVolumeMonitor",
+                                      "MountOpShowUnmountProgress",
+                                      g_variant_new ("(ssstt)",
+                                                     the_dbus_name,
+                                                     mount_op_id,
+                                                     message_to_show,
+                                                     time_left,
+                                                     bytes_left),
+                                      &error))
+    {
+      g_printerr ("Error emitting signal: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+}
+
+static void
 aborted_cb (GMountOperation         *mount_operation,
             GVfsRemoteVolumeMonitor *monitor)
 {
@@ -356,6 +411,7 @@ wrap_mount_op (const gchar *mount_op_id,
   g_signal_connect (op, "ask-password", G_CALLBACK (ask_password_cb), monitor);
   g_signal_connect (op, "ask-question", G_CALLBACK (ask_question_cb), monitor);
   g_signal_connect (op, "show-processes", G_CALLBACK (show_processes_cb), monitor);
+  g_signal_connect (op, "show-unmount-progress", G_CALLBACK (show_unmount_progress_cb), monitor);
   g_signal_connect (op, "aborted", G_CALLBACK (aborted_cb), monitor);
   g_object_set_data_full (G_OBJECT (op), "mount_op_id", g_strdup (mount_op_id), g_free);
   g_object_set_data_full (G_OBJECT (op), "mount_op_owner", g_strdup (mount_op_owner), g_free);

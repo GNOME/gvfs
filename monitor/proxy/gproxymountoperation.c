@@ -307,6 +307,35 @@ g_proxy_mount_operation_handle_show_processes (const gchar        *wrapped_id,
 /* ---------------------------------------------------------------------------------------------------- */
 
 void
+g_proxy_mount_operation_handle_show_unmount_progress (const gchar *wrapped_id,
+                                                      const gchar *message,
+                                                      guint64      time_left,
+                                                      guint64      bytes_left)
+{
+  ProxyMountOpData *data;
+
+  g_return_if_fail (wrapped_id != NULL);
+
+  if (id_to_op == NULL)
+    return;
+  
+  G_LOCK (proxy_op);
+  data = g_hash_table_lookup (id_to_op, wrapped_id);
+  G_UNLOCK (proxy_op);
+
+  if (data == NULL)
+    return;
+
+  g_signal_emit_by_name (data->op,
+                         "show-unmount-progress",
+                         message,
+                         time_left,
+                         bytes_left);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+void
 g_proxy_mount_operation_handle_aborted (const gchar *wrapped_id)
 {
   ProxyMountOpData *data;
