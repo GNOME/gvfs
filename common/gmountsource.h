@@ -125,6 +125,11 @@ gboolean     g_mount_source_show_processes_finish     (GMountSource             
                                                        gboolean                  *aborted,
                                                        gint                      *choice_out);
 
+void         g_mount_source_show_unmount_progress     (GMountSource              *mount_source,
+						       const char                *message,
+                                                       guint64                    time_left,
+                                                       guint64                    bytes_left);
+
 gboolean     g_mount_source_abort                     (GMountSource              *source);
 
 gboolean     g_mount_source_is_dummy                  (GMountSource              *source);

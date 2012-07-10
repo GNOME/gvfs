@@ -931,6 +931,66 @@ op_show_processes (GMountOperation *op,
   return TRUE;
 }
 
+/* the callback from dbus -> main thread */
+static void
+show_unmount_progress_reply (DBusMessage *reply,
+                             GError      *error,
+                             gpointer     _data)
+{
+  if (error != NULL)
+    g_warning ("ShowUnmountProgress request failed: %s", error->message);
+}
+
+void
+g_mount_source_show_unmount_progress (GMountSource        *source,
+                                      const char          *message_string,
+                                      guint64              time_left,
+                                      guint64              bytes_left)
+{
+  DBusMessage *message;
+
+  /* If no dbus id specified, warn and return */
+  if (source->dbus_id[0] == 0)
+    {
+      g_warning ("No dbus id specified in the mount source, "
+                 "ignoring show-unmount-progress request");
+      return;
+    }
+
+  if (message_string == NULL)
+    message_string = "";
+
+  message = dbus_message_new_method_call (source->dbus_id,
+					  source->obj_path,
+					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
+					  G_VFS_DBUS_MOUNT_OPERATION_OP_SHOW_UNMOUNT_PROGRESS);
+
+  _g_dbus_message_append_args (message,
+			       DBUS_TYPE_STRING, &message_string,
+                               DBUS_TYPE_UINT64, &time_left,
+                               DBUS_TYPE_UINT64, &bytes_left,
+			       0);
+
+  /* 30 minute timeout */
+  _g_dbus_connection_call_async (NULL, message, 1000 * 60 * 30,
+				 show_unmount_progress_reply, NULL);
+  dbus_message_unref (message);
+}
+
+static void
+op_show_unmount_progress (GMountOperation *op,
+                          const char      *message,
+                          guint64          time_left,
+                          guint64          bytes_left,
+                          GMountSource    *mount_source)
+{
+  g_mount_source_show_unmount_progress (mount_source,
+                                        message,
+                                        time_left,
+                                        bytes_left);
+  g_signal_stop_emission_by_name (op, "show_unmount_progress");
+}
+
 gboolean
 g_mount_source_abort (GMountSource *source)
 {
@@ -993,6 +1053,7 @@ g_mount_source_get_operation (GMountSource *mount_source)
   g_signal_connect (op, "ask_password", (GCallback)op_ask_password, mount_source);
   g_signal_connect (op, "ask_question", (GCallback)op_ask_question, mount_source);
   g_signal_connect (op, "show_processes", (GCallback)op_show_processes, mount_source);
+  g_signal_connect (op, "show_unmount_progress", (GCallback)op_show_unmount_progress, mount_source);
   g_signal_connect (op, "aborted", (GCallback)op_aborted, mount_source);
 
   return op;

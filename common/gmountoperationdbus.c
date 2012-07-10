@@ -53,6 +53,8 @@ static void              mount_op_ask_question        (GMountOperationDBus *op_d
 						       DBusMessage         *message);
 static void              mount_op_show_processes      (GMountOperationDBus *op_dbus,
 						       DBusMessage         *message);
+static void              mount_op_show_unmount_progress (GMountOperationDBus *op_dbus,
+                                                         DBusMessage         *message);
 static void              mount_op_aborted             (GMountOperationDBus *op_dbus,
 						       DBusMessage         *message);
 
@@ -139,6 +141,10 @@ mount_op_message_function (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
 					G_VFS_DBUS_MOUNT_OPERATION_OP_SHOW_PROCESSES))
     mount_op_show_processes (op_dbus, message);
+  else if (dbus_message_is_method_call (message,
+                                        G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
+                                        G_VFS_DBUS_MOUNT_OPERATION_OP_SHOW_UNMOUNT_PROGRESS))
+    mount_op_show_unmount_progress (op_dbus, message);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
 					G_VFS_DBUS_MOUNT_OPERATION_OP_ABORTED))
@@ -404,6 +410,49 @@ mount_op_show_processes (GMountOperationDBus *op_dbus,
 
   dbus_free_string_array (choices);
   g_array_unref (processes);
+}
+
+static void
+mount_op_show_unmount_progress (GMountOperationDBus *op_dbus,
+                                DBusMessage *message)
+{
+  const gchar *message_string;
+  guint64 time_left, bytes_left;
+  DBusMessage *reply;
+  DBusMessageIter iter;
+  DBusError error;
+
+  reply = NULL;
+
+  dbus_message_iter_init (message, &iter);
+  dbus_error_init (&error);
+  if (!_g_dbus_message_iter_get_args (&iter,
+                                      &error,
+                                      DBUS_TYPE_STRING, &message_string,
+                                      DBUS_TYPE_UINT64, &time_left,
+                                      DBUS_TYPE_UINT64, &bytes_left,
+                                      0))
+    {
+      reply = dbus_message_new_error (message, error.name, error.message);
+      if (reply == NULL)
+        _g_dbus_oom ();
+      if (!dbus_connection_send (op_dbus->connection, reply, NULL))
+        _g_dbus_oom ();
+      dbus_message_unref (reply);
+      dbus_error_free (&error);
+      return;
+    }
+
+  reply = dbus_message_new_method_return (message);
+  if (reply == NULL)
+    _g_dbus_oom ();
+
+  g_signal_emit_by_name (op_dbus->op, "show-unmount-progress",
+                         message_string,
+                         time_left,
+                         bytes_left);
+
+  mount_op_send_reply (op_dbus, reply);
 }
 
 static void
