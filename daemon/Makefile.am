@@ -44,6 +44,12 @@ libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-lo
 mount_in_files = sftp.mount.in ftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in
 mount_DATA =  sftp.mount ftp.mount trash.mount computer.mount burn.mount localtest.mount network.mount
 
+mount_in_files +=recent.mount.in
+if USE_GTK
+mount_DATA += recent.mount
+libexec_PROGRAMS += gvfsd-recent
+endif
+
 mount_in_files += http.mount.in dav.mount.in dav+sd.mount.in
 if HAVE_HTTP
 mount_DATA += http.mount dav.mount
@@ -305,6 +311,20 @@ gvfsd_trash_CPPFLAGS = \
 	-Itrashlib
 
 gvfsd_trash_LDADD = trashlib/libtrash.a $(libraries)
+
+gvfsd_recent_SOURCES = \
+	gvfsbackendrecent.c gvfsbackendrecent.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c
+
+gvfsd_recent_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendrecent.h \
+	-DDEFAULT_BACKEND_TYPE=recent \
+	-DMAX_JOB_THREADS=10 \
+	-DBACKEND_TYPES='"recent", G_VFS_TYPE_BACKEND_RECENT,' \
+	$(GTK_CFLAGS)
+
+gvfsd_recent_LDADD = $(libraries) $(GTK_LIBS)
 
 gvfsd_computer_SOURCES = \
 	gvfsbackendcomputer.c gvfsbackendcomputer.h \
