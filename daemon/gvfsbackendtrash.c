@@ -485,7 +485,7 @@ trash_backend_add_info (TrashItem *item,
   if (is_toplevel)
     {
       const gchar *delete_date;
-      GFile *original;
+      GFile *original, *real;
 
       g_assert (item != NULL);
 
@@ -504,6 +504,19 @@ trash_backend_add_info (TrashItem *item,
                                                  path);
           g_free (basename);
           g_free (path);
+        }
+
+      real = trash_item_get_file (item);
+
+      if (real)
+        {
+          char *uri;
+
+          uri = g_file_get_uri (real);
+          g_file_info_set_attribute_string (info,
+                                            G_FILE_ATTRIBUTE_STANDARD_TARGET_URI,
+                                            uri);
+          g_free (uri);
         }
 
       delete_date = trash_item_get_delete_date (item);
