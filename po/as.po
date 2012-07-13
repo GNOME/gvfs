@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: as\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug."
 "cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-07-10 01:43+0000\n"
-"PO-Revision-Date: 2012-07-11 16:43+0530\n"
+"POT-Creation-Date: 2012-07-12 00:00+0000\n"
+"PO-Revision-Date: 2012-07-13 19:23+0530\n"
 "Last-Translator: Nilamdyuti Goswami <ngoswami@redhat.com>\n"
 "Language-Team: as_IN <kde-i18n-doc@kde.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Lokalize 1.0\n"
 
@@ -91,7 +91,7 @@ msgstr "মান স্ট্ৰিং অথবা স্ট্ৰিংৰ �
 #: ../daemon/gvfsbackendobexftp.c:2087 ../daemon/gvfsbackendsmb.c:1179
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
-#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1073
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1070
 #: ../monitor/proxy/gproxydrive.c:522 ../monitor/proxy/gproxydrive.c:610
 #: ../monitor/proxy/gproxydrive.c:760 ../monitor/proxy/gproxydrive.c:898
 #: ../monitor/proxy/gproxydrive.c:936 ../monitor/proxy/gproxydrive.c:1061
@@ -580,8 +580,8 @@ msgid "Try again"
 msgstr "পুনৰ চেষ্টা কৰক"
 
 #: ../daemon/gvfsbackendafc.c:390 ../daemon/gvfsbackend.c:963
-#: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:926
-#: ../monitor/udisks2/gvfsudisks2mount.c:720
+#: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
+#: ../monitor/udisks2/gvfsudisks2mount.c:736
 msgid "Cancel"
 msgstr "বাতিল কৰক"
 
@@ -816,8 +816,8 @@ msgstr "নথিপত্ৰ অস্তিত্ববান"
 #: ../daemon/gvfsjobstartmountable.c:133 ../daemon/gvfsjobstopmountable.c:136
 #: ../daemon/gvfsjobtrash.c:123 ../daemon/gvfsjobunmountmountable.c:140
 #: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
-#: ../monitor/gdu/ggdumount.c:1177 ../monitor/gdu/ggdumount.c:1261
-#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1104
+#: ../monitor/gdu/ggdumount.c:1174 ../monitor/gdu/ggdumount.c:1258
+#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1108
 #: ../monitor/udisks2/gvfsudisks2volume.c:1508
 msgid "Operation not supported by backend"
 msgstr "কাৰ্য্য বেকএন্ড দ্বাৰা সমৰ্থিত নহয়"
@@ -839,13 +839,13 @@ msgstr "লক্ষ্য নথিপত্ৰ অস্বিত্ববা�
 msgid "Not supported"
 msgstr "সমৰ্থিত নহয়"
 
-#: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:925
-#: ../monitor/udisks2/gvfsudisks2mount.c:718
+#: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:922
+#: ../monitor/udisks2/gvfsudisks2mount.c:734
 msgid "Unmount Anyway"
 msgstr "তথাপিও আনমাউন্ট কৰক"
 
-#: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:927
-#: ../monitor/udisks2/gvfsudisks2mount.c:721
+#: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:924
+#: ../monitor/udisks2/gvfsudisks2mount.c:737
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -1806,7 +1806,7 @@ msgstr "নামবিহীন ড্ৰাইভ (%s)"
 msgid "Unnamed Drive"
 msgstr "নাম বিহীন ড্ৰাইভ"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:509
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:505
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr "আয়তনত এটা বা অধিক মাধ্যম ব্যস্ত; মাধ্যম বাহিৰ কৰিবলে ব্যৰ্থ।"
@@ -1825,15 +1825,15 @@ msgstr ""
 msgid "Start Anyway"
 msgstr "তথাপিও আৰম্ভ কৰক"
 
-#: ../monitor/gdu/ggdumount.c:860 ../monitor/udisks2/gvfsudisks2mount.c:631
+#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:649
 msgid "One or more programs are preventing the unmount operation."
 msgstr "এটা অথবা অধিক প্ৰগ্ৰাম দ্বাৰা আনমাউন্টৰ কাৰ্য্য সঞ্চালন প্ৰতিৰোধ কৰা হৈছে"
 
-#: ../monitor/gdu/ggdumount.c:988
+#: ../monitor/gdu/ggdumount.c:985
 msgid "Cannot get LUKS cleartext slave"
 msgstr "LUKS cleartext স্লেইভ প্ৰাপ্ত কৰা নাযায়"
 
-#: ../monitor/gdu/ggdumount.c:1010
+#: ../monitor/gdu/ggdumount.c:1007
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
 msgstr "`%s' পথৰ পৰা LUKS cleartext স্লেইভ প্ৰাপ্ত কৰা নাযায়"
@@ -2188,7 +2188,7 @@ msgstr "%s এনক্ৰিপ্ট কৰা তথ্য"
 msgid "%s Media"
 msgstr "%s মাধ্যম"
 
-#: ../monitor/udisks2/gvfsudisks2mount.c:714
+#: ../monitor/udisks2/gvfsudisks2mount.c:730
 msgid "Eject Anyway"
 msgstr "তথাপিও উলাওক"
 
@@ -2196,6 +2196,34 @@ msgstr "তথাপিও উলাওক"
 #, c-format
 msgid "Timed out running command-line `%s'"
 msgstr "কমান্ড-শাৰী `%s' চলাওতে সময়অন্ত"
+
+#: ../monitor/udisks2/gvfsudisks2utils.c:663
+#, c-format
+msgid ""
+"Unmounting %s\n"
+"Please wait"
+msgstr ""
+"%s আনমাউন্ট কৰা হৈছে\n"
+"অনুগ্ৰহ কৰি অপেক্ষা কৰক"
+
+#: ../monitor/udisks2/gvfsudisks2utils.c:664
+#, c-format
+msgid ""
+"Writing data to %s\n"
+"Don't unplug until finished"
+msgstr ""
+"%s লে তথ্য লিখা হৈছে\n"
+"সম্পূৰ্ণ নহোৱালৈকে আনপ্লাগ নকৰিব"
+
+#: ../monitor/udisks2/gvfsudisks2utils.c:809
+#, c-format
+msgid "%s has been unmounted\n"
+msgstr "%s আনমাউন্ট কৰা হৈছে\n"
+
+#: ../monitor/udisks2/gvfsudisks2utils.c:809
+#, c-format
+msgid "You can now unplug %s\n"
+msgstr "আপুনি এতিয়া %s আনপ্লাগ কৰিব পাৰিব\n"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2312,9 +2340,10 @@ msgid ""
 "locations instead of local files: for example you can use something\n"
 "like smb://server/resource/file.txt as location."
 msgstr ""
-"gvfs-cat পাৰম্পৰিক cat সঁজুলিৰ নিচিনা কাৰ্য্য কৰে, কেৱল স্থানীয় নথিপত্ৰসমূহৰ পৰিৱৰ্তে\n"
-"gvfs অৱস্থানসমূহ ব্যৱহাৰ কৰি: উদাহৰণস্বৰূপ আপুনি smb://server/resource/file.txt "
-"ৰ নিচিনা কিবা এটাক অৱস্থান হিচাপে ব্যৱহাৰ কৰিব পাৰিব।"
+"gvfs-cat পাৰম্পৰিক cat সঁজুলিৰ নিচিনা কাৰ্য্য কৰে, কেৱল স্থানীয় নথিপত্ৰসমূহৰ "
+"পৰিৱৰ্তে\n"
+"gvfs অৱস্থানসমূহ ব্যৱহাৰ কৰি: উদাহৰণস্বৰূপ আপুনি smb://server/resource/file.txt ৰ "
+"নিচিনা কিবা এটাক অৱস্থান হিচাপে ব্যৱহাৰ কৰিব পাৰিব।"
 
 #: ../programs/gvfs-cat.c:143
 msgid ""
@@ -2569,8 +2598,8 @@ msgid ""
 msgstr ""
 "gvfs-ls পাৰম্পৰিক ls সঁজুলিৰ সৈতে সদৃশ, কিন্তু স্থানীয় নথিপত্ৰসমূহৰ পৰিৱৰ্তে\n"
 "gvfs অৱস্থানসমূহ ব্যৱহাৰ কৰি: উদাহৰণস্বৰূপ আপুনি smb://server/resource/file.txt\n"
-"ৰ নিচিনা কিবা এটাক অৱস্থান হিচাপে ব্যৱহাৰ কৰিব পাৰিব। নথিপত্ৰ বৈশিষ্টসমূহ সিহতৰ gvfs "
-"নামৰ\n"
+"ৰ নিচিনা কিবা এটাক অৱস্থান হিচাপে ব্যৱহাৰ কৰিব পাৰিব। নথিপত্ৰ বৈশিষ্টসমূহ সিহতৰ "
+"gvfs নামৰ\n"
 "সৈতে ধাৰ্য্য কৰিব পাৰি, উদাহৰণস্বৰূপ standard::icon।"
 
 #: ../programs/gvfs-mime.c:36
