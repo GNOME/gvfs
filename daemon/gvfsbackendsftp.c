@@ -71,8 +71,8 @@
  * fstat
  */
 
-#ifdef HAVE_GRANTPT
-/* We only use this on systems with unix98 ptys */
+#if defined(HAVE_GRANTPT) || defined(HAVE_OPENPTY)
+/* We only use this on systems with unix98 or BSD ptys */
 #define USE_PTY 1
 #endif
 

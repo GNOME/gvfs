@@ -119,8 +119,12 @@ AC_CHECK_FUNCS(getpt posix_openpt grantpt unlockpt ptsname ptsname_r)
 # Pull in the right libraries for various functions which might not be
 # bundled into an exploded libc.
 AC_CHECK_FUNC(socketpair,[have_socketpair=1],AC_CHECK_LIB(socket,socketpair,[have_socketpair=1; LIBS="$LIBS -lsocket"]))
+AC_CHECK_FUNC(openpty,[have_openpty=1],AC_CHECK_LIB(util,openpty,[have_openpty=1; LIBS="$LIBS -lutil"]))
 if test x$have_socketpair = x1 ; then
 	AC_DEFINE(HAVE_SOCKETPAIR,1,[Define if you have the socketpair function.])
+fi
+if test x$have_openpty = x1 ; then
+	AC_DEFINE(HAVE_OPENPTY,1,[Define if you have the openpty function.])
 fi
 
 AC_SEARCH_LIBS(login_tty, util, [AC_DEFINE([HAVE_LOGIN_TTY],[],[Whether login_tty is available])])
