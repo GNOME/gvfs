@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: as\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug."
 "cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-07-12 00:00+0000\n"
-"PO-Revision-Date: 2012-07-13 19:23+0530\n"
+"POT-Creation-Date: 2012-07-13 20:29+0000\n"
+"PO-Revision-Date: 2012-07-16 12:53+0530\n"
 "Last-Translator: Nilamdyuti Goswami <ngoswami@redhat.com>\n"
 "Language-Team: as_IN <kde-i18n-doc@kde.org>\n"
 "Language: \n"
@@ -639,8 +639,8 @@ msgstr ""
 #
 #: ../daemon/gvfsbackendafc.c:926 ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1808
-#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:718
-#: ../daemon/gvfsbackendtrash.c:232
+#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendrecent.c:121
+#: ../daemon/gvfsbackendsmb.c:718 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "ডাইৰেকটৰি খোলিব নোৱাৰি"
 
@@ -772,7 +772,8 @@ msgstr "অস্থায়ী ডাইৰেকটৰি সৃষ্টি ক
 #: ../daemon/gvfsbackendburn.c:776 ../daemon/gvfsbackendburn.c:967
 #: ../daemon/gvfsbackendburn.c:1003 ../daemon/gvfsbackendftp.c:793
 #: ../daemon/gvfsbackendgphoto2.c:1205 ../daemon/gvfsbackendgphoto2.c:2129
-#: ../daemon/gvfsbackendgphoto2.c:2848 ../daemon/gvfsbackendsftp.c:1836
+#: ../daemon/gvfsbackendgphoto2.c:2848 ../daemon/gvfsbackendrecent.c:105
+#: ../daemon/gvfsbackendrecent.c:259 ../daemon/gvfsbackendsftp.c:1836
 #: ../daemon/gvfsbackendsftp.c:2949 ../daemon/gvfsbackendsftp.c:2962
 #: ../daemon/gvfsbackendsftp.c:2982 ../daemon/gvfsbackendtrash.c:216
 #, c-format
@@ -1357,6 +1358,17 @@ msgstr "ডিভাইচৰ এটা চফ্টৱেৰ আপডেটৰ
 msgid "Error deleting file: %s"
 msgstr "নথিপত্ৰ মচোতে ত্ৰুটি: %s"
 
+#: ../daemon/gvfsbackendrecent.c:238
+#| msgid "The trash folder may not be deleted"
+msgid "The recent folder may not be deleted"
+msgstr "শেহতীয়া ফোল্ডাৰ মচি পেলোৱা নহবও পাৰে"
+
+#. Translators: this is the display name of the backend
+#. translators: This is the name of the backend
+#: ../daemon/gvfsbackendrecent.c:547 ../daemon/gvfsbackendrecent.c:658
+msgid "Recent"
+msgstr "শেহতীয়া"
+
 #: ../daemon/gvfsbackendsftp.c:302 ../daemon/gvfsbackendsftp.c:658
 msgid "ssh program unexpectedly exited"
 msgstr "ssh প্ৰগ্ৰাম অপ্ৰত্যাশিতভাবে বন্ধ হৈ গল"
@@ -1605,7 +1617,7 @@ msgstr "আবৰ্জনাৰ বাকচত উপস্থিত বস্
 #
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:742 ../daemon/gvfsbackendtrash.c:850
+#: ../daemon/gvfsbackendtrash.c:755 ../daemon/gvfsbackendtrash.c:863
 msgid "Trash"
 msgstr "আৰ্বজনা"
 
