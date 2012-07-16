@@ -1,3 +1,14 @@
+Major changes in 1.13.3
+=======================
+* Added man pages for all gvfs utilities
+* Added a recent files backend (using GtkRecentManager)
+* Support for new GMountOperation::show-unmount-progress signal
+* daemon: Updated to use XDG Cache Home for thumbnails
+* daemon/sftp: Support allocating PTYs through openpty on BSD
+* udisks2: Plug a memory leak
+* trash: Make it possible to get to real URI
+* Translation updates
+
 Major changes in 1.13.2
 =======================
 * dav: Ignore empty tags in multistatus responses
