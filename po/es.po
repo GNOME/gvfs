@@ -11,15 +11,16 @@ msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-06-29 21:45+0000\n"
-"PO-Revision-Date: 2012-07-02 17:09+0200\n"
+"POT-Creation-Date: 2012-07-13 20:29+0000\n"
+"PO-Revision-Date: 2012-07-16 16:16+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #: ../client/gdaemonfile.c:500 ../client/gdaemonfile.c:2405
 msgid "Operation not supported, files on different mounts"
@@ -94,7 +95,7 @@ msgstr "los valores deben ser cadenas o listas de cadenas"
 #: ../daemon/gvfsbackendobexftp.c:2087 ../daemon/gvfsbackendsmb.c:1179
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
-#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1073
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1070
 #: ../monitor/proxy/gproxydrive.c:522 ../monitor/proxy/gproxydrive.c:610
 #: ../monitor/proxy/gproxydrive.c:760 ../monitor/proxy/gproxydrive.c:898
 #: ../monitor/proxy/gproxydrive.c:936 ../monitor/proxy/gproxydrive.c:1061
@@ -583,8 +584,8 @@ msgid "Try again"
 msgstr "Intentarlo de nuevo"
 
 #: ../daemon/gvfsbackendafc.c:390 ../daemon/gvfsbackend.c:963
-#: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:926
-#: ../monitor/udisks2/gvfsudisks2mount.c:720
+#: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
+#: ../monitor/udisks2/gvfsudisks2mount.c:736
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -643,8 +644,8 @@ msgstr ""
 
 #: ../daemon/gvfsbackendafc.c:926 ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1808
-#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:718
-#: ../daemon/gvfsbackendtrash.c:232
+#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendrecent.c:121
+#: ../daemon/gvfsbackendsmb.c:718 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "No se puede abrir la carpeta"
 
@@ -772,7 +773,8 @@ msgstr "No se pudo crear la carpeta temporal"
 #: ../daemon/gvfsbackendburn.c:776 ../daemon/gvfsbackendburn.c:967
 #: ../daemon/gvfsbackendburn.c:1003 ../daemon/gvfsbackendftp.c:793
 #: ../daemon/gvfsbackendgphoto2.c:1205 ../daemon/gvfsbackendgphoto2.c:2129
-#: ../daemon/gvfsbackendgphoto2.c:2848 ../daemon/gvfsbackendsftp.c:1836
+#: ../daemon/gvfsbackendgphoto2.c:2848 ../daemon/gvfsbackendrecent.c:105
+#: ../daemon/gvfsbackendrecent.c:259 ../daemon/gvfsbackendsftp.c:1836
 #: ../daemon/gvfsbackendsftp.c:2949 ../daemon/gvfsbackendsftp.c:2962
 #: ../daemon/gvfsbackendsftp.c:2982 ../daemon/gvfsbackendtrash.c:216
 #, c-format
@@ -815,9 +817,9 @@ msgstr "El archivo ya existe"
 #: ../daemon/gvfsjobstartmountable.c:133 ../daemon/gvfsjobstopmountable.c:136
 #: ../daemon/gvfsjobtrash.c:123 ../daemon/gvfsjobunmountmountable.c:140
 #: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
-#: ../monitor/gdu/ggdumount.c:1177 ../monitor/gdu/ggdumount.c:1261
-#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1104
-#: ../monitor/udisks2/gvfsudisks2volume.c:1505
+#: ../monitor/gdu/ggdumount.c:1174 ../monitor/gdu/ggdumount.c:1258
+#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1108
+#: ../monitor/udisks2/gvfsudisks2volume.c:1508
 msgid "Operation not supported by backend"
 msgstr "El backend no soporta la operación"
 
@@ -837,13 +839,13 @@ msgstr "El archivo destino ya existe"
 msgid "Not supported"
 msgstr "No soportado"
 
-#: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:925
-#: ../monitor/udisks2/gvfsudisks2mount.c:718
+#: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:922
+#: ../monitor/udisks2/gvfsudisks2mount.c:734
 msgid "Unmount Anyway"
 msgstr "Desmontar de todas formas"
 
-#: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:927
-#: ../monitor/udisks2/gvfsudisks2mount.c:721
+#: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:924
+#: ../monitor/udisks2/gvfsudisks2mount.c:737
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -1355,6 +1357,17 @@ msgstr "El dispositivo requiere una actualización de software"
 msgid "Error deleting file: %s"
 msgstr "Error al borrar el archivo: %s"
 
+#: ../daemon/gvfsbackendrecent.c:238
+#| msgid "The trash folder may not be deleted"
+msgid "The recent folder may not be deleted"
+msgstr "No se puede borrar la carpeta reciente"
+
+#. Translators: this is the display name of the backend
+#. translators: This is the name of the backend
+#: ../daemon/gvfsbackendrecent.c:547 ../daemon/gvfsbackendrecent.c:658
+msgid "Recent"
+msgstr "Recientes"
+
 #: ../daemon/gvfsbackendsftp.c:302 ../daemon/gvfsbackendsftp.c:658
 msgid "ssh program unexpectedly exited"
 msgstr "el programa de ssh finalizó inesperadamente"
@@ -1599,7 +1612,7 @@ msgstr "Los elementos en la papelera no se deben modificar"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:742 ../daemon/gvfsbackendtrash.c:850
+#: ../daemon/gvfsbackendtrash.c:755 ../daemon/gvfsbackendtrash.c:863
 msgid "Trash"
 msgstr "Papelera"
 
@@ -1801,7 +1814,7 @@ msgstr "Unidad sin nombre (%s)"
 msgid "Unnamed Drive"
 msgstr "Unidad sin nombre"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:509
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:505
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
@@ -1822,15 +1835,15 @@ msgstr ""
 msgid "Start Anyway"
 msgstr "Iniciar de todas formas"
 
-#: ../monitor/gdu/ggdumount.c:860 ../monitor/udisks2/gvfsudisks2mount.c:631
+#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:649
 msgid "One or more programs are preventing the unmount operation."
 msgstr "Uno o más programas evitan la operación de desmontado."
 
-#: ../monitor/gdu/ggdumount.c:988
+#: ../monitor/gdu/ggdumount.c:985
 msgid "Cannot get LUKS cleartext slave"
 msgstr "No se puede obtener el esclavo LUKS en texto claro"
 
-#: ../monitor/gdu/ggdumount.c:1010
+#: ../monitor/gdu/ggdumount.c:1007
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
 msgstr "No se puede obtener el esclavo LUKS en texto claro desde la ruta «%s»"
@@ -2185,7 +2198,7 @@ msgstr "Datos cifrados %s"
 msgid "%s Media"
 msgstr "Soporte %s"
 
-#: ../monitor/udisks2/gvfsudisks2mount.c:714
+#: ../monitor/udisks2/gvfsudisks2mount.c:730
 msgid "Eject Anyway"
 msgstr "Expulsar de todas formas"
 
@@ -2193,6 +2206,34 @@ msgstr "Expulsar de todas formas"
 #, c-format
 msgid "Timed out running command-line `%s'"
 msgstr "Expiro el tiempo al ejecutar el comando «%s»"
+
+#: ../monitor/udisks2/gvfsudisks2utils.c:663
+#, c-format
+msgid ""
+"Unmounting %s\n"
+"Please wait"
+msgstr ""
+"Desmontando %s\n"
+"Espere"
+
+#: ../monitor/udisks2/gvfsudisks2utils.c:664
+#, c-format
+msgid ""
+"Writing data to %s\n"
+"Don't unplug until finished"
+msgstr ""
+"Escribiendo datos en %s\n"
+"No lo desconecte hasta que termine"
+
+#: ../monitor/udisks2/gvfsudisks2utils.c:809
+#, c-format
+msgid "%s has been unmounted\n"
+msgstr "Se ha desmontado %s\n"
+
+#: ../monitor/udisks2/gvfsudisks2utils.c:809
+#, c-format
+msgid "You can now unplug %s\n"
+msgstr "Ahora puede desconectar %s\n"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2233,17 +2274,17 @@ msgid "The unlocked device does not have a recognizable filesystem on it"
 msgstr ""
 "El dispositivo desbloqueado no contiene un sistema de archivos reconocible"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1074
+#: ../monitor/udisks2/gvfsudisks2volume.c:1077
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Contraseña de cifrado para %s"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1244
+#: ../monitor/udisks2/gvfsudisks2volume.c:1247
 msgid "A passphrase is required to access the volume"
 msgstr "Se requiere una contraseña para acceder al volumen"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1259
+#: ../monitor/udisks2/gvfsudisks2volume.c:1262
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2259,7 +2300,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1410
+#: ../monitor/udisks2/gvfsudisks2volume.c:1413
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
@@ -2304,16 +2345,10 @@ msgstr "ARCHIVO"
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
 #: ../programs/gvfs-cat.c:138
-#| msgid "LOCATION... - concatenate LOCATIONS to standard output."
 msgid "Concatenate files and print to the standard output."
 msgstr "Concatenar archivos y mostrar en la salida estándar."
 
 #: ../programs/gvfs-cat.c:139
-#| msgid ""
-#| "Concatenate files at locations and print to the standard output. Works "
-#| "just like the traditional cat utility, but using gvfs location instead "
-#| "local files: for example you can use something like smb://server/resource/"
-#| "file.txt as location to concatenate."
 msgid ""
 "gvfs-cat works just like the traditional cat utility, but using gvfs\n"
 "locations instead of local files: for example you can use something\n"
@@ -2324,9 +2359,6 @@ msgstr ""
 "smb://servidor/recurso/archivo.txt como una ubicación."
 
 #: ../programs/gvfs-cat.c:143
-#| msgid ""
-#| "Note: just pipe through cat if you need its formatting option like -n, -T "
-#| "or other."
 msgid ""
 "Note: just pipe through cat if you need its formatting options\n"
 "like -n, -T or other."
@@ -2355,33 +2387,27 @@ msgid "%s: missing locations"
 msgstr "%s: faltan ubicaciones"
 
 #: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
-#| msgid "no target directory"
 msgid "No target directory"
 msgstr "Sin carpeta de destino"
 
 #: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
-#| msgid "show progress"
 msgid "Show progress"
 msgstr "Mostrar progreso"
 
 #: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
-#| msgid "prompt before overwrite"
 msgid "Prompt before overwrite"
 msgstr "Preguntar antes de sobreescribir"
 
 #: ../programs/gvfs-copy.c:47
-#| msgid "preserve all attributes"
 msgid "Preserve all attributes"
 msgstr "Conservar todos los atributos"
 
 #: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
 #: ../programs/gvfs-save.c:43
-#| msgid "backup existing destination files"
 msgid "Backup existing destination files"
 msgstr "Respaldar los archivos de destino existentes"
 
 #: ../programs/gvfs-copy.c:49
-#| msgid "never follow symbolic links"
 msgid "Never follow symbolic links"
 msgstr "No seguir nunca enlaces simbólicos"
 
@@ -2400,7 +2426,6 @@ msgid "DEST"
 msgstr "DESTINO"
 
 #: ../programs/gvfs-copy.c:122
-#| msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
 msgid "Copy one or more files from SOURCE to DEST."
 msgstr "Copiar uno o más archivos de ORIGEN a DESTINO."
 
@@ -2446,7 +2471,6 @@ msgstr "ATRIBUTOS"
 
 #: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
 #: ../programs/gvfs-set-attribute.c:37
-#| msgid "Don't follow symlinks"
 msgid "Don't follow symbolic links"
 msgstr "No seguir enlaces simbólicos"
 
@@ -2549,7 +2573,6 @@ msgid "LOCATION"
 msgstr "UBICACIÓN"
 
 #: ../programs/gvfs-info.c:369
-#| msgid "- show info for <location>"
 msgid "Show information about locations."
 msgstr "Mostrar información sobre las ubicaciones"
 
@@ -2580,11 +2603,6 @@ msgid "List the contents of the locations."
 msgstr "Listar los contenidos de las ubicaciones."
 
 #: ../programs/gvfs-ls.c:392
-#| msgid ""
-#| "Concatenate files at locations and print to the standard output. Works "
-#| "just like the traditional cat utility, but using gvfs location instead "
-#| "local files: for example you can use something like smb://server/resource/"
-#| "file.txt as location to concatenate."
 msgid ""
 "gvfs-ls is similar to the traditional ls utility, but using gvfs\n"
 "locations instead of local files: for example you can use something\n"
@@ -2613,12 +2631,10 @@ msgid "HANDLER"
 msgstr "MANEJADOR"
 
 #: ../programs/gvfs-mime.c:83
-#| msgid "Set handler for mime-type"
 msgid "Get or set the handler for a mime-type."
 msgstr "Establecer u obtener el manejador para un tipo MIME"
 
 #: ../programs/gvfs-mime.c:95
-#| msgid "Specify one of --query and --set"
 msgid "Specify either --query or --set"
 msgstr "Especifique --query o --set"
 
@@ -2673,12 +2689,10 @@ msgid "Failed to set '%s' as the default handler for '%s': %s\n"
 msgstr "falló al establecer «%s» como el gestor predeterminado para «%s»: %s\n"
 
 #: ../programs/gvfs-mkdir.c:33
-#| msgid "create parent directories"
 msgid "Create parent directories"
 msgstr "Crear carpetas padre"
 
 #: ../programs/gvfs-mkdir.c:58
-#| msgid "- create directories"
 msgid "Create directories."
 msgstr "Crear carpetas."
 
@@ -2688,7 +2702,6 @@ msgid "Error creating directory: %s\n"
 msgstr "Error al crear la carpeta: %s\n"
 
 #: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
-#| msgid "Don't send single MOVED events."
 msgid "Don't send single MOVED events"
 msgstr "No enviar eventos MOVIDO individuales."
 
@@ -2738,7 +2751,6 @@ msgid "Monitor events"
 msgstr "Monitorizar eventos"
 
 #: ../programs/gvfs-mount.c:63
-#| msgid "Show extra information for List and Monitor"
 msgid "Show extra information"
 msgstr "Mostrar información adicional"
 
@@ -2778,12 +2790,10 @@ msgid "No volume for device file %s\n"
 msgstr "No existe un volumen para el archivo de dispositivo %s\n"
 
 #: ../programs/gvfs-mount.c:1006
-#| msgid "- mount <location>"
 msgid "Mount the locations."
 msgstr "Montar las ubicaciones"
 
 #: ../programs/gvfs-move.c:110
-#| msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
 msgid "Move one or more files from SOURCE to DEST."
 msgstr "Mover uno o más archivos de ORIGEN a DESTINO"
 
@@ -2795,9 +2805,6 @@ msgstr "Error al mover el archivo %s: %s\n"
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
 #: ../programs/gvfs-open.c:64
-#| msgid ""
-#| "Opens the file(s) with the default application registered to handle the "
-#| "type of the file."
 msgid ""
 "Open files with the default application that\n"
 "is registered to handle files of this type."
@@ -2817,7 +2824,6 @@ msgid "NEW-NAME"
 msgstr "NOMBRE-NUEVO"
 
 #: ../programs/gvfs-rename.c:65
-#| msgid "- rename file"
 msgid "Rename a file."
 msgstr "Renombrar un archivo"
 
@@ -2827,7 +2833,6 @@ msgid "Rename successful. New uri: %s\n"
 msgstr "Renombrado correctamente. URI nuevo: %s\n"
 
 #: ../programs/gvfs-rm.c:34 ../programs/gvfs-trash.c:34
-#| msgid "ignore nonexistent files, never prompt"
 msgid "Ignore nonexistent files, never prompt"
 msgstr "Ignorar archivos no existentes, nunca preguntar"
 
@@ -2844,7 +2849,6 @@ msgid "Append to end of file"
 msgstr "Añadir al final del archivo"
 
 #: ../programs/gvfs-save.c:46
-#| msgid "When creating a file, restrict access to the current user only"
 msgid "When creating, restrict access to the current user"
 msgstr "Al crear el archivo restringir el acceso al usuario actual"
 
@@ -2880,12 +2884,10 @@ msgid "Etag not available\n"
 msgstr "Etiqueta-e no disponible\n"
 
 #: ../programs/gvfs-save.c:163
-#| msgid "DEST - read from standard input and save to DEST"
 msgid "Read from standard input and save to DEST."
 msgstr "Leer de entrada estándar y guardar en DESTINO."
 
 #: ../programs/gvfs-set-attribute.c:36
-#| msgid "The attributes to get"
 msgid "Type of the attribute"
 msgstr "Tipo del atributo"
 
@@ -2928,7 +2930,6 @@ msgid "Error setting attribute: %s\n"
 msgstr "Error al establecer el archivo: %s\n"
 
 #: ../programs/gvfs-trash.c:58
-#| msgid "Can't move a shared directory into the Trash"
 msgid "Move files or directories to the trash."
 msgstr "Mover archivos o carpetas compartida a la papelera"
 
@@ -2938,12 +2939,10 @@ msgid "Error trashing file: %s\n"
 msgstr "Error al borrar el archivo: %s\n"
 
 #: ../programs/gvfs-tree.c:37
-#| msgid "Follow symbolic links, mounts and shortcuts like directories"
 msgid "Follow symbolic links, mounts and shortcuts"
 msgstr "Seguir enlaces simbólicos, puntos de montaje y atajos"
 
 #: ../programs/gvfs-tree.c:249
-#| msgid "- list contents of directories in a tree-like format"
 msgid "List contents of directories in a tree-like format."
 msgstr "Listar los contenidos de las carpeta en una vista de árbol."
 
