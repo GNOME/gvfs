@@ -16,12 +16,6 @@ $(dbus_built_sources) : Makefile.am dbus-interfaces.xml
 		--interface-prefix org.gtk.vfs.		\
 		--c-namespace GVfsDBus			\
 		--generate-c-code gvfsdbus		\
-		--annotate "org.gtk.vfs.Mount.OpenForRead()"	\
-		  org.gtk.GDBus.C.UnixFD true		\
-		--annotate "org.gtk.vfs.Mount.OpenForWrite()"	\
-		  org.gtk.GDBus.C.UnixFD true		\
-		--annotate "org.gtk.vfs.Mount.OpenIconForRead()"	\
-		  org.gtk.GDBus.C.UnixFD true		\
 		$(srcdir)/dbus-interfaces.xml		\
 		$(NULL)
 

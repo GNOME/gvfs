@@ -183,6 +183,7 @@
       <arg type='u' name='pid' direction='in'/>
       <arg type='u' name='fd_id' direction='out'/>
       <arg type='b' name='can_seek' direction='out'/>
+      <annotation name="org.gtk.GDBus.C.UnixFD" value="true"/>
     </method>
     <method name="OpenForWrite">
       <arg type='ay' name='path_data' direction='in'/>
@@ -194,6 +195,7 @@
       <arg type='u' name='fd_id' direction='out'/>
       <arg type='b' name='can_seek' direction='out'/>
       <arg type='t' name='initial_offset' direction='out'/>
+      <annotation name="org.gtk.GDBus.C.UnixFD" value="true"/>
     </method>
     <method name="QueryInfo">
       <arg type='ay' name='path_data' direction='in'/>
@@ -322,6 +324,7 @@
       <arg type='ay' name='path_data' direction='in'/>
       <arg type='u' name='fd_id' direction='out'/>
       <arg type='b' name='can_seek' direction='out'/>
+      <annotation name="org.gtk.GDBus.C.UnixFD" value="true"/>
     </method>
   </interface>
 
