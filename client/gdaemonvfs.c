@@ -1294,7 +1294,7 @@ _g_daemon_vfs_get_metadata_proxy (GCancellable *cancellable, GError **error)
   if (metadata_proxy == NULL)
     {
       metadata_proxy = gvfs_metadata_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
-                                                             G_DBUS_PROXY_FLAGS_NONE,
+                                                             G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                                              G_VFS_DBUS_METADATA_NAME,
                                                              G_VFS_DBUS_METADATA_PATH,
                                                              cancellable,

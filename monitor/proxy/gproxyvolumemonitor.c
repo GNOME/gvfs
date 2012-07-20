@@ -965,7 +965,7 @@ g_proxy_volume_monitor_constructor (GType                  type,
 
   error = NULL;
   monitor->proxy = gvfs_remote_volume_monitor_proxy_new_sync (the_session_bus,
-                                                              G_DBUS_PROXY_FLAGS_NONE,
+                                                              G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                                               dbus_name,
                                                               "/org/gtk/Private/RemoteVolumeMonitor",
                                                               NULL,
@@ -1130,7 +1130,7 @@ is_remote_monitor_supported (const char *dbus_name)
   error = NULL;
 
   proxy = gvfs_remote_volume_monitor_proxy_new_sync (the_session_bus,
-                                                     G_DBUS_PROXY_FLAGS_NONE,
+                                                     G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                                      dbus_name,
                                                      "/org/gtk/Private/RemoteVolumeMonitor",
                                                      NULL,
