@@ -12,7 +12,7 @@ dbus_built_sources = gvfsdbus.c gvfsdbus.h
 BUILT_SOURCES = $(dbus_built_sources)
 
 $(dbus_built_sources) : Makefile.am dbus-interfaces.xml
-	gdbus-codegen					\
+	$(AM_V_GEN) gdbus-codegen			\
 		--interface-prefix org.gtk.vfs.		\
 		--c-namespace GVfsDBus			\
 		--generate-c-code gvfsdbus		\
@@ -22,7 +22,7 @@ $(dbus_built_sources) : Makefile.am dbus-interfaces.xml
 		  org.gtk.GDBus.C.UnixFD true		\
 		--annotate "org.gtk.vfs.Mount.OpenIconForRead()"	\
 		  org.gtk.GDBus.C.UnixFD true		\
-		dbus-interfaces.xml			\
+		$(srcdir)/dbus-interfaces.xml		\
 		$(NULL)
 
 libgvfscommon_la_SOURCES = 	\
