@@ -1040,17 +1040,21 @@ read_async_cb (GVfsDBusMount *proxy,
   gboolean can_seek;
   GUnixFDList *fd_list;
   int fd;
+  GVariant *fd_id_val;
   guint fd_id;
   GFileInputStream *stream;
 
   g_print ("read_async_cb\n");
   orig_result = data->result;
   
-  if (! gvfs_dbus_mount_call_open_for_read_finish (proxy, &fd_id, &can_seek, &fd_list, res, &error))
+  if (! gvfs_dbus_mount_call_open_for_read_finish (proxy, &fd_id_val, &can_seek, &fd_list, res, &error))
     {
       g_simple_async_result_take_error (orig_result, error);
       goto out;
     }
+
+  fd_id = g_variant_get_handle (fd_id_val);
+  g_variant_unref (fd_id_val);
 
   if (fd_list == NULL || g_unix_fd_list_get_length (fd_list) != 1 ||
       (fd = g_unix_fd_list_get (fd_list, fd_id, NULL)) == -1)
@@ -1152,6 +1156,7 @@ g_daemon_file_read (GFile *file,
   gboolean can_seek;
   GUnixFDList *fd_list;
   int fd;
+  GVariant *fd_id_val;
   guint fd_id;
   guint32 pid;
   GError *local_error = NULL;
@@ -1168,13 +1173,16 @@ g_daemon_file_read (GFile *file,
                                                  path,
                                                  pid,
                                                  NULL,
-                                                 &fd_id,
+                                                 &fd_id_val,
                                                  &can_seek,
                                                  &fd_list,
                                                  cancellable,
                                                  &local_error);
   
   g_print ("g_daemon_file_read: done, res = %d\n", res);
+
+  fd_id = g_variant_get_handle (fd_id_val);
+  g_variant_unref (fd_id_val);
 
   if (! res)
     {
@@ -1217,6 +1225,7 @@ file_open_write (GFile *file,
   gboolean can_seek;
   GUnixFDList *fd_list;
   int fd;
+  GVariant *fd_id_val;
   guint32 fd_id;
   guint32 pid;
   guint64 initial_offset;
@@ -1239,7 +1248,7 @@ file_open_write (GFile *file,
                                                   flags,
                                                   pid,
                                                   NULL,
-                                                  &fd_id,
+                                                  &fd_id_val,
                                                   &can_seek,
                                                   &initial_offset,
                                                   &fd_list,
@@ -1247,6 +1256,9 @@ file_open_write (GFile *file,
                                                   &local_error);
   
   g_print ("file_open_write: done, res = %d\n", res);
+
+  fd_id = g_variant_get_handle (fd_id_val);
+  g_variant_unref (fd_id_val);
 
   if (! res)
     {
@@ -3201,6 +3213,7 @@ file_open_write_async_cb (GVfsDBusMount *proxy,
   gboolean can_seek;
   GUnixFDList *fd_list;
   int fd;
+  GVariant *fd_id_val;
   guint fd_id;
   guint64 initial_offset;
   GFileOutputStream *output_stream;
@@ -3208,11 +3221,14 @@ file_open_write_async_cb (GVfsDBusMount *proxy,
   g_print ("file_open_write_async_cb\n");
   orig_result = data->result;
   
-  if (! gvfs_dbus_mount_call_open_for_write_finish (proxy, &fd_id, &can_seek, &initial_offset, &fd_list, res, &error))
+  if (! gvfs_dbus_mount_call_open_for_write_finish (proxy, &fd_id_val, &can_seek, &initial_offset, &fd_list, res, &error))
     {
       g_simple_async_result_take_error (orig_result, error);
       goto out;
     }
+
+  fd_id = g_variant_get_handle (fd_id_val);
+  g_variant_unref (fd_id_val);
 
   if (fd_list == NULL || g_unix_fd_list_get_length (fd_list) != 1 ||
       (fd = g_unix_fd_list_get (fd_list, fd_id, NULL)) == -1)

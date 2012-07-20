@@ -91,6 +91,7 @@ g_vfs_icon_load (GLoadableIcon  *icon,
   gboolean can_seek;
   GUnixFDList *fd_list;
   int fd;
+  GVariant *fd_id_val;
   guint32 fd_id;
   GError *local_error = NULL;
 
@@ -103,7 +104,7 @@ g_vfs_icon_load (GLoadableIcon  *icon,
   res = gvfs_dbus_mount_call_open_icon_for_read_sync (proxy,
                                                       vfs_icon->icon_id,
                                                       NULL,
-                                                      &fd_id,
+                                                      &fd_id_val,
                                                       &can_seek,
                                                       &fd_list,
                                                       cancellable,
@@ -111,6 +112,9 @@ g_vfs_icon_load (GLoadableIcon  *icon,
   
   g_print ("gvfsiconloadable.c: g_vfs_icon_load: done, res = %d\n", res);
   
+  fd_id = g_variant_get_handle (fd_id_val);
+  g_variant_unref (fd_id_val);
+
   if (! res)
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
@@ -290,16 +294,20 @@ open_icon_read_cb (GVfsDBusMount *proxy,
   gboolean can_seek;
   GUnixFDList *fd_list;
   int fd;
+  GVariant *fd_id_val;
   guint fd_id;
   GFileInputStream *stream;
 
   g_print ("gvfsiconloadable.c: open_icon_read_cb\n");
 
-  if (! gvfs_dbus_mount_call_open_icon_for_read_finish (proxy, &fd_id, &can_seek, &fd_list, res, &error))
+  if (! gvfs_dbus_mount_call_open_icon_for_read_finish (proxy, &fd_id_val, &can_seek, &fd_list, res, &error))
     {
       g_simple_async_result_take_error (data->result, error);
       goto out;
     }
+
+  fd_id = g_variant_get_handle (fd_id_val);
+  g_variant_unref (fd_id_val);
 
   if (fd_list == NULL || g_unix_fd_list_get_length (fd_list) != 1 ||
       (fd = g_unix_fd_list_get (fd_list, fd_id, NULL)) == -1)

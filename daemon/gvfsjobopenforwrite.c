@@ -270,7 +270,10 @@ create_reply (GVfsJob *job,
       g_error_free (error);
     }
 
-  gvfs_dbus_mount_complete_open_for_write (object, invocation, fd_list, fd_id, open_job->can_seek, open_job->initial_offset);
+  gvfs_dbus_mount_complete_open_for_write (object, invocation,
+                                           fd_list, g_variant_new_handle (fd_id),
+                                           open_job->can_seek,
+                                           open_job->initial_offset);
   
   close (remote_fd);
   g_object_unref (fd_list);
