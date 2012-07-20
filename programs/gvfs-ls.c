@@ -128,15 +128,16 @@ show_info (GFileInfo *info)
   g_print ("\n");
 }
 
-static void
+static gboolean
 list (GFile *file)
 {
   GFileEnumerator *enumerator;
   GFileInfo *info;
   GError *error;
+  gboolean res;
 
   if (file == NULL)
-    return;
+    return FALSE;
 
   error = NULL;
   enumerator = g_file_enumerate_children (file,
@@ -149,9 +150,10 @@ list (GFile *file)
       g_printerr ("Error: %s\n", error->message);
       g_error_free (error);
       error = NULL;
-      return;
+      return FALSE;
     }
 
+  res = TRUE;
   while ((info = g_file_enumerator_next_file (enumerator, NULL, &error)) != NULL)
     {
       show_info (info);
@@ -164,6 +166,7 @@ list (GFile *file)
       g_printerr (_("Error: %s\n"), error->message);
       g_error_free (error);
       error = NULL;
+      res = FALSE;
     }
 
   if (!g_file_enumerator_close (enumerator, NULL, &error))
@@ -171,7 +174,10 @@ list (GFile *file)
       g_printerr (_("Error: %s\n"), error->message);
       g_error_free (error);
       error = NULL;
+      res = FALSE;
     }
+
+  return res;
 }
 
 static void
@@ -377,6 +383,7 @@ main (int argc, char *argv[])
   gchar *param;
   gchar *summary;
   gchar *description;
+  gboolean res;
 
   setlocale (LC_ALL, "");
 
@@ -432,13 +439,14 @@ main (int argc, char *argv[])
       return 0;
     }
 
+  res = TRUE;
   if (argc > 1)
     {
       int i;
 
       for (i = 1; i < argc; i++) {
 	file = g_file_new_for_commandline_arg (argv[i]);
-	list (file);
+	res = list (file) && res;
 	g_object_unref (file);
       }
     }
@@ -449,11 +457,11 @@ main (int argc, char *argv[])
       cwd = g_get_current_dir ();
       file = g_file_new_for_path (cwd);
       g_free (cwd);
-      list (file);
+      res = list (file);
       g_object_unref (file);
     }
 
   g_free (attributes);
 
-  return 0;
+  return res ? 0 : 2;
 }

@@ -49,6 +49,8 @@ static gboolean extra_detail = FALSE;
 static gboolean mount_monitor = FALSE;
 static const char *unmount_scheme = NULL;
 static const char *mount_device_file = NULL;
+static gboolean success = TRUE;
+
 
 static const GOptionEntry entries[] =
 {
@@ -163,7 +165,10 @@ mount_mountable_done_cb (GObject *object,
   target = g_file_mount_mountable_finish (G_FILE (object), res, &error);
 
   if (target == NULL)
-    g_printerr (_("Error mounting location: %s\n"), error->message);
+    {
+      g_printerr (_("Error mounting location: %s\n"), error->message);
+      success = FALSE;
+    }
   else
     g_object_unref (target);
 
@@ -184,7 +189,10 @@ mount_done_cb (GObject *object,
   succeeded = g_file_mount_enclosing_volume_finish (G_FILE (object), res, &error);
 
   if (!succeeded)
-    g_printerr (_("Error mounting location: %s\n"), error->message);
+    {
+      g_printerr (_("Error mounting location: %s\n"), error->message);
+      success = FALSE;
+    }
 
   outstanding_mounts--;
 
@@ -241,7 +249,10 @@ unmount_done_cb (GObject *object,
   g_object_unref (G_MOUNT (object));
 
   if (!succeeded)
-    g_printerr (_("Error unmounting mount: %s\n"), error->message);
+    {
+      g_printerr (_("Error unmounting mount: %s\n"), error->message);
+      success = FALSE;
+    }
 
   outstanding_mounts--;
 
@@ -263,6 +274,7 @@ unmount (GFile *file)
   if (mount == NULL)
     {
       g_printerr (_("Error finding enclosing mount: %s\n"), error->message);
+      success = FALSE;
       return;
     }
 
@@ -286,7 +298,10 @@ eject_done_cb (GObject *object,
   g_object_unref (G_MOUNT (object));
 
   if (!succeeded)
-    g_printerr (_("Error ejecting mount: %s\n"), error->message);
+    {
+      g_printerr (_("Error ejecting mount: %s\n"), error->message);
+      success = FALSE;
+    }
 
   outstanding_mounts--;
 
@@ -308,6 +323,7 @@ eject (GFile *file)
   if (mount == NULL)
     {
       g_printerr (_("Error finding enclosing mount: %s\n"), error->message);
+      success = FALSE;
       return;
     }
 
@@ -743,6 +759,7 @@ mount_with_device_file_cb (GObject *object,
       g_printerr (_("Error mounting %s: %s\n"),
                   g_volume_get_identifier (volume, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE),
                   error->message);
+      success = FALSE;
     }
   else
     {
@@ -1057,5 +1074,5 @@ main (int argc, char *argv[])
   if (outstanding_mounts > 0)
     g_main_loop_run (main_loop);
 
-  return 0;
+  return success ? 0 : 2;
 }

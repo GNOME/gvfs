@@ -185,7 +185,7 @@ show_info (GFileInfo *info)
   show_attributes (info);
 }
 
-static void
+static gboolean
 query_info (GFile *file)
 {
   GFileQueryInfoFlags flags;
@@ -193,7 +193,7 @@ query_info (GFile *file)
   GError *error;
 
   if (file == NULL)
-    return;
+    return FALSE;
 
   if (attributes == NULL)
     attributes = "*";
@@ -212,7 +212,7 @@ query_info (GFile *file)
     {
       g_printerr ("Error getting info: %s\n", error->message);
       g_error_free (error);
-      return;
+      return FALSE;
     }
 
   if (filesystem)
@@ -221,6 +221,8 @@ query_info (GFile *file)
     show_info (info);
 
   g_object_unref (info);
+
+  return TRUE;
 }
 
 static char *
@@ -288,7 +290,7 @@ attribute_flags_to_string (GFileAttributeInfoFlags flags)
   return g_string_free (s, FALSE);
 }
 
-static void
+static gboolean
 get_writable_info (GFile *file)
 {
   GFileAttributeInfoList *list;
@@ -297,7 +299,7 @@ get_writable_info (GFile *file)
   char *flags;
 
   if (file == NULL)
-    return;
+    return FALSE;
 
   error = NULL;
 
@@ -306,7 +308,7 @@ get_writable_info (GFile *file)
     {
       g_printerr (_("Error getting writable attributes: %s\n"), error->message);
       g_error_free (error);
-      return;
+      return FALSE;
     }
 
   g_print (_("Settable attributes:\n"));
@@ -327,7 +329,7 @@ get_writable_info (GFile *file)
     {
       g_printerr ("Error getting writable namespaces: %s\n", error->message);
       g_error_free (error);
-      return;
+      return FALSE;
     }
 
   if (list->n_infos > 0)
@@ -344,6 +346,8 @@ get_writable_info (GFile *file)
     }
 
   g_file_attribute_info_list_unref (list);
+
+  return TRUE;
 }
 
 
@@ -355,6 +359,7 @@ main (int argc, char *argv[])
   GFile *file;
   gchar *param;
   gchar *summary;
+  gboolean res;
 
   setlocale (LC_ALL, "");
 
@@ -385,6 +390,7 @@ main (int argc, char *argv[])
       return 1;
     }
 
+  res = TRUE;
   if (argc > 1)
     {
       int i;
@@ -392,12 +398,12 @@ main (int argc, char *argv[])
       for (i = 1; i < argc; i++) {
 	file = g_file_new_for_commandline_arg (argv[i]);
 	if (writable)
-	  get_writable_info (file);
+	  res = get_writable_info (file) && res;
 	else
-	  query_info (file);
+	  res = query_info (file) && res;
 	g_object_unref (file);
       }
     }
 
-  return 0;
+  return res ? 0 : 2;
 }

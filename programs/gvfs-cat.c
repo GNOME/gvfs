@@ -38,7 +38,7 @@ static GOptionEntry entries[] = {
   { NULL }
 };
 
-static void
+static gboolean
 cat (GFile * file)
 {
   GInputStream *in;
@@ -47,6 +47,7 @@ cat (GFile * file)
   gssize res;
   gboolean close_res;
   GError *error;
+  gboolean success;
 
   error = NULL;
   in = (GInputStream *) g_file_read (file, NULL, &error);
@@ -57,9 +58,10 @@ cat (GFile * file)
       g_printerr (_("%s: %s: error opening file: %s\n"),
                   g_get_prgname (), g_file_get_uri (file), error->message);
       g_error_free (error);
-      return;
+      return FALSE;
     }
 
+  success = TRUE;
   while (1)
     {
       res =
@@ -79,6 +81,7 @@ cat (GFile * file)
                   /* second one is the URI of the file.                 */
                   g_printerr (_("%s: %s, error writing to stdout"),
                               g_get_prgname (), g_file_get_uri (file));
+                  success = FALSE;
                   goto out;
                 }
               res -= written;
@@ -94,6 +97,7 @@ cat (GFile * file)
                       error->message);
           g_error_free (error);
           error = NULL;
+          success = FALSE;
           break;
         }
       else if (res == 0)
@@ -110,7 +114,10 @@ cat (GFile * file)
       g_printerr (_("%s: %s:error closing: %s\n"),
                   g_get_prgname (), g_file_get_uri (file), error->message);
       g_error_free (error);
+      success = FALSE;
     }
+
+  return success;
 }
 
 int
@@ -123,6 +130,7 @@ main (int argc, char *argv[])
   gchar *description;
   int i;
   gchar *param;
+  gboolean res;
 
   setlocale (LC_ALL, "");
 
@@ -177,15 +185,16 @@ main (int argc, char *argv[])
       return 1;
     }
 
+  res = TRUE;
   i = 0;
 
   do
     {
       file = g_file_new_for_commandline_arg (locations[i]);
-      cat (file);
+      res = cat (file) && res;
       g_object_unref (file);
     }
   while (locations[++i] != NULL);
 
-  return 0;
+  return res ? 0 : 2;
 }
