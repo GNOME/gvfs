@@ -620,7 +620,7 @@ create_mount_tracker_proxy (GVfsBackend *backend,
   data->backend = g_object_ref (backend);
 
   gvfs_dbus_mount_tracker_proxy_new_for_bus (G_BUS_TYPE_SESSION,
-                                             G_DBUS_PROXY_FLAGS_NONE,
+                                             G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                              G_VFS_DBUS_DAEMON_NAME,
                                              G_VFS_DBUS_MOUNTTRACKER_PATH,
                                              NULL,

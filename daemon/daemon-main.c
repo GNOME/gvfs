@@ -194,7 +194,7 @@ send_spawned (gboolean succeeded,
   error = NULL;
   g_print ("send_spawned: before proxy creation, spawner_id = '%s', spawner_path = '%s'\n", spawner_id, spawner_path);
   proxy = gvfs_dbus_spawner_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
-                                                    G_DBUS_PROXY_FLAGS_NONE,
+                                                    G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                                     spawner_id,
                                                     spawner_path,
                                                     NULL,

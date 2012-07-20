@@ -343,7 +343,7 @@ mountable_mount_with_name (MountData *data,
   g_print ("mountable_mount_with_name: dbus_name = '%s'\n", dbus_name);
   
   gvfs_dbus_mountable_proxy_new_for_bus (G_BUS_TYPE_SESSION,
-                                         G_DBUS_PROXY_FLAGS_NONE,
+                                         G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                          dbus_name,
                                          G_VFS_DBUS_MOUNTABLE_PATH,
                                          NULL,

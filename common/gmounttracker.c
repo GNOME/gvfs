@@ -470,7 +470,7 @@ init_connection (GMountTracker *tracker)
 
   error = NULL;
   tracker->proxy = gvfs_dbus_mount_tracker_proxy_new_sync (tracker->connection,
-                                                           G_DBUS_PROXY_FLAGS_NONE,
+                                                           G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                                            G_VFS_DBUS_DAEMON_NAME,
                                                            G_VFS_DBUS_MOUNTTRACKER_PATH,
                                                            NULL,
