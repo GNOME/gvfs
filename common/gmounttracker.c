@@ -460,7 +460,7 @@ unmounted_cb (GVfsDBusMountTracker *object,
 
 /* Called after construction when the construct properties (like connection) are set */
 static void
-init_connection (GMountTracker *tracker)
+init_connection_sync (GMountTracker *tracker)
 {
   GError *error;
   GVariant *iter_mounts;
@@ -517,7 +517,7 @@ g_mount_tracker_constructor (GType                  type,
   
   tracker = G_MOUNT_TRACKER (object);
   
-  init_connection (tracker);
+  init_connection_sync (tracker);
   
   return object;
 }

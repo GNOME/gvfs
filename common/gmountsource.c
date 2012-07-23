@@ -163,9 +163,9 @@ ask_password_data_free (gpointer _data)
 }
 
 static GVfsDBusMountOperation *
-create_mount_operation_proxy (GMountSource        *source,
-                              GAsyncReadyCallback  callback,
-                              gpointer             user_data)
+create_mount_operation_proxy_sync (GMountSource        *source,
+                                   GAsyncReadyCallback  callback,
+                                   gpointer             user_data)
 {
   GVfsDBusMountOperation *proxy;
   GError *error;
@@ -183,6 +183,7 @@ create_mount_operation_proxy (GMountSource        *source,
     }
 
   error = NULL;
+  /* Synchronously creating a proxy using unique/private d-bus name and not loading properties or connecting signals should not block */
   proxy = gvfs_dbus_mount_operation_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
                                                             G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                                             source->dbus_id,
@@ -275,7 +276,7 @@ g_mount_source_ask_password_async (GMountSource              *source,
   GSimpleAsyncResult *result;
   GVfsDBusMountOperation *proxy;
   
-  proxy = create_mount_operation_proxy (source, callback, user_data);
+  proxy = create_mount_operation_proxy_sync (source, callback, user_data);
   if (proxy == NULL)
     return;
 
@@ -617,7 +618,7 @@ g_mount_source_ask_question_async (GMountSource       *source,
   GSimpleAsyncResult *result;
   GVfsDBusMountOperation *proxy;
   
-  proxy = create_mount_operation_proxy (source, callback, user_data);
+  proxy = create_mount_operation_proxy_sync (source, callback, user_data);
   if (proxy == NULL)
     return;
 
@@ -780,7 +781,7 @@ g_mount_source_show_processes_async (GMountSource        *source,
   GVariantBuilder builder;
   guint i;
   
-  proxy = create_mount_operation_proxy (source, callback, user_data);
+  proxy = create_mount_operation_proxy_sync (source, callback, user_data);
   if (proxy == NULL)
     return;
 
@@ -960,7 +961,7 @@ g_mount_source_show_unmount_progress (GMountSource *source,
       return;
     }
   
-  proxy = create_mount_operation_proxy (source, NULL, NULL);
+  proxy = create_mount_operation_proxy_sync (source, NULL, NULL);
   if (proxy == NULL)
     return;
 
@@ -1006,7 +1007,7 @@ g_mount_source_abort (GMountSource *source)
 {
   GVfsDBusMountOperation *proxy;
 
-  proxy = create_mount_operation_proxy (source, NULL, NULL);
+  proxy = create_mount_operation_proxy_sync (source, NULL, NULL);
   if (proxy == NULL)
     return FALSE;
   
