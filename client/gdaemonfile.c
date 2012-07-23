@@ -2767,7 +2767,7 @@ g_daemon_file_set_attribute (GFile *file,
       else
       if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
 	{
-	  g_error_free (my_error);
+	  g_clear_error (&my_error);
 	  g_object_unref (proxy);
 	  goto retry;
 	}
@@ -3008,7 +3008,7 @@ retry:
       else
       if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
         {
-          g_error_free (my_error);
+          g_clear_error (&my_error);
           g_object_unref (proxy);
           goto retry;
         }
@@ -3545,8 +3545,7 @@ find_enclosing_mount_cb (GMountInfo *mount_info,
 out:
   _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
 
-  if (my_error)
-    g_error_free (my_error);
+  g_clear_error (&my_error);
   g_clear_object (&data->cancellable);
   g_object_unref (data->file);
   g_object_unref (data->result);

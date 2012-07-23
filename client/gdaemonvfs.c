@@ -887,9 +887,7 @@ async_get_mount_info_response (GVfsDBusMountTracker *proxy,
         g_mount_info_unref (info);
 
       g_variant_unref (iter_mount);
-      
-      if (error)
-        g_error_free (error);
+      g_clear_error (&error);
     }
   
   free_get_mount_info_data (data);

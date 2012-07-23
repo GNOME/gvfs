@@ -416,8 +416,7 @@ re_register_jobs_cb (GVfsDBusMountTracker *proxy,
                                                       res,
                                                       &error);
   g_debug ("re_register_jobs_cb, error: %p\n", error);
-  if (error)
-    g_error_free (error);
+  g_clear_error (&error);
 }
 
 static void

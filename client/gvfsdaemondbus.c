@@ -300,8 +300,7 @@ async_call_finish (AsyncDBusCall *async_call)
 
   g_clear_object (&async_call->connection);
   g_clear_object (&async_call->cancellable);
-  if (async_call->io_error)
-    g_error_free (async_call->io_error);
+  g_clear_error (&async_call->io_error);
   g_free (async_call);
 }
 

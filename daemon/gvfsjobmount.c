@@ -177,8 +177,7 @@ register_mount_callback (GVfsDBusMountTracker *proxy,
       g_vfs_job_emit_finished (G_VFS_JOB (op_job));
     }
 
-  if (error != NULL)
-    g_error_free (error);
+  g_clear_error (&error);
 }
 
 /* Might be called on an i/o thread */
