@@ -218,11 +218,11 @@ _g_dbus_append_file_info (GFileInfo *info)
 }
 
 gboolean
-_g_dbus_get_file_attribute (GVariant *iter,
+_g_dbus_get_file_attribute (GVariant *value,
 			    gchar **attribute,
 			    GFileAttributeStatus *status,
 			    GFileAttributeType *type,
-			    GDbusAttributeValue *value)
+			    GDbusAttributeValue *attr_value)
 {
   gboolean res;
   char *str;
@@ -230,7 +230,7 @@ _g_dbus_get_file_attribute (GVariant *iter,
   GObject *obj;
   GVariant *v;
 
-  g_variant_get (iter, "(suv)",
+  g_variant_get (value, "(suv)",
                  attribute,
                  status,
                  &v);
@@ -239,19 +239,19 @@ _g_dbus_get_file_attribute (GVariant *iter,
   if (g_variant_is_of_type (v, G_VARIANT_TYPE_STRING))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_STRING;
-      g_variant_get (v, "s", &value->ptr);
+      g_variant_get (v, "s", &attr_value->ptr);
     } 
   else
   if (g_variant_is_of_type (v, G_VARIANT_TYPE_BYTESTRING))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_BYTE_STRING;
-      g_variant_get (v, "^ay", &value->ptr);
+      g_variant_get (v, "^ay", &attr_value->ptr);
     } 
   else
   if (g_variant_is_of_type (v, G_VARIANT_TYPE_STRING_ARRAY))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_STRINGV;
-      g_variant_get (v, "^as", &value->ptr);
+      g_variant_get (v, "^as", &attr_value->ptr);
     } 
   else
   if (g_variant_is_of_type (v, G_VARIANT_TYPE_BYTE))
@@ -262,31 +262,31 @@ _g_dbus_get_file_attribute (GVariant *iter,
   if (g_variant_is_of_type (v, G_VARIANT_TYPE_BOOLEAN))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_BOOLEAN;
-      g_variant_get (v, "b", &value->boolean);
+      g_variant_get (v, "b", &attr_value->boolean);
     } 
   else
   if (g_variant_is_of_type (v, G_VARIANT_TYPE_UINT32))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_UINT32;
-      g_variant_get (v, "u", &value->uint32);
+      g_variant_get (v, "u", &attr_value->uint32);
     } 
   else
   if (g_variant_is_of_type (v, G_VARIANT_TYPE_INT32))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_INT32;
-      g_variant_get (v, "i", &value->ptr);
+      g_variant_get (v, "i", &attr_value->ptr);
     } 
   else
   if (g_variant_is_of_type (v, G_VARIANT_TYPE_UINT64))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_UINT64;
-      g_variant_get (v, "t", &value->uint64);
+      g_variant_get (v, "t", &attr_value->uint64);
     } 
   else
   if (g_variant_is_of_type (v, G_VARIANT_TYPE_INT64))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_INT64;
-      g_variant_get (v, "x", &value->ptr);
+      g_variant_get (v, "x", &attr_value->ptr);
     } 
   else
   if (g_variant_is_container (v))
@@ -317,7 +317,7 @@ _g_dbus_get_file_attribute (GVariant *iter,
           if (obj_type != 0)
             g_warning ("Unsupported object type in file attribute");
         }
-      value->ptr = obj;
+      attr_value->ptr = obj;
     } 
   else
     res = FALSE;
@@ -328,31 +328,31 @@ _g_dbus_get_file_attribute (GVariant *iter,
 }
 
 GFileInfo *
-_g_dbus_get_file_info (GVariant *iter,
+_g_dbus_get_file_info (GVariant *value,
 		       GError **error)
 {
   GFileInfo *info;
   gchar *attribute;
   GFileAttributeType type;
   GFileAttributeStatus status;
-  GDbusAttributeValue value;
-  GVariantIter i;
+  GDbusAttributeValue attr_value;
+  GVariantIter iter;
   GVariant *child;
 
   info = g_file_info_new ();
 
-  g_variant_iter_init (&i, iter);
-  while ((child = g_variant_iter_next_value (&i)))
+  g_variant_iter_init (&iter, value);
+  while ((child = g_variant_iter_next_value (&iter)))
     {
-      if (!_g_dbus_get_file_attribute (child, &attribute, &status, &type, &value))
+      if (!_g_dbus_get_file_attribute (child, &attribute, &status, &type, &attr_value))
         goto error;
 
-      g_file_info_set_attribute (info, attribute, type, _g_dbus_attribute_as_pointer (type, &value));
+      g_file_info_set_attribute (info, attribute, type, _g_dbus_attribute_as_pointer (type, &attr_value));
       if (status)
         g_file_info_set_attribute_status (info, attribute, status);
 
       g_free (attribute);
-      _g_dbus_attribute_value_destroy (type, &value);
+      _g_dbus_attribute_value_destroy (type, &attr_value);
 
       g_variant_unref (child);
     }
@@ -367,18 +367,18 @@ _g_dbus_get_file_info (GVariant *iter,
 }
 
 GFileAttributeInfoList *
-_g_dbus_get_attribute_info_list (GVariant *iter,
+_g_dbus_get_attribute_info_list (GVariant *value,
 				 GError **error)
 {
   GFileAttributeInfoList *list;
-  GVariantIter i;
+  GVariantIter iter;
   const char *name;
   guint32 type, flags;
   
   list = g_file_attribute_info_list_new ();
 
-  g_variant_iter_init (&i, iter);
-  while (g_variant_iter_next (&i, "(&suu)", &name, &type, &flags))
+  g_variant_iter_init (&iter, value);
+  while (g_variant_iter_next (&iter, "(&suu)", &name, &type, &flags))
     g_file_attribute_info_list_add (list, name, type, flags);
   
   return list;

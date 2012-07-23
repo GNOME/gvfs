@@ -85,15 +85,15 @@ GVariant * _g_dbus_append_file_attribute         (const char                 *at
 						  GFileAttributeType          type,
 						  gpointer                    value_p);
 GVariant * _g_dbus_append_file_info              (GFileInfo                  *file_info);
-gboolean   _g_dbus_get_file_attribute            (GVariant                   *iter,
+gboolean   _g_dbus_get_file_attribute            (GVariant                   *value,
 						  gchar                     **attribute,
 						  GFileAttributeStatus       *status,
 						  GFileAttributeType         *type,
-						  GDbusAttributeValue        *value);
-GFileInfo *_g_dbus_get_file_info                 (GVariant                   *iter,
+						  GDbusAttributeValue        *attr_value);
+GFileInfo *_g_dbus_get_file_info                 (GVariant                   *value,
 						  GError                    **error);
 
-GFileAttributeInfoList *_g_dbus_get_attribute_info_list    (GVariant                *iter,
+GFileAttributeInfoList *_g_dbus_get_attribute_info_list    (GVariant                *value,
 							    GError                 **error);
 GVariant *              _g_dbus_append_attribute_info_list (GFileAttributeInfoList  *list);
 

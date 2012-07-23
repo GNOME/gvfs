@@ -225,16 +225,16 @@ g_mount_spec_unref (GMountSpec *spec)
 }
 
 GMountSpec *
-g_mount_spec_from_dbus (GVariant *iter)
+g_mount_spec_from_dbus (GVariant *value)
 {
   GMountSpec *spec;
   const gchar *key;
   const gchar *mount_prefix;
   GVariantIter *iter_mount_spec_items;
-  GVariant *value;
+  GVariant *v;
 
   mount_prefix = NULL;
-  g_variant_get (iter, "(^&aya{sv})",
+  g_variant_get (value, "(^&aya{sv})",
                  &mount_prefix,
                  &iter_mount_spec_items);
   
@@ -244,9 +244,9 @@ g_mount_spec_from_dbus (GVariant *iter)
   if (mount_prefix && mount_prefix[0])
     spec->mount_prefix = g_strdup (mount_prefix);
 
-  while (g_variant_iter_loop (iter_mount_spec_items, "{&sv}", &key, &value))
+  while (g_variant_iter_loop (iter_mount_spec_items, "{&sv}", &key, &v))
     {
-      add_item (spec, key, g_variant_dup_bytestring (value, NULL));
+      add_item (spec, key, g_variant_dup_bytestring (v, NULL));
     }
 
   /* Sort on key */

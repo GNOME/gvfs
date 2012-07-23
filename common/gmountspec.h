@@ -47,7 +47,7 @@ GMountSpec *g_mount_spec_ref               (GMountSpec      *spec);
 void        g_mount_spec_unref             (GMountSpec      *spec);
 GMountSpec *g_mount_spec_get_unique_for    (GMountSpec      *spec);
 GMountSpec *g_mount_spec_copy              (GMountSpec      *spec);
-GMountSpec *g_mount_spec_from_dbus         (GVariant        *iter);
+GMountSpec *g_mount_spec_from_dbus         (GVariant        *value);
 GVariant   *g_mount_spec_to_dbus           (GMountSpec      *spec);
 GVariant   *g_mount_spec_to_dbus_with_path (GMountSpec      *spec,
 					    const char      *path);

@@ -76,7 +76,7 @@ const char *g_mount_info_resolve_path (GMountInfo *info,
 void        g_mount_info_apply_prefix (GMountInfo *info,
                                        char      **path);
 
-GMountInfo * g_mount_info_from_dbus (GVariant *iter);
+GMountInfo * g_mount_info_from_dbus (GVariant *value);
 
 GMountTracker *g_mount_tracker_new                (GDBusConnection *connection);
 GList *        g_mount_tracker_list_mounts        (GMountTracker *tracker);

@@ -104,11 +104,11 @@ g_mount_source_to_dbus (GMountSource *source)
 }
 
 GMountSource *
-g_mount_source_from_dbus (GVariant *iter)
+g_mount_source_from_dbus (GVariant *value)
 {
   const gchar *obj_path, *dbus_id;
 
-  g_variant_get (iter, "(&s&o)",
+  g_variant_get (value, "(&s&o)",
                  &dbus_id,
                  &obj_path);
   

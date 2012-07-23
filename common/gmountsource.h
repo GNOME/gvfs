@@ -55,7 +55,7 @@ GMountSource *g_mount_source_new                      (const char               
 						       const char                *obj_path);
 GMountSource *g_mount_source_new_dummy                (void);
 GVariant     *g_mount_source_to_dbus                  (GMountSource              *source);
-GMountSource *g_mount_source_from_dbus                (GVariant                  *iter);
+GMountSource *g_mount_source_from_dbus                (GVariant                  *value);
 gboolean      g_mount_source_ask_password             (GMountSource              *mount_source,
 						       const char                *message,
 						       const char                *initial_user,

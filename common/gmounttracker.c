@@ -172,7 +172,7 @@ g_mount_info_apply_prefix (GMountInfo  *info,
 }
 
 GMountInfo *
-g_mount_info_from_dbus (GVariant *iter)
+g_mount_info_from_dbus (GVariant *value)
 {
   GMountInfo *info;
   GMountSpec *mount_spec;
@@ -190,7 +190,7 @@ g_mount_info_from_dbus (GVariant *iter)
   GVariant *iter_mount_spec;
   GError *error;
 
-  g_variant_get (iter, "(&s&o&s&s&s&s&sb^&ay@(aya{sv})^&ay)",
+  g_variant_get (value, "(&s&o&s&s&s&s&sb^&ay@(aya{sv})^&ay)",
                  &dbus_id,
                  &obj_path,
                  &display_name,
@@ -406,13 +406,13 @@ g_mount_tracker_remove_mount (GMountTracker *tracker,
 
 static void
 list_mounts_reply (GMountTracker *tracker,
-                   GVariant *iter_mounts)
+                   GVariant *mounts)
 {
   GMountInfo *info;
   GVariantIter iter;
   GVariant *child;
   
-  g_variant_iter_init (&iter, iter_mounts);
+  g_variant_iter_init (&iter, mounts);
   while ((child = g_variant_iter_next_value (&iter)))
     {
       info = g_mount_info_from_dbus (child);
