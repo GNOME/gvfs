@@ -47,10 +47,8 @@ g_vfs_job_mount_finalize (GObject *object)
   g_mount_spec_unref (job->mount_spec);
   g_object_unref (job->mount_source);
   g_object_unref (job->backend);
-  if (job->object)
-    g_object_unref (job->object);
-  if (job->invocation)
-    g_object_unref (job->invocation);
+  g_clear_object (&job->object);
+  g_clear_object (&job->invocation);
   
   if (G_OBJECT_CLASS (g_vfs_job_mount_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_mount_parent_class)->finalize) (object);

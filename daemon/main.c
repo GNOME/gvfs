@@ -200,8 +200,7 @@ main (int argc, char *argv[])
 
   mount_finalize ();
 
-  if (daemon != NULL)
-    g_object_unref (daemon);
+  g_clear_object (&daemon);
   if (name_owner_id != 0)
     g_bus_unown_name (name_owner_id);
   if (loop != NULL)

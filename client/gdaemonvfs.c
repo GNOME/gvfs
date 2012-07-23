@@ -98,11 +98,8 @@ g_daemon_vfs_finalize (GObject *object)
 
   g_strfreev (vfs->supported_uri_schemes);
 
-  if (vfs->async_bus)
-    g_object_unref (vfs->async_bus);
-
-  if (vfs->wrapped_vfs)
-    g_object_unref (vfs->wrapped_vfs);
+  g_clear_object (&vfs->async_bus);
+  g_clear_object (&vfs->wrapped_vfs);
   
   /* must chain up */
   G_OBJECT_CLASS (g_daemon_vfs_parent_class)->finalize (object);

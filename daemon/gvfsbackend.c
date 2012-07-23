@@ -147,8 +147,7 @@ g_vfs_backend_finalize (GObject *object)
   g_free (backend->priv->display_name);
   g_free (backend->priv->stable_name);
   g_strfreev (backend->priv->x_content_types);
-  if (backend->priv->icon != NULL)
-    g_object_unref (backend->priv->icon);
+  g_clear_object (&backend->priv->icon);
   g_free (backend->priv->prefered_filename_encoding);
   g_free (backend->priv->default_location);
   if (backend->priv->mount_spec)
@@ -388,8 +387,7 @@ void
 g_vfs_backend_set_icon_name (GVfsBackend *backend,
 			     const char *icon_name)
 {
-  if (backend->priv->icon != NULL)
-    g_object_unref (backend->priv->icon);
+  g_clear_object (&backend->priv->icon);
   backend->priv->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
 }
 
@@ -397,8 +395,7 @@ void
 g_vfs_backend_set_icon (GVfsBackend *backend,
                         GIcon       *icon)
 {
-  if (backend->priv->icon != NULL)
-    g_object_unref (backend->priv->icon);
+  g_clear_object (&backend->priv->icon);
   backend->priv->icon = g_object_ref (icon);
 }
 
@@ -599,8 +596,7 @@ typedef struct {
 static void
 async_proxy_create_free (AsyncProxyCreate *data)
 {
-  if (data->backend)
-    g_object_unref (data->backend);
+  g_clear_object (&data->backend);
   g_free (data);
 }
 

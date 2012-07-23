@@ -254,10 +254,8 @@ g_mount_tracker_finalize (GObject *object)
 		  (GFunc)g_mount_info_unref, NULL);
   g_list_free (tracker->mounts);
 
-  if (tracker->proxy)
-    g_object_unref (tracker->proxy);
-  if (tracker->connection)
-    g_object_unref (tracker->connection);
+  g_clear_object (&tracker->proxy);
+  g_clear_object (&tracker->connection);
   
   if (G_OBJECT_CLASS (g_mount_tracker_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_mount_tracker_parent_class)->finalize) (object);
@@ -310,9 +308,7 @@ g_mount_tracker_set_property (GObject         *object,
   switch (prop_id)
     {
     case PROP_CONNECTION:
-      if (tracker->connection)
-	g_object_unref (tracker->connection);
-      tracker->connection = NULL;
+      g_clear_object (&tracker->connection);
       if (g_value_get_pointer (value))
 	tracker->connection = g_object_ref (g_value_get_pointer (value));
       break;

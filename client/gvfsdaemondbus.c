@@ -298,10 +298,8 @@ async_call_finish (AsyncDBusCall *async_call)
 			  async_call->io_error, 
 			  async_call->callback_data);
 
-  if (async_call->connection)
-    g_object_unref (async_call->connection);
-  if (async_call->cancellable)
-    g_object_unref (async_call->cancellable);
+  g_clear_object (&async_call->connection);
+  g_clear_object (&async_call->cancellable);
   if (async_call->io_error)
     g_error_free (async_call->io_error);
   g_free (async_call);
@@ -595,8 +593,7 @@ free_local_connections (ThreadLocalConnections *local)
 {
   g_print ("free_local_connections()\n");
   g_hash_table_destroy (local->connections);
-  if (local->session_bus)
-    g_object_unref (local->session_bus);
+  g_clear_object (&local->session_bus);
   g_free (local);
 }
 

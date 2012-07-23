@@ -60,8 +60,7 @@ g_daemon_file_monitor_finalize (GObject* object)
 
   _g_dbus_unregister_vfs_filter (daemon_monitor->object_path);
   
-  if (daemon_monitor->connection)
-    g_object_unref (daemon_monitor->connection);
+  g_clear_object (&daemon_monitor->connection);
 
   g_free (daemon_monitor->object_path);
   g_free (daemon_monitor->remote_id);
@@ -173,8 +172,7 @@ static void
 async_proxy_create_free (AsyncProxyCreate *data)
 {
   g_object_unref (data->monitor);
-  if (data->connection)
-    g_object_unref (data->connection);
+  g_clear_object (&data->connection);
   g_free (data);
 }
 

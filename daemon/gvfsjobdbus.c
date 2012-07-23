@@ -59,11 +59,8 @@ g_vfs_job_dbus_finalize (GObject *object)
 
   job = G_VFS_JOB_DBUS (object);
 
-  if (job->invocation)
-    g_object_unref (job->invocation);
-  
-  if (job->object)
-    g_object_unref (job->object);
+  g_clear_object (&job->invocation);
+  g_clear_object (&job->object);
   
   if (G_OBJECT_CLASS (g_vfs_job_dbus_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_dbus_parent_class)->finalize) (object);

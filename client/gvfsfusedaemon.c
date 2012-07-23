@@ -2413,8 +2413,7 @@ vfs_destroy (gpointer param)
 {
   if (daemon_name_watcher)
     g_bus_unwatch_name (daemon_name_watcher);
-  if (dbus_conn)
-    g_object_unref (dbus_conn);
+  g_clear_object (&dbus_conn);
   
   mount_list_free ();
   if (subthread_main_loop != NULL) 

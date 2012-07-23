@@ -413,8 +413,7 @@ daemon_main (int argc,
   
   g_main_loop_run (loop);
   
-  if (data->daemon != NULL)
-    g_object_unref (data->daemon);
+  g_clear_object (&data->daemon);
   g_free (data->mountable_name);
   g_free (data);
   if (name_owner_id != 0)

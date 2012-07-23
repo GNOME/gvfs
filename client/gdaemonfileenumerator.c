@@ -121,8 +121,7 @@ g_daemon_file_enumerator_finalize (GObject *object)
   if (daemon->metadata_tree)
     meta_tree_unref (daemon->metadata_tree);
 
-  if (daemon->sync_connection)
-    g_object_unref (daemon->sync_connection);
+  g_clear_object (&daemon->sync_connection);
 
   if (daemon->next_files_context)
     g_main_context_unref (daemon->next_files_context);

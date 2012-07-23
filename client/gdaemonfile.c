@@ -500,18 +500,14 @@ async_proxy_create_free (AsyncProxyCreate *data)
   if (data->notify)
     data->notify (data->callback_data);
 
-  if (data->result)
-    g_object_unref (data->result);
-  g_object_unref (data->file);
+  g_clear_object (&data->result);
+  g_clear_object (&data->file);
   g_free (data->op);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
+  g_clear_object (&data->cancellable);
   if (data->mount_info)
     g_mount_info_unref (data->mount_info);
-  if (data->connection)
-    g_object_unref (data->connection);
-  if (data->proxy)
-    g_object_unref (data->proxy);
+  g_clear_object (&data->connection);
+  g_clear_object (&data->proxy);
   g_free (data);
 }
 
@@ -734,8 +730,7 @@ g_daemon_file_enumerate_children (GFile      *file,
   return G_FILE_ENUMERATOR (enumerator);
   
 out:
-  if (enumerator != NULL)
-    g_object_unref (enumerator);
+  g_clear_object (&enumerator);
   return NULL;
 }
 
@@ -875,12 +870,9 @@ typedef struct {
 static void
 async_call_query_info_free (AsyncCallQueryInfo *data)
 {
-  if (data->file)
-    g_object_unref (data->file);
-  if (data->result)
-    g_object_unref (data->result);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
+  g_clear_object (&data->file);
+  g_clear_object (&data->result);
+  g_clear_object (&data->cancellable);
   g_free (data->attributes);
   g_free (data);
 }
@@ -1019,12 +1011,9 @@ typedef struct {
 static void
 async_call_file_read_write_free (AsyncCallFileReadWrite *data)
 {
-  if (data->file)
-    g_object_unref (data->file);
-  if (data->result)
-    g_object_unref (data->result);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
+  g_clear_object (&data->file);
+  g_clear_object (&data->result);
+  g_clear_object (&data->cancellable);
   g_free (data->etag);
   g_free (data);
 }
@@ -1333,12 +1322,9 @@ typedef struct {
 static void
 free_async_mount_op (AsyncMountOp *data)
 {
-  if (data->result)
-    g_object_unref (data->result);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
-  if (data->mount_operation)
-    g_object_unref (data->mount_operation);
+  g_clear_object (&data->result);
+  g_clear_object (&data->cancellable);
+  g_clear_object (&data->mount_operation);
   g_free (data);
 }
 
@@ -2001,10 +1987,8 @@ static void
 free_mount_data (MountData *data)
 {
   g_object_unref (data->file);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
-  if (data->mount_operation)
-    g_object_unref (data->mount_operation);
+  g_clear_object (&data->cancellable);
+  g_clear_object (&data->mount_operation);
   g_free (data);
 }
 
@@ -2188,12 +2172,9 @@ typedef struct {
 static void
 async_call_query_fs_info_free (AsyncCallQueryFsInfo *data)
 {
-  if (data->file)
-    g_object_unref (data->file);
-  if (data->result)
-    g_object_unref (data->result);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
+  g_clear_object (&data->file);
+  g_clear_object (&data->result);
+  g_clear_object (&data->cancellable);
   g_free (data->attributes);
   g_free (data);
 }
@@ -3034,8 +3015,7 @@ retry:
       g_propagate_error (error, my_error);
     }
 
-  if (proxy)
-    g_object_unref (proxy);
+  g_clear_object (&proxy);
 
   g_free (local_path);
   g_free (obj_path);
@@ -3392,14 +3372,10 @@ async_call_enumerate_free (AsyncCallEnumerate *data)
 {
   g_print ("async_call_enumerate_free\n");
   
-  if (data->file)
-    g_object_unref (data->file);
-  if (data->result)
-    g_object_unref (data->result);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
-  if (data->enumerator)
-    g_object_unref (data->enumerator);
+  g_clear_object (&data->file);
+  g_clear_object (&data->result);
+  g_clear_object (&data->cancellable);
+  g_clear_object (&data->enumerator);
   g_free (data->attributes);
   g_free (data);
 }
@@ -3571,8 +3547,7 @@ out:
 
   if (my_error)
     g_error_free (my_error);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
+  g_clear_object (&data->cancellable);
   g_object_unref (data->file);
   g_object_unref (data->result);
   g_free (data);
@@ -3665,12 +3640,9 @@ typedef struct {
 static void
 async_call_set_display_name_free (AsyncCallSetDisplayName *data)
 {
-  if (data->file)
-    g_object_unref (data->file);
-  if (data->result)
-    g_object_unref (data->result);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
+  g_clear_object (&data->file);
+  g_clear_object (&data->result);
+  g_clear_object (&data->cancellable);
   if (data->mount_info)
     g_mount_info_unref (data->mount_info);
   g_free (data->display_name);

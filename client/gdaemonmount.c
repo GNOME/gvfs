@@ -188,18 +188,12 @@ typedef struct {
 static void
 async_proxy_create_free (AsyncProxyCreate *data)
 {
-  if (data->mount)
-    g_object_unref (data->mount);
-  if (data->result)
-    g_object_unref (data->result);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
-  if (data->mount_operation)
-    g_object_unref (data->mount_operation);
-  if (data->connection)
-    g_object_unref (data->connection);
-  if (data->proxy)
-    g_object_unref (data->proxy);
+  g_clear_object (&data->mount);
+  g_clear_object (&data->result);
+  g_clear_object (&data->cancellable);
+  g_clear_object (&data->mount_operation);
+  g_clear_object (&data->connection);
+  g_clear_object (&data->proxy);
   g_free (data);
 }
 

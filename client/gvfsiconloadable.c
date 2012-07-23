@@ -162,17 +162,13 @@ typedef struct {
 static void
 async_path_call_free (AsyncPathCall *data)
 {
-  if (data->connection)
-    g_object_unref (data->connection);
+  g_clear_object (&data->connection);
   if (data->mount_info)
     g_mount_info_unref (data->mount_info);
-  if (data->result)
-    g_object_unref (data->result);
+  g_clear_object (&data->result);
   g_object_unref (data->vfs_icon);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
-  if (data->proxy)
-    g_object_unref (data->proxy);
+  g_clear_object (&data->cancellable);
+  g_clear_object (&data->proxy);
   g_free (data);
 }
 
