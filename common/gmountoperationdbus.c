@@ -36,11 +36,13 @@ typedef struct
   char *dbus_id;
   GDBusConnection *connection;
   GVfsDBusMountOperation *mount_op_skeleton;
+
+  GVfsDBusMountOperation *object;
+  GDBusMethodInvocation *invocation;
 } GMountOperationDBus;
 
 static void
-mount_op_send_reply (GMountOperationDBus *op_dbus,
-                     GDBusMethodInvocation *invocation)
+mount_op_got_reply (GMountOperationDBus *op_dbus)
 {
   g_signal_handlers_disconnect_matched (op_dbus->op,
 					G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DATA,
@@ -48,8 +50,7 @@ mount_op_send_reply (GMountOperationDBus *op_dbus,
 					0,
 					NULL,
 					NULL,
-					invocation);
-  g_object_unref (invocation);
+					op_dbus);
 }
 
 static void
@@ -57,14 +58,11 @@ ask_password_reply (GMountOperation *op,
 		    GMountOperationResult result,
 		    gpointer data)
 {
-  GDBusMethodInvocation *invocation = data;
+  GMountOperationDBus *op_dbus = data;
   const char *username, *password, *domain;
   gboolean anonymous;
   guint32 password_save;
   gboolean handled, abort_dbus;
-  GMountOperationDBus *op_dbus;
-
-  op_dbus = g_object_get_data (G_OBJECT (op), "dbus-op");
 
   handled = (result != G_MOUNT_OPERATION_UNHANDLED);
   abort_dbus = (result == G_MOUNT_OPERATION_ABORTED);
@@ -81,8 +79,8 @@ ask_password_reply (GMountOperation *op,
   anonymous = g_mount_operation_get_anonymous (op);
   password_save = g_mount_operation_get_password_save (op);
 
-  gvfs_dbus_mount_operation_complete_ask_password (NULL, /* FIXME */
-                                                   invocation,
+  gvfs_dbus_mount_operation_complete_ask_password (op_dbus->object,
+                                                   op_dbus->invocation,
                                                    handled,
                                                    abort_dbus,
                                                    password,
@@ -91,7 +89,7 @@ ask_password_reply (GMountOperation *op,
                                                    anonymous,
                                                    password_save);
 
-  mount_op_send_reply (op_dbus, invocation);
+  mount_op_got_reply (op_dbus);
 }
 
 static gboolean
@@ -107,9 +105,11 @@ handle_ask_password (GVfsDBusMountOperation *object,
 
   g_print ("gmountoperationdbus.c: handle_ask_password()\n");
 
+  op_dbus->object = object;
+  op_dbus->invocation = invocation;
   g_signal_connect (op_dbus->op, "reply", 
                     (GCallback)ask_password_reply, 
-                    g_object_ref (invocation));
+                    op_dbus);
   
   g_signal_emit_by_name (op_dbus->op, "ask_password",
                          arg_message_string,
@@ -124,10 +124,9 @@ ask_question_reply (GMountOperation *op,
 		    GMountOperationResult result,
 		    gpointer data)
 {
-  GDBusMethodInvocation *invocation = data;
+  GMountOperationDBus *op_dbus = data;
   guint32 choice;
   gboolean handled, abort_dbus;
-  GMountOperationDBus *op_dbus;
 
   op_dbus = g_object_get_data (G_OBJECT (op), "dbus-op");
 
@@ -136,13 +135,13 @@ ask_question_reply (GMountOperation *op,
   
   choice = g_mount_operation_get_choice (op);
 
-  gvfs_dbus_mount_operation_complete_ask_question (NULL, /* FIXME */
-                                                   invocation,
+  gvfs_dbus_mount_operation_complete_ask_question (op_dbus->object,
+                                                   op_dbus->invocation,
                                                    handled,
                                                    abort_dbus,
                                                    choice);
 
-  mount_op_send_reply (op_dbus, invocation);
+  mount_op_got_reply (op_dbus);
 }
 
 static gboolean
@@ -156,10 +155,12 @@ handle_ask_question (GVfsDBusMountOperation *object,
 
   g_print ("gmountoperationdbus.c: handle_ask_question()\n");
 
+  op_dbus->object = object;
+  op_dbus->invocation = invocation;
   g_signal_connect (op_dbus->op,
                     "reply",
                     (GCallback)ask_question_reply,
-                    g_object_ref (invocation));
+                    op_dbus);
 
   g_signal_emit_by_name (op_dbus->op, "ask_question",
                          arg_message_string,
@@ -172,10 +173,9 @@ show_processes_reply (GMountOperation *op,
                       GMountOperationResult result,
                       gpointer data)
 {
-  GDBusMethodInvocation *invocation = data;
+  GMountOperationDBus *op_dbus = data;
   guint32 choice;
   gboolean handled, abort_dbus;
-  GMountOperationDBus *op_dbus;
 
   op_dbus = g_object_get_data (G_OBJECT (op), "dbus-op");
 
@@ -184,13 +184,13 @@ show_processes_reply (GMountOperation *op,
 
   choice = g_mount_operation_get_choice (op);
   
-  gvfs_dbus_mount_operation_complete_show_processes (NULL, /* FIXME */
-                                                     invocation,
+  gvfs_dbus_mount_operation_complete_show_processes (op_dbus->object,
+                                                     op_dbus->invocation,
                                                      handled,
                                                      abort_dbus,
                                                      choice);
 
-  mount_op_send_reply (op_dbus, invocation);
+  mount_op_got_reply (op_dbus);
 }
 
 static gboolean
@@ -213,10 +213,12 @@ handle_show_processes (GVfsDBusMountOperation *object,
   while (g_variant_iter_loop (&iter, "i", &pid))
     g_array_append_val (processes, pid);
 
+  op_dbus->object = object;
+  op_dbus->invocation = invocation;
   g_signal_connect (op_dbus->op,
                     "reply",
                     (GCallback)show_processes_reply,
-                    g_object_ref (invocation));
+                    op_dbus);
 
   g_signal_emit_by_name (op_dbus->op, "show_processes",
                          arg_message_string,
