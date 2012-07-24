@@ -159,8 +159,7 @@ _g_dbus_append_file_attribute (const char *attribute,
 
   if (g_variant_type_is_tuple (G_VARIANT_TYPE (dbus_type)))
     v = append_object ((GObject *)value_p);
-  else
-  if (g_variant_type_is_array (G_VARIANT_TYPE (dbus_type)))
+  else if (g_variant_type_is_array (G_VARIANT_TYPE (dbus_type)))
     {
       char *s;
       
@@ -168,20 +167,15 @@ _g_dbus_append_file_attribute (const char *attribute,
       v = g_variant_new (s, value_p);
       g_free (s);
     }
-  else
-  if (g_variant_type_equal (G_VARIANT_TYPE (dbus_type), G_VARIANT_TYPE_UINT32))
+  else if (g_variant_type_equal (G_VARIANT_TYPE (dbus_type), G_VARIANT_TYPE_UINT32))
     v = g_variant_new (dbus_type, *(guint32 *)value_p);
-  else
-  if (g_variant_type_equal (G_VARIANT_TYPE (dbus_type), G_VARIANT_TYPE_INT32))
+  else if (g_variant_type_equal (G_VARIANT_TYPE (dbus_type), G_VARIANT_TYPE_INT32))
     v = g_variant_new (dbus_type, *(gint32 *)value_p);
-  else
-  if (g_variant_type_equal (G_VARIANT_TYPE (dbus_type), G_VARIANT_TYPE_UINT64))
+  else if (g_variant_type_equal (G_VARIANT_TYPE (dbus_type), G_VARIANT_TYPE_UINT64))
     v = g_variant_new (dbus_type, *(guint64 *)value_p);
-  else
-  if (g_variant_type_equal (G_VARIANT_TYPE (dbus_type), G_VARIANT_TYPE_INT64))
+  else if (g_variant_type_equal (G_VARIANT_TYPE (dbus_type), G_VARIANT_TYPE_INT64))
     v = g_variant_new (dbus_type, *(gint64 *)value_p);
-  else
-  if (g_variant_type_equal (G_VARIANT_TYPE (dbus_type), G_VARIANT_TYPE_BOOLEAN))
+  else if (g_variant_type_equal (G_VARIANT_TYPE (dbus_type), G_VARIANT_TYPE_BOOLEAN))
     v = g_variant_new (dbus_type, *(gboolean *)value_p);
   else
     v = g_variant_new (dbus_type, value_p);
@@ -241,55 +235,46 @@ _g_dbus_get_file_attribute (GVariant *value,
       *type = G_FILE_ATTRIBUTE_TYPE_STRING;
       g_variant_get (v, "s", &attr_value->ptr);
     } 
-  else
-  if (g_variant_is_of_type (v, G_VARIANT_TYPE_BYTESTRING))
+  else if (g_variant_is_of_type (v, G_VARIANT_TYPE_BYTESTRING))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_BYTE_STRING;
       g_variant_get (v, "^ay", &attr_value->ptr);
     } 
-  else
-  if (g_variant_is_of_type (v, G_VARIANT_TYPE_STRING_ARRAY))
+  else if (g_variant_is_of_type (v, G_VARIANT_TYPE_STRING_ARRAY))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_STRINGV;
       g_variant_get (v, "^as", &attr_value->ptr);
     } 
-  else
-  if (g_variant_is_of_type (v, G_VARIANT_TYPE_BYTE))
+  else if (g_variant_is_of_type (v, G_VARIANT_TYPE_BYTE))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_INVALID;
     } 
-  else
-  if (g_variant_is_of_type (v, G_VARIANT_TYPE_BOOLEAN))
+  else if (g_variant_is_of_type (v, G_VARIANT_TYPE_BOOLEAN))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_BOOLEAN;
       g_variant_get (v, "b", &attr_value->boolean);
     } 
-  else
-  if (g_variant_is_of_type (v, G_VARIANT_TYPE_UINT32))
+  else if (g_variant_is_of_type (v, G_VARIANT_TYPE_UINT32))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_UINT32;
       g_variant_get (v, "u", &attr_value->uint32);
     } 
-  else
-  if (g_variant_is_of_type (v, G_VARIANT_TYPE_INT32))
+  else if (g_variant_is_of_type (v, G_VARIANT_TYPE_INT32))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_INT32;
       g_variant_get (v, "i", &attr_value->ptr);
     } 
-  else
-  if (g_variant_is_of_type (v, G_VARIANT_TYPE_UINT64))
+  else if (g_variant_is_of_type (v, G_VARIANT_TYPE_UINT64))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_UINT64;
       g_variant_get (v, "t", &attr_value->uint64);
     } 
-  else
-  if (g_variant_is_of_type (v, G_VARIANT_TYPE_INT64))
+  else if (g_variant_is_of_type (v, G_VARIANT_TYPE_INT64))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_INT64;
       g_variant_get (v, "x", &attr_value->ptr);
     } 
-  else
-  if (g_variant_is_container (v))
+  else if (g_variant_is_container (v))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_OBJECT;
 
@@ -297,8 +282,7 @@ _g_dbus_get_file_attribute (GVariant *value,
         {
           g_variant_get (v, "(u)", &obj_type);
         }
-      else
-      if (g_variant_is_of_type (v, G_VARIANT_TYPE ("(us)")))
+      else if (g_variant_is_of_type (v, G_VARIANT_TYPE ("(us)")))
         {
           g_variant_get (v, "(u&s)", &obj_type, &str);
         }
