@@ -11,12 +11,12 @@ INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 dbus_built_sources = gvfsdbus.c gvfsdbus.h
 BUILT_SOURCES = $(dbus_built_sources)
 
-$(dbus_built_sources) : Makefile.am dbus-interfaces.xml
+$(dbus_built_sources) : Makefile.am org.gtk.vfs.xml
 	$(AM_V_GEN) gdbus-codegen			\
 		--interface-prefix org.gtk.vfs.		\
 		--c-namespace GVfsDBus			\
 		--generate-c-code gvfsdbus		\
-		$(srcdir)/dbus-interfaces.xml		\
+		$(srcdir)/org.gtk.vfs.xml		\
 		$(NULL)
 
 libgvfscommon_la_SOURCES = 	\
@@ -59,6 +59,6 @@ libgvfscommon_dnssd_la_LIBADD =	\
 endif
 
 
-EXTRA_DIST = dbus-interfaces.xml
+EXTRA_DIST = org.gtk.vfs.xml
 
 CLEANFILES = $(dbus_built_sources)
