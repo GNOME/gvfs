@@ -426,7 +426,7 @@ mounted_cb (GVfsDBusMountTracker *object,
             GVariant *arg_mount,
             gpointer user_data)
 {
-  GMountTracker *tracker = user_data;
+  GMountTracker *tracker = G_MOUNT_TRACKER (user_data);
   GMountInfo *info;
   
   info = g_mount_info_from_dbus (arg_mount);
@@ -442,7 +442,7 @@ unmounted_cb (GVfsDBusMountTracker *object,
               GVariant *arg_mount,
               gpointer user_data)
 {
-  GMountTracker *tracker = user_data;
+  GMountTracker *tracker = G_MOUNT_TRACKER (user_data);
   GMountInfo *info;
   
   info = g_mount_info_from_dbus (arg_mount);

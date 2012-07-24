@@ -245,7 +245,7 @@ get_connection_for_async (const char *dbus_id)
 static void
 close_and_unref_connection (void *data)
 {
-  GDBusConnection *connection = data;
+  GDBusConnection *connection = G_DBUS_CONNECTION (data);
   
   g_print ("close_and_unref_connection: closing connection\n");
   
@@ -527,7 +527,7 @@ _g_dbus_async_subscribe_cancellable (GDBusConnection *connection, GCancellable *
       cancel_data->serial = g_dbus_connection_get_last_serial (connection);
       cancelled_tag =
         g_signal_connect_data (cancellable, "cancelled",
-                               (GCallback)async_call_cancelled_cb,
+                               G_CALLBACK (async_call_cancelled_cb),
                                cancel_data,
                                (GClosureNotify)async_call_cancel_data_free,
                                0);

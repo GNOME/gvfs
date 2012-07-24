@@ -91,7 +91,7 @@ handle_changed (GVfsDBusMonitorClient *object,
                 const gchar *arg_other_file_path,
                 gpointer user_data)
 {
-  GDaemonFileMonitor* monitor = user_data;
+  GDaemonFileMonitor *monitor = G_DAEMON_FILE_MONITOR (user_data);
   GMountSpec *spec1, *spec2;
   GFile *file1, *file2;
 

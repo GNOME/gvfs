@@ -190,7 +190,7 @@ name_appeared_handler (GDBusConnection *connection,
                        const gchar *name_owner,
                        gpointer user_data)
 {
-  GVfsDaemon *daemon = user_data;
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
 
   g_print ("gvfsdaemon: name_appeared_handler()\n");
   
@@ -208,7 +208,7 @@ name_vanished_handler (GDBusConnection *connection,
                        const gchar *name,
                        gpointer user_data)
 {
-  GVfsDaemon *daemon = user_data;
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
 
   g_print ("gvfsdaemon: name_vanished_handler()\n");
 
@@ -430,7 +430,7 @@ g_vfs_daemon_re_register_job_sources (GVfsDaemon *daemon)
     {
       if (G_VFS_IS_BACKEND (l->data))
 	{
-	  GVfsBackend *backend = l->data;
+	  GVfsBackend *backend = G_VFS_BACKEND (l->data);
 
 	  /* Only re-register if we registered before, not e.g
 	     if we're currently mounting. */
@@ -617,7 +617,7 @@ peer_connection_closed (GDBusConnection *connection,
                         GError          *error,
                         gpointer         user_data)
 {
-  GVfsDaemon *daemon = user_data;
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
   GList *l;
   GVfsDBusDaemon *daemon_skeleton;
 
@@ -626,7 +626,7 @@ peer_connection_closed (GDBusConnection *connection,
   g_mutex_lock (&daemon->lock);
   for (l = daemon->jobs; l != NULL; l = l->next)
     {
-      GVfsJob *job = l->data;
+      GVfsJob *job = G_VFS_JOB (l->data);
       
       if (G_VFS_IS_JOB_DBUS (job) &&
           G_VFS_JOB_DBUS (job)->invocation &&
@@ -839,7 +839,7 @@ handle_get_connection (GVfsDBusDaemon *object,
                        GDBusMethodInvocation *invocation,
                        gpointer user_data)
 {
-  GVfsDaemon *daemon = user_data;
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
   GDBusServer *server;
   GError *error;
   gchar *address1;
@@ -906,7 +906,7 @@ handle_cancel (GVfsDBusDaemon *object,
                guint arg_serial,
                gpointer user_data)
 {
-  GVfsDaemon *daemon = user_data;
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
   GList *l;
   GVfsJob *job_to_cancel = NULL;
 
@@ -915,7 +915,7 @@ handle_cancel (GVfsDBusDaemon *object,
   g_mutex_lock (&daemon->lock);
   for (l = daemon->jobs; l != NULL; l = l->next)
     {
-      GVfsJob *job = l->data;
+      GVfsJob *job = G_VFS_JOB (l->data);
       
       if (G_VFS_IS_JOB_DBUS (job) &&
           g_vfs_job_dbus_is_serial (G_VFS_JOB_DBUS (job),
@@ -947,7 +947,7 @@ daemon_handle_mount (GVfsDBusMountable *object,
                      GVariant *arg_mount_source,
                      gpointer user_data)
 {
-  GVfsDaemon *daemon = user_data;
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
   GMountSpec *mount_spec;
   GMountSource *mount_source;
   

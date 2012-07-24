@@ -107,8 +107,8 @@ handle_ask_password (GVfsDBusMountOperation *object,
 
   op_dbus->object = object;
   op_dbus->invocation = invocation;
-  g_signal_connect (op_dbus->op, "reply", 
-                    (GCallback)ask_password_reply, 
+  g_signal_connect (op_dbus->op, "reply",
+                    G_CALLBACK (ask_password_reply),
                     op_dbus);
   
   g_signal_emit_by_name (op_dbus->op, "ask_password",
@@ -159,7 +159,7 @@ handle_ask_question (GVfsDBusMountOperation *object,
   op_dbus->invocation = invocation;
   g_signal_connect (op_dbus->op,
                     "reply",
-                    (GCallback)ask_question_reply,
+                    G_CALLBACK (ask_question_reply),
                     op_dbus);
 
   g_signal_emit_by_name (op_dbus->op, "ask_question",
@@ -217,7 +217,7 @@ handle_show_processes (GVfsDBusMountOperation *object,
   op_dbus->invocation = invocation;
   g_signal_connect (op_dbus->op,
                     "reply",
-                    (GCallback)show_processes_reply,
+                    G_CALLBACK (show_processes_reply),
                     op_dbus);
 
   g_signal_emit_by_name (op_dbus->op, "show_processes",

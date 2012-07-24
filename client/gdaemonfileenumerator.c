@@ -169,7 +169,7 @@ handle_done (GVfsDBusEnumerator *object,
              GDBusMethodInvocation *invocation,
              gpointer user_data)
 {
-  GDaemonFileEnumerator *enumerator = user_data;
+  GDaemonFileEnumerator *enumerator = G_DAEMON_FILE_ENUMERATOR (user_data);
 
   g_print ("handle_done: daemon = %p, async_requested_files = %d\n", enumerator, enumerator->async_requested_files);
 
@@ -191,7 +191,7 @@ handle_got_info (GVfsDBusEnumerator *object,
                  GVariant *arg_infos,
                  gpointer user_data)
 {
-  GDaemonFileEnumerator *enumerator = user_data;
+  GDaemonFileEnumerator *enumerator = G_DAEMON_FILE_ENUMERATOR (user_data);
   GList *infos;
   GFileInfo *info;
   GVariantIter iter;
@@ -314,7 +314,7 @@ enumerate_keys_callback (const char *key,
 			 gpointer value,
 			 gpointer user_data)
 {
-  GFileInfo  *info = user_data;
+  GFileInfo *info = G_FILE_INFO (user_data);
   char *attr;
 
   attr = g_strconcat ("metadata::", key, NULL);

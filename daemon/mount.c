@@ -832,7 +832,7 @@ mount_location_done  (VfsMountable *mountable,
 		      GError *error,
 		      gpointer user_data)
 {
-  GDBusMethodInvocation *invocation = user_data;
+  GDBusMethodInvocation *invocation = G_DBUS_METHOD_INVOCATION (user_data);
   
   if (error)
     g_dbus_method_invocation_return_gerror (invocation, error);
