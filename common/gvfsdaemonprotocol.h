@@ -74,12 +74,12 @@ typedef union {
   guint32 uint32;
   guint64 uint64;
   gpointer ptr;
-} GDbusAttributeValue;
+} GDBusAttributeValue;
 
 void       _g_dbus_attribute_value_destroy       (GFileAttributeType          type,
-						  GDbusAttributeValue        *value);
+						  GDBusAttributeValue        *value);
 gpointer   _g_dbus_attribute_as_pointer          (GFileAttributeType          type,
-						  GDbusAttributeValue        *value);
+						  GDBusAttributeValue        *value);
 GVariant * _g_dbus_append_file_attribute         (const char                 *attribute,
 						  GFileAttributeStatus        status,
 						  GFileAttributeType          type,
@@ -89,7 +89,7 @@ gboolean   _g_dbus_get_file_attribute            (GVariant                   *va
 						  gchar                     **attribute,
 						  GFileAttributeStatus       *status,
 						  GFileAttributeType         *type,
-						  GDbusAttributeValue        *attr_value);
+						  GDBusAttributeValue        *attr_value);
 GFileInfo *_g_dbus_get_file_info                 (GVariant                   *value,
 						  GError                    **error);
 

@@ -86,7 +86,7 @@ g_vfs_job_set_attribute_new_handle (GVfsDBusMount *object,
   GVfsJobSetAttribute *job;
   gchar *attribute;
   GFileAttributeType type;
-  GDbusAttributeValue value;
+  GDBusAttributeValue value;
  
   g_print ("called SetAttribute()\n");
 

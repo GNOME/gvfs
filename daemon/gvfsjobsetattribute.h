@@ -49,7 +49,7 @@ struct _GVfsJobSetAttribute
   char *filename;
   char *attribute;
   GFileAttributeType type;
-  GDbusAttributeValue value;
+  GDBusAttributeValue value;
   GFileQueryInfoFlags flags;
 };
 

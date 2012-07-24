@@ -63,7 +63,7 @@ append_object (GObject *obj)
 
 void
 _g_dbus_attribute_value_destroy (GFileAttributeType          type,
-				 GDbusAttributeValue        *value)
+				 GDBusAttributeValue        *value)
 {
   switch (type) {
   case G_FILE_ATTRIBUTE_TYPE_STRING:
@@ -84,7 +84,7 @@ _g_dbus_attribute_value_destroy (GFileAttributeType          type,
 
 gpointer
 _g_dbus_attribute_as_pointer (GFileAttributeType type,
-			      GDbusAttributeValue *value)
+			      GDBusAttributeValue *value)
 {
   switch (type) {
   case G_FILE_ATTRIBUTE_TYPE_STRING:
@@ -222,7 +222,7 @@ _g_dbus_get_file_attribute (GVariant *value,
 			    gchar **attribute,
 			    GFileAttributeStatus *status,
 			    GFileAttributeType *type,
-			    GDbusAttributeValue *attr_value)
+			    GDBusAttributeValue *attr_value)
 {
   gboolean res;
   char *str;
@@ -335,7 +335,7 @@ _g_dbus_get_file_info (GVariant *value,
   gchar *attribute;
   GFileAttributeType type;
   GFileAttributeStatus status;
-  GDbusAttributeValue attr_value;
+  GDBusAttributeValue attr_value;
   GVariantIter iter;
   GVariant *child;
 
