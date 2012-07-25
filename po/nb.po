@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.13.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-09 22:39+0200\n"
-"PO-Revision-Date: 2012-07-09 22:42+0200\n"
+"POT-Creation-Date: 2012-07-25 13:18+0200\n"
+"PO-Revision-Date: 2012-07-25 13:20+0200\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian bokmål <i18n-nb@lister.ping.uio.no>\n"
 "Language: \n"
@@ -88,7 +88,7 @@ msgstr "verdier må være av type streng eller liste med strenger"
 #: ../daemon/gvfsbackendobexftp.c:2087 ../daemon/gvfsbackendsmb.c:1179
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
-#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1073
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1070
 #: ../monitor/proxy/gproxydrive.c:522 ../monitor/proxy/gproxydrive.c:610
 #: ../monitor/proxy/gproxydrive.c:760 ../monitor/proxy/gproxydrive.c:898
 #: ../monitor/proxy/gproxydrive.c:936 ../monitor/proxy/gproxydrive.c:1061
@@ -575,8 +575,8 @@ msgid "Try again"
 msgstr "Prøv igjen"
 
 #: ../daemon/gvfsbackendafc.c:390 ../daemon/gvfsbackend.c:963
-#: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:926
-#: ../monitor/udisks2/gvfsudisks2mount.c:720
+#: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
+#: ../monitor/udisks2/gvfsudisks2mount.c:736
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -632,8 +632,8 @@ msgstr "Enhet «%s» er låst. Oppgi passord på enheten og klikk på «Prøv ig
 
 #: ../daemon/gvfsbackendafc.c:926 ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1808
-#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:718
-#: ../daemon/gvfsbackendtrash.c:232
+#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendrecent.c:121
+#: ../daemon/gvfsbackendsmb.c:718 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "Kan ikke åpne katalog"
 
@@ -761,7 +761,8 @@ msgstr "Kan ikke opprette midlertidig katalog"
 #: ../daemon/gvfsbackendburn.c:776 ../daemon/gvfsbackendburn.c:967
 #: ../daemon/gvfsbackendburn.c:1003 ../daemon/gvfsbackendftp.c:793
 #: ../daemon/gvfsbackendgphoto2.c:1205 ../daemon/gvfsbackendgphoto2.c:2129
-#: ../daemon/gvfsbackendgphoto2.c:2848 ../daemon/gvfsbackendsftp.c:1836
+#: ../daemon/gvfsbackendgphoto2.c:2848 ../daemon/gvfsbackendrecent.c:105
+#: ../daemon/gvfsbackendrecent.c:259 ../daemon/gvfsbackendsftp.c:1836
 #: ../daemon/gvfsbackendsftp.c:2949 ../daemon/gvfsbackendsftp.c:2962
 #: ../daemon/gvfsbackendsftp.c:2982 ../daemon/gvfsbackendtrash.c:216
 #, c-format
@@ -804,9 +805,9 @@ msgstr "Filen eksisterer"
 #: ../daemon/gvfsjobstartmountable.c:133 ../daemon/gvfsjobstopmountable.c:136
 #: ../daemon/gvfsjobtrash.c:123 ../daemon/gvfsjobunmountmountable.c:140
 #: ../daemon/gvfsjobunmountmountable.c:155 ../daemon/gvfsjobwrite.c:120
-#: ../monitor/gdu/ggdumount.c:1177 ../monitor/gdu/ggdumount.c:1261
-#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1104
-#: ../monitor/udisks2/gvfsudisks2volume.c:1505
+#: ../monitor/gdu/ggdumount.c:1174 ../monitor/gdu/ggdumount.c:1258
+#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1108
+#: ../monitor/udisks2/gvfsudisks2volume.c:1508
 msgid "Operation not supported by backend"
 msgstr "Operasjonen ikke tillatt av motoren"
 
@@ -826,13 +827,13 @@ msgstr "Målfilen eksisterer"
 msgid "Not supported"
 msgstr "Ikke støttet"
 
-#: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:925
-#: ../monitor/udisks2/gvfsudisks2mount.c:718
+#: ../daemon/gvfsbackend.c:962 ../monitor/gdu/ggdumount.c:922
+#: ../monitor/udisks2/gvfsudisks2mount.c:734
 msgid "Unmount Anyway"
 msgstr "Avmonter likevel"
 
-#: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:927
-#: ../monitor/udisks2/gvfsudisks2mount.c:721
+#: ../daemon/gvfsbackend.c:965 ../monitor/gdu/ggdumount.c:924
+#: ../monitor/udisks2/gvfsudisks2mount.c:737
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -1341,6 +1342,17 @@ msgstr "Enheten krever en programvareoppdatering"
 msgid "Error deleting file: %s"
 msgstr "Feil under sletting av fil: %s"
 
+#: ../daemon/gvfsbackendrecent.c:238
+#, fuzzy
+msgid "The recent folder may not be deleted"
+msgstr "Papirkurven kan ikke slettes"
+
+#. Translators: this is the display name of the backend
+#. translators: This is the name of the backend
+#: ../daemon/gvfsbackendrecent.c:547 ../daemon/gvfsbackendrecent.c:658
+msgid "Recent"
+msgstr ""
+
 #: ../daemon/gvfsbackendsftp.c:302 ../daemon/gvfsbackendsftp.c:658
 msgid "ssh program unexpectedly exited"
 msgstr "SSH-program avsluttet uventet"
@@ -1585,7 +1597,7 @@ msgstr "Oppføringer i papirkurven kan ikke endres"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:742 ../daemon/gvfsbackendtrash.c:850
+#: ../daemon/gvfsbackendtrash.c:755 ../daemon/gvfsbackendtrash.c:863
 msgid "Trash"
 msgstr "Papirkurv"
 
@@ -1670,7 +1682,19 @@ msgstr "Symbolske lenker er ikke støttet av motoren"
 msgid "Invalid dbus message"
 msgstr "Ugyldig dbus-melding"
 
-#: ../daemon/gvfsjobunmount.c:159
+#: ../daemon/gvfsjobunmount.c:143 ../monitor/udisks2/gvfsudisks2utils.c:809
+#, c-format
+msgid "%s has been unmounted\n"
+msgstr ""
+
+#: ../daemon/gvfsjobunmount.c:161 ../monitor/udisks2/gvfsudisks2utils.c:663
+#, c-format
+msgid ""
+"Unmounting %s\n"
+"Please wait"
+msgstr ""
+
+#: ../daemon/gvfsjobunmount.c:217
 msgid "Filesystem is busy"
 msgstr "Filsystemet er opptatt"
 
@@ -1698,12 +1722,12 @@ msgid "%s: %s"
 msgstr "%s: %s"
 
 #: ../daemon/main.c:80 ../metadata/meta-daemon.c:474
-#: ../programs/gvfs-cat.c:162 ../programs/gvfs-cat.c:174
-#: ../programs/gvfs-copy.c:133 ../programs/gvfs-info.c:382
-#: ../programs/gvfs-ls.c:409 ../programs/gvfs-mime.c:97
+#: ../programs/gvfs-cat.c:170 ../programs/gvfs-cat.c:182
+#: ../programs/gvfs-copy.c:133 ../programs/gvfs-info.c:387
+#: ../programs/gvfs-ls.c:416 ../programs/gvfs-mime.c:97
 #: ../programs/gvfs-mime.c:107 ../programs/gvfs-mime.c:114
 #: ../programs/gvfs-mkdir.c:71 ../programs/gvfs-monitor-dir.c:126
-#: ../programs/gvfs-monitor-file.c:125 ../programs/gvfs-mount.c:1019
+#: ../programs/gvfs-monitor-file.c:125 ../programs/gvfs-mount.c:1036
 #: ../programs/gvfs-move.c:121 ../programs/gvfs-open.c:78
 #: ../programs/gvfs-open.c:90 ../programs/gvfs-rename.c:75
 #: ../programs/gvfs-rm.c:72 ../programs/gvfs-save.c:175
@@ -1786,7 +1810,7 @@ msgstr "Stasjon uten navn (%s)"
 msgid "Unnamed Drive"
 msgstr "Stasjon uten navn"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:509
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:505
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
@@ -1807,15 +1831,15 @@ msgstr ""
 msgid "Start Anyway"
 msgstr "Start likevel"
 
-#: ../monitor/gdu/ggdumount.c:860 ../monitor/udisks2/gvfsudisks2mount.c:631
+#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:649
 msgid "One or more programs are preventing the unmount operation."
 msgstr "Ett eller flere programmer forhindrer avmonteringsoperasjonen."
 
-#: ../monitor/gdu/ggdumount.c:988
+#: ../monitor/gdu/ggdumount.c:985
 msgid "Cannot get LUKS cleartext slave"
 msgstr "Kan ikke hente klartekstslave for LUKS"
 
-#: ../monitor/gdu/ggdumount.c:1010
+#: ../monitor/gdu/ggdumount.c:1007
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
 msgstr "Kan ikke hente LUKS klartekstslave fra stien «%s»"
@@ -2170,7 +2194,7 @@ msgstr "%s krypterte data"
 msgid "%s Media"
 msgstr "%s medie"
 
-#: ../monitor/udisks2/gvfsudisks2mount.c:714
+#: ../monitor/udisks2/gvfsudisks2mount.c:730
 msgid "Eject Anyway"
 msgstr "Løs ut likevel"
 
@@ -2178,6 +2202,18 @@ msgstr "Løs ut likevel"
 #, c-format
 msgid "Timed out running command-line `%s'"
 msgstr "Tidsavbrudd ved kjøring av kommandolinje «%s»"
+
+#: ../monitor/udisks2/gvfsudisks2utils.c:664
+#, c-format
+msgid ""
+"Writing data to %s\n"
+"Don't unplug until finished"
+msgstr ""
+
+#: ../monitor/udisks2/gvfsudisks2utils.c:809
+#, c-format
+msgid "You can now unplug %s\n"
+msgstr ""
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2214,17 +2250,17 @@ msgstr "Feil ved sletting av ugyldig passordfrase fra nøkkelring (feilkode %d)"
 msgid "The unlocked device does not have a recognizable filesystem on it"
 msgstr "Kjenner ikke igjen filsystemet på ulåst enhet"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1074
+#: ../monitor/udisks2/gvfsudisks2volume.c:1077
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Passordfrase for kryptering for %s"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1244
+#: ../monitor/udisks2/gvfsudisks2volume.c:1247
 msgid "A passphrase is required to access the volume"
 msgstr "En passordfrase kreves for å aksessere volumet"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1259
+#: ../monitor/udisks2/gvfsudisks2volume.c:1262
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2240,7 +2276,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1410
+#: ../monitor/udisks2/gvfsudisks2volume.c:1413
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
@@ -2251,45 +2287,44 @@ msgstr "GVfs UDisks2 volumovervåking"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-cat.c:57
+#: ../programs/gvfs-cat.c:58
 #, c-format
 msgid "%s: %s: error opening file: %s\n"
 msgstr "%s: %s feil ved åpning av fil: %s\n"
 
 #. Translators: the first %s is the program name, the
 #. second one is the URI of the file.
-#: ../programs/gvfs-cat.c:80
+#: ../programs/gvfs-cat.c:82
 #, c-format
 msgid "%s: %s, error writing to stdout"
 msgstr "%s: %s, feil ved skriving til stdout"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-cat.c:92
+#: ../programs/gvfs-cat.c:95
 #, c-format
 msgid "%s: %s: error reading: %s\n"
 msgstr "%s: %s: feil ved lesing: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-cat.c:110
+#: ../programs/gvfs-cat.c:114
 #, c-format
 msgid "%s: %s:error closing: %s\n"
 msgstr "%s: %s: feil ved lukking: %s\n"
 
-#: ../programs/gvfs-cat.c:135 ../programs/gvfs-open.c:61
+#: ../programs/gvfs-cat.c:143 ../programs/gvfs-open.c:61
 #: ../programs/gvfs-rm.c:58
 msgid "FILE"
 msgstr "FIL"
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-cat.c:138
-#, fuzzy
+#: ../programs/gvfs-cat.c:146
 msgid "Concatenate files and print to the standard output."
-msgstr "ADRESSE … - slå sammen ADRESSER til standard utdata."
+msgstr "Slå sammen filer og skriv til standard utdata."
 
-#: ../programs/gvfs-cat.c:139
+#: ../programs/gvfs-cat.c:147
 #, fuzzy
 msgid ""
 "gvfs-cat works just like the traditional cat utility, but using gvfs\n"
@@ -2301,7 +2336,7 @@ msgstr ""
 "filer. Du kan for eksempel bruke smb://tjener/ressurs/fil.txt som en adresse "
 "som skal vises."
 
-#: ../programs/gvfs-cat.c:143
+#: ../programs/gvfs-cat.c:151
 #, fuzzy
 msgid ""
 "Note: just pipe through cat if you need its formatting options\n"
@@ -2310,11 +2345,11 @@ msgstr ""
 "Merk: bare send dette gjennom cat hvis du trenger formateringsalternativene "
 "som -n -T eller annet."
 
-#: ../programs/gvfs-cat.c:160 ../programs/gvfs-copy.c:131
-#: ../programs/gvfs-info.c:380 ../programs/gvfs-ls.c:407
+#: ../programs/gvfs-cat.c:168 ../programs/gvfs-copy.c:131
+#: ../programs/gvfs-info.c:385 ../programs/gvfs-ls.c:414
 #: ../programs/gvfs-mime.c:94 ../programs/gvfs-mkdir.c:69
 #: ../programs/gvfs-monitor-dir.c:124 ../programs/gvfs-monitor-file.c:123
-#: ../programs/gvfs-mount.c:1017 ../programs/gvfs-move.c:119
+#: ../programs/gvfs-mount.c:1034 ../programs/gvfs-move.c:119
 #: ../programs/gvfs-open.c:76 ../programs/gvfs-rename.c:73
 #: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:173
 #: ../programs/gvfs-set-attribute.c:149 ../programs/gvfs-trash.c:69
@@ -2325,7 +2360,7 @@ msgstr "Feil ved lesing av kommandolinjeflagg: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:172 ../programs/gvfs-open.c:88
+#: ../programs/gvfs-cat.c:180 ../programs/gvfs-open.c:88
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: mangler adresser"
@@ -2370,9 +2405,8 @@ msgid "DEST"
 msgstr "MÅL"
 
 #: ../programs/gvfs-copy.c:122
-#, fuzzy
 msgid "Copy one or more files from SOURCE to DEST."
-msgstr "KILDE … MÅL - flytt fil(er) fra KILDE til MÅL"
+msgstr "Kopier en eller flere filer fra KILDE til MÅL."
 
 #: ../programs/gvfs-copy.c:141 ../programs/gvfs-move.c:129
 #: ../programs/gvfs-rename.c:83
@@ -2486,38 +2520,38 @@ msgstr "størrelse: "
 msgid "hidden\n"
 msgstr "skjult\n"
 
-#: ../programs/gvfs-info.c:266
+#: ../programs/gvfs-info.c:268
 msgid "Copy with file"
 msgstr "Kopier med fil"
 
-#: ../programs/gvfs-info.c:270
+#: ../programs/gvfs-info.c:272
 msgid "Keep with file when moved"
 msgstr "Behold med filen når den flyttes"
 
-#: ../programs/gvfs-info.c:307
+#: ../programs/gvfs-info.c:309
 #, c-format
 msgid "Error getting writable attributes: %s\n"
 msgstr "Feil under henting av skrivbare attributter: %s\n"
 
-#: ../programs/gvfs-info.c:312
+#: ../programs/gvfs-info.c:314
 #, c-format
 msgid "Settable attributes:\n"
 msgstr "Attributter som kan settes:\n"
 
-#: ../programs/gvfs-info.c:335
+#: ../programs/gvfs-info.c:337
 #, c-format
 msgid "Writable attribute namespaces:\n"
 msgstr "Navneområder for skrivbare attributter:\n"
 
-#: ../programs/gvfs-info.c:368 ../programs/gvfs-ls.c:390
+#: ../programs/gvfs-info.c:373 ../programs/gvfs-ls.c:397
 #: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-monitor-dir.c:112
-#: ../programs/gvfs-monitor-file.c:111 ../programs/gvfs-mount.c:1005
+#: ../programs/gvfs-monitor-file.c:111 ../programs/gvfs-mount.c:1022
 #: ../programs/gvfs-rename.c:64 ../programs/gvfs-set-attribute.c:139
 #: ../programs/gvfs-trash.c:57 ../programs/gvfs-tree.c:248
 msgid "LOCATION"
 msgstr "LOKASJON"
 
-#: ../programs/gvfs-info.c:369
+#: ../programs/gvfs-info.c:374
 msgid "Show information about locations."
 msgstr "Vis informasjon om lokasjoner."
 
@@ -2537,17 +2571,17 @@ msgstr "Vis fullføring"
 msgid "PREFIX"
 msgstr "PREFIKS"
 
-#: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
+#: ../programs/gvfs-ls.c:166 ../programs/gvfs-ls.c:174
 #: ../programs/gvfs-rename.c:97
 #, c-format
 msgid "Error: %s\n"
 msgstr "Feil: %s\n"
 
-#: ../programs/gvfs-ls.c:391
+#: ../programs/gvfs-ls.c:398
 msgid "List the contents of the locations."
 msgstr ""
 
-#: ../programs/gvfs-ls.c:392
+#: ../programs/gvfs-ls.c:399
 #, fuzzy
 msgid ""
 "gvfs-ls is similar to the traditional ls utility, but using gvfs\n"
@@ -2582,9 +2616,8 @@ msgid "Get or set the handler for a mime-type."
 msgstr "Sett håndterer for MIME-type"
 
 #: ../programs/gvfs-mime.c:95
-#, fuzzy
 msgid "Specify either --query or --set"
-msgstr "Oppgi en av --query og --set"
+msgstr "Oppgi en av --query eller --set"
 
 #: ../programs/gvfs-mime.c:106
 #, c-format
@@ -2650,9 +2683,8 @@ msgid "Error creating directory: %s\n"
 msgstr "Feil ved oppretting av katalog: %s\n"
 
 #: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
-#, fuzzy
 msgid "Don't send single MOVED events"
-msgstr "Ikke send FLYTTET-hendelser enkeltvis."
+msgstr "Ikke send FLYTTET-hendelser enkeltvis"
 
 #: ../programs/gvfs-monitor-dir.c:113
 msgid "Monitor directories for changes."
@@ -2662,90 +2694,89 @@ msgstr ""
 msgid "Monitor files for changes."
 msgstr ""
 
-#: ../programs/gvfs-mount.c:55
+#: ../programs/gvfs-mount.c:57
 msgid "Mount as mountable"
 msgstr "Monter som monterbar"
 
-#: ../programs/gvfs-mount.c:56
+#: ../programs/gvfs-mount.c:58
 msgid "Mount volume with device file"
 msgstr "Monter volum med enhetsfil"
 
-#: ../programs/gvfs-mount.c:56
+#: ../programs/gvfs-mount.c:58
 msgid "DEVICE"
 msgstr "ENHET"
 
-#: ../programs/gvfs-mount.c:57
+#: ../programs/gvfs-mount.c:59
 msgid "Unmount"
 msgstr "Avmonter"
 
-#: ../programs/gvfs-mount.c:58
+#: ../programs/gvfs-mount.c:60
 msgid "Eject"
 msgstr "Løs ut"
 
-#: ../programs/gvfs-mount.c:59
+#: ../programs/gvfs-mount.c:61
 msgid "Unmount all mounts with the given scheme"
 msgstr "Avmonter alle monteringspunkter med gitt schema"
 
-#: ../programs/gvfs-mount.c:59
+#: ../programs/gvfs-mount.c:61
 msgid "SCHEME"
 msgstr ""
 
 #. Translator: List here is a verb as in 'List all mounts'
-#: ../programs/gvfs-mount.c:61
+#: ../programs/gvfs-mount.c:63
 msgid "List"
 msgstr "Vis liste"
 
-#: ../programs/gvfs-mount.c:62
+#: ../programs/gvfs-mount.c:64
 msgid "Monitor events"
 msgstr "Overvåk hendelser"
 
-#: ../programs/gvfs-mount.c:63
+#: ../programs/gvfs-mount.c:65
 msgid "Show extra information"
 msgstr "Vis ekstra informasjon"
 
-#: ../programs/gvfs-mount.c:166 ../programs/gvfs-mount.c:187
+#: ../programs/gvfs-mount.c:169 ../programs/gvfs-mount.c:193
 #, c-format
 msgid "Error mounting location: %s\n"
 msgstr "Feil under montering av adresse: %s\n"
 
-#: ../programs/gvfs-mount.c:244
+#: ../programs/gvfs-mount.c:253
 #, c-format
 msgid "Error unmounting mount: %s\n"
 msgstr "Feil ved avmontering av monteringspunkt: %s\n"
 
-#: ../programs/gvfs-mount.c:265 ../programs/gvfs-mount.c:310
+#: ../programs/gvfs-mount.c:276 ../programs/gvfs-mount.c:325
 #, c-format
 msgid "Error finding enclosing mount: %s\n"
 msgstr "Kan ikke finne omsluttende montering: %s\n"
 
-#: ../programs/gvfs-mount.c:289
+#: ../programs/gvfs-mount.c:302
 #, c-format
 msgid "Error ejecting mount: %s\n"
 msgstr "Feil ved utløsing av monteringspunkt: %s\n"
 
-#: ../programs/gvfs-mount.c:743
+#: ../programs/gvfs-mount.c:759
 #, c-format
 msgid "Error mounting %s: %s\n"
 msgstr "Feil under montering av %s: %s\n"
 
-#: ../programs/gvfs-mount.c:757
+#: ../programs/gvfs-mount.c:774
 #, c-format
 msgid "Mounted %s at %s\n"
 msgstr "Monterte %s i %s\n"
 
-#: ../programs/gvfs-mount.c:808
+#: ../programs/gvfs-mount.c:825
 #, c-format
 msgid "No volume for device file %s\n"
 msgstr "Ingen volum for enhetsfil %s\n"
 
-#: ../programs/gvfs-mount.c:1006
+#: ../programs/gvfs-mount.c:1023
 msgid "Mount the locations."
 msgstr "Monter lokasjoner."
 
 #: ../programs/gvfs-move.c:110
-#, fuzzy
 msgid "Move one or more files from SOURCE to DEST."
-msgstr "KILDE … MÅL - flytt fil(er) fra KILDE til MÅL"
+msgstr "Flytt en eller flere filer fra KILDE til MÅL."
 
 #: ../programs/gvfs-move.c:199
 #, c-format
