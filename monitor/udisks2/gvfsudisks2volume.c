@@ -224,6 +224,10 @@ update_volume (GVfsUDisks2Volume *volume)
       GVariantIter iter;
       const gchar *configuration_type;
       GVariant *configuration_value;
+      UDisksLoop *loop = NULL;
+
+      loop = udisks_client_get_loop_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                               volume->block);
 
       /* If unlocked, use the values from the unlocked block device for presentation */
       cleartext_block = udisks_client_get_cleartext_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
@@ -355,6 +359,17 @@ update_volume (GVfsUDisks2Volume *volume)
           g_object_unref (udisks_drive);
         }
 
+      /* Also automount loop devices set up by the user himself - e.g. via the
+       * udisks interfaces or the gnome-disk-image-mounter(1) command
+       */
+      if (loop != NULL)
+        {
+          if (udisks_loop_get_setup_by_uid (loop) == getuid ())
+            {
+              volume->should_automount = TRUE;
+            }
+        }
+
       /* Use hints, if available */
       hint = udisks_block_get_hint_name (volume->block);
       if (hint != NULL && strlen (hint) > 0)
@@ -402,6 +417,7 @@ update_volume (GVfsUDisks2Volume *volume)
         }
 
       g_clear_object (&cleartext_block);
+      g_clear_object (&loop);
     }
   else
     {
@@ -886,6 +902,28 @@ mount_command_cb (GObject       *source_object,
 /* ------------------------------ */
 
 static void
+ensure_autoclear (MountData *data)
+{
+  UDisksLoop *loop;
+  loop = udisks_client_get_loop_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (data->volume->monitor),
+                                           data->volume->block);
+  if (loop != NULL)
+    {
+      if (!udisks_loop_get_autoclear (loop) && udisks_loop_get_setup_by_uid (loop) == getuid ())
+        {
+          /* we don't care about the result */
+          udisks_loop_call_set_autoclear (loop, TRUE,
+                                          g_variant_new ("a{sv}", NULL), /* options */
+                                          NULL, NULL, NULL);
+        }
+      g_object_unref (loop);
+    }
+}
+
+/* ------------------------------ */
+
+
+static void
 mount_cb (GObject       *source_object,
           GAsyncResult  *res,
           gpointer       user_data)
@@ -906,6 +944,9 @@ mount_cb (GObject       *source_object,
     }
   else
     {
+      /* if mounting worked, ensure that the loop device goes away when unmounted */
+      ensure_autoclear (data);
+
       gvfs_udisks2_volume_monitor_update (data->volume->monitor);
       g_simple_async_result_complete (data->simple);
       g_free (mount_path);
@@ -1034,6 +1075,9 @@ unlock_cb (GObject       *source_object,
   else
     {
       UDisksObject *object;
+
+      /* if unlocking worked, ensure that the loop device goes away when locked */
+      ensure_autoclear (data);
 
       gvfs_udisks2_volume_monitor_update (data->volume->monitor);
 
