@@ -398,11 +398,15 @@ update_volume (GVfsUDisks2Volume *volume)
         }
 
       /* Add an emblem, depending on whether the encrypted volume is locked or unlocked */
-      if (g_strcmp0 (udisks_block_get_id_type (volume->block), "crypto_LUKS") == 0 && volume->icon != NULL)
+      if (g_strcmp0 (udisks_block_get_id_type (volume->block), "crypto_LUKS") == 0)
         {
           GEmblem *emblem;
           GIcon *padlock;
           GIcon *emblemed_icon;
+
+          if (volume->icon == NULL)
+            volume->icon = g_themed_icon_new ("drive-removable-media");
+
           if (cleartext_block != NULL)
             padlock = g_themed_icon_new ("changes-allow");
           else
