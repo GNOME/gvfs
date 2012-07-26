@@ -824,6 +824,39 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
   if (udisks_block_get_hint_ignore (block))
     goto out;
 
+  /* If the device (or if a partition, its containing device) is a
+   * loop device, check the SetupByUid property - we don't want to
+   * show loop devices set up by other users
+   */
+#ifdef UDISKS_CHECK_VERSION
+# if UDISKS_CHECK_VERSION(1,97,0)
+  loop = udisks_client_get_loop_for_block (monitor->client, block);
+  if (loop != NULL)
+    {
+      GDBusObject *loop_object;
+      UDisksBlock *block_for_loop;
+      guint setup_by_uid;
+
+      setup_by_uid = udisks_loop_get_setup_by_uid (loop);
+      if (setup_by_uid != 0 && setup_by_uid != getuid ())
+        goto out;
+
+      /* Work-around bug in Linux where partitions of a loop
+       * device (e.g. /dev/loop0p1) are lingering even when the
+       * parent loop device (e.g. /dev/loop0) has been cleared
+       */
+      loop_object = g_dbus_interface_get_object (G_DBUS_INTERFACE (loop));
+      if (loop_object == NULL)
+        goto out;
+      block_for_loop = udisks_object_peek_block (UDISKS_OBJECT (loop_object));
+      if (block_for_loop == NULL)
+        goto out;
+      if (udisks_block_get_size (block_for_loop) == 0)
+        goto out;
+    }
+# endif
+#endif
+
   /* ignore the volume if the drive is ignored */
   udisks_drive = udisks_client_get_drive_for_block (monitor->client, block);
   if (udisks_drive != NULL)
@@ -888,39 +921,6 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
       if (!should_include_volume_check_configuration (monitor, block))
         goto out;
     }
-
-  /* If the device (or if a partition, its containing device) is a
-   * loop device, check the SetupByUid property - we don't want to
-   * show loop devices set up by other users
-   */
-#ifdef UDISKS_CHECK_VERSION
-# if UDISKS_CHECK_VERSION(1,97,0)
-  loop = udisks_client_get_loop_for_block (monitor->client, block);
-  if (loop != NULL)
-    {
-      GDBusObject *loop_object;
-      UDisksBlock *block_for_loop;
-      guint setup_by_uid;
-
-      setup_by_uid = udisks_loop_get_setup_by_uid (loop);
-      if (setup_by_uid != 0 && setup_by_uid != getuid ())
-        goto out;
-
-      /* Work-around bug in Linux where partitions of a loop
-       * device (e.g. /dev/loop0p1) are lingering even when the
-       * parent loop device (e.g. /dev/loop0) has been cleared
-       */
-      loop_object = g_dbus_interface_get_object (G_DBUS_INTERFACE (loop));
-      if (loop_object == NULL)
-        goto out;
-      block_for_loop = udisks_object_peek_block (UDISKS_OBJECT (loop_object));
-      if (block_for_loop == NULL)
-        goto out;
-      if (udisks_block_get_size (block_for_loop) == 0)
-        goto out;
-    }
-# endif
-#endif
 
   /* otherwise, we're good to go */
   ret = TRUE;
