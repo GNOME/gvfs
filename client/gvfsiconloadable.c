@@ -74,7 +74,9 @@ create_proxy_for_icon (GVfsIcon *vfs_icon,
  out:
   if (mount_info)
     g_mount_info_unref (mount_info);
- 
+  if (error && *error)
+    g_dbus_error_strip_remote_error (*error);
+
   return proxy;
 }
 
@@ -119,7 +121,7 @@ g_vfs_icon_load (GLoadableIcon  *icon,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_object_unref (proxy);
@@ -185,7 +187,7 @@ async_proxy_new_cb (GObject *source_object,
   g_print ("gvfsiconloadable.c: async_proxy_new_cb, proxy = %p\n", proxy);
   if (proxy == NULL)
     {
-      g_simple_async_result_take_error (data->result, error);      
+      _g_simple_async_result_take_error_stripped (data->result, error);      
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_path_call_free (data);
       return;
@@ -211,6 +213,7 @@ async_got_connection_cb (GDBusConnection *connection,
   
   if (connection == NULL)
     {
+      g_dbus_error_strip_remote_error (io_error);
       g_simple_async_result_set_from_error (data->result, io_error);
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_path_call_free (data);
@@ -238,6 +241,7 @@ async_got_mount_info (GMountInfo *mount_info,
 
   if (error != NULL)
     {
+      g_dbus_error_strip_remote_error (error);
       g_simple_async_result_set_from_error (data->result, error);      
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_path_call_free (data);
@@ -298,7 +302,7 @@ open_icon_read_cb (GVfsDBusMount *proxy,
 
   if (! gvfs_dbus_mount_call_open_icon_for_read_finish (proxy, &fd_id_val, &can_seek, &fd_list, res, &error))
     {
-      g_simple_async_result_take_error (data->result, error);
+      _g_simple_async_result_take_error_stripped (data->result, error);
       goto out;
     }
 

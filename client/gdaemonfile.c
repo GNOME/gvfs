@@ -450,7 +450,9 @@ create_proxy_for_file2 (GFile *file1,
     g_mount_info_unref (mount_info1);
   if (mount_info2)
     g_mount_info_unref (mount_info2);
- 
+  if (error && *error)
+    g_dbus_error_strip_remote_error (*error);
+
   return proxy;
 }
 
@@ -527,7 +529,7 @@ async_proxy_new_cb (GObject *source_object,
   g_print ("async_proxy_new_cb, proxy = %p\n", proxy);
   if (proxy == NULL)
     {
-      g_simple_async_result_take_error (data->result, error);      
+      _g_simple_async_result_take_error_stripped (data->result, error);
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_proxy_create_free (data);
       return;
@@ -582,7 +584,7 @@ bus_get_cb (GObject *source_object,
   
   if (connection == NULL)
     {
-      g_simple_async_result_set_from_error (data->result, error);
+      _g_simple_async_result_take_error_stripped (data->result, error);
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_proxy_create_free (data);
       return;
@@ -625,6 +627,7 @@ async_got_mount_info (GMountInfo *mount_info,
 
   if (error != NULL)
     {
+      g_dbus_error_strip_remote_error (error);
       g_simple_async_result_set_from_error (data->result, error);      
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_proxy_create_free (data);
@@ -714,7 +717,7 @@ g_daemon_file_enumerate_children (GFile      *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
   
   g_free (path);
@@ -837,7 +840,7 @@ g_daemon_file_query_info (GFile                *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -894,7 +897,7 @@ query_info_async_cb (GVfsDBusMount *proxy,
   
   if (! gvfs_dbus_mount_call_query_info_finish (proxy, &iter_info, res, &error))
     {
-      g_simple_async_result_take_error (orig_result, error);
+      _g_simple_async_result_take_error_stripped (orig_result, error);
       goto out;
     }
   
@@ -903,7 +906,7 @@ query_info_async_cb (GVfsDBusMount *proxy,
 
   if (info == NULL)
     {
-      g_simple_async_result_take_error (orig_result, error);
+      _g_simple_async_result_take_error_stripped (orig_result, error);
       goto out;
     }
 
@@ -1038,7 +1041,7 @@ read_async_cb (GVfsDBusMount *proxy,
   
   if (! gvfs_dbus_mount_call_open_for_read_finish (proxy, &fd_id_val, &can_seek, &fd_list, res, &error))
     {
-      g_simple_async_result_take_error (orig_result, error);
+      _g_simple_async_result_take_error_stripped (orig_result, error);
       goto out;
     }
 
@@ -1177,7 +1180,7 @@ g_daemon_file_read (GFile *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -1253,7 +1256,7 @@ file_open_write (GFile *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -1340,8 +1343,7 @@ mount_mountable_location_mounted_cb (GObject *source_object,
 
   if (!g_file_mount_enclosing_volume_finish (G_FILE (source_object), res, &error))
     {
-      g_simple_async_result_set_from_error (result, error);
-      g_error_free (error);
+      _g_simple_async_result_take_error_stripped (result, error);
     }
 
   g_simple_async_result_complete (result);
@@ -1379,7 +1381,7 @@ mount_mountable_async_cb (GVfsDBusMount *proxy,
                                                      res,
                                                      &error))
     {
-      g_simple_async_result_take_error (orig_result, error);
+      _g_simple_async_result_take_error_stripped (orig_result, error);
       goto out;
     }
   
@@ -1512,7 +1514,7 @@ start_mountable_async_cb (GVfsDBusMount *proxy,
   orig_result = data->result;
 
   if (! gvfs_dbus_mount_call_start_mountable_finish (proxy, res, &error))
-    g_simple_async_result_take_error (orig_result, error);
+    _g_simple_async_result_take_error_stripped (orig_result, error);
 
   _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
   _g_dbus_async_unsubscribe_cancellable (data->cancellable, data->cancelled_tag);
@@ -1601,7 +1603,7 @@ stop_mountable_async_cb (GVfsDBusMount *proxy,
   orig_result = data->result;
 
   if (! gvfs_dbus_mount_call_stop_mountable_finish (proxy, res, &error))
-    g_simple_async_result_take_error (orig_result, error);
+    _g_simple_async_result_take_error_stripped (orig_result, error);
 
   _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
   _g_dbus_async_unsubscribe_cancellable (data->cancellable, data->cancelled_tag);
@@ -1691,7 +1693,7 @@ eject_mountable_async_cb (GVfsDBusMount *proxy,
   orig_result = data->result;
 
   if (! gvfs_dbus_mount_call_eject_mountable_finish (proxy, res, &error))
-    g_simple_async_result_take_error (orig_result, error);
+    _g_simple_async_result_take_error_stripped (orig_result, error);
 
   _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
   _g_dbus_async_unsubscribe_cancellable (data->cancellable, data->cancelled_tag);
@@ -1799,7 +1801,7 @@ unmount_mountable_async_cb (GVfsDBusMount *proxy,
   orig_result = data->result;
 
   if (! gvfs_dbus_mount_call_unmount_mountable_finish (proxy, res, &error))
-    g_simple_async_result_take_error (orig_result, error);
+    _g_simple_async_result_take_error_stripped (orig_result, error);
 
   _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
   _g_dbus_async_unsubscribe_cancellable (data->cancellable, data->cancelled_tag);
@@ -1889,7 +1891,7 @@ poll_mountable_async_cb (GVfsDBusMount *proxy,
   orig_result = data->result;
   
   if (! gvfs_dbus_mount_call_poll_mountable_finish (proxy, res, &error))
-    g_simple_async_result_take_error (orig_result, error);
+    _g_simple_async_result_take_error_stripped (orig_result, error);
 
   _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
   _g_dbus_async_unsubscribe_cancellable (data->cancellable, data->cancelled_tag);
@@ -2005,11 +2007,11 @@ mount_reply (GVfsDBusMountTracker *proxy,
 
   if (!gvfs_dbus_mount_tracker_call_mount_location_finish (proxy, res, &error))
     {
-      ares = g_simple_async_result_new_from_error (G_OBJECT (data->file),
+      g_dbus_error_strip_remote_error (error);
+      ares = g_simple_async_result_new_take_error (G_OBJECT (data->file),
 						   data->callback,
 						   data->user_data,
 						   error);
-      g_error_free (error);
     }
   else
     {
@@ -2043,11 +2045,11 @@ mount_enclosing_volume_proxy_cb (GObject *source_object,
   proxy = gvfs_dbus_mount_tracker_proxy_new_for_bus_finish (res, &error);
   if (proxy == NULL)
     {
-      ares = g_simple_async_result_new_from_error (G_OBJECT (data->file),
+      g_dbus_error_strip_remote_error (error);
+      ares = g_simple_async_result_new_take_error (G_OBJECT (data->file),
                                                    data->callback,
                                                    data->user_data,
                                                    error);
-      g_error_free (error);
       _g_simple_async_result_complete_with_cancellable (ares, data->cancellable);
       free_mount_data (data);
       return;
@@ -2143,7 +2145,7 @@ g_daemon_file_query_filesystem_info (GFile                *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -2195,7 +2197,7 @@ query_fs_info_async_cb (GVfsDBusMount *proxy,
   
   if (! gvfs_dbus_mount_call_query_filesystem_info_finish (proxy, &iter_info, res, &error))
     {
-      g_simple_async_result_take_error (orig_result, error);
+      _g_simple_async_result_take_error_stripped (orig_result, error);
       goto out;
     }
 
@@ -2204,7 +2206,7 @@ query_fs_info_async_cb (GVfsDBusMount *proxy,
 
   if (info == NULL)
     {
-      g_simple_async_result_take_error (orig_result, error);
+      _g_simple_async_result_take_error_stripped (orig_result, error);
       goto out;
     }
 
@@ -2302,7 +2304,7 @@ g_daemon_file_find_enclosing_mount (GFile *file,
 						  cancellable,
 						  error);
   if (mount_info == NULL)
-    return NULL;
+    goto out;
 
   if (mount_info->user_visible)
     {
@@ -2323,6 +2325,11 @@ g_daemon_file_find_enclosing_mount (GFile *file,
   /* translators: this is an error message when there is no user visible "mount" object
      corresponding to a particular path/uri */
 		       _("Could not find enclosing mount"));
+ 
+out:
+  if (error && *error)
+    g_dbus_error_strip_remote_error (*error);
+
   return NULL;
 }
 
@@ -2339,7 +2346,7 @@ g_daemon_file_get_child_for_display_name (GFile        *file,
   mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
 						 daemon_file->path,
                                                  NULL,  /* TODO: cancellable */
-						 NULL);
+						 NULL); /* TODO: error? */
 
 
   if (mount_info && mount_info->prefered_filename_encoding)
@@ -2400,7 +2407,7 @@ g_daemon_file_set_display_name (GFile *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -2444,7 +2451,7 @@ g_daemon_file_delete (GFile *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -2479,7 +2486,7 @@ g_daemon_file_trash (GFile *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -2514,7 +2521,7 @@ g_daemon_file_make_directory (GFile *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -2551,7 +2558,7 @@ g_daemon_file_make_symbolic_link (GFile *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -2590,7 +2597,7 @@ g_daemon_file_query_settable_attributes (GFile                      *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -2635,7 +2642,7 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -2721,6 +2728,8 @@ set_metadata_attribute (GFile *file,
     }
 
   meta_tree_unref (tree);
+  if (error && *error)
+    g_dbus_error_strip_remote_error (*error);
 
   return res;
 }
@@ -2771,7 +2780,7 @@ g_daemon_file_set_attribute (GFile *file,
 	  g_object_unref (proxy);
 	  goto retry;
 	}
-      g_propagate_error (error, my_error);
+      _g_propagate_error_stripped (error, my_error);
       return FALSE;
     }
 
@@ -3012,7 +3021,7 @@ retry:
           g_object_unref (proxy);
           goto retry;
         }
-      g_propagate_error (error, my_error);
+      _g_propagate_error_stripped (error, my_error);
     }
 
   g_clear_object (&proxy);
@@ -3106,7 +3115,7 @@ g_daemon_file_monitor_dir (GFile* file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -3162,7 +3171,7 @@ g_daemon_file_monitor_file (GFile* file,
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      g_propagate_error (error, local_error);
+      _g_propagate_error_stripped (error, local_error);
     }
 
   g_free (path);
@@ -3203,7 +3212,7 @@ file_open_write_async_cb (GVfsDBusMount *proxy,
   
   if (! gvfs_dbus_mount_call_open_for_write_finish (proxy, &fd_id_val, &can_seek, &initial_offset, &fd_list, res, &error))
     {
-      g_simple_async_result_take_error (orig_result, error);
+      _g_simple_async_result_take_error_stripped (orig_result, error);
       goto out;
     }
 
@@ -3394,7 +3403,7 @@ enumerate_children_async_cb (GVfsDBusMount *proxy,
   
   if (! gvfs_dbus_mount_call_enumerate_finish (proxy, res, &error))
     {
-      g_simple_async_result_take_error (orig_result, error);
+      _g_simple_async_result_take_error_stripped (orig_result, error);
       goto out;
     }
   
@@ -3507,12 +3516,13 @@ find_enclosing_mount_cb (GMountInfo *mount_info,
 
   if (data->cancellable && g_cancellable_set_error_if_cancelled (data->cancellable, &my_error))
     {
-      g_simple_async_result_set_from_error (data->result, my_error);
+      _g_simple_async_result_take_error_stripped (data->result, my_error);
       goto out;
     }
 
   if (error)
     {
+      g_dbus_error_strip_remote_error (error);
       g_simple_async_result_set_from_error (data->result, error);
       goto out;
     }
@@ -3545,7 +3555,6 @@ find_enclosing_mount_cb (GMountInfo *mount_info,
 out:
   _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
 
-  g_clear_error (&my_error);
   g_clear_object (&data->cancellable);
   g_object_unref (data->file);
   g_object_unref (data->result);
@@ -3664,7 +3673,7 @@ set_display_name_async_cb (GVfsDBusMount *proxy,
 
   if (! gvfs_dbus_mount_call_set_display_name_finish (proxy, &new_path, res, &error))
     {
-      g_simple_async_result_take_error (orig_result, error);
+      _g_simple_async_result_take_error_stripped (orig_result, error);
       goto out;
     }
 

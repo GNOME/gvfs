@@ -209,7 +209,7 @@ unmount_reply (GVfsDBusMount *proxy,
 
   if (! gvfs_dbus_mount_call_unmount_finish (proxy, res, &error))
     {
-      g_simple_async_result_take_error (data->result, error);      
+      _g_simple_async_result_take_error_stripped (data->result, error);
     }
   
   _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
@@ -231,7 +231,7 @@ async_proxy_new_cb (GObject *source_object,
   g_print ("gdaemonmount.c: async_proxy_new_cb, proxy = %p\n", proxy);
   if (proxy == NULL)
     {
-      g_simple_async_result_take_error (data->result, error);      
+      _g_simple_async_result_take_error_stripped (data->result, error);
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_proxy_create_free (data);
       return;
@@ -281,7 +281,7 @@ bus_get_cb (GObject *source_object,
   
   if (connection == NULL)
     {
-      g_simple_async_result_set_from_error (data->result, error);
+      _g_simple_async_result_take_error_stripped (data->result, error);
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_proxy_create_free (data);
       return;

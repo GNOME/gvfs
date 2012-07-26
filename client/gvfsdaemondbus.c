@@ -753,3 +753,18 @@ _g_simple_async_result_complete_with_cancellable (GSimpleAsyncResult *result,
   g_simple_async_result_complete (result);
 }
 
+void
+_g_propagate_error_stripped (GError **dest, GError *src)
+{
+  g_propagate_error (dest, src);
+  if (dest && *dest)
+    g_dbus_error_strip_remote_error (*dest);
+}
+
+void
+_g_simple_async_result_take_error_stripped (GSimpleAsyncResult *simple,
+                                            GError *error)
+{
+  g_dbus_error_strip_remote_error (error);
+  g_simple_async_result_take_error (simple, error);
+}
