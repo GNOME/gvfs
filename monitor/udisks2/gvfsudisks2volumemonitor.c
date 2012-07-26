@@ -898,9 +898,26 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
   loop = udisks_client_get_loop_for_block (monitor->client, block);
   if (loop != NULL)
     {
-      guint setup_by_uid = udisks_loop_get_setup_by_uid (loop);
+      GDBusObject *loop_object;
+      UDisksBlock *block_for_loop;
+      guint setup_by_uid;
+
+      setup_by_uid = udisks_loop_get_setup_by_uid (loop);
       g_object_unref (loop);
       if (setup_by_uid != 0 && setup_by_uid != getuid ())
+        goto out;
+
+      /* Work-around bug in Linux where partitions of a loop
+       * device (e.g. /dev/loop0p1) are lingering even when the
+       * parent loop device (e.g. /dev/loop0) has been cleared
+       */
+      loop_object = g_dbus_interface_get_object (G_DBUS_INTERFACE (loop));
+      if (loop_object == NULL)
+        goto out;
+      block_for_loop = udisks_object_peek_block (UDISKS_OBJECT (loop_object));
+      if (block_for_loop == NULL)
+        goto out;
+      if (udisks_block_get_size (block_for_loop) == 0)
         goto out;
     }
 # endif
