@@ -818,7 +818,7 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
   UDisksFilesystem *filesystem;
   UDisksDrive *udisks_drive = NULL;
   const gchar* const *mount_points;
-  UDisksLoop *loop;
+  UDisksLoop *loop = NULL;
 
   /* Block:Ignore trumps everything */
   if (udisks_block_get_hint_ignore (block))
@@ -903,7 +903,6 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
       guint setup_by_uid;
 
       setup_by_uid = udisks_loop_get_setup_by_uid (loop);
-      g_object_unref (loop);
       if (setup_by_uid != 0 && setup_by_uid != getuid ())
         goto out;
 
@@ -928,6 +927,7 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
 
  out:
   g_clear_object (&udisks_drive);
+  g_clear_object (&loop);
   return ret;
 }
 
