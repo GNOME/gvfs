@@ -873,7 +873,7 @@ async_get_mount_info_response (GVfsDBusMountTracker *proxy,
                                                           res, 
                                                           &error))
     {
-      g_warning ("Error from org.gtk.vfs.MountTracker.lookupMount(): %s", error->message);
+      /* g_warning ("Error from org.gtk.vfs.MountTracker.lookupMount(): %s", error->message); */
       data->callback (NULL, data->user_data, error);
       g_error_free (error);
     }
