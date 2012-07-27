@@ -204,6 +204,13 @@ subscribe_proxy_created_cb (GVfsDBusMonitor *proxy,
 {
   AsyncProxyCreate *data = user_data;
 
+  if (proxy == NULL)
+    {
+      /* TODO: report an error? */
+      async_proxy_create_free (data);
+      return;
+    }
+  
   gvfs_dbus_monitor_call_subscribe (proxy,
                                     data->monitor->object_path,
                                     NULL,
@@ -226,14 +233,12 @@ async_proxy_new_cb (GObject *source_object,
   g_print ("gdaemonfilemonitor.c: async_proxy_new_cb, proxy = %p\n", proxy);
   if (proxy == NULL)
     {
-      g_printerr ("Error creating proxy: %s (%s, %d)\n",
+      g_printerr ("Error creating monitor proxy: %s (%s, %d)\n",
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
-      async_proxy_create_free (data);
-      return;
     }
   
-  data->cb(proxy, data);
+  data->cb (proxy, data);
 }
 
 static void
@@ -244,6 +249,14 @@ async_got_connection_cb (GDBusConnection *connection,
   AsyncProxyCreate *data = callback_data;
   
   g_print ("gdaemonfilemonitor.c: async_got_connection_cb, connection = %p\n", connection);
+
+  if (! connection)
+    {
+      g_printerr ("Error getting connection for monitoring: %s (%s, %d)\n",
+                   io_error->message, g_quark_to_string (io_error->domain), io_error->code);
+      data->cb (NULL, data);
+      return;
+    }
 
   data->connection = g_object_ref (connection);
   gvfs_dbus_monitor_proxy_new (connection,
@@ -303,6 +316,13 @@ unsubscribe_proxy_created_cb (GVfsDBusMonitor *proxy,
 {
   AsyncProxyCreate *data = user_data;
 
+  if (proxy == NULL)
+    {
+      /* Let's assume the target backend is gone already and there's nothing to cancel */
+      async_proxy_create_free (data);
+      return;
+    }
+  
   gvfs_dbus_monitor_call_unsubscribe (proxy,
                                       data->monitor->object_path,
                                       NULL,
@@ -317,6 +337,8 @@ g_daemon_file_monitor_cancel (GFileMonitor* monitor)
 {
   GDaemonFileMonitor *daemon_monitor = G_DAEMON_FILE_MONITOR (monitor);
   AsyncProxyCreate *data;
+  
+  g_print ("g_daemon_file_monitor_cancel\n");
   
   data = g_new0 (AsyncProxyCreate, 1);
   data->monitor = g_object_ref (daemon_monitor);
