@@ -2022,6 +2022,7 @@ mount_reply (GVfsDBusMountTracker *proxy,
     }
 
   _g_simple_async_result_complete_with_cancellable (ares, data->cancellable);
+  g_object_unref (ares);
 
   free_mount_data (data);
 }
@@ -2051,6 +2052,7 @@ mount_enclosing_volume_proxy_cb (GObject *source_object,
                                                    data->user_data,
                                                    error);
       _g_simple_async_result_complete_with_cancellable (ares, data->cancellable);
+      g_object_unref (ares);
       free_mount_data (data);
       return;
     }
