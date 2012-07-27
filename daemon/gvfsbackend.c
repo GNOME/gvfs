@@ -642,6 +642,7 @@ register_mount_got_proxy_cb (GObject *source_object,
   g_print ("register_mount_got_proxy_cb, proxy = %p\n", proxy);
   if (proxy == NULL)
     {
+      g_dbus_error_strip_remote_error (error);
       result = g_simple_async_result_new_take_error (source_object,
                                                      data->callback, data->callback_data,
                                                      error);
@@ -716,6 +717,7 @@ unregister_mount_got_proxy_cb (GObject *source_object,
   g_print ("unregister_mount_got_proxy_cb, proxy = %p\n", proxy);
   if (proxy == NULL)
     {
+      g_dbus_error_strip_remote_error (error);
       result = g_simple_async_result_new_take_error (source_object,
                                                      data->callback, data->callback_data,
                                                      error);

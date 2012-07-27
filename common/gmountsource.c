@@ -234,6 +234,7 @@ ask_password_reply (GVfsDBusMountOperation *proxy,
                                                            &error))
     {
       data->aborted = TRUE;
+      g_dbus_error_strip_remote_error (error);
       g_simple_async_result_take_error (result, error);
     }
   else
@@ -544,6 +545,7 @@ ask_question_reply (GVfsDBusMountOperation *proxy,
                                                            &error))
     {
       data->aborted = TRUE;
+      g_dbus_error_strip_remote_error (error);
       g_simple_async_result_take_error (result, error);
     }
   else
@@ -750,6 +752,7 @@ show_processes_reply (GVfsDBusMountOperation *proxy,
                                                              &error))
     {
       data->aborted = TRUE;
+      g_dbus_error_strip_remote_error (error);
       g_simple_async_result_take_error (result, error);
     }
   else
