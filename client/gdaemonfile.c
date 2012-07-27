@@ -1148,8 +1148,7 @@ g_daemon_file_read (GFile *file,
   gboolean can_seek;
   GUnixFDList *fd_list;
   int fd;
-  GVariant *fd_id_val;
-  guint fd_id;
+  GVariant *fd_id_val = NULL;
   guint32 pid;
   GError *local_error = NULL;
 
@@ -1173,9 +1172,6 @@ g_daemon_file_read (GFile *file,
   
   g_print ("g_daemon_file_read: done, res = %d\n", res);
 
-  fd_id = g_variant_get_handle (fd_id_val);
-  g_variant_unref (fd_id_val);
-
   if (! res)
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
@@ -1188,15 +1184,17 @@ g_daemon_file_read (GFile *file,
 
   if (! res)
     return NULL;
-  
-  if (fd_list == NULL || g_unix_fd_list_get_length (fd_list) != 1 ||
-      (fd = g_unix_fd_list_get (fd_list, fd_id, NULL)) == -1)
+
+  if (fd_list == NULL || fd_id_val == NULL ||
+      g_unix_fd_list_get_length (fd_list) != 1 ||
+      (fd = g_unix_fd_list_get (fd_list, g_variant_get_handle (fd_id_val), NULL)) == -1)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			   _("Didn't get stream file descriptor"));
       return NULL;
     }
 
+  g_variant_unref (fd_id_val);
   g_object_unref (fd_list);
   
   return g_daemon_file_input_stream_new (fd, can_seek);
@@ -1217,8 +1215,7 @@ file_open_write (GFile *file,
   gboolean can_seek;
   GUnixFDList *fd_list;
   int fd;
-  GVariant *fd_id_val;
-  guint32 fd_id;
+  GVariant *fd_id_val = NULL;
   guint32 pid;
   guint64 initial_offset;
   GError *local_error = NULL;
@@ -1249,9 +1246,6 @@ file_open_write (GFile *file,
   
   g_print ("file_open_write: done, res = %d\n", res);
 
-  fd_id = g_variant_get_handle (fd_id_val);
-  g_variant_unref (fd_id_val);
-
   if (! res)
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
@@ -1265,14 +1259,16 @@ file_open_write (GFile *file,
   if (! res)
     return NULL;
   
-  if (fd_list == NULL || g_unix_fd_list_get_length (fd_list) != 1 ||
-      (fd = g_unix_fd_list_get (fd_list, 0, NULL)) == -1)
+  if (fd_list == NULL || fd_id_val == NULL ||
+      g_unix_fd_list_get_length (fd_list) != 1 ||
+      (fd = g_unix_fd_list_get (fd_list, g_variant_get_handle (fd_id_val), NULL)) == -1)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                            _("Didn't get stream file descriptor"));
       return NULL;
     }
 
+  g_variant_unref (fd_id_val);
   g_object_unref (fd_list);
   
   return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);

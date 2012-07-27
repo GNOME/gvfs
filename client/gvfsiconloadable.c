@@ -93,8 +93,7 @@ g_vfs_icon_load (GLoadableIcon  *icon,
   gboolean can_seek;
   GUnixFDList *fd_list;
   int fd;
-  GVariant *fd_id_val;
-  guint32 fd_id;
+  GVariant *fd_id_val = NULL;
   GError *local_error = NULL;
 
   g_print ("gvfsiconloadable.c: g_vfs_icon_load\n");
@@ -114,9 +113,6 @@ g_vfs_icon_load (GLoadableIcon  *icon,
   
   g_print ("gvfsiconloadable.c: g_vfs_icon_load: done, res = %d\n", res);
   
-  fd_id = g_variant_get_handle (fd_id_val);
-  g_variant_unref (fd_id_val);
-
   if (! res)
     {
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
@@ -129,14 +125,16 @@ g_vfs_icon_load (GLoadableIcon  *icon,
   if (! res)
     return NULL;
   
-  if (fd_list == NULL || g_unix_fd_list_get_length (fd_list) != 1 ||
-      (fd = g_unix_fd_list_get (fd_list, 0, NULL)) == -1)
+  if (fd_list == NULL || fd_id_val == NULL ||
+      g_unix_fd_list_get_length (fd_list) != 1 ||
+      (fd = g_unix_fd_list_get (fd_list, g_variant_get_handle (fd_id_val), NULL)) == -1)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                            _("Didn't get stream file descriptor"));
       return NULL;
     }
 
+  g_variant_unref (fd_id_val);
   g_object_unref (fd_list);
   
   return G_INPUT_STREAM (g_daemon_file_input_stream_new (fd, can_seek));
