@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2012-01-22 18:43+0000\n"
-"PO-Revision-Date: 2012-07-22 22:01+0200\n"
+"PO-Revision-Date: 2012-07-29 17:43+0200\n"
 "Last-Translator: Åsmund Skjæveland <aasmunds@ulrik.uio.no>\n"
 "Language-Team: Norwegian Nynorsk <i18n-no@lister.ping.uio.no>\n"
 "MIME-Version: 1.0\n"
@@ -67,7 +67,7 @@ msgstr "Ugyldig filnamn %s"
 #, c-format
 #| msgid "Error deleting file: %s"
 msgid "Error setting file metadata: %s"
-msgstr ""
+msgstr "Klarte ikkje setja metadata for fil: %s"
 
 #: ../client/gdaemonfile.c:2257 ../client/gdaemonvfs.c:1387
 msgid "values must be string or list of strings"
@@ -439,7 +439,7 @@ msgstr "Målfila finst frå før"
 #: ../daemon/gvfsafpvolume.c:833 ../daemon/gvfsafpvolume.c:1023
 #| msgid "File doesn't exist"
 msgid "Ancestor directory doesn't exist"
-msgstr ""
+msgstr "Mappe høgare oppe finst ikkje"
 
 #: ../daemon/gvfsafpvolume.c:1019
 msgid "Volume is flat and doesn't support directories"
@@ -1110,34 +1110,34 @@ msgstr "Nettverk"
 
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendftp.c:488
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter password for ftp on %s"
 msgid "Enter password for FTP as %s on %s"
-msgstr "Skriv inn passord for ftp på %s"
+msgstr "Skriv inn FTP-passord for %s på %s"
 
 #. translators: %s here is the hostname
 #: ../daemon/gvfsbackendftp.c:491
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter password for ftp on %s"
 msgid "Enter password for FTP on %s"
-msgstr "Skriv inn passord for ftp på %s"
+msgstr "Skriv inn FTP-passord på %s"
 
 #: ../daemon/gvfsbackendftp.c:630
-#, fuzzy, c-format
+#, c-format
 #| msgid "/ on %s"
 msgid "FTP on %s"
-msgstr "/ på %s"
+msgstr "FTP på %s"
 
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendftp.c:634
-#, fuzzy, c-format
+#, c-format
 #| msgid "ftp as %s on %s"
 msgid "FTP as %s on %s"
-msgstr "ftp som %s på %s"
+msgstr "FTP som %s på %s"
 
 #: ../daemon/gvfsbackendftp.c:727
 msgid "Insufficient permissions"
-msgstr ""
+msgstr "Ikkje tilstrekkeleg tilgang"
 
 #: ../daemon/gvfsbackendftp.c:981 ../daemon/gvfsbackendftp.c:1335
 #: ../daemon/gvfsbackendsftp.c:3274
@@ -1145,28 +1145,28 @@ msgid "backups not supported yet"
 msgstr "tryggleikskopiar er ikkje støtta enno"
 
 #: ../daemon/gvfsbackendgphoto2.c:506
-#, fuzzy, c-format
+#, c-format
 #| msgid "%s: %s: error opening file: %s\n"
 msgid "%s: %d: Directory or file exists"
-msgstr "%s: %s feil ved opning av fil: %s\n"
+msgstr "%s: %d: Mappa eller fila finst"
 
 #: ../daemon/gvfsbackendgphoto2.c:513
-#, fuzzy, c-format
+#, c-format
 #| msgid "No such file or directory"
 msgid "%s: %d: No such file or directory"
-msgstr "Fila eller mappa finst ikkje"
+msgstr "%s: %d: Fila eller mappa finst ikkje"
 
 #: ../daemon/gvfsbackendgphoto2.c:519
-#, fuzzy, c-format
+#, c-format
 #| msgid "Invalid filename"
 msgid "%s: %d: Invalid filename"
-msgstr "Ugyldig filnamn"
+msgstr "%s: %d: Ugyldig filnamn"
 
 #: ../daemon/gvfsbackendgphoto2.c:525
-#, fuzzy, c-format
+#, c-format
 #| msgid "Not supported"
 msgid "%s: %d: Not Supported"
-msgstr "Ikkje støtta"
+msgstr "%s: %d: Ikkje støtta"
 
 #. Translator: %s represents the device, e.g. usb:001,042
 #: ../daemon/gvfsbackendgphoto2.c:716 ../daemon/gvfsbackendgphoto2.c:722
@@ -1200,40 +1200,38 @@ msgid "Audio Player"
 msgstr "Lydspelar"
 
 #: ../daemon/gvfsbackendgphoto2.c:1565
-#, fuzzy
 #| msgid "No drive specified"
 msgid "No device specified"
-msgstr "Inga stasjon oppgjeven"
+msgstr "Inga eining oppgjeven"
 
 #: ../daemon/gvfsbackendgphoto2.c:1586
 msgid "Cannot create gphoto2 context"
-msgstr ""
+msgstr "Klarte ikkje laga gphoto2-kontekst"
 
 #: ../daemon/gvfsbackendgphoto2.c:1596
-#, fuzzy
 #| msgid "Error creating socket: %s"
 msgid "Error creating camera"
-msgstr "Feil ved oppretting av plugg: %s"
+msgstr "Klarte ikkje oppretta kamera"
 
 #: ../daemon/gvfsbackendgphoto2.c:1609 ../daemon/gvfsbackendgphoto2.c:1619
 msgid "Error loading device information"
-msgstr ""
+msgstr "Klarte ikkje lasta informasjon om eininga"
 
 #: ../daemon/gvfsbackendgphoto2.c:1631
 msgid "Error looking up device information"
-msgstr ""
+msgstr "Klarte ikkje slå opp informasjon om eininga"
 
 #: ../daemon/gvfsbackendgphoto2.c:1641
 msgid "Error getting device information"
-msgstr ""
+msgstr "Klarte ikkje henta informasjon om eininga"
 
 #: ../daemon/gvfsbackendgphoto2.c:1654
 msgid "Error setting up camera communications port"
-msgstr ""
+msgstr "Klarte ikkje setja opp kamerakommunikasjonsport"
 
 #: ../daemon/gvfsbackendgphoto2.c:1665
 msgid "Error initializing camera"
-msgstr ""
+msgstr "Klarte ikkje starta kamera"
 
 #. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
 #. backend and shouldn't be translated.
@@ -1243,39 +1241,35 @@ msgid "gphoto2 mount on %s"
 msgstr "gphoto2 montert på %s"
 
 #: ../daemon/gvfsbackendgphoto2.c:1762
-#, fuzzy
 #| msgid "No hostname specified"
 msgid "No camera specified"
-msgstr "Inga vertsnamn oppgjeven"
+msgstr "Ikkje noko kamera vald"
 
 #: ../daemon/gvfsbackendgphoto2.c:1824
-#, fuzzy
 #| msgid "Error creating backup file: %s"
 msgid "Error creating file object"
-msgstr "Feil under oppretting av sikkerhetskopi: %s"
+msgstr "Klarte ikkje laga filobjekt"
 
 #: ../daemon/gvfsbackendgphoto2.c:1839
-#, fuzzy
 #| msgid "Error deleting file: %s"
 msgid "Error getting file"
-msgstr "Feil under sletting av fil: %s"
+msgstr "Klarte ikkje henta fil"
 
 #: ../daemon/gvfsbackendgphoto2.c:1849
-#, fuzzy
 #| msgid "Error removing target file: %s"
 msgid "Error getting data from file"
-msgstr "Feil under fjerning av målfil: %s"
+msgstr "Klarte ikkje henta data frå fil"
 
 #: ../daemon/gvfsbackendgphoto2.c:1907
 #, c-format
 msgid "Malformed icon identifier '%s'"
-msgstr ""
+msgstr "Misforma ikonidentifikasjon «%s»"
 
 #: ../daemon/gvfsbackendgphoto2.c:1983 ../daemon/gvfsbackendgphoto2.c:3172
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error seeking in stream on drive %s"
 msgid "Error seeking in stream on camera %s"
-msgstr "Feil ved søking i straum på stasjon %s"
+msgstr "Feil ved søking i straum på kamera %s"
 
 #: ../daemon/gvfsbackendgphoto2.c:2123 ../daemon/gvfsbackendsftp.c:2952
 #: ../daemon/gvfsbackendsmbbrowse.c:1399
@@ -1283,110 +1277,98 @@ msgid "Not a directory"
 msgstr "Ikkje ei mappe"
 
 #: ../daemon/gvfsbackendgphoto2.c:2156
-#, fuzzy
 #| msgid "File doesn't exist"
 msgid "Failed to get folder list"
-msgstr "Fila eksisterer ikkje"
+msgstr "Klarte ikkje henta mappelista"
 
 #: ../daemon/gvfsbackendgphoto2.c:2222
-#, fuzzy
 #| msgid "Target file exists"
 msgid "Failed to get file list"
-msgstr "Målfila eksisterer"
+msgstr "Klarte ikkje henta fillista"
 
 #: ../daemon/gvfsbackendgphoto2.c:2514
-#, fuzzy
 #| msgid "Error creating socket: %s"
 msgid "Error creating directory"
-msgstr "Feil ved oppretting av plugg: %s"
+msgstr "Klarte ikkje laga mappe"
 
 #: ../daemon/gvfsbackendgphoto2.c:2723
-#, fuzzy
 #| msgid "Target file already exists"
 msgid "Name already exists"
-msgstr "Målfila eksisterer allereie"
+msgstr "Namnet finst frå før"
 
 #: ../daemon/gvfsbackendgphoto2.c:2734 ../daemon/gvfsbackendgphoto2.c:3363
-#, fuzzy
 #| msgid "filename too long"
 msgid "New name too long"
-msgstr "for langt filnamn"
+msgstr "Nytt namn for langt"
 
 #: ../daemon/gvfsbackendgphoto2.c:2744 ../daemon/gvfsbackendgphoto2.c:3374
-#, fuzzy
 #| msgid "Not a directory"
 msgid "Error renaming directory"
-msgstr "Ikkje ei mappe"
+msgstr "Klarte ikkje endra namn på mappe"
 
 #: ../daemon/gvfsbackendgphoto2.c:2757 ../daemon/gvfsbackendgphoto2.c:3387
-#, fuzzy
 #| msgid "Error moving file: %s"
 msgid "Error renaming file"
-msgstr "Feil under flytting av fil: %s"
+msgstr "Klarte ikkje endra namn på fil"
 
 #: ../daemon/gvfsbackendgphoto2.c:2821
-#, fuzzy, c-format
+#, c-format
 #| msgid "Directory not empty"
 msgid "Directory '%s' is not empty"
-msgstr "Mappa er ikkje tom"
+msgstr "Mappa «%s» er ikkje tom"
 
 #: ../daemon/gvfsbackendgphoto2.c:2832
-#, fuzzy
 #| msgid "Error deleting file: %s"
 msgid "Error deleting directory"
-msgstr "Feil under sletting av fil: %s"
+msgstr "Klarte ikkje sletta mappe"
 
 #: ../daemon/gvfsbackendgphoto2.c:2858
-#, fuzzy
 #| msgid "Error deleting file: %s"
 msgid "Error deleting file"
-msgstr "Feil under sletting av fil: %s"
+msgstr "Klarte ikkje sletta fil"
 
 #: ../daemon/gvfsbackendgphoto2.c:2911
-#, fuzzy
 #| msgid "Can't open directory"
 msgid "Can't write to directory"
-msgstr "Kan ikkje opna mappe"
+msgstr "Klarte ikkje skriva til mappe"
 
 #: ../daemon/gvfsbackendgphoto2.c:2958
 msgid "Cannot allocate new file to append to"
-msgstr ""
+msgstr "Klarte ikkje allokera ny fil å leggja til i"
 
 #: ../daemon/gvfsbackendgphoto2.c:2973
 msgid "Cannot read file to append to"
-msgstr ""
+msgstr "Klarte ikkje lesa fil å leggja til i"
 
 #: ../daemon/gvfsbackendgphoto2.c:2984
 msgid "Cannot get data of file to append to"
-msgstr ""
+msgstr "Klarte ikkje henta data frå fil å leggja til i"
 
 #: ../daemon/gvfsbackendgphoto2.c:3271
-#, fuzzy
 #| msgid "Error deleting file: %s"
 msgid "Error writing file"
-msgstr "Feil under sletting av fil: %s"
+msgstr "Klarte ikkje skriva fil"
 
 #: ../daemon/gvfsbackendgphoto2.c:3319
-#, fuzzy
 #| msgid "Not a directory"
 msgid "Not supported (not same directory)"
-msgstr "Ikkje ei mappe"
+msgstr "Ikkje støtta (ikkje same mappa)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3331
 msgid ""
 "Not supported (the source is a directory, the destination is a directory too)"
-msgstr ""
+msgstr "Ikkje støtta (både kjelde og mål er mapper)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3339
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
-msgstr ""
+msgstr "Ikkje støtta (kjelda er ei mappe, målet er ei fil som finst frå før)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3351
 msgid ""
 "Not supported (the source is a file, but the destination is a directory)"
-msgstr ""
+msgstr "Ikkje støtta (kjelda er ei fil, men målet er ei mappe)"
 
 #: ../daemon/gvfsbackendhttp.c:251
 #, c-format
@@ -1422,15 +1404,15 @@ msgstr "%s på %s"
 
 #: ../daemon/gvfsbackendobexftp.c:891
 msgid "USB support missing. Please contact your software vendor"
-msgstr ""
+msgstr "USB-støtte manglar. Kontakt programvareleveandøren din"
 
 #: ../daemon/gvfsbackendobexftp.c:1010
 msgid "Connection to the device lost"
-msgstr ""
+msgstr "Mista tilkoplinga til eininga"
 
 #: ../daemon/gvfsbackendobexftp.c:1507
 msgid "Device requires a software update"
-msgstr ""
+msgstr "Eininga krev ei programvareoppdatering"
 
 #: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1973
 #, c-format
@@ -1472,31 +1454,31 @@ msgstr "Tidsavbrot ved innlogging"
 
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendsftp.c:958
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter passphrase for key"
 msgid "Enter passphrase for key for ssh as %s on %s"
-msgstr "Oppgi passord for nøkkel"
+msgstr "Oppgje passfrase for ssh-nøkkel til %s på %s"
 
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendsftp.c:961
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter password for ftp on %s"
 msgid "Enter password for ssh as %s on %s"
-msgstr "Skriv inn passord for ftp på %s"
+msgstr "Oppgje ssh-passord til %s på %s"
 
 #. Translators: %s is the hostname
 #: ../daemon/gvfsbackendsftp.c:965
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter passphrase for key"
 msgid "Enter passphrase for key for ssh on %s"
-msgstr "Oppgi passord for nøkkel"
+msgstr "Oppgje passfrase for ssh-nøkkel på %s"
 
 #. Translators: %s is the hostname
 #: ../daemon/gvfsbackendsftp.c:968
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter password for ftp on %s"
 msgid "Enter password for ssh on %s"
-msgstr "Skriv inn passord for ftp på %s"
+msgstr "Oppgje ssh-passord på %s"
 
 #: ../daemon/gvfsbackendsftp.c:1048
 msgid "Can't send password"
@@ -1540,21 +1522,21 @@ msgstr "Feil i protokoll"
 
 #. Translators: This is the name of an SFTP share, like "SFTP for <user> on <hostname>"
 #: ../daemon/gvfsbackendsftp.c:1691
-#, fuzzy, c-format
+#, c-format
 #| msgid "%s on %s"
 msgid "SFTP for %s on %s"
-msgstr "%s på %s"
+msgstr "SFTP for %s på %s"
 
 #. Translators: This is the name of an SFTP share, like "SFTP on <hostname>"
 #: ../daemon/gvfsbackendsftp.c:1694
-#, fuzzy, c-format
+#, c-format
 #| msgid "/ on %s"
 msgid "SFTP on %s"
-msgstr "/ på %s"
+msgstr "SFTP på %s"
 
 #: ../daemon/gvfsbackendsftp.c:1735
 msgid "Unable to find supported ssh command"
-msgstr "Kan ikkje finna støtta ssh-kommando"
+msgstr "Klarte finna støtta ssh-kommando"
 
 #: ../daemon/gvfsbackendsftp.c:2009 ../daemon/gvfsbackendsftp.c:2398
 #: ../daemon/gvfsbackendsftp.c:2477 ../daemon/gvfsbackendsftp.c:2488
@@ -1574,7 +1556,7 @@ msgstr "Kan ikkje finna støtta ssh-kommando"
 #: ../daemon/gvfsbackendsftp.c:4506 ../daemon/gvfsbackendsftp.c:4521
 #: ../daemon/gvfsbackendsftp.c:4536 ../daemon/gvfsbackendsftp.c:4614
 msgid "Invalid reply received"
-msgstr "Ugyldig svar motteken"
+msgstr "Ugyldig svar motteke"
 
 #: ../daemon/gvfsbackendsftp.c:2257 ../daemon/gvfsbackendsmb.c:1440
 #: ../daemon/gvfsdaemonutils.c:211
@@ -1588,7 +1570,7 @@ msgstr "Feil"
 #: ../daemon/gvfsbackendsftp.c:2450
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
-msgstr ""
+msgstr "Ugyldig icon_id '%s' i OpenIconForRead"
 
 #: ../daemon/gvfsbackendsftp.c:2746
 #, c-format
@@ -1601,10 +1583,10 @@ msgstr "Kan ikkje oppretta mellombels fil"
 
 #. translators: %s is a server name
 #: ../daemon/gvfsbackendsmbbrowse.c:375
-#, fuzzy, c-format
+#, c-format
 #| msgid "Password required for share %s on %s"
 msgid "Password required for %s"
-msgstr "Passord kreves for delt ressurs %s på %s"
+msgstr "Passord trengst for %s"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
@@ -1616,7 +1598,7 @@ msgstr "Delt Windows-ressurs på %s"
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmbbrowse.c:1001
 msgid "Failed to retrieve share list from server"
-msgstr ""
+msgstr "Klarte ikkje å henta liste over delte ressursar frå tenaren"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1157
 msgid "Not a regular file"
@@ -1653,16 +1635,14 @@ msgid "Backup file creation failed: %s"
 msgstr "Oppretting av tryggleikskopi mislukkast: %s"
 
 #: ../daemon/gvfsbackendsmb.c:1734
-#, fuzzy
 #| msgid "Invalid attribute info list content"
 msgid "Invalid attribute type (uint64 expected)"
-msgstr "Ugyldig listeinnhald for attributtinformasjon"
+msgstr "Ugyldig attributtype (venta uint64)"
 
 #: ../daemon/gvfsbackendsmb.c:1922
-#, fuzzy
 #| msgid "Target file already exists"
 msgid "Can't rename file, filename already exists"
-msgstr "Målfila eksisterer allereie"
+msgstr "Kan ikkje byta namn på fila. Målfila finst frå før"
 
 #: ../daemon/gvfsbackendsmb.c:2047
 #, c-format
@@ -1684,11 +1664,11 @@ msgstr "Filsystemteneste for delte Windows-ressurser"
 
 #: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
 msgid "The trash folder may not be deleted"
-msgstr ""
+msgstr "Papirkorgmappa kan ikkje slettast"
 
 #: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
 msgid "Items in the trash may not be modified"
-msgstr ""
+msgstr "Ting i papirkorga kan ikkje endrast"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
@@ -1698,19 +1678,18 @@ msgstr "Papirkorg"
 
 #: ../daemon/gvfsdaemon.c:1057
 msgid "Invalid backend type"
-msgstr "Ugyldige type-motor"
+msgstr "Ugyldig type-motor"
 
 #: ../daemon/gvfsdaemonutils.c:104
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error sending fd: %s"
 msgid "Error sending file descriptor: %s"
-msgstr "Feil ved sending av fd: %s"
+msgstr "Feil ved sending av fildeskriptor: %s"
 
 #: ../daemon/gvfsftpconnection.c:180
-#, fuzzy
 #| msgid "Unexpected reply from server"
 msgid "Unexpected end of stream"
-msgstr "Uventet svar frå tenar"
+msgstr "Uventa slutt på straum"
 
 #: ../daemon/gvfsftpconnection.c:196 ../daemon/gvfsftpconnection.c:209
 #: ../daemon/gvfsftptask.c:411 ../daemon/gvfsftptask.c:839
@@ -1718,24 +1697,25 @@ msgid "Invalid reply"
 msgstr "Ugyldig svar"
 
 #: ../daemon/gvfsftpconnection.c:392
-#, fuzzy
 #| msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
-msgstr "Kan ikkje opna datasamband. Kanskje ein brannmur forhindrer dette?"
+msgstr ""
+"Klarte ikkje opna tilkopling for aktiv FTP. Kanskje ruteren din ikkje støttar "
+"dette?"
 
 #: ../daemon/gvfsftpconnection.c:399
 msgid "Failed to create active FTP connection."
-msgstr ""
+msgstr "Klarte ikkje opna tilkopling for aktiv FTP."
 
 #: ../daemon/gvfsftpfile.c:170
 msgid "Filename contains invalid characters."
-msgstr ""
+msgstr "Filnamnet inneheld ugyldige teikn."
 
 #: ../daemon/gvfsftptask.c:261
 msgid "The FTP server is busy. Try again later"
-msgstr ""
+msgstr "FTP-tenaren er oppteken. Prøv att seinare."
 
 #: ../daemon/gvfsftptask.c:355
 msgid "Accounts are unsupported"
@@ -1762,10 +1742,9 @@ msgid "No space left on server"
 msgstr "Ikkje meir plass på tenar"
 
 #: ../daemon/gvfsftptask.c:395
-#, fuzzy
 #| msgid "Unsupported seek type"
 msgid "Unsupported network protocol"
-msgstr "Søkjetype ikkje støtta"
+msgstr "Ikkje støtta nettverksprotokoll"
 
 #: ../daemon/gvfsftptask.c:403
 msgid "Page type unknown"
@@ -1784,10 +1763,9 @@ msgid "Invalid dbus message"
 msgstr "Ugyldig dbus-melding"
 
 #: ../daemon/gvfsjobunmount.c:156
-#, fuzzy
 #| msgid "Filesystem"
 msgid "Filesystem is busy"
-msgstr "Filsystem"
+msgstr "Filsystemet er oppteke"
 
 #: ../daemon/main.c:45 ../metadata/meta-daemon.c:694
 msgid "Replace old daemon."
@@ -1860,19 +1838,19 @@ msgstr "Klarte ikkje finna metadatafila %s"
 
 #: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
 msgid "Unable to set metadata key"
-msgstr ""
+msgstr "Klarte ikkje setja metadatanøkkel"
 
 #: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:399
 msgid "Unable to unset metadata key"
-msgstr ""
+msgstr "Klarte ikkje nulla metadatanøkkel"
 
 #: ../metadata/meta-daemon.c:428
 msgid "Unable to remove metadata keys"
-msgstr ""
+msgstr "Klarte ikkje fjerna metadatanøklar"
 
 #: ../metadata/meta-daemon.c:459
 msgid "Unable to move metadata keys"
-msgstr ""
+msgstr "Klarte ikkje flytta metadatanøklar"
 
 #: ../metadata/meta-daemon.c:704
 #| msgid "GVFS Daemon"
@@ -1886,7 +1864,7 @@ msgstr "Metadatateneste for GVFS"
 
 #: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
 msgid "GVfs GDU Volume Monitor"
-msgstr ""
+msgstr "GVfs GDU volumovervakar"
 
 #: ../monitor/gdu/ggdudrive.c:168 ../monitor/hal/ghaldrive.c:179
 msgid "Floppy Drive"
@@ -1895,7 +1873,7 @@ msgstr "Diskettstasjon"
 #: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:201
 #, c-format
 msgid "Unnamed Drive (%s)"
-msgstr ""
+msgstr "Stasjon utan namn (%s)"
 
 #: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:203
 #| msgid "Tape Drive"
@@ -1915,23 +1893,26 @@ msgid ""
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
 "to failures. Data on the drive may be irrevocably lost if a component fails."
 msgstr ""
+"Start stasjon i degradert modus?\n"
+"Å starta i degradert modus vil seia at stasjonen ikkje lenger taklar feil. "
+"Data på stasjonen kan gå tapt for alltid dersom ein komponent sviktar."
 
 #: ../monitor/gdu/ggdudrive.c:1023
 msgid "Start Anyway"
-msgstr ""
+msgstr "Start likevel"
 
 #: ../monitor/gdu/ggdumount.c:860 ../monitor/udisks2/gvfsudisks2mount.c:631
 msgid "One or more programs are preventing the unmount operation."
-msgstr ""
+msgstr "Eitt eller fleire program hindrar avmontering."
 
 #: ../monitor/gdu/ggdumount.c:988
 msgid "Cannot get LUKS cleartext slave"
-msgstr ""
+msgstr "Klarte ikkje henta LUKS klartekstslave"
 
 #: ../monitor/gdu/ggdumount.c:1010
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
-msgstr ""
+msgstr "Klarte ikkje henta LUKS klartekstslave frå stien «%s»"
 
 #: ../monitor/gdu/ggduvolume.c:337
 #| msgid "Floppy Drive"
@@ -1944,6 +1925,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data on partition %d."
 msgstr ""
+"Skriv eit passord for å låsa opp volumet\n"
+"Eininga «%s» inneheld krypterte data på partisjon %d."
 
 #: ../monitor/gdu/ggduvolume.c:1104
 #, c-format
@@ -1951,6 +1934,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data."
 msgstr ""
+"Skriv eit passord for å låsa opp volumet\n"
+"Eininga «%s» inneheld krypterte data."
 
 #: ../monitor/gdu/ggduvolume.c:1111
 #: ../monitor/udisks2/gvfsudisks2volume.c:1045
@@ -1959,6 +1944,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device %s contains encrypted data."
 msgstr ""
+"Skriv eit passord for å låsa opp volumet\n"
+"Eininga %s inneheld krypterte data."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
@@ -2283,7 +2270,7 @@ msgstr "%s media"
 #: ../monitor/udisks2/gvfsudisks2utils.c:494
 #, c-format
 msgid "Timed out running command-line `%s'"
-msgstr ""
+msgstr "Tidsavbrot under køyring av kommandolinjeinstruksen «%s»"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2300,24 +2287,24 @@ msgstr "%s kryptert"
 #: ../monitor/udisks2/gvfsudisks2volume.c:256
 #, c-format
 msgid "%s Volume"
-msgstr ""
+msgstr "%s volum"
 
 #. Translators: Name used for volume
 #: ../monitor/udisks2/gvfsudisks2volume.c:408
 msgid "Volume"
-msgstr ""
+msgstr "volum"
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:908
 msgid "The unlocked device does not have a recognizable filesystem on it"
-msgstr ""
+msgstr "Den opplåste eininga har ikkje noko kjent filsystem på seg"
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:1031
 msgid "A passphrase is required to access the volume"
-msgstr ""
+msgstr "Ein passfrase er naudsynt for å låsa opp eininga"
 
 #: ../monitor/udisks2/udisks2volumemonitordaemon.c:40
 msgid "GVfs UDisks2 Volume Monitor"
-msgstr ""
+msgstr "GVfs UDisks2 volumovervakar"
 
 #: ../programs/gvfs-cat.c:37
 #| msgid "%s: missing locations"
@@ -2386,7 +2373,7 @@ msgstr ""
 #: ../programs/gvfs-tree.c:249
 #, c-format
 msgid "Error parsing commandline options: %s\n"
-msgstr ""
+msgstr "Feil under tolking av kommandolinjeval: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -2410,33 +2397,33 @@ msgstr "spør før overskriving"
 
 #: ../programs/gvfs-copy.c:47
 msgid "preserve all attributes"
-msgstr ""
+msgstr "ta vare på alle attributtar"
 
 #: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
 #| msgid "Backup file creation failed"
 msgid "backup existing destination files"
-msgstr ""
+msgstr "ta tryggleikskopi av målfiler som finst frå før"
 
 #: ../programs/gvfs-copy.c:49
 msgid "never follow symbolic links"
-msgstr ""
+msgstr "aldri følg symbolske lenkjer"
 
 #: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
 #, c-format
 msgid "progress"
-msgstr ""
+msgstr "framdrift"
 
 #: ../programs/gvfs-copy.c:115
 msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
-msgstr ""
+msgstr "KJELDE…MÅL – kopier filer frå KJELDE til MÅL"
 
 #: ../programs/gvfs-copy.c:132 ../programs/gvfs-move.c:120
 msgid "Missing operand\n"
-msgstr ""
+msgstr "Manglande operand\n"
 
 #: ../programs/gvfs-copy.c:140 ../programs/gvfs-move.c:128
 msgid "Too many arguments\n"
-msgstr ""
+msgstr "For mange argument\n"
 
 #: ../programs/gvfs-copy.c:149 ../programs/gvfs-move.c:137
 #, c-format
@@ -2457,7 +2444,7 @@ msgstr "Feil under kopiering av fila %s: %s\n"
 
 #: ../programs/gvfs-info.c:37
 msgid "List writable attributes"
-msgstr ""
+msgstr "Rams opp skrivbare attributtar"
 
 #: ../programs/gvfs-info.c:38
 #| msgid "Filesystem"
@@ -2466,12 +2453,12 @@ msgstr "Hent filsysteminformasjon"
 
 #: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
 msgid "The attributes to get"
-msgstr ""
+msgstr "Attributtar å henta"
 
 #: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
 #: ../programs/gvfs-set-attribute.c:37
 msgid "Don't follow symlinks"
-msgstr ""
+msgstr "Ikkje følg symbolske lenkjer"
 
 #: ../programs/gvfs-info.c:50
 #| msgid "Invalid backend type"
@@ -2484,7 +2471,7 @@ msgstr "ukjend"
 
 #: ../programs/gvfs-info.c:56
 msgid "regular"
-msgstr ""
+msgstr "vanleg"
 
 #: ../programs/gvfs-info.c:59
 #| msgid "Not a directory"
@@ -2511,7 +2498,7 @@ msgstr "monterbar"
 #: ../programs/gvfs-info.c:109
 #, c-format
 msgid "attributes:\n"
-msgstr ""
+msgstr "attributtar:\n"
 
 #: ../programs/gvfs-info.c:155
 #, c-format
@@ -2526,12 +2513,12 @@ msgstr ""
 #: ../programs/gvfs-info.c:165
 #, c-format
 msgid "name: %s\n"
-msgstr ""
+msgstr "namn: %s\n"
 
 #: ../programs/gvfs-info.c:172
 #, c-format
 msgid "type: %s\n"
-msgstr ""
+msgstr "type: %s\n"
 
 #: ../programs/gvfs-info.c:178
 #, c-format
@@ -2556,17 +2543,17 @@ msgstr "Følgjer med fila når flytta"
 #, c-format
 #| msgid "Error deleting file: %s"
 msgid "Error getting writable attributes: %s\n"
-msgstr ""
+msgstr "Klarte ikkje henta skrivbare attributtar: %s\n"
 
 #: ../programs/gvfs-info.c:312
 #, c-format
 msgid "Settable attributes:\n"
-msgstr ""
+msgstr "Skrivbare atttributtar:\n"
 
 #: ../programs/gvfs-info.c:335
 #, c-format
 msgid "Writable attribute namespaces:\n"
-msgstr ""
+msgstr "Namnerom for skrivbare attributtar:\n"
 
 #: ../programs/gvfs-info.c:362
 msgid "- show info for <location>"
@@ -2601,25 +2588,25 @@ msgstr "Førespurnadhandsamar for mimetype"
 
 #: ../programs/gvfs-mime.c:37
 msgid "Set handler for mime-type"
-msgstr ""
+msgstr "Vel handsamar for mimetype"
 
 #: ../programs/gvfs-mime.c:76
 msgid "- get/set handler for <mimetype>"
-msgstr ""
+msgstr "– hent/vel handsamar for <mimetype>"
 
 #: ../programs/gvfs-mime.c:85
 msgid "Specify one of --query and --set"
-msgstr ""
+msgstr "Bruk anten --query eller --set"
 
 #: ../programs/gvfs-mime.c:97
 #, c-format
 msgid "Must specify a single mime-type.\n"
-msgstr ""
+msgstr "Må oppgje eksakt ein mimetype.\n"
 
 #: ../programs/gvfs-mime.c:105
 #, c-format
 msgid "Must specify the mime-type followed by the default handler.\n"
-msgstr ""
+msgstr "Må oppgje mimetypen følgt av standard handsamar.\n"
 
 #: ../programs/gvfs-mime.c:121
 #, c-format
@@ -2655,12 +2642,12 @@ msgstr "Ingen tilrådde program\n"
 #: ../programs/gvfs-mime.c:167
 #, c-format
 msgid "Failed to load info for handler '%s'\n"
-msgstr ""
+msgstr "Klarte ikkje lasta informasjon om handsamar «%s»\n"
 
 #: ../programs/gvfs-mime.c:173
 #, c-format
 msgid "Failed to set '%s' as the default handler for '%s': %s\n"
-msgstr ""
+msgstr "Klarte ikkje å velja «%s» som standard handsamar for «%s»: %s\n"
 
 #: ../programs/gvfs-mkdir.c:33
 #| msgid "Can't open directory"
@@ -2706,11 +2693,11 @@ msgstr "List opp"
 
 #: ../programs/gvfs-mount.c:60
 msgid "Show extra information for List and Monitor"
-msgstr ""
+msgstr "Vis ekstra informasjon for Liste og Overvakar"
 
 #: ../programs/gvfs-mount.c:61
 msgid "Monitor events"
-msgstr ""
+msgstr "Overvak hendingar"
 
 #: ../programs/gvfs-mount.c:164 ../programs/gvfs-mount.c:185
 #, c-format
@@ -2744,16 +2731,16 @@ msgstr "Monterte %s på %s\n"
 #: ../programs/gvfs-mount.c:761
 #, c-format
 msgid "No volume for device file %s\n"
-msgstr ""
+msgstr "Ikkje noko volum for einingsfila %s\n"
 
 #: ../programs/gvfs-mount.c:952
 #| msgid "%s: missing locations"
 msgid "- mount <location>"
-msgstr ""
+msgstr "– monter <stad>"
 
 #: ../programs/gvfs-move.c:103
 msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
-msgstr ""
+msgstr "KJELDE…MÅL – flytt filer frå KJELDE til MÅL"
 
 #: ../programs/gvfs-move.c:189
 #, c-format
@@ -2781,7 +2768,7 @@ msgstr "%s: %s: feil under start av program: %s\n"
 
 #: ../programs/gvfs-open.c:123
 msgid "FILES... - open FILES with registered application."
-msgstr "FILER … - opna FILER med registrert program."
+msgstr "FILER … – opna FILER med registrert program."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -2796,21 +2783,21 @@ msgstr ""
 
 #: ../programs/gvfs-rename.c:50
 msgid "- rename file"
-msgstr "- byt namn på fil"
+msgstr "– byt namn på fil"
 
 #: ../programs/gvfs-rename.c:76
 #, c-format
 msgid "Rename successful. New uri: %s\n"
-msgstr ""
+msgstr "Namnet vart endra. Ny URI: %s\n"
 
 #: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
 msgid "ignore nonexistent files, never prompt"
-msgstr ""
+msgstr "oversjå filer som ikkje finst, aldri spør"
 
 #: ../programs/gvfs-rm.c:53
 #| msgid "Error deleting file: %s"
 msgid "- delete files"
-msgstr "- slett filer"
+msgstr "– slett filer"
 
 #: ../programs/gvfs-save.c:43
 msgid "Create backup"
@@ -2818,23 +2805,24 @@ msgstr "Lag tryggleiksskopi"
 
 #: ../programs/gvfs-save.c:44
 msgid "Only create if not existing"
-msgstr ""
+msgstr "Lag berre om ikkje finst frå før"
 
 #: ../programs/gvfs-save.c:45
 msgid "Append to end of file"
-msgstr ""
+msgstr "Legg til på slutten av fila"
 
 #: ../programs/gvfs-save.c:46
 msgid "When creating a file, restrict access to the current user only"
 msgstr ""
+"Når ei fil vert laga skal tilgangen avgrensast til berre den aktive brukaren"
 
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
-msgstr ""
+msgstr "Skriv ny etag på slutten"
 
 #: ../programs/gvfs-save.c:48
 msgid "The etag of the file being overwritten"
-msgstr ""
+msgstr "etag til fila som vert skriven over"
 
 #: ../programs/gvfs-save.c:76
 #, c-format
@@ -2845,7 +2833,7 @@ msgstr "Feil under opning av fil: %s\n"
 #: ../programs/gvfs-save.c:109
 #| msgid "Error creating socket: %s"
 msgid "Error reading stdin"
-msgstr ""
+msgstr "Feil under opning av stdin"
 
 #: ../programs/gvfs-save.c:122
 #, c-format
@@ -2861,51 +2849,53 @@ msgstr "Etag er ikkje tilgjengeleg\n"
 
 #: ../programs/gvfs-save.c:156
 msgid "DEST - read from standard input and save to DEST"
-msgstr ""
+msgstr "MÅL – les frå standard inndata og lagra til MÅL"
 
 #: ../programs/gvfs-set-attribute.c:36
 msgid ""
 "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
 "stringv, unset]"
 msgstr ""
+"attributtype [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv, unset]"
 
 #: ../programs/gvfs-set-attribute.c:119
 msgid " <location> <attribute> <values> - set attribute"
-msgstr ""
+msgstr "<stad> <attributt> <verdiar> – sett attributt"
 
 #: ../programs/gvfs-set-attribute.c:137
 #, c-format
 #| msgid "No mount type specified"
 msgid "Location not specified\n"
-msgstr ""
+msgstr "Stad ikkje oppgjeven\n"
 
 #: ../programs/gvfs-set-attribute.c:145
 #, c-format
 #| msgid "No drive specified"
 msgid "Attribute not specified\n"
-msgstr ""
+msgstr "Attributt ikkje oppgjeven\n"
 
 #: ../programs/gvfs-set-attribute.c:154
 #, c-format
 #| msgid "No hostname specified"
 msgid "Value not specified\n"
-msgstr ""
+msgstr "Verdi ikkje oppgjeven\n"
 
 #: ../programs/gvfs-set-attribute.c:194
 #, c-format
 #| msgid "Invalid attribute info list content"
 msgid "Invalid attribute type %s\n"
-msgstr ""
+msgstr "Ugyldig attributtype %s\n"
 
 #: ../programs/gvfs-set-attribute.c:204
 #, c-format
 #| msgid "Error deleting file: %s"
 msgid "Error setting attribute: %s\n"
-msgstr ""
+msgstr "Feil ved setjing av attributt: %s\n"
 
 #: ../programs/gvfs-trash.c:52
 msgid "- move files to trash"
-msgstr "- flytt filer til papirkorga"
+msgstr "– flytt filer til papirkorga"
 
 #: ../programs/gvfs-trash.c:69
 #, c-format
@@ -2919,7 +2909,7 @@ msgstr "Følg symbolske lenkjer, monteringar og snarvegar som mapper"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
-msgstr "- list opp innhaldet av mapper i eit tre-liknande format"
+msgstr "– list opp innhaldet av mapper i eit tre-liknande format"
 
 #~ msgid "Invalid return value from get_info"
 #~ msgstr "Ugyldig returverdi frå get_info"
