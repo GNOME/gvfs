@@ -688,6 +688,7 @@ file_info_from_file (ComputerFile *file,
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_MOUNTABLE_START_STOP_TYPE, file->start_stop_type);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
 }
