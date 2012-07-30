@@ -39,10 +39,10 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp gvfsd-network
+libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp gvfsd-network gvfsd-mtp
 
-mount_in_files = sftp.mount.in ftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in
-mount_DATA =  sftp.mount ftp.mount trash.mount computer.mount burn.mount localtest.mount network.mount
+mount_in_files = sftp.mount.in ftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in mtp.mount.in
+mount_DATA =  sftp.mount ftp.mount trash.mount computer.mount burn.mount localtest.mount network.mount mtp.mount
 
 mount_in_files +=recent.mount.in
 if USE_GTK
@@ -215,6 +215,18 @@ gvfsd_localtest_CPPFLAGS = \
 	-DBACKEND_TYPES='"localtest", G_VFS_TYPE_BACKEND_LOCALTEST,'
 
 gvfsd_localtest_LDADD = $(libraries)
+
+gvfsd_mtp_SOURCES = \
+	gvfsbackendmtp.c gvfsbackendmtp.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c
+
+gvfsd_mtp_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendmtp.h \
+	-DDEFAULT_BACKEND_TYPE=mtp \
+	-DBACKEND_TYPES='"mtp", G_VFS_TYPE_BACKEND_MTP,'
+
+gvfsd_mtp_LDADD = $(libraries) -lmtp
 
 gvfsd_smb_SOURCES = \
 	gvfsbackendsmb.c gvfsbackendsmb.h libsmb-compat.h \
