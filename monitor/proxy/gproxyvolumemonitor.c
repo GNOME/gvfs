@@ -858,12 +858,8 @@ volume_removed (GVfsRemoteVolumeMonitor *object,
 }
 
 static void
-on_name_owner_appeared (GDBusConnection *connection,
-                        const gchar     *name,
-                        const gchar     *name_owner,
-                        gpointer         user_data)
+name_owner_appeared (GProxyVolumeMonitor *monitor)
 {
-  GProxyVolumeMonitor *monitor = G_PROXY_VOLUME_MONITOR (user_data);
   GHashTableIter hash_iter;
   GProxyDrive *drive;
   GProxyVolume *volume;
@@ -886,22 +882,12 @@ on_name_owner_appeared (GDBusConnection *connection,
 }
 
 static void
-on_name_owner_vanished (GDBusConnection *connection,
-                        const gchar     *name,
-                        gpointer         user_data)
+name_owner_vanished (GProxyVolumeMonitor *monitor)
 {
-  GProxyVolumeMonitor *monitor = G_PROXY_VOLUME_MONITOR (user_data);
-  GProxyVolumeMonitorClass *klass;
   GHashTableIter hash_iter;
   GProxyDrive *drive;
   GProxyVolume *volume;
   GProxyMount *mount;
-
-  klass = G_PROXY_VOLUME_MONITOR_CLASS (G_OBJECT_GET_CLASS (monitor));
-
-  g_warning ("Owner of %s of volume monitor %s disconnected from the bus; removing drives/volumes/mounts",
-             name,
-             klass->dbus_name);
 
   g_hash_table_iter_init (&hash_iter, monitor->mounts);
   while (g_hash_table_iter_next (&hash_iter, NULL, (gpointer) &mount))
@@ -926,8 +912,40 @@ on_name_owner_vanished (GDBusConnection *connection,
       signal_emit_in_idle (monitor, "drive-disconnected", drive);
     }
   g_hash_table_remove_all (monitor->drives);
+}
 
-  /* TODO: maybe try to relaunch the monitor? */
+static void
+name_owner_changed (GObject    *gobject,
+                    GParamSpec *pspec,
+                    gpointer    user_data)
+{
+  GProxyVolumeMonitor *monitor = G_PROXY_VOLUME_MONITOR (user_data);
+  GProxyVolumeMonitorClass *klass;
+  gchar *name_owner = NULL;
+  GHashTableIter hash_iter;
+  GProxyDrive *drive;
+  GProxyVolume *volume;
+  GProxyMount *mount;
+
+  klass = G_PROXY_VOLUME_MONITOR_CLASS (G_OBJECT_GET_CLASS (monitor));
+
+  g_object_get (gobject, "g-name-owner", &name_owner, NULL);
+
+  if (name_owner != NULL)
+    {
+      name_owner_appeared (monitor);
+    }
+  else
+    {
+      g_warning ("Owner of volume monitor %s disconnected from the bus; removing drives/volumes/mounts",
+                 klass->dbus_name);
+
+      name_owner_vanished (monitor);
+
+      /* TODO: maybe try to relaunch the monitor? */
+  }
+
+  g_free (name_owner);
 }
 
 static GObject *
@@ -1002,14 +1020,9 @@ g_proxy_volume_monitor_constructor (GType                  type,
   monitor->mounts = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 
   /* listen to when the owner of the service appears/disappears */
-  /* this will automatically call on_name_owner_appeared() when the daemon is ready and seed drives/volumes/mounts */
-  monitor->name_watcher_id = g_bus_watch_name_on_connection (the_session_bus,
-                                                             dbus_name,
-                                                             G_BUS_NAME_WATCHER_FLAGS_AUTO_START,
-                                                             on_name_owner_appeared,
-                                                             on_name_owner_vanished,
-                                                             monitor,
-                                                             NULL);
+  g_signal_connect (monitor->proxy, "notify::g-name-owner", G_CALLBACK (name_owner_changed), monitor);
+  /* initially seed drives/volumes/mounts if we have an owner */
+  name_owner_changed (G_OBJECT (monitor->proxy), NULL, monitor);
 
   g_hash_table_insert (the_volume_monitors, (gpointer) type, object);
 
