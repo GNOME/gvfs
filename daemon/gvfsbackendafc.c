@@ -2607,7 +2607,7 @@ g_vfs_backend_afc_finalize (GObject *obj)
 static void
 g_vfs_backend_afc_init (GVfsBackendAfc *self)
 {
-  if (g_getenv ("GVFS_DEBUG") != NULL)
+  if (g_getenv ("GVFS_AFC_DEBUG") != NULL)
     {
       /* enable full debugging */
       idevice_set_debug_level (1);
