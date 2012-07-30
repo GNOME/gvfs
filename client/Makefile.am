@@ -66,19 +66,19 @@ if USE_FUSE
 
 ## FUSE daemon
 
-libexec_PROGRAMS = gvfs-fuse-daemon
+libexec_PROGRAMS = gvfsd-fuse
 
-gvfs_fuse_daemon_SOURCES = \
+gvfsd_fuse_SOURCES = \
 	gvfsfusedaemon.c
 
-gvfs_fuse_daemon_CFLAGS = \
+gvfsd_fuse_CFLAGS = \
 	-I$(top_srcdir) \
         -I$(top_srcdir)/common \
         $(GLIB_CFLAGS) $(DBUS_CFLAGS) $(FUSE_CFLAGS) \
         -UG_LOG_DOMAIN -DG_LOG_DOMAIN=\"GVFS-FUSE\" \
         -DDBUS_API_SUBJECT_TO_CHANGE
 
-gvfs_fuse_daemon_LDADD = \
+gvfsd_fuse_LDADD = \
 	$(top_builddir)/common/libgvfscommon.la \
 	$(GLIB_LIBS) $(DBUS_LIBS) $(FUSE_LIBS)
 

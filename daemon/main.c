@@ -121,7 +121,7 @@ main (int argc, char *argv[])
       /* pthread_create() produce an undefined result accoring to     */
       /* Opengroup. On system with the uClibc library this will badly */
       /* hang the process.                                            */
-      argv2[0] = LIBEXEC_DIR "/gvfs-fuse-daemon";
+      argv2[0] = LIBEXEC_DIR "/gvfsd-fuse";
       argv2[1] = "-f";
       argv2[2] = fuse_path;
       argv2[3] = NULL;
