@@ -31,10 +31,9 @@
 #include "gdaemonmount.h"
 #include "gvfsdaemondbus.h"
 #include "gdaemonfile.h"
-#include "gvfsdaemonprotocol.h"
-#include "gvfsdbusutils.h"
 #include "gmountsource.h"
 #include "gmountoperationdbus.h"
+#include <gvfsdbus.h>
 
 /* Protects all fields of GDaemonMount that can change
    which at this point is just foreign_volume */
@@ -173,19 +172,148 @@ g_daemon_mount_can_eject (GMount *mount)
   return FALSE;
 }
 
-static void
-unmount_reply (DBusMessage *reply,
-	       DBusConnection *connection,
-	       GError *io_error,
-	       gpointer _data)
-{
-  GSimpleAsyncResult *result = _data;
 
-  if (io_error != NULL)
-    g_simple_async_result_set_from_error (result, io_error);
+typedef struct {
+  GMount *mount;
+  GCancellable *cancellable;
+  GSimpleAsyncResult *result;
+  GMountInfo *mount_info;
+  GMountOperation *mount_operation;
+  GMountUnmountFlags flags;
+  GDBusConnection *connection;
+  GVfsDBusMount *proxy;
+} AsyncProxyCreate;
+
+static void
+async_proxy_create_free (AsyncProxyCreate *data)
+{
+  if (data->mount)
+    g_object_unref (data->mount);
+  if (data->result)
+    g_object_unref (data->result);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
+  if (data->mount_operation)
+    g_object_unref (data->mount_operation);
+  if (data->connection)
+    g_object_unref (data->connection);
+  if (data->proxy)
+    g_object_unref (data->proxy);
+  g_free (data);
+}
+
+static void
+unmount_reply (GVfsDBusMount *proxy,
+               GAsyncResult *res,
+               gpointer user_data)
+{
+  AsyncProxyCreate *data = user_data;
+  GError *error = NULL;
+
+  g_print ("gdaemonmount.c: unmount_reply, proxy = %p\n", proxy);
+
+  if (! gvfs_dbus_mount_call_unmount_finish (proxy, res, &error))
+    {
+      g_simple_async_result_take_error (data->result, error);      
+    }
   
-  g_simple_async_result_complete (result);
-  g_object_unref (result);
+  _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
+  async_proxy_create_free (data);
+}
+
+static void
+async_proxy_new_cb (GObject *source_object,
+                    GAsyncResult *res,
+                    gpointer user_data)
+{
+  AsyncProxyCreate *data = user_data;
+  GVfsDBusMount *proxy;
+  GError *error = NULL;
+  GMountSource *mount_source;
+
+  proxy = gvfs_dbus_mount_proxy_new_finish (res, &error);
+  g_print ("gdaemonmount.c: async_proxy_new_cb, proxy = %p\n", proxy);
+  if (proxy == NULL)
+    {
+      g_simple_async_result_take_error (data->result, error);      
+      _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
+      async_proxy_create_free (data);
+      return;
+    }
+
+  data->proxy = proxy;
+  _g_dbus_connect_vfs_filters (data->connection);
+
+  mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
+
+  gvfs_dbus_mount_call_unmount (proxy,
+                                g_mount_source_get_dbus_id (mount_source),
+                                g_mount_source_get_obj_path (mount_source),
+                                data->flags,
+                                data->cancellable,
+                                (GAsyncReadyCallback) unmount_reply,
+                                data);
+  
+  g_object_unref (mount_source);
+}
+
+static void
+async_construct_proxy (GDBusConnection *connection,
+                       AsyncProxyCreate *data)
+{
+  data->connection = g_object_ref (connection);
+  gvfs_dbus_mount_proxy_new (connection,
+                             G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                             data->mount_info->dbus_id,
+                             data->mount_info->object_path,
+                             data->cancellable,
+                             async_proxy_new_cb,
+                             data);
+}
+
+static void
+bus_get_cb (GObject *source_object,
+            GAsyncResult *res,
+            gpointer user_data)
+{
+  AsyncProxyCreate *data = user_data;
+  GDBusConnection *connection;
+  GError *error = NULL;
+  
+  connection = g_bus_get_finish (res, &error);
+  
+  if (connection == NULL)
+    {
+      g_simple_async_result_set_from_error (data->result, error);
+      _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
+      async_proxy_create_free (data);
+      return;
+    }
+
+  async_construct_proxy (connection, data);
+}
+
+static void
+async_got_connection_cb (GDBusConnection *connection,
+                         GError *io_error,
+                         gpointer callback_data)
+{
+  AsyncProxyCreate *data = callback_data;
+  
+  g_print ("gdaemonmount.c: async_got_connection_cb, connection = %p\n", connection);
+  
+  if (connection == NULL)
+    {
+      /* TODO: we should probably test if we really want a session bus;
+       *       for now, this code is on par with the old dbus code */ 
+      g_bus_get (G_BUS_TYPE_SESSION,
+                 data->cancellable,
+                 bus_get_cb,
+                 data);
+      return;
+    }
+  
+  async_construct_proxy (connection, data);
 }
 
 static void
@@ -197,42 +325,26 @@ g_daemon_mount_unmount_with_operation (GMount *mount,
                                        gpointer         user_data)
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
-  DBusMessage *message;
-  GMountInfo *mount_info;
-  GSimpleAsyncResult *res;
-  guint32 dbus_flags;
-  GMountSource *mount_source;
-  const char *dbus_id, *obj_path;
+  AsyncProxyCreate *data;
 
-  mount_info = daemon_mount->mount_info;
+  g_print ("g_daemon_mount_unmount_with_operation\n");
 
-  message =
-    dbus_message_new_method_call (mount_info->dbus_id,
-				  mount_info->object_path,
-				  G_VFS_DBUS_MOUNT_INTERFACE,
-				  G_VFS_DBUS_MOUNT_OP_UNMOUNT);
+  data = g_new0 (AsyncProxyCreate, 1);
+  data->mount = g_object_ref (mount);
+  data->mount_info = daemon_mount->mount_info;
+  data->mount_operation = g_object_ref (mount_operation);
+  data->flags = flags;
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
 
-  mount_source = g_mount_operation_dbus_wrap (mount_operation, _g_daemon_vfs_get_async_bus ());
-  dbus_id = g_mount_source_get_dbus_id (mount_source);
-  obj_path = g_mount_source_get_obj_path (mount_source);
-
-  dbus_flags = flags;
-  _g_dbus_message_append_args (message,
-                               DBUS_TYPE_STRING, &dbus_id, DBUS_TYPE_OBJECT_PATH, &obj_path,
-                               DBUS_TYPE_UINT32, &dbus_flags,
-                               0);
+  data->result = g_simple_async_result_new (G_OBJECT (mount),
+                                            callback, user_data,
+                                            g_daemon_mount_unmount_with_operation);
   
-  res = g_simple_async_result_new (G_OBJECT (mount),
-				   callback, user_data,
-				   g_daemon_mount_unmount_with_operation);
-  
-  _g_vfs_daemon_call_async (message,
-			    unmount_reply, res,
-			    cancellable);
-  
-  dbus_message_unref (message);
-
-  g_object_unref (mount_source);
+  _g_dbus_connection_get_for_async (data->mount_info->dbus_id,
+                                    async_got_connection_cb,
+                                    data,
+                                    data->cancellable);
 }
 
 static gboolean

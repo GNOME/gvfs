@@ -28,20 +28,17 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobunmount.h"
-#include "gvfsdbusutils.h"
-#include "gvfsdaemonprotocol.h"
 
 G_DEFINE_TYPE (GVfsJobUnmount, g_vfs_job_unmount, G_VFS_TYPE_JOB_DBUS)
 
 static void     run        (GVfsJob *job);
 static gboolean try        (GVfsJob *job);
 static void     send_reply (GVfsJob *job);
-static DBusMessage *create_reply (GVfsJob *job,
-				  DBusConnection *connection,
-				  DBusMessage *message);
+static void     create_reply (GVfsJob               *job,
+                              GVfsDBusMount         *object,
+                              GDBusMethodInvocation *invocation);
 
 static void
 g_vfs_job_unmount_finalize (GObject *object)
@@ -70,7 +67,6 @@ g_vfs_job_unmount_class_init (GVfsJobUnmountClass *klass)
   job_class->send_reply = send_reply;
 
   job_dbus_class->create_reply = create_reply;
-
 }
 
 static void
@@ -78,50 +74,36 @@ g_vfs_job_unmount_init (GVfsJobUnmount *job)
 {
 }
 
-GVfsJob *
-g_vfs_job_unmount_new (DBusConnection *connection,
-		       DBusMessage *message,
-		       GVfsBackend *backend)
+gboolean
+g_vfs_job_unmount_new_handle (GVfsDBusMount *object,
+                              GDBusMethodInvocation *invocation,
+                              const gchar *arg_dbus_id,
+                              const gchar *arg_obj_path,
+                              guint arg_flags,
+                              GVfsBackend *backend)
 {
   GVfsJobUnmount *job;
-  DBusMessage *reply;
-  DBusMessageIter iter;
-  DBusError derror;
-  const char *dbus_id, *obj_path;
-  guint32 flags;
-  
-  
-  dbus_error_init (&derror);
-  dbus_message_iter_init (message, &iter);
 
-  if (!_g_dbus_message_iter_get_args (&iter, &derror, 
-                                      DBUS_TYPE_STRING, &dbus_id,
-                                      DBUS_TYPE_OBJECT_PATH, &obj_path,
-                                      DBUS_TYPE_UINT32, &flags,
-				      0))
-    {
-      reply = dbus_message_new_error (message,
-				      derror.name,
-                                      derror.message);
-      dbus_error_free (&derror);
+  g_print ("called Unmount()\n");
 
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return NULL;
-    }
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
 
-  g_debug ("g_vfs_job_unmount_new request: %p\n", message);
-  
+  g_debug ("g_vfs_job_unmount_new request: %p\n", invocation);
+
   job = g_object_new (G_VFS_TYPE_JOB_UNMOUNT,
-		      "message", message,
-		      "connection", connection,
-		      NULL);
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
 
   job->backend = backend;
-  job->flags = flags;
-  job->mount_source = g_mount_source_new (dbus_id, obj_path);
+  job->flags = arg_flags;
+  job->mount_source = g_mount_source_new (arg_dbus_id, arg_obj_path);
   
-  return G_VFS_JOB (job);
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
 }
 
 static void
@@ -289,16 +271,29 @@ try (GVfsJob *job)
 }
 
 static void
-unregister_mount_callback (DBusMessage *unmount_reply,
-			   GError *error,
-			   gpointer user_data)
+unregister_mount_callback (GVfsDBusMountTracker *proxy,
+                           GAsyncResult *res,
+                           gpointer user_data)
 {
   GVfsBackend *backend;
   GVfsDaemon *daemon;
+  GVfsJob *job = G_VFS_JOB (user_data);
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (user_data);
+  GError *error = NULL;
 
-  g_debug ("unregister_mount_callback, unmount_reply: %p, error: %p\n", unmount_reply, error);
-
+  gvfs_dbus_mount_tracker_call_unregister_mount_finish (proxy,
+                                                        res,
+                                                        &error);
+  g_debug ("unregister_mount_callback, error: %p\n", error);
+  
+  if (error != NULL)
+    {
+      /* If we failed before, don't overwrite the error as this one is not that important */ 
+      if (! job->failed)
+        g_vfs_job_failed_from_error (job, error);
+      g_error_free (error);
+    }
+  
   backend = op_job->backend;
   (*G_VFS_JOB_CLASS (g_vfs_job_unmount_parent_class)->send_reply) (G_VFS_JOB (op_job));
 
@@ -327,20 +322,16 @@ send_reply (GVfsJob *job)
          set active GVfsChannels to block requets  */
       g_vfs_backend_set_block_requests (backend);
       g_vfs_backend_unregister_mount (backend,
-				      unregister_mount_callback,
+				      (GAsyncReadyCallback) unregister_mount_callback,
 				      job);
     }
 }
 
 /* Might be called on an i/o thread */
-static DBusMessage *
+static void
 create_reply (GVfsJob *job,
-	      DBusConnection *connection,
-	      DBusMessage *message)
+              GVfsDBusMount *object,
+              GDBusMethodInvocation *invocation)
 {
-  DBusMessage *reply;
-
-  reply = dbus_message_new_method_return (message);
-
-  return reply;
+  gvfs_dbus_mount_complete_unmount (object, invocation);
 }

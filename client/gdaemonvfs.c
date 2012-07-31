@@ -25,15 +25,12 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <dbus/dbus.h>
 #include "gdaemonvfs.h"
 #include "gvfsuriutils.h"
 #include "gdaemonfile.h"
 #include <gio/gio.h>
 #include <gvfsdaemonprotocol.h>
 #include <gmodule.h>
-#include "gvfsdaemondbus.h"
-#include "gvfsdbusutils.h"
 #include "gmountspec.h"
 #include "gvfsurimapper.h"
 #include "gdaemonvolumemonitor.h"
@@ -41,6 +38,7 @@
 #include "gvfsiconloadable.h"
 #include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
+#include <gvfsdbus.h>
 
 typedef struct  {
   char *type;
@@ -54,7 +52,7 @@ struct _GDaemonVfs
 {
   GVfs parent;
 
-  DBusConnection *async_bus;
+  GDBusConnection *async_bus;
   
   GVfs *wrapped_vfs;
   GList *mount_cache;
@@ -101,10 +99,7 @@ g_daemon_vfs_finalize (GObject *object)
   g_strfreev (vfs->supported_uri_schemes);
 
   if (vfs->async_bus)
-    {
-      dbus_connection_close (vfs->async_bus);
-      dbus_connection_unref (vfs->async_bus);
-    }
+    g_object_unref (vfs->async_bus);
 
   if (vfs->wrapped_vfs)
     g_object_unref (vfs->wrapped_vfs);
@@ -302,9 +297,7 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 
-  dbus_threads_init_default ();
-
-  vfs->async_bus = dbus_bus_get_private (DBUS_BUS_SESSION, NULL);
+  vfs->async_bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
   if (vfs->async_bus == NULL)
     return; /* Not supported, return here and return false in vfs_is_active() */
@@ -336,9 +329,7 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   vfs->fuse_root = g_vfs_get_file_for_path (vfs->wrapped_vfs, file);
   g_free (file);
   
-  dbus_connection_set_exit_on_disconnect (vfs->async_bus, FALSE);
-
-  _g_dbus_connection_integrate_with_main (vfs->async_bus);
+  g_dbus_connection_set_exit_on_close (vfs->async_bus, FALSE);
 
   modules = g_io_modules_load_all_in_directory (GVFS_MODULE_DIR);
 
@@ -611,107 +602,101 @@ find_string (GPtrArray *array, const char *find_me)
   return -1;
 }
 
+static GVfsDBusMountTracker *
+create_mount_tracker_proxy ()
+{
+  GVfsDBusMountTracker *proxy;
+  GError *error;
+
+  error = NULL;
+  proxy = gvfs_dbus_mount_tracker_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                                          G_DBUS_PROXY_FLAGS_NONE,
+                                                          G_VFS_DBUS_DAEMON_NAME,
+                                                          G_VFS_DBUS_MOUNTTRACKER_PATH,
+                                                          NULL,
+                                                          &error);
+  if (proxy == NULL)
+    {
+      g_printerr ("Error creating proxy: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+  
+  return proxy;
+}
 
 static void
 fill_mountable_info (GDaemonVfs *vfs)
 {
-  DBusMessage *message, *reply;
-  DBusError error;
-  DBusMessageIter iter, array_iter, struct_iter;
   MountableInfo *info;
   GPtrArray *infos, *uri_schemes;
   gint i;
+  GVfsDBusMountTracker *proxy;
+  GVariant *iter_mountables;
+  GError *error;
+  GVariantIter iter;
+  const gchar *type, *scheme, **scheme_aliases;
+  guint scheme_aliases_len;
+  gint32 default_port;
+  gboolean host_is_inet;
+  
+  proxy = create_mount_tracker_proxy ();
+  g_return_if_fail (proxy != NULL);
 
-  message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
-                                          G_VFS_DBUS_MOUNTTRACKER_PATH,
-					  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-					  G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTABLE_INFO);
-
-  if (message == NULL)
-    _g_dbus_oom ();
-  
-  dbus_message_set_auto_start (message, TRUE);
-  
-  dbus_error_init (&error);
-  reply = dbus_connection_send_with_reply_and_block (vfs->async_bus,
-                                                     message,
-						     G_VFS_DBUS_TIMEOUT_MSECS,
-						     &error);
-  dbus_message_unref (message);
-  
-  if (dbus_error_is_set (&error))
+  error = NULL;
+  if (!gvfs_dbus_mount_tracker_call_list_mountable_info_sync (proxy, 
+                                                              &iter_mountables,
+                                                              NULL,
+                                                              &error))
     {
-      dbus_error_free (&error);
+      g_printerr ("org.gtk.vfs.MountTracker.listMountableInfo call failed: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
       return;
     }
-  
-  if (reply == NULL)
-    _g_dbus_oom ();
-
-  dbus_message_iter_init (reply, &iter);
-
-  dbus_message_iter_recurse (&iter, &array_iter);
 
   infos = g_ptr_array_new ();
   uri_schemes = g_ptr_array_new ();
   g_ptr_array_add (uri_schemes, g_strdup ("file"));
-  do
-    {
-      char *type, *scheme, **scheme_aliases;
-      int scheme_aliases_len;
-      gint32 default_port;
-      dbus_bool_t host_is_inet;
-      
-      if (dbus_message_iter_get_arg_type (&array_iter) != DBUS_TYPE_STRUCT)
-	break;
-      
-      dbus_message_iter_recurse (&array_iter, &struct_iter);
-      
-      if (!_g_dbus_message_iter_get_args (&struct_iter, NULL,
-					  DBUS_TYPE_STRING, &type,
-					  DBUS_TYPE_STRING, &scheme,
-					  DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &scheme_aliases, &scheme_aliases_len,
-					  DBUS_TYPE_INT32, &default_port,
-					  DBUS_TYPE_BOOLEAN, &host_is_inet,
-					  0))
-	break;
 
+  g_variant_iter_init (&iter, iter_mountables);
+  while (g_variant_iter_loop (&iter, "(&s&s^a&sib)", &type, &scheme, &scheme_aliases, &default_port, &host_is_inet))
+    {
       info = g_new0 (MountableInfo, 1);
       info->type = g_strdup (type);
       if (*scheme != 0)
-	{
-	  info->scheme = g_strdup (scheme);
-	  if (find_string (uri_schemes, scheme) == -1)
-	    g_ptr_array_add (uri_schemes, g_strdup (scheme));
-	}
+        {
+          info->scheme = g_strdup (scheme);
+          if (find_string (uri_schemes, scheme) == -1)
+            g_ptr_array_add (uri_schemes, g_strdup (scheme));
+        }
       
+      scheme_aliases_len = g_strv_length ((gchar **) scheme_aliases);
       if (scheme_aliases_len > 0)
-	{
-	  info->scheme_aliases = g_new (char *, scheme_aliases_len + 1);
-	  for (i = 0; i < scheme_aliases_len; i++)
-	    {
-	      info->scheme_aliases[i] = g_strdup (scheme_aliases[i]);
-	      if (find_string (uri_schemes, scheme_aliases[i]) == -1)
-		g_ptr_array_add (uri_schemes, g_strdup (scheme_aliases[i]));
-	    }
-	  info->scheme_aliases[scheme_aliases_len] = NULL;
-	}
-	
+        {
+          info->scheme_aliases = g_new (char *, scheme_aliases_len + 1);
+          for (i = 0; i < scheme_aliases_len; i++)
+            {
+              info->scheme_aliases[i] = g_strdup (scheme_aliases[i]);
+              if (find_string (uri_schemes, scheme_aliases[i]) == -1)
+                g_ptr_array_add (uri_schemes, g_strdup (scheme_aliases[i]));
+            }
+          info->scheme_aliases[scheme_aliases_len] = NULL;
+        }
+        
       info->default_port = default_port;
       info->host_is_inet = host_is_inet;
       
       g_ptr_array_add (infos, info);
-
-      g_strfreev (scheme_aliases);
     }
-  while (dbus_message_iter_next (&array_iter));
-
-  dbus_message_unref (reply);
 
   g_ptr_array_add (uri_schemes, NULL);
   g_ptr_array_add (infos, NULL);
   vfs->mountable_info = (MountableInfo **)g_ptr_array_free (infos, FALSE);
   vfs->supported_uri_schemes = (char **)g_ptr_array_free (uri_schemes, FALSE);
+  
+  g_variant_unref (iter_mountables);
+  g_object_unref (proxy);
 }
 
 
@@ -814,23 +799,14 @@ _g_daemon_vfs_invalidate_dbus_id (const char *dbus_id)
 
 
 static GMountInfo *
-handler_lookup_mount_reply (DBusMessage *reply,
+handler_lookup_mount_reply (GVariant *iter,
 			    GError **error)
 {
-  DBusError derror;
   GMountInfo *info;
-  DBusMessageIter iter;
   GList *l;
   gboolean in_cache;
   
-
-  if (_g_error_from_message (reply, error))
-    return NULL;
-
-  dbus_error_init (&derror);
-  dbus_message_iter_init (reply, &iter);
-
-  info = g_mount_info_from_dbus (&iter);
+  info = g_mount_info_from_dbus (iter);
   if (info == NULL)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -869,34 +845,57 @@ typedef struct {
   GMountInfoLookupCallback callback;
   gpointer user_data;
   GMountInfo *info;
+  GMountSpec *spec;
+  char *path;
 } GetMountInfoData;
 
 static void
-async_get_mount_info_response (DBusMessage *reply,
-			       GError *io_error,
-			       void *_data)
+free_get_mount_info_data (GetMountInfoData *data)
 {
-  GetMountInfoData *data = _data;
+  if (data->info)
+    g_mount_info_unref (data->info);
+  if (data->spec)
+    g_mount_spec_unref (data->spec);
+  g_free (data->path);
+  g_free (data);
+}
+
+static void
+async_get_mount_info_response (GVfsDBusMountTracker *proxy,
+                               GAsyncResult *res,
+                               gpointer user_data)
+{
+  GetMountInfoData *data = user_data;
   GMountInfo *info;
   GError *error;
-
-  if (reply == NULL)
-    data->callback (NULL, data->user_data, io_error);
+  GVariant *iter_mount;
+  
+  error = NULL;
+  if (! gvfs_dbus_mount_tracker_call_lookup_mount_finish (proxy, 
+                                                          &iter_mount, 
+                                                          res, 
+                                                          &error))
+    {
+      g_warning ("Error from org.gtk.vfs.MountTracker.lookupMount(): %s", error->message);
+      data->callback (NULL, data->user_data, error);
+      g_error_free (error);
+    }
   else
     {
-      error = NULL;
-      info = handler_lookup_mount_reply (reply, &error);
+      info = handler_lookup_mount_reply (iter_mount, &error);
 
       data->callback (info, data->user_data, error);
 
       if (info)
-	g_mount_info_unref (info);
+        g_mount_info_unref (info);
 
+      g_variant_unref (iter_mount);
+      
       if (error)
-	g_error_free (error);
+        g_error_free (error);
     }
   
-  g_free (data);
+  free_get_mount_info_data (data);
 }
 
 static gboolean
@@ -904,9 +903,35 @@ async_get_mount_info_cache_hit (gpointer _data)
 {
   GetMountInfoData *data = _data;
   data->callback (data->info, data->user_data, NULL);
-  g_mount_info_unref (data->info);
-  g_free (data);
+  free_get_mount_info_data (data);
   return FALSE;
+}
+
+static void 
+get_mount_info_async_got_proxy_cb (GObject *source_object,
+                                   GAsyncResult *res,
+                                   gpointer user_data)
+{
+  GetMountInfoData *data = user_data;
+  GVfsDBusMountTracker *proxy;
+  GError *error = NULL;
+
+  proxy = gvfs_dbus_mount_tracker_proxy_new_for_bus_finish (res, &error);
+  if (proxy == NULL)
+    {
+      g_warning ("Error creating MountTracker proxy: %s", error->message);
+      data->callback (NULL, data->user_data, error);
+      free_get_mount_info_data (data);
+      g_error_free (error);
+      return;
+    }
+  
+  gvfs_dbus_mount_tracker_call_lookup_mount (proxy,
+                                             g_mount_spec_to_dbus_with_path (data->spec, data->path),
+                                             NULL,
+                                             (GAsyncReadyCallback) async_get_mount_info_response,
+                                             data);
+  g_object_unref (proxy);
 }
 
 void
@@ -917,12 +942,12 @@ _g_daemon_vfs_get_mount_info_async (GMountSpec *spec,
 {
   GMountInfo *info;
   GetMountInfoData *data;
-  DBusMessage *message;
-  DBusMessageIter iter;
 
   data = g_new0 (GetMountInfoData, 1);
   data->callback = callback;
   data->user_data = user_data;
+  data->spec = g_mount_spec_ref (spec);
+  data->path = g_strdup (path);
 
   info = lookup_mount_info_in_cache (spec, path);
 
@@ -933,70 +958,44 @@ _g_daemon_vfs_get_mount_info_async (GMountSpec *spec,
       return;
     }
 
-  message =
-    dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
-				  G_VFS_DBUS_MOUNTTRACKER_PATH,
-				  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-				  G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT);
-  dbus_message_set_auto_start (message, TRUE);
-  
-  dbus_message_iter_init_append (message, &iter);
-  g_mount_spec_to_dbus_with_path (&iter, spec, path);
-
-  
-  _g_dbus_connection_call_async (the_vfs->async_bus, message, G_VFS_DBUS_TIMEOUT_MSECS,
-				 async_get_mount_info_response,
-				 data);
-  
-  dbus_message_unref (message);
+  gvfs_dbus_mount_tracker_proxy_new_for_bus (G_BUS_TYPE_SESSION,
+                                             G_DBUS_PROXY_FLAGS_NONE,
+                                             G_VFS_DBUS_DAEMON_NAME,
+                                             G_VFS_DBUS_MOUNTTRACKER_PATH,
+                                             NULL,
+                                             get_mount_info_async_got_proxy_cb,
+                                             data);
 }
-
 
 GMountInfo *
 _g_daemon_vfs_get_mount_info_sync (GMountSpec *spec,
 				   const char *path,
+				   GCancellable *cancellable,
 				   GError **error)
 {
   GMountInfo *info;
-  DBusConnection *conn;
-  DBusMessage *message, *reply;
-  DBusMessageIter iter;
-  DBusError derror;
-	
+  GVfsDBusMountTracker *proxy;
+  GVariant *iter_mount;
+  
   info = lookup_mount_info_in_cache (spec, path);
-
   if (info != NULL)
     return info;
   
-  conn = _g_dbus_connection_get_sync (NULL, error);
-  if (conn == NULL)
-    return NULL;
-
-  message =
-    dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
-				  G_VFS_DBUS_MOUNTTRACKER_PATH,
-				  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-				  G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT);
-  dbus_message_set_auto_start (message, TRUE);
+  proxy = create_mount_tracker_proxy ();
+  g_return_val_if_fail (proxy != NULL, NULL);
   
-  dbus_message_iter_init_append (message, &iter);
-  g_mount_spec_to_dbus_with_path (&iter, spec, path);
-
-  dbus_error_init (&derror);
-  reply = dbus_connection_send_with_reply_and_block (conn, message, -1, &derror);
-  dbus_message_unref (message);
-
-  if (!reply)
+  if (gvfs_dbus_mount_tracker_call_lookup_mount_sync (proxy,
+                                                      g_mount_spec_to_dbus_with_path (spec, path),
+                                                      &iter_mount,
+                                                      cancellable,
+                                                      error))
     {
-      _g_error_from_dbus (&derror, error);
-      dbus_error_free (&derror);
-      return NULL;
+      info = handler_lookup_mount_reply (iter_mount, error);
+      g_variant_unref (iter_mount);
     }
-
-  info = handler_lookup_mount_reply (reply, error);
-
-  dbus_message_unref (reply);
   
+  g_object_unref (proxy);
+
   return info;
 }
 
@@ -1005,43 +1004,28 @@ _g_daemon_vfs_get_mount_info_by_fuse_sync (const char *fuse_path,
 					   char **mount_path)
 {
   GMountInfo *info;
-  DBusConnection *conn;
-  DBusMessage *message, *reply;
-  DBusMessageIter iter;
-  DBusError derror;
   int len;
   const char *mount_path_end;
-	
+  GVfsDBusMountTracker *proxy;
+  GVariant *iter_mount;
+
   info = lookup_mount_info_by_fuse_path_in_cache (fuse_path,
 						  mount_path);
   if (info != NULL)
     return info;
   
-  conn = _g_dbus_connection_get_sync (NULL, NULL);
-  if (conn == NULL)
-    return NULL;
-
-  message =
-    dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
-				  G_VFS_DBUS_MOUNTTRACKER_PATH,
-				  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-				  G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT_BY_FUSE_PATH);
-  dbus_message_set_auto_start (message, TRUE);
+  proxy = create_mount_tracker_proxy ();
+  g_return_val_if_fail (proxy != NULL, NULL);
   
-  dbus_message_iter_init_append (message, &iter);
-  _g_dbus_message_iter_append_cstring (&iter, fuse_path);
-
-  dbus_error_init (&derror);
-  reply = dbus_connection_send_with_reply_and_block (conn, message, -1, &derror);
-  dbus_message_unref (message);
-  if (!reply)
+  if (gvfs_dbus_mount_tracker_call_lookup_mount_by_fuse_path_sync (proxy,
+                                                                   fuse_path,
+                                                                   &iter_mount,
+                                                                   NULL,
+                                                                   NULL))
     {
-      dbus_error_free (&derror);
-      return NULL;
+      info = handler_lookup_mount_reply (iter_mount, NULL);
+      g_variant_unref (iter_mount);
     }
-
-  info = handler_lookup_mount_reply (reply, NULL);
-  dbus_message_unref (reply);
   
   if (info)
     {
@@ -1065,7 +1049,8 @@ _g_daemon_vfs_get_mount_info_by_fuse_sync (const char *fuse_path,
 	}
     }
 
-  
+  g_object_unref (proxy);
+
   return info;
 }
 
@@ -1171,44 +1156,6 @@ g_daemon_vfs_add_writable_namespaces (GVfs       *vfs,
 				  G_FILE_ATTRIBUTE_TYPE_STRING, /* Also STRINGV, but no way express this ... */
 				  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
 				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
-}
-
-/* Sends a message on the session bus and blocks for the reply,
-   using the thread local connection */
-gboolean
-_g_daemon_vfs_send_message_sync (DBusMessage *message,
-				 GCancellable *cancellable,
-				 GError **error)
-{
-  DBusConnection *connection;
-  DBusError derror;
-  DBusMessage *reply;
-
-  connection = _g_dbus_connection_get_sync (NULL, NULL);
-  if (connection == NULL)
-    {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_FAILED,
-		   _("Error setting file metadata: %s"),
-		   _("Can't contact session bus"));
-      return FALSE;
-    }
-
-  dbus_error_init (&derror);
-  /* TODO: Handle cancellable */
-  reply = dbus_connection_send_with_reply_and_block (connection, message,
-						     G_VFS_DBUS_TIMEOUT_MSECS,
-						     &derror);
-  if (!reply)
-    {
-      _g_error_from_dbus (&derror, error);
-      dbus_error_free (&derror);
-      return FALSE;
-    }
-
-  dbus_message_unref (reply);
-
-  return TRUE;
 }
 
 static gboolean
@@ -1529,7 +1476,7 @@ g_daemon_vfs_local_file_moved (GVfs       *vfs,
   meta_lookup_cache_free (cache);
 }
 
-DBusConnection *
+GDBusConnection *
 _g_daemon_vfs_get_async_bus (void)
 {
   return the_vfs->async_bus;

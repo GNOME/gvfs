@@ -1,0 +1,351 @@
+<!DOCTYPE node PUBLIC
+"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+
+<!--
+ Copyright (C) 2011 Red Hat, Inc.
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General
+ Public License along with this library; if not, write to the
+ Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ Boston, MA 02111-1307, USA.
+
+ Author: Tomas Bzatek <tbzatek@redhat.com>
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+  <!--
+      org.gtk.vfs.Daemon:
+
+      Each daemon (main and for mounts) implement this.
+  -->
+  <interface name='org.gtk.vfs.Daemon'>
+    <method name="GetConnection">
+      <arg type='s' name='address1' direction='out'/>
+      <arg type='s' name='address2' direction='out'/>
+    </method>
+    <method name="Cancel">
+      <arg type='u' name='serial' direction='in'/>
+    </method>
+    <method name="mount">
+      <arg type='b' name='automount' direction='in'/>
+      <arg type='s' name='dbus_id' direction='in'/>
+      <arg type='o' name='obj_path' direction='in'/>
+      <arg type='a{sv}' name='reply' direction='out'/>
+    </method>
+  </interface>
+
+  <!--
+      org.gtk.vfs.Spawner:
+
+      Implemented by the spawner of a process, the spawned process sends the
+      spawned message (with noreply) when it has spawned and gotten a dbus id.
+  -->
+  <interface name='org.gtk.vfs.Spawner'>
+    <method name="spawned">
+      <arg type='b' name='succeeded' direction='in'/>
+      <arg type='s' name='error_message' direction='in'/>
+    </method>
+  </interface>
+
+  <!--
+      org.gtk.vfs.MountTracker:
+
+      The mount tracking interface in the main daemon.
+  -->
+  <interface name='org.gtk.vfs.MountTracker'>
+    <method name="lookupMount">
+      <arg type='(aya{sv})' name='mount_spec' direction='in'/>
+      <arg type='(sosssssbay(aya{sv})ay)' name='mount' direction='out'/>
+    </method>
+    <method name="lookupMountByFusePath">
+      <arg type='ay' name='fuse_path' direction='in'/>
+      <arg type='(sosssssbay(aya{sv})ay)' name='mount' direction='out'/>
+    </method>
+    <method name="mountLocation">
+      <arg type='(aya{sv})' name='mount_spec' direction='in'/>
+      <arg type='(so)' name='mount_source' direction='in'/>
+    </method>
+    <method name="listMounts">
+      <arg type='a(sosssssbay(aya{sv})ay)' name='mounts' direction='out'/>
+    </method>
+    <method name="registerMount">
+      <arg type='o' name='obj_path' direction='in'/>
+      <arg type='s' name='display_name' direction='in'/>
+      <arg type='s' name='stable_name' direction='in'/>
+      <arg type='s' name='x_content_types' direction='in'/>
+      <arg type='s' name='icon' direction='in'/>
+      <arg type='s' name='prefered_filename_encoding' direction='in'/>
+      <arg type='b' name='user_visible' direction='in'/>
+      <arg type='(aya{sv})' name='mount_spec' direction='in'/>
+      <arg type='ay' name='default_location' direction='in'/>
+    </method>
+    <method name="unregisterMount">
+      <arg type='o' name='obj_path' direction='in'/>
+    </method>
+    <method name="listMountTypes">
+      <arg type='as' name='mount_types' direction='out'/>
+    </method>
+    <method name="listMountableInfo">
+      <arg type='a(ssasib)' name='mountables' direction='out'/>
+    </method>
+    <method name="registerFuse">
+    </method>
+    <signal name="mounted">
+      <arg type='(sosssssbay(aya{sv})ay)' name='mount'/>
+    </signal>
+    <signal name="unmounted">
+      <arg type='(sosssssbay(aya{sv})ay)' name='mount'/>
+    </signal>
+  </interface>
+
+  <!--
+      org.gtk.vfs.Mountable:
+
+      Mount daemons that support mounting more mounts implement this,
+      and set the dbus name in the mountable description file.
+  -->
+  <interface name='org.gtk.vfs.Mountable'>
+    <method name="mount">
+      <arg type='(aya{sv})' name='mount_spec' direction='in'/>
+      <arg type='b' name='automount' direction='in'/>
+      <arg type='(so)' name='mount_source' direction='in'/>
+    </method>
+  </interface>
+
+  <!--
+      org.gtk.vfs.MountOperation:
+
+      Used by the dbus-proxying implementation of GMoutOperation.
+  -->
+  <interface name='org.gtk.vfs.MountOperation'>
+    <method name="askPassword">
+      <arg type='s' name='message_string' direction='in'/>
+      <arg type='s' name='default_user' direction='in'/>
+      <arg type='s' name='default_domain' direction='in'/>
+      <arg type='u' name='flags_as_int' direction='in'/>
+      <arg type='b' name='handled' direction='out'/>
+      <arg type='b' name='aborted' direction='out'/>
+      <arg type='s' name='password' direction='out'/>
+      <arg type='s' name='username' direction='out'/>
+      <arg type='s' name='domain' direction='out'/>
+      <arg type='b' name='anonymous' direction='out'/>
+      <arg type='u' name='password_save' direction='out'/>
+    </method>
+    <method name="askQuestion">
+      <arg type='s' name='message_string' direction='in'/>
+      <arg type='as' name='choices' direction='in'/>
+      <arg type='b' name='handled' direction='out'/>
+      <arg type='b' name='aborted' direction='out'/>
+      <arg type='u' name='choice' direction='out'/>
+    </method>
+    <method name="showProcesses">
+      <arg type='s' name='message_string' direction='in'/>
+      <arg type='as' name='choices' direction='in'/>
+      <arg type='ai' name='processes' direction='in'/>
+      <arg type='b' name='handled' direction='out'/>
+      <arg type='b' name='aborted' direction='out'/>
+      <arg type='u' name='choice' direction='out'/>
+    </method>
+    <method name="ShowUnmountProgress">
+      <arg type='s' name='message_string' direction='in'/>
+      <arg type='t' name='time_left' direction='in'/>
+      <arg type='t' name='bytes_left' direction='in'/>
+    </method>
+    <method name="aborted">
+    </method>
+  </interface>
+
+  <!--
+      org.gtk.vfs.Mount:
+
+      Each mount (there might be several in a daemon) implements one of these interfaces
+      for standard i/o operations.
+  -->
+  <interface name='org.gtk.vfs.Mount'>
+    <method name="Unmount">
+      <arg type='s' name='dbus_id' direction='in'/>
+      <arg type='o' name='obj_path' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+    </method>
+    <method name="OpenForRead">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='u' name='pid' direction='in'/>
+      <arg type='u' name='fd_id' direction='out'/>
+      <arg type='b' name='can_seek' direction='out'/>
+    </method>
+    <method name="OpenForWrite">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='q' name='mode' direction='in'/>
+      <arg type='s' name='etag' direction='in'/>
+      <arg type='b' name='make_backup' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='u' name='pid' direction='in'/>
+      <arg type='u' name='fd_id' direction='out'/>
+      <arg type='b' name='can_seek' direction='out'/>
+      <arg type='t' name='initial_offset' direction='out'/>
+    </method>
+    <method name="QueryInfo">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='s' name='attributes' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='s' name='uri' direction='in'/>
+      <arg type='a(suv)' name='info' direction='out'/>
+    </method>
+    <method name="QueryFilesystemInfo">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='s' name='attributes' direction='in'/>
+      <arg type='a(suv)' name='info' direction='out'/>
+    </method>
+    <method name="Enumerate">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='s' name='obj_path' direction='in'/>
+      <arg type='s' name='attributes' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='s' name='uri' direction='in'/>
+    </method>
+    <method name="CreateDirectoryMonitor">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='s' name='obj_path' direction='out'/>
+    </method>
+    <method name="CreateFileMonitor">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='s' name='obj_path' direction='out'/>
+    </method>
+    <method name="MountMountable">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='s' name='dbus_id' direction='in'/>
+      <arg type='o' name='obj_path' direction='in'/>
+      <arg type='b' name='is_uri' direction='out'/>
+      <arg type='ay' name='path' direction='out'/>
+      <arg type='b' name='must_mount_location' direction='out'/>
+      <arg type='(aya{sv})' name='mount_spec' direction='out'/>
+    </method>
+    <method name="UnmountMountable">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='s' name='dbus_id' direction='in'/>
+      <arg type='o' name='obj_path' direction='in'/>
+    </method>
+    <method name="EjectMountable">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='s' name='dbus_id' direction='in'/>
+      <arg type='o' name='obj_path' direction='in'/>
+    </method>
+    <method name="StartMountable">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='s' name='dbus_id' direction='in'/>
+      <arg type='o' name='obj_path' direction='in'/>
+    </method>
+    <method name="StopMountable">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='s' name='dbus_id' direction='in'/>
+      <arg type='o' name='obj_path' direction='in'/>
+    </method>
+    <method name="PollMountable">
+      <arg type='ay' name='path_data' direction='in'/>
+    </method>
+    <method name="SetDisplayName">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='s' name='display_name' direction='in'/>
+      <arg type='ay' name='new_path' direction='out'/>
+    </method>
+    <method name="Delete">
+      <arg type='ay' name='path_data' direction='in'/>
+    </method>
+    <method name="Trash">
+      <arg type='ay' name='path_data' direction='in'/>
+    </method>
+    <method name="MakeDirectory">
+      <arg type='ay' name='path_data' direction='in'/>
+    </method>
+    <method name="MakeSymbolicLink">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='ay' name='symlink_value' direction='in'/>
+    </method>
+    <method name="Copy">
+      <arg type='ay' name='path1_data' direction='in'/>
+      <arg type='ay' name='path2_data' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='o' name='progress_obj_path' direction='in'/>
+    </method>
+    <method name="Move">
+      <arg type='ay' name='path1_data' direction='in'/>
+      <arg type='ay' name='path2_data' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='o' name='progress_obj_path' direction='in'/>
+    </method>
+    <method name="Push">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='ay' name='local_path' direction='in'/>
+      <arg type='b' name='send_progress' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='o' name='progress_obj_path' direction='in'/>
+      <arg type='b' name='remove_source' direction='in'/>
+    </method>
+    <method name="Pull">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='ay' name='local_path' direction='in'/>
+      <arg type='b' name='send_progress' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='o' name='progress_obj_path' direction='in'/>
+      <arg type='b' name='remove_source' direction='in'/>
+    </method>
+    <method name="SetAttribute">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='u' name='flags' direction='in'/>
+      <arg type='(suv)' name='attribute' direction='in'/>
+    </method>
+    <method name="QuerySettableAttributes">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='a(suu)' name='list' direction='out'/>
+    </method>
+    <method name="QueryWritableNamespaces">
+      <arg type='ay' name='path_data' direction='in'/>
+      <arg type='a(suu)' name='list' direction='out'/>
+    </method>
+    <method name="OpenIconForRead">
+    </method>
+  </interface>
+
+  <!--
+      org.gtk.vfs.Enumerator:
+
+      Implemented by client side for a file enumerator.
+  -->
+  <interface name='org.gtk.vfs.Enumerator'>
+    <method name="Done">
+    </method>
+    <method name="GotInfo">
+      <arg type='aa(suv)' name='infos' direction='in'/>
+    </method>
+  </interface>
+
+  <!--
+      org.gtk.vfs.Progress:
+
+      Progress callback interface for copy and move.
+  -->
+  <interface name='org.gtk.vfs.Progress'>
+    <method name="Progress">
+      <arg type='t' name='current' direction='in'/>
+      <arg type='t' name='total' direction='in'/>
+    </method>
+  </interface>
+
+</node>
+

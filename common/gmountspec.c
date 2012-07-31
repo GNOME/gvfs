@@ -27,7 +27,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#include "gvfsdbusutils.h"
 #include "gmountspec.h"
 
 static GHashTable *unique_hash = NULL;
@@ -226,113 +225,64 @@ g_mount_spec_unref (GMountSpec *spec)
 }
 
 GMountSpec *
-g_mount_spec_from_dbus (DBusMessageIter *iter)
+g_mount_spec_from_dbus (GVariant *iter)
 {
   GMountSpec *spec;
-  DBusMessageIter array_iter, struct_iter, spec_iter;
-  const char *key;
-  char *value;
-  char *mount_prefix;
-
-  if (dbus_message_iter_get_arg_type (iter) != DBUS_TYPE_STRUCT)
-    return NULL;
-
-  dbus_message_iter_recurse (iter, &spec_iter);
+  const gchar *key;
+  const gchar *mount_prefix;
+  GVariantIter *iter_mount_spec_items;
+  GVariant *value;
 
   mount_prefix = NULL;
-  if (!_g_dbus_message_iter_get_args (&spec_iter, NULL,
-				      G_DBUS_TYPE_CSTRING, &mount_prefix,
-				      0))
-    return NULL;
-
+  g_variant_get (iter, "(^&aya{sv})",
+                 &mount_prefix,
+                 &iter_mount_spec_items);
+  
   spec = g_mount_spec_new (NULL);
   g_free (spec->mount_prefix);
-  spec->mount_prefix = mount_prefix;
-  
-  if (dbus_message_iter_get_arg_type (&spec_iter) != DBUS_TYPE_ARRAY ||
-      dbus_message_iter_get_element_type (&spec_iter) != DBUS_TYPE_STRUCT)
+  spec->mount_prefix = g_strdup (mount_prefix);
+
+  while (g_variant_iter_loop (iter_mount_spec_items, "{&sv}", &key, &value))
     {
-      g_mount_spec_unref (spec);
-      return NULL;
+      add_item (spec, key, g_variant_dup_bytestring (value, NULL));
     }
 
-  dbus_message_iter_recurse (&spec_iter, &array_iter);
-  while (dbus_message_iter_get_arg_type (&array_iter) == DBUS_TYPE_STRUCT)
-    {
-      dbus_message_iter_recurse (&array_iter, &struct_iter);
-      if (_g_dbus_message_iter_get_args (&struct_iter, NULL,
-					 DBUS_TYPE_STRING, &key,
-					 G_DBUS_TYPE_CSTRING, &value,
-					 0))
-	add_item (spec, key, value);
-      dbus_message_iter_next (&array_iter);
-    }
-
-  dbus_message_iter_next (iter);
-  
   /* Sort on key */
   g_array_sort (spec->items, item_compare);
   
   return spec;
 }
 
-void
-g_mount_spec_to_dbus_with_path (DBusMessageIter *iter,
-				GMountSpec *spec,
+GVariant *
+g_mount_spec_to_dbus_with_path (GMountSpec *spec,
 				const char *path)
 {
-  DBusMessageIter spec_iter, array_iter, item_iter;
+  GVariantBuilder builder;
+  GVariant *v;
   int i;
 
-  if (!dbus_message_iter_open_container (iter,
-					 DBUS_TYPE_STRUCT,
-					 NULL,
-					 &spec_iter))
-    _g_dbus_oom ();
-
-  _g_dbus_message_iter_append_cstring (&spec_iter, path ? path : "");
-
-  if (!dbus_message_iter_open_container (&spec_iter,
-					 DBUS_TYPE_ARRAY,
- 					 G_MOUNT_SPEC_ITEM_TYPE_AS_STRING,
-					 &array_iter))
-    _g_dbus_oom ();
-
+  g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
   for (i = 0; i < spec->items->len; i++)
     {
       GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
 
-      if (!dbus_message_iter_open_container (&array_iter,
-					     DBUS_TYPE_STRUCT,
-					     NULL,
-					     &item_iter))
-	_g_dbus_oom ();
-
-      if (!dbus_message_iter_append_basic (&item_iter, DBUS_TYPE_STRING,
-					   &item->key))
-	_g_dbus_oom ();
-      _g_dbus_message_iter_append_cstring  (&item_iter, item->value);
-      
-      if (!dbus_message_iter_close_container (&array_iter, &item_iter))
-	_g_dbus_oom ();
-      
+      g_variant_builder_add_value (&builder, g_variant_new ("{sv}",
+                                                            item->key,
+                                                            g_variant_new_bytestring (item->value)));
     }
   
-  if (!dbus_message_iter_close_container (&spec_iter, &array_iter))
-    _g_dbus_oom ();
+  v = g_variant_new ("(^aya{sv})",
+                      path ? path : "",
+                      &builder);
+  g_variant_builder_clear (&builder);
   
-  
-  
-  if (!dbus_message_iter_close_container (iter, &spec_iter))
-    _g_dbus_oom ();
-    
+  return v;
 }
 
-void
-g_mount_spec_to_dbus (DBusMessageIter *iter,
-		      GMountSpec      *spec)
+GVariant *
+g_mount_spec_to_dbus (GMountSpec *spec)
 {
-  g_mount_spec_to_dbus_with_path (iter, spec, spec->mount_prefix);
+  return g_mount_spec_to_dbus_with_path (spec, spec->mount_prefix);
 }
 
 static gboolean

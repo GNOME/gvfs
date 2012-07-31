@@ -25,21 +25,104 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
-#include <dbus/dbus.h>
 #include "gvfsdaemon.h"
 #include "gvfsbackendtest.h"
 #include <gvfsdaemonprotocol.h>
 #include "mount.h"
 #include <locale.h>
 
+
+
+static GMainLoop *loop;
+static gboolean already_acquired = FALSE;
+static int process_result = 0;
+
+static void
+on_name_lost (GDBusConnection *connection,
+              const gchar     *name,
+              gpointer         user_data)
+{
+  if (connection == NULL)
+    {
+      g_printerr ("A connection to the bus can't be made\n");
+      process_result = 1;
+    }
+  else
+    {
+      if (already_acquired)
+        {
+          g_printerr ("Got NameLost, some other instance replaced us\n");
+        }
+      else
+        {
+          g_printerr ("Failed to acquire daemon name, perhaps the VFS daemon is already running?\n");
+          process_result = 1;
+        }
+    }
+  g_main_loop_quit (loop);
+}
+
+static void
+on_name_acquired (GDBusConnection *connection,
+                  const gchar     *name,
+                  gpointer         user_data)
+{
+  gboolean no_fuse = GPOINTER_TO_UINT (user_data);
+
+  g_warning ("main.c: Acquired the name %s on the session message bus\n", name);
+  already_acquired = TRUE;
+
+  mount_init ();
+  
+#ifdef HAVE_FUSE
+  if (!no_fuse)
+    {
+      char *fuse_path;
+      char *argv2[4];
+      
+      /* Use the old .gvfs location as fallback, not .cache/gvfs */
+      if (g_get_user_runtime_dir() == g_get_user_cache_dir ())
+        fuse_path = g_build_filename (g_get_home_dir(), ".gvfs", NULL);
+      else
+        fuse_path = g_build_filename (g_get_user_runtime_dir (), "gvfs", NULL);
+      
+      if (!g_file_test (fuse_path, G_FILE_TEST_EXISTS))
+        g_mkdir (fuse_path, 0700);
+      
+      /* The -f (foreground) option prevent libfuse to call daemon(). */
+      /* First, this is not required as g_spawn_async() already       */
+      /* detach the process. Secondly, calling daemon() and then      */
+      /* pthread_create() produce an undefined result accoring to     */
+      /* Opengroup. On system with the uClibc library this will badly */
+      /* hang the process.                                            */
+      argv2[0] = LIBEXEC_DIR "/gvfsd-fuse";
+      argv2[1] = "-f";
+      argv2[2] = fuse_path;
+      argv2[3] = NULL;
+      
+      g_spawn_async (NULL,
+                     argv2,
+                     NULL,
+                     G_SPAWN_STDOUT_TO_DEV_NULL |
+                     G_SPAWN_STDERR_TO_DEV_NULL, 
+                     NULL, NULL,
+                     NULL, NULL);
+      
+      g_free (fuse_path);
+    }
+#endif
+}
+
+
 int
 main (int argc, char *argv[])
 {
-  GMainLoop *loop;
   GVfsDaemon *daemon;
   gboolean replace;
   gboolean no_fuse;
   GError *error;
+  guint name_owner_id;
+  GBusNameOwnerFlags flags;
   GOptionContext *context;
   const GOptionEntry options[] = {
     { "replace", 'r', 0, G_OPTION_ARG_NONE, &replace,  N_("Replace old daemon."), NULL },
@@ -87,58 +170,39 @@ main (int argc, char *argv[])
 
   g_option_context_free (context);
 
-  dbus_threads_init_default ();
-  
   g_type_init ();
+  loop = g_main_loop_new (NULL, FALSE);
 
   daemon = g_vfs_daemon_new (TRUE, replace);
   if (daemon == NULL)
     return 1;
 
-  mount_init ();
-  
-  loop = g_main_loop_new (NULL, FALSE);
+  /* FIXME: a message filter??! */
+  /* Request name only after we've installed the message filter */
+  flags = G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT;
+  if (replace)
+    flags |= G_BUS_NAME_OWNER_FLAGS_REPLACE;
 
+  name_owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
+                                  G_VFS_DBUS_DAEMON_NAME,
+                                  flags,
+                                  NULL,
+                                  on_name_acquired,
+                                  on_name_lost,
+                                  GUINT_TO_POINTER (no_fuse),
+                                  NULL);
 
-#ifdef HAVE_FUSE
-  if (!no_fuse)
-    {
-      char *fuse_path;
-      char *argv2[4];
-      
-      /* Use the old .gvfs location as fallback, not .cache/gvfs */
-      if (g_get_user_runtime_dir() == g_get_user_cache_dir ())
-	fuse_path = g_build_filename (g_get_home_dir(), ".gvfs", NULL);
-      else
-	fuse_path = g_build_filename (g_get_user_runtime_dir (), "gvfs", NULL);
-      
-      if (!g_file_test (fuse_path, G_FILE_TEST_EXISTS))
-	g_mkdir (fuse_path, 0700);
-      
-      /* The -f (foreground) option prevent libfuse to call daemon(). */
-      /* First, this is not required as g_spawn_async() already       */
-      /* detach the process. Secondly, calling daemon() and then      */
-      /* pthread_create() produce an undefined result accoring to     */
-      /* Opengroup. On system with the uClibc library this will badly */
-      /* hang the process.                                            */
-      argv2[0] = LIBEXEC_DIR "/gvfsd-fuse";
-      argv2[1] = "-f";
-      argv2[2] = fuse_path;
-      argv2[3] = NULL;
-      
-      g_spawn_async (NULL,
-		     argv2,
-		     NULL,
-		     G_SPAWN_STDOUT_TO_DEV_NULL |
-		     G_SPAWN_STDERR_TO_DEV_NULL, 
-		     NULL, NULL,
-		     NULL, NULL);
-      
-      g_free (fuse_path);
-    }
-#endif
-  
   g_main_loop_run (loop);
+
+#if 0
+  /* FIXME: crashing */
+  if (daemon != NULL)
+    g_object_unref (daemon);
+#endif
+  if (name_owner_id != 0)
+    g_bus_unown_name (name_owner_id);
+  if (loop != NULL)
+    g_main_loop_unref (loop);
   
-  return 0;
+  return process_result;
 }

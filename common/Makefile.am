@@ -8,6 +8,21 @@ INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-DG_LOG_DOMAIN=\"GVFS\" \
 	-DDBUS_API_SUBJECT_TO_CHANGE
 
+dbus_built_sources = gvfsdbus.c gvfsdbus.h
+BUILT_SOURCES = $(dbus_built_sources)
+
+$(dbus_built_sources) : Makefile.am dbus-interfaces.xml
+	gdbus-codegen					\
+		--interface-prefix org.gtk.vfs.		\
+		--c-namespace GVfsDBus			\
+		--generate-c-code gvfsdbus		\
+		--annotate "org.gtk.vfs.Mount.OpenForRead()"	\
+		  org.gtk.GDBus.C.UnixFD true		\
+		--annotate "org.gtk.vfs.Mount.OpenForWrite()"	\
+		  org.gtk.GDBus.C.UnixFD true		\
+		dbus-interfaces.xml			\
+		$(NULL)
+
 libgvfscommon_la_SOURCES = 	\
 	gsysutils.c gsysutils.h \
 	gvfsdbusutils.c gvfsdbusutils.h \
@@ -19,6 +34,7 @@ libgvfscommon_la_SOURCES = 	\
 	gvfsicon.h gvfsicon.c \
 	gvfsmountinfo.h gvfsmountinfo.c \
 	gvfsfileinfo.c gvfsfileinfo.h \
+	$(dbus_built_sources) \
 	$(NULL)
 
 # needed by cygwin (see bug #564003)
@@ -46,3 +62,7 @@ libgvfscommon_dnssd_la_LIBADD =	\
 	$(GLIB_LIBS)
 endif
 
+
+EXTRA_DIST = dbus-interfaces.xml
+
+CLEANFILES = $(dbus_built_sources)

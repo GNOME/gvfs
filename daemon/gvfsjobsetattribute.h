@@ -60,9 +60,12 @@ struct _GVfsJobSetAttributeClass
 
 GType g_vfs_job_set_attribute_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_set_attribute_new (DBusConnection *connection,
-				      DBusMessage    *message,
-				      GVfsBackend    *backend);
+gboolean g_vfs_job_set_attribute_new_handle (GVfsDBusMount         *object,
+                                             GDBusMethodInvocation *invocation,
+                                             const gchar           *arg_path_data,
+                                             guint                  arg_flags,
+                                             GVariant              *arg_attribute,
+                                             GVfsBackend           *backend);
 
 G_END_DECLS
 

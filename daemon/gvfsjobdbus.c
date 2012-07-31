@@ -28,10 +28,8 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobdbus.h"
-#include "gvfsdbusutils.h"
 
 G_DEFINE_TYPE (GVfsJobDBus, g_vfs_job_dbus, G_VFS_TYPE_JOB)
 
@@ -40,8 +38,8 @@ G_DEFINE_TYPE (GVfsJobDBus, g_vfs_job_dbus, G_VFS_TYPE_JOB)
 
 enum {
   PROP_0,
-  PROP_MESSAGE,
-  PROP_CONNECTION
+  PROP_INVOCATION,
+  PROP_OBJECT
 };
 
 static void send_reply                  (GVfsJob      *job);
@@ -61,11 +59,11 @@ g_vfs_job_dbus_finalize (GObject *object)
 
   job = G_VFS_JOB_DBUS (object);
 
-  if (job->message)
-    dbus_message_unref (job->message);
-
-  if (job->connection)
-    dbus_connection_unref (job->connection);
+  if (job->invocation)
+    g_object_unref (job->invocation);
+  
+  if (job->object)
+    g_object_unref (job->object);
   
   if (G_OBJECT_CLASS (g_vfs_job_dbus_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_dbus_parent_class)->finalize) (object);
@@ -84,19 +82,19 @@ g_vfs_job_dbus_class_init (GVfsJobDBusClass *klass)
   job_class->send_reply = send_reply;
 
   g_object_class_install_property (gobject_class,
-				   PROP_CONNECTION,
-				   g_param_spec_pointer ("connection",
+				   PROP_INVOCATION,
+				   g_param_spec_pointer ("invocation",
 							P_("VFS Backend"),
-							P_("The implementation for this job operartion."),
+							P_("The implementation for this job operation."),
 							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
 							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
   g_object_class_install_property (gobject_class,
-				   PROP_MESSAGE,
-				   g_param_spec_pointer ("message",
-							P_("VFS Backend"),
-							P_("The implementation for this job operartion."),
-							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                   PROP_OBJECT,
+                                   g_param_spec_pointer ("object",
+                                                        P_("VFS Backend"),
+                                                        P_("The implementation for this job operation."),
+                                                        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
 }
 
 static void
@@ -114,11 +112,11 @@ g_vfs_job_dbus_set_property (GObject         *object,
   
   switch (prop_id)
     {
-    case PROP_MESSAGE:
-      job->message = dbus_message_ref (g_value_get_pointer (value));
+    case PROP_INVOCATION:
+      job->invocation = g_object_ref (g_value_get_pointer (value));
       break;
-    case PROP_CONNECTION:
-      job->connection = dbus_connection_ref (g_value_get_pointer (value));
+    case PROP_OBJECT:
+      job->object = g_object_ref (g_value_get_pointer (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -136,11 +134,11 @@ g_vfs_job_dbus_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_MESSAGE:
-      g_value_set_pointer (value, job->message);
+    case PROP_INVOCATION:
+      g_value_set_pointer (value, job->invocation);
       break;
-    case PROP_CONNECTION:
-      g_value_set_pointer (value, job->connection);
+    case PROP_OBJECT:
+      g_value_set_pointer (value, job->object);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -153,44 +151,29 @@ static void
 send_reply (GVfsJob *job)
 {
   GVfsJobDBus *dbus_job = G_VFS_JOB_DBUS (job);
-  DBusMessage *reply;
   GVfsJobDBusClass *class;
 
   g_debug ("send_reply(%p), failed=%d (%s)\n", job, job->failed, job->failed?job->error->message:"");
   
   class = G_VFS_JOB_DBUS_GET_CLASS (job);
   
-  if (job->failed) 
-    reply = _dbus_message_new_from_gerror (dbus_job->message, job->error);
+  if (job->failed)
+    g_dbus_method_invocation_return_gerror (dbus_job->invocation, job->error);
   else
-    reply = class->create_reply (job, dbus_job->connection, dbus_job->message);
+    class->create_reply (job, dbus_job->object, dbus_job->invocation);
  
-  g_assert (reply != NULL);
-
-  /* Queues reply (threadsafely), actually sends it in mainloop */
-  dbus_connection_send (dbus_job->connection, reply, NULL);
-  dbus_message_unref (reply);
-
   g_vfs_job_emit_finished (job);
-}
-
-DBusConnection *
-g_vfs_job_dbus_get_connection (GVfsJobDBus *job_dbus)
-{
-  return job_dbus->connection;
-}
-
-DBusMessage *
-g_vfs_job_dbus_get_message (GVfsJobDBus *job_dbus)
-{
-  return job_dbus->message;
 }
 
 gboolean
 g_vfs_job_dbus_is_serial (GVfsJobDBus *job_dbus,
-			  DBusConnection *connection,
-			  dbus_uint32_t serial)
+                          GDBusConnection *connection,
+			  guint serial)
 {
+  return TRUE;
+  
+  /* FIXME 
   return job_dbus->connection == connection &&
     dbus_message_get_serial (job_dbus->message) == serial;
+    */
 }

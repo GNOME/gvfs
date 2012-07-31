@@ -23,7 +23,6 @@
 #ifndef __G_VFS_JOB_OPEN_FOR_WRITE_H__
 #define __G_VFS_JOB_OPEN_FOR_WRITE_H__
 
-#include <dbus/dbus.h>
 #include <gvfsjobdbus.h>
 #include <gvfsbackend.h>
 #include <gvfswritechannel.h>
@@ -72,9 +71,16 @@ struct _GVfsJobOpenForWriteClass
 
 GType g_vfs_job_open_for_write_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_open_for_write_new                (DBusConnection      *connection,
-						      DBusMessage         *message,
-						      GVfsBackend         *backend);
+gboolean g_vfs_job_open_for_write_new_handle         (GVfsDBusMount         *object,
+                                                      GDBusMethodInvocation *invocation,
+                                                      GUnixFDList           *fd_list,
+                                                      const gchar           *arg_path_data,
+                                                      guint16                arg_mode,
+                                                      const gchar           *arg_etag,
+                                                      gboolean               arg_make_backup,
+                                                      guint                  arg_flags,
+                                                      guint                  arg_pid,
+                                                      GVfsBackend           *backend);
 void     g_vfs_job_open_for_write_set_handle         (GVfsJobOpenForWrite *job,
 						      GVfsBackendHandle    handle);
 void     g_vfs_job_open_for_write_set_can_seek       (GVfsJobOpenForWrite *job,

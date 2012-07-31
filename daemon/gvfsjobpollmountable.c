@@ -28,19 +28,16 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobpollmountable.h"
-#include "gvfsdbusutils.h"
-#include "gvfsdaemonutils.h"
 
 G_DEFINE_TYPE (GVfsJobPollMountable, g_vfs_job_poll_mountable, G_VFS_TYPE_JOB_DBUS)
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
-static DBusMessage *create_reply (GVfsJob        *job,
-				  DBusConnection *connection,
-				  DBusMessage    *message);
+static void         create_reply (GVfsJob               *job,
+                                  GVfsDBusMount         *object,
+                                  GDBusMethodInvocation *invocation);
 
 static void
 g_vfs_job_poll_mountable_finalize (GObject *object)
@@ -73,45 +70,31 @@ g_vfs_job_poll_mountable_init (GVfsJobPollMountable *job)
 {
 }
 
-GVfsJob *
-g_vfs_job_poll_mountable_new (DBusConnection *connection,
-                              DBusMessage *message,
-                              GVfsBackend *backend)
+gboolean
+g_vfs_job_poll_mountable_new_handle (GVfsDBusMount *object,
+                                     GDBusMethodInvocation *invocation,
+                                     const gchar *arg_path_data,
+                                     GVfsBackend *backend)
 {
   GVfsJobPollMountable *job;
-  DBusMessage *reply;
-  DBusMessageIter iter;
-  DBusError derror;
-  char *path;
 
-  dbus_error_init (&derror);
-  dbus_message_iter_init (message, &iter);
+  g_print ("called PollMountable()\n");
 
-  path = NULL;
-  if (!_g_dbus_message_iter_get_args (&iter, &derror,
-				      G_DBUS_TYPE_CSTRING, &path,
-				      0))
-    {
-      g_free (path);
-      reply = dbus_message_new_error (message,
-				      derror.name,
-                                      derror.message);
-      dbus_error_free (&derror);
-
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return NULL;
-    }
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
 
   job = g_object_new (G_VFS_TYPE_JOB_POLL_MOUNTABLE,
-		      "message", message,
-		      "connection", connection,
-		      NULL);
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
 
-  job->filename = path;
+  job->filename = g_strdup (arg_path_data);
   job->backend = backend;
 
-  return G_VFS_JOB (job);
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
 }
 
 static void
@@ -147,14 +130,10 @@ try (GVfsJob *job)
 }
 
 /* Might be called on an i/o thread */
-static DBusMessage *
+static void
 create_reply (GVfsJob *job,
-	      DBusConnection *connection,
-	      DBusMessage *message)
+              GVfsDBusMount *object,
+              GDBusMethodInvocation *invocation)
 {
-  DBusMessage *reply;
-
-  reply = dbus_message_new_method_return (message);
-  
-  return reply;
+  gvfs_dbus_mount_complete_poll_mountable (object, invocation);
 }

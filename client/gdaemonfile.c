@@ -38,11 +38,12 @@
 #include <gdaemonfilemonitor.h>
 #include <gdaemonfileenumerator.h>
 #include <glib/gi18n-lib.h>
-#include "gvfsdbusutils.h"
 #include "gmountoperationdbus.h"
 #include <gio/gio.h>
 #include "metatree.h"
 #include <metadata-dbus.h>
+#include <gvfsdbus.h>
+#include <gio/gunixfdlist.h>
 
 static void g_daemon_file_file_iface_init (GFileIface       *iface);
 
@@ -179,6 +180,7 @@ g_daemon_file_get_path (GFile *file)
   
   mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
 						  daemon_file->path,
+						  NULL,  /* TODO: cancellable */
 						  NULL);
 
   if (mount_info == NULL)
@@ -370,210 +372,130 @@ g_daemon_file_resolve_relative_path (GFile *file,
   return child;
 }
 
-static DBusMessage *
-create_empty_message (GFile *file,
-		      const char *op,
-		      GMountInfo **mount_info_out,
-		      GError **error)
+static GVfsDBusMount *
+create_proxy_for_file2 (GFile *file1,
+                        GFile *file2,
+                        GMountInfo **mount_info1_out,
+                        GMountInfo **mount_info2_out,
+                        gchar **path1_out,
+                        gchar **path2_out,
+                        GDBusConnection **connection_out,
+                        GCancellable *cancellable,
+                        GError **error)
 {
-  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
-  DBusMessage *message;
-  GMountInfo *mount_info;
-  const char *path;
-
-  mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
-						  daemon_file->path,
-						  error);
-  if (mount_info == NULL)
-    return NULL;
-
-  if (mount_info_out)
-    *mount_info_out = g_mount_info_ref (mount_info);
-  
-  message =
-    dbus_message_new_method_call (mount_info->dbus_id,
-				  mount_info->object_path,
-				  G_VFS_DBUS_MOUNT_INTERFACE,
-				  op);
-
-  path = g_mount_info_resolve_path (mount_info,
-				    daemon_file->path);
-  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
-
-  g_mount_info_unref (mount_info);
-  return message;
-}
-
-static DBusMessage *
-do_sync_path_call (GFile *file,
-		   const char *op,
-		   GMountInfo **mount_info_out,
-		   DBusConnection **connection_out,
-		   GCancellable *cancellable,
-		   GError **error,
-		   int first_arg_type,
-		   ...)
-{
-  DBusMessage *message, *reply;
-  va_list var_args;
-  GError *my_error;
-
- retry:
-  
-  message = create_empty_message (file, op, mount_info_out, error);
-  if (!message)
-    return NULL;
-
-  va_start (var_args, first_arg_type);
-  _g_dbus_message_append_args_valist (message,
-				      first_arg_type,
-				      var_args);
-  va_end (var_args);
-
-
-  my_error = NULL;
-  reply = _g_vfs_daemon_call_sync (message,
-				   connection_out,
-				   NULL, NULL, NULL,
-				   cancellable, &my_error);
-  dbus_message_unref (message);
-
-  if (reply == NULL)
-    {
-      if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
-	{
-	  g_error_free (my_error);
-	  goto retry;
-	}
-      g_propagate_error (error, my_error);
-    }
-
-  return reply;
-}
-
-static DBusMessage *
-do_sync_2_path_call (GFile *file1,
-		     GFile *file2,
-		     const char *op,
-		     const char *callback_obj_path,
-		     DBusObjectPathMessageFunction callback,
-		     gpointer callback_user_data, 
-		     DBusConnection **connection_out,
-		     GCancellable *cancellable,
-		     GError **error,
-		     int first_arg_type,
-		     ...)
-{
+  GVfsDBusMount *proxy;
   GDaemonFile *daemon_file1 = G_DAEMON_FILE (file1);
   GDaemonFile *daemon_file2 = G_DAEMON_FILE (file2);
-  DBusMessage *message, *reply;
   GMountInfo *mount_info1, *mount_info2;
-  const char *path1, *path2;
-  va_list var_args;
-  GError *my_error;
+  GDBusConnection *connection;
 
- retry:
+  proxy = NULL;
+  mount_info2 = NULL;
   
   mount_info1 = _g_daemon_vfs_get_mount_info_sync (daemon_file1->mount_spec,
-						   daemon_file1->path,
-						   error);
+                                                   daemon_file1->path,
+                                                   cancellable,
+                                                   error);
+  
   if (mount_info1 == NULL)
-    return NULL;
+    goto out;
 
-  mount_info2 = NULL;
   if (daemon_file2)
     {
       mount_info2 = _g_daemon_vfs_get_mount_info_sync (daemon_file2->mount_spec,
-						       daemon_file2->path,
-						       error);
+                                                       daemon_file2->path,
+                                                       cancellable,
+                                                       error);
       if (mount_info2 == NULL)
-	{
-	  g_mount_info_unref (mount_info1);
-	  return NULL;
-	}
+        goto out;
 
-      if (mount_info1 != mount_info2)
-	{
-	  g_mount_info_unref (mount_info1);
-	  /* For copy this will cause the fallback code to be involved */
-	  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			       _("Operation not supported, files on different mounts"));
-	  return NULL;
-	}
+      if (! g_mount_info_equal (mount_info1, mount_info2))
+        {
+          /* For copy this will cause the fallback code to be involved */
+          g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                               _("Operation not supported, files on different mounts"));
+          goto out;
+        }
     }
-      
-  message =
-    dbus_message_new_method_call (mount_info1->dbus_id,
-				  mount_info1->object_path,
-				  G_VFS_DBUS_MOUNT_INTERFACE,
-				  op);
 
-  path1 = g_mount_info_resolve_path (mount_info1,
-				     daemon_file1->path);
-  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path1, 0);
+  connection = _g_dbus_connection_get_sync (mount_info1->dbus_id, cancellable, error);
+  if (connection == NULL)
+    goto out;
 
-  if (daemon_file2)
-    {
-      path2 = g_mount_info_resolve_path (mount_info2,
-					 daemon_file2->path);
-      _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path2, 0);
-    }
+  proxy = gvfs_dbus_mount_proxy_new_sync (connection,
+                                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                                          mount_info1->dbus_id,
+                                          mount_info1->object_path,
+                                          cancellable,
+                                          error);
   
-  va_start (var_args, first_arg_type);
-  _g_dbus_message_append_args_valist (message,
-				      first_arg_type,
-				      var_args);
-  va_end (var_args);
+  if (proxy == NULL)
+    goto out;
+  
+  _g_dbus_connect_vfs_filters (connection);
 
-  my_error = NULL;
-  reply = _g_vfs_daemon_call_sync (message,
-				   connection_out,
-				   callback_obj_path,
-				   callback,
-				   callback_user_data, 
-				   cancellable, &my_error);
-  dbus_message_unref (message);
+  if (mount_info1_out)
+    *mount_info1_out = g_mount_info_ref (mount_info1);
+  if (mount_info2_out && mount_info2)
+    *mount_info2_out = g_mount_info_ref (mount_info2);
+  if (path1_out)
+    *path1_out = g_strdup (g_mount_info_resolve_path (mount_info1, daemon_file1->path));
+  if (path2_out && mount_info2)
+    *path2_out = g_strdup (g_mount_info_resolve_path (mount_info2, daemon_file2->path));
+  if (connection_out)
+    *connection_out = connection;
 
+ out:
   g_mount_info_unref (mount_info1);
   if (mount_info2)
     g_mount_info_unref (mount_info2);
-
-  if (reply == NULL)
-    {
-      if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
-	{
-	  g_error_free (my_error);
-	  goto retry;
-	}
-      g_propagate_error (error, my_error);
-    }
-  
-  return reply;
+ 
+  return proxy;
 }
 
-typedef void (*AsyncPathCallCallback) (DBusMessage *reply,
-				       DBusConnection *connection,
-				       GMountInfo *mount_info,
-				       GSimpleAsyncResult *result,
-				       GCancellable *cancellable,
-				       gpointer callback_data);
+static GVfsDBusMount *
+create_proxy_for_file (GFile *file,
+                       GMountInfo **mount_info_out,
+                       gchar **path_out,
+                       GDBusConnection **connection_out,
+                       GCancellable *cancellable,
+                       GError **error)
+{
+  return create_proxy_for_file2 (file, NULL,
+                                 mount_info_out, NULL,
+                                 path_out, NULL,
+                                 connection_out,
+                                 cancellable,
+                                 error);
+}
 
+
+typedef void (*CreateProxyAsyncCallback) (GVfsDBusMount *proxy,
+                                          GDBusConnection *connection,
+                                          GMountInfo *mount_info,
+                                          const gchar *path,
+                                          GSimpleAsyncResult *result,
+                                          GError *error,
+                                          GCancellable *cancellable,
+                                          gpointer callback_data);
 
 typedef struct {
   GSimpleAsyncResult *result;
   GFile *file;
   char *op;
   GCancellable *cancellable;
-  DBusMessage *args;
-  AsyncPathCallCallback callback;
+  CreateProxyAsyncCallback callback;
   gpointer callback_data;
   GDestroyNotify notify;
   GMountInfo *mount_info;
-} AsyncPathCall;
+  GDBusConnection *connection;
+  GVfsDBusMount *proxy;
+} AsyncProxyCreate;
 
 static void
-async_path_call_free (AsyncPathCall *data)
+async_proxy_create_free (AsyncProxyCreate *data)
 {
+  g_print ("async_proxy_create_free\n");
   if (data->notify)
     data->notify (data->callback_data);
 
@@ -583,143 +505,175 @@ async_path_call_free (AsyncPathCall *data)
   g_free (data->op);
   if (data->cancellable)
     g_object_unref (data->cancellable);
-  if (data->args)
-    dbus_message_unref (data->args);
   if (data->mount_info)
     g_mount_info_unref (data->mount_info);
+  if (data->connection)
+    g_object_unref (data->connection);
+  if (data->proxy)
+    g_object_unref (data->proxy);
   g_free (data);
 }
 
 static void
-async_path_call_done (DBusMessage *reply,
-		      DBusConnection *connection,
-		      GError *io_error,
-		      gpointer _data)
+async_proxy_new_cb (GObject *source_object,
+                    GAsyncResult *res,
+                    gpointer user_data)
 {
-  AsyncPathCall *data = _data;
+  AsyncProxyCreate *data = user_data;
+  GDaemonFile *daemon_file = G_DAEMON_FILE (data->file);
+  const char *path;
+  GVfsDBusMount *proxy;
+  GError *error = NULL;
   GSimpleAsyncResult *result;
-
-  if (io_error != NULL)
+  
+  proxy = gvfs_dbus_mount_proxy_new_finish (res, &error);
+  g_print ("async_proxy_new_cb, proxy = %p\n", proxy);
+  if (proxy == NULL)
     {
-      g_simple_async_result_set_from_error (data->result, io_error);
+      g_simple_async_result_take_error (data->result, error);      
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
-      async_path_call_free (data);
+      async_proxy_create_free (data);
+      return;
     }
-  else
-    {
-      result = data->result;
-      g_object_weak_ref (G_OBJECT (result), (GWeakNotify)async_path_call_free, data);
-      data->result = NULL;
-      
-      data->callback (reply,
-                      connection,
-                      data->mount_info,
-		      result,
-		      data->cancellable,
-		      data->callback_data);
+  
+  data->proxy = proxy;
+  _g_dbus_connect_vfs_filters (data->connection);
+  path = g_mount_info_resolve_path (data->mount_info, daemon_file->path);
 
-      /* Free data here, or later if callback ref:ed the result */
-      g_object_unref (result);
-    }
+  /* Complete the create_proxy_for_file_async() call */
+  result = data->result;
+  g_object_weak_ref (G_OBJECT (result), (GWeakNotify)async_proxy_create_free, data);
+  data->result = NULL;
+  
+  data->callback (proxy,
+                  data->connection,
+                  data->mount_info,
+                  path,
+                  result,
+                  NULL,
+                  data->cancellable,
+                  data->callback_data);
+
+  /* Free data here, or later if callback ref:ed the result */
+  g_object_unref (result);
 }
 
 static void
-do_async_path_call_callback (GMountInfo *mount_info,
-			     gpointer _data,
-			     GError *error)
+async_construct_proxy (GDBusConnection *connection,
+                       AsyncProxyCreate *data)
 {
-  AsyncPathCall *data = _data;
-  GDaemonFile *daemon_file = G_DAEMON_FILE (data->file);
-  const char *path;
-  DBusMessage *message;
-  DBusMessageIter arg_source, arg_dest;
+  data->connection = g_object_ref (connection);
+  gvfs_dbus_mount_proxy_new (connection,
+                             G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                             data->mount_info->dbus_id,
+                             data->mount_info->object_path,
+                             data->cancellable,
+                             async_proxy_new_cb,
+                             data);
+}
+
+static void
+bus_get_cb (GObject *source_object,
+            GAsyncResult *res,
+            gpointer user_data)
+{
+  AsyncProxyCreate *data = user_data;
+  GDBusConnection *connection;
+  GError *error = NULL;
   
+  connection = g_bus_get_finish (res, &error);
+  
+  if (connection == NULL)
+    {
+      g_simple_async_result_set_from_error (data->result, error);
+      _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
+      async_proxy_create_free (data);
+      return;
+    }
+
+  async_construct_proxy (connection, data);
+}
+
+static void
+async_got_connection_cb (GDBusConnection *connection,
+                         GError *io_error,
+                         gpointer callback_data)
+{
+  AsyncProxyCreate *data = callback_data;
+  
+  g_print ("async_got_connection_cb, connection = %p\n", connection);
+  
+  if (connection == NULL)
+    {
+      /* TODO: we should probably test if we really want a session bus;
+       *       for now, this code is on par with the old dbus code */ 
+      g_bus_get (G_BUS_TYPE_SESSION,
+                 data->cancellable,
+                 bus_get_cb,
+                 data);
+      return;
+    }
+  
+  async_construct_proxy (connection, data);
+}
+
+static void
+async_got_mount_info (GMountInfo *mount_info,
+                      gpointer _data,
+                      GError *error)
+{
+  AsyncProxyCreate *data = _data;
+ 
+  g_print ("async_got_mount_info, mount_info = %p\n", mount_info);
+
   if (error != NULL)
     {
       g_simple_async_result_set_from_error (data->result, error);      
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
-      async_path_call_free (data);
+      async_proxy_create_free (data);
       return;
     }
 
   data->mount_info = g_mount_info_ref (mount_info);
 
-  message =
-    dbus_message_new_method_call (mount_info->dbus_id,
-				  mount_info->object_path,
-				  G_VFS_DBUS_MOUNT_INTERFACE,
-				  data->op);
-  
-  path = g_mount_info_resolve_path (mount_info, daemon_file->path);
-  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
-
-  /* Append more args from data->args */
-
-  if (data->args)
-    {
-      dbus_message_iter_init (data->args, &arg_source);
-      dbus_message_iter_init_append (message, &arg_dest);
-
-      _g_dbus_message_iter_copy (&arg_dest, &arg_source);
-    }
-
-  _g_vfs_daemon_call_async (message,
-			    async_path_call_done, data,
-			    data->cancellable);
-  
-  dbus_message_unref (message);
+  _g_dbus_connection_get_for_async (mount_info->dbus_id,
+                                    async_got_connection_cb,
+                                    data,
+                                    data->cancellable);
 }
 
 static void
-do_async_path_call (GFile *file,
-		    const char *op,
-		    GCancellable *cancellable,
-		    GAsyncReadyCallback op_callback,
-		    gpointer op_callback_data,
-		    AsyncPathCallCallback callback,
-		    gpointer callback_data,
-		    GDestroyNotify notify,
-		    int first_arg_type,
-		    ...)
+create_proxy_for_file_async (GFile *file,
+                             GCancellable *cancellable,
+                             GAsyncReadyCallback op_callback,
+                             gpointer op_callback_data,
+                             CreateProxyAsyncCallback callback,
+                             gpointer callback_data,
+                             GDestroyNotify notify)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
-  va_list var_args;
-  AsyncPathCall *data;
+  AsyncProxyCreate *data;
 
-  data = g_new0 (AsyncPathCall, 1);
+  g_print ("create_proxy_for_file_async\n");
+  
+  data = g_new0 (AsyncProxyCreate, 1);
 
   data->result = g_simple_async_result_new (G_OBJECT (file),
-					    op_callback, op_callback_data,
-					    NULL);
+                                            op_callback, op_callback_data,
+                                            NULL);
 
   data->file = g_object_ref (file);
-  data->op = g_strdup (op);
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
   data->callback = callback;
   data->callback_data = callback_data;
   data->notify = notify;
   
-  if (first_arg_type != 0)
-    {
-      data->args = dbus_message_new (DBUS_MESSAGE_TYPE_METHOD_CALL);
-      if (data->args == NULL)
-	_g_dbus_oom ();
-      
-      va_start (var_args, first_arg_type);
-      _g_dbus_message_append_args_valist (data->args,
-					  first_arg_type,
-					  var_args);
-      va_end (var_args);
-    }
-  
-  
   _g_daemon_vfs_get_mount_info_async (daemon_file->mount_spec,
-				     daemon_file->path,
-				     do_async_path_call_callback,
-				     data);
+                                      daemon_file->path,
+                                      async_got_mount_info,
+                                      data);
 }
-
 
 static GFileEnumerator *
 g_daemon_file_enumerate_children (GFile      *file,
@@ -728,47 +682,51 @@ g_daemon_file_enumerate_children (GFile      *file,
 				  GCancellable *cancellable,
 				  GError **error)
 {
-  DBusMessage *reply;
-  dbus_uint32_t flags_dbus;
   char *obj_path;
+  char *path;
   GDaemonFileEnumerator *enumerator;
-  DBusConnection *connection;
+  GDBusConnection *connection;
   char *uri;
-
-  enumerator = g_daemon_file_enumerator_new (file, attributes);
-  obj_path = g_daemon_file_enumerator_get_object_path (enumerator);
-
-
-  uri = g_file_get_uri (file);
+  GVfsDBusMount *proxy;
+  gboolean res;
   
-  if (attributes == NULL)
-    attributes = "";
-  flags_dbus = flags;
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_ENUMERATE,
-			     NULL, &connection,
-			     cancellable, error,
-			     DBUS_TYPE_STRING, &obj_path,
-			     DBUS_TYPE_STRING, &attributes,
-			     DBUS_TYPE_UINT32, &flags_dbus,
-			     DBUS_TYPE_STRING, &uri,
-			     0);
+  g_print ("g_daemon_file_enumerate_children\n");
+  
+  enumerator = g_daemon_file_enumerator_new (file, attributes);
+
+  proxy = create_proxy_for_file (file, NULL, &path, &connection, cancellable, error);
+  if (proxy == NULL)
+    goto out;
+ 
+  obj_path = g_daemon_file_enumerator_get_object_path (enumerator);
+  uri = g_file_get_uri (file);
+
+  res = gvfs_dbus_mount_call_enumerate_sync (proxy,
+                                             path,
+                                             obj_path,
+                                             attributes ? attributes : "",
+                                             flags,
+                                             uri,
+                                             cancellable,
+                                             error);
+  
+  g_print ("g_daemon_file_enumerate_children: done, res = %d\n", res);
+  
+  g_free (path);
   g_free (uri);
   g_free (obj_path);
+  g_object_unref (proxy);
 
-  if (reply == NULL)
-    goto error;
-
-  dbus_message_unref (reply);
-
+  if (! res)
+    goto out;
+  
   g_daemon_file_enumerator_set_sync_connection (enumerator, connection);
   
   return G_FILE_ENUMERATOR (enumerator);
-
- error:
-  if (reply)
-    dbus_message_unref (reply);
-  g_object_unref (enumerator);
+  
+out:
+  if (enumerator != NULL)
+    g_object_unref (enumerator);
   return NULL;
 }
 
@@ -843,94 +801,143 @@ g_daemon_file_query_info (GFile                *file,
 			  GCancellable         *cancellable,
 			  GError              **error)
 {
-  DBusMessage *reply;
-  dbus_uint32_t flags_dbus;
-  DBusMessageIter iter;
+  char *path;
   GFileInfo *info;
   char *uri;
+  GVfsDBusMount *proxy;
+  GVariant *iter_info;
+  gboolean res;
+
+  g_print ("g_daemon_file_query_info\n");
+
+  proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
+  if (proxy == NULL)
+    return NULL;
 
   uri = g_file_get_uri (file);
 
-  if (attributes == NULL)
-    attributes = "";
-  flags_dbus = flags;
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_QUERY_INFO,
-			     NULL, NULL,
-			     cancellable, error,
-			     DBUS_TYPE_STRING, &attributes,
-			     DBUS_TYPE_UINT32, &flags_dbus,
-			     DBUS_TYPE_STRING, &uri,
-			     0);
+  iter_info = NULL;
+  res = gvfs_dbus_mount_call_query_info_sync (proxy,
+                                              path,
+                                              attributes ? attributes : "",
+                                              flags,
+                                              uri,
+                                              &iter_info,
+                                              cancellable,
+                                              error);
 
+  g_print ("g_daemon_file_query_info: done, res = %d\n", res);
+
+  g_free (path);
   g_free (uri);
-  
-  if (reply == NULL)
+  g_object_unref (proxy);
+
+  if (! res)
     return NULL;
 
-  info = NULL;
-  
-  if (!dbus_message_iter_init (reply, &iter) ||
-      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
-    {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   /* Translators: %s is the name of a programming function */
-			   _("Invalid return value from %s"), "get_info");
-      goto out;
-    }
-
-  info = _g_dbus_get_file_info (&iter, error);
+  info = _g_dbus_get_file_info (iter_info, error);
+  g_variant_unref (iter_info);
 
   if (info)
     add_metadata (file, attributes, info);
-
- out:
-  dbus_message_unref (reply);
+  
   return info;
 }
 
-static void
-query_info_async_cb (DBusMessage *reply,
-		     DBusConnection *connection,
-                     GMountInfo *mount_info,
-		     GSimpleAsyncResult *result,
-		     GCancellable *cancellable,
-		     gpointer callback_data)
-{
-  const char *attributes = callback_data;
-  DBusMessageIter iter;
-  GFileInfo *info;
-  GError *error;
+
+typedef struct {
   GFile *file;
+  char *attributes;
+  GFileQueryInfoFlags flags;
+  int io_priority;
+  GSimpleAsyncResult *result;
+  GCancellable *cancellable;
+} AsyncCallQueryInfo;
 
-  info = NULL;
+static void
+async_call_query_info_free (AsyncCallQueryInfo *data)
+{
+  if (data->file)
+    g_object_unref (data->file);
+  if (data->result)
+    g_object_unref (data->result);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
+  g_free (data->attributes);
+  g_free (data);
+}
+
+static void
+query_info_async_cb (GVfsDBusMount *proxy,
+                     GAsyncResult *res,
+                     gpointer user_data)
+{
+  AsyncCallQueryInfo *data = user_data;
+  GError *error = NULL;
+  GSimpleAsyncResult *orig_result;
+  GVariant *iter_info;
+  GFileInfo *info;
+  GFile *file;
   
-  if (!dbus_message_iter_init (reply, &iter) ||
-      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
+  g_print ("query_info_async_cb\n");
+  orig_result = data->result;
+  
+  if (! gvfs_dbus_mount_call_query_info_finish (proxy, &iter_info, res, &error))
     {
-      g_simple_async_result_set_error (result,
-				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Invalid return value from %s"), "query_info");
-      _g_simple_async_result_complete_with_cancellable (result, cancellable);
-      return;
+      g_simple_async_result_take_error (orig_result, error);
+      goto out;
     }
+  
+  info = _g_dbus_get_file_info (iter_info, &error);
+  g_variant_unref (iter_info);
 
-  error = NULL;
-  info = _g_dbus_get_file_info (&iter, &error);
   if (info == NULL)
     {
-      g_simple_async_result_set_from_error (result, error);
-      g_error_free (error);
-      _g_simple_async_result_complete_with_cancellable (result, cancellable);
-      return;
+      g_simple_async_result_take_error (orig_result, error);
+      goto out;
     }
 
-  file = G_FILE (g_async_result_get_source_object (G_ASYNC_RESULT (result)));
-  add_metadata (file, attributes, info);
+  file = G_FILE (g_async_result_get_source_object (G_ASYNC_RESULT (orig_result)));
+  add_metadata (file, data->attributes, info);
   g_object_unref (file);
 
-  g_simple_async_result_set_op_res_gpointer (result, info, g_object_unref);
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
+  g_simple_async_result_set_op_res_gpointer (orig_result, info, g_object_unref);
+  
+out:
+  _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+  data->result = NULL;
+  g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
+}
+
+static void
+query_info_async_get_proxy_cb (GVfsDBusMount *proxy,
+                               GDBusConnection *connection,
+                               GMountInfo *mount_info,
+                               const gchar *path,
+                               GSimpleAsyncResult *result,
+                               GError *error,
+                               GCancellable *cancellable,
+                               gpointer callback_data)
+{
+  AsyncCallQueryInfo *data = callback_data;
+  char *uri;
+
+  g_print ("query_info_async_get_proxy_cb, proxy = %p\n", proxy);
+  
+  uri = g_file_get_uri (data->file);
+  
+  data->result = g_object_ref (result);
+  
+  gvfs_dbus_mount_call_query_info (proxy,
+                                   path,
+                                   data->attributes ? data->attributes : "",
+                                   data->flags,
+                                   uri,
+                                   cancellable,
+                                   (GAsyncReadyCallback) query_info_async_cb,
+                                   data);
+  
+  g_free (uri);
 }
 
 static void
@@ -942,23 +949,23 @@ g_daemon_file_query_info_async (GFile                      *file,
 				GAsyncReadyCallback         callback,
 				gpointer                    user_data)
 {
-  guint32 dbus_flags;
-  char *uri;
+  AsyncCallQueryInfo *data;
 
-  uri = g_file_get_uri (file);
+  g_print ("g_daemon_file_query_info_async\n");
+  
+  data = g_new0 (AsyncCallQueryInfo, 1);
+  data->file = g_object_ref (file);
+  data->attributes = g_strdup (attributes);
+  data->flags = flags;
+  data->io_priority = io_priority;
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
 
-  dbus_flags = flags;
-  do_async_path_call (file,
-		      G_VFS_DBUS_MOUNT_OP_QUERY_INFO,
-		      cancellable,
-		      callback, user_data,
-		      query_info_async_cb, g_strdup (attributes), g_free,
-		      DBUS_TYPE_STRING, &attributes,
-		      DBUS_TYPE_UINT32, &dbus_flags,
-		      DBUS_TYPE_STRING, &uri,
-		      0);
-
-  g_free (uri);
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, user_data,
+                               query_info_async_get_proxy_cb,
+                               data, (GDestroyNotify) async_call_query_info_free);
 }
 
 static GFileInfo *
@@ -976,67 +983,100 @@ g_daemon_file_query_info_finish (GFile                      *file,
   return NULL;
 }
 
+
 typedef struct {
+  GFile *file;
+  guint16 mode;
+  int io_priority;
+  gchar *etag;
+  gboolean make_backup;
+  GFileCreateFlags flags;
   GSimpleAsyncResult *result;
   GCancellable *cancellable;
-  gboolean can_seek;
-} GetFDData;
+} AsyncCallFileReadWrite;
 
 static void
-read_async_get_fd_cb (int fd,
-		      gpointer callback_data)
+async_call_file_read_write_free (AsyncCallFileReadWrite *data)
 {
-  GetFDData *data = callback_data;
-  GFileInputStream *stream;
-  
-  if (fd == -1)
-    {
-      g_simple_async_result_set_error (data->result,
-				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Couldn't get stream file descriptor"));
-    }
-  else
-    {
-      stream = g_daemon_file_input_stream_new (fd, data->can_seek);
-      g_simple_async_result_set_op_res_gpointer (data->result, stream, g_object_unref);
-    }
-
-  _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
-
-  g_object_unref (data->result);
+  if (data->file)
+    g_object_unref (data->file);
+  if (data->result)
+    g_object_unref (data->result);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
+  g_free (data->etag);
   g_free (data);
 }
 
 static void
-read_async_cb (DBusMessage *reply,
-	       DBusConnection *connection,
-               GMountInfo *mount_info,
-	       GSimpleAsyncResult *result,
-	       GCancellable *cancellable,
-	       gpointer callback_data)
+read_async_cb (GVfsDBusMount *proxy,
+               GAsyncResult *res,
+               gpointer user_data)
 {
-  guint32 fd_id;
-  dbus_bool_t can_seek;
-  GetFDData *get_fd_data;
+  AsyncCallFileReadWrite *data = user_data;
+  GError *error = NULL;
+  GSimpleAsyncResult *orig_result;
+  gboolean can_seek;
+  GUnixFDList *fd_list;
+  int fd;
+  guint fd_id;
+  GFileInputStream *stream;
+
+  g_print ("read_async_cb\n");
+  orig_result = data->result;
   
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_UINT32, &fd_id,
-			      DBUS_TYPE_BOOLEAN, &can_seek,
-			      DBUS_TYPE_INVALID))
+  if (! gvfs_dbus_mount_call_open_for_read_finish (proxy, &fd_id, &can_seek, &fd_list, res, &error))
     {
-      g_simple_async_result_set_error (result,
-				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Invalid return value from %s"), "open");
-      _g_simple_async_result_complete_with_cancellable (result, cancellable);
-      return;
+      g_simple_async_result_take_error (orig_result, error);
+      goto out;
     }
+
+  if (fd_list == NULL || g_unix_fd_list_get_length (fd_list) != 1 ||
+      (fd = g_unix_fd_list_get (fd_list, fd_id, NULL)) == -1)
+    {
+      g_simple_async_result_set_error (orig_result,
+                                       G_IO_ERROR, G_IO_ERROR_FAILED,
+                                       _("Couldn't get stream file descriptor"));
+    }
+  else
+    {
+      stream = g_daemon_file_input_stream_new (fd, can_seek);
+      g_simple_async_result_set_op_res_gpointer (orig_result, stream, g_object_unref);
+      g_object_unref (fd_list);
+    }
+
+out:
+  _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+  data->result = NULL;
+  g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
+}
+
+static void
+file_read_async_get_proxy_cb (GVfsDBusMount *proxy,
+                               GDBusConnection *connection,
+                               GMountInfo *mount_info,
+                               const gchar *path,
+                               GSimpleAsyncResult *result,
+                               GError *error,
+                               GCancellable *cancellable,
+                               gpointer callback_data)
+{
+  AsyncCallFileReadWrite *data = callback_data;
+  guint32 pid;
+
+  g_print ("file_read_async_get_proxy_cb, proxy = %p\n", proxy);
+
+  pid = get_pid_for_file (data->file);
   
-  get_fd_data = g_new0 (GetFDData, 1);
-  get_fd_data->result = g_object_ref (result);
-  get_fd_data->can_seek = can_seek;
+  data->result = g_object_ref (result);
   
-  _g_dbus_connection_get_fd_async (connection, fd_id,
-				   read_async_get_fd_cb, get_fd_data);
+  gvfs_dbus_mount_call_open_for_read (proxy,
+                                     path,
+                                     pid,
+                                     NULL,
+                                     cancellable,
+                                     (GAsyncReadyCallback) read_async_cb,
+                                     data);
 }
 
 static void
@@ -1046,17 +1086,21 @@ g_daemon_file_read_async (GFile *file,
 			  GAsyncReadyCallback callback,
 			  gpointer callback_data)
 {
-  guint32 pid;
+  AsyncCallFileReadWrite *data;
 
-  pid = get_pid_for_file (file);
+  g_print ("g_daemon_file_read_async\n");
+  
+  data = g_new0 (AsyncCallFileReadWrite, 1);
+  data->file = g_object_ref (file);
+  data->io_priority = io_priority;
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
 
-  do_async_path_call (file,
-		      G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ,
-		      cancellable,
-		      callback, callback_data,
-		      read_async_cb, NULL, NULL,
-                      DBUS_TYPE_UINT32, &pid,
-		      0);
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, callback_data,
+                               file_read_async_get_proxy_cb,
+                               data, (GDestroyNotify) async_call_file_read_write_free);
 }
 
 static GFileInputStream *
@@ -1074,115 +1118,132 @@ g_daemon_file_read_finish (GFile                  *file,
   return NULL;
 }
 
-
 static GFileInputStream *
 g_daemon_file_read (GFile *file,
 		    GCancellable *cancellable,
 		    GError **error)
 {
-  DBusConnection *connection;
+  GVfsDBusMount *proxy;
+  char *path;
+  gboolean res;
+  gboolean can_seek;
+  GUnixFDList *fd_list;
   int fd;
-  DBusMessage *reply;
-  guint32 fd_id;
-  dbus_bool_t can_seek;
+  guint fd_id;
   guint32 pid;
+
+  g_print ("g_daemon_file_read\n");
 
   pid = get_pid_for_file (file);
 
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ,
-			     NULL, &connection,
-			     cancellable, error,
-                             DBUS_TYPE_UINT32, &pid,
-			     0);
-  if (reply == NULL)
+  proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
+  if (proxy == NULL)
     return NULL;
 
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_UINT32, &fd_id,
-			      DBUS_TYPE_BOOLEAN, &can_seek,
-			      DBUS_TYPE_INVALID))
-    {
-      dbus_message_unref (reply);
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from %s"), "open");
-      return NULL;
-    }
+  res = gvfs_dbus_mount_call_open_for_read_sync (proxy,
+                                                 path,
+                                                 pid,
+                                                 NULL,
+                                                 &fd_id,
+                                                 &can_seek,
+                                                 &fd_list,
+                                                 cancellable,
+                                                 error);
   
-  dbus_message_unref (reply);
+  g_print ("g_daemon_file_read: done, res = %d\n", res);
+  
+  g_free (path);
+  g_object_unref (proxy);
 
-  fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
-  if (fd == -1)
+  if (! res)
+    return NULL;
+  
+  if (fd_list == NULL || g_unix_fd_list_get_length (fd_list) != 1 ||
+      (fd = g_unix_fd_list_get (fd_list, fd_id, NULL)) == -1)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			   _("Didn't get stream file descriptor"));
       return NULL;
     }
+
+  g_object_unref (fd_list);
   
   return g_daemon_file_input_stream_new (fd, can_seek);
 }
 
 static GFileOutputStream *
-g_daemon_file_append_to (GFile *file,
-			 GFileCreateFlags flags,
-			 GCancellable *cancellable,
-			 GError **error)
+file_open_write (GFile *file,
+		 guint16 mode,
+                 const char *etag,
+                 gboolean make_backup,
+                 GFileCreateFlags flags,
+		 GCancellable *cancellable,
+		 GError **error)
 {
-  DBusConnection *connection;
+  GVfsDBusMount *proxy;
+  char *path;
+  gboolean res;
+  gboolean can_seek;
+  GUnixFDList *fd_list;
   int fd;
-  DBusMessage *reply;
   guint32 fd_id;
-  dbus_bool_t can_seek;
-  guint16 mode;
-  guint64 initial_offset;
-  dbus_bool_t make_backup;
-  guint32 dbus_flags;
-  char *etag;
   guint32 pid;
+  guint64 initial_offset;
 
   pid = get_pid_for_file (file);
 
-  mode = 1;
-  etag = "";
-  make_backup = FALSE;
-  dbus_flags = flags;
-  
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
-			     NULL, &connection,
-			     cancellable, error,
-			     DBUS_TYPE_UINT16, &mode,
-			     DBUS_TYPE_STRING, &etag,
-			     DBUS_TYPE_BOOLEAN, &make_backup,
-			     DBUS_TYPE_UINT32, &dbus_flags,
-                             DBUS_TYPE_UINT32, &pid,
-			     0);
-  if (reply == NULL)
+  if (etag == NULL)
+    etag = "";
+
+  proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
+  if (proxy == NULL)
     return NULL;
 
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_UINT32, &fd_id,
-			      DBUS_TYPE_BOOLEAN, &can_seek,
-			      DBUS_TYPE_UINT64, &initial_offset,
-			      DBUS_TYPE_INVALID))
-    {
-      dbus_message_unref (reply);
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from %s"), "open");
-      return NULL;
-    }
+  res = gvfs_dbus_mount_call_open_for_write_sync (proxy,
+                                                  path,
+                                                  mode,
+                                                  etag,
+                                                  make_backup,
+                                                  flags,
+                                                  pid,
+                                                  NULL,
+                                                  &fd_id,
+                                                  &can_seek,
+                                                  &initial_offset,
+                                                  &fd_list,
+                                                  cancellable,
+                                                  error);
   
-  dbus_message_unref (reply);
+  g_print ("file_open_write: done, res = %d\n", res);
+  
+  g_free (path);
+  g_object_unref (proxy);
 
-  fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
-  if (fd == -1)
+  if (! res)
+    return NULL;
+  
+  if (fd_list == NULL || g_unix_fd_list_get_length (fd_list) != 1 ||
+      (fd = g_unix_fd_list_get (fd_list, 0, NULL)) == -1)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Didn't get stream file descriptor"));
+                           _("Didn't get stream file descriptor"));
       return NULL;
     }
+
+  g_object_unref (fd_list);
   
   return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
+}
+
+static GFileOutputStream *
+g_daemon_file_append_to (GFile *file,
+                         GFileCreateFlags flags,
+                         GCancellable *cancellable,
+                         GError **error)
+{
+  g_print ("g_daemon_file_append_to\n");
+
+  return file_open_write (file, 1, "", FALSE, flags, cancellable, error);
 }
 
 static GFileOutputStream *
@@ -1191,61 +1252,9 @@ g_daemon_file_create (GFile *file,
 		      GCancellable *cancellable,
 		      GError **error)
 {
-  DBusConnection *connection;
-  int fd;
-  DBusMessage *reply;
-  guint32 fd_id;
-  dbus_bool_t can_seek;
-  guint16 mode;
-  guint64 initial_offset;
-  dbus_bool_t make_backup;
-  char *etag;
-  guint32 dbus_flags;
-  guint32 pid;
+  g_print ("g_daemon_file_create\n");
 
-  pid = get_pid_for_file (file);
-
-  mode = 0;
-  etag = "";
-  make_backup = FALSE;
-  dbus_flags = flags;
-  
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
-			     NULL, &connection,
-			     cancellable, error,
-			     DBUS_TYPE_UINT16, &mode,
-			     DBUS_TYPE_STRING, &etag,
-			     DBUS_TYPE_BOOLEAN, &make_backup,
-			     DBUS_TYPE_UINT32, &dbus_flags,
-                             DBUS_TYPE_UINT32, &pid,
-			     0);
-  if (reply == NULL)
-    return NULL;
-
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_UINT32, &fd_id,
-			      DBUS_TYPE_BOOLEAN, &can_seek,
-			      DBUS_TYPE_UINT64, &initial_offset,
-			      DBUS_TYPE_INVALID))
-    {
-      dbus_message_unref (reply);
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from %s"), "open");
-      return NULL;
-    }
-  
-  dbus_message_unref (reply);
-
-  fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
-  if (fd == -1)
-    {
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Didn't get stream file descriptor"));
-      return NULL;
-    }
-  
-  return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
+  return file_open_write (file, 0, "", FALSE, flags, cancellable, error);
 }
 
 static GFileOutputStream *
@@ -1256,62 +1265,29 @@ g_daemon_file_replace (GFile *file,
 		       GCancellable *cancellable,
 		       GError **error)
 {
-  DBusConnection *connection;
-  int fd;
-  DBusMessage *reply;
-  guint32 fd_id;
-  dbus_bool_t can_seek;
-  guint16 mode;
-  guint64 initial_offset;
-  dbus_bool_t dbus_make_backup;
-  guint32 dbus_flags;
-  guint32 pid;
+  g_print ("g_daemon_file_replace\n");
 
-  pid = get_pid_for_file (file);
+  return file_open_write (file, 2, etag, make_backup, flags, cancellable, error);
+}
 
-  mode = 2;
-  dbus_make_backup = make_backup;
-  dbus_flags = flags;
 
-  if (etag == NULL)
-    etag = "";
-  
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
-			     NULL, &connection,
-			     cancellable, error,
-			     DBUS_TYPE_UINT16, &mode,
-			     DBUS_TYPE_STRING, &etag,
-			     DBUS_TYPE_BOOLEAN, &dbus_make_backup,
-			     DBUS_TYPE_UINT32, &dbus_flags,
-                             DBUS_TYPE_UINT32, &pid,
-			     0);
-  if (reply == NULL)
-    return NULL;
+typedef struct {
+  GSimpleAsyncResult *result;
+  GCancellable *cancellable;
+  guint32 flags;
+  GMountOperation *mount_operation;
+} AsyncMountOp;
 
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_UINT32, &fd_id,
-			      DBUS_TYPE_BOOLEAN, &can_seek,
-			      DBUS_TYPE_UINT64, &initial_offset,
-			      DBUS_TYPE_INVALID))
-    {
-      dbus_message_unref (reply);
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from %s"), "open");
-      return NULL;
-    }
-  
-  dbus_message_unref (reply);
-
-  fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
-  if (fd == -1)
-    {
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Didn't get stream file descriptor"));
-      return NULL;
-    }
-  
-  return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
+static void
+free_async_mount_op (AsyncMountOp *data)
+{
+  if (data->result)
+    g_object_unref (data->result);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
+  if (data->mount_operation)
+    g_object_unref (data->mount_operation);
+  g_free (data);
 }
 
 static void
@@ -1321,7 +1297,9 @@ mount_mountable_location_mounted_cb (GObject *source_object,
 {
   GSimpleAsyncResult *result = user_data;
   GError *error = NULL;
-  
+
+  g_print ("mount_mountable_location_mounted_cb\n");
+
   if (!g_file_mount_enclosing_volume_finish (G_FILE (source_object), res, &error))
     {
       g_simple_async_result_set_from_error (result, error);
@@ -1330,77 +1308,115 @@ mount_mountable_location_mounted_cb (GObject *source_object,
 
   g_simple_async_result_complete (result);
   g_object_unref (result);
-
 }
 
 static void
-mount_mountable_async_cb (DBusMessage *reply,
-			  DBusConnection *connection,
-                          GMountInfo *mount_info,
-			  GSimpleAsyncResult *result,
-			  GCancellable *cancellable,
-			  gpointer callback_data)
+mount_mountable_async_cb (GVfsDBusMount *proxy,
+                          GAsyncResult *res,
+                          gpointer user_data)
 {
-  GMountOperation *mount_operation = callback_data;
-  GMountSpec *mount_spec;
-  char *path;
-  DBusMessageIter iter;
+  AsyncMountOp *data = user_data;
+  GSimpleAsyncResult *orig_result;
+  GError *error = NULL;
+  gboolean is_uri;
+  gchar *out_path;
+  gboolean must_mount_location;
+  GVariant *iter_mountspec;
   GFile *file;
-  dbus_bool_t must_mount_location, is_uri;
-
-  path = NULL;
-
-  dbus_message_iter_init (reply, &iter);
+  GMountSpec *mount_spec;
   
-  if (!_g_dbus_message_iter_get_args (&iter, NULL,
-				      DBUS_TYPE_BOOLEAN, &is_uri,
-				      G_DBUS_TYPE_CSTRING, &path,
-				      DBUS_TYPE_BOOLEAN, &must_mount_location,
-				      0))
+  g_print ("mount_mountable_async_cb\n");
+  orig_result = data->result;
+  data->result = NULL;
+
+  is_uri = FALSE;
+  out_path = NULL;
+  must_mount_location = FALSE;
+  iter_mountspec = NULL;
+  if (! gvfs_dbus_mount_call_mount_mountable_finish (proxy,
+                                                     &is_uri,
+                                                     &out_path,
+                                                     &must_mount_location,
+                                                     &iter_mountspec,
+                                                     res,
+                                                     &error))
     {
-      g_simple_async_result_set_error (result,
-				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Invalid return value from %s"), "call");
-      _g_simple_async_result_complete_with_cancellable (result, cancellable);
-
-      return;
+      g_simple_async_result_take_error (orig_result, error);
+      goto out;
     }
-
+  
   if (is_uri)
     {
-      file = g_file_new_for_uri (path);
+      file = g_file_new_for_uri (out_path);
     }
   else
     {
-      mount_spec = g_mount_spec_from_dbus (&iter);
-      if (mount_spec == NULL)
-	{
-	  g_simple_async_result_set_error (result,
-					   G_IO_ERROR, G_IO_ERROR_FAILED,
-					   _("Invalid return value from %s"), "call");
-          _g_simple_async_result_complete_with_cancellable (result, cancellable);
-	  return;
-	}
+      mount_spec = g_mount_spec_from_dbus (iter_mountspec);
+      g_variant_unref (iter_mountspec);
       
-      file = g_daemon_file_new (mount_spec, path);
+      if (mount_spec == NULL)
+        {
+          g_simple_async_result_set_error (orig_result,
+                                           G_IO_ERROR, G_IO_ERROR_FAILED,
+                                           _("Invalid return value from %s"), "call");
+          goto out;
+        }
+      
+      file = g_daemon_file_new (mount_spec, out_path);
       g_mount_spec_unref (mount_spec);
     }
   
-  g_free (path);
-  g_simple_async_result_set_op_res_gpointer (result, file, g_object_unref);
+  g_free (out_path);
+  g_simple_async_result_set_op_res_gpointer (orig_result, file, g_object_unref);
 
   if (must_mount_location)
     {
       g_file_mount_enclosing_volume (file,
-				     0,
-				     mount_operation,
-				     cancellable,
-				     mount_mountable_location_mounted_cb,
-				     g_object_ref (result));
-      
+                                     0,
+                                     data->mount_operation,
+                                     data->cancellable,
+                                     mount_mountable_location_mounted_cb,
+                                     orig_result);
+      return;
     }
-  else
-    _g_simple_async_result_complete_with_cancellable (result, cancellable);
+
+out:
+  _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+  g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
+}
+
+static void
+mount_mountable_got_proxy_cb (GVfsDBusMount *proxy,
+                              GDBusConnection *connection,
+                              GMountInfo *mount_info,
+                              const gchar *path,
+                              GSimpleAsyncResult *result,
+                              GError *error,
+                              GCancellable *cancellable,
+                              gpointer callback_data)
+{
+  AsyncMountOp *data = callback_data;
+  GMountSource *mount_source;
+  const char *dbus_id, *obj_path;
+
+  g_print ("mount_mountable_got_proxy_cb, proxy = %p\n", proxy);
+  
+  data->result = g_object_ref (result);
+
+  mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
+
+  dbus_id = g_mount_source_get_dbus_id (mount_source);
+  obj_path = g_mount_source_get_obj_path (mount_source);
+  
+  gvfs_dbus_mount_call_mount_mountable (proxy,
+                                        path,
+                                        dbus_id,
+                                        obj_path,
+                                        cancellable,
+                                        (GAsyncReadyCallback) mount_mountable_async_cb,
+                                        data);
+  
+  g_object_unref (mount_source);
 }
 
 static void
@@ -1411,28 +1427,21 @@ g_daemon_file_mount_mountable (GFile               *file,
 			       GAsyncReadyCallback  callback,
 			       gpointer             user_data)
 {
-  GMountSource *mount_source;
-  const char *dbus_id, *obj_path;
+  AsyncMountOp *data;
   
-  mount_source = g_mount_operation_dbus_wrap (mount_operation, _g_daemon_vfs_get_async_bus ());
-  
-  dbus_id = g_mount_source_get_dbus_id (mount_source);
-  obj_path = g_mount_source_get_obj_path (mount_source);
+  g_print ("g_daemon_file_mount_mountable\n");
+ 
+  data = g_new0 (AsyncMountOp, 1);
+  data->flags = flags;
+  data->mount_operation = g_object_ref (mount_operation);
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
 
-  if (mount_operation)
-    g_object_ref (mount_operation);
-  
-  do_async_path_call (file,
-		      G_VFS_DBUS_MOUNT_OP_MOUNT_MOUNTABLE,
-		      cancellable,
-		      callback, user_data,
-		      mount_mountable_async_cb,
-		      mount_operation, mount_operation ? g_object_unref : NULL,
-		      DBUS_TYPE_STRING, &dbus_id,
-		      DBUS_TYPE_OBJECT_PATH, &obj_path,
-		      0);
-
-  g_object_unref (mount_source);
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, user_data,
+                               mount_mountable_got_proxy_cb,
+                               data, (GDestroyNotify) free_async_mount_op);
 }
 
 static GFile *
@@ -1451,14 +1460,57 @@ g_daemon_file_mount_mountable_finish (GFile               *file,
 }
 
 static void
-start_mountable_async_cb (DBusMessage *reply,
-			  DBusConnection *connection,
-                          GMountInfo *mount_info,
-			  GSimpleAsyncResult *result,
-			  GCancellable *cancellable,
-			  gpointer callback_data)
+start_mountable_async_cb (GVfsDBusMount *proxy,
+                          GAsyncResult *res,
+                          gpointer user_data)
 {
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
+  AsyncMountOp *data = user_data;
+  GSimpleAsyncResult *orig_result;
+  GError *error = NULL;
+
+  g_print ("start_mountable_async_cb\n");
+  orig_result = data->result;
+
+  if (! gvfs_dbus_mount_call_start_mountable_finish (proxy, res, &error))
+    g_simple_async_result_take_error (orig_result, error);
+
+  _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+  data->result = NULL;
+  g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
+}
+
+static void
+start_mountable_got_proxy_cb (GVfsDBusMount *proxy,
+                              GDBusConnection *connection,
+                              GMountInfo *mount_info,
+                              const gchar *path,
+                              GSimpleAsyncResult *result,
+                              GError *error,
+                              GCancellable *cancellable,
+                              gpointer callback_data)
+{
+  AsyncMountOp *data = callback_data;
+  GMountSource *mount_source;
+  const char *dbus_id, *obj_path;
+
+  g_print ("start_mountable_got_proxy_cb, proxy = %p\n", proxy);
+  
+  data->result = g_object_ref (result);
+
+  mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
+
+  dbus_id = g_mount_source_get_dbus_id (mount_source);
+  obj_path = g_mount_source_get_obj_path (mount_source);
+  
+  gvfs_dbus_mount_call_start_mountable (proxy,
+                                        path,
+                                        dbus_id,
+                                        obj_path,
+                                        cancellable,
+                                        (GAsyncReadyCallback) start_mountable_async_cb,
+                                        data);
+  
+  g_object_unref (mount_source);
 }
 
 static void
@@ -1469,28 +1521,21 @@ g_daemon_file_start_mountable (GFile               *file,
 			       GAsyncReadyCallback  callback,
 			       gpointer             user_data)
 {
-  GMountSource *mount_source;
-  const char *dbus_id, *obj_path;
+  AsyncMountOp *data;
+  
+  g_print ("g_daemon_file_start_mountable\n");
+ 
+  data = g_new0 (AsyncMountOp, 1);
+  data->flags = flags;
+  data->mount_operation = g_object_ref (mount_operation);
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
 
-  mount_source = g_mount_operation_dbus_wrap (mount_operation, _g_daemon_vfs_get_async_bus ());
-
-  dbus_id = g_mount_source_get_dbus_id (mount_source);
-  obj_path = g_mount_source_get_obj_path (mount_source);
-
-  if (mount_operation)
-    g_object_ref (mount_operation);
-
-  do_async_path_call (file,
-		      G_VFS_DBUS_MOUNT_OP_START_MOUNTABLE,
-		      cancellable,
-		      callback, user_data,
-		      start_mountable_async_cb,
-		      mount_operation, mount_operation ? g_object_unref : NULL,
-		      DBUS_TYPE_STRING, &dbus_id,
-		      DBUS_TYPE_OBJECT_PATH, &obj_path,
-		      0);
-
-  g_object_unref (mount_source);
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, user_data,
+                               start_mountable_got_proxy_cb,
+                               data, (GDestroyNotify) free_async_mount_op);
 }
 
 static gboolean
@@ -1502,14 +1547,58 @@ g_daemon_file_start_mountable_finish (GFile               *file,
 }
 
 static void
-stop_mountable_async_cb (DBusMessage *reply,
-                         DBusConnection *connection,
-                         GMountInfo *mount_info,
-                         GSimpleAsyncResult *result,
-                         GCancellable *cancellable,
-                         gpointer callback_data)
+stop_mountable_async_cb (GVfsDBusMount *proxy,
+                          GAsyncResult *res,
+                          gpointer user_data)
 {
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
+  AsyncMountOp *data = user_data;
+  GSimpleAsyncResult *orig_result;
+  GError *error = NULL;
+
+  g_print ("stop_mountable_async_cb\n");
+  orig_result = data->result;
+
+  if (! gvfs_dbus_mount_call_stop_mountable_finish (proxy, res, &error))
+    g_simple_async_result_take_error (orig_result, error);
+
+  _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+  data->result = NULL;
+  g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
+}
+
+static void
+stop_mountable_got_proxy_cb (GVfsDBusMount *proxy,
+                             GDBusConnection *connection,
+                             GMountInfo *mount_info,
+                             const gchar *path,
+                             GSimpleAsyncResult *result,
+                             GError *error,
+                             GCancellable *cancellable,
+                             gpointer callback_data)
+{
+  AsyncMountOp *data = callback_data;
+  GMountSource *mount_source;
+  const char *dbus_id, *obj_path;
+
+  g_print ("stop_mountable_got_proxy_cb, proxy = %p\n", proxy);
+  
+  data->result = g_object_ref (result);
+
+  mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
+
+  dbus_id = g_mount_source_get_dbus_id (mount_source);
+  obj_path = g_mount_source_get_obj_path (mount_source);
+ 
+  gvfs_dbus_mount_call_stop_mountable (proxy,
+                                       path,
+                                       data->flags,
+                                       dbus_id,
+                                       obj_path,
+                                       cancellable,
+                                       (GAsyncReadyCallback) stop_mountable_async_cb,
+                                       data);
+
+  g_object_unref (mount_source);
 }
 
 static void
@@ -1520,30 +1609,21 @@ g_daemon_file_stop_mountable (GFile               *file,
                               GAsyncReadyCallback  callback,
                               gpointer             user_data)
 {
-  guint32 dbus_flags;
-  GMountSource *mount_source;
-  const char *dbus_id, *obj_path;
+  AsyncMountOp *data;
+  
+  g_print ("g_daemon_file_stop_mountable\n");
+ 
+  data = g_new0 (AsyncMountOp, 1);
+  data->flags = flags;
+  data->mount_operation = g_object_ref (mount_operation);
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
 
-  mount_source = g_mount_operation_dbus_wrap (mount_operation, _g_daemon_vfs_get_async_bus ());
-
-  dbus_id = g_mount_source_get_dbus_id (mount_source);
-  obj_path = g_mount_source_get_obj_path (mount_source);
-
-  if (mount_operation)
-    g_object_ref (mount_operation);
-
-  dbus_flags = flags;
-  do_async_path_call (file,
-		      G_VFS_DBUS_MOUNT_OP_STOP_MOUNTABLE,
-		      cancellable,
-		      callback, user_data,
-		      stop_mountable_async_cb,
-		      mount_operation, mount_operation ? g_object_unref : NULL,
-		      DBUS_TYPE_UINT32, &dbus_flags,
-                      DBUS_TYPE_STRING, &dbus_id, DBUS_TYPE_OBJECT_PATH, &obj_path,
-		      0);
-
-  g_object_unref (mount_source);
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, user_data,
+                               stop_mountable_got_proxy_cb,
+                               data, (GDestroyNotify) free_async_mount_op);
 }
 
 static gboolean
@@ -1554,16 +1634,59 @@ g_daemon_file_stop_mountable_finish (GFile               *file,
   return TRUE;
 }
 
+static void
+eject_mountable_async_cb (GVfsDBusMount *proxy,
+                          GAsyncResult *res,
+                          gpointer user_data)
+{
+  AsyncMountOp *data = user_data;
+  GSimpleAsyncResult *orig_result;
+  GError *error = NULL;
+
+  g_print ("eject_mountable_async_cb\n");
+  orig_result = data->result;
+
+  if (! gvfs_dbus_mount_call_eject_mountable_finish (proxy, res, &error))
+    g_simple_async_result_take_error (orig_result, error);
+
+  _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+  data->result = NULL;
+  g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
+}
 
 static void
-eject_mountable_async_cb (DBusMessage *reply,
-			  DBusConnection *connection,
-                          GMountInfo *mount_info,
-			  GSimpleAsyncResult *result,
-			  GCancellable *cancellable,
-			  gpointer callback_data)
+eject_mountable_got_proxy_cb (GVfsDBusMount *proxy,
+                              GDBusConnection *connection,
+                              GMountInfo *mount_info,
+                              const gchar *path,
+                              GSimpleAsyncResult *result,
+                              GError *error,
+                              GCancellable *cancellable,
+                              gpointer callback_data)
 {
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
+  AsyncMountOp *data = callback_data;
+  GMountSource *mount_source;
+  const char *dbus_id, *obj_path;
+
+  g_print ("eject_mountable_got_proxy_cb, proxy = %p\n", proxy);
+  
+  data->result = g_object_ref (result);
+
+  mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
+
+  dbus_id = g_mount_source_get_dbus_id (mount_source);
+  obj_path = g_mount_source_get_obj_path (mount_source);
+ 
+  gvfs_dbus_mount_call_eject_mountable (proxy,
+                                        path,
+                                        data->flags,
+                                        dbus_id,
+                                        obj_path,
+                                        cancellable,
+                                        (GAsyncReadyCallback) eject_mountable_async_cb,
+                                        data);
+
+  g_object_unref (mount_source);
 }
 
 static void
@@ -1574,30 +1697,21 @@ g_daemon_file_eject_mountable_with_operation (GFile               *file,
                                               GAsyncReadyCallback  callback,
                                               gpointer             user_data)
 {
-  guint32 dbus_flags;
-  GMountSource *mount_source;
-  const char *dbus_id, *obj_path;
+  AsyncMountOp *data;
+  
+  g_print ("g_daemon_file_eject_mountable_with_operation\n");
+ 
+  data = g_new0 (AsyncMountOp, 1);
+  data->flags = flags;
+  data->mount_operation = g_object_ref (mount_operation);
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
 
-  mount_source = g_mount_operation_dbus_wrap (mount_operation, _g_daemon_vfs_get_async_bus ());
-
-  dbus_id = g_mount_source_get_dbus_id (mount_source);
-  obj_path = g_mount_source_get_obj_path (mount_source);
-
-  if (mount_operation)
-    g_object_ref (mount_operation);
-
-  dbus_flags = flags;
-  do_async_path_call (file,
-		      G_VFS_DBUS_MOUNT_OP_EJECT_MOUNTABLE,
-		      cancellable,
-		      callback, user_data,
-		      eject_mountable_async_cb,
-		      mount_operation, mount_operation ? g_object_unref : NULL,
-		      DBUS_TYPE_UINT32, &dbus_flags,
-                      DBUS_TYPE_STRING, &dbus_id, DBUS_TYPE_OBJECT_PATH, &obj_path,
-		      0);
-
-  g_object_unref (mount_source);
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, user_data,
+                               eject_mountable_got_proxy_cb,
+                               data, (GDestroyNotify) free_async_mount_op);
 }
 
 static gboolean
@@ -1627,14 +1741,58 @@ g_daemon_file_eject_mountable_finish (GFile               *file,
 }
 
 static void
-unmount_mountable_async_cb (DBusMessage *reply,
-			    DBusConnection *connection,
-                            GMountInfo *mount_info,
-			    GSimpleAsyncResult *result,
-			    GCancellable *cancellable,
-			    gpointer callback_data)
+unmount_mountable_async_cb (GVfsDBusMount *proxy,
+                            GAsyncResult *res,
+                            gpointer user_data)
 {
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
+  AsyncMountOp *data = user_data;
+  GSimpleAsyncResult *orig_result;
+  GError *error = NULL;
+
+  g_print ("unmount_mountable_async_cb\n");
+  orig_result = data->result;
+
+  if (! gvfs_dbus_mount_call_unmount_mountable_finish (proxy, res, &error))
+    g_simple_async_result_take_error (orig_result, error);
+
+  _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+  data->result = NULL;
+  g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
+}
+
+static void
+unmount_mountable_got_proxy_cb (GVfsDBusMount *proxy,
+                                GDBusConnection *connection,
+                                GMountInfo *mount_info,
+                                const gchar *path,
+                                GSimpleAsyncResult *result,
+                                GError *error,
+                                GCancellable *cancellable,
+                                gpointer callback_data)
+{
+  AsyncMountOp *data = callback_data;
+  GMountSource *mount_source;
+  const char *dbus_id, *obj_path;
+
+  g_print ("unmount_mountable_got_proxy_cb, proxy = %p\n", proxy);
+  
+  data->result = g_object_ref (result);
+
+  mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
+
+  dbus_id = g_mount_source_get_dbus_id (mount_source);
+  obj_path = g_mount_source_get_obj_path (mount_source);
+ 
+  gvfs_dbus_mount_call_unmount_mountable (proxy,
+                                          path,
+                                          data->flags,
+                                          dbus_id,
+                                          obj_path,
+                                          cancellable,
+                                          (GAsyncReadyCallback) unmount_mountable_async_cb,
+                                          data);
+
+  g_object_unref (mount_source);
 }
 
 static void
@@ -1645,30 +1803,21 @@ g_daemon_file_unmount_mountable_with_operation (GFile               *file,
                                                 GAsyncReadyCallback  callback,
                                                 gpointer             user_data)
 {
-  guint32 dbus_flags;
-  GMountSource *mount_source;
-  const char *dbus_id, *obj_path;
+  AsyncMountOp *data;
+  
+  g_print ("g_daemon_file_unmount_mountable_with_operation\n");
+ 
+  data = g_new0 (AsyncMountOp, 1);
+  data->flags = flags;
+  data->mount_operation = g_object_ref (mount_operation);
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
 
-  mount_source = g_mount_operation_dbus_wrap (mount_operation, _g_daemon_vfs_get_async_bus ());
-
-  dbus_id = g_mount_source_get_dbus_id (mount_source);
-  obj_path = g_mount_source_get_obj_path (mount_source);
-
-  if (mount_operation)
-    g_object_ref (mount_operation);
-
-  dbus_flags = flags;
-  do_async_path_call (file,
-		      G_VFS_DBUS_MOUNT_OP_UNMOUNT_MOUNTABLE,
-		      cancellable,
-		      callback, user_data,
-		      unmount_mountable_async_cb,
-		      mount_operation, mount_operation ? g_object_unref : NULL,
-		      DBUS_TYPE_UINT32, &dbus_flags,
-                      DBUS_TYPE_STRING, &dbus_id, DBUS_TYPE_OBJECT_PATH, &obj_path,
-		      0);
-
-  g_object_unref (mount_source);
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, user_data,
+                               unmount_mountable_got_proxy_cb,
+                               data, (GDestroyNotify) free_async_mount_op);
 }
 
 static gboolean
@@ -1680,14 +1829,46 @@ g_daemon_file_unmount_mountable_with_operation_finish (GFile               *file
 }
 
 static void
-poll_mountable_async_cb (DBusMessage *reply,
-                         DBusConnection *connection,
-                         GMountInfo *mount_info,
-                         GSimpleAsyncResult *result,
-                         GCancellable *cancellable,
-                         gpointer callback_data)
+poll_mountable_async_cb (GVfsDBusMount *proxy,
+                         GAsyncResult *res,
+                         gpointer user_data)
 {
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
+  AsyncMountOp *data = user_data;
+  GSimpleAsyncResult *orig_result;
+  GError *error = NULL;
+  
+  g_print ("poll_mountable_async_cb\n");
+  orig_result = data->result;
+  
+  if (! gvfs_dbus_mount_call_poll_mountable_finish (proxy, res, &error))
+    g_simple_async_result_take_error (orig_result, error);
+
+  _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+  data->result = NULL;
+  g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
+}
+
+static void
+poll_mountable_got_proxy_cb (GVfsDBusMount *proxy,
+                             GDBusConnection *connection,
+                             GMountInfo *mount_info,
+                             const gchar *path,
+                             GSimpleAsyncResult *result,
+                             GError *error,
+                             GCancellable *cancellable,
+                             gpointer callback_data)
+{
+  AsyncMountOp *data = callback_data;
+
+  g_print ("poll_mountable_got_proxy_cb, proxy = %p\n", proxy);
+  
+  data->result = g_object_ref (result);
+  
+  gvfs_dbus_mount_call_poll_mountable (proxy,
+                                       path,
+                                       cancellable,
+                                       (GAsyncReadyCallback) poll_mountable_async_cb,
+                                       data);
 }
 
 static void
@@ -1696,14 +1877,19 @@ g_daemon_file_poll_mountable (GFile               *file,
                               GAsyncReadyCallback  callback,
                               gpointer             user_data)
 {
-  do_async_path_call (file,
-		      G_VFS_DBUS_MOUNT_OP_POLL_MOUNTABLE,
-		      cancellable,
-		      callback, user_data,
-		      poll_mountable_async_cb,
-		      NULL,
-		      NULL,
-                      0);
+  AsyncMountOp *data;
+  
+  g_print ("g_daemon_file_poll_mountable\n");
+ 
+  data = g_new0 (AsyncMountOp, 1);
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
+
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, user_data,
+                               poll_mountable_got_proxy_cb,
+                               data, (GDestroyNotify) free_async_mount_op);
 }
 
 static gboolean
@@ -1748,36 +1934,93 @@ static void g_daemon_file_mount_enclosing_volume (GFile *location,
 						  gpointer user_data);
 
 static void
-mount_reply (DBusMessage *reply,
-	     GError *error,
-	     gpointer user_data)
+free_mount_data (MountData *data)
 {
-  MountData *data = user_data;
-  GSimpleAsyncResult *res;
-
-  if (reply == NULL)
-    {
-      res = g_simple_async_result_new_from_error (G_OBJECT (data->file),
-						  data->callback,
-						  data->user_data,
-						  error);
-    }
-  else
-    {
-      res = g_simple_async_result_new (G_OBJECT (data->file),
-				       data->callback,
-				       data->user_data,
-				       g_daemon_file_mount_enclosing_volume);
-    }
-
-  _g_simple_async_result_complete_with_cancellable (res, data->cancellable);
-  
   g_object_unref (data->file);
   if (data->cancellable)
     g_object_unref (data->cancellable);
   if (data->mount_operation)
     g_object_unref (data->mount_operation);
   g_free (data);
+}
+
+static void
+mount_reply (GVfsDBusMountTracker *proxy,
+             GAsyncResult *res,
+             gpointer user_data)
+{
+  MountData *data = user_data;
+  GSimpleAsyncResult *ares;
+  GError *error = NULL;
+  
+  g_print ("mount_reply\n");
+
+  if (!gvfs_dbus_mount_tracker_call_mount_location_finish (proxy, res, &error))
+    {
+      ares = g_simple_async_result_new_from_error (G_OBJECT (data->file),
+						   data->callback,
+						   data->user_data,
+						   error);
+      g_error_free (error);
+    }
+  else
+    {
+      ares = g_simple_async_result_new (G_OBJECT (data->file),
+				       data->callback,
+				       data->user_data,
+				       g_daemon_file_mount_enclosing_volume);
+    }
+
+  _g_simple_async_result_complete_with_cancellable (ares, data->cancellable);
+
+  free_mount_data (data);
+}
+
+static void
+mount_enclosing_volume_proxy_cb (GObject *source_object,
+                                 GAsyncResult *res,
+                                 gpointer user_data)
+{
+  MountData *data = user_data;
+  GVfsDBusMountTracker *proxy;
+  GError *error = NULL;
+  GSimpleAsyncResult *ares;
+  GDaemonFile *daemon_file;
+  GMountSpec *spec;
+  GMountSource *mount_source;
+
+  g_print ("mount_enclosing_volume_proxy_cb\n");
+  daemon_file = G_DAEMON_FILE (data->file);
+
+  proxy = gvfs_dbus_mount_tracker_proxy_new_for_bus_finish (res, &error);
+  if (proxy == NULL)
+    {
+      ares = g_simple_async_result_new_from_error (G_OBJECT (data->file),
+                                                   data->callback,
+                                                   data->user_data,
+                                                   error);
+      g_error_free (error);
+      _g_simple_async_result_complete_with_cancellable (ares, data->cancellable);
+      free_mount_data (data);
+      return;
+    }
+  
+  spec = g_mount_spec_copy (daemon_file->mount_spec);
+  g_mount_spec_set_mount_prefix (spec, daemon_file->path);
+  mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
+
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_VFS_DBUS_MOUNT_TIMEOUT_MSECS);
+
+  gvfs_dbus_mount_tracker_call_mount_location (proxy,
+                                               g_mount_spec_to_dbus (spec),
+                                               g_mount_source_to_dbus (mount_source),
+                                               data->cancellable,
+                                               (GAsyncReadyCallback) mount_reply,
+                                               data);
+
+  g_mount_spec_unref (spec);
+  g_object_unref (mount_source);
+  g_object_unref (proxy);
 }
 
 static void
@@ -1788,30 +2031,10 @@ g_daemon_file_mount_enclosing_volume (GFile *location,
 				      GAsyncReadyCallback callback,
 				      gpointer user_data)
 {
-  GDaemonFile *daemon_file;
-  DBusMessage *message;
-  GMountSpec *spec;
-  GMountSource *mount_source;
-  DBusMessageIter iter;
   MountData *data;
   
-  daemon_file = G_DAEMON_FILE (location);
+  g_print ("g_daemon_file_mount_enclosing_volume\n");
   
-  message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
-					  G_VFS_DBUS_MOUNTTRACKER_PATH,
-					  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-					  G_VFS_DBUS_MOUNTTRACKER_OP_MOUNT_LOCATION);
-
-  spec = g_mount_spec_copy (daemon_file->mount_spec);
-  g_mount_spec_set_mount_prefix (spec, daemon_file->path);
-  dbus_message_iter_init_append (message, &iter);
-  g_mount_spec_to_dbus (&iter, spec);
-  g_mount_spec_unref (spec);
-
-  mount_source = g_mount_operation_dbus_wrap (mount_operation, _g_daemon_vfs_get_async_bus ());
-  g_mount_source_to_dbus (mount_source, message);
-  g_object_unref (mount_source);
-
   data = g_new0 (MountData, 1);
   data->callback = callback;
   if (data->cancellable)
@@ -1821,13 +2044,13 @@ g_daemon_file_mount_enclosing_volume (GFile *location,
   if (mount_operation)
     data->mount_operation = g_object_ref (mount_operation);
 
-  /* TODO: Ignoring cancellable here */
-  _g_dbus_connection_call_async (_g_daemon_vfs_get_async_bus (),
-				 message,
-				 G_VFS_DBUS_MOUNT_TIMEOUT_MSECS,
-				 mount_reply, data);
- 
-  dbus_message_unref (message);
+  gvfs_dbus_mount_tracker_proxy_new_for_bus (G_BUS_TYPE_SESSION,
+                                             G_DBUS_PROXY_FLAGS_NONE,
+                                             G_VFS_DBUS_DAEMON_NAME,
+                                             G_VFS_DBUS_MOUNTTRACKER_PATH,
+                                             NULL,
+                                             mount_enclosing_volume_proxy_cb,
+                                             data);
 }
 
 static gboolean
@@ -1845,74 +2068,127 @@ g_daemon_file_query_filesystem_info (GFile                *file,
 				     GCancellable         *cancellable,
 				     GError              **error)
 {
-  DBusMessage *reply;
-  DBusMessageIter iter;
   GFileInfo *info;
+  GVfsDBusMount *proxy;
+  char *path;
+  gboolean res;
+  GVariant *iter_info;
 
-  if (attributes == NULL)
-    attributes = "";
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_QUERY_FILESYSTEM_INFO,
-			     NULL, NULL,
-			     cancellable, error,
-			     DBUS_TYPE_STRING, &attributes,
-			     0);
-  if (reply == NULL)
+  g_print ("g_daemon_file_query_filesystem_info\n");
+
+  proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
+  if (proxy == NULL)
     return NULL;
 
-  info = NULL;
+  iter_info = NULL;
+  res = gvfs_dbus_mount_call_query_filesystem_info_sync (proxy,
+                                                         path,
+                                                         attributes ? attributes : "",
+                                                         &iter_info,
+                                                         cancellable,
+                                                         error);
   
-  if (!dbus_message_iter_init (reply, &iter) ||
-      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
-    {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from %s"), "get_filesystem_info");
-      goto out;
-    }
+  g_print ("g_daemon_file_query_filesystem_info: done, res = %d\n", res);
 
-  info = _g_dbus_get_file_info (&iter, error);
+  g_free (path);
+  g_object_unref (proxy);
 
- out:
-  dbus_message_unref (reply);
+  if (! res)
+    return NULL;
+
+  info = _g_dbus_get_file_info (iter_info, error);
+  g_variant_unref (iter_info);
+
   return info;
 }
 
-static void
-query_fs_info_async_cb (DBusMessage *reply,
-			DBusConnection *connection,
-                        GMountInfo *mount_info,
-			GSimpleAsyncResult *result,
-			GCancellable *cancellable,
-			gpointer callback_data)
-{
-  DBusMessageIter iter;
-  GFileInfo *info;
-  GError *error;
 
-  info = NULL;
+typedef struct {
+  GFile *file;
+  char *attributes;
+  GFileQueryInfoFlags flags;
+  int io_priority;
+  GSimpleAsyncResult *result;
+  GCancellable *cancellable;
+} AsyncCallQueryFsInfo;
+
+static void
+async_call_query_fs_info_free (AsyncCallQueryFsInfo *data)
+{
+  if (data->file)
+    g_object_unref (data->file);
+  if (data->result)
+    g_object_unref (data->result);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
+  g_free (data->attributes);
+  g_free (data);
+}
+
+static void
+query_fs_info_async_cb (GVfsDBusMount *proxy,
+                        GAsyncResult *res,
+                        gpointer user_data)
+{
+  AsyncCallQueryFsInfo *data = user_data;
+  GFileInfo *info;
+  GError *error = NULL;
+  GSimpleAsyncResult *orig_result;
+  GVariant *iter_info;
+
+  g_print ("query_info_async_cb\n");
+  orig_result = data->result;
   
-  if (!dbus_message_iter_init (reply, &iter) ||
-      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
+  if (! gvfs_dbus_mount_call_query_filesystem_info_finish (proxy, &iter_info, res, &error))
     {
-      g_simple_async_result_set_error (result,
-				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Invalid return value from %s"), "query_info");
-      _g_simple_async_result_complete_with_cancellable (result, cancellable);
-      return;
+      g_simple_async_result_take_error (orig_result, error);
+      goto out;
     }
 
-  error = NULL;
-  info = _g_dbus_get_file_info (&iter, &error);
+  info = _g_dbus_get_file_info (iter_info, &error);
+  g_variant_unref (iter_info);
+
   if (info == NULL)
     {
-      g_simple_async_result_set_from_error (result, error);
-      g_error_free (error);
-      _g_simple_async_result_complete_with_cancellable (result, cancellable);
-      return;
+      g_simple_async_result_take_error (orig_result, error);
+      goto out;
     }
 
-  g_simple_async_result_set_op_res_gpointer (result, info, g_object_unref);
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
+  g_simple_async_result_set_op_res_gpointer (orig_result, info, g_object_unref);
+  
+out:
+  _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+  data->result = NULL;
+  g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
+}
+
+static void
+query_info_fs_async_get_proxy_cb (GVfsDBusMount *proxy,
+                                  GDBusConnection *connection,
+                                  GMountInfo *mount_info,
+                                  const gchar *path,
+                                  GSimpleAsyncResult *result,
+                                  GError *error,
+                                  GCancellable *cancellable,
+                                  gpointer callback_data)
+{
+  AsyncCallQueryFsInfo *data = callback_data;
+  char *uri;
+
+  g_print ("query_info_fs_async_get_proxy_cb, proxy = %p\n", proxy);
+  
+  uri = g_file_get_uri (data->file);
+  
+  data->result = g_object_ref (result);
+  
+  gvfs_dbus_mount_call_query_filesystem_info (proxy,
+                                              path,
+                                              data->attributes ? data->attributes : "",
+                                              cancellable,
+                                              (GAsyncReadyCallback) query_fs_info_async_cb,
+                                              data);
+  
+  g_free (uri);
 }
 
 static void
@@ -1923,13 +2199,22 @@ g_daemon_file_query_filesystem_info_async (GFile                      *file,
 					   GAsyncReadyCallback         callback,
 					   gpointer                    user_data)
 {
-  do_async_path_call (file,
-		      G_VFS_DBUS_MOUNT_OP_QUERY_FILESYSTEM_INFO,
-		      cancellable,
-		      callback, user_data,
-		      query_fs_info_async_cb, NULL, NULL,
-		      DBUS_TYPE_STRING, &attributes,
-		      0);
+  AsyncCallQueryFsInfo *data;
+
+  g_print ("g_daemon_file_query_filesystem_info_async\n");
+  
+  data = g_new0 (AsyncCallQueryFsInfo, 1);
+  data->file = g_object_ref (file);
+  data->attributes = g_strdup (attributes);
+  data->io_priority = io_priority;
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
+
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, user_data,
+                               query_info_fs_async_get_proxy_cb,
+                               data, (GDestroyNotify) async_call_query_fs_info_free);
 }
 
 static GFileInfo *
@@ -1958,6 +2243,7 @@ g_daemon_file_find_enclosing_mount (GFile *file,
   
   mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
 						  daemon_file->path,
+						  cancellable,
 						  error);
   if (mount_info == NULL)
     return NULL;
@@ -1995,8 +2281,9 @@ g_daemon_file_get_child_for_display_name (GFile        *file,
   GFile *child;
 
   mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
-						daemon_file->path,
-						NULL);
+						 daemon_file->path,
+                                                 NULL,  /* TODO: cancellable */
+						 NULL);
 
 
   if (mount_info && mount_info->prefered_filename_encoding)
@@ -2031,43 +2318,39 @@ g_daemon_file_set_display_name (GFile *file,
 {
   GDaemonFile *daemon_file;
   GMountInfo  *mount_info;
-  DBusMessage *reply;
-  DBusMessageIter iter;
   char *new_path;
+  GVfsDBusMount *proxy;
+  char *path;
+  gboolean res;
 
   daemon_file = G_DAEMON_FILE (file);
-
   mount_info = NULL;
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME,
-			     &mount_info, NULL,
-			     cancellable, error,
-			     DBUS_TYPE_STRING, &display_name,
-			     0);
-  if (reply == NULL)
-    {
-      if (mount_info)
-        g_mount_info_unref (mount_info);
-      return NULL;
-    }
+  g_print ("g_daemon_file_set_display_name\n");
 
-  if (!dbus_message_iter_init (reply, &iter) ||
-      !_g_dbus_message_iter_get_args (&iter, NULL,
-				      G_DBUS_TYPE_CSTRING, &new_path,
-				      0))
-    {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from %s"), "query_filesystem_info");
-      goto out;
-    }
+  proxy = create_proxy_for_file (file, &mount_info, &path, NULL, cancellable, error);
+  if (proxy == NULL)
+    return NULL;
 
+  res = gvfs_dbus_mount_call_set_display_name_sync (proxy,
+                                                    path,
+                                                    display_name,
+                                                    &new_path,
+                                                    cancellable,
+                                                    error);
+  g_print ("g_daemon_file_set_display_name: done, res = %d\n", res);
+
+  g_free (path);
+  g_object_unref (proxy);
+
+  if (! res)
+    goto out;
+  
   g_mount_info_apply_prefix (mount_info, &new_path);
   file = new_file_for_new_path (daemon_file, new_path);
   g_free (new_path);
 
  out:
   g_mount_info_unref (mount_info);
-  dbus_message_unref (reply);
   return file;
 }
 
@@ -2076,18 +2359,26 @@ g_daemon_file_delete (GFile *file,
 		      GCancellable *cancellable,
 		      GError **error)
 {
-  DBusMessage *reply;
+  GVfsDBusMount *proxy;
+  char *path;
+  gboolean res;
 
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_DELETE,
-			     NULL, NULL,
-			     cancellable, error,
-			     0);
-  if (reply == NULL)
+  g_print ("g_daemon_file_delete\n");
+
+  proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
+  if (proxy == NULL)
     return FALSE;
 
-  dbus_message_unref (reply);
-  return TRUE;
+  res = gvfs_dbus_mount_call_delete_sync (proxy,
+                                          path,
+                                          cancellable,
+                                          error);
+  g_print ("g_daemon_file_delete: done, res = %d\n", res);
+
+  g_free (path);
+  g_object_unref (proxy);
+  
+  return res;
 }
 
 static gboolean
@@ -2095,18 +2386,26 @@ g_daemon_file_trash (GFile *file,
 		     GCancellable *cancellable,
 		     GError **error)
 {
-  DBusMessage *reply;
+  GVfsDBusMount *proxy;
+  char *path;
+  gboolean res;
 
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_TRASH,
-			     NULL, NULL,
-			     cancellable, error,
-			     0);
-  if (reply == NULL)
+  g_print ("g_daemon_file_trash\n");
+
+  proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
+  if (proxy == NULL)
     return FALSE;
 
-  dbus_message_unref (reply);
-  return TRUE;
+  res = gvfs_dbus_mount_call_trash_sync (proxy,
+                                         path,
+                                         cancellable,
+                                         error);
+  g_print ("g_daemon_file_trash: done, res = %d\n", res);
+
+  g_free (path);
+  g_object_unref (proxy);
+  
+  return res;
 }
 
 static gboolean
@@ -2114,18 +2413,26 @@ g_daemon_file_make_directory (GFile *file,
 			      GCancellable *cancellable,
 			      GError **error)
 {
-  DBusMessage *reply;
+  GVfsDBusMount *proxy;
+  char *path;
+  gboolean res;
 
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY,
-			     NULL, NULL,
-			     cancellable, error,
-			     0);
-  if (reply == NULL)
+  g_print ("g_daemon_file_make_directory\n");
+
+  proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
+  if (proxy == NULL)
     return FALSE;
 
-  dbus_message_unref (reply);
-  return TRUE;
+  res = gvfs_dbus_mount_call_make_directory_sync (proxy,
+                                                  path,
+                                                  cancellable,
+                                                  error);
+  g_print ("g_daemon_file_make_directory: done, res = %d\n", res);
+
+  g_free (path);
+  g_object_unref (proxy);
+  
+  return res;
 }
 
 static gboolean
@@ -2134,19 +2441,27 @@ g_daemon_file_make_symbolic_link (GFile *file,
 				  GCancellable *cancellable,
 				  GError **error)
 {
-  DBusMessage *reply;
+  GVfsDBusMount *proxy;
+  char *path;
+  gboolean res;
 
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_MAKE_SYMBOLIC_LINK,
-			     NULL, NULL,
-			     cancellable, error,
-			     G_DBUS_TYPE_CSTRING, &symlink_value,
-			     0);
-  if (reply == NULL)
+  g_print ("g_daemon_file_make_symbolic_link\n");
+
+  proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
+  if (proxy == NULL)
     return FALSE;
 
-  dbus_message_unref (reply);
-  return TRUE;
+  res = gvfs_dbus_mount_call_make_symbolic_link_sync (proxy,
+                                                      path,
+                                                      symlink_value,
+                                                      cancellable,
+                                                      error);
+  g_print ("g_daemon_file_make_symbolic_link: done, res = %d\n", res);
+
+  g_free (path);
+  g_object_unref (proxy);
+  
+  return res;
 }
 
 static GFileAttributeInfoList *
@@ -2154,22 +2469,34 @@ g_daemon_file_query_settable_attributes (GFile                      *file,
 					 GCancellable               *cancellable,
 					 GError                    **error)
 {
-  DBusMessage *reply;
+  GVfsDBusMount *proxy;
+  char *path;
+  gboolean res;
+  GVariant *iter_list;
   GFileAttributeInfoList *list;
-  DBusMessageIter iter;
 
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_QUERY_SETTABLE_ATTRIBUTES,
-			     NULL, NULL,
-			     cancellable, error,
-			     0);
-  if (reply == NULL)
+  g_print ("g_daemon_file_query_settable_attributes\n");
+
+  proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
+  if (proxy == NULL)
+    return FALSE;
+
+  iter_list = NULL;
+  res = gvfs_dbus_mount_call_query_settable_attributes_sync (proxy,
+                                                             path,
+                                                             &iter_list,
+                                                             cancellable,
+                                                             error);
+  g_print ("g_daemon_file_query_settable_attributes: done, res = %d\n", res);
+
+  g_free (path);
+  g_object_unref (proxy);
+
+  if (!res)
     return NULL;
 
-  dbus_message_iter_init (reply, &iter);
-  list = _g_dbus_get_attribute_info_list (&iter, error);
-  
-  dbus_message_unref (reply);
+  list = _g_dbus_get_attribute_info_list (iter_list, error);
+  g_variant_unref (iter_list);
   
   return list;
 }
@@ -2179,20 +2506,33 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
 					 GCancellable               *cancellable,
 					 GError                    **error)
 {
-  DBusMessage *reply;
+  GVfsDBusMount *proxy;
+  char *path;
+  gboolean res;
+  GVariant *iter_list;
   GFileAttributeInfoList *list;
-  DBusMessageIter iter;
 
-  reply = do_sync_path_call (file,
-			     G_VFS_DBUS_MOUNT_OP_QUERY_WRITABLE_NAMESPACES,
-			     NULL, NULL,
-			     cancellable, error,
-			     0);
-  if (reply)
+  g_print ("g_daemon_file_query_writable_namespaces\n");
+
+  proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
+  if (proxy == NULL)
+    return FALSE;
+
+  iter_list = NULL;
+  res = gvfs_dbus_mount_call_query_writable_namespaces_sync (proxy,
+                                                             path,
+                                                             &iter_list,
+                                                             cancellable,
+                                                             error);
+  g_print ("g_daemon_file_query_writable_namespaces: done, res = %d\n", res);
+
+  g_free (path);
+  g_object_unref (proxy);
+
+  if (res)
     {
-      dbus_message_iter_init (reply, &iter);
-      list = _g_dbus_get_attribute_info_list (&iter, error);
-      dbus_message_unref (reply);
+      list = _g_dbus_get_attribute_info_list (iter_list, error);
+      g_variant_unref (iter_list);
     }
   else
     {
@@ -2200,11 +2540,11 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
     }
 
   g_file_attribute_info_list_add (list,
-				  "metadata",
-				  G_FILE_ATTRIBUTE_TYPE_STRING, /* Also STRINGV, but no way express this ... */
-				  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
-				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
-
+                                  "metadata",
+                                  G_FILE_ATTRIBUTE_TYPE_STRING, /* Also STRINGV, but no way express this ... */
+                                  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+                                  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+  
   return list;
 }
 
@@ -2282,38 +2622,34 @@ g_daemon_file_set_attribute (GFile *file,
 			     GCancellable *cancellable,
 			     GError **error)
 {
-  DBusMessage *message, *reply;
-  DBusMessageIter iter;
-  dbus_uint32_t flags_dbus;
+  GVfsDBusMount *proxy;
+  char *path;
+  gboolean res;
   GError *my_error;
 
   if (g_str_has_prefix (attribute, "metadata::"))
     return set_metadata_attribute (file, attribute, type, value_p, cancellable, error);
 
  retry:
-  
-  message = create_empty_message (file, G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE, NULL, error);
-  if (!message)
+  g_print ("g_daemon_file_set_attribute\n");
+
+  proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
+  if (proxy == NULL)
     return FALSE;
 
-  dbus_message_iter_init_append (message, &iter);
-
-  flags_dbus = flags;
-  dbus_message_iter_append_basic (&iter,
-				  DBUS_TYPE_UINT32,
-				  &flags_dbus);
-
-  _g_dbus_append_file_attribute (&iter, attribute, 0, type, value_p);
-
   my_error = NULL;
-  reply = _g_vfs_daemon_call_sync (message,
-				   NULL,
-				   NULL, NULL, NULL,
-				   cancellable, &my_error);
+  res = gvfs_dbus_mount_call_set_attribute_sync (proxy,
+                                                 path,
+                                                 flags,
+                                                 _g_dbus_append_file_attribute (attribute, 0, type, value_p),
+                                                 cancellable,
+                                                 &my_error);
+  g_print ("g_daemon_file_set_attribute: done, res = %d\n", res);
 
-  dbus_message_unref (message);
+  g_free (path);
+  g_object_unref (proxy);
 
-  if (reply == NULL)
+  if (! res)
     {
       if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
 	{
@@ -2324,38 +2660,28 @@ g_daemon_file_set_attribute (GFile *file,
       return FALSE;
     }
 
-  dbus_message_unref (reply);
   return TRUE;
 }
 
-struct ProgressCallbackData {
+typedef struct {
   GFileProgressCallback progress_callback;
   gpointer progress_callback_data;
-};
+} ProgressCallbackData;
 
-static DBusHandlerResult
-progress_callback_message (DBusConnection  *connection,
-			   DBusMessage     *message,
-			   void            *user_data)
+static gboolean
+handle_progress (GVfsDBusProgress *object,
+                 GDBusMethodInvocation *invocation,
+                 guint64 arg_current,
+                 guint64 arg_total,
+                 ProgressCallbackData *data)
 {
-  struct ProgressCallbackData *data = user_data;
-  dbus_uint64_t current_dbus, total_dbus;
+  g_print ("handle_progress\n");
   
-  if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_PROGRESS_INTERFACE,
-				   G_VFS_DBUS_PROGRESS_OP_PROGRESS))
-    {
-      if (dbus_message_get_args (message, NULL, 
-				 DBUS_TYPE_UINT64, &current_dbus,
-				 DBUS_TYPE_UINT64, &total_dbus,
-				 0))
-	data->progress_callback (current_dbus, total_dbus, data->progress_callback_data);
-    }
-  else
-    g_warning ("Unknown progress callback message type\n");
+  data->progress_callback (arg_current, arg_total, data->progress_callback_data);
   
-  /* TODO: demarshal args and call reall callback */
-  return DBUS_HANDLER_RESULT_HANDLED;
+  gvfs_dbus_progress_complete_progress (object, invocation);
+  
+  return TRUE;
 }
 
 static gboolean
@@ -2368,17 +2694,23 @@ file_transfer (GFile                  *source,
                gpointer                progress_callback_data,
                GError                **error)
 {
-  DBusMessage *reply;
-  char *obj_path, *dbus_obj_path;
-  dbus_uint32_t flags_dbus;
-  dbus_bool_t dbus_remove_source;
-  struct ProgressCallbackData data;
+  char *obj_path;
+  ProgressCallbackData data;
   char *local_path = NULL;
   gboolean source_is_daemon;
   gboolean dest_is_daemon;
   gboolean native_transfer;
   gboolean send_progress;
+  GVfsDBusMount *proxy;
+  gchar *path1, *path2;
+  GDBusConnection *connection;
+  gboolean res;
+  GVfsDBusProgress *progress_skeleton;
+  GFile *file1, *file2;
+  GError *my_error;
 
+  res = FALSE;
+  progress_skeleton = NULL;
   native_transfer  = FALSE;
   source_is_daemon = G_IS_DAEMON_FILE (source);
   dest_is_daemon   = G_IS_DAEMON_FILE (destination);
@@ -2408,76 +2740,126 @@ file_transfer (GFile                  *source,
     }
 
   if (progress_callback)
-    {
-      obj_path = g_strdup_printf ("/org/gtk/vfs/callback/%p", &obj_path);
-      dbus_obj_path = obj_path;
-    }
+    obj_path = g_strdup_printf ("/org/gtk/vfs/callback/%p", &obj_path);
   else
-    {
-      obj_path = NULL;
-      /* Can't pass NULL obj path as arg */
-      dbus_obj_path = "/org/gtk/vfs/void";
-    }
+    obj_path = g_strdup ("/org/gtk/vfs/void");
 
   data.progress_callback = progress_callback;
   data.progress_callback_data = progress_callback_data;
 
-  flags_dbus = flags;
-  dbus_remove_source = remove_source;
-
-  if (native_transfer == TRUE)
+  /* need to create proxy with daemon files only */ 
+  if (native_transfer)
     {
-      const char *method_string;
-
-      if (remove_source == FALSE)
-        method_string = G_VFS_DBUS_MOUNT_OP_COPY;
-      else
-        method_string = G_VFS_DBUS_MOUNT_OP_MOVE;
-
-      reply = do_sync_2_path_call (source, destination,
-                                   method_string,
-                                   obj_path, progress_callback_message, &data,
-                                   NULL, cancellable, error,
-                                   DBUS_TYPE_UINT32, &flags_dbus,
-                                   DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
-                                   0);
-    }
-  else if (dest_is_daemon == TRUE)
-    {
-      reply = do_sync_2_path_call (destination, NULL,
-                                   G_VFS_DBUS_MOUNT_OP_PUSH,
-                                   obj_path, progress_callback_message, &data,
-                                   NULL, cancellable, error,
-                                   G_DBUS_TYPE_CSTRING, &local_path,
-                                   DBUS_TYPE_BOOLEAN, &send_progress,
-                                   DBUS_TYPE_UINT32, &flags_dbus,
-                                   DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
-                                   DBUS_TYPE_BOOLEAN, &dbus_remove_source,
-                                   0);
+      file1 = source;
+      file2 = destination;
     }
   else
     {
-      reply = do_sync_2_path_call (source, NULL,
-                                   G_VFS_DBUS_MOUNT_OP_PULL,
-                                   obj_path, progress_callback_message, &data,
-                                   NULL, cancellable, error,
-                                   G_DBUS_TYPE_CSTRING, &local_path,
-                                   DBUS_TYPE_BOOLEAN, &send_progress,
-                                   DBUS_TYPE_UINT32, &flags_dbus,
-                                   DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
-                                   DBUS_TYPE_BOOLEAN, &dbus_remove_source,
-                                   0);
+      if (dest_is_daemon)
+        {
+          file1 = destination;
+          file2 = NULL;
+        }
+      else
+        {
+          file1 = source;
+          file2 = NULL;
+        }
+    }
+  
+retry:
+  my_error = NULL;
 
+  proxy = create_proxy_for_file2 (file1, file2,
+                                  NULL, NULL,
+                                  &path1, &path2,
+                                  &connection,
+                                  cancellable,
+                                  &my_error);
+  
+  if (proxy == NULL)
+    goto out;
+
+  /* Register progress interface skeleton */
+  progress_skeleton = gvfs_dbus_progress_skeleton_new ();
+  g_dbus_interface_skeleton_set_flags (G_DBUS_INTERFACE_SKELETON (progress_skeleton), G_DBUS_INTERFACE_SKELETON_FLAGS_HANDLE_METHOD_INVOCATIONS_IN_THREAD);
+  g_signal_connect (progress_skeleton, "handle-progress", G_CALLBACK (handle_progress), &data);
+
+  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (progress_skeleton),
+                                         connection,
+                                         obj_path,
+                                         &my_error))
+    goto out;
+
+  if (native_transfer == TRUE)
+    {
+      if (remove_source == FALSE)
+        {
+          res = gvfs_dbus_mount_call_copy_sync (proxy,
+                                                path1, path2,
+                                                flags,
+                                                obj_path,
+                                                cancellable,
+                                                &my_error);
+        }
+      else
+        {
+          res = gvfs_dbus_mount_call_move_sync (proxy,
+                                                path1, path2,
+                                                flags,
+                                                obj_path,
+                                                cancellable,
+                                                &my_error);
+        }
+    }
+  else if (dest_is_daemon == TRUE)
+    {
+      res = gvfs_dbus_mount_call_push_sync (proxy,
+                                            path1,
+                                            local_path,
+                                            send_progress,
+                                            flags,
+                                            obj_path,
+                                            remove_source,
+                                            cancellable,
+                                            &my_error);
+    }
+  else
+    {
+      res = gvfs_dbus_mount_call_pull_sync (proxy,
+                                            path1,
+                                            local_path,
+                                            send_progress,
+                                            flags,
+                                            obj_path,
+                                            remove_source,
+                                            cancellable,
+                                            &my_error);
+    }
+
+ out:
+  if (progress_skeleton)
+    {
+      g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (progress_skeleton));
+      g_object_unref (progress_skeleton);
+    }
+  if (proxy)
+    g_object_unref (proxy);
+
+  if (! res)
+    {
+      if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
+        {
+          g_error_free (my_error);
+          goto retry;
+        }
+      g_propagate_error (error, my_error);
     }
 
   g_free (local_path);
   g_free (obj_path);
 
-  if (reply == NULL)
-    return FALSE;
-
-  dbus_message_unref (reply);
-  return TRUE;
+  return res;
 }
 
 static gboolean
@@ -2533,45 +2915,44 @@ g_daemon_file_monitor_dir (GFile* file,
 			   GError **error)
 {
   GFileMonitor *monitor;
-  char *obj_path;
-  dbus_uint32_t flags_dbus;
   GMountInfo *mount_info;
-  DBusMessage *reply;
+  GVfsDBusMount *proxy;
+  char *path;
+  char *obj_path;
+  gboolean res;
 
-  flags_dbus = flags;
+  g_print ("g_daemon_file_monitor_dir\n");
 
+  monitor = NULL;
   mount_info = NULL;
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_CREATE_DIR_MONITOR,
-			     &mount_info, NULL,
-			     cancellable, error,
-			     DBUS_TYPE_UINT32, &flags_dbus,
-			     0);
+  obj_path = NULL;
+
+  proxy = create_proxy_for_file (file, &mount_info, &path, NULL, cancellable, error);
+  if (proxy == NULL)
+    return FALSE;
+
   
-  if (reply == NULL)
-    {
-      if (mount_info)
-	g_mount_info_unref (mount_info);
-      return NULL;
-    }
+  res = gvfs_dbus_mount_call_create_directory_monitor_sync (proxy,
+                                                            path,
+                                                            flags,
+                                                            &obj_path,
+                                                            cancellable,
+                                                            error);
+  g_print ("g_daemon_file_monitor_dir: done, res = %d\n", res);
   
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_OBJECT_PATH, &obj_path,
-			      DBUS_TYPE_INVALID))
-    {
-      g_mount_info_unref (mount_info);
-      dbus_message_unref (reply);
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from %s"), "monitor_dir");
-      return NULL;
-    }
+  g_free (path);
+  g_object_unref (proxy);
+
+  if (! res)
+    goto out;
   
   monitor = g_daemon_file_monitor_new (mount_info->dbus_id,
 				       obj_path);
   
+ out:
   g_mount_info_unref (mount_info);
-  dbus_message_unref (reply);
-  
+  g_free (obj_path);
+
   return monitor;
 }
 
@@ -2582,114 +2963,151 @@ g_daemon_file_monitor_file (GFile* file,
 			    GError **error)
 {
   GFileMonitor *monitor;
-  char *obj_path;
-  dbus_uint32_t flags_dbus;
   GMountInfo *mount_info;
-  DBusMessage *reply;
+  GVfsDBusMount *proxy;
+  char *path;
+  char *obj_path;
+  gboolean res;
 
-  flags_dbus = flags;
+  g_print ("g_daemon_file_monitor_file\n");
 
+  monitor = NULL;
   mount_info = NULL;
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_CREATE_FILE_MONITOR,
-			     &mount_info, NULL,
-			     cancellable, error,
-			     DBUS_TYPE_UINT32, &flags_dbus,
-			     0);
+  obj_path = NULL;
+
+  proxy = create_proxy_for_file (file, &mount_info, &path, NULL, cancellable, error);
+  if (proxy == NULL)
+    return FALSE;
+
   
-  if (reply == NULL)
-    {
-      if (mount_info)
-	g_mount_info_unref (mount_info);
-      return NULL;
-    }
+  res = gvfs_dbus_mount_call_create_file_monitor_sync (proxy,
+                                                       path,
+                                                       flags,
+                                                       &obj_path,
+                                                       cancellable,
+                                                       error);
+  g_print ("g_daemon_file_monitor_file: done, res = %d\n", res);
   
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_OBJECT_PATH, &obj_path,
-			      DBUS_TYPE_INVALID))
-    {
-      g_mount_info_unref (mount_info);
-      dbus_message_unref (reply);
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from %s"), "monitor_file");
-      return NULL;
-    }
+  g_free (path);
+  g_object_unref (proxy);
+
+  if (! res)
+    goto out;
   
   monitor = g_daemon_file_monitor_new (mount_info->dbus_id,
-				       obj_path);
+                                       obj_path);
   
+ out:
   g_mount_info_unref (mount_info);
-  dbus_message_unref (reply);
-  
+  g_free (obj_path);
+
   return monitor;
 }
 
-typedef struct
-{
-  GSimpleAsyncResult *result;
-  GCancellable       *cancellable;
-  dbus_bool_t         can_seek;
-  guint64             initial_offset;
-}
-StreamOpenParams;
 
 static void
-stream_open_cb (gint fd, StreamOpenParams *params)
+file_open_write_async_cb (GVfsDBusMount *proxy,
+                          GAsyncResult *res,
+                          gpointer user_data)
 {
+  AsyncCallFileReadWrite *data = user_data;
+  GError *error = NULL;
+  GSimpleAsyncResult *orig_result;
+  gboolean can_seek;
+  GUnixFDList *fd_list;
+  int fd;
+  guint fd_id;
+  guint64 initial_offset;
   GFileOutputStream *output_stream;
 
-  if (fd == -1)
+  g_print ("file_open_write_async_cb\n");
+  orig_result = data->result;
+  
+  if (! gvfs_dbus_mount_call_open_for_write_finish (proxy, &fd_id, &can_seek, &initial_offset, &fd_list, res, &error))
     {
-      g_simple_async_result_set_error (params->result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       "%s", _("Didn't get stream file descriptor"));
+      g_simple_async_result_take_error (orig_result, error);
       goto out;
     }
 
-  output_stream = g_daemon_file_output_stream_new (fd, params->can_seek, params->initial_offset);
-  g_simple_async_result_set_op_res_gpointer (params->result, output_stream, g_object_unref);
+  if (fd_list == NULL || g_unix_fd_list_get_length (fd_list) != 1 ||
+      (fd = g_unix_fd_list_get (fd_list, fd_id, NULL)) == -1)
+    {
+      g_simple_async_result_set_error (orig_result,
+                                       G_IO_ERROR, G_IO_ERROR_FAILED,
+                                       _("Couldn't get stream file descriptor"));
+    }
+  else
+    {
+      output_stream = g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
+      g_simple_async_result_set_op_res_gpointer (orig_result, output_stream, g_object_unref);
+      g_object_unref (fd_list);
+    }
 
 out:
-  _g_simple_async_result_complete_with_cancellable (params->result, params->cancellable);
-  if (params->cancellable)
-    g_object_unref (params->cancellable);
-  g_object_unref (params->result);
-  g_slice_free (StreamOpenParams, params);
+  _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+  data->result = NULL;
+  g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
 }
 
 static void
-append_to_async_cb (DBusMessage *reply,
-                    DBusConnection *connection,
-                    GMountInfo *mount_info,
-                    GSimpleAsyncResult *result,
-                    GCancellable *cancellable,
-                    gpointer callback_data)
+file_open_write_async_get_proxy_cb (GVfsDBusMount *proxy,
+                                    GDBusConnection *connection,
+                                    GMountInfo *mount_info,
+                                    const gchar *path,
+                                    GSimpleAsyncResult *result,
+                                    GError *error,
+                                    GCancellable *cancellable,
+                                    gpointer callback_data)
 {
-  guint32 fd_id;
-  StreamOpenParams *open_params;
+  AsyncCallFileReadWrite *data = callback_data;
+  guint32 pid;
 
-  open_params = g_slice_new0 (StreamOpenParams);
+  g_print ("file_open_write_async_get_proxy_cb, proxy = %p\n", proxy);
 
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_UINT32, &fd_id,
-			      DBUS_TYPE_BOOLEAN, &open_params->can_seek,
-			      DBUS_TYPE_UINT64, &open_params->initial_offset,
-			      DBUS_TYPE_INVALID))
-    {
-      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       _("Invalid return value from %s"), "open");
-      goto failure;
-    }
+  pid = get_pid_for_file (data->file);
+  
+  data->result = g_object_ref (result);
+  
+  gvfs_dbus_mount_call_open_for_write (proxy,
+                                       path,
+                                       data->mode,
+                                       data->etag,
+                                       data->make_backup,
+                                       data->flags,
+                                       pid,
+                                       NULL,
+                                       cancellable,
+                                       (GAsyncReadyCallback) file_open_write_async_cb,
+                                       data);
+}
 
-  open_params->result = g_object_ref (result);
+static void
+file_open_write_async (GFile                      *file,
+                       guint16                     mode,
+                       const char                 *etag,
+                       gboolean                    make_backup,
+                       GFileCreateFlags            flags,
+                       int                         io_priority,
+                       GCancellable               *cancellable,
+                       GAsyncReadyCallback         callback,
+                       gpointer                    user_data)
+{
+  AsyncCallFileReadWrite *data;
+
+  data = g_new0 (AsyncCallFileReadWrite, 1);
+  data->file = g_object_ref (file);
+  data->mode = mode;
+  data->etag = g_strdup (etag ? etag : "");
+  data->make_backup = make_backup;
+  data->io_priority = io_priority;
   if (cancellable)
-    open_params->cancellable = g_object_ref (cancellable);
-  _g_dbus_connection_get_fd_async (connection, fd_id,
-                                   (GetFdAsyncCallback) stream_open_cb, open_params);
-  return;
+    data->cancellable = g_object_ref (cancellable);
 
-failure:
-  g_slice_free (StreamOpenParams, open_params);
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, user_data,
+                               file_open_write_async_get_proxy_cb,
+                               data, (GDestroyNotify) async_call_file_read_write_free);
 }
 
 static void
@@ -2700,30 +3118,12 @@ g_daemon_file_append_to_async (GFile                      *file,
                                GAsyncReadyCallback         callback,
                                gpointer                    user_data)
 {
-  guint16 mode;
-  dbus_bool_t make_backup;
-  guint32 dbus_flags;
-  char *etag;
-  guint32 pid;
-
-  pid = get_pid_for_file (file);
-
-  mode = 1;
-  etag = "";
-  make_backup = FALSE;
-  dbus_flags = flags;
+  g_print ("g_daemon_file_append_to_async\n");
   
-  do_async_path_call (file, 
-                      G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
-                      cancellable,
-                      callback, user_data,
-                      append_to_async_cb, NULL, NULL,
-                      DBUS_TYPE_UINT16, &mode,
-                      DBUS_TYPE_STRING, &etag,
-                      DBUS_TYPE_BOOLEAN, &make_backup,
-                      DBUS_TYPE_UINT32, &dbus_flags,
-                      DBUS_TYPE_UINT32, &pid,
-                      0);
+  file_open_write_async (file,
+                         1, "", FALSE, flags, io_priority,
+                         cancellable,
+                         callback, user_data);
 }
 
 static GFileOutputStream *
@@ -2742,40 +3142,6 @@ g_daemon_file_append_to_finish (GFile                      *file,
 }
 
 static void
-create_async_cb (DBusMessage *reply,
-                 DBusConnection *connection,
-                 GMountInfo *mount_info,
-                 GSimpleAsyncResult *result,
-                 GCancellable *cancellable,
-                 gpointer callback_data)
-{
-  guint32 fd_id;
-  StreamOpenParams *open_params;
-
-  open_params = g_slice_new0 (StreamOpenParams);
-
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_UINT32, &fd_id,
-			      DBUS_TYPE_BOOLEAN, &open_params->can_seek,
-			      DBUS_TYPE_UINT64, &open_params->initial_offset,
-			      DBUS_TYPE_INVALID))
-    {
-      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       _("Invalid return value from %s"), "open");
-      goto failure;
-    }
-
-  open_params->result = g_object_ref (result);
-  _g_dbus_connection_get_fd_async (connection, fd_id,
-                                   (GetFdAsyncCallback) stream_open_cb, open_params);
-  return;
-
-failure:
-  g_slice_free (StreamOpenParams, open_params);
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
-}
-
-static void
 g_daemon_file_create_async (GFile                      *file,
                             GFileCreateFlags            flags,
                             int                         io_priority,
@@ -2783,30 +3149,12 @@ g_daemon_file_create_async (GFile                      *file,
                             GAsyncReadyCallback         callback,
                             gpointer                    user_data)
 {
-  guint16 mode;
-  dbus_bool_t make_backup;
-  char *etag;
-  guint32 dbus_flags;
-  guint32 pid;
-
-  pid = get_pid_for_file (file);
-
-  mode = 0;
-  etag = "";
-  make_backup = FALSE;
-  dbus_flags = flags;
+  g_print ("g_daemon_file_create_async\n");
   
-  do_async_path_call (file, 
-                      G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
-                      cancellable,
-                      callback, user_data,
-                      create_async_cb, NULL, NULL,
-                      DBUS_TYPE_UINT16, &mode,
-                      DBUS_TYPE_STRING, &etag,
-                      DBUS_TYPE_BOOLEAN, &make_backup,
-                      DBUS_TYPE_UINT32, &dbus_flags,
-                      DBUS_TYPE_UINT32, &pid,
-                      0);
+  file_open_write_async (file,
+                         0, "", FALSE, flags, io_priority,
+                         cancellable,
+                         callback, user_data);
 }
 
 static GFileOutputStream *
@@ -2824,29 +3172,95 @@ g_daemon_file_create_finish (GFile                      *file,
   return NULL;
 }
 
+
+typedef struct {
+  GFile *file;
+  char *attributes;
+  GFileQueryInfoFlags flags;
+  int io_priority;
+  GSimpleAsyncResult *result;
+  GCancellable *cancellable;
+  GDaemonFileEnumerator *enumerator;
+} AsyncCallEnumerate;
+
 static void
-enumerate_children_async_cb (DBusMessage *reply,
-                             DBusConnection *connection,
-                             GMountInfo *mount_info,
-                             GSimpleAsyncResult *result,
-                             GCancellable *cancellable,
-                             gpointer callback_data)
+async_call_enumerate_free (AsyncCallEnumerate *data)
 {
-  GDaemonFileEnumerator *enumerator = callback_data;
+  g_print ("async_call_enumerate_free\n");
+  
+  if (data->file)
+    g_object_unref (data->file);
+  if (data->result)
+    g_object_unref (data->result);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
+  if (data->enumerator)
+    g_object_unref (data->enumerator);
+  g_free (data->attributes);
+  g_free (data);
+}
 
-  if (reply == NULL || connection == NULL)
-  {
-    g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                     _("Invalid return value from %s"), "enumerate_children");
-    goto out;
-  }
+static void
+enumerate_children_async_cb (GVfsDBusMount *proxy,
+                             GAsyncResult *res,
+                             gpointer user_data)
+{
+  AsyncCallEnumerate *data = user_data;
+  GError *error = NULL;
+  GSimpleAsyncResult *orig_result;
 
-  g_object_ref (enumerator);
+  g_print ("enumerate_children_async_cb\n");
+  orig_result = data->result;
+  
+  if (! gvfs_dbus_mount_call_enumerate_finish (proxy, res, &error))
+    {
+      g_simple_async_result_take_error (orig_result, error);
+      goto out;
+    }
+  
+  g_object_ref (data->enumerator);
 
-  g_simple_async_result_set_op_res_gpointer (result, enumerator, g_object_unref);
+  g_simple_async_result_set_op_res_gpointer (orig_result, data->enumerator, g_object_unref);
 
 out:
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
+  _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+  data->result = NULL;
+  g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
+}
+
+static void
+enumerate_children_async_get_proxy_cb (GVfsDBusMount *proxy,
+                                       GDBusConnection *connection,
+                                       GMountInfo *mount_info,
+                                       const gchar *path,
+                                       GSimpleAsyncResult *result,
+                                       GError *error,
+                                       GCancellable *cancellable,
+                                       gpointer callback_data)
+{
+  AsyncCallEnumerate *data = callback_data;
+  char *obj_path;
+  char *uri;
+
+  g_print ("enumerate_children_async_get_proxy_cb, proxy = %p\n", proxy);
+  
+  obj_path = g_daemon_file_enumerator_get_object_path (data->enumerator);
+  uri = g_file_get_uri (data->file);
+  
+  data->result = g_object_ref (result);
+  
+  gvfs_dbus_mount_call_enumerate (proxy,
+                                  path,
+                                  obj_path,
+                                  data->attributes ? data->attributes : "",
+                                  data->flags,
+                                  uri,
+                                  cancellable,
+                                  (GAsyncReadyCallback) enumerate_children_async_cb,
+                                  data);
+  
+  g_free (uri);
+  g_free (obj_path);
 }
 
 static void
@@ -2858,31 +3272,24 @@ g_daemon_file_enumerate_children_async (GFile                      *file,
                                         GAsyncReadyCallback         callback,
                                         gpointer                    user_data)
 {
-  dbus_uint32_t flags_dbus;
-  char *obj_path;
-  GDaemonFileEnumerator *enumerator;
-  char *uri;
+  AsyncCallEnumerate *data;
 
-  enumerator = g_daemon_file_enumerator_new (file, attributes);
-  obj_path = g_daemon_file_enumerator_get_object_path (enumerator);
+  g_print ("g_daemon_file_enumerate_children_async\n");
 
-  uri = g_file_get_uri (file);
+  data = g_new0 (AsyncCallEnumerate, 1);
+  data->file = g_object_ref (file);
+  data->attributes = g_strdup (attributes);
+  data->flags = flags;
+  data->io_priority = io_priority;
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
+  data->enumerator = g_daemon_file_enumerator_new (data->file, data->attributes);
 
-  if (attributes == NULL)
-    attributes = "";
-  flags_dbus = flags;
-  do_async_path_call (file, 
-                      G_VFS_DBUS_MOUNT_OP_ENUMERATE,
-                      cancellable,
-                      callback, user_data,
-                      enumerate_children_async_cb, enumerator, g_object_unref,
-                      DBUS_TYPE_STRING, &obj_path,
-                      DBUS_TYPE_STRING, &attributes,
-                      DBUS_TYPE_UINT32, &flags_dbus,
-                      DBUS_TYPE_STRING, &uri,
-                      0);
-  g_free (uri);
-  g_free (obj_path);
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, user_data,
+                               enumerate_children_async_get_proxy_cb,
+                               data, (GDestroyNotify) async_call_enumerate_free);
 }
 
 static GFileEnumerator *
@@ -3007,40 +3414,6 @@ g_daemon_file_find_enclosing_mount_finish (GFile              *file,
 }
 
 static void
-replace_async_cb (DBusMessage *reply,
-                  DBusConnection *connection,
-                  GMountInfo *mount_info,
-                  GSimpleAsyncResult *result,
-                  GCancellable *cancellable,
-                  gpointer callback_data)
-{
-  guint32 fd_id;
-  StreamOpenParams *open_params;
-
-  open_params = g_slice_new0 (StreamOpenParams);
-
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_UINT32, &fd_id,
-			      DBUS_TYPE_BOOLEAN, &open_params->can_seek,
-			      DBUS_TYPE_UINT64, &open_params->initial_offset,
-			      DBUS_TYPE_INVALID))
-    {
-      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       _("Invalid return value from %s"), "open");
-      goto failure;
-    }
-
-  open_params->result = g_object_ref (result);
-  _g_dbus_connection_get_fd_async (connection, fd_id,
-                                   (GetFdAsyncCallback) stream_open_cb, open_params);
-  return;
-
-failure:
-  g_slice_free (StreamOpenParams, open_params);
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
-}
-
-static void
 g_daemon_file_replace_async (GFile                      *file,
                              const char                 *etag,
                              gboolean                    make_backup,
@@ -3050,27 +3423,12 @@ g_daemon_file_replace_async (GFile                      *file,
                              GAsyncReadyCallback         callback,
                              gpointer                    user_data)
 {
-  dbus_bool_t dbus_make_backup = make_backup;
-  guint32 dbus_flags = flags;
-  guint16 mode = 2;
-  guint32 pid;
-
-  pid = get_pid_for_file (file);
+  g_print ("g_daemon_file_replace_async\n");
   
-  if (etag == NULL)
-    etag = "";
-
-  do_async_path_call (file,
-                      G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
-                      cancellable,
-                      callback, user_data,
-                      replace_async_cb, NULL, NULL,
-                      DBUS_TYPE_UINT16, &mode,
-                      DBUS_TYPE_STRING, &etag,
-                      DBUS_TYPE_BOOLEAN, &dbus_make_backup,
-                      DBUS_TYPE_UINT32, &dbus_flags,
-                      DBUS_TYPE_UINT32, &pid,
-                      0);
+  file_open_write_async (file,
+                         2, etag, make_backup, flags, io_priority,
+                         cancellable,
+                         callback, user_data);
 }
 
 static GFileOutputStream *
@@ -3088,38 +3446,86 @@ g_daemon_file_replace_finish (GFile                      *file,
   return NULL;
 }
 
-static void
-set_display_name_async_cb (DBusMessage *reply,
-                           DBusConnection *connection,
-                           GMountInfo *mount_info,
-                           GSimpleAsyncResult *result,
-                           GCancellable *cancellable,
-                           gpointer callback_data)
-{
-  GDaemonFile *daemon_file = callback_data;
+typedef struct {
   GFile *file;
-  DBusMessageIter iter;
-  gchar *new_path;
+  char *display_name;
+  int io_priority;
+  GMountInfo *mount_info;
+  GSimpleAsyncResult *result;
+  GCancellable *cancellable;
+} AsyncCallSetDisplayName;
 
-  if (!dbus_message_iter_init (reply, &iter) ||
-      !_g_dbus_message_iter_get_args (&iter, NULL,
-				      G_DBUS_TYPE_CSTRING, &new_path,
-				      0))
+static void
+async_call_set_display_name_free (AsyncCallSetDisplayName *data)
+{
+  if (data->file)
+    g_object_unref (data->file);
+  if (data->result)
+    g_object_unref (data->result);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
+  if (data->mount_info)
+    g_mount_info_unref (data->mount_info);
+  g_free (data->display_name);
+  g_free (data);
+}
+
+static void
+set_display_name_async_cb (GVfsDBusMount *proxy,
+                           GAsyncResult *res,
+                           gpointer user_data)
+{
+  AsyncCallSetDisplayName *data = user_data;
+  GFile *file;
+  GError *error = NULL;
+  gchar *new_path;
+  GSimpleAsyncResult *orig_result;
+
+  g_print ("set_display_name_async_cb\n");
+  orig_result = data->result;
+
+  if (! gvfs_dbus_mount_call_set_display_name_finish (proxy, &new_path, res, &error))
     {
-      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       _("Invalid return value from %s"), "set_display_name");
+      g_simple_async_result_take_error (orig_result, error);
       goto out;
     }
 
-  g_mount_info_apply_prefix (mount_info, &new_path);
-  file = new_file_for_new_path (daemon_file, new_path);
+  g_mount_info_apply_prefix (data->mount_info, &new_path);
+  file = new_file_for_new_path (G_DAEMON_FILE (data->file), new_path);
 
   g_free (new_path);
 
-  g_simple_async_result_set_op_res_gpointer (result, file, g_object_unref);
+  g_simple_async_result_set_op_res_gpointer (orig_result, file, g_object_unref);
 
-out:
-  _g_simple_async_result_complete_with_cancellable (result, cancellable);
+  out:
+    _g_simple_async_result_complete_with_cancellable (orig_result, data->cancellable);
+    data->result = NULL;
+    g_object_unref (orig_result);   /* trigger async_proxy_create_free() */
+}
+
+static void
+set_display_name_async_get_proxy_cb (GVfsDBusMount *proxy,
+                                     GDBusConnection *connection,
+                                     GMountInfo *mount_info,
+                                     const gchar *path,
+                                     GSimpleAsyncResult *result,
+                                     GError *error,
+                                     GCancellable *cancellable,
+                                     gpointer callback_data)
+{
+  AsyncCallSetDisplayName *data = callback_data;
+
+  g_print ("set_display_name_async_get_proxy_cb, proxy = %p\n", proxy);
+  
+  data->result = g_object_ref (result);
+  data->mount_info = g_mount_info_ref (mount_info);
+  
+  gvfs_dbus_mount_call_set_display_name (proxy,
+                                         path,
+                                         data->display_name,
+                                         cancellable,
+                                         (GAsyncReadyCallback) set_display_name_async_cb,
+                                         data);
 }
 
 static void
@@ -3130,15 +3536,22 @@ g_daemon_file_set_display_name_async (GFile                      *file,
                                       GAsyncReadyCallback         callback,
                                       gpointer                    user_data)
 {
-  g_object_ref (file);
+  AsyncCallSetDisplayName *data;
 
-  do_async_path_call (file,
-                      G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME,
-                      cancellable,
-                      callback, user_data,
-                      set_display_name_async_cb, file, g_object_unref,
-                      DBUS_TYPE_STRING, &display_name,
-                      0);
+  g_print ("g_daemon_file_set_display_name_async\n");
+  
+  data = g_new0 (AsyncCallSetDisplayName, 1);
+  data->file = g_object_ref (file);
+  data->display_name = g_strdup (display_name);
+  data->io_priority = io_priority;
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
+
+  create_proxy_for_file_async (file,
+                               cancellable,
+                               callback, user_data,
+                               set_display_name_async_get_proxy_cb,
+                               data, (GDestroyNotify) async_call_set_display_name_free);
 }
 
 static GFile *

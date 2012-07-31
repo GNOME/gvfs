@@ -58,9 +58,13 @@ struct _GVfsJobCopyClass
 
 GType g_vfs_job_copy_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_copy_new (DBusConnection *connection,
-			     DBusMessage    *message,
-			     GVfsBackend    *backend);
+gboolean g_vfs_job_copy_new_handle (GVfsDBusMount         *object,
+                                    GDBusMethodInvocation *invocation,
+                                    const gchar           *arg_path1_data,
+                                    const gchar           *arg_path2_data,
+                                    guint                  arg_flags,
+                                    const gchar           *arg_progress_obj_path,
+                                    GVfsBackend           *backend);
 
 G_END_DECLS
 

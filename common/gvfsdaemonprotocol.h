@@ -186,26 +186,22 @@ void       _g_dbus_attribute_value_destroy       (GFileAttributeType          ty
 						  GDbusAttributeValue        *value);
 gpointer   _g_dbus_attribute_as_pointer          (GFileAttributeType          type,
 						  GDbusAttributeValue        *value);
-const char*_g_dbus_type_from_file_attribute_type (GFileAttributeType          type);
-void       _g_dbus_append_file_attribute         (DBusMessageIter            *iter,
-						  const char                 *attribute,
+GVariant * _g_dbus_append_file_attribute         (const char                 *attribute,
 						  GFileAttributeStatus        status,
 						  GFileAttributeType          type,
 						  gpointer                    value_p);
-void       _g_dbus_append_file_info              (DBusMessageIter            *iter,
-						  GFileInfo                  *file_info);
-gboolean   _g_dbus_get_file_attribute            (DBusMessageIter            *iter,
+GVariant * _g_dbus_append_file_info              (GFileInfo                  *file_info);
+gboolean   _g_dbus_get_file_attribute            (GVariant                   *iter,
 						  gchar                     **attribute,
 						  GFileAttributeStatus       *status,
 						  GFileAttributeType         *type,
 						  GDbusAttributeValue        *value);
-GFileInfo *_g_dbus_get_file_info                 (DBusMessageIter            *iter,
+GFileInfo *_g_dbus_get_file_info                 (GVariant                   *iter,
 						  GError                    **error);
 
-GFileAttributeInfoList *_g_dbus_get_attribute_info_list    (DBusMessageIter         *iter,
+GFileAttributeInfoList *_g_dbus_get_attribute_info_list    (GVariant                *iter,
 							    GError                 **error);
-void                    _g_dbus_append_attribute_info_list (DBusMessageIter         *iter,
-							    GFileAttributeInfoList  *list);
+GVariant *              _g_dbus_append_attribute_info_list (GFileAttributeInfoList  *list);
 
 G_END_DECLS
 

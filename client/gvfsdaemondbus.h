@@ -24,7 +24,6 @@
 #define __G_VFS_DAEMON_DBUS_H__
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <gio/gio.h>
 
 G_BEGIN_DECLS
@@ -39,42 +38,28 @@ typedef enum
 } GVfsError;
 
 
-typedef void (*GVfsAsyncDBusCallback) (DBusMessage *reply,
-				       DBusConnection *connection,
+typedef void (*GVfsAsyncDBusCallback) (GDBusConnection *connection,
 				       GError *io_error,
 				       gpointer callback_data);
 typedef void (*GetFdAsyncCallback)    (int fd,
 				       gpointer callback_data);
+typedef GDBusInterfaceSkeleton *  (*GVfsRegisterVfsFilterCallback)  (GDBusConnection *connection,
+                                                                     const char      *obj_path,
+                                                                     gpointer         callback_data);
+
 
 void            _g_dbus_register_vfs_filter             (const char                     *obj_path,
-							 DBusHandleMessageFunction       callback,
+							 GVfsRegisterVfsFilterCallback   callback,
 							 GObject                        *data);
 void            _g_dbus_unregister_vfs_filter           (const char                     *obj_path);
-GList *         _g_dbus_bus_list_names_with_prefix_sync (DBusConnection                 *connection,
-							 const char                     *prefix,
-							 DBusError                      *error);
-DBusConnection *_g_dbus_connection_get_sync             (const char                     *dbus_id,
+void            _g_dbus_connect_vfs_filters             (GDBusConnection                *connection);
+GDBusConnection *_g_dbus_connection_get_sync            (const char                     *dbus_id,
+                                                         GCancellable                   *cancellable,
 							 GError                        **error);
-int             _g_dbus_connection_get_fd_sync          (DBusConnection                 *conn,
-							 int                             fd_id);
-void            _g_dbus_connection_get_fd_async         (DBusConnection                 *connection,
-							 int                             fd_id,
-							 GetFdAsyncCallback              callback,
-							 gpointer                        callback_data);
-void            _g_vfs_daemon_call_async                (DBusMessage                    *message,
-							 GVfsAsyncDBusCallback           callback,
-							 gpointer                        callback_data,
-							 GCancellable                   *cancellable);
-DBusMessage *   _g_vfs_daemon_call_sync                 (DBusMessage                    *message,
-							 DBusConnection                **connection_out,
-							 const char                     *callback_obj_path,
-							 DBusObjectPathMessageFunction   callback,
-							 gpointer                        callback_user_data,
-							 GCancellable                   *cancellable,
-							 GError                        **error);
-GFileInfo *     _g_dbus_get_file_info                   (DBusMessageIter                *iter,
-							 GError                        **error);
-
+void            _g_dbus_connection_get_for_async        (const char                     *dbus_id,
+                                                         GVfsAsyncDBusCallback           callback,
+                                                         gpointer                        callback_data,
+                                                         GCancellable                   *cancellable);
 void        _g_simple_async_result_complete_with_cancellable
                                                         (GSimpleAsyncResult             *result,
                                                          GCancellable                   *cancellable);

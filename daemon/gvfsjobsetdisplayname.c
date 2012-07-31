@@ -28,19 +28,16 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobsetdisplayname.h"
-#include "gvfsdbusutils.h"
-#include "gvfsdaemonprotocol.h"
 
 G_DEFINE_TYPE (GVfsJobSetDisplayName, g_vfs_job_set_display_name, G_VFS_TYPE_JOB_DBUS)
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
-static DBusMessage *create_reply (GVfsJob        *job,
-				  DBusConnection *connection,
-				  DBusMessage    *message);
+static void         create_reply (GVfsJob               *job,
+                                  GVfsDBusMount         *object,
+                                  GDBusMethodInvocation *invocation);
 
 static void
 g_vfs_job_set_display_name_finalize (GObject *object)
@@ -75,45 +72,33 @@ g_vfs_job_set_display_name_init (GVfsJobSetDisplayName *job)
 {
 }
 
-GVfsJob *
-g_vfs_job_set_display_name_new (DBusConnection *connection,
-				DBusMessage *message,
-				GVfsBackend *backend)
+gboolean
+g_vfs_job_set_display_name_new_handle (GVfsDBusMount *object,
+                                       GDBusMethodInvocation *invocation,
+                                       const gchar *arg_path_data,
+                                       const gchar *arg_display_name,
+                                       GVfsBackend *backend)
 {
   GVfsJobSetDisplayName *job;
-  DBusMessage *reply;
-  DBusError derror;
-  int path_len;
-  const char *path_data;
-  char *display_name;
   
-  dbus_error_init (&derror);
-  if (!dbus_message_get_args (message, &derror, 
-			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
-			      &path_data, &path_len,
-			      DBUS_TYPE_STRING, &display_name,
-			      0))
-    {
-      reply = dbus_message_new_error (message,
-				      derror.name,
-                                      derror.message);
-      dbus_error_free (&derror);
+  g_print ("called SetDisplayName()\n");
 
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return NULL;
-    }
-
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
+  
   job = g_object_new (G_VFS_TYPE_JOB_SET_DISPLAY_NAME,
-		      "message", message,
-		      "connection", connection,
-		      NULL);
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
 
-  job->filename = g_strndup (path_data, path_len);
+  job->filename = g_strdup (arg_path_data);
   job->backend = backend;
-  job->display_name = g_strdup (display_name);
+  job->display_name = g_strdup (arg_display_name);
   
-  return G_VFS_JOB (job);
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
 }
 
 static void
@@ -158,22 +143,14 @@ g_vfs_job_set_display_name_set_new_path (GVfsJobSetDisplayName *job,
 }
 
 /* Might be called on an i/o thread */
-static DBusMessage *
+static void
 create_reply (GVfsJob *job,
-	      DBusConnection *connection,
-	      DBusMessage *message)
+              GVfsDBusMount *object,
+              GDBusMethodInvocation *invocation)
 {
   GVfsJobSetDisplayName *op_job = G_VFS_JOB_SET_DISPLAY_NAME (job);
-  DBusMessage *reply;
-  DBusMessageIter iter;
-
-  reply = dbus_message_new_method_return (message);
-
-  dbus_message_iter_init_append (reply, &iter);
 
   g_assert (op_job->new_path != NULL);
   
-  _g_dbus_message_iter_append_cstring (&iter, op_job->new_path);
-  
-  return reply;
+  gvfs_dbus_mount_complete_set_display_name (object, invocation, op_job->new_path);
 }

@@ -54,10 +54,10 @@ struct _GVfsJobMakeDirectoryClass
 
 GType g_vfs_job_make_directory_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_make_directory_new (DBusConnection *connection,
-			       DBusMessage    *message,
-			       GVfsBackend    *backend);
-
+gboolean g_vfs_job_make_directory_new_handle (GVfsDBusMount         *object,
+                                              GDBusMethodInvocation *invocation,
+                                              const gchar           *arg_path_data,
+                                              GVfsBackend           *backend);
 G_END_DECLS
 
 #endif /* __G_VFS_JOB_MAKE_DIRECTORY_H__ */

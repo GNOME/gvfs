@@ -40,3 +40,4 @@ gtk-doc.make
 *.enums.xml
 monitor/proxy/gvfsvolumemonitordbus.*
 metadata/metadata-dbus.*
+common/gvfsdbus.*

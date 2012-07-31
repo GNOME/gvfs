@@ -28,17 +28,21 @@
 #include <locale.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include "daemon-main.h"
 #include <glib/gi18n.h>
 #include <gvfsdaemon.h>
-#include <gvfsdaemonprotocol.h>
 #include <gvfsbackend.h>
+#include <gvfsdbus.h>
 
 static char *spawner_id = NULL;
 static char *spawner_path = NULL;
 
 static gboolean print_debug = FALSE;
+static gboolean already_acquired = FALSE;
+static int process_result = 0;
+
+static GMainLoop *loop;
+
 
 static void
 log_debug (const gchar   *log_domain,
@@ -53,8 +57,8 @@ log_debug (const gchar   *log_domain,
 void
 daemon_init (void)
 {
-  DBusConnection *connection;
-  DBusError derror;
+  GDBusConnection *conn;
+  GError *error;
 
   setlocale (LC_ALL, "");
 
@@ -62,7 +66,6 @@ daemon_init (void)
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
   
-  dbus_threads_init_default ();
   g_type_init ();
 
   g_log_set_handler (NULL, G_LOG_LEVEL_DEBUG, log_debug, NULL);
@@ -73,16 +76,17 @@ daemon_init (void)
    */
   signal (SIGPIPE, SIG_IGN);
 #endif
-  
-  dbus_error_init (&derror);
-  connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
-  if (connection == NULL)
+
+  error = NULL;
+  conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
+  if (!conn)
     {
-      g_printerr (_("Error connecting to D-Bus: %s"), derror.message);
-      g_printerr ("\n");
-      dbus_error_free (&derror);
+      g_printerr ("Error connecting to D-Bus: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
       exit (1);
     }
+  g_object_unref (conn);
 }
 
 void
@@ -99,11 +103,69 @@ daemon_setup (void)
   g_free (up);
 }
 
+typedef struct {
+  GVfsDaemon *daemon;
+  GMountSpec *mount_spec;
+  int max_job_threads;
+  char *mountable_name;
+} DaemonData;
+
+typedef struct {
+  GDestroyNotify callback;
+  gpointer user_data;
+} SpawnData;
+
 static void
-send_spawned (DBusConnection *connection, gboolean succeeded, char *error_message)
+spawned_failed_cb (gpointer user_data)
 {
-  DBusMessage *message;
-  dbus_bool_t dbus_succeeded;
+  process_result = 1;
+  g_main_loop_quit (loop);
+}
+
+static void
+spawned_succeeded_cb (gpointer user_data)
+{
+  DaemonData *data = user_data;
+  GMountSource *mount_source;
+  
+  if (data->mount_spec)
+    {
+      mount_source = g_mount_source_new_dummy ();
+      g_vfs_daemon_initiate_mount (data->daemon, data->mount_spec, mount_source, FALSE, NULL, NULL);
+      g_mount_spec_unref (data->mount_spec);
+      g_object_unref (mount_source);
+    }
+}
+
+static void
+call_spawned_cb (GVfsDBusSpawner *proxy,
+                 GAsyncResult  *res,
+                 gpointer user_data)
+{
+  GError *error = NULL;
+  SpawnData *data = user_data;
+
+  if (! gvfs_dbus_spawner_call_spawned_finish (proxy, res, &error))
+    {
+      g_printerr ("call_spawned_cb: Error sending a message: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+  g_print ("call_spawned_cb\n");
+  
+  data->callback (data->user_data);
+  g_free (data);
+}
+
+static void
+send_spawned (gboolean succeeded, 
+              char *error_message,
+              GDestroyNotify callback,
+              gpointer user_data)
+{
+  GVfsDBusSpawner *proxy;
+  GError *error;
+  SpawnData *data;
 
   if (error_message == NULL)
     error_message = "";
@@ -115,26 +177,42 @@ send_spawned (DBusConnection *connection, gboolean succeeded, char *error_messag
 	  g_printerr (_("Error: %s"), error_message);
 	  g_printerr ("\n");
 	}
+      callback (user_data);
+      return;
+    }
+
+  g_print ("sending spawned.\n");
+  
+  error = NULL;
+  g_print ("send_spawned: before proxy creation, spawner_id = '%s', spawner_path = '%s'\n", spawner_id, spawner_path);
+  proxy = gvfs_dbus_spawner_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                                    G_DBUS_PROXY_FLAGS_NONE,
+                                                    spawner_id,
+                                                    spawner_path,
+                                                    NULL,
+                                                    &error);
+  g_print ("send_spawned: after proxy creation\n");
+  if (proxy == NULL)
+    {
+      g_printerr ("Error creating proxy: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
       return;
     }
   
-  message = dbus_message_new_method_call (spawner_id,
-					  spawner_path,
-					  G_VFS_DBUS_SPAWNER_INTERFACE,
-					  G_VFS_DBUS_OP_SPAWNED);
-  dbus_message_set_no_reply (message, TRUE);
+  data = g_new0 (SpawnData, 1);
+  data->callback = callback;
+  data->user_data = user_data;
+  
+  g_print ("send_spawned: before call_spawned\n");
+  gvfs_dbus_spawner_call_spawned (proxy, 
+                                  succeeded,
+                                  error_message,
+                                  NULL,
+                                  (GAsyncReadyCallback) call_spawned_cb,
+                                  data);
 
-  dbus_succeeded = succeeded;
-  if (!dbus_message_append_args (message,
-				 DBUS_TYPE_BOOLEAN, &dbus_succeeded,
-				 DBUS_TYPE_STRING, &error_message,
-				 DBUS_TYPE_INVALID))
-    _g_dbus_oom ();
-    
-  dbus_connection_send (connection, message, NULL);
-  dbus_message_unref (message);
-  /* Make sure the message is sent */
-  dbus_connection_flush (connection);
+  g_object_unref (proxy);
 }
 
 GMountSpec *
@@ -209,6 +287,67 @@ daemon_parse_args (int argc, char *argv[], const char *default_type)
   return mount_spec;
 }
 
+static void
+on_name_lost (GDBusConnection *connection,
+              const gchar     *name,
+              gpointer         user_data)
+{
+  DaemonData *data = user_data;
+  gchar *s;
+  
+  if (connection == NULL)
+    {
+      g_printerr ("A connection to the bus can't be made\n");
+      process_result = 1;
+    }
+  else
+    {
+      if (already_acquired)
+        {
+          g_printerr ("Got NameLost, some other instance replaced us\n");
+        }
+      else
+        {
+          s = g_strdup_printf (_("mountpoint for %s already running"), data->mountable_name);
+          g_printerr (_("Error: %s"), s);
+          g_printerr ("\n");
+          g_free (s);
+          process_result = 1;
+        }
+    }
+  g_main_loop_quit (loop);
+}
+
+static void
+on_name_acquired (GDBusConnection *connection,
+                  const gchar     *name,
+                  gpointer         user_data)
+{
+  DaemonData *data = user_data;
+
+  g_warning ("daemon-main.c: Acquired the name on the session message bus\n");
+  
+  already_acquired = TRUE;
+  
+  data->daemon = g_vfs_daemon_new (FALSE, FALSE);
+  if (data->daemon == NULL)
+    {
+      send_spawned (FALSE, _("error starting mount daemon"), spawned_failed_cb, data);
+      return;
+    }
+
+  g_vfs_daemon_set_max_threads (data->daemon, data->max_job_threads);
+
+  send_spawned (TRUE, NULL, spawned_succeeded_cb, data);
+}
+
+static gboolean
+do_name_acquired (gpointer user_data)
+{
+  on_name_acquired (NULL, NULL, user_data);
+  return FALSE;
+}
+
 void
 daemon_main (int argc,
 	     char *argv[],
@@ -219,28 +358,17 @@ daemon_main (int argc,
 	     ...)
 {
   va_list var_args;
-  DBusConnection *connection;
-  GMainLoop *loop;
-  GVfsDaemon *daemon;
-  DBusError derror;
-  GMountSpec *mount_spec;
-  GMountSource *mount_source;
-  GError *error;
-  int res;
   const char *type;
+  guint name_owner_id;
+  DaemonData *data;
 
-  dbus_error_init (&derror);
-  connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
-  if (connection == NULL)
-    {
-      g_printerr (_("Error connecting to D-Bus: %s"), derror.message);
-      g_printerr ("\n");
-      dbus_error_free (&derror);
-      exit (1);
-    }
+  g_print ("daemon_main: mountable_name = '%s'\n", mountable_name);
   
-  mount_spec = daemon_parse_args (argc, argv, default_type);
-
+  data = g_new0 (DaemonData, 1);
+  data->mountable_name = g_strdup (mountable_name);
+  data->max_job_threads = max_job_threads;
+  data->mount_spec = daemon_parse_args (argc, argv, default_type);
+  
   va_start (var_args, first_type_name);
 
   type = first_type_name;
@@ -254,49 +382,38 @@ daemon_main (int argc,
       type = va_arg (var_args, char *);
     }
 
-  error = NULL;
+  loop = g_main_loop_new (NULL, FALSE);
+  
+  name_owner_id = 0;
   if (mountable_name)
     {
-      
-      res = dbus_bus_request_name (connection,
-				   mountable_name,
-				   0, &derror);
+      g_print ("daemon_main: requesting name '%s'\n", mountable_name); 
 
-      if (res != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
-	{
-	  if (res == -1)
-	    _g_error_from_dbus (&derror, &error);
-	  else
-	    g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			 _("mountpoint for %s already running"), mountable_name);
-
-	  send_spawned (connection, FALSE, error->message);
-	  g_error_free (error);
-	  exit (1);
-	}
+      name_owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
+                                      mountable_name,
+                                      G_BUS_NAME_OWNER_FLAGS_NONE,
+                                      NULL,
+                                      on_name_acquired,
+                                      on_name_lost,
+                                      data,
+                                      NULL);
     }
-  
-  daemon = g_vfs_daemon_new (FALSE, FALSE);
-  if (daemon == NULL)
+  else
     {
-      send_spawned (connection, FALSE, _("error starting mount daemon"));
-      exit (1);
-    }
-
-  g_vfs_daemon_set_max_threads (daemon, max_job_threads);  
-  
-  send_spawned (connection, TRUE, NULL);
-	  
-  if (mount_spec)
-    {
-      mount_source = g_mount_source_new_dummy ();
-      g_vfs_daemon_initiate_mount (daemon, mount_spec, mount_source, FALSE, NULL);
-      g_mount_spec_unref (mount_spec);
-      g_object_unref (mount_source);
+      g_idle_add (do_name_acquired, data);
     }
   
-  loop = g_main_loop_new (NULL, FALSE);
-
   g_main_loop_run (loop);
+  
+  if (data->daemon != NULL)
+    g_object_unref (data->daemon);
+  g_free (data->mountable_name);
+  g_free (data);
+  if (name_owner_id != 0)
+    g_bus_unown_name (name_owner_id);
+  if (loop != NULL)
+    g_main_loop_unref (loop);
+  
+  if (process_result)
+    exit (process_result);
 }
-

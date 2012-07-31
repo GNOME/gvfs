@@ -59,9 +59,15 @@ struct _GVfsJobPushClass
 
 GType g_vfs_job_push_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_push_new (DBusConnection *connection,
-                             DBusMessage    *message,
-                             GVfsBackend    *backend);
+gboolean g_vfs_job_push_new_handle (GVfsDBusMount         *object,
+                                    GDBusMethodInvocation *invocation,
+                                    const gchar           *arg_path_data,
+                                    const gchar           *arg_local_path,
+                                    gboolean               arg_send_progress,
+                                    guint                  arg_flags,
+                                    const gchar           *arg_progress_obj_path,
+                                    gboolean               arg_remove_source,
+                                    GVfsBackend           *backend);
 
 G_END_DECLS
 

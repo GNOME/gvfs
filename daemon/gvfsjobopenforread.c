@@ -28,11 +28,10 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
+#include <gio/gunixfdlist.h>
 #include "gvfsreadchannel.h"
 #include "gvfsjobopenforread.h"
-#include "gvfsdbusutils.h"
 #include "gvfsdaemonutils.h"
 
 G_DEFINE_TYPE (GVfsJobOpenForRead, g_vfs_job_open_for_read, G_VFS_TYPE_JOB_DBUS)
@@ -40,9 +39,9 @@ G_DEFINE_TYPE (GVfsJobOpenForRead, g_vfs_job_open_for_read, G_VFS_TYPE_JOB_DBUS)
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
 static void         finished     (GVfsJob        *job);
-static DBusMessage *create_reply (GVfsJob        *job,
-				  DBusConnection *connection,
-				  DBusMessage    *message);
+static void         create_reply (GVfsJob               *job,
+                                  GVfsDBusMount         *object,
+                                  GDBusMethodInvocation *invocation);
 
 static void
 g_vfs_job_open_for_read_finalize (GObject *object)
@@ -81,45 +80,34 @@ g_vfs_job_open_for_read_init (GVfsJobOpenForRead *job)
 {
 }
 
-GVfsJob *
-g_vfs_job_open_for_read_new (DBusConnection *connection,
-			     DBusMessage *message,
-			     GVfsBackend *backend)
+gboolean
+g_vfs_job_open_for_read_new_handle (GVfsDBusMount *object,
+                                    GDBusMethodInvocation *invocation,
+                                    GUnixFDList *fd_list,
+                                    const gchar *arg_path_data,
+                                    guint arg_pid,
+                                    GVfsBackend *backend)
 {
   GVfsJobOpenForRead *job;
-  DBusMessage *reply;
-  DBusError derror;
-  int path_len;
-  const char *path_data;
-  guint32 pid;
   
-  dbus_error_init (&derror);
-  if (!dbus_message_get_args (message, &derror, 
-			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
-			      &path_data, &path_len,
-                              DBUS_TYPE_UINT32, &pid,
-			      0))
-    {
-      reply = dbus_message_new_error (message,
-				      derror.name,
-                                      derror.message);
-      dbus_error_free (&derror);
+  g_print ("called OpenForRead()\n");
 
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return NULL;
-    }
-
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
+  
   job = g_object_new (G_VFS_TYPE_JOB_OPEN_FOR_READ,
-		      "message", message,
-		      "connection", connection,
-		      NULL);
-
-  job->filename = g_strndup (path_data, path_len);
-  job->backend = backend;
-  job->pid = pid;
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
   
-  return G_VFS_JOB (job);
+  job->filename = g_strdup (arg_path_data);
+  job->backend = backend;
+  job->pid = arg_pid;
+
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
 }
 
 static void
@@ -170,52 +158,45 @@ g_vfs_job_open_for_read_set_can_seek (GVfsJobOpenForRead *job,
 }
 
 /* Might be called on an i/o thread */
-static DBusMessage *
+static void
 create_reply (GVfsJob *job,
-	      DBusConnection *connection,
-	      DBusMessage *message)
+              GVfsDBusMount *object,
+              GDBusMethodInvocation *invocation)
 {
   GVfsJobOpenForRead *open_job = G_VFS_JOB_OPEN_FOR_READ (job);
   GVfsReadChannel *channel;
-  DBusMessage *reply;
   GError *error;
   int remote_fd;
   int fd_id;
-  dbus_bool_t can_seek;
+  GUnixFDList *fd_list;
 
   g_assert (open_job->backend_handle != NULL);
 
-  error = NULL;
   channel = g_vfs_read_channel_new (open_job->backend,
                                     open_job->pid);
 
   remote_fd = g_vfs_channel_steal_remote_fd (G_VFS_CHANNEL (channel));
-  if (!dbus_connection_send_fd (connection, 
-				remote_fd,
-				&fd_id, &error))
+  
+  fd_list = g_unix_fd_list_new ();
+  error = NULL;
+  fd_id = g_unix_fd_list_append (fd_list, remote_fd, &error);
+  if (fd_id == -1)
     {
-      close (remote_fd);
-      reply = _dbus_message_new_from_gerror (message, error);
+      g_warning ("create_reply: %s (%s, %d)\n", error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
-      g_object_unref (channel);
-      return reply;
     }
+
+  gvfs_dbus_mount_complete_open_for_read (object, invocation, fd_list, fd_id, open_job->can_seek);
+  
+  /* FIXME: this could cause issues as long as fd_list closes all its fd's when it's finalized */
   close (remote_fd);
-
-  reply = dbus_message_new_method_return (message);
-  can_seek = open_job->can_seek;
-  dbus_message_append_args (reply,
-			    DBUS_TYPE_UINT32, &fd_id,
-			    DBUS_TYPE_BOOLEAN, &can_seek,
-			    DBUS_TYPE_INVALID);
-
+  g_object_unref (fd_list);
+  
   g_vfs_channel_set_backend_handle (G_VFS_CHANNEL (channel), open_job->backend_handle);
   open_job->backend_handle = NULL;
   open_job->read_channel = channel;
 
   g_signal_emit_by_name (job, "new-source", open_job->read_channel);
-  
-  return reply;
 }
 
 static void

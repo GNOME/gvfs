@@ -28,11 +28,8 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobmount.h"
-#include "gvfsdbusutils.h"
-#include "gvfsdaemonprotocol.h"
 
 G_DEFINE_TYPE (GVfsJobMount, g_vfs_job_mount, G_VFS_TYPE_JOB)
 
@@ -50,6 +47,10 @@ g_vfs_job_mount_finalize (GObject *object)
   g_mount_spec_unref (job->mount_spec);
   g_object_unref (job->mount_source);
   g_object_unref (job->backend);
+  if (job->object)
+    g_object_unref (job->object);
+  if (job->invocation)
+    g_object_unref (job->invocation);
   
   if (G_OBJECT_CLASS (g_vfs_job_mount_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_mount_parent_class)->finalize) (object);
@@ -76,8 +77,9 @@ GVfsJob *
 g_vfs_job_mount_new (GMountSpec *spec,
 		     GMountSource *source,
 		     gboolean is_automount,
-		     DBusMessage *request,
-		     GVfsBackend *backend)
+		     GVfsDBusMountable *object,
+                     GDBusMethodInvocation *invocation,
+                     GVfsBackend *backend)
 {
   GVfsJobMount *job;
 
@@ -90,8 +92,11 @@ g_vfs_job_mount_new (GMountSpec *spec,
   /* Ref the backend so we're sure its alive
      during the whole job request. */
   job->backend = g_object_ref (backend);
-  if (request)
-    job->request = dbus_message_ref (request);
+  if (object != NULL && invocation != NULL)
+    {
+      job->object = g_object_ref (object);
+      job->invocation = g_object_ref (invocation);
+    }
   
   return G_VFS_JOB (job);
 }
@@ -139,23 +144,10 @@ try (GVfsJob *job)
 static void
 mount_failed (GVfsJobMount *op_job, GError *error)
 {
-  DBusConnection *conn;
-  DBusMessage *reply;
   GVfsBackend *backend;
 
-  if (op_job->request)
-    {
-      reply = _dbus_message_new_from_gerror (op_job->request, error);
-      
-      /* Queues reply (threadsafely), actually sends it in mainloop */
-      conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-      if (conn)
-	{
-	  dbus_connection_send (conn, reply, NULL);
-	  dbus_message_unref (reply);
-	  dbus_connection_unref (conn);
-	}
-    }
+  if (op_job->invocation)
+    g_dbus_method_invocation_return_gerror (op_job->invocation, error);
   else
     g_debug ("Mount failed: %s\n", error->message);
 
@@ -168,35 +160,27 @@ mount_failed (GVfsJobMount *op_job, GError *error)
 }
 
 static void
-register_mount_callback (DBusMessage *mount_reply,
-			 GError *error,
-			 gpointer user_data)
+register_mount_callback (GVfsDBusMountTracker *proxy,
+                         GAsyncResult *res,
+                         gpointer user_data)
 {
   GVfsJobMount *op_job = G_VFS_JOB_MOUNT (user_data);
-  DBusConnection *conn;
-  DBusMessage *reply;
-
-  g_debug ("register_mount_callback, mount_reply: %p, error: %p\n", mount_reply, error);
+  GError *error = NULL;
   
-  if (mount_reply == NULL)
-    mount_failed (op_job, error);
+  if (! gvfs_dbus_mount_tracker_call_register_mount_finish (proxy, res, &error))
+    {
+      mount_failed (op_job, error);
+    }
   else
     {
-      if (op_job->request)
-	{
-	  reply = dbus_message_new_method_return (op_job->request);
-	  /* Queues reply (threadsafely), actually sends it in mainloop */
-	  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-	  if (conn)
-	    {
-	      dbus_connection_send (conn, reply, NULL);
-	      dbus_message_unref (reply);
-	      dbus_connection_unref (conn);
-	    }
-	}
+      if (op_job->invocation && op_job->object)
+        gvfs_dbus_mountable_complete_mount (op_job->object, op_job->invocation);
 
       g_vfs_job_emit_finished (G_VFS_JOB (op_job));
     }
+
+  if (error != NULL)
+    g_error_free (error);
 }
 
 /* Might be called on an i/o thread */
@@ -211,6 +195,6 @@ send_reply (GVfsJob *job)
     mount_failed (op_job, job->error);
   else
     g_vfs_backend_register_mount (op_job->backend,
-				  register_mount_callback,
+                                  (GAsyncReadyCallback) register_mount_callback,
 				  job);
 }

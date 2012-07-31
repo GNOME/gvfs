@@ -57,9 +57,11 @@ struct _GVfsJobSetDisplayNameClass
 
 GType g_vfs_job_set_display_name_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_set_display_name_new          (DBusConnection        *connection,
-						  DBusMessage           *message,
-						  GVfsBackend           *backend);
+gboolean g_vfs_job_set_display_name_new_handle   (GVfsDBusMount         *object,
+                                                  GDBusMethodInvocation *invocation,
+                                                  const gchar           *arg_path_data,
+                                                  const gchar           *arg_display_name,
+                                                  GVfsBackend           *backend);
 void     g_vfs_job_set_display_name_set_new_path (GVfsJobSetDisplayName *job,
 						  const char            *new_path);
 

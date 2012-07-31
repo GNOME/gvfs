@@ -24,7 +24,6 @@
 #define __G_DAEMON_FILE_ENUMERATOR_H__
 
 #include <gio/gio.h>
-#include <dbus/dbus.h>
 
 G_BEGIN_DECLS
 
@@ -50,7 +49,7 @@ GDaemonFileEnumerator *g_daemon_file_enumerator_new                 (GFile *file
 								     const char *attributes);
 char  *                g_daemon_file_enumerator_get_object_path     (GDaemonFileEnumerator *enumerator);
 void                   g_daemon_file_enumerator_set_sync_connection (GDaemonFileEnumerator *enumerator,
-								     DBusConnection        *connection);
+								     GDBusConnection       *connection);
 
 
 G_END_DECLS

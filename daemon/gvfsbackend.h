@@ -23,12 +23,10 @@
 #ifndef __G_VFS_BACKEND_H__
 #define __G_VFS_BACKEND_H__
 
-#include <dbus/dbus.h>
 #include <gio/gio.h>
 #include <gvfsdaemon.h>
 #include <gvfsjob.h>
 #include <gmountspec.h>
-#include <gvfsdbusutils.h>
 
 G_BEGIN_DECLS
 
@@ -478,10 +476,10 @@ void        g_vfs_backend_set_default_location           (GVfsBackend        *ba
 void        g_vfs_backend_set_mount_spec                 (GVfsBackend        *backend,
 							  GMountSpec         *mount_spec);
 void        g_vfs_backend_register_mount                 (GVfsBackend        *backend,
-							  GAsyncDBusCallback  callback,
+                                                          GAsyncReadyCallback callback,
 							  gpointer            user_data);
 void        g_vfs_backend_unregister_mount               (GVfsBackend        *backend,
-							  GAsyncDBusCallback  callback,
+                                                          GAsyncReadyCallback callback,
 							  gpointer            user_data);
 const char *g_vfs_backend_get_backend_type               (GVfsBackend        *backend);
 const char *g_vfs_backend_get_display_name               (GVfsBackend        *backend);
@@ -510,6 +508,10 @@ void        g_vfs_backend_unmount_with_operation (GVfsBackend        *backend,
                                                   GMountSource       *mount_source,
                                                   GAsyncReadyCallback callback,
                                                   gpointer            user_data);
+
+gboolean    g_vfs_backend_invocation_first_handler       (GVfsDBusMount *object,
+                                                          GDBusMethodInvocation *invocation,
+                                                          GVfsBackend *backend);
 
 G_END_DECLS
 

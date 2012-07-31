@@ -24,152 +24,32 @@
 
 #include <string.h>
 
-#include <dbus/dbus.h>
-
-#define I_(string) g_intern_static_string (string)
-
 #include <gio/gio.h>
-#include "gmountoperationdbus.h"
-#include "gvfsdaemonprotocol.h"
-#include "gvfsdbusutils.h"
 #include <glib/gi18n-lib.h>
+#include "gmountoperationdbus.h"
+#include "gvfsdbus.h"
 
 typedef struct 
 {
   GMountOperation *op;
   char *obj_path;
   char *dbus_id;
-  DBusConnection *connection;
+  GDBusConnection *connection;
+  GVfsDBusMountOperation *mount_op_skeleton;
 } GMountOperationDBus;
-
-static DBusHandlerResult mount_op_message_function    (DBusConnection      *connection,
-						       DBusMessage         *message,
-						       void                *user_data);
-static void              mount_op_unregister_function (DBusConnection      *connection,
-						       void                *user_data);
-static void              mount_op_ask_password        (GMountOperationDBus *op_dbus,
-						       DBusMessage         *message);
-static void              mount_op_ask_question        (GMountOperationDBus *op_dbus,
-						       DBusMessage         *message);
-static void              mount_op_show_processes      (GMountOperationDBus *op_dbus,
-						       DBusMessage         *message);
-static void              mount_op_show_unmount_progress (GMountOperationDBus *op_dbus,
-                                                         DBusMessage         *message);
-static void              mount_op_aborted             (GMountOperationDBus *op_dbus,
-						       DBusMessage         *message);
-
-static void
-g_mount_operation_dbus_free (GMountOperationDBus *op_dbus)
-{
-  if (op_dbus->connection)
-    {
-      dbus_connection_unregister_object_path (op_dbus->connection,
-					      op_dbus->obj_path);
-      dbus_connection_unref (op_dbus->connection);
-    }
-  g_free (op_dbus->dbus_id);
-  g_free (op_dbus->obj_path);
-  g_free (op_dbus);
-}
-
-GMountSource *
-g_mount_operation_dbus_wrap (GMountOperation *op,
-			     DBusConnection *connection)
-{
-  GMountOperationDBus *op_dbus;
-  static int mount_id = 0;
-  DBusObjectPathVTable mount_vtable = {
-    mount_op_unregister_function,
-    mount_op_message_function
-  };
-
-  if (op == NULL)
-    return g_mount_source_new_dummy ();
-  
-  op_dbus = g_new0 (GMountOperationDBus, 1);
-  
-  op_dbus->op = op;
-  op_dbus->connection = dbus_connection_ref (connection);
-  op_dbus->obj_path = g_strdup_printf ("/org/gtk/gvfs/mountop/%d", mount_id++);
-  if (op_dbus->connection)
-    {
-      op_dbus->dbus_id = g_strdup (dbus_bus_get_unique_name (op_dbus->connection));
-      if (!dbus_connection_register_object_path (op_dbus->connection,
-						 op_dbus->obj_path,
-						 &mount_vtable,
-						 op_dbus))
-	_g_dbus_oom ();
-    }
-
-  g_object_set_data_full (G_OBJECT (op), "dbus-op",
-			  op_dbus, (GDestroyNotify)g_mount_operation_dbus_free);
-  
-  return g_mount_source_new (op_dbus->dbus_id, op_dbus->obj_path);
-}
-
-/**
- * Called when a #DBusObjectPathVTable is unregistered (or its connection is freed).
- * Found in #DBusObjectPathVTable.
- */
-static void
-mount_op_unregister_function (DBusConnection  *connection,
-			      void            *user_data)
-{
-}
-
-/**
- * Called when a message is sent to a registered object path. Found in
- * #DBusObjectPathVTable which is registered with dbus_connection_register_object_path()
- * or dbus_connection_register_fallback().
- */
-static DBusHandlerResult
-mount_op_message_function (DBusConnection  *connection,
-			   DBusMessage     *message,
-			   void            *user_data)
-{
-  GMountOperationDBus *op_dbus = user_data;
-  
-  if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-				   G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_PASSWORD))
-    mount_op_ask_password (op_dbus, message);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_QUESTION))
-    mount_op_ask_question (op_dbus, message);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					G_VFS_DBUS_MOUNT_OPERATION_OP_SHOW_PROCESSES))
-    mount_op_show_processes (op_dbus, message);
-  else if (dbus_message_is_method_call (message,
-                                        G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-                                        G_VFS_DBUS_MOUNT_OPERATION_OP_SHOW_UNMOUNT_PROGRESS))
-    mount_op_show_unmount_progress (op_dbus, message);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					G_VFS_DBUS_MOUNT_OPERATION_OP_ABORTED))
-    mount_op_aborted (op_dbus, message);
-  else
-    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-
-  return DBUS_HANDLER_RESULT_HANDLED;
-}
 
 static void
 mount_op_send_reply (GMountOperationDBus *op_dbus,
-		     DBusMessage *reply)
+                     GDBusMethodInvocation *invocation)
 {
-  if (!dbus_connection_send (op_dbus->connection, reply, NULL))
-    _g_dbus_oom ();
-
   g_signal_handlers_disconnect_matched (op_dbus->op,
 					G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DATA,
 					g_signal_lookup ("reply", G_TYPE_MOUNT_OPERATION),
 					0,
 					NULL,
 					NULL,
-					reply);
-  dbus_message_unref (reply);
+					invocation);
+  g_object_unref (invocation);
 }
 
 static void
@@ -177,11 +57,11 @@ ask_password_reply (GMountOperation *op,
 		    GMountOperationResult result,
 		    gpointer data)
 {
-  DBusMessage *reply = data;
+  GDBusMethodInvocation *invocation = data;
   const char *username, *password, *domain;
-  dbus_bool_t anonymous;
+  gboolean anonymous;
   guint32 password_save;
-  dbus_bool_t handled, abort_dbus;
+  gboolean handled, abort_dbus;
   GMountOperationDBus *op_dbus;
 
   op_dbus = g_object_get_data (G_OBJECT (op), "dbus-op");
@@ -201,63 +81,42 @@ ask_password_reply (GMountOperation *op,
   anonymous = g_mount_operation_get_anonymous (op);
   password_save = g_mount_operation_get_password_save (op);
 
-  _g_dbus_message_append_args (reply,
-			       DBUS_TYPE_BOOLEAN, &handled,
-			       DBUS_TYPE_BOOLEAN, &abort_dbus,
-			       DBUS_TYPE_STRING, &password,
-			       DBUS_TYPE_STRING, &username,
-			       DBUS_TYPE_STRING, &domain,
-			       DBUS_TYPE_BOOLEAN, &anonymous,
-			       DBUS_TYPE_UINT32, &password_save,
-			       0);
+  gvfs_dbus_mount_operation_complete_ask_password (NULL, /* FIXME */
+                                                   invocation,
+                                                   handled,
+                                                   abort_dbus,
+                                                   password,
+                                                   username,
+                                                   domain,
+                                                   anonymous,
+                                                   password_save);
 
-  mount_op_send_reply (op_dbus, reply);
+  mount_op_send_reply (op_dbus, invocation);
 }
 
-static void
-mount_op_ask_password (GMountOperationDBus *op_dbus,
-		       DBusMessage *message)
+static gboolean
+handle_ask_password (GVfsDBusMountOperation *object,
+                     GDBusMethodInvocation *invocation,
+                     const gchar *arg_message_string,
+                     const gchar *arg_default_user,
+                     const gchar *arg_default_domain,
+                     guint arg_flags_as_int,
+                     gpointer data)
 {
-  const char *message_string, *default_user, *default_domain;
-  guint32 flags;
-  DBusMessageIter iter;
-  DBusMessage *reply;
-  DBusError error;
+  GMountOperationDBus *op_dbus = data;
 
-  reply = NULL;
+  g_print ("gmountoperationdbus.c: handle_ask_password()\n");
 
-  dbus_message_iter_init (message, &iter);
-  
-  dbus_error_init (&error);
-  if (!_g_dbus_message_iter_get_args (&iter,
-				      &error,
-				      DBUS_TYPE_STRING, &message_string,
-				      DBUS_TYPE_STRING, &default_user,
-				      DBUS_TYPE_STRING, &default_domain,
-				      DBUS_TYPE_UINT32, &flags,
-				      0))
-    {
-      reply = dbus_message_new_error (message, error.name, error.message);
-      if (reply == NULL)
-	_g_dbus_oom ();
-      if (!dbus_connection_send (op_dbus->connection, reply, NULL))
-	_g_dbus_oom ();
-      dbus_message_unref (reply);
-      dbus_error_free (&error);
-      return;
-    }
-  
-  reply = dbus_message_new_method_return (message);
-  if (reply == NULL)
-    _g_dbus_oom ();
-  
-  g_signal_connect (op_dbus->op, "reply", (GCallback)ask_password_reply, reply);
+  g_signal_connect (op_dbus->op, "reply", 
+                    (GCallback)ask_password_reply, 
+                    g_object_ref (invocation));
   
   g_signal_emit_by_name (op_dbus->op, "ask_password",
-			 message_string,
-			 default_user,
-			 default_domain,
-			 flags);
+                         arg_message_string,
+                         arg_default_user,
+                         arg_default_domain,
+                         arg_flags_as_int);
+  return TRUE;
 }
 
 static void
@@ -265,9 +124,9 @@ ask_question_reply (GMountOperation *op,
 		    GMountOperationResult result,
 		    gpointer data)
 {
-  DBusMessage *reply = data;
+  GDBusMethodInvocation *invocation = data;
   guint32 choice;
-  dbus_bool_t handled, abort_dbus;
+  gboolean handled, abort_dbus;
   GMountOperationDBus *op_dbus;
 
   op_dbus = g_object_get_data (G_OBJECT (op), "dbus-op");
@@ -277,58 +136,35 @@ ask_question_reply (GMountOperation *op,
   
   choice = g_mount_operation_get_choice (op);
 
-  _g_dbus_message_append_args (reply,
-			       DBUS_TYPE_BOOLEAN, &handled,
-			       DBUS_TYPE_BOOLEAN, &abort_dbus,
-			       DBUS_TYPE_UINT32, &choice,
-			       0);
+  gvfs_dbus_mount_operation_complete_ask_question (NULL, /* FIXME */
+                                                   invocation,
+                                                   handled,
+                                                   abort_dbus,
+                                                   choice);
 
-  mount_op_send_reply (op_dbus, reply);
+  mount_op_send_reply (op_dbus, invocation);
 }
 
-static void
-mount_op_ask_question (GMountOperationDBus *op_dbus,
-		       DBusMessage         *message)
+static gboolean
+handle_ask_question (GVfsDBusMountOperation *object,
+                     GDBusMethodInvocation *invocation,
+                     const gchar *arg_message_string,
+                     const gchar *const *arg_choices,
+                     gpointer data)
 {
-  const char *message_string;
-  char **choices;
-  int num_choices;
-  DBusMessage *reply;
-  DBusError error;
-  DBusMessageIter iter;
+  GMountOperationDBus *op_dbus = data;
 
-  reply = NULL;
-  
-  dbus_message_iter_init (message, &iter);
-  dbus_error_init (&error);
-  if (!_g_dbus_message_iter_get_args (&iter,
-				      &error,
-				      DBUS_TYPE_STRING, &message_string,
-				      DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
-				      &choices, &num_choices,
-				      0))
-    {
-      reply = dbus_message_new_error (message, error.name, error.message);
-      if (reply == NULL)
-	_g_dbus_oom ();
-      if (!dbus_connection_send (op_dbus->connection, reply, NULL))
-	_g_dbus_oom ();
-      dbus_message_unref (reply);
-      dbus_error_free (&error);
-      return;
-    }
-  
-  reply = dbus_message_new_method_return (message);
-  if (reply == NULL)
-    _g_dbus_oom ();
-  
-  g_signal_connect (op_dbus->op, "reply", (GCallback)ask_question_reply, reply);
+  g_print ("gmountoperationdbus.c: handle_ask_question()\n");
+
+  g_signal_connect (op_dbus->op,
+                    "reply",
+                    (GCallback)ask_question_reply,
+                    g_object_ref (invocation));
 
   g_signal_emit_by_name (op_dbus->op, "ask_question",
-			 message_string,
-			 choices);
-  
-  dbus_free_string_array (choices);
+                         arg_message_string,
+                         arg_choices);
+  return TRUE;
 }
 
 static void
@@ -336,9 +172,9 @@ show_processes_reply (GMountOperation *op,
                       GMountOperationResult result,
                       gpointer data)
 {
-  DBusMessage *reply = data;
+  GDBusMethodInvocation *invocation = data;
   guint32 choice;
-  dbus_bool_t handled, abort_dbus;
+  gboolean handled, abort_dbus;
   GMountOperationDBus *op_dbus;
 
   op_dbus = g_object_get_data (G_OBJECT (op), "dbus-op");
@@ -347,119 +183,149 @@ show_processes_reply (GMountOperation *op,
   abort_dbus = (result == G_MOUNT_OPERATION_ABORTED);
 
   choice = g_mount_operation_get_choice (op);
+  
+  gvfs_dbus_mount_operation_complete_show_processes (NULL, /* FIXME */
+                                                     invocation,
+                                                     handled,
+                                                     abort_dbus,
+                                                     choice);
 
-  _g_dbus_message_append_args (reply,
-			       DBUS_TYPE_BOOLEAN, &handled,
-			       DBUS_TYPE_BOOLEAN, &abort_dbus,
-			       DBUS_TYPE_UINT32, &choice,
-			       0);
-
-  mount_op_send_reply (op_dbus, reply);
+  mount_op_send_reply (op_dbus, invocation);
 }
 
-static void
-mount_op_show_processes (GMountOperationDBus *op_dbus,
-                         DBusMessage         *message)
+static gboolean
+handle_show_processes (GVfsDBusMountOperation *object,
+                       GDBusMethodInvocation *invocation,
+                       const gchar *arg_message_string,
+                       const gchar *const *arg_choices,
+                       GVariant *arg_processes,
+                       gpointer data)
 {
-  const char *message_string;
-  char **choices;
-  int num_choices;
-  gint32 **process_pids;
-  int num_process_pids;
-  DBusMessage *reply;
-  DBusError error;
-  DBusMessageIter iter;
+  GMountOperationDBus *op_dbus = data;
   GArray *processes;
+  GPid pid;
+  GVariantIter iter;
 
-  reply = NULL;
+  g_print ("gmountoperationdbus.c: handle_show_processes()\n");
 
-  dbus_message_iter_init (message, &iter);
-  dbus_error_init (&error);
-  if (!_g_dbus_message_iter_get_args (&iter,
-				      &error,
-				      DBUS_TYPE_STRING, &message_string,
-				      DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
-				      &choices, &num_choices,
-				      DBUS_TYPE_ARRAY, DBUS_TYPE_INT32,
-				      &process_pids, &num_process_pids,
-				      0))
-    {
-      reply = dbus_message_new_error (message, error.name, error.message);
-      if (reply == NULL)
-	_g_dbus_oom ();
-      if (!dbus_connection_send (op_dbus->connection, reply, NULL))
-	_g_dbus_oom ();
-      dbus_message_unref (reply);
-      dbus_error_free (&error);
-      return;
-    }
+  processes = g_array_new (FALSE, FALSE, sizeof (GPid));
+  g_variant_iter_init (&iter, arg_processes);
+  while (g_variant_iter_loop (&iter, "i", &pid))
+    g_array_append_val (processes, pid);
 
-  processes = g_array_sized_new (FALSE, FALSE, sizeof (GPid), num_process_pids);
-  g_array_append_vals (processes, process_pids, num_process_pids);
-
-  reply = dbus_message_new_method_return (message);
-  if (reply == NULL)
-    _g_dbus_oom ();
-
-  g_signal_connect (op_dbus->op, "reply", (GCallback)show_processes_reply, reply);
+  g_signal_connect (op_dbus->op,
+                    "reply",
+                    (GCallback)show_processes_reply,
+                    g_object_ref (invocation));
 
   g_signal_emit_by_name (op_dbus->op, "show_processes",
-			 message_string,
+                         arg_message_string,
                          processes,
-			 choices);
+                         arg_choices);
 
-  dbus_free_string_array (choices);
   g_array_unref (processes);
+  
+  return TRUE;
 }
 
-static void
-mount_op_show_unmount_progress (GMountOperationDBus *op_dbus,
-                                DBusMessage *message)
+static gboolean
+handle_show_unmount_progress (GVfsDBusMountOperation *object,
+                              GDBusMethodInvocation *invocation,
+                              const gchar *arg_message_string,
+                              guint64 arg_time_left,
+                              guint64 arg_bytes_left,
+                              gpointer data)
 {
-  const gchar *message_string;
-  guint64 time_left, bytes_left;
-  DBusMessage *reply;
-  DBusMessageIter iter;
-  DBusError error;
-
-  reply = NULL;
-
-  dbus_message_iter_init (message, &iter);
-  dbus_error_init (&error);
-  if (!_g_dbus_message_iter_get_args (&iter,
-                                      &error,
-                                      DBUS_TYPE_STRING, &message_string,
-                                      DBUS_TYPE_UINT64, &time_left,
-                                      DBUS_TYPE_UINT64, &bytes_left,
-                                      0))
-    {
-      reply = dbus_message_new_error (message, error.name, error.message);
-      if (reply == NULL)
-        _g_dbus_oom ();
-      if (!dbus_connection_send (op_dbus->connection, reply, NULL))
-        _g_dbus_oom ();
-      dbus_message_unref (reply);
-      dbus_error_free (&error);
-      return;
-    }
-
-  reply = dbus_message_new_method_return (message);
-  if (reply == NULL)
-    _g_dbus_oom ();
+  GMountOperationDBus *op_dbus = data;
+ 
+  g_print ("gmountoperationdbus.c: handle_show_unmount_progress()\n");
 
   g_signal_emit_by_name (op_dbus->op, "show-unmount-progress",
-                         message_string,
-                         time_left,
-                         bytes_left);
+                         arg_message_string,
+                         arg_time_left,
+                         arg_bytes_left);
 
-  mount_op_send_reply (op_dbus, reply);
+  gvfs_dbus_mount_operation_complete_show_unmount_progress (object, invocation);
+  
+  return TRUE;
 }
 
-static void
-mount_op_aborted (GMountOperationDBus *op_dbus,
-		  DBusMessage         *message)
+static gboolean
+handle_aborted (GVfsDBusMountOperation *object,
+                GDBusMethodInvocation *invocation,
+                gpointer data)
 {
+  GMountOperationDBus *op_dbus = data;
+ 
+  g_print ("gmountoperationdbus.c: handle_aborted()\n");
+  
   /* also emit reply to make the all DBus ops return */
   g_mount_operation_reply (op_dbus->op, G_MOUNT_OPERATION_UNHANDLED);
   g_signal_emit_by_name (op_dbus->op, "aborted");
+  gvfs_dbus_mount_operation_complete_aborted (object, invocation);
+  
+  return TRUE;
+}
+
+
+static void
+g_mount_operation_dbus_free (GMountOperationDBus *op_dbus)
+{
+  if (op_dbus->connection)
+    {
+      if (op_dbus->mount_op_skeleton != NULL)
+        {
+          g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (op_dbus->mount_op_skeleton));
+          g_object_unref (op_dbus->mount_op_skeleton);
+        }
+      g_object_unref (op_dbus->connection);
+    }
+  g_free (op_dbus->dbus_id);
+  g_free (op_dbus->obj_path);
+  g_free (op_dbus);
+}
+
+GMountSource *
+g_mount_operation_dbus_wrap (GMountOperation *op,
+                             GDBusConnection *connection)
+{
+  GMountOperationDBus *op_dbus;
+  static int mount_id = 0;
+  GError *error; 
+
+  if (op == NULL)
+    return g_mount_source_new_dummy ();
+  
+  op_dbus = g_new0 (GMountOperationDBus, 1);
+  
+  op_dbus->op = op;
+  op_dbus->connection = g_object_ref (connection);
+  op_dbus->obj_path = g_strdup_printf ("/org/gtk/gvfs/mountop/%d", mount_id++);
+  if (op_dbus->connection)
+    {
+      op_dbus->dbus_id = g_strdup (g_dbus_connection_get_unique_name (op_dbus->connection));
+      op_dbus->mount_op_skeleton = gvfs_dbus_mount_operation_skeleton_new ();
+      
+      g_signal_connect (op_dbus->mount_op_skeleton, "handle-ask-password", G_CALLBACK (handle_ask_password), op_dbus);
+      g_signal_connect (op_dbus->mount_op_skeleton, "handle-ask-question", G_CALLBACK (handle_ask_question), op_dbus);
+      g_signal_connect (op_dbus->mount_op_skeleton, "handle-show-processes", G_CALLBACK (handle_show_processes), op_dbus);
+      g_signal_connect (op_dbus->mount_op_skeleton, "handle-show-unmount-progress", G_CALLBACK (handle_show_unmount_progress), op_dbus);
+      g_signal_connect (op_dbus->mount_op_skeleton, "handle-aborted", G_CALLBACK (handle_aborted), op_dbus);
+
+      error = NULL;
+      if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (op_dbus->mount_op_skeleton),
+                                             op_dbus->connection,
+                                             op_dbus->obj_path, 
+                                             &error))
+        {
+          g_warning ("Error exporting GMountOperationDBus: %s (%s, %d)\n",
+                      error->message, g_quark_to_string (error->domain), error->code);
+          g_error_free (error);
+        }
+    }
+
+  g_object_set_data_full (G_OBJECT (op), "dbus-op",
+                          op_dbus, (GDestroyNotify)g_mount_operation_dbus_free);
+  
+  return g_mount_source_new (op_dbus->dbus_id, op_dbus->obj_path);
 }

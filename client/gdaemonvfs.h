@@ -24,7 +24,6 @@
 #define __G_DAEMON_VFS_H__
 
 #include <gio/gio.h>
-#include <dbus/dbus.h>
 #include "gmountspec.h"
 #include "gmounttracker.h"
 #include "gvfsuriutils.h"
@@ -61,6 +60,7 @@ void            _g_daemon_vfs_get_mount_info_async     (GMountSpec              
 							gpointer                  user_data);
 GMountInfo *    _g_daemon_vfs_get_mount_info_sync      (GMountSpec               *spec,
 							const char               *path,
+							GCancellable             *cancellable,
 							GError                  **error);
 GMountInfo *    _g_daemon_vfs_get_mount_info_by_fuse_sync (const char *fuse_path,
 							   char **mount_path);
@@ -68,10 +68,7 @@ GMountSpec *    _g_daemon_vfs_get_mount_spec_for_path  (GMountSpec              
 						        const char               *path,
 						        const char               *new_path);
 void            _g_daemon_vfs_invalidate_dbus_id       (const char               *dbus_id);
-DBusConnection *_g_daemon_vfs_get_async_bus            (void);
-gboolean        _g_daemon_vfs_send_message_sync        (DBusMessage              *message,
-							GCancellable             *cancellable,
-							GError                  **error);
+GDBusConnection *_g_daemon_vfs_get_async_bus           (void);
 int             _g_daemon_vfs_append_metadata_for_set  (GVariantBuilder *builder,
 							MetaTree *tree,
 							const char *path,

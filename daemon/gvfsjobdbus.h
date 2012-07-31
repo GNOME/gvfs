@@ -23,7 +23,6 @@
 #ifndef __G_VFS_JOB_DBUS_H__
 #define __G_VFS_JOB_DBUS_H__
 
-#include <dbus/dbus.h>
 #include <gvfsjob.h>
 #include <gvfsbackend.h>
 
@@ -43,8 +42,8 @@ struct _GVfsJobDBus
 {
   GVfsJob parent_instance;
 
-  DBusConnection *connection;
-  DBusMessage *message;
+  GVfsDBusMount *object;
+  GDBusMethodInvocation *invocation;
 };
 
 struct _GVfsJobDBusClass
@@ -52,18 +51,16 @@ struct _GVfsJobDBusClass
   GVfsJobClass parent_class;
 
   /* Might be called on an i/o thread */
-  DBusMessage * (*create_reply) (GVfsJob *job,
-				 DBusConnection *connection,
-				 DBusMessage *message);
+  void (*create_reply) (GVfsJob *job,
+                        GVfsDBusMount *object,
+                        GDBusMethodInvocation *invocation);
 };
 
 GType g_vfs_job_dbus_get_type (void) G_GNUC_CONST;
 
-gboolean        g_vfs_job_dbus_is_serial      (GVfsJobDBus    *job_dbus,
-					       DBusConnection *connection,
-					       dbus_uint32_t   serial);
-DBusConnection *g_vfs_job_dbus_get_connection (GVfsJobDBus    *job_dbus);
-DBusMessage    *g_vfs_job_dbus_get_message    (GVfsJobDBus    *job_dbus);
+gboolean g_vfs_job_dbus_is_serial (GVfsJobDBus     *job_dbus,
+                                   GDBusConnection *connection,
+                                   guint            serial);
 
 G_END_DECLS
 

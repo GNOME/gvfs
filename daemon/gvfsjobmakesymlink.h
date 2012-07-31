@@ -55,9 +55,11 @@ struct _GVfsJobMakeSymlinkClass
 
 GType g_vfs_job_make_symlink_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_make_symlink_new (DBusConnection *connection,
-				     DBusMessage    *message,
-				     GVfsBackend    *backend);
+gboolean g_vfs_job_make_symlink_new_handle (GVfsDBusMount         *object,
+                                            GDBusMethodInvocation *invocation,
+                                            const gchar           *arg_path_data,
+                                            const gchar           *arg_symlink_value,
+                                            GVfsBackend           *backend);
 
 G_END_DECLS
 

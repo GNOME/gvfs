@@ -54,8 +54,8 @@ GType g_mount_source_get_type (void) G_GNUC_CONST;
 GMountSource *g_mount_source_new                      (const char                *dbus_id,
 						       const char                *obj_path);
 GMountSource *g_mount_source_new_dummy                (void);
-void          g_mount_source_to_dbus                  (GMountSource              *source,
-						       DBusMessage               *message);
+GVariant     *g_mount_source_to_dbus                  (GMountSource              *source);
+GMountSource *g_mount_source_from_dbus                (GVariant                  *iter);
 gboolean      g_mount_source_ask_password             (GMountSource              *mount_source,
 						       const char                *message,
 						       const char                *initial_user,

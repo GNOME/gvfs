@@ -28,20 +28,19 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobenumerate.h"
-#include "gvfsdbusutils.h"
 #include "gvfsdaemonprotocol.h"
+#include <gvfsdbus.h>
 
 G_DEFINE_TYPE (GVfsJobEnumerate, g_vfs_job_enumerate, G_VFS_TYPE_JOB_DBUS)
 
 static void         run        (GVfsJob        *job);
 static gboolean     try        (GVfsJob        *job);
 static void         send_reply   (GVfsJob        *job);
-static DBusMessage *create_reply (GVfsJob        *job,
-				  DBusConnection *connection,
-				  DBusMessage    *message);
+static void         create_reply (GVfsJob               *job,
+                                  GVfsDBusMount         *object,
+                                  GDBusMethodInvocation *invocation);
 
 static void
 g_vfs_job_enumerate_finalize (GObject *object)
@@ -79,72 +78,91 @@ g_vfs_job_enumerate_init (GVfsJobEnumerate *job)
 {
 }
 
-GVfsJob *
-g_vfs_job_enumerate_new (DBusConnection *connection,
-			 DBusMessage *message,
-			 GVfsBackend *backend)
+gboolean 
+g_vfs_job_enumerate_new_handle (GVfsDBusMount *object,
+                                GDBusMethodInvocation *invocation,
+                                const gchar *arg_path_data,
+                                const gchar *arg_obj_path,
+                                const gchar *arg_attributes,
+                                guint arg_flags,
+                                const gchar *arg_uri,
+                                GVfsBackend *backend)
 {
   GVfsJobEnumerate *job;
-  DBusMessage *reply;
-  DBusError derror;
-  int path_len;
-  const char *obj_path;
-  const char *path_data;
-  char *attributes, *uri;
-  dbus_uint32_t flags;
-  DBusMessageIter iter;
+
+  g_print ("called Enumerate()\n");
+
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
   
-  dbus_message_iter_init (message, &iter);
-  dbus_error_init (&derror);
-  if (!_g_dbus_message_iter_get_args (&iter, &derror, 
-				      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
-				      &path_data, &path_len,
-				      DBUS_TYPE_STRING, &obj_path,
-				      DBUS_TYPE_STRING, &attributes,
-				      DBUS_TYPE_UINT32, &flags,
-				      0))
-    {
-      reply = dbus_message_new_error (message,
-				      derror.name,
-                                      derror.message);
-      dbus_error_free (&derror);
-
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return NULL;
-    }
-
-  /* Optional uri arg for thumbnail info */
-  if (!_g_dbus_message_iter_get_args (&iter, NULL,
-				      DBUS_TYPE_STRING, &uri,
-				      0))
-    uri = NULL;
-
   job = g_object_new (G_VFS_TYPE_JOB_ENUMERATE,
-		      "message", message,
-		      "connection", connection,
-		      NULL);
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
   
-  job->object_path = g_strdup (obj_path);
-  job->filename = g_strndup (path_data, path_len);
+  job->object_path = g_strdup (arg_obj_path);
+  job->filename = g_strdup (arg_path_data);
   job->backend = backend;
-  job->attributes = g_strdup (attributes);
-  job->attribute_matcher = g_file_attribute_matcher_new (attributes);
-  job->flags = flags;
-  job->uri = g_strdup (uri);
+  job->attributes = g_strdup (arg_attributes);
+  job->attribute_matcher = g_file_attribute_matcher_new (arg_attributes);
+  job->flags = arg_flags;
+  job->uri = g_strdup (arg_uri);
+
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
+}
+
+static GVfsDBusEnumerator *
+create_enumerator_proxy (GVfsJobEnumerate *job)
+{
+  GDBusConnection *connection;
+  const gchar *sender;
+
+  connection = g_dbus_method_invocation_get_connection (G_VFS_JOB_DBUS (job)->invocation);
+  sender = g_dbus_method_invocation_get_sender (G_VFS_JOB_DBUS (job)->invocation);
+
+  g_print ("create_enumerator_proxy: sender = '%s', object_path = '%s'\n", sender, job->object_path);
   
-  return G_VFS_JOB (job);
+  return gvfs_dbus_enumerator_proxy_new_sync (connection,
+                                              G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                                              sender,
+                                              job->object_path,
+                                              NULL,
+                                              NULL);
+}
+
+static void
+send_infos_cb (GVfsDBusEnumerator *proxy,
+               GAsyncResult *res,
+               gpointer user_data)
+{
+  GError *error = NULL;
+  
+  gvfs_dbus_enumerator_call_got_info_finish (proxy, res, &error);
+  if (error != NULL)
+    {
+      g_warning ("send_infos_cb: %s (%s, %d)\n", error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
 }
 
 static void
 send_infos (GVfsJobEnumerate *job)
 {
-  if (!dbus_message_iter_close_container (&job->building_iter, &job->building_array_iter))
-    _g_dbus_oom ();
+  GVfsDBusEnumerator *proxy;
+
+  proxy = create_enumerator_proxy (job);
+  g_assert (proxy != NULL);
   
-  dbus_connection_send (g_vfs_job_dbus_get_connection (G_VFS_JOB_DBUS (job)),
-			job->building_infos, NULL);
-  dbus_message_unref (job->building_infos);
+  gvfs_dbus_enumerator_call_got_info (proxy,
+                                      g_variant_builder_end (job->building_infos),
+                                      NULL,
+                                      (GAsyncReadyCallback) send_infos_cb,
+                                      NULL);
+  g_object_unref (proxy);
+
   job->building_infos = NULL;
   job->n_building_infos = 0;
 }
@@ -153,32 +171,14 @@ void
 g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
 			      GFileInfo *info)
 {
-  DBusMessage *message, *orig_message;
   char *uri, *escaped_name;
+  GVariant *v;
   
   if (job->building_infos == NULL)
     {
-      orig_message = g_vfs_job_dbus_get_message (G_VFS_JOB_DBUS (job));
-      
-      message = dbus_message_new_method_call (dbus_message_get_sender (orig_message),
-					      job->object_path,
-					      G_VFS_DBUS_ENUMERATOR_INTERFACE,
-					      G_VFS_DBUS_ENUMERATOR_OP_GOT_INFO);
-      dbus_message_set_no_reply (message, TRUE);
-      
-      dbus_message_iter_init_append (message, &job->building_iter);
-      
-      if (!dbus_message_iter_open_container (&job->building_iter,
-					     DBUS_TYPE_ARRAY,
-					     G_FILE_INFO_TYPE_AS_STRING, 
-					     &job->building_array_iter))
-	_g_dbus_oom ();
-
-      job->building_infos = message;
+      job->building_infos = g_variant_builder_new (G_VARIANT_TYPE ("aa(suv)"));
       job->n_building_infos = 0;
     }
-
-  
 
   uri = NULL;
   if (job->uri != NULL &&
@@ -198,8 +198,9 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
   g_free (uri);
 
   g_file_info_set_attribute_mask (info, job->attribute_matcher);
-  
-  _g_dbus_append_file_info (&job->building_array_iter, info);
+
+  v = _g_dbus_append_file_info (info);
+  g_variant_builder_add_value (job->building_infos, v);
   job->n_building_infos++;
 
   if (job->n_building_infos == 50)
@@ -220,27 +221,45 @@ g_vfs_job_enumerate_add_infos (GVfsJobEnumerate *job,
     }
 }
 
+static void
+send_done_cb (GVfsDBusEnumerator *proxy,
+               GAsyncResult *res,
+               gpointer user_data)
+{
+  GError *error = NULL;
+
+  g_print ("send_done_cb\n");
+
+  gvfs_dbus_enumerator_call_done_finish (proxy, res, &error);
+  if (error != NULL)
+    {
+      g_warning ("send_done_cb: %s (%s, %d)\n", error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+}
+
 void
 g_vfs_job_enumerate_done (GVfsJobEnumerate *job)
 {
-  DBusMessage *message, *orig_message;
+  GVfsDBusEnumerator *proxy;
   
   g_assert (!G_VFS_JOB (job)->failed);
 
+  g_print ("g_vfs_job_enumerate_done: sending...\n");
+
   if (job->building_infos != NULL)
     send_infos (job);
-  
-  orig_message = g_vfs_job_dbus_get_message (G_VFS_JOB_DBUS (job));
-  
-  message = dbus_message_new_method_call (dbus_message_get_sender (orig_message),
-					  job->object_path,
-					  G_VFS_DBUS_ENUMERATOR_INTERFACE,
-					  G_VFS_DBUS_ENUMERATOR_OP_DONE);
-  dbus_message_set_no_reply (message, TRUE);
 
-  dbus_connection_send (g_vfs_job_dbus_get_connection (G_VFS_JOB_DBUS (job)),
-			message, NULL);
-  dbus_message_unref (message);
+  proxy = create_enumerator_proxy (job);
+  g_assert (proxy != NULL);
+  
+  gvfs_dbus_enumerator_call_done (proxy,
+                                  NULL,
+                                  (GAsyncReadyCallback) send_done_cb,
+                                  NULL);
+  g_object_unref (proxy);
+
+  g_print ("g_vfs_job_enumerate_done: done.\n");
 
   g_vfs_job_emit_finished (G_VFS_JOB (job));
 }
@@ -250,7 +269,7 @@ run (GVfsJob *job)
 {
   GVfsJobEnumerate *op_job = G_VFS_JOB_ENUMERATE (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
-  
+
   if (class->enumerate == NULL)
     {
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
@@ -285,37 +304,26 @@ static void
 send_reply (GVfsJob *job)
 {
   GVfsJobDBus *dbus_job = G_VFS_JOB_DBUS (job);
-  DBusMessage *reply;
   GVfsJobDBusClass *class;
 
   g_debug ("send_reply(%p), failed=%d (%s)\n", job, job->failed, job->failed?job->error->message:"");
   
   class = G_VFS_JOB_DBUS_GET_CLASS (job);
   
-  if (job->failed) 
-    reply = _dbus_message_new_from_gerror (dbus_job->message, job->error);
+  if (job->failed)
+    g_dbus_method_invocation_return_gerror (dbus_job->invocation, job->error);
   else
-    reply = class->create_reply (job, dbus_job->connection, dbus_job->message);
+    class->create_reply (job, dbus_job->object, dbus_job->invocation);
  
-  g_assert (reply != NULL);
-
-  /* Queues reply (threadsafely), actually sends it in mainloop */
-  dbus_connection_send (dbus_job->connection, reply, NULL);
-  dbus_message_unref (reply);
-  
   if (job->failed)
     g_vfs_job_emit_finished (job);
 }
 
 /* Might be called on an i/o thread */
-static DBusMessage *
+static void
 create_reply (GVfsJob *job,
-	      DBusConnection *connection,
-	      DBusMessage *message)
+              GVfsDBusMount *object,
+              GDBusMethodInvocation *invocation)
 {
-  DBusMessage *reply;
-
-  reply = dbus_message_new_method_return (message);
-
-  return reply;
+  gvfs_dbus_mount_complete_enumerate (object, invocation);
 }

@@ -28,19 +28,17 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobmountmountable.h"
-#include "gvfsdbusutils.h"
 #include "gvfsdaemonutils.h"
 
 G_DEFINE_TYPE (GVfsJobMountMountable, g_vfs_job_mount_mountable, G_VFS_TYPE_JOB_DBUS)
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
-static DBusMessage *create_reply (GVfsJob        *job,
-				  DBusConnection *connection,
-				  DBusMessage    *message);
+static void         create_reply (GVfsJob               *job,
+                                  GVfsDBusMount         *object,
+                                  GDBusMethodInvocation *invocation);
 
 static void
 g_vfs_job_mount_mountable_finalize (GObject *object)
@@ -80,49 +78,34 @@ g_vfs_job_mount_mountable_init (GVfsJobMountMountable *job)
 {
 }
 
-GVfsJob *
-g_vfs_job_mount_mountable_new (DBusConnection *connection,
-			       DBusMessage *message,
-			       GVfsBackend *backend)
+gboolean
+g_vfs_job_mount_mountable_new_handle (GVfsDBusMount *object,
+                                      GDBusMethodInvocation *invocation,
+                                      const gchar *arg_path_data,
+                                      const gchar *arg_dbus_id,
+                                      const gchar *arg_obj_path,
+                                      GVfsBackend *backend)
 {
   GVfsJobMountMountable *job;
-  DBusMessage *reply;
-  DBusMessageIter iter;
-  DBusError derror;
-  char *path;
-  const char *dbus_id, *obj_path;
+
+  g_print ("called MountMountable()\n");
+
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
   
-  dbus_error_init (&derror);
-  dbus_message_iter_init (message, &iter);
-
-  path = NULL;
-  if (!_g_dbus_message_iter_get_args (&iter, &derror, 
-				      G_DBUS_TYPE_CSTRING, &path,
-				      DBUS_TYPE_STRING, &dbus_id,
-				      DBUS_TYPE_OBJECT_PATH, &obj_path,
-				      0))
-    {
-      g_free (path);
-      reply = dbus_message_new_error (message,
-				      derror.name,
-                                      derror.message);
-      dbus_error_free (&derror);
-
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return NULL;
-    }
-
   job = g_object_new (G_VFS_TYPE_JOB_MOUNT_MOUNTABLE,
-		      "message", message,
-		      "connection", connection,
-		      NULL);
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
 
-  job->filename = path;
+  job->filename = g_strdup (arg_path_data);
   job->backend = backend;
-  job->mount_source = g_mount_source_new (dbus_id, obj_path);
-  
-  return G_VFS_JOB (job);
+  job->mount_source = g_mount_source_new (arg_dbus_id, arg_obj_path);
+
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
 }
 
 void
@@ -180,38 +163,28 @@ try (GVfsJob *job)
 }
 
 /* Might be called on an i/o thread */
-static DBusMessage *
+static void
 create_reply (GVfsJob *job,
-	      DBusConnection *connection,
-	      DBusMessage *message)
+              GVfsDBusMount *object,
+              GDBusMethodInvocation *invocation)
 {
   GVfsJobMountMountable *op_job = G_VFS_JOB_MOUNT_MOUNTABLE (job);
-  DBusMessage *reply;
-  DBusMessageIter iter;
-  dbus_bool_t must_mount, is_uri;
-
-  reply = dbus_message_new_method_return (message);
-
+  gboolean is_uri, must_mount;
+  GMountSpec *fake_mountspec = NULL;
+  
   must_mount = op_job->must_mount_location;
   is_uri = op_job->target_uri != NULL;
-  if (is_uri)
-    {
-      _g_dbus_message_append_args (reply,
-				   DBUS_TYPE_BOOLEAN, &is_uri,
-				   G_DBUS_TYPE_CSTRING, &op_job->target_uri,
-				   DBUS_TYPE_BOOLEAN, &must_mount,
-				   0);
-    }
-  else
-    {
-      _g_dbus_message_append_args (reply,
-				   DBUS_TYPE_BOOLEAN, &is_uri,
-				   G_DBUS_TYPE_CSTRING, &op_job->target_filename,
-				   DBUS_TYPE_BOOLEAN, &must_mount,
-				   0);
-      dbus_message_iter_init_append (reply, &iter);
-      g_mount_spec_to_dbus (&iter, op_job->mount_spec);
-    }
+
+  if (! is_uri)
+    fake_mountspec = g_mount_spec_new (NULL);
+
+  gvfs_dbus_mount_complete_mount_mountable (object,
+                                            invocation,
+                                            is_uri,
+                                            is_uri ? op_job->target_uri : op_job->target_filename,
+                                            must_mount,
+                                            g_mount_spec_to_dbus (is_uri ? fake_mountspec : op_job->mount_spec));
   
-  return reply;
+  if (fake_mountspec)
+    g_mount_spec_unref (fake_mountspec);
 }
