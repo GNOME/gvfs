@@ -29,11 +29,9 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsbackend.h"
 #include "gvfsjobsource.h"
-#include "gvfsdaemonprotocol.h"
 #include <gvfsjobopenforread.h>
 #include <gvfsjobopeniconforread.h>
 #include <gvfsjobopenforwrite.h>
@@ -58,7 +56,7 @@
 #include <gvfsjobpull.h>
 #include <gvfsjobsetattribute.h>
 #include <gvfsjobqueryattributes.h>
-#include <gvfsdbusutils.h>
+#include <gvfsdbus.h>
 
 enum {
   PROP_0,
@@ -99,9 +97,6 @@ static void              g_vfs_backend_set_property          (GObject           
 static GObject*          g_vfs_backend_constructor           (GType                  type,
 							      guint                  n_construct_properties,
 							      GObjectConstructParam *construct_params);
-static DBusHandlerResult backend_dbus_handler                (DBusConnection        *connection,
-							      DBusMessage           *message,
-							      void                  *user_data);
 
 
 G_DEFINE_TYPE_WITH_CODE (GVfsBackend, g_vfs_backend, G_TYPE_OBJECT,
@@ -152,8 +147,7 @@ g_vfs_backend_finalize (GObject *object)
   g_free (backend->priv->display_name);
   g_free (backend->priv->stable_name);
   g_strfreev (backend->priv->x_content_types);
-  if (backend->priv->icon != NULL)
-    g_object_unref (backend->priv->icon);
+  g_clear_object (&backend->priv->icon);
   g_free (backend->priv->prefered_filename_encoding);
   g_free (backend->priv->default_location);
   if (backend->priv->mount_spec)
@@ -254,6 +248,57 @@ g_vfs_backend_get_property (GObject    *object,
     }
 }
 
+static GDBusInterfaceSkeleton *
+register_path_cb (GDBusConnection *conn,
+                  const char *obj_path,
+                  gpointer data)
+{
+  GError *error;
+  GVfsDBusMount *skeleton;
+  
+  skeleton = gvfs_dbus_mount_skeleton_new ();
+  g_signal_connect (skeleton, "handle-enumerate", G_CALLBACK (g_vfs_job_enumerate_new_handle), data);
+  g_signal_connect (skeleton, "handle-query-info", G_CALLBACK (g_vfs_job_query_info_new_handle), data);
+  g_signal_connect (skeleton, "handle-query-filesystem-info", G_CALLBACK (g_vfs_job_query_fs_info_new_handle), data);
+  g_signal_connect (skeleton, "handle-set-display-name", G_CALLBACK (g_vfs_job_set_display_name_new_handle), data);
+  g_signal_connect (skeleton, "handle-delete", G_CALLBACK (g_vfs_job_delete_new_handle), data);
+  g_signal_connect (skeleton, "handle-trash", G_CALLBACK (g_vfs_job_trash_new_handle), data);
+  g_signal_connect (skeleton, "handle-make-directory", G_CALLBACK (g_vfs_job_make_directory_new_handle), data);
+  g_signal_connect (skeleton, "handle-make-symbolic-link", G_CALLBACK (g_vfs_job_make_symlink_new_handle), data);
+  g_signal_connect (skeleton, "handle-query-settable-attributes", G_CALLBACK (g_vfs_job_query_settable_attributes_new_handle), data);
+  g_signal_connect (skeleton, "handle-query-writable-namespaces", G_CALLBACK (g_vfs_job_query_writable_namespaces_new_handle), data);
+  g_signal_connect (skeleton, "handle-set-attribute", G_CALLBACK (g_vfs_job_set_attribute_new_handle), data);
+  g_signal_connect (skeleton, "handle-poll-mountable", G_CALLBACK (g_vfs_job_poll_mountable_new_handle), data);
+  g_signal_connect (skeleton, "handle-start-mountable", G_CALLBACK (g_vfs_job_start_mountable_new_handle), data);
+  g_signal_connect (skeleton, "handle-stop-mountable", G_CALLBACK (g_vfs_job_stop_mountable_new_handle), data);
+  g_signal_connect (skeleton, "handle-unmount-mountable", G_CALLBACK (g_vfs_job_unmount_mountable_new_handle), data);
+  g_signal_connect (skeleton, "handle-eject-mountable", G_CALLBACK (g_vfs_job_eject_mountable_new_handle), data);
+  g_signal_connect (skeleton, "handle-mount-mountable", G_CALLBACK (g_vfs_job_mount_mountable_new_handle), data);
+  g_signal_connect (skeleton, "handle-unmount", G_CALLBACK (g_vfs_job_unmount_new_handle), data);
+  g_signal_connect (skeleton, "handle-open-for-read", G_CALLBACK (g_vfs_job_open_for_read_new_handle), data);
+  g_signal_connect (skeleton, "handle-open-for-write", G_CALLBACK (g_vfs_job_open_for_write_new_handle), data);
+  g_signal_connect (skeleton, "handle_copy", G_CALLBACK (g_vfs_job_copy_new_handle), data);
+  g_signal_connect (skeleton, "handle-move", G_CALLBACK (g_vfs_job_move_new_handle), data);
+  g_signal_connect (skeleton, "handle-push", G_CALLBACK (g_vfs_job_push_new_handle), data);
+  g_signal_connect (skeleton, "handle-pull", G_CALLBACK (g_vfs_job_pull_new_handle), data);
+  g_signal_connect (skeleton, "handle-create-directory-monitor", G_CALLBACK (g_vfs_job_create_directory_monitor_new_handle), data);
+  g_signal_connect (skeleton, "handle-create-file-monitor", G_CALLBACK (g_vfs_job_create_file_monitor_new_handle), data);
+  g_signal_connect (skeleton, "handle-open-icon-for-read", G_CALLBACK (g_vfs_job_open_icon_for_read_new_handle), data);
+  
+  error = NULL;
+  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (skeleton),
+                                         conn,
+                                         obj_path,
+                                         &error))
+    {
+      g_warning ("Error registering path: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+
+  return G_DBUS_INTERFACE_SKELETON (skeleton);
+}
+  
 static GObject*
 g_vfs_backend_constructor (GType                  type,
 			   guint                  n_construct_properties,
@@ -269,7 +314,7 @@ g_vfs_backend_constructor (GType                  type,
   
   g_vfs_daemon_register_path (backend->priv->daemon,
 			      backend->priv->object_path, 
-			      backend_dbus_handler,
+			      register_path_cb,
 			      backend);
   
   return object;
@@ -342,8 +387,7 @@ void
 g_vfs_backend_set_icon_name (GVfsBackend *backend,
 			     const char *icon_name)
 {
-  if (backend->priv->icon != NULL)
-    g_object_unref (backend->priv->icon);
+  g_clear_object (&backend->priv->icon);
   backend->priv->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
 }
 
@@ -351,8 +395,7 @@ void
 g_vfs_backend_set_icon (GVfsBackend *backend,
                         GIcon       *icon)
 {
-  if (backend->priv->icon != NULL)
-    g_object_unref (backend->priv->icon);
+  g_clear_object (&backend->priv->icon);
   backend->priv->icon = g_object_ref (icon);
 }
 
@@ -522,167 +565,91 @@ g_vfs_backend_get_block_requests (GVfsBackend *backend)
   return backend->priv->block_requests;
 }
 
-
-static DBusHandlerResult
-backend_dbus_handler (DBusConnection  *connection,
-		      DBusMessage     *message,
-		      void            *user_data)
+gboolean
+g_vfs_backend_invocation_first_handler (GVfsDBusMount *object,
+                                        GDBusMethodInvocation *invocation,
+                                        GVfsBackend *backend)
 {
-  GVfsBackend *backend = user_data;
-  GVfsJob *job;
-
-  job = NULL;
-
   g_debug ("backend_dbus_handler %s:%s\n",
-	   dbus_message_get_interface (message),
-	   dbus_message_get_member (message));
+           g_dbus_method_invocation_get_interface_name (invocation),
+           g_dbus_method_invocation_get_method_name (invocation));
 
   if (backend->priv->block_requests)
     {
-      DBusMessage *reply;
-
-      reply = _dbus_message_new_gerror (message,
-					G_IO_ERROR,
-					G_IO_ERROR_NOT_MOUNTED,
-					"%s", "Backend currently unmounting");
-
-      g_assert (reply != NULL);
-
-      dbus_connection_send (connection, reply, NULL);
-      return DBUS_HANDLER_RESULT_HANDLED;
+      g_dbus_method_invocation_return_error (invocation,
+                                             G_IO_ERROR,
+                                             G_IO_ERROR_NOT_MOUNTED,
+                                             "%s", "Backend currently unmounting");
+      return TRUE;
     }
-  
-  if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_MOUNT_INTERFACE,
-				   G_VFS_DBUS_MOUNT_OP_UNMOUNT))
-    job = g_vfs_job_unmount_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_MOUNT_INTERFACE,
-				   G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ))
-    job = g_vfs_job_open_for_read_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_MOUNT_INTERFACE,
-				   G_VFS_DBUS_MOUNT_OP_OPEN_ICON_FOR_READ))
-    job = g_vfs_job_open_icon_for_read_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_QUERY_INFO))
-    job = g_vfs_job_query_info_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_QUERY_FILESYSTEM_INFO))
-    job = g_vfs_job_query_fs_info_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_ENUMERATE))
-    job = g_vfs_job_enumerate_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE))
-    job = g_vfs_job_open_for_write_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_MOUNT_MOUNTABLE))
-    job = g_vfs_job_mount_mountable_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_UNMOUNT_MOUNTABLE))
-    job = g_vfs_job_unmount_mountable_new (connection, message, backend, FALSE);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_EJECT_MOUNTABLE))
-    job = g_vfs_job_unmount_mountable_new (connection, message, backend, TRUE);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_START_MOUNTABLE))
-    job = g_vfs_job_start_mountable_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_STOP_MOUNTABLE))
-    job = g_vfs_job_stop_mountable_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_POLL_MOUNTABLE))
-    job = g_vfs_job_poll_mountable_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME))
-    job = g_vfs_job_set_display_name_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_DELETE))
-    job = g_vfs_job_delete_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_TRASH))
-    job = g_vfs_job_trash_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY))
-    job = g_vfs_job_make_directory_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_MAKE_SYMBOLIC_LINK))
-    job = g_vfs_job_make_symlink_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_COPY))
-    job = g_vfs_job_copy_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_PUSH))
-    job = g_vfs_job_push_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_PULL))
-    job = g_vfs_job_pull_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_MOVE))
-    job = g_vfs_job_move_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE))
-    job = g_vfs_job_set_attribute_new (connection, message, backend);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_QUERY_SETTABLE_ATTRIBUTES))
-    job = g_vfs_job_query_attributes_new (connection, message, backend, FALSE);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_QUERY_WRITABLE_NAMESPACES))
-    job = g_vfs_job_query_attributes_new (connection, message, backend, TRUE);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_CREATE_DIR_MONITOR))
-    job = g_vfs_job_create_monitor_new (connection, message, backend, TRUE);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_CREATE_FILE_MONITOR))
-    job = g_vfs_job_create_monitor_new (connection, message, backend, FALSE);
 
-  if (job)
-    {
-      g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), job);
-      g_object_unref (job);
-      return DBUS_HANDLER_RESULT_HANDLED;
-    }
-      
-  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+  return FALSE;
 }
 
-void
-g_vfs_backend_register_mount (GVfsBackend *backend,
-			      GAsyncDBusCallback callback,
-			      gpointer user_data)
+
+typedef struct {
+  GVfsBackend *backend;
+  GAsyncReadyCallback callback;
+  gpointer callback_data;
+} AsyncProxyCreate;
+
+static void
+async_proxy_create_free (AsyncProxyCreate *data)
 {
+  g_clear_object (&data->backend);
+  g_free (data);
+}
+
+static void
+create_mount_tracker_proxy (GVfsBackend *backend,
+                            GAsyncReadyCallback op_callback,
+                            gpointer op_callback_data,
+                            GAsyncReadyCallback callback)
+{
+  AsyncProxyCreate *data;
+
+  data = g_new0 (AsyncProxyCreate, 1);
+  data->callback = op_callback;
+  data->callback_data = op_callback_data;
+  data->backend = g_object_ref (backend);
+
+  gvfs_dbus_mount_tracker_proxy_new_for_bus (G_BUS_TYPE_SESSION,
+                                             G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+                                             G_VFS_DBUS_DAEMON_NAME,
+                                             G_VFS_DBUS_MOUNTTRACKER_PATH,
+                                             NULL,
+                                             callback,
+                                             data);
+}
+
+static void
+register_mount_got_proxy_cb (GObject *source_object,
+                             GAsyncResult *res,
+                             gpointer user_data)
+{
+  AsyncProxyCreate *data = user_data;
+  GVfsDBusMountTracker *proxy;
+  GError *error = NULL;
+  GSimpleAsyncResult *result;
+  GVfsBackend *backend;
   const char *stable_name;
-  DBusMessage *message;
-  DBusMessageIter iter;
-  dbus_bool_t user_visible;
   char *x_content_types_string;
   char *icon_str;
 
+  proxy = gvfs_dbus_mount_tracker_proxy_new_for_bus_finish (res, &error);
+  if (proxy == NULL)
+    {
+      g_dbus_error_strip_remote_error (error);
+      result = g_simple_async_result_new_take_error (source_object,
+                                                     data->callback, data->callback_data,
+                                                     error);
+      g_simple_async_result_complete_in_idle (result);
+      g_object_unref (result);
+      async_proxy_create_free (data);
+      return;
+    }
+
+  backend = data->backend;
   backend->priv->is_mounted = TRUE;
 
   if (backend->priv->x_content_types != NULL && g_strv_length (backend->priv->x_content_types) > 0)
@@ -695,71 +662,80 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   else
     icon_str = g_strdup ("");
 
-  message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
-					  G_VFS_DBUS_MOUNTTRACKER_PATH,
-					  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-					  G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_MOUNT);
-  if (message == NULL)
-    _g_dbus_oom ();
-
   if (backend->priv->stable_name != NULL &&
       *backend->priv->stable_name != 0)
    stable_name = backend->priv->stable_name;
   else
    stable_name = backend->priv->display_name;
 
-  user_visible = backend->priv->user_visible;
-  if (!dbus_message_append_args (message,
-				 DBUS_TYPE_OBJECT_PATH, &backend->priv->object_path,
-				 DBUS_TYPE_STRING, &backend->priv->display_name,
-				 DBUS_TYPE_STRING, &stable_name,
-				 DBUS_TYPE_STRING, &x_content_types_string,
-				 DBUS_TYPE_STRING, &icon_str,
-				 DBUS_TYPE_STRING, &backend->priv->prefered_filename_encoding,
-				 DBUS_TYPE_BOOLEAN, &user_visible,
-				 0))
-    _g_dbus_oom ();
-
-  dbus_message_iter_init_append (message, &iter);
-  g_mount_spec_to_dbus (&iter, backend->priv->mount_spec);
-
-  _g_dbus_message_append_args (message,
-			       G_DBUS_TYPE_CSTRING, &backend->priv->default_location,
-			       0);
-
-
-  dbus_message_set_auto_start (message, TRUE);
-
-  _g_dbus_connection_call_async (NULL, message, -1, 
-				 callback, user_data);
-  dbus_message_unref (message);
+  gvfs_dbus_mount_tracker_call_register_mount (proxy,
+                                               backend->priv->object_path,
+                                               backend->priv->display_name,
+                                               stable_name,
+                                               x_content_types_string,
+                                               icon_str,
+                                               backend->priv->prefered_filename_encoding,
+                                               backend->priv->user_visible,
+                                               g_mount_spec_to_dbus (backend->priv->mount_spec),
+                                               backend->priv->default_location ? backend->priv->default_location : "",
+                                               NULL,
+                                               data->callback, data->callback_data);
 
   g_free (x_content_types_string);
   g_free (icon_str);
+  g_object_unref (proxy);
+  async_proxy_create_free (data);
+}
+
+void
+g_vfs_backend_register_mount (GVfsBackend *backend,
+                              GAsyncReadyCallback callback,
+			      gpointer user_data)
+{
+  create_mount_tracker_proxy (backend, callback, user_data, register_mount_got_proxy_cb);
+}
+
+static void
+unregister_mount_got_proxy_cb (GObject *source_object,
+                               GAsyncResult *res,
+                               gpointer user_data)
+{
+  AsyncProxyCreate *data = user_data;
+  GVfsDBusMountTracker *proxy;
+  GError *error = NULL;
+  GSimpleAsyncResult *result;
+  GVfsBackend *backend;
+
+  proxy = gvfs_dbus_mount_tracker_proxy_new_for_bus_finish (res, &error);
+  if (proxy == NULL)
+    {
+      g_dbus_error_strip_remote_error (error);
+      result = g_simple_async_result_new_take_error (source_object,
+                                                     data->callback, data->callback_data,
+                                                     error);
+      g_simple_async_result_complete_in_idle (result);
+      g_object_unref (result);
+      async_proxy_create_free (data);
+      return;
+    }
+
+  backend = data->backend;
+  
+  gvfs_dbus_mount_tracker_call_unregister_mount (proxy,
+                                                 backend->priv->object_path,
+                                                 NULL,
+                                                 data->callback, data->callback_data);
+
+  g_object_unref (proxy);
+  async_proxy_create_free (data);
 }
 
 void
 g_vfs_backend_unregister_mount (GVfsBackend *backend,
-				GAsyncDBusCallback callback,
+                                GAsyncReadyCallback callback,
 				gpointer user_data)
 {
-  DBusMessage *message;
-  
-  message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
-					  G_VFS_DBUS_MOUNTTRACKER_PATH,
-					  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-					  G_VFS_DBUS_MOUNTTRACKER_OP_UNREGISTER_MOUNT);
-  if (message == NULL)
-    _g_dbus_oom ();
-
-  if (!dbus_message_append_args (message,
-				 DBUS_TYPE_OBJECT_PATH, &backend->priv->object_path,
-				 0))
-    _g_dbus_oom ();
-
-  _g_dbus_connection_call_async (NULL, message, -1, 
-				 callback, user_data);
-  dbus_message_unref (message);
+  create_mount_tracker_proxy (backend, callback, user_data, unregister_mount_got_proxy_cb);
 }
 
 /* ------------------------------------------------------------------------------------------------- */

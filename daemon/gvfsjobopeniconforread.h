@@ -23,7 +23,6 @@
 #ifndef __G_VFS_JOB_OPEN_ICON_FOR_READ_H__
 #define __G_VFS_JOB_OPEN_ICON_FOR_READ_H__
 
-#include <dbus/dbus.h>
 #include <gvfsjobdbus.h>
 #include <gvfsbackend.h>
 #include <gvfsreadchannel.h>
@@ -54,9 +53,11 @@ struct _GVfsJobOpenIconForReadClass
 
 GType g_vfs_job_open_icon_for_read_get_type (void) G_GNUC_CONST;
 
-GVfsJob *        g_vfs_job_open_icon_for_read_new           (DBusConnection     *connection,
-                                                             DBusMessage        *message,
-                                                             GVfsBackend        *backend);
+gboolean g_vfs_job_open_icon_for_read_new_handle (GVfsDBusMount         *object,
+                                                  GDBusMethodInvocation *invocation,
+                                                  GUnixFDList           *fd_list,
+                                                  const gchar           *arg_path_data,
+                                                  GVfsBackend           *backend);
 
 G_END_DECLS
 

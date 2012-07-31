@@ -24,27 +24,9 @@
 #define __G_MOUNT_SPEC_H__
 
 #include <glib.h>
-#include <dbus/dbus.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
-
-#define G_MOUNT_SPEC_ITEM_INNER_TYPE_AS_STRING         \
-    DBUS_TYPE_STRING_AS_STRING                         \
-    DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING
-
-#define G_MOUNT_SPEC_ITEM_TYPE_AS_STRING  \
-  DBUS_STRUCT_BEGIN_CHAR_AS_STRING        \
-   G_MOUNT_SPEC_ITEM_INNER_TYPE_AS_STRING \
-  DBUS_STRUCT_END_CHAR_AS_STRING 
-
-#define G_MOUNT_SPEC_INNER_TYPE_AS_STRING                     \
-   DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING         \
-   DBUS_TYPE_ARRAY_AS_STRING G_MOUNT_SPEC_ITEM_TYPE_AS_STRING 
-
-#define G_MOUNT_SPEC_TYPE_AS_STRING  \
-  DBUS_STRUCT_BEGIN_CHAR_AS_STRING   \
-   G_MOUNT_SPEC_INNER_TYPE_AS_STRING \
-  DBUS_STRUCT_END_CHAR_AS_STRING 
 
 typedef struct {
   char *key;
@@ -65,11 +47,9 @@ GMountSpec *g_mount_spec_ref               (GMountSpec      *spec);
 void        g_mount_spec_unref             (GMountSpec      *spec);
 GMountSpec *g_mount_spec_get_unique_for    (GMountSpec      *spec);
 GMountSpec *g_mount_spec_copy              (GMountSpec      *spec);
-GMountSpec *g_mount_spec_from_dbus         (DBusMessageIter *iter);
-void        g_mount_spec_to_dbus           (DBusMessageIter *iter,
-					    GMountSpec      *spec);
-void        g_mount_spec_to_dbus_with_path (DBusMessageIter *iter,
-					    GMountSpec      *spec,
+GMountSpec *g_mount_spec_from_dbus         (GVariant        *value);
+GVariant   *g_mount_spec_to_dbus           (GMountSpec      *spec);
+GVariant   *g_mount_spec_to_dbus_with_path (GMountSpec      *spec,
 					    const char      *path);
 void        g_mount_spec_set_mount_prefix  (GMountSpec      *spec,
 					    const char      *mount_prefix);

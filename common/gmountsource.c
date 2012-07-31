@@ -23,9 +23,8 @@
 #include <config.h>
 
 #include <gmountsource.h>
-#include <gvfsdbusutils.h>
 #include <gio/gio.h>
-#include <gvfsdaemonprotocol.h>
+#include <gvfsdbus.h>
 
 #include <string.h>
 
@@ -93,20 +92,27 @@ g_mount_source_new_dummy (void)
   return source;
 }
 
-
-void
-g_mount_source_to_dbus (GMountSource *source,
-			DBusMessage *message)
+GVariant *
+g_mount_source_to_dbus (GMountSource *source)
 {
   g_assert (source->dbus_id != NULL);
   g_assert (source->obj_path != NULL);
 
-  if (!dbus_message_append_args (message,
-				 DBUS_TYPE_STRING, &source->dbus_id,
-				 DBUS_TYPE_OBJECT_PATH, &source->obj_path,
-				 0))
-    _g_dbus_oom ();
+  return g_variant_new ("(so)",
+                        source->dbus_id,
+                        source->obj_path);
+}
+
+GMountSource *
+g_mount_source_from_dbus (GVariant *value)
+{
+  const gchar *obj_path, *dbus_id;
+
+  g_variant_get (value, "(&s&o)",
+                 &dbus_id,
+                 &obj_path);
   
+  return g_mount_source_new (dbus_id, obj_path);
 }
 
 const char *
@@ -156,64 +162,103 @@ ask_password_data_free (gpointer _data)
   g_free (data);
 }
 
+static GVfsDBusMountOperation *
+create_mount_operation_proxy_sync (GMountSource        *source,
+                                   GAsyncReadyCallback  callback,
+                                   gpointer             user_data)
+{
+  GVfsDBusMountOperation *proxy;
+  GError *error;
+
+  /* If no dbus id specified, reply that we weren't handled */
+  if (source->dbus_id[0] == 0)
+    { 
+      if (callback != NULL)
+        g_simple_async_report_error_in_idle (G_OBJECT (source),
+                                             callback,
+                                             user_data,
+                                             G_IO_ERROR, G_IO_ERROR_FAILED, 
+                                             "Internal Error"); 
+      return NULL;
+    }
+
+  error = NULL;
+  /* Synchronously creating a proxy using unique/private d-bus name and not loading properties or connecting signals should not block */
+  proxy = gvfs_dbus_mount_operation_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                                            G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+                                                            source->dbus_id,
+                                                            source->obj_path,
+                                                            NULL,
+                                                            &error);
+  if (proxy == NULL)
+    if (callback != NULL)
+      g_simple_async_report_take_gerror_in_idle (G_OBJECT (source),
+                                                 callback,
+                                                 user_data,
+                                                 error);
+  
+  return proxy;
+}
+
 /* the callback from dbus -> main thread */
 static void
-ask_password_reply (DBusMessage *reply,
-		    GError      *error,
-		    gpointer     _data)
+ask_password_reply (GVfsDBusMountOperation *proxy,
+                    GAsyncResult *res,
+                    gpointer user_data)
 {
   GSimpleAsyncResult *result;
   AskPasswordData *data;
-  dbus_bool_t handled, aborted, anonymous;
+  gboolean handled, aborted, anonymous;
   guint32 password_save;
-  const char *password, *username, *domain;
-  DBusMessageIter iter;
+  gchar *password, *username, *domain;
+  GError *error;
 
-  result = G_SIMPLE_ASYNC_RESULT (_data);
+  result = G_SIMPLE_ASYNC_RESULT (user_data);
   handled = TRUE;
-  
+
   data = g_new0 (AskPasswordData, 1);
   g_simple_async_result_set_op_res_gpointer (result, data, ask_password_data_free);
 
-  if (reply == NULL)
+  error = NULL;
+  if (!gvfs_dbus_mount_operation_call_ask_password_finish (proxy,
+                                                           &handled,
+                                                           &aborted,
+                                                           &password,
+                                                           &username,
+                                                           &domain,
+                                                           &anonymous,
+                                                           &password_save,
+                                                           res,
+                                                           &error))
     {
       data->aborted = TRUE;
+      g_dbus_error_strip_remote_error (error);
+      g_simple_async_result_take_error (result, error);
     }
   else
     {
-      dbus_message_iter_init (reply, &iter);
-      if (!_g_dbus_message_iter_get_args (&iter, NULL,
-					  DBUS_TYPE_BOOLEAN, &handled,
-					  DBUS_TYPE_BOOLEAN, &aborted,
-					  DBUS_TYPE_STRING, &password,
-					  DBUS_TYPE_STRING, &username,
-					  DBUS_TYPE_STRING, &domain,
-					  DBUS_TYPE_BOOLEAN, &anonymous,
-					  DBUS_TYPE_UINT32, &password_save,
-					  0))
-	data->aborted = TRUE;
-      else
-	{
-	  data->aborted = aborted;
+      data->aborted = aborted;
 
-	  if (!anonymous)
-	    {
-	      data->password = g_strdup (password);
-	      data->username = *username == 0 ? NULL : g_strdup (username);
-	      data->domain = *domain == 0 ? NULL : g_strdup (domain);
-	    }
-	  data->password_save = (GPasswordSave)password_save;
-	  data->anonymous = anonymous;
+      if (!anonymous)
+        {
+          data->password = g_strdup (password);
+          data->username = *username == 0 ? NULL : g_strdup (username);
+          data->domain = *domain == 0 ? NULL : g_strdup (domain);
+        }
+      data->password_save = (GPasswordSave)password_save;
+      data->anonymous = anonymous;
 
-	  /* TODO: handle more args */
-	}
+      /* TODO: handle more args */
+      g_free (password);
+      g_free (username);
+      g_free (domain);
     }
 
   if (handled == FALSE)
     {
       g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED, "Internal Error");
     }
-
+  
   g_simple_async_result_complete (result);
   g_object_unref (result);
 }
@@ -228,49 +273,27 @@ g_mount_source_ask_password_async (GMountSource              *source,
                                    gpointer                   user_data)
 {
   GSimpleAsyncResult *result;
-  DBusMessage *message;
-  guint32 flags_as_int;
- 
-
-  /* If no dbus id specified, reply that we weren't handled */
-  if (source->dbus_id[0] == 0)
-    { 
-      g_simple_async_report_error_in_idle (G_OBJECT (source),
-					   callback,
-					   user_data,
-					   G_IO_ERROR, G_IO_ERROR_FAILED, 
-					   "Internal Error"); 
-      return;
-    }
-
-  if (message_string == NULL)
-    message_string = "";
-  if (default_user == NULL)
-    default_user = "";
-  if (default_domain == NULL)
-    default_domain = "";
-
-  flags_as_int = flags;
+  GVfsDBusMountOperation *proxy;
   
-  message = dbus_message_new_method_call (source->dbus_id,
-					  source->obj_path,
-					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					  G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_PASSWORD);
-  
-  _g_dbus_message_append_args (message,
-			       DBUS_TYPE_STRING, &message_string,
-			       DBUS_TYPE_STRING, &default_user,
-			       DBUS_TYPE_STRING, &default_domain,
-			       DBUS_TYPE_UINT32, &flags_as_int,
-			       0);
+  proxy = create_mount_operation_proxy_sync (source, callback, user_data);
+  if (proxy == NULL)
+    return;
+
+  /* 30 minute timeout */
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), 1000 * 60 * 30);
 
   result = g_simple_async_result_new (G_OBJECT (source), callback, user_data, 
                                       g_mount_source_ask_password_async);
-  /* 30 minute timeout */
-  _g_dbus_connection_call_async (NULL, message, 1000 * 60 * 30,
-				 ask_password_reply, result);
-  dbus_message_unref (message);
-
+  
+  gvfs_dbus_mount_operation_call_ask_password (proxy,
+                                               message_string ? message_string : "",
+                                               default_user ? default_user : "",
+                                               default_domain ? default_domain : "",
+                                               flags,
+                                               NULL,
+                                               (GAsyncReadyCallback) ask_password_reply,
+                                               result);
+  g_object_unref (proxy);
 }
 
 /**
@@ -493,40 +516,38 @@ struct AskQuestionData {
 
 /* the callback from dbus -> main thread */
 static void
-ask_question_reply (DBusMessage *reply,
-		    GError      *error,
-		    gpointer     _data)
+ask_question_reply (GVfsDBusMountOperation *proxy,
+                    GAsyncResult *res,
+                    gpointer user_data)
 {
   GSimpleAsyncResult *result;
   AskQuestionData *data;
-  dbus_bool_t handled, aborted;
+  gboolean handled, aborted;
   guint32 choice;
-  DBusMessageIter iter;
-
-  result = G_SIMPLE_ASYNC_RESULT (_data);
-  handled = TRUE;
+  GError *error;
   
+  result = G_SIMPLE_ASYNC_RESULT (user_data);
+  handled = TRUE;
+
   data = g_new0 (AskQuestionData, 1);
   g_simple_async_result_set_op_res_gpointer (result, data, g_free);
 
-  if (reply == NULL)
+  error = NULL;
+  if (!gvfs_dbus_mount_operation_call_ask_question_finish (proxy,
+                                                           &handled,
+                                                           &aborted,
+                                                           &choice,
+                                                           res,
+                                                           &error))
     {
       data->aborted = TRUE;
+      g_dbus_error_strip_remote_error (error);
+      g_simple_async_result_take_error (result, error);
     }
   else
     {
-      dbus_message_iter_init (reply, &iter);
-      if (!_g_dbus_message_iter_get_args (&iter, NULL,
-					  DBUS_TYPE_BOOLEAN, &handled,
-					  DBUS_TYPE_BOOLEAN, &aborted,
-					  DBUS_TYPE_UINT32, &choice,
-					  0))
-	data->aborted = TRUE;
-      else
-	{
-	  data->aborted = aborted;
-	  data->choice = choice;
-	}
+      data->aborted = aborted;
+      data->choice = choice;
     }
 
   if (handled == FALSE)
@@ -593,40 +614,25 @@ g_mount_source_ask_question_async (GMountSource       *source,
 				   gpointer            user_data)
 {
   GSimpleAsyncResult *result;
-  DBusMessage *message;
-
-  /* If no dbus id specified, reply that we weren't handled */
-  if (source->dbus_id[0] == 0)
-    { 
-      g_simple_async_report_error_in_idle (G_OBJECT (source),
-					   callback,
-					   user_data,
-					   G_IO_ERROR, G_IO_ERROR_FAILED, 
-					   "Internal Error"); 
-      return;
-    }
-
-  if (message_string == NULL)
-    message_string = "";
+  GVfsDBusMountOperation *proxy;
   
-  message = dbus_message_new_method_call (source->dbus_id,
-					  source->obj_path,
-					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					  G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_QUESTION);
+  proxy = create_mount_operation_proxy_sync (source, callback, user_data);
+  if (proxy == NULL)
+    return;
 
-  _g_dbus_message_append_args (message,
-			       DBUS_TYPE_STRING, &message_string,
-			       DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
-			       &choices, n_choices,
-			       0);
+  /* 30 minute timeout */
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), 1000 * 60 * 30);
 
   result = g_simple_async_result_new (G_OBJECT (source), callback, user_data, 
                                       g_mount_source_ask_question_async);
-  /* 30 minute timeout */
-  _g_dbus_connection_call_async (NULL, message, 1000 * 60 * 30,
-				 ask_question_reply, result);
-  dbus_message_unref (message);
-	
+  
+  gvfs_dbus_mount_operation_call_ask_question (proxy,
+                                               message_string ? message_string : "",
+                                               choices,   
+                                               NULL,
+                                               (GAsyncReadyCallback) ask_question_reply,
+                                               result);
+  g_object_unref (proxy);
 }
 
 gboolean
@@ -714,40 +720,39 @@ struct ShowProcessesData {
 
 /* the callback from dbus -> main thread */
 static void
-show_processes_reply (DBusMessage *reply,
-                      GError      *error,
-                      gpointer     _data)
+show_processes_reply (GVfsDBusMountOperation *proxy,
+                      GAsyncResult *res,
+                      gpointer user_data)
 {
   GSimpleAsyncResult *result;
   ShowProcessesData *data;
-  dbus_bool_t handled, aborted;
+  gboolean handled, aborted;
   guint32 choice;
-  DBusMessageIter iter;
-
-  result = G_SIMPLE_ASYNC_RESULT (_data);
+  GError *error;
+  
+  result = G_SIMPLE_ASYNC_RESULT (user_data);
   handled = TRUE;
 
   data = g_new0 (ShowProcessesData, 1);
   g_simple_async_result_set_op_res_gpointer (result, data, g_free);
 
-  if (reply == NULL)
+  
+  error = NULL;
+  if (!gvfs_dbus_mount_operation_call_show_processes_finish (proxy,
+                                                             &handled,
+                                                             &aborted,
+                                                             &choice,
+                                                             res,
+                                                             &error))
     {
       data->aborted = TRUE;
+      g_dbus_error_strip_remote_error (error);
+      g_simple_async_result_take_error (result, error);
     }
   else
     {
-      dbus_message_iter_init (reply, &iter);
-      if (!_g_dbus_message_iter_get_args (&iter, NULL,
-					  DBUS_TYPE_BOOLEAN, &handled,
-					  DBUS_TYPE_BOOLEAN, &aborted,
-					  DBUS_TYPE_UINT32, &choice,
-					  0))
-	data->aborted = TRUE;
-      else
-	{
-	  data->aborted = aborted;
-	  data->choice = choice;
-	}
+      data->aborted = aborted;
+      data->choice = choice;
     }
 
   if (handled == FALSE)
@@ -769,42 +774,33 @@ g_mount_source_show_processes_async (GMountSource        *source,
                                      gpointer             user_data)
 {
   GSimpleAsyncResult *result;
-  DBusMessage *message;
+  GVfsDBusMountOperation *proxy;
+  GVariantBuilder builder;
+  guint i;
+  
+  proxy = create_mount_operation_proxy_sync (source, callback, user_data);
+  if (proxy == NULL)
+    return;
 
-  /* If no dbus id specified, reply that we weren't handled */
-  if (source->dbus_id[0] == 0)
-    {
-      g_simple_async_report_error_in_idle (G_OBJECT (source),
-					   callback,
-					   user_data,
-					   G_IO_ERROR, G_IO_ERROR_FAILED,
-					   "Internal Error");
-      return;
-    }
+  /* 30 minute timeout */
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), 1000 * 60 * 30);
 
   result = g_simple_async_result_new (G_OBJECT (source), callback, user_data,
                                       g_mount_source_show_processes_async);
-
-  if (message_string == NULL)
-    message_string = "";
-
-  message = dbus_message_new_method_call (source->dbus_id,
-					  source->obj_path,
-					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					  G_VFS_DBUS_MOUNT_OPERATION_OP_SHOW_PROCESSES);
-
-  _g_dbus_message_append_args (message,
-			       DBUS_TYPE_STRING, &message_string,
-			       DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
-			       &choices, n_choices,
-			       DBUS_TYPE_ARRAY, DBUS_TYPE_INT32,
-			       &processes->data, processes->len,
-			       0);
-
-  /* 30 minute timeout */
-  _g_dbus_connection_call_async (NULL, message, 1000 * 60 * 30,
-				 show_processes_reply, result);
-  dbus_message_unref (message);
+  
+  g_variant_builder_init (&builder, G_VARIANT_TYPE ("ai"));
+  for (i = 0; i < processes->len; i++)
+    g_variant_builder_add (&builder, "i", 
+                           g_array_index (processes, gint32, i));
+  
+  gvfs_dbus_mount_operation_call_show_processes (proxy,
+                                                 message_string ? message_string : "",
+                                                 choices,
+                                                 g_variant_builder_end (&builder),
+                                                 NULL,
+                                                 (GAsyncReadyCallback) show_processes_reply,
+                                                 result);
+  g_object_unref (proxy);
 }
 
 gboolean
@@ -931,23 +927,28 @@ op_show_processes (GMountOperation *op,
   return TRUE;
 }
 
-/* the callback from dbus -> main thread */
 static void
-show_unmount_progress_reply (DBusMessage *reply,
-                             GError      *error,
-                             gpointer     _data)
+show_unmount_progress_reply (GVfsDBusMountOperation *proxy,
+                             GAsyncResult *res,
+                             gpointer user_data)
 {
-  if (error != NULL)
-    g_warning ("ShowUnmountProgress request failed: %s", error->message);
+  GError *error;
+
+  error = NULL;
+  if (!gvfs_dbus_mount_operation_call_show_unmount_progress_finish (proxy, res, &error))
+    {
+      g_warning ("ShowUnmountProgress request failed: %s", error->message);
+      g_error_free (error);
+    }
 }
 
 void
-g_mount_source_show_unmount_progress (GMountSource        *source,
-                                      const char          *message_string,
-                                      guint64              time_left,
-                                      guint64              bytes_left)
+g_mount_source_show_unmount_progress (GMountSource *source,
+                                      const char   *message_string,
+                                      guint64      time_left,
+                                      guint64      bytes_left)
 {
-  DBusMessage *message;
+  GVfsDBusMountOperation *proxy;
 
   /* If no dbus id specified, warn and return */
   if (source->dbus_id[0] == 0)
@@ -956,25 +957,22 @@ g_mount_source_show_unmount_progress (GMountSource        *source,
                  "ignoring show-unmount-progress request");
       return;
     }
-
-  if (message_string == NULL)
-    message_string = "";
-
-  message = dbus_message_new_method_call (source->dbus_id,
-					  source->obj_path,
-					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					  G_VFS_DBUS_MOUNT_OPERATION_OP_SHOW_UNMOUNT_PROGRESS);
-
-  _g_dbus_message_append_args (message,
-			       DBUS_TYPE_STRING, &message_string,
-                               DBUS_TYPE_UINT64, &time_left,
-                               DBUS_TYPE_UINT64, &bytes_left,
-			       0);
+  
+  proxy = create_mount_operation_proxy_sync (source, NULL, NULL);
+  if (proxy == NULL)
+    return;
 
   /* 30 minute timeout */
-  _g_dbus_connection_call_async (NULL, message, 1000 * 60 * 30,
-				 show_unmount_progress_reply, NULL);
-  dbus_message_unref (message);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), 1000 * 60 * 30);
+
+  gvfs_dbus_mount_operation_call_show_unmount_progress (proxy,
+                                                        message_string ? message_string : "",
+                                                        time_left,
+                                                        bytes_left,
+                                                        NULL,
+                                                        (GAsyncReadyCallback) show_unmount_progress_reply,
+                                                        NULL);
+  g_object_unref (proxy);
 }
 
 static void
@@ -991,38 +989,28 @@ op_show_unmount_progress (GMountOperation *op,
   g_signal_stop_emission_by_name (op, "show_unmount_progress");
 }
 
+static void
+abort_reply (GVfsDBusMountOperation *proxy,
+             GAsyncResult *res,
+             gpointer user_data)
+{
+  gvfs_dbus_mount_operation_call_aborted_finish (proxy, res, NULL);
+}
+
 gboolean
 g_mount_source_abort (GMountSource *source)
 {
-  DBusMessage *message;
-  DBusConnection *connection;
-  gboolean ret;
+  GVfsDBusMountOperation *proxy;
 
-  ret = FALSE;
-
-  /* If no dbus id specified, reply that we weren't handled */
-  if (source->dbus_id[0] == 0)
-    goto out;
-
-  connection = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-  if (connection == NULL)
-    goto out;
-
-  message = dbus_message_new_method_call (source->dbus_id,
-					  source->obj_path,
-					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					  G_VFS_DBUS_MOUNT_OPERATION_OP_ABORTED);
-
-  if (message)
-    {
-      dbus_connection_send (connection, message, NULL);
-      dbus_message_unref (message);
-    }
-
-  ret = TRUE;
-
- out:
-  return ret;
+  proxy = create_mount_operation_proxy_sync (source, NULL, NULL);
+  if (proxy == NULL)
+    return FALSE;
+  
+  gvfs_dbus_mount_operation_call_aborted (proxy, NULL, 
+                                          (GAsyncReadyCallback) abort_reply, NULL);
+  
+  g_object_unref (proxy);
+  return TRUE;
 }
 
 static void

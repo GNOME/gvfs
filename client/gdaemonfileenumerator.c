@@ -32,6 +32,7 @@
 #include <gvfsdaemonprotocol.h>
 #include "gdaemonfile.h"
 #include "metatree.h"
+#include <gvfsdbus.h>
 
 #define OBJ_PATH_PREFIX "/org/gtk/vfs/client/enumerator/"
 
@@ -45,7 +46,7 @@ struct _GDaemonFileEnumerator
   GFileEnumerator parent;
 
   gint id;
-  DBusConnection *sync_connection; /* NULL if async, i.e. we're listening on main dbus connection */
+  GDBusConnection *sync_connection; /* NULL if async, i.e. we're listening on main dbus connection */
 
   /* protected by infos lock */
   GList *infos;
@@ -56,6 +57,10 @@ struct _GDaemonFileEnumerator
   gulong cancelled_tag;
   guint timeout_tag;
   GSimpleAsyncResult *async_res;
+  GMainLoop *next_files_mainloop;
+  GMainContext *next_files_context;
+  guint next_files_sync_timeout_tag;
+  GMutex next_files_mutex;
 
   GFileAttributeMatcher *matcher;
   MetaTree *metadata_tree;
@@ -86,9 +91,8 @@ static void              g_daemon_file_enumerator_close_async (GFileEnumerator  
 static gboolean          g_daemon_file_enumerator_close_finish (GFileEnumerator      *enumerator,
 							       GAsyncResult         *result,
 							       GError              **error);
-static DBusHandlerResult g_daemon_file_enumerator_dbus_filter (DBusConnection   *connection,
-							       DBusMessage      *message,
-							       void             *user_data);
+static void              trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok);
+
 
 static void
 free_info_list (GList *infos)
@@ -115,8 +119,12 @@ g_daemon_file_enumerator_finalize (GObject *object)
   if (daemon->metadata_tree)
     meta_tree_unref (daemon->metadata_tree);
 
-  if (daemon->sync_connection)
-    dbus_connection_unref (daemon->sync_connection);
+  g_clear_object (&daemon->sync_connection);
+
+  if (daemon->next_files_context)
+    g_main_context_unref (daemon->next_files_context);
+
+  g_mutex_clear (&daemon->next_files_mutex);
   
   if (G_OBJECT_CLASS (g_daemon_file_enumerator_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_daemon_file_enumerator_parent_class)->finalize) (object);
@@ -140,28 +148,141 @@ g_daemon_file_enumerator_class_init (GDaemonFileEnumeratorClass *klass)
 }
 
 static void
+next_files_sync_check (GDaemonFileEnumerator *enumerator)
+{
+  g_mutex_lock (&enumerator->next_files_mutex);
+  if ((enumerator->infos || enumerator->done) && 
+      enumerator->next_files_mainloop != NULL)
+    {
+      g_main_loop_quit (enumerator->next_files_mainloop);
+    }
+  g_mutex_unlock (&enumerator->next_files_mutex);
+}
+
+static gboolean
+handle_done (GVfsDBusEnumerator *object,
+             GDBusMethodInvocation *invocation,
+             gpointer user_data)
+{
+  GDaemonFileEnumerator *enumerator = G_DAEMON_FILE_ENUMERATOR (user_data);
+
+  G_LOCK (infos);
+  enumerator->done = TRUE;
+  if (enumerator->async_requested_files > 0)
+    trigger_async_done (enumerator, TRUE);
+  next_files_sync_check (enumerator);
+  G_UNLOCK (infos);
+
+  gvfs_dbus_enumerator_complete_done (object, invocation);
+  
+  return TRUE;
+}
+
+static gboolean
+handle_got_info (GVfsDBusEnumerator *object,
+                 GDBusMethodInvocation *invocation,
+                 GVariant *arg_infos,
+                 gpointer user_data)
+{
+  GDaemonFileEnumerator *enumerator = G_DAEMON_FILE_ENUMERATOR (user_data);
+  GList *infos;
+  GFileInfo *info;
+  GVariantIter iter;
+  GVariant *child;
+
+  infos = NULL;
+    
+  g_variant_iter_init (&iter, arg_infos);
+  while ((child = g_variant_iter_next_value (&iter)))
+    {
+      info = _g_dbus_get_file_info (child, NULL);
+      if (info)
+        g_assert (G_IS_FILE_INFO (info));
+
+      if (info)
+        infos = g_list_prepend (infos, info);
+
+      g_variant_unref (child);
+    }
+  
+  infos = g_list_reverse (infos);
+  
+  G_LOCK (infos);
+  enumerator->infos = g_list_concat (enumerator->infos, infos);
+  if (enumerator->async_requested_files > 0 &&
+      g_list_length (enumerator->infos) >= enumerator->async_requested_files)
+    trigger_async_done (enumerator, TRUE);
+  next_files_sync_check (enumerator);
+  G_UNLOCK (infos);
+
+  gvfs_dbus_enumerator_complete_got_info (object, invocation);
+  
+  return TRUE;
+}
+
+static GDBusInterfaceSkeleton *
+register_vfs_filter_cb (GDBusConnection *connection,
+                        const char *obj_path,
+                        gpointer callback_data)
+{
+  GError *error;
+  GVfsDBusEnumerator *skeleton;
+  GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (callback_data);
+
+  if (daemon->next_files_context)
+    g_main_context_push_thread_default (daemon->next_files_context);
+
+  skeleton = gvfs_dbus_enumerator_skeleton_new ();
+  g_signal_connect (skeleton, "handle-done", G_CALLBACK (handle_done), callback_data);
+  g_signal_connect (skeleton, "handle-got-info", G_CALLBACK (handle_got_info), callback_data);
+
+  error = NULL;
+  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (skeleton),
+                                         connection,
+                                         obj_path,
+                                         &error))
+    {
+      g_warning ("Error registering path: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+
+  if (daemon->next_files_context)
+    g_main_context_pop_thread_default (daemon->next_files_context);
+
+  return G_DBUS_INTERFACE_SKELETON (skeleton);
+}
+
+static void
 g_daemon_file_enumerator_init (GDaemonFileEnumerator *daemon)
 {
-  char *path;
-  
   daemon->id = g_atomic_int_add (&path_counter, 1);
 
-  path = g_daemon_file_enumerator_get_object_path (daemon);
-  _g_dbus_register_vfs_filter (path, g_daemon_file_enumerator_dbus_filter,
-			       G_OBJECT (daemon));
-  g_free (path);
+  g_mutex_init (&daemon->next_files_mutex);
 }
 
 GDaemonFileEnumerator *
 g_daemon_file_enumerator_new (GFile *file,
-			      const char *attributes)
+			      const char *attributes,
+			      gboolean sync)
 {
   GDaemonFileEnumerator *daemon;
   char *treename;
+  char *path;
 
   daemon = g_object_new (G_TYPE_DAEMON_FILE_ENUMERATOR,
                          "container", file,
                          NULL);
+
+  if (sync)
+    daemon->next_files_context = g_main_context_new ();
+
+  path = g_daemon_file_enumerator_get_object_path (daemon);
+
+  _g_dbus_register_vfs_filter (path,
+                               register_vfs_filter_cb,
+                               G_OBJECT (daemon));
+  g_free (path);
 
   daemon->matcher = g_file_attribute_matcher_new (attributes);
   if (g_file_attribute_matcher_enumerate_namespace (daemon->matcher, "metadata") ||
@@ -181,7 +302,7 @@ enumerate_keys_callback (const char *key,
 			 gpointer value,
 			 gpointer user_data)
 {
-  GFileInfo  *info = user_data;
+  GFileInfo *info = G_FILE_INFO (user_data);
   char *attr;
 
   attr = g_strconcat ("metadata::", key, NULL);
@@ -243,7 +364,7 @@ static void
 trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
 {
   GList *rest, *l;
-
+  
   if (daemon->cancelled_tag != 0)
     {
       GCancellable *cancellable = simple_async_result_get_cancellable (daemon->async_res);
@@ -309,65 +430,6 @@ trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
   daemon->async_res = NULL;
 }
 
-static DBusHandlerResult
-g_daemon_file_enumerator_dbus_filter (DBusConnection     *connection,
-				      DBusMessage        *message,
-				      void               *user_data)
-{
-  GDaemonFileEnumerator *enumerator = user_data;
-  const char *member;
-  DBusMessageIter iter, array_iter;
-  GList *infos;
-  GFileInfo *info;
-  
-  member = dbus_message_get_member (message);
-
-  if (strcmp (member, G_VFS_DBUS_ENUMERATOR_OP_DONE) == 0)
-    {
-      G_LOCK (infos);
-      enumerator->done = TRUE;
-      if (enumerator->async_requested_files > 0)
-	trigger_async_done (enumerator, TRUE);
-      G_UNLOCK (infos);
-      return DBUS_HANDLER_RESULT_HANDLED;
-    }
-  else if (strcmp (member, G_VFS_DBUS_ENUMERATOR_OP_GOT_INFO) == 0)
-    {
-      infos = NULL;
-      
-      dbus_message_iter_init (message, &iter);
-      if (dbus_message_iter_get_arg_type (&iter) == DBUS_TYPE_ARRAY &&
-	  dbus_message_iter_get_element_type (&iter) == DBUS_TYPE_STRUCT)
-	{
-	  dbus_message_iter_recurse (&iter, &array_iter);
-
-	  while (dbus_message_iter_get_arg_type (&array_iter) == DBUS_TYPE_STRUCT)
-	    {
-	      info = _g_dbus_get_file_info (&array_iter, NULL);
-	      if (info)
-		g_assert (G_IS_FILE_INFO (info));
-
-	      if (info)
-		infos = g_list_prepend (infos, info);
-
-	      dbus_message_iter_next (&iter);
-	    }
-	}
-
-      infos = g_list_reverse (infos);
-      
-      G_LOCK (infos);
-      enumerator->infos = g_list_concat (enumerator->infos, infos);
-      if (enumerator->async_requested_files > 0 &&
-	  g_list_length (enumerator->infos) >= enumerator->async_requested_files)
-	trigger_async_done (enumerator, TRUE);
-      G_UNLOCK (infos);
-      return DBUS_HANDLER_RESULT_HANDLED;
-    }
-
-  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-}
-
 char  *
 g_daemon_file_enumerator_get_object_path (GDaemonFileEnumerator *enumerator)
 {
@@ -376,9 +438,21 @@ g_daemon_file_enumerator_get_object_path (GDaemonFileEnumerator *enumerator)
 
 void
 g_daemon_file_enumerator_set_sync_connection (GDaemonFileEnumerator *enumerator,
-					      DBusConnection        *connection)
+                                              GDBusConnection       *connection)
 {
-  enumerator->sync_connection = dbus_connection_ref (connection);
+  enumerator->sync_connection = g_object_ref (connection);
+}
+
+static gboolean
+sync_timeout (gpointer data)
+{
+  GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (data);
+
+  g_mutex_lock (&daemon->next_files_mutex);
+  g_main_loop_quit (daemon->next_files_mainloop);
+  g_mutex_unlock (&daemon->next_files_mutex);
+  
+  return FALSE;
 }
 
 static GFileInfo *
@@ -388,71 +462,60 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
 {
   GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (enumerator);
   GFileInfo *info;
-  gboolean done;
-  int count;
   
-  info = NULL;
-  done = FALSE;
-  count = 0;
-  while (count++ < G_VFS_DBUS_TIMEOUT_MSECS / 100)
+  if (daemon->sync_connection == NULL)
     {
-      G_LOCK (infos);
-      if (daemon->infos)
-	{
-	  done = TRUE;
-	  info = daemon->infos->data;
-	  if (info)
-	    {
-	      g_assert (G_IS_FILE_INFO (info));
-	      add_metadata (G_FILE_INFO (info), daemon);
-	    }
-	  daemon->infos = g_list_delete_link (daemon->infos, daemon->infos);
-	}
-      else if (daemon->done)
-	done = TRUE;
-      G_UNLOCK (infos);
-
-      if (info)
-	g_assert (G_IS_FILE_INFO (info));
-      
-      if (done)
-	break;
-
-      /* We sleep only 100 msecs here, not the full time because we might have
-       * raced with the filter func being called after unlocking
-       * and setting done or ->infos. So, we want to check it again reasonaby soon.
-       */
-      if (daemon->sync_connection != NULL)
-	{
-	  /* The initializing call for the enumerator was a sync one, and we
-	     have a reference to its private connection. In order to ensure we
-	     get the responses sent to that originating connection we pump it
-	     here.
-	     This should be safe as we're either on the thread that did the call
-	     so its our connection, or its the private connection for another
-	     thread. If that thread is idle the pumping won't affect anything, and
-	     if it is doing something thats ok to, because we don't use filters
-	     on the private sync connections so we won't cause any reentrancy
-	     (except the file enumerator filter, but that is safe to run in
-	     some other thread).
-	  */
-	  if (!dbus_connection_read_write_dispatch (daemon->sync_connection, 100))
-	    break;
-	}
-      else
-	{
-	  /* The enumerator was initialized by an async call, so responses will
-	     come to the async dbus connection. We can't pump that as that would
-	     cause all sort of filters and stuff to run, possibly on the wrong
-	     thread. If you want to do async next_files you must create the
-	     enumerator asynchrounously.
-	  */
-	  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			       "Can't do synchronous next_files() on a file enumerator created asynchronously");
-	  return NULL;
-	}
+      /* The enumerator was initialized by an async call, so responses will
+         come to the async dbus connection. We can't pump that as that would
+         cause all sort of filters and stuff to run, possibly on the wrong
+         thread. If you want to do async next_files you must create the
+         enumerator asynchrounously.
+      */
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                           "Can't do synchronous next_files() on a file enumerator created asynchronously");
+      return NULL;
     }
 
+  if (! daemon->infos && ! daemon->done)
+    {
+      /* Wait for incoming data */
+      g_mutex_lock (&daemon->next_files_mutex);
+      daemon->next_files_mainloop = g_main_loop_new (daemon->next_files_context, FALSE);
+
+      g_mutex_unlock (&daemon->next_files_mutex);
+      
+      g_main_context_push_thread_default (daemon->next_files_context);
+      daemon->next_files_sync_timeout_tag = g_timeout_add (G_VFS_DBUS_TIMEOUT_MSECS,
+                                                           sync_timeout, daemon);
+      g_main_loop_run (daemon->next_files_mainloop);
+      g_main_context_pop_thread_default (daemon->next_files_context);
+
+      g_mutex_lock (&daemon->next_files_mutex);
+      g_source_remove (daemon->next_files_sync_timeout_tag);
+
+      g_main_loop_unref (daemon->next_files_mainloop);
+      daemon->next_files_mainloop = NULL;
+      g_mutex_unlock (&daemon->next_files_mutex);
+    }
+  
+  info = NULL;
+
+  G_LOCK (infos);
+  if (daemon->infos)
+    {
+      info = daemon->infos->data;
+      if (info)
+        {
+          g_assert (G_IS_FILE_INFO (info));
+          add_metadata (G_FILE_INFO (info), daemon);
+        }
+      daemon->infos = g_list_delete_link (daemon->infos, daemon->infos);
+    }
+  G_UNLOCK (infos);
+
+  if (info)
+    g_assert (G_IS_FILE_INFO (info));
+      
   return info;
 }
 

@@ -28,10 +28,7 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
-#include "gvfsjobmove.h"
-#include "gvfsdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfsjobqueryattributes.h"
 
@@ -39,9 +36,9 @@ G_DEFINE_TYPE (GVfsJobQueryAttributes, g_vfs_job_query_attributes, G_VFS_TYPE_JO
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
-static DBusMessage *create_reply (GVfsJob        *job,
-				  DBusConnection *connection,
-				  DBusMessage    *message);
+static void         create_reply (GVfsJob               *job,
+                                  GVfsDBusMount         *object,
+                                  GDBusMethodInvocation *invocation);
 
 static void
 g_vfs_job_query_attributes_finalize (GObject *object)
@@ -76,44 +73,56 @@ g_vfs_job_query_attributes_init (GVfsJobQueryAttributes *job)
 {
 }
 
-GVfsJob *
-g_vfs_job_query_attributes_new (DBusConnection *connection,
-				DBusMessage *message,
-				GVfsBackend *backend,
-				gboolean namespaces)
+gboolean
+g_vfs_job_query_settable_attributes_new_handle (GVfsDBusMount *object,
+                                                GDBusMethodInvocation *invocation,
+                                                const gchar *arg_path_data,
+                                                GVfsBackend *backend)
 {
   GVfsJobQueryAttributes *job;
-  DBusMessage *reply;
-  DBusError derror;
-  const gchar *path = NULL;
-  gint path_len;
+
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
   
-  dbus_error_init (&derror);
-  if (!dbus_message_get_args (message, &derror, 
-			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
-			      &path, &path_len,
-			      0))
-    {
-      reply = dbus_message_new_error (message,
-				      derror.name,
-                                      derror.message);
-      dbus_error_free (&derror);
-
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return NULL;
-    }
-
   job = g_object_new (G_VFS_TYPE_JOB_QUERY_ATTRIBUTES,
-		      "message", message,
-		      "connection", connection,
-		      NULL);
-
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
+ 
   job->backend = backend;
-  job->filename = g_strndup (path, path_len);
-  job->namespaces = namespaces;
+  job->filename = g_strdup (arg_path_data);
+  job->namespaces = FALSE;
 
-  return G_VFS_JOB (job);
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
+}
+
+gboolean
+g_vfs_job_query_writable_namespaces_new_handle (GVfsDBusMount *object,
+                                                GDBusMethodInvocation *invocation,
+                                                const gchar *arg_path_data,
+                                                GVfsBackend *backend)
+{
+  GVfsJobQueryAttributes *job;
+
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
+  
+  job = g_object_new (G_VFS_TYPE_JOB_QUERY_ATTRIBUTES,
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
+ 
+  job->backend = backend;
+  job->filename = g_strdup (arg_path_data);
+  job->namespaces = TRUE;
+
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
 }
 
 static void
@@ -172,20 +181,18 @@ g_vfs_job_query_attributes_set_list (GVfsJobQueryAttributes *job,
 }
 
 /* Might be called on an i/o thread */
-static DBusMessage *
+static void
 create_reply (GVfsJob *job,
-	      DBusConnection *connection,
-	      DBusMessage *message)
+              GVfsDBusMount *object,
+              GDBusMethodInvocation *invocation)
 {
   GVfsJobQueryAttributes *op_job = G_VFS_JOB_QUERY_ATTRIBUTES (job);
-  DBusMessage *reply;
-  DBusMessageIter iter;
-
-  reply = dbus_message_new_method_return (message);
-
-  dbus_message_iter_init_append (reply, &iter);
-  _g_dbus_append_attribute_info_list (&iter, 
-				      op_job->list);
+  GVariant *list;
   
-  return reply;
+  list = _g_dbus_append_attribute_info_list (op_job->list);
+  
+  if (! op_job->namespaces)
+    gvfs_dbus_mount_complete_query_settable_attributes (object, invocation, list);
+  else
+    gvfs_dbus_mount_complete_query_writable_namespaces (object, invocation, list);
 }

@@ -55,9 +55,12 @@ struct _GVfsJobStartMountableClass
 
 GType g_vfs_job_start_mountable_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_start_mountable_new        (DBusConnection        *connection,
-					       DBusMessage           *message,
-					       GVfsBackend           *backend);
+gboolean g_vfs_job_start_mountable_new_handle (GVfsDBusMount         *object,
+                                               GDBusMethodInvocation *invocation,
+                                               const gchar           *arg_path_data,
+                                               const gchar           *arg_dbus_id,
+                                               const gchar           *arg_obj_path,
+                                               GVfsBackend           *backend);
 
 G_END_DECLS
 

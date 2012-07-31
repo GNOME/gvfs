@@ -61,6 +61,7 @@
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsjobmakedirectory.h"
+#include "gvfsjobprogress.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfskeyring.h"
 #include "sftp.h"
@@ -344,81 +345,79 @@ look_for_stderr_errors (GVfsBackend *backend, GError **error)
 }
 
 static gchar*
-read_dbus_string_dict_value (DBusMessageIter *args, const gchar *key)
+read_dbus_string_dict_value (GVariant *args, const gchar *key)
 {
-  DBusMessageIter items, entry;
-  gchar *str, *sig;
-
-  sig = dbus_message_iter_get_signature (args);
-  if (!sig || strcmp (sig, "a{ss}") != 0)
+  GVariant *a;
+  GVariantIter iter;
+  const gchar *str, *val;
+  gchar *res;
+  
+  if (! g_variant_is_of_type (args, G_VARIANT_TYPE ("(a{ss})")))
     return NULL;
-
-  dbus_message_iter_recurse (args, &items);
-
-  if (dbus_message_iter_has_next (&items))
+  
+  g_variant_get (args, "(@a{ss})", &a);
+  
+  res = NULL;
+  g_variant_iter_init (&iter, a);
+  while (g_variant_iter_next (&iter, "{&s&s}", &str, &val))
     {
-      do
-	{
-	  dbus_message_iter_recurse (&items, &entry);
-	  dbus_message_iter_get_basic (&entry, &str);
-	  if (str && strcmp (key, str) == 0) 
-	    {
-	      dbus_message_iter_next (&entry);
-	      dbus_message_iter_get_basic (&entry, &str);
-	      return g_strdup (str);
-	    }
-	}
-      while (dbus_message_iter_next (&items));
+      if (g_strcmp0 (str, key) == 0)
+        {
+          res = g_strdup (val);
+          break;
+        }
     }
-
-  return NULL;
+  
+  g_variant_unref (a);
+  
+  return res;
 }
 
 static void
 setup_ssh_environment (void)
 {
-  DBusConnection *dconn;
-  DBusMessage *reply;
-  DBusMessage *msg;
-  DBusMessageIter args;
-  DBusError derr;
+  GDBusConnection *conn;
+  GError *error;
+  GVariant *iter;
   gchar *env;
-
-  dbus_error_init (&derr);
-  dconn = dbus_bus_get (DBUS_BUS_SESSION, &derr);
-  if (!dconn)
-    return;
-
-  msg = dbus_message_new_method_call ("org.gnome.keyring",
-				      "/org/gnome/keyring/daemon",
-				      "org.gnome.keyring.Daemon",
-				      "GetEnvironment");
-  if (!msg)
+  
+  error = NULL;
+  conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
+  if (! conn)
     {
-      dbus_connection_unref (dconn);
+      g_warning ("Failed to setup ssh evironment: %s (%s, %d)",
+                 error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
       return;
     }
 
-  /* Send message and get a handle for a reply */
-  reply = dbus_connection_send_with_reply_and_block (dconn, msg, 1000, &derr);
-  dbus_message_unref (msg);
-  if (!reply)
+  iter = g_dbus_connection_call_sync (conn,
+                                      "org.gnome.keyring",
+                                      "/org/gnome/keyring/daemon",
+                                      "org.gnome.keyring.Daemon",
+                                      "GetEnvironment",
+                                      NULL,
+                                      NULL,
+                                      G_DBUS_CALL_FLAGS_NONE,
+                                      -1,
+                                      NULL,
+                                      &error);
+  if (! iter)
     {
-      dbus_connection_unref (dconn);
-      return;
+      g_warning ("Failed to setup ssh evironment: %s (%s, %d)",
+                 error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
     }
-
-  /* Read the return value */
-  if (dbus_message_iter_init (reply, &args))
+  else
     {
-      env = read_dbus_string_dict_value (&args, "SSH_AUTH_SOCK");
+      env = read_dbus_string_dict_value (iter, "SSH_AUTH_SOCK");
       if (env && env[0])
-	g_setenv ("SSH_AUTH_SOCK", env, TRUE);
+        g_setenv ("SSH_AUTH_SOCK", env, TRUE);
       g_free (env);
+      g_variant_unref (iter);
     }
-
-  dbus_message_unref (reply);
-  dbus_connection_unref (dconn);
+  
+  g_object_unref (conn);
 }
 
 static char **
@@ -4165,7 +4164,7 @@ move_reply (GVfsBackendSftp *backend,
           /* Succeeded, report file size */
           file_size = job->backend_data;
           if (file_size != NULL) 
-            g_vfs_job_move_progress_callback (*file_size, *file_size, job);
+            g_vfs_job_progress_callback (*file_size, *file_size, job);
           g_vfs_job_succeeded (job);
         }
     }

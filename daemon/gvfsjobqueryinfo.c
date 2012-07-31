@@ -29,19 +29,17 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobqueryinfo.h"
-#include "gvfsdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 
 G_DEFINE_TYPE (GVfsJobQueryInfo, g_vfs_job_query_info, G_VFS_TYPE_JOB_DBUS)
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
-static DBusMessage *create_reply (GVfsJob        *job,
-				  DBusConnection *connection,
-				  DBusMessage    *message);
+static void         create_reply (GVfsJob               *job,
+                                  GVfsDBusMount         *object,
+                                  GDBusMethodInvocation *invocation);
 
 static void
 g_vfs_job_query_info_finalize (GObject *object)
@@ -79,63 +77,39 @@ g_vfs_job_query_info_init (GVfsJobQueryInfo *job)
 {
 }
 
-GVfsJob *
-g_vfs_job_query_info_new (DBusConnection *connection,
-			  DBusMessage *message,
-			  GVfsBackend *backend)
+gboolean
+g_vfs_job_query_info_new_handle (GVfsDBusMount *object,
+                                 GDBusMethodInvocation *invocation,
+                                 const gchar *arg_path_data,
+                                 const gchar *arg_attributes,
+                                 guint arg_flags,
+                                 const gchar *arg_uri,
+                                 GVfsBackend *backend)
 {
   GVfsJobQueryInfo *job;
-  DBusMessage *reply;
-  DBusError derror;
-  int path_len;
-  const char *path_data;
-  char *attributes;
-  char *uri;
-  dbus_uint32_t flags;
-  DBusMessageIter iter;
 
-  dbus_message_iter_init (message, &iter);
-  
-  dbus_error_init (&derror);
-  if (!_g_dbus_message_iter_get_args (&iter, &derror, 
-				      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
-				      &path_data, &path_len,
-				      DBUS_TYPE_STRING, &attributes,
-				      DBUS_TYPE_UINT32, &flags,
-				      0))
-    {
-      reply = dbus_message_new_error (message,
-				      derror.name,
-                                      derror.message);
-      dbus_error_free (&derror);
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
 
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return NULL;
-    }
-
-  /* Optional uri arg for thumbnail info */
-  if (!_g_dbus_message_iter_get_args (&iter, NULL,
-				      DBUS_TYPE_STRING, &uri,
-				      0))
-    uri = NULL;
-  
   job = g_object_new (G_VFS_TYPE_JOB_QUERY_INFO,
-		      "message", message,
-		      "connection", connection,
+                      "object", object,
+                      "invocation", invocation,
 		      NULL);
 
-  job->filename = g_strndup (path_data, path_len);
+  job->filename = g_strdup (arg_path_data);
   job->backend = backend;
-  job->attributes = g_strdup (attributes);
-  job->attribute_matcher = g_file_attribute_matcher_new (attributes);
-  job->flags = flags;
-  job->uri = g_strdup (uri);
+  job->attributes = g_strdup (arg_attributes);
+  job->attribute_matcher = g_file_attribute_matcher_new (arg_attributes);
+  job->flags = arg_flags;
+  job->uri = g_strdup (arg_uri);
 
   job->file_info = g_file_info_new ();
   g_file_info_set_attribute_mask (job->file_info, job->attribute_matcher);
+
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
   
-  return G_VFS_JOB (job);
+  return TRUE;
 }
 
 static void
@@ -177,26 +151,18 @@ try (GVfsJob *job)
 }
 
 /* Might be called on an i/o thread */
-static DBusMessage *
+static void
 create_reply (GVfsJob *job,
-	      DBusConnection *connection,
-	      DBusMessage *message)
+              GVfsDBusMount *object,
+              GDBusMethodInvocation *invocation)
 {
   GVfsJobQueryInfo *op_job = G_VFS_JOB_QUERY_INFO (job);
-  DBusMessage *reply;
-  DBusMessageIter iter;
-
-  reply = dbus_message_new_method_return (message);
-
-  dbus_message_iter_init_append (reply, &iter);
-
+  
   g_vfs_backend_add_auto_info (op_job->backend,
-			       op_job->attribute_matcher,
-			       op_job->file_info,
-			       op_job->uri);
-  
-  _g_dbus_append_file_info (&iter, 
-			    op_job->file_info);
-  
-  return reply;
+                               op_job->attribute_matcher,
+                               op_job->file_info,
+                               op_job->uri);
+
+  gvfs_dbus_mount_complete_query_info (object, invocation,
+      _g_dbus_append_file_info (op_job->file_info));
 }

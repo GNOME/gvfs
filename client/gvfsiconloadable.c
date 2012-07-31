@@ -23,6 +23,7 @@
 #include <config.h>
 #include <string.h>
 #include <glib/gi18n-lib.h>
+#include <gio/gunixfdlist.h>
 
 #include "gvfsicon.h"
 #include "gvfsiconloadable.h"
@@ -30,86 +31,53 @@
 #include "gvfsdaemondbus.h"
 #include "gdaemonvfs.h"
 #include "gdaemonfileinputstream.h"
-#include "gvfsdaemonprotocol.h"
-#include "gvfsdbusutils.h"
+#include <gvfsdbus.h>
 
 /* see comment in common/giconvfs.c for why the GLoadableIcon interface is here */
 
-static DBusMessage *
-create_empty_message (GVfsIcon *vfs_icon,
-		      const char *op,
-		      GMountInfo **mount_info_out,
-		      GError **error)
+
+static GVfsDBusMount *
+create_proxy_for_icon (GVfsIcon *vfs_icon,
+                       GCancellable *cancellable,
+                       GError **error)
 {
-  DBusMessage *message;
+  GVfsDBusMount *proxy;
   GMountInfo *mount_info;
+  GDBusConnection *connection;
 
+  proxy = NULL;
+  
   mount_info = _g_daemon_vfs_get_mount_info_sync (vfs_icon->mount_spec,
-						  "/",
-						  error);
-
+                                                  "/",
+                                                  cancellable,
+                                                  error);
+  
   if (mount_info == NULL)
-    return NULL;
+    goto out;
 
-  if (mount_info_out)
-    *mount_info_out = g_mount_info_ref (mount_info);
+  connection = _g_dbus_connection_get_sync (mount_info->dbus_id, cancellable, error);
+  if (connection == NULL)
+    goto out;
 
-  message =
-    dbus_message_new_method_call (mount_info->dbus_id,
-				  mount_info->object_path,
-				  G_VFS_DBUS_MOUNT_INTERFACE,
-				  op);
+  proxy = gvfs_dbus_mount_proxy_new_sync (connection,
+                                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                                          mount_info->dbus_id,
+                                          mount_info->object_path,
+                                          cancellable,
+                                          error);
+  
+  if (proxy == NULL)
+    goto out;
+  
+  _g_dbus_connect_vfs_filters (connection);
 
-  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &(vfs_icon->icon_id), 0);
+ out:
+  if (mount_info)
+    g_mount_info_unref (mount_info);
+  if (error && *error)
+    g_dbus_error_strip_remote_error (*error);
 
-  g_mount_info_unref (mount_info);
-  return message;
-}
-
-static DBusMessage *
-do_sync_path_call (GVfsIcon *vfs_icon,
-		   const char *op,
-		   GMountInfo **mount_info_out,
-		   DBusConnection **connection_out,
-		   GCancellable *cancellable,
-		   GError **error,
-		   int first_arg_type,
-		   ...)
-{
-  DBusMessage *message, *reply;
-  va_list var_args;
-  GError *my_error;
-
- retry:
-  message = create_empty_message (vfs_icon, op, mount_info_out, error);
-  if (!message)
-    return NULL;
-
-  va_start (var_args, first_arg_type);
-  _g_dbus_message_append_args_valist (message,
-				      first_arg_type,
-				      var_args);
-  va_end (var_args);
-
-
-  my_error = NULL;
-  reply = _g_vfs_daemon_call_sync (message,
-				   connection_out,
-				   NULL, NULL, NULL,
-				   cancellable, &my_error);
-  dbus_message_unref (message);
-
-  if (reply == NULL)
-    {
-      if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
-	{
-	  g_error_free (my_error);
-	  goto retry;
-	}
-      g_propagate_error (error, my_error);
-    }
-
-  return reply;
+  return proxy;
 }
 
 static GInputStream *
@@ -119,170 +87,172 @@ g_vfs_icon_load (GLoadableIcon  *icon,
                  GCancellable   *cancellable,
                  GError        **error)
 {
-  DBusConnection *connection;
+  GVfsIcon *vfs_icon = G_VFS_ICON (icon);
+  GVfsDBusMount *proxy;
+  gboolean res;
+  gboolean can_seek;
+  GUnixFDList *fd_list;
   int fd;
-  DBusMessage *reply;
-  guint32 fd_id;
-  dbus_bool_t can_seek;
+  GVariant *fd_id_val = NULL;
+  GError *local_error = NULL;
 
-  reply = do_sync_path_call (G_VFS_ICON (icon),
-			     G_VFS_DBUS_MOUNT_OP_OPEN_ICON_FOR_READ,
-			     NULL,
-                             &connection,
-			     cancellable,
-                             error,
-			     0);
-  if (reply == NULL)
+  proxy = create_proxy_for_icon (vfs_icon, cancellable, error);
+  if (proxy == NULL)
     return NULL;
 
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_UINT32, &fd_id,
-			      DBUS_TYPE_BOOLEAN, &can_seek,
-			      DBUS_TYPE_INVALID))
+  res = gvfs_dbus_mount_call_open_icon_for_read_sync (proxy,
+                                                      vfs_icon->icon_id,
+                                                      NULL,
+                                                      &fd_id_val,
+                                                      &can_seek,
+                                                      &fd_list,
+                                                      cancellable,
+                                                      &local_error);
+  
+  if (! res)
     {
-      dbus_message_unref (reply);
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from %s"), "open_icon_for_read");
-      return NULL;
+      if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+        _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
+      _g_propagate_error_stripped (error, local_error);
     }
 
-  dbus_message_unref (reply);
+  g_object_unref (proxy);
 
-  fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
-  if (fd == -1)
+  if (! res)
+    return NULL;
+  
+  if (fd_list == NULL || fd_id_val == NULL ||
+      g_unix_fd_list_get_length (fd_list) != 1 ||
+      (fd = g_unix_fd_list_get (fd_list, g_variant_get_handle (fd_id_val), NULL)) == -1)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Didn't get stream file descriptor"));
+                           _("Didn't get stream file descriptor"));
       return NULL;
     }
 
+  g_variant_unref (fd_id_val);
+  g_object_unref (fd_list);
+  
   return G_INPUT_STREAM (g_daemon_file_input_stream_new (fd, can_seek));
 }
 
 
-typedef void (*AsyncPathCallCallback) (DBusMessage *reply,
-				       DBusConnection *connection,
-				       GSimpleAsyncResult *result,
-				       GCancellable *cancellable,
-				       gpointer callback_data);
-
+typedef void (*CreateProxyAsyncCallback) (GVfsDBusMount *proxy,
+                                          GSimpleAsyncResult *result,
+                                          GCancellable *cancellable,
+                                          gpointer callback_data);
 
 typedef struct {
   GSimpleAsyncResult *result;
   GVfsIcon *vfs_icon;
-  char *op;
+  GMountInfo *mount_info;
+  GDBusConnection *connection;
+  GVfsDBusMount *proxy;
   GCancellable *cancellable;
-  DBusMessage *args;
-  AsyncPathCallCallback callback;
+  CreateProxyAsyncCallback callback;
   gpointer callback_data;
-  GDestroyNotify notify;
+  gulong cancelled_tag;
 } AsyncPathCall;
 
 
 static void
 async_path_call_free (AsyncPathCall *data)
 {
-  if (data->notify)
-    data->notify (data->callback_data);
-
-  if (data->result)
-    g_object_unref (data->result);
+  g_clear_object (&data->connection);
+  if (data->mount_info)
+    g_mount_info_unref (data->mount_info);
+  g_clear_object (&data->result);
   g_object_unref (data->vfs_icon);
-  g_free (data->op);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
-  if (data->args)
-    dbus_message_unref (data->args);
+  g_clear_object (&data->cancellable);
+  g_clear_object (&data->proxy);
   g_free (data);
 }
 
 static void
-async_path_call_done (DBusMessage *reply,
-		      DBusConnection *connection,
-		      GError *io_error,
-		      gpointer _data)
+async_proxy_new_cb (GObject *source_object,
+                    GAsyncResult *res,
+                    gpointer user_data)
 {
-  AsyncPathCall *data = _data;
-  GSimpleAsyncResult *result;
-
-  if (io_error != NULL)
+  AsyncPathCall *data = user_data;
+  GVfsDBusMount *proxy;
+  GError *error = NULL;
+  
+  proxy = gvfs_dbus_mount_proxy_new_finish (res, &error);
+  if (proxy == NULL)
     {
-      g_simple_async_result_set_from_error (data->result, io_error);
+      _g_simple_async_result_take_error_stripped (data->result, error);      
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_path_call_free (data);
+      return;
     }
-  else
-    {
-      result = data->result;
-      g_object_weak_ref (G_OBJECT (result), (GWeakNotify)async_path_call_free, data);
-      data->result = NULL;
-      
-      data->callback (reply, connection,
-		      result,
-		      data->cancellable,
-		      data->callback_data);
+  
+  data->proxy = proxy;
+  _g_dbus_connect_vfs_filters (data->connection);
 
-      /* Free data here, or later if callback ref:ed the result */
-      g_object_unref (result);
-    }
+  data->callback (proxy,
+                  data->result,
+                  data->cancellable,
+                  data->callback_data);
 }
 
 static void
-do_async_path_call_callback (GMountInfo *mount_info,
-			     gpointer _data,
-			     GError *error)
+async_got_connection_cb (GDBusConnection *connection,
+                         GError *io_error,
+                         gpointer callback_data)
+{
+  AsyncPathCall *data = callback_data;
+  
+  if (connection == NULL)
+    {
+      g_dbus_error_strip_remote_error (io_error);
+      g_simple_async_result_set_from_error (data->result, io_error);
+      _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
+      async_path_call_free (data);
+      return;
+    }
+  
+  data->connection = g_object_ref (connection);
+  gvfs_dbus_mount_proxy_new (connection,
+                             G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                             data->mount_info->dbus_id,
+                             data->mount_info->object_path,
+                             data->cancellable,
+                             async_proxy_new_cb,
+                             data);
+}
+
+static void
+async_got_mount_info (GMountInfo *mount_info,
+                      gpointer _data,
+                      GError *error)
 {
   AsyncPathCall *data = _data;
-  DBusMessage *message;
-  DBusMessageIter arg_source, arg_dest;
-  
+
   if (error != NULL)
     {
+      g_dbus_error_strip_remote_error (error);
       g_simple_async_result_set_from_error (data->result, error);      
       _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_path_call_free (data);
       return;
     }
 
-  message =
-    dbus_message_new_method_call (mount_info->dbus_id,
-				  mount_info->object_path,
-				  G_VFS_DBUS_MOUNT_INTERFACE,
-				  data->op);
-  
-  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &(data->vfs_icon->icon_id), 0);
+  data->mount_info = g_mount_info_ref (mount_info);
 
-  /* Append more args from data->args */
-
-  if (data->args)
-    {
-      dbus_message_iter_init (data->args, &arg_source);
-      dbus_message_iter_init_append (message, &arg_dest);
-
-      _g_dbus_message_iter_copy (&arg_dest, &arg_source);
-    }
-
-  _g_vfs_daemon_call_async (message,
-			    async_path_call_done, data,
-			    data->cancellable);
-  
-  dbus_message_unref (message);
+  _g_dbus_connection_get_for_async (mount_info->dbus_id,
+                                    async_got_connection_cb,
+                                    data,
+                                    data->cancellable);
 }
 
-
 static void
-do_async_path_call (GVfsIcon *vfs_icon,
-		    const char *op,
-		    GCancellable *cancellable,
-		    GAsyncReadyCallback op_callback,
-		    gpointer op_callback_data,
-		    AsyncPathCallCallback callback,
-		    gpointer callback_data,
-		    GDestroyNotify notify,
-		    int first_arg_type,
-		    ...)
+create_proxy_for_icon_async (GVfsIcon *vfs_icon,
+		             GCancellable *cancellable,
+		             GAsyncReadyCallback op_callback,
+		             gpointer op_callback_data,
+		             CreateProxyAsyncCallback callback,
+		             gpointer callback_data)
 {
-  va_list var_args;
   AsyncPathCall *data;
 
   data = g_new0 (AsyncPathCall, 1);
@@ -292,98 +262,75 @@ do_async_path_call (GVfsIcon *vfs_icon,
 					    NULL);
 
   data->vfs_icon = g_object_ref (vfs_icon);
-  data->op = g_strdup (op);
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
   data->callback = callback;
   data->callback_data = callback_data;
-  data->notify = notify;
-  
-  if (first_arg_type != 0)
-    {
-      data->args = dbus_message_new (DBUS_MESSAGE_TYPE_METHOD_CALL);
-      if (data->args == NULL)
-	_g_dbus_oom ();
-      
-      va_start (var_args, first_arg_type);
-      _g_dbus_message_append_args_valist (data->args,
-					  first_arg_type,
-					  var_args);
-      va_end (var_args);
-    }
-  
-  
+
   _g_daemon_vfs_get_mount_info_async (vfs_icon->mount_spec,
                                       "/",
-                                      do_async_path_call_callback,
+                                      async_got_mount_info,
                                       data);
 }
 
-typedef struct {
-  GSimpleAsyncResult *result;
-  GCancellable *cancellable;
-  gboolean can_seek;
-} GetFDData;
-
 static void
-load_async_get_fd_cb (int fd,
-		      gpointer callback_data)
+open_icon_read_cb (GVfsDBusMount *proxy,
+                   GAsyncResult *res,
+                   gpointer user_data)
 {
-  GetFDData *data = callback_data;
+  AsyncPathCall *data = user_data;
+  GError *error = NULL;
+  gboolean can_seek;
+  GUnixFDList *fd_list;
+  int fd;
+  GVariant *fd_id_val;
+  guint fd_id;
   GFileInputStream *stream;
 
-  if (fd == -1)
+  if (! gvfs_dbus_mount_call_open_icon_for_read_finish (proxy, &fd_id_val, &can_seek, &fd_list, res, &error))
+    {
+      _g_simple_async_result_take_error_stripped (data->result, error);
+      goto out;
+    }
+
+  fd_id = g_variant_get_handle (fd_id_val);
+  g_variant_unref (fd_id_val);
+
+  if (fd_list == NULL || g_unix_fd_list_get_length (fd_list) != 1 ||
+      (fd = g_unix_fd_list_get (fd_list, fd_id, NULL)) == -1)
     {
       g_simple_async_result_set_error (data->result,
-				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Couldn't get stream file descriptor"));
+                                       G_IO_ERROR, G_IO_ERROR_FAILED,
+                                       _("Couldn't get stream file descriptor"));
     }
   else
     {
-      stream = g_daemon_file_input_stream_new (fd, data->can_seek);
+      stream = g_daemon_file_input_stream_new (fd, can_seek);
       g_simple_async_result_set_op_res_gpointer (data->result, stream, g_object_unref);
+      g_object_unref (fd_list);
     }
 
-  _g_simple_async_result_complete_with_cancellable (data->result,
-                                                    data->cancellable);
-
-  g_object_unref (data->result);
-  if (data->cancellable)
-    g_object_unref (data->cancellable);
-  g_free (data);
+out:
+  _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
+  _g_dbus_async_unsubscribe_cancellable (data->cancellable, data->cancelled_tag);
+  async_path_call_free (data);
 }
 
 static void
-load_async_cb (DBusMessage *reply,
-	       DBusConnection *connection,
-	       GSimpleAsyncResult *result,
-	       GCancellable *cancellable,
-	       gpointer callback_data)
+load_async_cb (GVfsDBusMount *proxy,
+               GSimpleAsyncResult *result,
+               GCancellable *cancellable,
+               gpointer callback_data)
 {
-  guint32 fd_id;
-  dbus_bool_t can_seek;
-  GetFDData *get_fd_data;
+  AsyncPathCall *data = callback_data;
 
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_UINT32, &fd_id,
-			      DBUS_TYPE_BOOLEAN, &can_seek,
-			      DBUS_TYPE_INVALID))
-    {
-      g_simple_async_result_set_error (result,
-				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Invalid return value from %s"), "open");
-      _g_simple_async_result_complete_with_cancellable (result, cancellable);
-      return;
-    }
-
-  get_fd_data = g_new0 (GetFDData, 1);
-  get_fd_data->result = g_object_ref (result);
-  if (cancellable)
-    get_fd_data->cancellable = g_object_ref (cancellable);
-  get_fd_data->can_seek = can_seek;
-
-  _g_dbus_connection_get_fd_async (connection, fd_id,
-				   load_async_get_fd_cb, get_fd_data);
+  gvfs_dbus_mount_call_open_icon_for_read (proxy,
+                                           data->vfs_icon->icon_id,
+                                           NULL,
+                                           cancellable,
+                                           (GAsyncReadyCallback) open_icon_read_cb,
+                                           callback_data);
+  data->cancelled_tag = _g_dbus_async_subscribe_cancellable (data->connection, cancellable);
 }
 
 static void
@@ -393,12 +340,10 @@ g_vfs_icon_load_async (GLoadableIcon       *icon,
                        GAsyncReadyCallback  callback,
                        gpointer             user_data)
 {
-  do_async_path_call (G_VFS_ICON (icon),
-		      G_VFS_DBUS_MOUNT_OP_OPEN_ICON_FOR_READ,
-		      cancellable,
-		      callback, user_data,
-		      load_async_cb, NULL, NULL,
-		      0);
+  create_proxy_for_icon_async (G_VFS_ICON (icon),
+		               cancellable,
+		               callback, user_data,
+		               load_async_cb, NULL);
 }
 
 static GInputStream *
@@ -416,7 +361,6 @@ g_vfs_icon_load_finish (GLoadableIcon  *icon,
 
   return NULL;
 }
-
 
 static void
 g_vfs_icon_loadable_icon_iface_init (GLoadableIconIface *iface)

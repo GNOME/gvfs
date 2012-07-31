@@ -9,6 +9,7 @@ INCLUDES =					\
 	-I$(top_srcdir)				\
 	-I$(top_srcdir)/common			\
 	-I$(top_builddir)			\
+	-I$(top_builddir)/common		\
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) 		\
 	$(OBEXFTP_CFLAGS) $(EXPAT_CFLAGS)	\
 	$(KEYRING_CFLAGS)			\
@@ -149,6 +150,7 @@ libdaemon_la_SOURCES = \
 	gvfsjob.c gvfsjob.h \
 	gvfsjobsource.c gvfsjobsource.h \
 	gvfsjobdbus.c gvfsjobdbus.h \
+	gvfsjobprogress.c gvfsjobprogress.h \
 	gvfsjobmount.c gvfsjobmount.h \
 	gvfsjobunmount.c gvfsjobunmount.h \
 	gvfsjobmountmountable.c gvfsjobmountmountable.h \

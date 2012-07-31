@@ -28,20 +28,17 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobmove.h"
-#include "gvfsdbusutils.h"
-#include "gvfsdaemonprotocol.h"
 #include "gvfsjobsetattribute.h"
 
 G_DEFINE_TYPE (GVfsJobSetAttribute, g_vfs_job_set_attribute, G_VFS_TYPE_JOB_DBUS)
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
-static DBusMessage *create_reply (GVfsJob        *job,
-				  DBusConnection *connection,
-				  DBusMessage    *message);
+static void         create_reply (GVfsJob               *job,
+                                  GVfsDBusMount         *object,
+                                  GDBusMethodInvocation *invocation);
 
 static void
 g_vfs_job_set_attribute_finalize (GObject *object)
@@ -78,65 +75,47 @@ g_vfs_job_set_attribute_init (GVfsJobSetAttribute *job)
   job->type = G_FILE_ATTRIBUTE_TYPE_INVALID;
 }
 
-GVfsJob *
-g_vfs_job_set_attribute_new (DBusConnection *connection,
-			     DBusMessage *message,
-			     GVfsBackend *backend)
+gboolean
+g_vfs_job_set_attribute_new_handle (GVfsDBusMount *object,
+                                    GDBusMethodInvocation *invocation,
+                                    const gchar *arg_path_data,
+                                    guint arg_flags,
+                                    GVariant *arg_attribute,
+                                    GVfsBackend *backend)
 {
   GVfsJobSetAttribute *job;
-  DBusMessage *reply;
-  DBusMessageIter iter, array_iter;
-  const gchar *filename = NULL;
-  gint filename_len;
-  GFileQueryInfoFlags flags;
   gchar *attribute;
-  dbus_uint32_t flags_u32 = 0;
   GFileAttributeType type;
-  GDbusAttributeValue value;
+  GDBusAttributeValue value;
+
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
   
-  dbus_message_iter_init (message, &iter);
-
-  if (dbus_message_iter_get_arg_type (&iter) == DBUS_TYPE_ARRAY &&
-      dbus_message_iter_get_element_type (&iter) == DBUS_TYPE_BYTE)
+  if (! _g_dbus_get_file_attribute (arg_attribute, &attribute, NULL, &type, &value))
     {
-      dbus_message_iter_recurse (&iter, &array_iter);
-      dbus_message_iter_get_fixed_array (&array_iter, &filename, &filename_len);
-    }
-
-  dbus_message_iter_next (&iter);
-
-  if (dbus_message_iter_get_arg_type (&iter) == DBUS_TYPE_UINT32)
-    {
-      dbus_message_iter_get_basic (&iter, &flags_u32);
-      dbus_message_iter_next (&iter);
-    }
-
-  flags = flags_u32;
-
-  if (!(filename && _g_dbus_get_file_attribute (&iter, &attribute, NULL, &type, &value)))
-    {
-      reply = dbus_message_new_error (message,
-				      DBUS_ERROR_FAILED,
-                                      _("Invalid dbus message"));
-
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return NULL;
+      g_dbus_method_invocation_return_error_literal (invocation,
+                                                     G_IO_ERROR,
+                                                     G_IO_ERROR_INVALID_ARGUMENT,
+                                                     _("Invalid dbus message"));
+      return TRUE;
     }
 
   job = g_object_new (G_VFS_TYPE_JOB_SET_ATTRIBUTE,
-		      "message", message,
-		      "connection", connection,
-		      NULL);
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
 
   job->backend = backend;
-  job->filename = g_strndup (filename, filename_len);
+  job->filename = g_strdup (arg_path_data);
   job->attribute = attribute;
   job->value = value;
   job->type = type;
-  job->flags = flags;
+  job->flags = arg_flags;
 
-  return G_VFS_JOB (job);
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
 }
 
 static void
@@ -180,14 +159,10 @@ try (GVfsJob *job)
 }
 
 /* Might be called on an i/o thread */
-static DBusMessage *
+static void
 create_reply (GVfsJob *job,
-	      DBusConnection *connection,
-	      DBusMessage *message)
+              GVfsDBusMount *object,
+              GDBusMethodInvocation *invocation)
 {
-  DBusMessage *reply;
-
-  reply = dbus_message_new_method_return (message);
-  
-  return reply;
+  gvfs_dbus_mount_complete_set_attribute (object, invocation);
 }

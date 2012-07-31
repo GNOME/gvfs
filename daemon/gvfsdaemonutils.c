@@ -35,84 +35,9 @@
 #include <glib/gi18n.h>
 
 #include <gio/gio.h>
-#include "gvfsdbusutils.h"
-#include "gsysutils.h"
 #include "gvfsdaemonutils.h"
 #include "gvfsdaemonprotocol.h"
 
-static gint32 extra_fd_slot = -1;
-static GMutex extra_lock;
-
-typedef struct {
-  int extra_fd;
-  int fd_count;
-} ConnectionExtra;
-
-static void
-free_extra (gpointer p)
-{
-  ConnectionExtra *extra = p;
-  close (extra->extra_fd);
-  g_free (extra);
-}
-
-void
-dbus_connection_add_fd_send_fd (DBusConnection *connection,
-				int extra_fd)
-{
-  ConnectionExtra *extra;
-
-  if (extra_fd_slot == -1 && 
-      !dbus_connection_allocate_data_slot (&extra_fd_slot))
-    g_error ("Unable to allocate data slot");
-
-  extra = g_new0 (ConnectionExtra, 1);
-  extra->extra_fd = extra_fd;
-  
-  if (!dbus_connection_set_data (connection, extra_fd_slot, extra, free_extra))
-    _g_dbus_oom ();
-}
-
-gboolean 
-dbus_connection_send_fd (DBusConnection *connection,
-			 int fd, 
-			 int *fd_id,
-			 GError **error)
-{
-  ConnectionExtra *extra;
-
-  g_assert (extra_fd_slot != -1);
-  extra = dbus_connection_get_data (connection, extra_fd_slot);
-  g_assert (extra != NULL);
-
-  if (extra->extra_fd == -1)
-    {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_FAILED,
-		   _("Internal Error (%s)"), "No fd passing socket available");
-      return FALSE;
-    }
-
-  g_mutex_lock (&extra_lock);
-
-  if (_g_socket_send_fd (extra->extra_fd, fd) == -1)
-    {
-      int errsv = errno;
-
-      g_set_error (error, G_IO_ERROR,
-		   g_io_error_from_errno (errsv),
-		   _("Error sending file descriptor: %s"),
-		   g_strerror (errsv));
-      g_mutex_unlock (&extra_lock);
-      return FALSE;
-    }
-
-  *fd_id = extra->fd_count++;
-
-  g_mutex_unlock (&extra_lock);
-
-  return TRUE;
-}
 
 char *
 g_error_to_daemon_reply (GError *error, guint32 seq_nr, gsize *len_out)

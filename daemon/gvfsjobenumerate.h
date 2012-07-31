@@ -51,9 +51,7 @@ struct _GVfsJobEnumerate
   GFileQueryInfoFlags flags;
   char *uri;
 
-  DBusMessage *building_infos;
-  DBusMessageIter building_iter;
-  DBusMessageIter building_array_iter;
+  GVariantBuilder *building_infos;
   int n_building_infos;
 };
 
@@ -64,9 +62,15 @@ struct _GVfsJobEnumerateClass
 
 GType g_vfs_job_enumerate_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_enumerate_new        (DBusConnection        *connection,
-					 DBusMessage           *message,
-					 GVfsBackend           *backend);
+gboolean g_vfs_job_enumerate_new_handle (GVfsDBusMount         *object,
+                                         GDBusMethodInvocation *invocation,
+                                         const gchar           *arg_path_data,
+                                         const gchar           *arg_obj_path,
+                                         const gchar           *arg_attributes,
+                                         guint                  arg_flags,
+                                         const gchar           *arg_uri,
+                                         GVfsBackend           *backend);
+
 void     g_vfs_job_enumerate_add_info   (GVfsJobEnumerate      *job,
 					 GFileInfo             *info);
 void     g_vfs_job_enumerate_add_infos  (GVfsJobEnumerate      *job,

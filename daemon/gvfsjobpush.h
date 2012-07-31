@@ -27,6 +27,7 @@
 #include <gvfsjob.h>
 #include <gvfsjobdbus.h>
 #include <gvfsbackend.h>
+#include <gvfsjobprogress.h>
 
 G_BEGIN_DECLS
 
@@ -41,27 +42,31 @@ typedef struct _GVfsJobPushClass   GVfsJobPushClass;
 
 struct _GVfsJobPush
 {
-  GVfsJobDBus parent_instance;
+  GVfsJobProgress parent_instance;
 
   GVfsBackend *backend;
   char *destination;
   char *local_path;
   GFileCopyFlags flags;
-  char *callback_obj_path;
-  gboolean send_progress;
   gboolean remove_source;
 };
 
 struct _GVfsJobPushClass
 {
-  GVfsJobDBusClass parent_class;
+  GVfsJobProgressClass parent_class;
 };
 
 GType g_vfs_job_push_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_push_new (DBusConnection *connection,
-                             DBusMessage    *message,
-                             GVfsBackend    *backend);
+gboolean g_vfs_job_push_new_handle (GVfsDBusMount         *object,
+                                    GDBusMethodInvocation *invocation,
+                                    const gchar           *arg_path_data,
+                                    const gchar           *arg_local_path,
+                                    gboolean               arg_send_progress,
+                                    guint                  arg_flags,
+                                    const gchar           *arg_progress_obj_path,
+                                    gboolean               arg_remove_source,
+                                    GVfsBackend           *backend);
 
 G_END_DECLS
 

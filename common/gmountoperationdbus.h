@@ -33,7 +33,7 @@
 G_BEGIN_DECLS
 
 GMountSource *g_mount_operation_dbus_wrap (GMountOperation *op,
-					   DBusConnection *connection);
+                                           GDBusConnection *connection);
 
 G_END_DECLS
 

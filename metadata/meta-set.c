@@ -1,8 +1,6 @@
 #include "config.h"
 #include "metatree.h"
 #include <glib/gstdio.h>
-/*  TODO: remove + remove traces in Makefile.am  */
-#include <dbus/dbus.h>
 #include "gvfsdaemonprotocol.h"
 #include "metadata-dbus.h"
 

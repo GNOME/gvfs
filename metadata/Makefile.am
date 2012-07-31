@@ -4,11 +4,11 @@ dbus_built_sources = metadata-dbus.c metadata-dbus.h
 BUILT_SOURCES = $(dbus_built_sources)
 
 $(dbus_built_sources) : Makefile.am dbus-interface.xml
-	gdbus-codegen						\
+	$(AM_V_GEN) gdbus-codegen				\
 		--interface-prefix org.gtk.vfs.			\
 		--c-namespace GVfs				\
 		--generate-c-code metadata-dbus			\
-		$(srcdir)/dbus-interface.xml				\
+		$(srcdir)/dbus-interface.xml			\
 		$(NULL)
 
 noinst_LTLIBRARIES=libmetadata.la
@@ -31,7 +31,7 @@ libexec_PROGRAMS =\
 	$(NULL)
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/common \
-	$(LIBXML_CFLAGS) $(GLIB_CFLAGS) $(DBUS_CFLAGS) \
+	$(LIBXML_CFLAGS) $(GLIB_CFLAGS) \
 	$(UDEV_CFLAGS) \
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"     \
 	-DG_LOG_DOMAIN=\"GVFS\" \

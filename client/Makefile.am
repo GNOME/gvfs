@@ -5,6 +5,7 @@ INCLUDES = -I$(top_srcdir) \
 	-I$(top_srcdir)/metadata \
 	-I$(top_builddir)/metadata \
 	-I$(top_srcdir)/common \
+	-I$(top_builddir)/common \
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) \
 	-DG_LOG_DOMAIN=\"GVFS\" \
 	-DGVFS_MODULE_DIR=\"$(libdir)/gvfs/modules\"	\
@@ -74,6 +75,7 @@ gvfsd_fuse_SOURCES = \
 gvfsd_fuse_CFLAGS = \
 	-I$(top_srcdir) \
         -I$(top_srcdir)/common \
+        -I$(top_builddir)/common \
         $(GLIB_CFLAGS) $(DBUS_CFLAGS) $(FUSE_CFLAGS) \
         -UG_LOG_DOMAIN -DG_LOG_DOMAIN=\"GVFS-FUSE\" \
         -DDBUS_API_SUBJECT_TO_CHANGE

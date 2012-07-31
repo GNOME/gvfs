@@ -28,19 +28,17 @@
 #include <sys/un.h>
 
 #include <glib.h>
-#include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobdelete.h"
-#include "gvfsdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 
 G_DEFINE_TYPE (GVfsJobDelete, g_vfs_job_delete, G_VFS_TYPE_JOB_DBUS)
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
-static DBusMessage *create_reply (GVfsJob        *job,
-				  DBusConnection *connection,
-				  DBusMessage    *message);
+static void         create_reply (GVfsJob               *job,
+                                  GVfsDBusMount         *object,
+                                  GDBusMethodInvocation *invocation);
 
 static void
 g_vfs_job_delete_finalize (GObject *object)
@@ -73,42 +71,29 @@ g_vfs_job_delete_init (GVfsJobDelete *job)
 {
 }
 
-GVfsJob *
-g_vfs_job_delete_new (DBusConnection *connection,
-			DBusMessage *message,
-			GVfsBackend *backend)
+gboolean
+g_vfs_job_delete_new_handle (GVfsDBusMount *object,
+                             GDBusMethodInvocation *invocation,
+                             const gchar *arg_path_data,
+                             GVfsBackend *backend)
 {
   GVfsJobDelete *job;
-  DBusMessage *reply;
-  DBusError derror;
-  int path_len;
-  const char *path_data;
-  
-  dbus_error_init (&derror);
-  if (!dbus_message_get_args (message, &derror, 
-			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
-			      &path_data, &path_len,
-			      0))
-    {
-      reply = dbus_message_new_error (message,
-				      derror.name,
-                                      derror.message);
-      dbus_error_free (&derror);
 
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-      return NULL;
-    }
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
 
   job = g_object_new (G_VFS_TYPE_JOB_DELETE,
-		      "message", message,
-		      "connection", connection,
-		      NULL);
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
 
-  job->filename = g_strndup (path_data, path_len);
+  job->filename = g_strdup (arg_path_data);
   job->backend = backend;
-  
-  return G_VFS_JOB (job);
+
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
 }
 
 static void
@@ -144,14 +129,10 @@ try (GVfsJob *job)
 }
 
 /* Might be called on an i/o thread */
-static DBusMessage *
+static void
 create_reply (GVfsJob *job,
-	      DBusConnection *connection,
-	      DBusMessage *message)
+              GVfsDBusMount *object,
+              GDBusMethodInvocation *invocation)
 {
-  DBusMessage *reply;
-
-  reply = dbus_message_new_method_return (message);
-  
-  return reply;
+  gvfs_dbus_mount_complete_delete (object, invocation);
 }

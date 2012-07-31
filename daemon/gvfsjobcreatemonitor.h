@@ -59,10 +59,17 @@ struct _GVfsJobCreateMonitorClass
 
 GType g_vfs_job_create_monitor_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_create_monitor_new         (DBusConnection       *connection,
-					       DBusMessage          *message,
-					       GVfsBackend          *backend,
-					       gboolean              is_directory);
+gboolean g_vfs_job_create_file_monitor_new_handle      (GVfsDBusMount         *object,
+                                                        GDBusMethodInvocation *invocation,
+                                                        const gchar           *arg_path_data,
+                                                        guint                  arg_flags,
+                                                        GVfsBackend           *backend);
+gboolean g_vfs_job_create_directory_monitor_new_handle (GVfsDBusMount         *object,
+                                                        GDBusMethodInvocation *invocation,
+                                                        const gchar           *arg_path_data,
+                                                        guint                  arg_flags,
+                                                        GVfsBackend           *backend);
+
 void     g_vfs_job_create_monitor_set_monitor (GVfsJobCreateMonitor *job,
 					       GVfsMonitor          *monitor);
 

@@ -58,9 +58,12 @@ struct _GVfsJobUnmountClass
 
 GType g_vfs_job_unmount_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_unmount_new (DBusConnection *connection,
-				DBusMessage *request,
-				GVfsBackend *backend);
+gboolean g_vfs_job_unmount_new_handle (GVfsDBusMount         *object,
+                                       GDBusMethodInvocation *invocation,
+                                       const gchar           *arg_dbus_id,
+                                       const gchar           *arg_obj_path,
+                                       guint                  arg_flags,
+                                       GVfsBackend           *backend);
 
 G_END_DECLS
 

@@ -35,14 +35,12 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 #include <glib-object.h>
-#include <dbus-gmain.h>
 #include <gvfsdaemon.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
 #include <gvfsjobmount.h>
 #include <gvfsjobopenforread.h>
 #include <gvfsjobopenforwrite.h>
-#include <gvfsdbusutils.h>
 
 enum {
   PROP_0
@@ -50,8 +48,10 @@ enum {
 
 typedef struct {
   char *obj_path;
-  DBusObjectPathMessageFunction callback;
+  GVfsRegisterPathCallback callback;
   gpointer data;
+  GDBusInterfaceSkeleton *session_skeleton;
+  GHashTable *client_skeletons;
 } RegisteredPath;
 
 struct _GVfsDaemon
@@ -62,26 +62,28 @@ struct _GVfsDaemon
   gboolean main_daemon;
 
   GThreadPool *thread_pool;
-  DBusConnection *session_bus;
   GHashTable *registered_paths;
+  GHashTable *client_connections;
   GList *jobs;
   GList *job_sources;
 
   guint exit_tag;
   
   gint mount_counter;
+  
+  GDBusConnection *conn;
+  GVfsDBusDaemon *daemon_skeleton;
+  GVfsDBusMountable *mountable_skeleton;
+  guint name_watcher;
+  gboolean lost_main_daemon;
 };
 
 typedef struct {
   GVfsDaemon *daemon;
   char *socket_dir;
-  guint io_watch;
-  DBusServer *server;
+  GDBusServer *server;
   
-  gboolean got_dbus_connection;
-  gboolean got_fd_connection;
-  int fd;
-  DBusConnection *conn;
+  GDBusConnection *conn;
 } NewConnectionData;
 
 static void              g_vfs_daemon_get_property (GObject        *object,
@@ -92,12 +94,25 @@ static void              g_vfs_daemon_set_property (GObject        *object,
 						    guint           prop_id,
 						    const GValue   *value,
 						    GParamSpec     *pspec);
-static DBusHandlerResult daemon_message_func       (DBusConnection *conn,
-						    DBusMessage    *message,
-						    gpointer        data);
-static DBusHandlerResult peer_to_peer_filter_func  (DBusConnection *conn,
-						    DBusMessage    *message,
-						    gpointer        data);
+
+static gboolean          handle_get_connection     (GVfsDBusDaemon        *object,
+                                                    GDBusMethodInvocation *invocation,
+                                                    gpointer               user_data);
+static gboolean          handle_cancel             (GVfsDBusDaemon        *object,
+                                                    GDBusMethodInvocation *invocation,
+                                                    guint                  arg_serial,
+                                                    gpointer               user_data);
+static gboolean          daemon_handle_mount       (GVfsDBusMountable     *object,
+                                                    GDBusMethodInvocation *invocation,
+                                                    GVariant              *arg_mount_spec,
+                                                    gboolean               arg_automount,
+                                                    GVariant              *arg_mount_source,
+                                                    gpointer               user_data);
+static void              g_vfs_daemon_re_register_job_sources (GVfsDaemon *daemon);
+
+
+
+
 
 
 G_DEFINE_TYPE (GVfsDaemon, g_vfs_daemon, G_TYPE_OBJECT)
@@ -106,6 +121,14 @@ static void
 registered_path_free (RegisteredPath *data)
 {
   g_free (data->obj_path);
+  if (data->session_skeleton)
+    {
+      /* Unexport the interface skeleton on session bus */
+      g_dbus_interface_skeleton_unexport (data->session_skeleton);
+      g_object_unref (data->session_skeleton);
+    }
+  g_hash_table_destroy (data->client_skeletons);
+  
   g_free (data);
 }
 
@@ -118,7 +141,24 @@ g_vfs_daemon_finalize (GObject *object)
 
   g_assert (daemon->jobs == NULL);
 
+  if (daemon->name_watcher)
+    g_bus_unwatch_name (daemon->name_watcher);
+  
+  if (daemon->daemon_skeleton != NULL)
+    {
+      g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (daemon->daemon_skeleton));
+      g_object_unref (daemon->daemon_skeleton);
+    }
+  if (daemon->mountable_skeleton != NULL)
+    {
+      g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (daemon->mountable_skeleton));
+      g_object_unref (daemon->mountable_skeleton);
+    }
+  if (daemon->conn != NULL)
+    g_object_unref (daemon->conn);
+  
   g_hash_table_destroy (daemon->registered_paths);
+  g_hash_table_destroy (daemon->client_connections);
   g_mutex_clear (&daemon->lock);
 
   if (G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize)
@@ -145,12 +185,39 @@ job_handler_callback (gpointer       data,
 }
 
 static void
+name_appeared_handler (GDBusConnection *connection,
+                       const gchar *name,
+                       const gchar *name_owner,
+                       gpointer user_data)
+{
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
+
+  if (strcmp (name, G_VFS_DBUS_DAEMON_NAME) == 0 &&
+      *name_owner != 0 &&
+      daemon->lost_main_daemon)
+      {
+        /* There is a new owner. Register mounts with it */
+        g_vfs_daemon_re_register_job_sources (daemon);
+      }
+}
+
+static void 
+name_vanished_handler (GDBusConnection *connection,
+                       const gchar *name,
+                       gpointer user_data)
+{
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
+
+  /* Ensure we react only to really lost daemon */ 
+  daemon->lost_main_daemon = TRUE;
+}
+
+static void
 g_vfs_daemon_init (GVfsDaemon *daemon)
 {
+  GError *error;
   gint max_threads = 1; /* TODO: handle max threads */
-  DBusError error;
-  
-  daemon->session_bus = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+
   daemon->thread_pool = g_thread_pool_new (job_handler_callback,
 					   daemon,
 					   max_threads,
@@ -165,25 +232,44 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
   daemon->jobs = NULL;
   daemon->registered_paths =
     g_hash_table_new_full (g_str_hash, g_str_equal,
-			   NULL, (GDestroyNotify)registered_path_free);
+			   g_free, (GDestroyNotify)registered_path_free);
 
-  dbus_error_init (&error);
-  dbus_bus_add_match (daemon->session_bus,
-		      "type='signal',"		      
-		      "interface='org.freedesktop.DBus',"
-		      "member='NameOwnerChanged',"
-		      "arg0='"G_VFS_DBUS_DAEMON_NAME"'",
-		      &error);
+  /* This is where we store active client connections so when a new filter is registered,
+   * we re-register them on all active connections */
+  daemon->client_connections =
+    g_hash_table_new_full (g_direct_hash, g_direct_equal, g_object_unref, NULL);
+
+  daemon->conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
+  g_assert (daemon->conn != NULL);
+
+  daemon->daemon_skeleton = gvfs_dbus_daemon_skeleton_new ();
+  g_signal_connect (daemon->daemon_skeleton, "handle-get-connection", G_CALLBACK (handle_get_connection), daemon);
+  g_signal_connect (daemon->daemon_skeleton, "handle-cancel", G_CALLBACK (handle_cancel), daemon);
   
-  if (dbus_error_is_set (&error))
+  error = NULL;
+  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (daemon->daemon_skeleton),
+                                         daemon->conn,
+                                         G_VFS_DBUS_DAEMON_PATH,
+                                         &error))
     {
-      g_warning ("Failed to add dbus match: %s\n", error.message);
-      dbus_error_free (&error);
+      g_warning ("Error exporting daemon interface: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
     }
+
+  daemon->mountable_skeleton = gvfs_dbus_mountable_skeleton_new ();
+  g_signal_connect (daemon->mountable_skeleton, "handle-mount", G_CALLBACK (daemon_handle_mount), daemon);
   
-  if (!dbus_connection_add_filter (daemon->session_bus,
-				   daemon_message_func, daemon, NULL))
-    _g_dbus_oom ();
+  error = NULL;
+  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (daemon->mountable_skeleton),
+      daemon->conn,
+                                         G_VFS_DBUS_MOUNTABLE_PATH,
+                                         &error))
+    {
+      g_warning ("Error exporting mountable interface: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
 }
 
 static void
@@ -192,11 +278,6 @@ g_vfs_daemon_set_property (GObject         *object,
 			   const GValue    *value,
 			   GParamSpec      *pspec)
 {
-#if 0
-  GVfsDaemon *daemon;
-  
-  daemon = G_VFS_DAEMON (object);
-#endif
   switch (prop_id)
     {
     default:
@@ -211,11 +292,6 @@ g_vfs_daemon_get_property (GObject    *object,
 			   GValue     *value,
 			   GParamSpec *pspec)
 {
-#if 0
-  GVfsDaemon *daemon;
-  
-  daemon = G_VFS_DAEMON (object);
-#endif
   switch (prop_id)
     {
     default:
@@ -228,58 +304,34 @@ GVfsDaemon *
 g_vfs_daemon_new (gboolean main_daemon, gboolean replace)
 {
   GVfsDaemon *daemon;
-  DBusConnection *conn;
-  DBusError error;
-  unsigned int flags;
-  int ret;
+  GDBusConnection *conn;
+  GError *error;
 
-  dbus_error_init (&error);
-  conn = dbus_bus_get (DBUS_BUS_SESSION, &error);
+  error = NULL;
+  conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   if (!conn)
     {
-      g_printerr ("Failed to connect to the D-BUS daemon: %s\n",
-		  error.message);
-      
-      dbus_error_free (&error);
+      g_printerr ("Failed to connect to the D-BUS daemon: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
       return NULL;
     }
 
-  dbus_connection_setup_with_g_main (conn, NULL);
-  
   daemon = g_object_new (G_VFS_TYPE_DAEMON, NULL);
   daemon->main_daemon = main_daemon;
-
-  /* Request name only after we've installed the message filter */
-  if (main_daemon)
+  
+  if (! main_daemon)
     {
-      flags = DBUS_NAME_FLAG_ALLOW_REPLACEMENT | DBUS_NAME_FLAG_DO_NOT_QUEUE;
-      if (replace)
-	flags |= DBUS_NAME_FLAG_REPLACE_EXISTING;
-
-      ret = dbus_bus_request_name (conn, G_VFS_DBUS_DAEMON_NAME, flags, &error);
-      if (ret == -1)
-	{
-	  g_printerr ("Failed to acquire daemon name: %s", error.message);
-	  dbus_error_free (&error);
-	  
-	  g_object_unref (daemon);
-	  daemon = NULL;
-	}
-      else if (ret == DBUS_REQUEST_NAME_REPLY_EXISTS)
-	{
-	  g_printerr ("VFS daemon already running, exiting.\n");
-	  g_object_unref (daemon);
-	  daemon = NULL;
-	}
-      else if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
-	{
-	  g_printerr ("Not primary owner of the service, exiting.\n");
-	  g_object_unref (daemon);
-	  daemon = NULL;
-	}
+      daemon->name_watcher = g_bus_watch_name_on_connection (conn,
+                                                             G_VFS_DBUS_DAEMON_NAME,
+                                                             G_BUS_NAME_WATCHER_FLAGS_AUTO_START,
+                                                             name_appeared_handler,
+                                                             name_vanished_handler,
+                                                             daemon,
+                                                             NULL);
     }
 
-  dbus_connection_unref (conn);
+  g_object_unref (conn);
   
   return daemon;
 }
@@ -348,6 +400,20 @@ job_source_closed_callback (GVfsJobSource *job_source,
 }
 
 static void
+re_register_jobs_cb (GVfsDBusMountTracker *proxy,
+                     GAsyncResult *res,
+                     gpointer user_data)
+{
+  GError *error = NULL;
+
+  gvfs_dbus_mount_tracker_call_register_mount_finish (proxy,
+                                                      res,
+                                                      &error);
+  g_debug ("re_register_jobs_cb, error: %p\n", error);
+  g_clear_error (&error);
+}
+
+static void
 g_vfs_daemon_re_register_job_sources (GVfsDaemon *daemon)
 {
   GList *l;
@@ -358,12 +424,12 @@ g_vfs_daemon_re_register_job_sources (GVfsDaemon *daemon)
     {
       if (G_VFS_IS_BACKEND (l->data))
 	{
-	  GVfsBackend *backend = l->data;
+	  GVfsBackend *backend = G_VFS_BACKEND (l->data);
 
 	  /* Only re-register if we registered before, not e.g
 	     if we're currently mounting. */
 	  if (g_vfs_backend_is_mounted (backend))
-	    g_vfs_backend_register_mount (backend, NULL, NULL);
+	    g_vfs_backend_register_mount (backend, (GAsyncReadyCallback) re_register_jobs_cb, NULL);
 	}
     }
   
@@ -391,12 +457,48 @@ g_vfs_daemon_add_job_source (GVfsDaemon *daemon,
   g_mutex_unlock (&daemon->lock);
 }
 
-/* This registers a dbus callback on *all* connections, client and session bus */
+static void
+unref_skeleton (gpointer object)
+{
+  GDBusInterfaceSkeleton *skeleton = object;
+
+  g_dbus_interface_skeleton_unexport (skeleton);
+  g_object_unref (skeleton);
+}
+
+static void
+peer_register_skeleton (const gchar *obj_path,
+                        RegisteredPath *reg_path,
+                        GDBusConnection *dbus_conn)
+{
+  GDBusInterfaceSkeleton *skeleton;
+
+  if (! g_hash_table_contains (reg_path->client_skeletons, dbus_conn))
+    {
+      skeleton = reg_path->callback (dbus_conn, obj_path, reg_path->data);
+      g_hash_table_insert (reg_path->client_skeletons, dbus_conn, skeleton);
+    }
+  else
+    {
+      /* Interface skeleton has been already registered on the connection, skipping */
+    }
+}
+
+static void
+client_conn_register_skeleton (GDBusConnection *dbus_conn,
+                               gpointer value,
+                               RegisteredPath *reg_path)
+{
+  peer_register_skeleton (reg_path->obj_path, reg_path, dbus_conn);
+}
+
+/* This registers a dbus interface skeleton on *all* connections, client and session bus */
+/* The object path needs to be unique globally. */
 void
 g_vfs_daemon_register_path (GVfsDaemon *daemon,
-			    const char *obj_path,
-			    DBusObjectPathMessageFunction callback,
-			    gpointer user_data)
+                            const char *obj_path,
+                            GVfsRegisterPathCallback callback,
+                            gpointer user_data)
 {
   RegisteredPath *data;
 
@@ -404,9 +506,18 @@ g_vfs_daemon_register_path (GVfsDaemon *daemon,
   data->obj_path = g_strdup (obj_path);
   data->callback = callback;
   data->data = user_data;
-
-  g_hash_table_insert (daemon->registered_paths, data->obj_path,
-		       data);
+  data->client_skeletons = g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, (GDestroyNotify)unref_skeleton);
+  
+  g_hash_table_insert (daemon->registered_paths, g_strdup (obj_path), data);
+  
+  /* Export the newly registered interface skeleton on session bus */
+  /* TODO: change the way we export skeletons on connections once 
+   *       https://bugzilla.gnome.org/show_bug.cgi?id=662718 is in place.
+   */ 
+  data->session_skeleton = callback (daemon->conn, obj_path, user_data);
+  
+  /* Export this newly registered path to all active client connections */
+  g_hash_table_foreach (daemon->client_connections, (GHFunc) client_conn_register_skeleton, data);
 }
 
 void
@@ -476,41 +587,86 @@ new_connection_data_free (void *memory)
   if (data->socket_dir) 
     rmdir (data->socket_dir);
 
-  if (data->io_watch)
-    g_source_remove (data->io_watch);
-
   g_free (data->socket_dir);
   g_free (data);
 }
 
 static void
+peer_unregister_skeleton (const gchar *obj_path,
+                          RegisteredPath *reg_path,
+                          GDBusConnection *dbus_conn)
+{
+  g_hash_table_remove (reg_path->client_skeletons, dbus_conn);
+}
+
+static void
+peer_connection_closed (GDBusConnection *connection,
+                        gboolean         remote_peer_vanished,
+                        GError          *error,
+                        gpointer         user_data)
+{
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
+  GList *l;
+  GVfsDBusDaemon *daemon_skeleton;
+
+  g_mutex_lock (&daemon->lock);
+  for (l = daemon->jobs; l != NULL; l = l->next)
+    {
+      GVfsJob *job = G_VFS_JOB (l->data);
+      
+      if (G_VFS_IS_JOB_DBUS (job) &&
+          G_VFS_JOB_DBUS (job)->invocation &&
+          g_dbus_method_invocation_get_connection (G_VFS_JOB_DBUS (job)->invocation) == connection)
+        g_vfs_job_cancel (job);
+    }
+  g_mutex_unlock (&daemon->lock);
+
+
+  daemon_skeleton = g_object_get_data (G_OBJECT (connection), "daemon_skeleton");
+  /* daemon_skeleton should be always valid in this case */
+  g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (daemon_skeleton));
+  
+  g_hash_table_remove (daemon->client_connections, connection);
+
+  /* Unexport the registered interface skeletons */
+  g_hash_table_foreach (daemon->registered_paths, (GHFunc) peer_unregister_skeleton, connection);
+
+  /* The peer-to-peer connection was disconnected */
+  g_signal_handlers_disconnect_by_data (connection, user_data);
+  g_object_unref (connection);
+}
+
+static void
 daemon_peer_connection_setup (GVfsDaemon *daemon,
-			      DBusConnection *dbus_conn,
+                              GDBusConnection *dbus_conn,
 			      NewConnectionData *data)
 {
-  /* We wait until we have the extra fd */
-  if (!data->got_fd_connection)
-    return;
+  GVfsDBusDaemon *daemon_skeleton;
+  GError *error;
 
-  if (data->fd == -1)
+  daemon_skeleton = gvfs_dbus_daemon_skeleton_new ();
+  g_signal_connect (daemon_skeleton, "handle-cancel", G_CALLBACK (handle_cancel), daemon);
+  
+  error = NULL;
+  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (daemon_skeleton),
+                                         dbus_conn,
+                                         G_VFS_DBUS_DAEMON_PATH,
+                                         &error))
     {
-      /* The fd connection failed, abort the whole thing */
-      g_warning ("Failed to accept client: %s", "accept of extra fd failed");
-      dbus_connection_unref (dbus_conn);
+      g_warning ("Failed to accept client: %s, %s (%s, %d)", "object registration failed", 
+                 error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+      g_object_unref (data->conn);
       goto error_out;
     }
+  g_object_set_data_full (G_OBJECT (data->conn), "daemon_skeleton", daemon_skeleton, (GDestroyNotify) g_object_unref);
   
-  dbus_connection_setup_with_g_main (dbus_conn, NULL);
-  if (!dbus_connection_add_filter (dbus_conn, peer_to_peer_filter_func, daemon, NULL) ||
-      !dbus_connection_add_filter (dbus_conn, daemon_message_func, daemon, NULL))
-    {
-      g_warning ("Failed to accept client: %s", "object registration failed");
-      dbus_connection_unref (dbus_conn);
-      close (data->fd);
-      goto error_out;
-    }
+  /* Export registered interface skeletons on this new connection */
+  g_hash_table_foreach (daemon->registered_paths, (GHFunc) peer_register_skeleton, dbus_conn);
   
-  dbus_connection_add_fd_send_fd (dbus_conn, data->fd);
+  g_hash_table_insert (daemon->client_connections, g_object_ref (dbus_conn), NULL);
+
+  g_signal_connect (data->conn, "closed", G_CALLBACK (peer_connection_closed), data->daemon);
 
  error_out:
   new_connection_data_free (data);
@@ -615,12 +771,10 @@ create_socket_dir (void)
 #endif
 
 static void
-generate_addresses (char **address1,
-		    char **address2,
-		    char **folder)
+generate_address (char **address,
+		  char **folder)
 {
-  *address1 = NULL;
-  *address2 = NULL;
+  *address = NULL;
   *folder = NULL;
 
 #ifdef USE_ABSTRACT_SOCKETS
@@ -628,403 +782,167 @@ generate_addresses (char **address1,
     gchar  tmp[9];
 
     randomize_string (tmp);
-    *address1 = g_strdup_printf ("unix:abstract=/dbus-vfs-daemon/socket-%s", tmp);
-
-    randomize_string (tmp);
-    *address2 = g_strdup_printf ("unix:abstract=/dbus-vfs-daemon/socket-%s", tmp);
+    *address = g_strdup_printf ("unix:abstract=/dbus-vfs-daemon/socket-%s", tmp);
   }
 #else
   {
     char *dir;
     
     dir = create_socket_dir ();
-    *address1 = g_strdup_printf ("unix:path=%s/socket1", dir);
-    *address2 = g_strdup_printf ("unix:path=%s/socket2", dir);
+    *address = g_strdup_printf ("unix:path=%s/socket", dir);
     *folder = dir;
   }
 #endif
 }
 
-static void
-daemon_new_connection_func (DBusServer     *server,
-			    DBusConnection *conn,
-			    gpointer        user_data)
+static gboolean
+daemon_new_connection_func (GDBusServer *server,
+                            GDBusConnection *connection,
+                            gpointer user_data)
 {
   NewConnectionData *data;
 
   data = user_data;
-  data->got_dbus_connection = TRUE;
 
   /* Take ownership */
-  data->conn = dbus_connection_ref (conn);
+  data->conn = g_object_ref (connection);
 
-  daemon_peer_connection_setup (data->daemon, conn, data);
+  daemon_peer_connection_setup (data->daemon, data->conn, data);
 
   /* Kill the server, no more need for it */
-  dbus_server_disconnect (server);
-  dbus_server_unref (server);
-}
-
-static int
-unix_socket_at (const char *address)
-{
-  int fd;
-  const char *path;
-  size_t path_len;
-  struct sockaddr_un addr;
-
-  fd = socket (PF_UNIX, SOCK_STREAM, 0);
-  if (fd == -1)
-    return -1;
-
-#ifdef USE_ABSTRACT_SOCKETS  
-  path = address + strlen ("unix:abstract=");
-#else
-  path = address + strlen ("unix:path=");
-#endif
-    
-  memset (&addr, 0, sizeof (addr));
-  addr.sun_family = AF_UNIX;
-  path_len = strlen (path);
-
-#ifdef USE_ABSTRACT_SOCKETS
-  addr.sun_path[0] = '\0'; /* this is what says "use abstract" */
-  path_len++; /* Account for the extra nul byte added to the start of sun_path */
-
-  strncpy (&addr.sun_path[1], path, path_len);
-#else /* USE_ABSTRACT_SOCKETS */
-  strncpy (addr.sun_path, path, path_len);
-  unlink (path);
-#endif /* ! USE_ABSTRACT_SOCKETS */
+  g_dbus_server_stop (server);
+  g_object_unref (server);
   
-  if (bind (fd, (struct sockaddr*) &addr, 
-	    G_STRUCT_OFFSET (struct sockaddr_un, sun_path) + path_len) < 0)
-    {
-      close (fd);
-      return -1;
-    }
-
-  if (listen (fd, 30 /* backlog */) < 0)
-    {
-      close (fd);
-      return -1;
-    }
-  
-  return fd;
+  return TRUE;
 }
 
 static gboolean
-accept_new_fd_client (GIOChannel  *channel,
-		      GIOCondition cond,
-		      gpointer     callback_data)
+handle_get_connection (GVfsDBusDaemon *object,
+                       GDBusMethodInvocation *invocation,
+                       gpointer user_data)
 {
-  NewConnectionData *data = callback_data;
-  int fd;
-  int new_fd;
-  struct sockaddr_un addr;
-  socklen_t addrlen;
-
-  data->got_fd_connection = TRUE;
-  
-  fd = g_io_channel_unix_get_fd (channel);
-  
-  addrlen = sizeof (addr);
-  new_fd = accept (fd, (struct sockaddr *) &addr, &addrlen);
-
-  data->fd = new_fd;
-  data->io_watch = 0;
-
-  /* Did we already accept the dbus connection, if so, finish it now */
-  if (data->got_dbus_connection)
-    daemon_peer_connection_setup (data->daemon,
-				  data->conn,
-				  data);
-  else if (data->fd == -1)
-    {
-      /* Didn't accept a dbus connection, and there is no need for one now */
-      g_warning ("Failed to accept client: %s", "accept of extra fd failed");
-      dbus_server_disconnect (data->server);
-      dbus_server_unref (data->server);
-      new_connection_data_free (data);
-    }
-  
-  return FALSE;
-}
-
-static void
-daemon_handle_get_connection (DBusConnection *conn,
-			      DBusMessage *message,
-			      GVfsDaemon *daemon)
-{
-  DBusServer    *server;
-  DBusError      error;
-  DBusMessage   *reply;
-  gchar         *address1;
-  gchar         *address2;
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
+  GDBusServer *server;
+  GError *error;
+  gchar *address1;
   NewConnectionData *data;
-  GIOChannel *channel;
   char *socket_dir;
-  int fd;
+  gchar *guid;
   
-  generate_addresses (&address1, &address2, &socket_dir);
+  generate_address (&address1, &socket_dir);
 
   data = g_new (NewConnectionData, 1);
   data->daemon = daemon;
   data->socket_dir = socket_dir;
-  data->got_fd_connection = FALSE;
-  data->got_dbus_connection = FALSE;
-  data->fd = -1;
   data->conn = NULL;
-  
-  dbus_error_init (&error);
-  server = dbus_server_listen (address1, &error);
-  if (!server)
+
+  guid = g_dbus_generate_guid ();
+  error = NULL;
+  server = g_dbus_server_new_sync (address1,
+                                   G_DBUS_SERVER_FLAGS_NONE,
+                                   guid,
+                                   NULL, /* GDBusAuthObserver */
+                                   NULL, /* GCancellable */
+                                   &error);
+  g_free (guid);
+
+  if (server == NULL)
     {
-      reply = dbus_message_new_error_printf (message,
-					     G_VFS_DBUS_ERROR_SOCKET_FAILED,
-					     "Failed to create new socket: %s", 
-					     error.message);
-      dbus_error_free (&error);
-      if (reply)
-	{
-	  dbus_connection_send (conn, reply, NULL);
-	  dbus_message_unref (reply);
-	}
-      
+      g_dbus_method_invocation_return_gerror (invocation, error);
+      g_printerr ("daemon: Error creating server at address %s: %s\n", address1, error->message);
+      g_error_free (error);
       goto error_out;
     }
+
+  g_dbus_server_start (server);
   data->server = server;
 
-  dbus_server_set_new_connection_function (server,
-					   daemon_new_connection_func,
-					   data, NULL);
-  dbus_server_setup_with_g_main (server, NULL);
+  g_signal_connect (server, "new-connection", G_CALLBACK (daemon_new_connection_func), data);
   
-  fd = unix_socket_at (address2);
-  if (fd == -1)
-    goto error_out;
-
-  channel = g_io_channel_unix_new (fd);
-  g_io_channel_set_close_on_unref (channel, TRUE);
-  data->io_watch = g_io_add_watch (channel, G_IO_IN | G_IO_HUP, accept_new_fd_client, data);
-  g_io_channel_unref (channel);
-    
-  reply = dbus_message_new_method_return (message);
-  if (reply == NULL)
-    _g_dbus_oom ();
-
-  if (!dbus_message_append_args (reply,
-				 DBUS_TYPE_STRING, &address1,
-				 DBUS_TYPE_STRING, &address2,
-				 DBUS_TYPE_INVALID))
-    _g_dbus_oom ();
-  
-  dbus_connection_send (conn, reply, NULL);
-  
-  dbus_message_unref (reply);
+  gvfs_dbus_daemon_complete_get_connection (object,
+                                            invocation,
+                                            address1,
+                                            "");
 
   g_free (address1);
-  g_free (address2);
-
-  return;
+  return TRUE;
 
  error_out:
   g_free (data);
   g_free (address1);
-  g_free (address2);
   if (socket_dir)
     {
       rmdir (socket_dir);
       g_free (socket_dir);
     }
+  return TRUE;
 }
 
-static void
-daemon_start_mount (GVfsDaemon *daemon,
-		    DBusConnection *connection,
-		    DBusMessage *message)
+static gboolean
+handle_cancel (GVfsDBusDaemon *object,
+               GDBusMethodInvocation *invocation,
+               guint arg_serial,
+               gpointer user_data)
 {
-  const char *dbus_id, *obj_path;
-  DBusMessageIter iter;
-  DBusError derror;
-  DBusMessage *reply;
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
+  GList *l;
+  GVfsJob *job_to_cancel = NULL;
+
+  g_mutex_lock (&daemon->lock);
+  for (l = daemon->jobs; l != NULL; l = l->next)
+    {
+      GVfsJob *job = G_VFS_JOB (l->data);
+      
+      if (G_VFS_IS_JOB_DBUS (job) &&
+          g_vfs_job_dbus_is_serial (G_VFS_JOB_DBUS (job),
+                                    g_dbus_method_invocation_get_connection (invocation),
+                                    arg_serial))
+        {
+          job_to_cancel = g_object_ref (job);
+          break;
+        }
+    }
+  g_mutex_unlock (&daemon->lock);
+
+  if (job_to_cancel)
+    {
+      g_vfs_job_cancel (job_to_cancel);
+      g_object_unref (job_to_cancel);
+    }
+  
+  gvfs_dbus_daemon_complete_cancel (object, invocation);
+
+  return TRUE;
+}
+
+static gboolean
+daemon_handle_mount (GVfsDBusMountable *object,
+                     GDBusMethodInvocation *invocation,
+                     GVariant *arg_mount_spec,
+                     gboolean arg_automount,
+                     GVariant *arg_mount_source,
+                     gpointer user_data)
+{
+  GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
   GMountSpec *mount_spec;
   GMountSource *mount_source;
-  dbus_bool_t automount;
-
-  dbus_message_iter_init (message, &iter);
-
-  reply = NULL;
-  mount_spec = NULL;
-  dbus_error_init (&derror);
-  if ((mount_spec = g_mount_spec_from_dbus (&iter)) == NULL)
-    reply = dbus_message_new_error (message,
-				    DBUS_ERROR_INVALID_ARGS,
-				    "Error in mount spec");
-  else if (!_g_dbus_message_iter_get_args (&iter, &derror,
-					   DBUS_TYPE_BOOLEAN, &automount,
-					   DBUS_TYPE_STRING, &dbus_id,
-					   DBUS_TYPE_OBJECT_PATH, &obj_path,
-					   0))
+  
+  mount_spec = g_mount_spec_from_dbus (arg_mount_spec);
+  if (mount_spec == NULL)
+    g_dbus_method_invocation_return_error_literal (invocation,
+                                                   G_IO_ERROR,
+                                                   G_IO_ERROR_INVALID_ARGUMENT,
+                                                   "Error in mount spec");
+  else 
     {
-      reply = dbus_message_new_error (message, derror.name, derror.message);
-      dbus_error_free (&derror);
-    }
-
-  if (reply)
-    {
-      dbus_connection_send (connection, reply, NULL);
-      dbus_message_unref (reply);
-    }
-  else
-    {
-      mount_source = g_mount_source_new (dbus_id, obj_path);
-      g_vfs_daemon_initiate_mount (daemon, mount_spec, mount_source, automount, message);
+      mount_source = g_mount_source_from_dbus (arg_mount_source);
+      g_vfs_daemon_initiate_mount (daemon, mount_spec, mount_source, arg_automount,
+                                   object, invocation);
       g_object_unref (mount_source);
       g_mount_spec_unref (mount_spec);
     }
-}
-
-static DBusHandlerResult
-daemon_message_func (DBusConnection *conn,
-		     DBusMessage    *message,
-		     gpointer        data)
-{
-  GVfsDaemon *daemon = data;
-  RegisteredPath *registered_path;
-  const char *path;
-  char *name;
-  char *old_owner, *new_owner;
-
-  path = dbus_message_get_path (message);
-  if (path == NULL)
-    path = "";
   
-  if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameLost"))
-    {
-      if (dbus_message_get_args (message, NULL,
-				 DBUS_TYPE_STRING, &name,
-				 DBUS_TYPE_INVALID) &&
-	  strcmp (name, G_VFS_DBUS_DAEMON_NAME) == 0)
-	{
-	  /* Someone else got the name (i.e. someone used --replace), exit */
-	  if (daemon->main_daemon)
-	    exit (1);
-	}
-    }
-  else if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameOwnerChanged"))
-    {
-      if (dbus_message_get_args (message, NULL,
-				 DBUS_TYPE_STRING, &name,
-				 DBUS_TYPE_STRING, &old_owner,
-				 DBUS_TYPE_STRING, &new_owner,
-				 DBUS_TYPE_INVALID) &&
-	  strcmp (name, G_VFS_DBUS_DAEMON_NAME) == 0 &&
-	  *new_owner != 0 &&
-	  !daemon->main_daemon)
-	{
-	  /* There is a new owner. Register mounts with it */
-	  g_vfs_daemon_re_register_job_sources (daemon);
-	}
-      
-    }
-
-
-  if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_DAEMON_INTERFACE,
-				   G_VFS_DBUS_OP_GET_CONNECTION))
-    {
-      daemon_handle_get_connection (conn, message, daemon);
-      return DBUS_HANDLER_RESULT_HANDLED;
-    }
-
-  if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_DAEMON_INTERFACE,
-				   G_VFS_DBUS_OP_CANCEL))
-    {
-      GList *l;
-      dbus_uint32_t serial;
-      GVfsJob *job_to_cancel = NULL;
-      
-      if (dbus_message_get_args (message, NULL, 
-				 DBUS_TYPE_UINT32, &serial,
-				 DBUS_TYPE_INVALID))
-	{
-	  g_mutex_lock (&daemon->lock);
-	  for (l = daemon->jobs; l != NULL; l = l->next)
-	    {
-	      GVfsJob *job = l->data;
-	      
-	      if (G_VFS_IS_JOB_DBUS (job) &&
-		  g_vfs_job_dbus_is_serial (G_VFS_JOB_DBUS (job),
-					    conn, serial))
-		{
-		  job_to_cancel = g_object_ref (job);
-		  break;
-		}
-	    }
-	  g_mutex_unlock (&daemon->lock);
-
-
-	  if (job_to_cancel)
-	    {
-	      g_vfs_job_cancel (job_to_cancel);
-	      g_object_unref (job_to_cancel);
-	    }
-	}
-      
-      return DBUS_HANDLER_RESULT_HANDLED;
-    }
-
-  if (strcmp (path, G_VFS_DBUS_MOUNTABLE_PATH) == 0 &&
-      dbus_message_is_method_call (message,
-				   G_VFS_DBUS_MOUNTABLE_INTERFACE,
-				   G_VFS_DBUS_MOUNTABLE_OP_MOUNT))
-    {
-      daemon_start_mount (daemon, conn, message);
-      return DBUS_HANDLER_RESULT_HANDLED;
-    }
-  
-  registered_path = g_hash_table_lookup (daemon->registered_paths, path);
-  
-  if (registered_path)
-    return registered_path->callback (conn, message, registered_path->data);
-  else
-    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-}
-
-
-/* Only called for peer-to-peer connections */
-static DBusHandlerResult
-peer_to_peer_filter_func (DBusConnection *conn,
-			  DBusMessage    *message,
-			  gpointer        data)
-{
-  GVfsDaemon *daemon = data;
-
-  if (dbus_message_is_signal (message,
-			      DBUS_INTERFACE_LOCAL,
-			      "Disconnected"))
-    {
-      GList *l;
-
-      g_mutex_lock (&daemon->lock);
-      for (l = daemon->jobs; l != NULL; l = l->next)
-        {
-          GVfsJob *job = l->data;
-          
-          if (G_VFS_IS_JOB_DBUS (job) &&
-              G_VFS_JOB_DBUS (job)->connection == conn)
-            g_vfs_job_cancel (job);
-        }
-      g_mutex_unlock (&daemon->lock);
-
-      /* The peer-to-peer connection was disconnected */
-      dbus_connection_unref (conn);
-      return DBUS_HANDLER_RESULT_HANDLED;
-    }
-  
-  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+  return TRUE;
 }
 
 void
@@ -1032,15 +950,14 @@ g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
 			     GMountSpec *mount_spec,
 			     GMountSource *mount_source,
 			     gboolean is_automount,
-			     DBusMessage *request)
+			     GVfsDBusMountable *object,
+			     GDBusMethodInvocation *invocation)
 {
   const char *type;
   GType backend_type;
   char *obj_path;
   GVfsJob *job;
   GVfsBackend *backend;
-  DBusConnection *conn;
-  DBusMessage *reply;
 
   type = g_mount_spec_get_type (mount_spec);
 
@@ -1050,21 +967,11 @@ g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
 
   if (backend_type == G_TYPE_INVALID)
     {
-      if (request)
-	{
-	  reply = _dbus_message_new_gerror (request,
-					    G_IO_ERROR, G_IO_ERROR_FAILED,
-					    _("Invalid backend type"));
-	  
-	  /* Queues reply (threadsafely), actually sends it in mainloop */
-	  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-	  if (conn)
-	    {
-	      dbus_connection_send (conn, reply, NULL);
-	      dbus_message_unref (reply);
-	      dbus_connection_unref (conn);
-	    }
-	}
+      if (invocation)
+        g_dbus_method_invocation_return_error_literal (invocation,
+                                                       G_IO_ERROR,
+                                                       G_IO_ERROR_ALREADY_MOUNTED,
+                                                       "Mountpoint Already registered");
       else
 	g_warning ("Error mounting: invalid backend type\n");
       return;
@@ -1076,11 +983,11 @@ g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
 			  "object-path", obj_path,
 			  NULL);
   g_free (obj_path);
-
+  
   g_vfs_daemon_add_job_source (daemon, G_VFS_JOB_SOURCE (backend));
   g_object_unref (backend);
 
-  job = g_vfs_job_mount_new (mount_spec, mount_source, is_automount, request, backend);
+  job = g_vfs_job_mount_new (mount_spec, mount_source, is_automount, object, invocation, backend);
   g_vfs_daemon_queue_job (daemon, job);
   g_object_unref (job);
 }

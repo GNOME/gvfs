@@ -26,7 +26,7 @@
 #include <glib-object.h>
 #include <gvfsjobsource.h>
 #include <gmountsource.h>
-#include <dbus/dbus.h>
+#include <gvfsdbus.h>
 
 G_BEGIN_DECLS
 
@@ -49,6 +49,10 @@ struct _GVfsDaemonClass
   
 };
 
+typedef GDBusInterfaceSkeleton *  (*GVfsRegisterPathCallback)  (GDBusConnection *conn,
+                                                                const char      *obj_path,
+                                                                gpointer         data);
+
 GType g_vfs_daemon_get_type (void) G_GNUC_CONST;
 
 GVfsDaemon *g_vfs_daemon_new             (gboolean                       main_daemon,
@@ -60,16 +64,17 @@ void        g_vfs_daemon_add_job_source  (GVfsDaemon                    *daemon,
 void        g_vfs_daemon_queue_job       (GVfsDaemon                    *daemon,
 					  GVfsJob                       *job);
 void        g_vfs_daemon_register_path   (GVfsDaemon                    *daemon,
-					  const char                    *obj_path,
-					  DBusObjectPathMessageFunction  callback,
-					  gpointer                       user_data);
+                                          const char                    *obj_path,
+                                          GVfsRegisterPathCallback       callback,
+                                          gpointer                       user_data);
 void        g_vfs_daemon_unregister_path (GVfsDaemon                    *daemon,
 					  const char                    *obj_path);
 void        g_vfs_daemon_initiate_mount  (GVfsDaemon                    *daemon,
 					  GMountSpec                    *mount_spec,
 					  GMountSource                  *mount_source,
 					  gboolean                       is_automount,
-					  DBusMessage                   *request);
+	                                  GVfsDBusMountable             *object,
+					  GDBusMethodInvocation         *invocation);
 GArray     *g_vfs_daemon_get_blocking_processes (GVfsDaemon             *daemon);
 void        g_vfs_daemon_run_job_in_thread      (GVfsDaemon             *daemon,
 						 GVfsJob                *job);

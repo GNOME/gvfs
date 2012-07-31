@@ -60,9 +60,14 @@ struct _GVfsJobQueryInfoClass
 
 GType g_vfs_job_query_info_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_query_info_new (DBusConnection        *connection,
-				   DBusMessage           *message,
-				   GVfsBackend           *backend);
+gboolean g_vfs_job_query_info_new_handle (GVfsDBusMount *object,
+                                          GDBusMethodInvocation *invocation,
+                                          const gchar *arg_path_data,
+                                          const gchar *arg_attributes,
+                                          guint arg_flags,
+                                          const gchar *arg_uri,
+                                          GVfsBackend *backend);
+
 
 G_END_DECLS
 

@@ -58,10 +58,14 @@ struct _GVfsJobQueryAttributesClass
 
 GType g_vfs_job_query_attributes_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_query_attributes_new      (DBusConnection         *connection,
-					      DBusMessage            *message,
-					      GVfsBackend            *backend,
-					      gboolean                namespaces);
+gboolean g_vfs_job_query_settable_attributes_new_handle (GVfsDBusMount         *object,
+                                                         GDBusMethodInvocation *invocation,
+                                                         const gchar           *arg_path_data,
+                                                         GVfsBackend           *backend);
+gboolean g_vfs_job_query_writable_namespaces_new_handle (GVfsDBusMount         *object,
+                                                         GDBusMethodInvocation *invocation,
+                                                         const gchar           *arg_path_data,
+                                                         GVfsBackend           *backend);
 void     g_vfs_job_query_attributes_set_list (GVfsJobQueryAttributes *job,
 					      GFileAttributeInfoList *list);
 
