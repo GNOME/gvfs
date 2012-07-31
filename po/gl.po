@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs-master-po-gl-70600.merged\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-30 03:20+0200\n"
-"PO-Revision-Date: 2012-07-30 03:21+0200\n"
+"POT-Creation-Date: 2012-07-31 16:08+0200\n"
+"PO-Revision-Date: 2012-07-31 16:10+0200\n"
 "Last-Translator: Fran Dieguez <frandieguez@gnome.org>\n"
 "Language-Team: Galician <gnome-l10n-gl@gnome.org>\n"
 "Language: gl\n"
@@ -231,7 +231,7 @@ msgstr "Produciuse un erro ao conectar co D-Bus: %s"
 #. * the %s is the type of the backend, like "FTP"
 #: ../daemon/daemon-main.c:96
 #, c-format
-msgid "%s Filesystem Service"
+msgid "%s File System Service"
 msgstr "Servizo de sistema de ficheiros %s"
 
 #: ../daemon/daemon-main.c:115 ../programs/gvfs-copy.c:90
@@ -756,7 +756,7 @@ msgid "/ on %s"
 msgstr "/ en %s"
 
 #: ../daemon/gvfsbackendarchive.c:785 ../daemon/gvfsbackendburn.c:675
-#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:445
+#: ../daemon/gvfsbackendcomputer.c:715 ../daemon/gvfsbackenddnssd.c:445
 #: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:649
 #: ../daemon/gvfsbackendsftp.c:3881 ../daemon/gvfsftpdircache.c:157
 msgid "The file is not a directory"
@@ -837,7 +837,7 @@ msgstr "Non existe ese ficheiro ou cartafol na ruta de destino"
 msgid "Target file exists"
 msgstr "O ficheiro de destino existe"
 
-#: ../daemon/gvfsbackendburn.c:945 ../daemon/gvfsbackendcomputer.c:794
+#: ../daemon/gvfsbackendburn.c:945 ../daemon/gvfsbackendcomputer.c:795
 #: ../daemon/gvfsbackendgphoto2.c:2502 ../daemon/gvfsbackendgphoto2.c:2711
 #: ../daemon/gvfsbackendgphoto2.c:2808 ../daemon/gvfsbackendgphoto2.c:2901
 msgid "Not supported"
@@ -936,10 +936,10 @@ msgid "The file does not exist or isn't an audio track"
 msgstr "O ficheiro non existe ou non é unha pista de son"
 
 #: ../daemon/gvfsbackendcdda.c:1100
-msgid "Audio CD Filesystem Service"
+msgid "Audio CD File System Service"
 msgstr "Servizo de sistemas de ficheiros de CD de son"
 
-#: ../daemon/gvfsbackendcomputer.c:192 ../daemon/gvfsbackendcomputer.c:756
+#: ../daemon/gvfsbackendcomputer.c:192 ../daemon/gvfsbackendcomputer.c:757
 msgid "Computer"
 msgstr "Computador"
 
@@ -951,42 +951,42 @@ msgstr "Sistema de ficheiros"
 msgid "Can't open mountable file"
 msgstr "Non é posíbel abrir o ficheiro montábel"
 
-#: ../daemon/gvfsbackendcomputer.c:840 ../daemon/gvfsbackendsftp.c:1163
+#: ../daemon/gvfsbackendcomputer.c:841 ../daemon/gvfsbackendsftp.c:1163
 #, c-format
 msgid "Internal error: %s"
 msgstr "Erro interno: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:872 ../daemon/gvfsbackendcomputer.c:991
+#: ../daemon/gvfsbackendcomputer.c:873 ../daemon/gvfsbackendcomputer.c:992
 msgid "Can't mount file"
 msgstr "Non é posíbel montar o ficheiro"
 
-#: ../daemon/gvfsbackendcomputer.c:884
+#: ../daemon/gvfsbackendcomputer.c:885
 msgid "No medium in the drive"
 msgstr "Non hai ningún soporte na unidade"
 
-#: ../daemon/gvfsbackendcomputer.c:941 ../daemon/gvfsbackendcomputer.c:1036
-#: ../daemon/gvfsbackendcomputer.c:1142 ../daemon/gvfsbackendcomputer.c:1232
-#: ../daemon/gvfsbackendcomputer.c:1305 ../daemon/gvfsbackendcomputer.c:1374
+#: ../daemon/gvfsbackendcomputer.c:942 ../daemon/gvfsbackendcomputer.c:1037
+#: ../daemon/gvfsbackendcomputer.c:1143 ../daemon/gvfsbackendcomputer.c:1233
+#: ../daemon/gvfsbackendcomputer.c:1306 ../daemon/gvfsbackendcomputer.c:1375
 msgid "Not a mountable file"
 msgstr "Non é un ficheiro montábel"
 
-#: ../daemon/gvfsbackendcomputer.c:1055
+#: ../daemon/gvfsbackendcomputer.c:1056
 msgid "Can't unmount file"
 msgstr "Non é posíbel desmontar o ficheiro"
 
-#: ../daemon/gvfsbackendcomputer.c:1185
+#: ../daemon/gvfsbackendcomputer.c:1186
 msgid "Can't eject file"
 msgstr "Non é posíbel expulsar o ficheiro"
 
-#: ../daemon/gvfsbackendcomputer.c:1252 ../daemon/gvfsbackendcomputer.c:1259
+#: ../daemon/gvfsbackendcomputer.c:1253 ../daemon/gvfsbackendcomputer.c:1260
 msgid "Can't start file"
 msgstr "Non é posíbel iniciar o ficheiro"
 
-#: ../daemon/gvfsbackendcomputer.c:1325 ../daemon/gvfsbackendcomputer.c:1332
+#: ../daemon/gvfsbackendcomputer.c:1326 ../daemon/gvfsbackendcomputer.c:1333
 msgid "Can't stop file"
 msgstr "Non é posíbel deter o ficheiro"
 
-#: ../daemon/gvfsbackendcomputer.c:1389 ../daemon/gvfsbackendcomputer.c:1396
+#: ../daemon/gvfsbackendcomputer.c:1390 ../daemon/gvfsbackendcomputer.c:1397
 msgid "Can't poll file"
 msgstr "Non é posíbel obter o ficheiro"
 
@@ -1550,7 +1550,7 @@ msgid "Not a regular file"
 msgstr "Non é un ficheiro normal"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1489
-msgid "Windows Network Filesystem Service"
+msgid "Windows Network File System Service"
 msgstr "Servizo de sistema de ficheiros en rede de Windows"
 
 #. translators: First %s is a share name, second is a server name
@@ -1602,7 +1602,7 @@ msgid "Can't recursively move directory"
 msgstr "Non é posíbel mover o cartafol recursivamente"
 
 #: ../daemon/gvfsbackendsmb.c:2187
-msgid "Windows Shares Filesystem Service"
+msgid "Windows Shares File System Service"
 msgstr "Servizo de sistema de ficheiros compartidos con Windows"
 
 #: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
@@ -1703,12 +1703,12 @@ msgstr "O backend non é compatíbel co symlinks"
 msgid "Invalid dbus message"
 msgstr "A mensaxe dbus non é válida"
 
-#: ../daemon/gvfsjobunmount.c:143 ../monitor/udisks2/gvfsudisks2utils.c:809
+#: ../daemon/gvfsjobunmount.c:143 ../monitor/udisks2/gvfsudisks2utils.c:805
 #, c-format
 msgid "%s has been unmounted\n"
 msgstr "%s foi desmontado\n"
 
-#: ../daemon/gvfsjobunmount.c:161 ../monitor/udisks2/gvfsudisks2utils.c:663
+#: ../daemon/gvfsjobunmount.c:161 ../monitor/udisks2/gvfsudisks2utils.c:659
 #, c-format
 msgid ""
 "Unmounting %s\n"
@@ -1718,7 +1718,7 @@ msgstr ""
 "Agarde"
 
 #: ../daemon/gvfsjobunmount.c:217
-msgid "Filesystem is busy"
+msgid "File system is busy"
 msgstr "O sistema de ficheiros está ocupado"
 
 #: ../daemon/main.c:45 ../metadata/meta-daemon.c:447
@@ -2228,7 +2228,7 @@ msgstr "Expulsar de todas formas"
 msgid "Timed out running command-line `%s'"
 msgstr "Expirou o tempo ao executar a orde «%s»"
 
-#: ../monitor/udisks2/gvfsudisks2utils.c:664
+#: ../monitor/udisks2/gvfsudisks2utils.c:660
 #, c-format
 msgid ""
 "Writing data to %s\n"
@@ -2237,7 +2237,7 @@ msgstr ""
 "Escribindo os datos en %s\n"
 "Non o desconecte até rematar"
 
-#: ../monitor/udisks2/gvfsudisks2utils.c:809
+#: ../monitor/udisks2/gvfsudisks2utils.c:805
 #, c-format
 msgid "You can now unplug %s\n"
 msgstr "Agora pode desconectar %s\n"
@@ -2278,7 +2278,7 @@ msgstr ""
 "chaves (código de erro %d)"
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:1096
-msgid "The unlocked device does not have a recognizable filesystem on it"
+msgid "The unlocked device does not have a recognizable file system on it"
 msgstr ""
 "O dispositivo desbloqueado non contén un sistema de ficheiros recoñecíbel"
 
@@ -2465,7 +2465,7 @@ msgid "List writable attributes"
 msgstr "Lista de atributos escribíbeis"
 
 #: ../programs/gvfs-info.c:38
-msgid "Get filesystem info"
+msgid "Get file system info"
 msgstr "Obter información do sistema de ficheiros"
 
 #: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
