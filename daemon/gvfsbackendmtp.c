@@ -158,33 +158,35 @@ static void
 get_file_info(LIBMTP_mtpdevice_t *device, GFileInfo *info, LIBMTP_file_t *file) {
   GIcon *icon = NULL;
   char *content_type = NULL;
+
   char *id = g_strdup_printf("%u", file->item_id);
+  g_file_info_set_name(info, id);
+  g_free(id);
 
-        g_file_info_set_name(info, id);
-        g_free(id);
-        g_file_info_set_display_name(info, file->filename);
-        switch (file->filetype) {
-        case LIBMTP_FILETYPE_FOLDER:
-          g_file_info_set_file_type(info, G_FILE_TYPE_DIRECTORY);
-          g_file_info_set_content_type (info, "inode/directory");
-          icon = g_themed_icon_new ("folder");
-          break;
-        default:
-          g_file_info_set_file_type(info, G_FILE_TYPE_REGULAR);
-          content_type = g_content_type_guess(file->filename, NULL, 0, NULL);
-          g_file_info_set_content_type(info, content_type);
-          icon = g_content_type_get_icon(content_type);
-          break;
-        }
+  g_file_info_set_display_name(info, file->filename);
 
-        g_file_info_set_size (info, file->filesize);
-        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
-        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
-        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);
-        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, TRUE);
-        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
-        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, TRUE);
-        g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_COPY_NAME, file->filename);
+  switch (file->filetype) {
+  case LIBMTP_FILETYPE_FOLDER:
+    g_file_info_set_file_type(info, G_FILE_TYPE_DIRECTORY);
+    g_file_info_set_content_type (info, "inode/directory");
+    icon = g_themed_icon_new ("folder");
+    break;
+  default:
+    g_file_info_set_file_type(info, G_FILE_TYPE_REGULAR);
+    content_type = g_content_type_guess(file->filename, NULL, 0, NULL);
+    g_file_info_set_content_type(info, content_type);
+    icon = g_content_type_get_icon(content_type);
+    break;
+  }
+
+  g_file_info_set_size (info, file->filesize);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, TRUE);
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_COPY_NAME, file->filename);
 
   if (icon != NULL) {
     g_file_info_set_icon (info, icon);
@@ -211,7 +213,6 @@ do_enumerate (GVfsBackend *backend,
   g_print ("(II) try_enumerate (filename = %s, n_elements = %d) \n", filename, ne);
 
   g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
-  //if (strcmp("/", filename) == 0) {
   if (ne == 2 && elements[1][0] == '\0') {
     LIBMTP_raw_device_t * rawdevices;
     int numrawdevices;
@@ -248,7 +249,11 @@ do_enumerate (GVfsBackend *backend,
       LIBMTP_mtpdevice_t *device;
       char *friendlyname;
       char *name;
-      name = g_strdup_printf("device%d", i);
+      name = g_strdup_printf("0x%04X-0x%04X-%u-%u",
+                             rawdevices[i].device_entry.vendor_id,
+                             rawdevices[i].device_entry.product_id,
+                             rawdevices[i].bus_location,
+                             rawdevices[i].devnum);
 
       device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, name);
       if (device == NULL) {
@@ -277,7 +282,7 @@ do_enumerate (GVfsBackend *backend,
       g_file_info_set_file_type(info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_attribute_boolean(info, G_FILE_ATTRIBUTE_STANDARD_IS_VIRTUAL, TRUE);
       g_file_info_set_name(info, name);
-      g_file_info_set_display_name(info, "MTP Device");
+      g_file_info_set_display_name(info, rawdevices[i].device_entry.product);
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_content_type (info, "inode/directory");
       g_file_info_set_size (info, 0);
@@ -293,14 +298,22 @@ do_enumerate (GVfsBackend *backend,
       g_vfs_job_enumerate_add_info (job, info);
       g_free(name);
     }
-  //} else if (strcmp("/device0", filename) == 0) {
   } else if (ne == 2) {
     LIBMTP_mtpdevice_t *device;
     LIBMTP_devicestorage_t *storage;
     device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    if (device == NULL) {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Device does not exist");
+      g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+      return;
+    }
     int ret = LIBMTP_Get_Storage(device, LIBMTP_STORAGE_SORTBY_NOTSORTED);
     if (ret != 0) {
       fprintf(stderr, "Unable to find storage for device %d\n", i);
+      LIBMTP_Dump_Errorstack(device);
+      LIBMTP_Clear_Errorstack(device);
     } else {
       for (storage = device->storage; storage != 0; storage = storage->next) {
         fprintf(stdout, "Storage: %s\n", storage->StorageDescription);
@@ -326,7 +339,6 @@ do_enumerate (GVfsBackend *backend,
         g_vfs_job_enumerate_add_info (job, info);
       }
     }
-  //} else if (strcmp("/device0/65537", filename) == 0) {
   } else if (ne > 2) {
     LIBMTP_file_t *files;
     LIBMTP_file_t *file;
@@ -344,10 +356,9 @@ do_enumerate (GVfsBackend *backend,
     }
   }
 
-  g_strfreev(elements);
-
   g_vfs_job_enumerate_done (job);
   g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
   g_print ("(II) try_enumerate done. \n");
 }
@@ -376,6 +387,13 @@ do_query_info (GVfsBackend *backend,
   } else {
     LIBMTP_mtpdevice_t *device;
     device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    if (device == NULL) {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Device does not exist");
+      g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+      return;
+    }
     LIBMTP_file_t *file = NULL;
     if (strtol(elements[ne-1], NULL, 10) == 0) {
       g_print ("(II) try get files and folders\n");
@@ -430,14 +448,23 @@ do_query_fs_info (GVfsBackend *backend,
     LIBMTP_mtpdevice_t *device;
     LIBMTP_devicestorage_t *storage;
     device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    if (device == NULL) {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Device does not exist");
+      g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+      return;
+    }
     int ret = LIBMTP_Get_Storage(device, LIBMTP_STORAGE_SORTBY_NOTSORTED);
     if (ret != 0) {
       fprintf(stderr, "Unable to find storage for device %s\n", elements[1]);
+      LIBMTP_Dump_Errorstack(device);
+      LIBMTP_Clear_Errorstack(device);
     } else {
       for (storage = device->storage; storage != 0; storage = storage->next) {
         if (storage->id == strtol(elements[2], NULL, 10)) {
           g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, storage->FreeSpaceInBytes);
-          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, storage->AccessCapability);
+          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, storage->MaxCapacity);
           g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "mtpfs");
         }
       }
@@ -445,6 +472,7 @@ do_query_fs_info (GVfsBackend *backend,
   }
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
 
@@ -493,6 +521,14 @@ do_pull(GVfsBackend *backend,
   } else {
     LIBMTP_mtpdevice_t *device;
     device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    if (device == NULL) {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Device does not exist");
+      g_strfreev(elements);
+      g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+      return;
+    }
     LIBMTP_file_t *file = LIBMTP_Get_Filemetadata(device, strtol(elements[ne-1], NULL, 10));
 
     GFileInfo *info = g_file_info_new();
@@ -531,6 +567,7 @@ do_pull(GVfsBackend *backend,
     g_object_unref(info);
   }
 
+  g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
 
@@ -559,6 +596,15 @@ do_push(GVfsBackend *backend,
   } else {
     LIBMTP_mtpdevice_t *device;
     device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    if (device == NULL) {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Device does not exist");
+      g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+      g_strfreev(elements);
+      return;
+    }
+
     int parent_id = 0;
 
     if (ne > 4) {
@@ -605,6 +651,7 @@ do_push(GVfsBackend *backend,
                         "Can't get file to upload.");
     }
   }
+  g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
 
@@ -628,6 +675,14 @@ do_make_directory (GVfsBackend *backend,
   } else {
     LIBMTP_mtpdevice_t *device;
     device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    if (device == NULL) {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Device does not exist");
+      g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+      return;
+    }
+
     int parent_id = 0;
 
     if (ne > 4) {
@@ -636,6 +691,8 @@ do_make_directory (GVfsBackend *backend,
 
     int ret = LIBMTP_Create_Folder(device, elements[ne-1], parent_id, strtol(elements[2], NULL, 10));
     if (ret != 0) {
+      LIBMTP_Dump_Errorstack(device);
+      LIBMTP_Clear_Errorstack(device);
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_FAILED,
                         "Error while creating directory.");
@@ -643,6 +700,7 @@ do_make_directory (GVfsBackend *backend,
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
   }
+  g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
 
@@ -665,8 +723,19 @@ do_delete (GVfsBackend *backend,
   } else {
     LIBMTP_mtpdevice_t *device;
     device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    if (device == NULL) {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Device does not exist");
+      g_strfreev(elements);
+      g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+      return;
+    }
+
     int ret = LIBMTP_Delete_Object(device, strtol(elements[ne-1], NULL, 10));
     if (ret != 0) {
+        LIBMTP_Dump_Errorstack(device);
+        LIBMTP_Clear_Errorstack(device);
         g_vfs_job_failed (G_VFS_JOB (job),
                           G_IO_ERROR, G_IO_ERROR_FAILED,
                           "Error while deleting entity.");
@@ -674,6 +743,7 @@ do_delete (GVfsBackend *backend,
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
   }
+  g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
 
@@ -698,9 +768,19 @@ do_set_display_name (GVfsBackend *backend,
   } else {
     LIBMTP_mtpdevice_t *device;
     device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    if (device == NULL) {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Device does not exist");
+      g_strfreev(elements);
+      g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+      return;
+    }
     LIBMTP_file_t *file = LIBMTP_Get_Filemetadata(device, strtol(elements[ne-1], NULL, 10));
     int ret = LIBMTP_Set_File_Name(device, file, display_name);
     if (ret != 0) {
+        LIBMTP_Dump_Errorstack(device);
+        LIBMTP_Clear_Errorstack(device);
         g_vfs_job_failed (G_VFS_JOB (job),
                           G_IO_ERROR, G_IO_ERROR_FAILED,
                           "Error while renaming entity.");
@@ -709,6 +789,7 @@ do_set_display_name (GVfsBackend *backend,
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
   }
+  g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
 
