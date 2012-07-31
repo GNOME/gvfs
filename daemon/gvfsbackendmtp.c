@@ -69,7 +69,8 @@ g_vfs_backend_mtp_init (GVfsBackendMtp *backend)
 
     g_mutex_init(&backend->mutex);
     backend->devices = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                             g_free, LIBMTP_Release_Device);
+                                             g_free,
+                                             (GDestroyNotify)LIBMTP_Release_Device);
 
     g_print ("(II) g_vfs_backend_mtp_init done.\n");
 }
@@ -154,19 +155,29 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
  */
 
 static void
-get_file_info(GFileInfo *info, LIBMTP_file_t *file) {
-        g_file_info_set_file_type(info, file->filetype == LIBMTP_FILETYPE_FOLDER ? G_FILE_TYPE_DIRECTORY : G_FILE_TYPE_REGULAR);
-        char *id = g_strdup_printf("%u", file->item_id);
+get_file_info(LIBMTP_mtpdevice_t *device, GFileInfo *info, LIBMTP_file_t *file) {
+  GIcon *icon = NULL;
+  char *content_type = NULL;
+  char *id = g_strdup_printf("%u", file->item_id);
+
         g_file_info_set_name(info, id);
         g_free(id);
         g_file_info_set_display_name(info, file->filename);
-        g_file_info_set_content_type (info, file->filetype == LIBMTP_FILETYPE_FOLDER ? "inode/directory" : "application/octet-stream");
-        g_file_info_set_size (info, file->filesize);
-        if (file->filetype == LIBMTP_FILETYPE_FOLDER) {
-          GIcon *icon = g_themed_icon_new ("folder");
-          g_file_info_set_icon (info, icon);
-          g_object_unref (icon);
+        switch (file->filetype) {
+        case LIBMTP_FILETYPE_FOLDER:
+          g_file_info_set_file_type(info, G_FILE_TYPE_DIRECTORY);
+          g_file_info_set_content_type (info, "inode/directory");
+          icon = g_themed_icon_new ("folder");
+          break;
+        default:
+          g_file_info_set_file_type(info, G_FILE_TYPE_REGULAR);
+          content_type = g_content_type_guess(file->filename, NULL, 0, NULL);
+          g_file_info_set_content_type(info, content_type);
+          icon = g_content_type_get_icon(content_type);
+          break;
         }
+
+        g_file_info_set_size (info, file->filesize);
         g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
         g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
         g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);
@@ -174,6 +185,12 @@ get_file_info(GFileInfo *info, LIBMTP_file_t *file) {
         g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
         g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, TRUE);
         g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_COPY_NAME, file->filename);
+
+  if (icon != NULL) {
+    g_file_info_set_icon (info, icon);
+    g_object_unref (icon);
+  }
+  g_free(content_type);
 }
 
 
@@ -184,11 +201,7 @@ do_enumerate (GVfsBackend *backend,
                GFileAttributeMatcher *attribute_matcher,
                GFileQueryInfoFlags flags)
 {
-  GFile *file;
   GFileInfo *info;
-  GError *error;
-  GFileEnumerator *enumerator;
-  gboolean res;
   int i;
 
   gchar **elements = g_strsplit_set(filename, "/", -1);
@@ -233,9 +246,7 @@ do_enumerate (GVfsBackend *backend,
     fprintf(stdout, "Attempting to connect device(s)\n");
     for (i = 0; i < numrawdevices; i++) {
       LIBMTP_mtpdevice_t *device;
-      LIBMTP_devicestorage_t *storage;
       char *friendlyname;
-      int ret;
       char *name;
       name = g_strdup_printf("device%d", i);
 
@@ -328,7 +339,7 @@ do_enumerate (GVfsBackend *backend,
     files = LIBMTP_Get_Files_And_Folders(device, strtol(elements[2], NULL, 10), pid);
     for (file = files; file != NULL; file = file->next) {
         info = g_file_info_new();
-        get_file_info(info, file);
+        get_file_info(device, info, file);
         g_vfs_job_enumerate_add_info (job, info);
     }
   }
@@ -365,8 +376,36 @@ do_query_info (GVfsBackend *backend,
   } else {
     LIBMTP_mtpdevice_t *device;
     device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
-    LIBMTP_file_t *file = LIBMTP_Get_Filemetadata(device, strtol(elements[ne-1], NULL, 10));
-    get_file_info(info, file);
+    LIBMTP_file_t *file = NULL;
+    if (strtol(elements[ne-1], NULL, 10) == 0) {
+      g_print ("(II) try get files and folders\n");
+      int parent_id = -1;
+      if (ne > 4) {
+        parent_id = strtol(elements[ne-2], NULL, 10);
+      }
+      LIBMTP_file_t *files = LIBMTP_Get_Files_And_Folders(device, strtol(elements[2], NULL, 10),
+                                                          parent_id);
+      LIBMTP_file_t *i;
+      for (i = files; i != NULL; i = i->next) {
+        g_print ("(II) backup query (entity = %s, name = %s) \n", i->filename, elements[ne-1]);
+        if (strcmp(i->filename, elements[ne-1]) == 0) {
+          file = i;
+          break;
+        }
+      }
+    } else {
+      file = LIBMTP_Get_Filemetadata(device, strtol(elements[ne-1], NULL, 10));
+    }
+
+    if (file != NULL) {
+      get_file_info(device, info, file);
+    } else {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Error while querying entity.");
+      g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+      return;
+    }
   }
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
@@ -457,7 +496,7 @@ do_pull(GVfsBackend *backend,
     LIBMTP_file_t *file = LIBMTP_Get_Filemetadata(device, strtol(elements[ne-1], NULL, 10));
 
     GFileInfo *info = g_file_info_new();
-    get_file_info(info, file);
+    get_file_info(device, info, file);
     if (g_file_info_get_file_type(info) == G_FILE_TYPE_DIRECTORY) {
       GError *error;
       GFile *file = g_file_new_for_path (local_path);
@@ -478,7 +517,8 @@ do_pull(GVfsBackend *backend,
       mtp_progress_data->progress_callback_data = progress_callback_data;
       mtp_progress_data->job = G_VFS_JOB(job);
       int ret = LIBMTP_Get_File_To_File(device, strtol(elements[ne-1], NULL, 10), local_path,
-                              mtp_progress, mtp_progress_data);
+                              (LIBMTP_progressfunc_t)mtp_progress,
+                              mtp_progress_data);
       g_free(mtp_progress_data);
       if (ret != 0) {
         g_vfs_job_failed (G_VFS_JOB (job),
@@ -488,8 +528,83 @@ do_pull(GVfsBackend *backend,
         g_vfs_job_succeeded (G_VFS_JOB (job));
       }
     }
+    g_object_unref(info);
   }
 
+  g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+}
+
+
+static void
+do_push(GVfsBackend *backend,
+                                GVfsJobPush *job,
+                                const char *destination,
+                                const char *local_path,
+                                GFileCopyFlags flags,
+                                gboolean remove_source,
+                                GFileProgressCallback progress_callback,
+                                gpointer progress_callback_data)
+{
+  g_print ("(II) do_push (filename = %s, local_path = %s) \n", destination, local_path);
+  g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
+
+  gchar **elements = g_strsplit_set(destination, "/", -1);
+  unsigned int ne = 0;
+  for (ne = 0; elements[ne] != NULL; ne++);
+
+  if (ne < 4) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
+                      "Can't upload to this location.");
+  } else {
+    LIBMTP_mtpdevice_t *device;
+    device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    int parent_id = 0;
+
+    if (ne > 4) {
+      parent_id = strtol(elements[ne-2], NULL, 10);
+    }
+
+    GFile *file = g_file_new_for_path (local_path);
+    g_assert (file != NULL);
+    if (file) {
+      GError *error = NULL;
+      GFileInfo *info = g_file_query_info(file, G_FILE_ATTRIBUTE_STANDARD_SIZE,
+                                          G_FILE_QUERY_INFO_NONE, G_VFS_JOB(job)->cancellable,
+                                          &error);
+      if (info) {
+        LIBMTP_file_t *file = LIBMTP_new_file_t();
+        file->filename = strdup(elements[ne-1]);
+        file->parent_id = parent_id;
+        file->storage_id = strtol(elements[2], NULL, 10);
+        file->filetype = LIBMTP_FILETYPE_UNKNOWN; 
+        file->filesize = g_file_info_get_size(info);
+
+        MtpProgressData *mtp_progress_data = g_new0(MtpProgressData, 1);
+        mtp_progress_data->progress_callback = progress_callback;
+        mtp_progress_data->progress_callback_data = progress_callback_data;
+        mtp_progress_data->job = G_VFS_JOB(job);
+        int ret = LIBMTP_Send_File_From_File(device, local_path, file, (LIBMTP_progressfunc_t)mtp_progress, mtp_progress_data);
+        g_free(mtp_progress_data);
+        LIBMTP_destroy_file_t(file);
+        if (ret != 0) {
+          g_vfs_job_failed (G_VFS_JOB (job),
+                            G_IO_ERROR, G_IO_ERROR_FAILED,
+                            "Error while uploading entity.");
+        } else {
+          g_vfs_job_succeeded (G_VFS_JOB (job));
+        }
+        g_object_unref(info);
+      } else {
+        g_vfs_job_failed_from_error (G_VFS_JOB (job), error); 
+        g_error_free (error);
+      }
+    } else {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Can't get file to upload.");
+    }
+  }
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
 
@@ -499,10 +614,36 @@ do_make_directory (GVfsBackend *backend,
                     GVfsJobMakeDirectory *job,
                     const char *filename)
 {
-  GError *error;
-  GFile *file;
-
   g_print ("(II) try_make_directory (filename = %s) \n", filename);
+  g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
+
+  gchar **elements = g_strsplit_set(filename, "/", -1);
+  unsigned int ne = 0;
+  for (ne = 0; elements[ne] != NULL; ne++);
+
+  if (ne < 4) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
+                      "Can't make directory in this location.");
+  } else {
+    LIBMTP_mtpdevice_t *device;
+    device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    int parent_id = 0;
+
+    if (ne > 4) {
+      parent_id = strtol(elements[ne-2], NULL, 10);
+    }
+
+    int ret = LIBMTP_Create_Folder(device, elements[ne-1], parent_id, strtol(elements[2], NULL, 10));
+    if (ret != 0) {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Error while creating directory.");
+    } else {
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  }
+  g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
 
 
@@ -511,10 +652,29 @@ do_delete (GVfsBackend *backend,
             GVfsJobDelete *job,
             const char *filename)
 {
-  GError *error;
-  GFile *file;
-
   g_print ("(II) try_delete (filename = %s) \n", filename);
+
+  gchar **elements = g_strsplit_set(filename, "/", -1);
+  unsigned int ne = 0;
+  for (ne = 0; elements[ne] != NULL; ne++);
+
+  if (ne < 4) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
+                      "Can't delete entity.");
+  } else {
+    LIBMTP_mtpdevice_t *device;
+    device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    int ret = LIBMTP_Delete_Object(device, strtol(elements[ne-1], NULL, 10));
+    if (ret != 0) {
+        g_vfs_job_failed (G_VFS_JOB (job),
+                          G_IO_ERROR, G_IO_ERROR_FAILED,
+                          "Error while deleting entity.");
+    } else {
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  }
+  g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
 
 
@@ -525,11 +685,31 @@ do_set_display_name (GVfsBackend *backend,
                       const char *filename,
                       const char *display_name)
 {
-  GError *error;
-  GFile *file;
-
   g_print ("(II) try_set_display_name '%s' --> '%s' \n", filename, display_name);
 
+  gchar **elements = g_strsplit_set(filename, "/", -1);
+  unsigned int ne = 0;
+  for (ne = 0; elements[ne] != NULL; ne++);
+
+  if (ne < 4) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
+                      "Can't rename entity.");
+  } else {
+    LIBMTP_mtpdevice_t *device;
+    device = g_hash_table_lookup(G_VFS_BACKEND_MTP(backend)->devices, elements[1]);
+    LIBMTP_file_t *file = LIBMTP_Get_Filemetadata(device, strtol(elements[ne-1], NULL, 10));
+    int ret = LIBMTP_Set_File_Name(device, file, display_name);
+    if (ret != 0) {
+        g_vfs_job_failed (G_VFS_JOB (job),
+                          G_IO_ERROR, G_IO_ERROR_FAILED,
+                          "Error while renaming entity.");
+    } else {
+      g_vfs_job_set_display_name_set_new_path(job, filename);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  }
+  g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
 
 
@@ -549,28 +729,15 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
 
   backend_class->mount = do_mount;
   backend_class->unmount = do_unmount;
-//  backend_class->open_for_read = do_open_for_read;
-//  backend_class->read = do_read;
-//  backend_class->seek_on_read = do_seek_on_read;
-//  backend_class->close_read = do_close_read;
-//  backend_class->close_write = do_close_write;
   backend_class->query_info = do_query_info;
   backend_class->enumerate = do_enumerate;
   backend_class->query_fs_info = do_query_fs_info;
   backend_class->pull = do_pull;
-//  backend_class->create = do_create;
-//  backend_class->append_to = do_append_to;
+  backend_class->push = do_push;
 //  backend_class->replace = do_replace;
-//  backend_class->write = do_write;
-//  backend_class->seek_on_write = do_seek_on_write;
-/*  -- disabled, read/write operations can handle copy correctly  */  
-/*   backend_class->copy = do_copy; */ 
-//  backend_class->move = do_move;
-//  backend_class->make_symlink = do_make_symlink;
-//  backend_class->make_directory = do_make_directory;
-//  backend_class->delete = do_delete;
-//  backend_class->trash = do_trash;
-//  backend_class->set_display_name = do_set_display_name;
+  backend_class->make_directory = do_make_directory;
+  backend_class->delete = do_delete;
+  backend_class->set_display_name = do_set_display_name;
 //  backend_class->set_attribute = do_set_attribute;
 //  backend_class->create_dir_monitor = do_create_dir_monitor;
 //  backend_class->create_file_monitor = do_create_file_monitor;
