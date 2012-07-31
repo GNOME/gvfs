@@ -2302,8 +2302,6 @@ name_vanished_handler (GDBusConnection *connection,
                        const gchar *name,
                        gpointer user_data)
 {
-  g_print ("name_vanished_handler()\n");
-
   /* The daemon died, unmount */
   g_main_loop_quit (subthread_main_loop);
 }
@@ -2314,8 +2312,6 @@ dbus_connection_closed (GDBusConnection *connection,
                         GError          *error,
                         gpointer user_data)
 {
-  g_print ("dbus_connection_closed\n");
-  
   /* Session bus died, unmount */
   g_main_loop_quit (subthread_main_loop);
 }
@@ -2333,7 +2329,6 @@ register_fuse_cb (GVfsDBusMountTracker *proxy,
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
-  g_print ("register_fuse_cb\n");
 }
 
 static gpointer

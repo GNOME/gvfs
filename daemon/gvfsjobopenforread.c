@@ -89,8 +89,6 @@ g_vfs_job_open_for_read_new_handle (GVfsDBusMount *object,
                                     GVfsBackend *backend)
 {
   GVfsJobOpenForRead *job;
-  
-  g_print ("called OpenForRead()\n");
 
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;

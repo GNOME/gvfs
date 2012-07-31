@@ -109,8 +109,6 @@ g_vfs_job_create_file_monitor_new_handle (GVfsDBusMount *object,
                                           guint arg_flags,
                                           GVfsBackend *backend)
 {
-  g_print ("called CreateFileMonitor()\n");
-  
   return create_monitor_new_handle (object, invocation, arg_path_data, arg_flags, backend, FALSE);
 }
 
@@ -122,8 +120,6 @@ g_vfs_job_create_directory_monitor_new_handle (GVfsDBusMount *object,
                                                guint arg_flags,
                                                GVfsBackend *backend)
 {
-  g_print ("called CreateDirectoryMonitor()\n");
-  
   return create_monitor_new_handle (object, invocation, arg_path_data, arg_flags, backend, TRUE);
 }
 

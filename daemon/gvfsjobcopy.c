@@ -85,8 +85,6 @@ g_vfs_job_copy_new_handle (GVfsDBusMount *object,
   GVfsJobCopy *job;
   GVfsJobProgress *progress_job;
 
-  g_print ("called Copy()\n");
-
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;
   

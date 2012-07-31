@@ -192,8 +192,6 @@ name_appeared_handler (GDBusConnection *connection,
 {
   GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
 
-  g_print ("gvfsdaemon: name_appeared_handler()\n");
-  
   if (strcmp (name, G_VFS_DBUS_DAEMON_NAME) == 0 &&
       *name_owner != 0 &&
       daemon->lost_main_daemon)
@@ -210,8 +208,6 @@ name_vanished_handler (GDBusConnection *connection,
 {
   GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
 
-  g_print ("gvfsdaemon: name_vanished_handler()\n");
-
   /* Ensure we react only to really lost daemon */ 
   daemon->lost_main_daemon = TRUE;
 }
@@ -221,8 +217,6 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
 {
   GError *error;
   gint max_threads = 1; /* TODO: handle max threads */
-
-  g_print ("g_vfs_daemon_init\n");
 
   daemon->thread_pool = g_thread_pool_new (job_handler_callback,
 					   daemon,
@@ -468,7 +462,6 @@ unref_skeleton (gpointer object)
 {
   GDBusInterfaceSkeleton *skeleton = object;
 
-  g_print ("unref_skeleton: unreffing skeleton %p\n", skeleton);
   g_dbus_interface_skeleton_unexport (skeleton);
   g_object_unref (skeleton);
 }
@@ -483,13 +476,11 @@ peer_register_skeleton (const gchar *obj_path,
   if (! g_hash_table_contains (reg_path->client_skeletons, dbus_conn))
     {
       skeleton = reg_path->callback (dbus_conn, obj_path, reg_path->data);
-      g_print ("registering '%s' on the %p connection\n", obj_path, dbus_conn);
-
       g_hash_table_insert (reg_path->client_skeletons, dbus_conn, skeleton);
     }
   else
     {
-      g_print ("interface skeleton '%s' already registered on the %p connection, skipping\n", obj_path, dbus_conn);
+      /* Interface skeleton has been already registered on the connection, skipping */
     }
 }
 
@@ -510,8 +501,6 @@ g_vfs_daemon_register_path (GVfsDaemon *daemon,
                             gpointer user_data)
 {
   RegisteredPath *data;
-
-  g_print ("g_vfs_daemon_register_path: obj_path = '%s'\n", obj_path);
 
   data = g_new0 (RegisteredPath, 1);
   data->obj_path = g_strdup (obj_path);
@@ -607,7 +596,6 @@ peer_unregister_skeleton (const gchar *obj_path,
                           RegisteredPath *reg_path,
                           GDBusConnection *dbus_conn)
 {
-  g_print ("unregistering '%s' on the %p connection\n", obj_path, dbus_conn);
   g_hash_table_remove (reg_path->client_skeletons, dbus_conn);
 }
 
@@ -621,8 +609,6 @@ peer_connection_closed (GDBusConnection *connection,
   GList *l;
   GVfsDBusDaemon *daemon_skeleton;
 
-  g_print ("peer_connection_closed\n");
-  
   g_mutex_lock (&daemon->lock);
   for (l = daemon->jobs; l != NULL; l = l->next)
     {
@@ -679,8 +665,6 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
   g_hash_table_foreach (daemon->registered_paths, (GHFunc) peer_register_skeleton, dbus_conn);
   
   g_hash_table_insert (daemon->client_connections, g_object_ref (dbus_conn), NULL);
-  
-  g_print ("daemon_peer_connection_setup: interface registration complete.\n");
 
   g_signal_connect (data->conn, "closed", G_CALLBACK (peer_connection_closed), data->daemon);
 
@@ -825,8 +809,6 @@ daemon_new_connection_func (GDBusServer *server,
 
   daemon_peer_connection_setup (data->daemon, data->conn, data);
 
-  g_print ("daemon_new_connection_func: closing server\n");
-  
   /* Kill the server, no more need for it */
   g_dbus_server_stop (server);
   g_object_unref (server);
@@ -846,8 +828,6 @@ handle_get_connection (GVfsDBusDaemon *object,
   NewConnectionData *data;
   char *socket_dir;
   gchar *guid;
-  
-  g_print ("called get_connection()\n");
   
   generate_address (&address1, &socket_dir);
 
@@ -876,8 +856,7 @@ handle_get_connection (GVfsDBusDaemon *object,
 
   g_dbus_server_start (server);
   data->server = server;
-  
-  g_print ("Server is listening at: %s\n", g_dbus_server_get_client_address (server));
+
   g_signal_connect (server, "new-connection", G_CALLBACK (daemon_new_connection_func), data);
   
   gvfs_dbus_daemon_complete_get_connection (object,
@@ -889,7 +868,6 @@ handle_get_connection (GVfsDBusDaemon *object,
   return TRUE;
 
  error_out:
-  g_print ("handle_get_connection: error_out\n"); 
   g_free (data);
   g_free (address1);
   if (socket_dir)
@@ -910,8 +888,6 @@ handle_cancel (GVfsDBusDaemon *object,
   GList *l;
   GVfsJob *job_to_cancel = NULL;
 
-  g_print ("called cancel(), should be on our private connection only\n");
-  
   g_mutex_lock (&daemon->lock);
   for (l = daemon->jobs; l != NULL; l = l->next)
     {
@@ -951,8 +927,6 @@ daemon_handle_mount (GVfsDBusMountable *object,
   GMountSpec *mount_spec;
   GMountSource *mount_source;
   
-  g_print ("called daemon_handle_mount()\n");
-  
   mount_spec = g_mount_spec_from_dbus (arg_mount_spec);
   if (mount_spec == NULL)
     g_dbus_method_invocation_return_error_literal (invocation,
@@ -985,8 +959,6 @@ g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
   GVfsJob *job;
   GVfsBackend *backend;
 
-  g_print ("g_vfs_daemon_initiate_mount\n");
-  
   type = g_mount_spec_get_type (mount_spec);
 
   backend_type = G_TYPE_INVALID;
@@ -1010,7 +982,6 @@ g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
 			  "daemon", daemon,
 			  "object-path", obj_path,
 			  NULL);
-  g_print ("g_vfs_daemon_initiate_mount: obj_path = '%s'\n", obj_path);
   g_free (obj_path);
   
   g_vfs_daemon_add_job_source (daemon, G_VFS_JOB_SOURCE (backend));

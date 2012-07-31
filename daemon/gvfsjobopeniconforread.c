@@ -70,8 +70,6 @@ g_vfs_job_open_icon_for_read_new_handle (GVfsDBusMount *object,
 {
   GVfsJobOpenIconForRead *job;
   GVfsJobOpenForRead *job_open_for_read;
-  
-  g_print ("called OpenIconForRead()\n");
 
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;

@@ -81,8 +81,6 @@ g_vfs_job_query_settable_attributes_new_handle (GVfsDBusMount *object,
 {
   GVfsJobQueryAttributes *job;
 
-  g_print ("called QuerySettableAttributes()\n");
-
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;
   
@@ -108,8 +106,6 @@ g_vfs_job_query_writable_namespaces_new_handle (GVfsDBusMount *object,
                                                 GVfsBackend *backend)
 {
   GVfsJobQueryAttributes *job;
-
-  g_print ("called QueryWritableNamespaces()\n");
 
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;

@@ -83,8 +83,6 @@ g_vfs_job_query_fs_info_new_handle (GVfsDBusMount *object,
 {
   GVfsJobQueryFsInfo *job;
   
-  g_print ("called QueryFsInfo()\n");
-  
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;
 

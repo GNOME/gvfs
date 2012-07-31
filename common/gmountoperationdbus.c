@@ -103,8 +103,6 @@ handle_ask_password (GVfsDBusMountOperation *object,
 {
   GMountOperationDBus *op_dbus = data;
 
-  g_print ("gmountoperationdbus.c: handle_ask_password()\n");
-
   op_dbus->object = object;
   op_dbus->invocation = invocation;
   g_signal_connect (op_dbus->op, "reply",
@@ -152,8 +150,6 @@ handle_ask_question (GVfsDBusMountOperation *object,
                      gpointer data)
 {
   GMountOperationDBus *op_dbus = data;
-
-  g_print ("gmountoperationdbus.c: handle_ask_question()\n");
 
   op_dbus->object = object;
   op_dbus->invocation = invocation;
@@ -206,8 +202,6 @@ handle_show_processes (GVfsDBusMountOperation *object,
   GPid pid;
   GVariantIter iter;
 
-  g_print ("gmountoperationdbus.c: handle_show_processes()\n");
-
   processes = g_array_new (FALSE, FALSE, sizeof (GPid));
   g_variant_iter_init (&iter, arg_processes);
   while (g_variant_iter_loop (&iter, "i", &pid))
@@ -239,8 +233,6 @@ handle_show_unmount_progress (GVfsDBusMountOperation *object,
                               gpointer data)
 {
   GMountOperationDBus *op_dbus = data;
- 
-  g_print ("gmountoperationdbus.c: handle_show_unmount_progress()\n");
 
   g_signal_emit_by_name (op_dbus->op, "show-unmount-progress",
                          arg_message_string,
@@ -258,8 +250,6 @@ handle_aborted (GVfsDBusMountOperation *object,
                 gpointer data)
 {
   GMountOperationDBus *op_dbus = data;
- 
-  g_print ("gmountoperationdbus.c: handle_aborted()\n");
   
   /* also emit reply to make the all DBus ops return */
   g_mount_operation_reply (op_dbus->op, G_MOUNT_OPERATION_UNHANDLED);

@@ -498,7 +498,6 @@ typedef struct {
 static void
 async_proxy_create_free (AsyncProxyCreate *data)
 {
-  g_print ("async_proxy_create_free\n");
   if (data->notify)
     data->notify (data->callback_data);
 
@@ -526,7 +525,6 @@ async_proxy_new_cb (GObject *source_object,
   GSimpleAsyncResult *result;
   
   proxy = gvfs_dbus_mount_proxy_new_finish (res, &error);
-  g_print ("async_proxy_new_cb, proxy = %p\n", proxy);
   if (proxy == NULL)
     {
       _g_simple_async_result_take_error_stripped (data->result, error);
@@ -600,8 +598,6 @@ async_got_connection_cb (GDBusConnection *connection,
 {
   AsyncProxyCreate *data = callback_data;
   
-  g_print ("async_got_connection_cb, connection = %p\n", connection);
-  
   if (connection == NULL)
     {
       /* TODO: we should probably test if we really want a session bus;
@@ -622,8 +618,6 @@ async_got_mount_info (GMountInfo *mount_info,
                       GError *error)
 {
   AsyncProxyCreate *data = _data;
- 
-  g_print ("async_got_mount_info, mount_info = %p\n", mount_info);
 
   if (error != NULL)
     {
@@ -654,8 +648,6 @@ create_proxy_for_file_async (GFile *file,
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   AsyncProxyCreate *data;
 
-  g_print ("create_proxy_for_file_async\n");
-  
   data = g_new0 (AsyncProxyCreate, 1);
 
   data->result = g_simple_async_result_new (G_OBJECT (file),
@@ -691,8 +683,6 @@ g_daemon_file_enumerate_children (GFile      *file,
   gboolean res;
   GError *local_error = NULL;
   
-  g_print ("g_daemon_file_enumerate_children\n");
-  
   enumerator = g_daemon_file_enumerator_new (file, attributes, TRUE);
 
   proxy = create_proxy_for_file (file, NULL, &path, &connection, cancellable, error);
@@ -710,8 +700,6 @@ g_daemon_file_enumerate_children (GFile      *file,
                                              uri,
                                              cancellable,
                                              &local_error);
-  
-  g_print ("g_daemon_file_enumerate_children: done, res = %d\n", res);
 
   if (! res)
     {
@@ -816,8 +804,6 @@ g_daemon_file_query_info (GFile                *file,
   gboolean res;
   GError *local_error = NULL;
 
-  g_print ("g_daemon_file_query_info\n");
-
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
   if (proxy == NULL)
     return NULL;
@@ -833,8 +819,6 @@ g_daemon_file_query_info (GFile                *file,
                                               &iter_info,
                                               cancellable,
                                               &local_error);
-
-  g_print ("g_daemon_file_query_info: done, res = %d\n", res);
 
   if (! res)
     {
@@ -892,7 +876,6 @@ query_info_async_cb (GVfsDBusMount *proxy,
   GFileInfo *info;
   GFile *file;
   
-  g_print ("query_info_async_cb\n");
   orig_result = data->result;
   
   if (! gvfs_dbus_mount_call_query_info_finish (proxy, &iter_info, res, &error))
@@ -936,8 +919,6 @@ query_info_async_get_proxy_cb (GVfsDBusMount *proxy,
   AsyncCallQueryInfo *data = callback_data;
   char *uri;
 
-  g_print ("query_info_async_get_proxy_cb, proxy = %p\n", proxy);
-  
   uri = g_file_get_uri (data->file);
   
   data->result = g_object_ref (result);
@@ -966,8 +947,6 @@ g_daemon_file_query_info_async (GFile                      *file,
 {
   AsyncCallQueryInfo *data;
 
-  g_print ("g_daemon_file_query_info_async\n");
-  
   data = g_new0 (AsyncCallQueryInfo, 1);
   data->file = g_object_ref (file);
   data->attributes = g_strdup (attributes);
@@ -1036,7 +1015,6 @@ read_async_cb (GVfsDBusMount *proxy,
   guint fd_id;
   GFileInputStream *stream;
 
-  g_print ("read_async_cb\n");
   orig_result = data->result;
   
   if (! gvfs_dbus_mount_call_open_for_read_finish (proxy, &fd_id_val, &can_seek, &fd_list, res, &error))
@@ -1082,8 +1060,6 @@ file_read_async_get_proxy_cb (GVfsDBusMount *proxy,
   AsyncCallFileReadWrite *data = callback_data;
   guint32 pid;
 
-  g_print ("file_read_async_get_proxy_cb, proxy = %p\n", proxy);
-
   pid = get_pid_for_file (data->file);
   
   data->result = g_object_ref (result);
@@ -1107,8 +1083,6 @@ g_daemon_file_read_async (GFile *file,
 {
   AsyncCallFileReadWrite *data;
 
-  g_print ("g_daemon_file_read_async\n");
-  
   data = g_new0 (AsyncCallFileReadWrite, 1);
   data->file = g_object_ref (file);
   data->io_priority = io_priority;
@@ -1152,8 +1126,6 @@ g_daemon_file_read (GFile *file,
   guint32 pid;
   GError *local_error = NULL;
 
-  g_print ("g_daemon_file_read\n");
-
   pid = get_pid_for_file (file);
 
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
@@ -1169,8 +1141,6 @@ g_daemon_file_read (GFile *file,
                                                  &fd_list,
                                                  cancellable,
                                                  &local_error);
-  
-  g_print ("g_daemon_file_read: done, res = %d\n", res);
 
   if (! res)
     {
@@ -1243,8 +1213,6 @@ file_open_write (GFile *file,
                                                   &fd_list,
                                                   cancellable,
                                                   &local_error);
-  
-  g_print ("file_open_write: done, res = %d\n", res);
 
   if (! res)
     {
@@ -1280,8 +1248,6 @@ g_daemon_file_append_to (GFile *file,
                          GCancellable *cancellable,
                          GError **error)
 {
-  g_print ("g_daemon_file_append_to\n");
-
   return file_open_write (file, 1, "", FALSE, flags, cancellable, error);
 }
 
@@ -1291,8 +1257,6 @@ g_daemon_file_create (GFile *file,
 		      GCancellable *cancellable,
 		      GError **error)
 {
-  g_print ("g_daemon_file_create\n");
-
   return file_open_write (file, 0, "", FALSE, flags, cancellable, error);
 }
 
@@ -1304,8 +1268,6 @@ g_daemon_file_replace (GFile *file,
 		       GCancellable *cancellable,
 		       GError **error)
 {
-  g_print ("g_daemon_file_replace\n");
-
   return file_open_write (file, 2, etag, make_backup, flags, cancellable, error);
 }
 
@@ -1335,8 +1297,6 @@ mount_mountable_location_mounted_cb (GObject *source_object,
   GSimpleAsyncResult *result = user_data;
   GError *error = NULL;
 
-  g_print ("mount_mountable_location_mounted_cb\n");
-
   if (!g_file_mount_enclosing_volume_finish (G_FILE (source_object), res, &error))
     {
       _g_simple_async_result_take_error_stripped (result, error);
@@ -1361,7 +1321,6 @@ mount_mountable_async_cb (GVfsDBusMount *proxy,
   GFile *file;
   GMountSpec *mount_spec;
   
-  g_print ("mount_mountable_async_cb\n");
   orig_result = data->result;
   data->result = NULL;
 
@@ -1436,8 +1395,6 @@ mount_mountable_got_proxy_cb (GVfsDBusMount *proxy,
   GMountSource *mount_source;
   const char *dbus_id, *obj_path;
 
-  g_print ("mount_mountable_got_proxy_cb, proxy = %p\n", proxy);
-  
   data->result = g_object_ref (result);
 
   mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
@@ -1466,8 +1423,6 @@ g_daemon_file_mount_mountable (GFile               *file,
 			       gpointer             user_data)
 {
   AsyncMountOp *data;
-  
-  g_print ("g_daemon_file_mount_mountable\n");
  
   data = g_new0 (AsyncMountOp, 1);
   data->flags = flags;
@@ -1506,7 +1461,6 @@ start_mountable_async_cb (GVfsDBusMount *proxy,
   GSimpleAsyncResult *orig_result;
   GError *error = NULL;
 
-  g_print ("start_mountable_async_cb\n");
   orig_result = data->result;
 
   if (! gvfs_dbus_mount_call_start_mountable_finish (proxy, res, &error))
@@ -1532,8 +1486,6 @@ start_mountable_got_proxy_cb (GVfsDBusMount *proxy,
   GMountSource *mount_source;
   const char *dbus_id, *obj_path;
 
-  g_print ("start_mountable_got_proxy_cb, proxy = %p\n", proxy);
-  
   data->result = g_object_ref (result);
 
   mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
@@ -1563,8 +1515,6 @@ g_daemon_file_start_mountable (GFile               *file,
 {
   AsyncMountOp *data;
   
-  g_print ("g_daemon_file_start_mountable\n");
- 
   data = g_new0 (AsyncMountOp, 1);
   data->flags = flags;
   data->mount_operation = g_object_ref (mount_operation);
@@ -1595,7 +1545,6 @@ stop_mountable_async_cb (GVfsDBusMount *proxy,
   GSimpleAsyncResult *orig_result;
   GError *error = NULL;
 
-  g_print ("stop_mountable_async_cb\n");
   orig_result = data->result;
 
   if (! gvfs_dbus_mount_call_stop_mountable_finish (proxy, res, &error))
@@ -1621,8 +1570,6 @@ stop_mountable_got_proxy_cb (GVfsDBusMount *proxy,
   GMountSource *mount_source;
   const char *dbus_id, *obj_path;
 
-  g_print ("stop_mountable_got_proxy_cb, proxy = %p\n", proxy);
-  
   data->result = g_object_ref (result);
 
   mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
@@ -1653,8 +1600,6 @@ g_daemon_file_stop_mountable (GFile               *file,
 {
   AsyncMountOp *data;
   
-  g_print ("g_daemon_file_stop_mountable\n");
- 
   data = g_new0 (AsyncMountOp, 1);
   data->flags = flags;
   data->mount_operation = g_object_ref (mount_operation);
@@ -1685,7 +1630,6 @@ eject_mountable_async_cb (GVfsDBusMount *proxy,
   GSimpleAsyncResult *orig_result;
   GError *error = NULL;
 
-  g_print ("eject_mountable_async_cb\n");
   orig_result = data->result;
 
   if (! gvfs_dbus_mount_call_eject_mountable_finish (proxy, res, &error))
@@ -1711,8 +1655,6 @@ eject_mountable_got_proxy_cb (GVfsDBusMount *proxy,
   GMountSource *mount_source;
   const char *dbus_id, *obj_path;
 
-  g_print ("eject_mountable_got_proxy_cb, proxy = %p\n", proxy);
-  
   data->result = g_object_ref (result);
 
   mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
@@ -1743,8 +1685,6 @@ g_daemon_file_eject_mountable_with_operation (GFile               *file,
 {
   AsyncMountOp *data;
   
-  g_print ("g_daemon_file_eject_mountable_with_operation\n");
- 
   data = g_new0 (AsyncMountOp, 1);
   data->flags = flags;
   data->mount_operation = g_object_ref (mount_operation);
@@ -1793,7 +1733,6 @@ unmount_mountable_async_cb (GVfsDBusMount *proxy,
   GSimpleAsyncResult *orig_result;
   GError *error = NULL;
 
-  g_print ("unmount_mountable_async_cb\n");
   orig_result = data->result;
 
   if (! gvfs_dbus_mount_call_unmount_mountable_finish (proxy, res, &error))
@@ -1819,8 +1758,6 @@ unmount_mountable_got_proxy_cb (GVfsDBusMount *proxy,
   GMountSource *mount_source;
   const char *dbus_id, *obj_path;
 
-  g_print ("unmount_mountable_got_proxy_cb, proxy = %p\n", proxy);
-  
   data->result = g_object_ref (result);
 
   mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
@@ -1851,8 +1788,6 @@ g_daemon_file_unmount_mountable_with_operation (GFile               *file,
 {
   AsyncMountOp *data;
   
-  g_print ("g_daemon_file_unmount_mountable_with_operation\n");
- 
   data = g_new0 (AsyncMountOp, 1);
   data->flags = flags;
   data->mount_operation = g_object_ref (mount_operation);
@@ -1883,7 +1818,6 @@ poll_mountable_async_cb (GVfsDBusMount *proxy,
   GSimpleAsyncResult *orig_result;
   GError *error = NULL;
   
-  g_print ("poll_mountable_async_cb\n");
   orig_result = data->result;
   
   if (! gvfs_dbus_mount_call_poll_mountable_finish (proxy, res, &error))
@@ -1907,8 +1841,6 @@ poll_mountable_got_proxy_cb (GVfsDBusMount *proxy,
 {
   AsyncMountOp *data = callback_data;
 
-  g_print ("poll_mountable_got_proxy_cb, proxy = %p\n", proxy);
-  
   data->result = g_object_ref (result);
   
   gvfs_dbus_mount_call_poll_mountable (proxy,
@@ -1927,8 +1859,6 @@ g_daemon_file_poll_mountable (GFile               *file,
 {
   AsyncMountOp *data;
   
-  g_print ("g_daemon_file_poll_mountable\n");
- 
   data = g_new0 (AsyncMountOp, 1);
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
@@ -1998,8 +1928,6 @@ mount_reply (GVfsDBusMountTracker *proxy,
   MountData *data = user_data;
   GSimpleAsyncResult *ares;
   GError *error = NULL;
-  
-  g_print ("mount_reply\n");
 
   if (!gvfs_dbus_mount_tracker_call_mount_location_finish (proxy, res, &error))
     {
@@ -2036,7 +1964,6 @@ mount_enclosing_volume_proxy_cb (GObject *source_object,
   GMountSpec *spec;
   GMountSource *mount_source;
 
-  g_print ("mount_enclosing_volume_proxy_cb\n");
   daemon_file = G_DAEMON_FILE (data->file);
 
   proxy = gvfs_dbus_mount_tracker_proxy_new_for_bus_finish (res, &error);
@@ -2081,8 +2008,6 @@ g_daemon_file_mount_enclosing_volume (GFile *location,
 {
   MountData *data;
   
-  g_print ("g_daemon_file_mount_enclosing_volume\n");
-  
   data = g_new0 (MountData, 1);
   data->callback = callback;
   if (data->cancellable)
@@ -2123,8 +2048,6 @@ g_daemon_file_query_filesystem_info (GFile                *file,
   GVariant *iter_info;
   GError *local_error = NULL;
 
-  g_print ("g_daemon_file_query_filesystem_info\n");
-
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
   if (proxy == NULL)
     return NULL;
@@ -2136,8 +2059,6 @@ g_daemon_file_query_filesystem_info (GFile                *file,
                                                          &iter_info,
                                                          cancellable,
                                                          &local_error);
-  
-  g_print ("g_daemon_file_query_filesystem_info: done, res = %d\n", res);
 
   if (! res)
     {
@@ -2190,7 +2111,6 @@ query_fs_info_async_cb (GVfsDBusMount *proxy,
   GSimpleAsyncResult *orig_result;
   GVariant *iter_info;
 
-  g_print ("query_info_async_cb\n");
   orig_result = data->result;
   
   if (! gvfs_dbus_mount_call_query_filesystem_info_finish (proxy, &iter_info, res, &error))
@@ -2230,8 +2150,6 @@ query_info_fs_async_get_proxy_cb (GVfsDBusMount *proxy,
   AsyncCallQueryFsInfo *data = callback_data;
   char *uri;
 
-  g_print ("query_info_fs_async_get_proxy_cb, proxy = %p\n", proxy);
-  
   uri = g_file_get_uri (data->file);
   
   data->result = g_object_ref (result);
@@ -2257,8 +2175,6 @@ g_daemon_file_query_filesystem_info_async (GFile                      *file,
 {
   AsyncCallQueryFsInfo *data;
 
-  g_print ("g_daemon_file_query_filesystem_info_async\n");
-  
   data = g_new0 (AsyncCallQueryFsInfo, 1);
   data->file = g_object_ref (file);
   data->attributes = g_strdup (attributes);
@@ -2387,7 +2303,6 @@ g_daemon_file_set_display_name (GFile *file,
 
   daemon_file = G_DAEMON_FILE (file);
   mount_info = NULL;
-  g_print ("g_daemon_file_set_display_name\n");
 
   proxy = create_proxy_for_file (file, &mount_info, &path, NULL, cancellable, error);
   if (proxy == NULL)
@@ -2399,7 +2314,6 @@ g_daemon_file_set_display_name (GFile *file,
                                                     &new_path,
                                                     cancellable,
                                                     &local_error);
-  g_print ("g_daemon_file_set_display_name: done, res = %d\n", res);
 
   if (! res)
     {
@@ -2433,8 +2347,6 @@ g_daemon_file_delete (GFile *file,
   gboolean res;
   GError *local_error = NULL;
 
-  g_print ("g_daemon_file_delete\n");
-
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
   if (proxy == NULL)
     return FALSE;
@@ -2443,7 +2355,6 @@ g_daemon_file_delete (GFile *file,
                                           path,
                                           cancellable,
                                           &local_error);
-  g_print ("g_daemon_file_delete: done, res = %d\n", res);
 
   if (! res)
     {
@@ -2468,8 +2379,6 @@ g_daemon_file_trash (GFile *file,
   gboolean res;
   GError *local_error = NULL;
 
-  g_print ("g_daemon_file_trash\n");
-
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
   if (proxy == NULL)
     return FALSE;
@@ -2478,7 +2387,6 @@ g_daemon_file_trash (GFile *file,
                                          path,
                                          cancellable,
                                          &local_error);
-  g_print ("g_daemon_file_trash: done, res = %d\n", res);
 
   if (! res)
     {
@@ -2503,8 +2411,6 @@ g_daemon_file_make_directory (GFile *file,
   gboolean res;
   GError *local_error = NULL;
 
-  g_print ("g_daemon_file_make_directory\n");
-
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
   if (proxy == NULL)
     return FALSE;
@@ -2513,7 +2419,6 @@ g_daemon_file_make_directory (GFile *file,
                                                   path,
                                                   cancellable,
                                                   &local_error);
-  g_print ("g_daemon_file_make_directory: done, res = %d\n", res);
 
   if (! res)
     {
@@ -2539,8 +2444,6 @@ g_daemon_file_make_symbolic_link (GFile *file,
   gboolean res;
   GError *local_error = NULL;
 
-  g_print ("g_daemon_file_make_symbolic_link\n");
-
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
   if (proxy == NULL)
     return FALSE;
@@ -2550,7 +2453,6 @@ g_daemon_file_make_symbolic_link (GFile *file,
                                                       symlink_value ? symlink_value : "",
                                                       cancellable,
                                                       &local_error);
-  g_print ("g_daemon_file_make_symbolic_link: done, res = %d\n", res);
 
   if (! res)
     {
@@ -2577,8 +2479,6 @@ g_daemon_file_query_settable_attributes (GFile                      *file,
   GFileAttributeInfoList *list;
   GError *local_error = NULL;
 
-  g_print ("g_daemon_file_query_settable_attributes\n");
-
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
   if (proxy == NULL)
     return FALSE;
@@ -2589,7 +2489,6 @@ g_daemon_file_query_settable_attributes (GFile                      *file,
                                                              &iter_list,
                                                              cancellable,
                                                              &local_error);
-  g_print ("g_daemon_file_query_settable_attributes: done, res = %d\n", res);
 
   if (! res)
     {
@@ -2622,8 +2521,6 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
   GFileAttributeInfoList *list;
   GError *local_error = NULL;
 
-  g_print ("g_daemon_file_query_writable_namespaces\n");
-
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
   if (proxy == NULL)
     return FALSE;
@@ -2634,7 +2531,6 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
                                                              &iter_list,
                                                              cancellable,
                                                              &local_error);
-  g_print ("g_daemon_file_query_writable_namespaces: done, res = %d\n", res);
 
   if (! res)
     {
@@ -2750,8 +2646,6 @@ g_daemon_file_set_attribute (GFile *file,
     return set_metadata_attribute (file, attribute, type, value_p, cancellable, error);
 
  retry:
-  g_print ("g_daemon_file_set_attribute\n");
-
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
   if (proxy == NULL)
     return FALSE;
@@ -2763,8 +2657,6 @@ g_daemon_file_set_attribute (GFile *file,
                                                  _g_dbus_append_file_attribute (attribute, 0, type, value_p),
                                                  cancellable,
                                                  &my_error);
-  g_print ("g_daemon_file_set_attribute: done, res = %d\n", res);
-
   g_free (path);
 
   if (! res)
@@ -3090,8 +2982,6 @@ g_daemon_file_monitor_dir (GFile* file,
   gboolean res;
   GError *local_error = NULL;
 
-  g_print ("g_daemon_file_monitor_dir\n");
-
   monitor = NULL;
   mount_info = NULL;
   obj_path = NULL;
@@ -3107,7 +2997,6 @@ g_daemon_file_monitor_dir (GFile* file,
                                                             &obj_path,
                                                             cancellable,
                                                             &local_error);
-  g_print ("g_daemon_file_monitor_dir: done, res = %d\n", res);
 
   if (! res)
     {
@@ -3146,8 +3035,6 @@ g_daemon_file_monitor_file (GFile* file,
   gboolean res;
   GError *local_error = NULL;
 
-  g_print ("g_daemon_file_monitor_file\n");
-
   monitor = NULL;
   mount_info = NULL;
   obj_path = NULL;
@@ -3163,7 +3050,6 @@ g_daemon_file_monitor_file (GFile* file,
                                                        &obj_path,
                                                        cancellable,
                                                        &local_error);
-  g_print ("g_daemon_file_monitor_file: done, res = %d\n", res);
 
   if (! res)
     {
@@ -3205,7 +3091,6 @@ file_open_write_async_cb (GVfsDBusMount *proxy,
   guint64 initial_offset;
   GFileOutputStream *output_stream;
 
-  g_print ("file_open_write_async_cb\n");
   orig_result = data->result;
   
   if (! gvfs_dbus_mount_call_open_for_write_finish (proxy, &fd_id_val, &can_seek, &initial_offset, &fd_list, res, &error))
@@ -3250,8 +3135,6 @@ file_open_write_async_get_proxy_cb (GVfsDBusMount *proxy,
 {
   AsyncCallFileReadWrite *data = callback_data;
   guint32 pid;
-
-  g_print ("file_open_write_async_get_proxy_cb, proxy = %p\n", proxy);
 
   pid = get_pid_for_file (data->file);
   
@@ -3308,8 +3191,6 @@ g_daemon_file_append_to_async (GFile                      *file,
                                GAsyncReadyCallback         callback,
                                gpointer                    user_data)
 {
-  g_print ("g_daemon_file_append_to_async\n");
-  
   file_open_write_async (file,
                          1, "", FALSE, flags, io_priority,
                          cancellable,
@@ -3339,8 +3220,6 @@ g_daemon_file_create_async (GFile                      *file,
                             GAsyncReadyCallback         callback,
                             gpointer                    user_data)
 {
-  g_print ("g_daemon_file_create_async\n");
-  
   file_open_write_async (file,
                          0, "", FALSE, flags, io_priority,
                          cancellable,
@@ -3377,8 +3256,6 @@ typedef struct {
 static void
 async_call_enumerate_free (AsyncCallEnumerate *data)
 {
-  g_print ("async_call_enumerate_free\n");
-  
   g_clear_object (&data->file);
   g_clear_object (&data->result);
   g_clear_object (&data->cancellable);
@@ -3396,7 +3273,6 @@ enumerate_children_async_cb (GVfsDBusMount *proxy,
   GError *error = NULL;
   GSimpleAsyncResult *orig_result;
 
-  g_print ("enumerate_children_async_cb\n");
   orig_result = data->result;
   
   if (! gvfs_dbus_mount_call_enumerate_finish (proxy, res, &error))
@@ -3430,8 +3306,6 @@ enumerate_children_async_get_proxy_cb (GVfsDBusMount *proxy,
   char *obj_path;
   char *uri;
 
-  g_print ("enumerate_children_async_get_proxy_cb, proxy = %p\n", proxy);
-  
   obj_path = g_daemon_file_enumerator_get_object_path (data->enumerator);
   uri = g_file_get_uri (data->file);
   
@@ -3462,8 +3336,6 @@ g_daemon_file_enumerate_children_async (GFile                      *file,
                                         gpointer                    user_data)
 {
   AsyncCallEnumerate *data;
-
-  g_print ("g_daemon_file_enumerate_children_async\n");
 
   data = g_new0 (AsyncCallEnumerate, 1);
   data->file = g_object_ref (file);
@@ -3610,8 +3482,6 @@ g_daemon_file_replace_async (GFile                      *file,
                              GAsyncReadyCallback         callback,
                              gpointer                    user_data)
 {
-  g_print ("g_daemon_file_replace_async\n");
-  
   file_open_write_async (file,
                          2, etag, make_backup, flags, io_priority,
                          cancellable,
@@ -3666,7 +3536,6 @@ set_display_name_async_cb (GVfsDBusMount *proxy,
   gchar *new_path;
   GSimpleAsyncResult *orig_result;
 
-  g_print ("set_display_name_async_cb\n");
   orig_result = data->result;
 
   if (! gvfs_dbus_mount_call_set_display_name_finish (proxy, &new_path, res, &error))
@@ -3701,8 +3570,6 @@ set_display_name_async_get_proxy_cb (GVfsDBusMount *proxy,
 {
   AsyncCallSetDisplayName *data = callback_data;
 
-  g_print ("set_display_name_async_get_proxy_cb, proxy = %p\n", proxy);
-  
   data->result = g_object_ref (result);
   data->mount_info = g_mount_info_ref (mount_info);
   
@@ -3725,8 +3592,6 @@ g_daemon_file_set_display_name_async (GFile                      *file,
 {
   AsyncCallSetDisplayName *data;
 
-  g_print ("g_daemon_file_set_display_name_async\n");
-  
   data = g_new0 (AsyncCallSetDisplayName, 1);
   data->file = g_object_ref (file);
   data->display_name = g_strdup (display_name);

@@ -87,8 +87,6 @@ g_vfs_job_push_new_handle (GVfsDBusMount *object,
   GVfsJobPush *job;
   GVfsJobProgress *progress_job;
 
-  g_print ("called Push()\n");
-
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;
   

@@ -95,8 +95,6 @@ g_vfs_job_open_for_write_new_handle (GVfsDBusMount *object,
 {
   GVfsJobOpenForWrite *job;
   
-  g_print ("called OpenForWrite()\n");
-
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;
   

@@ -90,8 +90,6 @@ g_vfs_job_enumerate_new_handle (GVfsDBusMount *object,
 {
   GVfsJobEnumerate *job;
 
-  g_print ("called Enumerate()\n");
-
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;
   
@@ -123,8 +121,6 @@ create_enumerator_proxy (GVfsJobEnumerate *job)
   connection = g_dbus_method_invocation_get_connection (G_VFS_JOB_DBUS (job)->invocation);
   sender = g_dbus_method_invocation_get_sender (G_VFS_JOB_DBUS (job)->invocation);
 
-  g_print ("create_enumerator_proxy: sender = '%s', object_path = '%s'\n", sender, job->object_path);
-  
   return gvfs_dbus_enumerator_proxy_new_sync (connection,
                                               G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                                               sender,
@@ -228,8 +224,6 @@ send_done_cb (GVfsDBusEnumerator *proxy,
 {
   GError *error = NULL;
 
-  g_print ("send_done_cb\n");
-
   gvfs_dbus_enumerator_call_done_finish (proxy, res, &error);
   if (error != NULL)
     {
@@ -245,8 +239,6 @@ g_vfs_job_enumerate_done (GVfsJobEnumerate *job)
   
   g_assert (!G_VFS_JOB (job)->failed);
 
-  g_print ("g_vfs_job_enumerate_done: sending...\n");
-
   if (job->building_infos != NULL)
     send_infos (job);
 
@@ -258,8 +250,6 @@ g_vfs_job_enumerate_done (GVfsJobEnumerate *job)
                                   (GAsyncReadyCallback) send_done_cb,
                                   NULL);
   g_object_unref (proxy);
-
-  g_print ("g_vfs_job_enumerate_done: done.\n");
 
   g_vfs_job_emit_finished (G_VFS_JOB (job));
 }

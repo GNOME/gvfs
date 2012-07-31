@@ -215,8 +215,6 @@ ask_password_reply (GVfsDBusMountOperation *proxy,
 
   result = G_SIMPLE_ASYNC_RESULT (user_data);
   handled = TRUE;
-  
-  g_print ("gmountsource.c: ask_password_reply()\n");
 
   data = g_new0 (AskPasswordData, 1);
   g_simple_async_result_set_op_res_gpointer (result, data, ask_password_data_free);
@@ -530,8 +528,6 @@ ask_question_reply (GVfsDBusMountOperation *proxy,
   
   result = G_SIMPLE_ASYNC_RESULT (user_data);
   handled = TRUE;
-  
-  g_print ("gmountsource.c: ask_question_reply()\n");
 
   data = g_new0 (AskQuestionData, 1);
   g_simple_async_result_set_op_res_gpointer (result, data, g_free);
@@ -736,8 +732,6 @@ show_processes_reply (GVfsDBusMountOperation *proxy,
   
   result = G_SIMPLE_ASYNC_RESULT (user_data);
   handled = TRUE;
-
-  g_print ("gmountsource.c: show_processes_reply()\n");
 
   data = g_new0 (ShowProcessesData, 1);
   g_simple_async_result_set_op_res_gpointer (result, data, g_free);
@@ -1000,8 +994,6 @@ abort_reply (GVfsDBusMountOperation *proxy,
              GAsyncResult *res,
              gpointer user_data)
 {
-  g_print ("gmountsource.c: abort_reply()\n");
-
   gvfs_dbus_mount_operation_call_aborted_finish (proxy, res, NULL);
 }
 

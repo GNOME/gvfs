@@ -84,8 +84,6 @@ g_vfs_job_stop_mountable_new_handle (GVfsDBusMount *object,
 {
   GVfsJobStopMountable *job;
 
-  g_print ("called StopMountable()\n");
-
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;
   

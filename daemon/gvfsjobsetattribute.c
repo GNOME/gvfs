@@ -87,8 +87,6 @@ g_vfs_job_set_attribute_new_handle (GVfsDBusMount *object,
   gchar *attribute;
   GFileAttributeType type;
   GDBusAttributeValue value;
- 
-  g_print ("called SetAttribute()\n");
 
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;

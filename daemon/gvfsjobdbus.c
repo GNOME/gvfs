@@ -173,8 +173,6 @@ g_vfs_job_dbus_is_serial (GVfsJobDBus *job_dbus,
   message = g_dbus_method_invocation_get_message (job_dbus->invocation);
   message_connection = g_dbus_method_invocation_get_connection (job_dbus->invocation);
   
-  g_print ("g_vfs_job_dbus_is_serial: serial = %u, message serial = %u, connection = %p, message connection = %p\n", serial, g_dbus_message_get_serial (message), connection, message_connection);
-  
   return message_connection == connection &&
       g_dbus_message_get_serial (message) == serial;
 }

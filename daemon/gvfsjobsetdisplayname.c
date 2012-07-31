@@ -80,8 +80,6 @@ g_vfs_job_set_display_name_new_handle (GVfsDBusMount *object,
                                        GVfsBackend *backend)
 {
   GVfsJobSetDisplayName *job;
-  
-  g_print ("called SetDisplayName()\n");
 
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;

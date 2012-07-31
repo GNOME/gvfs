@@ -86,7 +86,6 @@ unref_skeleton (gpointer object)
 {
   GDBusInterfaceSkeleton *skeleton = object;
 
-  g_print ("unref_skeleton: unreffing skeleton %p\n", skeleton);
   g_dbus_interface_skeleton_unexport (skeleton);
   g_object_unref (skeleton);
 }
@@ -98,8 +97,6 @@ _g_dbus_register_vfs_filter (const char *obj_path,
 			     GObject *data)
 {
   PathMapEntry *entry;
-  
-  g_print ("_g_dbus_register_vfs_filter: obj_path = '%s'\n", obj_path);
 
   G_LOCK (obj_path_map);
   
@@ -139,13 +136,11 @@ register_skeleton (const char *obj_path,
     {
       /* Note that the newly created GDBusInterfaceSkeleton instance refs the connection so it's not needed to watch for connection being destroyed */ 
       skeleton = entry->callback (dbus_conn, obj_path, entry->data);
-      g_print ("registering interface skeleton %p for path '%s' on the %p connection\n", skeleton, obj_path, dbus_conn);
-      
       g_hash_table_insert (entry->skeletons, dbus_conn, skeleton);
     }
   else
     {
-      g_print ("interface skeleton '%s' already registered on the %p connection, skipping\n", obj_path, dbus_conn);
+      /* Interface skeleton has already been registered on the connection, skipping */
     }
 }
 
@@ -162,8 +157,6 @@ register_skeleton (const char *obj_path,
 void
 _g_dbus_connect_vfs_filters (GDBusConnection *connection)
 {
-  g_print ("_g_dbus_connect_vfs_filters: connection = %p\n", connection);
-  
   G_LOCK (obj_path_map);
 
   if (obj_path_map)
@@ -192,12 +185,8 @@ vfs_connection_closed (GDBusConnection *connection,
 {
   VfsConnectionData *connection_data;
 
-  g_print ("gvfsdaemondbus.c: vfs_connection_closed()\n");
-  
   connection_data = g_object_get_data (G_OBJECT (connection), "connection_data");
   g_assert (connection_data != NULL);
-
-  g_print ("   async_dbus_id = '%s'\n", connection_data->async_dbus_id);
 
   if (connection_data->async_dbus_id)
     {
@@ -247,8 +236,6 @@ close_and_unref_connection (void *data)
 {
   GDBusConnection *connection = G_DBUS_CONNECTION (data);
   
-  g_print ("close_and_unref_connection: closing connection\n");
-  
   /* TODO: watch for the need to manually call g_dbus_connection_close_sync () */
   g_object_unref (connection);
 }
@@ -257,8 +244,6 @@ static void
 set_connection_for_async (GDBusConnection *connection, const char *dbus_id)
 {
   VfsConnectionData *data;
-  
-  g_print ("set_connection_for_async: connection = %p, dbus_id = '%s'\n", connection, dbus_id);
   
   G_LOCK (async_map);
   data = g_object_get_data (G_OBJECT (connection), "connection_data");
@@ -314,7 +299,6 @@ async_got_private_connection_cb (GObject *source_object,
   GError *error = NULL;
   
   connection = g_dbus_connection_new_for_address_finish (res, &error);
-  g_print ("async_got_private_connection_cb, connection = %p\n", connection);
   if (!connection)
     {
       async_call->io_error = g_error_copy (error);
@@ -363,8 +347,6 @@ async_get_connection_response (GVfsDBusDaemon *proxy,
   GError *error = NULL;
   gchar *address1;
 
-  g_print ("async_get_connection_response\n");
-
   if (! gvfs_dbus_daemon_call_get_connection_finish (proxy,
                                                      &address1, NULL,
                                                      res,
@@ -394,8 +376,6 @@ open_connection_async_cb (GObject *source_object,
   GError *error = NULL;
  
   proxy = gvfs_dbus_daemon_proxy_new_finish (res, &error);
-  g_print ("open_connection_async_cb, proxy = %p\n", proxy);
-  
   if (proxy == NULL)
     {
       async_call->io_error = g_error_copy (error);
@@ -434,8 +414,6 @@ _g_dbus_connection_get_for_async (const char *dbus_id,
 {
   AsyncDBusCall *async_call;
 
-  g_print ("_g_dbus_connection_get_for_async\n");
-  
   async_call = g_new0 (AsyncDBusCall, 1);
   async_call->dbus_id = g_strdup (dbus_id);
   if (cancellable)
@@ -448,7 +426,6 @@ _g_dbus_connection_get_for_async (const char *dbus_id,
     open_connection_async (async_call);
   else
     {
-      g_print ("got connection from cache\n");
       async_call_finish (async_call);
     }
 }
@@ -590,7 +567,6 @@ struct _ThreadLocalConnections {
 static void
 free_local_connections (ThreadLocalConnections *local)
 {
-  g_print ("free_local_connections()\n");
   g_hash_table_destroy (local->connections);
   g_clear_object (&local->session_bus);
   g_free (local);

@@ -159,8 +159,6 @@ subscriber_connection_closed (GDBusConnection *connection,
                               GError          *error,
                               Subscriber      *subscriber)
 {
-  g_print ("subscriber_connection_closed, connection = %p\n", connection);
-  
   unsubscribe (subscriber);
 }
 
@@ -172,8 +170,6 @@ handle_subscribe (GVfsDBusMonitor *object,
 {
   Subscriber *subscriber;
 
-  g_print ("handle_subscribe: adding connection %p\n", g_dbus_method_invocation_get_connection (invocation));
-  
   subscriber = g_new0 (Subscriber, 1);
   subscriber->connection = g_object_ref (g_dbus_method_invocation_get_connection (invocation));
   subscriber->id = g_strdup (g_dbus_method_invocation_get_sender (invocation));
@@ -197,8 +193,6 @@ handle_unsubscribe (GVfsDBusMonitor *object,
 {
   Subscriber *subscriber;
   GList *l;
-
-  g_print ("handle_unsubscribe\n");
 
   g_object_ref (monitor); /* Keep alive during possible last remove */
   for (l = monitor->priv->subscribers; l != NULL; l = l->next)
@@ -301,7 +295,6 @@ changed_cb (GVfsDBusMonitorClient *proxy,
 {
   GError *error = NULL;
 
-  g_print ("gvfsmonitor.c: changed_cb()\n");
   if (! gvfs_dbus_monitor_client_call_changed_finish (proxy, res, &error))
     {
       g_printerr ("Error calling org.gtk.vfs.MonitorClient.Changed(): %s (%s, %d)\n",
@@ -320,7 +313,6 @@ got_proxy_cb (GObject *source_object,
   GError *error = NULL;
   GVfsDBusMonitorClient *proxy;
   
-  g_print ("gvfsmonitor.c: got_proxy_cb()\n");
   proxy = gvfs_dbus_monitor_client_proxy_new_finish (res, &error);
   if (proxy == NULL)
     {
@@ -351,8 +343,6 @@ g_vfs_monitor_emit_event (GVfsMonitor       *monitor,
 {
   GList *l;
   Subscriber *subscriber;
-  
-  g_print ("g_vfs_monitor_emit_event: file_path = '%s', other_file_path = '%s'\n", file_path, other_file_path);
 
   for (l = monitor->priv->subscribers; l != NULL; l = l->next)
     {
@@ -366,8 +356,6 @@ g_vfs_monitor_emit_event (GVfsMonitor       *monitor,
       data->file_path = g_strdup (file_path);
       data->other_file_path = g_strdup (other_file_path);
 
-      g_print ("  subscriber %p: object_path = '%s', name = '%s'\n", subscriber, subscriber->object_path, subscriber->id);
-      
       gvfs_dbus_monitor_client_proxy_new (subscriber->connection,
                                           G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                                           subscriber->id,

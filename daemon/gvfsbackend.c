@@ -608,8 +608,6 @@ create_mount_tracker_proxy (GVfsBackend *backend,
 {
   AsyncProxyCreate *data;
 
-  g_print ("create_mount_tracker_proxy\n");
-  
   data = g_new0 (AsyncProxyCreate, 1);
   data->callback = op_callback;
   data->callback_data = op_callback_data;
@@ -639,7 +637,6 @@ register_mount_got_proxy_cb (GObject *source_object,
   char *icon_str;
 
   proxy = gvfs_dbus_mount_tracker_proxy_new_for_bus_finish (res, &error);
-  g_print ("register_mount_got_proxy_cb, proxy = %p\n", proxy);
   if (proxy == NULL)
     {
       g_dbus_error_strip_remote_error (error);
@@ -671,8 +668,6 @@ register_mount_got_proxy_cb (GObject *source_object,
   else
    stable_name = backend->priv->display_name;
 
-  g_print ("g_vfs_backend_register_mount: calling register_mount() for object_path = '%s', display_name = '%s'\n", backend->priv->object_path, backend->priv->display_name);
-  
   gvfs_dbus_mount_tracker_call_register_mount (proxy,
                                                backend->priv->object_path,
                                                backend->priv->display_name,
@@ -697,8 +692,6 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
                               GAsyncReadyCallback callback,
 			      gpointer user_data)
 {
-  g_print ("g_vfs_backend_register_mount\n");
-  
   create_mount_tracker_proxy (backend, callback, user_data, register_mount_got_proxy_cb);
 }
 
@@ -714,7 +707,6 @@ unregister_mount_got_proxy_cb (GObject *source_object,
   GVfsBackend *backend;
 
   proxy = gvfs_dbus_mount_tracker_proxy_new_for_bus_finish (res, &error);
-  g_print ("unregister_mount_got_proxy_cb, proxy = %p\n", proxy);
   if (proxy == NULL)
     {
       g_dbus_error_strip_remote_error (error);
@@ -743,8 +735,6 @@ g_vfs_backend_unregister_mount (GVfsBackend *backend,
                                 GAsyncReadyCallback callback,
 				gpointer user_data)
 {
-  g_print ("g_vfs_backend_unregister_mount\n");
-  
   create_mount_tracker_proxy (backend, callback, user_data, unregister_mount_got_proxy_cb);
 }
 

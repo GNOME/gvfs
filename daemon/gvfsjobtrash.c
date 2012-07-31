@@ -77,8 +77,6 @@ g_vfs_job_trash_new_handle (GVfsDBusMount *object,
                             GVfsBackend *backend)
 {
   GVfsJobTrash *job;
-  
-  g_print ("called Trash()\n");
 
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;

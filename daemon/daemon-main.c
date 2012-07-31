@@ -159,7 +159,6 @@ call_spawned_cb (GVfsDBusSpawner *proxy,
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
-  g_print ("call_spawned_cb\n");
   
   data->callback (data->user_data);
   g_free (data);
@@ -189,17 +188,13 @@ send_spawned (gboolean succeeded,
       return;
     }
 
-  g_print ("sending spawned.\n");
-  
   error = NULL;
-  g_print ("send_spawned: before proxy creation, spawner_id = '%s', spawner_path = '%s'\n", spawner_id, spawner_path);
   proxy = gvfs_dbus_spawner_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
                                                     G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                                     spawner_id,
                                                     spawner_path,
                                                     NULL,
                                                     &error);
-  g_print ("send_spawned: after proxy creation\n");
   if (proxy == NULL)
     {
       g_printerr ("Error creating proxy: %s (%s, %d)\n",
@@ -212,7 +207,6 @@ send_spawned (gboolean succeeded,
   data->callback = callback;
   data->user_data = user_data;
   
-  g_print ("send_spawned: before call_spawned\n");
   gvfs_dbus_spawner_call_spawned (proxy, 
                                   succeeded,
                                   error_message,
@@ -370,8 +364,6 @@ daemon_main (int argc,
   guint name_owner_id;
   DaemonData *data;
 
-  g_print ("daemon_main: mountable_name = '%s'\n", mountable_name);
-  
   data = g_new0 (DaemonData, 1);
   data->mountable_name = g_strdup (mountable_name);
   data->max_job_threads = max_job_threads;
@@ -395,8 +387,6 @@ daemon_main (int argc,
   name_owner_id = 0;
   if (mountable_name)
     {
-      g_print ("daemon_main: requesting name '%s'\n", mountable_name); 
-
       name_owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
                                       mountable_name,
                                       G_BUS_NAME_OWNER_FLAGS_NONE,

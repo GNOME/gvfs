@@ -69,7 +69,6 @@ on_name_acquired (GDBusConnection *connection,
 {
   gboolean no_fuse = GPOINTER_TO_UINT (user_data);
 
-  g_warning ("main.c: Acquired the name %s on the session message bus\n", name);
   already_acquired = TRUE;
 
   if (! mount_init ())

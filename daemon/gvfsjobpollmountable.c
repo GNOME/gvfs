@@ -78,8 +78,6 @@ g_vfs_job_poll_mountable_new_handle (GVfsDBusMount *object,
 {
   GVfsJobPollMountable *job;
 
-  g_print ("called PollMountable()\n");
-
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;
 

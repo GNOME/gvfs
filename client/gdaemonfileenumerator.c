@@ -109,8 +109,6 @@ g_daemon_file_enumerator_finalize (GObject *object)
 
   daemon = G_DAEMON_FILE_ENUMERATOR (object);
 
-  g_print ("g_daemon_file_enumerator_finalize: daemon = %p\n", daemon);
-
   path = g_daemon_file_enumerator_get_object_path (daemon);
   _g_dbus_unregister_vfs_filter (path);
   g_free (path);
@@ -152,13 +150,10 @@ g_daemon_file_enumerator_class_init (GDaemonFileEnumeratorClass *klass)
 static void
 next_files_sync_check (GDaemonFileEnumerator *enumerator)
 {
-  g_print ("next_files_sync_check: enumerator->infos = %p, enumerator->done = %d, loop = %p, daemon = %p\n", enumerator->infos, enumerator->done, enumerator->next_files_mainloop, enumerator);
-
   g_mutex_lock (&enumerator->next_files_mutex);
   if ((enumerator->infos || enumerator->done) && 
       enumerator->next_files_mainloop != NULL)
     {
-      g_print ("next_files_sync_check: calling quit\n");
       g_main_loop_quit (enumerator->next_files_mainloop);
     }
   g_mutex_unlock (&enumerator->next_files_mutex);
@@ -170,8 +165,6 @@ handle_done (GVfsDBusEnumerator *object,
              gpointer user_data)
 {
   GDaemonFileEnumerator *enumerator = G_DAEMON_FILE_ENUMERATOR (user_data);
-
-  g_print ("handle_done: daemon = %p, async_requested_files = %d\n", enumerator, enumerator->async_requested_files);
 
   G_LOCK (infos);
   enumerator->done = TRUE;
@@ -196,8 +189,6 @@ handle_got_info (GVfsDBusEnumerator *object,
   GFileInfo *info;
   GVariantIter iter;
   GVariant *child;
-  
-  g_print ("handle_got_info: daemon = %p\n", enumerator);
 
   infos = NULL;
     
@@ -245,8 +236,6 @@ register_vfs_filter_cb (GDBusConnection *connection,
   g_signal_connect (skeleton, "handle-done", G_CALLBACK (handle_done), callback_data);
   g_signal_connect (skeleton, "handle-got-info", G_CALLBACK (handle_got_info), callback_data);
 
-  g_print ("register_vfs_filter_cb: callback_data = %p, skeleton = %p, obj_path = '%s'\n", callback_data, skeleton, obj_path);
-
   error = NULL;
   if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (skeleton),
                                          connection,
@@ -289,7 +278,6 @@ g_daemon_file_enumerator_new (GFile *file,
     daemon->next_files_context = g_main_context_new ();
 
   path = g_daemon_file_enumerator_get_object_path (daemon);
-  g_print ("g_daemon_file_enumerator_new: daemon = %p, obj_path = '%s', sync = %d\n", daemon, path, sync);
 
   _g_dbus_register_vfs_filter (path,
                                register_vfs_filter_cb,
@@ -460,8 +448,6 @@ sync_timeout (gpointer data)
 {
   GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (data);
 
-  g_print ("sync_timeout\n");
-  
   g_mutex_lock (&daemon->next_files_mutex);
   g_main_loop_quit (daemon->next_files_mainloop);
   g_mutex_unlock (&daemon->next_files_mutex);
@@ -490,13 +476,10 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
       return NULL;
     }
 
-  g_print ("g_daemon_file_enumerator_next_file: done = %d\n", daemon->done);
-  
   if (! daemon->infos && ! daemon->done)
     {
       /* Wait for incoming data */
       g_mutex_lock (&daemon->next_files_mutex);
-      g_print ("g_daemon_file_enumerator_next_file: starting loop, daemon = %p\n", daemon);
       daemon->next_files_mainloop = g_main_loop_new (daemon->next_files_context, FALSE);
 
       g_mutex_unlock (&daemon->next_files_mutex);
@@ -508,7 +491,6 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
       g_main_context_pop_thread_default (daemon->next_files_context);
 
       g_mutex_lock (&daemon->next_files_mutex);
-      g_print ("g_daemon_file_enumerator_next_file: loop done.\n");
       g_source_remove (daemon->next_files_sync_timeout_tag);
 
       g_main_loop_unref (daemon->next_files_mainloop);

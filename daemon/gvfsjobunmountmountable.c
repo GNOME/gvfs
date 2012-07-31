@@ -114,8 +114,6 @@ g_vfs_job_unmount_mountable_new_handle (GVfsDBusMount *object,
                                         const gchar *arg_obj_path,
                                         GVfsBackend *backend)
 {
-  g_print ("called UnmountMountable()\n");
-
   return do_g_vfs_job_unmount_mountable_new_handle (object,
                                                     invocation,
                                                     arg_path_data,
@@ -135,8 +133,6 @@ g_vfs_job_eject_mountable_new_handle (GVfsDBusMount *object,
                                       const gchar *arg_obj_path,
                                       GVfsBackend *backend)
 {
-  g_print ("called EjectMountable()\n");
-
   return do_g_vfs_job_unmount_mountable_new_handle (object,
                                                     invocation,
                                                     arg_path_data,

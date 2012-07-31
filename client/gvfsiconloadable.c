@@ -96,8 +96,6 @@ g_vfs_icon_load (GLoadableIcon  *icon,
   GVariant *fd_id_val = NULL;
   GError *local_error = NULL;
 
-  g_print ("gvfsiconloadable.c: g_vfs_icon_load\n");
-
   proxy = create_proxy_for_icon (vfs_icon, cancellable, error);
   if (proxy == NULL)
     return NULL;
@@ -110,8 +108,6 @@ g_vfs_icon_load (GLoadableIcon  *icon,
                                                       &fd_list,
                                                       cancellable,
                                                       &local_error);
-  
-  g_print ("gvfsiconloadable.c: g_vfs_icon_load: done, res = %d\n", res);
   
   if (! res)
     {
@@ -182,7 +178,6 @@ async_proxy_new_cb (GObject *source_object,
   GError *error = NULL;
   
   proxy = gvfs_dbus_mount_proxy_new_finish (res, &error);
-  g_print ("gvfsiconloadable.c: async_proxy_new_cb, proxy = %p\n", proxy);
   if (proxy == NULL)
     {
       _g_simple_async_result_take_error_stripped (data->result, error);      
@@ -206,8 +201,6 @@ async_got_connection_cb (GDBusConnection *connection,
                          gpointer callback_data)
 {
   AsyncPathCall *data = callback_data;
-  
-  g_print ("gvfsiconloadable.c: async_got_connection_cb, connection = %p\n", connection);
   
   if (connection == NULL)
     {
@@ -234,8 +227,6 @@ async_got_mount_info (GMountInfo *mount_info,
                       GError *error)
 {
   AsyncPathCall *data = _data;
- 
-  g_print ("gvfsiconloadable.c: async_got_mount_info, mount_info = %p\n", mount_info);
 
   if (error != NULL)
     {
@@ -296,8 +287,6 @@ open_icon_read_cb (GVfsDBusMount *proxy,
   guint fd_id;
   GFileInputStream *stream;
 
-  g_print ("gvfsiconloadable.c: open_icon_read_cb\n");
-
   if (! gvfs_dbus_mount_call_open_icon_for_read_finish (proxy, &fd_id_val, &can_seek, &fd_list, res, &error))
     {
       _g_simple_async_result_take_error_stripped (data->result, error);
@@ -334,8 +323,6 @@ load_async_cb (GVfsDBusMount *proxy,
                gpointer callback_data)
 {
   AsyncPathCall *data = callback_data;
-
-  g_print ("gvfsiconloadable.c: load_async_cb\n");
 
   gvfs_dbus_mount_call_open_icon_for_read (proxy,
                                            data->vfs_icon->icon_id,

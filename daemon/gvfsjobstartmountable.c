@@ -83,8 +83,6 @@ g_vfs_job_start_mountable_new_handle (GVfsDBusMount *object,
 {
   GVfsJobStartMountable *job;
 
-  g_print ("called StartMountable()\n");
-
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;
   

@@ -84,8 +84,6 @@ g_vfs_job_unmount_new_handle (GVfsDBusMount *object,
 {
   GVfsJobUnmount *job;
 
-  g_print ("called Unmount()\n");
-
   if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
     return TRUE;
 

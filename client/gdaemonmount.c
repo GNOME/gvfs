@@ -205,8 +205,6 @@ unmount_reply (GVfsDBusMount *proxy,
   AsyncProxyCreate *data = user_data;
   GError *error = NULL;
 
-  g_print ("gdaemonmount.c: unmount_reply, proxy = %p\n", proxy);
-
   if (! gvfs_dbus_mount_call_unmount_finish (proxy, res, &error))
     {
       _g_simple_async_result_take_error_stripped (data->result, error);
@@ -228,7 +226,6 @@ async_proxy_new_cb (GObject *source_object,
   GMountSource *mount_source;
 
   proxy = gvfs_dbus_mount_proxy_new_finish (res, &error);
-  g_print ("gdaemonmount.c: async_proxy_new_cb, proxy = %p\n", proxy);
   if (proxy == NULL)
     {
       _g_simple_async_result_take_error_stripped (data->result, error);
@@ -297,8 +294,6 @@ async_got_connection_cb (GDBusConnection *connection,
 {
   AsyncProxyCreate *data = callback_data;
   
-  g_print ("gdaemonmount.c: async_got_connection_cb, connection = %p\n", connection);
-  
   if (connection == NULL)
     {
       /* TODO: we should probably test if we really want a session bus;
@@ -323,8 +318,6 @@ g_daemon_mount_unmount_with_operation (GMount *mount,
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
   AsyncProxyCreate *data;
-
-  g_print ("g_daemon_mount_unmount_with_operation\n");
 
   data = g_new0 (AsyncProxyCreate, 1);
   data->mount = g_object_ref (mount);

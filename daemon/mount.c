@@ -260,8 +260,6 @@ mount_data_free (MountData *data)
   g_free (data->obj_path);
   g_clear_object (&data->spawner);
 
-  g_print ("mount_data_free\n");
-
   g_free (data);
 }
 
@@ -311,7 +309,6 @@ mountable_mount_proxy_cb (GObject *source_object,
   MountData *data = user_data;
   
   proxy = gvfs_dbus_mountable_proxy_new_for_bus_finish (res, &error);
-  g_print ("mountable_mount_proxy_cb: proxy = %p, error = %p\n", proxy, error);
 
   if (proxy == NULL)
     {
@@ -339,8 +336,6 @@ static void
 mountable_mount_with_name (MountData *data,
 			   const char *dbus_name)
 {
-  g_print ("mountable_mount_with_name: dbus_name = '%s'\n", dbus_name);
-  
   gvfs_dbus_mountable_proxy_new_for_bus (G_BUS_TYPE_SESSION,
                                          G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                          dbus_name,
@@ -360,8 +355,6 @@ spawn_mount_handle_spawned (GVfsDBusSpawner *object,
   MountData *data = user_data;
   GError *error;
 
-  g_print ("called org.gtk.vfs.Spawner.spawned(), sender = '%s', succeeded = %d\n", g_dbus_method_invocation_get_sender (invocation), arg_succeeded);
-  
   g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (data->spawner));
   
   if (!arg_succeeded)
@@ -427,12 +420,10 @@ spawn_mount (MountData *data)
       exec = g_strconcat (data->mountable->exec, " --spawner ", g_dbus_connection_get_unique_name (connection), " ", data->obj_path, NULL);
       if (!g_spawn_command_line_async (exec, &error))
 	{
-          g_print ("spawning failed.\n");
           g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (data->spawner));
 	  mount_finish (data, error);
 	  g_error_free (error);
 	}
-      g_print ("spawn okay.\n");
       
       /* TODO: Add a timeout here to detect spawned app crashing */
       
@@ -540,8 +531,6 @@ static void
 signal_mounted_unmounted (VfsMount *mount,
 			  gboolean mounted)
 {
-  g_print ("signal_mounted_unmounted: signalling %s\n", mounted ? "mount" : "umount");
-  
   if (mounted)
     gvfs_dbus_mount_tracker_emit_mounted (mount_tracker, vfs_mount_to_dbus (mount));
   else
@@ -574,8 +563,6 @@ name_vanished_cb (GDBusConnection *connection,
                   const gchar *name,
                   gpointer user_data)
 {
-  g_print ("name_vanished_cb: name = '%s'\n", name);
-  
   dbus_client_disconnected (name);
 }
 
@@ -596,8 +583,6 @@ handle_register_mount (GVfsDBusMountTracker *object,
   VfsMount *mount;
   const char *id;
   GMountSpec *mount_spec;
-
-  g_print ("called handle_register_mount()\n");
 
   id = g_dbus_method_invocation_get_sender (invocation);
 
@@ -653,8 +638,6 @@ handle_register_mount (GVfsDBusMountTracker *object,
       
       mounts = g_list_prepend (mounts, mount);
 
-      g_print ("handle_register_mount: dbus_id = '%s'\n", id);
-      
       /* watch the mount for being disconnected */
       mount->name_watcher_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
                                                  id,
@@ -666,7 +649,6 @@ handle_register_mount (GVfsDBusMountTracker *object,
 
       signal_mounted_unmounted (mount, TRUE);
 
-      g_print ("handle_register_mount: calling complete\n");
       gvfs_dbus_mount_tracker_complete_register_mount (object, invocation);
     }
   
@@ -765,8 +747,6 @@ handle_lookup_mount (GVfsDBusMountTracker *object,
 {
   GMountSpec *spec;
 
-  g_print ("called lookup_mount(), sender = '%s', obj_path = '%s'\n", g_dbus_method_invocation_get_sender (invocation), g_dbus_method_invocation_get_object_path (invocation));
-
   spec = g_mount_spec_from_dbus (arg_mount_spec);
 
   if (spec != NULL)
@@ -790,8 +770,6 @@ handle_lookup_mount_by_fuse_path (GVfsDBusMountTracker *object,
 {
   VfsMount *mount;
 
-  g_print ("called lookup_mount_by_fuse_path()\n");
-
   mount = find_vfs_mount_by_fuse_path (arg_fuse_path);
 
   if (mount == NULL)
@@ -814,8 +792,6 @@ handle_list_mounts (GVfsDBusMountTracker *object,
 {
   GList *l;
   GVariantBuilder mounts_array;
-
-  g_print ("called list_mounts()\n");
 
   g_variant_builder_init (&mounts_array, G_VARIANT_TYPE (VFS_MOUNT_ARRAY_DBUS_STRUCT_TYPE));
   for (l = mounts; l != NULL; l = l->next)
@@ -852,8 +828,6 @@ handle_mount_location (GVfsDBusMountTracker *object,
 {
   GMountSpec *spec;
   VfsMountable *mountable;
-
-  g_print ("called mount_location()\n");
 
   spec = g_mount_spec_from_dbus (arg_mount_spec);
   if (spec == NULL)
@@ -910,8 +884,6 @@ handle_list_mount_types (GVfsDBusMountTracker *object,
   GPtrArray *types;
   GList *l;
 
-  g_print ("called list_mount_types()\n");
-
   types = g_ptr_array_new ();
   for (l = mountables; l != NULL; l = l->next)
     {
@@ -935,8 +907,6 @@ handle_list_mountable_info (GVfsDBusMountTracker *object,
   GList *l;
   GVariantBuilder mountables_array;
   
-  g_print ("called list_mountable_info()\n");
-  
   g_variant_builder_init (&mountables_array, G_VARIANT_TYPE (VFS_MOUNTABLE_ARRAY_DBUS_STRUCT_TYPE));
   for (l = mountables; l != NULL; l = l->next) {
     g_variant_builder_add_value (&mountables_array, vfs_mountable_to_dbus (l->data));
@@ -953,8 +923,6 @@ handle_register_fuse (GVfsDBusMountTracker *object,
                       GDBusMethodInvocation *invocation,
                       gpointer user_data)
 {
-  g_print ("called register_fuse()\n");
-  
   fuse_available = TRUE;
   gvfs_dbus_mount_tracker_complete_register_fuse (object, invocation);
   
