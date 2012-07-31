@@ -241,7 +241,7 @@ AC_ARG_ENABLE(udisks2, AS_HELP_STRING([--disable-udisks2],[build without libudis
 msg_udisks2=no
 UDISKS2_LIBS=
 UDISKS2_CFLAGS=
-UDISKS2_REQUIRED=1.90
+UDISKS2_REQUIRED=1.97
 
 if test "x$enable_udisks2" != "xno"; then
   PKG_CHECK_EXISTS([udisks2 >= $UDISKS2_REQUIRED], msg_udisks2=yes)
