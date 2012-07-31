@@ -399,7 +399,7 @@ setup_ssh_environment (void)
                                       NULL,
                                       NULL,
                                       G_DBUS_CALL_FLAGS_NONE,
-                                      1000,
+                                      -1,
                                       NULL,
                                       &error);
   if (! iter)
