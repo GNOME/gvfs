@@ -1,0 +1,101 @@
+<?xml version='1.0'?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+        "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<refentry id="gvfs-metadata-daemon">
+
+        <refentryinfo>
+                <title>gvfsd-metadata</title>
+                <productname>gvfs</productname>
+
+                <authorgroup>
+                        <author>
+                                <contrib>Developer</contrib>
+                                <firstname>Alexander</firstname>
+                                <surname>Larsson</surname>
+                                <email>alexl@redhat.com</email>
+                        </author>
+                </authorgroup>
+
+        </refentryinfo>
+
+        <refmeta>
+                <refentrytitle>gvfsd-metadata</refentrytitle>
+                <manvolnum>1</manvolnum>
+        </refmeta>
+
+        <refnamediv>
+                <refname>gvfsd-metadata</refname>
+                <refpurpose>Metadata daemon for gvfs</refpurpose>
+        </refnamediv>
+
+        <refsynopsisdiv>
+                <cmdsynopsis>
+                        <command>gvfs-metadata</command>
+                        <arg choice="opt" rep="repeat">OPTION</arg>
+                </cmdsynopsis>
+        </refsynopsisdiv>
+
+        <refsect1>
+                <title>Description</title>
+
+                <para><command>gvfsd-metadata</command> is a daemon acting
+                as a write serialiser to the internal gvfs metadata storage.
+                It is autostarted by GIO clients when they make metadata
+                changes. Read operations are done by client-side GIO code
+                directly, and don't require the daemon to be running.</para>
+
+                <para>The gvfs metadata capabilities are used by
+                the nautilus file manager, for example.</para>
+        </refsect1>
+
+        <refsect1>
+                <title>Options</title>
+
+                <variablelist>
+                        <varlistentry>
+                                <term><option>-h</option>, <option>--help</option></term>
+
+                                <listitem><para>Prints a short help
+                                text and exits.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
+                                <term><option>-r</option>, <option>--replace</option></term>
+
+                                <listitem><para>Replace the currently running instance.</para></listitem>
+                        </varlistentry>
+
+                </variablelist>
+        </refsect1>
+
+        <refsect1>
+                <title>Exit status</title>
+
+                <para>On success 0 is returned, a non-zero failure
+                code otherwise.</para>
+        </refsect1>
+
+        <refsect1>
+                <title>Files</title>
+
+                <variablelist>
+                        <varlistentry>
+                                <term><filename><envar>$XDG_DATA_HOME</envar>/gvfs-metadata</filename></term>
+
+                                <listitem><para>The directory where the gvfs
+                                metadata database files are stored</para></listitem>
+                        </varlistentry>
+                </variablelist>
+
+        </refsect1>
+
+        <refsect1>
+                <title>See Also</title>
+                <para>
+                        <citerefentry><refentrytitle>gvfs</refentrytitle><manvolnum>7</manvolnum></citerefentry>,
+                        <citerefentry><refentrytitle>nautilus</refentrytitle><manvolnum>1</manvolnum></citerefentry>
+                </para>
+        </refsect1>
+
+</refentry>

@@ -1,0 +1,143 @@
+<?xml version='1.0'?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+        "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<refentry id="gvfs">
+
+        <refentryinfo>
+                <title>gvfs</title>
+                <productname>gvfs</productname>
+
+                <authorgroup>
+                        <author>
+                                <contrib>Developer</contrib>
+                                <firstname>Alexander</firstname>
+                                <surname>Larsson</surname>
+                                <email>alexl@redhat.com</email>
+                        </author>
+                </authorgroup>
+
+        </refentryinfo>
+
+        <refmeta>
+                <refentrytitle>gvfs</refentrytitle>
+                <manvolnum>7</manvolnum>
+                <refmiscinfo class="manual">Conventions and miscellaneous</refmiscinfo>
+        </refmeta>
+
+        <refnamediv>
+                <refname>gvfs</refname>
+                <refpurpose>GIO virtual file system</refpurpose>
+        </refnamediv>
+
+        <refsect1>
+                <title>Description</title>
+
+                <para>GIO provides a VFS API to GLib applications. It
+                includes a 'local' implementation using POSIX. gvfs
+                provides implementations that go beyond that and allow
+                to access files and storage using many protocols, such
+                as ftp, http, sftp, dav, obexftp, etc. It also provides
+                support for trash folders, for cd burning and for monitoring
+                interesting devices and volumes on the computer.</para>
+
+                <para>Applications use gvfs indirectly, by means of GIO
+                loading the gvfs module that implements the GIO extension
+                points. The gvfs support for volume monitoring is included
+                in a separate loadable module.</para>
+
+                <para>The actual gvfs implementation is distributed over
+                a number of processes. None of these are expected to be
+                started from the commandline, except for debugging
+                purposes.</para>
+
+                <para>Main processes:
+                <itemizedlist>
+                        <listitem><para>gvfsd - the main gvfs daemon</para></listitem>
+                        <listitem><para>gvfs-fuse-daemon - mounts gvfs as a fuse filesystem</para></listitem>
+                        <listitem><para>gvfsd-metadata - writes gvfs metadata</para></listitem>
+                </itemizedlist>
+                Volume monitors:
+                <itemizedlist>
+                        <listitem><para>gvfs-udisks2-volume-monitor - a udisks-based volume monitor</para></listitem>
+                        <listitem><para>gvfs-afc-volume-monitor - a volume monitor for Apple iPhone/iPod Touch devices</para></listitem>
+                </itemizedlist>
+                Mount backends:
+                <itemizedlist>
+                        <listitem><para>gvfsd-afc - mounts iPhone/iPod touch volumes</para></listitem>
+                        <listitem><para>gvfsd-afp - mounts Apple Filing Protocol volumes</para></listitem>
+                        <listitem><para>gvfsd-afp-browse - browses Apple Filing Protocol volumes</para></listitem>
+                        <listitem><para>gvfsd-archive - mounts archive files in various formats</para></listitem>
+                        <listitem><para>gvfsd-burn - provides a location for burning CDs</para></listitem>
+                        <listitem><para>gvfsd-cdda - mounts audio CDs</para></listitem>
+                        <listitem><para>gvfsd-computer - provides computer://</para></listitem>
+                        <listitem><para>gvfsd-dav - mounts DAV filesystems</para></listitem>
+                        <listitem><para>gvfsd-dnssd - browses dnssd</para></listitem>
+                        <listitem><para>gvfsd-ftp - mounts over FTP</para></listitem>
+                        <listitem><para>gvfsd-http - mounts over HTTP</para></listitem>
+                        <listitem><para>gvfsd-localtest - a test backend</para></listitem>
+                        <listitem><para>gvfsd-network - provides network://</para></listitem>
+                        <listitem><para>gvfsd-obexftp - mounts over obexftp</para></listitem>
+                        <listitem><para>gvfsd-recent - provides recent://</para></listitem>
+                        <listitem><para>gvfsd-sftp - mounts over sftp</para></listitem>
+                        <listitem><para>gvfsd-smb - mounts Windows Shares Filesystem volumes</para></listitem>
+                        <listitem><para>gvfsd-smb-browse - browses Windows Shares Filesystem volumes</para></listitem>
+                        <listitem><para>gvfsd-trash - provides trash://</para></listitem>
+                </itemizedlist>
+                </para>
+        </refsect1>
+
+        <refsect1>
+                <title>Environment</title>
+
+                <varlistentry>
+                        <term><envar>GIO_USE_VFS</envar></term>
+
+                        <listitem><para>If set, specifies the GIO vfs
+                        implementation to use. Possible values include
+                        'local' and 'gvfs'.</para></listitem>
+                </varlistentry>
+
+                <varlistentry>
+                        <term><envar>GIO_USE_VOLUME_MONITOR</envar></term>
+
+                        <listitem><para>If set, specifies the GIO volume
+                        monitor implementation to use. Possible values include
+                        'unix', 'GProxyVolumeMonitorUDisks2', as well as
+                        other native volume monitors that are described in
+                        the key files in
+                        <filename><envar>$XDG_DATA_DIRS</envar>/gvfs/remote-volume-monitors</filename>.</para></listitem>
+                </varlistentry>
+
+        </refsect1>
+
+        <refsect1>
+                <title>Files</title>
+
+                <varlistentry>
+                        <term><filename><envar>$XDG_DATA_DIRS</envar>/gvfs/mounts</filename></term>
+
+                        <listitem><para>This directory contains key files
+                        describing mount daemons.</para></listitem>
+                </varlistentry>
+
+                <varlistentry>
+                        <term><filename><envar>$XDG_DATA_DIRS</envar>/gvfs/remote-volume-monitors</filename></term>
+
+                        <listitem><para>This directory contains key files
+                        describing remote volume monitors.</para></listitem>
+                </varlistentry>
+
+        </refsect1>
+
+        <refsect1>
+                <title>See Also</title>
+                <para>
+                        <ulink url="http://developer.gnome.org/gio">GIO documentation</ulink>,
+                        <citerefentry><refentrytitle>gvfsd</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+                        <citerefentry><refentrytitle>gvfsd-fuse</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+                        <citerefentry><refentrytitle>gvfsd-metadata</refentrytitle><manvolnum>1</manvolnum></citerefentry>
+                </para>
+        </refsect1>
+
+</refentry>

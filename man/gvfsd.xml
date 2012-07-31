@@ -1,0 +1,122 @@
+<?xml version='1.0'?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+        "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<refentry id="gvfsd">
+
+        <refentryinfo>
+                <title>gvfsd</title>
+                <productname>gvfs</productname>
+
+                <authorgroup>
+                        <author>
+                                <contrib>Developer</contrib>
+                                <firstname>Alexander</firstname>
+                                <surname>Larsson</surname>
+                                <email>alexl@redhat.com</email>
+                        </author>
+                </authorgroup>
+
+        </refentryinfo>
+
+        <refmeta>
+                <refentrytitle>gvfsd</refentrytitle>
+                <manvolnum>1</manvolnum>
+        </refmeta>
+
+        <refnamediv>
+                <refname>gvfsd</refname>
+                <refpurpose>Main daemon for gvfs</refpurpose>
+        </refnamediv>
+
+        <refsynopsisdiv>
+                <cmdsynopsis>
+                        <command>gvfsd</command>
+                        <arg choice="opt" rep="repeat">OPTION</arg>
+                </cmdsynopsis>
+        </refsynopsisdiv>
+
+        <refsect1>
+                <title>Description</title>
+
+                <para><command>gvfsd</command> is the main daemon for
+                the gvfs virtual filesystem. It provides the
+                <emphasis>org.gtk.vfs.Daemon</emphasis> name on the
+                session bus. gvfsd is autostarted by GIO clients if it
+                is not running.</para>
+
+                <para>The primary task of <command>gvfsd</command> is to
+                act as a mount tracker/manager. It spawns new backends
+                when requested and keeps track fo their lifecycle,
+                maintaining a list of active mounts and creates direct
+                connections to them.</para>
+
+                <para>Since gvfs backends are running as children of the
+                gvfsd process, it is possible to start gvfsd in
+                a terminal and set environment variables to get
+                debug output from individual backends.</para>
+
+                <para><command>gvfsd</command> also starts the
+                <citerefentry><refentrytitle>gvfsd-fuse</refentrytitle><manvolnum>1</manvolnum></citerefentry>, and provides it the mount point
+                where the fuse file system should be mounted.</para>
+        </refsect1>
+
+        <refsect1>
+                <title>Options</title>
+
+                <variablelist>
+                        <varlistentry>
+                                <term><option>-h</option>, <option>--help</option></term>
+
+                                <listitem><para>Prints a short help
+                                text and exits.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
+                                <term><option>-r</option>, <option>--replace</option></term>
+
+                                <listitem><para>Replace the currently running gvfsd instance.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
+                                <term><option>--no-fuse</option></term>
+
+                                <listitem><para>Don't start the fuse filesystem.</para></listitem>
+                        </varlistentry>
+
+                </variablelist>
+        </refsect1>
+
+        <refsect1>
+                <title>Environment</title>
+
+                <variablelist>
+
+                        <varlistentry>
+                                <term><envar>GVFS_DISABLE_FUSE</envar></term>
+
+                                <listitem><para>If this environment variable
+                                is set, gvfsd will not start the fuse
+                                filesystem.</para></listitem>
+                        </varlistentry>
+
+                </variablelist>
+
+        </refsect1>
+
+        <refsect1>
+                <title>Exit status</title>
+
+                <para>On success 0 is returned, a non-zero failure
+                code otherwise.</para>
+        </refsect1>
+
+        <refsect1>
+                <title>See Also</title>
+                <para>
+                        <citerefentry><refentrytitle>gvfs</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+                        <citerefentry><refentrytitle>gvfsd-fuse</refentrytitle><manvolnum>1</manvolnum></citerefentry>
+                </para>
+        </refsect1>
+
+</refentry>

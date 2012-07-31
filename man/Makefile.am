@@ -1,5 +1,16 @@
-.xml.1:
-	$(AM_V_GEN) $(XSLTPROC) -o $@ --nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
+XSLTPROC_FLAGS = \
+	--nonet \
+	--stringparam man.output.quietly 1 \
+	--stringparam funcsynopsis.style ansi \
+	--stringparam man.th.extra1.suppress 1 \
+	--stringparam man.authors.section.enabled 0 \
+	--stringparam man.copyright.section.enabled 0
+
+%.1: %.xml
+	$(AM_V_GEN) $(XSLTPROC) $(XSLTPROC_FLAGS) http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
+
+%.7: %.xml
+	$(AM_V_GEN) $(XSLTPROC) $(XSLTPROC_FLAGS) http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
 
 man_MANS = \
 	gvfs-cat.1 \
@@ -18,10 +29,14 @@ man_MANS = \
 	gvfs-save.1 \
 	gvfs-set-attribute.1 \
 	gvfs-trash.1 \
-	gvfs-tree.1
+	gvfs-tree.1 \
+	gvfs.7 \
+	gvfsd.1 \
+	gvfsd-fuse.1 \
+	gvfsd-metadata.1
 
-xml_files = $(man_MANS:.1=.xml)
+xml_files = ${patsubst %.1,%.xml,${patsubst %.7,%.xml,$(man_MANS)}}
 
 EXTRA_DIST = $(xml_files)
 
-DISTCLEANFILES = $(man_MANS)
+CLEANFILES = $(man_MANS)

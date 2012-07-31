@@ -1,0 +1,102 @@
+<?xml version='1.0'?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+        "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<refentry id="gvfsd-fuse">
+
+        <refentryinfo>
+                <title>gvfsd-fuse</title>
+                <productname>gvfs</productname>
+
+                <authorgroup>
+                        <author>
+                                <contrib>Developer</contrib>
+                                <firstname>Alexander</firstname>
+                                <surname>Larsson</surname>
+                                <email>alexl@redhat.com</email>
+                        </author>
+                </authorgroup>
+
+        </refentryinfo>
+
+        <refmeta>
+                <refentrytitle>gvfsd-fuse</refentrytitle>
+                <manvolnum>1</manvolnum>
+        </refmeta>
+
+        <refnamediv>
+                <refname>gvfsd-fuse</refname>
+                <refpurpose>Fuse daemon for gvfs</refpurpose>
+        </refnamediv>
+
+        <refsynopsisdiv>
+                <cmdsynopsis>
+                        <command>gvfsd-fuse</command>
+                        <arg choice="plain">PATH</arg>
+                </cmdsynopsis>
+        </refsynopsisdiv>
+
+        <refsect1>
+                <title>Description</title>
+
+                <para><command>gvfsd-fuse</command> maintains
+                a fuse mount to make gvfs backends available to
+                POSIX applications. The mount point for the fuse
+                filesystem is provided by the <arg>PATH</arg>
+                argument.</para>
+
+                <para><command>gvfsd-fuse</command> is normally
+                started by
+                <citerefentry><refentrytitle>gvfsd</refentrytitle><manvolnum>1</manvolnum></citerefentry>.
+                In this case, the mount point is
+                <filename><envar>$XDG_RUNTIME_DIR</envar>/gvfs</filename> or
+                <filename><envar>$HOME</envar>/.gvfs</filename>.</para>
+        </refsect1>
+
+       <refsect1>
+                <title>Options</title>
+
+                <variablelist>
+                        <varlistentry>
+                                <term><option>-d</option></term>
+
+                                <listitem><para>Enable fuse debug output.
+                                This implies <option>-f</option>.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
+                                <term><option>-f</option></term>
+
+                                <listitem><para>Run in the foreground.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
+                                <term><option>-s</option></term>
+
+                                <listitem><para>Run single-threaded.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
+                                <term><option>-o OPTION</option></term>
+
+                                <listitem><para>Set a fuse-specific option.
+                                See the fuse documentation for a list of these.</para></listitem>
+                        </varlistentry>
+                </variablelist>
+        </refsect1>
+
+        <refsect1>
+                <title>Exit status</title>
+
+                <para>On success 0 is returned, a non-zero failure
+                code otherwise.</para>
+        </refsect1>
+
+        <refsect1>
+                <title>See Also</title>
+                <para>
+                        <citerefentry><refentrytitle>gvfs</refentrytitle><manvolnum>7</manvolnum></citerefentry>
+                </para>
+        </refsect1>
+
+</refentry>
