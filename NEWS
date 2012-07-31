@@ -1,3 +1,19 @@
+Major changes in 1.13.4
+=======================
+* Core daemon and backends GDBus port
+* FSF Address has been updated
+* gvfs-fuse-daemon has been renamed to gvfsd-fuse
+* Spelling correction "filesystem" -> "file system"
+* programs: Return proper exit value when something fails
+* udisks2: Work around Linux bug for lingering partitions of cleared loop device
+* udisks2: set should_automount to TRUE for loop devices set up by the user
+* udisks2: ensure that encrypted loop devices also get padlock emblem
+* build: Update udisks2 requirement to version 1.97
+* proxyvolumemonitor: Use GDBusProxy's name owner change notification
+* computer: Mark items as not renamable
+* afc: Use consistent debug env var
+* Translation updates
+
 Major changes in 1.13.3
 =======================
 * Added man pages for all gvfs utilities
