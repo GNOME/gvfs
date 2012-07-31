@@ -1097,5 +1097,5 @@ g_vfs_backend_cdda_class_init (GVfsBackendCddaClass *klass)
 void
 g_vfs_cdda_daemon_init (void)
 {
-  g_set_application_name (_("Audio CD Filesystem Service"));
+  g_set_application_name (_("Audio CD File System Service"));
 }

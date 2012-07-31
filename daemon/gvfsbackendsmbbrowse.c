@@ -1486,5 +1486,5 @@ g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
 void
 g_vfs_smb_browse_daemon_init (void)
 {
-  g_set_application_name (_("Windows Network Filesystem Service"));
+  g_set_application_name (_("Windows Network File System Service"));
 }

@@ -2184,5 +2184,5 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
 void
 g_vfs_smb_daemon_init (void)
 {
-  g_set_application_name (_("Windows Shares Filesystem Service"));
+  g_set_application_name (_("Windows Shares File System Service"));
 }

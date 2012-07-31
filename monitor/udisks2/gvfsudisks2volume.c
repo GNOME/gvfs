@@ -1093,7 +1093,7 @@ unlock_cb (GObject       *source_object,
           g_simple_async_result_set_error (data->simple,
                                            G_IO_ERROR,
                                            G_IO_ERROR_FAILED,
-                                           _("The unlocked device does not have a recognizable filesystem on it"));
+                                           _("The unlocked device does not have a recognizable file system on it"));
           g_simple_async_result_complete (data->simple);
           mount_data_free (data);
           goto out;

@@ -35,7 +35,7 @@ static gboolean writable = FALSE;
 static GOptionEntry entries[] =
 {
   { "query-writable", 'w', 0, G_OPTION_ARG_NONE, &writable, N_("List writable attributes"), NULL },
-  { "filesystem", 'f', 0, G_OPTION_ARG_NONE, &filesystem, N_("Get filesystem info"), NULL },
+  { "filesystem", 'f', 0, G_OPTION_ARG_NONE, &filesystem, N_("Get file system info"), NULL },
   { "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, N_("The attributes to get"), N_("ATTRIBUTES") },
   { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symbolic links"), NULL },
   { NULL }

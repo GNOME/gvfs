@@ -214,7 +214,7 @@ job_finish_immediately_if_possible (GVfsJobUnmount *op_job)
   if (is_busy && ! force_unmount)
     g_vfs_job_failed_literal (G_VFS_JOB (op_job),
 			      G_IO_ERROR, G_IO_ERROR_BUSY,
-			      _("Filesystem is busy"));
+			      _("File system is busy"));
   else
     g_vfs_job_succeeded (G_VFS_JOB (op_job));
 
