@@ -352,7 +352,7 @@ read_dbus_string_dict_value (GVariant *args, const gchar *key)
   const gchar *str, *val;
   gchar *res;
   
-  if (g_strcmp0 (g_variant_get_type_string (args), "(a{ss})") != 0)
+  if (! g_variant_is_of_type (args, G_VARIANT_TYPE ("(a{ss})")))
     return NULL;
   
   g_variant_get (args, "(@a{ss})", &a);
