@@ -828,8 +828,6 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
    * loop device, check the SetupByUid property - we don't want to
    * show loop devices set up by other users
    */
-#ifdef UDISKS_CHECK_VERSION
-# if UDISKS_CHECK_VERSION(1,97,0)
   loop = udisks_client_get_loop_for_block (monitor->client, block);
   if (loop != NULL)
     {
@@ -854,8 +852,6 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
       if (udisks_block_get_size (block_for_loop) == 0)
         goto out;
     }
-# endif
-#endif
 
   /* ignore the volume if the drive is ignored */
   udisks_drive = udisks_client_get_drive_for_block (monitor->client, block);

@@ -566,14 +566,10 @@ gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive)
    * seat.
    *
    * Note that seat support was added in udisks 1.95.0 (and so was the
-   * UDISKS_CHECK_VERSION macro) - for now, be compatible with older
-   * versions instead of bumping requirement in configure.ac
+   * UDISKS_CHECK_VERSION macro).
    */
-#ifdef UDISKS_CHECK_VERSION
-# if UDISKS_CHECK_VERSION(1,95,0)
   drive_seat = udisks_drive_get_seat (drive);
-# endif
-#endif
+
   if (drive_seat == NULL || strlen (drive_seat) == 0)
     {
       ret = TRUE;
