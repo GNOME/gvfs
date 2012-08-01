@@ -152,10 +152,12 @@ show_info (GFileInfo *info)
 
   name = g_file_info_get_display_name (info);
   if (name)
+    /* Translators: This is a noun and represents and attribute of a file */
     g_print (_("display name: %s\n"), name);
 
   name = g_file_info_get_edit_name (info);
   if (name)
+    /* Translators: This is a noun and represents and attribute of a file */
     g_print (_("edit name: %s\n"), name);
 
   name = g_file_info_get_name (info);
