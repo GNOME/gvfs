@@ -491,17 +491,17 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
               g_vfs_backend_set_display_name (G_VFS_BACKEND(self), display_name);
               break;
             case 2:
+              g_vfs_backend_set_display_name (G_VFS_BACKEND(self),
               /* translators:
                * This is the device name, with the service being browsed in brackets, eg.:
                * Alan Smithee's iPhone (jailbreak) */
-              g_vfs_backend_set_display_name (G_VFS_BACKEND(self),
                                               g_strdup_printf (_("%s (jailbreak)"), display_name));
               break;
             case 3:
+              g_vfs_backend_set_display_name (G_VFS_BACKEND(self),
               /* translators:
                * This is "Documents on foo" where foo is the device name, eg.:
                * Documents on Alan Smithee's iPhone */
-              g_vfs_backend_set_display_name (G_VFS_BACKEND(self),
                                               g_strdup_printf (_("Documents on %s"), display_name));
               break;
             default:
