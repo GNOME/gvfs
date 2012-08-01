@@ -1593,7 +1593,7 @@ do_pull (GVfsBackend *backend,
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File does not exist"));
+                              _("File doesn't exist"));
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1609,7 +1609,7 @@ do_pull (GVfsBackend *backend,
   if (file == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File does not exist"));
+                              _("File doesn't exist"));
     goto exit;
   }
 
@@ -2063,7 +2063,7 @@ do_delete (GVfsBackend *backend,
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File does not exist"));
+                              _("File doesn't exist"));
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -2108,7 +2108,7 @@ do_set_display_name (GVfsBackend *backend,
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File does not exist"));
+                              _("File doesn't exist"));
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -2175,7 +2175,7 @@ do_open_for_read (GVfsBackend *backend,
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File does not exist"));
+                              _("File doesn't exist"));
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -2521,7 +2521,7 @@ do_append_to (GVfsBackend *backend,
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File does not exist"));
+                              _("File doesn't exist"));
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),

@@ -215,7 +215,7 @@ try_mount_mountable (GVfsBackend *backend,
   {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_MOUNTABLE_FILE,
-                      _("The file is not a mountable"));
+                      _("Not a mountable file"));
     return TRUE;
   }
 

@@ -215,11 +215,11 @@ g_vfs_backend_afc_check (afc_error_t cond, GVfsJob *job)
       break;
     case AFC_E_OBJECT_NOT_FOUND:
       g_vfs_job_failed (job, G_IO_ERROR, error,
-                        _("File does not exist"));
+                        _("File doesn't exist"));
       break;
     case AFC_E_DIR_NOT_EMPTY:
       g_vfs_job_failed (job, G_IO_ERROR, error,
-                        _("The directory is not empty"));
+                        _("Directory not empty"));
       break;
     case AFC_E_OP_TIMEOUT:
       g_vfs_job_failed (job, G_IO_ERROR, error,
@@ -1372,7 +1372,7 @@ g_vfs_backend_afc_seek (GVfsBackendAfc *self,
   if ((afc_seek_type = gvfs_seek_type_to_lseek (type)) == -1)
     {
       g_vfs_job_failed(job, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-                       _("Invalid seek type"));
+                       _("Unsupported seek type"));
       return 1;
     }
 

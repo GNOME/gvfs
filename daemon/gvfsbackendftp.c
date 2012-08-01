@@ -775,7 +775,7 @@ error_550_permission_or_not_found (GVfsFtpTask *task, gpointer file)
       g_set_error_literal (&task->error,
                            G_IO_ERROR,
                            G_IO_ERROR_NOT_FOUND,
-                           _("File does not exist"));
+                           _("File doesn't exist"));
     }
 }
 

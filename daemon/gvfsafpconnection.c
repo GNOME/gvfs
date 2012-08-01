@@ -1609,7 +1609,7 @@ read_reply_sync (GInputStream      *input,
   {
     g_free (*data);
     g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                         _("Got EOS"));
+                         _("Got unexpected end of stream"));
     return FALSE;
   }
 
