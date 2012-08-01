@@ -44,7 +44,9 @@ static GOptionEntry entries[] =
   { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Only create if not existing"), NULL },
   { "append", 'a', 0, G_OPTION_ARG_NONE, &append, N_("Append to end of file"), NULL },
   { "private", 'p', 0, G_OPTION_ARG_NONE, &priv, N_("When creating, restrict access to the current user"), NULL },
+  /* Translators: The "etag" is a token allowing to verify whether a file has been modified */
   { "print-etag", 'v', 0, G_OPTION_ARG_NONE, &print_etag, N_("Print new etag at end"), NULL },
+  /* Translators: The "etag" is a token allowing to verify whether a file has been modified */
   { "etag", 'e', 0, G_OPTION_ARG_STRING, &etag, N_("The etag of the file being overwritten"), N_("ETAG") },
   { NULL }
 };
@@ -131,6 +133,7 @@ save (GFile *file)
       if (etag)
 	g_print ("Etag: %s\n", etag);
       else
+	/* Translators: The "etag" is a token allowing to verify whether a file has been modified */
 	g_print (_("Etag not available\n"));
       g_free (etag);
     }

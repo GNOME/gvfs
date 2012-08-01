@@ -1250,14 +1250,14 @@ try_start_mountable (GVfsBackend *backend,
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _("Can't start file"));
+                            _("Can't start drive"));
         }
     }
   else
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Can't start file"));
+                        _("Can't start drive"));
     }
   return TRUE;
 }
@@ -1323,14 +1323,14 @@ try_stop_mountable (GVfsBackend *backend,
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _("Can't stop file"));
+                            _("Can't stop drive"));
         }
     }
   else
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Can't stop file"));
+                        _("Can't stop drive"));
     }
   return TRUE;
 }
