@@ -201,6 +201,11 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
 	return;
       }
 #endif /* HAVE_AFC */
+    if (g_udev_device_get_property_as_boolean (device, "ID_MTP_DEVICE"))
+      {
+	/* g_debug ("ignoring device, is AFC"); */
+	return;
+      }
 
     usb_bus_num = g_udev_device_get_property (device, "BUSNUM");
     if (usb_bus_num == NULL) {
