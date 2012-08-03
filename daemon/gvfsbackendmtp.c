@@ -574,6 +574,7 @@ do_query_info (GVfsBackend *backend,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
  exit:
+  g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
 
@@ -873,6 +874,7 @@ do_delete (GVfsBackend *backend,
             const char *filename)
 {
   g_print ("(II) try_delete (filename = %s) \n", filename);
+  g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
 
   gchar **elements = g_strsplit_set(filename, "/", -1);
   unsigned int ne = 0;
@@ -918,6 +920,7 @@ do_set_display_name (GVfsBackend *backend,
                       const char *display_name)
 {
   g_print ("(II) try_set_display_name '%s' --> '%s' \n", filename, display_name);
+  g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
 
   gchar **elements = g_strsplit_set(filename, "/", -1);
   unsigned int ne = 0;
