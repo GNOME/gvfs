@@ -835,34 +835,36 @@ do_make_directory (GVfsBackend *backend,
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_FAILED,
                       "Can't make directory in this location.");
-  } else {
-    LIBMTP_mtpdevice_t *device;
-    device = get_device(backend, elements[1], G_VFS_JOB(job));
-    if (device == NULL) {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_FAILED,
-                        "Device does not exist");
-      g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
-      return;
-    }
-
-    int parent_id = 0;
-
-    if (ne > 4) {
-      parent_id = strtol(elements[ne-2], NULL, 10);
-    }
-
-    int ret = LIBMTP_Create_Folder(device, elements[ne-1], parent_id, strtol(elements[2], NULL, 10));
-    if (ret != 0) {
-      LIBMTP_Dump_Errorstack(device);
-      LIBMTP_Clear_Errorstack(device);
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_FAILED,
-                        "Error while creating directory.");
-    } else {
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
+    goto exit;
   }
+
+  LIBMTP_mtpdevice_t *device;
+  device = get_device(backend, elements[1], G_VFS_JOB(job));
+  if (device == NULL) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
+                      "Device does not exist");
+    goto exit;
+  }
+
+  int parent_id = 0;
+  if (ne > 4) {
+    parent_id = strtol(elements[ne-2], NULL, 10);
+  }
+
+  int ret = LIBMTP_Create_Folder(device, elements[ne-1], parent_id, strtol(elements[2], NULL, 10));
+  if (ret != 0) {
+    LIBMTP_Dump_Errorstack(device);
+    LIBMTP_Clear_Errorstack(device);
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
+                      "Error while creating directory.");
+    goto exit;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ exit:
   g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
@@ -884,29 +886,30 @@ do_delete (GVfsBackend *backend,
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_FAILED,
                       "Can't delete entity.");
-  } else {
-    LIBMTP_mtpdevice_t *device;
-    device = get_device(backend, elements[1], G_VFS_JOB(job));
-    if (device == NULL) {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_FAILED,
-                        "Device does not exist");
-      g_strfreev(elements);
-      g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
-      return;
-    }
-
-    int ret = LIBMTP_Delete_Object(device, strtol(elements[ne-1], NULL, 10));
-    if (ret != 0) {
-        LIBMTP_Dump_Errorstack(device);
-        LIBMTP_Clear_Errorstack(device);
-        g_vfs_job_failed (G_VFS_JOB (job),
-                          G_IO_ERROR, G_IO_ERROR_FAILED,
-                          "Error while deleting entity.");
-    } else {
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
+    goto exit;
   }
+
+  LIBMTP_mtpdevice_t *device;
+  device = get_device(backend, elements[1], G_VFS_JOB(job));
+  if (device == NULL) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
+                      "Device does not exist");
+    goto exit;
+  }
+
+  int ret = LIBMTP_Delete_Object(device, strtol(elements[ne-1], NULL, 10));
+  if (ret != 0) {
+    LIBMTP_Dump_Errorstack(device);
+    LIBMTP_Clear_Errorstack(device);
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
+                      "Error while deleting entity.");
+    goto exit;
+  }
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ exit:
   g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
