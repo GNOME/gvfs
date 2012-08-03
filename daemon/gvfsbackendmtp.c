@@ -103,6 +103,12 @@ g_vfs_backend_mtp_finalize (GObject *object)
  */
 
 static void
+on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer user_data)
+{
+  g_print ("on_uevent action %s, device %s\n", action, g_udev_device_get_device_file (device));
+}
+
+static void
 do_mount (GVfsBackend *backend,
            GVfsJobMount *job,
            GMountSpec *mount_spec,
@@ -122,6 +128,17 @@ do_mount (GVfsBackend *backend,
 
   LIBMTP_Init();
 
+  const char *subsystems[] = {"usb", NULL};
+  op_backend->gudev_client = g_udev_client_new (subsystems);
+  if (op_backend->gudev_client == NULL) {
+    GError *error;
+    g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create gudev client"));
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_error_free (error);
+    return;
+  }
+  g_signal_connect (op_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), op_backend);
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
@@ -136,6 +153,7 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
   g_print ("(II) try_umount \n");
 
   op_backend = G_VFS_BACKEND_MTP (backend);
+  g_object_unref(op_backend->gudev_client);
   g_mount_spec_unref (op_backend->mount_spec);
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }

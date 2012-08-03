@@ -225,8 +225,14 @@ gvfsd_mtp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendmtp.h \
 	-DDEFAULT_BACKEND_TYPE=mtp \
 	-DBACKEND_TYPES='"mtp", G_VFS_TYPE_BACKEND_MTP,'
+if USE_GUDEV
+gvfsd_mtp_CPPFLAGS += $(GUDEV_CFLAGS)
+endif
 
 gvfsd_mtp_LDADD = $(libraries) -lmtp
+if USE_GUDEV
+gvfsd_mtp_LDADD += $(GUDEV_LIBS)
+endif
 
 gvfsd_smb_SOURCES = \
 	gvfsbackendsmb.c gvfsbackendsmb.h libsmb-compat.h \

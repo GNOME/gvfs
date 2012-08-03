@@ -24,6 +24,9 @@
 
 #include <gvfsbackend.h>
 #include <gmountspec.h>
+#ifdef HAVE_GUDEV
+#include <gudev/gudev.h>
+#endif
 
 G_BEGIN_DECLS
 
@@ -41,6 +44,10 @@ struct _GVfsBackendMtp
 {
   GVfsBackend parent_instance;
   GMountSpec *mount_spec;
+
+#ifdef HAVE_GUDEV
+  GUdevClient *gudev_client;
+#endif
 
   GMutex mutex;
   GHashTable *devices;
