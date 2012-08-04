@@ -747,6 +747,8 @@ do_push(GVfsBackend *backend,
   g_print ("(II) do_push (filename = %s, local_path = %s) \n", destination, local_path);
   g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
 
+  GFile *file = NULL;
+  GFileInfo *info = NULL;
   gchar **elements = g_strsplit_set(destination, "/", -1);
   unsigned int ne = 0;
   for (ne = 0; elements[ne] != NULL; ne++);
@@ -773,47 +775,56 @@ do_push(GVfsBackend *backend,
     parent_id = strtol(elements[ne-2], NULL, 10);
   }
 
-    GFile *file = g_file_new_for_path (local_path);
-    g_assert (file != NULL);
-    if (file) {
-      GError *error = NULL;
-      GFileInfo *info = g_file_query_info(file, G_FILE_ATTRIBUTE_STANDARD_SIZE,
-                                          G_FILE_QUERY_INFO_NONE, G_VFS_JOB(job)->cancellable,
-                                          &error);
-      if (info) {
-        LIBMTP_file_t *file = LIBMTP_new_file_t();
-        file->filename = strdup(elements[ne-1]);
-        file->parent_id = parent_id;
-        file->storage_id = strtol(elements[2], NULL, 10);
-        file->filetype = LIBMTP_FILETYPE_UNKNOWN; 
-        file->filesize = g_file_info_get_size(info);
+  file = g_file_new_for_path (local_path);
+  if (!file) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                      "Can't get file to upload.");
+    goto exit;
+  }
 
-        MtpProgressData *mtp_progress_data = g_new0(MtpProgressData, 1);
-        mtp_progress_data->progress_callback = progress_callback;
-        mtp_progress_data->progress_callback_data = progress_callback_data;
-        mtp_progress_data->job = G_VFS_JOB(job);
-        int ret = LIBMTP_Send_File_From_File(device, local_path, file, (LIBMTP_progressfunc_t)mtp_progress, mtp_progress_data);
-        g_free(mtp_progress_data);
-        LIBMTP_destroy_file_t(file);
-        if (ret != 0) {
-          g_vfs_job_failed (G_VFS_JOB (job),
-                            G_IO_ERROR, G_IO_ERROR_FAILED,
-                            "Error while uploading entity.");
-        } else {
-          g_vfs_job_succeeded (G_VFS_JOB (job));
-        }
-        g_object_unref(info);
-      } else {
-        g_vfs_job_failed_from_error (G_VFS_JOB (job), error); 
-        g_error_free (error);
-      }
-    } else {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                        "Can't get file to upload.");
-    }
+  GError *error = NULL;
+  info = g_file_query_info(file, G_FILE_ATTRIBUTE_STANDARD_SIZE,
+                           G_FILE_QUERY_INFO_NONE, G_VFS_JOB(job)->cancellable,
+                           &error);
+  if (!info) {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error); 
+    g_error_free (error);
+    goto exit;
+  }
+
+  LIBMTP_file_t *mtpfile = LIBMTP_new_file_t();
+  mtpfile->filename = strdup(elements[ne-1]);
+  mtpfile->parent_id = parent_id;
+  mtpfile->storage_id = strtol(elements[2], NULL, 10);
+  mtpfile->filetype = LIBMTP_FILETYPE_UNKNOWN; 
+  mtpfile->filesize = g_file_info_get_size(info);
+
+  MtpProgressData *mtp_progress_data = g_new0(MtpProgressData, 1);
+  mtp_progress_data->progress_callback = progress_callback;
+  mtp_progress_data->progress_callback_data = progress_callback_data;
+  mtp_progress_data->job = G_VFS_JOB(job);
+  int ret = LIBMTP_Send_File_From_File(device, local_path, mtpfile,
+                                       (LIBMTP_progressfunc_t)mtp_progress,
+                                       mtp_progress_data);
+  g_free(mtp_progress_data);
+  LIBMTP_destroy_file_t(mtpfile);
+  if (ret != 0) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
+                      "Error while uploading entity.");
+    goto exit;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 
  exit:
+  if (file) {
+    g_object_unref(file);
+  }
+  if (info) {
+    g_object_unref(info);
+  }
   g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 }
