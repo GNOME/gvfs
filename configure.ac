@@ -827,6 +827,7 @@ monitor/gdu/Makefile
 monitor/udisks2/Makefile
 monitor/gphoto2/Makefile
 monitor/afc/Makefile
+monitor/mtp/Makefile
 programs/Makefile
 man/Makefile
 test/Makefile

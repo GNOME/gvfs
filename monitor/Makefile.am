@@ -1,5 +1,5 @@
-DIST_SUBDIRS = proxy hal gdu gphoto2 afc udisks2
-SUBDIRS = proxy
+DIST_SUBDIRS = proxy hal gdu gphoto2 afc udisks2 mtp
+SUBDIRS = proxy mtp
 
 if USE_HAL
 SUBDIRS += hal
