@@ -1,6 +1,7 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
- * Copyright (C) 2006-2007 Red Hat, Inc.
+ *   Volume Monitor for MTP Backend
+ *
+ * Copyright (C) 2012 Philip Langdale <philipl@overt.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,8 +17,6 @@
  * Public License along with this library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA.
- *
- * Author: David Zeuthen <davidz@redhat.com>
  */
 
 #ifndef __G_MTP_VOLUME_H__
@@ -45,15 +44,15 @@ struct _GMtpVolumeClass {
 
 GType g_mtp_volume_get_type (void) G_GNUC_CONST;
 
-GMtpVolume *g_mtp_volume_new            (GVolumeMonitor   *volume_monitor,
-                                                 GUdevDevice      *device,
-                                                 GUdevClient      *gudev_client,
-                                                 GFile            *activation_root);
+GMtpVolume *g_mtp_volume_new      (GVolumeMonitor   *volume_monitor,
+                                   GUdevDevice      *device,
+                                   GUdevClient      *gudev_client,
+                                   GFile            *activation_root);
 
-gboolean    g_mtp_volume_has_path       (GMtpVolume       *volume,
-                                             const char       *path);
+gboolean    g_mtp_volume_has_path (GMtpVolume       *volume,
+                                   const char       *path);
 
-void        g_mtp_volume_removed        (GMtpVolume       *volume);
+void        g_mtp_volume_removed  (GMtpVolume       *volume);
 
 G_END_DECLS
 

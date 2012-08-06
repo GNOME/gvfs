@@ -1,7 +1,9 @@
-/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /* GIO - GLib Input, Output and Streaming Library
+ *   Volume Monitor for MTP Backend
  *
- * Copyright (C) 2006-2007 Red Hat, Inc.
+ * Copyright (C) 2012 Philip Langdale <philipl@overt.org>
+ * - Based on ggphoto2volume.c
+ *   - Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,8 +19,6 @@
  * Public License along with this library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA.
- *
- * Author: David Zeuthen <davidz@redhat.com>
  */
 
 #include <config.h>

@@ -1,5 +1,5 @@
-/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
-/* gvfs - extensions for gio
+/* GIO - GLib Input, Output and Streaming Library
+ *   Volume Monitor for MTP Backend
  *
  * Copyright (C) 2012 Philip Langdale <philipl@overt.org>
  *
@@ -20,11 +20,6 @@
  */
 
 #include <config.h>
-
-#include <glib.h>
-#include <glib/gi18n-lib.h>
-#include <gmodule.h>
-#include <gio/gio.h>
 
 #include <gvfsproxyvolumemonitordaemon.h>
 
