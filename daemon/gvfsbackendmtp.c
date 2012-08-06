@@ -110,7 +110,21 @@ get_device(GVfsBackend *backend, const char *id, GVfsJob *job);
 static void
 on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer user_data)
 {
-  g_print ("on_uevent action %s, device %s\n", action, g_udev_device_get_device_file (device));
+  const char *dev_path = g_udev_device_get_device_file (device);
+  g_print ("on_uevent action %s, device %s\n", action, dev_path);
+
+  if (dev_path == NULL) {
+    return;
+  }
+
+  GVfsBackendMtp *op_backend = G_VFS_BACKEND_MTP (user_data);
+
+  if (g_strcmp0(op_backend->dev_path, dev_path) == 0 &&
+      strcmp (action, "remove") == 0) {
+    g_print("Quiting after remove event on device %s\n", dev_path);
+    /* TODO: need a cleaner way to force unmount ourselves */
+    exit (1);
+  }
 }
 
 static gboolean
@@ -168,9 +182,42 @@ do_mount (GVfsBackend *backend,
   }
   g_signal_connect (op_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), op_backend);
 
+  const char *host = g_mount_spec_get (mount_spec, "host");
+
+  /* turn usb:001,041 string into an udev device name */
+  if (!g_str_has_prefix (host, "[usb:")) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                      "Unexpected host uri format.");
+    return;
+  }
+
+  char *comma;
+  char *dev_path = g_strconcat ("/dev/bus/usb/", host + 5, NULL);
+  if ((comma = strchr (dev_path, ',')) == NULL) {
+    g_free (dev_path);
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                      "Malformed host uri.");
+    return;
+  }
+  *comma = '/';
+  dev_path[strlen(dev_path) -1] = '\0';
+  g_print("Parsed '%s' into device name %s", host, dev_path);
+
+  /* find corresponding GUdevDevice */
+  if (!g_udev_client_query_by_device_file (op_backend->gudev_client, dev_path)) {
+    g_free(dev_path);
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                      "Couldn't find matching udev device.");
+    return;
+  }
+
+  op_backend->dev_path = dev_path;
+
   LIBMTP_Init();
 
-  const char *host = g_mount_spec_get (mount_spec, "host");
   get_device(backend, host, G_VFS_JOB(job));
   if (!G_VFS_JOB(job)->failed) {
     GMountSpec *mtp_mount_spec = g_mount_spec_new ("mtp");
@@ -194,6 +241,7 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
 
   op_backend = G_VFS_BACKEND_MTP (backend);
   g_object_unref(op_backend->gudev_client);
+  g_free(op_backend->dev_path);
   LIBMTP_Release_Device(op_backend->device);
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }

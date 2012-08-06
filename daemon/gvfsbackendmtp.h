@@ -51,6 +51,7 @@ struct _GVfsBackendMtp
 
   GMutex mutex;
   LIBMTP_mtpdevice_t *device;
+  char *dev_path;
 };
 
 struct _GVfsBackendMtpClass
