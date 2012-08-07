@@ -173,11 +173,22 @@ fetch_metadata (GVfsBackendCdda *cdda_backend)
   if (!cdio)
     return;
 
-  cdtext = cdio_get_cdtext(cdio, 0);
+#if LIBCDIO_VERSION_NUM >= 84
+  cdtext = cdio_get_cdtext (cdio);
+#else
+  cdtext = cdio_get_cdtext (cdio, 0);
+#endif /* LIBCDIO_VERSION_NUM >= 84 */
+
   if (cdtext) {
+#if LIBCDIO_VERSION_NUM >= 84
+    cdda_backend->album_title = cdtext_string_to_utf8 (cdtext_get_const (cdtext, CDTEXT_FIELD_TITLE, 0));
+    cdda_backend->album_artist = cdtext_string_to_utf8 (cdtext_get_const (cdtext, CDTEXT_FIELD_PERFORMER, 0));
+    cdda_backend->genre = cdtext_string_to_utf8 (cdtext_get_const (cdtext, CDTEXT_FIELD_GENRE, 0));
+#else
     cdda_backend->album_title = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_TITLE, cdtext));
     cdda_backend->album_artist = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_PERFORMER, cdtext));
     cdda_backend->genre = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_GENRE, cdtext));
+#endif /* LIBCDIO_VERSION_NUM >= 84 */
   }
 
   cdtrack = cdio_get_first_track_num(cdio);
@@ -186,10 +197,17 @@ fetch_metadata (GVfsBackendCdda *cdda_backend)
   for ( ; cdtrack < last_cdtrack; cdtrack++ ) {
     GVfsBackendCddaTrack *track;
     track = g_new0 (GVfsBackendCddaTrack, 1);
-    cdtext = cdio_get_cdtext(cdio, cdtrack);
+#if LIBCDIO_VERSION_NUM < 84
+    cdtext = cdio_get_cdtext (cdio, cdtrack);
+#endif /* LIBCDIO_VERSION_NUM < 84 */
     if (cdtext) {
+#if LIBCDIO_VERSION_NUM >= 84
+      track->title = cdtext_string_to_utf8 (cdtext_get_const (cdtext, CDTEXT_FIELD_TITLE, cdtrack));
+      track->artist = cdtext_string_to_utf8 (cdtext_get_const (cdtext, CDTEXT_FIELD_PERFORMER, cdtrack));
+#else
       track->title = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_TITLE, cdtext));
       track->artist = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_PERFORMER, cdtext));
+#endif /* LIBCDIO_VERSION_NUM >= 84 */
     }
     track->duration = cdio_get_track_sec_count (cdio, cdtrack) / CDIO_CD_FRAMES_PER_SEC;
 
