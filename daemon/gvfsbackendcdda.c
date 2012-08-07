@@ -64,9 +64,6 @@
  *   - g_vfs_backend_set_display_name() needs to work post mount
  *
  * - Metadata
- *   - Use CD-Text to read metadata from the physical disc
- *     - http://en.wikipedia.org/wiki/CD-Text
- *     - libcdio can do this
  *   - Use Musicbrainz to read metadata from the net
  *     - libmusicbrainz appear to be a dead-end: http://musicbrainz.org/doc/libmusicbrainz
  *     - Need to provide some UI for configuring musicbrainz; think proxy, local server, 
