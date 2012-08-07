@@ -1,3 +1,9 @@
+Major changes in 1.13.5
+=======================
+* cdda: Fix abort with non-ASCII text
+* Add more man pages
+* Translation updates
+
 Major changes in 1.13.4
 =======================
 * Core daemon and backends GDBus port
