@@ -43,7 +43,7 @@ install-data-hook:
 	fi
 
 uninstall-local:
-	$(RM) $(DESTDIR)$(GIO_MODULE_DIR)/giomodules.cache
+	$(RM) $(DESTDIR)$(giomodulesdir)/giomodule.cache
 
 ChangeLog:
 	$(AM_V_GEN) if test -d "$(srcdir)/.git"; then \
