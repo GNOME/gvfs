@@ -1,3 +1,7 @@
+Major changes in 1.13.6
+=======================
+* gphoto: suppor libgphoto 2.5 API
+
 Major changes in 1.13.5
 =======================
 * cdda: Fix abort with non-ASCII text
