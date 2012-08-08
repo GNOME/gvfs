@@ -436,6 +436,9 @@ if test "x$enable_gphoto2" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" 
   if test "x$msg_gphoto2" = "xyes"; then
     if test "x$use_gphoto2" = "xyes"; then
       AC_DEFINE(HAVE_GPHOTO2, 1, [Define to 1 if gphoto2 is available])
+      PKG_CHECK_MODULES(GPHOTO2, libgphoto2 >= 2.5.0,
+         AC_DEFINE(HAVE_GPHOTO25, 1, [Define to 1 if libgphoto2 2.5 is available])
+      )
     else
       if test "x$enable_gphoto2" = "xyes"; then
         AC_MSG_ERROR([Cannot build with gphoto2 support. Need OS tweaks in hal volume monitor.])
