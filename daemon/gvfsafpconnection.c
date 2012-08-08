@@ -1858,16 +1858,10 @@ g_vfs_afp_connection_open_sync (GVfsAfpConnection *afp_connection,
 
   sync_data_init (&data, afp_connection, error);
   data.cancellable = cancellable;
-  
-  priv->worker_thread = g_thread_create (open_thread_func, &data,
-                                         FALSE, error);
-  if (!priv->worker_thread)
-    goto out;
 
+  priv->worker_thread = g_thread_new ("AFP Worker Thread", open_thread_func,
+                                      &data);
   sync_data_wait (&data);
-
-out:
-  
   sync_data_clear (&data);
 
   return data.res;
