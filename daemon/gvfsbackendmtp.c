@@ -749,6 +749,8 @@ do_pull(GVfsBackend *backend,
                               mtp_progress_data);
       g_free(mtp_progress_data);
       if (ret != 0) {
+        LIBMTP_Dump_Errorstack(device);
+        LIBMTP_Clear_Errorstack(device);
         g_vfs_job_failed (G_VFS_JOB (job),
                           G_IO_ERROR,
                           g_vfs_job_is_cancelled(G_VFS_JOB(job)) ?
@@ -840,6 +842,8 @@ do_push(GVfsBackend *backend,
   g_free(mtp_progress_data);
   LIBMTP_destroy_file_t(mtpfile);
   if (ret != 0) {
+    LIBMTP_Dump_Errorstack(device);
+    LIBMTP_Clear_Errorstack(device);
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_FAILED,
                       "Error while uploading entity.");
