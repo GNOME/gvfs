@@ -681,7 +681,9 @@ typedef struct {
 static int mtp_progress (uint64_t const sent, uint64_t const total,
                   MtpProgressData const * const data)
 {
-  data->progress_callback(sent, total, data->progress_callback_data);
+  if (data->progress_callback) {
+    data->progress_callback(sent, total, data->progress_callback_data);
+  }
   return g_vfs_job_is_cancelled(data->job);
 }
 
