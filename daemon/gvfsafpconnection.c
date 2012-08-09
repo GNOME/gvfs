@@ -1045,6 +1045,7 @@ read_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
 
   if (priv->free_reply_buf)
     g_free (priv->reply_buf);
+  priv->reply_buf = NULL;
   
   read_reply (afp_connection);
 }
