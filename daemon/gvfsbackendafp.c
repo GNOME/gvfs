@@ -1021,20 +1021,12 @@ close_write_get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpoint
 
   AfpHandle *afp_handle = (AfpHandle *)job->handle;
 
-  GError *err = NULL;
   GFileInfo *info;
 
-  info = g_vfs_afp_volume_get_fork_parms_finish (volume, res, &err);
-  if (!info)
-  {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
-    g_error_free (err);
+  info = g_vfs_afp_volume_get_fork_parms_finish (volume, res, NULL);
+  if (info)
+    g_vfs_job_close_write_set_etag (job, g_file_info_get_etag (info));
 
-    afp_handle_free (afp_handle);
-    return;
-  }
-
-  g_vfs_job_close_write_set_etag (job, g_file_info_get_etag (info));
   close_fork (volume, G_VFS_JOB (job), afp_handle);
 }
   
