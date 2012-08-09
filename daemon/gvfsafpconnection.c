@@ -619,9 +619,10 @@ typedef struct {
 } DSIHeader;
 
 enum {
-  FLAG_INITIALIZED   = 1 << 0,
-  FLAG_PENDING_CLOSE = 1 << 1,
-  FLAG_CLOSED        = 1 << 2
+  STATE_INITIAL,
+  STATE_CONNECTED,
+  STATE_PENDING_CLOSE,
+  STATE_CLOSED
 };
 
 struct _GVfsAfpConnectionPrivate
@@ -629,8 +630,8 @@ struct _GVfsAfpConnectionPrivate
   GSocketConnectable *addr;
   GIOStream *stream;
 
-  /* Flags */
-  volatile gint atomic_flags;
+  /* State */
+  volatile gint atomic_state;
   
   guint16 request_id;
 
@@ -754,16 +755,16 @@ check_open (GVfsAfpConnection *conn, GError **error)
   GVfsAfpConnectionPrivate *priv = conn->priv;
   
   /* Acts as memory barrier */
-  gint flags = g_atomic_int_get (&priv->atomic_flags);
+  gint state = g_atomic_int_get (&priv->atomic_state);
 
-  if (!(flags & FLAG_INITIALIZED))
+  if (state == STATE_INITIAL)
   {
     g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_INITIALIZED,
                          _("The connection is not opened"));
     return FALSE;
   }
 
-  else if ((flags & FLAG_CLOSED))
+  else if (state == STATE_CLOSED)
   {
     g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
                          _("The connection is closed"));
@@ -1027,7 +1028,7 @@ read_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   gboolean result;
   GError *err = NULL;
 
-  if (g_atomic_int_get (&priv->atomic_flags) & FLAG_PENDING_CLOSE)
+  if (g_atomic_int_get (&priv->atomic_state) == STATE_PENDING_CLOSE)
   {
     if (!priv->send_loop_running)
       close_connection (afp_connection);
@@ -1061,7 +1062,7 @@ read_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   GError *err = NULL;
   DSIHeader *dsi_header;
 
-  if (g_atomic_int_get (&priv->atomic_flags) & FLAG_PENDING_CLOSE)
+  if (g_atomic_int_get (&priv->atomic_state) == STATE_PENDING_CLOSE)
   {
     if (!priv->send_loop_running)
       close_connection (afp_conn);
@@ -1115,7 +1116,7 @@ read_reply (GVfsAfpConnection *afp_connection)
   
   GInputStream *input;
 
-  if (g_atomic_int_get (&priv->atomic_flags) & FLAG_PENDING_CLOSE)
+  if (g_atomic_int_get (&priv->atomic_state) & STATE_PENDING_CLOSE)
   {
     if (!priv->send_loop_running)
       close_connection (afp_connection);
@@ -1659,7 +1660,7 @@ close_connection (GVfsAfpConnection *conn)
   g_mutex_lock (&priv->mutex);
 
   /* Set closed flag */
-  g_atomic_int_or (&priv->atomic_flags, FLAG_CLOSED);
+  g_atomic_int_set (&priv->atomic_state, STATE_CLOSED);
 
   request_queue = priv->request_queue;
   priv->request_queue = NULL;
@@ -1706,6 +1707,11 @@ close_connection (GVfsAfpConnection *conn)
   
 #undef REQUEST_DATA_CLOSED
 
+  /* quit main_loop */
+  g_main_loop_quit (priv->worker_loop);
+  g_main_loop_unref (priv->worker_loop);
+  g_main_context_unref (priv->worker_context);
+  
   for (siter = pending_closes; siter != NULL; siter = siter->next)
   {
     SyncData *close_data = siter->data;
@@ -1714,11 +1720,6 @@ close_connection (GVfsAfpConnection *conn)
     sync_data_signal (close_data);
   }
   g_slist_free (pending_closes);
-
-  /* quit main_loop */
-  g_main_loop_quit (priv->worker_loop);
-  g_main_loop_unref (priv->worker_loop);
-  g_main_context_unref (priv->worker_context);
 }
 
 gboolean
@@ -1744,8 +1745,8 @@ g_vfs_afp_connection_close_sync (GVfsAfpConnection *afp_connection,
   /* Release lock */
   g_mutex_unlock (&priv->mutex);
 
-  g_atomic_int_or (&priv->atomic_flags, FLAG_PENDING_CLOSE);
-  g_cancellable_cancel (priv->read_cancellable);
+  if (g_atomic_int_compare_and_exchange (&priv->atomic_state, STATE_CONNECTED, STATE_PENDING_CLOSE))
+    g_cancellable_cancel (priv->read_cancellable);
   
   sync_data_wait (&close_data);
 
@@ -1823,7 +1824,7 @@ open_thread_func (gpointer user_data)
 
 out:
   if (res)
-    g_atomic_int_or (&priv->atomic_flags, FLAG_INITIALIZED);
+    g_atomic_int_set (&priv->atomic_state, STATE_CONNECTED);
   
   /* Signal sync call thread */
   data->res = res;
