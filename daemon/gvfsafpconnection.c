@@ -964,6 +964,7 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
       /* Send back a tickle message */
       req_data = g_slice_new0 (RequestData);
       req_data->type = REQUEST_TYPE_TICKLE;
+      req_data->conn = afp_connection;
 
       /* take lock */
       g_mutex_lock (&priv->mutex);
