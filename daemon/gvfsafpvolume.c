@@ -353,7 +353,7 @@ open_fork_data_free (OpenForkData *data)
 }
 
 static void
-open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+open_fork_cb (GObject *source_object, GAsyncResult *result, gpointer user_data)
 {
   GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
@@ -363,6 +363,7 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   GVfsAfpReply *reply;
   GError *err = NULL;
   AfpResultCode res_code;
+  gboolean res;
 
   OpenForkData *data;
   guint16 file_bitmap;
@@ -370,7 +371,7 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   volume = G_VFS_AFP_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
   priv = volume->priv;
   
-  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, result, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -413,8 +414,13 @@ open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   g_vfs_afp_reply_read_int16  (reply, &data->fork_refnum);
 
   data->info = g_file_info_new ();
-  g_vfs_afp_server_fill_info (priv->server, data->info, reply, FALSE, file_bitmap);
+  res = g_vfs_afp_server_fill_info (priv->server, data->info, reply, FALSE, file_bitmap, &err);
   g_object_unref (reply);
+  if (!res)
+  {
+    g_simple_async_result_take_error (simple, err);
+    goto done;
+  }
 
   g_simple_async_result_set_op_res_gpointer (simple, data,
                                              (GDestroyNotify)open_fork_data_free);
@@ -1680,7 +1686,7 @@ g_vfs_afp_volume_copy_file_finish (GVfsAfpVolume *volume,
 }
 
 static void
-get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+get_filedir_parms_cb (GObject *source_object, GAsyncResult *result, gpointer user_data)
 {
   GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
@@ -1689,13 +1695,14 @@ get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
   GVfsAfpReply *reply;
   GError *err = NULL;
   AfpResultCode res_code;
+  gboolean res;
 
   guint16 file_bitmap, dir_bitmap, bitmap;
   guint8 FileDir;
   gboolean directory;
   GFileInfo *info;
 
-  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, result, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -1731,9 +1738,13 @@ get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
   bitmap =  directory ? dir_bitmap : file_bitmap;
 
   info = g_file_info_new ();
-  g_vfs_afp_server_fill_info (volume->priv->server, info, reply, directory, bitmap);
-  
+  res = g_vfs_afp_server_fill_info (volume->priv->server, info, reply, directory, bitmap, &err);
   g_object_unref (reply);
+  if (!res)
+  {
+    g_simple_async_result_take_error (simple, err);
+    goto done;
+  }
 
   g_simple_async_result_set_op_res_gpointer (simple, info, g_object_unref);
 
@@ -1833,7 +1844,7 @@ g_vfs_afp_volume_get_filedir_parms_finish (GVfsAfpVolume  *volume,
 }
 
 static void
-get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+get_fork_parms_cb (GObject *source_object, GAsyncResult *result, gpointer user_data)
 {
   GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
@@ -1843,11 +1854,12 @@ get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   GVfsAfpReply *reply;
   GError *err = NULL;
   AfpResultCode res_code;
+  gboolean res;
 
   guint16 file_bitmap;
   GFileInfo *info;
 
-  reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
+  reply = g_vfs_afp_connection_send_command_finish (conn, result, &err);
   if (!reply)
   {
     g_simple_async_result_take_error (simple, err);
@@ -1866,9 +1878,13 @@ get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   g_vfs_afp_reply_read_uint16 (reply, &file_bitmap);
 
   info = g_file_info_new ();
-  g_vfs_afp_server_fill_info (priv->server, info, reply, FALSE, file_bitmap);
-
+  res = g_vfs_afp_server_fill_info (priv->server, info, reply, FALSE, file_bitmap, &err);
   g_object_unref (reply);
+  if (!res)
+  {
+    g_simple_async_result_take_error (simple, err);
+    goto done;
+  }
 
   g_simple_async_result_set_op_res_gpointer (simple, info, g_object_unref);
 
@@ -2314,7 +2330,13 @@ enumerate_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     bitmap =  directory ? dir_bitmap : file_bitmap;
     
     info = g_file_info_new ();
-    g_vfs_afp_server_fill_info (priv->server, info, reply, directory, bitmap);
+    if (!g_vfs_afp_server_fill_info (priv->server, info, reply, directory, bitmap, &err))
+    {
+      g_object_unref (reply);
+      g_simple_async_result_take_error (simple, err);
+      goto done;
+    }
+    
     g_ptr_array_add (infos, info);
 
     g_vfs_afp_reply_seek (reply, start_pos + struct_length, G_SEEK_SET);

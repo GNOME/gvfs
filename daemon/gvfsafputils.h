@@ -91,6 +91,66 @@ GError *afp_result_code_to_gerror (AfpResultCode res_code);
 
 gboolean is_root (const char *filename);
 
+#define REPLY_READ_BYTE(reply, val)			    	\
+G_STMT_START {										\
+    if (!g_vfs_afp_reply_read_byte (reply, val))    \
+        goto invalid_reply;							\
+} G_STMT_END
+
+#define REPLY_READ_UINT16(reply, val)				\
+G_STMT_START {										\
+    if (!g_vfs_afp_reply_read_uint16 (reply, val))	\
+        goto invalid_reply;							\
+} G_STMT_END
+
+#define REPLY_READ_UINT32(reply, val)				\
+G_STMT_START {										\
+    if (!g_vfs_afp_reply_read_uint32 (reply, val))	\
+        goto invalid_reply;							\
+} G_STMT_END
+
+#define REPLY_READ_UINT64(reply, val)				\
+G_STMT_START {										\
+    if (!g_vfs_afp_reply_read_uint64 (reply, val))	\
+        goto invalid_reply;							\
+} G_STMT_END
+
+#define REPLY_READ_INT32(reply, val)				\
+G_STMT_START {										\
+    if (!g_vfs_afp_reply_read_int32 (reply, val))	\
+        goto invalid_reply;							\
+} G_STMT_END
+
+#define REPLY_GET_DATA(reply, size, val)				\
+G_STMT_START {											\
+    if (!g_vfs_afp_reply_get_data (reply, size, val))	\
+        goto invalid_reply;								\
+} G_STMT_END
+
+#define REPLY_READ_PASCAL(reply, val)				\
+G_STMT_START {										\
+    if (!g_vfs_afp_reply_read_pascal (reply, val))	\
+        goto invalid_reply;							\
+} G_STMT_END
+
+#define REPLY_READ_AFP_NAME(reply, read_text_encoding, val)					\
+G_STMT_START {																\
+    if (!g_vfs_afp_reply_read_afp_name (reply, read_text_encoding, val))	\
+        goto invalid_reply;													\
+} G_STMT_END
+
+#define REPLY_SKIP_TO_EVEN(reply)				\
+G_STMT_START {								    \
+    if (!g_vfs_afp_reply_skip_to_even (reply))	\
+        goto invalid_reply;						\
+} G_STMT_END
+
+#define REPLY_SEEK(reply, offset, type)		        	\
+G_STMT_START {								    		\
+    if (!g_vfs_afp_reply_seek (reply, offset, type))	\
+        goto invalid_reply;								\
+} G_STMT_END
+
 G_END_DECLS
 
 #endif /* _GVFSAFPUTILS_H_ */

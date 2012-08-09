@@ -114,11 +114,12 @@ GVfsAfpVolume *    g_vfs_afp_server_mount_volume_sync (GVfsAfpServer *server,
                                                        GCancellable  *cancellable,
                                                        GError        **error);
 
-void               g_vfs_afp_server_fill_info         (GVfsAfpServer *server,
+gboolean           g_vfs_afp_server_fill_info         (GVfsAfpServer *server,
                                                        GFileInfo     *info,
                                                        GVfsAfpReply  *reply,
                                                        gboolean       directory,
-                                                       guint16        bitmap);
+                                                       guint16        bitmap,
+                                                       GError        **error);
 
 
 typedef enum

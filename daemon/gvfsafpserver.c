@@ -224,25 +224,25 @@ dhx2_login (GVfsAfpServer *server,
     else
       goto generic_error;
   }
-  
+
   /* Get data from reply */
-  g_vfs_afp_reply_read_uint16 (reply, &id);
+  REPLY_READ_UINT16 (reply, &id);
 
   /* read g */
-  g_vfs_afp_reply_get_data (reply, 4, &tmp_buf);
+  REPLY_GET_DATA (reply, 4, &tmp_buf);
   gcry_err = gcry_mpi_scan (&g, GCRYMPI_FMT_USG, tmp_buf, 4, NULL);
   g_assert (gcry_err == 0);
 
-  g_vfs_afp_reply_read_uint16 (reply, &len);
+  REPLY_READ_UINT16 (reply, &len);
   bits = len * 8;
 
   /* read p */
-  g_vfs_afp_reply_get_data (reply, len, &tmp_buf);
+  REPLY_GET_DATA (reply, len, &tmp_buf);
   gcry_err = gcry_mpi_scan (&p, GCRYMPI_FMT_USG, tmp_buf, len, NULL);
   g_assert (gcry_err == 0);
 
   /* read Mb */
-  g_vfs_afp_reply_get_data (reply, len, &tmp_buf);
+  REPLY_GET_DATA (reply, len, &tmp_buf);
   gcry_err = gcry_mpi_scan (&Mb, GCRYMPI_FMT_USG, tmp_buf, len, NULL);
   g_assert (gcry_err == 0);
 
@@ -323,13 +323,13 @@ dhx2_login (GVfsAfpServer *server,
   }
 
   /* read data from reply 2 */
-  g_vfs_afp_reply_read_uint16 (reply, &id);
+  REPLY_READ_UINT16 (reply, &id);
 
-  g_vfs_afp_reply_get_data (reply, 32, &tmp_buf);
+  REPLY_GET_DATA (reply, 32, &tmp_buf);
   memcpy (reply2_buf, tmp_buf, 32);
 
   g_object_unref (reply);
-  
+
   /* decrypt */
   gcry_cipher_setiv (cipher, S2CIV, G_N_ELEMENTS (S2CIV));
   gcry_err = gcry_cipher_decrypt (cipher, reply2_buf, 32, NULL, 0);
@@ -418,6 +418,11 @@ error:
   
 generic_error:
   g_propagate_error (error, afp_result_code_to_gerror (res_code));
+  goto error;
+
+invalid_reply:
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+               "%s", _("Received invalid reply from server"));
   goto error;
 }
 
@@ -526,15 +531,15 @@ dhx_login (GVfsAfpServer *server,
       goto generic_error;
   }
 
-  g_vfs_afp_reply_read_uint16 (reply, &id);
+  REPLY_READ_UINT16 (reply, &id);
 
   /* read Mb */
-  g_vfs_afp_reply_get_data (reply, 16, &tmp_buf);
+  REPLY_GET_DATA (reply, 16, &tmp_buf);
   gcry_err = gcry_mpi_scan (&mb, GCRYMPI_FMT_USG, tmp_buf, 16, NULL);
   g_assert (gcry_err == 0);
 
   /* read Nonce */
-  g_vfs_afp_reply_get_data (reply, 32, &tmp_buf);
+  REPLY_GET_DATA (reply, 32, &tmp_buf);
   memcpy (nonce_buf, tmp_buf, 32);
 
   g_object_unref (reply);
@@ -633,6 +638,11 @@ generic_error:
   g_propagate_error (error, afp_result_code_to_gerror (res_code));
   res = FALSE;
   goto done;
+
+invalid_reply:
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+               "%s", _("Received invalid reply from server"));
+  goto error;
 }
 #endif
 
@@ -734,44 +744,45 @@ get_server_info (GVfsAfpServer *server,
   if (!reply)
     return FALSE;
 
-  g_vfs_afp_reply_read_uint16 (reply, &MachineType_offset);
-  g_vfs_afp_reply_read_uint16 (reply, &AFPVersionCount_offset);
-  g_vfs_afp_reply_read_uint16 (reply, &UAMCount_offset);
+  REPLY_READ_UINT16 (reply, &MachineType_offset);
+  REPLY_READ_UINT16 (reply, &AFPVersionCount_offset);
+  REPLY_READ_UINT16 (reply, &UAMCount_offset);
+
   /* VolumeIconAndMask_offset */
-  g_vfs_afp_reply_read_uint16 (reply, NULL);
+  REPLY_READ_UINT16 (reply, NULL);
 
-  g_vfs_afp_reply_read_uint16 (reply, &priv->info.flags);
+  REPLY_READ_UINT16 (reply, &priv->info.flags);
 
-  g_vfs_afp_reply_read_pascal (reply, &priv->info.server_name);
+  REPLY_READ_PASCAL (reply, &priv->info.server_name);
 
   /* Parse UTF-8 ServerName */
   if (priv->info.flags & (0x1 << 8)) {
     guint16 UTF8ServerName_offset;
     GVfsAfpName *utf8_server_name;
 
-    g_vfs_afp_reply_skip_to_even (reply);
-    g_vfs_afp_reply_seek (reply, 6, G_SEEK_CUR);
-    g_vfs_afp_reply_read_uint16 (reply, &UTF8ServerName_offset);
+    REPLY_SKIP_TO_EVEN (reply);
+    REPLY_SEEK (reply, 6, G_SEEK_CUR);
+    REPLY_READ_UINT16 (reply, &UTF8ServerName_offset);
 
-    g_vfs_afp_reply_seek (reply, UTF8ServerName_offset, G_SEEK_SET);
-    g_vfs_afp_reply_read_afp_name (reply, FALSE, &utf8_server_name);
+    REPLY_SEEK (reply, UTF8ServerName_offset, G_SEEK_SET);
+    REPLY_READ_AFP_NAME (reply, FALSE, &utf8_server_name);
     priv->info.utf8_server_name = g_vfs_afp_name_get_string (utf8_server_name);
     g_vfs_afp_name_unref (utf8_server_name);
   }
-    
+
   /* Parse MachineType */
-  g_vfs_afp_reply_seek (reply, MachineType_offset, G_SEEK_SET);
-  g_vfs_afp_reply_read_pascal (reply, &priv->info.machine_type);
-  
+  REPLY_SEEK (reply, MachineType_offset, G_SEEK_SET);
+  REPLY_READ_PASCAL (reply, &priv->info.machine_type);
+
   /* Parse Versions */
-  g_vfs_afp_reply_seek (reply, AFPVersionCount_offset, G_SEEK_SET);
-  g_vfs_afp_reply_read_byte (reply, &count);
+  REPLY_SEEK (reply, AFPVersionCount_offset, G_SEEK_SET);
+  REPLY_READ_BYTE (reply, &count);
   for (i = 0; i < count; i++)
   {
     char *version;
     AfpVersion afp_version;
 
-    g_vfs_afp_reply_read_pascal (reply, &version);
+    REPLY_READ_PASCAL (reply, &version);
     afp_version = string_to_afp_version (version);
     if (afp_version > priv->info.version)
       priv->info.version = afp_version;
@@ -782,24 +793,29 @@ get_server_info (GVfsAfpServer *server,
     g_object_unref (reply);
     g_set_error (error,
                  G_IO_ERROR, G_IO_ERROR_FAILED,
-                 _("Failed to connect to server (%s)"), "Server doesn't support AFP version 3.0 or later");
+                 _("Failed to connect to server (%s)"), _("Server doesn't support AFP version 3.0 or later"));
     return FALSE;
   }
 
   /* Parse UAMs */
-  g_vfs_afp_reply_seek (reply, UAMCount_offset, G_SEEK_SET);
-  g_vfs_afp_reply_read_byte (reply, &count);
+  REPLY_SEEK (reply, UAMCount_offset, G_SEEK_SET);
+  REPLY_READ_BYTE (reply, &count);
   for (i = 0; i < count; i++)
   {
     char *uam;
 
-    g_vfs_afp_reply_read_pascal (reply, &uam);
+    REPLY_READ_PASCAL (reply, &uam);
     priv->info.uams = g_slist_prepend (priv->info.uams, uam);
   }
 
   g_object_unref (reply);
-  
+
   return TRUE;
+
+invalid_reply:
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+               _("Failed to connect to server (%s)"), _("Received invalid reply from server"));
+  return FALSE;
 }
 
 static gboolean
@@ -835,12 +851,17 @@ get_server_parms (GVfsAfpServer *server,
   }
 
   /* server time */
-  g_vfs_afp_reply_read_int32 (reply, &server_time);
+  REPLY_READ_INT32 (reply, &server_time);
   priv->time_diff = (g_get_real_time () / G_USEC_PER_SEC) - server_time;
 
   g_object_unref (reply);
 
   return TRUE;
+
+invalid_reply:
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+               _("Received invalid reply from server"));
+  return FALSE;
 }
 
 static gboolean
@@ -904,15 +925,22 @@ get_userinfo (GVfsAfpServer *server,
   }
 
   /* Bitmap */
-  g_vfs_afp_reply_read_uint16 (reply, NULL);
-  /* UID */
-  g_vfs_afp_reply_read_uint32 (reply, &priv->user_id);
-  /* GID */
-  g_vfs_afp_reply_read_uint32 (reply, &priv->group_id);
+  REPLY_READ_UINT16 (reply, &bitmap);
 
+  if (bitmap & AFP_GET_USER_INFO_BITMAP_GET_UID_BIT)
+    REPLY_READ_UINT16 (reply, &priv->user_id);
+  
+  if (bitmap & AFP_GET_USER_INFO_BITMAP_GET_GID_BIT)
+    REPLY_READ_UINT16 (reply, &priv->group_id);
+  
   g_object_unref (reply);
   
   return TRUE;
+
+invalid_reply:
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+               _("Received invalid reply from server"));
+  return FALSE;
 }
 
 gboolean
@@ -1231,13 +1259,13 @@ get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
     goto done;
   }
-  
+
   /* server time */
-  g_vfs_afp_reply_read_int32 (reply, NULL);
+  REPLY_READ_INT32 (reply, NULL);
 
   /* NumVolStructures */
-  g_vfs_afp_reply_read_byte (reply, &num_volumes);
-  
+  REPLY_READ_BYTE (reply, &num_volumes);
+
   volumes = g_ptr_array_sized_new (num_volumes);
   g_ptr_array_set_free_func (volumes, (GDestroyNotify)volume_data_free);
   for (i = 0; i < num_volumes; i++)
@@ -1247,8 +1275,8 @@ get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 
     GVfsAfpVolumeData *volume_data;
 
-    g_vfs_afp_reply_read_byte (reply, &flags);
-    g_vfs_afp_reply_read_pascal (reply, &vol_name);
+    REPLY_READ_BYTE (reply, &flags);
+    REPLY_READ_PASCAL (reply, &vol_name);
     if (!vol_name)
       continue;
 
@@ -1265,6 +1293,12 @@ get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 done:
   g_simple_async_result_complete (simple);
   g_object_unref (simple);
+  return;
+
+invalid_reply:
+  g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                   "%s", _("Received invalid reply from server"));
+  goto done;
 }
 
 /*
@@ -1380,12 +1414,13 @@ set_access_attributes (GFileInfo *info,
 				       TRUE);
 }
 
-void
+gboolean
 g_vfs_afp_server_fill_info (GVfsAfpServer *server,
                             GFileInfo     *info,
                             GVfsAfpReply  *reply,
                             gboolean       directory,
-                            guint16        bitmap)
+                            guint16        bitmap,
+                            GError         **error)
 {
   goffset start_pos;
 
@@ -1410,7 +1445,7 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
   {
     guint16 attributes;
 
-    g_vfs_afp_reply_read_uint16 (reply, &attributes);
+    REPLY_READ_UINT16 (reply, &attributes);
     
     if (attributes & AFP_FILEDIR_ATTRIBUTES_BITMAP_INVISIBLE_BIT)
       g_file_info_set_is_hidden (info, TRUE);
@@ -1420,7 +1455,7 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
   {
     guint32 parent_dir_id;
 
-    g_vfs_afp_reply_read_uint32 (reply, &parent_dir_id);
+    REPLY_READ_UINT32 (reply, &parent_dir_id);
     g_file_info_set_attribute_uint32 (info, "afp::parent-dir-id", parent_dir_id);
   }
   
@@ -1429,7 +1464,7 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
     gint32 create_date;
     gint64 create_date_local;
 
-    g_vfs_afp_reply_read_int32 (reply, &create_date);
+    REPLY_READ_INT32 (reply, &create_date);
     
     create_date_local = g_vfs_afp_server_time_to_local_time (server, create_date);
     g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED,
@@ -1442,7 +1477,7 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
     guint64 mod_date_unix;
     char *etag;
 
-    g_vfs_afp_reply_read_int32 (reply, &mod_date);
+    REPLY_READ_INT32 (reply, &mod_date);
     mod_date_unix = g_vfs_afp_server_time_to_local_time (server, mod_date);
     
     g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED,
@@ -1457,7 +1492,7 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
   {
     guint32 node_id;
 
-    g_vfs_afp_reply_read_uint32 (reply, &node_id);
+    REPLY_READ_UINT32 (reply, &node_id);
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_NODE_ID, node_id);
   }
   
@@ -1481,7 +1516,7 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
     {
       guint64 fork_len;
 
-      g_vfs_afp_reply_read_uint64 (reply, &fork_len);
+      REPLY_READ_UINT64 (reply, &fork_len);
       g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE,
                                         fork_len);
     }
@@ -1494,14 +1529,14 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
     GVfsAfpName *afp_name;
     char *utf8_name;
 
-    g_vfs_afp_reply_read_uint16 (reply, &UTF8Name_offset);
+    REPLY_READ_UINT16 (reply, &UTF8Name_offset);
     /* Pad */
-    g_vfs_afp_reply_read_uint32 (reply, NULL);
+    REPLY_READ_UINT32 (reply, NULL);
 
     old_pos = g_vfs_afp_reply_get_pos (reply);
-    g_vfs_afp_reply_seek (reply, start_pos + UTF8Name_offset, G_SEEK_SET);
+    REPLY_SEEK (reply, start_pos + UTF8Name_offset, G_SEEK_SET);
 
-    g_vfs_afp_reply_read_afp_name (reply, TRUE, &afp_name);
+    REPLY_READ_AFP_NAME (reply, TRUE, &afp_name);
     utf8_name = g_vfs_afp_name_get_string (afp_name);    
     g_vfs_afp_name_unref (afp_name);
 
@@ -1532,18 +1567,18 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
     
     g_free (utf8_name);
 
-    g_vfs_afp_reply_seek (reply, old_pos, G_SEEK_SET);
+    REPLY_SEEK (reply, old_pos, G_SEEK_SET);
   }
 
   if (bitmap & AFP_FILEDIR_BITMAP_UNIX_PRIVS_BIT)
   {
     guint32 uid, gid, permissions, ua_permissions;
 
-    g_vfs_afp_reply_read_uint32 (reply, &uid);
-    g_vfs_afp_reply_read_uint32 (reply, &gid);
-    g_vfs_afp_reply_read_uint32 (reply, &permissions);
+    REPLY_READ_UINT32 (reply, &uid);
+    REPLY_READ_UINT32 (reply, &gid);
+    REPLY_READ_UINT32 (reply, &permissions);
     /* ua_permissions */
-    g_vfs_afp_reply_read_uint32 (reply, &ua_permissions);
+    REPLY_READ_UINT32 (reply, &ua_permissions);
 
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, permissions);
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, uid);
@@ -1559,6 +1594,13 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
     else
       set_access_attributes (info, (permissions >> 0) & 0x7);
   }
+
+  return TRUE;
+
+invalid_reply:
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+               _("Received invalid reply from server"));
+  return FALSE;
 }
 
 typedef struct
@@ -1619,26 +1661,35 @@ map_id_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
       map_data->function == GVFS_AFP_MAP_ID_FUNCTION_GROUP_UUID_TO_UTF8_NAME)
   {
     /* objType */
-    g_vfs_afp_reply_read_uint32 (reply, NULL);
+	REPLY_READ_UINT32 (reply, NULL);	
     /* id */
-    g_vfs_afp_reply_read_uint32 (reply, NULL);
+	REPLY_READ_UINT32 (reply, NULL);
   }
 
   if (map_data->function == GVFS_AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME ||
       map_data->function == GVFS_AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME)
   {
-    g_vfs_afp_reply_read_pascal (reply, &map_data->name);
+    REPLY_READ_PASCAL (reply, &map_data->name);
   }
   else
   {
     GVfsAfpName *afp_name;
 
-    g_vfs_afp_reply_read_afp_name (reply, FALSE, &afp_name);
+	
+    REPLY_READ_AFP_NAME (reply, FALSE, &afp_name);
     map_data->name = g_vfs_afp_name_get_string (afp_name);
     g_vfs_afp_name_unref (afp_name);
   }
 
+done:
   g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+  return;
+
+invalid_reply:
+  g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                   "%s", _("Received invalid reply from server"));
+  goto done;
 }
 
 /*
