@@ -634,6 +634,7 @@ struct _GVfsAfpConnectionPrivate
   volatile gint atomic_state;
   
   guint16 request_id;
+  guint16 tickle_id;
 
   guint32 kRequestQuanta;
   guint32 kServerReplayCacheSize;
@@ -833,6 +834,14 @@ get_request_id (GVfsAfpConnection *afp_connection)
   GVfsAfpConnectionPrivate *priv = afp_connection->priv;
 
   return priv->request_id++;
+}
+
+static guint16
+get_tickle_id (GVfsAfpConnection *afp_connection)
+{
+  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
+
+  return priv->tickle_id++;
 }
 
 typedef struct
@@ -1374,7 +1383,7 @@ send_request_unlocked (GVfsAfpConnection *afp_connection)
     case REQUEST_TYPE_TICKLE:
       priv->write_dsi_header.flags = 0x00;
       priv->write_dsi_header.command = DSI_TICKLE;
-      priv->write_dsi_header.requestID = GUINT16_TO_BE (get_request_id (afp_connection));
+      priv->write_dsi_header.requestID = GUINT16_TO_BE (get_tickle_id (afp_connection));
       priv->write_dsi_header.writeOffset = 0;
       priv->write_dsi_header.totalDataLength = 0;
       priv->write_dsi_header.reserved = 0;
