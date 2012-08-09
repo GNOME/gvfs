@@ -1920,3 +1920,9 @@ g_vfs_afp_query_server_info (GSocketConnectable *addr,
   return g_vfs_afp_reply_new (dsi_header.errorCode, data,
                               dsi_header.totalDataLength, TRUE);
 }
+
+guint32
+g_vfs_afp_connection_get_max_request_size (GVfsAfpConnection *afp_connection)
+{
+  g_return_val_if_fail (G_VFS_IS_AFP_CONNECTION (afp_connection), 0);
+}

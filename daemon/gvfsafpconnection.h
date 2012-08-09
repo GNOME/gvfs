@@ -366,6 +366,10 @@ void               g_vfs_afp_connection_send_command     (GVfsAfpConnection   *a
                                                           GAsyncReadyCallback  callback,
                                                           GCancellable        *cancellable,                                                           
                                                           gpointer             user_data);
+
+
+guint32            g_vfs_afp_connection_get_max_request_size  (GVfsAfpConnection *afp_connection);
+
 G_END_DECLS
 
 #endif /* _GVFSAFPCONNECTION_H_ */

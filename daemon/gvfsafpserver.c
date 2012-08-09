@@ -1183,7 +1183,7 @@ done:
   return res; 
 }
 
-/*
+/**
  * g_vfs_afp_server_get_info:
  * 
  * @server: a #GVfsAfpServer
@@ -1205,7 +1205,23 @@ g_vfs_afp_server_get_info (GVfsAfpServer *server)
   return &priv->info;
 }
 
-/*
+/**
+ * g_vfs_afp_server_get_max_request_size:
+ * @server: a #GVfsAfpServer
+ * 
+ * Get the maximum request size the server supports.
+ * 
+ * Returns: The maximum request size the server supports.
+ */
+guint32
+g_vfs_afp_server_get_max_request_size (GVfsAfpServer *server)
+{
+  g_return_val_if_fail (G_VFS_IS_AFP_SERVER (server), 0);
+  
+  return g_vfs_afp_connection_get_max_request_size (server->priv->conn);
+}
+
+/**
  * g_vfs_afp_server_time_to_local_time:
  * 
  * @server: a #GVfsAfpServer
@@ -1301,7 +1317,7 @@ invalid_reply:
   goto done;
 }
 
-/*
+/**
  * g_vfs_afp_server_get_volumes:
  * 
  * @server: a #GVfsAfpServer
@@ -1332,7 +1348,7 @@ g_vfs_afp_server_get_volumes (GVfsAfpServer       *server,
                                      cancellable, simple);
 }
 
-/*
+/**
  * g_vfs_afp_server_get_volumes_finish:
  * 
  * @server: a #GVfsAfpServer.
@@ -1503,7 +1519,7 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
     {
       guint16 offspring_count;
 
-      g_vfs_afp_reply_read_uint16 (reply, &offspring_count);
+      REPLY_READ_UINT16 (reply, &offspring_count);
       g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_AFP_CHILDREN_COUNT,
                                         offspring_count);
     }
@@ -1692,7 +1708,7 @@ invalid_reply:
   goto done;
 }
 
-/*
+/**
  * g_vfs_afp_server_map_id:
  * 
  * @server: a #GVfsAfpServer.
@@ -1746,7 +1762,7 @@ g_vfs_afp_server_map_id (GVfsAfpServer       *server,
   g_object_unref (comm);
 }
 
-/*
+/**
  * g_vfs_afp_server_map_id_finish:
  * 
  * @server: a #GVfsAfpServer.

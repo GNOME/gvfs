@@ -94,6 +94,8 @@ gint64             g_vfs_afp_server_time_to_local_time   (GVfsAfpServer *server,
 const
 GVfsAfpServerInfo* g_vfs_afp_server_get_info             (GVfsAfpServer *server);
 
+guint32            g_vfs_afp_server_get_max_request_size (GVfsAfpServer *server);
+
 typedef struct _GVfsAfpVolumeData GVfsAfpVolumeData;
 struct _GVfsAfpVolumeData
 {
