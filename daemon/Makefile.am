@@ -39,10 +39,10 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp gvfsd-network gvfsd-mtp
+libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp gvfsd-network
 
-mount_in_files = sftp.mount.in ftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in mtp.mount.in
-mount_DATA =  sftp.mount ftp.mount trash.mount computer.mount burn.mount localtest.mount network.mount mtp.mount
+mount_in_files = sftp.mount.in ftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in
+mount_DATA =  sftp.mount ftp.mount trash.mount computer.mount burn.mount localtest.mount network.mount
 
 mount_in_files +=recent.mount.in
 if USE_GTK
@@ -77,6 +77,12 @@ mount_in_files += gphoto2.mount.in
 if USE_GPHOTO2
 mount_DATA += gphoto2.mount
 libexec_PROGRAMS += gvfsd-gphoto2
+endif
+
+mount_in_files += mtp.mount.in
+if USE_LIBMTP
+mount_DATA += mtp.mount
+libexec_PROGRAMS += gvfsd-mtp
 endif
 
 mount_in_files += obexftp.mount.in
@@ -215,24 +221,6 @@ gvfsd_localtest_CPPFLAGS = \
 	-DBACKEND_TYPES='"localtest", G_VFS_TYPE_BACKEND_LOCALTEST,'
 
 gvfsd_localtest_LDADD = $(libraries)
-
-gvfsd_mtp_SOURCES = \
-	gvfsbackendmtp.c gvfsbackendmtp.h \
-	daemon-main.c daemon-main.h \
-	daemon-main-generic.c
-
-gvfsd_mtp_CPPFLAGS = \
-	-DBACKEND_HEADER=gvfsbackendmtp.h \
-	-DDEFAULT_BACKEND_TYPE=mtp \
-	-DBACKEND_TYPES='"mtp", G_VFS_TYPE_BACKEND_MTP,'
-if USE_GUDEV
-gvfsd_mtp_CPPFLAGS += $(GUDEV_CFLAGS)
-endif
-
-gvfsd_mtp_LDADD = $(libraries) -lmtp
-if USE_GUDEV
-gvfsd_mtp_LDADD += $(GUDEV_LIBS)
-endif
 
 gvfsd_smb_SOURCES = \
 	gvfsbackendsmb.c gvfsbackendsmb.h libsmb-compat.h \
@@ -457,6 +445,19 @@ gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(GUDEV_LIBS)
 else
 gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(HAL_LIBS)
 endif
+
+gvfsd_mtp_SOURCES = \
+	gvfsbackendmtp.c gvfsbackendmtp.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c
+
+gvfsd_mtp_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendmtp.h \
+	-DDEFAULT_BACKEND_TYPE=mtp \
+	-DBACKEND_TYPES='"mtp", G_VFS_TYPE_BACKEND_MTP,' \
+	$(GUDEV_CFLAGS) $(LIBMTP_CFLAGS)
+
+gvfsd_mtp_LDADD = $(libraries) $(GUDEV_LIBS) $(LIBMTP_LIBS)
 
 gvfsd_http_SOURCES = \
 	soup-input-stream.c soup-input-stream.h \

@@ -493,6 +493,25 @@ AC_SUBST(BLURAY_CFLAGS)
 AC_SUBST(BLURAY_LIBS)
 AM_CONDITIONAL(HAVE_BLURAY, [test "$msg_bluray" = "yes"])
 
+dnl *************************
+dnl *** Check for libmtp ***
+dnl *************************
+AC_ARG_ENABLE(libmtp, AS_HELP_STRING([--disable-libmtp],[build without libmtp support]))
+msg_libmtp=no
+LIBMTP_LIBS=
+LIBMTP_CFLAGS=
+
+if test "x$enable_libmtp" != "xno" -a "x$msg_gudev" = "xyes"; then
+  PKG_CHECK_EXISTS(libmtp, msg_libmtp=yes)
+
+  if test "x$msg_libmtp" = "xyes"; then
+    PKG_CHECK_MODULES(LIBMTP, libmtp >= 1.1.0)
+    AC_DEFINE(HAVE_LIBMTP, 1, [Define to 1 if libmtp is available])
+  fi
+fi
+
+AM_CONDITIONAL(USE_LIBMTP, [test "$msg_libmtp" = "yes"])
+
 dnl ==========================================================================
 dnl Samba 3.0
 
@@ -848,6 +867,7 @@ echo "
 	FUSE support:                 $msg_fuse
         CDDA support:                 $msg_cdda
         Gphoto2 support:              $msg_gphoto2
+        MTP support:                  $msg_libmtp
 	archive support:              $msg_archive
 	AFC support:                  $msg_afc
         AFP support:                  $msg_afp
