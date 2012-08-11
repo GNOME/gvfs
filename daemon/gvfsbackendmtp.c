@@ -37,6 +37,7 @@
 #include <libmtp.h>
 
 #include "gvfsbackendmtp.h"
+#include "gvfsicon.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
@@ -515,10 +516,11 @@ get_storage_info(LIBMTP_devicestorage_t *storage, GFileInfo *info) {
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, storage->FreeSpaceInBytes);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, storage->MaxCapacity);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "mtpfs");
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW, G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL);
 }
 
 static void
-get_file_info(LIBMTP_mtpdevice_t *device, GFileInfo *info, LIBMTP_file_t *file) {
+get_file_info(GVfsBackend *backend, LIBMTP_mtpdevice_t *device, GFileInfo *info, LIBMTP_file_t *file) {
   GIcon *icon = NULL;
   char *content_type = NULL;
 
@@ -542,6 +544,27 @@ get_file_info(LIBMTP_mtpdevice_t *device, GFileInfo *info, LIBMTP_file_t *file) 
     g_file_info_set_content_type(info, content_type);
     icon = g_content_type_get_icon(content_type);
     break;
+  }
+
+
+  if (LIBMTP_FILETYPE_IS_IMAGE(file->filetype) ||
+      LIBMTP_FILETYPE_IS_VIDEO(file->filetype) ||
+      LIBMTP_FILETYPE_IS_AUDIOVIDEO(file->filetype)) {
+    g_print("Thumbnail file: %s\n", file->filename);
+
+    char *icon_id;
+    GIcon *icon;
+    GMountSpec *mount_spec;
+
+    mount_spec = g_vfs_backend_get_mount_spec (backend);
+    icon_id = g_strdup_printf("%u", file->item_id);
+    icon = g_vfs_icon_new (mount_spec,
+                           icon_id);
+    g_file_info_set_attribute_object (info,
+                                      G_FILE_ATTRIBUTE_PREVIEW_ICON,
+                                      G_OBJECT (icon));
+    g_object_unref (icon);
+    g_free (icon_id);
   }
 
   g_file_info_set_size (info, file->filesize);
@@ -625,7 +648,7 @@ do_enumerate (GVfsBackend *backend,
     }
     for (file = files; file != NULL; file = file->next) {
         info = g_file_info_new();
-        get_file_info(device, info, file);
+        get_file_info(backend, device, info, file);
         g_vfs_job_enumerate_add_info (job, info);
         g_object_unref(info);
     }
@@ -701,7 +724,7 @@ do_query_info (GVfsBackend *backend,
     }
 
     if (file != NULL) {
-      get_file_info(device, info, file);
+      get_file_info(backend, device, info, file);
     } else {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -754,6 +777,7 @@ do_query_fs_info (GVfsBackend *backend,
       }
     }
   }
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
  exit:
@@ -820,7 +844,7 @@ do_pull(GVfsBackend *backend,
   }
 
   info = g_file_info_new();
-  get_file_info(device, info, file);
+  get_file_info(backend, device, info, file);
   if (g_file_info_get_file_type(info) == G_FILE_TYPE_DIRECTORY) {
     GError *error;
     GFile *file = g_file_new_for_path (local_path);
@@ -1095,6 +1119,82 @@ do_set_display_name (GVfsBackend *backend,
 }
 
 
+static void
+do_open_icon_for_read (GVfsBackend *backend,
+                       GVfsJobOpenIconForRead *job,
+                       const char *icon_id)
+{
+  g_print ("open_icon_for_read (%s)", icon_id);
+  g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
+
+  guint id = strtol(icon_id, NULL, 10);
+
+  if (id > 0) {
+    unsigned char *data;
+    unsigned int size;
+    int ret = LIBMTP_Get_Thumbnail(G_VFS_BACKEND_MTP(backend)->device, id,
+                                   &data, &size);
+    if (ret == 0) {
+      g_print("File %u has sampledata: %u\n", id, size);
+      GByteArray *bytes = g_byte_array_sized_new(size);
+      g_byte_array_append(bytes, data, size);
+      free(data);
+      g_vfs_job_open_for_read_set_can_seek (G_VFS_JOB_OPEN_FOR_READ(job), FALSE);
+      g_vfs_job_open_for_read_set_handle (G_VFS_JOB_OPEN_FOR_READ(job), bytes);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    } else {
+      g_print("File %u has no thumbnail:\n", id);
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,
+                        G_IO_ERROR_NOT_FOUND,
+                        _("No thumbnail for entity '%s'"),
+                        icon_id);
+    }
+  } else {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR,
+                      G_IO_ERROR_INVALID_ARGUMENT,
+                      _("Malformed icon identifier '%s'"),
+                      icon_id);
+  }
+  g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+}
+
+static gboolean
+try_read (GVfsBackend *backend,
+          GVfsJobRead *job,
+          GVfsBackendHandle handle,
+          char *buffer,
+          gsize bytes_requested)
+{
+  GByteArray *bytes = handle;
+
+  g_print ("try_read (%u %lu)", bytes->len, bytes_requested);
+
+  gsize bytes_to_copy =  MIN(bytes->len, bytes_requested);
+  if (bytes_to_copy == 0) {
+    goto out;
+  }
+  memcpy(buffer, bytes->data, bytes_to_copy);
+  g_byte_array_remove_range(bytes, 0, bytes_to_copy);
+
+ out:
+  g_vfs_job_read_set_size (job, bytes_to_copy);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  return TRUE;
+}
+
+static void
+do_close_read (GVfsBackend *backend,
+                GVfsJobCloseRead *job,
+                GVfsBackendHandle handle)
+{
+  g_print ("do_close_read\n");
+  g_byte_array_unref(handle);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+
 /************************************************
  * 	  Class init
  * 
@@ -1122,4 +1222,7 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->set_display_name = do_set_display_name;
   backend_class->create_dir_monitor = do_create_dir_monitor;
   backend_class->create_file_monitor = do_create_file_monitor;
+  backend_class->open_icon_for_read = do_open_icon_for_read;
+  backend_class->try_read = try_read;
+  backend_class->close_read = do_close_read;
 }
