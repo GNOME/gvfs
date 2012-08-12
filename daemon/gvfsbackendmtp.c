@@ -76,6 +76,8 @@ g_vfs_backend_mtp_init (GVfsBackendMtp *backend)
   g_vfs_backend_set_mount_spec (G_VFS_BACKEND(backend), mount_spec);
   g_mount_spec_unref (mount_spec);
 
+  backend->monitors = g_hash_table_new(g_direct_hash, g_direct_equal);
+
   g_print ("(II) g_vfs_backend_mtp_init done.\n");
 }
 
@@ -88,6 +90,7 @@ g_vfs_backend_mtp_finalize (GObject *object)
 
   backend = G_VFS_BACKEND_MTP (object);
 
+  g_hash_table_unref(backend->monitors);
   g_mutex_clear(&backend->mutex);
 
   if (G_OBJECT_CLASS (g_vfs_backend_mtp_parent_class)->finalize)
@@ -95,10 +98,99 @@ g_vfs_backend_mtp_finalize (GObject *object)
 }
 
 
+/************************************************
+ * Monitors
+ */
+
+static void
+do_create_dir_monitor (GVfsBackend *backend,
+                       GVfsJobCreateMonitor *job,
+                       const char *filename,
+                       GFileMonitorFlags flags)
+{
+  char *dir;
+  char *name;
+  GVfsBackendMtp *mtp_backend = G_VFS_BACKEND_MTP (backend);
+
+  g_print ("create_dir_monitor (%s)", filename);
+
+  GVfsMonitor *vfs_monitor = g_vfs_monitor_new (backend);
+
+  g_object_set_data_full(G_OBJECT(vfs_monitor), "gvfsbackendmtp:path",
+                         g_strdup(filename), g_free);
+
+  g_vfs_job_create_monitor_set_monitor (job, vfs_monitor);
+  g_hash_table_insert(mtp_backend->monitors, vfs_monitor, NULL);
+  g_object_weak_ref(G_OBJECT(vfs_monitor), (GWeakNotify)g_hash_table_remove, mtp_backend->monitors);
+  g_object_unref (vfs_monitor);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
 
 
-static LIBMTP_mtpdevice_t *
-get_device(GVfsBackend *backend, const char *id, GVfsJob *job);
+static void
+do_create_file_monitor (GVfsBackend *backend,
+                        GVfsJobCreateMonitor *job,
+                        const char *filename,
+                        GFileMonitorFlags flags)
+{
+  char *dir;
+  char *name;
+  GVfsBackendMtp *mtp_backend = G_VFS_BACKEND_MTP (backend);
+
+  g_print ("create_file_monitor (%s)", filename);
+
+  GVfsMonitor *vfs_monitor = g_vfs_monitor_new (backend);
+
+  g_object_set_data_full(G_OBJECT(vfs_monitor), "gvfsbackendmtp:path",
+                         g_strdup(filename), g_free);
+
+  g_vfs_job_create_monitor_set_monitor (job, vfs_monitor);
+  g_hash_table_insert(mtp_backend->monitors, vfs_monitor, NULL);
+  g_object_weak_ref(G_OBJECT(vfs_monitor), (GWeakNotify)g_hash_table_remove, mtp_backend->monitors);
+  g_object_unref (vfs_monitor);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
+emit_event_internal(GVfsMonitor *monitor,
+                    const char *path,
+                    GFileMonitorEvent event)
+{
+  char *dir = g_dirname(path);
+  const char *monitored_path = g_object_get_data(G_OBJECT(monitor), "gvfsbackendmtp:path");
+  if (g_strcmp0(dir, monitored_path) == 0) {
+    g_print("Event %d on directory %s for %s\n", event, dir, path);
+    g_vfs_monitor_emit_event(monitor, event, path, NULL);
+  } else if (g_strcmp0(path, monitored_path) == 0) {
+    g_print("Event %d on file %s\n", event, path);
+    g_vfs_monitor_emit_event(monitor, event, path, NULL);
+  }
+  g_free(dir);
+}
+
+static void
+emit_create_event(gpointer key,
+                  gpointer value,
+                  gpointer user_data)
+{
+  emit_event_internal(key, user_data, G_FILE_MONITOR_EVENT_CREATED);
+}
+
+static void
+emit_delete_event(gpointer key,
+                  gpointer value,
+                  gpointer user_data)
+{
+  emit_event_internal(key, user_data, G_FILE_MONITOR_EVENT_DELETED);
+}
+
+static void
+emit_change_event(gpointer key,
+                  gpointer value,
+                  gpointer user_data)
+{
+  emit_event_internal(key, user_data, G_FILE_MONITOR_EVENT_CHANGED);
+}
 
 
 
@@ -106,6 +198,10 @@ get_device(GVfsBackend *backend, const char *id, GVfsJob *job);
  * 	  Mount
  * 
  */
+
+static LIBMTP_mtpdevice_t *
+get_device(GVfsBackend *backend, const char *id, GVfsJob *job);
+
 
 static void
 on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer user_data)
@@ -852,6 +948,8 @@ do_push(GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
+  g_hash_table_foreach(G_VFS_BACKEND_MTP(backend)->monitors, emit_create_event, (char *)destination);
+
  exit:
   if (file) {
     g_object_unref(file);
@@ -903,6 +1001,8 @@ do_make_directory (GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
+  g_hash_table_foreach(G_VFS_BACKEND_MTP(backend)->monitors, emit_create_event, (char *)filename);
+
  exit:
   g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
@@ -941,6 +1041,8 @@ do_delete (GVfsBackend *backend,
     goto exit;
   }
   g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  g_hash_table_foreach(G_VFS_BACKEND_MTP(backend)->monitors, emit_delete_event, (char *)filename);
 
  exit:
   g_strfreev(elements);
@@ -985,6 +1087,8 @@ do_set_display_name (GVfsBackend *backend,
   g_vfs_job_set_display_name_set_new_path(job, filename);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
+  g_hash_table_foreach(G_VFS_BACKEND_MTP(backend)->monitors, emit_change_event, (char *)filename);
+
  exit:
   g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
@@ -1016,6 +1120,6 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->make_directory = do_make_directory;
   backend_class->delete = do_delete;
   backend_class->set_display_name = do_set_display_name;
-//  backend_class->create_dir_monitor = do_create_dir_monitor;
-//  backend_class->create_file_monitor = do_create_file_monitor;
+  backend_class->create_dir_monitor = do_create_dir_monitor;
+  backend_class->create_file_monitor = do_create_file_monitor;
 }
