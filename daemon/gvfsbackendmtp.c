@@ -1002,7 +1002,7 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
-  
+
   gobject_class->finalize = g_vfs_backend_mtp_finalize;
 
   backend_class->try_mount = try_mount;
@@ -1013,13 +1013,9 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->query_fs_info = do_query_fs_info;
   backend_class->pull = do_pull;
   backend_class->push = do_push;
-//  backend_class->replace = do_replace;
   backend_class->make_directory = do_make_directory;
   backend_class->delete = do_delete;
   backend_class->set_display_name = do_set_display_name;
-//  backend_class->set_attribute = do_set_attribute;
 //  backend_class->create_dir_monitor = do_create_dir_monitor;
 //  backend_class->create_file_monitor = do_create_file_monitor;
-//  backend_class->query_settable_attributes = do_query_settable_attributes;
-//  backend_class->query_writable_namespaces = do_query_writable_namespaces;
 }
