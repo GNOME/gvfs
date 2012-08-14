@@ -47,6 +47,7 @@ struct _GvfsAfpServerPrivate
 
   guint32             user_id;
   guint32             group_id;
+  guint64             uuid;
 };
 
 #define AFP_UAM_NO_USER   "No User Authent"
@@ -864,33 +865,31 @@ invalid_reply:
   return FALSE;
 }
 
-static gboolean
-get_userinfo (GVfsAfpServer *server,
-              GCancellable  *cancellable,
-              GError       **error)
+static GVfsAfpReply *
+command_get_user_info (GVfsAfpServer *server,
+                       guint16        bitmap,
+                       GCancellable  *cancellable,
+                       GError       **error)
 {
   GVfsAfpServerPrivate *priv = server->priv;
   
   GVfsAfpCommand *comm;
-  guint16 bitmap;
-
   GVfsAfpReply *reply;
   AfpResultCode res_code;
-
+  
   comm = g_vfs_afp_command_new (AFP_COMMAND_GET_USER_INFO);
   /* Flags, ThisUser = 1 */
   g_vfs_afp_command_put_byte (comm, 0x01);
   /* UserId */
   g_vfs_afp_command_put_int32 (comm, 0);
   /* Bitmap */
-  bitmap = AFP_GET_USER_INFO_BITMAP_GET_UID_BIT | AFP_GET_USER_INFO_BITMAP_GET_GID_BIT;
   g_vfs_afp_command_put_uint16 (comm, bitmap);
 
   reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm, cancellable,
                                                   error);
   g_object_unref (comm);
   if (!reply)
-    return FALSE;
+    return NULL;
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
   if (res_code != AFP_RESULT_NO_ERROR)
@@ -921,26 +920,63 @@ get_userinfo (GVfsAfpServer *server,
         g_propagate_error (error, afp_result_code_to_gerror (res_code));
         break;
     }
-    return FALSE;
+    return NULL;
   }
+
+  return reply;
+}
+
+static gboolean
+get_userinfo (GVfsAfpServer *server,
+              GCancellable  *cancellable,
+              GError       **error)
+{
+  GVfsAfpServerPrivate *priv = server->priv;
+
+  gboolean res = FALSE;
+  GVfsAfpReply *reply = NULL;
+  guint16 bitmap;
+
+  bitmap = AFP_GET_USER_INFO_BITMAP_GET_UID_BIT | AFP_GET_USER_INFO_BITMAP_GET_UUID_BIT;
+  reply = command_get_user_info (server, bitmap, cancellable, error);
+  if (!reply)
+    goto done;
+  
+  /* Bitmap */
+  REPLY_READ_UINT16 (reply, &bitmap);
+  if (bitmap != (AFP_GET_USER_INFO_BITMAP_GET_UID_BIT | AFP_GET_USER_INFO_BITMAP_GET_UUID_BIT))
+    goto invalid_reply;
+
+  REPLY_READ_UINT32 (reply, &priv->user_id);
+  REPLY_READ_UINT64 (reply, &priv->uuid);
+
+  g_clear_object (&reply);
+
+  /* We try to get the group id separately since seems to give an invalid reply
+   * on some OS X versions. */
+  bitmap = AFP_GET_USER_INFO_BITMAP_GET_GID_BIT;
+  reply = command_get_user_info (server, bitmap, cancellable, error);
+  if (!reply)
+    goto done;
 
   /* Bitmap */
   REPLY_READ_UINT16 (reply, &bitmap);
+  if (bitmap != AFP_GET_USER_INFO_BITMAP_GET_GID_BIT)
+    goto invalid_reply;
 
-  if (bitmap & AFP_GET_USER_INFO_BITMAP_GET_UID_BIT)
-    REPLY_READ_UINT16 (reply, &priv->user_id);
-  
-  if (bitmap & AFP_GET_USER_INFO_BITMAP_GET_GID_BIT)
-    REPLY_READ_UINT16 (reply, &priv->group_id);
-  
-  g_object_unref (reply);
-  
-  return TRUE;
+  /* Don't check for errors since it's known to fail on some servers. */
+  g_vfs_afp_reply_read_uint32 (reply, &priv->group_id);
+
+  res = TRUE;
+
+done:
+  g_clear_object (&reply);
+  return res;
 
 invalid_reply:
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                _("Received invalid reply from server"));
-  return FALSE;
+  goto done;
 }
 
 gboolean
