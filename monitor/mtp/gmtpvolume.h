@@ -44,15 +44,15 @@ struct _GMtpVolumeClass {
 
 GType g_mtp_volume_get_type (void) G_GNUC_CONST;
 
-GMtpVolume *g_mtp_volume_new      (GVolumeMonitor   *volume_monitor,
-                                   GUdevDevice      *device,
-                                   GUdevClient      *gudev_client,
-                                   GFile            *activation_root);
+GMtpVolume *g_mtp_volume_new      (GVolumeMonitor *volume_monitor,
+                                   GUdevDevice    *device,
+                                   GUdevClient    *gudev_client,
+                                   GFile          *activation_root);
 
-gboolean    g_mtp_volume_has_path (GMtpVolume       *volume,
-                                   const char       *path);
+gboolean    g_mtp_volume_has_path (GMtpVolume     *volume,
+                                   const char     *path);
 
-void        g_mtp_volume_removed  (GMtpVolume       *volume);
+void        g_mtp_volume_removed  (GMtpVolume     *volume);
 
 G_END_DECLS
 

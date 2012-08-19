@@ -36,7 +36,7 @@
 
 #include <gio/gunixmounts.h>
 
-G_LOCK_DEFINE_STATIC(hal_vm);
+G_LOCK_DEFINE_STATIC(vm_lock);
 
 static GMtpVolumeMonitor *the_volume_monitor = NULL;
 
@@ -52,10 +52,10 @@ struct _GMtpVolumeMonitor {
   GList *device_volumes;
 };
 
-static void on_uevent                (GUdevClient *client, 
-                                      gchar *action,
-                                      GUdevDevice *device,
-                                      gpointer user_data);
+static void on_uevent (GUdevClient *client, 
+                       gchar *action,
+                       GUdevDevice *device,
+                       gpointer user_data);
 
 G_DEFINE_TYPE (GMtpVolumeMonitor, g_mtp_volume_monitor, G_TYPE_VOLUME_MONITOR)
 
@@ -69,9 +69,9 @@ list_free (GList *objects)
 static void
 g_mtp_volume_monitor_dispose (GObject *object)
 {
-  G_LOCK (hal_vm);
+  G_LOCK (vm_lock);
   the_volume_monitor = NULL;
-  G_UNLOCK (hal_vm);
+  G_UNLOCK (vm_lock);
 
   if (G_OBJECT_CLASS (g_mtp_volume_monitor_parent_class)->dispose)
     (*G_OBJECT_CLASS (g_mtp_volume_monitor_parent_class)->dispose) (object);
@@ -109,12 +109,12 @@ get_volumes (GVolumeMonitor *volume_monitor)
 
   monitor = G_MTP_VOLUME_MONITOR (volume_monitor);
 
-  G_LOCK (hal_vm);
+  G_LOCK (vm_lock);
 
   l = g_list_copy (monitor->device_volumes);
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
 
-  G_UNLOCK (hal_vm);
+  G_UNLOCK (vm_lock);
 
   return l;
 }
@@ -140,46 +140,45 @@ get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
 static void
 gudev_add_device (GMtpVolumeMonitor *monitor, GUdevDevice *device, gboolean do_emit)
 {
-    GMtpVolume *volume;
-    GList *store_heads, *l;
-    guint num_store_heads;
-    const char *usb_bus_num, *usb_device_num;
+  GMtpVolume *volume;
+  const char *usb_bus_num, *usb_device_num;
 
-    usb_bus_num = g_udev_device_get_property (device, "BUSNUM");
-    if (usb_bus_num == NULL) {
-	g_warning("device %s has no BUSNUM property, ignoring", g_udev_device_get_device_file (device));
-	return;
-    }
+  usb_bus_num = g_udev_device_get_property (device, "BUSNUM");
+  if (usb_bus_num == NULL) {
+    g_warning ("device %s has no BUSNUM property, ignoring", g_udev_device_get_device_file (device));
+    return;
+  }
 
-    usb_device_num = g_udev_device_get_property (device, "DEVNUM");
-    if (usb_device_num == NULL) {
-	g_warning("device %s has no DEVNUM property, ignoring", g_udev_device_get_device_file (device));
-	return;
-    }
+  usb_device_num = g_udev_device_get_property (device, "DEVNUM");
+  if (usb_device_num == NULL) {
+    g_warning ("device %s has no DEVNUM property, ignoring", g_udev_device_get_device_file (device));
+    return;
+  }
 
-    g_print ("gudev_add_device: device %s (bus: %i, device: %i)", 
-             g_udev_device_get_device_file (device),
-             usb_bus_num, usb_device_num);
+  /*
+  g_debug ("gudev_add_device: device %s (bus: %i, device: %i)",
+           g_udev_device_get_device_file (device),
+           usb_bus_num, usb_device_num);
+  */
 
-    gchar *uri = g_strdup_printf("mtp://[usb:%s,%s]", usb_bus_num, usb_device_num);
-    GFile *activation_mount_root;
+  gchar *uri = g_strdup_printf ("mtp://[usb:%s,%s]", usb_bus_num, usb_device_num);
+  GFile *activation_mount_root;
 
-    activation_mount_root = g_file_new_for_uri (uri);
-    g_free (uri);
+  activation_mount_root = g_file_new_for_uri (uri);
+  g_free (uri);
 
-    volume = g_mtp_volume_new (G_VOLUME_MONITOR (monitor),
-                               device, 
-                               monitor->gudev_client,
-                               activation_mount_root);
-        if (volume != NULL)
-          {
-            monitor->device_volumes = g_list_prepend (monitor->device_volumes, volume);
-            if (do_emit)
-                g_signal_emit_by_name (monitor, "volume_added", volume);
-          }
+  volume = g_mtp_volume_new (G_VOLUME_MONITOR (monitor),
+                             device,
+                             monitor->gudev_client,
+                             activation_mount_root);
+  if (volume != NULL) {
+    monitor->device_volumes = g_list_prepend (monitor->device_volumes, volume);
+    if (do_emit)
+      g_signal_emit_by_name (monitor, "volume_added", volume);
+  }
 
-        if (activation_mount_root != NULL)
-          g_object_unref (activation_mount_root);
+  if (activation_mount_root != NULL)
+    g_object_unref (activation_mount_root);
 }
 
 static void
@@ -192,29 +191,24 @@ gudev_remove_device (GMtpVolumeMonitor *monitor, GUdevDevice *device)
 
   /* g_debug ("gudev_remove_device: %s", g_udev_device_get_device_file (device)); */
 
-  for (l = monitor->device_volumes; l != NULL; l = ll)
-    {
-      GMtpVolume *volume = G_MTP_VOLUME (l->data);
+  for (l = monitor->device_volumes; l != NULL; l = ll) {
+    GMtpVolume *volume = G_MTP_VOLUME (l->data);
 
-      ll = l->next;
+    ll = l->next;
 
-      if (g_mtp_volume_has_path (volume, sysfs_path))
-        {
-          /* g_debug ("gudev_remove_device: found volume %s, deleting", sysfs_path); */
-          g_signal_emit_by_name (monitor, "volume_removed", volume);
-          g_signal_emit_by_name (volume, "removed");
-          g_mtp_volume_removed (volume);
-          monitor->device_volumes = g_list_remove (monitor->device_volumes, volume);
-          g_object_unref (volume);
-        }
+    if (g_mtp_volume_has_path (volume, sysfs_path)) {
+      /* g_debug ("gudev_remove_device: found volume %s, deleting", sysfs_path); */
+      g_signal_emit_by_name (monitor, "volume_removed", volume);
+      g_signal_emit_by_name (volume, "removed");
+      g_mtp_volume_removed (volume);
+      monitor->device_volumes = g_list_remove (monitor->device_volumes, volume);
+      g_object_unref (volume);
     }
+  }
 }
 
 static void
-on_uevent (GUdevClient *client, 
-           gchar *action,
-           GUdevDevice *device,
-           gpointer user_data)
+on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer user_data)
 {
   GMtpVolumeMonitor *monitor = G_MTP_VOLUME_MONITOR (user_data);
 
@@ -236,15 +230,14 @@ on_uevent (GUdevClient *client,
 static void
 gudev_coldplug_devices (GMtpVolumeMonitor *monitor)
 {
-    GList *usb_devices, *l;
+  GList *usb_devices, *l;
 
-    usb_devices = g_udev_client_query_by_subsystem (monitor->gudev_client, "usb");
-    for (l = usb_devices; l != NULL; l = l->next)
-    {
-        GUdevDevice *d = l->data;
-        if (g_udev_device_has_property (d, "ID_MTP_DEVICE"))
-            gudev_add_device (monitor, d, FALSE);
-    }
+  usb_devices = g_udev_client_query_by_subsystem (monitor->gudev_client, "usb");
+  for (l = usb_devices; l != NULL; l = l->next) {
+    GUdevDevice *d = l->data;
+    if (g_udev_device_has_property (d, "ID_MTP_DEVICE"))
+        gudev_add_device (monitor, d, FALSE);
+  }
 }
 
 static GObject *
@@ -257,16 +250,15 @@ g_mtp_volume_monitor_constructor (GType                  type,
   GMtpVolumeMonitorClass *klass;
   GObjectClass *parent_class;
 
-  G_LOCK (hal_vm);
-  if (the_volume_monitor != NULL)
-    {
-      object = g_object_ref (the_volume_monitor);
-      G_UNLOCK (hal_vm);
-      return object;
-    }
-  G_UNLOCK (hal_vm);
+  G_LOCK (vm_lock);
+  if (the_volume_monitor != NULL) {
+    object = g_object_ref (the_volume_monitor);
+    G_UNLOCK (vm_lock);
+    return object;
+  }
+  G_UNLOCK (vm_lock);
 
-  /*g_warning ("creating hal vm");*/
+  /*g_warning ("creating vm singleton");*/
 
   object = NULL;
 
@@ -279,7 +271,7 @@ g_mtp_volume_monitor_constructor (GType                  type,
 
   monitor = G_MTP_VOLUME_MONITOR (object);
 
-  const char *subsystems[] = {"usb", NULL};
+  const char *subsystems[] = { "usb", NULL };
   monitor->gudev_client = g_udev_client_new (subsystems);
 
   g_signal_connect (monitor->gudev_client, 
@@ -288,9 +280,9 @@ g_mtp_volume_monitor_constructor (GType                  type,
 
   gudev_coldplug_devices (monitor);
 
-  G_LOCK (hal_vm);
+  G_LOCK (vm_lock);
   the_volume_monitor = monitor;
-  G_UNLOCK (hal_vm);
+  G_UNLOCK (vm_lock);
 
   return object;
 }

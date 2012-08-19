@@ -33,11 +33,6 @@
 
 #include "gmtpvolume.h"
 
-#ifndef HAVE_GUDEV
-#include "hal-utils.h"
-#endif
-
-/* Protects all fields of GHalDrive that can change */
 G_LOCK_DEFINE_STATIC(mtp_volume);
 
 struct _GMtpVolume {
@@ -99,9 +94,9 @@ g_mtp_volume_init (GMtpVolume *mtp_volume)
 static int hexdigit(char c)
 {
   if (c >= 'a')
-      return c - 'a' + 10;
+    return c - 'a' + 10;
   if (c >= 'A')
-     return c - 'A' + 10;
+   return c - 'A' + 10;
   g_return_val_if_fail (c >= '0' && c <= '9', 0);
   return c - '0';
 }
@@ -115,19 +110,17 @@ udev_decode_string (const char* encoded)
   const char* s;
 
   if (encoded == NULL)
-      return NULL;
+    return NULL;
 
-  for (len = 0, s = encoded; *s && len < sizeof(decoded)-1; ++len, ++s)
-    {
-      /* need to check for NUL terminator in advance */
-      if (s[0] == '\\' && s[1] == 'x' && s[2] >= '0' && s[3] >= '0')
-	{
-	  decoded[len] = (hexdigit(s[2]) << 4) | hexdigit(s[3]);
-	  s += 3;
-	}
-      else
-	  decoded[len] = *s;
+  for (len = 0, s = encoded; *s && len < sizeof(decoded)-1; ++len, ++s) {
+    /* need to check for NUL terminator in advance */
+    if (s[0] == '\\' && s[1] == 'x' && s[2] >= '0' && s[3] >= '0') {
+      decoded[len] = (hexdigit(s[2]) << 4) | hexdigit(s[3]);
+      s += 3;
+    } else {
+      decoded[len] = *s;
     }
+  }
   decoded[len] = '\0';
   return decoded;
 }
@@ -144,75 +137,64 @@ set_volume_name (GMtpVolume *v)
    * ID_{VENDOR,MODEL} */
 
   gphoto_name = g_udev_device_get_property (v->device, "ID_MTP");
-  if (gphoto_name != NULL && strcmp (gphoto_name, "1") != 0)
-    {
-      v->name = g_strdup (gphoto_name);
-      return;
-    }
+  if (gphoto_name != NULL && strcmp (gphoto_name, "1") != 0) {
+    v->name = g_strdup (gphoto_name);
+    return;
+  }
 
   vendor = g_udev_device_get_property (v->device, "ID_MEDIA_PLAYER_VENDOR");
   if (vendor == NULL)
-      vendor = g_udev_device_get_property (v->device, "ID_VENDOR_ENC");
+    vendor = g_udev_device_get_property (v->device, "ID_VENDOR_ENC");
   model = g_udev_device_get_property (v->device, "ID_MEDIA_PLAYER_MODEL");
-  if (model == NULL)
-    {
-      model = g_udev_device_get_property (v->device, "ID_MODEL_ENC");
-      product = g_udev_device_get_sysfs_attr (v->device, "product");
-    }
+  if (model == NULL) {
+    model = g_udev_device_get_property (v->device, "ID_MODEL_ENC");
+    product = g_udev_device_get_sysfs_attr (v->device, "product");
+  }
 
   v->name = NULL;
-  if (product != NULL && strlen (product) > 0)
+  if (product != NULL && strlen (product) > 0) {
     v->name = g_strdup (product);
-  else if (vendor == NULL)
-    {
-      if (model != NULL)
-        v->name = g_strdup (udev_decode_string (model));
+  } else if (vendor == NULL) {
+    if (model != NULL)
+      v->name = g_strdup (udev_decode_string (model));
+  } else {
+    if (model != NULL) {
+      /* we can't call udev_decode_string() twice in one g_strdup_printf(),
+       * it returns a static buffer */
+      gchar *temp = g_strdup_printf ("%s %s", vendor, model);
+      v->name = g_strdup (udev_decode_string (temp));
+      g_free (temp);
+    } else {
+      if (g_udev_device_has_property (v->device, "ID_MEDIA_PLAYER")) {
+        /* Translators: %s is the device vendor */
+        v->name = g_strdup_printf (_("%s Audio Player"), udev_decode_string (vendor));
+      } else {
+        /* Translators: %s is the device vendor */
+        v->name = g_strdup_printf (_("%s Camera"), udev_decode_string (vendor));
+      }
     }
-  else
-    {
-      if (model != NULL)
-	{
-	  /* we can't call udev_decode_string() twice in one g_strdup_printf(),
-	   * it returns a static buffer */
-	  gchar *temp = g_strdup_printf ("%s %s", vendor, model);
-          v->name = g_strdup (udev_decode_string (temp));
-	  g_free (temp);
-        }
-      else
-        {
-          if (g_udev_device_has_property (v->device, "ID_MEDIA_PLAYER"))
-            {
-              /* Translators: %s is the device vendor */
-              v->name = g_strdup_printf (_("%s Audio Player"), udev_decode_string (vendor));
-	    }
-	  else
-	    {
-	      /* Translators: %s is the device vendor */
-	      v->name = g_strdup_printf (_("%s Camera"), udev_decode_string (vendor));
-	    }
-        }
-    }
+  }
 
   if (v->name == NULL)
-      v->name = g_strdup (_("Camera"));
+    v->name = g_strdup (_("Camera"));
 }
 
 static void
 set_volume_icon (GMtpVolume *volume)
 {
   if (g_udev_device_has_property (volume->device, "ID_MEDIA_PLAYER_ICON_NAME"))
-      volume->icon = g_strdup (g_udev_device_get_property (volume->device, "ID_MEDIA_PLAYER_ICON_NAME"));
+    volume->icon = g_strdup (g_udev_device_get_property (volume->device, "ID_MEDIA_PLAYER_ICON_NAME"));
   else if (g_udev_device_has_property (volume->device, "ID_MEDIA_PLAYER"))
-      volume->icon = g_strdup ("multimedia-player");
+    volume->icon = g_strdup ("multimedia-player");
   else
-      volume->icon = g_strdup ("camera-photo");
+    volume->icon = g_strdup ("camera-photo");
 }
 
 GMtpVolume *
 g_mtp_volume_new (GVolumeMonitor   *volume_monitor,
-                      GUdevDevice      *device,
-                      GUdevClient      *gudev_client,
-                      GFile            *activation_root)
+                  GUdevDevice      *device,
+                  GUdevClient      *gudev_client,
+                  GFile            *activation_root)
 {
   GMtpVolume *volume;
   const char *device_path;
@@ -223,7 +205,7 @@ g_mtp_volume_new (GVolumeMonitor   *volume_monitor,
   g_return_val_if_fail (activation_root != NULL, NULL);
 
   if (!g_udev_device_has_property (device, "ID_MTP_DEVICE"))
-      return NULL;
+    return NULL;
   device_path = g_udev_device_get_device_file (device);
 
   volume = g_object_new (G_TYPE_MTP_VOLUME, NULL);
@@ -316,7 +298,7 @@ g_mtp_volume_has_path (GMtpVolume  *volume,
   G_LOCK (mtp_volume);
   res = FALSE;
   if (mtp_volume->device != NULL)
-    res = strcmp (g_udev_device_get_sysfs_path   (mtp_volume->device), sysfs_path) == 0;
+    res = strcmp (g_udev_device_get_sysfs_path (mtp_volume->device), sysfs_path) == 0;
   G_UNLOCK (mtp_volume);
   return res;
 }
@@ -387,15 +369,15 @@ g_mtp_volume_mount_finish (GVolume       *volume,
 }
 
 static char *
-g_mtp_volume_get_identifier (GVolume              *volume,
-                             const char          *kind)
+g_mtp_volume_get_identifier (GVolume    *volume,
+                             const char *kind)
 {
   GMtpVolume *mtp_volume = G_MTP_VOLUME (volume);
   char *id;
 
   G_LOCK (mtp_volume);
   id = NULL;
-    if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
+  if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
     id = g_strdup (mtp_volume->device_path);
   G_UNLOCK (mtp_volume);
 
