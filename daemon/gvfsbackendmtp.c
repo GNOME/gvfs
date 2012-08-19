@@ -1135,7 +1135,7 @@ do_open_icon_for_read (GVfsBackend *backend,
     int ret = LIBMTP_Get_Thumbnail(G_VFS_BACKEND_MTP(backend)->device, id,
                                    &data, &size);
     if (ret == 0) {
-      g_print("File %u has sampledata: %u\n", id, size);
+      g_print("File %u has thumbnail: %u\n", id, size);
       GByteArray *bytes = g_byte_array_sized_new(size);
       g_byte_array_append(bytes, data, size);
       free(data);
@@ -1143,12 +1143,24 @@ do_open_icon_for_read (GVfsBackend *backend,
       g_vfs_job_open_for_read_set_handle (G_VFS_JOB_OPEN_FOR_READ(job), bytes);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     } else {
-      g_print("File %u has no thumbnail:\n", id);
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR,
-                        G_IO_ERROR_NOT_FOUND,
-                        _("No thumbnail for entity '%s'"),
-                        icon_id);
+      LIBMTP_filesampledata_t *sample_data = LIBMTP_new_filesampledata_t();
+      ret = LIBMTP_Get_Representative_Sample(G_VFS_BACKEND_MTP(backend)->device, id, sample_data);
+      if (ret == 0) {
+        g_print("File %u has sampledata: %u\n", id, size);
+        GByteArray *bytes = g_byte_array_sized_new(sample_data->size);
+        g_byte_array_append(bytes, sample_data->data, sample_data->size);
+        LIBMTP_destroy_filesampledata_t(sample_data);
+        g_vfs_job_open_for_read_set_can_seek (G_VFS_JOB_OPEN_FOR_READ(job), FALSE);
+        g_vfs_job_open_for_read_set_handle (G_VFS_JOB_OPEN_FOR_READ(job), bytes);
+        g_vfs_job_succeeded (G_VFS_JOB (job));
+      } else {
+        g_print("File %u has no thumbnail:\n", id);
+        g_vfs_job_failed (G_VFS_JOB (job),
+                          G_IO_ERROR,
+                          G_IO_ERROR_NOT_FOUND,
+                          _("No thumbnail for entity '%s'"),
+                          icon_id);
+      }
     }
   } else {
     g_vfs_job_failed (G_VFS_JOB (job),
