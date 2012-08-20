@@ -1,3 +1,10 @@
+Major changes in 1.13.7
+=======================
+* Use libsecret instead of gnome-keyring
+* afp: Lots of robustness work
+* cdda: Support libcdio >= 0.84
+* Translation updates
+
 Major changes in 1.13.6
 =======================
 * gphoto: suppor libgphoto 2.5 API
