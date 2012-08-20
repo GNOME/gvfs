@@ -1937,4 +1937,6 @@ guint32
 g_vfs_afp_connection_get_max_request_size (GVfsAfpConnection *afp_connection)
 {
   g_return_val_if_fail (G_VFS_IS_AFP_CONNECTION (afp_connection), 0);
+
+  return afp_connection->priv->kRequestQuanta;
 }
