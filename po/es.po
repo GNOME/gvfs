@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-08-09 20:16+0000\n"
-"PO-Revision-Date: 2012-08-10 11:01+0200\n"
+"POT-Creation-Date: 2012-08-20 16:59+0000\n"
+"PO-Revision-Date: 2012-08-20 19:32+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "Language: \n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Gtranslator 2.91.5\n"
-"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../client/gdaemonfile.c:416 ../client/gdaemonfile.c:2767
 msgid "Operation not supported, files on different mounts"
@@ -235,12 +235,10 @@ msgid "error starting mount daemon"
 msgstr "error al iniciar el demonio de montado"
 
 #: ../daemon/gvfsafpconnection.c:764
-#| msgid "The connection was interrupted"
 msgid "The connection is not opened"
 msgstr "La conexión no está abierta"
 
 #: ../daemon/gvfsafpconnection.c:771
-#| msgid "Data connection closed"
 msgid "The connection is closed"
 msgstr "La conexión está cerrada"
 
@@ -252,35 +250,34 @@ msgstr "Se perdió la conexión inesperadamente"
 msgid "Got EOS"
 msgstr "Se obtuvo EOS"
 
-#: ../daemon/gvfsafpserver.c:197 ../daemon/gvfsafpserver.c:476
+#: ../daemon/gvfsafpserver.c:198 ../daemon/gvfsafpserver.c:477
 #, c-format
 msgid "Server doesn't support passwords longer than %d characters"
 msgstr "El servidor no soporta contraseñas de más de %d caracteres"
 
-#: ../daemon/gvfsafpserver.c:221 ../daemon/gvfsafpserver.c:527
+#: ../daemon/gvfsafpserver.c:222 ../daemon/gvfsafpserver.c:528
 msgid "An invalid username was provided"
 msgstr "Se ha proporcionado un nombre de usuario no válido"
 
-#: ../daemon/gvfsafpserver.c:390 ../daemon/gvfsafpserver.c:617
+#: ../daemon/gvfsafpserver.c:391 ../daemon/gvfsafpserver.c:618
 #, c-format
 msgid "AFP server %s declined the submitted password"
 msgstr "El servidor AFP %s rechazó la contraseña enviada"
 
-#: ../daemon/gvfsafpserver.c:425 ../daemon/gvfsafpserver.c:644
-#: ../daemon/gvfsafpserver.c:817 ../daemon/gvfsafpserver.c:863
-#: ../daemon/gvfsafpserver.c:942 ../daemon/gvfsafpserver.c:1316
-#: ../daemon/gvfsafpserver.c:1618 ../daemon/gvfsafpserver.c:1707
+#: ../daemon/gvfsafpserver.c:426 ../daemon/gvfsafpserver.c:645
+#: ../daemon/gvfsafpserver.c:818 ../daemon/gvfsafpserver.c:864
+#: ../daemon/gvfsafpserver.c:978 ../daemon/gvfsafpserver.c:1352
+#: ../daemon/gvfsafpserver.c:1654 ../daemon/gvfsafpserver.c:1743
 #, c-format
-#| msgid "Unexpected reply from server"
 msgid "Received invalid reply from server"
 msgstr "Se recibió una respuesta no válida del servidor"
 
-#: ../daemon/gvfsafpserver.c:669 ../daemon/gvfsafpserver.c:694
+#: ../daemon/gvfsafpserver.c:670 ../daemon/gvfsafpserver.c:695
 #, c-format
 msgid "AFP server %s doesn't support anonymous login"
 msgstr "El servidor AFP %s no soporta inicio de sesión anónimo"
 
-#: ../daemon/gvfsafpserver.c:722
+#: ../daemon/gvfsafpserver.c:723
 #, c-format
 msgid ""
 "Login to AFP server %s failed (no suitable authentication mechanism found)"
@@ -288,17 +285,16 @@ msgstr ""
 "Falló al iniciar sesión en el servidor AFP %s (no se encontró un mecanismo "
 "de autenticación apropiado)"
 
-#: ../daemon/gvfsafpserver.c:796 ../daemon/gvfsafpserver.c:817
+#: ../daemon/gvfsafpserver.c:797 ../daemon/gvfsafpserver.c:818
 #, c-format
 msgid "Failed to connect to server (%s)"
 msgstr "Falló al conectar al servidor (%s)"
 
-#: ../daemon/gvfsafpserver.c:796
-#| msgid "Server doesn't support the FPCopyFile operation"
+#: ../daemon/gvfsafpserver.c:797
 msgid "Server doesn't support AFP version 3.0 or later"
 msgstr "El servidor no soporta la operación la versión 3.0 o superior de AFP"
 
-#: ../daemon/gvfsafpserver.c:904 ../daemon/gvfsafpvolume.c:390
+#: ../daemon/gvfsafpserver.c:903 ../daemon/gvfsafpvolume.c:390
 #: ../daemon/gvfsafpvolume.c:668 ../daemon/gvfsafpvolume.c:821
 #: ../daemon/gvfsafpvolume.c:1015 ../daemon/gvfsafpvolume.c:1215
 #: ../daemon/gvfsafpvolume.c:1398 ../daemon/gvfsafpvolume.c:1555
@@ -310,45 +306,44 @@ msgstr "El servidor no soporta la operación la versión 3.0 o superior de AFP"
 msgid "Permission denied"
 msgstr "Permiso denegado"
 
-#: ../daemon/gvfsafpserver.c:909
+#: ../daemon/gvfsafpserver.c:908
 #, c-format
 msgid "Command is not supported by server"
 msgstr "El servidor no soporta el comando"
 
-#: ../daemon/gvfsafpserver.c:913
+#: ../daemon/gvfsafpserver.c:912
 #, c-format
 msgid "User's password has expired"
 msgstr "La contraseña del usuario ha expirado"
 
-#: ../daemon/gvfsafpserver.c:917
+#: ../daemon/gvfsafpserver.c:916
 #, c-format
 msgid "User's password needs to be changed"
 msgstr "Se debe cambiar la contraseña del usuario"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsafpserver.c:1022
+#: ../daemon/gvfsafpserver.c:1058
 #, c-format
 msgid "Enter password for afp as %s on %s"
 msgstr "Introducir la contraseña para AFP como %s en %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:1025
+#: ../daemon/gvfsafpserver.c:1061
 #, c-format
 msgid "Enter password for afp on %s"
 msgstr "Introducir la contraseña para AFP en %s"
 
-#: ../daemon/gvfsafpserver.c:1057 ../daemon/gvfsbackendftp.c:518
+#: ../daemon/gvfsafpserver.c:1093 ../daemon/gvfsbackendftp.c:518
 #: ../daemon/gvfsbackendsftp.c:984 ../daemon/gvfsbackendsmbbrowse.c:995
 #: ../daemon/gvfsbackendsmb.c:619
 msgid "Password dialog cancelled"
 msgstr "Se canceló el diálogo de la contraseña"
 
-#: ../daemon/gvfsafpserver.c:1174
-#| msgid "Failed to connect to server (%s)"
+#: ../daemon/gvfsafpserver.c:1210
 msgid "Failed to logout from server"
 msgstr "Falló al desconectarse del servidor"
 
-#: ../daemon/gvfsafpserver.c:1663
+#: ../daemon/gvfsafpserver.c:1699
 msgid "ID not found"
 msgstr "ID no econtrado"
 
@@ -372,7 +367,7 @@ msgstr "No se pudo montar el volumen %s en %s"
 #: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:323
 #: ../daemon/gvfsbackendafpbrowse.c:355 ../daemon/gvfsbackendarchive.c:647
 #: ../daemon/gvfsbackendarchive.c:695 ../daemon/gvfsbackendarchive.c:747
-#: ../daemon/gvfsbackendarchive.c:776 ../daemon/gvfsbackendcdda.c:993
+#: ../daemon/gvfsbackendarchive.c:776 ../daemon/gvfsbackendcdda.c:1011
 #: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:398
 #: ../daemon/gvfsbackendftp.c:1067 ../daemon/gvfsbackendnetwork.c:602
 #: ../daemon/gvfsbackendsmbbrowse.c:1094 ../daemon/gvfsbackendsmbbrowse.c:1161
@@ -456,7 +451,8 @@ msgstr "La existe un objeto con este nombre"
 
 #: ../daemon/gvfsafpvolume.c:1227
 msgid "Target object is marked as not renameable (RenameInhibit)"
-msgstr "El objeto de destino está marcado como no renombrable («RenameInhibit»)"
+msgstr ""
+"El objeto de destino está marcado como no renombrable («RenameInhibit»)"
 
 #: ../daemon/gvfsafpvolume.c:1402
 msgid "Can't move directory into one of its descendants"
@@ -826,7 +822,7 @@ msgstr "El archivo ya existe"
 #: ../daemon/gvfsjobunmountmountable.c:172 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1174 ../monitor/gdu/ggdumount.c:1258
 #: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1108
-#: ../monitor/udisks2/gvfsudisks2volume.c:1556
+#: ../monitor/udisks2/gvfsudisks2volume.c:1566
 msgid "Operation not supported by backend"
 msgstr "El backend no soporta la operación"
 
@@ -860,44 +856,44 @@ msgstr ""
 "El volumen está ocupado\n"
 "Una o más aplicaciones mantienen el volumen ocupado."
 
-#: ../daemon/gvfsbackendcdda.c:336 ../daemon/gvfsbackendgphoto2.c:1508
+#: ../daemon/gvfsbackendcdda.c:354 ../daemon/gvfsbackendgphoto2.c:1508
 msgid "Cannot create gudev client"
 msgstr "No se puede crear el cliente gudev"
 
-#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1526
+#: ../daemon/gvfsbackendcdda.c:374 ../daemon/gvfsbackendgphoto2.c:1526
 msgid "Cannot connect to the system bus"
 msgstr "No se pudo conectar con el bus del sistema"
 
-#: ../daemon/gvfsbackendcdda.c:367 ../daemon/gvfsbackendgphoto2.c:1538
+#: ../daemon/gvfsbackendcdda.c:385 ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Cannot create libhal context"
 msgstr "No se pudo crear el contexto libhal"
 
-#: ../daemon/gvfsbackendcdda.c:381 ../daemon/gvfsbackendgphoto2.c:1551
+#: ../daemon/gvfsbackendcdda.c:399 ../daemon/gvfsbackendgphoto2.c:1551
 msgid "Cannot initialize libhal"
 msgstr "No se puede inicializar libhal"
 
-#: ../daemon/gvfsbackendcdda.c:397 ../daemon/gvfsbackendcdda.c:482
+#: ../daemon/gvfsbackendcdda.c:415 ../daemon/gvfsbackendcdda.c:500
 msgid "No drive specified"
 msgstr "No se especificó una unidad"
 
-#: ../daemon/gvfsbackendcdda.c:421
+#: ../daemon/gvfsbackendcdda.c:439
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "No se pudo encontrar la unidad %s"
 
-#: ../daemon/gvfsbackendcdda.c:434
+#: ../daemon/gvfsbackendcdda.c:452
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "La unidad %s no contiene archivos de sonido"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
-#: ../daemon/gvfsbackendcdda.c:444
+#: ../daemon/gvfsbackendcdda.c:462
 #, c-format
 msgid "cdda mount on %s"
 msgstr "CDDA montado en %s"
 
-#: ../daemon/gvfsbackendcdda.c:445 ../daemon/gvfsbackendcdda.c:965
+#: ../daemon/gvfsbackendcdda.c:463 ../daemon/gvfsbackendcdda.c:983
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #: ../monitor/udisks2/gvfsudisks2volume.c:308
@@ -905,40 +901,40 @@ msgstr "CDDA montado en %s"
 msgid "Audio Disc"
 msgstr "Disco de sonido"
 
-#: ../daemon/gvfsbackendcdda.c:508
+#: ../daemon/gvfsbackendcdda.c:526
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "El sistema de archivos está ocupado: %d archivo abierto"
 msgstr[1] "El sistema de archivos está ocupado: %d archivos abiertos"
 
-#: ../daemon/gvfsbackendcdda.c:700
+#: ../daemon/gvfsbackendcdda.c:718
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "El archivo %s no existe en la unidad %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:809
+#: ../daemon/gvfsbackendcdda.c:827
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "Error de «paranoia» en la unidad %s"
 
-#: ../daemon/gvfsbackendcdda.c:872
+#: ../daemon/gvfsbackendcdda.c:890
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Error al buscar en el flujo en la unidad %s"
 
-#: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendgphoto2.c:1818
+#: ../daemon/gvfsbackendcdda.c:1004 ../daemon/gvfsbackendgphoto2.c:1818
 #, c-format
 msgid "No such file"
 msgstr "No existe el archivo"
 
-#: ../daemon/gvfsbackendcdda.c:1000
+#: ../daemon/gvfsbackendcdda.c:1018
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "El archivo no existe o no es una pista de sonido"
 
-#: ../daemon/gvfsbackendcdda.c:1106
+#: ../daemon/gvfsbackendcdda.c:1124
 msgid "Audio CD File System Service"
 msgstr "Servicio del sistema de archivos de CD de sonido"
 
@@ -2248,35 +2244,34 @@ msgstr "Volumen de %s"
 msgid "Volume"
 msgstr "Volumen"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:999
+#: ../monitor/udisks2/gvfsudisks2volume.c:1008
 #, c-format
-msgid "Error storing passphrase in keyring (error code %d)"
-msgstr ""
-"Error al guardar la contraseña en el depósito de claves (código de error %d)"
+#| msgid "Error storing passphrase in keyring (error code %d)"
+msgid "Error storing passphrase in keyring (%s)"
+msgstr "Error al guardar la contraseña en el depósito de claves (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1030
+#: ../monitor/udisks2/gvfsudisks2volume.c:1043
 #, c-format
-msgid "Error deleting invalid passphrase from keyring (error code %d)"
-msgstr ""
-"Error al eliminar la contraseña no válida del depósito de claves (código de "
-"error %d)"
+#| msgid "Error deleting invalid passphrase from keyring (error code %d)"
+msgid "Error deleting invalid passphrase from keyring (%s)"
+msgstr "Error al eliminar la contraseña no válida del depósito de claves (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1096
+#: ../monitor/udisks2/gvfsudisks2volume.c:1108
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr ""
 "El dispositivo desbloqueado no contiene un sistema de archivos reconocible"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1125
+#: ../monitor/udisks2/gvfsudisks2volume.c:1137
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Contraseña de cifrado para %s"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1295
+#: ../monitor/udisks2/gvfsudisks2volume.c:1305
 msgid "A passphrase is required to access the volume"
 msgstr "Se requiere una contraseña para acceder al volumen"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1310
+#: ../monitor/udisks2/gvfsudisks2volume.c:1320
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2292,7 +2287,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1461
+#: ../monitor/udisks2/gvfsudisks2volume.c:1471
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
