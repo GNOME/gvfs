@@ -228,8 +228,8 @@ static gboolean
 handle_show_unmount_progress (GVfsDBusMountOperation *object,
                               GDBusMethodInvocation *invocation,
                               const gchar *arg_message_string,
-                              guint64 arg_time_left,
-                              guint64 arg_bytes_left,
+                              gint64 arg_time_left,
+                              gint64 arg_bytes_left,
                               gpointer data)
 {
   GMountOperationDBus *op_dbus = data;

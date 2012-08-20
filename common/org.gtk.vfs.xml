@@ -159,8 +159,8 @@
     </method>
     <method name="ShowUnmountProgress">
       <arg type='s' name='message_string' direction='in'/>
-      <arg type='t' name='time_left' direction='in'/>
-      <arg type='t' name='bytes_left' direction='in'/>
+      <arg type='x' name='time_left' direction='in'/>
+      <arg type='x' name='bytes_left' direction='in'/>
     </method>
     <method name="Aborted">
     </method>

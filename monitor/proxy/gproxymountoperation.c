@@ -309,8 +309,8 @@ g_proxy_mount_operation_handle_show_processes (const gchar        *wrapped_id,
 void
 g_proxy_mount_operation_handle_show_unmount_progress (const gchar *wrapped_id,
                                                       const gchar *message,
-                                                      guint64      time_left,
-                                                      guint64      bytes_left)
+                                                      gint64       time_left,
+                                                      gint64       bytes_left)
 {
   ProxyMountOpData *data;
 

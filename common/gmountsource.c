@@ -945,8 +945,8 @@ show_unmount_progress_reply (GVfsDBusMountOperation *proxy,
 void
 g_mount_source_show_unmount_progress (GMountSource *source,
                                       const char   *message_string,
-                                      guint64      time_left,
-                                      guint64      bytes_left)
+                                      gint64      time_left,
+                                      gint64      bytes_left)
 {
   GVfsDBusMountOperation *proxy;
 
@@ -978,8 +978,8 @@ g_mount_source_show_unmount_progress (GMountSource *source,
 static void
 op_show_unmount_progress (GMountOperation *op,
                           const char      *message,
-                          guint64          time_left,
-                          guint64          bytes_left,
+                          gint64           time_left,
+                          gint64           bytes_left,
                           GMountSource    *mount_source)
 {
   g_mount_source_show_unmount_progress (mount_source,

@@ -127,8 +127,8 @@ g_proxy_mount_operation_show_processes (GMountOperation *op,
 static void
 g_proxy_mount_operation_show_unmount_progress (GMountOperation *op,
                                                const gchar     *message,
-                                               guint64          time_left,
-                                               guint64          bytes_left)
+                                               gint64           time_left,
+                                               gint64           bytes_left)
 {
   /* do nothing */
 }
@@ -316,8 +316,8 @@ show_processes_cb (GMountOperation          *mount_operation,
 static void
 show_unmount_progress_cb (GMountOperation *mount_operation,
                           const gchar *message_to_show,
-                          guint64 time_left,
-                          guint64 bytes_left,
+                          gint64 time_left,
+                          gint64 bytes_left,
                           GVfsRemoteVolumeMonitor *monitor)
 {
   const gchar *mount_op_id;
@@ -344,7 +344,7 @@ show_unmount_progress_cb (GMountOperation *mount_operation,
                                       "/org/gtk/Private/RemoteVolumeMonitor",
                                       "org.gtk.Private.RemoteVolumeMonitor",
                                       "MountOpShowUnmountProgress",
-                                      g_variant_new ("(ssstt)",
+                                      g_variant_new ("(sssxx)",
                                                      the_dbus_name,
                                                      mount_op_id,
                                                      message_to_show,

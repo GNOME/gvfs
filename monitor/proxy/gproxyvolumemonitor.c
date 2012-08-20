@@ -730,9 +730,9 @@ mount_op_show_unmount_progress (GVfsRemoteVolumeMonitor *object,
                                 const gchar *arg_dbus_name,
                                 const gchar *arg_id,
                                 const gchar *arg_message_to_show,
-                                guint64      arg_time_left,
-                                guint64      arg_bytes_left,
-                                gpointer user_data)
+                                gint64       arg_time_left,
+                                gint64       arg_bytes_left,
+                                gpointer     user_data)
 {
   GProxyVolumeMonitor *monitor = G_PROXY_VOLUME_MONITOR (user_data);
   GProxyVolumeMonitorClass *klass;
