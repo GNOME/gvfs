@@ -135,8 +135,6 @@ build_network_label (const gchar *user,
   return name;
 }
 
-#endif /* HAVE_KEYRING */
-
 gint
 compare_specificity (gconstpointer  a,
 		     gconstpointer  b)
@@ -158,6 +156,8 @@ compare_specificity (gconstpointer  a,
 
   return res;
 }
+
+#endif /* HAVE_KEYRING */
 
 gboolean
 g_vfs_keyring_lookup_password (const gchar *username,
