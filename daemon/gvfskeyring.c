@@ -22,8 +22,10 @@
 
 #include <config.h>
 
+#define SECRET_API_SUBJECT_TO_CHANGE 1
+
 #ifdef HAVE_KEYRING
-#include <gnome-keyring.h>
+#include <libsecret/secret.h>
 #endif
 
 #include "gvfskeyring.h"
@@ -32,10 +34,129 @@ gboolean
 g_vfs_keyring_is_available (void)
 {
 #ifdef HAVE_KEYRING
-  return gnome_keyring_is_available ();
+  return TRUE;
 #else
   return FALSE;
 #endif
+}
+
+#ifdef HAVE_KEYRING
+
+static void
+insert_string (const gchar *key,
+	       const gchar *value,
+	       GHashTable **attributes)
+{
+  if (*attributes == NULL)
+    return;
+
+  if (!g_utf8_validate (value, -1, NULL))
+    {
+      g_warning ("Non-utf8 value for key %s\n", key);
+      g_hash_table_unref (*attributes);
+      *attributes = NULL;
+    }
+
+  g_hash_table_insert (*attributes,
+		       g_strdup (key),
+		       g_strdup (value));
+}
+
+static void
+insert_int (const gchar *key,
+	    gint value,
+	    GHashTable **attributes)
+{
+  if (*attributes == NULL)
+    return;
+
+  g_hash_table_insert (*attributes,
+		       g_strdup (key),
+		       g_strdup_printf ("%d", value));
+}
+
+static GHashTable *
+build_network_attributes (const gchar *username,
+                          const gchar *host,
+                          const gchar *domain,
+                          const gchar *protocol,
+                          const gchar *object,
+                          const gchar *authtype,
+                          guint32 port)
+{
+  GHashTable *attributes;
+
+  attributes = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+  if (username)
+    insert_string ("user", username, &attributes);
+  if (host)
+    insert_string ("server", host, &attributes);
+  if (domain)
+    insert_string ("domain", domain, &attributes);
+  if (protocol)
+    insert_string ("protocol", protocol, &attributes);
+  if (object)
+    insert_string ("object", object, &attributes);
+  if (authtype)
+    insert_string ("authtype", authtype, &attributes);
+  if (port != 0)
+    insert_int ("port", (gint)port, &attributes);
+
+  return attributes;
+}
+
+static gchar *
+build_network_label (const gchar *user,
+                     const gchar *server,
+                     const gchar *object,
+                     guint32  port)
+{
+  GString *s;
+  gchar *name;
+
+  if (server != NULL)
+    {
+      s = g_string_new (NULL);
+      if (user != NULL)
+	g_string_append_uri_escaped (s, user, G_URI_RESERVED_CHARS_ALLOWED_IN_USERINFO, TRUE);
+        g_string_append (s, "@");
+      g_string_append (s, server);
+      if (port != 0)
+        g_string_append_printf (s, ":%d", port);
+      if (object != NULL)
+        g_string_append_printf (s, "/%s", object);
+      name = g_string_free (s, FALSE);
+    }
+  else
+    {
+      name = g_strdup ("network password");
+    }
+  return name;
+}
+
+#endif /* HAVE_KEYRING */
+
+gint
+compare_specificity (gconstpointer  a,
+		     gconstpointer  b)
+{
+  GHashTable  *attributes_a, *attributes_b;
+  SecretItem  *item_a, *item_b;
+  int res;
+
+  item_a = SECRET_ITEM (a);
+  attributes_a = secret_item_get_attributes (item_a);
+
+  item_b = SECRET_ITEM (b);
+  attributes_b = secret_item_get_attributes (item_b);
+
+  res = g_hash_table_size (attributes_a) - g_hash_table_size (attributes_b);
+
+  g_hash_table_unref (attributes_a);
+  g_hash_table_unref (attributes_b);
+
+  return res;
 }
 
 gboolean
@@ -51,39 +172,58 @@ g_vfs_keyring_lookup_password (const gchar *username,
                                gchar      **password_out)
 {
 #ifdef HAVE_KEYRING
-  GnomeKeyringNetworkPasswordData *pwd_data;
-  GnomeKeyringResult               result;
-  GList                           *plist;
+  GHashTable  *attributes;
+  SecretItem  *item;
+  SecretValue *secret;
+  GList       *plist;
+  GError      *error = NULL;
 
-  if (!gnome_keyring_is_available ())
+
+  attributes = build_network_attributes (username, host, domain, protocol, object, authtype, port);
+  plist = secret_service_search_sync (NULL, SECRET_SCHEMA_COMPAT_NETWORK, attributes,
+                                      SECRET_SEARCH_UNLOCK | SECRET_SEARCH_LOAD_SECRETS |
+				      SECRET_SEARCH_ALL,
+                                      NULL, &error);
+  g_hash_table_unref (attributes);
+
+  if (error != NULL)
+    {
+       g_error_free (error);
+       return FALSE;
+    }
+
+  if (plist == NULL)
     return FALSE;
 
-  result = gnome_keyring_find_network_password_sync (
-    username,
-    domain,
-    host,
-    object,
-    protocol,
-    authtype,
-    port,
-    &plist);
+  /* We want the least specific result, so we sort the return values.
+     For instance, given both items for ftp://host:port and ftp://host
+     in the keyring we always want to use the ftp://host one for
+     i.e. ftp://host/some/path. */
+
+  plist = g_list_sort (plist, compare_specificity);
   
-  if (result != GNOME_KEYRING_RESULT_OK || plist == NULL)
-    return FALSE;
+  item = SECRET_ITEM (plist->data);
+  secret = secret_item_get_secret (item);
+  attributes = secret_item_get_attributes (item);
+  g_list_free_full (plist, g_object_unref);
 
-  /* We use the first result, which is the least specific match */
-  pwd_data = (GnomeKeyringNetworkPasswordData *)plist->data;
+  if (secret == NULL)
+    {
+      if (attributes)
+        g_hash_table_unref (attributes);
+      return FALSE;
+    }
 
-  *password_out = g_strdup (pwd_data->password);
+  *password_out = g_strdup (secret_value_get (secret, NULL));
+  secret_value_unref (secret);
 
   if (username_out)
-    *username_out = g_strdup (pwd_data->user);
-  
+    *username_out = g_strdup (g_hash_table_lookup (attributes, "user"));
+
   if (domain_out)
-    *domain_out = g_strdup (pwd_data->domain);
-      
-  gnome_keyring_network_password_list_free (plist);
-  
+    *domain_out = g_strdup (g_hash_table_lookup (attributes, "domain"));
+
+  g_hash_table_unref (attributes);
   return TRUE;
 #else
   return FALSE;
@@ -102,31 +242,26 @@ g_vfs_keyring_save_password (const gchar  *username,
                              GPasswordSave flags)
 {
 #ifdef HAVE_KEYRING
-  GnomeKeyringResult result;
   const gchar       *keyring;
-  guint32            item_id;
-  
-  if (!gnome_keyring_is_available ())
-    return FALSE;
+  GHashTable        *attributes;
+  gchar             *label;
+  gboolean           ret;
 
   if (flags == G_PASSWORD_SAVE_NEVER)
     return FALSE;
 
-  keyring = (flags == G_PASSWORD_SAVE_FOR_SESSION) ? "session" : NULL;
+  keyring = (flags == G_PASSWORD_SAVE_FOR_SESSION) ? SECRET_COLLECTION_SESSION : SECRET_COLLECTION_DEFAULT;
 
-  result = gnome_keyring_set_network_password_sync (
-    keyring,
-    username,
-    domain,
-    host,
-    object,
-    protocol,
-    authtype,
-    port,
-    password,
-    &item_id);
+  label = build_network_label (username, host, object, port);
+  attributes = build_network_attributes (username, host, domain, protocol, object, authtype, port);
 
-  return (result == GNOME_KEYRING_RESULT_OK);
+  ret = secret_password_storev_sync (SECRET_SCHEMA_COMPAT_NETWORK, attributes,
+                                     keyring, label, password, NULL, NULL);
+
+  g_free (label);
+  g_hash_table_unref (attributes);
+
+  return ret;
 #else
   return FALSE;
 #endif /* HAVE_KEYRING */

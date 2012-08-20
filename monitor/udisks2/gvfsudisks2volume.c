@@ -32,7 +32,7 @@
 #include <gio/gio.h>
 
 #ifdef HAVE_KEYRING
-#include <gnome-keyring.h>
+#include <libsecret/secret.h>
 #endif
 
 #include "gvfsudisks2drive.h"
@@ -779,12 +779,13 @@ gvfs_udisks2_volume_get_activation_root (GVolume *_volume)
 /* ---------------------------------------------------------------------------------------------------- */
 
 #ifdef HAVE_KEYRING
-static GnomeKeyringPasswordSchema luks_passphrase_schema =
+static SecretSchema luks_passphrase_schema =
 {
-  GNOME_KEYRING_ITEM_GENERIC_SECRET,
+  "org.gnome.GVfs.Luks.Password",
+  SECRET_SCHEMA_DONT_MATCH_NAME,
   {
-    {"gvfs-luks-uuid", GNOME_KEYRING_ATTRIBUTE_TYPE_STRING},
-    {NULL, 0}
+    { "gvfs-luks-uuid", SECRET_SCHEMA_ATTRIBUTE_STRING },
+    { NULL, 0 },
   }
 };
 #endif
@@ -833,8 +834,13 @@ mount_data_free (MountData *data)
       g_object_unref (data->mount_operation);
     }
 
+#ifdef HAVE_KEYRING
+  secret_password_free (data->passphrase);
+  secret_password_free (data->passphrase_from_keyring);
+#else
   g_free (data->passphrase);
   g_free (data->passphrase_from_keyring);
+#endif
 
   g_free (data->uuid_of_encrypted_to_unlock);
   g_free (data->desc_of_encrypted_to_unlock);
@@ -981,11 +987,14 @@ do_mount (MountData *data)
 
 #ifdef HAVE_KEYRING
 static void
-luks_store_passphrase_cb (GnomeKeyringResult result,
-                          gpointer           user_data)
+luks_store_passphrase_cb (GObject      *source,
+                          GAsyncResult *result,
+                          gpointer      user_data)
 {
   MountData *data = user_data;
-  if (result == GNOME_KEYRING_RESULT_OK)
+  GError *error = NULL;
+
+  if (secret_password_store_finish (result, &error))
     {
       /* everything is good */
       do_mount (data);
@@ -996,9 +1005,10 @@ luks_store_passphrase_cb (GnomeKeyringResult result,
       g_simple_async_result_set_error (data->simple,
                                        G_IO_ERROR,
                                        G_IO_ERROR_FAILED,
-                                       _("Error storing passphrase in keyring (error code %d)"),
-                                       result);
+                                       _("Error storing passphrase in keyring (%s)"),
+                                       error->message);
       g_simple_async_result_complete (data->simple);
+      g_error_free (error);
       mount_data_free (data);
     }
 }
@@ -1010,11 +1020,14 @@ static void do_unlock (MountData *data);
 
 #ifdef HAVE_KEYRING
 static void
-luks_delete_passphrase_cb (GnomeKeyringResult result,
-                           gpointer           user_data)
+luks_delete_passphrase_cb (GObject      *source,
+                           GAsyncResult *result,
+                           gpointer      user_data)
 {
   MountData *data = user_data;
-  if (result == GNOME_KEYRING_RESULT_OK)
+  GError *error = NULL;
+
+  if (secret_password_clear_finish (result, &error))
     {
       /* with the bad passphrase out of the way, try again */
       g_free (data->passphrase);
@@ -1027,9 +1040,10 @@ luks_delete_passphrase_cb (GnomeKeyringResult result,
       g_simple_async_result_set_error (data->simple,
                                        G_IO_ERROR,
                                        G_IO_ERROR_FAILED,
-                                       _("Error deleting invalid passphrase from keyring (error code %d)"),
-                                       result);
+                                       _("Error deleting invalid passphrase from keyring (%s)"),
+                                       error->message);
       g_simple_async_result_complete (data->simple);
+      g_error_free (error);
       mount_data_free (data);
     }
 }
@@ -1061,12 +1075,10 @@ unlock_cb (GObject       *source_object,
           g_strcmp0 (data->passphrase, data->passphrase_from_keyring) == 0)
         {
           /* nuke the invalid passphrase from keyring... */
-          gnome_keyring_delete_password (&luks_passphrase_schema,
-                                         luks_delete_passphrase_cb,
-                                         data,
-                                         NULL, /* GDestroyNotify */
-                                         "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
-                                         NULL); /* sentinel */
+          secret_password_clear (&luks_passphrase_schema, data->cancellable,
+                                 luks_delete_passphrase_cb, data,
+                                 "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
+                                 NULL); /* sentinel */
           goto out;
         }
 #endif
@@ -1112,28 +1124,25 @@ unlock_cb (GObject       *source_object,
               g_assert_not_reached ();
               break;
             case G_PASSWORD_SAVE_FOR_SESSION:
-              keyring = GNOME_KEYRING_SESSION;
+              keyring = SECRET_COLLECTION_SESSION;
               break;
             case G_PASSWORD_SAVE_PERMANENTLY:
-              keyring = GNOME_KEYRING_DEFAULT;
+              keyring = SECRET_COLLECTION_DEFAULT;
               break;
             default:
-              keyring = GNOME_KEYRING_DEFAULT;
+              keyring = SECRET_COLLECTION_DEFAULT;
               break;
             }
 
           display_name = g_strdup_printf (_("Encryption passphrase for %s"),
                                           data->desc_of_encrypted_to_unlock);
 
-          gnome_keyring_store_password (&luks_passphrase_schema,
-                                        keyring,
-                                        display_name,
-                                        data->passphrase,
-                                        luks_store_passphrase_cb,
-                                        data,
-                                        NULL, /* GDestroyNotify */
-                                        "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
-                                        NULL); /* sentinel */
+          secret_password_store (&luks_passphrase_schema,
+                                 keyring, display_name, data->passphrase,
+                                 data->cancellable,
+                                 luks_store_passphrase_cb, data,
+                                 "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
+                                 NULL); /* sentinel */
           goto out;
         }
 #endif
@@ -1237,19 +1246,22 @@ has_crypttab_passphrase (MountData *data)
 
 #ifdef HAVE_KEYRING
 static void
-luks_find_passphrase_cb (GnomeKeyringResult result,
-                         const gchar       *string,
-                         gpointer           user_data)
+luks_find_passphrase_cb (GObject      *source,
+                         GAsyncResult *result,
+                         gpointer      user_data)
 {
   MountData *data = user_data;
+  gchar *password;
+
+  password = secret_password_lookup_finish (result, NULL);
 
   /* Don't fail if a keyring error occured - just continue and request
    * the passphrase from the user...
    */
-  if (result == GNOME_KEYRING_RESULT_OK)
+  if (password)
     {
-      data->passphrase = g_strdup (string);
-      data->passphrase_from_keyring = g_strdup (string);
+      data->passphrase = password;
+      data->passphrase_from_keyring = g_strdup (password);
     }
   /* try again */
   do_unlock (data);
@@ -1277,12 +1289,10 @@ do_unlock (MountData *data)
           if (!data->checked_keyring)
             {
               data->checked_keyring = TRUE;
-              gnome_keyring_find_password (&luks_passphrase_schema,
-                                           luks_find_passphrase_cb,
-                                           data,
-                                           NULL, /* GDestroyNotify */
-                                           "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
-                                           NULL); /* sentinel */
+              secret_password_lookup (&luks_passphrase_schema, data->cancellable,
+                                      luks_find_passphrase_cb, data,
+                                      "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
+                                      NULL); /* sentinel */
               goto out;
             }
 #endif

@@ -461,10 +461,10 @@ KEYRING_LIBS=
 KEYRING_CFLAGS=
 
 if test "x$enable_keyring" != "xno"; then
-  PKG_CHECK_EXISTS(gnome-keyring-1, msg_keyring=yes)
+  PKG_CHECK_EXISTS(libsecret-unstable, msg_keyring=yes)
 
   if test "x$msg_keyring" = "xyes"; then
-    PKG_CHECK_MODULES(KEYRING, gnome-keyring-1)
+    PKG_CHECK_MODULES(KEYRING, libsecret-unstable)
     AC_DEFINE(HAVE_KEYRING, 1, [Define to 1 if GNOME Keyring is available])
   fi
 fi
