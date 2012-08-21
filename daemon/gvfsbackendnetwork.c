@@ -43,10 +43,11 @@
 #define NETWORK_FILE_ATTRIBUTES "standard::name,standard::display-name,standard::target-uri"
 
 typedef struct {
-  char *file_name; 
+  char *file_name;
   char *display_name;
   char *target_uri;
   GIcon *icon;
+  guint num_duplicates;
 } NetworkFile;
 
 static NetworkFile root = { "/" };
@@ -140,6 +141,79 @@ sort_file_by_file_name (NetworkFile *a, NetworkFile *b)
   return strcmp (a->file_name, b->file_name);
 }
 
+static char *
+get_pretty_scheme_for_uri (const char *uri)
+{
+  GFile *file;
+  char *scheme;
+  char *pretty = NULL;
+
+  file = g_file_new_for_uri (uri);
+  if (file == NULL)
+    return NULL;
+
+  scheme = g_file_get_uri_scheme (file);
+  if (g_strcmp0 (scheme, "afp") == 0
+      || g_strcmp0 (scheme, "smb") == 0)
+    {
+      pretty = g_strdup (_("File Sharing"));
+    }
+  else if (g_strcmp0 (scheme, "sftp") == 0
+           || g_strcmp0 (scheme, "ssh") == 0)
+    {
+      pretty = g_strdup (_("Remote Login"));
+    }
+  else
+    {
+      pretty = g_strdup (scheme);
+    }
+
+  g_free (scheme);
+
+  return pretty;
+}
+
+static void
+network_file_append_service_name (NetworkFile *file)
+{
+  char *name;
+  char *service;
+
+  service = get_pretty_scheme_for_uri (file->target_uri);
+  name = g_strdup_printf ("%s (%s)", file->display_name, service);
+  g_free (service);
+  g_free (file->display_name);
+  file->display_name = name;
+}
+
+static void
+uniquify_display_names (GVfsBackendNetwork *backend)
+{
+  GHashTable *names;
+  GList *l;
+
+  names = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+
+  for (l = backend->files; l != NULL; l = l->next)
+    {
+      NetworkFile *prev_file;
+      NetworkFile *file = l->data;
+
+      prev_file = g_hash_table_lookup (names, file->display_name);
+      if (prev_file != NULL)
+        {
+          prev_file->num_duplicates++;
+          /* only change the first file once */
+          if (prev_file->num_duplicates == 1)
+            network_file_append_service_name (prev_file);
+          network_file_append_service_name (file);
+        }
+      g_hash_table_replace (names, g_strdup (file->display_name), file);
+    }
+
+  g_hash_table_destroy (names);
+}
+
 static void
 update_from_files (GVfsBackendNetwork *backend,
                    GList *files)
@@ -152,6 +226,8 @@ update_from_files (GVfsBackendNetwork *backend,
 
   old_files = backend->files;
   backend->files = g_list_sort (files, (GCompareFunc)sort_file_by_file_name);
+
+  uniquify_display_names (backend);
 
   /* Generate change events */
   oldl = old_files;
