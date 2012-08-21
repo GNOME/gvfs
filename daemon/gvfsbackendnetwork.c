@@ -618,7 +618,6 @@ file_info_from_file (NetworkFile *file,
     g_file_info_set_icon (info, file->icon);
 
   g_file_info_set_file_type (info, G_FILE_TYPE_SHORTCUT);
-  g_file_info_set_size (info, 0);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
