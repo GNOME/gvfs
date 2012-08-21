@@ -36,7 +36,6 @@
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
 #include <gdaemonvfs.h>
-#include "gsysutils.h"
 #include <gvfsdbus.h>
 
 /* Extra vfs-specific data for GDBusConnections */

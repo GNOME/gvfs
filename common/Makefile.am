@@ -19,7 +19,6 @@ $(dbus_built_sources) : Makefile.am org.gtk.vfs.xml
 		$(NULL)
 
 libgvfscommon_la_SOURCES = 	\
-	gsysutils.c gsysutils.h \
 	gmountspec.c gmountspec.h \
 	gmountoperationdbus.c gmountoperationdbus.h \
 	gmountsource.c gmountsource.h \
