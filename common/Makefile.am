@@ -51,7 +51,7 @@ libgvfscommon_monitor_la_LIBADD =	\
 	$(GLIB_LIBS)
 
 if HAVE_AVAHI
-lib_LTLIBRARIES += libgvfscommon-dnssd.la
+noinst_LTLIBRARIES += libgvfscommon-dnssd.la
 
 libgvfscommon_dnssd_la_SOURCES = 	\
 	gvfsdnssdutils.c gvfsdnssdutils.h \
