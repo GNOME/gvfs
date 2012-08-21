@@ -1,6 +1,7 @@
 NULL =
 
 lib_LTLIBRARIES=libgvfscommon.la
+noinst_LTLIBRARIES = libgvfscommon-monitor.la
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-I$(top_srcdir)/daemon \
@@ -25,7 +26,6 @@ libgvfscommon_la_SOURCES = 	\
 	gmounttracker.c gmounttracker.h \
 	gvfsdaemonprotocol.c gvfsdaemonprotocol.h \
 	gvfsicon.h gvfsicon.c \
-	gvfsmountinfo.h gvfsmountinfo.c \
 	gvfsfileinfo.c gvfsfileinfo.h \
 	$(dbus_built_sources) \
 	$(NULL)
@@ -36,6 +36,19 @@ libgvfscommon_la_LDFLAGS = -no-undefined
 libgvfscommon_la_LIBADD =	\
 	$(GLIB_LIBS)		\
 	$(BLURAY_LIBS)
+
+libgvfscommon_monitor_la_SOURCES = 	\
+	gvfsmountinfo.h gvfsmountinfo.c \
+	$(NULL)
+
+libgvfscommon_monitor_la_CFLAGS =	\
+	$(GLIB_LIBS)			\
+	$(BLURAY_CFLAGS)
+
+libgvfscommon_monitor_la_LIBADD =	\
+	libgvfscommon.la 		\
+	$(BLURAY_LIBS) 			\
+	$(GLIB_LIBS)
 
 if HAVE_AVAHI
 lib_LTLIBRARIES += libgvfscommon-dnssd.la

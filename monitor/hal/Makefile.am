@@ -42,6 +42,7 @@ gvfs_hal_volume_monitor_LDADD  =		     			      \
 	$(GLIB_LIBS)                                 			      \
 	$(HAL_LIBS)                                  			      \
 	$(top_builddir)/common/libgvfscommon.la 			      \
+	$(top_builddir)/common/libgvfscommon-monitor.la			      \
 	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la \
 	$(NULL)
 
