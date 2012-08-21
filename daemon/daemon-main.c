@@ -34,10 +34,6 @@
 #include <gvfsbackend.h>
 #include <gvfsdbus.h>
 
-#if HAVE_KEYRING
-#  include <dbus/dbus.h>
-#endif
-
 static char *spawner_id = NULL;
 static char *spawner_path = NULL;
 
@@ -70,10 +66,6 @@ daemon_init (void)
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
   
-#if HAVE_KEYRING
-  /* gnome-keyring needs d-bus threads properly initialized */
-  dbus_threads_init_default ();
-#endif
   g_type_init ();
 
   g_log_set_handler (NULL, G_LOG_LEVEL_DEBUG, log_debug, NULL);
