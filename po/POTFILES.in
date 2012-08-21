@@ -9,7 +9,6 @@ client/gdaemonvfs.c
 client/gvfsdaemondbus.c
 client/gvfsiconloadable.c
 common/gmounttracker.c
-common/gsysutils.c
 common/gvfsdaemonprotocol.c
 common/gvfsdnssdresolver.c
 common/gvfsdnssdutils.c
