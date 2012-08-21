@@ -10,10 +10,9 @@ INCLUDES =					\
 	-I$(top_srcdir)/common			\
 	-I$(top_builddir)			\
 	-I$(top_builddir)/common		\
-	$(GLIB_CFLAGS) $(DBUS_CFLAGS) 		\
+	$(GLIB_CFLAGS) 				\
 	$(OBEXFTP_CFLAGS) $(EXPAT_CFLAGS)	\
 	$(KEYRING_CFLAGS)			\
-	-DDBUS_API_SUBJECT_TO_CHANGE		\
 	-DG_UDEV_API_IS_SUBJECT_TO_CHANGE	\
 	-DLIBEXEC_DIR=\"$(libexecdir)/\" 	\
 	-DMOUNTABLE_DIR=\"$(mountdir)/\" 	\
@@ -24,7 +23,7 @@ noinst_LTLIBRARIES=libdaemon.la
 libraries =						\
 	libdaemon.la					\
 	$(top_builddir)/common/libgvfscommon.la		\
-	$(GLIB_LIBS) $(DBUS_LIBS) $(KEYRING_LIBS)
+	$(GLIB_LIBS) $(KEYRING_LIBS)
 
 gvfs_gschemas =
 gvfs_gschemas_convert =
@@ -184,7 +183,6 @@ libdaemon_la_SOURCES = \
 	gvfsjobsetattribute.c gvfsjobsetattribute.h \
 	gvfsjobqueryattributes.c gvfsjobqueryattributes.h \
 	gvfsjobcreatemonitor.c gvfsjobcreatemonitor.h \
-	dbus-gmain.h dbus-gmain.c \
 	gvfskeyring.h gvfskeyring.c \
         $(NULL)
 

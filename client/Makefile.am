@@ -6,11 +6,10 @@ INCLUDES = -I$(top_srcdir) \
 	-I$(top_builddir)/metadata \
 	-I$(top_srcdir)/common \
 	-I$(top_builddir)/common \
-	$(GLIB_CFLAGS) $(DBUS_CFLAGS) \
+	$(GLIB_CFLAGS) \
 	-DG_LOG_DOMAIN=\"GVFS\" \
 	-DGVFS_MODULE_DIR=\"$(libdir)/gvfs/modules\"	\
-	-DGVFS_LOCALEDIR=\""$(localedir)"\"     \
-	-DDBUS_API_SUBJECT_TO_CHANGE
+	-DGVFS_LOCALEDIR=\""$(localedir)"\"
 
 module_flags = -export_dynamic -avoid-version -module -no-undefined -export-symbols-regex '^g_vfs_.*|g_io_module_load|g_io_module_unload|g_io_module_query'
 
@@ -45,7 +44,6 @@ vfssources = \
 
 vfslibs = \
 	$(top_builddir)/common/libgvfscommon.la \
-	$(DBUS_LIBS) \
 	$(GLIB_LIBS) \
 	$(NULL)
 
@@ -76,12 +74,11 @@ gvfsd_fuse_CFLAGS = \
 	-I$(top_srcdir) \
         -I$(top_srcdir)/common \
         -I$(top_builddir)/common \
-        $(GLIB_CFLAGS) $(DBUS_CFLAGS) $(FUSE_CFLAGS) \
-        -UG_LOG_DOMAIN -DG_LOG_DOMAIN=\"GVFS-FUSE\" \
-        -DDBUS_API_SUBJECT_TO_CHANGE
+        $(GLIB_CFLAGS) $(FUSE_CFLAGS) \
+        -UG_LOG_DOMAIN -DG_LOG_DOMAIN=\"GVFS-FUSE\"
 
 gvfsd_fuse_LDADD = \
 	$(top_builddir)/common/libgvfscommon.la \
-	$(GLIB_LIBS) $(DBUS_LIBS) $(FUSE_LIBS)
+	$(GLIB_LIBS) $(FUSE_LIBS)
 
 endif

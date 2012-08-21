@@ -4,9 +4,8 @@ lib_LTLIBRARIES=libgvfscommon.la
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-I$(top_srcdir)/daemon \
-	$(GLIB_CFLAGS) $(DBUS_CFLAGS) $(BLURAY_CFLAGS) \
-	-DG_LOG_DOMAIN=\"GVFS\" \
-	-DDBUS_API_SUBJECT_TO_CHANGE
+	$(GLIB_CFLAGS) $(BLURAY_CFLAGS) \
+	-DG_LOG_DOMAIN=\"GVFS\"
 
 dbus_built_sources = gvfsdbus.c gvfsdbus.h
 BUILT_SOURCES = $(dbus_built_sources)
@@ -21,7 +20,6 @@ $(dbus_built_sources) : Makefile.am org.gtk.vfs.xml
 
 libgvfscommon_la_SOURCES = 	\
 	gsysutils.c gsysutils.h \
-	gvfsdbusutils.c gvfsdbusutils.h \
 	gmountspec.c gmountspec.h \
 	gmountoperationdbus.c gmountoperationdbus.h \
 	gmountsource.c gmountsource.h \
@@ -37,7 +35,6 @@ libgvfscommon_la_SOURCES = 	\
 libgvfscommon_la_LDFLAGS = -no-undefined
 
 libgvfscommon_la_LIBADD =	\
-	$(DBUS_LIBS) 		\
 	$(GLIB_LIBS)		\
 	$(BLURAY_LIBS)
 
