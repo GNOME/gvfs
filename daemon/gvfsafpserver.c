@@ -195,7 +195,9 @@ dhx2_login (GVfsAfpServer *server,
   {
     /* Translators: %d is a constant, currently hardcoded to 256 */
     g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                 _("Server doesn't support passwords longer than %d characters"), 256);
+                 ngettext ("The server doesn't support passwords longer than %d character.",
+                           "The server doesn't support passwords longer than %d characters.",
+                           256), 256);
     goto error;
   }
 
@@ -219,7 +221,7 @@ dhx2_login (GVfsAfpServer *server,
     if (res_code == AFP_RESULT_USER_NOT_AUTH)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                           _("An invalid username was provided"));
+                           _("An invalid username was provided."));
       goto error;
     }
     else
@@ -388,7 +390,7 @@ dhx2_login (GVfsAfpServer *server,
     if (res_code == AFP_RESULT_USER_NOT_AUTH)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                   _("AFP server %s declined the submitted password"),
+                   _("Unable to login to the server “%s” with the given password."),
                    priv->info.server_name);
       goto error;
     }
@@ -423,7 +425,8 @@ generic_error:
 
 invalid_reply:
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               "%s", _("Received invalid reply from server"));
+               _("Unable to connect to the server “%s”. A communication problem occurred."),
+               priv->info.server_name);
   goto error;
 }
 
@@ -473,8 +476,10 @@ dhx_login (GVfsAfpServer *server,
 
   if (strlen (password) > 64)
   {
-    g_set_error(error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                _("Server doesn't support passwords longer than %d characters"), 64);
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                 ngettext ("The server doesn't support passwords longer than %d character.",
+                           "The server doesn't support passwords longer than %d characters.",
+                           64), 64);
     return FALSE;
   }
   
@@ -525,7 +530,7 @@ dhx_login (GVfsAfpServer *server,
     if (res_code == AFP_RESULT_USER_NOT_AUTH)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                   _("An invalid username was provided"));
+                   _("An invalid username was provided."));
       goto error;
     }
     else
@@ -615,7 +620,7 @@ dhx_login (GVfsAfpServer *server,
     if (res_code == AFP_RESULT_USER_NOT_AUTH)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                   _("AFP server %s declined the submitted password"),
+                   _("Unable to connect to the server “%s” with the given password."),
                    priv->info.server_name);
       goto error;
     }
@@ -642,7 +647,8 @@ generic_error:
 
 invalid_reply:
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               "%s", _("Received invalid reply from server"));
+               _("Unable to connect to the server “%s”. A communication problem occurred."),
+               priv->info.server_name);
   goto error;
 }
 #endif
@@ -667,7 +673,7 @@ do_login (GVfsAfpServer *server,
     if (!g_slist_find_custom (priv->info.uams, AFP_UAM_NO_USER, (GCompareFunc)g_strcmp0))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                           _("AFP server %s doesn't support anonymous login"),
+                           _("The server “%s” doesn't support anonymous access."),
                    priv->info.server_name);
       return FALSE;
     }
@@ -692,7 +698,7 @@ do_login (GVfsAfpServer *server,
         case AFP_RESULT_USER_NOT_AUTH:
         case AFP_RESULT_BAD_UAM:
           g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                       _("AFP server %s doesn't support anonymous login"),
+                       _("The server “%s” doesn't support anonymous access."),
                        priv->info.server_name);
           break;
           
@@ -720,7 +726,7 @@ do_login (GVfsAfpServer *server,
 #endif
 
     g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                 _("Login to AFP server %s failed (no suitable authentication mechanism found)"),
+                 _("Unable to connect to the server “%s”. No suitable authentication mechanism was found."),
                  priv->info.server_name);
     return FALSE;
   }
@@ -794,7 +800,8 @@ get_server_info (GVfsAfpServer *server,
     g_object_unref (reply);
     g_set_error (error,
                  G_IO_ERROR, G_IO_ERROR_FAILED,
-                 _("Failed to connect to server (%s)"), _("Server doesn't support AFP version 3.0 or later"));
+                 _("Unable to connect to the server “%s”. The server doesn't support AFP version 3.0 or later."),
+                 priv->info.server_name);
     return FALSE;
   }
 
@@ -815,7 +822,9 @@ get_server_info (GVfsAfpServer *server,
 
 invalid_reply:
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               _("Failed to connect to server (%s)"), _("Received invalid reply from server"));
+               _("Unable to connect to the server “%s”. A communication problem occurred."),
+               priv->info.server_name);
+
   return FALSE;
 }
 
@@ -861,7 +870,9 @@ get_server_parms (GVfsAfpServer *server,
 
 invalid_reply:
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               _("Received invalid reply from server"));
+               _("Unable to connect to the server “%s”. A communication problem occurred."),
+               priv->info.server_name);
+
   return FALSE;
 }
 
@@ -900,20 +911,20 @@ command_get_user_info (GVfsAfpServer *server,
     {
       case AFP_RESULT_ACCESS_DENIED:
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                     _("Permission denied"));
+                     _("Permission denied."));
         break;
         break;
       case AFP_RESULT_CALL_NOT_SUPPORTED:
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                     _("Command is not supported by server"));
+                     _("The command is not supported by the server."));
         break;
       case AFP_RESULT_PWD_EXPIRED_ERR:
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                     _("User's password has expired"));
+                     _("Your password has expired."));
         break;
       case AFP_RESULT_PWD_NEEDS_CHANGE_ERR:
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                     _("User's password needs to be changed"));
+                     _("Your password needs to be changed."));
         break;
 
       default:
@@ -975,7 +986,8 @@ done:
 
 invalid_reply:
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               _("Received invalid reply from server"));
+               _("Unable to connect to the server “%s”. A communication problem occurred."),
+               priv->info.server_name);
   goto done;
 }
 
@@ -1054,11 +1066,11 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
     
     /* create prompt */
     if (initial_user)
-      /* Translators: the first %s is the username, the second the host name */
-      g_string_append_printf (str, _("Enter password for afp as %s on %s"), initial_user, server_name);
+      /* translators: %s here is the hostname */
+      g_string_append_printf (str, _("Enter your password for the server “%s”."), server_name);
     else
       /* translators: %s here is the hostname */
-      g_string_append_printf (str, _("Enter password for afp on %s"), server_name);
+      g_string_append_printf (str, _("Enter your name and password for the server “%s”."), server_name);
 
     prompt = g_string_free (str, FALSE);
 
@@ -1090,7 +1102,7 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
     {
       g_set_error_literal (&err, G_IO_ERROR,
                            aborted ? G_IO_ERROR_FAILED_HANDLED : G_IO_ERROR_PERMISSION_DENIED,
-                           _("Password dialog cancelled"));
+                           _("The password prompt was cancelled."));
       res = FALSE;
       break;
     }
@@ -1207,7 +1219,7 @@ g_vfs_afp_server_logout_sync (GVfsAfpServer *server,
   res_code = g_vfs_afp_reply_get_result_code (reply);
   g_object_unref (reply);
   if (res_code != AFP_RESULT_NO_ERROR) {
-    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Failed to logout from server"));
+    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Unable to disconnect from the server."));
     g_vfs_afp_connection_close_sync (priv->conn, cancellable, NULL);
     goto done;
   }
@@ -1349,7 +1361,7 @@ done:
 
 invalid_reply:
   g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                   "%s", _("Received invalid reply from server"));
+                                   _("Unable to connect to the server. A communication problem occurred."));
   goto done;
 }
 
@@ -1651,7 +1663,9 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
 
 invalid_reply:
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               _("Received invalid reply from server"));
+               _("Unable to connect to the server. A communication problem occurred."),
+               server->priv->info.server_name);
+
   return FALSE;
 }
 
@@ -1696,7 +1710,7 @@ map_id_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     {
       case AFP_RESULT_ITEM_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("ID not found"));
+                                         _("Identification not found."));
         break;
       default:
         g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
@@ -1740,7 +1754,8 @@ done:
 
 invalid_reply:
   g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                   "%s", _("Received invalid reply from server"));
+                                   _("Unable to connect to the server. A communication problem occurred."));
+
   goto done;
 }
 
