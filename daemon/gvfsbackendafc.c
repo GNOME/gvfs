@@ -615,7 +615,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
       /* translators:
        * %s is the device name. 'Try again' is the caption of the button
        * shown in the dialog which is defined above. */
-      message = g_strdup_printf (_("The device '%s' is locked. Enter the passcode on the device and click 'Try again'."), display_name);
+      message = g_strdup_printf (_("The device “%s” is locked. Enter the passcode on the device and click “Try again”."), display_name);
 
     ret = g_mount_source_ask_question (src,
                                        message,
