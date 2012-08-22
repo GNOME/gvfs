@@ -367,6 +367,22 @@ _idevice_event_cb (const idevice_event_t *event, void *user_data)
   exit (1);
 }
 
+static gboolean
+unpair_client (lockdownd_client_t client,
+               const char        *udid)
+{
+  lockdownd_error_t lerr;
+  gboolean ret = FALSE;
+
+  lerr = lockdownd_unpair (client, NULL);
+  if (lerr == LOCKDOWN_E_SUCCESS)
+    {
+      ret = TRUE;
+    }
+
+  return ret;
+}
+
 /* Callback for mounting. */
 static void
 g_vfs_backend_afc_mount (GVfsBackend *backend,
@@ -385,6 +401,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   int retries;
   idevice_error_t err;
   lockdownd_client_t lockdown_cli = NULL;
+  lockdownd_client_t lockdown_cli_old = NULL;
   char *camera_x_content_types[] = { "x-content/audio-player", "x-content/image-dcf", NULL};
   char *media_player_x_content_types[] = {"x-content/audio-player", NULL};
   char **dcim_afcinfo;
@@ -574,16 +591,23 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
         }
     }
 
-  lockdownd_client_free (lockdown_cli);
+  /* save the old client until we connect with the handshake */
+  lockdown_cli_old = lockdown_cli;
   lockdown_cli = NULL;
 
   /* now, try to connect with handshake */
+  retries = 0;
   do {
     lerr = lockdownd_client_new_with_handshake (self->dev,
                                                 &lockdown_cli,
                                                 "gvfsd-afc");
-    if (lerr != LOCKDOWN_E_PASSWORD_PROTECTED
-        || lerr != LOCKDOWN_E_SSL_ERROR)
+    if (lerr == LOCKDOWN_E_SSL_ERROR)
+      {
+        unpair_client (lockdown_cli_old, self->uuid);
+        continue;
+      }
+
+    if (lerr != LOCKDOWN_E_PASSWORD_PROTECTED)
       break;
 
     aborted = FALSE;
@@ -601,7 +625,11 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
                                        &choice);
     if (!ret || aborted || (choice == 0))
       break;
-  } while (1);
+  } while (retries++ < 10);
+
+  /* Now we're done with the old client */
+  lockdownd_client_free (lockdown_cli_old);
+  lockdown_cli_old = NULL;
 
   g_free (display_name);
   display_name = NULL;
