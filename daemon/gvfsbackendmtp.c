@@ -109,8 +109,6 @@ do_create_dir_monitor (GVfsBackend *backend,
                        const char *filename,
                        GFileMonitorFlags flags)
 {
-  char *dir;
-  char *name;
   GVfsBackendMtp *mtp_backend = G_VFS_BACKEND_MTP (backend);
 
   g_print ("create_dir_monitor (%s)", filename);
@@ -134,8 +132,6 @@ do_create_file_monitor (GVfsBackend *backend,
                         const char *filename,
                         GFileMonitorFlags flags)
 {
-  char *dir;
-  char *name;
   GVfsBackendMtp *mtp_backend = G_VFS_BACKEND_MTP (backend);
 
   g_print ("create_file_monitor (%s)", filename);
