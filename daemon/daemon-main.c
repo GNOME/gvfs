@@ -319,8 +319,6 @@ on_name_acquired (GDBusConnection *connection,
 {
   DaemonData *data = user_data;
 
-  g_warning ("daemon-main.c: Acquired the name on the session message bus\n");
-  
   already_acquired = TRUE;
   
   data->daemon = g_vfs_daemon_new (FALSE, FALSE);
