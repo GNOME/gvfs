@@ -55,6 +55,7 @@
     <method name="Spawned">
       <arg type='b' name='succeeded' direction='in'/>
       <arg type='s' name='error_message' direction='in'/>
+      <arg type='u' name='error_code' direction='in'/>
     </method>
   </interface>
 

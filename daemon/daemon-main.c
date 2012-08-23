@@ -159,6 +159,7 @@ call_spawned_cb (GVfsDBusSpawner *proxy,
 static void
 send_spawned (gboolean succeeded, 
               char *error_message,
+              guint32 error_code,
               GDestroyNotify callback,
               gpointer user_data)
 {
@@ -202,6 +203,7 @@ send_spawned (gboolean succeeded,
   gvfs_dbus_spawner_call_spawned (proxy, 
                                   succeeded,
                                   error_message,
+                                  error_code,
                                   NULL,
                                   (GAsyncReadyCallback) call_spawned_cb,
                                   data);
@@ -303,10 +305,9 @@ on_name_lost (GDBusConnection *connection,
       else
         {
           s = g_strdup_printf (_("mountpoint for %s already running"), data->mountable_name);
-          g_printerr (_("Error: %s"), s);
-          g_printerr ("\n");
+          send_spawned (FALSE, s, G_IO_ERROR_ALREADY_MOUNTED, spawned_failed_cb, data);
           g_free (s);
-          process_result = 1;
+          return;
         }
     }
   g_main_loop_quit (loop);
@@ -324,13 +325,13 @@ on_name_acquired (GDBusConnection *connection,
   data->daemon = g_vfs_daemon_new (FALSE, FALSE);
   if (data->daemon == NULL)
     {
-      send_spawned (FALSE, _("error starting mount daemon"), spawned_failed_cb, data);
+      send_spawned (FALSE, _("error starting mount daemon"), G_IO_ERROR_FAILED, spawned_failed_cb, data);
       return;
     }
 
   g_vfs_daemon_set_max_threads (data->daemon, data->max_job_threads);
 
-  send_spawned (TRUE, NULL, spawned_succeeded_cb, data);
+  send_spawned (TRUE, NULL, 0, spawned_succeeded_cb, data);
 }
 
 static gboolean
