@@ -383,6 +383,12 @@ unpair_client (lockdownd_client_t client,
   return ret;
 }
 
+/* keep in sync with the choices array in g_vfs_backend_afc_mount() */
+enum {
+  CHOICE_TRY_AGAIN = 0,
+  CHOICE_CANCEL
+};
+
 /* Callback for mounting. */
 static void
 g_vfs_backend_afc_mount (GVfsBackend *backend,
@@ -407,7 +413,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   char **dcim_afcinfo;
   plist_t value;
   lockdownd_error_t lerr;
-  const gchar *choices[] = {_("Try again"), _("Cancel"), NULL};
+  const gchar *choices[] = {_("Try again"), _("Cancel"), NULL}; /* keep in sync with the enum above */
   gboolean aborted = FALSE;
   gchar *message = NULL;
   gint choice;
@@ -623,7 +629,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
                                        2,
                                        &aborted,
                                        &choice);
-    if (!ret || aborted || (choice == 0))
+    if (!ret || aborted || (choice == CHOICE_CANCEL))
       break;
   } while (retries++ < 10);
 
