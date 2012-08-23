@@ -970,8 +970,8 @@ g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
       if (invocation)
         g_dbus_method_invocation_return_error_literal (invocation,
                                                        G_IO_ERROR,
-                                                       G_IO_ERROR_ALREADY_MOUNTED,
-                                                       "Mountpoint Already registered");
+                                                       G_IO_ERROR_FAILED,
+                                                       "Invalid backend type");
       else
 	g_warning ("Error mounting: invalid backend type\n");
       return;
