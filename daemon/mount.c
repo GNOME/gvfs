@@ -286,6 +286,9 @@ dbus_mount_reply (GVfsDBusMountable *proxy,
            g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_SERVICE_UNKNOWN)) &&
            !data->spawned)
         spawn_mount (data);
+      else if (g_error_matches (error, G_IO_ERROR,
+                                G_IO_ERROR_ALREADY_MOUNTED))
+        mount_finish (data, NULL);
       else
         {
           g_warning ("dbus_mount_reply: Error from org.gtk.vfs.Mountable.mount(): %s", error->message);
@@ -350,18 +353,33 @@ spawn_mount_handle_spawned (GVfsDBusSpawner *object,
                             GDBusMethodInvocation *invocation,
                             gboolean arg_succeeded,
                             const gchar *arg_error_message,
+                            guint arg_error_code,
                             gpointer user_data)
 {
   MountData *data = user_data;
-  GError *error;
+  GError *error = NULL;
 
   g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (data->spawner));
-  
+
   if (!arg_succeeded)
     {
-      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, arg_error_message);
-      mount_finish (data, error);
-      g_error_free (error);
+      if (arg_error_code == G_IO_ERROR_ALREADY_MOUNTED &&
+          data->mountable->dbus_name != NULL)
+        {
+          /* This means the spawn failed since someone already owned the name.
+             It might not strictly be mounted yet, as the mount might not
+             be registred yet. So, to avoid races we ask the new owner of
+             the name to mount. It'll typically return an ALREADY_MOUNTED
+             error which we treat as success.
+          */
+          mountable_mount_with_name (data, data->mountable->dbus_name);
+        }
+      else
+        {
+          g_set_error_literal (&error, G_IO_ERROR, arg_error_code, arg_error_message);
+          mount_finish (data, error);
+          g_error_free (error);
+        }
     }
   else
     {
