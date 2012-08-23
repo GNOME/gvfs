@@ -547,6 +547,7 @@ get_file_info(GVfsBackend *backend, LIBMTP_mtpdevice_t *device, GFileInfo *info,
   }
 
 
+#if HAVE_LIBMTP_GET_THUMBNAIL
   if (LIBMTP_FILETYPE_IS_IMAGE(file->filetype) ||
       LIBMTP_FILETYPE_IS_VIDEO(file->filetype) ||
       LIBMTP_FILETYPE_IS_AUDIOVIDEO(file->filetype)) {
@@ -566,6 +567,7 @@ get_file_info(GVfsBackend *backend, LIBMTP_mtpdevice_t *device, GFileInfo *info,
     g_object_unref (icon);
     g_free (icon_id);
   }
+#endif
 
   g_file_info_set_size (info, file->filesize);
 
@@ -1119,6 +1121,7 @@ do_set_display_name (GVfsBackend *backend,
 }
 
 
+#if HAVE_LIBMTP_GET_THUMBNAIL
 static void
 do_open_icon_for_read (GVfsBackend *backend,
                        GVfsJobOpenIconForRead *job,
@@ -1205,6 +1208,7 @@ do_close_read (GVfsBackend *backend,
   g_byte_array_unref(handle);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
+#endif /* HAVE_LIBMTP_GET_THUMBNAIL */
 
 
 /************************************************
@@ -1234,7 +1238,9 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->set_display_name = do_set_display_name;
   backend_class->create_dir_monitor = do_create_dir_monitor;
   backend_class->create_file_monitor = do_create_file_monitor;
+#if HAVE_LIBMTP_GET_THUMBNAIL
   backend_class->open_icon_for_read = do_open_icon_for_read;
   backend_class->try_read = try_read;
   backend_class->close_read = do_close_read;
+#endif
 }
