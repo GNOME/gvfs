@@ -147,6 +147,7 @@ call_spawned_cb (GVfsDBusSpawner *proxy,
 
   if (! gvfs_dbus_spawner_call_spawned_finish (proxy, res, &error))
     {
+      g_dbus_error_strip_remote_error (error);
       g_printerr ("call_spawned_cb: Error sending a message: %s (%s, %d)\n",
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);

@@ -291,6 +291,7 @@ dbus_mount_reply (GVfsDBusMountable *proxy,
         mount_finish (data, NULL);
       else
         {
+          g_dbus_error_strip_remote_error (error);
           g_warning ("dbus_mount_reply: Error from org.gtk.vfs.Mountable.mount(): %s", error->message);
           mount_finish (data, error);
           g_error_free (error);

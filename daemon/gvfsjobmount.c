@@ -167,6 +167,7 @@ register_mount_callback (GVfsDBusMountTracker *proxy,
   
   if (! gvfs_dbus_mount_tracker_call_register_mount_finish (proxy, res, &error))
     {
+      g_dbus_error_strip_remote_error (error);
       mount_failed (op_job, error);
     }
   else

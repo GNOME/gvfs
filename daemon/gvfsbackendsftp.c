@@ -404,6 +404,7 @@ setup_ssh_environment (void)
                                       &error);
   if (! iter)
     {
+      g_dbus_error_strip_remote_error (error);
       g_warning ("Failed to setup ssh evironment: %s (%s, %d)",
                  error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
