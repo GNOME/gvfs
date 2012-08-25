@@ -249,6 +249,8 @@ g_mount_spec_from_dbus (GVariant *value)
       add_item (spec, key, g_variant_dup_bytestring (v, NULL));
     }
 
+  g_variant_iter_free (iter_mount_spec_items);
+
   /* Sort on key */
   g_array_sort (spec->items, item_compare);
   
