@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-08-23 09:58+0000\n"
-"PO-Revision-Date: 2012-08-23 17:29+0200\n"
+"POT-Creation-Date: 2012-08-24 11:21+0000\n"
+"PO-Revision-Date: 2012-08-25 12:00+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "Language: \n"
@@ -193,34 +193,34 @@ msgstr "Datos de entrada GVfsIcon malformados"
 msgid "%s File System Service"
 msgstr "Servicio %s del sistema de archivos"
 
-#: ../daemon/daemon-main.c:176 ../daemon/daemon-main.c:306
-#: ../programs/gvfs-copy.c:90 ../programs/gvfs-move.c:78
-#: ../programs/gvfs-rename.c:36 ../programs/gvfs-set-attribute.c:105
+#: ../daemon/daemon-main.c:177 ../programs/gvfs-copy.c:90
+#: ../programs/gvfs-move.c:78 ../programs/gvfs-rename.c:36
+#: ../programs/gvfs-set-attribute.c:105
 #, c-format
 msgid "Error: %s"
 msgstr "Error: %s"
 
-#: ../daemon/daemon-main.c:233
+#: ../daemon/daemon-main.c:235
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "Uso: %s --spawner dbus-id ruta_del_objeto"
 
-#: ../daemon/daemon-main.c:257 ../daemon/daemon-main.c:275
+#: ../daemon/daemon-main.c:259 ../daemon/daemon-main.c:277
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "Uso: %s clave=valor clave=valor …"
 
-#: ../daemon/daemon-main.c:273
+#: ../daemon/daemon-main.c:275
 #, c-format
 msgid "No mount type specified"
 msgstr "No se especificó el tipo de montaje"
 
-#: ../daemon/daemon-main.c:305
+#: ../daemon/daemon-main.c:307
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "el punto de montaje para %s ya se está usando"
 
-#: ../daemon/daemon-main.c:329
+#: ../daemon/daemon-main.c:328
 msgid "error starting mount daemon"
 msgstr "error al iniciar el demonio de montado"
 
@@ -240,102 +240,122 @@ msgstr "Se perdió la conexión inesperadamente"
 msgid "Got EOS"
 msgstr "Se obtuvo EOS"
 
-#: ../daemon/gvfsafpserver.c:198 ../daemon/gvfsafpserver.c:477
+#: ../daemon/gvfsafpserver.c:198 ../daemon/gvfsafpserver.c:480
 #, c-format
-msgid "Server doesn't support passwords longer than %d characters"
-msgstr "El servidor no soporta contraseñas de más de %d caracteres"
+#| msgid "Server doesn't support passwords longer than %d characters"
+msgid "The server doesn't support passwords longer than %d character."
+msgid_plural "The server doesn't support passwords longer than %d characters."
+msgstr[0] "El servidor no soporta contraseñas de más de %d carácter"
+msgstr[1] "El servidor no soporta contraseñas de más de %d caracteres."
 
-#: ../daemon/gvfsafpserver.c:222 ../daemon/gvfsafpserver.c:528
-msgid "An invalid username was provided"
-msgstr "Se ha proporcionado un nombre de usuario no válido"
+#: ../daemon/gvfsafpserver.c:224 ../daemon/gvfsafpserver.c:533
+#| msgid "An invalid username was provided"
+msgid "An invalid username was provided."
+msgstr "Se ha proporcionado un nombre de usuario no válido."
 
-#: ../daemon/gvfsafpserver.c:391 ../daemon/gvfsafpserver.c:618
+#: ../daemon/gvfsafpserver.c:393
 #, c-format
-msgid "AFP server %s declined the submitted password"
-msgstr "El servidor AFP %s rechazó la contraseña enviada"
+msgid "Unable to login to the server “%s” with the given password."
+msgstr "No se pudo iniciar sesión en el servidor «%s» con la contraseña dada."
 
-#: ../daemon/gvfsafpserver.c:426 ../daemon/gvfsafpserver.c:645
-#: ../daemon/gvfsafpserver.c:818 ../daemon/gvfsafpserver.c:864
-#: ../daemon/gvfsafpserver.c:978 ../daemon/gvfsafpserver.c:1352
-#: ../daemon/gvfsafpserver.c:1654 ../daemon/gvfsafpserver.c:1743
+#: ../daemon/gvfsafpserver.c:428 ../daemon/gvfsafpserver.c:650
+#: ../daemon/gvfsafpserver.c:825 ../daemon/gvfsafpserver.c:873
+#: ../daemon/gvfsafpserver.c:989
 #, c-format
-msgid "Received invalid reply from server"
-msgstr "Se recibió una respuesta no válida del servidor"
-
-#: ../daemon/gvfsafpserver.c:670 ../daemon/gvfsafpserver.c:695
-#, c-format
-msgid "AFP server %s doesn't support anonymous login"
-msgstr "El servidor AFP %s no soporta inicio de sesión anónimo"
-
-#: ../daemon/gvfsafpserver.c:723
-#, c-format
-msgid ""
-"Login to AFP server %s failed (no suitable authentication mechanism found)"
+msgid "Unable to connect to the server “%s”. A communication problem occurred."
 msgstr ""
-"Falló al iniciar sesión en el servidor AFP %s (no se encontró un mecanismo "
-"de autenticación apropiado)"
+"No se pudo conectar al servidor «%s». Ocurrió un problema en la comunicación."
 
-#: ../daemon/gvfsafpserver.c:797 ../daemon/gvfsafpserver.c:818
+#: ../daemon/gvfsafpserver.c:623
 #, c-format
-msgid "Failed to connect to server (%s)"
-msgstr "Falló al conectar al servidor (%s)"
+msgid "Unable to connect to the server “%s” with the given password."
+msgstr "No se pudo conectar al servidor «%s» con la contraseña dada."
 
-#: ../daemon/gvfsafpserver.c:797
-msgid "Server doesn't support AFP version 3.0 or later"
-msgstr "El servidor no soporta la operación la versión 3.0 o superior de AFP"
-
-#: ../daemon/gvfsafpserver.c:903 ../daemon/gvfsafpvolume.c:390
-#: ../daemon/gvfsafpvolume.c:668 ../daemon/gvfsafpvolume.c:821
-#: ../daemon/gvfsafpvolume.c:1015 ../daemon/gvfsafpvolume.c:1215
-#: ../daemon/gvfsafpvolume.c:1398 ../daemon/gvfsafpvolume.c:1555
-#: ../daemon/gvfsafpvolume.c:2001 ../daemon/gvfsafpvolume.c:2127
-#: ../daemon/gvfsafpvolume.c:2289 ../daemon/gvfsafpvolume.c:2509
-#: ../daemon/gvfsbackendafc.c:286 ../daemon/gvfsbackendsftp.c:311
-#: ../daemon/gvfsbackendsftp.c:1833 ../daemon/gvfsftptask.c:399
+#: ../daemon/gvfsafpserver.c:676 ../daemon/gvfsafpserver.c:701
 #, c-format
-msgid "Permission denied"
-msgstr "Permiso denegado"
+#| msgid "AFP server %s doesn't support anonymous login"
+msgid "The server “%s” doesn't support anonymous access."
+msgstr "El servidor «%s» no soporta inicio de sesión anónimo."
 
-#: ../daemon/gvfsafpserver.c:908
+#: ../daemon/gvfsafpserver.c:729
 #, c-format
-msgid "Command is not supported by server"
-msgstr "El servidor no soporta el comando"
+#| msgid ""
+#| "Login to AFP server %s failed (no suitable authentication mechanism found)"
+msgid ""
+"Unable to connect to the server “%s”. No suitable authentication mechanism "
+"was found."
+msgstr ""
+"No se pudo conectar al servidor «%s». No se encontró ningún mecanismo de "
+"autenticación apropiado."
 
-#: ../daemon/gvfsafpserver.c:912
+#: ../daemon/gvfsafpserver.c:803
 #, c-format
-msgid "User's password has expired"
-msgstr "La contraseña del usuario ha expirado"
+#| msgid "Server doesn't support AFP version 3.0 or later"
+msgid ""
+"Unable to connect to the server “%s”. The server doesn't support AFP version "
+"3.0 or later."
+msgstr ""
+"No se pudo conectar al servidor «%s». El servidor no soporta la operación la "
+"versión 3.0 o superior de AFP."
 
-#: ../daemon/gvfsafpserver.c:916
+#: ../daemon/gvfsafpserver.c:914
 #, c-format
-msgid "User's password needs to be changed"
-msgstr "Se debe cambiar la contraseña del usuario"
+#| msgid "Permission denied"
+msgid "Permission denied."
+msgstr "Permiso denegado."
 
-#. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsafpserver.c:1058
+#: ../daemon/gvfsafpserver.c:919
 #, c-format
-msgid "Enter password for afp as %s on %s"
-msgstr "Introducir la contraseña para AFP como %s en %s"
+#| msgid "Command is not supported by server"
+msgid "The command is not supported by the server."
+msgstr "El servidor no soporta el comando."
+
+#: ../daemon/gvfsafpserver.c:923
+#, c-format
+#| msgid "User's password has expired"
+msgid "Your password has expired."
+msgstr "Su contraseña ha caducado."
+
+#: ../daemon/gvfsafpserver.c:927
+#, c-format
+#| msgid "User's password needs to be changed"
+msgid "Your password needs to be changed."
+msgstr "Debe cambiar su contraseña."
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:1061
+#: ../daemon/gvfsafpserver.c:1070
 #, c-format
-msgid "Enter password for afp on %s"
-msgstr "Introducir la contraseña para AFP en %s"
+#| msgid "Enter password for ssh on %s"
+msgid "Enter your password for the server “%s”."
+msgstr "Introduzca su contraseña para el servidor «%s»."
 
-#: ../daemon/gvfsafpserver.c:1093 ../daemon/gvfsbackendftp.c:518
-#: ../daemon/gvfsbackendsftp.c:984 ../daemon/gvfsbackendsmbbrowse.c:995
-#: ../daemon/gvfsbackendsmb.c:619
-msgid "Password dialog cancelled"
-msgstr "Se canceló el diálogo de la contraseña"
+#. translators: %s here is the hostname
+#: ../daemon/gvfsafpserver.c:1073
+#, c-format
+msgid "Enter your name and password for the server “%s”."
+msgstr "Introduzca su nombre y su contraseña para el servidor «%s»."
 
-#: ../daemon/gvfsafpserver.c:1210
-msgid "Failed to logout from server"
-msgstr "Falló al desconectarse del servidor"
+#: ../daemon/gvfsafpserver.c:1105
+#| msgid "Password dialog cancelled"
+msgid "The password prompt was cancelled."
+msgstr "Se canceló el diálogo de la contraseña."
 
-#: ../daemon/gvfsafpserver.c:1699
-msgid "ID not found"
-msgstr "ID no econtrado"
+#: ../daemon/gvfsafpserver.c:1222
+#| msgid "Failed to connect to server (%s)"
+msgid "Unable to disconnect from the server."
+msgstr "No se pudo desconectar del servidor."
+
+#: ../daemon/gvfsafpserver.c:1364 ../daemon/gvfsafpserver.c:1666
+#: ../daemon/gvfsafpserver.c:1757
+#, c-format
+msgid "Unable to connect to the server. A communication problem occurred."
+msgstr ""
+"No se pudo conectar al servidor. Ocurrió un problema en la comunicación."
+
+#: ../daemon/gvfsafpserver.c:1713
+#| msgid "Directory notification not supported"
+msgid "Identification not found."
+msgstr "Identificación no encontrada."
 
 #: ../daemon/gvfsafputils.c:124
 #, c-format
@@ -352,14 +372,25 @@ msgstr "Se obtuvo el código de error desconocido %d del servidor"
 msgid "Couldn't mount AFP volume %s on %s"
 msgstr "No se pudo montar el volumen %s en %s"
 
+#: ../daemon/gvfsafpvolume.c:390 ../daemon/gvfsafpvolume.c:668
+#: ../daemon/gvfsafpvolume.c:821 ../daemon/gvfsafpvolume.c:1015
+#: ../daemon/gvfsafpvolume.c:1215 ../daemon/gvfsafpvolume.c:1398
+#: ../daemon/gvfsafpvolume.c:1555 ../daemon/gvfsafpvolume.c:2001
+#: ../daemon/gvfsafpvolume.c:2127 ../daemon/gvfsafpvolume.c:2289
+#: ../daemon/gvfsafpvolume.c:2509 ../daemon/gvfsbackendafc.c:286
+#: ../daemon/gvfsbackendsftp.c:311 ../daemon/gvfsbackendsftp.c:1833
+#: ../daemon/gvfsftptask.c:399
+msgid "Permission denied"
+msgstr "Permiso denegado"
+
 #: ../daemon/gvfsafpvolume.c:394 ../daemon/gvfsafpvolume.c:1721
-#: ../daemon/gvfsafpvolume.c:2513 ../daemon/gvfsbackendafc.c:968
+#: ../daemon/gvfsafpvolume.c:2513 ../daemon/gvfsbackendafc.c:974
 #: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:323
 #: ../daemon/gvfsbackendafpbrowse.c:355 ../daemon/gvfsbackendarchive.c:647
 #: ../daemon/gvfsbackendarchive.c:695 ../daemon/gvfsbackendarchive.c:747
 #: ../daemon/gvfsbackendarchive.c:776 ../daemon/gvfsbackendcdda.c:1011
 #: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:398
-#: ../daemon/gvfsbackendftp.c:1067 ../daemon/gvfsbackendnetwork.c:602
+#: ../daemon/gvfsbackendftp.c:1067 ../daemon/gvfsbackendnetwork.c:678
 #: ../daemon/gvfsbackendsmbbrowse.c:1094 ../daemon/gvfsbackendsmbbrowse.c:1161
 #: ../daemon/gvfsbackendsmbbrowse.c:1333 ../daemon/gvfsbackendsmbbrowse.c:1403
 #, c-format
@@ -573,17 +604,17 @@ msgstr ""
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Error no manejable de libimobiledevice (%d)"
 
-#: ../daemon/gvfsbackendafc.c:410
+#: ../daemon/gvfsbackendafc.c:416
 msgid "Try again"
 msgstr "Intentarlo de nuevo"
 
-#: ../daemon/gvfsbackendafc.c:410 ../daemon/gvfsbackend.c:939
+#: ../daemon/gvfsbackendafc.c:416 ../daemon/gvfsbackend.c:939
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
 #: ../monitor/udisks2/gvfsudisks2mount.c:736
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../daemon/gvfsbackendafc.c:428 ../daemon/gvfsbackendarchive.c:550
+#: ../daemon/gvfsbackendafc.c:434 ../daemon/gvfsbackendarchive.c:550
 #: ../daemon/gvfsbackendarchive.c:579 ../daemon/gvfsbackenddav.c:1820
 #: ../daemon/gvfsbackendhttp.c:309 ../daemon/gvfsbackendobexftp.c:862
 #: ../daemon/gvfsbackendobexftp.c:878 ../daemon/gvfsbackendobexftp.c:897
@@ -591,22 +622,22 @@ msgstr "Cancelar"
 msgid "Invalid mount spec"
 msgstr "Especificación de montaje no válida"
 
-#: ../daemon/gvfsbackendafc.c:434 ../daemon/gvfsbackendafc.c:464
+#: ../daemon/gvfsbackendafc.c:440 ../daemon/gvfsbackendafc.c:470
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr ""
 "Ubicación AFC no válida: debe ser de la forma afc://uuid:número-de-puerto"
 
-#: ../daemon/gvfsbackendafc.c:450
+#: ../daemon/gvfsbackendafc.c:456
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Dispositivo móvil de Apple"
 
-#: ../daemon/gvfsbackendafc.c:455
+#: ../daemon/gvfsbackendafc.c:461
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Dispositivo móvil de Apple, desbloqueado"
 
-#: ../daemon/gvfsbackendafc.c:460
+#: ../daemon/gvfsbackendafc.c:466
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Documentos en el dispositivo móvil de Apple"
@@ -614,7 +645,7 @@ msgstr "Documentos en el dispositivo móvil de Apple"
 #. translators:
 #. * This is the device name, with the service being browsed in brackets, eg.:
 #. * Alan Smithee's iPhone (jailbreak)
-#: ../daemon/gvfsbackendafc.c:519
+#: ../daemon/gvfsbackendafc.c:525
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s («jailbreak»)"
@@ -622,7 +653,7 @@ msgstr "%s («jailbreak»)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:526 ../monitor/afc/afcvolume.c:125
+#: ../daemon/gvfsbackendafc.c:532 ../monitor/afc/afcvolume.c:125
 #, c-format
 msgid "Documents on %s"
 msgstr "Documentación sobre %s"
@@ -630,11 +661,8 @@ msgstr "Documentación sobre %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:618
+#: ../daemon/gvfsbackendafc.c:624
 #, c-format
-#| msgid ""
-#| "The device '%s' is locked. Enter the passcode on the device and click "
-#| "'Try again'."
 msgid ""
 "The device “%s” is locked. Enter the passcode on the device and click “Try "
 "again”."
@@ -642,22 +670,22 @@ msgstr ""
 "El dispositivo «%s» está bloqueado. Introduzca la contraseña en el "
 "dispositivo y pulse «Intentarlo de nuevo»."
 
-#: ../daemon/gvfsbackendafc.c:958 ../daemon/gvfsbackendarchive.c:655
+#: ../daemon/gvfsbackendafc.c:964 ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1810
 #: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendrecent.c:121
 #: ../daemon/gvfsbackendsmb.c:718 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "No se puede abrir la carpeta"
 
-#: ../daemon/gvfsbackendafc.c:1159 ../daemon/gvfsbackendafc.c:2502
+#: ../daemon/gvfsbackendafc.c:1165 ../daemon/gvfsbackendafc.c:2508
 msgid "Backups are not yet supported."
 msgstr "Aún no se soportan los respaldos."
 
-#: ../daemon/gvfsbackendafc.c:1331
+#: ../daemon/gvfsbackendafc.c:1337
 msgid "Invalid seek type"
 msgstr "Tipo de búsqueda no soportado"
 
-#: ../daemon/gvfsbackendafc.c:2339 ../daemon/gvfsbackendafp.c:1749
+#: ../daemon/gvfsbackendafc.c:2345 ../daemon/gvfsbackendafp.c:1749
 #: ../daemon/gvfsbackendftp.c:1087 ../daemon/gvfsbackendftp.c:1135
 #: ../daemon/gvfsbackendftp.c:1156 ../daemon/gvfsbackendsftp.c:1831
 #: ../daemon/gvfsbackendsftp.c:4632 ../daemon/gvfsbackendsmb.c:1719
@@ -753,7 +781,7 @@ msgstr "/ en %s"
 
 #: ../daemon/gvfsbackendarchive.c:785 ../daemon/gvfsbackendburn.c:675
 #: ../daemon/gvfsbackendcomputer.c:715 ../daemon/gvfsbackenddnssd.c:445
-#: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:648
+#: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:724
 #: ../daemon/gvfsbackendsftp.c:3880 ../daemon/gvfsftpdircache.c:157
 msgid "The file is not a directory"
 msgstr "El archivo no es una carpeta"
@@ -975,12 +1003,10 @@ msgid "Can't eject file"
 msgstr "No se puede expulsar el archivo"
 
 #: ../daemon/gvfsbackendcomputer.c:1253 ../daemon/gvfsbackendcomputer.c:1260
-#| msgid "Can't start file"
 msgid "Can't start drive"
 msgstr "No se puede iniciar la unidad"
 
 #: ../daemon/gvfsbackendcomputer.c:1326 ../daemon/gvfsbackendcomputer.c:1333
-#| msgid "Can't stop file"
 msgid "Can't stop drive"
 msgstr "No se puede detener la unidad"
 
@@ -1055,11 +1081,11 @@ msgid "Backup file creation failed"
 msgstr "Falló la creación del archivo de respaldo"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:371
+#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:447
 msgid "Local Network"
 msgstr "Red local"
 
-#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:752
+#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:828
 msgid "Can't monitor file or directory."
 msgstr "No se puede monitorizar el archivo o carpeta."
 
@@ -1068,8 +1094,8 @@ msgstr "No se puede monitorizar el archivo o carpeta."
 msgid "Dns-SD"
 msgstr "DNS-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:687
-#: ../daemon/gvfsbackendnetwork.c:819 ../daemon/gvfsbackendnetwork.c:820
+#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:763
+#: ../daemon/gvfsbackendnetwork.c:895 ../daemon/gvfsbackendnetwork.c:896
 msgid "Network"
 msgstr "Red"
 
@@ -1084,6 +1110,11 @@ msgstr "Introducir la contraseña para el FTP como %s en %s"
 #, c-format
 msgid "Enter password for FTP on %s"
 msgstr "Introducir la contraseña para el FTP en %s"
+
+#: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:984
+#: ../daemon/gvfsbackendsmbbrowse.c:995 ../daemon/gvfsbackendsmb.c:619
+msgid "Password dialog cancelled"
+msgstr "Se canceló el diálogo de la contraseña"
 
 #: ../daemon/gvfsbackendftp.c:630
 #, c-format
@@ -1319,14 +1350,22 @@ msgstr "Error HTTP en el cliente: %s"
 msgid "Directory notification not supported"
 msgstr "No se soporta la notificación de carpetas"
 
+#: ../daemon/gvfsbackendnetwork.c:159
+msgid "File Sharing"
+msgstr "Compartición de archivos"
+
+#: ../daemon/gvfsbackendnetwork.c:164
+msgid "Remote Login"
+msgstr "Inicio de sesión remoto"
+
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:247 ../daemon/gvfsbackendsmbbrowse.c:894
+#: ../daemon/gvfsbackendnetwork.c:323 ../daemon/gvfsbackendsmbbrowse.c:894
 msgid "Windows Network"
 msgstr "Red de Windows"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:872
+#: ../daemon/gvfsbackendnetwork.c:948
 msgid "Network Location Monitor"
 msgstr "Monitor de ubicación de red"
 
@@ -1746,24 +1785,24 @@ msgstr "%s: %s"
 msgid "Try \"%s --help\" for more information."
 msgstr "Intente \"%s --help\" para obtener más información."
 
-#: ../daemon/mount.c:674
+#: ../daemon/mount.c:692
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Falló automount: %s"
 
-#: ../daemon/mount.c:718 ../daemon/mount.c:779
+#: ../daemon/mount.c:736 ../daemon/mount.c:797
 msgid "The specified location is not mounted"
 msgstr "La ubicación especificada no está montada"
 
-#: ../daemon/mount.c:723
+#: ../daemon/mount.c:741
 msgid "The specified location is not supported"
 msgstr "La ubicación especificada no está soportada"
 
-#: ../daemon/mount.c:847
+#: ../daemon/mount.c:865
 msgid "Location is already mounted"
 msgstr "La ubicación ya está montada"
 
-#: ../daemon/mount.c:856
+#: ../daemon/mount.c:874
 msgid "Location is not mountable"
 msgstr "La ubicación no es montable"
 
@@ -2934,6 +2973,24 @@ msgstr "Seguir enlaces simbólicos, puntos de montaje y atajos"
 #: ../programs/gvfs-tree.c:249
 msgid "List contents of directories in a tree-like format."
 msgstr "Listar los contenidos de las carpeta en una vista de árbol."
+
+#~ msgid "AFP server %s declined the submitted password"
+#~ msgstr "El servidor AFP %s rechazó la contraseña enviada"
+
+#~ msgid "Received invalid reply from server"
+#~ msgstr "Se recibió una respuesta no válida del servidor"
+
+#~ msgid "Enter password for afp as %s on %s"
+#~ msgstr "Introducir la contraseña para AFP como %s en %s"
+
+#~ msgid "Enter password for afp on %s"
+#~ msgstr "Introducir la contraseña para AFP en %s"
+
+#~ msgid "Failed to logout from server"
+#~ msgstr "Falló al desconectarse del servidor"
+
+#~ msgid "ID not found"
+#~ msgstr "ID no econtrado"
 
 #~ msgid "Error creating socket: %s"
 #~ msgstr "Error al crear el socket: %s"
