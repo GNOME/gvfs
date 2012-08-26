@@ -111,7 +111,7 @@ do_create_dir_monitor (GVfsBackend *backend,
 {
   GVfsBackendMtp *mtp_backend = G_VFS_BACKEND_MTP (backend);
 
-  g_print ("create_dir_monitor (%s)", filename);
+  g_print ("create_dir_monitor (%s)\n", filename);
 
   GVfsMonitor *vfs_monitor = g_vfs_monitor_new (backend);
 
@@ -134,7 +134,7 @@ do_create_file_monitor (GVfsBackend *backend,
 {
   GVfsBackendMtp *mtp_backend = G_VFS_BACKEND_MTP (backend);
 
-  g_print ("create_file_monitor (%s)", filename);
+  g_print ("create_file_monitor (%s)\n", filename);
 
   GVfsMonitor *vfs_monitor = g_vfs_monitor_new (backend);
 
@@ -1123,7 +1123,7 @@ do_open_icon_for_read (GVfsBackend *backend,
                        GVfsJobOpenIconForRead *job,
                        const char *icon_id)
 {
-  g_print ("open_icon_for_read (%s)", icon_id);
+  g_print ("open_icon_for_read (%s)\n", icon_id);
   g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
 
   guint id = strtol(icon_id, NULL, 10);
@@ -1180,7 +1180,7 @@ try_read (GVfsBackend *backend,
 {
   GByteArray *bytes = handle;
 
-  g_print ("try_read (%u %lu)", bytes->len, bytes_requested);
+  g_print ("try_read (%u %lu)\n", bytes->len, bytes_requested);
 
   gsize bytes_to_copy =  MIN(bytes->len, bytes_requested);
   if (bytes_to_copy == 0) {
