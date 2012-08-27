@@ -402,6 +402,7 @@ reload_recent_items (GVfsBackendRecent *backend)
       const char *guid;
 
       if (!gtk_recent_info_is_local (recent_info)
+          || gtk_recent_info_get_private_hint (recent_info)
           || g_strcmp0 (gtk_recent_info_get_mime_type (recent_info), "inode/directory") == 0)
         continue;
 
