@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: as\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug."
 "cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-08-09 20:16+0000\n"
-"PO-Revision-Date: 2012-08-10 13:17+0530\n"
+"POT-Creation-Date: 2012-08-24 11:21+0000\n"
+"PO-Revision-Date: 2012-08-27 18:15+0530\n"
 "Last-Translator: Nilamdyuti Goswami <ngoswami@redhat.com>\n"
 "Language-Team: as_IN <kde-i18n-doc@kde.org>\n"
 "Language: \n"
@@ -70,7 +70,7 @@ msgstr "মান স্ট্ৰিং অথবা স্ট্ৰিংৰ �
 #: ../client/gdaemonfileoutputstream.c:506
 #: ../client/gdaemonfileoutputstream.c:681
 #: ../client/gdaemonfileoutputstream.c:873
-#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:727
+#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:726
 #: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1106
 #: ../daemon/gvfsbackendobexftp.c:1225 ../daemon/gvfsbackendobexftp.c:1362
 #: ../daemon/gvfsbackendobexftp.c:1426 ../daemon/gvfsbackendobexftp.c:1628
@@ -118,16 +118,6 @@ msgstr "স্ট্ৰিম দ্বাৰা Seek সমৰ্থিত ন�
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "মাউন্টৰ তথ্য প্ৰাপ্ত কৰোতে ত্ৰুটি: %s"
-
-#: ../common/gsysutils.c:136
-#, c-format
-msgid "Error creating socket: %s"
-msgstr "চকেট সৃষ্টি কৰোতে ত্ৰুটি: %s"
-
-#: ../common/gsysutils.c:174
-#, c-format
-msgid "Error connecting to socket: %s"
-msgstr "চকেটৰ লগত সংযোগ কৰোতে ত্ৰুটি: %s"
 
 #: ../common/gvfsdaemonprotocol.c:349
 msgid "Invalid file info format"
@@ -195,49 +185,47 @@ msgstr "GVfsIcon ৰ বাবে ক্ষতিগ্ৰস্থ ইনপু
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "FTP"
-#: ../daemon/daemon-main.c:108
+#: ../daemon/daemon-main.c:100
 #, c-format
 msgid "%s File System Service"
 msgstr "%s নথিপত্ৰ প্ৰণালী সেৱা"
 
-#: ../daemon/daemon-main.c:184 ../daemon/daemon-main.c:314
-#: ../programs/gvfs-copy.c:90 ../programs/gvfs-move.c:78
-#: ../programs/gvfs-rename.c:36 ../programs/gvfs-set-attribute.c:105
+#: ../daemon/daemon-main.c:177 ../programs/gvfs-copy.c:90
+#: ../programs/gvfs-move.c:78 ../programs/gvfs-rename.c:36
+#: ../programs/gvfs-set-attribute.c:105
 #, c-format
 msgid "Error: %s"
 msgstr "ত্ৰুটি: %s"
 
-#: ../daemon/daemon-main.c:241
+#: ../daemon/daemon-main.c:235
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "ব্যৱহাৰ: %s --spawner dbus-id object_path"
 
-#: ../daemon/daemon-main.c:265 ../daemon/daemon-main.c:283
+#: ../daemon/daemon-main.c:259 ../daemon/daemon-main.c:277
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "ব্যৱহাৰ: %s কি'=মান কি'=মান ..."
 
-#: ../daemon/daemon-main.c:281
+#: ../daemon/daemon-main.c:275
 #, c-format
 msgid "No mount type specified"
 msgstr "কোনো মাউন্ট ধৰণ ধাৰ্য্য কৰা হোৱা নাই"
 
-#: ../daemon/daemon-main.c:313
+#: ../daemon/daemon-main.c:307
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "%s ৰ বাবে মাউন্টপইন্ট ইতিমধ্যে চলি আছে"
 
-#: ../daemon/daemon-main.c:337
+#: ../daemon/daemon-main.c:328
 msgid "error starting mount daemon"
 msgstr "মাউন্ট ডিমন আৰম্ভ কৰোতে ত্ৰুটি"
 
 #: ../daemon/gvfsafpconnection.c:764
-#| msgid "The connection was interrupted"
 msgid "The connection is not opened"
 msgstr "সংযোগ খোলা নহয়"
 
 #: ../daemon/gvfsafpconnection.c:771
-#| msgid "Data connection closed"
 msgid "The connection is closed"
 msgstr "সংযোগ বন্ধ"
 
@@ -249,103 +237,119 @@ msgstr "সংযোগ অপ্ৰত্যাশিতভাৱে বন্�
 msgid "Got EOS"
 msgstr "EOS পোৱা গল"
 
-#: ../daemon/gvfsafpserver.c:197 ../daemon/gvfsafpserver.c:476
+#: ../daemon/gvfsafpserver.c:198 ../daemon/gvfsafpserver.c:480
 #, c-format
-msgid "Server doesn't support passwords longer than %d characters"
-msgstr "চাৰ্ভাৰে %d আখৰতকে দীঘল পাছৱাৰ্ডসমূহ সমৰ্থন নকৰে"
+#| msgid "Server doesn't support passwords longer than %d characters"
+msgid "The server doesn't support passwords longer than %d character."
+msgid_plural "The server doesn't support passwords longer than %d characters."
+msgstr[0] "চাৰ্ভাৰে %d আখৰতকে দীঘল পাছৱাৰ্ডসমূহ সমৰ্থন নকৰে।"
+msgstr[1] "চাৰ্ভাৰে %d আখৰতকে দীঘল পাছৱাৰ্ডসমূহ সমৰ্থন নকৰে।"
 
-#: ../daemon/gvfsafpserver.c:221 ../daemon/gvfsafpserver.c:527
-msgid "An invalid username was provided"
-msgstr "এটা অবৈধ ব্যৱহাৰকাৰীনাম প্ৰদান কৰা হৈছিল"
+#: ../daemon/gvfsafpserver.c:224 ../daemon/gvfsafpserver.c:533
+#| msgid "An invalid username was provided"
+msgid "An invalid username was provided."
+msgstr "এটা অবৈধ ব্যৱহাৰকাৰীনাম প্ৰদান কৰা হৈছিল।"
 
-#: ../daemon/gvfsafpserver.c:390 ../daemon/gvfsafpserver.c:617
+#: ../daemon/gvfsafpserver.c:393
 #, c-format
-msgid "AFP server %s declined the submitted password"
-msgstr "AFP চাৰ্ভাৰ %s এ জমা দিয়া পাছৱাৰ্ড নাকচ কৰিছে"
+msgid "Unable to login to the server “%s” with the given password."
+msgstr "প্ৰদান কৰা পাছৱাৰ্ডৰ সৈতে চাৰ্ভাৰ “%s” লে লগিন কৰিবলে অক্ষম।"
 
-#: ../daemon/gvfsafpserver.c:425 ../daemon/gvfsafpserver.c:644
-#: ../daemon/gvfsafpserver.c:817 ../daemon/gvfsafpserver.c:863
-#: ../daemon/gvfsafpserver.c:942 ../daemon/gvfsafpserver.c:1316
-#: ../daemon/gvfsafpserver.c:1618 ../daemon/gvfsafpserver.c:1707
+#: ../daemon/gvfsafpserver.c:428 ../daemon/gvfsafpserver.c:650
+#: ../daemon/gvfsafpserver.c:825 ../daemon/gvfsafpserver.c:873
+#: ../daemon/gvfsafpserver.c:989
 #, c-format
-#| msgid "Unexpected reply from server"
-msgid "Received invalid reply from server"
-msgstr "চাৰ্ভাৰৰ পৰা অবৈধ উত্তৰ প্ৰাপ্ত হৈছে"
+msgid "Unable to connect to the server “%s”. A communication problem occurred."
+msgstr "চাৰ্ভাৰ “%s” ৰ সৈতে সংযোগ কৰিবলে অক্ষম। এটা সংযোগ সমস্যা দেখা দিলে।"
 
-#: ../daemon/gvfsafpserver.c:669 ../daemon/gvfsafpserver.c:694
+#: ../daemon/gvfsafpserver.c:623
 #, c-format
-msgid "AFP server %s doesn't support anonymous login"
-msgstr "AFP চাৰ্ভাৰ %s এ বেনামী লগিন সমৰ্থন নকৰে"
+msgid "Unable to connect to the server “%s” with the given password."
+msgstr "প্ৰদান কৰা পাছৱাৰ্ডৰ সৈতে চাৰ্ভাৰ “%s” লে সংযোগ কৰিবলে অক্ষম।"
 
-#: ../daemon/gvfsafpserver.c:722
+#: ../daemon/gvfsafpserver.c:676 ../daemon/gvfsafpserver.c:701
 #, c-format
-msgid "Login to AFP server %s failed (no suitable authentication mechanism found)"
-msgstr "AFP চাৰ্ভাৰ %s লে লগিন ব্যৰ্থ হল (কোনো যথাযথ প্ৰমাণীকৰণ পদ্ধতি পোৱা নগল)"
+#| msgid "AFP server %s doesn't support anonymous login"
+msgid "The server “%s” doesn't support anonymous access."
+msgstr "চাৰ্ভাৰ “%s” এ বেনামী অভিগম সমৰ্থন নকৰে।"
 
-#: ../daemon/gvfsafpserver.c:796 ../daemon/gvfsafpserver.c:817
+#: ../daemon/gvfsafpserver.c:729
 #, c-format
-msgid "Failed to connect to server (%s)"
-msgstr "চাৰ্ভাৰ (%s) লে সংযোগ কৰিবলে ব্যৰ্থ"
+#| msgid ""
+#| "Login to AFP server %s failed (no suitable authentication mechanism found)"
+msgid ""
+"Unable to connect to the server “%s”. No suitable authentication mechanism "
+"was found."
+msgstr ""
+"চাৰ্ভাৰ “%s” ৰ সৈতে সংযোগ কৰিবলে অক্ষম। কোনো উপযোগী প্ৰমাণীকৰণ পদ্ধতি পোৱা নগল।"
 
-#: ../daemon/gvfsafpserver.c:796
-#| msgid "Server doesn't support the FPCopyFile operation"
-msgid "Server doesn't support AFP version 3.0 or later"
-msgstr "চাৰ্ভাৰে AFP সংস্কৰণ 3.0 অথবা পিছৰ সমৰ্থন নকৰে"
-
-#
-#: ../daemon/gvfsafpserver.c:904 ../daemon/gvfsafpvolume.c:390
-#: ../daemon/gvfsafpvolume.c:668 ../daemon/gvfsafpvolume.c:821
-#: ../daemon/gvfsafpvolume.c:1015 ../daemon/gvfsafpvolume.c:1215
-#: ../daemon/gvfsafpvolume.c:1398 ../daemon/gvfsafpvolume.c:1555
-#: ../daemon/gvfsafpvolume.c:2001 ../daemon/gvfsafpvolume.c:2127
-#: ../daemon/gvfsafpvolume.c:2289 ../daemon/gvfsafpvolume.c:2509
-#: ../daemon/gvfsbackendafc.c:286 ../daemon/gvfsbackendsftp.c:311
-#: ../daemon/gvfsbackendsftp.c:1833 ../daemon/gvfsftptask.c:399
+#: ../daemon/gvfsafpserver.c:803
 #, c-format
-msgid "Permission denied"
-msgstr "অনুমতি নাকচ কৰা হৈছে"
+#| msgid "Server doesn't support AFP version 3.0 or later"
+msgid ""
+"Unable to connect to the server “%s”. The server doesn't support AFP version "
+"3.0 or later."
+msgstr ""
+"চাৰ্ভাৰ “%s” ৰ সৈতে সংযোগ কৰিবলে অক্ষম। চাৰ্ভাৰে AFP সংস্কৰণ 3.0 অথবা পিছৰ সমৰ্থন "
+"নকৰে।"
 
-#: ../daemon/gvfsafpserver.c:909
+#: ../daemon/gvfsafpserver.c:914
 #, c-format
-msgid "Command is not supported by server"
-msgstr "কমান্ড চাৰ্ভাৰ দ্বাৰা সমৰ্থিত নহয়"
+#| msgid "Permission denied"
+msgid "Permission denied."
+msgstr "অনুমতি নাকচ কৰা হৈছে।"
 
-#: ../daemon/gvfsafpserver.c:913
+#: ../daemon/gvfsafpserver.c:919
 #, c-format
-msgid "User's password has expired"
-msgstr "ব্যৱহাৰকাৰীৰ পাছৱাৰ্ডৰ অৱসান ঘটিছে"
+#| msgid "Command is not supported by server"
+msgid "The command is not supported by the server."
+msgstr "কমান্ড চাৰ্ভাৰ দ্বাৰা সমৰ্থিত নহয়।"
 
-#: ../daemon/gvfsafpserver.c:917
+#: ../daemon/gvfsafpserver.c:923
 #, c-format
-msgid "User's password needs to be changed"
-msgstr "ব্যৱহাৰকাৰীৰ পাছৱাৰ্ড সলনি কৰাৰ প্ৰয়োজন আছে"
+#| msgid "User's password has expired"
+msgid "Your password has expired."
+msgstr "আপোনাৰ পাছৱাৰ্ডৰ অৱসান ঘটিছে।"
 
-#. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsafpserver.c:1022
+#: ../daemon/gvfsafpserver.c:927
 #, c-format
-msgid "Enter password for afp as %s on %s"
-msgstr "%s ত %s ধৰণে afp ৰ বাবে পাছৱাৰ্ড সুমুৱাওক"
+#| msgid "User's password needs to be changed"
+msgid "Your password needs to be changed."
+msgstr "আপোনাৰ পাছৱাৰ্ড সলনি কৰাটো প্ৰয়োজনীয়।"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:1025
+#: ../daemon/gvfsafpserver.c:1070
 #, c-format
-msgid "Enter password for afp on %s"
-msgstr "%s ত afp ৰ বাবে পাছৱাৰ্ড সুমুৱাওক"
+#| msgid "Enter password for ssh on %s"
+msgid "Enter your password for the server “%s”."
+msgstr "চাৰ্ভাৰ “%s” ৰ বাবে পাছৱাৰ্ড সুমুৱাওক।"
 
-#: ../daemon/gvfsafpserver.c:1057 ../daemon/gvfsbackendftp.c:518
-#: ../daemon/gvfsbackendsftp.c:984 ../daemon/gvfsbackendsmbbrowse.c:995
-#: ../daemon/gvfsbackendsmb.c:619
-msgid "Password dialog cancelled"
-msgstr "পাছৱাৰ্ড ডাইলগ বাতিল কৰা হৈছে"
+#. translators: %s here is the hostname
+#: ../daemon/gvfsafpserver.c:1073
+#, c-format
+msgid "Enter your name and password for the server “%s”."
+msgstr "চাৰ্ভাৰ “%s” ৰ বাবে আপোনাৰ নাম আৰু পাছৱাৰ্ড সুমুৱাওক।"
 
-#: ../daemon/gvfsafpserver.c:1174
+#: ../daemon/gvfsafpserver.c:1105
+#| msgid "Password dialog cancelled"
+msgid "The password prompt was cancelled."
+msgstr "পাছৱাৰ্ড প্ৰমপ্ট বাতিল কৰা হৈছিল।"
+
+#: ../daemon/gvfsafpserver.c:1222
 #| msgid "Failed to connect to server (%s)"
-msgid "Failed to logout from server"
-msgstr "চাৰ্ভাৰৰ পৰা লগআউট কৰিবলে ব্যৰ্থ"
+msgid "Unable to disconnect from the server."
+msgstr "চাৰ্ভাৰৰ পৰা বিচ্ছিন্ন কৰিবলে অক্ষম।"
 
-#: ../daemon/gvfsafpserver.c:1663
-msgid "ID not found"
-msgstr "ID পোৱা নগল"
+#: ../daemon/gvfsafpserver.c:1364 ../daemon/gvfsafpserver.c:1666
+#: ../daemon/gvfsafpserver.c:1757
+#, c-format
+msgid "Unable to connect to the server. A communication problem occurred."
+msgstr "চাৰ্ভাৰৰ সৈতে সংযোগ কৰিবলে অক্ষম। এটা সংযোগ সমস্যা দেখা দিলে।"
+
+#: ../daemon/gvfsafpserver.c:1713
+#| msgid "Directory notification not supported"
+msgid "Identification not found."
+msgstr "পৰিচয় পোৱা নগল।"
 
 #: ../daemon/gvfsafputils.c:124
 #, c-format
@@ -362,14 +366,26 @@ msgstr "চাৰ্ভাৰৰ পৰা অজ্ঞাত ত্ৰুটি
 msgid "Couldn't mount AFP volume %s on %s"
 msgstr "%s ত AFP আয়তন %s মাউন্ট কৰিব নোৱাৰি"
 
+#
+#: ../daemon/gvfsafpvolume.c:390 ../daemon/gvfsafpvolume.c:668
+#: ../daemon/gvfsafpvolume.c:821 ../daemon/gvfsafpvolume.c:1015
+#: ../daemon/gvfsafpvolume.c:1215 ../daemon/gvfsafpvolume.c:1398
+#: ../daemon/gvfsafpvolume.c:1555 ../daemon/gvfsafpvolume.c:2001
+#: ../daemon/gvfsafpvolume.c:2127 ../daemon/gvfsafpvolume.c:2289
+#: ../daemon/gvfsafpvolume.c:2509 ../daemon/gvfsbackendafc.c:286
+#: ../daemon/gvfsbackendsftp.c:311 ../daemon/gvfsbackendsftp.c:1833
+#: ../daemon/gvfsftptask.c:399
+msgid "Permission denied"
+msgstr "অনুমতি নাকচ কৰা হৈছে"
+
 #: ../daemon/gvfsafpvolume.c:394 ../daemon/gvfsafpvolume.c:1721
-#: ../daemon/gvfsafpvolume.c:2513 ../daemon/gvfsbackendafc.c:936
+#: ../daemon/gvfsafpvolume.c:2513 ../daemon/gvfsbackendafc.c:974
 #: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:323
 #: ../daemon/gvfsbackendafpbrowse.c:355 ../daemon/gvfsbackendarchive.c:647
 #: ../daemon/gvfsbackendarchive.c:695 ../daemon/gvfsbackendarchive.c:747
-#: ../daemon/gvfsbackendarchive.c:776 ../daemon/gvfsbackendcdda.c:993
+#: ../daemon/gvfsbackendarchive.c:776 ../daemon/gvfsbackendcdda.c:1011
 #: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:398
-#: ../daemon/gvfsbackendftp.c:1067 ../daemon/gvfsbackendnetwork.c:602
+#: ../daemon/gvfsbackendftp.c:1067 ../daemon/gvfsbackendnetwork.c:678
 #: ../daemon/gvfsbackendsmbbrowse.c:1094 ../daemon/gvfsbackendsmbbrowse.c:1161
 #: ../daemon/gvfsbackendsmbbrowse.c:1333 ../daemon/gvfsbackendsmbbrowse.c:1403
 #, c-format
@@ -558,15 +574,19 @@ msgid "Lockdown Error: Invalid Argument"
 msgstr "লকডাউন ত্ৰুটি: অবৈধ তৰ্ক"
 
 #: ../daemon/gvfsbackendafc.c:290
+msgid "Unable to connect"
+msgstr "সংযোগ কৰিবলে অক্ষম"
+
+#: ../daemon/gvfsbackendafc.c:293
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "অনিয়ন্ত্ৰীত লকডাউন ত্ৰুটি (%d)"
 
-#: ../daemon/gvfsbackendafc.c:307
+#: ../daemon/gvfsbackendafc.c:310
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "libimobiledevice ত্ৰুটি: অবৈধ তৰ্ক"
 
-#: ../daemon/gvfsbackendafc.c:311
+#: ../daemon/gvfsbackendafc.c:314
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
@@ -574,22 +594,22 @@ msgstr ""
 "libimobiledevice ত্ৰুটি: কোনো ডিভাইচ পোৱা নগল। নিশ্চিত হয়ক usbmuxd সঠিকভাৱে "
 "সংস্থাপন হৈছে।"
 
-#: ../daemon/gvfsbackendafc.c:315
+#: ../daemon/gvfsbackendafc.c:318
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "অনিয়ন্ত্ৰীত libimobiledevice ত্ৰুটি (%d)"
 
-#: ../daemon/gvfsbackendafc.c:390
+#: ../daemon/gvfsbackendafc.c:416
 msgid "Try again"
 msgstr "পুনৰ চেষ্টা কৰক"
 
-#: ../daemon/gvfsbackendafc.c:390 ../daemon/gvfsbackend.c:939
+#: ../daemon/gvfsbackendafc.c:416 ../daemon/gvfsbackend.c:939
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
 #: ../monitor/udisks2/gvfsudisks2mount.c:736
 msgid "Cancel"
 msgstr "বাতিল কৰক"
 
-#: ../daemon/gvfsbackendafc.c:408 ../daemon/gvfsbackendarchive.c:550
+#: ../daemon/gvfsbackendafc.c:434 ../daemon/gvfsbackendarchive.c:550
 #: ../daemon/gvfsbackendarchive.c:579 ../daemon/gvfsbackenddav.c:1820
 #: ../daemon/gvfsbackendhttp.c:309 ../daemon/gvfsbackendobexftp.c:862
 #: ../daemon/gvfsbackendobexftp.c:878 ../daemon/gvfsbackendobexftp.c:897
@@ -597,21 +617,21 @@ msgstr "বাতিল কৰক"
 msgid "Invalid mount spec"
 msgstr "মাউন্ট বৰ্ণনা সঠিক নহয়"
 
-#: ../daemon/gvfsbackendafc.c:414 ../daemon/gvfsbackendafc.c:444
+#: ../daemon/gvfsbackendafc.c:440 ../daemon/gvfsbackendafc.c:470
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "অবৈধ AFC অৱস্থান:  afc://uuid:port-number সঁজাত থাকিব লাগিব"
 
-#: ../daemon/gvfsbackendafc.c:430
+#: ../daemon/gvfsbackendafc.c:456
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Apple মোবাইল ডিভাইচ"
 
-#: ../daemon/gvfsbackendafc.c:435
+#: ../daemon/gvfsbackendafc.c:461
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Apple মোবাইল ডিভাইচ, Jailbroken"
 
-#: ../daemon/gvfsbackendafc.c:440
+#: ../daemon/gvfsbackendafc.c:466
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Apple মোবাইল ডিভাইচত দস্তাবেজসমূহ"
@@ -619,7 +639,7 @@ msgstr "Apple মোবাইল ডিভাইচত দস্তাবেজ�
 #. translators:
 #. * This is the device name, with the service being browsed in brackets, eg.:
 #. * Alan Smithee's iPhone (jailbreak)
-#: ../daemon/gvfsbackendafc.c:498
+#: ../daemon/gvfsbackendafc.c:525
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (jailbreak)"
@@ -627,7 +647,7 @@ msgstr "%s (jailbreak)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:505 ../monitor/afc/afcvolume.c:125
+#: ../daemon/gvfsbackendafc.c:532 ../monitor/afc/afcvolume.c:125
 #, c-format
 msgid "Documents on %s"
 msgstr "%s ত থকা দস্তাবেজসমূহ"
@@ -635,31 +655,35 @@ msgstr "%s ত থকা দস্তাবেজসমূহ"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:587
+#: ../daemon/gvfsbackendafc.c:624
 #, c-format
+#| msgid ""
+#| "The device '%s' is locked. Enter the passcode on the device and click "
+#| "'Try again'."
 msgid ""
-"The device '%s' is locked. Enter the passcode on the device and click 'Try "
-"again'."
+"The device “%s” is locked. Enter the passcode on the device and click “Try "
+"again”."
 msgstr ""
-"'%s' ডিভাইচ লক কৰা আছে। ডিভাইচত পাছক'ডটো সুমুৱাওক আৰু 'পুনৰ চেষ্টা কৰক' ক্লিক কৰক।"
+"“%s” ডিভাইচ লক কৰা আছে। ডিভাইচত পাছক'ডটো সুমুৱাওক আৰু “পুনৰ চেষ্টা "
+"কৰক“ ক্লিক কৰক।"
 
 #
-#: ../daemon/gvfsbackendafc.c:926 ../daemon/gvfsbackendarchive.c:655
+#: ../daemon/gvfsbackendafc.c:964 ../daemon/gvfsbackendarchive.c:655
 #: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1810
 #: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendrecent.c:121
 #: ../daemon/gvfsbackendsmb.c:718 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "ডাইৰেকটৰি খোলিব নোৱাৰি"
 
-#: ../daemon/gvfsbackendafc.c:1127 ../daemon/gvfsbackendafc.c:2470
+#: ../daemon/gvfsbackendafc.c:1165 ../daemon/gvfsbackendafc.c:2508
 msgid "Backups are not yet supported."
 msgstr "বেক আপৰ বাবে সমৰ্থন নাই।"
 
-#: ../daemon/gvfsbackendafc.c:1299
+#: ../daemon/gvfsbackendafc.c:1337
 msgid "Invalid seek type"
 msgstr "অবৈধ সন্ধানৰ ধৰণ"
 
-#: ../daemon/gvfsbackendafc.c:2307 ../daemon/gvfsbackendafp.c:1749
+#: ../daemon/gvfsbackendafc.c:2345 ../daemon/gvfsbackendafp.c:1749
 #: ../daemon/gvfsbackendftp.c:1087 ../daemon/gvfsbackendftp.c:1135
 #: ../daemon/gvfsbackendftp.c:1156 ../daemon/gvfsbackendsftp.c:1831
 #: ../daemon/gvfsbackendsftp.c:4632 ../daemon/gvfsbackendsmb.c:1719
@@ -759,7 +783,7 @@ msgstr "%s ত /"
 
 #: ../daemon/gvfsbackendarchive.c:785 ../daemon/gvfsbackendburn.c:675
 #: ../daemon/gvfsbackendcomputer.c:715 ../daemon/gvfsbackenddnssd.c:445
-#: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:649
+#: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:724
 #: ../daemon/gvfsbackendsftp.c:3880 ../daemon/gvfsftpdircache.c:157
 msgid "The file is not a directory"
 msgstr "এই নথিপত্ৰটো এটা ডাইৰেকটৰি নহয়"
@@ -826,7 +850,7 @@ msgstr "নথিপত্ৰ অস্তিত্ববান"
 #: ../daemon/gvfsjobunmountmountable.c:172 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1174 ../monitor/gdu/ggdumount.c:1258
 #: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1108
-#: ../monitor/udisks2/gvfsudisks2volume.c:1556
+#: ../monitor/udisks2/gvfsudisks2volume.c:1566
 msgid "Operation not supported by backend"
 msgstr "কাৰ্য্য বেকএন্ড দ্বাৰা সমৰ্থিত নহয়"
 
@@ -861,44 +885,44 @@ msgstr ""
 "আয়তন বৰ্তমানে ব্যস্ত\n"
 "এটা অথবা অধিক অনুপ্ৰয়োগ দ্বাৰা আয়তন ব্যস্ত ৰখা হৈছে।"
 
-#: ../daemon/gvfsbackendcdda.c:336 ../daemon/gvfsbackendgphoto2.c:1508
+#: ../daemon/gvfsbackendcdda.c:354 ../daemon/gvfsbackendgphoto2.c:1508
 msgid "Cannot create gudev client"
 msgstr "gudev ক্লাএন্ট সৃষ্টি কৰা নাযায়"
 
-#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1526
+#: ../daemon/gvfsbackendcdda.c:374 ../daemon/gvfsbackendgphoto2.c:1526
 msgid "Cannot connect to the system bus"
 msgstr "প্ৰণালী বাছৰ সৈতে সংযোগ কৰিব নোৱাৰি"
 
-#: ../daemon/gvfsbackendcdda.c:367 ../daemon/gvfsbackendgphoto2.c:1538
+#: ../daemon/gvfsbackendcdda.c:385 ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Cannot create libhal context"
 msgstr "libhal পৰিপ্ৰেক্ষতিত সৃষ্টি কৰা নাযায়"
 
-#: ../daemon/gvfsbackendcdda.c:381 ../daemon/gvfsbackendgphoto2.c:1551
+#: ../daemon/gvfsbackendcdda.c:399 ../daemon/gvfsbackendgphoto2.c:1551
 msgid "Cannot initialize libhal"
 msgstr "libhal আৰম্ভ কৰা নাযায়"
 
-#: ../daemon/gvfsbackendcdda.c:397 ../daemon/gvfsbackendcdda.c:482
+#: ../daemon/gvfsbackendcdda.c:415 ../daemon/gvfsbackendcdda.c:500
 msgid "No drive specified"
 msgstr "কোনো ড্ৰাইভ ধাৰ্য্য কৰা হোৱা নাই"
 
-#: ../daemon/gvfsbackendcdda.c:421
+#: ../daemon/gvfsbackendcdda.c:439
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "ড্ৰাইভ পোৱা নগল: %s"
 
-#: ../daemon/gvfsbackendcdda.c:434
+#: ../daemon/gvfsbackendcdda.c:452
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "ড্ৰাইভ %sত কোনো অডিঅ' নথিপত্ৰ নাই"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
-#: ../daemon/gvfsbackendcdda.c:444
+#: ../daemon/gvfsbackendcdda.c:462
 #, c-format
 msgid "cdda mount on %s"
 msgstr "%s ত cdda মাউন্ট"
 
-#: ../daemon/gvfsbackendcdda.c:445 ../daemon/gvfsbackendcdda.c:965
+#: ../daemon/gvfsbackendcdda.c:463 ../daemon/gvfsbackendcdda.c:983
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #: ../monitor/udisks2/gvfsudisks2volume.c:308
@@ -906,40 +930,40 @@ msgstr "%s ত cdda মাউন্ট"
 msgid "Audio Disc"
 msgstr "অডিঅ' ডিস্ক"
 
-#: ../daemon/gvfsbackendcdda.c:508
+#: ../daemon/gvfsbackendcdda.c:526
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "নথিপত্ৰ প্ৰণালী ব্যস্ত: %d খোলা নথিপত্ৰ"
 msgstr[1] "নথিপত্ৰ প্ৰণালী ব্যস্ত: %d খোলা নথিপত্ৰসমূহ"
 
-#: ../daemon/gvfsbackendcdda.c:700
+#: ../daemon/gvfsbackendcdda.c:718
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "%s নামক কোনো নথিপত্ৰ, %s ড্ৰাইভত উপস্থিত নাই"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:809
+#: ../daemon/gvfsbackendcdda.c:827
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "ড্ৰাইভ %s ত  'paranoia ৰ পৰা উৎপন্ন ত্ৰুটি"
 
-#: ../daemon/gvfsbackendcdda.c:872
+#: ../daemon/gvfsbackendcdda.c:890
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "ড্ৰাইভ %s ত স্ট্ৰিম সন্ধান কৰোতে ত্ৰুটি"
 
-#: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendgphoto2.c:1818
+#: ../daemon/gvfsbackendcdda.c:1004 ../daemon/gvfsbackendgphoto2.c:1818
 #, c-format
 msgid "No such file"
 msgstr "এনে কোনো নথিপত্ৰ নাই"
 
-#: ../daemon/gvfsbackendcdda.c:1000
+#: ../daemon/gvfsbackendcdda.c:1018
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "এই নামৰ নথিপত্ৰটো নাই অথবা অডিঅ' ট্ৰ্যাক নহয়"
 
-#: ../daemon/gvfsbackendcdda.c:1106
+#: ../daemon/gvfsbackendcdda.c:1124
 msgid "Audio CD File System Service"
 msgstr "অডিঅ' CD নথিপত্ৰ প্ৰণালী সেৱা"
 
@@ -983,12 +1007,14 @@ msgid "Can't eject file"
 msgstr "নথিপত্ৰটো বাহিৰ কৰিব নোৱাৰি"
 
 #: ../daemon/gvfsbackendcomputer.c:1253 ../daemon/gvfsbackendcomputer.c:1260
-msgid "Can't start file"
-msgstr "নথিপত্ৰ আৰম্ভ কৰা নাযায়"
+#| msgid "Can't start file"
+msgid "Can't start drive"
+msgstr "ড্ৰাইভ আৰম্ভ কৰা নাযায়"
 
 #: ../daemon/gvfsbackendcomputer.c:1326 ../daemon/gvfsbackendcomputer.c:1333
-msgid "Can't stop file"
-msgstr "নথিপত্ৰ বন্ধ কৰা নাযায়"
+#| msgid "Can't stop file"
+msgid "Can't stop drive"
+msgstr "ড্ৰাইভ বন্ধ কৰা নাযায়"
 
 #: ../daemon/gvfsbackendcomputer.c:1390 ../daemon/gvfsbackendcomputer.c:1397
 msgid "Can't poll file"
@@ -1062,11 +1088,11 @@ msgid "Backup file creation failed"
 msgstr "বেকআপ নথিপত্ৰ সৃষ্টি কৰা নাযায়"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:371
+#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:447
 msgid "Local Network"
 msgstr "স্থানীয় নেটৱাৰ্ক"
 
-#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:753
+#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:828
 msgid "Can't monitor file or directory."
 msgstr "নথিপত্ৰ বা ডাইৰেকটৰি নিৰীক্ষণ কৰিব নোৱাৰি"
 
@@ -1076,8 +1102,8 @@ msgid "Dns-SD"
 msgstr "Dns-SD"
 
 #
-#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:688
-#: ../daemon/gvfsbackendnetwork.c:820 ../daemon/gvfsbackendnetwork.c:821
+#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:763
+#: ../daemon/gvfsbackendnetwork.c:895 ../daemon/gvfsbackendnetwork.c:896
 msgid "Network"
 msgstr "নেটৱাৰ্ক"
 
@@ -1092,6 +1118,11 @@ msgstr "%s ত %s  হিচাপে FTP ৰ বাবে পাছৱাৰ্
 #, c-format
 msgid "Enter password for FTP on %s"
 msgstr "%s ত  FTP ৰ বাবে পাছৱাৰ্ড সুমুৱাওক"
+
+#: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:984
+#: ../daemon/gvfsbackendsmbbrowse.c:995 ../daemon/gvfsbackendsmb.c:619
+msgid "Password dialog cancelled"
+msgstr "পাছৱাৰ্ড ডাইলগ বাতিল কৰা হৈছে"
 
 #: ../daemon/gvfsbackendftp.c:630
 #, c-format
@@ -1324,15 +1355,23 @@ msgstr "HTTP ক্লাএন্ট ত্ৰুটি: %s"
 msgid "Directory notification not supported"
 msgstr "ডাইৰেকটৰি সকীয়নি সমৰ্থিত নহয়"
 
+#: ../daemon/gvfsbackendnetwork.c:159
+msgid "File Sharing"
+msgstr "নথিপত্ৰ অংশীদাৰী"
+
+#: ../daemon/gvfsbackendnetwork.c:164
+msgid "Remote Login"
+msgstr "দূৰৱৰ্তী লগিন"
+
 #
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:247 ../daemon/gvfsbackendsmbbrowse.c:894
+#: ../daemon/gvfsbackendnetwork.c:323 ../daemon/gvfsbackendsmbbrowse.c:894
 msgid "Windows Network"
 msgstr "Windows নেটৱাৰ্ক"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:873
+#: ../daemon/gvfsbackendnetwork.c:948
 msgid "Network Location Monitor"
 msgstr "নেটৱাৰ্ক অৱস্থান মনিটৰ"
 
@@ -1741,38 +1780,38 @@ msgstr "%s: %s"
 
 #: ../daemon/main.c:168 ../metadata/meta-daemon.c:472
 #: ../programs/gvfs-cat.c:170 ../programs/gvfs-cat.c:182
-#: ../programs/gvfs-copy.c:133 ../programs/gvfs-info.c:387
+#: ../programs/gvfs-copy.c:133 ../programs/gvfs-info.c:389
 #: ../programs/gvfs-ls.c:416 ../programs/gvfs-mime.c:97
 #: ../programs/gvfs-mime.c:107 ../programs/gvfs-mime.c:114
 #: ../programs/gvfs-mkdir.c:71 ../programs/gvfs-monitor-dir.c:126
 #: ../programs/gvfs-monitor-file.c:125 ../programs/gvfs-mount.c:1036
 #: ../programs/gvfs-move.c:121 ../programs/gvfs-open.c:78
 #: ../programs/gvfs-open.c:90 ../programs/gvfs-rename.c:75
-#: ../programs/gvfs-rm.c:72 ../programs/gvfs-save.c:175
+#: ../programs/gvfs-rm.c:72 ../programs/gvfs-save.c:178
 #: ../programs/gvfs-set-attribute.c:151 ../programs/gvfs-trash.c:71
 #: ../programs/gvfs-tree.c:262
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "অধিক তথ্যৰ বাবে \"%s --help\" ব্যৱহাৰ কৰক"
 
-#: ../daemon/mount.c:674
+#: ../daemon/mount.c:692
 #, c-format
 msgid "Automount failed: %s"
 msgstr "স্বমাউন্ট কৰা নাযায়: %s"
 
-#: ../daemon/mount.c:718 ../daemon/mount.c:779
+#: ../daemon/mount.c:736 ../daemon/mount.c:797
 msgid "The specified location is not mounted"
 msgstr "ধাৰ্য্য কৰা স্থান মাউন্ট কৰা নহয়"
 
-#: ../daemon/mount.c:723
+#: ../daemon/mount.c:741
 msgid "The specified location is not supported"
 msgstr "ধাৰ্য্য কৰা স্থানটো সমৰ্থিত নহয়"
 
-#: ../daemon/mount.c:847
+#: ../daemon/mount.c:865
 msgid "Location is already mounted"
 msgstr "স্থানটো ইতিমধ্যে মাউন্ট কৰা"
 
-#: ../daemon/mount.c:856
+#: ../daemon/mount.c:874
 msgid "Location is not mountable"
 msgstr "স্থানটো মাউন্ট কৰা নাযায়"
 
@@ -2250,31 +2289,33 @@ msgstr "%s আয়তন"
 msgid "Volume"
 msgstr "আয়তন"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:999
+#: ../monitor/udisks2/gvfsudisks2volume.c:1008
 #, c-format
-msgid "Error storing passphrase in keyring (error code %d)"
-msgstr "কি'ৰিংত পাচফ্ৰেইছ সংৰক্ষণ কৰোতে ত্ৰুটি (ত্ৰুটি ক'ড %d)"
+#| msgid "Error storing passphrase in keyring (error code %d)"
+msgid "Error storing passphrase in keyring (%s)"
+msgstr "কি'ৰিংত পাচফ্ৰেইছ সংৰক্ষণ কৰোতে ত্ৰুটি (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1030
+#: ../monitor/udisks2/gvfsudisks2volume.c:1043
 #, c-format
-msgid "Error deleting invalid passphrase from keyring (error code %d)"
-msgstr "কি'ৰিংৰ পৰা অবৈধ পাচফ্ৰেইছ মচি পেলাওতে ত্ৰুটি (ত্ৰুটি ক'ড %d)"
+#| msgid "Error deleting invalid passphrase from keyring (error code %d)"
+msgid "Error deleting invalid passphrase from keyring (%s)"
+msgstr "কি'ৰিংৰ পৰা অবৈধ পাচফ্ৰেইছ মচি পেলাওতে ত্ৰুটি (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1096
+#: ../monitor/udisks2/gvfsudisks2volume.c:1108
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr "আনলক কৰা ডিভাইচৰ চিনাক্ত কৰিব পৰা এটা নথিপত্ৰ প্ৰণালী নাই"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1125
+#: ../monitor/udisks2/gvfsudisks2volume.c:1137
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "%s ৰ বাবে ইনক্ৰিপষণ পাচফ্ৰেইছ"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1295
+#: ../monitor/udisks2/gvfsudisks2volume.c:1305
 msgid "A passphrase is required to access the volume"
 msgstr "আয়তন অভিগম কৰিবলে এটা পাচফ্ৰেইছৰ প্ৰয়োজন"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1310
+#: ../monitor/udisks2/gvfsudisks2volume.c:1320
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2290,7 +2331,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1461
+#: ../monitor/udisks2/gvfsudisks2volume.c:1471
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
@@ -2358,12 +2399,12 @@ msgstr ""
 "যেনে -n, -T অথবা অন্য।"
 
 #: ../programs/gvfs-cat.c:168 ../programs/gvfs-copy.c:131
-#: ../programs/gvfs-info.c:385 ../programs/gvfs-ls.c:414
+#: ../programs/gvfs-info.c:387 ../programs/gvfs-ls.c:414
 #: ../programs/gvfs-mime.c:94 ../programs/gvfs-mkdir.c:69
 #: ../programs/gvfs-monitor-dir.c:124 ../programs/gvfs-monitor-file.c:123
 #: ../programs/gvfs-mount.c:1034 ../programs/gvfs-move.c:119
 #: ../programs/gvfs-open.c:76 ../programs/gvfs-rename.c:73
-#: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:173
+#: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:176
 #: ../programs/gvfs-set-attribute.c:149 ../programs/gvfs-trash.c:69
 #: ../programs/gvfs-tree.c:260
 #, c-format
@@ -2412,7 +2453,7 @@ msgid "SOURCE"
 msgstr "SOURCE"
 
 #: ../programs/gvfs-copy.c:121 ../programs/gvfs-move.c:109
-#: ../programs/gvfs-save.c:162
+#: ../programs/gvfs-save.c:165
 msgid "DEST"
 msgstr "DEST"
 
@@ -2502,60 +2543,62 @@ msgstr "মাউন্ট কৰাৰ যোগ্য"
 msgid "attributes:\n"
 msgstr "বৈশিষ্ট্যসমূহ:\n"
 
-#: ../programs/gvfs-info.c:155
+#. Translators: This is a noun and represents and attribute of a file
+#: ../programs/gvfs-info.c:156
 #, c-format
 msgid "display name: %s\n"
 msgstr "প্ৰদৰ্শনৰ নাম: %s\n"
 
-#: ../programs/gvfs-info.c:159
+#. Translators: This is a noun and represents and attribute of a file
+#: ../programs/gvfs-info.c:161
 #, c-format
 msgid "edit name: %s\n"
 msgstr "নাম সম্পাদনা কৰক: %s\n"
 
-#: ../programs/gvfs-info.c:165
+#: ../programs/gvfs-info.c:167
 #, c-format
 msgid "name: %s\n"
 msgstr "নাম: %s\n"
 
-#: ../programs/gvfs-info.c:172
+#: ../programs/gvfs-info.c:174
 #, c-format
 msgid "type: %s\n"
 msgstr "ধৰণ: %s\n"
 
-#: ../programs/gvfs-info.c:178
+#: ../programs/gvfs-info.c:180
 #, c-format
 msgid "size: "
 msgstr "আকাৰ: "
 
-#: ../programs/gvfs-info.c:183
+#: ../programs/gvfs-info.c:185
 #, c-format
 msgid "hidden\n"
 msgstr "লুকুৱা\n"
 
-#: ../programs/gvfs-info.c:268
+#: ../programs/gvfs-info.c:270
 msgid "Copy with file"
 msgstr "নথিপত্ৰৰ সৈতে কপি কৰক"
 
-#: ../programs/gvfs-info.c:272
+#: ../programs/gvfs-info.c:274
 msgid "Keep with file when moved"
 msgstr "স্থানান্তৰ কৰোতে নথিপত্ৰৰ সৈতে ৰাখক"
 
-#: ../programs/gvfs-info.c:309
+#: ../programs/gvfs-info.c:311
 #, c-format
 msgid "Error getting writable attributes: %s\n"
 msgstr "লিখাৰ যোগ্য বৈশিষ্ট্য প্ৰাপ্ত কৰোতে ত্ৰুটি: %s\n"
 
-#: ../programs/gvfs-info.c:314
+#: ../programs/gvfs-info.c:316
 #, c-format
 msgid "Settable attributes:\n"
 msgstr "নিৰ্ধাৰণযোগ্য বৈশিষ্ট্যসমূহ:\n"
 
-#: ../programs/gvfs-info.c:337
+#: ../programs/gvfs-info.c:339
 #, c-format
 msgid "Writable attribute namespaces:\n"
 msgstr "লিখাৰ যোগ্য বৈশিষ্ট্যৰ নেমস্পেইচসমূহ:\n"
 
-#: ../programs/gvfs-info.c:373 ../programs/gvfs-ls.c:397
+#: ../programs/gvfs-info.c:375 ../programs/gvfs-ls.c:397
 #: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-monitor-dir.c:112
 #: ../programs/gvfs-monitor-file.c:111 ../programs/gvfs-mount.c:1022
 #: ../programs/gvfs-rename.c:64 ../programs/gvfs-set-attribute.c:139
@@ -2563,7 +2606,7 @@ msgstr "লিখাৰ যোগ্য বৈশিষ্ট্যৰ নেম
 msgid "LOCATION"
 msgstr "LOCATION"
 
-#: ../programs/gvfs-info.c:374
+#: ../programs/gvfs-info.c:376
 msgid "Show information about locations."
 msgstr "অৱস্থানসমূহৰ বিষয়ে তথ্য দেখুৱাওক"
 
@@ -2844,38 +2887,41 @@ msgstr "নথিপত্ৰৰ শেষত যোগ কৰক"
 msgid "When creating, restrict access to the current user"
 msgstr "সৃষ্টি কৰোতে, অভিগম কেৱল বৰ্তমান ব্যৱহাৰকাৰীৰ বাবে ৰাখক"
 
-#: ../programs/gvfs-save.c:47
+#. Translators: The "etag" is a token allowing to verify whether a file has been modified
+#: ../programs/gvfs-save.c:48
 msgid "Print new etag at end"
 msgstr "শেষত নতুন etag প্ৰিন্ট কৰক"
 
-#: ../programs/gvfs-save.c:48
+#. Translators: The "etag" is a token allowing to verify whether a file has been modified
+#: ../programs/gvfs-save.c:50
 msgid "The etag of the file being overwritten"
 msgstr "নতুনকৈ লিখাৰ বাবে চিহ্নিত নথিপত্ৰৰ etag"
 
-#: ../programs/gvfs-save.c:48
+#: ../programs/gvfs-save.c:50
 msgid "ETAG"
 msgstr "ETAG"
 
-#: ../programs/gvfs-save.c:76
+#: ../programs/gvfs-save.c:78
 #, c-format
 msgid "Error opening file: %s\n"
 msgstr "নথিপত্ৰ খোলিবলৈ ত্ৰুটি: %s\n"
 
-#: ../programs/gvfs-save.c:109
+#: ../programs/gvfs-save.c:111
 msgid "Error reading stdin"
 msgstr "stdin পঢ়িবলৈ ত্ৰুটি"
 
-#: ../programs/gvfs-save.c:122
+#: ../programs/gvfs-save.c:124
 #, c-format
 msgid "Error closing: %s\n"
 msgstr "বন্ধ কৰোতে ত্ৰুটি: %s\n"
 
-#: ../programs/gvfs-save.c:134
+#. Translators: The "etag" is a token allowing to verify whether a file has been modified
+#: ../programs/gvfs-save.c:137
 #, c-format
 msgid "Etag not available\n"
 msgstr "Etag উপলব্ধ নাই\n"
 
-#: ../programs/gvfs-save.c:163
+#: ../programs/gvfs-save.c:166
 msgid "Read from standard input and save to DEST."
 msgstr "প্ৰামাণিক ইনপুটৰ পৰা পঢ়ক আৰু DEST লে সংৰক্ষণ কৰক।"
 
@@ -2937,6 +2983,32 @@ msgstr "সাংকেতিক লিঙ্কসমূহ, মাউন্ট
 #: ../programs/gvfs-tree.c:249
 msgid "List contents of directories in a tree-like format."
 msgstr "এটা ট্ৰি অনুৰূপ বিন্যাসত ডাইৰেকটৰিৰ সমলসমূহ তালিকাভুক্ত কৰক।"
+
+#~ msgid "Error creating socket: %s"
+#~ msgstr "চকেট সৃষ্টি কৰোতে ত্ৰুটি: %s"
+
+#~ msgid "Error connecting to socket: %s"
+#~ msgstr "চকেটৰ লগত সংযোগ কৰোতে ত্ৰুটি: %s"
+
+#~ msgid "AFP server %s declined the submitted password"
+#~ msgstr "AFP চাৰ্ভাৰ %s এ জমা দিয়া পাছৱাৰ্ড নাকচ কৰিছে"
+
+#~| msgid "Unexpected reply from server"
+#~ msgid "Received invalid reply from server"
+#~ msgstr "চাৰ্ভাৰৰ পৰা অবৈধ উত্তৰ প্ৰাপ্ত হৈছে"
+
+#~ msgid "Enter password for afp as %s on %s"
+#~ msgstr "%s ত %s ধৰণে afp ৰ বাবে পাছৱাৰ্ড সুমুৱাওক"
+
+#~ msgid "Enter password for afp on %s"
+#~ msgstr "%s ত afp ৰ বাবে পাছৱাৰ্ড সুমুৱাওক"
+
+#~| msgid "Failed to connect to server (%s)"
+#~ msgid "Failed to logout from server"
+#~ msgstr "চাৰ্ভাৰৰ পৰা লগআউট কৰিবলে ব্যৰ্থ"
+
+#~ msgid "ID not found"
+#~ msgstr "ID পোৱা নগল"
 
 #~ msgid "Can't contact session bus"
 #~ msgstr "অধিবেশন বাছৰ সৈতে সংযোগ স্থাপনত ব্যৰ্থ"
