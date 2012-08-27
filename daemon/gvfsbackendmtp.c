@@ -628,7 +628,6 @@ do_enumerate (GVfsBackend *backend,
     }
   } else {
     LIBMTP_file_t *files;
-    LIBMTP_file_t *file;
 
     int pid = (ne == 2 ? -1 : strtol(elements[ne-1], NULL, 10));
 
@@ -642,11 +641,16 @@ do_enumerate (GVfsBackend *backend,
       LIBMTP_Clear_Errorstack(device);
       goto exit;
     }
-    for (file = files; file != NULL; file = file->next) {
-        info = g_file_info_new();
-        get_file_info(backend, device, info, file);
-        g_vfs_job_enumerate_add_info (job, info);
-        g_object_unref(info);
+    while (files != NULL) {
+      LIBMTP_file_t *file = files;
+      files = files->next;
+
+      info = g_file_info_new();
+      get_file_info(backend, device, info, file);
+      g_vfs_job_enumerate_add_info (job, info);
+      g_object_unref(info);
+
+      LIBMTP_destroy_file_t(file);
     }
   }
 
@@ -705,15 +709,24 @@ do_query_info (GVfsBackend *backend,
       if (ne > 3) {
         parent_id = strtol(elements[ne-2], NULL, 10);
       }
-      LIBMTP_file_t *files = LIBMTP_Get_Files_And_Folders(device, strtol(elements[1], NULL, 10),
-                                                          parent_id);
-      LIBMTP_file_t *i;
-      for (i = files; i != NULL; i = i->next) {
+      LIBMTP_file_t *i = LIBMTP_Get_Files_And_Folders(device, strtol(elements[1], NULL, 10),
+                                                      parent_id);
+      while (i != NULL) {
         g_print ("(II) backup query (entity = %s, name = %s) \n", i->filename, elements[ne-1]);
         if (strcmp(i->filename, elements[ne-1]) == 0) {
           file = i;
+          i = i->next;
           break;
+        } else {
+          LIBMTP_file_t *tmp = i;
+          i = i->next;
+          LIBMTP_destroy_file_t(tmp);
         }
+      }
+      while (i != NULL) {
+        LIBMTP_file_t *tmp = i;
+        i = i->next;
+        LIBMTP_destroy_file_t(tmp);
       }
     } else {
       file = LIBMTP_Get_Filemetadata(device, strtol(elements[ne-1], NULL, 10));
@@ -721,6 +734,7 @@ do_query_info (GVfsBackend *backend,
 
     if (file != NULL) {
       get_file_info(backend, device, info, file);
+      LIBMTP_destroy_file_t(file);
     } else {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -841,6 +855,8 @@ do_pull(GVfsBackend *backend,
 
   info = g_file_info_new();
   get_file_info(backend, device, info, file);
+  LIBMTP_destroy_file_t(file);
+  file = NULL;
   if (g_file_info_get_file_type(info) == G_FILE_TYPE_DIRECTORY) {
     GError *error;
     GFile *file = g_file_new_for_path (local_path);
@@ -1104,6 +1120,8 @@ do_set_display_name (GVfsBackend *backend,
                         "Error while renaming entity.");
       goto exit;
   }
+  LIBMTP_destroy_file_t(file);
+  file = NULL;
   g_vfs_job_set_display_name_set_new_path(job, filename);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
