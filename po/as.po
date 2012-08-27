@@ -21,17 +21,17 @@ msgstr ""
 
 #: ../client/gdaemonfile.c:416 ../client/gdaemonfile.c:2767
 msgid "Operation not supported, files on different mounts"
-msgstr "এই কাৰ্য্য অসমৰ্থিত, নথিপত্ৰসমূহ অন্য মাউন্টত অৱস্থিত"
+msgstr "এই কাৰ্য্য অসমৰ্থিত, ফাইলসমূহ অন্য মাউন্টত অৱস্থিত"
 
 #: ../client/gdaemonfile.c:1034 ../client/gdaemonfile.c:3110
 #: ../client/gvfsiconloadable.c:304
 msgid "Couldn't get stream file descriptor"
-msgstr "স্ট্ৰিম নথিপত্ৰৰ বিৱৰক পোৱা নগল"
+msgstr "স্ট্ৰিম ফাইলৰ বিৱৰক পোৱা নগল"
 
 #: ../client/gdaemonfile.c:1163 ../client/gdaemonfile.c:1235
 #: ../client/gvfsiconloadable.c:129
 msgid "Didn't get stream file descriptor"
-msgstr "স্ট্ৰিম নথিপত্ৰৰ বিৱৰক পোৱা নগল"
+msgstr "স্ট্ৰিম ফাইলৰ বিৱৰক পোৱা নগল"
 
 #: ../client/gdaemonfile.c:1356
 #, c-format
@@ -47,13 +47,13 @@ msgstr "আৱৰিত মাউন্ট পোৱা নগল"
 #: ../client/gdaemonfile.c:2277
 #, c-format
 msgid "Invalid filename %s"
-msgstr "অবৈধ নথিপত্ৰ: %s"
+msgstr "অবৈধ ফাইল: %s"
 
 #: ../client/gdaemonfile.c:2609 ../client/gdaemonvfs.c:1286
 #: ../client/gdaemonvfs.c:1338
 #, c-format
 msgid "Error setting file metadata: %s"
-msgstr "নথিপত্ৰৰ মেটাডাটা সংহতি কৰোতে ত্ৰুটি: %s"
+msgstr "ফাইলৰ মেটাডাটা সংহতি কৰোতে ত্ৰুটি: %s"
 
 #: ../client/gdaemonfile.c:2610 ../client/gdaemonvfs.c:1339
 msgid "values must be string or list of strings"
@@ -121,7 +121,7 @@ msgstr "মাউন্টৰ তথ্য প্ৰাপ্ত কৰোতে
 
 #: ../common/gvfsdaemonprotocol.c:349
 msgid "Invalid file info format"
-msgstr "অবৈধ নথিপত্ৰ তথ্য বিন্যাস"
+msgstr "অবৈধ ফাইল তথ্য বিন্যাস"
 
 #: ../common/gvfsdnssdresolver.c:209
 #, c-format
@@ -188,7 +188,7 @@ msgstr "GVfsIcon ৰ বাবে ক্ষতিগ্ৰস্থ ইনপু
 #: ../daemon/daemon-main.c:100
 #, c-format
 msgid "%s File System Service"
-msgstr "%s নথিপত্ৰ প্ৰণালী সেৱা"
+msgstr "%s ফাইল চিস্টেম সেৱা"
 
 #: ../daemon/daemon-main.c:177 ../programs/gvfs-copy.c:90
 #: ../programs/gvfs-move.c:78 ../programs/gvfs-rename.c:36
@@ -390,7 +390,7 @@ msgstr "অনুমতি নাকচ কৰা হৈছে"
 #: ../daemon/gvfsbackendsmbbrowse.c:1333 ../daemon/gvfsbackendsmbbrowse.c:1403
 #, c-format
 msgid "File doesn't exist"
-msgstr "নথিপত্ৰ নাই"
+msgstr "ফাইল নাই"
 
 #: ../daemon/gvfsafpvolume.c:398 ../daemon/gvfsafpvolume.c:468
 #: ../daemon/gvfsafpvolume.c:2517 ../daemon/gvfsbackendafp.c:277
@@ -399,15 +399,15 @@ msgstr "নথিপত্ৰ নাই"
 #: ../daemon/gvfsbackendsftp.c:2332 ../daemon/gvfsbackendsftp.c:3068
 #: ../daemon/gvfsbackendsftp.c:3407 ../daemon/gvfsbackendsftp.c:4275
 msgid "File is directory"
-msgstr "নথিপত্ৰটো ডাইৰেকটৰি হয়"
+msgstr "ফাইলটো ডাইৰেকটৰি হয়"
 
 #: ../daemon/gvfsafpvolume.c:402
 msgid "Too many files open"
-msgstr "বহু বেছি নথিপত্ৰ খোলা আছে"
+msgstr "বহু বেছি ফাইল খোলা আছে"
 
 #: ../daemon/gvfsafpvolume.c:672 ../daemon/gvfsafpvolume.c:829
 msgid "Target file is open"
-msgstr "গন্তব্য নথিপত্ৰ খোলা আছে"
+msgstr "গন্তব্য ফাইল খোলা আছে"
 
 #
 #: ../daemon/gvfsafpvolume.c:676 ../daemon/gvfsbackendburn.c:420
@@ -444,7 +444,7 @@ msgstr "আয়তনত পৰ্যাপ্ত স্থান নাই"
 #: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
 #: ../daemon/gvfsbackendsftp.c:4284 ../daemon/gvfsbackendsmb.c:2082
 msgid "Target file already exists"
-msgstr "লক্ষ্য নথিপত্ৰ ইতিমধ্যে অস্তিত্ববান"
+msgstr "লক্ষ্য ফাইল ইতিমধ্যে অস্তিত্ববান"
 
 #: ../daemon/gvfsafpvolume.c:837 ../daemon/gvfsafpvolume.c:1027
 msgid "Ancestor directory doesn't exist"
@@ -498,15 +498,15 @@ msgstr "চাৰ্ভাৰে FPCopyFile কাৰ্য্য সমৰ্�
 
 #: ../daemon/gvfsafpvolume.c:1563
 msgid "Unable to open source file for reading"
-msgstr "উৎস নথিপত্ৰক পঢ়াৰ বাবে খোলিবলে অক্ষম"
+msgstr "উৎস ফাইলক পঢ়াৰ বাবে খোলিবলে অক্ষম"
 
 #: ../daemon/gvfsafpvolume.c:1575
 msgid "Source file and/or destination directory doesn't exist"
-msgstr "উৎস নথিপত্ৰ আৰু/অথবা গন্তব্য ডাইৰেকটৰিৰ অস্তিত্ব নাই"
+msgstr "উৎস ফাইল আৰু/অথবা গন্তব্য ডাইৰেকটৰিৰ অস্তিত্ব নাই"
 
 #: ../daemon/gvfsafpvolume.c:1579
 msgid "Source file is a directory"
-msgstr "উৎস নথিপত্ৰ এটা ডাইৰেকটৰি"
+msgstr "উৎস ফাইল এটা ডাইৰেকটৰি"
 
 #: ../daemon/gvfsafpvolume.c:2009
 msgid "Range lock conflict exists"
@@ -522,23 +522,23 @@ msgstr "লক্ষ্য অবজেক্ট এটা ডাইৰেকট
 
 #: ../daemon/gvfsafpvolume.c:2643
 msgid "File is not open for write access"
-msgstr "নথিপত্ৰ লিখিব পৰা অভিগমৰ বাবে খোলা নহয়"
+msgstr "ফাইল লিখিব পৰা অভিগমৰ বাবে খোলা নহয়"
 
 #: ../daemon/gvfsafpvolume.c:2651
 msgid "File is locked by another user"
-msgstr "নথিপত্ৰ অন্য ব্যৱহাৰকাৰী দ্বাৰা লক কৰা আছে"
+msgstr "ফাইল অন্য ব্যৱহাৰকাৰী দ্বাৰা লক কৰা আছে"
 
 #: ../daemon/gvfsafpvolume.c:2790
 msgid "File is not open for read access"
-msgstr "নথিপত্ৰ পঢ়িব পৰা অভিগমৰ বাবে খোলা নহয়"
+msgstr "ফাইল পঢ়িব পৰা অভিগমৰ বাবে খোলা নহয়"
 
 #: ../daemon/gvfsbackendafc.c:209
 msgid "Internal Apple File Control error"
-msgstr "অভ্যন্তৰিক Apple নথিপত্ৰ নিয়ন্ত্ৰণ ত্ৰুটি"
+msgstr "অভ্যন্তৰিক Apple ফাইল নিয়ন্ত্ৰণ ত্ৰুটি"
 
 #: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:736
 msgid "File does not exist"
-msgstr "নথিপত্ৰ নাই"
+msgstr "ফাইল নাই"
 
 #: ../daemon/gvfsbackendafc.c:217
 msgid "The directory is not empty"
@@ -554,20 +554,20 @@ msgstr "সংযোগটো বাধাগ্ৰস্থ হৈছিল"
 
 #: ../daemon/gvfsbackendafc.c:229
 msgid "Invalid Apple File Control data received"
-msgstr "অবৈধ Apple নথিপত্ৰ নিয়ন্ত্ৰণ তথ্য প্ৰাপ্ত হৈছে"
+msgstr "অবৈধ Apple ফাইল নিয়ন্ত্ৰণ তথ্য প্ৰাপ্ত হৈছে"
 
 #: ../daemon/gvfsbackendafc.c:233
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
-msgstr "অনিয়ন্ত্ৰীত Apple নথিপত্ৰ নিয়ন্ত্ৰণ ত্ৰুটি (%d)"
+msgstr "অনিয়ন্ত্ৰীত Apple ফাইল নিয়ন্ত্ৰণ ত্ৰুটি (%d)"
 
 #: ../daemon/gvfsbackendafc.c:249
 msgid "Listing applications installed on device failed"
-msgstr "ডিভাইচত ইনস্টল থকা অনুপ্ৰয়োগসমূহ তালিকাভুক্ত কৰোতে ব্যৰ্থ"
+msgstr "ডিভাইচত ইনস্টল থকা এপ্লিকেচনসমূহ তালিকাভুক্ত কৰোতে ব্যৰ্থ"
 
 #: ../daemon/gvfsbackendafc.c:265
 msgid "Accessing application icons on device failed"
-msgstr "ডিভাইচত অনুপ্ৰয়োগ আইকনসমূহ অভিগম কৰোতে ব্যৰ্থ"
+msgstr "ডিভাইচত এপ্লিকেচন আইকনসমূহ অভিগম কৰোতে ব্যৰ্থ"
 
 #: ../daemon/gvfsbackendafc.c:282
 msgid "Lockdown Error: Invalid Argument"
@@ -694,7 +694,7 @@ msgstr "কাৰ্য্য অসমৰ্থিত"
 #: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1089
 #: ../daemon/gvfsbackendsmbbrowse.c:1135
 msgid "The file is not a mountable"
-msgstr "এই নথিপত্ৰটো মাউন্ট কৰিব নোৱাৰি"
+msgstr "এই ফাইলটো মাউন্ট কৰিব নোৱাৰি"
 
 #. Translators: first %s is username and second serververname
 #: ../daemon/gvfsbackendafpbrowse.c:452
@@ -743,13 +743,13 @@ msgstr "বেকআপৰ বাবে সমৰ্থন নাই"
 #: ../daemon/gvfsbackendafp.c:1243
 #, c-format
 msgid "Unable to create temporary file (%s)"
-msgstr "অস্থায়ী নথিপত্ৰ (%s) সৃষ্টি কৰিবলে অক্ষম"
+msgstr "অস্থায়ী ফাইল (%s) সৃষ্টি কৰিবলে অক্ষম"
 
 #
 #: ../daemon/gvfsbackendafp.c:1317 ../daemon/gvfsbackenddav.c:2370
 #: ../daemon/gvfsbackendsftp.c:3420 ../daemon/gvfsbackendsmb.c:1148
 msgid "The file was externally modified"
-msgstr "নথিপত্ৰটো বহিৰ্তমভাৱে পৰিবৰ্তন কৰা হৈছিল"
+msgstr "ফাইলটো বহিৰ্তমভাৱে পৰিবৰ্তন কৰা হৈছিল"
 
 #: ../daemon/gvfsbackendafp.c:1733 ../daemon/gvfsbackendftp.c:1128
 #: ../daemon/gvfsbackendsftp.c:4642
@@ -786,7 +786,7 @@ msgstr "%s ত /"
 #: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:724
 #: ../daemon/gvfsbackendsftp.c:3880 ../daemon/gvfsftpdircache.c:157
 msgid "The file is not a directory"
-msgstr "এই নথিপত্ৰটো এটা ডাইৰেকটৰি নহয়"
+msgstr "এই ফাইলটো এটা ডাইৰেকটৰি নহয়"
 
 #. Translators: This is the name of the backend
 #: ../daemon/gvfsbackendburn.c:346
@@ -809,12 +809,12 @@ msgstr "অস্থায়ী ডাইৰেকটৰি সৃষ্টি ক
 #: ../daemon/gvfsbackendsftp.c:2981 ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
-msgstr "এনে কোনো নথিপত্ৰ বা ডাইৰেকটৰি নাই"
+msgstr "এনে কোনো ফাইল বা ডাইৰেকটৰি নাই"
 
 #: ../daemon/gvfsbackendburn.c:454 ../daemon/gvfsbackendburn.c:899
 #: ../daemon/gvfsbackendobexftp.c:1810
 msgid "Can't copy file over directory"
-msgstr "ডাইৰেকটৰিত নথিপত্ৰ কপি কৰিব নোৱাৰি"
+msgstr "ডাইৰেকটৰিত ফাইল কপি কৰিব নোৱাৰি"
 
 #. Translators: this is the display name of the backend
 #: ../daemon/gvfsbackendburn.c:646
@@ -827,7 +827,7 @@ msgstr "CD/DVD সৃষ্টিকৰ্তা"
 #: ../daemon/gvfsbackendburn.c:985 ../daemon/gvfsbackendburn.c:995
 #: ../daemon/gvfsbackendgphoto2.c:2928
 msgid "File exists"
-msgstr "নথিপত্ৰ অস্তিত্ববান"
+msgstr "ফাইল অস্তিত্ববান"
 
 #: ../daemon/gvfsbackendburn.c:823 ../daemon/gvfsjobcloseread.c:112
 #: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:121
@@ -856,14 +856,14 @@ msgstr "কাৰ্য্য বেকএন্ড দ্বাৰা সমৰ
 
 #: ../daemon/gvfsbackendburn.c:848
 msgid "No such file or directory in target path"
-msgstr "লক্ষ্য পথত এনে কোনো নথিপত্ৰ বা ডাইৰেকটৰি উপস্থিত নাই"
+msgstr "লক্ষ্য পথত এনে কোনো ফাইল বা ডাইৰেকটৰি উপস্থিত নাই"
 
 #
 #: ../daemon/gvfsbackendburn.c:880 ../daemon/gvfsbackendobexftp.c:1787
 #: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1829
 #: ../daemon/gvfsbackendsftp.c:4440
 msgid "Target file exists"
-msgstr "লক্ষ্য নথিপত্ৰ অস্বিত্ববান"
+msgstr "লক্ষ্য ফাইল অস্বিত্ববান"
 
 #: ../daemon/gvfsbackendburn.c:945 ../daemon/gvfsbackendcomputer.c:795
 #: ../daemon/gvfsbackendgphoto2.c:2504 ../daemon/gvfsbackendgphoto2.c:2717
@@ -883,7 +883,7 @@ msgid ""
 "One or more applications are keeping the volume busy."
 msgstr ""
 "আয়তন বৰ্তমানে ব্যস্ত\n"
-"এটা অথবা অধিক অনুপ্ৰয়োগ দ্বাৰা আয়তন ব্যস্ত ৰখা হৈছে।"
+"এটা অথবা অধিক এপ্লিকেচন দ্বাৰা আয়তন ব্যস্ত ৰখা হৈছে।"
 
 #: ../daemon/gvfsbackendcdda.c:354 ../daemon/gvfsbackendgphoto2.c:1508
 msgid "Cannot create gudev client"
@@ -913,7 +913,7 @@ msgstr "ড্ৰাইভ পোৱা নগল: %s"
 #: ../daemon/gvfsbackendcdda.c:452
 #, c-format
 msgid "Drive %s does not contain audio files"
-msgstr "ড্ৰাইভ %sত কোনো অডিঅ' নথিপত্ৰ নাই"
+msgstr "ড্ৰাইভ %sত কোনো অডিঅ' ফাইল নাই"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
@@ -934,13 +934,13 @@ msgstr "অডিঅ' ডিস্ক"
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
-msgstr[0] "নথিপত্ৰ প্ৰণালী ব্যস্ত: %d খোলা নথিপত্ৰ"
-msgstr[1] "নথিপত্ৰ প্ৰণালী ব্যস্ত: %d খোলা নথিপত্ৰসমূহ"
+msgstr[0] "ফাইল চিস্টেম ব্যস্ত: %d খোলা ফাইল"
+msgstr[1] "ফাইল চিস্টেম ব্যস্ত: %d খোলা ফাইলসমূহ"
 
 #: ../daemon/gvfsbackendcdda.c:718
 #, c-format
 msgid "No such file %s on drive %s"
-msgstr "%s নামক কোনো নথিপত্ৰ, %s ড্ৰাইভত উপস্থিত নাই"
+msgstr "%s নামক কোনো ফাইল, %s ড্ৰাইভত উপস্থিত নাই"
 
 #. Translators: paranoia is the name of the cd audio reading library
 #: ../daemon/gvfsbackendcdda.c:827
@@ -956,16 +956,16 @@ msgstr "ড্ৰাইভ %s ত স্ট্ৰিম সন্ধান ক�
 #: ../daemon/gvfsbackendcdda.c:1004 ../daemon/gvfsbackendgphoto2.c:1818
 #, c-format
 msgid "No such file"
-msgstr "এনে কোনো নথিপত্ৰ নাই"
+msgstr "এনে কোনো ফাইল নাই"
 
 #: ../daemon/gvfsbackendcdda.c:1018
 #, c-format
 msgid "The file does not exist or isn't an audio track"
-msgstr "এই নামৰ নথিপত্ৰটো নাই অথবা অডিঅ' ট্ৰ্যাক নহয়"
+msgstr "এই নামৰ ফাইলটো নাই অথবা অডিঅ' ট্ৰ্যাক নহয়"
 
 #: ../daemon/gvfsbackendcdda.c:1124
 msgid "Audio CD File System Service"
-msgstr "অডিঅ' CD নথিপত্ৰ প্ৰণালী সেৱা"
+msgstr "অডিঅ' CD ফাইল চিস্টেম সেৱা"
 
 #: ../daemon/gvfsbackendcomputer.c:192 ../daemon/gvfsbackendcomputer.c:757
 msgid "Computer"
@@ -973,11 +973,11 @@ msgstr "কমপিউটাৰ"
 
 #: ../daemon/gvfsbackendcomputer.c:521
 msgid "File System"
-msgstr "নথিপত্ৰ প্ৰণালী"
+msgstr "ফাইল চিস্টেম"
 
 #: ../daemon/gvfsbackendcomputer.c:649
 msgid "Can't open mountable file"
-msgstr "মাউন্টযোগ্য নথিপত্ৰ খোলিব নোৱাৰি"
+msgstr "মাউন্টযোগ্য ফাইল খোলিব নোৱাৰি"
 
 #: ../daemon/gvfsbackendcomputer.c:841 ../daemon/gvfsbackendsftp.c:1162
 #, c-format
@@ -986,7 +986,7 @@ msgstr "অভ্যন্তৰীক ত্ৰুটি: %s"
 
 #: ../daemon/gvfsbackendcomputer.c:873 ../daemon/gvfsbackendcomputer.c:992
 msgid "Can't mount file"
-msgstr "নথিপত্ৰ মাউন্ট কৰিব নোৱাৰি"
+msgstr "ফাইল মাউন্ট কৰিব নোৱাৰি"
 
 #: ../daemon/gvfsbackendcomputer.c:885
 msgid "No medium in the drive"
@@ -996,15 +996,15 @@ msgstr "ড্ৰাইভত কোনো মাধ্যম নাই"
 #: ../daemon/gvfsbackendcomputer.c:1143 ../daemon/gvfsbackendcomputer.c:1233
 #: ../daemon/gvfsbackendcomputer.c:1306 ../daemon/gvfsbackendcomputer.c:1375
 msgid "Not a mountable file"
-msgstr "নথিপত্ৰটো মাউন্টযোগ্য নহয়"
+msgstr "ফাইলটো মাউন্টযোগ্য নহয়"
 
 #: ../daemon/gvfsbackendcomputer.c:1056
 msgid "Can't unmount file"
-msgstr "নথিপত্ৰটো আনমাউন্ট কৰিব নোৱাৰি"
+msgstr "ফাইলটো আনমাউন্ট কৰিব নোৱাৰি"
 
 #: ../daemon/gvfsbackendcomputer.c:1186
 msgid "Can't eject file"
-msgstr "নথিপত্ৰটো বাহিৰ কৰিব নোৱাৰি"
+msgstr "ফাইলটো বাহিৰ কৰিব নোৱাৰি"
 
 #: ../daemon/gvfsbackendcomputer.c:1253 ../daemon/gvfsbackendcomputer.c:1260
 #| msgid "Can't start file"
@@ -1018,7 +1018,7 @@ msgstr "ড্ৰাইভ বন্ধ কৰা নাযায়"
 
 #: ../daemon/gvfsbackendcomputer.c:1390 ../daemon/gvfsbackendcomputer.c:1397
 msgid "Can't poll file"
-msgstr "নথিপত্ৰ poll কৰা নাযায়"
+msgstr "ফাইল poll কৰা নাযায়"
 
 #. Translators: This is the name of the WebDAV share constructed as
 #. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
@@ -1085,7 +1085,7 @@ msgstr "অনুৰোধ সৃষ্টি কৰিব নোৱাৰি"
 #: ../daemon/gvfsbackenddav.c:2401 ../daemon/gvfsbackendsmb.c:1184
 #: ../daemon/gvfsbackendsmb.c:2099
 msgid "Backup file creation failed"
-msgstr "বেকআপ নথিপত্ৰ সৃষ্টি কৰা নাযায়"
+msgstr "বেকআপ ফাইল সৃষ্টি কৰা নাযায়"
 
 #. "separate": a link to dns-sd://local/
 #: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:447
@@ -1094,7 +1094,7 @@ msgstr "স্থানীয় নেটৱাৰ্ক"
 
 #: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:828
 msgid "Can't monitor file or directory."
-msgstr "নথিপত্ৰ বা ডাইৰেকটৰি নিৰীক্ষণ কৰিব নোৱাৰি"
+msgstr "ফাইল বা ডাইৰেকটৰি নিৰীক্ষণ কৰিব নোৱাৰি"
 
 #. TODO: Names, etc
 #: ../daemon/gvfsbackenddnssd.c:754
@@ -1147,17 +1147,17 @@ msgstr "বেকআপৰ বাবে সমৰ্থন নাই"
 #: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
 msgid "%s: %d: Directory or file exists"
-msgstr "%s: %d: ডাইৰেকটৰি অথবা নথিপত্ৰ অস্বিত্ববান"
+msgstr "%s: %d: ডাইৰেকটৰি অথবা ফাইল অস্বিত্ববান"
 
 #: ../daemon/gvfsbackendgphoto2.c:513
 #, c-format
 msgid "%s: %d: No such file or directory"
-msgstr "%s: %d: এনে কোনো নথিপত্ৰ বা ডাইৰেকটৰি নাই"
+msgstr "%s: %d: এনে কোনো ফাইল বা ডাইৰেকটৰি নাই"
 
 #: ../daemon/gvfsbackendgphoto2.c:519
 #, c-format
 msgid "%s: %d: Invalid filename"
-msgstr "%s: %d: অবৈধ নথিপত্ৰনাম "
+msgstr "%s: %d: অবৈধ ফাইলনাম "
 
 #: ../daemon/gvfsbackendgphoto2.c:525
 #, c-format
@@ -1241,15 +1241,15 @@ msgstr "কোনো কেমেৰা ধাৰ্য্য কৰা হো�
 
 #: ../daemon/gvfsbackendgphoto2.c:1826
 msgid "Error creating file object"
-msgstr "নথিপত্ৰ অবজেক্ট সৃষ্টি কৰোতে ত্ৰুটি"
+msgstr "ফাইল অবজেক্ট সৃষ্টি কৰোতে ত্ৰুটি"
 
 #: ../daemon/gvfsbackendgphoto2.c:1841
 msgid "Error getting file"
-msgstr "নথিপত্ৰ প্ৰাপ্ত কৰোতে ত্ৰুটি"
+msgstr "ফাইল প্ৰাপ্ত কৰোতে ত্ৰুটি"
 
 #: ../daemon/gvfsbackendgphoto2.c:1851
 msgid "Error getting data from file"
-msgstr "নথিপত্ৰৰ পৰা তথ্য প্ৰাপ্ত কৰোতে ত্ৰুটি"
+msgstr "ফাইলৰ পৰা তথ্য প্ৰাপ্ত কৰোতে ত্ৰুটি"
 
 #: ../daemon/gvfsbackendgphoto2.c:1909
 #, c-format
@@ -1273,7 +1273,7 @@ msgstr "ফোল্ডাৰ তালিকা প্ৰাপ্ত কৰা
 
 #: ../daemon/gvfsbackendgphoto2.c:2224
 msgid "Failed to get file list"
-msgstr "নথিপত্ৰৰ তালিকা প্ৰাপ্ত কৰা নাযায়"
+msgstr "ফাইলৰ তালিকা প্ৰাপ্ত কৰা নাযায়"
 
 #: ../daemon/gvfsbackendgphoto2.c:2516
 msgid "Error creating directory"
@@ -1293,7 +1293,7 @@ msgstr "ডাইৰেকটৰি পুনৰ নামকৰণ কৰোত
 
 #: ../daemon/gvfsbackendgphoto2.c:2763 ../daemon/gvfsbackendgphoto2.c:3397
 msgid "Error renaming file"
-msgstr "নথিপত্ৰৰ পুনৰ নামকৰণ কৰোতে ত্ৰুটি"
+msgstr "ফাইলৰ পুনৰ নামকৰণ কৰোতে ত্ৰুটি"
 
 #: ../daemon/gvfsbackendgphoto2.c:2827
 #, c-format
@@ -1306,7 +1306,7 @@ msgstr "ডাইৰেকটৰি মচোতে ত্ৰুটি"
 
 #: ../daemon/gvfsbackendgphoto2.c:2864
 msgid "Error deleting file"
-msgstr "নথিপত্ৰ মচোতে ত্ৰুটি"
+msgstr "ফাইল মচোতে ত্ৰুটি"
 
 #: ../daemon/gvfsbackendgphoto2.c:2917
 msgid "Can't write to directory"
@@ -1314,15 +1314,15 @@ msgstr "ডাইৰেকটৰিত লিখিব নোৱাৰি"
 
 #: ../daemon/gvfsbackendgphoto2.c:2964
 msgid "Cannot allocate new file to append to"
-msgstr "সংযোজন কৰাৰ বাবে নতুন নথিপত্ৰ আবন্টন কৰিব নোৱাৰি"
+msgstr "সংযোজন কৰাৰ বাবে নতুন ফাইল আবন্টন কৰিব নোৱাৰি"
 
 #: ../daemon/gvfsbackendgphoto2.c:2979
 msgid "Cannot read file to append to"
-msgstr "সংযোজন কৰাৰ বাবে চিহ্নিত নথিপত্ৰ পঢ়িব নোৱাৰি"
+msgstr "সংযোজন কৰাৰ বাবে চিহ্নিত ফাইল পঢ়িব নোৱাৰি"
 
 #: ../daemon/gvfsbackendgphoto2.c:2990
 msgid "Cannot get data of file to append to"
-msgstr "সংযোজন কৰাৰ বাবে চিহ্নিত নথিপত্ৰৰ তথ্য প্ৰাপ্ত কৰা নাযায়"
+msgstr "সংযোজন কৰাৰ বাবে চিহ্নিত ফাইলৰ তথ্য প্ৰাপ্ত কৰা নাযায়"
 
 #: ../daemon/gvfsbackendgphoto2.c:3281
 msgid "Error writing file"
@@ -1340,11 +1340,11 @@ msgstr "সমৰ্থিত নহয় (উৎস এটা ডাইৰেক�
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
-msgstr "সমৰ্থিত নহয় (উৎস এটা ডাইৰেকটৰি, গন্তব্য এটা অস্বিত্ববান নথিপত্ৰ)"
+msgstr "সমৰ্থিত নহয় (উৎস এটা ডাইৰেকটৰি, গন্তব্য এটা অস্বিত্ববান ফাইল)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3361
 msgid "Not supported (the source is a file, but the destination is a directory)"
-msgstr "সমৰ্থিত নহয় (উৎস এটা নথিপত্ৰ, কিন্তু গন্তব্য এটা ডাইৰেকটৰি)"
+msgstr "সমৰ্থিত নহয় (উৎস এটা ফাইল, কিন্তু গন্তব্য এটা ডাইৰেকটৰি)"
 
 #: ../daemon/gvfsbackendhttp.c:251
 #, c-format
@@ -1357,7 +1357,7 @@ msgstr "ডাইৰেকটৰি সকীয়নি সমৰ্থিত ন
 
 #: ../daemon/gvfsbackendnetwork.c:159
 msgid "File Sharing"
-msgstr "নথিপত্ৰ অংশীদাৰী"
+msgstr "ফাইল অংশীদাৰী"
 
 #: ../daemon/gvfsbackendnetwork.c:164
 msgid "Remote Login"
@@ -1402,7 +1402,7 @@ msgstr "ডিভাইচৰ এটা চফ্টৱেৰ আপডেটৰ
 #: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1973
 #, c-format
 msgid "Error deleting file: %s"
-msgstr "নথিপত্ৰ মচোতে ত্ৰুটি: %s"
+msgstr "ফাইল মচোতে ত্ৰুটি: %s"
 
 #: ../daemon/gvfsbackendrecent.c:238
 msgid "The recent folder may not be deleted"
@@ -1566,11 +1566,11 @@ msgstr "OpenIconForRead ত অবৈধ icon_id '%s'"
 #: ../daemon/gvfsbackendsftp.c:2745
 #, c-format
 msgid "Error creating backup file: %s"
-msgstr "বেকআপ নথিপত্ৰ সৃষ্টি কৰোতে ত্ৰুটি: %s"
+msgstr "বেকআপ ফাইল সৃষ্টি কৰোতে ত্ৰুটি: %s"
 
 #: ../daemon/gvfsbackendsftp.c:3349
 msgid "Unable to create temporary file"
-msgstr "অস্থায়ী নথিপত্ৰ সৃষ্টি কৰিবলে অক্ষম"
+msgstr "অস্থায়ী ফাইল সৃষ্টি কৰিবলে অক্ষম"
 
 #. translators: %s is a server name
 #: ../daemon/gvfsbackendsmbbrowse.c:375
@@ -1593,11 +1593,11 @@ msgstr "চাৰ্ভাৰৰ পৰা অংশীদাৰীৰ তাল
 #
 #: ../daemon/gvfsbackendsmbbrowse.c:1157
 msgid "Not a regular file"
-msgstr "সাধাৰণ নথিপত্ৰ নহয়"
+msgstr "সাধাৰণ ফাইল নহয়"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1489
 msgid "Windows Network File System Service"
-msgstr "Windows নেটৱাৰ্ক নথিপত্ৰ প্ৰণালী সেৱা"
+msgstr "Windows নেটৱাৰ্ক ফাইল চিস্টেম সেৱা"
 
 #. translators: First %s is a share name, second is a server name
 #: ../daemon/gvfsbackendsmb.c:238
@@ -1622,7 +1622,7 @@ msgstr "অসমৰ্থিত সন্ধানৰ ধৰণ"
 #: ../daemon/gvfsbackendsmb.c:1376
 #, c-format
 msgid "Backup file creation failed: %s"
-msgstr "বেকআপ নথিপত্ৰ সৃষ্টি কৰা নাযায়: %s"
+msgstr "বেকআপ ফাইল সৃষ্টি কৰা নাযায়: %s"
 
 #: ../daemon/gvfsbackendsmb.c:1734
 msgid "Invalid attribute type (uint64 expected)"
@@ -1630,17 +1630,17 @@ msgstr "অবৈধ বৈশিষ্ট্যৰ ধৰণ (uint64 আশা 
 
 #: ../daemon/gvfsbackendsmb.c:1922
 msgid "Can't rename file, filename already exists"
-msgstr "নথিপত্ৰ পুনৰ নামকৰণ কৰিব নোৱাৰি, নথিপত্ৰনাম ইতিমধ্যে অস্তিত্ববান"
+msgstr "ফাইল পুনৰ নামকৰণ কৰিব নোৱাৰি, ফাইলনাম ইতিমধ্যে অস্তিত্ববান"
 
 #: ../daemon/gvfsbackendsmb.c:2047
 #, c-format
 msgid "Error moving file: %s"
-msgstr "নথিপত্ৰ স্থানান্তৰ কৰোতে ত্ৰুটি: %s"
+msgstr "ফাইল স্থানান্তৰ কৰোতে ত্ৰুটি: %s"
 
 #: ../daemon/gvfsbackendsmb.c:2119
 #, c-format
 msgid "Error removing target file: %s"
-msgstr "লক্ষ্য নথিপত্ৰ আতৰাওতে ত্ৰুটি: %s"
+msgstr "লক্ষ্য ফাইল আতৰাওতে ত্ৰুটি: %s"
 
 #: ../daemon/gvfsbackendsmb.c:2143
 msgid "Can't recursively move directory"
@@ -1648,7 +1648,7 @@ msgstr "বাৰংবাৰতা ৰূপে ডাইৰেকটৰি স
 
 #: ../daemon/gvfsbackendsmb.c:2187
 msgid "Windows Shares File System Service"
-msgstr "Windows অংশীদাৰীসমূহ নথিপত্ৰ প্ৰণালী সেৱা"
+msgstr "Windows অংশীদাৰীসমূহ ফাইল চিস্টেম সেৱা"
 
 #: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
 msgid "The trash folder may not be deleted"
@@ -1686,7 +1686,7 @@ msgstr "সক্ৰিয় FTP সংযোগ সৃষ্টি কৰা ন�
 
 #: ../daemon/gvfsftpfile.c:170
 msgid "Filename contains invalid characters."
-msgstr "নথিপত্ৰৰ নামত অবৈধ অক্ষৰ আছে।"
+msgstr "ফাইলৰ নামত অবৈধ অক্ষৰ আছে।"
 
 #: ../daemon/gvfsftptask.c:261
 msgid "The FTP server is busy. Try again later"
@@ -1727,7 +1727,7 @@ msgstr "অজ্ঞাত পৃষ্ঠা ধৰণ"
 #
 #: ../daemon/gvfsftptask.c:407
 msgid "Invalid filename"
-msgstr "অবৈধ নথিপত্ৰৰ নাম"
+msgstr "অবৈধ ফাইলৰ নাম"
 
 #: ../daemon/gvfsjobmakesymlink.c:111
 msgid "Symlinks not supported by backend"
@@ -1753,7 +1753,7 @@ msgstr ""
 
 #: ../daemon/gvfsjobunmount.c:197
 msgid "File system is busy"
-msgstr "নথিপত্ৰ প্ৰণালী ব্যস্ত"
+msgstr "ফাইল চিস্টেম ব্যস্ত"
 
 #: ../daemon/main.c:133 ../metadata/meta-daemon.c:445
 msgid "Replace old daemon."
@@ -1820,7 +1820,7 @@ msgstr "স্থানটো মাউন্ট কৰা নাযায়"
 #: ../metadata/meta-daemon.c:373
 #, c-format
 msgid "Can't find metadata file %s"
-msgstr "মেটাডাটা নথিপত্ৰ %s বিচাৰি পোৱা নাযায়"
+msgstr "মেটাডাটা ফাইল %s বিচাৰি পোৱা নাযায়"
 
 #: ../metadata/meta-daemon.c:151 ../metadata/meta-daemon.c:163
 msgid "Unable to set metadata key"
@@ -2303,7 +2303,7 @@ msgstr "কি'ৰিংৰ পৰা অবৈধ পাচফ্ৰেইছ �
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:1108
 msgid "The unlocked device does not have a recognizable file system on it"
-msgstr "আনলক কৰা ডিভাইচৰ চিনাক্ত কৰিব পৰা এটা নথিপত্ৰ প্ৰণালী নাই"
+msgstr "আনলক কৰা ডিভাইচৰ চিনাক্ত কৰিব পৰা এটা ফাইল চিস্টেম নাই"
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:1137
 #, c-format
@@ -2345,7 +2345,7 @@ msgstr "GVfs UDisks2 আয়তন পৰ্যবেক্ষক"
 #: ../programs/gvfs-cat.c:58
 #, c-format
 msgid "%s: %s: error opening file: %s\n"
-msgstr "%s: %s: নথিপত্ৰ খোলিবলৈ ত্ৰুটি: %s\n"
+msgstr "%s: %s: ফাইল খোলিবলৈ ত্ৰুটি: %s\n"
 
 #. Translators: the first %s is the program name, the
 #. second one is the URI of the file.
@@ -2377,7 +2377,7 @@ msgstr "FILE"
 #. and before the list of options.
 #: ../programs/gvfs-cat.c:146
 msgid "Concatenate files and print to the standard output."
-msgstr "নথিপত্ৰসমূহ সংযোজন কৰে আৰু প্ৰামাণিক আউটপুটলে প্ৰিন্ট কৰে।"
+msgstr "ফাইলসমূহ সংযোজন কৰে আৰু প্ৰামাণিক আউটপুটলে প্ৰিন্ট কৰে।"
 
 #: ../programs/gvfs-cat.c:147
 msgid ""
@@ -2385,7 +2385,7 @@ msgid ""
 "locations instead of local files: for example you can use something\n"
 "like smb://server/resource/file.txt as location."
 msgstr ""
-"gvfs-cat পাৰম্পৰিক cat সঁজুলিৰ নিচিনা কাৰ্য্য কৰে, কেৱল স্থানীয় নথিপত্ৰসমূহৰ "
+"gvfs-cat পাৰম্পৰিক cat সঁজুলিৰ নিচিনা কাৰ্য্য কৰে, কেৱল স্থানীয় ফাইলসমূহৰ "
 "পৰিৱৰ্তে\n"
 "gvfs অৱস্থানসমূহ ব্যৱহাৰ কৰি: উদাহৰণস্বৰূপ আপুনি smb://server/resource/file.txt ৰ "
 "নিচিনা কিবা এটাক অৱস্থান হিচাপে ব্যৱহাৰ কৰিব পাৰিব।"
@@ -2437,7 +2437,7 @@ msgstr "সকলো বৈশিষ্ট্য অপৰিবৰ্তিত 
 #: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
 #: ../programs/gvfs-save.c:43
 msgid "Backup existing destination files"
-msgstr "অস্তিত্ববান গন্তব্য নথিপত্ৰসমূহৰ বেকআপ লওক"
+msgstr "অস্তিত্ববান গন্তব্য ফাইলসমূহৰ বেকআপ লওক"
 
 #: ../programs/gvfs-copy.c:49
 msgid "Never follow symbolic links"
@@ -2459,7 +2459,7 @@ msgstr "DEST"
 
 #: ../programs/gvfs-copy.c:122
 msgid "Copy one or more files from SOURCE to DEST."
-msgstr "এটা বা অধিক নথিপত্ৰসমূহ SOURCE ৰ পৰা DEST লে কপি কৰক।"
+msgstr "এটা বা অধিক ফাইলসমূহ SOURCE ৰ পৰা DEST লে কপি কৰক।"
 
 #: ../programs/gvfs-copy.c:141 ../programs/gvfs-move.c:129
 #: ../programs/gvfs-rename.c:83
@@ -2483,7 +2483,7 @@ msgstr "%s নতুনকৈ লিখা হ'ব নেকি ?"
 #: ../programs/gvfs-copy.c:217
 #, c-format
 msgid "Error copying file %s: %s\n"
-msgstr "%s নথিপত্ৰ কপি কৰোতে ত্ৰুটি: %s\n"
+msgstr "%s ফাইল কপি কৰোতে ত্ৰুটি: %s\n"
 
 #: ../programs/gvfs-info.c:37
 msgid "List writable attributes"
@@ -2491,7 +2491,7 @@ msgstr "লিখাৰযোগ্য বৈশিষ্ট্যসমূহ�
 
 #: ../programs/gvfs-info.c:38
 msgid "Get file system info"
-msgstr "নথিপত্ৰ প্ৰণালী তথ্য প্ৰাপ্ত কৰক"
+msgstr "ফাইল চিস্টেম তথ্য প্ৰাপ্ত কৰক"
 
 #: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
 msgid "The attributes to get"
@@ -2577,11 +2577,11 @@ msgstr "লুকুৱা\n"
 
 #: ../programs/gvfs-info.c:270
 msgid "Copy with file"
-msgstr "নথিপত্ৰৰ সৈতে কপি কৰক"
+msgstr "ফাইলৰ সৈতে কপি কৰক"
 
 #: ../programs/gvfs-info.c:274
 msgid "Keep with file when moved"
-msgstr "স্থানান্তৰ কৰোতে নথিপত্ৰৰ সৈতে ৰাখক"
+msgstr "স্থানান্তৰ কৰোতে ফাইলৰ সৈতে ৰাখক"
 
 #: ../programs/gvfs-info.c:311
 #, c-format
@@ -2612,7 +2612,7 @@ msgstr "অৱস্থানসমূহৰ বিষয়ে তথ্য দে
 
 #: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
 msgid "Show hidden files"
-msgstr "লুকুৱা নথিপত্ৰ দেখুৱাওক"
+msgstr "লুকুৱা ফাইল দেখুৱাওক"
 
 #: ../programs/gvfs-ls.c:41
 msgid "Use a long listing format"
@@ -2643,9 +2643,9 @@ msgid ""
 "like smb://server/resource/file.txt as location. File attributes can\n"
 "be specified with their gvfs name, e.g. standard::icon."
 msgstr ""
-"gvfs-ls পাৰম্পৰিক ls সঁজুলিৰ সৈতে সদৃশ, কিন্তু স্থানীয় নথিপত্ৰসমূহৰ পৰিৱৰ্তে\n"
+"gvfs-ls পাৰম্পৰিক ls সঁজুলিৰ সৈতে সদৃশ, কিন্তু স্থানীয় ফাইলসমূহৰ পৰিৱৰ্তে\n"
 "gvfs অৱস্থানসমূহ ব্যৱহাৰ কৰি: উদাহৰণস্বৰূপ আপুনি smb://server/resource/file.txt\n"
-"ৰ নিচিনা কিবা এটাক অৱস্থান হিচাপে ব্যৱহাৰ কৰিব পাৰিব। নথিপত্ৰ বৈশিষ্টসমূহ সিহতৰ "
+"ৰ নিচিনা কিবা এটাক অৱস্থান হিচাপে ব্যৱহাৰ কৰিব পাৰিব। ফাইল বৈশিষ্টসমূহ সিহতৰ "
 "gvfs নামৰ\n"
 "সৈতে ধাৰ্য্য কৰিব পাৰি, উদাহৰণস্বৰূপ standard::icon।"
 
@@ -2686,32 +2686,32 @@ msgstr "অবিকল্পিত ব্যৱস্থাপকৰে অন�
 #: ../programs/gvfs-mime.c:128
 #, c-format
 msgid "No default applications for '%s'\n"
-msgstr "'%s' ৰ বাবে কোনো অবিকল্প অনুপ্ৰয়োগ নাই\n"
+msgstr "'%s' ৰ বাবে কোনো অবিকল্প এপ্লিকেচন নাই\n"
 
 #: ../programs/gvfs-mime.c:134
 #, c-format
 msgid "Default application for '%s': %s\n"
-msgstr "'%s' ৰ বাবে অবিকল্প অনুপ্ৰয়োগ: %s\n"
+msgstr "'%s' ৰ বাবে অবিকল্প এপ্লিকেচন: %s\n"
 
 #: ../programs/gvfs-mime.c:139
 #, c-format
 msgid "Registered applications:\n"
-msgstr "ৰেজিস্টাৰ কৰা অনুপ্ৰয়োগসমূহ:\n"
+msgstr "ৰেজিস্টাৰ কৰা এপ্লিকেচনসমূহ:\n"
 
 #: ../programs/gvfs-mime.c:141
 #, c-format
 msgid "No registered applications\n"
-msgstr "কোনো ৰেজিস্টাৰ কৰা অনুপ্ৰয়োগ নাই\n"
+msgstr "কোনো ৰেজিস্টাৰ কৰা এপ্লিকেচন নাই\n"
 
 #: ../programs/gvfs-mime.c:152
 #, c-format
 msgid "Recommended applications:\n"
-msgstr "উপদেশিত অনুপ্ৰয়োগসমূহ:\n"
+msgstr "উপদেশিত এপ্লিকেচনসমূহ:\n"
 
 #: ../programs/gvfs-mime.c:154
 #, c-format
 msgid "No recommended applications\n"
-msgstr "কোনো উপদেশিত অনুপ্ৰয়োগ নাই\n"
+msgstr "কোনো উপদেশিত এপ্লিকেচন নাই\n"
 
 #: ../programs/gvfs-mime.c:174
 #, c-format
@@ -2746,7 +2746,7 @@ msgstr "ডাইৰেকটৰিসমূহ পৰিবৰ্তনৰ ব�
 
 #: ../programs/gvfs-monitor-file.c:112
 msgid "Monitor files for changes."
-msgstr "নথিপত্ৰসমূহ পৰিবৰ্তনৰ বাবে পৰ্যবেক্ষণ কৰক।"
+msgstr "ফাইলসমূহ পৰিবৰ্তনৰ বাবে পৰ্যবেক্ষণ কৰক।"
 
 #: ../programs/gvfs-mount.c:57
 msgid "Mount as mountable"
@@ -2754,7 +2754,7 @@ msgstr "মাউন্ট কৰাৰ যোগ্য হিছাপে ম�
 
 #: ../programs/gvfs-mount.c:58
 msgid "Mount volume with device file"
-msgstr "ডিভাইচ নথিপত্ৰ সহযোগে আয়তন মাউন্ট কৰক"
+msgstr "ডিভাইচ ফাইল সহযোগে আয়তন মাউন্ট কৰক"
 
 #: ../programs/gvfs-mount.c:58
 msgid "DEVICE"
@@ -2822,7 +2822,7 @@ msgstr "%s ক %s ত মাউন্ট কৰা হৈছে\n"
 #: ../programs/gvfs-mount.c:825
 #, c-format
 msgid "No volume for device file %s\n"
-msgstr "ডিভাইচ নথিপত্ৰ %s ৰ বাবে কোনো আয়তন উপস্থিত নাই\n"
+msgstr "ডিভাইচ ফাইল %s ৰ বাবে কোনো আয়তন উপস্থিত নাই\n"
 
 #: ../programs/gvfs-mount.c:1023
 msgid "Mount the locations."
@@ -2830,12 +2830,12 @@ msgstr "অৱস্থানসমূহ মাউন্ট কৰক।"
 
 #: ../programs/gvfs-move.c:110
 msgid "Move one or more files from SOURCE to DEST."
-msgstr "এটা বা অধিক নথিপত্ৰসমূহ SOURCE ৰ পৰা DEST লে স্থানান্তৰ কৰক।"
+msgstr "এটা বা অধিক ফাইলসমূহ SOURCE ৰ পৰা DEST লে স্থানান্তৰ কৰক।"
 
 #: ../programs/gvfs-move.c:199
 #, c-format
 msgid "Error moving file %s: %s\n"
-msgstr "%s নথিপত্ৰ স্তানান্তৰ কৰোতে ত্ৰুটি: %s\n"
+msgstr "%s ফাইল স্তানান্তৰ কৰোতে ত্ৰুটি: %s\n"
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -2844,8 +2844,8 @@ msgid ""
 "Open files with the default application that\n"
 "is registered to handle files of this type."
 msgstr ""
-"এই ধৰণৰ নথিপত্ৰ ব্যৱস্থাপনা কৰিবলে ৰেজিস্টাৰ্ড অবিকল্পিত\n"
-"অনুপ্ৰয়োগৰ সৈতে নথিপত্ৰসমূহ খোলক।"
+"এই ধৰণৰ ফাইল ব্যৱস্থাপনা কৰিবলে ৰেজিস্টাৰ্ড অবিকল্পিত\n"
+"এপ্লিকেচনৰ সৈতে ফাইলসমূহ খোলক।"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -2860,7 +2860,7 @@ msgstr "NEW-NAME"
 
 #: ../programs/gvfs-rename.c:65
 msgid "Rename a file."
-msgstr "এটা নথিপত্ৰ পুনৰনামকৰণ কৰক।"
+msgstr "এটা ফাইল পুনৰনামকৰণ কৰক।"
 
 #: ../programs/gvfs-rename.c:104
 #, c-format
@@ -2869,11 +2869,11 @@ msgstr "সফলতাৰে সৈতে পুনৰ নামকৰণ ক�
 
 #: ../programs/gvfs-rm.c:34 ../programs/gvfs-trash.c:34
 msgid "Ignore nonexistent files, never prompt"
-msgstr "অস্তিত্ব নহোৱা নথিপত্ৰসমূহ উপেক্ষা কৰক, কেতিয়াও নুসুধিব"
+msgstr "অস্তিত্ব নহোৱা ফাইলসমূহ উপেক্ষা কৰক, কেতিয়াও নুসুধিব"
 
 #: ../programs/gvfs-rm.c:59
 msgid "Delete the given files."
-msgstr "প্ৰদান কৰা নথিপত্ৰসমূহ মচি পেলাওক।"
+msgstr "প্ৰদান কৰা ফাইলসমূহ মচি পেলাওক।"
 
 #: ../programs/gvfs-save.c:44
 msgid "Only create if not existing"
@@ -2881,7 +2881,7 @@ msgstr "অকল উপস্থিত নাথাকিলে সৃষ্ট
 
 #: ../programs/gvfs-save.c:45
 msgid "Append to end of file"
-msgstr "নথিপত্ৰৰ শেষত যোগ কৰক"
+msgstr "ফাইলৰ শেষত যোগ কৰক"
 
 #: ../programs/gvfs-save.c:46
 msgid "When creating, restrict access to the current user"
@@ -2895,7 +2895,7 @@ msgstr "শেষত নতুন etag প্ৰিন্ট কৰক"
 #. Translators: The "etag" is a token allowing to verify whether a file has been modified
 #: ../programs/gvfs-save.c:50
 msgid "The etag of the file being overwritten"
-msgstr "নতুনকৈ লিখাৰ বাবে চিহ্নিত নথিপত্ৰৰ etag"
+msgstr "নতুনকৈ লিখাৰ বাবে চিহ্নিত ফাইলৰ etag"
 
 #: ../programs/gvfs-save.c:50
 msgid "ETAG"
@@ -2904,7 +2904,7 @@ msgstr "ETAG"
 #: ../programs/gvfs-save.c:78
 #, c-format
 msgid "Error opening file: %s\n"
-msgstr "নথিপত্ৰ খোলিবলৈ ত্ৰুটি: %s\n"
+msgstr "ফাইল খোলিবলৈ ত্ৰুটি: %s\n"
 
 #: ../programs/gvfs-save.c:111
 msgid "Error reading stdin"
@@ -2943,7 +2943,7 @@ msgstr "VALUE"
 
 #: ../programs/gvfs-set-attribute.c:140
 msgid "Set a file attribute of LOCATION."
-msgstr "LOCATION ৰ এটা নথিপত্ৰ বৈশিষ্ট সংহতি কৰক।"
+msgstr "LOCATION ৰ এটা ফাইল বৈশিষ্ট সংহতি কৰক।"
 
 #: ../programs/gvfs-set-attribute.c:159
 msgid "Location not specified\n"
@@ -2969,12 +2969,12 @@ msgstr "বৈশিষ্ট্য সংহতি কৰোতে ত্ৰু
 
 #: ../programs/gvfs-trash.c:58
 msgid "Move files or directories to the trash."
-msgstr "নথিপত্ৰসমূহ অথবা ডাইৰেকটৰিসমূহক আবৰ্জনালে স্থানান্তৰ কৰক।"
+msgstr "ফাইলসমূহ অথবা ডাইৰেকটৰিসমূহক আবৰ্জনালে স্থানান্তৰ কৰক।"
 
 #: ../programs/gvfs-trash.c:89
 #, c-format
 msgid "Error trashing file: %s\n"
-msgstr "নথিপত্ৰক আবৰ্জনাত পঠাওতে ত্ৰুটি: %s\n"
+msgstr "ফাইলক আবৰ্জনাত পঠাওতে ত্ৰুটি: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symbolic links, mounts and shortcuts"
@@ -3026,7 +3026,7 @@ msgstr "এটা ট্ৰি অনুৰূপ বিন্যাসত ড�
 #~ msgstr "অবৈধ বেকএন্ড ধৰণ"
 
 #~ msgid "Error sending file descriptor: %s"
-#~ msgstr "নথিপত্ৰ বিৱৰক পঠাওতে ত্ৰুটি: %s"
+#~ msgstr "ফাইল বিৱৰক পঠাওতে ত্ৰুটি: %s"
 
 #~ msgid "Invalid arguments from spawned child"
 #~ msgstr "spawn কৰা চাইল্ডৰ পৰা প্ৰাপ্ত তৰ্কসমূহ অবৈধ"
@@ -3035,25 +3035,25 @@ msgstr "এটা ট্ৰি অনুৰূপ বিন্যাসত ড�
 #~ msgstr "অৱস্থানসমূহ"
 
 #~ msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
-#~ msgstr "SOURCE... DEST - নথিপত্ৰ(সমূহ) SOURCE ৰ পৰা DEST লে কপি কৰক"
+#~ msgstr "SOURCE... DEST - ফাইল(সমূহ) SOURCE ৰ পৰা DEST লে কপি কৰক"
 
 #~ msgid "- list files at <location>"
-#~ msgstr "<location> ত অস্বিত্ববান নথিপত্ৰসমূহ তালিকাভুক্ত কৰক"
+#~ msgstr "<location> ত অস্বিত্ববান ফাইলসমূহ তালিকাভুক্ত কৰক"
 
 #~ msgid "- get/set handler for <mimetype>"
 #~ msgstr "<mimetype> ৰ বাবে ব্যৱস্থাপক - প্ৰাপ্ত কৰক/গ্ৰহণ কৰক"
 
 #~ msgid "files"
-#~ msgstr "নথিপত্ৰসমূহ"
+#~ msgstr "ফাইলসমূহ"
 
 #~ msgid "%s: %s: error launching application: %s\n"
-#~ msgstr "%s: %s: অনুপ্ৰয়োগ আৰম্ভ কৰোতে ত্ৰুটি: %s\n"
+#~ msgstr "%s: %s: এপ্লিকেচন আৰম্ভ কৰোতে ত্ৰুটি: %s\n"
 
 #~ msgid "FILES... - open FILES with registered application."
-#~ msgstr "FILES... - ৰেজিস্টাৰ্ড অনুপ্ৰয়োগসমূহৰ সৈতে FILES খোলক।"
+#~ msgstr "FILES... - ৰেজিস্টাৰ্ড এপ্লিকেচনসমূহৰ সৈতে FILES খোলক।"
 
 #~ msgid "- delete files"
-#~ msgstr "- নথিপত্ৰসমূহ মচি পেলাওক"
+#~ msgstr "- ফাইলসমূহ মচি পেলাওক"
 
 #~ msgid "Create backup"
 #~ msgstr "বেকআপ সৃষ্টি কৰক"
@@ -3069,7 +3069,7 @@ msgstr "এটা ট্ৰি অনুৰূপ বিন্যাসত ড�
 #~ msgstr " <location> <attribute> <values> - বৈশিষ্ট্য ধাৰ্য্য কৰক"
 
 #~ msgid "- move files to trash"
-#~ msgstr "- নথিপত্ৰসমূহ আবৰ্জনাত স্থানান্তৰ কৰক"
+#~ msgstr "- ফাইলসমূহ আবৰ্জনাত স্থানান্তৰ কৰক"
 
 #~ msgid "Server doesn't support passwords longer than 256 characters"
 #~ msgstr "চাৰ্ভাৰে ২৫৬ আখৰতকে দীঘল পাছৱাৰ্ডসমূহ সমৰ্থন নকৰে"
@@ -3090,11 +3090,11 @@ msgstr "এটা ট্ৰি অনুৰূপ বিন্যাসত ড�
 
 #~| msgid "File is directory"
 #~ msgid "File is a directory"
-#~ msgstr "নথিপত্ৰটো এটা ডাইৰেকটৰি"
+#~ msgstr "ফাইলটো এটা ডাইৰেকটৰি"
 
 #~| msgid "Unable to create temporary file"
 #~ msgid "Couldn't create temporary file (%s)"
-#~ msgstr "অস্থায়ী নথিপত্ৰ (%s) সৃষ্টি কৰিব নোৱাৰি"
+#~ msgstr "অস্থায়ী ফাইল (%s) সৃষ্টি কৰিব নোৱাৰি"
 
 #~ msgid "FPGetUserInfo failed (%s)"
 #~ msgstr "FPGetUserInfo ব্যৰ্থ হল (%s)"
@@ -3146,7 +3146,7 @@ msgstr "এটা ট্ৰি অনুৰূপ বিন্যাসত ড�
 #~ msgstr "পাছৱাৰ্ড সুমুৱাওক"
 
 #~ msgid "- output files at <location>"
-#~ msgstr "- <location> ত উপস্থিত নিৰ্গম নথিপত্ৰ"
+#~ msgstr "- <location> ত উপস্থিত নিৰ্গম ফাইল"
 
 #~ msgid "broken transmission"
 #~ msgstr "বিচ্ছিন্ন সংযোগ"
