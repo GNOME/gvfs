@@ -646,8 +646,12 @@ fill_mountable_info (GDaemonVfs *vfs)
                                                               NULL,
                                                               &error))
     {
-      g_printerr ("org.gtk.vfs.MountTracker.listMountableInfo call failed: %s (%s, %d)\n",
-                  error->message, g_quark_to_string (error->domain), error->code);
+      /* Don't warn if we're running a new gvfs plugin against an old gvfs-daemon,
+       * as happens in jhbuild.
+       */
+      if (!g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
+	g_printerr ("org.gtk.vfs.MountTracker.listMountableInfo call failed: %s (%s, %d)\n",
+		    error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
       return;
     }
