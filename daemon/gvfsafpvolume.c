@@ -142,7 +142,7 @@ g_vfs_afp_volume_mount_sync (GVfsAfpVolume *volume,
 generic_error:
   /* Translators: first %s is volumename and second servername */ 
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               _("Couldn't mount AFP volume %s on %s"), volume_name,
+               _("Couldn't load %s on %s"), volume_name,
                g_vfs_afp_server_get_info(priv->server)->server_name);
   return FALSE;
 }

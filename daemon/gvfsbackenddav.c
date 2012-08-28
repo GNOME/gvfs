@@ -482,15 +482,12 @@ g_vfs_backend_dav_setup_display_name (GVfsBackend *backend)
     /* Translators: This is the name of the WebDAV share constructed as
        "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
        the second %s and only shown if it is not the default http(s) port. */
-    display_name = g_strdup_printf (_("WebDAV as %s on %s%s"),
+    display_name = g_strdup_printf (_("%s on %s%s"),
 				    mount_base->user,
 				    mount_base->host,
 				    port);
   else
-    /* Translators: This is the name of the WebDAV share constructed as
-       "WebDAV on <hostname>:<port>"; The ":port" part is again the second
-       %s and it is only shown if it is not the default http(s) port. */
-    display_name = g_strdup_printf (_("WebDAV on %s%s"),
+    display_name = g_strdup_printf ("%s%s",
 				    mount_base->host,
 				    port);
 
