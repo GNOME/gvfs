@@ -45,6 +45,7 @@ typedef struct {
   char *stable_name;
   char *x_content_types;
   GIcon *icon;
+  GIcon *symbolic_icon;
   char *dbus_id;
   char *object_path;
   gboolean user_visible;

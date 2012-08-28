@@ -55,6 +55,7 @@ struct _GProxyVolume {
   char *uuid;
   char *activation_uri;
   GIcon *icon;
+  GIcon *symbolic_icon;
   char *drive_id;
   char *mount_id;
   GHashTable *identifiers;
@@ -110,6 +111,8 @@ g_proxy_volume_finalize (GObject *object)
   g_free (volume->activation_uri);
   if (volume->icon != NULL)
     g_object_unref (volume->icon);
+  if (volume->symbolic_icon != NULL)
+    g_object_unref (volume->symbolic_icon);
   g_free (volume->drive_id);
   g_free (volume->mount_id);
   if (volume->identifiers != NULL)
@@ -342,6 +345,7 @@ update_shadow_mount_in_idle (GProxyVolume *volume)
 /* string               id
  * string               name
  * string               gicon_data
+ * string               symbolic_gicon_data
  * string               uuid
  * string               activation_uri
  * boolean              can-mount
@@ -353,7 +357,7 @@ update_shadow_mount_in_idle (GProxyVolume *volume)
  * a{sv}                expansion
  */
 
-#define VOLUME_STRUCT_TYPE "(&s&s&s&s&sbb&s&sa{ss}&sa{sv})"
+#define VOLUME_STRUCT_TYPE "(&s&s&s&s&s&sbb&s&sa{ss}&sa{sv})"
 
 void g_proxy_volume_update (GProxyVolume    *volume,
                             GVariant        *iter)
@@ -361,6 +365,7 @@ void g_proxy_volume_update (GProxyVolume    *volume,
   const char *id;
   const char *name;
   const char *gicon_data;
+  const char *symbolic_gicon_data = NULL;
   const char *uuid;
   const char *activation_uri;
   const char *drive_id;
@@ -375,6 +380,7 @@ void g_proxy_volume_update (GProxyVolume    *volume,
   sort_key = NULL;
   g_variant_get (iter, VOLUME_STRUCT_TYPE,
                  &id, &name, &gicon_data, 
+                 &symbolic_gicon_data,
                  &uuid, &activation_uri, 
                  &can_mount, &should_automount, 
                  &drive_id, &mount_id, 
@@ -406,6 +412,8 @@ void g_proxy_volume_update (GProxyVolume    *volume,
   g_free (volume->activation_uri);
   if (volume->icon != NULL)
     g_object_unref (volume->icon);
+  if (volume->symbolic_icon != NULL)
+    g_object_unref (volume->symbolic_icon);
   g_free (volume->drive_id);
   g_free (volume->mount_id);
   if (volume->identifiers != NULL)
@@ -421,6 +429,10 @@ void g_proxy_volume_update (GProxyVolume    *volume,
     volume->icon = NULL;
   else
     volume->icon = g_icon_new_for_string (gicon_data, NULL);
+  if (*symbolic_gicon_data == 0)
+    volume->symbolic_icon = NULL;
+  else
+    volume->symbolic_icon = g_icon_new_for_string (symbolic_gicon_data, NULL);
   volume->drive_id = g_strdup (drive_id);
   volume->mount_id = g_strdup (mount_id);
   volume->can_mount = can_mount;
@@ -453,6 +465,18 @@ g_proxy_volume_get_icon (GVolume *volume)
 
   G_LOCK (proxy_volume);
   icon = proxy_volume->icon != NULL ? g_object_ref (proxy_volume->icon) : NULL;
+  G_UNLOCK (proxy_volume);
+  return icon;
+}
+
+static GIcon *
+g_proxy_volume_get_symbolic_icon (GVolume *volume)
+{
+  GProxyVolume *proxy_volume = G_PROXY_VOLUME (volume);
+  GIcon *icon;
+
+  G_LOCK (proxy_volume);
+  icon = proxy_volume->symbolic_icon != NULL ? g_object_ref (proxy_volume->symbolic_icon) : NULL;
   G_UNLOCK (proxy_volume);
   return icon;
 }
@@ -970,6 +994,7 @@ g_proxy_volume_volume_iface_init (GVolumeIface *iface)
 {
   iface->get_name = g_proxy_volume_get_name;
   iface->get_icon = g_proxy_volume_get_icon;
+  iface->get_symbolic_icon = g_proxy_volume_get_symbolic_icon;
   iface->get_uuid = g_proxy_volume_get_uuid;
   iface->get_drive = g_proxy_volume_get_drive;
   iface->get_mount = g_proxy_volume_get_mount;

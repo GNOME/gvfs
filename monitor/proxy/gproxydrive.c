@@ -47,6 +47,7 @@ struct _GProxyDrive {
   char *id;
   char *name;
   GIcon *icon;
+  GIcon *symbolic_icon;
   char **volume_ids;
   gboolean can_eject;
   gboolean can_poll_for_media;
@@ -82,6 +83,8 @@ g_proxy_drive_finalize (GObject *object)
   g_free (drive->name);
   if (drive->icon != NULL)
     g_object_unref (drive->icon);
+  if (drive->symbolic_icon != NULL)
+    g_object_unref (drive->symbolic_icon);
   g_strfreev (drive->volume_ids);
   if (drive->identifiers != NULL)
     g_hash_table_unref (drive->identifiers);
@@ -124,6 +127,7 @@ g_proxy_drive_new (GProxyVolumeMonitor *volume_monitor)
 /* string               id
  * string               name
  * string               gicon_data
+ * string               symbolic_gicon_data
  * boolean              can-eject
  * boolean              can-poll-for-media
  * boolean              has-media
@@ -138,7 +142,7 @@ g_proxy_drive_new (GProxyVolumeMonitor *volume_monitor)
  * string               sort_key
  * a{sv}                expansion
  */
-#define DRIVE_STRUCT_TYPE "(&s&s&sbbbbbbbbuasa{ss}&sa{sv})"
+#define DRIVE_STRUCT_TYPE "(&s&s&s&sbbbbbbbbuasa{ss}&sa{sv})"
 
 void
 g_proxy_drive_update (GProxyDrive  *drive,
@@ -147,6 +151,7 @@ g_proxy_drive_update (GProxyDrive  *drive,
   const char *id;
   const char *name;
   const char *gicon_data;
+  const char *symbolic_gicon_data = NULL;
   gboolean can_eject;
   gboolean can_poll_for_media;
   gboolean has_media;
@@ -168,6 +173,7 @@ g_proxy_drive_update (GProxyDrive  *drive,
   sort_key = NULL;
   g_variant_get (iter, DRIVE_STRUCT_TYPE,
                  &id, &name, &gicon_data,
+                 &symbolic_gicon_data,
                  &can_eject, &can_poll_for_media,
                  &has_media, &is_media_removable,
                  &is_media_check_automatic,
@@ -201,6 +207,8 @@ g_proxy_drive_update (GProxyDrive  *drive,
   g_free (drive->name);
   if (drive->icon != NULL)
     g_object_unref (drive->icon);
+  if (drive->symbolic_icon != NULL)
+    g_object_unref (drive->symbolic_icon);
   g_strfreev (drive->volume_ids);
   if (drive->identifiers != NULL)
     g_hash_table_unref (drive->identifiers);
@@ -213,6 +221,10 @@ g_proxy_drive_update (GProxyDrive  *drive,
     drive->icon = NULL;
   else
     drive->icon = g_icon_new_for_string (gicon_data, NULL);
+  if (*symbolic_gicon_data == 0)
+    drive->symbolic_icon = NULL;
+  else
+    drive->symbolic_icon = g_icon_new_for_string (symbolic_gicon_data, NULL);
   drive->can_eject = can_eject;
   drive->can_poll_for_media = can_poll_for_media;
   drive->has_media = has_media;
@@ -244,6 +256,19 @@ g_proxy_drive_get_icon (GDrive *drive)
 
   G_LOCK (proxy_drive);
   icon = proxy_drive->icon != NULL ? g_object_ref (proxy_drive->icon) : NULL;
+  G_UNLOCK (proxy_drive);
+
+  return icon;
+}
+
+static GIcon *
+g_proxy_drive_get_symbolic_icon (GDrive *drive)
+{
+  GProxyDrive *proxy_drive = G_PROXY_DRIVE (drive);
+  GIcon *icon;
+
+  G_LOCK (proxy_drive);
+  icon = proxy_drive->symbolic_icon != NULL ? g_object_ref (proxy_drive->symbolic_icon) : NULL;
   G_UNLOCK (proxy_drive);
 
   return icon;
@@ -1124,6 +1149,7 @@ g_proxy_drive_drive_iface_init (GDriveIface *iface)
 {
   iface->get_name = g_proxy_drive_get_name;
   iface->get_icon = g_proxy_drive_get_icon;
+  iface->get_symbolic_icon = g_proxy_drive_get_symbolic_icon;
   iface->has_volumes = g_proxy_drive_has_volumes;
   iface->get_volumes = g_proxy_drive_get_volumes;
   iface->is_media_removable = g_proxy_drive_is_media_removable;

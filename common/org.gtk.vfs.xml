@@ -67,18 +67,18 @@
   <interface name='org.gtk.vfs.MountTracker'>
     <method name="LookupMount">
       <arg type='(aya{sv})' name='mount_spec' direction='in'/>
-      <arg type='(sosssssbay(aya{sv})ay)' name='mount' direction='out'/>
+      <arg type='(sossssssbay(aya{sv})ay)' name='mount' direction='out'/>
     </method>
     <method name="LookupMountByFusePath">
       <arg type='ay' name='fuse_path' direction='in'/>
-      <arg type='(sosssssbay(aya{sv})ay)' name='mount' direction='out'/>
+      <arg type='(sossssssbay(aya{sv})ay)' name='mount' direction='out'/>
     </method>
     <method name="MountLocation">
       <arg type='(aya{sv})' name='mount_spec' direction='in'/>
       <arg type='(so)' name='mount_source' direction='in'/>
     </method>
     <method name="ListMounts">
-      <arg type='a(sosssssbay(aya{sv})ay)' name='mounts' direction='out'/>
+      <arg type='a(sossssssbay(aya{sv})ay)' name='mounts' direction='out'/>
     </method>
     <method name="RegisterMount">
       <arg type='o' name='obj_path' direction='in'/>
@@ -86,6 +86,7 @@
       <arg type='s' name='stable_name' direction='in'/>
       <arg type='s' name='x_content_types' direction='in'/>
       <arg type='s' name='icon' direction='in'/>
+      <arg type='s' name='symbolic_icon' direction='in'/>
       <arg type='s' name='prefered_filename_encoding' direction='in'/>
       <arg type='b' name='user_visible' direction='in'/>
       <arg type='(aya{sv})' name='mount_spec' direction='in'/>
@@ -103,10 +104,10 @@
     <method name="RegisterFuse">
     </method>
     <signal name="Mounted">
-      <arg type='(sosssssbay(aya{sv})ay)' name='mount'/>
+      <arg type='(sossssssbay(aya{sv})ay)' name='mount'/>
     </signal>
     <signal name="Unmounted">
-      <arg type='(sosssssbay(aya{sv})ay)' name='mount'/>
+      <arg type='(sossssssbay(aya{sv})ay)' name='mount'/>
     </signal>
   </interface>
 

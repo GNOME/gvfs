@@ -39,6 +39,7 @@ typedef struct {
   char *stable_name;
   char *x_content_types;
   char *icon;
+  char *symbolic_icon;
   char *prefered_filename_encoding;
   gboolean user_visible;
   char *default_location;
@@ -187,6 +188,7 @@ vfs_mount_free (VfsMount *mount)
   g_free (mount->stable_name);
   g_free (mount->x_content_types);
   g_free (mount->icon);
+  g_free (mount->symbolic_icon);
   g_free (mount->fuse_mountpoint);
   g_free (mount->prefered_filename_encoding);
   g_free (mount->default_location);
@@ -199,19 +201,20 @@ vfs_mount_free (VfsMount *mount)
 
 
 /* Keep in sync with dbus-interfaces.xml */
-#define VFS_MOUNT_ARRAY_DBUS_STRUCT_TYPE "a(sosssssbay(aya{sv})ay)"
+#define VFS_MOUNT_ARRAY_DBUS_STRUCT_TYPE "a(sossssssbay(aya{sv})ay)"
 #define VFS_MOUNTABLE_ARRAY_DBUS_STRUCT_TYPE "a(ssasib)"
 
 static GVariant *
 vfs_mount_to_dbus (VfsMount *mount)
 {
-  return g_variant_new ("(sosssssb^ay@(aya{sv})^ay)",
+  return g_variant_new ("(sossssssb^ay@(aya{sv})^ay)",
                         mount->dbus_id,
                         mount->object_path,
                         mount->display_name,
                         mount->stable_name,
                         mount->x_content_types,
                         mount->icon,
+                        mount->symbolic_icon,
                         mount->prefered_filename_encoding,
                         mount->user_visible,
                         (fuse_available && mount->fuse_mountpoint) ? mount->fuse_mountpoint : "",
@@ -593,6 +596,7 @@ handle_register_mount (GVfsDBusMountTracker *object,
                        const gchar *arg_stable_name,
                        const gchar *arg_x_content_types,
                        const gchar *arg_icon,
+                       const gchar *arg_symbolic_icon,
                        const gchar *arg_prefered_filename_encoding,
                        gboolean arg_user_visible,
                        GVariant *arg_mount_spec,
@@ -630,6 +634,7 @@ handle_register_mount (GVfsDBusMountTracker *object,
       mount->stable_name = g_strdup (arg_stable_name);
       mount->x_content_types = g_strdup (arg_x_content_types);
       mount->icon = g_strdup (arg_icon);
+      mount->symbolic_icon = g_strdup (arg_symbolic_icon);
       mount->prefered_filename_encoding = g_strdup (arg_prefered_filename_encoding);
       mount->user_visible = arg_user_visible;
       mount->dbus_id = g_strdup (id);

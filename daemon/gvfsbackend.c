@@ -74,6 +74,7 @@ struct _GVfsBackendPrivate
   char *stable_name;
   char **x_content_types;
   GIcon *icon;
+  GIcon *symbolic_icon;
   char *prefered_filename_encoding;
   gboolean user_visible;
   char *default_location;
@@ -148,6 +149,7 @@ g_vfs_backend_finalize (GObject *object)
   g_free (backend->priv->stable_name);
   g_strfreev (backend->priv->x_content_types);
   g_clear_object (&backend->priv->icon);
+  g_clear_object (&backend->priv->symbolic_icon);
   g_free (backend->priv->prefered_filename_encoding);
   g_free (backend->priv->default_location);
   if (backend->priv->mount_spec)
@@ -197,6 +199,7 @@ g_vfs_backend_init (GVfsBackend *backend)
 {
   backend->priv = G_TYPE_INSTANCE_GET_PRIVATE (backend, G_VFS_TYPE_BACKEND, GVfsBackendPrivate);
   backend->priv->icon = NULL;
+  backend->priv->symbolic_icon = NULL;
   backend->priv->prefered_filename_encoding = g_strdup ("");
   backend->priv->display_name = g_strdup ("");
   backend->priv->stable_name = g_strdup ("");
@@ -400,6 +403,22 @@ g_vfs_backend_set_icon (GVfsBackend *backend,
 }
 
 void
+g_vfs_backend_set_symbolic_icon_name (GVfsBackend *backend,
+                                      const char *icon_name)
+{
+  g_clear_object (&backend->priv->symbolic_icon);
+  backend->priv->symbolic_icon = g_themed_icon_new_with_default_fallbacks (icon_name);
+}
+
+void
+g_vfs_backend_set_symbolic_icon (GVfsBackend *backend,
+                                 GIcon       *icon)
+{
+  g_clear_object (&backend->priv->symbolic_icon);
+  backend->priv->symbolic_icon = g_object_ref (icon);
+}
+
+void
 g_vfs_backend_set_prefered_filename_encoding (GVfsBackend  *backend,
 					      const char *prefered_filename_encoding)
 {
@@ -473,6 +492,12 @@ GIcon *
 g_vfs_backend_get_icon (GVfsBackend *backend)
 {
   return backend->priv->icon;
+}
+
+GIcon *
+g_vfs_backend_get_symbolic_icon (GVfsBackend *backend)
+{
+  return backend->priv->symbolic_icon;
 }
 
 const char *
@@ -635,6 +660,7 @@ register_mount_got_proxy_cb (GObject *source_object,
   const char *stable_name;
   char *x_content_types_string;
   char *icon_str;
+  char *symbolic_icon_str;
 
   proxy = gvfs_dbus_mount_tracker_proxy_new_for_bus_finish (res, &error);
   if (proxy == NULL)
@@ -662,6 +688,11 @@ register_mount_got_proxy_cb (GObject *source_object,
   else
     icon_str = g_strdup ("");
 
+  if (backend->priv->symbolic_icon != NULL)
+    symbolic_icon_str = g_icon_to_string (backend->priv->symbolic_icon);
+  else
+    symbolic_icon_str = g_strdup ("");
+
   if (backend->priv->stable_name != NULL &&
       *backend->priv->stable_name != 0)
    stable_name = backend->priv->stable_name;
@@ -674,6 +705,7 @@ register_mount_got_proxy_cb (GObject *source_object,
                                                stable_name,
                                                x_content_types_string,
                                                icon_str,
+                                               symbolic_icon_str,
                                                backend->priv->prefered_filename_encoding,
                                                backend->priv->user_visible,
                                                g_mount_spec_to_dbus (backend->priv->mount_spec),
@@ -683,6 +715,7 @@ register_mount_got_proxy_cb (GObject *source_object,
 
   g_free (x_content_types_string);
   g_free (icon_str);
+  g_free (symbolic_icon_str);
   g_object_unref (proxy);
   async_proxy_create_free (data);
 }

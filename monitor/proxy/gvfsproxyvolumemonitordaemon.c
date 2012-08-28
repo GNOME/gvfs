@@ -516,6 +516,7 @@ static void monitor_try_create (void);
 /* string               id
  * string               name
  * string               gicon_data
+ * string               symbolic_gicon_data
  * boolean              can-eject
  * boolean              can-poll-for-media
  * boolean              has-media
@@ -530,7 +531,7 @@ static void monitor_try_create (void);
  * string               sort_key
  * a{sv}                expansion
  */
-#define DRIVE_STRUCT_TYPE "(sssbbbbbbbbuasa{ss}sa{sv})"
+#define DRIVE_STRUCT_TYPE "(ssssbbbbbbbbuasa{ss}sa{sv})"
 
 static GVariant *
 drive_to_dbus (GDrive *drive)
@@ -538,7 +539,9 @@ drive_to_dbus (GDrive *drive)
   char *id;
   char *name;
   GIcon *icon;
+  GIcon *symbolic_icon;
   char *icon_data;
+  char *symbolic_icon_data;
   gboolean can_eject;
   gboolean can_poll_for_media;
   gboolean has_media;
@@ -565,6 +568,11 @@ drive_to_dbus (GDrive *drive)
     icon_data = g_icon_to_string (icon);
   else
     icon_data = g_strdup ("");
+  symbolic_icon = g_drive_get_symbolic_icon (drive);
+  if (symbolic_icon)
+    symbolic_icon_data = g_icon_to_string (symbolic_icon);
+  else
+    symbolic_icon_data = g_strdup ("");
   can_eject = g_drive_can_eject (drive);
   can_poll_for_media = g_drive_can_poll_for_media (drive);
   has_media = g_drive_has_media (drive);
@@ -624,6 +632,7 @@ drive_to_dbus (GDrive *drive)
                           id,
                           name,
                           icon_data,
+                          symbolic_icon_data,
                           can_eject,
                           can_poll_for_media,
                           has_media,
@@ -647,6 +656,8 @@ drive_to_dbus (GDrive *drive)
   g_list_free (volumes);
   g_free (icon_data);
   g_object_unref (icon);
+  g_free (symbolic_icon_data);
+  g_object_unref (symbolic_icon);
   g_free (name);
   g_free (id);
 
@@ -656,6 +667,7 @@ drive_to_dbus (GDrive *drive)
 /* string               id
  * string               name
  * string               gicon_data
+ * string               symbolic_gicon_data
  * string               uuid
  * string               activation_uri
  * boolean              can-mount
@@ -666,7 +678,7 @@ drive_to_dbus (GDrive *drive)
  * string               sort_key
  * a{sv}                expansion
  */
-#define VOLUME_STRUCT_TYPE "(sssssbbssa{ss}sa{sv})"
+#define VOLUME_STRUCT_TYPE "(ssssssbbssa{ss}sa{sv})"
 
 static GVariant *
 volume_to_dbus (GVolume *volume)
@@ -675,6 +687,8 @@ volume_to_dbus (GVolume *volume)
   char *name;
   GIcon *icon;
   char *icon_data;
+  GIcon *symbolic_icon;
+  char *symbolic_icon_data;
   char *uuid;
   GFile *activation_root;
   char *activation_uri;
@@ -699,6 +713,11 @@ volume_to_dbus (GVolume *volume)
     icon_data = g_icon_to_string (icon);
   else
     icon_data = g_strdup ("");
+  symbolic_icon = g_volume_get_symbolic_icon (volume);
+  if (symbolic_icon)
+    symbolic_icon_data = g_icon_to_string (symbolic_icon);
+  else
+    symbolic_icon_data = g_strdup ("");
   uuid = g_volume_get_uuid (volume);
   activation_root = g_volume_get_activation_root (volume);
   if (activation_root == NULL)
@@ -749,6 +768,7 @@ volume_to_dbus (GVolume *volume)
                           id,
                           name,
                           icon_data,
+                          symbolic_icon_data,
                           uuid,
                           activation_uri,
                           can_mount,
@@ -775,6 +795,8 @@ volume_to_dbus (GVolume *volume)
   g_free (activation_uri);
   g_free (icon_data);
   g_object_unref (icon);
+  g_free (symbolic_icon_data);
+  g_object_unref (symbolic_icon);
   g_free (name);
   g_free (id);
 
@@ -784,6 +806,7 @@ volume_to_dbus (GVolume *volume)
 /* string               id
  * string               name
  * string               gicon_data
+ * string               symbolic_gicon_data
  * string               uuid
  * string               root_uri
  * boolean              can-unmount
@@ -792,7 +815,7 @@ volume_to_dbus (GVolume *volume)
  * string               sort_key
  * a{sv}                expansion
  */
-#define MOUNT_STRUCT_TYPE "(sssssbsassa{sv})"
+#define MOUNT_STRUCT_TYPE "(ssssssbsassa{sv})"
 
 static GVariant *
 mount_to_dbus (GMount *mount)
@@ -801,6 +824,8 @@ mount_to_dbus (GMount *mount)
   char *name;
   GIcon *icon;
   char *icon_data;
+  GIcon *symbolic_icon;
+  char *symbolic_icon_data;
   char *uuid;
   GFile *root;
   char *root_uri;
@@ -821,6 +846,11 @@ mount_to_dbus (GMount *mount)
     icon_data = g_icon_to_string (icon);
   else
     icon_data = g_strdup ("");
+  symbolic_icon = g_mount_get_symbolic_icon (mount);
+  if (symbolic_icon)
+    symbolic_icon_data = g_icon_to_string (symbolic_icon);
+  else
+    symbolic_icon_data = g_strdup ("");
   uuid = g_mount_get_uuid (mount);
   root = g_mount_get_root (mount);
   root_uri = g_file_get_uri (root);
@@ -855,6 +885,7 @@ mount_to_dbus (GMount *mount)
                           id,
                           name,
                           icon_data,
+                          symbolic_icon_data,
                           uuid,
                           root_uri,
                           can_unmount,
@@ -874,6 +905,8 @@ mount_to_dbus (GMount *mount)
   g_free (uuid);
   g_free (icon_data);
   g_object_unref (icon);
+  g_free (symbolic_icon_data);
+  g_object_unref (symbolic_icon);
   g_free (name);
   g_free (id);
 

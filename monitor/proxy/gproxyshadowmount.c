@@ -210,6 +210,18 @@ g_proxy_shadow_mount_get_icon (GMount *mount)
   return icon;
 }
 
+static GIcon *
+g_proxy_shadow_mount_get_symbolic_icon (GMount *mount)
+{
+  GProxyShadowMount *proxy_shadow_mount = G_PROXY_SHADOW_MOUNT (mount);
+  GIcon *icon;
+
+  G_LOCK (proxy_shadow_mount);
+  icon = g_volume_get_symbolic_icon (G_VOLUME (proxy_shadow_mount->volume));
+  G_UNLOCK (proxy_shadow_mount);
+  return icon;
+}
+
 static char *
 g_proxy_shadow_mount_get_uuid (GMount *mount)
 {
@@ -494,6 +506,7 @@ g_proxy_shadow_mount_mount_iface_init (GMountIface *iface)
   iface->get_root = g_proxy_shadow_mount_get_root;
   iface->get_name = g_proxy_shadow_mount_get_name;
   iface->get_icon = g_proxy_shadow_mount_get_icon;
+  iface->get_symbolic_icon = g_proxy_shadow_mount_get_symbolic_icon;
   iface->get_uuid = g_proxy_shadow_mount_get_uuid;
   iface->get_drive = g_proxy_shadow_mount_get_drive;
   iface->get_volume = g_proxy_shadow_mount_get_volume;

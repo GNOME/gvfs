@@ -89,6 +89,7 @@ g_mount_info_dup (GMountInfo *info)
   copy->stable_name = g_strdup (info->stable_name);
   copy->x_content_types = g_strdup (info->x_content_types);
   copy->icon = g_object_ref (info->icon);
+  copy->symbolic_icon = g_object_ref (info->symbolic_icon);
   copy->dbus_id = g_strdup (info->dbus_id);
   copy->object_path = g_strdup (info->object_path);
   copy->mount_spec = g_mount_spec_copy (info->mount_spec);
@@ -116,6 +117,7 @@ g_mount_info_unref (GMountInfo *info)
       g_free (info->stable_name);
       g_free (info->x_content_types);
       g_object_unref (info->icon);
+      g_object_unref (info->symbolic_icon);
       g_free (info->dbus_id);
       g_free (info->object_path);
       g_mount_spec_unref (info->mount_spec);
@@ -181,22 +183,25 @@ g_mount_info_from_dbus (GVariant *value)
   const gchar *stable_name;
   const gchar *x_content_types;
   const gchar *icon_str;
+  const gchar *symbolic_icon_str;
   const gchar *prefered_filename_encoding;
   const gchar *dbus_id;
   const gchar *obj_path;
   const gchar *fuse_mountpoint;
   const gchar *default_location;
   GIcon *icon;
+  GIcon *symbolic_icon;
   GVariant *iter_mount_spec;
   GError *error;
 
-  g_variant_get (value, "(&s&o&s&s&s&s&sb^&ay@(aya{sv})^&ay)",
+  g_variant_get (value, "(&s&o&s&s&s&s&s&sb^&ay@(aya{sv})^&ay)",
                  &dbus_id,
                  &obj_path,
                  &display_name,
                  &stable_name,
                  &x_content_types,
                  &icon_str,
+                 &symbolic_icon_str,
                  &prefered_filename_encoding,
                  &user_visible,
                  &fuse_mountpoint,
@@ -224,12 +229,24 @@ g_mount_info_from_dbus (GVariant *value)
       icon = g_themed_icon_new ("gtk-missing-image"); /* TODO: maybe choose a better name */
     }
 
+  if (symbolic_icon_str == NULL || strlen (symbolic_icon_str) == 0)
+    symbolic_icon_str = "drive-removable-media-symbolic";
+  error = NULL;
+  symbolic_icon = g_icon_new_for_string (symbolic_icon_str, &error);
+  if (symbolic_icon == NULL)
+    {
+      g_warning ("Malformed icon string '%s': %s", symbolic_icon_str, error->message);
+      g_error_free (error);
+      symbolic_icon = g_themed_icon_new ("drive-removable-media-symbolic");
+    }
+
   info = g_new0 (GMountInfo, 1);
   info->ref_count = 1;
   info->display_name = g_strdup (display_name);
   info->stable_name = g_strdup (stable_name);
   info->x_content_types = g_strdup (x_content_types);
   info->icon = icon;
+  info->symbolic_icon = symbolic_icon;
   info->dbus_id = g_strdup (dbus_id);
   info->object_path = g_strdup (obj_path);
   info->mount_spec = mount_spec;

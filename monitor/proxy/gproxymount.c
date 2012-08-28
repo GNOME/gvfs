@@ -52,6 +52,7 @@ struct _GProxyMount {
   char **x_content_types;
   GFile *root;
   GIcon *icon;
+  GIcon *symbolic_icon;
   gchar *sort_key;
 };
 
@@ -75,6 +76,8 @@ g_proxy_mount_finalize (GObject *object)
   g_strfreev (mount->x_content_types);
   if (mount->icon != NULL)
     g_object_unref (mount->icon);
+  if (mount->symbolic_icon != NULL)
+    g_object_unref (mount->symbolic_icon);
   if (mount->root != NULL)
     g_object_unref (mount->root);
 
@@ -136,14 +139,17 @@ g_proxy_mount_has_mount_path (GProxyMount *mount, const char *mount_path)
 /* string               id
  * string               name
  * string               gicon_data
+ * string               symbolic_gicon_data
  * string               uuid
  * string               root_uri
  * boolean              can-unmount
  * string               volume-id
  * array:string         x-content-types
+ * string               sort_key
+ * a{sv}                expansion
  */
 
-#define MOUNT_STRUCT_TYPE "(&s&s&s&s&sb&sas&sa{sv})"
+#define MOUNT_STRUCT_TYPE "(&s&s&s&s&s&sb&sas&sa{sv})"
 
 void
 g_proxy_mount_update (GProxyMount         *mount,
@@ -152,6 +158,7 @@ g_proxy_mount_update (GProxyMount         *mount,
   const char *id;
   const char *name;
   const char *gicon_data;
+  const char *symbolic_gicon_data = NULL;
   const char *uuid;
   const char *root_uri;
   gboolean can_unmount;
@@ -165,6 +172,7 @@ g_proxy_mount_update (GProxyMount         *mount,
   sort_key = NULL;
   g_variant_get (iter, MOUNT_STRUCT_TYPE,
                  &id, &name, &gicon_data,
+                 &symbolic_gicon_data,
                  &uuid, &root_uri,
                  &can_unmount, &volume_id,
                  &iter_content_types,
@@ -196,6 +204,8 @@ g_proxy_mount_update (GProxyMount         *mount,
   g_free (mount->volume_id);
   if (mount->icon != NULL)
     g_object_unref (mount->icon);
+  if (mount->symbolic_icon != NULL)
+    g_object_unref (mount->symbolic_icon);
   g_strfreev (mount->x_content_types);
   if (mount->root != NULL)
     g_object_unref (mount->root);
@@ -208,6 +218,10 @@ g_proxy_mount_update (GProxyMount         *mount,
     mount->icon = NULL;
   else
     mount->icon = g_icon_new_for_string (gicon_data, NULL);
+  if (*symbolic_gicon_data == 0)
+    mount->symbolic_icon = NULL;
+  else
+    mount->symbolic_icon = g_icon_new_for_string (symbolic_gicon_data, NULL);
   mount->uuid = g_strdup (uuid);
   mount->root = g_file_new_for_uri (root_uri);
   mount->can_unmount = can_unmount;
@@ -249,6 +263,18 @@ g_proxy_mount_get_icon (GMount *mount)
 
   G_LOCK (proxy_mount);
   icon = proxy_mount->icon != NULL ? g_object_ref (proxy_mount->icon) : NULL;
+  G_UNLOCK (proxy_mount);
+  return icon;
+}
+
+static GIcon *
+g_proxy_mount_get_symbolic_icon (GMount *mount)
+{
+  GProxyMount *proxy_mount = G_PROXY_MOUNT (mount);
+  GIcon *icon;
+
+  G_LOCK (proxy_mount);
+  icon = proxy_mount->symbolic_icon != NULL ? g_object_ref (proxy_mount->symbolic_icon) : NULL;
   G_UNLOCK (proxy_mount);
   return icon;
 }
@@ -684,6 +710,7 @@ g_proxy_mount_mount_iface_init (GMountIface *iface)
   iface->get_root = g_proxy_mount_get_root;
   iface->get_name = g_proxy_mount_get_name;
   iface->get_icon = g_proxy_mount_get_icon;
+  iface->get_symbolic_icon = g_proxy_mount_get_symbolic_icon;
   iface->get_uuid = g_proxy_mount_get_uuid;
   iface->get_drive = g_proxy_mount_get_drive;
   iface->get_volume = g_proxy_mount_get_volume;

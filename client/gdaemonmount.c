@@ -121,6 +121,14 @@ g_daemon_mount_get_icon (GMount *mount)
   return g_object_ref (daemon_mount->mount_info->icon);
 }
 
+static GIcon *
+g_daemon_mount_get_symbolic_icon (GMount *mount)
+{
+  GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
+
+  return g_object_ref (daemon_mount->mount_info->symbolic_icon);
+}
+
 static char *
 g_daemon_mount_get_name (GMount *mount)
 {
@@ -413,6 +421,7 @@ g_daemon_mount_mount_iface_init (GMountIface *iface)
   iface->get_root = g_daemon_mount_get_root;
   iface->get_name = g_daemon_mount_get_name;
   iface->get_icon = g_daemon_mount_get_icon;
+  iface->get_symbolic_icon = g_daemon_mount_get_symbolic_icon;
   iface->get_uuid = g_daemon_mount_get_uuid;
   iface->get_volume = g_daemon_mount_get_volume;
   iface->get_drive = g_daemon_mount_get_drive;

@@ -25,6 +25,7 @@ struct _GVfsAfcVolume {
 
   char *name;
   char *icon;
+  char *symbolic_icon;
   char *icon_fallback;
 };
 
@@ -45,6 +46,7 @@ g_vfs_afc_volume_finalize (GObject *object)
 
   g_free (self->name);
   g_free (self->icon);
+  g_free (self->symbolic_icon);
   g_free (self->icon_fallback);
 
   if (G_OBJECT_CLASS(g_vfs_afc_volume_parent_class)->finalize)
@@ -58,6 +60,7 @@ g_vfs_afc_volume_init (GVfsAfcVolume *self)
 
   afc_volume->name = g_strdup ("iPhone");
   afc_volume->icon = g_strdup ("phone-apple-iphone");
+  afc_volume->symbolic_icon = g_strdup ("phone-apple-iphone-symbolic");
 }
 
 static void
@@ -138,11 +141,13 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
         {
           g_free (self->icon);
           self->icon = g_strdup ("multimedia-player-apple-ipod-touch");
+          self->symbolic_icon = g_strdup ("multimedia-player-apple-ipod-touch-symbolic");
         }
       else if (g_str_equal(model, "iPad") != FALSE)
         {
           g_free (self->icon);
           self->icon = g_strdup ("computer-apple-ipad");
+          self->symbolic_icon = g_strdup ("computer-apple-ipad-symbolic");
         }
       g_free (model);
       plist_free (value);
@@ -203,6 +208,17 @@ g_vfs_afc_volume_get_icon (GVolume *volume)
   GIcon *icon;
 
   icon = g_themed_icon_new_with_default_fallbacks (afc_volume->icon);
+
+  return icon;
+}
+
+static GIcon *
+g_vfs_afc_volume_get_symbolic_icon (GVolume *volume)
+{
+  GVfsAfcVolume *afc_volume = G_VFS_AFC_VOLUME (volume);
+  GIcon *icon;
+
+  icon = g_themed_icon_new_with_default_fallbacks (afc_volume->symbolic_icon);
 
   return icon;
 }
@@ -355,6 +371,7 @@ g_vfs_afc_volume_iface_init (GVolumeIface *iface)
 {
   iface->get_name = g_vfs_afc_volume_get_name;
   iface->get_icon = g_vfs_afc_volume_get_icon;
+  iface->get_symbolic_icon = g_vfs_afc_volume_get_symbolic_icon;
   iface->get_uuid = g_vfs_afc_volume_get_uuid;
   iface->get_drive = g_vfs_afc_volume_get_drive;
   iface->get_mount = g_vfs_afc_volume_get_mount;

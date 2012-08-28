@@ -351,12 +351,12 @@ iterate_gmain(void)
 }
 
 static void
-show_themed_icon_names (GThemedIcon *icon, int indent)
+show_themed_icon_names (GThemedIcon *icon, gboolean symbolic, int indent)
 {
   char **names;
   char **iter;
 
-  g_print ("%*sthemed icons:", indent, " ");
+  g_print ("%*s%sthemed icons:", indent, " ", symbolic ? "symbolic " : "");
 
   names = NULL;
 
@@ -472,7 +472,16 @@ list_mounts (GList *mounts,
           if (icon)
             {
               if (G_IS_THEMED_ICON (icon))
-                show_themed_icon_names (G_THEMED_ICON (icon), indent + 2);
+                show_themed_icon_names (G_THEMED_ICON (icon), FALSE, indent + 2);
+
+              g_object_unref (icon);
+            }
+
+          icon = g_mount_get_symbolic_icon (mount);
+          if (icon)
+            {
+              if (G_IS_THEMED_ICON (icon))
+                show_themed_icon_names (G_THEMED_ICON (icon), TRUE, indent + 2);
 
               g_object_unref (icon);
             }
@@ -576,7 +585,16 @@ list_volumes (GList *volumes,
           if (icon)
             {
               if (G_IS_THEMED_ICON (icon))
-                show_themed_icon_names (G_THEMED_ICON (icon), indent + 2);
+                show_themed_icon_names (G_THEMED_ICON (icon), FALSE, indent + 2);
+
+              g_object_unref (icon);
+            }
+
+          icon = g_volume_get_symbolic_icon (volume);
+          if (icon)
+            {
+              if (G_IS_THEMED_ICON (icon))
+                show_themed_icon_names (G_THEMED_ICON (icon), TRUE, indent + 2);
 
               g_object_unref (icon);
             }
@@ -649,9 +667,18 @@ list_drives (GList *drives,
           if (icon)
           {
                   if (G_IS_THEMED_ICON (icon))
-                          show_themed_icon_names (G_THEMED_ICON (icon), indent + 2);
+                          show_themed_icon_names (G_THEMED_ICON (icon), FALSE, indent + 2);
                   g_object_unref (icon);
           }
+
+          icon = g_drive_get_symbolic_icon (drive);
+          if (icon)
+            {
+              if (G_IS_THEMED_ICON (icon))
+                show_themed_icon_names (G_THEMED_ICON (icon), TRUE, indent + 2);
+
+              g_object_unref (icon);
+            }
 
           g_print ("%*sis_media_removable=%d\n", indent + 2, "", g_drive_is_media_removable (drive));
           g_print ("%*shas_media=%d\n", indent + 2, "", g_drive_has_media (drive));

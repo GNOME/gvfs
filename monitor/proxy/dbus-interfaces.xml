@@ -30,62 +30,62 @@
     <signal name="DriveChanged">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssbbbbbbbbuasa{ss}sa{sv})' name='drive'/>
+      <arg type='(ssssbbbbbbbbuasa{ss}sa{sv})' name='drive'/>
     </signal>
     <signal name="DriveConnected">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssbbbbbbbbuasa{ss}sa{sv})' name='drive'/>
+      <arg type='(ssssbbbbbbbbuasa{ss}sa{sv})' name='drive'/>
     </signal>
     <signal name="DriveDisconnected">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssbbbbbbbbuasa{ss}sa{sv})' name='drive'/>
+      <arg type='(ssssbbbbbbbbuasa{ss}sa{sv})' name='drive'/>
     </signal>
     <signal name="DriveEjectButton">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssbbbbbbbbuasa{ss}sa{sv})' name='drive'/>
+      <arg type='(ssssbbbbbbbbuasa{ss}sa{sv})' name='drive'/>
     </signal>
     <signal name="DriveStopButton">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssbbbbbbbbuasa{ss}sa{sv})' name='drive'/>
+      <arg type='(ssssbbbbbbbbuasa{ss}sa{sv})' name='drive'/>
     </signal>
     <signal name="VolumeChanged">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssssbbssa{ss}sa{sv})' name='volume'/>
+      <arg type='(ssssssbbssa{ss}sa{sv})' name='volume'/>
     </signal>
     <signal name="VolumeAdded">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssssbbssa{ss}sa{sv})' name='volume'/>
+      <arg type='(ssssssbbssa{ss}sa{sv})' name='volume'/>
     </signal>
     <signal name="VolumeRemoved">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssssbbssa{ss}sa{sv})' name='volume'/>
+      <arg type='(ssssssbbssa{ss}sa{sv})' name='volume'/>
     </signal>
     <signal name="MountChanged">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssssbsassa{sv})' name='mount'/>
+      <arg type='(ssssssbsassa{sv})' name='mount'/>
     </signal>
     <signal name="MountAdded">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssssbsassa{sv})' name='mount'/>
+      <arg type='(ssssssbsassa{sv})' name='mount'/>
     </signal>
     <signal name="MountPreUnmount">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssssbsassa{sv})' name='mount'/>
+      <arg type='(ssssssbsassa{sv})' name='mount'/>
     </signal>
     <signal name="MountRemoved">
       <arg type='s' name='dbus_name'/>
       <arg type='s' name='id'/>
-      <arg type='(sssssbsassa{sv})' name='mount'/>
+      <arg type='(ssssssbsassa{sv})' name='mount'/>
     </signal>
     <signal name="MountOpAskPassword">
       <arg type='s' name='dbus_name'/>
@@ -126,9 +126,9 @@
       <arg type='b' name='is_supported' direction='out'/>
     </method>
     <method name="List">
-      <arg type='a(sssbbbbbbbbuasa{ss}sa{sv})' name='drives' direction='out'/>
-      <arg type='a(sssssbbssa{ss}sa{sv})' name='volumes' direction='out'/>
-      <arg type='a(sssssbsassa{sv})' name='mounts' direction='out'/>
+      <arg type='a(ssssbbbbbbbbuasa{ss}sa{sv})' name='drives' direction='out'/>
+      <arg type='a(ssssssbbssa{ss}sa{sv})' name='volumes' direction='out'/>
+      <arg type='a(ssssssbsassa{sv})' name='mounts' direction='out'/>
     </method>
     <method name="CancelOperation">
       <arg type='s' name='cancellation_id' direction='in'/>
