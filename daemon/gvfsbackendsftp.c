@@ -1692,6 +1692,7 @@ do_mount (GVfsBackend *backend,
   g_free (display_name);
 
   g_vfs_backend_set_icon_name (G_VFS_BACKEND (backend), "folder-remote");
+  g_vfs_backend_set_symbolic_icon_name (G_VFS_BACKEND (backend), "folder-remote-symbolic");
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
@@ -2081,7 +2082,6 @@ parse_attributes (GVfsBackendSftp *backend,
   guint32 mode;
   gboolean has_uid, free_mimetype;
   char *mimetype;
-  GIcon *icon;
   
   flags = g_data_input_stream_read_uint32 (reply, NULL, NULL);
 
@@ -2171,19 +2171,33 @@ parse_attributes (GVfsBackendSftp *backend,
       g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, mimetype);
       
       if (g_file_attribute_matcher_matches (matcher,
-                                            G_FILE_ATTRIBUTE_STANDARD_ICON))
+                                            G_FILE_ATTRIBUTE_STANDARD_ICON)
+          || g_file_attribute_matcher_matches (matcher,
+                                               G_FILE_ATTRIBUTE_STANDARD_SYMBOLIC_ICON))
         {
-          icon = NULL;
+          GIcon *icon = NULL;
+          GIcon *symbolic_icon = NULL;
+
           if (S_ISDIR(mode))
-            icon = g_themed_icon_new ("folder");
+            {
+              icon = g_themed_icon_new ("folder");
+              symbolic_icon = g_themed_icon_new ("folder-symbolic");
+            }
           else if (mimetype)
+            {
               icon = g_content_type_get_icon (mimetype);
+              symbolic_icon = g_content_type_get_symbolic_icon (mimetype);
+            }
 
           if (icon == NULL)
             icon = g_themed_icon_new ("text-x-generic");
+          if (symbolic_icon == NULL)
+            symbolic_icon = g_themed_icon_new ("text-x-generic-symbolic");
 
           g_file_info_set_icon (info, icon);
+          g_file_info_set_symbolic_icon (info, symbolic_icon);
           g_object_unref (icon);
+          g_object_unref (symbolic_icon);
         }
 
 

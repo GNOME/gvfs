@@ -606,6 +606,10 @@ file_info_from_message (SoupMessage *msg,
       icon = g_content_type_get_icon (text);
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
+
+      icon = g_content_type_get_symbolic_icon (text);
+      g_file_info_set_symbolic_icon (info, icon);
+      g_object_unref (icon);
     }
 
 

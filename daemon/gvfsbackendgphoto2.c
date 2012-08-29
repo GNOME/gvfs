@@ -192,6 +192,7 @@ struct _GVfsBackendGphoto2
   char *hal_name;
 #endif
   char *icon_name;
+  char *symbolic_icon_name;
 
   /* whether we can write to the device */
   gboolean can_write;
@@ -582,6 +583,8 @@ release_device (GVfsBackendGphoto2 *gphoto2_backend)
 #endif
   g_free (gphoto2_backend->icon_name);
   gphoto2_backend->icon_name = NULL;
+  g_free (gphoto2_backend->symbolic_icon_name);
+  gphoto2_backend->symbolic_icon_name = NULL;
 
   g_free (gphoto2_backend->ignore_prefix);
   gphoto2_backend->ignore_prefix = NULL;
@@ -691,6 +694,23 @@ compute_icon_name (GVfsBackendGphoto2 *gphoto2_backend)
   return result;
 }
 
+static char *
+compute_symbolic_icon_name (GVfsBackendGphoto2 *gphoto2_backend)
+{
+  char *result;
+
+  if (gphoto2_backend->symbolic_icon_name == NULL)
+    {
+      result = g_strdup_printf ("camera-photo-symbolic");
+    }
+  else
+    {
+      result = g_strdup (gphoto2_backend->symbolic_icon_name);
+    }
+
+  return result;
+}
+
 /* ------------------------------------------------------------------------------------------------- */
 
 static char *
@@ -767,15 +787,20 @@ setup_for_device (GVfsBackendGphoto2 *gphoto2_backend)
       if (g_udev_device_has_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER_ICON_NAME"))
 	{
           gphoto2_backend->icon_name = g_strdup (g_udev_device_get_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER_ICON_NAME"));
+          gphoto2_backend->symbolic_icon_name = g_strdup ("multimedia-player-symbolic");
 	  is_media_player = TRUE;
 	}
       else if (g_udev_device_has_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER"))
 	{
           gphoto2_backend->icon_name = g_strdup ("multimedia-player");
+          gphoto2_backend->symbolic_icon_name = g_strdup ("multimedia-player-symbolic");
 	  is_media_player = TRUE;
 	}
       else
+        {
           gphoto2_backend->icon_name = g_strdup ("camera-photo");
+          gphoto2_backend->symbolic_icon_name = g_strdup ("camera-photo-symbolic");
+        }
     }
   else
       DEBUG ("-> did not find matching udev device");
@@ -982,11 +1007,13 @@ find_udi_for_device (GVfsBackendGphoto2 *gphoto2_backend)
                           /* TODO: should we sniff the files instead? */
                           if (m == 0)
                             {
+                              gphoto2_backend->symbolic_icon_name = g_strdup ("camera-photo-symbolic");
                               g_vfs_backend_set_x_content_types (G_VFS_BACKEND (gphoto2_backend),
                                                                  camera_x_content_types);
                             }
                           else
                             {
+                              gphoto2_backend->symbolic_icon_name = g_strdup ("multimedia-player-symbolic");
                               g_vfs_backend_set_x_content_types (G_VFS_BACKEND (gphoto2_backend),
                                                                  music_player_x_content_types);
                             }
@@ -1133,6 +1160,9 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
       icon = g_themed_icon_new ("folder");
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
+      icon = g_themed_icon_new ("folder-symbolic");
+      g_file_info_set_symbolic_icon (info, icon);
+      g_object_unref (icon);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, gphoto2_backend->can_write);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, gphoto2_backend->can_delete);
@@ -1181,6 +1211,9 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
           g_file_info_set_display_name (info, name);
           icon = g_themed_icon_new ("folder");
           g_file_info_set_icon (info, icon);
+          g_object_unref (icon);
+          icon = g_themed_icon_new ("folder-symbolic");
+          g_file_info_set_symbolic_icon (info, icon);
           g_object_unref (icon);
           g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
           g_file_info_set_content_type (info, "inode/directory");
@@ -1267,6 +1300,13 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
   if (icon != NULL)
     {
       g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
+    }
+  icon = g_content_type_get_symbolic_icon (mime_type);
+  DEBUG ("  got symbolic icon %p for mime_type '%s'", icon, mime_type);
+  if (icon != NULL)
+    {
+      g_file_info_set_symbolic_icon (info, icon);
       g_object_unref (icon);
     }
   g_free (mime_type);
@@ -1682,13 +1722,19 @@ do_mount (GVfsBackend *backend,
   /* Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
      backend and shouldn't be translated. */
   fuse_name = g_strdup_printf (_("gphoto2 mount on %s"), gphoto2_backend->gphoto2_port);
-  icon_name = compute_icon_name (gphoto2_backend);
   display_name = compute_display_name (gphoto2_backend);
   g_vfs_backend_set_stable_name (backend, fuse_name);
   g_vfs_backend_set_display_name (backend, display_name);
+
+  icon_name = compute_icon_name (gphoto2_backend);
   g_vfs_backend_set_icon_name (backend, icon_name);
-  g_free (display_name);
   g_free (icon_name);
+
+  icon_name = compute_symbolic_icon_name (gphoto2_backend);
+  g_vfs_backend_set_symbolic_icon_name (backend, icon_name);
+  g_free (icon_name);
+
+  g_free (display_name);
   g_free (fuse_name);
 
   gphoto2_backend->can_write = FALSE;

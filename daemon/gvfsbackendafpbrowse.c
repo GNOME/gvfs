@@ -245,6 +245,10 @@ fill_info (GFileInfo *info, GVfsAfpVolumeData *vol_data, GVfsBackendAfpBrowse *a
   g_file_info_set_icon (info, icon);
   g_object_unref (icon);
 
+  icon = g_themed_icon_new_with_default_fallbacks ("folder-remote-symbolic");
+  g_file_info_set_symbolic_icon (info, icon);
+  g_object_unref (icon);
+
   mount_spec = g_mount_spec_new ("afp-volume");
   g_mount_spec_set (mount_spec, "host",
                     g_network_address_get_hostname (G_NETWORK_ADDRESS (afp_backend->addr)));
@@ -379,6 +383,11 @@ try_query_info (GVfsBackend *backend,
     icon = g_vfs_backend_get_icon (backend);
     if (icon != NULL)
       g_file_info_set_icon (info, icon);
+
+    icon = g_vfs_backend_get_symbolic_icon (backend);
+    if (icon != NULL)
+      g_file_info_set_symbolic_icon (info, icon);
+
     g_vfs_job_succeeded (G_VFS_JOB (job));
   }
   else

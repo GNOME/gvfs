@@ -103,6 +103,9 @@ fl_parser_start_node_cb (void        *user_data,
 		icon = g_themed_icon_new ("folder");
 		g_file_info_set_icon (info, icon);
 		g_object_unref (icon);
+		icon = g_themed_icon_new ("folder-symbolic");
+		g_file_info_set_symbolic_icon (info, icon);
+		g_object_unref (icon);
 	} else {
 		g_set_error (data->error,
 			     G_MARKUP_ERROR,
@@ -132,12 +135,23 @@ fl_parser_start_node_cb (void        *user_data,
 
 	if (g_file_info_get_file_type (info) ==  G_FILE_TYPE_REGULAR) {
 		GIcon *icon;
+                const char *content_type;
 
-		icon = g_content_type_get_icon (g_file_info_get_content_type (info));
+                content_type = g_file_info_get_content_type (info);
+
+		icon = g_content_type_get_icon (content_type);
 		if (icon != NULL) {
 			if (G_IS_THEMED_ICON (icon))
 				g_themed_icon_append_name (G_THEMED_ICON (icon), "text-x-generic");
 			g_file_info_set_icon (info, icon);
+			g_object_unref (icon);
+		}
+
+		icon = g_content_type_get_symbolic_icon (content_type);
+		if (icon != NULL) {
+			if (G_IS_THEMED_ICON (icon))
+				g_themed_icon_append_name (G_THEMED_ICON (icon), "text-x-generic-symbolic");
+			g_file_info_set_symbolic_icon (info, icon);
 			g_object_unref (icon);
 		}
 	}

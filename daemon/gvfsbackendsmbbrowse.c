@@ -816,6 +816,7 @@ do_mount (GVfsBackend *backend,
   const char *debug;
   int debug_val;
   char *icon;
+  char *symbolic_icon;
   GString *uri;
   gboolean res;
   GMountSpec *browse_mount_spec;
@@ -889,11 +890,13 @@ do_mount (GVfsBackend *backend,
     op_backend->server = g_strdup (op_backend->mounted_server);
 
   icon = NULL;
+  symbolic_icon = NULL;
   if (op_backend->server == NULL)
     {
       display_name = g_strdup (_("Windows Network"));
       browse_mount_spec = g_mount_spec_new ("smb-network");
       icon = "network-workgroup";
+      symbolic_icon = "network-workgroup-symbolic";
     }
   else
     {
@@ -903,6 +906,7 @@ do_mount (GVfsBackend *backend,
       browse_mount_spec = g_mount_spec_new ("smb-server");
       g_mount_spec_set (browse_mount_spec, "server", op_backend->mounted_server);
       icon = "network-server";
+      symbolic_icon = "network-server-symbolic";
     }
 
   if (op_backend->user)
@@ -914,6 +918,8 @@ do_mount (GVfsBackend *backend,
   g_free (display_name);
   if (icon)
     g_vfs_backend_set_icon_name (backend, icon);
+  if (symbolic_icon)
+    g_vfs_backend_set_symbolic_icon_name (backend, symbolic_icon);
   g_vfs_backend_set_user_visible (backend, FALSE);  
   g_vfs_backend_set_mount_spec (backend, browse_mount_spec);
   g_mount_spec_unref (browse_mount_spec);
@@ -1232,6 +1238,7 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
   GMountSpec *mount_spec;
   GString *uri;
   GIcon *icon;
+  GIcon *symbolic_icon;
   
   g_file_info_set_name (info, entry->name);
   g_file_info_set_display_name (info, entry->name_utf8);
@@ -1242,16 +1249,30 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
 
   icon = NULL;
   if (entry->smbc_type == SMBC_WORKGROUP)
-    icon = g_themed_icon_new ("network-workgroup");
+    {
+      icon = g_themed_icon_new ("network-workgroup");
+      symbolic_icon = g_themed_icon_new ("network-workgroup-symbolic");
+    }
   else if (entry->smbc_type == SMBC_SERVER)
-    icon = g_themed_icon_new ("network-server");
+    {
+      icon = g_themed_icon_new ("network-server");
+      symbolic_icon = g_themed_icon_new ("network-server-symbolic");
+    }
   else
-    icon = g_themed_icon_new ("folder-remote");
+    {
+      icon = g_themed_icon_new ("folder-remote");
+      symbolic_icon = g_themed_icon_new ("folder-remote-symbolic");
+    }
 
   if (icon)
     {
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
+    }
+  if (symbolic_icon)
+    {
+      g_file_info_set_symbolic_icon (info, symbolic_icon);
+      g_object_unref (symbolic_icon);
     }
   
   mount_spec = NULL;
@@ -1369,6 +1390,9 @@ try_query_info (GVfsBackend *backend,
       icon = g_vfs_backend_get_icon (backend);
       if (icon != NULL)
         g_file_info_set_icon (info, icon);
+      icon = g_vfs_backend_get_symbolic_icon (backend);
+      if (icon != NULL)
+        g_file_info_set_symbolic_icon (info, icon);
       g_vfs_job_succeeded (G_VFS_JOB (job));
       
       return TRUE;

@@ -466,6 +466,7 @@ do_mount (GVfsBackend *backend,
   g_free (display_name);
   g_free (fuse_name);
   g_vfs_backend_set_icon_name (backend, "media-optical-audio");
+  g_vfs_backend_set_symbolic_icon_name (backend, "media-optical-symbolic");
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 

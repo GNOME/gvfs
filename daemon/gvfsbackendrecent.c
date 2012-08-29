@@ -551,8 +551,11 @@ recent_backend_query_info (GVfsBackend           *vfs_backend,
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
 
-      icon = g_themed_icon_new ("document-open-recent-symbolic");
+      icon = g_themed_icon_new ("document-open-recent");
       g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
+      icon = g_themed_icon_new ("document-open-recent-symbolic");
+      g_file_info_set_symbolic_icon (info, icon);
       g_object_unref (icon);
 
       g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -657,7 +660,8 @@ g_vfs_backend_recent_init (GVfsBackendRecent *backend)
 
   /* translators: This is the name of the backend */
   g_vfs_backend_set_display_name (vfs_backend, _("Recent"));
-  g_vfs_backend_set_icon_name (vfs_backend, "document-open-recent-symbolic");
+  g_vfs_backend_set_icon_name (vfs_backend, "document-open-recent");
+  g_vfs_backend_set_symbolic_icon_name (vfs_backend, "document-open-recent-symbolic");
   g_vfs_backend_set_user_visible (vfs_backend, FALSE);
 
   mount_spec = g_mount_spec_new ("recent");

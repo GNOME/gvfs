@@ -1866,6 +1866,9 @@ set_root_info (GVfsBackendAfp *afp_backend, GFileInfo *info)
   icon = g_vfs_backend_get_icon (G_VFS_BACKEND (afp_backend));
   if (icon != NULL)
     g_file_info_set_icon (info, icon);
+  icon = g_vfs_backend_get_symbolic_icon (G_VFS_BACKEND (afp_backend));
+  if (icon != NULL)
+    g_file_info_set_symbolic_icon (info, icon);
 }
 
 static void
@@ -2067,6 +2070,7 @@ do_mount (GVfsBackend *backend,
   g_free (display_name);
 
   g_vfs_backend_set_icon_name (backend, "folder-remote-afp");
+  g_vfs_backend_set_symbolic_icon_name (backend, "folder-remote-symbolic");
   g_vfs_backend_set_user_visible (backend, TRUE);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));

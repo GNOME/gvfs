@@ -1498,6 +1498,9 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
     icon = g_themed_icon_new ("folder");
     g_file_info_set_icon (info, icon);
     g_object_unref (icon);
+    icon = g_themed_icon_new ("folder-symbolic");
+    g_file_info_set_symbolic_icon (info, icon);
+    g_object_unref (icon);
   }
   else
     g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
@@ -1624,8 +1627,11 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
 
       icon = g_content_type_get_icon (content_type);
       g_file_info_set_icon (info, icon);
-
       g_object_unref (icon);
+      icon = g_content_type_get_symbolic_icon (content_type);
+      g_file_info_set_symbolic_icon (info, icon);
+      g_object_unref (icon);
+
       g_free (content_type);
     }
     

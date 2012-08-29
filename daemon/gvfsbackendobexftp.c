@@ -78,6 +78,7 @@ struct _GVfsBackendObexftp
   char *display_name;
   char *bdaddr;
   char *icon_name;
+  char *symbolic_icon_name;
   gint usbintfnum;
 
   DBusGConnection *connection;
@@ -177,7 +178,9 @@ _is_nokia_3650 (const char *bdaddr)
 }
 
 static char *
-_get_bluetooth_name_and_icon (DBusGProxy *device, char **icon_name)
+_get_bluetooth_name_and_icon (DBusGProxy *device,
+                              char      **icon_name,
+                              char      **symbolic_icon_name)
 {
   GHashTable *hash;
 
@@ -200,6 +203,9 @@ _get_bluetooth_name_and_icon (DBusGProxy *device, char **icon_name)
         {
           *icon_name = g_strdup ("bluetooth");
         }
+
+      *symbolic_icon_name = g_strdup ("bluetooth-symbolic");
+
       g_hash_table_destroy (hash);
       return name;
     }
@@ -212,7 +218,9 @@ _get_bluetooth_name_and_icon (DBusGProxy *device, char **icon_name)
 #define DBUS_G_CONNECTION_FROM_CONNECTION(x)     ((DBusGConnection*) _DBUS_POINTER_SHIFT(x))
 
 static gchar *
-_get_bluetooth_device_properties (const char *bdaddr, char **icon_name)
+_get_bluetooth_device_properties (const char *bdaddr,
+                                  char      **icon_name,
+                                  char      **symbolic_icon_name)
 {
   DBusConnection *conn;
   DBusGProxy *manager;
@@ -256,7 +264,7 @@ _get_bluetooth_device_properties (const char *bdaddr, char **icon_name)
         {
           DBusGProxy *device;
           device = dbus_g_proxy_new_for_name (DBUS_G_CONNECTION_FROM_CONNECTION(conn), "org.bluez", device_path, "org.bluez.Device");
-          name = _get_bluetooth_name_and_icon (device, icon_name);
+          name = _get_bluetooth_name_and_icon (device, icon_name, symbolic_icon_name);
           g_object_unref (device);
         }
       g_object_unref (adapter);
@@ -327,7 +335,11 @@ _find_ods_usb_intfnum (DBusGProxy *obex_manager, int device_usb_bus_num, int dev
 #endif
 
 static gint
-_get_usb_intfnum_and_properties (DBusGProxy *obex_manager, const char *device, char **display_name, char **icon_name)
+_get_usb_intfnum_and_properties (DBusGProxy *obex_manager,
+                                 const char *device,
+                                 char      **display_name,
+                                 char      **icon_name,
+                                 char      **symbolic_icon_name)
 {
   int usb_bus_num;
   int usb_device_num;
@@ -439,6 +451,8 @@ _get_usb_intfnum_and_properties (DBusGProxy *obex_manager, const char *device, c
                               else
                                 *icon_name = "drive-removable-media-usb";
 
+                              *symbolic_icon_name = g_strdup ("drive-removable-media-symbolic");
+
                               if (name_from_hal != NULL)
                                 *display_name = g_strdup (name_from_hal);
                               else
@@ -489,6 +503,7 @@ g_vfs_backend_obexftp_finalize (GObject *object)
   g_free (backend->display_name);
   g_free (backend->bdaddr);
   g_free (backend->icon_name);
+  g_free (backend->symbolic_icon_name);
   g_free (backend->files_listing);
   g_free (backend->directory);
 
@@ -677,6 +692,14 @@ _query_file_info_helper (GVfsBackend *backend,
           g_vfs_backend_set_icon_name (backend, op_backend->icon_name);
           icon = g_themed_icon_new (op_backend->icon_name);
           g_file_info_set_icon (info, icon);
+          g_object_unref (icon);
+      }
+      if (op_backend->symbolic_icon_name) {
+          GIcon *icon;
+
+          g_vfs_backend_set_icon_name (backend, op_backend->symbolic_icon_name);
+          icon = g_themed_icon_new (op_backend->symbolic_icon_name);
+          g_file_info_set_symbolic_icon (info, icon);
           g_object_unref (icon);
       }
       display = g_strdup_printf (_("%s on %s"), "/", op_backend->display_name);
@@ -881,7 +904,7 @@ do_mount (GVfsBackend *backend,
     }
   else
     {
-      op_backend->usbintfnum = _get_usb_intfnum_and_properties (op_backend->manager_proxy, device, &op_backend->display_name, &op_backend->icon_name);
+      op_backend->usbintfnum = _get_usb_intfnum_and_properties (op_backend->manager_proxy, device, &op_backend->display_name, &op_backend->icon_name, &op_backend->symbolic_icon_name);
       if (op_backend->usbintfnum < 0)
         {
           if (op_backend->usbintfnum == -2)
@@ -915,11 +938,13 @@ do_mount (GVfsBackend *backend,
           g_error_free (error);
           return;
         }
-      op_backend->display_name = _get_bluetooth_device_properties (op_backend->bdaddr, &op_backend->icon_name);
+      op_backend->display_name = _get_bluetooth_device_properties (op_backend->bdaddr, &op_backend->icon_name, &op_backend->symbolic_icon_name);
       if (!op_backend->display_name)
         op_backend->display_name = g_strdelimit (g_strdup (op_backend->bdaddr), ":", '-');
       if (!op_backend->icon_name)
         op_backend->icon_name = g_strdup ("bluetooth");
+      if (!op_backend->symbolic_icon_name)
+        op_backend->symbolic_icon_name = g_strdup ("bluetooth-symbolic");
       g_debug ("  do_mount: %s (%s) mounted\n", op_backend->display_name, op_backend->bdaddr);
     }
   else
@@ -945,6 +970,7 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_display_name (G_VFS_BACKEND  (op_backend),
                                   op_backend->display_name);
   g_vfs_backend_set_icon_name (G_VFS_BACKEND (op_backend), op_backend->icon_name);
+  g_vfs_backend_set_symbolic_icon_name (G_VFS_BACKEND (op_backend), op_backend->symbolic_icon_name);
 
   obexftp_mount_spec = g_mount_spec_new ("obex");
   g_mount_spec_set (obexftp_mount_spec, "host", device);

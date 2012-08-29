@@ -60,6 +60,7 @@ typedef struct {
   char *filename;
   char *display_name;
   GIcon *icon;
+  GIcon *symbolic_icon;
   GFile *root;
   int prio;
   gchar *unix_device_file;
@@ -105,6 +106,8 @@ computer_file_free (ComputerFile *file)
   g_free (file->display_name);
   if (file->icon)
     g_object_unref (file->icon);
+  if (file->symbolic_icon)
+    g_object_unref (file->symbolic_icon);
   if (file->root)
     g_object_unref (file->root);
   
@@ -127,6 +130,9 @@ computer_file_equal (ComputerFile *a,
     return FALSE;
 
   if (!g_icon_equal (a->icon, b->icon))
+    return FALSE;
+
+  if (!g_icon_equal (a->symbolic_icon, b->symbolic_icon))
     return FALSE;
       
   if ((a->root != NULL && b->root != NULL &&
@@ -191,6 +197,7 @@ g_vfs_backend_computer_init (GVfsBackendComputer *computer_backend)
   
   g_vfs_backend_set_display_name (backend, _("Computer"));
   g_vfs_backend_set_icon_name (backend, "computer");
+  g_vfs_backend_set_symbolic_icon_name (backend, "computer-symbolic");
   g_vfs_backend_set_user_visible (backend, FALSE);
 
   mount_spec = g_mount_spec_new ("computer");
@@ -439,6 +446,7 @@ recompute_files (GVfsBackendComputer *backend)
             file->unix_device_file = g_volume_get_identifier (file->volume,
                                                               G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
           file->icon = g_mount_get_icon (file->mount);
+          file->symbolic_icon = g_mount_get_symbolic_icon (file->mount);
           file->display_name = display_name;
           file->root = g_mount_get_default_location (file->mount);
           file->can_unmount = g_mount_can_unmount (file->mount);
@@ -461,6 +469,7 @@ recompute_files (GVfsBackendComputer *backend)
           file->unix_device_file = g_volume_get_identifier (file->volume,
                                                             G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
           file->icon = g_volume_get_icon (file->volume);
+          file->symbolic_icon = g_volume_get_symbolic_icon (file->volume);
           file->display_name = display_name;
           file->can_mount = g_volume_can_mount (file->volume);
           file->root = NULL;
@@ -471,6 +480,7 @@ recompute_files (GVfsBackendComputer *backend)
           file->unix_device_file = g_drive_get_identifier (file->drive,
                                                             G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
           file->icon = g_drive_get_icon (file->drive);
+          file->symbolic_icon = g_drive_get_symbolic_icon (file->drive);
           file->display_name = g_drive_get_name (file->drive);
           file->can_eject = g_drive_can_eject (file->drive);
           file->can_mount = ! g_drive_is_media_removable (file->drive) || ! g_drive_is_media_check_automatic (file->drive) || g_drive_has_media (file->drive);
@@ -520,6 +530,7 @@ recompute_files (GVfsBackendComputer *backend)
   file->filename = g_strdup ("root.link");
   file->display_name = g_strdup (_("File System"));
   file->icon = g_themed_icon_new_with_default_fallbacks ("drive-harddisk-system");
+  file->symbolic_icon = g_themed_icon_new_with_default_fallbacks ("drive-harddisk-system-symbolic");
   file->root = g_file_new_for_path ("/");
   file->prio = 0;
   
@@ -661,6 +672,8 @@ file_info_from_file (ComputerFile *file,
 
   if (file->icon)
     g_file_info_set_icon (info, file->icon);
+  if (file->symbolic_icon)
+    g_file_info_set_symbolic_icon (info, file->symbolic_icon);
 
   if (file->root)
     {
@@ -757,6 +770,9 @@ try_query_info (GVfsBackend *backend,
       g_file_info_set_display_name (info, _("Computer"));
       icon = g_themed_icon_new ("computer");
       g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
+      icon = g_themed_icon_new ("computer-symbolic");
+      g_file_info_set_symbolic_icon (info, icon);
       g_object_unref (icon);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);

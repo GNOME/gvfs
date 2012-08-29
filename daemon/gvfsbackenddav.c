@@ -990,6 +990,7 @@ ms_response_to_file_info (MsResponse *response,
   GFileType   file_type;
   char       *mime_type;
   GIcon      *icon;
+  GIcon      *symbolic_icon;
   gboolean    have_display_name;
 
   basename = ms_response_get_basename (response);
@@ -1067,6 +1068,7 @@ ms_response_to_file_info (MsResponse *response,
   if (file_type == G_FILE_TYPE_DIRECTORY)
     {
       icon = g_themed_icon_new ("folder");
+      symbolic_icon = g_themed_icon_new ("folder-symbolic");
       file_info_set_content_type (info, "inode/directory");
     }
   else
@@ -1075,9 +1077,16 @@ ms_response_to_file_info (MsResponse *response,
         mime_type = g_content_type_guess (basename, NULL, 0, NULL);
 
       icon = g_content_type_get_icon (mime_type);
-
       if (G_IS_THEMED_ICON (icon))
-        g_themed_icon_append_name (G_THEMED_ICON (icon), "text-x-generic");
+        {
+          g_themed_icon_append_name (G_THEMED_ICON (icon), "text-x-generic");
+        }
+
+      symbolic_icon = g_content_type_get_symbolic_icon (mime_type);
+      if (G_IS_THEMED_ICON (icon))
+        {
+          g_themed_icon_append_name (G_THEMED_ICON (symbolic_icon), "text-x-generic-symbolic");
+        }
 
       file_info_set_content_type (info, mime_type);
     }
@@ -1086,7 +1095,9 @@ ms_response_to_file_info (MsResponse *response,
     g_file_info_set_display_name (info, basename);
 
   g_file_info_set_icon (info, icon);
+  g_file_info_set_symbolic_icon (info, symbolic_icon);
   g_object_unref (icon);
+  g_object_unref (symbolic_icon);
   g_free (mime_type);
   g_free (basename);
 
@@ -1937,6 +1948,7 @@ do_mount (GVfsBackend  *backend,
 
   g_vfs_backend_set_mount_spec (backend, mount_spec);
   g_vfs_backend_set_icon_name (backend, "folder-remote");
+  g_vfs_backend_set_symbolic_icon_name (backend, "folder-remote-symbolic");
   
   g_vfs_backend_dav_setup_display_name (backend);
   

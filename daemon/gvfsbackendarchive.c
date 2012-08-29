@@ -45,6 +45,7 @@
 #include "gvfskeyring.h"
 
 #define MOUNT_ICON_NAME "drive-removable-media"
+#define MOUNT_SYMBOLIC_ICON_NAME "drive-removable-media-symbolic"
 
 /* #define PRINT_DEBUG  */
 
@@ -346,6 +347,9 @@ create_root_file (GVfsBackendArchive *ba)
   icon = g_themed_icon_new ("folder");
   g_file_info_set_icon (info, icon);
   g_object_unref (icon);
+  icon = g_themed_icon_new ("folder-symbolic");
+  g_file_info_set_symbolic_icon (info, icon);
+  g_object_unref (icon);
 }
 
 static void
@@ -594,6 +598,7 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_display_name (backend, g_file_info_get_display_name (info));
 
   g_vfs_backend_set_icon_name (backend, MOUNT_ICON_NAME);
+  g_vfs_backend_set_symbolic_icon_name (backend, MOUNT_SYMBOLIC_ICON_NAME);
 
   create_root_file (archive);
   create_file_tree (archive, G_VFS_JOB (job));

@@ -439,6 +439,9 @@ create_root_file_info (GVfsBackendFtp *ftp)
   icon = g_themed_icon_new ("folder-remote");
   g_file_info_set_icon (info, icon);
   g_object_unref (icon);
+  icon = g_themed_icon_new ("folder-remote-symbolic");
+  g_file_info_set_symbolic_icon (info, icon);
+  g_object_unref (icon);
 
   return info;
 }

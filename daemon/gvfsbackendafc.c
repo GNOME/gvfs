@@ -547,14 +547,17 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   if ((self->model != NULL) && (g_str_equal (self->model, "iPod") != FALSE))
     {
       g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "multimedia-player-apple-ipod-touch");
+      g_vfs_backend_set_symbolic_icon_name (G_VFS_BACKEND(self), "multimedia-player-apple-ipod-touch-symbolic");
     }
   else if ((self->model != NULL) && (g_str_equal (self->model, "iPad") != FALSE))
     {
       g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "computer-apple-ipad");
+      g_vfs_backend_set_symbolic_icon_name (G_VFS_BACKEND(self), "computer-apple-ipad-symbolic");
     }
   else
     {
       g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "phone-apple-iphone");
+      g_vfs_backend_set_symbolic_icon_name (G_VFS_BACKEND(self), "phone-apple-iphone-symbolic");
     }
 
   /* Get the major OS version */
@@ -1403,6 +1406,7 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
 {
   GFileType type = G_FILE_TYPE_REGULAR;
   GIcon *icon = NULL;
+  GIcon *symbolic_icon = NULL;
   gchar *content_type = NULL;
   char *display_name;
   char *linktarget = NULL;
@@ -1495,11 +1499,13 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
    * seems a little funny to put this in the backends.
    */
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE)
-      || g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STANDARD_ICON))
+      || g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STANDARD_ICON)
+      || g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STANDARD_SYMBOLIC_ICON))
     {
       if (type == G_FILE_TYPE_DIRECTORY)
         {
           icon = g_themed_icon_new ("folder");
+          symbolic_icon = g_themed_icon_new ("folder-symbolic");
         }
       else
         {
@@ -1507,15 +1513,27 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
             {
               icon = g_content_type_get_icon (content_type);
               if (G_IS_THEMED_ICON(icon))
-                g_themed_icon_append_name (G_THEMED_ICON(icon), "text-x-generic");
+                {
+                  g_themed_icon_append_name (G_THEMED_ICON(icon), "text-x-generic");
+                }
+
+              symbolic_icon = g_content_type_get_symbolic_icon (content_type);
+              if (G_IS_THEMED_ICON(symbolic_icon))
+                {
+                  g_themed_icon_append_name (G_THEMED_ICON(symbolic_icon), "text-x-generic-symbolic");
+                }
             }
         }
 
       if (icon == NULL)
         icon = g_themed_icon_new ("text-x-generic");
+      if (symbolic_icon == NULL)
+        symbolic_icon = g_themed_icon_new ("text-x-generic-symbolic");
 
       g_file_info_set_icon (info, icon);
+      g_file_info_set_symbolic_icon (info, symbolic_icon);
       g_object_unref (icon);
+      g_object_unref (symbolic_icon);
     }
 
   g_free (content_type);
@@ -1694,6 +1712,7 @@ g_vfs_backend_afc_set_info_from_app (GVfsBackendAfc *self,
                                      AppInfo *app_info)
 {
   GIcon *icon;
+  GIcon *symbolic_icon;
 
   /* content-type */
   g_file_info_set_content_type (info, "inode/directory");
@@ -1717,6 +1736,11 @@ g_vfs_backend_afc_set_info_from_app (GVfsBackendAfc *self,
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
     }
+
+  /* symbolic icon */
+  symbolic_icon = g_themed_icon_new ("folder-symbolic");
+  g_file_info_set_symbolic_icon (info, symbolic_icon);
+  g_object_unref (symbolic_icon);
 
   /* hidden ? */
   if (app_info && app_info->hidden)

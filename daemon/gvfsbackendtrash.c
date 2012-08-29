@@ -759,6 +759,10 @@ trash_backend_query_info (GVfsBackend           *vfs_backend,
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
 
+      icon = g_themed_icon_new (n_items ? "user-trash-full-symbolic" : "user-trash-symbolic");
+      g_file_info_set_symbolic_icon (info, icon);
+      g_object_unref (icon);
+
       g_file_info_set_attribute_uint32 (info, "trash::item-count", n_items);
 
       g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -862,6 +866,7 @@ g_vfs_backend_trash_init (GVfsBackendTrash *backend)
   /* translators: This is the name of the backend */
   g_vfs_backend_set_display_name (vfs_backend, _("Trash"));
   g_vfs_backend_set_icon_name (vfs_backend, "user-trash");
+  g_vfs_backend_set_symbolic_icon_name (vfs_backend, "user-trash-symbolic");
   g_vfs_backend_set_user_visible (vfs_backend, FALSE);
 
   mount_spec = g_mount_spec_new ("trash");

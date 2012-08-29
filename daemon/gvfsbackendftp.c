@@ -639,6 +639,7 @@ try_login:
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
   g_vfs_backend_set_icon_name (backend, "folder-remote");
+  g_vfs_backend_set_symbolic_icon_name (backend, "folder-remote-symbolic");
 
   ftp->connections = 1;
   ftp->max_connections = G_MAXUINT;

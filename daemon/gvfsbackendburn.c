@@ -345,6 +345,7 @@ g_vfs_backend_burn_init (GVfsBackendBurn *burn_backend)
   /* Translators: This is the name of the backend */
   g_vfs_backend_set_display_name (backend, _("Burn"));
   g_vfs_backend_set_icon_name (backend, "computer");
+  g_vfs_backend_set_symbolic_icon_name (backend, "computer-symbolic");
   g_vfs_backend_set_user_visible (backend, FALSE);
 
   mount_spec = g_mount_spec_new ("burn");
@@ -605,6 +606,9 @@ file_info_from_node (VirtualNode *node,
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       icon = g_themed_icon_new ("folder");
       g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
+      icon = g_themed_icon_new ("folder-symbolic");
+      g_file_info_set_symbolic_icon (info, icon);
       g_object_unref (icon);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);

@@ -555,6 +555,7 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
   g_vfs_backend_set_icon_name (backend, "folder-remote");
+  g_vfs_backend_set_symbolic_icon_name (backend, "folder-remote-symbolic");
 
   smb_mount_spec = g_mount_spec_new ("smb-share");
   g_mount_spec_set (smb_mount_spec, "share", op_backend->share);
@@ -1413,7 +1414,6 @@ set_info_from_stat (GVfsBackendSmb *backend,
 {
   GFileType file_type;
   GTimeVal t;
-  GIcon *icon;
   char *content_type;
   char *display_name;
 
@@ -1488,24 +1488,37 @@ set_info_from_stat (GVfsBackendSmb *backend,
   if (g_file_attribute_matcher_matches (matcher,
 					G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE) ||
       g_file_attribute_matcher_matches (matcher,
-					G_FILE_ATTRIBUTE_STANDARD_ICON))
+					G_FILE_ATTRIBUTE_STANDARD_ICON) ||
+      g_file_attribute_matcher_matches (matcher,
+					G_FILE_ATTRIBUTE_STANDARD_SYMBOLIC_ICON))
     {
-      icon = NULL;
+      GIcon *icon = NULL;
+      GIcon *symbolic_icon = NULL;
+
       content_type = NULL;
       
       if (S_ISDIR(statbuf->st_mode))
 	{
 	  content_type = g_strdup ("inode/directory");
 	  if (basename != NULL && strcmp (basename, "/") == 0)
-	    icon = g_themed_icon_new ("folder-remote");
+            {
+              icon = g_themed_icon_new ("folder-remote");
+              symbolic_icon = g_themed_icon_new ("folder-remote-symbolic");
+            }
 	  else
-	    icon = g_themed_icon_new ("folder");
+            {
+              icon = g_themed_icon_new ("folder");
+              symbolic_icon = g_themed_icon_new ("folder-symbolic");
+            }
 	}
       else if (basename != NULL)
 	{
 	  content_type = g_content_type_guess (basename, NULL, 0, NULL);
 	  if (content_type)
-	    icon = g_content_type_get_icon (content_type);
+            {
+              icon = g_content_type_get_icon (content_type);
+              symbolic_icon = g_content_type_get_symbolic_icon (content_type);
+            }
 	}
       
       if (content_type)
@@ -1516,10 +1529,14 @@ set_info_from_stat (GVfsBackendSmb *backend,
 
       if (icon == NULL)
 	icon = g_themed_icon_new ("text-x-generic");
-      
+      if (symbolic_icon == NULL)
+	symbolic_icon = g_themed_icon_new ("text-x-generic-symbolic");
+
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
-  }
+      g_file_info_set_symbolic_icon (info, symbolic_icon);
+      g_object_unref (symbolic_icon);
+    }
   
   /* Don't trust n_link, uid, gid, etc returned from libsmb, its just made up.
      These are ok though: */

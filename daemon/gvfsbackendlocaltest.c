@@ -247,6 +247,7 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_mount_spec (backend, op_backend->mount_spec);
 
   g_vfs_backend_set_icon_name (backend, "folder-remote");
+  g_vfs_backend_set_symbolic_icon_name (backend, "folder-remote-symbolic");
 
   inject_error (backend, G_VFS_JOB (job), GVFS_JOB_MOUNT);
 }

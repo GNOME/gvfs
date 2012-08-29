@@ -49,41 +49,49 @@ static struct {
   char *method;
   gboolean use_dns_sd_uri;
   char *icon;
+  char *symbolic_icon;
 } dns_sd_types[] = {
 	{
           "_ftp._tcp",
           "ftp",
           FALSE,
-          "folder-remote-ftp"
+          "folder-remote-ftp",
+          "folder-remote-symbolic"
         },
 	{
           "_webdav._tcp",
           "dav+sd",
           TRUE,
-          "folder-remote-dav"
+          "folder-remote-dav",
+          "folder-remote-symbolic"
         },
 	{
           "_webdavs._tcp",
           "davs+sd",
           TRUE,
-          "folder-remote-davs"},
+          "folder-remote-davs",
+          "folder-remote-symbolic"
+        },
 	{
           "_sftp-ssh._tcp",
           "sftp",
           FALSE,
-          "folder-remote-ssh"
+          "folder-remote-ssh",
+          "folder-remote-symbolic"
         },
 	{
 	  "_smb._tcp",
 	  "smb",
 	  FALSE,
-	  "network-server"
+	  "network-server",
+          "network-server-symbolic"
 	},
 	{
-		"_afpovertcp._tcp",
-		"afp",
-		FALSE,
-		"network-server-afp"
+          "_afpovertcp._tcp",
+          "afp",
+          FALSE,
+          "network-server-afp",
+          "network-server-symbolic"
 	}
 };
 
@@ -100,6 +108,7 @@ typedef struct {
   char *target_uri;
 
   GIcon *icon;
+  GIcon *symbolic_icon;
 } LinkFile;
 
 static LinkFile root = { "/" };
@@ -192,17 +201,22 @@ get_global_avahi_client (void)
 }
 
 static GIcon *
-get_icon_for_type (const char *type)
+get_icon_for_type (const char *type,
+                   gboolean    use_symbolic)
 {
   int i;
 
   for (i = 0; i < G_N_ELEMENTS (dns_sd_types); i++)
     {
       if (strcmp (type, dns_sd_types[i].type) == 0)
-	return g_themed_icon_new_with_default_fallbacks (dns_sd_types[i].icon);
+        {
+          const char *icon_name;
+          icon_name = use_symbolic ? dns_sd_types[i].symbolic_icon : dns_sd_types[i].icon;
+          return g_themed_icon_new_with_default_fallbacks (icon_name);
+        }
     }
   
-  return g_themed_icon_new ("text-x-generic");
+  return g_themed_icon_new (use_symbolic ? "text-x-generic-symbolic" : "text-x-generic");
 }
 
 static const char *
@@ -253,7 +267,8 @@ link_file_new (const char *name,
   file->name = g_strdup (name);
   file->type = g_strdup (type);
   file->domain = g_strdup (domain);
-  file->icon = get_icon_for_type (type);
+  file->icon = get_icon_for_type (type, FALSE);
+  file->symbolic_icon = get_icon_for_type (type, TRUE);
 
   uri = g_vfs_get_dns_sd_uri_for_triple (name, type, domain);
   file->file_name = g_path_get_basename (uri);
@@ -342,6 +357,8 @@ link_file_free (LinkFile *file)
  
   if (file->icon)
     g_object_unref (file->icon);
+  if (file->symbolic_icon)
+    g_object_unref (file->symbolic_icon);
   
   g_slice_free (LinkFile, file);
 }
@@ -412,6 +429,8 @@ file_info_from_file (LinkFile *file,
 
   if (file->icon)
     g_file_info_set_icon (info, file->icon);
+  if (file->symbolic_icon)
+    g_file_info_set_symbolic_icon (info, file->symbolic_icon);
 
   g_file_info_set_file_type (info, G_FILE_TYPE_SHORTCUT);
   g_file_info_set_size(info, 0);
@@ -498,6 +517,9 @@ try_query_info (GVfsBackend *backend,
       g_file_info_set_display_name (info, display_name);
       icon = g_themed_icon_new ("network-workgroup");
       g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
+      icon = g_themed_icon_new ("network-workgroup-symbolic");
+      g_file_info_set_symbolic_icon (info, icon);
       g_object_unref (icon);
       g_free (display_name);
 
@@ -754,6 +776,7 @@ g_vfs_backend_dns_sd_init (GVfsBackendDnsSd *network_backend)
   g_vfs_backend_set_display_name (backend, _("Dns-SD"));
   g_vfs_backend_set_stable_name (backend, _("Network"));
   g_vfs_backend_set_icon_name (backend, "network-workgroup");
+  g_vfs_backend_set_symbolic_icon_name (backend, "network-workgroup-symbolic");
   g_vfs_backend_set_user_visible (backend, FALSE);
 
   resolver_supports_mdns = (avahi_nss_support () > 0);

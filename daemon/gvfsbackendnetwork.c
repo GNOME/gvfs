@@ -47,6 +47,7 @@ typedef struct {
   char *display_name;
   char *target_uri;
   GIcon *icon;
+  GIcon *symbolic_icon;
   guint num_duplicates;
 } NetworkFile;
 
@@ -78,6 +79,8 @@ struct _GVfsBackendNetwork
   /* Icons */
   GIcon *workgroup_icon; /* GThemedIcon = "network-workgroup" */
   GIcon *server_icon; /* GThemedIcon = "network-server" */
+  GIcon *workgroup_symbolic_icon; /* GThemedIcon = "network-workgroup-symbolic" */
+  GIcon *server_symbolic_icon; /* GThemedIcon = "network-server-symbolic" */
 };
 
 typedef struct _GVfsBackendNetwork GVfsBackendNetwork;
@@ -88,7 +91,8 @@ static NetworkFile *
 network_file_new (const char *file_name, 
                   const char *display_name, 
                   const char *target_uri, 
-                  GIcon *icon)
+                  GIcon      *icon,
+                  GIcon      *symbolic_icon)
 {
   NetworkFile *file;
   
@@ -98,6 +102,7 @@ network_file_new (const char *file_name,
   file->display_name = g_strdup (display_name);
   file->target_uri = g_strdup (target_uri);
   file->icon = g_object_ref (icon);
+  file->symbolic_icon = g_object_ref (symbolic_icon);
 
   return file;
 }
@@ -111,6 +116,8 @@ network_file_free (NetworkFile *file)
  
   if (file->icon)
     g_object_unref (file->icon);
+  if (file->symbolic_icon)
+    g_object_unref (file->symbolic_icon);
 
   g_slice_free (NetworkFile, file);
 }
@@ -122,6 +129,8 @@ network_file_equal (NetworkFile *a,
                     NetworkFile *b)
 {
   if (!g_icon_equal (a->icon, b->icon))
+    return FALSE;
+  if (!g_icon_equal (a->symbolic_icon, b->symbolic_icon))
     return FALSE;
 
   if ((a->display_name != NULL && b->display_name == NULL) ||
@@ -320,8 +329,11 @@ recompute_files (GVfsBackendNetwork *backend)
       char *workgroup;
       
       /* smb:/// root link */
-      file = network_file_new ("smb-root", _("Windows Network"), 
-                               "smb:///", backend->workgroup_icon);
+      file = network_file_new ("smb-root",
+                               _("Windows Network"),
+                               "smb:///",
+                               backend->workgroup_icon,
+                               backend->workgroup_symbolic_icon);
       files = g_list_prepend (files, file);
 
       if (backend->current_workgroup == NULL ||
@@ -369,7 +381,8 @@ recompute_files (GVfsBackendNetwork *backend)
               file = network_file_new (file_name, 
                                        g_file_info_get_display_name (info), 
                                        link_uri, 
-                                       backend->server_icon);
+                                       backend->server_icon,
+                                       backend->server_symbolic_icon);
               files = g_list_prepend (files, file);
 
               g_free (link_uri);
@@ -427,8 +440,9 @@ recompute_files (GVfsBackendNetwork *backend)
                                       "standard::target-uri"));
                   file = network_file_new (file_name, 
 					   g_file_info_get_display_name (info), 
-					   link_uri, 
-					   backend->server_icon);
+					   link_uri,
+					   backend->server_icon,
+					   backend->server_symbolic_icon);
                   files = g_list_prepend (files, file);
 		  
                   g_free (link_uri);
@@ -444,8 +458,11 @@ recompute_files (GVfsBackendNetwork *backend)
       else
         {
           /* "separate": a link to dns-sd://local/ */
-          file = network_file_new ("dnssd-local", _("Local Network"), 
-				   "dns-sd://local/", backend->workgroup_icon);
+          file = network_file_new ("dnssd-local",
+                                   _("Local Network"),
+				   "dns-sd://local/",
+                                   backend->workgroup_icon,
+                                   backend->workgroup_symbolic_icon);
           files = g_list_prepend (files, file);   
         }
       
@@ -466,7 +483,8 @@ recompute_files (GVfsBackendNetwork *backend)
 	      file = network_file_new (file_name,
 				       domains[i],
 				       link_uri,
-				       backend->workgroup_icon);
+				       backend->workgroup_icon,
+				       backend->workgroup_symbolic_icon);
 	      files = g_list_prepend (files, file);   
 	      g_free (link_uri);
 	      g_free (file_name);
@@ -692,6 +710,8 @@ file_info_from_file (NetworkFile *file,
 
   if (file->icon) 
     g_file_info_set_icon (info, file->icon);
+  if (file->symbolic_icon)
+    g_file_info_set_symbolic_icon (info, file->symbolic_icon);
 
   g_file_info_set_file_type (info, G_FILE_TYPE_SHORTCUT);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
@@ -763,6 +783,9 @@ try_query_info (GVfsBackend *backend,
       g_file_info_set_display_name (info, _("Network"));
       icon = g_themed_icon_new ("network-workgroup");
       g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
+      icon = g_themed_icon_new ("network-workgroup-symbolic");
+      g_file_info_set_symbolic_icon (info, icon);
       g_object_unref (icon);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
@@ -895,6 +918,7 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
   g_vfs_backend_set_display_name (backend, _("Network"));
   g_vfs_backend_set_stable_name (backend, _("Network"));
   g_vfs_backend_set_icon_name (backend, "network-workgroup");
+  g_vfs_backend_set_symbolic_icon_name (backend, "network-workgroup-symbolic");
   g_vfs_backend_set_user_visible (backend, FALSE);
 
   mount_spec = g_mount_spec_new ("network");
@@ -903,6 +927,8 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
 
   network_backend->workgroup_icon = g_themed_icon_new ("network-workgroup");
   network_backend->server_icon = g_themed_icon_new ("network-server");
+  network_backend->workgroup_symbolic_icon = g_themed_icon_new ("network-workgroup-symbolic");
+  network_backend->server_symbolic_icon = g_themed_icon_new ("network-server-symbolic");
 }
 
 static void
@@ -916,6 +942,8 @@ g_vfs_backend_network_finalize (GObject *object)
   g_object_unref (backend->root_monitor);
   g_object_unref (backend->workgroup_icon);
   g_object_unref (backend->server_icon);
+  g_object_unref (backend->workgroup_symbolic_icon);
+  g_object_unref (backend->server_symbolic_icon);
   if (backend->smb_settings)
     g_object_unref (backend->smb_settings);
   if (backend->dnssd_settings)
