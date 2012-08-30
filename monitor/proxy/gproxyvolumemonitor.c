@@ -922,10 +922,6 @@ name_owner_changed (GObject    *gobject,
   GProxyVolumeMonitor *monitor = G_PROXY_VOLUME_MONITOR (user_data);
   GProxyVolumeMonitorClass *klass;
   gchar *name_owner = NULL;
-  GHashTableIter hash_iter;
-  GProxyDrive *drive;
-  GProxyVolume *volume;
-  GProxyMount *mount;
 
   klass = G_PROXY_VOLUME_MONITOR_CLASS (G_OBJECT_GET_CLASS (monitor));
 

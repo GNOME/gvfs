@@ -1999,11 +1999,9 @@ g_vfs_proxy_volume_monitor_daemon_main (int argc,
                                         const char *dbus_name,
                                         GType volume_monitor_type)
 {
-  int ret;
   guint name_owner_id;
 
   name_owner_id = 0;
-  ret = 1;
 
   loop = g_main_loop_new (NULL, FALSE);
 
@@ -2030,9 +2028,6 @@ g_vfs_proxy_volume_monitor_daemon_main (int argc,
                                   NULL);
   g_main_loop_run (loop);
 
-  ret = 0;
-
-out:
   if (name_owner_id != 0)
     g_bus_unown_name (name_owner_id);
   if (loop != NULL)
@@ -2040,5 +2035,5 @@ out:
   if (unique_names_being_watched)
     g_hash_table_unref (unique_names_being_watched);
 
-  return ret;
+  return 0;
 }
