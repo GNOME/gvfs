@@ -657,7 +657,7 @@ register_mount_got_proxy_cb (GObject *source_object,
   GError *error = NULL;
   GSimpleAsyncResult *result;
   GVfsBackend *backend;
-  const char *stable_name;
+  char *stable_name;
   char *x_content_types_string;
   char *icon_str;
   char *symbolic_icon_str;
@@ -693,11 +693,7 @@ register_mount_got_proxy_cb (GObject *source_object,
   else
     symbolic_icon_str = g_strdup ("");
 
-  if (backend->priv->stable_name != NULL &&
-      *backend->priv->stable_name != 0)
-   stable_name = backend->priv->stable_name;
-  else
-   stable_name = backend->priv->display_name;
+  stable_name = g_mount_spec_to_string (backend->priv->mount_spec);
 
   gvfs_dbus_mount_tracker_call_register_mount (proxy,
                                                backend->priv->object_path,
@@ -713,6 +709,7 @@ register_mount_got_proxy_cb (GObject *source_object,
                                                NULL,
                                                data->callback, data->callback_data);
 
+  g_free (stable_name);
   g_free (x_content_types_string);
   g_free (icon_str);
   g_free (symbolic_icon_str);

@@ -379,15 +379,7 @@ mount_record_new (GMount *mount)
   mount_record = g_new (MountRecord, 1);
   
   mount_record->root = g_mount_get_root (mount);
-  name = g_object_get_data (G_OBJECT (mount), "g-stable-name");
-  if (name != NULL && *name != 0)
-    name = g_strdup (name);
-  else
-    name = g_mount_get_name (mount);
-
-  /* Keep in sync with gvfs daemon mount tracker */
-  mount_record->name = g_uri_escape_string (name, "+@#$., ", TRUE);
-  g_free (name);
+  mount_record->name = g_object_get_data (G_OBJECT (mount), "g-stable-name");
   mount_record->creation_time = time (NULL);
   
   return mount_record;
