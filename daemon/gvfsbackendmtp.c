@@ -253,6 +253,34 @@ try_mount (GVfsBackend *backend,
   return FALSE;
 }
 
+#if HAVE_LIBMTP_READ_EVENT
+static gpointer
+check_event(gpointer user_data)
+{
+  GVfsBackendMtp *backend = user_data;
+
+  LIBMTP_event_t event;
+  int ret = 0;
+  while (ret == 0) {
+    uint32_t param1;
+    char *path;
+    ret = LIBMTP_Read_Event(backend->device, &event, &param1);
+    switch (event) {
+    case LIBMTP_EVENT_STORE_ADDED:
+      path = g_strdup_printf ("/%u", param1);
+      g_mutex_lock (&backend->mutex);
+      g_hash_table_foreach (backend->monitors, emit_create_event, path);
+      g_mutex_unlock (&backend->mutex);
+      g_free (path);
+      break;
+    default:
+      break;
+    }
+  }
+  return NULL;
+}
+#endif
+
 static void
 do_mount (GVfsBackend *backend,
            GVfsJobMount *job,
@@ -319,6 +347,10 @@ do_mount (GVfsBackend *backend,
     g_mount_spec_unref (mtp_mount_spec);
 
     g_vfs_job_succeeded (G_VFS_JOB (job));
+
+#if HAVE_LIBMTP_READ_EVENT
+    g_thread_new("events", check_event, backend);
+#endif
   }
 }
 

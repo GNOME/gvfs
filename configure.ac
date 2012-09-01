@@ -514,6 +514,11 @@ if test "x$enable_libmtp" != "xno" -a "x$msg_gudev" = "xyes"; then
     if test "x$have_libmtp_get_thumbnail" = "xyes"; then
       AC_DEFINE(HAVE_LIBMTP_GET_THUMBNAIL, 1, [Define to 1 if LIBMTP_Get_Thumbnail is available])
     fi
+
+    AC_CHECK_LIB(mtp, LIBMTP_Read_Event, have_libmtp_read_event=yes)
+    if test "x$have_libmtp_read_event" = "xyes"; then
+      AC_DEFINE(HAVE_LIBMTP_READ_EVENT, 1, [Define to 1 if LIBMTP_Read_Event is available])
+    fi
     LIBS="$save_libs"
   fi
 fi
