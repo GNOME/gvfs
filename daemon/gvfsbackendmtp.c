@@ -190,6 +190,20 @@ emit_change_event(gpointer key,
 }
 
 
+static void
+fail_job (GVfsJob *job, LIBMTP_mtpdevice_t *device)
+{
+  LIBMTP_error_t *error = LIBMTP_Get_Errorstack(device);
+
+  g_vfs_job_failed (job, G_IO_ERROR,
+                    g_vfs_job_is_cancelled(job) ?
+                      G_IO_ERROR_CANCELLED :
+                      G_IO_ERROR_FAILED,
+                    g_strrstr(error->error_text, ":") + 1);
+
+  LIBMTP_Clear_Errorstack(device);
+}
+
 
 /************************************************
  * 	  Mount
@@ -666,11 +680,7 @@ do_enumerate (GVfsBackend *backend,
     LIBMTP_Clear_Errorstack(device);
     files = LIBMTP_Get_Files_And_Folders(device, strtol(elements[1], NULL, 10), pid);
     if (files == NULL && LIBMTP_Get_Errorstack(device) != NULL) {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_FAILED,
-                        "Failed to enumerate contents of %s\n", filename);
-      LIBMTP_Dump_Errorstack(device);
-      LIBMTP_Clear_Errorstack(device);
+      fail_job(G_VFS_JOB(job), device);
       goto exit;
     }
     while (files != NULL) {
@@ -913,14 +923,7 @@ do_pull(GVfsBackend *backend,
                               mtp_progress_data);
       g_free(mtp_progress_data);
       if (ret != 0) {
-        LIBMTP_Dump_Errorstack(device);
-        LIBMTP_Clear_Errorstack(device);
-        g_vfs_job_failed (G_VFS_JOB (job),
-                          G_IO_ERROR,
-                          g_vfs_job_is_cancelled(G_VFS_JOB(job)) ?
-                            G_IO_ERROR_CANCELLED :
-                            G_IO_ERROR_FAILED,
-                          "Error while downloading entity.");
+        fail_job(G_VFS_JOB(job), device);
         goto exit;
       }
   }
@@ -1101,11 +1104,7 @@ do_delete (GVfsBackend *backend,
 
   int ret = LIBMTP_Delete_Object(device, strtol(elements[ne-1], NULL, 10));
   if (ret != 0) {
-    LIBMTP_Dump_Errorstack(device);
-    LIBMTP_Clear_Errorstack(device);
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_FAILED,
-                      "Error while deleting entity.");
+    fail_job(G_VFS_JOB(job), device);
     goto exit;
   }
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1145,12 +1144,8 @@ do_set_display_name (GVfsBackend *backend,
   LIBMTP_file_t *file = LIBMTP_Get_Filemetadata(device, strtol(elements[ne-1], NULL, 10));
   int ret = LIBMTP_Set_File_Name(device, file, display_name);
   if (ret != 0) {
-      LIBMTP_Dump_Errorstack(device);
-      LIBMTP_Clear_Errorstack(device);
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_FAILED,
-                        "Error while renaming entity.");
-      goto exit;
+    fail_job(G_VFS_JOB(job), device);
+    goto exit;
   }
   LIBMTP_destroy_file_t(file);
   file = NULL;
