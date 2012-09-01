@@ -8,7 +8,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2012-08-30 18:54+0000\n"
-"PO-Revision-Date: 2012-09-01 17:24+0700\n"
+"PO-Revision-Date: 2012-09-01 17:30+0700\n"
 "Last-Translator: Nguyễn Thái Ngọc Duy <pclouds@gmail.com>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
 "Language: vi\n"
@@ -345,10 +345,10 @@ msgid "Got unknown error code %d from server"
 msgstr "Nhận mã lỗi lạ %d từ máy chủ"
 
 #: ../daemon/gvfsafpvolume.c:145
-#, fuzzy, c-format
+#, c-format
 #| msgid "Couldn't mount AFP volume %s on %s"
 msgid "Couldn't load %s on %s"
-msgstr "Không thể gắn khối tin AFP %s trên %s"
+msgstr "Không thể nạp %s trên %s"
 
 #: ../daemon/gvfsafpvolume.c:390 ../daemon/gvfsafpvolume.c:668
 #: ../daemon/gvfsafpvolume.c:821 ../daemon/gvfsafpvolume.c:1015
@@ -694,7 +694,7 @@ msgstr "%s trên %s"
 #: ../daemon/gvfsbackendafpbrowse.c:465
 #, c-format
 msgid "%s"
-msgstr ""
+msgstr "%s"
 
 #: ../daemon/gvfsbackendafpbrowse.c:498 ../daemon/gvfsbackendafp.c:2101
 #: ../daemon/gvfsbackendarchive.c:543 ../daemon/gvfsbackendftp.c:668
@@ -742,10 +742,10 @@ msgstr "Loại thuộc tính không hợp lệ (cần uint32)"
 
 #. Translators: first %s is volumename, second username and third servername
 #: ../daemon/gvfsbackendafp.c:2061
-#, fuzzy, c-format
+#, c-format
 #| msgid "SFTP for %s on %s"
 msgid "%s for %s on %s"
-msgstr "SFTP cho %s trên %s"
+msgstr "%s cho %s trên %s"
 
 #: ../daemon/gvfsbackendafp.c:2110
 msgid "No volume specified"
@@ -998,10 +998,10 @@ msgstr "Không thể dò (poll) tập tin"
 #. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
 #. the second %s and only shown if it is not the default http(s) port.
 #: ../daemon/gvfsbackenddav.c:485
-#, fuzzy, c-format
+#, c-format
 #| msgid "%s on %s"
 msgid "%s on %s%s"
-msgstr "%s trên %s"
+msgstr "%s trên %s%s"
 
 #: ../daemon/gvfsbackenddav.c:677 ../daemon/gvfsbackenddav.c:1918
 #: ../daemon/gvfsbackendhttp.c:255
@@ -1076,10 +1076,10 @@ msgstr "Mạng"
 
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendftp.c:488 ../daemon/gvfsbackendsftp.c:957
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter password for ssh on %s"
 msgid "Enter password for %s on %s"
-msgstr "Nhập mật khẩu cho ssh trên %s"
+msgstr "Nhập mật khẩu cho %s trên %s"
 
 #: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:981
 #: ../daemon/gvfsbackendsmbbrowse.c:1001 ../daemon/gvfsbackendsmb.c:620
@@ -1386,17 +1386,17 @@ msgstr "Quá hạn trong khi đăng nhập"
 
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendsftp.c:954
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter passphrase for key for ssh on %s"
 msgid "Enter passphrase for secure key for %s on %s"
-msgstr "Nhập mật khẩu cho khoá ssh trên %s"
+msgstr "Nhập mật khẩu cho khoá an ninh cho %s trên %s"
 
 #. Translators: %s is the hostname
 #: ../daemon/gvfsbackendsftp.c:961
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter passphrase for key for ssh on %s"
 msgid "Enter passphrase for secure key for %s"
-msgstr "Nhập mật khẩu cho khoá ssh trên %s"
+msgstr "Nhập mật khẩu cho khoá an ninh cho %s"
 
 #: ../daemon/gvfsbackendsftp.c:1044
 msgid "Can't send password"
@@ -2283,7 +2283,6 @@ msgid "Concatenate files and print to the standard output."
 msgstr "Nối các tập tin và xuất ra đầu ra chuẩn."
 
 #: ../programs/gvfs-cat.c:147
-#, fuzzy
 #| msgid ""
 #| "Concatenate files at locations and print to the standard output. Works "
 #| "just like the traditional cat utility, but using gvfs location instead "
@@ -2294,13 +2293,11 @@ msgid ""
 "locations instead of local files: for example you can use something\n"
 "like smb://server/resource/file.txt as location."
 msgstr ""
-"Ghép nối các tập tin ở vị trí, và in ra đầu ra tiêu chuẩn (stdout). Chạy "
-"đúng như tiện ích cat truyền thống, nhưng dùng vị trí gvfs thay cho tập tin "
-"cục bộ. Ví dụ, bạn có thể sử dụng cái gì như « smb://máy/tài_nguyên/tập_tin."
-"txt » làm vị trí cần ghép nối."
+"gvfs-cat chạy đúng như tiện ích cat truyền thống, nhưng dùng vị trí gvfs "
+"thay cho tập tin cục bộ. Ví dụ, bạn có thể sử dụng cái gì như smb://máy/"
+"tài_nguyên/tập_tin.txt làm vị trí cần ghép nối."
 
 #: ../programs/gvfs-cat.c:151
-#, fuzzy
 #| msgid ""
 #| "Note: just pipe through cat if you need its formatting option like -n, -T "
 #| "or other."
@@ -2308,8 +2305,8 @@ msgid ""
 "Note: just pipe through cat if you need its formatting options\n"
 "like -n, -T or other."
 msgstr ""
-"Ghi chú : chỉ gửi dữ liệu qua ống dẫn cho tiện ích cat nếu bạn cần dùng tùy "
-"chọn định dạng của nó (v.d. « -n », « -T »)."
+"Ghi chú: chỉ gửi dữ liệu qua ống dẫn cho tiện ích cat nếu bạn cần dùng tùy "
+"chọn định dạng của nó như -n,-T hoặc tương tự."
 
 #: ../programs/gvfs-cat.c:168 ../programs/gvfs-copy.c:131
 #: ../programs/gvfs-info.c:387 ../programs/gvfs-ls.c:414
@@ -2550,7 +2547,6 @@ msgid "List the contents of the locations."
 msgstr "Liệt kê nội dung vị trí."
 
 #: ../programs/gvfs-ls.c:399
-#, fuzzy
 #| msgid ""
 #| "Concatenate files at locations and print to the standard output. Works "
 #| "just like the traditional cat utility, but using gvfs location instead "
@@ -2562,10 +2558,9 @@ msgid ""
 "like smb://server/resource/file.txt as location. File attributes can\n"
 "be specified with their gvfs name, e.g. standard::icon."
 msgstr ""
-"Ghép nối các tập tin ở vị trí, và in ra đầu ra tiêu chuẩn (stdout). Chạy "
-"đúng như tiện ích cat truyền thống, nhưng dùng vị trí gvfs thay cho tập tin "
-"cục bộ. Ví dụ, bạn có thể sử dụng cái gì như « smb://máy/tài_nguyên/tập_tin."
-"txt » làm vị trí cần ghép nối."
+"gvfs-ls chạy đúng như tiện ích cat truyền thống, nhưng dùng vị trí gvfs thay "
+"cho tập tin cục bộ. Ví dụ, bạn có thể sử dụng cái gì như smb://máy/"
+"tài_nguyên/tập_tin.txt làm vị trí cần ghép nối."
 
 #: ../programs/gvfs-mime.c:36
 msgid "Query handler for mime-type"
@@ -2577,20 +2572,18 @@ msgstr "Trình đặt cho mime-type"
 
 #: ../programs/gvfs-mime.c:82
 msgid "MIMETYPE"
-msgstr ""
+msgstr "LOẠI MIME"
 
 #: ../programs/gvfs-mime.c:82
 msgid "HANDLER"
-msgstr ""
+msgstr "TRÌNH XỬ LÝ"
 
 #: ../programs/gvfs-mime.c:83
-#, fuzzy
 #| msgid "Set handler for mime-type"
 msgid "Get or set the handler for a mime-type."
-msgstr "Trình đặt cho mime-type"
+msgstr "Đặt hoặc lấy trình xử lý cho mime-type."
 
 #: ../programs/gvfs-mime.c:95
-#, fuzzy
 #| msgid "Specify one of --query and --set"
 msgid "Specify either --query or --set"
 msgstr "Xác định hoặc --query hoặc --set"
@@ -2664,11 +2657,11 @@ msgstr "Không gửi sự kiện MOVED đơn lẻ"
 
 #: ../programs/gvfs-monitor-dir.c:113
 msgid "Monitor directories for changes."
-msgstr ""
+msgstr "Theo dõi thay đổi trong thư mục."
 
 #: ../programs/gvfs-monitor-file.c:112
 msgid "Monitor files for changes."
-msgstr ""
+msgstr "Theo dõi thay đổi tập tin."
 
 #: ../programs/gvfs-mount.c:57
 msgid "Mount as mountable"
@@ -2680,7 +2673,7 @@ msgstr "Gắn kết khối tin với tập tin thiết bị"
 
 #: ../programs/gvfs-mount.c:58
 msgid "DEVICE"
-msgstr ""
+msgstr "THIẾT BỊ"
 
 #: ../programs/gvfs-mount.c:59
 msgid "Unmount"
@@ -2688,7 +2681,7 @@ msgstr "Bỏ gắn kết"
 
 #: ../programs/gvfs-mount.c:60
 msgid "Eject"
-msgstr ""
+msgstr "Đẩy ra"
 
 #: ../programs/gvfs-mount.c:61
 msgid "Unmount all mounts with the given scheme"
@@ -2729,7 +2722,7 @@ msgstr "Lỗi tìm đầu gắn kết: %s\n"
 #: ../programs/gvfs-mount.c:302
 #, c-format
 msgid "Error ejecting mount: %s\n"
-msgstr ""
+msgstr "Lỗi đẩy ra: %s\n"
 
 #: ../programs/gvfs-mount.c:786
 #, c-format
@@ -2762,7 +2755,6 @@ msgstr "Lỗi di chuyển tập tin %s: %s\n"
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
 #: ../programs/gvfs-open.c:64
-#, fuzzy
 #| msgid ""
 #| "Opens the file(s) with the default application registered to handle the "
 #| "type of the file."
@@ -2770,8 +2762,8 @@ msgid ""
 "Open files with the default application that\n"
 "is registered to handle files of this type."
 msgstr ""
-"Mở (các) tập tin bằng ứng dụng mặc định được đăng ký để xử lý tập tin kiểu "
-"đó."
+"Mở tập tin bằng ứng dụng mặc định được\n"
+" đăng ký để xử lý tập tin kiểu đó."
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -2782,7 +2774,7 @@ msgstr "%s: %s: gặp lỗi khi mở vị trí: %s\n"
 
 #: ../programs/gvfs-rename.c:64
 msgid "NEW-NAME"
-msgstr ""
+msgstr "TÊN-MỚI"
 
 #: ../programs/gvfs-rename.c:65
 msgid "Rename a file."
@@ -2794,14 +2786,13 @@ msgid "Rename successful. New uri: %s\n"
 msgstr "Đổi tên thành công. URI mới: %s\n"
 
 #: ../programs/gvfs-rm.c:34 ../programs/gvfs-trash.c:34
-#, fuzzy
 #| msgid "ignore nonexistent files, never prompt"
 msgid "Ignore nonexistent files, never prompt"
-msgstr "bỏ qua tập tin không tồn tại, không bao giờ hỏi"
+msgstr "Bỏ qua tập tin không tồn tại, không bao giờ hỏi"
 
 #: ../programs/gvfs-rm.c:59
 msgid "Delete the given files."
-msgstr ""
+msgstr "Xoá tập tin đã cho."
 
 #: ../programs/gvfs-save.c:44
 msgid "Only create if not existing"
@@ -2812,10 +2803,9 @@ msgid "Append to end of file"
 msgstr "Nối vào cuối tập tin"
 
 #: ../programs/gvfs-save.c:46
-#, fuzzy
 #| msgid "When creating a file, restrict access to the current user only"
 msgid "When creating, restrict access to the current user"
-msgstr "Khi tạo tập tin, giới hạn truy cập cho chỉ người dùng hiện tại"
+msgstr "Khi tạo, giới hạn truy cập cho chỉ người dùng hiện tại"
 
 #. Translators: The "etag" is a token allowing to verify whether a file has been modified
 #: ../programs/gvfs-save.c:48
@@ -2829,7 +2819,7 @@ msgstr "Ghi đè etag của tập tin"
 
 #: ../programs/gvfs-save.c:50
 msgid "ETAG"
-msgstr ""
+msgstr "ETAG"
 
 #: ../programs/gvfs-save.c:78
 #, c-format
@@ -2852,32 +2842,30 @@ msgid "Etag not available\n"
 msgstr "Không có etag\n"
 
 #: ../programs/gvfs-save.c:166
-#, fuzzy
 #| msgid "DEST - read from standard input and save to DEST"
 msgid "Read from standard input and save to DEST."
-msgstr "ĐÍCH - đọc từ đầu nhập chuẩn và lưu vào ĐÍCH"
+msgstr "Đọc từ đầu nhập chuẩn và lưu vào ĐÍCH."
 
 #: ../programs/gvfs-set-attribute.c:36
-#, fuzzy
 #| msgid "The attributes to get"
 msgid "Type of the attribute"
-msgstr "Thuộc tính cần lấy"
+msgstr "Loại thuộc tính"
 
 #: ../programs/gvfs-set-attribute.c:36
 msgid "TYPE"
-msgstr ""
+msgstr "LOẠI"
 
 #: ../programs/gvfs-set-attribute.c:139
 msgid "ATTRIBUTE"
-msgstr ""
+msgstr "THUỘC TÍNH"
 
 #: ../programs/gvfs-set-attribute.c:139
 msgid "VALUE"
-msgstr ""
+msgstr "GIÁ TRỊ"
 
 #: ../programs/gvfs-set-attribute.c:140
 msgid "Set a file attribute of LOCATION."
-msgstr ""
+msgstr "Đặt thuộc tính tập tin VỊ TRÍ."
 
 #: ../programs/gvfs-set-attribute.c:159
 msgid "Location not specified\n"
@@ -2902,10 +2890,9 @@ msgid "Error setting attribute: %s\n"
 msgstr "Lỗi đặt thuộc tính: %s\n"
 
 #: ../programs/gvfs-trash.c:58
-#, fuzzy
 #| msgid "Can't move a shared directory into the Trash"
 msgid "Move files or directories to the trash."
-msgstr "Không thể di chuyển thư mục được chia sẻ vào Sọt rác"
+msgstr "Di chuyển tập tin hoặc thư mục vào Sọt rác."
 
 #: ../programs/gvfs-trash.c:89
 #, c-format
@@ -2913,16 +2900,14 @@ msgid "Error trashing file: %s\n"
 msgstr "Lỗi chuyển tập tin vào sọt rác: %s\n"
 
 #: ../programs/gvfs-tree.c:37
-#, fuzzy
 #| msgid "Follow symbolic links, mounts and shortcuts like directories"
 msgid "Follow symbolic links, mounts and shortcuts"
-msgstr "Theo liên kết biểu tượng, gắn kết và đường tắt như theo thư mục"
+msgstr "Theo liên kết biểu tượng, gắn kết và đường tắt"
 
 #: ../programs/gvfs-tree.c:249
-#, fuzzy
 #| msgid "- list contents of directories in a tree-like format"
 msgid "List contents of directories in a tree-like format."
-msgstr "- liệt kê nội dung thư mục dạng cây"
+msgstr "Liệt kê nội dung thư mục dạng cây"
 
 #~ msgid "AFP volumes for %s on %s"
 #~ msgstr "Khối tin AFP cho %s trên %s"
