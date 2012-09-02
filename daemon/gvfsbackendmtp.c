@@ -512,7 +512,6 @@ get_storage_info(LIBMTP_devicestorage_t *storage, GFileInfo *info) {
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, storage->FreeSpaceInBytes);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, storage->MaxCapacity);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "mtpfs");
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW, G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL);
 }
 
 static void
@@ -547,7 +546,6 @@ get_file_info(GVfsBackend *backend, LIBMTP_mtpdevice_t *device, GFileInfo *info,
   if (LIBMTP_FILETYPE_IS_IMAGE(file->filetype) ||
       LIBMTP_FILETYPE_IS_VIDEO(file->filetype) ||
       LIBMTP_FILETYPE_IS_AUDIOVIDEO(file->filetype)) {
-    g_print("Thumbnail file: %s\n", file->filename);
 
     char *icon_id;
     GIcon *icon;
