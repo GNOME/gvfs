@@ -13,15 +13,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master.ta\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-01 05:41+0530\n"
-"PO-Revision-Date: 2012-02-27 13:31+0530\n"
+"POT-Creation-Date: 2012-09-02 21:11+0530\n"
+"PO-Revision-Date: 2012-09-03 12:17+0530\n"
 "Last-Translator: Dr.T.Vasudevan <agnihot3@gmail.com>\n"
 "Language-Team: American English <kde-i18n-doc@kde.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n!=1);\\n\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\\n"
+"\n"
 "\n"
 "\n"
 "\n"
@@ -196,7 +197,7 @@ msgstr "GVfsIcon க்கு சிதைந்த உள்ளீட்டு 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "FTP"
 #: ../daemon/daemon-main.c:100
-#, fuzzy, c-format
+#, c-format
 msgid "%s File System Service"
 msgstr "%s கோப்பு முறைமை சேவை"
 
@@ -232,14 +233,12 @@ msgid "error starting mount daemon"
 msgstr "டீமானை ஏற்றும் போது பிழை"
 
 #: ../daemon/gvfsafpconnection.c:764
-#, fuzzy
 msgid "The connection is not opened"
-msgstr "இணைப்பு மறிக்கப்பட்டது"
+msgstr "இணைப்பு திறக்கப்படவில்லை"
 
 #: ../daemon/gvfsafpconnection.c:771
-#, fuzzy
 msgid "The connection is closed"
-msgstr "தரவு இணைப்பு இல்லை"
+msgstr "இணைப்பு மூடப்பட்டது"
 
 #: ../daemon/gvfsafpconnection.c:1545
 msgid "Connection unexpectedly went down"
@@ -250,47 +249,46 @@ msgid "Got EOS"
 msgstr "ஈஓஎஸ் உள்ளது"
 
 #: ../daemon/gvfsafpserver.c:198 ../daemon/gvfsafpserver.c:480
-#, fuzzy, c-format
+#, c-format
 msgid "The server doesn't support passwords longer than %d character."
 msgid_plural "The server doesn't support passwords longer than %d characters."
-msgstr[0] "சேவையகம் %d எழுத்துருக்களுக்கு மேல் உள்ள கடவுச்சொல்லை ஆதரிக்கவில்லை"
-msgstr[1] "சேவையகம் %d எழுத்துருக்களுக்கு மேல் உள்ள கடவுச்சொல்லை ஆதரிக்கவில்லை"
+msgstr[0] "சேவையகம் %d எழுத்துருக்களுக்கு மேல் உள்ள கடவுச்சொற்களை ஆதரிக்கவில்லை"
+msgstr[1] "சேவையகம் %d எழுத்துருக்களுக்கு மேல் உள்ள கடவுச்சொற்களை ஆதரிக்கவில்லை"
 
 #: ../daemon/gvfsafpserver.c:224 ../daemon/gvfsafpserver.c:533
-#, fuzzy
 msgid "An invalid username was provided."
-msgstr "செல்லுபடியாகாத பயனர் பெயர் தர்ப்பட்டது"
+msgstr "செல்லுபடியாகாத பயனர் பெயர் தரப்பட்டது"
 
 #: ../daemon/gvfsafpserver.c:393
 #, c-format
 msgid "Unable to login to the server “%s” with the given password."
-msgstr ""
+msgstr "கொடுத்த கடவுச்சொல்லுடன் “%s\" சேவையகத்தில் உள்நுழைய முடியவில்லை."
 
 #: ../daemon/gvfsafpserver.c:428 ../daemon/gvfsafpserver.c:650
 #: ../daemon/gvfsafpserver.c:825 ../daemon/gvfsafpserver.c:873
 #: ../daemon/gvfsafpserver.c:989
 #, c-format
 msgid "Unable to connect to the server “%s”. A communication problem occurred."
-msgstr ""
+msgstr "“%s\" சேவையகத்துடன் இணைக்க முடியவில்லை. ஒரு தொடர்பு பிரச்சினை ஏற்பட்டது."
 
 #: ../daemon/gvfsafpserver.c:623
 #, c-format
 msgid "Unable to connect to the server “%s” with the given password."
-msgstr ""
+msgstr "கொடுத்த கடவுச்சொல்லுடன் “%s\" சேவையகத்துடன் இணைக்க முடியவில்லை."
 
 #: ../daemon/gvfsafpserver.c:676 ../daemon/gvfsafpserver.c:701
-#, fuzzy, c-format
+#, c-format
 msgid "The server “%s” doesn't support anonymous access."
-msgstr "ஏஎஃப்பி சேவையகம்  %s  அனானியாக உள்நுழைவதை ஆதரிக்கவில்லை"
+msgstr "\"%s\" சேவையகம்  அனானியாக உள்நுழைவதை ஆதரிக்கவில்லை"
 
 #: ../daemon/gvfsafpserver.c:729
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Unable to connect to the server “%s”. No suitable authentication mechanism "
 "was found."
 msgstr ""
-"ஏஎஃப்பி சேவையகம் %s  இல் உள்நுழைதல் தோல்வி அடைந்தது (தோதான உறுதிபடுத்தல் வழி "
-"ஏதுமில்லை )"
+"சேவையகம் \"%s\"  உடன் இணைத்தல் தோல்வி அடைந்தது. தோதான உறுதிபடுத்தல் வழி "
+"ஏதுமில்லை "
 
 #: ../daemon/gvfsafpserver.c:803
 #, c-format
@@ -298,59 +296,58 @@ msgid ""
 "Unable to connect to the server “%s”. The server doesn't support AFP version "
 "3.0 or later."
 msgstr ""
+"“%s” சேவ்வையகத்துடன் இணைக்க முடியவில்லை. சேவையகம் ஏஎஃப்பி பதிப்பு 3.0 அல்லது அதன் பின் ஐ "
+"ஆதரிக்கவில்லை"
 
 #: ../daemon/gvfsafpserver.c:914
-#, fuzzy, c-format
+#, c-format
 msgid "Permission denied."
 msgstr "அனுமதி மறுக்கப்பட்டது"
 
 #: ../daemon/gvfsafpserver.c:919
-#, fuzzy, c-format
+#, c-format
 msgid "The command is not supported by the server."
 msgstr "கட்டளைக்கு சேவையகத்தின் ஆதரவில்லை"
 
 #: ../daemon/gvfsafpserver.c:923
-#, fuzzy, c-format
+#, c-format
 msgid "Your password has expired."
-msgstr "பயனர் கடவுச்சொல் காலாவதியானது."
+msgstr "உங்கள் கடவுச்சொல் காலாவதியானது."
 
 #: ../daemon/gvfsafpserver.c:927
-#, fuzzy, c-format
+#, c-format
 msgid "Your password needs to be changed."
-msgstr "பயனர் கடவுச்சொல்லை மாற்ற வேண்டும்"
+msgstr "உங்கள் கடவுச்சொல்லை மாற்ற வேண்டும்"
 
 #. translators: %s here is the hostname
 #: ../daemon/gvfsafpserver.c:1070
-#, fuzzy, c-format
+#, c-format
 msgid "Enter your password for the server “%s”."
-msgstr "%s இல் எஸ்எஸ்ஹெச் க்கு கடவுச்சொல்லை உள்ளிடவும்"
+msgstr "சேவையகம் \"%s\" க்கு கடவுச்சொல்லை உள்ளிடவும்."
 
 #. translators: %s here is the hostname
 #: ../daemon/gvfsafpserver.c:1073
 #, c-format
 msgid "Enter your name and password for the server “%s”."
-msgstr ""
+msgstr "சேவையகம் \"%s\" க்கு உங்கள் பெயரையும் கடவுச்சொல்லையும் உள்ளிடவும்."
 
 #: ../daemon/gvfsafpserver.c:1105
-#, fuzzy
 msgid "The password prompt was cancelled."
-msgstr "கடவுச்சொல் உரையாடல் ரத்தானது"
+msgstr "கடவுச்சொல் தூண்டி ரத்தானது"
 
 #: ../daemon/gvfsafpserver.c:1222
-#, fuzzy
 msgid "Unable to disconnect from the server."
-msgstr "(%s) சேவையகத்தை  இணைத்தல்  தோல்வியுற்றது"
+msgstr "சேவையகத்தை  துண்டித்தல் தோல்வியுற்றது"
 
 #: ../daemon/gvfsafpserver.c:1364 ../daemon/gvfsafpserver.c:1672
 #: ../daemon/gvfsafpserver.c:1763
 #, c-format
 msgid "Unable to connect to the server. A communication problem occurred."
-msgstr ""
+msgstr "சேவையகத்துடன் இணைக்க முடியவில்லை. ஒரு தொடர்பு பிரச்சினை ஏற்பட்டது"
 
 #: ../daemon/gvfsafpserver.c:1719
-#, fuzzy
 msgid "Identification not found."
-msgstr "அடைவு அறிவிப்பு துணைபுரியவில்லை"
+msgstr "அடையாளம் காணவில்லை"
 
 #: ../daemon/gvfsafputils.c:124
 #, c-format
@@ -363,9 +360,9 @@ msgid "Got unknown error code %d from server"
 msgstr "சேவையகத்திலிருந்து தெரியாத பிழை கோட் %d பெறப்பட்டது"
 
 #: ../daemon/gvfsafpvolume.c:145
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't load %s on %s"
-msgstr "ஏஈபி தொகுதி %s  %s  இல் ஏற்றமுடியவில்லை"
+msgstr "%s ஐ %s மீது ஏற்றமுடியவில்லை"
 
 #: ../daemon/gvfsafpvolume.c:390 ../daemon/gvfsafpvolume.c:668
 #: ../daemon/gvfsafpvolume.c:821 ../daemon/gvfsafpvolume.c:1015
@@ -525,7 +522,7 @@ msgstr "திறந்துள்ள கோப்புக்கு எழு�
 
 #: ../daemon/gvfsafpvolume.c:2651
 msgid "File is locked by another user"
-msgstr ""
+msgstr "கோப்பு இன்னொரு பயனரால் பூட்டப்பட்டது"
 
 #: ../daemon/gvfsafpvolume.c:2790
 msgid "File is not open for read access"
@@ -574,7 +571,7 @@ msgstr " பூட்டுதல் பிழை: தவறான மதிப�
 
 #: ../daemon/gvfsbackendafc.c:290
 msgid "Unable to connect"
-msgstr ""
+msgstr "இணைக்க முடியவில்லை"
 
 #: ../daemon/gvfsbackendafc.c:293
 #, c-format
@@ -653,12 +650,13 @@ msgstr "%s இல் ஆவணங்கள்"
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
 #: ../daemon/gvfsbackendafc.c:627
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The device “%s” is locked. Enter the passcode on the device and click “Try "
 "again”."
 msgstr ""
-"சாதனம் '%s' பூட்டப்பட்டது. சாதனத்தின் கடவுச்சொல்லை உள்ளிட்டு மீண்டும் 'முயற்சி செய்க' மீது "
+"சாதனம் \"%s\" பூட்டப்பட்டது. சாதனத்தின் கடவுச்சொல்லை உள்ளிட்டு மீண்டும் \"முயற்சி செய்க\" "
+"மீது "
 "சொடுக்கவும்."
 
 #: ../daemon/gvfsbackendafc.c:967 ../daemon/gvfsbackendarchive.c:660
@@ -711,7 +709,7 @@ msgstr "%s இல் %s"
 #: ../daemon/gvfsbackendafpbrowse.c:465
 #, c-format
 msgid "%s"
-msgstr ""
+msgstr "%s"
 
 #: ../daemon/gvfsbackendafpbrowse.c:498 ../daemon/gvfsbackendafp.c:2101
 #: ../daemon/gvfsbackendarchive.c:543 ../daemon/gvfsbackendftp.c:668
@@ -759,9 +757,9 @@ msgstr "தவறான அளவுரு வகை (uint32 எதிர்ப�
 
 #. Translators: first %s is volumename, second username and third servername
 #: ../daemon/gvfsbackendafp.c:2061
-#, fuzzy, c-format
+#, c-format
 msgid "%s for %s on %s"
-msgstr "எஸ்எஃப்பிடி  %s க்கு  %s  இல்"
+msgstr "%s  %s க்கு %s மீது"
 
 #: ../daemon/gvfsbackendafp.c:2110
 msgid "No volume specified"
@@ -957,7 +955,6 @@ msgid "The file does not exist or isn't an audio track"
 msgstr "கோப்பு இல்லை அல்லது அது இசை பாதையாக இருக்காது"
 
 #: ../daemon/gvfsbackendcdda.c:1125
-#, fuzzy
 msgid "Audio CD File System Service"
 msgstr "இசை குறுவட்டு கோப்பு முறைமை சேவை"
 
@@ -1001,14 +998,12 @@ msgid "Can't eject file"
 msgstr "கோப்பினை வெளியேற்ற முடியவில்லை"
 
 #: ../daemon/gvfsbackendcomputer.c:1269 ../daemon/gvfsbackendcomputer.c:1276
-#, fuzzy
 msgid "Can't start drive"
-msgstr "கோப்பினை துவக்க முடியவில்லை"
+msgstr "இயக்கியை துவக்க முடியவில்லை"
 
 #: ../daemon/gvfsbackendcomputer.c:1342 ../daemon/gvfsbackendcomputer.c:1349
-#, fuzzy
 msgid "Can't stop drive"
-msgstr "கோப்பினை நிறுத்த முடியவில்லை"
+msgstr "இயக்கியை நிறுத்த முடியவில்லை"
 
 #: ../daemon/gvfsbackendcomputer.c:1406 ../daemon/gvfsbackendcomputer.c:1413
 msgid "Can't poll file"
@@ -1018,9 +1013,9 @@ msgstr "கோப்பினை அழைக்க முடியவில்�
 #. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
 #. the second %s and only shown if it is not the default http(s) port.
 #: ../daemon/gvfsbackenddav.c:485
-#, fuzzy, c-format
+#, c-format
 msgid "%s on %s%s"
-msgstr "%s இல் %s"
+msgstr "%s  %s%s மீது"
 
 #: ../daemon/gvfsbackenddav.c:677 ../daemon/gvfsbackenddav.c:1918
 #: ../daemon/gvfsbackendhttp.c:255
@@ -1095,9 +1090,9 @@ msgstr "பிணையம்"
 
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendftp.c:488 ../daemon/gvfsbackendsftp.c:957
-#, fuzzy, c-format
+#, c-format
 msgid "Enter password for %s on %s"
-msgstr "%s இல் எஸ்எஸ்ஹெச் க்கு கடவுச்சொல்லை உள்ளிடவும்"
+msgstr "%s க்கு %s மீது கடவுச்சொல்லை உள்ளிடவும்"
 
 #: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:981
 #: ../daemon/gvfsbackendsmbbrowse.c:1001 ../daemon/gvfsbackendsmb.c:620
@@ -1300,8 +1295,7 @@ msgid "Not supported (not same directory)"
 msgstr "ஆதரவில்லை (அதே அடைவு அல்ல)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3387
-msgid ""
-"Not supported (the source is a directory, the destination is a directory too)"
+msgid "Not supported (the source is a directory, the destination is a directory too)"
 msgstr "ஆதரவில்லை ( மூலம் ஒரு அடைவு, இலக்கும் ஒரு அடைவு)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3395
@@ -1311,8 +1305,7 @@ msgid ""
 msgstr "ஆதரவில்லை ( மூலம் அடைவு, ஆனால் இலக்கு இருப்பு கோப்பு)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3407
-msgid ""
-"Not supported (the source is a file, but the destination is a directory)"
+msgid "Not supported (the source is a file, but the destination is a directory)"
 msgstr "ஆதரவில்லை ( மூலம் கோப்பு,  ஆனால் இலக்கு அடைவு)"
 
 #: ../daemon/gvfsbackendhttp.c:251
@@ -1326,11 +1319,11 @@ msgstr "அடைவு அறிவிப்பு துணைபுரிய�
 
 #: ../daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
-msgstr ""
+msgstr "கோப்பு பகிர்தல்"
 
 #: ../daemon/gvfsbackendnetwork.c:173
 msgid "Remote Login"
-msgstr ""
+msgstr "தொலை உள்நுழைவு"
 
 #: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:896
 msgid "Windows Network"
@@ -1360,15 +1353,14 @@ msgid "Error deleting file: %s"
 msgstr "கோப்பு அழித்தலில் பிழை: %s"
 
 #: ../daemon/gvfsbackendrecent.c:238
-#, fuzzy
 msgid "The recent folder may not be deleted"
-msgstr "குப்பை அடைவை நீக்க முடியாது"
+msgstr "சமீபத்திய அடைவை நீக்க முடியாது"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
 #: ../daemon/gvfsbackendrecent.c:548 ../daemon/gvfsbackendrecent.c:662
 msgid "Recent"
-msgstr ""
+msgstr "சமீபத்திய "
 
 #: ../daemon/gvfsbackendsftp.c:299 ../daemon/gvfsbackendsftp.c:654
 msgid "ssh program unexpectedly exited"
@@ -1405,15 +1397,15 @@ msgstr "புகுபதிவு நேரம் முடிவடைந்�
 
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendsftp.c:954
-#, fuzzy, c-format
+#, c-format
 msgid "Enter passphrase for secure key for %s on %s"
-msgstr "எஸ்எஸ்ஹெச் க்கு விசைக்கு கடவுச்சொல்லை %s இல் உள்ளிடவும்"
+msgstr "%s  க்கு பாதுகாப்பான விசைக்கு கடவுச்சொல்லை %s இல் உள்ளிடவும்"
 
 #. Translators: %s is the hostname
 #: ../daemon/gvfsbackendsftp.c:961
-#, fuzzy, c-format
+#, c-format
 msgid "Enter passphrase for secure key for %s"
-msgstr "எஸ்எஸ்ஹெச் க்கு விசைக்கு கடவுச்சொல்லை %s இல் உள்ளிடவும்"
+msgstr "%s க்கு பாதுகாப்பான விசைக்கு கடவுச்சொல்லை %s இல் இடவும்"
 
 #: ../daemon/gvfsbackendsftp.c:1044
 msgid "Can't send password"
@@ -1519,7 +1511,6 @@ msgid "Not a regular file"
 msgstr "ஒழுங்கான கோப்பு அல்ல"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1513
-#, fuzzy
 msgid "Windows Network File System Service"
 msgstr "விண்டோஸ் பிணைய கோப்பு முறைமை சேவை"
 
@@ -1571,7 +1562,6 @@ msgid "Can't recursively move directory"
 msgstr "அடைவை நகர்த்த முடியவில்லை"
 
 #: ../daemon/gvfsbackendsmb.c:2204
-#, fuzzy
 msgid "Windows Shares File System Service"
 msgstr "விண்டோஸ் பங்கீடு கோப்பு முறைமை சேவை"
 
@@ -1663,7 +1653,7 @@ msgstr "தவறான dbus தகவல்"
 #: ../daemon/gvfsjobunmount.c:123 ../monitor/udisks2/gvfsudisks2utils.c:805
 #, c-format
 msgid "%s has been unmounted\n"
-msgstr ""
+msgstr "%s ஏற்றநீக்கம் செய்யப்பட்டது\n"
 
 #: ../daemon/gvfsjobunmount.c:141 ../monitor/udisks2/gvfsudisks2utils.c:659
 #, c-format
@@ -1671,9 +1661,10 @@ msgid ""
 "Unmounting %s\n"
 "Please wait"
 msgstr ""
+"%s ஐ ஏற்றநீக்கம் செய்கிறது\n"
+"தயைசெய்து பொறுக்கவும்"
 
 #: ../daemon/gvfsjobunmount.c:197
-#, fuzzy
 msgid "File system is busy"
 msgstr "கோப்பு முறைமை வேலையாக உள்ளது"
 
@@ -2169,9 +2160,8 @@ msgid "%s Media"
 msgstr "%s ஊடகம்"
 
 #: ../monitor/udisks2/gvfsudisks2mount.c:730
-#, fuzzy
 msgid "Eject Anyway"
-msgstr "எவ்வாறேனும் துவக்கவும்"
+msgstr "எவ்வாறேனும் வெளியேற்றவும்"
 
 #: ../monitor/udisks2/gvfsudisks2utils.c:494
 #, c-format
@@ -2184,11 +2174,13 @@ msgid ""
 "Writing data to %s\n"
 "Don't unplug until finished"
 msgstr ""
+"%s க்கு தரவு எழுதப்படுகிறது\n"
+"முடியும் வரை வெளியெடுக்காதே"
 
 #: ../monitor/udisks2/gvfsudisks2utils.c:805
 #, c-format
 msgid "You can now unplug %s\n"
-msgstr ""
+msgstr "நீங்கள் %s ஐ இப்போது வெளியெடுக்கலாம்\n"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2212,24 +2204,23 @@ msgid "Volume"
 msgstr "தொகுதி"
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:1008
-#, fuzzy, c-format
+#, c-format
 msgid "Error storing passphrase in keyring (%s)"
-msgstr "எஸ்எஸ்ஹெச் க்கு விசைக்கு கடவுச்சொல்லை %s இல் உள்ளிடவும்"
+msgstr " விசைவளையத்தில் (%s )  கடவுச்சொல்லை  சேமித்தலில் பிழை"
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:1043
-#, fuzzy, c-format
+#, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
-msgstr "%s இயக்கியல் இணைப்பை தேடும் போது பிழை"
+msgstr " விசைவளையத்தில் (%s ) செல்லுபடியாகாத கடவுச்சொற்றொடரை  நீக்குதலில் பிழை"
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:1108
-#, fuzzy
 msgid "The unlocked device does not have a recognizable file system on it"
-msgstr "பூட்டு திறக்கப்ப்பட்ட சாதனத்தில் அடையாளம் காணக்கூடிய கோப்பு முறைமை ஏதுமில்லை"
+msgstr "பூட்டு திறக்கப்பட்ட சாதனத்தில் அடையாளம் காணக்கூடிய கோப்பு முறைமை ஏதுமில்லை"
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:1137
-#, fuzzy, c-format
+#, c-format
 msgid "Encryption passphrase for %s"
-msgstr "%sக்கு கடவுச்சொல்லை உள்ளிடவும்"
+msgstr "%sக்கு மறைக்குறியீடு கடவுச்சொல்"
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:1305
 msgid "A passphrase is required to access the volume"
@@ -2237,13 +2228,13 @@ msgstr "தொகுதியை அணுக ஒரு கடவு சொற�
 
 #. Translators: This is the message shown to users
 #: ../monitor/udisks2/gvfsudisks2volume.c:1320
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
 "The passphrase is needed to access encrypted data on %s."
 msgstr ""
-"தொகுதியின் பூட்டு திறக்க ஒரு கடவுச்சொல்லை உள்ளிடுக \n"
-"சாதனம்  %s மறையாக்கம் செய்த தரவை கொண்டு உள்ளது."
+"தொகுதியின் பூட்டு திறக்க ஒரு கடவுச்சொற்றொடரை உள்ளிடுக \n"
+" %s இல் உள்ள மறையாக்கம் செய்த தரவை  படிக்க கடவுச்சொற்றொடர் தேவை"
 
 #. drive_icon
 #. media_desc
@@ -2292,35 +2283,31 @@ msgstr "%s: %s: மூடுவதில் பிழை: %s\n"
 #: ../programs/gvfs-cat.c:143 ../programs/gvfs-open.c:61
 #: ../programs/gvfs-rm.c:58
 msgid "FILE"
-msgstr ""
+msgstr "FILE"
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
 #: ../programs/gvfs-cat.c:146
-#, fuzzy
 msgid "Concatenate files and print to the standard output."
-msgstr "இடம்... - இடங்களை நிலையான வெளியீடு உடன் சேர்."
+msgstr "கோப்புக்களை படித்து செந்தர வெளியீட்டில் அச்சிடு"
 
 #: ../programs/gvfs-cat.c:147
-#, fuzzy
 msgid ""
 "gvfs-cat works just like the traditional cat utility, but using gvfs\n"
 "locations instead of local files: for example you can use something\n"
 "like smb://server/resource/file.txt as location."
 msgstr ""
-"கோப்புகளை இடங்களில் சேர் மற்றும் நிலையான வெளியிக்கு அச்சிடு. இது வலக்கமான cat "
-"செயலாற்றியை போல் வேலைச்செய்கிறது, ஆனால் சொந்த கோப்புகளுக்கு பதிலாக gvfs இடத்தைப் "
-"பயன்படுத்தும்எடுத்துக்காட்டாக  இதுப்போன்ற smb://server/resource/file.txtபகுதிகளுக்குச் "
-"சேர்"
+"ஜிவிஎஃப்எஸ்-கேட் வழக்கமான cat செயலாற்றியை போல் வேலைச்செய்கிறது, \n"
+"ஆனால் உள்ளமை கோப்புகளுக்கு பதிலாக gvfs இடங்களைப் பயன்படுத்தும். \n"
+"எடுத்துக்காட்டாக  smb://server/resource/file.txt போன்றவற்றை இடமாக பயன்படுத்தலாம்."
 
 #: ../programs/gvfs-cat.c:151
-#, fuzzy
 msgid ""
 "Note: just pipe through cat if you need its formatting options\n"
 "like -n, -T or other."
 msgstr ""
-"குறிப்பு: சற்று பைப் வழியாக cat பன்னுங்க,  உங்களுக்கு உருமாற்றும் வழிகள் -n, -T அல்லது "
-"தேவைப்பட்டால்"
+"குறிப்பு: உங்களுக்கு உரு ஒழுங்கு செய்யும் வழிகள் -n, -T அல்லது மற்றவை \n"
+"தேவைப்பட்டால் பைப் வழியாக cat செய்க."
 
 #: ../programs/gvfs-cat.c:168 ../programs/gvfs-copy.c:131
 #: ../programs/gvfs-info.c:387 ../programs/gvfs-ls.c:414
@@ -2343,35 +2330,29 @@ msgid "%s: missing locations"
 msgstr "%s: விடுபட்ட இடங்கள்"
 
 #: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
-#, fuzzy
 msgid "No target directory"
 msgstr "இலக்கு அடைவு இல்லை"
 
 #: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
-#, fuzzy
 msgid "Show progress"
 msgstr "முன்னேற்றத்தைக் காட்டு"
 
 #: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
-#, fuzzy
 msgid "Prompt before overwrite"
-msgstr "prompt மேலெழுதுவதற்கு முன்"
+msgstr "மேலெழுதுவதற்கு முன் தூண்டுக"
 
 #: ../programs/gvfs-copy.c:47
-#, fuzzy
 msgid "Preserve all attributes"
 msgstr "அனைத்து பண்புகளை பாதுகாக்கவும்"
 
 #: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
 #: ../programs/gvfs-save.c:43
-#, fuzzy
 msgid "Backup existing destination files"
-msgstr "உள்ளிருக்கும் பின்சேமிப்பு பரிமாணக் கோப்புகள்"
+msgstr "உள்ளிருக்கும் இலக்கு கோப்புகளை பாதுகாப்பு செய்க"
 
 #: ../programs/gvfs-copy.c:49
-#, fuzzy
 msgid "Never follow symbolic links"
-msgstr "symbolic இணைப்புகளை ஒருபோதும் பின்பற்றாதே"
+msgstr "சிம்பாலிக் இணைப்புகளை ஒருபோதும் பின்பற்றாதே"
 
 #: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
 #, c-format
@@ -2380,17 +2361,16 @@ msgstr "முன்னேற்றம்"
 
 #: ../programs/gvfs-copy.c:121 ../programs/gvfs-move.c:109
 msgid "SOURCE"
-msgstr ""
+msgstr "SOURCE"
 
 #: ../programs/gvfs-copy.c:121 ../programs/gvfs-move.c:109
 #: ../programs/gvfs-save.c:165
 msgid "DEST"
-msgstr ""
+msgstr "DEST"
 
 #: ../programs/gvfs-copy.c:122
-#, fuzzy
 msgid "Copy one or more files from SOURCE to DEST."
-msgstr "SOURCE... DEST -கோப்பு(க்களை) SOURCE இலிருந்து DEST க்கு நகர்த்தவும்"
+msgstr "ஒன்று அல்லது மேலும் கோப்புக்களை SOURCE இலிருந்து DEST க்கு நகர்த்தவும்"
 
 #: ../programs/gvfs-copy.c:141 ../programs/gvfs-move.c:129
 #: ../programs/gvfs-rename.c:83
@@ -2421,7 +2401,6 @@ msgid "List writable attributes"
 msgstr "பட்டியல் எழுதக்கூடிய பணிக்கூறுகள்"
 
 #: ../programs/gvfs-info.c:38
-#, fuzzy
 msgid "Get file system info"
 msgstr "கோப்பு முறைமை தகவலை பெறு"
 
@@ -2431,13 +2410,12 @@ msgstr "பெறக்குடிய பணிக்கூறுகள்"
 
 #: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
 msgid "ATTRIBUTES"
-msgstr ""
+msgstr "ATTRIBUTES"
 
 #: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
 #: ../programs/gvfs-set-attribute.c:37
-#, fuzzy
 msgid "Don't follow symbolic links"
-msgstr "symlinksஐ பின்பற்றாதே"
+msgstr "symlinks ஐ பின்பற்றாதே"
 
 #: ../programs/gvfs-info.c:50
 msgid "invalid type"
@@ -2537,12 +2515,11 @@ msgstr "எழுதக்கூடிய பண்பு பெயர்இட�
 #: ../programs/gvfs-rename.c:64 ../programs/gvfs-set-attribute.c:139
 #: ../programs/gvfs-trash.c:57 ../programs/gvfs-tree.c:248
 msgid "LOCATION"
-msgstr ""
+msgstr "LOCATION"
 
 #: ../programs/gvfs-info.c:376
-#, fuzzy
 msgid "Show information about locations."
-msgstr "- இதறுகான தகவலைக் காட்டு <location>"
+msgstr "இடங்கள் பற்றிய தகவலை காட்டு."
 
 #: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
 msgid "Show hidden files"
@@ -2558,7 +2535,7 @@ msgstr "முடிவுற்றத்தைக் காட்டு"
 
 #: ../programs/gvfs-ls.c:42
 msgid "PREFIX"
-msgstr ""
+msgstr "PREFIX"
 
 #: ../programs/gvfs-ls.c:166 ../programs/gvfs-ls.c:174
 #: ../programs/gvfs-rename.c:97
@@ -2568,7 +2545,7 @@ msgstr "பிழை: %s\n"
 
 #: ../programs/gvfs-ls.c:398
 msgid "List the contents of the locations."
-msgstr ""
+msgstr "இடங்களின் உள்ளடக்கங்களை பட்டியலிடுக"
 
 #: ../programs/gvfs-ls.c:399
 #, fuzzy
@@ -2578,10 +2555,10 @@ msgid ""
 "like smb://server/resource/file.txt as location. File attributes can\n"
 "be specified with their gvfs name, e.g. standard::icon."
 msgstr ""
-"கோப்புகளை இடங்களில் சேர் மற்றும் நிலையான வெளியிக்கு அச்சிடு. இது வலக்கமான cat "
-"செயலாற்றியை போல் வேலைச்செய்கிறது, ஆனால் சொந்த கோப்புகளுக்கு பதிலாக gvfs இடத்தைப் "
-"பயன்படுத்தும்எடுத்துக்காட்டாக  இதுப்போன்ற smb://server/resource/file.txtபகுதிகளுக்குச் "
-"சேர்"
+"ஜிவிஎஃப்எஸ்-எல் எஸ் வழக்கமான எல் எஸ்  செயலாற்றியை போல் வேலைச்செய்கிறது, \n"
+"ஆனால் உள்ளமை கோப்புகளுக்கு பதிலாக gvfs இடங்களைப் பயன்படுத்தும். \n"
+"எடுத்துக்காட்டாக  smb://server/resource/file.txt போன்றவற்றை இடமாக பயன்படுத்தலாம். \n"
+"கோப்பு பண்புகூறுகளை அவற்றின் ஜிவிஎஃப்எஸ் பெயர்களால் குறீப்பிடலாம். எ-கா: standard::icon "
 
 #: ../programs/gvfs-mime.c:36
 msgid "Query handler for mime-type"
@@ -2593,21 +2570,19 @@ msgstr "மைம் வகைக்கு செட் கையாளர் "
 
 #: ../programs/gvfs-mime.c:82
 msgid "MIMETYPE"
-msgstr ""
+msgstr "MIMETYPE"
 
 #: ../programs/gvfs-mime.c:82
 msgid "HANDLER"
-msgstr ""
+msgstr "HANDLER"
 
 #: ../programs/gvfs-mime.c:83
-#, fuzzy
 msgid "Get or set the handler for a mime-type."
-msgstr "மைம் வகைக்கு செட் கையாளர் "
+msgstr "மைம் வகைக்கு செட் கையாளரை பெறு அல்லது அமை"
 
 #: ../programs/gvfs-mime.c:95
-#, fuzzy
 msgid "Specify either --query or --set"
-msgstr "--query அலல்து  --set ஐ குறிப்பிடவும்."
+msgstr "--query அல்லது --set ஐ குறிப்பிடவும்."
 
 #: ../programs/gvfs-mime.c:106
 #, c-format
@@ -2660,14 +2635,12 @@ msgid "Failed to set '%s' as the default handler for '%s': %s\n"
 msgstr " '%s' ஐ  '%s' க்கு முன்னிருப்பு கையாளராக அமைக்க முடியவில்லை: %s\n"
 
 #: ../programs/gvfs-mkdir.c:33
-#, fuzzy
 msgid "Create parent directories"
-msgstr "பெற்றோர் அமைவுகளை உருவாக்கு"
+msgstr "பெற்றோர் அடைவுகளை உருவாக்கு"
 
 #: ../programs/gvfs-mkdir.c:58
-#, fuzzy
 msgid "Create directories."
-msgstr "- அடைவுகளை உருவாக்கு"
+msgstr " அடைவுகளை உருவாக்குக."
 
 #: ../programs/gvfs-mkdir.c:89 ../programs/gvfs-mkdir.c:98
 #, c-format
@@ -2675,17 +2648,16 @@ msgid "Error creating directory: %s\n"
 msgstr "பிழையை உருவாக்கும் அடைவு: %s\n"
 
 #: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
-#, fuzzy
 msgid "Don't send single MOVED events"
-msgstr "த னி MOVED நிகழ்வுகளை அனுப்பாதே "
+msgstr "தனி MOVED நிகழ்வுகளை அனுப்பாதே "
 
 #: ../programs/gvfs-monitor-dir.c:113
 msgid "Monitor directories for changes."
-msgstr ""
+msgstr "மாற்றங்களுக்கு அடைவுகளை கண்காணிக்கவும்"
 
 #: ../programs/gvfs-monitor-file.c:112
 msgid "Monitor files for changes."
-msgstr ""
+msgstr "மாற்றங்களுக்கு கோப்புகளை கண்காணிக்கவும்"
 
 #: ../programs/gvfs-mount.c:57
 msgid "Mount as mountable"
@@ -2697,7 +2669,7 @@ msgstr "சாதக் கோப்புடன் ஏறும் ஒலிய
 
 #: ../programs/gvfs-mount.c:58
 msgid "DEVICE"
-msgstr ""
+msgstr "DEVICE"
 
 #: ../programs/gvfs-mount.c:59
 msgid "Unmount"
@@ -2705,7 +2677,7 @@ msgstr "ஏற முடியாத"
 
 #: ../programs/gvfs-mount.c:60
 msgid "Eject"
-msgstr ""
+msgstr "வெளியேற்று"
 
 #: ../programs/gvfs-mount.c:61
 msgid "Unmount all mounts with the given scheme"
@@ -2713,7 +2685,7 @@ msgstr "கொடுக்கப்பட்ட திட்டத்தின�
 
 #: ../programs/gvfs-mount.c:61
 msgid "SCHEME"
-msgstr ""
+msgstr "SCHEME"
 
 #. Translator: List here is a verb as in 'List all mounts'
 #: ../programs/gvfs-mount.c:63
@@ -2725,9 +2697,8 @@ msgid "Monitor events"
 msgstr "கணினி நிகழ்வுகள்"
 
 #: ../programs/gvfs-mount.c:65
-#, fuzzy
 msgid "Show extra information"
-msgstr "பட்டியல் மற்றும் கணினிக்கு கூடுதல் தகவலைக் காட்டு"
+msgstr "கூடுதல் தகவலைக் காட்டு"
 
 #: ../programs/gvfs-mount.c:169 ../programs/gvfs-mount.c:193
 #, c-format
@@ -2745,9 +2716,9 @@ msgid "Error finding enclosing mount: %s\n"
 msgstr "இணைக்கப்பட்ட மவுண்ட்டை தேடும் போது பிழை: %s\n"
 
 #: ../programs/gvfs-mount.c:302
-#, fuzzy, c-format
+#, c-format
 msgid "Error ejecting mount: %s\n"
-msgstr "பிழையை ஏற்றப்படாத ஏற்றம்: %s\n"
+msgstr "ஏற்றியதை வெளியேற்றுவதில் பிழை: %s\n"
 
 #: ../programs/gvfs-mount.c:786
 #, c-format
@@ -2765,14 +2736,12 @@ msgid "No volume for device file %s\n"
 msgstr "சாதனக் கோப்பிற்கான ஒலி இல்லை %s\n"
 
 #: ../programs/gvfs-mount.c:1050
-#, fuzzy
 msgid "Mount the locations."
-msgstr "- ஏற்றம் <location>"
+msgstr "இருப்பிடங்களை ஏற்றுக"
 
 #: ../programs/gvfs-move.c:110
-#, fuzzy
 msgid "Move one or more files from SOURCE to DEST."
-msgstr "SOURCE... DEST -கோப்பு(க்களை) SOURCE இலிருந்து DEST க்கு நகர்த்தவும்"
+msgstr "ஒன்றூ அல்லது மேற்பட்ட கோப்புக்களை SOURCE இலிருந்து DEST க்கு நகர்த்தவும்"
 
 #: ../programs/gvfs-move.c:199
 #, c-format
@@ -2782,13 +2751,12 @@ msgstr "பிழையை நகர்த்தும் கோப்பு %s:
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
 #: ../programs/gvfs-open.c:64
-#, fuzzy
 msgid ""
 "Open files with the default application that\n"
 "is registered to handle files of this type."
 msgstr ""
-"திறந்த கோப்பு(கள்) ஏற்கனவேயுள்ள பயன்பாட்டுடன் பதிவானவைகள் மற்றும் கையாளக்கூடிய கோப்பு "
-"வகையை சரர்ந்தவை"
+"இந்த வகையை சரர்ந்த கோப்புக்களை திறக்க \n"
+"பதிவான முன்னிருப்பு பயன்பாடுகளால் திறக்கவும். "
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -2799,12 +2767,11 @@ msgstr "%s: %s : இடத்தை திறப்பதில் பிழை:
 
 #: ../programs/gvfs-rename.c:64
 msgid "NEW-NAME"
-msgstr ""
+msgstr "NEW-NAME"
 
 #: ../programs/gvfs-rename.c:65
-#, fuzzy
 msgid "Rename a file."
-msgstr "- மறுபெயரிடப்பட்ட கோப்பு"
+msgstr "கோப்பை மறுபெயரிடு."
 
 #: ../programs/gvfs-rename.c:104
 #, c-format
@@ -2812,13 +2779,12 @@ msgid "Rename successful. New uri: %s\n"
 msgstr "மறுபெயரிடல் வெற்றிகரமானது. புதிய uri: %s\n"
 
 #: ../programs/gvfs-rm.c:34 ../programs/gvfs-trash.c:34
-#, fuzzy
 msgid "Ignore nonexistent files, never prompt"
-msgstr "இல்லாத கோப்புகளை தவிர், ஒருபோதும் காட்டாதே"
+msgstr "இல்லாத கோப்புகளை உதாசீனம் செய்க, ஒருபோதும் தூண்டாதே"
 
 #: ../programs/gvfs-rm.c:59
 msgid "Delete the given files."
-msgstr ""
+msgstr "கொடுத்த கோப்புக்களை நீக்குக"
 
 #: ../programs/gvfs-save.c:44
 msgid "Only create if not existing"
@@ -2829,9 +2795,8 @@ msgid "Append to end of file"
 msgstr "கோப்பின் முடிவுக்குச் சேர்"
 
 #: ../programs/gvfs-save.c:46
-#, fuzzy
 msgid "When creating, restrict access to the current user"
-msgstr "ஒரு கோப்பினை உருவாக்கும் போது, தற்போதைய பயனரை மட்டும் அணுக தடைவிதி"
+msgstr "கோப்பினை உருவாக்கும் போது, தற்போதைய பயனரை மட்டும் அனுமதி"
 
 #. Translators: The "etag" is a token allowing to verify whether a file has been modified
 #: ../programs/gvfs-save.c:48
@@ -2845,7 +2810,7 @@ msgstr "கோப்பின் etag ஆனது மேலெழுதப்�
 
 #: ../programs/gvfs-save.c:50
 msgid "ETAG"
-msgstr ""
+msgstr "ETAG"
 
 #: ../programs/gvfs-save.c:78
 #, c-format
@@ -2868,30 +2833,28 @@ msgid "Etag not available\n"
 msgstr "Etag கிடைக்கப் பெறவில்லை\n"
 
 #: ../programs/gvfs-save.c:166
-#, fuzzy
 msgid "Read from standard input and save to DEST."
-msgstr "DEST - செந்த ர உள்ளீட்டிலிருந்து படித்து இதற்கு சேமிக்கவும் DEST"
+msgstr "செந்தர உள்ளீட்டிலிருந்து படித்து DEST க்கு சேமிக்கவும் "
 
 #: ../programs/gvfs-set-attribute.c:36
-#, fuzzy
 msgid "Type of the attribute"
-msgstr "பெறக்குடிய பணிக்கூறுகள்"
+msgstr "பண்புக்கூறு வகை"
 
 #: ../programs/gvfs-set-attribute.c:36
 msgid "TYPE"
-msgstr ""
+msgstr "TYPE"
 
 #: ../programs/gvfs-set-attribute.c:139
 msgid "ATTRIBUTE"
-msgstr ""
+msgstr "ATTRIBUTE"
 
 #: ../programs/gvfs-set-attribute.c:139
 msgid "VALUE"
-msgstr ""
+msgstr "VALUE"
 
 #: ../programs/gvfs-set-attribute.c:140
 msgid "Set a file attribute of LOCATION."
-msgstr ""
+msgstr "LOCATION இன் கோப்பு பண்புக்கூறை அமைக்கவும்."
 
 #: ../programs/gvfs-set-attribute.c:159
 msgid "Location not specified\n"
@@ -2916,9 +2879,8 @@ msgid "Error setting attribute: %s\n"
 msgstr "பண்புக்கூறு அமைப்பதில் பிழை: %s\n"
 
 #: ../programs/gvfs-trash.c:58
-#, fuzzy
 msgid "Move files or directories to the trash."
-msgstr "பகிர்ந்த அடைவை குப்பைக்கு நகர்த்த முடியாது"
+msgstr "கோப்புகள் அலல்து அடைவுகளை குப்பைக்கு நகர்த்துக"
 
 #: ../programs/gvfs-trash.c:89
 #, c-format
@@ -2926,14 +2888,12 @@ msgid "Error trashing file: %s\n"
 msgstr "பிழையை அழிக்கும் கோப்பு: %s\n"
 
 #: ../programs/gvfs-tree.c:37
-#, fuzzy
 msgid "Follow symbolic links, mounts and shortcuts"
-msgstr "symlinks, mounts மற்றும் அடைவுகள் போன்ற குறுக்குவழிகளை பின்பற்று"
+msgstr "சிம்லிங்க்ஸ், ஏற்றப்பட்டவை மற்றும் குறுக்குவழிகளை பின்பற்று"
 
 #: ../programs/gvfs-tree.c:249
-#, fuzzy
 msgid "List contents of directories in a tree-like format."
-msgstr "- அடைவுகள் உள்ளடக்கங்கள் பட்டியலை கிளை வடிவத்தில் காட்டவும்"
+msgstr "அடைவுகள் உள்ளடக்கங்கள் பட்டியலை கிளை வடிவத்தில் காட்டவும்"
 
 #~ msgid "Can't contact session bus"
 #~ msgstr "அமர்வு பஸ் உடன் இணைக்க முடியவில்லை"
