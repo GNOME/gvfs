@@ -1405,7 +1405,7 @@ msgstr "%s  க்கு பாதுகாப்பான விசைக்க
 #: ../daemon/gvfsbackendsftp.c:961
 #, c-format
 msgid "Enter passphrase for secure key for %s"
-msgstr "%s க்கு பாதுகாப்பான விசைக்கு கடவுச்சொல்லை %s இல் இடவும்"
+msgstr "%s க்கு பாதுகாப்பான விசைக்கு கடவுச்சொல்லை இடவும்"
 
 #: ../daemon/gvfsbackendsftp.c:1044
 msgid "Can't send password"
