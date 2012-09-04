@@ -861,7 +861,6 @@ on_update_processes_timeout (gpointer user_data)
                                            data->message,
                                            processes,
                                            data->choices,
-                                           g_strv_length ((gchar **) data->choices),
                                            NULL,
                                            NULL);
     }
@@ -982,7 +981,6 @@ g_vfs_backend_unmount_with_operation (GVfsBackend        *backend,
                                        data->message,
                                        processes,
                                        data->choices,
-                                       g_strv_length ((gchar **) data->choices),
                                        (GAsyncReadyCallback) on_show_processes_reply,
                                        data);
 

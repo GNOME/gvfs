@@ -1049,7 +1049,7 @@ handle_login (GVfsBackend *backend,
       else if (g_str_has_prefix (buffer, "The authenticity of host '") ||
                strstr (buffer, "Key fingerprint:") != NULL)
         {
-	  const gchar *choices[] = {_("Log In Anyway"), _("Cancel Login")};
+	  const gchar *choices[] = {_("Log In Anyway"), _("Cancel Login"), NULL};
 	  const gchar *choice_string;
 	  gchar *hostname = NULL;
 	  gchar *fingerprint = NULL;
@@ -1071,7 +1071,6 @@ handle_login (GVfsBackend *backend,
 	  if (!g_mount_source_ask_question (mount_source,
 					    message,
 					    choices,
-					    2,
 					    &aborted,
 					    &choice) || 
 	      aborted)

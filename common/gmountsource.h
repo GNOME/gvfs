@@ -88,14 +88,12 @@ gboolean     g_mount_source_ask_password_finish       (GMountSource             
 gboolean      g_mount_source_ask_question             (GMountSource              *mount_source,
 						       const char                *message,
 						       const char               **choices,
-						       gint                       n_choices,
 						       gboolean                  *aborted,
 						       gint                      *choice_out);
 
 void          g_mount_source_ask_question_async       (GMountSource              *mount_source,
 						       const char                *message,
 						       const char               **choices,
-						       gint                       n_choices,
                                                        GAsyncReadyCallback        callback,
                                                        gpointer                   user_data);
 
@@ -108,7 +106,6 @@ gboolean      g_mount_source_show_processes           (GMountSource             
 						       const char                *message,
                                                        GArray                    *processes,
 						       const char               **choices,
-						       gint                       n_choices,
 						       gboolean                  *aborted,
 						       gint                      *choice_out);
 
@@ -116,7 +113,6 @@ void          g_mount_source_show_processes_async     (GMountSource             
 						       const char                *message,
                                                        GArray                    *processes,
 						       const char               **choices,
-						       gint                       n_choices,
                                                        GAsyncReadyCallback        callback,
                                                        gpointer                   user_data);
 

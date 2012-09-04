@@ -629,7 +629,6 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
     ret = g_mount_source_ask_question (src,
                                        message,
                                        choices,
-                                       2,
                                        &aborted,
                                        &choice);
     if (!ret || aborted || (choice == CHOICE_CANCEL))

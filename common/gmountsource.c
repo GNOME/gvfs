@@ -563,7 +563,6 @@ gboolean
 g_mount_source_ask_question (GMountSource *source,
 			     const char   *message,
 			     const char  **choices,
-			     gint          n_choices,
 			     gboolean     *aborted_out,
 			     gint         *choice_out)
 {
@@ -579,7 +578,6 @@ g_mount_source_ask_question (GMountSource *source,
   g_mount_source_ask_question_async (source,
                                      message,
 				     choices,
-				     n_choices,
                                      ask_reply_sync,
                                      &data);
   
@@ -609,7 +607,6 @@ void
 g_mount_source_ask_question_async (GMountSource       *source,
 				   const char         *message_string,
 				   const char        **choices,
-				   gint                n_choices,
 				   GAsyncReadyCallback callback,
 				   gpointer            user_data)
 {
@@ -702,7 +699,6 @@ op_ask_question (GMountOperation *op,
   g_mount_source_ask_question_async (mount_source,
 				     message,
 				     choices,
-				     g_strv_length ((gchar **) choices),
 				     op_ask_question_reply,
 				     g_object_ref (op));
   g_signal_stop_emission_by_name (op, "ask_question");
@@ -769,7 +765,6 @@ g_mount_source_show_processes_async (GMountSource        *source,
                                      const char          *message_string,
                                      GArray              *processes,
                                      const char         **choices,
-                                     gint                 n_choices,
                                      GAsyncReadyCallback  callback,
                                      gpointer             user_data)
 {
@@ -833,7 +828,6 @@ g_mount_source_show_processes (GMountSource *source,
                                const char   *message,
                                GArray       *processes,
                                const char  **choices,
-                               gint          n_choices,
                                gboolean     *aborted_out,
                                gint         *choice_out)
 {
@@ -850,7 +844,6 @@ g_mount_source_show_processes (GMountSource *source,
                                        message,
                                        processes,
                                        choices,
-                                       n_choices,
                                        ask_reply_sync,
                                        &data);
 
@@ -920,7 +913,6 @@ op_show_processes (GMountOperation *op,
                                        message,
                                        processes,
                                        choices,
-                                       g_strv_length ((gchar **) choices),
                                        op_show_processes_reply,
                                        g_object_ref (op));
   g_signal_stop_emission_by_name (op, "show_processes");
