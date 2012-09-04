@@ -1,3 +1,26 @@
+Major changes in 1.13.8
+=======================
+* Added support for symbolic icons
+* Removed favicon support
+* Various build fixes and cleanup
+* daemon: Return correct error for invalid backends
+* daemon: Fix races when mounting the same mount in parallel
+* daemon: Don't warn when running against an older gvfs-daemon
+* gdbus: Don't g_warn about getting the dbus name
+* gmountspec: Make sure to free the GVariantIter
+* afc: Improve idevice error handling
+* afc: Unpair an idevice if it was already paired and refuses to connect
+* afc: Use the correct choice index for "Cancel"
+* afp: fix g_vfs_afp_connection_get_max_request() not returning any value
+* afp: Use human friendly error messages
+* network: Don't set a file size for the network:// shortcuts
+* network: Append the service name when needed to help differentiate
+* recent: Honor the private hint
+* Don't use the display name to make the unique mount point
+* Don't include jargon in mount display names and messages
+* Added more hints for translators
+* Translation updates
+
 Major changes in 1.13.7
 =======================
 * Use libsecret instead of gnome-keyring
