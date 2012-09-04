@@ -1669,7 +1669,7 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
 
 invalid_reply:
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               _("Unable to connect to the server. A communication problem occurred."),
+               _("Unable to connect to the server '%s'. A communication problem occurred."),
                server->priv->info.server_name);
 
   return FALSE;
