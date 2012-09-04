@@ -613,8 +613,8 @@ file_info_from_message (SoupMessage *msg,
     }
 
 
-  text = soup_message_headers_get (msg->response_headers,
-                                   "Last-Modified");
+  text = soup_message_headers_get_one (msg->response_headers,
+                                       "Last-Modified");
   if (text)
     {
       SoupDate *sd;
@@ -630,8 +630,8 @@ file_info_from_message (SoupMessage *msg,
     }
 
 
-  text = soup_message_headers_get (msg->response_headers,
-                                   "ETag");
+  text = soup_message_headers_get_one (msg->response_headers,
+                                       "ETag");
   if (text)
     {
       g_file_info_set_attribute_string (info,
