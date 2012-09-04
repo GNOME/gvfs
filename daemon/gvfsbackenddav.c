@@ -153,7 +153,7 @@ string_to_uint64 (const char *str, guint64 *value)
 static inline gboolean
 sm_has_header (SoupMessage *msg, const char *header)
 {
-  return soup_message_headers_get (msg->response_headers, header) != NULL;
+  return soup_message_headers_get_one (msg->response_headers, header) != NULL;
 }
 
 static char *
@@ -289,8 +289,8 @@ message_should_apply_redir_ref (SoupMessage *msg)
 {
   const char *header;
 
-  header = soup_message_headers_get (msg->request_headers,
-                                     "Apply-To-Redirect-Ref");
+  header = soup_message_headers_get_one (msg->request_headers,
+                                         "Apply-To-Redirect-Ref");
 
   if (header == NULL || g_ascii_strcasecmp (header, "T"))
     return FALSE;
@@ -350,7 +350,7 @@ redirect_handler (SoupMessage *msg, gpointer user_data)
     gboolean     redirect;
 
     status = msg->status_code;
-    new_loc = soup_message_headers_get (msg->response_headers, "Location");
+    new_loc = soup_message_headers_get_one (msg->response_headers, "Location");
 
     /* If we don't have a location to redirect to, just fail */
     if (new_loc == NULL)
@@ -383,8 +383,8 @@ redirect_handler (SoupMessage *msg, gpointer user_data)
      {
        const char *dest;
 
-       dest = soup_message_headers_get (msg->request_headers,
-                                        "Destination");
+       dest = soup_message_headers_get_one (msg->request_headers,
+                                            "Destination");
 
        if (dest && g_str_has_suffix (dest, "/") == FALSE)
          {
@@ -2382,7 +2382,7 @@ try_replace_checked_etag (SoupSession *session, SoupMessage *msg,
   /* TODO: other errors */
 
   open_for_replace_succeeded (op_backend, job, soup_message_get_uri (msg),
-                              soup_message_headers_get (msg->request_headers, "If-Match"));
+                              soup_message_headers_get_one (msg->request_headers, "If-Match"));
 }  
 
 static gboolean
