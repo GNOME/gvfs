@@ -1058,9 +1058,9 @@ handle_login (GVfsBackend *backend,
 
 	  get_hostname_and_fingerprint_from_line (buffer, &hostname, &fingerprint);
 
-	  message = g_strdup_printf (_("The identity of the remote computer (%s) is unknown.\n"
+	  message = g_strdup_printf (_("Can't verify the identity of “%s”.\n"
 				       "This happens when you log in to a computer the first time.\n\n"
-				       "The identity sent by the remote computer is %s. "
+				       "The identity sent by the remote computer is “%s”. "
 				       "If you want to be absolutely sure it is safe to continue, "
 				       "contact the system administrator."),
 				     hostname ? hostname : op_backend->host, fingerprint);
