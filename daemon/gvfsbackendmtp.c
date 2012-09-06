@@ -619,11 +619,6 @@ get_file_info(GVfsBackend *backend, LIBMTP_mtpdevice_t *device, GFileInfo *info,
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, TRUE);
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, 0644);
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, getuid());
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, getgid());
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_USER, g_get_user_name());
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_USER_REAL, g_get_real_name());
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_COPY_NAME, file->filename);
 
 
