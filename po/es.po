@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-08-30 18:54+0000\n"
-"PO-Revision-Date: 2012-09-03 13:43+0200\n"
+"POT-Creation-Date: 2012-09-04 16:31+0000\n"
+"PO-Revision-Date: 2012-09-06 18:21+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "Language: \n"
@@ -332,12 +332,17 @@ msgstr "Se canceló el diálogo de la contraseña."
 msgid "Unable to disconnect from the server."
 msgstr "No se pudo desconectar del servidor."
 
-#: ../daemon/gvfsafpserver.c:1364 ../daemon/gvfsafpserver.c:1672
-#: ../daemon/gvfsafpserver.c:1763
-#, c-format
+#: ../daemon/gvfsafpserver.c:1364 ../daemon/gvfsafpserver.c:1763
 msgid "Unable to connect to the server. A communication problem occurred."
 msgstr ""
 "No se pudo conectar al servidor. Ocurrió un problema en la comunicación."
+
+#: ../daemon/gvfsafpserver.c:1672
+#, c-format
+#| msgid "Unable to connect to the server. A communication problem occurred."
+msgid "Unable to connect to the server '%s'. A communication problem occurred."
+msgstr ""
+"No se pudo conectar al servidor «%s». Ocurrió un problema en la comunicación."
 
 #: ../daemon/gvfsafpserver.c:1719
 msgid "Identification not found."
@@ -355,7 +360,6 @@ msgstr "Se obtuvo el código de error desconocido %d del servidor"
 
 #: ../daemon/gvfsafpvolume.c:145
 #, c-format
-#| msgid "Couldn't mount AFP volume %s on %s"
 msgid "Couldn't load %s on %s"
 msgstr "No se pudo cargar %s en %s"
 
@@ -755,7 +759,6 @@ msgstr "Tipo de atributo no válido (se esperaba uint32)"
 #. Translators: first %s is volumename, second username and third servername
 #: ../daemon/gvfsbackendafp.c:2061
 #, c-format
-#| msgid "SFTP for %s on %s"
 msgid "%s for %s on %s"
 msgstr "%s para %s en %s"
 
@@ -1012,7 +1015,6 @@ msgstr "No se puede sondear el archivo"
 #. the second %s and only shown if it is not the default http(s) port.
 #: ../daemon/gvfsbackenddav.c:485
 #, c-format
-#| msgid "%s on %s"
 msgid "%s on %s%s"
 msgstr "%s en %s%s"
 
@@ -1090,7 +1092,6 @@ msgstr "Red"
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendftp.c:488 ../daemon/gvfsbackendsftp.c:957
 #, c-format
-#| msgid "Enter password for ssh on %s"
 msgid "Enter password for %s on %s"
 msgstr "Introducir la contraseña para %s en %s"
 
@@ -1403,14 +1404,12 @@ msgstr "Expiró el tiempo para iniciar la sesión"
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendsftp.c:954
 #, c-format
-#| msgid "Enter passphrase for key for ssh on %s"
 msgid "Enter passphrase for secure key for %s on %s"
 msgstr "Introducir una contraseña para la clave segura de %s en %s"
 
 #. Translators: %s is the hostname
 #: ../daemon/gvfsbackendsftp.c:961
 #, c-format
-#| msgid "Enter passphrase for key for ssh on %s"
 msgid "Enter passphrase for secure key for %s"
 msgstr "Introducir una contraseña para la clave segura de %s"
 
@@ -1428,17 +1427,23 @@ msgstr "Cancelar inicio de sesión"
 
 #: ../daemon/gvfsbackendsftp.c:1061
 #, c-format
+#| msgid ""
+#| "The identity of the remote computer (%s) is unknown.\n"
+#| "This happens when you log in to a computer the first time.\n"
+#| "\n"
+#| "The identity sent by the remote computer is %s. If you want to be "
+#| "absolutely sure it is safe to continue, contact the system administrator."
 msgid ""
-"The identity of the remote computer (%s) is unknown.\n"
+"Can't verify the identity of “%s”.\n"
 "This happens when you log in to a computer the first time.\n"
 "\n"
-"The identity sent by the remote computer is %s. If you want to be absolutely "
-"sure it is safe to continue, contact the system administrator."
+"The identity sent by the remote computer is “%s”. If you want to be "
+"absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
-"Se desconoce la identidad del equipo remoto (%s).\n"
+"No se puede verificar la identidad de «%s».\n"
 "Esto sucede cuando inicia sesión por primera vez en un equipo.\n"
 "\n"
-"La identidad enviada por el equipo remoto es %s. Contacte con el "
+"La identidad enviada por el equipo remoto es «%s». Contacte con el "
 "administrador del sistema si quiere estar completamente seguro de que es "
 "seguro continuar."
 
