@@ -10,9 +10,9 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2012-09-04 16:46+0000\n"
-"PO-Revision-Date: 2012-09-04 17:36+0700\n"
-"Last-Translator: Dirgita <dirgitadevina@yahoo.co.id>\n"
-"Language-Team: Indonesian <gnome-l10n-id@googlegroups.com>\n"
+"PO-Revision-Date: 2012-09-06 15:55+0700\n"
+"Last-Translator: Andika Triwidada <andika@gmail.com>\n"
+"Language-Team: Indonesian <gnome@i15n.org>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -332,10 +332,9 @@ msgid "Unable to connect to the server. A communication problem occurred."
 msgstr "Tak bisa menyambung ke server. Terjadi masalah komunikasi."
 
 #: ../daemon/gvfsafpserver.c:1672
-#, fuzzy, c-format
-#| msgid "Unable to connect to the server. A communication problem occurred."
+#, c-format
 msgid "Unable to connect to the server '%s'. A communication problem occurred."
-msgstr "Tak bisa menyambung ke server. Terjadi masalah komunikasi."
+msgstr "Tak bisa menyambung ke server '%s'. Terjadi masalah komunikasi."
 
 #: ../daemon/gvfsafpserver.c:1719
 msgid "Identification not found."
@@ -1415,7 +1414,7 @@ msgid "Cancel Login"
 msgstr "Batalkan Log Masuk"
 
 #: ../daemon/gvfsbackendsftp.c:1061
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The identity of the remote computer (%s) is unknown.\n"
 #| "This happens when you log in to a computer the first time.\n"
@@ -1429,11 +1428,11 @@ msgid ""
 "The identity sent by the remote computer is “%s”. If you want to be "
 "absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
-"Identitas komputer jauh (%s) tak dikenal.\n"
+"Tak bisa memastikan kebenaran identitas \"%s\".\n"
 "Ini terjadi ketika Anda pertama kali log masuk ke suatu komputer.\n"
 "\n"
-"Identitas yang dikirim oleh komputer jauh adalah %s. Bila Anda ingin benar-"
-"benar yakin aman untuk melanjutkan, hubungi administrator sistem."
+"Identitas yang dikirim oleh komputer jauh adalah \"%s\". Bila Anda ingin "
+"benar-benar yakin aman untuk melanjutkan, hubungi administrator sistem."
 
 #: ../daemon/gvfsbackendsftp.c:1080
 msgid "Login dialog cancelled"
@@ -2898,45 +2897,3 @@ msgstr "Ikuti taut simbolis, kait, dan pintasan"
 #: ../programs/gvfs-tree.c:249
 msgid "List contents of directories in a tree-like format."
 msgstr "Mendaftar isi direktori dalam bentuk seperti pohon."
-
-#~ msgid "AFP volumes for %s on %s"
-#~ msgstr "Volume AFP bagi %s pada %s"
-
-#~ msgid "AFP volumes on %s"
-#~ msgstr "Volume AFP pada %s"
-
-#~ msgid "AFP volume %s for %s on %s"
-#~ msgstr "Volume AFP %s bagi %s pada %s"
-
-#~ msgid "AFP volume %s on %s"
-#~ msgstr "Volume AFP %s pada %s"
-
-#~ msgid "WebDAV as %s on %s%s"
-#~ msgstr "WebDAV sebagai %s pada %s%s"
-
-#~ msgid "WebDAV on %s%s"
-#~ msgstr "WebDAV pada %s%s"
-
-#~ msgid "Enter password for FTP as %s on %s"
-#~ msgstr "Masukkan sandi bagi FTP sebagai %s pada %s"
-
-#~ msgid "Enter password for FTP on %s"
-#~ msgstr "Masukkan sandi bagi FTP pada %s"
-
-#~ msgid "FTP on %s"
-#~ msgstr "FTP pada %s"
-
-#~ msgid "FTP as %s on %s"
-#~ msgstr "FTP sebagai %s pada %s"
-
-#~ msgid "Enter passphrase for key for ssh as %s on %s"
-#~ msgstr "Masukkan frasa sandi bagi ssh sebagai %s pada %s"
-
-#~ msgid "Enter password for ssh as %s on %s"
-#~ msgstr "Masukkan sandi bagi ssh sebagai %s pada %s"
-
-#~ msgid "SFTP on %s"
-#~ msgstr "SFTP pada %s"
-
-#~ msgid "Invalid icon_id '%s' in OpenIconForRead"
-#~ msgstr "icon_id '%s' tak valid pada OpenIconForRead"
