@@ -640,7 +640,7 @@ g_proxy_drive_eject_with_operation (GDrive              *drive,
     }
 
   data = g_new0 (DBusOp, 1);
-  data->drive = g_object_ref (drive);
+  data->drive = g_object_ref (proxy_drive);
   data->callback = callback;
   data->user_data = user_data;
   data->mount_op_id = g_proxy_mount_operation_wrap (mount_operation, proxy_drive->volume_monitor);
@@ -659,7 +659,7 @@ g_proxy_drive_eject_with_operation (GDrive              *drive,
       data->cancellation_id = g_strdup ("");
     }
 
-  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->drive->volume_monitor);
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (proxy_drive->volume_monitor);
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT);  /* 30 minute timeout */
   
   gvfs_remote_volume_monitor_call_drive_eject (proxy,
@@ -790,7 +790,7 @@ g_proxy_drive_stop (GDrive              *drive,
     }
 
   data = g_new0 (DBusOp, 1);
-  data->drive = g_object_ref (drive);
+  data->drive = g_object_ref (proxy_drive);
   data->callback = callback;
   data->user_data = user_data;
   data->mount_op_id = g_proxy_mount_operation_wrap (mount_operation, proxy_drive->volume_monitor);
@@ -809,7 +809,7 @@ g_proxy_drive_stop (GDrive              *drive,
       data->cancellation_id = g_strdup ("");
     }
 
-  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->drive->volume_monitor);
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (proxy_drive->volume_monitor);
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT);  /* 30 minute timeout */
 
   gvfs_remote_volume_monitor_call_drive_stop (proxy,
@@ -966,7 +966,7 @@ g_proxy_drive_start (GDrive              *drive,
     }
 
   data = g_new0 (DBusStartOp, 1);
-  data->drive = g_object_ref (drive);
+  data->drive = g_object_ref (proxy_drive);
   data->callback = callback;
   data->user_data = user_data;
   if (cancellable != NULL)
@@ -985,7 +985,7 @@ g_proxy_drive_start (GDrive              *drive,
 
   data->mount_op_id = g_proxy_mount_operation_wrap (mount_operation, proxy_drive->volume_monitor);
 
-  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->drive->volume_monitor);
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (proxy_drive->volume_monitor);
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT);  /* 30 minute timeout */
 
   gvfs_remote_volume_monitor_call_drive_start (proxy,
@@ -1091,7 +1091,7 @@ g_proxy_drive_poll_for_media (GDrive              *drive,
     }
 
   data = g_new0 (DBusOp, 1);
-  data->drive = g_object_ref (drive);
+  data->drive = g_object_ref (proxy_drive);
   data->callback = callback;
   data->user_data = user_data;
 
@@ -1109,7 +1109,7 @@ g_proxy_drive_poll_for_media (GDrive              *drive,
       data->cancellation_id = g_strdup ("");
     }
   
-  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->drive->volume_monitor);
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (proxy_drive->volume_monitor);
   gvfs_remote_volume_monitor_call_drive_poll_for_media (proxy,
                                                         proxy_drive->id,
                                                         data->cancellation_id,
