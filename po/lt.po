@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs gnome-2-32\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-08-30 18:54+0000\n"
-"PO-Revision-Date: 2012-09-02 15:33+0300\n"
+"POT-Creation-Date: 2012-09-04 16:31+0000\n"
+"PO-Revision-Date: 2012-09-07 20:43+0300\n"
 "Last-Translator: Aurimas Černius <aurisc4@gmail.com>\n"
 "Language-Team: Lithuanian <gnome-lt@lists.akl.lt>\n"
 "Language: lt\n"
@@ -347,11 +347,15 @@ msgid "Unable to disconnect from the server."
 msgstr "Nepavyko atsijungti nuo serverio."
 
 #: ../daemon/gvfsafpserver.c:1364
-#: ../daemon/gvfsafpserver.c:1672
 #: ../daemon/gvfsafpserver.c:1763
-#, c-format
 msgid "Unable to connect to the server. A communication problem occurred."
 msgstr "Nepavyko prisijungti prie serverio. Kilo komunikacijos problema."
+
+#: ../daemon/gvfsafpserver.c:1672
+#, c-format
+#| msgid "Unable to connect to the server. A communication problem occurred."
+msgid "Unable to connect to the server '%s'. A communication problem occurred."
+msgstr "Nepavyko prisijungti prie serverio „%s“. Kilo komunikacijos problema."
 
 #: ../daemon/gvfsafpserver.c:1719
 msgid "Identification not found."
@@ -369,7 +373,6 @@ msgstr "Iš serverio gautas nežinomas klaidos kodas %d"
 
 #: ../daemon/gvfsafpvolume.c:145
 #, c-format
-#| msgid "Couldn't mount AFP volume %s on %s"
 msgid "Couldn't load %s on %s"
 msgstr "Nepavyko įkelti %s vietoje %s"
 
@@ -832,7 +835,6 @@ msgstr "Netinkamas požymio tipas (laukta uint32)"
 #. Translators: first %s is volumename, second username and third servername
 #: ../daemon/gvfsbackendafp.c:2061
 #, c-format
-#| msgid "SFTP for %s on %s"
 msgid "%s for %s on %s"
 msgstr "%s naudotojui %s serveryje %s"
 
@@ -1155,7 +1157,6 @@ msgstr "Nepavyko apklausti failo"
 #. the second %s and only shown if it is not the default http(s) port.
 #: ../daemon/gvfsbackenddav.c:485
 #, c-format
-#| msgid "%s on %s"
 msgid "%s on %s%s"
 msgstr "%s serveryje %s%s"
 
@@ -1246,7 +1247,6 @@ msgstr "Tinklas"
 #: ../daemon/gvfsbackendftp.c:488
 #: ../daemon/gvfsbackendsftp.c:957
 #, c-format
-#| msgid "Enter password for ssh on %s"
 msgid "Enter password for %s on %s"
 msgstr "Įveskite slaptažodį naudotojui %s serveryje %s"
 
@@ -1571,14 +1571,12 @@ msgstr "Baigėsi prisijungimo laiko limitas"
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendsftp.c:954
 #, c-format
-#| msgid "Enter passphrase for key for ssh on %s"
 msgid "Enter passphrase for secure key for %s on %s"
 msgstr "Įveskite saugaus rakto slaptafrazę naudotojui %s serveryje %s"
 
 #. Translators: %s is the hostname
 #: ../daemon/gvfsbackendsftp.c:961
 #, c-format
-#| msgid "Enter passphrase for key for ssh on %s"
 msgid "Enter passphrase for secure key for %s"
 msgstr "Įveskite saugaus rakto slaptafrazę serveriui %s"
 
@@ -1596,16 +1594,22 @@ msgstr "Nutraukti prisijungimą"
 
 #: ../daemon/gvfsbackendsftp.c:1061
 #, c-format
+#| msgid ""
+#| "The identity of the remote computer (%s) is unknown.\n"
+#| "This happens when you log in to a computer the first time.\n"
+#| "\n"
+#| "The identity sent by the remote computer is %s. If you want to be "
+#| "absolutely sure it is safe to continue, contact the system administrator."
 msgid ""
-"The identity of the remote computer (%s) is unknown.\n"
+"Can't verify the identity of “%s”.\n"
 "This happens when you log in to a computer the first time.\n"
 "\n"
-"The identity sent by the remote computer is %s. If you want to be absolutely sure it is safe to continue, contact the system administrator."
+"The identity sent by the remote computer is “%s”. If you want to be absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
-"Nutolusio kompiuterio (%s) tapatybė nežinoma.\n"
+"Nepavyko patikrinti „%s“ identiteto.\n"
 "Tai atsitinka, kai jungiatės prie kompiuterio pirmą kartą.\n"
 "\n"
-"Kompiuterio atsiųsta tapatybė yra %s. Jei norite būti visiškai tikri, kad saugu tęsti, susisiekite su sistemos administratoriumi."
+"Nutolusio kompiuterio atsiųsta tapatybė yra „%s“. Jei norite būti visiškai tikri, kad saugu tęsti, susisiekite su sistemos administratoriumi."
 
 #: ../daemon/gvfsbackendsftp.c:1081
 msgid "Login dialog cancelled"
