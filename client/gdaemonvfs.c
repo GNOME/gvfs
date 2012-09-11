@@ -653,6 +653,7 @@ fill_mountable_info (GDaemonVfs *vfs)
 	g_printerr ("org.gtk.vfs.MountTracker.listMountableInfo call failed: %s (%s, %d)\n",
 		    error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
+      g_object_unref (proxy);
       return;
     }
 

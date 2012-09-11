@@ -262,7 +262,7 @@ set_connection_for_async (GDBusConnection *connection, const char *dbus_id)
  *************************************************************************/
 
 typedef struct {
-  const char *dbus_id;
+  char *dbus_id;
 
   GDBusConnection *connection;
   GCancellable *cancellable;
@@ -285,6 +285,7 @@ async_call_finish (AsyncDBusCall *async_call)
   g_clear_object (&async_call->connection);
   g_clear_object (&async_call->cancellable);
   g_clear_error (&async_call->io_error);
+  g_free (async_call->dbus_id);
   g_free (async_call);
 }
 
@@ -344,7 +345,7 @@ async_get_connection_response (GVfsDBusDaemon *proxy,
 {
   AsyncDBusCall *async_call = user_data;
   GError *error = NULL;
-  gchar *address1;
+  gchar *address1 = NULL;
 
   if (! gvfs_dbus_daemon_call_get_connection_finish (proxy,
                                                      &address1, NULL,
@@ -353,6 +354,7 @@ async_get_connection_response (GVfsDBusDaemon *proxy,
     {
       async_call->io_error = g_error_copy (error);
       g_error_free (error);
+      g_free (address1);
       async_call_finish (async_call);
       return;
     }
@@ -363,6 +365,7 @@ async_get_connection_response (GVfsDBusDaemon *proxy,
                                      async_call->cancellable,
                                      async_got_private_connection_cb,
                                      async_call);
+  g_free (address1);
 }
 
 static void
@@ -661,7 +664,6 @@ _g_dbus_connection_get_sync (const char *dbus_id,
 	return bus; /* We actually wanted the session bus, so done */
     }
 
-  address1 = NULL;
   daemon_proxy = gvfs_dbus_daemon_proxy_new_sync (local->session_bus,
                                                   G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                                                   dbus_id,
@@ -671,6 +673,7 @@ _g_dbus_connection_get_sync (const char *dbus_id,
   if (daemon_proxy == NULL)
     return NULL;
 
+  address1 = NULL;
   res = gvfs_dbus_daemon_call_get_connection_sync (daemon_proxy,
                                                    &address1,
                                                    NULL,
@@ -679,7 +682,11 @@ _g_dbus_connection_get_sync (const char *dbus_id,
   g_object_unref (daemon_proxy);
 
   if (!res)
-    return NULL;
+    {
+      g_free (address1);
+      return NULL;
+    }
+
 
   local_error = NULL;
   connection = g_dbus_connection_new_for_address_sync (address1,
@@ -687,13 +694,14 @@ _g_dbus_connection_get_sync (const char *dbus_id,
                                                        NULL, /* GDBusAuthObserver */
                                                        cancellable,
                                                        &local_error);
+  g_free (address1);
+
   if (!connection)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   local_error->message);
       g_error_free (local_error);
-      g_free (address1);
       return NULL;
     }
 
