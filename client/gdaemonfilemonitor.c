@@ -47,6 +47,7 @@ struct _GDaemonFileMonitor
   char *remote_obj_path;
   char *remote_id;
   GDBusConnection *connection;
+  GVfsDBusMonitor *proxy;
 };
 
 G_DEFINE_TYPE (GDaemonFileMonitor, g_daemon_file_monitor, G_TYPE_FILE_MONITOR)
@@ -58,6 +59,8 @@ g_daemon_file_monitor_finalize (GObject* object)
   
   daemon_monitor = G_DAEMON_FILE_MONITOR (object);
 
+  g_clear_object (&daemon_monitor->proxy);
+
   _g_dbus_unregister_vfs_filter (daemon_monitor->object_path);
   
   g_clear_object (&daemon_monitor->connection);
@@ -65,7 +68,7 @@ g_daemon_file_monitor_finalize (GObject* object)
   g_free (daemon_monitor->object_path);
   g_free (daemon_monitor->remote_id);
   g_free (daemon_monitor->remote_obj_path);
-  
+
   if (G_OBJECT_CLASS (g_daemon_file_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_daemon_file_monitor_parent_class)->finalize) (object);
 }
@@ -156,27 +159,10 @@ g_daemon_file_monitor_init (GDaemonFileMonitor* daemon_monitor)
 			       G_OBJECT (daemon_monitor));
 }
 
-
-typedef void (*ProxyCreated) (GVfsDBusMonitor *proxy, gpointer user_data);
-
-typedef struct {
-  GDaemonFileMonitor* monitor;
-  ProxyCreated cb;
-  GDBusConnection *connection;
-} AsyncProxyCreate;
-
-static void
-async_proxy_create_free (AsyncProxyCreate *data)
-{
-  g_object_unref (data->monitor);
-  g_clear_object (&data->connection);
-  g_free (data);
-}
-
 static void
 subscribe_cb (GVfsDBusMonitor *proxy,
               GAsyncResult *res,
-              AsyncProxyCreate *data)
+              GDaemonFileMonitor* monitor)
 {
   GError *error = NULL;
 
@@ -186,34 +172,22 @@ subscribe_cb (GVfsDBusMonitor *proxy,
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
-  
-  /* monitor subscription successful, let's keep the connection open and listen for the changes */
-  data->monitor->connection = g_object_ref (data->connection);
-  _g_dbus_connect_vfs_filters (data->monitor->connection);
-  
-  async_proxy_create_free (data);
-}
 
-static void
-subscribe_proxy_created_cb (GVfsDBusMonitor *proxy,
-                            gpointer user_data)
-{
-  AsyncProxyCreate *data = user_data;
-
-  if (proxy == NULL)
+  /* If its cancelled already, unsubscribe and don't save stuff */
+  if (g_file_monitor_is_cancelled (G_FILE_MONITOR (monitor)))
     {
-      /* TODO: report an error? */
-      async_proxy_create_free (data);
+      gvfs_dbus_monitor_call_unsubscribe (proxy,
+                                          monitor->object_path,
+                                          NULL, NULL, NULL);
+      g_clear_object (&monitor->connection);
+      g_object_unref (monitor);
       return;
     }
-  
-  gvfs_dbus_monitor_call_subscribe (proxy,
-                                    data->monitor->object_path,
-                                    NULL,
-                                    (GAsyncReadyCallback) subscribe_cb,
-                                    data);
-  
-  g_object_unref (proxy);
+
+  _g_dbus_connect_vfs_filters (monitor->connection);
+  monitor->proxy = g_object_ref (proxy);
+
+  g_object_unref (monitor);
 }
 
 static void
@@ -221,7 +195,7 @@ async_proxy_new_cb (GObject *source_object,
                     GAsyncResult *res,
                     gpointer user_data)
 {
-  AsyncProxyCreate *data = user_data;
+  GDaemonFileMonitor* monitor = user_data;
   GVfsDBusMonitor *proxy;
   GError *error = NULL;
 
@@ -231,9 +205,25 @@ async_proxy_new_cb (GObject *source_object,
       g_printerr ("Error creating monitor proxy: %s (%s, %d)\n",
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
+      g_clear_object (&monitor->connection);
+      g_object_unref (monitor);
+      return;
     }
-  
-  data->cb (proxy, data);
+
+  if (g_file_monitor_is_cancelled (G_FILE_MONITOR (monitor)))
+    {
+      g_clear_object (&monitor->connection);
+      g_object_unref (proxy);
+      g_object_unref (monitor);
+      return;
+    }
+
+  gvfs_dbus_monitor_call_subscribe (proxy,
+                                    monitor->object_path,
+                                    NULL,
+                                    (GAsyncReadyCallback) subscribe_cb,
+                                    monitor);
+  g_object_unref (proxy);
 }
 
 static void
@@ -241,24 +231,24 @@ async_got_connection_cb (GDBusConnection *connection,
                          GError *io_error,
                          gpointer callback_data)
 {
-  AsyncProxyCreate *data = callback_data;
+  GDaemonFileMonitor* monitor = callback_data;
 
   if (! connection)
     {
       g_printerr ("Error getting connection for monitoring: %s (%s, %d)\n",
                    io_error->message, g_quark_to_string (io_error->domain), io_error->code);
-      data->cb (NULL, data);
+      g_object_unref (monitor);
       return;
     }
 
-  data->connection = g_object_ref (connection);
+  monitor->connection = g_object_ref (connection);
   gvfs_dbus_monitor_proxy_new (connection,
                                G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
-                               data->monitor->remote_id,
-                               data->monitor->remote_obj_path,
+                               monitor->remote_id,
+                               monitor->remote_obj_path,
                                NULL,
                                async_proxy_new_cb,
-                               data);
+                               monitor);
 }
 
 GFileMonitor*
@@ -266,78 +256,29 @@ g_daemon_file_monitor_new (const char *remote_id,
 				const char *remote_obj_path)
 {
   GDaemonFileMonitor* daemon_monitor;
-  AsyncProxyCreate *data;
-  
+
   daemon_monitor = g_object_new (G_TYPE_DAEMON_FILE_MONITOR, NULL);
 
   daemon_monitor->remote_id = g_strdup (remote_id);
   daemon_monitor->remote_obj_path = g_strdup (remote_obj_path);
 
-  data = g_new0 (AsyncProxyCreate, 1);
-  data->monitor = g_object_ref (daemon_monitor);
-  data->cb = subscribe_proxy_created_cb;
-  
   _g_dbus_connection_get_for_async (daemon_monitor->remote_id,
                                     async_got_connection_cb,
-                                    data,
+                                    g_object_ref (daemon_monitor),
                                     NULL);
-  
+
   return G_FILE_MONITOR (daemon_monitor);
-}
-
-static void
-unsubscribe_cb (GVfsDBusMonitor *proxy,
-                GAsyncResult *res,
-                AsyncProxyCreate *data)
-{
-  GError *error = NULL;
-
-  if (! gvfs_dbus_monitor_call_unsubscribe_finish (proxy, res, &error))
-    {
-      g_printerr ("Error calling org.gtk.vfs.Monitor.Unsubscribe(): %s (%s, %d)\n",
-                  error->message, g_quark_to_string (error->domain), error->code);
-      g_error_free (error);
-    }
-  
-  async_proxy_create_free (data);
-}
-
-static void
-unsubscribe_proxy_created_cb (GVfsDBusMonitor *proxy,
-                              gpointer user_data)
-{
-  AsyncProxyCreate *data = user_data;
-
-  if (proxy == NULL)
-    {
-      /* Let's assume the target backend is gone already and there's nothing to cancel */
-      async_proxy_create_free (data);
-      return;
-    }
-  
-  gvfs_dbus_monitor_call_unsubscribe (proxy,
-                                      data->monitor->object_path,
-                                      NULL,
-                                      (GAsyncReadyCallback) unsubscribe_cb,
-                                      data);
-  
-  g_object_unref (proxy);
 }
 
 static gboolean
 g_daemon_file_monitor_cancel (GFileMonitor* monitor)
 {
   GDaemonFileMonitor *daemon_monitor = G_DAEMON_FILE_MONITOR (monitor);
-  AsyncProxyCreate *data;
-  
-  data = g_new0 (AsyncProxyCreate, 1);
-  data->monitor = g_object_ref (daemon_monitor);
-  data->cb = unsubscribe_proxy_created_cb;
-  
-  _g_dbus_connection_get_for_async (daemon_monitor->remote_id,
-                                    async_got_connection_cb,
-                                    data,
-                                    NULL);
+
+  if (daemon_monitor->proxy != NULL)
+    gvfs_dbus_monitor_call_unsubscribe (daemon_monitor->proxy,
+					daemon_monitor->object_path,
+					NULL, NULL, NULL);
 
   return TRUE;
 }
