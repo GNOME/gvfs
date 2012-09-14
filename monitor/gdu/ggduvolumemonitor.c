@@ -126,7 +126,7 @@ g_gdu_volume_monitor_finalize (GObject *object)
 
   g_object_unref (monitor->mount_monitor);
 
-  g_object_unref (monitor->pool);
+  g_clear_object (&monitor->pool);
 
   list_free (monitor->last_optical_disc_devices);
   list_free (monitor->last_mountpoints);
