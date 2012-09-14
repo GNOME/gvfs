@@ -23,6 +23,7 @@ gvfs_hal_volume_monitor_SOURCES =			\
 	ghalvolume.c		ghalvolume.h		\
 	ghalmount.c		ghalmount.h		\
 	ghalvolumemonitor.c	ghalvolumemonitor.h	\
+	gvfsdbusutils.c		gvfsdbusutils.h		\
 	$(NULL)
 
 gvfs_hal_volume_monitor_CFLAGS =		\
@@ -30,6 +31,7 @@ gvfs_hal_volume_monitor_CFLAGS =		\
 	-I$(top_srcdir)/common                  \
 	-I$(top_srcdir)/monitor/proxy           \
 	$(GLIB_CFLAGS)                          \
+	$(DBUS_CFLAGS)                          \
 	$(HAL_CFLAGS)                           \
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
@@ -40,6 +42,7 @@ gvfs_hal_volume_monitor_LDFLAGS =	\
 
 gvfs_hal_volume_monitor_LDADD  =		     			      \
 	$(GLIB_LIBS)                                 			      \
+	$(DBUS_LIBS)                                 			      \
 	$(HAL_LIBS)                                  			      \
 	$(top_builddir)/common/libgvfscommon.la 			      \
 	$(top_builddir)/common/libgvfscommon-monitor.la			      \
