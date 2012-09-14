@@ -428,25 +428,28 @@ g_gdu_volume_monitor_constructor (GType                  type,
 
   monitor->pool = gdu_pool_new ();
 
-  g_signal_connect (monitor->pool,
-                    "presentable_added",
-                    G_CALLBACK (presentable_added),
-                    monitor);
+  if (monitor->pool != NULL)
+    {
+      g_signal_connect (monitor->pool,
+                        "presentable_added",
+                        G_CALLBACK (presentable_added),
+                        monitor);
 
-  g_signal_connect (monitor->pool,
-                    "presentable_removed",
-                    G_CALLBACK (presentable_removed),
-                    monitor);
+      g_signal_connect (monitor->pool,
+                        "presentable_removed",
+                        G_CALLBACK (presentable_removed),
+                        monitor);
 
-  g_signal_connect (monitor->pool,
-                    "presentable_changed",
-                    G_CALLBACK (presentable_changed),
-                    monitor);
+      g_signal_connect (monitor->pool,
+                        "presentable_changed",
+                        G_CALLBACK (presentable_changed),
+                        monitor);
 
-  g_signal_connect (monitor->pool,
-                    "presentable_job_changed",
-                    G_CALLBACK (presentable_job_changed),
-                    monitor);
+      g_signal_connect (monitor->pool,
+                        "presentable_job_changed",
+                        G_CALLBACK (presentable_job_changed),
+                        monitor);
+    }
 
   update_all (monitor, FALSE);
 
@@ -1213,6 +1216,9 @@ update_drives (GGduVolumeMonitor *monitor,
   GGduDrive *drive;
   GList *fstab_mount_points;
 
+  if (monitor->pool == NULL)
+    return;
+
   fstab_mount_points = g_unix_mount_points_get (NULL);
 
   cur_drives = NULL;
@@ -1295,6 +1301,9 @@ update_volumes (GGduVolumeMonitor *monitor,
   GGduVolume *volume;
   GGduDrive *drive;
   GList *fstab_mount_points;
+
+  if (monitor->pool == NULL)
+    return;
 
   fstab_mount_points = g_unix_mount_points_get (NULL);
 
@@ -1424,14 +1433,15 @@ update_fstab_volumes (GGduVolumeMonitor *monitor,
       if (g_str_has_prefix (device_file, "/dev/"))
         {
           gchar resolved_path[PATH_MAX];
-          GduDevice *device;
+          GduDevice *device = NULL;
 
           /* doesn't exist */
           if (realpath (device_file, resolved_path) == NULL)
             continue;
 
           /* is handled by DKD */
-          device = gdu_pool_get_by_device_file (monitor->pool, resolved_path);
+          if (monitor->pool != NULL)
+            device = gdu_pool_get_by_device_file (monitor->pool, resolved_path);
           if (device != NULL)
             {
               g_object_unref (device);
@@ -1613,6 +1623,9 @@ update_discs (GGduVolumeMonitor *monitor,
    * - optical discs that are blank
    *
    */
+
+  if (monitor->pool == NULL)
+    return;
 
   cur_discs = NULL;
   for (l = monitor->disc_volumes; l != NULL; l = l->next)
