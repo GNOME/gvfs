@@ -1,3 +1,12 @@
+Major changes in 1.13.9
+=======================
+* build: Use tar-ustar instead of tar-pax
+* daemon: Fix some memory leaks
+* file monitor: Try to unsubscribe from the proxy used for subscription
+* hal volume monitor: Fix compilation
+* gdu volume monitor: Handle gdu_pool_new() returning NULL gracefully
+* Translation updates
+
 Major changes in 1.13.8
 =======================
 * Added support for symbolic icons
