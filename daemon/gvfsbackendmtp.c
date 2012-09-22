@@ -60,11 +60,25 @@
 
 /* showing debug traces */
 #define DEBUG_SHOW_TRACES 1
+//#define DEBUG_SHOW_ENUMERATE_TRACES 1
 
 static void
 DEBUG (const gchar *message, ...)
 {
 #ifdef DEBUG_SHOW_TRACES
+  va_list args;
+  va_start (args, message);
+  g_vfprintf (stderr, message, args);
+  va_end (args);
+  g_fprintf (stderr, "\n");
+  fflush (stderr);
+#endif
+}
+
+static void
+DEBUG_ENUMERATE (const gchar *message, ...)
+{
+#ifdef DEBUG_SHOW_ENUMERATE_TRACES
   va_list args;
   va_start (args, message);
   g_vfprintf (stderr, message, args);
@@ -491,6 +505,8 @@ get_device_info(GVfsBackendMtp *backend, GFileInfo *info) {
   LIBMTP_mtpdevice_t *device = backend->device;
   const char *name = g_mount_spec_get(g_vfs_backend_get_mount_spec(G_VFS_BACKEND(backend)), "host");
 
+  DEBUG_ENUMERATE ("(II) get_device_info: %s", name);
+
   g_file_info_set_file_type(info, G_FILE_TYPE_DIRECTORY);
   g_file_info_set_name(info, name);
 
@@ -519,6 +535,7 @@ get_device_info(GVfsBackendMtp *backend, GFileInfo *info) {
   if (ret != 0) {
     LIBMTP_Dump_Errorstack(device);
     LIBMTP_Clear_Errorstack(device);
+    DEBUG_ENUMERATE ("(II) get_device_info done with no stores.");
     return;
   }
   guint64 freeSpace = 0;
@@ -531,6 +548,8 @@ get_device_info(GVfsBackendMtp *backend, GFileInfo *info) {
 
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, freeSpace);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, maxSpace);
+
+  DEBUG_ENUMERATE ("(II) get_device_info done.");
 }
 
 static void
@@ -539,6 +558,8 @@ get_storage_info(LIBMTP_devicestorage_t *storage, GFileInfo *info) {
   char *id = g_strdup_printf("%u", storage->id);
   g_file_info_set_name(info, id);
   g_free(id);
+
+  DEBUG_ENUMERATE ("(II) get_storage_info: %s", storage->id);
 
   g_file_info_set_display_name(info, storage->StorageDescription);
   g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
@@ -577,6 +598,8 @@ get_storage_info(LIBMTP_devicestorage_t *storage, GFileInfo *info) {
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, storage->FreeSpaceInBytes);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, storage->MaxCapacity);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "mtpfs");
+
+  DEBUG_ENUMERATE ("(II) get_storage_info done.");
 }
 
 static void
@@ -587,6 +610,8 @@ get_file_info(GVfsBackend *backend, LIBMTP_mtpdevice_t *device, GFileInfo *info,
   char *id = g_strdup_printf("%u", file->item_id);
   g_file_info_set_name(info, id);
   g_free(id);
+
+  DEBUG_ENUMERATE ("(II) get_file_info: %u", file->item_id);
 
   g_file_info_set_display_name(info, file->filename);
 
@@ -646,6 +671,8 @@ get_file_info(GVfsBackend *backend, LIBMTP_mtpdevice_t *device, GFileInfo *info,
     g_object_unref (icon);
   }
   g_free(content_type);
+
+  DEBUG_ENUMERATE ("(II) get_file_info done.");
 }
 
 
@@ -885,7 +912,7 @@ do_pull(GVfsBackend *backend,
                                 GFileProgressCallback progress_callback,
                                 gpointer progress_callback_data)
 {
-  DEBUG ("(II) do_pull (filename = %s, local_path = %s) ", source, local_path);
+  DEBUG ("(I) do_pull (filename = %s, local_path = %s) ", source, local_path);
   g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
 
   GFileInfo *info = NULL;
@@ -916,11 +943,6 @@ do_pull(GVfsBackend *backend,
   LIBMTP_destroy_file_t(file);
   file = NULL;
   if (g_file_info_get_file_type(info) == G_FILE_TYPE_DIRECTORY) {
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                      "Can't get file to upload.");
-    goto exit;
-#if 0
     GError *error;
     GFile *file = g_file_new_for_path (local_path);
     g_assert (file != NULL);
@@ -934,7 +956,6 @@ do_pull(GVfsBackend *backend,
       }
       g_object_unref (file);
     }
-#endif
   } else {
       MtpProgressData *mtp_progress_data = g_new0(MtpProgressData, 1);
       mtp_progress_data->progress_callback = progress_callback;
@@ -958,6 +979,8 @@ do_pull(GVfsBackend *backend,
   }
   g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+
+  DEBUG ("(I) do_pull done.");
 }
 
 
@@ -971,7 +994,7 @@ do_push(GVfsBackend *backend,
                                 GFileProgressCallback progress_callback,
                                 gpointer progress_callback_data)
 {
-  DEBUG ("(II) do_push (filename = %s, local_path = %s) ", destination, local_path);
+  DEBUG ("(I) do_push (filename = %s, local_path = %s) ", destination, local_path);
   g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
 
   GFile *file = NULL;
@@ -1052,6 +1075,8 @@ do_push(GVfsBackend *backend,
   }
   g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+
+  DEBUG ("(I) do_push done.");
 }
 
 
@@ -1060,7 +1085,7 @@ do_make_directory (GVfsBackend *backend,
                     GVfsJobMakeDirectory *job,
                     const char *filename)
 {
-  DEBUG ("(II) try_make_directory (filename = %s) ", filename);
+  DEBUG ("(I) do_make_directory (filename = %s) ", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
 
   gchar **elements = g_strsplit_set(filename, "/", -1);
@@ -1099,6 +1124,8 @@ do_make_directory (GVfsBackend *backend,
  exit:
   g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+
+  DEBUG ("(I) do_make_directory done.");
 }
 
 
@@ -1107,7 +1134,7 @@ do_delete (GVfsBackend *backend,
             GVfsJobDelete *job,
             const char *filename)
 {
-  DEBUG ("(II) try_delete (filename = %s) ", filename);
+  DEBUG ("(I) do_delete (filename = %s) ", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
 
   gchar **elements = g_strsplit_set(filename, "/", -1);
@@ -1136,6 +1163,8 @@ do_delete (GVfsBackend *backend,
  exit:
   g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+
+  DEBUG ("(I) do_delete done.");
 }
 
 
@@ -1146,7 +1175,7 @@ do_set_display_name (GVfsBackend *backend,
                       const char *filename,
                       const char *display_name)
 {
-  DEBUG ("(II) try_set_display_name '%s' --> '%s' ", filename, display_name);
+  DEBUG ("(I) do_set_display_name '%s' --> '%s' ", filename, display_name);
   g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
 
   gchar **elements = g_strsplit_set(filename, "/", -1);
@@ -1179,6 +1208,8 @@ do_set_display_name (GVfsBackend *backend,
  exit:
   g_strfreev(elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+
+  DEBUG ("(I) do_set_display_name done.");
 }
 
 
@@ -1188,7 +1219,7 @@ do_open_icon_for_read (GVfsBackend *backend,
                        GVfsJobOpenIconForRead *job,
                        const char *icon_id)
 {
-  DEBUG ("open_icon_for_read (%s)", icon_id);
+  DEBUG ("(I) do_open_icon_for_read (%s)", icon_id);
   g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
 
   guint id = strtol(icon_id, NULL, 10);
@@ -1234,6 +1265,8 @@ do_open_icon_for_read (GVfsBackend *backend,
                       icon_id);
   }
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+
+  DEBUG ("(I) do_open_icon_for_read done.");
 }
 
 static gboolean
@@ -1245,7 +1278,7 @@ try_read (GVfsBackend *backend,
 {
   GByteArray *bytes = handle;
 
-  DEBUG ("try_read (%u %lu)", bytes->len, bytes_requested);
+  DEBUG ("(I) try_read (%u %lu)", bytes->len, bytes_requested);
 
   gsize bytes_to_copy =  MIN(bytes->len, bytes_requested);
   if (bytes_to_copy == 0) {
@@ -1257,6 +1290,8 @@ try_read (GVfsBackend *backend,
  out:
   g_vfs_job_read_set_size (job, bytes_to_copy);
   g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  DEBUG ("(I) try_read done.");
   return TRUE;
 }
 
@@ -1265,16 +1300,17 @@ do_close_read (GVfsBackend *backend,
                 GVfsJobCloseRead *job,
                 GVfsBackendHandle handle)
 {
-  DEBUG ("do_close_read");
+  DEBUG ("(I) do_close_read");
   g_byte_array_unref(handle);
   g_vfs_job_succeeded (G_VFS_JOB (job));
+  DEBUG ("(I) do_close_read done.");
 }
 #endif /* HAVE_LIBMTP_GET_THUMBNAIL */
 
 
 /************************************************
  * 	  Class init
- * 
+ *
  */
 
 
