@@ -955,6 +955,7 @@ g_proxy_volume_monitor_constructor (GType                  type,
   GObjectClass *parent_class;
   GError *error;
   const char *dbus_name;
+  gchar *name_owner;
 
   G_LOCK (proxy_vm);
 
@@ -1018,7 +1019,12 @@ g_proxy_volume_monitor_constructor (GType                  type,
   /* listen to when the owner of the service appears/disappears */
   g_signal_connect (monitor->proxy, "notify::g-name-owner", G_CALLBACK (name_owner_changed), monitor);
   /* initially seed drives/volumes/mounts if we have an owner */
-  name_owner_changed (G_OBJECT (monitor->proxy), NULL, monitor);
+  name_owner = g_dbus_proxy_get_name_owner (G_DBUS_PROXY (monitor->proxy));
+  if (name_owner != NULL)
+    {
+      seed_monitor (monitor);
+      g_free (name_owner);
+    }
 
   g_hash_table_insert (the_volume_monitors, (gpointer) type, object);
 
