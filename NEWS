@@ -1,3 +1,7 @@
+Major changes in 1.14.0
+=======================
+* Translation updates
+
 Major changes in 1.13.9
 =======================
 * build: Use tar-ustar instead of tar-pax
