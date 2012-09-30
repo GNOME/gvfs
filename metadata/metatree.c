@@ -302,7 +302,11 @@ is_on_nfs (char *filename)
 			  sizeof (statfs_buffer), 0);
 # endif
   if (statfs_result == 0)
+#ifdef __OpenBSD__
+    res = strcmp(statfs_buffer.f_fstypename, MOUNT_NFS) == 0;
+#else
     res = statfs_buffer.f_type == 0x6969;
+#endif
 
 #elif defined(USE_STATVFS) && defined(HAVE_STRUCT_STATVFS_F_BASETYPE)
   statfs_result = statvfs (dirname, &statfs_buffer);
