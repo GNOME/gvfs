@@ -379,7 +379,7 @@ mount_record_new (GMount *mount)
   mount_record = g_new (MountRecord, 1);
   
   mount_record->root = g_mount_get_root (mount);
-  mount_record->name = g_object_get_data (G_OBJECT (mount), "g-stable-name");
+  mount_record->name = g_strdup (g_object_get_data (G_OBJECT (mount), "g-stable-name"));
   mount_record->creation_time = time (NULL);
   
   return mount_record;
