@@ -1206,7 +1206,6 @@ gvfs_udisks2_mount_guess_content_type_sync (GMount        *_mount,
         }
     }
 
-  /* Check if its bootable */
   if (mount->device_file != NULL)
     {
       GUdevDevice *gudev_device;
@@ -1214,8 +1213,14 @@ gvfs_udisks2_mount_guess_content_type_sync (GMount        *_mount,
                                                          mount->device_file);
       if (gudev_device != NULL)
         {
+          /* Check if its bootable */
           if (g_udev_device_get_property_as_boolean (gudev_device, "OSINFO_BOOTABLE"))
             g_ptr_array_add (p, g_strdup ("x-content/bootable-media"));
+
+          /* Check for media player */
+          if (g_udev_device_has_property (gudev_device, "ID_MEDIA_PLAYER"))
+            g_ptr_array_add (p, g_strdup ("x-content/audio-player"));
+
           g_object_unref (gudev_device);
         }
     }
