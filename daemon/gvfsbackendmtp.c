@@ -818,9 +818,7 @@ do_query_info (GVfsBackend *backend,
       get_file_info(backend, device, info, file);
       LIBMTP_destroy_file_t(file);
     } else {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_FAILED,
-                        "Error while querying entity.");
+      fail_job(G_VFS_JOB(job), device);
       goto exit;
     }
   }
@@ -1054,11 +1052,7 @@ do_push(GVfsBackend *backend,
   g_free(mtp_progress_data);
   LIBMTP_destroy_file_t(mtpfile);
   if (ret != 0) {
-    LIBMTP_Dump_Errorstack(device);
-    LIBMTP_Clear_Errorstack(device);
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_FAILED,
-                      "Error while uploading entity.");
+    fail_job(G_VFS_JOB(job), device);
     goto exit;
   }
 
@@ -1109,11 +1103,7 @@ do_make_directory (GVfsBackend *backend,
 
   int ret = LIBMTP_Create_Folder(device, elements[ne-1], parent_id, strtol(elements[1], NULL, 10));
   if (ret == 0) {
-    LIBMTP_Dump_Errorstack(device);
-    LIBMTP_Clear_Errorstack(device);
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_FAILED,
-                      "Error while creating directory.");
+    fail_job(G_VFS_JOB(job), device);
     goto exit;
   }
 
