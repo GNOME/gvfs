@@ -621,7 +621,6 @@ release_device (GVfsBackendGphoto2 *gphoto2_backend)
   g_list_free (gphoto2_backend->file_monitor_proxies);
   gphoto2_backend->file_monitor_proxies = NULL;
 
-  g_mutex_clear (&gphoto2_backend->lock);
   gphoto2_backend->capacity = -1;
   gphoto2_backend->free_space = -1;
 }
@@ -636,6 +635,7 @@ g_vfs_backend_gphoto2_finalize (GObject *object)
   DEBUG ("finalizing %p", object);
 
   release_device (gphoto2_backend);
+  g_mutex_clear (&gphoto2_backend->lock);
 
   if (G_OBJECT_CLASS (g_vfs_backend_gphoto2_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_gphoto2_parent_class)->finalize) (object);
