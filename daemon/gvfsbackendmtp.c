@@ -948,8 +948,12 @@ do_pull(GVfsBackend *backend,
       error = NULL;
       if (g_file_make_directory (file, G_VFS_JOB (job)->cancellable, &error)) {
         g_vfs_job_succeeded (G_VFS_JOB (job));
+      } else if (error->code == G_IO_ERROR_EXISTS) {
+        g_vfs_job_succeeded (G_VFS_JOB (job));
+        g_error_free (error);
       } else {
         g_vfs_job_failed_from_error (G_VFS_JOB (job), error); 
+        DEBUG ("(II) pull dir failed: %s", error->message);
         g_error_free (error);
       }
       g_object_unref (file);
@@ -967,9 +971,8 @@ do_pull(GVfsBackend *backend,
         fail_job(G_VFS_JOB(job), device);
         goto exit;
       }
+    g_vfs_job_succeeded (G_VFS_JOB (job));
   }
-
-  g_vfs_job_succeeded (G_VFS_JOB (job));
 
  exit:
   if (info != NULL) {
