@@ -18,3 +18,4 @@ gvfsd-smb-browse
 gvfsd-test
 gvfsd-trash
 *.mount
+*.localmount

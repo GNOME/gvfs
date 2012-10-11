@@ -9,7 +9,6 @@ Makefile.in
 *.exe
 .deps
 .libs
-test
 aclocal.m4
 autom4te.cache
 config.cache
@@ -41,3 +40,5 @@ gtk-doc.make
 monitor/proxy/gvfsvolumemonitordbus.*
 metadata/metadata-dbus.*
 common/gvfsdbus.*
+man/*.1
+man/*.7

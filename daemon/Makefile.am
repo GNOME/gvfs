@@ -39,6 +39,9 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
+%.localmount: %.mount.in ../config.log
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_builddir)|" $< > $@
+
 libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp gvfsd-network
 
 mount_in_files = sftp.mount.in ftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in
@@ -118,6 +121,8 @@ if USE_AFP
 mount_DATA += afp-browse.mount afp.mount
 libexec_PROGRAMS += gvfsd-afp-browse gvfsd-afp
 endif
+
+noinst_DATA = $(mount_DATA:.mount=.localmount)
 
 EXTRA_DIST = 				\
 	gvfs-daemon.service.in		\
