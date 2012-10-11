@@ -482,20 +482,29 @@ static void
 read_mountable_config (void)
 {
   GDir *dir;
-  char *mount_dir, *path;
+  char *mount_dir, *mount_extension, *path;
   const char *filename;
   GKeyFile *keyfile;
   char **types;
   VfsMountable *mountable;
   int i;
+
+  mount_extension = g_getenv ("GVFS_MOUNTABLE_EXTENSION");
+  if (mount_extension == NULL || *mount_extension == 0)
+    mount_extension = ".mount";
   
-  mount_dir = MOUNTABLE_DIR;
+  mount_dir = g_getenv ("GVFS_MOUNTABLE_DIR");
+  if (mount_dir == NULL || *mount_dir == 0)
+    mount_dir = MOUNTABLE_DIR;
   dir = g_dir_open (mount_dir, 0, NULL);
 
   if (dir)
     {
       while ((filename = g_dir_read_name (dir)) != NULL)
 	{
+	  if (!g_str_has_suffix (filename, mount_extension))
+	    continue;
+
 	  path = g_build_filename (mount_dir, filename, NULL);
 	  
 	  keyfile = g_key_file_new ();
