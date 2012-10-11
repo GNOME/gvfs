@@ -321,6 +321,7 @@ gvfsd_recent_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendrecent.h \
 	-DDEFAULT_BACKEND_TYPE=recent \
 	-DMAX_JOB_THREADS=10 \
+	-DBACKEND_USES_GVFS=1 \
 	-DBACKEND_TYPES='"recent", G_VFS_TYPE_BACKEND_RECENT,' \
 	$(GTK_CFLAGS)
 
@@ -348,6 +349,7 @@ gvfsd_network_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendnetwork.h \
 	-DDEFAULT_BACKEND_TYPE=network \
 	-DMAX_JOB_THREADS=1 \
+	-DBACKEND_USES_GVFS=1 \
 	-DBACKEND_TYPES='"network", G_VFS_TYPE_BACKEND_NETWORK,'
 
 gvfsd_network_LDADD = $(libraries)
@@ -377,6 +379,7 @@ gvfsd_archive_CPPFLAGS = \
 	-DDEFAULT_BACKEND_TYPE=archive \
 	-DMAX_JOB_THREADS=1 \
 	$(ARCHIVE_CFLAGS) \
+	-DBACKEND_USES_GVFS=1 \
 	-DBACKEND_TYPES='"archive", G_VFS_TYPE_BACKEND_ARCHIVE,'
 
 gvfsd_archive_LDADD = $(libraries) $(ARCHIVE_LIBS)
@@ -491,6 +494,7 @@ gvfsd_afc_CPPFLAGS = \
 	-DDEFAULT_BACKEND_TYPE=afc \
 	-DMAX_JOB_THREADS=1 \
 	$(AFC_CFLAGS) \
+	-DBACKEND_USES_GVFS=1 \
 	-DBACKEND_TYPES='"afc", G_VFS_TYPE_BACKEND_AFC,'
 
 gvfsd_afc_LDADD = \
