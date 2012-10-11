@@ -326,8 +326,6 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   vfs->fuse_root = g_vfs_get_file_for_path (vfs->wrapped_vfs, file);
   g_free (file);
   
-  g_dbus_connection_set_exit_on_close (vfs->async_bus, FALSE);
-
   modules = g_io_modules_load_all_in_directory (GVFS_MODULE_DIR);
 
   vfs->from_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
