@@ -401,7 +401,7 @@ class Ftp(GvfsTestCase):
         finally:
             self.unmount(uri)
 
-@unittest.skipUnless(samba_running, 'smbd is not running')
+@unittest.skipUnless(in_testbed, 'not running under gvfs-testbed')
 class Smb(GvfsTestCase):
 
     def setUp(self):
