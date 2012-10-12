@@ -25,39 +25,46 @@ gvfs-daemon.service: $(top_srcdir)/daemon/gvfs-daemon.service.in ../config.log
 gvfs-metadata.service: $(top_srcdir)/metadata/gvfs-metadata.service.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/metadata|" $< > $@
 
-noinst_DATA= session.conf gvfs-daemon.service gvfs-metadata.service
+%.monitor:
+	$(AM_V_GEN) ln -s $(top_srcdir)/monitor/$(*F)/$(@F) $@
+
+CONFIG_FILES=session.conf gvfs-daemon.service gvfs-metadata.service
 
 if USE_AFC
 org.gtk.Private.AfcVolumeMonitor.service: $(top_srcdir)/monitor/afc/org.gtk.Private.AfcVolumeMonitor.service.in ../config.log
-	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor//afc|" $< > $@
-noinst_DATA+=org.gtk.Private.AfcVolumeMonitor.service
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor/afc|" $< > $@
+CONFIG_FILES+=org.gtk.Private.AfcVolumeMonitor.service afc.monitor
 endif
 
 if USE_GDU
 org.gtk.Private.GduVolumeMonitor.service: $(top_srcdir)/monitor/gdu/org.gtk.Private.GduVolumeMonitor.service.in ../config.log
-	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor//gdu|" $< > $@
-noinst_DATA+=org.gtk.Private.GduVolumeMonitor.service
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor/gdu|" $< > $@
+CONFIG_FILES+=org.gtk.Private.GduVolumeMonitor.service gdu.monitor
 endif
 
 if USE_GPHOTO2
 org.gtk.Private.GPhoto2VolumeMonitor.service: $(top_srcdir)/monitor/gphoto2/org.gtk.Private.GPhoto2VolumeMonitor.service.in ../config.log
-	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor//gphoto2|" $< > $@
-noinst_DATA+=org.gtk.Private.GPhoto2VolumeMonitor.service
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor/gphoto2|" $< > $@
+CONFIG_FILES+=org.gtk.Private.GPhoto2VolumeMonitor.service gphoto2.monitor
 endif
 
 if USE_HAL
 org.gtk.Private.HalVolumeMonitor.service: $(top_srcdir)/monitor/hal/org.gtk.Private.HalVolumeMonitor.service.in ../config.log
-	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor//hal|" $< > $@
-noinst_DATA+=org.gtk.Private.HalVolumeMonitor.service
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor/hal|" $< > $@
+CONFIG_FILES+=org.gtk.Private.HalVolumeMonitor.service hal.monitor
 endif
 
 if USE_UDISKS2
 org.gtk.Private.UDisks2VolumeMonitor.service: $(top_srcdir)/monitor/udisks2/org.gtk.Private.UDisks2VolumeMonitor.service.in ../config.log
-	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor//udisks2|" $< > $@
-noinst_DATA+=org.gtk.Private.UDisks2VolumeMonitor.service
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor/udisks2|" $< > $@
+CONFIG_FILES+=org.gtk.Private.UDisks2VolumeMonitor.service udisks2.monitor
 endif
+
+noinst_DATA= $(CONFIG_FILES)
 
 test: session.conf gvfs-daemon.service gvfs-metadata.service
 	./run-in-tree.sh ./gvfs-test
+
+CLEANFILES=$(CONFIG_FILES)
 
 EXTRA_DIST = benchmark-common.c session.conf.in gvfs-test

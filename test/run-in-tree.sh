@@ -8,7 +8,9 @@ fi
 # Set up env vars to make gvfs read mounts from the build tree
 export GVFS_MOUNTABLE_EXTENSION=".localmount"
 export GVFS_MOUNTABLE_DIR=`pwd`/../daemon
+export GVFS_MONITOR_DIR=`pwd`
 export PATH=`pwd`/../programs:$PATH
+export GIO_EXTRA_MODULES=`pwd`/../client/.libs:`pwd`/../monitor/proxy/.libs
 
 # Start a custom session dbus
 PIDFILE=`mktemp`
