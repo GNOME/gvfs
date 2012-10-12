@@ -60,12 +60,12 @@
 
 /* showing debug traces */
 #define DEBUG_SHOW_TRACES 1
-//#define DEBUG_SHOW_ENUMERATE_TRACES 1
+#define DEBUG_SHOW_ENUMERATE_TRACES 0
 
 static void
 DEBUG (const gchar *message, ...)
 {
-#ifdef DEBUG_SHOW_TRACES
+#if DEBUG_SHOW_TRACES
   va_list args;
   va_start (args, message);
   g_vfprintf (stderr, message, args);
@@ -78,7 +78,7 @@ DEBUG (const gchar *message, ...)
 static void
 DEBUG_ENUMERATE (const gchar *message, ...)
 {
-#ifdef DEBUG_SHOW_ENUMERATE_TRACES
+#if DEBUG_SHOW_ENUMERATE_TRACES
   va_list args;
   va_start (args, message);
   g_vfprintf (stderr, message, args);
@@ -350,7 +350,7 @@ do_mount (GVfsBackend *backend,
   if (!g_str_has_prefix (host, "[usb:")) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                      "Unexpected host uri format.");
+                      _("Unexpected host uri format."));
     return;
   }
 
@@ -360,7 +360,7 @@ do_mount (GVfsBackend *backend,
     g_free (dev_path);
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                      "Malformed host uri.");
+                      _("Malformed host uri."));
     return;
   }
   *comma = '/';
@@ -372,7 +372,7 @@ do_mount (GVfsBackend *backend,
     g_free(dev_path);
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      "Couldn't find matching udev device.");
+                      _("Couldn't find matching udev device."));
     return;
   }
 
@@ -448,23 +448,23 @@ get_device(GVfsBackend *backend, const char *id, GVfsJob *job) {
   case LIBMTP_ERROR_NO_DEVICE_ATTACHED:
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      "MTPDetect: No devices found.");
+                      _("MTPDetect: No devices found."));
     goto exit;
   case LIBMTP_ERROR_CONNECTING:
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_CONNECTION_REFUSED,
-                      "MTPDetect: There has been an error connecting.");
+                      _("MTPDetect: There has been an error connecting."));
     goto exit;
   case LIBMTP_ERROR_MEMORY_ALLOCATION:
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_FILE_ERROR, G_FILE_ERROR_NOMEM,
-                      "MTPDetect: Encountered a Memory Allocation Error.");
+                      _("MTPDetect: Encountered a Memory Allocation Error."));
     goto exit;
   case LIBMTP_ERROR_GENERAL:
   default:
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_FAILED,
-                      "MTPDetect: Unknown Error.");
+                      _("MTPDetect: Unknown Error."));
     goto exit;
   }
 
@@ -479,7 +479,7 @@ get_device(GVfsBackend *backend, const char *id, GVfsJob *job) {
       if (device == NULL) {
         g_vfs_job_failed (G_VFS_JOB (job),
                           G_IO_ERROR, G_IO_ERROR_FAILED,
-                          "MTPDetect: Unable to open device %s", name);
+                          _("MTPDetect: Unable to open device %s"), name);
         g_free(name);
         goto exit;
       }
@@ -501,9 +501,12 @@ get_device(GVfsBackend *backend, const char *id, GVfsJob *job) {
 }
 
 static void
-get_device_info(GVfsBackendMtp *backend, GFileInfo *info) {
+get_device_info(GVfsBackendMtp *backend, GFileInfo *info)
+{
   LIBMTP_mtpdevice_t *device = backend->device;
-  const char *name = g_mount_spec_get(g_vfs_backend_get_mount_spec(G_VFS_BACKEND(backend)), "host");
+  const char *name;
+
+  name = g_mount_spec_get(g_vfs_backend_get_mount_spec(G_VFS_BACKEND(backend)), "host");
 
   DEBUG_ENUMERATE ("(II) get_device_info: %s", name);
 
@@ -774,7 +777,7 @@ do_query_info (GVfsBackend *backend,
       LIBMTP_Clear_Errorstack(device);
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                        "Storage not found");
+                        _("Storage not found"));
       goto exit;
     }
     for (storage = device->storage; storage != 0; storage = storage->next) {
@@ -859,7 +862,7 @@ do_query_fs_info (GVfsBackend *backend,
       LIBMTP_Clear_Errorstack(device);
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                        "Storage does not exist");
+                        _("Storage not found"));
       goto exit;
     }
     for (storage = device->storage; storage != 0; storage = storage->next) {
@@ -921,7 +924,7 @@ do_pull(GVfsBackend *backend,
   if (ne < 3) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
-                      "Can't download entity.");
+                      _("Can't download entity."));
     goto exit;
   }
 
@@ -932,7 +935,7 @@ do_pull(GVfsBackend *backend,
   if (file == NULL) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      "File does not exist");
+                      _("File does not exist"));
     goto exit;
   }
 
@@ -986,14 +989,19 @@ do_pull(GVfsBackend *backend,
 
 
 static void
+do_make_directory (GVfsBackend *backend,
+                    GVfsJobMakeDirectory *job,
+                    const char *filename);
+
+static void
 do_push(GVfsBackend *backend,
-                                GVfsJobPush *job,
-                                const char *destination,
-                                const char *local_path,
-                                GFileCopyFlags flags,
-                                gboolean remove_source,
-                                GFileProgressCallback progress_callback,
-                                gpointer progress_callback_data)
+        GVfsJobPush *job,
+        const char *destination,
+        const char *local_path,
+        GFileCopyFlags flags,
+        gboolean remove_source,
+        GFileProgressCallback progress_callback,
+        gpointer progress_callback_data)
 {
   DEBUG ("(I) do_push (filename = %s, local_path = %s) ", destination, local_path);
   g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
@@ -1007,7 +1015,7 @@ do_push(GVfsBackend *backend,
   if (ne < 3) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
-                      "Can't upload to this location.");
+                      _("Can't upload to this location."));
     goto exit;
   }
 
@@ -1024,7 +1032,7 @@ do_push(GVfsBackend *backend,
   if (!file) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      "Can't get file to upload.");
+                      _("Can't get file to upload."));
     goto exit;
   }
 
@@ -1092,7 +1100,7 @@ do_make_directory (GVfsBackend *backend,
   if (ne < 3) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_FAILED,
-                      "Can't make directory in this location.");
+                      _("Can't make directory in this location."));
     goto exit;
   }
 
@@ -1137,7 +1145,7 @@ do_delete (GVfsBackend *backend,
   if (ne < 3) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_FAILED,
-                      "Can't delete entity.");
+                      _("Can't delete entity."));
     goto exit;
   }
 
@@ -1178,7 +1186,7 @@ do_set_display_name (GVfsBackend *backend,
   if (ne < 3) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                      "Can't rename storage entities.");
+                      _("Can't rename storage entities."));
     goto exit;
   }
 
