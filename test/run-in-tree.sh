@@ -12,7 +12,13 @@ export GVFS_MONITOR_DIR=`pwd`
 export PATH=`pwd`/../programs:$PATH
 export GIO_EXTRA_MODULES=`pwd`/../client/.libs:`pwd`/../monitor/proxy/.libs
 
-DBUS_CONF=`dirname $0`/session.conf
+if [ -e $(pwd)/session.conf ]; then
+    # case for out-of tree build (distcheck)
+    DBUS_CONF=`pwd`/session.conf
+else
+    # case for calling this manually in a built tree
+    DBUS_CONF=`dirname $0`/session.conf
+fi
 
 # Start a custom session dbus
 PIDFILE=`mktemp`
