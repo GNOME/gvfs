@@ -62,8 +62,13 @@ endif
 
 noinst_DATA= $(CONFIG_FILES)
 
+# run tests against build tree
 check: $(CONFIG_FILES) gvfs-test
 	$(srcdir)/run-in-tree.sh $(srcdir)/gvfs-test
+
+# run tests against the installed system packages
+installcheck-local: gvfs-test
+	$(srcdir)/gvfs-test
 
 CLEANFILES=$(CONFIG_FILES)
 
