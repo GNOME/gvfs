@@ -1457,6 +1457,7 @@ g_proxy_volume_monitor_register (GIOModule *module)
 {
   GDir *dir;
   GError *error;
+  const char *monitors_dir;
 
   /* first register the abstract base type... */
   g_proxy_volume_monitor_register_type (G_TYPE_MODULE (module));
@@ -1472,11 +1473,15 @@ g_proxy_volume_monitor_register (GIOModule *module)
    *   - and if so the priority
    */
 
+  monitors_dir = g_getenv ("GVFS_MONITOR_DIR");
+  if (monitors_dir == NULL || *monitors_dir == 0)
+    monitors_dir = REMOTE_VOLUME_MONITORS_DIR;
+
   error = NULL;
-  dir = g_dir_open (REMOTE_VOLUME_MONITORS_DIR, 0, &error);
+  dir = g_dir_open (monitors_dir, 0, &error);
   if (dir == NULL)
     {
-      g_warning ("cannot open directory " REMOTE_VOLUME_MONITORS_DIR ": %s", error->message);
+      g_warning ("cannot open directory %s: %s", monitors_dir, error->message);
       g_error_free (error);
     }
   else
@@ -1500,7 +1505,7 @@ g_proxy_volume_monitor_register (GIOModule *module)
           if (!g_str_has_suffix (name, ".monitor"))
             goto cont;
 
-          path = g_build_filename (REMOTE_VOLUME_MONITORS_DIR, name, NULL);
+          path = g_build_filename (monitors_dir, name, NULL);
 
           key_file = g_key_file_new ();
           error = NULL;
