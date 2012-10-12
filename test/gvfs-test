@@ -823,24 +823,26 @@ class Dav(GvfsTestCase):
         with open(os.path.join(klass.httpd_sandbox, 'htpasswd'), 'w') as f:
             f.write('test:$apr1$t0B4mfkT$Tr8ip333/ZR/7xrRBuxjI.\n')
 
+        # some distros have some extra modules which we need to load
+        modules = ''
+        for m in ['authn_core', 'authz_core', 'authz_user', 'auth_basic',
+                  'authn_file', 'mpm_prefork', 'unixd', 'dav', 'dav_fs', 'ssl']:
+            if os.path.exists(os.path.join(klass.mod_dir, 'mod_%s.so' % m)):
+                modules += 'LoadModule %s_module %s/mod_%s.so\n' % (m, klass.mod_dir, m)
+
         with open(os.path.join(klass.httpd_sandbox, 'apache2.conf'), 'w') as f:
             f.write('''Listen localhost:8088
 Listen localhost:4443
-LoadModule dav_module %(mod_dir)s/mod_dav.so
-LoadModule dav_fs_module %(mod_dir)s/mod_dav_fs.so
-LoadModule ssl_module %(mod_dir)s/mod_ssl.so
-LoadModule auth_basic_module %(mod_dir)s/mod_auth_basic.so
-LoadModule authn_file_module %(mod_dir)s/mod_authn_file.so
-LoadModule authz_user_module %(mod_dir)s/mod_authz_user.so
+%(modules)s
 
 DocumentRoot .
+ServerName localhost
 PidFile apache.pid
 LogLevel debug
 ErrorLog error_log
 DAVLockDB DAVLock
 
 <VirtualHost localhost:4443>
-  ServerName localhost
   SSLEngine on
   SSLCertificateFile mycert.pem
   SSLCertificateKeyFile mycert.pem
@@ -857,10 +859,19 @@ DAVLockDB DAVLock
   AuthUserFile htpasswd
   Require valid-user
 </Directory>
-''' % {'mod_dir': klass.mod_dir, 'root': klass.httpd_sandbox})
+''' % {'mod_dir': klass.mod_dir,
+       'root': klass.httpd_sandbox,
+       'modules': modules})
 
         # start server
-        subprocess.check_call(['apachectl', '-d', klass.httpd_sandbox, '-f', 'apache2.conf', '-k', 'start'])
+        try:
+            subprocess.check_call(['apachectl', '-d', klass.httpd_sandbox, '-f', 'apache2.conf', '-k', 'start'])
+        except subprocess.CalledProcessError as e:
+            error_log = os.path.join(klass.httpd_sandbox, 'error_log')
+            if os.path.exists(error_log):
+                with open(error_log) as f:
+                    print('---- apache http error log ----\n%s\n---------\n' % f.read())
+            raise
 
     @classmethod
     def tearDownClass(klass):
