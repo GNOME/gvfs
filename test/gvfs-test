@@ -35,6 +35,7 @@ from glob import glob
 
 in_testbed = os.path.exists('/home/gvfs_sandbox_marker')
 samba_running = subprocess.call(['pidof', 'smbd'], stdout=subprocess.PIPE) == 0
+have_httpd = subprocess.call(['which', 'apachectl'], stdout=subprocess.PIPE) == 0
 
 local_ip = subprocess.check_output("ip -4 addr | sed -nr '/127\.0\.0/ n; "
                                    "/inet / {  s/^.*inet ([0-9.]+).*$/\\1/; p; q  }'",
@@ -789,6 +790,7 @@ pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
             self.mock_polkit.wait()
             self.mock_polkit = None
 
+@unittest.skipUnless(have_httpd, 'Apache httpd not installed')
 class Dav(GvfsTestCase):
     '''Test WebDAV backend'''
 
