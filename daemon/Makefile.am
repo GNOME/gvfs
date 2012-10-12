@@ -133,7 +133,7 @@ EXTRA_DIST = 				\
 	$(gsettings_ENUM_FILES)		\
 	$(NULL)
 
-DISTCLEANFILES = gvfs-daemon.service $(mount_DATA)
+DISTCLEANFILES = gvfs-daemon.service $(mount_DATA) $(noinst_DATA)
 
 CLEANFILES =					\
 	$(gsettings__enum_file)			\

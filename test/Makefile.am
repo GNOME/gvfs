@@ -62,9 +62,9 @@ endif
 
 noinst_DATA= $(CONFIG_FILES)
 
-test: session.conf gvfs-daemon.service gvfs-metadata.service
-	./run-in-tree.sh ./gvfs-test
+check: $(CONFIG_FILES) gvfs-test
+	$(srcdir)/run-in-tree.sh $(srcdir)/gvfs-test
 
 CLEANFILES=$(CONFIG_FILES)
 
-EXTRA_DIST = benchmark-common.c session.conf.in gvfs-test
+EXTRA_DIST = benchmark-common.c session.conf.in gvfs-test run-in-tree.sh
