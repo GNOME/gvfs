@@ -449,23 +449,23 @@ get_device(GVfsBackend *backend, const char *id, GVfsJob *job) {
   case LIBMTP_ERROR_NO_DEVICE_ATTACHED:
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      _("MTPDetect: No devices found."));
+                      _("No MTP devices found"));
     goto exit;
   case LIBMTP_ERROR_CONNECTING:
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_CONNECTION_REFUSED,
-                      _("MTPDetect: There has been an error connecting."));
+                      _("Unable to connect to MTP device"));
     goto exit;
   case LIBMTP_ERROR_MEMORY_ALLOCATION:
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_FILE_ERROR, G_FILE_ERROR_NOMEM,
-                      _("MTPDetect: Encountered a Memory Allocation Error."));
+                      _("Unable to allocate memory while detecting MTP devices"));
     goto exit;
   case LIBMTP_ERROR_GENERAL:
   default:
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("MTPDetect: Unknown Error."));
+                      _("Generic libmtp error"));
     goto exit;
   }
 
@@ -480,7 +480,7 @@ get_device(GVfsBackend *backend, const char *id, GVfsJob *job) {
       if (device == NULL) {
         g_vfs_job_failed (G_VFS_JOB (job),
                           G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("MTPDetect: Unable to open device %s"), name);
+                          _("Unable to open MTP device '%s'"), name);
         g_free(name);
         goto exit;
       }
@@ -515,7 +515,8 @@ get_device_info(GVfsBackendMtp *backend, GFileInfo *info)
   g_file_info_set_name(info, name);
 
   char *friendlyname = LIBMTP_Get_Friendlyname(device);
-  g_file_info_set_display_name(info, friendlyname == NULL ? "Unnamed Device" : friendlyname);
+  g_file_info_set_display_name(info, friendlyname == NULL ?
+                                     _("Unnamed Device") : friendlyname);
   free(friendlyname);
 
   g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
@@ -778,7 +779,7 @@ do_query_info (GVfsBackend *backend,
       LIBMTP_Clear_Errorstack(device);
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                        _("Storage not found"));
+                        _("No storage volumes found"));
       goto exit;
     }
     for (storage = device->storage; storage != 0; storage = storage->next) {
@@ -863,7 +864,7 @@ do_query_fs_info (GVfsBackend *backend,
       LIBMTP_Clear_Errorstack(device);
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                        _("Storage not found"));
+                        _("No storage volumes found"));
       goto exit;
     }
     for (storage = device->storage; storage != 0; storage = storage->next) {
@@ -970,7 +971,7 @@ do_pull(GVfsBackend *backend,
   if (ne < 3) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
-                      _("Can't download entity."));
+                      _("Not a regular file"));
     goto exit;
   }
 
@@ -1056,7 +1057,7 @@ do_push(GVfsBackend *backend,
   if (ne < 3) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
-                      _("Can't upload to this location."));
+                      _("Cannot write to this location"));
     goto exit;
   }
 
@@ -1073,7 +1074,7 @@ do_push(GVfsBackend *backend,
   if (!file) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      _("Can't get file to upload."));
+                      _("File not found"));
     goto exit;
   }
 
@@ -1152,7 +1153,7 @@ do_delete (GVfsBackend *backend,
   if (ne < 3) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("Can't delete entity."));
+                      _("Cannot delete this entity"));
     goto exit;
   }
 
@@ -1193,7 +1194,7 @@ do_set_display_name (GVfsBackend *backend,
   if (ne < 3) {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                      _("Can't rename storage entities."));
+                      _("Can't rename volume"));
     goto exit;
   }
 
