@@ -141,7 +141,8 @@ static void
 gudev_add_device (GMtpVolumeMonitor *monitor, GUdevDevice *device, gboolean do_emit)
 {
   GMtpVolume *volume;
-  const char *usb_bus_num, *usb_device_num;
+  const char *usb_bus_num, *usb_device_num, *uri;
+  GFile *activation_mount_root;
 
   usb_bus_num = g_udev_device_get_property (device, "BUSNUM");
   if (usb_bus_num == NULL) {
@@ -155,15 +156,11 @@ gudev_add_device (GMtpVolumeMonitor *monitor, GUdevDevice *device, gboolean do_e
     return;
   }
 
-  /*
   g_debug ("gudev_add_device: device %s (bus: %i, device: %i)",
            g_udev_device_get_device_file (device),
            usb_bus_num, usb_device_num);
-  */
 
-  gchar *uri = g_strdup_printf ("mtp://[usb:%s,%s]", usb_bus_num, usb_device_num);
-  GFile *activation_mount_root;
-
+  uri = g_strdup_printf ("mtp://[usb:%s,%s]", usb_bus_num, usb_device_num);
   activation_mount_root = g_file_new_for_uri (uri);
   g_free (uri);
 
@@ -189,7 +186,7 @@ gudev_remove_device (GMtpVolumeMonitor *monitor, GUdevDevice *device)
 
   sysfs_path = g_udev_device_get_sysfs_path (device);
 
-  /* g_debug ("gudev_remove_device: %s", g_udev_device_get_device_file (device)); */
+  g_debug ("gudev_remove_device: %s", g_udev_device_get_device_file (device));
 
   for (l = monitor->device_volumes; l != NULL; l = ll) {
     GMtpVolume *volume = G_MTP_VOLUME (l->data);
@@ -197,7 +194,7 @@ gudev_remove_device (GMtpVolumeMonitor *monitor, GUdevDevice *device)
     ll = l->next;
 
     if (g_mtp_volume_has_path (volume, sysfs_path)) {
-      /* g_debug ("gudev_remove_device: found volume %s, deleting", sysfs_path); */
+      g_debug ("gudev_remove_device: found volume %s, deleting", sysfs_path);
       g_signal_emit_by_name (monitor, "volume_removed", volume);
       g_signal_emit_by_name (volume, "removed");
       g_mtp_volume_removed (volume);
@@ -212,12 +209,12 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
 {
   GMtpVolumeMonitor *monitor = G_MTP_VOLUME_MONITOR (user_data);
 
-  /* g_debug ("on_uevent: action=%s, device=%s", action, g_udev_device_get_device_file(device)); */
+  g_debug ("on_uevent: action=%s, device=%s", action, g_udev_device_get_device_file(device));
 
   /* filter out uninteresting events */
   if (!g_udev_device_has_property (device, "ID_MTP_DEVICE"))
     {
-      /* g_debug ("on_uevent: discarding, not ID_MTP"); */
+      g_debug ("on_uevent: discarding, not ID_MTP");
       return;
     }
 
