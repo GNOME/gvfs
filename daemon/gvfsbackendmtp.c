@@ -292,7 +292,7 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
   GVfsBackendMtp *op_backend = G_VFS_BACKEND_MTP (user_data);
 
   if (g_strcmp0(op_backend->dev_path, dev_path) == 0 &&
-      strcmp (action, "remove") == 0) {
+      g_str_equal (action, "remove")) {
     DEBUG ("(I) on_uevent: Quiting after remove event on device %s", dev_path);
     /* TODO: need a cleaner way to force unmount ourselves */
     exit (1);
@@ -1192,7 +1192,6 @@ do_delete (GVfsBackend *backend,
 }
 
 
-//  aka 'rename'
 static void
 do_set_display_name (GVfsBackend *backend,
                       GVfsJobSetDisplayName *job,
