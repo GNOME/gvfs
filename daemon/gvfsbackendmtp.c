@@ -53,6 +53,7 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfsjobcreatemonitor.h"
+#include "gvfsjobmakedirectory.h"
 #include "gvfsmonitor.h"
 
 
@@ -904,6 +905,51 @@ static int mtp_progress (uint64_t const sent, uint64_t const total,
 }
 
 static void
+do_make_directory (GVfsBackend *backend,
+                    GVfsJobMakeDirectory *job,
+                    const char *filename)
+{
+  DEBUG ("(I) do_make_directory (filename = %s) ", filename);
+  g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
+
+  gchar **elements = g_strsplit_set(filename, "/", -1);
+  unsigned int ne = 0;
+  for (ne = 0; elements[ne] != NULL; ne++);
+
+  if (ne < 3) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Cannot make directory in this location"));
+    goto exit;
+  }
+
+  LIBMTP_mtpdevice_t *device;
+  device = G_VFS_BACKEND_MTP(backend)->device;
+
+  int parent_id = 0;
+  if (ne > 3) {
+    parent_id = strtol(elements[ne-2], NULL, 10);
+  }
+
+  int ret = LIBMTP_Create_Folder(device, elements[ne-1], parent_id, strtol(elements[1], NULL, 10));
+  if (ret == 0) {
+    fail_job(G_VFS_JOB(job), device);
+    goto exit;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  g_hash_table_foreach(G_VFS_BACKEND_MTP(backend)->monitors, emit_create_event, (char *)filename);
+
+ exit:
+  g_strfreev(elements);
+  g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
+
+  DEBUG ("(I) do_make_directory done.");
+}
+
+
+static void
 do_pull(GVfsBackend *backend,
                                 GVfsJobPull *job,
                                 const char *source,
@@ -989,11 +1035,6 @@ do_pull(GVfsBackend *backend,
 
 
 static void
-do_make_directory (GVfsBackend *backend,
-                    GVfsJobMakeDirectory *job,
-                    const char *filename);
-
-static void
 do_push(GVfsBackend *backend,
         GVfsJobPush *job,
         const char *destination,
@@ -1034,6 +1075,17 @@ do_push(GVfsBackend *backend,
                       G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
                       _("Can't get file to upload."));
     goto exit;
+  }
+
+  if (g_file_query_file_type(file, G_FILE_QUERY_INFO_NONE,
+                             G_VFS_JOB(job)->cancellable) ==
+      G_FILE_TYPE_DIRECTORY) {
+    /*
+     * It happens to be the case that we can reuse do_make_directory
+     * here.
+     */
+    return do_make_directory(backend, G_VFS_JOB_MAKE_DIRECTORY(job),
+                             elements[ne-1]);
   }
 
   GError *error = NULL;
@@ -1082,51 +1134,6 @@ do_push(GVfsBackend *backend,
   g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
 
   DEBUG ("(I) do_push done.");
-}
-
-
-static void
-do_make_directory (GVfsBackend *backend,
-                    GVfsJobMakeDirectory *job,
-                    const char *filename)
-{
-  DEBUG ("(I) do_make_directory (filename = %s) ", filename);
-  g_mutex_lock (&G_VFS_BACKEND_MTP(backend)->mutex);
-
-  gchar **elements = g_strsplit_set(filename, "/", -1);
-  unsigned int ne = 0;
-  for (ne = 0; elements[ne] != NULL; ne++);
-
-  if (ne < 3) {
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("Can't make directory in this location."));
-    goto exit;
-  }
-
-  LIBMTP_mtpdevice_t *device;
-  device = G_VFS_BACKEND_MTP(backend)->device;
-
-  int parent_id = 0;
-  if (ne > 3) {
-    parent_id = strtol(elements[ne-2], NULL, 10);
-  }
-
-  int ret = LIBMTP_Create_Folder(device, elements[ne-1], parent_id, strtol(elements[1], NULL, 10));
-  if (ret == 0) {
-    fail_job(G_VFS_JOB(job), device);
-    goto exit;
-  }
-
-  g_vfs_job_succeeded (G_VFS_JOB (job));
-
-  g_hash_table_foreach(G_VFS_BACKEND_MTP(backend)->monitors, emit_create_event, (char *)filename);
-
- exit:
-  g_strfreev(elements);
-  g_mutex_unlock (&G_VFS_BACKEND_MTP(backend)->mutex);
-
-  DEBUG ("(I) do_make_directory done.");
 }
 
 
