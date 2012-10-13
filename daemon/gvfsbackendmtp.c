@@ -329,6 +329,16 @@ check_event (gpointer user_data)
 }
 #endif
 
+static gboolean
+mtp_heartbeat (GVfsBackendMtp *backend)
+{
+  if (g_mutex_trylock (&backend->mutex)) {
+    LIBMTP_Dump_Device_Info(backend->device);
+    g_mutex_unlock (&backend->mutex);
+  }
+  return TRUE;
+}
+
 static void
 do_mount (GVfsBackend *backend,
            GVfsJobMount *job,
@@ -404,6 +414,9 @@ do_mount (GVfsBackend *backend,
 
     g_vfs_job_succeeded (G_VFS_JOB (job));
 
+    op_backend->hb_id =
+      g_timeout_add_seconds (900, (GSourceFunc)mtp_heartbeat, op_backend);
+
 #if HAVE_LIBMTP_READ_EVENT
     g_thread_new ("events", check_event, backend);
 #endif
@@ -422,9 +435,15 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
   DEBUG ("(I) do_umount");
 
   op_backend = G_VFS_BACKEND_MTP (backend);
+
+  g_source_remove (op_backend->hb_id);
   g_object_unref (op_backend->gudev_client);
   g_free (op_backend->dev_path);
+
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
   LIBMTP_Release_Device (op_backend->device);
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   DEBUG ("(I) do_umount done.");

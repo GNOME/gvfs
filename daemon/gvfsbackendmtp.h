@@ -54,6 +54,7 @@ struct _GVfsBackendMtp
   char *dev_path;
 
   GHashTable *monitors;
+  guint hb_id;
 };
 
 struct _GVfsBackendMtpClass
