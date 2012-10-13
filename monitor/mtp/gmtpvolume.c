@@ -33,7 +33,7 @@
 
 #include "gmtpvolume.h"
 
-G_LOCK_DEFINE_STATIC(mtp_volume);
+G_LOCK_DEFINE_STATIC (mtp_volume);
 
 struct _GMtpVolume {
   GObject parent;
@@ -91,7 +91,7 @@ g_mtp_volume_init (GMtpVolume *mtp_volume)
 {
 }
 
-static int hexdigit(char c)
+static int hexdigit (char c)
 {
   if (c >= 'a')
     return c - 'a' + 10;
@@ -112,10 +112,10 @@ udev_decode_string (const char* encoded)
   if (encoded == NULL)
     return NULL;
 
-  for (len = 0, s = encoded; *s && len < sizeof(decoded)-1; ++len, ++s) {
+  for (len = 0, s = encoded; *s && len < sizeof (decoded) - 1; ++len, ++s) {
     /* need to check for NUL terminator in advance */
     if (s[0] == '\\' && s[1] == 'x' && s[2] >= '0' && s[3] >= '0') {
-      decoded[len] = (hexdigit(s[2]) << 4) | hexdigit(s[3]);
+      decoded[len] = (hexdigit (s[2]) << 4) | hexdigit (s[3]);
       s += 3;
     } else {
       decoded[len] = *s;
