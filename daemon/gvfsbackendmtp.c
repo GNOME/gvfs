@@ -89,7 +89,21 @@ DEBUG_ENUMERATE (const gchar *message, ...)
 #endif
 }
 
-/* ------------------------------------------------------------------------------------------------- */
+
+/************************************************
+ * Storage constants copied from ptp.h
+ *
+ * ptp.h is treated as a private header by libmtp
+ ************************************************/
+
+/* PTP Storage Types */
+
+#define PTP_ST_Undefined                        0x0000
+#define PTP_ST_FixedROM                         0x0001
+#define PTP_ST_RemovableROM                     0x0002
+#define PTP_ST_FixedRAM                         0x0003
+#define PTP_ST_RemovableRAM                     0x0004
+
 
 /************************************************
  * Initialization
@@ -573,18 +587,19 @@ get_storage_info(LIBMTP_devicestorage_t *storage, GFileInfo *info) {
 
   GIcon *icon;
   switch (storage->StorageType) {
-  case 1:
+  case PTP_ST_FixedROM:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
     icon = g_themed_icon_new_with_default_fallbacks ("drive-harddisk");
     break;
-  case 2:
+  case PTP_ST_RemovableROM:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
     icon = g_themed_icon_new_with_default_fallbacks ("media-memory-sd");
     break;
-  case 4:
+  case PTP_ST_RemovableRAM:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, FALSE);
     icon = g_themed_icon_new_with_default_fallbacks ("media-memory-sd");
     break;
+  case PTP_ST_FixedRAM:
   default:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, FALSE);
     icon = g_themed_icon_new_with_default_fallbacks ("drive-harddisk");
