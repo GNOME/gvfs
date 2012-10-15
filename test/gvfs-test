@@ -276,9 +276,9 @@ Subsystem sftp %(sftp_server)s
        'sftp_server': sftp_server
       })
 
-        self.sshd_log = open('/var/log/sshd.log', 'ab')
         self.sshd = subprocess.Popen([os.environ['SSHD'], '-Dde', '-f', self.sshd_config],
-                                     stderr=self.sshd_log)
+                                     universal_newlines=True,
+                                     stderr=subprocess.PIPE)
 
     def tearDown(self):
         if os.path.exists('.ssh/authorized_keys'):
@@ -287,8 +287,16 @@ Subsystem sftp %(sftp_server)s
         if self.sshd.returncode is None:
             self.sshd.terminate()
             self.sshd.wait()
-        self.sshd_log.close()
         super().tearDown()
+
+    def run(self, result=None):
+        '''Show sshd log output on failed tests'''
+
+        if result:
+            orig_err_fail = result.errors + result.failures
+        super().run(result)
+        if result and result.errors + result.failures > orig_err_fail:
+            print('\n----- sshd log -----\n%s\n------\n' % self.sshd.stderr.read())
 
     def test_rsa(self):
         '''sftp://localhost with RSA authentication'''
