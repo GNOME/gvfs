@@ -248,10 +248,36 @@ class Sftp(GvfsTestCase):
 
         super().setUp()
 
+        # find sftp-server
+        for dir in ['/usr/local/lib/openssh',
+                    '/usr/lib/openssh',
+                    '/usr/local/libexec/openssh',
+                    '/usr/libexec/openssh']:
+            sftp_server = os.path.join(dir, 'sftp-server')
+            if os.path.exists(sftp_server):
+                break
+        else:
+            self.fail('Cannot locate OpenSSH sftp-server program, please update tests for your distribution')
+
+        # generate sshd configuration; note that we must ensure that the
+        # private key is not world-readable, so we need to copy it
+        shutil.copy(os.path.join(my_dir, 'files', 'ssh_host_rsa_key'), self.workdir)
+        os.chmod(os.path.join(self.workdir, 'ssh_host_rsa_key'), 0o600)
+        shutil.copy(os.path.join(my_dir, 'files', 'ssh_host_rsa_key.pub'), self.workdir)
+
+        self.sshd_config = os.path.join(self.workdir, 'sshd_config')
+        with open(self.sshd_config, 'w') as f:
+            f.write('''Port 2222
+HostKey %(workdir)s/ssh_host_rsa_key
+UsePrivilegeSeparation no
+UsePam no
+Subsystem sftp %(sftp_server)s
+''' % {'workdir': self.workdir,
+       'sftp_server': sftp_server
+      })
+
         self.sshd_log = open('/var/log/sshd.log', 'ab')
-        self.sshd = subprocess.Popen([os.environ['SSHD'], '-Dde', '-p', '2222',
-                                      '-o', 'UsePrivilegeSeparation no',
-                                      '-o', 'UsePam no'],
+        self.sshd = subprocess.Popen([os.environ['SSHD'], '-Dde', '-f', self.sshd_config],
                                      stderr=self.sshd_log)
 
     def tearDown(self):
