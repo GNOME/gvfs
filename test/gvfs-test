@@ -119,12 +119,13 @@ class GvfsTestCase(unittest.TestCase):
     def unmount(self, uri):
         self.program_out_success(['gvfs-mount', '-u', uri])
 
-        timeout = 50
+        timeout = 5
         while timeout > 0:
             (out, err) = self.program_out_err(['gvfs-mount', '-li'])
             if 'Mount(0)' not in out:
                 break
             timeout -= 1
+            time.sleep(1)
         else:
             self.fail('gvfs-mount -u %s failed' % uri)
 
@@ -548,8 +549,8 @@ ncalrpc dir = %(workdir)s/samba
                 break
         else:
             mount.terminate()
-            mount.wait()
             self.fail('timed out waiting for gvfs-mount %s' % uri)
+        mount.wait()
 
         self.do_mount_check(uri, False)
 
