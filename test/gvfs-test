@@ -446,20 +446,85 @@ class Ftp(GvfsTestCase):
         finally:
             self.unmount(uri)
 
-@unittest.skipUnless(in_testbed, 'not running under gvfs-testbed')
+@unittest.skipUnless(in_testbed or 'LIBSMB_PROG' in os.environ,
+                     'not running under gvfs-testbed or LIBSMB_PROG="nc localhost 1445"')
 class Smb(GvfsTestCase):
+    def setUp(self):
+        '''start local smbd as user if we are not in test bed'''
+        super().setUp()
 
-    @classmethod
-    def setUpClass(klass):
         # create a few test files
-        myfiles = os.path.expanduser('~/myfiles')
-        os.makedirs(os.path.join(myfiles, 'mydir'))
-        with open(os.path.join(myfiles, 'myfile.txt'), 'w') as f:
-            f.write('hello world\n')
-        secret_path = os.path.join(myfiles, 'mydir', 'onlyme.txt')
-        with open(secret_path, 'w') as f:
-            f.write('secret\n')
-        os.chmod(secret_path, 0o600)
+        if in_testbed:
+            myfiles = os.path.expanduser('~/myfiles')
+        else:
+            myfiles = os.path.join(self.workdir, 'myfiles')
+        if not os.path.exists(myfiles):
+            # only run this once
+            os.makedirs(os.path.join(myfiles, 'mydir'))
+            with open(os.path.join(myfiles, 'myfile.txt'), 'w') as f:
+                f.write('hello world\n')
+            secret_path = os.path.join(myfiles, 'mydir', 'onlyme.txt')
+            with open(secret_path, 'w') as f:
+                f.write('secret\n')
+            os.chmod(secret_path, 0o600)
+
+        if in_testbed:
+            return
+
+        # smbpasswd file with password "foo"
+        smbpasswd = os.path.join(self.workdir, 'smbpasswd')
+        with open(smbpasswd, 'w') as f:
+            f.write(os.environ['USER'])
+            f.write(':2:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX:AC8E657F83DF82BEEA5D43BDAF7800CC:[U          ]:LCT-507C14C7:\n')
+        
+        # create local samba configuration
+        smbdir = os.path.join(self.workdir, 'samba')
+        os.mkdir(smbdir, 0o755)
+        smbconf = os.path.join(self.workdir, 'smb.conf')
+        with open(smbconf, 'w') as f:
+            f.write('''[global]
+workgroup = TESTGROUP
+interfaces = lo 127.0.0.0/8
+smb ports = 1445
+log level = 2
+map to guest = Bad User
+passdb backend = smbpasswd
+smb passwd file = %(workdir)s/smbpasswd
+lock directory = %(workdir)s/samba
+state directory = %(workdir)s/samba
+cache directory = %(workdir)s/samba
+pid directory = %(workdir)s/samba
+private directory = %(workdir)s/samba
+ncalrpc dir = %(workdir)s/samba
+
+[myfiles]
+  path = %(workdir)s/myfiles
+  guest ok = yes
+  read only = no
+''' % {'workdir': self.workdir})
+
+        # start smbd
+        self.smbd = subprocess.Popen(['smbd', '-iFS', '-s', smbconf],
+                                     universal_newlines=True,
+                                     stdout=subprocess.PIPE)
+        time.sleep(1)
+
+    def tearDown(self):
+        # stop smbd
+        if hasattr(self, 'smbd') and self.smbd.returncode is None:
+            self.smbd.terminate()
+            self.smbd.wait()
+        super().tearDown()
+
+    def run(self, result=None):
+        '''Show smbd log output on failed tests'''
+
+        if result:
+            orig_err_fail = result.errors + result.failures
+        super().run(result)
+        if hasattr(self, 'smbd'):
+            if result and result.errors + result.failures > orig_err_fail:
+                print('\n----- smbd log -----\n%s\n------\n' % self.smbd.stdout.read())
 
     def test_anonymous(self):
         '''smb:// anonymous'''
@@ -521,7 +586,9 @@ class Smb(GvfsTestCase):
             out = self.program_out_success(['gvfs-cat', uri + '/myfile.txt'])
             self.assertEqual(out, 'hello world\n')
 
-            if auth:
+            # FIXME: when running smbd as user it cannot change user to guest
+            # and prevent access
+            if auth or not in_testbed:
                 out = self.program_out_success(['gvfs-cat', uri + '/mydir/onlyme.txt'])
                 self.assertEqual(out, 'secret\n')
 
