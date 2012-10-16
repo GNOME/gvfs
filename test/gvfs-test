@@ -465,7 +465,21 @@ class Smb(GvfsTestCase):
         '''smb:// anonymous'''
 
         uri = 'smb://%s/myfiles' % os.uname()[1]
-        subprocess.check_call(['gvfs-mount', uri])
+
+        # ensure that this does not ask for any credentials
+        mount = subprocess.Popen(['gvfs-mount', uri])
+        timeout = 50
+        while timeout > 0:
+            time.sleep(0.1)
+            timeout -= 1
+            if mount.poll() is not None:
+                self.assertEqual(mount.returncode, 0, 'gvfs-mount %s failed' % uri)
+                break
+        else:
+            mount.terminate()
+            mount.wait()
+            self.fail('timed out waiting for gvfs-mount %s' % uri)
+
         self.do_mount_check(uri, False)
 
     def test_authenticated(self):
