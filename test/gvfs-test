@@ -145,7 +145,7 @@ class GvfsTestCase(unittest.TestCase):
                 self.assertGreater(empty_timeout, 0,
                                    'timed out waiting for auth prompt')
 
-            if b'User' in r:
+            if b'User' in r or b'Domain' in r:
                 break
             time.sleep(0.1)
 
@@ -449,14 +449,14 @@ class Ftp(GvfsTestCase):
 @unittest.skipUnless(in_testbed, 'not running under gvfs-testbed')
 class Smb(GvfsTestCase):
 
-    def setUp(self):
-        super().setUp()
-
+    @classmethod
+    def setUpClass(klass):
         # create a few test files
-        with open(os.path.join(self.workdir, 'myfile.txt'), 'w') as f:
+        myfiles = os.path.expanduser('~/myfiles')
+        os.makedirs(os.path.join(myfiles, 'mydir'))
+        with open(os.path.join(myfiles, 'myfile.txt'), 'w') as f:
             f.write('hello world\n')
-        os.mkdir(os.path.join(self.workdir, 'mydir'))
-        secret_path = os.path.join(self.workdir, 'mydir', 'onlyme.txt')
+        secret_path = os.path.join(myfiles, 'mydir', 'onlyme.txt')
         with open(secret_path, 'w') as f:
             f.write('secret\n')
         os.chmod(secret_path, 0o600)
@@ -464,43 +464,27 @@ class Smb(GvfsTestCase):
     def test_anonymous(self):
         '''smb:// anonymous'''
 
-        os.chmod(self.workdir, 0o755)
-        subprocess.check_call(['net', 'usershare', 'add', 'myfiles',
-                               self.workdir,  'My Files',
-                               '%s:F,Everyone:R' % os.environ['USER'],
-                               'guest_ok=y'])
-        try:
-            uri = 'smb://%s/myfiles' % os.uname()[1]
-            subprocess.check_call(['gvfs-mount', uri])
-            self.do_mount_check(uri, False)
-        finally:
-            subprocess.check_call(['net', 'usershare', 'delete', 'myfiles'])
+        uri = 'smb://%s/myfiles' % os.uname()[1]
+        subprocess.check_call(['gvfs-mount', uri])
+        self.do_mount_check(uri, False)
 
-    # needs predictable password
-    @unittest.skipUnless(in_testbed, 'not running under gvfs-testbed')
     def test_authenticated(self):
         '''smb:// authenticated'''
 
-        subprocess.check_call(['net', 'usershare', 'add', 'myfiles',
-                               self.workdir,  'My Files',
-                               '%s:F' % os.environ['USER']])
-        try:
-            uri = 'smb://%s/myfiles' % os.uname()[1]
-            mount = subprocess.Popen(['gvfs-mount', uri],
-                                     stdin=subprocess.PIPE,
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.PIPE)
+        uri = 'smb://%s@%s/myfiles' % (os.environ['USER'], os.uname()[1])
+        mount = subprocess.Popen(['gvfs-mount', uri],
+                                 stdin=subprocess.PIPE,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
 
-            # correct credentials
-            self.wait_for_gvfs_mount_user_prompt(mount)
-            # default user, default domain, password
-            (out, err) = mount.communicate(b'\n\nfoo\n')
-            self.assertEqual(mount.returncode, 0, err)
-            #self.assertEqual(err, b'') # we get some warnings
+        # correct credentials
+        self.wait_for_gvfs_mount_user_prompt(mount)
+        # default domain, password
+        (out, err) = mount.communicate(b'\nfoo\n')
+        self.assertEqual(mount.returncode, 0, err)
+        #self.assertEqual(err, b'') # we get some warnings
 
-            self.do_mount_check(uri, True)
-        finally:
-            subprocess.check_call(['net', 'usershare', 'delete', 'myfiles'])
+        self.do_mount_check(uri, True)
 
     def do_mount_check(self, uri, auth):
         # appears in gvfs-mount list
