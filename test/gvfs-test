@@ -455,15 +455,18 @@ class Smb(GvfsTestCase):
 
         # create a few test files
         if in_testbed:
-            myfiles = os.path.expanduser('~/myfiles')
+            pubdir = os.path.expanduser('~/public')
+            privdir = os.path.expanduser('~/private')
         else:
-            myfiles = os.path.join(self.workdir, 'myfiles')
-        if not os.path.exists(myfiles):
+            pubdir = os.path.join(self.workdir, 'public')
+            privdir = os.path.join(self.workdir, 'private')
+        if not os.path.exists(pubdir):
             # only run this once
-            os.makedirs(os.path.join(myfiles, 'mydir'))
-            with open(os.path.join(myfiles, 'myfile.txt'), 'w') as f:
+            os.mkdir(pubdir)
+            os.makedirs(os.path.join(privdir, 'mydir'))
+            with open(os.path.join(pubdir, 'myfile.txt'), 'w') as f:
                 f.write('hello world\n')
-            secret_path = os.path.join(myfiles, 'mydir', 'onlyme.txt')
+            secret_path = os.path.join(privdir, 'mydir', 'onlyme.txt')
             with open(secret_path, 'w') as f:
                 f.write('secret\n')
             os.chmod(secret_path, 0o600)
@@ -497,9 +500,12 @@ pid directory = %(workdir)s/samba
 private directory = %(workdir)s/samba
 ncalrpc dir = %(workdir)s/samba
 
-[myfiles]
-  path = %(workdir)s/myfiles
+[public]
+  path = %(workdir)s/public
   guest ok = yes
+
+[private]
+  path = %(workdir)s/private
   read only = no
 ''' % {'workdir': self.workdir})
 
@@ -529,7 +535,7 @@ ncalrpc dir = %(workdir)s/samba
     def test_anonymous(self):
         '''smb:// anonymous'''
 
-        uri = 'smb://%s/myfiles' % os.uname()[1]
+        uri = 'smb://%s/public' % os.uname()[1]
 
         # ensure that this does not ask for any credentials
         mount = subprocess.Popen(['gvfs-mount', uri])
@@ -550,7 +556,7 @@ ncalrpc dir = %(workdir)s/samba
     def test_authenticated(self):
         '''smb:// authenticated'''
 
-        uri = 'smb://%s@%s/myfiles' % (os.environ['USER'], os.uname()[1])
+        uri = 'smb://%s@%s/private' % (os.environ['USER'], os.uname()[1])
         mount = subprocess.Popen(['gvfs-mount', uri],
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE,
@@ -565,50 +571,47 @@ ncalrpc dir = %(workdir)s/samba
 
         self.do_mount_check(uri, True)
 
-    def do_mount_check(self, uri, auth):
+    def do_mount_check(self, uri, writable):
+        sharename = uri.split('/')[-1]
+
         # appears in gvfs-mount list
         (out, err) = self.program_out_err(['gvfs-mount', '-li'])
         try:
-            self.assertRegex(out, 'Mount\(0\): myfiles .* smb://.*/myfiles')
+            self.assertRegex(out, 'Mount\(0\): %s .* smb://.*/%s' % (sharename, sharename))
 
             # check gvfs-info
             out = self.program_out_success(['gvfs-info', uri])
-            self.assertTrue('display name: myfiles' in out, out)
+            self.assertTrue('display name: ' + sharename in out, out)
             self.assertTrue('type: directory' in out, out)
 
-            # check gvfs-ls
+            # check gvfs-ls and gvfs-cat
             out = self.program_out_success(['gvfs-ls', uri])
-            self.assertEqual(set(out.split()), set(['myfile.txt', 'mydir']))
-            out = self.program_out_success(['gvfs-ls', uri + '/mydir'])
-            self.assertEqual(out, 'onlyme.txt\n')
+            if sharename == 'public':
+                self.assertEqual(out, 'myfile.txt\n')
 
-            # check gvfs-cat
-            out = self.program_out_success(['gvfs-cat', uri + '/myfile.txt'])
-            self.assertEqual(out, 'hello world\n')
+                out = self.program_out_success(['gvfs-cat', uri + '/myfile.txt'])
+                self.assertEqual(out, 'hello world\n')
+            else:
+                self.assertEqual(out, 'mydir\n')
+                self.assertEqual(self.program_out_success(['gvfs-ls', uri + '/mydir']),
+                                 'onlyme.txt\n')
 
-            # FIXME: when running smbd as user it cannot change user to guest
-            # and prevent access
-            if auth or not in_testbed:
                 out = self.program_out_success(['gvfs-cat', uri + '/mydir/onlyme.txt'])
                 self.assertEqual(out, 'secret\n')
 
+            if writable:
                 # should be writable
-                self.program_out_success(['gvfs-copy', uri + '/myfile.txt',
-                                          uri + '/mycopy.txt'])
-                out = self.program_out_success(['gvfs-cat', uri + '/mycopy.txt'])
-                self.assertEqual(out, 'hello world\n')
+                self.program_out_success(['gvfs-copy', '/etc/passwd', uri + '/newfile.txt'])
+                out = self.program_out_success(['gvfs-cat', uri + '/newfile.txt'])
+                with open('/etc/passwd') as f:
+                    self.assertEqual(out, f.read())
             else:
-                (code, out, err) = self.program_code_out_err(['gvfs-cat', uri + '/mydir/onlyme.txt'])
+                # should not be writable
+                (code, out, err) = self.program_code_out_err(
+                    ['gvfs-copy', '/etc/passwd', uri + '/newfile.txt'])
                 self.assertNotEqual(code, 0)
                 self.assertEqual(out, '')
-                self.assertTrue('onlyme.txt' in err)
-
-                # should be read-only
-                (code, out, err) = self.program_code_out_err(['gvfs-copy', uri + '/myfile.txt',
-                                                              uri + '/mycopy.txt'])
-                self.assertNotEqual(code, 0)
-                self.assertEqual(out, '')
-                self.assertTrue('myfile.txt' in err, err)
+                self.assertNotEqual(err, '')
         finally:
             self.unmount(uri)
 
