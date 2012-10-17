@@ -74,4 +74,12 @@ installcheck-local: gvfs-test
 
 CLEANFILES=$(CONFIG_FILES)
 
-EXTRA_DIST = benchmark-common.c session.conf.in gvfs-test run-in-tree.sh
+EXTRA_DIST = \
+	benchmark-common.c		\
+	session.conf.in 		\
+	gvfs-test			\
+	run-in-tree.sh			\
+	files/ssh_host_rsa_key files	\
+	files/ssh_host_rsa_key.pub	\
+	files/testcert.pem		\
+	$(NULL)
