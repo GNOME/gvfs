@@ -496,28 +496,31 @@ AM_CONDITIONAL(HAVE_BLURAY, [test "$msg_bluray" = "yes"])
 dnl ==========================================================================
 dnl Samba 3.0
 
+dnl Samba 4 ships a pc file and requires a non-default include subdir, so pick it up:
+PKG_CHECK_MODULES(SMBCLIENT, smbclient, samba_default_cflags="$SMBCLIENT_CFLAGS",samba_default_cflags=-I/usr/include)
+
 AC_ARG_ENABLE(samba, AS_HELP_STRING([--disable-samba],[build without samba support]))
 msg_samba="no"
 if test "x$enable_samba" != "xno"; then
   AC_ARG_WITH(samba-includes, AS_HELP_STRING([--with-samba-includes=PREFIX],[Location of samba includes.]),
-	      with_samba_includes="$withval", with_samba_includes="/usr/include")
+	      with_samba_includes="-I$withval", with_samba_includes=${samba_default_cflags})
   have_samba_includes="no"
-  if test "x${with_samba_includes}" != "xno"; then
+  if test "x${with_samba_includes}" != "x-Ino"; then
 	CPPFLAGS_save="$CPPFLAGS"
 
-	CPPFLAGS="$CPPFLAGS -I$with_samba_includes"
+	CPPFLAGS="$CPPFLAGS $with_samba_includes"
 	AC_CHECK_HEADER(libsmbclient.h, [ samba_includes="yes" ])
 	CPPFLAGS="$CPPFLAGS_save"
 	
 	if test "x{samba_includes}" != "xno" -a "x${samba_includes}" != "x"; then
 		have_samba_includes="yes"
 		if test "${with_samba_includes}" != "/usr/include" ; then
-			SAMBA_CFLAGS="-I$with_samba_includes"
+			SAMBA_CFLAGS="$with_samba_includes"
 		else
 			SAMBA_CFLAGS=""
 		fi
 		
-		CPPFLAGS="$CPPFLAGS -I$with_samba_includes"
+		CPPFLAGS="$CPPFLAGS $with_samba_includes"
 		AC_CHECK_MEMBER(SMBCCTX.flags,
 				[AC_DEFINE(HAVE_SAMBA_FLAGS,, [Defined if flags available in SMBCCTXT])],,
 				[#include <libsmbclient.h>])
