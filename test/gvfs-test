@@ -276,7 +276,7 @@ class Sftp(GvfsTestCase):
         shutil.copy(os.path.join(my_dir, 'files', 'ssh_host_rsa_key.pub'), self.workdir)
         self.sshd_config = os.path.join(self.workdir, 'sshd_config')
         with open(self.sshd_config, 'w') as f:
-            f.write('''Port 2222
+            f.write('''Port 22222
 HostKey %(workdir)s/ssh_host_rsa_key
 UsePrivilegeSeparation no
 AuthorizedKeysFile %(authorized_keys)s
@@ -313,7 +313,7 @@ Subsystem sftp %(sftp_server)s
         shutil.copy(os.path.expanduser('~/.ssh/id_rsa.pub'), self.authorized_keys)
 
         # mount it
-        uri = 'sftp://localhost:2222'
+        uri = 'sftp://localhost:22222'
         subprocess.check_call(['gvfs-mount', uri])
 
         self.do_mount_check(uri)
@@ -326,7 +326,7 @@ Subsystem sftp %(sftp_server)s
         shutil.copy(os.path.expanduser('~/.ssh/id_rsa.pub'), self.authorized_keys)
 
         # try to mount it; should fail as it's an unknown host
-        uri = 'sftp://%s:2222' % local_ip
+        uri = 'sftp://%s:22222' % local_ip
         (code, out, err) = self.program_code_out_err(['gvfs-mount', uri])
 
         self.assertNotEqual(code, 0)
