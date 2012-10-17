@@ -318,6 +318,7 @@ Subsystem sftp %(sftp_server)s
 
         self.do_mount_check(uri)
 
+    @unittest.expectedFailure # https://bugzilla.gnome.org/show_bug.cgi?id=686006#c38
     @unittest.skipUnless(local_ip, 'not having any non-localhost IP')
     def test_unknown_host(self):
         '''sftp:// with RSA authentication for unknown host'''
