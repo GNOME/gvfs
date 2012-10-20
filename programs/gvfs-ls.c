@@ -33,6 +33,7 @@ static gboolean show_hidden = FALSE;
 static gboolean show_long = FALSE;
 static gboolean nofollow_symlinks = FALSE;
 static char *show_completions = NULL;
+static gboolean print_uris = FALSE;
 
 static GOptionEntry entries[] =
 {
@@ -41,6 +42,7 @@ static GOptionEntry entries[] =
   { "long", 'l', 0, G_OPTION_ARG_NONE, &show_long, N_("Use a long listing format"), NULL },
   { "show-completions", 'c', 0, G_OPTION_ARG_STRING, &show_completions, N_("Show completions"), N_("PREFIX") },
   { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symbolic links"), NULL},
+  { "print-uris", 'u', 0, G_OPTION_ARG_NONE, &print_uris, N_("Print full URIs"), NULL},
   { NULL }
 };
 
@@ -76,13 +78,15 @@ type_to_string (GFileType type)
 }
 
 static void
-show_info (GFileInfo *info)
+show_info (GFileInfo *info, GFile *parent)
 {
   const char *name, *type;
+  char *uri;
   goffset size;
   char **attributes;
   int i;
   gboolean first_attr;
+  GFile *child;
 
   if ((g_file_info_get_is_hidden (info)) && !show_hidden)
     return;
@@ -91,12 +95,22 @@ show_info (GFileInfo *info)
   if (name == NULL)
     name = "";
 
+  if (print_uris) {
+    child = g_file_get_child (parent, name);
+    uri = g_file_get_uri (child);
+    g_object_unref (child);
+  }
+
   size = g_file_info_get_size (info);
   type = type_to_string (g_file_info_get_file_type (info));
   if (show_long)
-    g_print ("%s\t%"G_GUINT64_FORMAT"\t(%s)", name, (guint64)size, type);
+    g_print ("%s\t%"G_GUINT64_FORMAT"\t(%s)", print_uris? uri: name, (guint64)size, type);
   else
-    g_print ("%s", name);
+    g_print ("%s", print_uris? uri: name);
+
+  if (print_uris) {
+    g_free (uri);
+  }
 
   first_attr = TRUE;
   attributes = g_file_info_list_attributes (info, NULL);
@@ -156,7 +170,7 @@ list (GFile *file)
   res = TRUE;
   while ((info = g_file_enumerator_next_file (enumerator, NULL, &error)) != NULL)
     {
-      show_info (info);
+      show_info (info, file);
 
       g_object_unref (info);
     }
