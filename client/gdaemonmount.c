@@ -330,8 +330,9 @@ g_daemon_mount_unmount_with_operation (GMount *mount,
   data = g_new0 (AsyncProxyCreate, 1);
   data->mount = g_object_ref (mount);
   data->mount_info = daemon_mount->mount_info;
-  data->mount_operation = g_object_ref (mount_operation);
   data->flags = flags;
+  if (mount_operation)
+    data->mount_operation = g_object_ref (mount_operation);
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
 
