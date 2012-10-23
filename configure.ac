@@ -388,6 +388,28 @@ AC_SUBST(AFC_CFLAGS)
 
 AM_CONDITIONAL(USE_AFC, [test "$msg_afc" = "yes"])
 
+dnl *************************************************
+dnl *** Check if we should build with GOA backend ***
+dnl *************************************************
+AC_ARG_ENABLE(goa, AS_HELP_STRING([--disable-goa],[build without GOA backend]))
+msg_goa=no
+GOA_LIBS=
+GOA_CFLAGS=
+
+if test "x$enable_goa" != "xno" ; then
+  PKG_CHECK_EXISTS(goa-1.0 >= 3.7.1, msg_goa=yes)
+
+  if test "x$msg_goa" = "xyes"; then
+    PKG_CHECK_MODULES(GOA, goa-1.0)
+    AC_DEFINE(HAVE_GOA, 1, [Define to 1 if GOA is going to be built])
+  fi
+fi
+
+AC_SUBST(GOA_LIBS)
+AC_SUBST(GOA_CFLAGS)
+
+AM_CONDITIONAL(USE_GOA, [test "$msg_goa" = "yes"])
+
 dnl *****************************************************
 dnl *** Check if we should build with obexftp backend ***
 dnl *****************************************************
@@ -879,6 +901,7 @@ monitor/udisks2/Makefile
 monitor/gphoto2/Makefile
 monitor/afc/Makefile
 monitor/mtp/Makefile
+monitor/goa/Makefile
 programs/Makefile
 man/Makefile
 test/Makefile
@@ -908,6 +931,7 @@ echo "
 	Build HAL volume monitor:     $msg_hal (with fast init path: $have_hal_fast_init)
 	Build GDU volume monitor:     $msg_gdu
 	Build udisks2 volume monitor: $msg_udisks2
+	Build GOA volume monitor:     $msg_goa
         Use libsystemd-login:         $msg_libsystemd_login
 	GNOME Keyring support:        $msg_keyring
 	GTK+ support:                 $msg_gtk
