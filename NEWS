@@ -1,3 +1,18 @@
+Major changes in 1.15.0
+=======================
+* New testing framework, written by Martin Pitt
+* daemon: Check for a NULL GMountOperation when unmounting
+* daemon: Allow specifying directory and extensions for mount files
+* proxy volume monitor: Don't emit connected/added signals at object creation
+* proxy volume monitor: Allow specifying the dir for .monitor files
+* client: Don't disable exit_on_close on session bus
+* fuse: Don't crash on unmount
+* udisks2: Add appropriate content type for media players
+* gphoto2: Make sure to not call g_mutex_clear twice, causing a crash
+* smb: Fix libsmbclient samba 4 support
+* Fix OpenBSD portability issues
+* Translation updates
+
 Major changes in 1.14.0
 =======================
 * Translation updates
