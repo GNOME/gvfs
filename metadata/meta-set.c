@@ -31,8 +31,6 @@ main (int argc,
   char *tree_path;
   GVfsMetadata *proxy;
   
-  g_type_init();
-  
   context = g_option_context_new ("<path> <key> <value> - set metadata");
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   if (!g_option_context_parse (context, &argc, &argv, &error))

@@ -208,8 +208,6 @@ main (int argc, char *argv[])
   guchar start;
   gboolean do_create_file;
   
-  g_type_init ();
-
   do_create_file = FALSE;
   
   if (argc > 1)

@@ -175,7 +175,6 @@ main (int argc, char *argv[])
 
   g_option_context_free (context);
 
-  g_type_init ();
   loop = g_main_loop_new (NULL, FALSE);
 
   daemon = g_vfs_daemon_new (TRUE, replace);

@@ -2454,7 +2454,5 @@ static struct fuse_operations vfs_oper =
 gint
 main (gint argc, gchar *argv [])
 {
-  g_type_init ();
-
   return fuse_main (argc, argv, &vfs_oper, NULL /* user data */);
 }

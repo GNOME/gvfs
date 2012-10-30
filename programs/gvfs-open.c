@@ -56,8 +56,6 @@ main (int argc, char *argv[])
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
 
-  g_type_init ();
-
   param = g_strdup_printf ("%s...", _("FILE"));
   /* Translators: this message will appear after the usage string */
   /* and before the list of options.                              */

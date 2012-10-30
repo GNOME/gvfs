@@ -52,8 +52,6 @@ main (int argc, char *argv[])
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
 
-  g_type_init ();
-
   error = NULL;
   param = g_strdup_printf ("[%s...]", _("FILE"));
   summary = _("Delete the given files.");

@@ -154,8 +154,6 @@ benchmark_run (gint argc, gchar *argv [])
   
   setlocale (LC_ALL, "");
 
-  g_type_init ();
-  
   if (argc < 2)
     {
       g_printerr ("Usage: %s <scratch URI>\n", argv [0]);

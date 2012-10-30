@@ -1873,8 +1873,6 @@ g_vfs_proxy_volume_monitor_daemon_init (void)
   bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
-
-  g_type_init ();
 }
 
 

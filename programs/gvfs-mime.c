@@ -76,8 +76,6 @@ main (int argc, char *argv[])
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
 
-  g_type_init ();
-
   error = NULL;
   param = g_strdup_printf ("%s [%s]", _("MIMETYPE"), _("HANDLER"));
   summary = _("Get or set the handler for a mime-type.");

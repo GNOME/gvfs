@@ -66,8 +66,6 @@ daemon_init (void)
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
   
-  g_type_init ();
-
   g_log_set_handler (NULL, G_LOG_LEVEL_DEBUG, log_debug, NULL);
 
 #ifdef SIGPIPE
