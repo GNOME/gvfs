@@ -1418,7 +1418,6 @@ g_proxy_volume_monitor_setup_session_bus_connection (void)
       g_error_free (error);
       goto out;
     }
-  g_dbus_connection_set_exit_on_close (the_session_bus, FALSE);
 
   the_volume_monitors = g_hash_table_new (g_direct_hash, g_direct_equal);
 
