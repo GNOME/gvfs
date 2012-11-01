@@ -1435,7 +1435,6 @@ g_proxy_volume_monitor_teardown_session_bus_connection (void)
   G_LOCK (proxy_vm);
   if (the_session_bus != NULL)
     {
-      g_dbus_connection_close_sync (the_session_bus, NULL, NULL);
       g_object_unref (the_session_bus);
       the_session_bus = NULL;
 
