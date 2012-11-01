@@ -68,7 +68,7 @@ g_io_module_unload (GIOModule *module)
   if (g_getenv ("GVFS_REMOTE_VOLUME_MONITOR_IGNORE") != NULL)
     goto out;
 
-  g_proxy_volume_monitor_teardown_session_bus_connection ();
+  g_proxy_volume_monitor_unload_cleanup ();
 
 out:
   ;

@@ -45,7 +45,6 @@
 
 G_LOCK_DEFINE_STATIC(proxy_vm);
 
-static GDBusConnection *the_session_bus = NULL;
 static GHashTable *the_volume_monitors = NULL;
 
 struct _GProxyVolumeMonitor {
@@ -979,12 +978,12 @@ g_proxy_volume_monitor_constructor (GType                  type,
   monitor = G_PROXY_VOLUME_MONITOR (object);
 
   error = NULL;
-  monitor->proxy = gvfs_remote_volume_monitor_proxy_new_sync (the_session_bus,
-                                                              G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
-                                                              dbus_name,
-                                                              "/org/gtk/Private/RemoteVolumeMonitor",
-                                                              NULL,
-                                                              &error);
+  monitor->proxy = gvfs_remote_volume_monitor_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                                                      G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+                                                                      dbus_name,
+                                                                      "/org/gtk/Private/RemoteVolumeMonitor",
+                                                                      NULL,
+                                                                      &error);
   if (monitor->proxy == NULL)
     {
       g_printerr ("Error creating proxy: %s (%s, %d)\n",
@@ -1144,12 +1143,12 @@ is_remote_monitor_supported (const char *dbus_name)
   is_supported = FALSE;
   error = NULL;
 
-  proxy = gvfs_remote_volume_monitor_proxy_new_sync (the_session_bus,
-                                                     G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
-                                                     dbus_name,
-                                                     "/org/gtk/Private/RemoteVolumeMonitor",
-                                                     NULL,
-                                                     &error);
+  proxy = gvfs_remote_volume_monitor_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                                             G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+                                                             dbus_name,
+                                                             "/org/gtk/Private/RemoteVolumeMonitor",
+                                                             NULL,
+                                                             &error);
   if (proxy == NULL)
     {
       g_printerr ("Error creating proxy: %s (%s, %d)\n",
@@ -1401,12 +1400,8 @@ static gboolean
 g_proxy_volume_monitor_setup_session_bus_connection (void)
 {
   gboolean ret;
-  GError *error;
 
   ret = FALSE;
-
-  if (the_session_bus != NULL)
-    goto has_bus_already;
 
   /* This is so that system daemons can use gio
    * without spawning private dbus instances.
@@ -1415,19 +1410,7 @@ g_proxy_volume_monitor_setup_session_bus_connection (void)
   if (g_getenv ("DBUS_SESSION_BUS_ADDRESS") == NULL)
     goto out;
 
-  error = NULL;
-  the_session_bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
-  if (error != NULL)
-    {
-      g_printerr ("cannot connect to the session bus: %s (%s, %d)\n",
-                  error->message, g_quark_to_string (error->domain), error->code);
-      g_error_free (error);
-      goto out;
-    }
-
   the_volume_monitors = g_hash_table_new (g_direct_hash, g_direct_equal);
-
- has_bus_already:
 
   ret = TRUE;
 
@@ -1436,15 +1419,11 @@ g_proxy_volume_monitor_setup_session_bus_connection (void)
 }
 
 void
-g_proxy_volume_monitor_teardown_session_bus_connection (void)
+g_proxy_volume_monitor_unload_cleanup (void)
 {
   G_LOCK (proxy_vm);
-  if (the_session_bus != NULL)
+  if (the_volume_monitors != NULL)
     {
-      g_dbus_connection_close_sync (the_session_bus, NULL, NULL);
-      g_object_unref (the_session_bus);
-      the_session_bus = NULL;
-
       g_hash_table_unref (the_volume_monitors);
       the_volume_monitors = NULL;
     }

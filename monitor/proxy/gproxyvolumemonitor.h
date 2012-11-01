@@ -74,7 +74,7 @@ GProxyMount     *g_proxy_volume_monitor_get_mount_for_id  (GProxyVolumeMonitor *
                                                           const char          *id);
 GVfsRemoteVolumeMonitor *g_proxy_volume_monitor_get_dbus_proxy (GProxyVolumeMonitor *volume_monitor);
 
-void g_proxy_volume_monitor_teardown_session_bus_connection (void);
+void             g_proxy_volume_monitor_unload_cleanup    (void);
 
 
 GHashTable *_get_identifiers (GVariantIter *identifiers);
