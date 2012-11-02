@@ -296,7 +296,7 @@ look_for_stderr_errors (GVfsBackend *backend, GError **error)
           /* Error (real or WOULDBLOCK) or EOF */
           g_set_error_literal (error,
 	                       G_IO_ERROR, G_IO_ERROR_FAILED,
-        	               _("ssh program unexpectedly exited"));
+        	               _("SSH program unexpectedly exited"));
           return;
         }
       
@@ -381,7 +381,7 @@ setup_ssh_environment (void)
   conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   if (! conn)
     {
-      g_warning ("Failed to setup ssh evironment: %s (%s, %d)",
+      g_warning ("Failed to setup SSH evironment: %s (%s, %d)",
                  error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
       return;
@@ -401,7 +401,7 @@ setup_ssh_environment (void)
   if (! iter)
     {
       g_dbus_error_strip_remote_error (error);
-      g_warning ("Failed to setup ssh evironment: %s (%s, %d)",
+      g_warning ("Failed to setup SSH evironment: %s (%s, %d)",
                  error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
@@ -495,7 +495,7 @@ spawn_ssh (GVfsBackend *backend,
     {
       g_set_error_literal (error,
 			   G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Unable to spawn ssh program"));
+			   _("Unable to spawn SSH program"));
       return FALSE;
     }
 #else
@@ -511,7 +511,7 @@ spawn_ssh (GVfsBackend *backend,
     {
       g_set_error (error,
                    G_IO_ERROR, G_IO_ERROR_FAILED,
-                   _("Unable to spawn ssh program: %s"), my_error->message);
+                   _("Unable to spawn SSH program: %s"), my_error->message);
       g_error_free (my_error);
       return FALSE;
     }
@@ -645,13 +645,13 @@ read_reply_sync (GVfsBackendSftp *backend, gsize *len_out, GError **error)
 				&bytes_read, NULL, error))
     return NULL;
 
-  /* Make sure we handle ssh exiting early, e.g. if no further
+  /* Make sure we handle SSH exiting early, e.g. if no further
      authentication methods */
   if (bytes_read == 0)
     {
       g_set_error_literal (error,
 			   G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("ssh program unexpectedly exited"));
+			   _("SSH program unexpectedly exited"));
       return NULL;
     }
   
@@ -1156,7 +1156,7 @@ check_input_stream_read_result (GVfsBackendSftp *backend, gssize res, GError *er
           g_clear_error (&error);
           g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
                        _("Internal error: %s"),
-                       res == 0 ? "The underlying ssh process died" : "Unkown Error");
+                       res == 0 ? "The underlying SSH process died" : "Unkown Error");
         }
 
       fail_jobs_and_die (backend, error);
@@ -1725,7 +1725,7 @@ try_mount (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_FAILED,
-			_("Unable to find supported ssh command"));
+			_("Unable to find supported SSH command"));
       return TRUE;
     }
   
