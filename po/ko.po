@@ -2,22 +2,26 @@
 # This file is distributed under the same license as the gvfs package.
 #
 # Young-Ho Cha <ganadist@gmail.com>, 2008.
-# Changwoo Ryu <cwryu@debian.org>, 2009, 2010, 2011.
 # Seong-ho Cho <darkcircle.0426@gmail.com>, 2011, 2012.
+# Changwoo Ryu <cwryu@debian.org>, 2009-2012.
 #
 # * 용어 번역
 #  * WebDAV (share) - 웹 공유, 웹 공유 디렉터리
-#  * backup - 예비 파일
 #  * AFP - AFP -- Apple Filing Protocol을 말함
+#
+# * mountable - mount 정보가 들어 있는 파일을 말한다. "마운트 정보"라고 번역.
+#
+# * UI에 어떻게 보일지 생각하면서 번역한다. 볼륨 이름 따위에 *printf()
+#   함수의 parameter order 기능을 (1$ 2$ 따위) 함부로 쓰면 파일
+#   관리자에서 이상하게 보일 수도 있다.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gvfs&keywords=I18N+L10N&component=general\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2012-09-14 14:17+0000\n"
-"PO-Revision-Date: 2012-09-15 19:38+0700\n"
-"Last-Translator: Seong-ho Cho <darkcircle.0426@gmail.com>\n"
+"PO-Revision-Date: 2012-11-07 07:34+0900\n"
+"Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: GNOME Korea <gnome-kr@googlegroups.com>\n"
 "Language: Korean\n"
 "MIME-Version: 1.0\n"
@@ -93,7 +97,7 @@ msgstr "값은 문자열이거나 문자열의 목록이어야 합니다"
 #: ../monitor/proxy/gproxymount.c:501 ../monitor/proxy/gproxymount.c:586
 #: ../monitor/proxy/gproxyvolume.c:853 ../monitor/proxy/gproxyvolume.c:916
 msgid "Operation was cancelled"
-msgstr "처리를 취소했습니다"
+msgstr "동작을 취소했습니다"
 
 #: ../client/gdaemonfileinputstream.c:527
 #: ../client/gdaemonfileinputstream.c:535
@@ -146,7 +150,7 @@ msgstr "Avahi resolver를 만드는 중 오류: %s"
 #: ../common/gvfsdnssdresolver.c:1100
 #, c-format
 msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr "도메인 \"%3$s\"에서 \"%1$s\" 형식의 \"%2$s\" 서비스를 찾는 중 오류"
+msgstr "\"%s\" 타입의 \"%s\" 서비스를 찾는데 오류가 발생했습니다(도메인 \"%s\")"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -180,7 +184,7 @@ msgstr ""
 #: ../common/gvfsdnssdutils.c:280
 #, c-format
 msgid "Malformed dns-sd encoded_triple '%s'"
-msgstr "DNS-SD encoded_triple '%s'의 형태가 잘못되었습니다"
+msgstr "DNS-SD encoded_triple 형태가 잘못되었습니다: '%s'"
 
 #: ../common/gvfsicon.c:250
 #, c-format
@@ -235,7 +239,7 @@ msgstr "연결이 열려있지 않습니다"
 
 #: ../daemon/gvfsafpconnection.c:771
 msgid "The connection is closed"
-msgstr "연결이 끊겼습니다"
+msgstr "연결이 닫혀 있습니다"
 
 #: ../daemon/gvfsafpconnection.c:1545
 msgid "Connection unexpectedly went down"
@@ -282,8 +286,7 @@ msgstr "“%s” 서버에서 익명 접근을 지원하지 않습니다."
 msgid ""
 "Unable to connect to the server “%s”. No suitable authentication mechanism "
 "was found."
-msgstr ""
-"“%s” 서버에 연결할 수 없습니다. 적당한 인증 매커니즘을 찾을 수 없습니다."
+msgstr "“%s” 서버에 연결할 수 없습니다. 적당한 인증 방식이 없습니다."
 
 #: ../daemon/gvfsafpserver.c:803
 #, c-format
@@ -307,12 +310,12 @@ msgstr "서버에서 명령을 지원하지 않습니다."
 #: ../daemon/gvfsafpserver.c:923
 #, c-format
 msgid "Your password has expired."
-msgstr "암호 기한이 끝났습니다."
+msgstr "암호가 만료되었습니다."
 
 #: ../daemon/gvfsafpserver.c:927
 #, c-format
 msgid "Your password needs to be changed."
-msgstr "암호를 바꿀 필요가 있습니다."
+msgstr "암호를 바꿔야 합니다."
 
 #. translators: %s here is the hostname
 #: ../daemon/gvfsafpserver.c:1070
@@ -461,15 +464,15 @@ msgstr "대상 객체가 이름 바꿀 수 없음(RenameInhibit)으로 표시되
 
 #: ../daemon/gvfsafpvolume.c:1402
 msgid "Can't move directory into one of its descendants"
-msgstr "하위 디렉터리중 한 곳에 디렉터리를 이동할 수 없습니다"
+msgstr "하위 디렉터리중 한 곳에 디렉터리를 옮길 수 없습니다"
 
 #: ../daemon/gvfsafpvolume.c:1406
 msgid "Can't move sharepoint into a shared directory"
-msgstr "공유된 디렉터리에 공유 지점을 이동할 수 없습니다"
+msgstr "공유된 디렉터리에 공유 지점을 옮길 수 없습니다"
 
 #: ../daemon/gvfsafpvolume.c:1410
 msgid "Can't move a shared directory into the Trash"
-msgstr "공유된 디렉터리를 휴지통에 이동할 수 없습니다"
+msgstr "공유된 디렉터리를 휴지통에 옮길 수 없습니다"
 
 #: ../daemon/gvfsafpvolume.c:1418
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
@@ -519,9 +522,10 @@ msgstr "다른 사용자가 파일을 잠궜습니다."
 msgid "File is not open for read access"
 msgstr "읽기 모드로 파일이 열지 못했습니다"
 
+# Apple File Control, 기술 용어이므로 음역
 #: ../daemon/gvfsbackendafc.c:209
 msgid "Internal Apple File Control error"
-msgstr "내부 애플 파일 컨트롤 오류"
+msgstr "처리되지 않는 애플 파일 컨트롤 오류(%d)"
 
 #: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:737
 msgid "File does not exist"
@@ -546,7 +550,7 @@ msgstr "잘못된 애플 파일 컨트롤 데이터를 받았습니다"
 #: ../daemon/gvfsbackendafc.c:233
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
-msgstr "처리되지 않은 애플 파일 제어 오류 (%d)"
+msgstr "처리되지 않은 애플 파일 제어 오류(%d)"
 
 #: ../daemon/gvfsbackendafc.c:249
 msgid "Listing applications installed on device failed"
@@ -556,6 +560,7 @@ msgstr "장치에 설치한 프로그램을 조회하는데 실패"
 msgid "Accessing application icons on device failed"
 msgstr "장치의 프로그램 아이콘에 접근하는데 실패"
 
+# Lockdown: 기술 용어, 음역
 #: ../daemon/gvfsbackendafc.c:282
 msgid "Lockdown Error: Invalid Argument"
 msgstr "락다운 오류: 인자가 올바르지 않습니다"
@@ -564,10 +569,11 @@ msgstr "락다운 오류: 인자가 올바르지 않습니다"
 msgid "Unable to connect"
 msgstr "연결할 수 없음"
 
+# Lockdown: 기술 용어, 음역
 #: ../daemon/gvfsbackendafc.c:293
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
-msgstr "처리되지 않은 잠금 오류 (%d)"
+msgstr "처리되지 않는 락다운 오류(%d)"
 
 #: ../daemon/gvfsbackendafc.c:310
 msgid "libimobiledevice Error: Invalid Argument"
@@ -582,7 +588,7 @@ msgstr "libimobiledevice 오류: 장치가 없습니다. usbmuxd를 올바로 �
 #: ../daemon/gvfsbackendafc.c:318
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
-msgstr "처리되지 않은 libimobiledevice 오류 (%d)"
+msgstr "처리되지 않은 libimobiledevice 오류(%d)"
 
 #: ../daemon/gvfsbackendafc.c:416
 msgid "Try again"
@@ -627,7 +633,7 @@ msgstr "애플 휴대 장치의 문서"
 #: ../daemon/gvfsbackendafc.c:525
 #, c-format
 msgid "%s (jailbreak)"
-msgstr "%s (탈옥)"
+msgstr "%s(탈옥)"
 
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
@@ -635,7 +641,7 @@ msgstr "%s (탈옥)"
 #: ../daemon/gvfsbackendafc.c:532 ../monitor/afc/afcvolume.c:128
 #, c-format
 msgid "Documents on %s"
-msgstr "%s의 문서"
+msgstr "문서, 위치 %s"
 
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
@@ -677,6 +683,7 @@ msgstr "지원하는 동작이 아닙니다"
 msgid "The file is not a mountable"
 msgstr "이 파일은 마운트할 수 없습니다"
 
+# 주의: 일부러 순서 바꾸지 않는다
 #. Translators: first %s is username and second serververname
 #. Translators: first %s is volumename and second servername
 #. Translators: the first %s is the username, the second the host name
@@ -693,7 +700,7 @@ msgstr "이 파일은 마운트할 수 없습니다"
 #: ../daemon/gvfsbackendsmb.c:1433
 #, c-format
 msgid "%s on %s"
-msgstr "%2$s의 %1$s"
+msgstr "%s, 위치 %s"
 
 #. Translators: %s is the servername
 #: ../daemon/gvfsbackendafpbrowse.c:465
@@ -724,7 +731,7 @@ msgstr "디렉터리를 되풀이해서 복사할 수 없습니다"
 #: ../daemon/gvfsbackendafp.c:475 ../daemon/gvfsbackendsftp.c:4257
 #: ../daemon/gvfsbackendsmb.c:2088
 msgid "Can't move directory over directory"
-msgstr "디렉터리에 디렉터리를 이동할 수 없습니다"
+msgstr "디렉터리에 디렉터리를 옮길 수 없습니다"
 
 #: ../daemon/gvfsbackendafp.c:1229 ../daemon/gvfsbackendafp.c:1328
 msgid "backups not supported"
@@ -745,16 +752,18 @@ msgstr "파일이 외부에서 수정되었습니다"
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "올바르지 않은 속성 형식(uint32여야 함)"
 
+# 주의: 일부러 순서 바꾸지 않는다
 #. Translators: first %s is volumename, second username and third servername
 #: ../daemon/gvfsbackendafp.c:2061
 #, c-format
 msgid "%s for %s on %s"
-msgstr "%3$s의 %2$s에 대한 %1$s"
+msgstr "%s, 사용자 %s, 위치 %s"
 
 #: ../daemon/gvfsbackendafp.c:2110
 msgid "No volume specified"
 msgstr "볼륨을 지정하지 않았습니다"
 
+# 주의: 일부러 순서 바꾸지 않는다
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
@@ -762,7 +771,7 @@ msgstr "볼륨을 지정하지 않았습니다"
 #: ../daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
-msgstr "%s의 /"
+msgstr "/, 위치 %s"
 
 #: ../daemon/gvfsbackendarchive.c:790 ../daemon/gvfsbackendburn.c:679
 #: ../daemon/gvfsbackendcomputer.c:728 ../daemon/gvfsbackenddnssd.c:464
@@ -901,7 +910,7 @@ msgstr "드라이브 %s에 음악 파일이 없습니다"
 #: ../daemon/gvfsbackendcdda.c:462
 #, c-format
 msgid "cdda mount on %s"
-msgstr "%s의 cdda 마운트"
+msgstr "CDDA 마운트, 위치 %s"
 
 #: ../daemon/gvfsbackendcdda.c:463 ../daemon/gvfsbackendcdda.c:984
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
@@ -998,13 +1007,14 @@ msgstr "드라이브를 중지할 수 없습니다"
 msgid "Can't poll file"
 msgstr "파일을 감시할 수 없습니다"
 
+# 주의: 일부러 순서 바꾸지 않는다
 #. Translators: This is the name of the WebDAV share constructed as
 #. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
 #. the second %s and only shown if it is not the default http(s) port.
 #: ../daemon/gvfsbackenddav.c:485
 #, c-format
 msgid "%s on %s%s"
-msgstr "%2$s%3$s의 %1$s"
+msgstr "%s, 위치 %s%s"
 
 #: ../daemon/gvfsbackenddav.c:677 ../daemon/gvfsbackenddav.c:1918
 #: ../daemon/gvfsbackendhttp.c:255
@@ -1057,7 +1067,7 @@ msgstr "요청을 만들 수 없습니다"
 #: ../daemon/gvfsbackenddav.c:2410 ../daemon/gvfsbackendsmb.c:1185
 #: ../daemon/gvfsbackendsmb.c:2116
 msgid "Backup file creation failed"
-msgstr "예비 파일을 만드는데 실패했습니다"
+msgstr "백업 파일을 만드는데 실패했습니다"
 
 #: ../daemon/gvfsbackenddnssd.c:511 ../daemon/gvfsbackendnetwork.c:462
 msgid "Local Network"
@@ -1077,11 +1087,12 @@ msgstr "DNS-SD"
 msgid "Network"
 msgstr "네트워크"
 
+# 주의: 일부러 순서 바꾸지 않는다
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendftp.c:488 ../daemon/gvfsbackendsftp.c:957
 #, c-format
 msgid "Enter password for %s on %s"
-msgstr "%2$s의 %1$s에 대한 암호를 입력하십시오"
+msgstr "%s 사용자, %s 컴퓨터의 암호를 입력하십시오"
 
 #: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:981
 #: ../daemon/gvfsbackendsmbbrowse.c:1001 ../daemon/gvfsbackendsmb.c:620
@@ -1095,7 +1106,7 @@ msgstr "권한이 없습니다"
 #: ../daemon/gvfsbackendftp.c:982 ../daemon/gvfsbackendftp.c:1336
 #: ../daemon/gvfsbackendsftp.c:3260
 msgid "backups not supported yet"
-msgstr "예비파일을 아직 지원하지 않습니다"
+msgstr "백업 파일을 아직 지원하지 않습니다"
 
 #: ../daemon/gvfsbackendgphoto2.c:507
 #, c-format
@@ -1186,7 +1197,7 @@ msgstr "카메라 초기화 중 오류"
 #: ../daemon/gvfsbackendgphoto2.c:1724
 #, c-format
 msgid "gphoto2 mount on %s"
-msgstr "%s의 gphoto2 마운트"
+msgstr "gphoto2 마운트, 위치 %s"
 
 #: ../daemon/gvfsbackendgphoto2.c:1810
 msgid "No camera specified"
@@ -1287,18 +1298,18 @@ msgstr "지원하지 않음(같은 디렉터리가 아님)"
 #: ../daemon/gvfsbackendgphoto2.c:3387
 msgid ""
 "Not supported (the source is a directory, the destination is a directory too)"
-msgstr "지원하지 않음(원본도 디렉터리이며, 대상도 역시 디렉터리)"
+msgstr "지원하지 않음(원본도 디렉터리이고 대상도 디렉터리)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3395
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
-msgstr "지원하지 않음(원본은 디렉터리, 대상은 이미 있는 파일)"
+msgstr "지원하지 않음(원본은 디렉터리이고 대상은 이미 있는 파일)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3407
 msgid ""
 "Not supported (the source is a file, but the destination is a directory)"
-msgstr "지원하지 않음(원본은 파일, 대상은 디렉터리)"
+msgstr "지원하지 않음(원본은 파일이고 대상은 디렉터리)"
 
 #: ../daemon/gvfsbackendhttp.c:251
 #, c-format
@@ -1319,7 +1330,7 @@ msgstr "원격 로그인"
 
 #: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:896
 msgid "Windows Network"
-msgstr "윈도우즈 네트워크"
+msgstr "윈도우 네트워크"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
@@ -1475,7 +1486,7 @@ msgstr "실패"
 #: ../daemon/gvfsbackendsftp.c:2732
 #, c-format
 msgid "Error creating backup file: %s"
-msgstr "예비 파일을 만드는 중 오류: %s"
+msgstr "백업 파일을 만드는 중 오류: %s"
 
 #: ../daemon/gvfsbackendsftp.c:3336
 msgid "Unable to create temporary file"
@@ -1492,7 +1503,7 @@ msgstr "%s에 연결하려면 암호가 필요합니다"
 #: ../daemon/gvfsbackendsmbbrowse.c:905
 #, c-format
 msgid "Windows shares on %s"
-msgstr "윈도우즈 공유, %s"
+msgstr "윈도우 공유, 위치 %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmbbrowse.c:1007
@@ -1505,7 +1516,7 @@ msgstr "일반 파일이 아닙니다"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1513
 msgid "Windows Network File System Service"
-msgstr "윈도우즈 네트워크 파일 시스템 서비스"
+msgstr "윈도우 네트워크 파일 시스템 서비스"
 
 #. translators: First %s is a share name, second is a server name
 #: ../daemon/gvfsbackendsmb.c:238
@@ -1516,12 +1527,12 @@ msgstr "%2$s의 %1$s에 연결하려면 암호가 필요합니다"
 #: ../daemon/gvfsbackendsmb.c:494 ../daemon/gvfsbackendsmb.c:540
 #, c-format
 msgid "Internal Error (%s)"
-msgstr "내부 오류 (%s)"
+msgstr "내부 오류(%s)"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:625
 msgid "Failed to mount Windows share"
-msgstr "윈도우즈 공유를 마운트 하는데 실패했습니다"
+msgstr "윈도우 공유를 마운트 하는데 실패했습니다"
 
 #: ../daemon/gvfsbackendsmb.c:789 ../daemon/gvfsbackendsmb.c:1285
 msgid "Unsupported seek type"
@@ -1530,7 +1541,7 @@ msgstr "지원하지 않는 찾기 형식"
 #: ../daemon/gvfsbackendsmb.c:1377
 #, c-format
 msgid "Backup file creation failed: %s"
-msgstr "예비 파일을 만드는데 실패했습니다: %s"
+msgstr "백업 파일을 만드는데 실패했습니다: %s"
 
 #: ../daemon/gvfsbackendsmb.c:1751
 msgid "Invalid attribute type (uint64 expected)"
@@ -1552,11 +1563,11 @@ msgstr "대상 파일을 제거하는 중 오류: %s"
 
 #: ../daemon/gvfsbackendsmb.c:2160
 msgid "Can't recursively move directory"
-msgstr "디렉터리를 되풀이해서 이동할 수 없습니다"
+msgstr "디렉터리를 되풀이해서 옮길 수 없습니다"
 
 #: ../daemon/gvfsbackendsmb.c:2204
 msgid "Windows Shares File System Service"
-msgstr "윈도우즈 공유 파일 시스템 서비스"
+msgstr "윈도우 공유 파일 시스템 서비스"
 
 #: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
 msgid "The trash folder may not be deleted"
@@ -1585,8 +1596,7 @@ msgstr "잘못된 응답"
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
-msgstr ""
-"FTP 연결을 만드는데 실패했습니다. 아마도 라우터가 지원하지 않는 것 같습니다?"
+msgstr "데이터 연결을 열 수 없습니다. 방화벽이 연결을 방해하는 것 같습니다."
 
 #: ../daemon/gvfsftpconnection.c:399
 msgid "Failed to create active FTP connection."
@@ -1739,11 +1749,11 @@ msgstr "메타데이터 키 설정을 해제할 수 없습니다"
 
 #: ../metadata/meta-daemon.c:347
 msgid "Unable to remove metadata keys"
-msgstr "메타데이터 키를 지울 수 없습니다"
+msgstr "메타데이터 키를 제거할 수 없습니다"
 
 #: ../metadata/meta-daemon.c:384
 msgid "Unable to move metadata keys"
-msgstr "메타데이터 키를 이동할 수 없습니다"
+msgstr "메타데이터 키를 옮길 수 없습니다"
 
 #: ../metadata/meta-daemon.c:455
 msgid "GVFS Metadata Daemon"
@@ -2160,6 +2170,7 @@ msgstr "그래도 꺼내기"
 msgid "Timed out running command-line `%s'"
 msgstr "`%s' 명령줄 실행하는 중 시간 초과"
 
+# 주의: 문자 그대로 "플러그"로 해석하지 마시오. 모든 종류의 저장 장치에 사용됨.
 #: ../monitor/udisks2/gvfsudisks2utils.c:660
 #, c-format
 msgid ""
@@ -2167,12 +2178,13 @@ msgid ""
 "Don't unplug until finished"
 msgstr ""
 "%s에 데이터 기록중입니다\n"
-"끝날때까지 플러그를 뽑지 마십시오"
+"끝날때까지 연결을 끊지 마십시오"
 
+# 주의: 문자 그대로 "플러그"로 해석하지 마시오. 모든 종류의 저장 장치에 사용됨.
 #: ../monitor/udisks2/gvfsudisks2utils.c:805
 #, c-format
 msgid "You can now unplug %s\n"
-msgstr "이제 %s의 플러그를 뽑으셔도 됩니다\n"
+msgstr "이제 %s의 연결을 끊어도 됩니다\n"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2180,7 +2192,7 @@ msgstr "이제 %s의 플러그를 뽑으셔도 됩니다\n"
 #: ../monitor/udisks2/gvfsudisks2volume.c:254
 #, c-format
 msgid "%s Encrypted"
-msgstr "%s 암호화함"
+msgstr "%s 암호화 볼륨"
 
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2188,7 +2200,7 @@ msgstr "%s 암호화함"
 #: ../monitor/udisks2/gvfsudisks2volume.c:267
 #, c-format
 msgid "%s Volume"
-msgstr "볼륨 %s"
+msgstr "%s 볼륨"
 
 #. Translators: Name used for volume
 #: ../monitor/udisks2/gvfsudisks2volume.c:444
@@ -2212,7 +2224,7 @@ msgstr "잠금 해제한 장치에 인식할 수 있는 파일 시스템이 없�
 #: ../monitor/udisks2/gvfsudisks2volume.c:1137
 #, c-format
 msgid "Encryption passphrase for %s"
-msgstr "%s에 대한 암호문 암호화"
+msgstr "%s에 대한 암호화 암호문"
 
 #: ../monitor/udisks2/gvfsudisks2volume.c:1305
 msgid "A passphrase is required to access the volume"
@@ -2242,7 +2254,7 @@ msgstr "%s (%s)"
 
 #: ../monitor/udisks2/udisks2volumemonitordaemon.c:40
 msgid "GVfs UDisks2 Volume Monitor"
-msgstr "GVfs UDisks2 볼륨 감시자"
+msgstr "GVfs UDisks2 볼륨 보기"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -2353,7 +2365,7 @@ msgstr "진행"
 
 #: ../programs/gvfs-copy.c:121 ../programs/gvfs-move.c:109
 msgid "SOURCE"
-msgstr "<목적>"
+msgstr "<원본>"
 
 #: ../programs/gvfs-copy.c:121 ../programs/gvfs-move.c:109
 #: ../programs/gvfs-save.c:165
@@ -2388,13 +2400,15 @@ msgstr "'%s'을(를) 덮어 쓰시겠습니까?"
 msgid "Error copying file %s: %s\n"
 msgstr "%s 파일을 복사하는 중 오류: %s\n"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-info.c:37
 msgid "List writable attributes"
 msgstr "쓰기 가능 속성을 열거합니다"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-info.c:38
 msgid "Get file system info"
-msgstr "파일 시스템 정보 가져오기"
+msgstr "파일 시스템 정보를 가져옵니다"
 
 #: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
 msgid "The attributes to get"
@@ -2404,10 +2418,11 @@ msgstr "가져올 속성"
 msgid "ATTRIBUTES"
 msgstr "<속성>"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
 #: ../programs/gvfs-set-attribute.c:37
 msgid "Don't follow symbolic links"
-msgstr "심볼릭 링크를 따라가지 않음"
+msgstr "심볼릭 링크를 따라가지 않습니다"
 
 #: ../programs/gvfs-info.c:50
 msgid "invalid type"
@@ -2439,7 +2454,7 @@ msgstr "줄임"
 
 #: ../programs/gvfs-info.c:71
 msgid "mountable"
-msgstr "마운트 가능"
+msgstr "마운트 정보"
 
 #: ../programs/gvfs-info.c:109
 #, c-format
@@ -2484,7 +2499,7 @@ msgstr "파일 복사"
 
 #: ../programs/gvfs-info.c:274
 msgid "Keep with file when moved"
-msgstr "이동할 때 파일 유지"
+msgstr "옮길 때 파일 유지"
 
 #: ../programs/gvfs-info.c:311
 #, c-format
@@ -2499,7 +2514,7 @@ msgstr "설정 가능한 속성:\n"
 #: ../programs/gvfs-info.c:339
 #, c-format
 msgid "Writable attribute namespaces:\n"
-msgstr "쓰기 가능한 속성 이름 공간:\n"
+msgstr "쓰기 가능 속성 네임스페이스:\n"
 
 #: ../programs/gvfs-info.c:375 ../programs/gvfs-ls.c:397
 #: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-monitor-dir.c:112
@@ -2519,7 +2534,7 @@ msgstr "숨김 파일 표시"
 
 #: ../programs/gvfs-ls.c:41
 msgid "Use a long listing format"
-msgstr "자세한 형식을 사용합니다"
+msgstr "자세한 형식으로 열거합니다"
 
 #: ../programs/gvfs-ls.c:42
 msgid "Show completions"
@@ -2553,11 +2568,11 @@ msgstr ""
 
 #: ../programs/gvfs-mime.c:36
 msgid "Query handler for mime-type"
-msgstr "mime 형식에 대한 핸들러 요청"
+msgstr "MIME 형식에 대한 핸들러를 물어봅니다"
 
 #: ../programs/gvfs-mime.c:37
 msgid "Set handler for mime-type"
-msgstr "mime 형식에 대한 핸들러 설정"
+msgstr "MIME 형식에 대해 핸들러를 설정합니다"
 
 #: ../programs/gvfs-mime.c:82
 msgid "MIMETYPE"
@@ -2569,7 +2584,7 @@ msgstr "<핸들러>"
 
 #: ../programs/gvfs-mime.c:83
 msgid "Get or set the handler for a mime-type."
-msgstr "mime 형식에 대해 핸들러를 가져오거나 설정합니다."
+msgstr "MIME 형식에 대해 핸들러를 가져오거나 설정합니다."
 
 #: ../programs/gvfs-mime.c:95
 msgid "Specify either --query or --set"
@@ -2625,9 +2640,10 @@ msgstr "'%s' 핸들러에 대한 정보를 불러오는데 실패했습니다\n"
 msgid "Failed to set '%s' as the default handler for '%s': %s\n"
 msgstr "'%s'의 기본값 핸들러를 '%s'(으)로 설정하는데 실패했습니다: %s\n"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-mkdir.c:33
 msgid "Create parent directories"
-msgstr "상위 디렉터리 만들기"
+msgstr "상위 디렉터리를 만듭니다"
 
 #: ../programs/gvfs-mkdir.c:58
 msgid "Create directories."
@@ -2638,9 +2654,10 @@ msgstr "디렉터리를 만듭니다."
 msgid "Error creating directory: %s\n"
 msgstr "디렉터리를 만드는 중 오류: %s\n"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
 msgid "Don't send single MOVED events"
-msgstr "단일 이동 이벤트를 전송하지 않음"
+msgstr "MOVED 이벤트 1개를 보내지 않습니다."
 
 #: ../programs/gvfs-monitor-dir.c:113
 msgid "Monitor directories for changes."
@@ -2650,13 +2667,15 @@ msgstr "바뀌는 디렉터리를 감시합니다."
 msgid "Monitor files for changes."
 msgstr "바뀌는 파일을 감시합니다."
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-mount.c:57
 msgid "Mount as mountable"
-msgstr "마운트 가능하게 마운트"
+msgstr "마운트 정보 파일을 마운트합니다"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-mount.c:58
 msgid "Mount volume with device file"
-msgstr "장치 파일로 볼륨을 마운트"
+msgstr "장치 파일로 볼륨을 마운트합니다"
 
 #: ../programs/gvfs-mount.c:58
 msgid "DEVICE"
@@ -2670,9 +2689,10 @@ msgstr "마운트 해제"
 msgid "Eject"
 msgstr "꺼내기"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-mount.c:61
 msgid "Unmount all mounts with the given scheme"
-msgstr "주어진 방식에 따라 마운트한 사항을 마운트 해제"
+msgstr "주어진 방식으로 마운트한 사항을 모두 해제합니다"
 
 #: ../programs/gvfs-mount.c:61
 msgid "SCHEME"
@@ -2683,13 +2703,15 @@ msgstr "<스킴>"
 msgid "List"
 msgstr "목록"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-mount.c:64
 msgid "Monitor events"
-msgstr "이벤트 정보 보기"
+msgstr "이벤트 정보를 봅니다"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-mount.c:65
 msgid "Show extra information"
-msgstr "추가 정보 보이기"
+msgstr "추가 정보를 표시합니다"
 
 #: ../programs/gvfs-mount.c:169 ../programs/gvfs-mount.c:193
 #, c-format
@@ -2747,8 +2769,8 @@ msgid ""
 "Open files with the default application that\n"
 "is registered to handle files of this type."
 msgstr ""
-"이 형식의 파일을 처리하도록 등록한 기본\n"
-"프로그램으로 파일을 엽니다."
+"기본 프로그램을 이용해 파일을 엽니다. 이 파일과 같은 종류의 파일을\n"
+"처리하도록 등록된 파일을 이용합니다."
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -2761,6 +2783,7 @@ msgstr "%s: %s: 위치 열기 오류: %s\n"
 msgid "NEW-NAME"
 msgstr "<새 이름>"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-rename.c:65
 msgid "Rename a file."
 msgstr "파일의 이름을 바꿉니다."
@@ -2770,31 +2793,38 @@ msgstr "파일의 이름을 바꿉니다."
 msgid "Rename successful. New uri: %s\n"
 msgstr "이름 바꾸기 성공. 새 URI: %s\n"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-rm.c:34 ../programs/gvfs-trash.c:34
 msgid "Ignore nonexistent files, never prompt"
 msgstr "없는 파일을 무시하고 물어보지 않음"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-rm.c:59
 msgid "Delete the given files."
 msgstr "주어진 파일을 삭제합니다."
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-save.c:44
 msgid "Only create if not existing"
 msgstr "없을 경우에만 새로 만듭니다"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-save.c:45
 msgid "Append to end of file"
 msgstr "파일 뒤에 덧붙입니다"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-save.c:46
 msgid "When creating, restrict access to the current user"
-msgstr "파일을 만들 때 현재 사용자만 접근할 수 있도록 제한"
+msgstr "파일을 만들 때 현재 사용자만 접근할 수 있도록 제한합니다"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #. Translators: The "etag" is a token allowing to verify whether a file has been modified
 #: ../programs/gvfs-save.c:48
 msgid "Print new etag at end"
 msgstr "끝에 새 etag를 표시합니다"
 
+# 커맨드라인 옵션 설명: 문장으로 번역한다
 #. Translators: The "etag" is a token allowing to verify whether a file has been modified
 #: ../programs/gvfs-save.c:50
 msgid "The etag of the file being overwritten"
@@ -2881,7 +2911,7 @@ msgstr "파일을 휴지통에 버리는 중 오류: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symbolic links, mounts and shortcuts"
-msgstr "심볼릭 링크, 마운트, 바로 가기를 따라감"
+msgstr "심볼릭 링크, 마운트, 바로 가기를 따라갑니다"
 
 #: ../programs/gvfs-tree.c:249
 msgid "List contents of directories in a tree-like format."
