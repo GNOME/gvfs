@@ -98,13 +98,12 @@ class GvfsTestCase(unittest.TestCase):
         assert in_testbed, 'root_command() only works under gvfs-testbed'
 
         rootsh = subprocess.Popen(['./rootsh'], stdin=subprocess.PIPE,
-                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                  universal_newlines=True)
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # set reasonable path that includes /sbin
-        rootsh.stdin.write('export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n')
+        rootsh.stdin.write(b'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n')
 
         (out, err) = rootsh.communicate(command.encode('UTF-8'))
-        return (rootsh.returncode, out, err)
+        return (rootsh.returncode, out.decode('UTF-8'), err.decode('UTF-8'))
 
     @classmethod
     def root_command_success(klass, command):
