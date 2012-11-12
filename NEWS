@@ -1,3 +1,12 @@
+Major changes in 1.14.2
+=======================
+* proxy volume monitor: Don't emit connected/added signals at object creation
+* proxy volume monitor: Don't disable exit_on_close on session bus
+* proxy volume monitor: Don't force-close the session bus
+* gdaemonmount: Check for a NULL GMountOperation when unmounting
+* smb: Find libsmbclient with samba 4
+* Translation updates
+
 Major changes in 1.14.1
 =======================
 * client: Don't disable exit_on_close on session bus
