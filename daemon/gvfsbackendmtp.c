@@ -829,7 +829,9 @@ do_query_info (GVfsBackend *backend,
     }
   } else {
     LIBMTP_file_t *file = NULL;
-    if (strtol (elements[ne-1], NULL, 10) == 0) {
+    char *endptr;
+    if (strtol (elements[ne-1], &endptr, 10) == 0 ||
+        *endptr != '\0') {
       DEBUG ("(II) try get files and folders");
       int parent_id = -1;
       if (ne > 3) {
