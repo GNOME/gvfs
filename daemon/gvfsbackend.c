@@ -527,7 +527,7 @@ get_thumbnail_attributes (const char *uri,
   g_checksum_free (checksum);
 
   filename = g_build_filename (g_get_user_cache_dir (),
-                               "thumbnails", "normal", basename,
+                               "thumbnails", "large", basename,
                                NULL);
 
   if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
@@ -536,13 +536,23 @@ get_thumbnail_attributes (const char *uri,
     {
       g_free (filename);
       filename = g_build_filename (g_get_user_cache_dir (),
-                                   "thumbnails", "fail",
-                                   "gnome-thumbnail-factory",
-                                   basename,
+                                   "thumbnails", "normal", basename,
                                    NULL);
-      
+
       if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
-	g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_THUMBNAILING_FAILED, TRUE);
+        g_file_info_set_attribute_byte_string (info, G_FILE_ATTRIBUTE_THUMBNAIL_PATH, filename);
+      else
+        {
+          g_free (filename);
+          filename = g_build_filename (g_get_user_cache_dir (),
+                                       "thumbnails", "fail",
+                                       "gnome-thumbnail-factory",
+                                       basename,
+                                       NULL);
+
+          if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
+            g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_THUMBNAILING_FAILED, TRUE);
+        }
     }
   g_free (basename);
   g_free (filename);
