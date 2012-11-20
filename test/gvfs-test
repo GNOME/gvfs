@@ -140,13 +140,13 @@ class GvfsTestCase(unittest.TestCase):
         empty_timeout = 50
         while True:
             r = popen.stdout.read(1000)
-            if not r:
-                empty_timeout -= 1
-                self.assertGreater(empty_timeout, 0,
-                                   'timed out waiting for auth prompt')
-
-            if b'User' in r or b'Domain' in r:
+            #print('  wait_for_gvfs_mount_user_prompt: got "%s"' % str(r))
+            if r and (b'User' in r or b'Domain' in r):
                 break
+
+            self.assertGreater(empty_timeout, 0,
+                               'timed out waiting for auth prompt')
+            empty_timeout -= 1
             time.sleep(0.1)
 
 class Programs(GvfsTestCase):
