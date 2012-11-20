@@ -52,6 +52,7 @@ struct _GVfsUDisks2Drive
   UDisksDrive *udisks_drive;
 
   GIcon *icon;
+  GIcon *symbolic_icon;
   gchar *name;
   gchar *sort_key;
   gchar *device_file;
@@ -88,8 +89,8 @@ gvfs_udisks2_drive_finalize (GObject *object)
       g_object_unref (drive->udisks_drive);
     }
 
-  if (drive->icon != NULL)
-    g_object_unref (drive->icon);
+  g_clear_object (&drive->icon);
+  g_clear_object (&drive->symbolic_icon);
   g_free (drive->name);
   g_free (drive->sort_key);
   g_free (drive->device_file);
@@ -118,11 +119,23 @@ emit_changed (GVfsUDisks2Drive *drive)
   g_signal_emit_by_name (drive->monitor, "drive-changed", drive);
 }
 
+
+static gpointer
+_g_object_ref0 (gpointer object)
+{
+  if (object != NULL)
+    return g_object_ref (G_OBJECT (object));
+  else
+    return NULL;
+}
+
 static gboolean
 update_drive (GVfsUDisks2Drive *drive)
 {
+  UDisksClient *udisks_client;
   gboolean changed;
   GIcon *old_icon;
+  GIcon *old_symbolic_icon;
   gchar *old_name;
   gchar *old_sort_key;
   gchar *old_device_file;
@@ -131,6 +144,11 @@ update_drive (GVfsUDisks2Drive *drive)
   gboolean old_has_media;
   gboolean old_can_eject;
   UDisksBlock *block;
+#if UDISKS_CHECK_VERSION(2,0,90)
+  UDisksObjectInfo *info = NULL;
+#endif
+
+  udisks_client = gvfs_udisks2_volume_monitor_get_udisks_client (drive->monitor);
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* save old values */
@@ -144,6 +162,7 @@ update_drive (GVfsUDisks2Drive *drive)
   old_device_file = g_strdup (drive->device_file);
   old_dev = drive->dev;
   old_icon = drive->icon != NULL ? g_object_ref (drive->icon) : NULL;
+  old_symbolic_icon = drive->symbolic_icon != NULL ? g_object_ref (drive->symbolic_icon) : NULL;
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* reset */
@@ -154,11 +173,12 @@ update_drive (GVfsUDisks2Drive *drive)
   g_free (drive->device_file); drive->device_file = NULL;
   drive->dev = 0;
   g_clear_object (&drive->icon);
+  g_clear_object (&drive->symbolic_icon);
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* in with the new */
 
-  block = udisks_client_get_block_for_drive (gvfs_udisks2_volume_monitor_get_udisks_client (drive->monitor),
+  block = udisks_client_get_block_for_drive (udisks_client,
                                              drive->udisks_drive,
                                              FALSE);
   if (block != NULL)
@@ -182,14 +202,29 @@ update_drive (GVfsUDisks2Drive *drive)
     }
   drive->can_eject = udisks_drive_get_ejectable (drive->udisks_drive);
 
-  udisks_client_get_drive_info (gvfs_udisks2_volume_monitor_get_udisks_client (drive->monitor),
+#if UDISKS_CHECK_VERSION(2,0,90)
+  {
+    UDisksObject *object = (UDisksObject *) g_dbus_interface_get_object (G_DBUS_INTERFACE (drive->udisks_drive));
+    if (object != NULL)
+      {
+        info = udisks_client_get_object_info (udisks_client, object);
+        if (info != NULL)
+          {
+            drive->name = g_strdup (udisks_object_info_get_name (info));
+            drive->icon = _g_object_ref0 (udisks_object_info_get_icon (info));
+            drive->symbolic_icon = _g_object_ref0 (udisks_object_info_get_icon_symbolic (info));
+          }
+      }
+  }
+#else
+  udisks_client_get_drive_info (udisks_client,
                                 drive->udisks_drive,
                                 NULL,         /* drive_name */
                                 &drive->name,
                                 &drive->icon,
                                 NULL,         /* media_desc */
                                 NULL);        /* media_icon */
-
+#endif
   /* ---------------------------------------------------------------------------------------------------- */
   /* fallbacks */
 
@@ -203,6 +238,8 @@ update_drive (GVfsUDisks2Drive *drive)
     }
   if (drive->icon == NULL)
     drive->icon = g_themed_icon_new ("drive-removable-media");
+  if (drive->symbolic_icon == NULL)
+    drive->symbolic_icon = g_themed_icon_new ("drive-removable-media-symbolic");
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* compute whether something changed */
@@ -213,17 +250,22 @@ update_drive (GVfsUDisks2Drive *drive)
               (g_strcmp0 (old_sort_key, drive->sort_key) == 0) &&
               (g_strcmp0 (old_device_file, drive->device_file) == 0) &&
               (old_dev == drive->dev) &&
-              g_icon_equal (old_icon, drive->icon)
+              g_icon_equal (old_icon, drive->icon) &&
+              g_icon_equal (old_symbolic_icon, drive->symbolic_icon)
               );
 
   /* free old values */
   g_free (old_name);
   g_free (old_sort_key);
   g_free (old_device_file);
-  if (old_icon != NULL)
-    g_object_unref (old_icon);
+  g_clear_object (&old_icon);
+  g_clear_object (&old_symbolic_icon);
 
   /*g_debug ("in update_drive(); has_media=%d changed=%d", drive->has_media, changed);*/
+
+#if UDISKS_CHECK_VERSION(2,0,90)
+  g_clear_object (&info);
+#endif
 
   return changed;
 }
@@ -302,6 +344,13 @@ gvfs_udisks2_drive_get_icon (GDrive *_drive)
 {
   GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
   return drive->icon != NULL ? g_object_ref (drive->icon) : NULL;
+}
+
+static GIcon *
+gvfs_udisks2_drive_get_symbolic_icon (GDrive *_drive)
+{
+  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+  return drive->symbolic_icon != NULL ? g_object_ref (drive->symbolic_icon) : NULL;
 }
 
 static char *
@@ -718,6 +767,7 @@ gvfs_udisks2_drive_drive_iface_init (GDriveIface *iface)
 {
   iface->get_name = gvfs_udisks2_drive_get_name;
   iface->get_icon = gvfs_udisks2_drive_get_icon;
+  iface->get_symbolic_icon = gvfs_udisks2_drive_get_symbolic_icon;
   iface->has_volumes = gvfs_udisks2_drive_has_volumes;
   iface->get_volumes = gvfs_udisks2_drive_get_volumes;
   iface->is_media_removable = gvfs_udisks2_drive_is_media_removable;

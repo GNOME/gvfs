@@ -69,6 +69,7 @@ struct _GVfsUDisks2Volume
 
   /* set in update_volume() */
   GIcon *icon;
+  GIcon *symbolic_icon;
   GFile *activation_root;
   gchar *name;
   gchar *sort_key;
@@ -125,10 +126,9 @@ gvfs_udisks2_volume_finalize (GObject *object)
   if (volume->mount_point != NULL)
     g_unix_mount_point_free (volume->mount_point);
 
-  if (volume->icon != NULL)
-    g_object_unref (volume->icon);
-  if (volume->activation_root != NULL)
-    g_object_unref (volume->activation_root);
+  g_clear_object (&volume->icon);
+  g_clear_object (&volume->symbolic_icon);
+  g_clear_object (&volume->activation_root);
 
   g_free (volume->name);
   g_free (volume->sort_key);
@@ -181,9 +181,20 @@ apply_options_from_fstab (GVfsUDisks2Volume *volume,
     }
 }
 
+
+static gpointer
+_g_object_ref0 (gpointer object)
+{
+  if (object != NULL)
+    return g_object_ref (G_OBJECT (object));
+  else
+    return NULL;
+}
+
 static gboolean
 update_volume (GVfsUDisks2Volume *volume)
 {
+  UDisksClient *udisks_client;
   gboolean changed;
   gboolean old_can_mount;
   gboolean old_should_automount;
@@ -191,8 +202,11 @@ update_volume (GVfsUDisks2Volume *volume)
   gchar *old_device_file;
   dev_t old_dev;
   GIcon *old_icon;
+  GIcon *old_symbolic_icon;
   UDisksDrive *udisks_drive;
   gchar *s;
+
+  udisks_client = gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor);
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* save old values */
@@ -203,6 +217,7 @@ update_volume (GVfsUDisks2Volume *volume)
   old_device_file = g_strdup (volume->device_file);
   old_dev = volume->dev;
   old_icon = volume->icon != NULL ? g_object_ref (volume->icon) : NULL;
+  old_symbolic_icon = volume->symbolic_icon != NULL ? g_object_ref (volume->symbolic_icon) : NULL;
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* reset */
@@ -212,6 +227,7 @@ update_volume (GVfsUDisks2Volume *volume)
   g_free (volume->device_file); volume->device_file = NULL;
   volume->dev = 0;
   g_clear_object (&volume->icon);
+  g_clear_object (&volume->symbolic_icon);
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* in with the new */
@@ -226,12 +242,11 @@ update_volume (GVfsUDisks2Volume *volume)
       GVariant *configuration_value;
       UDisksLoop *loop = NULL;
 
-      loop = udisks_client_get_loop_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+      loop = udisks_client_get_loop_for_block (udisks_client,
                                                volume->block);
 
       /* If unlocked, use the values from the unlocked block device for presentation */
-      cleartext_block = udisks_client_get_cleartext_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
-                                                           volume->block);
+      cleartext_block = udisks_client_get_cleartext_block (udisks_client, volume->block);
       if (cleartext_block != NULL)
         block = cleartext_block;
       else
@@ -246,8 +261,7 @@ update_volume (GVfsUDisks2Volume *volume)
         }
       else if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_LUKS") == 0)
         {
-          s = udisks_client_get_size_for_display (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
-                                                  udisks_block_get_size (volume->block), FALSE, FALSE);
+          s = udisks_client_get_size_for_display (udisks_client, udisks_block_get_size (volume->block), FALSE, FALSE);
           /* Translators: This is used for encrypted volumes.
            *              The first %s is the formatted size (e.g. "42.0 MB").
            */
@@ -259,8 +273,7 @@ update_volume (GVfsUDisks2Volume *volume)
           guint64 size = udisks_block_get_size (block);
           if (size > 0)
             {
-              s = udisks_client_get_size_for_display (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
-                                                      size, FALSE, FALSE);
+              s = udisks_client_get_size_for_display (udisks_client, size, FALSE, FALSE);
               /* Translators: This is used for volume with no filesystem label.
                *              The first %s is the formatted size (e.g. "42.0 MB").
                */
@@ -269,22 +282,44 @@ update_volume (GVfsUDisks2Volume *volume)
             }
         }
 
-      udisks_drive = udisks_client_get_drive_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
-                                                        volume->block);
+      udisks_drive = udisks_client_get_drive_for_block (udisks_client, volume->block);
       if (udisks_drive != NULL)
         {
           gchar *drive_desc;
           GIcon *drive_icon;
+          GIcon *drive_symbolic_icon;
           gchar *media_desc;
           GIcon *media_icon;
+          GIcon *media_symbolic_icon;
 
-          udisks_client_get_drive_info (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+#if UDISKS_CHECK_VERSION(2,0,90)
+          {
+            UDisksObject *object = (UDisksObject *) g_dbus_interface_get_object (G_DBUS_INTERFACE (udisks_drive));
+            if (object != NULL)
+              {
+                UDisksObjectInfo *info = udisks_client_get_object_info (udisks_client, object);
+                if (info != NULL)
+                  {
+                    drive_desc = g_strdup (udisks_object_info_get_description (info));
+                    drive_icon = _g_object_ref0 (udisks_object_info_get_icon (info));
+                    drive_symbolic_icon = _g_object_ref0 (udisks_object_info_get_icon_symbolic (info));
+                    media_desc = g_strdup (udisks_object_info_get_media_description (info));
+                    media_icon = _g_object_ref0 (udisks_object_info_get_media_icon (info));
+                    media_symbolic_icon = _g_object_ref0 (udisks_object_info_get_media_icon_symbolic (info));
+                    g_object_unref (info);
+                  }
+              }
+          }
+#else
+          udisks_client_get_drive_info (udisks_client,
                                         udisks_drive,
                                         NULL, /* drive_name */
                                         &drive_desc,
                                         &drive_icon,
                                         &media_desc,
                                         &media_icon);
+#endif
+
           if (media_desc == NULL)
             {
               media_desc = drive_desc;
@@ -294,6 +329,11 @@ update_volume (GVfsUDisks2Volume *volume)
             {
               media_icon = drive_icon;
               drive_icon = NULL;
+            }
+          if (media_symbolic_icon == NULL)
+            {
+              media_symbolic_icon = drive_symbolic_icon;
+              drive_symbolic_icon = NULL;
             }
 
           /* Override name for blank and audio discs */
@@ -309,6 +349,7 @@ update_volume (GVfsUDisks2Volume *volume)
             }
 
           volume->icon = media_icon != NULL ? g_object_ref (media_icon) : NULL;
+          volume->symbolic_icon = media_symbolic_icon != NULL ? g_object_ref (media_symbolic_icon) : NULL;
 
           /* use media_desc if we haven't figured out a name yet (applies to e.g.
            * /dev/fd0 since its size is 0)
@@ -320,8 +361,8 @@ update_volume (GVfsUDisks2Volume *volume)
             }
 
           g_free (media_desc);
-          if (media_icon != NULL)
-            g_object_unref (media_icon);
+          g_clear_object (&media_icon);
+          g_clear_object (&media_symbolic_icon);
 
           /* Only automount drives attached to the same seat as we're running on
            */
@@ -445,6 +486,8 @@ update_volume (GVfsUDisks2Volume *volume)
     }
   if (volume->icon == NULL)
     volume->icon = g_themed_icon_new ("drive-removable-media");
+  if (volume->symbolic_icon == NULL)
+    volume->symbolic_icon = g_themed_icon_new ("folder-remote-symbolic");
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* compute whether something changed */
@@ -629,6 +672,13 @@ gvfs_udisks2_volume_get_icon (GVolume *_volume)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
   return volume->icon != NULL ? g_object_ref (volume->icon) : NULL;
+}
+
+static GIcon *
+gvfs_udisks2_volume_get_symbolic_icon (GVolume *_volume)
+{
+  GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
+  return volume->symbolic_icon != NULL ? g_object_ref (volume->symbolic_icon) : NULL;
 }
 
 static char *
@@ -1457,6 +1507,23 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
             {
               gchar *drive_name;
               gchar *drive_desc;
+
+#if UDISKS_CHECK_VERSION(2,0,90)
+              {
+                UDisksObject *object = (UDisksObject *) g_dbus_interface_get_object (G_DBUS_INTERFACE (udisks_drive));
+                if (object != NULL)
+                  {
+                    UDisksObjectInfo *info = udisks_client_get_object_info (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                                                            object);
+                    if (info != NULL)
+                      {
+                        drive_name = g_strdup (udisks_object_info_get_name (info));
+                        drive_desc = g_strdup (udisks_object_info_get_description (info));
+                        g_object_unref (info);
+                      }
+                  }
+              }
+#else
               udisks_client_get_drive_info (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
                                             udisks_drive,
                                             &drive_name,
@@ -1464,6 +1531,7 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
                                             NULL,  /* drive_icon */
                                             NULL,  /* media_desc */
                                             NULL); /* media_icon */
+#endif
               /* Translators: this is used to describe the drive the encrypted media
                * is on - the first %s is the name (such as 'WD 2500JB External'), the
                * second %s is the description ('250 GB Hard Disk').
@@ -1623,6 +1691,7 @@ gvfs_udisks2_volume_volume_iface_init (GVolumeIface *iface)
 {
   iface->get_name = gvfs_udisks2_volume_get_name;
   iface->get_icon = gvfs_udisks2_volume_get_icon;
+  iface->get_symbolic_icon = gvfs_udisks2_volume_get_symbolic_icon;
   iface->get_uuid = gvfs_udisks2_volume_get_uuid;
   iface->get_drive = gvfs_udisks2_volume_get_drive;
   iface->get_mount = gvfs_udisks2_volume_get_mount;

@@ -64,6 +64,7 @@ struct _GVfsUDisks2Mount
   /* the following members are set in update_mount() */
   GFile *root;
   GIcon *icon;
+  GIcon *symbolic_icon;
   gchar *name;
   gchar *sort_key;
   gchar *uuid;
@@ -108,10 +109,9 @@ gvfs_udisks2_mount_finalize (GObject *object)
       gvfs_udisks2_volume_unset_mount (mount->volume, mount);
     }
 
-  if (mount->root != NULL)
-    g_object_unref (mount->root);
-  if (mount->icon != NULL)
-    g_object_unref (mount->icon);
+  g_clear_object (&mount->root);
+  g_clear_object (&mount->icon);
+  g_clear_object (&mount->symbolic_icon);
   g_free (mount->name);
   g_free (mount->sort_key);
   g_free (mount->uuid);
@@ -200,15 +200,18 @@ update_mount (GVfsUDisks2Mount *mount)
   gboolean old_can_unmount;
   gchar *old_name;
   GIcon *old_icon;
+  GIcon *old_symbolic_icon;
 
   /* save old values */
   old_can_unmount = mount->can_unmount;
   old_name = g_strdup (mount->name);
   old_icon = mount->icon != NULL ? g_object_ref (mount->icon) : NULL;
+  old_symbolic_icon = mount->symbolic_icon != NULL ? g_object_ref (mount->symbolic_icon) : NULL;
 
   /* reset */
   mount->can_unmount = FALSE;
   g_clear_object (&mount->icon);
+  g_clear_object (&mount->symbolic_icon);
   g_free (mount->name); mount->name = NULL;
 
   /* in with the new */
@@ -233,6 +236,8 @@ update_mount (GVfsUDisks2Mount *mount)
         mount->name = g_strdup (mount->xdg_volume_info_name);
       else
         mount->name = g_volume_get_name (G_VOLUME (mount->volume));
+
+      mount->symbolic_icon = g_volume_get_symbolic_icon (G_VOLUME (mount->volume));
     }
   else
     {
@@ -262,17 +267,20 @@ update_mount (GVfsUDisks2Mount *mount)
         mount->name = g_strdup (mount->xdg_volume_info_name);
       else
         mount->name = g_strdup (mount->mount_entry_name);
+
+      mount->symbolic_icon = g_themed_icon_new ("folder-remote-symbolic");
     }
 
   /* compute whether something changed */
   changed = !((old_can_unmount == mount->can_unmount) &&
               (g_strcmp0 (old_name, mount->name) == 0) &&
-              g_icon_equal (old_icon, mount->icon));
+              g_icon_equal (old_icon, mount->icon) &&
+              g_icon_equal (old_symbolic_icon, mount->symbolic_icon));
 
   /* free old values */
   g_free (old_name);
-  if (old_icon != NULL)
-    g_object_unref (old_icon);
+  g_clear_object (&old_icon);
+  g_clear_object (&old_symbolic_icon);
 
   /*g_debug ("in update_mount(), changed=%d", changed);*/
 
@@ -422,6 +430,13 @@ gvfs_udisks2_mount_get_icon (GMount *_mount)
 {
   GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
   return mount->icon != NULL ? g_object_ref (mount->icon) : NULL;
+}
+
+static GIcon *
+gvfs_udisks2_mount_get_symbolic_icon (GMount *_mount)
+{
+  GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
+  return mount->symbolic_icon != NULL ? g_object_ref (mount->symbolic_icon) : NULL;
 }
 
 static gchar *
@@ -1279,6 +1294,7 @@ gvfs_udisks2_mount_mount_iface_init (GMountIface *iface)
   iface->get_root = gvfs_udisks2_mount_get_root;
   iface->get_name = gvfs_udisks2_mount_get_name;
   iface->get_icon = gvfs_udisks2_mount_get_icon;
+  iface->get_symbolic_icon = gvfs_udisks2_mount_get_symbolic_icon;
   iface->get_uuid = gvfs_udisks2_mount_get_uuid;
   iface->get_drive = gvfs_udisks2_mount_get_drive;
   iface->get_volume = gvfs_udisks2_mount_get_volume_;
