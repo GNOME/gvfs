@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-11-22 13:05+0100\n"
-"PO-Revision-Date: 2012-11-22 13:05+0100\n"
+"PO-Revision-Date: 2012-11-22 13:06+0100\n"
 "Last-Translator: Wouter Bolsterlee <wbolster@gnome.org>\n"
 "Language-Team: Dutch <vertaling@vrijschrift.org>\n"
 "Language: nl\n"
@@ -172,7 +172,7 @@ msgstr "Timeout bij resolven van ‘%s’-service ‘%s’ in domein ‘%s’"
 #: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
 #, c-format
-msgid "Malformed DNS-SD encoded_triple '%s'"
+msgid "Malformed dns-sd encoded_triple '%s'"
 msgstr "Ongeldige ‘DNS-SD encoded_triple’: ‘%s’"
 
 #: ../common/gvfsicon.c:250
@@ -186,39 +186,39 @@ msgstr "Ongeldige invoergegevens voor GVfsIcon"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "FTP"
-#: ../daemon/daemon-main.c:98
+#: ../daemon/daemon-main.c:100
 #, c-format
 msgid "%s File System Service"
 msgstr "Bestandssysteemvoorziening voor %s"
 
-#: ../daemon/daemon-main.c:176 ../programs/gvfs-copy.c:90
+#: ../daemon/daemon-main.c:178 ../programs/gvfs-copy.c:90
 #: ../programs/gvfs-move.c:78 ../programs/gvfs-rename.c:36
 #: ../programs/gvfs-set-attribute.c:105
 #, c-format
 msgid "Error: %s"
 msgstr "Fout: %s"
 
-#: ../daemon/daemon-main.c:234
+#: ../daemon/daemon-main.c:236
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "Gebruik: %s --spawner dbus-id object_path"
 
-#: ../daemon/daemon-main.c:258 ../daemon/daemon-main.c:276
+#: ../daemon/daemon-main.c:260 ../daemon/daemon-main.c:278
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "Gebruik: %s key=value key=value ..."
 
-#: ../daemon/daemon-main.c:274
+#: ../daemon/daemon-main.c:276
 #, c-format
 msgid "No mount type specified"
 msgstr "Geen koppeltype opgegeven"
 
-#: ../daemon/daemon-main.c:306
+#: ../daemon/daemon-main.c:308
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "koppelpunt voor %s reeds actief"
 
-#: ../daemon/daemon-main.c:327
+#: ../daemon/daemon-main.c:329
 msgid "error starting mount daemon"
 msgstr "fout bij starten van koppelvoorziening"
 
@@ -591,7 +591,7 @@ msgstr "Opnieuw proberen"
 
 #: ../daemon/gvfsbackendafc.c:416 ../daemon/gvfsbackend.c:968
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
-#: ../monitor/udisks2/gvfsudisks2mount.c:751
+#: ../monitor/udisks2/gvfsudisks2mount.c:736
 msgid "Cancel"
 msgstr "Annuleren"
 
@@ -833,8 +833,8 @@ msgstr "Bestand bestaat al"
 #: ../daemon/gvfsjobtrash.c:107 ../daemon/gvfsjobunmountmountable.c:157
 #: ../daemon/gvfsjobunmountmountable.c:172 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1174 ../monitor/gdu/ggdumount.c:1258
-#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1123
-#: ../monitor/udisks2/gvfsudisks2volume.c:1634
+#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1108
+#: ../monitor/udisks2/gvfsudisks2volume.c:1566
 msgid "Operation not supported by backend"
 msgstr "Bewerking niet door backend ondersteund"
 
@@ -855,12 +855,12 @@ msgid "Not supported"
 msgstr "Niet ondersteund"
 
 #: ../daemon/gvfsbackend.c:967 ../monitor/gdu/ggdumount.c:922
-#: ../monitor/udisks2/gvfsudisks2mount.c:749
+#: ../monitor/udisks2/gvfsudisks2mount.c:734
 msgid "Unmount Anyway"
 msgstr "Toch ontkoppelen"
 
 #: ../daemon/gvfsbackend.c:970 ../monitor/gdu/ggdumount.c:924
-#: ../monitor/udisks2/gvfsudisks2mount.c:752
+#: ../monitor/udisks2/gvfsudisks2mount.c:737
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -908,7 +908,7 @@ msgstr "cdda-koppeling op %s"
 #: ../daemon/gvfsbackendcdda.c:463 ../daemon/gvfsbackendcdda.c:984
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:348
+#: ../monitor/udisks2/gvfsudisks2volume.c:308
 #, c-format
 msgid "Audio Disc"
 msgstr "Audio-cd"
@@ -1360,7 +1360,7 @@ msgid "Recent"
 msgstr "Recente bestanden"
 
 #: ../daemon/gvfsbackendsftp.c:299 ../daemon/gvfsbackendsftp.c:654
-msgid "SSH program unexpectedly exited"
+msgid "ssh program unexpectedly exited"
 msgstr "SSH-programma werd onverwacht afgesloten"
 
 #: ../daemon/gvfsbackendsftp.c:314
@@ -1380,12 +1380,12 @@ msgid "Host key verification failed"
 msgstr "Controle van hostsleutel mislukt"
 
 #: ../daemon/gvfsbackendsftp.c:498
-msgid "Unable to spawn SSH program"
+msgid "Unable to spawn ssh program"
 msgstr "Kon SSH-programma niet starten"
 
 #: ../daemon/gvfsbackendsftp.c:514
 #, c-format
-msgid "Unable to spawn SSH program: %s"
+msgid "Unable to spawn ssh program: %s"
 msgstr "Kon SSH-programma niet starten: %s"
 
 #: ../daemon/gvfsbackendsftp.c:616 ../daemon/gvfsbackendsftp.c:874
@@ -1445,7 +1445,7 @@ msgid "Protocol error"
 msgstr "Protocolfout"
 
 #: ../daemon/gvfsbackendsftp.c:1728
-msgid "Unable to find supported SSH command"
+msgid "Unable to find supported ssh command"
 msgstr "Kon geen ondersteund SSH-programma vinden"
 
 #: ../daemon/gvfsbackendsftp.c:2002 ../daemon/gvfsbackendsftp.c:2404
@@ -1692,39 +1692,39 @@ msgid "%s: %s"
 msgstr "%s: %s"
 
 #: ../daemon/main.c:168 ../metadata/meta-daemon.c:472
-#: ../programs/gvfs-cat.c:168 ../programs/gvfs-cat.c:180
-#: ../programs/gvfs-copy.c:131 ../programs/gvfs-info.c:387
-#: ../programs/gvfs-ls.c:414 ../programs/gvfs-mime.c:95
-#: ../programs/gvfs-mime.c:105 ../programs/gvfs-mime.c:112
-#: ../programs/gvfs-mkdir.c:69 ../programs/gvfs-monitor-dir.c:124
-#: ../programs/gvfs-monitor-file.c:123 ../programs/gvfs-mount.c:1061
-#: ../programs/gvfs-move.c:119 ../programs/gvfs-open.c:76
-#: ../programs/gvfs-open.c:88 ../programs/gvfs-rename.c:73
-#: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:176
-#: ../programs/gvfs-set-attribute.c:149 ../programs/gvfs-trash.c:69
-#: ../programs/gvfs-tree.c:260
+#: ../programs/gvfs-cat.c:170 ../programs/gvfs-cat.c:182
+#: ../programs/gvfs-copy.c:133 ../programs/gvfs-info.c:389
+#: ../programs/gvfs-ls.c:416 ../programs/gvfs-mime.c:97
+#: ../programs/gvfs-mime.c:107 ../programs/gvfs-mime.c:114
+#: ../programs/gvfs-mkdir.c:71 ../programs/gvfs-monitor-dir.c:126
+#: ../programs/gvfs-monitor-file.c:125 ../programs/gvfs-mount.c:1063
+#: ../programs/gvfs-move.c:121 ../programs/gvfs-open.c:78
+#: ../programs/gvfs-open.c:90 ../programs/gvfs-rename.c:75
+#: ../programs/gvfs-rm.c:72 ../programs/gvfs-save.c:178
+#: ../programs/gvfs-set-attribute.c:151 ../programs/gvfs-trash.c:71
+#: ../programs/gvfs-tree.c:262
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "Probeer ‘%s --help’ voor meer informatie."
 
-#: ../daemon/mount.c:702
+#: ../daemon/mount.c:693
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Auto-aankoppelen mislukt: %s"
 
-#: ../daemon/mount.c:746 ../daemon/mount.c:807
+#: ../daemon/mount.c:737 ../daemon/mount.c:798
 msgid "The specified location is not mounted"
 msgstr "De opgegeven locatie is niet aangekoppeld"
 
-#: ../daemon/mount.c:751
+#: ../daemon/mount.c:742
 msgid "The specified location is not supported"
 msgstr "De opgegeven locatie wordt niet ondersteund"
 
-#: ../daemon/mount.c:875
+#: ../daemon/mount.c:866
 msgid "Location is already mounted"
 msgstr "Locatie is reeds aangekoppeld"
 
-#: ../daemon/mount.c:884
+#: ../daemon/mount.c:875
 msgid "Location is not mountable"
 msgstr "Locatie is niet aankoppelbaar"
 
@@ -1767,16 +1767,16 @@ msgstr "GVfs-GDU-volumenmonitor"
 msgid "Floppy Drive"
 msgstr "Diskettestation"
 
-#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:235
+#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:200
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "Naamloze schrijf (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:237
+#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:202
 msgid "Unnamed Drive"
 msgstr "Naamloze schijf"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:554
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:505
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr "Kon media niet uitwerpen; een of meerdere volumina zijn bezig."
@@ -1795,7 +1795,7 @@ msgstr ""
 msgid "Start Anyway"
 msgstr "Toch starten"
 
-#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:664
+#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:649
 msgid "One or more programs are preventing the unmount operation."
 msgstr "Ontkoppelen wordt door één of meer toepassingen verhinderd"
 
@@ -2157,7 +2157,7 @@ msgstr "%s versleutelde gegevens"
 msgid "%s Media"
 msgstr "Media van %s"
 
-#: ../monitor/udisks2/gvfsudisks2mount.c:745
+#: ../monitor/udisks2/gvfsudisks2mount.c:730
 msgid "Eject Anyway"
 msgstr "Toch uitwerpen"
 
@@ -2183,7 +2183,7 @@ msgstr "%s kan nu losgekoppeld worden\n"
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:268
+#: ../monitor/udisks2/gvfsudisks2volume.c:254
 #, c-format
 msgid "%s Encrypted"
 msgstr "%s (versleuteld)"
@@ -2191,41 +2191,41 @@ msgstr "%s (versleuteld)"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:280
+#: ../monitor/udisks2/gvfsudisks2volume.c:267
 #, c-format
 msgid "%s Volume"
 msgstr "Volumen van %s"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:485
+#: ../monitor/udisks2/gvfsudisks2volume.c:444
 msgid "Volume"
 msgstr "Volumen"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1058
+#: ../monitor/udisks2/gvfsudisks2volume.c:1008
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "Fout bij het opslaan van wachtwoordzin in sleutelbos (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1093
+#: ../monitor/udisks2/gvfsudisks2volume.c:1043
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "Fout bij verwijderen ongeldige wachtwoordzin uit sleutelbos (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1158
+#: ../monitor/udisks2/gvfsudisks2volume.c:1108
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr "Het ontgrendelde apparaat bevat geen herkend bestandssysteem."
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1187
+#: ../monitor/udisks2/gvfsudisks2volume.c:1137
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Wachtwoordzin voor versleuteling voor %s"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1355
+#: ../monitor/udisks2/gvfsudisks2volume.c:1305
 msgid "A passphrase is required to access the volume"
 msgstr "Er is een wachtwoordzin benodigd om het volumen te benaderen"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1370
+#: ../monitor/udisks2/gvfsudisks2volume.c:1320
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2234,11 +2234,14 @@ msgstr ""
 "Geef een wachtwoordzin om het volumen te ontgrendelen.\n"
 "Het apparaat %s bevat vercijferde gegevens."
 
+#. drive_icon
+#. media_desc
+#. media_icon
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1539
+#: ../monitor/udisks2/gvfsudisks2volume.c:1471
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
@@ -2276,18 +2279,18 @@ msgstr "%s: %s: leesfout: %s\n"
 msgid "%s: %s:error closing: %s\n"
 msgstr "%s: %s: fout bij sluiten: %s\n"
 
-#: ../programs/gvfs-cat.c:141 ../programs/gvfs-open.c:59
-#: ../programs/gvfs-rm.c:56
+#: ../programs/gvfs-cat.c:143 ../programs/gvfs-open.c:61
+#: ../programs/gvfs-rm.c:58
 msgid "FILE"
 msgstr "BESTAND"
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-cat.c:144
+#: ../programs/gvfs-cat.c:146
 msgid "Concatenate files and print to the standard output."
 msgstr "Bestanden achter elkaar tonen op standaarduitvoer"
 
-#: ../programs/gvfs-cat.c:145
+#: ../programs/gvfs-cat.c:147
 msgid ""
 "gvfs-cat works just like the traditional cat utility, but using gvfs\n"
 "locations instead of local files: for example you can use something\n"
@@ -2297,7 +2300,7 @@ msgstr ""
 "plaats van lokale bestanden. U kunt bijvoorbeeld iets als ‘smb://server/map/"
 "naar/bestand.txt’ gebruiken als locatie."
 
-#: ../programs/gvfs-cat.c:149
+#: ../programs/gvfs-cat.c:151
 msgid ""
 "Note: just pipe through cat if you need its formatting options\n"
 "like -n, -T or other."
@@ -2305,15 +2308,15 @@ msgstr ""
 "Tip: gebruik een ‘pipe’ naar ‘cat‘ als u opmaakopties zoals ‘-n’ of ‘-T’ "
 "wilt gebruiken."
 
-#: ../programs/gvfs-cat.c:166 ../programs/gvfs-copy.c:129
-#: ../programs/gvfs-info.c:385 ../programs/gvfs-ls.c:412
-#: ../programs/gvfs-mime.c:92 ../programs/gvfs-mkdir.c:67
-#: ../programs/gvfs-monitor-dir.c:122 ../programs/gvfs-monitor-file.c:121
-#: ../programs/gvfs-mount.c:1059 ../programs/gvfs-move.c:117
-#: ../programs/gvfs-open.c:74 ../programs/gvfs-rename.c:71
-#: ../programs/gvfs-rm.c:68 ../programs/gvfs-save.c:174
-#: ../programs/gvfs-set-attribute.c:147 ../programs/gvfs-trash.c:67
-#: ../programs/gvfs-tree.c:258
+#: ../programs/gvfs-cat.c:168 ../programs/gvfs-copy.c:131
+#: ../programs/gvfs-info.c:387 ../programs/gvfs-ls.c:414
+#: ../programs/gvfs-mime.c:94 ../programs/gvfs-mkdir.c:69
+#: ../programs/gvfs-monitor-dir.c:124 ../programs/gvfs-monitor-file.c:123
+#: ../programs/gvfs-mount.c:1061 ../programs/gvfs-move.c:119
+#: ../programs/gvfs-open.c:76 ../programs/gvfs-rename.c:73
+#: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:176
+#: ../programs/gvfs-set-attribute.c:149 ../programs/gvfs-trash.c:69
+#: ../programs/gvfs-tree.c:260
 #, c-format
 msgid "Error parsing commandline options: %s\n"
 msgstr "Fout bij verwerken opdrachtregelopties: %s\n"
@@ -2321,7 +2324,7 @@ msgstr "Fout bij verwerken opdrachtregelopties: %s\n"
 # Vrij vertaald (Wouter Bolsterlee)
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:178 ../programs/gvfs-open.c:86
+#: ../programs/gvfs-cat.c:180 ../programs/gvfs-open.c:88
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: locatie ontbreekt"
@@ -2356,39 +2359,39 @@ msgstr "Nooit symbolische verwijzingen volgen"
 msgid "progress"
 msgstr "voortgang"
 
-#: ../programs/gvfs-copy.c:119 ../programs/gvfs-move.c:107
+#: ../programs/gvfs-copy.c:121 ../programs/gvfs-move.c:109
 msgid "SOURCE"
 msgstr "BRON"
 
-#: ../programs/gvfs-copy.c:119 ../programs/gvfs-move.c:107
-#: ../programs/gvfs-save.c:163
+#: ../programs/gvfs-copy.c:121 ../programs/gvfs-move.c:109
+#: ../programs/gvfs-save.c:165
 msgid "DEST"
 msgstr "DOEL"
 
-#: ../programs/gvfs-copy.c:120
+#: ../programs/gvfs-copy.c:122
 msgid "Copy one or more files from SOURCE to DEST."
 msgstr "Een of meer bestanden van BRON naar DOEL kopiëren"
 
-#: ../programs/gvfs-copy.c:139 ../programs/gvfs-move.c:127
-#: ../programs/gvfs-rename.c:81
+#: ../programs/gvfs-copy.c:141 ../programs/gvfs-move.c:129
+#: ../programs/gvfs-rename.c:83
 msgid "Missing operand\n"
 msgstr "Ontbrekende operand\n"
 
-#: ../programs/gvfs-copy.c:147 ../programs/gvfs-move.c:135
+#: ../programs/gvfs-copy.c:149 ../programs/gvfs-move.c:137
 msgid "Too many arguments\n"
 msgstr "Te veel parameters\n"
 
-#: ../programs/gvfs-copy.c:156 ../programs/gvfs-move.c:144
+#: ../programs/gvfs-copy.c:158 ../programs/gvfs-move.c:146
 #, c-format
 msgid "Target %s is not a directory\n"
 msgstr "Doel %s is geen map\n"
 
-#: ../programs/gvfs-copy.c:201
+#: ../programs/gvfs-copy.c:203
 #, c-format
 msgid "overwrite %s?"
 msgstr "%s overschrijven?"
 
-#: ../programs/gvfs-copy.c:215
+#: ../programs/gvfs-copy.c:217
 #, c-format
 msgid "Error copying file %s: %s\n"
 msgstr "Fout bij kopiëren van bestand %s: %s\n"
@@ -2506,15 +2509,15 @@ msgstr "Instelbare attributen:\n"
 msgid "Writable attribute namespaces:\n"
 msgstr "Schrijfbare attribuut-namespaces:\n"
 
-#: ../programs/gvfs-info.c:373 ../programs/gvfs-ls.c:395
-#: ../programs/gvfs-mkdir.c:55 ../programs/gvfs-monitor-dir.c:110
-#: ../programs/gvfs-monitor-file.c:109 ../programs/gvfs-mount.c:1047
-#: ../programs/gvfs-rename.c:62 ../programs/gvfs-set-attribute.c:137
-#: ../programs/gvfs-trash.c:55 ../programs/gvfs-tree.c:246
+#: ../programs/gvfs-info.c:375 ../programs/gvfs-ls.c:397
+#: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-monitor-dir.c:112
+#: ../programs/gvfs-monitor-file.c:111 ../programs/gvfs-mount.c:1049
+#: ../programs/gvfs-rename.c:64 ../programs/gvfs-set-attribute.c:139
+#: ../programs/gvfs-trash.c:57 ../programs/gvfs-tree.c:248
 msgid "LOCATION"
 msgstr "LOCATIE"
 
-#: ../programs/gvfs-info.c:374
+#: ../programs/gvfs-info.c:376
 msgid "Show information about locations."
 msgstr "Informatie tonen over locaties"
 
@@ -2535,16 +2538,16 @@ msgid "PREFIX"
 msgstr "PREFIX"
 
 #: ../programs/gvfs-ls.c:166 ../programs/gvfs-ls.c:174
-#: ../programs/gvfs-rename.c:95
+#: ../programs/gvfs-rename.c:97
 #, c-format
 msgid "Error: %s\n"
 msgstr "Fout: %s\n"
 
-#: ../programs/gvfs-ls.c:396
+#: ../programs/gvfs-ls.c:398
 msgid "List the contents of the locations."
 msgstr "De inhoud van de locaties tonen"
 
-#: ../programs/gvfs-ls.c:397
+#: ../programs/gvfs-ls.c:399
 msgid ""
 "gvfs-ls is similar to the traditional ls utility, but using gvfs\n"
 "locations instead of local files: for example you can use something\n"
@@ -2565,70 +2568,70 @@ msgstr "Afhandelaar van mime-type opvragen"
 msgid "Set handler for mime-type"
 msgstr "Afhandelaar voor mime-type instellen"
 
-#: ../programs/gvfs-mime.c:80
+#: ../programs/gvfs-mime.c:82
 msgid "MIMETYPE"
 msgstr "MIMETYPE"
 
-#: ../programs/gvfs-mime.c:80
+#: ../programs/gvfs-mime.c:82
 msgid "HANDLER"
 msgstr "AFHANDELAAR"
 
-#: ../programs/gvfs-mime.c:81
+#: ../programs/gvfs-mime.c:83
 msgid "Get or set the handler for a mime-type."
 msgstr "Afhandelaar voor mime-type opvragen of instellen"
 
-#: ../programs/gvfs-mime.c:93
+#: ../programs/gvfs-mime.c:95
 msgid "Specify either --query or --set"
 msgstr "Geef ofwel --query ofwel --set op"
 
-#: ../programs/gvfs-mime.c:104
+#: ../programs/gvfs-mime.c:106
 #, c-format
 msgid "Must specify a single mime-type.\n"
 msgstr "Er moet een enkel mime-type opgegeven worden.\n"
 
-#: ../programs/gvfs-mime.c:111
+#: ../programs/gvfs-mime.c:113
 #, c-format
 msgid "Must specify the mime-type followed by the default handler.\n"
 msgstr ""
 "Er moet een mime-typeopgegeven worden, gevolgd door een "
 "standaardafhandelaar.\n"
 
-#: ../programs/gvfs-mime.c:126
+#: ../programs/gvfs-mime.c:128
 #, c-format
 msgid "No default applications for '%s'\n"
 msgstr "Geen standaardtoepassingen voor ‘%s’\n"
 
-#: ../programs/gvfs-mime.c:132
+#: ../programs/gvfs-mime.c:134
 #, c-format
 msgid "Default application for '%s': %s\n"
 msgstr "Standaardtoepassing voor ‘%s’: %s\n"
 
-#: ../programs/gvfs-mime.c:137
+#: ../programs/gvfs-mime.c:139
 #, c-format
 msgid "Registered applications:\n"
 msgstr "Geregistreerde toepassingen:\n"
 
-#: ../programs/gvfs-mime.c:139
+#: ../programs/gvfs-mime.c:141
 #, c-format
 msgid "No registered applications\n"
 msgstr "Geen geregistreerde toepassingen\n"
 
-#: ../programs/gvfs-mime.c:150
+#: ../programs/gvfs-mime.c:152
 #, c-format
 msgid "Recommended applications:\n"
 msgstr "Aanbevolen toepassingen:\n"
 
-#: ../programs/gvfs-mime.c:152
+#: ../programs/gvfs-mime.c:154
 #, c-format
 msgid "No recommended applications\n"
 msgstr "Geen aanbevolen toepassingen\n"
 
-#: ../programs/gvfs-mime.c:172
+#: ../programs/gvfs-mime.c:174
 #, c-format
 msgid "Failed to load info for handler '%s'\n"
 msgstr "Kon informatie voor afhandelaar ‘%s’ niet laden\n"
 
-#: ../programs/gvfs-mime.c:178
+#: ../programs/gvfs-mime.c:180
 #, c-format
 msgid "Failed to set '%s' as the default handler for '%s': %s\n"
 msgstr "Kon ‘%s’ niet als standaardafhandelaar voor ‘%s’ instellen: %s\n"
@@ -2637,11 +2640,11 @@ msgstr "Kon ‘%s’ niet als standaardafhandelaar voor ‘%s’ instellen: %s\n
 msgid "Create parent directories"
 msgstr "Bovenliggende mappen aanmaken"
 
-#: ../programs/gvfs-mkdir.c:56
+#: ../programs/gvfs-mkdir.c:58
 msgid "Create directories."
 msgstr "Mappen aanmaken"
 
-#: ../programs/gvfs-mkdir.c:87 ../programs/gvfs-mkdir.c:96
+#: ../programs/gvfs-mkdir.c:89 ../programs/gvfs-mkdir.c:98
 #, c-format
 msgid "Error creating directory: %s\n"
 msgstr "Fout bij aanmaken van map: %s\n"
@@ -2650,11 +2653,11 @@ msgstr "Fout bij aanmaken van map: %s\n"
 msgid "Don't send single MOVED events"
 msgstr "Geen afzonderlijke MOVED-gebeurtenissen sturen"
 
-#: ../programs/gvfs-monitor-dir.c:111
+#: ../programs/gvfs-monitor-dir.c:113
 msgid "Monitor directories for changes."
 msgstr "Mappen monitoren op wijzigingen"
 
-#: ../programs/gvfs-monitor-file.c:110
+#: ../programs/gvfs-monitor-file.c:112
 msgid "Monitor files for changes."
 msgstr "Bestanden monitoren op wijzigingen"
 
@@ -2735,22 +2738,22 @@ msgid "No volume for device file %s\n"
 msgstr "Geen volumen voor apparaatbestand %s\n"
 
 # Vrij vertaald (Wouter Bolsterlee)
-#: ../programs/gvfs-mount.c:1048
+#: ../programs/gvfs-mount.c:1050
 msgid "Mount the locations."
 msgstr "Locaties aankoppelen"
 
-#: ../programs/gvfs-move.c:108
+#: ../programs/gvfs-move.c:110
 msgid "Move one or more files from SOURCE to DEST."
 msgstr "Een of meer bestanden van BRON naar DOEL verplaatsen"
 
-#: ../programs/gvfs-move.c:197
+#: ../programs/gvfs-move.c:199
 #, c-format
 msgid "Error moving file %s: %s\n"
 msgstr "Fout bij verplaatsen van bestand %s: %s\n"
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-open.c:62
+#: ../programs/gvfs-open.c:64
 msgid ""
 "Open files with the default application that\n"
 "is registered to handle files of this type."
@@ -2758,20 +2761,20 @@ msgstr "Bestanden met de standaardtoepassing voor het bestandstype openen."
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:118
+#: ../programs/gvfs-open.c:120
 #, c-format
 msgid "%s: %s: error opening location: %s\n"
 msgstr "%s: %s: fout bij openen locatie: %s\n"
 
-#: ../programs/gvfs-rename.c:62
+#: ../programs/gvfs-rename.c:64
 msgid "NEW-NAME"
 msgstr "NIEUWE-NAAM"
 
-#: ../programs/gvfs-rename.c:63
+#: ../programs/gvfs-rename.c:65
 msgid "Rename a file."
 msgstr "Een bestand hernoemen"
 
-#: ../programs/gvfs-rename.c:102
+#: ../programs/gvfs-rename.c:104
 #, c-format
 msgid "Rename successful. New uri: %s\n"
 msgstr "Hernoemen succesvol. Nieuwe uri: %s\n"
@@ -2780,7 +2783,7 @@ msgstr "Hernoemen succesvol. Nieuwe uri: %s\n"
 msgid "Ignore nonexistent files, never prompt"
 msgstr "Niet-bestaande bestanden negeren, nooit vragen"
 
-#: ../programs/gvfs-rm.c:57
+#: ../programs/gvfs-rm.c:59
 msgid "Delete the given files."
 msgstr "Opgegeven bestanden verwijderen"
 
@@ -2831,7 +2834,7 @@ msgstr "Fout bij sluiten: %s\n"
 msgid "Etag not available\n"
 msgstr "Etag niet beschikbaar\n"
 
-#: ../programs/gvfs-save.c:164
+#: ../programs/gvfs-save.c:166
 msgid "Read from standard input and save to DEST."
 msgstr "Standaardinvoer lezen en als DOEL opslaan"
 
@@ -2843,45 +2846,45 @@ msgstr "Type van het attribuut"
 msgid "TYPE"
 msgstr "TYPE"
 
-#: ../programs/gvfs-set-attribute.c:137
+#: ../programs/gvfs-set-attribute.c:139
 msgid "ATTRIBUTE"
 msgstr "ATTRIBUUT"
 
-#: ../programs/gvfs-set-attribute.c:137
+#: ../programs/gvfs-set-attribute.c:139
 msgid "VALUE"
 msgstr "WAARDE"
 
-#: ../programs/gvfs-set-attribute.c:138
+#: ../programs/gvfs-set-attribute.c:140
 msgid "Set a file attribute of LOCATION."
 msgstr "Bestandsattribuut van LOCATIE instellen"
 
-#: ../programs/gvfs-set-attribute.c:157
+#: ../programs/gvfs-set-attribute.c:159
 msgid "Location not specified\n"
 msgstr "Locatie niet opgegeven\n"
 
-#: ../programs/gvfs-set-attribute.c:165
+#: ../programs/gvfs-set-attribute.c:167
 msgid "Attribute not specified\n"
 msgstr "Attribuut niet opgegeven\n"
 
-#: ../programs/gvfs-set-attribute.c:174
+#: ../programs/gvfs-set-attribute.c:176
 msgid "Value not specified\n"
 msgstr "Waarde niet opgegeven\n"
 
-#: ../programs/gvfs-set-attribute.c:217
+#: ../programs/gvfs-set-attribute.c:219
 #, c-format
 msgid "Invalid attribute type %s\n"
 msgstr "Ongeldige attribuuttype %s\n"
 
-#: ../programs/gvfs-set-attribute.c:227
+#: ../programs/gvfs-set-attribute.c:229
 #, c-format
 msgid "Error setting attribute: %s\n"
 msgstr "Fout bij instellen van attribute: %s\n"
 
-#: ../programs/gvfs-trash.c:56
+#: ../programs/gvfs-trash.c:58
 msgid "Move files or directories to the trash."
 msgstr "Bestanden of mappen naar de prullenbak verplaatsen"
 
-#: ../programs/gvfs-trash.c:87
+#: ../programs/gvfs-trash.c:89
 #, c-format
 msgid "Error trashing file: %s\n"
 msgstr "Fout bij verplaatsen naar prullenbak: %s\n"
@@ -2890,7 +2893,7 @@ msgstr "Fout bij verplaatsen naar prullenbak: %s\n"
 msgid "Follow symbolic links, mounts and shortcuts"
 msgstr "Symbolische verwijzingen, koppelingen en verwijzingen volgen"
 
-#: ../programs/gvfs-tree.c:247
+#: ../programs/gvfs-tree.c:249
 msgid "List contents of directories in a tree-like format."
 msgstr "Inhoud van mappen in een boomstructuur weergeven"
 
