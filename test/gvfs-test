@@ -34,6 +34,8 @@ import re
 import locale
 from glob import glob
 
+from gi.repository import GLib, Gio
+
 in_testbed = os.path.exists('/home/gvfs_sandbox_marker')
 samba_running = subprocess.call(['pidof', 'smbd'], stdout=subprocess.PIPE) == 0
 have_httpd = subprocess.call(['which', 'apachectl'], stdout=subprocess.PIPE) == 0
@@ -149,6 +151,89 @@ class GvfsTestCase(unittest.TestCase):
             empty_timeout -= 1
             time.sleep(0.1)
 
+    def mount_api(self, gfile, mount_op=None):
+        '''Mount a Gio.File using the Gio API
+        
+        This times out after 30 seconds.
+
+        Return True on success or a GLib.GError object from the mount call.
+        '''
+        self.cb_result = None
+
+        def mount_done(obj, result, main_loop):
+            ml.quit()
+            try:
+                success = obj.mount_enclosing_volume_finish(result)
+                self.cb_result = (obj, success)
+            except GLib.GError as e:
+                self.cb_result = (obj, e)
+
+        ml = GLib.MainLoop()
+        gfile.mount_enclosing_volume(Gio.MountMountFlags.NONE, mount_op, None, mount_done, ml)
+        # ensure we are timing out
+        GLib.timeout_add_seconds(30, lambda data: ml.quit(), None)
+        ml.run()
+
+        self.assertNotEqual(self.cb_result, None, 'operation timed out')
+        self.assertEqual(self.cb_result[0], gfile)
+        return self.cb_result[1]
+
+    def unmount_api(self, gfile):
+        '''Umount a mounted Gio.File using the Gio API
+
+        This times out after 5 seconds.
+        '''
+        self.cb_result = None
+
+        def unmount_done(obj, result, main_loop):
+            success = obj.unmount_with_operation_finish(result)
+            self.cb_result = (obj, success)
+
+        def mount_removed(vm, m, main_loop):
+            if m.get_name() == mount.get_name():
+                main_loop.quit()
+
+        mount = gfile.find_enclosing_mount(None)
+        self.assertNotEqual(mount, None)
+
+        ml = GLib.MainLoop()
+
+        # the mount is not really gone after unmount_done() gets called, so we
+        # need to wait until it is really removed
+        vm = Gio.VolumeMonitor.get()
+        vm.connect('mount-removed', mount_removed, ml)
+        mount.unmount_with_operation(Gio.MountUnmountFlags.NONE, None, None,
+                                     unmount_done, ml)
+        # ensure we are timing out
+        GLib.timeout_add_seconds(5, lambda data: ml.quit(), None)
+        ml.run()
+
+        self.assertNotEqual(self.cb_result, None, 'operation timed out')
+        self.assertEqual(self.cb_result[0], mount)
+        self.assertTrue(self.cb_result[1])
+
+    def make_mountop(self, user, password):
+        '''Create a Gio.MountOperation from given credentials
+        
+        On the first ask_password signal this sends the password, and aborts
+        the second request (for tests that use wrong credentials).
+        '''
+        def pwd_cb(op, message, default_user, default_domain, flags, data):
+            # first call: send correct result
+            if op.get_username():
+                op.reply(Gio.MountOperationResult.HANDLED)
+
+            # subsequent calls: abort
+            op.set_username('')
+            op.reply(Gio.MountOperationResult.ABORTED)
+
+        mo = Gio.MountOperation.new()
+        mo.set_username(user)
+        mo.set_password(password)
+        mo.connect('ask_password', pwd_cb, None)
+        return mo
+
+
 class Programs(GvfsTestCase):
     '''Test gvfs-* programs'''
 
@@ -239,6 +324,32 @@ class ArchiveMounter(GvfsTestCase):
                 self.assertEqual(out, f.read())
         finally:
             self.unmount(uri)
+
+    def test_api(self):
+        '''archive:// with Gio API'''
+
+        tar_path = os.path.join(self.workdir, 'stuff.tar')
+        tf = tarfile.open(tar_path, 'w')
+        tf.add(__file__, 'gvfs-test.py')
+        tf.close()
+        uri = 'archive://' + self.quote(self.quote('file://' + tar_path))
+
+        gfile = Gio.File.new_for_uri(uri)
+
+        # not mounted yet, should fail
+        self.assertRaises(GLib.GError, gfile.query_info, '*', 0, None)
+
+        self.assertEqual(self.mount_api(gfile), True)
+        try:
+            info = gfile.query_info('*', 0, None)
+            self.assertEqual(info.get_content_type(), 'inode/directory')
+            self.assertEqual(info.get_file_type(), Gio.FileType.DIRECTORY)
+            self.assertTrue('stuff.tar' in info.get_display_name(),
+                            info.get_display_name())
+            self.assertEqual(info.get_attribute_boolean('access::can-read'), True)
+        finally:
+            self.unmount_api(gfile)
+
 
 @unittest.skipUnless(os.getenv('XDG_RUNTIME_DIR'), 'No $XDG_RUNTIME_DIR available')
 class Sftp(GvfsTestCase):
@@ -387,16 +498,16 @@ class Ftp(GvfsTestCase):
         self.ftpd.wait()
         super().tearDown()
 
-    def test_anonymous(self):
-        '''ftp:// anonymous'''
+    def test_anonymous_cli(self):
+        '''ftp:// anonymous (CLI)'''
 
         uri = 'ftp://anonymous@localhost:2121'
         subprocess.check_call(['gvfs-mount', uri])
 
-        self.do_mount_check(uri, True)
+        self.do_mount_check_cli(uri, True)
 
-    def test_authenticated(self):
-        '''ftp:// authenticated'''
+    def test_authenticated_cli(self):
+        '''ftp:// authenticated (CLI)'''
 
         uri = 'ftp://localhost:2121'
         mount = subprocess.Popen(['gvfs-mount', uri],
@@ -421,9 +532,9 @@ class Ftp(GvfsTestCase):
         # in test bed, there is nothing interesting in /home/testuser/, and
         # without the test bed we do not know what's in the folder, so skip
         # gvfs-ls check
-        self.do_mount_check(uri, False)
+        self.do_mount_check_cli(uri, False)
 
-    def do_mount_check(self, uri, check_contents):
+    def do_mount_check_cli(self, uri, check_contents):
         # appears in gvfs-mount list
         (out, err) = self.program_out_err(['gvfs-mount', '-li'])
         try:
@@ -446,6 +557,69 @@ class Ftp(GvfsTestCase):
                 self.assertEqual(out, 'hello world\n')
         finally:
             self.unmount(uri)
+
+    def test_anonymous_api(self):
+        '''ftp:// anonymous (API)'''
+
+        uri = 'ftp://anonymous@localhost:2121'
+        gfile = Gio.File.new_for_uri(uri)
+        self.assertEqual(self.mount_api(gfile), True)
+        try:
+            self.do_mount_check_api(gfile, True)
+        finally:
+            self.unmount_api(gfile)
+
+    def test_authenticated_api(self):
+        '''ftp:// authenticated (API)'''
+
+        uri = 'ftp://localhost:2121'
+        gfile = Gio.File.new_for_uri(uri)
+
+        # no password supplied
+        res = self.mount_api(gfile)
+        self.assertTrue(isinstance(res, GLib.GError), res)
+
+        # wrong username
+        res = self.mount_api(gfile, self.make_mountop('eve', 'h4ck'))
+        self.assertTrue(isinstance(res, GLib.GError))
+
+        # wrong password
+        res = self.mount_api(gfile, self.make_mountop('testuser', 'h4ck'))
+        self.assertTrue(isinstance(res, GLib.GError))
+
+        # correct credentials
+        res = self.mount_api(gfile, self.make_mountop('testuser', 'pwd1'))
+        self.assertEqual(res, True)
+        try:
+            self.do_mount_check_api(gfile, False)
+        finally:
+            self.unmount_api(gfile)
+
+    def do_mount_check_api(self, gfile, check_contents):
+        info = gfile.query_info('*', 0, None)
+        self.assertEqual(info.get_content_type(), 'inode/directory')
+        self.assertEqual(info.get_file_type(), Gio.FileType.DIRECTORY)
+        self.assertTrue('localhost' in info.get_display_name(),
+                        info.get_display_name())
+        #FIXME: this is actually supposed to be true!
+        #self.assertEqual(info.get_attribute_boolean('access::can-read'), True)
+
+        if check_contents:
+            # check available files
+            enum = gfile.enumerate_children('*', Gio.FileQueryInfoFlags.NONE, None)
+            files = set()
+            while True:
+                info = enum.next_file(None)
+                if info is None:
+                    break
+                files.add(info.get_name())
+            self.assertEqual(files, set(['myfile.txt', 'mydir']))
+
+            gfile_myfile = Gio.File.new_for_uri(gfile.get_uri() + '/myfile.txt')
+            (success, contents, etags) = gfile_myfile.load_contents(None)
+            self.assertTrue(success)
+            self.assertEqual(contents, b'hello world\n')
+
 
 @unittest.skipUnless(in_testbed or 'LIBSMB_PROG' in os.environ,
                      'not running under gvfs-testbed or LIBSMB_PROG="nc localhost 1445"')
