@@ -12,7 +12,10 @@
 
   <servicedir>@testdir@</servicedir>
   
-  <standard_session_servicedirs />
+  <!-- disabled for now; this causes gnome-keyring to be spawned, which can
+       interfere with user's real keyrings, as well as causing long delays
+       during D-BUS activation -->
+  <!-- <standard_session_servicedirs /> -->
 
   <policy context="default">
     <!-- Allow everything to be sent -->
