@@ -45,6 +45,11 @@ local_ip = subprocess.check_output("ip -4 addr | sed -nr '/127\.0\.0/ n; "
                                    "/inet / {  s/^.*inet ([0-9.]+).*$/\\1/; p; q  }'",
                                    shell=True, universal_newlines=True)
 
+# when running in the build tree, check whether Dav backend is enabled
+have_dav_backend = True
+if 'GVFS_MOUNTABLE_DIR' in os.environ:
+    have_dav_backend = os.path.exists(os.path.join(os.environ['GVFS_MOUNTABLE_DIR'], 'dav.localmount'))
+
 my_dir = os.path.dirname(os.path.abspath(__file__))
 
 # we need this flag to check if we can test error messages
@@ -1078,6 +1083,7 @@ pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
             self.mock_polkit = None
 
 @unittest.skipUnless(have_httpd, 'Apache httpd not installed')
+@unittest.skipUnless(have_dav_backend, 'Dav backend not enabled')
 class Dav(GvfsTestCase):
     '''Test WebDAV backend'''
 
