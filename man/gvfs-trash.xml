@@ -78,6 +78,12 @@
                                 non-deletable files.</para></listitem>
                         </varlistentry>
 
+                        <varlistentry>
+                                <term><option>--empty</option></term>
+
+                                <listitem><para>Empty the trash.</para></listitem>
+                        </varlistentry>
+
                 </variablelist>
         </refsect1>
 

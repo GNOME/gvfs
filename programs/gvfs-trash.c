@@ -27,11 +27,46 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 
+static void
+delete_trash_file (GFile *file, gboolean del_file, gboolean del_children)
+{
+  GFileInfo *info;
+  GFile *child;
+  GFileEnumerator *enumerator;
+
+  if (del_children)
+    {
+      enumerator = g_file_enumerate_children (file,
+                                              G_FILE_ATTRIBUTE_STANDARD_NAME ","
+                                              G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                                              G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                              NULL,
+                                              NULL);
+      if (enumerator)
+        {
+          while ((info = g_file_enumerator_next_file (enumerator, NULL, NULL)) != NULL)
+            {
+              child = g_file_get_child (file, g_file_info_get_name (info));
+              delete_trash_file (child, TRUE, g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY);
+              g_object_unref (child);
+              g_object_unref (info);
+            }
+          g_file_enumerator_close (enumerator, NULL, NULL);
+          g_object_unref (enumerator);
+        }
+    }
+
+  if (del_file)
+    g_file_delete (file, NULL, NULL);
+}
+
 static gboolean force = FALSE;
+static gboolean empty = FALSE;
 
 static GOptionEntry entries[] =
 {
-  {"force", 'f', 0, G_OPTION_ARG_NONE, &force, N_("Ignore nonexistent files, never prompt"), NULL},
+  { "force", 'f', 0, G_OPTION_ARG_NONE, &force, N_("Ignore nonexistent files, never prompt"), NULL },
+  { "empty", 0, 0, G_OPTION_ARG_NONE, &empty, N_("Empty the trash"), NULL },
   { NULL }
 };
 
@@ -91,6 +126,14 @@ main (int argc, char *argv[])
 	  }
 	g_object_unref (file);
       }
+    }
+
+  if (empty)
+    {
+      GFile *file;
+      file = g_file_new_for_uri ("trash:");
+      delete_trash_file (file, FALSE, TRUE);
+      g_object_unref (file);
     }
 
   return retval;
