@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: as\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-11-02 16:10+0000\n"
-"PO-Revision-Date: 2012-11-23 20:36+0530\n"
+"POT-Creation-Date: 2012-11-25 05:43+0000\n"
+"PO-Revision-Date: 2012-11-26 17:00+0530\n"
 "Last-Translator: Nilamdyuti Goswami <ngoswami@redhat.com>\n"
 "Language-Team: as_IN <kde-i18n-doc@kde.org>\n"
 "Language: as_IN\n"
@@ -171,7 +171,6 @@ msgstr "ডমেইন \"%s\" ত  \"%s\" সেৱা \"%s\" সমাধা�
 #: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
 #, c-format
-#| msgid "Malformed dns-sd encoded_triple '%s'"
 msgid "Malformed DNS-SD encoded_triple '%s'"
 msgstr "ত্ৰুটিপূৰ্ণ DNS-SD encoded_triple '%s'"
 
@@ -593,7 +592,7 @@ msgstr "পুনৰ চেষ্টা কৰক"
 
 #: ../daemon/gvfsbackendafc.c:416 ../daemon/gvfsbackend.c:968
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
-#: ../monitor/udisks2/gvfsudisks2mount.c:736
+#: ../monitor/udisks2/gvfsudisks2mount.c:751
 msgid "Cancel"
 msgstr "বাতিল কৰক"
 
@@ -840,8 +839,8 @@ msgstr "ফাইল অস্তিত্ববান"
 #: ../daemon/gvfsjobtrash.c:107 ../daemon/gvfsjobunmountmountable.c:157
 #: ../daemon/gvfsjobunmountmountable.c:172 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1174 ../monitor/gdu/ggdumount.c:1258
-#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1108
-#: ../monitor/udisks2/gvfsudisks2volume.c:1566
+#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1123
+#: ../monitor/udisks2/gvfsudisks2volume.c:1634
 msgid "Operation not supported by backend"
 msgstr "কাৰ্য্য বেকএন্ড দ্বাৰা সমৰ্থিত নহয়"
 
@@ -863,12 +862,12 @@ msgid "Not supported"
 msgstr "সমৰ্থিত নহয়"
 
 #: ../daemon/gvfsbackend.c:967 ../monitor/gdu/ggdumount.c:922
-#: ../monitor/udisks2/gvfsudisks2mount.c:734
+#: ../monitor/udisks2/gvfsudisks2mount.c:749
 msgid "Unmount Anyway"
 msgstr "তথাপিও আনমাউন্ট কৰক"
 
 #: ../daemon/gvfsbackend.c:970 ../monitor/gdu/ggdumount.c:924
-#: ../monitor/udisks2/gvfsudisks2mount.c:737
+#: ../monitor/udisks2/gvfsudisks2mount.c:752
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -916,7 +915,7 @@ msgstr "%s ত cdda মাউন্ট"
 #: ../daemon/gvfsbackendcdda.c:463 ../daemon/gvfsbackendcdda.c:984
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:308
+#: ../monitor/udisks2/gvfsudisks2volume.c:348
 #, c-format
 msgid "Audio Disc"
 msgstr "অডিঅ' ডিস্ক"
@@ -1371,7 +1370,6 @@ msgid "Recent"
 msgstr "শেহতীয়া"
 
 #: ../daemon/gvfsbackendsftp.c:299 ../daemon/gvfsbackendsftp.c:654
-#| msgid "ssh program unexpectedly exited"
 msgid "SSH program unexpectedly exited"
 msgstr "SSH প্ৰগ্ৰাম অপ্ৰত্যাশিতভাবে প্ৰস্থান কৰিলে"
 
@@ -1392,13 +1390,11 @@ msgid "Host key verification failed"
 msgstr "হস্ট কি' সতাসত্য নিৰূপণ ব্যৰ্থ হল"
 
 #: ../daemon/gvfsbackendsftp.c:498
-#| msgid "Unable to spawn ssh program"
 msgid "Unable to spawn SSH program"
 msgstr "SSH প্ৰগ্ৰাম সৃষ্টি কৰিবলে অক্ষম"
 
 #: ../daemon/gvfsbackendsftp.c:514
 #, c-format
-#| msgid "Unable to spawn ssh program: %s"
 msgid "Unable to spawn SSH program: %s"
 msgstr "SSH প্ৰগ্ৰাম সৃষ্টি কৰিবলে অক্ষম: %s"
 
@@ -1461,7 +1457,6 @@ msgid "Protocol error"
 msgstr "প্ৰটোকল তথ্য"
 
 #: ../daemon/gvfsbackendsftp.c:1728
-#| msgid "Unable to find supported ssh command"
 msgid "Unable to find supported SSH command"
 msgstr "সমৰ্থিত SSH কম্যান্ড পোৱা নগল"
 
@@ -1722,7 +1717,7 @@ msgstr "%s: %s"
 #: ../programs/gvfs-move.c:119 ../programs/gvfs-open.c:76
 #: ../programs/gvfs-open.c:88 ../programs/gvfs-rename.c:73
 #: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:176
-#: ../programs/gvfs-set-attribute.c:149 ../programs/gvfs-trash.c:69
+#: ../programs/gvfs-set-attribute.c:149 ../programs/gvfs-trash.c:104
 #: ../programs/gvfs-tree.c:260
 #, c-format
 msgid "Try \"%s --help\" for more information."
@@ -1788,16 +1783,16 @@ msgstr "GVfs GDU আয়তন মনিটৰ"
 msgid "Floppy Drive"
 msgstr "ফ্লপি ড্ৰাইভ"
 
-#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:200
+#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:235
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "নামবিহীন ড্ৰাইভ (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:202
+#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:237
 msgid "Unnamed Drive"
 msgstr "নাম বিহীন ড্ৰাইভ"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:505
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:554
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr "আয়তনত এটা বা অধিক মাধ্যম ব্যস্ত; মাধ্যম বাহিৰ কৰিবলে ব্যৰ্থ।"
@@ -1817,7 +1812,7 @@ msgstr ""
 msgid "Start Anyway"
 msgstr "তথাপিও আৰম্ভ কৰক"
 
-#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:649
+#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:664
 msgid "One or more programs are preventing the unmount operation."
 msgstr ""
 "এটা অথবা অধিক প্ৰগ্ৰাম দ্বাৰা আনমাউন্টৰ কাৰ্য্য সঞ্চালন প্ৰতিৰোধ কৰা হৈছে"
@@ -2181,7 +2176,7 @@ msgstr "%s এনক্ৰিপ্ট কৰা তথ্য"
 msgid "%s Media"
 msgstr "%s মাধ্যম"
 
-#: ../monitor/udisks2/gvfsudisks2mount.c:730
+#: ../monitor/udisks2/gvfsudisks2mount.c:745
 msgid "Eject Anyway"
 msgstr "তথাপিও উলাওক"
 
@@ -2207,7 +2202,7 @@ msgstr "আপুনি এতিয়া %s আনপ্লাগ কৰিব �
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:254
+#: ../monitor/udisks2/gvfsudisks2volume.c:268
 #, c-format
 msgid "%s Encrypted"
 msgstr "%s এনক্ৰিপ্ট কৰা আছে"
@@ -2215,41 +2210,41 @@ msgstr "%s এনক্ৰিপ্ট কৰা আছে"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:267
+#: ../monitor/udisks2/gvfsudisks2volume.c:280
 #, c-format
 msgid "%s Volume"
 msgstr "%s আয়তন"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:444
+#: ../monitor/udisks2/gvfsudisks2volume.c:485
 msgid "Volume"
 msgstr "আয়তন"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1008
+#: ../monitor/udisks2/gvfsudisks2volume.c:1058
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "কি'ৰিংত পাচফ্ৰেইছ সংৰক্ষণ কৰোতে ত্ৰুটি (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1043
+#: ../monitor/udisks2/gvfsudisks2volume.c:1093
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "কি'ৰিংৰ পৰা অবৈধ পাচফ্ৰেইছ মচি পেলাওতে ত্ৰুটি (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1108
+#: ../monitor/udisks2/gvfsudisks2volume.c:1158
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr "আনলক কৰা ডিভাইচৰ চিনাক্ত কৰিব পৰা এটা ফাইল চিস্টেম নাই"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1137
+#: ../monitor/udisks2/gvfsudisks2volume.c:1187
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "%s ৰ বাবে ইনক্ৰিপষণ পাচফ্ৰেইছ"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1305
+#: ../monitor/udisks2/gvfsudisks2volume.c:1355
 msgid "A passphrase is required to access the volume"
 msgstr "আয়তন অভিগম কৰিবলে এটা পাচফ্ৰেইছৰ প্ৰয়োজন"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1320
+#: ../monitor/udisks2/gvfsudisks2volume.c:1370
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2258,14 +2253,11 @@ msgstr ""
 "আয়তন আনলক কৰাৰ বাবে এটা পাচফ্ৰেইছ সুমুৱাওক\n"
 "%s ত ইনক্ৰিপ্ট কৰা তথ্য অভিগম কৰিবলে পাচফ্ৰেইছটো প্ৰয়োজনীয়।"
 
-#. drive_icon
-#. media_desc
-#. media_icon
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1471
+#: ../monitor/udisks2/gvfsudisks2volume.c:1539
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
@@ -2340,7 +2332,7 @@ msgstr ""
 #: ../programs/gvfs-mount.c:1059 ../programs/gvfs-move.c:117
 #: ../programs/gvfs-open.c:74 ../programs/gvfs-rename.c:71
 #: ../programs/gvfs-rm.c:68 ../programs/gvfs-save.c:174
-#: ../programs/gvfs-set-attribute.c:147 ../programs/gvfs-trash.c:67
+#: ../programs/gvfs-set-attribute.c:147 ../programs/gvfs-trash.c:102
 #: ../programs/gvfs-tree.c:258
 #, c-format
 msgid "Error parsing commandline options: %s\n"
@@ -2537,7 +2529,7 @@ msgstr "লিখাৰ যোগ্য বৈশিষ্ট্যৰ নেম
 #: ../programs/gvfs-mkdir.c:55 ../programs/gvfs-monitor-dir.c:110
 #: ../programs/gvfs-monitor-file.c:109 ../programs/gvfs-mount.c:1047
 #: ../programs/gvfs-rename.c:62 ../programs/gvfs-set-attribute.c:137
-#: ../programs/gvfs-trash.c:55 ../programs/gvfs-tree.c:246
+#: ../programs/gvfs-trash.c:90 ../programs/gvfs-tree.c:246
 msgid "LOCATION"
 msgstr "LOCATION"
 
@@ -2804,7 +2796,7 @@ msgstr "এটা ফাইল পুনৰনামকৰণ কৰক।"
 msgid "Rename successful. New uri: %s\n"
 msgstr "সফলতাৰে সৈতে পুনৰ নামকৰণ কৰা হৈছে। নতুন uri: %s\n"
 
-#: ../programs/gvfs-rm.c:34 ../programs/gvfs-trash.c:34
+#: ../programs/gvfs-rm.c:34 ../programs/gvfs-trash.c:68
 msgid "Ignore nonexistent files, never prompt"
 msgstr "অস্তিত্ব নহোৱা ফাইলসমূহ উপেক্ষা কৰক, কেতিয়াও নুসুধিব"
 
@@ -2904,11 +2896,15 @@ msgstr "বৈশিষ্ট্যৰ ধৰণ %s অবৈধ\n"
 msgid "Error setting attribute: %s\n"
 msgstr "বৈশিষ্ট্য সংহতি কৰোতে ত্ৰুটি: %s\n"
 
-#: ../programs/gvfs-trash.c:56
+#: ../programs/gvfs-trash.c:69
+msgid "Empty the trash"
+msgstr "আবৰ্জনা খালি কৰক"
+
+#: ../programs/gvfs-trash.c:91
 msgid "Move files or directories to the trash."
 msgstr "ফাইলসমূহ অথবা ডাইৰেকটৰিসমূহক আবৰ্জনালে স্থানান্তৰ কৰক।"
 
-#: ../programs/gvfs-trash.c:87
+#: ../programs/gvfs-trash.c:122
 #, c-format
 msgid "Error trashing file: %s\n"
 msgstr "ফাইলক আবৰ্জনাত পঠাওতে ত্ৰুটি: %s\n"
