@@ -433,7 +433,11 @@ Subsystem sftp %(sftp_server)s
 
         self.do_mount_check(uri)
 
-    @unittest.expectedFailure # https://bugzilla.gnome.org/show_bug.cgi?id=686006#c38
+    # if we are in the testbed, then ssh defaults to
+    # "StrictHostKeyChecking ask", and a connection attempt should fail;
+    # otherwise this is client-configurable behaviour which cannot be
+    # temporarily overridden
+    @unittest.skipUnless(in_testbed, 'not running under gvfs-testbed')
     @unittest.skipUnless(local_ip, 'not having any non-localhost IP')
     def test_unknown_host(self):
         '''sftp:// with RSA authentication for unknown host'''
