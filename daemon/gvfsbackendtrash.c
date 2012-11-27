@@ -500,7 +500,7 @@ trash_backend_add_info (TrashItem *item,
 
           g_file_info_set_display_name (info, basename);
           g_file_info_set_attribute_byte_string (info,
-                                                 "trash::orig-path",
+                                                 G_FILE_ATTRIBUTE_TRASH_ORIG_PATH,
                                                  path);
           g_free (basename);
           g_free (path);
@@ -523,7 +523,7 @@ trash_backend_add_info (TrashItem *item,
 
       if (delete_date)
         g_file_info_set_attribute_string (info,
-                                          "trash::deletion-date",
+                                          G_FILE_ATTRIBUTE_TRASH_DELETION_DATE,
                                           delete_date);
     }
 
@@ -763,7 +763,7 @@ trash_backend_query_info (GVfsBackend           *vfs_backend,
       g_file_info_set_symbolic_icon (info, icon);
       g_object_unref (icon);
 
-      g_file_info_set_attribute_uint32 (info, "trash::item-count", n_items);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TRASH_ITEM_COUNT, n_items);
 
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
