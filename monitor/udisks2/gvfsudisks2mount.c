@@ -268,7 +268,7 @@ update_mount (GVfsUDisks2Mount *mount)
       else
         mount->name = g_strdup (mount->mount_entry_name);
 
-      mount->symbolic_icon = g_themed_icon_new ("folder-remote-symbolic");
+      mount->symbolic_icon = gvfs_udisks2_utils_symbolic_icon_from_fs_type (g_unix_mount_get_fs_type (mount->mount_entry));
     }
 
   /* compute whether something changed */

@@ -33,6 +33,7 @@ G_BEGIN_DECLS
 
 void   gvfs_udisks2_utils_udisks_error_to_gio_error (GError *error);
 GIcon *gvfs_udisks2_utils_icon_from_fs_type (const gchar *fs_type);
+GIcon *gvfs_udisks2_utils_symbolic_icon_from_fs_type (const gchar *fs_type);
 
 gchar *gvfs_udisks2_utils_lookup_fstab_options_value (const gchar *fstab_options,
                                                       const gchar *key);

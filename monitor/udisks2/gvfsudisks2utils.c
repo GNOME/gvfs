@@ -82,6 +82,23 @@ gvfs_udisks2_utils_icon_from_fs_type (const gchar *fs_type)
   return g_themed_icon_new_with_default_fallbacks (icon_name);
 }
 
+GIcon *
+gvfs_udisks2_utils_symbolic_icon_from_fs_type (const gchar *fs_type)
+{
+  const gchar *icon_name;
+  if (g_strcmp0 (fs_type, "nfs") == 0 ||
+      g_strcmp0 (fs_type, "nfs4") == 0 ||
+      g_strcmp0 (fs_type, "cifs") == 0)
+    {
+      icon_name = "folder-remote-symbolic";
+    }
+  else
+    {
+      icon_name = "drive-removable-media-symbolic";
+    }
+  return g_themed_icon_new_with_default_fallbacks (icon_name);
+}
+
 gchar *
 gvfs_udisks2_utils_lookup_fstab_options_value (const gchar *fstab_options,
                                                const gchar *key)

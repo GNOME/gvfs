@@ -471,6 +471,8 @@ update_volume (GVfsUDisks2Volume *volume)
         volume->name = g_unix_mount_point_guess_name (volume->mount_point);
       if (volume->icon == NULL)
         volume->icon = gvfs_udisks2_utils_icon_from_fs_type (g_unix_mount_point_get_fs_type (volume->mount_point));
+      if (volume->symbolic_icon == NULL)
+        volume->symbolic_icon = gvfs_udisks2_utils_symbolic_icon_from_fs_type (g_unix_mount_point_get_fs_type (volume->mount_point));
     }
 
   if (volume->mount == NULL)
@@ -487,7 +489,7 @@ update_volume (GVfsUDisks2Volume *volume)
   if (volume->icon == NULL)
     volume->icon = g_themed_icon_new ("drive-removable-media");
   if (volume->symbolic_icon == NULL)
-    volume->symbolic_icon = g_themed_icon_new ("folder-remote-symbolic");
+    volume->symbolic_icon = g_themed_icon_new ("drive-removable-media-symbolic");
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* compute whether something changed */
