@@ -63,14 +63,12 @@ endif
 noinst_DATA= $(CONFIG_FILES)
 
 # run tests against build tree
-# $LIBSMB_PROG needs to be set in the local dbus-daemon, but only if we
-# run tests; it doesn't help on the client-side
 check: $(CONFIG_FILES) gvfs-test
-	env LIBSMB_PROG="nc localhost 1445" $(srcdir)/run-in-tree.sh $(srcdir)/gvfs-test $(TEST_NAMES)
+	$(srcdir)/run-in-tree.sh $(srcdir)/gvfs-test $(TEST_NAMES)
 
 # run tests against the installed system packages
 installcheck-local: gvfs-test
-	env LIBSMB_PROG="nc localhost 1445" $(srcdir)/gvfs-test $(TEST_NAMES)
+	$(srcdir)/gvfs-test $(TEST_NAMES)
 
 CLEANFILES=$(CONFIG_FILES)
 

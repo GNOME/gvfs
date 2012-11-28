@@ -61,6 +61,10 @@ english_messages = not lc or lc.startswith('en_')
 PTYPE_DISK = 0 
 PTYPE_CDROM = 5 
 
+# local D-BUS daemon if we don't run under gvfs-testbed
+dbus_daemon = None
+
+
 class GvfsTestCase(unittest.TestCase):
     '''Gvfs tests base class.
 
@@ -71,6 +75,22 @@ class GvfsTestCase(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.workdir)
+
+    def run(self, result=None):
+        '''Show dbus daemon output on failed tests'''
+
+        if result:
+            orig_err_fail = len(result.errors) + len(result.failures)
+        super().run(result)
+        # always read the logs, so that we only get the ones relevant to this
+        # particular test case
+        if dbus_daemon:
+            dbus_out = dbus_daemon.stdout.read()
+            dbus_err = dbus_daemon.stderr.read()
+            if result and len(result.errors) + len(result.failures) > orig_err_fail:
+                print('\n----- dbus stdout -----\n%s\n----- dbus stderr -----\n%s\n' %
+                      (dbus_out and dbus_out.decode('UTF-8') or '',
+                       dbus_err and dbus_err.decode('UTF-8') or ''))
 
     def program_code_out_err(self, argv):
         '''Return (exitcode, stdout, stderr) from a program call.'''
@@ -630,8 +650,6 @@ class Ftp(GvfsTestCase):
             self.assertEqual(contents, b'hello world\n')
 
 
-@unittest.skipUnless(in_testbed or 'LIBSMB_PROG' in os.environ,
-                     'not running under gvfs-testbed or LIBSMB_PROG="nc localhost 1445"')
 class Smb(GvfsTestCase):
     def setUp(self):
         '''start local smbd as user if we are not in test bed'''
@@ -1301,6 +1319,47 @@ DAVLockDB DAVLock
             self.unmount(uri)
 
 
+def start_dbus():
+    '''Run a local D-BUS daemon under temporary XDG directories
+    
+    Return temporary XDG home directory.
+    '''
+
+    global dbus_daemon
+
+    # use temporary config/data/runtime directories; NB that these need to be
+    # in g_get_home_dir(), otherwise you can't trash files as this doesn't work
+    # across fs boundaries
+    # if/once https://bugzilla.gnome.org/show_bug.cgi?id=142568 gets fixed, we
+    # can put it into a proper temp dir again
+    temp_home = tempfile.mkdtemp(prefix='gvfs_test', dir=GLib.get_home_dir())
+    os.environ['XDG_CONFIG_HOME'] = os.path.join(temp_home, 'config')
+    os.environ['XDG_DATA_HOME'] = os.path.join(temp_home, 'data')
+
+    # run local D-BUS
+    if os.path.exists('session.conf'):
+        dbus_conf = 'session.conf'
+    else:
+        dbus_conf = os.path.join(os.path.dirname(__file__), 'session.conf')
+    env = os.environ.copy()
+    env['G_MESSAGES_DEBUG'] = 'all'
+    env['GVFS_DEBUG'] = 'all'
+    env['LIBSMB_PROG'] = "nc localhost 1445"
+    dbus_daemon = subprocess.Popen(
+        ['dbus-daemon', '--config-file', dbus_conf, '--print-address=1'],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    addr = dbus_daemon.stdout.readline().decode()
+    os.environ['DBUS_SESSION_BUS_ADDRESS'] = addr
+
+    # set dbus output to nonblocking
+    flags = fcntl.fcntl(dbus_daemon.stdout, fcntl.F_GETFL)
+    fcntl.fcntl(dbus_daemon.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+    flags = fcntl.fcntl(dbus_daemon.stderr, fcntl.F_GETFL)
+    fcntl.fcntl(dbus_daemon.stderr, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+
+    return temp_home
+
+
 if __name__ == '__main__':
     # do not break tests due to translations
     try:
@@ -1308,4 +1367,13 @@ if __name__ == '__main__':
     except KeyError:
         pass
     os.environ['LC_ALL'] = 'C'
-    unittest.main(testRunner=unittest.TextTestRunner(stream=sys.stdout, verbosity=2))
+    
+    if not in_testbed:
+        temp_home = start_dbus()
+    try:
+        unittest.main(testRunner=unittest.TextTestRunner(stream=sys.stdout, verbosity=2))
+    finally:
+        if not in_testbed:
+            dbus_daemon.terminate()
+            dbus_daemon.wait()
+            shutil.rmtree(temp_home)

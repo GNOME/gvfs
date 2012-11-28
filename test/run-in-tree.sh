@@ -12,21 +12,24 @@ export GVFS_MONITOR_DIR=`pwd`
 export PATH=`pwd`/../programs:$PATH
 export GIO_EXTRA_MODULES=`pwd`/../client/.libs:`pwd`/../monitor/proxy/.libs
 
-if [ -e $(pwd)/session.conf ]; then
-    # case for out-of tree build (distcheck)
-    DBUS_CONF=`pwd`/session.conf
-else
-    # case for calling this manually in a built tree
-    DBUS_CONF=`dirname $0`/session.conf
+# Start a custom session dbus, unless we run under "make check" (test suite
+# starts its own)
+if [ -z "$MAKEFLAGS" ]; then
+    if [ -e $(pwd)/session.conf ]; then
+        # case for out-of tree build (distcheck)
+        DBUS_CONF=`pwd`/session.conf
+    else
+        # case for calling this manually in a built tree
+        DBUS_CONF=`dirname $0`/session.conf
+    fi
+
+    PIDFILE=`mktemp`
+    export DBUS_SESSION_BUS_ADDRESS=`dbus-daemon --config-file=$DBUS_CONF --fork --print-address=1 --print-pid=3 3>${PIDFILE}`
+    DBUS_SESSION_BUS_PID=`cat $PIDFILE`
+    rm $PIDFILE
+
+    trap "kill -9 $DBUS_SESSION_BUS_PID" SIGINT SIGTERM EXIT
 fi
-
-# Start a custom session dbus
-PIDFILE=`mktemp`
-export DBUS_SESSION_BUS_ADDRESS=`dbus-daemon --config-file=$DBUS_CONF --fork --print-address=1 --print-pid=3 3>${PIDFILE}`
-DBUS_SESSION_BUS_PID=`cat $PIDFILE`
-rm $PIDFILE
-
-trap "kill -9 $DBUS_SESSION_BUS_PID" SIGINT SIGTERM EXIT
 
 $@
 
