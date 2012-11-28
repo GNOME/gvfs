@@ -2223,7 +2223,7 @@ msgstr ""
 #: ../monitor/udisks2/gvfsudisks2utils.c:805
 #, c-format
 msgid "You can now unplug %s\n"
-msgstr "మీరు యిప్పుడు అన్‌ప్లగ్ చేయవచ్చు\n"
+msgstr "మీరు యిప్పుడు %s అన్‌ప్లగ్ చేయవచ్చు\n"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
