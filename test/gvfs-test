@@ -1319,6 +1319,141 @@ DAVLockDB DAVLock
             self.unmount(uri)
 
 
+class Trash(GvfsTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.gfile_trash = Gio.File.new_for_uri('trash://')
+
+        # double-check that we are really running with a temporary
+        # $XDG_DATA_HOME and that gvfs respects it, or under gvfs-testbed
+        self.assertEqual(self.files_in_trash(), set())
+
+        self.my_file = None
+
+    def tearDown(self):
+        if self.my_file:
+            if os.path.exists(self.my_file):
+                os.unlink(self.my_file)
+
+            # clean up the trash, for predictable test cases
+            for f in self.files_in_trash():
+                #print('cleaning up trash:///' + f)
+                subprocess.call(['gvfs-rm', 'trash:///' + f])
+
+        super().tearDown()
+
+    def files_in_trash(self):
+        files = set()
+        enum = self.gfile_trash.enumerate_children('*', Gio.FileQueryInfoFlags.NONE, None)
+        while True:
+            info = enum.next_file(None)
+            if info is None:
+                break
+            files.add(info.get_name())
+        return files
+
+    def test_file_in_home_cli(self):
+        '''trash:// deletion, attributes, restoring for a file in $HOME (CLI)'''
+
+        # create test file
+        self.my_file = os.path.expanduser('~/hello_gvfs_tests.txt')
+        with open(self.my_file, 'w') as f:
+            f.write('hello world\n')
+
+        # trash it
+        del_time = time.time()
+        subprocess.check_call(['gvfs-trash', self.my_file])
+        # should now be gone
+        self.assertFalse(os.path.exists(self.my_file))
+        # and be in the trash
+        self.assertEqual(self.files_in_trash(), set(['hello_gvfs_tests.txt']))
+
+        out = self.program_out_success(['gvfs-info', 'trash:///hello_gvfs_tests.txt'])
+
+        # has proper original path
+        self.assertTrue('trash::orig-path: ' + self.my_file in out, out)
+
+        # has proper deletion time
+        m = re.search('trash::deletion-date: (.*)\n', out)
+        self.assertNotEqual(m, None)
+        recorded_time = time.mktime(time.strptime(m.group(1), '%Y-%m-%dT%H:%M:%S'))
+        self.assertLess(abs(recorded_time - del_time), 2.0)
+
+        # is saved in home trash, not by-device trash
+        data_home = os.environ.get('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
+        self.assertTrue('standard::target-uri: file://' + data_home in out, out)
+
+    def test_file_in_home_api(self):
+        '''trash:// deletion, attributes, restoring for a file in $HOME (API)'''
+
+        # create test file
+        self.my_file = os.path.expanduser('~/hello_gvfs_tests.txt')
+        with open(self.my_file, 'w') as f:
+            f.write('hello world\n')
+        gfile = Gio.File.new_for_path(self.my_file)
+
+        self.assertTrue(gfile.trash(None))
+        # should now be gone
+        self.assertFalse(os.path.exists(self.my_file))
+        # and be in the trash
+        self.assertEqual(self.files_in_trash(), set(['hello_gvfs_tests.txt']))
+
+    def test_deletion_with_same_path(self):
+        '''trash:// deletion of two files with the same path'''
+
+        # create test file
+        self.my_file = os.path.expanduser('~/hello_gvfs_tests.txt')
+        with open(self.my_file, 'w') as f:
+            f.write('hello world\n')
+        gfile = Gio.File.new_for_path(self.my_file)
+        self.assertTrue(gfile.trash(None))
+        self.assertFalse(os.path.exists(self.my_file))
+
+        # and re-create/re-trash it again
+        self.my_file = os.path.expanduser('~/hello_gvfs_tests.txt')
+        with open(self.my_file, 'w') as f:
+            f.write('bye bye\n')
+        gfile = Gio.File.new_for_path(self.my_file)
+        self.assertTrue(gfile.trash(None))
+        self.assertFalse(os.path.exists(self.my_file))
+
+        # should have two trash entries now with tame original path
+        enum = self.gfile_trash.enumerate_children('*', Gio.FileQueryInfoFlags.NONE, None)
+        count = 0
+        while True:
+            info = enum.next_file(None)
+            if info is None:
+                break
+            count += 1
+            self.assertEqual(info.get_attribute_byte_string('trash::orig-path'), self.my_file)
+        self.assertEqual(count, 2)
+
+    def test_file_in_system(self):
+        '''trash:// deletion for system location
+        
+        This either should work if /tmp/ is a partition on its own writable to
+        the user (such as a tmpfs), or fail gracefully without deleting the
+        file. 
+        '''
+        # create test file
+        self.my_file = os.path.join(self.workdir, 'hello_gvfs_tests.txt')
+        with open(self.my_file, 'w') as f:
+            f.write('hello world\n')
+
+        # try to trash it
+        trash = subprocess.Popen(['gvfs-trash', self.my_file], stderr=subprocess.PIPE)
+        trash.communicate()
+
+        if trash.returncode == 0:
+            self.assertFalse(os.path.exists(self.my_file))
+            self.assertTrue(os.path.exists('/tmp/.Trash-%i/files/hello_gvfs_tests.txt'
+                                           % os.getuid()))
+        else:
+            # file should still be there
+            self.assertTrue(os.path.exists(self.my_file))
+
+
 def start_dbus():
     '''Run a local D-BUS daemon under temporary XDG directories
     
