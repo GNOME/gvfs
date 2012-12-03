@@ -110,12 +110,17 @@ show_attributes (GFileInfo *info)
   for (i = 0; attributes[i] != NULL; i++)
     {
       /* list the icons in order rather than displaying "GThemedIcon:0x8df7200" */
-      if (strcmp (attributes[i], "standard::icon") == 0)
+      if (strcmp (attributes[i], "standard::icon") == 0 ||
+          strcmp (attributes[i], "standard::symbolic-icon") == 0)
 	{
 	  GIcon *icon;
 	  int j;
 	  const char * const *names = NULL;
-	  icon = g_file_info_get_icon (info);
+
+          if (strcmp (attributes[i], "standard::symbolic-icon") == 0)
+            icon = g_file_info_get_symbolic_icon (info);
+          else
+            icon = g_file_info_get_icon (info);
 
 	  /* only look up names if GThemedIcon */
 	  if (G_IS_THEMED_ICON(icon))
