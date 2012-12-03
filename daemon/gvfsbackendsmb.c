@@ -1633,7 +1633,7 @@ do_query_fs_info (GVfsBackend *backend,
   smbc_statvfs_fn smbc_statvfs;
   struct statvfs st = {0};
   char *uri;
-  int res;
+  int res, saved_errno;
 
   if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||
@@ -1645,6 +1645,7 @@ do_query_fs_info (GVfsBackend *backend,
       uri = create_smb_uri (op_backend->server, op_backend->share, filename);
       smbc_statvfs = smbc_getFunctionStatVFS (op_backend->smb_context);
       res = smbc_statvfs (op_backend->smb_context, uri, &st);
+      saved_errno = errno;
       g_free (uri);
 
       if (res == 0)
@@ -1660,6 +1661,11 @@ do_query_fs_info (GVfsBackend *backend,
               g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, st.f_bsize * st.f_bfree * ((st.f_frsize == 0) ? 1 : st.f_frsize));
               g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, st.f_flag & SMBC_VFS_FEATURE_RDONLY);
             }
+        }
+      else
+        {
+          g_vfs_job_failed_from_errno (G_VFS_JOB (job), saved_errno);
+          return;
         }
     }
 #endif
