@@ -432,6 +432,9 @@ create_proxy_for_file2 (GFile *file1,
   if (proxy == NULL)
     goto out;
   
+  /* Set infinite timeout, see bug 687534 */
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_MAXINT);
+  
   _g_dbus_connect_vfs_filters (connection);
 
   if (mount_info1_out)
@@ -534,6 +537,10 @@ async_proxy_new_cb (GObject *source_object,
     }
   
   data->proxy = proxy;
+
+  /* Set infinite timeout, see bug 687534 */
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (data->proxy), G_MAXINT);
+
   _g_dbus_connect_vfs_filters (data->connection);
   path = g_mount_info_resolve_path (data->mount_info, daemon_file->path);
 
