@@ -176,6 +176,7 @@ apply_options_from_fstab (GVfsUDisks2Volume *volume,
   icon_name = gvfs_udisks2_utils_lookup_fstab_options_value (fstab_options, "x-gvfs-icon=");
   if (icon_name != NULL)
     {
+      g_clear_object (&volume->icon);
       volume->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
       g_free (icon_name);
     }
