@@ -400,6 +400,27 @@ update_volume (GVfsUDisks2Volume *volume)
             }
           g_object_unref (udisks_drive);
         }
+      else
+        {
+          /* No UDisksDrive, but we do have a UDisksBlock (example: /dev/loop0). Use
+           * that to get the icons via UDisksObjectInfo
+           */
+#if UDISKS_CHECK_VERSION(2,0,90)
+          {
+            UDisksObject *object = (UDisksObject *) g_dbus_interface_get_object (G_DBUS_INTERFACE (volume->block));
+            if (object != NULL)
+              {
+                UDisksObjectInfo *info = udisks_client_get_object_info (udisks_client, object);
+                if (info != NULL)
+                  {
+                    volume->icon = _g_object_ref0 (udisks_object_info_get_icon (info));
+                    volume->symbolic_icon = _g_object_ref0 (udisks_object_info_get_icon_symbolic (info));
+                    g_object_unref (info);
+                  }
+              }
+          }
+#endif
+        }
 
       /* Also automount loop devices set up by the user himself - e.g. via the
        * udisks interfaces or the gnome-disk-image-mounter(1) command
