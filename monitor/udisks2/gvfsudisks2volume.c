@@ -165,6 +165,7 @@ apply_options_from_fstab (GVfsUDisks2Volume *volume,
 {
   gchar *name;
   gchar *icon_name;
+  gchar *symbolic_icon_name;
 
   name = gvfs_udisks2_utils_lookup_fstab_options_value (fstab_options, "x-gvfs-name=");
   if (name != NULL)
@@ -179,6 +180,14 @@ apply_options_from_fstab (GVfsUDisks2Volume *volume,
       g_clear_object (&volume->icon);
       volume->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
       g_free (icon_name);
+    }
+
+  symbolic_icon_name = gvfs_udisks2_utils_lookup_fstab_options_value (fstab_options, "x-gvfs-symbolic-icon=");
+  if (symbolic_icon_name != NULL)
+    {
+      g_clear_object (&volume->symbolic_icon);
+      volume->symbolic_icon = g_themed_icon_new_with_default_fallbacks (symbolic_icon_name);
+      g_free (symbolic_icon_name);
     }
 }
 
@@ -446,8 +455,16 @@ update_volume (GVfsUDisks2Volume *volume)
           g_clear_object (&volume->icon);
           volume->icon = g_themed_icon_new_with_default_fallbacks (hint);
         }
+#if UDISKS_CHECK_VERSION(2,0,90)
+      hint = udisks_block_get_hint_symbolic_icon_name (volume->block);
+      if (hint != NULL && strlen (hint) > 0)
+        {
+          g_clear_object (&volume->symbolic_icon);
+          volume->symbolic_icon = g_themed_icon_new_with_default_fallbacks (hint);
+        }
+#endif
 
-      /* Use x-gvfs-name=The%20Name and x-gvfs-icon=foo-name, if available */
+      /* Use x-gvfs-name=The%20Name, x-gvfs-icon=foo-name, x-gvfs-icon=foo-name-symbolic, if available */
       g_variant_iter_init (&iter, udisks_block_get_configuration (block));
       while (g_variant_iter_next (&iter, "(&s@a{sv})", &configuration_type, &configuration_value))
         {

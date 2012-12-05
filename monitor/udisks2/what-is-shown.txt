@@ -26,12 +26,13 @@ in its directory starts with a dot ("."), the device is not shown
 either. This policy may be overriden by use of the options x-gvfs-show
 and x-gvfs-hide.
 
-The name and icon to use for a device is chosen according to certain
-heuristics - for example, if a device has a filesystem label, it is
-used - if not, some other characteristic is used. The options
-x-gvfs-name=<value> and x-gvfs-icon=<value> can be used to override
-this policy with <value> being an URL-encoded string. For icons, the
-Icon Naming Specification is used.
+The name, icon and symbolic icon to use for a device is chosen
+according to certain heuristics - for example, if a device has a
+filesystem label, it is used - if not, some other characteristic is
+used. The options x-gvfs-name=<value>, x-gvfs-icon=<value> and
+x-gvfs-symbolic-icon=<value> can be used to override this policy with
+<value> being an URL-encoded string. For icons, the Icon Naming
+Specification is used.
 
 Users are advised to use (stable) symlinks in the /dev/disk/ hierarchy
 for /etc/fstab entries instead of the kernel names sda, sdb and so
@@ -55,6 +56,9 @@ EXAMPLES
 # forcibly show device in user interface and with name "My Movies"
 /dev/disk/by-uuid/4CAE8E5B5AF47502   /Movies  auto   defaults,x-gvfs-show,x-gvfs-name=My%20Movies  0 0
 
+# the same, but also with custom icons
+/dev/disk/by-uuid/4CAE8E5B5AF47502   /Movies  auto   defaults,x-gvfs-show,x-gvfs-name=My%20Movies,x-gvfs-icon=folder-videos,x-gvfs-symbolic-icon=folder-videos-symbolic  0 0
+
 # forcibly show NFS mount in user interface
 10.200.0.210:/tank/media  /mnt/Filer  nfs4  default,users,noauto,x-gvfs-show  0 0
 
@@ -76,7 +80,7 @@ SUBSYSTEMS=="usb", ENV{ID_VENDOR}=="*Kingston*", ENV{ID_MODEL}=="*DataTraveler*"
 ENV{ID_SERIAL}=="WDC_WD1002FAEX-00Y9A0_WD-WCAW30039835", ENV{UDISKS_AUTO}="1", ENV{UDISKS_SYSTEM}="0"
 
 # Specify name and icon name for a specific device.
-ENV{ID_MEDIA_PLAYER}=="apple-ipod", ENV{UDISKS_NAME}="David's iPod", ENV{UDISKS_ICON_NAME}="multimedia-player-ipod"
+ENV{ID_MEDIA_PLAYER}=="apple-ipod", ENV{UDISKS_NAME}="David's iPod", ENV{UDISKS_ICON_NAME}="multimedia-player-ipod", ENV{UDISKS_SYMBOLIC_ICON_NAME}="multimedia-player-ipod-symbolic"
 
 # Make sure this specific hard disk does not appear in the user interface
 ENV{ID_SERIAL}=="HITACHI_HTS723232A7A364_E3834563KRG2HN", ENV{UDISKS_IGNORE}="1"
