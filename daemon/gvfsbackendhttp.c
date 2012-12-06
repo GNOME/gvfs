@@ -579,14 +579,11 @@ file_info_from_message (SoupMessage *msg,
   /* read http/1.1 rfc, until then we copy the local files
    * behaviour */ 
   if (basename != NULL &&
-      g_file_attribute_matcher_matches (matcher,
-                                        G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME))
+      (g_file_attribute_matcher_matches (matcher,
+                                         G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME) ||
+       g_file_attribute_matcher_matches (matcher,
+                                         G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME)))
     ed_name = gvfs_file_info_populate_names_as_local (info, basename);
-
-  if (ed_name != NULL &&
-      g_file_attribute_matcher_matches (matcher,
-                                        G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME))
-    g_file_info_set_edit_name (info, ed_name);
 
   g_free (basename);
   g_free (ed_name);
