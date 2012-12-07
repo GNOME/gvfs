@@ -371,6 +371,7 @@ daemon_main (int argc,
 
       type = va_arg (var_args, char *);
     }
+  va_end (var_args);
 
   loop = g_main_loop_new (NULL, FALSE);
   
