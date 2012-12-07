@@ -277,6 +277,8 @@ _g_dbus_get_file_attribute (GVariant *value,
   else if (g_variant_is_container (v))
     {
       *type = G_FILE_ATTRIBUTE_TYPE_OBJECT;
+      obj_type = G_MAXUINT32;   /* treat it as an error if not set below */
+      str = NULL;
 
       if (g_variant_is_of_type (v, G_VARIANT_TYPE ("(u)")))
         {
@@ -292,8 +294,15 @@ _g_dbus_get_file_attribute (GVariant *value,
       /* obj_type 1 and 2 are deprecated and treated as errors */
       if (obj_type == 3)
         {
-          /* serialized G_ICON */
-          obj = (GObject *)g_icon_new_for_string (str, NULL);
+          if (str != NULL)
+            {
+              /* serialized G_ICON */
+              obj = (GObject *)g_icon_new_for_string (str, NULL);
+            }
+          else
+            {
+              g_warning ("Malformed object data in file attribute");
+            }
         }
       else
         {

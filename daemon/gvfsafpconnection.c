@@ -1774,7 +1774,7 @@ open_thread_func (gpointer user_data)
   GSocketClient *client;
 
   guint16 req_id;
-  gboolean res;
+  gboolean res = FALSE;
   char *reply;
   DSIHeader dsi_header;
   guint pos;

@@ -494,7 +494,7 @@ g_mount_spec_new_from_string (const gchar     *str,
       item.value = g_uri_unescape_string (tokens[1], NULL);
       if (strcmp (tokens[0], "prefix") == 0)
         {
-          g_free (item.key);
+          g_free (mount_prefix);
           mount_prefix = item.value;
         }
       else
