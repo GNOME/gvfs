@@ -1915,9 +1915,10 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
                     {
                       /* If the truncated size is larger than the current size
                        * then we need to pad out the difference with 0's */
-                     goffset orig_pos = g_seekable_tell (G_SEEKABLE (fh->stream));
-                     result = pad_file (fh, size - current_size, current_size);
-                     g_seekable_seek (G_SEEKABLE (fh->stream), orig_pos, G_SEEK_SET, NULL, NULL);
+                      goffset orig_pos = g_seekable_tell (G_SEEKABLE (fh->stream));
+                      result = pad_file (fh, size - current_size, current_size);
+                      if (result == 0)
+                        g_seekable_seek (G_SEEKABLE (fh->stream), orig_pos, G_SEEK_SET, NULL, &error);
                     }
 		}
 	      else
