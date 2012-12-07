@@ -288,6 +288,7 @@ g_vfs_backend_lockdownd_check (lockdownd_error_t cond, GVfsJob *job)
     case LOCKDOWN_E_SSL_ERROR:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_CONNECTION_REFUSED,
                         _("Unable to connect"));
+      break;
     default:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Unhandled Lockdown error (%d)"), cond);
