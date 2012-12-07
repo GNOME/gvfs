@@ -154,7 +154,7 @@ get_g_file_info_from_local (const char *filename, GFile *file,
 		error = NULL;
 		info = g_file_query_info (file, attributes, flags, G_VFS_JOB (job)->cancellable, &error);
 		
-		if ((error) || (! info) ) {
+		if (info == NULL) {
 		    g_print (" (EE) get_g_file_info_from_local (filename = '%s'): g_file_query_info failed: %s \n", filename, error->message);
 		    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
 		    return NULL;
@@ -392,7 +392,7 @@ do_query_fs_info (GVfsBackend *backend,
   if (file) {
 	  error = NULL;  
 	  info2 = g_file_query_filesystem_info (file, "fs:*", G_VFS_JOB (job)->cancellable, &error);
-	  if ((error) || (! info2) ) {
+	  if (info2 == NULL) {
 		  g_print ("  (EE) try_query_fs_info (filename = '%s'): g_file_query_filesystem_info failed: %s \n", filename, error->message);
 		  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
 		  g_error_free (error);

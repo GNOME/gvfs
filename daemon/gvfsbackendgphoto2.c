@@ -1497,7 +1497,7 @@ ensure_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, GVfsJob *job)
     }
 
   /* Some cameras, such as the Canon 5D, won't report the basedir */
-  if (head->fields & GP_STORAGEINFO_BASE)
+  if (head && head->fields & GP_STORAGEINFO_BASE)
     prefix = g_strdup_printf ("%s/", head->basedir);
 
  out:
