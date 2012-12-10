@@ -1088,6 +1088,7 @@ dispose_in_idle (gpointer object)
   g_idle_add ((GSourceFunc) dispose_in_idle_do, g_object_ref (object));
 }
 
+/* Typically called from g_proxy_volume_monitor_constructor() with proxy_vm lock being held */
 static void
 g_proxy_volume_monitor_init (GProxyVolumeMonitor *monitor)
 {
