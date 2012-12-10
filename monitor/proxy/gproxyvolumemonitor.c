@@ -1400,24 +1400,17 @@ register_volume_monitor (GTypeModule *type_module,
 static gboolean
 g_proxy_volume_monitor_setup_session_bus_connection (void)
 {
-  gboolean ret;
-
-  ret = FALSE;
-
   /* This is so that system daemons can use gio
    * without spawning private dbus instances.
    * See bug 526454.
    */
   if (g_getenv ("DBUS_SESSION_BUS_ADDRESS") == NULL)
-    goto out;
+    return FALSE;
 
   if (the_volume_monitors == NULL)
     the_volume_monitors = g_hash_table_new (g_direct_hash, g_direct_equal);
 
-  ret = TRUE;
-
- out:
-  return ret;
+  return TRUE;
 }
 
 void
