@@ -1411,7 +1411,8 @@ g_proxy_volume_monitor_setup_session_bus_connection (void)
   if (g_getenv ("DBUS_SESSION_BUS_ADDRESS") == NULL)
     goto out;
 
-  the_volume_monitors = g_hash_table_new (g_direct_hash, g_direct_equal);
+  if (the_volume_monitors == NULL)
+    the_volume_monitors = g_hash_table_new (g_direct_hash, g_direct_equal);
 
   ret = TRUE;
 
