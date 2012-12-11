@@ -295,12 +295,12 @@ update_volume (GVfsUDisks2Volume *volume)
       udisks_drive = udisks_client_get_drive_for_block (udisks_client, volume->block);
       if (udisks_drive != NULL)
         {
-          gchar *drive_desc;
-          GIcon *drive_icon;
-          GIcon *drive_symbolic_icon;
-          gchar *media_desc;
-          GIcon *media_icon;
-          GIcon *media_symbolic_icon;
+          gchar *drive_desc = NULL;
+          GIcon *drive_icon = NULL;
+          GIcon *drive_symbolic_icon = NULL;
+          gchar *media_desc = NULL;
+          GIcon *media_icon = NULL;
+          GIcon *media_symbolic_icon = NULL;
 
 #if UDISKS_CHECK_VERSION(2,0,90)
           {
