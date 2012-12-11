@@ -37,7 +37,8 @@ G_BEGIN_DECLS
 
 GType             gvfs_udisks2_drive_get_type        (void) G_GNUC_CONST;
 GVfsUDisks2Drive *gvfs_udisks2_drive_new             (GVfsUDisks2VolumeMonitor *monitor,
-                                                      UDisksDrive              *udisks_drive);
+                                                      UDisksDrive              *udisks_drive,
+                                                      gboolean                   coldplug);
 void              gvfs_udisks2_drive_disconnected    (GVfsUDisks2Drive         *drive);
 
 void              gvfs_udisks2_drive_set_volume      (GVfsUDisks2Drive         *drive,

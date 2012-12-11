@@ -49,6 +49,9 @@ struct _GVfsUDisks2Drive
   GVfsUDisks2VolumeMonitor  *monitor; /* owned by volume monitor */
   GList                     *volumes; /* entries in list are owned by volume monitor */
 
+  /* If TRUE, the drive was discovered at coldplug time */
+  gboolean coldplug;
+
   UDisksDrive *udisks_drive;
 
   GIcon *icon;
@@ -60,6 +63,7 @@ struct _GVfsUDisks2Drive
   gboolean is_media_removable;
   gboolean has_media;
   gboolean can_eject;
+  gboolean can_stop;
 };
 
 static void gvfs_udisks2_drive_drive_iface_init (GDriveIface *iface);
@@ -143,6 +147,7 @@ update_drive (GVfsUDisks2Drive *drive)
   gboolean old_is_media_removable;
   gboolean old_has_media;
   gboolean old_can_eject;
+  gboolean old_can_stop;
   UDisksBlock *block;
 #if UDISKS_CHECK_VERSION(2,0,90)
   UDisksObjectInfo *info = NULL;
@@ -156,6 +161,7 @@ update_drive (GVfsUDisks2Drive *drive)
   old_is_media_removable = drive->is_media_removable;
   old_has_media = drive->has_media;
   old_can_eject = drive->can_eject;
+  old_can_stop = drive->can_stop;
 
   old_name = g_strdup (drive->name);
   old_sort_key = g_strdup (drive->sort_key);
@@ -167,7 +173,7 @@ update_drive (GVfsUDisks2Drive *drive)
   /* ---------------------------------------------------------------------------------------------------- */
   /* reset */
 
-  drive->is_media_removable = drive->has_media = drive->can_eject = FALSE;
+  drive->is_media_removable = drive->has_media = drive->can_eject = drive->can_stop = FALSE;
   g_free (drive->name); drive->name = NULL;
   g_free (drive->sort_key); drive->sort_key = NULL;
   g_free (drive->device_file); drive->device_file = NULL;
@@ -225,6 +231,44 @@ update_drive (GVfsUDisks2Drive *drive)
                                 NULL,         /* media_desc */
                                 NULL);        /* media_icon */
 #endif
+
+#if UDISKS_CHECK_VERSION(2,0,90)
+  {
+    /* If can_stop is TRUE, then
+     *
+     *  - the GUI (e.g. Files, Shell) will call GDrive.stop() whenever the
+     *    user presses the Eject icon, which will result in:
+     *
+     *  - us calling UDisksDrive.PowerOff() on GDrive.stop(), which
+     *    will result in:
+     *
+     *  - UDisks asking the kernel to power off the USB port the drive
+     *    is connected to, which will result in
+     *
+     *  - Most drives powering off (especially true for bus-powered
+     *    drives such as 2.5" HDDs and USB sticks), which will result in
+     *
+     *  - Users feeling warm and cozy when they see the LED on the
+     *    device turn off (win)
+     *
+     * Obviously this is unwanted if the device is internal. Therefore,
+     * only do this for drives we appear *during* the login session.
+     *
+     * Note that this heuristic has the nice side-effect that
+     * USB-attached hard disks that are plugged in when the computer
+     * starts up will not be powered off when the user clicks the
+     * "eject" icon.
+     */
+    if (!drive->coldplug)
+      {
+        if (udisks_drive_get_can_power_off (drive->udisks_drive))
+          {
+            drive->can_stop = TRUE;
+          }
+      }
+  }
+#endif
+
   /* ---------------------------------------------------------------------------------------------------- */
   /* fallbacks */
 
@@ -246,6 +290,7 @@ update_drive (GVfsUDisks2Drive *drive)
   changed = !((old_is_media_removable == drive->is_media_removable) &&
               (old_has_media == drive->has_media) &&
               (old_can_eject == drive->can_eject) &&
+              (old_can_stop == drive->can_stop) &&
               (g_strcmp0 (old_name, drive->name) == 0) &&
               (g_strcmp0 (old_sort_key, drive->sort_key) == 0) &&
               (g_strcmp0 (old_device_file, drive->device_file) == 0) &&
@@ -282,12 +327,14 @@ on_udisks_drive_notify (GObject     *object,
 
 GVfsUDisks2Drive *
 gvfs_udisks2_drive_new (GVfsUDisks2VolumeMonitor  *monitor,
-                        UDisksDrive               *udisks_drive)
+                        UDisksDrive               *udisks_drive,
+                        gboolean                   coldplug)
 {
   GVfsUDisks2Drive *drive;
 
   drive = g_object_new (GVFS_TYPE_UDISKS2_DRIVE, NULL);
   drive->monitor = monitor;
+  drive->coldplug = coldplug;
 
   drive->udisks_drive = g_object_ref (udisks_drive);
   g_signal_connect (drive->udisks_drive,
@@ -427,13 +474,14 @@ gvfs_udisks2_drive_can_start_degraded (GDrive *_drive)
 static gboolean
 gvfs_udisks2_drive_can_stop (GDrive *_drive)
 {
-  return FALSE;
+  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+  return drive->can_stop;
 }
 
 static GDriveStartStopType
 gvfs_udisks2_drive_get_start_stop_type (GDrive *_drive)
 {
-  return G_DRIVE_START_STOP_TYPE_UNKNOWN;
+  return G_DRIVE_START_STOP_TYPE_SHUTDOWN;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -706,7 +754,7 @@ gvfs_udisks2_drive_eject_with_operation (GDrive              *_drive,
 
   /* This information is needed in GVfsDdisks2Volume when apps have
    * open files on the device ... we need to know if the button should
-   * be "Unmount Anyway" or "Eject Anyway"
+   * be "Unmount Anyway", "Eject Anyway" or "Power Off Anyway"
    */
   if (mount_operation != NULL)
     {
@@ -753,6 +801,132 @@ gvfs_udisks2_drive_eject_finish (GDrive        *drive,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+#if UDISKS_CHECK_VERSION(2,0,90)
+
+typedef struct
+{
+  GSimpleAsyncResult *simple;
+
+  GVfsUDisks2Drive *drive;
+  GMountOperation *mount_operation;
+} StopData;
+
+static void
+stop_data_free (StopData *data)
+{
+  g_object_unref (data->simple);
+  g_clear_object (&data->drive);
+  g_clear_object (&data->mount_operation);
+
+  g_free (data);
+}
+
+static void
+power_off_cb (GObject      *source_object,
+              GAsyncResult *res,
+              gpointer      user_data)
+{
+  StopData *data = user_data;
+  GError *error;
+
+  error = NULL;
+  if (!udisks_drive_call_power_off_finish (UDISKS_DRIVE (source_object), res, &error))
+    {
+      gvfs_udisks2_utils_udisks_error_to_gio_error (error);
+      g_simple_async_result_take_error (data->simple, error);
+    }
+
+  if (data->mount_operation != NULL)
+    {
+      /* If we fail send an ::aborted signal to make any notification go away */
+      if (error != NULL)
+        g_signal_emit_by_name (data->mount_operation, "aborted");
+
+      gvfs_udisks2_unmount_notify_stop (data->mount_operation);
+    }
+
+  g_simple_async_result_complete (data->simple);
+  stop_data_free (data);
+}
+
+static void
+gvfs_udisks2_drive_stop_on_all_unmounted (GDrive              *_drive,
+                                          GMountOperation     *mount_operation,
+                                          GCancellable        *cancellable,
+                                          GAsyncReadyCallback  callback,
+                                          gpointer             user_data,
+                                          gpointer             on_all_unmounted_data)
+{
+  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+  GVariantBuilder builder;
+  StopData *data;
+
+  data = g_new0 (StopData, 1);
+  data->simple = g_simple_async_result_new (G_OBJECT (drive),
+                                            callback,
+                                            user_data,
+                                            gvfs_udisks2_drive_stop_on_all_unmounted);
+  data->drive = g_object_ref (drive);
+  if (mount_operation != NULL)
+    data->mount_operation = g_object_ref (mount_operation);
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
+  if (mount_operation == NULL)
+    {
+      g_variant_builder_add (&builder,
+                             "{sv}",
+                             "auth.no_user_interaction", g_variant_new_boolean (TRUE));
+    }
+  udisks_drive_call_power_off (drive->udisks_drive,
+                               g_variant_builder_end (&builder),
+                               cancellable,
+                               power_off_cb,
+                               data);
+}
+
+static void
+gvfs_udisks2_drive_stop (GDrive              *_drive,
+                         GMountUnmountFlags   flags,
+                         GMountOperation     *mount_operation,
+                         GCancellable        *cancellable,
+                         GAsyncReadyCallback  callback,
+                         gpointer             user_data)
+{
+  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+
+  /* This information is needed in GVfsDdisks2Volume when apps have
+   * open files on the device ... we need to know if the button should
+   * be "Unmount Anyway", "Eject Anyway" or "Power Off Anyway"
+   */
+  if (mount_operation != NULL)
+    {
+      g_object_set_data (G_OBJECT (mount_operation), "x-udisks2-is-stop", GINT_TO_POINTER (1));
+      gvfs_udisks2_unmount_notify_start (mount_operation, NULL, _drive, FALSE);
+    }
+
+  /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
+  unmount_mounts (drive,
+                  flags,
+                  mount_operation,
+                  cancellable,
+                  callback,
+                  user_data,
+                  gvfs_udisks2_drive_stop_on_all_unmounted,
+                  NULL);
+}
+
+static gboolean
+gvfs_udisks2_drive_stop_finish (GDrive        *drive,
+                                GAsyncResult  *result,
+                                GError       **error)
+{
+  return !g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
+}
+
+#endif /* UDISKS_CHECK_VERSION(2,0,90) */
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static const gchar *
 gvfs_udisks2_drive_get_sort_key (GDrive *_drive)
 {
@@ -791,6 +965,9 @@ gvfs_udisks2_drive_drive_iface_init (GDriveIface *iface)
   iface->poll_for_media_finish = gvfs_udisks2_drive_poll_for_media_finish;
   iface->start = gvfs_udisks2_drive_start;
   iface->start_finish = gvfs_udisks2_drive_start_finish;
+#endif
+
+#if UDISKS_CHECK_VERSION(2,0,90)
   iface->stop = gvfs_udisks2_drive_stop;
   iface->stop_finish = gvfs_udisks2_drive_stop_finish;
 #endif

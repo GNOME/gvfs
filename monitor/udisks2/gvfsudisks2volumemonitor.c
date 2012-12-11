@@ -1342,7 +1342,7 @@ update_drives (GVfsUDisks2VolumeMonitor  *monitor,
       if (drive == NULL)
         {
           /*g_debug ("adding drive %s", gdu_presentable_get_id (p));*/
-          drive = gvfs_udisks2_drive_new (monitor, udisks_drive);
+          drive = gvfs_udisks2_drive_new (monitor, udisks_drive, coldplug);
           if (udisks_drive != NULL)
             {
               monitor->drives = g_list_prepend (monitor->drives, drive);

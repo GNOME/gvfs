@@ -584,6 +584,12 @@ unmount_operation_is_eject (GMountOperation *op)
   return GPOINTER_TO_INT (g_object_get_data (G_OBJECT (op), "x-udisks2-is-eject"));
 }
 
+static gboolean
+unmount_operation_is_stop (GMountOperation *op)
+{
+  return GPOINTER_TO_INT (g_object_get_data (G_OBJECT (op), "x-udisks2-is-stop"));
+}
+
 static void
 unmount_data_complete (UnmountData *data,
                        gboolean     complete_idle)
@@ -723,8 +729,10 @@ lsof_command_cb (GObject       *source_object,
   if (!data->completed)
     {
       gboolean is_eject;
+      gboolean is_stop;
 
       is_eject = unmount_operation_is_eject (data->mount_operation);
+      is_stop = unmount_operation_is_stop (data->mount_operation);
 
       /* We want to emit the 'show-processes' signal even if launching
        * lsof(1) failed or if it didn't return any PIDs. This is because
@@ -740,8 +748,11 @@ lsof_command_cb (GObject       *source_object,
                                                               G_CALLBACK (on_mount_op_reply),
                                                               data);
         }
-      if (is_eject)
+      if (is_eject || is_stop)
         {
+          /* Note that the GUI (Shell, Files) currently use the term
+           * "Eject" for both GDrive.stop() and GDrive.eject().
+           */
           choices[0] = _("Eject Anyway");
         }
       else
