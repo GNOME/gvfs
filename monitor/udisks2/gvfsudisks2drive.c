@@ -251,15 +251,20 @@ update_drive (GVfsUDisks2Drive *drive)
      *  - Users feeling warm and cozy when they see the LED on the
      *    device turn off (win)
      *
-     * Obviously this is unwanted if the device is internal. Therefore,
-     * only do this for drives we appear *during* the login session.
+     * Obviously this is unwanted if
      *
-     * Note that this heuristic has the nice side-effect that
-     * USB-attached hard disks that are plugged in when the computer
-     * starts up will not be powered off when the user clicks the
-     * "eject" icon.
+     *  - the drive is using removable media (e.g. optical discs,
+     *    flash media etc); or
+     *
+     *  - the device is internal
+     *
+     * So for the latter, only do this for drives we appear *during*
+     * the login session.  Note that this heuristic has the nice
+     * side-effect that USB-attached hard disks that are plugged in
+     * when the computer starts up will not be powered off when the
+     * user clicks the "eject" icon.
      */
-    if (!drive->coldplug)
+    if (!drive->is_media_removable && !drive->coldplug)
       {
         if (udisks_drive_get_can_power_off (drive->udisks_drive))
           {
