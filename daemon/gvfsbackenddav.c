@@ -2219,16 +2219,10 @@ try_open_stat_done (SoupSession *session,
   GFileType        target_type;
   SoupURI         *uri;
   gboolean         res;
-  guint            status;
 
-  status = msg->status_code;
-
-  if (status != 207)
+  if (msg->status_code != 207)
     {
-      g_vfs_job_failed_literal (job,
-				G_IO_ERROR,
-				http_error_code_from_status (status),
-				msg->reason_phrase);
+      http_job_failed (job, msg);
       return;
     }
 
@@ -2557,9 +2551,7 @@ do_make_directory (GVfsBackend          *backend,
                         G_IO_ERROR_EXISTS,
                         _("Target file already exists"));
     else
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
-                                http_error_code_from_status (status),
-                                msg->reason_phrase);
+      http_job_failed (G_VFS_JOB (job), msg);
   else
     g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -2604,10 +2596,7 @@ do_delete (GVfsBackend   *backend,
   status = g_vfs_backend_dav_send_message (backend, msg);
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (status))
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR,
-                              http_error_code_from_status (status),
-                              msg->reason_phrase);
+    http_job_failed (G_VFS_JOB (job), msg);
   else
     g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -2668,9 +2657,7 @@ do_set_display_name (GVfsBackend           *backend,
                       G_IO_ERROR_EXISTS,
                       _("Target file already exists"));
   else
-    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-                      http_error_code_from_status (status),
-                      "%s", msg->reason_phrase);
+    http_job_failed (G_VFS_JOB (job), msg);
 
   g_object_unref (msg);
   g_free (dirname);

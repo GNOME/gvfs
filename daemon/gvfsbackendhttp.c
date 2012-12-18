@@ -239,25 +239,25 @@ http_error_code_from_status (guint status)
 }
 
 
-static void
-g_vfs_job_failed_from_http_status (GVfsJob *job, guint status_code, const char *message)
+void
+http_job_failed (GVfsJob *job, SoupMessage *msg)
 {
-  switch (status_code) {
+  switch (msg->status_code) {
 
   case SOUP_STATUS_NOT_FOUND:
     g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              message);
+                              msg->reason_phrase);
     break;
 
   case SOUP_STATUS_UNAUTHORIZED:
   case SOUP_STATUS_PAYMENT_REQUIRED:
   case SOUP_STATUS_FORBIDDEN:
     g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                      _("HTTP Client Error: %s"), message);
+                      _("HTTP Client Error: %s"), msg->reason_phrase);
     break;
   default:
     g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("HTTP Error: %s"), message);
+                      _("HTTP Error: %s"), msg->reason_phrase);
   }
 }
 
@@ -369,9 +369,7 @@ open_for_read_ready (GObject      *source_object,
   msg = g_vfs_http_input_stream_get_message (stream);
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
-      g_vfs_job_failed_from_http_status (G_VFS_JOB (job),
-					 msg->status_code,
-					 msg->reason_phrase);
+      http_job_failed (G_VFS_JOB (job), msg);
       g_object_unref (msg);
       g_object_unref (stream);
       return;
@@ -664,8 +662,7 @@ query_info_ready (SoupSession *session,
 
   if (! SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
-      g_vfs_job_failed_from_http_status (G_VFS_JOB (job), msg->status_code,
-                                         msg->reason_phrase);
+      http_job_failed (G_VFS_JOB (job), msg);
       return;
     }
 

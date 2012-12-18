@@ -77,6 +77,9 @@ void          http_backend_open_for_read     (GVfsBackend         *backend,
 					      GVfsJob             *job,
 					      SoupURI             *uri);
 
+void          http_job_failed                (GVfsJob             *job,
+					      SoupMessage         *msg);
+
 G_END_DECLS
 
 #endif /* __G_VFS_BACKEND_HTTP_H__ */
