@@ -2514,7 +2514,7 @@ try_close_write (GVfsBackend *backend,
   data = g_memory_output_stream_steal_data (G_MEMORY_OUTPUT_STREAM (stream));
   g_object_unref (stream);
 
-  soup_message_set_request (msg, NULL,
+  soup_message_set_request (msg, "application/octet-stream",
 			    SOUP_MEMORY_TAKE, data, length);
   soup_session_queue_message (G_VFS_BACKEND_HTTP (backend)->session_async,
 			      msg, try_close_write_sent, job);
