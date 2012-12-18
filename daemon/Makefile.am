@@ -466,7 +466,6 @@ gvfsd_http_LDADD = $(libraries) $(HTTP_LIBS)
 
 gvfsd_dav_SOURCES = \
 	gvfshttpinputstream.c gvfshttpinputstream.h \
-	soup-output-stream.c soup-output-stream.h \
 	gvfsbackendhttp.c gvfsbackendhttp.h \
 	gvfsbackenddav.c gvfsbackenddav.h \
 	daemon-main.c daemon-main.h \

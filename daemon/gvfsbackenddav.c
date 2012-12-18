@@ -58,8 +58,6 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
 
-#include "soup-output-stream.h"
-
 #ifdef HAVE_AVAHI
 #include "gvfsdnssdutils.h"
 #include "gvfsdnssdresolver.h"
@@ -2308,8 +2306,8 @@ try_create_tested_existence (SoupSession *session, SoupMessage *msg,
    * Doesn't work with apache > 2.2.9
    * soup_message_headers_append (put_msg->request_headers, "If-None-Match", "*");
    */
-  stream = soup_output_stream_new (op_backend->session, put_msg, -1);
-  g_object_unref (put_msg);
+  stream = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
+  g_object_set_data_full (G_OBJECT (stream), "-gvfs-stream-msg", put_msg, g_object_unref);
 
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), stream);
   g_vfs_job_succeeded (job);
@@ -2324,7 +2322,7 @@ try_create (GVfsBackend *backend,
   SoupMessage *msg;
   SoupURI     *uri;
 
-  /* TODO: if SoupOutputStream supported chunked requests, we could
+  /* TODO: if we supported chunked requests, we could
    * use a PUT with "If-None-Match: *" and "Expect: 100-continue"
    */
   uri = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
@@ -2350,8 +2348,8 @@ open_for_replace_succeeded (GVfsBackendHttp *op_backend, GVfsJob *job,
   if (etag)
     soup_message_headers_append (put_msg->request_headers, "If-Match", etag);
 
-  stream = soup_output_stream_new (op_backend->session, put_msg, -1);
-  g_object_unref (put_msg);
+  stream = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
+  g_object_set_data_full (G_OBJECT (stream), "-gvfs-stream-msg", put_msg, g_object_unref);
 
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), stream);
   g_vfs_job_succeeded (job);
@@ -2482,34 +2480,17 @@ try_write (GVfsBackend *backend,
 
 /* *** close_write () *** */
 static void
-close_write_ready (GObject      *source_object,
-                   GAsyncResult *result,
-                   gpointer      user_data)
+try_close_write_sent (SoupSession *session,
+		      SoupMessage *msg,
+		      gpointer     user_data)
 {
-  GOutputStream *stream;
-  GVfsJob       *job;
-  GError        *error;
-  gboolean       res;
+  GVfsJob *job;
 
-  error = NULL;
   job = G_VFS_JOB (user_data);
-  stream = G_OUTPUT_STREAM (source_object);
-  res = g_output_stream_close_finish (stream,
-                                      result,
-                                      &error);
-  if (res == FALSE)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                error->domain,
-                                error->code,
-                                error->message);
-
-      g_error_free (error);
-    }
+  if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
+    http_job_failed (job, msg);
   else
     g_vfs_job_succeeded (job);
-
-  g_object_unref (stream);
 }
 
 static gboolean
@@ -2517,15 +2498,26 @@ try_close_write (GVfsBackend *backend,
                  GVfsJobCloseWrite *job,
                  GVfsBackendHandle handle)
 {
-  GOutputStream   *stream;
+  GOutputStream *stream;
+  SoupMessage *msg;
+  gsize length;
+  gchar *data;
 
   stream = G_OUTPUT_STREAM (handle);
 
-  g_output_stream_close_async (stream,
-                               G_PRIORITY_DEFAULT,
-                               G_VFS_JOB (job)->cancellable,
-                               close_write_ready,
-                               job);
+  msg = g_object_get_data (G_OBJECT (stream), "-gvfs-stream-msg");
+  g_object_ref (msg);
+  g_object_set_data (G_OBJECT (stream), "-gvfs-stream-msg", NULL);
+
+  g_output_stream_close (stream, NULL, NULL);
+  length = g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (stream));
+  data = g_memory_output_stream_steal_data (G_MEMORY_OUTPUT_STREAM (stream));
+  g_object_unref (stream);
+
+  soup_message_set_request (msg, NULL,
+			    SOUP_MEMORY_TAKE, data, length);
+  soup_session_queue_message (G_VFS_BACKEND_HTTP (backend)->session_async,
+			      msg, try_close_write_sent, job);
 
   return TRUE;
 }
