@@ -95,6 +95,8 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   backend->session_async = soup_session_async_new_with_options ("user-agent",
                                                                 "gvfs/" VERSION,
                                                                 NULL);
+  /* SoupRequester seems to depend on use-thread-context */
+  g_object_set (G_OBJECT (backend->session_async), "use-thread-context", TRUE, NULL);
 
   /* Proxy handling */
   proxy_resolver = g_object_new (SOUP_TYPE_PROXY_RESOLVER_GNOME, NULL);
