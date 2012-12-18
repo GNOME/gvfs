@@ -1,3 +1,28 @@
+Major changes in 1.15.1
+=======================
+* client: Set default timeout to infinite for all GDaemonFile methods
+* http, dav: Port to SoupRequest
+* sftp: Fix symlink target in query_info_reply()
+* smb: Report proper error on do_query_fs_info()
+* proxy volume monitor: Don't disable exit_on_close on session bus
+* proxy volume monitor: Get session bus on demand
+* udisks2: Use udisks 2.0.90 API for symbolic icons
+* udisks2: Fix symbolic icons for devices without an UDisksDrive
+* udisks2: Don't leak GIcon when applying hints
+* udisks2: Get icons via UDisksObjectInfo for block devices that are not drives
+* udisks2: Add support for mount option x-gvfs-symbolic-icon
+* udisks2: If a drive is hotplugged and CanPowerOff is TRUE, set can_stop to TRUE
+* udisks2: Don't set GDrive.can_stop to TRUE if drive has removable media
+* test: Add tests for trash://
+* test: Add tests using the introspected Gio API
+* test: Fix Drive tests for Python 3.3
+* test: Disable service activation for local D-BUS
+* test: Skip Dav tests if http is disabled
+* programs: Add a cmdline way to empty the trash
+* programs: Print out symbolic-icon in gvfs-info
+* Removed calls to g_type_init()
+* Translation updates
+
 Major changes in 1.15.0
 =======================
 * New testing framework, written by Martin Pitt
