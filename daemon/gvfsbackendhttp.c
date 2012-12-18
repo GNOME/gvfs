@@ -33,8 +33,12 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 
+#define LIBSOUP_USE_UNSTABLE_REQUEST_API
 #include <libsoup/soup-gnome.h>
+#include <libsoup/soup-requester.h>
+
 #include "gvfsbackendhttp.h"
+#include "gvfshttpinputstream.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
@@ -48,9 +52,6 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfsdaemonutils.h"
-
-#include "soup-input-stream.h"
-
 
 G_DEFINE_TYPE (GVfsBackendHttp, g_vfs_backend_http, G_VFS_TYPE_BACKEND)
 
@@ -117,6 +118,10 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   soup_session_add_feature (backend->session, content_decoder);
   soup_session_add_feature (backend->session_async, content_decoder);
   g_object_unref (content_decoder);
+
+  /* Request API */
+  soup_session_add_feature_by_type (backend->session, SOUP_TYPE_REQUESTER);
+  soup_session_add_feature_by_type (backend->session_async, SOUP_TYPE_REQUESTER);
 
   /* Logging */
   debug = g_getenv ("GVFS_HTTP_DEBUG");
@@ -337,6 +342,7 @@ open_for_read_ready (GObject      *source_object,
 {
   GInputStream *stream;
   GVfsJob      *job;
+  SoupMessage  *msg;
   gboolean      res;
   gboolean      can_seek;
   GError       *error;
@@ -345,9 +351,9 @@ open_for_read_ready (GObject      *source_object,
   error  = NULL;
   job    = G_VFS_JOB (user_data);
 
-  res = soup_input_stream_send_finish (stream,
-                                       result,
-                                       &error);
+  res = g_vfs_http_input_stream_send_finish (stream,
+					     result,
+					     &error);
   if (res == FALSE)
     {
       g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -359,6 +365,18 @@ open_for_read_ready (GObject      *source_object,
       g_object_unref (stream);
       return;
     }
+
+  msg = g_vfs_http_input_stream_get_message (stream);
+  if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
+    {
+      g_vfs_job_failed_from_http_status (G_VFS_JOB (job),
+					 msg->status_code,
+					 msg->reason_phrase);
+      g_object_unref (msg);
+      g_object_unref (stream);
+      return;
+    }
+  g_object_unref (msg);
 
   can_seek = G_IS_SEEKABLE (stream) && g_seekable_can_seek (G_SEEKABLE (stream));
 
@@ -387,22 +405,16 @@ http_backend_open_for_read (GVfsBackend *backend,
 {
   GVfsBackendHttp *op_backend;
   GInputStream    *stream;
-  SoupMessage     *msg;
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
 
-  msg = soup_message_new_from_uri (SOUP_METHOD_GET, uri);
+  stream = g_vfs_http_input_stream_new (op_backend->session_async, uri);
 
-  soup_message_body_set_accumulate (msg->response_body, FALSE);
-
-  stream = soup_input_stream_new (op_backend->session_async, msg);
-  g_object_unref (msg);
-
-  soup_input_stream_send_async (stream,
-                                G_PRIORITY_DEFAULT,
-                                job->cancellable,
-                                open_for_read_ready,
-                                job);
+  g_vfs_http_input_stream_send_async (stream,
+				      G_PRIORITY_DEFAULT,
+				      job->cancellable,
+				      open_for_read_ready,
+				      job);
 }
 
 /* *** read () *** */
@@ -690,7 +702,7 @@ try_query_info_on_read (GVfsBackend           *backend,
                         GFileInfo             *info,
                         GFileAttributeMatcher *attribute_matcher)
 {
-    SoupMessage *msg = soup_input_stream_get_message (G_INPUT_STREAM (handle));
+    SoupMessage *msg = g_vfs_http_input_stream_get_message (G_INPUT_STREAM (handle));
 
     file_info_from_message (msg, info, attribute_matcher);
     g_object_unref (msg);

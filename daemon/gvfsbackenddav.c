@@ -58,7 +58,6 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
 
-#include "soup-input-stream.h"
 #include "soup-output-stream.h"
 
 #ifdef HAVE_AVAHI
@@ -1954,7 +1953,7 @@ do_mount (GVfsBackend  *backend,
   g_object_unref (msg_opts);
   g_object_unref (msg_stat);
 
-  /* also auth the workaround async session we need for SoupInputStream */
+  /* also auth the async session */
   g_signal_connect (G_VFS_BACKEND_HTTP (backend)->session_async, "authenticate",
                     G_CALLBACK (soup_authenticate_from_data),
                     data);

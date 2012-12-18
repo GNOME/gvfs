@@ -28,7 +28,6 @@
 #include <libsoup/soup.h>
 
 #include "soup-output-stream.h"
-#include "soup-input-stream.h"
 
 G_DEFINE_TYPE (SoupOutputStream, soup_output_stream, G_TYPE_OUTPUT_STREAM)
 

@@ -449,7 +449,7 @@ gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(HAL_LIBS)
 endif
 
 gvfsd_http_SOURCES = \
-	soup-input-stream.c soup-input-stream.h \
+	gvfshttpinputstream.c gvfshttpinputstream.h \
 	gvfsbackendhttp.c gvfsbackendhttp.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
@@ -465,7 +465,7 @@ gvfsd_http_CPPFLAGS = \
 gvfsd_http_LDADD = $(libraries) $(HTTP_LIBS)
 
 gvfsd_dav_SOURCES = \
-	soup-input-stream.c soup-input-stream.h \
+	gvfshttpinputstream.c gvfshttpinputstream.h \
 	soup-output-stream.c soup-output-stream.h \
 	gvfsbackendhttp.c gvfsbackendhttp.h \
 	gvfsbackenddav.c gvfsbackenddav.h \
