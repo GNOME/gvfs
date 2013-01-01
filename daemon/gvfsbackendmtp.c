@@ -353,29 +353,25 @@ do_mount (GVfsBackend *backend,
   const char *host = g_mount_spec_get (mount_spec, "host");
   DEBUG ("(I) do_mount: host=%s", host);
   if (host == NULL) {
-    GError *error;
-    g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No device specified"));
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-    g_error_free (error);
+    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                              G_IO_ERROR_FAILED, _("No device specified"));
     return;
   }
 
   const char *subsystems[] = {"usb", NULL};
   op_backend->gudev_client = g_udev_client_new (subsystems);
   if (op_backend->gudev_client == NULL) {
-    GError *error;
-    g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create gudev client"));
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-    g_error_free (error);
+    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                              G_IO_ERROR_FAILED, _("Cannot create gudev client"));
     return;
   }
   g_signal_connect (op_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), op_backend);
 
   /* turn usb:001,041 string into an udev device name */
   if (!g_str_has_prefix (host, "[usb:")) {
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                      _("Unexpected host uri format."));
+    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                              G_IO_ERROR_NOT_SUPPORTED,
+                              _("Unexpected host uri format."));
     return;
   }
 
@@ -383,9 +379,9 @@ do_mount (GVfsBackend *backend,
   char *dev_path = g_strconcat ("/dev/bus/usb/", host + 5, NULL);
   if ((comma = strchr (dev_path, ',')) == NULL) {
     g_free (dev_path);
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                      _("Malformed host uri."));
+    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                              G_IO_ERROR_NOT_SUPPORTED,
+                              _("Malformed host uri."));
     return;
   }
   *comma = '/';
@@ -395,9 +391,9 @@ do_mount (GVfsBackend *backend,
   /* find corresponding GUdevDevice */
   if (!g_udev_client_query_by_device_file (op_backend->gudev_client, dev_path)) {
     g_free (dev_path);
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      _("Couldn't find matching udev device."));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("Couldn't find matching udev device."));
     return;
   }
 
@@ -480,25 +476,25 @@ get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
   case LIBMTP_ERROR_NONE:
     break;
   case LIBMTP_ERROR_NO_DEVICE_ATTACHED:
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      _("No MTP devices found"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("No MTP devices found"));
     goto exit;
   case LIBMTP_ERROR_CONNECTING:
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_CONNECTION_REFUSED,
-                      _("Unable to connect to MTP device"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_CONNECTION_REFUSED,
+                              _("Unable to connect to MTP device"));
     goto exit;
   case LIBMTP_ERROR_MEMORY_ALLOCATION:
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_FILE_ERROR, G_FILE_ERROR_NOMEM,
-                      _("Unable to allocate memory while detecting MTP devices"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_FILE_ERROR, G_FILE_ERROR_NOMEM,
+                              _("Unable to allocate memory while detecting MTP devices"));
     goto exit;
   case LIBMTP_ERROR_GENERAL:
   default:
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("Generic libmtp error"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_FAILED,
+                              _("Generic libmtp error"));
     goto exit;
   }
 
@@ -816,9 +812,9 @@ do_query_info (GVfsBackend *backend,
     if (ret != 0) {
       LIBMTP_Dump_Errorstack (device);
       LIBMTP_Clear_Errorstack (device);
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                        _("No storage volumes found"));
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                _("No storage volumes found"));
       goto exit;
     }
     for (storage = device->storage; storage != 0; storage = storage->next) {
@@ -903,9 +899,9 @@ do_query_fs_info (GVfsBackend *backend,
     if (ret != 0) {
       LIBMTP_Dump_Errorstack (device);
       LIBMTP_Clear_Errorstack (device);
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                        _("No storage volumes found"));
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                _("No storage volumes found"));
       goto exit;
     }
     for (storage = device->storage; storage != 0; storage = storage->next) {
@@ -959,9 +955,9 @@ do_make_directory (GVfsBackend *backend,
   for (ne = 0; elements[ne] != NULL; ne++);
 
   if (ne < 3) {
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("Cannot make directory in this location"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_FAILED,
+                              _("Cannot make directory in this location"));
     goto exit;
   }
 
@@ -1010,9 +1006,9 @@ do_pull (GVfsBackend *backend,
   for (ne = 0; elements[ne] != NULL; ne++);
 
   if (ne < 3) {
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
-                      _("Not a regular file"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+                              _("Not a regular file"));
     goto exit;
   }
 
@@ -1021,9 +1017,9 @@ do_pull (GVfsBackend *backend,
 
   LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, strtol (elements[ne-1], NULL, 10));
   if (file == NULL) {
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      _("File does not exist"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("File does not exist"));
     goto exit;
   }
 
@@ -1098,9 +1094,9 @@ do_push (GVfsBackend *backend,
   for (ne = 0; elements[ne] != NULL; ne++);
 
   if (ne < 3) {
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
-                      _("Cannot write to this location"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+                              _("Cannot write to this location"));
     goto exit;
   }
 
@@ -1115,9 +1111,9 @@ do_push (GVfsBackend *backend,
 
   file = g_file_new_for_path (local_path);
   if (!file) {
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      _("File not found"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("File not found"));
     goto exit;
   }
 
@@ -1197,9 +1193,9 @@ do_delete (GVfsBackend *backend,
   for (ne = 0; elements[ne] != NULL; ne++);
 
   if (ne < 3) {
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("Cannot delete this entity"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_FAILED,
+                              _("Cannot delete this entity"));
     goto exit;
   }
 
@@ -1239,9 +1235,9 @@ do_set_display_name (GVfsBackend *backend,
   for (ne = 0; elements[ne] != NULL; ne++);
 
   if (ne < 3) {
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                      _("Can't rename volume"));
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                              _("Can't rename volume"));
     goto exit;
   }
 
