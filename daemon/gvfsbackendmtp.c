@@ -339,6 +339,46 @@ mtp_heartbeat (GVfsBackendMtp *backend)
   return TRUE;
 }
 
+static char *
+get_dev_path_from_host (GVfsJob *job,
+                        GUdevClient *gudev_client,
+                        const char *host)
+{
+  /* turn usb:001,041 string into an udev device name */
+  if (!g_str_has_prefix (host, "[usb:")) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                              G_IO_ERROR_NOT_SUPPORTED,
+                              _("Unexpected host uri format."));
+    return NULL;
+  }
+
+  char *comma;
+  char *dev_path = g_strconcat ("/dev/bus/usb/", host + 5, NULL);
+  if ((comma = strchr (dev_path, ',')) == NULL) {
+    g_free (dev_path);
+    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                              G_IO_ERROR_NOT_SUPPORTED,
+                              _("Malformed host uri."));
+    return NULL;
+  }
+  *comma = '/';
+  dev_path[strlen (dev_path) -1] = '\0';
+  DEBUG ("(II) get_dev_path_from_host: Parsed '%s' into device name %s", host, dev_path);
+
+  /* find corresponding GUdevDevice */
+  GUdevDevice *device = g_udev_client_query_by_device_file (gudev_client, dev_path);
+  if (!device) {
+    g_free (dev_path);
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("Couldn't find matching udev device."));
+    return NULL;
+  }
+  g_object_unref (device);
+
+  return dev_path;
+}
+
 static void
 do_mount (GVfsBackend *backend,
            GVfsJobMount *job,
@@ -365,39 +405,16 @@ do_mount (GVfsBackend *backend,
                               G_IO_ERROR_FAILED, _("Cannot create gudev client"));
     return;
   }
-  g_signal_connect (op_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), op_backend);
 
-  /* turn usb:001,041 string into an udev device name */
-  if (!g_str_has_prefix (host, "[usb:")) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
-                              G_IO_ERROR_NOT_SUPPORTED,
-                              _("Unexpected host uri format."));
+  char *dev_path = get_dev_path_from_host (G_VFS_JOB (job), op_backend->gudev_client, host);
+  if (dev_path == NULL) {
+    g_object_unref (op_backend->gudev_client);
+    // get_dev_path_from_host() sets job state.
     return;
   }
-
-  char *comma;
-  char *dev_path = g_strconcat ("/dev/bus/usb/", host + 5, NULL);
-  if ((comma = strchr (dev_path, ',')) == NULL) {
-    g_free (dev_path);
-    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
-                              G_IO_ERROR_NOT_SUPPORTED,
-                              _("Malformed host uri."));
-    return;
-  }
-  *comma = '/';
-  dev_path[strlen (dev_path) -1] = '\0';
-  DEBUG ("(I) do_mount: Parsed '%s' into device name %s", host, dev_path);
-
-  /* find corresponding GUdevDevice */
-  if (!g_udev_client_query_by_device_file (op_backend->gudev_client, dev_path)) {
-    g_free (dev_path);
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("Couldn't find matching udev device."));
-    return;
-  }
-
   op_backend->dev_path = dev_path;
+
+  g_signal_connect (op_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), op_backend);
 
   LIBMTP_Init ();
 
