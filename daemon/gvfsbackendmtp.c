@@ -1076,23 +1076,10 @@ do_pull (GVfsBackend *backend,
   LIBMTP_destroy_file_t (file);
   file = NULL;
   if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY) {
-    GError *error;
-    GFile *file = g_file_new_for_path (local_path);
-    g_assert (file != NULL);
-    if (file) {
-      error = NULL;
-      if (g_file_make_directory (file, G_VFS_JOB (job)->cancellable, &error)) {
-        g_vfs_job_succeeded (G_VFS_JOB (job));
-      } else if (error->code == G_IO_ERROR_EXISTS) {
-        g_vfs_job_succeeded (G_VFS_JOB (job));
-        g_error_free (error);
-      } else {
-        g_vfs_job_failed_from_error (G_VFS_JOB (job), error); 
-        DEBUG ("(II) pull dir failed: %s", error->message);
-        g_error_free (error);
-      }
-      g_object_unref (file);
-    }
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                              _("Can't recursively copy directory"));
+    goto exit;
   } else {
       MtpProgressData *mtp_progress_data = g_new0 (MtpProgressData, 1);
       mtp_progress_data->progress_callback = progress_callback;
@@ -1168,12 +1155,10 @@ do_push (GVfsBackend *backend,
   if (g_file_query_file_type (file, G_FILE_QUERY_INFO_NONE,
                               G_VFS_JOB (job)->cancellable) ==
       G_FILE_TYPE_DIRECTORY) {
-    /*
-     * It happens to be the case that we can reuse do_make_directory
-     * here.
-     */
-    return do_make_directory (backend, G_VFS_JOB_MAKE_DIRECTORY (job),
-                              elements[ne-1]);
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                              _("Can't recursively copy directory"));
+    goto exit;
   }
 
   GError *error = NULL;
