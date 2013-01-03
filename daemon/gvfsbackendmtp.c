@@ -600,7 +600,6 @@ get_device_info (GVfsBackendMtp *backend, GFileInfo *info)
                                       _("Unnamed Device") : friendlyname);
   free (friendlyname);
 
-  g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
   g_file_info_set_content_type (info, "inode/directory");
   g_file_info_set_size (info, 0);
 
@@ -728,7 +727,6 @@ get_file_info (GVfsBackend *backend,
       LIBMTP_FILETYPE_IS_AUDIOVIDEO (file->filetype)) {
 
     char *icon_id;
-    GIcon *icon;
     GMountSpec *mount_spec;
 
     mount_spec = g_vfs_backend_get_mount_spec (backend);
