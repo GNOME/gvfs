@@ -305,22 +305,44 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
 static gpointer
 check_event (gpointer user_data)
 {
-  GVfsBackendMtp *backend = user_data;
+  GWeakRef *event_ref = user_data;
 
   LIBMTP_event_t event;
   int ret = 0;
   while (ret == 0) {
     uint32_t param1;
     char *path;
-    ret = LIBMTP_Read_Event (backend->device, &event, &param1);
+    GVfsBackendMtp *backend;
+
+    backend = g_weak_ref_get (event_ref);
+    if (backend && !g_atomic_int_get (&backend->unmount_started)) {
+      LIBMTP_mtpdevice_t *device = backend->device;
+      g_object_unref (backend);
+      /*
+       * Unavoidable race. We can't hold a reference when
+       * calling Read_Event as it blocks while waiting and
+       * we can't interrupt it in any sane way, so it would
+       * end up preventing finalization of the backend.
+       */
+      ret = LIBMTP_Read_Event (device, &event, &param1);
+    } else {
+      return NULL;
+    }
+
     switch (event) {
     case LIBMTP_EVENT_STORE_ADDED:
-      path = g_strdup_printf ("/%u", param1);
-      g_mutex_lock (&backend->mutex);
-      g_hash_table_foreach (backend->monitors, emit_create_event, path);
-      g_mutex_unlock (&backend->mutex);
-      g_free (path);
-      break;
+      backend = g_weak_ref_get (event_ref);
+      if (backend && !g_atomic_int_get (&backend->unmount_started)) {
+        path = g_strdup_printf ("/%u", param1);
+        g_mutex_lock (&backend->mutex);
+        g_hash_table_foreach (backend->monitors, emit_create_event, path);
+        g_mutex_unlock (&backend->mutex);
+        g_free (path);
+        g_object_unref (backend);
+        break;
+      } else {
+        return NULL;
+      }
     default:
       break;
     }
@@ -431,7 +453,15 @@ do_mount (GVfsBackend *backend,
       g_timeout_add_seconds (900, (GSourceFunc)mtp_heartbeat, op_backend);
 
 #if HAVE_LIBMTP_READ_EVENT
-    g_thread_new ("events", check_event, backend);
+    GWeakRef *event_ref = g_new0 (GWeakRef, 1);
+    g_weak_ref_init (event_ref, backend);
+    GThread *event_thread = g_thread_new ("events", check_event, event_ref);
+    /*
+     * We don't need our ref to the thread, as the libmtp semantics mean
+     * that in the normal case, the thread will block forever when we are
+     * cleanining up before termination, so we can never join the thread.
+     */
+    g_thread_unref (event_thread);
 #endif
   }
   DEBUG ("(I) do_mount done.");
@@ -449,13 +479,16 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
 
   op_backend = G_VFS_BACKEND_MTP (backend);
 
+  g_mutex_lock (&op_backend->mutex);
+
+  g_atomic_int_set (&op_backend->unmount_started, TRUE);
+
   g_source_remove (op_backend->hb_id);
   g_object_unref (op_backend->gudev_client);
   g_free (op_backend->dev_path);
-
-  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
   LIBMTP_Release_Device (op_backend->device);
-  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  g_mutex_unlock (&op_backend->mutex);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
