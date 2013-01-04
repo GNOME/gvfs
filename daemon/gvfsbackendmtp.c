@@ -125,7 +125,7 @@ g_vfs_backend_mtp_init (GVfsBackendMtp *backend)
   g_vfs_backend_set_mount_spec (G_VFS_BACKEND (backend), mount_spec);
   g_mount_spec_unref (mount_spec);
 
-  backend->monitors = g_hash_table_new (g_direct_hash, g_direct_equal);
+  backend->monitors = g_hash_table_new (NULL, NULL);
 
   DEBUG ("(I) g_vfs_backend_mtp_init done.");
 }
@@ -174,7 +174,7 @@ do_create_dir_monitor (GVfsBackend *backend,
                           g_strdup (filename), g_free);
 
   g_vfs_job_create_monitor_set_monitor (job, vfs_monitor);
-  g_hash_table_insert (mtp_backend->monitors, vfs_monitor, NULL);
+  g_hash_table_add (mtp_backend->monitors, vfs_monitor);
   g_object_weak_ref (G_OBJECT (vfs_monitor), (GWeakNotify)g_hash_table_remove, mtp_backend->monitors);
   g_object_unref (vfs_monitor);
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -204,7 +204,7 @@ do_create_file_monitor (GVfsBackend *backend,
                           g_strdup (filename), g_free);
 
   g_vfs_job_create_monitor_set_monitor (job, vfs_monitor);
-  g_hash_table_insert (mtp_backend->monitors, vfs_monitor, NULL);
+  g_hash_table_add (mtp_backend->monitors, vfs_monitor);
   g_object_weak_ref (G_OBJECT (vfs_monitor), (GWeakNotify)g_hash_table_remove, mtp_backend->monitors);
   g_object_unref (vfs_monitor);
   g_vfs_job_succeeded (G_VFS_JOB (job));
