@@ -808,8 +808,7 @@ do_enumerate (GVfsBackend *backend,
   GFileInfo *info;
 
   gchar **elements = g_strsplit_set (filename, "/", -1);
-  unsigned int ne = 0;
-  for (ne = 0; elements[ne] != NULL; ne++);
+  unsigned int ne = g_strv_length (elements);
 
   DEBUG ("(I) do_enumerate (filename = %s, n_elements = %d) ", filename, ne);
 
@@ -880,8 +879,7 @@ do_query_info (GVfsBackend *backend,
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   gchar **elements = g_strsplit_set (filename, "/", -1);
-  unsigned int ne = 0;
-  for (ne = 0; elements[ne] != NULL; ne++);
+  unsigned int ne = g_strv_length (elements);
 
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
@@ -967,8 +965,7 @@ do_query_fs_info (GVfsBackend *backend,
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   gchar **elements = g_strsplit_set (filename, "/", -1);
-  unsigned int ne = 0;
-  for (ne = 0; elements[ne] != NULL; ne++);
+  unsigned int ne = g_strv_length (elements);
 
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
@@ -1035,8 +1032,7 @@ do_make_directory (GVfsBackend *backend,
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   gchar **elements = g_strsplit_set (filename, "/", -1);
-  unsigned int ne = 0;
-  for (ne = 0; elements[ne] != NULL; ne++);
+  unsigned int ne = g_strv_length (elements);
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1086,8 +1082,7 @@ do_pull (GVfsBackend *backend,
 
   GFileInfo *info = NULL;
   gchar **elements = g_strsplit_set (source, "/", -1);
-  unsigned int ne = 0;
-  for (ne = 0; elements[ne] != NULL; ne++);
+  unsigned int ne = g_strv_length (elements);
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1161,8 +1156,7 @@ do_push (GVfsBackend *backend,
   GFile *file = NULL;
   GFileInfo *info = NULL;
   gchar **elements = g_strsplit_set (destination, "/", -1);
-  unsigned int ne = 0;
-  for (ne = 0; elements[ne] != NULL; ne++);
+  unsigned int ne = g_strv_length (elements);
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1258,8 +1252,7 @@ do_delete (GVfsBackend *backend,
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   gchar **elements = g_strsplit_set (filename, "/", -1);
-  unsigned int ne = 0;
-  for (ne = 0; elements[ne] != NULL; ne++);
+  unsigned int ne = g_strv_length (elements);
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1300,8 +1293,7 @@ do_set_display_name (GVfsBackend *backend,
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   gchar **elements = g_strsplit_set (filename, "/", -1);
-  unsigned int ne = 0;
-  for (ne = 0; elements[ne] != NULL; ne++);
+  unsigned int ne = g_strv_length (elements);
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
