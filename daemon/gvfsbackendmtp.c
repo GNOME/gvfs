@@ -1105,7 +1105,6 @@ do_pull (GVfsBackend *backend,
   info = g_file_info_new ();
   get_file_info (backend, device, info, file);
   LIBMTP_destroy_file_t (file);
-  file = NULL;
   if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
@@ -1130,9 +1129,7 @@ do_pull (GVfsBackend *backend,
   }
 
  exit:
-  if (info != NULL) {
-    g_object_unref (info);
-  }
+  g_clear_object (&info);
   g_strfreev (elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
@@ -1175,12 +1172,7 @@ do_push (GVfsBackend *backend,
   }
 
   file = g_file_new_for_path (local_path);
-  if (!file) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File not found"));
-    goto exit;
-  }
+  g_assert(file);
 
   if (g_file_query_file_type (file, G_FILE_QUERY_INFO_NONE,
                               G_VFS_JOB (job)->cancellable) ==
@@ -1230,12 +1222,8 @@ do_push (GVfsBackend *backend,
                         (char *)destination);
 
  exit:
-  if (file) {
-    g_object_unref (file);
-  }
-  if (info) {
-    g_object_unref (info);
-  }
+  g_clear_object (&file);
+  g_clear_object (&info);
   g_strfreev (elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
