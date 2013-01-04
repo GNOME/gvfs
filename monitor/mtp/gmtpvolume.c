@@ -105,12 +105,14 @@ static int hexdigit (char c)
 static const char*
 udev_decode_string (const char* encoded)
 {
-  static char decoded[4096];
   int len;
   const char* s;
+  char *decoded;
 
   if (encoded == NULL)
     return NULL;
+
+  decoded = g_malloc(4096);
 
   for (len = 0, s = encoded; *s && len < sizeof (decoded) - 1; ++len, ++s) {
     /* need to check for NUL terminator in advance */
