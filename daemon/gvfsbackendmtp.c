@@ -153,6 +153,11 @@ g_vfs_backend_mtp_finalize (GObject *object)
  * Monitors
  ************************************************/
 
+/**
+ * do_create_dir_monitor:
+ *
+ * Called with backend mutex lock held.
+ */
 static void
 do_create_dir_monitor (GVfsBackend *backend,
                        GVfsJobCreateMonitor *job,
@@ -178,6 +183,11 @@ do_create_dir_monitor (GVfsBackend *backend,
 }
 
 
+/**
+ * do_create_file_monitor:
+ *
+ * Called with backend mutex lock held.
+ */
 static void
 do_create_file_monitor (GVfsBackend *backend,
                         GVfsJobCreateMonitor *job,
@@ -202,6 +212,7 @@ do_create_file_monitor (GVfsBackend *backend,
   DEBUG ("(I) create_file_monitor done.");
 }
 
+
 static void
 emit_event_internal (GVfsMonitor *monitor,
                      const char *path,
@@ -223,6 +234,7 @@ emit_event_internal (GVfsMonitor *monitor,
   DEBUG ("(III) emit_event_internal done.");
 }
 
+
 static void
 emit_create_event (gpointer key,
                    gpointer value,
@@ -232,6 +244,7 @@ emit_create_event (gpointer key,
   emit_event_internal (key, user_data, G_FILE_MONITOR_EVENT_CREATED);
 }
 
+
 static void
 emit_delete_event (gpointer key,
                    gpointer value,
@@ -240,6 +253,7 @@ emit_delete_event (gpointer key,
   DEBUG ("(II) emit_delete_event.");
   emit_event_internal (key, user_data, G_FILE_MONITOR_EVENT_DELETED);
 }
+
 
 static void
 emit_change_event (gpointer key,
@@ -496,16 +510,17 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
 }
 
 
-
-
-
-
-
 /************************************************
  * 	  Queries
  * 
  */
 
+
+/**
+ * get_device:
+ *
+ * Called with backend mutex lock held.
+ */
 LIBMTP_mtpdevice_t *
 get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
   DEBUG ("(II) get_device: %s", id);
@@ -582,6 +597,12 @@ get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
   return device;
 }
 
+
+/**
+ * get_device_info:
+ *
+ * Called with backend mutex lock held.
+ */
 static void
 get_device_info (GVfsBackendMtp *backend, GFileInfo *info)
 {
@@ -637,6 +658,12 @@ get_device_info (GVfsBackendMtp *backend, GFileInfo *info)
   DEBUG_ENUMERATE ("(II) get_device_info done.");
 }
 
+
+/**
+ * get_storage_info:
+ *
+ * Called with backend mutex lock held.
+ */
 static void
 get_storage_info (LIBMTP_devicestorage_t *storage, GFileInfo *info) {
 
@@ -688,6 +715,12 @@ get_storage_info (LIBMTP_devicestorage_t *storage, GFileInfo *info) {
   DEBUG_ENUMERATE ("(II) get_storage_info done.");
 }
 
+
+/**
+ * get_file_info:
+ *
+ * Called with backend mutex lock held.
+ */
 static void
 get_file_info (GVfsBackend *backend,
                LIBMTP_mtpdevice_t *device,
@@ -766,10 +799,10 @@ get_file_info (GVfsBackend *backend,
 
 static void
 do_enumerate (GVfsBackend *backend,
-               GVfsJobEnumerate *job,
-               const char *filename,
-               GFileAttributeMatcher *attribute_matcher,
-               GFileQueryInfoFlags flags)
+              GVfsJobEnumerate *job,
+              const char *filename,
+              GFileAttributeMatcher *attribute_matcher,
+              GFileQueryInfoFlags flags)
 {
   GVfsBackendMtp *op_backend = G_VFS_BACKEND_MTP (backend);
   GFileInfo *info;
@@ -834,13 +867,14 @@ do_enumerate (GVfsBackend *backend,
   DEBUG ("(I) do_enumerate done.");
 }
 
+
 static void
 do_query_info (GVfsBackend *backend,
-                GVfsJobQueryInfo *job,
-                const char *filename,
-                GFileQueryInfoFlags flags,
-                GFileInfo *info,
-                GFileAttributeMatcher *matcher)
+               GVfsJobQueryInfo *job,
+               const char *filename,
+               GFileQueryInfoFlags flags,
+               GFileInfo *info,
+               GFileAttributeMatcher *matcher)
 {
   DEBUG ("(I) do_query_info (filename = %s) ", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
@@ -981,8 +1015,9 @@ typedef struct {
 } MtpProgressData;
 
 
-static int mtp_progress (uint64_t const sent, uint64_t const total,
-                  MtpProgressData const * const data)
+static int
+mtp_progress (uint64_t const sent, uint64_t const total,
+              MtpProgressData const * const data)
 {
   if (data->progress_callback) {
     data->progress_callback (sent, total, data->progress_callback_data);
@@ -990,10 +1025,11 @@ static int mtp_progress (uint64_t const sent, uint64_t const total,
   return g_vfs_job_is_cancelled (data->job);
 }
 
+
 static void
 do_make_directory (GVfsBackend *backend,
-                    GVfsJobMakeDirectory *job,
-                    const char *filename)
+                   GVfsJobMakeDirectory *job,
+                   const char *filename)
 {
   DEBUG ("(I) do_make_directory (filename = %s) ", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
@@ -1356,6 +1392,7 @@ do_open_icon_for_read (GVfsBackend *backend,
 
   DEBUG ("(I) do_open_icon_for_read done.");
 }
+
 
 static gboolean
 try_read (GVfsBackend *backend,
