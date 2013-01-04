@@ -759,17 +759,18 @@ get_file_info (GVfsBackend *backend,
       LIBMTP_FILETYPE_IS_VIDEO (file->filetype) ||
       LIBMTP_FILETYPE_IS_AUDIOVIDEO (file->filetype)) {
 
+    GIcon *preview;
     char *icon_id;
     GMountSpec *mount_spec;
 
     mount_spec = g_vfs_backend_get_mount_spec (backend);
     icon_id = g_strdup_printf ("%u", file->item_id);
-    icon = g_vfs_icon_new (mount_spec,
-                           icon_id);
+    preview = g_vfs_icon_new (mount_spec,
+                              icon_id);
     g_file_info_set_attribute_object (info,
                                       G_FILE_ATTRIBUTE_PREVIEW_ICON,
-                                      G_OBJECT (icon));
-    g_object_unref (icon);
+                                      G_OBJECT (preview));
+    g_object_unref (preview);
     g_free (icon_id);
   }
 #endif
