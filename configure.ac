@@ -523,6 +523,8 @@ if test "x$enable_libmtp" != "xno" -a "x$msg_gudev" = "xyes"; then
   fi
 fi
 
+AC_SUBST(LIBMTP_CFLAGS)
+AC_SUBST(LIBMTP_LIBS)
 AM_CONDITIONAL(USE_LIBMTP, [test "$msg_libmtp" = "yes"])
 
 dnl ==========================================================================
