@@ -141,7 +141,8 @@ static void
 gudev_add_device (GMtpVolumeMonitor *monitor, GUdevDevice *device, gboolean do_emit)
 {
   GMtpVolume *volume;
-  const char *usb_bus_num, *usb_device_num, *uri;
+  const char *usb_bus_num, *usb_device_num;
+  char *uri;
   GFile *activation_mount_root;
 
   usb_bus_num = g_udev_device_get_property (device, "BUSNUM");
@@ -156,7 +157,7 @@ gudev_add_device (GMtpVolumeMonitor *monitor, GUdevDevice *device, gboolean do_e
     return;
   }
 
-  g_debug ("gudev_add_device: device %s (bus: %i, device: %i)",
+  g_debug ("gudev_add_device: device %s (bus: %s, device: %s)",
            g_udev_device_get_device_file (device),
            usb_bus_num, usb_device_num);
 
