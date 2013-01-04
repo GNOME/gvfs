@@ -585,6 +585,7 @@ get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
 
       LIBMTP_Dump_Errorstack (device);
       LIBMTP_Clear_Errorstack (device);
+      g_free (name);
       break;
     } else {
       g_free (name);
@@ -1110,16 +1111,15 @@ do_pull (GVfsBackend *backend,
                               _("Can't recursively copy directory"));
     goto exit;
   } else {
-      MtpProgressData *mtp_progress_data = g_new0 (MtpProgressData, 1);
-      mtp_progress_data->progress_callback = progress_callback;
-      mtp_progress_data->progress_callback_data = progress_callback_data;
-      mtp_progress_data->job = G_VFS_JOB (job);
+      MtpProgressData mtp_progress_data;
+      mtp_progress_data.progress_callback = progress_callback;
+      mtp_progress_data.progress_callback_data = progress_callback_data;
+      mtp_progress_data.job = G_VFS_JOB (job);
       int ret = LIBMTP_Get_File_To_File (device,
                                          strtol (elements[ne-1], NULL, 10),
                                          local_path,
                                          (LIBMTP_progressfunc_t)mtp_progress,
-                                         mtp_progress_data);
-      g_free (mtp_progress_data);
+                                         &mtp_progress_data);
       if (ret != 0) {
         fail_job (G_VFS_JOB (job), device);
         goto exit;
@@ -1200,14 +1200,13 @@ do_push (GVfsBackend *backend,
   mtpfile->filetype = LIBMTP_FILETYPE_UNKNOWN; 
   mtpfile->filesize = g_file_info_get_size (info);
 
-  MtpProgressData *mtp_progress_data = g_new0 (MtpProgressData, 1);
-  mtp_progress_data->progress_callback = progress_callback;
-  mtp_progress_data->progress_callback_data = progress_callback_data;
-  mtp_progress_data->job = G_VFS_JOB (job);
+  MtpProgressData mtp_progress_data;
+  mtp_progress_data.progress_callback = progress_callback;
+  mtp_progress_data.progress_callback_data = progress_callback_data;
+  mtp_progress_data.job = G_VFS_JOB (job);
   int ret = LIBMTP_Send_File_From_File (device, local_path, mtpfile,
                                         (LIBMTP_progressfunc_t)mtp_progress,
-                                        mtp_progress_data);
-  g_free (mtp_progress_data);
+                                        &mtp_progress_data);
   LIBMTP_destroy_file_t (mtpfile);
   if (ret != 0) {
     fail_job (G_VFS_JOB (job), device);

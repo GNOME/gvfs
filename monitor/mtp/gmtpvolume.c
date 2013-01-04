@@ -62,11 +62,8 @@ g_mtp_volume_finalize (GObject *object)
 
   volume = G_MTP_VOLUME (object);
 
-  if (volume->device != NULL)
-    g_object_unref (volume->device);
-
-  if (volume->activation_root != NULL)
-    g_object_unref (volume->activation_root);
+  g_clear_object (&volume->device);
+  g_clear_object (&volume->activation_root);
 
   if (volume->volume_monitor != NULL)
     g_object_remove_weak_pointer (G_OBJECT (volume->volume_monitor), (gpointer) &(volume->volume_monitor));
@@ -162,7 +159,7 @@ set_volume_name (GMtpVolume *v)
     if (model != NULL) {
       /* we can't call udev_decode_string() twice in one g_strdup_printf(),
        * it returns a static buffer */
-      gchar *temp = g_strdup_printf ("%s %s", vendor, model);
+      gchar *temp = g_strconcat (vendor, " ", model, NULL);
       v->name = g_strdup (udev_decode_string (temp));
       g_free (temp);
     } else {

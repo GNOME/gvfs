@@ -62,8 +62,7 @@ G_DEFINE_TYPE (GMtpVolumeMonitor, g_mtp_volume_monitor, G_TYPE_VOLUME_MONITOR)
 static void
 list_free (GList *objects)
 {
-  g_list_foreach (objects, (GFunc)g_object_unref, NULL);
-  g_list_free (objects);
+  g_list_free_full (objects, g_object_unref);
 }
 
 static void
@@ -234,6 +233,7 @@ gudev_coldplug_devices (GMtpVolumeMonitor *monitor)
     if (g_udev_device_has_property (d, "ID_MTP_DEVICE"))
         gudev_add_device (monitor, d, FALSE);
   }
+  g_list_free_full(usb_devices, g_object_unref);
 }
 
 static GObject *
