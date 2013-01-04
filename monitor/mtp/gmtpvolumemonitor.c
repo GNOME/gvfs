@@ -73,8 +73,7 @@ g_mtp_volume_monitor_dispose (GObject *object)
   the_volume_monitor = NULL;
   G_UNLOCK (vm_lock);
 
-  if (G_OBJECT_CLASS (g_mtp_volume_monitor_parent_class)->dispose)
-    (*G_OBJECT_CLASS (g_mtp_volume_monitor_parent_class)->dispose) (object);
+  (*G_OBJECT_CLASS (g_mtp_volume_monitor_parent_class)->dispose) (object);
 }
 
 static void
@@ -91,8 +90,7 @@ g_mtp_volume_monitor_finalize (GObject *object)
   list_free (monitor->last_devices);
   list_free (monitor->device_volumes);
 
-  if (G_OBJECT_CLASS (g_mtp_volume_monitor_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_mtp_volume_monitor_parent_class)->finalize) (object);
+  (*G_OBJECT_CLASS (g_mtp_volume_monitor_parent_class)->finalize) (object);
 }
 
 static GList *

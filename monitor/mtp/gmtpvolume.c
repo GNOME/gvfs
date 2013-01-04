@@ -74,8 +74,7 @@ g_mtp_volume_finalize (GObject *object)
   g_free (volume->name);
   g_free (volume->icon);
 
-  if (G_OBJECT_CLASS (g_mtp_volume_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_mtp_volume_parent_class)->finalize) (object);
+  (*G_OBJECT_CLASS (g_mtp_volume_parent_class)->finalize) (object);
 }
 
 static void

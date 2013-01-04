@@ -142,8 +142,7 @@ g_vfs_backend_mtp_finalize (GObject *object)
   g_hash_table_unref (backend->monitors);
   g_mutex_clear (&backend->mutex);
 
-  if (G_OBJECT_CLASS (g_vfs_backend_mtp_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_vfs_backend_mtp_parent_class)->finalize) (object);
+  (*G_OBJECT_CLASS (g_vfs_backend_mtp_parent_class)->finalize) (object);
 
   DEBUG ("(I) g_vfs_backend_mtp_finalize done.");
 }
