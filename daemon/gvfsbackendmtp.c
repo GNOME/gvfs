@@ -933,6 +933,14 @@ do_query_info (GVfsBackend *backend,
         i = i->next;
         LIBMTP_destroy_file_t (tmp);
       }
+      if (file == NULL) {
+        /* The backup query might have found nothing. */
+        DEBUG ("(II) backup query could not find file");
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                  _("File not found"));
+        goto exit;
+      }
     } else {
       file = LIBMTP_Get_Filemetadata (device, strtol (elements[ne-1], NULL, 10));
     }
