@@ -868,6 +868,97 @@ do_enumerate (GVfsBackend *backend,
 }
 
 
+/**
+ * get_file_for_filename:
+ *
+ * Get the entity ID for an element given its filename and
+ * the IDs of its parents.
+ *
+ * Called with backend mutex lock held.
+ */
+static LIBMTP_file_t *
+get_file_for_filename (LIBMTP_mtpdevice_t *device,
+                       gchar **elements,
+                       unsigned int i)
+{
+  LIBMTP_file_t *file = NULL;
+
+  DEBUG ("(III) get_file_for_filename (element %d '%s') ", i, elements[i]);
+  long parent_id = -1;
+  if (i > 2) {
+    parent_id = strtol (elements[i - 1], NULL, 10);
+  }
+  LIBMTP_file_t *f = LIBMTP_Get_Files_And_Folders (device, strtol (elements[1], NULL, 10),
+                                                   parent_id);
+  while (f != NULL) {
+    DEBUG_ENUMERATE ("(III) query (entity = %s, name = %s) ", f->filename, elements[i]);
+    if (strcmp (f->filename, elements[i]) == 0) {
+      file = f;
+      f = f->next;
+      break;
+    } else {
+      LIBMTP_file_t *tmp = f;
+      f = f->next;
+      LIBMTP_destroy_file_t (tmp);
+    }
+  }
+  while (f != NULL) {
+    LIBMTP_file_t *tmp = f;
+    f = f->next;
+    LIBMTP_destroy_file_t (tmp);
+  }
+  DEBUG ("(III) get_file_for_filename done");
+  return file;
+}
+
+
+/**
+ * normalize_elements:
+ *
+ * Take a set of path elements and turn any file/directory names into
+ * MTP entity IDs.
+ *
+ * Called with backend mutex lock held.
+ */
+static void
+normalize_elements (LIBMTP_mtpdevice_t *device,
+                    gchar **elements,
+                    unsigned int ne)
+{
+  DEBUG ("(II) normalize_elements (ne = %d)", ne);
+  if (ne < 3) {
+    /* In these cases, elements are always normal. */
+    return;
+  }
+
+  unsigned int i;
+  for (i = 2; i < ne; i++) {
+    LIBMTP_file_t *file = NULL;
+    char *endptr;
+    long file_id = strtol (elements[i], &endptr, 10);
+
+    if (file_id == 0 || *endptr != '\0') {
+      file = get_file_for_filename(device, elements, i);
+      if (file == NULL) {
+        /* Missing entity. Cannot normalize. */
+        DEBUG ("(II) Cannot normalize missing entity '%s'", elements[i]);
+        continue;
+      } else {
+        char *item_id = g_strdup_printf ("%d", file->item_id);
+        DEBUG ("(II) %s = %s", elements[i], item_id);
+        g_free (elements[i]);
+        elements[i] = item_id;
+        LIBMTP_destroy_file_t (file);
+      }
+    } else {
+      /* Already normal. */
+      DEBUG ("(II) normal entity '%s'", elements[i]);
+      continue;
+    }
+  }
+  DEBUG ("(II) normalize_elements done");
+}
+
 static void
 do_query_info (GVfsBackend *backend,
                GVfsJobQueryInfo *job,
@@ -900,49 +991,28 @@ do_query_info (GVfsBackend *backend,
     }
     for (storage = device->storage; storage != 0; storage = storage->next) {
       if (storage->id == strtol (elements[ne-1], NULL, 10)) {
-        DEBUG ("(III) found storage %u", storage->id);
+        DEBUG ("(I) found storage %u", storage->id);
         get_storage_info (storage, info);
       }
     }
   } else {
     LIBMTP_file_t *file = NULL;
     char *endptr;
-    if (strtol (elements[ne-1], &endptr, 10) == 0 ||
-        *endptr != '\0') {
-      DEBUG ("(II) try get files and folders");
-      int parent_id = -1;
-      if (ne > 3) {
-        parent_id = strtol (elements[ne-2], NULL, 10);
-      }
-      LIBMTP_file_t *i = LIBMTP_Get_Files_And_Folders (device, strtol (elements[1], NULL, 10),
-                                                       parent_id);
-      while (i != NULL) {
-        DEBUG ("(II) backup query (entity = %s, name = %s) ", i->filename, elements[ne-1]);
-        if (strcmp (i->filename, elements[ne-1]) == 0) {
-          file = i;
-          i = i->next;
-          break;
-        } else {
-          LIBMTP_file_t *tmp = i;
-          i = i->next;
-          LIBMTP_destroy_file_t (tmp);
-        }
-      }
-      while (i != NULL) {
-        LIBMTP_file_t *tmp = i;
-        i = i->next;
-        LIBMTP_destroy_file_t (tmp);
-      }
+    long file_id = strtol (elements[ne - 1], &endptr, 10);
+
+    if (file_id == 0 || *endptr != '\0') {
+      file = get_file_for_filename (device, elements, ne - 1);
       if (file == NULL) {
         /* The backup query might have found nothing. */
-        DEBUG ("(II) backup query could not find file");
+        DEBUG ("(I) get_file_for_filename could not find '%s'",
+               elements[ne - 1]);
         g_vfs_job_failed_literal (G_VFS_JOB (job),
                                   G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
                                   _("File not found"));
         goto exit;
       }
     } else {
-      file = LIBMTP_Get_Filemetadata (device, strtol (elements[ne-1], NULL, 10));
+      file = LIBMTP_Get_Filemetadata (device, file_id);
     }
 
     if (file != NULL) {
@@ -1052,6 +1122,12 @@ do_make_directory (GVfsBackend *backend,
 
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
+
+  /*
+   * Might be called as part of a batch copy of a nested directory hierarchy.
+   * New directories would then be referred to by name and not id.
+   */
+  normalize_elements(device, elements, ne - 1);
 
   int parent_id = 0;
   if (ne > 3) {
@@ -1172,6 +1248,12 @@ do_push (GVfsBackend *backend,
 
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
+
+  /*
+   * Might be called as part of a batch copy of a nested directory hierarchy.
+   * New files would then be referred to by name and not id.
+   */
+  normalize_elements(device, elements, ne - 1);
 
   int parent_id = 0;
 
