@@ -444,7 +444,7 @@ do_mount (GVfsBackend *backend,
   char *dev_path = get_dev_path_from_host (G_VFS_JOB (job), op_backend->gudev_client, host);
   if (dev_path == NULL) {
     g_object_unref (op_backend->gudev_client);
-    // get_dev_path_from_host() sets job state.
+    /* get_dev_path_from_host() sets job state. */
     return;
   }
   op_backend->dev_path = dev_path;
