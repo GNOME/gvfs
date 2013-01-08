@@ -1,0 +1,172 @@
+#!/bin/bash
+# Build an "unshared tmpfs" sandbox for gvfs-test to safely run tests which
+# need root privileges.
+#
+# (C) 2012-2013 Canonical Ltd.
+# Author: Martin Pitt <martin.pitt@ubuntu.com>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+
+set -e
+if [ "`id -u`" != 0 ]; then
+    echo "Error: this test suite wrapper needs to be called as root" >&2
+    exit 1
+fi
+
+if ! type smbd >/dev/null 2>&1; then
+    echo "Error: this test suite wrapper needs samba installed" >&2
+    exit 1
+fi
+
+# find out the user who calls us
+pid=$$
+while [ "`stat -c '%u' /proc/$pid`" = "0" ]; do
+    pid=`awk '/^PPid:/ {print $2}' /proc/$pid/status`
+    if [ -z "$pid" -o "$pid" = "1" ]; then
+        echo "Error: Did not find a parent process that runs as non-root" >&2
+        exit 1
+    fi
+done
+CALLING_UID="`stat -c '%u' /proc/$pid`"
+CALLING_USER="`stat -c '%U' /proc/$pid`"
+
+# sanity check
+[ "$CALLING_UID" -gt 0 ] && [ -n "$CALLING_USER" ]
+CALLING_GROUP="`id -gn $CALLING_USER`"
+
+# find udisks daemon
+UDISKSD=`sed -n '/^Exec=/ { s/^[^=]*=//; p }' /usr/share/dbus-1/system-services/*UDisks2*.service | cut -f1 -d' '`
+if [ ! -x "$UDISKSD" ]; then
+    echo "Error: Did not find udisksd path" >&2
+    exit 1
+fi
+
+# smbd needs to be restarted in the sandbox
+(service smbd stop || service smb stop) && smbd_running=1 || :
+(service nmbd stop || service nmb stop) && nmbd_running=1 || :
+
+MNT=`mktemp -d`
+
+# work around scsi_debug not implementing CD-ROM SCSI commands
+# see https://launchpad.net/bugs/1043182 for details
+if [ -d /run/udev/rules.d/ -a ! -e /run/udev/rules.d/60-persistent-storage-scsi_debug.rules ]; then
+    cat <<EOF > /run/udev/rules.d/60-persistent-storage-scsi_debug.rules
+KERNEL=="sr*", ENV{DISK_EJECT_REQUEST}!="?*", ATTRS{model}=="scsi_debug*", ENV{ID_CDROM_MEDIA}=="?*", IMPORT{program}="/sbin/blkid -o udev -p -u noraid \$tempnode"
+EOF
+    sync
+    pkill -HUP udevd || pkill -HUP systemd-udevd
+fi
+
+# prevent nautilus popups for temporary drives in running sessions
+pkill -STOP -f gvfs-udisks2-volume-monitor || :
+
+cat <<EOF | unshare -m sh
+set -e
+mount --make-rprivate /
+mount -n -t tmpfs tmpfs $MNT
+
+# prepare overlay directories and copy essential configuration
+mkdir -p $MNT/etc/samba $MNT/var/lib/samba/private $MNT/var/cache/samba $MNT/var/log/samba $MNT/home/$CALLING_USER/run $MNT/run_samba $MNT/media
+touch $MNT/etc/fstab $MNT/home/gvfs_sandbox_marker
+cp -a /etc/passwd /etc/shadow /etc/group /etc/hosts /etc/pam* /etc/nsswitch.conf /etc/security/ /etc/init /etc/init.d /etc/systemd /etc/login.defs /etc/dbus-1 /etc/polkit-1 $MNT/etc/
+if [ -d /etc/selinux ]; then
+    cp -a /etc/selinux $MNT/etc/
+fi
+chown -R $CALLING_USER:$CALLING_GROUP $MNT/home/$CALLING_USER
+# ensure we can resolve our hostname
+echo "127.0.0.1 `uname -n`" >> $MNT/etc/hosts
+
+# copy our local mock polkitd into testbed
+cp `dirname $0`/test_polkitd.py $MNT/home/
+
+# Debianisms
+if [ -d /etc/alternatives ]; then
+    cp -a /etc/alternatives $MNT/etc/
+fi
+if [ -L /var/run ]; then
+    cp -a /var/run $MNT/var
+fi
+
+# if we run a script, we need to copy it into the sandbox as it might be in
+# a directory that we overlay
+if [ -f "$1" ]; then
+    cp -a "$1" $MNT/home/gvfs-testbed-script
+    ARGS="/home/gvfs-testbed-script ${@:2}"
+
+    # we need to copy our test files as well, if we run gvfs-test
+    if [ -d "`dirname $1`/files" ]; then
+        cp -a "`dirname $1`/files" $MNT/home
+    fi
+else
+    ARGS="$@"
+fi
+
+# realize our overlays
+mount -n --bind $MNT/etc/ /etc/
+mount -n --bind $MNT/home/ /home/
+mount -n --bind $MNT/var/ /var/
+mount -n --bind $MNT/media/ /media
+mkdir -p /run/samba
+mount -n --bind $MNT/run_samba/ /run/samba
+
+# run Samba with local configuration/state
+cat <<SMBEOF >/etc/samba/smb.conf
+[global]
+workgroup = TESTGROUP
+interfaces = 127.0.0.0/8
+map to guest = Bad User
+
+[public]
+path = /home/$CALLING_USER/public
+guest ok = yes
+
+[private]
+path = /home/$CALLING_USER/private
+read only = no
+SMBEOF
+nmbd -D -l /var/log/samba
+smbd -D -l /var/log/samba
+
+# we need a predictable password for the smb:// authenticated test, so change
+# it to "foo" in the sandbox
+/bin/echo -e 'foo\\nfoo\\n' | smbpasswd -a $CALLING_USER -s
+
+# set up SSH key for test user
+su -lc "mkdir ~/.ssh; ssh-keygen -q -f ~/.ssh/id_rsa -N ''" $CALLING_USER
+
+# create a root shell that the user can call to control scsi_debug and
+# similar
+cp /bin/sh /home/$CALLING_USER/rootsh
+chown root:$CALLING_USER /home/$CALLING_USER/rootsh
+chmod 4550 /home/$CALLING_USER/rootsh
+
+# we must start udisksd in our private mount environment, so that gvfs and
+# udisks agree to the same view of mounts
+$UDISKSD --no-debug --replace &
+UDISKS_PID=\$!
+
+echo "Running commmand in testbed: \$ARGS"
+su -lc "export PATH=$PATH; export \\\`dbus-launch\\\`; export XDG_RUNTIME_DIR=/home/$CALLING_USER/run; \$ARGS; rc=\\\$?; kill \\\$DBUS_SESSION_BUS_PID; exit \\\$rc" $CALLING_USER || {
+    RC=\$?
+    echo "=== command failed, showing Samba log files ==="
+    for f in /var/log/samba/log.*; do
+        echo "--- \$f ---"
+        cat \$f
+    done
+}
+(cat /var/run/samba/*.pid | xargs kill ) || ( cat /var/run/[sn]mbd.pid | xargs kill )
+kill \$UDISKS_PID || :
+exit \$RC
+EOF
+RC=$?
+
+pkill -CONT -f gvfs-udisks2-volume-monitor || :
+
+[ -n "$smbd_running" ] && service smbd start || service smb start || :
+[ -n "$nmbd_running" ] && service nmbd start || service nmb start || :
+
+rmdir "$MNT" || :
+exit $RC

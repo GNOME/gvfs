@@ -67,8 +67,13 @@ check: $(CONFIG_FILES) gvfs-test
 	$(srcdir)/run-in-tree.sh $(srcdir)/gvfs-test $(TEST_NAMES)
 
 # run tests against the installed system packages
+# when running as root, use gvfs-testbed to enable all tests
 installcheck-local: gvfs-test
-	$(srcdir)/gvfs-test $(TEST_NAMES)
+	if [ `id -u` = 0 ]; then \
+	    $(srcdir)/gvfs-testbed $(srcdir)/gvfs-test $(TEST_NAMES); \
+	else \
+	    $(srcdir)/gvfs-test $(TEST_NAMES); \
+	fi
 
 CLEANFILES=$(CONFIG_FILES)
 
@@ -76,7 +81,9 @@ EXTRA_DIST = \
 	benchmark-common.c		\
 	session.conf.in 		\
 	gvfs-test			\
+	gvfs-testbed			\
 	run-in-tree.sh			\
+	test_polkitd.py			\
 	files/ssh_host_rsa_key files	\
 	files/ssh_host_rsa_key.pub	\
 	files/testcert.pem		\
