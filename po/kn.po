@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2012-10-14 18:18+0000\n"
-"PO-Revision-Date: 2013-01-09 12:07+0530\n"
+"PO-Revision-Date: 2013-01-09 12:25+0530\n"
 "Last-Translator: Shankar Prasad <svenkate@redhat.com>\n"
 "Language-Team: Kannada <en@li.org>\n"
 "Language: kn\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #: ../client/gdaemonfile.c:416 ../client/gdaemonfile.c:2767
 msgid "Operation not supported, files on different mounts"
-msgstr "ಕಾರ್ಯಕ್ಕೆ ಬೆಂಬಲವಿಲ್ಲ, ಬೇರೆ ಆರೋಹಣಾ ತಾಣದ ಮೇಲಿರುವ ಕಡತಗಳು"
+msgstr "ಕಾರ್ಯಕ್ಕೆ ಬೆಂಬಲವಿಲ್ಲ, ಬೇರೆ ಏರಿಸುವ ತಾಣದ ಮೇಲಿರುವ ಕಡತಗಳು"
 
 #: ../client/gdaemonfile.c:1034 ../client/gdaemonfile.c:3110
 #: ../client/gvfsiconloadable.c:304
@@ -43,7 +43,7 @@ msgstr "%s ಇಂದ ಅಮಾನ್ಯವಾದ ಮೌಲ್ಯವು ಮರಳ
 #. corresponding to a particular path/uri
 #: ../client/gdaemonfile.c:2241
 msgid "Could not find enclosing mount"
-msgstr "ಅಡಕಗೊಳಿಸಲಾದ ಆರೋಹಣವು ಕಂಡುಬಂದಿಲ್ಲ"
+msgstr "ಅಡಕಗೊಳಿಸಲಾದ ಏರಿಸುವ ಸ್ಥಳವು ಕಂಡುಬಂದಿಲ್ಲ"
 
 #: ../client/gdaemonfile.c:2277
 #, c-format
@@ -116,7 +116,7 @@ msgstr "ಸ್ಟ್ರೀಮ್‍ನಲ್ಲಿ ಕೋರುವುದು (see
 #: ../client/gdaemonvfs.c:813
 #, c-format
 msgid "Error while getting mount info: %s"
-msgstr "ಆರೋಹಣಾ ಮಾಹಿತಿಯನ್ನು ಪಡೆದುಕೊಳ್ಳುವಾಗ ದೋಷ ಉಂಟಾಗಿದೆ: %s"
+msgstr "ಏರಿಸುವ ಮಾಹಿತಿಯನ್ನು ಪಡೆದುಕೊಳ್ಳುವಾಗ ದೋಷ ಉಂಟಾಗಿದೆ: %s"
 
 #: ../common/gvfsdaemonprotocol.c:349
 msgid "Invalid file info format"
@@ -212,16 +212,16 @@ msgstr "ಬಳಕೆ: %s key=value key=value ..."
 #: ../daemon/daemon-main.c:276
 #, c-format
 msgid "No mount type specified"
-msgstr "ಯಾವುದೆ ಆರೋಹಣಾ ಬಗೆಯನ್ನು ಸೂಚಿಸಲಾಗಿಲ್ಲ"
+msgstr "ಯಾವುದೆ ಏರಿಸುವ ಬಗೆಯನ್ನು ಸೂಚಿಸಲಾಗಿಲ್ಲ"
 
 #: ../daemon/daemon-main.c:308
 #, c-format
 msgid "mountpoint for %s already running"
-msgstr "%s ಗಾಗಿನ ಆರೋಹಣ ತಾಣವು ಈಗಾಗಲೆ ಚಾಲನೆಯಲ್ಲಿದೆ"
+msgstr "%s ಗಾಗಿನ ಏರಿಸುವ ತಾಣವು ಈಗಾಗಲೆ ಚಾಲನೆಯಲ್ಲಿದೆ"
 
 #: ../daemon/daemon-main.c:329
 msgid "error starting mount daemon"
-msgstr "ಆರೋಹಣ ಡೀಮನ್ ಅನ್ನು ಆರಂಭಿಸುವಲ್ಲಿ ದೋಷ"
+msgstr "ಏರಿಸುವ ಡೀಮನ್ ಅನ್ನು ಆರಂಭಿಸುವಲ್ಲಿ ದೋಷ"
 
 #: ../daemon/gvfsafpconnection.c:764
 #| msgid "The specified location is not mounted"
@@ -630,7 +630,7 @@ msgstr "ರದ್ದು ಮಾಡು"
 #: ../daemon/gvfsbackendobexftp.c:901 ../daemon/gvfsbackendobexftp.c:920
 #: ../daemon/gvfsbackendsmb.c:663
 msgid "Invalid mount spec"
-msgstr "ಅಮಾನ್ಯವಾದ ಆರೋಹಣಾ spec"
+msgstr "ಅಮಾನ್ಯವಾದ ಏರಿಸುವ spec"
 
 #: ../daemon/gvfsbackendafc.c:440 ../daemon/gvfsbackendafc.c:470
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
@@ -708,7 +708,7 @@ msgstr "ಕಾರ್ಯಕ್ಕೆ ಬೆಂಬಲವಿಲ್ಲ"
 #: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1095
 #: ../daemon/gvfsbackendsmbbrowse.c:1141
 msgid "The file is not a mountable"
-msgstr "ಆರೋಹಿಸಲು ಸಾಧ್ಯವಿರದ ಕಡತ"
+msgstr "ಏರಿಸಲು ಸಾಧ್ಯವಿರದ ಕಡತ"
 
 #. Translators: first %s is username and second serververname
 #. Translators: first %s is volumename and second servername
@@ -747,12 +747,12 @@ msgstr "Apple ಫೈಲಿಂಗ್ ಪ್ರೊಟೊಕಾಲ್ ಸೇವೆ"
 #: ../daemon/gvfsbackendafp.c:274 ../daemon/gvfsbackendburn.c:875
 #: ../daemon/gvfsbackendftp.c:1545 ../daemon/gvfsbackendobexftp.c:1805
 msgid "Can't copy directory over directory"
-msgstr "ಕೋಶವನ್ನು ಕೋಶಕ್ಕೆ ಕಾಪಿ ಮಾಡಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+msgstr "ಕೋಶವನ್ನು ಕೋಶಕ್ಕೆ ಪ್ರತಿ ಮಾಡಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendafp.c:293 ../daemon/gvfsbackendburn.c:891
 #: ../daemon/gvfsbackendftp.c:1568 ../daemon/gvfsbackendobexftp.c:1820
 msgid "Can't recursively copy directory"
-msgstr "ಕೋಶವನ್ನು ಪುನರಾವರ್ತಿತವಾಗಿ ಕಾಪಿ ಮಾಡಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+msgstr "ಕೋಶವನ್ನು ಪುನರಾವರ್ತಿತವಾಗಿ ಪ್ರತಿ ಮಾಡಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendafp.c:475 ../daemon/gvfsbackendsftp.c:4257
 #: ../daemon/gvfsbackendsmb.c:2088
@@ -834,7 +834,7 @@ msgstr "ಅಂತಹ ಯಾವುದೆ ಕಡತ ಅಥವ ಕೋಶವಿಲ�
 #: ../daemon/gvfsbackendburn.c:455 ../daemon/gvfsbackendburn.c:903
 #: ../daemon/gvfsbackendobexftp.c:1836
 msgid "Can't copy file over directory"
-msgstr "ಕಡತವನ್ನು ಕೋಶದ ಮೇಲೆ ಕಾಪಿ ಮಾಡುವಂತಿಲ್ಲ"
+msgstr "ಕಡತವನ್ನು ಕೋಶದ ಮೇಲೆ ಪ್ರತಿ ಮಾಡುವಂತಿಲ್ಲ"
 
 #. Translators: this is the display name of the backend
 #: ../daemon/gvfsbackendburn.c:650
@@ -892,7 +892,7 @@ msgstr "ಬೆಂಬಲವಿಲ್ಲ"
 #: ../daemon/gvfsbackend.c:967 ../monitor/gdu/ggdumount.c:922
 #: ../monitor/udisks2/gvfsudisks2mount.c:734
 msgid "Unmount Anyway"
-msgstr "ಪರವಾಗಿಲ್ಲ ಅವರೋಹಿಸು"
+msgstr "ಪರವಾಗಿಲ್ಲ ಇಳಿಸು"
 
 #: ../daemon/gvfsbackend.c:970 ../monitor/gdu/ggdumount.c:924
 #: ../monitor/udisks2/gvfsudisks2mount.c:737
@@ -996,7 +996,7 @@ msgstr "ಕಡತ ವ್ಯವಸ್ಥೆ"
 
 #: ../daemon/gvfsbackendcomputer.c:660
 msgid "Can't open mountable file"
-msgstr "ಆರೋಹಿಸಬಹುದಾದ ಕಡತವನ್ನು ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+msgstr "ಏರಿಸಬಹುದಾದ ಕಡತವನ್ನು ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendcomputer.c:857 ../daemon/gvfsbackendsftp.c:1158
 #, c-format
@@ -1005,7 +1005,7 @@ msgstr "ಆಂತರಿಕ ದೋಷ: %s"
 
 #: ../daemon/gvfsbackendcomputer.c:889 ../daemon/gvfsbackendcomputer.c:1008
 msgid "Can't mount file"
-msgstr "ಕಡತವನ್ನು ಆರೋಹಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+msgstr "ಕಡತವನ್ನು ಏರಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendcomputer.c:901
 #| msgid "No media in the drive"
@@ -1016,11 +1016,11 @@ msgstr "ಡ್ರೈವಿನಲ್ಲಿ ಯಾವುದೆ ಮಾಧ್ಯಮ 
 #: ../daemon/gvfsbackendcomputer.c:1159 ../daemon/gvfsbackendcomputer.c:1249
 #: ../daemon/gvfsbackendcomputer.c:1322 ../daemon/gvfsbackendcomputer.c:1391
 msgid "Not a mountable file"
-msgstr "ಒಂದು ಆರೋಹಿಸಬಹುದಾದ ಕಡತವಾಗಿಲ್ಲ"
+msgstr "ಒಂದು ಏರಿಸಬಹುದಾದ ಕಡತವಾಗಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendcomputer.c:1072
 msgid "Can't unmount file"
-msgstr "ಕಡತವನ್ನು ಅವರೋಹಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+msgstr "ಕಡತವನ್ನು ಇಳಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendcomputer.c:1202
 msgid "Can't eject file"
@@ -1229,7 +1229,7 @@ msgstr "ಕ್ಯಾಮೆರಾವನ್ನು ಆರಂಭಿಸುವಲ್�
 #: ../daemon/gvfsbackendgphoto2.c:1724
 #, c-format
 msgid "gphoto2 mount on %s"
-msgstr "gphoto2 ಅನ್ನು %s ನಲ್ಲಿ ಆರೋಹಿಸಲಾಗಿದೆ"
+msgstr "gphoto2 ಅನ್ನು %s ನಲ್ಲಿ ಏರಿಸಲಾಗಿದೆ"
 
 #: ../daemon/gvfsbackendgphoto2.c:1810
 msgid "No camera specified"
@@ -1580,7 +1580,7 @@ msgstr "ಆಂತರಿಕ ದೋಷ (%s)"
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:625
 msgid "Failed to mount Windows share"
-msgstr "ವಿಂಡೋಸ್ ಹಂಚಿಕೆಯನ್ನು ಆರೋಹಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+msgstr "ವಿಂಡೋಸ್ ಹಂಚಿಕೆಯನ್ನು ಏರಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendsmb.c:789 ../daemon/gvfsbackendsmb.c:1285
 msgid "Unsupported seek type"
@@ -1769,11 +1769,11 @@ msgstr "ಹೆಚ್ಚಿನ ಮಾಹಿತಿಗಾಗಿ \"%s --help\" ಅ�
 #: ../daemon/mount.c:693
 #, c-format
 msgid "Automount failed: %s"
-msgstr "ಸ್ವಯಂಆರೋಹಣ ವಿಫಲಗೊಂಡಿದೆ: %s"
+msgstr "ಸ್ವಯಂಏರಿಸುವಿಕೆ ವಿಫಲಗೊಂಡಿದೆ: %s"
 
 #: ../daemon/mount.c:737 ../daemon/mount.c:798
 msgid "The specified location is not mounted"
-msgstr "ಸೂಚಿಸಲಾದ ಸ್ಥಳವು ಆರೋಹಿತವಾಗಿಲ್ಲ"
+msgstr "ಸೂಚಿಸಲಾದ ಸ್ಥಳವು ಏರಿತವಾಗಿಲ್ಲ"
 
 #: ../daemon/mount.c:742
 msgid "The specified location is not supported"
@@ -1781,11 +1781,11 @@ msgstr "ಸೂಚಿಸಲಾದ ಸ್ಥಳವು ಬೆಂಬಲಿತವಾ�
 
 #: ../daemon/mount.c:866
 msgid "Location is already mounted"
-msgstr "ಸ್ಥಳವು ಈಗಾಗಲೆ ಆರೋಹಿತವಾಗಿದೆ"
+msgstr "ಸ್ಥಳವು ಈಗಾಗಲೆ ಏರಿತವಾಗಿದೆ"
 
 #: ../daemon/mount.c:875
 msgid "Location is not mountable"
-msgstr "ಸ್ಥಳವನ್ನು ಆರೋಹಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ"
+msgstr "ಸ್ಥಳವನ್ನು ಏರಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ"
 
 #: ../metadata/meta-daemon.c:133 ../metadata/meta-daemon.c:253
 #: ../metadata/meta-daemon.c:302 ../metadata/meta-daemon.c:337
@@ -1861,7 +1861,7 @@ msgstr "ಪರವಾಗಿಲ್ಲ ಆರಂಭಿಸು"
 
 #: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:649
 msgid "One or more programs are preventing the unmount operation."
-msgstr "ಅವರೋಹಿಸದಂತೆ ಒಂದು ಅಥವ ಹೆಚ್ಚಿನ ಪ್ರೊಗ್ರಾಮ್‌ಗಳು ತಡೆಯುತ್ತಿವೆ."
+msgstr "ಇಳಿಸದಂತೆ ಒಂದು ಅಥವ ಹೆಚ್ಚಿನ ಪ್ರೊಗ್ರಾಮ್‌ಗಳು ತಡೆಯುತ್ತಿವೆ."
 
 #: ../monitor/gdu/ggdumount.c:985
 msgid "Cannot get LUKS cleartext slave"
@@ -2533,7 +2533,7 @@ msgstr "ಶಾರ್ಟ್-ಕಟ್"
 
 #: ../programs/gvfs-info.c:71
 msgid "mountable"
-msgstr "ಆರೋಹಿಸಬಹುದಾದ"
+msgstr "ಏರಿಸಬಹುದಾದ"
 
 #: ../programs/gvfs-info.c:109
 #, c-format
@@ -2574,7 +2574,7 @@ msgstr "ಅಡಗಿಸಲಾದ\n"
 
 #: ../programs/gvfs-info.c:270
 msgid "Copy with file"
-msgstr "ಕಡತದೊಂದಿಗೆ ಕಾಪಿ ಮಾಡು"
+msgstr "ಕಡತದೊಂದಿಗೆ ಪ್ರತಿ ಮಾಡು"
 
 #: ../programs/gvfs-info.c:274
 msgid "Keep with file when moved"
@@ -2654,11 +2654,11 @@ msgstr ""
 
 #: ../programs/gvfs-mime.c:36
 msgid "Query handler for mime-type"
-msgstr "mime-ಬಗೆಗಾಗಿ ಹ್ಯಾಂಡ್ಲರ್ ಅನ್ನು ಮನವಿ ಮಾಡು"
+msgstr "mime-ಬಗೆಗಾಗಿ ಹಿಡಿಕೆಯನ್ನು ಮನವಿ ಮಾಡು"
 
 #: ../programs/gvfs-mime.c:37
 msgid "Set handler for mime-type"
-msgstr "mime-ಬಗೆಗಾಗಿ ಹ್ಯಾಂಡ್ಲರ್ ಅನ್ನು ಹೊಂದಿಸು"
+msgstr "mime-ಬಗೆಗಾಗಿ ಹಿಡಿಕೆಯನ್ನು ಹೊಂದಿಸು"
 
 #: ../programs/gvfs-mime.c:82
 msgid "MIMETYPE"
@@ -2670,7 +2670,7 @@ msgstr "HANDLER"
 
 #: ../programs/gvfs-mime.c:83
 msgid "Get or set the handler for a mime-type."
-msgstr "mime-ಬಗೆಗಾಗಿ ಹ್ಯಾಂಡ್ಲರ್ ಅನ್ನು ಪಡೆಯಿರಿ ಅಥವ ಹೊಂದಿಸು."
+msgstr "mime-ಬಗೆಗಾಗಿ ಹಿಡಿಕೆಯನ್ನು ಪಡೆಯಿರಿ ಅಥವ ಹೊಂದಿಸು."
 
 #: ../programs/gvfs-mime.c:95
 msgid "Specify either --query or --set"
@@ -2726,7 +2726,7 @@ msgstr "'%s' ಹ್ಯಾಂಡ್ಲರಿಗಾಗಿ ಮಾಹಿತಿಯನ
 #, c-format
 msgid "Failed to set '%s' as the default handler for '%s': %s\n"
 msgstr ""
-"'%s' ಅನ್ನು '%s' ಗಾಗಿ ಪೂರ್ವನಿಯೋಜಿತ ಹ್ಯಾಂಡ್ಲರ್ ಆಗಿ ಹೊಂದಿಸುವಲ್ಲಿ ವಿಫಲಗೊಂಡಿದೆ: %"
+"'%s' ಅನ್ನು '%s' ಗಾಗಿ ಪೂರ್ವನಿಯೋಜಿತ ಹಿಡಿಕೆಯಾಗಿ ಹೊಂದಿಸುವಲ್ಲಿ ವಿಫಲಗೊಂಡಿದೆ: %"
 "s\n"
 
 #: ../programs/gvfs-mkdir.c:33
@@ -2756,11 +2756,11 @@ msgstr "ಬದಲಾವಣೆಗಾಗಿ ಕಡತಗಳನ್ನು ಮೇಲ�
 
 #: ../programs/gvfs-mount.c:57
 msgid "Mount as mountable"
-msgstr "ಆರೋಹಿತವಾಗಿ ಆರೋಹಿಸಿ"
+msgstr "ಏರಿತವಾಗಿ ಏರಿಸಿ"
 
 #: ../programs/gvfs-mount.c:58
 msgid "Mount volume with device file"
-msgstr "ಸಾಧನ ಕಡತದೊಂದಿಗೆ ಪರಿಮಾಣವನ್ನು ಆರೋಹಿಸಿ"
+msgstr "ಸಾಧನ ಕಡತದೊಂದಿಗೆ ಪರಿಮಾಣವನ್ನು ಏರಿಸಿ"
 
 #: ../programs/gvfs-mount.c:58
 msgid "DEVICE"
@@ -2768,7 +2768,7 @@ msgstr "DEVICE"
 
 #: ../programs/gvfs-mount.c:59
 msgid "Unmount"
-msgstr "ಅವರೋಹಿಸು"
+msgstr "ಇಳಿಸು"
 
 #: ../programs/gvfs-mount.c:60
 msgid "Eject"
@@ -2776,7 +2776,7 @@ msgstr "ಹೊರತಳ್ಳು"
 
 #: ../programs/gvfs-mount.c:61
 msgid "Unmount all mounts with the given scheme"
-msgstr "ಆರೋಹಿಸಲಾದ ಎಲ್ಲವನ್ನೂ ಒದಗಿಸಲಾದ ಪದ್ಧತಿಯೊಂದಿಗೆ ಅವರೋಹಿಸು"
+msgstr "ಏರಿಸಲಾದ ಎಲ್ಲವನ್ನೂ ಒದಗಿಸಲಾದ ಪದ್ಧತಿಯೊಂದಿಗೆ ಇಳಿಸು"
 
 #: ../programs/gvfs-mount.c:61
 msgid "SCHEME"
@@ -2799,17 +2799,17 @@ msgstr "ಹೆಚ್ಚಿನ ಮಾಹಿತಿಯನ್ನು ತೋರಿಸ�
 #: ../programs/gvfs-mount.c:169 ../programs/gvfs-mount.c:193
 #, c-format
 msgid "Error mounting location: %s\n"
-msgstr "ಸ್ಥಳವನ್ನು ಆರೋಹಿಸುವಲ್ಲಿ ದೋಷ: %s\n"
+msgstr "ಸ್ಥಳವನ್ನು ಏರಿಸುವಲ್ಲಿ ದೋಷ: %s\n"
 
 #: ../programs/gvfs-mount.c:253
 #, c-format
 msgid "Error unmounting mount: %s\n"
-msgstr "ಆರೋಹಣವನ್ನು ಅವರೋಹಿಸುವಲ್ಲಿ ದೋಷ: %s\n"
+msgstr "ಏರಿಸುವಿಕೆಯನ್ನು ಇಳಿಸುವಲ್ಲಿ ದೋಷ: %s\n"
 
 #: ../programs/gvfs-mount.c:276 ../programs/gvfs-mount.c:325
 #, c-format
 msgid "Error finding enclosing mount: %s\n"
-msgstr "ಅಡಕಗೊಳಿಸಲಾದ ಆರೋಹಣವನ್ನು ಪತ್ತೆ ಮಾಡುವಲ್ಲಿ ದೋಷ: %s\n"
+msgstr "ಅಡಕಗೊಳಿಸಲಾದ ಏರಿಸುವಿಕೆಯ ಸ್ಥಳವನ್ನು ಪತ್ತೆ ಮಾಡುವಲ್ಲಿ ದೋಷ: %s\n"
 
 #: ../programs/gvfs-mount.c:302
 #, c-format
@@ -2820,12 +2820,12 @@ msgstr "ಏರಿಸುವು ಸ್ಥಳವನ್ನು ಹೊರತಳ್ಳ�
 #: ../programs/gvfs-mount.c:786
 #, c-format
 msgid "Error mounting %s: %s\n"
-msgstr "%s ಅನ್ನು ಆರೋಹಿಸುವಲ್ಲಿ ದೋಷ: %s\n"
+msgstr "%s ಅನ್ನು ಏರಿಸುವಲ್ಲಿ ದೋಷ: %s\n"
 
 #: ../programs/gvfs-mount.c:801
 #, c-format
 msgid "Mounted %s at %s\n"
-msgstr "%s ಅನ್ನು %s ನಲ್ಲಿ ಆರೋಹಿಸಲಾಗಿದೆ\n"
+msgstr "%s ಅನ್ನು %s ನಲ್ಲಿ ಏರಿಸಲಾಗಿದೆ\n"
 
 #: ../programs/gvfs-mount.c:852
 #, c-format
