@@ -961,6 +961,86 @@ class Drive(GvfsTestCase):
         # unmount it again
         self.unmount(match.group(1))
 
+    def test_cdrom_api(self):
+        '''drive mount: cdrom with Gio API'''
+
+        self.start_polkit(['org.freedesktop.udisks2.filesystem-mount'])
+
+        self.bogus_volume = None
+
+        # add CD and wait for it to appear in the monitor
+        def volume_added(vm, v, main_loop):
+            if v.get_name() == 'bogus-cd':
+                self.bogus_volume = v
+                main_loop.quit()
+
+        vm = Gio.VolumeMonitor.get()
+        ml = GLib.MainLoop()
+        vm.connect('volume-added', volume_added, ml)
+
+        dev = self.create_host(PTYPE_CDROM)
+        timeout_id = GLib.timeout_add_seconds(5, lambda data: ml.quit(), None)
+        ml.run()
+        self.assertNotEqual(self.bogus_volume, None,
+                            'timed out waiting for bogus-cd volume')
+        ml.get_context().find_source_by_id(timeout_id).destroy()
+
+        # check properties
+        ids = self.bogus_volume.enumerate_identifiers()
+        self.assertTrue('unix-device' in ids, ids)
+        self.assertTrue('label' in ids, ids)
+        self.assertEqual(self.bogus_volume.get_identifier('unix-device'), '/dev/' + dev)
+        self.assertEqual(self.bogus_volume.get_identifier('label'), 'bogus-cd')
+
+        self.assertEqual(self.bogus_volume.get_mount(), None)
+
+        # mount it
+        self.cb_result = None
+        def mount_done(obj, result, main_loop):
+            main_loop.quit()
+            try:
+                success = obj.mount_finish(result)
+                self.cb_result = (obj, success)
+            except GLib.GError as e:
+                self.cb_result = (obj, e)
+        self.bogus_volume.mount(Gio.MountMountFlags.NONE, None, None, mount_done, ml)
+
+        timeout_id = GLib.timeout_add_seconds(5, lambda data: ml.quit(), None)
+        ml.run()
+        self.assertNotEqual(self.cb_result, None,
+                            'timed out waiting for bogus-cd mount')
+        ml.get_context().find_source_by_id(timeout_id).destroy()
+
+        self.assertEqual(self.cb_result[1], True)
+        self.assertEqual(self.cb_result[0], self.bogus_volume)
+
+        # get Mount object
+        mount = self.bogus_volume.get_mount()
+        self.assertNotEqual(mount, None)
+        self.assertEqual(mount.get_name(), 'bogus-cd')
+        p = mount.get_root().get_path()
+        self.assertTrue(os.path.isdir(p), p)
+        self.assertTrue(os.path.isfile(os.path.join(p, 'passwd')))
+        self.assertTrue('/media/' in p, p)
+        self.assertEqual(mount.get_volume(), self.bogus_volume)
+
+        # unmount
+        self.cb_result = None
+
+        def unmount_done(obj, result, main_loop):
+            main_loop.quit()
+            try:
+                success = obj.unmount_with_operation_finish(result)
+                self.cb_result = (obj, success)
+            except GLib.GError as e:
+                self.cb_result = (obj, e)
+
+        mount.unmount_with_operation(Gio.MountUnmountFlags.NONE, None, None, unmount_done, ml)
+        timeout_id = GLib.timeout_add_seconds(5, lambda data: ml.quit(), None)
+        ml.run()
+        self.assertEqual(self.cb_result[1], True)
+        self.assertEqual(self.bogus_volume.get_mount(), None)
+
     def test_system_partition(self):
         '''drive mount: system partition'''
 
