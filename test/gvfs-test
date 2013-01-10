@@ -1085,6 +1085,41 @@ class Drive(GvfsTestCase):
         # unmount it again
         self.unmount(match.group(1))
 
+    def test_system_partition_api(self):
+        '''drive mount: system partition with Gio API'''
+
+        self.load_image('vfat.img.bz2')
+
+        self.start_polkit(['org.freedesktop.udisks2.filesystem-mount-system'])
+
+        self.volume = None
+
+        # add partition and wait for it to appear in the monitor
+        def volume_added(vm, v, main_loop):
+            if v.get_name() == 'testvfat':
+                self.volume = v
+                main_loop.quit()
+
+        vm = Gio.VolumeMonitor.get()
+        ml = GLib.MainLoop()
+        vm.connect('volume-added', volume_added, ml)
+
+        dev = self.create_host(PTYPE_DISK)
+        timeout_id = GLib.timeout_add_seconds(5, lambda data: ml.quit(), None)
+        ml.run()
+        self.assertNotEqual(self.volume, None,
+                            'timed out waiting for volume')
+        ml.get_context().find_source_by_id(timeout_id).destroy()
+
+        # check properties
+        ids = self.volume.enumerate_identifiers()
+        self.assertTrue('unix-device' in ids, ids)
+        self.assertTrue('label' in ids, ids)
+        self.assertTrue('uuid' in ids, ids)
+        self.assertEqual(self.volume.get_identifier('unix-device'), '/dev/' + dev)
+        self.assertEqual(self.volume.get_identifier('label'), 'testvfat')
+        self.assertEqual(self.volume.get_identifier('uuid'), 'F3C1-6301')
+
     def test_media_player(self):
         '''drive mount: media player'''
 
