@@ -138,9 +138,9 @@ class GvfsTestCase(unittest.TestCase):
 
         (code, out, err) = klass.root_command(command)
         if code != 0:
-            raise SystemError('command "%s" failed with code %i:\n%s' % (code, err))
+            raise SystemError('command "%s" failed with code %i:\n%s' % (command, code, err))
         if err:
-            raise SystemError('command "%s" produced error:\n%s' % err)
+            raise SystemError('command "%s" produced error:\n%s' % (command, err))
 
     def unmount(self, uri):
         self.program_out_success(['gvfs-mount', '-u', uri])
@@ -822,33 +822,12 @@ ncalrpc dir = %(workdir)s/samba
 class Drive(GvfsTestCase):
     @classmethod
     def setUpClass(klass):
-        '''Load scsi_debug and put a simple .iso into it'''
+        '''Load scsi_debug'''
 
-        # generate a test .iso
-        test_iso = 'test.iso'
-        subprocess.check_call(['genisoimage', '-R', '-quiet', '-V', 'bogus-cd', '-o',
-                               test_iso, '/etc/passwd', __file__])
-
-        # we cannot write to a scsi_debug CD drive, so write it into it in hard
-        # disk mode
         klass.root_command_success('modprobe scsi_debug add_host=0 dev_size_mb=64')
-        dev = klass.create_host(PTYPE_DISK)
-
-        # put test.iso onto disk
-        klass.root_command_success('cat %s > /dev/%s; sync' % (test_iso, dev))
-
-        # leave the actual device creation to the individual tests; all devices
-        # created henceforth will default to the test.iso contents
-        klass.remove_device(dev)
-
-        while klass.get_devices():
-            time.sleep(0.2)
 
     @classmethod
     def tearDownClass(klass):
-        for dev in klass.get_devices():
-            klass.remove_device(dev)
-
         # remove scsi_debug; might need a few tries while being busy
         timeout = 10
         while timeout > 0:
@@ -905,6 +884,29 @@ class Drive(GvfsTestCase):
 
         klass.root_command_success('echo 1 > /sys/block/%s/device/delete' % device)
 
+    def load_image(self, fname):
+        '''Install a test image on the scsi_debug drive
+
+        This must be a bzip2'ed file in test/files/.
+        '''
+        # we cannot write to a scsi_debug CD drive, so write it into it in hard
+        # disk mode
+        dev = self.create_host(PTYPE_DISK)
+
+        # put test.iso onto disk
+        img = os.path.join(my_dir, 'files', fname)
+        self.root_command_success('bzip2 -cd %s > /dev/%s; sync' % (img, dev))
+
+        # leave the actual device creation to the individual tests; all devices
+        # created henceforth will default to the image contents
+        self.remove_device(dev)
+
+        while dev in self.get_devices():
+            time.sleep(0.2)
+
+        # flush volume monitor output
+        self.monitor.stdout.readall()
+
     def setUp(self):
         self.mock_polkit = None
 
@@ -919,6 +921,9 @@ class Drive(GvfsTestCase):
             time.sleep(0.1)
 
     def tearDown(self):
+        for dev in self.get_devices():
+            self.remove_device(dev)
+
         self.monitor.terminate()
         self.monitor.wait()
         self.stop_polkit()
@@ -926,6 +931,7 @@ class Drive(GvfsTestCase):
     def test_cdrom(self):
         '''drive mount: cdrom'''
 
+        self.load_image('bogus-cd.iso.bz2')
         dev = self.create_host(PTYPE_CDROM)
 
         # check that gvfs monitor picks up the new drive
@@ -963,6 +969,8 @@ class Drive(GvfsTestCase):
 
     def test_cdrom_api(self):
         '''drive mount: cdrom with Gio API'''
+
+        self.load_image('bogus-cd.iso.bz2')
 
         self.start_polkit(['org.freedesktop.udisks2.filesystem-mount'])
 
@@ -1020,7 +1028,7 @@ class Drive(GvfsTestCase):
         self.assertEqual(mount.get_name(), 'bogus-cd')
         p = mount.get_root().get_path()
         self.assertTrue(os.path.isdir(p), p)
-        self.assertTrue(os.path.isfile(os.path.join(p, 'passwd')))
+        self.assertTrue(os.path.isfile(os.path.join(p, 'hello.txt')))
         self.assertTrue('/media/' in p, p)
         self.assertEqual(mount.get_volume(), self.bogus_volume)
 
@@ -1044,6 +1052,7 @@ class Drive(GvfsTestCase):
     def test_system_partition(self):
         '''drive mount: system partition'''
 
+        self.load_image('vfat.img.bz2')
         dev = self.create_host(PTYPE_DISK)
 
         # check that gvfs monitor picks up the new drive
@@ -1052,8 +1061,8 @@ class Drive(GvfsTestCase):
         self.assertRegex(out, 'unix-device:.*/dev/%s' % dev)
         self.assertTrue('has_media=1' in out, out)
 
-        self.assertRegex(out, 'Volume added:\s+.*bogus-cd')
-        self.assertRegex(out, "label:\s+'bogus-cd")
+        self.assertRegex(out, 'Volume added:\s+.*testvfat')
+        self.assertRegex(out, "label:\s+'testvfat")
         self.assertTrue('should_automount=0' in out, out)
         self.assertRegex(out, 'themed icons:.*harddisk')
 
@@ -1070,7 +1079,7 @@ class Drive(GvfsTestCase):
         # should appear as Mount
         (out, err) = self.program_out_err(['gvfs-mount', '-li'])
         self.assertEqual(err.strip(), '')
-        match = re.search('Mount\(\d+\): bogus-cd -> (file://.*/media/.*/bogus-cd)', out)
+        match = re.search('Mount\(\d+\): testvfat -> (file://.*/media/.*/testvfat)', out)
         self.assertTrue(match, 'no Mount found in gvfs-mount -li output:\n' + out)
 
         # unmount it again
@@ -1078,6 +1087,8 @@ class Drive(GvfsTestCase):
 
     def test_media_player(self):
         '''drive mount: media player'''
+
+        self.load_image('bogus-cd.iso.bz2')
 
         def cleanup():
             rootsh = subprocess.Popen(['./rootsh'], stdin=subprocess.PIPE)
