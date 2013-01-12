@@ -313,19 +313,20 @@ class ArchiveMounter(GvfsTestCase):
     def test_iso_rr(self):
         '''archive:// for RockRidge .iso'''
 
-        shutil.copy(__file__, os.path.join(self.workdir, 'gvfs-test.py'))
-        subprocess.check_call(['genisoimage', '-R', '-quiet', '-o', 'stuff.iso', 'gvfs-test.py'],
-                             cwd=self.workdir)
-        self.do_test_for_archive(os.path.join(self.workdir, 'stuff.iso'))
+        iso = os.path.join(self.workdir, 'bogus-cd.iso')
+        with open(iso, 'wb') as f:
+            subprocess.check_call(['bzip2', '-cd', os.path.join(my_dir, 'files', 'bogus-cd.iso.bz2')],
+                            stdout=f)
+        self.do_test_for_archive(iso)
 
     def test_iso_joliet(self):
         '''archive:// for Joliet .iso'''
 
-        shutil.copy(__file__, os.path.join(self.workdir, 'gvfs-test.py'))
-        iso_path = os.path.join(self.workdir, 'stuff.iso')
-        subprocess.check_call(['genisoimage', '-JR', '-quiet', '-o', 'stuff.iso', 'gvfs-test.py'],
-                             cwd=self.workdir)
-        self.do_test_for_archive(os.path.join(self.workdir, 'stuff.iso'))
+        iso = os.path.join(self.workdir, 'joliet.iso')
+        with open(iso, 'wb') as f:
+            subprocess.check_call(['bzip2', '-cd', os.path.join(my_dir, 'files', 'joliet.iso.bz2')],
+                            stdout=f)
+        self.do_test_for_archive(iso)
 
     def do_test_for_archive(self, path):
         # mount it; yes, gvfs expects double quoting
@@ -344,9 +345,10 @@ class ArchiveMounter(GvfsTestCase):
             self.assertTrue('access::can-read: TRUE' in out, out)
 
             # check gvfs-cat
-            out = self.program_out_success(['gvfs-cat', uri + '/gvfs-test.py'])
-            with open(__file__) as f:
-                self.assertEqual(out, f.read())
+            out = self.program_out_success(['gvfs-cat', uri + '/hello.txt'])
+            self.assertEqual(out, 'hello\n')
+            out = self.program_out_success(['gvfs-cat', uri + '/stuff/bye.txt'])
+            self.assertEqual(out, 'bye\n')
         finally:
             self.unmount(uri)
 
