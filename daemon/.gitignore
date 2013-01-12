@@ -11,6 +11,7 @@ gvfsd-gphoto2
 gvfsd-http
 gvfsd-localtest
 gvfsd-network
+gvfsd-mtp
 gvfsd-obexftp
 gvfsd-sftp
 gvfsd-smb

@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.gtk.Private.MTPVolumeMonitor
+Exec=@libexecdir@/gvfs-mtp-volume-monitor

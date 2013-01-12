@@ -493,6 +493,40 @@ AC_SUBST(BLURAY_CFLAGS)
 AC_SUBST(BLURAY_LIBS)
 AM_CONDITIONAL(HAVE_BLURAY, [test "$msg_bluray" = "yes"])
 
+dnl *************************
+dnl *** Check for libmtp ***
+dnl *************************
+AC_ARG_ENABLE(libmtp, AS_HELP_STRING([--disable-libmtp],[build without libmtp support]))
+msg_libmtp=no
+LIBMTP_LIBS=
+LIBMTP_CFLAGS=
+
+if test "x$enable_libmtp" != "xno" -a "x$msg_gudev" = "xyes"; then
+  PKG_CHECK_EXISTS(libmtp, msg_libmtp=yes)
+
+  if test "x$msg_libmtp" = "xyes"; then
+    PKG_CHECK_MODULES(LIBMTP, libmtp >= 1.1.0)
+    AC_DEFINE(HAVE_LIBMTP, 1, [Define to 1 if libmtp is available])
+
+    save_libs="$LIBS"
+    LIBS="$LIBMTP_LIBS"
+    AC_CHECK_LIB(mtp, LIBMTP_Get_Thumbnail, have_libmtp_get_thumbnail=yes)
+    if test "x$have_libmtp_get_thumbnail" = "xyes"; then
+      AC_DEFINE(HAVE_LIBMTP_GET_THUMBNAIL, 1, [Define to 1 if LIBMTP_Get_Thumbnail is available])
+    fi
+
+    AC_CHECK_LIB(mtp, LIBMTP_Read_Event, have_libmtp_read_event=yes)
+    if test "x$have_libmtp_read_event" = "xyes"; then
+      AC_DEFINE(HAVE_LIBMTP_READ_EVENT, 1, [Define to 1 if LIBMTP_Read_Event is available])
+    fi
+    LIBS="$save_libs"
+  fi
+fi
+
+AC_SUBST(LIBMTP_CFLAGS)
+AC_SUBST(LIBMTP_LIBS)
+AM_CONDITIONAL(USE_LIBMTP, [test "$msg_libmtp" = "yes"])
+
 dnl ==========================================================================
 dnl Samba 3.0
 
@@ -830,6 +864,7 @@ monitor/gdu/Makefile
 monitor/udisks2/Makefile
 monitor/gphoto2/Makefile
 monitor/afc/Makefile
+monitor/mtp/Makefile
 programs/Makefile
 man/Makefile
 test/Makefile
@@ -850,6 +885,7 @@ echo "
 	FUSE support:                 $msg_fuse
         CDDA support:                 $msg_cdda
         Gphoto2 support:              $msg_gphoto2
+        MTP support:                  $msg_libmtp
 	archive support:              $msg_archive
 	AFC support:                  $msg_afc
         AFP support:                  $msg_afp

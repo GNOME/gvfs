@@ -82,6 +82,12 @@ mount_DATA += gphoto2.mount
 libexec_PROGRAMS += gvfsd-gphoto2
 endif
 
+mount_in_files += mtp.mount.in
+if USE_LIBMTP
+mount_DATA += mtp.mount
+libexec_PROGRAMS += gvfsd-mtp
+endif
+
 mount_in_files += obexftp.mount.in
 if USE_OBEXFTP
 mount_DATA += obexftp.mount
@@ -447,6 +453,19 @@ gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(GUDEV_LIBS)
 else
 gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(HAL_LIBS)
 endif
+
+gvfsd_mtp_SOURCES = \
+	gvfsbackendmtp.c gvfsbackendmtp.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c
+
+gvfsd_mtp_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendmtp.h \
+	-DDEFAULT_BACKEND_TYPE=mtp \
+	-DBACKEND_TYPES='"mtp", G_VFS_TYPE_BACKEND_MTP,' \
+	$(GUDEV_CFLAGS) $(LIBMTP_CFLAGS)
+
+gvfsd_mtp_LDADD = $(libraries) $(GUDEV_LIBS) $(LIBMTP_LIBS)
 
 gvfsd_http_SOURCES = \
 	gvfshttpinputstream.c gvfshttpinputstream.h \
