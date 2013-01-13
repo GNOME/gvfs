@@ -9,13 +9,13 @@
 # Antón Méixome <meixome@certima.net>, 2010.
 # Fran Diéguez <frandieguez@gnome.org>, 2009, 2010, 2011, 2012.
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2012.
-# Fran Dieguez <frandieguez@gnome.org>, 2012.
+# Fran Dieguez <frandieguez@gnome.org>, 2012, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs-master-po-gl-70600.merged\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 00:32+0100\n"
-"PO-Revision-Date: 2012-12-15 00:32+0200\n"
+"POT-Creation-Date: 2013-01-13 16:39+0100\n"
+"PO-Revision-Date: 2013-01-13 16:44+0200\n"
 "Last-Translator: Fran Dieguez <frandieguez@gnome.org>\n"
 "Language-Team: gnome-l10n-gl@gnome.org\n"
 "Language: gl\n"
@@ -391,7 +391,7 @@ msgstr "O ficheiro non existe"
 #: ../daemon/gvfsafpvolume.c:398 ../daemon/gvfsafpvolume.c:468
 #: ../daemon/gvfsafpvolume.c:2517 ../daemon/gvfsbackendafp.c:277
 #: ../daemon/gvfsbackendafp.c:478 ../daemon/gvfsbackendafp.c:1310
-#: ../daemon/gvfsbackenddav.c:2250 ../daemon/gvfsbackendftp.c:774
+#: ../daemon/gvfsbackenddav.c:2241 ../daemon/gvfsbackendftp.c:774
 #: ../daemon/gvfsbackendsftp.c:2339 ../daemon/gvfsbackendsftp.c:3055
 #: ../daemon/gvfsbackendsftp.c:3394 ../daemon/gvfsbackendsftp.c:4264
 msgid "File is directory"
@@ -406,7 +406,7 @@ msgid "Target file is open"
 msgstr "O ficheiro de destino está aberto"
 
 #: ../daemon/gvfsafpvolume.c:676 ../daemon/gvfsbackendburn.c:421
-#: ../daemon/gvfsbackenddav.c:2599 ../daemon/gvfsbackendsftp.c:1821
+#: ../daemon/gvfsbackenddav.c:2582 ../daemon/gvfsbackendsftp.c:1821
 msgid "Directory not empty"
 msgstr "O cartafol non está baleiro"
 
@@ -433,8 +433,8 @@ msgstr "Non hai espazo dabondo no volume"
 
 #: ../daemon/gvfsafpvolume.c:833 ../daemon/gvfsafpvolume.c:1414
 #: ../daemon/gvfsafpvolume.c:1571 ../daemon/gvfsbackendafp.c:284
-#: ../daemon/gvfsbackendafp.c:485 ../daemon/gvfsbackenddav.c:2306
-#: ../daemon/gvfsbackenddav.c:2559 ../daemon/gvfsbackenddav.c:2670
+#: ../daemon/gvfsbackendafp.c:485 ../daemon/gvfsbackenddav.c:2297
+#: ../daemon/gvfsbackenddav.c:2544 ../daemon/gvfsbackenddav.c:2650
 #: ../daemon/gvfsbackendftp.c:753 ../daemon/gvfsbackendftp.c:934
 #: ../daemon/gvfsbackendftp.c:1373 ../daemon/gvfsbackendftp.c:1553
 #: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2105
@@ -454,6 +454,7 @@ msgid "Target directory already exists"
 msgstr "O cartafol de destino xa existe"
 
 #: ../daemon/gvfsafpvolume.c:1219 ../daemon/gvfsbackendafp.c:590
+#: ../daemon/gvfsbackendmtp.c:1378
 msgid "Can't rename volume"
 msgstr "Non é posíbel renomear un volume"
 
@@ -533,6 +534,7 @@ msgid "Internal Apple File Control error"
 msgstr "Erro interno de control de ficheiro de Apple"
 
 #: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:737
+#: ../daemon/gvfsbackendmtp.c:1186
 msgid "File does not exist"
 msgstr "O ficheiro non existe"
 
@@ -606,8 +608,8 @@ msgid "Cancel"
 msgstr "Cancelar"
 
 #: ../daemon/gvfsbackendafc.c:435 ../daemon/gvfsbackendarchive.c:554
-#: ../daemon/gvfsbackendarchive.c:583 ../daemon/gvfsbackenddav.c:1828
-#: ../daemon/gvfsbackendhttp.c:309 ../daemon/gvfsbackendobexftp.c:885
+#: ../daemon/gvfsbackendarchive.c:583 ../daemon/gvfsbackenddav.c:1825
+#: ../daemon/gvfsbackendhttp.c:316 ../daemon/gvfsbackendobexftp.c:885
 #: ../daemon/gvfsbackendobexftp.c:901 ../daemon/gvfsbackendobexftp.c:920
 #: ../daemon/gvfsbackendsmb.c:663
 msgid "Invalid mount spec"
@@ -729,7 +731,8 @@ msgid "Can't copy directory over directory"
 msgstr "Non é posíbel copiar un cartafol sobre outro cartafol"
 
 #: ../daemon/gvfsbackendafp.c:293 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackendftp.c:1568 ../daemon/gvfsbackendobexftp.c:1820
+#: ../daemon/gvfsbackendftp.c:1568 ../daemon/gvfsbackendmtp.c:1196
+#: ../daemon/gvfsbackendmtp.c:1272 ../daemon/gvfsbackendobexftp.c:1820
 msgid "Can't recursively copy directory"
 msgstr "Non é posíbel copiar un cartafol recursivamente"
 
@@ -747,7 +750,7 @@ msgstr "copias de seguranza non compatíbeis"
 msgid "Unable to create temporary file (%s)"
 msgstr "Non é posíbel crear un ficheiro temporal (%s)"
 
-#: ../daemon/gvfsbackendafp.c:1317 ../daemon/gvfsbackenddav.c:2379
+#: ../daemon/gvfsbackendafp.c:1317 ../daemon/gvfsbackenddav.c:2370
 #: ../daemon/gvfsbackendsftp.c:3407 ../daemon/gvfsbackendsmb.c:1149
 msgid "The file was externally modified"
 msgstr "O ficheiro foi modificado de forma externa"
@@ -879,6 +882,7 @@ msgstr ""
 "Un ou máis aplicativos manteñen o volume ocupado."
 
 #: ../daemon/gvfsbackendcdda.c:354 ../daemon/gvfsbackendgphoto2.c:1548
+#: ../daemon/gvfsbackendmtp.c:440
 msgid "Cannot create gudev client"
 msgstr "Non é posíbel crear o cliente gudev"
 
@@ -1014,60 +1018,60 @@ msgstr "Non é posíbel obter o ficheiro"
 #. Translators: This is the name of the WebDAV share constructed as
 #. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
 #. the second %s and only shown if it is not the default http(s) port.
-#: ../daemon/gvfsbackenddav.c:485
+#: ../daemon/gvfsbackenddav.c:482
 #, c-format
 msgid "%s on %s%s"
 msgstr "%s en %s%s"
 
-#: ../daemon/gvfsbackenddav.c:677 ../daemon/gvfsbackenddav.c:1918
-#: ../daemon/gvfsbackendhttp.c:255
+#: ../daemon/gvfsbackenddav.c:674 ../daemon/gvfsbackenddav.c:1915
+#: ../daemon/gvfsbackendhttp.c:262
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "Erro HTTP: %s"
 
-#: ../daemon/gvfsbackenddav.c:694
+#: ../daemon/gvfsbackenddav.c:691
 msgid "Could not parse response"
 msgstr "Non foi posíbel analizar a resposta"
 
-#: ../daemon/gvfsbackenddav.c:703
+#: ../daemon/gvfsbackenddav.c:700
 msgid "Empty response"
 msgstr "Resposta baleira"
 
-#: ../daemon/gvfsbackenddav.c:711
+#: ../daemon/gvfsbackenddav.c:708
 msgid "Unexpected reply from server"
 msgstr "Resposta inesperada do servidor"
 
-#: ../daemon/gvfsbackenddav.c:1402 ../daemon/gvfsbackenddav.c:2048
-#: ../daemon/gvfsbackenddav.c:2135 ../daemon/gvfsbackenddav.c:2242
+#: ../daemon/gvfsbackenddav.c:1399 ../daemon/gvfsbackenddav.c:2045
+#: ../daemon/gvfsbackenddav.c:2132 ../daemon/gvfsbackenddav.c:2233
 msgid "Response invalid"
 msgstr "A resposta é incorrecta"
 
-#: ../daemon/gvfsbackenddav.c:1545
+#: ../daemon/gvfsbackenddav.c:1542
 msgid "WebDAV share"
 msgstr "Compartido co WebDAV"
 
 #. translators: %s here is the hostname
 #. Translators: %s is the hostname
-#: ../daemon/gvfsbackenddav.c:1547 ../daemon/gvfsbackendftp.c:491
+#: ../daemon/gvfsbackenddav.c:1544 ../daemon/gvfsbackendftp.c:491
 #: ../daemon/gvfsbackendsftp.c:964
 #, c-format
 msgid "Enter password for %s"
 msgstr "Introducir o contrasinal para %s"
 
-#: ../daemon/gvfsbackenddav.c:1550
+#: ../daemon/gvfsbackenddav.c:1547
 msgid "Please enter proxy password"
 msgstr "Introduza o seu contrasinal proxy"
 
-#: ../daemon/gvfsbackenddav.c:1922 ../daemon/gvfsbackenddav.c:1926
+#: ../daemon/gvfsbackenddav.c:1919 ../daemon/gvfsbackenddav.c:1923
 msgid "Not a WebDAV enabled share"
 msgstr "Non é un cartafol compartido con WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:2002 ../daemon/gvfsbackenddav.c:2090
-#: ../daemon/gvfsbackenddav.c:2163 ../daemon/gvfsbackenddav.c:2276
+#: ../daemon/gvfsbackenddav.c:1999 ../daemon/gvfsbackenddav.c:2087
+#: ../daemon/gvfsbackenddav.c:2160 ../daemon/gvfsbackenddav.c:2267
 msgid "Could not create request"
 msgstr "Non foi posíbel crear a petición"
 
-#: ../daemon/gvfsbackenddav.c:2410 ../daemon/gvfsbackendsmb.c:1185
+#: ../daemon/gvfsbackenddav.c:2401 ../daemon/gvfsbackendsmb.c:1185
 #: ../daemon/gvfsbackendsmb.c:2122
 msgid "Backup file creation failed"
 msgstr "Produciuse un fallou a creación do ficheiro de copia de seguranza"
@@ -1161,7 +1165,7 @@ msgstr "Cámara"
 msgid "Audio Player"
 msgstr "Reprodutor de son"
 
-#: ../daemon/gvfsbackendgphoto2.c:1607
+#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:432
 msgid "No device specified"
 msgstr "Non se especificou ningún dispositivo"
 
@@ -1216,7 +1220,7 @@ msgstr "Produciuse un erro ao obter o ficheiro"
 msgid "Error getting data from file"
 msgstr "Produciuse un erro ao obter os datos do ficheiro"
 
-#: ../daemon/gvfsbackendgphoto2.c:1955
+#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1457
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Identificador de iconas «%s» malformado"
@@ -1315,7 +1319,7 @@ msgid ""
 "Not supported (the source is a file, but the destination is a directory)"
 msgstr "Non é compatíbel (a orixe é un ficheiro, pero o destino é un cartafol)"
 
-#: ../daemon/gvfsbackendhttp.c:251
+#: ../daemon/gvfsbackendhttp.c:258
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "Erro de cliente HTTP: %s"
@@ -1323,6 +1327,78 @@ msgstr "Erro de cliente HTTP: %s"
 #: ../daemon/gvfsbackendlocaltest.c:856
 msgid "Directory notification not supported"
 msgstr "O cartafol de notificación non é compatíbel"
+
+#: ../daemon/gvfsbackendmtp.c:280
+#, c-format
+msgid "libmtp error: %s"
+msgstr "Erro de libmtp: %s"
+
+#: ../daemon/gvfsbackendmtp.c:386
+msgid "Unexpected host uri format."
+msgstr "Forma de URI de equipo non esperado."
+
+#: ../daemon/gvfsbackendmtp.c:396
+msgid "Malformed host uri."
+msgstr "URI de equipo mal formado."
+
+#: ../daemon/gvfsbackendmtp.c:409
+msgid "Couldn't find matching udev device."
+msgstr "Non foi posíbel coincidir o udev do dispositivo."
+
+#: ../daemon/gvfsbackendmtp.c:545
+msgid "No MTP devices found"
+msgstr "Non se atoparon dispositivos MTP"
+
+#: ../daemon/gvfsbackendmtp.c:550
+msgid "Unable to connect to MTP device"
+msgstr "Non foi posíbel conectarse ao dispositivo MTP"
+
+#: ../daemon/gvfsbackendmtp.c:555
+msgid "Unable to allocate memory while detecting MTP devices"
+msgstr ""
+"Non foi posíbel reservar memoria mentres se detectaban os dispositivos MTP"
+
+#: ../daemon/gvfsbackendmtp.c:561
+msgid "Generic libmtp error"
+msgstr "Erro xenérico de libmtp"
+
+#: ../daemon/gvfsbackendmtp.c:578
+#, c-format
+msgid "Unable to open MTP device '%s'"
+msgstr "Non foi poisíbel abrir o dispositivo MTP «%s»"
+
+#: ../daemon/gvfsbackendmtp.c:621
+msgid "Unnamed Device"
+msgstr "Dispositivo sen nome"
+
+#: ../daemon/gvfsbackendmtp.c:989 ../daemon/gvfsbackendmtp.c:1062
+msgid "No storage volumes found"
+msgstr "Non se atoparon volumes de almacenamento"
+
+#: ../daemon/gvfsbackendmtp.c:1011
+msgid "File not found"
+msgstr "Ficheiro non atopado"
+
+#: ../daemon/gvfsbackendmtp.c:1119
+msgid "Cannot make directory in this location"
+msgstr "Non é posíbel crear un cartafol nesta localización"
+
+#: ../daemon/gvfsbackendmtp.c:1175 ../daemon/gvfsbackendsmbbrowse.c:1163
+msgid "Not a regular file"
+msgstr "Non é un ficheiro normal"
+
+#: ../daemon/gvfsbackendmtp.c:1245
+msgid "Cannot write to this location"
+msgstr "Non foi posíbel escribir nesta localización"
+
+#: ../daemon/gvfsbackendmtp.c:1337
+msgid "Cannot delete this entity"
+msgstr "Non é posíbel eliminar esta entrada"
+
+#: ../daemon/gvfsbackendmtp.c:1449
+#, c-format
+msgid "No thumbnail for entity '%s'"
+msgstr "Non hai ningunha miniatura para a entidade «%s»"
 
 #: ../daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
@@ -1514,10 +1590,6 @@ msgstr "Compartidos con Windows en %s"
 msgid "Failed to retrieve share list from server"
 msgstr ""
 "Produciuse un erro ao recuperar a lista de recursos compartidos do servidor"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:1163
-msgid "Not a regular file"
-msgstr "Non é un ficheiro normal"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1513
 msgid "Windows Network File System Service"
