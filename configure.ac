@@ -2,25 +2,32 @@ AC_PREREQ([2.64])
 
 AC_INIT([gvfs],[1.15.3],[http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs])
 AM_INIT_AUTOMAKE([1.11.1 no-dist-gzip dist-xz tar-ustar])
-AM_CONFIG_HEADER(config.h)
+
+AC_CONFIG_HEADERS(config.h)
+AC_CONFIG_MACRO_DIR([m4])
 
 AM_SANITY_CHECK
 
 AC_C_CONST
-AC_ISC_POSIX
+AC_SEARCH_LIBS([strerror],[cposix])
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AM_DISABLE_STATIC
-AM_PROG_LIBTOOL
 AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 AC_PATH_PROG(GIO_QUERYMODULES, gio-querymodules, no)
 AM_PROG_CC_C_O
 AC_PROG_SED
+
+# Initialize libtool
+LT_PREREQ([2.2])
+LT_INIT([disable-static])
+LIBTOOL_EXPORT_OPTIONS='-export-symbols-regex "^[[^_]].*"'
+AC_SUBST(LIBTOOL_EXPORT_OPTIONS)
+
 AC_ARG_ENABLE(documentation,
-              AC_HELP_STRING([--enable-documentation],
+              AS_HELP_STRING([--enable-documentation],
                              [build documentation]),,
               enable_documentation=yes)
 if test x$enable_documentation = xyes; then
@@ -50,9 +57,6 @@ saved_CFLAGS=$CFLAGS
 AC_CHECK_MEMBERS([struct stat.st_mtimensec, struct stat.st_mtim.tv_nsec, struct stat.st_atimensec, struct stat.st_atim.tv_nsec, struct stat.st_ctimensec, struct stat.st_ctim.tv_nsec])
 CFLAGS=$saved_CFLAGS
 
-LIBTOOL_EXPORT_OPTIONS='-export-symbols-regex "^[[^_]].*"'
-AC_SUBST(LIBTOOL_EXPORT_OPTIONS)
-			
 GTK_DOC_CHECK
 DISTCHECK_CONFIGURE_FLAGS="--enable-gtk-doc"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
@@ -718,7 +722,7 @@ AM_CONDITIONAL(USE_AFP, test "x$enable_afp" != "xno")
 
 dnl Install bash-completion file?
 AC_ARG_ENABLE([bash-completion],
-	      AC_HELP_STRING([--disable-bash-completion],
+	      AS_HELP_STRING([--disable-bash-completion],
 			     [build without bash-completion support]),
 	      msg_bash_completion=$enableval,
 	      msg_bash_completion=yes)
@@ -728,7 +732,7 @@ fi
 AM_CONDITIONAL(ENABLE_BASHCOMP, test "$msg_bash_completion" = "yes")
 
 AC_ARG_WITH([bash-completion-dir],
-	    AC_HELP_STRING([--with-bash-completion-dir=PATH],
+	    AS_HELP_STRING([--with-bash-completion-dir=PATH],
 	    		   [choose directory for bash-completion file (default=DATADIR/bash-completion/completions)]),
 	    with_bashcomp_dir=$withval,
 	    with_bashcomp_dir=$datadir/bash-completion/completions)
@@ -850,7 +854,7 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
 common/Makefile
 client/Makefile
@@ -870,6 +874,7 @@ man/Makefile
 test/Makefile
 po/Makefile.in
 ])
+AC_OUTPUT
 
 echo 
 echo "gvfs configuration summary:"
