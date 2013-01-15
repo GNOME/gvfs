@@ -1,3 +1,11 @@
+Major changes in 1.15.2
+=======================
+* New MTP backend and volume monitor written by Philip Langdale
+* test: Add Drive tests
+* test: Drop genisoimage dependency
+* test: Include */sbin in PATH
+* Translation updates
+
 Major changes in 1.15.1
 =======================
 * client: Set default timeout to infinite for all GDaemonFile methods
