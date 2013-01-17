@@ -269,8 +269,7 @@ update_shadow_mount (GProxyVolume *volume)
           break;
         }
     }
-  g_list_foreach (mounts, (GFunc) g_object_unref, NULL);
-  g_list_free (mounts);
+  g_list_free_full (mounts, g_object_unref);
 
   if (mount_to_shadow != NULL)
     {

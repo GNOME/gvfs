@@ -86,13 +86,6 @@ static GList* get_stores_for_camera (const char *bus_num, const char *device_num
 
 G_DEFINE_TYPE (GGPhoto2VolumeMonitor, g_gphoto2_volume_monitor, G_TYPE_VOLUME_MONITOR)
 
-static void
-list_free (GList *objects)
-{
-  g_list_foreach (objects, (GFunc)g_object_unref, NULL);
-  g_list_free (objects);
-}
-
 #ifndef HAVE_GUDEV
 static HalPool *
 get_hal_pool (void)
@@ -133,8 +126,8 @@ g_gphoto2_volume_monitor_finalize (GObject *object)
   g_object_unref (monitor->pool);
 #endif
 
-  list_free (monitor->last_camera_devices);
-  list_free (monitor->camera_volumes);
+  g_list_free_full (monitor->last_camera_devices, g_object_unref);
+  g_list_free_full (monitor->camera_volumes, g_object_unref);
 
   if (G_OBJECT_CLASS (g_gphoto2_volume_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_gphoto2_volume_monitor_parent_class)->finalize) (object);
@@ -265,8 +258,7 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
           g_object_unref (activation_mount_root);
       }
 
-    g_list_foreach (store_heads, (GFunc) g_free, NULL);
-    g_list_free (store_heads);
+    g_list_free_full (store_heads, g_free);
 }
 
 static void
@@ -565,8 +557,8 @@ emit_lists_in_idle (gpointer data)
              "volume_added", NULL,
              lists->added_volumes);
 
-  list_free (lists->removed_volumes);
-  list_free (lists->added_volumes);
+  g_list_free_full (lists->removed_volumes, g_object_unref);
+  g_list_free_full (lists->added_volumes, g_object_unref);
   g_object_unref (lists->monitor);
   g_free (lists);
 
@@ -599,8 +591,8 @@ update_all (GGPhoto2VolumeMonitor *monitor,
     }
   else
     {
-      list_free (removed_volumes);
-      list_free (added_volumes);
+      g_list_free_full (removed_volumes, g_object_unref);
+      g_list_free_full (added_volumes, g_object_unref);
     }
 }
 #endif
@@ -838,13 +830,12 @@ update_cameras (GGPhoto2VolumeMonitor *monitor,
           if (activation_mount_root != NULL)
             g_object_unref (activation_mount_root);
         }
-      g_list_foreach (store_heads, (GFunc) g_free, NULL);
-      g_list_free (store_heads);
+      g_list_free_full (store_heads, g_free);
     }
 
   g_list_free (added);
   g_list_free (removed);
-  list_free (monitor->last_camera_devices);
+  g_list_free_full (monitor->last_camera_devices, g_object_unref);
   monitor->last_camera_devices = new_camera_devices;
 }
 #endif

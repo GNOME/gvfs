@@ -834,8 +834,7 @@ more_files_callback (GObject *source_object, GAsyncResult *res,
         break;
     }
 
-  g_list_foreach (files, (GFunc)g_object_unref, NULL);
-  g_list_free (files);
+  g_list_free_full (files, g_object_unref);
   g_free (name_collation_key);
 
   if (filename)

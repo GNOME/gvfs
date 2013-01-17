@@ -752,8 +752,7 @@ _query_file_info_helper (GVfsBackend *backend,
     }
 
   g_free (basename);
-  g_list_foreach (elements, (GFunc)g_object_unref, NULL);
-  g_list_free (elements);
+  g_list_free_full (elements, g_object_unref);
 
   g_debug ("- _query_file_info_helper\n");
 
@@ -1547,8 +1546,7 @@ do_enumerate (GVfsBackend *backend,
 
   g_vfs_job_enumerate_add_infos (job, elements);
 
-  g_list_foreach (elements, (GFunc)g_object_unref, NULL);
-  g_list_free (elements);
+  g_list_free_full (elements, g_object_unref);
   g_vfs_job_enumerate_done (job);
 
   g_mutex_unlock (&op_backend->mutex);
@@ -1972,8 +1970,7 @@ do_delete (GVfsBackend *backend,
       g_free (files);
 
       len = g_list_length (elements);
-      g_list_foreach (elements, (GFunc)g_object_unref, NULL);
-      g_list_free (elements);
+      g_list_free_full (elements, g_object_unref);
 
       if (len != 0)
         {

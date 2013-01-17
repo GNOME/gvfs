@@ -120,13 +120,6 @@ g_vfs_afc_volume_monitor_constructor (GType type, guint ncps,
 }
 
 static void
-list_free (GList *objects)
-{
-  g_list_foreach (objects, (GFunc)g_object_unref, NULL);
-  g_list_free (objects);
-}
-
-static void
 g_vfs_afc_volume_monitor_finalize (GObject *_self)
 {
   GVfsAfcVolumeMonitor *self;
@@ -134,7 +127,7 @@ g_vfs_afc_volume_monitor_finalize (GObject *_self)
   self = G_VFS_AFC_VOLUME_MONITOR(_self);
 
   if (self->volumes)
-    list_free (self->volumes);
+    g_list_free_full (self->volumes, g_object_unref);
 
   idevice_event_unsubscribe();
 

@@ -118,10 +118,7 @@ metadata_free (MetaData *data)
 {
   g_free (data->key);
   if (data->is_list)
-    {
-      g_list_foreach (data->values, (GFunc)g_free, NULL);
-      g_list_free (data->values);
-    }
+    g_list_free_full (data->values, g_free);
   else
     g_free (data->value);
 
@@ -132,10 +129,8 @@ void
 metafile_free (MetaFile *file)
 {
   g_free (file->name);
-  g_list_foreach (file->children, (GFunc)metafile_free, NULL);
-  g_list_free (file->children);
-  g_list_foreach (file->data, (GFunc)metadata_free, NULL);
-  g_list_free (file->data);
+  g_list_free_full (file->children, (GDestroyNotify)metafile_free);
+  g_list_free_full (file->data, (GDestroyNotify)metadata_free);
   g_free (file);
 }
 
@@ -226,8 +221,7 @@ meta_builder_remove (MetaBuilder *builder,
   else
     {
       /* Removing root not allowed, just remove children */
-      g_list_foreach (f->children, (GFunc)metafile_free, NULL);
-      g_list_free (f->children);
+      g_list_free_full (f->children, (GDestroyNotify)metafile_free);
       f->children = NULL;
       if (mtime)
 	f->last_changed = mtime;
@@ -312,8 +306,7 @@ metadata_clear (MetaData *data)
 {
   if (data->is_list)
     {
-      g_list_foreach (data->values, (GFunc)g_free, NULL);
-      g_list_free (data->values);
+      g_list_free_full (data->values, g_free);
       data->values = NULL;
     }
   else
@@ -361,8 +354,7 @@ metafile_key_list_set (MetaFile    *metafile,
       metadata_clear (data);
       data->is_list = TRUE;
     }
-  g_list_foreach (data->values, (GFunc)g_free, NULL);
-  g_list_free (data->values);
+  g_list_free_full (data->values, g_free);
   data->values = NULL;
 }
 

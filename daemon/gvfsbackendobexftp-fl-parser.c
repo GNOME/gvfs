@@ -350,8 +350,7 @@ static void
 fl_parser_free_parser_data (ParserData *data, gboolean free_list)
 {
 	if (free_list) {
-		g_list_foreach (data->elements, (GFunc) g_object_unref, NULL);
-		g_list_free (data->elements);
+		g_list_free_full (data->elements, g_object_unref);
 		data->elements = NULL;
 	}
 

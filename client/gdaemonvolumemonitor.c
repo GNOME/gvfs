@@ -239,8 +239,7 @@ g_daemon_volume_monitor_finalize (GObject *object)
   
   g_object_unref (monitor->mount_tracker);
   
-  g_list_foreach (monitor->mounts, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->mounts);
+  g_list_free_full (monitor->mounts, g_object_unref);
   
   if (G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->finalize) (object);

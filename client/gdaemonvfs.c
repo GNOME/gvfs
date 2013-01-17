@@ -349,8 +349,7 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
     }
 
   /* The above should have ref:ed the modules anyway */
-  g_list_foreach (modules, (GFunc)g_type_module_unuse, NULL);
-  g_list_free (modules);
+  g_list_free_full (modules, (GDestroyNotify)g_type_module_unuse);
   g_free (mappers);
 }
 

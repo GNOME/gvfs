@@ -652,8 +652,7 @@ drive_to_dbus (GDrive *drive)
   g_variant_builder_unref (expansion_builder);
 
   g_strfreev (identifiers);
-  g_list_foreach (volumes, (GFunc) g_object_unref, NULL);
-  g_list_free (volumes);
+  g_list_free_full (volumes, g_object_unref);
   g_free (icon_data);
   g_object_unref (icon);
   g_free (symbolic_icon_data);
@@ -942,12 +941,9 @@ handle_list (GVfsRemoteVolumeMonitor *object,
   for (l = mounts; l; l = l->next)
     g_variant_builder_add_value (mounts_array, mount_to_dbus (l->data));
 
-  g_list_foreach (drives, (GFunc) g_object_unref, NULL);
-  g_list_free (drives);
-  g_list_foreach (volumes, (GFunc) g_object_unref, NULL);
-  g_list_free (volumes);
-  g_list_foreach (mounts, (GFunc) g_object_unref, NULL);
-  g_list_free (mounts);
+  g_list_free_full (drives, g_object_unref);
+  g_list_free_full (volumes, g_object_unref);
+  g_list_free_full (mounts, g_object_unref);
   
   gvfs_remote_volume_monitor_complete_list (object, invocation,
                                             g_variant_builder_end (drives_array),
@@ -1067,10 +1063,7 @@ handle_mount_unmount (GVfsRemoteVolumeMonitor *object,
 
  out:
   if (mounts != NULL)
-    {
-      g_list_foreach (mounts, (GFunc) g_object_unref, NULL);
-      g_list_free (mounts);
-    }
+    g_list_free_full (mounts, g_object_unref);
   return TRUE;
 }
 
@@ -1248,10 +1241,7 @@ handle_volume_mount (GVfsRemoteVolumeMonitor *object,
 
  out:
   if (volumes != NULL)
-    {
-      g_list_foreach (volumes, (GFunc) g_object_unref, NULL);
-      g_list_free (volumes);
-    }
+    g_list_free_full (volumes, g_object_unref);
   return TRUE;
 }
 
@@ -1358,10 +1348,7 @@ handle_drive_eject (GVfsRemoteVolumeMonitor *object,
 
  out:
   if (drives != NULL)
-    {
-      g_list_foreach (drives, (GFunc) g_object_unref, NULL);
-      g_list_free (drives);
-    }
+    g_list_free_full (drives, g_object_unref);
   return TRUE;
 }
 
@@ -1468,10 +1455,7 @@ handle_drive_stop (GVfsRemoteVolumeMonitor *object,
 
  out:
   if (drives != NULL)
-    {
-      g_list_foreach (drives, (GFunc) g_object_unref, NULL);
-      g_list_free (drives);
-    }
+    g_list_free_full (drives, g_object_unref);
   return TRUE;
 }
 
@@ -1578,10 +1562,7 @@ handle_drive_start (GVfsRemoteVolumeMonitor *object,
 
  out:
   if (drives != NULL)
-    {
-      g_list_foreach (drives, (GFunc) g_object_unref, NULL);
-      g_list_free (drives);
-    }
+    g_list_free_full (drives, g_object_unref);
   return TRUE;
 }
 
@@ -1675,10 +1656,7 @@ handle_drive_poll_for_media (GVfsRemoteVolumeMonitor *object,
   
  out:
   if (drives != NULL)
-    {
-      g_list_foreach (drives, (GFunc) g_object_unref, NULL);
-      g_list_free (drives);
-    }
+    g_list_free_full (drives, g_object_unref);
   return TRUE;
 }
 
@@ -1910,8 +1888,7 @@ monitor_try_create (void)
   mounts = g_volume_monitor_get_mounts (monitor);
   for (l = mounts; l != NULL; l = l->next)
     mount_sniff_x_content_type (G_MOUNT (l->data));
-  g_list_foreach (mounts, (GFunc) g_object_unref, NULL);
-  g_list_free (mounts);
+  g_list_free_full (mounts, g_object_unref);
 
  fail:
   if (klass != NULL)

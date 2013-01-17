@@ -408,8 +408,7 @@ mount_list_unlock (void)
 static void
 mount_list_free (void)
 {
-  g_list_foreach (mount_list, (GFunc) mount_record_free, NULL);
-  g_list_free (mount_list);
+  g_list_free_full (mount_list, (GDestroyNotify) mount_record_free);
   mount_list = NULL;
 }
 

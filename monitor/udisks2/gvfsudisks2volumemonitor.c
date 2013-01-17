@@ -67,7 +67,6 @@ struct _GVfsUDisks2VolumeMonitor
   GList *disc_mounts;
 };
 
-static void object_list_free (GList *objects);
 static UDisksClient *get_udisks_client_sync (GError **error);
 
 static void update_all               (GVfsUDisks2VolumeMonitor  *monitor,
@@ -133,13 +132,13 @@ gvfs_udisks2_volume_monitor_finalize (GObject *object)
   g_clear_object (&monitor->client);
   g_clear_object (&monitor->gudev_client);
 
-  object_list_free (monitor->drives);
-  object_list_free (monitor->volumes);
-  object_list_free (monitor->fstab_volumes);
-  object_list_free (monitor->mounts);
+  g_list_free_full (monitor->drives, g_object_unref);
+  g_list_free_full (monitor->volumes, g_object_unref);
+  g_list_free_full (monitor->fstab_volumes, g_object_unref);
+  g_list_free_full (monitor->mounts, g_object_unref);
 
-  object_list_free (monitor->disc_volumes);
-  object_list_free (monitor->disc_mounts);
+  g_list_free_full (monitor->disc_volumes, g_object_unref);
+  g_list_free_full (monitor->disc_mounts, g_object_unref);
 
   G_OBJECT_CLASS (gvfs_udisks2_volume_monitor_parent_class)->finalize (object);
 }
@@ -472,15 +471,6 @@ diff_sorted_lists (GList         *list1,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-object_list_free (GList *objects)
-{
-  g_list_foreach (objects, (GFunc)g_object_unref, NULL);
-  g_list_free (objects);
-}
-
-/* ---------------------------------------------------------------------------------------------------- */
-
-static void
 object_list_emit (GVfsUDisks2VolumeMonitor *monitor,
                   const gchar              *monitor_signal,
                   const gchar              *object_signal,
@@ -572,12 +562,12 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
                         added_mounts);
     }
 
-  object_list_free (removed_drives);
-  object_list_free (added_drives);
-  object_list_free (removed_volumes);
-  object_list_free (added_volumes);
-  object_list_free (removed_mounts);
-  object_list_free (added_mounts);
+  g_list_free_full (removed_drives, g_object_unref);
+  g_list_free_full (added_drives, g_object_unref);
+  g_list_free_full (removed_volumes, g_object_unref);
+  g_list_free_full (added_volumes, g_object_unref);
+  g_list_free_full (removed_mounts, g_object_unref);
+  g_list_free_full (added_mounts, g_object_unref);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1249,8 +1239,7 @@ find_volume_for_device (GVfsUDisks2VolumeMonitor *monitor,
     }
 
  out:
-  g_list_foreach (blocks, (GFunc) g_object_unref, NULL);
-  g_list_free (blocks);
+  g_list_free_full (blocks, g_object_unref);
   return ret;
 }
 
@@ -1357,8 +1346,7 @@ update_drives (GVfsUDisks2VolumeMonitor  *monitor,
   g_list_free (cur_udisks_drives);
   g_list_free (new_udisks_drives);
 
-  g_list_foreach (objects, (GFunc) g_object_unref, NULL);
-  g_list_free (objects);
+  g_list_free_full (objects, g_object_unref);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1448,8 +1436,7 @@ update_volumes (GVfsUDisks2VolumeMonitor  *monitor,
   g_list_free (new_block_volumes);
   g_list_free (cur_block_volumes);
 
-  g_list_foreach (objects, (GFunc) g_object_unref, NULL);
-  g_list_free (objects);
+  g_list_free_full (objects, g_object_unref);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1535,8 +1522,7 @@ mount_point_has_device (GVfsUDisks2VolumeMonitor  *monitor,
   ret = TRUE;
 
  out:
-  g_list_foreach (blocks, (GFunc) g_object_unref, NULL);
-  g_list_free (blocks);
+  g_list_free_full (blocks, g_object_unref);
   return ret;
 }
 
@@ -1629,8 +1615,7 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
         }
     }
 
-  g_list_foreach (new_mount_points, (GFunc) g_unix_mount_point_free, NULL);
-  g_list_free (new_mount_points);
+  g_list_free_full (new_mount_points, (GDestroyNotify) g_unix_mount_point_free);
 
   g_list_free (cur_mount_points);
 }
@@ -1744,8 +1729,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
   g_list_free (removed);
   g_list_free (unchanged);
 
-  g_list_foreach (new_mounts, (GFunc) g_unix_mount_free, NULL);
-  g_list_free (new_mounts);
+  g_list_free_full (new_mounts, (GDestroyNotify) g_unix_mount_free);
 
   g_list_free (cur_mounts);
 }
@@ -1895,8 +1879,7 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
   g_list_free (new_disc_drives);
   g_list_free (cur_disc_drives);
 
-  g_list_foreach (objects, (GFunc) g_object_unref, NULL);
-  g_list_free (objects);
+  g_list_free_full (objects, g_object_unref);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */

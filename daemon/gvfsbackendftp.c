@@ -1269,8 +1269,7 @@ do_delete (GVfsBackend *backend,
                 		   G_IO_ERROR,
                 		   G_IO_ERROR_NOT_EMPTY,
                 		   g_strerror (ENOTEMPTY));
-              g_list_foreach (list, (GFunc) g_object_unref, NULL);
-              g_list_free (list);
+              g_list_free_full (list, g_object_unref);
             }
           else
             {

@@ -267,9 +267,7 @@ g_mount_tracker_finalize (GObject *object)
 
   g_mutex_clear (&tracker->lock);
   
-  g_list_foreach (tracker->mounts,
-		  (GFunc)g_mount_info_unref, NULL);
-  g_list_free (tracker->mounts);
+  g_list_free_full (tracker->mounts, (GDestroyNotify)g_mount_info_unref);
 
   g_clear_object (&tracker->proxy);
   g_clear_object (&tracker->connection);

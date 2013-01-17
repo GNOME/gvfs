@@ -800,7 +800,7 @@ g_vfs_backend_dns_sd_finalize (GObject *object)
   
   g_free (backend->domain);
 
-  g_list_foreach (backend->files, (GFunc)link_file_free, NULL);
+  g_list_free_full (backend->files, (GDestroyNotify)link_file_free);
   
   if (G_OBJECT_CLASS (g_vfs_backend_dns_sd_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_dns_sd_parent_class)->finalize) (object);

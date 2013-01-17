@@ -547,8 +547,7 @@ read_mountable_config (void)
 static void
 re_read_mountable_config (void)
 {
-  g_list_foreach (mountables, (GFunc)vfs_mountable_free, NULL);
-  g_list_free (mountables);
+  g_list_free_full (mountables, (GDestroyNotify)vfs_mountable_free);
   mountables = NULL;
 
   read_mountable_config ();

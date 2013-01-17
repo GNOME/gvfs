@@ -150,8 +150,7 @@ release_metadata (GVfsBackendCdda *cdda_backend)
   cdda_backend->album_artist = NULL;
   g_free (cdda_backend->genre);
   cdda_backend->genre = NULL;
-  g_list_foreach (cdda_backend->tracks, (GFunc) track_free, NULL);
-  g_list_free (cdda_backend->tracks);
+  g_list_free_full (cdda_backend->tracks, (GDestroyNotify) track_free);
   cdda_backend->tracks = NULL;
 }
 
@@ -1066,8 +1065,7 @@ do_enumerate (GVfsBackend *backend,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   g_vfs_job_enumerate_add_infos (job, l);
-  g_list_foreach (l, (GFunc) g_object_unref, NULL);
-  g_list_free (l);
+  g_list_free_full (l, g_object_unref);
 
   g_vfs_job_enumerate_done (job);
 }

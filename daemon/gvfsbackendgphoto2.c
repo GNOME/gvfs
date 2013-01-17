@@ -2227,8 +2227,7 @@ do_enumerate (GVfsBackend *backend,
         {
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
-          g_list_foreach (l, (GFunc) g_object_unref, NULL);
-          g_list_free (l);
+          g_list_free_full (l, g_object_unref);
           gp_list_free (list);
           return;
         }
@@ -2294,8 +2293,7 @@ do_enumerate (GVfsBackend *backend,
         {
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
-          g_list_foreach (l, (GFunc) g_object_unref, NULL);
-          g_list_free (l);
+          g_list_free_full (l, g_object_unref);
           gp_list_free (list);
           return;
         }
@@ -2320,8 +2318,7 @@ do_enumerate (GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_vfs_job_enumerate_add_infos (job, l);
-  g_list_foreach (l, (GFunc) g_object_unref, NULL);
-  g_list_free (l);
+  g_list_free_full (l, g_object_unref);
   g_vfs_job_enumerate_done (job);
 
   g_free (filename);
@@ -2411,8 +2408,7 @@ try_enumerate (GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_vfs_job_enumerate_add_infos (job, l);
-  g_list_foreach (l, (GFunc) g_object_unref, NULL);
-  g_list_free (l);
+  g_list_free_full (l, g_object_unref);
   g_vfs_job_enumerate_done (job);
 
   g_free (filename);
@@ -2420,8 +2416,7 @@ try_enumerate (GVfsBackend *backend,
   return TRUE;
 
  error_not_cached:
-  g_list_foreach (l, (GFunc) g_object_unref, NULL);
-  g_list_free (l);
+  g_list_free_full (l, g_object_unref);
 
   g_free (filename);
   DEBUG ("  BUU no info from cache for try_enumerate (%s)", given_filename);

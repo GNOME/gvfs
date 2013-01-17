@@ -513,8 +513,7 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
 static void
 archive_file_free (ArchiveFile *file)
 {
-  g_slist_foreach (file->children, (GFunc) archive_file_free, NULL);
-  g_slist_free (file->children);
+  g_slist_free_full (file->children, (GDestroyNotify) archive_file_free);
   if (file->info)
     g_object_unref (file->info);
   g_free (file->name);

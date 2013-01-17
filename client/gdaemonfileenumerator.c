@@ -97,8 +97,7 @@ static void              trigger_async_done (GDaemonFileEnumerator *daemon, gboo
 static void
 free_info_list (GList *infos)
 {
-  g_list_foreach (infos, (GFunc)g_object_unref, NULL);
-  g_list_free (infos);
+  g_list_free_full (infos, g_object_unref);
 }
 
 static void

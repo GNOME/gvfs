@@ -1888,8 +1888,7 @@ do_enumerate (GVfsBackend *backend,
 	{
 	  files = g_list_reverse (files);
 	  g_vfs_job_enumerate_add_infos (job, files);
-	  g_list_foreach (files, (GFunc)g_object_unref, NULL);
-	  g_list_free (files);
+	  g_list_free_full (files, g_object_unref);
 	}
     }
       

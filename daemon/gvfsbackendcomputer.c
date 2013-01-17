@@ -889,8 +889,7 @@ mount_volume_from_drive (GDrive *drive,
                         _("Can't mount file"));
     }
   
-  g_list_foreach (volumes, (GFunc)g_object_unref, NULL);
-  g_list_free (volumes);
+  g_list_free_full (volumes, g_object_unref);
 }
 
 static void

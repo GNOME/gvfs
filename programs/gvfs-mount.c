@@ -704,8 +704,7 @@ list_drives (GList *drives,
         }
       volumes = g_drive_get_volumes (drive);
       list_volumes (volumes, indent + 2, FALSE);
-      g_list_foreach (volumes, (GFunc)g_object_unref, NULL);
-      g_list_free (volumes);
+      g_list_free_full (volumes, g_object_unref);
     }
 }
 
@@ -723,18 +722,15 @@ list_monitor_items(void)
 
   drives = g_volume_monitor_get_connected_drives (volume_monitor);
   list_drives (drives, 0);
-  g_list_foreach (drives, (GFunc)g_object_unref, NULL);
-  g_list_free (drives);
+  g_list_free_full (drives, g_object_unref);
 
   volumes = g_volume_monitor_get_volumes (volume_monitor);
   list_volumes (volumes, 0, TRUE);
-  g_list_foreach (volumes, (GFunc)g_object_unref, NULL);
-  g_list_free (volumes);
+  g_list_free_full (volumes, g_object_unref);
 
   mounts = g_volume_monitor_get_mounts (volume_monitor);
   list_mounts (mounts, 0, TRUE);
-  g_list_foreach (mounts, (GFunc)g_object_unref, NULL);
-  g_list_free (mounts);
+  g_list_free_full (mounts, g_object_unref);
 
   g_object_unref (volume_monitor);
 }
@@ -762,8 +758,7 @@ unmount_all_with_scheme (const char *scheme)
     }
     g_object_unref (root);
   }
-  g_list_foreach (mounts, (GFunc)g_object_unref, NULL);
-  g_list_free (mounts);
+  g_list_free_full (mounts, g_object_unref);
 
   g_object_unref (volume_monitor);
 }
@@ -844,8 +839,7 @@ mount_with_device_file (const char *device_file)
           outstanding_mounts++;
         }
     }
-  g_list_foreach (volumes, (GFunc) g_object_unref, NULL);
-  g_list_free (volumes);
+  g_list_free_full (volumes, g_object_unref);
 
   if (outstanding_mounts == 0)
     {

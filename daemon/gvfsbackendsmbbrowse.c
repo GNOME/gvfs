@@ -231,8 +231,7 @@ g_vfs_backend_smb_browse_finalize (GObject *object)
 
   smbc_free_context (backend->smb_context, TRUE);
   
-  g_list_foreach (backend->entries, (GFunc)browse_entry_free, NULL);
-  g_list_free (backend->entries);
+  g_list_free_full (backend->entries, (GDestroyNotify)browse_entry_free);
   
   if (G_OBJECT_CLASS (g_vfs_backend_smb_browse_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_smb_browse_parent_class)->finalize) (object);
@@ -668,8 +667,7 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
   g_mutex_lock (&backend->entries_lock);
   
   /* Clear old cache */
-  g_list_foreach (backend->entries, (GFunc)browse_entry_free, NULL);
-  g_list_free (backend->entries);
+  g_list_free_full (backend->entries, (GDestroyNotify)browse_entry_free);
   backend->entries = entries;
   backend->entry_errno = entry_errno;
   backend->last_entry_update = time (NULL);
@@ -1447,8 +1445,7 @@ run_enumerate (GVfsBackendSmbBrowse *backend,
   files = g_list_reverse (files);
 
   g_vfs_job_enumerate_add_infos (job, files);
-  g_list_foreach (files, (GFunc)g_object_unref, NULL);
-  g_list_free (files);
+  g_list_free_full (files, g_object_unref);
 
   g_vfs_job_enumerate_done (job);
 }

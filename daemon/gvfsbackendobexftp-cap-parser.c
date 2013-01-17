@@ -523,10 +523,7 @@ ovu_caps_memory_equal (OvuCapsMemory *m1, OvuCapsMemory *m2)
 void
 ovu_caps_free (OvuCaps *caps)
 {
-	g_list_foreach (caps->memory_entries,
-			(GFunc) ovu_caps_memory_free, NULL);
-
-	g_list_free (caps->memory_entries);
+	g_list_free_full (caps->memory_entries, (GDestroyNotify) ovu_caps_memory_free);
 
 	g_free (caps);
 }
