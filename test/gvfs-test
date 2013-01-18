@@ -270,12 +270,25 @@ class Programs(GvfsTestCase):
         self.assertTrue('filesystem::type:' in out, out)
 
 class ArchiveMounter(GvfsTestCase):
+    def add_files(self, add_fn):
+        '''Add test files to an archive'''
+
+        p = os.path.join(self.workdir, 'hello.txt')
+        with open(p, 'w') as f:
+            f.write('hello\n')
+        add_fn(p, 'hello.txt')
+
+        p = os.path.join(self.workdir, 'bye.txt')
+        with open(p, 'w') as f:
+            f.write('bye\n')
+        add_fn(p, 'stuff/bye.txt')
+
     def test_tar(self):
         '''archive:// for tar'''
 
         tar_path = os.path.join(self.workdir, 'stuff.tar')
         tf = tarfile.open(tar_path, 'w')
-        tf.add(__file__, 'gvfs-test.py')
+        self.add_files(tf.add)
         tf.close()
 
         self.do_test_for_archive(tar_path)
@@ -285,7 +298,7 @@ class ArchiveMounter(GvfsTestCase):
 
         tar_path = os.path.join(self.workdir, 'stuff.tar.gz')
         tf = tarfile.open(tar_path, 'w:gz')
-        tf.add(__file__, 'gvfs-test.py')
+        self.add_files(tf.add)
         tf.close()
 
         self.do_test_for_archive(tar_path)
@@ -295,7 +308,7 @@ class ArchiveMounter(GvfsTestCase):
 
         tar_path = os.path.join(self.workdir, 'stuff.tar.bz2')
         tf = tarfile.open(tar_path, 'w:bz2')
-        tf.add(__file__, 'gvfs-test.py')
+        self.add_files(tf.add)
         tf.close()
 
         self.do_test_for_archive(tar_path)
@@ -305,7 +318,7 @@ class ArchiveMounter(GvfsTestCase):
 
         zip_path = os.path.join(self.workdir, 'stuff.zip')
         zf = zipfile.ZipFile(zip_path, 'w')
-        zf.write(__file__, 'gvfs-test.py')
+        self.add_files(zf.write)
         zf.close()
 
         self.do_test_for_archive(zip_path)
