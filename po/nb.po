@@ -1,14 +1,14 @@
 # Norwegian bokmål translation of gvfs.
 # Copyright (C) 1999-2003 Free Software Foundation, Inc.
 #
-# Kjartan Maraas <kmaraas@gnome.org>, 1999-2012.
+# Kjartan Maraas <kmaraas@gnome.org>, 1999-2013.
 # Torstein Adolf Winterseth <kvikende@fsfe.org>, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.13.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-23 17:40+0100\n"
-"PO-Revision-Date: 2012-12-23 17:41+0100\n"
+"POT-Creation-Date: 2013-01-21 12:28+0100\n"
+"PO-Revision-Date: 2013-01-21 12:31+0100\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian bokmål <i18n-nb@lister.ping.uio.no>\n"
 "Language: \n"
@@ -47,18 +47,18 @@ msgstr "Kan ikke finne omsluttende montering"
 msgid "Invalid filename %s"
 msgstr "Ugyldig filnavn %s"
 
-#: ../client/gdaemonfile.c:2616 ../client/gdaemonvfs.c:1289
-#: ../client/gdaemonvfs.c:1341
+#: ../client/gdaemonfile.c:2616 ../client/gdaemonvfs.c:1288
+#: ../client/gdaemonvfs.c:1340
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Feil under setting av metadata for fil: %s"
 
-#: ../client/gdaemonfile.c:2617 ../client/gdaemonvfs.c:1342
+#: ../client/gdaemonfile.c:2617 ../client/gdaemonvfs.c:1341
 msgid "values must be string or list of strings"
 msgstr "verdier må være av type streng eller liste med strenger"
 
-#: ../client/gdaemonfileenumerator.c:529 ../client/gdaemonfileenumerator.c:612
-#: ../client/gdaemonfileenumerator.c:663
+#: ../client/gdaemonfileenumerator.c:528 ../client/gdaemonfileenumerator.c:611
+#: ../client/gdaemonfileenumerator.c:662
 #: ../client/gdaemonfileinputstream.c:630
 #: ../client/gdaemonfileinputstream.c:783
 #: ../client/gdaemonfileinputstream.c:901
@@ -68,13 +68,13 @@ msgstr "verdier må være av type streng eller liste med strenger"
 #: ../client/gdaemonfileoutputstream.c:681
 #: ../client/gdaemonfileoutputstream.c:873
 #: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:734
-#: ../daemon/gvfsbackendobexftp.c:1111 ../daemon/gvfsbackendobexftp.c:1132
-#: ../daemon/gvfsbackendobexftp.c:1251 ../daemon/gvfsbackendobexftp.c:1388
-#: ../daemon/gvfsbackendobexftp.c:1452 ../daemon/gvfsbackendobexftp.c:1654
-#: ../daemon/gvfsbackendobexftp.c:1761 ../daemon/gvfsbackendobexftp.c:1923
-#: ../daemon/gvfsbackendobexftp.c:1950 ../daemon/gvfsbackendobexftp.c:2009
-#: ../daemon/gvfsbackendobexftp.c:2031 ../daemon/gvfsbackendobexftp.c:2094
-#: ../daemon/gvfsbackendobexftp.c:2113 ../daemon/gvfsbackendsmb.c:1180
+#: ../daemon/gvfsbackendobexftp.c:1110 ../daemon/gvfsbackendobexftp.c:1131
+#: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1387
+#: ../daemon/gvfsbackendobexftp.c:1451 ../daemon/gvfsbackendobexftp.c:1652
+#: ../daemon/gvfsbackendobexftp.c:1759 ../daemon/gvfsbackendobexftp.c:1921
+#: ../daemon/gvfsbackendobexftp.c:1948 ../daemon/gvfsbackendobexftp.c:2006
+#: ../daemon/gvfsbackendobexftp.c:2028 ../daemon/gvfsbackendobexftp.c:2091
+#: ../daemon/gvfsbackendobexftp.c:2110 ../daemon/gvfsbackendsmb.c:1180
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1070
@@ -82,7 +82,7 @@ msgstr "verdier må være av type streng eller liste med strenger"
 #: ../monitor/proxy/gproxydrive.c:785 ../monitor/proxy/gproxydrive.c:923
 #: ../monitor/proxy/gproxydrive.c:961 ../monitor/proxy/gproxydrive.c:1086
 #: ../monitor/proxy/gproxymount.c:501 ../monitor/proxy/gproxymount.c:586
-#: ../monitor/proxy/gproxyvolume.c:853 ../monitor/proxy/gproxyvolume.c:916
+#: ../monitor/proxy/gproxyvolume.c:852 ../monitor/proxy/gproxyvolume.c:915
 msgid "Operation was cancelled"
 msgstr "Operasjonen ble avbrutt"
 
@@ -110,7 +110,7 @@ msgstr "Slutt på strømmen"
 msgid "Seek not supported on stream"
 msgstr "Søking ikke støttet på strøm"
 
-#: ../client/gdaemonvfs.c:813
+#: ../client/gdaemonvfs.c:812
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Feil ved henting av informasjon om monteringspunkt: %s"
@@ -361,13 +361,13 @@ msgstr "Tilgang nektet"
 #: ../daemon/gvfsafpvolume.c:394 ../daemon/gvfsafpvolume.c:1721
 #: ../daemon/gvfsafpvolume.c:2513 ../daemon/gvfsbackendafc.c:977
 #: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:327
-#: ../daemon/gvfsbackendafpbrowse.c:359 ../daemon/gvfsbackendarchive.c:652
-#: ../daemon/gvfsbackendarchive.c:700 ../daemon/gvfsbackendarchive.c:752
-#: ../daemon/gvfsbackendarchive.c:781 ../daemon/gvfsbackendcdda.c:1012
+#: ../daemon/gvfsbackendafpbrowse.c:359 ../daemon/gvfsbackendarchive.c:651
+#: ../daemon/gvfsbackendarchive.c:699 ../daemon/gvfsbackendarchive.c:751
+#: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1011
 #: ../daemon/gvfsbackendcomputer.c:638 ../daemon/gvfsbackenddnssd.c:415
 #: ../daemon/gvfsbackendftp.c:1068 ../daemon/gvfsbackendnetwork.c:696
-#: ../daemon/gvfsbackendsmbbrowse.c:1100 ../daemon/gvfsbackendsmbbrowse.c:1167
-#: ../daemon/gvfsbackendsmbbrowse.c:1354 ../daemon/gvfsbackendsmbbrowse.c:1427
+#: ../daemon/gvfsbackendsmbbrowse.c:1098 ../daemon/gvfsbackendsmbbrowse.c:1165
+#: ../daemon/gvfsbackendsmbbrowse.c:1352 ../daemon/gvfsbackendsmbbrowse.c:1425
 #, c-format
 msgid "File doesn't exist"
 msgstr "Filen eksisterer ikke"
@@ -420,8 +420,8 @@ msgstr "Ikke nok plass på volumet"
 #: ../daemon/gvfsbackendafp.c:485 ../daemon/gvfsbackenddav.c:2297
 #: ../daemon/gvfsbackenddav.c:2544 ../daemon/gvfsbackenddav.c:2650
 #: ../daemon/gvfsbackendftp.c:753 ../daemon/gvfsbackendftp.c:934
-#: ../daemon/gvfsbackendftp.c:1373 ../daemon/gvfsbackendftp.c:1553
-#: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2105
+#: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
+#: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2104
 msgid "Target file already exists"
 msgstr "Målfilen eksisterer allerede"
 
@@ -438,6 +438,7 @@ msgid "Target directory already exists"
 msgstr "Målkatalogen eksisterer allerede"
 
 #: ../daemon/gvfsafpvolume.c:1219 ../daemon/gvfsbackendafp.c:590
+#: ../daemon/gvfsbackendmtp.c:1378
 msgid "Can't rename volume"
 msgstr "Kan ikke endre navn på volumet"
 
@@ -514,6 +515,7 @@ msgid "Internal Apple File Control error"
 msgstr "Intern Apple File Control feil"
 
 #: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:737
+#: ../daemon/gvfsbackendmtp.c:1186
 msgid "File does not exist"
 msgstr "Filen eksisterer ikke"
 
@@ -586,10 +588,10 @@ msgstr "Prøv igjen"
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: ../daemon/gvfsbackendafc.c:435 ../daemon/gvfsbackendarchive.c:554
-#: ../daemon/gvfsbackendarchive.c:583 ../daemon/gvfsbackenddav.c:1825
-#: ../daemon/gvfsbackendhttp.c:316 ../daemon/gvfsbackendobexftp.c:885
-#: ../daemon/gvfsbackendobexftp.c:901 ../daemon/gvfsbackendobexftp.c:920
+#: ../daemon/gvfsbackendafc.c:435 ../daemon/gvfsbackendarchive.c:553
+#: ../daemon/gvfsbackendarchive.c:582 ../daemon/gvfsbackenddav.c:1825
+#: ../daemon/gvfsbackendhttp.c:316 ../daemon/gvfsbackendobexftp.c:884
+#: ../daemon/gvfsbackendobexftp.c:900 ../daemon/gvfsbackendobexftp.c:919
 #: ../daemon/gvfsbackendsmb.c:663
 msgid "Invalid mount spec"
 msgstr "Ugyldige monteringsspesifikasjon"
@@ -640,9 +642,9 @@ msgid ""
 msgstr ""
 "Enhet «%s» er låst. Oppgi passordkode på enheten og klikk på «Prøv igjen»."
 
-#: ../daemon/gvfsbackendafc.c:967 ../daemon/gvfsbackendarchive.c:660
+#: ../daemon/gvfsbackendafc.c:967 ../daemon/gvfsbackendarchive.c:659
 #: ../daemon/gvfsbackendcomputer.c:656 ../daemon/gvfsbackendgphoto2.c:1856
-#: ../daemon/gvfsbackendobexftp.c:1097 ../daemon/gvfsbackendrecent.c:121
+#: ../daemon/gvfsbackendobexftp.c:1096 ../daemon/gvfsbackendrecent.c:121
 #: ../daemon/gvfsbackendsmb.c:719 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "Kan ikke åpne katalog"
@@ -663,8 +665,8 @@ msgstr "Ugyldig type søk"
 msgid "Operation unsupported"
 msgstr "Operasjonen støttes ikke"
 
-#: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1095
-#: ../daemon/gvfsbackendsmbbrowse.c:1141
+#: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1093
+#: ../daemon/gvfsbackendsmbbrowse.c:1139
 msgid "The file is not a mountable"
 msgstr "Filen er ikke monterbar"
 
@@ -693,7 +695,7 @@ msgid "%s"
 msgstr "%s"
 
 #: ../daemon/gvfsbackendafpbrowse.c:498 ../daemon/gvfsbackendafp.c:2101
-#: ../daemon/gvfsbackendarchive.c:543 ../daemon/gvfsbackendftp.c:668
+#: ../daemon/gvfsbackendarchive.c:542 ../daemon/gvfsbackendftp.c:668
 #: ../daemon/gvfsbackendsftp.c:1738
 msgid "No hostname specified"
 msgstr "Ingen vertsnavn oppgitt"
@@ -703,17 +705,18 @@ msgid "Apple Filing Protocol Service"
 msgstr "Apple Filing Protocol Service"
 
 #: ../daemon/gvfsbackendafp.c:274 ../daemon/gvfsbackendburn.c:875
-#: ../daemon/gvfsbackendftp.c:1545 ../daemon/gvfsbackendobexftp.c:1805
+#: ../daemon/gvfsbackendftp.c:1544 ../daemon/gvfsbackendobexftp.c:1803
 msgid "Can't copy directory over directory"
 msgstr "Kan ikke kopiere katalog over katalog"
 
 #: ../daemon/gvfsbackendafp.c:293 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackendftp.c:1568 ../daemon/gvfsbackendobexftp.c:1820
+#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1196
+#: ../daemon/gvfsbackendmtp.c:1272 ../daemon/gvfsbackendobexftp.c:1818
 msgid "Can't recursively copy directory"
 msgstr "Kan ikke kopiere katalog rekursivt"
 
 #: ../daemon/gvfsbackendafp.c:475 ../daemon/gvfsbackendsftp.c:4259
-#: ../daemon/gvfsbackendsmb.c:2094
+#: ../daemon/gvfsbackendsmb.c:2093
 msgid "Can't move directory over directory"
 msgstr "Kan ikke flytte katalog over katalog"
 
@@ -755,7 +758,7 @@ msgstr "Ingen volumer oppgitt"
 msgid "/ on %s"
 msgstr "/ på %s"
 
-#: ../daemon/gvfsbackendarchive.c:790 ../daemon/gvfsbackendburn.c:679
+#: ../daemon/gvfsbackendarchive.c:789 ../daemon/gvfsbackendburn.c:679
 #: ../daemon/gvfsbackendcomputer.c:728 ../daemon/gvfsbackenddnssd.c:464
 #: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:744
 #: ../daemon/gvfsbackendsftp.c:3867 ../daemon/gvfsftpdircache.c:157
@@ -777,7 +780,7 @@ msgstr "Kan ikke opprette midlertidig katalog"
 #: ../daemon/gvfsbackendburn.c:780 ../daemon/gvfsbackendburn.c:971
 #: ../daemon/gvfsbackendburn.c:1007 ../daemon/gvfsbackendftp.c:794
 #: ../daemon/gvfsbackendgphoto2.c:1238 ../daemon/gvfsbackendgphoto2.c:2177
-#: ../daemon/gvfsbackendgphoto2.c:2900 ../daemon/gvfsbackendrecent.c:105
+#: ../daemon/gvfsbackendgphoto2.c:2895 ../daemon/gvfsbackendrecent.c:105
 #: ../daemon/gvfsbackendrecent.c:259 ../daemon/gvfsbackendsftp.c:1829
 #: ../daemon/gvfsbackendsftp.c:2935 ../daemon/gvfsbackendsftp.c:2948
 #: ../daemon/gvfsbackendsftp.c:2968 ../daemon/gvfsbackendtrash.c:216
@@ -786,7 +789,7 @@ msgid "No such file or directory"
 msgstr "Filen eller katalogen finnes ikke"
 
 #: ../daemon/gvfsbackendburn.c:455 ../daemon/gvfsbackendburn.c:903
-#: ../daemon/gvfsbackendobexftp.c:1836
+#: ../daemon/gvfsbackendobexftp.c:1834
 msgid "Can't copy file over directory"
 msgstr "Kan ikke kopiere fil over katalog"
 
@@ -798,7 +801,7 @@ msgstr "CD/DVD-oppretting"
 #: ../daemon/gvfsbackendburn.c:752 ../daemon/gvfsbackendburn.c:788
 #: ../daemon/gvfsbackendburn.c:923 ../daemon/gvfsbackendburn.c:985
 #: ../daemon/gvfsbackendburn.c:989 ../daemon/gvfsbackendburn.c:999
-#: ../daemon/gvfsbackendgphoto2.c:2974
+#: ../daemon/gvfsbackendgphoto2.c:2969
 msgid "File exists"
 msgstr "Filen eksisterer"
 
@@ -831,15 +834,15 @@ msgstr "Operasjonen ikke tillatt av motoren"
 msgid "No such file or directory in target path"
 msgstr "Fil eller katalog finnes ikke i målsti"
 
-#: ../daemon/gvfsbackendburn.c:884 ../daemon/gvfsbackendobexftp.c:1813
-#: ../daemon/gvfsbackendobexftp.c:1844 ../daemon/gvfsbackendsftp.c:1823
+#: ../daemon/gvfsbackendburn.c:884 ../daemon/gvfsbackendobexftp.c:1811
+#: ../daemon/gvfsbackendobexftp.c:1842 ../daemon/gvfsbackendsftp.c:1823
 #: ../daemon/gvfsbackendsftp.c:4429
 msgid "Target file exists"
 msgstr "Målfilen eksisterer"
 
 #: ../daemon/gvfsbackendburn.c:949 ../daemon/gvfsbackendcomputer.c:811
-#: ../daemon/gvfsbackendgphoto2.c:2550 ../daemon/gvfsbackendgphoto2.c:2763
-#: ../daemon/gvfsbackendgphoto2.c:2860 ../daemon/gvfsbackendgphoto2.c:2953
+#: ../daemon/gvfsbackendgphoto2.c:2545 ../daemon/gvfsbackendgphoto2.c:2758
+#: ../daemon/gvfsbackendgphoto2.c:2855 ../daemon/gvfsbackendgphoto2.c:2948
 msgid "Not supported"
 msgstr "Ikke støttet"
 
@@ -857,44 +860,45 @@ msgstr ""
 "Volumet er opptatt\n"
 "Et eller flere programmer holder volumet opptatt."
 
-#: ../daemon/gvfsbackendcdda.c:354 ../daemon/gvfsbackendgphoto2.c:1548
+#: ../daemon/gvfsbackendcdda.c:353 ../daemon/gvfsbackendgphoto2.c:1548
+#: ../daemon/gvfsbackendmtp.c:440
 msgid "Cannot create gudev client"
 msgstr "Kan ikke opprette gudev-klient"
 
-#: ../daemon/gvfsbackendcdda.c:374 ../daemon/gvfsbackendgphoto2.c:1566
+#: ../daemon/gvfsbackendcdda.c:373 ../daemon/gvfsbackendgphoto2.c:1566
 msgid "Cannot connect to the system bus"
 msgstr "Kunne ikke koble til systembussen"
 
-#: ../daemon/gvfsbackendcdda.c:385 ../daemon/gvfsbackendgphoto2.c:1578
+#: ../daemon/gvfsbackendcdda.c:384 ../daemon/gvfsbackendgphoto2.c:1578
 msgid "Cannot create libhal context"
 msgstr "Kan ikke lage libhal-kontekst"
 
-#: ../daemon/gvfsbackendcdda.c:399 ../daemon/gvfsbackendgphoto2.c:1591
+#: ../daemon/gvfsbackendcdda.c:398 ../daemon/gvfsbackendgphoto2.c:1591
 msgid "Cannot initialize libhal"
 msgstr "Kan ikke initiere libhal"
 
-#: ../daemon/gvfsbackendcdda.c:415 ../daemon/gvfsbackendcdda.c:501
+#: ../daemon/gvfsbackendcdda.c:414 ../daemon/gvfsbackendcdda.c:500
 msgid "No drive specified"
 msgstr "Ingen stasjon oppgitt"
 
-#: ../daemon/gvfsbackendcdda.c:439
+#: ../daemon/gvfsbackendcdda.c:438
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "Kan ikke finne stasjon %s"
 
-#: ../daemon/gvfsbackendcdda.c:452
+#: ../daemon/gvfsbackendcdda.c:451
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "Stasjon %s inneholder ikke lydfiler"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
-#: ../daemon/gvfsbackendcdda.c:462
+#: ../daemon/gvfsbackendcdda.c:461
 #, c-format
 msgid "cdda mount on %s"
 msgstr "cdda montert på %s"
 
-#: ../daemon/gvfsbackendcdda.c:463 ../daemon/gvfsbackendcdda.c:984
+#: ../daemon/gvfsbackendcdda.c:462 ../daemon/gvfsbackendcdda.c:983
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #: ../monitor/udisks2/gvfsudisks2volume.c:358
@@ -902,40 +906,40 @@ msgstr "cdda montert på %s"
 msgid "Audio Disc"
 msgstr "Lyd-plate"
 
-#: ../daemon/gvfsbackendcdda.c:527
+#: ../daemon/gvfsbackendcdda.c:526
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "Filsystemet er opptatt: %d åpen fil"
 msgstr[1] "Filsystemet er opptatt: %d åpne filer"
 
-#: ../daemon/gvfsbackendcdda.c:719
+#: ../daemon/gvfsbackendcdda.c:718
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "Fil %s finnes ikke på lager %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:828
+#: ../daemon/gvfsbackendcdda.c:827
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "Feil fra «paranoia» på stasjon %s"
 
-#: ../daemon/gvfsbackendcdda.c:891
+#: ../daemon/gvfsbackendcdda.c:890
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Feil ved søking i strøm på stasjon %s"
 
-#: ../daemon/gvfsbackendcdda.c:1005 ../daemon/gvfsbackendgphoto2.c:1864
+#: ../daemon/gvfsbackendcdda.c:1004 ../daemon/gvfsbackendgphoto2.c:1864
 #, c-format
 msgid "No such file"
 msgstr "Filen finnes ikke"
 
-#: ../daemon/gvfsbackendcdda.c:1019
+#: ../daemon/gvfsbackendcdda.c:1018
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Filen eksisterer ikke eller er ikke et lydspor"
 
-#: ../daemon/gvfsbackendcdda.c:1125
+#: ../daemon/gvfsbackendcdda.c:1123
 msgid "Audio CD File System Service"
 msgstr "Filsystemtjeneste for lyd-CD"
 
@@ -956,37 +960,37 @@ msgstr "Kan ikke åpne monterbar fil"
 msgid "Internal error: %s"
 msgstr "Intern feil: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:889 ../daemon/gvfsbackendcomputer.c:1008
+#: ../daemon/gvfsbackendcomputer.c:889 ../daemon/gvfsbackendcomputer.c:1007
 msgid "Can't mount file"
 msgstr "Kan ikke montere fil"
 
-#: ../daemon/gvfsbackendcomputer.c:901
+#: ../daemon/gvfsbackendcomputer.c:900
 msgid "No medium in the drive"
 msgstr "Ikke noe medie i stasjonen"
 
-#: ../daemon/gvfsbackendcomputer.c:958 ../daemon/gvfsbackendcomputer.c:1053
-#: ../daemon/gvfsbackendcomputer.c:1159 ../daemon/gvfsbackendcomputer.c:1249
-#: ../daemon/gvfsbackendcomputer.c:1322 ../daemon/gvfsbackendcomputer.c:1391
+#: ../daemon/gvfsbackendcomputer.c:957 ../daemon/gvfsbackendcomputer.c:1052
+#: ../daemon/gvfsbackendcomputer.c:1158 ../daemon/gvfsbackendcomputer.c:1248
+#: ../daemon/gvfsbackendcomputer.c:1321 ../daemon/gvfsbackendcomputer.c:1390
 msgid "Not a mountable file"
 msgstr "Ikke en monterbar fil"
 
-#: ../daemon/gvfsbackendcomputer.c:1072
+#: ../daemon/gvfsbackendcomputer.c:1071
 msgid "Can't unmount file"
 msgstr "Kan ikke avmontere fil"
 
-#: ../daemon/gvfsbackendcomputer.c:1202
+#: ../daemon/gvfsbackendcomputer.c:1201
 msgid "Can't eject file"
 msgstr "Kan ikke løse ut fil"
 
-#: ../daemon/gvfsbackendcomputer.c:1269 ../daemon/gvfsbackendcomputer.c:1276
+#: ../daemon/gvfsbackendcomputer.c:1268 ../daemon/gvfsbackendcomputer.c:1275
 msgid "Can't start drive"
 msgstr "Kan ikke starte stasjon"
 
-#: ../daemon/gvfsbackendcomputer.c:1342 ../daemon/gvfsbackendcomputer.c:1349
+#: ../daemon/gvfsbackendcomputer.c:1341 ../daemon/gvfsbackendcomputer.c:1348
 msgid "Can't stop drive"
 msgstr "Kan ikke stoppe stasjon"
 
-#: ../daemon/gvfsbackendcomputer.c:1406 ../daemon/gvfsbackendcomputer.c:1413
+#: ../daemon/gvfsbackendcomputer.c:1405 ../daemon/gvfsbackendcomputer.c:1412
 msgid "Can't poll file"
 msgstr "Kan ikke hente data om fil"
 
@@ -1047,7 +1051,7 @@ msgid "Could not create request"
 msgstr "Kan ikke opprette forespørsel"
 
 #: ../daemon/gvfsbackenddav.c:2401 ../daemon/gvfsbackendsmb.c:1185
-#: ../daemon/gvfsbackendsmb.c:2122
+#: ../daemon/gvfsbackendsmb.c:2121
 msgid "Backup file creation failed"
 msgstr "Oppretting av sikkerhetskopi feilet"
 
@@ -1076,7 +1080,7 @@ msgid "Enter password for %s on %s"
 msgstr "Skriv inn passord for %s på %s"
 
 #: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:981
-#: ../daemon/gvfsbackendsmbbrowse.c:1001 ../daemon/gvfsbackendsmb.c:620
+#: ../daemon/gvfsbackendsmbbrowse.c:999 ../daemon/gvfsbackendsmb.c:620
 msgid "Password dialog cancelled"
 msgstr "Passorddialog avbrutt"
 
@@ -1084,7 +1088,7 @@ msgstr "Passorddialog avbrutt"
 msgid "Insufficient permissions"
 msgstr "Ikke nok rettigheter"
 
-#: ../daemon/gvfsbackendftp.c:982 ../daemon/gvfsbackendftp.c:1336
+#: ../daemon/gvfsbackendftp.c:982 ../daemon/gvfsbackendftp.c:1335
 #: ../daemon/gvfsbackendsftp.c:3260
 msgid "backups not supported yet"
 msgstr "sikkerhetskopier er ikke støttet ennå"
@@ -1140,7 +1144,7 @@ msgstr "Kamera"
 msgid "Audio Player"
 msgstr "Lydspiller"
 
-#: ../daemon/gvfsbackendgphoto2.c:1607
+#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:432
 msgid "No device specified"
 msgstr "Ingen enhet oppgitt"
 
@@ -1195,18 +1199,18 @@ msgstr "Feil under henting av fil"
 msgid "Error getting data from file"
 msgstr "Feil under henting av data fra fil"
 
-#: ../daemon/gvfsbackendgphoto2.c:1955
+#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1457
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Feilutformet ikonidentifikator «%s»"
 
-#: ../daemon/gvfsbackendgphoto2.c:2031 ../daemon/gvfsbackendgphoto2.c:3224
+#: ../daemon/gvfsbackendgphoto2.c:2031 ../daemon/gvfsbackendgphoto2.c:3219
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Feil ved søking i strøm på kamera %s"
 
 #: ../daemon/gvfsbackendgphoto2.c:2171 ../daemon/gvfsbackendsftp.c:2938
-#: ../daemon/gvfsbackendsmbbrowse.c:1423
+#: ../daemon/gvfsbackendsmbbrowse.c:1421
 msgid "Not a directory"
 msgstr "Ikke en katalog"
 
@@ -1214,79 +1218,79 @@ msgstr "Ikke en katalog"
 msgid "Failed to get folder list"
 msgstr "Fikk ikke mappeliste"
 
-#: ../daemon/gvfsbackendgphoto2.c:2270
+#: ../daemon/gvfsbackendgphoto2.c:2269
 msgid "Failed to get file list"
 msgstr "Fant ikke filliste"
 
-#: ../daemon/gvfsbackendgphoto2.c:2562
+#: ../daemon/gvfsbackendgphoto2.c:2557
 msgid "Error creating directory"
 msgstr "Feil ved oppretting av katalog"
 
-#: ../daemon/gvfsbackendgphoto2.c:2775
+#: ../daemon/gvfsbackendgphoto2.c:2770
 msgid "Name already exists"
 msgstr "Navnet eksisterer allerede"
 
-#: ../daemon/gvfsbackendgphoto2.c:2786 ../daemon/gvfsbackendgphoto2.c:3419
+#: ../daemon/gvfsbackendgphoto2.c:2781 ../daemon/gvfsbackendgphoto2.c:3414
 msgid "New name too long"
 msgstr "Nytt navn er for langt"
 
-#: ../daemon/gvfsbackendgphoto2.c:2796 ../daemon/gvfsbackendgphoto2.c:3430
+#: ../daemon/gvfsbackendgphoto2.c:2791 ../daemon/gvfsbackendgphoto2.c:3425
 msgid "Error renaming directory"
 msgstr "Feil ved endring av navn på katalog"
 
-#: ../daemon/gvfsbackendgphoto2.c:2809 ../daemon/gvfsbackendgphoto2.c:3443
+#: ../daemon/gvfsbackendgphoto2.c:2804 ../daemon/gvfsbackendgphoto2.c:3438
 msgid "Error renaming file"
 msgstr "Feil under endring av navn på fil"
 
-#: ../daemon/gvfsbackendgphoto2.c:2873
+#: ../daemon/gvfsbackendgphoto2.c:2868
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "Katalog «%s» er ikke tom"
 
-#: ../daemon/gvfsbackendgphoto2.c:2884
+#: ../daemon/gvfsbackendgphoto2.c:2879
 msgid "Error deleting directory"
 msgstr "Feil under sletting av katalog"
 
-#: ../daemon/gvfsbackendgphoto2.c:2910
+#: ../daemon/gvfsbackendgphoto2.c:2905
 msgid "Error deleting file"
 msgstr "Feil under sletting av fil"
 
-#: ../daemon/gvfsbackendgphoto2.c:2963
+#: ../daemon/gvfsbackendgphoto2.c:2958
 msgid "Can't write to directory"
 msgstr "Kan ikke skrive til katalog"
 
-#: ../daemon/gvfsbackendgphoto2.c:3010
+#: ../daemon/gvfsbackendgphoto2.c:3005
 msgid "Cannot allocate new file to append to"
 msgstr "Kan ikke lage ny fil å legge til i"
 
-#: ../daemon/gvfsbackendgphoto2.c:3025
+#: ../daemon/gvfsbackendgphoto2.c:3020
 msgid "Cannot read file to append to"
 msgstr "Kan ikke lese fil for å legge til"
 
-#: ../daemon/gvfsbackendgphoto2.c:3036
+#: ../daemon/gvfsbackendgphoto2.c:3031
 msgid "Cannot get data of file to append to"
 msgstr "Kan ikke finne data om filen vi skal legge til"
 
-#: ../daemon/gvfsbackendgphoto2.c:3327
+#: ../daemon/gvfsbackendgphoto2.c:3322
 msgid "Error writing file"
 msgstr "Feil under skriving til fil"
 
-#: ../daemon/gvfsbackendgphoto2.c:3375
+#: ../daemon/gvfsbackendgphoto2.c:3370
 msgid "Not supported (not same directory)"
 msgstr "Ikke støttet (ikke samme katalog)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3387
+#: ../daemon/gvfsbackendgphoto2.c:3382
 msgid ""
 "Not supported (the source is a directory, the destination is a directory too)"
 msgstr "Ikke støttet (kilde er en katalog, mål er også en katalog)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3395
+#: ../daemon/gvfsbackendgphoto2.c:3390
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
 msgstr "Ikke støttet (kilde er en katalog, mål er en eksisterende fil)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3407
+#: ../daemon/gvfsbackendgphoto2.c:3402
 msgid ""
 "Not supported (the source is a file, but the destination is a directory)"
 msgstr "Ikke støttet (kilde er fil, mål er katalog)"
@@ -1300,6 +1304,77 @@ msgstr "HTTP-klientfeil: %s"
 msgid "Directory notification not supported"
 msgstr "Varsling for kataloger er ikke støttet"
 
+#: ../daemon/gvfsbackendmtp.c:280
+#, c-format
+msgid "libmtp error: %s"
+msgstr "feil i libmtp: %s"
+
+#: ../daemon/gvfsbackendmtp.c:386
+msgid "Unexpected host uri format."
+msgstr "Uventet format på URI for vert."
+
+#: ../daemon/gvfsbackendmtp.c:396
+msgid "Malformed host uri."
+msgstr "Feilutformet URI for vert."
+
+#: ../daemon/gvfsbackendmtp.c:409
+msgid "Couldn't find matching udev device."
+msgstr "Fant ikke passende udev-enhet."
+
+#: ../daemon/gvfsbackendmtp.c:545
+msgid "No MTP devices found"
+msgstr "Fant ingen MTP-enheter"
+
+#: ../daemon/gvfsbackendmtp.c:550
+msgid "Unable to connect to MTP device"
+msgstr "Kan ikke koble til MTP-enhet"
+
+#: ../daemon/gvfsbackendmtp.c:555
+msgid "Unable to allocate memory while detecting MTP devices"
+msgstr "Kan ikke allokere minne under søk etter MTP-enheter"
+
+#: ../daemon/gvfsbackendmtp.c:561
+msgid "Generic libmtp error"
+msgstr "Generisk libmtp-feil"
+
+#: ../daemon/gvfsbackendmtp.c:578
+#, c-format
+msgid "Unable to open MTP device '%s'"
+msgstr "Kan ikke åpne MTP-enhet «%s»"
+
+#: ../daemon/gvfsbackendmtp.c:621
+msgid "Unnamed Device"
+msgstr "Enhet uten navn"
+
+#: ../daemon/gvfsbackendmtp.c:989 ../daemon/gvfsbackendmtp.c:1062
+msgid "No storage volumes found"
+msgstr "Fant ingen lagringsvolumer"
+
+#: ../daemon/gvfsbackendmtp.c:1011
+msgid "File not found"
+msgstr "Fant ikke fil"
+
+#: ../daemon/gvfsbackendmtp.c:1119
+msgid "Cannot make directory in this location"
+msgstr "Kan ikke lage katalog på denne lokasjonen"
+
+#: ../daemon/gvfsbackendmtp.c:1175 ../daemon/gvfsbackendsmbbrowse.c:1161
+msgid "Not a regular file"
+msgstr "Ikke en vanlig fil"
+
+#: ../daemon/gvfsbackendmtp.c:1245
+msgid "Cannot write to this location"
+msgstr "Kan ikke skrive til lokasjonen"
+
+#: ../daemon/gvfsbackendmtp.c:1337
+msgid "Cannot delete this entity"
+msgstr "Kan ikke slette denne entiteten"
+
+#: ../daemon/gvfsbackendmtp.c:1449
+#, c-format
+msgid "No thumbnail for entity '%s'"
+msgstr "Ingen miniatyr for entitet «%s»"
+
 #: ../daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
 msgstr "Fildeling"
@@ -1308,7 +1383,7 @@ msgstr "Fildeling"
 msgid "Remote Login"
 msgstr "Ekstern pålogging"
 
-#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:896
+#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:894
 msgid "Windows Network"
 msgstr "Windows nettverk"
 
@@ -1318,19 +1393,19 @@ msgstr "Windows nettverk"
 msgid "Network Location Monitor"
 msgstr "Vis nettverksadresser"
 
-#: ../daemon/gvfsbackendobexftp.c:914
+#: ../daemon/gvfsbackendobexftp.c:913
 msgid "USB support missing. Please contact your software vendor"
 msgstr "Støtte for USB mangler. Vennligst kontakt din programvareleverandør"
 
-#: ../daemon/gvfsbackendobexftp.c:1036
+#: ../daemon/gvfsbackendobexftp.c:1035
 msgid "Connection to the device lost"
 msgstr "Mistet forbindelsen til enheten"
 
-#: ../daemon/gvfsbackendobexftp.c:1533
+#: ../daemon/gvfsbackendobexftp.c:1532
 msgid "Device requires a software update"
 msgstr "Enheten krever en programvareoppdatering"
 
-#: ../daemon/gvfsbackendobexftp.c:1881 ../daemon/gvfsbackendsmb.c:1996
+#: ../daemon/gvfsbackendobexftp.c:1879 ../daemon/gvfsbackendsmb.c:1995
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Feil under sletting av fil: %s"
@@ -1473,28 +1548,24 @@ msgid "Unable to create temporary file"
 msgstr "Kan ikke opprette midlertidig fil"
 
 #. translators: %s is a server name
-#: ../daemon/gvfsbackendsmbbrowse.c:375
+#: ../daemon/gvfsbackendsmbbrowse.c:374
 #, c-format
 msgid "Password required for %s"
 msgstr "Passord kreves for %s"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:905
+#: ../daemon/gvfsbackendsmbbrowse.c:903
 #, c-format
 msgid "Windows shares on %s"
 msgstr "Delt Windows-ressurs på %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmbbrowse.c:1007
+#: ../daemon/gvfsbackendsmbbrowse.c:1005
 msgid "Failed to retrieve share list from server"
 msgstr "Klarte ikke å hente liste over delte ressurser fra tjener"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1163
-msgid "Not a regular file"
-msgstr "Ikke en vanlig fil"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:1513
+#: ../daemon/gvfsbackendsmbbrowse.c:1510
 msgid "Windows Network File System Service"
 msgstr "Filsystemtjeneste for Windows nettverk"
 
@@ -1527,25 +1598,25 @@ msgstr "Oppretting av sikkerhetskopi feilet: %s"
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Ugyldig type attributt (uint64 forventet)"
 
-#: ../daemon/gvfsbackendsmb.c:1945
+#: ../daemon/gvfsbackendsmb.c:1944
 msgid "Can't rename file, filename already exists"
 msgstr "Kan ikke bytte navn på fil. Filnavnet eksisterer allerede"
 
-#: ../daemon/gvfsbackendsmb.c:2070
+#: ../daemon/gvfsbackendsmb.c:2069
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Feil under flytting av fil: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2142
+#: ../daemon/gvfsbackendsmb.c:2141
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Feil under fjerning av målfil: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2166
+#: ../daemon/gvfsbackendsmb.c:2165
 msgid "Can't recursively move directory"
 msgstr "Kan ikke flytte katalog rekursivt"
 
-#: ../daemon/gvfsbackendsmb.c:2210
+#: ../daemon/gvfsbackendsmb.c:2209
 msgid "Windows Shares File System Service"
 msgstr "Filsystemtjeneste for delte Windows-ressurser"
 
@@ -1682,7 +1753,7 @@ msgstr "%s: %s"
 #: ../programs/gvfs-ls.c:414 ../programs/gvfs-mime.c:95
 #: ../programs/gvfs-mime.c:105 ../programs/gvfs-mime.c:112
 #: ../programs/gvfs-mkdir.c:69 ../programs/gvfs-monitor-dir.c:124
-#: ../programs/gvfs-monitor-file.c:123 ../programs/gvfs-mount.c:1061
+#: ../programs/gvfs-monitor-file.c:123 ../programs/gvfs-mount.c:1055
 #: ../programs/gvfs-move.c:119 ../programs/gvfs-open.c:76
 #: ../programs/gvfs-open.c:88 ../programs/gvfs-rename.c:73
 #: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:176
@@ -1692,24 +1763,24 @@ msgstr "%s: %s"
 msgid "Try \"%s --help\" for more information."
 msgstr "Prøv «%s --help» for mer informasjon."
 
-#: ../daemon/mount.c:702
+#: ../daemon/mount.c:701
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Automatisk montering feilet: %s"
 
-#: ../daemon/mount.c:746 ../daemon/mount.c:807
+#: ../daemon/mount.c:745 ../daemon/mount.c:806
 msgid "The specified location is not mounted"
 msgstr "Spesifisert adresse er ikke montert"
 
-#: ../daemon/mount.c:751
+#: ../daemon/mount.c:750
 msgid "The specified location is not supported"
 msgstr "Spesifisert adresse er ikke støttet"
 
-#: ../daemon/mount.c:875
+#: ../daemon/mount.c:874
 msgid "Location is already mounted"
 msgstr "Adressen er allerede montert"
 
-#: ../daemon/mount.c:884
+#: ../daemon/mount.c:883
 msgid "Location is not mountable"
 msgstr "Adressen kan ikke monteres"
 
@@ -2299,7 +2370,7 @@ msgstr ""
 #: ../programs/gvfs-info.c:390 ../programs/gvfs-ls.c:412
 #: ../programs/gvfs-mime.c:92 ../programs/gvfs-mkdir.c:67
 #: ../programs/gvfs-monitor-dir.c:122 ../programs/gvfs-monitor-file.c:121
-#: ../programs/gvfs-mount.c:1059 ../programs/gvfs-move.c:117
+#: ../programs/gvfs-mount.c:1053 ../programs/gvfs-move.c:117
 #: ../programs/gvfs-open.c:74 ../programs/gvfs-rename.c:71
 #: ../programs/gvfs-rm.c:68 ../programs/gvfs-save.c:174
 #: ../programs/gvfs-set-attribute.c:147 ../programs/gvfs-trash.c:102
@@ -2497,7 +2568,7 @@ msgstr "Navneområder for skrivbare attributter:\n"
 
 #: ../programs/gvfs-info.c:378 ../programs/gvfs-ls.c:395
 #: ../programs/gvfs-mkdir.c:55 ../programs/gvfs-monitor-dir.c:110
-#: ../programs/gvfs-monitor-file.c:109 ../programs/gvfs-mount.c:1047
+#: ../programs/gvfs-monitor-file.c:109 ../programs/gvfs-mount.c:1041
 #: ../programs/gvfs-rename.c:62 ../programs/gvfs-set-attribute.c:137
 #: ../programs/gvfs-trash.c:90 ../programs/gvfs-tree.c:246
 msgid "LOCATION"
@@ -2705,22 +2776,22 @@ msgstr "Kan ikke finne omsluttende montering: %s\n"
 msgid "Error ejecting mount: %s\n"
 msgstr "Feil ved utløsing av monteringspunkt: %s\n"
 
-#: ../programs/gvfs-mount.c:786
+#: ../programs/gvfs-mount.c:781
 #, c-format
 msgid "Error mounting %s: %s\n"
 msgstr "Feil under montering av %s: %s\n"
 
-#: ../programs/gvfs-mount.c:801
+#: ../programs/gvfs-mount.c:796
 #, c-format
 msgid "Mounted %s at %s\n"
 msgstr "Monterte %s i %s\n"
 
-#: ../programs/gvfs-mount.c:852
+#: ../programs/gvfs-mount.c:846
 #, c-format
 msgid "No volume for device file %s\n"
 msgstr "Ingen volum for enhetsfil %s\n"
 
-#: ../programs/gvfs-mount.c:1048
+#: ../programs/gvfs-mount.c:1042
 msgid "Mount the locations."
 msgstr "Monter lokasjoner."
 
