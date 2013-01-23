@@ -131,6 +131,14 @@ g_vfs_backend_mtp_init (GVfsBackendMtp *backend)
 }
 
 static void
+remove_monitor_weak_ref (gpointer monitor,
+                         gpointer unused,
+                         gpointer monitors)
+{
+  g_object_weak_unref (G_OBJECT(monitor), (GWeakNotify)g_hash_table_remove, monitors);
+}
+
+static void
 g_vfs_backend_mtp_finalize (GObject *object)
 {
   GVfsBackendMtp *backend;
@@ -139,6 +147,7 @@ g_vfs_backend_mtp_finalize (GObject *object)
 
   backend = G_VFS_BACKEND_MTP (object);
 
+  g_hash_table_foreach (backend->monitors, remove_monitor_weak_ref, backend->monitors);
   g_hash_table_unref (backend->monitors);
   g_mutex_clear (&backend->mutex);
 
