@@ -449,7 +449,9 @@ do_mount (GVfsBackend *backend,
   }
   op_backend->dev_path = dev_path;
 
-  g_signal_connect (op_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), op_backend);
+  op_backend->on_uevent_id =
+    g_signal_connect_object (op_backend->gudev_client, "uevent",
+                             G_CALLBACK (on_uevent), op_backend, 0);
 
   LIBMTP_Init ();
 
@@ -497,8 +499,10 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
   g_atomic_int_set (&op_backend->unmount_started, TRUE);
 
   g_source_remove (op_backend->hb_id);
+  g_signal_handler_disconnect (op_backend->gudev_client,
+                               op_backend->on_uevent_id);
   g_object_unref (op_backend->gudev_client);
-  g_free (op_backend->dev_path);
+  g_clear_pointer (&op_backend->dev_path, g_free);
   LIBMTP_Release_Device (op_backend->device);
 
   g_mutex_unlock (&op_backend->mutex);
