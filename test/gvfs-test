@@ -453,7 +453,7 @@ Subsystem sftp %(sftp_server)s
         if result:
             orig_err_fail = result.errors + result.failures
         super().run(result)
-        if result and result.errors + result.failures > orig_err_fail:
+        if result and result.errors + result.failures > orig_err_fail and hasattr(self, 'sshd'):
             print('\n----- sshd log -----\n%s\n------\n' % self.sshd.stderr.read())
 
     def test_rsa(self):
