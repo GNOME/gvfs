@@ -414,7 +414,8 @@ class Sftp(GvfsTestCase):
         for dir in ['/usr/local/lib/openssh',
                     '/usr/lib/openssh',
                     '/usr/local/libexec/openssh',
-                    '/usr/libexec/openssh']:
+                    '/usr/libexec/openssh',
+                    '/usr/lib/misc', '/usr/lib64/misc']:
             sftp_server = os.path.join(dir, 'sftp-server')
             if os.path.exists(sftp_server):
                 break
