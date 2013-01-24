@@ -461,9 +461,9 @@ Subsystem sftp %(sftp_server)s
         '''Show sshd log output on failed tests'''
 
         if result:
-            orig_err_fail = result.errors + result.failures
+            orig_err_fail = len(result.errors) + len(result.failures)
         super().run(result)
-        if result and result.errors + result.failures > orig_err_fail and hasattr(self, 'sshd'):
+        if result and len(result.errors) + len(result.failures) > orig_err_fail and hasattr(self, 'sshd'):
             print('\n----- sshd log -----\n%s\n------\n' % self.sshd.stderr.read())
 
     def test_rsa(self):
@@ -753,10 +753,10 @@ ncalrpc dir = %(workdir)s/samba
         '''Show smbd log output on failed tests'''
 
         if result:
-            orig_err_fail = result.errors + result.failures
+            orig_err_fail = len(result.errors) + len(result.failures)
         super().run(result)
         if hasattr(self, 'smbd'):
-            if result and result.errors + result.failures > orig_err_fail:
+            if result and len(result.errors) + len(result.failures) > orig_err_fail:
                 print('\n----- smbd log -----\n%s\n------\n' % self.smbd.stdout.read())
 
     def test_anonymous(self):
