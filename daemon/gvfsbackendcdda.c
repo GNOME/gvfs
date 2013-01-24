@@ -55,7 +55,11 @@
 #include "gvfsjobenumerate.h"
 
 #define DO_NOT_WANT_PARANOIA_COMPATIBILITY
-#include <cdio/paranoia.h>
+#ifdef HAVE_PARANOIA_NEW_INCLUDES
+  #include <cdio/paranoia/paranoia.h>
+#else
+  #include <cdio/paranoia.h>
+#endif
 #include <cdio/cdio.h>
 
 /* TODO:

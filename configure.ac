@@ -348,8 +348,18 @@ if test "x$enable_cdda" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" = "
   if test "x$msg_cdda" = "xyes"; then
     PKG_CHECK_MODULES(CDDA, libcdio_paranoia)
     AC_DEFINE(HAVE_CDDA, 1, [Define to 1 if CDDA is going to be built])
+
+    # test for actual headers location
+    CPPFLAGS_save="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $CDDA_CFLAGS"
+    AC_CHECK_HEADER(cdio/paranoia/paranoia.h, [
+       AC_DEFINE(HAVE_PARANOIA_NEW_INCLUDES, 1, [Define to 1 if cdio/paranoia/paranoia.h is present]) ])
+    CPPFLAGS="$CPPFLAGS_save"
   fi
 fi
+
+AC_SUBST(CDDA_LIBS)
+AC_SUBST(CDDA_CFLAGS)
 
 AM_CONDITIONAL(USE_CDDA, [test "$msg_cdda" = "yes"])
 
