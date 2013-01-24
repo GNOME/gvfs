@@ -36,9 +36,18 @@ from glob import glob
 
 from gi.repository import GLib, Gio
 
+
+def find_alternative(cmds):
+    '''Find command in cmds array and return the found alternative'''
+
+    for cmd in cmds:
+        if subprocess.call(['which', cmd], stdout=subprocess.PIPE) == 0:
+            return cmd
+
 in_testbed = os.path.exists('/home/gvfs_sandbox_marker')
 samba_running = subprocess.call(['pidof', 'smbd'], stdout=subprocess.PIPE) == 0
-have_httpd = subprocess.call(['which', 'apachectl'], stdout=subprocess.PIPE) == 0
+httpd_cmd = find_alternative(['apache2', 'httpd', 'apachectl'])
+have_httpd = httpd_cmd is not None
 sshd_path = subprocess.check_output(['which', 'sshd'], universal_newlines=True).strip()
 
 local_ip = subprocess.check_output("ip -4 addr | sed -nr '/127\.0\.0/ n; "
@@ -1314,7 +1323,7 @@ DAVLockDB DAVLock
 
         # start server
         try:
-            subprocess.check_call(['apachectl', '-d', klass.httpd_sandbox, '-f', 'apache2.conf', '-k', 'start'])
+            subprocess.check_call([httpd_cmd, '-d', klass.httpd_sandbox, '-f', 'apache2.conf', '-k', 'start'])
         except subprocess.CalledProcessError as e:
             error_log = os.path.join(klass.httpd_sandbox, 'error_log')
             if os.path.exists(error_log):
@@ -1326,7 +1335,7 @@ DAVLockDB DAVLock
     def tearDownClass(klass):
         '''Stop httpd server and remove sandbox'''
 
-        subprocess.call(['apachectl', '-d', klass.httpd_sandbox, '-f', 'apache2.conf', '-k', 'stop'])
+        subprocess.call([httpd_cmd, '-d', klass.httpd_sandbox, '-f', 'apache2.conf', '-k', 'stop'])
         shutil.rmtree(klass.httpd_sandbox)
 
     @classmethod
@@ -1334,7 +1343,7 @@ DAVLockDB DAVLock
         '''Return module directory for Apache httpd.
 
         Unfortunately this is highly distro/platform specific, so try to
-        determine it from apxs2 or apachectl.
+        determine it from apxs2 or apachectl/apache2.
         '''
         # if we have apxs2 installed, use this
         try:
@@ -1360,13 +1369,13 @@ DAVLockDB DAVLock
                 pass
 
         # fall back to looking for modules in HTTPD_ROOT/modules/
-        ctl = subprocess.Popen(['apachectl', '-V'],
+        ctl = subprocess.Popen([httpd_cmd, '-V'],
                                stdout=subprocess.PIPE,
                                universal_newlines=True)
         out = ctl.communicate()[0]
-        assert ctl.returncode == 0, 'apachectl -V failed'
+        assert ctl.returncode == 0, httpd_cmd + ' -V failed'
         m = re.search('\sHTTPD_ROOT="([^"]+)"\s', out)
-        assert m, 'apachectl -V does not show HTTPD_ROOT'
+        assert m, httpd_cmd + ' -V does not show HTTPD_ROOT'
         mod_dir = os.path.join(m.group(1), 'modules')
         assert os.path.isdir(mod_dir), \
             '%s does not exist, cannot determine httpd module path' % mod_dir
