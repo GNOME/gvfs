@@ -724,7 +724,7 @@ lock directory = %(workdir)s/samba
 state directory = %(workdir)s/samba
 cache directory = %(workdir)s/samba
 pid directory = %(workdir)s/samba
-private directory = %(workdir)s/samba
+private dir = %(workdir)s/samba
 ncalrpc dir = %(workdir)s/samba
 
 [public]
