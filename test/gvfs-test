@@ -1630,6 +1630,8 @@ def start_dbus():
     env = os.environ.copy()
     env['G_MESSAGES_DEBUG'] = 'all'
     env['GVFS_DEBUG'] = 'all'
+    env['GVFS_SMB_DEBUG'] = '6'
+    env['GVFS_HTTP_DEBUG'] = 'all'
     env['LIBSMB_PROG'] = "nc localhost 1445"
     dbus_daemon = subprocess.Popen(
         ['dbus-daemon', '--config-file', dbus_conf, '--print-address=1'],
