@@ -677,6 +677,34 @@ try_mount (GVfsBackend *backend,
   return FALSE;
 }
 
+static void
+do_unmount (GVfsBackend *backend,
+	    GVfsJobUnmount *job,
+	    GMountUnmountFlags flags,
+	    GMountSource *mount_source)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  int res;
+
+  if (op_backend->smb_context == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_IO_ERROR, G_IO_ERROR_FAILED,
+			_("Internal Error (%s)"), "SMB context has not been initialized");
+      return;
+    }
+
+  /* shutdown_ctx = TRUE, "all connections and files will be closed even if they are busy" */
+  res = smbc_free_context (op_backend->smb_context, TRUE);
+  if (res != 0)
+    {
+      g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
+      return;
+    }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
 static int
 fixup_open_errno (int err)
 {
@@ -2180,6 +2208,7 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
 
   backend_class->mount = do_mount;
   backend_class->try_mount = try_mount;
+  backend_class->unmount = do_unmount;
   backend_class->open_for_read = do_open_for_read;
   backend_class->read = do_read;
   backend_class->seek_on_read = do_seek_on_read;
