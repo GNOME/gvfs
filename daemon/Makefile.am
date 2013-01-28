@@ -347,6 +347,7 @@ gvfsd_computer_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendcomputer.h \
 	-DDEFAULT_BACKEND_TYPE=computer \
 	-DMAX_JOB_THREADS=1 \
+	-DBACKEND_USES_GVFS=1 \
 	-DBACKEND_TYPES='"computer", G_VFS_TYPE_BACKEND_COMPUTER,'
 
 gvfsd_computer_LDADD = $(libraries)
