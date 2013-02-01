@@ -930,6 +930,9 @@ class Drive(GvfsTestCase):
             time.sleep(0.2)
 
         # flush volume monitor output
+        ctx = GLib.MainContext().default()
+        while ctx.iteration(False):
+            pass
         self.monitor.stdout.readall()
 
     def setUp(self):
