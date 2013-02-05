@@ -222,20 +222,13 @@ class GvfsTestCase(unittest.TestCase):
         def unmount_done(obj, result, main_loop):
             success = obj.unmount_with_operation_finish(result)
             self.cb_result = (obj, success)
-
-        def mount_removed(vm, m, main_loop):
-            if m.get_name() == mount.get_name():
-                main_loop.quit()
+            main_loop.quit()
 
         mount = gfile.find_enclosing_mount(None)
         self.assertNotEqual(mount, None)
 
         ml = GLib.MainLoop()
 
-        # the mount is not really gone after unmount_done() gets called, so we
-        # need to wait until it is really removed
-        vm = Gio.VolumeMonitor.get()
-        vm.connect('mount-removed', mount_removed, ml)
         mount.unmount_with_operation(Gio.MountUnmountFlags.NONE, None, None,
                                      unmount_done, ml)
         # ensure we are timing out
