@@ -956,6 +956,31 @@ handle_register_fuse (GVfsDBusMountTracker *object,
   return TRUE;
 }
 
+static gboolean
+handle_unregister_mount (GVfsDBusMountTracker *object,
+                         GDBusMethodInvocation *invocation,
+                         const gchar *arg_obj_path,
+                         gpointer user_data)
+{
+  VfsMount *mount;
+  const char *id;
+
+  id = g_dbus_method_invocation_get_sender (invocation);
+
+  if (find_vfs_mount (id, arg_obj_path) == NULL) {
+    g_dbus_method_invocation_return_error_literal (invocation,
+                                                   G_IO_ERROR,
+                                                   G_IO_ERROR_NOT_MOUNTED,
+                                                   "Mountpoint not registered");
+    return TRUE;
+  }
+
+  dbus_client_disconnected (id);
+
+  gvfs_dbus_mount_tracker_complete_unregister_mount (object, invocation);
+
+  return TRUE;
+}
 
 static int reload_pipes[2];
 
@@ -1026,7 +1051,7 @@ mount_init (void)
   g_signal_connect (mount_tracker, "handle-list-mounts", G_CALLBACK (handle_list_mounts), NULL);
   g_signal_connect (mount_tracker, "handle-list-mountable-info", G_CALLBACK (handle_list_mountable_info), NULL);
   g_signal_connect (mount_tracker, "handle-list-mount-types", G_CALLBACK (handle_list_mount_types), NULL);
-  /* FIXME: handle unregisterMount() */
+  g_signal_connect (mount_tracker, "handle-unregister-mount", G_CALLBACK (handle_unregister_mount), NULL);
   
   error = NULL;
   if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (mount_tracker), conn,
