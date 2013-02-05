@@ -90,6 +90,7 @@ monitor/gdu/gdu-volume-monitor-daemon.c
 monitor/gdu/ggdudrive.c
 monitor/gdu/ggdumount.c
 monitor/gdu/ggduvolume.c
+monitor/goa/goavolume.c
 monitor/gphoto2/ggphoto2volume.c
 monitor/gphoto2/ggphoto2volumemonitor.c
 monitor/gphoto2/hal-utils.c
