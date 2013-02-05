@@ -1,3 +1,19 @@
+Major changes in 1.15.3
+=======================
+* New gnome-online-accounts volume monitor written by Debarshi Ray
+* Various test suite fixes and improvements
+* tests: Fix tar/zip ArchiveMounter tests
+* tests: Fix race condition in Drive tests
+* tests: Use apache2 binary directly
+* daemon: Implement proper org.gtk.vfs.MountTracker.UnregisterMount()
+* mtp: Fix race between on_uevent and do_unmount
+* mtp: Fix leaked weak reference on monitors
+* cdda: Adapt to new paranoia.h location
+* smb: Implement proper unmount method
+* computer: Fix volume monitoring
+* build: Replace deprecated autoconf macros
+* Translation updates
+
 Major changes in 1.15.2
 =======================
 * New MTP backend and volume monitor written by Philip Langdale
