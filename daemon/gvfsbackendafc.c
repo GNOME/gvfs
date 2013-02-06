@@ -343,7 +343,7 @@ static void
 _idevice_event_cb (const idevice_event_t *event, void *user_data)
 {
   GVfsBackendAfc *afc_backend = G_VFS_BACKEND_AFC (user_data);
-  gchar *event_udid;
+  const gchar *event_udid;
 
   g_return_if_fail (afc_backend->uuid != NULL);
   if (event->event != IDEVICE_DEVICE_REMOVE)

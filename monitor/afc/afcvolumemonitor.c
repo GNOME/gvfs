@@ -83,7 +83,7 @@ static void
 g_vfs_afc_monitor_idevice_event (const idevice_event_t *event, void *user_data)
 {
   GVfsAfcVolumeMonitor *self;
-  gchar *event_udid;
+  const gchar *event_udid;
 
   g_return_if_fail (event != NULL);
 

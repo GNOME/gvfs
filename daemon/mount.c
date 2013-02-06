@@ -482,7 +482,8 @@ static void
 read_mountable_config (void)
 {
   GDir *dir;
-  char *mount_dir, *mount_extension, *path;
+  char *path;
+  const gchar *mount_extension, *mount_dir;
   const char *filename;
   GKeyFile *keyfile;
   char **types;
