@@ -81,4 +81,19 @@ gvfsd_fuse_LDADD = \
 	$(top_builddir)/common/libgvfscommon.la \
 	$(GLIB_LIBS) $(FUSE_LIBS)
 
+
+# FIXME: reusing USE_LIBSYSTEMD_LOGIN as systemd has no universal header or pkg-config file
+if USE_LIBSYSTEMD_LOGIN
+
+# FIXME: hardcoded path (systemd doesn't use lib64)
+tmpfilesddir = $(prefix)/lib/tmpfiles.d
+tmpfilesd_DATA = gvfsd-fuse-tmpfiles.conf
+
 endif
+
+endif
+
+
+EXTRA_DIST = \
+	gvfsd-fuse-tmpfiles.conf	\
+	$(NULL)
