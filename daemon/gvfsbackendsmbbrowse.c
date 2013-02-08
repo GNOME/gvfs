@@ -354,6 +354,11 @@ auth_callback (SMBCCTX *context,
 						      &ask_domain,
 						      &ask_password);
 	  backend->password_in_keyring = in_keyring;
+
+	  if (in_keyring)
+	    DEBUG ("auth_callback - reusing keyring credentials: user = '%s', domain = '%s'\n",
+	           ask_user ? ask_user : "NULL",
+	           ask_domain ? ask_domain : "NULL");
 	}
 
       if (!in_keyring)
@@ -443,6 +448,13 @@ add_cached_server (SMBCCTX *context, SMBCSRV *new,
   cached_server->domain = g_strdup (domain);
   cached_server->username = g_strdup (username);
 
+  DEBUG ("adding cached server '%s'\\'%s', user '%s';'%s' with data %p\n",
+          server_name ? server_name : "NULL",
+          share_name ? share_name : "(no share)",
+          domain ? domain : "(no domain)",
+          username ? username : "NULL",
+          new);
+
   if (server_cache == NULL)
     server_cache = g_hash_table_new_full (cached_server_hash, cached_server_equal,
 					  (GDestroyNotify)cached_server_free, NULL);
@@ -474,6 +486,7 @@ remove_cached_server (SMBCCTX * context, SMBCSRV * server)
 
   if (server_cache)
     {
+      DEBUG ("removing cached servers with data %p\n", server);
       num = g_hash_table_foreach_remove (server_cache, remove_cb, server);
       if (num != 0)
 	return 0;
@@ -503,11 +516,19 @@ get_cached_server (SMBCCTX * context,
     (char *)domain,
     (char *)username
   };
+  SMBCSRV *ret = NULL;
+
+  DEBUG ("looking up cached server '%s'\\'%s', user '%s';'%s'\n",
+          server_name ? server_name : "NULL",
+          share_name ? share_name : "(no share)",
+          domain ? domain : "(no domain)",
+          username ? username : "NULL");
 
   if (server_cache)
-    return g_hash_table_lookup (server_cache, &key);
-  else
-    return NULL;
+    ret = g_hash_table_lookup (server_cache, &key);
+
+  DEBUG ("  returning %p\n", ret);
+  return ret;
 }
 
 /* Try to remove all servers from the cache system and disconnect
@@ -520,6 +541,8 @@ get_cached_server (SMBCCTX * context,
 static int
 purge_cached (SMBCCTX * context)
 {
+  DEBUG ("purging server cache\n");
+
   if (server_cache)
     g_hash_table_remove_all (server_cache);
   
@@ -826,7 +849,7 @@ do_mount (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_FAILED,
-			"Failed to allocate smb context");
+			_("Internal Error (%s)"), "Failed to allocate smb context");
       return;
     }
 
@@ -873,7 +896,7 @@ do_mount (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_FAILED,
-			"Failed to initialize smb context");
+			_("Internal Error (%s)"), "Failed to initialize smb context");
       smbc_free_context (smb_context, FALSE);
       return;
     }
@@ -955,7 +978,7 @@ do_mount (GVfsBackend *backend,
       if (dir == NULL && 
           (op_backend->mount_cancelled || (errno != EPERM && errno != EACCES)))
         {
-	  DEBUG ("do_mount - (errno != EPERM && errno != EACCES), breaking\n");
+	  DEBUG ("do_mount - (errno != EPERM && errno != EACCES), cancelled = %d, breaking\n", op_backend->mount_cancelled);
 	  break;
 	}
 
@@ -998,11 +1021,10 @@ do_mount (GVfsBackend *backend,
                          G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED,
                          _("Password dialog cancelled"));
       else
-        /* TODO: Error from errno? */
         g_vfs_job_failed (G_VFS_JOB (job),
 			  G_IO_ERROR, G_IO_ERROR_FAILED,
 			  /* translators: We tried to mount a windows (samba) share, but failed */
-			  _("Failed to retrieve share list from server"));
+			  _("Failed to retrieve share list from server: %s"), g_strerror (errno));
 
       return;
     }
