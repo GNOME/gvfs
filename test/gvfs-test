@@ -157,7 +157,7 @@ class GvfsTestCase(unittest.TestCase):
         timeout = 5
         while timeout > 0:
             (out, err) = self.program_out_err(['gvfs-mount', '-li'])
-            if 'Mount(0)' not in out:
+            if uri not in out:
                 break
             timeout -= 1
             time.sleep(1)
