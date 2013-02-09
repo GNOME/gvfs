@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-01 17:10+0100\n"
-"PO-Revision-Date: 2013-02-01 17:09+0100\n"
+"POT-Creation-Date: 2013-02-09 17:56+0100\n"
+"PO-Revision-Date: 2013-02-09 17:56+0100\n"
 "Last-Translator: Wouter Bolsterlee <wbolster@gnome.org>\n"
 "Language-Team: Dutch <vertaling@vrijschrift.org>\n"
 "Language: nl\n"
@@ -79,7 +79,7 @@ msgstr "waarden moeten een string of een lijst van strings zijn"
 #: ../daemon/gvfsbackendobexftp.c:1759 ../daemon/gvfsbackendobexftp.c:1921
 #: ../daemon/gvfsbackendobexftp.c:1948 ../daemon/gvfsbackendobexftp.c:2006
 #: ../daemon/gvfsbackendobexftp.c:2028 ../daemon/gvfsbackendobexftp.c:2091
-#: ../daemon/gvfsbackendobexftp.c:2110 ../daemon/gvfsbackendsmb.c:1208
+#: ../daemon/gvfsbackendobexftp.c:2110 ../daemon/gvfsbackendsmb.c:1244
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1070
@@ -374,8 +374,8 @@ msgstr "Toegang geweigerd"
 #: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1015
 #: ../daemon/gvfsbackendcomputer.c:638 ../daemon/gvfsbackenddnssd.c:415
 #: ../daemon/gvfsbackendftp.c:1068 ../daemon/gvfsbackendnetwork.c:696
-#: ../daemon/gvfsbackendsmbbrowse.c:1098 ../daemon/gvfsbackendsmbbrowse.c:1165
-#: ../daemon/gvfsbackendsmbbrowse.c:1352 ../daemon/gvfsbackendsmbbrowse.c:1425
+#: ../daemon/gvfsbackendsmbbrowse.c:1120 ../daemon/gvfsbackendsmbbrowse.c:1187
+#: ../daemon/gvfsbackendsmbbrowse.c:1374 ../daemon/gvfsbackendsmbbrowse.c:1447
 #, c-format
 msgid "File doesn't exist"
 msgstr "Bestand bestaat niet"
@@ -429,7 +429,7 @@ msgstr "Niet genoeg ruimte op volumen"
 #: ../daemon/gvfsbackenddav.c:2544 ../daemon/gvfsbackenddav.c:2650
 #: ../daemon/gvfsbackendftp.c:753 ../daemon/gvfsbackendftp.c:934
 #: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
-#: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2132
+#: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2168
 msgid "Target file already exists"
 msgstr "Doelbestand bestaat al"
 
@@ -601,7 +601,7 @@ msgstr "Annuleren"
 #: ../daemon/gvfsbackendarchive.c:582 ../daemon/gvfsbackenddav.c:1825
 #: ../daemon/gvfsbackendhttp.c:316 ../daemon/gvfsbackendobexftp.c:884
 #: ../daemon/gvfsbackendobexftp.c:900 ../daemon/gvfsbackendobexftp.c:919
-#: ../daemon/gvfsbackendsmb.c:663
+#: ../daemon/gvfsbackendsmb.c:699
 msgid "Invalid mount spec"
 msgstr "Ongeldige aankoppelspecificatie"
 
@@ -655,7 +655,7 @@ msgstr ""
 #: ../daemon/gvfsbackendafc.c:967 ../daemon/gvfsbackendarchive.c:659
 #: ../daemon/gvfsbackendcomputer.c:656 ../daemon/gvfsbackendgphoto2.c:1856
 #: ../daemon/gvfsbackendobexftp.c:1096 ../daemon/gvfsbackendrecent.c:121
-#: ../daemon/gvfsbackendsmb.c:747 ../daemon/gvfsbackendtrash.c:232
+#: ../daemon/gvfsbackendsmb.c:783 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "Kan map niet openen"
 
@@ -670,13 +670,13 @@ msgstr "Ongeldig seek-type"
 #: ../daemon/gvfsbackendafc.c:2369 ../daemon/gvfsbackendafp.c:1749
 #: ../daemon/gvfsbackendftp.c:1088 ../daemon/gvfsbackendftp.c:1136
 #: ../daemon/gvfsbackendftp.c:1157 ../daemon/gvfsbackendsftp.c:1825
-#: ../daemon/gvfsbackendsftp.c:4621 ../daemon/gvfsbackendsmb.c:1770
+#: ../daemon/gvfsbackendsftp.c:4621 ../daemon/gvfsbackendsmb.c:1806
 #: ../daemon/gvfsftptask.c:391
 msgid "Operation unsupported"
 msgstr "Bewerking niet ondersteund"
 
-#: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1093
-#: ../daemon/gvfsbackendsmbbrowse.c:1139
+#: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1115
+#: ../daemon/gvfsbackendsmbbrowse.c:1161
 msgid "The file is not a mountable"
 msgstr "Het bestand is niet aankoppelbaar"
 
@@ -692,8 +692,8 @@ msgstr "Het bestand is niet aankoppelbaar"
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: ../daemon/gvfsbackendafpbrowse.c:461 ../daemon/gvfsbackendafp.c:2066
 #: ../daemon/gvfsbackendftp.c:634 ../daemon/gvfsbackendobexftp.c:705
-#: ../daemon/gvfsbackendsftp.c:1686 ../daemon/gvfsbackendsmb.c:554
-#: ../daemon/gvfsbackendsmb.c:1461
+#: ../daemon/gvfsbackendsftp.c:1686 ../daemon/gvfsbackendsmb.c:578
+#: ../daemon/gvfsbackendsmb.c:1497
 #, c-format
 msgid "%s on %s"
 msgstr "%s op %s"
@@ -726,7 +726,7 @@ msgid "Can't recursively copy directory"
 msgstr "Kan map niet recursief kopiëren"
 
 #: ../daemon/gvfsbackendafp.c:475 ../daemon/gvfsbackendsftp.c:4259
-#: ../daemon/gvfsbackendsmb.c:2121
+#: ../daemon/gvfsbackendsmb.c:2157
 msgid "Can't move directory over directory"
 msgstr "Kan map niet over andere map heen verplaatsen"
 
@@ -741,7 +741,7 @@ msgstr "Kon tijdelijk bestand (%s) niet maken"
 
 # Vrij vertaald (Wouter Bolsterlee)
 #: ../daemon/gvfsbackendafp.c:1317 ../daemon/gvfsbackenddav.c:2370
-#: ../daemon/gvfsbackendsftp.c:3407 ../daemon/gvfsbackendsmb.c:1177
+#: ../daemon/gvfsbackendsftp.c:3407 ../daemon/gvfsbackendsmb.c:1213
 msgid "The file was externally modified"
 msgstr "Het bestand is tussentijds gewijzigd"
 
@@ -1063,8 +1063,8 @@ msgstr "Geen WebDAV-schijf"
 msgid "Could not create request"
 msgstr "Kon aanvraag niet aanmaken"
 
-#: ../daemon/gvfsbackenddav.c:2401 ../daemon/gvfsbackendsmb.c:1213
-#: ../daemon/gvfsbackendsmb.c:2149
+#: ../daemon/gvfsbackenddav.c:2401 ../daemon/gvfsbackendsmb.c:1249
+#: ../daemon/gvfsbackendsmb.c:2185
 msgid "Backup file creation failed"
 msgstr "Aanmaken reservekopie"
 
@@ -1093,7 +1093,7 @@ msgid "Enter password for %s on %s"
 msgstr "Voer wachtwoord in voor %s op %s"
 
 #: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:981
-#: ../daemon/gvfsbackendsmbbrowse.c:999 ../daemon/gvfsbackendsmb.c:620
+#: ../daemon/gvfsbackendsmbbrowse.c:1022 ../daemon/gvfsbackendsmb.c:655
 msgid "Password dialog cancelled"
 msgstr "Wachtwoordvenster geannuleerd"
 
@@ -1223,7 +1223,7 @@ msgid "Error seeking in stream on camera %s"
 msgstr "Fout bij zoeken in stream op camera %s"
 
 #: ../daemon/gvfsbackendgphoto2.c:2171 ../daemon/gvfsbackendsftp.c:2938
-#: ../daemon/gvfsbackendsmbbrowse.c:1421
+#: ../daemon/gvfsbackendsmbbrowse.c:1443
 msgid "Not a directory"
 msgstr "Geen map"
 
@@ -1371,7 +1371,7 @@ msgstr "Bestand niet gevonden"
 msgid "Cannot make directory in this location"
 msgstr "Kan geen map maken op deze lokatie"
 
-#: ../daemon/gvfsbackendmtp.c:1188 ../daemon/gvfsbackendsmbbrowse.c:1161
+#: ../daemon/gvfsbackendmtp.c:1188 ../daemon/gvfsbackendsmbbrowse.c:1183
 msgid "Not a regular file"
 msgstr "Geen normaal bestand"
 
@@ -1396,7 +1396,7 @@ msgstr "Bestanden delen"
 msgid "Remote Login"
 msgstr "Op afstand inloggen"
 
-#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:894
+#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:917
 msgid "Windows Network"
 msgstr "Windows-netwerk"
 
@@ -1419,7 +1419,7 @@ msgstr "Verbinding met apparaat verloren"
 msgid "Device requires a software update"
 msgstr "Het apparaat heeft een software-update nodig"
 
-#: ../daemon/gvfsbackendobexftp.c:1879 ../daemon/gvfsbackendsmb.c:2023
+#: ../daemon/gvfsbackendobexftp.c:1879 ../daemon/gvfsbackendsmb.c:2059
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Fout bij verwijderen van bestand: %s"
@@ -1543,7 +1543,7 @@ msgstr "Kon geen ondersteund SSH-programma vinden"
 msgid "Invalid reply received"
 msgstr "Ongeldig antwoord ontvangen"
 
-#: ../daemon/gvfsbackendsftp.c:2263 ../daemon/gvfsbackendsmb.c:1468
+#: ../daemon/gvfsbackendsftp.c:2263 ../daemon/gvfsbackendsmb.c:1504
 #: ../daemon/gvfsdaemonutils.c:136
 msgid " (invalid encoding)"
 msgstr " (ongeldige codering)"
@@ -1562,76 +1562,79 @@ msgid "Unable to create temporary file"
 msgstr "Kon tijdelijk bestand niet maken"
 
 #. translators: %s is a server name
-#: ../daemon/gvfsbackendsmbbrowse.c:374
+#: ../daemon/gvfsbackendsmbbrowse.c:379
 #, c-format
 msgid "Password required for %s"
 msgstr "Wachtwoord benodigd voor %s"
 
+#: ../daemon/gvfsbackendsmbbrowse.c:852 ../daemon/gvfsbackendsmbbrowse.c:899
+#: ../daemon/gvfsbackendsmb.c:518 ../daemon/gvfsbackendsmb.c:564
+#: ../daemon/gvfsbackendsmb.c:729
+#, c-format
+msgid "Internal Error (%s)"
+msgstr "Interne fout (%s)"
+
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:903
+#: ../daemon/gvfsbackendsmbbrowse.c:926
 #, c-format
 msgid "Windows shares on %s"
 msgstr "Gedeelde Windows-mappen op %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmbbrowse.c:1005
-msgid "Failed to retrieve share list from server"
-msgstr "Kon lijst van gedeelde mappen niet van server opvragen"
+#: ../daemon/gvfsbackendsmbbrowse.c:1027
+#, c-format
+msgid "Failed to retrieve share list from server: %s"
+msgstr "Kon lijst van gedeelde mappen niet van server opvragen: %s"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1510
+#: ../daemon/gvfsbackendsmbbrowse.c:1532
 msgid "Windows Network File System Service"
 msgstr "Bestandssysteemvoorziening voor Windows-netwerken"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:238
+#: ../daemon/gvfsbackendsmb.c:260
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "Wachtwoord benodigd voor gedeelde map %s op %s"
 
-#: ../daemon/gvfsbackendsmb.c:494 ../daemon/gvfsbackendsmb.c:540
-#: ../daemon/gvfsbackendsmb.c:693
-#, c-format
-msgid "Internal Error (%s)"
-msgstr "Interne fout (%s)"
-
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:625
-msgid "Failed to mount Windows share"
-msgstr "Kon gedeelde Windows-map niet aankoppelen"
+#: ../daemon/gvfsbackendsmb.c:660
+#, c-format
+msgid "Failed to mount Windows share: %s"
+msgstr "Kon gedeelde Windows-map niet aankoppelen: %s"
 
-#: ../daemon/gvfsbackendsmb.c:817 ../daemon/gvfsbackendsmb.c:1313
+#: ../daemon/gvfsbackendsmb.c:853 ../daemon/gvfsbackendsmb.c:1349
 msgid "Unsupported seek type"
 msgstr "Niet ondersteund zoektype"
 
-#: ../daemon/gvfsbackendsmb.c:1405
+#: ../daemon/gvfsbackendsmb.c:1441
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Kon reservekopiebestand niet maken: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1785
+#: ../daemon/gvfsbackendsmb.c:1821
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Ongeldig attribuuttype (uint64 verwacht)"
 
-#: ../daemon/gvfsbackendsmb.c:1972
+#: ../daemon/gvfsbackendsmb.c:2008
 msgid "Can't rename file, filename already exists"
 msgstr "Kan bestand niet hernoemen; bestandsnaam reeds in gebruik"
 
-#: ../daemon/gvfsbackendsmb.c:2097
+#: ../daemon/gvfsbackendsmb.c:2133
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Fout bij verplaatsen van bestand: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2169
+#: ../daemon/gvfsbackendsmb.c:2205
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Fout bij verwijderen doelbestand: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2193
+#: ../daemon/gvfsbackendsmb.c:2229
 msgid "Can't recursively move directory"
 msgstr "Kan map niet recursief verplaatsen"
 
-#: ../daemon/gvfsbackendsmb.c:2238
+#: ../daemon/gvfsbackendsmb.c:2274
 msgid "Windows Shares File System Service"
 msgstr "Bestandssysteemvoorziening voor gedeelde Windows-mappen"
 
@@ -1779,24 +1782,24 @@ msgstr "%s: %s"
 msgid "Try \"%s --help\" for more information."
 msgstr "Probeer ‘%s --help’ voor meer informatie."
 
-#: ../daemon/mount.c:701
+#: ../daemon/mount.c:702
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Auto-aankoppelen mislukt: %s"
 
-#: ../daemon/mount.c:745 ../daemon/mount.c:806
+#: ../daemon/mount.c:746 ../daemon/mount.c:807
 msgid "The specified location is not mounted"
 msgstr "De opgegeven locatie is niet aangekoppeld"
 
-#: ../daemon/mount.c:750
+#: ../daemon/mount.c:751
 msgid "The specified location is not supported"
 msgstr "De opgegeven locatie wordt niet ondersteund"
 
-#: ../daemon/mount.c:874
+#: ../daemon/mount.c:875
 msgid "Location is already mounted"
 msgstr "Locatie is reeds aangekoppeld"
 
-#: ../daemon/mount.c:883
+#: ../daemon/mount.c:884
 msgid "Location is not mountable"
 msgstr "Locatie is niet aankoppelbaar"
 
@@ -1910,6 +1913,21 @@ msgid ""
 msgstr ""
 "Geef een wachtwoord om het volumen te ontgrendelen\n"
 "Het apparaat %s bevat vercijferde gegevens."
+
+#: ../monitor/goa/goavolume.c:214
+#, c-format
+msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
+msgstr "Fout bij verkrijgen van org.gnome.OnlineAccounts.Files voor %s"
+
+#: ../monitor/goa/goavolume.c:251
+#, c-format
+msgid "Invalid credentials for %s"
+msgstr "Ongeldige inloggegevens voor %s"
+
+#: ../monitor/goa/goavolume.c:268
+#, c-format
+msgid "Unsupported authentication method for %s"
+msgstr "Ongeldige authenticatiemethode voor %s"
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
