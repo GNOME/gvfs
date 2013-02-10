@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs-master-po-gl-70600.merged\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-06 18:18+0100\n"
-"PO-Revision-Date: 2013-02-06 18:18+0200\n"
+"POT-Creation-Date: 2013-02-10 15:39+0100\n"
+"PO-Revision-Date: 2013-02-10 15:39+0200\n"
 "Last-Translator: Fran Dieguez <frandieguez@gnome.org>\n"
 "Language-Team: gnome-l10n-gl@gnome.org\n"
 "Language: gl\n"
@@ -85,7 +85,7 @@ msgstr "os valores deben ser unha cadea ou unha lista de cadeas"
 #: ../daemon/gvfsbackendobexftp.c:1759 ../daemon/gvfsbackendobexftp.c:1921
 #: ../daemon/gvfsbackendobexftp.c:1948 ../daemon/gvfsbackendobexftp.c:2006
 #: ../daemon/gvfsbackendobexftp.c:2028 ../daemon/gvfsbackendobexftp.c:2091
-#: ../daemon/gvfsbackendobexftp.c:2110 ../daemon/gvfsbackendsmb.c:1208
+#: ../daemon/gvfsbackendobexftp.c:2110 ../daemon/gvfsbackendsmb.c:1244
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1070
@@ -382,8 +382,8 @@ msgstr "Permiso denegado"
 #: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1015
 #: ../daemon/gvfsbackendcomputer.c:638 ../daemon/gvfsbackenddnssd.c:415
 #: ../daemon/gvfsbackendftp.c:1068 ../daemon/gvfsbackendnetwork.c:696
-#: ../daemon/gvfsbackendsmbbrowse.c:1098 ../daemon/gvfsbackendsmbbrowse.c:1165
-#: ../daemon/gvfsbackendsmbbrowse.c:1352 ../daemon/gvfsbackendsmbbrowse.c:1425
+#: ../daemon/gvfsbackendsmbbrowse.c:1120 ../daemon/gvfsbackendsmbbrowse.c:1187
+#: ../daemon/gvfsbackendsmbbrowse.c:1374 ../daemon/gvfsbackendsmbbrowse.c:1447
 #, c-format
 msgid "File doesn't exist"
 msgstr "O ficheiro non existe"
@@ -437,7 +437,7 @@ msgstr "Non hai espazo dabondo no volume"
 #: ../daemon/gvfsbackenddav.c:2544 ../daemon/gvfsbackenddav.c:2650
 #: ../daemon/gvfsbackendftp.c:753 ../daemon/gvfsbackendftp.c:934
 #: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
-#: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2132
+#: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2168
 msgid "Target file already exists"
 msgstr "O ficheiro de destino xa existe"
 
@@ -611,7 +611,7 @@ msgstr "Cancelar"
 #: ../daemon/gvfsbackendarchive.c:582 ../daemon/gvfsbackenddav.c:1825
 #: ../daemon/gvfsbackendhttp.c:316 ../daemon/gvfsbackendobexftp.c:884
 #: ../daemon/gvfsbackendobexftp.c:900 ../daemon/gvfsbackendobexftp.c:919
-#: ../daemon/gvfsbackendsmb.c:663
+#: ../daemon/gvfsbackendsmb.c:699
 msgid "Invalid mount spec"
 msgstr "A especificación de montaxe non é válida"
 
@@ -666,7 +666,7 @@ msgstr ""
 #: ../daemon/gvfsbackendafc.c:967 ../daemon/gvfsbackendarchive.c:659
 #: ../daemon/gvfsbackendcomputer.c:656 ../daemon/gvfsbackendgphoto2.c:1856
 #: ../daemon/gvfsbackendobexftp.c:1096 ../daemon/gvfsbackendrecent.c:121
-#: ../daemon/gvfsbackendsmb.c:747 ../daemon/gvfsbackendtrash.c:232
+#: ../daemon/gvfsbackendsmb.c:783 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "Non é posíbel abrir o cartafol"
 
@@ -681,13 +681,13 @@ msgstr "Tipo de busca incorrecta"
 #: ../daemon/gvfsbackendafc.c:2369 ../daemon/gvfsbackendafp.c:1749
 #: ../daemon/gvfsbackendftp.c:1088 ../daemon/gvfsbackendftp.c:1136
 #: ../daemon/gvfsbackendftp.c:1157 ../daemon/gvfsbackendsftp.c:1825
-#: ../daemon/gvfsbackendsftp.c:4621 ../daemon/gvfsbackendsmb.c:1770
+#: ../daemon/gvfsbackendsftp.c:4621 ../daemon/gvfsbackendsmb.c:1806
 #: ../daemon/gvfsftptask.c:391
 msgid "Operation unsupported"
 msgstr "A operación non é compatíbel"
 
-#: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1093
-#: ../daemon/gvfsbackendsmbbrowse.c:1139
+#: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1115
+#: ../daemon/gvfsbackendsmbbrowse.c:1161
 msgid "The file is not a mountable"
 msgstr "O ficheiro non é montábel"
 
@@ -703,8 +703,8 @@ msgstr "O ficheiro non é montábel"
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: ../daemon/gvfsbackendafpbrowse.c:461 ../daemon/gvfsbackendafp.c:2066
 #: ../daemon/gvfsbackendftp.c:634 ../daemon/gvfsbackendobexftp.c:705
-#: ../daemon/gvfsbackendsftp.c:1686 ../daemon/gvfsbackendsmb.c:554
-#: ../daemon/gvfsbackendsmb.c:1461
+#: ../daemon/gvfsbackendsftp.c:1686 ../daemon/gvfsbackendsmb.c:578
+#: ../daemon/gvfsbackendsmb.c:1497
 #, c-format
 msgid "%s on %s"
 msgstr "%s en %s"
@@ -737,7 +737,7 @@ msgid "Can't recursively copy directory"
 msgstr "Non é posíbel copiar un cartafol recursivamente"
 
 #: ../daemon/gvfsbackendafp.c:475 ../daemon/gvfsbackendsftp.c:4259
-#: ../daemon/gvfsbackendsmb.c:2121
+#: ../daemon/gvfsbackendsmb.c:2157
 msgid "Can't move directory over directory"
 msgstr "Non é posíbel mover un cartafol sobre outro cartafol"
 
@@ -751,7 +751,7 @@ msgid "Unable to create temporary file (%s)"
 msgstr "Non é posíbel crear un ficheiro temporal (%s)"
 
 #: ../daemon/gvfsbackendafp.c:1317 ../daemon/gvfsbackenddav.c:2370
-#: ../daemon/gvfsbackendsftp.c:3407 ../daemon/gvfsbackendsmb.c:1177
+#: ../daemon/gvfsbackendsftp.c:3407 ../daemon/gvfsbackendsmb.c:1213
 msgid "The file was externally modified"
 msgstr "O ficheiro foi modificado de forma externa"
 
@@ -1071,8 +1071,8 @@ msgstr "Non é un cartafol compartido con WebDAV"
 msgid "Could not create request"
 msgstr "Non foi posíbel crear a petición"
 
-#: ../daemon/gvfsbackenddav.c:2401 ../daemon/gvfsbackendsmb.c:1213
-#: ../daemon/gvfsbackendsmb.c:2149
+#: ../daemon/gvfsbackenddav.c:2401 ../daemon/gvfsbackendsmb.c:1249
+#: ../daemon/gvfsbackendsmb.c:2185
 msgid "Backup file creation failed"
 msgstr "Produciuse un fallou a creación do ficheiro de copia de seguranza"
 
@@ -1101,7 +1101,7 @@ msgid "Enter password for %s on %s"
 msgstr "Escriba o contrasinal para o %s en %s"
 
 #: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:981
-#: ../daemon/gvfsbackendsmbbrowse.c:999 ../daemon/gvfsbackendsmb.c:620
+#: ../daemon/gvfsbackendsmbbrowse.c:1022 ../daemon/gvfsbackendsmb.c:655
 msgid "Password dialog cancelled"
 msgstr "Cancelouse a caixa de diálogo do contrasinal"
 
@@ -1231,7 +1231,7 @@ msgid "Error seeking in stream on camera %s"
 msgstr "Produciuse un erro ao buscar no fluxo na cámara «%s»"
 
 #: ../daemon/gvfsbackendgphoto2.c:2171 ../daemon/gvfsbackendsftp.c:2938
-#: ../daemon/gvfsbackendsmbbrowse.c:1421
+#: ../daemon/gvfsbackendsmbbrowse.c:1443
 msgid "Not a directory"
 msgstr "Non é un cartafol"
 
@@ -1383,7 +1383,7 @@ msgstr "Ficheiro non atopado"
 msgid "Cannot make directory in this location"
 msgstr "Non é posíbel crear un cartafol nesta localización"
 
-#: ../daemon/gvfsbackendmtp.c:1188 ../daemon/gvfsbackendsmbbrowse.c:1161
+#: ../daemon/gvfsbackendmtp.c:1188 ../daemon/gvfsbackendsmbbrowse.c:1183
 msgid "Not a regular file"
 msgstr "Non é un ficheiro normal"
 
@@ -1408,7 +1408,7 @@ msgstr "Compartición de ficheiros"
 msgid "Remote Login"
 msgstr "Inicio de sesión remoto"
 
-#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:894
+#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:917
 msgid "Windows Network"
 msgstr "Rede de Windows"
 
@@ -1430,7 +1430,7 @@ msgstr "Perdeuse a conexión co dispositivo"
 msgid "Device requires a software update"
 msgstr "O dispositivo require unha actualización do software"
 
-#: ../daemon/gvfsbackendobexftp.c:1879 ../daemon/gvfsbackendsmb.c:2023
+#: ../daemon/gvfsbackendobexftp.c:1879 ../daemon/gvfsbackendsmb.c:2059
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Produciuse un erro ao eliminar o ficheiro: %s"
@@ -1554,7 +1554,7 @@ msgstr "Non é posíbel atopar unha orde SSH"
 msgid "Invalid reply received"
 msgstr "Recibiuse unha resposta incorrecta"
 
-#: ../daemon/gvfsbackendsftp.c:2263 ../daemon/gvfsbackendsmb.c:1468
+#: ../daemon/gvfsbackendsftp.c:2263 ../daemon/gvfsbackendsmb.c:1504
 #: ../daemon/gvfsdaemonutils.c:136
 msgid " (invalid encoding)"
 msgstr " (a codificación non é válida)"
@@ -1573,77 +1573,81 @@ msgid "Unable to create temporary file"
 msgstr "Non é posíbel crear un ficheiro temporal"
 
 #. translators: %s is a server name
-#: ../daemon/gvfsbackendsmbbrowse.c:374
+#: ../daemon/gvfsbackendsmbbrowse.c:379
 #, c-format
 msgid "Password required for %s"
 msgstr "Requírese un contrasinal para %s"
 
+#: ../daemon/gvfsbackendsmbbrowse.c:852 ../daemon/gvfsbackendsmbbrowse.c:899
+#: ../daemon/gvfsbackendsmb.c:518 ../daemon/gvfsbackendsmb.c:564
+#: ../daemon/gvfsbackendsmb.c:729
+#, c-format
+msgid "Internal Error (%s)"
+msgstr "Erro interno (%s)"
+
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:903
+#: ../daemon/gvfsbackendsmbbrowse.c:926
 #, c-format
 msgid "Windows shares on %s"
 msgstr "Compartidos con Windows en %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmbbrowse.c:1005
-msgid "Failed to retrieve share list from server"
+#: ../daemon/gvfsbackendsmbbrowse.c:1027
+#, c-format
+msgid "Failed to retrieve share list from server: %s"
 msgstr ""
-"Produciuse un erro ao recuperar a lista de recursos compartidos do servidor"
+"Produciuse un erro ao recuperar a lista de recursos compartidos do servidor: "
+"%s"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1510
+#: ../daemon/gvfsbackendsmbbrowse.c:1532
 msgid "Windows Network File System Service"
 msgstr "Servizo de sistema de ficheiros en rede de Windows"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:238
+#: ../daemon/gvfsbackendsmb.c:260
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "Requírese un contrasinal para o %s compartido en %s"
 
-#: ../daemon/gvfsbackendsmb.c:494 ../daemon/gvfsbackendsmb.c:540
-#: ../daemon/gvfsbackendsmb.c:693
-#, c-format
-msgid "Internal Error (%s)"
-msgstr "Erro interno (%s)"
-
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:625
-msgid "Failed to mount Windows share"
-msgstr "Produciuse un erro ao montar o compartido con Windows"
+#: ../daemon/gvfsbackendsmb.c:660
+#, c-format
+msgid "Failed to mount Windows share: %s"
+msgstr "Produciuse un erro ao montar o compartido con Windows: %s"
 
-#: ../daemon/gvfsbackendsmb.c:817 ../daemon/gvfsbackendsmb.c:1313
+#: ../daemon/gvfsbackendsmb.c:853 ../daemon/gvfsbackendsmb.c:1349
 msgid "Unsupported seek type"
 msgstr "O tipo de busca non é compatíbel"
 
-#: ../daemon/gvfsbackendsmb.c:1405
+#: ../daemon/gvfsbackendsmb.c:1441
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Produciuse un erro na creación do ficheiro de copia de seguranza: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1785
+#: ../daemon/gvfsbackendsmb.c:1821
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "O tipo de atributo non é válido (agardábase un uint64)"
 
-#: ../daemon/gvfsbackendsmb.c:1972
+#: ../daemon/gvfsbackendsmb.c:2008
 msgid "Can't rename file, filename already exists"
 msgstr "Non é posíbel renomear o ficheiro; o nome de ficheiro xa existe"
 
-#: ../daemon/gvfsbackendsmb.c:2097
+#: ../daemon/gvfsbackendsmb.c:2133
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Produciuse un erro ao mover o ficheiro: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2169
+#: ../daemon/gvfsbackendsmb.c:2205
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Produciuse un erro ao mover o ficheiro de destino: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2193
+#: ../daemon/gvfsbackendsmb.c:2229
 msgid "Can't recursively move directory"
 msgstr "Non é posíbel mover o cartafol recursivamente"
 
-#: ../daemon/gvfsbackendsmb.c:2238
+#: ../daemon/gvfsbackendsmb.c:2274
 msgid "Windows Shares File System Service"
 msgstr "Servizo de sistema de ficheiros compartidos con Windows"
 
