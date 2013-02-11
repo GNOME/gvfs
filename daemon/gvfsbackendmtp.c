@@ -280,14 +280,20 @@ emit_change_event (gpointer key,
 static void
 fail_job (GVfsJob *job, LIBMTP_mtpdevice_t *device)
 {
+  const char *text;
   LIBMTP_error_t *error = LIBMTP_Get_Errorstack (device);
 
+  if (error) {
+    text = g_strrstr (error->error_text, ":") + 1;
+  } else {
+    text = _("Unknown error.");
+  }
   g_vfs_job_failed (job, G_IO_ERROR,
                     g_vfs_job_is_cancelled (job) ?
                       G_IO_ERROR_CANCELLED :
                       G_IO_ERROR_FAILED,
                     _("libmtp error: %s"),
-                    g_strrstr (error->error_text, ":") + 1);
+                    text);
 
   LIBMTP_Clear_Errorstack (device);
 }
