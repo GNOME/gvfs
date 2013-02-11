@@ -631,6 +631,15 @@ get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
     }
   }
 
+  /* Check supported methods/extensions. */
+  LIBMTP_device_extension_t *extension;
+  for (extension = device->extensions; extension != NULL; extension = extension->next) {
+    if (g_strcmp0 ("android.com", extension->name) == 0) {
+      G_VFS_BACKEND_MTP (backend)->android_extension = TRUE;
+      break;
+    }
+  }
+
  exit:
   DEBUG ("(II) get_device done.");
   return device;
@@ -1455,6 +1464,64 @@ do_set_display_name (GVfsBackend *backend,
 }
 
 
+#if HAVE_LIBMTP_1_1_6
+static void
+do_open_for_read (GVfsBackend *backend,
+                  GVfsJobOpenForRead *job,
+                  const char *filename)
+{
+  if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                              _("Operation not supported."));
+    return;
+  }
+
+  DEBUG ("(I) do_open_for_read (%s)", filename);
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  gchar **elements = g_strsplit_set (filename, "/", -1);
+  unsigned int ne = g_strv_length (elements);
+
+  if (ne < 3) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_FAILED,
+                              _("Cannot open this entity"));
+    goto exit;
+  }
+
+  unsigned int id = strtol (elements[ne-1], NULL, 10);
+
+  LIBMTP_mtpdevice_t *device;
+  device = G_VFS_BACKEND_MTP (backend)->device;
+
+  LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, id);
+  if (file == NULL) {
+    fail_job (G_VFS_JOB (job), device);
+    goto exit;
+  }
+
+  RWHandle *handle = g_new0(RWHandle, 1);
+  handle->handle_type = HANDLE_FILE;
+  handle->id = id;
+  handle->offset = 0;
+  handle->size = file->filesize;
+
+  LIBMTP_destroy_file_t (file);
+
+  g_vfs_job_open_for_read_set_can_seek (G_VFS_JOB_OPEN_FOR_READ (job), TRUE);
+  g_vfs_job_open_for_read_set_handle (G_VFS_JOB_OPEN_FOR_READ (job), handle);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ exit:
+  g_strfreev (elements);
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  DEBUG ("(I) do_open_for_read done.");
+}
+#endif /* HAVE_LIBMTP_1_1_6 */
+
+
 #if HAVE_LIBMTP_1_1_5
 static void
 do_open_icon_for_read (GVfsBackend *backend,
@@ -1521,7 +1588,7 @@ do_open_icon_for_read (GVfsBackend *backend,
 
   DEBUG ("(I) do_open_icon_for_read done.");
 }
-#endif /* HAVE_LIBMTP_GET_THUMBNAIL */
+#endif /* HAVE_LIBMTP_1_1_5 */
 
 
 static void
@@ -1579,7 +1646,17 @@ do_read (GVfsBackend *backend,
 
   uint32_t actual;
   if (handle->handle_type == HANDLE_FILE) {
-    g_assert_not_reached();
+    unsigned char *temp;
+    int ret = LIBMTP_GetPartialObject (G_VFS_BACKEND_MTP (backend)->device, id, offset,
+                                       bytes_requested, &temp, &actual);
+    if (ret != 0) {
+      fail_job (G_VFS_JOB (job), G_VFS_BACKEND_MTP (backend)->device);
+      DEBUG ("(I) job failed.");
+      goto exit;
+    }
+
+    memcpy (buffer, temp, actual);
+    free (temp);
   } else {
     GByteArray *bytes = handle->bytes;
     actual = MIN (bytes->len - offset, bytes_requested);
@@ -1637,6 +1714,9 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->set_display_name = do_set_display_name;
   backend_class->create_dir_monitor = do_create_dir_monitor;
   backend_class->create_file_monitor = do_create_file_monitor;
+#if HAVE_LIBMTP_1_1_6
+  backend_class->open_for_read = do_open_for_read;
+#endif
 #if HAVE_LIBMTP_1_1_5
   backend_class->open_icon_for_read = do_open_icon_for_read;
 #endif
