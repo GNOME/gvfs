@@ -1215,19 +1215,24 @@ do_pull (GVfsBackend *backend,
                               _("Can't recursively copy directory"));
     goto exit;
   } else {
-      MtpProgressData mtp_progress_data;
-      mtp_progress_data.progress_callback = progress_callback;
-      mtp_progress_data.progress_callback_data = progress_callback_data;
-      mtp_progress_data.job = G_VFS_JOB (job);
-      int ret = LIBMTP_Get_File_To_File (device,
-                                         strtol (elements[ne-1], NULL, 10),
-                                         local_path,
-                                         (LIBMTP_progressfunc_t)mtp_progress,
-                                         &mtp_progress_data);
-      if (ret != 0) {
-        fail_job (G_VFS_JOB (job), device);
-        goto exit;
-      }
+    MtpProgressData mtp_progress_data;
+    mtp_progress_data.progress_callback = progress_callback;
+    mtp_progress_data.progress_callback_data = progress_callback_data;
+    mtp_progress_data.job = G_VFS_JOB (job);
+    int ret = LIBMTP_Get_File_To_File (device,
+                                       strtol (elements[ne-1], NULL, 10),
+                                       local_path,
+                                       (LIBMTP_progressfunc_t)mtp_progress,
+                                       &mtp_progress_data);
+    if (ret != 0) {
+      fail_job (G_VFS_JOB (job), device);
+      goto exit;
+    }
+    /* Attempt to delete object if requested but don't fail it it fails. */
+    if (remove_source) {
+      DEBUG ("(I) Removing source.");
+      LIBMTP_Delete_Object (device, strtol (elements[ne-1], NULL, 10));
+    }
     g_vfs_job_succeeded (G_VFS_JOB (job));
   }
 
