@@ -1328,6 +1328,12 @@ do_push (GVfsBackend *backend,
     goto exit;
   }
 
+  /* Attempt to delete object if requested but don't fail it it fails. */
+  if (remove_source) {
+    DEBUG ("(I) Removing source.");
+    g_file_delete (file, G_VFS_JOB (job)->cancellable, NULL);
+  }
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
