@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-02-08 15:43+0000\n"
-"PO-Revision-Date: 2013-02-11 13:48+0100\n"
+"POT-Creation-Date: 2013-02-11 15:50+0000\n"
+"PO-Revision-Date: 2013-02-14 14:41+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "Language: \n"
@@ -447,7 +447,7 @@ msgid "Target directory already exists"
 msgstr "La carpeta destino ya existe"
 
 #: ../daemon/gvfsafpvolume.c:1219 ../daemon/gvfsbackendafp.c:590
-#: ../daemon/gvfsbackendmtp.c:1391
+#: ../daemon/gvfsbackendmtp.c:1402
 msgid "Can't rename volume"
 msgstr "No se puede renombrar un volumen"
 
@@ -526,7 +526,7 @@ msgid "Internal Apple File Control error"
 msgstr "Error de control de archivos interno de Apple"
 
 #: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:737
-#: ../daemon/gvfsbackendmtp.c:1199
+#: ../daemon/gvfsbackendmtp.c:1205
 msgid "File does not exist"
 msgstr "El archivo no existe"
 
@@ -723,8 +723,8 @@ msgid "Can't copy directory over directory"
 msgstr "No se puede copiar una carpeta sobre otra carpeta"
 
 #: ../daemon/gvfsbackendafp.c:293 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1209
-#: ../daemon/gvfsbackendmtp.c:1285 ../daemon/gvfsbackendobexftp.c:1818
+#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1215
+#: ../daemon/gvfsbackendmtp.c:1296 ../daemon/gvfsbackendobexftp.c:1818
 msgid "Can't recursively copy directory"
 msgstr "No se puede copiar recursivamente una carpeta"
 
@@ -874,7 +874,7 @@ msgstr ""
 "Una o más aplicaciones mantienen el volumen ocupado."
 
 #: ../daemon/gvfsbackendcdda.c:357 ../daemon/gvfsbackendgphoto2.c:1548
-#: ../daemon/gvfsbackendmtp.c:449
+#: ../daemon/gvfsbackendmtp.c:455
 msgid "Cannot create gudev client"
 msgstr "No se puede crear el cliente gudev"
 
@@ -1157,7 +1157,7 @@ msgstr "Cámara"
 msgid "Audio Player"
 msgstr "Reproductor de sonido"
 
-#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:441
+#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:447
 msgid "No device specified"
 msgstr "No se especificó el dispositivo"
 
@@ -1212,7 +1212,7 @@ msgstr "Error al obtener el archivo"
 msgid "Error getting data from file"
 msgstr "Error al obtener datos del archivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1470
+#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1481
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Identificador de icono «%s» mal formado"
@@ -1321,72 +1321,76 @@ msgid "Directory notification not supported"
 msgstr "No se soporta la notificación de carpetas"
 
 #: ../daemon/gvfsbackendmtp.c:289
+msgid "Unknown error."
+msgstr "Elementos desconocido."
+
+#: ../daemon/gvfsbackendmtp.c:295
 #, c-format
 msgid "libmtp error: %s"
 msgstr "Error de libmtp: %s"
 
-#: ../daemon/gvfsbackendmtp.c:395
+#: ../daemon/gvfsbackendmtp.c:401
 msgid "Unexpected host uri format."
 msgstr "Final de URI del equipo inesperado."
 
-#: ../daemon/gvfsbackendmtp.c:405
+#: ../daemon/gvfsbackendmtp.c:411
 msgid "Malformed host uri."
 msgstr "URI del equipo mal formado"
 
-#: ../daemon/gvfsbackendmtp.c:418
+#: ../daemon/gvfsbackendmtp.c:424
 msgid "Couldn't find matching udev device."
 msgstr "No se pudo encontrar un dispositivo de udev que coincida"
 
-#: ../daemon/gvfsbackendmtp.c:558
+#: ../daemon/gvfsbackendmtp.c:564
 msgid "No MTP devices found"
 msgstr "No se encontraron dispositivos MTP"
 
-#: ../daemon/gvfsbackendmtp.c:563
+#: ../daemon/gvfsbackendmtp.c:569
 msgid "Unable to connect to MTP device"
 msgstr "No se pudo conectar al dispositivo MTP"
 
-#: ../daemon/gvfsbackendmtp.c:568
+#: ../daemon/gvfsbackendmtp.c:574
 msgid "Unable to allocate memory while detecting MTP devices"
 msgstr "No se pudo reservar memoria al detectar dispositivos MTP"
 
-#: ../daemon/gvfsbackendmtp.c:574
+#: ../daemon/gvfsbackendmtp.c:580
 msgid "Generic libmtp error"
 msgstr "Error de libmtp genérico"
 
-#: ../daemon/gvfsbackendmtp.c:591
+#: ../daemon/gvfsbackendmtp.c:597
 #, c-format
 msgid "Unable to open MTP device '%s'"
 msgstr "No se pudo abrir el dispositivo MTP «%s»"
 
-#: ../daemon/gvfsbackendmtp.c:634
+#: ../daemon/gvfsbackendmtp.c:640
 msgid "Unnamed Device"
 msgstr "Dispositivo sin nombre"
 
-#: ../daemon/gvfsbackendmtp.c:1002 ../daemon/gvfsbackendmtp.c:1075
+#: ../daemon/gvfsbackendmtp.c:1008 ../daemon/gvfsbackendmtp.c:1081
 msgid "No storage volumes found"
 msgstr "No se encontraron volúmenes de almacenamiento"
 
-#: ../daemon/gvfsbackendmtp.c:1024
+#: ../daemon/gvfsbackendmtp.c:1030
 msgid "File not found"
 msgstr "No se encontró el archivo"
 
-#: ../daemon/gvfsbackendmtp.c:1132
+#: ../daemon/gvfsbackendmtp.c:1138
 msgid "Cannot make directory in this location"
 msgstr "No se puede crear una carpeta en esta ubicación"
 
-#: ../daemon/gvfsbackendmtp.c:1188 ../daemon/gvfsbackendsmbbrowse.c:1183
+#: ../daemon/gvfsbackendmtp.c:1194 ../daemon/gvfsbackendsmbbrowse.c:1183
 msgid "Not a regular file"
 msgstr "No es un archivo regular"
 
-#: ../daemon/gvfsbackendmtp.c:1258
+#: ../daemon/gvfsbackendmtp.c:1269
 msgid "Cannot write to this location"
 msgstr "No se puede escribir en esta ubicación"
 
-#: ../daemon/gvfsbackendmtp.c:1350
+#: ../daemon/gvfsbackendmtp.c:1361
 msgid "Cannot delete this entity"
 msgstr "No se puede eliminar esta entidad"
 
-#: ../daemon/gvfsbackendmtp.c:1462
+#: ../daemon/gvfsbackendmtp.c:1473
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "No hay miniatura para la entidad «%s»"
@@ -1586,7 +1590,6 @@ msgstr "Comparticiones Windows en %s"
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmbbrowse.c:1027
 #, c-format
-#| msgid "Failed to retrieve share list from server"
 msgid "Failed to retrieve share list from server: %s"
 msgstr "Falló al obtener la lista de compartición del servidor: %s"
 
@@ -1603,7 +1606,6 @@ msgstr "Se requiere contraseña para la compartición %s en %s"
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:660
 #, c-format
-#| msgid "Failed to mount Windows share"
 msgid "Failed to mount Windows share: %s"
 msgstr "Falló al montar la compartición Windows: %s"
 
@@ -1927,7 +1929,6 @@ msgstr "Falló al obtener org.gnome.OnlineAccounts.Files para %s"
 
 #: ../monitor/goa/goavolume.c:251
 #, c-format
-#| msgid "Invalid return value from %s"
 msgid "Invalid credentials for %s"
 msgstr "Credenciales no válidas para %s"
 
