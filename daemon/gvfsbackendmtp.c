@@ -1674,8 +1674,8 @@ do_read (GVfsBackend *backend,
 
 static void
 do_close_read (GVfsBackend *backend,
-                GVfsJobCloseRead *job,
-                GVfsBackendHandle opaque_handle)
+               GVfsJobCloseRead *job,
+               GVfsBackendHandle opaque_handle)
 {
   DEBUG ("(I) do_close_read");
   RWHandle *handle = opaque_handle;
@@ -1687,6 +1687,344 @@ do_close_read (GVfsBackend *backend,
   DEBUG ("(I) do_close_read done.");
 }
 
+
+#if HAVE_LIBMTP_1_1_6
+uint16_t zero_get_func (void* params,
+                        void* priv,
+                        uint32_t wantlen,
+                        unsigned char *data,
+                        uint32_t *gotlen)
+{
+  *gotlen = 0;
+  return LIBMTP_HANDLER_RETURN_OK;
+}
+
+
+static void
+do_create (GVfsBackend *backend,
+           GVfsJobOpenForWrite *job,
+           const char *filename,
+           GFileCreateFlags flags)
+{
+  if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                              _("Operation not supported."));
+    return;
+  }
+
+  DEBUG ("(I) do_create (%s)", filename);
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  gchar **elements = g_strsplit_set (filename, "/", -1);
+  unsigned int ne = g_strv_length (elements);
+
+  if (ne < 3) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_FAILED,
+                              _("Cannot create files in this location"));
+    goto exit;
+  }
+
+  int parent_id = 0;
+
+  if (ne > 3) {
+    parent_id = strtol (elements[ne-2], NULL, 10);
+  }
+
+  LIBMTP_mtpdevice_t *device;
+  device = G_VFS_BACKEND_MTP (backend)->device;
+
+  unsigned int id = strtol (elements[ne-1], NULL, 10);
+  char *existing_filename;
+  LIBMTP_file_t *existing_file = LIBMTP_Get_Filemetadata (device, id);
+  if (existing_file != NULL) {
+    existing_filename = strdup (existing_file->filename);
+    LIBMTP_destroy_file_t (existing_file);
+  } else {
+    existing_filename = strdup (elements[ne-1]);
+  }
+
+  LIBMTP_file_t *mtpfile = LIBMTP_new_file_t ();
+  mtpfile->filename = existing_filename;
+  mtpfile->parent_id = parent_id;
+  mtpfile->storage_id = strtol (elements[1], NULL, 10);
+  mtpfile->filetype = LIBMTP_FILETYPE_UNKNOWN;
+  mtpfile->filesize = 0;
+
+  int ret = LIBMTP_Send_File_From_Handler (device, zero_get_func, NULL,
+                                           mtpfile, NULL, NULL);
+  id = mtpfile->item_id;
+  LIBMTP_destroy_file_t (mtpfile);
+  if (ret != 0) {
+    fail_job (G_VFS_JOB (job), device);
+    DEBUG ("(I) Failed to create empty file.");
+    goto exit;
+  }
+
+  ret = LIBMTP_BeginEditObject (device, id);
+  if (ret != 0) {
+    fail_job (G_VFS_JOB (job), device);
+    DEBUG ("(I) Failed to begin edit.");
+    goto exit;
+  }
+
+  RWHandle *handle = g_new0(RWHandle, 1);
+  handle->handle_type = HANDLE_FILE;
+  handle->id = id;
+  handle->offset = 0;
+  handle->size = 0;
+
+  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
+  g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ exit:
+  g_strfreev (elements);
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  DEBUG ("(I) do_create done.");
+}
+
+
+static void
+do_append_to (GVfsBackend *backend,
+              GVfsJobOpenForWrite *job,
+              const char *filename,
+              GFileCreateFlags flags)
+{
+  if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                              _("Operation not supported."));
+    return;
+  }
+
+  DEBUG ("(I) do_append_to (%s)", filename);
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  gchar **elements = g_strsplit_set (filename, "/", -1);
+  unsigned int ne = g_strv_length (elements);
+
+  if (ne < 3) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_FAILED,
+                              _("Cannot open this entity"));
+    goto exit;
+  }
+
+  unsigned int id = strtol (elements[ne-1], NULL, 10);
+
+  LIBMTP_mtpdevice_t *device;
+  device = G_VFS_BACKEND_MTP (backend)->device;
+
+  LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, id);
+  if (file == NULL) {
+    fail_job (G_VFS_JOB (job), device);
+    DEBUG ("(I) Failed to get metadata.");
+    goto exit;
+  }
+
+  int ret = LIBMTP_BeginEditObject (device, id);
+  if (ret != 0) {
+    fail_job (G_VFS_JOB (job), device);
+    DEBUG ("(I) Failed to begin edit.");
+    goto exit;
+  }
+
+  RWHandle *handle = g_new0(RWHandle, 1);
+  handle->handle_type = HANDLE_FILE;
+  handle->id = id;
+  handle->offset = file->filesize;
+  handle->size = file->filesize;
+
+  LIBMTP_destroy_file_t (file);
+
+  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
+  g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ exit:
+  g_strfreev (elements);
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  DEBUG ("(I) do_append_to done.");
+}
+
+
+static void
+do_replace (GVfsBackend *backend,
+            GVfsJobOpenForWrite *job,
+            const char *filename,
+            const char *etag,
+            gboolean make_backup,
+            GFileCreateFlags flags)
+{
+  if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                              _("Operation not supported."));
+    return;
+  }
+
+  DEBUG ("(I) do_replace (%s)", filename);
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  gchar **elements = g_strsplit_set (filename, "/", -1);
+  unsigned int ne = g_strv_length (elements);
+
+  if (ne < 3) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_FAILED,
+                              _("Cannot open this entity"));
+    goto exit;
+  }
+
+  unsigned int id = strtol (elements[ne-1], NULL, 10);
+
+  LIBMTP_mtpdevice_t *device;
+  device = G_VFS_BACKEND_MTP (backend)->device;
+
+  LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, id);
+  if (file == NULL) {
+    g_strfreev (elements);
+    g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+    return do_create(backend, job, filename, flags);
+
+    fail_job (G_VFS_JOB (job), device);
+    DEBUG ("(I) Failed to get metadata.");
+    goto exit;
+  }
+
+  int ret = LIBMTP_BeginEditObject (device, id);
+  if (ret != 0) {
+    fail_job (G_VFS_JOB (job), device);
+    DEBUG ("(I) Failed to begin edit.");
+    goto exit;
+  }
+
+  ret = LIBMTP_TruncateObject (device, id, 0);
+  if (ret != 0) {
+    fail_job (G_VFS_JOB (job), device);
+    DEBUG ("(I) Failed to truncate.");
+    goto exit;
+  }
+
+  RWHandle *handle = g_new0(RWHandle, 1);
+  handle->handle_type = HANDLE_FILE;
+  handle->id = id;
+  handle->offset = 0;
+  handle->size = file->filesize;
+
+  LIBMTP_destroy_file_t (file);
+
+  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
+  g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ exit:
+  g_strfreev (elements);
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  DEBUG ("(I) do_replace done.");
+}
+
+
+static void
+do_write (GVfsBackend *backend,
+          GVfsJobWrite *job,
+          GVfsBackendHandle opaque_handle,
+          char *buffer,
+          gsize buffer_size)
+{
+  RWHandle *handle = opaque_handle;
+  uint32_t id = handle->id;
+  goffset offset = handle->offset;
+  gsize size = handle->size;
+
+  DEBUG ("(I) do_write (%u %lu %lu)", id, offset, buffer_size);
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  int ret = LIBMTP_SendPartialObject (G_VFS_BACKEND_MTP (backend)->device, id, offset,
+                                      buffer, buffer_size);
+  if (ret != 0) {
+    fail_job (G_VFS_JOB (job), G_VFS_BACKEND_MTP (backend)->device);
+    DEBUG ("(I) job failed.");
+    goto exit;
+  }
+
+  handle->offset = offset + buffer_size;
+  g_vfs_job_write_set_written_size (job, buffer_size);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ exit:
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+  DEBUG ("(I) do_write done.");
+}
+
+
+static void
+do_seek_on_write (GVfsBackend *backend,
+                  GVfsJobSeekWrite *job,
+                  GVfsBackendHandle opaque_handle,
+                  goffset offset,
+                  GSeekType type)
+{
+  RWHandle *handle = opaque_handle;
+  uint32_t id = handle->id;
+  goffset old_offset = handle->offset;
+  gsize size = handle->size;
+
+  DEBUG ("(I) do_seek_on_write (%u %lu %ld %u)", id, old_offset, offset, type);
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  if (type == G_SEEK_END) {
+    offset = size + offset;
+  } else if (type == G_SEEK_CUR) {
+    offset += old_offset;
+  }
+
+  if (offset < 0) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                              _("Can't seek outside file"));
+    goto exit;
+  }
+
+  handle->offset = offset;
+  g_vfs_job_seek_write_set_offset (job, offset);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ exit:
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+  DEBUG ("(I) do_seek_on_write done. (%lu)", offset);
+}
+
+
+static void
+do_close_write (GVfsBackend *backend,
+                GVfsJobCloseWrite *job,
+                GVfsBackendHandle opaque_handle)
+{
+  DEBUG ("(I) do_close_write");
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  RWHandle *handle = opaque_handle;
+
+  int ret = LIBMTP_EndEditObject (G_VFS_BACKEND_MTP (backend)->device, handle->id);
+  if (ret != 0) {
+    fail_job (G_VFS_JOB (job), G_VFS_BACKEND_MTP (backend)->device);
+    goto exit;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ exit:
+  g_free(handle);
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+  DEBUG ("(I) do_close_write done.");
+}
+#endif /* HAVE_LIBMTP_1_1_6 */
 
 /************************************************
  * 	  Class init
@@ -1723,4 +2061,12 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->seek_on_read = do_seek_on_read;
   backend_class->read = do_read;
   backend_class->close_read = do_close_read;
+#if HAVE_LIBMTP_1_1_6
+  backend_class->create = do_create;
+  backend_class->append_to = do_append_to;
+  backend_class->replace = do_replace;
+  backend_class->write = do_write;
+  backend_class->seek_on_write = do_seek_on_write;
+  backend_class->close_write = do_close_write;
+#endif
 }
