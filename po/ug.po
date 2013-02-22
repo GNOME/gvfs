@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-02-08 15:43+0000\n"
-"PO-Revision-Date: 2013-02-09 10:43+0900\n"
+"POT-Creation-Date: 2013-02-11 15:50+0000\n"
+"PO-Revision-Date: 2013-02-22 22:21+0900\n"
 "Last-Translator: Gheyret Kenji <gheyret@gmail.com>\n"
 "Language-Team: Uyghur Computer Science Association <UKIJ@yahoogroups.com>\n"
 "Language: \n"
@@ -311,7 +311,7 @@ msgstr "مۇلازىمېتىر «%s» نىڭدا ئىشلىتىدىغان ئات
 
 #: ../daemon/gvfsafpserver.c:1105
 msgid "The password prompt was cancelled."
-msgstr ""
+msgstr "ئىم كۆرسەتمىسى ئەمەلدىن قالدۇرۇلدى."
 
 #: ../daemon/gvfsafpserver.c:1222
 msgid "Unable to disconnect from the server."
@@ -431,7 +431,7 @@ msgid "Target directory already exists"
 msgstr "نىشان مۇندەرىجە مەۋجۇت"
 
 #: ../daemon/gvfsafpvolume.c:1219 ../daemon/gvfsbackendafp.c:590
-#: ../daemon/gvfsbackendmtp.c:1391
+#: ../daemon/gvfsbackendmtp.c:1402
 msgid "Can't rename volume"
 msgstr "دىسكىنىڭ ئاتىنى ئۆزگەرتكىلى بولمايدۇ"
 
@@ -508,7 +508,7 @@ msgid "Internal Apple File Control error"
 msgstr "ئالما ئىچكى ھۆججەت باشقۇرۇش ئۇچۇرى خاتالىقى"
 
 #: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:737
-#: ../daemon/gvfsbackendmtp.c:1199
+#: ../daemon/gvfsbackendmtp.c:1205
 msgid "File does not exist"
 msgstr "ھۆججەت مەۋجۇت ئەمەس"
 
@@ -700,8 +700,8 @@ msgid "Can't copy directory over directory"
 msgstr "مۇندەرىجىنى مۇندەرىجىگە كۆچۈرەلمىدى"
 
 #: ../daemon/gvfsbackendafp.c:293 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1209
-#: ../daemon/gvfsbackendmtp.c:1285 ../daemon/gvfsbackendobexftp.c:1818
+#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1215
+#: ../daemon/gvfsbackendmtp.c:1296 ../daemon/gvfsbackendobexftp.c:1818
 msgid "Can't recursively copy directory"
 msgstr "مۇندەرىجىنى قايتىلانما كۆچۈرەلمەيدۇ"
 
@@ -850,7 +850,7 @@ msgstr "دىسكا ئالدىراش\n"
 "بىر ياكى بىر قانچە پروگرامما دىسكىنى ئىگىلىۋالغان."
 
 #: ../daemon/gvfsbackendcdda.c:357 ../daemon/gvfsbackendgphoto2.c:1548
-#: ../daemon/gvfsbackendmtp.c:449
+#: ../daemon/gvfsbackendmtp.c:455
 msgid "Cannot create gudev client"
 msgstr "gudev خېرىدارىنى قۇرالمايدۇ"
 
@@ -1132,7 +1132,7 @@ msgstr "كامېرا"
 msgid "Audio Player"
 msgstr "ئۈن قويغۇچ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:441
+#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:447
 msgid "No device specified"
 msgstr "ئۈسكۈنە بەلگىلەنمىگەن"
 
@@ -1187,7 +1187,7 @@ msgstr "ھۆججەتكە ئېرىشىۋاتقاندا خاتالىق كۆرۈل�
 msgid "Error getting data from file"
 msgstr "ھۆججەتتىن سانلىق-مەلۇماتقا ئېرىشىۋاتقاندا خاتالىق كۆرۈلدى"
 
-#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1470
+#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1481
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "سىنبەلگە تونۇتۇش بەلگىسى ‹%s› نىڭ فورماتى خاتا"
@@ -1293,72 +1293,76 @@ msgid "Directory notification not supported"
 msgstr "مۇندەرىجە ئۇقتۇرۇشىنى قوللىمايدۇ"
 
 #: ../daemon/gvfsbackendmtp.c:289
+msgid "Unknown error."
+msgstr "نامەلۇم خاتالىق."
+
+#: ../daemon/gvfsbackendmtp.c:295
 #, c-format
 msgid "libmtp error: %s"
 msgstr "libmtp خاتالىق: %s"
 
-#: ../daemon/gvfsbackendmtp.c:395
+#: ../daemon/gvfsbackendmtp.c:401
 msgid "Unexpected host uri format."
-msgstr ""
+msgstr "ئويلاپمۇ باقمىغان كومپيۇتېر uri پىچىمى."
 
-#: ../daemon/gvfsbackendmtp.c:405
+#: ../daemon/gvfsbackendmtp.c:411
 msgid "Malformed host uri."
-msgstr ""
+msgstr "كومپيۇتېرنىڭ بولمىغۇر uri."
 
-#: ../daemon/gvfsbackendmtp.c:418
+#: ../daemon/gvfsbackendmtp.c:424
 msgid "Couldn't find matching udev device."
 msgstr "ماس udev كېلىدىغان  ئۈسكۈنىسى تېپىلمىدى."
 
-#: ../daemon/gvfsbackendmtp.c:558
+#: ../daemon/gvfsbackendmtp.c:564
 msgid "No MTP devices found"
 msgstr "MTP ئۈسكۈنىسى تېپىلمىدى"
 
-#: ../daemon/gvfsbackendmtp.c:563
+#: ../daemon/gvfsbackendmtp.c:569
 msgid "Unable to connect to MTP device"
 msgstr "MTP ئۈسكۈنىسىگە باغلانغىلى بولمىدى"
 
-#: ../daemon/gvfsbackendmtp.c:568
+#: ../daemon/gvfsbackendmtp.c:574
 msgid "Unable to allocate memory while detecting MTP devices"
 msgstr "MTP ئۈسكۈنىسىنى ئىزدەۋاتقاندا ئەسلەك تەقسىملىگىلى بولمىدى"
 
-#: ../daemon/gvfsbackendmtp.c:574
+#: ../daemon/gvfsbackendmtp.c:580
 msgid "Generic libmtp error"
 msgstr "ئادەتتىكى libmtp خاتالىقى"
 
-#: ../daemon/gvfsbackendmtp.c:591
+#: ../daemon/gvfsbackendmtp.c:597
 #, c-format
 msgid "Unable to open MTP device '%s'"
 msgstr "MTP ئۈسكۈنىسى ‹%s› نى ئاچقىلى بولمىدى"
 
-#: ../daemon/gvfsbackendmtp.c:634
+#: ../daemon/gvfsbackendmtp.c:640
 msgid "Unnamed Device"
 msgstr "نامسىز ئۈسكۈنە"
 
-#: ../daemon/gvfsbackendmtp.c:1002 ../daemon/gvfsbackendmtp.c:1075
+#: ../daemon/gvfsbackendmtp.c:1008 ../daemon/gvfsbackendmtp.c:1081
 msgid "No storage volumes found"
 msgstr "ساقلاش دىسكىسى تېپىلمىدى"
 
-#: ../daemon/gvfsbackendmtp.c:1024
+#: ../daemon/gvfsbackendmtp.c:1030
 msgid "File not found"
 msgstr "ھۆججەت تېپىلمىدى"
 
-#: ../daemon/gvfsbackendmtp.c:1132
+#: ../daemon/gvfsbackendmtp.c:1138
 msgid "Cannot make directory in this location"
 msgstr "بۇ ئورۇنغا مۇندەرىجە ياسىغىلى بولمايدۇ"
 
-#: ../daemon/gvfsbackendmtp.c:1188 ../daemon/gvfsbackendsmbbrowse.c:1183
+#: ../daemon/gvfsbackendmtp.c:1194 ../daemon/gvfsbackendsmbbrowse.c:1183
 msgid "Not a regular file"
 msgstr "ئادەتتىكى ھۆججەت ئەمەس"
 
-#: ../daemon/gvfsbackendmtp.c:1258
+#: ../daemon/gvfsbackendmtp.c:1269
 msgid "Cannot write to this location"
 msgstr "بۇ ئورۇنغا ياشىغىلى بولمايدۇ"
 
-#: ../daemon/gvfsbackendmtp.c:1350
+#: ../daemon/gvfsbackendmtp.c:1361
 msgid "Cannot delete this entity"
 msgstr "مەزكۇر كىرگۈنى ئۆچۈرگىلى بولمايدۇ"
 
-#: ../daemon/gvfsbackendmtp.c:1462
+#: ../daemon/gvfsbackendmtp.c:1473
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "كىرگۈ ‹%s› نىڭ كىچىك سۈرەتلىرى يوق"
@@ -1552,7 +1556,6 @@ msgstr "%s دىكى Windows ھەمبەھىر"
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmbbrowse.c:1027
 #, c-format
-#| msgid "Failed to retrieve share list from server"
 msgid "Failed to retrieve share list from server: %s"
 msgstr "مۇلازىمېتىردىن ھەمبەھىر تىزىمىغا ئېرىشىش مەغلۇپ بولدى: %s"
 
@@ -1569,7 +1572,6 @@ msgstr "%2$s دىكى %1$s ھەمبەھىرگە ئىم زۆرۈر"
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:660
 #, c-format
-#| msgid "Failed to mount Windows share"
 msgid "Failed to mount Windows share: %s"
 msgstr "Windows ھەمبەھىرىنى ئېگەرلەش مەغلۇپ بولدى: %s"
 
@@ -1880,7 +1882,6 @@ msgstr "%s نىڭ org.gnome.OnlineAccounts.Files ھۆججىتىنى مەغلۇپ
 
 #: ../monitor/goa/goavolume.c:251
 #, c-format
-#| msgid "Invalid return value from %s"
 msgid "Invalid credentials for %s"
 msgstr " %s نىڭ ئىسپاتنامىسى ئىناۋەتسىز"
 
@@ -2791,7 +2792,8 @@ msgstr "%s ھۆججەت يۆتكەش خاتالىقى: %s\n"
 msgid ""
 "Open files with the default application that\n"
 "is registered to handle files of this type."
-msgstr ""
+msgstr "مۇشۇ تىپتىكى ھۆججەتلەرنى ئاچىدىغان خەتلىتىلگەن\n"
+" پروگراممىنى ئىشلىتىپ ھۆججەتلەرنى ئاچىدۇ."
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
