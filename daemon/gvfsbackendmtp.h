@@ -54,6 +54,8 @@ struct _GVfsBackendMtp
   LIBMTP_mtpdevice_t *device;
   char *dev_path;
 
+  GHashTable *file_cache;
+
   GHashTable *monitors;
   guint hb_id;
   gint unmount_started;
