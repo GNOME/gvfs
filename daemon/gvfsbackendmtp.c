@@ -106,6 +106,26 @@ DEBUG_ENUMERATE (const gchar *message, ...)
 
 
 /************************************************
+ * Private Types
+ ************************************************/
+
+typedef enum {
+  HANDLE_FILE,
+  HANDLE_PREVIEW,
+} HandleType;
+
+typedef struct {
+  HandleType handle_type;
+  uint32_t id;
+  goffset offset;
+  gsize size;
+
+  /* For previews only */
+  GByteArray *bytes;
+} RWHandle;
+
+
+/************************************************
  * Initialization
  ************************************************/
 
@@ -1447,30 +1467,26 @@ do_open_icon_for_read (GVfsBackend *backend,
   guint id = strtol (icon_id, NULL, 10);
 
   if (id > 0) {
+    GByteArray *bytes;
     unsigned char *data;
     unsigned int size;
     int ret = LIBMTP_Get_Thumbnail (G_VFS_BACKEND_MTP (backend)->device, id,
                                     &data, &size);
     if (ret == 0) {
       DEBUG ("File %u has thumbnail: %u", id, size);
-      GByteArray *bytes = g_byte_array_sized_new (size);
+      bytes = g_byte_array_sized_new (size);
       g_byte_array_append (bytes, data, size);
       free (data);
-      g_vfs_job_open_for_read_set_can_seek (G_VFS_JOB_OPEN_FOR_READ (job), FALSE);
-      g_vfs_job_open_for_read_set_handle (G_VFS_JOB_OPEN_FOR_READ (job), bytes);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
     } else {
       LIBMTP_filesampledata_t *sample_data = LIBMTP_new_filesampledata_t ();
       ret = LIBMTP_Get_Representative_Sample (G_VFS_BACKEND_MTP (backend)->device,
                                               id, sample_data);
       if (ret == 0) {
         DEBUG ("File %u has sampledata: %u", id, size);
-        GByteArray *bytes = g_byte_array_sized_new (sample_data->size);
+        bytes = g_byte_array_sized_new (sample_data->size);
         g_byte_array_append (bytes, (const guint8 *)sample_data->data, sample_data->size);
+        size = sample_data->size;
         LIBMTP_destroy_filesampledata_t (sample_data);
-        g_vfs_job_open_for_read_set_can_seek (G_VFS_JOB_OPEN_FOR_READ (job), FALSE);
-        g_vfs_job_open_for_read_set_handle (G_VFS_JOB_OPEN_FOR_READ (job), bytes);
-        g_vfs_job_succeeded (G_VFS_JOB (job));
       } else {
         DEBUG ("File %u has no thumbnail:", id);
         g_vfs_job_failed (G_VFS_JOB (job),
@@ -1478,58 +1494,121 @@ do_open_icon_for_read (GVfsBackend *backend,
                           G_IO_ERROR_NOT_FOUND,
                           _("No thumbnail for entity '%s'"),
                           icon_id);
+        goto exit;
       }
     }
+
+    RWHandle *handle = g_new0(RWHandle, 1);
+    handle->handle_type = HANDLE_PREVIEW;
+    handle->id = id;
+    handle->offset = 0;
+    handle->size = size;
+    handle->bytes = bytes;
+    g_vfs_job_open_for_read_set_can_seek (G_VFS_JOB_OPEN_FOR_READ (job), TRUE);
+    g_vfs_job_open_for_read_set_handle (G_VFS_JOB_OPEN_FOR_READ (job), handle);
+    g_vfs_job_succeeded (G_VFS_JOB (job));
   } else {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR,
                       G_IO_ERROR_INVALID_ARGUMENT,
                       _("Malformed icon identifier '%s'"),
                       icon_id);
+    goto exit;
   }
+
+ exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   DEBUG ("(I) do_open_icon_for_read done.");
 }
+#endif /* HAVE_LIBMTP_GET_THUMBNAIL */
 
 
-static gboolean
-try_read (GVfsBackend *backend,
-          GVfsJobRead *job,
-          GVfsBackendHandle handle,
-          char *buffer,
-          gsize bytes_requested)
+static void
+do_seek_on_read (GVfsBackend *backend,
+                 GVfsJobSeekRead *job,
+                 GVfsBackendHandle opaque_handle,
+                 goffset    offset,
+                 GSeekType  type)
 {
-  GByteArray *bytes = handle;
+  RWHandle *handle = opaque_handle;
+  uint32_t id = handle->id;
+  goffset old_offset = handle->offset;
+  gsize size = handle->size;
 
-  DEBUG ("(I) try_read (%u %lu)", bytes->len, bytes_requested);
+  DEBUG ("(I) do_seek_on_read (%u %lu %ld %u)", id, old_offset, offset, type);
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  gsize bytes_to_copy =  MIN (bytes->len, bytes_requested);
-  if (bytes_to_copy == 0) {
-    goto out;
+  if (type == G_SEEK_END) {
+    offset = size + offset;
+  } else if (type == G_SEEK_CUR) {
+    offset += old_offset;
   }
-  memcpy (buffer, bytes->data, bytes_to_copy);
-  g_byte_array_remove_range (bytes, 0, bytes_to_copy);
 
- out:
-  g_vfs_job_read_set_size (job, bytes_to_copy);
+  if (offset > size || offset < 0) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                              _("Can't seek outside file"));
+    goto exit;
+  }
+
+  handle->offset = offset;
+  g_vfs_job_seek_read_set_offset (job, offset);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  DEBUG ("(I) try_read done.");
-  return TRUE;
+ exit:
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+  DEBUG ("(I) do_seek_on_read done. (%lu)", offset);
+}
+
+
+static void
+do_read (GVfsBackend *backend,
+         GVfsJobRead *job,
+         GVfsBackendHandle opaque_handle,
+         char *buffer,
+         gsize bytes_requested)
+{
+  RWHandle *handle = opaque_handle;
+  uint32_t id = handle->id;
+  goffset offset = handle->offset;
+  gsize size = handle->size;
+
+  DEBUG ("(I) do_read (%u %lu %lu)", id, offset, bytes_requested);
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  uint32_t actual;
+  if (handle->handle_type == HANDLE_FILE) {
+    g_assert_not_reached();
+  } else {
+    GByteArray *bytes = handle->bytes;
+    actual = MIN (bytes->len - offset, bytes_requested);
+    memcpy (buffer, bytes->data + offset, actual);
+  }
+
+  handle->offset = offset + actual;
+  g_vfs_job_read_set_size (job, actual);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ exit:
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+  DEBUG ("(I) do_read done.");
 }
 
 static void
 do_close_read (GVfsBackend *backend,
                 GVfsJobCloseRead *job,
-                GVfsBackendHandle handle)
+                GVfsBackendHandle opaque_handle)
 {
   DEBUG ("(I) do_close_read");
-  g_byte_array_unref (handle);
+  RWHandle *handle = opaque_handle;
+  if (handle->bytes) {
+    g_byte_array_unref (handle->bytes);
+  }
+  g_free(handle);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   DEBUG ("(I) do_close_read done.");
 }
-#endif /* HAVE_LIBMTP_GET_THUMBNAIL */
 
 
 /************************************************
@@ -1560,7 +1639,8 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->create_file_monitor = do_create_file_monitor;
 #if HAVE_LIBMTP_1_1_5
   backend_class->open_icon_for_read = do_open_icon_for_read;
-  backend_class->try_read = try_read;
-  backend_class->close_read = do_close_read;
 #endif
+  backend_class->seek_on_read = do_seek_on_read;
+  backend_class->read = do_read;
+  backend_class->close_read = do_close_read;
 }
