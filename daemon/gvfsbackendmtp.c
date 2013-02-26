@@ -264,12 +264,27 @@ static CacheEntry *get_cache_entry (GVfsBackendMtp *backend,
 }
 
 
+static gboolean
+remove_cache_entry_by_prefix (gpointer key,
+                              gpointer value,
+                              gpointer user_data)
+{
+  const char *path = key;
+  const char *prefix = user_data;
+
+  return g_str_has_prefix (path, prefix);
+}
+
+
 static void
 remove_cache_entry (GVfsBackendMtp *backend,
                     const char *path)
 {
   DEBUG ("(III) remove_cache_entry: %s", path);
-  g_hash_table_remove (backend->file_cache, path);
+  //g_hash_table_remove (backend->file_cache, path);
+  g_hash_table_foreach_remove (backend->file_cache,
+                               remove_cache_entry_by_prefix,
+                               (gpointer) path);
   DEBUG ("(III) remove_cache_entry done");
 }
 
