@@ -1,14 +1,14 @@
 # Vietnamese translation for GVFS.
 # Copyright © 2009 GNOME i18n Project for Vietnamese.
 # Clytie Siddall <clytie@riverland.net.au>, 2008-2009.
-# Nguyễn Thái Ngọc Duy <pclouds@gmail.com>, 2011-2012.
+# Nguyễn Thái Ngọc Duy <pclouds@gmail.com>, 2011-2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.1.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2013-02-11 15:50+0000\n"
-"PO-Revision-Date: 2013-03-02 20:45+0700\n"
+"PO-Revision-Date: 2013-03-02 20:54+0700\n"
 "Last-Translator: Nguyễn Thái Ngọc Duy <pclouds@gmail.com>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
 "Language: vi\n"
@@ -167,10 +167,9 @@ msgstr "Quá hạn khi tìm dịch vụ « %s » « %s » trên miền « %s »"
 
 #: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
-#, fuzzy, c-format
-#| msgid "Malformed dns-sd encoded_triple '%s'"
+#, c-format
 msgid "Malformed DNS-SD encoded_triple '%s'"
-msgstr "dns-sd encoded_triple dạng sai « %s »"
+msgstr "DNS-SD encoded_triple dạng sai '%s'"
 
 #: ../common/gvfsicon.c:250
 #, c-format
@@ -1307,95 +1306,78 @@ msgstr "Thông báo thư mục không được hỗ trợ"
 
 #: ../daemon/gvfsbackendmtp.c:289
 msgid "Unknown error."
-msgstr ""
+msgstr "Lỗi lạ."
 
 #: ../daemon/gvfsbackendmtp.c:295
-#, fuzzy, c-format
-#| msgid "HTTP Client Error: %s"
+#, c-format
 msgid "libmtp error: %s"
-msgstr "Lỗi ứng dụng khách HTTP: %s"
+msgstr "lỗi libmtp: %s"
 
 #: ../daemon/gvfsbackendmtp.c:401
-#, fuzzy
-#| msgid "Unexpected end of stream"
 msgid "Unexpected host uri format."
-msgstr "Luồng bị kết thúc bất ngờ"
+msgstr "Định dạng uri máy không ngờ."
 
 #: ../daemon/gvfsbackendmtp.c:411
 msgid "Malformed host uri."
-msgstr ""
+msgstr "uri máy hư."
 
 #: ../daemon/gvfsbackendmtp.c:424
 msgid "Couldn't find matching udev device."
-msgstr ""
+msgstr "Không thể tìm thiết bị udev khớp."
 
 #: ../daemon/gvfsbackendmtp.c:564
-#, fuzzy
-#| msgid "No device specified"
 msgid "No MTP devices found"
-msgstr "Chưa xác định thiết bị"
+msgstr "Không tìm thấy thiết bị MTP"
 
 #: ../daemon/gvfsbackendmtp.c:569
-#, fuzzy
-#| msgid "Unable to connect"
 msgid "Unable to connect to MTP device"
-msgstr "Không thể kết nối"
+msgstr "Không thể kết nối đến thiết bị MTP"
 
 #: ../daemon/gvfsbackendmtp.c:574
 msgid "Unable to allocate memory while detecting MTP devices"
-msgstr ""
+msgstr "Không thể cấp phát bộ nhớ khi dò tìm thiết bị MTP"
 
 #: ../daemon/gvfsbackendmtp.c:580
 msgid "Generic libmtp error"
-msgstr ""
+msgstr "Lỗi libmtp chung"
 
 #: ../daemon/gvfsbackendmtp.c:597
 #, c-format
 msgid "Unable to open MTP device '%s'"
-msgstr ""
+msgstr "Không thể mở thiết bị MTP '%s'"
 
 #: ../daemon/gvfsbackendmtp.c:640
-#, fuzzy
-#| msgid "Unnamed Drive"
 msgid "Unnamed Device"
-msgstr "Ổ không tên"
+msgstr "Thiết bị không tên"
 
 #: ../daemon/gvfsbackendmtp.c:1008 ../daemon/gvfsbackendmtp.c:1081
 msgid "No storage volumes found"
-msgstr ""
+msgstr "Không tìm thấy lưu trữ"
 
 #: ../daemon/gvfsbackendmtp.c:1030
-#, fuzzy
-#| msgid "ID not found"
 msgid "File not found"
-msgstr "ID không tìm ra"
+msgstr "Không tìm thấy tập tin"
 
 #: ../daemon/gvfsbackendmtp.c:1138
-#, fuzzy
-#| msgid "Can't move a shared directory into the Trash"
 msgid "Cannot make directory in this location"
-msgstr "Không thể di chuyển thư mục được chia sẻ vào Sọt rác"
+msgstr "Không thể tạo thư mục chỗ này"
 
 #: ../daemon/gvfsbackendmtp.c:1194 ../daemon/gvfsbackendsmbbrowse.c:1183
 msgid "Not a regular file"
 msgstr "Không phải là một tập tin tiêu chuẩn"
 
 #: ../daemon/gvfsbackendmtp.c:1269
-#, fuzzy
-#| msgid "Can't write to directory"
 msgid "Cannot write to this location"
-msgstr "Không thể ghi vào thư mục"
+msgstr "Không thể ghi ở chỗ này"
 
 #: ../daemon/gvfsbackendmtp.c:1361
-#, fuzzy
-#| msgid "Cannot create libhal context"
 msgid "Cannot delete this entity"
-msgstr "Không thể tạo ngữ cảnh libhal"
+msgstr "Không thể xoá thực thể này"
 
 #: ../daemon/gvfsbackendmtp.c:1473
 #, c-format
 msgid "No thumbnail for entity '%s'"
-msgstr ""
+msgstr "Không có ảnh nhỏ cho '%s'"
 
 #: ../daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
@@ -1443,10 +1425,8 @@ msgid "Recent"
 msgstr "Gần đây"
 
 #: ../daemon/gvfsbackendsftp.c:299 ../daemon/gvfsbackendsftp.c:654
-#, fuzzy
-#| msgid "ssh program unexpectedly exited"
 msgid "SSH program unexpectedly exited"
-msgstr "Chương trình SSH đã thoát bất thường"
+msgstr "Chương trình SSH đã thoát bất ngờ"
 
 #: ../daemon/gvfsbackendsftp.c:314
 msgid "Hostname not known"
@@ -1465,16 +1445,13 @@ msgid "Host key verification failed"
 msgstr "Lỗi thẩm tra khoá của máy"
 
 #: ../daemon/gvfsbackendsftp.c:498
-#, fuzzy
-#| msgid "Unable to spawn ssh program"
 msgid "Unable to spawn SSH program"
-msgstr "Không thể tạọ và thực hiện chương trình SSH"
+msgstr "Không thể chạy chương trình SSH"
 
 #: ../daemon/gvfsbackendsftp.c:514
-#, fuzzy, c-format
-#| msgid "Unable to spawn ssh program: %s"
+#, c-format
 msgid "Unable to spawn SSH program: %s"
-msgstr "Không thể tạọ và thực hiện chương trình SSH: %s"
+msgstr "Không thể chạy chương trình SSH: %s"
 
 #: ../daemon/gvfsbackendsftp.c:616 ../daemon/gvfsbackendsftp.c:874
 msgid "Timed out when logging in"
@@ -1505,13 +1482,7 @@ msgid "Cancel Login"
 msgstr "Thôi đăng nhập"
 
 #: ../daemon/gvfsbackendsftp.c:1061
-#, fuzzy, c-format
-#| msgid ""
-#| "The identity of the remote computer (%s) is unknown.\n"
-#| "This happens when you log in to a computer the first time.\n"
-#| "\n"
-#| "The identity sent by the remote computer is %s. If you want to be "
-#| "absolutely sure it is safe to continue, contact the system administrator."
+#, c-format
 msgid ""
 "Can't verify the identity of “%s”.\n"
 "This happens when you log in to a computer the first time.\n"
@@ -1519,10 +1490,10 @@ msgid ""
 "The identity sent by the remote computer is “%s”. If you want to be "
 "absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
-"Không rõ máy ở xa (%s) là máy gì.\n"
-"Trường hợp này xảy ra khi bạn đăng nhập vào một máy tính lần đầu tiên.\n"
+"Không thể xác minh máy “%s”.\n"
+"Việc này xảy ra khi bạn đăng nhập vào một máy tính lần đầu tiên.\n"
 "\n"
-"Máy tính ở xa đã gửi thông tin nhận diện là %s. Nếu bạn muốn đảm bảo là an "
+"Máy tính ở xa đã gửi thông tin nhận diện là “%s”. Nếu bạn muốn đảm bảo là an "
 "toàn để tiếp tục, hãy liên lạc với nhà quản trị hệ thống."
 
 #: ../daemon/gvfsbackendsftp.c:1080
@@ -1538,10 +1509,8 @@ msgid "Protocol error"
 msgstr "Lỗi giao thức"
 
 #: ../daemon/gvfsbackendsftp.c:1728
-#, fuzzy
-#| msgid "Unable to find supported ssh command"
 msgid "Unable to find supported SSH command"
-msgstr "Không tìm thấy câu lệnh ssh được hỗ trợ"
+msgstr "Không tìm thấy câu lệnh SSH được hỗ trợ"
 
 #: ../daemon/gvfsbackendsftp.c:2002 ../daemon/gvfsbackendsftp.c:2404
 #: ../daemon/gvfsbackendsftp.c:2463 ../daemon/gvfsbackendsftp.c:2474
@@ -1603,10 +1572,9 @@ msgstr "Vùng chia sẻ Windows trên %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmbbrowse.c:1027
-#, fuzzy, c-format
-#| msgid "Failed to retrieve share list from server"
+#, c-format
 msgid "Failed to retrieve share list from server: %s"
-msgstr "Lỗi lấy danh sách chia sẻ từ máy phục vụ"
+msgstr "Lỗi lấy danh sách chia sẻ từ máy phục vụ: %s"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1532
 msgid "Windows Network File System Service"
@@ -1620,10 +1588,9 @@ msgstr "Yêu cầu mật khẩu cho vùng chia sẻ %s trên %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:660
-#, fuzzy, c-format
-#| msgid "Failed to mount Windows share"
+#, c-format
 msgid "Failed to mount Windows share: %s"
-msgstr "Lỗi gắn kết vùng chia sẻ Windows"
+msgstr "Lỗi gắn kết vùng chia sẻ Windows: %s"
 
 #: ../daemon/gvfsbackendsmb.c:853 ../daemon/gvfsbackendsmb.c:1349
 msgid "Unsupported seek type"
@@ -1939,18 +1906,17 @@ msgstr ""
 #: ../monitor/goa/goavolume.c:214
 #, c-format
 msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
-msgstr ""
+msgstr "Lỗi gấy org.gnome.OnlineAccounts.Files cho %s"
 
 #: ../monitor/goa/goavolume.c:251
-#, fuzzy, c-format
-#| msgid "Invalid return value from %s"
+#, c-format
 msgid "Invalid credentials for %s"
-msgstr "Giá trị đáp ứng không hợp lệ từ %s"
+msgstr "Giấy uỷ nhiệm không hợp lệ cho %s"
 
 #: ../monitor/goa/goavolume.c:268
 #, c-format
 msgid "Unsupported authentication method for %s"
-msgstr ""
+msgstr "Phương thức xác thực cho %s không hợp lệ"
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
@@ -2794,7 +2760,7 @@ msgstr "Bỏ mọi gắn kết theo kế hoạch đã cho"
 
 #: ../programs/gvfs-mount.c:61
 msgid "SCHEME"
-msgstr ""
+msgstr "SCHEME"
 
 #. Translator: List here is a verb as in 'List all mounts'
 #: ../programs/gvfs-mount.c:63
@@ -2989,7 +2955,7 @@ msgstr "Lỗi đặt thuộc tính: %s\n"
 
 #: ../programs/gvfs-trash.c:69
 msgid "Empty the trash"
-msgstr ""
+msgstr "Đổ rác"
 
 #: ../programs/gvfs-trash.c:91
 msgid "Move files or directories to the trash."
