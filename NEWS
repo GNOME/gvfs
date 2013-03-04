@@ -1,3 +1,14 @@
+Major changes in 1.15.4
+=======================
+* gdu,udisks2: Make use of new ID_FS_BOOT_SYSTEM_ID udev property
+* fuse: Install systemd tmpfiles.d exclusion file
+* mtp: Fix crash when libmtp operations fails without error message
+* mtp: Respect remove_source when pulling a file
+* mtp: Respect remove_source in do_push
+* tests: Add gvfs-testbed to enable tests which need root
+* tests: Check for URI string presence on CLI unmount
+* Translation updates
+
 Major changes in 1.15.3
 =======================
 * New gnome-online-accounts volume monitor written by Debarshi Ray
