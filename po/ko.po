@@ -21,7 +21,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2013-02-11 15:50+0000\n"
-"PO-Revision-Date: 2013-03-12 02:45+0900\n"
+"PO-Revision-Date: 2013-03-12 02:46+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: GNOME Korea <gnome-kr@googlegroups.com>\n"
 "Language: Korean\n"
@@ -1595,10 +1595,9 @@ msgstr "윈도우 공유, 위치 %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmbbrowse.c:1027
-#, fuzzy, c-format
-#| msgid "Failed to retrieve share list from server"
+#, c-format
 msgid "Failed to retrieve share list from server: %s"
-msgstr "서버에서 공유 목록을 가져오는데 실패했습니다"
+msgstr "서버에서 공유 목록을 가져오는데 실패했습니다: %s"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1532
 msgid "Windows Network File System Service"
@@ -1612,10 +1611,9 @@ msgstr "%2$s의 %1$s에 연결하려면 암호가 필요합니다"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:660
-#, fuzzy, c-format
-#| msgid "Failed to mount Windows share"
+#, c-format
 msgid "Failed to mount Windows share: %s"
-msgstr "윈도우 공유를 마운트 하는데 실패했습니다"
+msgstr "윈도우 공유를 마운트 하는데 실패했습니다: %s"
 
 #: ../daemon/gvfsbackendsmb.c:853 ../daemon/gvfsbackendsmb.c:1349
 msgid "Unsupported seek type"
@@ -1932,7 +1930,7 @@ msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
 msgstr "%s에 대한 org.gnome.OnlineAccounts.Files 값을 가져오는데 실패했습니다"
 
 #: ../monitor/goa/goavolume.c:251
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid credentials for %s"
 msgstr "%s에 대한 비밀 값이 잘못되었습니다"
 
