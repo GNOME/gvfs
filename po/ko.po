@@ -20,7 +20,7 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2012-09-14 14:17+0000\n"
-"PO-Revision-Date: 2012-11-07 07:34+0900\n"
+"PO-Revision-Date: 2013-02-19 01:49+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: GNOME Korea <gnome-kr@googlegroups.com>\n"
 "Language: Korean\n"
@@ -37,17 +37,17 @@ msgstr "동작을 지원하지 않습니다. 파일이 각각 다른곳에 마�
 #: ../client/gdaemonfile.c:1034 ../client/gdaemonfile.c:3110
 #: ../client/gvfsiconloadable.c:304
 msgid "Couldn't get stream file descriptor"
-msgstr "파일 기술자 스트림을 가져올 수 없습니다"
+msgstr "파일 디스크립터 스트림을 가져올 수 없습니다"
 
 #: ../client/gdaemonfile.c:1163 ../client/gdaemonfile.c:1235
 #: ../client/gvfsiconloadable.c:129
 msgid "Didn't get stream file descriptor"
-msgstr "파일 기술자 스트림을 가져올 수 없습니다"
+msgstr "파일 디스크립터 스트림을 가져오지 않았습니다"
 
 #: ../client/gdaemonfile.c:1356
 #, c-format
 msgid "Invalid return value from %s"
-msgstr "%s에 잘못된 반환값"
+msgstr "%s에서 반환값이 잘못되었습니다"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
@@ -109,7 +109,7 @@ msgstr "동작을 취소했습니다"
 #: ../client/gdaemonfileoutputstream.c:1246
 #, c-format
 msgid "Error in stream protocol: %s"
-msgstr "스트림 프로토콜 오류: %s"
+msgstr "스트림 프로토콜에 오류: %s"
 
 #: ../client/gdaemonfileinputstream.c:535
 #: ../client/gdaemonfileinputstream.c:1694
@@ -516,7 +516,7 @@ msgstr "쓰기 모드로 파일이 열지 못했습니다"
 
 #: ../daemon/gvfsafpvolume.c:2651
 msgid "File is locked by another user"
-msgstr "다른 사용자가 파일을 잠궜습니다."
+msgstr "다른 사용자가 파일을 잠궜습니다"
 
 #: ../daemon/gvfsafpvolume.c:2790
 msgid "File is not open for read access"
@@ -1737,7 +1737,7 @@ msgstr "위치가 마운트 정보가 아닙니다"
 #: ../metadata/meta-daemon.c:373
 #, c-format
 msgid "Can't find metadata file %s"
-msgstr "%s 메타데이터 파일을 찾을 수 없습니다."
+msgstr "%s 메타데이터 파일을 찾을 수 없습니다"
 
 #: ../metadata/meta-daemon.c:151 ../metadata/meta-daemon.c:163
 msgid "Unable to set metadata key"
@@ -2576,7 +2576,7 @@ msgstr "MIME 형식에 대해 핸들러를 설정합니다"
 
 #: ../programs/gvfs-mime.c:82
 msgid "MIMETYPE"
-msgstr "<MIME 형식>"
+msgstr "<MIME형식>"
 
 #: ../programs/gvfs-mime.c:82
 msgid "HANDLER"
@@ -2588,7 +2588,7 @@ msgstr "MIME 형식에 대해 핸들러를 가져오거나 설정합니다."
 
 #: ../programs/gvfs-mime.c:95
 msgid "Specify either --query or --set"
-msgstr "--query 또는 --set 둘 중 하나를 지정합니다"
+msgstr "--query 또는 --set 둘 중 하나를 지정하십시오"
 
 #: ../programs/gvfs-mime.c:106
 #, c-format
@@ -2657,7 +2657,7 @@ msgstr "디렉터리를 만드는 중 오류: %s\n"
 # 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
 msgid "Don't send single MOVED events"
-msgstr "MOVED 이벤트 1개를 보내지 않습니다."
+msgstr "MOVED 이벤트 1개를 보내지 않습니다"
 
 #: ../programs/gvfs-monitor-dir.c:113
 msgid "Monitor directories for changes."
@@ -2692,11 +2692,11 @@ msgstr "꺼내기"
 # 커맨드라인 옵션 설명: 문장으로 번역한다
 #: ../programs/gvfs-mount.c:61
 msgid "Unmount all mounts with the given scheme"
-msgstr "주어진 방식으로 마운트한 사항을 모두 해제합니다"
+msgstr "주어진 방식으로 마운트한 사항을 모두 마운트 해제합니다"
 
 #: ../programs/gvfs-mount.c:61
 msgid "SCHEME"
-msgstr "<스킴>"
+msgstr "<방식>"
 
 #. Translator: List here is a verb as in 'List all mounts'
 #: ../programs/gvfs-mount.c:63
