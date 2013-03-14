@@ -137,10 +137,8 @@ find_enclosing_mount_cb (GObject *source_object, GAsyncResult *res, gpointer use
   GSimpleAsyncResult *simple = user_data;
   GVfsGoaVolume *self;
   GError *error;
-  MountOp *data;
 
   self = G_VFS_GOA_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
-  data = g_async_result_get_user_data (G_ASYNC_RESULT (simple));
 
   error = NULL;
   g_clear_object (&self->mount);
@@ -156,12 +154,7 @@ mount_enclosing_volume_cb (GObject *source_object, GAsyncResult *res, gpointer u
 {
   GFile *root = G_FILE (source_object);
   GSimpleAsyncResult *simple = user_data;
-  GVfsGoaVolume *self;
   GError *error;
-  MountOp *data;
-
-  self = G_VFS_GOA_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
-  data = g_async_result_get_user_data (G_ASYNC_RESULT (simple));
 
   error = NULL;
   if (!g_file_mount_enclosing_volume_finish (root, res, &error))
@@ -292,7 +285,6 @@ g_vfs_goa_volume_can_mount (GVolume *_self)
 static char **
 g_vfs_goa_volume_enumerate_identifiers (GVolume *_self)
 {
-  GVfsGoaVolume *self = G_VFS_GOA_VOLUME (_self);
   GPtrArray *res;
 
   res = g_ptr_array_new ();

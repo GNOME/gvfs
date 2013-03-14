@@ -364,7 +364,6 @@ g_vfs_http_input_stream_read_async (GInputStream        *stream,
 				    gpointer             user_data)
 {
   GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
-  GError *error = NULL;
   GTask *task;
 
   task = g_task_new (stream, cancellable, callback, user_data);
@@ -422,7 +421,6 @@ g_vfs_http_input_stream_close_async (GInputStream       *stream,
 				     gpointer            user_data)
 {
   GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
-  GError *error = NULL;
   GTask *task;
 
   task = g_task_new (stream, cancellable, callback, user_data);

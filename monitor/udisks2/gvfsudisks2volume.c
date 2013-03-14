@@ -212,7 +212,6 @@ update_volume (GVfsUDisks2Volume *volume)
   gchar *old_device_file;
   dev_t old_dev;
   GIcon *old_icon;
-  GIcon *old_symbolic_icon;
   UDisksDrive *udisks_drive;
   gchar *s;
 
@@ -227,7 +226,6 @@ update_volume (GVfsUDisks2Volume *volume)
   old_device_file = g_strdup (volume->device_file);
   old_dev = volume->dev;
   old_icon = volume->icon != NULL ? g_object_ref (volume->icon) : NULL;
-  old_symbolic_icon = volume->symbolic_icon != NULL ? g_object_ref (volume->symbolic_icon) : NULL;
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* reset */
