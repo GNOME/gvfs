@@ -999,9 +999,17 @@ do_query_info (GVfsBackend *backend,
     }
   else
     {
-      g_file_info_set_name (info, filename);
-      g_file_info_set_display_name (info, filename);
-      
+      if (*filename == '/')
+        {
+          g_file_info_set_name (info, filename + 1);
+          g_file_info_set_display_name (info, filename + 1);
+        }
+      else
+        {
+          g_file_info_set_name (info, filename);
+          g_file_info_set_display_name (info, filename);
+        }
+
       track_num = get_track_num_from_name (filename);
       if (track_num == -1)
         {
