@@ -161,6 +161,9 @@ release_metadata (GVfsBackendCdda *cdda_backend)
 static char *
 cdtext_string_to_utf8 (const char *string)
 {
+  if (string == NULL)
+    return NULL;
+
   /* CD-text doesn't specify encoding. In case outside ascii, assume latin-1. */
   return g_convert (string, -1, "UTF-8", "ISO-8859-1", NULL, NULL, NULL);
 }
