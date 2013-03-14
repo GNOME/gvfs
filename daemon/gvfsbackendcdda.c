@@ -545,7 +545,7 @@ do_unmount (GVfsBackend *backend,
 
 /* returns -1 if we couldn't map */
 static int
-get_track_num_from_name (GVfsBackendCdda *cdda_backend, const char *filename)
+get_track_num_from_name (const char *filename)
 {
   int n;
   char *basename;
@@ -715,7 +715,7 @@ do_open_for_read (GVfsBackend *backend,
 
   read_handle = g_new0 (ReadHandle, 1);
 
-  track_num = get_track_num_from_name (cdda_backend, job->filename);
+  track_num = get_track_num_from_name (job->filename);
   if (track_num == -1)
     {
       error = g_error_new (G_IO_ERROR, G_IO_ERROR_NOT_FOUND, 
@@ -1002,7 +1002,7 @@ do_query_info (GVfsBackend *backend,
       g_file_info_set_name (info, filename);
       g_file_info_set_display_name (info, filename);
       
-      track_num = get_track_num_from_name (cdda_backend, filename);
+      track_num = get_track_num_from_name (filename);
       if (track_num == -1)
         {
           error = g_error_new (G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("No such file"));
