@@ -443,7 +443,7 @@ get_iso_639_3_for_locale (void)
 }
 
 static const char *
-get_icon (META_DL *meta)
+get_icon (const META_DL *meta)
 {
   const char *icon;
   guint i;
@@ -470,7 +470,7 @@ bdmv_metadata_thread (GSimpleAsyncResult *result,
                       GCancellable *cancellable)
 {
   BLURAY *bd;
-  META_DL *meta;
+  const META_DL *meta;
   GError *error;
   GFile *file;
   char *disc_root;

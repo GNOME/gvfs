@@ -374,7 +374,6 @@ static MountRecord *
 mount_record_new (GMount *mount)
 {
   MountRecord *mount_record;
-  char *name;
 
   mount_record = g_new (MountRecord, 1);
   

@@ -51,7 +51,7 @@ main (int argc,
 	{
 	  char buffer[1000];
 	  g_print ("Pausing, press enter\n");
-	  gets(buffer);
+	  fgets(buffer, sizeof(buffer), stdin);
 	}
     }
 

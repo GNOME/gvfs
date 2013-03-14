@@ -2695,7 +2695,7 @@ g_vfs_afp_volume_write_to_fork (GVfsAfpVolume       *volume,
                                 gpointer             user_data)
 {
   GVfsAfpCommand *comm;
-  guint32 max_req_count, req_count;
+  guint32 req_count;
   GSimpleAsyncResult *simple;
 
   g_return_if_fail (G_VFS_IS_AFP_VOLUME (volume));
@@ -2710,7 +2710,6 @@ g_vfs_afp_volume_write_to_fork (GVfsAfpVolume       *volume,
   g_vfs_afp_command_put_int64 (comm, offset);
   
   /* ReqCount */
-  max_req_count = g_vfs_afp_server_get_max_request_size (volume->priv->server) - 20;
   req_count = MIN (buffer_size, G_MAXUINT32);
   g_vfs_afp_command_put_int64 (comm, req_count);
 

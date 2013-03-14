@@ -2284,7 +2284,6 @@ try_create_tested_existence (SoupSession *session, SoupMessage *msg,
                              gpointer user_data)
 {
   GVfsJob *job = G_VFS_JOB (user_data);
-  GVfsBackendHttp *op_backend = job->backend_data;
   GOutputStream   *stream;
   SoupMessage     *put_msg;
   SoupURI         *uri;
