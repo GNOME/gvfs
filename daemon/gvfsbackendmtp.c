@@ -1073,6 +1073,11 @@ do_enumerate (GVfsBackend *backend,
       goto exit;
     }
 
+    /* Invalidate existing cache entries in case any are stale. */
+    char *remove_prefix = g_strdup_printf("%s/", filename);
+    remove_cache_entry (G_VFS_BACKEND_MTP (backend), remove_prefix);
+    g_free (remove_prefix);
+
     LIBMTP_file_t *files;
     LIBMTP_Clear_Errorstack (device);
     files = LIBMTP_Get_Files_And_Folders (device, entry->storage, entry->id);
