@@ -12,7 +12,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2013-02-11 15:50+0000\n"
-"PO-Revision-Date: 2013-03-17 20:20+0200\n"
+"PO-Revision-Date: 2013-03-17 20:21+0200\n"
 "Last-Translator: Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>\n"
 "Language-Team: Latvian <lata-l10n@googlegroups.com>\n"
 "Language: lv\n"
@@ -1384,10 +1384,9 @@ msgid "Not a regular file"
 msgstr "Nav parasta datne"
 
 #: ../daemon/gvfsbackendmtp.c:1269
-#, fuzzy
 #| msgid "Can't write to directory"
 msgid "Cannot write to this location"
-msgstr "Nevar rakstīt direktorijā"
+msgstr "Šajā vietā nevarēja rakstīt"
 
 #: ../daemon/gvfsbackendmtp.c:1361
 #| msgid "Cannot create libhal context"
