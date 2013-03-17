@@ -329,7 +329,7 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
   DEBUG ("(I) on_uevent done.");
 }
 
-#if HAVE_LIBMTP_READ_EVENT
+#if HAVE_LIBMTP_1_1_5
 static gpointer
 check_event (gpointer user_data)
 {
@@ -482,7 +482,7 @@ do_mount (GVfsBackend *backend,
     op_backend->hb_id =
       g_timeout_add_seconds (900, (GSourceFunc)mtp_heartbeat, op_backend);
 
-#if HAVE_LIBMTP_READ_EVENT
+#if HAVE_LIBMTP_1_1_5
     GWeakRef *event_ref = g_new0 (GWeakRef, 1);
     g_weak_ref_init (event_ref, backend);
     GThread *event_thread = g_thread_new ("events", check_event, event_ref);
@@ -773,7 +773,7 @@ get_file_info (GVfsBackend *backend,
   }
 
 
-#if HAVE_LIBMTP_GET_THUMBNAIL
+#if HAVE_LIBMTP_1_1_5
   if (LIBMTP_FILETYPE_IS_IMAGE (file->filetype) ||
       LIBMTP_FILETYPE_IS_VIDEO (file->filetype) ||
       LIBMTP_FILETYPE_IS_AUDIOVIDEO (file->filetype)) {
@@ -1435,7 +1435,7 @@ do_set_display_name (GVfsBackend *backend,
 }
 
 
-#if HAVE_LIBMTP_GET_THUMBNAIL
+#if HAVE_LIBMTP_1_1_5
 static void
 do_open_icon_for_read (GVfsBackend *backend,
                        GVfsJobOpenIconForRead *job,
@@ -1558,7 +1558,7 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->set_display_name = do_set_display_name;
   backend_class->create_dir_monitor = do_create_dir_monitor;
   backend_class->create_file_monitor = do_create_file_monitor;
-#if HAVE_LIBMTP_GET_THUMBNAIL
+#if HAVE_LIBMTP_1_1_5
   backend_class->open_icon_for_read = do_open_icon_for_read;
   backend_class->try_read = try_read;
   backend_class->close_read = do_close_read;

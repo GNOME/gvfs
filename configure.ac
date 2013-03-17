@@ -544,18 +544,10 @@ if test "x$enable_libmtp" != "xno" -a "x$msg_gudev" = "xyes"; then
     PKG_CHECK_MODULES(LIBMTP, libmtp >= 1.1.0)
     AC_DEFINE(HAVE_LIBMTP, 1, [Define to 1 if libmtp is available])
 
-    save_libs="$LIBS"
-    LIBS="$LIBMTP_LIBS"
-    AC_CHECK_LIB(mtp, LIBMTP_Get_Thumbnail, have_libmtp_get_thumbnail=yes)
-    if test "x$have_libmtp_get_thumbnail" = "xyes"; then
-      AC_DEFINE(HAVE_LIBMTP_GET_THUMBNAIL, 1, [Define to 1 if LIBMTP_Get_Thumbnail is available])
-    fi
-
-    AC_CHECK_LIB(mtp, LIBMTP_Read_Event, have_libmtp_read_event=yes)
-    if test "x$have_libmtp_read_event" = "xyes"; then
-      AC_DEFINE(HAVE_LIBMTP_READ_EVENT, 1, [Define to 1 if LIBMTP_Read_Event is available])
-    fi
-    LIBS="$save_libs"
+    PKG_CHECK_MODULES(LIBMTP_1_1_5, libmtp >= 1.1.5,
+        AC_DEFINE(HAVE_LIBMTP_1_1_5, 1, [Define to 1 if libmtp 1.1.5 is available]),
+        []
+    )
   fi
 fi
 
