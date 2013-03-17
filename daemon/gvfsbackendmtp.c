@@ -131,6 +131,16 @@ typedef struct {
 
 
 /************************************************
+ * Static prototypes
+ ************************************************/
+
+static void
+emit_delete_event (gpointer key,
+                   gpointer value,
+                   gpointer user_data);
+
+
+/************************************************
  * Cache Helpers
  ************************************************/
 
@@ -287,6 +297,33 @@ remove_cache_entry (GVfsBackendMtp *backend,
                                (gpointer) path);
   DEBUG ("(III) remove_cache_entry done");
 }
+
+
+static void
+remove_cache_entry_by_id (GVfsBackendMtp *backend,
+                          uint32_t id)
+{
+  GHashTableIter iter;
+  gpointer key, value;
+  DEBUG ("(III) remove_cache_entry_by_id: %u", id);
+
+  g_hash_table_iter_init (&iter, backend->file_cache);
+  while (g_hash_table_iter_next (&iter, &key, &value)) {
+    const char *path = key;
+    const CacheEntry *entry = value;
+
+    if (entry->id == id) {
+      g_hash_table_foreach (backend->monitors,
+                            emit_delete_event,
+                            (char *)path);
+      g_hash_table_iter_remove (&iter);
+      break;
+    }
+  }
+
+  DEBUG ("(III) remove_cache_entry_by_id done");
+}
+
 
 /************************************************
  * Initialization
@@ -570,6 +607,18 @@ check_event (gpointer user_data)
       } else {
         return NULL;
       }
+#if HAVE_LIBMTP_1_1_6
+    case LIBMTP_EVENT_OBJECT_REMOVED:
+      backend = g_weak_ref_get (event_ref);
+      if (backend && !g_atomic_int_get (&backend->unmount_started)) {
+        g_mutex_lock (&backend->mutex);
+        remove_cache_entry_by_id (G_VFS_BACKEND_MTP (backend), param1);
+        g_mutex_unlock (&backend->mutex);
+        g_object_unref (backend);
+      } else {
+        return NULL;
+      }
+#endif
     default:
       break;
     }
