@@ -957,14 +957,16 @@ class Drive(GvfsTestCase):
 
         # check that gvfs monitor picks up the new drive
         out = self.get_monitor_output()
-        self.assertRegex(out, 'Drive connected:\s+.*CD')
+        self.assertRegex(out, 'Drive connected:')
+        self.assertRegex(out, '\[drive-optical\]')
+        self.assertRegex(out, '\[media-optical-cd\]')
         self.assertRegex(out, 'unix-device:.*/dev/%s' % dev)
-        self.assertTrue('has_media=1' in out, out)
+        self.assertRegex(out, 'has_media=1')
 
         self.assertRegex(out, 'Volume added:\s+.*bogus-cd')
         self.assertRegex(out, "label:\s+'bogus-cd")
-        self.assertTrue('can_mount=1' in out, out)
-        self.assertTrue('should_automount=1' in out, out)
+        self.assertRegex(out, 'can_mount=1')
+        self.assertRegex(out, 'should_automount=1')
         self.assertRegex(out, 'themed icons:.*media-optical')
 
         # user is not on any local session in the sandbox, so mounting ought to
@@ -1078,13 +1080,14 @@ class Drive(GvfsTestCase):
 
         # check that gvfs monitor picks up the new drive
         out = self.get_monitor_output()
-        self.assertRegex(out, 'Drive connected:\s+.*Disk')
+        self.assertRegex(out, 'Drive connected:')
+        self.assertRegex(out, '\[drive-harddisk\]')
         self.assertRegex(out, 'unix-device:.*/dev/%s' % dev)
-        self.assertTrue('has_media=1' in out, out)
+        self.assertRegex(out, 'has_media=1')
 
         self.assertRegex(out, 'Volume added:\s+.*testvfat')
         self.assertRegex(out, "label:\s+'testvfat")
-        self.assertTrue('should_automount=0' in out, out)
+        self.assertRegex(out, 'should_automount=0')
         self.assertRegex(out, 'themed icons:.*harddisk')
 
         # should fail with only allowing the user to mount removable storage
