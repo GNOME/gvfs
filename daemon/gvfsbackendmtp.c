@@ -1513,7 +1513,29 @@ do_push (GVfsBackend *backend,
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
 
-  CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
+  CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), destination);
+  if (entry != NULL && entry->id != -1) {
+    if (flags & G_FILE_COPY_OVERWRITE) {
+      DEBUG ("(I) Removing destination.");
+      int ret = LIBMTP_Delete_Object (device, entry->id);
+      if (ret != 0) {
+        fail_job (G_VFS_JOB (job), device);
+        goto exit;
+      }
+      g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
+                            emit_delete_event,
+                            (char *)destination);
+      remove_cache_entry (G_VFS_BACKEND_MTP (backend),
+                          destination);
+    } else {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                _("File already exists"));
+      goto exit;
+    }
+  }
+
+  entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
   if (!entry) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
