@@ -24,6 +24,7 @@ EXTRA_DIST = \
 	gvfs.doap		\
 	README.commits		\
 	MAINTAINERS		\
+	m4			\
 	$(NULL)
 
 DISTCLEANFILES = \

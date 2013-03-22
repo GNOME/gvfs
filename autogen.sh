@@ -106,9 +106,9 @@ rm -rf autom4te.cache
 # regenerated from their corresponding *.in files by ./configure anyway.
 touch README INSTALL
 
-libtoolize --force || exit $?
+libtoolize --force --copy || exit $?
 intltoolize --force --copy --automake || exit $?
-gtkdocize || exit $?
+gtkdocize --copy || exit $?
 
 $ACLOCAL $ACLOCAL_FLAGS || exit $?
 
