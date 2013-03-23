@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-09 17:56+0100\n"
-"PO-Revision-Date: 2013-02-09 17:56+0100\n"
+"POT-Creation-Date: 2013-03-23 23:24+0100\n"
+"PO-Revision-Date: 2013-03-23 23:24+0100\n"
 "Last-Translator: Wouter Bolsterlee <wbolster@gnome.org>\n"
 "Language-Team: Dutch <vertaling@vrijschrift.org>\n"
 "Language: nl\n"
@@ -371,7 +371,7 @@ msgstr "Toegang geweigerd"
 #: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:327
 #: ../daemon/gvfsbackendafpbrowse.c:359 ../daemon/gvfsbackendarchive.c:651
 #: ../daemon/gvfsbackendarchive.c:699 ../daemon/gvfsbackendarchive.c:751
-#: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1015
+#: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1026
 #: ../daemon/gvfsbackendcomputer.c:638 ../daemon/gvfsbackenddnssd.c:415
 #: ../daemon/gvfsbackendftp.c:1068 ../daemon/gvfsbackendnetwork.c:696
 #: ../daemon/gvfsbackendsmbbrowse.c:1120 ../daemon/gvfsbackendsmbbrowse.c:1187
@@ -446,7 +446,7 @@ msgid "Target directory already exists"
 msgstr "Doelmap bestaat al"
 
 #: ../daemon/gvfsafpvolume.c:1219 ../daemon/gvfsbackendafp.c:590
-#: ../daemon/gvfsbackendmtp.c:1391
+#: ../daemon/gvfsbackendmtp.c:1408
 msgid "Can't rename volume"
 msgstr "Kan volumen niet hernoemen"
 
@@ -524,7 +524,7 @@ msgid "Internal Apple File Control error"
 msgstr "Interne Apple File Control-fout"
 
 #: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:737
-#: ../daemon/gvfsbackendmtp.c:1199
+#: ../daemon/gvfsbackendmtp.c:1205
 msgid "File does not exist"
 msgstr "Bestand bestaat niet"
 
@@ -720,8 +720,8 @@ msgid "Can't copy directory over directory"
 msgstr "Kan map niet over map heen kopiëren"
 
 #: ../daemon/gvfsbackendafp.c:293 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1209
-#: ../daemon/gvfsbackendmtp.c:1285 ../daemon/gvfsbackendobexftp.c:1818
+#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1215
+#: ../daemon/gvfsbackendmtp.c:1296 ../daemon/gvfsbackendobexftp.c:1818
 msgid "Can't recursively copy directory"
 msgstr "Kan map niet recursief kopiëren"
 
@@ -871,45 +871,45 @@ msgstr ""
 "Volumen is bezig\n"
 "Een of meerdere toepassingen houden dit volumen bezig"
 
-#: ../daemon/gvfsbackendcdda.c:357 ../daemon/gvfsbackendgphoto2.c:1548
-#: ../daemon/gvfsbackendmtp.c:449
+#: ../daemon/gvfsbackendcdda.c:360 ../daemon/gvfsbackendgphoto2.c:1548
+#: ../daemon/gvfsbackendmtp.c:455
 msgid "Cannot create gudev client"
 msgstr "Kon gudev-client niet aanmaken"
 
-#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1566
+#: ../daemon/gvfsbackendcdda.c:380 ../daemon/gvfsbackendgphoto2.c:1566
 msgid "Cannot connect to the system bus"
 msgstr "Kon niet met ‘system bus’ verbinden"
 
-#: ../daemon/gvfsbackendcdda.c:388 ../daemon/gvfsbackendgphoto2.c:1578
+#: ../daemon/gvfsbackendcdda.c:391 ../daemon/gvfsbackendgphoto2.c:1578
 msgid "Cannot create libhal context"
 msgstr "Kon libhal-context niet aanmaken"
 
-#: ../daemon/gvfsbackendcdda.c:402 ../daemon/gvfsbackendgphoto2.c:1591
+#: ../daemon/gvfsbackendcdda.c:405 ../daemon/gvfsbackendgphoto2.c:1591
 msgid "Cannot initialize libhal"
 msgstr "Kon libhal niet initialiseren"
 
-#: ../daemon/gvfsbackendcdda.c:418 ../daemon/gvfsbackendcdda.c:504
+#: ../daemon/gvfsbackendcdda.c:421 ../daemon/gvfsbackendcdda.c:507
 msgid "No drive specified"
 msgstr "Geen station opgegeven"
 
-#: ../daemon/gvfsbackendcdda.c:442
+#: ../daemon/gvfsbackendcdda.c:445
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "Can station %s niet vinden"
 
-#: ../daemon/gvfsbackendcdda.c:455
+#: ../daemon/gvfsbackendcdda.c:458
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "Station %s bevat geen audiobestanden"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
-#: ../daemon/gvfsbackendcdda.c:465
+#: ../daemon/gvfsbackendcdda.c:468
 #, c-format
 msgid "cdda mount on %s"
 msgstr "cdda-koppeling op %s"
 
-#: ../daemon/gvfsbackendcdda.c:466 ../daemon/gvfsbackendcdda.c:987
+#: ../daemon/gvfsbackendcdda.c:469 ../daemon/gvfsbackendcdda.c:990
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #: ../monitor/udisks2/gvfsudisks2volume.c:358
@@ -917,40 +917,40 @@ msgstr "cdda-koppeling op %s"
 msgid "Audio Disc"
 msgstr "Audio-cd"
 
-#: ../daemon/gvfsbackendcdda.c:530
+#: ../daemon/gvfsbackendcdda.c:533
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "Bestandssysteem is bezig: %d open bestand"
 msgstr[1] "Bestandssysteem is bezig: %d open bestanden"
 
-#: ../daemon/gvfsbackendcdda.c:722
+#: ../daemon/gvfsbackendcdda.c:725
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "Geen bestand %s op station %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:831
+#: ../daemon/gvfsbackendcdda.c:834
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "Fout van ‘paranoia’ op station %s"
 
-#: ../daemon/gvfsbackendcdda.c:894
+#: ../daemon/gvfsbackendcdda.c:897
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Fout bij zoeken in stream op station %s"
 
-#: ../daemon/gvfsbackendcdda.c:1008 ../daemon/gvfsbackendgphoto2.c:1864
+#: ../daemon/gvfsbackendcdda.c:1019 ../daemon/gvfsbackendgphoto2.c:1864
 #, c-format
 msgid "No such file"
 msgstr "Bestand bestaat niet"
 
-#: ../daemon/gvfsbackendcdda.c:1022
+#: ../daemon/gvfsbackendcdda.c:1033
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Het bestand bestaat niet of is geen muziekbestand"
 
-#: ../daemon/gvfsbackendcdda.c:1127
+#: ../daemon/gvfsbackendcdda.c:1138
 msgid "Audio CD File System Service"
 msgstr "Bestandssysteemvoorziening voor audio-cd's"
 
@@ -1157,7 +1157,7 @@ msgstr "Camera"
 msgid "Audio Player"
 msgstr "Muziekspeler"
 
-#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:441
+#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:447
 msgid "No device specified"
 msgstr "Geen apparaat opgegeven"
 
@@ -1212,7 +1212,7 @@ msgstr "Fout bij ophalen bestand"
 msgid "Error getting data from file"
 msgstr "Fout bij verkrijgen data van bestand"
 
-#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1470
+#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1487
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Ongeldige pictogram-identifier ‘%s’"
@@ -1318,72 +1318,76 @@ msgid "Directory notification not supported"
 msgstr "Mapwijzigingsmeldingen niet ondersteund"
 
 #: ../daemon/gvfsbackendmtp.c:289
+msgid "Unknown error."
+msgstr "Onbekende fout"
+
+#: ../daemon/gvfsbackendmtp.c:295
 #, c-format
 msgid "libmtp error: %s"
 msgstr "libmtp-fout: %s"
 
-#: ../daemon/gvfsbackendmtp.c:395
+#: ../daemon/gvfsbackendmtp.c:401
 msgid "Unexpected host uri format."
 msgstr "Onverwachts formaat host-uri"
 
-#: ../daemon/gvfsbackendmtp.c:405
+#: ../daemon/gvfsbackendmtp.c:411
 msgid "Malformed host uri."
 msgstr "Onjuiste host-uri"
 
-#: ../daemon/gvfsbackendmtp.c:418
+#: ../daemon/gvfsbackendmtp.c:424
 msgid "Couldn't find matching udev device."
 msgstr "Kon bijbehorende udev-apparaat niet vinden"
 
-#: ../daemon/gvfsbackendmtp.c:558
+#: ../daemon/gvfsbackendmtp.c:564
 msgid "No MTP devices found"
 msgstr "Geen MTP-apparaten gevonden"
 
-#: ../daemon/gvfsbackendmtp.c:563
+#: ../daemon/gvfsbackendmtp.c:569
 msgid "Unable to connect to MTP device"
 msgstr "Verbinden met MTP-apparaat mislukt"
 
-#: ../daemon/gvfsbackendmtp.c:568
+#: ../daemon/gvfsbackendmtp.c:574
 msgid "Unable to allocate memory while detecting MTP devices"
 msgstr "Kon geen geheugen alloceren tijdens het detecteren van MTP-apparaten"
 
-#: ../daemon/gvfsbackendmtp.c:574
+#: ../daemon/gvfsbackendmtp.c:580
 msgid "Generic libmtp error"
 msgstr "Algemene libmtp-fout"
 
-#: ../daemon/gvfsbackendmtp.c:591
+#: ../daemon/gvfsbackendmtp.c:597
 #, c-format
 msgid "Unable to open MTP device '%s'"
 msgstr "Kon MTP-apparaat ‘%s’ niet openen"
 
-#: ../daemon/gvfsbackendmtp.c:634
+#: ../daemon/gvfsbackendmtp.c:640
 msgid "Unnamed Device"
 msgstr "Naamloos apparaat"
 
-#: ../daemon/gvfsbackendmtp.c:1002 ../daemon/gvfsbackendmtp.c:1075
+#: ../daemon/gvfsbackendmtp.c:1008 ../daemon/gvfsbackendmtp.c:1081
 msgid "No storage volumes found"
 msgstr "Geen opslag-volumina gevonden"
 
-#: ../daemon/gvfsbackendmtp.c:1024
+#: ../daemon/gvfsbackendmtp.c:1030
 msgid "File not found"
 msgstr "Bestand niet gevonden"
 
-#: ../daemon/gvfsbackendmtp.c:1132
+#: ../daemon/gvfsbackendmtp.c:1138
 msgid "Cannot make directory in this location"
 msgstr "Kan geen map maken op deze lokatie"
 
-#: ../daemon/gvfsbackendmtp.c:1188 ../daemon/gvfsbackendsmbbrowse.c:1183
+#: ../daemon/gvfsbackendmtp.c:1194 ../daemon/gvfsbackendsmbbrowse.c:1183
 msgid "Not a regular file"
 msgstr "Geen normaal bestand"
 
-#: ../daemon/gvfsbackendmtp.c:1258
+#: ../daemon/gvfsbackendmtp.c:1269
 msgid "Cannot write to this location"
 msgstr "Kan niet naar deze lokatie schrijven"
 
-#: ../daemon/gvfsbackendmtp.c:1350
+#: ../daemon/gvfsbackendmtp.c:1367
 msgid "Cannot delete this entity"
 msgstr "Kan item niet verwijderen"
 
-#: ../daemon/gvfsbackendmtp.c:1462
+#: ../daemon/gvfsbackendmtp.c:1479
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "Geen miniatuur voor item ‘%s’"
