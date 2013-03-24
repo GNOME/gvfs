@@ -71,7 +71,14 @@ backend_died (GVfsMonitor *monitor,
 	      GObject     *old_backend)
 {
   Subscriber *subscriber;
-  
+
+  /*
+   * Take an extra ref on the monitor because
+   * unsubscribing may lead to the last ref
+   * being released.
+   */
+  g_object_ref (G_OBJECT (monitor));
+
   monitor->priv->backend = NULL;
 
   while (monitor->priv->subscribers != NULL)
@@ -79,6 +86,8 @@ backend_died (GVfsMonitor *monitor,
       subscriber = monitor->priv->subscribers->data;
       unsubscribe (subscriber);
     }
+
+  g_object_unref (G_OBJECT (monitor));
 }
 
 static void
