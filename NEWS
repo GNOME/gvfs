@@ -1,3 +1,13 @@
+Major changes in 1.16.0
+=======================
+* cdda: Fix warnings for each track on the CD
+* cdda: Remove unneeded function argument
+* cdda: Remove leading '/' from the filenames
+* mtp: Switch to version based checks for new libmtp features
+* trash: Use the symbolic names for trash:: attributes
+* tests: Update expected gvfs-mount -li output
+* Translation updates
+
 Major changes in 1.15.4
 =======================
 * gdu,udisks2: Make use of new ID_FS_BOOT_SYSTEM_ID udev property
