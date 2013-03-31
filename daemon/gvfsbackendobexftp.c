@@ -2142,6 +2142,8 @@ g_vfs_backend_obexftp_class_init (GVfsBackendObexftpClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
 
+  dbus_threads_init_default ();
+
   gobject_class->finalize = g_vfs_backend_obexftp_finalize;
 
   backend_class->mount = do_mount;
