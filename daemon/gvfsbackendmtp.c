@@ -1724,7 +1724,7 @@ do_open_for_read (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation unsupported."));
+                              _("Operation unsupported"));
     return;
   }
 
@@ -1960,7 +1960,7 @@ do_create (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation unsupported."));
+                              _("Operation unsupported"));
     return;
   }
 
@@ -1976,7 +1976,7 @@ do_create (GVfsBackend *backend,
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_FAILED,
-                              _("Invalid destination filename"));
+                              _("Invalid filename"));
     goto exit;
   }
 
@@ -2047,7 +2047,7 @@ do_append_to (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation unsupported."));
+                              _("Operation unsupported"));
     return;
   }
 
@@ -2114,7 +2114,7 @@ do_replace (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation unsupported."));
+                              _("Operation unsupported"));
     return;
   }
 
