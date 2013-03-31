@@ -16,9 +16,9 @@ msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-02-25 16:20+0000\n"
-"PO-Revision-Date: 2013-02-24 22:15+0100\n"
-"Last-Translator: Christian Kirbach <christian.kirbach@gmail.com>\n"
+"POT-Creation-Date: 2013-03-30 23:26+0000\n"
+"PO-Revision-Date: 2013-03-31 15:41+0100\n"
+"Last-Translator: Mario Blättermann <mario.blaettermann@gmail.com>\n"
 "Language-Team: Deutsch <gnome-de@gnome.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -72,8 +72,7 @@ msgid "values must be string or list of strings"
 msgstr "Werte müssen Zeichenketten oder Listen aus Zeichenketten sein"
 
 #: ../client/gdaemonfileenumerator.c:528 ../client/gdaemonfileenumerator.c:611
-#: ../client/gdaemonfileenumerator.c:662
-#: ../client/gdaemonfileinputstream.c:630
+#: ../client/gdaemonfileenumerator.c:662 ../client/gdaemonfileinputstream.c:630
 #: ../client/gdaemonfileinputstream.c:783
 #: ../client/gdaemonfileinputstream.c:901
 #: ../client/gdaemonfileinputstream.c:1149
@@ -279,8 +278,7 @@ msgstr ""
 #, c-format
 msgid "Unable to connect to the server “%s” with the given password."
 msgstr ""
-"Verbindung mit dem Server »%s« ist nicht mit dem angegebenen Passwort "
-"möglich."
+"Verbindung mit dem Server »%s« ist nicht mit dem angegebenen Passwort möglich."
 
 #: ../daemon/gvfsafpserver.c:676 ../daemon/gvfsafpserver.c:701
 #, c-format
@@ -386,7 +384,7 @@ msgstr "Zugriff verweigert"
 #: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:327
 #: ../daemon/gvfsbackendafpbrowse.c:359 ../daemon/gvfsbackendarchive.c:651
 #: ../daemon/gvfsbackendarchive.c:699 ../daemon/gvfsbackendarchive.c:751
-#: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1015
+#: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1026
 #: ../daemon/gvfsbackendcomputer.c:638 ../daemon/gvfsbackenddnssd.c:415
 #: ../daemon/gvfsbackendftp.c:1068 ../daemon/gvfsbackendnetwork.c:696
 #: ../daemon/gvfsbackendsmbbrowse.c:1120 ../daemon/gvfsbackendsmbbrowse.c:1187
@@ -462,7 +460,6 @@ msgid "Target directory already exists"
 msgstr "Zielordner existiert bereits"
 
 #: ../daemon/gvfsafpvolume.c:1219 ../daemon/gvfsbackendafp.c:590
-#: ../daemon/gvfsbackendmtp.c:1408
 msgid "Can't rename volume"
 msgstr "Datenträger kann nicht umbenannt werden"
 
@@ -541,7 +538,9 @@ msgid "Internal Apple File Control error"
 msgstr "Interner Fehler in »Apple File Control«"
 
 #: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:737
-#: ../daemon/gvfsbackendmtp.c:1205
+#: ../daemon/gvfsbackendmtp.c:1422 ../daemon/gvfsbackendmtp.c:1438
+#: ../daemon/gvfsbackendmtp.c:1625 ../daemon/gvfsbackendmtp.c:1670
+#: ../daemon/gvfsbackendmtp.c:1738 ../daemon/gvfsbackendmtp.c:2061
 msgid "File does not exist"
 msgstr "Datei existiert nicht"
 
@@ -739,8 +738,8 @@ msgid "Can't copy directory over directory"
 msgstr "Ordner kann nicht über einen Ordner kopiert werden"
 
 #: ../daemon/gvfsbackendafp.c:293 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1215
-#: ../daemon/gvfsbackendmtp.c:1296 ../daemon/gvfsbackendobexftp.c:1818
+#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1448
+#: ../daemon/gvfsbackendmtp.c:1554 ../daemon/gvfsbackendobexftp.c:1818
 msgid "Can't recursively copy directory"
 msgstr "Ordner kann nicht rekursiv kopiert werden"
 
@@ -890,45 +889,45 @@ msgstr ""
 "Datenträger ist belegt\n"
 "Eine oder mehrere Anwendungen halten den Datenträger belegt."
 
-#: ../daemon/gvfsbackendcdda.c:357 ../daemon/gvfsbackendgphoto2.c:1548
-#: ../daemon/gvfsbackendmtp.c:455
+#: ../daemon/gvfsbackendcdda.c:360 ../daemon/gvfsbackendgphoto2.c:1548
+#: ../daemon/gvfsbackendmtp.c:703
 msgid "Cannot create gudev client"
 msgstr "gudev-Client konnte nicht erstellt werden"
 
-#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1566
+#: ../daemon/gvfsbackendcdda.c:380 ../daemon/gvfsbackendgphoto2.c:1566
 msgid "Cannot connect to the system bus"
 msgstr "Keine Verbindung zum System-Bus möglich"
 
-#: ../daemon/gvfsbackendcdda.c:388 ../daemon/gvfsbackendgphoto2.c:1578
+#: ../daemon/gvfsbackendcdda.c:391 ../daemon/gvfsbackendgphoto2.c:1578
 msgid "Cannot create libhal context"
 msgstr "libhal-Kontext konnte nicht erstellt werden"
 
-#: ../daemon/gvfsbackendcdda.c:402 ../daemon/gvfsbackendgphoto2.c:1591
+#: ../daemon/gvfsbackendcdda.c:405 ../daemon/gvfsbackendgphoto2.c:1591
 msgid "Cannot initialize libhal"
 msgstr "libhal konnte nicht initialisiert werden"
 
-#: ../daemon/gvfsbackendcdda.c:418 ../daemon/gvfsbackendcdda.c:504
+#: ../daemon/gvfsbackendcdda.c:421 ../daemon/gvfsbackendcdda.c:507
 msgid "No drive specified"
 msgstr "Kein Laufwerk angegeben"
 
-#: ../daemon/gvfsbackendcdda.c:442
+#: ../daemon/gvfsbackendcdda.c:445
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "Laufwerk %s konnte nicht gefunden werden"
 
-#: ../daemon/gvfsbackendcdda.c:455
+#: ../daemon/gvfsbackendcdda.c:458
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "Laufwerk %s enthält keine Audiodateien"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
-#: ../daemon/gvfsbackendcdda.c:465
+#: ../daemon/gvfsbackendcdda.c:468
 #, c-format
 msgid "cdda mount on %s"
 msgstr "CDDA-Medium in %s"
 
-#: ../daemon/gvfsbackendcdda.c:466 ../daemon/gvfsbackendcdda.c:987
+#: ../daemon/gvfsbackendcdda.c:469 ../daemon/gvfsbackendcdda.c:990
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #: ../monitor/udisks2/gvfsudisks2volume.c:358
@@ -936,40 +935,40 @@ msgstr "CDDA-Medium in %s"
 msgid "Audio Disc"
 msgstr "Audio-CD"
 
-#: ../daemon/gvfsbackendcdda.c:530
+#: ../daemon/gvfsbackendcdda.c:533
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "Dateisystem ist belegt: %d geöffnete Datei"
 msgstr[1] "Dateisystem ist belegt: %d geöffnete Dateien"
 
-#: ../daemon/gvfsbackendcdda.c:722
+#: ../daemon/gvfsbackendcdda.c:725
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "Keine Datei %s auf Laufwerk %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:831
+#: ../daemon/gvfsbackendcdda.c:834
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "Fehler von »paranoia« auf Laufwerk %s"
 
-#: ../daemon/gvfsbackendcdda.c:894
+#: ../daemon/gvfsbackendcdda.c:897
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Fehler beim Durchlaufen des Datenstroms auf Laufwerk %s"
 
-#: ../daemon/gvfsbackendcdda.c:1008 ../daemon/gvfsbackendgphoto2.c:1864
+#: ../daemon/gvfsbackendcdda.c:1019 ../daemon/gvfsbackendgphoto2.c:1864
 #, c-format
 msgid "No such file"
 msgstr "Unbekannte Datei"
 
-#: ../daemon/gvfsbackendcdda.c:1022
+#: ../daemon/gvfsbackendcdda.c:1033
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Die Datei existiert nicht oder ist kein Audiotitel"
 
-#: ../daemon/gvfsbackendcdda.c:1127
+#: ../daemon/gvfsbackendcdda.c:1138
 msgid "Audio CD File System Service"
 msgstr "Dateisystem-Dienst für Audio-CD"
 
@@ -1174,7 +1173,7 @@ msgstr "Kamera"
 msgid "Audio Player"
 msgstr "Musik-Player"
 
-#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:447
+#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:695
 msgid "No device specified"
 msgstr "Kein Gerät angegeben"
 
@@ -1229,7 +1228,7 @@ msgstr "Fehler beim Abrufen der Datei"
 msgid "Error getting data from file"
 msgstr "Fehler beim Auslesen der Datei"
 
-#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1487
+#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1832
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Fehlerhafte Symbolidentifikation »%s«"
@@ -1322,8 +1321,7 @@ msgstr ""
 "Nicht unterstützt (Quelle ist Ordner, Ziel ist bereits existierende Datei)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3402
-msgid ""
-"Not supported (the source is a file, but the destination is a directory)"
+msgid "Not supported (the source is a file, but the destination is a directory)"
 msgstr "Nicht unterstützt (Quelle ist Datei, Ziel ist Ordner)"
 
 #: ../daemon/gvfsbackendhttp.c:258
@@ -1335,81 +1333,103 @@ msgstr "HTTP-Client-Fehler: %s"
 msgid "Directory notification not supported"
 msgstr "Ordnerbenachrichtigung wird nicht unterstützt"
 
-#: ../daemon/gvfsbackendmtp.c:289
+#: ../daemon/gvfsbackendmtp.c:509
 msgid "Unknown error."
 msgstr "Unbekannter Fehler."
 
-#: ../daemon/gvfsbackendmtp.c:295
+#: ../daemon/gvfsbackendmtp.c:515
 #, c-format
 msgid "libmtp error: %s"
 msgstr "libmtp-Fehler: %s"
 
-#: ../daemon/gvfsbackendmtp.c:401
+#: ../daemon/gvfsbackendmtp.c:649
 msgid "Unexpected host uri format."
 msgstr "Unerwartetes Adressformat des Rechners."
 
 # CHECK
-#: ../daemon/gvfsbackendmtp.c:411
+#: ../daemon/gvfsbackendmtp.c:659
 msgid "Malformed host uri."
 msgstr "Beschädigte Rechneradresse"
 
-#: ../daemon/gvfsbackendmtp.c:424
+#: ../daemon/gvfsbackendmtp.c:672
 msgid "Couldn't find matching udev device."
 msgstr "Passendes udev-Gerät kann nicht gefunden werden"
 
-#: ../daemon/gvfsbackendmtp.c:564
+#: ../daemon/gvfsbackendmtp.c:816
 msgid "No MTP devices found"
 msgstr "Keine MTP-Geräte gefunden"
 
-#: ../daemon/gvfsbackendmtp.c:569
+#: ../daemon/gvfsbackendmtp.c:821
 msgid "Unable to connect to MTP device"
 msgstr "Verbindung zum MTP-Gerät kann nicht hergestellt werden"
 
-#: ../daemon/gvfsbackendmtp.c:574
+#: ../daemon/gvfsbackendmtp.c:826
 msgid "Unable to allocate memory while detecting MTP devices"
 msgstr "Beim Erkennen von MTP-Geräten konnte kein Speicher zugewiesen werden"
 
-#: ../daemon/gvfsbackendmtp.c:580
+#: ../daemon/gvfsbackendmtp.c:832
 msgid "Generic libmtp error"
 msgstr "Allgemeiner libmtp-Fehler"
 
-#: ../daemon/gvfsbackendmtp.c:597
+#: ../daemon/gvfsbackendmtp.c:849
 #, c-format
 msgid "Unable to open MTP device '%s'"
 msgstr "MTP-Gerät »%s« kann nicht geöffnet werden"
 
-#: ../daemon/gvfsbackendmtp.c:640
+#: ../daemon/gvfsbackendmtp.c:901
 msgid "Unnamed Device"
 msgstr "Unbenanntes Gerät"
 
-#: ../daemon/gvfsbackendmtp.c:1008 ../daemon/gvfsbackendmtp.c:1081
-msgid "No storage volumes found"
-msgstr "Keine Speichergeräte gefunden"
-
-#: ../daemon/gvfsbackendmtp.c:1030
+#: ../daemon/gvfsbackendmtp.c:1121 ../daemon/gvfsbackendmtp.c:1256
+#: ../daemon/gvfsbackendmtp.c:1308
 msgid "File not found"
 msgstr "Datei nicht gefunden"
 
-#: ../daemon/gvfsbackendmtp.c:1138
+#: ../daemon/gvfsbackendmtp.c:1237
+msgid "Storage not found"
+msgstr "Speicher nicht gefunden"
+
+#: ../daemon/gvfsbackendmtp.c:1369
 msgid "Cannot make directory in this location"
 msgstr "Ordner kann an diesem Ort nicht angelegt werden"
 
-#: ../daemon/gvfsbackendmtp.c:1194 ../daemon/gvfsbackendsmbbrowse.c:1183
+#: ../daemon/gvfsbackendmtp.c:1380 ../daemon/gvfsbackendmtp.c:1542
+#: ../daemon/gvfsbackendmtp.c:1987
+msgid "Destination directory not found"
+msgstr "Zielordner wurde nicht gefunden"
+
+#: ../daemon/gvfsbackendmtp.c:1427 ../daemon/gvfsbackendmtp.c:1630
+#: ../daemon/gvfsbackendmtp.c:1675 ../daemon/gvfsbackendmtp.c:1743
+#: ../daemon/gvfsbackendmtp.c:2066 ../daemon/gvfsbackendmtp.c:2131
+#: ../daemon/gvfsbackendsmbbrowse.c:1183
 msgid "Not a regular file"
 msgstr "Keine gültige Datei"
 
-#: ../daemon/gvfsbackendmtp.c:1269
+#: ../daemon/gvfsbackendmtp.c:1509
 msgid "Cannot write to this location"
 msgstr "Dieser Ort ist schreibgeschützt"
 
-#: ../daemon/gvfsbackendmtp.c:1367
-msgid "Cannot delete this entity"
-msgstr "Dieses Objekt kann nicht gelöscht werden"
+#: ../daemon/gvfsbackendmtp.c:1533
+msgid "File already exists"
+msgstr "Datei existiert bereits"
 
-#: ../daemon/gvfsbackendmtp.c:1479
+#: ../daemon/gvfsbackendmtp.c:1727 ../daemon/gvfsbackendmtp.c:1963
+#: ../daemon/gvfsbackendmtp.c:2050 ../daemon/gvfsbackendmtp.c:2117
+msgid "Operation not supported."
+msgstr "Vorgang wird nicht unterstützt."
+
+#: ../daemon/gvfsbackendmtp.c:1813
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "Keine Vorschau für Objekt »%s«"
+
+#: ../daemon/gvfsbackendmtp.c:1869 ../daemon/gvfsbackendmtp.c:2235
+msgid "Can't seek outside file"
+msgstr "Außerhalb der Datei kann nicht gesucht werden"
+
+#: ../daemon/gvfsbackendmtp.c:1979
+msgid "Cannot create files in this location"
+msgstr "Dateien können an diesem Ort nicht angelegt werden"
 
 #: ../daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
@@ -1691,8 +1711,8 @@ msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr ""
-"Es konnte keine aktive FTP-Verbindung hergestellt werden. Wird dies "
-"eventuell von Ihrem Router nicht unterstützt?"
+"Es konnte keine aktive FTP-Verbindung hergestellt werden. Wird dies eventuell "
+"von Ihrem Router nicht unterstützt?"
 
 #: ../daemon/gvfsftpconnection.c:399
 msgid "Failed to create active FTP connection."
@@ -1882,8 +1902,8 @@ msgstr "Unbenanntes Laufwerk"
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
-"Medium konnte nicht ausgeworfen werden. Ein oder mehrere Speicherorte auf "
-"dem Medium sind noch in Verwendung."
+"Medium konnte nicht ausgeworfen werden. Ein oder mehrere Speicherorte auf dem "
+"Medium sind noch in Verwendung."
 
 #: ../monitor/gdu/ggdudrive.c:1017
 msgid ""
@@ -3018,12 +3038,17 @@ msgstr "Fehler beim Löschen der Datei: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symbolic links, mounts and shortcuts"
-msgstr ""
-"Symbolischen Verknüpfungen, Einhängepunkten und Schnellzugriffen folgen"
+msgstr "Symbolischen Verknüpfungen, Einhängepunkten und Schnellzugriffen folgen"
 
 #: ../programs/gvfs-tree.c:247
 msgid "List contents of directories in a tree-like format."
 msgstr "Den Inhalt von Ordnern in einer Baumstruktur auflisten."
+
+#~ msgid "No storage volumes found"
+#~ msgstr "Keine Speichergeräte gefunden"
+
+#~ msgid "Cannot delete this entity"
+#~ msgstr "Dieses Objekt kann nicht gelöscht werden"
 
 #~ msgid "Can't contact session bus"
 #~ msgstr "Keine Verbindung zum Sitzungs-Bus möglich"
@@ -3131,8 +3156,8 @@ msgstr "Den Inhalt von Ordnern in einer Baumstruktur auflisten."
 #~ msgstr "Sicherung erstellen"
 
 #~ msgid ""
-#~ "attribute type [string, bytestring, boolean, uint32, int32, uint64, "
-#~ "int64, stringv, unset]"
+#~ "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
+#~ "stringv, unset]"
 #~ msgstr ""
 #~ "Typ des Attribut [string, bytestring, boolean, uint32, int32, uint64, "
 #~ "int64, stringv, unset]"
