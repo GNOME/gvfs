@@ -1234,7 +1234,7 @@ do_query_info (GVfsBackend *backend,
       LIBMTP_Clear_Errorstack (device);
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                _("Storage not found"));
+                                _("Directory doesn't exist"));
       goto exit;
     }
 
@@ -1377,7 +1377,7 @@ do_make_directory (GVfsBackend *backend,
   if (!entry) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("Destination directory not found"));
+                              _("Directory doesn't exist"));
     goto exit;
   }
 
@@ -1530,7 +1530,7 @@ do_push (GVfsBackend *backend,
     } else {
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_EXISTS,
-                                _("File already exists"));
+                                _("Target file already exists"));
       goto exit;
     }
   }
@@ -1539,7 +1539,7 @@ do_push (GVfsBackend *backend,
   if (!entry) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("Destination directory not found"));
+                              _("Directory doesn't exist"));
     goto exit;
   }
 
@@ -1724,7 +1724,7 @@ do_open_for_read (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation not supported."));
+                              _("Operation unsupported."));
     return;
   }
 
@@ -1866,7 +1866,7 @@ do_seek_on_read (GVfsBackend *backend,
   if (offset > size || offset < 0) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-                              _("Can't seek outside file"));
+                              _("End of stream"));
     goto exit;
   }
 
@@ -1960,7 +1960,7 @@ do_create (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation not supported."));
+                              _("Operation unsupported."));
     return;
   }
 
@@ -1976,7 +1976,7 @@ do_create (GVfsBackend *backend,
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_FAILED,
-                              _("Cannot create files in this location"));
+                              _("Invalid destination filename"));
     goto exit;
   }
 
@@ -1984,7 +1984,7 @@ do_create (GVfsBackend *backend,
   if (!entry) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("Destination directory not found"));
+                              _("Directory doesn't exist"));
     goto exit;
   }
 
@@ -2047,7 +2047,7 @@ do_append_to (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation not supported."));
+                              _("Operation unsupported."));
     return;
   }
 
@@ -2114,7 +2114,7 @@ do_replace (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation not supported."));
+                              _("Operation unsupported."));
     return;
   }
 
@@ -2232,7 +2232,7 @@ do_seek_on_write (GVfsBackend *backend,
   if (offset < 0) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-                              _("Can't seek outside file"));
+                              _("End of stream"));
     goto exit;
   }
 
