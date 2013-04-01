@@ -7,14 +7,15 @@
 # Tao Wei <weitao1979@gmail.com>, 2009.
 # Tao Wang <dancefire@gmail.com>, 2010.
 # YunQiang Su <wzssyqa@gmail.com>, 2011, 2012.
+# tuhaihe <1132321739qq@gmail.com>, 2012
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-09-19 15:28+0000\n"
-"PO-Revision-Date: 2012-09-20 21:35+0800\n"
+"POT-Creation-Date: 2013-01-09 06:58+0000\n"
+"PO-Revision-Date: 2013-02-28 21:15+0800\n"
 "Last-Translator: tuhaihe <1132321739qq@gmail.com>\n"
 "Language-Team: Chinese (simplified) <i18n-zh@googlegroups.com>\n"
 "Language: zh_CN\n"
@@ -53,13 +54,13 @@ msgstr "找不到所属挂载点"
 msgid "Invalid filename %s"
 msgstr "无效文件名 %s"
 
-#: ../client/gdaemonfile.c:2609 ../client/gdaemonvfs.c:1291
-#: ../client/gdaemonvfs.c:1343
+#: ../client/gdaemonfile.c:2609 ../client/gdaemonvfs.c:1289
+#: ../client/gdaemonvfs.c:1341
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "设置文件元数据出错：%s"
 
-#: ../client/gdaemonfile.c:2610 ../client/gdaemonvfs.c:1344
+#: ../client/gdaemonfile.c:2610 ../client/gdaemonvfs.c:1342
 msgid "values must be string or list of strings"
 msgstr "值必须是字符串或字符串列表"
 
@@ -116,7 +117,7 @@ msgstr "流终止"
 msgid "Seek not supported on stream"
 msgstr "流不支持搜索"
 
-#: ../client/gdaemonvfs.c:815
+#: ../client/gdaemonvfs.c:813
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "获取挂载信息时出错：%s"
@@ -174,7 +175,7 @@ msgstr "在“%3$s”域上解析“%1$s”服务“%2$s”时超时"
 #: ../common/gvfsdnssdutils.c:280
 #, c-format
 msgid "Malformed dns-sd encoded_triple '%s'"
-msgstr "dns-sd encoded_triple“%s”格式错误"
+msgstr "dns-sd encoded_triple“%s” 格式错误"
 
 #: ../common/gvfsicon.c:250
 #, c-format
@@ -378,7 +379,7 @@ msgstr "文件不存在"
 #: ../daemon/gvfsbackendafp.c:478 ../daemon/gvfsbackendafp.c:1310
 #: ../daemon/gvfsbackenddav.c:2250 ../daemon/gvfsbackendftp.c:774
 #: ../daemon/gvfsbackendsftp.c:2339 ../daemon/gvfsbackendsftp.c:3055
-#: ../daemon/gvfsbackendsftp.c:3394 ../daemon/gvfsbackendsftp.c:4262
+#: ../daemon/gvfsbackendsftp.c:3394 ../daemon/gvfsbackendsftp.c:4264
 msgid "File is directory"
 msgstr "文件是目录"
 
@@ -422,7 +423,7 @@ msgstr "卷上空间不足"
 #: ../daemon/gvfsbackenddav.c:2559 ../daemon/gvfsbackenddav.c:2670
 #: ../daemon/gvfsbackendftp.c:753 ../daemon/gvfsbackendftp.c:934
 #: ../daemon/gvfsbackendftp.c:1373 ../daemon/gvfsbackendftp.c:1553
-#: ../daemon/gvfsbackendsftp.c:4271 ../daemon/gvfsbackendsmb.c:2099
+#: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2099
 msgid "Target file already exists"
 msgstr "目标文件已存在"
 
@@ -656,7 +657,7 @@ msgstr "无效的搜索类型"
 #: ../daemon/gvfsbackendafc.c:2368 ../daemon/gvfsbackendafp.c:1749
 #: ../daemon/gvfsbackendftp.c:1088 ../daemon/gvfsbackendftp.c:1136
 #: ../daemon/gvfsbackendftp.c:1157 ../daemon/gvfsbackendsftp.c:1825
-#: ../daemon/gvfsbackendsftp.c:4619 ../daemon/gvfsbackendsmb.c:1736
+#: ../daemon/gvfsbackendsftp.c:4621 ../daemon/gvfsbackendsmb.c:1736
 #: ../daemon/gvfsftptask.c:391
 msgid "Operation unsupported"
 msgstr "不支持此操作"
@@ -710,7 +711,7 @@ msgstr "无法将目录复制到目录"
 msgid "Can't recursively copy directory"
 msgstr "无法递归复制目录"
 
-#: ../daemon/gvfsbackendafp.c:475 ../daemon/gvfsbackendsftp.c:4257
+#: ../daemon/gvfsbackendafp.c:475 ../daemon/gvfsbackendsftp.c:4259
 #: ../daemon/gvfsbackendsmb.c:2088
 msgid "Can't move directory over directory"
 msgstr "不能将目录移动到目录上"
@@ -730,7 +731,7 @@ msgid "The file was externally modified"
 msgstr "文件被其它程序更改"
 
 #: ../daemon/gvfsbackendafp.c:1733 ../daemon/gvfsbackendftp.c:1129
-#: ../daemon/gvfsbackendsftp.c:4629
+#: ../daemon/gvfsbackendsftp.c:4631
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "无效的属性类型(预期为 uint32)"
 
@@ -831,7 +832,7 @@ msgstr "目的路径中不存在此文件或目录"
 
 #: ../daemon/gvfsbackendburn.c:884 ../daemon/gvfsbackendobexftp.c:1813
 #: ../daemon/gvfsbackendobexftp.c:1844 ../daemon/gvfsbackendsftp.c:1823
-#: ../daemon/gvfsbackendsftp.c:4427
+#: ../daemon/gvfsbackendsftp.c:4429
 msgid "Target file exists"
 msgstr "目标文件已存在"
 
@@ -1332,10 +1333,9 @@ msgstr "设备要求一个软件更新"
 msgid "Error deleting file: %s"
 msgstr "删除文件失败：%s"
 
-#, fuzzy
 #: ../daemon/gvfsbackendrecent.c:238
 msgid "The recent folder may not be deleted"
-msgstr "最近的文件夹可能不被删除"
+msgstr "最近的文件夹可能不会被删除"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
@@ -1412,8 +1412,8 @@ msgstr ""
 "无法验证“%s”的标识。\n"
 "这会在您首次登录计算机时发生。\n"
 "\n"
-"远程计算机发送的标识是“%s”。如果您要完全确保继续操作是安全的，请联系其系统管理"
-"员。"
+"远程计算机发送的标识是“%s”。如果您要完全确保继续操作是安全的，请联系其系统管"
+"理员。"
 
 #: ../daemon/gvfsbackendsftp.c:1080
 msgid "Login dialog cancelled"
@@ -1442,12 +1442,12 @@ msgstr "无法找到支持的 ssh 命令"
 #: ../daemon/gvfsbackendsftp.c:3459 ../daemon/gvfsbackendsftp.c:3491
 #: ../daemon/gvfsbackendsftp.c:3546 ../daemon/gvfsbackendsftp.c:3603
 #: ../daemon/gvfsbackendsftp.c:3900 ../daemon/gvfsbackendsftp.c:3967
-#: ../daemon/gvfsbackendsftp.c:4100 ../daemon/gvfsbackendsftp.c:4160
-#: ../daemon/gvfsbackendsftp.c:4195 ../daemon/gvfsbackendsftp.c:4223
-#: ../daemon/gvfsbackendsftp.c:4331 ../daemon/gvfsbackendsftp.c:4385
-#: ../daemon/gvfsbackendsftp.c:4424 ../daemon/gvfsbackendsftp.c:4458
-#: ../daemon/gvfsbackendsftp.c:4492 ../daemon/gvfsbackendsftp.c:4507
-#: ../daemon/gvfsbackendsftp.c:4522 ../daemon/gvfsbackendsftp.c:4600
+#: ../daemon/gvfsbackendsftp.c:4102 ../daemon/gvfsbackendsftp.c:4162
+#: ../daemon/gvfsbackendsftp.c:4197 ../daemon/gvfsbackendsftp.c:4225
+#: ../daemon/gvfsbackendsftp.c:4333 ../daemon/gvfsbackendsftp.c:4387
+#: ../daemon/gvfsbackendsftp.c:4426 ../daemon/gvfsbackendsftp.c:4460
+#: ../daemon/gvfsbackendsftp.c:4494 ../daemon/gvfsbackendsftp.c:4509
+#: ../daemon/gvfsbackendsftp.c:4524 ../daemon/gvfsbackendsftp.c:4602
 msgid "Invalid reply received"
 msgstr "收到无效回复"
 
