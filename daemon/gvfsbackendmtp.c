@@ -1897,6 +1897,7 @@ do_read (GVfsBackend *backend,
 
   uint32_t actual;
   if (handle->handle_type == HANDLE_FILE) {
+#if HAVE_LIBMTP_1_1_6
     unsigned char *temp;
     int ret = LIBMTP_GetPartialObject (G_VFS_BACKEND_MTP (backend)->device, id, offset,
                                        bytes_requested, &temp, &actual);
@@ -1908,6 +1909,9 @@ do_read (GVfsBackend *backend,
 
     memcpy (buffer, temp, actual);
     free (temp);
+#else
+    g_assert_not_reached ();
+#endif
   } else {
     GByteArray *bytes = handle->bytes;
     actual = MIN (bytes->len - offset, bytes_requested);
