@@ -174,7 +174,17 @@ create_reply (GVfsJob *job,
                                     open_job->pid);
 
   remote_fd = g_vfs_channel_steal_remote_fd (G_VFS_CHANNEL (channel));
-  
+  if (remote_fd < 0)
+    {
+      /* expecting we're out of fds when remote_fd == -1 */
+      g_dbus_method_invocation_return_error_literal (invocation,
+                                                     G_IO_ERROR,
+                                                     G_IO_ERROR_TOO_MANY_OPEN_FILES,
+                                                     _("Couldn't get stream file descriptor"));
+      g_object_unref (channel);
+      return;
+    }
+
   fd_list = g_unix_fd_list_new ();
   error = NULL;
   fd_id = g_unix_fd_list_append (fd_list, remote_fd, &error);

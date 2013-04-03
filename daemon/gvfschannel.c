@@ -200,7 +200,7 @@ g_vfs_channel_init (GVfsChannel *channel)
 
   ret = socketpair (AF_UNIX, SOCK_STREAM, 0, socket_fds);
   if (ret == -1) 
-    g_warning ("Error creating socket pair: %d\n", errno);
+    g_warning ("Error creating socket pair: %s\n", g_strerror (errno));
   else
     {
       channel->priv->command_stream = g_unix_input_stream_new (socket_fds[0], TRUE);
