@@ -316,6 +316,15 @@ error_is_cancel (GError *error)
 }
 
 static void
+unappend_request (GDaemonFileOutputStream *stream)
+{
+  g_assert (stream->output_buffer->len >= G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE);
+  stream->seq_nr--;
+  g_string_truncate (stream->output_buffer,
+		     stream->output_buffer->len - G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE);
+}
+
+static void
 append_request (GDaemonFileOutputStream *stream, guint32 command,
 		guint32 arg1, guint32 arg2, guint32 data_len, guint32 *seq_nr)
 {
@@ -499,6 +508,8 @@ iterate_write_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 	case WRITE_STATE_WROTE_COMMAND:
 	  if (io_op->io_cancelled)
 	    {
+	      if (!op->sent_cancel)
+		unappend_request (file);
 	      op->ret_val = -1;
 	      g_set_error_literal (&op->ret_error,
 				   G_IO_ERROR,
@@ -674,6 +685,8 @@ iterate_close_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 	case CLOSE_STATE_WROTE_REQUEST:
 	  if (io_op->io_cancelled)
 	    {
+	      if (!op->sent_cancel)
+		unappend_request (file);
 	      op->ret_val = FALSE;
 	      g_set_error_literal (&op->ret_error,
 				   G_IO_ERROR,
@@ -866,6 +879,8 @@ iterate_seek_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_o
 	case SEEK_STATE_WROTE_REQUEST:
 	  if (io_op->io_cancelled)
 	    {
+	      if (!op->sent_cancel)
+		unappend_request (file);
 	      op->ret_val = -1;
 	      g_set_error_literal (&op->ret_error,
 				   G_IO_ERROR,
@@ -1045,6 +1060,8 @@ iterate_query_state_machine (GDaemonFileOutputStream *file,
 	case QUERY_STATE_WROTE_REQUEST:
 	  if (io_op->io_cancelled)
 	    {
+	      if (!op->sent_cancel)
+		unappend_request (file);
 	      op->info = NULL;
 	      g_set_error_literal (&op->ret_error,
 				   G_IO_ERROR,
