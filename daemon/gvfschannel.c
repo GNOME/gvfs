@@ -40,6 +40,7 @@
 #include <gvfsdaemonutils.h>
 #include <gvfsjobcloseread.h>
 #include <gvfsjobclosewrite.h>
+#include <gvfsjoberror.h>
 #include <gvfsfileinfo.h>
 
 static void g_vfs_channel_job_source_iface_init (GVfsJobSourceIface *iface);
@@ -312,39 +313,38 @@ start_queued_request (GVfsChannel *channel)
       channel->priv->queued_requests =
 	g_list_delete_link (channel->priv->queued_requests,
 			    channel->priv->queued_requests);
-      
+
       error = NULL;
-      job = NULL;
-      if (req->cancelled)
+      /* This passes on ownership of req->data */
+      job = class->handle_request (channel,
+				   req->command, req->seq_nr,
+				   req->arg1, req->arg2,
+				   req->data, req->data_len,
+				   &error);
+      if (job == NULL)
 	{
+	  job = g_vfs_job_error_new (channel, error);
+	  g_error_free (error);
+	}
+
+
+      if (job != NULL && req->cancelled)
+	{
+	  /* Ignore the job, although we need to create it to rely
+	     on handle_request side effects like seek generations, etc */
+	  g_object_unref (job);
 	  error =
 	    g_error_new_literal (G_IO_ERROR, G_IO_ERROR_CANCELLED,
 				 _("Operation was cancelled"));
-	  g_free (req->data); /* Did no pass ownership */
-	}
-      else
-	{
-	  /* This passes on ownership of req->data */
-	  job = class->handle_request (channel,
-				       req->command, req->seq_nr,
-				       req->arg1, req->arg2,
-				       req->data, req->data_len, 
-				       &error);
-	}
-      
-      if (job)
-	{
-	  channel->priv->current_job = job;
-	  channel->priv->current_job_seq_nr = req->seq_nr;
-	  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (channel), channel->priv->current_job);
-	  started_job = TRUE;
-	}
-      else
-	{
-	  g_vfs_channel_send_error (channel, error);
+	  job = g_vfs_job_error_new (channel, error);
 	  g_error_free (error);
 	}
-      
+
+      channel->priv->current_job = job;
+      channel->priv->current_job_seq_nr = req->seq_nr;
+      g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (channel), channel->priv->current_job);
+      started_job = TRUE;
+
       g_free (req);
     }
 
