@@ -1035,7 +1035,8 @@ iterate_close_state_machine (GDaemonFileInputStream *file, IOOperationData *io_o
 		op->state = CLOSE_STATE_HANDLE_INPUT_BLOCK;
 		break;
 	      }
-	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_CLOSED)
+	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_CLOSED &&
+		     reply.seq_nr == op->seq_nr)
 	      {
 		op->ret_val = TRUE;
 		g_string_truncate (file->input_buffer, 0);
@@ -1301,7 +1302,8 @@ iterate_seek_state_machine (GDaemonFileInputStream *file, IOOperationData *io_op
 		op->state = SEEK_STATE_HANDLE_INPUT_BLOCK;
 		break;
 	      }
-	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SEEK_POS)
+	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SEEK_POS &&
+		     reply.seq_nr == op->seq_nr)
 	      {
 		op->ret_val = TRUE;
 		op->ret_offset = ((goffset)reply.arg2) << 32 | (goffset)reply.arg1;
@@ -1580,7 +1582,8 @@ iterate_query_state_machine (GDaemonFileInputStream *file,
 		op->state = QUERY_STATE_HANDLE_INPUT_BLOCK;
 		break;
 	      }
-	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_INFO)
+	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_INFO &&
+		reply.seq_nr == op->seq_nr)
 	      {
 		op->info = gvfs_file_info_demarshal (data, reply.arg2);
 		g_string_truncate (file->input_buffer, 0);
