@@ -75,8 +75,6 @@ g_vfs_job_error_new (GVfsChannel *channel,
 {
   GVfsJobError *job;
 
-  g_print ("g_vfs_job_error_new\n");
-
   job = g_object_new (G_VFS_TYPE_JOB_ERROR,
 		      NULL);
   job->channel = g_object_ref (channel);
@@ -91,8 +89,6 @@ send_reply (GVfsJob *job)
 {
   GVfsJobError *op_job = G_VFS_JOB_ERROR (job);
 
-  g_print ("g_vfs_job_error send_reply\n");
-  
   g_assert (job->failed);
 
   g_vfs_channel_send_error (G_VFS_CHANNEL (op_job->channel), job->error);
