@@ -321,21 +321,19 @@ start_queued_request (GVfsChannel *channel)
 				   req->arg1, req->arg2,
 				   req->data, req->data_len,
 				   &error);
-      if (job == NULL)
-	{
-	  job = g_vfs_job_error_new (channel, error);
-	  g_error_free (error);
-	}
-
 
       if (job != NULL && req->cancelled)
 	{
 	  /* Ignore the job, although we need to create it to rely
 	     on handle_request side effects like seek generations, etc */
 	  g_object_unref (job);
-	  error =
-	    g_error_new_literal (G_IO_ERROR, G_IO_ERROR_CANCELLED,
-				 _("Operation was cancelled"));
+	  job = NULL;
+	  error =  g_error_new_literal (G_IO_ERROR, G_IO_ERROR_CANCELLED,
+					_("Operation was cancelled"));
+	}
+
+      if (job == NULL)
+	{
 	  job = g_vfs_job_error_new (channel, error);
 	  g_error_free (error);
 	}
