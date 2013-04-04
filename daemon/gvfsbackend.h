@@ -74,6 +74,7 @@ typedef struct _GVfsJobPull             GVfsJobPull;
 typedef struct _GVfsJobSetAttribute     GVfsJobSetAttribute;
 typedef struct _GVfsJobQueryAttributes  GVfsJobQueryAttributes;
 typedef struct _GVfsJobCreateMonitor    GVfsJobCreateMonitor;
+typedef struct _GVfsJobError            GVfsJobError;
 
 typedef gpointer GVfsBackendHandle;
 
