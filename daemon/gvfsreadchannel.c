@@ -96,27 +96,38 @@ read_channel_close (GVfsChannel *channel)
 } 
 
 /* Always request large chunks. Its very inefficient
-   to do network requests for smaller chunks. */
+ * to do network requests for smaller chunks.
+ *
+ * gstreamer tends to do 4k reads and seeks, and
+ * the first read when sniffing is also small, so
+ * it makes sense to never read more that 4k
+ * (one page) on the first read. It should not affect
+ * long-file copy performance anyway.
+ */
 static guint32
 modify_read_size (GVfsReadChannel *channel,
 		  guint32 requested_size)
 {
   guint32 real_size;
-  
+
   if (channel->read_count <= 1)
-    real_size = 16*1024;
+    real_size = 4*1024;
   else if (channel->read_count <= 2)
+    real_size = 8*1024;
+  else if (channel->read_count <= 3)
+    real_size = 16*1024;
+  else if (channel->read_count <= 4)
     real_size = 32*1024;
   else
     real_size = 64*1024;
-  
+
   if (requested_size > real_size)
-    real_size = requested_size;
+      real_size = requested_size;
 
   /* Don't do ridicoulously large requests as this
      is just stupid on the network */
-  if (real_size > 512 * 1024)
-    real_size = 512 * 1024;
+  if (real_size > 128 * 1024)
+    real_size = 128 * 1024;
 
   return real_size;
 }
