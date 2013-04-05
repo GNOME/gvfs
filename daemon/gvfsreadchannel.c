@@ -209,7 +209,20 @@ read_channel_readahead (GVfsChannel  *channel,
       read_job = G_VFS_JOB_READ (job);
       read_channel = G_VFS_READ_CHANNEL (channel);
 
-      if (read_job->data_count != 0)
+      /* If the last operation was a read and it succeeded then we
+	 might want to start a readahead. We don't do this for the
+	 first read op as we're not sure we're streaming larger
+	 parts of the file yet. However, after the second read we
+	 queue a readahead read. After this the reading side will
+	 constantly be one read operation behind, such that by
+	 the time the second read operation is done and a third
+	 read() is done we will send a read request but start
+	 reading the readahead data, and after that is done
+	 send a new request but start reading the result of the
+	 previous read request. This way the reading will be
+	 fully pipelined. */
+      if (read_job->data_count != 0 &&
+	  read_channel->read_count == 2)
 	{
 	  read_channel->read_count++;
 	  readahead_job = g_vfs_job_read_new (read_channel,
@@ -218,7 +231,7 @@ read_channel_readahead (GVfsChannel  *channel,
 					      g_vfs_channel_get_backend (channel));
 	}
     }
-  
+
   return readahead_job;
 }
 
