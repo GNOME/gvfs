@@ -103,4 +103,5 @@ static gboolean
 try (GVfsJob *job)
 {
   g_vfs_job_failed_from_error (job, G_VFS_JOB_ERROR (job)->error);
+  return TRUE;
 }
