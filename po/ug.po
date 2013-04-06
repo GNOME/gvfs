@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-02-22 13:23+0000\n"
-"PO-Revision-Date: 2013-02-25 18:54+0900\n"
+"POT-Creation-Date: 2013-04-02 13:33+0000\n"
+"PO-Revision-Date: 2013-04-06 18:25+0900\n"
 "Last-Translator: Gheyret Kenji <gheyret@gmail.com>\n"
 "Language-Team: Uyghur Computer Science Association <UKIJ@yahoogroups.com>\n"
 "Language: \n"
@@ -356,7 +356,7 @@ msgstr "ھوقۇقىڭىز يەتمىدى"
 #: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:327
 #: ../daemon/gvfsbackendafpbrowse.c:359 ../daemon/gvfsbackendarchive.c:651
 #: ../daemon/gvfsbackendarchive.c:699 ../daemon/gvfsbackendarchive.c:751
-#: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1015
+#: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1026
 #: ../daemon/gvfsbackendcomputer.c:638 ../daemon/gvfsbackenddnssd.c:415
 #: ../daemon/gvfsbackendftp.c:1068 ../daemon/gvfsbackendnetwork.c:696
 #: ../daemon/gvfsbackendsmbbrowse.c:1120 ../daemon/gvfsbackendsmbbrowse.c:1187
@@ -431,7 +431,7 @@ msgid "Target directory already exists"
 msgstr "نىشان مۇندەرىجە مەۋجۇت"
 
 #: ../daemon/gvfsafpvolume.c:1219 ../daemon/gvfsbackendafp.c:590
-#: ../daemon/gvfsbackendmtp.c:1402
+#: ../daemon/gvfsbackendmtp.c:1408
 msgid "Can't rename volume"
 msgstr "دىسكىنىڭ ئاتىنى ئۆزگەرتكىلى بولمايدۇ"
 
@@ -676,7 +676,7 @@ msgstr "بۇ ئېگەرلىگىلى بولىدىغان ھۆججەت ئەمەس"
 #: ../daemon/gvfsbackendsmb.c:1497
 #, c-format
 msgid "%s on %s"
-msgstr "‫%2$s دىكى %1$s"
+msgstr "%2$s دىكى %1$s"
 
 #. Translators: %s is the servername
 #: ../daemon/gvfsbackendafpbrowse.c:465
@@ -733,7 +733,7 @@ msgstr "ئىناۋەتسىز خاسلىق تىپى (uint32 بولۇشى لازى
 #: ../daemon/gvfsbackendafp.c:2061
 #, c-format
 msgid "%s for %s on %s"
-msgstr ""
+msgstr "%3$s نىڭدىكى %2$s ئىشلىتىدىغان %1$s"
 
 #: ../daemon/gvfsbackendafp.c:2110
 msgid "No volume specified"
@@ -849,45 +849,45 @@ msgid ""
 msgstr "دىسكا ئالدىراش\n"
 "بىر ياكى بىر قانچە پروگرامما دىسكىنى ئىگىلىۋالغان."
 
-#: ../daemon/gvfsbackendcdda.c:357 ../daemon/gvfsbackendgphoto2.c:1548
+#: ../daemon/gvfsbackendcdda.c:360 ../daemon/gvfsbackendgphoto2.c:1548
 #: ../daemon/gvfsbackendmtp.c:455
 msgid "Cannot create gudev client"
 msgstr "gudev خېرىدارىنى قۇرالمايدۇ"
 
-#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1566
+#: ../daemon/gvfsbackendcdda.c:380 ../daemon/gvfsbackendgphoto2.c:1566
 msgid "Cannot connect to the system bus"
 msgstr "سىستېما باش لىنىيىسىگە باغلىنالمىدى"
 
-#: ../daemon/gvfsbackendcdda.c:388 ../daemon/gvfsbackendgphoto2.c:1578
+#: ../daemon/gvfsbackendcdda.c:391 ../daemon/gvfsbackendgphoto2.c:1578
 msgid "Cannot create libhal context"
 msgstr "libhal كونتېكىست قۇرالمىدى"
 
-#: ../daemon/gvfsbackendcdda.c:402 ../daemon/gvfsbackendgphoto2.c:1591
+#: ../daemon/gvfsbackendcdda.c:405 ../daemon/gvfsbackendgphoto2.c:1591
 msgid "Cannot initialize libhal"
 msgstr "libhal دەسلەپلەشتۈرەلمىدى"
 
-#: ../daemon/gvfsbackendcdda.c:418 ../daemon/gvfsbackendcdda.c:504
+#: ../daemon/gvfsbackendcdda.c:421 ../daemon/gvfsbackendcdda.c:507
 msgid "No drive specified"
 msgstr "قوزغاتقۇچ بەلگىلەنمىگەن"
 
-#: ../daemon/gvfsbackendcdda.c:442
+#: ../daemon/gvfsbackendcdda.c:445
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "%s قوزغاتقۇچنى تاپالمىدى"
 
-#: ../daemon/gvfsbackendcdda.c:455
+#: ../daemon/gvfsbackendcdda.c:458
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "%s قوزغاتقۇچتا ئۈن ھۆججىتى يوق"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
-#: ../daemon/gvfsbackendcdda.c:465
+#: ../daemon/gvfsbackendcdda.c:468
 #, c-format
 msgid "cdda mount on %s"
 msgstr "%s غا ئېگەرلەنگەن cdda"
 
-#: ../daemon/gvfsbackendcdda.c:466 ../daemon/gvfsbackendcdda.c:987
+#: ../daemon/gvfsbackendcdda.c:469 ../daemon/gvfsbackendcdda.c:990
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #: ../monitor/udisks2/gvfsudisks2volume.c:358
@@ -895,39 +895,39 @@ msgstr "%s غا ئېگەرلەنگەن cdda"
 msgid "Audio Disc"
 msgstr "ئۈن دىسكا"
 
-#: ../daemon/gvfsbackendcdda.c:530
+#: ../daemon/gvfsbackendcdda.c:533
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "ھۆججەت سىستېمىسى ئالدىراش: %d ھۆججەت ئېچىلدى"
 
-#: ../daemon/gvfsbackendcdda.c:722
+#: ../daemon/gvfsbackendcdda.c:725
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "%2$s قوزغاتقۇچتا %1$s ھۆججەت يوق"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:831
+#: ../daemon/gvfsbackendcdda.c:834
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "%s قوزغاتقۇچتا 'paranoia' دىن كەلگەن خاتالىق بار"
 
-#: ../daemon/gvfsbackendcdda.c:894
+#: ../daemon/gvfsbackendcdda.c:897
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "%s قوزغاتقۇچتا ئېقىم ئىزدىگەندە خاتالىق كۆرۈلدى"
 
-#: ../daemon/gvfsbackendcdda.c:1008 ../daemon/gvfsbackendgphoto2.c:1864
+#: ../daemon/gvfsbackendcdda.c:1019 ../daemon/gvfsbackendgphoto2.c:1864
 #, c-format
 msgid "No such file"
 msgstr "بۇنداق ھۆججەت يوق"
 
-#: ../daemon/gvfsbackendcdda.c:1022
+#: ../daemon/gvfsbackendcdda.c:1033
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "ھۆججەت مەۋجۇت ئەمەس ياكى ئۈن يولىدا ئەمەس"
 
-#: ../daemon/gvfsbackendcdda.c:1127
+#: ../daemon/gvfsbackendcdda.c:1138
 msgid "Audio CD File System Service"
 msgstr "ئۈن CD ھۆججەت سىستېما مۇلازىمىتى"
 
@@ -988,7 +988,7 @@ msgstr "ھۆججەتنى تەكشۈرەلمىدى"
 #: ../daemon/gvfsbackenddav.c:482
 #, c-format
 msgid "%s on %s%s"
-msgstr ""
+msgstr "%2$s%3$s نىڭ ئۈستىدىكى %1$s"
 
 #: ../daemon/gvfsbackenddav.c:674 ../daemon/gvfsbackenddav.c:1915
 #: ../daemon/gvfsbackendhttp.c:262
@@ -1187,7 +1187,7 @@ msgstr "ھۆججەتكە ئېرىشىۋاتقاندا خاتالىق كۆرۈل�
 msgid "Error getting data from file"
 msgstr "ھۆججەتتىن سانلىق-مەلۇماتقا ئېرىشىۋاتقاندا خاتالىق كۆرۈلدى"
 
-#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1481
+#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1487
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "سىنبەلگە تونۇتۇش بەلگىسى ‹%s› نىڭ فورماتى خاتا"
@@ -1358,11 +1358,11 @@ msgstr "ئادەتتىكى ھۆججەت ئەمەس"
 msgid "Cannot write to this location"
 msgstr "بۇ ئورۇنغا ياشىغىلى بولمايدۇ"
 
-#: ../daemon/gvfsbackendmtp.c:1361
+#: ../daemon/gvfsbackendmtp.c:1367
 msgid "Cannot delete this entity"
 msgstr "مەزكۇر كىرگۈنى ئۆچۈرگىلى بولمايدۇ"
 
-#: ../daemon/gvfsbackendmtp.c:1473
+#: ../daemon/gvfsbackendmtp.c:1479
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "كىرگۈ ‹%s› نىڭ كىچىك سۈرەتلىرى يوق"
