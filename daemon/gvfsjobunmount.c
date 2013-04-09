@@ -294,9 +294,9 @@ unregister_mount_callback (GVfsDBusMountTracker *proxy,
 
   /* Unlink job source from daemon */
   daemon = g_vfs_backend_get_daemon (backend);
+  g_vfs_daemon_close_active_channels (daemon, backend);
   g_vfs_job_source_closed (G_VFS_JOB_SOURCE (backend));
 
-  g_vfs_daemon_close_active_channels (daemon);
 }
 
 /* Might be called on an i/o thread */

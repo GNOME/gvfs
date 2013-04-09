@@ -1029,11 +1029,13 @@ g_vfs_daemon_run_job_in_thread (GVfsDaemon *daemon,
 }
 
 void
-g_vfs_daemon_close_active_channels (GVfsDaemon *daemon)
+g_vfs_daemon_close_active_channels (GVfsDaemon *daemon,
+				    GVfsBackend *backend)
 {
   GList *l;
 
    for (l = daemon->job_sources; l != NULL; l = l->next)
-      if (G_VFS_IS_CHANNEL (l->data))
+      if (G_VFS_IS_CHANNEL (l->data) &&
+          g_vfs_channel_get_backend (G_VFS_CHANNEL (l->data)) == backend)
         g_vfs_channel_force_close (G_VFS_CHANNEL (l->data));
 }
