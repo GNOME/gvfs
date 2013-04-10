@@ -150,6 +150,7 @@ noinst_PROGRAMS =				\
 	$(NULL)
 
 libdaemon_la_SOURCES = \
+	gvfstypes.h \
 	gvfsdaemon.c gvfsdaemon.h \
 	gvfsbackend.c gvfsbackend.h \
 	gvfschannel.c gvfschannel.h \

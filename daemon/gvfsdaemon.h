@@ -25,6 +25,7 @@
 
 #include <glib-object.h>
 #include <gvfsjobsource.h>
+#include <gvfstypes.h>
 #include <gmountsource.h>
 #include <gvfsdbus.h>
 
@@ -37,7 +38,6 @@ G_BEGIN_DECLS
 #define G_VFS_IS_DAEMON_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_DAEMON))
 #define G_VFS_DAEMON_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_DAEMON, GVfsDaemonClass))
 
-typedef struct _GVfsDaemon        GVfsDaemon;
 typedef struct _GVfsDaemonClass   GVfsDaemonClass;
 typedef struct _GVfsDaemonPrivate GVfsDaemonPrivate;
 
@@ -78,7 +78,8 @@ void        g_vfs_daemon_initiate_mount  (GVfsDaemon                    *daemon,
 GArray     *g_vfs_daemon_get_blocking_processes (GVfsDaemon             *daemon);
 void        g_vfs_daemon_run_job_in_thread      (GVfsDaemon             *daemon,
 						 GVfsJob                *job);
-void       g_vfs_daemon_close_active_channels (GVfsDaemon                *daemon);
+void       g_vfs_daemon_close_active_channels (GVfsDaemon                *daemon,
+					       GVfsBackend *backend);
 
 G_END_DECLS
 
