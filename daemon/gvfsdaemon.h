@@ -45,6 +45,9 @@ struct _GVfsDaemonClass
 {
   GObjectClass parent_class;
 
+  /* signals */
+  void (*shutdown) (GVfsDaemon *daemon);
+
   /* vtable */
   
 };

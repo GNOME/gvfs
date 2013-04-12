@@ -46,6 +46,11 @@ enum {
   PROP_0
 };
 
+enum {
+  SHUTDOWN,
+  LAST_SIGNAL
+};
+
 typedef struct {
   char *obj_path;
   GVfsRegisterPathCallback callback;
@@ -85,6 +90,8 @@ typedef struct {
   
   GDBusConnection *conn;
 } NewConnectionData;
+
+static guint signals[LAST_SIGNAL] = { 0 };
 
 static void              g_vfs_daemon_get_property (GObject        *object,
 						    guint           prop_id,
@@ -173,6 +180,15 @@ g_vfs_daemon_class_init (GVfsDaemonClass *klass)
   gobject_class->finalize = g_vfs_daemon_finalize;
   gobject_class->set_property = g_vfs_daemon_set_property;
   gobject_class->get_property = g_vfs_daemon_get_property;
+
+  signals[SHUTDOWN] =
+    g_signal_new ("shutdown",
+		  G_TYPE_FROM_CLASS (gobject_class),
+		  G_SIGNAL_RUN_LAST,
+		  G_STRUCT_OFFSET (GVfsDaemonClass, shutdown),
+		  NULL, NULL,
+		  g_cclosure_marshal_VOID__VOID,
+		  G_TYPE_NONE, 0);
 }
 
 static void
@@ -344,9 +360,9 @@ g_vfs_daemon_set_max_threads (GVfsDaemon                    *daemon,
 }
 
 static gboolean
-exit_at_idle (gpointer data)
+exit_at_idle (GVfsDaemon *daemon)
 {
-  exit (0);
+  g_signal_emit (daemon, signals[SHUTDOWN], 0);
   return FALSE;
 }
 
@@ -364,7 +380,7 @@ static void
 daemon_schedule_exit (GVfsDaemon *daemon)
 {
   if (daemon->exit_tag == 0)
-    daemon->exit_tag = g_timeout_add_seconds (1, exit_at_idle, daemon);
+    daemon->exit_tag = g_timeout_add_seconds (1, (GSourceFunc)exit_at_idle, daemon);
 }
 
 static void

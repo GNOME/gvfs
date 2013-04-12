@@ -118,6 +118,13 @@ on_name_acquired (GDBusConnection *connection,
 #endif
 }
 
+static void
+daemon_shutdown (GVfsDaemon *daemon,
+                 GMainLoop  *loop)
+{
+  if (g_main_loop_is_running (loop))
+    g_main_loop_quit (loop);
+}
 
 int
 main (int argc, char *argv[])
@@ -180,6 +187,9 @@ main (int argc, char *argv[])
   daemon = g_vfs_daemon_new (TRUE, replace);
   if (daemon == NULL)
     return 1;
+
+  g_signal_connect (daemon, "shutdown",
+		    G_CALLBACK (daemon_shutdown), loop);
 
   flags = G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT;
   if (replace)
