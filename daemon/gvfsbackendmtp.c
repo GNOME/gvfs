@@ -1414,6 +1414,7 @@ do_pull (GVfsBackend *backend,
   DEBUG ("(I) do_pull (filename = %s, local_path = %s) ", source, local_path);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  GFile *local_file = NULL;
   GFileInfo *info = NULL;
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), source);
   if (entry == NULL) {
@@ -1427,6 +1428,28 @@ do_pull (GVfsBackend *backend,
                               _("Not a regular file"));
     goto exit;
   }
+
+  local_file = g_file_new_for_path (local_path);
+  if (g_file_query_exists (local_file, G_VFS_JOB (job)->cancellable)) {
+    if (flags & G_FILE_COPY_OVERWRITE) {
+      DEBUG ("(I) Removing destination.");
+      GError *error = NULL;
+      gboolean ret = g_file_delete (local_file,
+                                    G_VFS_JOB (job)->cancellable,
+                                    &error);
+      if (!ret) {
+        g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+        g_error_free (error);
+        goto exit;
+      }
+    } else {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                _("Target file already exists"));
+      goto exit;
+    }
+  }
+
 
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
@@ -1475,6 +1498,7 @@ do_pull (GVfsBackend *backend,
   }
 
  exit:
+  g_clear_object (&local_file);
   g_clear_object (&info);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
