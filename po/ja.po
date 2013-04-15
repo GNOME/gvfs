@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-03-19 21:31+0000\n"
-"PO-Revision-Date: 2012-10-03 18:34+0900\n"
-"Last-Translator: Nishio Futoshi <fut_nis@d3.dion.ne.jp>\n"
+"POT-Creation-Date: 2013-04-14 14:07+0000\n"
+"PO-Revision-Date: 2013-04-15 23:27+0900\n"
+"Last-Translator: OKANO Takayoshi <kano@na.rim.or.jp>\n"
 "Language-Team: Japanese <gnome-translation@gnome.gr.jp>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -27,7 +27,8 @@ msgid "Operation not supported, files on different mounts"
 msgstr "サポートされていない操作です (ファイルが別々のマウント先にあります)"
 
 #: ../client/gdaemonfile.c:1041 ../client/gdaemonfile.c:3117
-#: ../client/gvfsiconloadable.c:304
+#: ../client/gvfsiconloadable.c:304 ../daemon/gvfsjobopenforread.c:183
+#: ../daemon/gvfsjobopenforwrite.c:267
 msgid "Couldn't get stream file descriptor"
 msgstr "ストリームファイルのディスクリプターを取得できませんでした"
 
@@ -64,15 +65,15 @@ msgstr "値は文字列または文字列リストである必要があります
 
 #: ../client/gdaemonfileenumerator.c:528 ../client/gdaemonfileenumerator.c:611
 #: ../client/gdaemonfileenumerator.c:662
-#: ../client/gdaemonfileinputstream.c:630
-#: ../client/gdaemonfileinputstream.c:783
-#: ../client/gdaemonfileinputstream.c:901
-#: ../client/gdaemonfileinputstream.c:1149
-#: ../client/gdaemonfileinputstream.c:1391
-#: ../client/gdaemonfileoutputstream.c:506
-#: ../client/gdaemonfileoutputstream.c:681
-#: ../client/gdaemonfileoutputstream.c:873
-#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:734
+#: ../client/gdaemonfileinputstream.c:642
+#: ../client/gdaemonfileinputstream.c:795
+#: ../client/gdaemonfileinputstream.c:915
+#: ../client/gdaemonfileinputstream.c:1166
+#: ../client/gdaemonfileinputstream.c:1411
+#: ../client/gdaemonfileoutputstream.c:517
+#: ../client/gdaemonfileoutputstream.c:695
+#: ../client/gdaemonfileoutputstream.c:890
+#: ../client/gdaemonfileoutputstream.c:1072 ../client/gvfsdaemondbus.c:734
 #: ../daemon/gvfsbackendobexftp.c:1110 ../daemon/gvfsbackendobexftp.c:1131
 #: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1387
 #: ../daemon/gvfsbackendobexftp.c:1451 ../daemon/gvfsbackendobexftp.c:1652
@@ -81,7 +82,7 @@ msgstr "値は文字列または文字列リストである必要があります
 #: ../daemon/gvfsbackendobexftp.c:2028 ../daemon/gvfsbackendobexftp.c:2091
 #: ../daemon/gvfsbackendobexftp.c:2110 ../daemon/gvfsbackendsmb.c:1244
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:332
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1070
 #: ../monitor/proxy/gproxydrive.c:547 ../monitor/proxy/gproxydrive.c:635
 #: ../monitor/proxy/gproxydrive.c:785 ../monitor/proxy/gproxydrive.c:923
@@ -91,27 +92,27 @@ msgstr "値は文字列または文字列リストである必要があります
 msgid "Operation was cancelled"
 msgstr "操作がキャンセルされました"
 
-#: ../client/gdaemonfileinputstream.c:527
-#: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1684
-#: ../client/gdaemonfileinputstream.c:1694
-#: ../client/gdaemonfileoutputstream.c:450
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1236
-#: ../client/gdaemonfileoutputstream.c:1246
+#: ../client/gdaemonfileinputstream.c:537
+#: ../client/gdaemonfileinputstream.c:545
+#: ../client/gdaemonfileinputstream.c:1705
+#: ../client/gdaemonfileinputstream.c:1715
+#: ../client/gdaemonfileoutputstream.c:459
+#: ../client/gdaemonfileoutputstream.c:467
+#: ../client/gdaemonfileoutputstream.c:1257
+#: ../client/gdaemonfileoutputstream.c:1267
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "ストリームのプロトコルでエラー: %s"
 
-#: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1694
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1246
+#: ../client/gdaemonfileinputstream.c:545
+#: ../client/gdaemonfileinputstream.c:1715
+#: ../client/gdaemonfileoutputstream.c:467
+#: ../client/gdaemonfileoutputstream.c:1267
 msgid "End of stream"
 msgstr "ストリームの末尾"
 
-#: ../client/gdaemonfileinputstream.c:1330
-#: ../client/gdaemonfileoutputstream.c:981
+#: ../client/gdaemonfileinputstream.c:1348
+#: ../client/gdaemonfileoutputstream.c:999
 msgid "Seek not supported on stream"
 msgstr "ストリーム上のシークはサポートしていません"
 
@@ -383,7 +384,7 @@ msgid "Target file is open"
 msgstr "対象のファイルはオープンされています"
 
 #: ../daemon/gvfsafpvolume.c:676 ../daemon/gvfsbackendburn.c:421
-#: ../daemon/gvfsbackenddav.c:2582 ../daemon/gvfsbackendsftp.c:1821
+#: ../daemon/gvfsbackenddav.c:2581 ../daemon/gvfsbackendsftp.c:1821
 msgid "Directory not empty"
 msgstr "フォルダーが空ではありません"
 
@@ -410,8 +411,8 @@ msgstr "ボリュームに十分な空き容量がありません"
 
 #: ../daemon/gvfsafpvolume.c:833 ../daemon/gvfsafpvolume.c:1414
 #: ../daemon/gvfsafpvolume.c:1571 ../daemon/gvfsbackendafp.c:284
-#: ../daemon/gvfsbackendafp.c:485 ../daemon/gvfsbackenddav.c:2297
-#: ../daemon/gvfsbackenddav.c:2544 ../daemon/gvfsbackenddav.c:2650
+#: ../daemon/gvfsbackendafp.c:485 ../daemon/gvfsbackenddav.c:2296
+#: ../daemon/gvfsbackenddav.c:2543 ../daemon/gvfsbackenddav.c:2649
 #: ../daemon/gvfsbackendftp.c:753 ../daemon/gvfsbackendftp.c:934
 #: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
 #: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2168
@@ -499,7 +500,7 @@ msgstr "書き込みアクセスに対してファイルがオープンされま
 msgid "File is locked by another user"
 msgstr "ファイルは他のユーザーによってロックされています"
 
-#: ../daemon/gvfsafpvolume.c:2790
+#: ../daemon/gvfsafpvolume.c:2789
 msgid "File is not open for read access"
 msgstr "読み取りアクセスに対してファイルがオープンされません"
 
@@ -716,7 +717,7 @@ msgstr "バックアップはサポートされていません"
 msgid "Unable to create temporary file (%s)"
 msgstr "一時ファイルを生成できません (%s)"
 
-#: ../daemon/gvfsbackendafp.c:1317 ../daemon/gvfsbackenddav.c:2370
+#: ../daemon/gvfsbackendafp.c:1317 ../daemon/gvfsbackenddav.c:2369
 #: ../daemon/gvfsbackendsftp.c:3407 ../daemon/gvfsbackendsmb.c:1213
 msgid "The file was externally modified"
 msgstr "そのファイルは他のプロセスで変更されました"
@@ -813,7 +814,7 @@ msgstr "ファイルが存在します"
 #: ../daemon/gvfsjobunmountmountable.c:172 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1174 ../monitor/gdu/ggdumount.c:1258
 #: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1134
-#: ../monitor/udisks2/gvfsudisks2volume.c:1675
+#: ../monitor/udisks2/gvfsudisks2volume.c:1673
 msgid "Operation not supported by backend"
 msgstr "バックエンドでサポートしていない操作です"
 
@@ -888,7 +889,7 @@ msgstr "cdda が %s にマウントしました"
 #: ../daemon/gvfsbackendcdda.c:469 ../daemon/gvfsbackendcdda.c:990
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:358
+#: ../monitor/udisks2/gvfsudisks2volume.c:356
 #, c-format
 msgid "Audio Disc"
 msgstr "オーディオディスク"
@@ -1036,7 +1037,7 @@ msgstr "WebDAV 共有は利用できません"
 msgid "Could not create request"
 msgstr "要求メッセージを生成できませんでした"
 
-#: ../daemon/gvfsbackenddav.c:2401 ../daemon/gvfsbackendsmb.c:1249
+#: ../daemon/gvfsbackenddav.c:2400 ../daemon/gvfsbackendsmb.c:1249
 #: ../daemon/gvfsbackendsmb.c:2185
 msgid "Backup file creation failed"
 msgstr "バックアップファイルの生成に失敗しました"
@@ -1424,10 +1425,8 @@ msgid "Recent"
 msgstr "最近"
 
 #: ../daemon/gvfsbackendsftp.c:299 ../daemon/gvfsbackendsftp.c:654
-#, fuzzy
-#| msgid "ssh program unexpectedly exited"
 msgid "SSH program unexpectedly exited"
-msgstr "ssh プログラムが突然終了しました"
+msgstr "SSH プログラムが突然終了しました"
 
 #: ../daemon/gvfsbackendsftp.c:314
 msgid "Hostname not known"
@@ -1446,16 +1445,13 @@ msgid "Host key verification failed"
 msgstr "ホストの鍵を検証できませんでした"
 
 #: ../daemon/gvfsbackendsftp.c:498
-#, fuzzy
-#| msgid "Unable to spawn ssh program"
 msgid "Unable to spawn SSH program"
-msgstr "ssh プログラムに fork() できませんでした"
+msgstr "SSH プログラムを起動できませんでした"
 
 #: ../daemon/gvfsbackendsftp.c:514
-#, fuzzy, c-format
-#| msgid "Unable to spawn ssh program: %s"
+#, c-format
 msgid "Unable to spawn SSH program: %s"
-msgstr "ssh プログラムに fork() できませんでした: %s"
+msgstr "SSH プログラムを起動できませんでした: %s"
 
 #: ../daemon/gvfsbackendsftp.c:616 ../daemon/gvfsbackendsftp.c:874
 msgid "Timed out when logging in"
@@ -1511,10 +1507,8 @@ msgid "Protocol error"
 msgstr "プロトコルのエラーです"
 
 #: ../daemon/gvfsbackendsftp.c:1728
-#, fuzzy
-#| msgid "Unable to find supported ssh command"
 msgid "Unable to find supported SSH command"
-msgstr "ssh コマンドが見つかりません"
+msgstr "SSH コマンドが見つかりません"
 
 #: ../daemon/gvfsbackendsftp.c:2002 ../daemon/gvfsbackendsftp.c:2404
 #: ../daemon/gvfsbackendsftp.c:2463 ../daemon/gvfsbackendsftp.c:2474
@@ -1903,18 +1897,18 @@ msgstr ""
 "ボリュームのロック解除をするパスワードを入力してください\n"
 "デバイス %s には暗号化されたデータが含まれています。"
 
-#: ../monitor/goa/goavolume.c:214
+#: ../monitor/goa/goavolume.c:207
 #, c-format
 msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
 msgstr ""
 
-#: ../monitor/goa/goavolume.c:251
+#: ../monitor/goa/goavolume.c:244
 #, fuzzy, c-format
 #| msgid "Invalid return value from %s"
 msgid "Invalid credentials for %s"
 msgstr "%s からの無効な戻り値"
 
-#: ../monitor/goa/goavolume.c:268
+#: ../monitor/goa/goavolume.c:261
 #, c-format
 msgid "Unsupported authentication method for %s"
 msgstr ""
@@ -2266,7 +2260,7 @@ msgstr "%s を取り外すことができます\n"
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:278
+#: ../monitor/udisks2/gvfsudisks2volume.c:276
 #, c-format
 msgid "%s Encrypted"
 msgstr "%s 暗号済み"
@@ -2274,41 +2268,41 @@ msgstr "%s 暗号済み"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:290
+#: ../monitor/udisks2/gvfsudisks2volume.c:288
 #, c-format
 msgid "%s Volume"
 msgstr "%s ボリューム"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:526
+#: ../monitor/udisks2/gvfsudisks2volume.c:524
 msgid "Volume"
 msgstr "ボリューム"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1099
+#: ../monitor/udisks2/gvfsudisks2volume.c:1097
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "キーリング (%s) にパスフレーズを保存する際にエラー"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1134
+#: ../monitor/udisks2/gvfsudisks2volume.c:1132
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "キーリング (%s) から無効なパスフレーズを削除する際にエラー"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1199
+#: ../monitor/udisks2/gvfsudisks2volume.c:1197
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr "ロックが解除されたデバイスには、その上に認識できるファイルシステムがありません"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1228
+#: ../monitor/udisks2/gvfsudisks2volume.c:1226
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "%s の暗号化パスフレーズ"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1396
+#: ../monitor/udisks2/gvfsudisks2volume.c:1394
 msgid "A passphrase is required to access the volume"
 msgstr "このボリュームにアクセスするにはパスフレーズが必要です"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1411
+#: ../monitor/udisks2/gvfsudisks2volume.c:1409
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2321,7 +2315,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1580
+#: ../monitor/udisks2/gvfsudisks2volume.c:1578
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
