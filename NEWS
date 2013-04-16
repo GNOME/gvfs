@@ -1,3 +1,13 @@
+Major changes in 1.16.1
+=======================
+* daemon: Ensure file monitors are not prematurally finalized
+* gvfschannel: Return proper error if we're out of free fds
+* gvfschannel: Fix daemon crash when cancelling channel operations
+* gvfschannel: Fix readahead behaviour
+* obexftp: Fix crasher due to missing D-Bus threads support
+* Fix compiler warnings
+* Translation updates
+
 Major changes in 1.16.0
 =======================
 * cdda: Fix warnings for each track on the CD
