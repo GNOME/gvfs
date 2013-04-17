@@ -705,11 +705,11 @@ get_storage_info (LIBMTP_devicestorage_t *storage, GFileInfo *info) {
     break;
   case PTP_ST_RemovableROM:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
-    icon = g_themed_icon_new_with_default_fallbacks ("gnome-dev-media-sdmmc");
+    icon = g_themed_icon_new_with_default_fallbacks ("media-flash-sd");
     break;
   case PTP_ST_RemovableRAM:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, FALSE);
-    icon = g_themed_icon_new_with_default_fallbacks ("gnome-dev-media-sdmmc");
+    icon = g_themed_icon_new_with_default_fallbacks ("media-flash-sd");
     break;
   case PTP_ST_FixedRAM:
   default:
