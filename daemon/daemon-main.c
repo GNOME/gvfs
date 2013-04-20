@@ -313,6 +313,14 @@ on_name_lost (GDBusConnection *connection,
 }
 
 static void
+daemon_shutdown (GVfsDaemon *daemon,
+		 GMainLoop  *loop)
+{
+  if (g_main_loop_is_running (loop))
+    g_main_loop_quit (loop);
+}
+
+static void
 on_name_acquired (GDBusConnection *connection,
                   const gchar     *name,
                   gpointer         user_data)
@@ -329,6 +337,8 @@ on_name_acquired (GDBusConnection *connection,
     }
 
   g_vfs_daemon_set_max_threads (data->daemon, data->max_job_threads);
+  g_signal_connect (data->daemon, "shutdown",
+		    G_CALLBACK (daemon_shutdown), loop);
 
   send_spawned (TRUE, NULL, 0, spawned_succeeded_cb, data);
 }
@@ -391,7 +401,7 @@ daemon_main (int argc,
     {
       g_idle_add (do_name_acquired, data);
     }
-  
+
   g_main_loop_run (loop);
   
   g_clear_object (&data->daemon);

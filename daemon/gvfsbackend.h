@@ -496,6 +496,7 @@ const char *g_vfs_backend_get_default_location           (GVfsBackend        *ba
 GMountSpec *g_vfs_backend_get_mount_spec                 (GVfsBackend        *backend);
 GVfsDaemon *g_vfs_backend_get_daemon                     (GVfsBackend        *backend);
 gboolean    g_vfs_backend_is_mounted                     (GVfsBackend        *backend);
+void        g_vfs_backend_force_unmount                  (GVfsBackend        *backend);
 
 void        g_vfs_backend_add_auto_info                  (GVfsBackend           *backend,
 							  GFileAttributeMatcher *matcher,

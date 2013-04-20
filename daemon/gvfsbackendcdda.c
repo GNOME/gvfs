@@ -237,9 +237,7 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
   if (strcmp (action, "remove") == 0 || (strcmp (action, "change") == 0 &&
       g_udev_device_get_property_as_int (device, "ID_CDROM_MEDIA") != 1))
     {
-      /*g_warning ("we have been removed!");*/
-      /* TODO: need a cleaner way to force unmount ourselves */
-      exit (1);
+      g_vfs_backend_force_unmount (cdda_backend);
     }
 }
 
@@ -292,9 +290,7 @@ _hal_device_removed (LibHalContext *hal_ctx, const char *udi)
 
   if (cdda_backend->hal_udi != NULL && strcmp (udi, cdda_backend->hal_udi) == 0)
     {
-      /*g_warning ("we have been removed!");*/
-      /* TODO: need a cleaner way to force unmount ourselves */
-      exit (1);
+      g_vfs_backend_force_unmount (cdda_backend);
     }
 }
 #endif
