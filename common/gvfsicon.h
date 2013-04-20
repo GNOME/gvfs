@@ -61,8 +61,11 @@ GType  g_vfs_icon_get_type        (void) G_GNUC_CONST;
 GIcon *g_vfs_icon_new             (GMountSpec  *mount_spec,
                                    const gchar *icon_id);
 
+GIcon *g_vfs_icon_deserialize     (GVariant    *value);
+
 GMountSpec  *g_vfs_icon_get_mount_spec (GVfsIcon *vfs_icon);
 const gchar *g_vfs_icon_get_icon_id    (GVfsIcon *vfs_icon);
+
 
 G_END_DECLS
 

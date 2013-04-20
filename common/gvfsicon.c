@@ -272,6 +272,39 @@ g_vfs_icon_from_tokens (gchar  **tokens,
   return icon;
 }
 
+static GVariant *
+g_vfs_icon_serialize (GIcon *icon)
+{
+  GVfsIcon *vfs_icon = G_VFS_ICON (icon);
+
+  return g_variant_new ("(@ss)",
+                        g_variant_new_take_string (g_mount_spec_to_string (vfs_icon->mount_spec)),
+                        vfs_icon->icon_id);
+}
+
+GIcon *
+g_vfs_icon_deserialize (GVariant *value)
+{
+  const gchar *mount_spec_str;
+  const gchar *id_str;
+  GMountSpec *mount_spec;
+  GIcon *icon;
+
+  if (!g_variant_is_of_type (value, G_VARIANT_TYPE ("(ss)")))
+    return NULL;
+
+  g_variant_get (value, "(&s&s)", &mount_spec_str, &id_str);
+
+  mount_spec = g_mount_spec_new_from_string (mount_spec_str, NULL);
+  if (mount_spec == NULL)
+    return NULL;
+
+  icon = g_vfs_icon_new (mount_spec, id_str);
+  g_mount_spec_unref (mount_spec);
+
+  return icon;
+}
+
 static void
 g_vfs_icon_icon_iface_init (GIconIface *iface)
 {
@@ -279,4 +312,5 @@ g_vfs_icon_icon_iface_init (GIconIface *iface)
   iface->equal = g_vfs_icon_equal;
   iface->to_tokens = g_vfs_icon_to_tokens;
   iface->from_tokens = g_vfs_icon_from_tokens;
+  iface->serialize = g_vfs_icon_serialize;
 }

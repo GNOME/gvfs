@@ -1473,6 +1473,13 @@ g_daemon_vfs_local_file_moved (GVfs       *vfs,
   meta_lookup_cache_free (cache);
 }
 
+static GIcon *
+g_daemon_vfs_deserialize_icon (GVfs     *vfs,
+                               GVariant *value)
+{
+  return g_vfs_icon_deserialize (value);
+}
+
 GDBusConnection *
 _g_daemon_vfs_get_async_bus (void)
 {
@@ -1515,6 +1522,7 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
   vfs_class->local_file_set_attributes = g_daemon_vfs_local_file_set_attributes;
   vfs_class->local_file_removed = g_daemon_vfs_local_file_removed;
   vfs_class->local_file_moved = g_daemon_vfs_local_file_moved;
+  vfs_class->deserialize_icon = g_daemon_vfs_deserialize_icon;
 }
 
 /* Module API */
