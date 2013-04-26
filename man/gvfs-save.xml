@@ -93,6 +93,11 @@
                                 <listitem><para>Print the new etag at the end.</para></listitem>
                         </varlistentry>
 
+                        <varlistentry>
+                                <term><option>-e</option>, <option>--etag=ETAG</option></term>
+
+                                <listitem><para>The etag of the file being overwritten.</para></listitem>
+                        </varlistentry>
 
                 </variablelist>
         </refsect1>
