@@ -82,12 +82,6 @@
                         </varlistentry>
 
                         <varlistentry>
-                                <term><option>--preserve</option></term>
-
-                                <listitem><para>Preserve all attributes.</para></listitem>
-                        </varlistentry>
-
-                        <varlistentry>
                                 <term><option>-b</option>, <option>--backup</option></term>
 
                                 <listitem><para>Backup existing destination files.</para></listitem>
