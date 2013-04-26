@@ -70,7 +70,7 @@
                         </varlistentry>
 
                         <varlistentry>
-                                <term><option>-n</option>, <option>--no-follow-symlinks</option></term>
+                                <term><option>-n</option>, <option>--nofollow-symlinks</option></term>
 
                                 <listitem><para>Don't follow symlinks.</para></listitem>
                         </varlistentry>
