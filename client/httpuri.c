@@ -66,7 +66,7 @@ http_get_handled_schemes (GVfsUriMapper *mapper)
 }
 
 static inline gboolean
-port_is_defaul_port (int port, gboolean ssl)
+port_is_default_port (int port, gboolean ssl)
 {
   if (ssl)
     return port == 443;
@@ -105,7 +105,7 @@ http_from_uri (GVfsUriMapper *mapper,
         g_vfs_uri_mount_info_set (info, "user", uri->userinfo);
 
       /* only set the port if it isn't the default port */
-      if (uri->port != -1 && ! port_is_defaul_port (uri->port, ssl))
+      if (uri->port != -1 && ! port_is_default_port (uri->port, ssl))
         {
           char *port = g_strdup_printf ("%d", uri->port);
           g_vfs_uri_mount_info_set (info, "port", port);
