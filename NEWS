@@ -1,3 +1,27 @@
+Major changes in 1.17.0
+=======================
+* daemon: Ensure monitors are not prematurely finalized
+* daemon: Fix crash when cancelling channel operations
+* daemon: Tweak read sizes
+* daemon: Close channels belonging to the active mount only
+* daemon: Add infrastructure for the backends to exit cleanly
+* channel: Unqueue cancelled requests
+* channel: Verify that replies are for the right serial
+* channel: Fix readahead behaviour
+* channel: Return proper error if we're out of free fds
+* mtp: Refactor read path in preparation for supporting normal files
+* mtp: Use Android extensions to support in place read and write of files
+* mtp: Use normal filenames in paths
+* mtp: When removing cache entries, remove children too
+* mtp: Clear previous cache entries when refreshing a directory
+* mtp: Clear cache and emit delete events when an object is removed
+* mtp: Handle overwriting of files in do_push and do_pull correctly
+* mtp: Use standard name for SD Card icon
+* obexftp: Fix crasher due to missing D-Bus threads support
+* GVfsIcon: support icon serialisation
+* Man pages typo fixes
+* Translation updates
+
 Major changes in 1.16.0
 =======================
 * cdda: Fix warnings for each track on the CD
