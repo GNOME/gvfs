@@ -72,6 +72,7 @@ struct _GVfsBackendSmb
   char *domain;
   char *path;
   char *default_workgroup;
+  int port;
   
   SMBCCTX *smb_context;
 
@@ -230,7 +231,7 @@ auth_callback (SMBCCTX *context,
 						      "smb",
 						      NULL,
 						      NULL,
-						      0,
+						      backend->port != -1 ? backend->port : 0,
 						      &ask_user,
 						      &ask_domain,
 						      &ask_password);
@@ -459,6 +460,7 @@ g_string_append_encoded (GString *string,
 
 static GString *
 create_smb_uri_string (const char *server,
+		       int port,
 		       const char *share,
 		       const char *path)
 {
@@ -466,6 +468,8 @@ create_smb_uri_string (const char *server,
 
   uri = g_string_new ("smb://");
   g_string_append_encoded (uri, server, NULL);
+  if (port != -1)
+    g_string_append_printf (uri, ":%d", port);
   g_string_append_c (uri, '/');
   g_string_append_encoded (uri, share, NULL);
   if (path != NULL)
@@ -484,11 +488,12 @@ create_smb_uri_string (const char *server,
 
 static char *
 create_smb_uri (const char *server,
+		int port,
 		const char *share,
 		const char *path)
 {
   GString *uri;
-  uri = create_smb_uri_string (server, share, path);
+  uri = create_smb_uri_string (server, port, share, path);
   return g_string_free (uri, FALSE);
 }
 
@@ -507,6 +512,7 @@ do_mount (GVfsBackend *backend,
   char *display_name;
   const char *debug;
   int debug_val;
+  gchar *port_str;
   GMountSpec *smb_mount_spec;
   smbc_stat_fn smbc_stat;
 
@@ -588,6 +594,12 @@ do_mount (GVfsBackend *backend,
     g_mount_spec_set (smb_mount_spec, "user", op_backend->user);
   if (op_backend->domain)
     g_mount_spec_set (smb_mount_spec, "domain", op_backend->domain);
+  if (op_backend->port != -1)
+    {
+      port_str = g_strdup_printf ("%d", op_backend->port);
+      g_mount_spec_set (smb_mount_spec, "port", port_str);
+      g_free (port_str);
+    }
 
   g_vfs_backend_set_mount_spec (backend, smb_mount_spec);
   g_mount_spec_unref (smb_mount_spec);
@@ -596,7 +608,7 @@ do_mount (GVfsBackend *backend,
             would like to fallback to root when first mount attempt fails, though
             it would be tough to actually say if it was an authentication failure
             or the particular path problem. */
-  uri = create_smb_uri (op_backend->server, op_backend->share, op_backend->path);
+  uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, op_backend->path);
   DEBUG ("do_mount - URI = %s\n", uri);
 
   /*  Samba mount loop  */
@@ -672,7 +684,7 @@ do_mount (GVfsBackend *backend,
 			       "smb",
 			       NULL,
 			       NULL,
-			       0,
+			       op_backend->port != -1 ? op_backend->port : 0,
 			       op_backend->last_password,
 			       op_backend->password_save);
   
@@ -687,7 +699,8 @@ try_mount (GVfsBackend *backend,
 	   gboolean is_automount)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  const char *server, *share, *user, *domain, *path;
+  const char *server, *share, *user, *domain, *path, *port;
+  int port_num;
 
   server = g_mount_spec_get (mount_spec, "server");
   share = g_mount_spec_get (mount_spec, "share");
@@ -702,6 +715,7 @@ try_mount (GVfsBackend *backend,
 
   user = g_mount_spec_get (mount_spec, "user");
   domain = g_mount_spec_get (mount_spec, "domain");
+  port = g_mount_spec_get (mount_spec, "port");
   path = mount_spec->mount_prefix;
   
   op_backend->server = g_strdup (server);
@@ -709,6 +723,11 @@ try_mount (GVfsBackend *backend,
   op_backend->user = g_strdup (user);
   op_backend->domain = g_strdup (domain);
   op_backend->path = g_strdup (path);
+
+  if (port && (port_num = atoi (port)))
+      op_backend->port = port_num;
+  else
+      op_backend->port = -1;
   
   return FALSE;
 }
@@ -765,7 +784,7 @@ do_open_for_read (GVfsBackend *backend,
   int olderr;
 
 
-  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
   smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
   errno = 0;
   file = smbc_open (op_backend->smb_context, uri, O_RDONLY, 0);
@@ -941,7 +960,7 @@ do_create (GVfsBackend *backend,
   smbc_open_fn smbc_open;
   int errsv;
 
-  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
   smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
   errno = 0;
   file = smbc_open (op_backend->smb_context, uri,
@@ -982,7 +1001,7 @@ do_append_to (GVfsBackend *backend,
   smbc_open_fn smbc_open;
   smbc_lseek_fn smbc_lseek;
 
-  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
   smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
   errno = 0;
   file = smbc_open (op_backend->smb_context, uri,
@@ -1173,7 +1192,7 @@ do_replace (GVfsBackend *backend,
   smbc_open_fn smbc_open;
   smbc_stat_fn smbc_stat;
 
-  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
   tmp_uri = NULL;
   if (make_backup)
     backup_uri = g_strconcat (uri, "~", NULL);
@@ -1663,7 +1682,7 @@ do_query_info (GVfsBackend *backend,
   char *basename;
   smbc_stat_fn smbc_stat;
 
-  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
   smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
   res = smbc_stat (op_backend->smb_context, uri, &st);
   saved_errno = errno;
@@ -1706,7 +1725,7 @@ do_query_fs_info (GVfsBackend *backend,
       g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_FILESYSTEM_READONLY))
     {
-      uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+      uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
       smbc_statvfs = smbc_getFunctionStatVFS (op_backend->smb_context);
       res = smbc_statvfs (op_backend->smb_context, uri, &st);
       saved_errno = errno;
@@ -1807,7 +1826,7 @@ do_set_attribute (GVfsBackend *backend,
       return;
     }
 
-  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
   res = -1;
 
   if (strcmp (attribute, G_FILE_ATTRIBUTE_TIME_MODIFIED) == 0)
@@ -1870,7 +1889,7 @@ do_enumerate (GVfsBackend *backend,
   smbc_stat_fn smbc_stat;
   smbc_closedir_fn smbc_closedir;
 
-  uri = create_smb_uri_string (op_backend->server, op_backend->share, filename);
+  uri = create_smb_uri_string (op_backend->server, op_backend->port, op_backend->share, filename);
   
   smbc_opendir = smbc_getFunctionOpendir (op_backend->smb_context);
   smbc_getdents = smbc_getFunctionGetdents (op_backend->smb_context);
@@ -1992,8 +2011,8 @@ do_set_display_name (GVfsBackend *backend,
   new_path = g_build_filename (dirname, display_name, NULL);
   g_free (dirname);
   
-  from_uri = create_smb_uri (op_backend->server, op_backend->share, filename);
-  to_uri = create_smb_uri (op_backend->server, op_backend->share, new_path);
+  from_uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
+  to_uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, new_path);
   
 
   /* We can't rely on libsmbclient reporting EEXIST, let's always stat first.
@@ -2042,7 +2061,7 @@ do_delete (GVfsBackend *backend,
   smbc_unlink_fn smbc_unlink;
 
 
-  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
 
   smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
   smbc_rmdir = smbc_getFunctionRmdir (op_backend->smb_context);
@@ -2085,7 +2104,7 @@ do_make_directory (GVfsBackend *backend,
   int errsv, res;
   smbc_mkdir_fn smbc_mkdir;
 
-  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
   smbc_mkdir = smbc_getFunctionMkdir (op_backend->smb_context);
   res = smbc_mkdir (op_backend->smb_context, uri, 0666);
   errsv = errno;
@@ -2116,7 +2135,7 @@ do_move (GVfsBackend *backend,
   smbc_unlink_fn smbc_unlink;
 
   
-  source_uri = create_smb_uri (op_backend->server, op_backend->share, source);
+  source_uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, source);
 
   smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
   smbc_rename = smbc_getFunctionRename (op_backend->smb_context);
@@ -2138,7 +2157,7 @@ do_move (GVfsBackend *backend,
   else
     source_is_dir = S_ISDIR (statbuf.st_mode);
 
-  dest_uri = create_smb_uri (op_backend->server, op_backend->share, destination);
+  dest_uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, destination);
   
   destination_exist = FALSE;
   res = smbc_stat (op_backend->smb_context, dest_uri, &statbuf);

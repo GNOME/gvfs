@@ -27,6 +27,8 @@
 #include <gvfsurimapper.h>
 #include <gvfsuriutils.h>
 
+#define DEFAULT_SMB_PORT 445
+
 typedef struct _GVfsUriMapperSmb GVfsUriMapperSmb;
 typedef struct _GVfsUriMapperSmbClass GVfsUriMapperSmbClass;
 
@@ -165,6 +167,14 @@ smb_from_uri (GVfsUriMapper *mapper,
 	      info->path = g_strconcat ("/", p, NULL);
 	    }
 	}
+
+      /* only set the port if it isn't the default port */
+      if (uri->port != -1 && uri->port != DEFAULT_SMB_PORT)
+	{
+	  gchar *port = g_strdup_printf ("%d", uri->port);
+	  g_vfs_uri_mount_info_set (info, "port", port);
+	  g_free (port);
+	}
     }
   
   if (uri->userinfo)
@@ -208,7 +218,9 @@ smb_to_uri (GVfsUriMapper *mapper,
   const char *share;
   const char *user;
   const char *domain;
+  const char *port = NULL;
   char *s;
+  int port_num;
   GDecodedUri *uri;
 
   uri = g_new0 (GDecodedUri, 1);
@@ -216,7 +228,6 @@ smb_to_uri (GVfsUriMapper *mapper,
   type = g_vfs_uri_mount_info_get (info, "type");
 
   uri->scheme = g_strdup ("smb");
-  uri->port = -1;
   
   if (strcmp (type, "smb-network") == 0)
     {
@@ -232,6 +243,7 @@ smb_to_uri (GVfsUriMapper *mapper,
 	uri->path = g_strconcat ("/._", info->path + 1, NULL);
       else
 	uri->path = g_strdup ("/");
+      port = g_vfs_uri_mount_info_get (info, "port");
     }
   else if (strcmp (type, "smb-share") == 0)
     {
@@ -251,7 +263,13 @@ smb_to_uri (GVfsUriMapper *mapper,
         else
           uri->userinfo = g_strdup (user);
       }
+      port = g_vfs_uri_mount_info_get (info, "port");
     }
+
+  if (port && (port_num = atoi (port)))
+      uri->port = port_num;
+  else
+      uri->port = -1;
 
   s = g_vfs_encode_uri (uri, allow_utf8);
   g_vfs_decoded_uri_free (uri);

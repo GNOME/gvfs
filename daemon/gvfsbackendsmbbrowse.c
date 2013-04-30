@@ -80,6 +80,7 @@ struct _GVfsBackendSmbBrowse
   char *server;
   char *mounted_server; /* server or DEFAULT_WORKGROUP_NAME */
   char *default_workgroup;
+  int port;
   SMBCCTX *smb_context;
 
   char *last_user;
@@ -349,7 +350,7 @@ auth_callback (SMBCCTX *context,
 						      "smb",
 						      NULL,
 						      NULL,
-						      0,
+						      backend->port != -1 ? backend->port : 0,
 						      &ask_user,
 						      &ask_domain,
 						      &ask_password);
@@ -624,6 +625,8 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
   if (backend->server)
     {
       g_string_append_encoded (uri, backend->server, NULL, NULL);
+      if (backend->port != -1)
+        g_string_append_printf (uri, ":%d", backend->port);
       g_string_append_c (uri, '/');
     }
 
@@ -767,10 +770,12 @@ find_entry_unlocked (GVfsBackendSmbBrowse *backend,
 
 static GMountSpec *
 get_mount_spec_for_share (const char *server,
+			  int port,
 			  const char *share)
 {
   GMountSpec *mount_spec;
   char *normalized;
+  char *port_str;
   
   mount_spec = g_mount_spec_new ("smb-share");
   normalized = normalize_smb_name (server, -1);
@@ -779,7 +784,13 @@ get_mount_spec_for_share (const char *server,
   normalized = normalize_smb_name (share, -1);
   g_mount_spec_set (mount_spec, "share", normalized);
   g_free (normalized);
-  
+  if (port != -1)
+    {
+      port_str = g_strdup_printf ("%d", port);
+      g_mount_spec_set (mount_spec, "port", port_str);
+      g_free (port_str);
+    }
+
   return mount_spec;
 }
 
@@ -838,6 +849,7 @@ do_mount (GVfsBackend *backend,
   int debug_val;
   char *icon;
   char *symbolic_icon;
+  gchar *port_str;
   GString *uri;
   gboolean res;
   GMountSpec *browse_mount_spec;
@@ -926,6 +938,12 @@ do_mount (GVfsBackend *backend,
       display_name = g_strdup_printf (_("Windows shares on %s"), op_backend->server);
       browse_mount_spec = g_mount_spec_new ("smb-server");
       g_mount_spec_set (browse_mount_spec, "server", op_backend->mounted_server);
+      if (op_backend->port != -1)
+        {
+          port_str = g_strdup_printf ("%d", op_backend->port);
+          g_mount_spec_set (browse_mount_spec, "port", port_str);
+          g_free (port_str);
+        }
       icon = "network-server";
       symbolic_icon = "network-server-symbolic";
     }
@@ -957,6 +975,8 @@ do_mount (GVfsBackend *backend,
   if (op_backend->server)
     {
       g_string_append_encoded (uri, op_backend->server, NULL, NULL);
+      if (op_backend->port != -1)
+        g_string_append_printf (uri, ":%d", op_backend->port);
       g_string_append_c (uri, '/');
     }
 
@@ -1052,6 +1072,8 @@ try_mount (GVfsBackend *backend,
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
   const char *server;
   const char *user, *domain;
+  const char *port;
+  int port_num;
 
   if (strcmp (g_mount_spec_get_type (mount_spec), "smb-network") == 0)
     server = NULL;
@@ -1069,6 +1091,7 @@ try_mount (GVfsBackend *backend,
 
   user = g_mount_spec_get (mount_spec, "user");
   domain = g_mount_spec_get (mount_spec, "domain");
+  port = g_mount_spec_get (mount_spec, "port");
 
   if (is_automount &&
       ((user != NULL) || (domain != NULL)))
@@ -1082,6 +1105,10 @@ try_mount (GVfsBackend *backend,
   op_backend->user = g_strdup (user);
   op_backend->domain = g_strdup (domain);
   op_backend->mounted_server = g_strdup (server);
+  if (port && (port_num = atoi (port)))
+      op_backend->port = port_num;
+  else
+      op_backend->port = -1;
   
   return FALSE;
 }
@@ -1105,7 +1132,7 @@ run_mount_mountable (GVfsBackendSmbBrowse *backend,
       if (backend->server != NULL &&
 	  entry->smbc_type == SMBC_FILE_SHARE)
 	{
-	  mount_spec = get_mount_spec_for_share (backend->server, entry->name);
+	  mount_spec = get_mount_spec_for_share (backend->server, backend->port, entry->name);
 	  g_vfs_job_mount_mountable_set_target (job, mount_spec, "/", TRUE);
 	  g_mount_spec_unref (mount_spec);
 	}
@@ -1308,7 +1335,7 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
 	}
       else
 	{
-	  mount_spec = get_mount_spec_for_share (backend->server, entry->name);
+	  mount_spec = get_mount_spec_for_share (backend->server, backend->port, entry->name);
 
 	  uri = g_string_new ("smb://");
 	  g_string_append_encoded (uri, backend->server, NULL, NULL);
