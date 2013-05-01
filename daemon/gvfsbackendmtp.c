@@ -144,7 +144,7 @@ emit_delete_event (gpointer key,
  * Cache Helpers
  ************************************************/
 
-static CacheEntry *
+static void
 add_cache_entry (GVfsBackendMtp *backend,
                  char *path,
                  uint32_t storage,
@@ -291,7 +291,6 @@ remove_cache_entry (GVfsBackendMtp *backend,
                     const char *path)
 {
   DEBUG ("(III) remove_cache_entry: %s", path);
-  //g_hash_table_remove (backend->file_cache, path);
   g_hash_table_foreach_remove (backend->file_cache,
                                remove_cache_entry_by_prefix,
                                (gpointer) path);
