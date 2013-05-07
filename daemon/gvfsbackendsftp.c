@@ -1143,7 +1143,7 @@ fail_jobs_and_die (GVfsBackendSftp *backend, GError *error)
 
   g_error_free (error);
 
-  _exit (1);
+  g_vfs_backend_force_unmount (backend);
 }
 
 static void
@@ -1282,8 +1282,8 @@ send_command_data (GObject *source_object,
 
   if (res <= 0)
     {
-      /* TODO: unmount, etc */
       g_warning ("Error sending command");
+      g_vfs_backend_force_unmount (backend);
       return;
     }
 
