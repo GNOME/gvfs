@@ -778,7 +778,8 @@ error_occurred_cb (DBusGProxy *proxy, const gchar *error_name, const gchar *erro
   if (strcmp (error_name, "org.openobex.Error.LinkError") == 0)
     {
       g_message ("link lost to remote device");
-      _exit (1);
+      g_vfs_backend_force_unmount ((GVfsBackend*)op_backend);
+      return;
     }
 
   /* Something is waiting on us */
@@ -796,7 +797,7 @@ error_occurred_cb (DBusGProxy *proxy, const gchar *error_name, const gchar *erro
   g_mutex_unlock (&op_backend->mutex);
 
   g_message ("Unhandled error, file a bug");
-  _exit (1);
+  g_vfs_backend_force_unmount ((GVfsBackend*)op_backend);
 }
 
 static void
@@ -846,17 +847,19 @@ cancelled_cb (DBusGProxy *proxy, gpointer user_data)
 static void
 disconnected_cb (DBusGProxy *proxy, gpointer user_data)
 {
-  g_message ("disconnected_cb");
+  GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (user_data);
 
-  _exit (1);
+  g_message ("disconnected_cb");
+  g_vfs_backend_force_unmount ((GVfsBackend*)op_backend);
 }
 
 static void
 closed_cb (DBusGProxy *proxy, gpointer user_data)
 {
-  g_message ("closed_cb");
+  GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (user_data);
 
-  _exit (1);
+  g_message ("closed_cb");
+  g_vfs_backend_force_unmount ((GVfsBackend*)op_backend);
 }
 
 static void
