@@ -541,8 +541,7 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
   if (g_strcmp0 (op_backend->dev_path, dev_path) == 0 &&
       g_str_equal (action, "remove")) {
     DEBUG ("(I) on_uevent: Quiting after remove event on device %s", dev_path);
-    /* TODO: need a cleaner way to force unmount ourselves */
-    exit (1);
+    g_vfs_backend_force_unmount ((GVfsBackend*)op_backend);
   }
 
   DEBUG ("(I) on_uevent done.");
