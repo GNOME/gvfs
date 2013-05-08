@@ -359,8 +359,7 @@ _idevice_event_cb (const idevice_event_t *event, void *user_data)
 
   idevice_event_unsubscribe ();
 
-  /* TODO: need a cleaner way to force unmount ourselves */
-  exit (1);
+  g_vfs_backend_force_unmount ((GVfsBackend*)afc_backend);
 }
 
 static gboolean
