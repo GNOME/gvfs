@@ -79,6 +79,24 @@ tree_info_schedule_writeout (TreeInfo *info)
     }
 }
 
+static void
+flush_single (const gchar *filename,
+              TreeInfo *info,
+              gpointer user_data)
+{
+  if (info->writeout_timeout != 0)
+    {
+      g_source_remove (info->writeout_timeout);
+      writeout_timeout (info);
+    }
+}
+
+static void
+flush_all ()
+{
+  g_hash_table_foreach (tree_infos, (GHFunc) flush_single, NULL);
+}
+
 static TreeInfo *
 tree_info_new (const char *filename)
 {
@@ -433,9 +451,22 @@ on_name_lost (GDBusConnection *connection,
   GMainLoop *loop = user_data;
 
   /* means that someone has claimed our name (we allow replacement) */
+  flush_all ();
   g_main_loop_quit (loop);
 }
 
+static void
+on_connection_closed (GDBusConnection *connection,
+                      gboolean         remote_peer_vanished,
+                      GError          *error,
+                      gpointer         user_data)
+{
+  GMainLoop *loop = user_data;
+
+  /* session bus died */
+  flush_all ();
+  g_main_loop_quit (loop);
+}
 
 int
 main (int argc, char *argv[])
@@ -496,7 +527,15 @@ main (int argc, char *argv[])
       g_error_free (error);
       return 1;
     }
-  
+
+  tree_infos = g_hash_table_new_full (g_str_hash,
+				      g_str_equal,
+				      NULL,
+				      (GDestroyNotify)tree_info_free);
+
+  g_dbus_connection_set_exit_on_close (conn, FALSE);
+  g_signal_connect (conn, "closed", G_CALLBACK (on_connection_closed), loop);
+
   flags = G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT;
   if (replace)
     flags |= G_BUS_NAME_OWNER_FLAGS_REPLACE;
@@ -509,11 +548,6 @@ main (int argc, char *argv[])
                                                 loop,
                                                 NULL);
   
-  tree_infos = g_hash_table_new_full (g_str_hash,
-				      g_str_equal,
-				      NULL,
-				      (GDestroyNotify)tree_info_free);
-
   g_main_loop_run (loop);
   
   if (skeleton)
