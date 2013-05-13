@@ -9,43 +9,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#if HAVE_SYS_STATFS_H
-#include <sys/statfs.h>
-#endif
-#if HAVE_SYS_STATVFS_H
-#include <sys/statvfs.h>
-#endif
-#if HAVE_SYS_VFS_H
-#include <sys/vfs.h>
-#elif HAVE_SYS_MOUNT_H
-#if HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-#include <sys/mount.h>
-#endif
-
-#if defined(HAVE_STATFS) && defined(HAVE_STATVFS)
-/* Some systems have both statfs and statvfs, pick the
-   most "native" for these */
-# if !defined(HAVE_STRUCT_STATFS_F_BAVAIL)
-   /* on solaris and irix, statfs doesn't even have the
-      f_bavail field */
-#  define USE_STATVFS
-# else
-  /* at least on linux, statfs is the actual syscall */
-#  define USE_STATFS
-# endif
-
-#elif defined(HAVE_STATFS)
-
-# define USE_STATFS
-
-#elif defined(HAVE_STATVFS)
-
-# define USE_STATVFS
-
-#endif
-
 #include "metatree.h"
 #include "metabuilder.h"
 #include <glib.h>
@@ -278,50 +241,6 @@ meta_tree_clear (MetaTree *tree)
 }
 
 static gboolean
-is_on_nfs (char *filename)
-{
-#ifdef USE_STATFS
-  struct statfs statfs_buffer;
-  int statfs_result;
-#elif defined(USE_STATVFS) && defined(HAVE_STRUCT_STATVFS_F_BASETYPE)
-  struct statvfs statfs_buffer;
-  int statfs_result;
-#endif
-  char *dirname;
-  gboolean res;
-
-  dirname = g_path_get_dirname (filename);
-
-  res = FALSE;
-
-#ifdef USE_STATFS
-
-# if STATFS_ARGS == 2
-  statfs_result = statfs (dirname, &statfs_buffer);
-# elif STATFS_ARGS == 4
-  statfs_result = statfs (dirname, &statfs_buffer,
-			  sizeof (statfs_buffer), 0);
-# endif
-  if (statfs_result == 0)
-#ifdef __OpenBSD__
-    res = strcmp(statfs_buffer.f_fstypename, MOUNT_NFS) == 0;
-#else
-    res = statfs_buffer.f_type == 0x6969;
-#endif
-
-#elif defined(USE_STATVFS) && defined(HAVE_STRUCT_STATVFS_F_BASETYPE)
-  statfs_result = statvfs (dirname, &statfs_buffer);
-
-  if (statfs_result == 0)
-    res = strcmp (statfs_buffer.f_basetype, "nfs") == 0;
-#endif
-
-  g_free (dirname);
-
-  return res;
-}
-
-static gboolean
 link_to_tmp (const char *source, char *tmpl)
 {
   char *XXXXXX;
@@ -431,7 +350,7 @@ meta_tree_init (MetaTree *tree)
 
   retried = FALSE;
  retry:
-  tree->on_nfs = is_on_nfs (tree->filename);
+  tree->on_nfs = meta_builder_is_on_nfs (tree->filename);
   fd = safe_open (tree, tree->filename, O_RDONLY);
   if (fd == -1)
     {
@@ -845,24 +764,6 @@ meta_data_get_key (MetaTree *tree,
   return dataent;
 }
 
-static char *
-get_journal_filename (const char *filename, guint32 random_tag)
-{
-  const char *hexdigits = "0123456789abcdef";
-  char tag[9];
-  int i;
-
-  for (i = 7; i >= 0; i--)
-    {
-      tag[i] = hexdigits[random_tag % 0x10];
-      random_tag >>= 4;
-    }
-
-  tag[8] = 0;
-
-  return g_strconcat (filename, "-", tag, ".log", NULL);
-}
-
 static void
 meta_journal_free (MetaJournal *journal)
 {
@@ -1157,7 +1058,7 @@ meta_journal_open (MetaTree *tree, const char *filename, gboolean for_write, gui
     open_flags = O_RDONLY;
 
  retry:
-  journal_filename = get_journal_filename (filename, tag);
+  journal_filename = meta_builder_get_journal_filename (filename, tag);
   fd = safe_open (tree, journal_filename, open_flags);
   g_free (journal_filename);
   if (fd == -1)
