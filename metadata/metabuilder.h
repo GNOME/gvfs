@@ -70,6 +70,9 @@ gboolean     meta_builder_write     (MetaBuilder *builder,
 				     const char  *filename);
 gboolean     meta_builder_create_new_journal (const char *filename,
 				     guint32      random_tag);
+char *       meta_builder_get_journal_filename (const char *tree_filename,
+				     guint32      random_tag);
+gboolean     meta_builder_is_on_nfs (const char  *filename);
 MetaFile *   metafile_new           (const char  *name,
 				     MetaFile    *parent);
 void         metafile_free          (MetaFile    *file);

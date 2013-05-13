@@ -1,3 +1,4 @@
+#include "config.h"
 #include "metabuilder.h"
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -7,6 +8,44 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <glib/gstdio.h>
+
+#if HAVE_SYS_STATFS_H
+#include <sys/statfs.h>
+#endif
+#if HAVE_SYS_STATVFS_H
+#include <sys/statvfs.h>
+#endif
+#if HAVE_SYS_VFS_H
+#include <sys/vfs.h>
+#elif HAVE_SYS_MOUNT_H
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#include <sys/mount.h>
+#endif
+
+#if defined(HAVE_STATFS) && defined(HAVE_STATVFS)
+/* Some systems have both statfs and statvfs, pick the
+   most "native" for these */
+# if !defined(HAVE_STRUCT_STATFS_F_BAVAIL)
+   /* on solaris and irix, statfs doesn't even have the
+      f_bavail field */
+#  define USE_STATVFS
+# else
+  /* at least on linux, statfs is the actual syscall */
+#  define USE_STATFS
+# endif
+
+#elif defined(HAVE_STATFS)
+
+# define USE_STATFS
+
+#elif defined(HAVE_STATVFS)
+
+# define USE_STATVFS
+
+#endif
+
 
 #define MAJOR_VERSION 1
 #define MINOR_VERSION 0
@@ -825,12 +864,89 @@ write_all_data_and_close (int fd, char *data, gsize len)
   return res;
 }
 
+gboolean
+meta_builder_is_on_nfs (const char *filename)
+{
+#ifdef USE_STATFS
+  struct statfs statfs_buffer;
+  int statfs_result;
+#elif defined(USE_STATVFS) && defined(HAVE_STRUCT_STATVFS_F_BASETYPE)
+  struct statvfs statfs_buffer;
+  int statfs_result;
+#endif
+  char *dirname;
+  gboolean res;
+
+  dirname = g_path_get_dirname (filename);
+
+  res = FALSE;
+
+#ifdef USE_STATFS
+
+# if STATFS_ARGS == 2
+  statfs_result = statfs (dirname, &statfs_buffer);
+# elif STATFS_ARGS == 4
+  statfs_result = statfs (dirname, &statfs_buffer,
+                          sizeof (statfs_buffer), 0);
+# endif
+  if (statfs_result == 0)
+#ifdef __OpenBSD__
+    res = strcmp(statfs_buffer.f_fstypename, MOUNT_NFS) == 0;
+#else
+    res = statfs_buffer.f_type == 0x6969;
+#endif
+
+#elif defined(USE_STATVFS) && defined(HAVE_STRUCT_STATVFS_F_BASETYPE)
+  statfs_result = statvfs (dirname, &statfs_buffer);
+
+  if (statfs_result == 0)
+    res = strcmp (statfs_buffer.f_basetype, "nfs") == 0;
+#endif
+
+  g_free (dirname);
+
+  return res;
+}
+
 static char *
-get_journal_filename (const char *filename, guint32 random_tag)
+get_runtime_journal_dir (const char *tree_filename)
+{
+  const char *rd;
+  char *dbname;
+  char *real_path;
+  char *ret;
+
+  rd = g_get_user_runtime_dir ();
+  if (! rd || *rd == '\0')
+    return NULL;
+
+  real_path = g_build_filename (rd, "gvfs-metadata", NULL);
+  if (! g_file_test (real_path, G_FILE_TEST_EXISTS))
+    {
+      if (g_mkdir_with_parents (real_path, 0700) != 0)
+        {
+          g_free (real_path);
+          return NULL;
+        }
+    }
+
+  dbname = g_path_get_basename (tree_filename);
+  ret = g_build_filename (real_path, dbname, NULL);
+
+  g_free (dbname);
+  g_free (real_path);
+
+  return ret;
+}
+
+char *
+meta_builder_get_journal_filename (const char *tree_filename, guint32 random_tag)
 {
   const char *hexdigits = "0123456789abcdef";
   char tag[9];
   int i;
+  char *ret;
+  char *real_filename = NULL;
 
   for (i = 7; i >= 0; i--)
     {
@@ -840,7 +956,18 @@ get_journal_filename (const char *filename, guint32 random_tag)
 
   tag[8] = 0;
 
-  return g_strconcat (filename, "-", tag, ".log", NULL);
+  if (meta_builder_is_on_nfs (tree_filename))
+    {
+      /* Put the journal in $XDG_RUNTIME_DIR to avoid file usage from concurrent clients */
+      real_filename = get_runtime_journal_dir (tree_filename);
+    }
+
+  if (! real_filename)
+    return g_strconcat (tree_filename, "-", tag, ".log", NULL);
+
+  ret = g_strconcat (real_filename, "-", tag, ".log", NULL);
+  g_free (real_filename);
+  return ret;
 }
 
 gboolean
@@ -852,7 +979,7 @@ meta_builder_create_new_journal (const char *filename, guint32 random_tag)
   gsize pos;
   gboolean res;
 
-  journal_name = get_journal_filename (filename, random_tag);
+  journal_name = meta_builder_get_journal_filename (filename, random_tag);
 
   out = g_string_new (NULL);
 
@@ -1055,7 +1182,7 @@ meta_builder_write (MetaBuilder *builder,
 	  munmap (data, RANDOM_TAG_OFFSET + 4);
 	  close (fd2);
 
-	  old_log = get_journal_filename (filename, old_tag);
+	  old_log = meta_builder_get_journal_filename (filename, old_tag);
 	  g_unlink (old_log);
 	  g_free (old_log);
 	}
