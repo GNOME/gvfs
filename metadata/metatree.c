@@ -472,6 +472,12 @@ meta_tree_exists (MetaTree *tree)
   return tree->fd != -1;
 }
 
+gboolean
+meta_tree_is_on_nfs (MetaTree *tree)
+{
+  return tree->on_nfs;
+}
+
 static GHashTable *cached_trees = NULL;
 G_LOCK_DEFINE_STATIC (cached_trees);
 

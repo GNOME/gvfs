@@ -32,6 +32,7 @@
 #include "metadata-dbus.h"
 
 #define WRITEOUT_TIMEOUT_SECS 60
+#define WRITEOUT_TIMEOUT_SECS_NFS 15
 
 typedef struct {
   char *filename;
@@ -67,10 +68,15 @@ writeout_timeout (gpointer data)
 static void
 tree_info_schedule_writeout (TreeInfo *info)
 {
+  gboolean on_nfs;
+
   if (info->writeout_timeout == 0)
-    info->writeout_timeout =
-      g_timeout_add_seconds (WRITEOUT_TIMEOUT_SECS,
-			     writeout_timeout, info);
+    {
+      on_nfs = meta_tree_is_on_nfs (info->tree);
+      info->writeout_timeout =
+        g_timeout_add_seconds (on_nfs ? WRITEOUT_TIMEOUT_SECS_NFS : WRITEOUT_TIMEOUT_SECS,
+			       writeout_timeout, info);
+    }
 }
 
 static TreeInfo *
