@@ -843,8 +843,8 @@ get_journal_filename (const char *filename, guint32 random_tag)
   return g_strconcat (filename, "-", tag, ".log", NULL);
 }
 
-static gboolean
-create_new_journal (const char *filename, guint32 random_tag)
+gboolean
+meta_builder_create_new_journal (const char *filename, guint32 random_tag)
 {
   char *journal_name;
   guint32 size_offset;
@@ -1016,7 +1016,7 @@ meta_builder_write (MetaBuilder *builder,
   if (!write_all_data_and_close (fd, out->str, out->len))
     goto out;
 
-  if (!create_new_journal (filename, random_tag))
+  if (!meta_builder_create_new_journal (filename, random_tag))
     goto out;
 
   /* Open old file so we can set it rotated */
