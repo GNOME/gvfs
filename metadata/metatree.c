@@ -1146,20 +1146,30 @@ meta_journal_open (MetaTree *tree, const char *filename, gboolean for_write, gui
   char *data;
   char *journal_filename;
   int open_flags, mmap_prot;
+  gboolean retried;
 
   g_assert (sizeof (MetaJournalHeader) == 20);
-
-  journal_filename = get_journal_filename (filename, tag);
+  retried = FALSE;
 
   if (for_write)
     open_flags = O_RDWR;
   else
     open_flags = O_RDONLY;
 
+ retry:
+  journal_filename = get_journal_filename (filename, tag);
   fd = safe_open (tree, journal_filename, open_flags);
   g_free (journal_filename);
   if (fd == -1)
-    return NULL;
+    {
+      if (errno == ENOENT && tree->for_write && !retried)
+        {
+          retried = TRUE;
+          if (meta_builder_create_new_journal (filename, tag))
+            goto retry;
+        }
+      return NULL;
+    }
 
   if (fstat (fd, &statbuf) != 0 ||
       statbuf.st_size < sizeof (MetaJournalHeader))

@@ -68,6 +68,8 @@ void         meta_builder_copy      (MetaBuilder *builder,
 				     guint64      mtime);
 gboolean     meta_builder_write     (MetaBuilder *builder,
 				     const char  *filename);
+gboolean     meta_builder_create_new_journal (const char *filename,
+				     guint32      random_tag);
 MetaFile *   metafile_new           (const char  *name,
 				     MetaFile    *parent);
 void         metafile_free          (MetaFile    *file);
