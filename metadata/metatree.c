@@ -169,7 +169,8 @@ struct _MetaTree {
   MetaJournal *journal;
 };
 
-static void         meta_tree_refresh_locked   (MetaTree    *tree);
+static void         meta_tree_refresh_locked   (MetaTree    *tree,
+						gboolean     force_reread);
 static MetaJournal *meta_journal_open          (MetaTree    *tree,
 						const char  *filename,
 						gboolean     for_write,
@@ -510,7 +511,7 @@ meta_tree_init (MetaTree *tree)
      journal. However we can detect this case by looking at the tree and see
      if its been rotated, we do this to ensure we have an uptodate tree+journal
      combo. */
-  meta_tree_refresh_locked (tree);
+  meta_tree_refresh_locked (tree, FALSE);
 
   return TRUE;
 
@@ -658,10 +659,10 @@ meta_tree_has_new_journal_entries (MetaTree *tree)
 
 /* Must be called with a write lock held */
 static void
-meta_tree_refresh_locked (MetaTree *tree)
+meta_tree_refresh_locked (MetaTree *tree, gboolean force_reread)
 {
   /* Needs to recheck since we dropped read lock */
-  if (meta_tree_needs_rereading (tree))
+  if (force_reread || meta_tree_needs_rereading (tree))
     {
       if (tree->header)
 	meta_tree_clear (tree);
@@ -685,7 +686,7 @@ meta_tree_refresh (MetaTree *tree)
   if (needs_refresh)
     {
       g_rw_lock_writer_lock (&metatree_lock);
-      meta_tree_refresh_locked (tree);
+      meta_tree_refresh_locked (tree, FALSE);
       g_rw_lock_writer_unlock (&metatree_lock);
     }
 }
@@ -2363,7 +2364,8 @@ meta_tree_flush_locked (MetaTree *tree)
   res = meta_builder_write (builder,
 			    meta_tree_get_filename (tree));
   if (res)
-    meta_tree_refresh_locked (tree);
+    /* Force re-read since we wrote a new file */
+    meta_tree_refresh_locked (tree, TRUE);
 
   meta_builder_free (builder);
 
