@@ -1304,6 +1304,11 @@ meta_journal_iterate (MetaJournal *journal,
     {
       sizep = (guint32 *)entry;
       entry = (MetaJournalEntry *)((char *)entry - GUINT32_FROM_BE (*(sizep-1)));
+      if (GUINT32_FROM_BE (*(sizep)) < sizeof (MetaJournalEntry) && entry > journal->first_entry)
+        {
+          g_warning ("meta_journal_iterate: found short sized entry, possible journal corruption\n");
+          break;
+        }
 
       mtime = GUINT64_FROM_BE (entry->mtime);
       journal_path = &entry->path[0];
@@ -2343,6 +2348,13 @@ apply_journal_to_builder (MetaTree *tree,
 
       sizep = (guint32 *)entry;
       entry = (MetaJournalEntry *)((char *)entry + GUINT32_FROM_BE (*(sizep)));
+      if (GUINT32_FROM_BE (*(sizep)) < sizeof (MetaJournalEntry) && entry < journal->last_entry)
+        {
+          /* This shouldn't happen, we found an entry that is shorter than its data */
+          /* See https://bugzilla.gnome.org/show_bug.cgi?id=637095 for discussion */
+          g_warning ("apply_journal_to_builder: found short sized entry, possible journal corruption\n");
+          break;
+        }
     }
 }
 
