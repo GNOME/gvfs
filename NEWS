@@ -1,3 +1,9 @@
+Major changes in 1.16.2
+=======================
+* mtp: Use standard name for SD Card icon
+* metadata: Bear with broken journal files
+* metadata: Put journal in $XDG_RUNTIME_DIR for shared NFS homedir case
+
 Major changes in 1.16.1
 =======================
 * daemon: Ensure file monitors are not prematurally finalized
