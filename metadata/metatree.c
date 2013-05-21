@@ -1223,7 +1223,7 @@ meta_journal_iterate (MetaJournal *journal,
       entry = (MetaJournalEntry *)((char *)entry - GUINT32_FROM_BE (*(sizep-1)));
       if (GUINT32_FROM_BE (*(sizep)) < sizeof (MetaJournalEntry) && entry > journal->first_entry)
         {
-          g_warning ("meta_journal_iterate: found short sized entry, possible journal corruption\n");
+          g_debug ("meta_journal_iterate: found short sized entry, possible journal corruption\n");
           break;
         }
 
