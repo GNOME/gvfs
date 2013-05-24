@@ -1,3 +1,15 @@
+Major changes in 1.17.1
+=======================
+* metadata: Downgrade journal short-read to debug
+* metadata: Flush all scheduled writeouts on daemon exit
+* metadata: Use shorter writeout timeout on NFS
+* metadata: Put journal in $XDG_RUNTIME_DIR for shared NFS homedir case
+* metadata: Create new journal if it doesn't exist
+* metadata: Be more resistive to broken journal files
+* metadata: Force tree re-read after successful flush
+* ccda: Adds remaining shutdown infrastructure and call from cdda backend
+* Translation updates
+
 Major changes in 1.17.0
 =======================
 * daemon: Ensure monitors are not prematurely finalized
