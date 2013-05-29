@@ -935,7 +935,7 @@ class Drive(GvfsTestCase):
         ctx = GLib.MainContext().default()
         while ctx.iteration(False):
             pass
-        self.monitor.stdout.readall()
+        self.monitor.stdout.read()
 
     def setUp(self):
         self.mock_polkit = None
@@ -1203,7 +1203,7 @@ pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
 
         empty_timeout = 50
         while True:
-            out = self.monitor.stdout.readall()
+            out = self.monitor.stdout.read()
             if out:
                 break
             else:
@@ -1215,7 +1215,7 @@ pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
 
         # wait a bit more to see whether we catch some stragglers
         time.sleep(0.2)
-        out2 = self.monitor.stdout.readall()
+        out2 = self.monitor.stdout.read()
         if out2:
             out += out2
 
@@ -1229,6 +1229,8 @@ pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
                                             stdin=subprocess.PIPE)
         self.mock_polkit.stdin.write(('set -e\n/home/test_polkitd.py -r -a %s\n'
                                       % ','.join(actions)).encode('ASCII'))
+        self.mock_polkit.stdin.flush()
+
         # wait until it started up
         if actions:
             timeout = 50
