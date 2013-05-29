@@ -978,12 +978,6 @@ class Drive(GvfsTestCase):
         self.assertRegex(out, 'should_automount=1')
         self.assertRegex(out, 'themed icons:.*media-optical')
 
-        # user is not on any local session in the sandbox, so mounting ought to
-        # fail
-        (code, out, err) = self.program_code_out_err(['gvfs-mount', '-d', '/dev/' + dev])
-        self.assertNotEqual(code, 0)
-        self.assertRegex(err, 'Not authorized')
-
         # tell polkit to do allow removable (but not internal) storage
         self.start_polkit(['org.freedesktop.udisks2.filesystem-mount'])
 
