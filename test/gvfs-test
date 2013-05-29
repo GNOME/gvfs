@@ -572,10 +572,12 @@ class Ftp(GvfsTestCase):
         # wrong user name
         self.wait_for_gvfs_mount_user_prompt(mount)
         mount.stdin.write(b'eve\nh4ck\n')
+        mount.stdin.flush()
 
         # wrong password name
         self.wait_for_gvfs_mount_user_prompt(mount)
         mount.stdin.write(b'testuser\nh4ck\n')
+        mount.stdin.flush()
 
         # correct credentials
         self.wait_for_gvfs_mount_user_prompt(mount)
@@ -1415,6 +1417,7 @@ DAVLockDB DAVLock
         # wrong password
         self.wait_for_gvfs_mount_user_prompt(mount)
         mount.stdin.write(b'test\nh4ck\n')
+        mount.stdin.flush()
 
         # correct password
         (out, err) = mount.communicate(b's3kr1t\n')
@@ -1436,6 +1439,7 @@ DAVLockDB DAVLock
         # wrong password
         self.wait_for_gvfs_mount_user_prompt(mount)
         mount.stdin.write(b'test\nh4ck\n')
+        mount.stdin.flush()
 
         # correct password
         (out, err) = mount.communicate(b's3kr1t\n')
