@@ -52,7 +52,8 @@ MNT=`mktemp -d`
 
 # work around scsi_debug not implementing CD-ROM SCSI commands
 # see https://launchpad.net/bugs/1043182 for details
-if [ -d /run/udev/rules.d/ -a ! -e /run/udev/rules.d/60-persistent-storage-scsi_debug.rules ]; then
+if [ -d /run/udev/ -a ! -e /run/udev/rules.d/60-persistent-storage-scsi_debug.rules ]; then
+    mkdir -p /run/udev/rules.d
     cat <<EOF > /run/udev/rules.d/60-persistent-storage-scsi_debug.rules
 KERNEL=="sr*", ENV{DISK_EJECT_REQUEST}!="?*", ATTRS{model}=="scsi_debug*", ENV{ID_CDROM_MEDIA}=="?*", IMPORT{program}="/sbin/blkid -o udev -p -u noraid \$tempnode"
 EOF

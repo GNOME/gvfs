@@ -1168,6 +1168,7 @@ pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
         self.addCleanup(cleanup)
         rootsh = subprocess.Popen(['./rootsh'], stdin=subprocess.PIPE)
         rootsh.communicate(b'''export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+mkdir -p /run/udev/rules.d
 echo 'SUBSYSTEM=="block", ATTRS{model}=="scsi_debug*", ENV{ID_MEDIA_PLAYER}="MockTune"' > /run/udev/rules.d/40-scsi_debug-fake-mediaplayer.rules
 sync
 pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
