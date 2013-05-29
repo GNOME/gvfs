@@ -36,9 +36,9 @@ static guint signals[LAST_SIGNAL] = { 0 };
 GType
 g_vfs_job_source_get_type (void)
 {
-  static GType vfs_job_source_type = 0;
+  static volatile gsize g_define_type_id__volatile = 0;
 
-  if (! vfs_job_source_type)
+  if (g_once_init_enter (&g_define_type_id__volatile))
     {
       static const GTypeInfo vfs_job_source_info =
       {
@@ -53,14 +53,15 @@ g_vfs_job_source_get_type (void)
 	NULL
       };
 
-      vfs_job_source_type =
+      GType vfs_job_source_type =
 	g_type_register_static (G_TYPE_INTERFACE, "GVfsJobSource",
 				&vfs_job_source_info, 0);
 
       g_type_interface_add_prerequisite (vfs_job_source_type, G_TYPE_OBJECT);
+      g_once_init_leave (&g_define_type_id__volatile, vfs_job_source_type);
     }
 
-  return vfs_job_source_type;
+  return g_define_type_id__volatile;
 }
 
 
