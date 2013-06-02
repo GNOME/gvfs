@@ -327,13 +327,32 @@ g_daemon_file_prefix_matches (GFile *parent,
   GDaemonFile *descendant_daemon = G_DAEMON_FILE (descendant);
   const char *remainder;
 
-  if (descendant_daemon->mount_spec != parent_daemon->mount_spec)
-    return FALSE;
-  
-  remainder = match_prefix (descendant_daemon->path, parent_daemon->path);
-  if (remainder != NULL && *remainder == '/')
-    return TRUE;
-  return FALSE;
+  if (descendant_daemon->mount_spec == parent_daemon->mount_spec)
+    {
+      remainder = match_prefix (descendant_daemon->path, parent_daemon->path);
+      if (remainder != NULL && *remainder == '/')
+        return TRUE;
+      else
+        return FALSE;
+    }
+  else
+    {
+      /* If descendant was created with g_file_new_for_uri(), it's
+         mount_prefix is /, but parent might have a different mount_prefix,
+         for example if obtained by g_mount_get_root()
+      */
+      char *full_path;
+      gboolean ok;
+
+      full_path = g_build_path ("/", descendant_daemon->mount_spec->mount_prefix,
+                                descendant_daemon->path, NULL);
+      ok = g_mount_spec_match_with_path (parent_daemon->mount_spec,
+                                         descendant_daemon->mount_spec,
+                                         full_path);
+
+      g_free (full_path);
+      return ok;
+    }
 }
 
 static char *
@@ -342,16 +361,50 @@ g_daemon_file_get_relative_path (GFile *parent,
 {
   GDaemonFile *parent_daemon = G_DAEMON_FILE (parent);
   GDaemonFile *descendant_daemon = G_DAEMON_FILE (descendant);
-  const char *remainder;
 
-  if (descendant_daemon->mount_spec != parent_daemon->mount_spec)
-    return NULL;
-  
-  remainder = match_prefix (descendant_daemon->path, parent_daemon->path);
-  
-  if (remainder != NULL && *remainder == '/')
-    return g_strdup (remainder + 1);
-  return NULL;
+  if (descendant_daemon->mount_spec == parent_daemon->mount_spec)
+    {
+      const char *remainder;
+
+      remainder = match_prefix (descendant_daemon->path, parent_daemon->path);
+
+      if (remainder != NULL && *remainder == '/')
+        return g_strdup (remainder + 1);
+      else
+        return NULL;
+    }
+  else
+    {
+      char *full_path_descendant;
+      char *full_path_parent;
+      char *ret;
+      const char *remainder;
+      gboolean ok;
+
+      full_path_descendant = g_build_path ("/", descendant_daemon->mount_spec->mount_prefix,
+                                           descendant_daemon->path, NULL);
+
+      if (!g_mount_spec_match_with_path (parent_daemon->mount_spec,
+                                         descendant_daemon->mount_spec,
+                                         full_path_descendant))
+        {
+          g_free (full_path_descendant);
+          return NULL;
+        }
+
+      full_path_parent = g_build_path ("/", parent_daemon->mount_spec->mount_prefix,
+                                       parent_daemon->path, NULL);
+
+      remainder = match_prefix (full_path_descendant, full_path_parent);
+      if (remainder == NULL || *remainder != '/')
+        ret = g_strdup (remainder + 1);
+      else
+        ret = NULL;
+
+      g_free (full_path_parent);
+      g_free (full_path_descendant);
+      return ret;
+    }
 }
 
 static GFile *
