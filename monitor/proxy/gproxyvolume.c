@@ -62,6 +62,7 @@ struct _GProxyVolume {
 
   gboolean can_mount;
   gboolean should_automount;
+  gboolean always_call_mount;
 
   GProxyShadowMount *shadow_mount;
 
@@ -356,7 +357,7 @@ update_shadow_mount_in_idle (GProxyVolume *volume)
  * a{sv}                expansion
  */
 
-#define VOLUME_STRUCT_TYPE "(&s&s&s&s&s&sbb&s&sa{ss}&sa{sv})"
+#define VOLUME_STRUCT_TYPE "(&s&s&s&s&s&sbb&s&sa{ss}&s@a{sv})"
 
 void g_proxy_volume_update (GProxyVolume    *volume,
                             GVariant        *iter)
@@ -374,7 +375,7 @@ void g_proxy_volume_update (GProxyVolume    *volume,
   GHashTable *identifiers;
   const gchar *sort_key;
   GVariantIter *iter_identifiers;
-  GVariantIter *iter_expansion;
+  GVariant *expansion;
 
   sort_key = NULL;
   g_variant_get (iter, VOLUME_STRUCT_TYPE,
@@ -385,7 +386,7 @@ void g_proxy_volume_update (GProxyVolume    *volume,
                  &drive_id, &mount_id, 
                  &iter_identifiers,
                  &sort_key,
-                 &iter_expansion);
+                 &expansion);
 
   identifiers = _get_identifiers (iter_identifiers);
 
@@ -439,14 +440,20 @@ void g_proxy_volume_update (GProxyVolume    *volume,
   volume->identifiers = identifiers != NULL ? g_hash_table_ref (identifiers) : NULL;
   volume->sort_key = g_strdup (sort_key);
 
-  /* TODO: decode expansion, once used */
+  if (volume->activation_uri)
+    {
+      if (!g_variant_lookup (expansion, "always-call-mount", "b", &volume->always_call_mount))
+        volume->always_call_mount = FALSE;
+    }
+  else
+    volume->always_call_mount = FALSE;
 
   /* this calls into the union monitor; do it in idle to avoid locking issues */
   update_shadow_mount_in_idle (volume);
 
  out:
   g_variant_iter_free (iter_identifiers);
-  g_variant_iter_free (iter_expansion);
+  g_variant_unref (expansion);
   g_hash_table_unref (identifiers);
 }
 
@@ -876,7 +883,8 @@ g_proxy_volume_mount (GVolume             *volume,
   GProxyVolume *proxy_volume = G_PROXY_VOLUME (volume);
 
   G_LOCK (proxy_volume);
-  if (proxy_volume->activation_uri != NULL)
+  if (proxy_volume->activation_uri != NULL &&
+      !proxy_volume->always_call_mount)
     {
       ForeignMountOp *data;
       GFile *root;

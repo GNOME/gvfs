@@ -32,4 +32,6 @@ int  g_vfs_proxy_volume_monitor_daemon_main (int         argc,
                                              const char *dbus_name,
                                              GType       volume_monitor_type);
 
+void g_vfs_proxy_volume_monitor_daemon_set_always_call_mount (gboolean always_call_mount);
+
 #endif
