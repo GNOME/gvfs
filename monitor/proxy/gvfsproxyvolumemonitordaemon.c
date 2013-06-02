@@ -41,6 +41,7 @@ static const char *the_dbus_name = NULL;
 static GList *outstanding_ops = NULL;
 static GList *outstanding_mount_op_objects = NULL;
 static GHashTable *unique_names_being_watched = NULL;
+static gboolean always_call_mount = FALSE;
 
 static GVfsRemoteVolumeMonitor *monitor_daemon = NULL;
 
@@ -760,8 +761,12 @@ volume_to_dbus (GVolume *volume)
       g_free (id_value);
     }
 
-  expansion_builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
   /* left for future expansion without ABI breaks */
+  expansion_builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
+
+  if (always_call_mount)
+    g_variant_builder_add (expansion_builder, "{sv}",
+                           "always-call-mount", g_variant_new_boolean (TRUE));
 
   result = g_variant_new (VOLUME_STRUCT_TYPE,
                           id,
@@ -2011,4 +2016,10 @@ g_vfs_proxy_volume_monitor_daemon_main (int argc,
     g_hash_table_unref (unique_names_being_watched);
 
   return 0;
+}
+
+void
+g_vfs_proxy_volume_monitor_daemon_set_always_call_mount (gboolean value)
+{
+  always_call_mount = value;
 }
