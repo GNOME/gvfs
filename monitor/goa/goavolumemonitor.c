@@ -466,6 +466,8 @@ g_vfs_goa_volume_monitor_init (GVfsGoaVolumeMonitor *self)
   g_signal_connect_swapped (self->client, "account-added", G_CALLBACK (update_all), self);
   g_signal_connect_swapped (self->client, "account-changed", G_CALLBACK (update_all), self);
   g_signal_connect_swapped (self->client, "account-removed", G_CALLBACK (update_all), self);
+
+  g_vfs_proxy_volume_monitor_daemon_set_always_call_mount (TRUE);
 }
 
 GVolumeMonitor *

@@ -131,6 +131,16 @@ mount_operation_ask_password_cb (GMountOperation   *op,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
+mount_unmounted_cb (GMount        *mount,
+                    GVfsGoaVolume *self)
+{
+  /* If this assert fails, we're leaking a reference to mount */
+  g_assert (self->mount == mount);
+
+  g_clear_object (&self->mount);
+}
+
+static void
 find_enclosing_mount_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GFile *root = G_FILE (source_object);
@@ -145,6 +155,8 @@ find_enclosing_mount_cb (GObject *source_object, GAsyncResult *res, gpointer use
   self->mount = g_file_find_enclosing_mount_finish (root, res, &error);
   if (self->mount == NULL)
     g_simple_async_result_take_error (simple, error);
+  else
+    g_signal_connect (self->mount, "unmounted", G_CALLBACK (mount_unmounted_cb), self);
 
   g_simple_async_result_complete_in_idle (simple);
 }
@@ -298,11 +310,7 @@ g_vfs_goa_volume_enumerate_identifiers (GVolume *_self)
 static GFile *
 g_vfs_goa_volume_get_activation_root (GVolume *_self)
 {
-  /* Even though we know the activation root before mounting the
-   * volume we can not reveal it, because we do not want it to be
-   * handled as a GProxyVolume.
-   */
-  return NULL;
+  return g_file_new_for_uri (G_VFS_GOA_VOLUME (_self)->uuid);
 }
 
 static GDrive *
@@ -334,15 +342,14 @@ g_vfs_goa_volume_get_identifier (GVolume *_self, const gchar *kind)
 static GMount *
 g_vfs_goa_volume_get_mount (GVolume *_self)
 {
-  GVfsGoaVolume *self = G_VFS_GOA_VOLUME (_self);
-  GMount *mount;
+  /* _self->mount is only used to unmount when we see
+     AttentionNeeded, it should not be exported by the
+     volume monitor, because we can't export a GDaemonMount
+     on the bus, and it's already handled as a shadow mount
+     anyway
+  */
 
-  mount = NULL;
-
-  if (self->mount != NULL)
-    mount = g_object_ref (self->mount);
-
-  return mount;
+  return NULL;
 }
 
 static char *
