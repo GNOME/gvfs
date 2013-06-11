@@ -80,6 +80,8 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
   guint retries;
   plist_t value;
   char *model, *display_name;
+  lockdownd_service_descriptor_t lockdown_service = NULL;
+  lockdownd_error_t lerr;
 
   retries = 0;
   do {
@@ -94,14 +96,14 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
 
   if (self->service != NULL)
     {
-      guint16 port;
-
       if (lockdownd_client_new_with_handshake (dev, &lockdown_cli, "gvfs-afc-volume-monitor") != LOCKDOWN_E_SUCCESS)
         {
           idevice_free (dev);
           return 0;
         }
-      if (lockdownd_start_service(lockdown_cli, "com.apple.mobile.house_arrest", &port) != LOCKDOWN_E_SUCCESS)
+      lerr = lockdownd_start_service (lockdown_cli, "com.apple.mobile.house_arrest", &lockdown_service);
+      lockdownd_service_descriptor_free (lockdown_service);
+      if (lerr != LOCKDOWN_E_SUCCESS)
         {
           idevice_free (dev);
           return 0;

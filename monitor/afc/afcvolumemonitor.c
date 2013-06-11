@@ -89,12 +89,7 @@ g_vfs_afc_monitor_idevice_event (const idevice_event_t *event, void *user_data)
 
   self = G_VFS_AFC_VOLUME_MONITOR(user_data);
 
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_2
   event_udid = event->udid;
-#else
-  event_udid = event->uuid;
-#endif
-
   if (event->event == IDEVICE_DEVICE_ADD)
     g_vfs_afc_monitor_create_volume (self, event_udid);
   else
