@@ -349,12 +349,7 @@ _idevice_event_cb (const idevice_event_t *event, void *user_data)
   if (event->event != IDEVICE_DEVICE_REMOVE)
     return;
 
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_2
   event_udid = event->udid;
-#else
-  event_udid = event->uuid;
-#endif
-
   if (g_str_equal (event_udid, afc_backend->uuid) == FALSE)
     return;
 
@@ -401,11 +396,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   const char *str;
   char *tmp;
   char *display_name = NULL;
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
   lockdownd_service_descriptor_t lockdown_service = NULL;
-#else
-  guint16 port;
-#endif
   int virtual_port;
   GMountSpec *real_spec;
   GVfsBackendAfc *self;
@@ -654,61 +645,37 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   switch (self->mode) {
     case ACCESS_MODE_AFC:
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
       lerr = lockdownd_start_service (lockdown_cli, self->service, &lockdown_service);
-#else
-      lerr = lockdownd_start_service (lockdown_cli, self->service, &port);
-#endif
       if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
         {
           goto out_destroy_lockdown;
         }
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
       aerr = afc_client_new (self->dev, lockdown_service, &self->afc_cli);
-#else
-      aerr = afc_client_new (self->dev, port, &self->afc_cli);
-#endif
       if (G_UNLIKELY(g_vfs_backend_afc_check (aerr, G_VFS_JOB(job))))
         {
           goto out_destroy_lockdown;
         }
       break;
     case ACCESS_MODE_HOUSE_ARREST:
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
       lerr = lockdownd_start_service (lockdown_cli, "com.apple.mobile.installation_proxy", &lockdown_service);
-#else
-      lerr = lockdownd_start_service (lockdown_cli, "com.apple.mobile.installation_proxy", &port);
-#endif
       if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
         {
           g_warning ("couldn't start inst proxy");
           goto out_destroy_lockdown;
         }
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
       aerr = instproxy_client_new (self->dev, lockdown_service, &self->inst);
-#else
-      aerr = instproxy_client_new (self->dev, port, &self->inst);
-#endif
       if (G_UNLIKELY(g_vfs_backend_inst_check (aerr, G_VFS_JOB(job))))
         {
           g_warning ("couldn't create inst proxy instance");
           goto out_destroy_lockdown;
         }
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
       lerr = lockdownd_start_service (lockdown_cli, "com.apple.springboardservices", &lockdown_service);
-#else
-      lerr = lockdownd_start_service (lockdown_cli, "com.apple.springboardservices", &port);
-#endif
       if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
         {
           g_warning ("couldn't start SBServices proxy");
           goto out_destroy_lockdown;
         }
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
       aerr = sbservices_client_new (self->dev, lockdown_service, &self->sbs);
-#else
-      aerr = sbservices_client_new (self->dev, port, &self->sbs);
-#endif
       if (G_UNLIKELY(g_vfs_backend_sbs_check (aerr, G_VFS_JOB(job))))
         {
           g_warning ("couldn't create SBServices proxy instance");
@@ -731,9 +698,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   /* lockdown connection is not needed anymore */
   lockdownd_client_free (lockdown_cli);
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
   lockdownd_service_descriptor_free (lockdown_service);
-#endif
 
   /* Add camera item if necessary */
   if (self->mode == ACCESS_MODE_AFC)
@@ -752,9 +717,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
 out_destroy_lockdown:
   lockdownd_client_free (lockdown_cli);
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
   lockdownd_service_descriptor_free (lockdown_service);
-#endif
 
 out_destroy_dev:
   idevice_free (self->dev);
@@ -826,11 +789,7 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
 {
   AppInfo *info;
   lockdownd_client_t lockdown_cli;
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
   lockdownd_service_descriptor_t lockdown_service = NULL;
-#else
-  guint16 port;
-#endif
   house_arrest_client_t house_arrest;
   afc_client_t afc;
   plist_t dict, error;
@@ -850,11 +809,7 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
       return;
     }
 
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
   lerr = lockdownd_start_service (lockdown_cli, "com.apple.mobile.house_arrest", &lockdown_service);
-#else
-  lerr = lockdownd_start_service (lockdown_cli, "com.apple.mobile.house_arrest", &port);
-#endif
   if (lerr != LOCKDOWN_E_SUCCESS)
     {
       lockdownd_client_free (lockdown_cli);
@@ -863,24 +818,16 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
     }
 
   house_arrest = NULL;
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
   house_arrest_client_new (self->dev, lockdown_service, &house_arrest);
-#else
-  house_arrest_client_new (self->dev, port, &house_arrest);
-#endif
   if (house_arrest == NULL)
     {
       g_warning ("Failed to start house arrest for app %s", info->id);
       lockdownd_client_free (lockdown_cli);
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
       lockdownd_service_descriptor_free (lockdown_service);
-#endif
       return;
     }
 
-#ifdef HAVE_LIBIMOBILEDEVICE_1_1_5
   lockdownd_service_descriptor_free (lockdown_service);
-#endif
 
   dict = NULL;
   if (house_arrest_send_command (house_arrest, "VendContainer", info->id) != HOUSE_ARREST_E_SUCCESS ||
