@@ -32,9 +32,19 @@ import shutil
 import fcntl
 import re
 import locale
+import signal
 from glob import glob
 
 from gi.repository import GLib, Gio
+
+try:
+    from gi.repository import UMockdev
+    have_umockdev = subprocess.call(['which', 'umockdev-wrapper'], stdout=subprocess.PIPE) == 0
+except ImportError:
+    have_umockdev = False
+
+# umockdev environment for gphoto/MTP tests
+umockdev_testbed = None
 
 
 def find_alternative(cmds):
@@ -84,6 +94,8 @@ class GvfsTestCase(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.workdir)
+        if umockdev_testbed:
+            umockdev_testbed.clear()
 
     def run(self, result=None):
         '''Show dbus daemon output on failed tests'''
@@ -1612,8 +1624,71 @@ class Trash(GvfsTestCase):
             self.assertTrue(os.path.exists(self.my_file))
 
 
+@unittest.skipIf(in_testbed, 'this test does not currently work under gvfs-testbed')
+@unittest.skipUnless(have_umockdev,
+                     'umockdev not installed; get it from https://launchpad.net/umockdev')
+class GPhoto(GvfsTestCase):
+    def test_mount_api(self):
+        '''gphoto2:// mount with Gio API'''
+
+        self.add_powershot()
+
+        uri = 'gphoto2://[usb:001,015]'
+        gfile_mount = Gio.File.new_for_uri(uri)
+
+        self.assertEqual(self.mount_api(gfile_mount), True)
+        try:
+            # check top-level directory
+            info = gfile_mount.query_info('*', 0, None)
+            self.assertEqual(info.get_content_type(), 'inode/directory')
+            self.assertEqual(info.get_file_type(), Gio.FileType.DIRECTORY)
+            self.assertIn('camera', info.get_display_name().lower())
+            self.assertEqual(info.get_attribute_boolean('access::can-read'), True)
+
+            # check a photo
+            gfile = Gio.File.new_for_uri(uri + '/DCIM/100CANON/IMG_0001.JPG')
+            # FIXME: The first call always fails (only with umockdev)
+            try:
+                info = gfile.query_info('*', 0, None)
+            except GLib.GError:
+                info = gfile.query_info('*', 0, None)
+
+            self.assertEqual(info.get_content_type(), 'image/jpeg')
+            self.assertEqual(info.get_file_type(), Gio.FileType.REGULAR)
+            # we don't care about capitalization
+            self.assertEqual(info.get_display_name().lower(), 'img_0001.jpg')
+            self.assertEqual(info.get_attribute_boolean('access::can-read'), True)
+            self.assertEqual(info.get_attribute_boolean('access::can-write'), True)
+
+            # open photo
+            stream = gfile.read(None)
+            block = stream.read_bytes(20, None)
+            self.assertIn(b'JFIF\x00', block.get_data())
+            stream.close(None)
+
+            # nonexisting file
+            gfile = Gio.File.new_for_uri(uri + '/DCIM/100CANON/IMG_9999.JPG')
+            self.assertRaises(GLib.GError, gfile.query_info, '*', 0, None)
+        finally:
+            self.unmount_api(gfile_mount)
+
+    def add_powershot(self):
+        '''Add PowerShot device and ioctls to umockdev testbed'''
+
+        with open(os.path.join(my_dir, 'files', 'powershot.umockdev')) as f:
+            umockdev_testbed.add_from_string(f.read())
+        umockdev_testbed.load_ioctl('/dev/bus/usb/001/015',
+                                    os.path.join(my_dir, 'files', 'powershot.ioctl.xz'))
+
+        # signal our monitor about the addition
+        #umockdev_testbed.uevent('/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.5/1-1.5.2/1-1.5.2.3', 'add');
+
+
 def start_dbus():
     '''Run a local D-BUS daemon under temporary XDG directories
+
+    This also runs the D-BUS daemon under umockdev-wrapper (if available), so
+    that it will see fake umockdev devices.
     
     Return temporary XDG home directory.
     '''
@@ -1640,9 +1715,12 @@ def start_dbus():
     env['GVFS_SMB_DEBUG'] = '6'
     env['GVFS_HTTP_DEBUG'] = 'all'
     env['LIBSMB_PROG'] = "nc localhost 1445"
-    dbus_daemon = subprocess.Popen(
-        ['dbus-daemon', '--config-file', dbus_conf, '--print-address=1'],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    argv = ['dbus-daemon', '--config-file', dbus_conf, '--print-address=1']
+    if umockdev_testbed:
+        argv.insert(0, 'umockdev-wrapper')
+        # Python doesn't catch the setenv() from UMockdev.Testbed.new()
+        env['UMOCKDEV_DIR'] = umockdev_testbed.get_root_dir()
+    dbus_daemon = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     addr = dbus_daemon.stdout.readline().decode()
     os.environ['DBUS_SESSION_BUS_ADDRESS'] = addr
 
@@ -1664,6 +1742,11 @@ if __name__ == '__main__':
     os.environ['LC_ALL'] = 'C'
     
     if not in_testbed:
+        # we need to create the umockdev testbed before launching D-BUS, so
+        # that all spawned gvfs daemons see it
+        if have_umockdev:
+            umockdev_testbed = UMockdev.Testbed.new()
+
         temp_home = start_dbus()
     try:
         unittest.main(testRunner=unittest.TextTestRunner(stream=sys.stdout, verbosity=2))
