@@ -1671,4 +1671,16 @@ if __name__ == '__main__':
         if not in_testbed:
             dbus_daemon.terminate()
             dbus_daemon.wait()
-            shutil.rmtree(temp_home)
+            # it might take a while until the child processes terminate and
+            # release usage of the home dir, so try several times
+            timeout = 20
+            while timeout > 0:
+                try:
+                    shutil.rmtree(temp_home)
+                    break
+                except OSError as e:
+                    timeout -= 1
+                    time.sleep(0.1)
+                    if timeout <= 0:
+                        raise
+
