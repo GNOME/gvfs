@@ -1,3 +1,11 @@
+Major changes in 1.16.3
+=======================
+* metadata: Fix a write regression introduced in 1.16.2
+* http: Don't send network requests when reading only thumbnail
+* goa: Don't show two icons for a mounted goa volume
+* Documentation fixes
+
+
 Major changes in 1.16.2
 =======================
 * mtp: Use standard name for SD Card icon
