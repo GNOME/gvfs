@@ -1692,7 +1692,6 @@ def start_dbus():
     
     Return temporary XDG home directory.
     '''
-
     global dbus_daemon
 
     # use temporary config/data/runtime directories; NB that these need to be
@@ -1704,10 +1703,10 @@ def start_dbus():
     os.environ['XDG_CONFIG_HOME'] = os.path.join(temp_home, 'config')
     os.environ['XDG_DATA_HOME'] = os.path.join(temp_home, 'data')
 
-    # run local D-BUS
     if os.path.exists('session.conf'):
         dbus_conf = 'session.conf'
     else:
+        # for out-of-tree builds
         dbus_conf = os.path.join(os.path.dirname(__file__), 'session.conf')
     env = os.environ.copy()
     env['G_MESSAGES_DEBUG'] = 'all'
@@ -1715,7 +1714,12 @@ def start_dbus():
     env['GVFS_SMB_DEBUG'] = '6'
     env['GVFS_HTTP_DEBUG'] = 'all'
     env['LIBSMB_PROG'] = "nc localhost 1445"
-    argv = ['dbus-daemon', '--config-file', dbus_conf, '--print-address=1']
+    # run local D-BUS; if we run this in a built tree, use our config to pick
+    # up the built services, otherwise the standard session one
+    if os.path.exists(dbus_conf):
+        argv = ['dbus-daemon', '--config-file', dbus_conf, '--print-address=1']
+    else:
+        argv = ['dbus-daemon', '--session', '--print-address=1']
     if umockdev_testbed:
         argv.insert(0, 'umockdev-wrapper')
         # Python doesn't catch the setenv() from UMockdev.Testbed.new()
