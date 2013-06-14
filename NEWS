@@ -1,3 +1,11 @@
+Major changes in 1.17.2
+=======================
+* metadata: Fix write regression
+* smb: Allow specifying custom port
+* tests: Various fixes
+* http: Don't do network i/o when reading just the thumbnail path
+* goa: Make shadowed mounts work
+
 Major changes in 1.17.1
 =======================
 * metadata: Downgrade journal short-read to debug
