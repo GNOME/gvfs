@@ -1205,7 +1205,7 @@ meta_journal_iterate (MetaJournal *journal,
 		      gpointer user_data)
 {
   MetaJournalEntry *entry;
-  guint32 *sizep;
+  guint32 *sizep, size;
   char *journal_path, *journal_key, *source_path;
   char *path_copy, *value;
   gboolean res;
@@ -1220,8 +1220,11 @@ meta_journal_iterate (MetaJournal *journal,
   while (entry > journal->first_entry)
     {
       sizep = (guint32 *)entry;
-      entry = (MetaJournalEntry *)((char *)entry - GUINT32_FROM_BE (*(sizep-1)));
-      if (GUINT32_FROM_BE (*(sizep)) < sizeof (MetaJournalEntry) && entry > journal->first_entry)
+      size = GUINT32_FROM_BE (*(sizep-1));
+      entry = (MetaJournalEntry *)((char *)entry - size);
+      if (size < sizeof (MetaJournalEntry) ||
+	  entry < journal->first_entry ||
+	  entry >= journal->last_entry)
         {
           g_warning ("meta_journal_iterate: found short sized entry, possible journal corruption\n");
           break;
@@ -2265,11 +2268,13 @@ apply_journal_to_builder (MetaTree *tree,
 
       sizep = (guint32 *)entry;
       entry = (MetaJournalEntry *)((char *)entry + GUINT32_FROM_BE (*(sizep)));
-      if (GUINT32_FROM_BE (*(sizep)) < sizeof (MetaJournalEntry) && entry < journal->last_entry)
+      if (GUINT32_FROM_BE (*(sizep)) < sizeof (MetaJournalEntry) ||
+	  entry < journal->first_entry ||
+	  entry > journal->last_entry)
         {
           /* This shouldn't happen, we found an entry that is shorter than its data */
           /* See https://bugzilla.gnome.org/show_bug.cgi?id=637095 for discussion */
-          g_warning ("apply_journal_to_builder: found short sized entry, possible journal corruption\n");
+          g_warning ("apply_journal_to_builder: found wrong sized entry, possible journal corruption\n");
           break;
         }
     }
