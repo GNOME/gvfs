@@ -150,7 +150,7 @@ $UDISKSD --no-debug --replace &
 UDISKS_PID=\$!
 
 echo "Running commmand in testbed: \$ARGS"
-su -lc "export PATH=$PATH; export \\\`dbus-launch\\\`; export XDG_RUNTIME_DIR=/home/$CALLING_USER/run; \$ARGS; rc=\\\$?; kill \\\$DBUS_SESSION_BUS_PID; exit \\\$rc" $CALLING_USER || {
+su -lc "export PATH=$PATH; export XDG_RUNTIME_DIR=/home/$CALLING_USER/run; \$ARGS" $CALLING_USER || {
     RC=\$?
     echo "=== command failed, showing Samba log files ==="
     for f in /var/log/samba/log.*; do

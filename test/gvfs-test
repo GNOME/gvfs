@@ -80,7 +80,7 @@ english_messages = not lc or lc.startswith('en_')
 PTYPE_DISK = 0 
 PTYPE_CDROM = 5 
 
-# local D-BUS daemon if we don't run under gvfs-testbed
+# local D-BUS daemon
 dbus_daemon = None
 
 
@@ -105,13 +105,12 @@ class GvfsTestCase(unittest.TestCase):
         super().run(result)
         # always read the logs, so that we only get the ones relevant to this
         # particular test case
-        if dbus_daemon:
-            dbus_out = dbus_daemon.stdout.read()
-            dbus_err = dbus_daemon.stderr.read()
-            if result and len(result.errors) + len(result.failures) > orig_err_fail:
-                print('\n----- dbus stdout -----\n%s\n----- dbus stderr -----\n%s\n' %
-                      (dbus_out and dbus_out.decode('UTF-8') or '',
-                       dbus_err and dbus_err.decode('UTF-8') or ''))
+        dbus_out = dbus_daemon.stdout.read()
+        dbus_err = dbus_daemon.stderr.read()
+        if result and len(result.errors) + len(result.failures) > orig_err_fail:
+            print('\n----- dbus stdout -----\n%s\n----- dbus stderr -----\n%s\n' %
+                  (dbus_out and dbus_out.decode('UTF-8') or '',
+                   dbus_err and dbus_err.decode('UTF-8') or ''))
 
     def program_code_out_err(self, argv):
         '''Return (exitcode, stdout, stderr) from a program call.'''
@@ -950,7 +949,14 @@ class Drive(GvfsTestCase):
         self.monitor.stdout.read()
 
     def setUp(self):
+        super().setUp()
+
         self.mock_polkit = None
+
+        # do not use the mocked /sys for these tests, but the real one
+        # (GvfsTestCase.tearDown() puts it back via .clear())
+        if umockdev_testbed:
+            umockdev_testbed.disable()
 
         self.monitor = subprocess.Popen(['gvfs-mount', '-oi'],
                                         stdout=subprocess.PIPE)
@@ -969,6 +975,8 @@ class Drive(GvfsTestCase):
         self.monitor.terminate()
         self.monitor.wait()
         self.stop_polkit()
+
+        super().tearDown()
 
     def test_cdrom(self):
         '''drive mount: cdrom'''
@@ -1624,7 +1632,6 @@ class Trash(GvfsTestCase):
             self.assertTrue(os.path.exists(self.my_file))
 
 
-@unittest.skipIf(in_testbed, 'this test does not currently work under gvfs-testbed')
 @unittest.skipUnless(have_umockdev,
                      'umockdev not installed; get it from https://launchpad.net/umockdev')
 class GPhoto(GvfsTestCase):
@@ -1713,7 +1720,8 @@ def start_dbus():
     env['GVFS_DEBUG'] = 'all'
     env['GVFS_SMB_DEBUG'] = '6'
     env['GVFS_HTTP_DEBUG'] = 'all'
-    env['LIBSMB_PROG'] = "nc localhost 1445"
+    if not in_testbed:
+        env['LIBSMB_PROG'] = "nc localhost 1445"
     # run local D-BUS; if we run this in a built tree, use our config to pick
     # up the built services, otherwise the standard session one
     if os.path.exists(dbus_conf):
@@ -1745,29 +1753,27 @@ if __name__ == '__main__':
         pass
     os.environ['LC_ALL'] = 'C'
     
-    if not in_testbed:
-        # we need to create the umockdev testbed before launching D-BUS, so
-        # that all spawned gvfs daemons see it
-        if have_umockdev:
-            umockdev_testbed = UMockdev.Testbed.new()
+    # we need to create the umockdev testbed before launching D-BUS, so
+    # that all spawned gvfs daemons see it
+    if have_umockdev:
+        umockdev_testbed = UMockdev.Testbed.new()
 
-        temp_home = start_dbus()
+    temp_home = start_dbus()
     try:
         unittest.main(testRunner=unittest.TextTestRunner(stream=sys.stdout, verbosity=2))
     finally:
-        if not in_testbed:
-            dbus_daemon.terminate()
-            dbus_daemon.wait()
-            # it might take a while until the child processes terminate and
-            # release usage of the home dir, so try several times
-            timeout = 20
-            while timeout > 0:
-                try:
-                    shutil.rmtree(temp_home)
-                    break
-                except OSError as e:
-                    timeout -= 1
-                    time.sleep(0.1)
-                    if timeout <= 0:
-                        raise
+        dbus_daemon.terminate()
+        dbus_daemon.wait()
+        # it might take a while until the child processes terminate and
+        # release usage of the home dir, so try several times
+        timeout = 20
+        while timeout > 0:
+            try:
+                shutil.rmtree(temp_home)
+                break
+            except OSError as e:
+                timeout -= 1
+                time.sleep(0.1)
+                if timeout <= 0:
+                    raise
 
