@@ -35,7 +35,6 @@
 
 #define LIBSOUP_USE_UNSTABLE_REQUEST_API
 #include <libsoup/soup-gnome.h>
-#include <libsoup/soup-requester.h>
 
 #include "gvfsbackendhttp.h"
 #include "gvfshttpinputstream.h"
@@ -99,7 +98,7 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   g_object_set (G_OBJECT (backend->session_async), "use-thread-context", TRUE, NULL);
 
   /* Proxy handling */
-  proxy_resolver = g_object_new (SOUP_TYPE_PROXY_RESOLVER_GNOME, NULL);
+  proxy_resolver = g_object_new (SOUP_TYPE_PROXY_RESOLVER_DEFAULT, NULL);
   soup_session_add_feature (backend->session, proxy_resolver);
   soup_session_add_feature (backend->session_async, proxy_resolver);
   g_object_unref (proxy_resolver);
@@ -120,10 +119,6 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   soup_session_add_feature (backend->session, content_decoder);
   soup_session_add_feature (backend->session_async, content_decoder);
   g_object_unref (content_decoder);
-
-  /* Request API */
-  soup_session_add_feature_by_type (backend->session, SOUP_TYPE_REQUESTER);
-  soup_session_add_feature_by_type (backend->session_async, SOUP_TYPE_REQUESTER);
 
   /* Logging */
   debug = g_getenv ("GVFS_HTTP_DEBUG");

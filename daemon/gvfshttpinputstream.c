@@ -27,7 +27,6 @@
 
 #define LIBSOUP_USE_UNSTABLE_REQUEST_API
 #include <libsoup/soup.h>
-#include <libsoup/soup-requester.h>
 #include <libsoup/soup-request-http.h>
 
 #include "gvfshttpinputstream.h"
@@ -40,7 +39,7 @@ G_DEFINE_TYPE_WITH_CODE (GVfsHttpInputStream, g_vfs_http_input_stream, G_TYPE_IN
 
 typedef struct {
   SoupURI *uri;
-  SoupRequester *requester;
+  SoupSession *session;
   SoupRequest *req;
   SoupMessage *msg;
   GInputStream *stream;
@@ -64,7 +63,7 @@ g_vfs_http_input_stream_finalize (GObject *object)
   GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
 
   g_clear_pointer (&priv->uri, soup_uri_free);
-  g_clear_object (&priv->requester);
+  g_clear_object (&priv->session);
   g_clear_object (&priv->req);
   g_clear_object (&priv->msg);
   g_clear_object (&priv->stream);
@@ -99,8 +98,7 @@ g_vfs_http_input_stream_new (SoupSession *session,
   stream = g_object_new (G_VFS_TYPE_HTTP_INPUT_STREAM, NULL);
   priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
 
-  priv->requester = (SoupRequester *)soup_session_get_feature (session, SOUP_TYPE_REQUESTER);
-  g_object_ref (priv->requester);
+  priv->session = g_object_ref (session);
   priv->uri = soup_uri_copy (uri);
 
   return G_INPUT_STREAM (stream);
@@ -115,7 +113,7 @@ g_vfs_http_input_stream_ensure_request (GInputStream *stream)
     {
       GError *error = NULL;
 
-      priv->req = soup_requester_request_uri (priv->requester, priv->uri, &error);
+      priv->req = soup_session_request_uri (priv->session, priv->uri, &error);
       g_assert_no_error (error);
       priv->msg = soup_request_http_get_message (SOUP_REQUEST_HTTP (priv->req));
       priv->offset = 0;
