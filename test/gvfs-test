@@ -40,6 +40,8 @@ from gi.repository import GLib, Gio
 try:
     from gi.repository import UMockdev
     have_umockdev = subprocess.call(['which', 'umockdev-wrapper'], stdout=subprocess.PIPE) == 0
+    # needs >= 0.2.10
+    have_umockdev = have_umockdev and hasattr(UMockdev.Testbed, 'add_from_file')
 except ImportError:
     have_umockdev = False
 
@@ -1689,6 +1691,89 @@ class GPhoto(GvfsTestCase):
 
         # signal our monitor about the addition
         #umockdev_testbed.uevent('/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.5/1-1.5.2/1-1.5.2.3', 'add');
+
+
+@unittest.skipUnless(have_umockdev,
+                     'umockdev not installed; get it from https://launchpad.net/umockdev')
+class Mtp(GvfsTestCase):
+    @classmethod
+    def setUpClass(klass):
+        '''Load Sony Xperia MTP dump into testbed'''
+
+        GvfsTestCase.setUpClass()
+        umockdev_testbed.add_from_file(os.path.join(my_dir, 'files', 'mtp_xperia.umockdev'))
+        umockdev_testbed.load_ioctl('/dev/bus/usb/001/017',
+                                    os.path.join(my_dir, 'files', 'mtp_xperia.ioctl.xz'))
+
+    def shell(self):
+        subprocess.call(['umockdev-wrapper', 'bash', '-i'])
+
+    def xtest_detect(self):
+        '''mtp:// detection'''
+
+        out = self.program_out_success(['umockdev-wrapper', 'gvfs-mount', '-li'])
+        print(out)
+
+    def test_mount_cli(self):
+        '''mtp:// mount with CLI'''
+
+        uri = 'mtp://[usb:001,017]'
+
+        # this might take a bit until everything is detected
+        timeout = 5
+        while timeout > 0:
+            if subprocess.call(['gvfs-mount', uri], stderr=subprocess.PIPE) == 0:
+                break
+            timeout -= 1
+            time.sleep(0.5)
+        else:
+            self.fail('gvfs-mount %s failed' % uri)
+
+        try:
+            # The top-level name is defined by the mobile firmware
+            self.assertEqual(self.program_out_success(['gvfs-ls', uri]), 'SD-Karte\n')
+            self.assertEqual(self.program_out_success(['gvfs-ls', uri + '/SD-Karte']),
+                             'DCIM\nhello.txt\nLOST.DIR\nMusic\nAndroid\nclockworkmod\n')
+            self.assertEqual(self.program_out_success(['gvfs-ls', uri + '/SD-Karte/Music']),
+                             'GStreamer - The Test Sine\n')
+            self.assertEqual(self.program_out_success(['gvfs-ls', uri + '/SD-Karte/Music/GStreamer - The Test Sine']),
+                             'sine.ogg\n')
+
+            # info for a dir and a music file
+            out = self.program_out_success(['gvfs-info', uri + '/SD-Karte/Music/GStreamer - The Test Sine'])
+            self.assertIn('standard::content-type: inode/directory', out)
+            self.assertIn('access::can-read: TRUE', out)
+            self.assertIn('access::can-write: TRUE', out)
+            self.assertIn('access::can-delete: TRUE', out)
+
+            out = self.program_out_success(['gvfs-info', uri + '/SD-Karte/Music/GStreamer - The Test Sine/sine.ogg'])
+            self.assertIn('standard::content-type: audio/ogg', out)
+            self.assertIn('standard::size: 4400', out)
+            self.assertIn('access::can-read: TRUE', out)
+            self.assertIn('access::can-write: TRUE', out)
+            self.assertIn('access::can-delete: TRUE', out)
+
+            # read ogg file
+            out = subprocess.check_output(['gvfs-cat', uri + '/SD-Karte/Music/GStreamer - The Test Sine/sine.ogg'])
+            self.assertTrue(out.startswith(b'OggS\x00'), out[:20])
+
+            # text file
+            self.assertEqual(self.program_out_success(['gvfs-cat', uri + '/SD-Karte/hello.txt']),
+                             'world\n')
+            out = self.program_out_success(['gvfs-info', uri + '/SD-Karte/hello.txt'])
+            self.assertIn('standard::content-type: text/plain', out)
+            self.assertIn('standard::size: 6', out)
+
+            # photo
+            out = self.program_out_success(['gvfs-info', uri + '/SD-Karte/DCIM/100CANON/IMG_0001.JPG'])
+            self.assertIn('standard::content-type: image/jpeg', out)
+            self.assertIn('standard::size: 8843', out)
+            self.assertIn('preview::icon:', out)
+
+            out = subprocess.check_output(['gvfs-cat', uri + '/SD-Karte/DCIM/100CANON/IMG_0001.JPG'])
+            self.assertIn(b'JFIF', out[:20])
+        finally:
+            self.unmount(uri)
 
 
 def start_dbus():
