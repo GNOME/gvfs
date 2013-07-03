@@ -205,7 +205,7 @@ gvfs_archive_finish (GVfsArchive *archive)
 {
   gvfs_archive_pop_job (archive);
 
-  archive_read_finish (archive->archive);
+  archive_read_free (archive->archive);
   g_slice_free (GVfsArchive, archive);
 }
 
@@ -221,7 +221,7 @@ gvfs_archive_new (GVfsBackendArchive *ba, GVfsJob *job)
   gvfs_archive_push_job (d, job);
 
   d->archive = archive_read_new ();
-  archive_read_support_compression_all (d->archive);
+  archive_read_support_filter_all (d->archive);
   archive_read_support_format_all (d->archive);
   archive_read_open2 (d->archive,
 		      d,
