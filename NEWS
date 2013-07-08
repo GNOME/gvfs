@@ -1,3 +1,9 @@
+Major changes in 1.17.3
+=======================
+* Clean shutdown implementation for various backends
+* tests: Various fixes
+* afc: Update to libimobiledevice new api
+
 Major changes in 1.17.2
 =======================
 * metadata: Fix write regression
