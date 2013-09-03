@@ -1,3 +1,7 @@
+Major changes in 1.17.91
+=======================
+* Handle large thumbnails as well as normal ones
+
 Major changes in 1.17.90
 =======================
 * archive: Update to latest libarchive API
