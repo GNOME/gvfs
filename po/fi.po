@@ -3,119 +3,121 @@
 # Ilkka Tuohela <hile@iki.fi> 2008-2009.
 #
 # Gnome 2012-03 Finnish translation sprint participants:
-# Jiri Grönroos
 # Timo Jyrinki <timo.jyrinki@iki.fi>, 2008.
 # Tommi Vainikainen <thv@iki.fi>, 2009-2010.
 # Jussi Aalto, 2010.
-# Jiri Grönroos, 2010-2011, 2012, 2013.
 # Ville-Pekka Vainio <vpivaini@cs.helsinki.fi>, 2011.
+# Jiri Grönroos <jiri.gronroos+l10n@iki.fi>, 2010-2011, 2012, 2013.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-02-11 15:50+0000\n"
-"PO-Revision-Date: 2013-03-21 21:26+0200\n"
+"POT-Creation-Date: 2013-08-01 06:27+0000\n"
+"PO-Revision-Date: 2013-09-06 22:35+0300\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos+l10n@iki.fi>\n"
-"Language-Team: Finnish <gnome-fi-laatu@lists.sourceforge.net>\n"
+"Language-Team: suomi <gnome-fi-laatu@lists.sourceforge.net>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 1.5\n"
+"X-Generator: Gtranslator 2.91.6\n"
 "X-POT-Import-Date: 2012-02-19 15:25:18+0000\n"
 
-#: ../client/gdaemonfile.c:416 ../client/gdaemonfile.c:2774
+#: ../client/gdaemonfile.c:469 ../client/gdaemonfile.c:2827
 msgid "Operation not supported, files on different mounts"
 msgstr "Toiminto ei ole tuettu, tiedostot eri liitospisteissä"
 
-#: ../client/gdaemonfile.c:1041 ../client/gdaemonfile.c:3117
-#: ../client/gvfsiconloadable.c:304
+#: ../client/gdaemonfile.c:1094 ../client/gdaemonfile.c:3170
+#: ../client/gvfsiconloadable.c:304 ../daemon/gvfsjobopenforread.c:183
+#: ../daemon/gvfsjobopenforwrite.c:267
 msgid "Couldn't get stream file descriptor"
 msgstr "Virran tiedostokuvaajaa ei saatu"
 
-#: ../client/gdaemonfile.c:1170 ../client/gdaemonfile.c:1242
+#: ../client/gdaemonfile.c:1223 ../client/gdaemonfile.c:1295
 #: ../client/gvfsiconloadable.c:129
 msgid "Didn't get stream file descriptor"
 msgstr "Virran tiedostokuvaajaa ei saatu"
 
-#: ../client/gdaemonfile.c:1363
+#: ../client/gdaemonfile.c:1416
 #, c-format
 msgid "Invalid return value from %s"
 msgstr "Virheellinen paluuarvo funktiolta %s"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:2248
+#: ../client/gdaemonfile.c:2301
 msgid "Could not find enclosing mount"
 msgstr "Yllä olevaa liitospistettä ei voitu selvittää"
 
-#: ../client/gdaemonfile.c:2284
+#: ../client/gdaemonfile.c:2337
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Virheellinen tiedostonimi %s"
 
-#: ../client/gdaemonfile.c:2616 ../client/gdaemonvfs.c:1288
+#: ../client/gdaemonfile.c:2669 ../client/gdaemonvfs.c:1288
 #: ../client/gdaemonvfs.c:1340
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Virhe asetettaessa tiedoston metatietoja: %s"
 
-#: ../client/gdaemonfile.c:2617 ../client/gdaemonvfs.c:1341
+#: ../client/gdaemonfile.c:2670 ../client/gdaemonvfs.c:1341
 msgid "values must be string or list of strings"
 msgstr "arvojen täytyy olla merkkijonoja tai merkkijonojen luetteloita"
 
 #: ../client/gdaemonfileenumerator.c:528 ../client/gdaemonfileenumerator.c:611
 #: ../client/gdaemonfileenumerator.c:662
-#: ../client/gdaemonfileinputstream.c:630
-#: ../client/gdaemonfileinputstream.c:783
-#: ../client/gdaemonfileinputstream.c:901
-#: ../client/gdaemonfileinputstream.c:1149
-#: ../client/gdaemonfileinputstream.c:1391
-#: ../client/gdaemonfileoutputstream.c:506
-#: ../client/gdaemonfileoutputstream.c:681
-#: ../client/gdaemonfileoutputstream.c:873
-#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:734
-#: ../daemon/gvfsbackendobexftp.c:1110 ../daemon/gvfsbackendobexftp.c:1131
-#: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1387
-#: ../daemon/gvfsbackendobexftp.c:1451 ../daemon/gvfsbackendobexftp.c:1652
-#: ../daemon/gvfsbackendobexftp.c:1759 ../daemon/gvfsbackendobexftp.c:1921
-#: ../daemon/gvfsbackendobexftp.c:1948 ../daemon/gvfsbackendobexftp.c:2006
-#: ../daemon/gvfsbackendobexftp.c:2028 ../daemon/gvfsbackendobexftp.c:2091
-#: ../daemon/gvfsbackendobexftp.c:2110 ../daemon/gvfsbackendsmb.c:1244
+#: ../client/gdaemonfileinputstream.c:642
+#: ../client/gdaemonfileinputstream.c:795
+#: ../client/gdaemonfileinputstream.c:915
+#: ../client/gdaemonfileinputstream.c:1166
+#: ../client/gdaemonfileinputstream.c:1411
+#: ../client/gdaemonfileoutputstream.c:517
+#: ../client/gdaemonfileoutputstream.c:695
+#: ../client/gdaemonfileoutputstream.c:890
+#: ../client/gdaemonfileoutputstream.c:1072 ../client/gvfsdaemondbus.c:734
+#: ../daemon/gvfsbackendobexftp.c:1113 ../daemon/gvfsbackendobexftp.c:1134
+#: ../daemon/gvfsbackendobexftp.c:1253 ../daemon/gvfsbackendobexftp.c:1390
+#: ../daemon/gvfsbackendobexftp.c:1454 ../daemon/gvfsbackendobexftp.c:1655
+#: ../daemon/gvfsbackendobexftp.c:1762 ../daemon/gvfsbackendobexftp.c:1924
+#: ../daemon/gvfsbackendobexftp.c:1951 ../daemon/gvfsbackendobexftp.c:2009
+#: ../daemon/gvfsbackendobexftp.c:2031 ../daemon/gvfsbackendobexftp.c:2094
+#: ../daemon/gvfsbackendobexftp.c:2113 ../daemon/gvfsbackendsmb.c:1263
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:332
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1070
 #: ../monitor/proxy/gproxydrive.c:547 ../monitor/proxy/gproxydrive.c:635
 #: ../monitor/proxy/gproxydrive.c:785 ../monitor/proxy/gproxydrive.c:923
 #: ../monitor/proxy/gproxydrive.c:961 ../monitor/proxy/gproxydrive.c:1086
 #: ../monitor/proxy/gproxymount.c:501 ../monitor/proxy/gproxymount.c:586
-#: ../monitor/proxy/gproxyvolume.c:852 ../monitor/proxy/gproxyvolume.c:915
+#: ../monitor/proxy/gproxyvolume.c:859 ../monitor/proxy/gproxyvolume.c:923
 msgid "Operation was cancelled"
 msgstr "Toiminto peruttiin"
 
-#: ../client/gdaemonfileinputstream.c:527
-#: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1684
-#: ../client/gdaemonfileinputstream.c:1694
-#: ../client/gdaemonfileoutputstream.c:450
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1236
-#: ../client/gdaemonfileoutputstream.c:1246
+#: ../client/gdaemonfileinputstream.c:537
+#: ../client/gdaemonfileinputstream.c:545
+#: ../client/gdaemonfileinputstream.c:1705
+#: ../client/gdaemonfileinputstream.c:1715
+#: ../client/gdaemonfileoutputstream.c:459
+#: ../client/gdaemonfileoutputstream.c:467
+#: ../client/gdaemonfileoutputstream.c:1257
+#: ../client/gdaemonfileoutputstream.c:1267
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "Virhe virtaprotokollassa: %s"
 
-#: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1694
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1246
+#: ../client/gdaemonfileinputstream.c:545
+#: ../client/gdaemonfileinputstream.c:1715
+#: ../client/gdaemonfileoutputstream.c:467
+#: ../client/gdaemonfileoutputstream.c:1267 ../daemon/gvfsbackendmtp.c:1891
+#: ../daemon/gvfsbackendmtp.c:2261
 msgid "End of stream"
 msgstr "Virta loppui"
 
-#: ../client/gdaemonfileinputstream.c:1330
-#: ../client/gdaemonfileoutputstream.c:981
+#: ../client/gdaemonfileinputstream.c:1348
+#: ../client/gdaemonfileoutputstream.c:999
 msgid "Seek not supported on stream"
 msgstr "Virta ei tue siirtymistä"
 
@@ -223,7 +225,7 @@ msgstr "Liitostyyppiä ei annettu"
 msgid "mountpoint for %s already running"
 msgstr "liitospiste kohteelle %s on jo käynnissä"
 
-#: ../daemon/daemon-main.c:327
+#: ../daemon/daemon-main.c:335
 msgid "error starting mount daemon"
 msgstr "virhe käynnistettäessä liitospalvelinta"
 
@@ -376,11 +378,11 @@ msgstr "Lupa evätty"
 #: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:327
 #: ../daemon/gvfsbackendafpbrowse.c:359 ../daemon/gvfsbackendarchive.c:651
 #: ../daemon/gvfsbackendarchive.c:699 ../daemon/gvfsbackendarchive.c:751
-#: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1015
+#: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1022
 #: ../daemon/gvfsbackendcomputer.c:638 ../daemon/gvfsbackenddnssd.c:415
 #: ../daemon/gvfsbackendftp.c:1068 ../daemon/gvfsbackendnetwork.c:696
-#: ../daemon/gvfsbackendsmbbrowse.c:1120 ../daemon/gvfsbackendsmbbrowse.c:1187
-#: ../daemon/gvfsbackendsmbbrowse.c:1374 ../daemon/gvfsbackendsmbbrowse.c:1447
+#: ../daemon/gvfsbackendsmbbrowse.c:1147 ../daemon/gvfsbackendsmbbrowse.c:1214
+#: ../daemon/gvfsbackendsmbbrowse.c:1401 ../daemon/gvfsbackendsmbbrowse.c:1474
 #, c-format
 msgid "File doesn't exist"
 msgstr "Tiedostoa ei ole olemassa"
@@ -403,7 +405,7 @@ msgid "Target file is open"
 msgstr "Kohdetiedosto on avoinna"
 
 #: ../daemon/gvfsafpvolume.c:676 ../daemon/gvfsbackendburn.c:421
-#: ../daemon/gvfsbackenddav.c:2582 ../daemon/gvfsbackendsftp.c:1821
+#: ../daemon/gvfsbackenddav.c:2581 ../daemon/gvfsbackendsftp.c:1821
 msgid "Directory not empty"
 msgstr "Kansio ei ole tyhjä"
 
@@ -430,11 +432,12 @@ msgstr "Taltiolla ei ole riittävästi tilaa"
 
 #: ../daemon/gvfsafpvolume.c:833 ../daemon/gvfsafpvolume.c:1414
 #: ../daemon/gvfsafpvolume.c:1571 ../daemon/gvfsbackendafp.c:284
-#: ../daemon/gvfsbackendafp.c:485 ../daemon/gvfsbackenddav.c:2297
-#: ../daemon/gvfsbackenddav.c:2544 ../daemon/gvfsbackenddav.c:2650
+#: ../daemon/gvfsbackendafp.c:485 ../daemon/gvfsbackenddav.c:2296
+#: ../daemon/gvfsbackenddav.c:2543 ../daemon/gvfsbackenddav.c:2649
 #: ../daemon/gvfsbackendftp.c:753 ../daemon/gvfsbackendftp.c:934
 #: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
-#: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2168
+#: ../daemon/gvfsbackendmtp.c:1446 ../daemon/gvfsbackendmtp.c:1555
+#: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2187
 msgid "Target file already exists"
 msgstr "Kohdetiedosto on jo olemassa"
 
@@ -452,14 +455,12 @@ msgid "Target directory already exists"
 msgstr "Kohdekansio on jo olemassa"
 
 #: ../daemon/gvfsafpvolume.c:1219 ../daemon/gvfsbackendafp.c:590
-#: ../daemon/gvfsbackendmtp.c:1402
 msgid "Can't rename volume"
 msgstr "Taltiota ei voi nimetä uudelleen"
 
 #: ../daemon/gvfsafpvolume.c:1223
-#, fuzzy
 msgid "Object with that name already exists"
-msgstr "Nimi on jo olemassa"
+msgstr "Objekti samalla nimellä on jo olemassa"
 
 #: ../daemon/gvfsafpvolume.c:1227
 msgid "Target object is marked as not renameable (RenameInhibit)"
@@ -484,9 +485,8 @@ msgid "Object being moved is marked as not renameable (RenameInhibit)"
 msgstr ""
 
 #: ../daemon/gvfsafpvolume.c:1422
-#, fuzzy
 msgid "Object being moved doesn't exist"
-msgstr "Tiedostoa ei ole olemassa"
+msgstr "Siirrettävää objektia ei ole olemassa"
 
 #: ../daemon/gvfsafpvolume.c:1559
 msgid "Server doesn't support the FPCopyFile operation"
@@ -508,33 +508,36 @@ msgstr "Lähdetiedosto on kansio"
 msgid "Range lock conflict exists"
 msgstr ""
 
-#: ../daemon/gvfsafpvolume.c:2293
+#: ../daemon/gvfsafpvolume.c:2293 ../daemon/gvfsbackendmtp.c:1235
+#: ../daemon/gvfsbackendmtp.c:1378 ../daemon/gvfsbackendmtp.c:1564
+#: ../daemon/gvfsbackendmtp.c:2013
 msgid "Directory doesn't exist"
 msgstr "Kansiota ei ole olemassa"
 
 #: ../daemon/gvfsafpvolume.c:2297
-#, fuzzy
 msgid "Target object is not a directory"
-msgstr "Kohde %s ei ole hakemisto\n"
+msgstr "Kohdeobjekti ei ole hakemisto"
 
 #: ../daemon/gvfsafpvolume.c:2643
 msgid "File is not open for write access"
-msgstr ""
+msgstr "Tiedosto ei ole avoinna kirjoitusta varten"
 
 #: ../daemon/gvfsafpvolume.c:2651
 msgid "File is locked by another user"
 msgstr "Tiedosto on lukittu toiselle käyttäjälle"
 
-#: ../daemon/gvfsafpvolume.c:2790
+#: ../daemon/gvfsafpvolume.c:2789
 msgid "File is not open for read access"
-msgstr ""
+msgstr "Tiedosto ei ole avoinna lukua varten"
 
 #: ../daemon/gvfsbackendafc.c:209
 msgid "Internal Apple File Control error"
 msgstr "Sisäinen Apple File Control -virhe"
 
 #: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:737
-#: ../daemon/gvfsbackendmtp.c:1205
+#: ../daemon/gvfsbackendmtp.c:1421 ../daemon/gvfsbackendmtp.c:1459
+#: ../daemon/gvfsbackendmtp.c:1647 ../daemon/gvfsbackendmtp.c:1692
+#: ../daemon/gvfsbackendmtp.c:1760 ../daemon/gvfsbackendmtp.c:2087
 msgid "File does not exist"
 msgstr "Tiedostoa ei ole olemassa"
 
@@ -597,39 +600,39 @@ msgstr ""
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Käsittelemätön libimobiledevice-virhe (%d)"
 
-#: ../daemon/gvfsbackendafc.c:417
+#: ../daemon/gvfsbackendafc.c:412
 msgid "Try again"
 msgstr "Yritä uudelleen"
 
-#: ../daemon/gvfsbackendafc.c:417 ../daemon/gvfsbackend.c:968
+#: ../daemon/gvfsbackendafc.c:412 ../daemon/gvfsbackend.c:968
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
 #: ../monitor/udisks2/gvfsudisks2mount.c:762
 msgid "Cancel"
 msgstr "Peru"
 
-#: ../daemon/gvfsbackendafc.c:435 ../daemon/gvfsbackendarchive.c:553
+#: ../daemon/gvfsbackendafc.c:430 ../daemon/gvfsbackendarchive.c:553
 #: ../daemon/gvfsbackendarchive.c:582 ../daemon/gvfsbackenddav.c:1825
-#: ../daemon/gvfsbackendhttp.c:316 ../daemon/gvfsbackendobexftp.c:884
-#: ../daemon/gvfsbackendobexftp.c:900 ../daemon/gvfsbackendobexftp.c:919
-#: ../daemon/gvfsbackendsmb.c:699
+#: ../daemon/gvfsbackendhttp.c:316 ../daemon/gvfsbackendobexftp.c:887
+#: ../daemon/gvfsbackendobexftp.c:903 ../daemon/gvfsbackendobexftp.c:922
+#: ../daemon/gvfsbackendsmb.c:712
 msgid "Invalid mount spec"
 msgstr "Virheellinen liitosmäärittely"
 
-#: ../daemon/gvfsbackendafc.c:441 ../daemon/gvfsbackendafc.c:471
+#: ../daemon/gvfsbackendafc.c:436 ../daemon/gvfsbackendafc.c:466
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "Viallinen AFC-sijainti: täytyy olla muotoa afc://uuid:porttinumero"
 
-#: ../daemon/gvfsbackendafc.c:457
+#: ../daemon/gvfsbackendafc.c:452
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Applen mobiililaite"
 
-#: ../daemon/gvfsbackendafc.c:462
+#: ../daemon/gvfsbackendafc.c:457
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Applen mobiililaite, Jailbreak"
 
-#: ../daemon/gvfsbackendafc.c:467
+#: ../daemon/gvfsbackendafc.c:462
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Asiakirjat Applen mobiililaitteessa"
@@ -637,7 +640,7 @@ msgstr "Asiakirjat Applen mobiililaitteessa"
 #. translators:
 #. * This is the device name, with the service being browsed in brackets, eg.:
 #. * Alan Smithee's iPhone (jailbreak)
-#: ../daemon/gvfsbackendafc.c:526
+#: ../daemon/gvfsbackendafc.c:521
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (jailbreak)"
@@ -645,7 +648,7 @@ msgstr "%s (jailbreak)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:533 ../monitor/afc/afcvolume.c:128
+#: ../daemon/gvfsbackendafc.c:528 ../monitor/afc/afcvolume.c:130
 #, c-format
 msgid "Documents on %s"
 msgstr "Asiakirjat laitteessa %s"
@@ -653,7 +656,7 @@ msgstr "Asiakirjat laitteessa %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:628
+#: ../daemon/gvfsbackendafc.c:623
 #, c-format
 msgid ""
 "The device “%s” is locked. Enter the passcode on the device and click “Try "
@@ -664,8 +667,8 @@ msgstr ""
 
 #: ../daemon/gvfsbackendafc.c:967 ../daemon/gvfsbackendarchive.c:659
 #: ../daemon/gvfsbackendcomputer.c:656 ../daemon/gvfsbackendgphoto2.c:1856
-#: ../daemon/gvfsbackendobexftp.c:1096 ../daemon/gvfsbackendrecent.c:121
-#: ../daemon/gvfsbackendsmb.c:783 ../daemon/gvfsbackendtrash.c:232
+#: ../daemon/gvfsbackendobexftp.c:1099 ../daemon/gvfsbackendrecent.c:121
+#: ../daemon/gvfsbackendsmb.c:802 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "Kansiota ei voi avata"
 
@@ -679,14 +682,16 @@ msgstr "Virheellinen kelaustyyppi"
 
 #: ../daemon/gvfsbackendafc.c:2369 ../daemon/gvfsbackendafp.c:1749
 #: ../daemon/gvfsbackendftp.c:1088 ../daemon/gvfsbackendftp.c:1136
-#: ../daemon/gvfsbackendftp.c:1157 ../daemon/gvfsbackendsftp.c:1825
-#: ../daemon/gvfsbackendsftp.c:4621 ../daemon/gvfsbackendsmb.c:1806
+#: ../daemon/gvfsbackendftp.c:1157 ../daemon/gvfsbackendmtp.c:1749
+#: ../daemon/gvfsbackendmtp.c:1989 ../daemon/gvfsbackendmtp.c:2076
+#: ../daemon/gvfsbackendmtp.c:2143 ../daemon/gvfsbackendsftp.c:1825
+#: ../daemon/gvfsbackendsftp.c:4621 ../daemon/gvfsbackendsmb.c:1825
 #: ../daemon/gvfsftptask.c:391
 msgid "Operation unsupported"
 msgstr "Toiminto ei tue tuettu"
 
-#: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1115
-#: ../daemon/gvfsbackendsmbbrowse.c:1161
+#: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1142
+#: ../daemon/gvfsbackendsmbbrowse.c:1188
 msgid "The file is not a mountable"
 msgstr "Tiedosto ei ole liitettävissä"
 
@@ -702,8 +707,8 @@ msgstr "Tiedosto ei ole liitettävissä"
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: ../daemon/gvfsbackendafpbrowse.c:461 ../daemon/gvfsbackendafp.c:2066
 #: ../daemon/gvfsbackendftp.c:634 ../daemon/gvfsbackendobexftp.c:705
-#: ../daemon/gvfsbackendsftp.c:1686 ../daemon/gvfsbackendsmb.c:578
-#: ../daemon/gvfsbackendsmb.c:1497
+#: ../daemon/gvfsbackendsftp.c:1686 ../daemon/gvfsbackendsmb.c:584
+#: ../daemon/gvfsbackendsmb.c:1516
 #, c-format
 msgid "%s on %s"
 msgstr "%s palvelimella %s"
@@ -725,18 +730,18 @@ msgid "Apple Filing Protocol Service"
 msgstr "Apple Filing Protocol -palvelu"
 
 #: ../daemon/gvfsbackendafp.c:274 ../daemon/gvfsbackendburn.c:875
-#: ../daemon/gvfsbackendftp.c:1544 ../daemon/gvfsbackendobexftp.c:1803
+#: ../daemon/gvfsbackendftp.c:1544 ../daemon/gvfsbackendobexftp.c:1806
 msgid "Can't copy directory over directory"
 msgstr "Kansiota ei voi kopioida kansion päälle"
 
 #: ../daemon/gvfsbackendafp.c:293 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1215
-#: ../daemon/gvfsbackendmtp.c:1296 ../daemon/gvfsbackendobexftp.c:1818
+#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1469
+#: ../daemon/gvfsbackendmtp.c:1576 ../daemon/gvfsbackendobexftp.c:1821
 msgid "Can't recursively copy directory"
 msgstr "Kansiota ei voi kopioida rekursiivisesti"
 
 #: ../daemon/gvfsbackendafp.c:475 ../daemon/gvfsbackendsftp.c:4259
-#: ../daemon/gvfsbackendsmb.c:2157
+#: ../daemon/gvfsbackendsmb.c:2176
 msgid "Can't move directory over directory"
 msgstr "Kansiota ei voi siirtää kansion päälle"
 
@@ -749,8 +754,8 @@ msgstr "varmuuskopioita ei tueta"
 msgid "Unable to create temporary file (%s)"
 msgstr "Väliaikaistiedoston (%s) luonti epäonnistui"
 
-#: ../daemon/gvfsbackendafp.c:1317 ../daemon/gvfsbackenddav.c:2370
-#: ../daemon/gvfsbackendsftp.c:3407 ../daemon/gvfsbackendsmb.c:1213
+#: ../daemon/gvfsbackendafp.c:1317 ../daemon/gvfsbackenddav.c:2369
+#: ../daemon/gvfsbackendsftp.c:3407 ../daemon/gvfsbackendsmb.c:1232
 msgid "The file was externally modified"
 msgstr "Tiedostoa muokattiin muualta"
 
@@ -809,7 +814,7 @@ msgid "No such file or directory"
 msgstr "Tiedostoa tai kansiota ei löydy"
 
 #: ../daemon/gvfsbackendburn.c:455 ../daemon/gvfsbackendburn.c:903
-#: ../daemon/gvfsbackendobexftp.c:1834
+#: ../daemon/gvfsbackendobexftp.c:1837
 msgid "Can't copy file over directory"
 msgstr "Tiedostoa ei voi kopioida kansion päälle"
 
@@ -846,7 +851,7 @@ msgstr "Tiedosto on jo olemassa"
 #: ../daemon/gvfsjobunmountmountable.c:172 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1174 ../monitor/gdu/ggdumount.c:1258
 #: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1134
-#: ../monitor/udisks2/gvfsudisks2volume.c:1675
+#: ../monitor/udisks2/gvfsudisks2volume.c:1673
 msgid "Operation not supported by backend"
 msgstr "Taustajärjestelmä ei tue toimintoa"
 
@@ -854,8 +859,8 @@ msgstr "Taustajärjestelmä ei tue toimintoa"
 msgid "No such file or directory in target path"
 msgstr "Kohdepolulla ei ole haluttua kansiota tai hakemistoa"
 
-#: ../daemon/gvfsbackendburn.c:884 ../daemon/gvfsbackendobexftp.c:1811
-#: ../daemon/gvfsbackendobexftp.c:1842 ../daemon/gvfsbackendsftp.c:1823
+#: ../daemon/gvfsbackendburn.c:884 ../daemon/gvfsbackendobexftp.c:1814
+#: ../daemon/gvfsbackendobexftp.c:1845 ../daemon/gvfsbackendsftp.c:1823
 #: ../daemon/gvfsbackendsftp.c:4429
 msgid "Target file exists"
 msgstr "Kohdetiedosto on jo olemassa"
@@ -880,86 +885,86 @@ msgstr ""
 "Taltio on varattu\n"
 "Yksi tai useampi sovellus käyttää taltiota."
 
-#: ../daemon/gvfsbackendcdda.c:357 ../daemon/gvfsbackendgphoto2.c:1548
-#: ../daemon/gvfsbackendmtp.c:455
+#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1548
+#: ../daemon/gvfsbackendmtp.c:701
 msgid "Cannot create gudev client"
 msgstr "Gudev-asiakasta ei voi luoda"
 
-#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1566
+#: ../daemon/gvfsbackendcdda.c:376 ../daemon/gvfsbackendgphoto2.c:1566
 msgid "Cannot connect to the system bus"
 msgstr "Järjestelmäväylään ei saatu yhteyttä"
 
-#: ../daemon/gvfsbackendcdda.c:388 ../daemon/gvfsbackendgphoto2.c:1578
+#: ../daemon/gvfsbackendcdda.c:387 ../daemon/gvfsbackendgphoto2.c:1578
 msgid "Cannot create libhal context"
 msgstr "Libhal-kontekstia ei voi luoda"
 
-#: ../daemon/gvfsbackendcdda.c:402 ../daemon/gvfsbackendgphoto2.c:1591
+#: ../daemon/gvfsbackendcdda.c:401 ../daemon/gvfsbackendgphoto2.c:1591
 msgid "Cannot initialize libhal"
 msgstr "Libhal-kirjastoa ei voi alustaa"
 
-#: ../daemon/gvfsbackendcdda.c:418 ../daemon/gvfsbackendcdda.c:504
+#: ../daemon/gvfsbackendcdda.c:417 ../daemon/gvfsbackendcdda.c:503
 msgid "No drive specified"
 msgstr "Asemaa ei annettu"
 
-#: ../daemon/gvfsbackendcdda.c:442
+#: ../daemon/gvfsbackendcdda.c:441
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "Asemaa %s ei löydy"
 
-#: ../daemon/gvfsbackendcdda.c:455
+#: ../daemon/gvfsbackendcdda.c:454
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "Asema %s ei sisällä äänitiedostoja"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
-#: ../daemon/gvfsbackendcdda.c:465
+#: ../daemon/gvfsbackendcdda.c:464
 #, c-format
 msgid "cdda mount on %s"
 msgstr "cdda-liitos laitteella %s"
 
-#: ../daemon/gvfsbackendcdda.c:466 ../daemon/gvfsbackendcdda.c:987
+#: ../daemon/gvfsbackendcdda.c:465 ../daemon/gvfsbackendcdda.c:986
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:358
+#: ../monitor/udisks2/gvfsudisks2volume.c:356
 #, c-format
 msgid "Audio Disc"
 msgstr "Äänilevy"
 
-#: ../daemon/gvfsbackendcdda.c:530
+#: ../daemon/gvfsbackendcdda.c:529
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "Tiedostojärjestelmä on käytössä: %d avoin tiedosto"
 msgstr[1] "Tiedostojärjestelmä on käytössä: %d avointa tiedostoa"
 
-#: ../daemon/gvfsbackendcdda.c:722
+#: ../daemon/gvfsbackendcdda.c:721
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "Tiedostoa %s ei löydy asemasta %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:831
+#: ../daemon/gvfsbackendcdda.c:830
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "'Paranoia'-virhe asemasta %s"
 
-#: ../daemon/gvfsbackendcdda.c:894
+#: ../daemon/gvfsbackendcdda.c:893
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Virhe siirryttäessä virrassa asemassa %s"
 
-#: ../daemon/gvfsbackendcdda.c:1008 ../daemon/gvfsbackendgphoto2.c:1864
+#: ../daemon/gvfsbackendcdda.c:1015 ../daemon/gvfsbackendgphoto2.c:1864
 #, c-format
 msgid "No such file"
 msgstr "Tiedostoa ei löydy"
 
-#: ../daemon/gvfsbackendcdda.c:1022
+#: ../daemon/gvfsbackendcdda.c:1029
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Tiedostoa ei ole olemassa tai se ei ole ääniraita"
 
-#: ../daemon/gvfsbackendcdda.c:1127
+#: ../daemon/gvfsbackendcdda.c:1134
 msgid "Audio CD File System Service"
 msgstr "Ääni-CD:n tiedostojärjestelmäpalvelu"
 
@@ -1003,16 +1008,14 @@ msgid "Can't eject file"
 msgstr "Tiedostoa ei voi poistaa asemasta"
 
 #: ../daemon/gvfsbackendcomputer.c:1268 ../daemon/gvfsbackendcomputer.c:1275
-#, fuzzy
 #| msgid "Can't start file"
 msgid "Can't start drive"
-msgstr "Tiedostoa ei voi käynnistää"
+msgstr "Asemaa ei voi käynnistää"
 
 #: ../daemon/gvfsbackendcomputer.c:1341 ../daemon/gvfsbackendcomputer.c:1348
-#, fuzzy
 #| msgid "Can't stop file"
 msgid "Can't stop drive"
-msgstr "Tiedostoa ei voi sammuttaa"
+msgstr "Asemaa ei voi pysäyttää"
 
 #: ../daemon/gvfsbackendcomputer.c:1405 ../daemon/gvfsbackendcomputer.c:1412
 msgid "Can't poll file"
@@ -1074,8 +1077,8 @@ msgstr "Jako ei tue WebDAV:ia"
 msgid "Could not create request"
 msgstr "Pyyntöä ei voitu luoda"
 
-#: ../daemon/gvfsbackenddav.c:2401 ../daemon/gvfsbackendsmb.c:1249
-#: ../daemon/gvfsbackendsmb.c:2185
+#: ../daemon/gvfsbackenddav.c:2400 ../daemon/gvfsbackendsmb.c:1268
+#: ../daemon/gvfsbackendsmb.c:2204
 msgid "Backup file creation failed"
 msgstr "Varmuuskopiotiedoston luonti epäonnistui"
 
@@ -1104,7 +1107,7 @@ msgid "Enter password for %s on %s"
 msgstr "Anna käyttäjän %s salasana palvelimelle %s"
 
 #: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:981
-#: ../daemon/gvfsbackendsmbbrowse.c:1022 ../daemon/gvfsbackendsmb.c:655
+#: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmb.c:667
 msgid "Password dialog cancelled"
 msgstr "Salasanakysely peruttiin"
 
@@ -1168,7 +1171,7 @@ msgstr "Kamera"
 msgid "Audio Player"
 msgstr "Musiikkisoitin"
 
-#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:447
+#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:693
 msgid "No device specified"
 msgstr "Laitetta ei määritelty"
 
@@ -1223,7 +1226,7 @@ msgstr "Virhe pyydettäessä tiedostoa"
 msgid "Error getting data from file"
 msgstr "Virhe pyydettäessä tietoja tiedostosta"
 
-#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1481
+#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1854
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Virheellinen kuvaketunniste ”%s”"
@@ -1234,7 +1237,7 @@ msgid "Error seeking in stream on camera %s"
 msgstr "Virhe siirryttäessä virrassa kamerassa %s"
 
 #: ../daemon/gvfsbackendgphoto2.c:2171 ../daemon/gvfsbackendsftp.c:2938
-#: ../daemon/gvfsbackendsmbbrowse.c:1443
+#: ../daemon/gvfsbackendsmbbrowse.c:1470
 msgid "Not a directory"
 msgstr "Ei ole kansio"
 
@@ -1328,90 +1331,82 @@ msgstr "HTTP-asiakkaan virhe: %s"
 msgid "Directory notification not supported"
 msgstr "Kansioiden huomautukset eivät ole tuettu"
 
-#: ../daemon/gvfsbackendmtp.c:289
+#: ../daemon/gvfsbackendmtp.c:508
 msgid "Unknown error."
 msgstr "Tuntematon virhe."
 
-#: ../daemon/gvfsbackendmtp.c:295
+#: ../daemon/gvfsbackendmtp.c:514
 #, c-format
-#| msgid "HTTP Client Error: %s"
 msgid "libmtp error: %s"
 msgstr "libmtp-virhe: %s"
 
-#: ../daemon/gvfsbackendmtp.c:401
+#: ../daemon/gvfsbackendmtp.c:647
 #, fuzzy
 #| msgid "Unexpected end of stream"
 msgid "Unexpected host uri format."
 msgstr "Odottamaton virtauksen loppu"
 
-#: ../daemon/gvfsbackendmtp.c:411
+#: ../daemon/gvfsbackendmtp.c:657
 msgid "Malformed host uri."
 msgstr ""
 
-#: ../daemon/gvfsbackendmtp.c:424
+#: ../daemon/gvfsbackendmtp.c:670
 msgid "Couldn't find matching udev device."
 msgstr "Vastaavaa udev-laitetta ei löytynyt."
 
-#: ../daemon/gvfsbackendmtp.c:564
-#| msgid "No device specified"
+#: ../daemon/gvfsbackendmtp.c:814
 msgid "No MTP devices found"
 msgstr "MTP-laitteita ei löytynyt"
 
-#: ../daemon/gvfsbackendmtp.c:569
-#| msgid "Unable to connect"
+#: ../daemon/gvfsbackendmtp.c:819
 msgid "Unable to connect to MTP device"
 msgstr "MTP-laitteeseen yhdistäminen epäonnistui"
 
-#: ../daemon/gvfsbackendmtp.c:574
+#: ../daemon/gvfsbackendmtp.c:824
 msgid "Unable to allocate memory while detecting MTP devices"
 msgstr ""
 
-#: ../daemon/gvfsbackendmtp.c:580
+#: ../daemon/gvfsbackendmtp.c:830
 msgid "Generic libmtp error"
 msgstr "Yleinen libmtp-virhe"
 
-#: ../daemon/gvfsbackendmtp.c:597
+#: ../daemon/gvfsbackendmtp.c:847
 #, c-format
 msgid "Unable to open MTP device '%s'"
 msgstr "MTP-laitteen \"%s\" avaaminen epäonnistui"
 
-#: ../daemon/gvfsbackendmtp.c:640
-#| msgid "Unnamed Drive"
+#: ../daemon/gvfsbackendmtp.c:899
 msgid "Unnamed Device"
 msgstr "Nimetön laite"
 
-#: ../daemon/gvfsbackendmtp.c:1008 ../daemon/gvfsbackendmtp.c:1081
-msgid "No storage volumes found"
-msgstr ""
-
-#: ../daemon/gvfsbackendmtp.c:1030
+#: ../daemon/gvfsbackendmtp.c:1119 ../daemon/gvfsbackendmtp.c:1254
+#: ../daemon/gvfsbackendmtp.c:1306
 msgid "File not found"
 msgstr "Tiedostoa ei löydy"
 
-#: ../daemon/gvfsbackendmtp.c:1138
-#| msgid "Can't move a shared directory into the Trash"
+#: ../daemon/gvfsbackendmtp.c:1367
 msgid "Cannot make directory in this location"
 msgstr "Tähän sijaintiin ei voi luoda kansiota"
 
-#: ../daemon/gvfsbackendmtp.c:1194 ../daemon/gvfsbackendsmbbrowse.c:1183
+#: ../daemon/gvfsbackendmtp.c:1426 ../daemon/gvfsbackendmtp.c:1652
+#: ../daemon/gvfsbackendmtp.c:1697 ../daemon/gvfsbackendmtp.c:1765
+#: ../daemon/gvfsbackendmtp.c:2092 ../daemon/gvfsbackendmtp.c:2157
+#: ../daemon/gvfsbackendsmbbrowse.c:1210
 msgid "Not a regular file"
 msgstr "Ei ole tavallinen tiedosto"
 
-#: ../daemon/gvfsbackendmtp.c:1269
-#| msgid "Can't write to directory"
+#: ../daemon/gvfsbackendmtp.c:1531
 msgid "Cannot write to this location"
 msgstr "Tähän sijaintiin ei voi kirjoittaa"
 
-#: ../daemon/gvfsbackendmtp.c:1361
-#, fuzzy
-#| msgid "Cannot create libhal context"
-msgid "Cannot delete this entity"
-msgstr "Libhal-kontekstia ei voi luoda"
-
-#: ../daemon/gvfsbackendmtp.c:1473
+#: ../daemon/gvfsbackendmtp.c:1835
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr ""
+
+#: ../daemon/gvfsbackendmtp.c:2005 ../daemon/gvfsftptask.c:407
+msgid "Invalid filename"
+msgstr "Virheellinen tiedostonimi"
 
 #: ../daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
@@ -1421,7 +1416,7 @@ msgstr "Tiedostonjako"
 msgid "Remote Login"
 msgstr "Etäkirjautuminen"
 
-#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:917
+#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:929
 msgid "Windows Network"
 msgstr "Windows-verkko"
 
@@ -1431,19 +1426,19 @@ msgstr "Windows-verkko"
 msgid "Network Location Monitor"
 msgstr "Verkkosijaintien tarkkailija"
 
-#: ../daemon/gvfsbackendobexftp.c:913
+#: ../daemon/gvfsbackendobexftp.c:916
 msgid "USB support missing. Please contact your software vendor"
 msgstr "USB-tuki puuttuu. Ota yhteyttä ohjelmiston toimittajaan"
 
-#: ../daemon/gvfsbackendobexftp.c:1035
+#: ../daemon/gvfsbackendobexftp.c:1038
 msgid "Connection to the device lost"
 msgstr "Yhteys laitteeseen hukattiin"
 
-#: ../daemon/gvfsbackendobexftp.c:1532
+#: ../daemon/gvfsbackendobexftp.c:1535
 msgid "Device requires a software update"
 msgstr "Laite vaatii ohjelmistopäivityksen"
 
-#: ../daemon/gvfsbackendobexftp.c:1879 ../daemon/gvfsbackendsmb.c:2059
+#: ../daemon/gvfsbackendobexftp.c:1882 ../daemon/gvfsbackendsmb.c:2078
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Virhe poistettaessa tiedostoa: %s"
@@ -1461,7 +1456,6 @@ msgid "Recent"
 msgstr ""
 
 #: ../daemon/gvfsbackendsftp.c:299 ../daemon/gvfsbackendsftp.c:654
-#| msgid "ssh program unexpectedly exited"
 msgid "SSH program unexpectedly exited"
 msgstr "SSH-ohjelma sulkeutui odottamatta"
 
@@ -1524,7 +1518,7 @@ msgid "Cancel Login"
 msgstr "Peru kirjautuminen"
 
 #: ../daemon/gvfsbackendsftp.c:1061
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The identity of the remote computer (%s) is unknown.\n"
 #| "This happens when you log in to a computer the first time.\n"
@@ -1540,7 +1534,8 @@ msgid ""
 msgstr ""
 "Palvelimen ”%s” identiteettiä ei voitu vahvistaa.\n"
 "Tämä tapahtuu, kun kirjaudut palvelimelle ensimmäistä kertaa.\n"
-"Palvelimen lähettämä tunniste on %s. Jos haluat olla täysin varma, että "
+"\n"
+"Palvelimen lähettämä tunniste on \"%s\". Jos haluat olla täysin varma, että "
 "yhdistäminen on turvallista, ota yhteys palvelimen ylläpitäjään."
 
 #: ../daemon/gvfsbackendsftp.c:1080
@@ -1556,7 +1551,6 @@ msgid "Protocol error"
 msgstr "Protokollavirhe"
 
 #: ../daemon/gvfsbackendsftp.c:1728
-#| msgid "Unable to find supported ssh command"
 msgid "Unable to find supported SSH command"
 msgstr "Tuettua SSH-komentoa ei löydy"
 
@@ -1580,7 +1574,7 @@ msgstr "Tuettua SSH-komentoa ei löydy"
 msgid "Invalid reply received"
 msgstr "Saatiin virheellinen vastaus"
 
-#: ../daemon/gvfsbackendsftp.c:2263 ../daemon/gvfsbackendsmb.c:1504
+#: ../daemon/gvfsbackendsftp.c:2263 ../daemon/gvfsbackendsmb.c:1523
 #: ../daemon/gvfsdaemonutils.c:136
 msgid " (invalid encoding)"
 msgstr " (virheellinen koodaus)"
@@ -1599,81 +1593,80 @@ msgid "Unable to create temporary file"
 msgstr "Virhe luotaessa väliaikaistiedostoa"
 
 #. translators: %s is a server name
-#: ../daemon/gvfsbackendsmbbrowse.c:379
+#: ../daemon/gvfsbackendsmbbrowse.c:380
 #, c-format
 msgid "Password required for %s"
 msgstr "%s vaatii salasanan"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:852 ../daemon/gvfsbackendsmbbrowse.c:899
-#: ../daemon/gvfsbackendsmb.c:518 ../daemon/gvfsbackendsmb.c:564
-#: ../daemon/gvfsbackendsmb.c:729
+#: ../daemon/gvfsbackendsmbbrowse.c:864 ../daemon/gvfsbackendsmbbrowse.c:911
+#: ../daemon/gvfsbackendsmb.c:524 ../daemon/gvfsbackendsmb.c:570
+#: ../daemon/gvfsbackendsmb.c:748
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "Sisäinen virhe (%s)"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:926
+#: ../daemon/gvfsbackendsmbbrowse.c:938
 #, c-format
 msgid "Windows shares on %s"
 msgstr "Palvelimen %s Windows-jaot"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmbbrowse.c:1027
+#: ../daemon/gvfsbackendsmbbrowse.c:1047
 #, fuzzy, c-format
 #| msgid "Failed to retrieve share list from server"
 msgid "Failed to retrieve share list from server: %s"
 msgstr "Luetteloa jaoista ei voitu noutaa palvelimelta"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1532
+#: ../daemon/gvfsbackendsmbbrowse.c:1559
 msgid "Windows Network File System Service"
 msgstr "Windows-verkon tiedostojärjestelmäpalvelu"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:260
+#: ../daemon/gvfsbackendsmb.c:261
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "Jako %s palvelimella %s vaatii salasanan"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:660
+#: ../daemon/gvfsbackendsmb.c:672
 #, c-format
-#| msgid "Failed to mount Windows share"
 msgid "Failed to mount Windows share: %s"
 msgstr "Windows-jaon liittäminen epäonnistui: %s"
 
-#: ../daemon/gvfsbackendsmb.c:853 ../daemon/gvfsbackendsmb.c:1349
+#: ../daemon/gvfsbackendsmb.c:872 ../daemon/gvfsbackendsmb.c:1368
 msgid "Unsupported seek type"
 msgstr "Siirtymistyyppi ei ole tuettu"
 
-#: ../daemon/gvfsbackendsmb.c:1441
+#: ../daemon/gvfsbackendsmb.c:1460
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Varmuuskopiotiedoston luonti epäonnistui: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1821
+#: ../daemon/gvfsbackendsmb.c:1840
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Virheellinen määretyyppi (odotettiin uint64:ää)"
 
-#: ../daemon/gvfsbackendsmb.c:2008
+#: ../daemon/gvfsbackendsmb.c:2027
 msgid "Can't rename file, filename already exists"
 msgstr "Tiedostoa ei voi nimetä uudelleen, tiedostonimi on jo olemassa"
 
-#: ../daemon/gvfsbackendsmb.c:2133
+#: ../daemon/gvfsbackendsmb.c:2152
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Virhe siirrettäessä tiedostoa: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2205
+#: ../daemon/gvfsbackendsmb.c:2224
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Virhe poistettaessa kohdetiedostoa: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2229
+#: ../daemon/gvfsbackendsmb.c:2248
 msgid "Can't recursively move directory"
 msgstr "Kansiota ei voi siirtää rekursiivisesti"
 
-#: ../daemon/gvfsbackendsmb.c:2274
+#: ../daemon/gvfsbackendsmb.c:2293
 msgid "Windows Shares File System Service"
 msgstr "Windows-jakojen tiedostojärjestelmäpalvelu"
 
@@ -1751,10 +1744,6 @@ msgstr "Verkkoprotokollalla ei ole tukea"
 msgid "Page type unknown"
 msgstr "Sivun tyyppi on tuntematon"
 
-#: ../daemon/gvfsftptask.c:407
-msgid "Invalid filename"
-msgstr "Virheellinen tiedostonimi"
-
 #: ../daemon/gvfsjobmakesymlink.c:111
 msgid "Symlinks not supported by backend"
 msgstr "Taustajärjestelmä ei tue symbolisia linkkejä"
@@ -1781,30 +1770,30 @@ msgstr ""
 msgid "File system is busy"
 msgstr "Tiedostojärjestelmä on varattu"
 
-#: ../daemon/main.c:133 ../metadata/meta-daemon.c:445
+#: ../daemon/main.c:140 ../metadata/meta-daemon.c:482
 msgid "Replace old daemon."
 msgstr "Korvaa vanha palvelinprosessi."
 
-#: ../daemon/main.c:134
+#: ../daemon/main.c:141
 msgid "Don't start fuse."
 msgstr "Älä käynnistä FUSE:a."
 
-#: ../daemon/main.c:148
+#: ../daemon/main.c:155
 msgid "GVFS Daemon"
 msgstr "GVFS-palvelinprosessi"
 
-#: ../daemon/main.c:151
+#: ../daemon/main.c:158
 msgid "Main daemon for GVFS"
 msgstr "GVFS-pääpalvelin"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:166 ../metadata/meta-daemon.c:470
+#: ../daemon/main.c:173 ../metadata/meta-daemon.c:507
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:168 ../metadata/meta-daemon.c:472
+#: ../daemon/main.c:175 ../metadata/meta-daemon.c:509
 #: ../programs/gvfs-cat.c:168 ../programs/gvfs-cat.c:180
 #: ../programs/gvfs-copy.c:131 ../programs/gvfs-info.c:392
 #: ../programs/gvfs-ls.c:414 ../programs/gvfs-mime.c:95
@@ -1841,34 +1830,34 @@ msgstr "Sijainti on jo liitetty"
 msgid "Location is not mountable"
 msgstr "Sijainti ei ole liitettävissä"
 
-#: ../metadata/meta-daemon.c:133 ../metadata/meta-daemon.c:253
-#: ../metadata/meta-daemon.c:302 ../metadata/meta-daemon.c:337
-#: ../metadata/meta-daemon.c:373
+#: ../metadata/meta-daemon.c:157 ../metadata/meta-daemon.c:277
+#: ../metadata/meta-daemon.c:326 ../metadata/meta-daemon.c:361
+#: ../metadata/meta-daemon.c:397
 #, c-format
 msgid "Can't find metadata file %s"
 msgstr "Ei löytynyt metatietotiedostoa %s"
 
-#: ../metadata/meta-daemon.c:151 ../metadata/meta-daemon.c:163
+#: ../metadata/meta-daemon.c:175 ../metadata/meta-daemon.c:187
 msgid "Unable to set metadata key"
 msgstr "Ei voitu asettaa metatietoavainta"
 
-#: ../metadata/meta-daemon.c:173 ../metadata/meta-daemon.c:312
+#: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:336
 msgid "Unable to unset metadata key"
 msgstr "Ei voitu poistaa metatietoavainta"
 
-#: ../metadata/meta-daemon.c:347
+#: ../metadata/meta-daemon.c:371
 msgid "Unable to remove metadata keys"
 msgstr "Ei voitu poistaa metatietoavaimia"
 
-#: ../metadata/meta-daemon.c:384
+#: ../metadata/meta-daemon.c:408
 msgid "Unable to move metadata keys"
 msgstr "Ei voitu siirtää metatietoavaimia"
 
-#: ../metadata/meta-daemon.c:455
+#: ../metadata/meta-daemon.c:492
 msgid "GVFS Metadata Daemon"
 msgstr "GVFS-metatietopalvelin"
 
-#: ../metadata/meta-daemon.c:458
+#: ../metadata/meta-daemon.c:495
 msgid "Metadata daemon for GVFS"
 msgstr "Metatietopalvelin GVFS:lle"
 
@@ -1953,18 +1942,18 @@ msgstr ""
 "Syötä salasana taltion avaamiseksi\n"
 "Laite %s sisältää salakirjoitettua tietoa."
 
-#: ../monitor/goa/goavolume.c:214
+#: ../monitor/goa/goavolume.c:219
 #, c-format
 msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
 msgstr ""
 
-#: ../monitor/goa/goavolume.c:251
+#: ../monitor/goa/goavolume.c:256
 #, fuzzy, c-format
 #| msgid "Invalid return value from %s"
 msgid "Invalid credentials for %s"
 msgstr "Virheellinen paluuarvo funktiolta %s"
 
-#: ../monitor/goa/goavolume.c:268
+#: ../monitor/goa/goavolume.c:273
 #, c-format
 msgid "Unsupported authentication method for %s"
 msgstr ""
@@ -2291,10 +2280,9 @@ msgstr "Media %s"
 #. * "Eject" for both GDrive.stop() and GDrive.eject().
 #.
 #: ../monitor/udisks2/gvfsudisks2mount.c:756
-#, fuzzy
 #| msgid "Start Anyway"
 msgid "Eject Anyway"
-msgstr "Käynnistä silti"
+msgstr "Irrota silti"
 
 #: ../monitor/udisks2/gvfsudisks2utils.c:511
 #, c-format
@@ -2318,7 +2306,7 @@ msgstr "Voit nyt irrottaa kohteen %s\n"
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:278
+#: ../monitor/udisks2/gvfsudisks2volume.c:276
 #, c-format
 msgid "%s Encrypted"
 msgstr "Salattu (%s)"
@@ -2326,48 +2314,47 @@ msgstr "Salattu (%s)"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:290
+#: ../monitor/udisks2/gvfsudisks2volume.c:288
 #, c-format
 msgid "%s Volume"
 msgstr "Taltio (%s)"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:526
+#: ../monitor/udisks2/gvfsudisks2volume.c:524
 msgid "Volume"
 msgstr "Taltio"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1099
-#, fuzzy, c-format
+#: ../monitor/udisks2/gvfsudisks2volume.c:1097
+#, c-format
 #| msgid "Enter passphrase for key for ssh on %s"
 msgid "Error storing passphrase in keyring (%s)"
-msgstr "Anna ssh-avaimen salalause palvelimelle %s"
+msgstr "Virhe tallentaessa salalausetta avainnippuun (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1134
+#: ../monitor/udisks2/gvfsudisks2volume.c:1132
 #, fuzzy, c-format
 #| msgid "Error seeking in stream on drive %s"
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "Virhe siirryttäessä virrassa asemassa %s"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1199
-#, fuzzy
+#: ../monitor/udisks2/gvfsudisks2volume.c:1197
 #| msgid "The unlocked device does not have a recognizable filesystem on it"
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr ""
 "Lukituksesta avatulla laitteella ei ole tunnistettavaa tiedostojärjestelmää"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1228
-#, fuzzy, c-format
+#: ../monitor/udisks2/gvfsudisks2volume.c:1226
+#, c-format
 #| msgid "Enter password for %s"
 msgid "Encryption passphrase for %s"
-msgstr "Anna kohteen %s salasana"
+msgstr "Kohteen %s salauksen salalause"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1396
+#: ../monitor/udisks2/gvfsudisks2volume.c:1394
 msgid "A passphrase is required to access the volume"
 msgstr "Taltion käyttö vaatii salalauseen"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1411
-#, fuzzy, c-format
+#: ../monitor/udisks2/gvfsudisks2volume.c:1409
+#, c-format
 #| msgid ""
 #| "Enter a password to unlock the volume\n"
 #| "The device %s contains encrypted data."
@@ -2375,14 +2362,14 @@ msgid ""
 "Enter a passphrase to unlock the volume\n"
 "The passphrase is needed to access encrypted data on %s."
 msgstr ""
-"Syötä salasana taltion avaamiseksi\n"
-"Laite %s sisältää salakirjoitettua tietoa."
+"Syötä salalause taltion avaamiseksi\n"
+"Salalause tarvitaan salatun tiedon käyttämiseksi laitteella %s."
 
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1580
+#: ../monitor/udisks2/gvfsudisks2volume.c:1578
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
@@ -2874,7 +2861,7 @@ msgid "Error finding enclosing mount: %s\n"
 msgstr "Virhe etsittäessä sisältävää liitosta: %s\n"
 
 #: ../programs/gvfs-mount.c:302
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error unmounting mount: %s\n"
 msgid "Error ejecting mount: %s\n"
 msgstr "Virhe irrotettaessa liitosta: %s\n"
@@ -3067,6 +3054,11 @@ msgstr "Seuraa symbolisia linkkejä, liitoksia ja pikakuvakkeita"
 #: ../programs/gvfs-tree.c:247
 msgid "List contents of directories in a tree-like format."
 msgstr "Luettele hakemistojen sisällöt puumaisessa muodossa."
+
+#, fuzzy
+#~| msgid "Cannot create libhal context"
+#~ msgid "Cannot delete this entity"
+#~ msgstr "Libhal-kontekstia ei voi luoda"
 
 #~ msgid "Can't contact session bus"
 #~ msgstr "Istuntoväylään ei saatu yhteyttä"
