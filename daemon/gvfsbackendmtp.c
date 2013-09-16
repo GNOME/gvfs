@@ -634,7 +634,7 @@ get_dev_path_from_host (GVfsJob *job,
   if (!g_str_has_prefix (host, "[usb:")) {
     g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
                               G_IO_ERROR_NOT_SUPPORTED,
-                              _("Unexpected host uri format."));
+                              _("Unexpected host URI format."));
     return NULL;
   }
 
@@ -644,7 +644,7 @@ get_dev_path_from_host (GVfsJob *job,
     g_free (dev_path);
     g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
                               G_IO_ERROR_NOT_SUPPORTED,
-                              _("Malformed host uri."));
+                              _("Malformed host URI."));
     return NULL;
   }
   *comma = '/';
