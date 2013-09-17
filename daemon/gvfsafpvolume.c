@@ -140,8 +140,8 @@ g_vfs_afp_volume_mount_sync (GVfsAfpVolume *volume,
   return TRUE;
 
 generic_error:
-  /* Translators: first %s is volumename and second servername */ 
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+               /* Translators: first %s is volumename and second servername */
                _("Couldn't load %s on %s"), volume_name,
                g_vfs_afp_server_get_info(priv->server)->server_name);
   return FALSE;
@@ -1020,6 +1020,8 @@ make_directory_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
         break;
       case AFP_RESULT_FLAT_VOL:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                                  /* Translators: flat means volume doesn't support directories
+                                     (all files are in the volume root) */
                                   _("Volume is flat and doesn't support directories"));
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
@@ -2006,6 +2008,8 @@ set_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
         break;
       case AFP_RESULT_LOCK_ERR:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         /* Translators: range conflict means
+                                            requested data are locked by another user */
                                          _("Range lock conflict exists"));
         break;
       default:
