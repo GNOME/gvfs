@@ -809,8 +809,7 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
       /* nuke all caches so we're a bit more valgrind friendly */
       caches_invalidate_all (gphoto2_backend);
 
-      /* TODO: need a cleaner way to force unmount ourselves */
-      exit (1);
+      g_vfs_backend_force_unmount (G_VFS_BACKEND (gphoto2_backend));
     }
 }
 
@@ -1028,8 +1027,7 @@ _hal_device_removed (LibHalContext *hal_ctx, const char *udi)
       /* nuke all caches so we're a bit more valgrind friendly */
       caches_invalidate_all (gphoto2_backend);
 
-      /* TODO: need a cleaner way to force unmount ourselves */
-      exit (1);
+      g_vfs_backend_force_unmount (G_VFS_BACKEND (gphoto2_backend));
     }
 }
 #endif
