@@ -48,7 +48,10 @@ typedef enum {
   IOS2,
   IOS3,
   IOS4,
-  IOS5
+  IOS5,
+  IOS6,
+  IOS7,
+  IOS8
 } HostOSVersion;
 
 typedef enum {
@@ -590,6 +593,15 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
                   break;
                 case 5:
                   self->version = IOS5;
+                  break;
+                case 6:
+                  self->version = IOS6;
+                  break;
+                case 7:
+                  self->version = IOS7;
+                  break;
+                case 8:
+                  self->version = IOS8;
                   break;
                 }
             }
@@ -1668,7 +1680,7 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
           g_free (parent);
           g_free (thumb_base);
         }
-      else if (self->version == IOS4 || self->version == IOS5)
+      else if (self->version >= IOS4)
         {
           char **components;
 
