@@ -6,6 +6,8 @@
 
 #include <config.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <glib.h>
 #include <gio/gio.h>
 #include <glib/gi18n.h>
@@ -71,6 +73,52 @@ g_vfs_afc_volume_class_init (GVfsAfcVolumeClass *klass)
   gobject_class->finalize = g_vfs_afc_volume_finalize;
 }
 
+static gboolean
+_g_vfs_afc_volume_check_house_arrest_version (lockdownd_client_t lockdown_cli)
+{
+  plist_t value;
+  lockdownd_error_t lerr;
+  gboolean retval;
+
+  value = NULL;
+  retval = FALSE;
+
+  lerr = lockdownd_get_value (lockdown_cli, NULL, "ProductVersion", &value);
+  if (G_LIKELY(lerr == LOCKDOWN_E_SUCCESS))
+    {
+      if (plist_get_node_type(value) == PLIST_STRING)
+        {
+          char *version_string = NULL;
+
+          plist_get_string_val(value, &version_string);
+          if (version_string)
+            {
+              /* parse version */
+              int maj = 0;
+              int min = 0;
+              int rev = 0;
+
+              sscanf(version_string, "%d.%d.%d", &maj, &min, &rev);
+              free(version_string);
+
+              if (maj > 3)
+                {
+                    retval = TRUE;
+                }
+              else if (maj == 3)
+                {
+                  if (min > 1)
+                        retval = TRUE;
+                  if (min == 1 && rev >= 2)
+                        retval = TRUE;
+              }
+            }
+        }
+    }
+
+  return retval;
+}
+
 static int
 _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
 {
@@ -98,6 +146,12 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
     {
       if (lockdownd_client_new_with_handshake (dev, &lockdown_cli, "gvfs-afc-volume-monitor") != LOCKDOWN_E_SUCCESS)
         {
+          idevice_free (dev);
+          return 0;
+        }
+      if (!_g_vfs_afc_volume_check_house_arrest_version (lockdown_cli))
+        {
+          lockdownd_service_descriptor_free (lockdown_service);
           idevice_free (dev);
           return 0;
         }
