@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2008 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -84,7 +84,7 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   SoupSessionFeature *cookie_jar;
   SoupSessionFeature *content_decoder;
 
-  g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);  
+  g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);
 
   backend->session = soup_session_sync_new_with_options ("user-agent",
                                                          "gvfs/" VERSION,
@@ -225,7 +225,7 @@ http_error_code_from_status (guint status)
 
   case SOUP_STATUS_NOT_FOUND:
   case SOUP_STATUS_GONE:
-    return G_IO_ERROR_NOT_FOUND;    
+    return G_IO_ERROR_NOT_FOUND;
 
   case SOUP_STATUS_GATEWAY_TIMEOUT:
     return G_IO_ERROR_TIMED_OUT;
@@ -274,7 +274,7 @@ http_backend_queue_message (GVfsBackend         *backend,
 {
   GVfsBackendHttp *op_backend = G_VFS_BACKEND_HTTP (backend);
 
-  soup_session_queue_message (op_backend->session_async, msg, 
+  soup_session_queue_message (op_backend->session_async, msg,
                               callback, user_data);
 }
 /* ************************************************************************* */
@@ -321,9 +321,9 @@ try_mount (GVfsBackend  *backend,
       real_mount_spec->mount_prefix = g_mount_spec_canonicalize_path (path);
       g_free (path);
     }
-  
+
   g_vfs_backend_set_mount_spec (backend, real_mount_spec);
-  
+
   op_backend->mount_base = uri;
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -343,7 +343,7 @@ open_for_read_ready (GObject      *source_object,
   gboolean      can_seek;
   GError       *error;
 
-  stream = G_INPUT_STREAM (source_object); 
+  stream = G_INPUT_STREAM (source_object);
   error  = NULL;
   job    = G_VFS_JOB (user_data);
 
@@ -422,7 +422,7 @@ read_ready (GObject      *source_object,
   GError       *error;
   gssize        nread;
 
-  stream = G_INPUT_STREAM (source_object); 
+  stream = G_INPUT_STREAM (source_object);
   error  = NULL;
   job    = G_VFS_JOB (user_data);
 
@@ -527,7 +527,7 @@ close_read_ready (GObject      *source_object,
   g_object_unref (stream);
 }
 
-static gboolean 
+static gboolean
 try_close_read (GVfsBackend       *backend,
                 GVfsJobCloseRead  *job,
                 GVfsBackendHandle  handle)
@@ -583,7 +583,7 @@ file_info_from_message (SoupMessage *msg,
   g_debug ("basename:%s\n", basename);
 
   /* read http/1.1 rfc, until then we copy the local files
-   * behaviour */ 
+   * behaviour */
   if (basename != NULL &&
       (g_file_attribute_matcher_matches (matcher,
                                          G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME) ||
@@ -718,10 +718,10 @@ g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsBackendClass *backend_class;
-  
+
   gobject_class->finalize  = g_vfs_backend_http_finalize;
 
-  backend_class = G_VFS_BACKEND_CLASS (klass); 
+  backend_class = G_VFS_BACKEND_CLASS (klass);
 
   backend_class->try_mount              = try_mount;
   backend_class->try_open_for_read      = try_open_for_read;
