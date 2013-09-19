@@ -12,8 +12,8 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-09-07 17:29+0000\n"
-"PO-Revision-Date: 2013-09-15 15:23+0200\n"
+"POT-Creation-Date: 2013-09-15 16:23+0000\n"
+"PO-Revision-Date: 2013-09-17 16:23+0100\n"
 "Last-Translator: Richard Stanislavský <kenny.vv@gmail.com>\n"
 "Language-Team: Slovak <gnome-sk-list@gnome.org>\n"
 "Language: sk\n"
@@ -451,8 +451,8 @@ msgstr "Cieľový súbor už existuje"
 msgid "Ancestor directory doesn't exist"
 msgstr "Príbuzný adresár neexistuje"
 
-# DK: co je "flat"? je to vynechane v preklade
-# https://bugzilla.gnome.org/show_bug.cgi?id=697451
+# * https://developer.apple.com/library/mac/documentation/Networking/Reference/AFP_Reference/Reference/reference.html#//apple_ref/c/econst/kFPFlatVol
+# flat does not support directories
 #: ../daemon/gvfsafpvolume.c:1023
 msgid "Volume is flat and doesn't support directories"
 msgstr "Zväzok nepodporuje adresáre"
@@ -480,8 +480,7 @@ msgstr "Nie je možné presunúť adresár do jedného z jeho vetiev"
 # MČ: obávam sa, že keby som si prečítal tento preklad bol by som úplne mimo. Ja viem zdieľať ešte stále v JULS nezaradili do slovníka, ale čo je veľa to je príliš.
 #: ../daemon/gvfsafpvolume.c:1406
 msgid "Can't move sharepoint into a shared directory"
-msgstr ""
-"Bod sprístupnenia nie je možné presunúť do sprístupneného adresára"
+msgstr "Bod sprístupnenia nie je možné presunúť do sprístupneného adresára"
 
 # MČ: detto.
 #: ../daemon/gvfsafpvolume.c:1410
@@ -512,12 +511,16 @@ msgstr "Zdrojový súbor a/alebo cieľový adresár neexistuje"
 msgid "Source file is a directory"
 msgstr "Zdrojový súbor nie je adresár"
 
-# PK: co to robi?
-# https://bugzilla.gnome.org/show_bug.cgi?id=697451
+# error message
+# Locking a range of bytes prevents other AFP clients from reading or writing
+# data within the specified range. If an AFP client locks a byte range, that
+# range is reserved for exclusive manipulation by the client that placed the
+# lock.
+# Some or all of the requested range is locked by another user; a lock range
+# conflict exists.
 #: ../daemon/gvfsafpvolume.c:2009
-#, fuzzy
 msgid "Range lock conflict exists"
-msgstr "Existuje konflikt rozsahu zámku"
+msgstr "Existuje konflikt zámku rozsahu"
 
 #: ../daemon/gvfsafpvolume.c:2293 ../daemon/gvfsbackendmtp.c:1235
 #: ../daemon/gvfsbackendmtp.c:1378 ../daemon/gvfsbackendmtp.c:1564
@@ -744,9 +747,10 @@ msgstr "Neurčený názov hostiteľa"
 msgid "Apple Filing Protocol Service"
 msgstr "Služba protokolu AFP"
 
-# PK: co to robi?
-#  PK: nastane to ked zdroj aj ciel je priecinok
-# https://bugzilla.gnome.org/show_bug.cgi?id=697451
+# You have for example directories "/A" and "/B" and you have try to do
+# "gvfs-copy /B /A", so you are trying to copy directory over (another existing)
+# directory (trying to overwrite or merge with another directory), what isn't
+# possible in some cases.
 #: ../daemon/gvfsbackendafp.c:274 ../daemon/gvfsbackendburn.c:875
 #: ../daemon/gvfsbackendftp.c:1544 ../daemon/gvfsbackendobexftp.c:1806
 msgid "Can't copy directory over directory"
@@ -758,8 +762,10 @@ msgstr "Nedá sa skopírovať adresár cez adresár"
 msgid "Can't recursively copy directory"
 msgstr "Adresár nie je možné rekurzívne skopírovať"
 
-# ak zdroj aj ciel je adresar
-# https://bugzilla.gnome.org/show_bug.cgi?id=697451
+# You have for example directories "/A" and "/B" and you have try to do
+# "gvfs-copy /B /A", so you are trying to copy directory over (another existing)
+# directory (trying to overwrite or merge with another directory), what isn't
+# possible in some cases.
 #: ../daemon/gvfsbackendafp.c:475 ../daemon/gvfsbackendsftp.c:4259
 #: ../daemon/gvfsbackendsmb.c:2176
 msgid "Can't move directory over directory"
