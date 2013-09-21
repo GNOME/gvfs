@@ -278,6 +278,12 @@ create_reply (GVfsJob *job,
       g_error_free (error);
     }
 
+  g_vfs_channel_set_backend_handle (G_VFS_CHANNEL (channel), open_job->backend_handle);
+  open_job->backend_handle = NULL;
+  open_job->write_channel = channel;
+
+  g_signal_emit_by_name (job, "new-source", open_job->write_channel);
+
   gvfs_dbus_mount_complete_open_for_write (object, invocation,
                                            fd_list, g_variant_new_handle (fd_id),
                                            open_job->can_seek,
@@ -285,12 +291,6 @@ create_reply (GVfsJob *job,
   
   close (remote_fd);
   g_object_unref (fd_list);
-
-  g_vfs_channel_set_backend_handle (G_VFS_CHANNEL (channel), open_job->backend_handle);
-  open_job->backend_handle = NULL;
-  open_job->write_channel = channel;
-
-  g_signal_emit_by_name (job, "new-source", open_job->write_channel);
 }
 
 static void
