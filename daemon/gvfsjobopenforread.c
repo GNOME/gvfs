@@ -194,6 +194,12 @@ create_reply (GVfsJob *job,
       g_error_free (error);
     }
 
+  g_vfs_channel_set_backend_handle (G_VFS_CHANNEL (channel), open_job->backend_handle);
+  open_job->backend_handle = NULL;
+  open_job->read_channel = channel;
+
+  g_signal_emit_by_name (job, "new-source", channel);
+
   if (open_job->read_icon)
     gvfs_dbus_mount_complete_open_icon_for_read (object, invocation,
                                                  fd_list, g_variant_new_handle (fd_id),
@@ -206,12 +212,6 @@ create_reply (GVfsJob *job,
   /* FIXME: this could cause issues as long as fd_list closes all its fd's when it's finalized */
   close (remote_fd);
   g_object_unref (fd_list);
-  
-  g_vfs_channel_set_backend_handle (G_VFS_CHANNEL (channel), open_job->backend_handle);
-  open_job->backend_handle = NULL;
-  open_job->read_channel = channel;
-
-  g_signal_emit_by_name (job, "new-source", open_job->read_channel);
 }
 
 static void
