@@ -2391,6 +2391,9 @@ vfs_init (struct fuse_conn_info *conn)
   /* Indicate O_TRUNC support for open() */
   conn->want |= FUSE_CAP_ATOMIC_O_TRUNC;
 
+  /* Prevent out-of-order readahead */
+  conn->async_read = 0;
+
   return NULL;
 }
 
