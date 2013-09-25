@@ -1198,7 +1198,7 @@ read_stream (FileHandle *fh, gchar *output_buf, size_t output_buf_size, off_t of
           if (n_bytes_skipped > 0)
             fh->pos += n_bytes_skipped;
 
-          if (n_bytes_skipped != offset - fh->pos)
+          if (offset != fh->pos)
             {
               if (error)
                 {
