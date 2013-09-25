@@ -998,6 +998,9 @@ open_common (const gchar *path, struct fuse_file_info *fi, GFile *file, int outp
   else
     result = setup_input_stream (file, fh);
 
+  if (fh->stream)
+    fi->nonseekable = !g_seekable_can_seek (G_SEEKABLE (fh->stream));
+
   g_mutex_unlock (&fh->mutex);
 
   /* The added reference to the file handle is released in vfs_release() */
