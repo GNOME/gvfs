@@ -742,13 +742,13 @@ g_daemon_file_enumerate_children (GFile      *file,
   GVfsDBusMount *proxy;
   gboolean res;
   GError *local_error = NULL;
-  
-  enumerator = g_daemon_file_enumerator_new (file, attributes, TRUE);
 
   proxy = create_proxy_for_file (file, NULL, &path, &connection, cancellable, error);
   if (proxy == NULL)
-    goto out;
- 
+    return NULL;
+
+  enumerator = g_daemon_file_enumerator_new (file, proxy, attributes, TRUE);
+
   obj_path = g_daemon_file_enumerator_get_object_path (enumerator);
   uri = g_file_get_uri (file);
 
@@ -3366,6 +3366,8 @@ enumerate_children_async_get_proxy_cb (GVfsDBusMount *proxy,
   char *obj_path;
   char *uri;
 
+  data->enumerator = g_daemon_file_enumerator_new (data->file, proxy, data->attributes, FALSE);
+
   obj_path = g_daemon_file_enumerator_get_object_path (data->enumerator);
   uri = g_file_get_uri (data->file);
   
@@ -3404,7 +3406,6 @@ g_daemon_file_enumerate_children_async (GFile                      *file,
   data->io_priority = io_priority;
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
-  data->enumerator = g_daemon_file_enumerator_new (data->file, data->attributes, FALSE);
 
   create_proxy_for_file_async (file,
                                cancellable,
