@@ -48,6 +48,8 @@ struct _GDaemonFileEnumerator
   gint id;
   GDBusConnection *sync_connection; /* NULL if async, i.e. we're listening on main dbus connection */
 
+  GVfsDBusEnumerator *skeleton;
+
   /* protected by infos lock */
   GList *infos;
   gboolean done;
@@ -100,17 +102,39 @@ free_info_list (GList *infos)
   g_list_free_full (infos, g_object_unref);
 }
 
+static guint
+add_timeout_for_context (GMainContext *context,
+                                guint32        interval,
+                                GSourceFunc    function,
+                                gpointer       data)
+{
+  GSource *source;
+  guint id;
+
+  g_return_val_if_fail (function != NULL, 0);
+
+  source = g_timeout_source_new (interval);
+
+  g_source_set_callback (source, function, data, NULL);
+  id = g_source_attach (source, context);
+  g_source_unref (source);
+
+  return id;
+}
+
+
 static void
 g_daemon_file_enumerator_finalize (GObject *object)
 {
   GDaemonFileEnumerator *daemon;
-  char *path;
 
   daemon = G_DAEMON_FILE_ENUMERATOR (object);
 
-  path = g_daemon_file_enumerator_get_object_path (daemon);
-  _g_dbus_unregister_vfs_filter (path);
-  g_free (path);
+  if (daemon->skeleton)
+    {
+      g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (daemon->skeleton));
+      g_object_unref (daemon->skeleton);
+    }
 
   free_info_list (daemon->infos);
 
@@ -219,21 +243,20 @@ handle_got_info (GVfsDBusEnumerator *object,
   return TRUE;
 }
 
-static GDBusInterfaceSkeleton *
-register_vfs_filter_cb (GDBusConnection *connection,
-                        const char *obj_path,
-                        gpointer callback_data)
+static void
+create_skeleton (GDaemonFileEnumerator *daemon,
+                 GDBusConnection *connection,
+                 const char *obj_path)
 {
-  GError *error;
   GVfsDBusEnumerator *skeleton;
-  GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (callback_data);
+  GError *error;
 
   if (daemon->next_files_context)
     g_main_context_push_thread_default (daemon->next_files_context);
 
   skeleton = gvfs_dbus_enumerator_skeleton_new ();
-  g_signal_connect (skeleton, "handle-done", G_CALLBACK (handle_done), callback_data);
-  g_signal_connect (skeleton, "handle-got-info", G_CALLBACK (handle_got_info), callback_data);
+  g_signal_connect (skeleton, "handle-done", G_CALLBACK (handle_done), daemon);
+  g_signal_connect (skeleton, "handle-got-info", G_CALLBACK (handle_got_info), daemon);
 
   error = NULL;
   if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (skeleton),
@@ -249,7 +272,7 @@ register_vfs_filter_cb (GDBusConnection *connection,
   if (daemon->next_files_context)
     g_main_context_pop_thread_default (daemon->next_files_context);
 
-  return G_DBUS_INTERFACE_SKELETON (skeleton);
+  daemon->skeleton = skeleton;
 }
 
 static void
@@ -262,12 +285,14 @@ g_daemon_file_enumerator_init (GDaemonFileEnumerator *daemon)
 
 GDaemonFileEnumerator *
 g_daemon_file_enumerator_new (GFile *file,
+                              GVfsDBusMount *mount_proxy,
 			      const char *attributes,
 			      gboolean sync)
 {
   GDaemonFileEnumerator *daemon;
   char *treename;
   char *path;
+  GThread *self = g_thread_self ();
 
   daemon = g_object_new (G_TYPE_DAEMON_FILE_ENUMERATOR,
                          "container", file,
@@ -278,9 +303,10 @@ g_daemon_file_enumerator_new (GFile *file,
 
   path = g_daemon_file_enumerator_get_object_path (daemon);
 
-  _g_dbus_register_vfs_filter (path,
-                               register_vfs_filter_cb,
-                               G_OBJECT (daemon));
+  create_skeleton (daemon,
+                   g_dbus_proxy_get_connection (G_DBUS_PROXY (mount_proxy)),
+                   path);
+
   g_free (path);
 
   daemon->matcher = g_file_attribute_matcher_new (attributes);
@@ -482,10 +508,11 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
       daemon->next_files_mainloop = g_main_loop_new (daemon->next_files_context, FALSE);
 
       g_mutex_unlock (&daemon->next_files_mutex);
-      
+
       g_main_context_push_thread_default (daemon->next_files_context);
-      daemon->next_files_sync_timeout_tag = g_timeout_add (G_VFS_DBUS_TIMEOUT_MSECS,
-                                                           sync_timeout, daemon);
+      daemon->next_files_sync_timeout_tag = add_timeout_for_context (daemon->next_files_context,
+                                                                     G_VFS_DBUS_TIMEOUT_MSECS,
+                                                                     sync_timeout, daemon);
       g_main_loop_run (daemon->next_files_mainloop);
       g_main_context_pop_thread_default (daemon->next_files_context);
 

@@ -24,6 +24,7 @@
 #define __G_DAEMON_FILE_ENUMERATOR_H__
 
 #include <gio/gio.h>
+#include <gvfsdbus.h>
 
 G_BEGIN_DECLS
 
@@ -46,6 +47,7 @@ struct _GDaemonFileEnumeratorClass
 GType g_daemon_file_enumerator_get_type (void) G_GNUC_CONST;
 
 GDaemonFileEnumerator *g_daemon_file_enumerator_new                 (GFile *file,
+                                                                     GVfsDBusMount *proxy,
 								     const char *attributes,
 								     gboolean sync);
 char  *                g_daemon_file_enumerator_get_object_path     (GDaemonFileEnumerator *enumerator);
