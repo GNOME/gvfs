@@ -52,10 +52,6 @@ static GPrivate local_connections = G_PRIVATE_INIT((GDestroyNotify)free_local_co
 static GHashTable *async_map = NULL;
 G_LOCK_DEFINE_STATIC(async_map);
 
-/* dbus object path -> dbus message filter */
-static GHashTable *obj_path_map = NULL;
-G_LOCK_DEFINE_STATIC(obj_path_map);
-
 
 GQuark
 _g_vfs_error_quark (void)
