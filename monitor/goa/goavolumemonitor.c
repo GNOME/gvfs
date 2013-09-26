@@ -351,7 +351,6 @@ g_vfs_goa_volume_monitor_get_connected_drives (GVolumeMonitor *_self)
 static GMount *
 g_vfs_goa_volume_monitor_get_mount_for_uuid (GVolumeMonitor *_self, const gchar *uuid)
 {
-  GVfsGoaVolumeMonitor *self = G_VFS_GOA_VOLUME_MONITOR (_self);
   GMount *mount;
   GVolume *volume;
 
@@ -390,7 +389,6 @@ g_vfs_goa_volume_monitor_get_volume_for_uuid (GVolumeMonitor *_self, const gchar
   GVfsGoaVolumeMonitor *self = G_VFS_GOA_VOLUME_MONITOR (_self);
   GList *llink;
   GVolume *volume = NULL;
-  gpointer value;
 
   llink = g_list_find_custom (self->volumes, uuid, (GCompareFunc) uuid_compare);
   if (llink != NULL)
