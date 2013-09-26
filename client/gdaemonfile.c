@@ -379,7 +379,6 @@ g_daemon_file_get_relative_path (GFile *parent,
       char *full_path_parent;
       char *ret;
       const char *remainder;
-      gboolean ok;
 
       full_path_descendant = g_build_path ("/", descendant_daemon->mount_spec->mount_prefix,
                                            descendant_daemon->path, NULL);
