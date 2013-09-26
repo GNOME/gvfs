@@ -482,16 +482,6 @@ emit_delete_event (gpointer key,
 }
 
 
-static void
-emit_change_event (gpointer key,
-                   gpointer value,
-                   gpointer user_data)
-{
-  DEBUG ("(II) emit_change_event.");
-  emit_event_internal (key, user_data, G_FILE_MONITOR_EVENT_CHANGED);
-}
-
-
 /************************************************
  * Errors
  ************************************************/
@@ -1161,50 +1151,6 @@ do_enumerate (GVfsBackend *backend,
 }
 
 
-/**
- * get_file_for_filename:
- *
- * Get the entity ID for an element given its filename and
- * the IDs of its parents.
- *
- * Called with backend mutex lock held.
- */
-static LIBMTP_file_t *
-get_file_for_filename (LIBMTP_mtpdevice_t *device,
-                       gchar **elements,
-                       unsigned int i)
-{
-  LIBMTP_file_t *file = NULL;
-
-  DEBUG ("(III) get_file_for_filename (element %d '%s') ", i, elements[i]);
-  long parent_id = -1;
-  if (i > 2) {
-    parent_id = strtol (elements[i - 1], NULL, 10);
-  }
-  LIBMTP_file_t *f = LIBMTP_Get_Files_And_Folders (device, strtol (elements[1], NULL, 10),
-                                                   parent_id);
-  while (f != NULL) {
-    DEBUG_ENUMERATE ("(III) query (entity = %s, name = %s) ", f->filename, elements[i]);
-    if (strcmp (f->filename, elements[i]) == 0) {
-      file = f;
-      f = f->next;
-      break;
-    } else {
-      LIBMTP_file_t *tmp = f;
-      f = f->next;
-      LIBMTP_destroy_file_t (tmp);
-    }
-  }
-  while (f != NULL) {
-    LIBMTP_file_t *tmp = f;
-    f = f->next;
-    LIBMTP_destroy_file_t (tmp);
-  }
-  DEBUG ("(III) get_file_for_filename done");
-  return file;
-}
-
-
 static void
 do_query_info (GVfsBackend *backend,
                GVfsJobQueryInfo *job,
@@ -1316,7 +1262,6 @@ do_query_fs_info (GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
- exit:
   g_strfreev (elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
@@ -1912,7 +1857,6 @@ do_read (GVfsBackend *backend,
   RWHandle *handle = opaque_handle;
   uint32_t id = handle->id;
   goffset offset = handle->offset;
-  gsize size = handle->size;
 
   DEBUG ("(I) do_read (%u %lu %lu)", id, offset, bytes_requested);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
@@ -2211,13 +2155,12 @@ do_write (GVfsBackend *backend,
   RWHandle *handle = opaque_handle;
   uint32_t id = handle->id;
   goffset offset = handle->offset;
-  gsize size = handle->size;
 
   DEBUG ("(I) do_write (%u %lu %lu)", id, offset, buffer_size);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   int ret = LIBMTP_SendPartialObject (G_VFS_BACKEND_MTP (backend)->device, id, offset,
-                                      buffer, buffer_size);
+                                      (unsigned char *)buffer, buffer_size);
   if (ret != 0) {
     fail_job (G_VFS_JOB (job), G_VFS_BACKEND_MTP (backend)->device);
     DEBUG ("(I) job failed.");
