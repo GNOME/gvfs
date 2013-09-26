@@ -292,7 +292,6 @@ g_daemon_file_enumerator_new (GFile *file,
   GDaemonFileEnumerator *daemon;
   char *treename;
   char *path;
-  GThread *self = g_thread_self ();
 
   daemon = g_object_new (G_TYPE_DAEMON_FILE_ENUMERATOR,
                          "container", file,
