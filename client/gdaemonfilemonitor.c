@@ -48,6 +48,7 @@ struct _GDaemonFileMonitor
   char *remote_id;
   GDBusConnection *connection;
   GVfsDBusMonitor *proxy;
+  GVfsDBusMonitorClient *skeleton;
 };
 
 G_DEFINE_TYPE (GDaemonFileMonitor, g_daemon_file_monitor, G_TYPE_FILE_MONITOR)
@@ -59,10 +60,14 @@ g_daemon_file_monitor_finalize (GObject* object)
   
   daemon_monitor = G_DAEMON_FILE_MONITOR (object);
 
+  if (daemon_monitor->skeleton)
+    {
+      g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (daemon_monitor->skeleton));
+      g_object_unref (daemon_monitor->skeleton);
+    }
+
   g_clear_object (&daemon_monitor->proxy);
 
-  _g_dbus_unregister_vfs_filter (daemon_monitor->object_path);
-  
   g_clear_object (&daemon_monitor->connection);
 
   g_free (daemon_monitor->object_path);
@@ -78,7 +83,6 @@ g_daemon_file_monitor_class_init (GDaemonFileMonitorClass* klass)
 {
   GObjectClass* gobject_class = G_OBJECT_CLASS (klass);
   GFileMonitorClass *file_monitor_class = G_FILE_MONITOR_CLASS (klass);
-  
   gobject_class->finalize = g_daemon_file_monitor_finalize;
 
   file_monitor_class->cancel = g_daemon_file_monitor_cancel;
@@ -120,43 +124,17 @@ handle_changed (GVfsDBusMonitorClient *object,
   return TRUE;
 }
 
-static GDBusInterfaceSkeleton *
-register_vfs_filter_cb (GDBusConnection *connection,
-                        const char *obj_path,
-                        gpointer callback_data)
-{
-  GError *error;
-  GVfsDBusMonitorClient *skeleton;
-
-  skeleton = gvfs_dbus_monitor_client_skeleton_new ();
-  g_signal_connect (skeleton, "handle-changed", G_CALLBACK (handle_changed), callback_data);
-
-  error = NULL;
-  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (skeleton),
-                                         connection,
-                                         obj_path,
-                                         &error))
-    {
-      g_warning ("Error registering path: %s (%s, %d)\n",
-                  error->message, g_quark_to_string (error->domain), error->code);
-      g_error_free (error);
-    }
-
-  return G_DBUS_INTERFACE_SKELETON (skeleton);
-}
-
 static void
 g_daemon_file_monitor_init (GDaemonFileMonitor* daemon_monitor)
 {
   gint id;
-  
+
   id = g_atomic_int_add (&path_counter, 1);
 
   daemon_monitor->object_path = g_strdup_printf (OBJ_PATH_PREFIX"%d", id);
 
-  _g_dbus_register_vfs_filter (daemon_monitor->object_path,
-                               register_vfs_filter_cb,
-			       G_OBJECT (daemon_monitor));
+  daemon_monitor->skeleton = gvfs_dbus_monitor_client_skeleton_new ();
+  g_signal_connect (daemon_monitor->skeleton, "handle-changed", G_CALLBACK (handle_changed), daemon_monitor);
 }
 
 static void
@@ -232,6 +210,7 @@ async_got_connection_cb (GDBusConnection *connection,
                          gpointer callback_data)
 {
   GDaemonFileMonitor* monitor = callback_data;
+  GError *error;
 
   if (! connection)
     {
@@ -239,6 +218,17 @@ async_got_connection_cb (GDBusConnection *connection,
                    io_error->message, g_quark_to_string (io_error->domain), io_error->code);
       g_object_unref (monitor);
       return;
+    }
+
+  error = NULL;
+  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (monitor->skeleton),
+                                         connection,
+                                         monitor->object_path,
+                                         &error))
+    {
+      g_warning ("Error registering path: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
     }
 
   monitor->connection = g_object_ref (connection);
