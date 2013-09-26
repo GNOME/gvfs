@@ -624,19 +624,35 @@ peer_connection_closed (GDBusConnection *connection,
   GVfsDaemon *daemon = G_VFS_DAEMON (user_data);
   GList *l;
   GVfsDBusDaemon *daemon_skeleton;
+  GVfsJob *job_to_cancel;
 
-  g_mutex_lock (&daemon->lock);
-  for (l = daemon->jobs; l != NULL; l = l->next)
+  do
     {
-      GVfsJob *job = G_VFS_JOB (l->data);
-      
-      if (G_VFS_IS_JOB_DBUS (job) &&
-          G_VFS_JOB_DBUS (job)->invocation &&
-          g_dbus_method_invocation_get_connection (G_VFS_JOB_DBUS (job)->invocation) == connection)
-        g_vfs_job_cancel (job);
-    }
-  g_mutex_unlock (&daemon->lock);
+      job_to_cancel = NULL;
 
+      g_mutex_lock (&daemon->lock);
+      for (l = daemon->jobs; l != NULL; l = l->next)
+        {
+          GVfsJob *job = G_VFS_JOB (l->data);
+
+          if (G_VFS_IS_JOB_DBUS (job) &&
+              !g_vfs_job_is_cancelled (job) &&
+              G_VFS_JOB_DBUS (job)->invocation &&
+              g_dbus_method_invocation_get_connection (G_VFS_JOB_DBUS (job)->invocation) == connection)
+            {
+              job_to_cancel = g_object_ref (job);
+              break;
+            }
+        }
+      g_mutex_unlock (&daemon->lock);
+
+      if (job_to_cancel)
+        {
+          g_vfs_job_cancel (job_to_cancel);
+          g_object_unref (job_to_cancel);
+        }
+    }
+  while (job_to_cancel != NULL);
 
   daemon_skeleton = g_object_get_data (G_OBJECT (connection), "daemon_skeleton");
   /* daemon_skeleton should be always valid in this case */
