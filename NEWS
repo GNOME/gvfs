@@ -1,3 +1,11 @@
+Major changes in 1.18.1
+=======================
+* GVfsDaemon: Don't deadlock on cliend disconnect
+* GDaemonFileMonitor: Only recieve events on one dbus connection
+* GDaemonFileEnumerator: Only listen to messages one connection
+* Several compilation warnings fixes and code cleanup
+* Translation updates
+
 Major changes in 1.18.0
 =======================
 * Translation updates
