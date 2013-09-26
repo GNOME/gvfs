@@ -963,7 +963,6 @@ handle_unregister_mount (GVfsDBusMountTracker *object,
                          const gchar *arg_obj_path,
                          gpointer user_data)
 {
-  VfsMount *mount;
   const char *id;
 
   id = g_dbus_method_invocation_get_sender (invocation);
