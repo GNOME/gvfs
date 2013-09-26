@@ -20,6 +20,7 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
+#include <stdlib.h>
 #include <config.h>
 #include <string.h>
 
