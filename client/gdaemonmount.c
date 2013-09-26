@@ -243,7 +243,6 @@ async_proxy_new_cb (GObject *source_object,
     }
 
   data->proxy = proxy;
-  _g_dbus_connect_vfs_filters (data->connection);
 
   mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
 

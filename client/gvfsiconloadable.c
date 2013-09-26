@@ -69,8 +69,6 @@ create_proxy_for_icon (GVfsIcon *vfs_icon,
   if (proxy == NULL)
     goto out;
   
-  _g_dbus_connect_vfs_filters (connection);
-
  out:
   if (mount_info)
     g_mount_info_unref (mount_info);
@@ -187,7 +185,6 @@ async_proxy_new_cb (GObject *source_object,
     }
   
   data->proxy = proxy;
-  _g_dbus_connect_vfs_filters (data->connection);
 
   data->callback (proxy,
                   data->result,

@@ -162,7 +162,6 @@ subscribe_cb (GVfsDBusMonitor *proxy,
       return;
     }
 
-  _g_dbus_connect_vfs_filters (monitor->connection);
   monitor->proxy = g_object_ref (proxy);
 
   g_object_unref (monitor);
