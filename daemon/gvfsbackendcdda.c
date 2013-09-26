@@ -237,7 +237,7 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
   if (strcmp (action, "remove") == 0 || (strcmp (action, "change") == 0 &&
       g_udev_device_get_property_as_int (device, "ID_CDROM_MEDIA") != 1))
     {
-      g_vfs_backend_force_unmount (GVFS_BACKEND (cdda_backend));
+      g_vfs_backend_force_unmount (G_VFS_BACKEND (cdda_backend));
     }
 }
 
@@ -290,7 +290,7 @@ _hal_device_removed (LibHalContext *hal_ctx, const char *udi)
 
   if (cdda_backend->hal_udi != NULL && strcmp (udi, cdda_backend->hal_udi) == 0)
     {
-      g_vfs_backend_force_unmount (GVFS_BACKEND (cdda_backend));
+      g_vfs_backend_force_unmount (G_VFS_BACKEND (cdda_backend));
     }
 }
 #endif
