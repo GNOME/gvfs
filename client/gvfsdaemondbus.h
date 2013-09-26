@@ -48,11 +48,6 @@ typedef GDBusInterfaceSkeleton *  (*GVfsRegisterVfsFilterCallback)  (GDBusConnec
                                                                      gpointer         callback_data);
 
 
-void            _g_dbus_register_vfs_filter             (const char                     *obj_path,
-							 GVfsRegisterVfsFilterCallback   callback,
-							 GObject                        *data);
-void            _g_dbus_unregister_vfs_filter           (const char                     *obj_path);
-void            _g_dbus_connect_vfs_filters             (GDBusConnection                *connection);
 GDBusConnection *_g_dbus_connection_get_sync            (const char                     *dbus_id,
                                                          GCancellable                   *cancellable,
 							 GError                        **error);
