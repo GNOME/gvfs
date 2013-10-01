@@ -83,6 +83,7 @@ typedef struct {
   GFile *	    file;
   GFileInputStream *stream;
   GVfsJob *	    job;
+  GVfsBackendArchive *backend;
   GError *	    error;
   guchar	    data[4096];
 } GVfsArchive;
@@ -156,8 +157,9 @@ gvfs_archive_close (struct archive *archive,
   GVfsArchive *d = data;
 
   DEBUG ("CLOSE\n");
-  g_object_unref (d->stream);
-  d->stream = NULL;
+  if (!d->stream)
+    g_vfs_backend_force_unmount (G_VFS_BACKEND (d->backend));
+  g_clear_object (&d->stream);
   return ARCHIVE_OK;
 }
 
@@ -205,6 +207,7 @@ gvfs_archive_finish (GVfsArchive *archive)
 {
   gvfs_archive_pop_job (archive);
 
+  g_object_unref (archive->backend);
   archive_read_free (archive->archive);
   g_slice_free (GVfsArchive, archive);
 }
@@ -217,6 +220,7 @@ gvfs_archive_new (GVfsBackendArchive *ba, GVfsJob *job)
   
   d = g_slice_new0 (GVfsArchive);
 
+  d->backend = g_object_ref (ba);
   d->file = ba->file;
   gvfs_archive_push_job (d, job);
 
