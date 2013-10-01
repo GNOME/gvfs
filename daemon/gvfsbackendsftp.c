@@ -3103,7 +3103,7 @@ append_to_reply (GVfsBackendSftp *backend,
   handle = sftp_handle_new (reply);
   
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
-  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), FALSE);
+  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
   g_vfs_job_succeeded (job);
 }
 
