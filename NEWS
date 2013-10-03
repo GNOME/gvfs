@@ -1,3 +1,9 @@
+Major changes in 1.18.2
+=======================
+* Fix a client side regression in 1.18.1 where apps would stop responding
+* Fix a race condition in job handling that could cause large copies to hang
+* Various fixes to the fuse implementation
+
 Major changes in 1.18.1
 =======================
 * GVfsDaemon: Don't deadlock on cliend disconnect
