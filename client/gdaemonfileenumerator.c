@@ -61,7 +61,7 @@ struct _GDaemonFileEnumerator
   GSimpleAsyncResult *async_res;
   GMainLoop *next_files_mainloop;
   GMainContext *next_files_context;
-  guint next_files_sync_timeout_tag;
+  GSource *next_files_sync_timeout_source;
   GMutex next_files_mutex;
 
   GFileAttributeMatcher *matcher;
@@ -102,7 +102,7 @@ free_info_list (GList *infos)
   g_list_free_full (infos, g_object_unref);
 }
 
-static guint
+static GSource *
 add_timeout_for_context (GMainContext *context,
                                 guint32        interval,
                                 GSourceFunc    function,
@@ -116,10 +116,9 @@ add_timeout_for_context (GMainContext *context,
   source = g_timeout_source_new (interval);
 
   g_source_set_callback (source, function, data, NULL);
-  id = g_source_attach (source, context);
-  g_source_unref (source);
+  g_source_attach (source, context);
 
-  return id;
+  return source;
 }
 
 
@@ -486,7 +485,7 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
 {
   GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (enumerator);
   GFileInfo *info;
-  
+
   if (daemon->sync_connection == NULL)
     {
       /* The enumerator was initialized by an async call, so responses will
@@ -509,14 +508,15 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
       g_mutex_unlock (&daemon->next_files_mutex);
 
       g_main_context_push_thread_default (daemon->next_files_context);
-      daemon->next_files_sync_timeout_tag = add_timeout_for_context (daemon->next_files_context,
-                                                                     G_VFS_DBUS_TIMEOUT_MSECS,
-                                                                     sync_timeout, daemon);
+      daemon->next_files_sync_timeout_source = add_timeout_for_context (daemon->next_files_context,
+									G_VFS_DBUS_TIMEOUT_MSECS,
+									sync_timeout, daemon);
       g_main_loop_run (daemon->next_files_mainloop);
       g_main_context_pop_thread_default (daemon->next_files_context);
 
       g_mutex_lock (&daemon->next_files_mutex);
-      g_source_remove (daemon->next_files_sync_timeout_tag);
+      g_source_destroy (daemon->next_files_sync_timeout_source);
+      g_source_unref (daemon->next_files_sync_timeout_source);
 
       g_main_loop_unref (daemon->next_files_mainloop);
       daemon->next_files_mainloop = NULL;
