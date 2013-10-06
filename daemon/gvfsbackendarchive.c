@@ -359,6 +359,7 @@ archive_file_set_info_from_entry (ArchiveFile *	        file,
 {
   GFileInfo *info = g_file_info_new ();
   GFileType type;
+  mode_t mode;
   file->info = info;
 
   DEBUG ("setting up %s (%s)\n", archive_entry_pathname (entry), file->name);
@@ -413,10 +414,13 @@ archive_file_set_info_from_entry (ArchiveFile *	        file,
   g_file_info_set_size (info,
 			archive_entry_size (entry));
 
+  mode = archive_entry_perm (entry);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, type == G_FILE_TYPE_DIRECTORY);
+  g_file_info_set_attribute_boolean (info,
+                                     G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE,
+                                     type == G_FILE_TYPE_DIRECTORY || mode & S_IXUSR);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE);
 
@@ -436,7 +440,6 @@ const char		*archive_entry_fflags_text(struct archive_entry *);
 gid_t			 archive_entry_gid(struct archive_entry *);
 const char		*archive_entry_gname(struct archive_entry *);
 const char		*archive_entry_hardlink(struct archive_entry *);
-mode_t			 archive_entry_mode(struct archive_entry *);
 unsigned int		 archive_entry_nlink(struct archive_entry *);
 dev_t			 archive_entry_rdev(struct archive_entry *);
 dev_t			 archive_entry_rdevmajor(struct archive_entry *);
