@@ -886,7 +886,7 @@ do_seek_on_read (GVfsBackend *backend,
       break;
     }
 
-  if (new_offset < 0 || new_offset >= read_handle->size)
+  if (new_offset < 0)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
 			G_IO_ERROR_FAILED,
