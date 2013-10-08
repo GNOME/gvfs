@@ -83,7 +83,7 @@ on_name_acquired (GDBusConnection *connection,
   if (!no_fuse)
     {
       char *fuse_path;
-      char *argv2[4];
+      char *argv2[6];
       
       /* Use the old .gvfs location as fallback, not .cache/gvfs */
       if (g_get_user_runtime_dir() == g_get_user_cache_dir ())
@@ -101,9 +101,11 @@ on_name_acquired (GDBusConnection *connection,
       /* Opengroup. On system with the uClibc library this will badly */
       /* hang the process.                                            */
       argv2[0] = LIBEXEC_DIR "/gvfsd-fuse";
-      argv2[1] = "-f";
-      argv2[2] = fuse_path;
-      argv2[3] = NULL;
+      argv2[1] = fuse_path;
+      argv2[2] = "-f";
+      argv2[3] = "-o";
+      argv2[4] = "big_writes";
+      argv2[5] = NULL;
       
       g_spawn_async (NULL,
                      argv2,

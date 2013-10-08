@@ -2397,6 +2397,10 @@ vfs_init (struct fuse_conn_info *conn)
   /* Prevent out-of-order readahead */
   conn->async_read = 0;
 
+  /* Use up to a 64KiB write block size.  Only has an effect if -o big_writes
+   * is given on the command-line. */
+  conn->max_write = 65536;
+
   return NULL;
 }
 
