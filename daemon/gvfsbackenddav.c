@@ -991,7 +991,7 @@ ms_response_to_file_info (MsResponse *response,
   g_file_info_set_name (info, basename);
   g_file_info_set_edit_name (info, basename);
 
-  file_type = G_FILE_TYPE_UNKNOWN;
+  file_type = G_FILE_TYPE_REGULAR;
   mime_type = NULL;
 
   have_display_name = FALSE;
@@ -1013,7 +1013,6 @@ ms_response_to_file_info (MsResponse *response,
           if (node_has_name (node, "resourcetype"))
             {
               file_type = parse_resourcetype (node);
-              g_file_info_set_file_type (info, file_type);
             }
           else if (node_has_name (node, "displayname") && text)
             {
@@ -1059,6 +1058,7 @@ ms_response_to_file_info (MsResponse *response,
         }
     }
 
+  g_file_info_set_file_type (info, file_type);
   if (file_type == G_FILE_TYPE_DIRECTORY)
     {
       icon = g_themed_icon_new ("folder");
