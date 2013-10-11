@@ -25,9 +25,7 @@
 #include <glib.h>
 #include <gio/gio.h>
 
-#define LIBSOUP_USE_UNSTABLE_REQUEST_API
 #include <libsoup/soup.h>
-#include <libsoup/soup-request-http.h>
 
 #include "gvfshttpinputstream.h"
 

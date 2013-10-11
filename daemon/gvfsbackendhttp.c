@@ -33,8 +33,7 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 
-#define LIBSOUP_USE_UNSTABLE_REQUEST_API
-#include <libsoup/soup-gnome.h>
+#include <libsoup/soup.h>
 
 #include "gvfsbackendhttp.h"
 #include "gvfshttpinputstream.h"

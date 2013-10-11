@@ -20,7 +20,7 @@
 #define __G_VFS_HTTP_INPUT_STREAM_H__
 
 #include <gio/gio.h>
-#include <libsoup/soup-types.h>
+#include <libsoup/soup.h>
 
 G_BEGIN_DECLS
 
