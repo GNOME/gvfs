@@ -1323,6 +1323,8 @@ do_move (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *srcfile, *destfile;
+  static const GVfsFtpErrorFunc rnfr_handlers[] = { error_550_permission_or_not_found,
+                                                    NULL };
 
   /* FIXME: what about G_FILE_COPY_NOFOLLOW_SYMLINKS and G_FILE_COPY_ALL_METADATA? */
 
@@ -1374,9 +1376,15 @@ do_move (GVfsBackend *backend,
         }
     }
 
-  g_vfs_ftp_task_send (&task,
-                       G_VFS_FTP_PASS_300 | G_VFS_FTP_FAIL_200,
-                       "RNFR %s", g_vfs_ftp_file_get_ftp_path (srcfile));
+
+  if (!g_vfs_ftp_task_send_and_check (&task,
+                                 G_VFS_FTP_PASS_300 | G_VFS_FTP_FAIL_200,
+                                 rnfr_handlers,
+                                 srcfile,
+                                 NULL,
+                                 "RNFR %s", g_vfs_ftp_file_get_ftp_path (srcfile)))
+    goto out;
+
   g_vfs_ftp_task_send (&task,
                        0,
                        "RNTO %s", g_vfs_ftp_file_get_ftp_path (destfile));
