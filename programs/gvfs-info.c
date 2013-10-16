@@ -149,10 +149,10 @@ show_attributes (GFileInfo *info)
 }
 
 static void
-show_info (GFileInfo *info)
+show_info (GFile *file, GFileInfo *info)
 {
   const char *name, *type;
-  char *escaped;
+  char *escaped, *uri;
   goffset size;
 
   name = g_file_info_get_display_name (info);
@@ -188,6 +188,10 @@ show_info (GFileInfo *info)
 
   if (g_file_info_get_is_hidden (info))
     g_print (_("hidden\n"));
+
+  uri = g_file_get_uri (file);
+  g_print (_("uri: %s\n"), uri);
+  g_free (uri);
 
   show_attributes (info);
 }
@@ -225,7 +229,7 @@ query_info (GFile *file)
   if (filesystem)
     show_attributes (info);
   else
-    show_info (info);
+    show_info (file, info);
 
   g_object_unref (info);
 
