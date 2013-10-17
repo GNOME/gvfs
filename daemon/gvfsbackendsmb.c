@@ -42,6 +42,7 @@
 #include "gvfsjobwrite.h"
 #include "gvfsjobclosewrite.h"
 #include "gvfsjobseekwrite.h"
+#include "gvfsjobtruncate.h"
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobqueryfsinfo.h"
@@ -981,6 +982,7 @@ do_create (GVfsBackend *backend,
       handle->file = file;
 
       g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+      g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
       g_vfs_job_open_for_write_set_handle (job, handle);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
@@ -1023,6 +1025,7 @@ do_append_to (GVfsBackend *backend,
 	{
 	  g_vfs_job_open_for_write_set_initial_offset (job, initial_offset);
 	  g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+	  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
 	}
       g_vfs_job_open_for_write_set_handle (job, handle);
       g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1299,6 +1302,7 @@ do_replace (GVfsBackend *backend,
   handle->backup_uri = backup_uri;
   
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
   g_vfs_job_open_for_write_set_handle (job, handle);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   
@@ -1380,6 +1384,23 @@ do_seek_on_write (GVfsBackend *backend,
     }
 
   return;
+}
+
+static void
+do_truncate (GVfsBackend *backend,
+             GVfsJobTruncate *job,
+             GVfsBackendHandle _handle,
+	     goffset size)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  SmbWriteHandle *handle = _handle;
+  smbc_ftruncate_fn smbc_ftruncate;
+
+  smbc_ftruncate = smbc_getFunctionFtruncate (op_backend->smb_context);
+  if (smbc_ftruncate (op_backend->smb_context, handle->file, size) == -1)
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static void
@@ -2276,6 +2297,7 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->replace = do_replace;
   backend_class->write = do_write;
   backend_class->seek_on_write = do_seek_on_write;
+  backend_class->truncate = do_truncate;
   backend_class->query_info_on_write = do_query_info_on_write;
   backend_class->close_write = do_close_write;
   backend_class->query_info = do_query_info;
