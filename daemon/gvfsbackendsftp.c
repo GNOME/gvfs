@@ -51,6 +51,7 @@
 #include "gvfsjobwrite.h"
 #include "gvfsjobclosewrite.h"
 #include "gvfsjobseekwrite.h"
+#include "gvfsjobtruncate.h"
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobqueryinforead.h"
@@ -3070,6 +3071,7 @@ create_reply (GVfsBackendSftp *backend,
   
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
   g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
   g_vfs_job_succeeded (job);
 }
 
@@ -3151,6 +3153,7 @@ append_to_reply (GVfsBackendSftp *backend,
   
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
   g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
   g_vfs_job_succeeded (job);
 }
 
@@ -3241,6 +3244,7 @@ replace_truncate_original_reply (GVfsBackendSftp *backend,
   
   g_vfs_job_open_for_write_set_handle (op_job, handle);
   g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (op_job, TRUE);
   
   g_vfs_job_succeeded (job);
 }
@@ -3340,6 +3344,7 @@ replace_create_temp_reply (GVfsBackendSftp *backend,
   
   g_vfs_job_open_for_write_set_handle (op_job, handle);
   g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (op_job, TRUE);
   
   g_vfs_job_succeeded (job);
 }
@@ -3580,6 +3585,7 @@ replace_exclusive_reply (GVfsBackendSftp *backend,
   
   g_vfs_job_open_for_write_set_handle (op_job, handle);
   g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (op_job, TRUE);
   
   g_vfs_job_succeeded (job);
 }
@@ -3737,6 +3743,40 @@ try_seek_on_write (GVfsBackend *backend,
 
   g_vfs_job_seek_write_set_offset (job, handle->offset);
   g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  return TRUE;
+}
+
+static void
+truncate_reply (GVfsBackendSftp *backend,
+                int reply_type,
+                GDataInputStream *reply,
+                guint32 len,
+                GVfsJob *job,
+                gpointer user_data)
+{
+  if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply, -1, -1);
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply received"));
+}
+
+static gboolean
+try_truncate (GVfsBackend *backend,
+              GVfsJobTruncate *job,
+              GVfsBackendHandle _handle,
+              goffset size)
+{
+  SftpHandle *handle = _handle;
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+
+  command = new_command_stream (op_backend, SSH_FXP_FSETSTAT);
+  put_data_buffer (command, handle->raw_handle);
+  g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_SIZE, NULL, NULL);
+  g_data_output_stream_put_uint64 (command, size, NULL, NULL);
+  queue_command_stream_and_free (op_backend, command, truncate_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
 }
@@ -6076,6 +6116,7 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   backend_class->try_replace = try_replace;
   backend_class->try_write = try_write;
   backend_class->try_seek_on_write = try_seek_on_write;
+  backend_class->try_truncate = try_truncate;
   backend_class->try_move = try_move;
   backend_class->try_make_symlink = try_make_symlink;
   backend_class->try_make_directory = try_make_directory;
