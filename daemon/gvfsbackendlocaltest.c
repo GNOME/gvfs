@@ -54,6 +54,7 @@
 #include "gvfsjobwrite.h"
 #include "gvfsjobclosewrite.h"
 #include "gvfsjobseekwrite.h"
+#include "gvfsjobtruncate.h"
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobdelete.h"
@@ -1034,6 +1035,7 @@ do_append_to (GVfsBackend *backend,
 		  }
 
 		  g_vfs_job_open_for_write_set_can_seek (job, g_seekable_can_seek (G_SEEKABLE (stream)));
+		  g_vfs_job_open_for_write_set_can_truncate (job, g_seekable_can_truncate (G_SEEKABLE (stream)));
 		  g_vfs_job_open_for_write_set_handle (job, stream);
 		  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_APPEND_TO);
 
@@ -1070,6 +1072,7 @@ do_create (GVfsBackend *backend,
 	  stream = g_file_create (file, flags, G_VFS_JOB (job)->cancellable, &error);
 	  if (stream) {
 		  g_vfs_job_open_for_write_set_can_seek (job, g_seekable_can_seek (G_SEEKABLE (stream)));
+		  g_vfs_job_open_for_write_set_can_truncate (job, g_seekable_can_truncate (G_SEEKABLE (stream)));
 		  g_vfs_job_open_for_write_set_handle (job, stream);
 		  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_CREATE);
 		  g_print ("(II) try_create success. \n");
@@ -1107,6 +1110,7 @@ do_replace (GVfsBackend *backend,
 	  stream = g_file_replace (file, etag, make_backup, flags, G_VFS_JOB (job)->cancellable, &error);
 	  if (stream) {
 		  g_vfs_job_open_for_write_set_can_seek (job, g_seekable_can_seek (G_SEEKABLE (stream)));
+		  g_vfs_job_open_for_write_set_can_truncate (job, g_seekable_can_truncate (G_SEEKABLE (stream)));
 		  g_vfs_job_open_for_write_set_handle (job, stream);
 		  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_REPLACE);
 		  g_print ("(II) try_replace success. \n");
@@ -1180,6 +1184,31 @@ do_seek_on_write (GVfsBackend *backend,
 
 
 static void
+do_truncate (GVfsBackend *backend,
+             GVfsJobTruncate *job,
+             GVfsBackendHandle _handle,
+             goffset size)
+{
+  GError *error;
+  GFileOutputStream *stream = _handle;
+
+  g_print ("(II) truncate (handle = '%lx', size = %ld) \n", (long int)_handle, (long int)size);
+
+  g_assert (stream != NULL);
+
+  error = NULL;
+  if (g_seekable_truncate (G_SEEKABLE (stream), size, G_VFS_JOB (job)->cancellable, &error)) {
+	  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_TRUNCATE);
+	  g_print ("(II) truncate success. \n");
+  } else  {
+	  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+	  g_print ("  (EE) truncate: g_seekable_truncate() failed, error: %s \n", error->message);
+	  g_error_free (error);
+  }
+}
+
+
+static void
 do_close_write (GVfsBackend *backend,
                  GVfsJobCloseWrite *job,
                  GVfsBackendHandle _handle)
@@ -1239,6 +1268,7 @@ g_vfs_backend_localtest_class_init (GVfsBackendLocalTestClass *klass)
   backend_class->replace = do_replace;
   backend_class->write = do_write;
   backend_class->seek_on_write = do_seek_on_write;
+  backend_class->truncate = do_truncate;
 /*  -- disabled, read/write operations can handle copy correctly  */  
 /*   backend_class->copy = do_copy; */ 
   backend_class->move = do_move;
