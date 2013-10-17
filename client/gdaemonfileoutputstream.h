@@ -45,7 +45,7 @@ struct _GDaemonFileOutputStreamClass
 GType g_daemon_file_output_stream_get_type (void) G_GNUC_CONST;
 
 GFileOutputStream *g_daemon_file_output_stream_new (int fd,
-						    gboolean can_seek,
+						    guint32 flags,
 						    goffset initial_offset);
 
 G_END_DECLS

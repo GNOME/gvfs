@@ -55,6 +55,7 @@ typedef struct _GVfsJobRead             GVfsJobRead;
 typedef struct _GVfsJobOpenForWrite     GVfsJobOpenForWrite;
 typedef struct _GVfsJobWrite            GVfsJobWrite;
 typedef struct _GVfsJobSeekWrite        GVfsJobSeekWrite;
+typedef struct _GVfsJobTruncate         GVfsJobTruncate;
 typedef struct _GVfsJobCloseWrite       GVfsJobCloseWrite;
 typedef struct _GVfsJobQueryInfo        GVfsJobQueryInfo;
 typedef struct _GVfsJobQueryInfoRead    GVfsJobQueryInfoRead;
@@ -236,6 +237,14 @@ struct _GVfsBackendClass
 				 GVfsBackendHandle handle,
 				 goffset    offset,
 				 GSeekType  type);
+  void     (*truncate)          (GVfsBackend *backend,
+				 GVfsJobTruncate *job,
+				 GVfsBackendHandle handle,
+				 goffset size);
+  gboolean (*try_truncate)      (GVfsBackend *backend,
+				 GVfsJobTruncate *job,
+				 GVfsBackendHandle handle,
+				 goffset size);
   void     (*query_info)        (GVfsBackend *backend,
 				 GVfsJobQueryInfo *job,
 				 const char *filename,

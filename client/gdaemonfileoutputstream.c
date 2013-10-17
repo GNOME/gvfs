@@ -98,6 +98,26 @@ typedef struct {
 } SeekOperation;
 
 typedef enum {
+  TRUNCATE_STATE_INIT = 0,
+  TRUNCATE_STATE_WROTE_REQUEST,
+  TRUNCATE_STATE_HANDLE_INPUT
+} TruncateState;
+
+typedef struct {
+  TruncateState state;
+
+  /* Output */
+  goffset size;
+  /* Input */
+  gboolean ret_val;
+  GError *ret_error;
+
+  gboolean sent_cancel;
+
+  guint32 seq_nr;
+} TruncateOperation;
+
+typedef enum {
   CLOSE_STATE_INIT = 0,
   CLOSE_STATE_WROTE_REQUEST,
   CLOSE_STATE_HANDLE_INPUT
@@ -157,7 +177,8 @@ struct _GDaemonFileOutputStream {
 
   GOutputStream *command_stream;
   GInputStream *data_stream;
-  guint can_seek : 1;
+  gboolean can_seek;
+  gboolean can_truncate;
   
   guint32 seq_nr;
   goffset current_offset;
@@ -189,6 +210,11 @@ static gboolean   g_daemon_file_output_stream_can_seek          (GFileOutputStre
 static gboolean   g_daemon_file_output_stream_seek              (GFileOutputStream    *stream,
 								 goffset               offset,
 								 GSeekType             type,
+								 GCancellable         *cancellable,
+								 GError              **error);
+static gboolean   g_daemon_file_output_stream_can_truncate      (GFileOutputStream    *stream);
+static gboolean   g_daemon_file_output_stream_truncate          (GFileOutputStream    *stream,
+								 goffset               size,
 								 GCancellable         *cancellable,
 								 GError              **error);
 static void       g_daemon_file_output_stream_write_async       (GOutputStream        *stream,
@@ -276,6 +302,8 @@ g_daemon_file_output_stream_class_init (GDaemonFileOutputStreamClass *klass)
   file_stream_class->tell = g_daemon_file_output_stream_tell;
   file_stream_class->can_seek = g_daemon_file_output_stream_can_seek;
   file_stream_class->seek = g_daemon_file_output_stream_seek;
+  file_stream_class->can_truncate = g_daemon_file_output_stream_can_truncate;
+  file_stream_class->truncate_fn = g_daemon_file_output_stream_truncate;
   file_stream_class->query_info = g_daemon_file_output_stream_query_info;
   file_stream_class->get_etag = g_daemon_file_output_stream_get_etag;
   file_stream_class->query_info_async = g_daemon_file_output_stream_query_info_async;
@@ -292,7 +320,7 @@ g_daemon_file_output_stream_init (GDaemonFileOutputStream *info)
 
 GFileOutputStream *
 g_daemon_file_output_stream_new (int fd,
-				 gboolean can_seek,
+				 guint32 flags,
 				 goffset initial_offset)
 {
   GDaemonFileOutputStream *stream;
@@ -301,7 +329,8 @@ g_daemon_file_output_stream_new (int fd,
 
   stream->command_stream = g_unix_output_stream_new (fd, FALSE);
   stream->data_stream = g_unix_input_stream_new (fd, TRUE);
-  stream->can_seek = can_seek;
+  stream->can_seek = flags & OPEN_FOR_WRITE_FLAG_CAN_SEEK;
+  stream->can_truncate = flags & OPEN_FOR_WRITE_FLAG_CAN_TRUNCATE;
   stream->current_offset = initial_offset;
   
   return G_FILE_OUTPUT_STREAM (stream);
@@ -1017,6 +1046,172 @@ g_daemon_file_output_stream_seek (GFileOutputStream *stream,
   else
     file->current_offset = op.ret_offset;
   
+  return op.ret_val;
+}
+
+static StateOp
+iterate_truncate_state_machine (GDaemonFileOutputStream *file,
+                                IOOperationData *io_op,
+                                TruncateOperation *op)
+{
+  gsize len;
+
+  while (TRUE)
+    {
+      switch (op->state)
+        {
+        case TRUNCATE_STATE_INIT:
+          append_request (file,
+                          G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_TRUNCATE,
+                          op->size & 0xffffffff,
+                          op->size >> 32,
+                          0,
+                          &op->seq_nr);
+          op->state = TRUNCATE_STATE_WROTE_REQUEST;
+          io_op->io_buffer = file->output_buffer->str;
+          io_op->io_size = file->output_buffer->len;
+          io_op->io_allow_cancel = TRUE;
+          return STATE_OP_WRITE;
+
+        case TRUNCATE_STATE_WROTE_REQUEST:
+          if (io_op->io_cancelled)
+            {
+              if (!op->sent_cancel)
+                unappend_request (file);
+              op->ret_val = FALSE;
+              g_set_error_literal (&op->ret_error,
+                                   G_IO_ERROR,
+                                   G_IO_ERROR_CANCELLED,
+                                   _("Operation was cancelled"));
+              return STATE_OP_DONE;
+            }
+
+          if (io_op->io_res < file->output_buffer->len)
+            {
+              g_string_remove_in_front (file->output_buffer, io_op->io_res);
+              io_op->io_buffer = file->output_buffer->str;
+              io_op->io_size = file->output_buffer->len;
+              io_op->io_allow_cancel = FALSE;
+              return STATE_OP_WRITE;
+            }
+          g_string_truncate (file->output_buffer, 0);
+
+          op->state = TRUNCATE_STATE_HANDLE_INPUT;
+          break;
+
+        case TRUNCATE_STATE_HANDLE_INPUT:
+          if (io_op->cancelled && !op->sent_cancel)
+            {
+              op->sent_cancel = TRUE;
+              append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL,
+                              op->seq_nr, 0, 0, NULL);
+              op->state = TRUNCATE_STATE_WROTE_REQUEST;
+              io_op->io_buffer = file->output_buffer->str;
+              io_op->io_size = file->output_buffer->len;
+              io_op->io_allow_cancel = FALSE;
+              return STATE_OP_WRITE;
+            }
+
+          if (io_op->io_res > 0)
+            {
+              gsize unread_size = io_op->io_size - io_op->io_res;
+              g_string_set_size (file->input_buffer,
+                                 file->input_buffer->len - unread_size);
+            }
+
+          len = get_reply_header_missing_bytes (file->input_buffer);
+          if (len > 0)
+            {
+              gsize current_len = file->input_buffer->len;
+              g_string_set_size (file->input_buffer, current_len + len);
+              io_op->io_buffer = file->input_buffer->str + current_len;
+              io_op->io_size = len;
+              io_op->io_allow_cancel = !op->sent_cancel;
+              return STATE_OP_READ;
+            }
+
+          {
+            GVfsDaemonSocketProtocolReply reply;
+            char *data;
+            data = decode_reply (file->input_buffer, &reply);
+
+            if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR &&
+                reply.seq_nr == op->seq_nr)
+              {
+                op->ret_val = FALSE;
+                decode_error (&reply, data, &op->ret_error);
+                g_string_truncate (file->input_buffer, 0);
+                return STATE_OP_DONE;
+              }
+            else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_TRUNCATED &&
+                     reply.seq_nr == op->seq_nr)
+              {
+                op->ret_val = TRUE;
+                g_string_truncate (file->input_buffer, 0);
+                return STATE_OP_DONE;
+              }
+            /* Ignore other reply types */
+          }
+
+          g_string_truncate (file->input_buffer, 0);
+
+          /* This wasn't interesting, read next reply */
+          op->state = TRUNCATE_STATE_HANDLE_INPUT;
+          break;
+
+        default:
+          g_assert_not_reached ();
+        }
+
+      /* Clear io_op between non-op state switches */
+      io_op->io_size = 0;
+      io_op->io_res = 0;
+      io_op->io_cancelled = FALSE;
+    }
+}
+
+static gboolean
+g_daemon_file_output_stream_can_truncate (GFileOutputStream *stream)
+{
+  GDaemonFileOutputStream *file;
+
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
+
+  return file->can_truncate;
+}
+
+static gboolean
+g_daemon_file_output_stream_truncate (GFileOutputStream *stream,
+                                      goffset            size,
+                                      GCancellable      *cancellable,
+                                      GError           **error)
+{
+  GDaemonFileOutputStream *file;
+  TruncateOperation op;
+
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
+
+  if (!file->can_truncate)
+    {
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           _("Truncate not supported on stream"));
+      return FALSE;
+    }
+
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
+
+  memset (&op, 0, sizeof (op));
+  op.state = TRUNCATE_STATE_INIT;
+  op.size = size;
+
+  if (!run_sync_state_machine (file, (state_machine_iterator)iterate_truncate_state_machine,
+                               &op, cancellable, error))
+    return FALSE; /* IO Error */
+
+  if (!op.ret_val)
+    g_propagate_error (error, op.ret_error);
+
   return op.ret_val;
 }
 

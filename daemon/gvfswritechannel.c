@@ -38,6 +38,7 @@
 #include <gvfsdaemonutils.h>
 #include <gvfsjobwrite.h>
 #include <gvfsjobseekwrite.h>
+#include <gvfsjobtruncate.h>
 #include <gvfsjobclosewrite.h>
 #include <gvfsjobqueryinfowrite.h>
 
@@ -137,7 +138,12 @@ write_channel_handle_request (GVfsChannel *channel,
 				      ((goffset)arg1) | (((goffset)arg2) << 32),
 				      backend);
       break;
-      
+    case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_TRUNCATE:
+      job = g_vfs_job_truncate_new (write_channel,
+                                    backend_handle,
+                                    ((goffset)arg1) | (((goffset)arg2) << 32),
+                                    backend);
+      break;
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_QUERY_INFO:
       attrs = g_strndup (data, data_len);
       job = g_vfs_job_query_info_write_new (write_channel,
@@ -174,6 +180,24 @@ g_vfs_write_channel_send_seek_offset (GVfsWriteChannel *write_channel,
   reply.seq_nr = g_htonl (g_vfs_channel_get_current_seq_nr (channel));
   reply.arg1 = g_htonl (offset & 0xffffffff);
   reply.arg2 = g_htonl (offset >> 32);
+
+  g_vfs_channel_send_reply (channel, &reply, NULL, 0);
+}
+
+/* Might be called on an i/o thread
+ */
+void
+g_vfs_write_channel_send_truncated (GVfsWriteChannel *write_channel)
+{
+  GVfsDaemonSocketProtocolReply reply;
+  GVfsChannel *channel;
+
+  channel = G_VFS_CHANNEL (write_channel);
+
+  reply.type = g_htonl (G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_TRUNCATED);
+  reply.seq_nr = g_htonl (g_vfs_channel_get_current_seq_nr (channel));
+  reply.arg1 = g_htonl (0);
+  reply.arg2 = g_htonl (0);
 
   g_vfs_channel_send_reply (channel, &reply, NULL, 0);
 }

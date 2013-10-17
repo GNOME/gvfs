@@ -55,6 +55,7 @@ void              g_vfs_write_channel_send_closed      (GVfsWriteChannel *write_
 							const char       *etag);
 void              g_vfs_write_channel_send_seek_offset (GVfsWriteChannel *write_channel,
 							goffset           offset);
+void              g_vfs_write_channel_send_truncated   (GVfsWriteChannel *write_channel);
 
 G_END_DECLS
 

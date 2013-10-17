@@ -1238,7 +1238,7 @@ file_open_write (GFile *file,
   GVfsDBusMount *proxy;
   char *path;
   gboolean res;
-  gboolean can_seek;
+  guint32 ret_flags;
   GUnixFDList *fd_list;
   int fd;
   GVariant *fd_id_val = NULL;
@@ -1255,20 +1255,20 @@ file_open_write (GFile *file,
   if (proxy == NULL)
     return NULL;
 
-  res = gvfs_dbus_mount_call_open_for_write_sync (proxy,
-                                                  path,
-                                                  mode,
-                                                  etag,
-                                                  make_backup,
-                                                  flags,
-                                                  pid,
-                                                  NULL,
-                                                  &fd_id_val,
-                                                  &can_seek,
-                                                  &initial_offset,
-                                                  &fd_list,
-                                                  cancellable,
-                                                  &local_error);
+  res = gvfs_dbus_mount_call_open_for_write_flags_sync (proxy,
+                                                        path,
+                                                        mode,
+                                                        etag,
+                                                        make_backup,
+                                                        flags,
+                                                        pid,
+                                                        NULL,
+                                                        &fd_id_val,
+                                                        &ret_flags,
+                                                        &initial_offset,
+                                                        &fd_list,
+                                                        cancellable,
+                                                        &local_error);
 
   if (! res)
     {
@@ -1295,7 +1295,7 @@ file_open_write (GFile *file,
   g_variant_unref (fd_id_val);
   g_object_unref (fd_list);
   
-  return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
+  return g_daemon_file_output_stream_new (fd, ret_flags, initial_offset);
 }
 
 static GFileOutputStream *
@@ -3144,7 +3144,7 @@ file_open_write_async_cb (GVfsDBusMount *proxy,
   AsyncCallFileReadWrite *data = user_data;
   GError *error = NULL;
   GSimpleAsyncResult *orig_result;
-  gboolean can_seek;
+  guint32 flags;
   GUnixFDList *fd_list;
   int fd;
   GVariant *fd_id_val;
@@ -3154,7 +3154,13 @@ file_open_write_async_cb (GVfsDBusMount *proxy,
 
   orig_result = data->result;
   
-  if (! gvfs_dbus_mount_call_open_for_write_finish (proxy, &fd_id_val, &can_seek, &initial_offset, &fd_list, res, &error))
+  if (! gvfs_dbus_mount_call_open_for_write_flags_finish (proxy,
+                                                          &fd_id_val,
+                                                          &flags,
+                                                          &initial_offset,
+                                                          &fd_list,
+                                                          res,
+                                                          &error))
     {
       _g_simple_async_result_take_error_stripped (orig_result, error);
       goto out;
@@ -3172,7 +3178,7 @@ file_open_write_async_cb (GVfsDBusMount *proxy,
     }
   else
     {
-      output_stream = g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
+      output_stream = g_daemon_file_output_stream_new (fd, flags, initial_offset);
       g_simple_async_result_set_op_res_gpointer (orig_result, output_stream, g_object_unref);
       g_object_unref (fd_list);
     }
@@ -3201,17 +3207,17 @@ file_open_write_async_get_proxy_cb (GVfsDBusMount *proxy,
   
   data->result = g_object_ref (result);
   
-  gvfs_dbus_mount_call_open_for_write (proxy,
-                                       path,
-                                       data->mode,
-                                       data->etag,
-                                       data->make_backup,
-                                       data->flags,
-                                       pid,
-                                       NULL,
-                                       cancellable,
-                                       (GAsyncReadyCallback) file_open_write_async_cb,
-                                       data);
+  gvfs_dbus_mount_call_open_for_write_flags (proxy,
+                                             path,
+                                             data->mode,
+                                             data->etag,
+                                             data->make_backup,
+                                             data->flags,
+                                             pid,
+                                             NULL,
+                                             cancellable,
+                                             (GAsyncReadyCallback) file_open_write_async_cb,
+                                             data);
   data->cancelled_tag = _g_dbus_async_subscribe_cancellable (connection, cancellable);
 }
 

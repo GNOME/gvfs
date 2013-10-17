@@ -81,6 +81,45 @@ g_vfs_job_open_for_write_init (GVfsJobOpenForWrite *job)
 {
 }
 
+static gboolean
+open_for_write_new_handle_common (GVfsDBusMount *object,
+                                  GDBusMethodInvocation *invocation,
+                                  GUnixFDList *fd_list,
+                                  const gchar *arg_path_data,
+                                  guint16 arg_mode,
+                                  const gchar *arg_etag,
+                                  gboolean arg_make_backup,
+                                  guint arg_flags,
+                                  guint arg_pid,
+                                  GVfsBackend *backend,
+                                  GVfsJobOpenForWriteVersion version)
+{
+  GVfsJobOpenForWrite *job;
+
+  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
+    return TRUE;
+
+  job = g_object_new (G_VFS_TYPE_JOB_OPEN_FOR_WRITE,
+                      "object", object,
+                      "invocation", invocation,
+                      NULL);
+
+  job->filename = g_strdup (arg_path_data);
+  job->mode = arg_mode;
+  if (*arg_etag != 0)
+    job->etag = g_strdup (arg_etag);
+  job->make_backup = arg_make_backup;
+  job->flags = arg_flags;
+  job->backend = backend;
+  job->pid = arg_pid;
+  job->version = version;
+
+  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
+  g_object_unref (job);
+
+  return TRUE;
+}
+
 gboolean
 g_vfs_job_open_for_write_new_handle (GVfsDBusMount *object,
                                      GDBusMethodInvocation *invocation,
@@ -93,29 +132,42 @@ g_vfs_job_open_for_write_new_handle (GVfsDBusMount *object,
                                      guint arg_pid,
                                      GVfsBackend *backend)
 {
-  GVfsJobOpenForWrite *job;
-  
-  if (g_vfs_backend_invocation_first_handler (object, invocation, backend))
-    return TRUE;
-  
-  job = g_object_new (G_VFS_TYPE_JOB_OPEN_FOR_WRITE,
-                      "object", object,
-                      "invocation", invocation,
-                      NULL);
-  
-  job->filename = g_strdup (arg_path_data);
-  job->mode = arg_mode;
-  if (*arg_etag != 0)
-    job->etag = g_strdup (arg_etag);
-  job->make_backup = arg_make_backup;
-  job->flags = arg_flags;
-  job->backend = backend;
-  job->pid = arg_pid;
+  return open_for_write_new_handle_common(object,
+                                          invocation,
+                                          fd_list,
+                                          arg_path_data,
+                                          arg_mode,
+                                          arg_etag,
+                                          arg_make_backup,
+                                          arg_flags,
+                                          arg_pid,
+                                          backend,
+                                          OPEN_FOR_WRITE_VERSION_ORIGINAL);
+}
 
-  g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
-  g_object_unref (job);
-
-  return TRUE;
+gboolean
+g_vfs_job_open_for_write_new_handle_with_flags (GVfsDBusMount *object,
+                                                GDBusMethodInvocation *invocation,
+                                                GUnixFDList *fd_list,
+                                                const gchar *arg_path_data,
+                                                guint16 arg_mode,
+                                                const gchar *arg_etag,
+                                                gboolean arg_make_backup,
+                                                guint arg_flags,
+                                                guint arg_pid,
+                                                GVfsBackend *backend)
+{
+  return open_for_write_new_handle_common(object,
+                                          invocation,
+                                          fd_list,
+                                          arg_path_data,
+                                          arg_mode,
+                                          arg_etag,
+                                          arg_make_backup,
+                                          arg_flags,
+                                          arg_pid,
+                                          backend,
+                                          OPEN_FOR_WRITE_VERSION_WITH_FLAGS);
 }
 
 static void
@@ -233,6 +285,13 @@ g_vfs_job_open_for_write_set_can_seek (GVfsJobOpenForWrite *job,
 }
 
 void
+g_vfs_job_open_for_write_set_can_truncate (GVfsJobOpenForWrite *job,
+                                           gboolean can_truncate)
+{
+  job->can_truncate = can_truncate;
+}
+
+void
 g_vfs_job_open_for_write_set_initial_offset (GVfsJobOpenForWrite *job,
 					     goffset              initial_offset)
 {
@@ -284,10 +343,22 @@ create_reply (GVfsJob *job,
 
   g_signal_emit_by_name (job, "new-source", open_job->write_channel);
 
-  gvfs_dbus_mount_complete_open_for_write (object, invocation,
-                                           fd_list, g_variant_new_handle (fd_id),
-                                           open_job->can_seek,
-                                           open_job->initial_offset);
+  switch (open_job->version)
+    {
+      case OPEN_FOR_WRITE_VERSION_ORIGINAL:
+        gvfs_dbus_mount_complete_open_for_write (object, invocation,
+                                                 fd_list, g_variant_new_handle (fd_id),
+                                                 open_job->can_seek ? OPEN_FOR_WRITE_FLAG_CAN_SEEK : 0,
+                                                 open_job->initial_offset);
+        break;
+      case OPEN_FOR_WRITE_VERSION_WITH_FLAGS:
+        gvfs_dbus_mount_complete_open_for_write_flags (object, invocation,
+                                                 fd_list, g_variant_new_handle (fd_id),
+                                                 (open_job->can_seek ? OPEN_FOR_WRITE_FLAG_CAN_SEEK : 0) |
+                                                 (open_job->can_truncate ? OPEN_FOR_WRITE_FLAG_CAN_TRUNCATE : 0),
+                                                 open_job->initial_offset);
+        break;
+    }
   
   close (remote_fd);
   g_object_unref (fd_list);

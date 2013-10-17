@@ -44,6 +44,11 @@ typedef enum {
   OPEN_FOR_WRITE_REPLACE = 2
 } GVfsJobOpenForWriteMode;
 
+typedef enum {
+  OPEN_FOR_WRITE_VERSION_ORIGINAL,
+  OPEN_FOR_WRITE_VERSION_WITH_FLAGS,
+} GVfsJobOpenForWriteVersion;
+
 struct _GVfsJobOpenForWrite
 {
   GVfsJobDBus parent_instance;
@@ -57,11 +62,14 @@ struct _GVfsJobOpenForWrite
   GVfsBackend *backend;
   GVfsBackendHandle backend_handle;
 
-  gboolean can_seek;
+  guint can_seek : 1;
+  guint can_truncate : 1;
   goffset initial_offset;
   GVfsWriteChannel *write_channel;
 
   GPid pid;
+
+  GVfsJobOpenForWriteVersion version;
 };
 
 struct _GVfsJobOpenForWriteClass
@@ -81,10 +89,22 @@ gboolean g_vfs_job_open_for_write_new_handle         (GVfsDBusMount         *obj
                                                       guint                  arg_flags,
                                                       guint                  arg_pid,
                                                       GVfsBackend           *backend);
+gboolean g_vfs_job_open_for_write_new_handle_with_flags (GVfsDBusMount         *object,
+                                                         GDBusMethodInvocation *invocation,
+                                                         GUnixFDList           *fd_list,
+                                                         const gchar           *arg_path_data,
+                                                         guint16                arg_mode,
+                                                         const gchar           *arg_etag,
+                                                         gboolean               arg_make_backup,
+                                                         guint                  arg_flags,
+                                                         guint                  arg_pid,
+                                                         GVfsBackend           *backend);
 void     g_vfs_job_open_for_write_set_handle         (GVfsJobOpenForWrite *job,
 						      GVfsBackendHandle    handle);
 void     g_vfs_job_open_for_write_set_can_seek       (GVfsJobOpenForWrite *job,
 						      gboolean             can_seek);
+void     g_vfs_job_open_for_write_set_can_truncate   (GVfsJobOpenForWrite *job,
+                                                      gboolean             can_truncate);
 void     g_vfs_job_open_for_write_set_initial_offset (GVfsJobOpenForWrite *job,
 						      goffset              initial_offset);
 GPid     g_vfs_job_open_for_write_get_pid            (GVfsJobOpenForWrite *job);
