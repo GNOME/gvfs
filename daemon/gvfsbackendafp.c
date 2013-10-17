@@ -44,6 +44,7 @@
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
 #include "gvfsjobseekwrite.h"
+#include "gvfsjobtruncate.h"
 #include "gvfsjobopenforwrite.h"
 #include "gvfsjobwrite.h"
 #include "gvfsjobclosewrite.h"
@@ -778,6 +779,43 @@ try_seek_on_write (GVfsBackend *backend,
 }
 
 static void
+truncate_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
+  GVfsJobTruncate *job = G_VFS_JOB_TRUNCATE (user_data);
+  AfpHandle *afp_handle = (AfpHandle *)job->handle;
+
+  GError *err = NULL;
+
+  if (g_vfs_afp_volume_set_fork_size_finish (volume, res, &err))
+  {
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+  }
+  else
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    afp_handle_free (afp_handle);
+  }
+}
+
+static gboolean
+try_truncate (GVfsBackend *backend,
+              GVfsJobTruncate *job,
+              GVfsBackendHandle handle,
+              goffset size)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  AfpHandle *afp_handle = (AfpHandle *)handle;
+
+  g_vfs_afp_volume_set_fork_size (afp_backend->volume, afp_handle->fork_refnum,
+                                  size, G_VFS_JOB (job)->cancellable,
+                                  truncate_cb, job);
+
+  return TRUE;
+}
+
+static void
 seek_on_read_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
@@ -1114,6 +1152,7 @@ create_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_da
   
   g_vfs_job_open_for_write_set_handle (job, (GVfsBackendHandle) afp_handle);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
   g_vfs_job_open_for_write_set_initial_offset (job, 0);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1186,6 +1225,7 @@ replace_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
     
   g_vfs_job_open_for_write_set_handle (job, (GVfsBackendHandle) afp_handle);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
   g_vfs_job_open_for_write_set_initial_offset (job, 0);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1374,6 +1414,7 @@ append_to_get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer
   afp_handle->offset = size;
   g_vfs_job_open_for_write_set_initial_offset (job, size);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
@@ -2174,6 +2215,7 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
   backend_class->try_replace = try_replace;
   backend_class->try_write = try_write;
   backend_class->try_seek_on_write = try_seek_on_write;
+  backend_class->try_truncate = try_truncate;
   backend_class->try_close_write = try_close_write;
   backend_class->try_delete = try_delete;
   backend_class->try_make_directory = try_make_directory;
