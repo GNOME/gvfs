@@ -51,7 +51,6 @@
 #include "gvfskeyring.h"
 
 #include <libsmbclient.h>
-#include "libsmb-compat.h"
 
 
 #define PRINT_DEBUG
@@ -1709,14 +1708,12 @@ do_query_fs_info (GVfsBackend *backend,
 		  GFileAttributeMatcher *attribute_matcher)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "cifs");
-
-#ifdef HAVE_SAMBA_STAT_VFS
   smbc_statvfs_fn smbc_statvfs;
   struct statvfs st = {0};
   char *uri;
   int res, saved_errno;
+
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "cifs");
 
   if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||
@@ -1757,7 +1754,6 @@ do_query_fs_info (GVfsBackend *backend,
           return;
         }
     }
-#endif
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }

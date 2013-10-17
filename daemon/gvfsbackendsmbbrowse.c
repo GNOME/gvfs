@@ -46,7 +46,6 @@
 #include "gmounttracker.h"
 
 #include <libsmbclient.h>
-#include "libsmb-compat.h"
 
 /* The magic "default workgroup" hostname */
 #define DEFAULT_WORKGROUP_NAME "X-GNOME-DEFAULT-WORKGROUP"
