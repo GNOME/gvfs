@@ -1055,6 +1055,7 @@ g_vfs_backend_afc_create (GVfsBackend *backend,
 
   g_vfs_job_open_for_write_set_handle (job, fh);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
   g_vfs_job_succeeded (G_VFS_JOB(job));
 
   return;
@@ -1136,6 +1137,7 @@ g_vfs_backend_afc_append_to (GVfsBackend *backend,
 
   g_vfs_job_open_for_write_set_handle (job, fh);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
   g_vfs_job_open_for_write_set_initial_offset (job, off);
   g_vfs_job_succeeded (G_VFS_JOB(job));
 
@@ -1212,6 +1214,7 @@ g_vfs_backend_afc_replace (GVfsBackend *backend,
 
   g_vfs_job_open_for_write_set_handle (job, fh);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
   g_vfs_job_succeeded (G_VFS_JOB(job));
 
   return;
@@ -1393,6 +1396,27 @@ g_vfs_backend_afc_seek_on_write (GVfsBackend *backend,
       g_vfs_job_seek_write_set_offset (job, offset);
       g_vfs_job_succeeded (G_VFS_JOB(job));
     }
+}
+
+static void
+g_vfs_backend_afc_truncate (GVfsBackend *backend,
+                            GVfsJobTruncate *job,
+                            GVfsBackendHandle handle,
+                            goffset size)
+{
+  GVfsBackendAfc *self;
+  FileHandle *fh;
+
+  g_return_if_fail (handle != NULL);
+
+  self = G_VFS_BACKEND_AFC(backend);
+  g_return_if_fail (self->connected);
+
+  fh = (FileHandle *) handle;
+
+  if (!g_vfs_backend_afc_check (afc_file_truncate (fh->afc_cli, fh->fd, size),
+                                G_VFS_JOB(job)))
+    g_vfs_job_succeeded (G_VFS_JOB(job));
 }
 
 static void
@@ -2698,6 +2722,7 @@ g_vfs_backend_afc_class_init (GVfsBackendAfcClass *klass)
   backend_class->close_write      = g_vfs_backend_afc_close_write;
   backend_class->write            = g_vfs_backend_afc_write;
   backend_class->seek_on_write    = g_vfs_backend_afc_seek_on_write;
+  backend_class->truncate         = g_vfs_backend_afc_truncate;
   backend_class->enumerate        = g_vfs_backend_afc_enumerate;
   backend_class->query_info       = g_vfs_backend_afc_query_info;
   backend_class->query_fs_info    = g_vfs_backend_afc_query_fs_info;
