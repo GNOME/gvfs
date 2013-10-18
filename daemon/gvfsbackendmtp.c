@@ -2040,6 +2040,7 @@ do_create (GVfsBackend *backend,
   handle->size = 0;
 
   g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -2113,6 +2114,7 @@ do_append_to (GVfsBackend *backend,
   LIBMTP_destroy_file_t (file);
 
   g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -2187,6 +2189,7 @@ do_replace (GVfsBackend *backend,
   LIBMTP_destroy_file_t (file);
 
   g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -2272,6 +2275,31 @@ do_seek_on_write (GVfsBackend *backend,
 
 
 static void
+do_truncate (GVfsBackend *backend,
+             GVfsJobTruncate *job,
+             GVfsBackendHandle opaque_handle,
+             goffset size)
+{
+  RWHandle *handle = opaque_handle;
+  uint32_t id = handle->id;
+
+  DEBUG("(I) do_truncate (%ld)\n", size);
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  if (LIBMTP_TruncateObject (G_VFS_BACKEND_MTP (backend)->device, id, size) == 0) {
+    handle->size = size;
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+  } else {
+    fail_job (G_VFS_JOB (job), G_VFS_BACKEND_MTP (backend)->device);
+    DEBUG ("(I) Failed to truncate.");
+  }
+
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+  DEBUG ("(I) truncate done.");
+}
+
+
+static void
 do_close_write (GVfsBackend *backend,
                 GVfsJobCloseWrite *job,
                 GVfsBackendHandle opaque_handle)
@@ -2339,6 +2367,7 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->replace = do_replace;
   backend_class->write = do_write;
   backend_class->seek_on_write = do_seek_on_write;
+  backend_class->truncate = do_truncate;
   backend_class->close_write = do_close_write;
 #endif
 }
