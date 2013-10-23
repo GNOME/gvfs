@@ -510,7 +510,7 @@ close_read_ready (GObject      *source_object,
 {
   GInputStream *stream;
   GVfsJob      *job;
-  GError       *error;
+  GError       *error = NULL;
   gboolean      res;
 
   job = G_VFS_JOB (user_data);
