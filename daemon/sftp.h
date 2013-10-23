@@ -20,7 +20,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-/* From draft-ietf-secsh-filexfer-02.txt */
+/* From draft-ietf-secsh-filexfer-02.txt
+ * OpenSSH extensions from: http://api.libssh.org/rfc/PROTOCOL */
 
 /* version */
 #define	SSH_FILEXFER_VERSION		3
@@ -85,3 +86,6 @@
 #define SSH_FX_OP_UNSUPPORTED		8
 #define SSH_FX_MAX			8
 
+/* OpenSSH extension flags */
+#define SSH_FXE_STATVFS_ST_RDONLY	0x1 /* read-only */
+#define SSH_FXE_STATVFS_ST_NOSUID	0x2 /* no setuid */

@@ -84,6 +84,10 @@
 static GQuark id_q;
 
 typedef enum {
+  SFTP_EXT_OPENSSH_STATVFS,
+} SFTPServerExtensions;
+
+typedef enum {
   SFTP_VENDOR_INVALID = 0,
   SFTP_VENDOR_OPENSSH,
   SFTP_VENDOR_SSH
@@ -162,6 +166,7 @@ struct _GVfsBackendSftp
   guint32 my_gid;
   
   int protocol_version;
+  SFTPServerExtensions extensions;
   
   GOutputStream *command_stream;
   GInputStream *reply_stream;
@@ -244,6 +249,12 @@ get_sftp_client_vendor (void)
   g_free (args[1]);
   
   return res;
+}
+
+static gboolean
+has_extension (GVfsBackendSftp *backend, SFTPServerExtensions extension)
+{
+  return (backend->extensions & (1 << extension)) != 0;
 }
 
 static void
@@ -1561,6 +1572,14 @@ do_mount (GVfsBackend *backend,
           GMountSource *mount_source,
           gboolean is_automount)
 {
+  const struct {
+    const char *name;               /* extension_name field */
+    const char *data;               /* extension_data field */
+    SFTPServerExtensions enable;    /* flag to enable this extension */
+  } extensions[] = {
+    { "statvfs@openssh.com", "2", SFTP_EXT_OPENSSH_STATVFS },
+  };
+
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   gchar **args; /* Enough for now, extend if you add more args */
   pid_t pid;
@@ -1573,6 +1592,7 @@ do_mount (GVfsBackend *backend,
   GMountSpec *sftp_mount_spec;
   char *extension_name, *extension_data;
   char *display_name;
+  int i;
 
   args = setup_ssh_commandline (backend);
 
@@ -1653,7 +1673,12 @@ do_mount (GVfsBackend *backend,
       extension_data = read_string (reply, NULL);
       if (extension_data)
         {
-          /* TODO: Do something with this */
+          for (i = 0; i < G_N_ELEMENTS (extensions); i++)
+            {
+              if (!strcmp (extension_name, extensions[i].name) &&
+                  !strcmp (extension_data, extensions[i].data))
+                op_backend->extensions |= 1 << extensions[i].enable;
+            }
         }
       g_free (extension_name);
       g_free (extension_data);
@@ -4131,6 +4156,108 @@ try_query_info (GVfsBackend *backend,
   return TRUE;
 }
 
+static void
+query_fs_info_reply (GVfsBackendSftp *backend,
+                     int reply_type,
+                     GDataInputStream *reply,
+                     guint32 len,
+                     GVfsJob *job,
+                     gpointer user_data)
+{
+  GFileInfo *info = user_data;
+  guint64 frsize, blocks, bfree, bavail, flags;
+
+  if (reply_type == SSH_FXP_STATUS)
+    {
+      guint32 code = read_status_code (reply);
+
+      if (code == SSH_FX_NO_SUCH_FILE)
+        not_dir_or_not_exist_error (backend, job, G_VFS_JOB_QUERY_FS_INFO (job)->filename);
+      else
+        result_from_status_code (job, code, -1, -1);
+      return;
+    }
+  else if (reply_type != SSH_FXP_EXTENDED_REPLY)
+    {
+      g_vfs_job_failed (job,
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "%s", _("Invalid reply received"));
+      return;
+    }
+
+  g_data_input_stream_read_uint64 (reply, NULL, NULL); /* bsize */
+  frsize = g_data_input_stream_read_uint64 (reply, NULL, NULL);
+  blocks = g_data_input_stream_read_uint64 (reply, NULL, NULL);
+  bfree = g_data_input_stream_read_uint64 (reply, NULL, NULL);
+  bavail = g_data_input_stream_read_uint64 (reply, NULL, NULL);
+  g_data_input_stream_read_uint64 (reply, NULL, NULL); /* files */
+  g_data_input_stream_read_uint64 (reply, NULL, NULL); /* ffree */
+  g_data_input_stream_read_uint64 (reply, NULL, NULL); /* favail */
+  g_data_input_stream_read_uint64 (reply, NULL, NULL); /* fsid */
+  flags = g_data_input_stream_read_uint64 (reply, NULL, NULL);
+  g_data_input_stream_read_uint64 (reply, NULL, NULL); /* namemax */
+
+  /* If free and available are both 0, treat it like the size information is
+   * missing.
+   * */
+  if (bfree || bavail)
+    {
+      g_file_info_set_attribute_uint64 (info,
+                                        G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                        frsize * bavail);
+
+      g_file_info_set_attribute_uint64 (info,
+                                        G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,
+                                        frsize * blocks);
+
+      g_file_info_set_attribute_uint64 (info,
+                                        G_FILE_ATTRIBUTE_FILESYSTEM_USED,
+                                        frsize * (blocks - bfree));
+    }
+
+  g_file_info_set_attribute_boolean (info,
+                                     G_FILE_ATTRIBUTE_FILESYSTEM_READONLY,
+                                     flags & SSH_FXE_STATVFS_ST_RDONLY);
+
+  g_vfs_job_succeeded (job);
+}
+
+static gboolean
+try_query_fs_info (GVfsBackend *backend,
+                   GVfsJobQueryFsInfo *job,
+                   const char *filename,
+                   GFileInfo *info,
+                   GFileAttributeMatcher *matcher)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+
+  g_file_info_set_attribute_string (info,
+                                    G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "sftp");
+
+  if (has_extension (op_backend, SFTP_EXT_OPENSSH_STATVFS) &&
+      (g_file_attribute_matcher_matches (matcher,
+                                         G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||
+       g_file_attribute_matcher_matches (matcher,
+                                         G_FILE_ATTRIBUTE_FILESYSTEM_FREE) ||
+       g_file_attribute_matcher_matches (matcher,
+                                         G_FILE_ATTRIBUTE_FILESYSTEM_USED) ||
+       g_file_attribute_matcher_matches (matcher,
+                                         G_FILE_ATTRIBUTE_FILESYSTEM_READONLY)))
+    {
+      command = new_command_stream (op_backend, SSH_FXP_EXTENDED);
+      put_string (command, "statvfs@openssh.com");
+      put_string (command, filename);
+
+      queue_command_stream_and_free (op_backend, command, query_fs_info_reply,
+                                     G_VFS_JOB (job), info);
+    }
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  return TRUE;
+}
+
 typedef struct {
    GFileInfo *info;
    GFileAttributeMatcher *attribute_matcher;
@@ -5940,6 +6067,7 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   backend_class->try_close_read = try_close_read;
   backend_class->try_close_write = try_close_write;
   backend_class->try_query_info = try_query_info;
+  backend_class->try_query_fs_info = try_query_fs_info;
   backend_class->try_query_info_on_read = (gpointer) try_query_info_fstat;
   backend_class->try_query_info_on_write = (gpointer) try_query_info_fstat;
   backend_class->try_enumerate = try_enumerate;
