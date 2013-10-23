@@ -1149,7 +1149,7 @@ iterate_query_state_machine (GDaemonFileOutputStream *file,
 	  g_string_truncate (file->input_buffer, 0);
 	  
 	  /* This wasn't interesting, read next reply */
-	  op->state = SEEK_STATE_HANDLE_INPUT;
+	  op->state = QUERY_STATE_HANDLE_INPUT;
 	  break;
 
 	default:
