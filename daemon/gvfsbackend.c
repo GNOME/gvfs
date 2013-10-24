@@ -280,7 +280,7 @@ register_path_cb (GDBusConnection *conn,
   g_signal_connect (skeleton, "handle-unmount", G_CALLBACK (g_vfs_job_unmount_new_handle), data);
   g_signal_connect (skeleton, "handle-open-for-read", G_CALLBACK (g_vfs_job_open_for_read_new_handle), data);
   g_signal_connect (skeleton, "handle-open-for-write", G_CALLBACK (g_vfs_job_open_for_write_new_handle), data);
-  g_signal_connect (skeleton, "handle_copy", G_CALLBACK (g_vfs_job_copy_new_handle), data);
+  g_signal_connect (skeleton, "handle-copy", G_CALLBACK (g_vfs_job_copy_new_handle), data);
   g_signal_connect (skeleton, "handle-move", G_CALLBACK (g_vfs_job_move_new_handle), data);
   g_signal_connect (skeleton, "handle-push", G_CALLBACK (g_vfs_job_push_new_handle), data);
   g_signal_connect (skeleton, "handle-pull", G_CALLBACK (g_vfs_job_pull_new_handle), data);
