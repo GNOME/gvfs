@@ -1,3 +1,16 @@
+Major changes in 1.19.1
+=======================
+* Fix seeking past end of file for various backends
+* archive: Set file executable bit from archive contents
+* http: Set error to NULL to possibly prevent crash on close
+* dav: Set file type to regular by default
+* build: Remove unnecessary trailing slashes in path
+* client: Fix usage of incorrect enum constant
+* gvfs-info: Show URI
+* gvfs-ls: Added option to output URIs
+* fuse: Use the big_writes option to speed up writes
+* Translation updates
+
 Major changes in 1.18.2
 =======================
 * Fix a client side regression in 1.18.1 where apps would stop responding
