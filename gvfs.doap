@@ -25,4 +25,11 @@
       <gnome:userid>gicmo</gnome:userid>
     </foaf:Person>
   </maintainer>
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Ross Lagerwall</foaf:name>
+      <foaf:mbox rdf:resource="mailto:rosslagerwall@gmail.com" />
+      <gnome:userid>rossl</gnome:userid>
+    </foaf:Person>
+  </maintainer>
 </Project>
