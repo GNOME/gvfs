@@ -4395,7 +4395,7 @@ make_symlink_reply (GVfsBackendSftp *backend,
                     gpointer user_data)
 {
   if (reply_type == SSH_FXP_STATUS)
-    result_from_status (job, reply, -1, -1); 
+    result_from_status (job, reply, G_IO_ERROR_EXISTS, -1);
   else
     g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                       _("Invalid reply received"));
