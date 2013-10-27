@@ -408,9 +408,9 @@ reload_recent_items (GVfsBackendRecent *backend)
 
       uri = gtk_recent_info_get_uri (recent_info);
       guid = g_hash_table_lookup (backend->uri_map, uri);
-      if (guid)
+      if (gtk_recent_info_exists (recent_info))
         {
-          if (gtk_recent_info_exists (recent_info))
+          if (guid)
             {
               RecentItem *item;
               item = g_hash_table_lookup (backend->items, guid);
@@ -418,14 +418,14 @@ reload_recent_items (GVfsBackendRecent *backend)
                 changed = g_list_prepend (changed, item->guid);
               not_seen_items = g_list_remove (not_seen_items, item);
             }
-        }
-      else
-        {
-          RecentItem *item;
-          item = recent_item_new (recent_info);
-          added = g_list_prepend (added, item->guid);
-          g_hash_table_insert (backend->items, item->guid, item);
-          g_hash_table_insert (backend->uri_map, item->uri, item->guid);
+          else
+            {
+              RecentItem *item;
+              item = recent_item_new (recent_info);
+              added = g_list_prepend (added, item->guid);
+              g_hash_table_insert (backend->items, item->guid, item);
+              g_hash_table_insert (backend->uri_map, item->uri, item->guid);
+            }
         }
       gtk_recent_info_unref (recent_info);
     }
