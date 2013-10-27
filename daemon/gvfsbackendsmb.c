@@ -1419,7 +1419,7 @@ do_close_write (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   SmbWriteHandle *handle = _handle;
   struct stat stat_at_close;
-  int stat_res;
+  int stat_res, errsv;
   ssize_t res;
   smbc_fstat_fn smbc_fstat;
   smbc_close_fn smbc_close;
@@ -1452,9 +1452,8 @@ do_close_write (GVfsBackend *backend,
 						 op_backend->smb_context, handle->backup_uri);
 	  if (res ==  -1)
 	    {
-              int errsv = errno;
-
-          smbc_unlink (op_backend->smb_context, handle->tmp_uri);
+              errsv = errno;
+              smbc_unlink (op_backend->smb_context, handle->tmp_uri);
 	      g_vfs_job_failed (G_VFS_JOB (job),
 				G_IO_ERROR, G_IO_ERROR_CANT_CREATE_BACKUP,
 				_("Backup file creation failed: %s"), g_strerror (errsv));
@@ -1468,8 +1467,9 @@ do_close_write (GVfsBackend *backend,
 					     op_backend->smb_context, handle->uri);
       if (res ==  -1)
 	{
+	  errsv = errno;
 	  smbc_unlink (op_backend->smb_context, handle->tmp_uri);
-	  g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
+	  g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
 	  goto out;
 	}
     }
