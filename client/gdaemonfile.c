@@ -1482,7 +1482,8 @@ g_daemon_file_mount_mountable (GFile               *file,
  
   data = g_new0 (AsyncMountOp, 1);
   data->flags = flags;
-  data->mount_operation = g_object_ref (mount_operation);
+  if (mount_operation)
+    data->mount_operation = g_object_ref (mount_operation);
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
 
@@ -1573,7 +1574,8 @@ g_daemon_file_start_mountable (GFile               *file,
   
   data = g_new0 (AsyncMountOp, 1);
   data->flags = flags;
-  data->mount_operation = g_object_ref (mount_operation);
+  if (mount_operation)
+    data->mount_operation = g_object_ref (mount_operation);
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
 
@@ -1658,7 +1660,8 @@ g_daemon_file_stop_mountable (GFile               *file,
   
   data = g_new0 (AsyncMountOp, 1);
   data->flags = flags;
-  data->mount_operation = g_object_ref (mount_operation);
+  if (mount_operation)
+    data->mount_operation = g_object_ref (mount_operation);
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
 
@@ -1743,7 +1746,8 @@ g_daemon_file_eject_mountable_with_operation (GFile               *file,
   
   data = g_new0 (AsyncMountOp, 1);
   data->flags = flags;
-  data->mount_operation = g_object_ref (mount_operation);
+  if (mount_operation)
+    data->mount_operation = g_object_ref (mount_operation);
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
 
@@ -1846,7 +1850,8 @@ g_daemon_file_unmount_mountable_with_operation (GFile               *file,
   
   data = g_new0 (AsyncMountOp, 1);
   data->flags = flags;
-  data->mount_operation = g_object_ref (mount_operation);
+  if (mount_operation)
+    data->mount_operation = g_object_ref (mount_operation);
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
 
