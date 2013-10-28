@@ -18,10 +18,10 @@ INCLUDES =					\
 	-DMOUNTABLE_DIR=\"$(mountdir)\" 	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"
 
-noinst_LTLIBRARIES=libdaemon.la
+pkglib_LTLIBRARIES=libgvfsdaemon.la
 
 libraries =						\
-	libdaemon.la					\
+	libgvfsdaemon.la					\
 	$(top_builddir)/common/libgvfscommon.la		\
 	$(GLIB_LIBS) $(KEYRING_LIBS)
 
@@ -149,7 +149,7 @@ noinst_PROGRAMS =				\
 	gvfsd-test			\
 	$(NULL)
 
-libdaemon_la_SOURCES = \
+libgvfsdaemon_la_SOURCES = \
 	gvfstypes.h \
 	gvfsdaemon.c gvfsdaemon.h \
 	gvfsbackend.c gvfsbackend.h \
@@ -199,6 +199,9 @@ libdaemon_la_SOURCES = \
 	gvfsjobcreatemonitor.c gvfsjobcreatemonitor.h \
 	gvfskeyring.h gvfskeyring.c \
         $(NULL)
+
+# needed by cygwin (see bug #564003)
+libgvfsdaemon_la_LDFLAGS = -no-undefined -avoid-version
 
 gvfsd_SOURCES = \
 	mount.c mount.h \
