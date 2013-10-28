@@ -577,7 +577,7 @@ recent_backend_query_fs_info (GVfsBackend           *vfs_backend,
 
   g_file_info_set_attribute_boolean (info,
                                      G_FILE_ATTRIBUTE_FILESYSTEM_READONLY,
-                                     TRUE);
+                                     FALSE);
 
   g_file_info_set_attribute_uint32 (info,
                                     G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW,
