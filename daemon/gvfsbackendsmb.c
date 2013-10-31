@@ -1437,10 +1437,10 @@ do_close_write (GVfsBackend *backend,
 
   if (res == -1)
     {
-      g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
-      
+      errsv = errno;
       if (handle->tmp_uri)
     	  smbc_unlink (op_backend->smb_context, handle->tmp_uri);
+      g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
       goto out;
     }
 
