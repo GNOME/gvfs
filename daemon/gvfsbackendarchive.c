@@ -123,10 +123,10 @@ gvfs_archive_read (struct archive *archive,
   return read_bytes;
 }
 
-static off_t
+static int64_t
 gvfs_archive_skip (struct archive *archive,
 		   void           *data,
-		   off_t	    request)
+		   int64_t         request)
 {
   GVfsArchive *d = data;
 
