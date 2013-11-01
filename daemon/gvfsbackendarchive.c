@@ -356,14 +356,48 @@ create_root_file (GVfsBackendArchive *ba)
   g_object_unref (icon);
 }
 
+/* Read archive entry data blocks to determine file size */
+static int64_t
+archive_entry_determine_size (GVfsArchive          *archive,
+			      struct archive_entry *entry)
+{
+  size_t read, size = 0;
+  int result;
+  const void *block;
+  int64_t offset;
+
+  do
+    {
+      result = archive_read_data_block (archive->archive, &block, &read, &offset);
+      if (result >= ARCHIVE_WARN && result <= ARCHIVE_OK)
+	{
+	  if (result < ARCHIVE_OK) {
+	    DEBUG ("archive_read_data_block: result = %d, error = '%s'\n", result, archive_error_string (archive->archive));
+	    archive_set_error (archive->archive, ARCHIVE_OK, "No error");
+	    archive_clear_error (archive->archive);
+	  }
+
+	  size += read;
+	}
+    }
+  while (result != ARCHIVE_FATAL && result != ARCHIVE_EOF);
+
+  if (result == ARCHIVE_FATAL)
+    gvfs_archive_set_error_from_errno (archive);
+
+  return size;
+}
+
 static void
-archive_file_set_info_from_entry (ArchiveFile *	        file, 
+archive_file_set_info_from_entry (GVfsArchive *         archive,
+				  ArchiveFile *         file,
 				  struct archive_entry *entry,
 				  guint64               entry_index)
 {
   GFileInfo *info = g_file_info_new ();
   GFileType type;
   mode_t mode;
+  int64_t size;
   file->info = info;
 
   DEBUG ("setting up %s (%s)\n", archive_entry_pathname (entry), file->name);
@@ -415,8 +449,15 @@ archive_file_set_info_from_entry (ArchiveFile *	        file,
 				   file->name,
 				   type);
 
-  g_file_info_set_size (info,
-			archive_entry_size (entry));
+  if (archive_entry_size_is_set (entry))
+    {
+      size = archive_entry_size (entry);
+    }
+  else
+    {
+      size = archive_entry_determine_size (archive, entry);
+    }
+  g_file_info_set_size (info, size);
 
   mode = archive_entry_perm (entry);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
@@ -503,12 +544,12 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
 							  TRUE);
           /* Don't set info for root */
           if (file != ba->files)
-            archive_file_set_info_from_entry (file, entry, entry_index);
+            archive_file_set_info_from_entry (archive, file, entry, entry_index);
 	  archive_read_data_skip (archive->archive);
 	  entry_index++;
 	}
     }
-  while (result != ARCHIVE_FATAL && result != ARCHIVE_EOF);
+  while (result != ARCHIVE_FATAL && result != ARCHIVE_EOF && !gvfs_archive_in_error (archive));
 
   if (result == ARCHIVE_FATAL)
     gvfs_archive_set_error_from_errno (archive);
