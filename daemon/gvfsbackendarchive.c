@@ -171,10 +171,10 @@ gvfs_archive_set_error_from_errno (GVfsArchive *archive)
   if (gvfs_archive_in_error (archive))
     return;
 
-  g_vfs_job_failed_literal (archive->job,
-                            G_IO_ERROR,
-                            g_io_error_from_errno (archive_errno (archive->archive)),
-                            archive_error_string (archive->archive));
+  g_set_error_literal (&archive->error,
+		       G_IO_ERROR,
+		       g_io_error_from_errno (archive_errno (archive->archive)),
+		       archive_error_string (archive->archive));
 }
 
 static void 
