@@ -25,6 +25,7 @@ intltool-*.in
 depcomp
 ltmain.sh
 install-sh
+m4
 missing
 mkinstalldirs
 stamp-h1

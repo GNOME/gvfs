@@ -2,6 +2,7 @@ gvfs-cat
 gvfs-copy
 gvfs-info
 gvfs-ls
+gvfs-mime
 gvfs-mkdir
 gvfs-monitor-dir
 gvfs-monitor-file

@@ -1,5 +1,7 @@
 gvfsd
 gvfsd-afc
+gvfsd-afp
+gvfsd-afp-browse
 gvfsd-archive
 gvfsd-burn
 gvfsd-cdda
@@ -13,6 +15,7 @@ gvfsd-localtest
 gvfsd-network
 gvfsd-mtp
 gvfsd-obexftp
+gvfsd-recent
 gvfsd-sftp
 gvfsd-smb
 gvfsd-smb-browse
