@@ -41,6 +41,7 @@ g_vfs_job_progress_finalize (GObject *object)
   job = G_VFS_JOB_PROGRESS (object);
 
   g_free (job->callback_obj_path);
+  g_clear_object (&job->progress_proxy);
 
   if (G_OBJECT_CLASS (g_vfs_job_progress_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_progress_parent_class)->finalize) (object);
@@ -88,7 +89,7 @@ g_vfs_job_progress_construct_proxy (GVfsJob *job)
   GVfsJobProgress *progress_job = G_VFS_JOB_PROGRESS (job);
   GError *error = NULL;
 
-  if (!progress_job->send_progress)
+  if (!progress_job->send_progress || progress_job->progress_proxy)
     return;
   
   progress_job->progress_proxy = gvfs_dbus_progress_proxy_new_sync (g_dbus_method_invocation_get_connection (dbus_job->invocation),

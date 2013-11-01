@@ -131,9 +131,6 @@ run (GVfsJob *job)
 	       op_job->flags,
                progress_job->send_progress ? g_vfs_job_progress_callback : NULL,
                progress_job->send_progress ? job : NULL);
-  
-  if (progress_job->progress_proxy)
-    g_clear_object (&progress_job->progress_proxy);
 }
 
 static gboolean
@@ -156,9 +153,6 @@ try (GVfsJob *job)
 			 op_job->flags,
 		         progress_job->send_progress ? g_vfs_job_progress_callback : NULL,
 		         progress_job->send_progress ? job : NULL);
-  
-  if (progress_job->progress_proxy)
-    g_clear_object (&progress_job->progress_proxy);
 
   return res;
 }
