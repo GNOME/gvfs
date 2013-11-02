@@ -1231,6 +1231,7 @@ read_reply_async_got_len  (GObject *source_object,
   /* Bail out if cancelled */
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     {
+      g_error_free (error);
       g_object_unref (backend);
       return;
     }
