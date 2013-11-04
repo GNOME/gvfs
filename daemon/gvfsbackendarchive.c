@@ -459,6 +459,9 @@ archive_file_set_info_from_entry (GVfsArchive *         archive,
     }
   g_file_info_set_size (info, size);
 
+  if (file->name[0] == '.')
+    g_file_info_set_is_hidden (info, TRUE);
+
   mode = archive_entry_perm (entry);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
