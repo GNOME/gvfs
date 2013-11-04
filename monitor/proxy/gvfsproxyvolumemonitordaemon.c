@@ -45,7 +45,7 @@ static gboolean always_call_mount = FALSE;
 
 static GVfsRemoteVolumeMonitor *monitor_daemon = NULL;
 
-#define DEBUG_ENABLED
+/* #define DEBUG_ENABLED */
 
 #ifdef DEBUG_ENABLED
 static void
