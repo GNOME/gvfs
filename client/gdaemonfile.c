@@ -2965,7 +2965,7 @@ retry:
       if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
         {
           g_clear_error (&my_error);
-          g_object_unref (proxy);
+          g_clear_object (&proxy);
           goto retry;
         }
       _g_propagate_error_stripped (error, my_error);
