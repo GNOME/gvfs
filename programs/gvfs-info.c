@@ -77,7 +77,7 @@ escape_string (const char *in)
 {
   GString *str;
   static char *hex_digits = "0123456789abcdef";
-  char c;
+  unsigned char c;
 
 
   str = g_string_new ("");
@@ -89,7 +89,7 @@ escape_string (const char *in)
       else
 	{
 	  g_string_append (str, "\\x");
-	  g_string_append_c (str, hex_digits[(c >> 8) & 0xf]);
+	  g_string_append_c (str, hex_digits[(c >> 4) & 0xf]);
 	  g_string_append_c (str, hex_digits[c & 0xf]);
 	}
     }
