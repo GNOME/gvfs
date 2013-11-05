@@ -493,16 +493,15 @@ trash_backend_add_info (TrashItem *item,
 
       if (original)
         {
-          gchar *basename, *path;
+          gchar *edit_name, *path;
 
           path = g_file_get_path (original);
-          basename = g_filename_display_basename (path);
+          edit_name = gvfs_file_info_populate_names_as_local (info, path);
 
-          g_file_info_set_display_name (info, basename);
           g_file_info_set_attribute_byte_string (info,
                                                  G_FILE_ATTRIBUTE_TRASH_ORIG_PATH,
                                                  path);
-          g_free (basename);
+          g_free (edit_name);
           g_free (path);
         }
 
