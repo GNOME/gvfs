@@ -567,25 +567,10 @@ trash_backend_enumerate_root (GVfsBackendTrash      *backend,
 
       if (info)
         {
-          GFile *original;
-
           g_file_info_set_attribute_mask (info, attribute_matcher);
 
           g_file_info_set_name (info, trash_item_get_escaped_name (item));
           trash_backend_add_info (item, info, TRUE);
-
-          original = trash_item_get_original (item);
-
-          if (original)
-            {
-              char *basename;
-
-              basename = g_file_get_basename (original);
-
-              /* XXX utf8 */
-              g_file_info_set_display_name (info, basename);
-              g_free (basename);
-            }
 
           g_vfs_job_enumerate_add_info (job, info);
           g_object_unref (info);
