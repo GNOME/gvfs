@@ -1750,7 +1750,7 @@ class Mtp(GvfsTestCase):
 
             out = self.program_out_success(['gvfs-info', uri + '/SD-Karte/Music/GStreamer - The Test Sine/sine.ogg'])
             self.assertIn('standard::content-type: audio/ogg', out)
-            self.assertIn('standard::size: 4400', out)
+            self.assertIn('standard::size: 4033', out)
             self.assertIn('access::can-read: TRUE', out)
             self.assertIn('access::can-write: TRUE', out)
             self.assertIn('access::can-delete: TRUE', out)
@@ -1769,7 +1769,7 @@ class Mtp(GvfsTestCase):
             # photo
             out = self.program_out_success(['gvfs-info', uri + '/SD-Karte/DCIM/100CANON/IMG_0001.JPG'])
             self.assertIn('standard::content-type: image/jpeg', out)
-            self.assertIn('standard::size: 8843', out)
+            self.assertIn('standard::size: 4151', out)
             self.assertIn('preview::icon:', out)
 
             out = subprocess.check_output(['gvfs-cat', uri + '/SD-Karte/DCIM/100CANON/IMG_0001.JPG'])
