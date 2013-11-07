@@ -170,7 +170,7 @@ class GvfsTestCase(unittest.TestCase):
         timeout = 5
         while timeout > 0:
             (out, err) = self.program_out_err(['gvfs-mount', '-li'])
-            if uri not in out:
+            if not re.search('Mount.*' + uri, out):
                 break
             timeout -= 1
             time.sleep(1)
@@ -1732,8 +1732,10 @@ class Mtp(GvfsTestCase):
         try:
             # The top-level name is defined by the mobile firmware
             self.assertEqual(self.program_out_success(['gvfs-ls', uri]), 'SD-Karte\n')
-            self.assertEqual(self.program_out_success(['gvfs-ls', uri + '/SD-Karte']),
-                             'DCIM\nhello.txt\nLOST.DIR\nMusic\nAndroid\nclockworkmod\n')
+            out = self.program_out_success(['gvfs-ls', uri + '/SD-Karte'])
+            self.assertIn('DCIM\n', out)
+            self.assertIn('Music\n', out)
+            self.assertIn('hello.txt\n', out)
             self.assertEqual(self.program_out_success(['gvfs-ls', uri + '/SD-Karte/Music']),
                              'GStreamer - The Test Sine\n')
             self.assertEqual(self.program_out_success(['gvfs-ls', uri + '/SD-Karte/Music/GStreamer - The Test Sine']),
