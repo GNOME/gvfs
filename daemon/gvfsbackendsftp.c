@@ -1245,7 +1245,7 @@ read_reply_async_got_len  (GObject *source_object,
   if (backend->reply_size_read < 4)
     {
       g_input_stream_read_async (backend->reply_stream,
-				 &backend->reply_size + backend->reply_size_read, 4 - backend->reply_size_read,
+				 (char *)&backend->reply_size + backend->reply_size_read, 4 - backend->reply_size_read,
 				 0, backend->reply_stream_cancellable, read_reply_async_got_len,
 				 backend);
       return;
