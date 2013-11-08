@@ -34,6 +34,7 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
+#include <gio/gfiledescriptorbased.h>
 #include <gphoto2.h>
 #ifdef HAVE_GUDEV
   #include <gudev/gudev.h>
@@ -291,6 +292,15 @@ typedef struct {
   unsigned long int size;
   unsigned long int cursor;
 } ReadHandle;
+
+/* ------------------------------------------------------------------------------------------------- */
+
+typedef struct {
+  goffset size;
+  float target;
+  GFileProgressCallback progress_callback;
+  gpointer progress_callback_data;
+} PullContext;
 
 /* ------------------------------------------------------------------------------------------------- */
 
@@ -3476,6 +3486,172 @@ do_move (GVfsBackend *backend,
   g_free (dst_name);
 }
 
+static unsigned int
+ctx_progress_start_func (GPContext *context,
+                         float target,
+                         const char *str,
+                         void *data)
+{
+  PullContext *pc = data;
+  pc->target = target;
+  return 0;
+}
+
+static void
+ctx_progress_update_func (GPContext *context,
+                          unsigned int id,
+                          float current,
+                          void *data)
+{
+  PullContext *pc = data;
+  if (pc->progress_callback)
+    pc->progress_callback ((current / pc->target) * pc->size, pc->size,
+                           pc->progress_callback_data);
+}
+
+static void
+ctx_progress_stop_func (GPContext *context,
+                        unsigned int id,
+                        void *data)
+{
+  PullContext *pc = data;
+  if (pc->progress_callback)
+    pc->progress_callback (pc->size, pc->size, pc->progress_callback_data);
+}
+
+static void
+do_pull (GVfsBackend *backend,
+         GVfsJobPull *job,
+         const char *source,
+         const char *local_path,
+         GFileCopyFlags flags,
+         gboolean remove_source,
+         GFileProgressCallback progress_callback,
+         gpointer progress_callback_data)
+{
+  GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (backend);
+  GFileInfo *info = g_file_info_new ();
+  GError *error = NULL;
+  PullContext pc;
+  CameraFile *file;
+  GFile *dest;
+  GFileDescriptorBased *fdstream;
+  char *dir, *name;
+  int rc;
+
+  ensure_not_dirty (gphoto2_backend);
+
+  split_filename_with_ignore_prefix (gphoto2_backend, source, &dir, &name);
+
+  if (remove_source && !gphoto2_backend->can_delete)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        _("Not supported"));
+      goto out;
+    }
+
+  /* Fallback to the default implementation unless we have a regular file */
+  if (!file_get_info (gphoto2_backend, dir, name, info, &error, FALSE) ||
+      g_file_info_get_file_type (info) != G_FILE_TYPE_REGULAR)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        _("Not supported"));
+      goto out;
+    }
+
+  dest = g_file_new_for_path (local_path);
+  if (flags & G_FILE_COPY_OVERWRITE)
+    {
+      fdstream = G_FILE_DESCRIPTOR_BASED (
+                     g_file_replace (dest,
+                                     NULL,
+                                     flags & G_FILE_COPY_BACKUP ? TRUE : FALSE,
+                                     G_FILE_CREATE_REPLACE_DESTINATION,
+                                     G_VFS_JOB (job)->cancellable, &error));
+    }
+  else
+    {
+      fdstream = G_FILE_DESCRIPTOR_BASED (
+                     g_file_create (dest,
+                                    G_FILE_CREATE_NONE,
+                                    G_VFS_JOB (job)->cancellable, &error));
+    }
+  g_object_unref (dest);
+
+  if (!fdstream)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      goto out;
+    }
+
+  rc = gp_file_new_from_fd (&file, g_file_descriptor_based_get_fd (fdstream));
+  if (rc != 0)
+    {
+      error = get_error_from_gphoto2 (_("Error creating file object"), rc);
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_object_unref (fdstream);
+      goto out;
+    }
+
+  pc.size = g_file_info_get_size (info);
+  pc.progress_callback = progress_callback;
+  pc.progress_callback_data = progress_callback_data;
+
+  gp_context_set_progress_funcs (gphoto2_backend->context,
+                                 ctx_progress_start_func,
+                                 ctx_progress_update_func,
+                                 ctx_progress_stop_func,
+                                 &pc);
+
+  rc = gp_camera_file_get (gphoto2_backend->camera,
+                           dir,
+                           name,
+                           GP_FILE_TYPE_NORMAL,
+                           file,
+                           gphoto2_backend->context);
+
+  gp_context_set_progress_funcs (gphoto2_backend->context, NULL, NULL, NULL, NULL);
+
+  /* gp_camera_file_get() closes the fd so we just unref here */
+  g_object_unref (fdstream);
+  gp_file_unref (file);
+
+  if (rc != 0)
+    {
+      error = get_error_from_gphoto2 (_("Error getting file"), rc);
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      goto out;
+    }
+
+  if (remove_source)
+    {
+      rc = gp_camera_file_delete (gphoto2_backend->camera,
+                                  dir,
+                                  name,
+                                  gphoto2_backend->context);
+      if (rc != 0)
+        {
+          error = get_error_from_gphoto2 (_("Error deleting file"), rc);
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          goto out;
+        }
+
+      caches_invalidate_file (gphoto2_backend, dir, name);
+      caches_invalidate_free_space (gphoto2_backend);
+      monitors_emit_deleted (gphoto2_backend, dir, name);
+    }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+out:
+  g_object_unref (info);
+  g_free (name);
+  g_free (dir);
+  g_clear_error (&error);
+}
+
 /* ------------------------------------------------------------------------------------------------- */
 
 static void
@@ -3607,6 +3783,7 @@ g_vfs_backend_gphoto2_class_init (GVfsBackendGphoto2Class *klass)
   backend_class->seek_on_write = do_seek_on_write;
   backend_class->truncate = do_truncate;
   backend_class->move = do_move;
+  backend_class->pull = do_pull;
   backend_class->create_dir_monitor = do_create_dir_monitor;
   backend_class->create_file_monitor = do_create_file_monitor;
 
