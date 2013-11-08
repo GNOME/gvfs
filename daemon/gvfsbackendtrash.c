@@ -24,6 +24,7 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsjobseekread.h"
 #include "gvfsjobread.h"
+#include "gvfsdaemonutils.h"
 
 typedef GVfsBackendClass GVfsBackendTrashClass;
 
