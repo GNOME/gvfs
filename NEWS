@@ -1,3 +1,9 @@
+Major changes in 1.18.3
+=======================
+* Fix seeking past end of file for various backends
+* fuse: Improve write performance
+* archive: Handle open failure
+
 Major changes in 1.18.2
 =======================
 * Fix a client side regression in 1.18.1 where apps would stop responding
