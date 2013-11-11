@@ -1723,6 +1723,8 @@ do_query_fs_info (GVfsBackend *backend,
       g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_FILESYSTEM_FREE) ||
       g_file_attribute_matcher_matches (attribute_matcher,
+                                        G_FILE_ATTRIBUTE_FILESYSTEM_USED) ||
+      g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_FILESYSTEM_READONLY))
     {
       uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
@@ -1740,8 +1742,12 @@ do_query_fs_info (GVfsBackend *backend,
                *       - for linux samba hosts, f_frsize is zero and f_bsize is a real block size
                *       - for some Windows hosts (XP), f_frsize and f_bsize should be multiplied to get real block size
                */
-              g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, st.f_bsize * st.f_blocks * ((st.f_frsize == 0) ? 1 : st.f_frsize));
-              g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, st.f_bsize * st.f_bfree * ((st.f_frsize == 0) ? 1 : st.f_frsize));
+              guint64 size, free_space;
+              size = st.f_bsize * st.f_blocks * ((st.f_frsize == 0) ? 1 : st.f_frsize);
+              free_space = st.f_bsize * st.f_bfree * ((st.f_frsize == 0) ? 1 : st.f_frsize);
+              g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, size);
+              g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, free_space);
+              g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USED, size - free_space);
               g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, st.f_flag & SMBC_VFS_FEATURE_RDONLY);
             }
         }
