@@ -1788,6 +1788,12 @@ try_query_fs_info (GVfsBackend *backend,
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_FREE))
     vol_bitmap |= AFP_VOLUME_BITMAP_EXT_BYTES_FREE_BIT;
 
+  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_USED))
+  {
+    vol_bitmap |= AFP_VOLUME_BITMAP_EXT_BYTES_TOTAL_BIT;
+    vol_bitmap |= AFP_VOLUME_BITMAP_EXT_BYTES_FREE_BIT;
+  }
+
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY))
     vol_bitmap |= AFP_VOLUME_BITMAP_ATTRIBUTE_BIT;
 

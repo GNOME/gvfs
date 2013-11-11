@@ -183,6 +183,8 @@ get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   guint16 vol_bitmap;
   GFileInfo *info;
 
+  guint64 bytes_free, bytes_total;
+
   reply = g_vfs_afp_connection_send_command_finish (connection, res, &err);
   if (!reply)
   {
@@ -239,8 +241,6 @@ get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 
   if (vol_bitmap & AFP_VOLUME_BITMAP_EXT_BYTES_FREE_BIT)
   {
-    guint64 bytes_free;
-
     g_vfs_afp_reply_read_uint64 (reply, &bytes_free);
     g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
                                       bytes_free);
@@ -248,12 +248,15 @@ get_vol_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 
   if (vol_bitmap & AFP_VOLUME_BITMAP_EXT_BYTES_TOTAL_BIT)
   {
-    guint64 bytes_total;
-
     g_vfs_afp_reply_read_uint64 (reply, &bytes_total);
     g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,
                                       bytes_total);
   }
+
+  if (vol_bitmap & AFP_VOLUME_BITMAP_EXT_BYTES_FREE_BIT &&
+      vol_bitmap & AFP_VOLUME_BITMAP_EXT_BYTES_TOTAL_BIT)
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USED,
+                                      bytes_total - bytes_free);
 
   g_object_unref (reply);
   
