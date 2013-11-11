@@ -70,6 +70,7 @@ struct _GVfsBackendArchive
 
   GFile *		file;
   ArchiveFile *		files;		/* the tree of files */
+  gsize                 size;
 };
 
 G_DEFINE_TYPE (GVfsBackendArchive, g_vfs_backend_archive, G_VFS_TYPE_BACKEND)
@@ -547,7 +548,10 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
 							  TRUE);
           /* Don't set info for root */
           if (file != ba->files)
-            archive_file_set_info_from_entry (archive, file, entry, entry_index);
+	    {
+	      archive_file_set_info_from_entry (archive, file, entry, entry_index);
+	      ba->size += g_file_info_get_size (file->info);
+            }
 	  archive_read_data_skip (archive->archive);
 	  entry_index++;
 	}
@@ -862,8 +866,13 @@ try_query_fs_info (GVfsBackend *backend,
                    GFileInfo *info,
                    GFileAttributeMatcher *attribute_matcher)
 {
+  GVfsBackendArchive *ba = G_VFS_BACKEND_ARCHIVE (backend);
+
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW, G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, ba->size);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, 0);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USED, ba->size);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   return TRUE;
 }
