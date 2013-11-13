@@ -1,3 +1,12 @@
+Major changes in 1.16.4
+=======================
+* Look for large thumbnails for files on gvfs mounts
+* Fix locking problems in file enumeration
+* Fix possible hang in reading large files
+* Some fuse fixes
+* allow seeking past end of files
+* Fix some crashes
+
 Major changes in 1.16.3
 =======================
 * metadata: Fix a write regression introduced in 1.16.2
