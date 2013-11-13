@@ -3052,6 +3052,7 @@ do_create_internal (GVfsBackend *backend,
 
   g_vfs_job_open_for_write_set_handle (job, handle);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
 
   gphoto2_backend->open_write_handles = g_list_prepend (gphoto2_backend->open_write_handles, handle);
 
@@ -3224,6 +3225,40 @@ do_seek_on_write (GVfsBackend *backend,
       g_vfs_job_seek_write_set_offset (job, new_offset);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
+}
+
+/* ------------------------------------------------------------------------------------------------- */
+
+static void
+do_truncate (GVfsBackend *backend,
+             GVfsJobTruncate *job,
+             GVfsBackendHandle _handle,
+             goffset size)
+{
+  WriteHandle *handle = _handle;
+
+  DEBUG ("truncate() %p, '%s', %ld bytes", handle, handle->filename, size);
+
+  /* ensure we have enough room */
+  if (size > handle->allocated_size)
+    {
+      unsigned long int new_allocated_size;
+      new_allocated_size = (size / WRITE_INCREMENT + 1) * WRITE_INCREMENT;
+      handle->data = g_realloc (handle->data, new_allocated_size);
+      handle->allocated_size = new_allocated_size;
+      DEBUG ("    allocated_size is now %ld bytes)", handle->allocated_size);
+    }
+
+
+  if (size > handle->size)
+    memset(handle->data + handle->size, 0, size - handle->size);
+
+  handle->size = size;
+
+  /* this will make us dirty */
+  handle->is_dirty = TRUE;
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -3586,6 +3621,7 @@ g_vfs_backend_gphoto2_class_init (GVfsBackendGphoto2Class *klass)
   backend_class->write = do_write;
   backend_class->close_write = do_close_write;
   backend_class->seek_on_write = do_seek_on_write;
+  backend_class->truncate = do_truncate;
   backend_class->move = do_move;
   backend_class->create_dir_monitor = do_create_dir_monitor;
   backend_class->create_file_monitor = do_create_file_monitor;
