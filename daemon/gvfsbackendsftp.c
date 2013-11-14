@@ -435,6 +435,7 @@ setup_ssh_commandline (GVfsBackend *backend)
     {
       args[last_arg++] = g_strdup ("-oForwardX11 no");
       args[last_arg++] = g_strdup ("-oForwardAgent no");
+      args[last_arg++] = g_strdup ("-oPermitLocalCommand no");
       args[last_arg++] = g_strdup ("-oClearAllForwardings yes");
       args[last_arg++] = g_strdup ("-oProtocol 2");
       args[last_arg++] = g_strdup ("-oNoHostAuthenticationForLocalhost yes");
