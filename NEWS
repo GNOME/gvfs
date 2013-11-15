@@ -1,3 +1,23 @@
+Major changes in 1.19.2
+=======================
+* sftp: Implement GFileCreateFlags and improve permission handling
+* sftp: Implement push support
+* sftp: Various fixes
+* smb: Report number of bytes used on the filesystem
+* smb: Various fixes
+* daemon: Make progress callbacks work with try methods
+* afp: Report number of bytes used on the filesystem
+* archive: Set filesystem size information
+* archive: Set the is_hidden attribute when appropriate
+* archive: Various fixes
+* trash: Add " (invalid encoding)" to files with invalid encoding
+* trash: Support enumerating non-UTF-8 filenames
+* tests: Various fixes
+* recent: Don't mark filesystem as read-only
+* recent: Prevent spurious monitor notifications
+* Several smaller bugfixes and cleanups
+* Translation updates
+
 Major changes in 1.19.1
 =======================
 * Fix seeking past end of file for various backends
