@@ -818,28 +818,26 @@ try_seek_on_read (GVfsBackend *backend,
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
   AfpHandle *afp_handle = (AfpHandle *)handle;
 
-  if (job->seek_type != G_SEEK_END)
+  switch (job->seek_type)
   {
-    switch (job->seek_type)
-    {
-      case G_SEEK_CUR:
-        afp_handle->offset += job->requested_offset;
-        break;
-      case G_SEEK_SET:
-        afp_handle->offset = job->requested_offset;
-        break;
-    }
-
-    if (afp_handle->offset < 0)
-      afp_handle->offset = 0;
-
-    g_vfs_job_seek_read_set_offset (job, afp_handle->offset);
-    g_vfs_job_succeeded (G_VFS_JOB (job));
+    case G_SEEK_CUR:
+      afp_handle->offset += job->requested_offset;
+      break;
+    case G_SEEK_SET:
+      afp_handle->offset = job->requested_offset;
+      break;
+    case G_SEEK_END:
+      g_vfs_afp_volume_get_fork_parms (afp_backend->volume, afp_handle->fork_refnum,
+                                 AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT,
+                                 G_VFS_JOB (job)->cancellable, seek_on_read_cb, job);
+      return TRUE;
   }
-  else
-    g_vfs_afp_volume_get_fork_parms (afp_backend->volume, afp_handle->fork_refnum,
-                                     AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT,
-                                     G_VFS_JOB (job)->cancellable, seek_on_read_cb, job);
+
+  if (afp_handle->offset < 0)
+    afp_handle->offset = 0;
+
+  g_vfs_job_seek_read_set_offset (job, afp_handle->offset);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 
   return TRUE;
 }
