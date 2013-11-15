@@ -109,7 +109,6 @@ add_timeout_for_context (GMainContext *context,
                                 gpointer       data)
 {
   GSource *source;
-  guint id;
 
   g_return_val_if_fail (function != NULL, 0);
 
