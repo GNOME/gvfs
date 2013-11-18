@@ -32,6 +32,7 @@
 #include <gio/gio.h>
 
 #ifdef HAVE_KEYRING
+#define SECRET_API_SUBJECT_TO_CHANGE
 #include <libsecret/secret.h>
 #endif
 
