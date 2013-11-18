@@ -135,7 +135,7 @@ build_network_label (const gchar *user,
   return name;
 }
 
-gint
+static gint
 compare_specificity (gconstpointer  a,
 		     gconstpointer  b)
 {

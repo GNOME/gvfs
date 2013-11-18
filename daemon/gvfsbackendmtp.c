@@ -1955,11 +1955,12 @@ do_close_read (GVfsBackend *backend,
 
 
 #if HAVE_LIBMTP_1_1_6
-uint16_t zero_get_func (void* params,
-                        void* priv,
-                        uint32_t wantlen,
-                        unsigned char *data,
-                        uint32_t *gotlen)
+static uint16_t
+zero_get_func (void* params,
+               void* priv,
+               uint32_t wantlen,
+               unsigned char *data,
+               uint32_t *gotlen)
 {
   *gotlen = 0;
   return LIBMTP_HANDLER_RETURN_OK;
