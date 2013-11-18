@@ -2033,7 +2033,7 @@ try_seek_on_read (GVfsBackend *backend,
   else
     {
       read_handle->cursor = new_offset;
-      g_vfs_job_seek_read_set_offset (job, offset);
+      g_vfs_job_seek_read_set_offset (job, new_offset);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
   return TRUE;
@@ -3221,7 +3221,7 @@ do_seek_on_write (GVfsBackend *backend,
   else
     {
       write_handle->cursor = new_offset;      
-      g_vfs_job_seek_write_set_offset (job, offset);
+      g_vfs_job_seek_write_set_offset (job, new_offset);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
 }
