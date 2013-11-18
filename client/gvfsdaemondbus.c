@@ -374,7 +374,7 @@ async_call_cancelled_cb (GCancellable *cancellable,
 
   /* TODO: use shared daemon proxy on private connection if possible */
   gvfs_dbus_daemon_proxy_new (data->connection,
-                              G_BUS_NAME_OWNER_FLAGS_NONE,
+                              G_DBUS_PROXY_FLAGS_NONE,
                               NULL,
                               G_VFS_DBUS_DAEMON_PATH,
                               NULL,
@@ -427,7 +427,7 @@ void
   serial = g_dbus_connection_get_last_serial (connection);
 
   proxy = gvfs_dbus_daemon_proxy_new_sync (connection,
-                                           G_BUS_NAME_OWNER_FLAGS_NONE,
+                                           G_DBUS_PROXY_FLAGS_NONE,
                                            NULL,
                                            G_VFS_DBUS_DAEMON_PATH,
                                            NULL,
