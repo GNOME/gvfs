@@ -2423,7 +2423,6 @@ static struct fuse_operations vfs_oper =
   .destroy     = vfs_destroy,
 
   .getattr     = vfs_getattr,
-  .readdir     = vfs_readdir,
 
   .statfs      = vfs_statfs,
 
