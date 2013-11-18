@@ -124,6 +124,7 @@ emit_changed (GVfsUDisks2Drive *drive)
 }
 
 
+#if UDISKS_CHECK_VERSION(2,0,90)
 static gpointer
 _g_object_ref0 (gpointer object)
 {
@@ -132,6 +133,7 @@ _g_object_ref0 (gpointer object)
   else
     return NULL;
 }
+#endif
 
 static gboolean
 update_drive (GVfsUDisks2Drive *drive)

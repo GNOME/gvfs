@@ -193,6 +193,7 @@ apply_options_from_fstab (GVfsUDisks2Volume *volume,
 }
 
 
+#if UDISKS_CHECK_VERSION(2,0,90)
 static gpointer
 _g_object_ref0 (gpointer object)
 {
@@ -201,6 +202,7 @@ _g_object_ref0 (gpointer object)
   else
     return NULL;
 }
+#endif
 
 static gboolean
 update_volume (GVfsUDisks2Volume *volume)
