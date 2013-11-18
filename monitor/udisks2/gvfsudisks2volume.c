@@ -1547,8 +1547,8 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
                                                             block);
           if (udisks_drive != NULL)
             {
-              gchar *drive_name;
-              gchar *drive_desc;
+              gchar *drive_name = NULL;
+              gchar *drive_desc = NULL;
 
 #if UDISKS_CHECK_VERSION(2,0,90)
               {
