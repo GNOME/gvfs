@@ -1147,6 +1147,11 @@ ms_response_to_fs_info (MsResponse *response,
         }
     }
 
+  if (have_bytes_used)
+    g_file_info_set_attribute_uint64 (info,
+                                      G_FILE_ATTRIBUTE_FILESYSTEM_USED,
+                                      bytes_used);
+
   if (have_bytes_avail)
     {
       g_file_info_set_attribute_uint64 (info,
@@ -2071,6 +2076,8 @@ do_query_fs_info (GVfsBackend           *backend,
 
   if (! (g_file_attribute_matcher_matches (attribute_matcher,
                                            G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||
+         g_file_attribute_matcher_matches (attribute_matcher,
+                                           G_FILE_ATTRIBUTE_FILESYSTEM_USED) ||
          g_file_attribute_matcher_matches (attribute_matcher,
                                            G_FILE_ATTRIBUTE_FILESYSTEM_FREE)))
     {
