@@ -105,6 +105,18 @@ DEBUG_ENUMERATE (const gchar *message, ...)
 #define PTP_ST_RemovableRAM                     0x0004
 
 
+#define FAIL_DURING_UNMOUNT() \
+  if (g_atomic_int_get (&G_VFS_BACKEND_MTP(backend)->unmount_started)) { \
+    DEBUG ("(I) aborting due to unmount"); \
+    g_vfs_job_failed_literal (G_VFS_JOB (job), \
+                              G_IO_ERROR, G_IO_ERROR_CLOSED, \
+                              _("The connection is closed")); \
+    goto exit; \
+  }
+
+
+
+
 /************************************************
  * Initialization
  ************************************************/
@@ -834,6 +846,8 @@ do_enumerate (GVfsBackend *backend,
 
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  FAIL_DURING_UNMOUNT();
+
   LIBMTP_mtpdevice_t *device;
   device = op_backend->device;
 
@@ -989,6 +1003,8 @@ do_query_info (GVfsBackend *backend,
   DEBUG ("(I) do_query_info (filename = %s) ", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  FAIL_DURING_UNMOUNT();
+
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
 
@@ -1065,6 +1081,8 @@ do_query_fs_info (GVfsBackend *backend,
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
 
+  FAIL_DURING_UNMOUNT();
+
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
 
@@ -1132,6 +1150,8 @@ do_make_directory (GVfsBackend *backend,
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
 
+  FAIL_DURING_UNMOUNT();
+
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -1187,6 +1207,8 @@ do_pull (GVfsBackend *backend,
   GFileInfo *info = NULL;
   gchar **elements = g_strsplit_set (source, "/", -1);
   unsigned int ne = g_strv_length (elements);
+
+  FAIL_DURING_UNMOUNT();
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1262,6 +1284,8 @@ do_push (GVfsBackend *backend,
   GFileInfo *info = NULL;
   gchar **elements = g_strsplit_set (destination, "/", -1);
   unsigned int ne = g_strv_length (elements);
+
+  FAIL_DURING_UNMOUNT();
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1361,6 +1385,8 @@ do_delete (GVfsBackend *backend,
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
 
+  FAIL_DURING_UNMOUNT();
+
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -1398,6 +1424,8 @@ do_set_display_name (GVfsBackend *backend,
 {
   DEBUG ("(I) do_set_display_name '%s' --> '%s' ", filename, display_name);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  FAIL_DURING_UNMOUNT();
 
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
@@ -1444,6 +1472,8 @@ do_open_icon_for_read (GVfsBackend *backend,
   DEBUG ("(I) do_open_icon_for_read (%s)", icon_id);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  FAIL_DURING_UNMOUNT();
+
   guint id = strtol (icon_id, NULL, 10);
 
   if (id > 0) {
@@ -1487,6 +1517,8 @@ do_open_icon_for_read (GVfsBackend *backend,
                       _("Malformed icon identifier '%s'"),
                       icon_id);
   }
+
+ exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   DEBUG ("(I) do_open_icon_for_read done.");
