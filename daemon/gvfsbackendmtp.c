@@ -324,6 +324,18 @@ remove_cache_entry_by_id (GVfsBackendMtp *backend,
 }
 
 
+#define FAIL_DURING_UNMOUNT() \
+  if (g_atomic_int_get (&G_VFS_BACKEND_MTP(backend)->unmount_started)) { \
+    DEBUG ("(I) aborting due to unmount"); \
+    g_vfs_job_failed_literal (G_VFS_JOB (job), \
+                              G_IO_ERROR, G_IO_ERROR_CLOSED, \
+                              _("The connection is closed")); \
+    goto exit; \
+  }
+
+
+
+
 /************************************************
  * Initialization
  ************************************************/
@@ -1076,6 +1088,8 @@ do_enumerate (GVfsBackend *backend,
 
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  FAIL_DURING_UNMOUNT();
+
   LIBMTP_mtpdevice_t *device;
   device = op_backend->device;
 
@@ -1162,6 +1176,8 @@ do_query_info (GVfsBackend *backend,
   DEBUG ("(I) do_query_info (filename = %s) ", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  FAIL_DURING_UNMOUNT();
+
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
 
@@ -1236,6 +1252,8 @@ do_query_fs_info (GVfsBackend *backend,
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
 
+  FAIL_DURING_UNMOUNT();
+
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
 
@@ -1262,6 +1280,7 @@ do_query_fs_info (GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
+ exit:
   g_strfreev (elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
@@ -1305,6 +1324,8 @@ do_make_directory (GVfsBackend *backend,
 
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
+
+  FAIL_DURING_UNMOUNT();
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1359,6 +1380,9 @@ do_pull (GVfsBackend *backend,
 
   GFile *local_file = NULL;
   GFileInfo *info = NULL;
+
+  FAIL_DURING_UNMOUNT();
+
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), source);
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1469,6 +1493,8 @@ do_push (GVfsBackend *backend,
   GFileInfo *info = NULL;
   gchar **elements = g_strsplit_set (destination, "/", -1);
   unsigned int ne = g_strv_length (elements);
+
+  FAIL_DURING_UNMOUNT();
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1585,6 +1611,8 @@ do_delete (GVfsBackend *backend,
   DEBUG ("(I) do_delete (filename = %s) ", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  FAIL_DURING_UNMOUNT();
+
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1629,6 +1657,8 @@ do_set_display_name (GVfsBackend *backend,
 {
   DEBUG ("(I) do_set_display_name '%s' --> '%s' ", filename, display_name);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  FAIL_DURING_UNMOUNT();
 
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
   if (entry == NULL) {
@@ -1698,6 +1728,8 @@ do_open_for_read (GVfsBackend *backend,
   DEBUG ("(I) do_open_for_read (%s)", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  FAIL_DURING_UNMOUNT();
+
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1748,6 +1780,8 @@ do_open_icon_for_read (GVfsBackend *backend,
 {
   DEBUG ("(I) do_open_icon_for_read (%s)", icon_id);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  FAIL_DURING_UNMOUNT();
 
   guint id = strtol (icon_id, NULL, 10);
 
@@ -1824,6 +1858,8 @@ do_seek_on_read (GVfsBackend *backend,
   DEBUG ("(I) do_seek_on_read (%u %lu %ld %u)", id, old_offset, offset, type);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  FAIL_DURING_UNMOUNT();
+
   if (type == G_SEEK_END) {
     offset = size + offset;
   } else if (type == G_SEEK_CUR) {
@@ -1860,6 +1896,8 @@ do_read (GVfsBackend *backend,
 
   DEBUG ("(I) do_read (%u %lu %lu)", id, offset, bytes_requested);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  FAIL_DURING_UNMOUNT();
 
   uint32_t actual;
   if (handle->handle_type == HANDLE_FILE) {
@@ -1943,6 +1981,8 @@ do_create (GVfsBackend *backend,
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
 
+  FAIL_DURING_UNMOUNT();
+
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -2024,6 +2064,8 @@ do_append_to (GVfsBackend *backend,
   DEBUG ("(I) do_append_to (%s)", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  FAIL_DURING_UNMOUNT();
+
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -2090,6 +2132,8 @@ do_replace (GVfsBackend *backend,
 
   DEBUG ("(I) do_replace (%s)", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  FAIL_DURING_UNMOUNT();
 
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
   if (entry == NULL) {
@@ -2159,6 +2203,8 @@ do_write (GVfsBackend *backend,
   DEBUG ("(I) do_write (%u %lu %lu)", id, offset, buffer_size);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  FAIL_DURING_UNMOUNT();
+
   int ret = LIBMTP_SendPartialObject (G_VFS_BACKEND_MTP (backend)->device, id, offset,
                                       (unsigned char *)buffer, buffer_size);
   if (ret != 0) {
@@ -2192,6 +2238,8 @@ do_seek_on_write (GVfsBackend *backend,
   DEBUG ("(I) do_seek_on_write (%u %lu %ld %u)", id, old_offset, offset, type);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
+  FAIL_DURING_UNMOUNT();
+
   if (type == G_SEEK_END) {
     offset = size + offset;
   } else if (type == G_SEEK_CUR) {
@@ -2224,6 +2272,8 @@ do_close_write (GVfsBackend *backend,
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   RWHandle *handle = opaque_handle;
+
+  FAIL_DURING_UNMOUNT();
 
   int ret = LIBMTP_EndEditObject (G_VFS_BACKEND_MTP (backend)->device, handle->id);
   if (ret != 0) {
