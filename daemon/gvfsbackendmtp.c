@@ -863,6 +863,13 @@ get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
     }
   }
 
+  if (device == NULL) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                      _("Device not found"));
+    goto exit;
+  }
+
   /* Check supported methods/extensions. */
   LIBMTP_device_extension_t *extension;
   for (extension = device->extensions; extension != NULL; extension = extension->next) {
