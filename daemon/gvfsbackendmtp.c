@@ -1003,13 +1003,13 @@ do_query_info (GVfsBackend *backend,
   DEBUG ("(I) do_query_info (filename = %s) ", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  FAIL_DURING_UNMOUNT();
-
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
 
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
+
+  FAIL_DURING_UNMOUNT();
 
   if (ne == 2 && elements[1][0] == '\0') {
     get_device_info (G_VFS_BACKEND_MTP (backend), info);
@@ -1425,10 +1425,10 @@ do_set_display_name (GVfsBackend *backend,
   DEBUG ("(I) do_set_display_name '%s' --> '%s' ", filename, display_name);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  FAIL_DURING_UNMOUNT();
-
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
+
+  FAIL_DURING_UNMOUNT();
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
