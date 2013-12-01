@@ -1544,7 +1544,6 @@ do_mount (GVfsBackend *backend,
   gphoto2_backend->gudev_client = g_udev_client_new (subsystems);
   if (gphoto2_backend->gudev_client == NULL)
     {
-      release_device (gphoto2_backend);
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create gudev client"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
@@ -1561,7 +1560,6 @@ do_mount (GVfsBackend *backend,
   gphoto2_backend->dbus_connection = dbus_bus_get_private (DBUS_BUS_SYSTEM, &dbus_error);
   if (dbus_error_is_set (&dbus_error))
     {
-      release_device (gphoto2_backend);
       dbus_error_free (&dbus_error);
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot connect to the system bus"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1574,7 +1572,6 @@ do_mount (GVfsBackend *backend,
   gphoto2_backend->hal_ctx = libhal_ctx_new ();
   if (gphoto2_backend->hal_ctx == NULL)
     {
-      release_device (gphoto2_backend);
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create libhal context"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
@@ -1586,7 +1583,6 @@ do_mount (GVfsBackend *backend,
   
   if (!libhal_ctx_init (gphoto2_backend->hal_ctx, &dbus_error))
     {
-      release_device (gphoto2_backend);
       dbus_error_free (&dbus_error);
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot initialize libhal"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1607,7 +1603,6 @@ do_mount (GVfsBackend *backend,
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No device specified"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
-      release_device (gphoto2_backend);
       return;
     }
 
@@ -1628,7 +1623,6 @@ do_mount (GVfsBackend *backend,
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create gphoto2 context"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
-      release_device (gphoto2_backend);
       return;
     }
 
@@ -1638,7 +1632,6 @@ do_mount (GVfsBackend *backend,
       error = get_error_from_gphoto2 (_("Error creating camera"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
-      release_device (gphoto2_backend);
       return;
     }
 
@@ -1651,7 +1644,6 @@ do_mount (GVfsBackend *backend,
       error = get_error_from_gphoto2 (_("Error loading device information"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
-      release_device (gphoto2_backend);
       return;
     }
 
@@ -1661,7 +1653,6 @@ do_mount (GVfsBackend *backend,
       error = get_error_from_gphoto2 (_("Error loading device information"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
-      release_device (gphoto2_backend);
       return;
     }
 
@@ -1673,7 +1664,6 @@ do_mount (GVfsBackend *backend,
       error = get_error_from_gphoto2 (_("Error looking up device information"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
-      release_device (gphoto2_backend);
       return;
     }
 
@@ -1683,7 +1673,6 @@ do_mount (GVfsBackend *backend,
       error = get_error_from_gphoto2 (_("Error getting device information"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
-      release_device (gphoto2_backend);
       return;
     }
 
@@ -1698,7 +1687,6 @@ do_mount (GVfsBackend *backend,
       error = get_error_from_gphoto2 (_("Error setting up camera communications port"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
-      release_device (gphoto2_backend);
       return;
     }
   gp_port_info_list_free(il);
@@ -1709,15 +1697,11 @@ do_mount (GVfsBackend *backend,
       error = get_error_from_gphoto2 (_("Error initializing camera"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
-      release_device (gphoto2_backend);
       return;
     }
 
   if (!ensure_ignore_prefix (gphoto2_backend, G_VFS_JOB (job)))
-    {
-      release_device (gphoto2_backend);
-      return;
-    }
+    return;
 
   /* Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
      backend and shouldn't be translated. */
