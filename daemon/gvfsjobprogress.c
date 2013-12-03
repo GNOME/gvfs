@@ -31,6 +31,13 @@
 #include <glib/gi18n.h>
 #include "gvfsjobprogress.h"
 
+#define RATE_LIMIT_TIME 100000
+
+struct _GVfsJobProgressPrivate
+{
+  gint64 last_time;
+};
+
 G_DEFINE_TYPE (GVfsJobProgress, g_vfs_job_progress, G_VFS_TYPE_JOB_DBUS)
 
 static void
@@ -51,6 +58,8 @@ static void
 g_vfs_job_progress_class_init (GVfsJobProgressClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+
+  g_type_class_add_private (klass, sizeof (GVfsJobProgressPrivate));
   
   gobject_class->finalize = g_vfs_job_progress_finalize;
 }
@@ -58,6 +67,7 @@ g_vfs_job_progress_class_init (GVfsJobProgressClass *klass)
 static void
 g_vfs_job_progress_init (GVfsJobProgress *job)
 {
+  job->priv = G_TYPE_INSTANCE_GET_PRIVATE (job, G_VFS_TYPE_JOB_PROGRESS, GVfsJobProgressPrivate);
 }
 
 void
@@ -67,6 +77,12 @@ g_vfs_job_progress_callback (goffset current_num_bytes,
 {
   GVfsJobProgress *job = G_VFS_JOB_PROGRESS (user_data);
   GVfsJobDBus *dbus_job = G_VFS_JOB_DBUS (job);
+  gint64 current_time = g_get_monotonic_time ();
+
+  if (current_time - job->priv->last_time < RATE_LIMIT_TIME &&
+      current_num_bytes != total_num_bytes)
+    return;
+  job->priv->last_time = current_time;
 
   g_debug ("g_vfs_job_progress_callback %" G_GOFFSET_FORMAT "/%" G_GOFFSET_FORMAT "\n", current_num_bytes, total_num_bytes);
 

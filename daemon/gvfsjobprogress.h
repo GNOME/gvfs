@@ -38,6 +38,7 @@ G_BEGIN_DECLS
 
 typedef struct _GVfsJobProgress        GVfsJobProgress;
 typedef struct _GVfsJobProgressClass   GVfsJobProgressClass;
+typedef struct _GVfsJobProgressPrivate GVfsJobProgressPrivate;
 
 struct _GVfsJobProgress
 {
@@ -46,6 +47,8 @@ struct _GVfsJobProgress
   gboolean send_progress;
   char *callback_obj_path;
   GVfsDBusProgress *progress_proxy;
+
+  GVfsJobProgressPrivate *priv;
 };
 
 struct _GVfsJobProgressClass
