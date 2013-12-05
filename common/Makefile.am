@@ -1,6 +1,6 @@
 NULL =
 
-lib_LTLIBRARIES=libgvfscommon.la
+pkglib_LTLIBRARIES=libgvfscommon.la
 noinst_LTLIBRARIES = libgvfscommon-monitor.la
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
@@ -31,7 +31,7 @@ libgvfscommon_la_SOURCES = 	\
 	$(NULL)
 
 # needed by cygwin (see bug #564003)
-libgvfscommon_la_LDFLAGS = -no-undefined
+libgvfscommon_la_LDFLAGS = -no-undefined -avoid-version
 
 libgvfscommon_la_LIBADD =	\
 	$(GLIB_LIBS)		\
