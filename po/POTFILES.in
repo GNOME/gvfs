@@ -79,6 +79,7 @@ daemon/gvfsjobsetdisplayname.c
 daemon/gvfsjobstartmountable.c
 daemon/gvfsjobstopmountable.c
 daemon/gvfsjobtrash.c
+daemon/gvfsjobtruncate.c
 daemon/gvfsjobunmount.c
 daemon/gvfsjobunmountmountable.c
 daemon/gvfsjobwrite.c
