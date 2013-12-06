@@ -795,7 +795,6 @@ truncate_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
     g_error_free (err);
-    afp_handle_free (afp_handle);
   }
 }
 
