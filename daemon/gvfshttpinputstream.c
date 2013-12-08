@@ -328,7 +328,8 @@ read_send_callback (GObject      *object,
   ReadAfterSendData *rasd = g_task_get_task_data (task);
   GError *error = NULL;
 
-  if (!soup_request_send_finish (SOUP_REQUEST (object), result, &error))
+  priv->stream = soup_request_send_finish (SOUP_REQUEST (object), result, &error);
+  if (!priv->stream)
     {
       g_task_return_error (task, error);
       g_object_unref (task);
