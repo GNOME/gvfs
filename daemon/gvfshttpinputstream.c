@@ -45,6 +45,7 @@ typedef struct {
   GInputStream *stream;
 
   char *range;
+  goffset request_offset;
   goffset offset;
 
 } GVfsHttpInputStreamPrivate;
@@ -476,7 +477,7 @@ g_vfs_http_input_stream_seek (GSeekable     *seekable,
       if (content_length)
 	{
 	  type = G_SEEK_SET;
-	  offset = content_length - offset;
+	  offset = priv->request_offset + content_length + offset;
 	}
     }
 
@@ -512,6 +513,7 @@ g_vfs_http_input_stream_seek (GSeekable     *seekable,
 
     case G_SEEK_SET:
       priv->range = g_strdup_printf ("bytes=%"G_GUINT64_FORMAT"-", (guint64)offset);
+      priv->request_offset = offset;
       priv->offset = offset;
       break;
 
