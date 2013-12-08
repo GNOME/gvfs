@@ -338,6 +338,14 @@ read_send_callback (GObject      *object,
     }
   if (!SOUP_STATUS_IS_SUCCESSFUL (priv->msg->status_code))
     {
+      if (priv->msg->status_code == SOUP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE)
+        {
+          g_input_stream_close (priv->stream, NULL, NULL);
+          g_task_return_int (task, 0);
+          g_clear_object (&priv->stream);
+          g_object_unref (task);
+          return;
+        }
       g_task_return_new_error (task,
 			       SOUP_HTTP_ERROR,
 			       priv->msg->status_code,
