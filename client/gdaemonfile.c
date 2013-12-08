@@ -2803,6 +2803,7 @@ file_transfer (GFile                  *source,
   GVfsDBusProgress *progress_skeleton;
   GFile *file1, *file2;
   GError *my_error;
+  guint32 serial;
 
   res = FALSE;
   progress_skeleton = NULL;
@@ -2810,6 +2811,7 @@ file_transfer (GFile                  *source,
   source_is_daemon = G_IS_DAEMON_FILE (source);
   dest_is_daemon   = G_IS_DAEMON_FILE (destination);
   send_progress    = progress_callback != NULL;
+  serial           = 0;
 
   if (source_is_daemon && dest_is_daemon)
     native_transfer = TRUE;
@@ -2911,6 +2913,7 @@ retry:
                                      cancellable,
                                      copy_cb,
                                      &data);
+          serial = g_dbus_connection_get_last_serial (connection);
           g_main_loop_run (data.loop);
           res = gvfs_dbus_mount_call_copy_finish (proxy, data.res, &my_error);
         }
@@ -2923,6 +2926,7 @@ retry:
                                      cancellable,
                                      copy_cb,
                                      &data);
+          serial = g_dbus_connection_get_last_serial (connection);
           g_main_loop_run (data.loop);
           res = gvfs_dbus_mount_call_move_finish (proxy, data.res, &my_error);
         }
@@ -2939,6 +2943,7 @@ retry:
                                  cancellable,
                                  copy_cb,
                                  &data);
+      serial = g_dbus_connection_get_last_serial (connection);
       g_main_loop_run (data.loop);
       res = gvfs_dbus_mount_call_push_finish (proxy, data.res, &my_error);
     }
@@ -2954,6 +2959,7 @@ retry:
                                  cancellable,
                                  copy_cb,
                                  &data);
+      serial = g_dbus_connection_get_last_serial (connection);
       g_main_loop_run (data.loop);
       res = gvfs_dbus_mount_call_pull_finish (proxy, data.res, &my_error);
     }
@@ -2975,8 +2981,12 @@ retry:
 
   if (! res)
     {
-      if (proxy && g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-        _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
+      if (serial != 0 &&
+          g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+        {
+          _g_dbus_send_cancelled_with_serial_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)),
+                                                   serial);
+        }
       else
       if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
         {
