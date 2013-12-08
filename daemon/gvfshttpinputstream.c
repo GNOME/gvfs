@@ -117,10 +117,10 @@ g_vfs_http_input_stream_ensure_request (GInputStream *stream)
       g_assert_no_error (error);
       priv->msg = soup_request_http_get_message (SOUP_REQUEST_HTTP (priv->req));
       priv->offset = 0;
-
-      if (priv->range)
-	soup_message_headers_replace (priv->msg->request_headers, "Range", priv->range);
     }
+
+  if (priv->range)
+    soup_message_headers_replace (priv->msg->request_headers, "Range", priv->range);
 
   return priv->req;
 }
