@@ -2319,6 +2319,8 @@ try_create_tested_existence (SoupSession *session, SoupMessage *msg,
   g_object_set_data_full (G_OBJECT (stream), "-gvfs-stream-msg", put_msg, g_object_unref);
 
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), stream);
+  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job),
+                                         g_seekable_can_seek (G_SEEKABLE (stream)));
   g_vfs_job_succeeded (job);
 }  
 
@@ -2361,6 +2363,8 @@ open_for_replace_succeeded (GVfsBackendHttp *op_backend, GVfsJob *job,
   g_object_set_data_full (G_OBJECT (stream), "-gvfs-stream-msg", put_msg, g_object_unref);
 
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), stream);
+  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job),
+                                         g_seekable_can_seek (G_SEEKABLE (stream)));
   g_vfs_job_succeeded (job);
 }
 
@@ -2485,6 +2489,28 @@ try_write (GVfsBackend *backend,
                                write_ready,
                                job);
   return TRUE;
+}
+
+static void
+do_seek_on_write (GVfsBackend *backend,
+                  GVfsJobSeekWrite *job,
+                  GVfsBackendHandle handle,
+                  goffset offset,
+                  GSeekType type)
+{
+  GSeekable *stream = G_SEEKABLE (handle);
+  GError *error = NULL;
+
+  if (g_seekable_seek (stream, offset, type, G_VFS_JOB (job)->cancellable, &error))
+    {
+      g_vfs_job_seek_write_set_offset (job, g_seekable_tell (stream));
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
 }
 
 /* *** close_write () *** */
@@ -2690,6 +2716,7 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
   backend_class->try_create        = try_create;
   backend_class->try_replace       = try_replace;
   backend_class->try_write         = try_write;
+  backend_class->seek_on_write     = do_seek_on_write;
   backend_class->try_close_write   = try_close_write;
   backend_class->make_directory    = do_make_directory;
   backend_class->delete            = do_delete;
