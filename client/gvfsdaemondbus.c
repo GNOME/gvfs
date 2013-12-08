@@ -418,13 +418,11 @@ _g_dbus_async_unsubscribe_cancellable (GCancellable *cancellable, gulong cancell
 }
 
 void
- _g_dbus_send_cancelled_sync (GDBusConnection *connection)
+_g_dbus_send_cancelled_with_serial_sync (GDBusConnection *connection,
+                                         guint32 serial)
 {
-  guint32 serial;
   GVfsDBusDaemon *proxy;
   GError *error = NULL;
-
-  serial = g_dbus_connection_get_last_serial (connection);
 
   proxy = gvfs_dbus_daemon_proxy_new_sync (connection,
                                            G_DBUS_PROXY_FLAGS_NONE,
@@ -446,6 +444,13 @@ void
                                 NULL,  /* we don't need any reply */
                                 NULL);
   g_object_unref (proxy);
+}
+
+void
+_g_dbus_send_cancelled_sync (GDBusConnection *connection)
+{
+  _g_dbus_send_cancelled_with_serial_sync (connection,
+                                           g_dbus_connection_get_last_serial (connection));
 }
 
 

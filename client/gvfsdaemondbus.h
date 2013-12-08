@@ -67,6 +67,8 @@ gulong          _g_dbus_async_subscribe_cancellable     (GDBusConnection        
 void            _g_dbus_async_unsubscribe_cancellable   (GCancellable                   *cancellable,
                                                          gulong                          cancelled_tag);
 void            _g_dbus_send_cancelled_sync             (GDBusConnection                *connection);
+void            _g_dbus_send_cancelled_with_serial_sync (GDBusConnection                *connection,
+                                                         guint32                         serial);
 void            _g_propagate_error_stripped             (GError                        **dest,
                                                          GError                         *src);
 G_END_DECLS
