@@ -783,7 +783,6 @@ truncate_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
   GVfsJobTruncate *job = G_VFS_JOB_TRUNCATE (user_data);
-  AfpHandle *afp_handle = (AfpHandle *)job->handle;
 
   GError *err = NULL;
 
