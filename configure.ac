@@ -910,7 +910,7 @@ echo "
         hotplug backend:              $msg_hotplug_backend
 
 	Blu-ray metadata support:     $msg_bluray
-        FTP/HTTP/WebDAV support:      $msg_http
+        HTTP/WebDAV support:          $msg_http
         ObexFTP support               $msg_obexftp
 	Samba support:	              $msg_samba
 	FUSE support:                 $msg_fuse
