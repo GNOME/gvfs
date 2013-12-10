@@ -39,7 +39,6 @@ gvfs_gphoto2_volume_monitor_CFLAGS =		\
 	$(GPHOTO2_CFLAGS)			\
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
-	-DG_UDEV_API_IS_SUBJECT_TO_CHANGE	\
 	$(NULL)
 
 if USE_GUDEV

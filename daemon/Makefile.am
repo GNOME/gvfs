@@ -13,7 +13,6 @@ AM_CPPFLAGS =					\
 	$(GLIB_CFLAGS) 				\
 	$(OBEXFTP_CFLAGS) $(EXPAT_CFLAGS)	\
 	$(KEYRING_CFLAGS)			\
-	-DG_UDEV_API_IS_SUBJECT_TO_CHANGE	\
 	-DLIBEXEC_DIR=\"$(libexecdir)\" 	\
 	-DMOUNTABLE_DIR=\"$(mountdir)\" 	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"

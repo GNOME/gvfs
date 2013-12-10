@@ -312,7 +312,7 @@ dnl *** Check for gudev ***
 dnl **********************
 AC_ARG_ENABLE(gudev, AS_HELP_STRING([--disable-gudev],[build without gudev support]))
 msg_gudev=no
-GUDEV_REQUIRED=001
+GUDEV_REQUIRED=147
 
 if test "x$enable_gudev" != "xno"; then
   PKG_CHECK_EXISTS([gudev-1.0 >= $GUDEV_REQUIRED], msg_gudev=yes)

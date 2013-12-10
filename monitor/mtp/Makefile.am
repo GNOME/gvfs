@@ -18,7 +18,6 @@ gvfs_mtp_volume_monitor_CFLAGS =		\
 	$(GLIB_CFLAGS)                          \
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
-	-DG_UDEV_API_IS_SUBJECT_TO_CHANGE	\
 	$(NULL)
 
 gvfs_mtp_volume_monitor_CFLAGS += $(GUDEV_CFLAGS)
