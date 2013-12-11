@@ -991,6 +991,9 @@ ms_response_to_file_info (MsResponse *response,
   g_file_info_set_name (info, basename);
   g_file_info_set_edit_name (info, basename);
 
+  if (basename && basename[0] == '.')
+    g_file_info_set_is_hidden (info, TRUE);
+
   file_type = G_FILE_TYPE_REGULAR;
   mime_type = NULL;
 
