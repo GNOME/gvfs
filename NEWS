@@ -1,3 +1,22 @@
+Major changes in 1.19.3
+=======================
+* Truncate support for output streams in various backends
+* Convert libgvfscommon and libdaemon to a private shared library
+* dav: Set the is_hidden property for files starting with a '.'
+* http: Allow seek past end of file
+* http: Various fixes
+* afp: Don't free the handle if truncate fails
+* gphoto2: Don't release the device multiple times
+* smb: Require libsmbclient from Samba 3.4.0 or higher
+* dav: Report number of bytes used on the filesystem
+* gphoto2: Return the correct offset when seeking
+* mtp: fix segfault when device not found
+* mtp: Fail fast if in the middle of an unmount
+* sftp: Implement try_query_fs_info using the OpenSSH statvfs extension
+* sftp: Implement pull support
+* Several smaller bugfixes and cleanups
+* Translation updates
+
 Major changes in 1.19.2
 =======================
 * sftp: Implement GFileCreateFlags and improve permission handling
