@@ -23,6 +23,7 @@
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsjobseekread.h"
+#include "gvfsjobqueryinforead.h"
 #include "gvfsjobread.h"
 #include "gvfsdaemonutils.h"
 
@@ -310,6 +311,33 @@ trash_backend_seek_on_read (GVfsBackend       *backend,
   g_error_free (error);
 
   return TRUE;
+}
+
+static void
+trash_backend_query_info_on_read (GVfsBackend           *backend,
+                                  GVfsJobQueryInfoRead  *job,
+                                  GVfsBackendHandle      handle,
+                                  GFileInfo             *info,
+                                  GFileAttributeMatcher *matcher)
+{
+  GError *error = NULL;
+  GFileInfo *real_info;
+
+  real_info = g_file_input_stream_query_info (handle,
+                                              job->attributes,
+                                              G_VFS_JOB (job)->cancellable,
+                                              &error);
+  if (real_info)
+    {
+      g_file_info_copy_into (real_info, info);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+      g_object_unref (real_info);
+    }
+  else
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
 }
 
 static gboolean
@@ -871,6 +899,7 @@ g_vfs_backend_trash_class_init (GVfsBackendTrashClass *class)
   backend_class->try_open_for_read = trash_backend_open_for_read;
   backend_class->try_read = trash_backend_read;
   backend_class->try_seek_on_read = trash_backend_seek_on_read;
+  backend_class->query_info_on_read = trash_backend_query_info_on_read;
   backend_class->try_close_read = trash_backend_close_read;
   backend_class->try_query_info = trash_backend_query_info;
   backend_class->try_query_fs_info = trash_backend_query_fs_info;
