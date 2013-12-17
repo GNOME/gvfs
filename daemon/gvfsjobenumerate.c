@@ -117,16 +117,21 @@ create_enumerator_proxy (GVfsJobEnumerate *job)
 {
   GDBusConnection *connection;
   const gchar *sender;
+  GVfsDBusEnumerator *proxy;
 
   connection = g_dbus_method_invocation_get_connection (G_VFS_JOB_DBUS (job)->invocation);
   sender = g_dbus_method_invocation_get_sender (G_VFS_JOB_DBUS (job)->invocation);
 
-  return gvfs_dbus_enumerator_proxy_new_sync (connection,
-                                              G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
-                                              sender,
-                                              job->object_path,
-                                              NULL,
-                                              NULL);
+  proxy = gvfs_dbus_enumerator_proxy_new_sync (connection,
+                                               G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                                               sender,
+                                               job->object_path,
+                                               NULL,
+                                               NULL);
+  g_assert (proxy != NULL);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_MAXINT);
+
+  return proxy;
 }
 
 static void
@@ -151,7 +156,6 @@ send_infos (GVfsJobEnumerate *job)
   GVfsDBusEnumerator *proxy;
 
   proxy = create_enumerator_proxy (job);
-  g_assert (proxy != NULL);
   
   gvfs_dbus_enumerator_call_got_info (proxy,
                                       g_variant_builder_end (job->building_infos),
@@ -245,7 +249,6 @@ g_vfs_job_enumerate_done (GVfsJobEnumerate *job)
     send_infos (job);
 
   proxy = create_enumerator_proxy (job);
-  g_assert (proxy != NULL);
   
   gvfs_dbus_enumerator_call_done (proxy,
                                   NULL,
