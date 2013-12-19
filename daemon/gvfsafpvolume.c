@@ -460,14 +460,6 @@ g_vfs_afp_volume_open_fork (GVfsAfpVolume      *volume,
   g_return_if_fail (G_VFS_IS_AFP_VOLUME (volume));
 
   priv = volume->priv;
-  
-  if (is_root (filename))
-  {
-    g_simple_async_report_error_in_idle (G_OBJECT (volume), callback,
-                                         user_data, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                                         _("File is directory"));
-    return;
-  }
 
   comm = g_vfs_afp_command_new (AFP_COMMAND_OPEN_FORK);
   /* data fork */
