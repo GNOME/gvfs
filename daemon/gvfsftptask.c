@@ -276,6 +276,8 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
  * or frees it if it is in an error state. You must use this function to free
  * a @task's connection, never use g_vfs_ftp_connection_free() directly. If
  * the task does not have a current connection, this function just returns.
+ *
+ * This function also closes all potentially open data connections.
  **/
 static void
 g_vfs_ftp_task_release_connection (GVfsFtpTask *task)
@@ -285,6 +287,8 @@ g_vfs_ftp_task_release_connection (GVfsFtpTask *task)
   /* we allow task->conn == NULL to ease error cases */
   if (task->conn == NULL)
     return;
+
+  g_vfs_ftp_task_close_data_connection (task);
 
   g_mutex_lock (&task->backend->mutex);
   if (task->backend->queue && g_vfs_ftp_connection_is_usable (task->conn))
