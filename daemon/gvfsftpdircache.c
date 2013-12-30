@@ -717,7 +717,15 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
 
       tv.tv_sec = mktime (&result.fe_time);
       if (tv.tv_sec != -1)
-        g_file_info_set_modification_time (info, &tv);
+        {
+          char *etag = g_strdup_printf ("%ld", tv.tv_sec);
+          g_file_info_set_attribute_string (info,
+                                            G_FILE_ATTRIBUTE_ETAG_VALUE,
+                                            etag);
+          g_free (etag);
+
+          g_file_info_set_modification_time (info, &tv);
+        }
 
       g_vfs_ftp_dir_cache_entry_add (entry, file, info);
       g_free (line);
