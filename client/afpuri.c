@@ -63,13 +63,14 @@ afp_get_handled_schemes (GVfsUriMapper *mapper)
   return schemes;
 }
 
-static GVfsUriMountInfo *
-afp_from_uri (GVfsUriMapper *mapper,
-              const char *uri_str)
+static GMountSpec *
+afp_from_uri (GVfsUriMapper  *mapper,
+              const char     *uri_str,
+              char          **path)
 {
   const char *p;
   GDecodedUri *uri;
-  GVfsUriMountInfo *info;
+  GMountSpec *spec;
 
   uri = g_vfs_decode_uri (uri_str);
   if (uri == NULL)
@@ -90,15 +91,15 @@ afp_from_uri (GVfsUriMapper *mapper,
     if (p == NULL || *p == 0)
     {
       /* uri form: afp://$host/ */
-       info = g_vfs_uri_mount_info_new ("afp-server");
+       spec = g_mount_spec_new ("afp-server");
 
-       g_vfs_uri_mount_info_set (info, "host", uri->host);
-       info->path = g_strdup ("/");
+       g_mount_spec_set (spec, "host", uri->host);
+       *path = g_strdup ("/");
     }
     else
     {
       const char *volume, *volume_end;
-      
+
       volume = p;
       volume_end = strchr (volume, '/');
       if (volume_end == NULL)
@@ -116,62 +117,56 @@ afp_from_uri (GVfsUriMapper *mapper,
         if (volume[0] == '.' && volume[1] == '_')
         {
           char *tmp;
-          
-          info = g_vfs_uri_mount_info_new ("afp-server");
-          
-          g_vfs_uri_mount_info_set  (info, "host", uri->host);
-          
+
+          spec = g_mount_spec_new ("afp-server");
+          g_mount_spec_set (spec, "host", uri->host);
+
           tmp = g_strndup (volume + 2, volume_end - (volume + 2));
-          info->path = g_strconcat ("/", tmp, NULL);
+          *path = g_strconcat ("/", tmp, NULL);
           g_free (tmp);
         }
         else
         {
           char *tmp;
-          
-          info = g_vfs_uri_mount_info_new ("afp-volume");
 
-          g_vfs_uri_mount_info_set  (info, "host", uri->host);
+          spec = g_mount_spec_new ("afp-volume");
+          g_mount_spec_set (spec, "host", uri->host);
 
           tmp = g_strndup (volume, volume_end - volume);
-          g_vfs_uri_mount_info_set  (info, "volume", tmp);
-          g_free (tmp);
-          info->path = g_strdup ("/");
+          g_mount_spec_take (spec, "volume", tmp);
+
+          *path = g_strdup ("/");
         }
       }
       else
       {
         char *tmp;
-        
-        info = g_vfs_uri_mount_info_new ("afp-volume");
 
-        g_vfs_uri_mount_info_set  (info, "host", uri->host);
+        spec = g_mount_spec_new ("afp-volume");
+        g_mount_spec_set (spec, "host", uri->host);
 
         tmp = g_strndup (volume, volume_end - volume);
-        g_vfs_uri_mount_info_set  (info, "volume", tmp);
-        g_free (tmp);
+        g_mount_spec_take (spec, "volume", tmp);
 
-        info->path = g_strconcat ("/", p, NULL);
+        *path = g_strconcat ("/", p, NULL);
       }
     }
   }
 
   if (uri->userinfo)
-  {
-    g_vfs_uri_mount_info_set  (info, "user", uri->userinfo);
-  }
+    g_mount_spec_set (spec, "user", uri->userinfo);
 
   g_vfs_decoded_uri_free (uri);
-           
-  return info;
+
+  return spec;
 }
 
 static const char * const *
 afp_get_handled_mount_types (GVfsUriMapper *mapper)
 {
   static const char *types[] = {
-    "afp-server", 
-    "afp-volume", 
+    "afp-server",
+    "afp-volume",
     NULL
   };
   return types;
@@ -179,7 +174,8 @@ afp_get_handled_mount_types (GVfsUriMapper *mapper)
 
 static char *
 afp_to_uri (GVfsUriMapper *mapper,
-            GVfsUriMountInfo *info,
+            GMountSpec *spec,
+            const char *path,
             gboolean allow_utf8)
 {
   const char *type;
@@ -191,27 +187,27 @@ afp_to_uri (GVfsUriMapper *mapper,
 
   uri = g_new0 (GDecodedUri, 1);
 
-  type = g_vfs_uri_mount_info_get (info, "type");
+  type = g_mount_spec_get (spec, "type");
 
   uri->scheme = g_strdup ("afp");
 
-  host = g_vfs_uri_mount_info_get (info, "host");
+  host = g_mount_spec_get (spec, "host");
   uri->host = g_strdup (host);
 
-  port = g_vfs_uri_mount_info_get (info, "port");
+  port = g_mount_spec_get (spec, "port");
   if (port)
     uri->port = atoi (port);
   else
     uri->port = -1;
 
-  user = g_vfs_uri_mount_info_get (info, "user");
+  user = g_mount_spec_get (spec, "user");
   uri->userinfo = g_strdup (user);
 
   if (strcmp (type, "afp-server") == 0)
   {
     /* Map the mountables in server to ._share because the actual share mount maps to afp://host/share */
-     if (info->path && info->path[0] == '/' && info->path[1] != 0)
-     uri->path = g_strconcat ("/._", info->path + 1, NULL);
+     if (path && path[0] == '/' && path[1] != 0)
+     uri->path = g_strconcat ("/._", path + 1, NULL);
      else
      uri->path = g_strdup ("/");
   }
@@ -219,11 +215,11 @@ afp_to_uri (GVfsUriMapper *mapper,
   {
     const char *volume;
 
-    volume = g_vfs_uri_mount_info_get (info, "volume");
-    if (info->path[0] == '/')
-      uri->path = g_strconcat ("/", volume, info->path, NULL);
+    volume = g_mount_spec_get (spec, "volume");
+    if (path[0] == '/')
+      uri->path = g_strconcat ("/", volume, path, NULL);
     else
-      uri->path = g_strconcat ("/", volume, "/", info->path, NULL);
+      uri->path = g_strconcat ("/", volume, "/", path, NULL);
   }
 
   s = g_vfs_encode_uri (uri, allow_utf8);
@@ -233,9 +229,9 @@ afp_to_uri (GVfsUriMapper *mapper,
 
 static const char *
 afp_to_uri_scheme (GVfsUriMapper *mapper,
-                   GVfsUriMountInfo *info)
+                   GMountSpec *spec)
 {
-  const gchar *type = g_vfs_uri_mount_info_get (info, "type");
+  const gchar *type = g_mount_spec_get (spec, "type");
 
   if (strcmp ("afp-server", type) == 0 ||
       strcmp ("afp-volume", type) == 0)

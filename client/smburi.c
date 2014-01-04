@@ -76,28 +76,29 @@ smb_get_handled_schemes (GVfsUriMapper *mapper)
   return schemes;
 }
 
-static GVfsUriMountInfo *
+static GMountSpec *
 smb_from_uri (GVfsUriMapper *mapper,
-	      const char *uri_str)
+	      const char  *uri_str,
+              char       **path)
 {
   char *tmp;
   const char *p;
   const char *share, *share_end;
   GDecodedUri *uri;
-  GVfsUriMountInfo *info;
+  GMountSpec *spec;
 
   uri = g_vfs_decode_uri (uri_str);
   if (uri == NULL)
     return NULL;
-  
+
   if (uri->host == NULL || strlen (uri->host) == 0)
     {
       /* uri form: smb:/// or smb:///$path */
-      info = g_vfs_uri_mount_info_new ("smb-network");
+      spec = g_mount_spec_new ("smb-network");
       if (uri->path == NULL || *uri->path == 0)
-	info->path = g_strdup ("/");
+	*path = g_strdup ("/");
       else
-	info->path = g_strdup (uri->path);
+	*path = g_strdup (uri->path);
     }
   else
     {
@@ -105,15 +106,14 @@ smb_from_uri (GVfsUriMapper *mapper,
       p = uri->path;
       while (p && *p == '/')
 	p++;
-      
+
       if (p == NULL || *p == 0)
 	{
 	  /* uri form: smb://$host/ */
-	  info = g_vfs_uri_mount_info_new ("smb-server");
-	  tmp = normalize_smb_name (uri->host, -1);
-	  g_vfs_uri_mount_info_set (info, "server", tmp);
-	  g_free (tmp);
-	  info->path = g_strdup ("/");
+	  spec = g_mount_spec_new ("smb-server");
+          g_mount_spec_take (spec, "server", normalize_smb_name (uri->host, -1));
+
+	  *path = g_strdup ("/");
 	}
       else
 	{
@@ -121,51 +121,41 @@ smb_from_uri (GVfsUriMapper *mapper,
 	  share_end = strchr (share, '/');
 	  if (share_end == NULL)
 	    share_end = share + strlen (share);
-	  
+
 	  p = share_end;
-	  
+
 	  while (*p == '/')
 	    p++;
-	  
+
 	  if (*p == 0)
 	    {
 	      /* uri form: smb://$host/$share/
 	       * Here we special case smb-server files by adding "._" to the names in the uri */
 	      if (share[0] == '.' && share[1] == '_')
 		{
-		  info = g_vfs_uri_mount_info_new ("smb-server");
-		  tmp = normalize_smb_name (uri->host, -1);
-		  g_vfs_uri_mount_info_set  (info, "server", tmp);
-		  g_free (tmp);
+		  spec = g_mount_spec_new ("smb-server");
+                  g_mount_spec_take (spec, "server", normalize_smb_name (uri->host, -1));
+
 		  tmp = normalize_smb_name (share + 2, share_end - (share + 2));
-		  info->path = g_strconcat ("/", tmp, NULL);
+		  *path = g_strconcat ("/", tmp, NULL);
 		  g_free (tmp);
 		}
 	      else
 		{
-		  info = g_vfs_uri_mount_info_new ("smb-share");
-		  tmp = normalize_smb_name (uri->host, -1);
-		  g_vfs_uri_mount_info_set  (info, "server", tmp);
-		  g_free (tmp);
-		  tmp = normalize_smb_name (share, share_end - share);
-		  g_vfs_uri_mount_info_set  (info, "share", tmp);
-		  g_free (tmp);
-		  info->path = g_strdup ("/");
+		  spec = g_mount_spec_new ("smb-share");
+		  g_mount_spec_take (spec, "server", normalize_smb_name (uri->host, -1));
+                  g_mount_spec_take (spec, "share", normalize_smb_name (share, share_end - share));
+
+		  *path = g_strdup ("/");
 		}
 	    }
 	  else
 	    {
-	      info = g_vfs_uri_mount_info_new ("smb-share");
-	      
-	      tmp = normalize_smb_name (uri->host, -1);
-	      g_vfs_uri_mount_info_set  (info, "server", tmp);
-	      g_free (tmp);
-	      
-	      tmp = normalize_smb_name (share, share_end - share);
-	      g_vfs_uri_mount_info_set  (info, "share", tmp);
-	      g_free (tmp);
-	      
-	      info->path = g_strconcat ("/", p, NULL);
+	      spec = g_mount_spec_new ("smb-share");
+              g_mount_spec_take (spec, "server", normalize_smb_name (uri->host, -1));
+              g_mount_spec_take (spec, "share", normalize_smb_name (share, share_end - share));
+
+	      *path = g_strconcat ("/", p, NULL);
 	    }
 	}
 
@@ -173,11 +163,10 @@ smb_from_uri (GVfsUriMapper *mapper,
       if (uri->port != -1 && uri->port != DEFAULT_SMB_PORT)
 	{
 	  gchar *port = g_strdup_printf ("%d", uri->port);
-	  g_vfs_uri_mount_info_set (info, "port", port);
-	  g_free (port);
+	  g_mount_spec_take (spec, "port", port);
 	}
     }
-  
+
   if (uri->userinfo)
     {
       const char *user = uri->userinfo;
@@ -185,16 +174,16 @@ smb_from_uri (GVfsUriMapper *mapper,
       if (p)
 	{
 	  if (p != user)
-	    g_vfs_uri_mount_info_set_with_len  (info, "domain", user, p - user);
+	    g_mount_spec_set_with_len (spec, "domain", user, p - user);
 	  user = p + 1;
 	}
       if (*user != 0)
-	g_vfs_uri_mount_info_set  (info, "user", user);
+	g_mount_spec_set (spec, "user", user);
     }
 
   g_vfs_decoded_uri_free (uri);
-  
-  return info;
+
+  return spec;
 }
 
 static const char * const *
@@ -211,7 +200,8 @@ smb_get_handled_mount_types (GVfsUriMapper *mapper)
 
 static char *
 smb_to_uri (GVfsUriMapper *mapper,
-	    GVfsUriMountInfo *info,
+            GMountSpec *spec,
+            const char *path,
 	    gboolean allow_utf8)
 {
   const char *type;
@@ -226,45 +216,45 @@ smb_to_uri (GVfsUriMapper *mapper,
 
   uri = g_new0 (GDecodedUri, 1);
   
-  type = g_vfs_uri_mount_info_get (info, "type");
+  type = g_mount_spec_get (spec, "type");
 
   uri->scheme = g_strdup ("smb");
   
   if (strcmp (type, "smb-network") == 0)
     {
-      uri->path = g_strdup (info->path);
+      uri->path = g_strdup (path);
     }
   else if (strcmp (type, "smb-server") == 0)
     {
-      server = g_vfs_uri_mount_info_get (info, "server");
+      server = g_mount_spec_get (spec, "server");
       uri->host = g_strdup (server);
 
       /* Map the mountables in server to ._share because the actual share mount maps to smb://server/share */
-      if (info->path && info->path[0] == '/' && info->path[1] != 0)
-	uri->path = g_strconcat ("/._", info->path + 1, NULL);
+      if (path && path[0] == '/' && path[1] != 0)
+	uri->path = g_strconcat ("/._", path + 1, NULL);
       else
 	uri->path = g_strdup ("/");
-      port = g_vfs_uri_mount_info_get (info, "port");
+      port = g_mount_spec_get (spec, "port");
     }
   else if (strcmp (type, "smb-share") == 0)
     {
-      server = g_vfs_uri_mount_info_get (info, "server");
+      server = g_mount_spec_get (spec, "server");
       uri->host = g_strdup (server);
-      share = g_vfs_uri_mount_info_get (info, "share");
-      if (info->path[0] == '/')
-	uri->path = g_strconcat ("/", share, info->path, NULL);
+      share = g_mount_spec_get (spec, "share");
+      if (path[0] == '/')
+	uri->path = g_strconcat ("/", share, path, NULL);
       else
-	uri->path = g_strconcat ("/", share, "/", info->path, NULL);
-	
-      user = g_vfs_uri_mount_info_get (info, "user");
-      domain = g_vfs_uri_mount_info_get (info, "domain");
+	uri->path = g_strconcat ("/", share, "/", path, NULL);
+
+      user = g_mount_spec_get (spec, "user");
+      domain = g_mount_spec_get (spec, "domain");
       if (user) {
         if (domain)
           uri->userinfo = g_strconcat (domain, ";", user, NULL);
         else
           uri->userinfo = g_strdup (user);
       }
-      port = g_vfs_uri_mount_info_get (info, "port");
+      port = g_mount_spec_get (spec, "port");
     }
 
   if (port && (port_num = atoi (port)))
@@ -279,10 +269,10 @@ smb_to_uri (GVfsUriMapper *mapper,
 
 static const char *
 smb_to_uri_scheme (GVfsUriMapper *mapper,
-                   GVfsUriMountInfo *info)
+                   GMountSpec    *spec)
 {
-  const gchar *type = g_vfs_uri_mount_info_get (info, "type");
-  
+  const gchar *type = g_mount_spec_get (spec, "type");
+
   if (strcmp ("smb-network", type) == 0 ||
       strcmp ("smb-server", type) == 0 ||
       strcmp ("smb-share", type) == 0)
@@ -300,7 +290,7 @@ static void
 g_vfs_uri_mapper_smb_class_init (GVfsUriMapperSmbClass *class)
 {
   GVfsUriMapperClass *mapper_class;
-  
+
   mapper_class = G_VFS_URI_MAPPER_CLASS (class);
   mapper_class->get_handled_schemes = smb_get_handled_schemes;
   mapper_class->from_uri = smb_from_uri;

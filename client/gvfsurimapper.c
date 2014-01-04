@@ -33,106 +33,6 @@ g_vfs_uri_mapper_register (GIOModule *module)
   g_vfs_uri_mapper_register_type (G_TYPE_MODULE (module));
 }
 
-GVfsUriMountInfo *
-g_vfs_uri_mount_info_new (const char *type)
-{
-  GVfsUriMountInfo *info;
-
-  info = g_new0 (GVfsUriMountInfo, 1);
-  info->keys = g_array_new (TRUE, TRUE, sizeof (GVfsUriMountInfoKey));
-
-  if (type != NULL)
-    g_vfs_uri_mount_info_set (info, "type", type);
-  
-  return info;
-}
-
-void
-g_vfs_uri_mount_info_free (GVfsUriMountInfo *info)
-{
-  int i;
-  GVfsUriMountInfoKey *key;
-    
-  for (i = 0; i < info->keys->len; i++) {
-    key = &g_array_index (info->keys, GVfsUriMountInfoKey, i);
-
-    g_free (key->key);
-    g_free (key->value);
-  }
-  g_array_free (info->keys, TRUE);  
-  g_free (info->path);
-  g_free (info);
-}
-
-static GVfsUriMountInfoKey *
-lookup_key (GVfsUriMountInfo *info,
-	    const char *key)
-{
-  int i;
-  GVfsUriMountInfoKey *keyp;
-    
-  for (i = 0; i < info->keys->len; i++) {
-    keyp = &g_array_index (info->keys, GVfsUriMountInfoKey, i);
-    
-    if (strcmp (keyp->key, key) == 0)
-      return keyp;
-  }
-
-  return NULL;
-}
-  
-const char *
-g_vfs_uri_mount_info_get (GVfsUriMountInfo *info,
-			  const char       *key)
-{
-  GVfsUriMountInfoKey *keyp;
-
-  keyp = lookup_key (info, key);
-
-  if (keyp)
-    return keyp->value;
-  
-  return NULL;
-}
-
-void 
-g_vfs_uri_mount_info_set_with_len (GVfsUriMountInfo *info,
-				   const char *key,
-				   const char *value,
-				   int value_len)
-{
-  GVfsUriMountInfoKey *keyp;
-  GVfsUriMountInfoKey keyv;
-  char *value_copy;
-
-  if (value_len == -1)
-    value_copy = g_strdup (value);
-  else
-    value_copy = g_strndup (value, value_len);
-  
-  keyp = lookup_key (info, key);
-  if (keyp)
-    {
-      g_free (keyp->value);
-      keyp->value = value_copy;
-    }
-  else
-    {
-      keyv.key = g_strdup (key);
-      keyv.value = value_copy;
-      g_array_append_val (info->keys, keyv);
-    }
-}
-
-void
-g_vfs_uri_mount_info_set (GVfsUriMountInfo *info,
-			  const char *key,
-			  const char *value)
-{
-  g_vfs_uri_mount_info_set_with_len (info, key, value, -1);
-}
-
-
 static void
 g_vfs_uri_mapper_class_finalize (GVfsUriMapperClass *klass)
 {
@@ -158,29 +58,30 @@ g_vfs_uri_mapper_get_handled_schemes (GVfsUriMapper  *mapper)
   return (* class->get_handled_schemes) (mapper);
 }
 
-  
-GVfsUriMountInfo *
+GMountSpec *
 g_vfs_uri_mapper_from_uri (GVfsUriMapper  *mapper,
-			   const char     *uri)
+			   const char     *uri,
+                           char          **path)
 {
   GVfsUriMapperClass *class;
 
   class = G_VFS_URI_MAPPER_GET_CLASS (mapper);
 
-  return (* class->from_uri) (mapper, uri);
+  return (* class->from_uri) (mapper, uri, path);
 }
 
-GVfsUriMountInfo *
-g_vfs_uri_mapper_get_mount_info_for_path (GVfsUriMapper    *mapper,
-					  GVfsUriMountInfo *info,
+GMountSpec *
+g_vfs_uri_mapper_get_mount_spec_for_path (GVfsUriMapper    *mapper,
+					  GMountSpec       *spec,
+                                          const char       *old_path,
 					  const char       *new_path)
 {
   GVfsUriMapperClass *class;
 
   class = G_VFS_URI_MAPPER_GET_CLASS (mapper);
 
-  if (class->get_mount_info_for_path != NULL)
-    return (* class->get_mount_info_for_path) (mapper, info, new_path);
+  if (class->get_mount_spec_for_path != NULL)
+    return (* class->get_mount_spec_for_path) (mapper, spec, old_path, new_path);
   else
     return NULL;
 }
@@ -197,24 +98,24 @@ g_vfs_uri_mapper_get_handled_mount_types (GVfsUriMapper  *mapper)
 
 char *
 g_vfs_uri_mapper_to_uri (GVfsUriMapper *mapper,
-			 GVfsUriMountInfo *mount_info,
+			 GMountSpec *mount_spec,
+                         const char *path,
 			 gboolean allow_utf8)
 {
   GVfsUriMapperClass *class;
   
   class = G_VFS_URI_MAPPER_GET_CLASS (mapper);
   
-  return (* class->to_uri) (mapper, mount_info, allow_utf8);
+  return (* class->to_uri) (mapper, mount_spec, path, allow_utf8);
 }
 
 const char *
-g_vfs_uri_mapper_to_uri_scheme (GVfsUriMapper  *mapper,
-                                GVfsUriMountInfo *mount_info)
+g_vfs_uri_mapper_to_uri_scheme (GVfsUriMapper *mapper,
+                                GMountSpec    *mount_spec)
 {
   GVfsUriMapperClass *class;
-  
+
   class = G_VFS_URI_MAPPER_GET_CLASS (mapper);
-  
-  return (* class->to_uri_scheme) (mapper, mount_info);
+
+  return (* class->to_uri_scheme) (mapper, mount_spec);
 }
-						       

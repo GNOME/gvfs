@@ -131,12 +131,12 @@ add_item (GMountSpec *spec,
   g_array_append_val (spec->items, item);
 }
 
-
-void 
-g_mount_spec_set_with_len (GMountSpec *spec,
-			   const char *key,
-			   const char *value,
-			   int value_len)
+static void 
+g_mount_spec_set_with_len_internal (GMountSpec *spec,
+                                    const char *key,
+                                    const char *value,
+                                    int value_len,
+                                    gboolean copy)
 {
   int i;
   char *value_copy;
@@ -144,10 +144,15 @@ g_mount_spec_set_with_len (GMountSpec *spec,
   g_return_if_fail (key != NULL);
   g_return_if_fail (value != NULL);
 
-  if (value_len == -1)
-    value_copy = g_strdup (value);
+  if (copy)
+    {
+      if (value_len == -1)
+        value_copy = g_strdup (value);
+      else
+        value_copy = g_strndup (value, value_len);
+    }
   else
-    value_copy = g_strndup (value, value_len);
+    value_copy = (char*) value;
 
   for (i = 0; i < spec->items->len; i++)
     {
@@ -165,6 +170,15 @@ g_mount_spec_set_with_len (GMountSpec *spec,
 }
 
 void 
+g_mount_spec_set_with_len (GMountSpec *spec,
+                           const char *key,
+                           const char *value,
+                           int value_len)
+{
+  g_mount_spec_set_with_len_internal (spec, key, value, value_len, TRUE);
+}
+
+void 
 g_mount_spec_set (GMountSpec *spec,
 		  const char *key,
 		  const char *value)
@@ -172,6 +186,13 @@ g_mount_spec_set (GMountSpec *spec,
   g_mount_spec_set_with_len (spec, key, value, -1);
 }
 
+void
+g_mount_spec_take (GMountSpec *spec,
+                   const char *key,
+                   char *value)
+{
+  g_mount_spec_set_with_len_internal (spec, key, value, -1, FALSE);
+}
 
 GMountSpec *
 g_mount_spec_copy (GMountSpec *spec)

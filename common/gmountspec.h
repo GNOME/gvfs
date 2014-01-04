@@ -56,6 +56,9 @@ void        g_mount_spec_set_mount_prefix  (GMountSpec      *spec,
 void        g_mount_spec_set               (GMountSpec      *spec,
 					    const char      *key,
 					    const char      *value);
+void        g_mount_spec_take              (GMountSpec      *spec,
+                                            const char      *key,
+                                            char            *value);
 void        g_mount_spec_set_with_len      (GMountSpec      *spec,
 					    const char      *key,
 					    const char      *value,

@@ -180,8 +180,7 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
   char *path;
   GVfsUriMapper *mapper;
   char *scheme;
-  GVfsUriMountInfo *info;
-  
+
   scheme = g_uri_parse_scheme (uri);
   if (scheme == NULL)
     return FALSE;
@@ -189,24 +188,15 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
   /* convert the scheme to lower case since g_uri_parse_scheme
    * doesn't do that and we compare with g_str_equal */
   str_tolower_inplace (scheme);
-  
+
   spec = NULL;
   path = NULL;
-  
+
   mapper = g_hash_table_lookup (vfs->from_uri_hash, scheme);
-  
+
   if (mapper)
-    {
-      info = g_vfs_uri_mapper_from_uri (mapper, uri);
-      if (info != NULL)
-	{
-	  spec = g_mount_spec_new_from_data (info->keys, NULL);
-	  path = info->path;
-	  /* We took over ownership of info parts, custom free: */
-	  g_free (info);
-	}
-    }
-  
+    spec = g_vfs_uri_mapper_from_uri (mapper, uri, &path);
+
   if (spec == NULL)
     {
       GDecodedUri *decoded;
@@ -449,19 +439,7 @@ _g_daemon_vfs_get_mount_spec_for_path (GMountSpec *spec,
   new_spec = NULL;
   mapper = g_hash_table_lookup (the_vfs->to_uri_hash, type);
   if (mapper)
-    {
-      GVfsUriMountInfo info, *new_info;
-      info.keys = spec->items;
-      info.path = (char *)path;
-      new_info = g_vfs_uri_mapper_get_mount_info_for_path (mapper, &info, new_path);
-      if (new_info != NULL)
-	{
-	  new_spec = g_mount_spec_new_from_data (new_info->keys, NULL);
-	  /* We took over ownership of parts of new_info, custom free: */
-	  g_free (new_info->path);
-	  g_free (new_info);
-	}
-    }
+    new_spec = g_vfs_uri_mapper_get_mount_spec_for_path (mapper, spec, path, new_path);
 
   if (new_spec == NULL)
     new_spec = g_mount_spec_ref (spec);
@@ -494,12 +472,7 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
   uri = NULL;
   mapper = g_hash_table_lookup (the_vfs->to_uri_hash, type);
   if (mapper)
-    {
-      GVfsUriMountInfo info;
-      info.keys = spec->items;
-      info.path = path;
-      uri = g_vfs_uri_mapper_to_uri (mapper, &info, allow_utf8);
-    }
+    uri = g_vfs_uri_mapper_to_uri (mapper, spec, path, allow_utf8);
 
   if (uri == NULL)
     {
@@ -559,15 +532,8 @@ _g_daemon_vfs_mountspec_get_uri_scheme (GMountSpec *spec)
 
   scheme = NULL;
   if (mapper)
-    {
-      GVfsUriMountInfo info;
-      
-      info.keys = spec->items;
-      info.path = "/";
-      
-      scheme = g_vfs_uri_mapper_to_uri_scheme (mapper, &info);
-    }
-  
+    scheme = g_vfs_uri_mapper_to_uri_scheme (mapper, spec);
+
   if (scheme == NULL)
     {
       mountable = get_mountable_info_for_type (the_vfs, type);
@@ -576,7 +542,7 @@ _g_daemon_vfs_mountspec_get_uri_scheme (GMountSpec *spec)
       else
 	scheme = type;
     }
-  
+
   return scheme;
 }
 

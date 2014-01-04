@@ -74,11 +74,12 @@ port_is_default_port (int port, gboolean ssl)
     return port == 80;
 }
 
-static GVfsUriMountInfo *
-http_from_uri (GVfsUriMapper *mapper,
-               const char     *uri_str)
+static GMountSpec *
+http_from_uri (GVfsUriMapper  *mapper,
+               const char     *uri_str,
+               char          **path)
 {
-  GVfsUriMountInfo *info;
+  GMountSpec *spec;
   gboolean ssl;
   GDecodedUri *uri;
 
@@ -89,54 +90,55 @@ http_from_uri (GVfsUriMapper *mapper,
 
   if (!g_ascii_strncasecmp (uri->scheme, "http", 4))
     {
-      info = g_vfs_uri_mount_info_new ("http");
-      g_vfs_uri_mount_info_set (info, "uri", uri_str);
+      spec = g_mount_spec_new ("http");
+      g_mount_spec_set (spec, "uri", uri_str);
     }
   else
     {
-      info = g_vfs_uri_mount_info_new ("dav");
+      spec = g_mount_spec_new ("dav");
       ssl = !g_ascii_strcasecmp (uri->scheme, "davs");
-      g_vfs_uri_mount_info_set (info, "ssl", ssl ? "true" : "false");
+      g_mount_spec_set (spec, "ssl", ssl ? "true" : "false");
 
       if (uri->host && *uri->host)
-        g_vfs_uri_mount_info_set (info, "host", uri->host);
+        g_mount_spec_set (spec, "host", uri->host);
 
       if (uri->userinfo && *uri->userinfo)
-        g_vfs_uri_mount_info_set (info, "user", uri->userinfo);
+        g_mount_spec_set (spec, "user", uri->userinfo);
 
       /* only set the port if it isn't the default port */
       if (uri->port != -1 && ! port_is_default_port (uri->port, ssl))
         {
           char *port = g_strdup_printf ("%d", uri->port);
-          g_vfs_uri_mount_info_set (info, "port", port);
+          g_mount_spec_set (spec, "port", port);
           g_free (port);
         }
     }
 
-  info->path = uri->path;
+  *path = uri->path;
   uri->path = NULL;
   g_vfs_decoded_uri_free (uri);
 
-  return info;
+  return spec;
 }
 
-static GVfsUriMountInfo *
-http_get_mount_info_for_path (GVfsUriMapper *mapper,
-			      GVfsUriMountInfo *info,
+static GMountSpec *
+http_get_mount_spec_for_path (GVfsUriMapper *mapper,
+			      GMountSpec *spec,
+                              const char *old_path,
 			      const char *new_path)
 {
   const char *type;
 
-  type = g_vfs_uri_mount_info_get (info, "type");
+  type = g_mount_spec_get (spec, "type");
 
   if (strcmp (type, "http") == 0)
     {
       const char *uri_str;
       char *new_uri;
       GDecodedUri *uri;
-      GVfsUriMountInfo *new_info;
+      GMountSpec *new_spec;
 
-      uri_str = g_vfs_uri_mount_info_get (info, "uri");
+      uri_str = g_mount_spec_get (spec, "uri");
 
       uri = g_vfs_decode_uri (uri_str);
 
@@ -158,15 +160,15 @@ http_get_mount_info_for_path (GVfsUriMapper *mapper,
       g_free (uri->fragment);
       uri->fragment = NULL;
 
-      new_info = g_vfs_uri_mount_info_new ("http");
+      new_spec = g_mount_spec_new ("http");
 
       new_uri = g_vfs_encode_uri (uri, TRUE);
-      g_vfs_uri_mount_info_set (new_info, "uri", new_uri);
+      g_mount_spec_set (new_spec, "uri", new_uri);
       g_free (new_uri);
 
       g_vfs_decoded_uri_free (uri);
 
-      return new_info;
+      return new_spec;
     }
   else
     return NULL;
@@ -184,9 +186,10 @@ http_get_handled_mount_types (GVfsUriMapper *mapper)
 }
 
 static char *
-http_to_uri (GVfsUriMapper    *mapper,
-             GVfsUriMountInfo *info,
-             gboolean          allow_utf8)
+http_to_uri (GVfsUriMapper *mapper,
+             GMountSpec    *spec,
+             const char    *path,
+             gboolean       allow_utf8)
 {
   char       *res;
   const char *type;
@@ -195,11 +198,11 @@ http_to_uri (GVfsUriMapper    *mapper,
   const char *port;
   const char *ssl;
 
-  type = g_vfs_uri_mount_info_get (info, "type");
+  type = g_mount_spec_get (spec, "type");
 
   if (strcmp (type, "http") == 0)
     {
-      res = g_strdup (g_vfs_uri_mount_info_get (info, "uri"));
+      res = g_strdup (g_mount_spec_get (spec, "uri"));
     }
   else
     {
@@ -208,10 +211,10 @@ http_to_uri (GVfsUriMapper    *mapper,
 
       decoded_uri = g_new0 (GDecodedUri, 1);
 
-      ssl  = g_vfs_uri_mount_info_get (info, "ssl");
-      host = g_vfs_uri_mount_info_get (info, "host");
-      user = g_vfs_uri_mount_info_get (info, "user");
-      port = g_vfs_uri_mount_info_get (info, "port");
+      ssl  = g_mount_spec_get (spec, "ssl");
+      host = g_mount_spec_get (spec, "host");
+      user = g_mount_spec_get (spec, "user");
+      port = g_mount_spec_get (spec, "port");
 
       if (ssl && strcmp (ssl, "true") == 0)
           decoded_uri->scheme = g_strdup ("davs");
@@ -220,13 +223,13 @@ http_to_uri (GVfsUriMapper    *mapper,
 
       decoded_uri->host = g_strdup (host);
       decoded_uri->userinfo = g_strdup (user);
-      
+
       if (port && (port_num = atoi (port)))
           decoded_uri->port = port_num;
       else
           decoded_uri->port = -1;
 
-      decoded_uri->path = g_strdup (info->path);
+      decoded_uri->path = g_strdup (path);
 
       res = g_vfs_encode_uri (decoded_uri, allow_utf8);
       g_vfs_decoded_uri_free (decoded_uri);
@@ -236,28 +239,28 @@ http_to_uri (GVfsUriMapper    *mapper,
 }
 
 static const char *
-http_to_uri_scheme (GVfsUriMapper    *mapper,
-                    GVfsUriMountInfo *info)
+http_to_uri_scheme (GVfsUriMapper *mapper,
+                    GMountSpec    *spec)
 {
   const gchar *ssl;
   const gchar *type;
   gboolean     is_dav;
   gboolean     is_ssl;
 
-  ssl = g_vfs_uri_mount_info_get (info, "ssl");
-  type = g_vfs_uri_mount_info_get (info, "type");
-  
+  ssl = g_mount_spec_get (spec, "ssl");
+  type = g_mount_spec_get (spec, "type");
+
   if (strcmp (type, "dav") == 0)
      is_dav = TRUE;
   else if (strcmp (type, "http") == 0)
      is_dav = FALSE;
   else
-     return NULL; 
+     return NULL;
 
   is_ssl =
     ssl != NULL &&
     strcmp (ssl, "true") == 0;
-  
+
   if (is_dav && is_ssl)
     return "davs";
   else if (is_dav && !is_ssl)
@@ -277,11 +280,11 @@ static void
 g_vfs_uri_mapper_http_class_init (GVfsUriMapperHttpClass *class)
 {
   GVfsUriMapperClass *mapper_class;
-  
+
   mapper_class = G_VFS_URI_MAPPER_CLASS (class);
   mapper_class->get_handled_schemes     = http_get_handled_schemes;
   mapper_class->from_uri                = http_from_uri;
-  mapper_class->get_mount_info_for_path = http_get_mount_info_for_path;
+  mapper_class->get_mount_spec_for_path = http_get_mount_spec_for_path;
   mapper_class->get_handled_mount_types = http_get_handled_mount_types;
   mapper_class->to_uri                  = http_to_uri;
   mapper_class->to_uri_scheme           = http_to_uri_scheme;
