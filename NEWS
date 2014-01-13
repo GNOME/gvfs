@@ -1,3 +1,11 @@
+Major changes in 1.19.4
+=======================
+* dav: Implement truncate for output streams
+* dav: Implement seek for output streams
+* gphoto2: Implement pull support
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.19.3
 =======================
 * Truncate support for output streams in various backends
