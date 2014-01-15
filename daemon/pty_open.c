@@ -78,6 +78,14 @@
 #undef HAVE_UNIX98_PTY
 #endif
 
+/*
+ * force openpty(3) on BSD
+ * https://bugzilla.gnome.org/show_bug.cgi?id=722001
+ */
+#if defined(__FreeBSD__) || defined(__OpenBSD__)
+#undef HAVE_UNIX98_PTY
+#endif
+
 int _pty_set_size(int master, int columns, int rows);
 
 /* Solaris does not have the login_tty() function so implement locally. */
