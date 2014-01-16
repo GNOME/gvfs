@@ -87,6 +87,6 @@ EXTRA_DIST = \
 	files/ssh_host_rsa_key files	\
 	files/ssh_host_rsa_key.pub	\
 	files/testcert.pem		\
-	files/powershot.ioctl.xz	\
+	files/powershot.ioctl		\
 	files/powershot.umockdev	\
 	$(NULL)
