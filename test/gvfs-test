@@ -1687,7 +1687,7 @@ class GPhoto(GvfsTestCase):
         with open(os.path.join(my_dir, 'files', 'powershot.umockdev')) as f:
             umockdev_testbed.add_from_string(f.read())
         umockdev_testbed.load_ioctl('/dev/bus/usb/001/015',
-                                    os.path.join(my_dir, 'files', 'powershot.ioctl.xz'))
+                                    os.path.join(my_dir, 'files', 'powershot.ioctl'))
 
         # signal our monitor about the addition
         #umockdev_testbed.uevent('/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.5/1-1.5.2/1-1.5.2.3', 'add');
