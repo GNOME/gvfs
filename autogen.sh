@@ -119,7 +119,7 @@ autoconf || exit $?
 cd $ORIGDIR || exit $?
 
 if test -z "$AUTOGEN_SUBDIR_MODE" && test -z "$NOCONFIGURE"; then
-        $srcdir/configure --enable-maintainer-mode $AUTOGEN_CONFIGURE_ARGS "$@" || exit $?
+        $srcdir/configure $AUTOGEN_CONFIGURE_ARGS "$@" || exit $?
 
         echo 
         echo "Now type 'make' to compile $PROJECT."
