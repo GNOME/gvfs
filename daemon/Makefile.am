@@ -4,7 +4,7 @@ NULL =
 
 mountdir = $(datadir)/gvfs/mounts
 
-INCLUDES =					\
+AM_CPPFLAGS =					\
 	$(SAMBA_CFLAGS)                         \
 	-I$(top_srcdir)				\
 	-I$(top_srcdir)/common			\

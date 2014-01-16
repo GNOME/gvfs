@@ -3,7 +3,7 @@ NULL =
 pkglib_LTLIBRARIES=libgvfscommon.la
 noinst_LTLIBRARIES = libgvfscommon-monitor.la
 
-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
+AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-I$(top_srcdir)/daemon \
 	$(GLIB_CFLAGS) $(BLURAY_CFLAGS) \
 	-DG_LOG_DOMAIN=\"GVFS\"

@@ -1,6 +1,6 @@
 NULL =
 
-INCLUDES = -I$(top_srcdir) \
+AM_CPPFLAGS = -I$(top_srcdir) \
 	-I$(top_srcdir)/client \
 	-I$(top_srcdir)/metadata \
 	-I$(top_builddir)/metadata \
@@ -59,7 +59,7 @@ noinst_PROGRAMS = test-uri-utils
 
 test_uri_utils_SOURCES = test-uri-utils.c gvfsuriutils.c gvfsuriutils.h
 test_uri_utils_LDADD = $(vfslibs)
-test_uri_utils_CFLAGS = $(INCLUDES)
+test_uri_utils_CFLAGS = $(AM_CPPFLAGS)
 
 if USE_FUSE
 

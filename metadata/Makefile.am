@@ -30,7 +30,7 @@ libexec_PROGRAMS =\
 	gvfsd-metadata	\
 	$(NULL)
 
-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/common \
+AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/common \
 	$(LIBXML_CFLAGS) $(GLIB_CFLAGS) \
 	$(UDEV_CFLAGS) \
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"     \
