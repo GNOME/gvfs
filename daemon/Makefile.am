@@ -25,6 +25,8 @@ libraries =						\
 	$(top_builddir)/common/libgvfscommon.la		\
 	$(GLIB_LIBS) $(KEYRING_LIBS)
 
+flags = $(AM_CPPFLAGS)
+
 gvfs_gschemas =
 gvfs_gschemas_convert =
 
@@ -215,6 +217,7 @@ gvfsd_test_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_test_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendtest.h \
 	-DDEFAULT_BACKEND_TYPE=test \
 	-DBACKEND_TYPES='"test", G_VFS_TYPE_BACKEND_TEST,'
@@ -227,6 +230,7 @@ gvfsd_localtest_SOURCES = \
 	daemon-main-generic.c
 
 gvfsd_localtest_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendlocaltest.h \
 	-DDEFAULT_BACKEND_TYPE=localtest \
 	-DBACKEND_TYPES='"localtest", G_VFS_TYPE_BACKEND_LOCALTEST,'
@@ -239,6 +243,7 @@ gvfsd_smb_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_smb_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendsmb.h \
 	-DDEFAULT_BACKEND_TYPE=smb-share \
 	-DMAX_JOB_THREADS=1 \
@@ -252,6 +257,7 @@ gvfsd_smb_browse_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_smb_browse_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendsmbbrowse.h \
 	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint.smb_browse \
 	-DMAX_JOB_THREADS=1 \
@@ -268,6 +274,7 @@ gvfsd_obexftp_SOURCES = \
 	daemon-main-generic.c
 
 gvfsd_obexftp_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendobexftp.h \
 	-DDEFAULT_BACKEND_TYPE=obex \
 	-DMAX_JOB_THREADS=1 \
@@ -292,6 +299,7 @@ gvfsd_ftp_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_ftp_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendftp.h \
 	-DDEFAULT_BACKEND_TYPE=ftp \
 	-DMAX_JOB_THREADS=10 \
@@ -307,6 +315,7 @@ gvfsd_sftp_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_sftp_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendsftp.h \
 	-DDEFAULT_BACKEND_TYPE=sftp \
 	-DMAX_JOB_THREADS=1 \
@@ -321,6 +330,7 @@ gvfsd_trash_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_trash_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendtrash.h \
 	-DDEFAULT_BACKEND_TYPE=trash \
 	-DMAX_JOB_THREADS=10 \
@@ -335,6 +345,7 @@ gvfsd_recent_SOURCES = \
 	daemon-main-generic.c
 
 gvfsd_recent_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendrecent.h \
 	-DDEFAULT_BACKEND_TYPE=recent \
 	-DMAX_JOB_THREADS=10 \
@@ -350,6 +361,7 @@ gvfsd_computer_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_computer_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendcomputer.h \
 	-DDEFAULT_BACKEND_TYPE=computer \
 	-DMAX_JOB_THREADS=1 \
@@ -364,6 +376,7 @@ gvfsd_network_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_network_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendnetwork.h \
 	-DDEFAULT_BACKEND_TYPE=network \
 	-DMAX_JOB_THREADS=1 \
@@ -378,6 +391,7 @@ gvfsd_dnssd_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_dnssd_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackenddnssd.h \
 	-DDEFAULT_BACKEND_TYPE=dns-sd \
 	-DMAX_JOB_THREADS=1 \
@@ -393,6 +407,7 @@ gvfsd_archive_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_archive_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendarchive.h \
 	-DDEFAULT_BACKEND_TYPE=archive \
 	-DMAX_JOB_THREADS=1 \
@@ -408,6 +423,7 @@ gvfsd_burn_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_burn_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendburn.h \
 	-DDEFAULT_BACKEND_TYPE=burn \
 	-DMAX_JOB_THREADS=1 \
@@ -421,6 +437,7 @@ gvfsd_cdda_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_cdda_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendcdda.h \
 	-DDEFAULT_BACKEND_TYPE=cdda \
 	-DMAX_JOB_THREADS=1 \
@@ -444,6 +461,7 @@ gvfsd_gphoto2_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_gphoto2_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendgphoto2.h \
 	-DDEFAULT_BACKEND_TYPE=gphoto2 \
 	-DMAX_JOB_THREADS=1 \
@@ -467,6 +485,7 @@ gvfsd_mtp_SOURCES = \
 	daemon-main-generic.c
 
 gvfsd_mtp_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendmtp.h \
 	-DDEFAULT_BACKEND_TYPE=mtp \
 	-DBACKEND_TYPES='"mtp", G_VFS_TYPE_BACKEND_MTP,' \
@@ -481,6 +500,7 @@ gvfsd_http_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_http_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendhttp.h \
 	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint.http \
 	-DDEFAULT_BACKEND_TYPE=http \
@@ -498,6 +518,7 @@ gvfsd_dav_SOURCES = \
 	daemon-main-generic.c 
 
 gvfsd_dav_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackenddav.h \
 	-DDEFAULT_BACKEND_TYPE=dav \
 	-DMAX_JOB_THREADS=1 \
@@ -520,6 +541,7 @@ gvfsd_afc_SOURCES = \
 	daemon-main-generic.c
 
 gvfsd_afc_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendafc.h \
 	-DDEFAULT_BACKEND_TYPE=afc \
 	-DMAX_JOB_THREADS=1 \
@@ -545,6 +567,7 @@ gvfsd_afp_browse_SOURCES = \
 	gvfsafpvolume.c
 
 gvfsd_afp_browse_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendafpbrowse.h \
 	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"afp-server", G_VFS_TYPE_BACKEND_AFP_BROWSE,' \
@@ -568,6 +591,7 @@ gvfsd_afp_SOURCES = \
 	gvfsafpvolume.c
 
 gvfsd_afp_CPPFLAGS = \
+	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendafp.h \
 	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"afp-volume", G_VFS_TYPE_BACKEND_AFP,' \
