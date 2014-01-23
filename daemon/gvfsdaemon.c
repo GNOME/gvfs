@@ -598,12 +598,18 @@ static void
 new_connection_data_free (void *memory)
 {
   NewConnectionData *data = memory;
+  gchar *socket;
   
   /* Remove the socket and dir after connected */
-  if (data->socket_dir) 
-    rmdir (data->socket_dir);
+  if (data->socket_dir)
+    {
+      socket = g_strdup_printf ("%s/socket", data->socket_dir);
+      g_unlink (socket);
+      g_free (socket);
+      rmdir (data->socket_dir);
+      g_free (data->socket_dir);
+    }
 
-  g_free (data->socket_dir);
   g_free (data);
 }
 
@@ -900,13 +906,8 @@ handle_get_connection (GVfsDBusDaemon *object,
   return TRUE;
 
  error_out:
-  g_free (data);
+  new_connection_data_free (data);
   g_free (address1);
-  if (socket_dir)
-    {
-      rmdir (socket_dir);
-      g_free (socket_dir);
-    }
   return TRUE;
 }
 
