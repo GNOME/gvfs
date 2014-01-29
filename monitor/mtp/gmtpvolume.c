@@ -46,6 +46,7 @@ struct _GMtpVolume {
 
   char *name;
   char *icon;
+  char *symbolic_icon;
 };
 
 static void g_mtp_volume_volume_iface_init (GVolumeIface *iface);
@@ -188,6 +189,17 @@ set_volume_icon (GMtpVolume *volume)
     volume->icon = g_strdup ("camera-photo");
 }
 
+static void
+set_volume_symbolic_icon (GMtpVolume *volume)
+{
+  if (g_udev_device_has_property (volume->device, "ID_MEDIA_PLAYER_ICON_NAME"))
+    volume->symbolic_icon = g_strconcat (g_udev_device_get_property (volume->device, "ID_MEDIA_PLAYER_ICON_NAME"), "-symbolic", NULL);
+  else if (g_udev_device_has_property (volume->device, "ID_MEDIA_PLAYER"))
+    volume->symbolic_icon = g_strdup ("multimedia-player-symbolic");
+  else
+    volume->symbolic_icon = g_strdup ("camera-photo-symbolic");
+}
+
 GMtpVolume *
 g_mtp_volume_new (GVolumeMonitor   *volume_monitor,
                   GUdevDevice      *device,
@@ -215,6 +227,7 @@ g_mtp_volume_new (GVolumeMonitor   *volume_monitor,
 
   set_volume_name (volume);
   set_volume_icon (volume);
+  set_volume_symbolic_icon (volume);
   /* we do not really need to listen for changes */
 
   return volume;
@@ -233,6 +246,18 @@ g_mtp_volume_get_icon (GVolume *volume)
 
   G_LOCK (mtp_volume);
   icon = g_themed_icon_new (mtp_volume->icon);
+  G_UNLOCK (mtp_volume);
+  return icon;
+}
+
+static GIcon *
+g_mtp_volume_get_symbolic_icon (GVolume *volume)
+{
+  GMtpVolume *mtp_volume = G_MTP_VOLUME (volume);
+  GIcon *icon;
+
+  G_LOCK (mtp_volume);
+  icon = g_themed_icon_new_with_default_fallbacks (mtp_volume->symbolic_icon);
   G_UNLOCK (mtp_volume);
   return icon;
 }
@@ -417,6 +442,7 @@ g_mtp_volume_volume_iface_init (GVolumeIface *iface)
 {
   iface->get_name = g_mtp_volume_get_name;
   iface->get_icon = g_mtp_volume_get_icon;
+  iface->get_symbolic_icon = g_mtp_volume_get_symbolic_icon;
   iface->get_uuid = g_mtp_volume_get_uuid;
   iface->get_drive = g_mtp_volume_get_drive;
   iface->get_mount = g_mtp_volume_get_mount;
