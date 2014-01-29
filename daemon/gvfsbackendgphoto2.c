@@ -310,10 +310,8 @@ DEBUG (const gchar *message, ...)
 #ifdef DEBUG_SHOW_TRACES
   va_list args;
   va_start (args, message);
-  g_vfprintf (stderr, message, args);
+  g_logv (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, message, args);
   va_end (args);
-  g_fprintf (stderr, "\n");
-  fflush (stderr);
 #endif
 }
 
