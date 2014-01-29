@@ -112,11 +112,14 @@ udev_decode_string (const char* encoded)
     if (s[0] == '\\' && s[1] == 'x' && s[2] >= '0' && s[3] >= '0') {
       decoded[len] = (hexdigit (s[2]) << 4) | hexdigit (s[3]);
       s += 3;
+    } else if (s[0] == '_' || s[0] == '-') {
+      decoded[len] = ' ';
     } else {
       decoded[len] = *s;
     }
   }
   decoded[len] = '\0';
+
   return decoded;
 }
 
@@ -148,7 +151,7 @@ set_volume_name (GMtpVolume *v)
 
   v->name = NULL;
   if (product != NULL && strlen (product) > 0) {
-    v->name = g_strdup (product);
+    v->name = g_strdup (udev_decode_string (product));
   } else if (vendor == NULL) {
     if (model != NULL)
       v->name = g_strdup (udev_decode_string (model));
