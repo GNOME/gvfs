@@ -1,3 +1,14 @@
+Major changes in 1.19.5
+=======================
+* gvfsdaemon: properly remove socket_dir
+* ftp: Set etag::value
+* daemon: Rate limit progress callbacks
+* daemon: Set infinite timeout for enumerate response
+* client: remove GVfsUriMountInfo
+* sftp: force openpty(3) on BSD
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.19.4
 =======================
 * dav: Implement truncate for output streams
