@@ -751,6 +751,7 @@ do_unmount (GVfsBackend *backend,
 
   /* shutdown_ctx = TRUE, "all connections and files will be closed even if they are busy" */
   res = smbc_free_context (op_backend->smb_context, TRUE);
+  op_backend->smb_context = NULL;
   if (res != 0)
     {
       g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
