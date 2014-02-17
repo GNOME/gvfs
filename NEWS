@@ -1,3 +1,11 @@
+Major changes in 1.19.90
+========================
+* mtp: Symbolic icons implementation
+* mtp: Volume name improvements
+* mtp: Various fixes
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.19.5
 =======================
 * gvfsdaemon: properly remove socket_dir
