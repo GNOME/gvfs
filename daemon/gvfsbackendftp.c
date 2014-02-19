@@ -380,8 +380,10 @@ g_vfs_backend_ftp_finalize (GObject *object)
   if (ftp->addr)
     g_object_unref (ftp->addr);
 
-  /* has been cleared on unmount */
-  g_assert (ftp->queue == NULL);
+  /* has been cleared on unmount, however it has to be cleared when mount fails */
+  if (ftp->queue)
+    g_queue_free (ftp->queue);
+
   g_cond_clear (&ftp->cond);
   g_mutex_clear (&ftp->mutex);
 
