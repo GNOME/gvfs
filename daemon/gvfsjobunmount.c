@@ -188,7 +188,7 @@ job_finish_immediately_if_possible (GVfsJobUnmount *op_job)
   if (class->try_unmount != NULL || class->unmount != NULL)
     return FALSE;
 
-  is_busy = g_vfs_backend_has_blocking_processes (backend);
+  is_busy = g_vfs_daemon_has_blocking_processes (g_vfs_backend_get_daemon (backend));
   force_unmount = op_job->flags & G_MOUNT_UNMOUNT_FORCE;
 
   if (is_busy && ! force_unmount)
@@ -244,7 +244,7 @@ try (GVfsJob *job)
   gboolean is_busy;
   gboolean force_unmount;
 
-  is_busy = g_vfs_backend_has_blocking_processes (backend);
+  is_busy = g_vfs_daemon_has_blocking_processes (g_vfs_backend_get_daemon (backend));
   force_unmount = op_job->flags & G_MOUNT_UNMOUNT_FORCE;
   
   if (is_busy && ! force_unmount

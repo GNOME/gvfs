@@ -856,9 +856,9 @@ on_update_processes_timeout (gpointer user_data)
 {
   UnmountWithOpData *data = user_data;
   GArray *processes;
+  GVfsDaemon *daemon = g_vfs_backend_get_daemon (data->backend);
 
-  processes = g_vfs_daemon_get_blocking_processes (g_vfs_backend_get_daemon (data->backend));
-  if (processes->len == 0)
+  if (!g_vfs_daemon_has_blocking_processes (daemon))
     {
       /* no more processes, abort mount op */
       g_mount_source_abort (data->mount_source);
@@ -868,15 +868,15 @@ on_update_processes_timeout (gpointer user_data)
   else
     {
       /* ignore reply */
+      processes = g_vfs_daemon_get_blocking_processes (daemon);
       g_mount_source_show_processes_async (data->mount_source,
                                            data->message,
                                            processes,
                                            data->choices,
                                            NULL,
                                            NULL);
+      g_array_unref (processes);
     }
-
-  g_array_unref (processes);
 
   /* keep timeout around */
   return TRUE;
@@ -949,14 +949,14 @@ g_vfs_backend_unmount_with_operation (GVfsBackend        *backend,
 {
   GArray *processes;
   UnmountWithOpData *data;
+  GVfsDaemon *daemon = g_vfs_backend_get_daemon (backend);
 
   g_return_if_fail (G_VFS_IS_BACKEND (backend));
   g_return_if_fail (G_IS_MOUNT_SOURCE (mount_source));
   g_return_if_fail (callback != NULL);
 
-  processes = g_vfs_daemon_get_blocking_processes (g_vfs_backend_get_daemon (backend));
   /* if no processes are blocking, complete immediately */
-  if (processes->len == 0)
+  if (!g_vfs_daemon_has_blocking_processes (daemon))
     {
       GSimpleAsyncResult *simple;
       simple = g_simple_async_result_new (G_OBJECT (backend),
@@ -966,7 +966,7 @@ g_vfs_backend_unmount_with_operation (GVfsBackend        *backend,
       g_simple_async_result_set_op_res_gboolean (simple, TRUE);
       g_simple_async_result_complete (simple);
       g_object_unref (simple);
-      goto out;
+      return;
     }
 
   data = g_new0 (UnmountWithOpData, 1);
@@ -988,21 +988,19 @@ g_vfs_backend_unmount_with_operation (GVfsBackend        *backend,
                           (GDestroyNotify) unmount_with_op_data_free);
 
   /* show processes */
+  processes = g_vfs_daemon_get_blocking_processes (daemon);
   g_mount_source_show_processes_async (mount_source,
                                        data->message,
                                        processes,
                                        data->choices,
                                        (GAsyncReadyCallback) on_show_processes_reply,
                                        data);
+  g_array_unref (processes);
 
   /* update these processes every two secs */
   data->timeout_id = g_timeout_add_seconds (2,
                                             on_update_processes_timeout,
                                             data);
-
- out:
-  g_array_unref (processes);
-
 }
 
 static void
@@ -1042,21 +1040,5 @@ g_vfs_backend_force_unmount (GVfsBackend *backend)
   g_vfs_backend_unregister_mount (backend,
 				  (GAsyncReadyCallback) forced_unregister_mount_callback,
 				  backend);
-}
-
-gboolean
-g_vfs_backend_has_blocking_processes (GVfsBackend  *backend)
-{
-  gboolean ret;
-  GArray *processes;
-
-  ret = FALSE;
-  processes = g_vfs_daemon_get_blocking_processes (g_vfs_backend_get_daemon (backend));
-  if (processes->len > 0)
-    ret = TRUE;
-
-  g_array_unref (processes);
-
-  return ret;
 }
 

@@ -41,6 +41,7 @@
 #include <gvfsjobmount.h>
 #include <gvfsjobopenforread.h>
 #include <gvfsjobopenforwrite.h>
+#include <gvfsjobunmount.h>
 
 enum {
   PROP_0
@@ -1030,7 +1031,9 @@ g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
  * @daemon: A #GVfsDaemon.
  *
  * Gets all processes that blocks unmounting, e.g. processes with open
- * file handles.
+ * file handles. Returned array could be empty in spite of
+ * g_vfs_daemon_has_blocking_processes returns TRUE, because for jobs without
+ * channel we can't get #GPid.
  *
  * Returns: An array of #GPid. Free with g_array_unref().
  */
@@ -1052,6 +1055,34 @@ g_vfs_daemon_get_blocking_processes (GVfsDaemon *daemon)
     }
 
   return processes;
+}
+
+/**
+ * g_vfs_daemon_has_blocking_processes:
+ * @daemon: A #GVfsDaemon.
+ *
+ * Determines if there are any jobs blocking unmounting, all jobs excepting
+ * unmount job.
+ *
+ * Returns: TRUE if there are any blocking processes, or FALSE otherwise.
+ */
+gboolean
+g_vfs_daemon_has_blocking_processes (GVfsDaemon *daemon)
+{
+  GList *l;
+
+  g_mutex_lock (&daemon->lock);
+  for (l = daemon->jobs; l != NULL; l = l->next)
+    {
+      if (!G_VFS_IS_JOB_UNMOUNT (l->data))
+        {
+          g_mutex_unlock (&daemon->lock);
+          return TRUE;
+        }
+    }
+  g_mutex_unlock (&daemon->lock);
+
+  return FALSE;
 }
 
 void
