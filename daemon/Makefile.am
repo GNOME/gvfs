@@ -205,6 +205,11 @@ libgvfsdaemon_la_SOURCES = \
 # needed by cygwin (see bug #564003)
 libgvfsdaemon_la_LDFLAGS = -no-undefined -avoid-version
 
+libgvfsdaemon_la_LIBADD = \
+	$(top_builddir)/common/libgvfscommon.la \
+	$(GLIB_LIBS) \
+	$(KEYRING_LIBS)
+
 gvfsd_SOURCES = \
 	mount.c mount.h \
 	main.c
