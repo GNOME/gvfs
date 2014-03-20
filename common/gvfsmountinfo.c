@@ -429,15 +429,19 @@ GIcon *g_vfs_mount_info_query_xdg_volume_info_finish (GFile          *directory,
 static const char *
 get_iso_639_3_for_locale (void)
 {
-  const char *lang;
+  const char *lang = NULL;
 
+#ifdef HAVE_NL_ADDRESS_LANG_TERM
   lang = nl_langinfo (_NL_ADDRESS_LANG_TERM);
   if (lang == NULL || *lang == '\0')
     {
+#ifdef HAVE_NL_ADDRESS_COUNTRY_AB3
       lang = nl_langinfo (_NL_ADDRESS_COUNTRY_AB3);
       if (lang == NULL || *lang == '\0')
+#endif
         return NULL;
     }
+#endif
 
   return lang;
 }

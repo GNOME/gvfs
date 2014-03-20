@@ -735,6 +735,16 @@ if test "x$enable_afp" != "xno"; then
 fi
 AM_CONDITIONAL(USE_AFP, test "x$enable_afp" != "xno")
 
+dnl ***************************************
+dnl *** Check for nl_langinfo constants ***
+dnl ***************************************
+AC_CHECK_DECL(_NL_ADDRESS_LANG_TERM,
+              AC_DEFINE(HAVE_NL_ADDRESS_LANG_TERM, 1, Define to 1 if _NL_ADDRESS_LANG_TERM is declared),,
+              [#include <langinfo.h>])
+AC_CHECK_DECL(_NL_ADDRESS_COUNTRY_AB3,
+              AC_DEFINE(HAVE_NL_ADDRESS_COUNTRY_AB3, 1, Define to 1 if _NL_ADDRESS_COUNTRY_AB3 is declared),,
+              [#include <langinfo.h>])
+
 dnl Install bash-completion file?
 AC_ARG_ENABLE([bash-completion],
 	      AS_HELP_STRING([--disable-bash-completion],
