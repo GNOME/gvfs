@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [ $# -lt 1 ]; then
     echo missing argument
@@ -28,7 +28,7 @@ if [ -z "$MAKEFLAGS" ]; then
     DBUS_SESSION_BUS_PID=`cat $PIDFILE`
     rm $PIDFILE
 
-    trap "kill -9 $DBUS_SESSION_BUS_PID" SIGINT SIGTERM EXIT
+    trap "kill -9 $DBUS_SESSION_BUS_PID" INT TERM EXIT
 fi
 
 $@
