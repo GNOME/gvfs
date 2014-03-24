@@ -1482,7 +1482,16 @@ do_close_write (GVfsBackend *backend,
 	    }
 	}
       else
-	smbc_unlink (op_backend->smb_context, handle->uri);
+        {
+	  res = smbc_unlink (op_backend->smb_context, handle->uri);
+	  if (res ==  -1)
+	    {
+	      errsv = errno;
+	      smbc_unlink (op_backend->smb_context, handle->tmp_uri);
+	      g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
+	      goto out;
+	    }
+	}
       
       res = smbc_rename (op_backend->smb_context, handle->tmp_uri,
 					     op_backend->smb_context, handle->uri);
