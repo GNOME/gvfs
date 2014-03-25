@@ -2381,6 +2381,8 @@ g_daemon_file_set_display_name (GFile *file,
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
       _g_propagate_error_stripped (error, local_error);
+
+      file = NULL;
     }
 
   g_free (path);
