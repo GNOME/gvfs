@@ -2696,6 +2696,138 @@ do_set_display_name (GVfsBackend           *backend,
   soup_uri_free (source);
 }
 
+static void
+do_move (GVfsBackend *backend,
+         GVfsJobMove *job,
+         const char *source,
+         const char *destination,
+         GFileCopyFlags flags,
+         GFileProgressCallback progress_callback,
+         gpointer progress_callback_data)
+{
+  SoupMessage *msg;
+  SoupURI *source_uri;
+  SoupURI *target_uri;
+  guint status;
+  GFileType source_ft, target_ft;
+  GError *error = NULL;
+  gboolean res;
+
+  if (flags & G_FILE_COPY_BACKUP)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB(job),
+                                G_IO_ERROR,
+                                G_IO_ERROR_CANT_CREATE_BACKUP,
+                                _("Backup file creation failed"));
+      return;
+    }
+
+  source_uri = g_vfs_backend_dav_uri_for_path (backend, source, FALSE);
+  msg = soup_message_new_from_uri (SOUP_METHOD_MOVE, source_uri);
+  target_uri = g_vfs_backend_dav_uri_for_path (backend, destination, FALSE);
+
+  res = stat_location (backend, target_uri, &target_ft, NULL, &error);
+  if (!res && !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      return;
+    }
+
+  if (res)
+    {
+      if (flags & G_FILE_COPY_OVERWRITE)
+        {
+          res = stat_location (backend, source_uri, &source_ft, NULL, &error);
+          if (res)
+            {
+              if (target_ft == G_FILE_TYPE_DIRECTORY)
+                {
+                  if (source_ft == G_FILE_TYPE_DIRECTORY)
+                    g_vfs_job_failed_literal (G_VFS_JOB(job),
+                                              G_IO_ERROR,
+                                              G_IO_ERROR_WOULD_MERGE,
+                                              _("Can't move directory over directory"));
+                  else
+                    g_vfs_job_failed_literal (G_VFS_JOB(job),
+                                              G_IO_ERROR,
+                                              G_IO_ERROR_IS_DIRECTORY,
+                                              _("Can't move over directory"));
+                  return;
+                }
+              else if (source_ft == G_FILE_TYPE_DIRECTORY)
+                {
+                  /* Overwriting a file with a directory, first remove the
+                   * file */
+                  SoupMessage *msg;
+
+                  msg = soup_message_new_from_uri (SOUP_METHOD_DELETE,
+                                                   target_uri);
+                  status = g_vfs_backend_dav_send_message (backend, msg);
+
+                  if (!SOUP_STATUS_IS_SUCCESSFUL (status))
+                    {
+                      http_job_failed (G_VFS_JOB (job), msg);
+                      g_object_unref (msg);
+                      return;
+                    }
+                  g_object_unref (msg);
+                }
+            }
+          else
+            {
+              g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+              g_error_free (error);
+              return;
+            }
+        }
+      else
+        {
+          g_vfs_job_failed_literal (G_VFS_JOB(job),
+                                    G_IO_ERROR,
+                                    G_IO_ERROR_EXISTS,
+                                    _("Target file exists"));
+        }
+    }
+
+  message_add_destination_header (msg, target_uri);
+  message_add_overwrite_header (msg, flags & G_FILE_COPY_OVERWRITE);
+
+  status = g_vfs_backend_dav_send_message (backend, msg);
+
+  /*
+   * The precondition of SOUP_STATUS_PRECONDITION_FAILED (412) in
+   * this case was triggered by the "Overwrite: F" header which
+   * means that the target already exists.
+   * Also if we get a REDIRECTION it means that there was no
+   * "Location" header, since otherwise that would have triggered
+   * our redirection handler. This probably means we are dealing
+   * with an web dav implementation (like mod_dav) that also sends
+   * redirects for the destionaion (i.e. "Destination: /foo" header)
+   * which very likely means that the target also exists (and is a
+   * directory). That or the webdav server is broken.
+   * We could find out by doing another stat and but I think this is
+   * such a corner case that we are totally fine with returning
+   * G_IO_ERROR_EXISTS.
+   * */
+
+  if (SOUP_STATUS_IS_SUCCESSFUL (status))
+    {
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else if (status == SOUP_STATUS_PRECONDITION_FAILED ||
+           SOUP_STATUS_IS_REDIRECTION (status))
+    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                      G_IO_ERROR_EXISTS,
+                      _("Target file already exists"));
+  else
+    http_job_failed (G_VFS_JOB (job), msg);
+
+  g_object_unref (msg);
+  soup_uri_free (source_uri);
+  soup_uri_free (target_uri);
+}
+
 /* ************************************************************************* */
 /*  */
 static void
@@ -2725,4 +2857,5 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
   backend_class->make_directory    = do_make_directory;
   backend_class->delete            = do_delete;
   backend_class->set_display_name  = do_set_display_name;
+  backend_class->move              = do_move;
 }
