@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # (C) 2011 Sebastian Heinlein
 # (C) 2012 Canonical Ltd.
 # Authors:
