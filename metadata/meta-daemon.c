@@ -474,12 +474,14 @@ main (int argc, char *argv[])
   GMainLoop *loop;
   GDBusConnection *conn;
   gboolean replace;
+  gboolean show_version;
   GError *error;
   guint name_owner_id;
   GBusNameOwnerFlags flags;
   GOptionContext *context;
   const GOptionEntry options[] = {
     { "replace", 'r', 0, G_OPTION_ARG_NONE, &replace,  N_("Replace old daemon."), NULL },
+    { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version."), NULL},
     { NULL }
   };
 
@@ -497,6 +499,7 @@ main (int argc, char *argv[])
   g_option_context_add_main_entries (context, options, GETTEXT_PACKAGE);
 
   replace = FALSE;
+  show_version = FALSE;
   name_owner_id = 0;
 
   error = NULL;
@@ -515,6 +518,12 @@ main (int argc, char *argv[])
     }
 
   g_option_context_free (context);
+
+  if (show_version)
+    {
+      g_print(PACKAGE_STRING "\n");
+      return 0;
+    }
 
   loop = g_main_loop_new (NULL, FALSE);
 

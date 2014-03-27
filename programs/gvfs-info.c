@@ -31,6 +31,7 @@ static char *attributes = NULL;
 static gboolean nofollow_symlinks = FALSE;
 static gboolean filesystem = FALSE;
 static gboolean writable = FALSE;
+static gboolean show_version = FALSE;
 
 static GOptionEntry entries[] =
 {
@@ -38,6 +39,7 @@ static GOptionEntry entries[] =
   { "filesystem", 'f', 0, G_OPTION_ARG_NONE, &filesystem, N_("Get file system info"), NULL },
   { "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, N_("The attributes to get"), N_("ATTRIBUTES") },
   { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symbolic links"), NULL },
+  { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
   { NULL }
 };
 
@@ -397,6 +399,12 @@ main (int argc, char *argv[])
       g_printerr ("\n");
       g_error_free (error);
       return 1;
+    }
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
     }
 
   res = TRUE;

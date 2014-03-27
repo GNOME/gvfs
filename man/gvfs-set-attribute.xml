@@ -64,6 +64,13 @@
                         </varlistentry>
 
                         <varlistentry>
+                                <term><option>--version</option></term>
+
+                                <listitem><para>Shows the version number and
+                                exits.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
                                 <term><option>-t</option>, <option>--type=TYPE</option></term>
 
                                 <listitem><para>Specifies the type of the attribute. Supported types are string, stringv, bytestring, boolean, uint32, int32, uint64, int64, object and unset.</para></listitem>

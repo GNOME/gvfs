@@ -30,11 +30,13 @@
 
 static gboolean show_hidden = FALSE;
 static gboolean follow_symlinks = FALSE;
+static gboolean show_version = FALSE;
 
 static GOptionEntry entries[] =
 {
   { "hidden", 'h', 0, G_OPTION_ARG_NONE, &show_hidden, N_("Show hidden files"), NULL },
   { "follow-symlinks", 'l', 0, G_OPTION_ARG_NONE, &follow_symlinks, N_("Follow symbolic links, mounts and shortcuts"), NULL },
+  { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
   { NULL }
 };
 
@@ -262,6 +264,12 @@ main (int argc, char *argv[])
       g_printerr ("\n");
       g_error_free (error);
       return 1;
+    }
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
     }
 
   if (argc > 1)

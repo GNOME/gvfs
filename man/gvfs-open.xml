@@ -61,6 +61,13 @@
                                 text and exits.</para></listitem>
                         </varlistentry>
 
+                        <varlistentry>
+                                <term><option>--version</option></term>
+
+                                <listitem><para>Shows the version number and
+                                exits.</para></listitem>
+                        </varlistentry>
+
                 </variablelist>
         </refsect1>
 

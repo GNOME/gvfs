@@ -64,6 +64,13 @@
                         </varlistentry>
 
                         <varlistentry>
+                                <term><option>--version</option></term>
+
+                                <listitem><para>Shows the version number and
+                                exits.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
                                 <term><option>-T</option>, <option>--no-target-directory</option></term>
 
                                 <listitem><para>Don't move into DEST even if it is a directory.</para></listitem>

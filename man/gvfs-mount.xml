@@ -75,6 +75,13 @@
                         </varlistentry>
 
                         <varlistentry>
+                                <term><option>--version</option></term>
+
+                                <listitem><para>Shows the version number and
+                                exits.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
                                 <term><option>-m</option>, <option>--mountable</option></term>
 
                                 <listitem><para>Mount as a mountable.</para></listitem>

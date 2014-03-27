@@ -27,6 +27,14 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 
+static gboolean show_version = FALSE;
+
+static GOptionEntry entries[] =
+{
+  { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
+  { NULL }
+};
+
 static void
 show_help (GOptionContext *context, const char *error)
 {
@@ -64,6 +72,7 @@ main (int argc, char *argv[])
 
   context = g_option_context_new (param);
   g_option_context_set_summary (context, summary);
+  g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
 
   if (error != NULL)
@@ -74,6 +83,12 @@ main (int argc, char *argv[])
       g_printerr ("\n");
       g_error_free (error);
       return 1;
+    }
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
     }
 
   if (argc < 3)

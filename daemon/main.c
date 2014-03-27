@@ -134,6 +134,7 @@ main (int argc, char *argv[])
   GVfsDaemon *daemon;
   gboolean replace;
   gboolean no_fuse;
+  gboolean show_version;
   GError *error;
   guint name_owner_id;
   GBusNameOwnerFlags flags;
@@ -141,6 +142,7 @@ main (int argc, char *argv[])
   const GOptionEntry options[] = {
     { "replace", 'r', 0, G_OPTION_ARG_NONE, &replace,  N_("Replace old daemon."), NULL },
     { "no-fuse", 0, 0, G_OPTION_ARG_NONE, &no_fuse,  N_("Don't start fuse."), NULL },
+    { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version."), NULL},
     { NULL }
   };
 
@@ -163,6 +165,7 @@ main (int argc, char *argv[])
 
   replace = FALSE;
   no_fuse = FALSE;
+  show_version = FALSE;
 
   if (g_getenv ("GVFS_DISABLE_FUSE") != NULL)
     no_fuse = TRUE;
@@ -183,6 +186,12 @@ main (int argc, char *argv[])
     }
 
   g_option_context_free (context);
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
+    }
 
   loop = g_main_loop_new (NULL, FALSE);
 

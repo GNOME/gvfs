@@ -71,6 +71,13 @@
                         </varlistentry>
 
                         <varlistentry>
+                                <term><option>--version</option></term>
+
+                                <listitem><para>Shows the version number and
+                                exits.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
                                 <term><option>-w</option>, <option>--query-writable</option></term>
 
                                 <listitem><para>Show writable attributes and their types.</para></listitem>

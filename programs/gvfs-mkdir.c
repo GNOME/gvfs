@@ -28,9 +28,12 @@
 #include <gio/gio.h>
 
 static gboolean parent = FALSE;
+static gboolean show_version = FALSE;
+
 static GOptionEntry entries[] =
 {
   { "parent", 'p', 0, G_OPTION_ARG_NONE, &parent, N_("Create parent directories"), NULL },
+  { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
   { NULL }
 };
 
@@ -70,6 +73,12 @@ main (int argc, char *argv[])
       g_printerr ("\n");
       g_error_free (error);
       return 1;
+    }
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
     }
 
   if (argc > 1)

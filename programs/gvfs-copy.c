@@ -38,6 +38,7 @@ static gboolean no_dereference = FALSE;
 static gboolean backup = FALSE;
 static gboolean preserve = FALSE;
 static gboolean no_target_directory = FALSE;
+static gboolean show_version = FALSE;
 
 static GOptionEntry entries[] =
 {
@@ -47,6 +48,7 @@ static GOptionEntry entries[] =
   { "preserve", 'p', 0, G_OPTION_ARG_NONE, &preserve, N_("Preserve all attributes"), NULL },
   { "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, N_("Backup existing destination files"), NULL },
   { "no-dereference", 'P', 0, G_OPTION_ARG_NONE, &no_dereference, N_("Never follow symbolic links"), NULL },
+  { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
   { NULL }
 };
 
@@ -132,6 +134,12 @@ main (int argc, char *argv[])
       g_printerr ("\n");
       g_error_free (error);
       return 1;
+    }
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
     }
 
   if (argc <= 2)

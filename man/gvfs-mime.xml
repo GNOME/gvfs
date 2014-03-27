@@ -70,6 +70,13 @@
                         </varlistentry>
 
                         <varlistentry>
+                                <term><option>--version</option></term>
+
+                                <listitem><para>Shows the version number and
+                                exits.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
                                 <term><option>--query</option></term>
 
                                 <listitem><para>Query the handler for MIMETYPE.</para></listitem>

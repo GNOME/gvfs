@@ -31,9 +31,11 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 
+static gboolean show_version = FALSE;
 static gchar **locations = NULL;
 
 static GOptionEntry entries[] = {
+  { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
   {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &locations, NULL, NULL },
   {NULL}
 };
@@ -77,6 +79,12 @@ main (int argc, char *argv[])
       g_printerr ("\n");
       g_error_free (error);
       return 1;
+    }
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
     }
 
   if (!locations)

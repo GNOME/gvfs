@@ -50,6 +50,7 @@ static gboolean mount_monitor = FALSE;
 static const char *unmount_scheme = NULL;
 static const char *mount_device_file = NULL;
 static gboolean success = TRUE;
+static gboolean show_version = FALSE;
 
 
 static const GOptionEntry entries[] =
@@ -63,6 +64,7 @@ static const GOptionEntry entries[] =
   { "list", 'l', 0, G_OPTION_ARG_NONE, &mount_list, N_("List"), NULL},
   { "monitor", 'o', 0, G_OPTION_ARG_NONE, &mount_monitor, N_("Monitor events"), NULL},
   { "detail", 'i', 0, G_OPTION_ARG_NONE, &extra_detail, N_("Show extra information"), NULL},
+  { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
   { NULL }
 };
 
@@ -1056,6 +1058,12 @@ main (int argc, char *argv[])
       g_printerr ("\n");
       g_error_free (error);
       return 1;
+    }
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
     }
 
   main_loop = g_main_loop_new (NULL, FALSE);

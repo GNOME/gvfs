@@ -30,11 +30,13 @@
 
 static gboolean query = FALSE;
 static gboolean set = FALSE;
+static gboolean show_version = FALSE;
 
 static GOptionEntry entries[] =
 {
   { "query", 0, 0, G_OPTION_ARG_NONE, &query, N_("Query handler for mime-type"), NULL },
   { "set", 0, 0, G_OPTION_ARG_NONE, &set, N_("Set handler for mime-type"), NULL },
+  { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
   { NULL }
 };
 
@@ -87,7 +89,7 @@ main (int argc, char *argv[])
   g_option_context_free (context);
   g_free (param);
 
-  if (error != NULL || query == set)
+  if (error != NULL || (query == set && !show_version))
     {
       g_printerr (_("Error parsing commandline options: %s\n"),
                   error ? error->message : _("Specify either --query or --set"));
@@ -97,6 +99,12 @@ main (int argc, char *argv[])
       if (error != NULL)
         g_error_free (error);
       return 1;
+    }
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
     }
 
   if (query && argc != 2)

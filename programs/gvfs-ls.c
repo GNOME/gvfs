@@ -34,6 +34,7 @@ static gboolean show_long = FALSE;
 static gboolean nofollow_symlinks = FALSE;
 static char *show_completions = NULL;
 static gboolean print_uris = FALSE;
+static gboolean show_version = FALSE;
 
 static GOptionEntry entries[] =
 {
@@ -43,6 +44,7 @@ static GOptionEntry entries[] =
   { "show-completions", 'c', 0, G_OPTION_ARG_STRING, &show_completions, N_("Show completions"), N_("PREFIX") },
   { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symbolic links"), NULL},
   { "print-uris", 'u', 0, G_OPTION_ARG_NONE, &print_uris, N_("Print full URIs"), NULL},
+  { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
   { NULL }
 };
 
@@ -429,6 +431,12 @@ main (int argc, char *argv[])
       g_printerr ("\n");
       g_error_free (error);
       return 1;
+    }
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
     }
 
   if (attributes != NULL)

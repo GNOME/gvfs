@@ -74,6 +74,13 @@
                         </varlistentry>
 
                         <varlistentry>
+                                <term><option>--version</option></term>
+
+                                <listitem><para>Shows the version number and
+                                exits.</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
                                 <term><option>-r</option>, <option>--replace</option></term>
 
                                 <listitem><para>Replace the currently running gvfsd instance.</para></listitem>

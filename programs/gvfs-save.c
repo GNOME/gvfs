@@ -37,6 +37,7 @@ static gboolean create = FALSE;
 static gboolean append = FALSE;
 static gboolean priv = FALSE;
 static gboolean print_etag = FALSE;
+static gboolean show_version = FALSE;
 
 static GOptionEntry entries[] =
 {
@@ -48,6 +49,7 @@ static GOptionEntry entries[] =
   { "print-etag", 'v', 0, G_OPTION_ARG_NONE, &print_etag, N_("Print new etag at end"), NULL },
   /* Translators: The "etag" is a token allowing to verify whether a file has been modified */
   { "etag", 'e', 0, G_OPTION_ARG_STRING, &etag, N_("The etag of the file being overwritten"), N_("ETAG") },
+  { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
   { NULL }
 };
 
@@ -177,6 +179,12 @@ main (int argc, char *argv[])
       g_printerr ("\n");
       g_error_free (error);
       return 1;
+    }
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
     }
 
   res = FALSE;

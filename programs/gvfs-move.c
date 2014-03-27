@@ -36,6 +36,7 @@ static gboolean progress = FALSE;
 static gboolean interactive = FALSE;
 static gboolean backup = FALSE;
 static gboolean no_target_directory = FALSE;
+static gboolean show_version = FALSE;
 
 static GOptionEntry entries[] =
 {
@@ -43,6 +44,7 @@ static GOptionEntry entries[] =
   { "progress", 'p', 0, G_OPTION_ARG_NONE, &progress, N_("Show progress"), NULL },
   { "interactive", 'i', 0, G_OPTION_ARG_NONE, &interactive, N_("Prompt before overwrite"), NULL },
   { "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, N_("Backup existing destination files"), NULL },
+  { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
   { NULL }
 };
 
@@ -120,6 +122,12 @@ main (int argc, char *argv[])
       g_printerr ("\n");
       g_error_free (error);
       return 1;
+    }
+
+  if (show_version)
+    {
+      g_print (PACKAGE_STRING "\n");
+      return 0;
     }
 
   if (argc <= 2)
