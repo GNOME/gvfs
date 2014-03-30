@@ -1,121 +1,128 @@
-# translation of eu.po to Basque
-# translation of gvfs.HEAD.po  to Basque
+# Basque translation of gvfs.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>, 2008, 2009, 2010, 2011, 2012.
-# Iñaki Larrañaga Murgoitio <dooteo@zundan.com>, 2013.
 #
+# Iñaki Larrañaga Murgoitio <dooteo@zundan.com>, 2008, 2009, 2010, 2011, 2012.
+# Iñaki Larrañaga Murgoitio <dooteo@zundan.com>, 2013, 2014.
 msgid ""
 msgstr ""
-"Project-Id-Version: eu\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-28 21:27+0100\n"
-"PO-Revision-Date: 2013-02-27 23:30+0100\n"
+"Project-Id-Version: gvfs master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=gvfs&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2014-03-30 12:07+0200\n"
+"PO-Revision-Date: 2014-03-30 12:08+0200\n"
 "Last-Translator: Iñaki Larrañaga Murgoitio <dooteo@zundan.com>\n"
-"Language-Team: Basque <itzulpena@euskalgnu.org>\n"
+"Language-Team: Basque <librezale@librezale.org>\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 1.0\n"
+"X-Generator: Lokalize 1.4\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "\n"
 
-#: ../client/gdaemonfile.c:416 ../client/gdaemonfile.c:2774
+#: ../client/gdaemonfile.c:468 ../client/gdaemonfile.c:2828
 msgid "Operation not supported, files on different mounts"
 msgstr "Eragiketa ez dago onartuta, fitxategiak muntai desberdinetan"
 
-#: ../client/gdaemonfile.c:1041 ../client/gdaemonfile.c:3117
-#: ../client/gvfsiconloadable.c:304
+#: ../client/gdaemonfile.c:1090 ../client/gdaemonfile.c:3177
+#: ../client/gvfsiconloadable.c:301 ../daemon/gvfsjobopenforread.c:183
+#: ../daemon/gvfsjobopenforwrite.c:326
 msgid "Couldn't get stream file descriptor"
 msgstr "Ezin izan da korronte-fitxategiaren deskriptorea lortu"
 
-#: ../client/gdaemonfile.c:1170 ../client/gdaemonfile.c:1242
-#: ../client/gvfsiconloadable.c:129
+#: ../client/gdaemonfile.c:1219 ../client/gdaemonfile.c:1291
+#: ../client/gvfsiconloadable.c:127
 msgid "Didn't get stream file descriptor"
 msgstr "Ez da korronte-fitxategiaren deskriptorea lortu"
 
-#: ../client/gdaemonfile.c:1363
+#: ../client/gdaemonfile.c:1412
 #, c-format
 msgid "Invalid return value from %s"
 msgstr "'%s'(e)k balio baliogabea itzuli du"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:2248
+#: ../client/gdaemonfile.c:2302
 msgid "Could not find enclosing mount"
 msgstr "Ezin izan da muntai inguratua aurkitu"
 
-#: ../client/gdaemonfile.c:2284
+#: ../client/gdaemonfile.c:2338
 #, c-format
 msgid "Invalid filename %s"
 msgstr "%s fitxategi-izen baliogabea"
 
-#: ../client/gdaemonfile.c:2616 ../client/gdaemonvfs.c:1288
-#: ../client/gdaemonvfs.c:1340
+#: ../client/gdaemonfile.c:2670 ../client/gdaemonvfs.c:1254
+#: ../client/gdaemonvfs.c:1306
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Errorea fitxategiaren metadatuen ezarpenetan: %s"
 
-#: ../client/gdaemonfile.c:2617 ../client/gdaemonvfs.c:1341
+#: ../client/gdaemonfile.c:2671 ../client/gdaemonvfs.c:1307
 msgid "values must be string or list of strings"
 msgstr "balioak katea edo kateen zerrenda izan behar dira"
 
-#: ../client/gdaemonfileenumerator.c:528 ../client/gdaemonfileenumerator.c:611
-#: ../client/gdaemonfileenumerator.c:662
-#: ../client/gdaemonfileinputstream.c:630
-#: ../client/gdaemonfileinputstream.c:783
-#: ../client/gdaemonfileinputstream.c:901
-#: ../client/gdaemonfileinputstream.c:1149
-#: ../client/gdaemonfileinputstream.c:1391
-#: ../client/gdaemonfileoutputstream.c:506
-#: ../client/gdaemonfileoutputstream.c:681
-#: ../client/gdaemonfileoutputstream.c:873
-#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:734
-#: ../daemon/gvfsbackendobexftp.c:1110 ../daemon/gvfsbackendobexftp.c:1131
-#: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1387
-#: ../daemon/gvfsbackendobexftp.c:1451 ../daemon/gvfsbackendobexftp.c:1652
-#: ../daemon/gvfsbackendobexftp.c:1759 ../daemon/gvfsbackendobexftp.c:1921
-#: ../daemon/gvfsbackendobexftp.c:1948 ../daemon/gvfsbackendobexftp.c:2006
-#: ../daemon/gvfsbackendobexftp.c:2028 ../daemon/gvfsbackendobexftp.c:2091
-#: ../daemon/gvfsbackendobexftp.c:2110 ../daemon/gvfsbackendsmb.c:1244
+#: ../client/gdaemonfileenumerator.c:553 ../client/gdaemonfileenumerator.c:636
+#: ../client/gdaemonfileenumerator.c:687
+#: ../client/gdaemonfileinputstream.c:642
+#: ../client/gdaemonfileinputstream.c:795
+#: ../client/gdaemonfileinputstream.c:915
+#: ../client/gdaemonfileinputstream.c:1166
+#: ../client/gdaemonfileinputstream.c:1411
+#: ../client/gdaemonfileoutputstream.c:546
+#: ../client/gdaemonfileoutputstream.c:724
+#: ../client/gdaemonfileoutputstream.c:919
+#: ../client/gdaemonfileoutputstream.c:1085
+#: ../client/gdaemonfileoutputstream.c:1267 ../client/gvfsdaemondbus.c:626
+#: ../daemon/gvfsbackendobexftp.c:1113 ../daemon/gvfsbackendobexftp.c:1134
+#: ../daemon/gvfsbackendobexftp.c:1253 ../daemon/gvfsbackendobexftp.c:1390
+#: ../daemon/gvfsbackendobexftp.c:1454 ../daemon/gvfsbackendobexftp.c:1655
+#: ../daemon/gvfsbackendobexftp.c:1762 ../daemon/gvfsbackendobexftp.c:1924
+#: ../daemon/gvfsbackendobexftp.c:1951 ../daemon/gvfsbackendobexftp.c:2009
+#: ../daemon/gvfsbackendobexftp.c:2031 ../daemon/gvfsbackendobexftp.c:2094
+#: ../daemon/gvfsbackendobexftp.c:2113 ../daemon/gvfsbackendsmb.c:1266
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:332
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1070
 #: ../monitor/proxy/gproxydrive.c:547 ../monitor/proxy/gproxydrive.c:635
 #: ../monitor/proxy/gproxydrive.c:785 ../monitor/proxy/gproxydrive.c:923
 #: ../monitor/proxy/gproxydrive.c:961 ../monitor/proxy/gproxydrive.c:1086
 #: ../monitor/proxy/gproxymount.c:501 ../monitor/proxy/gproxymount.c:586
-#: ../monitor/proxy/gproxyvolume.c:852 ../monitor/proxy/gproxyvolume.c:915
+#: ../monitor/proxy/gproxyvolume.c:859 ../monitor/proxy/gproxyvolume.c:923
 msgid "Operation was cancelled"
 msgstr "Eragiketa bertan behera utzi da"
 
-#: ../client/gdaemonfileinputstream.c:527
-#: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1684
-#: ../client/gdaemonfileinputstream.c:1694
-#: ../client/gdaemonfileoutputstream.c:450
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1236
-#: ../client/gdaemonfileoutputstream.c:1246
+#: ../client/gdaemonfileinputstream.c:537
+#: ../client/gdaemonfileinputstream.c:545
+#: ../client/gdaemonfileinputstream.c:1705
+#: ../client/gdaemonfileinputstream.c:1715
+#: ../client/gdaemonfileoutputstream.c:488
+#: ../client/gdaemonfileoutputstream.c:496
+#: ../client/gdaemonfileoutputstream.c:1452
+#: ../client/gdaemonfileoutputstream.c:1462
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "Errorea korrontearen protokoloan: %s"
 
-#: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1694
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1246
+#: ../client/gdaemonfileinputstream.c:545
+#: ../client/gdaemonfileinputstream.c:1715
+#: ../client/gdaemonfileoutputstream.c:496
+#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:1874
+#: ../daemon/gvfsbackendmtp.c:2258
 msgid "End of stream"
 msgstr "Korrontearen amaiera"
 
-#: ../client/gdaemonfileinputstream.c:1330
-#: ../client/gdaemonfileoutputstream.c:981
+#: ../client/gdaemonfileinputstream.c:1348
+#: ../client/gdaemonfileoutputstream.c:1028
 msgid "Seek not supported on stream"
 msgstr "Ez da bilaketarik onartzen korrontean"
 
-#: ../client/gdaemonvfs.c:812
+#: ../client/gdaemonfileoutputstream.c:1197
+msgid "Truncate not supported on stream"
+msgstr "Ez da trunkatzerik onartzen korrontean"
+
+#: ../client/gdaemonvfs.c:778
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Errorea muntaiaren informazioa lortzean: %s"
@@ -218,7 +225,7 @@ msgstr "Ez da muntai motarik zehaztu"
 msgid "mountpoint for %s already running"
 msgstr "%s(r)en muntatze-puntua jadanik exekutatzen ari da"
 
-#: ../daemon/daemon-main.c:327
+#: ../daemon/daemon-main.c:335
 msgid "error starting mount daemon"
 msgstr "Errorea muntatze-daemona abiaraztean"
 
@@ -226,7 +233,7 @@ msgstr "Errorea muntatze-daemona abiaraztean"
 msgid "The connection is not opened"
 msgstr "Konexioa ez da ireki"
 
-#: ../daemon/gvfsafpconnection.c:771
+#: ../daemon/gvfsafpconnection.c:771 ../daemon/gvfsbackendmtp.c:327
 msgid "The connection is closed"
 msgstr "Konexioa itxi da"
 
@@ -352,173 +359,180 @@ msgstr "Zerbitzaritik lortutako errorea: %s"
 msgid "Got unknown error code %d from server"
 msgstr "Zerbitzaritik %d errore-kodea ezezaguna lortuta"
 
+#. Translators: first %s is volumename and second servername
 #: ../daemon/gvfsafpvolume.c:145
 #, c-format
 msgid "Couldn't load %s on %s"
 msgstr "Ezin izan da %s kargatu %s(e)n"
 
-#: ../daemon/gvfsafpvolume.c:390 ../daemon/gvfsafpvolume.c:668
-#: ../daemon/gvfsafpvolume.c:821 ../daemon/gvfsafpvolume.c:1015
-#: ../daemon/gvfsafpvolume.c:1215 ../daemon/gvfsafpvolume.c:1398
-#: ../daemon/gvfsafpvolume.c:1555 ../daemon/gvfsafpvolume.c:2001
-#: ../daemon/gvfsafpvolume.c:2127 ../daemon/gvfsafpvolume.c:2289
-#: ../daemon/gvfsafpvolume.c:2509 ../daemon/gvfsbackendafc.c:286
-#: ../daemon/gvfsbackendsftp.c:307 ../daemon/gvfsbackendsftp.c:1827
-#: ../daemon/gvfsftptask.c:399
+#: ../daemon/gvfsafpvolume.c:393 ../daemon/gvfsafpvolume.c:663
+#: ../daemon/gvfsafpvolume.c:816 ../daemon/gvfsafpvolume.c:1010
+#: ../daemon/gvfsafpvolume.c:1212 ../daemon/gvfsafpvolume.c:1395
+#: ../daemon/gvfsafpvolume.c:1552 ../daemon/gvfsafpvolume.c:1998
+#: ../daemon/gvfsafpvolume.c:2126 ../daemon/gvfsafpvolume.c:2288
+#: ../daemon/gvfsafpvolume.c:2508 ../daemon/gvfsbackendafc.c:286
+#: ../daemon/gvfsbackendsftp.c:322 ../daemon/gvfsbackendsftp.c:1858
+#: ../daemon/gvfsftptask.c:403
 msgid "Permission denied"
 msgstr "Baimena ukatuta"
 
-#: ../daemon/gvfsafpvolume.c:394 ../daemon/gvfsafpvolume.c:1721
-#: ../daemon/gvfsafpvolume.c:2513 ../daemon/gvfsbackendafc.c:977
+#: ../daemon/gvfsafpvolume.c:397 ../daemon/gvfsafpvolume.c:1718
+#: ../daemon/gvfsafpvolume.c:2512 ../daemon/gvfsbackendafc.c:977
 #: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:327
-#: ../daemon/gvfsbackendafpbrowse.c:359 ../daemon/gvfsbackendarchive.c:651
-#: ../daemon/gvfsbackendarchive.c:699 ../daemon/gvfsbackendarchive.c:751
-#: ../daemon/gvfsbackendarchive.c:780 ../daemon/gvfsbackendcdda.c:1015
+#: ../daemon/gvfsbackendafpbrowse.c:359 ../daemon/gvfsbackendarchive.c:706
+#: ../daemon/gvfsbackendarchive.c:754 ../daemon/gvfsbackendarchive.c:806
+#: ../daemon/gvfsbackendarchive.c:835 ../daemon/gvfsbackendcdda.c:1022
 #: ../daemon/gvfsbackendcomputer.c:638 ../daemon/gvfsbackenddnssd.c:415
 #: ../daemon/gvfsbackendftp.c:1068 ../daemon/gvfsbackendnetwork.c:696
-#: ../daemon/gvfsbackendsmbbrowse.c:1120 ../daemon/gvfsbackendsmbbrowse.c:1187
-#: ../daemon/gvfsbackendsmbbrowse.c:1374 ../daemon/gvfsbackendsmbbrowse.c:1447
+#: ../daemon/gvfsbackendsmbbrowse.c:1146 ../daemon/gvfsbackendsmbbrowse.c:1213
+#: ../daemon/gvfsbackendsmbbrowse.c:1400 ../daemon/gvfsbackendsmbbrowse.c:1473
 #, c-format
 msgid "File doesn't exist"
 msgstr "Fitxategia ez da existitzen"
 
-#: ../daemon/gvfsafpvolume.c:398 ../daemon/gvfsafpvolume.c:468
-#: ../daemon/gvfsafpvolume.c:2517 ../daemon/gvfsbackendafp.c:277
-#: ../daemon/gvfsbackendafp.c:478 ../daemon/gvfsbackendafp.c:1310
-#: ../daemon/gvfsbackenddav.c:2241 ../daemon/gvfsbackendftp.c:774
-#: ../daemon/gvfsbackendsftp.c:2339 ../daemon/gvfsbackendsftp.c:3055
-#: ../daemon/gvfsbackendsftp.c:3394 ../daemon/gvfsbackendsftp.c:4264
+#: ../daemon/gvfsafpvolume.c:401 ../daemon/gvfsafpvolume.c:2516
+#: ../daemon/gvfsbackendafp.c:278 ../daemon/gvfsbackendafp.c:479
+#: ../daemon/gvfsbackendafp.c:1338 ../daemon/gvfsbackenddav.c:2258
+#: ../daemon/gvfsbackendftp.c:774 ../daemon/gvfsbackendsftp.c:2370
+#: ../daemon/gvfsbackendsftp.c:3111 ../daemon/gvfsbackendsftp.c:3461
+#: ../daemon/gvfsbackendsftp.c:4493 ../daemon/gvfsbackendsftp.c:5375
 msgid "File is directory"
 msgstr "Fitxategia direktorioa da"
 
-#: ../daemon/gvfsafpvolume.c:402
+#: ../daemon/gvfsafpvolume.c:405
 msgid "Too many files open"
 msgstr "Fitxategi gehiegi irekita"
 
-#: ../daemon/gvfsafpvolume.c:672 ../daemon/gvfsafpvolume.c:829
+#: ../daemon/gvfsafpvolume.c:667 ../daemon/gvfsafpvolume.c:824
 msgid "Target file is open"
 msgstr "Helburuko fitxategia irekita dago"
 
-#: ../daemon/gvfsafpvolume.c:676 ../daemon/gvfsbackendburn.c:421
-#: ../daemon/gvfsbackenddav.c:2582 ../daemon/gvfsbackendsftp.c:1821
+#: ../daemon/gvfsafpvolume.c:671 ../daemon/gvfsbackendburn.c:421
+#: ../daemon/gvfsbackenddav.c:2648 ../daemon/gvfsbackendsftp.c:1852
 msgid "Directory not empty"
 msgstr "Direktorioa ez dago hutsik"
 
-#: ../daemon/gvfsafpvolume.c:680
+#: ../daemon/gvfsafpvolume.c:675
 msgid "Target object is marked as not deletable (DeleteInhibit)"
 msgstr "Helburuko objektua ez-ezabagarri gisa markatu da (DeleteInhibit)"
 
-#: ../daemon/gvfsafpvolume.c:684 ../daemon/gvfsafpvolume.c:1231
-#: ../daemon/gvfsafpvolume.c:2131
+#: ../daemon/gvfsafpvolume.c:679 ../daemon/gvfsafpvolume.c:1228
+#: ../daemon/gvfsafpvolume.c:2130
 msgid "Target object doesn't exist"
 msgstr "Helburuko objektua ez da existitzen"
 
-#: ../daemon/gvfsafpvolume.c:688 ../daemon/gvfsafpvolume.c:841
-#: ../daemon/gvfsafpvolume.c:1035 ../daemon/gvfsafpvolume.c:1235
-#: ../daemon/gvfsafpvolume.c:2135
+#: ../daemon/gvfsafpvolume.c:683 ../daemon/gvfsafpvolume.c:836
+#: ../daemon/gvfsafpvolume.c:1032 ../daemon/gvfsafpvolume.c:1232
+#: ../daemon/gvfsafpvolume.c:2134
 msgid "Volume is read-only"
 msgstr "Bolumena irakurtzeko soilik da"
 
-#: ../daemon/gvfsafpvolume.c:825 ../daemon/gvfsafpvolume.c:1019
-#: ../daemon/gvfsafpvolume.c:1567 ../daemon/gvfsafpvolume.c:2005
-#: ../daemon/gvfsafpvolume.c:2647
+#: ../daemon/gvfsafpvolume.c:820 ../daemon/gvfsafpvolume.c:1014
+#: ../daemon/gvfsafpvolume.c:1564 ../daemon/gvfsafpvolume.c:2002
+#: ../daemon/gvfsafpvolume.c:2646
 msgid "Not enough space on volume"
 msgstr "Ez dago nahikoa leku librerik bolumenean"
 
-#: ../daemon/gvfsafpvolume.c:833 ../daemon/gvfsafpvolume.c:1414
-#: ../daemon/gvfsafpvolume.c:1571 ../daemon/gvfsbackendafp.c:284
-#: ../daemon/gvfsbackendafp.c:485 ../daemon/gvfsbackenddav.c:2297
-#: ../daemon/gvfsbackenddav.c:2544 ../daemon/gvfsbackenddav.c:2650
+#: ../daemon/gvfsafpvolume.c:828 ../daemon/gvfsafpvolume.c:1411
+#: ../daemon/gvfsafpvolume.c:1568 ../daemon/gvfsbackendafp.c:285
+#: ../daemon/gvfsbackendafp.c:486 ../daemon/gvfsbackenddav.c:2313
+#: ../daemon/gvfsbackenddav.c:2610 ../daemon/gvfsbackenddav.c:2716
 #: ../daemon/gvfsbackendftp.c:753 ../daemon/gvfsbackendftp.c:934
-#: ../daemon/gvfsbackendftp.c:1372 ../daemon/gvfsbackendftp.c:1552
-#: ../daemon/gvfsbackendsftp.c:4273 ../daemon/gvfsbackendsmb.c:2168
+#: ../daemon/gvfsbackendftp.c:1374 ../daemon/gvfsbackendftp.c:1482
+#: ../daemon/gvfsbackendmtp.c:1417 ../daemon/gvfsbackendmtp.c:1528
+#: ../daemon/gvfsbackendsftp.c:4502 ../daemon/gvfsbackendsmb.c:2211
 msgid "Target file already exists"
 msgstr "Helburuko fitxategia badago lehendik ere"
 
-#: ../daemon/gvfsafpvolume.c:837 ../daemon/gvfsafpvolume.c:1027
+#: ../daemon/gvfsafpvolume.c:832 ../daemon/gvfsafpvolume.c:1024
 msgid "Ancestor directory doesn't exist"
 msgstr "Direktorio aitzindaria ez da existitzen"
 
-#: ../daemon/gvfsafpvolume.c:1023
+#. Translators: flat means volume doesn't support directories
+#. (all files are in the volume root)
+#: ../daemon/gvfsafpvolume.c:1020
 msgid "Volume is flat and doesn't support directories"
 msgstr "Bolumena laua da, eta ez du direktoriorik onartzen"
 
-#: ../daemon/gvfsafpvolume.c:1031
+#: ../daemon/gvfsafpvolume.c:1028
 msgid "Target directory already exists"
 msgstr "Helburuko direktorioa badago lehendik ere"
 
-#: ../daemon/gvfsafpvolume.c:1219 ../daemon/gvfsbackendafp.c:590
-#: ../daemon/gvfsbackendmtp.c:1408
+#: ../daemon/gvfsafpvolume.c:1216 ../daemon/gvfsbackendafp.c:591
 msgid "Can't rename volume"
 msgstr "Ezin da bolumena izenez aldatu"
 
-#: ../daemon/gvfsafpvolume.c:1223
+#: ../daemon/gvfsafpvolume.c:1220
 msgid "Object with that name already exists"
 msgstr "Izen hau duen objektua badago lehendik"
 
-#: ../daemon/gvfsafpvolume.c:1227
+#: ../daemon/gvfsafpvolume.c:1224
 msgid "Target object is marked as not renameable (RenameInhibit)"
 msgstr "Helburuko objektua ez-berrizendagarri gisa markatu da (RenameInhibit)"
 
-#: ../daemon/gvfsafpvolume.c:1402
+#: ../daemon/gvfsafpvolume.c:1399
 msgid "Can't move directory into one of its descendants"
 msgstr "Ezin da direktorioa bere ondorengoen gainera eraman"
 
-#: ../daemon/gvfsafpvolume.c:1406
+#: ../daemon/gvfsafpvolume.c:1403
 msgid "Can't move sharepoint into a shared directory"
 msgstr "Ezin da partekatze-puntua partekatutako direktorio batera eraman"
 
-#: ../daemon/gvfsafpvolume.c:1410
+#: ../daemon/gvfsafpvolume.c:1407
 msgid "Can't move a shared directory into the Trash"
 msgstr "Ezin da partekatutako direktorioa zakarrontzira bota"
 
-#: ../daemon/gvfsafpvolume.c:1418
+#: ../daemon/gvfsafpvolume.c:1415
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
 msgstr ""
 "Lekuz aldatzen ari den objektua ez-berrizendagarri gisa markatu da "
 "(RenameInhibit)"
 
-#: ../daemon/gvfsafpvolume.c:1422
+#: ../daemon/gvfsafpvolume.c:1419
 msgid "Object being moved doesn't exist"
 msgstr "Lekuz aldatzen ari den objektua ez da existitzen"
 
-#: ../daemon/gvfsafpvolume.c:1559
+#: ../daemon/gvfsafpvolume.c:1556
 msgid "Server doesn't support the FPCopyFile operation"
 msgstr "Zerbitzariak ez du FPCopyFile eragiketa onartzen"
 
-#: ../daemon/gvfsafpvolume.c:1563
+#: ../daemon/gvfsafpvolume.c:1560
 msgid "Unable to open source file for reading"
 msgstr "Ezin da konfigurazioko fitxategia irakurtzeko ireki"
 
-#: ../daemon/gvfsafpvolume.c:1575
+#: ../daemon/gvfsafpvolume.c:1572
 msgid "Source file and/or destination directory doesn't exist"
 msgstr "Iturburuko fitxategia edo/eta helburuko direktorioa ez da existitzen"
 
-#: ../daemon/gvfsafpvolume.c:1579
+#: ../daemon/gvfsafpvolume.c:1576
 msgid "Source file is a directory"
 msgstr "Iturburuko fitxategia direktorioa da"
 
-#: ../daemon/gvfsafpvolume.c:2009
+#. Translators: range conflict means
+#. requested data are locked by another user
+#: ../daemon/gvfsafpvolume.c:2008
 msgid "Range lock conflict exists"
 msgstr "Barrutiko blokeoan gatazkak daude"
 
-#: ../daemon/gvfsafpvolume.c:2293
+#: ../daemon/gvfsafpvolume.c:2292 ../daemon/gvfsbackendmtp.c:1199
+#: ../daemon/gvfsbackendmtp.c:1346 ../daemon/gvfsbackendmtp.c:1537
+#: ../daemon/gvfsbackendmtp.c:2000
 msgid "Directory doesn't exist"
 msgstr "Direktorioa ez da existitzen"
 
-#: ../daemon/gvfsafpvolume.c:2297
+#: ../daemon/gvfsafpvolume.c:2296
 msgid "Target object is not a directory"
 msgstr "Helburuko objektua ez da direktorio bat"
 
-#: ../daemon/gvfsafpvolume.c:2643
+#: ../daemon/gvfsafpvolume.c:2642
 msgid "File is not open for write access"
 msgstr "Fitxategia ez da idazteko atzipenarekin ireki"
 
-#: ../daemon/gvfsafpvolume.c:2651
+#: ../daemon/gvfsafpvolume.c:2650
 msgid "File is locked by another user"
 msgstr "Fitxategia beste erabiltzaile batek blokeatuta dago"
 
-#: ../daemon/gvfsafpvolume.c:2790
+#: ../daemon/gvfsafpvolume.c:2788
 msgid "File is not open for read access"
 msgstr "Fitxategia ez da irakurtzeko atzipenarekin ireki"
 
@@ -527,7 +541,9 @@ msgid "Internal Apple File Control error"
 msgstr "Apple-ren fitxategi-kontrol (AFC) barneko errorea"
 
 #: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:737
-#: ../daemon/gvfsbackendmtp.c:1205
+#: ../daemon/gvfsbackendmtp.c:1392 ../daemon/gvfsbackendmtp.c:1430
+#: ../daemon/gvfsbackendmtp.c:1622 ../daemon/gvfsbackendmtp.c:1669
+#: ../daemon/gvfsbackendmtp.c:1739 ../daemon/gvfsbackendmtp.c:2077
 msgid "File does not exist"
 msgstr "Fitxategia ez da existitzen"
 
@@ -590,41 +606,41 @@ msgstr ""
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "libimobiledevice-ren kudeatu gabeko errorea (%d)"
 
-#: ../daemon/gvfsbackendafc.c:417
+#: ../daemon/gvfsbackendafc.c:412
 msgid "Try again"
 msgstr "Saiatu berriro"
 
-#: ../daemon/gvfsbackendafc.c:417 ../daemon/gvfsbackend.c:968
+#: ../daemon/gvfsbackendafc.c:412 ../daemon/gvfsbackend.c:979
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
 #: ../monitor/udisks2/gvfsudisks2mount.c:762
 msgid "Cancel"
 msgstr "Utzi"
 
-#: ../daemon/gvfsbackendafc.c:435 ../daemon/gvfsbackendarchive.c:553
-#: ../daemon/gvfsbackendarchive.c:582 ../daemon/gvfsbackenddav.c:1825
-#: ../daemon/gvfsbackendhttp.c:316 ../daemon/gvfsbackendobexftp.c:884
-#: ../daemon/gvfsbackendobexftp.c:900 ../daemon/gvfsbackendobexftp.c:919
-#: ../daemon/gvfsbackendsmb.c:699
+#: ../daemon/gvfsbackendafc.c:430 ../daemon/gvfsbackendarchive.c:608
+#: ../daemon/gvfsbackendarchive.c:637 ../daemon/gvfsbackenddav.c:1840
+#: ../daemon/gvfsbackendhttp.c:310 ../daemon/gvfsbackendobexftp.c:887
+#: ../daemon/gvfsbackendobexftp.c:903 ../daemon/gvfsbackendobexftp.c:922
+#: ../daemon/gvfsbackendsmb.c:712
 msgid "Invalid mount spec"
 msgstr "Muntaiaren zehaztapen baliogabea"
 
-#: ../daemon/gvfsbackendafc.c:441 ../daemon/gvfsbackendafc.c:471
+#: ../daemon/gvfsbackendafc.c:436 ../daemon/gvfsbackendafc.c:466
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr ""
 "Baliogabeko AFC kokalekua: era honetakoa izan behar du 'afc://uuid:ataka-"
 "zenbakia'"
 
-#: ../daemon/gvfsbackendafc.c:457
+#: ../daemon/gvfsbackendafc.c:452
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Apple gailu mugikorra"
 
-#: ../daemon/gvfsbackendafc.c:462
+#: ../daemon/gvfsbackendafc.c:457
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Apple gailu mugikorra, kaiolatik askatuta"
 
-#: ../daemon/gvfsbackendafc.c:467
+#: ../daemon/gvfsbackendafc.c:462
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Dokumentuak Apple gailu mugikorrean"
@@ -632,7 +648,7 @@ msgstr "Dokumentuak Apple gailu mugikorrean"
 #. translators:
 #. * This is the device name, with the service being browsed in brackets, eg.:
 #. * Alan Smithee's iPhone (jailbreak)
-#: ../daemon/gvfsbackendafc.c:526
+#: ../daemon/gvfsbackendafc.c:521
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (kaiolatik askatuta)"
@@ -640,7 +656,7 @@ msgstr "%s (kaiolatik askatuta)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:533 ../monitor/afc/afcvolume.c:128
+#: ../daemon/gvfsbackendafc.c:528 ../monitor/afc/afcvolume.c:130
 #, c-format
 msgid "Documents on %s"
 msgstr "%s(e)ngo dokumentuak"
@@ -648,7 +664,7 @@ msgstr "%s(e)ngo dokumentuak"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:628
+#: ../daemon/gvfsbackendafc.c:623
 #, c-format
 msgid ""
 "The device “%s” is locked. Enter the passcode on the device and click “Try "
@@ -657,31 +673,33 @@ msgstr ""
 "'%s' gailua blokeatuta dago. Idatzi pasakodea gailuan eta egin klik 'Saiatu "
 "berriro' botoian."
 
-#: ../daemon/gvfsbackendafc.c:967 ../daemon/gvfsbackendarchive.c:659
-#: ../daemon/gvfsbackendcomputer.c:656 ../daemon/gvfsbackendgphoto2.c:1856
-#: ../daemon/gvfsbackendobexftp.c:1096 ../daemon/gvfsbackendrecent.c:121
-#: ../daemon/gvfsbackendsmb.c:783 ../daemon/gvfsbackendtrash.c:232
+#: ../daemon/gvfsbackendafc.c:967 ../daemon/gvfsbackendarchive.c:714
+#: ../daemon/gvfsbackendcomputer.c:656 ../daemon/gvfsbackendgphoto2.c:1848
+#: ../daemon/gvfsbackendobexftp.c:1099 ../daemon/gvfsbackendrecent.c:121
+#: ../daemon/gvfsbackendsmb.c:803 ../daemon/gvfsbackendtrash.c:233
 msgid "Can't open directory"
 msgstr "Ezin da direktorioa ireki"
 
-#: ../daemon/gvfsbackendafc.c:1168 ../daemon/gvfsbackendafc.c:2532
+#: ../daemon/gvfsbackendafc.c:1170 ../daemon/gvfsbackendafc.c:2556
 msgid "Backups are not yet supported."
 msgstr "Babeskopiak ez daude onartuta oraindik."
 
-#: ../daemon/gvfsbackendafc.c:1340
+#: ../daemon/gvfsbackendafc.c:1343
 msgid "Invalid seek type"
 msgstr "Onartu gabeko bilaketa mota"
 
-#: ../daemon/gvfsbackendafc.c:2369 ../daemon/gvfsbackendafp.c:1749
+#: ../daemon/gvfsbackendafc.c:2393 ../daemon/gvfsbackendafp.c:1778
 #: ../daemon/gvfsbackendftp.c:1088 ../daemon/gvfsbackendftp.c:1136
-#: ../daemon/gvfsbackendftp.c:1157 ../daemon/gvfsbackendsftp.c:1825
-#: ../daemon/gvfsbackendsftp.c:4621 ../daemon/gvfsbackendsmb.c:1806
-#: ../daemon/gvfsftptask.c:391
+#: ../daemon/gvfsbackendftp.c:1157 ../daemon/gvfsbackendmtp.c:1726
+#: ../daemon/gvfsbackendmtp.c:1974 ../daemon/gvfsbackendmtp.c:2064
+#: ../daemon/gvfsbackendmtp.c:2134 ../daemon/gvfsbackendsftp.c:1856
+#: ../daemon/gvfsbackendsftp.c:4850 ../daemon/gvfsbackendsmb.c:1849
+#: ../daemon/gvfsftptask.c:395
 msgid "Operation unsupported"
 msgstr "Eragiketa ez dago onartuta"
 
-#: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1115
-#: ../daemon/gvfsbackendsmbbrowse.c:1161
+#: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1141
+#: ../daemon/gvfsbackendsmbbrowse.c:1187
 msgid "The file is not a mountable"
 msgstr "Fitxategia ez da muntagarria"
 
@@ -695,10 +713,10 @@ msgstr "Fitxategia ez da muntagarria"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendafpbrowse.c:461 ../daemon/gvfsbackendafp.c:2066
+#: ../daemon/gvfsbackendafpbrowse.c:461 ../daemon/gvfsbackendafp.c:2101
 #: ../daemon/gvfsbackendftp.c:634 ../daemon/gvfsbackendobexftp.c:705
-#: ../daemon/gvfsbackendsftp.c:1686 ../daemon/gvfsbackendsmb.c:578
-#: ../daemon/gvfsbackendsmb.c:1497
+#: ../daemon/gvfsbackendsftp.c:1717 ../daemon/gvfsbackendsmb.c:584
+#: ../daemon/gvfsbackendsmb.c:1537
 #, c-format
 msgid "%s on %s"
 msgstr "%s - %s"
@@ -709,74 +727,74 @@ msgstr "%s - %s"
 msgid "%s"
 msgstr "%s"
 
-#: ../daemon/gvfsbackendafpbrowse.c:498 ../daemon/gvfsbackendafp.c:2101
-#: ../daemon/gvfsbackendarchive.c:542 ../daemon/gvfsbackendftp.c:668
-#: ../daemon/gvfsbackendsftp.c:1738
+#: ../daemon/gvfsbackendafpbrowse.c:498 ../daemon/gvfsbackendafp.c:2136
+#: ../daemon/gvfsbackendarchive.c:597 ../daemon/gvfsbackendftp.c:668
+#: ../daemon/gvfsbackendsftp.c:1769
 msgid "No hostname specified"
 msgstr "Ez da ostalari-izenik zehaztu"
 
-#: ../daemon/gvfsbackendafpbrowse.c:568 ../daemon/gvfsbackendafp.c:2192
+#: ../daemon/gvfsbackendafpbrowse.c:568 ../daemon/gvfsbackendafp.c:2228
 msgid "Apple Filing Protocol Service"
 msgstr "'Apple Filing Protocol'-aren zerbitzua"
 
-#: ../daemon/gvfsbackendafp.c:274 ../daemon/gvfsbackendburn.c:875
-#: ../daemon/gvfsbackendftp.c:1544 ../daemon/gvfsbackendobexftp.c:1803
+#: ../daemon/gvfsbackendafp.c:275 ../daemon/gvfsbackendburn.c:875
+#: ../daemon/gvfsbackendftp.c:1474 ../daemon/gvfsbackendobexftp.c:1806
 msgid "Can't copy directory over directory"
 msgstr "Ezin da direktorioa direktorio gainean kopiatu"
 
-#: ../daemon/gvfsbackendafp.c:293 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackendftp.c:1567 ../daemon/gvfsbackendmtp.c:1215
-#: ../daemon/gvfsbackendmtp.c:1296 ../daemon/gvfsbackendobexftp.c:1818
+#: ../daemon/gvfsbackendafp.c:294 ../daemon/gvfsbackendburn.c:891
+#: ../daemon/gvfsbackendftp.c:1497 ../daemon/gvfsbackendmtp.c:1440
+#: ../daemon/gvfsbackendmtp.c:1549 ../daemon/gvfsbackendobexftp.c:1821
 msgid "Can't recursively copy directory"
 msgstr "Ezin da direktorioa errekurtsiboki kopiatu"
 
-#: ../daemon/gvfsbackendafp.c:475 ../daemon/gvfsbackendsftp.c:4259
-#: ../daemon/gvfsbackendsmb.c:2157
+#: ../daemon/gvfsbackendafp.c:476 ../daemon/gvfsbackendsftp.c:4488
+#: ../daemon/gvfsbackendsmb.c:2200
 msgid "Can't move directory over directory"
 msgstr "Ezin da direktorioa direktorio gainera eraman"
 
-#: ../daemon/gvfsbackendafp.c:1229 ../daemon/gvfsbackendafp.c:1328
+#: ../daemon/gvfsbackendafp.c:1257 ../daemon/gvfsbackendafp.c:1356
 msgid "backups not supported"
 msgstr "babeskopiak ez daude onartuta"
 
-#: ../daemon/gvfsbackendafp.c:1243
+#: ../daemon/gvfsbackendafp.c:1271
 #, c-format
 msgid "Unable to create temporary file (%s)"
 msgstr "Ezin da aldi baterako fitxategia sortu (%s)"
 
-#: ../daemon/gvfsbackendafp.c:1317 ../daemon/gvfsbackenddav.c:2370
-#: ../daemon/gvfsbackendsftp.c:3407 ../daemon/gvfsbackendsmb.c:1213
+#: ../daemon/gvfsbackendafp.c:1345 ../daemon/gvfsbackenddav.c:2394
+#: ../daemon/gvfsbackendsftp.c:3476 ../daemon/gvfsbackendsmb.c:1235
 msgid "The file was externally modified"
 msgstr "Fitxategia kanpotik aldatu da"
 
-#: ../daemon/gvfsbackendafp.c:1733 ../daemon/gvfsbackendftp.c:1129
-#: ../daemon/gvfsbackendsftp.c:4631
+#: ../daemon/gvfsbackendafp.c:1762 ../daemon/gvfsbackendftp.c:1129
+#: ../daemon/gvfsbackendsftp.c:4860
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "Baliogabeko atributu mota (uint32 espero zen)"
 
 #. Translators: first %s is volumename, second username and third servername
-#: ../daemon/gvfsbackendafp.c:2061
+#: ../daemon/gvfsbackendafp.c:2096
 #, c-format
 msgid "%s for %s on %s"
 msgstr " %s - %s @ %s(e)n"
 
-#: ../daemon/gvfsbackendafp.c:2110
+#: ../daemon/gvfsbackendafp.c:2145
 msgid "No volume specified"
 msgstr "Ez da bolumenik zehaztu"
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:331 ../daemon/gvfsbackendsftp.c:2275
+#: ../daemon/gvfsbackendarchive.c:336 ../daemon/gvfsbackendsftp.c:2306
 #: ../daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
 msgstr "%s(e)ko /"
 
-#: ../daemon/gvfsbackendarchive.c:789 ../daemon/gvfsbackendburn.c:679
+#: ../daemon/gvfsbackendarchive.c:844 ../daemon/gvfsbackendburn.c:679
 #: ../daemon/gvfsbackendcomputer.c:728 ../daemon/gvfsbackenddnssd.c:464
 #: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:744
-#: ../daemon/gvfsbackendsftp.c:3867 ../daemon/gvfsftpdircache.c:157
+#: ../daemon/gvfsbackendsftp.c:3994 ../daemon/gvfsftpdircache.c:157
 msgid "The file is not a directory"
 msgstr "Fitxategia ez da direktorioa"
 
@@ -794,17 +812,17 @@ msgstr "Ezin da aldi baterako direktorioa sortu"
 #: ../daemon/gvfsbackendburn.c:716 ../daemon/gvfsbackendburn.c:742
 #: ../daemon/gvfsbackendburn.c:780 ../daemon/gvfsbackendburn.c:971
 #: ../daemon/gvfsbackendburn.c:1007 ../daemon/gvfsbackendftp.c:794
-#: ../daemon/gvfsbackendgphoto2.c:1238 ../daemon/gvfsbackendgphoto2.c:2177
-#: ../daemon/gvfsbackendgphoto2.c:2895 ../daemon/gvfsbackendrecent.c:105
-#: ../daemon/gvfsbackendrecent.c:259 ../daemon/gvfsbackendsftp.c:1829
-#: ../daemon/gvfsbackendsftp.c:2935 ../daemon/gvfsbackendsftp.c:2948
-#: ../daemon/gvfsbackendsftp.c:2968 ../daemon/gvfsbackendtrash.c:216
+#: ../daemon/gvfsbackendgphoto2.c:1246 ../daemon/gvfsbackendgphoto2.c:2169
+#: ../daemon/gvfsbackendgphoto2.c:2887 ../daemon/gvfsbackendrecent.c:105
+#: ../daemon/gvfsbackendrecent.c:259 ../daemon/gvfsbackendsftp.c:1860
+#: ../daemon/gvfsbackendsftp.c:2990 ../daemon/gvfsbackendsftp.c:3003
+#: ../daemon/gvfsbackendsftp.c:3023 ../daemon/gvfsbackendtrash.c:217
 #, c-format
 msgid "No such file or directory"
 msgstr "Ez dago halako fitxategi edo direktoriorik"
 
 #: ../daemon/gvfsbackendburn.c:455 ../daemon/gvfsbackendburn.c:903
-#: ../daemon/gvfsbackendobexftp.c:1834
+#: ../daemon/gvfsbackendobexftp.c:1837
 msgid "Can't copy file over directory"
 msgstr "Ezin da fitxategia direktorio gainean kopiatu"
 
@@ -816,7 +834,7 @@ msgstr "CD/DVD sortzailea"
 #: ../daemon/gvfsbackendburn.c:752 ../daemon/gvfsbackendburn.c:788
 #: ../daemon/gvfsbackendburn.c:923 ../daemon/gvfsbackendburn.c:985
 #: ../daemon/gvfsbackendburn.c:989 ../daemon/gvfsbackendburn.c:999
-#: ../daemon/gvfsbackendgphoto2.c:2969
+#: ../daemon/gvfsbackendgphoto2.c:2961
 msgid "File exists"
 msgstr "Fitxategia badago lehendik ere"
 
@@ -824,11 +842,11 @@ msgstr "Fitxategia badago lehendik ere"
 #: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:121
 #: ../daemon/gvfsjobcreatemonitor.c:143 ../daemon/gvfsjobcreatemonitor.c:154
 #: ../daemon/gvfsjobcreatemonitor.c:177 ../daemon/gvfsjobcreatemonitor.c:195
-#: ../daemon/gvfsjobdelete.c:108 ../daemon/gvfsjobenumerate.c:268
+#: ../daemon/gvfsjobdelete.c:108 ../daemon/gvfsjobenumerate.c:271
 #: ../daemon/gvfsjobmakedirectory.c:108 ../daemon/gvfsjobmount.c:112
 #: ../daemon/gvfsjobmountmountable.c:138 ../daemon/gvfsjobmove.c:121
-#: ../daemon/gvfsjobopenforread.c:120 ../daemon/gvfsjobopenforwrite.c:132
-#: ../daemon/gvfsjobopenforwrite.c:146 ../daemon/gvfsjobopenforwrite.c:160
+#: ../daemon/gvfsjobopenforread.c:120 ../daemon/gvfsjobopenforwrite.c:184
+#: ../daemon/gvfsjobopenforwrite.c:198 ../daemon/gvfsjobopenforwrite.c:212
 #: ../daemon/gvfsjobopeniconforread.c:104 ../daemon/gvfsjobpollmountable.c:107
 #: ../daemon/gvfsjobpull.c:125 ../daemon/gvfsjobpush.c:125
 #: ../daemon/gvfsjobqueryattributes.c:145 ../daemon/gvfsjobqueryfsinfo.c:116
@@ -837,11 +855,12 @@ msgstr "Fitxategia badago lehendik ere"
 #: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
 #: ../daemon/gvfsjobsetattribute.c:130 ../daemon/gvfsjobsetdisplayname.c:111
 #: ../daemon/gvfsjobstartmountable.c:113 ../daemon/gvfsjobstopmountable.c:115
-#: ../daemon/gvfsjobtrash.c:107 ../daemon/gvfsjobunmountmountable.c:157
+#: ../daemon/gvfsjobtrash.c:107 ../daemon/gvfsjobtruncate.c:112
+#: ../daemon/gvfsjobunmountmountable.c:157
 #: ../daemon/gvfsjobunmountmountable.c:172 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1174 ../monitor/gdu/ggdumount.c:1258
 #: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1134
-#: ../monitor/udisks2/gvfsudisks2volume.c:1675
+#: ../monitor/udisks2/gvfsudisks2volume.c:1676
 msgid "Operation not supported by backend"
 msgstr "Motorrak ez du eragiketa onartzen"
 
@@ -849,24 +868,27 @@ msgstr "Motorrak ez du eragiketa onartzen"
 msgid "No such file or directory in target path"
 msgstr "Ez dago halako fitxategi edo direktoriorik helburuko bide-izenean"
 
-#: ../daemon/gvfsbackendburn.c:884 ../daemon/gvfsbackendobexftp.c:1811
-#: ../daemon/gvfsbackendobexftp.c:1842 ../daemon/gvfsbackendsftp.c:1823
-#: ../daemon/gvfsbackendsftp.c:4429
+#: ../daemon/gvfsbackendburn.c:884 ../daemon/gvfsbackendobexftp.c:1814
+#: ../daemon/gvfsbackendobexftp.c:1845 ../daemon/gvfsbackendsftp.c:1854
+#: ../daemon/gvfsbackendsftp.c:4658
 msgid "Target file exists"
 msgstr "Helburuko fitxategia badago lehendik ere"
 
 #: ../daemon/gvfsbackendburn.c:949 ../daemon/gvfsbackendcomputer.c:811
-#: ../daemon/gvfsbackendgphoto2.c:2545 ../daemon/gvfsbackendgphoto2.c:2758
-#: ../daemon/gvfsbackendgphoto2.c:2855 ../daemon/gvfsbackendgphoto2.c:2948
+#: ../daemon/gvfsbackendgphoto2.c:2537 ../daemon/gvfsbackendgphoto2.c:2750
+#: ../daemon/gvfsbackendgphoto2.c:2847 ../daemon/gvfsbackendgphoto2.c:2940
+#: ../daemon/gvfsbackendgphoto2.c:3548 ../daemon/gvfsbackendgphoto2.c:3558
+#: ../daemon/gvfsbackendsftp.c:5489 ../daemon/gvfsbackendsftp.c:5521
+#: ../daemon/gvfsbackendsftp.c:6007
 msgid "Not supported"
 msgstr "Ez dago onartuta"
 
-#: ../daemon/gvfsbackend.c:967 ../monitor/gdu/ggdumount.c:922
+#: ../daemon/gvfsbackend.c:978 ../monitor/gdu/ggdumount.c:922
 #: ../monitor/udisks2/gvfsudisks2mount.c:760
 msgid "Unmount Anyway"
 msgstr "Desmuntatu dena den"
 
-#: ../daemon/gvfsbackend.c:970 ../monitor/gdu/ggdumount.c:924
+#: ../daemon/gvfsbackend.c:981 ../monitor/gdu/ggdumount.c:924
 #: ../monitor/udisks2/gvfsudisks2mount.c:763
 msgid ""
 "Volume is busy\n"
@@ -875,86 +897,86 @@ msgstr ""
 "Bolumena lanpetuta dago\n"
 "Aplikazio batek edo gehiagok bolumena lanpetuta daukate."
 
-#: ../daemon/gvfsbackendcdda.c:357 ../daemon/gvfsbackendgphoto2.c:1548
-#: ../daemon/gvfsbackendmtp.c:455
+#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1555
+#: ../daemon/gvfsbackendmtp.c:698
 msgid "Cannot create gudev client"
 msgstr "Ezin da gudev bezeroa sortu"
 
-#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1566
+#: ../daemon/gvfsbackendcdda.c:376 ../daemon/gvfsbackendgphoto2.c:1572
 msgid "Cannot connect to the system bus"
 msgstr "Ezin izan da sistemako busarekin konektatu"
 
-#: ../daemon/gvfsbackendcdda.c:388 ../daemon/gvfsbackendgphoto2.c:1578
+#: ../daemon/gvfsbackendcdda.c:387 ../daemon/gvfsbackendgphoto2.c:1583
 msgid "Cannot create libhal context"
 msgstr "Ezin da libhal testuingurua sortu"
 
-#: ../daemon/gvfsbackendcdda.c:402 ../daemon/gvfsbackendgphoto2.c:1591
+#: ../daemon/gvfsbackendcdda.c:401 ../daemon/gvfsbackendgphoto2.c:1595
 msgid "Cannot initialize libhal"
 msgstr "Ezin da libhal hasieratu"
 
-#: ../daemon/gvfsbackendcdda.c:418 ../daemon/gvfsbackendcdda.c:504
+#: ../daemon/gvfsbackendcdda.c:417 ../daemon/gvfsbackendcdda.c:503
 msgid "No drive specified"
 msgstr "Ez da unitaterik zehaztu"
 
-#: ../daemon/gvfsbackendcdda.c:442
+#: ../daemon/gvfsbackendcdda.c:441
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "Ezin da %s unitatea aurkitu"
 
-#: ../daemon/gvfsbackendcdda.c:455
+#: ../daemon/gvfsbackendcdda.c:454
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "%s unitateak ez dauka audio-fitxategirik"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
-#: ../daemon/gvfsbackendcdda.c:465
+#: ../daemon/gvfsbackendcdda.c:464
 #, c-format
 msgid "cdda mount on %s"
 msgstr "cdda hemen muntatuta: %s"
 
-#: ../daemon/gvfsbackendcdda.c:466 ../daemon/gvfsbackendcdda.c:987
+#: ../daemon/gvfsbackendcdda.c:465 ../daemon/gvfsbackendcdda.c:986
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:358
+#: ../monitor/udisks2/gvfsudisks2volume.c:359
 #, c-format
 msgid "Audio Disc"
 msgstr "Audio-diskoa"
 
-#: ../daemon/gvfsbackendcdda.c:530
+#: ../daemon/gvfsbackendcdda.c:529
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "Fitxategi-sistema lanpetuta dago: fitxategi %d irekita"
 msgstr[1] "Fitxategi-sistema lanpetuta dago: %d fitxategi irekita"
 
-#: ../daemon/gvfsbackendcdda.c:722
+#: ../daemon/gvfsbackendcdda.c:721
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "Ez dago %s fitxategia %s unitatean"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:831
+#: ../daemon/gvfsbackendcdda.c:830
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "'Paranoia' programaren errorea %s unitatean"
 
-#: ../daemon/gvfsbackendcdda.c:894
+#: ../daemon/gvfsbackendcdda.c:893
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Errorea korrontean bilaketa egitean %s unitatean"
 
-#: ../daemon/gvfsbackendcdda.c:1008 ../daemon/gvfsbackendgphoto2.c:1864
+#: ../daemon/gvfsbackendcdda.c:1015 ../daemon/gvfsbackendgphoto2.c:1856
 #, c-format
 msgid "No such file"
 msgstr "Ez dago halako fitxategirik"
 
-#: ../daemon/gvfsbackendcdda.c:1022
+#: ../daemon/gvfsbackendcdda.c:1029
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Fitxategia ez da existitzen edo ez da audioko pista bat"
 
-#: ../daemon/gvfsbackendcdda.c:1127
+#: ../daemon/gvfsbackendcdda.c:1134
 msgid "Audio CD File System Service"
 msgstr "Audio CDaren fitxategi-sistemaren zerbitzua"
 
@@ -970,7 +992,7 @@ msgstr "Fitxategi-sistema"
 msgid "Can't open mountable file"
 msgstr "Ezin da fitxategi muntagarria ireki"
 
-#: ../daemon/gvfsbackendcomputer.c:857 ../daemon/gvfsbackendsftp.c:1158
+#: ../daemon/gvfsbackendcomputer.c:857 ../daemon/gvfsbackendsftp.c:1174
 #, c-format
 msgid "Internal error: %s"
 msgstr "Barneko errorea: %s"
@@ -1012,61 +1034,61 @@ msgstr "Ezin da fitxategia kontsultatu"
 #. Translators: This is the name of the WebDAV share constructed as
 #. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
 #. the second %s and only shown if it is not the default http(s) port.
-#: ../daemon/gvfsbackenddav.c:482
+#: ../daemon/gvfsbackenddav.c:489
 #, c-format
 msgid "%s on %s%s"
 msgstr "%s - %s%s"
 
-#: ../daemon/gvfsbackenddav.c:674 ../daemon/gvfsbackenddav.c:1915
-#: ../daemon/gvfsbackendhttp.c:262
+#: ../daemon/gvfsbackenddav.c:681 ../daemon/gvfsbackenddav.c:1930
+#: ../daemon/gvfsbackendhttp.c:256
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP errorea: %s"
 
-#: ../daemon/gvfsbackenddav.c:691
+#: ../daemon/gvfsbackenddav.c:698
 msgid "Could not parse response"
 msgstr "Ezin izan da erantzuna analizatu"
 
-#: ../daemon/gvfsbackenddav.c:700
+#: ../daemon/gvfsbackenddav.c:707
 msgid "Empty response"
 msgstr "Erantzun hutsa"
 
-#: ../daemon/gvfsbackenddav.c:708
+#: ../daemon/gvfsbackenddav.c:715
 msgid "Unexpected reply from server"
 msgstr "Ustekabeko erantzuna zerbitzaritik"
 
-#: ../daemon/gvfsbackenddav.c:1399 ../daemon/gvfsbackenddav.c:2045
-#: ../daemon/gvfsbackenddav.c:2132 ../daemon/gvfsbackenddav.c:2233
+#: ../daemon/gvfsbackenddav.c:1414 ../daemon/gvfsbackenddav.c:2060
+#: ../daemon/gvfsbackenddav.c:2149 ../daemon/gvfsbackenddav.c:2250
 msgid "Response invalid"
 msgstr "Erantzun baliogabea"
 
-#: ../daemon/gvfsbackenddav.c:1542
+#: ../daemon/gvfsbackenddav.c:1557
 msgid "WebDAV share"
 msgstr "WebDAV partekatzea"
 
 #. translators: %s here is the hostname
 #. Translators: %s is the hostname
-#: ../daemon/gvfsbackenddav.c:1544 ../daemon/gvfsbackendftp.c:491
-#: ../daemon/gvfsbackendsftp.c:964
+#: ../daemon/gvfsbackenddav.c:1559 ../daemon/gvfsbackendftp.c:491
+#: ../daemon/gvfsbackendsftp.c:980
 #, c-format
 msgid "Enter password for %s"
 msgstr "Sartu %s(r)en pasahitza"
 
-#: ../daemon/gvfsbackenddav.c:1547
+#: ../daemon/gvfsbackenddav.c:1562
 msgid "Please enter proxy password"
 msgstr "Sartu proxy-aren pasahitza"
 
-#: ../daemon/gvfsbackenddav.c:1919 ../daemon/gvfsbackenddav.c:1923
+#: ../daemon/gvfsbackenddav.c:1934 ../daemon/gvfsbackenddav.c:1938
 msgid "Not a WebDAV enabled share"
 msgstr "Ez da gaitutako WebDAV partekatzea"
 
-#: ../daemon/gvfsbackenddav.c:1999 ../daemon/gvfsbackenddav.c:2087
-#: ../daemon/gvfsbackenddav.c:2160 ../daemon/gvfsbackenddav.c:2267
+#: ../daemon/gvfsbackenddav.c:2014 ../daemon/gvfsbackenddav.c:2104
+#: ../daemon/gvfsbackenddav.c:2177 ../daemon/gvfsbackenddav.c:2284
 msgid "Could not create request"
 msgstr "Ezin izan da eskaera sortu"
 
-#: ../daemon/gvfsbackenddav.c:2401 ../daemon/gvfsbackendsmb.c:1249
-#: ../daemon/gvfsbackendsmb.c:2185
+#: ../daemon/gvfsbackenddav.c:2425 ../daemon/gvfsbackendsmb.c:1271
+#: ../daemon/gvfsbackendsmb.c:2228
 msgid "Backup file creation failed"
 msgstr "Huts egin du babeskopiaren fitxategia sortzean"
 
@@ -1089,13 +1111,13 @@ msgid "Network"
 msgstr "Sarea"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:488 ../daemon/gvfsbackendsftp.c:957
+#: ../daemon/gvfsbackendftp.c:488 ../daemon/gvfsbackendsftp.c:973
 #, c-format
 msgid "Enter password for %s on %s"
 msgstr "Sartu %s(r)en pasahitza %s ostalarian"
 
-#: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:981
-#: ../daemon/gvfsbackendsmbbrowse.c:1022 ../daemon/gvfsbackendsmb.c:655
+#: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:997
+#: ../daemon/gvfsbackendsmbbrowse.c:1041 ../daemon/gvfsbackendsmb.c:667
 msgid "Password dialog cancelled"
 msgstr "Pasahitzaren elkarrizketa-koadroa bertan behera utzita"
 
@@ -1103,40 +1125,40 @@ msgstr "Pasahitzaren elkarrizketa-koadroa bertan behera utzita"
 msgid "Insufficient permissions"
 msgstr "Ez duzu nahikoa baimen"
 
-#: ../daemon/gvfsbackendftp.c:982 ../daemon/gvfsbackendftp.c:1335
-#: ../daemon/gvfsbackendsftp.c:3260
+#: ../daemon/gvfsbackendftp.c:982 ../daemon/gvfsbackendftp.c:1337
+#: ../daemon/gvfsbackendsftp.c:3320 ../daemon/gvfsbackendsftp.c:3522
 msgid "backups not supported yet"
 msgstr "babeskopiak ez daude onartuta oraindik"
 
-#: ../daemon/gvfsbackendgphoto2.c:507
+#: ../daemon/gvfsbackendgphoto2.c:515
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "%s: %d: direktorioa edo fitxategia badago lehendik ere"
 
-#: ../daemon/gvfsbackendgphoto2.c:514
+#: ../daemon/gvfsbackendgphoto2.c:522
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "%s: %d: ez dago halako fitxategi edo direktoriorik"
 
-#: ../daemon/gvfsbackendgphoto2.c:520
+#: ../daemon/gvfsbackendgphoto2.c:528
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: fitxategi-izen baliogabea"
 
-#: ../daemon/gvfsbackendgphoto2.c:526
+#: ../daemon/gvfsbackendgphoto2.c:534
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "%s: %d: ez dago onartuta"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:738 ../daemon/gvfsbackendgphoto2.c:744
+#: ../daemon/gvfsbackendgphoto2.c:746 ../daemon/gvfsbackendgphoto2.c:752
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Kamera digitala (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:972 ../monitor/gphoto2/ggphoto2volume.c:197
+#: ../daemon/gvfsbackendgphoto2.c:980 ../monitor/gphoto2/ggphoto2volume.c:197
 #: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
 msgid "%s Camera"
@@ -1144,163 +1166,163 @@ msgstr "%s kamera"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:975 ../monitor/gphoto2/ggphoto2volume.c:192
+#: ../daemon/gvfsbackendgphoto2.c:983 ../monitor/gphoto2/ggphoto2volume.c:192
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "%s audio-erreproduzigailua"
 
-#: ../daemon/gvfsbackendgphoto2.c:984 ../monitor/gphoto2/ggphoto2volume.c:203
+#: ../daemon/gvfsbackendgphoto2.c:992 ../monitor/gphoto2/ggphoto2volume.c:203
 #: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "Kamera"
 
-#: ../daemon/gvfsbackendgphoto2.c:986 ../monitor/gphoto2/ggphoto2volume.c:306
+#: ../daemon/gvfsbackendgphoto2.c:994 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "Audio-erreproduzigailua"
 
-#: ../daemon/gvfsbackendgphoto2.c:1607 ../daemon/gvfsbackendmtp.c:447
+#: ../daemon/gvfsbackendgphoto2.c:1611 ../daemon/gvfsbackendmtp.c:690
 msgid "No device specified"
 msgstr "Ez da gailurik zehaztu"
 
-#: ../daemon/gvfsbackendgphoto2.c:1628
+#: ../daemon/gvfsbackendgphoto2.c:1631
 msgid "Cannot create gphoto2 context"
 msgstr "Ezin da gphoto2 testuingurua sortu"
 
-#: ../daemon/gvfsbackendgphoto2.c:1638
+#: ../daemon/gvfsbackendgphoto2.c:1640
 msgid "Error creating camera"
 msgstr "Errorea kamera sortzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:1651 ../daemon/gvfsbackendgphoto2.c:1661
+#: ../daemon/gvfsbackendgphoto2.c:1652 ../daemon/gvfsbackendgphoto2.c:1661
 msgid "Error loading device information"
 msgstr "Errorea gailuaren informazioa kargatzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:1673
+#: ../daemon/gvfsbackendgphoto2.c:1672
 msgid "Error looking up device information"
 msgstr "Errorea gailuaren informazioa bilatzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:1683
+#: ../daemon/gvfsbackendgphoto2.c:1681
 msgid "Error getting device information"
 msgstr "Errorea gailuaren informazioa lortzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:1698
+#: ../daemon/gvfsbackendgphoto2.c:1695
 msgid "Error setting up camera communications port"
 msgstr "Errorea kameraren komunikazio-ataka ezartzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:1709
+#: ../daemon/gvfsbackendgphoto2.c:1705
 msgid "Error initializing camera"
 msgstr "Errorea kamera hasieratzean"
 
 #. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
 #. backend and shouldn't be translated.
-#: ../daemon/gvfsbackendgphoto2.c:1724
+#: ../daemon/gvfsbackendgphoto2.c:1716
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2 hemen muntatuta: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1810
+#: ../daemon/gvfsbackendgphoto2.c:1802
 msgid "No camera specified"
 msgstr "Ez da kamerarik zehaztu"
 
-#: ../daemon/gvfsbackendgphoto2.c:1872
+#: ../daemon/gvfsbackendgphoto2.c:1864 ../daemon/gvfsbackendgphoto2.c:3590
 msgid "Error creating file object"
 msgstr "Errorea fitxategi-objektua sortzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:1887
+#: ../daemon/gvfsbackendgphoto2.c:1879 ../daemon/gvfsbackendgphoto2.c:3621
 msgid "Error getting file"
 msgstr "Errorea fitxategia lortzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:1897
+#: ../daemon/gvfsbackendgphoto2.c:1889
 msgid "Error getting data from file"
 msgstr "Errorea fitxategitik datuak lortzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:1955 ../daemon/gvfsbackendmtp.c:1487
+#: ../daemon/gvfsbackendgphoto2.c:1947 ../daemon/gvfsbackendmtp.c:1835
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Gaizki osatutako '%s' ikono-identifikatzailea"
 
-#: ../daemon/gvfsbackendgphoto2.c:2031 ../daemon/gvfsbackendgphoto2.c:3219
+#: ../daemon/gvfsbackendgphoto2.c:2023 ../daemon/gvfsbackendgphoto2.c:3212
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Errorea %s kamerako korrontean bilaketa egitean"
 
-#: ../daemon/gvfsbackendgphoto2.c:2171 ../daemon/gvfsbackendsftp.c:2938
-#: ../daemon/gvfsbackendsmbbrowse.c:1443
+#: ../daemon/gvfsbackendgphoto2.c:2163 ../daemon/gvfsbackendsftp.c:2993
+#: ../daemon/gvfsbackendsmbbrowse.c:1469
 msgid "Not a directory"
 msgstr "Ez da direktorioa"
 
-#: ../daemon/gvfsbackendgphoto2.c:2204
+#: ../daemon/gvfsbackendgphoto2.c:2196
 msgid "Failed to get folder list"
 msgstr "Huts egin du karpeten zerrenda lortzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:2269
+#: ../daemon/gvfsbackendgphoto2.c:2261
 msgid "Failed to get file list"
 msgstr "Huts egin du fitxategien zerrenda lortzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:2557
+#: ../daemon/gvfsbackendgphoto2.c:2549
 msgid "Error creating directory"
 msgstr "Errorea direktorioa sortzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:2770
+#: ../daemon/gvfsbackendgphoto2.c:2762
 msgid "Name already exists"
 msgstr "Izen hori badago lehendik ere"
 
-#: ../daemon/gvfsbackendgphoto2.c:2781 ../daemon/gvfsbackendgphoto2.c:3414
+#: ../daemon/gvfsbackendgphoto2.c:2773 ../daemon/gvfsbackendgphoto2.c:3441
 msgid "New name too long"
 msgstr "Izen berria luzeegia da"
 
-#: ../daemon/gvfsbackendgphoto2.c:2791 ../daemon/gvfsbackendgphoto2.c:3425
+#: ../daemon/gvfsbackendgphoto2.c:2783 ../daemon/gvfsbackendgphoto2.c:3452
 msgid "Error renaming directory"
 msgstr "Errorea direktorioa izenez aldatzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:2804 ../daemon/gvfsbackendgphoto2.c:3438
+#: ../daemon/gvfsbackendgphoto2.c:2796 ../daemon/gvfsbackendgphoto2.c:3465
 msgid "Error renaming file"
 msgstr "Errorea fitxategia izenez aldatzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:2868
+#: ../daemon/gvfsbackendgphoto2.c:2860
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "'%s' direktorioa ez dago hutsik"
 
-#: ../daemon/gvfsbackendgphoto2.c:2879
+#: ../daemon/gvfsbackendgphoto2.c:2871
 msgid "Error deleting directory"
 msgstr "Errorea direktorioa ezabatzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:2905
+#: ../daemon/gvfsbackendgphoto2.c:2897 ../daemon/gvfsbackendgphoto2.c:3634
 msgid "Error deleting file"
 msgstr "Errorea fitxategia ezabatzean"
 
-#: ../daemon/gvfsbackendgphoto2.c:2958
+#: ../daemon/gvfsbackendgphoto2.c:2950
 msgid "Can't write to directory"
 msgstr "Ezin da direktorioan idatzi"
 
-#: ../daemon/gvfsbackendgphoto2.c:3005
+#: ../daemon/gvfsbackendgphoto2.c:2997
 msgid "Cannot allocate new file to append to"
 msgstr "Ezin da fitxategi berria esleitu eransteko"
 
-#: ../daemon/gvfsbackendgphoto2.c:3020
+#: ../daemon/gvfsbackendgphoto2.c:3012
 msgid "Cannot read file to append to"
 msgstr "Ezin da fitxategia irakurri eransteko"
 
-#: ../daemon/gvfsbackendgphoto2.c:3031
+#: ../daemon/gvfsbackendgphoto2.c:3023
 msgid "Cannot get data of file to append to"
 msgstr "Ezin da daturik lortu fitxategitik eransteko"
 
-#: ../daemon/gvfsbackendgphoto2.c:3322
+#: ../daemon/gvfsbackendgphoto2.c:3349
 msgid "Error writing file"
 msgstr "Errorea fitxategia idaztean"
 
-#: ../daemon/gvfsbackendgphoto2.c:3370
+#: ../daemon/gvfsbackendgphoto2.c:3397
 msgid "Not supported (not same directory)"
 msgstr "Ez dago onartuta (ez da direktorio berdina)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3382
+#: ../daemon/gvfsbackendgphoto2.c:3409
 msgid ""
 "Not supported (the source is a directory, the destination is a directory too)"
 msgstr ""
 "Ez dago onartuta (iturburuko direktorioa da, helburukoa ere direktorioa da)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3390
+#: ../daemon/gvfsbackendgphoto2.c:3417
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
@@ -1308,95 +1330,99 @@ msgstr ""
 "Ez dago onartuta (iturburukoa direktorioa da, baina helburukoa badagoen "
 "fitxategia da)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3402
+#: ../daemon/gvfsbackendgphoto2.c:3429
 msgid ""
 "Not supported (the source is a file, but the destination is a directory)"
 msgstr ""
 "Ez dago onartuta (iturburukoa fitxategia da, baina helburukoa direktorioa da)"
 
-#: ../daemon/gvfsbackendhttp.c:258
+#: ../daemon/gvfsbackendhttp.c:252
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "HTTP bezeroaren errorea: %s"
 
-#: ../daemon/gvfsbackendlocaltest.c:856
+#: ../daemon/gvfsbackendlocaltest.c:857
 msgid "Directory notification not supported"
 msgstr "Direktorioaren jakinarazpena ez dago onartuta"
 
-#: ../daemon/gvfsbackendmtp.c:289
+#: ../daemon/gvfsbackendmtp.c:505
 msgid "Unknown error."
 msgstr "Errore ezezaguna."
 
-#: ../daemon/gvfsbackendmtp.c:295
+#: ../daemon/gvfsbackendmtp.c:511
 #, c-format
 msgid "libmtp error: %s"
 msgstr "libmtp liburutegiaren errorea: %s"
 
-#: ../daemon/gvfsbackendmtp.c:401
-msgid "Unexpected host uri format."
+#: ../daemon/gvfsbackendmtp.c:644
+msgid "Unexpected host URI format."
 msgstr "Ustekabeko ostalariaren URI formatua."
 
-#: ../daemon/gvfsbackendmtp.c:411
-msgid "Malformed host uri."
+#: ../daemon/gvfsbackendmtp.c:654
+msgid "Malformed host URI."
 msgstr "Ostalariaren URIa gaizki eratuta."
 
-#: ../daemon/gvfsbackendmtp.c:424
+#: ../daemon/gvfsbackendmtp.c:667
 msgid "Couldn't find matching udev device."
 msgstr "Ezin izan da udev gailuarekin bat datorrenik aurkitu."
 
-#: ../daemon/gvfsbackendmtp.c:564
+#: ../daemon/gvfsbackendmtp.c:811
 msgid "No MTP devices found"
 msgstr "Ez da MTP gailurik aurkitu"
 
-#: ../daemon/gvfsbackendmtp.c:569
+#: ../daemon/gvfsbackendmtp.c:816
 msgid "Unable to connect to MTP device"
 msgstr "Ezin da MTP gailuarekin konektatu"
 
-#: ../daemon/gvfsbackendmtp.c:574
+#: ../daemon/gvfsbackendmtp.c:821
 msgid "Unable to allocate memory while detecting MTP devices"
 msgstr "Ezin da memoria esleitu MTP gailuak detektatzen diren bitartean"
 
-#: ../daemon/gvfsbackendmtp.c:580
+#: ../daemon/gvfsbackendmtp.c:827
 msgid "Generic libmtp error"
 msgstr "libmtp liburutegiaren errore orokorra"
 
-#: ../daemon/gvfsbackendmtp.c:597
+#: ../daemon/gvfsbackendmtp.c:844
 #, c-format
 msgid "Unable to open MTP device '%s'"
 msgstr "Ezin da '%s' MTP gailua ireki"
 
-#: ../daemon/gvfsbackendmtp.c:640
+#: ../daemon/gvfsbackendmtp.c:864
+msgid "Device not found"
+msgstr "Ez da gailua aurkitu"
+
+#: ../daemon/gvfsbackendmtp.c:903
 msgid "Unnamed Device"
 msgstr "Izenik gabeko gailua"
 
-#: ../daemon/gvfsbackendmtp.c:1008 ../daemon/gvfsbackendmtp.c:1081
-msgid "No storage volumes found"
-msgstr "Ez da biltegiaren bolumenik aurkitu"
-
-#: ../daemon/gvfsbackendmtp.c:1030
+#: ../daemon/gvfsbackendmtp.c:1125 ../daemon/gvfsbackendmtp.c:1218
+#: ../daemon/gvfsbackendmtp.c:1272
 msgid "File not found"
 msgstr "Ez da fitxategia aurkitu"
 
-#: ../daemon/gvfsbackendmtp.c:1138
+#: ../daemon/gvfsbackendmtp.c:1335
 msgid "Cannot make directory in this location"
 msgstr "Ezin da direktorioa sortu kokaleku honetan"
 
-#: ../daemon/gvfsbackendmtp.c:1194 ../daemon/gvfsbackendsmbbrowse.c:1183
+#: ../daemon/gvfsbackendmtp.c:1397 ../daemon/gvfsbackendmtp.c:1627
+#: ../daemon/gvfsbackendmtp.c:1674 ../daemon/gvfsbackendmtp.c:1744
+#: ../daemon/gvfsbackendmtp.c:2082 ../daemon/gvfsbackendmtp.c:2150
+#: ../daemon/gvfsbackendsmbbrowse.c:1209
 msgid "Not a regular file"
 msgstr "Ez da fitxategi erregularra"
 
-#: ../daemon/gvfsbackendmtp.c:1269
+#: ../daemon/gvfsbackendmtp.c:1504
 msgid "Cannot write to this location"
 msgstr "Ezin da kokaleku honetan idatzi"
 
-#: ../daemon/gvfsbackendmtp.c:1367
-msgid "Cannot delete this entity"
-msgstr "Ezin da sarrera hau ezabatu"
-
-#: ../daemon/gvfsbackendmtp.c:1479
+#: ../daemon/gvfsbackendmtp.c:1816
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "Ez dago koadro txikirik '%s' sarrerarentzako"
+
+#: ../daemon/gvfsbackendmtp.c:1992 ../daemon/gvfsftptask.c:411
+msgid "Invalid filename"
+msgstr "Fitxategi-izen baliogabea"
 
 #: ../daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
@@ -1406,7 +1432,7 @@ msgstr "Fitxategi-partekatzea"
 msgid "Remote Login"
 msgstr "Urruneko saioa"
 
-#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:917
+#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:928
 msgid "Windows Network"
 msgstr "Windows sarea"
 
@@ -1416,20 +1442,20 @@ msgstr "Windows sarea"
 msgid "Network Location Monitor"
 msgstr "Sarea kokatzeko monitorea"
 
-#: ../daemon/gvfsbackendobexftp.c:913
+#: ../daemon/gvfsbackendobexftp.c:916
 msgid "USB support missing. Please contact your software vendor"
 msgstr ""
 "USB euskarria falta da. Jar zaitez software hornitzailearekin harremanetan"
 
-#: ../daemon/gvfsbackendobexftp.c:1035
+#: ../daemon/gvfsbackendobexftp.c:1038
 msgid "Connection to the device lost"
 msgstr "Gailuaren konexioa galduta"
 
-#: ../daemon/gvfsbackendobexftp.c:1532
+#: ../daemon/gvfsbackendobexftp.c:1535
 msgid "Device requires a software update"
 msgstr "Gailuak softwarea eguneratzea eskatzen du"
 
-#: ../daemon/gvfsbackendobexftp.c:1879 ../daemon/gvfsbackendsmb.c:2059
+#: ../daemon/gvfsbackendobexftp.c:1882 ../daemon/gvfsbackendsmb.c:2102
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Errorea fitxategia ezabatzean: %s"
@@ -1444,64 +1470,64 @@ msgstr "Azken karpeta ezin da ezabatu"
 msgid "Recent"
 msgstr "Oraintsukoa"
 
-#: ../daemon/gvfsbackendsftp.c:299 ../daemon/gvfsbackendsftp.c:654
+#: ../daemon/gvfsbackendsftp.c:314 ../daemon/gvfsbackendsftp.c:670
 msgid "SSH program unexpectedly exited"
 msgstr "'SSH' programa ustekabean amaitu da"
 
-#: ../daemon/gvfsbackendsftp.c:314
+#: ../daemon/gvfsbackendsftp.c:329
 msgid "Hostname not known"
 msgstr "Ostalari-izena ezezaguna"
 
-#: ../daemon/gvfsbackendsftp.c:321
+#: ../daemon/gvfsbackendsftp.c:336
 msgid "No route to host"
 msgstr "Ez dago biderik ostalariraino"
 
-#: ../daemon/gvfsbackendsftp.c:328
+#: ../daemon/gvfsbackendsftp.c:343
 msgid "Connection refused by server"
 msgstr "Zerbitzariak konexioa ukatu du"
 
-#: ../daemon/gvfsbackendsftp.c:335
+#: ../daemon/gvfsbackendsftp.c:350
 msgid "Host key verification failed"
 msgstr "Ostalariaren gakoaren egiaztaketak huts egin du"
 
-#: ../daemon/gvfsbackendsftp.c:498
+#: ../daemon/gvfsbackendsftp.c:514
 msgid "Unable to spawn SSH program"
 msgstr "Ezin da 'SSH' programa abiarazi"
 
-#: ../daemon/gvfsbackendsftp.c:514
+#: ../daemon/gvfsbackendsftp.c:530
 #, c-format
 msgid "Unable to spawn SSH program: %s"
 msgstr "Ezin da 'SSH' programa abiarazi: %s"
 
-#: ../daemon/gvfsbackendsftp.c:616 ../daemon/gvfsbackendsftp.c:874
+#: ../daemon/gvfsbackendsftp.c:632 ../daemon/gvfsbackendsftp.c:890
 msgid "Timed out when logging in"
 msgstr "Denboraz kanpo saioa hastean"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendsftp.c:954
+#: ../daemon/gvfsbackendsftp.c:970
 #, c-format
 msgid "Enter passphrase for secure key for %s on %s"
 msgstr "Sartu gako seguruaren pasaesaldia %s(r)entzako %s ostalarian"
 
 #. Translators: %s is the hostname
-#: ../daemon/gvfsbackendsftp.c:961
+#: ../daemon/gvfsbackendsftp.c:977
 #, c-format
 msgid "Enter passphrase for secure key for %s"
 msgstr "Sartu gako seguruaren pasaesaldia %s(r)entzako"
 
-#: ../daemon/gvfsbackendsftp.c:1044
+#: ../daemon/gvfsbackendsftp.c:1060
 msgid "Can't send password"
 msgstr "Ezin da pasahitza bidali"
 
-#: ../daemon/gvfsbackendsftp.c:1052
+#: ../daemon/gvfsbackendsftp.c:1068
 msgid "Log In Anyway"
 msgstr "Sartu saioan hala ere"
 
-#: ../daemon/gvfsbackendsftp.c:1052
+#: ../daemon/gvfsbackendsftp.c:1068
 msgid "Cancel Login"
 msgstr "Ez sartu saioan"
 
-#: ../daemon/gvfsbackendsftp.c:1061
+#: ../daemon/gvfsbackendsftp.c:1077
 #, c-format
 msgid ""
 "Can't verify the identity of “%s”.\n"
@@ -1516,57 +1542,65 @@ msgstr ""
 "Urruneko ordenagailuak bidalitako identitatea '%s' da. Jarraitzea segurua "
 "ote den jakiteko, jar zaitez sistemako administratzailearekin harremanetan."
 
-#: ../daemon/gvfsbackendsftp.c:1080
+#: ../daemon/gvfsbackendsftp.c:1096
 msgid "Login dialog cancelled"
 msgstr "Saio-hasieraren elkarrizketa-koadroa bertan behera utzita"
 
-#: ../daemon/gvfsbackendsftp.c:1100
+#: ../daemon/gvfsbackendsftp.c:1116
 msgid "Can't send host identity confirmation"
 msgstr "Ezin da ostalari-identitatearen berrespena bidali"
 
-#: ../daemon/gvfsbackendsftp.c:1638 ../daemon/gvfsbackendsftp.c:1661
+#: ../daemon/gvfsbackendsftp.c:1664 ../daemon/gvfsbackendsftp.c:1692
 msgid "Protocol error"
 msgstr "Protokoloaren errorea"
 
-#: ../daemon/gvfsbackendsftp.c:1728
+#: ../daemon/gvfsbackendsftp.c:1759
 msgid "Unable to find supported SSH command"
 msgstr "Ezin da onartutako 'SSH' komandoa aurkitu"
 
-#: ../daemon/gvfsbackendsftp.c:2002 ../daemon/gvfsbackendsftp.c:2404
-#: ../daemon/gvfsbackendsftp.c:2463 ../daemon/gvfsbackendsftp.c:2474
-#: ../daemon/gvfsbackendsftp.c:2530 ../daemon/gvfsbackendsftp.c:2616
-#: ../daemon/gvfsbackendsftp.c:2666 ../daemon/gvfsbackendsftp.c:2712
-#: ../daemon/gvfsbackendsftp.c:2787 ../daemon/gvfsbackendsftp.c:2894
-#: ../daemon/gvfsbackendsftp.c:3011 ../daemon/gvfsbackendsftp.c:3092
-#: ../daemon/gvfsbackendsftp.c:3164 ../daemon/gvfsbackendsftp.c:3176
-#: ../daemon/gvfsbackendsftp.c:3232 ../daemon/gvfsbackendsftp.c:3274
-#: ../daemon/gvfsbackendsftp.c:3459 ../daemon/gvfsbackendsftp.c:3491
-#: ../daemon/gvfsbackendsftp.c:3546 ../daemon/gvfsbackendsftp.c:3603
-#: ../daemon/gvfsbackendsftp.c:3900 ../daemon/gvfsbackendsftp.c:3967
-#: ../daemon/gvfsbackendsftp.c:4102 ../daemon/gvfsbackendsftp.c:4162
-#: ../daemon/gvfsbackendsftp.c:4197 ../daemon/gvfsbackendsftp.c:4225
-#: ../daemon/gvfsbackendsftp.c:4333 ../daemon/gvfsbackendsftp.c:4387
-#: ../daemon/gvfsbackendsftp.c:4426 ../daemon/gvfsbackendsftp.c:4460
-#: ../daemon/gvfsbackendsftp.c:4494 ../daemon/gvfsbackendsftp.c:4509
-#: ../daemon/gvfsbackendsftp.c:4524 ../daemon/gvfsbackendsftp.c:4602
+#: ../daemon/gvfsbackendsftp.c:2033 ../daemon/gvfsbackendsftp.c:2435
+#: ../daemon/gvfsbackendsftp.c:2494 ../daemon/gvfsbackendsftp.c:2505
+#: ../daemon/gvfsbackendsftp.c:2561 ../daemon/gvfsbackendsftp.c:2650
+#: ../daemon/gvfsbackendsftp.c:2700 ../daemon/gvfsbackendsftp.c:2753
+#: ../daemon/gvfsbackendsftp.c:2828 ../daemon/gvfsbackendsftp.c:2935
+#: ../daemon/gvfsbackendsftp.c:3066 ../daemon/gvfsbackendsftp.c:3148
+#: ../daemon/gvfsbackendsftp.c:3222 ../daemon/gvfsbackendsftp.c:3234
+#: ../daemon/gvfsbackendsftp.c:3292 ../daemon/gvfsbackendsftp.c:3334
+#: ../daemon/gvfsbackendsftp.c:3548 ../daemon/gvfsbackendsftp.c:3580
+#: ../daemon/gvfsbackendsftp.c:3636 ../daemon/gvfsbackendsftp.c:3693
+#: ../daemon/gvfsbackendsftp.c:3762 ../daemon/gvfsbackendsftp.c:4027
+#: ../daemon/gvfsbackendsftp.c:4094 ../daemon/gvfsbackendsftp.c:4224
+#: ../daemon/gvfsbackendsftp.c:4331 ../daemon/gvfsbackendsftp.c:4391
+#: ../daemon/gvfsbackendsftp.c:4426 ../daemon/gvfsbackendsftp.c:4454
+#: ../daemon/gvfsbackendsftp.c:4562 ../daemon/gvfsbackendsftp.c:4616
+#: ../daemon/gvfsbackendsftp.c:4655 ../daemon/gvfsbackendsftp.c:4689
+#: ../daemon/gvfsbackendsftp.c:4723 ../daemon/gvfsbackendsftp.c:4738
+#: ../daemon/gvfsbackendsftp.c:4753 ../daemon/gvfsbackendsftp.c:4831
+#: ../daemon/gvfsbackendsftp.c:4992 ../daemon/gvfsbackendsftp.c:5027
+#: ../daemon/gvfsbackendsftp.c:5097 ../daemon/gvfsbackendsftp.c:5181
+#: ../daemon/gvfsbackendsftp.c:5263 ../daemon/gvfsbackendsftp.c:5304
+#: ../daemon/gvfsbackendsftp.c:5308 ../daemon/gvfsbackendsftp.c:5421
+#: ../daemon/gvfsbackendsftp.c:5425 ../daemon/gvfsbackendsftp.c:5651
+#: ../daemon/gvfsbackendsftp.c:5864 ../daemon/gvfsbackendsftp.c:5881
+#: ../daemon/gvfsbackendsftp.c:6013 ../daemon/gvfsbackendsftp.c:6041
 msgid "Invalid reply received"
 msgstr "Jasotako erantzun baliogabea"
 
-#: ../daemon/gvfsbackendsftp.c:2263 ../daemon/gvfsbackendsmb.c:1504
+#: ../daemon/gvfsbackendsftp.c:2294 ../daemon/gvfsbackendsmb.c:1544
 #: ../daemon/gvfsdaemonutils.c:136
 msgid " (invalid encoding)"
 msgstr " (kodeketa baliogabea)"
 
-#: ../daemon/gvfsbackendsftp.c:2348
+#: ../daemon/gvfsbackendsftp.c:2379
 msgid "Failure"
 msgstr "Hutsegitea"
 
-#: ../daemon/gvfsbackendsftp.c:2732
+#: ../daemon/gvfsbackendsftp.c:2773
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Errorea babeskopiaren fitxategia sortzean: %s"
 
-#: ../daemon/gvfsbackendsftp.c:3336
+#: ../daemon/gvfsbackendsftp.c:3398 ../daemon/gvfsbackendsftp.c:5332
 msgid "Unable to create temporary file"
 msgstr "Ezin da aldi baterako fitxategia sortu"
 
@@ -1576,88 +1610,88 @@ msgstr "Ezin da aldi baterako fitxategia sortu"
 msgid "Password required for %s"
 msgstr "Pasahitza behar da %s(e)n"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:852 ../daemon/gvfsbackendsmbbrowse.c:899
-#: ../daemon/gvfsbackendsmb.c:518 ../daemon/gvfsbackendsmb.c:564
-#: ../daemon/gvfsbackendsmb.c:729
+#: ../daemon/gvfsbackendsmbbrowse.c:863 ../daemon/gvfsbackendsmbbrowse.c:910
+#: ../daemon/gvfsbackendsmb.c:524 ../daemon/gvfsbackendsmb.c:570
+#: ../daemon/gvfsbackendsmb.c:748
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "Barneko errorea (%s)"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:926
+#: ../daemon/gvfsbackendsmbbrowse.c:937
 #, c-format
 msgid "Windows shares on %s"
 msgstr "Windows-ek partekatua %s(e)n"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmbbrowse.c:1027
+#: ../daemon/gvfsbackendsmbbrowse.c:1046
 #, c-format
 msgid "Failed to retrieve share list from server: %s"
 msgstr "Huts egin du partekatutako zerrenda zerrendatik eskuratzean: %s"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1532
+#: ../daemon/gvfsbackendsmbbrowse.c:1558
 msgid "Windows Network File System Service"
 msgstr "Windows sareko fitxategi-sistemaren zerbitzua"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:260
+#: ../daemon/gvfsbackendsmb.c:261
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "Pasahitza behar da %s partekatzeko %s(e)n"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:660
+#: ../daemon/gvfsbackendsmb.c:672
 #, c-format
 msgid "Failed to mount Windows share: %s"
 msgstr "Huts egin du Windows-en partekatzea muntatzean: %s"
 
-#: ../daemon/gvfsbackendsmb.c:853 ../daemon/gvfsbackendsmb.c:1349
+#: ../daemon/gvfsbackendsmb.c:873 ../daemon/gvfsbackendsmb.c:1372
 msgid "Unsupported seek type"
 msgstr "Onartu gabeko bilaketa mota"
 
-#: ../daemon/gvfsbackendsmb.c:1441
+#: ../daemon/gvfsbackendsmb.c:1480
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Huts egin du babeskopiaren fitxategia sortzean: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1821
+#: ../daemon/gvfsbackendsmb.c:1864
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Baliogabeko atributu mota (uint64 espero zen)"
 
-#: ../daemon/gvfsbackendsmb.c:2008
+#: ../daemon/gvfsbackendsmb.c:2051
 msgid "Can't rename file, filename already exists"
 msgstr "Ezin da fitxategia izenez aldatu, fitxategi-izena badago lehendik ere"
 
-#: ../daemon/gvfsbackendsmb.c:2133
+#: ../daemon/gvfsbackendsmb.c:2176
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Errorea fitxategia lekuz aldatzean: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2205
+#: ../daemon/gvfsbackendsmb.c:2248
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Errorea helburuko fitxategia kentzean: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2229
+#: ../daemon/gvfsbackendsmb.c:2272
 msgid "Can't recursively move directory"
 msgstr "Ezin da direktorioa errekurtsiboki lekuz aldatu"
 
-#: ../daemon/gvfsbackendsmb.c:2274
+#: ../daemon/gvfsbackendsmb.c:2318
 msgid "Windows Shares File System Service"
 msgstr "Windows-eko fitxategi partekatuen sistemaren zerbitzua"
 
-#: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
+#: ../daemon/gvfsbackendtrash.c:371 ../daemon/gvfsbackendtrash.c:427
 msgid "The trash folder may not be deleted"
 msgstr "Zakarrontzia karpeta ezin da ezabatu"
 
-#: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
+#: ../daemon/gvfsbackendtrash.c:388 ../daemon/gvfsbackendtrash.c:441
 msgid "Items in the trash may not be modified"
 msgstr "Zakarrontziko elementuak ezin dira eraldatu"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:755 ../daemon/gvfsbackendtrash.c:867
+#: ../daemon/gvfsbackendtrash.c:740 ../daemon/gvfsbackendtrash.c:852
 msgid "Trash"
 msgstr "Zakarrontzia"
 
@@ -1666,7 +1700,7 @@ msgid "Unexpected end of stream"
 msgstr "Ustekabeko korrontearen amaiera"
 
 #: ../daemon/gvfsftpconnection.c:196 ../daemon/gvfsftpconnection.c:209
-#: ../daemon/gvfsftptask.c:411 ../daemon/gvfsftptask.c:839
+#: ../daemon/gvfsftptask.c:415 ../daemon/gvfsftptask.c:843
 msgid "Invalid reply"
 msgstr "Erantzun baliogabea"
 
@@ -1690,41 +1724,37 @@ msgstr "Fitxategi-izenak baliogabeko karaktereak ditu."
 msgid "The FTP server is busy. Try again later"
 msgstr "FTP zerbitzaria lanpetuta dago. Saiatu beranduago"
 
-#: ../daemon/gvfsftptask.c:355
+#: ../daemon/gvfsftptask.c:359
 msgid "Accounts are unsupported"
 msgstr "Kontuak ez daude onartuta"
 
-#: ../daemon/gvfsftptask.c:359
+#: ../daemon/gvfsftptask.c:363
 msgid "Host closed connection"
 msgstr "Ostalariak konexioa itxi du"
 
-#: ../daemon/gvfsftptask.c:363
+#: ../daemon/gvfsftptask.c:367
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "Ezin da datuen konexioa ireki. Agian suebakiak eragozten du?"
 
-#: ../daemon/gvfsftptask.c:367
+#: ../daemon/gvfsftptask.c:371
 msgid "Data connection closed"
 msgstr "Datuen konexioa itxita"
 
-#: ../daemon/gvfsftptask.c:374 ../daemon/gvfsftptask.c:378
+#: ../daemon/gvfsftptask.c:378 ../daemon/gvfsftptask.c:382
 msgid "Operation failed"
 msgstr "Eragiketak huts egin du"
 
-#: ../daemon/gvfsftptask.c:383
+#: ../daemon/gvfsftptask.c:387
 msgid "No space left on server"
 msgstr "Ez dago leku librerik zerbitzarian"
 
-#: ../daemon/gvfsftptask.c:395
+#: ../daemon/gvfsftptask.c:399
 msgid "Unsupported network protocol"
 msgstr "Onartu gabeko sareko protokoloa"
 
-#: ../daemon/gvfsftptask.c:403
+#: ../daemon/gvfsftptask.c:407
 msgid "Page type unknown"
 msgstr "Orrialde mota ezezaguna"
-
-#: ../daemon/gvfsftptask.c:407
-msgid "Invalid filename"
-msgstr "Fitxategi-izen baliogabea"
 
 #: ../daemon/gvfsjobmakesymlink.c:111
 msgid "Symlinks not supported by backend"
@@ -1752,33 +1782,33 @@ msgstr ""
 msgid "File system is busy"
 msgstr "Fitxategi-sistema lanpetuta dago"
 
-#: ../daemon/main.c:133 ../metadata/meta-daemon.c:445
+#: ../daemon/main.c:142 ../metadata/meta-daemon.c:482
 msgid "Replace old daemon."
 msgstr "Ordeztu daemon zaharra."
 
-#: ../daemon/main.c:134
+#: ../daemon/main.c:143
 msgid "Don't start fuse."
 msgstr "Ez hasi fuse."
 
-#: ../daemon/main.c:148
+#: ../daemon/main.c:157
 msgid "GVFS Daemon"
 msgstr "GVFS daemona"
 
-#: ../daemon/main.c:151
+#: ../daemon/main.c:160
 msgid "Main daemon for GVFS"
 msgstr "GVFSren daemon nagusia"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:166 ../metadata/meta-daemon.c:470
+#: ../daemon/main.c:175 ../metadata/meta-daemon.c:507
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:168 ../metadata/meta-daemon.c:472
+#: ../daemon/main.c:177 ../metadata/meta-daemon.c:509
 #: ../programs/gvfs-cat.c:168 ../programs/gvfs-cat.c:180
-#: ../programs/gvfs-copy.c:131 ../programs/gvfs-info.c:392
-#: ../programs/gvfs-ls.c:414 ../programs/gvfs-mime.c:95
+#: ../programs/gvfs-copy.c:131 ../programs/gvfs-info.c:396
+#: ../programs/gvfs-ls.c:428 ../programs/gvfs-mime.c:95
 #: ../programs/gvfs-mime.c:105 ../programs/gvfs-mime.c:112
 #: ../programs/gvfs-mkdir.c:69 ../programs/gvfs-monitor-dir.c:124
 #: ../programs/gvfs-monitor-file.c:123 ../programs/gvfs-mount.c:1055
@@ -1812,34 +1842,34 @@ msgstr "Kokalekua jadanik muntatuta dago"
 msgid "Location is not mountable"
 msgstr "Kokalekua ez da muntagarria"
 
-#: ../metadata/meta-daemon.c:133 ../metadata/meta-daemon.c:253
-#: ../metadata/meta-daemon.c:302 ../metadata/meta-daemon.c:337
-#: ../metadata/meta-daemon.c:373
+#: ../metadata/meta-daemon.c:157 ../metadata/meta-daemon.c:277
+#: ../metadata/meta-daemon.c:326 ../metadata/meta-daemon.c:361
+#: ../metadata/meta-daemon.c:397
 #, c-format
 msgid "Can't find metadata file %s"
 msgstr "Ezin da %s fitxategiaren metadaturik aurkitu"
 
-#: ../metadata/meta-daemon.c:151 ../metadata/meta-daemon.c:163
+#: ../metadata/meta-daemon.c:175 ../metadata/meta-daemon.c:187
 msgid "Unable to set metadata key"
 msgstr "Ezin da metadatuen gakoa ezarri"
 
-#: ../metadata/meta-daemon.c:173 ../metadata/meta-daemon.c:312
+#: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:336
 msgid "Unable to unset metadata key"
 msgstr "Ezin da metadatuen gakoaren ezarpena kendu"
 
-#: ../metadata/meta-daemon.c:347
+#: ../metadata/meta-daemon.c:371
 msgid "Unable to remove metadata keys"
 msgstr "Ezin da metadatuen gakoa kendu"
 
-#: ../metadata/meta-daemon.c:384
+#: ../metadata/meta-daemon.c:408
 msgid "Unable to move metadata keys"
 msgstr "Ezin da metadatuen gakoa mugitu"
 
-#: ../metadata/meta-daemon.c:455
+#: ../metadata/meta-daemon.c:492
 msgid "GVFS Metadata Daemon"
 msgstr "GVFS metadatuen daemona"
 
-#: ../metadata/meta-daemon.c:458
+#: ../metadata/meta-daemon.c:495
 msgid "Metadata daemon for GVFS"
 msgstr "GVFSren metadatuen daemon-a"
 
@@ -1851,16 +1881,16 @@ msgstr "GVfs GDU bolumenaren monitorea"
 msgid "Floppy Drive"
 msgstr "Diskete unitatea"
 
-#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:284
+#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:286
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "Izenik gabeko unitatea (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:286
+#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:288
 msgid "Unnamed Drive"
 msgstr "Izenik gabeko unitatea"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:607
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:609
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
@@ -1926,17 +1956,17 @@ msgstr ""
 "Sartu pasahitza bolumena desblokeatzeko\n"
 "%s gailuak enkriptatutako datuak ditu."
 
-#: ../monitor/goa/goavolume.c:214
+#: ../monitor/goa/goavolume.c:219
 #, c-format
 msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
 msgstr "Huts egin du %s(r)en org.gnome.OnlineAccounts.Files lortzean"
 
-#: ../monitor/goa/goavolume.c:251
+#: ../monitor/goa/goavolume.c:256
 #, c-format
 msgid "Invalid credentials for %s"
 msgstr "'%s'(r)en baliogabeko kredentzialak"
 
-#: ../monitor/goa/goavolume.c:268
+#: ../monitor/goa/goavolume.c:273
 #, c-format
 msgid "Unsupported authentication method for %s"
 msgstr "Autentifikazio metodoa ez da onartzen %s(r)entzako"
@@ -2290,7 +2320,7 @@ msgstr "Orain '%s' deskonekta dezakezu\n"
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:278
+#: ../monitor/udisks2/gvfsudisks2volume.c:279
 #, c-format
 msgid "%s Encrypted"
 msgstr "%s enkriptatuta"
@@ -2298,41 +2328,41 @@ msgstr "%s enkriptatuta"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:290
+#: ../monitor/udisks2/gvfsudisks2volume.c:291
 #, c-format
 msgid "%s Volume"
 msgstr "%s bolumena"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:526
+#: ../monitor/udisks2/gvfsudisks2volume.c:527
 msgid "Volume"
 msgstr "Bolumena"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1099
+#: ../monitor/udisks2/gvfsudisks2volume.c:1100
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "Errorea pasahitza gako-sortan gordetzean (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1134
+#: ../monitor/udisks2/gvfsudisks2volume.c:1135
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "Errorea pasaesaldi baliogabea gako-sortatik ezabatzean (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1199
+#: ../monitor/udisks2/gvfsudisks2volume.c:1200
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr "Desblokeatutako gailuak ez dauka fitxategi-sistema ezagunik"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1228
+#: ../monitor/udisks2/gvfsudisks2volume.c:1229
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Enkriptazioaren pasaesaldia %s(r)entzako"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1396
+#: ../monitor/udisks2/gvfsudisks2volume.c:1397
 msgid "A passphrase is required to access the volume"
 msgstr "Pasaesaldia behar da bolumena atzitzeko"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1411
+#: ../monitor/udisks2/gvfsudisks2volume.c:1412
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2345,7 +2375,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1580
+#: ../monitor/udisks2/gvfsudisks2volume.c:1581
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
@@ -2412,7 +2442,7 @@ msgstr ""
 "formatua ematea behar baduzu."
 
 #: ../programs/gvfs-cat.c:166 ../programs/gvfs-copy.c:129
-#: ../programs/gvfs-info.c:390 ../programs/gvfs-ls.c:412
+#: ../programs/gvfs-info.c:394 ../programs/gvfs-ls.c:426
 #: ../programs/gvfs-mime.c:92 ../programs/gvfs-mkdir.c:67
 #: ../programs/gvfs-monitor-dir.c:122 ../programs/gvfs-monitor-file.c:121
 #: ../programs/gvfs-mount.c:1053 ../programs/gvfs-move.c:117
@@ -2506,15 +2536,15 @@ msgstr "Zerrendatu atributu idazgarriak"
 msgid "Get file system info"
 msgstr "Lortu fitxategi-sistemaren informazioa"
 
-#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
+#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:40
 msgid "The attributes to get"
 msgstr "Atributuak lortzeko"
 
-#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
+#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:40
 msgid "ATTRIBUTES"
 msgstr "ATRIBUTUAK"
 
-#: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
+#: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:44
 #: ../programs/gvfs-set-attribute.c:37
 msgid "Don't follow symbolic links"
 msgstr "Ez jarraitu esteka sinbolikoak"
@@ -2588,30 +2618,35 @@ msgstr "tamaina: "
 msgid "hidden\n"
 msgstr "ezkutatuta\n"
 
-#: ../programs/gvfs-info.c:275
+#: ../programs/gvfs-info.c:193
+#, c-format
+msgid "uri: %s\n"
+msgstr "URIa: %s\n"
+
+#: ../programs/gvfs-info.c:279
 msgid "Copy with file"
 msgstr "Kopiatu fitxategiarekin"
 
-#: ../programs/gvfs-info.c:279
+#: ../programs/gvfs-info.c:283
 msgid "Keep with file when moved"
 msgstr "Mantendu fitxategiarekin lekuz aldatzean"
 
-#: ../programs/gvfs-info.c:316
+#: ../programs/gvfs-info.c:320
 #, c-format
 msgid "Error getting writable attributes: %s\n"
 msgstr "Errorea atributu idazgarriak lortzean: %s\n"
 
-#: ../programs/gvfs-info.c:321
+#: ../programs/gvfs-info.c:325
 #, c-format
 msgid "Settable attributes:\n"
 msgstr "Atributu ezargarriak:\n"
 
-#: ../programs/gvfs-info.c:344
+#: ../programs/gvfs-info.c:348
 #, c-format
 msgid "Writable attribute namespaces:\n"
 msgstr "Atributu idazgarrien izen-espazioak:\n"
 
-#: ../programs/gvfs-info.c:378 ../programs/gvfs-ls.c:395
+#: ../programs/gvfs-info.c:382 ../programs/gvfs-ls.c:409
 #: ../programs/gvfs-mkdir.c:55 ../programs/gvfs-monitor-dir.c:110
 #: ../programs/gvfs-monitor-file.c:109 ../programs/gvfs-mount.c:1041
 #: ../programs/gvfs-rename.c:62 ../programs/gvfs-set-attribute.c:137
@@ -2619,37 +2654,41 @@ msgstr "Atributu idazgarrien izen-espazioak:\n"
 msgid "LOCATION"
 msgstr "KOKALEKUA"
 
-#: ../programs/gvfs-info.c:379
+#: ../programs/gvfs-info.c:383
 msgid "Show information about locations."
 msgstr "Erakutsi kokalekuari buruzko informazioa"
 
-#: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
+#: ../programs/gvfs-ls.c:41 ../programs/gvfs-tree.c:36
 msgid "Show hidden files"
 msgstr "Erakutsi ezkutuko fitxategiak"
 
-#: ../programs/gvfs-ls.c:41
+#: ../programs/gvfs-ls.c:42
 msgid "Use a long listing format"
 msgstr "Erabili zerrenda luzeen formatua"
 
-#: ../programs/gvfs-ls.c:42
+#: ../programs/gvfs-ls.c:43
 msgid "Show completions"
 msgstr "Erakutsi osaketak"
 
-#: ../programs/gvfs-ls.c:42
+#: ../programs/gvfs-ls.c:43
 msgid "PREFIX"
 msgstr "AURRIZKIA"
 
-#: ../programs/gvfs-ls.c:166 ../programs/gvfs-ls.c:174
+#: ../programs/gvfs-ls.c:45
+msgid "Print full URIs"
+msgstr "Erakutsi URI osoak"
+
+#: ../programs/gvfs-ls.c:180 ../programs/gvfs-ls.c:188
 #: ../programs/gvfs-rename.c:95
 #, c-format
 msgid "Error: %s\n"
 msgstr "Errorea: %s\n"
 
-#: ../programs/gvfs-ls.c:396
+#: ../programs/gvfs-ls.c:410
 msgid "List the contents of the locations."
 msgstr "Kokalekuen edukia zerrendatzen du."
 
-#: ../programs/gvfs-ls.c:397
+#: ../programs/gvfs-ls.c:411
 msgid ""
 "gvfs-ls is similar to the traditional ls utility, but using gvfs\n"
 "locations instead of local files: for example you can use something\n"
@@ -3002,6 +3041,12 @@ msgstr "Jarraitu esteka sinbolikoak, muntatze-puntuak eta lasterbideak"
 #: ../programs/gvfs-tree.c:247
 msgid "List contents of directories in a tree-like format."
 msgstr "Zerrendatu direktorioen edukia zuhaitz baten bezalako formatuan."
+
+#~ msgid "No storage volumes found"
+#~ msgstr "Ez da biltegiaren bolumenik aurkitu"
+
+#~ msgid "Cannot delete this entity"
+#~ msgstr "Ezin da sarrera hau ezabatu"
 
 #~ msgid "Can't contact session bus"
 #~ msgstr "Ezin da saioko busarekin konektatu"
