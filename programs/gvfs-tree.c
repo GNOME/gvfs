@@ -35,6 +35,7 @@ static GOptionEntry entries[] =
 {
   { "hidden", 'h', 0, G_OPTION_ARG_NONE, &show_hidden, N_("Show hidden files"), NULL },
   { "follow-symlinks", 'l', 0, G_OPTION_ARG_NONE, &follow_symlinks, N_("Follow symbolic links, mounts and shortcuts"), NULL },
+  { NULL }
 };
 
 static gint
