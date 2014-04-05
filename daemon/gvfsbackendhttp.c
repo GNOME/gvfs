@@ -206,7 +206,7 @@ http_uri_get_basename (const char *uri_str)
   return decoded;
 }
 
-guint
+int
 http_error_code_from_status (guint status)
 {
   switch (status) {
@@ -228,7 +228,15 @@ http_error_code_from_status (guint status)
     return G_IO_ERROR_NOT_FOUND;
 
   case SOUP_STATUS_GATEWAY_TIMEOUT:
+  case SOUP_STATUS_REQUEST_TIMEOUT:
     return G_IO_ERROR_TIMED_OUT;
+
+  case SOUP_STATUS_NOT_IMPLEMENTED:
+    return G_IO_ERROR_NOT_SUPPORTED;
+
+  case SOUP_STATUS_INSUFFICIENT_STORAGE:
+    return G_IO_ERROR_NO_SPACE;
+
   }
 
   return G_IO_ERROR_FAILED;

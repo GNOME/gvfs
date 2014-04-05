@@ -61,7 +61,7 @@ char *        http_uri_get_basename          (const char *uri_str);
 
 char *        http_path_get_basename         (const char *path_str);
 
-guint         http_error_code_from_status    (guint status);
+int           http_error_code_from_status    (guint status);
 
 SoupURI *     http_backend_get_mount_base    (GVfsBackend *backend);
 
