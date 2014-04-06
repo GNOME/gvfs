@@ -479,16 +479,16 @@ on_name_owner_vanished (GDBusConnection *connection,
 
   /* unwatch the name */
   name_watcher_id = GPOINTER_TO_UINT (g_hash_table_lookup (unique_names_being_watched, name));
+  g_hash_table_remove (unique_names_being_watched, name);
   if (name_watcher_id == 0)
     {
       g_warning ("Was asked to remove match rule for unique_name %s but we don't have one", name);
     }
   else
     {
+      /* Note that calling g_bus_unwatch_name () makes @name invalid */
       g_bus_unwatch_name (name_watcher_id);
     }
-
-  g_hash_table_remove (unique_names_being_watched, name);
 }
 
 static void
