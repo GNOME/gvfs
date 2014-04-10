@@ -708,17 +708,26 @@ file_info_get_stat_mode (GFileInfo *file_info)
         break;
     }
 
-  if (file_type == G_FILE_TYPE_DIRECTORY ||
-      !g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ) ||
-      g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ))
-    unix_mode |= S_IRUSR;
-  if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE) ||
-      g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))
-    unix_mode |= S_IWUSR;
-  if (file_type == G_FILE_TYPE_DIRECTORY ||
-      !g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE) ||
-      g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))
-    unix_mode |= S_IXUSR;
+  if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_MODE))
+    {
+      mode_t mode = g_file_info_get_attribute_uint32 (file_info,
+                                                      G_FILE_ATTRIBUTE_UNIX_MODE);
+      unix_mode |= mode & (S_IRWXU | S_IRWXG | S_IRWXO);
+    }
+  else
+    {
+      if (file_type == G_FILE_TYPE_DIRECTORY ||
+          !g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ) ||
+          g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ))
+        unix_mode |= S_IRUSR;
+      if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE) ||
+          g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))
+        unix_mode |= S_IWUSR;
+      if (file_type == G_FILE_TYPE_DIRECTORY ||
+          !g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE) ||
+          g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))
+        unix_mode |= S_IXUSR;
+    }
   
   return unix_mode;
 }
