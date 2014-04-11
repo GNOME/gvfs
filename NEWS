@@ -1,3 +1,10 @@
+Major changes in 1.20.1
+=======================
+* smb: Give correct error when unlink fails while closing file
+* dav: Fix problem with names with non-ascii characters
+* Several smaller bugfixes and portability fixes
+* Translation updates
+
 Major changes in 1.20.0
 =======================
 * Translation updates
