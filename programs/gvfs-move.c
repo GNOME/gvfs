@@ -217,7 +217,8 @@ main (int argc, char *argv[])
 		  (line[0] == 'y' || line[0] == 'Y'))
 		{
 		  flags |= G_FILE_COPY_OVERWRITE;
-		  if (!g_file_move (source, target, flags, NULL, NULL, NULL, &error))
+		  start_time = g_get_monotonic_time ();
+		  if (!g_file_move (source, target, flags, NULL, progress?show_progress:NULL, NULL, &error))
 		    goto move_failed;
 		}
 	    }
