@@ -61,14 +61,34 @@ is_dir (GFile *file)
   return res;
 }
 
+static gint64 start_time;
+static gint64 previous_time;
 static void
 show_progress (goffset current_num_bytes,
 	       goffset total_num_bytes,
 	       gpointer user_data)
 {
-  g_print (_("progress"));
-  g_print (" %"G_GINT64_FORMAT"/%"G_GINT64_FORMAT"\n",
-	   current_num_bytes, total_num_bytes);
+  gint64 tv;
+  char *current_size, *total_size, *rate;
+
+  tv = g_get_monotonic_time ();
+  if (tv - previous_time < (G_USEC_PER_SEC / 5) &&
+      current_num_bytes != total_num_bytes)
+    return;
+
+  current_size = g_format_size (current_num_bytes);
+  total_size = g_format_size (total_num_bytes);
+  rate = g_format_size (current_num_bytes /
+                        MAX ((tv - start_time) / G_USEC_PER_SEC, 1));
+  g_print ("\r\033[K");
+  g_print (_("Transferred %s out of %s (%s/s)"),
+           current_size, total_size, rate);
+
+  previous_time = tv;
+
+  g_free (current_size);
+  g_free (total_size);
+  g_free (rate);
 }
 
 static void
@@ -178,6 +198,7 @@ main (int argc, char *argv[])
 	flags |= G_FILE_COPY_OVERWRITE;
 
       error = NULL;
+      start_time = g_get_monotonic_time ();
       if (!g_file_move (source, target, flags, NULL, progress?show_progress:NULL, NULL, &error))
 	{
 	  if (interactive && g_error_matches (error, G_IO_ERROR, G_IO_ERROR_EXISTS))
@@ -207,6 +228,8 @@ main (int argc, char *argv[])
 	      retval = 1;
 	    }
 	}
+      if (progress && retval == 0)
+	g_print("\n");
 
       g_object_unref (source);
       g_object_unref (target);
