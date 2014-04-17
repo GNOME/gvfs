@@ -117,6 +117,7 @@ main (int argc, char *argv[])
   GFile *source, *dest, *target;
   gboolean dest_is_dir;
   char *basename;
+  char *uri;
   int i;
   GFileCopyFlags flags;
   int retval = 0;
@@ -217,12 +218,12 @@ main (int argc, char *argv[])
 	      g_error_free (error);
 	      error = NULL;
 
-	      basename = g_file_get_basename (target);
-	      g_print (_("overwrite %s?"), basename);
-	      g_free (basename);
+	      uri = g_file_get_uri (target);
+	      g_print (_("%s: overwrite ‘%s’? "), argv[0], uri);
+	      g_free (uri);
 
 	      if (fgets(line, sizeof (line), stdin) &&
-		  line[0] == 'y')
+		  (line[0] == 'y' || line[0] == 'Y'))
 		{
 		  flags |= G_FILE_COPY_OVERWRITE;
 		  if (!g_file_copy (source, target, flags, NULL, NULL, NULL, &error))
