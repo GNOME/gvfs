@@ -1,7 +1,7 @@
 AC_PREREQ([2.64])
 
 AC_INIT([gvfs],[1.21.2],[http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs])
-AM_INIT_AUTOMAKE([1.11.1 no-dist-gzip dist-xz tar-ustar])
+AM_INIT_AUTOMAKE([1.11.1 no-dist-gzip dist-xz tar-ustar -Wno-portability])
 
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_MACRO_DIR([m4])
