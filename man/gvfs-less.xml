@@ -1,0 +1,72 @@
+<?xml version='1.0'?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+        "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<refentry id="gvfs-less">
+
+        <refentryinfo>
+                <title>gvfs-less</title>
+                <productname>gvfs</productname>
+
+                <authorgroup>
+                        <author>
+                                <contrib>Developer</contrib>
+                                <firstname>David</firstname>
+                                <surname>Zeuthen</surname>
+                                <email>davidz@redhat.com</email>
+                        </author>
+                </authorgroup>
+
+        </refentryinfo>
+
+        <refmeta>
+                <refentrytitle>gvfs-less</refentrytitle>
+                <manvolnum>1</manvolnum>
+                <refmiscinfo class="manual">User Commands</refmiscinfo>
+        </refmeta>
+
+        <refnamediv>
+                <refname>gvfs-less</refname>
+                <refpurpose>Execute less on the output of gvfs-cat</refpurpose>
+        </refnamediv>
+
+        <refsynopsisdiv>
+                <cmdsynopsis>
+                        <command>gvfs-less <arg choice="opt" rep="repeat">OPTION</arg> <arg rep="repeat">LOCATION</arg></command>
+                </cmdsynopsis>
+        </refsynopsisdiv>
+
+        <refsect1>
+                <title>Description</title>
+
+                <para><command>gvfs-less</command> executes <command>less</command>
+                on the output of <command>gvfs-cat</command>.</para>
+
+                <para><command>gvfs-less</command> works just like the
+                traditional less utility, but using gvfs locations instead
+                of local files: for example you can use something like
+                smb://server/resource/file.txt as location.</para>
+        </refsect1>
+
+        <refsect1>
+                <title>Options</title>
+
+                <para>See <citerefentry><refentrytitle>less</refentrytitle><manvolnum>1</manvolnum></citerefentry> for the options.</para>
+        </refsect1>
+
+        <refsect1>
+                <title>Exit status</title>
+
+                <para>On success 0 is returned, a non-zero failure
+                code otherwise.</para>
+        </refsect1>
+
+        <refsect1>
+                <title>See Also</title>
+                <para>
+                        <citerefentry><refentrytitle>less</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+                        <citerefentry><refentrytitle>gvfs-cat</refentrytitle><manvolnum>1</manvolnum></citerefentry>
+                </para>
+        </refsect1>
+
+</refentry>

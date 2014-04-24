@@ -17,6 +17,7 @@ man_MANS = \
 	gvfs-copy.1 \
 	gvfs-info.1 \
 	gvfs-ls.1 \
+	gvfs-less.1 \
 	gvfs-mime.1 \
 	gvfs-mkdir.1 \
 	gvfs-monitor-dir.1 \
