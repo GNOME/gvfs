@@ -1,3 +1,16 @@
+Major changes in 1.21.1
+=======================
+* gvfs-move: Improve the interactive move and progress output
+* gvfs-copy: Improve the interactive copy and progress output
+* afc: Check for iOS >= 3.1.2 to enable house arrest
+* dav: Use the native move operation
+* fuse: Set permissions from UNIX mode when available
+* smb: Give correct error when unlink fails while closing file
+* dav: Unescape URIs before comparing them for equality
+* Report gvfs version when --version is used
+* Several smaller bugfixes and portability fixes
+* Translation updates
+
 Major changes in 1.20.0
 =======================
 * Translation updates
