@@ -297,9 +297,8 @@ archive_file_get_from_path (ArchiveFile *file, const char *filename, gboolean ad
 	    }
 	  else
 	    {
-	      /* happens when adding directories, their path ends with a / */
-              /* Can also happen with "." in e.g. iso files */
-	      g_assert (names[i + 1] == NULL);
+	      /* Ignore empty elements from directories ending with a slash.
+	       * Ignore elements consisting of a single "." */
 	      g_free (names[i]);
 	      names[i] = NULL;
 	      cur = file;
