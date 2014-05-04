@@ -23,6 +23,7 @@
 
 #include <config.h>
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -157,6 +158,35 @@ ask_password_cb (GMountOperation *op,
 }
 
 static void
+ask_question_cb (GMountOperation *op,
+                 char *message,
+                 char **choices,
+                 gpointer user_data)
+{
+  char **ptr = choices;
+  char *s;
+  int i, choice;
+
+  g_print ("%s\n", message);
+
+  i = 1;
+  while (*ptr)
+    {
+      g_print ("[%d] %s\n", i, *ptr++);
+      i++;
+    }
+
+  s = prompt_for ("Choice", NULL, TRUE);
+  choice = atoi (s);
+  if (choice > 0 && choice < i)
+    {
+      g_mount_operation_set_choice (op, choice - 1);
+      g_mount_operation_reply (op, G_MOUNT_OPERATION_HANDLED);
+    }
+  g_free (s);
+}
+
+static void
 mount_mountable_done_cb (GObject *object,
                          GAsyncResult *res,
                          gpointer user_data)
@@ -210,6 +240,7 @@ new_mount_op (void)
   op = g_mount_operation_new ();
 
   g_signal_connect (op, "ask_password", G_CALLBACK (ask_password_cb), NULL);
+  g_signal_connect (op, "ask_question", G_CALLBACK (ask_question_cb), NULL);
 
   /* TODO: we *should* also connect to the "aborted" signal but since the
    *       main thread is blocked handling input we won't get that signal
