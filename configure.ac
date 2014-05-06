@@ -738,6 +738,27 @@ if test "x$enable_afp" != "xno"; then
 fi
 AM_CONDITIONAL(USE_AFP, test "x$enable_afp" != "xno")
 
+dnl *******************
+dnl *** NFS backend ***
+dnl *******************
+AC_ARG_ENABLE(nfs, AS_HELP_STRING([--disable-nfs], [build without NFS support]))
+msg_nfs="no"
+NFS_CFLAGS=
+NFS_LIBS=
+
+if test "x$enable_nfs" != "xno"; then
+  PKG_CHECK_EXISTS([libnfs >= 1.9.7], msg_nfs=yes)
+
+  if test "x$msg_nfs" = "xyes"; then
+    PKG_CHECK_MODULES([NFS],[libnfs >= 1.9.7])
+    AC_DEFINE(HAVE_NFS, 1, [Define to 1 if nfs is going to be built])
+  fi
+fi
+
+AC_SUBST(NFS_CFLAGS)
+AC_SUBST(NFS_LIBS)
+AM_CONDITIONAL(HAVE_NFS, [test "$msg_nfs" = "yes"])
+
 dnl ***************************************
 dnl *** Check for nl_langinfo constants ***
 dnl ***************************************
@@ -949,6 +970,7 @@ echo "
 	archive support:              $msg_archive
 	AFC support:                  $msg_afc
         AFP support:                  $msg_afp
+        NFS support:                  $msg_nfs
         DNS-SD support:               $msg_avahi
 	Build HAL volume monitor:     $msg_hal (with fast init path: $have_hal_fast_init)
 	Build GDU volume monitor:     $msg_gdu

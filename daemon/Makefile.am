@@ -129,6 +129,12 @@ mount_DATA += afp-browse.mount afp.mount
 libexec_PROGRAMS += gvfsd-afp-browse gvfsd-afp
 endif
 
+mount_in_files += nfs.mount.in
+if HAVE_NFS
+mount_DATA += nfs.mount
+libexec_PROGRAMS += gvfsd-nfs
+endif
+
 noinst_DATA = $(mount_DATA:.mount=.localmount)
 
 EXTRA_DIST = 				\
@@ -607,6 +613,21 @@ gvfsd_afp_CPPFLAGS = \
 gvfsd_afp_LDADD = \
 	$(libraries) \
 	$(LIBGCRYPT_LIBS)
+
+gvfsd_nfs_SOURCES = \
+	gvfsbackendnfs.c gvfsbackendnfs.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c
+
+gvfsd_nfs_CPPFLAGS = \
+	$(flags) \
+	-DBACKEND_HEADER=gvfsbackendnfs.h \
+	-DDEFAULT_BACKEND_TYPE=nfs \
+	-DMAX_JOB_THREADS=1 \
+	-DBACKEND_TYPES='"nfs", G_VFS_TYPE_BACKEND_NFS,' \
+	$(NFS_CFLAGS)
+
+gvfsd_nfs_LDADD = $(libraries) $(NFS_LIBS)
 
 
 # GSettings stuff

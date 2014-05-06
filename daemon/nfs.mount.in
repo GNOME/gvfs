@@ -1,0 +1,5 @@
+[Mount]
+Type=nfs
+Exec=@libexecdir@/gvfsd-nfs
+AutoMount=false
+Scheme=nfs
