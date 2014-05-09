@@ -1,3 +1,9 @@
+Major changes in 1.20.2
+=======================
+* afc: Fix problems when mount devices with older iOS
+* fuse: Fix settings file permissions
+* Translation updates
+
 Major changes in 1.20.1
 =======================
 * smb: Give correct error when unlink fails while closing file
