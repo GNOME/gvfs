@@ -2181,6 +2181,7 @@ do_enumerate (GVfsBackend           *backend,
 	  info = g_file_info_new ();
 	  ms_response_to_file_info (&response, info);
 	  g_vfs_job_enumerate_add_info (job, info);
+          g_object_unref (info);
 	}
 
       ms_response_clear (&response);
