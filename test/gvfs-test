@@ -33,6 +33,7 @@ import fcntl
 import re
 import locale
 import signal
+import socket
 from glob import glob
 
 from gi.repository import GLib, Gio
@@ -555,8 +556,18 @@ class Ftp(GvfsTestCase):
                                       '-r', self.workdir,
                                       '--auth', 'memory:testuser:pwd1'],
                                      stdout=subprocess.PIPE)
-        # give ftp server some time to start up
-        time.sleep(0.5)
+        # wait until server is started up
+        s = socket.socket()
+        for timeout in range(50):
+            try:
+                s.connect(('127.0.0.1', 2121))
+                s.close()
+                break
+            except ConnectionRefusedError:
+                time.sleep(0.01)
+                pass
+        else:
+            self.fail('timed out waiting for test FTP server')
  
     def tearDown(self):
         '''Shut down FTP server'''
