@@ -32,7 +32,6 @@ import shutil
 import fcntl
 import re
 import locale
-import signal
 import socket
 from glob import glob
 
@@ -1363,7 +1362,7 @@ DAVLockDB DAVLock
         # start server
         try:
             subprocess.check_call([httpd_cmd, '-d', klass.httpd_sandbox, '-f', 'apache2.conf', '-k', 'start'])
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             error_log = os.path.join(klass.httpd_sandbox, 'error_log')
             if os.path.exists(error_log):
                 with open(error_log) as f:
