@@ -1,3 +1,13 @@
+Major changes in 1.21.2
+=======================
+* gvfs-mount: Handle the ask-question signal
+* dav: Implement push support
+* recent: Implement query_info_on_read ()
+* trash: Implement query_info_on_read ()
+* tests: Various fixes
+* Several smaller bugfixes and portability fixes
+* Translation updates
+
 Major changes in 1.21.1
 =======================
 * gvfs-move: Improve the interactive move and progress output
