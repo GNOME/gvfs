@@ -4858,6 +4858,7 @@ try_set_attribute (GVfsBackend *backend,
                         G_IO_ERROR_INVALID_ARGUMENT,
                         "%s",
                         _("Invalid attribute type (uint32 expected)"));
+      return TRUE;
     }
 
   command = new_command_stream (op_backend,
