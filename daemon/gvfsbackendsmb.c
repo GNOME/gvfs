@@ -1864,7 +1864,17 @@ do_set_attribute (GVfsBackend *backend,
 
   if (strcmp (attribute, G_FILE_ATTRIBUTE_TIME_MODIFIED) == 0)
     {
-      if (type != G_FILE_ATTRIBUTE_TYPE_UINT64) 
+      if (type == G_FILE_ATTRIBUTE_TYPE_UINT64)
+        {
+	  smbc_utimes = smbc_getFunctionUtimes (op_backend->smb_context);
+	  tbuf[1].tv_sec = (*(guint64 *)value_p);  /* mtime */
+	  tbuf[1].tv_usec = 0;
+	  /* atime = mtime (atimes are usually disabled on desktop systems) */
+	  tbuf[0].tv_sec = tbuf[1].tv_sec;
+	  tbuf[0].tv_usec = 0;
+	  res = smbc_utimes (op_backend->smb_context, uri, &tbuf[0]);
+	}
+      else
         {
           g_vfs_job_failed (G_VFS_JOB (job),
                             G_IO_ERROR,
@@ -1872,14 +1882,6 @@ do_set_attribute (GVfsBackend *backend,
                             "%s",
                             _("Invalid attribute type (uint64 expected)"));
         }
-
-      smbc_utimes = smbc_getFunctionUtimes (op_backend->smb_context);
-      tbuf[1].tv_sec = (*(guint64 *)value_p);  /* mtime */
-      tbuf[1].tv_usec = 0;
-      /* atime = mtime (atimes are usually disabled on desktop systems) */
-      tbuf[0].tv_sec = tbuf[1].tv_sec;  
-      tbuf[0].tv_usec = 0;
-      res = smbc_utimes (op_backend->smb_context, uri, &tbuf[0]);
     }
 #if 0
   else
