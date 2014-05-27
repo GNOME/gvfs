@@ -351,6 +351,7 @@ recent_backend_enumerate (GVfsBackend           *vfs_backend,
           g_file_info_set_attribute_mask (info, attribute_matcher);
           recent_backend_add_info (item, info);
           g_vfs_job_enumerate_add_info (job, info);
+          g_object_unref (info);
         }
     }
   g_vfs_job_enumerate_done (job);
@@ -432,7 +433,10 @@ reload_recent_items (GVfsBackendRecent *backend)
       if (!gtk_recent_info_is_local (recent_info)
           || gtk_recent_info_get_private_hint (recent_info)
           || g_strcmp0 (gtk_recent_info_get_mime_type (recent_info), "inode/directory") == 0)
-        continue;
+        {
+          gtk_recent_info_unref (recent_info);
+          continue;
+        }
 
       uri = gtk_recent_info_get_uri (recent_info);
       guid = g_hash_table_lookup (backend->uri_map, uri);
