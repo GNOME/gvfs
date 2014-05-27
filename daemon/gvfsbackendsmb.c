@@ -1913,7 +1913,6 @@ do_enumerate (GVfsBackend *backend,
   SMBCFILE *dir;
   char dirents[1024*4];
   struct smbc_dirent *dirp;
-  GList *files;
   GFileInfo *info;
   GString *uri;
   int uri_start_len;
@@ -1950,8 +1949,6 @@ do_enumerate (GVfsBackend *backend,
 
   while (TRUE)
     {
-      files = NULL;
-      
       res = smbc_getdents (op_backend->smb_context, dir, (struct smbc_dirent *)dirents, sizeof (dirents));
       if (res <= 0)
 	break;
@@ -1980,7 +1977,8 @@ do_enumerate (GVfsBackend *backend,
 		{
 		  info = g_file_info_new ();
 		  g_file_info_set_name (info, dirp->name);
-		  files = g_list_prepend (files, info);
+                  g_vfs_job_enumerate_add_info (job, info);
+                  g_object_unref (info);
 		}
 	      else
 		{
@@ -1990,7 +1988,8 @@ do_enumerate (GVfsBackend *backend,
 		    {
 		      info = g_file_info_new ();
 		      set_info_from_stat (op_backend, info, &st, dirp->name, matcher);
-		      files = g_list_prepend (files, info);
+                      g_vfs_job_enumerate_add_info (job, info);
+                      g_object_unref (info);
 		    }
 		}
 	    }
@@ -1998,13 +1997,6 @@ do_enumerate (GVfsBackend *backend,
 	  dirlen = dirp->dirlen;
 	  dirp = (struct smbc_dirent *) (((char *)dirp) + dirlen);
 	  res -= dirlen;
-	}
-      
-      if (files)
-	{
-	  files = g_list_reverse (files);
-	  g_vfs_job_enumerate_add_infos (job, files);
-	  g_list_free_full (files, g_object_unref);
 	}
     }
       
