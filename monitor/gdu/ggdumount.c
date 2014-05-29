@@ -982,6 +982,7 @@ _gdu_unmount_cb (GduDevice *device,
                                                         data->user_data,
                                                         G_IO_ERROR,
                                                         G_IO_ERROR_FAILED,
+                                                        /* Translators: can't get block device with unencrypted data to unmount */
                                                         _("Cannot get LUKS cleartext slave"));
               data->completed = TRUE;
               _gdu_unmount_data_unref (data);
@@ -1004,6 +1005,7 @@ _gdu_unmount_cb (GduDevice *device,
                                                         data->user_data,
                                                         G_IO_ERROR,
                                                         G_IO_ERROR_FAILED,
+                                                        /* Translators: can't get block device with unencrypted data from path */
                                                         _("Cannot get LUKS cleartext slave from path `%s'"),
                                                         luks_cleartext_slave_object_path);
               data->completed = TRUE;
