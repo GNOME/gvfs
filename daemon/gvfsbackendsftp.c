@@ -1171,8 +1171,8 @@ check_input_stream_read_result (GVfsBackendSftp *backend, gssize res, GError *er
         {
           g_clear_error (&error);
           g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                       _("Internal error: %s"),
-                       res == 0 ? "The underlying SSH process died" : "Unkown Error");
+                       res == 0 ? _("The connection is closed (the underlying SSH process died)")
+                                : _("Internal error: Unknown Error"));
         }
 
       fail_jobs_and_unmount (backend, error);
