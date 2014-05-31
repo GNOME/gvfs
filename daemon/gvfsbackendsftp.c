@@ -1145,7 +1145,7 @@ handle_login (GVfsBackend *backend,
 }
 
 static void
-fail_jobs_and_die (GVfsBackendSftp *backend, GError *error)
+fail_jobs_and_unmount (GVfsBackendSftp *backend, GError *error)
 {
   GHashTableIter iter;
   gpointer key, value;
@@ -1162,7 +1162,7 @@ fail_jobs_and_die (GVfsBackendSftp *backend, GError *error)
   g_vfs_backend_force_unmount ((GVfsBackend*)backend);
 }
 
-static void
+static int
 check_input_stream_read_result (GVfsBackendSftp *backend, gssize res, GError *error)
 {
   if (G_UNLIKELY (res <= 0))
@@ -1175,8 +1175,11 @@ check_input_stream_read_result (GVfsBackendSftp *backend, gssize res, GError *er
                        res == 0 ? "The underlying SSH process died" : "Unkown Error");
         }
 
-      fail_jobs_and_die (backend, error);
+      fail_jobs_and_unmount (backend, error);
+      return -1;
     }
+
+  return 0;
 }
 
 static void read_reply_async (GVfsBackendSftp *backend);
@@ -1197,7 +1200,10 @@ read_reply_async_got_data  (GObject *source_object,
   error = NULL;
   res = g_input_stream_read_finish (G_INPUT_STREAM (source_object), result, &error);
 
-  check_input_stream_read_result (backend, res, error);
+  /* If we got an error, we've already called force_unmount so don't do
+   * anything further. */
+  if (check_input_stream_read_result (backend, res, error) == -1)
+    return;
 
   backend->reply_size_read += res;
 
@@ -1252,7 +1258,10 @@ read_reply_async_got_len  (GObject *source_object,
       return;
     }
 
-  check_input_stream_read_result (backend, res, error);
+  /* If we got an error, we've already called force_unmount so don't do
+   * anything further. */
+  if (check_input_stream_read_result (backend, res, error) == -1)
+    return;
 
   backend->reply_size_read += res;
 
