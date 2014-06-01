@@ -1463,7 +1463,11 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
         }
       else if (g_str_equal (afcinfo[i], "st_blocks"))
         {
-            g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_BLOCKS, atoi(afcinfo[i+1]));
+          int blocks = atoi(afcinfo[i+1]);
+          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_BLOCKS, blocks);
+          g_file_info_set_attribute_uint64 (info,
+                                            G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE,
+                                            blocks * G_GUINT64_CONSTANT (512));
         }
       else if (g_str_equal (afcinfo[i], "st_ifmt"))
         {
