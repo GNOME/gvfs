@@ -1586,6 +1586,9 @@ set_info_from_stat (GVfsBackendSmb *backend,
 
   g_file_info_set_file_type (info, file_type);
   g_file_info_set_size (info, statbuf->st_size);
+  g_file_info_set_attribute_uint64 (info,
+                                    G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE,
+                                    statbuf->st_blocks * G_GUINT64_CONSTANT (512));
 
   t.tv_sec = statbuf->st_mtime;
 #if defined (HAVE_STRUCT_STAT_ST_MTIMENSEC)
