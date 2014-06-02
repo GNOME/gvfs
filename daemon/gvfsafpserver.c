@@ -791,6 +791,7 @@ get_server_info (GVfsAfpServer *server,
 
     REPLY_READ_PASCAL (reply, &version);
     afp_version = string_to_afp_version (version);
+    g_free (version);
     if (afp_version > priv->info.version)
       priv->info.version = afp_version;
   }
@@ -1211,6 +1212,7 @@ g_vfs_afp_server_logout_sync (GVfsAfpServer *server,
   g_vfs_afp_command_put_byte (comm, 0);
 
   reply = g_vfs_afp_connection_send_command_sync (priv->conn, comm, cancellable, error);
+  g_object_unref (comm);
   if (!reply) {
     g_vfs_afp_connection_close_sync (priv->conn, cancellable, NULL);
     goto done;
