@@ -2191,6 +2191,9 @@ g_vfs_backend_afp_finalize (GObject *object)
 
   g_free (afp_backend->user);
 
+  if (afp_backend->volume_name)
+    g_free (afp_backend->volume_name);
+
   if (afp_backend->volume)
     g_object_unref (afp_backend->volume);
     
