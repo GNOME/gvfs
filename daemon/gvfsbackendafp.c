@@ -163,6 +163,7 @@ typedef struct
   GVfsJobCopy  *job;
   GAsyncResult *source_parms_res;
   GAsyncResult *dest_parms_res;
+  goffset size;
 } CopyData;
 
 static void
@@ -178,9 +179,14 @@ static void
 copy_copy_file_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
-  GVfsJobCopy *job = G_VFS_JOB_COPY (user_data);
+  CopyData *copy_data = user_data;
+  GVfsJobCopy *job = copy_data->job;
+  goffset size;
 
   GError *err = NULL;
+
+  size = copy_data->size;
+  copy_data_free (copy_data);
   
   if (!g_vfs_afp_volume_copy_file_finish (volume, res, &err))
   {
@@ -189,6 +195,7 @@ copy_copy_file_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
     return;
   }
 
+  g_vfs_job_progress_callback (size, size, job);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
@@ -196,7 +203,8 @@ static void
 copy_delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
-  GVfsJobCopy *job = G_VFS_JOB_COPY (user_data);
+  CopyData *copy_data = user_data;
+  GVfsJobCopy *job = copy_data->job;
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
 
   GError *err = NULL;
@@ -205,11 +213,12 @@ copy_delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
     g_error_free (err);
+    copy_data_free (copy_data);
     return;
   }
 
   g_vfs_afp_volume_copy_file (afp_backend->volume, job->source, job->destination,
-                              G_VFS_JOB (job)->cancellable, copy_copy_file_cb, job);
+                              G_VFS_JOB (job)->cancellable, copy_copy_file_cb, copy_data);
 }
 
 static void
@@ -230,8 +239,9 @@ do_copy (CopyData *copy_data)
   {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
     g_error_free (err);
-    goto done;
+    goto error;
   }
+  copy_data->size = g_file_info_get_size (info);
 
   /* If the source is a directory, don't fail with WOULD_RECURSE immediately,
    * as that is less useful to the app. Better check for errors on the
@@ -252,7 +262,7 @@ do_copy (CopyData *copy_data)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
       g_error_free (err);
-      goto done;
+      goto error;
     }
   }
   else
@@ -276,14 +286,14 @@ do_copy (CopyData *copy_data)
         else
           g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
                                     _("File is directory"));
-        goto done;
+        goto error;
       }
     }
     else
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
                         _("Target file already exists"));
-      goto done;
+      goto error;
     }
   }
 
@@ -292,21 +302,22 @@ do_copy (CopyData *copy_data)
   {
     g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
                       _("Can't recursively copy directory"));
-    goto done;
+    goto error;
   }
 
   if (dest_exists)
   {
     g_vfs_afp_volume_delete (afp_backend->volume, job->destination,
-                             G_VFS_JOB (job)->cancellable, copy_delete_cb, job);
+                             G_VFS_JOB (job)->cancellable, copy_delete_cb, copy_data);
   }
   else
   {
     g_vfs_afp_volume_copy_file (afp_backend->volume, job->source, job->destination,
-                                G_VFS_JOB (job)->cancellable, copy_copy_file_cb, job);
+                                G_VFS_JOB (job)->cancellable, copy_copy_file_cb, copy_data);
   }
+  return;
   
-done:
+error:
   copy_data_free (copy_data);
   return;
 }
@@ -348,7 +359,8 @@ try_copy (GVfsBackend *backend,
   copy_data->job = job;
 
   g_vfs_afp_volume_get_filedir_parms (afp_backend->volume, source,
-                                      AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT,
+                                      AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT |
+                                        AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT,
                                       AFP_FILEDIR_BITMAP_ATTRIBUTE_BIT,
                                       G_VFS_JOB (job)->cancellable, copy_get_source_parms_cb,
                                       copy_data);
