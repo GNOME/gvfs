@@ -362,7 +362,9 @@ _idevice_event_cb (const idevice_event_t *event, void *user_data)
 
   idevice_event_unsubscribe ();
 
-  g_vfs_backend_force_unmount ((GVfsBackend*)afc_backend);
+  /* TODO: need a cleaner way to force unmount ourselves:
+   * https://bugzilla.gnome.org/show_bug.cgi?id=708288 */
+  exit (1);
 }
 
 static gboolean
