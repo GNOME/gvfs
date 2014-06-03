@@ -1008,7 +1008,8 @@ class Drive(GvfsTestCase):
         self.assertRegex(out, 'themed icons:.*media-optical')
 
         # tell polkit to do allow removable (but not internal) storage
-        self.start_polkit(['org.freedesktop.udisks2.filesystem-mount'])
+        self.start_polkit(['org.freedesktop.udisks2.filesystem-mount',
+                           'org.freedesktop.udisks2.filesystem-mount-other-seat'])
 
         # now mounting should succeed
         (out, err) = self.program_out_err(['gvfs-mount', '-d', '/dev/' + dev])
@@ -1027,7 +1028,8 @@ class Drive(GvfsTestCase):
 
         self.load_image('bogus-cd.iso.bz2')
 
-        self.start_polkit(['org.freedesktop.udisks2.filesystem-mount'])
+        self.start_polkit(['org.freedesktop.udisks2.filesystem-mount',
+                           'org.freedesktop.udisks2.filesystem-mount-other-seat'])
 
         self.bogus_volume = None
 
