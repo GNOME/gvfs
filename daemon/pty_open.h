@@ -57,7 +57,7 @@ enum {
 int pty_open(pid_t *child, guint flags, char **env_add,
 	     const char *command, char **argv, const char *directory,
 	     int columns, int rows,
-	     int *stdin_fd, int *stdout_fd, int *stderr_fd);
+	     int *stdin_fd, int *stdout_fd, int *stderr_fd, int *slave_fd);
 int pty_get_size(int master, int *columns, int *rows);
 
 G_END_DECLS

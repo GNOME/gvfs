@@ -500,13 +500,14 @@ spawn_ssh (GVfsBackend *backend,
            int *stdin_fd,
            int *stdout_fd,
            int *stderr_fd,
+           int *slave_fd,
            GError **error)
 {
 #ifdef USE_PTY
   *tty_fd = pty_open(pid, PTY_REAP_CHILD, NULL,
 		     args[0], args, NULL,
 		     300, 300, 
-		     stdin_fd, stdout_fd, stderr_fd);
+		     stdin_fd, stdout_fd, stderr_fd, slave_fd);
   if (*tty_fd == -1)
     {
       g_set_error_literal (error,
@@ -1593,7 +1594,7 @@ do_mount (GVfsBackend *backend,
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   gchar **args; /* Enough for now, extend if you add more args */
   pid_t pid;
-  int tty_fd, stdout_fd, stdin_fd, stderr_fd;
+  int tty_fd, stdout_fd, stdin_fd, stderr_fd, slave_fd;
   GError *error;
   GInputStream *is;
   GDataOutputStream *command;
@@ -1609,7 +1610,7 @@ do_mount (GVfsBackend *backend,
   error = NULL;
   if (!spawn_ssh (backend,
 		  args, &pid,
-		  &tty_fd, &stdin_fd, &stdout_fd, &stderr_fd,
+		  &tty_fd, &stdin_fd, &stdout_fd, &stderr_fd, &slave_fd,
 		  &error))
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1630,7 +1631,13 @@ do_mount (GVfsBackend *backend,
   if (tty_fd == -1)
     res = wait_for_reply (backend, stdout_fd, &error);
   else
-    res = handle_login (backend, mount_source, tty_fd, stdout_fd, stderr_fd, &error);
+    {
+      res = handle_login (backend,
+                          mount_source,
+                          tty_fd, stdout_fd, stderr_fd,
+                          &error);
+      close (slave_fd);
+    }
   
   if (!res)
     {
