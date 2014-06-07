@@ -2160,6 +2160,7 @@ do_enumerate (GVfsBackend           *backend,
       g_object_unref (msg);
       return;
     }
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 
   multistatus_get_response_iter (&ms, &iter);
 
@@ -2185,7 +2186,6 @@ do_enumerate (GVfsBackend           *backend,
   multistatus_free (&ms);
   g_object_unref (msg);
 
-  g_vfs_job_succeeded (G_VFS_JOB (job)); /* should that be called earlier? */
   g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (job));
 }
 
