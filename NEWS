@@ -1,3 +1,14 @@
+Major changes in 1.21.3
+=======================
+* afc: Implement standard::allocated-size
+* smb: Implement standard::allocated-size
+* afp: Report number of bytes copied
+* afc: Work-around mounts not disappearing when disconnecting device
+* afc: Add version detection for iOS 6, 7 and 8
+* metadata: Fix misaligned accesses to 64bit data
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.21.2
 =======================
 * gvfs-mount: Handle the ask-question signal
