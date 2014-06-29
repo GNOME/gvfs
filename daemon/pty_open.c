@@ -86,8 +86,6 @@
 #undef HAVE_UNIX98_PTY
 #endif
 
-int _pty_set_size(int master, int columns, int rows);
-
 /* Solaris does not have the login_tty() function so implement locally. */
 #ifndef HAVE_LOGIN_TTY
 static int login_tty(int pts)
@@ -189,6 +187,7 @@ _pty_reset_signal_handlers(void)
 #endif
 }
 
+#ifdef HAVE_UNIX98_PTY
 #ifdef HAVE_SOCKETPAIR
 static int
 _pty_pipe_open(int *a, int *b)
@@ -406,6 +405,8 @@ _pty_run_on_pty(int fd, gboolean login,
 
 	return 0;
 }
+
+static int _pty_set_size(int master, int columns, int rows);
 
 /* Open the named PTY slave, fork off a child (storing its PID in child),
  * and exec the named command in its own session as a process group leader */
@@ -643,7 +644,7 @@ _pty_fork_on_pty_name(const char *path, int parent_fd, char **env_add,
  *
  * Returns: 0 on success, -1 on failure.
  */
-int
+static int
 _pty_set_size(int master, int columns, int rows)
 {
 	struct winsize size;
@@ -737,8 +738,6 @@ _pty_unlockpt(int fd)
 	return -1;
 #endif
 }
-
-#if defined(HAVE_UNIX98_PTY)
 
 static int
 _pty_open_unix98(pid_t *child, guint flags, char **env_add,
