@@ -66,9 +66,6 @@ g_vfs_backend_http_finalize (GObject *object)
   soup_session_abort (backend->session);
   g_object_unref (backend->session);
 
-  soup_session_abort (backend->session_async);
-  g_object_unref (backend->session_async);
-
 
   if (G_OBJECT_CLASS (g_vfs_backend_http_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_http_parent_class)->finalize) (object);
@@ -80,44 +77,24 @@ static void
 g_vfs_backend_http_init (GVfsBackendHttp *backend)
 {
   const char         *debug;
-  SoupSessionFeature *proxy_resolver;
   SoupSessionFeature *cookie_jar;
-  SoupSessionFeature *content_decoder;
 
   g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);
 
-  backend->session = soup_session_sync_new_with_options ("user-agent",
-                                                         "gvfs/" VERSION,
-                                                         NULL);
+  backend->session = soup_session_new_with_options ("user-agent",
+                                                    "gvfs/" VERSION,
+                                                    NULL);
 
-  backend->session_async = soup_session_async_new_with_options ("user-agent",
-                                                                "gvfs/" VERSION,
-                                                                NULL);
-  /* SoupRequester seems to depend on use-thread-context */
-  g_object_set (G_OBJECT (backend->session_async), "use-thread-context", TRUE, NULL);
-
-  /* Proxy handling */
-  proxy_resolver = g_object_new (SOUP_TYPE_PROXY_RESOLVER_DEFAULT, NULL);
-  soup_session_add_feature (backend->session, proxy_resolver);
-  soup_session_add_feature (backend->session_async, proxy_resolver);
-  g_object_unref (proxy_resolver);
+  g_object_set (backend->session, "ssl-strict", FALSE, NULL);
 
   /* Cookie handling - stored temporarlly in memory, mostly useful for
    * authentication in WebDAV. */
   cookie_jar = g_object_new (SOUP_TYPE_COOKIE_JAR, NULL);
   soup_session_add_feature (backend->session, cookie_jar);
-  soup_session_add_feature (backend->session_async, cookie_jar);
   g_object_unref (cookie_jar);
 
   /* Send Accept-Language header (see bug 166795) */
   g_object_set (backend->session, "accept-language-auto", TRUE, NULL);
-  g_object_set (backend->session_async, "accept-language-auto", TRUE, NULL);
-
-  /* Handle decompression automatically */
-  content_decoder = g_object_new (SOUP_TYPE_CONTENT_DECODER, NULL);
-  soup_session_add_feature (backend->session, content_decoder);
-  soup_session_add_feature (backend->session_async, content_decoder);
-  g_object_unref (content_decoder);
 
   /* Logging */
   debug = g_getenv ("GVFS_HTTP_DEBUG");
@@ -136,7 +113,6 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
 
       logger = soup_logger_new (level, DEBUG_MAX_BODY_SIZE);
       soup_session_add_feature (backend->session, SOUP_SESSION_FEATURE (logger));
-      soup_session_add_feature (backend->session_async, SOUP_SESSION_FEATURE (logger));
       g_object_unref (logger);
     }
 
@@ -282,7 +258,7 @@ http_backend_queue_message (GVfsBackend         *backend,
 {
   GVfsBackendHttp *op_backend = G_VFS_BACKEND_HTTP (backend);
 
-  soup_session_queue_message (op_backend->session_async, msg,
+  soup_session_queue_message (op_backend->session, msg,
                               callback, user_data);
 }
 /* ************************************************************************* */
@@ -410,7 +386,7 @@ http_backend_open_for_read (GVfsBackend *backend,
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
 
-  stream = g_vfs_http_input_stream_new (op_backend->session_async, uri);
+  stream = g_vfs_http_input_stream_new (op_backend->session, uri);
 
   g_vfs_http_input_stream_send_async (stream,
 				      G_PRIORITY_DEFAULT,

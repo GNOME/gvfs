@@ -51,8 +51,6 @@ struct _GVfsBackendHttp
 
   SoupURI     *mount_base;
   SoupSession *session;
-
-  SoupSession *session_async;
 };
 
 GType         g_vfs_backend_http_get_type    (void) G_GNUC_CONST;
