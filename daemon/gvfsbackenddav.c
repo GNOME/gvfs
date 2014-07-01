@@ -1939,11 +1939,6 @@ do_mount (GVfsBackend  *backend,
   g_object_unref (msg_opts);
   g_object_unref (msg_stat);
 
-  /* also auth the async session */
-  g_signal_connect (G_VFS_BACKEND_HTTP (backend)->session_async, "authenticate",
-                    G_CALLBACK (soup_authenticate_from_data),
-                    data);
-
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_debug ("- mount\n");
 }
@@ -2556,7 +2551,7 @@ try_close_write (GVfsBackend *backend,
 
   soup_message_set_request (msg, "application/octet-stream",
 			    SOUP_MEMORY_TAKE, data, length);
-  soup_session_queue_message (G_VFS_BACKEND_HTTP (backend)->session_async,
+  soup_session_queue_message (G_VFS_BACKEND_HTTP (backend)->session,
 			      msg, try_close_write_sent, job);
 
   return TRUE;
@@ -2904,7 +2899,7 @@ push_read_cb (GObject *source, GAsyncResult *res, gpointer user_data)
       soup_message_body_append_take (handle->msg->request_body, handle->buf, n);
       handle->buf = NULL;
       handle->n_read += n;
-      soup_session_unpause_message (G_VFS_BACKEND_HTTP (handle->backend)->session_async,
+      soup_session_unpause_message (G_VFS_BACKEND_HTTP (handle->backend)->session,
                                     handle->msg);
     }
   else if (n == 0)
@@ -2919,7 +2914,7 @@ push_read_cb (GObject *source, GAsyncResult *res, gpointer user_data)
                                     G_IO_ERROR_FAILED,
                                     _("File length changed during transfer"));
 
-          soup_session_cancel_message (G_VFS_BACKEND_HTTP (handle->backend)->session_async,
+          soup_session_cancel_message (G_VFS_BACKEND_HTTP (handle->backend)->session,
                                        handle->msg,
                                        SOUP_STATUS_CANCELLED);
         }
@@ -2930,7 +2925,7 @@ push_read_cb (GObject *source, GAsyncResult *res, gpointer user_data)
       handle->buf = NULL;
       g_vfs_job_failed_from_error (handle->job, error);
       g_error_free (error);
-      soup_session_cancel_message (G_VFS_BACKEND_HTTP (handle->backend)->session_async,
+      soup_session_cancel_message (G_VFS_BACKEND_HTTP (handle->backend)->session,
                                    handle->msg,
                                    SOUP_STATUS_CANCELLED);
     }
@@ -2963,7 +2958,7 @@ push_write_next_chunk (SoupMessage *msg, gpointer user_data)
         {
           g_vfs_job_failed_from_error (handle->job, error);
           g_error_free (error);
-          soup_session_cancel_message (G_VFS_BACKEND_HTTP (handle->backend)->session_async,
+          soup_session_cancel_message (G_VFS_BACKEND_HTTP (handle->backend)->session,
                                        handle->msg,
                                        SOUP_STATUS_CANCELLED);
           return;
@@ -3072,7 +3067,7 @@ push_stat_dest_cb (SoupSession *session, SoupMessage *msg, gpointer user_data)
   g_signal_connect (handle->msg, "wrote-body-data",
                     G_CALLBACK (push_wrote_body_data), handle);
 
-  soup_session_queue_message (G_VFS_BACKEND_HTTP (handle->backend)->session_async,
+  soup_session_queue_message (G_VFS_BACKEND_HTTP (handle->backend)->session,
                               handle->msg,
                               push_done, handle);
 }
