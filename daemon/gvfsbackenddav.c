@@ -166,12 +166,12 @@ path_get_parent_dir (const char *path)
     len--;
 
   if (len == 0)
-    return NULL;
+    return g_strdup ("/");
 
   parent = g_strrstr_len (path, len, "/");
 
   if (parent == NULL)
-    return NULL;
+    return g_strdup ("/");
 
   return g_strndup (path, (parent - path) + 1);
 }
@@ -1886,7 +1886,7 @@ do_mount (GVfsBackend  *backend,
     soup_message_headers_clear (msg_stat->response_headers);
     soup_message_body_truncate (msg_stat->response_body);
 
-  } while (mount_base->path != NULL);
+  } while (strcmp (mount_base->path, "/") != 0);
 
   /* we either encountered an error or we have
      reached the end of paths we are allowed to
