@@ -1741,7 +1741,7 @@ static void
 dns_sd_resolver_changed (GVfsDnsSdResolver *resolver,
                          GVfsBackendDav    *dav_backend)
 {
-  /* TODO: handle when DNS-SD data changes */
+  g_vfs_backend_force_unmount (G_VFS_BACKEND (dav_backend));
 }
 #endif
 
