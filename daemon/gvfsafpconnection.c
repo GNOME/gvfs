@@ -1265,6 +1265,9 @@ write_all_finish (GOutputStream *stream,
     } \
 \
     g_error_free (err); \
+\
+    g_hash_table_remove (priv->request_hash, \
+                         GUINT_TO_POINTER ((guint)GUINT16_FROM_BE (priv->write_dsi_header.requestID))); \
     free_request_data (req_data); \
 \
     g_mutex_lock (&priv->mutex); \
@@ -1283,11 +1286,6 @@ write_buf_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   GVfsAfpConnectionPrivate *priv = afp_conn->priv;
   
   HANDLE_RES ();
-
-  g_hash_table_insert (priv->request_hash,
-                       GUINT_TO_POINTER ((guint)GUINT16_FROM_BE (priv->write_dsi_header.requestID)),
-                       req_data);
-
 
   g_mutex_lock (&priv->mutex);
   send_request_unlocked (afp_conn);
@@ -1312,10 +1310,6 @@ write_command_cb (GObject *object, GAsyncResult *res, gpointer user_data)
     return;
   }
   
-  g_hash_table_insert (priv->request_hash,
-                       GUINT_TO_POINTER ((guint)GUINT16_FROM_BE (priv->write_dsi_header.requestID)),
-                       req_data);
-
   g_mutex_lock (&priv->mutex);
   send_request_unlocked (afp_conn);
   g_mutex_unlock (&priv->mutex);
@@ -1430,6 +1424,10 @@ send_request_unlocked (GVfsAfpConnection *afp_connection)
       g_assert_not_reached ();
   }
 
+  if (req_data->type != REQUEST_TYPE_TICKLE)
+    g_hash_table_insert (priv->request_hash,
+                         GUINT_TO_POINTER ((guint)GUINT16_FROM_BE (priv->write_dsi_header.requestID)),
+                         req_data);
 
   write_all_async (g_io_stream_get_output_stream (priv->stream),
                    &priv->write_dsi_header, sizeof (DSIHeader), 0,
