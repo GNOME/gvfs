@@ -22,6 +22,7 @@
 
 #include <string.h>
 #include <glib/gi18n.h>
+#include <gio/gnetworking.h>
 
 
 #include "gvfsafpconnection.h"
@@ -1772,6 +1773,9 @@ open_thread_func (gpointer user_data)
   GVfsAfpConnectionPrivate *priv = conn->priv;
 
   GSocketClient *client;
+  GSocketConnection *connection;
+  GSocket *socket;
+  GError *error = NULL;
 
   guint16 req_id;
   gboolean res = FALSE;
@@ -1780,12 +1784,21 @@ open_thread_func (gpointer user_data)
   guint pos;
 
   client = g_socket_client_new ();
-  priv->stream = G_IO_STREAM (g_socket_client_connect (client, priv->addr, data->cancellable,
-                                                       data->error));
+  connection = g_socket_client_connect (client,
+                                        priv->addr,
+                                        data->cancellable, data->error);
   g_object_unref (client);
 
-  if (!priv->stream)
+  if (!connection)
     goto out;
+
+  socket = g_socket_connection_get_socket (connection);
+  if (!g_socket_set_option (socket, IPPROTO_TCP, TCP_NODELAY, TRUE, &error))
+  {
+    g_warning ("Could not set TCP_NODELAY: %s\n", error->message);
+    g_error_free (error);
+  }
+  priv->stream = G_IO_STREAM (connection);
 
   req_id = get_request_id (conn);
   res = send_request_sync (g_io_stream_get_output_stream (priv->stream),
