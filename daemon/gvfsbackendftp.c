@@ -29,6 +29,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 
@@ -1142,7 +1145,7 @@ do_set_attribute (GVfsBackend *backend,
           if (g_vfs_ftp_task_send (&task,
                                    0,
                                    "SITE CHMOD %04o %s",
-                                   mode,
+                                   mode & (S_IRWXU | S_IRWXG | S_IRWXO),
                                    g_vfs_ftp_file_get_ftp_path (file)))
             {
               g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
