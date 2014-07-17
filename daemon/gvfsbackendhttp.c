@@ -51,8 +51,6 @@
 #include "gvfsdaemonprotocol.h"
 #include "gvfsdaemonutils.h"
 
-static SoupSession *the_session;
-
 G_DEFINE_TYPE (GVfsBackendHttp, g_vfs_backend_http, G_VFS_TYPE_BACKEND)
 
 static void
@@ -65,6 +63,7 @@ g_vfs_backend_http_finalize (GObject *object)
   if (backend->mount_base)
     soup_uri_free (backend->mount_base);
 
+  soup_session_abort (backend->session);
   g_object_unref (backend->session);
 
 
@@ -72,12 +71,51 @@ g_vfs_backend_http_finalize (GObject *object)
     (*G_OBJECT_CLASS (g_vfs_backend_http_parent_class)->finalize) (object);
 }
 
+#define DEBUG_MAX_BODY_SIZE (100 * 1024 * 1024)
+
 static void
 g_vfs_backend_http_init (GVfsBackendHttp *backend)
 {
+  const char         *debug;
+  SoupSessionFeature *cookie_jar;
+
   g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);
 
-  backend->session = g_object_ref (the_session);
+  backend->session = soup_session_new_with_options ("user-agent",
+                                                    "gvfs/" VERSION,
+                                                    NULL);
+
+  g_object_set (backend->session, "ssl-strict", FALSE, NULL);
+
+  /* Cookie handling - stored temporarlly in memory, mostly useful for
+   * authentication in WebDAV. */
+  cookie_jar = g_object_new (SOUP_TYPE_COOKIE_JAR, NULL);
+  soup_session_add_feature (backend->session, cookie_jar);
+  g_object_unref (cookie_jar);
+
+  /* Send Accept-Language header (see bug 166795) */
+  g_object_set (backend->session, "accept-language-auto", TRUE, NULL);
+
+  /* Logging */
+  debug = g_getenv ("GVFS_HTTP_DEBUG");
+  if (debug)
+    {
+      SoupLogger         *logger;
+      SoupLoggerLogLevel  level;
+
+      if (g_ascii_strcasecmp (debug, "all") ||
+          g_ascii_strcasecmp (debug, "body"))
+        level = SOUP_LOGGER_LOG_BODY;
+      else if (g_ascii_strcasecmp (debug, "header"))
+        level = SOUP_LOGGER_LOG_HEADERS;
+      else
+        level = SOUP_LOGGER_LOG_MINIMAL;
+
+      logger = soup_logger_new (level, DEBUG_MAX_BODY_SIZE);
+      soup_session_add_feature (backend->session, SOUP_SESSION_FEATURE (logger));
+      g_object_unref (logger);
+    }
+
 }
 
 /* ************************************************************************* */
@@ -659,14 +697,9 @@ try_query_info_on_read (GVfsBackend           *backend,
 }
 
 
-#define DEBUG_MAX_BODY_SIZE (100 * 1024 * 1024)
-
 static void
 g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
 {
-  const char         *debug;
-  SoupSessionFeature *cookie_jar;
-
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsBackendClass *backend_class;
 
@@ -681,40 +714,4 @@ g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
   backend_class->try_close_read         = try_close_read;
   backend_class->try_query_info         = try_query_info;
   backend_class->try_query_info_on_read = try_query_info_on_read;
-
-  /* Initialize the SoupSession, common to all backend instances */
-  the_session = soup_session_new_with_options ("user-agent",
-                                               "gvfs/" VERSION,
-                                               NULL);
-
-  g_object_set (the_session, "ssl-strict", FALSE, NULL);
-
-  /* Cookie handling - stored temporarlly in memory, mostly useful for
-   * authentication in WebDAV. */
-  cookie_jar = g_object_new (SOUP_TYPE_COOKIE_JAR, NULL);
-  soup_session_add_feature (the_session, cookie_jar);
-  g_object_unref (cookie_jar);
-
-  /* Send Accept-Language header (see bug 166795) */
-  g_object_set (the_session, "accept-language-auto", TRUE, NULL);
-
-  /* Logging */
-  debug = g_getenv ("GVFS_HTTP_DEBUG");
-  if (debug)
-    {
-      SoupLogger         *logger;
-      SoupLoggerLogLevel  level;
-
-      if (g_ascii_strcasecmp (debug, "all") ||
-          g_ascii_strcasecmp (debug, "body"))
-        level = SOUP_LOGGER_LOG_BODY;
-      else if (g_ascii_strcasecmp (debug, "header"))
-        level = SOUP_LOGGER_LOG_HEADERS;
-      else
-        level = SOUP_LOGGER_LOG_MINIMAL;
-
-      logger = soup_logger_new (level, DEBUG_MAX_BODY_SIZE);
-      soup_session_add_feature (the_session, SOUP_SESSION_FEATURE (logger));
-      g_object_unref (logger);
-    }
 }
