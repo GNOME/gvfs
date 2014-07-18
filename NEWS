@@ -1,3 +1,11 @@
+Major changes in 1.21.4
+========================
+* afp: Fix hangs while enumerating large directories
+* afp: Performance improvement
+* dav: Fix mounting multiple shares on the same host with different paths
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.21.3
 =======================
 * afc: Implement standard::allocated-size
