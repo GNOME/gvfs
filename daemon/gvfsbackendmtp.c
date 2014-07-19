@@ -148,7 +148,7 @@ add_cache_entry (GVfsBackendMtp *backend,
   CacheEntry *entry = g_new0 (CacheEntry, 1);
   entry->storage = storage;
   entry->id = id;
-  DEBUG ("(II) add_cache_entry: %s: %u, %u",
+  DEBUG ("(II) add_cache_entry: %s: %X, %X",
          path, entry->storage, entry->id);
   g_hash_table_replace (backend->file_cache,
                         path, entry);
@@ -299,7 +299,7 @@ remove_cache_entry_by_id (GVfsBackendMtp *backend,
 {
   GHashTableIter iter;
   gpointer key, value;
-  DEBUG ("(III) remove_cache_entry_by_id: %u", id);
+  DEBUG ("(III) remove_cache_entry_by_id: %X", id);
 
   g_hash_table_iter_init (&iter, backend->file_cache);
   while (g_hash_table_iter_next (&iter, &key, &value)) {
@@ -1008,7 +1008,7 @@ get_file_info (GVfsBackend *backend,
   GIcon *icon = NULL;
   char *content_type = NULL;
 
-  DEBUG_ENUMERATE ("(II) get_file_info: %u", file->item_id);
+  DEBUG_ENUMERATE ("(II) get_file_info: %X", file->item_id);
 
   g_file_info_set_name (info, file->filename);
   g_file_info_set_display_name (info, file->filename);
@@ -1040,7 +1040,7 @@ get_file_info (GVfsBackend *backend,
     GMountSpec *mount_spec;
 
     mount_spec = g_vfs_backend_get_mount_spec (backend);
-    icon_id = g_strdup_printf ("%u", file->item_id);
+    icon_id = g_strdup_printf ("%X", file->item_id);
     preview = g_vfs_icon_new (mount_spec,
                               icon_id);
     g_file_info_set_attribute_object (info,
@@ -1203,7 +1203,7 @@ do_query_info (GVfsBackend *backend,
     LIBMTP_devicestorage_t *storage;
     for (storage = device->storage; storage != 0; storage = storage->next) {
       if (storage->id == entry->storage) {
-        DEBUG ("(I) found storage %u", storage->id);
+        DEBUG ("(I) found storage %X", storage->id);
         get_storage_info (storage, info);
       }
     }
@@ -1794,7 +1794,7 @@ do_open_icon_for_read (GVfsBackend *backend,
     int ret = LIBMTP_Get_Thumbnail (G_VFS_BACKEND_MTP (backend)->device, id,
                                     &data, &size);
     if (ret == 0) {
-      DEBUG ("File %u has thumbnail: %u", id, size);
+      DEBUG ("File %X has thumbnail: %u", id, size);
       bytes = g_byte_array_sized_new (size);
       g_byte_array_append (bytes, data, size);
       free (data);
@@ -1803,13 +1803,13 @@ do_open_icon_for_read (GVfsBackend *backend,
       ret = LIBMTP_Get_Representative_Sample (G_VFS_BACKEND_MTP (backend)->device,
                                               id, sample_data);
       if (ret == 0) {
-        DEBUG ("File %u has sampledata: %u", id, size);
+        DEBUG ("File %X has sampledata: %u", id, size);
         bytes = g_byte_array_sized_new (sample_data->size);
         g_byte_array_append (bytes, (const guint8 *)sample_data->data, sample_data->size);
         size = sample_data->size;
         LIBMTP_destroy_filesampledata_t (sample_data);
       } else {
-        DEBUG ("File %u has no thumbnail:", id);
+        DEBUG ("File %X has no thumbnail:", id);
         g_vfs_job_failed (G_VFS_JOB (job),
                           G_IO_ERROR,
                           G_IO_ERROR_NOT_FOUND,
@@ -1857,7 +1857,7 @@ do_seek_on_read (GVfsBackend *backend,
   goffset old_offset = handle->offset;
   gsize size = handle->size;
 
-  DEBUG ("(I) do_seek_on_read (%u %lu %ld %u)", id, old_offset, offset, type);
+  DEBUG ("(I) do_seek_on_read (%X %lu %ld %u)", id, old_offset, offset, type);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   FAIL_DURING_UNMOUNT();
@@ -1896,7 +1896,7 @@ do_read (GVfsBackend *backend,
   uint32_t id = handle->id;
   goffset offset = handle->offset;
 
-  DEBUG ("(I) do_read (%u %lu %lu)", id, offset, bytes_requested);
+  DEBUG ("(I) do_read (%X %lu %lu)", id, offset, bytes_requested);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   FAIL_DURING_UNMOUNT();
@@ -2206,7 +2206,7 @@ do_write (GVfsBackend *backend,
   uint32_t id = handle->id;
   goffset offset = handle->offset;
 
-  DEBUG ("(I) do_write (%u %lu %lu)", id, offset, buffer_size);
+  DEBUG ("(I) do_write (%X %lu %lu)", id, offset, buffer_size);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   FAIL_DURING_UNMOUNT();
@@ -2241,7 +2241,7 @@ do_seek_on_write (GVfsBackend *backend,
   goffset old_offset = handle->offset;
   gsize size = handle->size;
 
-  DEBUG ("(I) do_seek_on_write (%u %lu %ld %u)", id, old_offset, offset, type);
+  DEBUG ("(I) do_seek_on_write (%X %lu %ld %u)", id, old_offset, offset, type);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   FAIL_DURING_UNMOUNT();
