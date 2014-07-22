@@ -136,6 +136,16 @@ emit_delete_event (gpointer key,
 
 
 /************************************************
+ * Storage name helper
+ ************************************************/
+
+static char *create_storage_name (const LIBMTP_devicestorage_t *storage)
+{
+  return g_strdup_printf("%s (%X)", storage->StorageDescription, storage->id);
+}
+
+
+/************************************************
  * Cache Helpers
  ************************************************/
 
@@ -195,8 +205,6 @@ add_cache_entries_for_filename (GVfsBackendMtp *backend,
     goto exit;
   }
 
-  int i;
-
   /* Identify Storage */
   LIBMTP_devicestorage_t *storage;
 
@@ -207,7 +215,12 @@ add_cache_entries_for_filename (GVfsBackendMtp *backend,
     goto exit;
   }
   for (storage = device->storage; storage != 0; storage = storage->next) {
-    if (g_strcmp0 (elements[1], storage->StorageDescription) == 0) {
+    /* Construct the name for storage and compare it to first element of path */
+    char *storage_name = create_storage_name (storage);
+    int is_equal = !g_strcmp0 (elements[1], storage_name);
+    g_free(storage_name);
+
+    if (is_equal) {
       char *partial = build_partial_path (elements, 2);
       add_cache_entry (backend, partial, storage->id, -1);
       break;
@@ -219,6 +232,8 @@ add_cache_entries_for_filename (GVfsBackendMtp *backend,
   }
 
   long parent_id = -1;
+  int i;
+
   for (i = 2; i < ne; i++) {
     LIBMTP_file_t *f =
       LIBMTP_Get_Files_And_Folders (device, storage->id, parent_id);
@@ -554,7 +569,6 @@ check_event (gpointer user_data)
   int ret = 0;
   while (ret == 0) {
     uint32_t param1;
-    char *path;
     GVfsBackendMtp *backend;
 
     backend = g_weak_ref_get (event_ref);
@@ -588,7 +602,10 @@ check_event (gpointer user_data)
         g_mutex_lock (&backend->mutex);
         for (storage = device->storage; storage != 0; storage = storage->next) {
           if (storage->id == param1) {
-            path = g_build_filename ("/", storage->StorageDescription, NULL);
+            char *storage_name = create_storage_name (storage);
+            char *path = g_build_filename ("/", storage_name, NULL);
+            g_free (storage_name);
+
             add_cache_entry (G_VFS_BACKEND_MTP (backend),
                              path,
                              storage->id,
@@ -951,8 +968,11 @@ get_storage_info (LIBMTP_devicestorage_t *storage, GFileInfo *info) {
 
   DEBUG_ENUMERATE ("(II) get_storage_info: %s", storage->id);
 
-  g_file_info_set_name (info, storage->StorageDescription);
-  g_file_info_set_display_name (info, storage->StorageDescription);
+  char *storage_name = create_storage_name(storage);
+  g_file_info_set_name (info, storage_name);
+  g_file_info_set_display_name (info, storage_name);
+  g_free(storage_name);
+
   g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
   g_file_info_set_content_type (info, "inode/directory");
   g_file_info_set_size (info, 0);
@@ -1109,10 +1129,14 @@ do_enumerate (GVfsBackend *backend,
       get_storage_info (storage, info);
       g_vfs_job_enumerate_add_info (job, info);
       g_object_unref (info);
+
+      char *storage_name = create_storage_name (storage);
       add_cache_entry (G_VFS_BACKEND_MTP (backend),
-                       g_build_filename (filename, storage->StorageDescription, NULL),
+                       g_build_filename (filename, storage_name, NULL),
                        storage->id,
                        -1);
+
+      g_free (storage_name);
     }
   } else {
     CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend),
