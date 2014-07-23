@@ -141,7 +141,40 @@ emit_delete_event (gpointer key,
 
 static char *create_storage_name (const LIBMTP_devicestorage_t *storage)
 {
-  return g_strdup_printf("%s (%X)", storage->StorageDescription, storage->id);
+  /* The optional post-fixing of storage's name with ID requires us to
+     know in advance whether the storage's description string is unique
+     or not. Since this function is called in several places, it is
+     safest to perform this check here, each time that storage name needs
+     to be created. */
+  gboolean is_unique = TRUE;
+  const LIBMTP_devicestorage_t *tmp_storage;
+
+  /* Forward search for duplicates */
+  for (tmp_storage = storage->next; tmp_storage != 0; tmp_storage = tmp_storage->next) {
+    if (!g_strcmp0 (storage->StorageDescription, tmp_storage->StorageDescription)) {
+      is_unique = FALSE;
+      break;
+    }
+  }
+
+  /* Backward search, if necessary */
+  if (is_unique) {
+    for (tmp_storage = storage->prev; tmp_storage != 0; tmp_storage = tmp_storage->prev) {
+      /* Compare descriptions */
+      if (!g_strcmp0 (storage->StorageDescription, tmp_storage->StorageDescription)) {
+        is_unique = FALSE;
+        break;
+      }
+    }
+  }
+
+  /* If description is unique, we can use it as storage name; otherwise,
+     we add storage ID to it */
+  if (is_unique) {
+    return g_strdup (storage->StorageDescription);
+  } else {
+    return g_strdup_printf ("%s (%X)", storage->StorageDescription, storage->id);
+  }
 }
 
 
