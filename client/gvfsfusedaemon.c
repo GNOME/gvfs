@@ -1923,13 +1923,70 @@ pad_file (FileHandle *fh, gsize num, goffset current_size)
   return (res < 0 ? res : 0);
 }
 
+static int
+truncate_stream (GFile *file, FileHandle *fh, off_t size)
+{
+  goffset current_size;
+  GError *error  = NULL;
+  int result = 0;
+
+  if (g_seekable_can_truncate (G_SEEKABLE (fh->stream)))
+    {
+      g_seekable_truncate (fh->stream, size, NULL, &error);
+    }
+  else if (size == 0)
+    {
+      g_output_stream_close (fh->stream, NULL, NULL);
+      g_object_unref (fh->stream);
+      fh->stream = NULL;
+
+      fh->stream = g_file_replace (file, 0, FALSE, 0, NULL, &error);
+
+      if (fh->stream != NULL)
+        {
+          /* The stream created by g_file_replace() won't always replace
+           * the file until it's been closed. So close it now to make
+           * future operations consistent. */
+          g_output_stream_close (fh->stream, NULL, NULL);
+          g_object_unref (fh->stream);
+          fh->stream = NULL;
+        }
+    }
+  else if (file_handle_get_size (fh, &current_size))
+    {
+      if (current_size == size)
+        {
+          /* Don't have to do anything to succeed */
+        }
+      else if ((current_size < size) && g_seekable_can_seek (G_SEEKABLE (fh->stream)))
+        {
+          /* If the truncated size is larger than the current size
+           * then we need to pad out the difference with 0's */
+          goffset orig_pos = g_seekable_tell (G_SEEKABLE (fh->stream));
+          result = pad_file (fh, size - current_size, current_size);
+          if (result == 0)
+            g_seekable_seek (G_SEEKABLE (fh->stream), orig_pos, G_SEEK_SET, NULL, &error);
+        }
+    }
+  else
+    {
+      result = -ENOTSUP;
+    }
+
+  if (error)
+    {
+      result = -errno_from_error (error);
+      g_error_free (error);
+    }
+
+  return result;
+}
+
 static gint
 vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
 {
   GFile  *file;
-  GError *error  = NULL;
   gint    result = 0;
-  goffset current_size;
 
   debug_print ("vfs_ftruncate: %s\n", path);
 
@@ -1946,56 +2003,7 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
           result = setup_output_stream (file, fh, 0);
 
           if (result == 0)
-            {
-              if (g_seekable_can_truncate (G_SEEKABLE (fh->stream)))
-                {
-                  g_seekable_truncate (fh->stream, size, NULL, &error);
-                }
-              else if (size == 0)
-                {
-                  g_output_stream_close (fh->stream, NULL, NULL);
-                  g_object_unref (fh->stream);
-                  fh->stream = NULL;
-
-                  fh->stream = g_file_replace (file, 0, FALSE, 0, NULL, &error);
-
-                  if (fh->stream != NULL)
-                    {
-                      /* The stream created by g_file_replace() won't always replace
-                       * the file until it's been closed. So close it now to make
-                       * future operations consistent. */
-                      g_output_stream_close (fh->stream, NULL, NULL);
-                      g_object_unref (fh->stream);
-                      fh->stream = NULL;
-                    }
-                }
-              else if (file_handle_get_size (fh, &current_size))
-                {
-                  if (current_size == size)
-                    {
-                      /* Don't have to do anything to succeed */
-                    }
-                  else if ((current_size < size) && g_seekable_can_seek (G_SEEKABLE (fh->stream)))
-                    {
-                      /* If the truncated size is larger than the current size
-                       * then we need to pad out the difference with 0's */
-                      goffset orig_pos = g_seekable_tell (G_SEEKABLE (fh->stream));
-                      result = pad_file (fh, size - current_size, current_size);
-                      if (result == 0)
-                        g_seekable_seek (G_SEEKABLE (fh->stream), orig_pos, G_SEEK_SET, NULL, &error);
-                    }
-		}
-	      else
-		{
-		  result = -ENOTSUP;
-                }
-
-              if (error)
-                {
-                  result = -errno_from_error (error);
-                  g_error_free (error);
-                }
-            }
+            result = truncate_stream (file, fh, size);
 
           g_mutex_unlock (&fh->mutex);
           file_handle_unref (fh);
@@ -2038,27 +2046,34 @@ vfs_truncate (const gchar *path, off_t size)
       if (fh)
         g_mutex_lock (&fh->mutex);
 
-      if (size == 0)
+      if (fh->stream && fh->op == FILE_OP_WRITE)
         {
-          file_output_stream = g_file_replace (file, 0, FALSE, 0, NULL, &error);
+          result = truncate_stream (file, fh, size);
         }
       else
         {
-          file_output_stream = g_file_append_to (file, 0, NULL, &error);
+          if (size == 0)
+            {
+              file_output_stream = g_file_replace (file, 0, FALSE, 0, NULL, &error);
+            }
+          else
+            {
+              file_output_stream = g_file_append_to (file, 0, NULL, &error);
+              if (file_output_stream)
+                  g_seekable_truncate (G_SEEKABLE (file_output_stream), size, NULL, &error);
+            }
+
+          if (error)
+            {
+              result = -errno_from_error (error);
+              g_error_free (error);
+            }
+
           if (file_output_stream)
-              g_seekable_truncate (G_SEEKABLE (file_output_stream), size, NULL, &error);
-        }
-
-      if (error)
-        {
-          result = -errno_from_error (error);
-          g_error_free (error);
-        }
-
-      if (file_output_stream)
-        {
-          g_output_stream_close (G_OUTPUT_STREAM (file_output_stream), NULL, NULL);
-          g_object_unref (file_output_stream);
+            {
+              g_output_stream_close (G_OUTPUT_STREAM (file_output_stream), NULL, NULL);
+              g_object_unref (file_output_stream);
+            }
         }
 
       if (fh)
