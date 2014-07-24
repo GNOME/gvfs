@@ -343,7 +343,7 @@ ensure_not_dirty (GVfsBackendGphoto2 *gphoto2_backend)
     {
       WriteHandle *write_handle = l->data;
 
-      DEBUG ("ensure_not_dirty: looking at handle for '%s", write_handle->filename);
+      DEBUG ("ensure_not_dirty: looking at handle for '%s'\n", write_handle->filename);
 
       if (write_handle->is_dirty)
         commit_write_handle (gphoto2_backend, write_handle);
@@ -376,7 +376,7 @@ monitors_emit_internal (GVfsBackendGphoto2 *gphoto2_backend,
 
   g_return_if_fail (g_str_has_prefix (dir, gphoto2_backend->ignore_prefix));
 
-  DEBUG ("monitors_emit_internal() %s for '%s' '%s'", event_name, dir, name);
+  DEBUG ("monitors_emit_internal() %s for '%s' '%s'\n", event_name, dir, name);
 
   for (l = gphoto2_backend->dir_monitor_proxies; l != NULL; l = l->next)
     {
@@ -386,7 +386,7 @@ monitors_emit_internal (GVfsBackendGphoto2 *gphoto2_backend,
           char *path;
           path = g_build_filename (dir + strlen (gphoto2_backend->ignore_prefix), name, NULL);
           g_vfs_monitor_emit_event (proxy->vfs_monitor, event, path, NULL);
-          DEBUG ("  emitted %s for '%s' on dir monitor for '%s'", event_name, path, dir);
+          DEBUG ("  emitted %s for '%s' on dir monitor for '%s'\n", event_name, path, dir);
           g_free (path);
         }
     }
@@ -399,7 +399,7 @@ monitors_emit_internal (GVfsBackendGphoto2 *gphoto2_backend,
         {
           const char *path = filepath + strlen (gphoto2_backend->ignore_prefix);
           g_vfs_monitor_emit_event (proxy->vfs_monitor, event, path, NULL);
-          DEBUG ("  emitted %s for '%s' on file monitor", event_name, path);
+          DEBUG ("  emitted %s for '%s' on file monitor\n", event_name, path);
         }
     }
   g_free (filepath);
@@ -411,7 +411,7 @@ monitors_emit_internal (GVfsBackendGphoto2 *gphoto2_backend,
 static void
 monitors_emit_created (GVfsBackendGphoto2 *gphoto2_backend, const char *dir, const char *name)
 {
-  DEBUG ("monitors_emit_created(): '%s' '%s'", dir, name);
+  DEBUG ("monitors_emit_created(): '%s' '%s'\n", dir, name);
   monitors_emit_internal (gphoto2_backend, dir, name, G_FILE_MONITOR_EVENT_CREATED, "CREATED");
 }
 
@@ -421,7 +421,7 @@ monitors_emit_created (GVfsBackendGphoto2 *gphoto2_backend, const char *dir, con
 static void
 monitors_emit_deleted (GVfsBackendGphoto2 *gphoto2_backend, const char *dir, const char *name)
 {
-  DEBUG ("monitors_emit_deleted(): '%s' '%s'", dir, name);
+  DEBUG ("monitors_emit_deleted(): '%s' '%s'\n", dir, name);
   monitors_emit_internal (gphoto2_backend, dir, name, G_FILE_MONITOR_EVENT_DELETED, "DELETED");
 }
 
@@ -431,7 +431,7 @@ monitors_emit_deleted (GVfsBackendGphoto2 *gphoto2_backend, const char *dir, con
 static void
 monitors_emit_changed (GVfsBackendGphoto2 *gphoto2_backend, const char *dir, const char *name)
 {
-  DEBUG ("monitors_emit_changed(): '%s' '%s'", dir, name);
+  DEBUG ("monitors_emit_changed(): '%s' '%s'\n", dir, name);
   monitors_emit_internal (gphoto2_backend, dir, name, G_FILE_MONITOR_EVENT_CHANGED, "CHANGED");
 }
 
@@ -440,7 +440,7 @@ monitors_emit_changed (GVfsBackendGphoto2 *gphoto2_backend, const char *dir, con
 static void
 caches_invalidate_all (GVfsBackendGphoto2 *gphoto2_backend)
 {
-  DEBUG ("caches_invalidate_all()");
+  DEBUG ("caches_invalidate_all()\n");
 
   g_mutex_lock (&gphoto2_backend->lock);
   if (gphoto2_backend->dir_name_cache != NULL)
@@ -469,7 +469,7 @@ caches_invalidate_free_space (GVfsBackendGphoto2 *gphoto2_backend)
 static void
 caches_invalidate_dir (GVfsBackendGphoto2 *gphoto2_backend, const char *dir)
 {
-  DEBUG ("caches_invalidate_dir() for '%s'", dir);
+  DEBUG ("caches_invalidate_dir() for '%s'\n", dir);
   g_mutex_lock (&gphoto2_backend->lock);
   g_hash_table_remove (gphoto2_backend->dir_name_cache, dir);
   g_hash_table_remove (gphoto2_backend->file_name_cache, dir);
@@ -495,7 +495,7 @@ caches_invalidate_file (GVfsBackendGphoto2 *gphoto2_backend, const char *dir, co
   g_hash_table_remove (gphoto2_backend->info_cache, full_name);
   g_mutex_unlock (&gphoto2_backend->lock);
 
-  DEBUG ("caches_invalidate_file() for '%s'", full_name);
+  DEBUG ("caches_invalidate_file() for '%s'\n", full_name);
   g_free (full_name);
 }
 
@@ -640,7 +640,7 @@ g_vfs_backend_gphoto2_finalize (GObject *object)
 {
   GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (object);
 
-  DEBUG ("finalizing %p", object);
+  DEBUG ("finalizing %p\n", object);
 
   release_device (gphoto2_backend);
   g_mutex_clear (&gphoto2_backend->lock);
@@ -668,7 +668,7 @@ g_vfs_backend_gphoto2_init (GVfsBackendGphoto2 *gphoto2_backend)
   GVfsBackend *backend = G_VFS_BACKEND (gphoto2_backend);
   GMountSpec *mount_spec;
 
-  DEBUG ("initing %p", gphoto2_backend);
+  DEBUG ("initing %p\n", gphoto2_backend);
 
   g_mutex_init (&gphoto2_backend->lock);
 
@@ -782,14 +782,14 @@ setup_for_device (GVfsBackendGphoto2 *gphoto2_backend)
       return;
     }
   *comma = '/';
-  DEBUG ("Parsed '%s' into device name %s", gphoto2_backend->gphoto2_port, devname);
+  DEBUG ("Parsed '%s' into device name %s\n", gphoto2_backend->gphoto2_port, devname);
 
   /* find corresponding GUdevDevice */
   gphoto2_backend->udev_device = g_udev_client_query_by_device_file (gphoto2_backend->gudev_client, devname);
   g_free (devname);
   if (gphoto2_backend->udev_device)
     {
-      DEBUG ("-> sysfs path %s, subsys %s, name %s", g_udev_device_get_sysfs_path (gphoto2_backend->udev_device), g_udev_device_get_subsystem (gphoto2_backend->udev_device), g_udev_device_get_name (gphoto2_backend->udev_device));
+      DEBUG ("-> sysfs path %s, subsys %s, name %s\n", g_udev_device_get_sysfs_path (gphoto2_backend->udev_device), g_udev_device_get_subsystem (gphoto2_backend->udev_device), g_udev_device_get_name (gphoto2_backend->udev_device));
 
       /* determine icon name */
       if (g_udev_device_has_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER_ICON_NAME"))
@@ -811,7 +811,7 @@ setup_for_device (GVfsBackendGphoto2 *gphoto2_backend)
         }
     }
   else
-      DEBUG ("-> did not find matching udev device");
+      DEBUG ("-> did not find matching udev device\n");
 
   if (is_media_player)
       g_vfs_backend_set_x_content_types (G_VFS_BACKEND (gphoto2_backend), media_player_x_content_types);
@@ -824,13 +824,13 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
 {
   GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (user_data);
 
-  DEBUG ("on_uevent action %s, device %s", action, g_udev_device_get_device_file (device));
+  DEBUG ("on_uevent action %s, device %s\n", action, g_udev_device_get_device_file (device));
 
   if (gphoto2_backend->udev_device != NULL && 
       g_strcmp0 (g_udev_device_get_device_file (gphoto2_backend->udev_device), g_udev_device_get_device_file (device)) == 0 &&
       strcmp (action, "remove") == 0)
     {
-      DEBUG ("we have been removed!");
+      DEBUG ("we have been removed!\n");
 
       /* nuke all caches so we're a bit more valgrind friendly */
       caches_invalidate_all (gphoto2_backend);
@@ -890,7 +890,7 @@ find_udi_for_device (GVfsBackendGphoto2 *gphoto2_backend)
 
   g_strfreev (tokens);
 
-  DEBUG ("Parsed '%s' into bus=%d device=%d", gphoto2_backend->gphoto2_port, usb_bus_num, usb_device_num);
+  DEBUG ("Parsed '%s' into bus=%d device=%d\n", gphoto2_backend->gphoto2_port, usb_bus_num, usb_device_num);
 
   camera_devices = libhal_find_device_by_capability (gphoto2_backend->hal_ctx,
                                                      "camera",
@@ -930,7 +930,7 @@ find_udi_for_device (GVfsBackendGphoto2 *gphoto2_backend)
                       icon_from_hal = libhal_ps_get_string (ps, "info.desktop.icon");
                       name_from_hal = libhal_ps_get_string (ps, "info.desktop.name");
                       
-                      DEBUG ("looking at usb device '%s' with bus=%d, device=%d", 
+                      DEBUG ("looking at usb device '%s' with bus=%d, device=%d\n", 
                              udi, device_usb_bus_num, device_usb_device_num);
                       
                       if (device_usb_bus_num == usb_bus_num && 
@@ -940,7 +940,7 @@ find_udi_for_device (GVfsBackendGphoto2 *gphoto2_backend)
                           const char *parent_udi;
                           LibHalPropertySet *ps2;
 
-                          DEBUG ("udi '%s' is the one!", udi);
+                          DEBUG ("udi '%s' is the one!\n", udi);
                           
                           /* IMPORTANT: 
                            * 
@@ -1049,7 +1049,7 @@ _hal_device_removed (LibHalContext *hal_ctx, const char *udi)
 
   if (gphoto2_backend->hal_udi != NULL && strcmp (udi, gphoto2_backend->hal_udi) == 0)
     {
-      DEBUG ("we have been removed!");
+      DEBUG ("we have been removed!\n");
 
       /* nuke all caches so we're a bit more valgrind friendly */
       caches_invalidate_all (gphoto2_backend);
@@ -1083,7 +1083,7 @@ split_filename_with_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, const ch
   if (s[strlen(s)] == '/')
     s[strlen(s)] = '\0';
 
-  /*DEBUG ("split_filename_with_ignore_prefix: '%s' -> '%s' '%s'", filename, *dir, *name);*/
+  /*DEBUG ("split_filename_with_ignore_prefix: '%s' -> '%s' '%s'\n", filename, *dir, *name);*/
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -1098,7 +1098,7 @@ add_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, const char *filename)
   else
     result = g_strconcat (gphoto2_backend->ignore_prefix, filename, NULL);
 
-  /*DEBUG ("add_ignore_prefix: '%s' -> '%s'", filename, result);*/
+  /*DEBUG ("add_ignore_prefix: '%s' -> '%s'\n", filename, result);*/
   return result;
 }
 
@@ -1127,7 +1127,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
 
   full_path = g_build_filename (dir, name, NULL);
   DEBUG ("file_get_info() try_cache_only=%d dir='%s', name='%s'\n"
-         "                full_path='%s'", 
+         "                full_path='%s'\n", 
          try_cache_only, dir, name, full_path, gphoto2_backend->ignore_prefix);
 
 
@@ -1138,7 +1138,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
     {
       g_file_info_copy_into (cached_info, info);
       g_mutex_unlock (&gphoto2_backend->lock);
-      DEBUG ("  Using cached info %p for '%s'", cached_info, full_path);
+      DEBUG ("  Using cached info %p for '%s'\n", cached_info, full_path);
       ret = TRUE;
       goto out;
     }
@@ -1149,7 +1149,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
 
   ensure_not_dirty (gphoto2_backend);
 
-  DEBUG ("  No cached info for '%s'", full_path);
+  DEBUG ("  No cached info for '%s'\n", full_path);
 
   /* Since we're caching stuff, make sure all information we store is set */
   g_file_info_unset_attribute_mask (info);
@@ -1178,7 +1178,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE); 
       ret = TRUE;
-      DEBUG ("  Generating info (root folder) for '%s'", full_path);
+      DEBUG ("  Generating info (root folder) for '%s'\n", full_path);
       goto add_to_cache;
     }
 
@@ -1234,7 +1234,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
           g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, gphoto2_backend->can_write); 
           g_file_info_set_is_hidden (info, name != NULL && name[0] == '.');
           ret = TRUE;
-          DEBUG ("  Generating info (folder) for '%s'", full_path);
+          DEBUG ("  Generating info (folder) for '%s'\n", full_path);
           goto add_to_cache;
         }
 
@@ -1304,14 +1304,14 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
     }
 
   icon = g_content_type_get_icon (mime_type);
-  DEBUG ("  got icon %p for mime_type '%s'", icon, mime_type);
+  DEBUG ("  got icon %p for mime_type '%s'\n", icon, mime_type);
   if (icon != NULL)
     {
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
     }
   icon = g_content_type_get_symbolic_icon (mime_type);
-  DEBUG ("  got symbolic icon %p for mime_type '%s'", icon, mime_type);
+  DEBUG ("  got symbolic icon %p for mime_type '%s'\n", icon, mime_type);
   if (icon != NULL)
     {
       g_file_info_set_symbolic_icon (info, icon);
@@ -1344,7 +1344,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
   }
 
   ret = TRUE;
-  DEBUG ("  Generating info (file) for '%s'", full_path);
+  DEBUG ("  Generating info (file) for '%s'\n", full_path);
 
  add_to_cache:
   /* add this sucker to the cache */
@@ -1352,7 +1352,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
     {
 #ifndef DEBUG_NO_CACHING
       cached_info = g_file_info_dup (info);
-      DEBUG ("  Storing cached info %p for '%s'", cached_info, full_path);
+      DEBUG ("  Storing cached info %p for '%s'\n", cached_info, full_path);
       g_mutex_lock (&gphoto2_backend->lock);
       g_hash_table_insert (gphoto2_backend->info_cache, g_strdup (full_path), cached_info);
       g_mutex_unlock (&gphoto2_backend->lock);
@@ -1419,7 +1419,7 @@ is_directory_empty (GVfsBackendGphoto2 *gphoto2_backend, const char *dir)
   int num_dirs;
   int num_files;
   
-  DEBUG ("is_directory_empty begin (%s)", dir);
+  DEBUG ("is_directory_empty begin (%s)\n", dir);
   
   /* TODO: use cache */
   
@@ -1452,7 +1452,7 @@ is_directory_empty (GVfsBackendGphoto2 *gphoto2_backend, const char *dir)
     ret = TRUE;
   
  out:
-  DEBUG ("  is_directory_empty (%s) -> %d", dir, ret);
+  DEBUG ("  is_directory_empty (%s) -> %d\n", dir, ret);
   return ret;
 }
 
@@ -1515,7 +1515,7 @@ ensure_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, GVfsJob *job)
   else
     gphoto2_backend->ignore_prefix = prefix;
 
-  DEBUG ("Using ignore_prefix='%s'", gphoto2_backend->ignore_prefix);
+  DEBUG ("Using ignore_prefix='%s'\n", gphoto2_backend->ignore_prefix);
 
   return TRUE;
 }
@@ -1543,7 +1543,7 @@ do_mount (GVfsBackend *backend,
   CameraStorageInformation *storage_info;
   int num_storage_info;
 
-  DEBUG ("do_mount %p", gphoto2_backend);
+  DEBUG ("do_mount %p\n", gphoto2_backend);
 
 #ifdef HAVE_GUDEV
   /* setup gudev */
@@ -1605,7 +1605,7 @@ do_mount (GVfsBackend *backend,
   /* setup gphoto2 */
 
   host = g_mount_spec_get (mount_spec, "host");
-  DEBUG ("  host='%s'", host);
+  DEBUG ("  host='%s'\n", host);
   if (host == NULL || strlen (host) < 3 || host[0] != '[' || host[strlen (host) - 1] != ']')
     {
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No device specified"));
@@ -1617,7 +1617,7 @@ do_mount (GVfsBackend *backend,
   gphoto2_backend->gphoto2_port = g_strdup (host + 1);
   gphoto2_backend->gphoto2_port[strlen (gphoto2_backend->gphoto2_port) - 1] = '\0';
 
-  DEBUG ("  decoded host='%s'", gphoto2_backend->gphoto2_port);
+  DEBUG ("  decoded host='%s'\n", gphoto2_backend->gphoto2_port);
 
 #ifdef HAVE_GUDEV
   setup_for_device (gphoto2_backend);
@@ -1664,7 +1664,7 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
-  DEBUG ("  gphoto2_port='%s'", gphoto2_backend->gphoto2_port);
+  DEBUG ("  gphoto2_port='%s'\n", gphoto2_backend->gphoto2_port);
 
   n = gp_port_info_list_lookup_path (il, gphoto2_backend->gphoto2_port);
   if (n == GP_ERROR_UNKNOWN_PORT)
@@ -1685,7 +1685,7 @@ do_mount (GVfsBackend *backend,
     }
 
 #ifndef HAVE_GPHOTO25
-  DEBUG ("  '%s' '%s' '%s'",  info.name, info.path, info.library_filename);
+  DEBUG ("  '%s' '%s' '%s'\n",  info.name, info.path, info.library_filename);
 #endif
   
   /* set port */
@@ -1747,8 +1747,8 @@ do_mount (GVfsBackend *backend,
             }
         }
     }
-  DEBUG ("  can_write = %d", gphoto2_backend->can_write);
-  DEBUG ("  can_delete = %d", gphoto2_backend->can_delete);
+  DEBUG ("  can_write = %d\n", gphoto2_backend->can_write);
+  DEBUG ("  can_delete = %d\n", gphoto2_backend->can_delete);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -1774,7 +1774,7 @@ do_mount (GVfsBackend *backend,
                                                             g_free,
                                                             (GDestroyNotify) gp_list_unref);
 
-  DEBUG ("  mounted %p", gphoto2_backend);
+  DEBUG ("  mounted %p\n", gphoto2_backend);
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -1790,13 +1790,13 @@ try_mount (GVfsBackend *backend,
   GError *error = NULL;
   GMountSpec *gphoto2_mount_spec;
 
-  DEBUG ("try_mount %p", backend);
+  DEBUG ("try_mount %p\n", backend);
 
   /* TODO: Hmm.. apparently we have to set the mount spec in
    * try_mount(); doing it in mount() do_won't work.. 
    */
   host = g_mount_spec_get (mount_spec, "host");
-  DEBUG ("  host=%s", host);
+  DEBUG ("  host=%s\n", host);
   if (host == NULL)
     {
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No camera specified"));
@@ -1893,7 +1893,7 @@ do_open_for_read_real (GVfsBackend *backend,
       goto out;
     }
 
-  DEBUG ("  data=%p size=%ld handle=%p get_preview=%d",
+  DEBUG ("  data=%p size=%ld handle=%p get_preview=%d\n",
          read_handle->data, read_handle->size, read_handle, get_preview);
 
   g_mutex_lock (&gphoto2_backend->lock);
@@ -1917,7 +1917,7 @@ do_open_for_read (GVfsBackend *backend,
                   GVfsJobOpenForRead *job,
                   const char *filename)
 {
-  DEBUG ("open_for_read (%s)", filename);
+  DEBUG ("open_for_read (%s)\n", filename);
 
   do_open_for_read_real (backend,
                          job,
@@ -1930,7 +1930,7 @@ do_open_icon_for_read (GVfsBackend *backend,
                        GVfsJobOpenIconForRead *job,
                        const char *icon_id)
 {
-  DEBUG ("open_icon_for_read (%s)", icon_id);
+  DEBUG ("open_icon_for_read (%s)\n", icon_id);
 
   if (g_str_has_prefix (icon_id, "preview:"))
     {
@@ -1963,7 +1963,7 @@ try_read (GVfsBackend *backend,
   gsize bytes_left;
   gsize bytes_to_copy;
 
-  DEBUG ("do_read() %d @ %ld of %ld, handle=%p", bytes_requested, read_handle->cursor, read_handle->size, handle);
+  DEBUG ("do_read() %d @ %ld of %ld, handle=%p\n", bytes_requested, read_handle->cursor, read_handle->size, handle);
 
   if (read_handle->cursor >= read_handle->size)
     {
@@ -2000,7 +2000,7 @@ try_seek_on_read (GVfsBackend *backend,
   ReadHandle *read_handle = (ReadHandle *) handle;
   long new_offset;
 
-  DEBUG ("seek_on_read() offset=%d, type=%d, handle=%p", (int)offset, type, handle);
+  DEBUG ("seek_on_read() offset=%d, type=%d, handle=%p\n", (int)offset, type, handle);
 
   switch (type)
     {
@@ -2042,7 +2042,7 @@ do_close_read (GVfsBackend *backend,
   ReadHandle *read_handle = (ReadHandle *) handle;
   GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (backend);
 
-  DEBUG ("close_read() handle=%p", handle);
+  DEBUG ("close_read() handle=%p\n", handle);
 
   g_mutex_lock (&gphoto2_backend->lock);
   gphoto2_backend->open_read_handles = g_list_remove (gphoto2_backend->open_read_handles, read_handle);
@@ -2068,7 +2068,7 @@ do_query_info (GVfsBackend *backend,
   char *dir;
   char *name;
 
-  DEBUG ("query_info (%s)", filename);
+  DEBUG ("query_info (%s)\n", filename);
 
   split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
@@ -2102,7 +2102,7 @@ try_query_info (GVfsBackend *backend,
   char *name;
   gboolean ret;
 
-  DEBUG ("try_query_info (%s)", filename);
+  DEBUG ("try_query_info (%s)\n", filename);
 
   ret = FALSE;
 
@@ -2110,10 +2110,10 @@ try_query_info (GVfsBackend *backend,
 
   if (!file_get_info (gphoto2_backend, dir, name, info, NULL, TRUE))
     {
-      DEBUG ("  BUU no info from cache for try_query_info (%s)", filename);
+      DEBUG ("  BUU no info from cache for try_query_info (%s)\n", filename);
       goto out;
     }
-  DEBUG ("  YAY got info from cache for try_query_info (%s)", filename);
+  DEBUG ("  YAY got info from cache for try_query_info (%s)\n", filename);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
   ret = TRUE;
@@ -2151,7 +2151,7 @@ do_enumerate (GVfsBackend *backend,
   using_cached_file_list = FALSE;
 
   filename = add_ignore_prefix (gphoto2_backend, given_filename);
-  DEBUG ("enumerate ('%s', with_prefix='%s')", given_filename, filename);
+  DEBUG ("enumerate ('%s', with_prefix='%s')\n", given_filename, filename);
 
   split_filename_with_ignore_prefix (gphoto2_backend, given_filename, &as_dir, &as_name);
   if (!is_directory (gphoto2_backend, as_dir, as_name))
@@ -2184,7 +2184,7 @@ do_enumerate (GVfsBackend *backend,
 
       ensure_not_dirty (gphoto2_backend);
 
-      DEBUG ("  Generating dir list for dir '%s'", filename);
+      DEBUG ("  Generating dir list for dir '%s'\n", filename);
 
       gp_list_new (&list);
       rc = gp_camera_folder_list_folders (gphoto2_backend->camera, 
@@ -2202,7 +2202,7 @@ do_enumerate (GVfsBackend *backend,
     }
   else
     {
-      DEBUG ("  Using cached dir list for dir '%s'", filename);
+      DEBUG ("  Using cached dir list for dir '%s'\n", filename);
       using_cached_dir_list = TRUE;
       gp_list_ref (list);
       g_mutex_unlock (&gphoto2_backend->lock);
@@ -2212,7 +2212,7 @@ do_enumerate (GVfsBackend *backend,
       const char *name;
 
       gp_list_get_name (list, n, &name);
-      DEBUG ("  enum folder '%s'", name);
+      DEBUG ("  enum folder '%s'\n", name);
       info = g_file_info_new ();
       error = NULL;
       if (!file_get_info (gphoto2_backend, filename, name, info, &error, FALSE))
@@ -2249,7 +2249,7 @@ do_enumerate (GVfsBackend *backend,
       g_mutex_unlock (&gphoto2_backend->lock);
       ensure_not_dirty (gphoto2_backend);
 
-      DEBUG ("  Generating file list for dir '%s'", filename);
+      DEBUG ("  Generating file list for dir '%s'\n", filename);
 
       gp_list_new (&list);
       rc = gp_camera_folder_list_files (gphoto2_backend->camera, 
@@ -2267,7 +2267,7 @@ do_enumerate (GVfsBackend *backend,
     }
   else
     {
-      DEBUG ("  Using cached file list for dir '%s'", filename);
+      DEBUG ("  Using cached file list for dir '%s'\n", filename);
       using_cached_file_list = TRUE;
       gp_list_ref (list);
       g_mutex_unlock (&gphoto2_backend->lock);
@@ -2277,7 +2277,7 @@ do_enumerate (GVfsBackend *backend,
       const char *name;
 
       gp_list_get_name (list, n, &name);
-      DEBUG ("  enum file '%s'", name);
+      DEBUG ("  enum file '%s'\n", name);
 
       info = g_file_info_new ();
       error = NULL;
@@ -2337,7 +2337,7 @@ try_enumerate (GVfsBackend *backend,
   l = NULL;
 
   filename = add_ignore_prefix (gphoto2_backend, given_filename);
-  DEBUG ("try_enumerate (%s)", given_filename);
+  DEBUG ("try_enumerate (%s)\n", given_filename);
 
   /* first, list the folders */
   g_mutex_lock (&gphoto2_backend->lock);
@@ -2352,7 +2352,7 @@ try_enumerate (GVfsBackend *backend,
   for (n = 0; n < gp_list_count (list); n++) 
     {
       gp_list_get_name (list, n, &name);
-      DEBUG ("  try_enum folder '%s'", name);
+      DEBUG ("  try_enum folder '%s'\n", name);
       info = g_file_info_new ();
       if (!file_get_info (gphoto2_backend, filename, name, info, &error, TRUE))
         {
@@ -2380,7 +2380,7 @@ try_enumerate (GVfsBackend *backend,
   for (n = 0; n < gp_list_count (list); n++) 
     {
       gp_list_get_name (list, n, &name);
-      DEBUG ("  try_enum file '%s'", name);
+      DEBUG ("  try_enum file '%s'\n", name);
 
       info = g_file_info_new ();
       if (!file_get_info (gphoto2_backend, filename, name, info, &error, TRUE))
@@ -2404,14 +2404,14 @@ try_enumerate (GVfsBackend *backend,
   g_vfs_job_enumerate_done (job);
 
   g_free (filename);
-  DEBUG ("  YAY got info from cache for try_enumerate (%s)", given_filename);
+  DEBUG ("  YAY got info from cache for try_enumerate (%s)\n", given_filename);
   return TRUE;
 
  error_not_cached:
   g_list_free_full (l, g_object_unref);
 
   g_free (filename);
-  DEBUG ("  BUU no info from cache for try_enumerate (%s)", given_filename);
+  DEBUG ("  BUU no info from cache for try_enumerate (%s)\n", given_filename);
   return FALSE;
 }
 
@@ -2429,7 +2429,7 @@ do_query_fs_info (GVfsBackend *backend,
   CameraStorageInformation *storage_info;
   int num_storage_info;
 
-  DEBUG ("query_fs_info (%s)", filename);
+  DEBUG ("query_fs_info (%s)\n", filename);
 
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "gphoto2");
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW, G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL);
@@ -2461,7 +2461,7 @@ do_query_fs_info (GVfsBackend *backend,
                                                 (guint64) gphoto2_backend->free_space);
             }
         }
-      DEBUG ("  got %d storage_info objects", num_storage_info);
+      DEBUG ("  got %d storage_info objects\n", num_storage_info);
     }
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -2481,7 +2481,7 @@ try_query_fs_info (GVfsBackend *backend,
   gint64 free_space;
   gint64 capacity;
 
-  DEBUG ("try_query_fs_info (%s)", filename);
+  DEBUG ("try_query_fs_info (%s)\n", filename);
 
   ret = FALSE;
 
@@ -2492,10 +2492,10 @@ try_query_fs_info (GVfsBackend *backend,
 
   if (free_space == -1 || capacity == -1)
     {
-      DEBUG ("  BUU no info from cache for try_query_fs_info (%s)", filename);
+      DEBUG ("  BUU no info from cache for try_query_fs_info (%s)\n", filename);
       goto out;
     }
-  DEBUG ("  YAY got info from cache for try_query_fs_info (%s)", filename);
+  DEBUG ("  YAY got info from cache for try_query_fs_info (%s)\n", filename);
 
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "gphoto2");
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW, G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL);
@@ -2522,7 +2522,7 @@ do_make_directory (GVfsBackend *backend,
   int rc;
   GError *error;
 
-  DEBUG ("make_directory (%s)", filename);
+  DEBUG ("make_directory (%s)\n", filename);
 
   ensure_not_dirty (gphoto2_backend);
 
@@ -2581,7 +2581,7 @@ do_slow_file_rename_in_same_dir (GVfsBackendGphoto2 *gphoto2_backend,
   file = NULL;
   file_dest = NULL;
 
-  DEBUG ("do_slow_file_rename_in_same_dir() '%s' '%s' -> '%s'", dir, name, new_name);
+  DEBUG ("do_slow_file_rename_in_same_dir() '%s' '%s' -> '%s'\n", dir, name, new_name);
 
   rc = gp_file_new (&file);
   if (rc != 0)
@@ -2620,7 +2620,7 @@ do_slow_file_rename_in_same_dir (GVfsBackendGphoto2 *gphoto2_backend,
                              gphoto2_backend->context);
       if (rc != 0)
         {
-          DEBUG ("  file delete failed as part of slow rename rc=%d", rc);
+          DEBUG ("  file delete failed as part of slow rename rc=%d\n", rc);
           goto out;
         }
     }
@@ -2686,7 +2686,7 @@ do_dir_rename_in_same_dir (GVfsBackendGphoto2 *gphoto2_backend,
 
   dir_name = g_build_filename (dir, name, NULL);
 
-  DEBUG ("do_dir_rename_in_same_dir() '%s' '%s' -> '%s' ('%s')", dir, name, new_name, dir_name);
+  DEBUG ("do_dir_rename_in_same_dir() '%s' '%s' -> '%s' ('%s')\n", dir, name, new_name, dir_name);
 
   /* TODO: Support non-empty folders by recursively renaming stuff.
    *       Or that might be too dangerous as it's not exactly atomic.
@@ -2736,7 +2736,7 @@ do_set_display_name (GVfsBackend *backend,
 
   ensure_not_dirty (gphoto2_backend);
 
-  DEBUG ("set_display_name() '%s' -> '%s'", filename, display_name);
+  DEBUG ("set_display_name() '%s' -> '%s'\n", filename, display_name);
 
   dir = NULL;
   name = NULL;
@@ -2834,7 +2834,7 @@ do_delete (GVfsBackend *backend,
 
   ensure_not_dirty (gphoto2_backend);
 
-  DEBUG ("delete() '%s'", filename);
+  DEBUG ("delete() '%s'\n", filename);
 
   dir = NULL;
   name = NULL;
@@ -3048,7 +3048,7 @@ do_create_internal (GVfsBackend *backend,
 
   gphoto2_backend->open_write_handles = g_list_prepend (gphoto2_backend->open_write_handles, handle);
 
-  DEBUG ("  handle=%p", handle);
+  DEBUG ("  handle=%p\n", handle);
 
   /* make sure we invalidate the dir and the file */
   caches_invalidate_file (gphoto2_backend, dir, name);
@@ -3077,7 +3077,7 @@ do_create (GVfsBackend *backend,
            const char *filename,
            GFileCreateFlags flags)
 {
-  DEBUG ("create() '%s' flags=0x%04x", filename, flags);
+  DEBUG ("create() '%s' flags=0x%04x\n", filename, flags);
 
   return do_create_internal (backend, job, filename, flags, FALSE, FALSE);
 }
@@ -3096,7 +3096,7 @@ do_replace (GVfsBackend *backend,
   char *dir;
   char *name;
 
-  DEBUG ("replace() '%s' etag='%s' make_backup=%d flags=0x%04x", filename, etag, make_backup, flags);
+  DEBUG ("replace() '%s' etag='%s' make_backup=%d flags=0x%04x\n", filename, etag, make_backup, flags);
 
   dir = NULL;
   name = NULL;
@@ -3123,7 +3123,7 @@ do_append_to (GVfsBackend *backend,
   char *dir;
   char *name;
 
-  DEBUG ("append_to() '%s' flags=0x%04x", filename, flags);
+  DEBUG ("append_to() '%s' flags=0x%04x\n", filename, flags);
 
   dir = NULL;
   name = NULL;
@@ -3150,7 +3150,7 @@ do_write (GVfsBackend *backend,
 {
   WriteHandle *handle = _handle;
 
-  DEBUG ("write() %p, '%s', %d bytes", handle, handle->filename, buffer_size);
+  DEBUG ("write() %p, '%s', %d bytes\n", handle, handle->filename, buffer_size);
 
   /* ensure we have enough room */
   if (handle->cursor + buffer_size > handle->allocated_size)
@@ -3159,7 +3159,7 @@ do_write (GVfsBackend *backend,
       new_allocated_size = ((handle->cursor + buffer_size) / WRITE_INCREMENT + 1) * WRITE_INCREMENT;
       handle->data = g_realloc (handle->data, new_allocated_size);
       handle->allocated_size = new_allocated_size;
-      DEBUG ("    allocated_size is now %ld bytes)", handle->allocated_size);
+      DEBUG ("    allocated_size is now %ld bytes)\n", handle->allocated_size);
     }
 
 
@@ -3189,7 +3189,7 @@ do_seek_on_write (GVfsBackend *backend,
   WriteHandle *write_handle = handle;
   long new_offset;
 
-  DEBUG ("seek_on_write() %p '%s' offset=%d type=%d cursor=%ld size=%ld", write_handle, write_handle->filename, (int)offset, type, write_handle->cursor, write_handle->size);
+  DEBUG ("seek_on_write() %p '%s' offset=%d type=%d cursor=%ld size=%ld\n", write_handle, write_handle->filename, (int)offset, type, write_handle->cursor, write_handle->size);
 
   switch (type)
     {
@@ -3229,7 +3229,7 @@ do_truncate (GVfsBackend *backend,
 {
   WriteHandle *handle = _handle;
 
-  DEBUG ("truncate() %p, '%s', %ld bytes", handle, handle->filename, size);
+  DEBUG ("truncate() %p, '%s', %ld bytes\n", handle, handle->filename, size);
 
   /* ensure we have enough room */
   if (size > handle->allocated_size)
@@ -3238,7 +3238,7 @@ do_truncate (GVfsBackend *backend,
       new_allocated_size = (size / WRITE_INCREMENT + 1) * WRITE_INCREMENT;
       handle->data = g_realloc (handle->data, new_allocated_size);
       handle->allocated_size = new_allocated_size;
-      DEBUG ("    allocated_size is now %ld bytes)", handle->allocated_size);
+      DEBUG ("    allocated_size is now %ld bytes)\n", handle->allocated_size);
     }
 
 
@@ -3262,12 +3262,12 @@ commit_write_handle (GVfsBackendGphoto2 *gphoto2_backend, WriteHandle *write_han
   int rc;
   CameraFile *file;
 
-  DEBUG ("commit_write_handle() '%s' of size %ld", write_handle->filename, write_handle->size);
+  DEBUG ("commit_write_handle() '%s' of size %ld\n", write_handle->filename, write_handle->size);
 
   /* no need to write as we're not dirty */
   if (!write_handle->is_dirty)
     {
-      DEBUG ("  not dirty => not writing");
+      DEBUG ("  not dirty => not writing\n");
       return 0;
     }
 
@@ -3287,7 +3287,7 @@ commit_write_handle (GVfsBackendGphoto2 *gphoto2_backend, WriteHandle *write_han
       if (rc != 0)
         goto out;
 
-      DEBUG ("  deleted '%s' '%s' for delete_before=%d, job_is_replace=%d, job_is_append_to=%d", 
+      DEBUG ("  deleted '%s' '%s' for delete_before=%d, job_is_replace=%d, job_is_append_to=%d\n", 
              write_handle->dir, write_handle->name, 
              write_handle->delete_before, write_handle->job_is_replace, write_handle->job_is_append_to);
     }
@@ -3314,7 +3314,7 @@ commit_write_handle (GVfsBackendGphoto2 *gphoto2_backend, WriteHandle *write_han
       goto out;
     }
 
-  DEBUG ("  successfully wrote '%s' of %ld bytes", write_handle->filename, write_handle->size);
+  DEBUG ("  successfully wrote '%s' of %ld bytes\n", write_handle->filename, write_handle->size);
   monitors_emit_changed (gphoto2_backend, write_handle->dir, write_handle->name);
 
   gp_file_unref (file);
@@ -3341,7 +3341,7 @@ do_close_write (GVfsBackend *backend,
   GError *error;
   int rc;
 
-  DEBUG ("close_write() %p '%s' %ld bytes total", write_handle, write_handle->filename, write_handle->size);
+  DEBUG ("close_write() %p '%s' %ld bytes total\n", write_handle, write_handle->filename, write_handle->size);
 
   rc = commit_write_handle (gphoto2_backend, write_handle);
   if (rc != 0)
@@ -3381,7 +3381,7 @@ do_move (GVfsBackend *backend,
   GError *error;
   gboolean mv_dir;
 
-  DEBUG ("move() '%s' -> '%s' %04x)", source, destination, flags);
+  DEBUG ("move() '%s' -> '%s' %04x)\n", source, destination, flags);
 
   ensure_not_dirty (gphoto2_backend);
 
@@ -3391,7 +3391,7 @@ do_move (GVfsBackend *backend,
   /* this is an limited implementation that can only move files / folders in the same directory */
   if (strcmp (src_dir, dst_dir) != 0)
     {
-      DEBUG ("  not supported (not same directory)");
+      DEBUG ("  not supported (not same directory)\n");
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
                         _("Not supported (not same directory)"));
@@ -3403,7 +3403,7 @@ do_move (GVfsBackend *backend,
     {
       if (is_directory (gphoto2_backend, dst_dir, dst_name))
         {
-          DEBUG ("  not supported (src is dir; dst is dir)");
+          DEBUG ("  not supported (src is dir; dst is dir)\n");
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
                             _("Not supported (the source is a directory, the destination is a directory too)"));
@@ -3411,7 +3411,7 @@ do_move (GVfsBackend *backend,
         }
       else if (is_regular (gphoto2_backend, dst_dir, dst_name))
         {
-          DEBUG ("  not supported (src is dir; dst is existing file)");
+          DEBUG ("  not supported (src is dir; dst is existing file)\n");
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
                             _("Not supported (the source is a directory, but the destination is an existing file)"));
@@ -3423,7 +3423,7 @@ do_move (GVfsBackend *backend,
     {
       if (is_directory (gphoto2_backend, dst_dir, dst_name))
         {
-          DEBUG ("  not supported (src is file; dst is dir)");
+          DEBUG ("  not supported (src is file; dst is dir)\n");
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
                             _("Not supported (the source is a file, but the destination is a directory)"));
@@ -3444,11 +3444,11 @@ do_move (GVfsBackend *backend,
 
   if (mv_dir)
     {
-      DEBUG ("  renaming dir");
+      DEBUG ("  renaming dir\n");
       rc = do_dir_rename_in_same_dir (gphoto2_backend, src_dir, src_name, dst_name);
       if (rc != 0)
         {
-          DEBUG ("  error renaming dir");
+          DEBUG ("  error renaming dir\n");
           error = get_error_from_gphoto2 (_("Error renaming directory"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
@@ -3457,11 +3457,11 @@ do_move (GVfsBackend *backend,
     }
   else
     {
-      DEBUG ("  renaming file");
+      DEBUG ("  renaming file\n");
       rc = do_file_rename_in_same_dir (gphoto2_backend, src_dir, src_name, dst_name, flags & G_FILE_COPY_OVERWRITE);
       if (rc != 0)
         {
-          DEBUG ("  error renaming file");
+          DEBUG ("  error renaming file\n");
           error = get_error_from_gphoto2 (_("Error renaming file"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
@@ -3473,7 +3473,7 @@ do_move (GVfsBackend *backend,
   monitors_emit_deleted (gphoto2_backend, src_dir, src_name);
   monitors_emit_created (gphoto2_backend, src_dir, dst_name);
 
-  DEBUG ("  success");
+  DEBUG ("  success\n");
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -3658,7 +3658,7 @@ vfs_dir_monitor_destroyed (gpointer user_data, GObject *where_the_object_was)
   GList *l;
   GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (user_data);
   
-  DEBUG ("vfs_dir_monitor_destroyed()");
+  DEBUG ("vfs_dir_monitor_destroyed()\n");
 
   for (l = gphoto2_backend->dir_monitor_proxies; l != NULL; l = l->next)
     {
@@ -3666,7 +3666,7 @@ vfs_dir_monitor_destroyed (gpointer user_data, GObject *where_the_object_was)
       if (G_OBJECT (proxy->vfs_monitor) == where_the_object_was)
         {
           gphoto2_backend->dir_monitor_proxies = g_list_remove (gphoto2_backend->dir_monitor_proxies, proxy);
-          DEBUG ("  Removed dead dir monitor for '%s'", proxy->path);
+          DEBUG ("  Removed dead dir monitor for '%s'\n", proxy->path);
           monitor_proxy_free (proxy);
           break;
         }
@@ -3684,7 +3684,7 @@ do_create_dir_monitor (GVfsBackend *backend,
   GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (backend);
   MonitorProxy *proxy;
 
-  DEBUG ("create_dir_monitor (%s)", filename);
+  DEBUG ("create_dir_monitor (%s)\n", filename);
 
   split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
@@ -3708,7 +3708,7 @@ vfs_file_monitor_destroyed (gpointer user_data, GObject *where_the_object_was)
   GList *l;
   GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (user_data);
   
-  DEBUG ("vfs_file_monitor_destroyed()");
+  DEBUG ("vfs_file_monitor_destroyed()\n");
 
   for (l = gphoto2_backend->file_monitor_proxies; l != NULL; l = l->next)
     {
@@ -3716,7 +3716,7 @@ vfs_file_monitor_destroyed (gpointer user_data, GObject *where_the_object_was)
       if (G_OBJECT (proxy->vfs_monitor) == where_the_object_was)
         {
           gphoto2_backend->dir_monitor_proxies = g_list_remove (gphoto2_backend->dir_monitor_proxies, proxy);
-          DEBUG ("  Removed dead file monitor for '%s'", proxy->path);
+          DEBUG ("  Removed dead file monitor for '%s'\n", proxy->path);
           monitor_proxy_free (proxy);
           break;
         }
@@ -3734,7 +3734,7 @@ do_create_file_monitor (GVfsBackend *backend,
   GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (backend);
   MonitorProxy *proxy;
 
-  DEBUG ("create_file_monitor (%s)", filename);
+  DEBUG ("create_file_monitor (%s)\n", filename);
 
   split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
