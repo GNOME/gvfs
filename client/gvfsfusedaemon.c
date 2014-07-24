@@ -734,6 +734,50 @@ file_info_get_stat_mode (GFileInfo *file_info)
   return unix_mode;
 }
 
+static void
+set_attributes_from_info (GFileInfo *file_info, struct stat *sbuf)
+{
+  GTimeVal mod_time;
+
+  sbuf->st_mode = file_info_get_stat_mode (file_info);
+  sbuf->st_size = g_file_info_get_size (file_info);
+  sbuf->st_uid = daemon_uid;
+  sbuf->st_gid = daemon_gid;
+
+  g_file_info_get_modification_time (file_info, &mod_time);
+  sbuf->st_mtime = mod_time.tv_sec;
+  sbuf->st_ctime = mod_time.tv_sec;
+  sbuf->st_atime = mod_time.tv_sec;
+
+  if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_TIME_CHANGED))
+    sbuf->st_ctime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_CHANGED);
+  if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_TIME_ACCESS))
+    sbuf->st_atime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_ACCESS);
+
+  if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE))
+    sbuf->st_blksize = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE);
+  if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCKS))
+    sbuf->st_blocks = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCKS);
+  else /* fake it to make 'du' work like 'du --apparent'. */
+    sbuf->st_blocks = (sbuf->st_size + 511) / 512;
+
+  /* Setting st_nlink to 1 for directories makes 'find' work */
+  sbuf->st_nlink = 1;
+}
+
+static const char *query_attributes = G_FILE_ATTRIBUTE_STANDARD_TYPE ","
+                                      G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
+                                      G_FILE_ATTRIBUTE_STANDARD_SIZE ","
+                                      G_FILE_ATTRIBUTE_UNIX_MODE ","
+                                      G_FILE_ATTRIBUTE_TIME_CHANGED ","
+                                      G_FILE_ATTRIBUTE_TIME_MODIFIED ","
+                                      G_FILE_ATTRIBUTE_TIME_ACCESS ","
+                                      G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE ","
+                                      G_FILE_ATTRIBUTE_UNIX_BLOCKS ","
+                                      G_FILE_ATTRIBUTE_ACCESS_CAN_READ ","
+                                      G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE ","
+                                      G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE;
+
 static gint
 getattr_for_file (GFile *file, struct stat *sbuf)
 {
@@ -741,49 +785,11 @@ getattr_for_file (GFile *file, struct stat *sbuf)
   GError    *error  = NULL;
   gint       result = 0;
 
-  file_info = g_file_query_info (file, 
-                                 G_FILE_ATTRIBUTE_STANDARD_TYPE ","
-                                 G_FILE_ATTRIBUTE_STANDARD_NAME ","
-                                 G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
-                                 G_FILE_ATTRIBUTE_STANDARD_SIZE ","
-                                 G_FILE_ATTRIBUTE_UNIX_MODE ","
-                                 G_FILE_ATTRIBUTE_TIME_CHANGED ","
-                                 G_FILE_ATTRIBUTE_TIME_MODIFIED ","
-                                 G_FILE_ATTRIBUTE_TIME_ACCESS ","
-                                 G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE ","
-                                 G_FILE_ATTRIBUTE_UNIX_BLOCKS ","
-				 "access::*",
-                                 0, NULL, &error);
+  file_info = g_file_query_info (file, query_attributes, 0, NULL, &error);
 
   if (file_info)
     {
-      GTimeVal mod_time;
-
-      sbuf->st_mode = file_info_get_stat_mode (file_info);
-      sbuf->st_size = g_file_info_get_size (file_info);
-      sbuf->st_uid = daemon_uid;
-      sbuf->st_gid = daemon_gid;
-
-      g_file_info_get_modification_time (file_info, &mod_time);
-      sbuf->st_mtime = mod_time.tv_sec;
-      sbuf->st_ctime = mod_time.tv_sec;
-      sbuf->st_atime = mod_time.tv_sec;
-
-      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_TIME_CHANGED))
-        sbuf->st_ctime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_CHANGED);
-      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_TIME_ACCESS))
-        sbuf->st_atime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_ACCESS);
-
-      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE))
-	sbuf->st_blksize = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE);
-      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCKS))
-	sbuf->st_blocks = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCKS);
-      else /* fake it to make 'du' work like 'du --apparent'. */
-	sbuf->st_blocks = (sbuf->st_size + 511) / 512;
-
-      /* Setting st_nlink to 1 for directories makes 'find' work */
-      sbuf->st_nlink = 1;
-
+      set_attributes_from_info (file_info, sbuf);
       g_object_unref (file_info);
     }
   else
@@ -804,16 +810,51 @@ getattr_for_file (GFile *file, struct stat *sbuf)
   return result;
 }
 
-static void
+/* Call with fh locked */
+static gint
 getattr_for_file_handle (FileHandle *fh, struct stat *sbuf)
 {
-  sbuf->st_mode = S_IFREG | S_IRUSR | S_IWUSR | S_IXUSR;
-  sbuf->st_uid = daemon_uid;
-  sbuf->st_gid = daemon_gid;
-  sbuf->st_nlink = 1;
-  sbuf->st_size = fh->pos;
-  sbuf->st_blksize = 512;
-  sbuf->st_blocks = (sbuf->st_size + 511) / 512;
+  GFileInfo *file_info;
+  GError    *error  = NULL;
+  gint       result = 0;
+
+  switch (fh->op)
+    {
+    case FILE_OP_READ:
+      file_info = g_file_input_stream_query_info (G_FILE_INPUT_STREAM (fh->stream),
+                                                  query_attributes,
+                                                  NULL, &error);
+      break;
+    case FILE_OP_WRITE:
+      file_info = g_file_output_stream_query_info (G_FILE_OUTPUT_STREAM (fh->stream),
+                                                  query_attributes,
+                                                  NULL, &error);
+      break;
+    default:
+      return -ENOTSUP;
+    }
+
+  if (file_info)
+    {
+      set_attributes_from_info (file_info, sbuf);
+      g_object_unref (file_info);
+    }
+  else
+    {
+      if (error)
+        {
+          debug_print ("Error from GVFS: %s\n", error->message);
+          result = -errno_from_error (error);
+          g_error_free (error);
+        }
+      else
+        {
+          debug_print ("No file info, but no error from GVFS.\n");
+          result = -EIO;
+        }
+    }
+
+  return result;
 }
 
 static gint
@@ -853,26 +894,43 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
   else if ((file = file_from_full_path (path)))
     {
       /* Submount */
+      FileHandle *fh = get_file_handle_for_path (path);
 
-      result = getattr_for_file (file, sbuf);
-
-      if (result != 0)
+      if (fh)
         {
-          FileHandle *fh = get_file_handle_for_path (path);
+          goffset pos;
 
-          /* Some backends don't create new files until their stream has
-           * been closed. So, if the path doesn't exist, but we have a stream
-           * associated with it, pretend it's there. */
+          g_mutex_lock (&fh->mutex);
 
-          if (fh != NULL)
+          result = getattr_for_file_handle (fh, sbuf);
+          pos = fh->pos;
+
+          g_mutex_unlock (&fh->mutex);
+          file_handle_unref (fh);
+
+          if (result == -ENOTSUP)
             {
-              g_mutex_lock (&fh->mutex);
-              getattr_for_file_handle (fh, sbuf);
-              g_mutex_unlock (&fh->mutex);
+              result = getattr_for_file (file, sbuf);
 
-              file_handle_unref (fh);
-              result = 0;
+              /* Some backends don't create new files until their stream has
+               * been closed. So, if the path doesn't exist, but we have a
+               * stream associated with it, pretend it's there. */
+              if (result != 0)
+                {
+                  result = 0;
+                  sbuf->st_mode = S_IFREG | S_IRUSR | S_IWUSR | S_IXUSR;
+                  sbuf->st_uid = daemon_uid;
+                  sbuf->st_gid = daemon_gid;
+                  sbuf->st_size = pos;
+                  sbuf->st_nlink = 1;
+                  sbuf->st_blksize = 512;
+                  sbuf->st_blocks = (sbuf->st_size + 511) / 512;
+                }
             }
+        }
+      else
+        {
+          result = getattr_for_file (file, sbuf);
         }
 
       g_object_unref (file);
