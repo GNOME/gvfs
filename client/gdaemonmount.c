@@ -210,8 +210,12 @@ unmount_reply (GVfsDBusMount *proxy,
                GAsyncResult *res,
                gpointer user_data)
 {
+  GDBusProxy *base_proxy = G_DBUS_PROXY (proxy);
   AsyncProxyCreate *data = user_data;
   GError *error = NULL;
+
+  _g_daemon_vfs_invalidate (g_dbus_proxy_get_name (base_proxy),
+                            g_dbus_proxy_get_object_path (base_proxy));
 
   if (! gvfs_dbus_mount_call_unmount_finish (proxy, res, &error))
     {

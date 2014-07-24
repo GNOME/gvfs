@@ -740,9 +740,18 @@ lookup_mount_info_by_fuse_path_in_cache (const char *fuse_path,
   return info;
 }
 
-
+/*
+ * _g_daemon_vfs_invalidate:
+ * @dbus_id: the D-Bus unique name of the backend process
+ * @object_path: the object path of the mount, or %NULL to invalidate
+ *    all mounts in that process
+ *
+ * Invalidate cache entries because we get out-of-band information that
+ * something has been mounted or unmounted.
+ */
 void
-_g_daemon_vfs_invalidate_dbus_id (const char *dbus_id)
+_g_daemon_vfs_invalidate (const char *dbus_id,
+                          const char *object_path)
 {
   GList *l, *next;
 
@@ -752,7 +761,8 @@ _g_daemon_vfs_invalidate_dbus_id (const char *dbus_id)
       GMountInfo *mount_info = l->data;
       next = l->next;
 
-      if (strcmp (mount_info->dbus_id, dbus_id) == 0)
+      if (strcmp (mount_info->dbus_id, dbus_id) == 0 &&
+          (object_path == NULL || strcmp (mount_info->object_path, object_path) == 0))
 	{
 	  the_vfs->mount_cache = g_list_delete_link (the_vfs->mount_cache, l);
 	  g_mount_info_unref (mount_info);

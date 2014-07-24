@@ -67,7 +67,8 @@ GMountInfo *    _g_daemon_vfs_get_mount_info_by_fuse_sync (const char *fuse_path
 GMountSpec *    _g_daemon_vfs_get_mount_spec_for_path  (GMountSpec               *spec,
 						        const char               *path,
 						        const char               *new_path);
-void            _g_daemon_vfs_invalidate_dbus_id       (const char               *dbus_id);
+void            _g_daemon_vfs_invalidate               (const char               *dbus_id,
+                                                        const char               *object_path);
 GDBusConnection *_g_daemon_vfs_get_async_bus           (void);
 int             _g_daemon_vfs_append_metadata_for_set  (GVariantBuilder *builder,
 							MetaTree *tree,

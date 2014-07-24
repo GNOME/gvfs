@@ -81,7 +81,7 @@ vfs_connection_closed (GDBusConnection *connection,
 
   if (connection_data->async_dbus_id)
     {
-      _g_daemon_vfs_invalidate_dbus_id (connection_data->async_dbus_id);
+      _g_daemon_vfs_invalidate (connection_data->async_dbus_id, NULL);
       G_LOCK (async_map);
       g_hash_table_remove (async_map, connection_data->async_dbus_id);
       G_UNLOCK (async_map);
@@ -472,7 +472,7 @@ invalidate_local_connection (const char *dbus_id,
 {
   ThreadLocalConnections *local;
   
-  _g_daemon_vfs_invalidate_dbus_id (dbus_id);
+  _g_daemon_vfs_invalidate (dbus_id, NULL);
 
   local = g_private_get (&local_connections);
   if (local)
