@@ -354,7 +354,7 @@ remove_cache_entry_by_id (GVfsBackendMtp *backend,
     const char *path = key;
     const CacheEntry *entry = value;
 
-    if (entry->id == id) {
+    if (entry->id == id || (entry->id == -1 && entry->storage == id)) {
       g_hash_table_foreach (backend->monitors,
                             emit_delete_event,
                             (char *)path);
@@ -660,6 +660,38 @@ check_event (gpointer user_data)
         remove_cache_entry_by_id (G_VFS_BACKEND_MTP (backend), param1);
         g_mutex_unlock (&backend->mutex);
         g_object_unref (backend);
+        break;
+      } else {
+        return NULL;
+      }
+    case LIBMTP_EVENT_STORE_REMOVED:
+      backend = g_weak_ref_get (event_ref);
+      if (backend && !g_atomic_int_get (&backend->unmount_started)) {
+        g_mutex_lock (&backend->mutex);
+
+        /* Clear the cache entries and emit delete event; first for all
+           entries under the storage in question... */
+        GHashTableIter iter;
+        gpointer key, value;
+        g_hash_table_iter_init (&iter, backend->file_cache);
+        while (g_hash_table_iter_next (&iter, &key, &value)) {
+          const char *path = key;
+          const CacheEntry *entry = value;
+
+          if (entry->storage == param1) {
+            g_hash_table_foreach (backend->monitors,
+                                  emit_delete_event,
+                                  (char *)path);
+            g_hash_table_iter_remove (&iter);
+          }
+        }
+
+        /* ... and then for the storage itself */
+        remove_cache_entry_by_id (G_VFS_BACKEND_MTP (backend), param1);
+
+        g_mutex_unlock (&backend->mutex);
+        g_object_unref (backend);
+        break;
       } else {
         return NULL;
       }
