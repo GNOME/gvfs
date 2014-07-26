@@ -1762,7 +1762,6 @@ do_set_display_name (GVfsBackend *backend,
                         emit_delete_event,
                         (char *)filename);
   g_free (dir_name);
-  g_free (new_name);
 
  exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
