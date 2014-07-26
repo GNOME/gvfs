@@ -543,12 +543,13 @@ file_info_from_message (SoupMessage *msg,
   if (soup_message_headers_get_encoding(msg->response_headers) == SOUP_ENCODING_CONTENT_LENGTH)
     g_file_info_set_size (info, soup_message_headers_get_content_length (msg->response_headers));
 
+  g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
+
   text = soup_message_headers_get_content_type (msg->response_headers, NULL);
   if (text)
     {
       GIcon *icon;
 
-      g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
       g_file_info_set_content_type (info, text);
       g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, text);
 
