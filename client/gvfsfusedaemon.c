@@ -70,6 +70,7 @@ typedef struct {
   FileOp    op;
   gpointer  stream;
   goffset   pos;
+  goffset   size;
 } FileHandle;
 
 static GThread        *subthread             = NULL;
@@ -216,6 +217,7 @@ file_handle_new (const gchar *path)
   g_mutex_init (&file_handle->mutex);
   file_handle->op = FILE_OP_NONE;
   file_handle->path = g_strdup (path);
+  file_handle->size = -1;
 
   g_hash_table_insert (global_active_fh_map, file_handle, file_handle);
 
@@ -274,6 +276,7 @@ file_handle_close_stream (FileHandle *file_handle)
       g_object_unref (file_handle->stream);
       file_handle->stream = NULL;
       file_handle->op = FILE_OP_NONE;
+      file_handle->size = -1;
     }
 }
 
@@ -898,12 +901,12 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
 
       if (fh)
         {
-          goffset pos;
+          goffset size;
 
           g_mutex_lock (&fh->mutex);
 
           result = getattr_for_file_handle (fh, sbuf);
-          pos = fh->pos;
+          size = fh->size;
 
           g_mutex_unlock (&fh->mutex);
           file_handle_unref (fh);
@@ -915,13 +918,19 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
               /* Some backends don't create new files until their stream has
                * been closed. So, if the path doesn't exist, but we have a
                * stream associated with it, pretend it's there. */
+
+              /* If we're tracking an open file's size, use that in preference
+               * to the stat information since it may be incorrect if
+               * g_file_replace writes to a temporary file. */
+              if (size != -1)
+                  sbuf->st_size = size;
+
               if (result != 0)
                 {
                   result = 0;
                   sbuf->st_mode = S_IFREG | S_IRUSR | S_IWUSR | S_IXUSR;
                   sbuf->st_uid = daemon_uid;
                   sbuf->st_gid = daemon_gid;
-                  sbuf->st_size = pos;
                   sbuf->st_nlink = 1;
                   sbuf->st_blksize = 512;
                   sbuf->st_blocks = (sbuf->st_size + 511) / 512;
@@ -979,6 +988,7 @@ setup_input_stream (GFile *file, FileHandle *fh)
           g_output_stream_close (fh->stream, NULL, NULL);
           g_object_unref (fh->stream);
           fh->stream = NULL;
+          fh->size = -1;
         }
     }
 
@@ -1026,7 +1036,10 @@ setup_output_stream (GFile *file, FileHandle *fh, int flags)
   if (!fh->stream)
     {
       if (flags & O_TRUNC)
-        fh->stream = g_file_replace (file, NULL, FALSE, 0, NULL, &error);
+        {
+          fh->stream = g_file_replace (file, NULL, FALSE, 0, NULL, &error);
+          fh->size = 0;
+        }
       else if (flags & O_APPEND)
         fh->stream = g_file_append_to (file, 0, NULL, &error);
       else
@@ -1190,6 +1203,7 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
 
               file_handle_close_stream (fh);
               fh->stream = file_output_stream;
+              fh->size = 0;
               fh->op = FILE_OP_WRITE;
 
               g_mutex_unlock (&fh->mutex);
@@ -1461,6 +1475,9 @@ write_stream (FileHandle *fh,
           g_error_free (error);
         }
     }
+
+  if (fh->size != -1 && fh->pos > fh->size)
+    fh->size = fh->pos;
 
   return result;
 }
@@ -1985,6 +2002,9 @@ truncate_stream (GFile *file, FileHandle *fh, off_t size)
       result = -errno_from_error (error);
       g_error_free (error);
     }
+
+  if (result == 0 && fh->size != -1)
+    fh->size = size;
 
   return result;
 }
