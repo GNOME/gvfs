@@ -3532,9 +3532,10 @@ do_pull (GVfsBackend *backend,
   GError *error = NULL;
   PullContext pc;
   CameraFile *file;
-  GFile *dest;
+  GFile *dest = NULL;
   GFileDescriptorBased *fdstream;
   char *dir, *name;
+  guint64 mtime;
   int rc;
 
   ensure_not_dirty (gphoto2_backend);
@@ -3576,7 +3577,6 @@ do_pull (GVfsBackend *backend,
                                     G_FILE_CREATE_NONE,
                                     G_VFS_JOB (job)->cancellable, &error));
     }
-  g_object_unref (dest);
 
   if (!fdstream)
     {
@@ -3623,6 +3623,14 @@ do_pull (GVfsBackend *backend,
       goto out;
     }
 
+  /* Ignore errors here. Failure to copy metadata is not a hard error */
+  mtime = g_file_info_get_attribute_uint64 (info,
+                                            G_FILE_ATTRIBUTE_TIME_MODIFIED);
+  g_file_set_attribute_uint64 (dest,
+                               G_FILE_ATTRIBUTE_TIME_MODIFIED, mtime,
+                               G_FILE_QUERY_INFO_NONE,
+                               G_VFS_JOB (job)->cancellable, NULL);
+
   if (remove_source)
     {
       rc = gp_camera_file_delete (gphoto2_backend->camera,
@@ -3645,6 +3653,7 @@ do_pull (GVfsBackend *backend,
 
 out:
   g_object_unref (info);
+  g_clear_object (&dest);
   g_free (name);
   g_free (dir);
   g_clear_error (&error);
