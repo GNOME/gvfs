@@ -1027,8 +1027,10 @@ setup_output_stream (GFile *file, FileHandle *fh, int flags)
     {
       if (flags & O_TRUNC)
         fh->stream = g_file_replace (file, NULL, FALSE, 0, NULL, &error);
-      else
+      else if (flags & O_APPEND)
         fh->stream = g_file_append_to (file, 0, NULL, &error);
+      else
+        result = -ENOTSUP;
       if (fh->stream)
         fh->pos = g_seekable_tell (G_SEEKABLE (fh->stream));
     }
@@ -1383,7 +1385,11 @@ vfs_read (const gchar *path, gchar *buf, size_t size,
 }
 
 static gint
-write_stream (FileHandle *fh, const gchar *input_buf, size_t input_buf_size, off_t offset)
+write_stream (FileHandle *fh,
+              gboolean is_append,
+              const gchar *input_buf,
+              size_t input_buf_size,
+              off_t offset)
 {
   GOutputStream *output_stream;
   gint           n_bytes_written = 0;
@@ -1394,7 +1400,7 @@ write_stream (FileHandle *fh, const gchar *input_buf, size_t input_buf_size, off
 
   output_stream = fh->stream;
 
-  if (offset != fh->pos)
+  if (!is_append && offset != fh->pos)
     {
       if (g_seekable_can_seek (G_SEEKABLE (output_stream)))
         {
@@ -1479,7 +1485,8 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
           result = setup_output_stream (file, fh, 0);
           if (result == 0)
             {
-              result = write_stream (fh, buf, len, offset);
+              result = write_stream (fh, fi->flags & O_APPEND,
+                                     buf, len, offset);
             }
 
           g_mutex_unlock (&fh->mutex);
@@ -1914,7 +1921,7 @@ pad_file (FileHandle *fh, gsize num, goffset current_size)
   buf = g_malloc0 (PAD_BLOCK_SIZE);
   for (written = 0; written < num; written += PAD_BLOCK_SIZE)
     {
-      res = write_stream (fh, buf, MIN (num - written, PAD_BLOCK_SIZE), current_size + written);
+      res = write_stream (fh, FALSE, buf, MIN (num - written, PAD_BLOCK_SIZE), current_size + written);
       if (res < 0)
         break;
     }
