@@ -1238,6 +1238,10 @@ vfs_release (const gchar *path, struct fuse_file_info *fi)
 
   if (fh)
     {
+      g_mutex_lock (&fh->mutex);
+      file_handle_close_stream (fh);
+      g_mutex_unlock (&fh->mutex);
+
       /* get_file_handle_from_info () adds a "working ref", so unref twice. */
       file_handle_unref (fh);
       file_handle_unref (fh);
@@ -1527,48 +1531,6 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
     debug_print ("vfs_write: -> %d bytes written.\n", result);
 
   return result;
-}
-
-static gint
-vfs_flush (const gchar *path, struct fuse_file_info *fi)
-{
-  FileHandle *fh = get_file_handle_from_info (fi);
-
-  debug_print ("vfs_flush: %s\n", path);
-
-  if (fh)
-    {
-      g_mutex_lock (&fh->mutex);
-      file_handle_close_stream (fh);
-      g_mutex_unlock (&fh->mutex);
-
-      /* get_file_handle_from_info () adds a "working ref", so release that. */
-      file_handle_unref (fh);
-    }
-
-  /* TODO: Error handling. */
-  return 0;
-}
-
-static gint
-vfs_fsync (const gchar *path, gint sync_data_only, struct fuse_file_info *fi)
-{
-  FileHandle *fh = get_file_handle_from_info (fi);
-
-  debug_print ("vfs_flush: %s\n", path);
-
-  if (fh)
-    {
-      g_mutex_lock (&fh->mutex);
-      file_handle_close_stream (fh);
-      g_mutex_unlock (&fh->mutex);
-
-      /* get_file_handle_from_info () adds a "working ref", so release that. */
-      file_handle_unref (fh);
-    }
-
-  /* TODO: Error handling. */
-  return 0;
 }
 
 static gint
@@ -2538,8 +2500,6 @@ static struct fuse_operations vfs_oper =
   .open        = vfs_open,
   .create      = vfs_create,
   .release     = vfs_release,
-  .flush       = vfs_flush,
-  .fsync       = vfs_fsync,
 
   .read        = vfs_read,
   .write       = vfs_write,
