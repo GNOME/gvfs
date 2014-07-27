@@ -586,6 +586,20 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
   if (g_strcmp0 (op_backend->dev_path, dev_path) == 0 &&
       g_str_equal (action, "remove")) {
     DEBUG ("(I) on_uevent: Quiting after remove event on device %s\n", dev_path);
+
+    /* Emit delete events to tell clients files are gone. */
+    GHashTableIter iter;
+    gpointer key, value;
+    g_hash_table_iter_init (&iter, op_backend->file_cache);
+    while (g_hash_table_iter_next (&iter, &key, &value)) {
+      const char *path = key;
+      const CacheEntry *entry = value;
+
+      g_hash_table_foreach (op_backend->monitors,
+                            emit_delete_event,
+                           (char *)path);
+    }
+
     g_vfs_backend_force_unmount ((GVfsBackend*)op_backend);
   }
 
@@ -840,6 +854,18 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
 
   g_atomic_int_set (&op_backend->unmount_started, TRUE);
 
+  /* Emit delete events to tell clients files are gone. */
+  GHashTableIter iter;
+  gpointer key, value;
+  g_hash_table_iter_init (&iter, op_backend->file_cache);
+  while (g_hash_table_iter_next (&iter, &key, &value)) {
+    const char *path = key;
+    const CacheEntry *entry = value;
+
+    g_hash_table_foreach (op_backend->monitors,
+                          emit_delete_event,
+                         (char *)path);
+  }
   g_hash_table_unref (op_backend->file_cache);
 
   g_source_remove (op_backend->hb_id);
