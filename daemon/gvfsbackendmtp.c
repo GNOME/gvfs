@@ -359,7 +359,10 @@ remove_cache_entry_by_id (GVfsBackendMtp *backend,
                             emit_delete_event,
                             (char *)path);
       g_hash_table_iter_remove (&iter);
-      break;
+
+      /* We do not break here because we can end up with multiple entries
+         that have same storage/object ID, and we should find and remove
+         them all instead of just the first one (Bug #733886) */
     }
   }
 
