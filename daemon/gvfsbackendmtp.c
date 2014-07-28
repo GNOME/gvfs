@@ -709,6 +709,58 @@ check_event (gpointer user_data)
       } else {
         return NULL;
       }
+    case LIBMTP_EVENT_OBJECT_ADDED:
+      backend = g_weak_ref_get (event_ref);
+      if (backend && !g_atomic_int_get (&backend->unmount_started)) {
+        g_mutex_lock (&backend->mutex);
+
+        LIBMTP_file_t *object = LIBMTP_Get_Filemetadata(backend->device, param1);
+        if (object) {
+          /* Obtain parent's path by searching cache by object's parent
+             ID; if the latter is zero, the object is located in storage's
+             root, otherwise, it is located in one of subfolders */
+          const char *parent_path = NULL;
+          GHashTableIter iter;
+          gpointer key, value;
+
+          g_hash_table_iter_init (&iter, backend->file_cache);
+          while (g_hash_table_iter_next (&iter, &key, &value)) {
+            const char *path = key;
+            const CacheEntry *entry = value;
+
+            if (object->parent_id != 0) {
+              if (object->parent_id == entry->id && object->storage_id == entry->storage) {
+                parent_path = path;
+                break;
+              }
+            } else {
+              if (entry->id == -1 && object->storage_id == entry->storage) {
+                parent_path = path;
+                break;
+              }
+            }
+          }
+
+          if (parent_path) {
+            /* Create path, add cache entry and emit create event(s) */
+            char *path = g_build_filename (parent_path, object->filename, NULL);
+
+            add_cache_entry (G_VFS_BACKEND_MTP (backend),
+                             path,
+                             object->storage_id,
+                             object->item_id);
+            g_hash_table_foreach (backend->monitors, emit_create_event, path);
+          }
+
+          LIBMTP_destroy_file_t (object);
+        }
+
+        g_mutex_unlock (&backend->mutex);
+        g_object_unref (backend);
+        break;
+      } else {
+        return NULL;
+      }
 #endif
     default:
       break;
