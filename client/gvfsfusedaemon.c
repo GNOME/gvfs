@@ -1503,7 +1503,7 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
         {
           g_mutex_lock (&fh->mutex);
 
-          result = setup_output_stream (file, fh, 0);
+          result = setup_output_stream (file, fh, fi->flags & O_APPEND);
           if (result == 0)
             {
               result = write_stream (fh, fi->flags & O_APPEND,
@@ -1989,7 +1989,7 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
         {
           g_mutex_lock (&fh->mutex);
 
-          result = setup_output_stream (file, fh, 0);
+          result = setup_output_stream (file, fh, fi->flags & O_APPEND);
 
           if (result == 0)
             result = truncate_stream (file, fh, size);
