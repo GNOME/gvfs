@@ -275,7 +275,7 @@ g_vfs_afp_reply_dup_data (GVfsAfpReply *reply, gsize size, guint8 **data)
 }
 
 gboolean
-g_vfs_afp_reply_read_pascal (GVfsAfpReply *reply, char **str)
+g_vfs_afp_reply_read_pascal (GVfsAfpReply *reply, gboolean is_utf8, char **str)
 {
   guint8 strsize;
   
@@ -290,12 +290,30 @@ g_vfs_afp_reply_read_pascal (GVfsAfpReply *reply, char **str)
 
   if (str)
   {
-    *str = g_convert (reply->data + reply->pos, strsize,
-                      "UTF-8", "MACINTOSH", NULL, NULL, NULL);
+    if (is_utf8)
+    {
+      char *tmp;
+
+      if (!g_vfs_afp_reply_get_data (reply, strsize, (guint8 **)&tmp))
+      {
+        reply->pos--;
+        return FALSE;
+      }
+
+      *str = g_utf8_normalize (tmp, strsize, G_NORMALIZE_DEFAULT_COMPOSE);
+    }
+    else
+    {
+      *str = g_convert (reply->data + reply->pos, strsize,
+                        "UTF-8", "MACINTOSH", NULL, NULL, NULL);
+      reply->pos += strsize;
+    }
+  }
+  else
+  {
+      reply->pos += strsize;
   }
 
-  reply->pos += strsize;
-  
   return TRUE;
 }
 

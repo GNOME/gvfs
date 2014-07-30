@@ -127,9 +127,9 @@ G_STMT_START {											\
         goto invalid_reply;								\
 } G_STMT_END
 
-#define REPLY_READ_PASCAL(reply, val)				\
+#define REPLY_READ_PASCAL(reply, is_utf8, val)				\
 G_STMT_START {										\
-    if (!g_vfs_afp_reply_read_pascal (reply, val))	\
+    if (!g_vfs_afp_reply_read_pascal (reply, is_utf8, val))	\
         goto invalid_reply;							\
 } G_STMT_END
 

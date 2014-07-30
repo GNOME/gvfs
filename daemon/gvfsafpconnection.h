@@ -254,7 +254,7 @@ gboolean        g_vfs_afp_reply_read_uint16       (GVfsAfpReply *reply, guint16 
 gboolean        g_vfs_afp_reply_get_data          (GVfsAfpReply *reply, gsize size, guint8 **data);
 gboolean        g_vfs_afp_reply_dup_data          (GVfsAfpReply *reply, gsize size, guint8 **data);
 
-gboolean        g_vfs_afp_reply_read_pascal       (GVfsAfpReply *reply, char **str);
+gboolean        g_vfs_afp_reply_read_pascal       (GVfsAfpReply *reply, gboolean is_utf8, char **str);
 gboolean        g_vfs_afp_reply_read_afp_name     (GVfsAfpReply *reply, gboolean read_text_encoding, GVfsAfpName **afp_name);
 
 gboolean        g_vfs_afp_reply_seek              (GVfsAfpReply *reply, goffset offset, GSeekType type);

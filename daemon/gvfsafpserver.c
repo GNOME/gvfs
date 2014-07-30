@@ -760,7 +760,7 @@ get_server_info (GVfsAfpServer *server,
 
   REPLY_READ_UINT16 (reply, &priv->info.flags);
 
-  REPLY_READ_PASCAL (reply, &priv->info.server_name);
+  REPLY_READ_PASCAL (reply, FALSE, &priv->info.server_name);
 
   /* Parse UTF-8 ServerName */
   if (priv->info.flags & (0x1 << 8)) {
@@ -779,7 +779,7 @@ get_server_info (GVfsAfpServer *server,
 
   /* Parse MachineType */
   REPLY_SEEK (reply, MachineType_offset, G_SEEK_SET);
-  REPLY_READ_PASCAL (reply, &priv->info.machine_type);
+  REPLY_READ_PASCAL (reply, FALSE, &priv->info.machine_type);
 
   /* Parse Versions */
   REPLY_SEEK (reply, AFPVersionCount_offset, G_SEEK_SET);
@@ -789,7 +789,7 @@ get_server_info (GVfsAfpServer *server,
     char *version;
     AfpVersion afp_version;
 
-    REPLY_READ_PASCAL (reply, &version);
+    REPLY_READ_PASCAL (reply, FALSE, &version);
     afp_version = string_to_afp_version (version);
     g_free (version);
     if (afp_version > priv->info.version)
@@ -813,7 +813,7 @@ get_server_info (GVfsAfpServer *server,
   {
     char *uam;
 
-    REPLY_READ_PASCAL (reply, &uam);
+    REPLY_READ_PASCAL (reply, FALSE, &uam);
     priv->info.uams = g_slist_prepend (priv->info.uams, uam);
   }
 
@@ -1342,7 +1342,7 @@ get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     GVfsAfpVolumeData *volume_data;
 
     REPLY_READ_BYTE (reply, &flags);
-    REPLY_READ_PASCAL (reply, &vol_name);
+    REPLY_READ_PASCAL (reply, TRUE, &vol_name);
     if (!vol_name)
       continue;
 
@@ -1743,7 +1743,7 @@ map_id_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   if (map_data->function == GVFS_AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME ||
       map_data->function == GVFS_AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME)
   {
-    REPLY_READ_PASCAL (reply, &map_data->name);
+    REPLY_READ_PASCAL (reply, FALSE, &map_data->name);
   }
   else
   {
