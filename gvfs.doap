@@ -5,12 +5,13 @@
          xmlns="http://usefulinc.com/ns/doap#">
 
   <name xml:lang="en">gvfs</name>
-  <shortdesc xml:lang="en">Virtual filesystem implementation for gio</shortdesc>
+  <shortdesc xml:lang="en">Virtual filesystem implementation for GIO</shortdesc>
   <homepage rdf:resource="https://wiki.gnome.org/Projects/gvfs" />
   <mailing-list rdf:resource="http://mail.gnome.org/mailman/listinfo/gvfs-list" />
   <download-page rdf:resource="http://download.gnome.org/sources/gvfs/" />
-  <category rdf:resource="http://api.gnome.org/doap-extensions#core" />
   <bug-database rdf:resource="https://bugzilla.gnome.org/browse.cgi?product=gvfs" />
+  <category rdf:resource="http://api.gnome.org/doap-extensions#core" />
+  <programming-language>C</programming-language>
 
   <maintainer>
     <foaf:Person>
