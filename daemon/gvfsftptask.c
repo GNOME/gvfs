@@ -233,10 +233,11 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
               g_vfs_ftp_task_setup_connection (task);
               if (G_LIKELY (!g_vfs_ftp_task_is_in_error (task)))
                 break;
+
+              g_vfs_ftp_connection_free (task->conn);
+              task->conn = NULL;
             }
 
-          g_vfs_ftp_connection_free (task->conn);
-          task->conn = NULL;
           g_mutex_lock (&ftp->mutex);
           ftp->connections--;
           /* If this value is still equal to our thread it means there were no races 
