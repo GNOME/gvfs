@@ -20,6 +20,7 @@
  * Author: Carl-Anton Ingmarsson <ca.ingmarsson@gmail.com>
  */
 
+#include <stdlib.h>
 #include <string.h>
 #include <glib/gi18n.h>
 
@@ -878,6 +879,12 @@ read_all_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     g_simple_async_result_take_error (simple, err);
     goto done;
   }
+  else if (bytes_read == 0)
+  {
+    g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_CLOSED,
+                                     _("Got EOS"));
+    goto done;
+  }
 
   read_data = g_simple_async_result_get_op_res_gpointer (simple);
 
@@ -1048,8 +1055,15 @@ read_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   result = read_all_finish (input, res, NULL, &err);
   if (!result)
   {
-    g_warning ("FAIL!!! \"%s\"\n", err->message);
-    g_error_free (err);
+    if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_CLOSED))
+    {
+      g_message (_("Host closed connection"));
+      exit(0);
+    }
+    else
+    {
+      g_error ("FAIL!!! \"%s\"\n", err->message);
+    }
   }
 
   dispatch_reply (afp_connection);
@@ -1082,8 +1096,15 @@ read_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
   result = read_all_finish (input, res, NULL, &err);
   if (!result)
   {
-    g_warning ("FAIL!!! \"%s\"\n", err->message);
-    g_error_free (err);
+    if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_CLOSED))
+    {
+      g_message (_("Host closed connection"));
+      exit(0);
+    }
+    else
+    {
+      g_error ("FAIL!!! \"%s\"\n", err->message);
+    }
   }
 
   dsi_header = &priv->read_dsi_header;
