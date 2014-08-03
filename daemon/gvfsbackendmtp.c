@@ -1955,35 +1955,45 @@ do_open_icon_for_read (GVfsBackend *backend,
   guint id = strtol (icon_id, NULL, 16);
 
   if (id > 0) {
-    GByteArray *bytes;
+    GByteArray *bytes = NULL;
     unsigned char *data;
     unsigned int size;
-    int ret = LIBMTP_Get_Thumbnail (G_VFS_BACKEND_MTP (backend)->device, id,
-                                    &data, &size);
+    int ret;
+
+    ret = LIBMTP_Get_Thumbnail (G_VFS_BACKEND_MTP (backend)->device, id,
+                                &data, &size);
     if (ret == 0) {
       DEBUG ("File %X has thumbnail: %u\n", id, size);
-      bytes = g_byte_array_sized_new (size);
-      g_byte_array_append (bytes, data, size);
+      if (size > 0) {
+        bytes = g_byte_array_sized_new (size);
+        g_byte_array_append (bytes, data, size);
+      }
       free (data);
-    } else {
+    }
+
+    if (!bytes) {
       LIBMTP_filesampledata_t *sample_data = LIBMTP_new_filesampledata_t ();
       ret = LIBMTP_Get_Representative_Sample (G_VFS_BACKEND_MTP (backend)->device,
                                               id, sample_data);
       if (ret == 0) {
-        DEBUG ("File %X has sampledata: %u\n", id, size);
-        bytes = g_byte_array_sized_new (sample_data->size);
-        g_byte_array_append (bytes, (const guint8 *)sample_data->data, sample_data->size);
-        size = sample_data->size;
-        LIBMTP_destroy_filesampledata_t (sample_data);
-      } else {
-        DEBUG ("File %X has no thumbnail or sampledata\n", id);
-        g_vfs_job_failed (G_VFS_JOB (job),
-                          G_IO_ERROR,
-                          G_IO_ERROR_NOT_FOUND,
-                          _("No thumbnail for entity '%s'"),
-                          icon_id);
-        goto exit;
+        DEBUG ("File %X has sampledata: %u\n", id, sample_data->size);
+        if (sample_data->size > 0) {
+          bytes = g_byte_array_sized_new (sample_data->size);
+          g_byte_array_append (bytes, (const guint8 *)sample_data->data, sample_data->size);
+          size = sample_data->size;
+        }
       }
+      LIBMTP_destroy_filesampledata_t (sample_data);
+    }
+
+    if (!bytes) {
+      DEBUG ("File %X has no thumbnail or sampledata\n", id);
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,
+                        G_IO_ERROR_NOT_FOUND,
+                        _("No thumbnail for entity '%s'"),
+                        icon_id);
+      goto exit;
     }
 
     RWHandle *handle = g_new0(RWHandle, 1);
