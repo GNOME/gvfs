@@ -59,7 +59,6 @@ g_vfs_afp_volume_finalize (GObject *object)
   GVfsAfpVolume *volume;
   GVfsAfpVolumePrivate *priv;
 
-  /* TODO: Add deinitalization code here */
   volume = G_VFS_AFP_VOLUME (object);
   priv = volume->priv;
   g_signal_handlers_disconnect_by_func (priv->conn, attention_cb, volume);
