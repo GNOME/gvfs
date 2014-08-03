@@ -596,7 +596,6 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
     g_hash_table_iter_init (&iter, op_backend->file_cache);
     while (g_hash_table_iter_next (&iter, &key, &value)) {
       const char *path = key;
-      const CacheEntry *entry = value;
 
       g_hash_table_foreach (op_backend->monitors,
                             emit_delete_event,
@@ -915,7 +914,6 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
   g_hash_table_iter_init (&iter, op_backend->file_cache);
   while (g_hash_table_iter_next (&iter, &key, &value)) {
     const char *path = key;
-    const CacheEntry *entry = value;
 
     g_hash_table_foreach (op_backend->monitors,
                           emit_delete_event,
