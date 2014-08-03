@@ -1952,7 +1952,7 @@ do_open_icon_for_read (GVfsBackend *backend,
 
   FAIL_DURING_UNMOUNT();
 
-  guint id = strtol (icon_id, NULL, 10);
+  guint id = strtol (icon_id, NULL, 16);
 
   if (id > 0) {
     GByteArray *bytes;
