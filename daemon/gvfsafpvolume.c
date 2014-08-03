@@ -41,6 +41,9 @@ struct _GVfsAfpVolumePrivate
 };
 
 static void
+attention_cb (GVfsAfpConnection *conn, guint attention, GVfsAfpVolume *volume);
+
+static void
 g_vfs_afp_volume_init (GVfsAfpVolume *volume)
 {
   GVfsAfpVolumePrivate *priv;
@@ -53,7 +56,13 @@ g_vfs_afp_volume_init (GVfsAfpVolume *volume)
 static void
 g_vfs_afp_volume_finalize (GObject *object)
 {
+  GVfsAfpVolume *volume;
+  GVfsAfpVolumePrivate *priv;
+
   /* TODO: Add deinitalization code here */
+  volume = G_VFS_AFP_VOLUME (object);
+  priv = volume->priv;
+  g_signal_handlers_disconnect_by_func (priv->conn, attention_cb, volume);
 
   G_OBJECT_CLASS (g_vfs_afp_volume_parent_class)->finalize (object);
 }
@@ -82,6 +91,7 @@ g_vfs_afp_volume_new (GVfsAfpServer *server, GVfsAfpConnection *conn)
 
   priv->server = server;
   priv->conn = conn;
+  g_signal_connect (priv->conn, "attention", G_CALLBACK (attention_cb), volume);
 
   return volume;
 }
@@ -2886,4 +2896,15 @@ g_vfs_afp_volume_read_from_fork_finish (GVfsAfpVolume  *volume,
     *bytes_read = g_simple_async_result_get_op_res_gssize (simple);
   
   return TRUE;
+}
+
+static void
+attention_cb (GVfsAfpConnection *conn, guint attention, GVfsAfpVolume *volume)
+{
+  /* Respond to the server notification with FPGetVolParms as the spec
+   * suggests.  Some servers disconnect us if we don't. */
+  if (attention == AFP_ATTENTION_CODE_SERVER_NOTIFICATION)
+    g_vfs_afp_volume_get_parms (volume,
+                                AFP_VOLUME_BITMAP_VOL_ID_BIT,
+                                NULL, NULL, NULL);
 }
