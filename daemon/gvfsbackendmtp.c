@@ -1921,6 +1921,14 @@ do_open_for_read (GVfsBackend *backend,
     goto exit;
   }
 
+  if (file->filetype == LIBMTP_FILETYPE_FOLDER) {
+    LIBMTP_destroy_file_t (file);
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                             _("Can't open directory"));
+    goto exit;
+  }
+
   RWHandle *handle = g_new0(RWHandle, 1);
   handle->handle_type = HANDLE_FILE;
   handle->id = entry->id;
