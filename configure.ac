@@ -879,6 +879,31 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+msg_installed_tests="no"
+AC_ARG_ENABLE(installed-tests,
+              AS_HELP_STRING([--enable-installed-tests],
+                             [Enable installation of some test cases]),
+              [case ${enableval} in
+                yes) ENABLE_INSTALLED_TESTS="1"  ;;
+                no)  ENABLE_INSTALLED_TESTS="" ;;
+                *) AC_MSG_ERROR([bad value ${enableval} for --enable-installed-tests]) ;;
+               esac])
+AM_CONDITIONAL([ENABLE_INSTALLED_TESTS], test "$ENABLE_INSTALLED_TESTS" = "1")
+AC_ARG_ENABLE(always-build-tests,
+              AS_HELP_STRING([--enable-always-build-tests],
+                             [Enable always building tests during 'make all']),
+              [case ${enableval} in
+                yes) ENABLE_ALWAYS_BUILD_TESTS="1"  ;;
+                no)  ENABLE_ALWAYS_BUILD_TESTS="" ;;
+                *) AC_MSG_ERROR([bad value ${enableval} for --enable-always-build-tests]) ;;
+               esac])
+AM_CONDITIONAL([ENABLE_ALWAYS_BUILD_TESTS], test "$ENABLE_ALWAYS_BUILD_TESTS" = "1")
+if test "$ENABLE_INSTALLED_TESTS" = "1"; then
+  AC_SUBST(installed_test_metadir, [${datadir}/installed-tests/]AC_PACKAGE_NAME)
+  AC_SUBST(installed_testdir, [${libexecdir}/installed-tests/]AC_PACKAGE_NAME)
+  msg_installed_tests="yes"
+fi
+
 AC_CONFIG_FILES([
 Makefile
 common/Makefile
@@ -929,6 +954,7 @@ echo "
 	GNOME Keyring support:        $msg_keyring
 	GTK+ support:                 $msg_gtk
 	Bash-completion support:      $msg_bash_completion
+	Installed tests:              $msg_installed_tests
 "
 
 # The gudev gphoto monitor needs a recent libgphoto; point to the required patch if the version is too old

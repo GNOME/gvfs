@@ -1,5 +1,6 @@
 *.monitor
 *.service
+*.test
 session.conf
 benchmark-gvfs-big-files
 benchmark-gvfs-small-files

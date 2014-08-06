@@ -1,3 +1,5 @@
+include $(top_srcdir)/glib-tap.mk
+
 NULL =
 
 AM_CFLAGS =                       \
@@ -8,7 +10,7 @@ AM_CFLAGS =                       \
 AM_LDFLAGS =                           \
 	$(GLIB_LIBS)
 
-noinst_PROGRAMS = \
+noinst_PROGRAMS += \
 	test-query-info-stream    \
 	benchmark-gvfs-small-files    \
 	benchmark-gvfs-big-files      \
@@ -60,7 +62,7 @@ org.gtk.Private.UDisks2VolumeMonitor.service: $(top_srcdir)/monitor/udisks2/org.
 CONFIG_FILES+=org.gtk.Private.UDisks2VolumeMonitor.service udisks2.monitor
 endif
 
-noinst_DATA= $(CONFIG_FILES)
+noinst_DATA += $(CONFIG_FILES)
 
 # run tests against build tree
 check: $(CONFIG_FILES) gvfs-test
@@ -75,9 +77,41 @@ installcheck-local: gvfs-test
 	    $(srcdir)/gvfs-test $(TEST_NAMES); \
 	fi
 
-CLEANFILES=$(CONFIG_FILES)
+CLEANFILES += $(CONFIG_FILES)
 
-EXTRA_DIST = \
+nobase_installed_test_DATA += $(CONFIG_FILES)
+nobase_installed_test_DATA += \
+	files/source-gphoto/IMG_0001.jpg \
+	files/source-gphoto/IMG_0002.jpg \
+	files/bogus-cd.iso.bz2 \
+	files/joliet.iso.bz2 \
+	files/mtp_xperia.ioctl.xz \
+	files/mtp_xperia.umockdev \
+	files/powershot.ioctl \
+	files/powershot.umockdev \
+	files/ssh_host_rsa_key \
+	files/ssh_host_rsa_key.pub \
+	files/testcert.pem \
+	files/vfat.img.bz2 \
+	$(NULL)
+
+test_extra_scripts = \
+	gvfs-test \
+	run-in-tree.sh \
+	$(NULL)
+
+test_scripts = gvfs-all-tests
+
+gvfs-all-tests.test: gvfs-test
+	$(AM_V_GEN) (echo '[Test]' > $@.tmp; \
+	echo 'Type=session' >> $@.tmp; \
+	echo 'Exec=$(installed_testdir)/gvfs-test' >> $@.tmp; \
+	echo 'Output=TAP' >> $@.tmp; \
+	mv $@.tmp $@)
+
+.PHONY: $(test_scripts)
+
+EXTRA_DIST += \
 	benchmark-common.c		\
 	session.conf.in 		\
 	gvfs-test			\
