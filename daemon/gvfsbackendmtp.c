@@ -1072,11 +1072,11 @@ get_device_info (GVfsBackendMtp *backend, GFileInfo *info)
   g_object_unref (icon);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, TRUE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, TRUE); 
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE);
 
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "mtpfs");
 
@@ -1149,7 +1149,7 @@ get_storage_info (LIBMTP_devicestorage_t *storage, GFileInfo *info) {
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, TRUE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE); 
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE);
 
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, storage->FreeSpaceInBytes);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, storage->MaxCapacity);
@@ -1499,7 +1499,7 @@ do_make_directory (GVfsBackend *backend,
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_FAILED,
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                               _("Cannot make directory in this location"));
     goto exit;
   }
@@ -1507,7 +1507,15 @@ do_make_directory (GVfsBackend *backend,
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
 
-  CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
+  CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
+  if (entry != NULL && entry->id != -1) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_EXISTS,
+                              _("Target file already exists"));
+    goto exit;
+  }
+
+  entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
   if (!entry) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
@@ -1549,6 +1557,7 @@ do_pull (GVfsBackend *backend,
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   GFile *local_file = NULL;
+  GFileInfo *local_info = NULL;
   GFileInfo *info = NULL;
 
   FAIL_DURING_UNMOUNT();
@@ -1566,9 +1575,62 @@ do_pull (GVfsBackend *backend,
     goto exit;
   }
 
+  LIBMTP_mtpdevice_t *device;
+  device = G_VFS_BACKEND_MTP (backend)->device;
+
+  LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, entry->id);
+  if (file == NULL) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("File does not exist"));
+    goto exit;
+  }
+
+  info = g_file_info_new ();
+  get_file_info (backend, device, info, file);
+  LIBMTP_destroy_file_t (file);
+
   local_file = g_file_new_for_path (local_path);
-  if (g_file_query_exists (local_file, G_VFS_JOB (job)->cancellable)) {
+
+  gboolean source_is_dir =
+    g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY;
+
+  GError *error = NULL;
+  local_info =
+    g_file_query_info (local_file, G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                       0, G_VFS_JOB (job)->cancellable, &error);
+  gboolean dest_exists = local_info || error->code != G_IO_ERROR_NOT_FOUND;
+  if (!local_info && error->code != G_IO_ERROR_NOT_FOUND) {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_error_free (error);
+    goto exit;
+  } else if (error != NULL) {
+    g_error_free (error);
+  }
+
+  gboolean dest_is_dir =
+    g_file_info_get_file_type (local_info) == G_FILE_TYPE_DIRECTORY;
+
+  /* Test all the GIO defined failure conditions */
+  if (dest_exists) {
     if (flags & G_FILE_COPY_OVERWRITE) {
+      if (!source_is_dir && dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                  _("Target is a directory"));
+        goto exit;
+      } else if (source_is_dir && dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
+                                  _("Can't merge directories"));
+        goto exit;
+      } else if (source_is_dir && !dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                                  _("Can't recursively copy directory"));
+        goto exit;
+      }
+      /* Source and Dest are files */
       DEBUG ("(I) Removing destination.\n");
       GError *error = NULL;
       gboolean ret = g_file_delete (local_file,
@@ -1585,56 +1647,40 @@ do_pull (GVfsBackend *backend,
                                 _("Target file already exists"));
       goto exit;
     }
-  }
-
-
-  LIBMTP_mtpdevice_t *device;
-  device = G_VFS_BACKEND_MTP (backend)->device;
-
-  LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, entry->id);
-  if (file == NULL) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File does not exist"));
-    goto exit;
-  }
-
-  info = g_file_info_new ();
-  get_file_info (backend, device, info, file);
-  LIBMTP_destroy_file_t (file);
-  if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY) {
+  } else if (source_is_dir) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
                               _("Can't recursively copy directory"));
     goto exit;
-  } else {
-    MtpProgressData mtp_progress_data;
-    mtp_progress_data.progress_callback = progress_callback;
-    mtp_progress_data.progress_callback_data = progress_callback_data;
-    mtp_progress_data.job = G_VFS_JOB (job);
-    int ret = LIBMTP_Get_File_To_File (device,
-                                       entry->id,
-                                       local_path,
-                                       (LIBMTP_progressfunc_t)mtp_progress,
-                                       &mtp_progress_data);
-    if (ret != 0) {
-      fail_job (G_VFS_JOB (job), device);
-      goto exit;
-    }
-    /* Attempt to delete object if requested but don't fail it it fails. */
-    if (remove_source) {
-      DEBUG ("(I) Removing source.\n");
-      LIBMTP_Delete_Object (device, entry->id);
-      g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
-                            emit_delete_event,
-                            (char *)source);
-      remove_cache_entry (G_VFS_BACKEND_MTP (backend),
-                          source);
-    }
-    g_vfs_job_succeeded (G_VFS_JOB (job));
   }
 
+  MtpProgressData mtp_progress_data;
+  mtp_progress_data.progress_callback = progress_callback;
+  mtp_progress_data.progress_callback_data = progress_callback_data;
+  mtp_progress_data.job = G_VFS_JOB (job);
+  int ret = LIBMTP_Get_File_To_File (device,
+                                     entry->id,
+                                     local_path,
+                                     (LIBMTP_progressfunc_t)mtp_progress,
+                                     &mtp_progress_data);
+  if (ret != 0) {
+    fail_job (G_VFS_JOB (job), device);
+    goto exit;
+  }
+  /* Attempt to delete object if requested but don't fail it it fails. */
+  if (remove_source) {
+    DEBUG ("(I) Removing source.\n");
+    LIBMTP_Delete_Object (device, entry->id);
+    g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
+                          emit_delete_event,
+                          (char *)source);
+    remove_cache_entry (G_VFS_BACKEND_MTP (backend),
+                        source);
+  }
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
  exit:
+  g_clear_object (&local_info);
   g_clear_object (&local_file);
   g_clear_object (&info);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
@@ -1659,7 +1705,7 @@ do_push (GVfsBackend *backend,
   char *dir_name = g_path_get_dirname (destination);
   char *filename = g_path_get_basename (destination);
 
-  GFile *file = NULL;
+  GFile *local_file = NULL;
   GFileInfo *info = NULL;
   gchar **elements = g_strsplit_set (destination, "/", -1);
   unsigned int ne = g_strv_length (elements);
@@ -1668,7 +1714,7 @@ do_push (GVfsBackend *backend,
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                               _("Cannot write to this location"));
     goto exit;
   }
@@ -1677,8 +1723,60 @@ do_push (GVfsBackend *backend,
   device = G_VFS_BACKEND_MTP (backend)->device;
 
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), destination);
-  if (entry != NULL && entry->id != -1) {
+  gboolean dest_exists = entry != NULL && entry->id != -1;
+  gboolean dest_is_dir = FALSE;
+
+  if (dest_exists) {
+    LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, entry->id);
+    if (file != NULL) {
+      dest_is_dir = file->filetype == LIBMTP_FILETYPE_FOLDER;
+      LIBMTP_destroy_file_t (file);
+    }
+  }
+
+  CacheEntry *parent = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
+  if (!parent) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("Directory doesn't exist"));
+    goto exit;
+  }
+
+  GError *error = NULL;
+  local_file = g_file_new_for_path (local_path);
+  info =
+    g_file_query_info (local_file,
+                       G_FILE_ATTRIBUTE_STANDARD_TYPE","G_FILE_ATTRIBUTE_STANDARD_SIZE,
+                       0, G_VFS_JOB (job)->cancellable, &error);
+  if (!info) {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    g_error_free (error);
+    goto exit;
+  }
+
+  gboolean source_is_dir =
+    g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY;
+
+  /* Test all the GIO defined failure conditions */
+  if (dest_exists) {
     if (flags & G_FILE_COPY_OVERWRITE) {
+      if (!source_is_dir && dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                  _("Target is a directory"));
+        goto exit;
+      } else if (source_is_dir && dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
+                                  _("Can't merge directories"));
+        goto exit;
+      } else if (source_is_dir && !dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                                  _("Can't recursively copy directory"));
+        goto exit;
+      }
+      /* Source and Dest are files */
       DEBUG ("(I) Removing destination.\n");
       int ret = LIBMTP_Delete_Object (device, entry->id);
       if (ret != 0) {
@@ -1696,44 +1794,18 @@ do_push (GVfsBackend *backend,
                                 _("Target file already exists"));
       goto exit;
     }
-  }
-
-  entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
-  if (!entry) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("Directory doesn't exist"));
-    goto exit;
-  }
-
-  file = g_file_new_for_path (local_path);
-  g_assert(file);
-
-  if (g_file_query_file_type (file, G_FILE_QUERY_INFO_NONE,
-                              G_VFS_JOB (job)->cancellable) ==
-      G_FILE_TYPE_DIRECTORY) {
+  } else if (source_is_dir) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
                               _("Can't recursively copy directory"));
     goto exit;
   }
 
-  GError *error = NULL;
-  info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_SIZE,
-                            G_FILE_QUERY_INFO_NONE,
-                            G_VFS_JOB (job)->cancellable,
-                            &error);
-  if (!info) {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error); 
-    g_error_free (error);
-    goto exit;
-  }
-
   LIBMTP_file_t *mtpfile = LIBMTP_new_file_t ();
   mtpfile->filename = strdup (filename);
-  mtpfile->parent_id = entry->id;
-  mtpfile->storage_id = entry->storage;
-  mtpfile->filetype = LIBMTP_FILETYPE_UNKNOWN; 
+  mtpfile->parent_id = parent->id;
+  mtpfile->storage_id = parent->storage;
+  mtpfile->filetype = LIBMTP_FILETYPE_UNKNOWN;
   mtpfile->filesize = g_file_info_get_size (info);
 
   MtpProgressData mtp_progress_data;
@@ -1752,7 +1824,7 @@ do_push (GVfsBackend *backend,
   /* Attempt to delete object if requested but don't fail it it fails. */
   if (remove_source) {
     DEBUG ("(I) Removing source.\n");
-    g_file_delete (file, G_VFS_JOB (job)->cancellable, NULL);
+    g_file_delete (local_file, G_VFS_JOB (job)->cancellable, NULL);
   }
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1762,7 +1834,7 @@ do_push (GVfsBackend *backend,
                         (char *)destination);
 
  exit:
-  g_clear_object (&file);
+  g_clear_object (&local_file);
   g_clear_object (&info);
   g_strfreev (elements);
   g_free (dir_name);
@@ -1791,7 +1863,7 @@ do_delete (GVfsBackend *backend,
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                               _("Not a regular file"));
     goto exit;
   }
@@ -1838,7 +1910,7 @@ do_set_display_name (GVfsBackend *backend,
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                               _("Not a regular file"));
     goto exit;
   }
@@ -1907,7 +1979,7 @@ do_open_for_read (GVfsBackend *backend,
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                               _("Not a regular file"));
     goto exit;
   }
@@ -2173,8 +2245,8 @@ do_create (GVfsBackend *backend,
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_FAILED,
-                              _("Invalid filename"));
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                              _("Cannot write to this location"));
     goto exit;
   }
 
@@ -2263,7 +2335,7 @@ do_append_to (GVfsBackend *backend,
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                               _("Not a regular file"));
     goto exit;
   }
@@ -2331,7 +2403,7 @@ do_replace (GVfsBackend *backend,
     return do_create(backend, job, filename, flags);
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                               _("Not a regular file"));
     goto exit;
   }
