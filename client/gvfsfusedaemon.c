@@ -1651,12 +1651,6 @@ vfs_rename (const gchar *old_path, const gchar *new_path)
           g_mutex_unlock (&fh->mutex);
           file_handle_unref (fh);
         }
-
-      if (result == -EISDIR)
-        {
-          /* This makes e.g. 'mv' fall back to a recursive copy + delete operation */
-          result = -EXDEV;
-        }
     }
   else
     {
