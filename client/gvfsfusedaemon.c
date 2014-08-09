@@ -163,6 +163,8 @@ errno_from_error (GError *error)
       { G_IO_ERROR_TIMED_OUT,          EIO          },
       { G_IO_ERROR_BUSY,               EBUSY        },
       { G_IO_ERROR_WOULD_BLOCK,        EAGAIN       },
+      { G_IO_ERROR_WOULD_RECURSE,      EXDEV        },
+      { G_IO_ERROR_WOULD_MERGE,        ENOTEMPTY    },
       { -1,                            -1           }
     };
 
