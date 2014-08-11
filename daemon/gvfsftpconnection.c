@@ -479,10 +479,16 @@ g_vfs_ftp_connection_is_usable (GVfsFtpConnection *conn)
   if (conn->waiting_for_reply)
     return FALSE;
 
-  cond = G_IO_ERR | G_IO_HUP;
+  cond = G_IO_ERR | G_IO_HUP | G_IO_IN;
   cond = g_socket_condition_check (g_socket_connection_get_socket (G_SOCKET_CONNECTION (conn->commands)), cond);
   if (cond)
-    return FALSE;
+    {
+      g_debug ("##%2d ##  connection unusuable: %s%s%s\r\n", conn->debug_id,
+                                                             cond & G_IO_IN ? "IN " : "",
+                                                             cond & G_IO_HUP ? "HUP " : "",
+                                                             cond & G_IO_ERR ? "ERR " : "");
+      return FALSE;
+    }
 
   return TRUE;
 }
