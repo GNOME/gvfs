@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: el\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-08-03 20:45+0000\n"
-"PO-Revision-Date: 2014-08-04 12:37+0200\n"
+"POT-Creation-Date: 2014-08-11 21:15+0000\n"
+"PO-Revision-Date: 2014-08-12 01:16+0200\n"
 "Last-Translator: Tom Tryfonidis <tomtryf@gmail.com>\n"
 "Language-Team: team@lists.gnome.gr\n"
 "Language: el\n"
@@ -111,8 +111,8 @@ msgstr "Σφάλμα στο πρωτόκολλο ροής: %s"
 #: ../client/gdaemonfileinputstream.c:545
 #: ../client/gdaemonfileinputstream.c:1715
 #: ../client/gdaemonfileoutputstream.c:496
-#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2051
-#: ../daemon/gvfsbackendmtp.c:2435
+#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2131
+#: ../daemon/gvfsbackendmtp.c:2515
 msgid "End of stream"
 msgstr "Τέλος της ροής"
 
@@ -248,7 +248,7 @@ msgid "Got EOS"
 msgstr "Ελήφθη EOS"
 
 #: ../daemon/gvfsafpconnection.c:1061 ../daemon/gvfsafpconnection.c:1102
-#: ../daemon/gvfsftptask.c:363
+#: ../daemon/gvfsftptask.c:370
 msgid "Host closed connection"
 msgstr "Ο κεντρικός υπολογιστής έκλεισε τη σύνδεση"
 
@@ -386,7 +386,7 @@ msgstr "Αδυναμία φόρτωσης %s στο %s"
 #: ../daemon/gvfsafpvolume.c:2135 ../daemon/gvfsafpvolume.c:2297
 #: ../daemon/gvfsafpvolume.c:2517 ../daemon/gvfsbackendafc.c:289
 #: ../daemon/gvfsbackendsftp.c:322 ../daemon/gvfsbackendsftp.c:1867
-#: ../daemon/gvfsftptask.c:403
+#: ../daemon/gvfsftptask.c:410
 msgid "Permission denied"
 msgstr "Δεν επιτρέπεται η πρόσβαση"
 
@@ -421,7 +421,7 @@ msgstr "Πάρα πολλά ανοιχτά αρχεία"
 
 #: ../daemon/gvfsafpvolume.c:676 ../daemon/gvfsafpvolume.c:833
 msgid "Target file is open"
-msgstr "Το τελικό αρχείο είναι ήδη ανοιχτό"
+msgstr "Το αρχείο προορισμού είναι ήδη ανοιχτό"
 
 #: ../daemon/gvfsafpvolume.c:680 ../daemon/gvfsbackendburn.c:421
 #: ../daemon/gvfsbackenddav.c:2617 ../daemon/gvfsbackendsftp.c:1861
@@ -430,13 +430,14 @@ msgstr "Ο κατάλογος δεν είναι άδειος"
 
 #: ../daemon/gvfsafpvolume.c:684
 msgid "Target object is marked as not deletable (DeleteInhibit)"
-msgstr "Το τελικό αντικείμενο χαρακτηρίζεται ως μη διαγράψιμο (DeleteInhibit)"
+msgstr ""
+"Το αντικείμενο προορισμού χαρακτηρίζεται ως μη διαγράψιμο (DeleteInhibit)"
 
 #
 #: ../daemon/gvfsafpvolume.c:688 ../daemon/gvfsafpvolume.c:1237
 #: ../daemon/gvfsafpvolume.c:2139
 msgid "Target object doesn't exist"
-msgstr "Το τελικό αντικείμενο δεν υπάρχει"
+msgstr "Το αντικείμενο προορισμού δεν υπάρχει"
 
 #: ../daemon/gvfsafpvolume.c:692 ../daemon/gvfsafpvolume.c:845
 #: ../daemon/gvfsafpvolume.c:1041 ../daemon/gvfsafpvolume.c:1241
@@ -457,8 +458,9 @@ msgstr "Ανεπαρκής ελεύθερος χώρος στο τόμο"
 #: ../daemon/gvfsbackenddav.c:2819 ../daemon/gvfsbackenddav.c:3043
 #: ../daemon/gvfsbackendftp.c:758 ../daemon/gvfsbackendftp.c:939
 #: ../daemon/gvfsbackendftp.c:1379 ../daemon/gvfsbackendftp.c:1487
-#: ../daemon/gvfsbackendmtp.c:1585 ../daemon/gvfsbackendmtp.c:1696
-#: ../daemon/gvfsbackendsftp.c:4511 ../daemon/gvfsbackendsmb.c:2217
+#: ../daemon/gvfsbackendmtp.c:1514 ../daemon/gvfsbackendmtp.c:1647
+#: ../daemon/gvfsbackendmtp.c:1794 ../daemon/gvfsbackendsftp.c:4511
+#: ../daemon/gvfsbackendsmb.c:2217
 msgid "Target file already exists"
 msgstr "Το αρχείο προορισμού υπάρχει ήδη"
 
@@ -488,7 +490,7 @@ msgstr "Το όνομα αντικειμένου υπάρχει ήδη"
 #: ../daemon/gvfsafpvolume.c:1233
 msgid "Target object is marked as not renameable (RenameInhibit)"
 msgstr ""
-"Το τελικό αντικείμενο χαρακτηρίζεται ως μη μετονομάσιμο (RenameInhibit)"
+"Το αντικείμενο προορισμού χαρακτηρίζεται ως μη μετονομάσιμο (RenameInhibit)"
 
 #: ../daemon/gvfsafpvolume.c:1408
 msgid "Can't move directory into one of its descendants"
@@ -537,8 +539,8 @@ msgstr "Υπάρχει σύγκρουση εύρους κλειδώματος"
 
 #
 #: ../daemon/gvfsafpvolume.c:2301 ../daemon/gvfsbackendmtp.c:1367
-#: ../daemon/gvfsbackendmtp.c:1514 ../daemon/gvfsbackendmtp.c:1705
-#: ../daemon/gvfsbackendmtp.c:2177
+#: ../daemon/gvfsbackendmtp.c:1522 ../daemon/gvfsbackendmtp.c:1741
+#: ../daemon/gvfsbackendmtp.c:2257
 msgid "Directory doesn't exist"
 msgstr "Ο φάκελος δεν υπάρχει"
 
@@ -564,9 +566,9 @@ msgstr "Εσωτερικό σφάλμα του ελέγχου αρχείων App
 
 #
 #: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:742
-#: ../daemon/gvfsbackendmtp.c:1560 ../daemon/gvfsbackendmtp.c:1598
-#: ../daemon/gvfsbackendmtp.c:1790 ../daemon/gvfsbackendmtp.c:1837
-#: ../daemon/gvfsbackendmtp.c:1906 ../daemon/gvfsbackendmtp.c:2254
+#: ../daemon/gvfsbackendmtp.c:1569 ../daemon/gvfsbackendmtp.c:1585
+#: ../daemon/gvfsbackendmtp.c:1862 ../daemon/gvfsbackendmtp.c:1909
+#: ../daemon/gvfsbackendmtp.c:1978 ../daemon/gvfsbackendmtp.c:2334
 msgid "File does not exist"
 msgstr "Το αρχείο δεν υπάρχει"
 
@@ -697,8 +699,9 @@ msgstr ""
 
 #: ../daemon/gvfsbackendafc.c:981 ../daemon/gvfsbackendarchive.c:713
 #: ../daemon/gvfsbackendcomputer.c:656 ../daemon/gvfsbackendgphoto2.c:1848
-#: ../daemon/gvfsbackendobexftp.c:1099 ../daemon/gvfsbackendrecent.c:122
-#: ../daemon/gvfsbackendsmb.c:803 ../daemon/gvfsbackendtrash.c:234
+#: ../daemon/gvfsbackendmtp.c:2000 ../daemon/gvfsbackendobexftp.c:1099
+#: ../daemon/gvfsbackendrecent.c:122 ../daemon/gvfsbackendsmb.c:803
+#: ../daemon/gvfsbackendtrash.c:234
 msgid "Can't open directory"
 msgstr "Αδυναμία ανοίγματος καταλόγου"
 
@@ -712,11 +715,11 @@ msgstr "Άκυρος τύπος αναζήτησης"
 
 #: ../daemon/gvfsbackendafc.c:2415 ../daemon/gvfsbackendafp.c:1790
 #: ../daemon/gvfsbackendftp.c:1093 ../daemon/gvfsbackendftp.c:1141
-#: ../daemon/gvfsbackendftp.c:1162 ../daemon/gvfsbackendmtp.c:1893
-#: ../daemon/gvfsbackendmtp.c:2151 ../daemon/gvfsbackendmtp.c:2241
-#: ../daemon/gvfsbackendmtp.c:2311 ../daemon/gvfsbackendsftp.c:1865
+#: ../daemon/gvfsbackendftp.c:1162 ../daemon/gvfsbackendmtp.c:1965
+#: ../daemon/gvfsbackendmtp.c:2231 ../daemon/gvfsbackendmtp.c:2321
+#: ../daemon/gvfsbackendmtp.c:2391 ../daemon/gvfsbackendsftp.c:1865
 #: ../daemon/gvfsbackendsftp.c:4859 ../daemon/gvfsbackendsmb.c:1861
-#: ../daemon/gvfsftptask.c:395
+#: ../daemon/gvfsftptask.c:402
 msgid "Operation unsupported"
 msgstr "Δεν υποστηρίζεται η λειτουργία"
 
@@ -765,8 +768,9 @@ msgid "Can't copy directory over directory"
 msgstr "Δεν είναι δυνατή η αντιγραφή καταλόγου πάνω σε κατάλογο"
 
 #: ../daemon/gvfsbackendafp.c:304 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackendftp.c:1502 ../daemon/gvfsbackendmtp.c:1608
-#: ../daemon/gvfsbackendmtp.c:1717 ../daemon/gvfsbackendobexftp.c:1821
+#: ../daemon/gvfsbackendftp.c:1502 ../daemon/gvfsbackendmtp.c:1630
+#: ../daemon/gvfsbackendmtp.c:1653 ../daemon/gvfsbackendmtp.c:1776
+#: ../daemon/gvfsbackendmtp.c:1800 ../daemon/gvfsbackendobexftp.c:1821
 msgid "Can't recursively copy directory"
 msgstr "Δεν είναι δυνατή η αντιγραφή καταλόγου αναδρομικά"
 
@@ -894,13 +898,13 @@ msgstr "Δεν υπάρχει τέτοιο αρχείο ή κατάλογος σ
 #: ../daemon/gvfsbackendobexftp.c:1814 ../daemon/gvfsbackendobexftp.c:1845
 #: ../daemon/gvfsbackendsftp.c:1863 ../daemon/gvfsbackendsftp.c:4667
 msgid "Target file exists"
-msgstr "Το τελικό αρχείο υπάρχει ήδη"
+msgstr "Το αρχείο προορισμού υπάρχει ήδη"
 
 #: ../daemon/gvfsbackendburn.c:949 ../daemon/gvfsbackendcomputer.c:811
 #: ../daemon/gvfsbackenddav.c:3128 ../daemon/gvfsbackenddav.c:3160
 #: ../daemon/gvfsbackendgphoto2.c:2537 ../daemon/gvfsbackendgphoto2.c:2750
 #: ../daemon/gvfsbackendgphoto2.c:2847 ../daemon/gvfsbackendgphoto2.c:2940
-#: ../daemon/gvfsbackendgphoto2.c:3548 ../daemon/gvfsbackendgphoto2.c:3558
+#: ../daemon/gvfsbackendgphoto2.c:3549 ../daemon/gvfsbackendgphoto2.c:3559
 #: ../daemon/gvfsbackendsftp.c:5499 ../daemon/gvfsbackendsftp.c:5531
 #: ../daemon/gvfsbackendsftp.c:6017
 msgid "Not supported"
@@ -1290,7 +1294,7 @@ msgstr "Σφάλμα λήψης αρχείου"
 msgid "Error getting data from file"
 msgstr "Σφάλμα λήψης δεδομένων από αρχείο"
 
-#: ../daemon/gvfsbackendgphoto2.c:1947 ../daemon/gvfsbackendmtp.c:2012
+#: ../daemon/gvfsbackendgphoto2.c:1947 ../daemon/gvfsbackendmtp.c:2092
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Κακοδιατυπωμένο αναγνωριστικό εικονιδίου '%s'"
@@ -1347,7 +1351,7 @@ msgstr "Ο κατάλογος '%s' δεν είναι άδειος"
 msgid "Error deleting directory"
 msgstr "Σφάλμα διαγραφής καταλόγου"
 
-#: ../daemon/gvfsbackendgphoto2.c:2897 ../daemon/gvfsbackendgphoto2.c:3634
+#: ../daemon/gvfsbackendgphoto2.c:2897 ../daemon/gvfsbackendgphoto2.c:3642
 msgid "Error deleting file"
 msgstr "Σφάλμα διαγραφής αρχείου"
 
@@ -1466,25 +1470,31 @@ msgstr "Δεν βρέθηκε το αρχείο"
 msgid "Cannot make directory in this location"
 msgstr "Αδύνατη η δημιουργία καταλόγου σε αυτήν την τοποθεσία"
 
-#: ../daemon/gvfsbackendmtp.c:1565 ../daemon/gvfsbackendmtp.c:1795
-#: ../daemon/gvfsbackendmtp.c:1842 ../daemon/gvfsbackendmtp.c:1911
-#: ../daemon/gvfsbackendmtp.c:2259 ../daemon/gvfsbackendmtp.c:2327
+#: ../daemon/gvfsbackendmtp.c:1574 ../daemon/gvfsbackendmtp.c:1867
+#: ../daemon/gvfsbackendmtp.c:1914 ../daemon/gvfsbackendmtp.c:1983
+#: ../daemon/gvfsbackendmtp.c:2339 ../daemon/gvfsbackendmtp.c:2407
 #: ../daemon/gvfsbackendsmbbrowse.c:1209
 msgid "Not a regular file"
 msgstr "Δεν είναι τυπικό αρχείο"
 
-#: ../daemon/gvfsbackendmtp.c:1672
+#: ../daemon/gvfsbackendmtp.c:1620 ../daemon/gvfsbackendmtp.c:1766
+#| msgid "Target %s is not a directory\n"
+msgid "Target is a directory"
+msgstr "Ο προορισμός είναι κατάλογος"
+
+#: ../daemon/gvfsbackendmtp.c:1625 ../daemon/gvfsbackendmtp.c:1771
+#| msgid "Create directories."
+msgid "Can't merge directories"
+msgstr "Αδυναμία συγχώνευσης καταλόγων"
+
+#: ../daemon/gvfsbackendmtp.c:1718 ../daemon/gvfsbackendmtp.c:2249
 msgid "Cannot write to this location"
 msgstr "Αδυναμία εγγραφής σε αυτήν τη θέση"
 
-#: ../daemon/gvfsbackendmtp.c:1994
+#: ../daemon/gvfsbackendmtp.c:2074
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "Χωρίς μικρογραφία για την οντότητα '%s'"
-
-#: ../daemon/gvfsbackendmtp.c:2169 ../daemon/gvfsftptask.c:411
-msgid "Invalid filename"
-msgstr "Άκυρο όνομα αρχείου"
 
 #: ../daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
@@ -1782,7 +1792,7 @@ msgid "Unexpected end of stream"
 msgstr "Αναπάντεχο τέλος της ροής"
 
 #: ../daemon/gvfsftpconnection.c:196 ../daemon/gvfsftpconnection.c:209
-#: ../daemon/gvfsftptask.c:415 ../daemon/gvfsftptask.c:843
+#: ../daemon/gvfsftptask.c:422 ../daemon/gvfsftptask.c:850
 msgid "Invalid reply"
 msgstr "Άκυρη απάντηση"
 
@@ -1802,39 +1812,43 @@ msgstr "Αποτυχία δημιουργίας ενεργής σύνδεσης 
 msgid "Filename contains invalid characters."
 msgstr "Το όνομα αρχείου περιέχει άκυρους χαρακτήρες."
 
-#: ../daemon/gvfsftptask.c:261
+#: ../daemon/gvfsftptask.c:268
 msgid "The FTP server is busy. Try again later"
 msgstr "Ο διακομιστής FTP είναι απασχολημένος. Προσπαθήστε ξανά αργότερα"
 
-#: ../daemon/gvfsftptask.c:359
+#: ../daemon/gvfsftptask.c:366
 msgid "Accounts are unsupported"
 msgstr "Δεν υποστηρίζονται λογαριασμοί"
 
-#: ../daemon/gvfsftptask.c:367
+#: ../daemon/gvfsftptask.c:374
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
 "Αδυναμία ανοίγματος σύνδεσης δεδομένων. Μήπως το τείχος προστασίας σας την "
 "εμποδίζει;"
 
-#: ../daemon/gvfsftptask.c:371
+#: ../daemon/gvfsftptask.c:378
 msgid "Data connection closed"
 msgstr "Η σύνδεση δεδομένων έκλεισε"
 
-#: ../daemon/gvfsftptask.c:378 ../daemon/gvfsftptask.c:382
+#: ../daemon/gvfsftptask.c:385 ../daemon/gvfsftptask.c:389
 msgid "Operation failed"
 msgstr "Αποτυχία λειτουργίας"
 
-#: ../daemon/gvfsftptask.c:387
+#: ../daemon/gvfsftptask.c:394
 msgid "No space left on server"
 msgstr "Δεν απέμεινε ελεύθερος χώρος στον διακομιστή"
 
-#: ../daemon/gvfsftptask.c:399
+#: ../daemon/gvfsftptask.c:406
 msgid "Unsupported network protocol"
 msgstr "Μη υποστηριζόμενο πρωτόκολλο δικτύου"
 
-#: ../daemon/gvfsftptask.c:407
+#: ../daemon/gvfsftptask.c:414
 msgid "Page type unknown"
 msgstr "Άγνωστος τύπος σελίδας"
+
+#: ../daemon/gvfsftptask.c:418
+msgid "Invalid filename"
+msgstr "Άκυρο όνομα αρχείου"
 
 #: ../daemon/gvfsjobmakesymlink.c:111
 msgid "Symlinks not supported by backend"
