@@ -205,7 +205,13 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
 
       task->conn = g_queue_pop_head (ftp->queue);
       if (task->conn != NULL)
-        break;
+        {
+          if (g_vfs_ftp_connection_is_usable (task->conn))
+            break;
+
+          g_vfs_ftp_connection_free (task->conn);
+          task->conn = NULL;
+        }
 
       if (ftp->connections < ftp->max_connections)
         {
