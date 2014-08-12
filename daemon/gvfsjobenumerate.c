@@ -164,6 +164,7 @@ send_infos (GVfsJobEnumerate *job)
                                       NULL);
   g_object_unref (proxy);
 
+  g_variant_builder_unref (job->building_infos);
   job->building_infos = NULL;
   job->n_building_infos = 0;
 }
