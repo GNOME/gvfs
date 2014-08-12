@@ -36,6 +36,7 @@ static gboolean backup = FALSE;
 static gboolean create = FALSE;
 static gboolean append = FALSE;
 static gboolean priv = FALSE;
+static gboolean replace_dest = FALSE;
 static gboolean print_etag = FALSE;
 static gboolean show_version = FALSE;
 
@@ -45,6 +46,7 @@ static GOptionEntry entries[] =
   { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Only create if not existing"), NULL },
   { "append", 'a', 0, G_OPTION_ARG_NONE, &append, N_("Append to end of file"), NULL },
   { "private", 'p', 0, G_OPTION_ARG_NONE, &priv, N_("When creating, restrict access to the current user"), NULL },
+  { "unlink", 'u', 0, G_OPTION_ARG_NONE, &replace_dest, N_("When replacing, replace as if the destination did not exist"), NULL },
   /* Translators: The "etag" is a token allowing to verify whether a file has been modified */
   { "print-etag", 'v', 0, G_OPTION_ARG_NONE, &print_etag, N_("Print new etag at end"), NULL },
   /* Translators: The "etag" is a token allowing to verify whether a file has been modified */
@@ -68,6 +70,7 @@ save (GFile *file)
   error = NULL;
 
   flags = priv ? G_FILE_CREATE_PRIVATE : G_FILE_CREATE_NONE;
+  flags |= replace_dest ? G_FILE_CREATE_REPLACE_DESTINATION : 0;
 
   if (create)
     out = (GOutputStream *)g_file_create (file, flags, NULL, &error);

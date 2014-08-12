@@ -95,6 +95,17 @@
                         </varlistentry>
 
                         <varlistentry>
+                                <term><option>-u</option>, <option>--unlink</option></term>
+
+                                <listitem>
+                                    <para>When replacing an existing file,
+                                        replace the destination as if it does
+                                        not exist.  Think of it as unlinking
+                                        the destination before writing.</para>
+                                </listitem>
+                        </varlistentry>
+
+                        <varlistentry>
                                 <term><option>-v</option>, <option>--print-etag</option></term>
 
                                 <listitem><para>Print the new etag at the end.</para></listitem>
