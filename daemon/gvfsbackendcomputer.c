@@ -358,6 +358,7 @@ recompute_files (GVfsBackendComputer *backend)
               file->prio = -3;
               files = g_list_prepend (files, file);
             }
+          g_list_free (volumes);
         }
       else
         {
