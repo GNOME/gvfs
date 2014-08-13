@@ -642,26 +642,28 @@ check_event (gpointer user_data)
         LIBMTP_mtpdevice_t *device = backend->device;
         LIBMTP_devicestorage_t *storage;
 
+        g_mutex_lock (&backend->mutex);
+
         int ret = LIBMTP_Get_Storage (device, LIBMTP_STORAGE_SORTBY_NOTSORTED);
         if (ret != 0) {
           LIBMTP_Dump_Errorstack (device);
           LIBMTP_Clear_Errorstack (device);
-          break;
-        }
-        g_mutex_lock (&backend->mutex);
-        for (storage = device->storage; storage != 0; storage = storage->next) {
-          if (storage->id == param1) {
-            char *storage_name = create_storage_name (storage);
-            char *path = g_build_filename ("/", storage_name, NULL);
-            g_free (storage_name);
+        } else {
+          for (storage = device->storage; storage != 0; storage = storage->next) {
+            if (storage->id == param1) {
+              char *storage_name = create_storage_name (storage);
+              char *path = g_build_filename ("/", storage_name, NULL);
+              g_free (storage_name);
 
-            add_cache_entry (G_VFS_BACKEND_MTP (backend),
-                             path,
-                             storage->id,
-                             -1);
-            g_hash_table_foreach (backend->monitors, emit_create_event, path);
+              add_cache_entry (G_VFS_BACKEND_MTP (backend),
+                              path,
+                              storage->id,
+                              -1);
+              g_hash_table_foreach (backend->monitors, emit_create_event, path);
+            }
           }
         }
+
         g_mutex_unlock (&backend->mutex);
         g_object_unref (backend);
         break;
@@ -1369,11 +1371,22 @@ do_query_info (GVfsBackend *backend,
     }
 
     LIBMTP_devicestorage_t *storage;
+    gboolean found = FALSE;
     for (storage = device->storage; storage != 0; storage = storage->next) {
       if (storage->id == entry->storage) {
         DEBUG ("(I) found storage %X\n", storage->id);
+        found = TRUE;
         get_storage_info (storage, info);
+        break;
       }
+    }
+
+    if (!found) {
+      DEBUG ("(W) storage %X not found?!\n", entry->storage);
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                _("Directory doesn't exist"));
+      goto exit;
     }
   } else {
     CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend),
