@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: gvfs gnome-2-32\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-07-05 09:21+0000\n"
-"PO-Revision-Date: 2014-07-05 13:48+0300\n"
+"POT-Creation-Date: 2014-08-15 09:22+0000\n"
+"PO-Revision-Date: 2014-08-15 23:51+0300\n"
 "Last-Translator: Aurimas Černius <aurisc4@gmail.com>\n"
 "Language-Team: Lietuvių <gnome-lt@lists.akl.lt>\n"
 "Language: lt\n"
@@ -54,13 +54,13 @@ msgstr "Nepavyko rasti tėvinio prijungimo taško"
 msgid "Invalid filename %s"
 msgstr "Netaisyklingas failo vardas „%s“"
 
-#: ../client/gdaemonfile.c:2672 ../client/gdaemonvfs.c:1254
-#: ../client/gdaemonvfs.c:1306
+#: ../client/gdaemonfile.c:2672 ../client/gdaemonvfs.c:1264
+#: ../client/gdaemonvfs.c:1316
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Klaida nustatant failo metaduomenis: %s"
 
-#: ../client/gdaemonfile.c:2673 ../client/gdaemonvfs.c:1307
+#: ../client/gdaemonfile.c:2673 ../client/gdaemonvfs.c:1317
 msgid "values must be string or list of strings"
 msgstr "reikšmės turi būti nurodytos kaip eilutė arba eilučių sąrašas"
 
@@ -109,8 +109,8 @@ msgstr "Klaida srauto protokole: %s"
 #: ../client/gdaemonfileinputstream.c:545
 #: ../client/gdaemonfileinputstream.c:1715
 #: ../client/gdaemonfileoutputstream.c:496
-#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:1874
-#: ../daemon/gvfsbackendmtp.c:2258
+#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2131
+#: ../daemon/gvfsbackendmtp.c:2515
 msgid "End of stream"
 msgstr "Srauto pabaiga"
 
@@ -123,7 +123,7 @@ msgstr "Pozicijos keitimas sraute nepalaikomas"
 msgid "Truncate not supported on stream"
 msgstr "Trumpinimas sraute nepalaikomas"
 
-#: ../client/gdaemonvfs.c:778
+#: ../client/gdaemonvfs.c:788
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Klaida gaunant prijungimo taško informaciją: %s"
@@ -230,21 +230,26 @@ msgstr "prijungimo taškas %s jau aktyvus"
 msgid "error starting mount daemon"
 msgstr "klaida paleidžiant prijungimo taškų tarnybą"
 
-#: ../daemon/gvfsafpconnection.c:764
+#: ../daemon/gvfsafpconnection.c:766
 msgid "The connection is not opened"
 msgstr "Ryšys neatvertas"
 
-#: ../daemon/gvfsafpconnection.c:771 ../daemon/gvfsbackendmtp.c:327
+#: ../daemon/gvfsafpconnection.c:773 ../daemon/gvfsbackendmtp.c:378
 msgid "The connection is closed"
 msgstr "Ryšys užvertas"
 
-#: ../daemon/gvfsafpconnection.c:1545
-msgid "Connection unexpectedly went down"
-msgstr "Ryšys netikėtai nutrūko"
-
-#: ../daemon/gvfsafpconnection.c:1572
+#: ../daemon/gvfsafpconnection.c:886 ../daemon/gvfsafpconnection.c:1592
 msgid "Got EOS"
 msgstr "Gautas EOS"
+
+#: ../daemon/gvfsafpconnection.c:1061 ../daemon/gvfsafpconnection.c:1102
+#: ../daemon/gvfsftptask.c:370
+msgid "Host closed connection"
+msgstr "Kompiuteris nutraukė ryšį"
+
+#: ../daemon/gvfsafpconnection.c:1565
+msgid "Connection unexpectedly went down"
+msgstr "Ryšys netikėtai nutrūko"
 
 #: ../daemon/gvfsafpserver.c:198 ../daemon/gvfsafpserver.c:480
 #, c-format
@@ -264,8 +269,8 @@ msgid "Unable to login to the server “%s” with the given password."
 msgstr "Nepavyko prisijungti prie serverio „%s“ su pateiktu slaptažodžiu."
 
 #: ../daemon/gvfsafpserver.c:428 ../daemon/gvfsafpserver.c:650
-#: ../daemon/gvfsafpserver.c:825 ../daemon/gvfsafpserver.c:873
-#: ../daemon/gvfsafpserver.c:989 ../daemon/gvfsafpserver.c:1672
+#: ../daemon/gvfsafpserver.c:826 ../daemon/gvfsafpserver.c:874
+#: ../daemon/gvfsafpserver.c:990 ../daemon/gvfsafpserver.c:1674
 #, c-format
 msgid "Unable to connect to the server “%s”. A communication problem occurred."
 msgstr "Nepavyko prisijungti prie serverio „%s“. Kilo komunikacijos problema."
@@ -289,7 +294,7 @@ msgstr ""
 "Prisijungimas prie serverio %s nepavyko. Nerastas tinkamas tapatybės "
 "patvirtinimo mechanizmas."
 
-#: ../daemon/gvfsafpserver.c:803
+#: ../daemon/gvfsafpserver.c:804
 #, c-format
 msgid ""
 "Unable to connect to the server “%s”. The server doesn't support AFP version "
@@ -298,51 +303,51 @@ msgstr ""
 "Nepavyko prisijungti prie serverio „%s“. Serveris nepalaiko AFP 3.0 ar "
 "vėlesnės versijos."
 
-#: ../daemon/gvfsafpserver.c:914
+#: ../daemon/gvfsafpserver.c:915
 #, c-format
 msgid "Permission denied."
 msgstr "Nėra leidimas."
 
-#: ../daemon/gvfsafpserver.c:919
+#: ../daemon/gvfsafpserver.c:920
 #, c-format
 msgid "The command is not supported by the server."
 msgstr "Serveris nepalaiko komandos."
 
-#: ../daemon/gvfsafpserver.c:923
+#: ../daemon/gvfsafpserver.c:924
 #, c-format
 msgid "Your password has expired."
 msgstr "Jūsų slaptažodžio galiojimas baigėsi."
 
-#: ../daemon/gvfsafpserver.c:927
+#: ../daemon/gvfsafpserver.c:928
 #, c-format
 msgid "Your password needs to be changed."
 msgstr "Reikia pakeisti slaptažodį."
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:1070
+#: ../daemon/gvfsafpserver.c:1071
 #, c-format
 msgid "Enter your password for the server “%s”."
 msgstr "Įveskite slaptažodį serveriui „%s“."
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:1073
+#: ../daemon/gvfsafpserver.c:1074
 #, c-format
 msgid "Enter your name and password for the server “%s”."
 msgstr "Įveskite savo vardą ir slaptažodį serveriui „%s“."
 
-#: ../daemon/gvfsafpserver.c:1105
+#: ../daemon/gvfsafpserver.c:1106
 msgid "The password prompt was cancelled."
 msgstr "Atsisakyta slaptažodžio dialogo."
 
-#: ../daemon/gvfsafpserver.c:1222
+#: ../daemon/gvfsafpserver.c:1224
 msgid "Unable to disconnect from the server."
 msgstr "Nepavyko atsijungti nuo serverio."
 
-#: ../daemon/gvfsafpserver.c:1364 ../daemon/gvfsafpserver.c:1763
+#: ../daemon/gvfsafpserver.c:1366 ../daemon/gvfsafpserver.c:1765
 msgid "Unable to connect to the server. A communication problem occurred."
 msgstr "Nepavyko prisijungti prie serverio. Kilo komunikacijos problema."
 
-#: ../daemon/gvfsafpserver.c:1719
+#: ../daemon/gvfsafpserver.c:1721
 msgid "Identification not found."
 msgstr "Identifikacija nerasta."
 
@@ -357,179 +362,180 @@ msgid "Got unknown error code %d from server"
 msgstr "Iš serverio gautas nežinomas klaidos kodas %d"
 
 #. Translators: first %s is volumename and second servername
-#: ../daemon/gvfsafpvolume.c:145
+#: ../daemon/gvfsafpvolume.c:154
 #, c-format
 msgid "Couldn't load %s on %s"
 msgstr "Nepavyko įkelti %s vietoje %s"
 
-#: ../daemon/gvfsafpvolume.c:393 ../daemon/gvfsafpvolume.c:663
-#: ../daemon/gvfsafpvolume.c:816 ../daemon/gvfsafpvolume.c:1010
-#: ../daemon/gvfsafpvolume.c:1212 ../daemon/gvfsafpvolume.c:1395
-#: ../daemon/gvfsafpvolume.c:1552 ../daemon/gvfsafpvolume.c:1998
-#: ../daemon/gvfsafpvolume.c:2126 ../daemon/gvfsafpvolume.c:2288
-#: ../daemon/gvfsafpvolume.c:2508 ../daemon/gvfsbackendafc.c:289
+#: ../daemon/gvfsafpvolume.c:402 ../daemon/gvfsafpvolume.c:672
+#: ../daemon/gvfsafpvolume.c:825 ../daemon/gvfsafpvolume.c:1019
+#: ../daemon/gvfsafpvolume.c:1221 ../daemon/gvfsafpvolume.c:1404
+#: ../daemon/gvfsafpvolume.c:1561 ../daemon/gvfsafpvolume.c:2007
+#: ../daemon/gvfsafpvolume.c:2135 ../daemon/gvfsafpvolume.c:2297
+#: ../daemon/gvfsafpvolume.c:2517 ../daemon/gvfsbackendafc.c:289
 #: ../daemon/gvfsbackendsftp.c:322 ../daemon/gvfsbackendsftp.c:1867
-#: ../daemon/gvfsftptask.c:403
+#: ../daemon/gvfsftptask.c:410
 msgid "Permission denied"
 msgstr "Leidimas neduotas"
 
-#: ../daemon/gvfsafpvolume.c:397 ../daemon/gvfsafpvolume.c:1718
-#: ../daemon/gvfsafpvolume.c:2512 ../daemon/gvfsbackendafc.c:991
+#: ../daemon/gvfsafpvolume.c:406 ../daemon/gvfsafpvolume.c:1727
+#: ../daemon/gvfsafpvolume.c:2521 ../daemon/gvfsbackendafc.c:991
 #: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:327
 #: ../daemon/gvfsbackendafpbrowse.c:359 ../daemon/gvfsbackendarchive.c:705
 #: ../daemon/gvfsbackendarchive.c:753 ../daemon/gvfsbackendarchive.c:805
 #: ../daemon/gvfsbackendarchive.c:834 ../daemon/gvfsbackendcdda.c:1022
-#: ../daemon/gvfsbackendcomputer.c:638 ../daemon/gvfsbackenddnssd.c:415
-#: ../daemon/gvfsbackendftp.c:1070 ../daemon/gvfsbackendnetwork.c:696
+#: ../daemon/gvfsbackendcomputer.c:639 ../daemon/gvfsbackenddnssd.c:415
+#: ../daemon/gvfsbackendftp.c:1073 ../daemon/gvfsbackendnetwork.c:696
 #: ../daemon/gvfsbackendsmbbrowse.c:1146 ../daemon/gvfsbackendsmbbrowse.c:1213
 #: ../daemon/gvfsbackendsmbbrowse.c:1400 ../daemon/gvfsbackendsmbbrowse.c:1473
 #, c-format
 msgid "File doesn't exist"
 msgstr "Failas neegzistuoja"
 
-#: ../daemon/gvfsafpvolume.c:401 ../daemon/gvfsafpvolume.c:2516
+#: ../daemon/gvfsafpvolume.c:410 ../daemon/gvfsafpvolume.c:2525
 #: ../daemon/gvfsbackendafp.c:288 ../daemon/gvfsbackendafp.c:491
 #: ../daemon/gvfsbackendafp.c:1350 ../daemon/gvfsbackenddav.c:2227
-#: ../daemon/gvfsbackenddav.c:3052 ../daemon/gvfsbackendftp.c:776
+#: ../daemon/gvfsbackenddav.c:3052 ../daemon/gvfsbackendftp.c:779
 #: ../daemon/gvfsbackendsftp.c:2379 ../daemon/gvfsbackendsftp.c:3120
 #: ../daemon/gvfsbackendsftp.c:3470 ../daemon/gvfsbackendsftp.c:4502
 #: ../daemon/gvfsbackendsftp.c:5385
 msgid "File is directory"
 msgstr "Failas yra aplankas"
 
-#: ../daemon/gvfsafpvolume.c:405
+#: ../daemon/gvfsafpvolume.c:414
 msgid "Too many files open"
 msgstr "Atverta per daug failų"
 
-#: ../daemon/gvfsafpvolume.c:667 ../daemon/gvfsafpvolume.c:824
+#: ../daemon/gvfsafpvolume.c:676 ../daemon/gvfsafpvolume.c:833
 msgid "Target file is open"
 msgstr "Paskirties failas atvertas"
 
-#: ../daemon/gvfsafpvolume.c:671 ../daemon/gvfsbackendburn.c:421
+#: ../daemon/gvfsafpvolume.c:680 ../daemon/gvfsbackendburn.c:421
 #: ../daemon/gvfsbackenddav.c:2617 ../daemon/gvfsbackendsftp.c:1861
 msgid "Directory not empty"
 msgstr "Aplankas netuščias"
 
-#: ../daemon/gvfsafpvolume.c:675
+#: ../daemon/gvfsafpvolume.c:684
 msgid "Target object is marked as not deletable (DeleteInhibit)"
 msgstr "Tikslo objektas pažymėtas kaip netrinamas (DeleteInhibit)"
 
-#: ../daemon/gvfsafpvolume.c:679 ../daemon/gvfsafpvolume.c:1228
-#: ../daemon/gvfsafpvolume.c:2130
+#: ../daemon/gvfsafpvolume.c:688 ../daemon/gvfsafpvolume.c:1237
+#: ../daemon/gvfsafpvolume.c:2139
 msgid "Target object doesn't exist"
 msgstr "Tikslo objektas neegzistuoja"
 
-#: ../daemon/gvfsafpvolume.c:683 ../daemon/gvfsafpvolume.c:836
-#: ../daemon/gvfsafpvolume.c:1032 ../daemon/gvfsafpvolume.c:1232
-#: ../daemon/gvfsafpvolume.c:2134
+#: ../daemon/gvfsafpvolume.c:692 ../daemon/gvfsafpvolume.c:845
+#: ../daemon/gvfsafpvolume.c:1041 ../daemon/gvfsafpvolume.c:1241
+#: ../daemon/gvfsafpvolume.c:2143
 msgid "Volume is read-only"
 msgstr "Laikmena yra tik skaitymui"
 
-#: ../daemon/gvfsafpvolume.c:820 ../daemon/gvfsafpvolume.c:1014
-#: ../daemon/gvfsafpvolume.c:1564 ../daemon/gvfsafpvolume.c:2002
-#: ../daemon/gvfsafpvolume.c:2646
+#: ../daemon/gvfsafpvolume.c:829 ../daemon/gvfsafpvolume.c:1023
+#: ../daemon/gvfsafpvolume.c:1573 ../daemon/gvfsafpvolume.c:2011
+#: ../daemon/gvfsafpvolume.c:2655
 msgid "Not enough space on volume"
 msgstr "Trūksta vietos laikmenoje"
 
-#: ../daemon/gvfsafpvolume.c:828 ../daemon/gvfsafpvolume.c:1411
-#: ../daemon/gvfsafpvolume.c:1568 ../daemon/gvfsbackendafp.c:295
+#: ../daemon/gvfsafpvolume.c:837 ../daemon/gvfsafpvolume.c:1420
+#: ../daemon/gvfsafpvolume.c:1577 ../daemon/gvfsbackendafp.c:295
 #: ../daemon/gvfsbackendafp.c:498 ../daemon/gvfsbackenddav.c:2282
 #: ../daemon/gvfsbackenddav.c:2579 ../daemon/gvfsbackenddav.c:2685
 #: ../daemon/gvfsbackenddav.c:2819 ../daemon/gvfsbackenddav.c:3043
-#: ../daemon/gvfsbackendftp.c:755 ../daemon/gvfsbackendftp.c:936
-#: ../daemon/gvfsbackendftp.c:1376 ../daemon/gvfsbackendftp.c:1484
-#: ../daemon/gvfsbackendmtp.c:1417 ../daemon/gvfsbackendmtp.c:1528
-#: ../daemon/gvfsbackendsftp.c:4511 ../daemon/gvfsbackendsmb.c:2217
+#: ../daemon/gvfsbackendftp.c:758 ../daemon/gvfsbackendftp.c:939
+#: ../daemon/gvfsbackendftp.c:1379 ../daemon/gvfsbackendftp.c:1487
+#: ../daemon/gvfsbackendmtp.c:1514 ../daemon/gvfsbackendmtp.c:1647
+#: ../daemon/gvfsbackendmtp.c:1794 ../daemon/gvfsbackendsftp.c:4511
+#: ../daemon/gvfsbackendsmb.c:2217
 msgid "Target file already exists"
 msgstr "Paskirties failas jau egzistuoja"
 
-#: ../daemon/gvfsafpvolume.c:832 ../daemon/gvfsafpvolume.c:1024
+#: ../daemon/gvfsafpvolume.c:841 ../daemon/gvfsafpvolume.c:1033
 msgid "Ancestor directory doesn't exist"
 msgstr "Aukštesnis katalogas neegzistuoja"
 
 #. Translators: flat means volume doesn't support directories
 #. (all files are in the volume root)
-#: ../daemon/gvfsafpvolume.c:1020
+#: ../daemon/gvfsafpvolume.c:1029
 msgid "Volume is flat and doesn't support directories"
 msgstr "Laikmena yra plokščia ir nepalaiko katalogų"
 
-#: ../daemon/gvfsafpvolume.c:1028
+#: ../daemon/gvfsafpvolume.c:1037
 msgid "Target directory already exists"
 msgstr "Paskirties katalogas jau yra"
 
-#: ../daemon/gvfsafpvolume.c:1216 ../daemon/gvfsbackendafp.c:603
+#: ../daemon/gvfsafpvolume.c:1225 ../daemon/gvfsbackendafp.c:603
 msgid "Can't rename volume"
 msgstr "Negalima pervadinti laikmenos"
 
-#: ../daemon/gvfsafpvolume.c:1220
+#: ../daemon/gvfsafpvolume.c:1229
 msgid "Object with that name already exists"
 msgstr "Objektas tokiu vardu jau yra"
 
-#: ../daemon/gvfsafpvolume.c:1224
+#: ../daemon/gvfsafpvolume.c:1233
 msgid "Target object is marked as not renameable (RenameInhibit)"
 msgstr "Tikslo objektas pažymėtas kaip nepervadinamas (RenameInhibit)"
 
-#: ../daemon/gvfsafpvolume.c:1399
+#: ../daemon/gvfsafpvolume.c:1408
 msgid "Can't move directory into one of its descendants"
 msgstr "Negalima perkelti aplanko į jo vaiką"
 
-#: ../daemon/gvfsafpvolume.c:1403
+#: ../daemon/gvfsafpvolume.c:1412
 msgid "Can't move sharepoint into a shared directory"
 msgstr "Negalima perkelti bendrinio į bendrinimo katalogą"
 
-#: ../daemon/gvfsafpvolume.c:1407
+#: ../daemon/gvfsafpvolume.c:1416
 msgid "Can't move a shared directory into the Trash"
 msgstr "Negalima perkelti bendrinamo katalogo į šiukšliadėžę"
 
-#: ../daemon/gvfsafpvolume.c:1415
+#: ../daemon/gvfsafpvolume.c:1424
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
 msgstr "Perkeliamas objektas pažymėtas kaip nepervadinamas (RenameInhibit)"
 
-#: ../daemon/gvfsafpvolume.c:1419
+#: ../daemon/gvfsafpvolume.c:1428
 msgid "Object being moved doesn't exist"
 msgstr "Perkeliamas objektas neegzistuoja"
 
-#: ../daemon/gvfsafpvolume.c:1556
+#: ../daemon/gvfsafpvolume.c:1565
 msgid "Server doesn't support the FPCopyFile operation"
 msgstr "Serveris nepalaiko operacijos FPCopyFile"
 
-#: ../daemon/gvfsafpvolume.c:1560
+#: ../daemon/gvfsafpvolume.c:1569
 msgid "Unable to open source file for reading"
 msgstr "Nepavyko atverti šaltinio failo skaitymui"
 
-#: ../daemon/gvfsafpvolume.c:1572
+#: ../daemon/gvfsafpvolume.c:1581
 msgid "Source file and/or destination directory doesn't exist"
 msgstr "Šaltinio failas ir (arba) paskirties katalogas neegzistuoja"
 
-#: ../daemon/gvfsafpvolume.c:1576
+#: ../daemon/gvfsafpvolume.c:1585
 msgid "Source file is a directory"
 msgstr "Šaltinio failas yra katalogas"
 
 #. Translators: range conflict means
 #. requested data are locked by another user
-#: ../daemon/gvfsafpvolume.c:2008
+#: ../daemon/gvfsafpvolume.c:2017
 msgid "Range lock conflict exists"
 msgstr "Yra rėžių rakinimo konfliktas"
 
-#: ../daemon/gvfsafpvolume.c:2292 ../daemon/gvfsbackendmtp.c:1199
-#: ../daemon/gvfsbackendmtp.c:1346 ../daemon/gvfsbackendmtp.c:1537
-#: ../daemon/gvfsbackendmtp.c:2000
+#: ../daemon/gvfsafpvolume.c:2301 ../daemon/gvfsbackendmtp.c:1367
+#: ../daemon/gvfsbackendmtp.c:1522 ../daemon/gvfsbackendmtp.c:1741
+#: ../daemon/gvfsbackendmtp.c:2257
 msgid "Directory doesn't exist"
 msgstr "Katalogas neegzistuoja"
 
-#: ../daemon/gvfsafpvolume.c:2296
+#: ../daemon/gvfsafpvolume.c:2305
 msgid "Target object is not a directory"
 msgstr "Paskirties objektas nėra katalogas"
 
-#: ../daemon/gvfsafpvolume.c:2642
+#: ../daemon/gvfsafpvolume.c:2651
 msgid "File is not open for write access"
 msgstr "Failas nėra atvertas rašymo prieiga"
 
-#: ../daemon/gvfsafpvolume.c:2650
+#: ../daemon/gvfsafpvolume.c:2659
 msgid "File is locked by another user"
 msgstr "Failas yra užrakintas kito naudotojo"
 
-#: ../daemon/gvfsafpvolume.c:2788
+#: ../daemon/gvfsafpvolume.c:2797
 msgid "File is not open for read access"
 msgstr "Failas nėra atvertas skaitymo prieiga"
 
@@ -537,10 +543,10 @@ msgstr "Failas nėra atvertas skaitymo prieiga"
 msgid "Internal Apple File Control error"
 msgstr "Vidinė Apple failų valdymo klaida"
 
-#: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:739
-#: ../daemon/gvfsbackendmtp.c:1392 ../daemon/gvfsbackendmtp.c:1430
-#: ../daemon/gvfsbackendmtp.c:1622 ../daemon/gvfsbackendmtp.c:1669
-#: ../daemon/gvfsbackendmtp.c:1739 ../daemon/gvfsbackendmtp.c:2077
+#: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:742
+#: ../daemon/gvfsbackendmtp.c:1569 ../daemon/gvfsbackendmtp.c:1585
+#: ../daemon/gvfsbackendmtp.c:1862 ../daemon/gvfsbackendmtp.c:1909
+#: ../daemon/gvfsbackendmtp.c:1978 ../daemon/gvfsbackendmtp.c:2334
 msgid "File does not exist"
 msgstr "Failas neegzistuoja"
 
@@ -669,13 +675,14 @@ msgstr ""
 "„Bandyti dar kartą“."
 
 #: ../daemon/gvfsbackendafc.c:981 ../daemon/gvfsbackendarchive.c:713
-#: ../daemon/gvfsbackendcomputer.c:656 ../daemon/gvfsbackendgphoto2.c:1848
-#: ../daemon/gvfsbackendobexftp.c:1099 ../daemon/gvfsbackendrecent.c:122
-#: ../daemon/gvfsbackendsmb.c:803 ../daemon/gvfsbackendtrash.c:234
+#: ../daemon/gvfsbackendcomputer.c:657 ../daemon/gvfsbackendgphoto2.c:1848
+#: ../daemon/gvfsbackendmtp.c:2000 ../daemon/gvfsbackendobexftp.c:1099
+#: ../daemon/gvfsbackendrecent.c:122 ../daemon/gvfsbackendsmb.c:803
+#: ../daemon/gvfsbackendtrash.c:234
 msgid "Can't open directory"
 msgstr "Nepavyko atverti aplanko"
 
-#: ../daemon/gvfsbackendafc.c:1184 ../daemon/gvfsbackendafc.c:2574
+#: ../daemon/gvfsbackendafc.c:1184 ../daemon/gvfsbackendafc.c:2578
 msgid "Backups are not yet supported."
 msgstr "Atsarginės kopijos dar nepalaikomos."
 
@@ -683,13 +690,13 @@ msgstr "Atsarginės kopijos dar nepalaikomos."
 msgid "Invalid seek type"
 msgstr "Netinkamas ieškos tipas"
 
-#: ../daemon/gvfsbackendafc.c:2411 ../daemon/gvfsbackendafp.c:1790
-#: ../daemon/gvfsbackendftp.c:1090 ../daemon/gvfsbackendftp.c:1138
-#: ../daemon/gvfsbackendftp.c:1159 ../daemon/gvfsbackendmtp.c:1726
-#: ../daemon/gvfsbackendmtp.c:1974 ../daemon/gvfsbackendmtp.c:2064
-#: ../daemon/gvfsbackendmtp.c:2134 ../daemon/gvfsbackendsftp.c:1865
+#: ../daemon/gvfsbackendafc.c:2415 ../daemon/gvfsbackendafp.c:1790
+#: ../daemon/gvfsbackendftp.c:1093 ../daemon/gvfsbackendftp.c:1141
+#: ../daemon/gvfsbackendftp.c:1162 ../daemon/gvfsbackendmtp.c:1965
+#: ../daemon/gvfsbackendmtp.c:2231 ../daemon/gvfsbackendmtp.c:2321
+#: ../daemon/gvfsbackendmtp.c:2391 ../daemon/gvfsbackendsftp.c:1865
 #: ../daemon/gvfsbackendsftp.c:4859 ../daemon/gvfsbackendsmb.c:1861
-#: ../daemon/gvfsftptask.c:395
+#: ../daemon/gvfsftptask.c:402
 msgid "Operation unsupported"
 msgstr "Operacija nepalaikoma"
 
@@ -709,7 +716,7 @@ msgstr "Šis failas nėra prijungiamas"
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: ../daemon/gvfsbackendafpbrowse.c:461 ../daemon/gvfsbackendafp.c:2113
-#: ../daemon/gvfsbackendftp.c:636 ../daemon/gvfsbackendobexftp.c:705
+#: ../daemon/gvfsbackendftp.c:639 ../daemon/gvfsbackendobexftp.c:705
 #: ../daemon/gvfsbackendsftp.c:1726 ../daemon/gvfsbackendsmb.c:584
 #: ../daemon/gvfsbackendsmb.c:1546
 #, c-format
@@ -723,23 +730,24 @@ msgid "%s"
 msgstr "%s"
 
 #: ../daemon/gvfsbackendafpbrowse.c:498 ../daemon/gvfsbackendafp.c:2148
-#: ../daemon/gvfsbackendarchive.c:596 ../daemon/gvfsbackendftp.c:670
+#: ../daemon/gvfsbackendarchive.c:596 ../daemon/gvfsbackendftp.c:673
 #: ../daemon/gvfsbackendsftp.c:1778
 msgid "No hostname specified"
 msgstr "Nenurodytas kompiuterio vardas"
 
-#: ../daemon/gvfsbackendafpbrowse.c:568 ../daemon/gvfsbackendafp.c:2240
+#: ../daemon/gvfsbackendafpbrowse.c:568 ../daemon/gvfsbackendafp.c:2243
 msgid "Apple Filing Protocol Service"
 msgstr "Apple siuntimo protokolo tarnyba"
 
 #: ../daemon/gvfsbackendafp.c:285 ../daemon/gvfsbackendburn.c:875
-#: ../daemon/gvfsbackendftp.c:1476 ../daemon/gvfsbackendobexftp.c:1806
+#: ../daemon/gvfsbackendftp.c:1479 ../daemon/gvfsbackendobexftp.c:1806
 msgid "Can't copy directory over directory"
 msgstr "Negalima kopijuoti aplanko ant aplanko"
 
 #: ../daemon/gvfsbackendafp.c:304 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackendftp.c:1499 ../daemon/gvfsbackendmtp.c:1440
-#: ../daemon/gvfsbackendmtp.c:1549 ../daemon/gvfsbackendobexftp.c:1821
+#: ../daemon/gvfsbackendftp.c:1502 ../daemon/gvfsbackendmtp.c:1630
+#: ../daemon/gvfsbackendmtp.c:1653 ../daemon/gvfsbackendmtp.c:1776
+#: ../daemon/gvfsbackendmtp.c:1800 ../daemon/gvfsbackendobexftp.c:1821
 msgid "Can't recursively copy directory"
 msgstr "Negalima rekursyviai kopijuoti aplanko"
 
@@ -762,7 +770,7 @@ msgstr "Nepavyko sukurti laikino failo (%s)"
 msgid "The file was externally modified"
 msgstr "Failas modifikuotas išorinės programos"
 
-#: ../daemon/gvfsbackendafp.c:1774 ../daemon/gvfsbackendftp.c:1131
+#: ../daemon/gvfsbackendafp.c:1774 ../daemon/gvfsbackendftp.c:1134
 #: ../daemon/gvfsbackendsftp.c:4869
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "Netinkamas požymio tipas (laukta uint32)"
@@ -787,8 +795,8 @@ msgid "/ on %s"
 msgstr "/ kompiuteryje %s"
 
 #: ../daemon/gvfsbackendarchive.c:843 ../daemon/gvfsbackendburn.c:679
-#: ../daemon/gvfsbackendcomputer.c:728 ../daemon/gvfsbackenddnssd.c:464
-#: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:744
+#: ../daemon/gvfsbackendcomputer.c:729 ../daemon/gvfsbackenddnssd.c:464
+#: ../daemon/gvfsbackendftp.c:354 ../daemon/gvfsbackendnetwork.c:744
 #: ../daemon/gvfsbackendsftp.c:4003 ../daemon/gvfsftpdircache.c:157
 msgid "The file is not a directory"
 msgstr "Failas nėra aplankas"
@@ -806,7 +814,7 @@ msgstr "Nepavyko sukurti laikino aplanko"
 #: ../daemon/gvfsbackendburn.c:447 ../daemon/gvfsbackendburn.c:671
 #: ../daemon/gvfsbackendburn.c:716 ../daemon/gvfsbackendburn.c:742
 #: ../daemon/gvfsbackendburn.c:780 ../daemon/gvfsbackendburn.c:971
-#: ../daemon/gvfsbackendburn.c:1007 ../daemon/gvfsbackendftp.c:796
+#: ../daemon/gvfsbackendburn.c:1007 ../daemon/gvfsbackendftp.c:799
 #: ../daemon/gvfsbackendgphoto2.c:1246 ../daemon/gvfsbackendgphoto2.c:2169
 #: ../daemon/gvfsbackendgphoto2.c:2887 ../daemon/gvfsbackendrecent.c:106
 #: ../daemon/gvfsbackendrecent.c:287 ../daemon/gvfsbackendsftp.c:1869
@@ -837,7 +845,7 @@ msgstr "Failas egzistuoja"
 #: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:121
 #: ../daemon/gvfsjobcreatemonitor.c:143 ../daemon/gvfsjobcreatemonitor.c:154
 #: ../daemon/gvfsjobcreatemonitor.c:177 ../daemon/gvfsjobcreatemonitor.c:195
-#: ../daemon/gvfsjobdelete.c:108 ../daemon/gvfsjobenumerate.c:271
+#: ../daemon/gvfsjobdelete.c:108 ../daemon/gvfsjobenumerate.c:272
 #: ../daemon/gvfsjobmakedirectory.c:108 ../daemon/gvfsjobmount.c:112
 #: ../daemon/gvfsjobmountmountable.c:138 ../daemon/gvfsjobmove.c:121
 #: ../daemon/gvfsjobopenforread.c:120 ../daemon/gvfsjobopenforwrite.c:184
@@ -869,11 +877,11 @@ msgstr "Paskirties kelyje nėra tokio failo ar aplanko"
 msgid "Target file exists"
 msgstr "Paskirties failas egzistuoja"
 
-#: ../daemon/gvfsbackendburn.c:949 ../daemon/gvfsbackendcomputer.c:811
+#: ../daemon/gvfsbackendburn.c:949 ../daemon/gvfsbackendcomputer.c:812
 #: ../daemon/gvfsbackenddav.c:3128 ../daemon/gvfsbackenddav.c:3160
 #: ../daemon/gvfsbackendgphoto2.c:2537 ../daemon/gvfsbackendgphoto2.c:2750
 #: ../daemon/gvfsbackendgphoto2.c:2847 ../daemon/gvfsbackendgphoto2.c:2940
-#: ../daemon/gvfsbackendgphoto2.c:3548 ../daemon/gvfsbackendgphoto2.c:3558
+#: ../daemon/gvfsbackendgphoto2.c:3549 ../daemon/gvfsbackendgphoto2.c:3559
 #: ../daemon/gvfsbackendsftp.c:5499 ../daemon/gvfsbackendsftp.c:5531
 #: ../daemon/gvfsbackendsftp.c:6017
 msgid "Not supported"
@@ -894,7 +902,7 @@ msgstr ""
 "Viena ar keletas programų naudoja šį skirsnį."
 
 #: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1555
-#: ../daemon/gvfsbackendmtp.c:698
+#: ../daemon/gvfsbackendmtp.c:848
 msgid "Cannot create gudev client"
 msgstr "Nepavyko sukurti gudev kliento"
 
@@ -977,54 +985,54 @@ msgstr "Failas neegzistuoja arba nėra audio takelis"
 msgid "Audio CD File System Service"
 msgstr "Audio CD failų sistemos tarnyba"
 
-#: ../daemon/gvfsbackendcomputer.c:198 ../daemon/gvfsbackendcomputer.c:770
+#: ../daemon/gvfsbackendcomputer.c:198 ../daemon/gvfsbackendcomputer.c:771
 msgid "Computer"
 msgstr "Kompiuteris"
 
-#: ../daemon/gvfsbackendcomputer.c:531
+#: ../daemon/gvfsbackendcomputer.c:532
 msgid "File System"
 msgstr "Failų sistema"
 
-#: ../daemon/gvfsbackendcomputer.c:660
+#: ../daemon/gvfsbackendcomputer.c:661
 msgid "Can't open mountable file"
 msgstr "Nepavyko atverti prijungiamo failo"
 
-#: ../daemon/gvfsbackendcomputer.c:857
+#: ../daemon/gvfsbackendcomputer.c:858
 #, c-format
 msgid "Internal error: %s"
 msgstr "Vidinė klaida: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:889 ../daemon/gvfsbackendcomputer.c:1007
+#: ../daemon/gvfsbackendcomputer.c:890 ../daemon/gvfsbackendcomputer.c:1008
 msgid "Can't mount file"
 msgstr "Nepavyko prijungti failo"
 
-#: ../daemon/gvfsbackendcomputer.c:900
+#: ../daemon/gvfsbackendcomputer.c:901
 msgid "No medium in the drive"
 msgstr "Įrenginyje nėra laikmenos"
 
-#: ../daemon/gvfsbackendcomputer.c:957 ../daemon/gvfsbackendcomputer.c:1052
-#: ../daemon/gvfsbackendcomputer.c:1158 ../daemon/gvfsbackendcomputer.c:1248
-#: ../daemon/gvfsbackendcomputer.c:1321 ../daemon/gvfsbackendcomputer.c:1390
+#: ../daemon/gvfsbackendcomputer.c:958 ../daemon/gvfsbackendcomputer.c:1053
+#: ../daemon/gvfsbackendcomputer.c:1159 ../daemon/gvfsbackendcomputer.c:1249
+#: ../daemon/gvfsbackendcomputer.c:1322 ../daemon/gvfsbackendcomputer.c:1391
 msgid "Not a mountable file"
 msgstr "Ne prijungiamas failas"
 
-#: ../daemon/gvfsbackendcomputer.c:1071
+#: ../daemon/gvfsbackendcomputer.c:1072
 msgid "Can't unmount file"
 msgstr "Nepavyko atjungti failo"
 
-#: ../daemon/gvfsbackendcomputer.c:1201
+#: ../daemon/gvfsbackendcomputer.c:1202
 msgid "Can't eject file"
 msgstr "Nepavyko išstumti failo"
 
-#: ../daemon/gvfsbackendcomputer.c:1268 ../daemon/gvfsbackendcomputer.c:1275
+#: ../daemon/gvfsbackendcomputer.c:1269 ../daemon/gvfsbackendcomputer.c:1276
 msgid "Can't start drive"
 msgstr "Nepavyko paleisti disko"
 
-#: ../daemon/gvfsbackendcomputer.c:1341 ../daemon/gvfsbackendcomputer.c:1348
+#: ../daemon/gvfsbackendcomputer.c:1342 ../daemon/gvfsbackendcomputer.c:1349
 msgid "Can't stop drive"
 msgstr "Nepavyko sustabdyti disko"
 
-#: ../daemon/gvfsbackendcomputer.c:1405 ../daemon/gvfsbackendcomputer.c:1412
+#: ../daemon/gvfsbackendcomputer.c:1406 ../daemon/gvfsbackendcomputer.c:1413
 msgid "Can't poll file"
 msgstr "Nepavyko apklausti failo"
 
@@ -1065,7 +1073,7 @@ msgstr "WebDAV viešinys"
 
 #. translators: %s here is the hostname
 #. Translators: %s is the hostname
-#: ../daemon/gvfsbackenddav.c:1532 ../daemon/gvfsbackendftp.c:493
+#: ../daemon/gvfsbackenddav.c:1532 ../daemon/gvfsbackendftp.c:496
 #: ../daemon/gvfsbackendsftp.c:980
 #, c-format
 msgid "Enter password for %s"
@@ -1090,7 +1098,6 @@ msgid "Backup file creation failed"
 msgstr "Atsarginio failo kūrimas nesėkmingas"
 
 #: ../daemon/gvfsbackenddav.c:2752
-#| msgid "Can't copy file over directory"
 msgid "Can't move over directory"
 msgstr "Negalima perkelti katalogo"
 
@@ -1117,21 +1124,21 @@ msgid "Network"
 msgstr "Tinklas"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:490 ../daemon/gvfsbackendsftp.c:973
+#: ../daemon/gvfsbackendftp.c:493 ../daemon/gvfsbackendsftp.c:973
 #, c-format
 msgid "Enter password for %s on %s"
 msgstr "Įveskite slaptažodį naudotojui %s serveryje %s"
 
-#: ../daemon/gvfsbackendftp.c:520 ../daemon/gvfsbackendsftp.c:997
+#: ../daemon/gvfsbackendftp.c:523 ../daemon/gvfsbackendsftp.c:997
 #: ../daemon/gvfsbackendsmbbrowse.c:1041 ../daemon/gvfsbackendsmb.c:667
 msgid "Password dialog cancelled"
 msgstr "Slaptažodžio dialogas atmestas"
 
-#: ../daemon/gvfsbackendftp.c:730
+#: ../daemon/gvfsbackendftp.c:733
 msgid "Insufficient permissions"
 msgstr "Nepakanka teisių"
 
-#: ../daemon/gvfsbackendftp.c:984 ../daemon/gvfsbackendftp.c:1339
+#: ../daemon/gvfsbackendftp.c:987 ../daemon/gvfsbackendftp.c:1342
 #: ../daemon/gvfsbackendsftp.c:3329 ../daemon/gvfsbackendsftp.c:3531
 msgid "backups not supported yet"
 msgstr "atsarginės kopijos dar nepalaikomos"
@@ -1187,7 +1194,7 @@ msgstr "Fotoaparatas"
 msgid "Audio Player"
 msgstr "Audio grotuvas"
 
-#: ../daemon/gvfsbackendgphoto2.c:1611 ../daemon/gvfsbackendmtp.c:690
+#: ../daemon/gvfsbackendgphoto2.c:1611 ../daemon/gvfsbackendmtp.c:840
 msgid "No device specified"
 msgstr "Nenurodytas įrenginys"
 
@@ -1242,7 +1249,7 @@ msgstr "Klaida gaunant failą"
 msgid "Error getting data from file"
 msgstr "Klaida gaunant duomenis iš failo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1947 ../daemon/gvfsbackendmtp.c:1835
+#: ../daemon/gvfsbackendgphoto2.c:1947 ../daemon/gvfsbackendmtp.c:2092
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Netaisyklingas piktogramos identifikatorius „%s“"
@@ -1294,7 +1301,7 @@ msgstr "Aplankas „%s“ netuščias"
 msgid "Error deleting directory"
 msgstr "Klaida trinant aplanką"
 
-#: ../daemon/gvfsbackendgphoto2.c:2897 ../daemon/gvfsbackendgphoto2.c:3634
+#: ../daemon/gvfsbackendgphoto2.c:2897 ../daemon/gvfsbackendgphoto2.c:3642
 msgid "Error deleting file"
 msgstr "Klaida trinant failą"
 
@@ -1348,84 +1355,90 @@ msgstr "HTTP kliento klaida: %s"
 msgid "Directory notification not supported"
 msgstr "Aplankų pranešimas nepalaikomas"
 
-#: ../daemon/gvfsbackendmtp.c:505
+#: ../daemon/gvfsbackendmtp.c:556
 msgid "Unknown error."
 msgstr "Nežinoma klaida."
 
-#: ../daemon/gvfsbackendmtp.c:511
+#: ../daemon/gvfsbackendmtp.c:562
 #, c-format
 msgid "libmtp error: %s"
 msgstr "libtmp klaida: %s"
 
-#: ../daemon/gvfsbackendmtp.c:644
+#: ../daemon/gvfsbackendmtp.c:794
 msgid "Unexpected host URI format."
 msgstr "Netikėtas kompiuterio URI formatas."
 
-#: ../daemon/gvfsbackendmtp.c:654
+#: ../daemon/gvfsbackendmtp.c:804
 msgid "Malformed host URI."
 msgstr "Blogai suformuotas kompiuterio URI."
 
-#: ../daemon/gvfsbackendmtp.c:667
+#: ../daemon/gvfsbackendmtp.c:817
 msgid "Couldn't find matching udev device."
 msgstr "Nepavyko rasti atitinkamo udev įrenginio."
 
-#: ../daemon/gvfsbackendmtp.c:811
+#: ../daemon/gvfsbackendmtp.c:972
 msgid "No MTP devices found"
 msgstr "Nerasta MTP įrenginių"
 
-#: ../daemon/gvfsbackendmtp.c:816
+#: ../daemon/gvfsbackendmtp.c:977
 msgid "Unable to connect to MTP device"
 msgstr "Nepavyko prijungti MTP įrenginio"
 
-#: ../daemon/gvfsbackendmtp.c:821
+#: ../daemon/gvfsbackendmtp.c:982
 msgid "Unable to allocate memory while detecting MTP devices"
 msgstr "Nepavyko išskirti atminties aptinkant MTP įrenginius"
 
-#: ../daemon/gvfsbackendmtp.c:827
+#: ../daemon/gvfsbackendmtp.c:988
 msgid "Generic libmtp error"
 msgstr "Bendrinė libtmp klaida"
 
-#: ../daemon/gvfsbackendmtp.c:844
+#: ../daemon/gvfsbackendmtp.c:1005
 #, c-format
 msgid "Unable to open MTP device '%s'"
 msgstr "Nepavyko atverti MTP įrenginio „%s“"
 
-#: ../daemon/gvfsbackendmtp.c:864
+#: ../daemon/gvfsbackendmtp.c:1025
 msgid "Device not found"
 msgstr "Įrenginys nerastas"
 
-#: ../daemon/gvfsbackendmtp.c:903
+#: ../daemon/gvfsbackendmtp.c:1064
 msgid "Unnamed Device"
 msgstr "Nepavadintas įrenginys"
 
-#: ../daemon/gvfsbackendmtp.c:1125 ../daemon/gvfsbackendmtp.c:1218
-#: ../daemon/gvfsbackendmtp.c:1272
+#: ../daemon/gvfsbackendmtp.c:1293 ../daemon/gvfsbackendmtp.c:1386
+#: ../daemon/gvfsbackendmtp.c:1440
 msgid "File not found"
 msgstr "Nerastas failas"
 
-#: ../daemon/gvfsbackendmtp.c:1335
+#: ../daemon/gvfsbackendmtp.c:1503
 msgid "Cannot make directory in this location"
 msgstr "Negalima šioje vietoje sukurti katalogo"
 
-#: ../daemon/gvfsbackendmtp.c:1397 ../daemon/gvfsbackendmtp.c:1627
-#: ../daemon/gvfsbackendmtp.c:1674 ../daemon/gvfsbackendmtp.c:1744
-#: ../daemon/gvfsbackendmtp.c:2082 ../daemon/gvfsbackendmtp.c:2150
+#: ../daemon/gvfsbackendmtp.c:1574 ../daemon/gvfsbackendmtp.c:1867
+#: ../daemon/gvfsbackendmtp.c:1914 ../daemon/gvfsbackendmtp.c:1983
+#: ../daemon/gvfsbackendmtp.c:2339 ../daemon/gvfsbackendmtp.c:2407
 #: ../daemon/gvfsbackendsmbbrowse.c:1209
 msgid "Not a regular file"
 msgstr "Ne paprastas failas"
 
-#: ../daemon/gvfsbackendmtp.c:1504
+#: ../daemon/gvfsbackendmtp.c:1620 ../daemon/gvfsbackendmtp.c:1766
+#| msgid "Target %s is not a directory\n"
+msgid "Target is a directory"
+msgstr "Paskirtis yra aplankas"
+
+#: ../daemon/gvfsbackendmtp.c:1625 ../daemon/gvfsbackendmtp.c:1771
+#| msgid "Create directories."
+msgid "Can't merge directories"
+msgstr "Negalima apjungti aplankų"
+
+#: ../daemon/gvfsbackendmtp.c:1718 ../daemon/gvfsbackendmtp.c:2249
 msgid "Cannot write to this location"
 msgstr "Negalima rašyti šioje vietoje"
 
-#: ../daemon/gvfsbackendmtp.c:1816
+#: ../daemon/gvfsbackendmtp.c:2074
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "Nėra miniatiūros elementui „%s“"
-
-#: ../daemon/gvfsbackendmtp.c:1992 ../daemon/gvfsftptask.c:411
-msgid "Invalid filename"
-msgstr "Netaisyklingas failo vardas"
 
 #: ../daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
@@ -1559,7 +1572,6 @@ msgstr "Ryšys užvertas (apačioje esantis SSH procesas nutrūko)"
 
 #: ../daemon/gvfsbackendsftp.c:1175
 #, c-format
-#| msgid "Internal error: %s"
 msgid "Internal error: Unknown Error"
 msgstr "Vidinė klaida: nežinoma klaida"
 
@@ -1713,7 +1725,7 @@ msgid "Unexpected end of stream"
 msgstr "Netikėta srauto pabaiga"
 
 #: ../daemon/gvfsftpconnection.c:196 ../daemon/gvfsftpconnection.c:209
-#: ../daemon/gvfsftptask.c:415 ../daemon/gvfsftptask.c:843
+#: ../daemon/gvfsftptask.c:422 ../daemon/gvfsftptask.c:850
 msgid "Invalid reply"
 msgstr "Netaisyklingas atsakymas"
 
@@ -1732,41 +1744,41 @@ msgstr "Nepavyko sukurti aktyvaus FTP ryšio."
 msgid "Filename contains invalid characters."
 msgstr "Failo varde yra neleistinų simbolių."
 
-#: ../daemon/gvfsftptask.c:261
+#: ../daemon/gvfsftptask.c:268
 msgid "The FTP server is busy. Try again later"
 msgstr "FTP serveris užimtas. Bandykite vėliau"
 
-#: ../daemon/gvfsftptask.c:359
+#: ../daemon/gvfsftptask.c:366
 msgid "Accounts are unsupported"
 msgstr "Paskyros nepalaikomos"
 
-#: ../daemon/gvfsftptask.c:363
-msgid "Host closed connection"
-msgstr "Kompiuteris nutraukė ryšį"
-
-#: ../daemon/gvfsftptask.c:367
+#: ../daemon/gvfsftptask.c:374
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "Nepavyko atverti duomenų ryšio. Gal tai draudžia jūsų užkarda?"
 
-#: ../daemon/gvfsftptask.c:371
+#: ../daemon/gvfsftptask.c:378
 msgid "Data connection closed"
 msgstr "Duomenų ryšys nutrauktas"
 
-#: ../daemon/gvfsftptask.c:378 ../daemon/gvfsftptask.c:382
+#: ../daemon/gvfsftptask.c:385 ../daemon/gvfsftptask.c:389
 msgid "Operation failed"
 msgstr "Operacija nesėkminga"
 
-#: ../daemon/gvfsftptask.c:387
+#: ../daemon/gvfsftptask.c:394
 msgid "No space left on server"
 msgstr "Serveryje neliko laisvos vietos"
 
-#: ../daemon/gvfsftptask.c:399
+#: ../daemon/gvfsftptask.c:406
 msgid "Unsupported network protocol"
 msgstr "Nepalaikomas tinklo protokolas"
 
-#: ../daemon/gvfsftptask.c:407
+#: ../daemon/gvfsftptask.c:414
 msgid "Page type unknown"
 msgstr "Puslapio tipas nežinomas"
+
+#: ../daemon/gvfsftptask.c:418
+msgid "Invalid filename"
+msgstr "Netaisyklingas failo vardas"
 
 #: ../daemon/gvfsjobmakesymlink.c:111
 msgid "Symlinks not supported by backend"
@@ -1803,7 +1815,6 @@ msgid "Don't start fuse."
 msgstr "Nepaleisti fuse."
 
 #: ../daemon/main.c:145 ../metadata/meta-daemon.c:484
-#| msgid "Show progress"
 msgid "Show program version."
 msgstr "Rodyti programos versiją."
 
@@ -1831,7 +1842,7 @@ msgstr "%s: %s"
 #: ../programs/gvfs-monitor-file.c:126 ../programs/gvfs-mount.c:1088
 #: ../programs/gvfs-move.c:142 ../programs/gvfs-open.c:78
 #: ../programs/gvfs-open.c:96 ../programs/gvfs-rename.c:82
-#: ../programs/gvfs-rm.c:72 ../programs/gvfs-save.c:178
+#: ../programs/gvfs-rm.c:72 ../programs/gvfs-save.c:181
 #: ../programs/gvfs-set-attribute.c:151 ../programs/gvfs-trash.c:106
 #: ../programs/gvfs-tree.c:263
 #, c-format
@@ -2405,10 +2416,9 @@ msgstr "GVfs UDisks2 tomų stebyklė"
 #: ../programs/gvfs-monitor-dir.c:41 ../programs/gvfs-monitor-file.c:41
 #: ../programs/gvfs-mount.c:68 ../programs/gvfs-move.c:47
 #: ../programs/gvfs-open.c:38 ../programs/gvfs-rename.c:34
-#: ../programs/gvfs-rm.c:36 ../programs/gvfs-save.c:52
+#: ../programs/gvfs-rm.c:36 ../programs/gvfs-save.c:54
 #: ../programs/gvfs-set-attribute.c:39 ../programs/gvfs-trash.c:71
 #: ../programs/gvfs-tree.c:39
-#| msgid "Show progress"
 msgid "Show program version"
 msgstr "Rodyti programos versiją"
 
@@ -2475,7 +2485,7 @@ msgstr ""
 #: ../programs/gvfs-monitor-dir.c:125 ../programs/gvfs-monitor-file.c:124
 #: ../programs/gvfs-mount.c:1086 ../programs/gvfs-move.c:140
 #: ../programs/gvfs-open.c:76 ../programs/gvfs-rename.c:80
-#: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:176
+#: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:179
 #: ../programs/gvfs-set-attribute.c:149 ../programs/gvfs-trash.c:104
 #: ../programs/gvfs-tree.c:261
 #, c-format
@@ -2506,7 +2516,7 @@ msgid "Preserve all attributes"
 msgstr "Išsaugoti visus atributus"
 
 #: ../programs/gvfs-copy.c:49 ../programs/gvfs-move.c:46
-#: ../programs/gvfs-save.c:44
+#: ../programs/gvfs-save.c:45
 msgid "Backup existing destination files"
 msgstr "Sukurti esamų paskirties failų atsarginę kopiją"
 
@@ -2524,7 +2534,7 @@ msgid "SOURCE"
 msgstr "ŠALTINIS"
 
 #: ../programs/gvfs-copy.c:134 ../programs/gvfs-move.c:130
-#: ../programs/gvfs-save.c:165
+#: ../programs/gvfs-save.c:168
 msgid "DEST"
 msgstr "TIKSLAS"
 
@@ -2548,7 +2558,6 @@ msgstr "Paskirtis %s nėra aplankas\n"
 
 #: ../programs/gvfs-copy.c:222 ../programs/gvfs-move.c:213
 #, c-format
-#| msgid "overwrite %s?"
 msgid "%s: overwrite ‘%s’? "
 msgstr "%s: perrašyti „%s“?"
 
@@ -2955,53 +2964,57 @@ msgstr "Nepaisyti nesančių failų, niekada neklausti"
 msgid "Delete the given files."
 msgstr "Ištrinti pateiktus failus."
 
-#: ../programs/gvfs-save.c:45
+#: ../programs/gvfs-save.c:46
 msgid "Only create if not existing"
 msgstr "Sukurti tik jei neegzistuoja"
 
-#: ../programs/gvfs-save.c:46
+#: ../programs/gvfs-save.c:47
 msgid "Append to end of file"
 msgstr "Įrašyti failo gale"
 
-#: ../programs/gvfs-save.c:47
+#: ../programs/gvfs-save.c:48
 msgid "When creating, restrict access to the current user"
 msgstr "Kuriant failus apriboti prieigą tik iki dabartinio naudotojo"
 
-#. Translators: The "etag" is a token allowing to verify whether a file has been modified
 #: ../programs/gvfs-save.c:49
+msgid "When replacing, replace as if the destination did not exist"
+msgstr "Keičiant, pakeisti tarsi paskirtis neegzistuoja"
+
+#. Translators: The "etag" is a token allowing to verify whether a file has been modified
+#: ../programs/gvfs-save.c:51
 msgid "Print new etag at end"
 msgstr "Spausdinti naują etag pabaigoje"
 
 #. Translators: The "etag" is a token allowing to verify whether a file has been modified
-#: ../programs/gvfs-save.c:51
+#: ../programs/gvfs-save.c:53
 msgid "The etag of the file being overwritten"
 msgstr "Perrašomo failo etag"
 
-#: ../programs/gvfs-save.c:51
+#: ../programs/gvfs-save.c:53
 msgid "ETAG"
 msgstr "ETAG"
 
-#: ../programs/gvfs-save.c:80
+#: ../programs/gvfs-save.c:83
 #, c-format
 msgid "Error opening file: %s\n"
 msgstr "Klaida atveriant failą: %s\n"
 
-#: ../programs/gvfs-save.c:113
+#: ../programs/gvfs-save.c:116
 msgid "Error reading stdin"
 msgstr "Klaida skaitant standartinę įvestį"
 
-#: ../programs/gvfs-save.c:126
+#: ../programs/gvfs-save.c:129
 #, c-format
 msgid "Error closing: %s\n"
 msgstr "Klaida užveriant: %s\n"
 
 #. Translators: The "etag" is a token allowing to verify whether a file has been modified
-#: ../programs/gvfs-save.c:139
+#: ../programs/gvfs-save.c:142
 #, c-format
 msgid "Etag not available\n"
 msgstr "Etag neprieinama\n"
 
-#: ../programs/gvfs-save.c:166
+#: ../programs/gvfs-save.c:169
 msgid "Read from standard input and save to DEST."
 msgstr "Skaityti iš standartinės įvesties ir įrašyti į PASKIRTĮ."
 
@@ -3067,4 +3080,3 @@ msgstr "Sekti simbolinėmis nuorodomis, prijungimo vietomis ir trumpiniais"
 #: ../programs/gvfs-tree.c:250
 msgid "List contents of directories in a tree-like format."
 msgstr "Rodyti aplankų turinį medžio formatu."
-
