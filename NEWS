@@ -1,3 +1,21 @@
+Major changes in 1.21.90
+========================
+* gvfs-save: Allow specifying G_FILE_CREATE_REPLACE_DESTINATION
+* dav: Send infos incrementally
+* ftp: Timeouted and closed connection handling improvements
+* fuse: Error mapping fixes
+* daemon: Wait to finish all jobs before unmount
+* afp: Timeouted and closed connection handling improvements
+* http: Limit maximal number of connections
+* http: Reuse idle connections
+* mtp: Error semantics and handling fixes
+* mtp: Fix icon handling
+* mtp: Support for create and delete events
+q* mtp: Use unique storage name
+* mtp: Various fixes
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.21.4
 ========================
 * afp: Fix hangs while enumerating large directories
