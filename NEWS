@@ -1,3 +1,15 @@
+Major changes in 1.20.3
+=======================
+* Fix several memory leaks
+* afc: Force unmount properly
+* afc: Add version detection for newer iOS
+* afp: Fix a race that caused hangs
+* afp & ftp: Handle idle connections better
+* ftp: Fix CHMOD against some servers
+* archive: Fix a couple of segfaults on certain archives
+* gphoto: Set mtime when copying to a local disk
+* Several smaller bugfixes
+
 Major changes in 1.20.2
 =======================
 * afc: Fix problems when mount devices with older iOS
