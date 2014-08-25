@@ -232,7 +232,7 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
               g_vfs_ftp_task_login (task, ftp->user, ftp->password);
               g_vfs_ftp_task_setup_connection (task);
               if (G_LIKELY (!g_vfs_ftp_task_is_in_error (task)))
-                break;
+                goto out_unlocked;
 
               g_vfs_ftp_connection_free (task->conn);
               task->conn = NULL;
@@ -269,8 +269,9 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
           break;
         }
     }
-  g_cancellable_disconnect (task->cancellable, id);
   g_mutex_unlock (&ftp->mutex);
+out_unlocked:
+  g_cancellable_disconnect (task->cancellable, id);
 
   return task->conn != NULL;
 }
