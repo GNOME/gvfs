@@ -1018,7 +1018,18 @@ ms_response_to_file_info (MsResponse *response,
             }
           else if (node_has_name (node, "getcontenttype"))
             {
+              char *ptr;
+
               mime_type = g_strdup (text);
+
+              /* Ignore parameters of the content type */
+              ptr = strchr (mime_type, ';');
+              if (ptr)
+                {
+                  do
+                    *ptr-- = '\0';
+                  while (ptr >= mime_type && g_ascii_isspace (*ptr));
+                }
             }
           else if (node_has_name (node, "getcontentlength"))
             {
