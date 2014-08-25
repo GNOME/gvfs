@@ -1741,6 +1741,8 @@ static void
 dns_sd_resolver_changed (GVfsDnsSdResolver *resolver,
                          GVfsBackendDav    *dav_backend)
 {
+  /* If anything has changed (e.g. address, port, txt-records or is-resolved),
+   * it is safest to just unmount. */
   g_vfs_backend_force_unmount (G_VFS_BACKEND (dav_backend));
 }
 #endif
