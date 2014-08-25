@@ -286,21 +286,17 @@ archive_file_get_from_path (ArchiveFile *file, const char *filename, gboolean ad
       if (cur == NULL && add != FALSE)
 	{
 	  DEBUG ("adding node %s to %s\n", names[i], file->name);
-	  /* (hopefully) clever trick to avoid string copy */
 	  if (names[i][0] != 0 &&
               strcmp (names[i], ".") != 0)
 	    {
 	      cur = g_slice_new0 (ArchiveFile);
-	      cur->name = names[i];
-	      names[i] = NULL;
+	      cur->name = g_strdup (names[i]);
 	      file->children = g_slist_prepend (file->children, cur);
 	    }
 	  else
 	    {
 	      /* Ignore empty elements from directories ending with a slash.
 	       * Ignore elements consisting of a single "." */
-	      g_free (names[i]);
-	      names[i] = NULL;
 	      cur = file;
 	    }
 	}
@@ -646,6 +642,7 @@ do_mount (GVfsBackend *backend,
   filename = g_file_get_uri (archive->file);
   DEBUG ("mounted %s\n", filename);
   s = g_uri_escape_string (filename, NULL, FALSE);
+  g_free (filename);
   mount_spec = g_mount_spec_new ("archive");
   g_mount_spec_set (mount_spec, "host", s);
   g_free (s);
