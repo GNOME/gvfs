@@ -1,3 +1,11 @@
+Major changes in 1.21.91
+========================
+* ftp: Fix crashing with latest glib
+* tests: Gnome desktop testing integration
+* dav: Force unmount when dns-sd data changes
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.21.90
 ========================
 * gvfs-save: Allow specifying G_FILE_CREATE_REPLACE_DESTINATION
@@ -11,12 +19,12 @@ Major changes in 1.21.90
 * mtp: Error semantics and handling fixes
 * mtp: Fix icon handling
 * mtp: Support for create and delete events
-q* mtp: Use unique storage name
+* mtp: Use unique storage name
 * mtp: Various fixes
 * Several smaller bugfixes
 * Translation updates
 
-Major changes in 1.21.4
+Majorjhbuild  changes in 1.21.4
 ========================
 * afp: Fix hangs while enumerating large directories
 * afp: Performance improvement
