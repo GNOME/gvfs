@@ -2361,13 +2361,18 @@ meta_tree_unset (MetaTree                         *tree,
   entry = meta_journal_entry_new_unset (mtime, path, key);
 
   res = TRUE;
- retry:
   if (!meta_journal_add_entry (tree->journal, entry))
     {
       if (meta_tree_flush_locked (tree))
-	goto retry;
-
-      res = FALSE;
+        {
+	  if (!meta_journal_add_entry (tree->journal, entry))
+	  {
+	    g_warning ("meta_tree_unset: entry is bigger then the size of journal\n");
+	    res = FALSE;
+	  }
+	}
+      else
+        res = FALSE;
     }
 
   g_string_free (entry, TRUE);
@@ -2401,13 +2406,18 @@ meta_tree_set_string (MetaTree                         *tree,
   entry = meta_journal_entry_new_set (mtime, path, key, value);
 
   res = TRUE;
- retry:
   if (!meta_journal_add_entry (tree->journal, entry))
     {
       if (meta_tree_flush_locked (tree))
-	goto retry;
-
-      res = FALSE;
+        {
+	  if (!meta_journal_add_entry (tree->journal, entry))
+	  {
+	    g_warning ("meta_tree_set_string: entry is bigger then the size of journal\n");
+	    res = FALSE;
+	  }
+	}
+      else
+        res = FALSE;
     }
 
   g_string_free (entry, TRUE);
@@ -2441,13 +2451,18 @@ meta_tree_set_stringv (MetaTree                         *tree,
   entry = meta_journal_entry_new_setv (mtime, path, key, value);
 
   res = TRUE;
- retry:
   if (!meta_journal_add_entry (tree->journal, entry))
     {
       if (meta_tree_flush_locked (tree))
-	goto retry;
-
-      res = FALSE;
+        {
+	  if (!meta_journal_add_entry (tree->journal, entry))
+	  {
+	    g_warning ("meta_tree_set_stringv: entry is bigger then the size of journal\n");
+	    res = FALSE;
+	  }
+	}
+      else
+        res = FALSE;
     }
 
   g_string_free (entry, TRUE);
@@ -2479,13 +2494,18 @@ meta_tree_remove (MetaTree *tree,
   entry = meta_journal_entry_new_remove (mtime, path);
 
   res = TRUE;
- retry:
   if (!meta_journal_add_entry (tree->journal, entry))
     {
       if (meta_tree_flush_locked (tree))
-	goto retry;
-
-      res = FALSE;
+        {
+	  if (!meta_journal_add_entry (tree->journal, entry))
+	  {
+	    g_warning ("meta_tree_remove: entry is bigger then the size of journal\n");
+	    res = FALSE;
+	  }
+	}
+      else
+        res = FALSE;
     }
 
   g_string_free (entry, TRUE);
@@ -2518,13 +2538,18 @@ meta_tree_copy (MetaTree                         *tree,
   entry = meta_journal_entry_new_copy (mtime, src, dest);
 
   res = TRUE;
- retry:
   if (!meta_journal_add_entry (tree->journal, entry))
     {
       if (meta_tree_flush_locked (tree))
-	goto retry;
-
-      res = FALSE;
+        {
+	  if (!meta_journal_add_entry (tree->journal, entry))
+	  {
+	    g_warning ("meta_tree_copy: entry is bigger then the size of journal\n");
+	    res = FALSE;
+	  }
+	}
+      else
+        res = FALSE;
     }
 
   g_string_free (entry, TRUE);
