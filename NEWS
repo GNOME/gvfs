@@ -1,3 +1,11 @@
+Major changes in 1.21.91
+========================
+* ftp: Fix crashing with latest glib
+* tests: Gnome desktop testing integration
+* dav: Force unmount when dns-sd data changes
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.21.90
 ========================
 * gvfs-save: Allow specifying G_FILE_CREATE_REPLACE_DESTINATION
