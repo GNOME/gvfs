@@ -133,6 +133,14 @@ g_vfs_afp_volume_mount_sync (GVfsAfpVolume *volume,
   if (res_code != AFP_RESULT_NO_ERROR)
   {
     g_object_unref (reply);
+
+    if (res_code == AFP_RESULT_OBJECT_NOT_FOUND)
+    {
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                           _("Volume doesn't exist"));
+      return FALSE;
+    }
+
     goto generic_error;
   }
   
