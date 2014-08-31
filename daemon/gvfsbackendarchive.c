@@ -257,8 +257,46 @@ g_vfs_backend_archive_init (GVfsBackendArchive *archive)
 }
 
 /*** FILE TREE HANDLING ***/
+static char *
+fixup_path (const char *path)
+{
+  char *str, *ptr;
+  int len;
 
-/* NB: filename must NOT start with a slash */
+  /* skip leading garbage if present */
+  if (g_str_has_prefix (path, "./"))
+    str = g_strdup (path + 2);
+  else
+    str = g_strdup (path);
+
+  /* strip '/./' from the path */
+  ptr = str;
+  while ((ptr = strstr (ptr, "/./")))
+    {
+      char *dst = ptr + 2;
+      while (*dst)
+        *++ptr = *++dst;
+    }
+
+  /* strip '//' from the path */
+  ptr = str;
+  while ((ptr = strstr (ptr, "//")))
+    {
+      char *dst = ptr + 1;
+      while (*dst)
+        *++ptr = *++dst;
+    }
+
+  /* strip trailing slash from the path */
+  len = strlen (str);
+  if (len > 0 && str[len - 1] == '/')
+    str[len - 1] = '\0';
+
+  return str;
+}
+
+/* Filename must be a clean path containing no '.' entries, no empty entries
+ * and must not start with a '/'. */
 static ArchiveFile *
 archive_file_get_from_path (ArchiveFile *file, const char *filename, gboolean add)
 {
@@ -267,9 +305,6 @@ archive_file_get_from_path (ArchiveFile *file, const char *filename, gboolean ad
   GSList *walk;
   guint i;
 
-  /* libarchive reports paths starting with ./ for some archive types */
-  if (g_str_has_prefix (filename, "./"))
-    filename += 2;
   names = g_strsplit (filename, "/", -1);
 
   DEBUG ("%s %s\n", add ? "add" : "find", filename);
@@ -286,19 +321,9 @@ archive_file_get_from_path (ArchiveFile *file, const char *filename, gboolean ad
       if (cur == NULL && add != FALSE)
 	{
 	  DEBUG ("adding node %s to %s\n", names[i], file->name);
-	  if (names[i][0] != 0 &&
-              strcmp (names[i], ".") != 0)
-	    {
-	      cur = g_slice_new0 (ArchiveFile);
-	      cur->name = g_strdup (names[i]);
-	      file->children = g_slist_prepend (file->children, cur);
-	    }
-	  else
-	    {
-	      /* Ignore empty elements from directories ending with a slash.
-	       * Ignore elements consisting of a single "." */
-	      cur = file;
-	    }
+          cur = g_slice_new0 (ArchiveFile);
+          cur->name = g_strdup (names[i]);
+          file->children = g_slist_prepend (file->children, cur);
 	}
       file = cur;
     }
@@ -534,6 +559,9 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
       result = archive_read_next_header (archive->archive, &entry);
       if (result >= ARCHIVE_WARN && result <= ARCHIVE_OK)
 	{
+          ArchiveFile *file;
+          char *path;
+
   	  if (result < ARCHIVE_OK) {
   	    DEBUG ("archive_read_next_header: result = %d, error = '%s'\n", result, archive_error_string (archive->archive));
   	    archive_set_error (archive->archive, ARCHIVE_OK, "No error");
@@ -542,9 +570,9 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
               continue;
 	  }
   
-	  ArchiveFile *file = archive_file_get_from_path (ba->files, 
-	                                                  archive_entry_pathname (entry), 
-							  TRUE);
+          path = fixup_path (archive_entry_pathname (entry));
+          file = archive_file_get_from_path (ba->files, path, TRUE);
+          g_free (path);
           /* Don't set info for root */
           if (file != ba->files)
 	    {
@@ -695,7 +723,7 @@ do_open_for_read (GVfsBackend *       backend,
   struct archive_entry *entry;
   int result;
   ArchiveFile *file;
-  const char *entry_pathname;
+  char *entry_pathname;
 
   file = archive_file_find (ba, filename);
   if (file == NULL)
@@ -730,12 +758,12 @@ do_open_for_read (GVfsBackend *       backend,
               continue;
 	  }
 
-          entry_pathname = archive_entry_pathname (entry);
-          /* skip leading garbage if present */
-          if (g_str_has_prefix (entry_pathname, "./"))
-            entry_pathname += 2;
+          entry_pathname = fixup_path (archive_entry_pathname (entry));
+
           if (g_str_equal (entry_pathname, filename + 1))
             {
+              g_free (entry_pathname);
+
               /* SUCCESS */
               g_vfs_job_open_for_read_set_handle (job, archive);
               g_vfs_job_open_for_read_set_can_seek (job, FALSE);
@@ -744,6 +772,8 @@ do_open_for_read (GVfsBackend *       backend,
             }
           else
             archive_read_data_skip (archive->archive);
+
+          g_free (entry_pathname);
         }
     }
   while (result != ARCHIVE_FATAL && result != ARCHIVE_EOF);
