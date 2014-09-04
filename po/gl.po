@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs-master-po-gl-70600.merged\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-04 22:13+0200\n"
-"PO-Revision-Date: 2014-09-04 22:14+0200\n"
+"POT-Creation-Date: 2014-09-04 22:47+0200\n"
+"PO-Revision-Date: 2014-09-04 22:48+0200\n"
 "Last-Translator: Fran Dieguez <frandieguez@gnome.org>\n"
 "Language-Team: gnome-l10n-gl@gnome.org\n"
 "Language: gl\n"
@@ -2501,7 +2501,8 @@ msgid ""
 "Note: just pipe through cat if you need its formatting options\n"
 "like -n, -T or other."
 msgstr ""
-"Nota: use unha tubería a través de «cat» se precisa as opcións de formato."
+"Nota: use unha tubería a través de «cat» se precisa as opcións de formato.\n"
+"como -n, -T ou outras."
 
 #: ../programs/gvfs-cat.c:168 ../programs/gvfs-copy.c:144
 #: ../programs/gvfs-info.c:396 ../programs/gvfs-ls.c:428
@@ -2551,7 +2552,7 @@ msgstr "Non seguir nunca ligazóns simbólicas"
 #: ../programs/gvfs-copy.c:88 ../programs/gvfs-move.c:84
 #, c-format
 msgid "Transferred %s out of %s (%s/s)"
-msgstr "Transferido %s de %s (%s/%s)"
+msgstr "Transferido %s de %s (%s/s)"
 
 #: ../programs/gvfs-copy.c:134 ../programs/gvfs-move.c:130
 msgid "SOURCE"
