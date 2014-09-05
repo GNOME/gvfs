@@ -45,6 +45,7 @@ static GMainLoop *main_loop;
 static gboolean mount_mountable = FALSE;
 static gboolean mount_unmount = FALSE;
 static gboolean mount_eject = FALSE;
+static gboolean force = FALSE;
 static gboolean mount_list = FALSE;
 static gboolean extra_detail = FALSE;
 static gboolean mount_monitor = FALSE;
@@ -61,6 +62,7 @@ static const GOptionEntry entries[] =
   { "unmount", 'u', 0, G_OPTION_ARG_NONE, &mount_unmount, N_("Unmount"), NULL},
   { "eject", 'e', 0, G_OPTION_ARG_NONE, &mount_eject, N_("Eject"), NULL},
   { "unmount-scheme", 's', 0, G_OPTION_ARG_STRING, &unmount_scheme, N_("Unmount all mounts with the given scheme"), N_("SCHEME") },
+  { "force", 'f', 0, G_OPTION_ARG_NONE, &force, N_("Ignore outstanding file operations when unmounting or ejecting"), NULL },
   /* Translator: List here is a verb as in 'List all mounts' */
   { "list", 'l', 0, G_OPTION_ARG_NONE, &mount_list, N_("List"), NULL},
   { "monitor", 'o', 0, G_OPTION_ARG_NONE, &mount_monitor, N_("Monitor events"), NULL},
@@ -299,6 +301,7 @@ unmount (GFile *file)
   GMount *mount;
   GError *error = NULL;
   GMountOperation *mount_op;
+  GMountUnmountFlags flags;
 
   if (file == NULL)
     return;
@@ -312,7 +315,8 @@ unmount (GFile *file)
     }
 
   mount_op = new_mount_op ();
-  g_mount_unmount_with_operation (mount, 0, mount_op, NULL, unmount_done_cb, NULL);
+  flags = force ? G_MOUNT_UNMOUNT_FORCE : G_MOUNT_UNMOUNT_NONE;
+  g_mount_unmount_with_operation (mount, flags, mount_op, NULL, unmount_done_cb, NULL);
   g_object_unref (mount_op);
 
   outstanding_mounts++;
@@ -348,6 +352,7 @@ eject (GFile *file)
   GMount *mount;
   GError *error = NULL;
   GMountOperation *mount_op;
+  GMountUnmountFlags flags;
 
   if (file == NULL)
     return;
@@ -361,7 +366,8 @@ eject (GFile *file)
     }
 
   mount_op = new_mount_op ();
-  g_mount_eject_with_operation (mount, 0, mount_op, NULL, eject_done_cb, NULL);
+  flags = force ? G_MOUNT_UNMOUNT_FORCE : G_MOUNT_UNMOUNT_NONE;
+  g_mount_eject_with_operation (mount, flags, mount_op, NULL, eject_done_cb, NULL);
   g_object_unref (mount_op);
 
   outstanding_mounts++;
