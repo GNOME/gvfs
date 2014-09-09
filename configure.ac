@@ -557,6 +557,9 @@ AC_SUBST(LIBMTP_CFLAGS)
 AC_SUBST(LIBMTP_LIBS)
 AM_CONDITIONAL(USE_LIBMTP, [test "$msg_libmtp" = "yes"])
 
+AM_CONDITIONAL(USE_GPHOTO2UTILS,
+               [test "$msg_libmtp" = "yes" -o \( "$msg_gphoto2" = "yes" -a "$msg_gudev" = "yes" \)])
+
 dnl ==========================================================================
 dnl Samba 3.0
 

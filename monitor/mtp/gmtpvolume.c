@@ -31,6 +31,7 @@
 #include <gio/gio.h>
 
 #include "gmtpvolume.h"
+#include "gvfsgphoto2utils.h"
 
 G_LOCK_DEFINE_STATIC (mtp_volume);
 
@@ -87,119 +88,6 @@ g_mtp_volume_init (GMtpVolume *mtp_volume)
 {
 }
 
-static int hexdigit (char c)
-{
-  if (c >= 'a')
-    return c - 'a' + 10;
-  if (c >= 'A')
-   return c - 'A' + 10;
-  g_return_val_if_fail (c >= '0' && c <= '9', 0);
-  return c - '0';
-}
-
-/* Do not free result, it's a static buffer */
-static const char*
-udev_decode_string (const char* encoded)
-{
-  int len;
-  const char* s;
-  static char decoded[4096];
-
-  if (encoded == NULL)
-    return NULL;
-
-  for (len = 0, s = encoded; *s && len < sizeof (decoded) - 1; ++len, ++s) {
-    /* need to check for NUL terminator in advance */
-    if (s[0] == '\\' && s[1] == 'x' && s[2] >= '0' && s[3] >= '0') {
-      decoded[len] = (hexdigit (s[2]) << 4) | hexdigit (s[3]);
-      s += 3;
-    } else if (s[0] == '_' || s[0] == '-') {
-      decoded[len] = ' ';
-    } else {
-      decoded[len] = *s;
-    }
-  }
-  decoded[len] = '\0';
-
-  return decoded;
-}
-
-static void
-set_volume_name (GMtpVolume *v)
-{
-  const char *gphoto_name;
-  const char *product = NULL;
-  const char *vendor;
-  const char *model;
-
-  /* our preference: ID_MTP > ID_MEDIA_PLAYER_{VENDOR,PRODUCT} > product >
-   * ID_{VENDOR,MODEL} */
-
-  gphoto_name = g_udev_device_get_property (v->device, "ID_MTP");
-  if (gphoto_name != NULL && strcmp (gphoto_name, "1") != 0) {
-    v->name = g_strdup (gphoto_name);
-    return;
-  }
-
-  vendor = g_udev_device_get_property (v->device, "ID_MEDIA_PLAYER_VENDOR");
-  if (vendor == NULL)
-    vendor = g_udev_device_get_property (v->device, "ID_VENDOR_ENC");
-  model = g_udev_device_get_property (v->device, "ID_MEDIA_PLAYER_MODEL");
-  if (model == NULL) {
-    model = g_udev_device_get_property (v->device, "ID_MODEL_ENC");
-    product = g_udev_device_get_sysfs_attr (v->device, "product");
-  }
-
-  v->name = NULL;
-  if (product != NULL && strlen (product) > 0) {
-    v->name = g_strdup (udev_decode_string (product));
-  } else if (vendor == NULL) {
-    if (model != NULL)
-      v->name = g_strdup (udev_decode_string (model));
-  } else {
-    if (model != NULL) {
-      /* we can't call udev_decode_string() twice in one g_strdup_printf(),
-       * it returns a static buffer */
-      gchar *temp = g_strconcat (vendor, " ", model, NULL);
-      v->name = g_strdup (udev_decode_string (temp));
-      g_free (temp);
-    } else {
-      if (g_udev_device_has_property (v->device, "ID_MEDIA_PLAYER")) {
-        /* Translators: %s is the device vendor */
-        v->name = g_strdup_printf (_("%s Audio Player"), udev_decode_string (vendor));
-      } else {
-        /* Translators: %s is the device vendor */
-        v->name = g_strdup_printf (_("%s Camera"), udev_decode_string (vendor));
-      }
-    }
-  }
-
-  if (v->name == NULL)
-    v->name = g_strdup (_("Camera"));
-}
-
-static void
-set_volume_icon (GMtpVolume *volume)
-{
-  if (g_udev_device_has_property (volume->device, "ID_MEDIA_PLAYER_ICON_NAME"))
-    volume->icon = g_strdup (g_udev_device_get_property (volume->device, "ID_MEDIA_PLAYER_ICON_NAME"));
-  else if (g_udev_device_has_property (volume->device, "ID_MEDIA_PLAYER"))
-    volume->icon = g_strdup ("multimedia-player");
-  else
-    volume->icon = g_strdup ("camera-photo");
-}
-
-static void
-set_volume_symbolic_icon (GMtpVolume *volume)
-{
-  if (g_udev_device_has_property (volume->device, "ID_MEDIA_PLAYER_ICON_NAME"))
-    volume->symbolic_icon = g_strconcat (g_udev_device_get_property (volume->device, "ID_MEDIA_PLAYER_ICON_NAME"), "-symbolic", NULL);
-  else if (g_udev_device_has_property (volume->device, "ID_MEDIA_PLAYER"))
-    volume->symbolic_icon = g_strdup ("multimedia-player-symbolic");
-  else
-    volume->symbolic_icon = g_strdup ("camera-photo-symbolic");
-}
-
 GMtpVolume *
 g_mtp_volume_new (GVolumeMonitor   *volume_monitor,
                   GUdevDevice      *device,
@@ -225,9 +113,9 @@ g_mtp_volume_new (GVolumeMonitor   *volume_monitor,
   volume->device = g_object_ref (device);
   volume->activation_root = g_object_ref (activation_root);
 
-  set_volume_name (volume);
-  set_volume_icon (volume);
-  set_volume_symbolic_icon (volume);
+  volume->name = g_vfs_get_volume_name (device, "ID_MTP");
+  volume->icon = g_vfs_get_volume_icon (device);
+  volume->symbolic_icon = g_vfs_get_volume_symbolic_icon (device);
   /* we do not really need to listen for changes */
 
   return volume;

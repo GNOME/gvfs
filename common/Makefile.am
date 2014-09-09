@@ -67,6 +67,20 @@ libgvfscommon_dnssd_la_LIBADD =	\
 	$(GLIB_LIBS)
 endif
 
+if USE_GPHOTO2UTILS
+noinst_LTLIBRARIES += libgvfscommon-gphoto2.la
+
+libgvfscommon_gphoto2_la_SOURCES = \
+	gvfsgphoto2utils.c gvfsgphoto2utils.h \
+	$(NULL)
+
+libgvfscommon_gphoto2_la_CPPFLAGS = \
+	$(GUDEV_CFLAGS)
+
+libgvfscommon_gphoto2_la_LIBADD = \
+	$(GUDEV_LIBS)
+endif
+
 
 EXTRA_DIST = org.gtk.vfs.xml
 
