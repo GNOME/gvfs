@@ -478,7 +478,8 @@ gvfsd_gphoto2_CPPFLAGS += $(HAL_CFLAGS)
 endif
 
 if USE_GUDEV
-gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(GUDEV_LIBS)
+gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(GUDEV_LIBS) \
+		      $(top_builddir)/common/libgvfscommon-gphoto2.la
 else
 gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(HAL_LIBS)
 endif

@@ -62,6 +62,7 @@
 #include "gvfsmonitor.h"
 #include "gvfsjobseekwrite.h"
 #include "gvfsicon.h"
+#include "gvfsgphoto2utils.h"
 
 /* showing debug traces */
 #if 1
@@ -727,19 +728,8 @@ compute_display_name (GVfsBackendGphoto2 *gphoto2_backend)
   char *result = NULL;
 
 #ifdef HAVE_GUDEV
-  const char *s;
-
-  /* the real "nice" and user-visible name is computed in the monitor; just try
-   * using the product name here */
   if (gphoto2_backend->udev_device != NULL)
-    {
-      s = g_udev_device_get_sysfs_attr (gphoto2_backend->udev_device, "product");
-      if (s == NULL)
-        s = g_udev_device_get_property (gphoto2_backend->udev_device, "ID_MODEL");
-
-      if (s != NULL)
-        result = g_strdup (s);
-    }
+    result = g_vfs_get_volume_name (gphoto2_backend->udev_device, "ID_GPHOTO2");
   if (result == NULL )
     {
       /* Translator: %s represents the device, e.g. usb:001,042  */
@@ -791,24 +781,8 @@ setup_for_device (GVfsBackendGphoto2 *gphoto2_backend)
     {
       DEBUG ("-> sysfs path %s, subsys %s, name %s\n", g_udev_device_get_sysfs_path (gphoto2_backend->udev_device), g_udev_device_get_subsystem (gphoto2_backend->udev_device), g_udev_device_get_name (gphoto2_backend->udev_device));
 
-      /* determine icon name */
-      if (g_udev_device_has_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER_ICON_NAME"))
-	{
-          gphoto2_backend->icon_name = g_strdup (g_udev_device_get_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER_ICON_NAME"));
-          gphoto2_backend->symbolic_icon_name = g_strdup ("multimedia-player-symbolic");
-	  is_media_player = TRUE;
-	}
-      else if (g_udev_device_has_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER"))
-	{
-          gphoto2_backend->icon_name = g_strdup ("multimedia-player");
-          gphoto2_backend->symbolic_icon_name = g_strdup ("multimedia-player-symbolic");
-	  is_media_player = TRUE;
-	}
-      else
-        {
-          gphoto2_backend->icon_name = g_strdup ("camera-photo");
-          gphoto2_backend->symbolic_icon_name = g_strdup ("camera-photo-symbolic");
-        }
+      gphoto2_backend->icon_name = g_vfs_get_volume_icon (gphoto2_backend->udev_device);
+      gphoto2_backend->symbolic_icon_name = g_vfs_get_volume_symbolic_icon (gphoto2_backend->udev_device);
     }
   else
       DEBUG ("-> did not find matching udev device\n");
