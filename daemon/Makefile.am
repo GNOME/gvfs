@@ -495,7 +495,8 @@ gvfsd_mtp_CPPFLAGS = \
 	-DBACKEND_TYPES='"mtp", G_VFS_TYPE_BACKEND_MTP,' \
 	$(GUDEV_CFLAGS) $(LIBMTP_CFLAGS)
 
-gvfsd_mtp_LDADD = $(libraries) $(GUDEV_LIBS) $(LIBMTP_LIBS)
+gvfsd_mtp_LDADD = $(libraries) $(GUDEV_LIBS) $(LIBMTP_LIBS) \
+		  $(top_builddir)/common/libgvfscommon-gphoto2.la
 
 gvfsd_http_SOURCES = \
 	gvfshttpinputstream.c gvfshttpinputstream.h \

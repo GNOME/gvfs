@@ -54,6 +54,7 @@
 #include "gvfsjobcreatemonitor.h"
 #include "gvfsjobmakedirectory.h"
 #include "gvfsmonitor.h"
+#include "gvfsgphoto2utils.h"
 
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -785,9 +786,10 @@ mtp_heartbeat (GVfsBackendMtp *backend)
 }
 
 static char *
-get_dev_path_from_host (GVfsJob *job,
-                        GUdevClient *gudev_client,
-                        const char *host)
+get_dev_path_and_device_from_host (GVfsJob *job,
+                                   GUdevClient *gudev_client,
+                                   const char *host,
+                                   GUdevDevice **device)
 {
   /* turn usb:001,041 string into an udev device name */
   if (!g_str_has_prefix (host, "[usb:")) {
@@ -811,15 +813,14 @@ get_dev_path_from_host (GVfsJob *job,
   DEBUG ("(II) get_dev_path_from_host: Parsed '%s' into device name %s\n", host, dev_path);
 
   /* find corresponding GUdevDevice */
-  GUdevDevice *device = g_udev_client_query_by_device_file (gudev_client, dev_path);
-  if (!device) {
+  *device = g_udev_client_query_by_device_file (gudev_client, dev_path);
+  if (!*device) {
     g_free (dev_path);
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
                               _("Couldn't find matching udev device."));
     return NULL;
   }
-  g_object_unref (device);
 
   return dev_path;
 }
@@ -832,6 +833,7 @@ do_mount (GVfsBackend *backend,
            gboolean is_automount)
 {
   GVfsBackendMtp *op_backend = G_VFS_BACKEND_MTP (backend);
+  GUdevDevice *device;
 
   DEBUG ("(I) do_mount\n");
 
@@ -851,13 +853,21 @@ do_mount (GVfsBackend *backend,
     return;
   }
 
-  char *dev_path = get_dev_path_from_host (G_VFS_JOB (job), op_backend->gudev_client, host);
+  char *dev_path = get_dev_path_and_device_from_host (G_VFS_JOB (job),
+                                                      op_backend->gudev_client,
+                                                      host,
+                                                      &device);
   if (dev_path == NULL) {
     g_object_unref (op_backend->gudev_client);
     /* get_dev_path_from_host() sets job state. */
     return;
   }
   op_backend->dev_path = dev_path;
+
+  op_backend->volume_name = g_vfs_get_volume_name (device, "ID_MTP");
+  op_backend->volume_icon = g_vfs_get_volume_icon (device);
+  op_backend->volume_symbolic_icon = g_vfs_get_volume_symbolic_icon (device);
+  g_object_unref (device);
 
   op_backend->on_uevent_id =
     g_signal_connect_object (op_backend->gudev_client, "uevent",
@@ -928,6 +938,9 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
                                op_backend->on_uevent_id);
   g_object_unref (op_backend->gudev_client);
   g_clear_pointer (&op_backend->dev_path, g_free);
+  g_clear_pointer (&op_backend->volume_name, g_free);
+  g_clear_pointer (&op_backend->volume_icon, g_free);
+  g_clear_pointer (&op_backend->volume_symbolic_icon, g_free);
   LIBMTP_Release_Device (op_backend->device);
 
   g_mutex_unlock (&op_backend->mutex);
@@ -1063,14 +1076,18 @@ get_device_info (GVfsBackendMtp *backend, GFileInfo *info)
 
   char *friendlyname = LIBMTP_Get_Friendlyname (device);
   g_file_info_set_display_name (info, friendlyname == NULL ?
-                                      _("Unnamed Device") : friendlyname);
+                                      backend->volume_name : friendlyname);
   free (friendlyname);
 
   g_file_info_set_content_type (info, "inode/directory");
   g_file_info_set_size (info, 0);
 
-  GIcon *icon = g_themed_icon_new ("multimedia-player");
+  GIcon *icon = g_themed_icon_new (backend->volume_icon);
   g_file_info_set_icon (info, icon);
+  g_object_unref (icon);
+
+  icon = g_themed_icon_new (backend->volume_symbolic_icon);
+  g_file_info_set_symbolic_icon (info, icon);
   g_object_unref (icon);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);

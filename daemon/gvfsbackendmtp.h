@@ -52,6 +52,9 @@ struct _GVfsBackendMtp
   GMutex mutex;
   LIBMTP_mtpdevice_t *device;
   char *dev_path;
+  char *volume_name;
+  char *volume_icon;
+  char *volume_symbolic_icon;
 
   GHashTable *file_cache;
 
