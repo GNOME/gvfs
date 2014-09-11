@@ -210,13 +210,19 @@ unmount_cb (GVfsBackend  *backend,
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
   gboolean should_unmount;
   gboolean finished;
+  GError *error = NULL;
 
   should_unmount = g_vfs_backend_unmount_with_operation_finish (backend,
-                                                                res);
+                                                                res,
+                                                                &error);
+  if (!should_unmount)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (op_job), error);
+      g_error_free (error);
+      return;
+    }
 
-  if (should_unmount)
-    op_job->flags |= G_MOUNT_UNMOUNT_FORCE;
-
+  op_job->flags |= G_MOUNT_UNMOUNT_FORCE;
   finished = job_finish_immediately_if_possible (op_job);
 
   if (! finished)
