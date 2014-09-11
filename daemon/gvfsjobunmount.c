@@ -210,13 +210,19 @@ unmount_cb (GVfsBackend  *backend,
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
   gboolean should_unmount;
   gboolean finished;
+  GError *error = NULL;
 
   should_unmount = g_vfs_backend_unmount_with_operation_finish (backend,
-                                                                res);
+                                                                res,
+                                                                &error);
+  if (!should_unmount)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (op_job), error);
+      g_error_free (error);
+      return;
+    }
 
-  if (should_unmount)
-    op_job->flags |= G_MOUNT_UNMOUNT_FORCE;
-
+  op_job->flags |= G_MOUNT_UNMOUNT_FORCE;
   finished = job_finish_immediately_if_possible (op_job);
 
   if (! finished)
@@ -247,13 +253,17 @@ try (GVfsJob *job)
   is_busy = g_vfs_daemon_has_blocking_processes (g_vfs_backend_get_daemon (backend));
   force_unmount = op_job->flags & G_MOUNT_UNMOUNT_FORCE;
   
-  if (is_busy && ! force_unmount
-      && ! g_mount_source_is_dummy (op_job->mount_source))
+  if (is_busy && !force_unmount)
     {
-      g_vfs_backend_unmount_with_operation (backend,
-					    op_job->mount_source,
-					    (GAsyncReadyCallback) unmount_cb,
-					    op_job);
+      if (g_mount_source_is_dummy (op_job->mount_source))
+        g_vfs_job_failed_literal (G_VFS_JOB (op_job),
+                                  G_IO_ERROR, G_IO_ERROR_BUSY,
+                                  _("File system is busy"));
+      else
+        g_vfs_backend_unmount_with_operation (backend,
+                                              op_job->mount_source,
+                                              (GAsyncReadyCallback)unmount_cb,
+                                              op_job);
       return TRUE;
     }
 

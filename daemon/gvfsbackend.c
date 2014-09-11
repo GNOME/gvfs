@@ -811,22 +811,32 @@ complete_unmount_with_op (UnmountWithOpData *data)
 
   ret = TRUE;
 
+  simple = g_simple_async_result_new (G_OBJECT (data->backend),
+                                      data->callback,
+                                      data->user_data,
+                                      NULL);
+
   if (data->no_more_processes)
     {
       /* do nothing, e.g. return TRUE to signal we should unmount */
+    }
+  else if (!data->ret)
+    {
+      /*  If the "show-processes" signal wasn't handled */
+      g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_BUSY,
+                                       _("File system is busy"));
+      ret = FALSE;
     }
   else
     {
       if (data->aborted || data->choice == 1)
         {
+          g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED,
+                                           "GMountOperation aborted");
           ret = FALSE;
         }
     }
 
-  simple = g_simple_async_result_new (G_OBJECT (data->backend),
-                                      data->callback,
-                                      data->user_data,
-                                      NULL);
   g_simple_async_result_set_op_res_gboolean (simple, ret);
   g_simple_async_result_complete (simple);
   g_object_unref (simple);
@@ -894,22 +904,28 @@ unmount_with_op_data_free (UnmountWithOpData *data)
  * @backend: A #GVfsBackend.
  * @res: A #GAsyncResult obtained from the @callback function passed
  *     to g_vfs_backend_unmount_with_operation().
+ * @error: A #GError, or NULL.
  *
  * Gets the result of the operation started by
  * gvfs_backend_unmount_with_operation_sync().
  *
+ * If the operation was cancelled, G_IO_ERROR_FAILED_HANDLED will be returned.
+ * If the operation wasn't interacted and there were outstanding jobs,
+ * G_IO_ERROR_BUSY will be returned.
+ *
  * Returns: %TRUE if the backend should be unmounted (either no blocking
  *     processes or the user decided to unmount anyway), %FALSE if
- *     no action should be taken.
+ *     no action should be taken (error is set).
  */
 gboolean
 g_vfs_backend_unmount_with_operation_finish (GVfsBackend *backend,
-                                             GAsyncResult *res)
+                                             GAsyncResult *res,
+                                             GError **error)
 {
   gboolean ret;
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
 
-  if (g_simple_async_result_propagate_error (simple, NULL))
+  if (g_simple_async_result_propagate_error (simple, error))
     {
       ret = FALSE;
     }
