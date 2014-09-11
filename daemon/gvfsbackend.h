@@ -517,7 +517,8 @@ gboolean    g_vfs_backend_get_block_requests             (GVfsBackend           
 gboolean    g_vfs_backend_has_blocking_processes         (GVfsBackend           *backend);
 
 gboolean    g_vfs_backend_unmount_with_operation_finish (GVfsBackend  *backend,
-                                                         GAsyncResult *res);
+                                                         GAsyncResult *res,
+                                                         GError      **error);
 
 void        g_vfs_backend_unmount_with_operation (GVfsBackend        *backend,
                                                   GMountSource       *mount_source,
