@@ -1767,6 +1767,18 @@ do_push (GVfsBackend *backend,
     goto exit;
   }
 
+  /*
+   * Don't do this for >=4GB files with android extensions. Some devices
+   * have trouble transferring large files this way. eg: Nexus 5.
+   */
+  if (g_file_info_get_size (info) > G_MAXUINT32 &&
+      G_VFS_BACKEND_MTP (backend)->android_extension) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                              _("Operation unsupported"));
+    goto exit;
+  }
+
   gboolean source_is_dir =
     g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY;
 
