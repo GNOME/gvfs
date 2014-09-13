@@ -1621,11 +1621,11 @@ do_pull (GVfsBackend *backend,
     g_error_free (error);
   }
 
-  gboolean dest_is_dir =
-    g_file_info_get_file_type (local_info) == G_FILE_TYPE_DIRECTORY;
-
   /* Test all the GIO defined failure conditions */
   if (dest_exists) {
+    gboolean dest_is_dir =
+      g_file_info_get_file_type (local_info) == G_FILE_TYPE_DIRECTORY;
+
     if (flags & G_FILE_COPY_OVERWRITE) {
       if (!source_is_dir && dest_is_dir) {
         g_vfs_job_failed_literal (G_VFS_JOB (job),
