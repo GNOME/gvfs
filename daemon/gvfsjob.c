@@ -221,7 +221,7 @@ g_vfs_job_try (GVfsJob *job)
 void
 g_vfs_job_cancel (GVfsJob *job)
 {
-  if (job->cancelled || job->sent_reply)
+  if (job->cancelled || job->finished)
     return;
 
   job->cancelled = TRUE;
