@@ -230,7 +230,10 @@ main (int argc, char *argv[])
 			     attribute,
 			     type,
 			     value,
-			     0, NULL, &error))
+                             nofollow_symlinks ?
+                               G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS :
+                               G_FILE_QUERY_INFO_NONE,
+                             NULL, &error))
     {
       g_printerr (_("Error setting attribute: %s\n"), error->message);
       g_error_free (error);
