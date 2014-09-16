@@ -45,4 +45,11 @@ There is a set of command line programs starting with "gvfs-" that lets you run 
       <gnome:userid>rossl</gnome:userid>
     </foaf:Person>
   </maintainer>
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Ondrej Holy</foaf:name>
+      <foaf:mbox rdf:resource="mailto:oholy@redhat.com" />
+      <gnome:userid>oholy</gnome:userid>
+    </foaf:Person>
+  </maintainer>
 </Project>
