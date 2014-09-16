@@ -250,6 +250,9 @@ async_proxy_new_cb (GObject *source_object,
 
   mount_source = g_mount_operation_dbus_wrap (data->mount_operation, _g_daemon_vfs_get_async_bus ());
 
+  /* 30 minute timeout */
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), 1000 * 60 * 30);
+
   gvfs_dbus_mount_call_unmount (proxy,
                                 g_mount_source_get_dbus_id (mount_source),
                                 g_mount_source_get_obj_path (mount_source),
