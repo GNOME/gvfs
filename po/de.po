@@ -10,22 +10,23 @@
 # Mario Blättermann <mario.blaettermann@gmail.com>, 2009-2013.
 # Paul Seyfert <pseyfert@mathphys.fsk.uni-heidelberg.de>, 2011.
 # Christian Kirbach <christian.kirbach@gmail.com>, 2009, 2010, 2011, 2012, 2013.
+# Wolfgang Stöggl <c72578@yahoo.de>, 2014.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-09-14 09:22+0000\n"
-"PO-Revision-Date: 2014-09-15 11:39+0100\n"
-"Last-Translator: Christian Kirbach <christian.kirbach@gmail.com>\n"
+"POT-Creation-Date: 2014-09-20 09:25+0000\n"
+"PO-Revision-Date: 2014-09-21 08:16+0100\n"
+"Last-Translator: Wolfgang Stoeggl <c72578@yahoo.de>\n"
 "Language-Team: Deutsch <gnome-de@gnome.org>\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.6.9\n"
 
 #: ../client/gdaemonfile.c:468 ../client/gdaemonfile.c:2830
 msgid "Operation not supported, files on different mounts"
@@ -126,7 +127,6 @@ msgid "Seek not supported on stream"
 msgstr "Durchsuchen im Datenstrom wird nicht unterstützt"
 
 #: ../client/gdaemonfileoutputstream.c:1197
-#| msgid "Seek not supported on stream"
 msgid "Truncate not supported on stream"
 msgstr "Abschneiden wird nicht auf einem Datenstrom unterstützt"
 
@@ -619,7 +619,7 @@ msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
 msgstr ""
-"libimobiledevice-Fehler: Kein Gerät gefunden. Stellen sie sicher, dass "
+"libimobiledevice-Fehler: Kein Gerät gefunden. Stellen Sie sicher, dass "
 "usbmuxd korrekt eingerichtet ist."
 
 #: ../daemon/gvfsbackendafc.c:322
@@ -1118,10 +1118,8 @@ msgid "Backup file creation failed"
 msgstr "Anlegen der Sicherheitskopie fehlgeschlagen"
 
 #: ../daemon/gvfsbackenddav.c:2765
-#, fuzzy
-#| msgid "Can't copy file over directory"
 msgid "Can't move over directory"
-msgstr "Datei kann nicht über einen Ordner kopiert werden"
+msgstr "Kann nicht über einen Ordner verschoben werden"
 
 #: ../daemon/gvfsbackenddav.c:2928
 msgid "File length changed during transfer"
@@ -1387,13 +1385,11 @@ msgid "libmtp error: %s"
 msgstr "libmtp-Fehler: %s"
 
 #: ../daemon/gvfsbackendmtp.c:796
-#| msgid "Unexpected host uri format."
 msgid "Unexpected host URI format."
 msgstr "Unerwartetes Format der Rechneradresse."
 
 # CHECK
 #: ../daemon/gvfsbackendmtp.c:806
-#| msgid "Malformed host uri."
 msgid "Malformed host URI."
 msgstr "Ungültige Rechneradresse."
 
@@ -1423,7 +1419,6 @@ msgid "Unable to open MTP device '%s'"
 msgstr "MTP-Gerät »%s« kann nicht geöffnet werden"
 
 #: ../daemon/gvfsbackendmtp.c:1027
-#| msgid "File not found"
 msgid "Device not found"
 msgstr "Gerät nicht gefunden"
 
@@ -1448,12 +1443,10 @@ msgid "Not a regular file"
 msgstr "Keine gültige Datei"
 
 #: ../daemon/gvfsbackendmtp.c:1633 ../daemon/gvfsbackendmtp.c:1779
-#| msgid "Target %s is not a directory\n"
 msgid "Target is a directory"
 msgstr "Das Ziel ist ein Ordner"
 
 #: ../daemon/gvfsbackendmtp.c:1638 ../daemon/gvfsbackendmtp.c:1784
-#| msgid "Create directories."
 msgid "Can't merge directories"
 msgstr "Ordner können nicht zusammengeführt werden"
 
@@ -1604,7 +1597,6 @@ msgstr ""
 
 #: ../daemon/gvfsbackendsftp.c:1175
 #, c-format
-#| msgid "Internal error: %s"
 msgid "Internal error: Unknown Error"
 msgstr "Interner Fehler: Unbekannter Fehler"
 
@@ -1851,7 +1843,6 @@ msgid "Don't start fuse."
 msgstr "FUSE nicht starten."
 
 #: ../daemon/main.c:145 ../metadata/meta-daemon.c:484
-#| msgid "Show progress"
 msgid "Show program version."
 msgstr "Programmversion zeigen."
 
@@ -2461,7 +2452,6 @@ msgstr "GVfs-UDisks2-Datenträgerüberwachung"
 #: ../programs/gvfs-rm.c:36 ../programs/gvfs-save.c:54
 #: ../programs/gvfs-set-attribute.c:39 ../programs/gvfs-trash.c:71
 #: ../programs/gvfs-tree.c:39
-#| msgid "Show progress"
 msgid "Show program version"
 msgstr "Programmversion zeigen"
 
@@ -2601,7 +2591,6 @@ msgstr "Das Ziel »%s« ist kein Ordner\n"
 
 #: ../programs/gvfs-copy.c:222 ../programs/gvfs-move.c:213
 #, c-format
-#| msgid "overwrite %s?"
 msgid "%s: overwrite ‘%s’? "
 msgstr "%s: Soll »%s« überschrieben werden?"
 
@@ -2702,7 +2691,6 @@ msgstr "verborgen\n"
 
 #: ../programs/gvfs-info.c:195
 #, c-format
-#| msgid "Error: %s\n"
 msgid "uri: %s\n"
 msgstr "Adresse: %s\n"
 
