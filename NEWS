@@ -1,3 +1,7 @@
+Major changes in 1.22.0
+=======================
+* Translation updates
+
 Major changes in 1.21.92
 ========================
 * metatree: Avoid endless looping when the entry is too large
@@ -26,7 +30,7 @@ Major changes in 1.21.90
 * mtp: Error semantics and handling fixes
 * mtp: Fix icon handling
 * mtp: Support for create and delete events
-q* mtp: Use unique storage name
+* mtp: Use unique storage name
 * mtp: Various fixes
 * Several smaller bugfixes
 * Translation updates
