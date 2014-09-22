@@ -5,10 +5,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-09-08 09:22+0000\n"
-"PO-Revision-Date: 2014-03-23 15:00+0200\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&k"
+"eywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2014-09-22 09:23+0000\n"
+"PO-Revision-Date: 2014-09-22 14:47+0200\n"
 "Last-Translator: Petr Kovar <pknbe@volny.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -1094,14 +1094,13 @@ msgid "Backup file creation failed"
 msgstr "Selhala tvorba záložního souboru"
 
 #: ../daemon/gvfsbackenddav.c:2765
-#, fuzzy
 #| msgid "Can't copy file over directory"
 msgid "Can't move over directory"
-msgstr "Nelze kopírovat přes složku"
+msgstr "Nelze přesunout nad adresář"
 
 #: ../daemon/gvfsbackenddav.c:2928
 msgid "File length changed during transfer"
-msgstr ""
+msgstr "Délka souboru se během přesunování změnila"
 
 #: ../daemon/gvfsbackenddnssd.c:511 ../daemon/gvfsbackendnetwork.c:462
 msgid "Local Network"
@@ -1419,16 +1418,14 @@ msgid "Not a regular file"
 msgstr "Není obyčejným souborem"
 
 #: ../daemon/gvfsbackendmtp.c:1633 ../daemon/gvfsbackendmtp.c:1779
-#, fuzzy
 #| msgid "Target %s is not a directory\n"
 msgid "Target is a directory"
-msgstr "Cíl %s není složkou\n"
+msgstr "Cíl je adresářem"
 
 #: ../daemon/gvfsbackendmtp.c:1638 ../daemon/gvfsbackendmtp.c:1784
-#, fuzzy
 #| msgid "Create directories."
 msgid "Can't merge directories"
-msgstr "Vytvořit adresáře."
+msgstr "Nelze sloučit adresáře"
 
 #: ../daemon/gvfsbackendmtp.c:1731 ../daemon/gvfsbackendmtp.c:2262
 msgid "Cannot write to this location"
@@ -1567,7 +1564,7 @@ msgstr "Nelze odeslat potvrzení identity hostitele"
 #: ../daemon/gvfsbackendsftp.c:1174
 #, c-format
 msgid "The connection is closed (the underlying SSH process died)"
-msgstr ""
+msgstr "Spojení je uzavřeno (základní proces SSH skončil)"
 
 #: ../daemon/gvfsbackendsftp.c:1175
 #, c-format
@@ -1813,10 +1810,9 @@ msgid "Don't start fuse."
 msgstr "Nespouštět fuse."
 
 #: ../daemon/main.c:145 ../metadata/meta-daemon.c:484
-#, fuzzy
 #| msgid "Show progress"
 msgid "Show program version."
-msgstr "Zobrazit průběh"
+msgstr "Zobrazit verzi programu."
 
 #: ../daemon/main.c:159
 msgid "GVFS Daemon"
@@ -2422,10 +2418,9 @@ msgstr "Sledování svazků GVfs UDisks2"
 #: ../programs/gvfs-rm.c:36 ../programs/gvfs-save.c:54
 #: ../programs/gvfs-set-attribute.c:39 ../programs/gvfs-trash.c:71
 #: ../programs/gvfs-tree.c:39
-#, fuzzy
 #| msgid "Show progress"
 msgid "Show program version"
-msgstr "Zobrazit průběh"
+msgstr "Zobrazit verzi programu"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -2532,7 +2527,7 @@ msgstr "Nikdy nesledovat symbolické odkazy"
 #: ../programs/gvfs-copy.c:88 ../programs/gvfs-move.c:84
 #, c-format
 msgid "Transferred %s out of %s (%s/s)"
-msgstr ""
+msgstr "Přeneseno %s z %s (%s/s)"
 
 #: ../programs/gvfs-copy.c:134 ../programs/gvfs-move.c:130
 msgid "SOURCE"
@@ -2983,7 +2978,7 @@ msgstr "Při vytváření souboru omezit přístup jen na aktuálního uživatel
 
 #: ../programs/gvfs-save.c:49
 msgid "When replacing, replace as if the destination did not exist"
-msgstr ""
+msgstr "Při nahrazování považovat cíl za neexistující"
 
 #. Translators: The "etag" is a token allowing to verify whether a file has been modified
 #: ../programs/gvfs-save.c:51
