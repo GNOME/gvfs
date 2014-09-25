@@ -66,6 +66,15 @@ decide_watch_type (GUnixMountEntry *mount,
                    gboolean         is_home_trash)
 {
   const gchar *fs_type;
+  const gchar *mount_path;
+
+  mount_path = g_unix_mount_get_mount_path (mount);
+
+  /* Do not care about mount points without read access to avoid polling, see:
+   * https://bugzilla.gnome.org/show_bug.cgi?id=522314
+   */
+  if (access (mount_path, R_OK) != 0)
+    return TRASH_WATCHER_NO_WATCH;
 
   fs_type = g_unix_mount_get_fs_type (mount);
 
