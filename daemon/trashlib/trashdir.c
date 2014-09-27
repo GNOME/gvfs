@@ -148,7 +148,8 @@ trash_dir_changed (GFileMonitor      *monitor,
     trash_root_remove_item (dir->root, file, dir->is_homedir);
 
   else if (event_type == G_FILE_MONITOR_EVENT_PRE_UNMOUNT ||
-           event_type == G_FILE_MONITOR_EVENT_UNMOUNTED)
+           event_type == G_FILE_MONITOR_EVENT_UNMOUNTED ||
+           event_type == G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT)
     ;
 
   else
