@@ -235,9 +235,12 @@ unmount_cb (GVfsBackend  *backend,
 					      op_job->flags,
 					      op_job->mount_source);
 
-       if (run_in_thread)
-	g_vfs_daemon_run_job_in_thread (g_vfs_backend_get_daemon (backend),
-					G_VFS_JOB (op_job));
+      if (run_in_thread)
+        {
+          g_vfs_backend_set_block_requests (backend, TRUE);
+          g_vfs_daemon_run_job_in_thread (g_vfs_backend_get_daemon (backend),
+                                          G_VFS_JOB (op_job));
+        }
     }
 }
 
@@ -275,7 +278,12 @@ try (GVfsJob *job)
 			       op_job->flags,
 			       op_job->mount_source);
   else
-    return FALSE;
+    {
+      /* We're going to run the backend's unmount method on a thread, block
+       * new jobs coming in. */
+      g_vfs_backend_set_block_requests (backend, TRUE);
+      return FALSE;
+    }
 }
 
 static void
@@ -314,18 +322,20 @@ static void
 send_reply (GVfsJob *job)
 {
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
+  GVfsBackend *backend = op_job->backend;
 
   g_debug ("send_reply, failed: %d\n", job->failed);
 
   if (job->failed)
-    (*G_VFS_JOB_CLASS (g_vfs_job_unmount_parent_class)->send_reply) (G_VFS_JOB (op_job));
+    {
+      g_vfs_backend_set_block_requests (backend, FALSE);
+      (*G_VFS_JOB_CLASS (g_vfs_job_unmount_parent_class)->send_reply) (G_VFS_JOB (op_job));
+    }
   else
     {
-      GVfsBackend *backend = op_job->backend;
-
       /* Setting the backend to block requests will also
          set active GVfsChannels to block requets  */
-      g_vfs_backend_set_block_requests (backend);
+      g_vfs_backend_set_block_requests (backend, TRUE);
       g_vfs_backend_unregister_mount (backend,
 				      (GAsyncReadyCallback) unregister_mount_callback,
 				      job);

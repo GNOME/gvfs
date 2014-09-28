@@ -590,9 +590,9 @@ g_vfs_backend_add_auto_info (GVfsBackend *backend,
 }
 
 void
-g_vfs_backend_set_block_requests (GVfsBackend *backend)
+g_vfs_backend_set_block_requests (GVfsBackend *backend, gboolean value)
 {
-  backend->priv->block_requests = TRUE;
+  backend->priv->block_requests = value;
 }
 
 gboolean
@@ -1052,7 +1052,7 @@ forced_unregister_mount_callback (GVfsDBusMountTracker *proxy,
 void
 g_vfs_backend_force_unmount (GVfsBackend *backend)
 {
-  g_vfs_backend_set_block_requests (backend);
+  g_vfs_backend_set_block_requests (backend, TRUE);
   g_vfs_backend_unregister_mount (backend,
 				  (GAsyncReadyCallback) forced_unregister_mount_callback,
 				  backend);
