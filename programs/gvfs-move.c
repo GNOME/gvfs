@@ -36,6 +36,7 @@ static gboolean progress = FALSE;
 static gboolean interactive = FALSE;
 static gboolean backup = FALSE;
 static gboolean no_target_directory = FALSE;
+static gboolean no_copy_fallback = FALSE;
 static gboolean show_version = FALSE;
 
 static GOptionEntry entries[] =
@@ -44,6 +45,7 @@ static GOptionEntry entries[] =
   { "progress", 'p', 0, G_OPTION_ARG_NONE, &progress, N_("Show progress"), NULL },
   { "interactive", 'i', 0, G_OPTION_ARG_NONE, &interactive, N_("Prompt before overwrite"), NULL },
   { "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, N_("Backup existing destination files"), NULL },
+  { "no-copy-fallback", 'C', 0, G_OPTION_ARG_NONE, &no_copy_fallback, N_("Don't use copy and delete fallback"), NULL },
   { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version"), NULL },
   { NULL }
 };
@@ -197,6 +199,8 @@ main (int argc, char *argv[])
 	flags |= G_FILE_COPY_BACKUP;
       if (!interactive)
 	flags |= G_FILE_COPY_OVERWRITE;
+      if (no_copy_fallback)
+	flags |= G_FILE_COPY_NO_FALLBACK_FOR_MOVE;
 
       error = NULL;
       start_time = g_get_monotonic_time ();

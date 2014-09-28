@@ -93,6 +93,12 @@
 
                                 <listitem><para>Backup existing destination files.</para></listitem>
                         </varlistentry>
+
+                        <varlistentry>
+                                <term><option>-C</option>, <option>--no-copy-fallback</option></term>
+
+                                <listitem><para>Don't use copy and delete fallback.</para></listitem>
+                        </varlistentry>
                 </variablelist>
         </refsect1>
 
