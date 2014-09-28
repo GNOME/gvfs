@@ -147,7 +147,9 @@ g_vfs_daemon_finalize (GObject *object)
 
   daemon = G_VFS_DAEMON (object);
 
-  g_assert (daemon->jobs == NULL);
+  /* There may be some jobs outstanding if we've been force unmounted. */
+  if (daemon->jobs)
+    g_warning ("daemon->jobs != NULL when finalizing daemon!");
 
   if (daemon->name_watcher)
     g_bus_unwatch_name (daemon->name_watcher);
