@@ -793,7 +793,7 @@ typedef struct
   const gchar *message;
   const gchar *choices[3];
 
-  gboolean no_more_processes;
+  gboolean completed;
 
   GAsyncReadyCallback callback;
   gpointer            user_data;
@@ -802,7 +802,7 @@ typedef struct
 } UnmountWithOpData;
 
 static void
-complete_unmount_with_op (UnmountWithOpData *data)
+complete_unmount_with_op (UnmountWithOpData *data, gboolean no_more_processes)
 {
   gboolean ret;
   GSimpleAsyncResult *simple;
@@ -816,7 +816,7 @@ complete_unmount_with_op (UnmountWithOpData *data)
                                       data->user_data,
                                       NULL);
 
-  if (data->no_more_processes)
+  if (no_more_processes)
     {
       /* do nothing, e.g. return TRUE to signal we should unmount */
     }
@@ -834,6 +834,7 @@ complete_unmount_with_op (UnmountWithOpData *data)
         }
     }
 
+  data->completed = TRUE;
   g_simple_async_result_set_op_res_gboolean (simple, ret);
   g_simple_async_result_complete (simple);
   g_object_unref (simple);
@@ -847,7 +848,7 @@ on_show_processes_reply (GMountSource  *mount_source,
   UnmountWithOpData *data = user_data;
 
   /* Do nothing if we've handled this already */
-  if (data->no_more_processes)
+  if (data->completed)
     return;
 
   data->ret = g_mount_source_show_processes_finish (mount_source,
@@ -855,7 +856,7 @@ on_show_processes_reply (GMountSource  *mount_source,
                                                     &data->aborted,
                                                     &data->choice);
 
-  complete_unmount_with_op (data);
+  complete_unmount_with_op (data, FALSE);
 }
 
 static gboolean
@@ -869,19 +870,17 @@ on_update_processes_timeout (gpointer user_data)
     {
       /* no more processes, abort mount op */
       g_mount_source_abort (data->mount_source);
-      data->no_more_processes = TRUE;
-      complete_unmount_with_op (data);
+      complete_unmount_with_op (data, TRUE);
     }
   else
     {
-      /* ignore reply */
       processes = g_vfs_daemon_get_blocking_processes (daemon);
       g_mount_source_show_processes_async (data->mount_source,
                                            data->message,
                                            processes,
                                            data->choices,
-                                           NULL,
-                                           NULL);
+                                           (GAsyncReadyCallback) on_show_processes_reply,
+                                           data);
       g_array_unref (processes);
     }
 
