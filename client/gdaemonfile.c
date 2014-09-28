@@ -2823,6 +2823,14 @@ file_transfer (GFile                  *source,
       return FALSE;
     }
 
+  if (!native_transfer && remove_source &&
+      (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE))
+    {
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
+      return FALSE;
+    }
+
   if (!native_transfer && local_path == NULL)
     {
       /* This will cause the fallback code to be involved */
