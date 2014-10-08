@@ -270,6 +270,9 @@ g_vfs_channel_connection_closed (GVfsChannel *channel)
     return;
   channel->priv->connection_closed = TRUE;
   
+  if (g_vfs_backend_get_block_requests (channel->priv->backend))
+    return;
+
   if (channel->priv->current_job == NULL &&
       channel->priv->backend_handle != NULL)
     {
