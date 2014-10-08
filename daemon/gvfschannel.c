@@ -145,8 +145,6 @@ g_vfs_channel_finalize (GObject *object)
   if (channel->priv->backend)
     g_object_unref (channel->priv->backend);
   
-  g_assert (channel->priv->backend_handle == NULL);
-  
   if (G_OBJECT_CLASS (g_vfs_channel_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_channel_parent_class)->finalize) (object);
 }
