@@ -315,12 +315,22 @@ start_queued_request (GVfsChannel *channel)
 			    channel->priv->queued_requests);
 
       error = NULL;
-      /* This passes on ownership of req->data */
-      job = class->handle_request (channel,
-				   req->command, req->seq_nr,
-				   req->arg1, req->arg2,
-				   req->data, req->data_len,
-				   &error);
+      if (!g_vfs_backend_get_block_requests (channel->priv->backend))
+        {
+	  /* This passes on ownership of req->data */
+	  job = class->handle_request (channel,
+				       req->command, req->seq_nr,
+				       req->arg1, req->arg2,
+				       req->data, req->data_len,
+				       &error);
+        }
+      else
+	{
+	  job = NULL;
+	  error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_CLOSED,
+	                               _("Channel blocked"));
+	  g_free (req->data);
+	}
 
       if (job != NULL && req->cancelled)
 	{
@@ -359,22 +369,6 @@ got_request (GVfsChannel *channel,
   Request *req;
   guint32 command, arg1;
   GList *l;
-
-  if (g_vfs_backend_get_block_requests (channel->priv->backend))
-    {
-      char   *data;
-      gsize   data_len;
-      GError *err = NULL;
-      guint32 seq_nr;
-
-      g_set_error_literal (&err, G_IO_ERROR, G_IO_ERROR_CLOSED,
-			   "Channel blocked");
-      seq_nr = g_ntohl (request->seq_nr);
-      data = g_error_to_daemon_reply (err, seq_nr, &data_len);
-      g_vfs_channel_send_reply (channel, NULL, data, data_len);
-      g_error_free (err);
-      return;
-    }
 
   command = g_ntohl (request->command);
   arg1 = g_ntohl (request->arg1);
