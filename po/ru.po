@@ -8,23 +8,24 @@
 # Alexander Saprykin <xelfium@gmail.com>, 2010.
 # Yuri Kozlov <yuray@komyakino.ru>, 2010, 2011.
 # Yuri Myasoedov <ymyasoedov@yandex.ru>, 2012-2014.
+# Stas Solovey <whats_up@tut.by>, 2014.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-09-09 09:21+0000\n"
-"PO-Revision-Date: 2014-09-09 15:44+0300\n"
-"Last-Translator: Yuri Myasoedov <omerta13@yandex.ru>\n"
-"Language-Team: русский <gnome-cyr@gnome.org>\n"
+"POT-Creation-Date: 2014-10-09 09:18+0000\n"
+"PO-Revision-Date: 2014-10-10 01:38+0300\n"
+"Last-Translator: Stas Solovey <whats_up@tut.by>\n"
+"Language-Team: Русский <gnome-cyr@gnome.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 1.5.4\n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"X-Generator: Gtranslator 2.91.6\n"
 
 #: ../client/gdaemonfile.c:468 ../client/gdaemonfile.c:2830
 msgid "Operation not supported, files on different mounts"
@@ -87,7 +88,7 @@ msgstr "значения должны быть строками или спис�
 #: ../daemon/gvfsbackendobexftp.c:2031 ../daemon/gvfsbackendobexftp.c:2094
 #: ../daemon/gvfsbackendobexftp.c:2113 ../daemon/gvfsbackendsmb.c:1266
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:332
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:343
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1072
 #: ../monitor/proxy/gproxydrive.c:547 ../monitor/proxy/gproxydrive.c:635
 #: ../monitor/proxy/gproxydrive.c:785 ../monitor/proxy/gproxydrive.c:923
@@ -112,8 +113,8 @@ msgstr "Ошибка в протоколе потока: %s"
 #: ../client/gdaemonfileinputstream.c:545
 #: ../client/gdaemonfileinputstream.c:1715
 #: ../client/gdaemonfileoutputstream.c:496
-#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2144
-#: ../daemon/gvfsbackendmtp.c:2528
+#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2156
+#: ../daemon/gvfsbackendmtp.c:2540
 msgid "End of stream"
 msgstr "Конец потока"
 
@@ -233,24 +234,24 @@ msgstr "точка монтирования для %s уже запущена"
 msgid "error starting mount daemon"
 msgstr "ошибка запуска службы монтирования"
 
-#: ../daemon/gvfsafpconnection.c:766
+#: ../daemon/gvfsafpconnection.c:784
 msgid "The connection is not opened"
-msgstr "Соединение закрыто"
+msgstr "Соединение не открыто"
 
-#: ../daemon/gvfsafpconnection.c:773 ../daemon/gvfsbackendmtp.c:378
+#: ../daemon/gvfsafpconnection.c:791 ../daemon/gvfsbackendmtp.c:378
 msgid "The connection is closed"
 msgstr "Соединение закрыто"
 
-#: ../daemon/gvfsafpconnection.c:886 ../daemon/gvfsafpconnection.c:1592
+#: ../daemon/gvfsafpconnection.c:904 ../daemon/gvfsafpconnection.c:1610
 msgid "Got EOS"
 msgstr "Получен символ конца строки"
 
-#: ../daemon/gvfsafpconnection.c:1061 ../daemon/gvfsafpconnection.c:1102
+#: ../daemon/gvfsafpconnection.c:1079 ../daemon/gvfsafpconnection.c:1120
 #: ../daemon/gvfsftptask.c:371
 msgid "Host closed connection"
 msgstr "Узел закрыл соединение"
 
-#: ../daemon/gvfsafpconnection.c:1565
+#: ../daemon/gvfsafpconnection.c:1583
 msgid "Connection unexpectedly went down"
 msgstr "Соединение неожиданно оборвалось"
 
@@ -276,7 +277,7 @@ msgstr "Не удалось войти на сервер «%s» с указан�
 #: ../daemon/gvfsafpserver.c:990 ../daemon/gvfsafpserver.c:1674
 #, c-format
 msgid "Unable to connect to the server “%s”. A communication problem occurred."
-msgstr "Не удалось войти на сервер «%s» из-за ошибок связи."
+msgstr "Не удалось подключиться к серверу «%s» из-за ошибок связи."
 
 #: ../daemon/gvfsafpserver.c:623
 #, c-format
@@ -362,7 +363,7 @@ msgstr "От сервера получена ошибка: «%s»"
 #: ../daemon/gvfsafputils.c:127
 #, c-format
 msgid "Got unknown error code %d from server"
-msgstr "От сервера получена ошибка с неизвестным кодом %d"
+msgstr "От сервера получена ошибка с неизвестным кодом: «%d»"
 
 #. Translators: first %s is volumename and second servername
 #: ../daemon/gvfsafpvolume.c:154
@@ -447,7 +448,7 @@ msgstr "Недостаточно места на томе"
 #: ../daemon/gvfsbackendftp.c:758 ../daemon/gvfsbackendftp.c:939
 #: ../daemon/gvfsbackendftp.c:1379 ../daemon/gvfsbackendftp.c:1487
 #: ../daemon/gvfsbackendmtp.c:1527 ../daemon/gvfsbackendmtp.c:1660
-#: ../daemon/gvfsbackendmtp.c:1807 ../daemon/gvfsbackendsftp.c:4511
+#: ../daemon/gvfsbackendmtp.c:1819 ../daemon/gvfsbackendsftp.c:4511
 #: ../daemon/gvfsbackendsmb.c:2217
 msgid "Target file already exists"
 msgstr "Файл назначения уже существует"
@@ -523,7 +524,7 @@ msgstr "Конфликт расширенного блокирования"
 
 #: ../daemon/gvfsafpvolume.c:2301 ../daemon/gvfsbackendmtp.c:1369
 #: ../daemon/gvfsbackendmtp.c:1388 ../daemon/gvfsbackendmtp.c:1535
-#: ../daemon/gvfsbackendmtp.c:1754 ../daemon/gvfsbackendmtp.c:2270
+#: ../daemon/gvfsbackendmtp.c:1754 ../daemon/gvfsbackendmtp.c:2282
 msgid "Directory doesn't exist"
 msgstr "Каталог не существует"
 
@@ -549,8 +550,8 @@ msgstr "Внутренняя ошибка Apple File Control"
 
 #: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:742
 #: ../daemon/gvfsbackendmtp.c:1582 ../daemon/gvfsbackendmtp.c:1598
-#: ../daemon/gvfsbackendmtp.c:1875 ../daemon/gvfsbackendmtp.c:1922
-#: ../daemon/gvfsbackendmtp.c:1991 ../daemon/gvfsbackendmtp.c:2347
+#: ../daemon/gvfsbackendmtp.c:1887 ../daemon/gvfsbackendmtp.c:1934
+#: ../daemon/gvfsbackendmtp.c:2003 ../daemon/gvfsbackendmtp.c:2359
 msgid "File does not exist"
 msgstr "Файл не существует"
 
@@ -680,7 +681,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackendafc.c:981 ../daemon/gvfsbackendarchive.c:742
 #: ../daemon/gvfsbackendcomputer.c:657 ../daemon/gvfsbackendgphoto2.c:1848
-#: ../daemon/gvfsbackendmtp.c:2013 ../daemon/gvfsbackendobexftp.c:1099
+#: ../daemon/gvfsbackendmtp.c:2025 ../daemon/gvfsbackendobexftp.c:1099
 #: ../daemon/gvfsbackendrecent.c:122 ../daemon/gvfsbackendsmb.c:803
 #: ../daemon/gvfsbackendtrash.c:234
 msgid "Can't open directory"
@@ -696,11 +697,11 @@ msgstr "Неверный тип поиска"
 
 #: ../daemon/gvfsbackendafc.c:2415 ../daemon/gvfsbackendafp.c:1790
 #: ../daemon/gvfsbackendftp.c:1093 ../daemon/gvfsbackendftp.c:1141
-#: ../daemon/gvfsbackendftp.c:1162 ../daemon/gvfsbackendmtp.c:1978
-#: ../daemon/gvfsbackendmtp.c:2244 ../daemon/gvfsbackendmtp.c:2334
-#: ../daemon/gvfsbackendmtp.c:2404 ../daemon/gvfsbackendsftp.c:1865
-#: ../daemon/gvfsbackendsftp.c:4859 ../daemon/gvfsbackendsmb.c:1861
-#: ../daemon/gvfsftptask.c:403
+#: ../daemon/gvfsbackendftp.c:1162 ../daemon/gvfsbackendmtp.c:1778
+#: ../daemon/gvfsbackendmtp.c:1990 ../daemon/gvfsbackendmtp.c:2256
+#: ../daemon/gvfsbackendmtp.c:2346 ../daemon/gvfsbackendmtp.c:2416
+#: ../daemon/gvfsbackendsftp.c:1865 ../daemon/gvfsbackendsftp.c:4859
+#: ../daemon/gvfsbackendsmb.c:1861 ../daemon/gvfsftptask.c:403
 msgid "Operation unsupported"
 msgstr "Действие не поддерживается"
 
@@ -750,8 +751,8 @@ msgstr "Не удалось скопировать каталог поверх �
 
 #: ../daemon/gvfsbackendafp.c:304 ../daemon/gvfsbackendburn.c:891
 #: ../daemon/gvfsbackendftp.c:1502 ../daemon/gvfsbackendmtp.c:1643
-#: ../daemon/gvfsbackendmtp.c:1666 ../daemon/gvfsbackendmtp.c:1789
-#: ../daemon/gvfsbackendmtp.c:1813 ../daemon/gvfsbackendobexftp.c:1821
+#: ../daemon/gvfsbackendmtp.c:1666 ../daemon/gvfsbackendmtp.c:1801
+#: ../daemon/gvfsbackendmtp.c:1825 ../daemon/gvfsbackendobexftp.c:1821
 msgid "Can't recursively copy directory"
 msgstr "Не удалось скопировать каталог рекурсивно"
 
@@ -1253,7 +1254,7 @@ msgstr "Ошибка получения файла"
 msgid "Error getting data from file"
 msgstr "Ошибка получения данных из файла"
 
-#: ../daemon/gvfsbackendgphoto2.c:1947 ../daemon/gvfsbackendmtp.c:2105
+#: ../daemon/gvfsbackendgphoto2.c:1947 ../daemon/gvfsbackendmtp.c:2117
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Некорректный идентификатор значка «%s»"
@@ -1417,28 +1418,26 @@ msgstr "Файл не найден"
 msgid "Cannot make directory in this location"
 msgstr "Не удалось создать каталог в данном каталоге"
 
-#: ../daemon/gvfsbackendmtp.c:1587 ../daemon/gvfsbackendmtp.c:1880
-#: ../daemon/gvfsbackendmtp.c:1927 ../daemon/gvfsbackendmtp.c:1996
-#: ../daemon/gvfsbackendmtp.c:2352 ../daemon/gvfsbackendmtp.c:2420
+#: ../daemon/gvfsbackendmtp.c:1587 ../daemon/gvfsbackendmtp.c:1892
+#: ../daemon/gvfsbackendmtp.c:1939 ../daemon/gvfsbackendmtp.c:2008
+#: ../daemon/gvfsbackendmtp.c:2364 ../daemon/gvfsbackendmtp.c:2432
 #: ../daemon/gvfsbackendsmbbrowse.c:1209
 msgid "Not a regular file"
 msgstr "Не является обычным файлом"
 
-#: ../daemon/gvfsbackendmtp.c:1633 ../daemon/gvfsbackendmtp.c:1779
-#| msgid "Target %s is not a directory\n"
+#: ../daemon/gvfsbackendmtp.c:1633 ../daemon/gvfsbackendmtp.c:1791
 msgid "Target is a directory"
 msgstr "Цель является каталогом"
 
-#: ../daemon/gvfsbackendmtp.c:1638 ../daemon/gvfsbackendmtp.c:1784
-#| msgid "Create directories."
+#: ../daemon/gvfsbackendmtp.c:1638 ../daemon/gvfsbackendmtp.c:1796
 msgid "Can't merge directories"
 msgstr "Невозможно объединить каталоги"
 
-#: ../daemon/gvfsbackendmtp.c:1731 ../daemon/gvfsbackendmtp.c:2262
+#: ../daemon/gvfsbackendmtp.c:1731 ../daemon/gvfsbackendmtp.c:2274
 msgid "Cannot write to this location"
 msgstr "Не удалось выполнить запись в данном каталоге"
 
-#: ../daemon/gvfsbackendmtp.c:2087
+#: ../daemon/gvfsbackendmtp.c:2099
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "Нет миниатюры для объекта «%s»"
@@ -1724,6 +1723,10 @@ msgstr "Элементы в корзине не могут быть измене
 #: ../daemon/gvfsbackendtrash.c:768 ../daemon/gvfsbackendtrash.c:880
 msgid "Trash"
 msgstr "Корзина"
+
+#: ../daemon/gvfschannel.c:332
+msgid "Channel blocked"
+msgstr "Канал заблокирован"
 
 #: ../daemon/gvfsftpconnection.c:180
 msgid "Unexpected end of stream"
@@ -2289,7 +2292,7 @@ msgstr "Запоминающее устройство"
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr ""
 "Не удалось извлечь диск, потому что один или несколько томов этого диска "
-"заняты."
+"используются."
 
 #: ../monitor/hal/ghalmount.c:159 ../monitor/hal/ghalvolume.c:163
 #, c-format
@@ -3071,7 +3074,7 @@ msgstr "Значение не определено\n"
 msgid "Invalid attribute type %s\n"
 msgstr "Неверный тип атрибута %s\n"
 
-#: ../programs/gvfs-set-attribute.c:235
+#: ../programs/gvfs-set-attribute.c:238
 #, c-format
 msgid "Error setting attribute: %s\n"
 msgstr "Ошибка установки атрибута: %s\n"
