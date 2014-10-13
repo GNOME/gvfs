@@ -56,7 +56,9 @@ complete -o nospace -F __gvfs_multiple_uris gvfs-monitor-dir
 complete -o nospace -F __gvfs_multiple_uris gvfs-monitor-file
 complete -o nospace -F __gvfs_multiple_uris gvfs-move
 complete -o nospace -F __gvfs_multiple_uris gvfs-open
+complete -o nospace -F __gvfs_multiple_uris gvfs-rename
 complete -o nospace -F __gvfs_multiple_uris gvfs-rm
 complete -o nospace -F __gvfs_multiple_uris gvfs-save
+complete -o nospace -F __gvfs_multiple_uris gvfs-set-attribute
 complete -o nospace -F __gvfs_multiple_uris gvfs-trash
 complete -o nospace -F __gvfs_multiple_uris gvfs-tree
