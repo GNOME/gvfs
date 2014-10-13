@@ -35,7 +35,7 @@
                         <command>gvfs-mime --query <arg choice="req">MIMETYPE</arg></command>
                 </cmdsynopsis>
                 <cmdsynopsis>
-                        <command>gvfs-mime --set <arg choice="req">MIMETYPE</arg> <arg choice="req">HANDER</arg></command>
+                        <command>gvfs-mime --set <arg choice="req">MIMETYPE</arg> <arg choice="req">HANDLER</arg></command>
                 </cmdsynopsis>
         </refsynopsisdiv>
 
