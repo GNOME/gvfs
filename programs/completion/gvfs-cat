@@ -17,7 +17,7 @@
 #
 # Author: David Zeuthen <davidz@redhat.com>
 
-# Check for bash                                                                
+# Check for bash
 [ -z "$BASH_VERSION" ] && return
 
 ####################################################################################################
@@ -32,7 +32,7 @@ __gvfs_multiple_uris() {
     # don't misbehave on colons; See item E13 at http://tiswww.case.edu/php/chet/bash/FAQ
     # We handle this locally be extracting any BLAH: prefix and removing it from the result.
     # Not great, but better than globally changing COMP_WORDBREAKS
-    
+
     case "$cur" in
 	*:*)
 	    case "$COMP_WORDBREAKS" in

@@ -1,5 +1,9 @@
 NULL =
 
+if ENABLE_BASHCOMP
+SUBDIRS = completion
+endif
+
 AM_CPPFLAGS =					\
 	-I$(top_srcdir)				\
 	-I$(top_builddir)			\
@@ -32,11 +36,6 @@ bin_PROGRAMS =					\
 bin_SCRIPTS =					\
 	gvfs-less				\
 	$(NULL)
-
-if ENABLE_BASHCOMP
-profiledir = $(BASHCOMP_DIR)
-profile_DATA = completion/gvfs
-endif
 
 gvfs_cat_SOURCES = gvfs-cat.c
 gvfs_cat_LDADD = $(libraries)
@@ -89,4 +88,4 @@ gvfs_mkdir_LDADD = $(libraries)
 gvfs_mime_SOURCES = gvfs-mime.c
 gvfs_mime_LDADD = $(libraries)
 
-EXTRA_DIST = gvfs-less completion/gvfs
+EXTRA_DIST = gvfs-less
