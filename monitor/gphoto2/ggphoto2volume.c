@@ -59,6 +59,7 @@ struct _GGPhoto2Volume {
 
   char *name;
   char *icon;
+  char *symbolic_icon;
 };
 
 static void g_gphoto2_volume_volume_iface_init (GVolumeIface *iface);
@@ -85,6 +86,7 @@ g_gphoto2_volume_finalize (GObject *object)
 
   g_free (volume->name);
   g_free (volume->icon);
+  g_free (volume->symbolic_icon);
 
   if (G_OBJECT_CLASS (g_gphoto2_volume_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_gphoto2_volume_parent_class)->finalize) (object);
@@ -317,6 +319,7 @@ g_gphoto2_volume_new (GVolumeMonitor   *volume_monitor,
 #ifdef HAVE_GUDEV
   volume->name = g_vfs_get_volume_name (device, "ID_GPHOTO2");
   volume->icon = g_vfs_get_volume_icon (device);
+  volume->symbolic_icon = g_vfs_get_volume_symbolic_icon (device);
   /* we do not really need to listen for changes */
 #else
   g_signal_connect_object (device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
@@ -342,6 +345,18 @@ g_gphoto2_volume_get_icon (GVolume *volume)
 
   G_LOCK (gphoto2_volume);
   icon = g_themed_icon_new (gphoto2_volume->icon);
+  G_UNLOCK (gphoto2_volume);
+  return icon;
+}
+
+static GIcon *
+g_gphoto2_volume_get_symbolic_icon (GVolume *volume)
+{
+  GGPhoto2Volume *gphoto2_volume = G_GPHOTO2_VOLUME (volume);
+  GIcon *icon;
+
+  G_LOCK (gphoto2_volume);
+  icon = g_themed_icon_new_with_default_fallbacks (gphoto2_volume->symbolic_icon);
   G_UNLOCK (gphoto2_volume);
   return icon;
 }
@@ -555,6 +570,7 @@ g_gphoto2_volume_volume_iface_init (GVolumeIface *iface)
 {
   iface->get_name = g_gphoto2_volume_get_name;
   iface->get_icon = g_gphoto2_volume_get_icon;
+  iface->get_symbolic_icon = g_gphoto2_volume_get_symbolic_icon;
   iface->get_uuid = g_gphoto2_volume_get_uuid;
   iface->get_drive = g_gphoto2_volume_get_drive;
   iface->get_mount = g_gphoto2_volume_get_mount;
