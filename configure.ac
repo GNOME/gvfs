@@ -924,6 +924,7 @@ monitor/afc/Makefile
 monitor/mtp/Makefile
 monitor/goa/Makefile
 programs/Makefile
+programs/completion/Makefile
 man/Makefile
 test/Makefile
 po/Makefile.in
