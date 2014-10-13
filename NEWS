@@ -1,3 +1,13 @@
+Major changes in 1.22.1
+=======================
+* mtp: Improve transfer speed for large files
+* trash: Do not poll mount points without read access
+* afp: Fix volume names encoding
+* gvfs-set-attribute: "-n" flag implementation
+* Improvements to avoid crashes during unmount
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.22.0
 =======================
 * Translation updates
