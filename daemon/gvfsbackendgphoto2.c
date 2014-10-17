@@ -38,6 +38,7 @@
 #include <gphoto2.h>
 #ifdef HAVE_GUDEV
   #include <gudev/gudev.h>
+  #include "gvfsgphoto2utils.h"
 #elif defined(HAVE_HAL)
   #include <libhal.h>
   #include <dbus/dbus.h>
@@ -62,7 +63,6 @@
 #include "gvfsmonitor.h"
 #include "gvfsjobseekwrite.h"
 #include "gvfsicon.h"
-#include "gvfsgphoto2utils.h"
 
 /* showing debug traces */
 #if 1
