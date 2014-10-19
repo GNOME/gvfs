@@ -876,18 +876,8 @@ do_seek_on_read (GVfsBackend *backend,
   off_t res;
   smbc_lseek_fn smbc_lseek;
 
-  switch (type)
+  if ((whence = gvfs_seek_type_to_lseek (type)) == -1)
     {
-    case G_SEEK_SET:
-      whence = SEEK_SET;
-      break;
-    case G_SEEK_CUR:
-      whence = SEEK_CUR;
-      break;
-    case G_SEEK_END:
-      whence = SEEK_END;
-      break;
-    default:
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 			_("Unsupported seek type"));
@@ -1365,18 +1355,8 @@ do_seek_on_write (GVfsBackend *backend,
   off_t res;
   smbc_lseek_fn smbc_lseek;
 
-  switch (type)
+  if ((whence = gvfs_seek_type_to_lseek (type)) == -1)
     {
-    case G_SEEK_SET:
-      whence = SEEK_SET;
-      break;
-    case G_SEEK_CUR:
-      whence = SEEK_CUR;
-      break;
-    case G_SEEK_END:
-      whence = SEEK_END;
-      break;
-    default:
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 			_("Unsupported seek type"));

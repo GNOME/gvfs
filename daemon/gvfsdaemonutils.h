@@ -40,6 +40,8 @@ void	     gvfs_file_info_populate_content_types  (GFileInfo        *info,
 						     const char       *basename,
 						     GFileType         type);
 
+int          gvfs_seek_type_to_lseek                (GSeekType         type);
+
 G_END_DECLS
 
 #endif /* __G_VFS_DAEMON_UTILS_H__ */

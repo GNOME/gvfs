@@ -43,6 +43,7 @@
 #include "gvfsjobopenforwrite.h"
 #include "gvfsjobclosewrite.h"
 #include "gvfsjobqueryinfowrite.h"
+#include "gvfsdaemonutils.h"
 
 G_DEFINE_TYPE (GVfsBackendTest, g_vfs_backend_test, G_VFS_TYPE_BACKEND)
 
@@ -218,20 +219,8 @@ do_seek_on_read (GVfsBackend *backend,
 
   g_print ("seek_on_read (%d, %u)\n", (int)offset, type);
 
-  switch (type)
-    {
-    default:
-    case G_SEEK_SET:
-      whence = SEEK_SET;
-      break;
-    case G_SEEK_CUR:
-      whence = SEEK_CUR;
-      break;
-    case G_SEEK_END:
-      whence = SEEK_END;
-      break;
-    }
-      
+  if ((whence = gvfs_seek_type_to_lseek (type)) == -1)
+    whence = SEEK_SET;
   
   fd = GPOINTER_TO_INT (handle);
 

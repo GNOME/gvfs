@@ -1341,18 +1341,8 @@ g_vfs_backend_afc_seek (GVfsBackendAfc *self,
   int afc_seek_type;
   FileHandle *fh;
 
-  switch (type)
+  if ((afc_seek_type = gvfs_seek_type_to_lseek (type)) == -1)
     {
-    case G_SEEK_SET:
-      afc_seek_type = SEEK_SET;
-      break;
-    case G_SEEK_CUR:
-      afc_seek_type = SEEK_CUR;
-      break;
-    case G_SEEK_END:
-      afc_seek_type = SEEK_END;
-      break;
-    default:
       g_vfs_job_failed(job, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                        _("Invalid seek type"));
       return 1;

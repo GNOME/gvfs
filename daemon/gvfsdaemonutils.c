@@ -215,3 +215,25 @@ gvfs_file_info_populate_content_types (GFileInfo  *info,
 
   g_free (free_mimetype);
 }
+
+/**
+ * gvfs_seek_type_to_lseek:
+ * @type: the seek type
+ *
+ * Takes a GSeekType and converts it to an lseek type.
+ **/
+int
+gvfs_seek_type_to_lseek (GSeekType type)
+{
+  switch (type)
+    {
+    case G_SEEK_CUR:
+      return SEEK_CUR;
+    case G_SEEK_SET:
+      return SEEK_SET;
+    case G_SEEK_END:
+      return SEEK_END;
+    default:
+      return -1;
+    }
+}
