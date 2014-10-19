@@ -13,6 +13,7 @@
 #include "metabuilder.h"
 #include <glib.h>
 #include <glib/gstdio.h>
+#include "gvfsutils.h"
 #include "crc32.h"
 
 #ifdef HAVE_LIBUDEV
@@ -266,38 +267,14 @@ link_to_tmp (const char *source, char *tmpl)
 {
   char *XXXXXX;
   int count, res;
-  static const char letters[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  static const int NLETTERS = sizeof (letters) - 1;
-  glong value;
-  GTimeVal tv;
-  static int counter = 0;
 
   /* find the last occurrence of "XXXXXX" */
   XXXXXX = g_strrstr (tmpl, "XXXXXX");
   g_assert (XXXXXX != NULL);
 
-  /* Get some more or less random data.  */
-  g_get_current_time (&tv);
-  value = (tv.tv_usec ^ tv.tv_sec) + counter++;
-
-  for (count = 0; count < 100; value += 7777, ++count)
+  for (count = 0; count < 100; ++count)
     {
-      glong v = value;
-
-      /* Fill in the random bits.  */
-      XXXXXX[0] = letters[v % NLETTERS];
-      v /= NLETTERS;
-      XXXXXX[1] = letters[v % NLETTERS];
-      v /= NLETTERS;
-      XXXXXX[2] = letters[v % NLETTERS];
-      v /= NLETTERS;
-      XXXXXX[3] = letters[v % NLETTERS];
-      v /= NLETTERS;
-      XXXXXX[4] = letters[v % NLETTERS];
-      v /= NLETTERS;
-      XXXXXX[5] = letters[v % NLETTERS];
-
+      gvfs_randomize_string (XXXXXX, 6);
       res = link (source, tmpl);
 
       if (res >= 0)

@@ -28,6 +28,7 @@ libgvfscommon_la_SOURCES = 	\
 	gvfsdaemonprotocol.c gvfsdaemonprotocol.h \
 	gvfsicon.h gvfsicon.c \
 	gvfsfileinfo.c gvfsfileinfo.h \
+	gvfsutils.c gvfsutils.h \
 	$(dbus_built_sources) \
 	$(NULL)
 

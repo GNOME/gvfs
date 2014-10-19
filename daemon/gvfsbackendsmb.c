@@ -49,6 +49,8 @@
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
+#include "gvfsdaemonutils.h"
+#include "gvfsutils.h"
 #include "gvfskeyring.h"
 
 #include <libsmbclient.h>
@@ -1052,16 +1054,6 @@ do_append_to (GVfsBackend *backend,
 }
 
 
-static void
-random_chars (char *str, int len)
-{
-  int i;
-  const char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-  for (i = 0; i < len; i++)
-    str[i] = chars[g_random_int_range (0, strlen(chars))];
-}
-
 static char *
 get_dir_from_uri (const char *uri)
 {
@@ -1095,7 +1087,7 @@ open_tmpfile (GVfsBackendSmb *backend,
   dir_uri = get_dir_from_uri (uri);
  
   do {
-    random_chars (filename + 4, 4);
+    gvfs_randomize_string (filename + 4, 4);
     tmp_uri = g_strconcat (dir_uri, filename, NULL);
 
     smbc_open = smbc_getFunctionOpen (backend->smb_context);

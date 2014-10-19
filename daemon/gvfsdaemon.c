@@ -38,6 +38,7 @@
 #include <gvfsdaemon.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
+#include <gvfsutils.h>
 #include <gvfsjobmount.h>
 #include <gvfsjobopenforread.h>
 #include <gvfsjobopenforwrite.h>
@@ -722,18 +723,6 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
 #define USE_ABSTRACT_SOCKETS
 #endif
 
-static void
-randomize_string (char tmp[9])
-{
-  int i;
-  const char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-  for (i = 0; i < 8; i++)
-    tmp[i] = chars[g_random_int_range (0, strlen(chars))];
-  
-  tmp[8] = '\0';
-}
-
 #ifndef USE_ABSTRACT_SOCKETS
 static gboolean
 test_safe_socket_dir (const char *dirname)
@@ -770,7 +759,8 @@ create_socket_dir (void)
     {
       g_free (safe_dir);
 
-      randomize_string (tmp);
+      gvfs_randomize_string (tmp, 8);
+      tmp[8] = '\0';
 		
       dirname = g_strdup_printf ("gvfs-%s-%s",
 				 g_get_user_name (), tmp);
@@ -827,7 +817,8 @@ generate_address (char **address,
   {
     gchar  tmp[9];
 
-    randomize_string (tmp);
+    gvfs_randomize_string (tmp, 8);
+    tmp[8] = '\0';
     *address = g_strdup_printf ("unix:abstract=/dbus-vfs-daemon/socket-%s", tmp);
   }
 #else

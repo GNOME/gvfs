@@ -215,4 +215,3 @@ gvfs_file_info_populate_content_types (GFileInfo  *info,
 
   g_free (free_mimetype);
 }
-

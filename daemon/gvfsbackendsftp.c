@@ -66,6 +66,7 @@
 #include "gvfsjobpush.h"
 #include "gvfsjobpull.h"
 #include "gvfsdaemonprotocol.h"
+#include "gvfsutils.h"
 #include "gvfskeyring.h"
 #include "sftp.h"
 #include "pty_open.h"
@@ -3408,34 +3409,6 @@ replace_create_temp_reply (GVfsBackendSftp *backend,
 }
 
 static void
-random_text (char *s)
-{
-  static const char letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  static const int NLETTERS = sizeof (letters) - 1;
-  static int counter = 0;
-
-  GTimeVal tv;
-  glong value;
-
-  /* Get some more or less random data.  */
-  g_get_current_time (&tv);
-  value = (tv.tv_usec ^ tv.tv_sec) + counter++;
-
-  /* Fill in the random bits.  */
-  s[0] = letters[value % NLETTERS];
-  value /= NLETTERS;
-  s[1] = letters[value % NLETTERS];
-  value /= NLETTERS;
-  s[2] = letters[value % NLETTERS];
-  value /= NLETTERS;
-  s[3] = letters[value % NLETTERS];
-  value /= NLETTERS;
-  s[4] = letters[value % NLETTERS];
-  value /= NLETTERS;
-  s[5] = letters[value % NLETTERS];
-}
-
-static void
 replace_create_temp (GVfsBackendSftp *backend,
                      GVfsJobOpenForWrite *job)
 {
@@ -3460,7 +3433,7 @@ replace_create_temp (GVfsBackendSftp *backend,
   g_free (data->tempname);
   
   dirname = g_path_get_dirname (job->filename);
-  random_text (basename + 8);
+  gvfs_randomize_string (basename + 8, 6);
   data->tempname = g_build_filename (dirname, basename, NULL);
   g_free (dirname);
 
@@ -5395,7 +5368,7 @@ push_create_temp (SftpPushHandle *handle)
 
   g_free (handle->tempname);
   dirname = g_path_get_dirname (handle->op_job->destination);
-  random_text (basename + 8);
+  gvfs_randomize_string (basename + 8, 6);
   handle->tempname = g_build_filename (dirname, basename, NULL);
   g_free (dirname);
 
