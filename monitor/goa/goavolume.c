@@ -179,7 +179,11 @@ mount_enclosing_volume_cb (GObject *source_object, GAsyncResult *res, gpointer u
         }
       else
         {
-          g_warning ("Already mounted %s: %s", g_file_get_uri (root), error->message);
+          gchar *uri;
+
+          uri = g_file_get_uri (root);
+          g_warning ("Already mounted %s: %s", uri, error->message);
+          g_free (uri);
           g_error_free (error);
         }
     }
