@@ -75,6 +75,15 @@
  * fstat
  */
 
+
+#define PRINT_DEBUG
+
+#ifdef PRINT_DEBUG
+#define DEBUG(msg...) g_print("### SFTP: " msg)
+#else
+#define DEBUG(...)
+#endif
+
 #if defined(HAVE_GRANTPT) || defined(HAVE_OPENPTY)
 /* We only use this on systems with unix98 or BSD ptys */
 #define USE_PTY 1
@@ -503,6 +512,14 @@ spawn_ssh (GVfsBackend *backend,
            int *slave_fd,
            GError **error)
 {
+#ifdef PRINT_DEBUG
+  DEBUG ("spawn_ssh: ");
+  const char **arg;
+  for (arg = (const char **)args; *arg != NULL; arg++)
+    g_print ("%s ", *arg);
+  g_print ("\n");
+#endif
+
 #ifdef USE_PTY
   *tty_fd = pty_open(pid, PTY_REAP_CHILD, NULL,
 		     args[0], args, NULL,
@@ -865,6 +882,13 @@ handle_login (GVfsBackend *backend,
   const gchar *authtype = NULL;
   gchar *object = NULL;
   char *prompt;
+#ifdef PRINT_DEBUG
+  static int i = 0;
+  i++;
+#endif
+
+  DEBUG ("handle_login #%d - user: %s, host: %s, port: %d\n",
+         i, op_backend->user, op_backend->host, op_backend->port);
   
   if (op_backend->client_vendor == SFTP_VENDOR_SSH) 
     prompt_fd = stderr_fd;
@@ -910,6 +934,8 @@ handle_login (GVfsBackend *backend,
         }
       
       buffer[len] = 0;
+
+      DEBUG ("handle_login #%d - prompt: \"%s\"\n", i, buffer);
 
       /*
        * If the input URI contains a username
@@ -957,6 +983,8 @@ handle_login (GVfsBackend *backend,
             {
               GAskPasswordFlags flags = G_ASK_PASSWORD_NEED_PASSWORD;
               
+              DEBUG ("handle_login #%d - asking for password...\n", i);
+
               if (g_vfs_keyring_is_available ())
                 flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
 	      if (strcmp (authtype, "password") == 0 &&
@@ -1008,14 +1036,22 @@ handle_login (GVfsBackend *backend,
 	       */
 	      new_password = op_backend->tmp_password;
 	      op_backend->tmp_password = NULL;
+
+              DEBUG ("handle_login #%d - using credentials from previous login attempt...\n", i);
 	    }
           else
-            password_in_keyring = TRUE;
+            {
+              password_in_keyring = TRUE;
+
+              DEBUG ("handle_login #%d - using credentials from keyring...\n", i);
+            }
 
 	  if (new_user &&
 	      (op_backend->user == NULL ||
 	       strcmp (new_user, op_backend->user) != 0))
 	    {
+	      DEBUG ("handle_login #%d - new_user: %s\n", i, new_user);
+
 	      g_free (op_backend->user);
 	      op_backend->user = new_user;
 
@@ -1073,6 +1109,8 @@ handle_login (GVfsBackend *backend,
 	  gint choice;
 	  gchar *message;
 
+          DEBUG ("handle_login #%d - confirming authenticity of host...\n", i);
+
 	  get_hostname_and_fingerprint_from_line (buffer, &hostname, &fingerprint);
 
 	  message = g_strdup_printf (_("Can't verify the identity of “%s”.\n"
@@ -1123,6 +1161,8 @@ handle_login (GVfsBackend *backend,
   
   if (ret_val)
     {
+      DEBUG ("handle_login #%d - password_save: %d\n", i, op_backend->password_save);
+
       /* Login succeed, save password in keyring */
       g_vfs_keyring_save_password (op_backend->user,
                                    op_backend->host,
@@ -1137,6 +1177,8 @@ handle_login (GVfsBackend *backend,
                                    new_password,
                                    op_backend->password_save);
     }
+
+  DEBUG ("handle_login #%d - ret_val: %d\n", i, ret_val);
 
   g_free (object);
   g_free (new_password);
