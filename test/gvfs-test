@@ -563,7 +563,7 @@ class Ftp(GvfsTestCase):
                 s.close()
                 break
             except ConnectionRefusedError:
-                time.sleep(0.01)
+                time.sleep(0.1)
                 pass
         else:
             self.fail('timed out waiting for test FTP server')
