@@ -951,7 +951,7 @@ handle_login (GVfsBackend *backend,
 					      op_backend->port
 					      :
 					      0,
-                                              NULL,
+                                              &new_user,
                                               NULL,
                                               &new_password)))
             {
