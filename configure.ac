@@ -385,10 +385,10 @@ AC_SUBST(AFC_CFLAGS)
 
 AM_CONDITIONAL(USE_AFC, [test "$msg_afc" = "yes"])
 
-dnl *************************************************
-dnl *** Check if we should build with GOA backend ***
-dnl *************************************************
-AC_ARG_ENABLE(goa, AS_HELP_STRING([--disable-goa],[build without GOA backend]))
+dnl ********************************************************
+dnl *** Check if we should build with GOA volume monitor ***
+dnl ********************************************************
+AC_ARG_ENABLE(goa, AS_HELP_STRING([--disable-goa],[build without GOA volume monitor]))
 msg_goa=no
 GOA_LIBS=
 GOA_CFLAGS=
