@@ -514,9 +514,6 @@ Subsystem sftp %(sftp_server)s
             self.assertTrue('Login dialog cancelled' in err, err)
 
     def do_mount_check(self, uri):
-        with open('stuff.txt', 'w') as f:
-            f.write('moo!')
-
         # appears in gvfs-mount list
         (out, err) = self.program_out_err(['gvfs-mount', '-li'])
         try:
