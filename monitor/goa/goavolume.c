@@ -244,7 +244,6 @@ ensure_credentials_cb (GObject *source_object, GAsyncResult *res, gpointer user_
   GError *error;
   GoaPasswordBased *passwd_based;
   MountOp *data;
-  const gchar *id;
 
   self = G_VFS_GOA_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
   data = g_async_result_get_user_data (G_ASYNC_RESULT (simple));
@@ -280,8 +279,7 @@ ensure_credentials_cb (GObject *source_object, GAsyncResult *res, gpointer user_
       return;
     }
 
-  id = goa_account_get_id (account);
-  goa_password_based_call_get_password (passwd_based, id, data->cancellable, get_password_cb, simple);
+  goa_password_based_call_get_password (passwd_based, "password", data->cancellable, get_password_cb, simple);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
