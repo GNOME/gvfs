@@ -1,7 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /* gvfs - extensions for gio
  *
- * Copyright (C) 2012, 2013 Red Hat, Inc.
+ * Copyright (C) 2012, 2013, 2014 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -192,6 +192,50 @@ mount_enclosing_volume_cb (GObject *source_object, GAsyncResult *res, gpointer u
 }
 
 static void
+get_access_token_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GoaOAuth2Based *oauth2_based = GOA_OAUTH2_BASED (source_object);
+  GSimpleAsyncResult *simple = user_data;
+  GVfsGoaVolume *self;
+  GError *error;
+  GoaAccount *account;
+  GoaFiles *files;
+  MountOp *data;
+
+  self = G_VFS_GOA_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
+  data = g_async_result_get_user_data (G_ASYNC_RESULT (simple));
+
+  error = NULL;
+  if (!goa_oauth2_based_call_get_access_token_finish (oauth2_based, &data->passwd, NULL, res, &error))
+    {
+      g_simple_async_result_take_error (simple, error);
+      g_simple_async_result_complete_in_idle (simple);
+      return;
+    }
+
+  account = goa_object_peek_account (self->object);
+  files = goa_object_peek_files (self->object);
+  if (files == NULL)
+    {
+      g_simple_async_result_set_error (simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_FAILED,
+                                       _("Failed to get org.gnome.OnlineAccounts.Files for %s"),
+                                       goa_account_get_id (account));
+      g_simple_async_result_complete_in_idle (simple);
+      return;
+    }
+
+  g_mount_operation_set_username (data->mount_operation, goa_account_get_identity (account));
+  g_file_mount_enclosing_volume (self->root,
+                                 G_MOUNT_MOUNT_NONE,
+                                 data->mount_operation,
+                                 data->cancellable,
+                                 mount_enclosing_volume_cb,
+                                 simple);
+}
+
+static void
 get_password_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GoaPasswordBased *passwd_based = GOA_PASSWORD_BASED (source_object);
@@ -242,6 +286,7 @@ ensure_credentials_cb (GObject *source_object, GAsyncResult *res, gpointer user_
   GSimpleAsyncResult *simple = user_data;
   GVfsGoaVolume *self;
   GError *error;
+  GoaOAuth2Based *oauth2_based;
   GoaPasswordBased *passwd_based;
   MountOp *data;
 
@@ -267,19 +312,27 @@ ensure_credentials_cb (GObject *source_object, GAsyncResult *res, gpointer user_
       return;
     }
 
-  passwd_based = goa_object_peek_password_based (self->object);
-  if (passwd_based == NULL)
+  oauth2_based = goa_object_peek_oauth2_based (self->object);
+  if (oauth2_based != NULL)
     {
-      g_simple_async_result_set_error (simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_NOT_SUPPORTED,
-                                       _("Unsupported authentication method for %s"),
-                                       goa_account_get_presentation_identity (account));
-      g_simple_async_result_complete_in_idle (simple);
+      goa_oauth2_based_call_get_access_token (oauth2_based, data->cancellable, get_access_token_cb, simple);
       return;
     }
 
-  goa_password_based_call_get_password (passwd_based, "password", data->cancellable, get_password_cb, simple);
+  passwd_based = goa_object_peek_password_based (self->object);
+  if (passwd_based != NULL)
+    {
+      goa_password_based_call_get_password (passwd_based, "password", data->cancellable, get_password_cb, simple);
+      return;
+    }
+
+  g_simple_async_result_set_error (simple,
+                                   G_IO_ERROR,
+                                   G_IO_ERROR_NOT_SUPPORTED,
+                                   _("Unsupported authentication method for %s"),
+                                   goa_account_get_presentation_identity (account));
+  g_simple_async_result_complete_in_idle (simple);
+
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
