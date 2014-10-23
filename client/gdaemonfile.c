@@ -2291,8 +2291,7 @@ g_daemon_file_find_enclosing_mount (GFile *file,
         }
       g_mount_info_unref (mount_info);
       
-      if (mount)
-	return G_MOUNT (mount);
+      return G_MOUNT (mount);
     }
 
   g_set_error_literal (error, G_IO_ERROR,
@@ -3492,12 +3491,8 @@ find_enclosing_mount_cb (GMountInfo *mount_info,
       if (mount == NULL)
         mount = g_daemon_mount_new (mount_info, NULL);
       
-      if (mount)
-        g_simple_async_result_set_op_res_gpointer (data->result, mount, g_object_unref);
-      else
-        g_simple_async_result_set_error (data->result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         "Internal error: \"%s\"",
-                                         "Mount info did not yield a mount");
+      g_simple_async_result_set_op_res_gpointer (data->result, mount, g_object_unref);
+      goto out;
     }
 
 out:
