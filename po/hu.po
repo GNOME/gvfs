@@ -9,16 +9,16 @@ msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-09-11 09:20+0000\n"
-"PO-Revision-Date: 2014-09-11 18:34+0200\n"
-"Last-Translator: Balázs Úr <urbalazs@gmail.com>\n"
+"POT-Creation-Date: 2014-10-13 11:08+0000\n"
+"PO-Revision-Date: 2014-10-23 14:12+0200\n"
+"Last-Translator: Gabor Kelemen <kelemeng at gnome dot hu>\n"
 "Language-Team: Hungarian <openscope at googlegroups dot com>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 1.2\n"
+"X-Generator: Lokalize 1.4\n"
 
 #: ../client/gdaemonfile.c:468 ../client/gdaemonfile.c:2830
 msgid "Operation not supported, files on different mounts"
@@ -81,7 +81,7 @@ msgstr "Az érték karakterlánc vagy karakterláncok listája lehet"
 #: ../daemon/gvfsbackendobexftp.c:2031 ../daemon/gvfsbackendobexftp.c:2094
 #: ../daemon/gvfsbackendobexftp.c:2113 ../daemon/gvfsbackendsmb.c:1266
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:332
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:343
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1072
 #: ../monitor/proxy/gproxydrive.c:547 ../monitor/proxy/gproxydrive.c:635
 #: ../monitor/proxy/gproxydrive.c:785 ../monitor/proxy/gproxydrive.c:923
@@ -106,8 +106,8 @@ msgstr "Hiba az adatfolyam-protokollban: %s"
 #: ../client/gdaemonfileinputstream.c:545
 #: ../client/gdaemonfileinputstream.c:1715
 #: ../client/gdaemonfileoutputstream.c:496
-#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2144
-#: ../daemon/gvfsbackendmtp.c:2528
+#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2156
+#: ../daemon/gvfsbackendmtp.c:2540
 msgid "End of stream"
 msgstr "Vége az adatfolyamnak"
 
@@ -227,24 +227,24 @@ msgstr "A(z) %s csatolási pontja már fut"
 msgid "error starting mount daemon"
 msgstr "hiba a csatolási démon indításakor"
 
-#: ../daemon/gvfsafpconnection.c:766
+#: ../daemon/gvfsafpconnection.c:784
 msgid "The connection is not opened"
 msgstr "A kapcsolat nem nyílt meg"
 
-#: ../daemon/gvfsafpconnection.c:773 ../daemon/gvfsbackendmtp.c:378
+#: ../daemon/gvfsafpconnection.c:791 ../daemon/gvfsbackendmtp.c:378
 msgid "The connection is closed"
 msgstr "A kapcsolat le van zárva"
 
-#: ../daemon/gvfsafpconnection.c:886 ../daemon/gvfsafpconnection.c:1592
+#: ../daemon/gvfsafpconnection.c:904 ../daemon/gvfsafpconnection.c:1610
 msgid "Got EOS"
 msgstr "EOS érkezett"
 
-#: ../daemon/gvfsafpconnection.c:1061 ../daemon/gvfsafpconnection.c:1102
+#: ../daemon/gvfsafpconnection.c:1079 ../daemon/gvfsafpconnection.c:1120
 #: ../daemon/gvfsftptask.c:371
 msgid "Host closed connection"
 msgstr "A gép lezárta a kapcsolatot"
 
-#: ../daemon/gvfsafpconnection.c:1565
+#: ../daemon/gvfsafpconnection.c:1583
 msgid "Connection unexpectedly went down"
 msgstr "A kapcsolat váratlanul befejeződött"
 
@@ -443,7 +443,7 @@ msgstr "Nincs elég hely a köteten"
 #: ../daemon/gvfsbackendftp.c:758 ../daemon/gvfsbackendftp.c:939
 #: ../daemon/gvfsbackendftp.c:1379 ../daemon/gvfsbackendftp.c:1487
 #: ../daemon/gvfsbackendmtp.c:1527 ../daemon/gvfsbackendmtp.c:1660
-#: ../daemon/gvfsbackendmtp.c:1807 ../daemon/gvfsbackendsftp.c:4511
+#: ../daemon/gvfsbackendmtp.c:1819 ../daemon/gvfsbackendsftp.c:4511
 #: ../daemon/gvfsbackendsmb.c:2217
 msgid "Target file already exists"
 msgstr "A célfájl már létezik"
@@ -519,7 +519,7 @@ msgstr "Tartományzárolási konfliktus van"
 
 #: ../daemon/gvfsafpvolume.c:2301 ../daemon/gvfsbackendmtp.c:1369
 #: ../daemon/gvfsbackendmtp.c:1388 ../daemon/gvfsbackendmtp.c:1535
-#: ../daemon/gvfsbackendmtp.c:1754 ../daemon/gvfsbackendmtp.c:2270
+#: ../daemon/gvfsbackendmtp.c:1754 ../daemon/gvfsbackendmtp.c:2282
 msgid "Directory doesn't exist"
 msgstr "A könyvtár nem létezik"
 
@@ -545,8 +545,8 @@ msgstr "Belső Apple fájlvezérlőhiba"
 
 #: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:742
 #: ../daemon/gvfsbackendmtp.c:1582 ../daemon/gvfsbackendmtp.c:1598
-#: ../daemon/gvfsbackendmtp.c:1875 ../daemon/gvfsbackendmtp.c:1922
-#: ../daemon/gvfsbackendmtp.c:1991 ../daemon/gvfsbackendmtp.c:2347
+#: ../daemon/gvfsbackendmtp.c:1887 ../daemon/gvfsbackendmtp.c:1934
+#: ../daemon/gvfsbackendmtp.c:2003 ../daemon/gvfsbackendmtp.c:2359
 msgid "File does not exist"
 msgstr "A fájl nem létezik"
 
@@ -676,7 +676,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackendafc.c:981 ../daemon/gvfsbackendarchive.c:742
 #: ../daemon/gvfsbackendcomputer.c:657 ../daemon/gvfsbackendgphoto2.c:1848
-#: ../daemon/gvfsbackendmtp.c:2013 ../daemon/gvfsbackendobexftp.c:1099
+#: ../daemon/gvfsbackendmtp.c:2025 ../daemon/gvfsbackendobexftp.c:1099
 #: ../daemon/gvfsbackendrecent.c:122 ../daemon/gvfsbackendsmb.c:803
 #: ../daemon/gvfsbackendtrash.c:234
 msgid "Can't open directory"
@@ -692,11 +692,11 @@ msgstr "Érvénytelen pozicionálási típus"
 
 #: ../daemon/gvfsbackendafc.c:2415 ../daemon/gvfsbackendafp.c:1790
 #: ../daemon/gvfsbackendftp.c:1093 ../daemon/gvfsbackendftp.c:1141
-#: ../daemon/gvfsbackendftp.c:1162 ../daemon/gvfsbackendmtp.c:1978
-#: ../daemon/gvfsbackendmtp.c:2244 ../daemon/gvfsbackendmtp.c:2334
-#: ../daemon/gvfsbackendmtp.c:2404 ../daemon/gvfsbackendsftp.c:1865
-#: ../daemon/gvfsbackendsftp.c:4859 ../daemon/gvfsbackendsmb.c:1861
-#: ../daemon/gvfsftptask.c:403
+#: ../daemon/gvfsbackendftp.c:1162 ../daemon/gvfsbackendmtp.c:1778
+#: ../daemon/gvfsbackendmtp.c:1990 ../daemon/gvfsbackendmtp.c:2256
+#: ../daemon/gvfsbackendmtp.c:2346 ../daemon/gvfsbackendmtp.c:2416
+#: ../daemon/gvfsbackendsftp.c:1865 ../daemon/gvfsbackendsftp.c:4859
+#: ../daemon/gvfsbackendsmb.c:1861 ../daemon/gvfsftptask.c:403
 msgid "Operation unsupported"
 msgstr "A művelet nem támogatott"
 
@@ -746,8 +746,8 @@ msgstr "A könyvtár nem másolható át könyvtárba"
 
 #: ../daemon/gvfsbackendafp.c:304 ../daemon/gvfsbackendburn.c:891
 #: ../daemon/gvfsbackendftp.c:1502 ../daemon/gvfsbackendmtp.c:1643
-#: ../daemon/gvfsbackendmtp.c:1666 ../daemon/gvfsbackendmtp.c:1789
-#: ../daemon/gvfsbackendmtp.c:1813 ../daemon/gvfsbackendobexftp.c:1821
+#: ../daemon/gvfsbackendmtp.c:1666 ../daemon/gvfsbackendmtp.c:1801
+#: ../daemon/gvfsbackendmtp.c:1825 ../daemon/gvfsbackendobexftp.c:1821
 msgid "Can't recursively copy directory"
 msgstr "A könyvtár nem másolható rekurzívan"
 
@@ -1097,7 +1097,6 @@ msgid "Backup file creation failed"
 msgstr "A mentési fájl létrehozása meghiúsult"
 
 #: ../daemon/gvfsbackenddav.c:2765
-#| msgid "Can't copy file over directory"
 msgid "Can't move over directory"
 msgstr "Nem helyezhető át könyvtárba"
 
@@ -1249,7 +1248,7 @@ msgstr "Hiba a fájl lekérésekor"
 msgid "Error getting data from file"
 msgstr "Hiba a fájl adatainak kérésekor"
 
-#: ../daemon/gvfsbackendgphoto2.c:1947 ../daemon/gvfsbackendmtp.c:2105
+#: ../daemon/gvfsbackendgphoto2.c:1947 ../daemon/gvfsbackendmtp.c:2117
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Rosszul formált ikonazonosító: „%s”"
@@ -1413,28 +1412,26 @@ msgstr "A fájl nem található"
 msgid "Cannot make directory in this location"
 msgstr "Itt nem hozható létre könyvtár"
 
-#: ../daemon/gvfsbackendmtp.c:1587 ../daemon/gvfsbackendmtp.c:1880
-#: ../daemon/gvfsbackendmtp.c:1927 ../daemon/gvfsbackendmtp.c:1996
-#: ../daemon/gvfsbackendmtp.c:2352 ../daemon/gvfsbackendmtp.c:2420
+#: ../daemon/gvfsbackendmtp.c:1587 ../daemon/gvfsbackendmtp.c:1892
+#: ../daemon/gvfsbackendmtp.c:1939 ../daemon/gvfsbackendmtp.c:2008
+#: ../daemon/gvfsbackendmtp.c:2364 ../daemon/gvfsbackendmtp.c:2432
 #: ../daemon/gvfsbackendsmbbrowse.c:1209
 msgid "Not a regular file"
 msgstr "Nem szabályos fájl"
 
-#: ../daemon/gvfsbackendmtp.c:1633 ../daemon/gvfsbackendmtp.c:1779
-#| msgid "Target %s is not a directory\n"
+#: ../daemon/gvfsbackendmtp.c:1633 ../daemon/gvfsbackendmtp.c:1791
 msgid "Target is a directory"
 msgstr "A cél egy könyvtár"
 
-#: ../daemon/gvfsbackendmtp.c:1638 ../daemon/gvfsbackendmtp.c:1784
-#| msgid "Create directories."
+#: ../daemon/gvfsbackendmtp.c:1638 ../daemon/gvfsbackendmtp.c:1796
 msgid "Can't merge directories"
 msgstr "Könyvtárak nem fésülhetők össze"
 
-#: ../daemon/gvfsbackendmtp.c:1731 ../daemon/gvfsbackendmtp.c:2262
+#: ../daemon/gvfsbackendmtp.c:1731 ../daemon/gvfsbackendmtp.c:2274
 msgid "Cannot write to this location"
 msgstr "Nem lehet írni erre a helyre"
 
-#: ../daemon/gvfsbackendmtp.c:2087
+#: ../daemon/gvfsbackendmtp.c:2099
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "Nincs bélyegkép az elemhez („%s”)"
@@ -1572,7 +1569,6 @@ msgstr "A kapcsolat lezárva (az alapjául szolgáló SSH folyamat meghalt)"
 
 #: ../daemon/gvfsbackendsftp.c:1175
 #, c-format
-#| msgid "Internal error: %s"
 msgid "Internal error: Unknown Error"
 msgstr "Belső hiba: ismeretlen hiba"
 
@@ -1721,6 +1717,10 @@ msgstr "A Kuka elemei nem módosíthatók"
 msgid "Trash"
 msgstr "Kuka"
 
+#: ../daemon/gvfschannel.c:332
+msgid "Channel blocked"
+msgstr "Csatorna blokkolva"
+
 #: ../daemon/gvfsftpconnection.c:180
 msgid "Unexpected end of stream"
 msgstr "Az adatfolyam váratlanul véget ért"
@@ -1817,7 +1817,6 @@ msgid "Don't start fuse."
 msgstr "Ne indítsa a fuse-t."
 
 #: ../daemon/main.c:145 ../metadata/meta-daemon.c:484
-#| msgid "Show progress"
 msgid "Show program version."
 msgstr "A programverzió megjelenítése."
 
@@ -2423,7 +2422,6 @@ msgstr "GVfs UDisks2 kötetfigyelő"
 #: ../programs/gvfs-rm.c:36 ../programs/gvfs-save.c:54
 #: ../programs/gvfs-set-attribute.c:39 ../programs/gvfs-trash.c:71
 #: ../programs/gvfs-tree.c:39
-#| msgid "Show progress"
 msgid "Show program version"
 msgstr "A programverzió megjelenítése"
 
@@ -2563,7 +2561,6 @@ msgstr "A(z) %s cél nem egy könyvtár\n"
 
 #: ../programs/gvfs-copy.c:222 ../programs/gvfs-move.c:213
 #, c-format
-#| msgid "overwrite %s?"
 msgid "%s: overwrite ‘%s’? "
 msgstr "%s: felülírja a következőt: „%s”? "
 
@@ -3062,7 +3059,7 @@ msgstr "Nincs megadva érték\n"
 msgid "Invalid attribute type %s\n"
 msgstr "Érvénytelen attribútumtípus (%s)\n"
 
-#: ../programs/gvfs-set-attribute.c:235
+#: ../programs/gvfs-set-attribute.c:238
 #, c-format
 msgid "Error setting attribute: %s\n"
 msgstr "Hiba az attribútum beállításakor: %s\n"
