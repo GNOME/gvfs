@@ -544,10 +544,6 @@ do_mount (GVfsBackend *backend,
   if (op_backend->default_workgroup != NULL)
     smbc_setWorkgroup (smb_context, op_backend->default_workgroup);
 
-#ifndef DEPRECATED_SMBC_INTERFACE
-  smb_context->flags = 0;
-#endif
-  
   /* Initial settings:
    *   - use Kerberos (always)
    *   - in case of no username specified, try anonymous login
