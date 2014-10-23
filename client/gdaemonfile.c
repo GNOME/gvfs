@@ -3495,6 +3495,12 @@ find_enclosing_mount_cb (GMountInfo *mount_info,
       goto out;
     }
 
+  g_simple_async_result_set_error (data->result, G_IO_ERROR,
+                                   G_IO_ERROR_NOT_FOUND,
+  /* translators: this is an error message when there is no user visible "mount" object
+     corresponding to a particular path/uri */
+                                   _("Could not find enclosing mount"));
+
 out:
   _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
 
