@@ -2278,8 +2278,18 @@ g_daemon_file_find_enclosing_mount (GFile *file,
 						  daemon_file->path,
 						  cancellable,
 						  error);
-  if (mount_info == NULL)
+
+  if (error)
     goto out;
+
+  if (mount_info == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+                   G_IO_ERROR_FAILED,
+                   "Internal error: \"%s\"",
+                   "No error but no mount info from g_daemon_vfs_get_mount_info_sync");
+      goto out;
+    }
 
   if (mount_info->user_visible)
     {
