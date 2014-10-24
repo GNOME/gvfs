@@ -7,10 +7,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&k"
-"eywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-09-23 09:24+0000\n"
-"PO-Revision-Date: 2014-09-23 12:13+0200\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&ke"
+"ywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2014-10-13 11:08+0000\n"
+"PO-Revision-Date: 2014-10-24 10:19+0200\n"
 "Last-Translator: Miroslav Nikolić <miroslavnikolic@rocketmail.com>\n"
 "Language-Team: Serbian <gnom@prevod.org>\n"
 "Language: sr\n"
@@ -82,7 +82,7 @@ msgstr "vrednosti moraju biti niz ili spisak niza znakova"
 #: ../daemon/gvfsbackendobexftp.c:2031 ../daemon/gvfsbackendobexftp.c:2094
 #: ../daemon/gvfsbackendobexftp.c:2113 ../daemon/gvfsbackendsmb.c:1266
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:332
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:343
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1072
 #: ../monitor/proxy/gproxydrive.c:547 ../monitor/proxy/gproxydrive.c:635
 #: ../monitor/proxy/gproxydrive.c:785 ../monitor/proxy/gproxydrive.c:923
@@ -107,8 +107,8 @@ msgstr "Greška u protokolu toka: %s"
 #: ../client/gdaemonfileinputstream.c:545
 #: ../client/gdaemonfileinputstream.c:1715
 #: ../client/gdaemonfileoutputstream.c:496
-#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2144
-#: ../daemon/gvfsbackendmtp.c:2528
+#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2156
+#: ../daemon/gvfsbackendmtp.c:2540
 msgid "End of stream"
 msgstr "Kraj toka"
 
@@ -179,7 +179,7 @@ msgstr "Isteklo je vreme prilikom razrešavanja „%s“ servisa „%s“ na dom
 #: ../common/gvfsdnssdutils.c:280
 #, c-format
 msgid "Malformed DNS-SD encoded_triple '%s'"
-msgstr "Loša DNS-SD šifrofana trojka „%s“"
+msgstr "Loša DNS-SD šifrofana_trojka „%s“"
 
 #: ../common/gvfsicon.c:250
 #, c-format
@@ -228,24 +228,24 @@ msgstr "već je pokrenuta tačka kačenja za %s"
 msgid "error starting mount daemon"
 msgstr "greška pokretanja demona kačenja"
 
-#: ../daemon/gvfsafpconnection.c:766
+#: ../daemon/gvfsafpconnection.c:784
 msgid "The connection is not opened"
 msgstr "Veza nije otvorena"
 
-#: ../daemon/gvfsafpconnection.c:773 ../daemon/gvfsbackendmtp.c:378
+#: ../daemon/gvfsafpconnection.c:791 ../daemon/gvfsbackendmtp.c:378
 msgid "The connection is closed"
 msgstr "Veza je zatvorena"
 
-#: ../daemon/gvfsafpconnection.c:886 ../daemon/gvfsafpconnection.c:1592
+#: ../daemon/gvfsafpconnection.c:904 ../daemon/gvfsafpconnection.c:1610
 msgid "Got EOS"
 msgstr "Dobih EOS"
 
-#: ../daemon/gvfsafpconnection.c:1061 ../daemon/gvfsafpconnection.c:1102
+#: ../daemon/gvfsafpconnection.c:1079 ../daemon/gvfsafpconnection.c:1120
 #: ../daemon/gvfsftptask.c:371
 msgid "Host closed connection"
 msgstr "Domaćin je zatvorio vezu"
 
-#: ../daemon/gvfsafpconnection.c:1565
+#: ../daemon/gvfsafpconnection.c:1583
 msgid "Connection unexpectedly went down"
 msgstr "Veza je neočekivano prekinuta"
 
@@ -446,7 +446,7 @@ msgstr "Nema dovoljno prostora na volumenu"
 #: ../daemon/gvfsbackendftp.c:758 ../daemon/gvfsbackendftp.c:939
 #: ../daemon/gvfsbackendftp.c:1379 ../daemon/gvfsbackendftp.c:1487
 #: ../daemon/gvfsbackendmtp.c:1527 ../daemon/gvfsbackendmtp.c:1660
-#: ../daemon/gvfsbackendmtp.c:1807 ../daemon/gvfsbackendsftp.c:4511
+#: ../daemon/gvfsbackendmtp.c:1819 ../daemon/gvfsbackendsftp.c:4511
 #: ../daemon/gvfsbackendsmb.c:2217
 msgid "Target file already exists"
 msgstr "Ciljna datoteka već postoji"
@@ -521,7 +521,7 @@ msgstr "Postoji sukob zaključavanja opsega"
 
 #: ../daemon/gvfsafpvolume.c:2301 ../daemon/gvfsbackendmtp.c:1369
 #: ../daemon/gvfsbackendmtp.c:1388 ../daemon/gvfsbackendmtp.c:1535
-#: ../daemon/gvfsbackendmtp.c:1754 ../daemon/gvfsbackendmtp.c:2270
+#: ../daemon/gvfsbackendmtp.c:1754 ../daemon/gvfsbackendmtp.c:2282
 msgid "Directory doesn't exist"
 msgstr "Direktorijum ne postoji"
 
@@ -547,8 +547,8 @@ msgstr "Unutrašnja greška Eplovog kontrolera datoteka"
 
 #: ../daemon/gvfsbackendafc.c:216 ../daemon/gvfsbackendftp.c:742
 #: ../daemon/gvfsbackendmtp.c:1582 ../daemon/gvfsbackendmtp.c:1598
-#: ../daemon/gvfsbackendmtp.c:1875 ../daemon/gvfsbackendmtp.c:1922
-#: ../daemon/gvfsbackendmtp.c:1991 ../daemon/gvfsbackendmtp.c:2347
+#: ../daemon/gvfsbackendmtp.c:1887 ../daemon/gvfsbackendmtp.c:1934
+#: ../daemon/gvfsbackendmtp.c:2003 ../daemon/gvfsbackendmtp.c:2359
 msgid "File does not exist"
 msgstr "Datoteka ne postoji"
 
@@ -679,7 +679,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackendafc.c:981 ../daemon/gvfsbackendarchive.c:742
 #: ../daemon/gvfsbackendcomputer.c:657 ../daemon/gvfsbackendgphoto2.c:1848
-#: ../daemon/gvfsbackendmtp.c:2013 ../daemon/gvfsbackendobexftp.c:1099
+#: ../daemon/gvfsbackendmtp.c:2025 ../daemon/gvfsbackendobexftp.c:1099
 #: ../daemon/gvfsbackendrecent.c:122 ../daemon/gvfsbackendsmb.c:803
 #: ../daemon/gvfsbackendtrash.c:234
 msgid "Can't open directory"
@@ -695,11 +695,11 @@ msgstr "Nije ispravna vrsta pretraživanja"
 
 #: ../daemon/gvfsbackendafc.c:2415 ../daemon/gvfsbackendafp.c:1790
 #: ../daemon/gvfsbackendftp.c:1093 ../daemon/gvfsbackendftp.c:1141
-#: ../daemon/gvfsbackendftp.c:1162 ../daemon/gvfsbackendmtp.c:1978
-#: ../daemon/gvfsbackendmtp.c:2244 ../daemon/gvfsbackendmtp.c:2334
-#: ../daemon/gvfsbackendmtp.c:2404 ../daemon/gvfsbackendsftp.c:1865
-#: ../daemon/gvfsbackendsftp.c:4859 ../daemon/gvfsbackendsmb.c:1861
-#: ../daemon/gvfsftptask.c:403
+#: ../daemon/gvfsbackendftp.c:1162 ../daemon/gvfsbackendmtp.c:1778
+#: ../daemon/gvfsbackendmtp.c:1990 ../daemon/gvfsbackendmtp.c:2256
+#: ../daemon/gvfsbackendmtp.c:2346 ../daemon/gvfsbackendmtp.c:2416
+#: ../daemon/gvfsbackendsftp.c:1865 ../daemon/gvfsbackendsftp.c:4859
+#: ../daemon/gvfsbackendsmb.c:1861 ../daemon/gvfsftptask.c:403
 msgid "Operation unsupported"
 msgstr "Radnja nije podržana"
 
@@ -749,8 +749,8 @@ msgstr "Ne mogu da umnožim direktorijum preko direktorijuma"
 
 #: ../daemon/gvfsbackendafp.c:304 ../daemon/gvfsbackendburn.c:891
 #: ../daemon/gvfsbackendftp.c:1502 ../daemon/gvfsbackendmtp.c:1643
-#: ../daemon/gvfsbackendmtp.c:1666 ../daemon/gvfsbackendmtp.c:1789
-#: ../daemon/gvfsbackendmtp.c:1813 ../daemon/gvfsbackendobexftp.c:1821
+#: ../daemon/gvfsbackendmtp.c:1666 ../daemon/gvfsbackendmtp.c:1801
+#: ../daemon/gvfsbackendmtp.c:1825 ../daemon/gvfsbackendobexftp.c:1821
 msgid "Can't recursively copy directory"
 msgstr "Ne mogu da umnožim direktorijum i njegov sadržaj"
 
@@ -1102,7 +1102,6 @@ msgid "Backup file creation failed"
 msgstr "Nije uspela izrada rezervne datoteke"
 
 #: ../daemon/gvfsbackenddav.c:2765
-#| msgid "Can't copy file over directory"
 msgid "Can't move over directory"
 msgstr "Ne mogu da premestim preko direktorijuma"
 
@@ -1254,7 +1253,7 @@ msgstr "Greška pri dobijanju datoteke"
 msgid "Error getting data from file"
 msgstr "Greška pri dobijanju podataka iz datoteke"
 
-#: ../daemon/gvfsbackendgphoto2.c:1947 ../daemon/gvfsbackendmtp.c:2105
+#: ../daemon/gvfsbackendgphoto2.c:1947 ../daemon/gvfsbackendmtp.c:2117
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Loš odrednik ikonice „%s“"
@@ -1421,28 +1420,26 @@ msgstr "Nisam našao datoteku"
 msgid "Cannot make directory in this location"
 msgstr "Ne mogu da napravim direktorijum na ovom mestu"
 
-#: ../daemon/gvfsbackendmtp.c:1587 ../daemon/gvfsbackendmtp.c:1880
-#: ../daemon/gvfsbackendmtp.c:1927 ../daemon/gvfsbackendmtp.c:1996
-#: ../daemon/gvfsbackendmtp.c:2352 ../daemon/gvfsbackendmtp.c:2420
+#: ../daemon/gvfsbackendmtp.c:1587 ../daemon/gvfsbackendmtp.c:1892
+#: ../daemon/gvfsbackendmtp.c:1939 ../daemon/gvfsbackendmtp.c:2008
+#: ../daemon/gvfsbackendmtp.c:2364 ../daemon/gvfsbackendmtp.c:2432
 #: ../daemon/gvfsbackendsmbbrowse.c:1209
 msgid "Not a regular file"
 msgstr "Nije obična datoteka"
 
-#: ../daemon/gvfsbackendmtp.c:1633 ../daemon/gvfsbackendmtp.c:1779
-#| msgid "Target %s is not a directory\n"
+#: ../daemon/gvfsbackendmtp.c:1633 ../daemon/gvfsbackendmtp.c:1791
 msgid "Target is a directory"
 msgstr "Cilj je direktorijum"
 
-#: ../daemon/gvfsbackendmtp.c:1638 ../daemon/gvfsbackendmtp.c:1784
-#| msgid "Create directories."
+#: ../daemon/gvfsbackendmtp.c:1638 ../daemon/gvfsbackendmtp.c:1796
 msgid "Can't merge directories"
 msgstr "Ne mogu da stopim direktorijume"
 
-#: ../daemon/gvfsbackendmtp.c:1731 ../daemon/gvfsbackendmtp.c:2262
+#: ../daemon/gvfsbackendmtp.c:1731 ../daemon/gvfsbackendmtp.c:2274
 msgid "Cannot write to this location"
 msgstr "Ne mogu da pišem na ovo mesto"
 
-#: ../daemon/gvfsbackendmtp.c:2087
+#: ../daemon/gvfsbackendmtp.c:2099
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "Nema sličice za celinu „%s“"
@@ -1580,7 +1577,6 @@ msgstr "Veza je zatvorena (glavni proces bezbedne školjke je crko)"
 
 #: ../daemon/gvfsbackendsftp.c:1175
 #, c-format
-#| msgid "Internal error: %s"
 msgid "Internal error: Unknown Error"
 msgstr "Unutrašnja greška: Nepoznata greška"
 
@@ -1729,6 +1725,10 @@ msgstr "Stavke iz smeća ne mogu biti izmenjene"
 msgid "Trash"
 msgstr "Smeće"
 
+#: ../daemon/gvfschannel.c:332
+msgid "Channel blocked"
+msgstr "Kanal je blokiran"
+
 #: ../daemon/gvfsftpconnection.c:180
 msgid "Unexpected end of stream"
 msgstr "Neočekivan kraj toka"
@@ -1826,7 +1826,6 @@ msgid "Don't start fuse."
 msgstr "Ne pokreći fuse."
 
 #: ../daemon/main.c:145 ../metadata/meta-daemon.c:484
-#| msgid "Show progress"
 msgid "Show program version."
 msgstr "Ispisuje izdanje programa."
 
@@ -2438,7 +2437,6 @@ msgstr "Pratilac diska GVfs UDisk2"
 #: ../programs/gvfs-rm.c:36 ../programs/gvfs-save.c:54
 #: ../programs/gvfs-set-attribute.c:39 ../programs/gvfs-trash.c:71
 #: ../programs/gvfs-tree.c:39
-#| msgid "Show progress"
 msgid "Show program version"
 msgstr "Ispisuje izdanje programa"
 
@@ -2579,7 +2577,6 @@ msgstr "Cilj %s nije direktorijum\n"
 
 #: ../programs/gvfs-copy.c:222 ../programs/gvfs-move.c:213
 #, c-format
-#| msgid "overwrite %s?"
 msgid "%s: overwrite ‘%s’? "
 msgstr "%s: da prepišem „%s“? "
 
@@ -3082,7 +3079,7 @@ msgstr "Nije određena vrednost\n"
 msgid "Invalid attribute type %s\n"
 msgstr "Nije ispravna vrsta osobine %s\n"
 
-#: ../programs/gvfs-set-attribute.c:235
+#: ../programs/gvfs-set-attribute.c:238
 #, c-format
 msgid "Error setting attribute: %s\n"
 msgstr "Greška postavljanja osobine: %s\n"
