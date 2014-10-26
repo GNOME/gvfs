@@ -1,3 +1,28 @@
+Major changes in 1.23.1
+=======================
+* Several improvements to unmounting reliability
+* fuse: Several fixes to prevent data corruption and improve stat() results
+* Improve root dir name and icon handling for gphoto2 and mtp
+* Add bash completion support for gvfs-rename and gvfs-set-attribute
+* client: Check for G_FILE_COPY_NO_FALLBACK_FOR_MOVE when push/pulling
+* Add -C flag to gvfs-move
+* sftp: Don't spin during connection
+* sftp: Correctly retrieve the username from the secret store
+* goa: Pass "password" as ID when fetching the password
+* tests: Some cleanups and reliability fixes
+* Several smaller bugfixes
+* Translation updates
+
+Major changes in 1.22.1
+=======================
+* mtp: Improve transfer speed for large files
+* trash: Do not poll mount points without read access
+* afp: Fix volume names encoding
+* gvfs-set-attribute: "-n" flag implementation
+* Improvements to avoid crashes during unmount
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.22.0
 =======================
 * Translation updates
