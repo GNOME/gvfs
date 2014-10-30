@@ -2304,7 +2304,7 @@ try_create_tested_existence (SoupSession *session, SoupMessage *msg,
    * Doesn't work with apache > 2.2.9
    * soup_message_headers_append (put_msg->request_headers, "If-None-Match", "*");
    */
-  stream = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
+  stream = g_memory_output_stream_new (NULL, 0, g_try_realloc, g_free);
   g_object_set_data_full (G_OBJECT (stream), "-gvfs-stream-msg", put_msg, g_object_unref);
 
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), stream);
@@ -2350,7 +2350,7 @@ open_for_replace_succeeded (GVfsBackendHttp *op_backend, GVfsJob *job,
   if (etag)
     soup_message_headers_append (put_msg->request_headers, "If-Match", etag);
 
-  stream = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
+  stream = g_memory_output_stream_new (NULL, 0, g_try_realloc, g_free);
   g_object_set_data_full (G_OBJECT (stream), "-gvfs-stream-msg", put_msg, g_object_unref);
 
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), stream);
