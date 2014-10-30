@@ -246,7 +246,6 @@ g_daemon_file_get_parent (GFile *file)
   GFile *parent;
   const char *base;
   char *parent_path;
-  gsize len;    
 
   path = daemon_file->path;
   base = strrchr (path, '/');
@@ -257,12 +256,7 @@ g_daemon_file_get_parent (GFile *file)
   while (base > path && *base == '/')
     base--;
 
-  len = (guint) 1 + base - path;
-  
-  parent_path = g_new (gchar, len + 1);
-  g_memmove (parent_path, path, len);
-  parent_path[len] = 0;
-
+  parent_path = g_strndup (path, (guint) 1 + base - path);
   parent = new_file_for_new_path (daemon_file, parent_path);
   g_free (parent_path);
   
