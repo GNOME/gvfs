@@ -2279,8 +2279,11 @@ g_daemon_file_find_enclosing_mount (GFile *file,
 						  cancellable,
 						  error);
 
-  if (error)
-    goto out;
+  if (error && *error)
+    {
+      g_dbus_error_strip_remote_error (*error);
+      return NULL;
+    }
 
   if (mount_info == NULL)
     {
@@ -2288,7 +2291,7 @@ g_daemon_file_find_enclosing_mount (GFile *file,
                    G_IO_ERROR_FAILED,
                    "Internal error: \"%s\"",
                    "No error but no mount info from g_daemon_vfs_get_mount_info_sync");
-      goto out;
+      return NULL;
     }
 
   if (mount_info->user_visible)
@@ -2310,10 +2313,6 @@ g_daemon_file_find_enclosing_mount (GFile *file,
      corresponding to a particular path/uri */
 		       _("Could not find enclosing mount"));
  
-out:
-  if (error && *error)
-    g_dbus_error_strip_remote_error (*error);
-
   return NULL;
 }
 
