@@ -79,8 +79,8 @@ lc = locale.getlocale(locale.LC_MESSAGES)[0]
 english_messages = not lc or lc.startswith('en_')
 
 # http://sg.danny.cz/sg/sdebug26.html
-PTYPE_DISK = 0 
-PTYPE_CDROM = 5 
+PTYPE_DISK = 0
+PTYPE_CDROM = 5
 
 # local D-BUS daemon
 dbus_daemon = None
@@ -118,7 +118,7 @@ class GvfsTestCase(unittest.TestCase):
         '''Return (exitcode, stdout, stderr) from a program call.'''
 
         prog = subprocess.Popen(argv, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE, universal_newlines=True)
+                                stderr=subprocess.PIPE, universal_newlines=True)
         (out, err) = prog.communicate()
         return (prog.returncode, out, err)
 
@@ -193,7 +193,7 @@ class GvfsTestCase(unittest.TestCase):
         fcntl.fcntl(popen.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
         while True:
             r = popen.stdout.read(1000)
-            #print('  wait_for_gvfs_mount_user_prompt: got "%s"' % str(r))
+            # print('  wait_for_gvfs_mount_user_prompt: got "%s"' % str(r))
             if r and (b'User' in r or b'Domain' in r):
                 break
 
@@ -207,7 +207,7 @@ class GvfsTestCase(unittest.TestCase):
 
     def mount_api(self, gfile, mount_op=None):
         '''Mount a Gio.File using the Gio API
-        
+
         This times out after 30 seconds.
 
         Return True on success or a GLib.GError object from the mount call.
@@ -261,7 +261,7 @@ class GvfsTestCase(unittest.TestCase):
 
     def make_mountop(self, user, password):
         '''Create a Gio.MountOperation from given credentials
-        
+
         On the first ask_password signal this sends the password, and aborts
         the second request (for tests that use wrong credentials).
         '''
@@ -290,6 +290,7 @@ class Programs(GvfsTestCase):
         out = self.program_out_success(['gvfs-info', '-f', '/'])
         self.assertTrue('filesystem::size:' in out, out)
         self.assertTrue('filesystem::type:' in out, out)
+
 
 class ArchiveMounter(GvfsTestCase):
     def add_files(self, add_fn):
@@ -351,7 +352,7 @@ class ArchiveMounter(GvfsTestCase):
         iso = os.path.join(self.workdir, 'bogus-cd.iso')
         with open(iso, 'wb') as f:
             subprocess.check_call(['bzip2', '-cd', os.path.join(my_dir, 'files', 'bogus-cd.iso.bz2')],
-                            stdout=f)
+                                  stdout=f)
         self.do_test_for_archive(iso)
 
     def test_iso_joliet(self):
@@ -360,7 +361,7 @@ class ArchiveMounter(GvfsTestCase):
         iso = os.path.join(self.workdir, 'joliet.iso')
         with open(iso, 'wb') as f:
             subprocess.check_call(['bzip2', '-cd', os.path.join(my_dir, 'files', 'joliet.iso.bz2')],
-                            stdout=f)
+                                  stdout=f)
         self.do_test_for_archive(iso)
 
     def do_test_for_archive(self, path):
@@ -455,10 +456,7 @@ UsePrivilegeSeparation no
 AuthorizedKeysFile %(authorized_keys)s
 UsePam no
 Subsystem sftp %(sftp_server)s
-''' % {'workdir': self.workdir,
-       'sftp_server': sftp_server,
-       'authorized_keys': self.authorized_keys,
-      })
+''' % {'workdir': self.workdir, 'sftp_server': sftp_server, 'authorized_keys': self.authorized_keys})
 
         self.sshd = subprocess.Popen([sshd_path, '-Dde', '-f', self.sshd_config],
                                      universal_newlines=True,
@@ -535,6 +533,7 @@ Subsystem sftp %(sftp_server)s
         finally:
             self.unmount(uri)
 
+
 class Ftp(GvfsTestCase):
     def setUp(self):
         '''Launch FTP server'''
@@ -564,7 +563,7 @@ class Ftp(GvfsTestCase):
                 pass
         else:
             self.fail('timed out waiting for test FTP server')
- 
+
     def tearDown(self):
         '''Shut down FTP server'''
 
@@ -677,8 +676,8 @@ class Ftp(GvfsTestCase):
         self.assertEqual(info.get_file_type(), Gio.FileType.DIRECTORY)
         self.assertTrue('localhost' in info.get_display_name(),
                         info.get_display_name())
-        #FIXME: this is actually supposed to be true!
-        #self.assertEqual(info.get_attribute_boolean('access::can-read'), True)
+        # FIXME: this is actually supposed to be true!
+        # self.assertEqual(info.get_attribute_boolean('access::can-read'), True)
 
         if check_contents:
             # check available files
@@ -728,7 +727,7 @@ class Smb(GvfsTestCase):
         with open(smbpasswd, 'w') as f:
             f.write(os.environ['USER'])
             f.write(':2:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX:AC8E657F83DF82BEEA5D43BDAF7800CC:[U          ]:LCT-507C14C7:\n')
-        
+
         # create local samba configuration
         smbdir = os.path.join(self.workdir, 'samba')
         os.mkdir(smbdir, 0o755)
@@ -816,7 +815,7 @@ ncalrpc dir = %(workdir)s/samba
         # default domain, password
         (out, err) = mount.communicate(b'\nfoo\n')
         self.assertEqual(mount.returncode, 0, err)
-        #self.assertEqual(err, b'') # we get some warnings
+        # self.assertEqual(err, b'') # we get some warnings
 
         self.do_mount_check(uri, True)
 
@@ -863,6 +862,7 @@ ncalrpc dir = %(workdir)s/samba
                 self.assertNotEqual(err, '')
         finally:
             self.unmount(uri)
+
 
 @unittest.skipUnless(in_testbed, 'not running under gvfs-testbed')
 @unittest.skipIf(os.path.exists('/sys/module/scsi_debug'), 'scsi_debug is already loaded')
@@ -1061,6 +1061,7 @@ class Drive(GvfsTestCase):
 
         # mount it
         self.cb_result = None
+
         def mount_done(obj, result, main_loop):
             main_loop.quit()
             try:
@@ -1186,7 +1187,7 @@ class Drive(GvfsTestCase):
         def cleanup():
             rootsh = subprocess.Popen(['./rootsh'], stdin=subprocess.PIPE)
             rootsh.communicate(b'''rm /run/udev/rules.d/40-scsi_debug-fake-mediaplayer.rules
-pkill --signal HUP udevd || pkill --signal HUP systemd-udevd                              
+pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
 ''')
 
         # create udev rule to turn it into a music player
@@ -1291,6 +1292,7 @@ pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
             self.mock_polkit.wait()
             self.mock_polkit = None
 
+
 @unittest.skipUnless(have_httpd, 'Apache httpd not installed')
 @unittest.skipUnless(have_dav_backend, 'Dav backend not enabled')
 class Dav(GvfsTestCase):
@@ -1353,10 +1355,7 @@ DAVLockDB DAVLock
   AuthUserFile htpasswd
   Require valid-user
 </Directory>
-''' % {'mod_dir': klass.mod_dir,
-       'root': klass.httpd_sandbox,
-       'modules': modules,
-       'mydir': my_dir})
+''' % {'mod_dir': klass.mod_dir, 'root': klass.httpd_sandbox, 'modules': modules, 'mydir': my_dir})
 
         # start server
         try:
@@ -1527,7 +1526,7 @@ class Trash(GvfsTestCase):
 
             # clean up the trash, for predictable test cases
             for f in self.files_in_trash():
-                #print('cleaning up trash:///' + f)
+                # print('cleaning up trash:///' + f)
                 subprocess.call(['gvfs-rm', 'trash:///' + f])
 
         super().tearDown()
@@ -1620,10 +1619,10 @@ class Trash(GvfsTestCase):
 
     def test_file_in_system(self):
         '''trash:// deletion for system location
-        
+
         This either should work if /tmp/ is a partition on its own writable to
         the user (such as a tmpfs), or fail gracefully without deleting the
-        file. 
+        file.
         '''
         # create test file
         self.my_file = os.path.join(self.workdir, 'hello_gvfs_tests.txt')
@@ -1699,7 +1698,7 @@ class GPhoto(GvfsTestCase):
                                     os.path.join(my_dir, 'files', 'powershot.ioctl'))
 
         # signal our monitor about the addition
-        #umockdev_testbed.uevent('/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.5/1-1.5.2/1-1.5.2.3', 'add');
+        # umockdev_testbed.uevent('/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.5/1-1.5.2/1-1.5.2.3', 'add');
 
 
 def start_dbus():
@@ -1707,7 +1706,7 @@ def start_dbus():
 
     This also runs the D-BUS daemon under umockdev-wrapper (if available), so
     that it will see fake umockdev devices.
-    
+
     Return temporary XDG home directory.
     '''
     global dbus_daemon
@@ -1763,7 +1762,7 @@ if __name__ == '__main__':
     except KeyError:
         pass
     os.environ['LC_ALL'] = 'C'
-    
+
     # we need to create the umockdev testbed before launching D-BUS, so
     # that all spawned gvfs daemons see it
     if have_umockdev:
@@ -1787,4 +1786,3 @@ if __name__ == '__main__':
                 time.sleep(0.1)
                 if timeout <= 0:
                     raise
-
