@@ -61,6 +61,7 @@ struct _GVfsBackendMtp
   GHashTable *monitors;
   guint hb_id;
   gint unmount_started;
+  gboolean force_unmounted;
 
   gboolean android_extension;
 };
