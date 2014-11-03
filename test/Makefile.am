@@ -85,8 +85,6 @@ nobase_installed_test_DATA += \
 	files/source-gphoto/IMG_0002.jpg \
 	files/bogus-cd.iso.bz2 \
 	files/joliet.iso.bz2 \
-	files/mtp_xperia.ioctl.xz \
-	files/mtp_xperia.umockdev \
 	files/powershot.ioctl \
 	files/powershot.umockdev \
 	files/ssh_host_rsa_key \
