@@ -426,7 +426,11 @@ g_vfs_backend_mtp_finalize (GObject *object)
 
   g_hash_table_foreach (backend->monitors, remove_monitor_weak_ref, backend->monitors);
   g_hash_table_unref (backend->monitors);
-  g_mutex_clear (&backend->mutex);
+
+  /* Leak the mutex if the backend is force unmounted to avoid crash caused by
+   * abort(), when trying to clear already locked mutex. */
+  if (!backend->force_unmounted)
+    g_mutex_clear (&backend->mutex);
 
   (*G_OBJECT_CLASS (g_vfs_backend_mtp_parent_class)->finalize) (object);
 
@@ -602,6 +606,7 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
                            (char *)path);
     }
 
+    op_backend->force_unmounted = TRUE;
     g_vfs_backend_force_unmount ((GVfsBackend*)op_backend);
   }
 
