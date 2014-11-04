@@ -493,6 +493,7 @@ gvfsd_mtp_CPPFLAGS = \
 	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendmtp.h \
 	-DDEFAULT_BACKEND_TYPE=mtp \
+	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"mtp", G_VFS_TYPE_BACKEND_MTP,' \
 	$(GUDEV_CFLAGS) $(LIBMTP_CFLAGS)
 
