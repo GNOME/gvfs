@@ -33,11 +33,11 @@
 #include <gvfsdaemon.h>
 #include <gvfsbackend.h>
 #include <gvfsdbus.h>
+#include <gvfsutils.h>
 
 static char *spawner_id = NULL;
 static char *spawner_path = NULL;
 
-static gboolean print_debug = FALSE;
 static gboolean already_acquired = FALSE;
 static int process_result = 0;
 
@@ -50,7 +50,7 @@ log_debug (const gchar   *log_domain,
 	   const gchar   *message,
 	   gpointer	      unused_data)
 {
-  if (print_debug)
+  if (gvfs_get_debug ())
     g_print ("%s", message);
 }
 
@@ -67,6 +67,8 @@ daemon_init (void)
   textdomain (GETTEXT_PACKAGE);
   
   g_log_set_handler (NULL, G_LOG_LEVEL_DEBUG, log_debug, NULL);
+
+  gvfs_setup_debug_handler ();
 
 #ifdef SIGPIPE
   /* Ignore SIGPIPE to avoid killing daemons on cancelled transfer *
@@ -217,13 +219,13 @@ daemon_parse_args (int argc, char *argv[], const char *default_type)
 
   if (argc > 1 && strcmp (argv[1], "--debug") == 0)
     {
-      print_debug = TRUE;
+      gvfs_set_debug (TRUE);
       argc--;
       argv++;
     }
   else if (g_getenv ("GVFS_DEBUG"))
     {
-      print_debug = TRUE;
+      gvfs_set_debug (TRUE);
     }
   
   mount_spec = NULL;

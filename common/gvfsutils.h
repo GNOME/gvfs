@@ -26,6 +26,10 @@ void         gvfs_randomize_string                  (char             *str,
                                                      int               len);
 gboolean     gvfs_have_session_bus                  (void);
 
+gboolean     gvfs_get_debug                         (void);
+void         gvfs_set_debug                         (gboolean          debugging);
+void         gvfs_setup_debug_handler               (void);
+
 G_END_DECLS
 
 #endif /* __G_VFS_UTILS_H__ */

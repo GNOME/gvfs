@@ -22,6 +22,7 @@
 #include <string.h>
 #include <glib.h>
 #include <glib/gstdio.h>
+#include <signal.h>
 #include "gvfsutils.h"
 
 #ifdef G_OS_UNIX
@@ -29,6 +30,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #endif
+
+/* Indicates whether debug output is enabled. */
+static gboolean debugging = FALSE;
 
 /**
  * gvfs_randomize_string:
@@ -85,4 +89,39 @@ out:
 #else
   return FALSE;
 #endif
+}
+
+gboolean
+gvfs_get_debug (void)
+{
+  return debugging;
+}
+
+void
+gvfs_set_debug (gboolean debugging_)
+{
+  debugging = debugging_;
+}
+
+static void
+toggle_debugging (int signum)
+{
+  debugging = !debugging;
+}
+
+/**
+ * gvfs_setup_debugging_handler:
+ *
+ * Sets up a handler for SIGUSR2 that toggles the debugging flag when the
+ * signal is received.
+ **/
+void
+gvfs_setup_debug_handler (void)
+{
+  struct sigaction sa;
+
+  sigemptyset (&sa.sa_mask);
+  sa.sa_handler = toggle_debugging;
+  sa.sa_flags = 0;
+  sigaction (SIGUSR2, &sa, NULL);
 }
