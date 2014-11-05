@@ -56,14 +56,6 @@
 #include <libsmbclient.h>
 
 
-#define PRINT_DEBUG
-
-#ifdef PRINT_DEBUG
-#define DEBUG(msg...) g_print("### SMB: " msg)
-#else
-#define DEBUG(...)
-#endif
-
 struct _GVfsBackendSmb
 {
   GVfsBackend parent_instance;
@@ -144,7 +136,7 @@ g_vfs_backend_smb_init (GVfsBackendSmb *backend)
 
   g_object_unref (settings);
 
-  DEBUG ("g_vfs_backend_smb_init: default workgroup = '%s'\n", backend->default_workgroup ? backend->default_workgroup : "NULL");
+  g_debug ("g_vfs_backend_smb_init: default workgroup = '%s'\n", backend->default_workgroup ? backend->default_workgroup : "NULL");
 }
 
 /**
@@ -195,7 +187,7 @@ auth_callback (SMBCCTX *context,
       /*  Don't prompt for credentials, let smbclient finish the mount loop  */
       strncpy (username_out, "ABORT", unmaxlen);
       strncpy (password_out, "", pwmaxlen);
-      DEBUG ("auth_callback - mount_cancelled\n");
+      g_debug ("auth_callback - mount_cancelled\n");
       return;
     }
 
@@ -218,20 +210,20 @@ auth_callback (SMBCCTX *context,
     {
       /* Try again if kerberos login fails */
       backend->mount_try_again = TRUE;
-      DEBUG ("auth_callback - kerberos pass\n");
+      g_debug ("auth_callback - kerberos pass\n");
     }
   else if (backend->use_anonymous)
     {
       /* Try again if anonymous login fails */
       backend->use_anonymous = FALSE;
       backend->mount_try_again = TRUE;
-      DEBUG ("auth_callback - anonymous login pass\n");
+      g_debug ("auth_callback - anonymous login pass\n");
     }
   else
     {
       gboolean in_keyring = FALSE;
 
-      DEBUG ("auth_callback - normal pass\n");
+      g_debug ("auth_callback - normal pass\n");
 
       if (!backend->password_in_keyring)
         {
@@ -248,9 +240,9 @@ auth_callback (SMBCCTX *context,
 	  backend->password_in_keyring = in_keyring;
 
 	  if (in_keyring)
-	    DEBUG ("auth_callback - reusing keyring credentials: user = '%s', domain = '%s'\n",
-	           ask_user ? ask_user : "NULL",
-	           ask_domain ? ask_domain : "NULL");
+            g_debug ("auth_callback - reusing keyring credentials: user = '%s', domain = '%s'\n",
+                     ask_user ? ask_user : "NULL",
+                     ask_domain ? ask_domain : "NULL");
 	}
       
       if (!in_keyring)
@@ -267,7 +259,7 @@ auth_callback (SMBCCTX *context,
           if (backend->user == NULL && backend->domain == NULL)
 	    flags |= G_ASK_PASSWORD_ANONYMOUS_SUPPORTED;
 
-	  DEBUG ("auth_callback - asking for password...\n");
+          g_debug ("auth_callback - asking for password...\n");
 
 	  /* translators: First %s is a share name, second is a server name */
 	  message = g_strdup_printf (_("Password required for share %s on %s"),
@@ -322,8 +314,8 @@ auth_callback (SMBCCTX *context,
   backend->last_user = g_strdup (username_out);
   backend->last_domain = g_strdup (domain_out);
   backend->last_password = g_strdup (password_out);
-  DEBUG ("auth_callback - out: last_user = '%s', last_domain = '%s'\n",
-         backend->last_user, backend->last_domain);
+  g_debug ("auth_callback - out: last_user = '%s', last_domain = '%s'\n",
+           backend->last_user, backend->last_domain);
 }
 
 /* Add a server to the cache system
@@ -624,7 +616,7 @@ do_mount (GVfsBackend *backend,
             it would be tough to actually say if it was an authentication failure
             or the particular path problem. */
   uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, op_backend->path);
-  DEBUG ("do_mount - URI = %s\n", uri);
+  g_debug ("do_mount - URI = %s\n", uri);
 
   /*  Samba mount loop  */
   op_backend->mount_source = mount_source;
@@ -636,12 +628,12 @@ do_mount (GVfsBackend *backend,
       op_backend->mount_try_again = FALSE;
       op_backend->mount_cancelled = FALSE;
 
-      DEBUG ("do_mount - try #%d \n", op_backend->mount_try);
+      g_debug ("do_mount - try #%d \n", op_backend->mount_try);
 
       smbc_stat = smbc_getFunctionStat (smb_context);
       res = smbc_stat (smb_context, uri, &st);
 
-      DEBUG ("do_mount - [%s; %d] res = %d, cancelled = %d, errno = [%d] '%s' \n",
+      g_debug ("do_mount - [%s; %d] res = %d, cancelled = %d, errno = [%d] '%s' \n",
              uri, op_backend->mount_try, res, op_backend->mount_cancelled,
              errno, g_strerror (errno));
 
@@ -650,7 +642,7 @@ do_mount (GVfsBackend *backend,
 
       if (op_backend->mount_cancelled || (errno != EACCES && errno != EPERM))
         {
-          DEBUG ("do_mount - (errno != EPERM && errno != EACCES), cancelled = %d, breaking\n", op_backend->mount_cancelled);
+          g_debug ("do_mount - (errno != EPERM && errno != EACCES), cancelled = %d, breaking\n", op_backend->mount_cancelled);
           break;
         }
 
@@ -659,7 +651,7 @@ do_mount (GVfsBackend *backend,
        */
       if (op_backend->mount_try == 0)
         {
-          DEBUG ("do_mount - after anon, enabling NTLMSSP fallback\n");
+          g_debug ("do_mount - after anon, enabling NTLMSSP fallback\n");
           smbc_setOptionFallbackAfterKerberos (op_backend->smb_context, 1);
         }
 
@@ -695,7 +687,7 @@ do_mount (GVfsBackend *backend,
     }
 
   /* Mount was successful */
-  DEBUG ("do_mount - login successful\n");
+  g_debug ("do_mount - login successful\n");
 
   g_vfs_backend_set_default_location (backend, op_backend->path);
   g_vfs_keyring_save_password (op_backend->last_user,
