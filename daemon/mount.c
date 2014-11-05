@@ -33,6 +33,7 @@
 #include "gmountoperationdbus.h"
 #include "gvfsdaemonprotocol.h"
 #include <gvfsdbus.h>
+#include <gvfsutils.h>
 
 typedef struct {
   char *display_name;
@@ -439,7 +440,13 @@ spawn_mount (MountData *data)
           return;
         }
 
-      exec = g_strconcat (data->mountable->exec, " --spawner ", g_dbus_connection_get_unique_name (connection), " ", data->obj_path, NULL);
+      exec = g_strconcat (data->mountable->exec,
+                          gvfs_get_debug () ? " --debug" : "",
+                          " --spawner ",
+                          g_dbus_connection_get_unique_name (connection),
+                          " ",
+                          data->obj_path,
+                          NULL);
       if (!g_spawn_command_line_async (exec, &error))
 	{
           g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (data->spawner));

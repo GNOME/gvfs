@@ -28,6 +28,7 @@
 #include "gvfsdaemon.h"
 #include "gvfsbackendtest.h"
 #include <gvfsdaemonprotocol.h>
+#include <gvfsutils.h>
 #include "mount.h"
 #include <locale.h>
 
@@ -139,6 +140,7 @@ main (int argc, char *argv[])
   GVfsDaemon *daemon;
   gboolean replace;
   gboolean no_fuse;
+  gboolean debugging;
   gboolean show_version;
   GError *error;
   guint name_owner_id;
@@ -147,6 +149,7 @@ main (int argc, char *argv[])
   const GOptionEntry options[] = {
     { "replace", 'r', 0, G_OPTION_ARG_NONE, &replace,  N_("Replace old daemon."), NULL },
     { "no-fuse", 0, 0, G_OPTION_ARG_NONE, &no_fuse,  N_("Don't start fuse."), NULL },
+    { "debug", 'd', 0, G_OPTION_ARG_NONE, &debugging,  N_("Enable debug output."), NULL },
     { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version."), NULL},
     { NULL }
   };
@@ -156,6 +159,8 @@ main (int argc, char *argv[])
   bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
+
+  gvfs_setup_debug_handler ();
 
 #ifdef SIGPIPE
   signal (SIGPIPE, SIG_IGN);
@@ -170,6 +175,7 @@ main (int argc, char *argv[])
 
   replace = FALSE;
   no_fuse = FALSE;
+  debugging = FALSE;
   show_version = FALSE;
 
   if (g_getenv ("GVFS_DISABLE_FUSE") != NULL)
@@ -191,6 +197,8 @@ main (int argc, char *argv[])
     }
 
   g_option_context_free (context);
+
+  gvfs_set_debug (debugging);
 
   if (show_version)
     {
