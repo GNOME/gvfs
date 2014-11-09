@@ -68,6 +68,7 @@
 #include "gvfsdaemonprotocol.h"
 #include "gvfsutils.h"
 #include "gvfskeyring.h"
+#include <gvfsutils.h>
 #include "sftp.h"
 #include "pty_open.h"
 
@@ -75,15 +76,6 @@
  * Implement can_delete & can_rename
  * fstat
  */
-
-
-#define PRINT_DEBUG
-
-#ifdef PRINT_DEBUG
-#define DEBUG(msg...) g_print("### SFTP: " msg)
-#else
-#define DEBUG(...)
-#endif
 
 #if defined(HAVE_GRANTPT) || defined(HAVE_OPENPTY)
 /* We only use this on systems with unix98 or BSD ptys */
@@ -337,7 +329,7 @@ look_for_stderr_errors (Connection *conn, GError **error)
           return;
         }
 
-      DEBUG ("stderr: %s\n", line);
+      g_debug ("stderr: %s\n", line);
       if (strstr (line, "Permission denied") != NULL)
         {
           g_set_error_literal (error,
@@ -534,13 +526,15 @@ spawn_ssh (GVfsBackend *backend,
            int *slave_fd,
            GError **error)
 {
-#ifdef PRINT_DEBUG
-  DEBUG ("spawn_ssh: ");
-  const char **arg;
-  for (arg = (const char **)args; *arg != NULL; arg++)
-    g_print ("%s ", *arg);
-  g_print ("\n");
-#endif
+  if (gvfs_get_debug ())
+    {
+      const char **arg;
+
+      g_debug ("spawn_ssh: ");
+      for (arg = (const char **)args; *arg != NULL; arg++)
+        g_debug ("%s ", *arg);
+      g_debug ("\n");
+    }
 
 #ifdef USE_PTY
   *tty_fd = pty_open(pid, PTY_REAP_CHILD, NULL,
@@ -992,14 +986,12 @@ handle_login (GVfsBackend *backend,
   gchar *object = NULL;
   char *prompt;
   int attempts = 0;
-#ifdef PRINT_DEBUG
   static int i = 0;
-  i++;
-#endif
 
-  DEBUG ("handle_login #%d, initial_connection = %d - user: %s, host: %s, port: %d\n",
-         i, initial_connection, op_backend->user, op_backend->host, op_backend->port);
-  
+  i++;
+  g_debug ("handle_login #%d initial_connection = %d - user: %s, host: %s, port: %d\n",
+           i, initial_connection, op_backend->user, op_backend->host, op_backend->port);
+
   if (op_backend->client_vendor == SFTP_VENDOR_SSH) 
     prompt_fd = stderr_fd;
   else
@@ -1046,7 +1038,7 @@ handle_login (GVfsBackend *backend,
       buffer[len] = 0;
       g_strchug (buffer);
 
-      DEBUG ("handle_login #%d - prompt: \"%s\"\n", i, buffer);
+      g_debug ("handle_login #%d - prompt: \"%s\"\n", i, buffer);
 
       /*
        * If logging in on a second connection (e.g. the data connection), use
@@ -1111,7 +1103,7 @@ handle_login (GVfsBackend *backend,
             {
               GAskPasswordFlags flags = G_ASK_PASSWORD_NEED_PASSWORD;
               
-              DEBUG ("handle_login #%d - asking for password...\n", i);
+              g_debug ("handle_login #%d - asking for password...\n", i);
 
               if (g_vfs_keyring_is_available ())
                 flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
@@ -1166,20 +1158,20 @@ handle_login (GVfsBackend *backend,
 	      new_password = op_backend->tmp_password;
 	      op_backend->tmp_password = NULL;
 
-              DEBUG ("handle_login #%d - using credentials from previous login attempt...\n", i);
+              g_debug ("handle_login #%d - using credentials from previous login attempt...\n", i);
 	    }
           else
             {
               password_in_keyring = TRUE;
 
-              DEBUG ("handle_login #%d - using credentials from keyring...\n", i);
+              g_debug ("handle_login #%d - using credentials from keyring...\n", i);
             }
 
 	  if (new_user &&
 	      (op_backend->user == NULL ||
 	       strcmp (new_user, op_backend->user) != 0))
 	    {
-	      DEBUG ("handle_login #%d - new_user: %s\n", i, new_user);
+              g_debug ("handle_login #%d - new_user: %s\n", i, new_user);
 
 	      g_free (op_backend->user);
 	      op_backend->user = new_user;
@@ -1235,7 +1227,7 @@ handle_login (GVfsBackend *backend,
 	  gchar *fingerprint = NULL;
 	  gchar *message;
 
-          DEBUG ("handle_login #%d - confirming authenticity of host...\n", i);
+          g_debug ("handle_login #%d - confirming authenticity of host...\n", i);
 
 	  get_hostname_and_fingerprint_from_line (buffer, &hostname, &fingerprint);
 
@@ -1262,7 +1254,7 @@ handle_login (GVfsBackend *backend,
           gchar *ip_address = NULL;
           gchar *message;
 
-          DEBUG ("handle_login #%d - host key / IP mismatch ...\n", i);
+          g_debug ("handle_login #%d - host key / IP mismatch ...\n", i);
 
           get_hostname_and_ip_address (buffer, &hostname, &ip_address);
 
@@ -1285,7 +1277,7 @@ handle_login (GVfsBackend *backend,
   
   if (ret_val && initial_connection)
     {
-      DEBUG ("handle_login #%d - password_save: %d\n", i, op_backend->password_save);
+      g_debug ("handle_login #%d - password_save: %d\n", i, op_backend->password_save);
 
       /* Login succeed, save password in keyring */
       g_vfs_keyring_save_password (op_backend->user,
@@ -1306,7 +1298,7 @@ handle_login (GVfsBackend *backend,
       new_password = NULL;
     }
 
-  DEBUG ("handle_login #%d - ret_val: %d\n", i, ret_val);
+  g_debug ("handle_login #%d - ret_val: %d\n", i, ret_val);
 
   g_free (object);
   g_free (new_password);
