@@ -1,3 +1,14 @@
+Major changes in 1.18.4
+=======================
+* metatree: Avoid endless looping when the entry is too large
+* daemon: Set infinite timeout for enumerate response
+* afp: Don't crash when opening the root directory
+* archive: Don't crash when libarchive fails
+* http: Several fixes for seeking
+* mtp: Fix crashes during unmount
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.18.3
 =======================
 * Fix seeking past end of file for various backends
