@@ -1,3 +1,10 @@
+Major changes in 1.22.2
+=======================
+* sftp: Correctly retrieve the username from the secret store
+* mtp: Fix crashes when device is unplugged
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.22.1
 =======================
 * mtp: Improve transfer speed for large files
