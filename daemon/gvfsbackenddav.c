@@ -2725,10 +2725,23 @@ do_move (GVfsBackend *backend,
 
   if (flags & G_FILE_COPY_BACKUP)
     {
-      g_vfs_job_failed_literal (G_VFS_JOB(job),
-                                G_IO_ERROR,
-                                G_IO_ERROR_CANT_CREATE_BACKUP,
-                                _("Backup file creation failed"));
+      if (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE)
+        {
+          g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                    G_IO_ERROR,
+                                    G_IO_ERROR_CANT_CREATE_BACKUP,
+                                    _("Backups not supported"));
+        }
+      else
+        {
+          /* Return G_IO_ERROR_NOT_SUPPORTED instead of G_IO_ERROR_CANT_CREATE_BACKUP
+           * to be proceeded with copy and delete fallback (see g_file_move). */
+          g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                    G_IO_ERROR,
+                                    G_IO_ERROR_NOT_SUPPORTED,
+                                    "Operation not supported");
+        }
+
       return;
     }
 
