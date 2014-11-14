@@ -153,7 +153,7 @@ static inline guint64 ldq_u(guint64 *p)
 #define ldq_u(x) (*(x))
 #endif
 
-static void         meta_tree_refresh_locked   (MetaTree    *tree,
+static gboolean     meta_tree_refresh_locked   (MetaTree    *tree,
 						gboolean     force_reread);
 static MetaJournal *meta_journal_open          (MetaTree    *tree,
 						const char  *filename,
@@ -368,6 +368,7 @@ meta_tree_init (MetaTree *tree)
   guint32 *attributes;
   gboolean retried;
   int i;
+  int errsv;
 
   retried = FALSE;
  retry:
@@ -375,6 +376,8 @@ meta_tree_init (MetaTree *tree)
   fd = safe_open (tree, tree->filename, O_RDONLY);
   if (fd == -1)
     {
+      errsv = errno;
+
       if (tree->for_write && !retried)
 	{
 	  MetaBuilder *builder;
@@ -393,13 +396,30 @@ meta_tree_init (MetaTree *tree)
 	    }
 	  meta_builder_free (builder);
 	}
+      else if (tree->for_write || errsv != ENOENT)
+        {
+          g_warning ("can't init metadata tree %s: open: %s", tree->filename, g_strerror (errsv));
+        }
       tree->fd = -1;
+
+      /* If we're opening for reading and the file does not exist, it is not
+       * an error. The file will be created later. */
+      return !tree->for_write && errsv == ENOENT;
+    }
+
+  if (fstat (fd, &statbuf) != 0)
+    {
+      errsv = errno;
+      g_warning ("can't init metadata tree %s: fstat: %s", tree->filename, g_strerror (errsv));
+
+      close (fd);
       return FALSE;
     }
 
-  if (fstat (fd, &statbuf) != 0 ||
-      statbuf.st_size < sizeof (MetaFileHeader))
+  if (statbuf.st_size < sizeof (MetaFileHeader))
     {
+      g_warning ("can't init metadata tree %s: wrong size", tree->filename);
+
       close (fd);
       return FALSE;
     }
@@ -407,6 +427,9 @@ meta_tree_init (MetaTree *tree)
   data = mmap (NULL, statbuf.st_size, PROT_READ, MAP_SHARED, fd, 0);
   if (data == MAP_FAILED)
     {
+      errsv = errno;
+      g_warning ("can't init metadata tree %s: mmap: %s", tree->filename, g_strerror (errsv));
+
       close (fd);
       return FALSE;
     }
@@ -418,18 +441,30 @@ meta_tree_init (MetaTree *tree)
   tree->header = (MetaFileHeader *)data;
 
   if (memcmp (tree->header->magic, MAGIC, MAGIC_LEN) != 0)
-    goto err;
+    {
+      g_warning ("can't init metadata tree %s: wrong magic", tree->filename);
+      goto err;
+    }
 
   if (tree->header->major != MAJOR_VERSION)
-    goto err;
+    {
+      g_warning ("can't init metadata tree %s: wrong version", tree->filename);
+      goto err;
+    }
 
   tree->root = verify_block_pointer (tree, tree->header->root, sizeof (MetaFileDirEnt));
   if (tree->root == NULL)
-    goto err;
+    {
+      g_warning ("can't init metadata tree %s: wrong pointer", tree->filename);
+      goto err;
+    }
 
   attributes = verify_array_block (tree, tree->header->attributes, sizeof (guint32));
   if (attributes == NULL)
-    goto err;
+    {
+      g_warning ("can't init metadata tree %s: wrong block", tree->filename);
+      goto err;
+    }
 
   tree->num_attributes = GUINT32_FROM_BE (*attributes);
   attributes++;
@@ -438,7 +473,10 @@ meta_tree_init (MetaTree *tree)
     {
       tree->attributes[i] = verify_string (tree, attributes[i]);
       if (tree->attributes[i] == NULL)
-	goto err;
+        {
+          g_warning ("can't init metadata tree %s: wrong attribute", tree->filename);
+          goto err;
+        }
     }
 
   tree->tag = GUINT32_FROM_BE (tree->header->random_tag);
@@ -451,9 +489,7 @@ meta_tree_init (MetaTree *tree)
      journal. However we can detect this case by looking at the tree and see
      if its been rotated, we do this to ensure we have an uptodate tree+journal
      combo. */
-  meta_tree_refresh_locked (tree, FALSE);
-
-  return TRUE;
+  return meta_tree_refresh_locked (tree, FALSE);
 
  err:
   meta_tree_clear (tree);
@@ -465,6 +501,7 @@ meta_tree_open (const char *filename,
 		gboolean for_write)
 {
   MetaTree *tree;
+  gboolean res;
 
   g_assert (sizeof (MetaFileHeader) == 32);
   g_assert (sizeof (MetaFileDirEnt) == 16);
@@ -476,7 +513,13 @@ meta_tree_open (const char *filename,
   tree->for_write = for_write;
   tree->fd = -1;
 
-  meta_tree_init (tree);
+  res = meta_tree_init (tree);
+  if (!res)
+    {
+      /* do not return uninitialized tree to avoid corruptions */
+      meta_tree_unref (tree);
+      tree = NULL;
+    }
 
   return tree;
 }
@@ -523,8 +566,11 @@ meta_tree_lookup_by_name (const char *name,
       meta_tree_ref (tree);
       G_UNLOCK (cached_trees);
 
-      meta_tree_refresh (tree);
-      return tree;
+      if (meta_tree_refresh (tree))
+        return tree;
+
+      meta_tree_unref (tree);
+      tree = NULL;
     }
 
   filename = g_build_filename (g_get_user_data_dir (), "gvfs-metadata", name, NULL);
@@ -604,7 +650,7 @@ meta_tree_has_new_journal_entries (MetaTree *tree)
 
 
 /* Must be called with a write lock held */
-static void
+static gboolean
 meta_tree_refresh_locked (MetaTree *tree, gboolean force_reread)
 {
   /* Needs to recheck since we dropped read lock */
@@ -612,16 +658,19 @@ meta_tree_refresh_locked (MetaTree *tree, gboolean force_reread)
     {
       if (tree->header)
 	meta_tree_clear (tree);
-      meta_tree_init (tree);
+      return meta_tree_init (tree);
     }
   else if (meta_tree_has_new_journal_entries (tree))
     meta_journal_validate_more (tree->journal);
+
+  return TRUE;
 }
 
-void
+gboolean
 meta_tree_refresh (MetaTree *tree)
 {
   gboolean needs_refresh;
+  gboolean res = TRUE;
 
   g_rw_lock_reader_lock (&metatree_lock);
   needs_refresh =
@@ -632,9 +681,11 @@ meta_tree_refresh (MetaTree *tree)
   if (needs_refresh)
     {
       g_rw_lock_writer_lock (&metatree_lock);
-      meta_tree_refresh_locked (tree, FALSE);
+      res = meta_tree_refresh_locked (tree, FALSE);
       g_rw_lock_writer_unlock (&metatree_lock);
     }
+
+  return res;
 }
 
 struct FindName {
@@ -2320,7 +2371,7 @@ meta_tree_flush_locked (MetaTree *tree)
 			    meta_tree_get_filename (tree));
   if (res)
     /* Force re-read since we wrote a new file */
-    meta_tree_refresh_locked (tree, TRUE);
+    res = meta_tree_refresh_locked (tree, TRUE);
 
   meta_builder_free (builder);
 
