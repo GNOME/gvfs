@@ -836,12 +836,16 @@ add_metadata (GFile *file,
   tree = meta_tree_lookup_by_name (treename, FALSE);
   g_free (treename);
 
-  g_file_info_set_attribute_mask (info, matcher);
-  meta_tree_enumerate_keys (tree, daemon_file->path,
-			    enumerate_keys_callback, info);
-  g_file_info_unset_attribute_mask (info);
+  if (tree)
+    {
+      g_file_info_set_attribute_mask (info, matcher);
+      meta_tree_enumerate_keys (tree, daemon_file->path,
+                                enumerate_keys_callback, info);
+      g_file_info_unset_attribute_mask (info);
 
-  meta_tree_unref (tree);
+      meta_tree_unref (tree);
+    }
+
   g_file_attribute_matcher_unref (matcher);
 }
 
@@ -2645,6 +2649,14 @@ set_metadata_attribute (GFile *file,
   tree = meta_tree_lookup_by_name (treename, FALSE);
   g_free (treename);
   
+  if (!tree)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                   _("Error setting file metadata: %s"),
+                   _("can't open metadata tree"));
+      return FALSE;
+    }
+
   res = FALSE;
   proxy = _g_daemon_vfs_get_metadata_proxy (cancellable, error);
 
