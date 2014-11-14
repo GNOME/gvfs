@@ -46,7 +46,11 @@ main (int argc,
       tree_path = NULL;
       tree = meta_lookup_cache_lookup_path (cache, argv[i], statbuf.st_dev,
 					    FALSE, &tree_path);
-      g_print ("tree: %s (exists: %d), tree path: %s\n", meta_tree_get_filename (tree), meta_tree_exists (tree), tree_path);
+      if (tree)
+	g_print ("tree: %s (exists: %d), tree path: %s\n", meta_tree_get_filename (tree), meta_tree_exists (tree), tree_path);
+      else
+	g_print ("tree lookup failed\n");
+
       if (pause)
 	{
 	  char buffer[1000];

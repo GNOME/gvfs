@@ -1,3 +1,4 @@
+
 /* GIO - GLib Input, Output and Streaming Library
  * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
@@ -1303,69 +1304,79 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
 						statbuf.st_dev,
 						FALSE,
 						&tree_path);
-	  
-	  proxy = _g_daemon_vfs_get_metadata_proxy (NULL, error);
-	  if (proxy == NULL)
-	    {
-	      res = FALSE;
+          if (!tree)
+            {
+              g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Error setting file metadata: %s"),
+                           _("can't open metadata tree"));
+              res = FALSE;
               error = NULL; /* Don't set further errors */
-	    }
-	  else
-	    {
-              builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
-	      metatreefile = meta_tree_get_filename (tree);
-              num_set = 0;
+            }
+          else
+            {
+	      proxy = _g_daemon_vfs_get_metadata_proxy (NULL, error);
+	      if (proxy == NULL)
+		{
+		  res = FALSE;
+		  error = NULL; /* Don't set further errors */
+		}
+	      else
+		{
+		  builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
+		  metatreefile = meta_tree_get_filename (tree);
+		  num_set = 0;
 
-              for (i = 0; attributes[i] != NULL; i++)
-                {
-                  if (g_file_info_get_attribute_data (info, attributes[i], &type, &value, NULL))
-                    {
-                      appended = _g_daemon_vfs_append_metadata_for_set (builder,
-                                                                        tree,
-                                                                        tree_path,
-                                                                        attributes[i],
-                                                                        type,
-                                                                        value);
-                      if (appended != -1)
-                        {
-                          num_set += appended;
-                          g_file_info_set_attribute_status (info, attributes[i],
-                                                            G_FILE_ATTRIBUTE_STATUS_SET);
-                        }
-                      else
-                        {
-                          res = FALSE;
-                          g_set_error (error, G_IO_ERROR,
-                                       G_IO_ERROR_INVALID_ARGUMENT,
-                                       _("Error setting file metadata: %s"),
-                                       _("values must be string or list of strings"));
-                          error = NULL; /* Don't set further errors */
-                          g_file_info_set_attribute_status (info, attributes[i],
-                                                            G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
-                        }
-                    }
-                }
-	      
-	      if (num_set > 0 &&
-	          ! gvfs_metadata_call_set_sync (proxy,
-	                                         metatreefile,
-	                                         tree_path,
-	                                         g_variant_builder_end (builder),
-	                                         NULL,
-	                                         error))
-                {
-	          res = FALSE;
-                  error = NULL; /* Don't set further errors */
-                  for (i = 0; attributes[i] != NULL; i++)
-                    g_file_info_set_attribute_status (info, attributes[i],
-                                                      G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
-                }
+		  for (i = 0; attributes[i] != NULL; i++)
+		    {
+		      if (g_file_info_get_attribute_data (info, attributes[i], &type, &value, NULL))
+			{
+			  appended = _g_daemon_vfs_append_metadata_for_set (builder,
+									    tree,
+									    tree_path,
+									    attributes[i],
+									    type,
+									    value);
+			  if (appended != -1)
+			    {
+			      num_set += appended;
+			      g_file_info_set_attribute_status (info, attributes[i],
+								G_FILE_ATTRIBUTE_STATUS_SET);
+			    }
+			  else
+			    {
+			      res = FALSE;
+			      g_set_error (error, G_IO_ERROR,
+					   G_IO_ERROR_INVALID_ARGUMENT,
+					   _("Error setting file metadata: %s"),
+					   _("values must be string or list of strings"));
+			      error = NULL; /* Don't set further errors */
+			      g_file_info_set_attribute_status (info, attributes[i],
+								G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
+			    }
+			}
+		    }
 
-	      g_variant_builder_unref (builder);
-	      
-              meta_lookup_cache_free (cache);
-              meta_tree_unref (tree);
-              g_free (tree_path);
+		  if (num_set > 0 &&
+		      ! gvfs_metadata_call_set_sync (proxy,
+						     metatreefile,
+						     tree_path,
+						     g_variant_builder_end (builder),
+						     NULL,
+						     error))
+		    {
+		      res = FALSE;
+		      error = NULL; /* Don't set further errors */
+		      for (i = 0; attributes[i] != NULL; i++)
+			g_file_info_set_attribute_status (info, attributes[i],
+							  G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
+		    }
+
+		  g_variant_builder_unref (builder);
+
+		  meta_lookup_cache_free (cache);
+		  meta_tree_unref (tree);
+		  g_free (tree_path);
+		}
 	    }
 	}
 
