@@ -63,7 +63,7 @@ MetaTree *  meta_tree_lookup_by_name (const char *name,
 				      gboolean    for_write);
 MetaTree *  meta_tree_ref            (MetaTree   *tree);
 void        meta_tree_unref          (MetaTree   *tree);
-void        meta_tree_refresh        (MetaTree   *tree);
+gboolean    meta_tree_refresh        (MetaTree   *tree);
 const char *meta_tree_get_filename   (MetaTree   *tree);
 gboolean    meta_tree_exists         (MetaTree   *tree);
 gboolean    meta_tree_is_on_nfs      (MetaTree   *tree);
