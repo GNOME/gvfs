@@ -259,7 +259,7 @@ g_vfs_backend_inst_check (instproxy_error_t cond, GVfsJob *job)
 static int
 g_vfs_backend_sbs_check (sbservices_error_t cond, GVfsJob *job)
 {
-  if (G_LIKELY(cond == INSTPROXY_E_SUCCESS))
+  if (G_LIKELY(cond == SBSERVICES_E_SUCCESS))
     {
       return 0;
     }
