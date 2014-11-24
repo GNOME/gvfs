@@ -540,8 +540,23 @@ file_info_from_message (SoupMessage *msg,
   g_free (basename);
   g_free (ed_name);
 
-  if (soup_message_headers_get_encoding(msg->response_headers) == SOUP_ENCODING_CONTENT_LENGTH)
-    g_file_info_set_size (info, soup_message_headers_get_content_length (msg->response_headers));
+  if (soup_message_headers_get_encoding (msg->response_headers) == SOUP_ENCODING_CONTENT_LENGTH)
+    {
+      goffset start, end, length;
+      gboolean ret;
+
+      ret = soup_message_headers_get_content_range (msg->response_headers,
+                                                    &start, &end, &length);
+      if (ret && length != -1)
+        {
+          g_file_info_set_size (info, length);
+        }
+      else if (!ret)
+        {
+          length = soup_message_headers_get_content_length (msg->response_headers);
+          g_file_info_set_size (info, length);
+        }
+    }
 
   g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
 
