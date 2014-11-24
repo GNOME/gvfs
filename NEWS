@@ -1,3 +1,11 @@
+Major changes in 1.23.2
+=======================
+* Try copy and delete fallback for move if backup couldn't be created
+* mtp: Do not crash when device is unplugged
+* tests: Several fixes
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.23.1
 =======================
 * Several improvements to unmounting reliability
