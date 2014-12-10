@@ -1122,7 +1122,7 @@ get_device_info (GVfsBackendMtp *backend, GFileInfo *info)
 static void
 get_storage_info (LIBMTP_devicestorage_t *storage, GFileInfo *info) {
 
-  DEBUG_ENUMERATE ("(II) get_storage_info: %s\n", storage->id);
+  DEBUG_ENUMERATE ("(II) get_storage_info: %X\n", storage->id);
 
   char *storage_name = create_storage_name(storage);
   g_file_info_set_name (info, storage_name);
