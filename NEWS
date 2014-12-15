@@ -1,3 +1,9 @@
+Major changes in 1.23.3
+=======================
+* Fix reported size for http and dav
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.23.2
 =======================
 * Try copy and delete fallback for move if backup couldn't be created
