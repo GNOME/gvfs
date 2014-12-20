@@ -1331,6 +1331,8 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
 						     error))
 		    {
 		      res = FALSE;
+                      if (error && *error)
+                        g_dbus_error_strip_remote_error (*error);
 		      error = NULL; /* Don't set further errors */
 		      for (i = 0; attributes[i] != NULL; i++)
 			g_file_info_set_attribute_status (info, attributes[i],
