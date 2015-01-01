@@ -118,6 +118,12 @@
                         </varlistentry>
 
                         <varlistentry>
+                                <term><option>-a</option>, <option>--anonymous</option></term>
+
+                                <listitem><para>Use an anonymous user when authenticating</para></listitem>
+                        </varlistentry>
+
+                        <varlistentry>
                                 <term><option>-l</option>, <option>--list</option></term>
 
                                 <listitem><para>List all known mounts.</para></listitem>
