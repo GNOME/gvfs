@@ -1,3 +1,10 @@
+Major changes in 1.22.3
+=======================
+* Fix metadata deamon crashes
+* Several improvements to unmounting reliability
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.22.2
 =======================
 * sftp: Correctly retrieve the username from the secret store
