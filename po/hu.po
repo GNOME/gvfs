@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the gvfs package.
 #
 # Gabor Kelemen <kelemeng at gnome dot hu>, 2008, 2009, 2010, 2011, 2012, 2013, 2014.
-# Balázs Úr <urbalazs at gmail dot com>, 2014.
+# Balázs Úr <urbalazs at gmail dot com>, 2014, 2015.
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-12-06 22:24+0000\n"
-"PO-Revision-Date: 2014-12-07 10:34+0100\n"
+"POT-Creation-Date: 2015-01-06 12:59+0000\n"
+"PO-Revision-Date: 2015-01-06 22:58+0100\n"
 "Last-Translator: Balázs Úr <urbalazs@gmail.com>\n"
 "Language-Team: Hungarian <openscope at googlegroups dot com>\n"
 "Language: hu\n"
@@ -20,49 +20,54 @@ msgstr ""
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 "X-Generator: Lokalize 1.2\n"
 
-#: ../client/gdaemonfile.c:462 ../client/gdaemonfile.c:2842
+#: ../client/gdaemonfile.c:462 ../client/gdaemonfile.c:2854
 msgid "Operation not supported, files on different mounts"
 msgstr "A művelet nem támogatott, a fájlok eltérő csatolásokon vannak"
 
-#: ../client/gdaemonfile.c:1084 ../client/gdaemonfile.c:3199
+#: ../client/gdaemonfile.c:1088 ../client/gdaemonfile.c:3211
 #: ../client/gvfsiconloadable.c:301 ../daemon/gvfsjobopenforread.c:183
 #: ../daemon/gvfsjobopenforwrite.c:326
 msgid "Couldn't get stream file descriptor"
 msgstr "Az adatfolyamfájl leírója nem kérhető le"
 
-#: ../client/gdaemonfile.c:1213 ../client/gdaemonfile.c:1285
+#: ../client/gdaemonfile.c:1217 ../client/gdaemonfile.c:1289
 #: ../client/gvfsiconloadable.c:127
 msgid "Didn't get stream file descriptor"
 msgstr "Az adatfolyamfájl-leíró lekérése meghiúsult"
 
-#: ../client/gdaemonfile.c:1406
+#: ../client/gdaemonfile.c:1410
 #, c-format
 msgid "Invalid return value from %s"
 msgstr "A(z) %s visszatérési értéke érvénytelen"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:2308 ../client/gdaemonfile.c:3515
+#: ../client/gdaemonfile.c:2312 ../client/gdaemonfile.c:3527
 msgid "Could not find enclosing mount"
 msgstr "Nem található befoglaló csatolási objektum"
 
-#: ../client/gdaemonfile.c:2340
+#: ../client/gdaemonfile.c:2344
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Érvénytelen fájlnév: %s"
 
-#: ../client/gdaemonfile.c:2674 ../client/gdaemonvfs.c:1264
-#: ../client/gdaemonvfs.c:1316
+#: ../client/gdaemonfile.c:2659 ../client/gdaemonfile.c:2686
+#: ../client/gdaemonvfs.c:1265 ../client/gdaemonvfs.c:1286
+#: ../client/gdaemonvfs.c:1326
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Hiba a fájl metaadatainak beállításakor: %s"
 
-#: ../client/gdaemonfile.c:2675 ../client/gdaemonvfs.c:1317
+#: ../client/gdaemonfile.c:2660 ../client/gdaemonvfs.c:1287
+#| msgid "Can't find metadata file %s"
+msgid "can't open metadata tree"
+msgstr "nem nyitható meg a metaadatfa"
+
+#: ../client/gdaemonfile.c:2687 ../client/gdaemonvfs.c:1327
 msgid "values must be string or list of strings"
 msgstr "Az érték karakterlánc vagy karakterláncok listája lehet"
 
-#: ../client/gdaemonfile.c:2834
-#| msgid "Operation unsupported"
+#: ../client/gdaemonfile.c:2846
 msgid "Operation not supported"
 msgstr "A művelet nem támogatott"
 
@@ -125,7 +130,7 @@ msgstr "Az adatfolyam nem támogatja a pozicionálást"
 msgid "Truncate not supported on stream"
 msgstr "Az adatfolyam csonkítása nem engedélyezett"
 
-#: ../client/gdaemonvfs.c:788
+#: ../client/gdaemonvfs.c:789
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Hiba a csatolási információk lekérésekor: %s"
@@ -366,7 +371,6 @@ msgid "Got unknown error code %d from server"
 msgstr "Ismeretlen hibakód (%d) érkezett a kiszolgálóról"
 
 #: ../daemon/gvfsafpvolume.c:140
-#| msgid "File doesn't exist"
 msgid "Volume doesn't exist"
 msgstr "A kötet nem létezik"
 
@@ -712,7 +716,6 @@ msgstr "A művelet nem támogatott"
 
 #: ../daemon/gvfsbackendafc.c:2581 ../daemon/gvfsbackenddav.c:2733
 #: ../daemon/gvfsbackendftp.c:1345
-#| msgid "backups not supported"
 msgid "Backups not supported"
 msgstr "A biztonsági mentések nem támogatottak"
 
@@ -1578,7 +1581,6 @@ msgstr "A gép azonossági információi nem küldhetők el"
 
 #: ../daemon/gvfsbackendsftp.c:1217
 #, c-format
-#| msgid "The connection is closed (the underlying SSH process died)"
 msgid "The connection is closed (the underlying SSH process exited)"
 msgstr "A kapcsolat lezárva (az alapjául szolgáló SSH folyamat kilépett)"
 
@@ -2461,7 +2463,6 @@ msgstr "%s: %s: hiba a következő olvasásakor: %s\n"
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:116
 #, c-format
-#| msgid "%s: %s:error closing: %s\n"
 msgid "%s: %s: error closing: %s\n"
 msgstr "%s: %s: hiba a következő lezárásakor: %s\n"
 
