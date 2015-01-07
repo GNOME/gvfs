@@ -60,10 +60,8 @@ msgid "Error setting file metadata: %s"
 msgstr "Chyba při nastavování metadat souboru: %s"
 
 #: ../client/gdaemonfile.c:2660 ../client/gdaemonvfs.c:1287
-#, fuzzy
-#| msgid "Can't find metadata file %s"
 msgid "can't open metadata tree"
-msgstr "Nelze najít soubor metadat %s"
+msgstr "nelze otevřít strom metadat"
 
 #: ../client/gdaemonfile.c:2687 ../client/gdaemonvfs.c:1327
 msgid "values must be string or list of strings"
@@ -715,10 +713,8 @@ msgstr "Operace nepodporována"
 
 #: ../daemon/gvfsbackendafc.c:2581 ../daemon/gvfsbackenddav.c:2733
 #: ../daemon/gvfsbackendftp.c:1345
-#, fuzzy
-#| msgid "backups not supported"
 msgid "Backups not supported"
-msgstr "zálohy nejsou podporovány"
+msgstr "Zálohy nejsou podporovány"
 
 #: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1137
 #: ../daemon/gvfsbackendsmbbrowse.c:1183
