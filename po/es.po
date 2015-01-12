@@ -4,15 +4,15 @@
 # 
 # Jorge González <jorgegonz@svn.gnome.org>, 2008, 2009, 2010, 2011, 2012.
 # 
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011., 2012, 2013, 2014.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011., 2012, 2013, 2014, 2015.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-11-19 10:21+0000\n"
-"PO-Revision-Date: 2014-11-19 12:58+0100\n"
+"POT-Creation-Date: 2015-01-11 22:21+0000\n"
+"PO-Revision-Date: 2015-01-12 12:11+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español; Castellano <gnome-es-list@gnome.org>\n"
 "Language: \n"
@@ -22,50 +22,56 @@ msgstr ""
 "X-Generator: Gtranslator 2.91.6\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../client/gdaemonfile.c:462 ../client/gdaemonfile.c:2842
+#: ../client/gdaemonfile.c:462 ../client/gdaemonfile.c:2854
 msgid "Operation not supported, files on different mounts"
 msgstr ""
 "La operación no está soportada, los archivos están en diferentes puntos de "
 "montaje"
 
-#: ../client/gdaemonfile.c:1084 ../client/gdaemonfile.c:3199
+#: ../client/gdaemonfile.c:1088 ../client/gdaemonfile.c:3211
 #: ../client/gvfsiconloadable.c:301 ../daemon/gvfsjobopenforread.c:183
 #: ../daemon/gvfsjobopenforwrite.c:326
 msgid "Couldn't get stream file descriptor"
 msgstr "No se pudo obtener el descriptor del archivo de flujo"
 
-#: ../client/gdaemonfile.c:1213 ../client/gdaemonfile.c:1285
+#: ../client/gdaemonfile.c:1217 ../client/gdaemonfile.c:1289
 #: ../client/gvfsiconloadable.c:127
 msgid "Didn't get stream file descriptor"
 msgstr "No se obtuvo un descriptor del archivo de flujo"
 
-#: ../client/gdaemonfile.c:1406
+#: ../client/gdaemonfile.c:1410
 #, c-format
 msgid "Invalid return value from %s"
 msgstr "%s devolvió un valor no válido"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:2308 ../client/gdaemonfile.c:3515
+#: ../client/gdaemonfile.c:2312 ../client/gdaemonfile.c:3527
 msgid "Could not find enclosing mount"
 msgstr "No se pudo encontrar el punto de montaje adjunto"
 
-#: ../client/gdaemonfile.c:2340
+#: ../client/gdaemonfile.c:2344
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Nombre de archivo no válido %s"
 
-#: ../client/gdaemonfile.c:2674 ../client/gdaemonvfs.c:1264
-#: ../client/gdaemonvfs.c:1316
+#: ../client/gdaemonfile.c:2659 ../client/gdaemonfile.c:2686
+#: ../client/gdaemonvfs.c:1265 ../client/gdaemonvfs.c:1286
+#: ../client/gdaemonvfs.c:1326
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Error al establecer los metadatos del archivo: %s"
 
-#: ../client/gdaemonfile.c:2675 ../client/gdaemonvfs.c:1317
+#: ../client/gdaemonfile.c:2660 ../client/gdaemonvfs.c:1287
+#| msgid "Can't find metadata file %s"
+msgid "can't open metadata tree"
+msgstr "no se puede abrir el árbol de metadatos"
+
+#: ../client/gdaemonfile.c:2687 ../client/gdaemonvfs.c:1327
 msgid "values must be string or list of strings"
 msgstr "los valores deben ser cadenas o listas de cadenas"
 
-#: ../client/gdaemonfile.c:2834
+#: ../client/gdaemonfile.c:2846
 msgid "Operation not supported"
 msgstr "Operación no soportada"
 
@@ -128,7 +134,7 @@ msgstr "No se permite buscar en el flujo"
 msgid "Truncate not supported on stream"
 msgstr "No se permite truncar en el flujo"
 
-#: ../client/gdaemonvfs.c:788
+#: ../client/gdaemonvfs.c:789
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Error al obtener la información de montaje: %s"
@@ -716,7 +722,6 @@ msgstr "La operación no está soportada"
 
 #: ../daemon/gvfsbackendafc.c:2581 ../daemon/gvfsbackenddav.c:2733
 #: ../daemon/gvfsbackendftp.c:1345
-#| msgid "backups not supported"
 msgid "Backups not supported"
 msgstr "Respaldos no soportados"
 
