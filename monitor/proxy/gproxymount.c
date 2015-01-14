@@ -386,7 +386,8 @@ eject_wrapper_callback (GObject *source_object,
                         gpointer user_data)
 {
   EjectWrapperOp *data  = user_data;
-  data->callback (data->object, res, data->user_data);
+  if (data->callback)
+    data->callback (data->object, res, data->user_data);
   g_object_unref (data->object);
   g_free (data);
 }
