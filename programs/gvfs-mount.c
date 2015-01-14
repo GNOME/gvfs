@@ -122,7 +122,12 @@ prompt_for (const char *prompt, const char *default_value, gboolean echo)
 #endif
 
   len = strlen (data);
-  if (len > 0 && data[len-1] == '\n')
+  if (len == 0)
+    {
+      g_print ("\n");
+      return NULL;
+    }
+  if (data[len-1] == '\n')
     data[len-1] = 0;
 
   if (!echo)
@@ -152,6 +157,8 @@ ask_password_cb (GMountOperation *op,
       if (flags & G_ASK_PASSWORD_NEED_USERNAME)
         {
           s = prompt_for ("User", default_user, TRUE);
+          if (!s)
+            goto error;
           g_mount_operation_set_username (op, s);
           g_free (s);
         }
@@ -159,6 +166,8 @@ ask_password_cb (GMountOperation *op,
       if (flags & G_ASK_PASSWORD_NEED_DOMAIN)
         {
           s = prompt_for ("Domain", default_domain, TRUE);
+          if (!s)
+            goto error;
           g_mount_operation_set_domain (op, s);
           g_free (s);
         }
@@ -166,6 +175,8 @@ ask_password_cb (GMountOperation *op,
       if (flags & G_ASK_PASSWORD_NEED_PASSWORD)
         {
           s = prompt_for ("Password", NULL, FALSE);
+          if (!s)
+            goto error;
           g_mount_operation_set_password (op, s);
           g_free (s);
         }
@@ -183,6 +194,11 @@ ask_password_cb (GMountOperation *op,
       g_object_set_data (G_OBJECT (op), "state", GINT_TO_POINTER (MOUNT_OP_ASKED));
       g_mount_operation_reply (op, G_MOUNT_OPERATION_HANDLED);
     }
+
+  return;
+
+error:
+  g_mount_operation_reply (op, G_MOUNT_OPERATION_ABORTED);
 }
 
 static void
@@ -205,6 +221,9 @@ ask_question_cb (GMountOperation *op,
     }
 
   s = prompt_for ("Choice", NULL, TRUE);
+  if (!s)
+    goto error;
+
   choice = atoi (s);
   if (choice > 0 && choice < i)
     {
@@ -212,6 +231,11 @@ ask_question_cb (GMountOperation *op,
       g_mount_operation_reply (op, G_MOUNT_OPERATION_HANDLED);
     }
   g_free (s);
+
+  return;
+
+error:
+  g_mount_operation_reply (op, G_MOUNT_OPERATION_ABORTED);
 }
 
 static void
@@ -230,7 +254,7 @@ mount_mountable_done_cb (GObject *object,
       success = FALSE;
       if (GPOINTER_TO_INT (g_object_get_data (G_OBJECT (op), "state")) == MOUNT_OP_ABORTED)
         g_printerr (_("Error mounting location: Anonymous access denied\n"));
-      else
+      else if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED))
         g_printerr (_("Error mounting location: %s\n"), error->message);
     }
   else
@@ -258,7 +282,7 @@ mount_done_cb (GObject *object,
       success = FALSE;
       if (GPOINTER_TO_INT (g_object_get_data (G_OBJECT (op), "state")) == MOUNT_OP_ABORTED)
         g_printerr (_("Error mounting location: Anonymous access denied\n"));
-      else
+      else if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED))
         g_printerr (_("Error mounting location: %s\n"), error->message);
     }
 
