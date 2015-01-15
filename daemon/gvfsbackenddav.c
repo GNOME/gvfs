@@ -2564,8 +2564,7 @@ try_close_write (GVfsBackend *backend,
   data = g_memory_output_stream_steal_data (G_MEMORY_OUTPUT_STREAM (stream));
   g_object_unref (stream);
 
-  soup_message_set_request (msg, "application/octet-stream",
-			    SOUP_MEMORY_TAKE, data, length);
+  soup_message_body_append (msg->request_body, SOUP_MEMORY_TAKE, data, length);
   soup_session_queue_message (G_VFS_BACKEND_HTTP (backend)->session,
 			      msg, try_close_write_sent, job);
 
@@ -3111,9 +3110,6 @@ push_setup_message (PushHandle *handle)
                                      SOUP_ENCODING_CONTENT_LENGTH);
   soup_message_headers_set_content_length (handle->msg->request_headers,
                                            handle->size);
-  soup_message_headers_set_content_type (handle->msg->request_headers,
-                                         "application/octet-stream",
-                                         NULL);
 }
 
 static void
