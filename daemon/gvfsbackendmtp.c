@@ -1701,6 +1701,160 @@ do_pull (GVfsBackend *backend,
 }
 
 
+static LIBMTP_filetype_t
+get_filetype_from_info (GFileInfo *info) {
+  const char *content_type = g_file_info_get_content_type (info);
+  DEBUG ("(II) get_filetype_from_info (info = %s)\n", content_type);
+
+  LIBMTP_filetype_t ret;
+  if (!content_type) {
+    ret = LIBMTP_FILETYPE_UNKNOWN;
+  } else if (strcmp (content_type, "audio/wav") == 0 ||
+             strcmp (content_type, "audio/x-wav") == 0 ||
+             strcmp (content_type, "audio/vnd.wave") == 0) {
+    ret = LIBMTP_FILETYPE_WAV;
+  } else if (strcmp (content_type, "audio/mpeg") == 0 ||
+             strcmp (content_type, "audio/x-mp3") == 0 ||
+             strcmp (content_type, "audio/x-mpeg") == 0 ||
+             strcmp (content_type, "audio/mp3") == 0) {
+    ret = LIBMTP_FILETYPE_MP3;
+  } else if (strcmp (content_type, "audio/x-ms-wma") == 0 ||
+             strcmp (content_type, "audio/wma") == 0) {
+    ret = LIBMTP_FILETYPE_WMA;
+  } else if (strcmp (content_type, "audio/ogg") == 0 ||
+             strcmp (content_type, "audio/x-ogg") == 0) {
+    ret = LIBMTP_FILETYPE_OGG;
+  } else if (strcmp (content_type, "audio/audible") == 0 ||
+             strcmp (content_type, "audio/x-pn-audibleaudio") == 0) {
+    ret = LIBMTP_FILETYPE_AUDIBLE;
+  } else if (strcmp (content_type, "video/mp4") == 0 ||
+             strcmp (content_type, "video/x-m4v") == 0 ||
+             strcmp (content_type, "video/mp4v-es") == 0) {
+    ret = LIBMTP_FILETYPE_MP4;
+  } else if (strcmp (content_type, "video/x-ms-wmv") == 0) {
+    ret = LIBMTP_FILETYPE_WMV;
+  } else if (strcmp (content_type, "video/x-msvideo") == 0 ||
+             strcmp (content_type, "video/x-avi") == 0 ||
+             strcmp (content_type, "video/avi") == 0 ||
+             strcmp (content_type, "video/divx") == 0 ||
+             strcmp (content_type, "video/msvideo") == 0 ||
+             strcmp (content_type, "video/vnd.divx") == 0) {
+    ret = LIBMTP_FILETYPE_AVI;
+  } else if (strcmp (content_type, "video/mpeg") == 0 ||
+             strcmp (content_type, "video/x-mpeg") == 0 ||
+             strcmp (content_type, "video/x-mpeg2") == 0) {
+    ret = LIBMTP_FILETYPE_MPEG;
+  } else if (strcmp (content_type, "video/x-ms-asf") == 0 ||
+             strcmp (content_type, "video/x-ms-wm") == 0 ||
+             strcmp (content_type, "video/vnd.ms-asf") == 0) {
+    ret = LIBMTP_FILETYPE_ASF;
+  } else if (strcmp (content_type, "video/quicktime") == 0) {
+    ret = LIBMTP_FILETYPE_QT;
+  } else if (strcmp (content_type, "image/jpeg") == 0 ||
+             strcmp (content_type, "image/pjpeg") == 0) {
+    ret = LIBMTP_FILETYPE_JPEG;
+  } else if (strcmp (content_type, "image/tiff") == 0) {
+    ret = LIBMTP_FILETYPE_TIFF;
+  } else if (strcmp (content_type, "image/bmp") == 0 ||
+             strcmp (content_type, "image/x-bmp") == 0 ||
+             strcmp (content_type, "image/x-MS-bmp") == 0) {
+    ret = LIBMTP_FILETYPE_BMP;
+  } else if (strcmp (content_type, "image/gif") == 0) {
+    ret = LIBMTP_FILETYPE_GIF;
+  } else if (strcmp (content_type, "image/x-pict") == 0) {
+    ret = LIBMTP_FILETYPE_PICT;
+  } else if (strcmp (content_type, "image/png") == 0) {
+    ret = LIBMTP_FILETYPE_PNG;
+  } else if (strcmp (content_type, "text/x-vcalendar") == 0) {
+    ret = LIBMTP_FILETYPE_VCALENDAR1;
+  } else if (strcmp (content_type, "text/calendar") == 0 ||
+             strcmp (content_type, "application/ics") == 0) {
+    ret = LIBMTP_FILETYPE_VCALENDAR2;
+  } else if (strcmp (content_type, "text/x-vcard") == 0 ||
+             strcmp (content_type, "text/directory") == 0) {
+    ret = LIBMTP_FILETYPE_VCARD2;
+  } else if (strcmp (content_type, "text/vcard") == 0) {
+    ret = LIBMTP_FILETYPE_VCARD3;
+  } else if (strcmp (content_type, "image/x-wmf") == 0 ||
+             strcmp (content_type, "image/wmf") == 0 ||
+             strcmp (content_type, "image/x-win-metafile") == 0 ||
+             strcmp (content_type, "application/x-wmf") == 0 ||
+             strcmp (content_type, "application/wmf") == 0 ||
+             strcmp (content_type, "application/x-msmetafile") == 0) {
+    ret = LIBMTP_FILETYPE_WINDOWSIMAGEFORMAT;
+  } else if (strcmp (content_type, "application/x-ms-dos-executable") == 0) {
+    ret = LIBMTP_FILETYPE_WINEXEC;
+  } else if (strcmp (content_type, "text/plain") == 0) {
+    ret = LIBMTP_FILETYPE_TEXT;
+  } else if (strcmp (content_type, "text/html") == 0) {
+    ret = LIBMTP_FILETYPE_HTML;
+  } else if (strcmp (content_type, "audio/aac") == 0) {
+    ret = LIBMTP_FILETYPE_AAC;
+  } else if (strcmp (content_type, "audio/flac") == 0 ||
+             strcmp (content_type, "audio/x-flac") == 0 ||
+             strcmp (content_type, "audio/x-flac+ogg") == 0 ||
+             strcmp (content_type, "audio/x-oggflac") == 0) {
+    ret = LIBMTP_FILETYPE_FLAC;
+  } else if (strcmp (content_type, "audio/mp2") == 0 ||
+             strcmp (content_type, "audio/x-mp2") == 0) {
+    ret = LIBMTP_FILETYPE_MP2;
+  } else if (strcmp (content_type, "audio/mp4") == 0 ||
+             strcmp (content_type, "audio/x-m4a") == 0) {
+    ret = LIBMTP_FILETYPE_M4A;
+  } else if (strcmp (content_type, "application/msword") == 0 ||
+             strcmp (content_type, "application/vnd.ms-word") == 0 ||
+             strcmp (content_type, "application/x-msword") == 0 ||
+             strcmp (content_type, "zz-application/zz-winassoc-doc") == 0) {
+    ret = LIBMTP_FILETYPE_DOC;
+  } else if (strcmp (content_type, "text/xml") == 0 ||
+             strcmp (content_type, "application/xml") == 0) {
+    ret = LIBMTP_FILETYPE_XML;
+  } else if (strcmp (content_type, "application/msexcel") == 0 ||
+             strcmp (content_type, "application/vnd.ms-excel") == 0 ||
+             strcmp (content_type, "application/x-msexcel") == 0 ||
+             strcmp (content_type, "zz-application/zz-winassoc-xls") == 0) {
+    ret = LIBMTP_FILETYPE_XLS;
+  } else if (strcmp (content_type, "application/mspowerpoint") == 0 ||
+             strcmp (content_type, "application/vnd.ms-powerpoint") == 0 ||
+             strcmp (content_type, "application/x-mspowerpoint") == 0 ||
+             strcmp (content_type, "application/powerpoint") == 0) {
+    ret = LIBMTP_FILETYPE_PPT;
+  } else if (strcmp (content_type, "message/rfc822") == 0) {
+    ret = LIBMTP_FILETYPE_MHT;
+  } else if (strcmp (content_type, "image/jp2") == 0) {
+    ret = LIBMTP_FILETYPE_JP2;
+  } else if (strcmp (content_type, "image/jpx") == 0) {
+    ret = LIBMTP_FILETYPE_JPX;
+  } else if (strcmp (content_type, "audio/x-mpegurl") == 0 ||
+             strcmp (content_type, "audio/mpegurl") == 0 ||
+             strcmp (content_type, "application/m3u") == 0 ||
+             strcmp (content_type, "audio/x-mp3-playlist") == 0 ||
+             strcmp (content_type, "audio/m3u") == 0 ||
+             strcmp (content_type, "audio/x-m3u") == 0) {
+    ret = LIBMTP_FILETYPE_PLAYLIST;
+  } else if (strncmp (content_type, "audio/", 6) == 0) {
+    // Must come after all other audio types.
+    ret = LIBMTP_FILETYPE_UNDEF_AUDIO;
+  } else if (strncmp (content_type, "video/", 6) == 0) {
+    // Must come after all other video types.
+    ret = LIBMTP_FILETYPE_UNDEF_VIDEO;
+  } else {
+    ret = LIBMTP_FILETYPE_UNKNOWN;
+  }
+
+  /* Unmappable Types
+    LIBMTP_FILETYPE_JFIF,
+    LIBMTP_FILETYPE_FIRMWARE,
+    LIBMTP_FILETYPE_MEDIACARD,
+    LIBMTP_FILETYPE_ALBUM,
+  */
+
+  DEBUG ("(II) get_filetype_from_info done.\n");
+
+  return ret;
+}
+
+
 static void
 do_push (GVfsBackend *backend,
          GVfsJobPush *job,
@@ -1756,7 +1910,9 @@ do_push (GVfsBackend *backend,
   local_file = g_file_new_for_path (local_path);
   info =
     g_file_query_info (local_file,
-                       G_FILE_ATTRIBUTE_STANDARD_TYPE","G_FILE_ATTRIBUTE_STANDARD_SIZE,
+                       G_FILE_ATTRIBUTE_STANDARD_TYPE","
+                       G_FILE_ATTRIBUTE_STANDARD_SIZE","
+                       G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
                        0, G_VFS_JOB (job)->cancellable, &error);
   if (!info) {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1827,7 +1983,7 @@ do_push (GVfsBackend *backend,
   mtpfile->filename = strdup (filename);
   mtpfile->parent_id = parent->id;
   mtpfile->storage_id = parent->storage;
-  mtpfile->filetype = LIBMTP_FILETYPE_UNKNOWN;
+  mtpfile->filetype = get_filetype_from_info (info);
   mtpfile->filesize = g_file_info_get_size (info);
 
   MtpProgressData mtp_progress_data;
