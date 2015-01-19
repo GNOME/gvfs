@@ -1,3 +1,10 @@
+Major changes in 1.23.4
+=======================
+* gproxymount: Fix crashes if eject callback isn't specified
+* metadata: Fix crashes if tree initilization failed
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.23.3
 =======================
 * Fix reported size for http and dav
