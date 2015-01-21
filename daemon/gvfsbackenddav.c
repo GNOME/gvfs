@@ -229,7 +229,6 @@ path_equal (const char *a, const char *b, gboolean relax)
 {
   gboolean res;
   size_t a_len, b_len;
-  char *ua, *ub;
 
   if (relax == FALSE)
     return str_equal (a, b, FALSE);
@@ -237,25 +236,19 @@ path_equal (const char *a, const char *b, gboolean relax)
   if (a == NULL || b == NULL)
       return a == b;
 
-  ua = g_uri_unescape_string (a, "/");
-  ub = g_uri_unescape_string (b, "/");
+  a_len = strlen (a);
+  b_len = strlen (b);
 
-  a_len = strlen (ua);
-  b_len = strlen (ub);
-
-  while (a_len > 0 && ua[a_len - 1] == '/')
+  while (a_len > 0 && a[a_len - 1] == '/')
     a_len--;
 
-  while (b_len > 0 && ub[b_len - 1] == '/')
+  while (b_len > 0 && b[b_len - 1] == '/')
     b_len--;
 
   if (a_len == b_len)
-    res = ! strncmp (ua, ub, a_len);
+    res = ! strncmp (a, b, a_len);
   else
     res = FALSE;
-
-  g_free(ua);
-  g_free(ub);
 
   return res;
 }
@@ -265,12 +258,19 @@ static gboolean
 dav_uri_match (SoupURI *a, SoupURI *b, gboolean relax)
 {
   gboolean diff;
+  char *ua, *ub;
+
+  ua = g_uri_unescape_string (a->path, "/");
+  ub = g_uri_unescape_string (b->path, "/");
 
   diff = a->scheme != b->scheme || a->port != b->port  ||
     ! str_equal (a->host, b->host, TRUE)               ||
-    ! path_equal (a->path, b->path, relax)             ||
+    ! path_equal (ua, ub, relax)                       ||
     ! str_equal (a->query, b->query, FALSE)            ||
     ! str_equal (a->fragment, b->fragment, FALSE);
+
+  g_free (ua);
+  g_free (ub);
 
   return !diff;
 }
