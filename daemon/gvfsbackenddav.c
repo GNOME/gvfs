@@ -2817,21 +2817,8 @@ do_move (GVfsBackend *backend,
 
   status = g_vfs_backend_dav_send_message (backend, msg);
 
-  /*
-   * The precondition of SOUP_STATUS_PRECONDITION_FAILED (412) in
-   * this case was triggered by the "Overwrite: F" header which
-   * means that the target already exists.
-   * Also if we get a REDIRECTION it means that there was no
-   * "Location" header, since otherwise that would have triggered
-   * our redirection handler. This probably means we are dealing
-   * with an web dav implementation (like mod_dav) that also sends
-   * redirects for the destionaion (i.e. "Destination: /foo" header)
-   * which very likely means that the target also exists (and is a
-   * directory). That or the webdav server is broken.
-   * We could find out by doing another stat and but I think this is
-   * such a corner case that we are totally fine with returning
-   * G_IO_ERROR_EXISTS.
-   * */
+  /* See do_set_display_name () for the explanation of the PRECONDITION_FAILED
+   * and IS_REDIRECTION handling below. */
 
   if (SOUP_STATUS_IS_SUCCESSFUL (status))
     {
