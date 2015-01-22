@@ -714,6 +714,9 @@ g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
   /* Send Accept-Language header (see bug 166795) */
   g_object_set (the_session, "accept-language-auto", TRUE, NULL);
 
+  /* Prevent connection timeouts during long operations like COPY. */
+  g_object_set (the_session, "timeout", 0, NULL);
+
   /* Logging */
   debug = g_getenv ("GVFS_HTTP_DEBUG");
   if (debug)

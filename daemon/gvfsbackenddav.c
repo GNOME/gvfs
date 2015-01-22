@@ -2851,6 +2851,116 @@ do_move (GVfsBackend *backend,
   soup_uri_free (target_uri);
 }
 
+static void
+do_copy (GVfsBackend *backend,
+         GVfsJobCopy *job,
+         const char *source,
+         const char *destination,
+         GFileCopyFlags flags,
+         GFileProgressCallback progress_callback,
+         gpointer progress_callback_data)
+{
+  SoupMessage *msg;
+  SoupURI *source_uri;
+  SoupURI *target_uri;
+  guint status;
+  GFileType source_ft, target_ft;
+  GError *error = NULL;
+  gboolean res;
+
+  if (flags & G_FILE_COPY_BACKUP)
+    {
+      /* Return G_IO_ERROR_NOT_SUPPORTED instead of
+       * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO fallback
+       * copy. */
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Operation not supported");
+      return;
+    }
+
+  source_uri = g_vfs_backend_dav_uri_for_path (backend, source, FALSE);
+  target_uri = g_vfs_backend_dav_uri_for_path (backend, destination, FALSE);
+
+  res = stat_location (backend, source_uri, &source_ft, NULL, &error);
+  if (!res)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      goto error;
+    }
+
+  res = stat_location (backend, target_uri, &target_ft, NULL, &error);
+  if (res)
+    {
+      if (flags & G_FILE_COPY_OVERWRITE)
+        {
+          if (target_ft == G_FILE_TYPE_DIRECTORY)
+            {
+              if (source_ft == G_FILE_TYPE_DIRECTORY)
+                g_vfs_job_failed_literal (G_VFS_JOB(job),
+                                          G_IO_ERROR,
+                                          G_IO_ERROR_WOULD_MERGE,
+                                          _("Can't copy directory over directory"));
+              else
+                g_vfs_job_failed_literal (G_VFS_JOB(job),
+                                          G_IO_ERROR,
+                                          G_IO_ERROR_IS_DIRECTORY,
+                                          _("File is directory"));
+              goto error;
+            }
+        }
+      else
+        {
+          g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                    G_IO_ERROR,
+                                    G_IO_ERROR_EXISTS,
+                                    _("Target file already exists"));
+          goto error;
+        }
+    }
+  else if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      goto error;
+    }
+
+  if (source_ft == G_FILE_TYPE_DIRECTORY)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR,
+                                G_IO_ERROR_WOULD_RECURSE,
+                                _("Can't recursively copy directory"));
+      goto error;
+    }
+
+  msg = soup_message_new_from_uri (SOUP_METHOD_COPY, source_uri);
+  message_add_destination_header (msg, target_uri);
+  message_add_overwrite_header (msg, flags & G_FILE_COPY_OVERWRITE);
+
+  status = g_vfs_backend_dav_send_message (backend, msg);
+
+  /* See do_set_display_name () for the explanation of the PRECONDITION_FAILED
+   * and IS_REDIRECTION handling below. */
+
+  if (SOUP_STATUS_IS_SUCCESSFUL (status))
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+  else if (status == SOUP_STATUS_PRECONDITION_FAILED ||
+           SOUP_STATUS_IS_REDIRECTION (status))
+    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                      G_IO_ERROR_EXISTS,
+                      _("Target file already exists"));
+  else
+    http_job_failed (G_VFS_JOB (job), msg);
+
+  g_object_unref (msg);
+
+error:
+  g_clear_error (&error);
+  soup_uri_free (source_uri);
+  soup_uri_free (target_uri);
+}
+
 #define CHUNK_SIZE 65536
 
 /* Used to keep track of the state of reads in flight when the restarted signal
@@ -3255,5 +3365,6 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
   backend_class->delete            = do_delete;
   backend_class->set_display_name  = do_set_display_name;
   backend_class->move              = do_move;
+  backend_class->copy              = do_copy;
   backend_class->try_push          = try_push;
 }
