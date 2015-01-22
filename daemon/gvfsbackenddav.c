@@ -2753,8 +2753,7 @@ do_move (GVfsBackend *backend,
   if (!res && !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      return;
+      goto error;
     }
 
   if (res)
@@ -2776,7 +2775,7 @@ do_move (GVfsBackend *backend,
                                               G_IO_ERROR,
                                               G_IO_ERROR_IS_DIRECTORY,
                                               _("Can't move over directory"));
-                  return;
+                  goto error;
                 }
               else if (source_ft == G_FILE_TYPE_DIRECTORY)
                 {
@@ -2792,7 +2791,7 @@ do_move (GVfsBackend *backend,
                     {
                       http_job_failed (G_VFS_JOB (job), msg);
                       g_object_unref (msg);
-                      return;
+                      goto error;
                     }
                   g_object_unref (msg);
                 }
@@ -2800,8 +2799,7 @@ do_move (GVfsBackend *backend,
           else
             {
               g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-              g_error_free (error);
-              return;
+              goto error;
             }
         }
       else
@@ -2810,6 +2808,7 @@ do_move (GVfsBackend *backend,
                                     G_IO_ERROR,
                                     G_IO_ERROR_EXISTS,
                                     _("Target file exists"));
+          goto error;
         }
     }
 
@@ -2847,6 +2846,9 @@ do_move (GVfsBackend *backend,
     http_job_failed (G_VFS_JOB (job), msg);
 
   g_object_unref (msg);
+
+error:
+  g_clear_error (&error);
   soup_uri_free (source_uri);
   soup_uri_free (target_uri);
 }
