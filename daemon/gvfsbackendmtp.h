@@ -64,6 +64,7 @@ struct _GVfsBackendMtp
   gboolean force_unmounted;
 
   gboolean android_extension;
+  gboolean get_partial_object_capability;
 };
 
 struct _GVfsBackendMtpClass

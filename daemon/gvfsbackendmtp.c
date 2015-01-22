@@ -1014,6 +1014,11 @@ get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
     }
   }
 
+#if HAVE_LIBMTP_1_1_9
+  G_VFS_BACKEND_MTP (backend)->get_partial_object_capability
+    = LIBMTP_Check_Capability (device, LIBMTP_DEVICECAP_GetPartialObject);
+#endif
+
  exit:
   g_debug ("(II) get_device done.\n");
   return device;
@@ -2150,7 +2155,8 @@ do_open_for_read (GVfsBackend *backend,
                   GVfsJobOpenForRead *job,
                   const char *filename)
 {
-  if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
+  if (!G_VFS_BACKEND_MTP (backend)->android_extension &&
+      !G_VFS_BACKEND_MTP (backend)->get_partial_object_capability) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                               _("Operation unsupported"));
@@ -2344,6 +2350,14 @@ do_read (GVfsBackend *backend,
   uint32_t actual;
   if (handle->handle_type == HANDLE_FILE) {
 #if HAVE_LIBMTP_1_1_6
+    if (!G_VFS_BACKEND_MTP (backend)->android_extension &&
+        offset > G_MAXUINT32) {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                                _("Operation unsupported"));
+      goto exit;
+    }
+
     unsigned char *temp;
     int ret = LIBMTP_GetPartialObject (G_VFS_BACKEND_MTP (backend)->device, id, offset,
                                        bytes_requested, &temp, &actual);

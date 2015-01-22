@@ -522,6 +522,11 @@ if test "x$enable_libmtp" != "xno" -a "x$msg_gudev" = "xyes"; then
         [AC_DEFINE([HAVE_LIBMTP_1_1_6], 1, [Define to 1 if libmtp 1.1.6 is available])],
         []
     )
+
+    PKG_CHECK_MODULES([LIBMTP_1_1_9], [libmtp >= 1.1.9],
+        [AC_DEFINE([HAVE_LIBMTP_1_1_9], 1, [Define to 1 if libmtp 1.1.9 is available])],
+        []
+    )
   fi
 fi
 
