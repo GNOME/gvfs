@@ -23,11 +23,16 @@ libgvfscommon_la_SOURCES = 	\
 	gmountspec.c gmountspec.h \
 	gmountoperationdbus.c gmountoperationdbus.h \
 	gmountsource.c gmountsource.h \
+	gvfsmonitorimpl.c gvfsmonitorimpl.h \
 	gmounttracker.c gmounttracker.h \
 	gvfsdaemonprotocol.c gvfsdaemonprotocol.h \
 	gvfsicon.h gvfsicon.c \
 	gvfsfileinfo.c gvfsfileinfo.h \
 	$(dbus_built_sources) \
+	$(NULL)
+
+libgvfscommon_la_CFLAGS = 	\
+	-DREMOTE_VOLUME_MONITORS_DIR=\"$(datadir)/gvfs/remote-volume-monitors\" 	\
 	$(NULL)
 
 # needed by cygwin (see bug #564003)
