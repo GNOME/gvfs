@@ -1268,6 +1268,7 @@ do_query_fs_info (GVfsBackend *backend,
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
                                 _("File not found"));
+      goto exit;
     }
 
     LIBMTP_devicestorage_t *storage;
