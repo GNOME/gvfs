@@ -45,7 +45,6 @@ g_vfs_monitor_implementation_from_dbus (GVariant *value)
 {
   GVfsMonitorImplementation *impl;
   GVariantIter *iter;
-  GVariant *v;
 
   impl = g_vfs_monitor_implementation_new ();
   
