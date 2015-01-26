@@ -43,6 +43,8 @@
 #include "gproxymountoperation.h"
 #include "gvfsvolumemonitordbus.h"
 #include "gvfsmonitorimpl.h"
+#include "gvfsdbus.h"
+#include "gvfsdaemonprotocol.h"
 
 G_LOCK_DEFINE_STATIC(proxy_vm);
 
@@ -1430,6 +1432,7 @@ void
 g_proxy_volume_monitor_register (GIOModule *module)
 {
   GList *impls, *l;
+  gboolean res, got_list;
 
   /* first register the abstract base type... */
   g_proxy_volume_monitor_register_type (G_TYPE_MODULE (module));
@@ -1445,7 +1448,62 @@ g_proxy_volume_monitor_register (GIOModule *module)
    *   - and if so the priority
    */
 
-  impls = g_vfs_list_monitor_implementations ();
+  impls = NULL;
+  got_list = FALSE;
+
+  G_LOCK (proxy_vm);
+  res = g_proxy_volume_monitor_setup_session_bus_connection ();
+  G_UNLOCK (proxy_vm);
+
+  if (res)
+    {
+      GVfsDBusDaemon *proxy;
+      GError *error = NULL;
+
+      proxy = gvfs_dbus_daemon_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                                       G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+                                                       G_VFS_DBUS_DAEMON_NAME,
+                                                       G_VFS_DBUS_DAEMON_PATH,
+                                                       NULL,
+                                                       &error);
+      if (proxy != NULL)
+        {
+          GVariant *monitors, *child;
+          GVfsMonitorImplementation *impl;
+          int i;
+
+          if (gvfs_dbus_daemon_call_list_monitor_implementations_sync (proxy,
+                                                                       &monitors, NULL, &error))
+            {
+              got_list = TRUE;
+              for (i = 0; i < g_variant_n_children (monitors); i++)
+                {
+                  child = g_variant_get_child_value (monitors, i);
+                  impl = g_vfs_monitor_implementation_from_dbus (child);
+                  impls = g_list_prepend (impls, impl);
+                  g_variant_unref (child);
+                }
+              g_variant_unref (monitors);
+            }
+          else
+            {
+              if (!g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
+                g_warning ("Error: %s\n", error->message);
+              g_error_free (error);
+            }
+        }
+      else
+        {
+          g_warning ("Error: %s\n", error->message);
+          g_error_free (error);
+        }
+    }
+
+  /* Fall back on the old non-dbus version for compatibility with older
+     versions of the services */
+  if (!got_list)
+    impls = g_vfs_list_monitor_implementations ();
+
   for (l = impls; l != NULL; l = l->next)
     {
       GVfsMonitorImplementation *impl = l->data;

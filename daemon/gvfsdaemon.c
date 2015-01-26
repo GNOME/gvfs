@@ -42,6 +42,7 @@
 #include <gvfsjobopenforread.h>
 #include <gvfsjobopenforwrite.h>
 #include <gvfsjobunmount.h>
+#include <gvfsmonitorimpl.h>
 
 enum {
   PROP_0
@@ -109,6 +110,9 @@ static gboolean          handle_get_connection     (GVfsDBusDaemon        *objec
 static gboolean          handle_cancel             (GVfsDBusDaemon        *object,
                                                     GDBusMethodInvocation *invocation,
                                                     guint                  arg_serial,
+                                                    gpointer               user_data);
+static gboolean          handle_list_monitor_implementations (GVfsDBusDaemon        *object,
+                                                    GDBusMethodInvocation *invocation,
                                                     gpointer               user_data);
 static gboolean          daemon_handle_mount       (GVfsDBusMountable     *object,
                                                     GDBusMethodInvocation *invocation,
@@ -264,6 +268,7 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
   daemon->daemon_skeleton = gvfs_dbus_daemon_skeleton_new ();
   g_signal_connect (daemon->daemon_skeleton, "handle-get-connection", G_CALLBACK (handle_get_connection), daemon);
   g_signal_connect (daemon->daemon_skeleton, "handle-cancel", G_CALLBACK (handle_cancel), daemon);
+  g_signal_connect (daemon->daemon_skeleton, "handle-list-monitor-implementations", G_CALLBACK (handle_list_monitor_implementations), daemon);
   
   error = NULL;
   if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (daemon->daemon_skeleton),
@@ -947,6 +952,34 @@ handle_cancel (GVfsDBusDaemon *object,
     }
   
   gvfs_dbus_daemon_complete_cancel (object, invocation);
+
+  return TRUE;
+}
+
+static gboolean
+handle_list_monitor_implementations (GVfsDBusDaemon        *object,
+				     GDBusMethodInvocation *invocation,
+				     gpointer               user_data)
+{
+  GList *impls, *l;
+  GVariantBuilder builder;
+
+  impls = g_vfs_list_monitor_implementations ();
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE_ARRAY);
+
+  for (l = impls; l != NULL; l = l->next)
+    {
+      GVfsMonitorImplementation *impl = l->data;
+
+      g_variant_builder_add_value (&builder, g_vfs_monitor_implementation_to_dbus (impl));
+    }
+
+  g_list_free_full (impls, (GDestroyNotify)g_vfs_monitor_implementation_free);
+
+  gvfs_dbus_daemon_complete_list_monitor_implementations (object,
+							  invocation,
+							  g_variant_builder_end (&builder));
 
   return TRUE;
 }

@@ -44,8 +44,6 @@ GVfsMonitorImplementation *
 g_vfs_monitor_implementation_from_dbus (GVariant *value)
 {
   GVfsMonitorImplementation *impl;
-  const gchar *key;
-  const gchar *mount_prefix;
   GVariantIter *iter;
   GVariant *v;
 

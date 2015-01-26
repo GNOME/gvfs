@@ -42,6 +42,9 @@
       <arg type='o' name='obj_path' direction='in'/>
       <arg type='a{sv}' name='reply' direction='out'/>
     </method>
+    <method name="ListMonitorImplementations">
+      <arg type='a(ssbia{sv})' name='monitors' direction='out'/>
+    </method>
   </interface>
 
   <!--
