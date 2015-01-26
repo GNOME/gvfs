@@ -34,6 +34,7 @@ libgioremote_volume_monitor_la_SOURCES =				\
 libgioremote_volume_monitor_la_CFLAGS =					\
 	-DG_LOG_DOMAIN=\"GVFS-RemoteVolumeMonitor\"			\
 	-I$(top_srcdir)/common                  			\
+	-I$(top_builddir)/common                  			\
 	$(GLIB_CFLAGS)                          			\
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"				\
 	-DREMOTE_VOLUME_MONITORS_DIR=\"$(remote_volume_monitorsdir)\" 	\
