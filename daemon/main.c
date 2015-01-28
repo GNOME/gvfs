@@ -71,14 +71,6 @@ on_name_acquired (GDBusConnection *connection,
 
   already_acquired = TRUE;
 
-  if (! mount_init ())
-    {
-      /* we were not able to properly initialize ourselves, bail out */
-      g_main_loop_quit (loop);
-      return;
-    }
-
-  
 #ifdef HAVE_FUSE
   if (!no_fuse)
     {
@@ -118,6 +110,19 @@ on_name_acquired (GDBusConnection *connection,
       g_free (fuse_path);
     }
 #endif
+}
+
+static void
+on_bus_acquired (GDBusConnection *connection,
+                 const gchar     *name,
+                 gpointer         user_data)
+{
+  if (!mount_init ())
+    {
+      /* we were not able to properly initialize ourselves, bail out */
+      g_main_loop_quit (loop);
+      return;
+    }
 }
 
 static void
@@ -209,7 +214,7 @@ main (int argc, char *argv[])
   name_owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
                                   G_VFS_DBUS_DAEMON_NAME,
                                   flags,
-                                  NULL,
+                                  on_bus_acquired,
                                   on_name_acquired,
                                   on_name_lost,
                                   GUINT_TO_POINTER (no_fuse),
