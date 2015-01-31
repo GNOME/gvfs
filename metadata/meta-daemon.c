@@ -500,8 +500,6 @@ main (int argc, char *argv[])
       return 0;
     }
 
-  loop = g_main_loop_new (NULL, FALSE);
-
   error = NULL;
   conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   if (!conn)
@@ -517,6 +515,7 @@ main (int argc, char *argv[])
 				      NULL,
 				      (GDestroyNotify)tree_info_free);
 
+  loop = g_main_loop_new (NULL, FALSE);
   g_dbus_connection_set_exit_on_close (conn, FALSE);
   g_signal_connect (conn, "closed", G_CALLBACK (on_connection_closed), loop);
 
@@ -539,6 +538,8 @@ main (int argc, char *argv[])
       g_printerr ("Error exporting metadata daemon: %s (%s, %d)\n",
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
+      g_object_unref (conn);
+      g_main_loop_unref (loop);
       return 1;
     }
 
