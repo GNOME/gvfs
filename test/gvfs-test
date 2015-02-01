@@ -1728,7 +1728,7 @@ def start_dbus():
     env = os.environ.copy()
     env['G_MESSAGES_DEBUG'] = 'all'
     env['GVFS_DEBUG'] = 'all'
-    env['GVFS_SMB_DEBUG'] = '6'
+    env['GVFS_SMB_DEBUG'] = '10'
     env['GVFS_HTTP_DEBUG'] = 'all'
     if not in_testbed:
         env['LIBSMB_PROG'] = "nc localhost 1445"
