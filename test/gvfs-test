@@ -758,7 +758,7 @@ ncalrpc dir = %(workdir)s/samba
 ''' % {'workdir': self.workdir})
 
         # start smbd
-        self.smbd = subprocess.Popen(['smbd', '-iFS', '-s', smbconf],
+        self.smbd = subprocess.Popen(['smbd', '-FS', '-s', smbconf],
                                      universal_newlines=True,
                                      stdout=subprocess.PIPE)
         time.sleep(1)
