@@ -1673,8 +1673,12 @@ class Trash(GvfsTestCase):
 
         if trash.returncode == 0:
             self.assertFalse(os.path.exists(self.my_file))
-            self.assertTrue(os.path.exists('/tmp/.Trash-%i/files/hello_gvfs_tests.txt'
-                                           % os.getuid()))
+            if os.stat('/tmp').st_dev == os.stat(os.environ['XDG_DATA_HOME']).st_dev:
+                self.assertTrue(os.path.exists(os.path.join(os.environ['XDG_DATA_HOME'],
+                                                            'Trash/files/hello_gvfs_tests.txt')))
+            else:
+                self.assertTrue(os.path.exists('/tmp/.Trash-%i/files/hello_gvfs_tests.txt'
+                                               % os.getuid()))
         else:
             # file should still be there
             self.assertTrue(os.path.exists(self.my_file))
