@@ -1541,6 +1541,31 @@ do_pull (GVfsBackend *         backend,
   src = g_vfs_ftp_file_new_from_gvfs (ftp, source);
   dest = g_file_new_for_path (local_path);
 
+  /* If the source is a symlink, then it needs to be handled specially. */
+  if (flags & G_FILE_COPY_NOFOLLOW_SYMLINKS)
+    {
+      GFileInfo *info = g_vfs_ftp_dir_cache_lookup_file (ftp->dir_cache,
+                                                         &task,
+                                                         src,
+                                                         FALSE);
+      if (!info)
+        goto out;
+
+      if (g_file_info_get_is_symlink (info))
+        {
+          /* Fall back to the default implementation to copy the symlink.
+           * Because of the cache, this doesn't require any extra I/O
+           * operations. */
+          g_set_error_literal (&task.error,
+                               G_IO_ERROR,
+                               G_IO_ERROR_NOT_SUPPORTED,
+                               "Operation not supported");
+          g_object_unref (info);
+          goto out;
+        }
+      g_object_unref (info);
+    }
+
   if (progress_callback)
     {
       GFileInfo *info = g_vfs_ftp_dir_cache_lookup_file (ftp->dir_cache, &task, src, TRUE);
