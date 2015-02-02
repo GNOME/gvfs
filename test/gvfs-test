@@ -259,24 +259,29 @@ class GvfsTestCase(unittest.TestCase):
         self.assertEqual(self.cb_result[0], mount)
         self.assertTrue(self.cb_result[1])
 
-    def make_mountop(self, user, password):
+    def make_mountop(self, user=None, password=None):
         '''Create a Gio.MountOperation from given credentials
+        (anonymous is requested if credentials aren't given)
 
         On the first ask_password signal this sends the password, and aborts
         the second request (for tests that use wrong credentials).
         '''
         def pwd_cb(op, message, default_user, default_domain, flags, data):
             # first call: send correct result
-            if op.get_username():
+            if op.get_username() or op.get_anonymous():
                 op.reply(Gio.MountOperationResult.HANDLED)
 
             # subsequent calls: abort
             op.set_username('')
+            mo.set_anonymous(False)
             op.reply(Gio.MountOperationResult.ABORTED)
 
         mo = Gio.MountOperation.new()
-        mo.set_username(user)
-        mo.set_password(password)
+        if user is None and password is None:
+            mo.set_anonymous(True)
+        else:
+            mo.set_username(user)
+            mo.set_password(password)
         mo.connect('ask_password', pwd_cb, None)
         return mo
 
@@ -571,11 +576,19 @@ class Ftp(GvfsTestCase):
         self.ftpd.wait()
         super().tearDown()
 
-    def test_anonymous_cli(self):
-        '''ftp:// anonymous (CLI)'''
+    def test_anonymous_cli_user(self):
+        '''ftp:// anonymous (CLI with user)'''
 
         uri = 'ftp://anonymous@localhost:2121'
         subprocess.check_call(['gvfs-mount', uri])
+
+        self.do_mount_check_cli(uri, True)
+
+    def test_anonymous_cli_option(self):
+        '''ftp:// anonymous (CLI with option)'''
+
+        uri = 'ftp://localhost:2121'
+        subprocess.check_call(['gvfs-mount', '-a', uri])
 
         self.do_mount_check_cli(uri, True)
 
@@ -633,12 +646,23 @@ class Ftp(GvfsTestCase):
         finally:
             self.unmount(uri)
 
-    def test_anonymous_api(self):
-        '''ftp:// anonymous (API)'''
+    def test_anonymous_api_user(self):
+        '''ftp:// anonymous (API with user)'''
 
         uri = 'ftp://anonymous@localhost:2121'
         gfile = Gio.File.new_for_uri(uri)
         self.assertEqual(self.mount_api(gfile), True)
+        try:
+            self.do_mount_check_api(gfile, True)
+        finally:
+            self.unmount_api(gfile)
+
+    def test_anonymous_api_flag(self):
+        '''ftp:// anonymous (API with flag)'''
+
+        uri = 'ftp://localhost:2121'
+        gfile = Gio.File.new_for_uri(uri)
+        self.assertEqual(self.mount_api(gfile, self.make_mountop()), True)
         try:
             self.do_mount_check_api(gfile, True)
         finally:
@@ -786,17 +810,17 @@ ncalrpc dir = %(workdir)s/samba
         uri = 'smb://%s/public' % os.uname()[1]
 
         # ensure that this does not ask for any credentials
-        mount = subprocess.Popen(['gvfs-mount', uri])
+        mount = subprocess.Popen(['gvfs-mount', '-a', uri])
         timeout = 50
         while timeout > 0:
             time.sleep(0.1)
             timeout -= 1
             if mount.poll() is not None:
-                self.assertEqual(mount.returncode, 0, 'gvfs-mount %s failed' % uri)
+                self.assertEqual(mount.returncode, 0, 'gvfs-mount -a %s failed' % uri)
                 break
         else:
             mount.terminate()
-            self.fail('timed out waiting for gvfs-mount %s' % uri)
+            self.fail('timed out waiting for gvfs-mount -a %s' % uri)
         mount.wait()
 
         self.do_mount_check(uri, False)
