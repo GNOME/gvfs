@@ -66,6 +66,8 @@ local_ip = subprocess.check_output("ip -4 addr | sed -nr '/127\.0\.0/ n; "
                                    "/inet / {  s/^.*inet ([0-9.]+).*$/\\1/; p; q  }'",
                                    shell=True, universal_newlines=True)
 
+SMB_USER_PORT = 1445
+
 # when running in the build tree, check whether Dav backend is enabled
 have_dav_backend = True
 if 'GVFS_MOUNTABLE_DIR' in os.environ:
@@ -760,7 +762,7 @@ class Smb(GvfsTestCase):
             f.write('''[global]
 workgroup = TESTGROUP
 interfaces = lo 127.0.0.0/8
-smb ports = 1445
+smb ports = %(port)d
 log level = 2
 map to guest = Bad User
 passdb backend = smbpasswd
@@ -779,13 +781,25 @@ ncalrpc dir = %(workdir)s/samba
 [private]
   path = %(workdir)s/private
   read only = no
-''' % {'workdir': self.workdir})
+''' % {'workdir': self.workdir,
+       'port': SMB_USER_PORT})
 
         # start smbd
         self.smbd = subprocess.Popen(['smbd', '-FS', '-s', smbconf],
                                      universal_newlines=True,
                                      stdout=subprocess.PIPE)
-        time.sleep(1)
+
+        timeout = 50
+        while timeout > 0:
+            (out, err) = self.program_out_err(['ss', '-ltn'])
+            if (':%d ' % SMB_USER_PORT) in out:
+                break
+            timeout -= 1
+            time.sleep(0.1)
+        else:
+            self.smbd.terminate()
+            self.smbd.wait()
+            self.fail('starting smbd failed')
 
     def tearDown(self):
         # stop smbd
@@ -1755,7 +1769,7 @@ def start_dbus():
     env['GVFS_SMB_DEBUG'] = '10'
     env['GVFS_HTTP_DEBUG'] = 'all'
     if not in_testbed:
-        env['LIBSMB_PROG'] = "nc localhost 1445"
+        env['LIBSMB_PROG'] = "nc localhost %d" % SMB_USER_PORT
     # run local D-BUS; if we run this in a built tree, use our config to pick
     # up the built services, otherwise the standard session one
     if os.path.exists(dbus_conf):
