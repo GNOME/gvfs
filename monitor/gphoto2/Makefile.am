@@ -63,7 +63,10 @@ gvfs_gphoto2_volume_monitor_LDADD +=                                          \
 	$(top_builddir)/common/libgvfscommon-gphoto2.la                       \
 	$(NULL)
 else
-gvfs_gphoto2_volume_monitor_LDADD += $(HAL_LIBS)
+gvfs_gphoto2_volume_monitor_LDADD +=                                          \
+	$(HAL_LIBS)                                                          \
+	$(top_builddir)/common/libgvfscommon-hal.la                          \
+	$(NULL)
 endif
 
 

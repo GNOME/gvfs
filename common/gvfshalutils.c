@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include <glib/gi18n-lib.h>
-#include <gvfsdbusutils.h>
+#include <gvfshalutils.h>
 #include <gio/gio.h>
 
 static void

@@ -23,7 +23,6 @@ gvfs_hal_volume_monitor_SOURCES =			\
 	ghalvolume.c		ghalvolume.h		\
 	ghalmount.c		ghalmount.h		\
 	ghalvolumemonitor.c	ghalvolumemonitor.h	\
-	gvfsdbusutils.c		gvfsdbusutils.h		\
 	$(NULL)
 
 gvfs_hal_volume_monitor_CFLAGS =		\
@@ -45,6 +44,7 @@ gvfs_hal_volume_monitor_LDADD  =		     			      \
 	$(DBUS_LIBS)                                 			      \
 	$(HAL_LIBS)                                  			      \
 	$(top_builddir)/common/libgvfscommon.la 			      \
+	$(top_builddir)/common/libgvfscommon-hal.la   			      \
 	$(top_builddir)/common/libgvfscommon-monitor.la			      \
 	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la \
 	$(NULL)

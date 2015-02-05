@@ -423,7 +423,8 @@ endif
 if USE_GUDEV
 gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS) $(GUDEV_LIBS)
 else
-gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS) $(HAL_LIBS)
+gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS) $(HAL_LIBS) \
+		   $(top_builddir)/common/libgvfscommon-hal.la
 endif
 
 gvfsd_gphoto2_SOURCES = \
@@ -448,7 +449,8 @@ if USE_GUDEV
 gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(GUDEV_LIBS) \
 		      $(top_builddir)/common/libgvfscommon-gphoto2.la
 else
-gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(HAL_LIBS)
+gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(HAL_LIBS) \
+		      $(top_builddir)/common/libgvfscommon-hal.la
 endif
 
 gvfsd_mtp_SOURCES = \

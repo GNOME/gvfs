@@ -43,6 +43,16 @@ libgvfscommon_la_LIBADD =	\
 	$(GLIB_LIBS)		\
 	$(BLURAY_LIBS)
 
+if USE_HAL
+noinst_LTLIBRARIES += libgvfscommon-hal.la
+libgvfscommon_hal_la_SOURCES =	\
+	gvfshalutils.c gvfshalutils.h
+libgvfscommon_hal_la_CFLAGS =	\
+	$(DBUS_CFLAGS)
+libgvfscommon_hal_la_LIBADD =	\
+	$(DBUS_LIBS)
+endif
+
 libgvfscommon_monitor_la_SOURCES = 	\
 	gvfsmountinfo.h gvfsmountinfo.c \
 	$(NULL)
