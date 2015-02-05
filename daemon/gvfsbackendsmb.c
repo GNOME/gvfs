@@ -816,7 +816,6 @@ do_open_for_read (GVfsBackend *backend,
       
       smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
       res = smbc_stat (op_backend->smb_context, uri, &st);
-      g_free (uri);
       if ((res == 0) && (S_ISDIR (st.st_mode)))
             g_vfs_job_failed (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
@@ -831,6 +830,7 @@ do_open_for_read (GVfsBackend *backend,
       g_vfs_job_open_for_read_set_handle (job, file);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
+  g_free (uri);
 }
 
 static void
