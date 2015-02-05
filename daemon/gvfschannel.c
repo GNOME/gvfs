@@ -100,7 +100,10 @@ struct _GVfsChannelPrivate
   char reply_buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE];
   int reply_buffer_pos;
   
-  const char *output_data; /* Owned by job */
+  /* output_data is owned by the channel if output_data_free is set,
+   * otherwise it is owned by the job. */
+  const char *output_data;
+  char *output_data_free;
   gsize output_data_size;
   gsize output_data_pos;
 };
@@ -599,6 +602,11 @@ send_reply_cb (GObject *source_object,
  error_out:
   
   /* Sent full reply */
+  if (channel->priv->output_data_free)
+    {
+      g_free (channel->priv->output_data_free);
+      channel->priv->output_data_free = NULL;
+    }
   channel->priv->output_data = NULL;
 
   job = channel->priv->current_job;
@@ -670,6 +678,17 @@ g_vfs_channel_send_reply (GVfsChannel *channel,
     }
 }
 
+/* Might be called on an i/o thread */
+void
+g_vfs_channel_send_reply_take (GVfsChannel *channel,
+                               GVfsDaemonSocketProtocolReply *reply,
+                               void *data,
+                               gsize data_len)
+{
+  channel->priv->output_data_free = data;
+  g_vfs_channel_send_reply (channel, reply, data, data_len);
+}
+
 /* Might be called on an i/o thread
  */
 void
@@ -680,7 +699,7 @@ g_vfs_channel_send_error (GVfsChannel *channel,
   gsize data_len;
   
   data = g_error_to_daemon_reply (error, channel->priv->current_job_seq_nr, &data_len);
-  g_vfs_channel_send_reply (channel, NULL, data, data_len);
+  g_vfs_channel_send_reply_take (channel, NULL, data, data_len);
 }
 
 /* Might be called on an i/o thread
@@ -700,7 +719,7 @@ g_vfs_channel_send_info (GVfsChannel *channel,
   reply.arg1 = 0;
   reply.arg2 = g_htonl (data_len);
 
-  g_vfs_channel_send_reply (channel, &reply, data, data_len);
+  g_vfs_channel_send_reply_take (channel, &reply, data, data_len);
 }
 
 int
