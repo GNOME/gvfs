@@ -976,24 +976,70 @@ do_replace (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
-  GVfsFtpFile *file;
+  GVfsFtpFile *file, *backupfile = NULL;
+  static const GVfsFtpErrorFunc rnfr_handlers[] = { error_550_permission_or_not_found,
+                                                    NULL };
+
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
 
   if (make_backup)
     {
-      /* FIXME: implement! */
-      g_set_error_literal (&task.error,
-                           G_IO_ERROR,
-                           G_IO_ERROR_CANT_CREATE_BACKUP,
-                           _("backups not supported yet"));
-      g_vfs_ftp_task_done (&task);
-      return;
+      GFileInfo *info;
+      char *backup_path = g_strconcat (filename, "~", NULL);
+      backupfile = g_vfs_ftp_file_new_from_gvfs (ftp, backup_path);
+      g_free (backup_path);
+
+      info = g_vfs_ftp_dir_cache_lookup_file (ftp->dir_cache, &task, file, FALSE);
+
+      if (info)
+        {
+          guint ret;
+
+          g_object_unref (info);
+
+          ret = g_vfs_ftp_task_send (&task,
+                                     G_VFS_FTP_PASS_550,
+                                     "DELE %s", g_vfs_ftp_file_get_ftp_path (backupfile));
+          if (!ret)
+            goto err_backup;
+          g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, backupfile);
+
+          ret = g_vfs_ftp_task_send_and_check (&task,
+                                               G_VFS_FTP_PASS_300 | G_VFS_FTP_FAIL_200,
+                                               rnfr_handlers,
+                                               file,
+                                               NULL,
+                                               "RNFR %s", g_vfs_ftp_file_get_ftp_path (file));
+          if (!ret)
+            goto err_backup;
+
+          ret = g_vfs_ftp_task_send (&task,
+                                     0,
+                                     "RNTO %s", g_vfs_ftp_file_get_ftp_path (backupfile));
+          if (!ret)
+            goto err_backup;
+
+          g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
+        }
+      g_vfs_ftp_file_free (backupfile);
     }
 
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
   do_start_write (&task, flags, "STOR %s", g_vfs_ftp_file_get_ftp_path (file));
   g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
   g_vfs_ftp_file_free (file);
 
+  g_vfs_ftp_task_done (&task);
+
+  return;
+
+err_backup:
+  g_vfs_ftp_file_free (file);
+  g_vfs_ftp_file_free (backupfile);
+  g_vfs_ftp_task_clear_error (&task);
+  g_set_error_literal (&task.error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_CANT_CREATE_BACKUP,
+                       _("Backup file creation failed"));
   g_vfs_ftp_task_done (&task);
 }
 
