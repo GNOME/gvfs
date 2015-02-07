@@ -1387,10 +1387,12 @@ stat_location (GVfsBackend  *backend,
         	           http_error_code_from_status (status),
                 	   msg->reason_phrase);
 
+      g_object_unref (msg);
       return FALSE;
     }
 
   res = stat_location_finish (msg, target_type, num_children);
+  g_object_unref (msg);
 
   if (res == FALSE)
     g_set_error_literal (error, 
@@ -2620,6 +2622,7 @@ do_delete (GVfsBackend   *backend,
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
+      soup_uri_free (uri);
       return;
     }
 
@@ -2628,6 +2631,7 @@ do_delete (GVfsBackend   *backend,
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
                         _("Directory not empty"));
+      soup_uri_free (uri);
       return;
     }
 
@@ -2832,9 +2836,8 @@ do_move (GVfsBackend *backend,
   else
     http_job_failed (G_VFS_JOB (job), msg);
 
-  g_object_unref (msg);
-
 error:
+  g_object_unref (msg);
   g_clear_error (&error);
   soup_uri_free (source_uri);
   soup_uri_free (target_uri);
