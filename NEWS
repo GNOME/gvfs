@@ -1,3 +1,17 @@
+Major changes in 1.23.90
+========================
+* ftp: Implement backups for replace
+* Add an nfs backend based on libnfs
+* test: Various improvements and fixes
+* ftp: Implement G_FILE_COPY_NOFOLLOW_SYMLINKS
+* programs: Fix bash completion
+* dav: Add support for server-side copying
+* mtp: Set MTP filetype from mime type when uploading files
+* gvfs-mount: Allow mounting as an anonymous user
+* smb: Handle the anonymous flag
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.23.4
 =======================
 * gproxymount: Fix crashes if eject callback isn't specified
