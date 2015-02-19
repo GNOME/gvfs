@@ -31,11 +31,6 @@
       <arg type='ay' name='path' direction='in'/>
       <arg type='a{sv}' name='data' direction='in'/>
     </method>
-    <method name="Unset">
-      <arg type='ay' name='treefile' direction='in'/>
-      <arg type='ay' name='path' direction='in'/>
-      <arg type='s' name='key' direction='in'/>
-    </method>
     <method name="Remove">
       <arg type='ay' name='treefile' direction='in'/>
       <arg type='ay' name='path' direction='in'/>

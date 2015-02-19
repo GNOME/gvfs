@@ -118,19 +118,29 @@ main (int argc,
     {
       if (use_dbus)
 	{
+          GVariantBuilder *builder;
+          unsigned char c = 0;
+
           metatreefile = meta_tree_get_filename (tree);
 
-          if (! gvfs_metadata_call_unset_sync (proxy,
-                                               metatreefile,
-                                               tree_path,
-                                               key,
-                                               NULL,
-                                               &error))
+          builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
+
+          /* Byte => unset */
+          g_variant_builder_add (builder, "{sv}", key, g_variant_new_byte (c));
+
+          if (! gvfs_metadata_call_set_sync (proxy,
+                                             metatreefile,
+                                             tree_path,
+                                             g_variant_builder_end (builder),
+                                             NULL,
+                                             &error))
 	    {
 	      g_printerr ("Unset error: %s (%s, %d)\n",
                            error->message, g_quark_to_string (error->domain), error->code);
 	      return 1;
 	    }
+
+          g_variant_builder_unref (builder);
 	}
       else
 	{

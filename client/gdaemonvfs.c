@@ -1192,7 +1192,7 @@ _g_daemon_vfs_append_metadata_for_set (GVariantBuilder *builder,
     {
       if (meta_tree_lookup_key_type (tree, path, key) != META_KEY_TYPE_NONE)
 	{
-	  char c = 0;
+	  unsigned char c = 0;
 	  res = 1;
 	  /* Byte => unset */
 	  g_variant_builder_add (builder, "{sv}", key, g_variant_new_byte (c));

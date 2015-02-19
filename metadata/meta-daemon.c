@@ -216,42 +216,6 @@ handle_set (GVfsMetadata *object,
 }
 
 static gboolean
-handle_unset (GVfsMetadata *object,
-              GDBusMethodInvocation *invocation,
-              const gchar *arg_treefile,
-              const gchar *arg_path,
-              const gchar *arg_key,
-              GVfsMetadata *daemon)
-{
-  TreeInfo *info;
-
-  info = tree_info_lookup (arg_treefile);
-  if (info == NULL)
-    {
-      g_dbus_method_invocation_return_error (invocation,
-                                             G_IO_ERROR,
-                                             G_IO_ERROR_NOT_FOUND,
-                                             _("Can't find metadata file %s"),
-                                             arg_treefile);
-      return TRUE;
-    }
-
-  if (!meta_tree_unset (info->tree, arg_path, arg_key))
-    {
-      g_dbus_method_invocation_return_error_literal (invocation,
-                                                     G_IO_ERROR,
-                                                     G_IO_ERROR_FAILED,
-                                                     _("Unable to unset metadata key"));
-      return TRUE;
-    }
-
-  tree_info_schedule_writeout (info);
-  gvfs_metadata_complete_unset (object, invocation);
-
-  return TRUE;
-}
-
-static gboolean
 handle_remove (GVfsMetadata *object,
                GDBusMethodInvocation *invocation,
                const gchar *arg_treefile,
@@ -434,7 +398,6 @@ main (int argc, char *argv[])
   skeleton = gvfs_metadata_skeleton_new ();
 
   g_signal_connect (skeleton, "handle-set", G_CALLBACK (handle_set), skeleton);
-  g_signal_connect (skeleton, "handle-unset", G_CALLBACK (handle_unset), skeleton);
   g_signal_connect (skeleton, "handle-remove", G_CALLBACK (handle_remove), skeleton);
   g_signal_connect (skeleton, "handle-move", G_CALLBACK (handle_move), skeleton);
 
