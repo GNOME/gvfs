@@ -215,98 +215,6 @@ handle_set (GVfsMetadata *object,
   return TRUE;
 }
 
-static void
-append_key (GVariantBuilder *builder,
-	    MetaTree *tree,
-	    const char *path,
-	    const char *key)
-{
-  MetaKeyType keytype;
-  char *str;
-  char **strv;
-
-  keytype = meta_tree_lookup_key_type (tree, path, key);
-
-  if (keytype == META_KEY_TYPE_STRING)
-    {
-      str = meta_tree_lookup_string (tree, path, key);
-      g_variant_builder_add (builder, "{sv}", key, g_variant_new_string (str));
-      g_free (str);
-    }
-  else if (keytype == META_KEY_TYPE_STRINGV)
-    {
-      strv = meta_tree_lookup_stringv (tree, path, key);
-      g_variant_builder_add (builder, "{sv}", key, g_variant_new_strv ((const gchar * const  *) strv, -1));
-      g_strfreev (strv);
-    }
-}
-
-static gboolean
-enum_keys (const char *key,
-	   MetaKeyType type,
-	   gpointer value,
-	   gpointer user_data)
-{
-  GPtrArray *keys = user_data;
-
-  g_ptr_array_add (keys, g_strdup (key));
-  return TRUE;
-}
-
-static gboolean
-handle_get (GVfsMetadata *object,
-            GDBusMethodInvocation *invocation,
-            const gchar *arg_treefile,
-            const gchar *arg_path,
-            const gchar *const *arg_keys,
-            GVfsMetadata *daemon)
-{
-  TreeInfo *info;
-  GPtrArray *meta_keys;
-  gboolean free_keys;
-  gchar **iter_keys;
-  gchar **i;
-  GVariantBuilder *builder;
-
-  info = tree_info_lookup (arg_treefile);
-  if (info == NULL)
-    {
-      g_dbus_method_invocation_return_error (invocation,
-                                             G_IO_ERROR,
-                                             G_IO_ERROR_NOT_FOUND,
-                                             _("Can't find metadata file %s"),
-                                             arg_treefile);
-      return TRUE;
-    }
-
-  if (arg_keys == NULL)
-    {
-      /* Get all keys */
-      free_keys = TRUE;
-      meta_keys = g_ptr_array_new ();
-      meta_tree_enumerate_keys (info->tree, arg_path, enum_keys, meta_keys);
-      iter_keys = (gchar **) g_ptr_array_free (meta_keys, FALSE);
-    }
-  else
-    {
-      free_keys = FALSE;
-      iter_keys = (gchar **) arg_keys;
-    }
-
-  builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
-
-  for (i = iter_keys; *i; i++)
-    append_key (builder, info->tree, arg_path, *i);
-  if (free_keys)
-    g_strfreev (iter_keys);
-  
-  gvfs_metadata_complete_get (object, invocation,
-                              g_variant_builder_end (builder));
-  g_variant_builder_unref (builder);
-
-  return TRUE;
-}
-
 static gboolean
 handle_unset (GVfsMetadata *object,
               GDBusMethodInvocation *invocation,
@@ -527,7 +435,6 @@ main (int argc, char *argv[])
 
   g_signal_connect (skeleton, "handle-set", G_CALLBACK (handle_set), skeleton);
   g_signal_connect (skeleton, "handle-unset", G_CALLBACK (handle_unset), skeleton);
-  g_signal_connect (skeleton, "handle-get", G_CALLBACK (handle_get), skeleton);
   g_signal_connect (skeleton, "handle-remove", G_CALLBACK (handle_remove), skeleton);
   g_signal_connect (skeleton, "handle-move", G_CALLBACK (handle_move), skeleton);
 

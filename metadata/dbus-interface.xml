@@ -36,12 +36,6 @@
       <arg type='ay' name='path' direction='in'/>
       <arg type='s' name='key' direction='in'/>
     </method>
-    <method name="Get">
-      <arg type='ay' name='treefile' direction='in'/>
-      <arg type='ay' name='path' direction='in'/>
-      <arg type='as' name='keys' direction='in'/>
-      <arg type='a{sv}' name='data' direction='out'/>
-    </method>
     <method name="Remove">
       <arg type='ay' name='treefile' direction='in'/>
       <arg type='ay' name='path' direction='in'/>
