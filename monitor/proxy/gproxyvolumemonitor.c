@@ -1488,7 +1488,7 @@ g_proxy_volume_monitor_register (GIOModule *module)
           else
             {
               if (!g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
-                g_warning ("Error: %s\n", error->message);
+                g_debug ("Error: %s\n", error->message);
               g_error_free (error);
             }
         }
