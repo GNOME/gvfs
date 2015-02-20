@@ -547,7 +547,7 @@ meta_tree_lookup_by_name (const char *name,
         return tree;
 
       meta_tree_unref (tree);
-      tree = NULL;
+      return NULL;
     }
 
   filename = g_build_filename (g_get_user_data_dir (), "gvfs-metadata", name, NULL);
