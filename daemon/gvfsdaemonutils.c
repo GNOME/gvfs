@@ -237,3 +237,116 @@ gvfs_seek_type_to_lseek (GSeekType type)
       return -1;
     }
 }
+
+/* Convert GTlsCertificateFlags into a message to display to the user. */
+static char *
+certificate_flags_to_string (GTlsCertificateFlags errors)
+{
+  GString *reason;
+
+  g_return_val_if_fail (errors, NULL);
+
+  reason = g_string_new (NULL);
+
+  if (errors & G_TLS_CERTIFICATE_UNKNOWN_CA)
+    g_string_append_printf (reason, "\n\t%s", _("The signing certificate authority is not known."));
+  if (errors & G_TLS_CERTIFICATE_BAD_IDENTITY)
+    g_string_append_printf (reason, "\n\t%s", _("The certificate does not match the identity of the site."));
+  if (errors & G_TLS_CERTIFICATE_NOT_ACTIVATED)
+    g_string_append_printf (reason, "\n\t%s", _("The certificate's activation time is in the future."));
+  if (errors & G_TLS_CERTIFICATE_EXPIRED)
+    g_string_append_printf (reason, "\n\t%s", _("The certificate has expired."));
+  if (errors & G_TLS_CERTIFICATE_REVOKED)
+    g_string_append_printf (reason, "\n\t%s", _("The certificate has been revoked."));
+  if (errors & G_TLS_CERTIFICATE_INSECURE)
+    g_string_append_printf (reason, "\n\t%s", _("The certificate's algorithm is considered insecure."));
+  if (errors & G_TLS_CERTIFICATE_GENERIC_ERROR)
+    g_string_append_printf (reason, "\n\t%s", _("Error occurred when validating the certificate."));
+
+  return g_string_free (reason, FALSE);
+}
+
+/* Convert a GTlsCertificate into a string to display to the user.
+ * It contains the identity, the issuer, the expiry date and the certificate
+ * fingerprint. With this information, a user can make an informed decision
+ * whether to trust it or not. */
+static char *
+certificate_to_string (GTlsCertificate *certificate)
+{
+  GByteArray *certificate_data;
+  GcrCertificate *simple_certificate;
+  GDate *date;
+  char date_str[32];
+  char *subject_name, *issuer_name, *fingerprint, *certificate_str;
+
+  g_object_get (certificate, "certificate", &certificate_data, NULL);
+  simple_certificate = gcr_simple_certificate_new_static (certificate_data->data,
+						          certificate_data->len);
+
+  date = gcr_certificate_get_expiry_date (simple_certificate);
+  g_date_strftime (date_str, 32, "%x", date);
+  g_date_free (date);
+
+  subject_name = gcr_certificate_get_subject_name (simple_certificate);
+  issuer_name = gcr_certificate_get_issuer_name (simple_certificate);
+  fingerprint = gcr_certificate_get_fingerprint_hex (simple_certificate, G_CHECKSUM_SHA1);
+
+  certificate_str = g_strdup_printf ("Certificate information:\n"
+                                     "\tIdentity: %s\n"
+                                     "\tVerified by: %s\n"
+                                     "\tExpires: %s\n"
+                                     "\tFingerprint (SHA1): %s",
+                                     subject_name,
+                                     issuer_name,
+                                     date_str,
+                                     fingerprint);
+  g_object_unref (simple_certificate);
+  g_byte_array_unref (certificate_data);
+  g_free (subject_name);
+  g_free (issuer_name);
+  g_free (fingerprint);
+
+  return certificate_str;
+}
+
+/**
+ * gvfs_accept_certificate:
+ * @mount_source: a GMountSource to ask the user a question
+ * @certificate: the certificate presented by the site
+ * @errors: flags describing the verification failure(s)
+ *
+ * Given a certificate presented by a site whose identity can't be verified,
+ * query the user whether they accept the certificate.
+ **/
+gboolean
+gvfs_accept_certificate (GMountSource *mount_source,
+                         GTlsCertificate *certificate,
+                         GTlsCertificateFlags errors)
+{
+  const char *choices[] = {"Yes", "No", NULL};
+  int choice;
+  gboolean handled, aborted = FALSE;
+  char *certificate_str, *reason, *message;
+
+  certificate_str = certificate_to_string (certificate);
+  reason = certificate_flags_to_string (errors);
+  message = g_strdup_printf (_("The site's identity can't be verified:"
+                               "%s\n\n"
+                               "%s\n\n"
+                               "Are you really sure you would like to continue?"),
+                             reason,
+                             certificate_str);
+  handled = g_mount_source_ask_question (mount_source,
+                                         message,
+                                         choices,
+                                         &aborted,
+                                         &choice);
+  g_free (certificate_str);
+  g_free (reason);
+  g_free (message);
+
+  if (handled && choice == 0)
+    return TRUE;
+
+  return FALSE;
+}

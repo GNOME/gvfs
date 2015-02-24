@@ -24,6 +24,9 @@
 #define __G_VFS_DAEMON_UTILS_H__
 
 #include <glib-object.h>
+#include <gmountsource.h>
+#define GCR_API_SUBJECT_TO_CHANGE
+#include <gcr/gcr-base.h>
 
 G_BEGIN_DECLS
 
@@ -41,6 +44,10 @@ void	     gvfs_file_info_populate_content_types  (GFileInfo        *info,
 						     GFileType         type);
 
 int          gvfs_seek_type_to_lseek                (GSeekType         type);
+
+gboolean     gvfs_accept_certificate                (GMountSource *mount_source,
+                                                     GTlsCertificate *certificate,
+                                                     GTlsCertificateFlags errors);
 
 G_END_DECLS
 

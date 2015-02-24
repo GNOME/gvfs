@@ -12,6 +12,7 @@ AM_CPPFLAGS =					\
 	-I$(top_builddir)/common		\
 	$(GLIB_CFLAGS) 				\
 	$(KEYRING_CFLAGS)			\
+	$(GCR_CFLAGS)                           \
 	-DLIBEXEC_DIR=\"$(libexecdir)\" 	\
 	-DMOUNTABLE_DIR=\"$(mountdir)\" 	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"
@@ -197,7 +198,8 @@ libgvfsdaemon_la_LDFLAGS = -no-undefined -avoid-version
 libgvfsdaemon_la_LIBADD = \
 	$(top_builddir)/common/libgvfscommon.la \
 	$(GLIB_LIBS) \
-	$(KEYRING_LIBS)
+	$(KEYRING_LIBS) \
+	$(GCR_LIBS)
 
 gvfsd_SOURCES = \
 	mount.c mount.h \

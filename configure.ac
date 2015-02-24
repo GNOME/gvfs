@@ -74,6 +74,8 @@ AC_SUBST(DBUS_SERVICE_DIR)
 giomodulesdir=$libdir/gio/modules
 AC_SUBST(giomodulesdir)
 
+PKG_CHECK_MODULES(GCR, gcr-base-3)
+
 dnl ****************************
 dnl *** Checks for intltool  ***
 dnl ****************************
