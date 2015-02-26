@@ -26,6 +26,7 @@
 
 #include <string.h>
 #include <glib/gi18n.h>
+#include <gio/gnetworking.h>
 
 #include "gvfsbackendftp.h"
 
@@ -61,6 +62,21 @@ enable_keepalive (GSocketConnection *conn)
    * http://tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/
    */
   g_socket_set_keepalive (g_socket_connection_get_socket (conn), TRUE);
+}
+
+/* Set TCP_NODELAY on the connection to avoid a bad interaction between Nagle's
+ * algorithm and delayed acks when doing a write-write-read. */
+static void
+enable_nodelay (GSocketConnection *conn)
+{
+  GError *error = NULL;
+  GSocket *socket = g_socket_connection_get_socket (conn);
+
+  if (!g_socket_set_option (socket, IPPROTO_TCP, TCP_NODELAY, TRUE, &error))
+    {
+      g_warning ("Could not set TCP_NODELAY: %s\n", error->message);
+      g_error_free (error);
+    }
 }
 
 static void
@@ -100,6 +116,7 @@ g_vfs_ftp_connection_new (GSocketConnectable *addr,
     }
 
   conn->connection = G_SOCKET_CONNECTION (conn->commands);
+  enable_nodelay (conn->connection);
   enable_keepalive (conn->connection);
   create_input_stream (conn);
   /* The first thing that needs to happen is receiving the welcome message */
@@ -334,6 +351,8 @@ g_vfs_ftp_connection_open_data_connection (GVfsFtpConnection *conn,
                                                      G_SOCKET_CONNECTABLE (addr),
                                                      cancellable,
                                                      error));
+  if (conn->data)
+    enable_nodelay (G_SOCKET_CONNECTION (conn->data));
 
   return conn->data != NULL;
 }
@@ -474,6 +493,7 @@ g_vfs_ftp_connection_accept_data_connection (GVfsFtpConnection *conn,
 
   conn->data = G_IO_STREAM (g_socket_connection_factory_create_connection (accepted));
   g_object_unref (accepted);
+  enable_nodelay (G_SOCKET_CONNECTION (conn->data));
   return TRUE;
 }
 
