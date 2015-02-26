@@ -161,6 +161,28 @@ do_broadcast (GCancellable *cancellable, GCond *cond)
   g_cond_broadcast (cond);
 }
 
+/* Decide whether to allow verification errors for control and data connections
+ * after the initial connection.  The connection is only allowed if the
+ * identity is the same as for the initial connection. */
+static gboolean
+reconnect_certificate_cb (GTlsConnection *conn,
+                          GTlsCertificate *certificate,
+                          GTlsCertificateFlags errors,
+                          gpointer user_data)
+{
+  GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (user_data);
+
+  /* If the verification result has changed in some way, abort the
+   * connection. */
+  if (errors != ftp->certificate_errors)
+    return FALSE;
+
+  /* Only allow the connection if the certificate presented is the same as for
+   * the initial connection which the user accepted. */
+  return ftp->certificate &&
+         g_tls_certificate_is_same (certificate, ftp->certificate);
+}
+
 /**
  * g_vfs_ftp_task_acquire_connection:
  * @task: a task without an associated connection
@@ -229,6 +251,8 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
           if (G_LIKELY (task->conn != NULL))
             {
               g_vfs_ftp_task_receive (task, 0, NULL);
+              if (ftp->use_tls)
+                g_vfs_ftp_task_enable_tls (task, reconnect_certificate_cb, ftp);
               g_vfs_ftp_task_login (task, ftp->user, ftp->password);
               g_vfs_ftp_task_setup_connection (task);
               if (G_LIKELY (!g_vfs_ftp_task_is_in_error (task)))
@@ -1144,8 +1168,8 @@ g_vfs_ftp_task_setup_data_connection (GVfsFtpTask *task)
  * g_vfs_ftp_task_open_data_connection:
  * @task: a task
  *
- * Tries to open a data connection to the ftp server. If the operation fails,
- * @task will be set into an error state.
+ * Tries to open a data connection to the ftp server and secures it if
+ * necessary. If the operation fails, @task will be set into an error state.
  **/
 void
 g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
@@ -1160,5 +1184,52 @@ g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
     g_vfs_ftp_connection_accept_data_connection (task->conn, 
                                                  task->cancellable,
                                                  &task->error);
+
+  if (g_vfs_ftp_task_is_in_error (task))
+    return;
+
+  if (task->backend->use_tls)
+    g_vfs_ftp_connection_data_connection_enable_tls (task->conn,
+                                                     task->backend->server_identity,
+                                                     reconnect_certificate_cb,
+                                                     task->backend,
+                                                     task->cancellable,
+                                                     &task->error);
 }
 
+/**
+ * g_vfs_ftp_task_enable_tls:
+ * @task: a task
+ * @cb: callback called if there's a verification error
+ * @user_data: user data passed to @cb
+ *
+ * Tries to enable tls on the control connection to an ftp server.
+ * If the operation fails, @task will be set into an error state.
+ **/
+gboolean
+g_vfs_ftp_task_enable_tls (GVfsFtpTask *task,
+                           CertificateCallback cb,
+                           gpointer user_data)
+{
+  if (g_vfs_ftp_task_is_in_error (task))
+    return FALSE;
+
+  if (!g_vfs_ftp_task_send (task, 0, "AUTH TLS"))
+    return FALSE;
+
+  if (!g_vfs_ftp_connection_enable_tls (task->conn,
+                                        task->backend->server_identity,
+                                        cb,
+                                        user_data,
+                                        task->cancellable,
+                                        &task->error))
+    return FALSE;
+
+  if (!g_vfs_ftp_task_send (task, 0, "PBSZ 0"))
+    return FALSE;
+
+  if (!g_vfs_ftp_task_send (task, 0, "PROT P"))
+    return FALSE;
+
+  return TRUE;
+}

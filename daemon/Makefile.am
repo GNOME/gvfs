@@ -45,8 +45,8 @@ service_DATA = gvfs-daemon.service
 
 libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp gvfsd-network
 
-mount_in_files = sftp.mount.in ftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in
-mount_DATA =  sftp.mount ftp.mount trash.mount computer.mount burn.mount localtest.mount network.mount
+mount_in_files = sftp.mount.in ftp.mount.in ftps.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in
+mount_DATA =  sftp.mount ftp.mount ftps.mount trash.mount computer.mount burn.mount localtest.mount network.mount
 
 mount_in_files +=recent.mount.in
 if USE_GTK
@@ -276,7 +276,7 @@ gvfsd_ftp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendftp.h \
 	-DDEFAULT_BACKEND_TYPE=ftp \
 	-DMAX_JOB_THREADS=10 \
-	-DBACKEND_TYPES='"ftp", G_VFS_TYPE_BACKEND_FTP,'
+	-DBACKEND_TYPES='"ftp", G_VFS_TYPE_BACKEND_FTP, "ftps", G_VFS_TYPE_BACKEND_FTP,'
 
 gvfsd_ftp_LDADD = $(libraries)
 

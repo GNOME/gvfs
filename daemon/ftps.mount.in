@@ -1,0 +1,7 @@
+[Mount]
+Type=ftps
+Exec=@libexecdir@/gvfsd-ftp
+AutoMount=false
+Scheme=ftps
+DefaultPort=21
+HostnameIsInetAddress=true

@@ -37,6 +37,7 @@ struct _GVfsFtpConnection
   GSocketClient *       client;                 /* socket client used for opening connections */
 
   GIOStream *        	commands;               /* ftp command stream */
+  GSocketConnection *   connection;             /* original connection */
   GDataInputStream *    commands_in;            /* wrapper around in stream to allow line-wise reading */
   gboolean              waiting_for_reply;           /* TRUE if a command was sent but no reply received yet */
 
@@ -62,6 +63,19 @@ enable_keepalive (GSocketConnection *conn)
   g_socket_set_keepalive (g_socket_connection_get_socket (conn), TRUE);
 }
 
+static void
+create_input_stream (GVfsFtpConnection *conn)
+{
+  if (conn->commands_in)
+    {
+      g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (conn->commands_in), FALSE);
+      g_object_unref (conn->commands_in);
+    }
+
+  conn->commands_in = G_DATA_INPUT_STREAM (g_data_input_stream_new (g_io_stream_get_input_stream (conn->commands)));
+  g_data_input_stream_set_newline_type (conn->commands_in, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
+}
+
 GVfsFtpConnection *
 g_vfs_ftp_connection_new (GSocketConnectable *addr,
                           GCancellable *      cancellable,
@@ -85,9 +99,9 @@ g_vfs_ftp_connection_new (GSocketConnectable *addr,
       return NULL;
     }
 
-  enable_keepalive (G_SOCKET_CONNECTION (conn->commands));
-  conn->commands_in = G_DATA_INPUT_STREAM (g_data_input_stream_new (g_io_stream_get_input_stream (conn->commands)));
-  g_data_input_stream_set_newline_type (conn->commands_in, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
+  conn->connection = G_SOCKET_CONNECTION (conn->commands);
+  enable_keepalive (conn->connection);
+  create_input_stream (conn);
   /* The first thing that needs to happen is receiving the welcome message */
   conn->waiting_for_reply = TRUE;
 
@@ -249,7 +263,60 @@ g_vfs_ftp_connection_get_address (GVfsFtpConnection *conn, GError **error)
 {
   g_return_val_if_fail (conn != NULL, NULL);
 
-  return g_socket_connection_get_remote_address (G_SOCKET_CONNECTION (conn->commands), error);
+  return g_socket_connection_get_remote_address (conn->connection, error);
+}
+
+/**
+ * g_vfs_ftp_connection_data_connection_enable_tls:
+ * @conn: a connection with an active control connection
+ * @server_identity: address of the server used to verify the certificate
+ * @cb: callback called if there's a verification error
+ * @user_data: user data passed to @cb
+ * @cancellable: cancellable to interrupt wait
+ * @error: %NULL or location to take a potential error
+ *
+ * Tries to enable TLS on the given @connection's data connection. If setting
+ * up TLS fails, %FALSE will be returned and @error will be set.
+ *
+ * Returns: %TRUE on success, %FALSE otherwise.
+ **/
+gboolean
+g_vfs_ftp_connection_data_connection_enable_tls (GVfsFtpConnection  *conn,
+                                                 GSocketConnectable *server_identity,
+                                                 CertificateCallback cb,
+                                                 gpointer            user_data,
+                                                 GCancellable *      cancellable,
+                                                 GError **           error)
+{
+  GIOStream *secure;
+
+  g_return_val_if_fail (conn != NULL, FALSE);
+  g_return_val_if_fail (conn->commands != NULL, FALSE);
+
+  secure = g_tls_client_connection_new (conn->data,
+                                        server_identity,
+                                        error);
+  if (secure == NULL)
+    return FALSE;
+
+  g_object_unref (conn->data);
+  conn->data = secure;
+
+  g_tls_client_connection_copy_session_state (G_TLS_CLIENT_CONNECTION (secure),
+                                              G_TLS_CLIENT_CONNECTION (conn->commands));
+
+  g_signal_connect (secure, "accept-certificate", G_CALLBACK (cb), user_data);
+
+  if (!g_tls_connection_handshake (G_TLS_CONNECTION (secure),
+                                   cancellable,
+                                   error))
+    {
+      /* Close here to be sure it won't get used anymore */
+      g_io_stream_close (secure, cancellable, NULL);
+      return FALSE;
+    }
+
+  return TRUE;
 }
 
 gboolean
@@ -295,7 +362,7 @@ g_vfs_ftp_connection_listen_data_connection (GVfsFtpConnection *conn,
 
   g_vfs_ftp_connection_stop_listening (conn);
 
-  local = g_socket_connection_get_local_address (G_SOCKET_CONNECTION (conn->commands), error);
+  local = g_socket_connection_get_local_address (conn->connection, error);
   if (local == NULL)
     return NULL;
 
@@ -480,7 +547,7 @@ g_vfs_ftp_connection_is_usable (GVfsFtpConnection *conn)
     return FALSE;
 
   cond = G_IO_ERR | G_IO_HUP | G_IO_IN;
-  cond = g_socket_condition_check (g_socket_connection_get_socket (G_SOCKET_CONNECTION (conn->commands)), cond);
+  cond = g_socket_condition_check (g_socket_connection_get_socket (conn->connection), cond);
   if (cond)
     {
       g_debug ("##%2d ##  connection unusuable: %s%s%s\r\n", conn->debug_id,
@@ -493,3 +560,57 @@ g_vfs_ftp_connection_is_usable (GVfsFtpConnection *conn)
   return TRUE;
 }
 
+/**
+ * g_vfs_ftp_connection_enable_tls:
+ * @conn: a connection without an active data connection
+ * @server_identity: address of the server used to verify the certificate
+ * @cb: callback called if there's a verification error
+ * @user_data: user data passed to @cb
+ * @cancellable: cancellable to interrupt wait
+ * @error: %NULL or location to take a potential error
+ *
+ * Tries to enable TLS on the given @connection. If setting up TLS fails,
+ * %FALSE will be returned and @error will be set. When this function fails,
+ * you need to check if the connection is still usable. It might have been
+ * closed.
+ *
+ * Returns: %TRUE on success, %FALSE otherwise.
+ **/
+gboolean
+g_vfs_ftp_connection_enable_tls (GVfsFtpConnection * conn,
+                                 GSocketConnectable *server_identity,
+                                 CertificateCallback cb,
+                                 gpointer            user_data,
+                                 GCancellable *      cancellable,
+                                 GError **           error)
+{
+  GIOStream *secure;
+
+  g_return_val_if_fail (conn != NULL, FALSE);
+  g_return_val_if_fail (conn->data == NULL, FALSE);
+  g_return_val_if_fail (!conn->waiting_for_reply, FALSE);
+  g_return_val_if_fail (g_buffered_input_stream_get_available (G_BUFFERED_INPUT_STREAM (conn->commands_in)) == 0, FALSE);
+
+  secure = g_tls_client_connection_new (conn->commands,
+                                        server_identity,
+                                        error);
+  if (secure == NULL)
+    return FALSE;
+
+  g_object_unref (conn->commands);
+  conn->commands = secure;
+  create_input_stream (conn);
+
+  g_signal_connect (secure, "accept-certificate", G_CALLBACK (cb), user_data);
+
+  if (!g_tls_connection_handshake (G_TLS_CONNECTION (secure),
+                                   cancellable,
+                                   error))
+    {
+      /* Close here to be sure it won't get used anymore */
+      g_io_stream_close (secure, cancellable, NULL);
+      return FALSE;
+    }
+
+  return TRUE;
+}

@@ -61,7 +61,7 @@ GTK_DOC_CHECK
 DISTCHECK_CONFIGURE_FLAGS="--enable-gtk-doc"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 
-PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.43.2 gobject-2.0 gmodule-no-export-2.0 gio-unix-2.0 gio-2.0 )
+PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.45.0 gobject-2.0 gmodule-no-export-2.0 gio-unix-2.0 gio-2.0 )
 
 PKG_CHECK_MODULES(DBUS, dbus-1)
 

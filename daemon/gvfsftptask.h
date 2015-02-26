@@ -93,6 +93,10 @@ gboolean                g_vfs_ftp_task_login                    (GVfsFtpTask *  
                                                                  const char *           password);
 void                    g_vfs_ftp_task_setup_connection         (GVfsFtpTask *          task);
 
+gboolean                g_vfs_ftp_task_enable_tls               (GVfsFtpTask *          task,
+                                                                 CertificateCallback    cb,
+                                                                 gpointer               user_data);
+
 
 G_END_DECLS
 

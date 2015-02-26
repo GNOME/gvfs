@@ -30,6 +30,11 @@ G_BEGIN_DECLS
 
 typedef struct _GVfsFtpConnection GVfsFtpConnection;
 
+typedef gboolean      (*CertificateCallback)                  (GTlsConnection *         conn,
+                                                               GTlsCertificate *        peer_cert,
+                                                               GTlsCertificateFlags     errors,
+                                                               gpointer                 user_data);
+
 GVfsFtpConnection *     g_vfs_ftp_connection_new              (GSocketConnectable *     addr,
                                                                GCancellable *           cancellable,
                                                                GError **                error);
@@ -65,6 +70,19 @@ gboolean                g_vfs_ftp_connection_accept_data_connection
 void                    g_vfs_ftp_connection_close_data_connection
                                                               (GVfsFtpConnection *      conn);
 GIOStream *             g_vfs_ftp_connection_get_data_stream  (GVfsFtpConnection *      conn);
+
+gboolean                g_vfs_ftp_connection_enable_tls       (GVfsFtpConnection *      conn,
+                                                               GSocketConnectable *     server_identity,
+                                                               CertificateCallback      cb,
+                                                               gpointer                 user_data,
+                                                               GCancellable *           cancellable,
+                                                               GError **                error);
+gboolean                g_vfs_ftp_connection_data_connection_enable_tls (GVfsFtpConnection  *conn,
+                                                                         GSocketConnectable *server_identity,
+                                                                         CertificateCallback cb,
+                                                                         gpointer            user_data,
+                                                                         GCancellable *      cancellable,
+                                                                         GError **           error);
 
 
 

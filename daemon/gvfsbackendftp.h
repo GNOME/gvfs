@@ -25,6 +25,7 @@
 
 #include <gvfsbackend.h>
 #include <gmountspec.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 
@@ -89,6 +90,13 @@ struct _GVfsBackendFtp
   gboolean              has_initial_user;
   char *                password;	        /* password or NULL for anonymous */
   char *                host_display_name;
+
+  /* ftps support */
+  gboolean              use_tls;
+  GSocketConnectable *  server_identity;        /* Server identity used for verification */
+  GTlsCertificate *     certificate;            /* Initial server certificate */
+  GTlsCertificateFlags  certificate_errors;     /* Errors received during TLS handshake */
+  GMountSource *        mount_source;           /* Only used during do_mount */
 
   GVfsFtpSystem         system;                 /* the system from the SYST response */
   int                   features;               /* GVfsFtpFeatures that are supported */

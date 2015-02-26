@@ -393,6 +393,9 @@ g_vfs_backend_ftp_finalize (GObject *object)
   g_free (ftp->user);
   g_free (ftp->password);
 
+  g_clear_object (&ftp->server_identity);
+  g_clear_object (&ftp->certificate);
+
   if (G_OBJECT_CLASS (g_vfs_backend_ftp_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_ftp_parent_class)->finalize) (object);
 }
@@ -402,6 +405,23 @@ g_vfs_backend_ftp_init (GVfsBackendFtp *ftp)
 {
   g_mutex_init (&ftp->mutex);
   g_cond_init (&ftp->cond);
+}
+
+/* If the initial connection has a verification error, display the certificate
+ * to the user and ask whether to proceed. */
+static gboolean
+initial_certificate_cb (GTlsConnection *conn,
+                        GTlsCertificate *certificate,
+                        GTlsCertificateFlags errors,
+                        gpointer user_data)
+{
+  GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (user_data);
+
+  /* Save the certificate and result for reconnections. */
+  ftp->certificate = g_object_ref (certificate);
+  ftp->certificate_errors = errors;
+
+  return gvfs_accept_certificate (ftp->mount_source, certificate, errors);
 }
 
 static void
@@ -435,6 +455,19 @@ restart:
 
   /* send pre-login commands */
   g_vfs_ftp_task_receive (&task, 0, NULL);
+
+  /* Secure the initial connection if necessary. This may result in a prompt
+   * for the user. */
+  ftp->mount_source = mount_source;
+  if (ftp->use_tls &&
+      !g_vfs_ftp_task_enable_tls (&task, initial_certificate_cb, ftp))
+    {
+      ftp->mount_source = NULL;
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
+  ftp->mount_source = NULL;
+
   if (!g_vfs_backend_ftp_uses_workaround (ftp, G_VFS_FTP_WORKAROUND_FEAT_AFTER_LOGIN) &&
       !gvfs_backend_ftp_determine_features (&task))
     {
@@ -619,7 +652,7 @@ try_login:
       g_free (prompt);
     }
 
-  mount_spec = g_mount_spec_new ("ftp");
+  mount_spec = g_mount_spec_new (ftp->use_tls ? "ftps" : "ftp");
   g_mount_spec_set (mount_spec, "host", g_network_address_get_hostname (addr));
   if (port != 21)
     {
@@ -691,6 +724,9 @@ try_mount (GVfsBackend *backend,
     ftp->host_display_name = g_strdup (host);
   else
     ftp->host_display_name = g_strdup_printf ("%s:%u", host, port);
+  ftp->use_tls = strcmp (g_mount_spec_get_type (mount_spec), "ftps") == 0;
+  if (ftp->use_tls)
+    ftp->server_identity = g_object_ref (ftp->addr);
 
   return FALSE;
 }
