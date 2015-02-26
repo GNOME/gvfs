@@ -162,6 +162,8 @@ create_reply (GVfsJob *job,
                                op_job->attribute_matcher,
                                op_job->file_info,
                                op_job->uri);
+  g_file_info_set_attribute_mask (op_job->file_info,
+                                  op_job->attribute_matcher);
 
   gvfs_dbus_mount_complete_query_info (object, invocation,
       _g_dbus_append_file_info (op_job->file_info));

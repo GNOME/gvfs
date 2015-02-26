@@ -156,6 +156,9 @@ create_reply (GVfsJob *job,
 				      G_FILE_ATTRIBUTE_GVFS_BACKEND,
 				      type);
 
+  g_file_info_set_attribute_mask (op_job->file_info,
+                                  op_job->attribute_matcher);
+
   gvfs_dbus_mount_complete_query_filesystem_info (object, invocation,
       _g_dbus_append_file_info (op_job->file_info));
 }

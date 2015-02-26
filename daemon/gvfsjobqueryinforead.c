@@ -104,7 +104,10 @@ send_reply (GVfsJob *job)
   if (job->failed)
     g_vfs_channel_send_error (G_VFS_CHANNEL (op_job->channel), job->error);
   else
-    g_vfs_channel_send_info (G_VFS_CHANNEL (op_job->channel), op_job->file_info);
+    {
+      g_file_info_set_attribute_mask (op_job->file_info, op_job->attribute_matcher);
+      g_vfs_channel_send_info (G_VFS_CHANNEL (op_job->channel), op_job->file_info);
+    }
 }
 
 static void
