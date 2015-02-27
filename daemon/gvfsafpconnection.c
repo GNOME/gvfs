@@ -1078,12 +1078,12 @@ read_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
         g_error_matches (err, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED))
     {
       g_message (_("Host closed connection"));
-      exit(0);
     }
     else
     {
-      g_error ("FAIL!!! \"%s\"\n", err->message);
+      g_warning ("FAIL!!! \"%s\"\n", err->message);
     }
+    exit (0);
   }
 
   dispatch_reply (afp_connection);
@@ -1120,12 +1120,12 @@ read_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
         g_error_matches (err, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED))
     {
       g_message (_("Host closed connection"));
-      exit(0);
     }
     else
     {
-      g_error ("FAIL!!! \"%s\"\n", err->message);
+      g_warning ("FAIL!!! \"%s\"\n", err->message);
     }
+    exit (0);
   }
 
   dsi_header = &priv->read_dsi_header;
