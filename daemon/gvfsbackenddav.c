@@ -58,6 +58,7 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsjobpush.h"
 #include "gvfsdaemonprotocol.h"
+#include "gvfsdaemonutils.h"
 
 #ifdef HAVE_AVAHI
 #include "gvfsdnssdutils.h"
@@ -100,6 +101,10 @@ struct _GVfsBackendDav
 
   MountAuthData auth_info;
 
+  /* Used for user-verified secure connections. */
+  GTlsCertificate *certificate;
+  GTlsCertificateFlags certificate_errors;
+
 #ifdef HAVE_AVAHI
   /* only set if we're handling a [dav|davs]+sd:// mounts */
   GVfsDnsSdResolver *resolver;
@@ -124,7 +129,9 @@ g_vfs_backend_dav_finalize (GObject *object)
 #endif
 
   mount_auth_info_free (&(dav_backend->auth_info));
-  
+
+  g_clear_object (&dav_backend->certificate);
+
   if (G_OBJECT_CLASS (g_vfs_backend_dav_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_dav_parent_class)->finalize) (object);
 }
@@ -500,6 +507,29 @@ g_vfs_backend_dav_setup_display_name (GVfsBackend *backend)
   g_free (display_name);
 }
 
+static void
+certificate_error_handler (SoupMessage *msg,
+                           GParamSpec *pspec,
+                           gpointer user_data)
+{
+  GVfsBackendDav *dav = G_VFS_BACKEND_DAV (user_data);
+  GTlsCertificate *certificate;
+  GTlsCertificateFlags errors;
+
+  /* Fail the message if the certificate errors change or the certificate is
+   * different. */
+  if (soup_message_get_https_status (msg, &certificate, &errors))
+    {
+      if (errors != dav->certificate_errors ||
+          !g_tls_certificate_is_same (certificate, dav->certificate))
+        {
+          soup_session_cancel_message (G_VFS_BACKEND_HTTP (dav)->session,
+                                       msg,
+                                       SOUP_STATUS_SSL_FAILED);
+        }
+    }
+}
+
 static guint
 g_vfs_backend_dav_send_message (GVfsBackend *backend, SoupMessage *message)
 {
@@ -512,10 +542,28 @@ g_vfs_backend_dav_send_message (GVfsBackend *backend, SoupMessage *message)
   /* We have our own custom redirect handler */
   soup_message_set_flags (message, SOUP_MESSAGE_NO_REDIRECT);
 
+  if (G_VFS_BACKEND_DAV (backend)->certificate_errors)
+    g_signal_connect (message, "notify::tls-errors",
+                      G_CALLBACK (certificate_error_handler), backend);
+
   soup_message_add_header_handler (message, "got_body", "Location",
                                    G_CALLBACK (redirect_handler), session);
 
   return http_backend_send_message (backend, message);
+}
+
+static void
+g_vfs_backend_dav_queue_message (GVfsBackend *backend,
+                                 SoupMessage *msg,
+                                 SoupSessionCallback callback,
+                                 gpointer user_data)
+{
+  if (G_VFS_BACKEND_DAV (backend)->certificate_errors)
+    g_signal_connect (msg, "notify::tls-errors",
+                      G_CALLBACK (certificate_error_handler), backend);
+
+  soup_session_queue_message (G_VFS_BACKEND_HTTP (backend)->session, msg,
+                              callback, user_data);
 }
 
 /* ************************************************************************* */
@@ -1832,6 +1880,9 @@ do_mount (GVfsBackend  *backend,
   session = G_VFS_BACKEND_HTTP (backend)->session;
   G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base; 
 
+  /* Override the HTTP backend's default. */
+  g_object_set (session, "ssl-strict", TRUE, NULL);
+
   data = &(G_VFS_BACKEND_DAV (backend)->auth_info); 
   data->mount_source = g_object_ref (mount_source);
   data->server_auth.username = g_strdup (mount_base->user);
@@ -1853,8 +1904,34 @@ do_mount (GVfsBackend  *backend,
     SoupURI *cur_uri;
  
     status = g_vfs_backend_dav_send_message (backend, msg_opts);
-
     is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
+
+    /* If SSL is used and the certificate verifies OK, then ssl-strict remains
+     * on for all further connections.
+     * If SSL is used and the certificate does not verify OK, then the user
+     * gets a chance to override it. If they do, ssl-strict is disabled but
+     * the certificate is stored, and checked on each subsequent connection to
+     * ensure that it hasn't changed. */
+    if (status == SOUP_STATUS_SSL_FAILED &&
+        !dav_backend->certificate_errors)
+      {
+        GTlsCertificate *certificate;
+        GTlsCertificateFlags errors;
+
+        soup_message_get_https_status (msg_opts, &certificate, &errors);
+
+        if (gvfs_accept_certificate (mount_source, certificate, errors))
+          {
+            g_object_set (session, "ssl-strict", FALSE, NULL);
+            dav_backend->certificate = g_object_ref (certificate);
+            dav_backend->certificate_errors = errors;
+            continue;
+          }
+        else
+          {
+            break;
+          }
+      }
     is_webdav = is_success && sm_has_header (msg_opts, "DAV");
 
     soup_message_headers_clear (msg_opts->response_headers);
@@ -2271,7 +2348,7 @@ try_open_for_read (GVfsBackend        *backend,
     }
 
   g_vfs_job_set_backend_data (G_VFS_JOB (job), backend, NULL);
-  http_backend_queue_message (backend, msg, try_open_stat_done, job);
+  g_vfs_backend_dav_queue_message (backend, msg, try_open_stat_done, job);
 
   return TRUE;
 }
@@ -2335,7 +2412,7 @@ try_create (GVfsBackend *backend,
 
   g_vfs_job_set_backend_data (G_VFS_JOB (job), backend, NULL);
 
-  http_backend_queue_message (backend, msg, try_create_tested_existence, job);
+  g_vfs_backend_dav_queue_message (backend, msg, try_create_tested_existence, job);
   return TRUE;
 }
 
@@ -2423,8 +2500,8 @@ try_replace (GVfsBackend *backend,
       soup_message_headers_append (msg->request_headers, "If-Match", etag);
 
       g_vfs_job_set_backend_data (G_VFS_JOB (job), op_backend, NULL);
-      soup_session_queue_message (op_backend->session, msg,
-                                  try_replace_checked_etag, job);
+      g_vfs_backend_dav_queue_message (backend, msg,
+                                       try_replace_checked_etag, job);
       return TRUE;
     }
 
@@ -2565,8 +2642,8 @@ try_close_write (GVfsBackend *backend,
   g_object_unref (stream);
 
   soup_message_body_append (msg->request_body, SOUP_MEMORY_TAKE, data, length);
-  soup_session_queue_message (G_VFS_BACKEND_HTTP (backend)->session,
-			      msg, try_close_write_sent, job);
+  g_vfs_backend_dav_queue_message (backend, msg,
+                                   try_close_write_sent, job);
 
   return TRUE;
 }
@@ -3191,9 +3268,8 @@ push_stat_dest_cb (SoupSession *session, SoupMessage *msg, gpointer user_data)
   g_signal_connect (handle->msg, "wrote-body-data",
                     G_CALLBACK (push_wrote_body_data), handle);
 
-  soup_session_queue_message (G_VFS_BACKEND_HTTP (handle->backend)->session,
-                              handle->msg,
-                              push_done, handle);
+  g_vfs_backend_dav_queue_message (handle->backend, handle->msg,
+                                   push_done, handle);
 }
 
 static void
@@ -3213,9 +3289,8 @@ push_source_fstat_cb (GObject *source, GAsyncResult *res, gpointer user_data)
       g_object_unref (info);
 
       msg = stat_location_begin (handle->uri, FALSE);
-      http_backend_queue_message (handle->backend,
-                                  msg,
-                                  push_stat_dest_cb, handle);
+      g_vfs_backend_dav_queue_message (handle->backend, msg,
+                                       push_stat_dest_cb, handle);
     }
   else
     {
