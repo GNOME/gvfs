@@ -269,7 +269,11 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
           break;
         }
     }
+  if (!ftp->queue)
+    task->error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
+                                       _("Backend currently unmounting"));
   g_mutex_unlock (&ftp->mutex);
+
 out_unlocked:
   g_cancellable_disconnect (task->cancellable, id);
 
