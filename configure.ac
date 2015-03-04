@@ -407,40 +407,6 @@ AC_SUBST(GOA_CFLAGS)
 
 AM_CONDITIONAL(USE_GOA, [test "$msg_goa" = "yes"])
 
-dnl *****************************************************
-dnl *** Check if we should build with obexftp backend ***
-dnl *****************************************************
-AC_ARG_ENABLE(obexftp, AS_HELP_STRING([--disable-obexftp],[build without ObexFTP backend]))
-msg_obexftp=no
-OBEXFTP_LIBS=
-OBEXFTP_CFLAGS=
-
-if test "x$enable_obexftp" != "xno";  then
-  PKG_CHECK_EXISTS(dbus-glib-1 bluez >= 4.0, msg_obexftp=yes)
-
-  dnl Make sure we have expat
-  AC_CHECK_LIB(expat, XML_ParserCreate_MM,
-               [ AC_CHECK_HEADERS(expat.h, have_expat=true, have_expat=false) ],
-               have_expat=false)
-
-  if test "x$msg_obexftp" = "xyes" -a "x$have_expat" = "xtrue"; then
-    PKG_CHECK_MODULES(OBEXFTP, dbus-glib-1 bluez >= 4.0)
-    AC_SUBST(OBEXFTP_LIBS)
-    AC_SUBST(OBEXFTP_CFLAGS)
-
-    msg_obexftp=yes
-    AC_DEFINE(HAVE_OBEXFTP, 1, [Define to 1 if ObexFTP is going to be built])
-    EXPAT_CFLAGS=""
-    EXPAT_LIBS="-lexpat"
-  else
-    msg_obexftp=no
-  fi
-fi
-
-AC_SUBST(EXPAT_CFLAGS)
-AC_SUBST(EXPAT_LIBS)
-AM_CONDITIONAL(USE_OBEXFTP, [test "$msg_obexftp" = "yes"])
-
 dnl *************************
 dnl *** Check for gphoto2 ***
 dnl *************************
@@ -961,7 +927,6 @@ echo "
 
 	Blu-ray metadata support:     $msg_bluray
         HTTP/WebDAV support:          $msg_http
-        ObexFTP support               $msg_obexftp
 	Samba support:	              $msg_samba
 	FUSE support:                 $msg_fuse
         CDDA support:                 $msg_cdda

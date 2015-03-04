@@ -15,7 +15,6 @@ gvfsd-localtest
 gvfsd-network
 gvfsd-mtp
 gvfsd-nfs
-gvfsd-obexftp
 gvfsd-recent
 gvfsd-sftp
 gvfsd-smb

@@ -11,7 +11,6 @@ AM_CPPFLAGS =					\
 	-I$(top_builddir)			\
 	-I$(top_builddir)/common		\
 	$(GLIB_CFLAGS) 				\
-	$(OBEXFTP_CFLAGS) $(EXPAT_CFLAGS)	\
 	$(KEYRING_CFLAGS)			\
 	-DLIBEXEC_DIR=\"$(libexecdir)\" 	\
 	-DMOUNTABLE_DIR=\"$(mountdir)\" 	\
@@ -89,20 +88,6 @@ mount_DATA += mtp.mount
 libexec_PROGRAMS += gvfsd-mtp
 endif
 
-mount_in_files += obexftp.mount.in
-if USE_OBEXFTP
-mount_DATA += obexftp.mount
-libexec_PROGRAMS += gvfsd-obexftp
-BUILT_SOURCES = obexftp-marshal.c obexftp-marshal.h
-
-obexftp-marshal.h: obexftp-marshal.list
-	$(AM_V_GEN) glib-genmarshal $< --prefix=obexftp_marshal --header > $@
-
-obexftp-marshal.c: obexftp-marshal.list
-	$(AM_V_GEN) echo "#include \"obexftp-marshal.h\"" > $@ && glib-genmarshal $< --prefix=obexftp_marshal --body >> $@
-
-endif
-
 mount_in_files += dns-sd.mount.in
 if HAVE_AVAHI
 mount_DATA += dns-sd.mount
@@ -140,7 +125,6 @@ noinst_DATA = $(mount_DATA:.mount=.localmount)
 EXTRA_DIST = 				\
 	gvfs-daemon.service.in		\
 	$(mount_in_files)		\
-	obexftp-marshal.list		\
 	$(gvfs_gschemas)		\
 	$(gvfs_gschemas_convert_DATA)	\
 	$(gsettings_ENUM_FILES)		\
@@ -274,29 +258,6 @@ gvfsd_smb_browse_CPPFLAGS = \
 	-DBACKEND_TYPES='"smb-network", G_VFS_TYPE_BACKEND_SMB_BROWSE,"smb-server", G_VFS_TYPE_BACKEND_SMB_BROWSE,'
 
 gvfsd_smb_browse_LDADD = $(SAMBA_LIBS) $(libraries)
-
-gvfsd_obexftp_SOURCES = \
-	gvfsbackendobexftp.c gvfsbackendobexftp.h \
-	obexftp-marshal.c obexftp-marshal.h \
-	gvfsbackendobexftp-fl-parser.c gvfsbackendobexftp-fl-parser.h \
-	gvfsbackendobexftp-cap-parser.c gvfsbackendobexftp-cap-parser.h \
-	daemon-main.c daemon-main.h \
-	daemon-main-generic.c
-
-gvfsd_obexftp_CPPFLAGS = \
-	$(flags) \
-	-DBACKEND_HEADER=gvfsbackendobexftp.h \
-	-DDEFAULT_BACKEND_TYPE=obex \
-	-DMAX_JOB_THREADS=1 \
-	-DBACKEND_TYPES='"obex", G_VFS_TYPE_BACKEND_OBEXFTP,'
-if USE_HAL
-gvfsd_obexftp_CPPFLAGS += $(HAL_CFLAGS)
-endif
-
-gvfsd_obexftp_LDADD = $(OBEXFTP_LIBS) $(EXPAT_LIBS) $(libraries)
-if USE_HAL
-gvfsd_obexftp_LDADD += $(HAL_LIBS)
-endif
 
 gvfsd_ftp_SOURCES = \
 	gvfsftpconnection.c gvfsftpconnection.h \

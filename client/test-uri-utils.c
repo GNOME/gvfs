@@ -14,8 +14,6 @@ static TestURIs uris[] = {
 	{ "https://[2001:0db8:85a3:08d3:1319:8a2e:0370:7344]:443/", "[2001:0db8:85a3:08d3:1319:8a2e:0370:7344]", 443 },
 	{ "http://test:443/", "test", 443 },
 	{ "http://test/", "test", -1 },
-	{ "obex://[00:FF:FF:FF:FF:FF]/MMC/foo.jpg", "[00:FF:FF:FF:FF:FF]", -1 },
-	{ "obex://[00:FF:FF:FF:FF:FF]/C:", "[00:FF:FF:FF:FF:FF]", -1 },
 	{ "http://windows-host:8080/C:/", "windows-host", 8080 },
 	{ "smb://user:password@192.192.192.192/foobar", "192.192.192.192", -1 },
 	{ "https://d134w4tst3t.s3.amazonaws.com/a?Signature=6VJ9%2BAdPVZ4Z7NnPShRvtDsLofc%3D&Expires=1249330377&AWSAccessKeyId=0EYZF4DV8A7WM0H73602", "d134w4tst3t.s3.amazonaws.com", -1 },
