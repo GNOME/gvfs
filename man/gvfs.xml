@@ -37,7 +37,7 @@
                 includes a 'local' implementation using POSIX. gvfs
                 provides implementations that go beyond that and allow
                 to access files and storage using many protocols, such
-                as ftp, http, sftp, dav, etc. It also provides
+                as ftp, http, sftp, dav, nfs, etc. It also provides
                 support for trash folders, for cd burning and for monitoring
                 interesting devices and volumes on the computer.</para>
 
@@ -74,9 +74,12 @@
                         <listitem><para>gvfsd-dav - mounts DAV filesystems</para></listitem>
                         <listitem><para>gvfsd-dnssd - browses dnssd</para></listitem>
                         <listitem><para>gvfsd-ftp - mounts over FTP</para></listitem>
+                        <listitem><para>gvfsd-gphoto2 - mounts over PTP</para></listitem>
                         <listitem><para>gvfsd-http - mounts over HTTP</para></listitem>
                         <listitem><para>gvfsd-localtest - a test backend</para></listitem>
+                        <listitem><para>gvfsd-mtp - mounts over MTP</para></listitem>
                         <listitem><para>gvfsd-network - provides network://</para></listitem>
+                        <listitem><para>gvfsd-nfs - mounts over NFS</para></listitem>
                         <listitem><para>gvfsd-recent - provides recent://</para></listitem>
                         <listitem><para>gvfsd-sftp - mounts over sftp</para></listitem>
                         <listitem><para>gvfsd-smb - mounts Windows Shares Filesystem volumes</para></listitem>
