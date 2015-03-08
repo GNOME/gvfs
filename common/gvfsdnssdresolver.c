@@ -23,6 +23,7 @@
 /*
  * TODO: - locking
  *       - cancellation
+ *       - error handling
  *       - get rid of g_main_loop (bug 555436#c32)
  */
 
@@ -100,8 +101,7 @@ static gboolean avahi_initialized = FALSE;
 static void free_global_avahi_client (void);
 static AvahiClient *get_global_avahi_client (GError **error);
 
-static gboolean ensure_avahi_resolver (GVfsDnsSdResolver  *resolver,
-                                       GError            **error);
+static void ensure_avahi_resolver (GVfsDnsSdResolver  *resolver);
 
 static void service_resolver_cb (AvahiServiceResolver   *resolver,
                                  AvahiIfIndex            interface,
@@ -139,7 +139,7 @@ remove_client_from_resolver (GVfsDnsSdResolver *resolver)
 static void
 add_client_to_resolver (GVfsDnsSdResolver *resolver)
 {
-  ensure_avahi_resolver (resolver, NULL);
+  ensure_avahi_resolver (resolver);
 }
 
 /* Callback for state changes on the Client */
@@ -217,23 +217,13 @@ get_global_avahi_client (GError **error)
   return global_client;
 }
 
-
 static gboolean
-ensure_avahi_resolver (GVfsDnsSdResolver  *resolver,
-                       GError            **error)
+start_avahi_resolver (gpointer user_data)
 {
+  GVfsDnsSdResolver *resolver = G_VFS_DNS_SD_RESOLVER (user_data);
   AvahiClient *avahi_client;
-  gboolean ret;
 
-  ret = FALSE;
-
-  if (resolver->avahi_resolver != NULL)
-    {
-      ret = TRUE;
-      goto out;
-    }
-
-  avahi_client = get_global_avahi_client (error);
+  avahi_client = get_global_avahi_client (NULL);
   if (avahi_client == NULL)
     goto out;
 
@@ -247,20 +237,19 @@ ensure_avahi_resolver (GVfsDnsSdResolver  *resolver,
                                                          0, /* AvahiLookupFlags */
                                                          service_resolver_cb,
                                                          resolver);
-  if (resolver->avahi_resolver == NULL)
-    {
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_FAILED,
-                   _("Error creating Avahi resolver: %s"),
-                   avahi_strerror (avahi_client_errno (avahi_client)));
-      goto out;
-    }
-
-  ret = TRUE;
 
 out:
-  return ret;
+  g_object_unref (resolver);
+  return FALSE;
+}
+
+static void
+ensure_avahi_resolver (GVfsDnsSdResolver  *resolver)
+{
+  if (resolver->avahi_resolver != NULL)
+    return;
+
+  g_idle_add (start_avahi_resolver, g_object_ref (resolver));
 }
 
 static void
@@ -469,7 +458,7 @@ g_vfs_dns_sd_resolver_constructed (GObject *object)
                                                          resolver->domain);
 
   /* start resolving immediately */
-  ensure_avahi_resolver (resolver, NULL);
+  ensure_avahi_resolver (resolver);
 
   resolvers = g_list_prepend (resolvers, resolver);
 
@@ -1175,7 +1164,6 @@ g_vfs_dns_sd_resolver_resolve (GVfsDnsSdResolver  *resolver,
 {
   ResolveData *data;
   GSimpleAsyncResult *simple;
-  GError *error;
 
   g_return_if_fail (G_VFS_IS_DNS_SD_RESOLVER (resolver));
 
@@ -1193,15 +1181,7 @@ g_vfs_dns_sd_resolver_resolve (GVfsDnsSdResolver  *resolver,
       goto out;
     }
 
-  error = NULL;
-  if (!ensure_avahi_resolver (resolver, &error))
-    {
-      g_simple_async_result_set_from_error (simple, error);
-      g_simple_async_result_complete (simple);
-      g_object_unref (simple);
-      g_error_free (error);
-      goto out;
-    }
+  ensure_avahi_resolver (resolver);
 
   data = g_new0 (ResolveData, 1);
   data->resolver = resolver;
