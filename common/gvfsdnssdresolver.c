@@ -1066,7 +1066,7 @@ service_resolver_changed (GVfsDnsSdResolver *resolver,
   if (resolver->is_resolved)
     {
       g_simple_async_result_set_op_res_gboolean (data->simple, TRUE);
-      g_simple_async_result_complete (data->simple);
+      g_simple_async_result_complete_in_idle (data->simple);
       resolve_data_free (data);
     }
   else
@@ -1089,7 +1089,7 @@ service_resolver_changed (GVfsDnsSdResolver *resolver,
                                            data->resolver->service_type,
                                            data->resolver->service_name,
                                            data->resolver->domain);
-          g_simple_async_result_complete (data->simple);
+          g_simple_async_result_complete_in_idle (data->simple);
           resolve_data_free (data);
         }
     }
@@ -1134,7 +1134,7 @@ service_resolver_timed_out (ResolveData *data)
                                        data->resolver->domain);
     }
 
-  g_simple_async_result_complete (data->simple);
+  g_simple_async_result_complete_in_idle (data->simple);
   data->timeout_id = 0;
   resolve_data_free (data);
   return FALSE;
@@ -1175,7 +1175,7 @@ g_vfs_dns_sd_resolver_resolve (GVfsDnsSdResolver  *resolver,
   if (resolver->is_resolved)
     {
       g_simple_async_result_set_op_res_gboolean (simple, TRUE);
-      g_simple_async_result_complete (simple);
+      g_simple_async_result_complete_in_idle (simple);
       g_object_unref (simple);
       goto out;
     }
