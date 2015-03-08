@@ -25,6 +25,7 @@
 #include <gmountsource.h>
 #include <gio/gio.h>
 #include <gvfsdbus.h>
+#include "gvfsdaemonprotocol.h"
 
 #include <string.h>
 
@@ -280,7 +281,7 @@ g_mount_source_ask_password_async (GMountSource              *source,
     return;
 
   /* 30 minute timeout */
-  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), 1000 * 60 * 30);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_VFS_DBUS_MOUNT_TIMEOUT_MSECS);
 
   result = g_simple_async_result_new (G_OBJECT (source), callback, user_data, 
                                       g_mount_source_ask_password_async);
@@ -618,7 +619,7 @@ g_mount_source_ask_question_async (GMountSource       *source,
     return;
 
   /* 30 minute timeout */
-  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), 1000 * 60 * 30);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_VFS_DBUS_MOUNT_TIMEOUT_MSECS);
 
   result = g_simple_async_result_new (G_OBJECT (source), callback, user_data, 
                                       g_mount_source_ask_question_async);
@@ -778,7 +779,7 @@ g_mount_source_show_processes_async (GMountSource        *source,
     return;
 
   /* 30 minute timeout */
-  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), 1000 * 60 * 30);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_VFS_DBUS_MOUNT_TIMEOUT_MSECS);
 
   result = g_simple_async_result_new (G_OBJECT (source), callback, user_data,
                                       g_mount_source_show_processes_async);
@@ -955,7 +956,7 @@ g_mount_source_show_unmount_progress (GMountSource *source,
     return;
 
   /* 30 minute timeout */
-  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), 1000 * 60 * 30);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_VFS_DBUS_MOUNT_TIMEOUT_MSECS);
 
   gvfs_dbus_mount_operation_call_show_unmount_progress (proxy,
                                                         message_string ? message_string : "",

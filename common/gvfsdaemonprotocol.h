@@ -14,8 +14,8 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_METADATA_NAME "org.gtk.vfs.Metadata"
 #define G_VFS_DBUS_METADATA_PATH "/org/gtk/vfs/metadata"
 
-/* Mounts time out in 10 minutes, since they can be slow, with auth, etc */
-#define G_VFS_DBUS_MOUNT_TIMEOUT_MSECS (1000*60*10)
+/* Mounts time out in 30 minutes, since they can be slow, with auth, etc */
+#define G_VFS_DBUS_MOUNT_TIMEOUT_MSECS (1000*60*30)
 /* Normal ops are faster, one minute timeout */
 #define G_VFS_DBUS_TIMEOUT_MSECS (1000*60)
 
