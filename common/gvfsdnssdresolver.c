@@ -24,7 +24,6 @@
  * TODO: - locking
  *       - cancellation
  *       - error handling
- *       - get rid of g_main_loop (bug 555436#c32)
  */
 
 #include <config.h>
@@ -1202,7 +1201,9 @@ g_vfs_dns_sd_resolver_resolve (GVfsDnsSdResolver  *resolver,
 
 typedef struct
 {
-  GMainLoop *loop;
+  GMutex mutex;
+  GCond cond;
+  gboolean done;
   GError *error;
   gboolean ret;
 } ResolveDataSync;
@@ -1215,10 +1216,13 @@ resolve_sync_cb (GVfsDnsSdResolver *resolver,
   data->ret = g_vfs_dns_sd_resolver_resolve_finish (resolver,
                                                     res,
                                                     &(data->error));
-  g_main_loop_quit (data->loop);
+  g_mutex_lock (&data->mutex);
+  data->done = TRUE;
+  g_cond_signal (&data->cond);
+  g_mutex_unlock (&data->mutex);
 }
 
-
+/* Do not call from the global main loop thread. */
 gboolean
 g_vfs_dns_sd_resolver_resolve_sync (GVfsDnsSdResolver  *resolver,
                                     GCancellable       *cancellable,
@@ -1229,29 +1233,26 @@ g_vfs_dns_sd_resolver_resolve_sync (GVfsDnsSdResolver  *resolver,
 
   g_return_val_if_fail (G_VFS_IS_DNS_SD_RESOLVER (resolver), FALSE);
 
-  /* TODO: get rid of this nested mainloop, port to avahi mainloop instead  */
-  /*       see http://bugzilla.gnome.org/show_bug.cgi?id=555436#c32 */
-
   data = g_new0 (ResolveDataSync, 1);
-  /* mark the main loop as running to have an indication
-     whether g_main_loop_quit() was called before g_main_loop_run() */
-  data->loop = g_main_loop_new (NULL, TRUE);
+  g_cond_init (&data->cond);
+  g_mutex_init (&data->mutex);
 
+  g_mutex_lock (&data->mutex);
   g_vfs_dns_sd_resolver_resolve (resolver,
                                  cancellable,
                                  (GAsyncReadyCallback) resolve_sync_cb,
                                  data);
 
-  /* start main loop only if wasn't quit before
-     (i.e. in case when pulling record from cache) */
-  if (g_main_loop_is_running (data->loop))
-    g_main_loop_run (data->loop);
+  while (!data->done)
+    g_cond_wait (&data->cond, &data->mutex);
+  g_mutex_unlock (&data->mutex);
 
   ret = data->ret;
   if (data->error != NULL)
     g_propagate_error (error, data->error);
 
-  g_main_loop_unref (data->loop);
+  g_mutex_clear (&data->mutex);
+  g_cond_clear (&data->cond);
   g_free (data);
 
   return ret;
