@@ -190,6 +190,13 @@ do_mount (GVfsBackend *backend,
   };
 
   host = g_mount_spec_get (mount_spec, "host");
+  if (!host)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                        _("No hostname specified"));
+      return;
+    }
   export_list = mount_getexports (host);
 
   /* Find the shortest matching mount. E.g. if the given mount_prefix is
