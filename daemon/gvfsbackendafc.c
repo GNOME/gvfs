@@ -342,6 +342,20 @@ app_info_free (AppInfo *info)
   g_free (info);
 }
 
+static gboolean
+force_umount_idle (gpointer user_data)
+{
+  GVfsBackendAfc *afc_backend = G_VFS_BACKEND_AFC (user_data);
+
+  g_vfs_backend_afc_close_connection (afc_backend);
+
+  idevice_event_unsubscribe ();
+
+  g_vfs_backend_force_unmount (G_VFS_BACKEND(afc_backend));
+
+  return G_SOURCE_REMOVE;
+}
+
 static void
 _idevice_event_cb (const idevice_event_t *event, void *user_data)
 {
@@ -358,13 +372,9 @@ _idevice_event_cb (const idevice_event_t *event, void *user_data)
 
   g_print ("Shutting down AFC backend for device uuid %s\n", afc_backend->uuid);
 
-  g_vfs_backend_afc_close_connection (afc_backend);
-
-  idevice_event_unsubscribe ();
-
-  /* TODO: need a cleaner way to force unmount ourselves:
-   * https://bugzilla.gnome.org/show_bug.cgi?id=708288 */
-  exit (1);
+  /* idevice_event_unsubscribe() will terminate the thread _idevice_event_cb
+   * is running in, so we need to call back into our main loop */
+  g_idle_add(force_umount_idle, afc_backend);
 }
 
 static gboolean
