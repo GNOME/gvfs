@@ -258,7 +258,7 @@ meta_tree_clear (MetaTree *tree)
   if (tree->fd != -1)
     {
       close (tree->fd);
-      tree->fd = 0;
+      tree->fd = -1;
     }
 }
 
