@@ -643,6 +643,7 @@ meta_tree_refresh_locked (MetaTree *tree, gboolean force_reread)
   return TRUE;
 }
 
+/* NB: The tree is uninitialized if FALSE is returned! */
 gboolean
 meta_tree_refresh (MetaTree *tree)
 {
@@ -2339,7 +2340,16 @@ meta_tree_flush_locked (MetaTree *tree)
 
   builder = meta_builder_new ();
 
-  copy_tree_to_builder (tree, tree->root, builder->root);
+  if (tree->root)
+    {
+      copy_tree_to_builder (tree, tree->root, builder->root);
+    }
+  else
+    {
+      /* It shouldn't happen, because tree is recovered in case of failed write
+       * out. Skip copy_tree_to_builder to avoid crash. */
+      g_warning ("meta_tree_flush_locked: tree->root == NULL, possible data loss");
+    }
 
   if (tree->journal)
     apply_journal_to_builder (tree, builder);
@@ -2347,14 +2357,44 @@ meta_tree_flush_locked (MetaTree *tree)
   res = meta_builder_write (builder,
 			    meta_tree_get_filename (tree));
   if (res)
-    /* Force re-read since we wrote a new file */
-    res = meta_tree_refresh_locked (tree, TRUE);
+    {
+      /* Force re-read since we wrote a new file */
+      res = meta_tree_refresh_locked (tree, TRUE);
+
+      if (tree->root == NULL)
+	{
+	  /* It shouldn't happen. We failed to write out an updated tree
+	   * probably, therefore all the data are lost. Backup the file and
+	   * reload the tree to avoid further crashes. */
+	  GTimeVal tv;
+	  char *timestamp, *backup;
+
+	  g_get_current_time (&tv);
+	  timestamp = g_time_val_to_iso8601 (&tv);
+	  backup = g_strconcat (meta_tree_get_filename (tree), ".backup.",
+				timestamp, NULL);
+	  g_rename (meta_tree_get_filename (tree), backup);
+
+	  g_warning ("meta_tree_flush_locked: tree->root == NULL, possible data loss\n"
+		     "corrupted file was moved to: %s\n"
+		     "(please make a comment on https://bugzilla.gnome.org/show_bug.cgi?id=598561 "
+		     "and attach the corrupted file)",
+		     backup);
+
+	  g_free (timestamp);
+	  g_free (backup);
+
+	  res = meta_tree_refresh_locked (tree, TRUE);
+	  g_assert (res);
+	}
+  }
 
   meta_builder_free (builder);
 
   return res;
 }
 
+/* NB: The tree can be uninitialized if FALSE is returned! */
 gboolean
 meta_tree_flush (MetaTree *tree)
 {
