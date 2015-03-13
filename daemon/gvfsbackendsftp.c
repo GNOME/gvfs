@@ -1205,7 +1205,8 @@ handle_login (GVfsBackend *backend,
 				       "The identity sent by the remote computer is “%s”. "
 				       "If you want to be absolutely sure it is safe to continue, "
 				       "contact the system administrator."),
-				     hostname ? hostname : op_backend->host, fingerprint);
+                                     hostname ? hostname : op_backend->host,
+                                     fingerprint ? fingerprint : "???");
 
 	  g_free (hostname);
 	  g_free (fingerprint);
