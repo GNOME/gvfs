@@ -828,6 +828,94 @@ get_hostname_and_fingerprint_from_line (const gchar *buffer,
   return TRUE;
 }
 
+static gboolean
+get_hostname_and_ip_address (const gchar *buffer,
+                             gchar      **hostname_out,
+                             gchar      **ip_address_out)
+{
+  char *startpos, *endpos;
+
+  /* Parse a line that looks like:
+   * Warning: the ECDSA/RSA host key for 'hostname' differs from the key for the IP address '...'
+   * First get the hostname.
+   */
+  startpos = strchr (buffer, '\'') + 1;
+  if (!startpos)
+    return FALSE;
+
+  endpos = strchr (startpos, '\'');
+  if (!endpos)
+    return FALSE;
+
+  *hostname_out = g_strndup (startpos, endpos - startpos);
+
+  /* Then get the ip address. */
+  startpos = strchr (endpos + 1, '\'') + 1;
+  if (!startpos)
+    {
+      g_free (hostname_out);
+      return FALSE;
+    }
+
+  endpos = strchr (startpos, '\'');
+  if (!endpos)
+    {
+      g_free (hostname_out);
+      return FALSE;
+    }
+
+  *ip_address_out = g_strndup (startpos, endpos - startpos);
+
+  return TRUE;
+}
+
+static gboolean
+login_answer_yes_no (GMountSource *mount_source,
+                     char *message,
+                     GOutputStream *reply_stream,
+                     GError **error)
+{
+  const char *choices[] = {_("Log In Anyway"), _("Cancel Login"), NULL};
+  const char *choice_string;
+  int choice;
+  gboolean aborted = FALSE;
+  gsize bytes_written;
+
+  if (!g_mount_source_ask_question (mount_source,
+                                    message,
+                                    choices,
+                                    &aborted,
+                                    &choice) ||
+      aborted)
+    {
+      g_set_error_literal (error,
+                           G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Login dialog cancelled"));
+      g_free (message);
+      return FALSE;
+    }
+  g_free (message);
+
+  choice_string = (choice == 0) ? "yes" : "no";
+  if (!g_output_stream_write_all (reply_stream,
+                                  choice_string,
+                                  strlen (choice_string),
+                                  &bytes_written,
+                                  NULL, NULL) ||
+      !g_output_stream_write_all (reply_stream,
+                                  "\n", 1,
+                                  &bytes_written,
+                                  NULL, NULL))
+    {
+      g_set_error_literal (error,
+                           G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Can't send host identity confirmation"));
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
 static const gchar *
 get_authtype_from_password_line (const char *password_line)
 {
@@ -874,11 +962,9 @@ handle_login (GVfsBackend *backend,
   struct pollfd fds[2];
   char buffer[1024];
   gsize len;
-  gboolean aborted = FALSE;
   gboolean ret_val;
   char *new_password = NULL;
   char *new_user = NULL;
-  gsize bytes_written;
   gboolean password_in_keyring = FALSE;
   const gchar *authtype = NULL;
   gchar *object = NULL;
@@ -963,6 +1049,9 @@ handle_login (GVfsBackend *backend,
           g_str_has_prefix (buffer, "Enter Kerberos password") ||
           g_str_has_prefix (buffer, "Enter passphrase for key"))
         {
+          gboolean aborted = FALSE;
+          gsize bytes_written;
+
 	  authtype = get_authtype_from_password_line (buffer);
 	  object = get_object_from_password_line (buffer);
 
@@ -1103,11 +1192,8 @@ handle_login (GVfsBackend *backend,
       else if (g_str_has_prefix (buffer, "The authenticity of host '") ||
                strstr (buffer, "Key fingerprint:") != NULL)
         {
-	  const gchar *choices[] = {_("Log In Anyway"), _("Cancel Login"), NULL};
-	  const gchar *choice_string;
 	  gchar *hostname = NULL;
 	  gchar *fingerprint = NULL;
-	  gint choice;
 	  gchar *message;
 
           DEBUG ("handle_login #%d - confirming authenticity of host...\n", i);
@@ -1124,40 +1210,37 @@ handle_login (GVfsBackend *backend,
 	  g_free (hostname);
 	  g_free (fingerprint);
 
-	  if (!g_mount_source_ask_question (mount_source,
-					    message,
-					    choices,
-					    &aborted,
-					    &choice) || 
-	      aborted)
-	    {
-	      g_set_error_literal (error,
-				   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-				   _("Login dialog cancelled"));
-	      g_free (message);
-	      ret_val = FALSE;
-	      break;
-	    }
-	  g_free (message); 
-
-	  choice_string = (choice == 0) ? "yes" : "no";
-	  if (!g_output_stream_write_all (reply_stream,
-					  choice_string,
-					  strlen (choice_string),
-					  &bytes_written,
-					  NULL, NULL) ||
-	      !g_output_stream_write_all (reply_stream,
-					  "\n", 1,
-					  &bytes_written,
-					  NULL, NULL))
-	    {
-	      g_set_error_literal (error,
-				   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-				   _("Can't send host identity confirmation"));
-	      ret_val = FALSE;
-	      break;
-	    }
+          if (!login_answer_yes_no (mount_source, message, reply_stream, error))
+            {
+              ret_val = FALSE;
+              break;
+            }
 	}
+      else if (strstr (buffer, "differs from the key for the IP address"))
+        {
+          gchar *hostname = NULL;
+          gchar *ip_address = NULL;
+          gchar *message;
+
+          DEBUG ("handle_login #%d - host key / IP mismatch ...\n", i);
+
+          get_hostname_and_ip_address (buffer, &hostname, &ip_address);
+
+          message = g_strdup_printf (_("The host key for “%s” differs from the key for the IP address “%s”\n"
+                                       "If you want to be absolutely sure it is safe to continue, "
+                                       "contact the system administrator."),
+                                     hostname ? hostname : op_backend->host,
+                                     ip_address ? ip_address : "???");
+
+          g_free (hostname);
+          g_free (ip_address);
+
+          if (!login_answer_yes_no (mount_source, message, reply_stream, error))
+            {
+              ret_val = FALSE;
+              break;
+            }
+        }
     }
   
   if (ret_val)
