@@ -1021,6 +1021,7 @@ handle_login (GVfsBackend *backend,
         }
       
       buffer[len] = 0;
+      g_strchug (buffer);
 
       DEBUG ("handle_login #%d - prompt: \"%s\"\n", i, buffer);
 
