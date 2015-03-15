@@ -2,15 +2,15 @@
 # Copyright (C) 2005-2006 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gvfs package.
 #
-# Matej Urbančič <mateju@svn.gnome.org>, 2008-2014.
+# Matej Urbančič <mateju@svn.gnome.org>, 2008-2015.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-02-14 10:26+0000\n"
-"PO-Revision-Date: 2015-02-14 20:00+0100\n"
+"POT-Creation-Date: 2015-03-14 23:07+0000\n"
+"PO-Revision-Date: 2015-03-15 09:39+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
@@ -61,7 +61,6 @@ msgid "Error setting file metadata: %s"
 msgstr "Napaka med nastavitvijo metapodatkov datoteke: %s"
 
 #: ../client/gdaemonfile.c:2658 ../client/gdaemonvfs.c:1287
-#| msgid "Can't find metadata file %s"
 msgid "can't open metadata tree"
 msgstr "ni mogoče odpreti metapodatkovnega drevesa"
 
@@ -248,7 +247,7 @@ msgid "Got EOS"
 msgstr "Pridobljen EOS"
 
 #: ../daemon/gvfsafpconnection.c:1079 ../daemon/gvfsafpconnection.c:1120
-#: ../daemon/gvfsftptask.c:371
+#: ../daemon/gvfsftptask.c:375
 msgid "Host closed connection"
 msgstr "Gostitelj je prekinil povezavo"
 
@@ -383,12 +382,12 @@ msgstr "Ni mogoče naložiti %s na %s"
 #: ../daemon/gvfsafpvolume.c:2135 ../daemon/gvfsafpvolume.c:2297
 #: ../daemon/gvfsafpvolume.c:2517 ../daemon/gvfsbackendafc.c:289
 #: ../daemon/gvfsbackendsftp.c:322 ../daemon/gvfsbackendsftp.c:1867
-#: ../daemon/gvfsftptask.c:411
+#: ../daemon/gvfsftptask.c:415
 msgid "Permission denied"
 msgstr "Ni ustreznih dovoljenj"
 
 #: ../daemon/gvfsafpvolume.c:406 ../daemon/gvfsafpvolume.c:1727
-#: ../daemon/gvfsafpvolume.c:2521 ../daemon/gvfsbackendafc.c:991
+#: ../daemon/gvfsafpvolume.c:2521 ../daemon/gvfsbackendafc.c:1001
 #: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:327
 #: ../daemon/gvfsbackendafpbrowse.c:359 ../daemon/gvfsbackendarchive.c:734
 #: ../daemon/gvfsbackendarchive.c:786 ../daemon/gvfsbackendarchive.c:838
@@ -621,17 +620,17 @@ msgstr ""
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Prezrta napaka libimobiledevice (%d)"
 
-#: ../daemon/gvfsbackendafc.c:417
+#: ../daemon/gvfsbackendafc.c:427
 msgid "Try again"
 msgstr "Poskusi znova"
 
-#: ../daemon/gvfsbackendafc.c:417 ../daemon/gvfsbackend.c:989
+#: ../daemon/gvfsbackendafc.c:427 ../daemon/gvfsbackend.c:989
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
 #: ../monitor/udisks2/gvfsudisks2mount.c:762
 msgid "Cancel"
 msgstr "Prekliči"
 
-#: ../daemon/gvfsbackendafc.c:435 ../daemon/gvfsbackendarchive.c:635
+#: ../daemon/gvfsbackendafc.c:445 ../daemon/gvfsbackendarchive.c:635
 #: ../daemon/gvfsbackendarchive.c:664 ../daemon/gvfsbackenddav.c:1826
 #: ../daemon/gvfsbackendhttp.c:256 ../daemon/gvfsbackendobexftp.c:887
 #: ../daemon/gvfsbackendobexftp.c:903 ../daemon/gvfsbackendobexftp.c:922
@@ -639,22 +638,22 @@ msgstr "Prekliči"
 msgid "Invalid mount spec"
 msgstr "Neveljavno določilo priklopa"
 
-#: ../daemon/gvfsbackendafc.c:441 ../daemon/gvfsbackendafc.c:471
+#: ../daemon/gvfsbackendafc.c:451 ../daemon/gvfsbackendafc.c:481
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr ""
 "Neveljavno mesto AFC: zapis mora biti oblikovan kot afc://uuid:port-number"
 
-#: ../daemon/gvfsbackendafc.c:457
+#: ../daemon/gvfsbackendafc.c:467
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Naprava Apple Mobile"
 
-#: ../daemon/gvfsbackendafc.c:462
+#: ../daemon/gvfsbackendafc.c:472
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Prenosna Apple naprava, odklenjena"
 
-#: ../daemon/gvfsbackendafc.c:467
+#: ../daemon/gvfsbackendafc.c:477
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Dokumenti na napravi Apple Mobile"
@@ -662,7 +661,7 @@ msgstr "Dokumenti na napravi Apple Mobile"
 #. translators:
 #. * This is the device name, with the service being browsed in brackets, eg.:
 #. * Alan Smithee's iPhone (jailbreak)
-#: ../daemon/gvfsbackendafc.c:526
+#: ../daemon/gvfsbackendafc.c:536
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (odklenjeno)"
@@ -670,7 +669,7 @@ msgstr "%s (odklenjeno)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:533 ../monitor/afc/afcvolume.c:184
+#: ../daemon/gvfsbackendafc.c:543 ../monitor/afc/afcvolume.c:184
 #, c-format
 msgid "Documents on %s"
 msgstr "Dokumenti na napravi %s"
@@ -678,7 +677,7 @@ msgstr "Dokumenti na napravi %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:637
+#: ../daemon/gvfsbackendafc.c:647
 #, c-format
 msgid ""
 "The device “%s” is locked. Enter the passcode on the device and click “Try "
@@ -687,7 +686,7 @@ msgstr ""
 "Naprava \"%s\" je zaklenjena. Vnesite geslo za napravo in pritisnite tipko "
 "\"Poskusi znova\"."
 
-#: ../daemon/gvfsbackendafc.c:981 ../daemon/gvfsbackendarchive.c:742
+#: ../daemon/gvfsbackendafc.c:991 ../daemon/gvfsbackendarchive.c:742
 #: ../daemon/gvfsbackendcomputer.c:657 ../daemon/gvfsbackendgphoto2.c:1848
 #: ../daemon/gvfsbackendmtp.c:2031 ../daemon/gvfsbackendobexftp.c:1099
 #: ../daemon/gvfsbackendrecent.c:122 ../daemon/gvfsbackendsmb.c:803
@@ -695,21 +694,21 @@ msgstr ""
 msgid "Can't open directory"
 msgstr "Ni mogoče odpreti mape"
 
-#: ../daemon/gvfsbackendafc.c:1184 ../daemon/gvfsbackendafc.c:2578
+#: ../daemon/gvfsbackendafc.c:1194 ../daemon/gvfsbackendafc.c:2588
 msgid "Backups are not yet supported."
 msgstr "Izdelava varnostnih kopij ni podprta."
 
-#: ../daemon/gvfsbackendafc.c:1357
+#: ../daemon/gvfsbackendafc.c:1367
 msgid "Invalid seek type"
 msgstr "Neveljavna vrsta iskanja"
 
-#: ../daemon/gvfsbackendafc.c:2415 ../daemon/gvfsbackendafp.c:1790
+#: ../daemon/gvfsbackendafc.c:2425 ../daemon/gvfsbackendafp.c:1790
 #: ../daemon/gvfsbackendftp.c:1093 ../daemon/gvfsbackendftp.c:1141
 #: ../daemon/gvfsbackendftp.c:1162 ../daemon/gvfsbackendmtp.c:1784
 #: ../daemon/gvfsbackendmtp.c:1996 ../daemon/gvfsbackendmtp.c:2262
 #: ../daemon/gvfsbackendmtp.c:2352 ../daemon/gvfsbackendmtp.c:2422
 #: ../daemon/gvfsbackendsftp.c:1865 ../daemon/gvfsbackendsftp.c:4859
-#: ../daemon/gvfsbackendsmb.c:1861 ../daemon/gvfsftptask.c:403
+#: ../daemon/gvfsbackendsmb.c:1861 ../daemon/gvfsftptask.c:407
 msgid "Operation unsupported"
 msgstr "Dejanje ni podprto"
 
@@ -1581,7 +1580,7 @@ msgstr "Ni mogoče poslati potrdila istovetnosti gostitelja"
 #: ../daemon/gvfsbackendsftp.c:1174
 #, c-format
 msgid "The connection is closed (the underlying SSH process died)"
-msgstr "Povezava je prekinjena (proces SSH je vsiljeno prekinjen)"
+msgstr "Povezava je zaprta (proces SSH se je nepričakovano končal)"
 
 #: ../daemon/gvfsbackendsftp.c:1175
 #, c-format
@@ -1742,7 +1741,7 @@ msgid "Unexpected end of stream"
 msgstr "Nepričakovan konec pretoka"
 
 #: ../daemon/gvfsftpconnection.c:196 ../daemon/gvfsftpconnection.c:209
-#: ../daemon/gvfsftptask.c:423 ../daemon/gvfsftptask.c:851
+#: ../daemon/gvfsftptask.c:427 ../daemon/gvfsftptask.c:855
 msgid "Invalid reply"
 msgstr "neveljaven odgovor"
 
@@ -1766,37 +1765,41 @@ msgstr "Ime datoteke vsebuje neveljavne znake."
 msgid "The FTP server is busy. Try again later"
 msgstr "Strežnik FTP je zaposlen. Poskusite kasneje."
 
-#: ../daemon/gvfsftptask.c:367
+#: ../daemon/gvfsftptask.c:274
+msgid "Backend currently unmounting"
+msgstr "Odklapljanje ozadnjega priklopa"
+
+#: ../daemon/gvfsftptask.c:371
 msgid "Accounts are unsupported"
 msgstr "Računi niso podprti"
 
-#: ../daemon/gvfsftptask.c:375
+#: ../daemon/gvfsftptask.c:379
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
 "Ni mogoče odpreti podatkovne povezave. Najverjetneje dejanje preprečuje "
 "požarni zid."
 
-#: ../daemon/gvfsftptask.c:379
+#: ../daemon/gvfsftptask.c:383
 msgid "Data connection closed"
 msgstr "Podatkovna povezava je zaprta"
 
-#: ../daemon/gvfsftptask.c:386 ../daemon/gvfsftptask.c:390
+#: ../daemon/gvfsftptask.c:390 ../daemon/gvfsftptask.c:394
 msgid "Operation failed"
 msgstr "Dejanje ni uspelo"
 
-#: ../daemon/gvfsftptask.c:395
+#: ../daemon/gvfsftptask.c:399
 msgid "No space left on server"
 msgstr "Na strežniku ni več prostora"
 
-#: ../daemon/gvfsftptask.c:407
+#: ../daemon/gvfsftptask.c:411
 msgid "Unsupported network protocol"
 msgstr "Nepodprt omrežni protokol"
 
-#: ../daemon/gvfsftptask.c:415
+#: ../daemon/gvfsftptask.c:419
 msgid "Page type unknown"
 msgstr "Neznana vrsta strani"
 
-#: ../daemon/gvfsftptask.c:419
+#: ../daemon/gvfsftptask.c:423
 msgid "Invalid filename"
 msgstr "Neveljavno ime datoteke"
 
@@ -3102,6 +3105,47 @@ msgstr "Sledi simbolnim povezavam, priklopom in bližnjicam map"
 #: ../programs/gvfs-tree.c:250
 msgid "List contents of directories in a tree-like format."
 msgstr "Izpiši seznam vsebine map v drevesni obliki."
+
+#~ msgid "Operation not supported"
+#~ msgstr "Opravilo ni podprto"
+
+#~ msgid "Volume doesn't exist"
+#~ msgstr "Pogon ne obstaja"
+
+#~ msgid "Backups not supported"
+#~ msgstr "Izdelava varnostnih kopij ni podprta"
+
+#~ msgid "Mount point does not exist"
+#~ msgstr "Priklopna točka ne obstaja"
+
+#~ msgid ""
+#~ "Permission denied: Perhaps this host is disallowed or a privileged port "
+#~ "is needed"
+#~ msgstr ""
+#~ "Dostop je zavrnjen: najverjetneje gostitelj ne dovoli dostopa ali pa je "
+#~ "zahtevan dostop preko določenih vrat"
+
+#~ msgid "Target file is a directory"
+#~ msgstr "Ciljna datoteka je mapa"
+
+#~ msgid "Target file is not a regular file"
+#~ msgstr "Ciljna datoteka ni običajna datoteka"
+
+#~ msgid "Invalid attribute type"
+#~ msgstr "Neveljavna vrsta atributa"
+
+#~ msgid "Ignore outstanding file operations when unmounting or ejecting"
+#~ msgstr ""
+#~ "Prezri opravila datotek med odklapljanjem oziroma izmetavanjem priklopa"
+
+#~ msgid "Use an anonymous user when authenticating"
+#~ msgstr "Uporabni brezimni dostop med overjanjem"
+
+#~ msgid "Error mounting location: Anonymous access denied\n"
+#~ msgstr "Napaka med priklapljanjem brezimni dostop ni dovoljen.\n"
+
+#~ msgid "Don't use copy and delete fallback"
+#~ msgstr "Ne ustvari kopije in izbriši povrnitvene datoteke"
 
 #~ msgid "progress"
 #~ msgstr "napredek"
