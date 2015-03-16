@@ -1,3 +1,16 @@
+Major changes in 1.23.92
+========================
+* Remove obsolete obexftp code
+* metadata: Reliability improvements
+* afc, gphoto2: Fix force unmount when device is removed
+* ftp: Prevent segfault when unmounting
+* ftp: Bug fixes for directory parsing
+* dav: Fix crash on mount when using dns-sd
+* common: Increase mount timeout to 30 minutes
+* Several smaller bugfixes
+* Update man pages
+* Translation updates
+
 Major changes in 1.23.90
 ========================
 * ftp: Implement backups for replace
