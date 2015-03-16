@@ -1,3 +1,13 @@
+Major changes in 1.22.4
+=======================
+* ftp: Prevent segfault when unmounting
+* ftp: Bug fixes for directory parsing
+* afc: Fix force unmount when device is removed
+* programs: Fix bash completion
+* mtp: Fix query_fs_info crashes when file not found
+* Several smaller bugfixes
+* Translation updates (add Bosnian translation)
+
 Major changes in 1.22.3
 =======================
 * Fix metadata deamon crashes
