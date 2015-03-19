@@ -1494,7 +1494,7 @@ g_proxy_volume_monitor_register (GIOModule *module)
         }
       else
         {
-          g_warning ("Error: %s\n", error->message);
+          g_debug ("Error: %s\n", error->message);
           g_error_free (error);
         }
     }
