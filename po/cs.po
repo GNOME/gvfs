@@ -1,24 +1,23 @@
 # Czech translation of gvfs.
 # Copyright (C) 2008, 2009, 2010, 2011 the author(s) of gvfs.
 # This file is distributed under the same license as the gvfs package.
-# Petr Kovar <pknbe@volny.cz>, 2008, 2009, 2010, 2011, 2012, 2013, 2014.
+# Petr Kovar <pknbe@volny.cz>, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015.
 # Marek Černocký <marek@manet.cz>, 2014.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-03-12 10:36+0000\n"
-"PO-Revision-Date: 2014-10-18 16:25+0200\n"
-"Last-Translator: Marek Černocký <marek@manet.cz>\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&k"
+"eywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2015-03-25 10:49+0000\n"
+"PO-Revision-Date: 2015-03-25 13:14+0200\n"
+"Last-Translator: Petr Kovar <pknbe@volny.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Gtranslator 2.91.6\n"
+"X-Generator: Virtaal 0.7.1\n"
 "X-Project-Style: gnome\n"
 
 #: ../client/gdaemonfile.c:462 ../client/gdaemonfile.c:2854
@@ -133,22 +132,17 @@ msgstr "Chyba při získávání informace o připojení: %s"
 msgid "Invalid file info format"
 msgstr "Neplatný formát informace o souboru"
 
-#: ../common/gvfsdnssdresolver.c:209
+#: ../common/gvfsdnssdresolver.c:208
 #, c-format
 msgid "Error initializing Avahi: %s"
 msgstr "Chyba při spouštění Avahi: %s"
-
-#: ../common/gvfsdnssdresolver.c:255
-#, c-format
-msgid "Error creating Avahi resolver: %s"
-msgstr "Chyba při vytváření překladače Avahi: %s"
 
 #. Translators:
 #. * - the first %s refers to the service type
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #.
-#: ../common/gvfsdnssdresolver.c:1100
+#: ../common/gvfsdnssdresolver.c:1088
 #, c-format
 msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
 msgstr "Chyba při řešení služby „%s“ „%s“ v doméně „%s“"
@@ -159,7 +153,7 @@ msgstr "Chyba při řešení služby „%s“ „%s“ v doméně „%s“"
 #. * - the third %s refers to the domain
 #. * - the fourth %s refers to the required TXT keys
 #.
-#: ../common/gvfsdnssdresolver.c:1126
+#: ../common/gvfsdnssdresolver.c:1114
 #, c-format
 msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
@@ -173,7 +167,7 @@ msgstr ""
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #.
-#: ../common/gvfsdnssdresolver.c:1143
+#: ../common/gvfsdnssdresolver.c:1131
 #, c-format
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
 msgstr "Při řešení služby „%s“ „%s“ v doméně „%s“ vypršel čas"
@@ -1464,16 +1458,17 @@ msgid "Network Location Monitor"
 msgstr "Sledování síťových umístění"
 
 #: ../daemon/gvfsbackendnfs.c:242
-#, fuzzy
 #| msgid "File does not exist"
 msgid "Mount point does not exist"
-msgstr "Soubor neexistuje"
+msgstr "Bod připojení neexistuje"
 
 #: ../daemon/gvfsbackendnfs.c:257
 msgid ""
 "Permission denied: Perhaps this host is disallowed or a privileged port is "
 "needed"
 msgstr ""
+"Oprávnění odmítnuto: Je možné, že tento hostitel není povolen nebo je "
+"vyžadován privilegovaný port"
 
 #: ../daemon/gvfsbackendnfs.c:1046 ../daemon/gvfsbackendnfs.c:1069
 #: ../daemon/gvfsbackendnfs.c:1117 ../daemon/gvfsbackendsftp.c:3429
@@ -1482,22 +1477,19 @@ msgid "Unable to create temporary file"
 msgstr "Nelze vytvořit dočasný soubor"
 
 #: ../daemon/gvfsbackendnfs.c:1150
-#, fuzzy
 #| msgid "Target is a directory"
 msgid "Target file is a directory"
-msgstr "Cíl je adresářem"
+msgstr "Cílový soubor je adresářem"
 
 #: ../daemon/gvfsbackendnfs.c:1160
-#, fuzzy
 #| msgid "The file is not a mountable"
 msgid "Target file is not a regular file"
-msgstr "Soubor není připojitelný"
+msgstr "Cílový soubor není obyčejným souborem"
 
 #: ../daemon/gvfsbackendnfs.c:2376
-#, fuzzy
 #| msgid "Invalid attribute type %s\n"
 msgid "Invalid attribute type"
-msgstr "Neplatný typ atributu %s\n"
+msgstr "Neplatný typ atributu"
 
 #: ../daemon/gvfsbackendrecent.c:266
 msgid "The recent folder may not be deleted"
@@ -2902,11 +2894,11 @@ msgstr "SCHÉMA"
 
 #: ../programs/gvfs-mount.c:72
 msgid "Ignore outstanding file operations when unmounting or ejecting"
-msgstr ""
+msgstr "Během odpojování nebo vysunování ignorovat nevyřízené operace"
 
 #: ../programs/gvfs-mount.c:73
 msgid "Use an anonymous user when authenticating"
-msgstr ""
+msgstr "Při ověřování použít anonymního uživatele"
 
 #. Translator: List here is a verb as in 'List all mounts'
 #: ../programs/gvfs-mount.c:75
@@ -2922,10 +2914,10 @@ msgid "Show extra information"
 msgstr "Zobrazit dodatečné informace"
 
 #: ../programs/gvfs-mount.c:256 ../programs/gvfs-mount.c:284
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error mounting location: %s\n"
 msgid "Error mounting location: Anonymous access denied\n"
-msgstr "Chyba při připojování umístění: %s\n"
+msgstr "Chyba při připojování umístění: Odmítnut anonymní přístup\n"
 
 #: ../programs/gvfs-mount.c:258 ../programs/gvfs-mount.c:286
 #, c-format
@@ -2968,7 +2960,7 @@ msgstr "Připojit umístění."
 
 #: ../programs/gvfs-move.c:48
 msgid "Don't use copy and delete fallback"
-msgstr ""
+msgstr "Nepoužívat sekundární kopírování a mazání"
 
 #: ../programs/gvfs-move.c:133
 msgid "Move one or more files from SOURCE to DEST."
@@ -3133,6 +3125,9 @@ msgstr "Sledovat symbolické odkazy, připojení a zástupce"
 #: ../programs/gvfs-tree.c:250
 msgid "List contents of directories in a tree-like format."
 msgstr "Vypsat obsah adresáře ve stromové struktuře."
+
+#~ msgid "Error creating Avahi resolver: %s"
+#~ msgstr "Chyba při vytváření překladače Avahi: %s"
 
 #~ msgid "USB support missing. Please contact your software vendor"
 #~ msgstr "Schází podpora USB. Kontaktujte prosím dodavatele softwaru"
