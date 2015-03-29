@@ -2597,7 +2597,10 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
 
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
   if (proxy == NULL)
-    return FALSE;
+    {
+      list = g_file_attribute_info_list_new ();
+      goto out;
+    }
 
   iter_list = NULL;
   res = gvfs_dbus_mount_call_query_writable_namespaces_sync (proxy,
