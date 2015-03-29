@@ -3090,7 +3090,7 @@ g_daemon_file_monitor_dir (GFile* file,
 
   proxy = create_proxy_for_file (file, &mount_info, &path, NULL, cancellable, error);
   if (proxy == NULL)
-    return FALSE;
+    return NULL;
 
   
   res = gvfs_dbus_mount_call_create_directory_monitor_sync (proxy,
@@ -3143,7 +3143,7 @@ g_daemon_file_monitor_file (GFile* file,
 
   proxy = create_proxy_for_file (file, &mount_info, &path, NULL, cancellable, error);
   if (proxy == NULL)
-    return FALSE;
+    return NULL;
 
   
   res = gvfs_dbus_mount_call_create_file_monitor_sync (proxy,
