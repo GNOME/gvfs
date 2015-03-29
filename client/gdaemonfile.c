@@ -2588,8 +2588,8 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
 					 GCancellable               *cancellable,
 					 GError                    **error)
 {
-  GVfsDBusMount *proxy;
-  char *path;
+  GVfsDBusMount *proxy = NULL;
+  char *path = NULL;
   gboolean res;
   GVariant *iter_list;
   GFileAttributeInfoList *list;
@@ -2611,27 +2611,23 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
       if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
       _g_propagate_error_stripped (error, local_error);
-    }
-
-  g_free (path);
-  g_object_unref (proxy);
-
-  if (res)
-    {
-      list = _g_dbus_get_attribute_info_list (iter_list, error);
-      g_variant_unref (iter_list);
-    }
-  else
-    {
       list = g_file_attribute_info_list_new ();
+      goto out;
     }
 
+  list = _g_dbus_get_attribute_info_list (iter_list, error);
+  g_variant_unref (iter_list);
+
+out:
   g_file_attribute_info_list_add (list,
                                   "metadata",
                                   G_FILE_ATTRIBUTE_TYPE_STRING, /* Also STRINGV, but no way express this ... */
                                   G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
                                   G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
-  
+  g_free (path);
+  if (proxy != NULL)
+    g_object_unref (proxy);
+
   return list;
 }
 
