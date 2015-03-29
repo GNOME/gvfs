@@ -487,8 +487,13 @@ create_proxy_for_file2 (GFile *file1,
     *mount_info2_out = g_mount_info_ref (mount_info2);
   if (path1_out)
     *path1_out = g_strdup (g_mount_info_resolve_path (mount_info1, daemon_file1->path));
-  if (path2_out && mount_info2)
-    *path2_out = g_strdup (g_mount_info_resolve_path (mount_info2, daemon_file2->path));
+  if (path2_out)
+    {
+      if (mount_info2)
+        *path2_out = g_strdup (g_mount_info_resolve_path (mount_info2, daemon_file2->path));
+      else
+        *path2_out = NULL;
+    }
   if (connection_out)
     *connection_out = connection;
 
