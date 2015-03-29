@@ -2995,6 +2995,8 @@ retry:
       g_main_context_unref (data.context);
       g_main_loop_unref (data.loop);
     }
+  g_free (path1);
+  g_free (path2);
 
   if (! res)
     {
