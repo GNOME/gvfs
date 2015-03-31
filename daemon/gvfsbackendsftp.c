@@ -286,6 +286,12 @@ destroy_connection (Connection *conn)
   g_clear_object (&conn->error_stream);
 }
 
+static gboolean
+connection_is_usable (Connection *conn)
+{
+  return conn->command_stream != NULL;
+}
+
 static void
 g_vfs_backend_sftp_finalize (GObject *object)
 {
@@ -964,6 +970,7 @@ static gboolean
 handle_login (GVfsBackend *backend,
               GMountSource *mount_source,
               int tty_fd, int stdout_fd, int stderr_fd,
+              gboolean initial_connection,
               GError **error)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
@@ -981,13 +988,14 @@ handle_login (GVfsBackend *backend,
   const gchar *authtype = NULL;
   gchar *object = NULL;
   char *prompt;
+  int attempts = 0;
 #ifdef PRINT_DEBUG
   static int i = 0;
   i++;
 #endif
 
-  DEBUG ("handle_login #%d - user: %s, host: %s, port: %d\n",
-         i, op_backend->user, op_backend->host, op_backend->port);
+  DEBUG ("handle_login #%d, initial_connection = %d - user: %s, host: %s, port: %d\n",
+         i, initial_connection, op_backend->user, op_backend->host, op_backend->port);
   
   if (op_backend->client_vendor == SFTP_VENDOR_SSH) 
     prompt_fd = stderr_fd;
@@ -1038,6 +1046,10 @@ handle_login (GVfsBackend *backend,
       DEBUG ("handle_login #%d - prompt: \"%s\"\n", i, buffer);
 
       /*
+       * If logging in on a second connection (e.g. the data connection), use
+       * the user and password stored in the backend and don't retry if it
+       * fails.
+       *
        * If the input URI contains a username
        *     if the input URI contains a password, we attempt one login and return GNOME_VFS_ERROR_ACCESS_DENIED on failure.
        *     if the input URI contains no password, we query the user until he provides a correct one, or he cancels.
@@ -1065,8 +1077,18 @@ handle_login (GVfsBackend *backend,
           gboolean aborted = FALSE;
           gsize bytes_written;
 
+          attempts++;
 	  authtype = get_authtype_from_password_line (buffer);
 	  object = get_object_from_password_line (buffer);
+
+          if (!initial_connection && attempts > 1)
+            {
+	      g_set_error_literal (error,
+				   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                   _("Permission denied"));
+	      ret_val = FALSE;
+	      break;
+            }
 
           /* If password is in keyring at this point is because it failed */
 	  if (!op_backend->tmp_password && (password_in_keyring ||
@@ -1134,8 +1156,9 @@ handle_login (GVfsBackend *backend,
             }
 	  else if (op_backend->tmp_password)
 	    {
-	      /* I already a have a password of a previous login attempt
-	       * that failed because the user provided a new user name
+              /* I already have a password of a previous login attempt
+               * (either because this is a second connection or because the
+               * user provided a new user name).
 	       */
 	      new_password = op_backend->tmp_password;
 	      op_backend->tmp_password = NULL;
@@ -1257,7 +1280,7 @@ handle_login (GVfsBackend *backend,
         }
     }
   
-  if (ret_val)
+  if (ret_val && initial_connection)
     {
       DEBUG ("handle_login #%d - password_save: %d\n", i, op_backend->password_save);
 
@@ -1274,6 +1297,10 @@ handle_login (GVfsBackend *backend,
 				   0, 
                                    new_password,
                                    op_backend->password_save);
+
+      /* Keep the successful password for subsequent connections. */
+      op_backend->tmp_password = new_password;
+      new_password = NULL;
     }
 
   DEBUG ("handle_login #%d - ret_val: %d\n", i, ret_val);
@@ -1732,7 +1759,17 @@ do_mount (GVfsBackend *backend,
           GVfsJobMount *job,
           GMountSpec *mount_spec,
           GMountSource *mount_source,
-          gboolean is_automount)
+          gboolean is_automount);
+
+static gboolean
+setup_connection (GVfsBackend *backend,
+                  GVfsJobMount *job,
+                  GMountSpec *mount_spec,
+                  GMountSource *mount_source,
+                  gboolean is_automount,
+                  Connection *connection,
+                  gboolean initial_connection,
+                  GError **error)
 {
   const struct {
     const char *name;               /* extension_name field */
@@ -1743,100 +1780,84 @@ do_mount (GVfsBackend *backend,
   };
 
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  gchar **args; /* Enough for now, extend if you add more args */
+  gchar **args;
   pid_t pid;
   int tty_fd, stdout_fd, stdin_fd, stderr_fd, slave_fd;
-  GError *error;
   GInputStream *is;
   GDataOutputStream *command;
   GDataInputStream *reply;
   gboolean res;
-  GMountSpec *sftp_mount_spec;
   char *extension_name, *extension_data;
-  char *display_name;
   int i;
 
   args = setup_ssh_commandline (backend);
 
-  error = NULL;
   if (!spawn_ssh (backend,
 		  args, &pid,
 		  &tty_fd, &stdin_fd, &stdout_fd, &stderr_fd, &slave_fd,
-		  &error))
+		  error))
     {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
       g_strfreev (args);
-      return;
+      return FALSE;
     }
 
   g_strfreev (args);
 
-  op_backend->command_connection.op_backend = op_backend;
-  op_backend->command_connection.command_stream = g_unix_output_stream_new (stdin_fd, TRUE);
+  connection->op_backend = op_backend;
+  connection->command_stream = g_unix_output_stream_new (stdin_fd, TRUE);
 
   command = new_command_stream (op_backend, SSH_FXP_INIT);
   g_data_output_stream_put_int32 (command,
                                   SSH_FILEXFER_VERSION, NULL, NULL);
-  send_command_sync_and_unref_command (&op_backend->command_connection,
-                                       command,
-                                       NULL, NULL);
+  send_command_sync_and_unref_command (connection, command, NULL, NULL);
 
   if (tty_fd == -1)
-    res = wait_for_reply (backend, stdout_fd, &error);
+    res = wait_for_reply (backend, stdout_fd, error);
   else
     {
       res = handle_login (backend,
                           mount_source,
                           tty_fd, stdout_fd, stderr_fd,
-                          &error);
+                          initial_connection,
+                          error);
       close (slave_fd);
     }
-  
+
   if (!res)
     {
-      if (error->code == G_IO_ERROR_INVALID_ARGUMENT)
+      if (error && (*error)->code == G_IO_ERROR_INVALID_ARGUMENT)
         {
 	  /* New username provided by the user,
 	   * we need to re-spawn the ssh command
 	   */
-	  g_error_free (error);
+	  g_clear_error (error);
 	  do_mount (backend, job, mount_spec, mount_source, is_automount);
 	}
-      else
-        {
-	  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-	  g_error_free (error);
-	}
-      
-      return;
+
+      return FALSE;
     }
 
-  op_backend->command_connection.reply_stream = g_unix_input_stream_new (stdout_fd, TRUE);
-  op_backend->command_connection.reply_stream_cancellable = g_cancellable_new ();
+  connection->reply_stream = g_unix_input_stream_new (stdout_fd, TRUE);
+  connection->reply_stream_cancellable = g_cancellable_new ();
 
   make_fd_nonblocking (stderr_fd);
   is = g_unix_input_stream_new (stderr_fd, TRUE);
-  op_backend->command_connection.error_stream = g_data_input_stream_new (is);
+  connection->error_stream = g_data_input_stream_new (is);
   g_object_unref (is);
-  
-  reply = read_reply_sync (&op_backend->command_connection, NULL, NULL);
+
+  reply = read_reply_sync (connection, NULL, NULL);
   if (reply == NULL)
     {
-      look_for_stderr_errors (&op_backend->command_connection, &error);
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      return;
+      look_for_stderr_errors (connection, error);
+      return FALSE;
     }
-  
+
   if (g_data_input_stream_read_byte (reply, NULL, NULL) != SSH_FXP_VERSION)
     {
-      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Protocol error"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      return;
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Protocol error"));
+      return FALSE;
     }
-  
+
   op_backend->protocol_version = g_data_input_stream_read_uint32 (reply, NULL, NULL);
 
   while ((extension_name = read_string (reply, NULL)) != NULL)
@@ -1857,16 +1878,64 @@ do_mount (GVfsBackend *backend,
 
   g_object_unref (reply);
 
-  if (!get_uid_sync (op_backend) || !get_home_sync (op_backend))
+  if (initial_connection &&
+      (!get_uid_sync (op_backend) || !get_home_sync (op_backend)))
     {
-      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Protocol error"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      return;
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Protocol error"));
+      return FALSE;
     }
 
   g_object_ref (op_backend);
-  read_reply_async (&op_backend->command_connection);
+  read_reply_async (connection);
+
+  return TRUE;
+}
+
+static void
+do_mount (GVfsBackend *backend,
+          GVfsJobMount *job,
+          GMountSpec *mount_spec,
+          GMountSource *mount_source,
+          gboolean is_automount)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GError *error = NULL;
+  GMountSpec *sftp_mount_spec;
+  char *display_name;
+
+  if (!setup_connection (backend,
+                         job,
+                         mount_spec,
+                         mount_source,
+                         is_automount,
+                         &op_backend->command_connection,
+                         TRUE,
+                         &error))
+    {
+      if (error)
+        {
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+        }
+      /* When a new user is specified, do_mount is called recursively so we
+       * need to return here without finishing the job. */
+      return;
+    }
+
+  if (!setup_connection (backend,
+                         job,
+                         mount_spec,
+                         mount_source,
+                         is_automount,
+                         &op_backend->data_connection,
+                         FALSE,
+                         NULL))
+    {
+      g_warning ("Setting up data connection failed\n");
+      destroy_connection (&op_backend->data_connection);
+    }
+
+  g_clear_pointer (&op_backend->tmp_password, g_free);
 
   sftp_mount_spec = g_mount_spec_new ("sftp");
   if (op_backend->user_specified_in_uri)
