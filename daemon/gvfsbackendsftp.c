@@ -5237,7 +5237,7 @@ sftp_push_handle_free (SftpPushHandle *handle)
         {
           command = new_command_stream (handle->backend, SSH_FXP_CLOSE);
           put_data_buffer (command, handle->raw_handle);
-          queue_command_stream_and_free (&handle->backend->command_connection,
+          queue_command_stream_and_free (&handle->backend->data_connection,
                                          command,
                                          NULL,
                                          handle->job, NULL);
@@ -5425,7 +5425,7 @@ push_finish (SftpPushHandle *handle)
 {
   GDataOutputStream *command = new_command_stream (handle->backend, SSH_FXP_CLOSE);
   put_data_buffer (command, handle->raw_handle);
-  queue_command_stream_and_free (&handle->backend->command_connection, command,
+  queue_command_stream_and_free (&handle->backend->data_connection, command,
                                  push_close_write_reply,
                                  handle->job, handle);
 
@@ -5555,7 +5555,7 @@ push_read_cb (GObject *source, GAsyncResult *res, gpointer user_data)
   g_output_stream_write_all (G_OUTPUT_STREAM (command),
                              handle->buffer, count,
                              NULL, NULL, NULL);
-  queue_command_stream_and_free (&handle->backend->command_connection, command,
+  queue_command_stream_and_free (&handle->backend->data_connection, command,
                                  push_write_reply,
                                  handle->job, request);
   handle->offset += count;
@@ -5615,7 +5615,7 @@ push_create_temp_reply (GVfsBackendSftp *backend,
           put_string (command, handle->op_job->destination);
           g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_TRUNC,  NULL, NULL);
           g_data_output_stream_put_uint32 (command, 0, NULL, NULL);
-          queue_command_stream_and_free (&backend->command_connection, command,
+          queue_command_stream_and_free (&backend->data_connection, command,
                                          push_truncate_original_reply,
                                          job, handle);
 
@@ -5671,7 +5671,7 @@ push_create_temp (SftpPushHandle *handle)
   put_string (command, handle->tempname);
   g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_EXCL,  NULL, NULL);
   g_data_output_stream_put_uint32 (command, 0, NULL, NULL);
-  queue_command_stream_and_free (&handle->backend->command_connection, command,
+  queue_command_stream_and_free (&handle->backend->data_connection, command,
                                  push_create_temp_reply,
                                  handle->job, handle);
 }
@@ -5782,7 +5782,7 @@ push_source_fstat_cb (GObject *source, GAsyncResult *res, gpointer user_data)
       put_string (command, handle->op_job->destination);
       g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_EXCL, NULL, NULL);
       g_data_output_stream_put_uint32 (command, 0, NULL, NULL);
-      queue_command_stream_and_free (&handle->backend->command_connection, command,
+      queue_command_stream_and_free (&handle->backend->data_connection, command,
                                      push_open_reply,
                                      handle->job, handle);
     }
@@ -5872,6 +5872,14 @@ try_push (GVfsBackend *backend,
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GFile *source;
   SftpPushHandle *handle;
+
+  if (!connection_is_usable (&op_backend->data_connection))
+    {
+      g_vfs_job_failed (G_VFS_JOB (op_job),
+                        G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                        _("Not supported"));
+      return TRUE;
+    }
 
   handle = g_slice_new0 (SftpPushHandle);
   handle->backend = g_object_ref (op_backend);
