@@ -864,6 +864,7 @@ should_drive_be_ignored (HalPool *pool, HalDevice *d, GList *fstab_mount_points)
         }
     }
 
+  g_list_free (volumes);
   return got_volumes && all_volumes_ignored;
 }
 
