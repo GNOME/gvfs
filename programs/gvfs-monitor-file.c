@@ -86,7 +86,15 @@ file_monitor_callback (GFileMonitor* monitor,
     case G_FILE_MONITOR_EVENT_MOVED:
       g_print ("Event = MOVED\n");
       break;
-
+    case G_FILE_MONITOR_EVENT_MOVED_IN:
+      g_print ("Event = MOVED IN\n");
+      break;
+    case G_FILE_MONITOR_EVENT_MOVED_OUT:
+      g_print ("Event = MOVED OUT\n");
+      break;
+    case G_FILE_MONITOR_EVENT_RENAMED:
+      g_print ("Event = RENAMED\n");
+      break;
     }
 
   return TRUE;
