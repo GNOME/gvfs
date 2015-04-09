@@ -323,7 +323,7 @@ gvfs_accept_certificate (GMountSource *mount_source,
                          GTlsCertificate *certificate,
                          GTlsCertificateFlags errors)
 {
-  const char *choices[] = {"Yes", "No", NULL};
+  const char *choices[] = {_("Yes"), _("No"), NULL};
   int choice;
   gboolean handled, aborted = FALSE;
   char *certificate_str, *reason, *message;
