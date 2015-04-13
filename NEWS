@@ -1,3 +1,8 @@
+Major changes in 1.24.1
+=======================
+* hal: Fix compilation error and memory leak
+* Translation updates
+
 Major changes in 1.24.0
 =======================
 * Fix g-ir-compiler failures
