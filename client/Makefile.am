@@ -39,6 +39,9 @@ vfssources = \
 	gvfsiconloadable.c gvfsiconloadable.h \
 	gvfsuriutils.c gvfsuriutils.h \
 	gvfsurimapper.c gvfsurimapper.h \
+	gvfsdocumentfile.c gvfsdocumentfile.h \
+	gvfsdocumentinputstream.c gvfsdocumentinputstream.h \
+	gvfsdocumentoutputstream.c gvfsdocumentoutputstream.h \
 	$(URI_PARSER_SOURCES) \
 	$(NULL)
 

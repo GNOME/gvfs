@@ -29,6 +29,7 @@
 #include "gdaemonvfs.h"
 #include "gvfsuriutils.h"
 #include "gdaemonfile.h"
+#include "gvfsdocumentfile.h"
 #include <gio/gio.h>
 #include <gvfsdaemonprotocol.h>
 #include <gmodule.h>
@@ -408,6 +409,17 @@ g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
       
       file = g_daemon_vfs_get_file_for_path (vfs, path);
       g_free (path);
+      return file;
+    }
+
+  if (g_ascii_strncasecmp (uri, "document:", 9) == 0)
+    {
+      file = gvfs_document_file_new (uri);
+
+      if (file == NULL)
+	/* Dummy file */
+	return g_vfs_get_file_for_uri (G_DAEMON_VFS (vfs)->wrapped_vfs, uri);
+
       return file;
     }
   
