@@ -414,7 +414,7 @@ g_gdu_volume_monitor_constructor (GType                  type,
 
   monitor = G_GDU_VOLUME_MONITOR (object);
 
-  monitor->mount_monitor = g_unix_mount_monitor_new ();
+  monitor->mount_monitor = g_unix_mount_monitor_get ();
 
   g_signal_connect (monitor->mount_monitor,
                     "mounts_changed",

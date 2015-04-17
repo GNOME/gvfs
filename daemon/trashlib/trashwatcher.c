@@ -264,7 +264,7 @@ trash_watcher_new (TrashRoot *root)
   watcher->root = root;
   watcher->mounts = NULL;
   watcher->watching = FALSE;
-  watcher->mount_monitor = g_unix_mount_monitor_new ();
+  watcher->mount_monitor = g_unix_mount_monitor_get ();
   g_signal_connect_swapped (watcher->mount_monitor, "mounts_changed",
                             G_CALLBACK (trash_watcher_remount), watcher);
 

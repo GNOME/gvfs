@@ -315,7 +315,7 @@ gvfs_udisks2_volume_monitor_init (GVfsUDisks2VolumeMonitor *monitor)
                     G_CALLBACK (on_client_changed),
                     monitor);
 
-  monitor->mount_monitor = g_unix_mount_monitor_new ();
+  monitor->mount_monitor = g_unix_mount_monitor_get ();
   g_signal_connect (monitor->mount_monitor,
                     "mounts-changed",
                     G_CALLBACK (mounts_changed),
