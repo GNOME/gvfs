@@ -207,6 +207,27 @@ class GvfsTestCase(unittest.TestCase):
         # restore flags
         fcntl.fcntl(popen.stdout, fcntl.F_SETFL, flags)
 
+    def wait_for_question(self, popen):
+        '''Wait for a gvfs-mount Popen process to show an question prompt'''
+
+        empty_timeout = 50
+
+        # set stdout to nonblocking
+        flags = fcntl.fcntl(popen.stdout, fcntl.F_GETFL)
+        fcntl.fcntl(popen.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+        while True:
+            r = popen.stdout.read(1000)
+            if r and (b'Choice' in r):
+                break
+
+            self.assertGreater(empty_timeout, 0,
+                               'timed out waiting for question prompt')
+            empty_timeout -= 1
+            time.sleep(0.1)
+
+        # restore flags
+        fcntl.fcntl(popen.stdout, fcntl.F_SETFL, flags)
+
     def mount_api(self, gfile, mount_op=None):
         '''Mount a Gio.File using the Gio API
 
@@ -1466,7 +1487,16 @@ DAVLockDB DAVLock
         '''davs://localhost without credentials'''
 
         uri = 'davs://localhost:4443/public'
-        subprocess.check_call(['gvfs-mount', uri])
+        mount = subprocess.Popen(['gvfs-mount', uri],
+                                 stdin=subprocess.PIPE,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+
+        # confirm unknown certificate
+        self.wait_for_question (mount);
+        mount.stdin.write(b'1\n')
+        mount.stdin.flush()
+
         self.do_mount_check(uri, 'hello.txt', 'hi\n')
 
     def test_http_auth(self):
@@ -1500,6 +1530,11 @@ DAVLockDB DAVLock
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
+
+        # confirm unknown certificate
+        self.wait_for_question (mount);
+        mount.stdin.write(b'1\n')
+        mount.stdin.flush()
 
         # wrong password
         self.wait_for_gvfs_mount_user_prompt(mount)
