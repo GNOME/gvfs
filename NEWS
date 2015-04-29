@@ -1,3 +1,16 @@
+Major changes in 1.25.1
+=======================
+* dav: Verify TLS certificates
+* ftp: Use TCP_NODELAY
+* ftp: Implement TLS support
+* sftp: Handle host key / IP mismatch
+* Several smaller bugfixes
+
+Major changes in 1.24.1
+=======================
+* hal: Fix compilation error and memory leak
+* Translation updates
+
 Major changes in 1.24.0
 =======================
 * Fix g-ir-compiler failures
