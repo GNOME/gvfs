@@ -287,27 +287,22 @@ try (GVfsJob *job)
 }
 
 static void
-unregister_mount_callback (GVfsDBusMountTracker *proxy,
+unregister_mount_callback (GVfsBackend *backend,
                            GAsyncResult *res,
                            gpointer user_data)
 {
-  GVfsBackend *backend;
   GVfsDaemon *daemon;
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (user_data);
   GError *error = NULL;
 
   g_debug ("unregister_mount_callback\n");
-  if (! gvfs_dbus_mount_tracker_call_unregister_mount_finish (proxy,
-                                                              res,
-                                                              &error))
+  if (!g_vfs_backend_unregister_mount_finish (backend, res, &error))
     {
-      g_dbus_error_strip_remote_error (error);
       g_warning ("Error unregistering mount: %s (%s, %d)\n",
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
   
-  backend = op_job->backend;
   (*G_VFS_JOB_CLASS (g_vfs_job_unmount_parent_class)->send_reply) (G_VFS_JOB (op_job));
 
   /* Unlink job source from daemon */

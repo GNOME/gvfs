@@ -158,16 +158,15 @@ mount_failed (GVfsJobMount *op_job, GError *error)
 }
 
 static void
-register_mount_callback (GVfsDBusMountTracker *proxy,
+register_mount_callback (GVfsBackend *backend,
                          GAsyncResult *res,
                          gpointer user_data)
 {
   GVfsJobMount *op_job = G_VFS_JOB_MOUNT (user_data);
   GError *error = NULL;
   
-  if (! gvfs_dbus_mount_tracker_call_register_mount_finish (proxy, res, &error))
+  if (!g_vfs_backend_register_mount_finish (backend, res, &error))
     {
-      g_dbus_error_strip_remote_error (error);
       mount_failed (op_job, error);
     }
   else

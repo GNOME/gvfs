@@ -491,9 +491,15 @@ void        g_vfs_backend_set_mount_spec                 (GVfsBackend        *ba
 void        g_vfs_backend_register_mount                 (GVfsBackend        *backend,
                                                           GAsyncReadyCallback callback,
 							  gpointer            user_data);
+gboolean    g_vfs_backend_register_mount_finish          (GVfsBackend        *backend,
+                                                          GAsyncResult       *res,
+                                                          GError            **error);
 void        g_vfs_backend_unregister_mount               (GVfsBackend        *backend,
                                                           GAsyncReadyCallback callback,
 							  gpointer            user_data);
+gboolean    g_vfs_backend_unregister_mount_finish        (GVfsBackend        *backend,
+                                                          GAsyncResult       *res,
+                                                          GError            **error);
 const char *g_vfs_backend_get_backend_type               (GVfsBackend        *backend);
 const char *g_vfs_backend_get_display_name               (GVfsBackend        *backend);
 const char *g_vfs_backend_get_stable_name                (GVfsBackend        *backend);

@@ -425,15 +425,13 @@ job_source_closed_callback (GVfsJobSource *job_source,
 }
 
 static void
-re_register_jobs_cb (GVfsDBusMountTracker *proxy,
+re_register_jobs_cb (GVfsBackend *backend,
                      GAsyncResult *res,
                      gpointer user_data)
 {
   GError *error = NULL;
 
-  gvfs_dbus_mount_tracker_call_register_mount_finish (proxy,
-                                                      res,
-                                                      &error);
+  g_vfs_backend_register_mount_finish (backend, res, &error);
   g_debug ("re_register_jobs_cb, error: %p\n", error);
   g_clear_error (&error);
 }
