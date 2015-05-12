@@ -485,6 +485,14 @@ bdmv_metadata_thread (GSimpleAsyncResult *result,
   file = G_FILE (object);
 
   disc_root = g_file_get_path (file);
+  if (!disc_root)
+    {
+      error = g_error_new_literal (G_IO_ERROR,
+                                   G_IO_ERROR_FAILED,
+                                   "Device is not a Blu-Ray disc");
+      goto error;
+    }
+
   bd = bd_open (disc_root, NULL);
   g_free (disc_root);
 
