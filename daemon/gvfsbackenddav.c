@@ -1206,43 +1206,6 @@ ms_response_to_fs_info (MsResponse *response,
     }
 }
 
-static GFileType
-ms_response_to_file_type (MsResponse *response)
-{
-  xmlNodeIter prop_iter;
-  MsPropstat  propstat;
-  GFileType   file_type;
-  guint       status;
-
-  file_type = G_FILE_TYPE_UNKNOWN;
-
-  ms_response_get_propstat_iter (response, &prop_iter);
-  while (xml_node_iter_next (&prop_iter))
-    {
-      xmlNodePtr iter;
-
-      status = ms_response_get_propstat (&prop_iter, &propstat);
-
-      if (! SOUP_STATUS_IS_SUCCESSFUL (status))
-        continue;
-
-      for (iter = propstat.prop_node->children; iter; iter = iter->next)
-        {
-          if (node_is_element (iter) &&
-              node_has_name_ns (iter, "resourcetype", "DAV:"))
-            break;
-        }
-
-      if (iter)
-        {
-          file_type = parse_resourcetype (iter);
-          break;
-        }
-    }
-
-  return file_type;
-}
-
 #define PROPSTAT_XML_BEGIN                        \
   "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" \
   " <D:propfind xmlns:D=\"DAV:\">\n"
@@ -1333,6 +1296,7 @@ stat_location_begin (SoupURI  *uri,
     PROPSTAT_XML_BEGIN
     PROPSTAT_XML_PROP_BEGIN
     "<D:resourcetype/>\n"
+    "<D:getcontentlength/>\n"
     PROPSTAT_XML_PROP_END
     PROPSTAT_XML_END;
 
@@ -1355,6 +1319,7 @@ stat_location_begin (SoupURI  *uri,
 static gboolean
 stat_location_finish (SoupMessage *msg,
                       GFileType   *target_type,
+                      gint64      *target_size,
                       guint       *num_children)
 {
   Multistatus  ms;
@@ -1362,7 +1327,7 @@ stat_location_finish (SoupMessage *msg,
   gboolean     res;
   GError      *error;
   guint        child_count;
-  GFileType    file_type;
+  GFileInfo   *file_info;
 
   if (msg->status_code != 207)
     return FALSE;
@@ -1374,7 +1339,7 @@ stat_location_finish (SoupMessage *msg,
 
   res = FALSE;
   child_count = 0;
-  file_type = G_FILE_TYPE_UNKNOWN;
+  file_info = g_file_info_new ();
 
   multistatus_get_response_iter (&ms, &iter);
   while (xml_node_iter_next (&iter))
@@ -1386,7 +1351,7 @@ stat_location_finish (SoupMessage *msg,
 
       if (response.is_target)
         {
-          file_type = ms_response_to_file_type (&response);
+          ms_response_to_file_info (&response, file_info);
           res = TRUE;
         }
       else
@@ -1398,13 +1363,17 @@ stat_location_finish (SoupMessage *msg,
   if (res)
     {
       if (target_type)
-        *target_type = file_type;
+        *target_type = g_file_info_get_file_type (file_info);
+
+      if (target_size)
+        *target_size = g_file_info_get_size (file_info);
 
       if (num_children)
         *num_children = child_count;
     }
 
   multistatus_free (&ms);
+  g_object_unref (file_info);
   return res;
 }
 
@@ -1412,6 +1381,7 @@ static gboolean
 stat_location (GVfsBackend  *backend,
                SoupURI      *uri,
                GFileType    *target_type,
+               gint64       *target_size,
                guint        *num_children,
                GError      **error)
 {
@@ -1439,7 +1409,7 @@ stat_location (GVfsBackend  *backend,
       return FALSE;
     }
 
-  res = stat_location_finish (msg, target_type, num_children);
+  res = stat_location_finish (msg, target_type, target_size, num_children);
   g_object_unref (msg);
 
   if (res == FALSE)
@@ -1944,7 +1914,7 @@ do_mount (GVfsBackend  *backend,
     soup_message_set_uri (msg_stat, cur_uri);
 
     g_vfs_backend_dav_send_message (backend, msg_stat);
-    res = stat_location_finish (msg_stat, &file_type, NULL);
+    res = stat_location_finish (msg_stat, &file_type, NULL, NULL);
     is_collection = res && file_type == G_FILE_TYPE_DIRECTORY;
 
     g_debug (" [%s] webdav: %d, collection %d [res: %d]\n",
@@ -2302,7 +2272,7 @@ try_open_stat_done (SoupSession *session,
       return;
     }
 
-  res = stat_location_finish (msg, &target_type, NULL);
+  res = stat_location_finish (msg, &target_type, NULL, NULL);
 
   if (res == FALSE)
     {
@@ -2692,7 +2662,7 @@ do_delete (GVfsBackend   *backend,
   error = NULL;
 
   uri = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
-  res = stat_location (backend, uri, &file_type, &num_children, &error);
+  res = stat_location (backend, uri, &file_type, NULL, &num_children, &error);
 
   if (res == FALSE)
     {
@@ -2801,7 +2771,8 @@ do_move (GVfsBackend *backend,
   guint status;
   GFileType source_ft, target_ft;
   GError *error = NULL;
-  gboolean res;
+  gboolean res, stat_res;
+  gint64 file_size;
 
   if (flags & G_FILE_COPY_BACKUP)
     {
@@ -2829,19 +2800,20 @@ do_move (GVfsBackend *backend,
   msg = soup_message_new_from_uri (SOUP_METHOD_MOVE, source_uri);
   target_uri = g_vfs_backend_dav_uri_for_path (backend, destination, FALSE);
 
-  res = stat_location (backend, target_uri, &target_ft, NULL, &error);
+  res = stat_location (backend, target_uri, &target_ft, NULL, NULL, &error);
   if (!res && !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       goto error;
     }
+  g_clear_error (&error);
 
+  stat_res = stat_location (backend, source_uri, &source_ft, &file_size, NULL, &error);
   if (res)
     {
       if (flags & G_FILE_COPY_OVERWRITE)
         {
-          res = stat_location (backend, source_uri, &source_ft, NULL, &error);
-          if (res)
+          if (stat_res)
             {
               if (target_ft == G_FILE_TYPE_DIRECTORY)
                 {
@@ -2902,6 +2874,8 @@ do_move (GVfsBackend *backend,
 
   if (SOUP_STATUS_IS_SUCCESSFUL (status))
     {
+      if (stat_res && progress_callback)
+        progress_callback (file_size, file_size, progress_callback_data);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
   else if (status == SOUP_STATUS_PRECONDITION_FAILED ||
@@ -2935,6 +2909,7 @@ do_copy (GVfsBackend *backend,
   GFileType source_ft, target_ft;
   GError *error = NULL;
   gboolean res;
+  gint64 file_size;
 
   if (flags & G_FILE_COPY_BACKUP)
     {
@@ -2951,14 +2926,14 @@ do_copy (GVfsBackend *backend,
   source_uri = g_vfs_backend_dav_uri_for_path (backend, source, FALSE);
   target_uri = g_vfs_backend_dav_uri_for_path (backend, destination, FALSE);
 
-  res = stat_location (backend, source_uri, &source_ft, NULL, &error);
+  res = stat_location (backend, source_uri, &source_ft, &file_size, NULL, &error);
   if (!res)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       goto error;
     }
 
-  res = stat_location (backend, target_uri, &target_ft, NULL, &error);
+  res = stat_location (backend, target_uri, &target_ft, NULL, NULL, &error);
   if (res)
     {
       if (flags & G_FILE_COPY_OVERWRITE)
@@ -3012,7 +2987,11 @@ do_copy (GVfsBackend *backend,
    * and IS_REDIRECTION handling below. */
 
   if (SOUP_STATUS_IS_SUCCESSFUL (status))
-    g_vfs_job_succeeded (G_VFS_JOB (job));
+    {
+      if (progress_callback)
+        progress_callback (file_size, file_size, progress_callback_data);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
   else if (status == SOUP_STATUS_PRECONDITION_FAILED ||
            SOUP_STATUS_IS_REDIRECTION (status))
     g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
@@ -3234,7 +3213,7 @@ push_stat_dest_cb (SoupSession *session, SoupMessage *msg, gpointer user_data)
   PushHandle *handle = user_data;
   GFileType type;
 
-  if (stat_location_finish (msg, &type, NULL))
+  if (stat_location_finish (msg, &type, NULL, NULL))
     {
       if (!(handle->op_job->flags & G_FILE_COPY_OVERWRITE))
         {
