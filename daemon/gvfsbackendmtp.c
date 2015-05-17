@@ -1378,6 +1378,12 @@ do_query_info (GVfsBackend *backend,
 
     LIBMTP_devicestorage_t *storage;
     gboolean found = FALSE;
+
+    int ret = LIBMTP_Get_Storage (device, LIBMTP_STORAGE_SORTBY_NOTSORTED);
+    if (ret != 0) {
+      fail_job (G_VFS_JOB (job), device);
+      goto exit;
+    }
     for (storage = device->storage; storage != 0; storage = storage->next) {
       if (storage->id == entry->storage) {
         DEBUG ("(I) found storage %X\n", storage->id);
@@ -1459,6 +1465,12 @@ do_query_fs_info (GVfsBackend *backend,
     }
 
     LIBMTP_devicestorage_t *storage;
+
+    int ret = LIBMTP_Get_Storage (device, LIBMTP_STORAGE_SORTBY_NOTSORTED);
+    if (ret != 0) {
+      fail_job (G_VFS_JOB (job), device);
+      goto exit;
+    }
     for (storage = device->storage; storage != 0; storage = storage->next) {
       if (storage->id == entry->storage) {
         get_storage_info (storage, info);
