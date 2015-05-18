@@ -183,9 +183,6 @@ g_daemon_mount_can_eject (GMount *mount)
 
 
 typedef struct {
-  GMount *mount;
-  GCancellable *cancellable;
-  GSimpleAsyncResult *result;
   GMountInfo *mount_info;
   GMountOperation *mount_operation;
   GMountUnmountFlags flags;
@@ -197,9 +194,6 @@ typedef struct {
 static void
 async_proxy_create_free (AsyncProxyCreate *data)
 {
-  g_clear_object (&data->mount);
-  g_clear_object (&data->result);
-  g_clear_object (&data->cancellable);
   g_clear_object (&data->mount_operation);
   g_clear_object (&data->connection);
   g_clear_object (&data->proxy);
@@ -212,7 +206,8 @@ unmount_reply (GVfsDBusMount *proxy,
                gpointer user_data)
 {
   GDBusProxy *base_proxy = G_DBUS_PROXY (proxy);
-  AsyncProxyCreate *data = user_data;
+  GTask *task = G_TASK (user_data);
+  AsyncProxyCreate *data = g_task_get_task_data (task);
   GError *error = NULL;
 
   _g_daemon_vfs_invalidate (g_dbus_proxy_get_name (base_proxy),
@@ -220,12 +215,16 @@ unmount_reply (GVfsDBusMount *proxy,
 
   if (! gvfs_dbus_mount_call_unmount_finish (proxy, res, &error))
     {
-      _g_simple_async_result_take_error_stripped (data->result, error);
+      g_dbus_error_strip_remote_error (error);
+      g_task_return_error (task, error);
     }
-  
-  _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
-  _g_dbus_async_unsubscribe_cancellable (data->cancellable, data->cancelled_tag);
-  async_proxy_create_free (data);
+  else
+    {
+      g_task_return_boolean (task, TRUE);
+    }
+
+  _g_dbus_async_unsubscribe_cancellable (g_task_get_cancellable (task), data->cancelled_tag);
+  g_object_unref (task);
 }
 
 static void
@@ -233,7 +232,8 @@ async_proxy_new_cb (GObject *source_object,
                     GAsyncResult *res,
                     gpointer user_data)
 {
-  AsyncProxyCreate *data = user_data;
+  GTask *task = G_TASK (user_data);
+  AsyncProxyCreate *data = g_task_get_task_data (task);
   GVfsDBusMount *proxy;
   GError *error = NULL;
   GMountSource *mount_source;
@@ -241,9 +241,9 @@ async_proxy_new_cb (GObject *source_object,
   proxy = gvfs_dbus_mount_proxy_new_finish (res, &error);
   if (proxy == NULL)
     {
-      _g_simple_async_result_take_error_stripped (data->result, error);
-      _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
-      async_proxy_create_free (data);
+      g_dbus_error_strip_remote_error (error);
+      g_task_return_error (task, error);
+      g_object_unref (task);
       return;
     }
 
@@ -258,26 +258,29 @@ async_proxy_new_cb (GObject *source_object,
                                 g_mount_source_get_dbus_id (mount_source),
                                 g_mount_source_get_obj_path (mount_source),
                                 data->flags,
-                                data->cancellable,
+                                g_task_get_cancellable (task),
                                 (GAsyncReadyCallback) unmount_reply,
-                                data);
-  data->cancelled_tag = _g_dbus_async_subscribe_cancellable (data->connection, data->cancellable);
+                                task);
+  data->cancelled_tag = _g_dbus_async_subscribe_cancellable (data->connection,
+                                                             g_task_get_cancellable (task));
   
   g_object_unref (mount_source);
 }
 
 static void
 async_construct_proxy (GDBusConnection *connection,
-                       AsyncProxyCreate *data)
+                       GTask *task)
 {
+  AsyncProxyCreate *data = g_task_get_task_data (task);
+
   data->connection = g_object_ref (connection);
   gvfs_dbus_mount_proxy_new (connection,
                              G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                              data->mount_info->dbus_id,
                              data->mount_info->object_path,
-                             data->cancellable,
+                             g_task_get_cancellable (task),
                              async_proxy_new_cb,
-                             data);
+                             task);
 }
 
 static void
@@ -285,7 +288,7 @@ bus_get_cb (GObject *source_object,
             GAsyncResult *res,
             gpointer user_data)
 {
-  AsyncProxyCreate *data = user_data;
+  GTask *task = G_TASK (user_data);
   GDBusConnection *connection;
   GError *error = NULL;
   
@@ -293,13 +296,13 @@ bus_get_cb (GObject *source_object,
   
   if (connection == NULL)
     {
-      _g_simple_async_result_take_error_stripped (data->result, error);
-      _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
-      async_proxy_create_free (data);
+      g_dbus_error_strip_remote_error (error);
+      g_task_return_error (task, error);
+      g_object_unref (task);
       return;
     }
 
-  async_construct_proxy (connection, data);
+  async_construct_proxy (connection, task);
 }
 
 static void
@@ -307,20 +310,20 @@ async_got_connection_cb (GDBusConnection *connection,
                          GError *io_error,
                          gpointer callback_data)
 {
-  AsyncProxyCreate *data = callback_data;
-  
+  GTask *task = G_TASK (callback_data);
+
   if (connection == NULL)
     {
       /* TODO: we should probably test if we really want a session bus;
        *       for now, this code is on par with the old dbus code */ 
       g_bus_get (G_BUS_TYPE_SESSION,
-                 data->cancellable,
+                 g_task_get_cancellable (task),
                  bus_get_cb,
-                 data);
+                 task);
       return;
     }
   
-  async_construct_proxy (connection, data);
+  async_construct_proxy (connection, task);
 }
 
 static void
@@ -332,25 +335,24 @@ g_daemon_mount_unmount_with_operation (GMount *mount,
                                        gpointer         user_data)
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
+  GTask *task;
   AsyncProxyCreate *data;
 
+  task = g_task_new (mount, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_daemon_mount_unmount_with_operation);
+
   data = g_new0 (AsyncProxyCreate, 1);
-  data->mount = g_object_ref (mount);
   data->mount_info = daemon_mount->mount_info;
   data->flags = flags;
   if (mount_operation)
     data->mount_operation = g_object_ref (mount_operation);
-  if (cancellable)
-    data->cancellable = g_object_ref (cancellable);
 
-  data->result = g_simple_async_result_new (G_OBJECT (mount),
-                                            callback, user_data,
-                                            g_daemon_mount_unmount_with_operation);
-  
+  g_task_set_task_data (task, data, (GDestroyNotify) async_proxy_create_free);
+
   _g_dbus_connection_get_for_async (data->mount_info->dbus_id,
                                     async_got_connection_cb,
-                                    data,
-                                    data->cancellable);
+                                    task,
+                                    cancellable);
 }
 
 static gboolean
@@ -358,7 +360,10 @@ g_daemon_mount_unmount_with_operation_finish (GMount *mount,
                                               GAsyncResult *result,
                                               GError **error)
 {
-  return TRUE;
+  g_return_val_if_fail (g_task_is_valid (result, mount), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, g_daemon_mount_unmount_with_operation), FALSE);
+
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void
@@ -406,13 +411,20 @@ g_daemon_mount_guess_content_type (GMount              *mount,
                                    GAsyncReadyCallback  callback,
                                    gpointer             user_data)
 {
-  GSimpleAsyncResult *simple;
-  simple = g_simple_async_result_new (G_OBJECT (mount),
-                                      callback,
-                                      user_data,
-                                      NULL);
-  g_simple_async_result_complete_in_idle (simple);
-  g_object_unref (simple);
+  GTask *task;
+  char **type;
+  GError *error = NULL;
+
+  task = g_task_new (mount, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_daemon_mount_guess_content_type);
+
+  type = g_daemon_mount_guess_content_type_sync (mount, FALSE, cancellable, &error);
+  if (error != NULL)
+    g_task_return_error (task, error);
+  else
+    g_task_return_pointer (task, type, (GDestroyNotify) g_strfreev);
+
+  g_object_unref (task);
 }
 
 static char **
@@ -420,7 +432,10 @@ g_daemon_mount_guess_content_type_finish (GMount              *mount,
                                           GAsyncResult        *result,
                                           GError             **error)
 {
-  return g_daemon_mount_guess_content_type_sync (mount, FALSE, NULL, error);
+  g_return_val_if_fail (g_task_is_valid (result, mount), NULL);
+  g_return_val_if_fail (g_async_result_is_tagged (result, g_daemon_mount_guess_content_type), NULL);
+
+  return g_task_propagate_pointer (G_TASK (result), error);
 }
 
 static void
