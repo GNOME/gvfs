@@ -264,18 +264,20 @@ dnl **********************************
 dnl *** Check for libsystemd-login ***
 dnl **********************************
 
-AC_ARG_ENABLE(libsystemd_login, AS_HELP_STRING([--disable-libsystemd-login],[build without liblibsystemd-login]))
+AC_ARG_ENABLE(libsystemd_login, AS_HELP_STRING([--disable-libsystemd-login],[build without libsystemd-login]))
 msg_libsystemd_login=no
 LIBSYSTEMD_LOGIN_LIBS=
 LIBSYSTEMD_LOGIN_CFLAGS=
 LIBSYSTEMD_LOGIN_REQUIRED=44
 
 if test "x$enable_libsystemd_login" != "xno"; then
-  PKG_CHECK_EXISTS([libsystemd-login >= $LIBSYSTEMD_LOGIN_REQUIRED], msg_libsystemd_login=yes)
+  PKG_CHECK_EXISTS([libsystemd], [msg_libsystemd_login=yes],
+                   [PKG_CHECK_EXISTS([libsystemd-login >= $LIBSYSTEMD_LOGIN_REQUIRED], msg_libsystemd_login=yes)])
 
   if test "x$msg_libsystemd_login" = "xyes"; then
-    PKG_CHECK_MODULES([LIBSYSTEMD_LOGIN],[libsystemd-login >= $LIBSYSTEMD_LOGIN_REQUIRED])
-    AC_DEFINE(HAVE_LIBSYSTEMD_LOGIN, 1, [Define to 1 if liblibsystemd_login is available])
+    PKG_CHECK_MODULES([LIBSYSTEMD_LOGIN],[libsystemd],,
+                      [PKG_CHECK_MODULES([LIBSYSTEMD_LOGIN],[libsystemd-login >= $LIBSYSTEMD_LOGIN_REQUIRED])])
+    AC_DEFINE(HAVE_LIBSYSTEMD_LOGIN, 1, [Define to 1 if libsystemd_login is available])
   fi
 fi
 
