@@ -103,13 +103,25 @@ main (int argc, char *argv[])
 
   do
     {
-      GFile *file;
-      char *uri;
+      char *uri = NULL;
+      char *uri_scheme;
 
-      file = g_file_new_for_commandline_arg (locations[i]);
-      uri = g_file_get_uri (file);
-      g_object_unref (file);
-      res = g_app_info_launch_default_for_uri (uri,
+      /* Workaround to handle non-URI locations. We still use the original
+       * location for other cases, because GFile might modify the URI in ways
+       * we don't want. See:
+       * https://bugzilla.gnome.org/show_bug.cgi?id=738690 */
+      uri_scheme = g_uri_parse_scheme (locations[i]);
+      if (!uri_scheme || uri_scheme[0] == '\0')
+        {
+          GFile *file;
+
+          file = g_file_new_for_commandline_arg (locations[i]);
+          uri = g_file_get_uri (file);
+          g_object_unref (file);
+        }
+      g_free (uri_scheme);
+
+      res = g_app_info_launch_default_for_uri (uri ? uri : locations[i],
 					       NULL,
 					       &error);
       g_free (uri);
