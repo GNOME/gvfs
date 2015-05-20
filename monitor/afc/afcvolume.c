@@ -159,6 +159,7 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
       lockdownd_service_descriptor_free (lockdown_service);
       if (lerr != LOCKDOWN_E_SUCCESS)
         {
+          g_warning ("Couldn't start com.apple.mobile.house_arrest for UUID %s: %d", self->uuid, lerr);
           idevice_free (dev);
           return 0;
         }
