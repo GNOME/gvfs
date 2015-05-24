@@ -1587,6 +1587,7 @@ do_pull (GVfsBackend *backend,
   GFile *local_file = NULL;
   GFileInfo *local_info = NULL;
   GFileInfo *info = NULL;
+  guint64 mtime;
 
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), source);
   if (entry == NULL) {
@@ -1693,6 +1694,19 @@ do_pull (GVfsBackend *backend,
     fail_job (G_VFS_JOB (job), device);
     goto exit;
   }
+
+  /* Ignore errors here. Failure to copy metadata is not a hard error */
+  mtime = g_file_info_get_attribute_uint64 (info,
+                                            G_FILE_ATTRIBUTE_TIME_MODIFIED);
+  g_file_set_attribute_uint64 (local_file,
+                               G_FILE_ATTRIBUTE_TIME_MODIFIED, mtime,
+                               G_FILE_QUERY_INFO_NONE,
+                               G_VFS_JOB (job)->cancellable, NULL);
+  g_file_set_attribute_uint32 (local_file,
+                               G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, 0,
+                               G_FILE_QUERY_INFO_NONE,
+                               G_VFS_JOB (job)->cancellable, NULL);
+
   /* Attempt to delete object if requested but don't fail it it fails. */
   if (remove_source) {
     DEBUG ("(I) Removing source.\n");
