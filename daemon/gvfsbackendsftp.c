@@ -1639,9 +1639,14 @@ multi_request_cb (GVfsBackendSftp *backend,
     }
 }
 
+typedef struct
+{
+  Connection *connection;
+  GDataOutputStream *cmd;
+} Command;
+
 static void
-queue_command_streams_and_free (Connection *conn,
-                                GDataOutputStream **commands,
+queue_command_streams_and_free (Command *commands,
                                 int n_commands,
                                 MultiReplyCallback callback,
                                 GVfsJob *job,
@@ -1664,8 +1669,8 @@ queue_command_streams_and_free (Connection *conn,
     {
       reply = &data->replies[i];
       reply->request = data;
-      queue_command_stream_and_free (conn,
-                                     commands[i],
+      queue_command_stream_and_free (commands[i].connection,
+                                     commands[i].cmd,
                                      multi_request_cb,
                                      job,
                                      reply);
@@ -4442,20 +4447,22 @@ try_query_info (GVfsBackend *backend,
                 GFileAttributeMatcher *matcher)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  GDataOutputStream *commands[3];
+  Command commands[3];
   GDataOutputStream *command;
   int n_commands;
 
   n_commands = 0;
   
-  command = commands[n_commands++] =
+  commands[n_commands].connection = &op_backend->command_connection;
+  command = commands[n_commands++].cmd =
     new_command_stream (op_backend,
                         SSH_FXP_LSTAT);
   put_string (command, filename);
   
   if (! (job->flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS))
     {
-      command = commands[n_commands++] =
+      commands[n_commands].connection = &op_backend->command_connection;
+      command = commands[n_commands++].cmd =
         new_command_stream (op_backend,
                             SSH_FXP_STAT);
       put_string (command, filename);
@@ -4464,14 +4471,14 @@ try_query_info (GVfsBackend *backend,
   if (g_file_attribute_matcher_matches (job->attribute_matcher,
                                         G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET))
     {
-      command = commands[n_commands++] =
+      commands[n_commands].connection = &op_backend->command_connection;
+      command = commands[n_commands++].cmd =
         new_command_stream (op_backend,
                             SSH_FXP_READLINK);
       put_string (command, filename);
     }
 
-  queue_command_streams_and_free (&op_backend->command_connection,
-                                  commands, n_commands,
+  queue_command_streams_and_free (commands, n_commands,
                                   query_info_reply,
                                   G_VFS_JOB (job), NULL);
   
@@ -4819,20 +4826,21 @@ try_move (GVfsBackend *backend,
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
-  GDataOutputStream *commands[2];
+  Command commands[2];
 
-  command = commands[0] =
+  commands[0].connection = &op_backend->command_connection;
+  command = commands[0].cmd =
     new_command_stream (op_backend,
                         SSH_FXP_LSTAT);
   put_string (command, source);
 
-  command = commands[1] =
+  commands[1].connection = &op_backend->command_connection;
+  command = commands[1].cmd =
     new_command_stream (op_backend,
                         SSH_FXP_LSTAT);
   put_string (command, destination);
 
-  queue_command_streams_and_free (&op_backend->command_connection,
-                                  commands, 2,
+  queue_command_streams_and_free (commands, 2,
                                   move_lstat_reply,
                                   G_VFS_JOB (job), NULL);
   
@@ -6405,7 +6413,7 @@ try_pull (GVfsBackend *backend,
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   SftpPullHandle *handle;
-  GDataOutputStream *commands[2];
+  Command commands[2];
 
   handle = g_slice_new0 (SftpPullHandle);
   handle->backend = g_object_ref (op_backend);
@@ -6415,17 +6423,18 @@ try_pull (GVfsBackend *backend,
   handle->size = PULL_SIZE_INVALID;
   handle->max_req = 1;
 
-  commands[0] = new_command_stream (op_backend,
-                                    flags & G_FILE_COPY_NOFOLLOW_SYMLINKS ? SSH_FXP_LSTAT : SSH_FXP_STAT);
-  put_string (commands[0], source);
+  commands[0].connection = &op_backend->command_connection;
+  commands[0].cmd = new_command_stream (op_backend,
+                                        flags & G_FILE_COPY_NOFOLLOW_SYMLINKS ? SSH_FXP_LSTAT : SSH_FXP_STAT);
+  put_string (commands[0].cmd, source);
 
-  commands[1] = new_command_stream (op_backend, SSH_FXP_OPEN);
-  put_string (commands[1], source);
-  g_data_output_stream_put_uint32 (commands[1], SSH_FXF_READ, NULL, NULL);
-  g_data_output_stream_put_uint32 (commands[1], 0, NULL, NULL);
+  commands[1].connection = &op_backend->command_connection;
+  commands[1].cmd = new_command_stream (op_backend, SSH_FXP_OPEN);
+  put_string (commands[1].cmd, source);
+  g_data_output_stream_put_uint32 (commands[1].cmd, SSH_FXF_READ, NULL, NULL);
+  g_data_output_stream_put_uint32 (commands[1].cmd, 0, NULL, NULL);
 
-  queue_command_streams_and_free (&op_backend->command_connection,
-                                  commands, 2,
+  queue_command_streams_and_free (commands, 2,
                                   pull_open_reply,
                                   G_VFS_JOB(job),
                                   handle);
