@@ -5973,7 +5973,7 @@ sftp_pull_handle_free (SftpPullHandle *handle)
         {
           GDataOutputStream *command = new_command_stream (handle->backend, SSH_FXP_CLOSE);
           put_data_buffer (command, handle->raw_handle);
-          queue_command_stream_and_free (&handle->backend->command_connection, command,
+          queue_command_stream_and_free (&handle->backend->data_connection, command,
                                          NULL,
                                          handle->job, NULL);
           data_buffer_free (handle->raw_handle);
@@ -6251,7 +6251,7 @@ pull_enqueue_request (SftpPullHandle *handle, guint64 offset, guint32 len)
   put_data_buffer (command, handle->raw_handle);
   g_data_output_stream_put_uint64 (command, offset, NULL, NULL);
   g_data_output_stream_put_uint32 (command, len, NULL, NULL);
-  queue_command_stream_and_free (&handle->backend->command_connection, command,
+  queue_command_stream_and_free (&handle->backend->data_connection, command,
                                  pull_read_reply,
                                  handle->job, request);
 
@@ -6317,7 +6317,7 @@ pull_dest_open_cb (GObject *source, GAsyncResult *res, gpointer user_data)
       GDataOutputStream *command = new_command_stream (handle->backend,
                                                        SSH_FXP_FSTAT);
       put_data_buffer (command, handle->raw_handle);
-      queue_command_stream_and_free (&handle->backend->command_connection,
+      queue_command_stream_and_free (&handle->backend->data_connection,
                                      command,
                                      pull_fstat_reply,
                                      handle->job,
@@ -6415,6 +6415,14 @@ try_pull (GVfsBackend *backend,
   SftpPullHandle *handle;
   Command commands[2];
 
+  if (!connection_is_usable (&op_backend->data_connection))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                        _("Not supported"));
+      return TRUE;
+    }
+
   handle = g_slice_new0 (SftpPullHandle);
   handle->backend = g_object_ref (op_backend);
   handle->op_job = g_object_ref (job);
@@ -6428,7 +6436,7 @@ try_pull (GVfsBackend *backend,
                                         flags & G_FILE_COPY_NOFOLLOW_SYMLINKS ? SSH_FXP_LSTAT : SSH_FXP_STAT);
   put_string (commands[0].cmd, source);
 
-  commands[1].connection = &op_backend->command_connection;
+  commands[1].connection = &op_backend->data_connection;
   commands[1].cmd = new_command_stream (op_backend, SSH_FXP_OPEN);
   put_string (commands[1].cmd, source);
   g_data_output_stream_put_uint32 (commands[1].cmd, SSH_FXF_READ, NULL, NULL);
