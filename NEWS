@@ -1,3 +1,11 @@
+Major changes in 1.25.2
+=======================
+* gvfs-open: Do not alter uris before use
+* mtp: Refresh storage information in query_info
+* dav: Emit progress callbacks when copying and moving
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.25.1
 =======================
 * dav: Verify TLS certificates
