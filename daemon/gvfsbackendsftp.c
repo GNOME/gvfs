@@ -203,6 +203,7 @@ struct _GVfsBackendSftp
   guint32 current_id;
 
   Connection command_connection;
+  Connection data_connection;
 
   GMountSource *mount_source; /* Only used/set during mount */
   int mount_try;
@@ -292,6 +293,7 @@ g_vfs_backend_sftp_finalize (GObject *object)
 
   backend = G_VFS_BACKEND_SFTP (object);
   destroy_connection (&backend->command_connection);
+  destroy_connection (&backend->data_connection);
 
   if (G_OBJECT_CLASS (g_vfs_backend_sftp_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_sftp_parent_class)->finalize) (object);
@@ -311,6 +313,10 @@ g_vfs_backend_sftp_init (GVfsBackendSftp *backend)
                                                                         NULL,
                                                                         NULL,
                                                                         (GDestroyNotify)expected_reply_free);
+  backend->data_connection.expected_replies = g_hash_table_new_full (NULL,
+                                                                     NULL,
+                                                                     NULL,
+                                                                     (GDestroyNotify)expected_reply_free);
 }
 
 static void
@@ -1297,6 +1303,7 @@ static void
 fail_jobs_and_unmount (GVfsBackendSftp *backend, GError *error)
 {
   fail_jobs (&backend->command_connection, error);
+  fail_jobs (&backend->data_connection, error);
 
   g_error_free (error);
 
@@ -1968,6 +1975,9 @@ try_unmount (GVfsBackend *backend,
   if (op_backend->command_connection.reply_stream &&
       op_backend->command_connection.reply_stream_cancellable)
     g_cancellable_cancel (op_backend->command_connection.reply_stream_cancellable);
+  if (op_backend->data_connection.reply_stream &&
+      op_backend->data_connection.reply_stream_cancellable)
+    g_cancellable_cancel (op_backend->data_connection.reply_stream_cancellable);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   return TRUE;
