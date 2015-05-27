@@ -40,8 +40,7 @@ libgvfscommon_la_CFLAGS = 	\
 libgvfscommon_la_LDFLAGS = -no-undefined -avoid-version
 
 libgvfscommon_la_LIBADD =	\
-	$(GLIB_LIBS)		\
-	$(BLURAY_LIBS)
+	$(GLIB_LIBS)
 
 if USE_HAL
 noinst_LTLIBRARIES += libgvfscommon-hal.la
