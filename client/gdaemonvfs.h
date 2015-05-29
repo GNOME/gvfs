@@ -28,7 +28,6 @@
 #include "gmounttracker.h"
 #include "gvfsuriutils.h"
 #include <metatree.h>
-#include <metadata-dbus.h>
 
 G_BEGIN_DECLS
 
@@ -76,11 +75,6 @@ int             _g_daemon_vfs_append_metadata_for_set  (GVariantBuilder *builder
 							const char *attribute,
 							GFileAttributeType type,
 							gpointer   value);
-
-GVfsMetadata *  _g_daemon_vfs_get_metadata_proxy       (GCancellable             *cancellable,
-                                                        GError                  **error);
-
-
 
 G_END_DECLS
 

@@ -2666,9 +2666,14 @@ set_metadata_attribute (GFile *file,
     }
 
   res = FALSE;
-  proxy = _g_daemon_vfs_get_metadata_proxy (cancellable, error);
-
-  if (proxy)
+  proxy = meta_tree_get_metadata_proxy ();
+  if (proxy == NULL)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                   _("Error setting file metadata: %s"),
+                   _("can't get metadata proxy"));
+    }
+  else
     {
       builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
 

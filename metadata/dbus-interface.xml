@@ -40,6 +40,11 @@
       <arg type='ay' name='path' direction='in'/>
       <arg type='ay' name='dest_path' direction='in'/>
     </method>
+    <method name="GetTreeFromDevice">
+      <arg type='u' name='major' direction='in'/>
+      <arg type='u' name='minor' direction='in'/>
+      <arg type='s' name='tree' direction='out'/>
+    </method>
 
   </interface>
 </node>

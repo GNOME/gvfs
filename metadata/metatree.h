@@ -24,6 +24,7 @@
 #define __META_TREE_H__
 
 #include <glib.h>
+#include "metadata-dbus.h"
 
 typedef struct _MetaTree MetaTree;
 typedef struct _MetaLookupCache MetaLookupCache;
@@ -104,4 +105,7 @@ gboolean    meta_tree_remove           (MetaTree                         *tree,
 gboolean    meta_tree_copy             (MetaTree                         *tree,
 					const char                       *src,
 					const char                       *dest);
+
+GVfsMetadata *meta_tree_get_metadata_proxy (void);
+
 #endif /* __META_TREE_H__ */

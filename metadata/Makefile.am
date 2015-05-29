@@ -32,7 +32,6 @@ libexec_PROGRAMS =\
 
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/common \
 	$(LIBXML_CFLAGS) $(GLIB_CFLAGS) \
-	$(UDEV_CFLAGS) \
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"     \
 	-DG_LOG_DOMAIN=\"GVFS\" \
 	-DDBUS_API_SUBJECT_TO_CHANGE
@@ -44,7 +43,7 @@ libmetadata_la_SOURCES = 		\
 	$(dbus_built_sources)		\
 	$(NULL)
 
-libmetadata_la_LIBADD = $(GLIB_LIBS) $(UDEV_LIBS)
+libmetadata_la_LIBADD = $(GLIB_LIBS)
 
 meta_ls_LDADD = libmetadata.la ../common/libgvfscommon.la
 meta_ls_SOURCES = meta-ls.c
@@ -61,8 +60,9 @@ meta_get_tree_SOURCES = meta-get-tree.c
 convert_nautilus_metadata_LDADD = libmetadata.la $(LIBXML_LIBS)
 convert_nautilus_metadata_SOURCES = metadata-nautilus.c
 
-gvfsd_metadata_LDADD = libmetadata.la ../common/libgvfscommon.la
+gvfsd_metadata_LDADD = libmetadata.la ../common/libgvfscommon.la $(UDEV_LIBS)
 gvfsd_metadata_SOURCES = meta-daemon.c
+gvfsd_metadata_CFLAFGS = $(UDEV_CFLAGS)
 
 # D-BUS service file
 %.service: %.service.in ../config.log

@@ -31,6 +31,11 @@
 #include "gvfsdaemonprotocol.h"
 #include "metadata-dbus.h"
 
+#ifdef HAVE_LIBUDEV
+#define LIBUDEV_I_KNOW_THE_API_IS_SUBJECT_TO_CHANGE
+#include <libudev.h>
+#endif
+
 #define WRITEOUT_TIMEOUT_SECS 60
 #define WRITEOUT_TIMEOUT_SECS_NFS 15
 
@@ -290,6 +295,48 @@ handle_move (GVfsMetadata *object,
   return TRUE;
 }
 
+static gboolean
+handle_get_tree_from_device (GVfsMetadata *object,
+                             GDBusMethodInvocation *invocation,
+                             guint arg_major,
+                             guint arg_minor)
+{
+  char *res = NULL;
+
+#ifdef HAVE_LIBUDEV
+  dev_t devnum = makedev (arg_major, arg_minor);
+  struct udev_device *dev;
+  const char *uuid, *label;
+  static struct udev *udev;
+
+  if (udev == NULL)
+    udev = udev_new ();
+
+  dev = udev_device_new_from_devnum (udev, 'b', devnum);
+  uuid = udev_device_get_property_value (dev, "ID_FS_UUID_ENC");
+
+  res = NULL;
+  if (uuid)
+    {
+      res = g_strconcat ("uuid-", uuid, NULL);
+    }
+  else
+    {
+      label = udev_device_get_property_value (dev, "ID_FS_LABEL_ENC");
+
+      if (label)
+        res = g_strconcat ("label-", label, NULL);
+    }
+
+  udev_device_unref (dev);
+#endif
+
+  gvfs_metadata_complete_get_tree_from_device (object, invocation, res ? res : "");
+  g_free (res);
+
+  return TRUE;
+}
+
 static void
 on_name_lost (GDBusConnection *connection,
               const gchar     *name,
@@ -400,6 +447,7 @@ main (int argc, char *argv[])
   g_signal_connect (skeleton, "handle-set", G_CALLBACK (handle_set), skeleton);
   g_signal_connect (skeleton, "handle-remove", G_CALLBACK (handle_remove), skeleton);
   g_signal_connect (skeleton, "handle-move", G_CALLBACK (handle_move), skeleton);
+  g_signal_connect (skeleton, "handle-get-tree-from-device", G_CALLBACK (handle_get_tree_from_device), skeleton);
 
   error = NULL;
   if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (skeleton), conn,

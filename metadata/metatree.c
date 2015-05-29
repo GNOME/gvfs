@@ -15,11 +15,8 @@
 #include <glib/gstdio.h>
 #include "gvfsutils.h"
 #include "crc32.h"
-
-#ifdef HAVE_LIBUDEV
-#define LIBUDEV_I_KNOW_THE_API_IS_SUBJECT_TO_CHANGE
-#include <libudev.h>
-#endif
+#include "metadata-dbus.h"
+#include "gvfsdaemonprotocol.h"
 
 #define MAGIC "\xda\x1ameta"
 #define MAGIC_LEN 6
@@ -162,6 +159,34 @@ static MetaJournal *meta_journal_open          (MetaTree    *tree,
 						guint32      tag);
 static void         meta_journal_free          (MetaJournal *journal);
 static void         meta_journal_validate_more (MetaJournal *journal);
+
+GVfsMetadata *
+meta_tree_get_metadata_proxy ()
+{
+  static GVfsMetadata *proxy = NULL;
+  static volatile gsize initialized = 0;
+
+  if (g_once_init_enter (&initialized))
+    {
+      GError *error = NULL;
+
+      proxy = gvfs_metadata_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                                    G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+                                                    G_VFS_DBUS_METADATA_NAME,
+                                                    G_VFS_DBUS_METADATA_PATH,
+                                                    NULL,
+                                                    &error);
+      if (error)
+        {
+          g_warning ("Error: %s\n", error->message);
+          g_error_free (error);
+        }
+
+      g_once_init_leave (&initialized, 1);
+    }
+
+  return proxy;
+}
 
 static gpointer
 verify_block_pointer (MetaTree *tree, guint32 pos, guint32 len)
@@ -2811,63 +2836,41 @@ struct _MetaLookupCache {
   char *last_device_tree;
 };
 
-#ifdef HAVE_LIBUDEV
-
-static struct udev *udev;
-G_LOCK_DEFINE_STATIC (udev);
-
-static char *
-get_tree_from_udev (MetaLookupCache *cache,
-		    dev_t devnum)
-{
-  struct udev_device *dev;
-  const char *uuid, *label;
-  char *res;
-
-  G_LOCK (udev);
-
-  if (udev == NULL)
-    udev = udev_new ();
-
-  dev = udev_device_new_from_devnum (udev, 'b', devnum);
-  uuid = udev_device_get_property_value (dev, "ID_FS_UUID_ENC");
-
-  res = NULL;
-  if (uuid)
-    {
-      res = g_strconcat ("uuid-", uuid, NULL);
-    }
-  else
-    {
-      label = udev_device_get_property_value (dev, "ID_FS_LABEL_ENC");
-
-      if (label)
-	res = g_strconcat ("label-", label, NULL);
-    }
-
-  udev_device_unref (dev);
-
-  G_UNLOCK (udev);
-
-  return res;
-}
-#endif
 
 static const char *
 get_tree_for_device (MetaLookupCache *cache,
 		     dev_t device)
 {
-#ifdef HAVE_LIBUDEV
+  gchar *res = NULL;
+
   if (device != cache->last_device)
     {
+      GError *error = NULL;
+      GVfsMetadata *metadata_proxy;
+
+      metadata_proxy = meta_tree_get_metadata_proxy ();
+      if (metadata_proxy != NULL)
+        gvfs_metadata_call_get_tree_from_device_sync (metadata_proxy,
+                                                      major (device),
+                                                      minor (device),
+                                                      &res,
+                                                      NULL,
+                                                      &error);
+
+      if (error)
+        {
+          g_warning ("Error: %s\n", error->message);
+          g_error_free (error);
+        }
+
+      if (res && res[0] == '\0')
+        g_clear_pointer (&res, g_free);
       cache->last_device = device;
       g_free (cache->last_device_tree);
-      cache->last_device_tree = get_tree_from_udev (cache, device);
+      cache->last_device_tree = res;
     }
 
   return cache->last_device_tree;
-#endif
-  return NULL;
 }
 
 

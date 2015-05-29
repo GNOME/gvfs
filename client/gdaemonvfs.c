@@ -76,9 +76,6 @@ G_DEFINE_DYNAMIC_TYPE (GDaemonVfs, g_daemon_vfs, G_TYPE_VFS)
 
 static GDaemonVfs *the_vfs = NULL;
 
-G_LOCK_DEFINE_STATIC (metadata_proxy);
-static GVfsMetadata *metadata_proxy = NULL;
-
 G_LOCK_DEFINE_STATIC(mount_cache);
 
 
@@ -1204,31 +1201,6 @@ _g_daemon_vfs_append_metadata_for_set (GVariantBuilder *builder,
   return res;
 }
 
-GVfsMetadata *
-_g_daemon_vfs_get_metadata_proxy (GCancellable *cancellable, GError **error)
-{
-  GVfsMetadata *proxy;
-
-  G_LOCK (metadata_proxy);
-
-  proxy = NULL;
-  if (metadata_proxy == NULL)
-    {
-      metadata_proxy = gvfs_metadata_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
-                                                             G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
-                                                             G_VFS_DBUS_METADATA_NAME,
-                                                             G_VFS_DBUS_METADATA_PATH,
-                                                             cancellable,
-                                                             error);
-    }
-
-  proxy = metadata_proxy;
-
-  G_UNLOCK (metadata_proxy);
-
-  return proxy;
-}
-
 static gboolean
 g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
 					const char *filename,
@@ -1290,9 +1262,12 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
             }
           else
             {
-	      proxy = _g_daemon_vfs_get_metadata_proxy (NULL, error);
+	      proxy = meta_tree_get_metadata_proxy ();
 	      if (proxy == NULL)
 		{
+		  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			       _("Error setting file metadata: %s"),
+			       _("can't get metadata proxy"));
 		  res = FALSE;
 		  error = NULL; /* Don't set further errors */
 		}
@@ -1382,7 +1357,7 @@ g_daemon_vfs_local_file_removed (GVfs       *vfs,
 					&tree_path);
   if (tree)
     {
-      proxy = _g_daemon_vfs_get_metadata_proxy (NULL, NULL);
+      proxy = meta_tree_get_metadata_proxy ();
       if (proxy)
         {
           metatreefile = meta_tree_get_filename (tree);
@@ -1429,7 +1404,7 @@ g_daemon_vfs_local_file_moved (GVfs       *vfs,
 					 &tree_path2);
   if (tree1 && tree2 && tree1 == tree2)
     {
-      proxy = _g_daemon_vfs_get_metadata_proxy (NULL, NULL);
+      proxy = meta_tree_get_metadata_proxy ();
       if (proxy)
         {
           metatreefile = meta_tree_get_filename (tree1);

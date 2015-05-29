@@ -4,11 +4,11 @@
 
 /*static gboolean recursive = FALSE;*/
 static gboolean verbose = FALSE;
-static gboolean pause = FALSE;
+static gboolean do_pause = FALSE;
 static GOptionEntry entries[] =
 {
   { "verbose", 'l', 0, G_OPTION_ARG_NONE, &verbose, "Verbose", NULL },
-  { "pause", 'p', 0, G_OPTION_ARG_NONE, &pause, "Pause", NULL },
+  { "pause", 'p', 0, G_OPTION_ARG_NONE, &do_pause, "Pause", NULL },
   { NULL }
 };
 
@@ -51,7 +51,7 @@ main (int argc,
       else
 	g_print ("tree lookup failed\n");
 
-      if (pause)
+      if (do_pause)
 	{
 	  char buffer[1000];
 	  g_print ("Pausing, press enter\n");
