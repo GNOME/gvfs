@@ -814,8 +814,6 @@ gvfs_udisks2_unmount_notify_stop (GMountOperation *op)
 
   if (data->op_aborted)
     return;
-  if (!data->unmount_fired)
-    return;
 
   name = unmount_notify_get_name (data);
   format = data->generic_text ?
