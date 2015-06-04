@@ -98,7 +98,7 @@ g_vfs_list_monitor_implementations (void)
   dir = g_dir_open (monitors_dir, 0, &error);
   if (dir == NULL)
     {
-      g_warning ("cannot open directory %s: %s", monitors_dir, error->message);
+      g_debug ("cannot open directory %s: %s", monitors_dir, error->message);
       g_error_free (error);
     }
   else

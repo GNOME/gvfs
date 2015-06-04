@@ -607,12 +607,8 @@ fill_mountable_info (GDaemonVfs *vfs)
                                                               NULL,
                                                               &error))
     {
-      /* Don't warn if we're running a new gvfs plugin against an old gvfs-daemon,
-       * as happens in jhbuild.
-       */
-      if (!g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
-	g_printerr ("org.gtk.vfs.MountTracker.listMountableInfo call failed: %s (%s, %d)\n",
-		    error->message, g_quark_to_string (error->domain), error->code);
+      g_debug ("org.gtk.vfs.MountTracker.listMountableInfo call failed: %s (%s, %d)\n",
+               error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
       g_object_unref (proxy);
       return;
@@ -1454,7 +1450,7 @@ static gboolean
 g_daemon_vfs_is_active (GVfs *vfs)
 {
   GDaemonVfs *daemon_vfs = G_DAEMON_VFS (vfs);
-  return daemon_vfs->async_bus != NULL;
+  return (daemon_vfs->async_bus != NULL) && (daemon_vfs->supported_uri_schemes != NULL);
 }
 
 static void
