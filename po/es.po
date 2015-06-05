@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-05-27 22:04+0000\n"
-"PO-Revision-Date: 2015-05-28 \n"
+"POT-Creation-Date: 2015-06-04 22:06+0000\n"
+"PO-Revision-Date: 2015-06-05 \n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español; Castellano <gnome-es-list@gnome.org>\n"
 "Language: \n"
@@ -22,13 +22,13 @@ msgstr ""
 "X-Generator: Gtranslator 2.91.6\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../client/gdaemonfile.c:467 ../client/gdaemonfile.c:2858
+#: ../client/gdaemonfile.c:467 ../client/gdaemonfile.c:2863
 msgid "Operation not supported, files on different mounts"
 msgstr ""
 "La operación no está soportada, los archivos están en diferentes puntos de "
 "montaje"
 
-#: ../client/gdaemonfile.c:1093 ../client/gdaemonfile.c:3217
+#: ../client/gdaemonfile.c:1093 ../client/gdaemonfile.c:3222
 #: ../client/gvfsiconloadable.c:301 ../daemon/gvfsjobopenforread.c:183
 #: ../daemon/gvfsjobopenforwrite.c:326
 msgid "Couldn't get stream file descriptor"
@@ -46,7 +46,7 @@ msgstr "%s devolvió un valor no válido"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:2317 ../client/gdaemonfile.c:3533
+#: ../client/gdaemonfile.c:2317 ../client/gdaemonfile.c:3538
 msgid "Could not find enclosing mount"
 msgstr "No se pudo encontrar el punto de montaje adjunto"
 
@@ -55,22 +55,28 @@ msgstr "No se pudo encontrar el punto de montaje adjunto"
 msgid "Invalid filename %s"
 msgstr "Nombre de archivo no válido %s"
 
-#: ../client/gdaemonfile.c:2663 ../client/gdaemonfile.c:2690
-#: ../client/gdaemonvfs.c:1265 ../client/gdaemonvfs.c:1286
-#: ../client/gdaemonvfs.c:1326
+#: ../client/gdaemonfile.c:2663 ../client/gdaemonfile.c:2673
+#: ../client/gdaemonfile.c:2695 ../client/gdaemonvfs.c:1237
+#: ../client/gdaemonvfs.c:1258 ../client/gdaemonvfs.c:1269
+#: ../client/gdaemonvfs.c:1301
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Error al establecer los metadatos del archivo: %s"
 
-#: ../client/gdaemonfile.c:2664 ../client/gdaemonvfs.c:1287
+#: ../client/gdaemonfile.c:2664 ../client/gdaemonvfs.c:1259
 msgid "can't open metadata tree"
 msgstr "no se puede abrir el árbol de metadatos"
 
-#: ../client/gdaemonfile.c:2691 ../client/gdaemonvfs.c:1327
+#: ../client/gdaemonfile.c:2674 ../client/gdaemonvfs.c:1270
+#| msgid "can't open metadata tree"
+msgid "can't get metadata proxy"
+msgstr "no se puediron obtener los metadatos del proxy"
+
+#: ../client/gdaemonfile.c:2696 ../client/gdaemonvfs.c:1302
 msgid "values must be string or list of strings"
 msgstr "los valores deben ser cadenas o listas de cadenas"
 
-#: ../client/gdaemonfile.c:2850
+#: ../client/gdaemonfile.c:2855
 msgid "Operation not supported"
 msgstr "Operación no soportada"
 
@@ -127,7 +133,7 @@ msgstr "No se permite buscar en el flujo"
 msgid "Truncate not supported on stream"
 msgstr "No se permite truncar en el flujo"
 
-#: ../client/gdaemonvfs.c:789
+#: ../client/gdaemonvfs.c:786
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Error al obtener la información de montaje: %s"
@@ -1590,12 +1596,6 @@ msgstr ""
 
 #: ../daemon/gvfsbackendsftp.c:1231
 #, c-format
-#| msgid ""
-#| "Can't verify the identity of “%s”.\n"
-#| "This happens when you log in to a computer the first time.\n"
-#| "\n"
-#| "The identity sent by the remote computer is “%s”. If you want to be "
-#| "absolutely sure it is safe to continue, contact the system administrator."
 msgid ""
 "The host key for “%s” differs from the key for the IP address “%s”\n"
 "If you want to be absolutely sure it is safe to continue, contact the system "
@@ -1907,7 +1907,7 @@ msgstr ""
 "Desmontando %s\n"
 "Espere"
 
-#: ../daemon/main.c:148 ../metadata/meta-daemon.c:330
+#: ../daemon/main.c:148 ../metadata/meta-daemon.c:377
 msgid "Replace old daemon."
 msgstr "Reemplace el demonio antiguo."
 
@@ -1915,7 +1915,7 @@ msgstr "Reemplace el demonio antiguo."
 msgid "Don't start fuse."
 msgstr "No iniciar fuse."
 
-#: ../daemon/main.c:150 ../metadata/meta-daemon.c:331
+#: ../daemon/main.c:150 ../metadata/meta-daemon.c:378
 msgid "Show program version."
 msgstr "Mostrar la versión del programa."
 
@@ -1929,12 +1929,12 @@ msgstr "Demonio principal para GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:183 ../metadata/meta-daemon.c:357
+#: ../daemon/main.c:183 ../metadata/meta-daemon.c:404
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:185 ../metadata/meta-daemon.c:359
+#: ../daemon/main.c:185 ../metadata/meta-daemon.c:406
 #: ../programs/gvfs-cat.c:170 ../programs/gvfs-cat.c:188
 #: ../programs/gvfs-copy.c:146 ../programs/gvfs-info.c:398
 #: ../programs/gvfs-ls.c:430 ../programs/gvfs-mime.c:97
@@ -1971,33 +1971,33 @@ msgstr "La ubicación ya está montada"
 msgid "Location is not mountable"
 msgstr "La ubicación no es montable"
 
-#: ../metadata/meta-daemon.c:157 ../metadata/meta-daemon.c:233
-#: ../metadata/meta-daemon.c:269
+#: ../metadata/meta-daemon.c:162 ../metadata/meta-daemon.c:238
+#: ../metadata/meta-daemon.c:274
 #, c-format
 msgid "Can't find metadata file %s"
 msgstr "No se puede encontrar el archivo de metadatos %s"
 
-#: ../metadata/meta-daemon.c:175 ../metadata/meta-daemon.c:187
+#: ../metadata/meta-daemon.c:180 ../metadata/meta-daemon.c:192
 msgid "Unable to set metadata key"
 msgstr "No se puede establecer la clave de metadatos"
 
-#: ../metadata/meta-daemon.c:197
+#: ../metadata/meta-daemon.c:202
 msgid "Unable to unset metadata key"
 msgstr "No se puede desestablecer la clave de metadatos"
 
-#: ../metadata/meta-daemon.c:243
+#: ../metadata/meta-daemon.c:248
 msgid "Unable to remove metadata keys"
 msgstr "No se pueden quitar las claves de metadatos"
 
-#: ../metadata/meta-daemon.c:280
+#: ../metadata/meta-daemon.c:285
 msgid "Unable to move metadata keys"
 msgstr "No se pueden mover las claves de metadatos"
 
-#: ../metadata/meta-daemon.c:341
+#: ../metadata/meta-daemon.c:388
 msgid "GVFS Metadata Daemon"
 msgstr "Demonio de metadatos de GVFS"
 
-#: ../metadata/meta-daemon.c:344
+#: ../metadata/meta-daemon.c:391
 msgid "Metadata daemon for GVFS"
 msgstr "Demonio de metadatos para GVFS"
 
