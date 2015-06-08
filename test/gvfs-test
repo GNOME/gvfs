@@ -148,7 +148,7 @@ class GvfsTestCase(unittest.TestCase):
         '''
         assert in_testbed, 'root_command() only works under gvfs-testbed'
 
-        rootsh = subprocess.Popen(['./rootsh'], stdin=subprocess.PIPE,
+        rootsh = subprocess.Popen(['./rootsh', '-p'], stdin=subprocess.PIPE,
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # set reasonable path that includes /sbin
         rootsh.stdin.write(b'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n')
@@ -1244,14 +1244,14 @@ class Drive(GvfsTestCase):
         self.load_image('bogus-cd.iso.bz2')
 
         def cleanup():
-            rootsh = subprocess.Popen(['./rootsh'], stdin=subprocess.PIPE)
+            rootsh = subprocess.Popen(['./rootsh', '-p'], stdin=subprocess.PIPE)
             rootsh.communicate(b'''rm /run/udev/rules.d/40-scsi_debug-fake-mediaplayer.rules
 pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
 ''')
 
         # create udev rule to turn it into a music player
         self.addCleanup(cleanup)
-        rootsh = subprocess.Popen(['./rootsh'], stdin=subprocess.PIPE)
+        rootsh = subprocess.Popen(['./rootsh', '-p'], stdin=subprocess.PIPE)
         rootsh.communicate(b'''export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 mkdir -p /run/udev/rules.d
 echo 'SUBSYSTEM=="block", ATTRS{model}=="scsi_debug*", ENV{ID_MEDIA_PLAYER}="MockTune"' > /run/udev/rules.d/40-scsi_debug-fake-mediaplayer.rules
@@ -1311,7 +1311,7 @@ pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
         '''Start mock polkit with list of allowed actions.'''
 
         self.stop_polkit()
-        self.mock_polkit = subprocess.Popen(['./rootsh'],
+        self.mock_polkit = subprocess.Popen(['./rootsh', '-p'],
                                             stdin=subprocess.PIPE)
         self.mock_polkit.stdin.write(('set -e\n/home/test_polkitd.py -r -a %s\n'
                                       % ','.join(actions)).encode('ASCII'))
