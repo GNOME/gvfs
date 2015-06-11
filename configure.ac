@@ -74,7 +74,17 @@ AC_SUBST(DBUS_SERVICE_DIR)
 giomodulesdir=$libdir/gio/modules
 AC_SUBST(giomodulesdir)
 
-PKG_CHECK_MODULES(GCR, gcr-base-3)
+dnl *********************
+dnl *** Check for gcr ***
+dnl *********************
+
+AC_ARG_ENABLE(gcr, AS_HELP_STRING([--disable-gcr],[build without gcr]))
+msg_gcr=no
+
+if test "x$enable_gcr" != "xno"; then
+  PKG_CHECK_MODULES(GCR, gcr-base-3, msg_gcr=yes)
+  AC_DEFINE(HAVE_GCR, 1, [Define to 1 if gcr is available])
+fi
 
 dnl ****************************
 dnl *** Checks for intltool  ***
@@ -946,6 +956,7 @@ echo "
 	Build udisks2 volume monitor: $msg_udisks2
 	Build GOA volume monitor:     $msg_goa
         Use libsystemd-login:         $msg_libsystemd_login
+        Use GCR:                      $msg_gcr
 	GNOME Keyring support:        $msg_keyring
 	GTK+ support:                 $msg_gtk
 	Bash-completion support:      $msg_bash_completion

@@ -35,6 +35,10 @@
 #include <glib/gi18n.h>
 
 #include <gio/gio.h>
+#ifdef HAVE_GCR
+#define GCR_API_SUBJECT_TO_CHANGE
+#include <gcr/gcr-base.h>
+#endif
 #include "gvfsdaemonutils.h"
 #include "gvfsdaemonprotocol.h"
 
@@ -238,6 +242,7 @@ gvfs_seek_type_to_lseek (GSeekType type)
     }
 }
 
+#ifdef HAVE_GCR
 /* Convert GTlsCertificateFlags into a message to display to the user. */
 static char *
 certificate_flags_to_string (GTlsCertificateFlags errors)
@@ -350,3 +355,12 @@ gvfs_accept_certificate (GMountSource *mount_source,
 
   return FALSE;
 }
+#else
+gboolean
+gvfs_accept_certificate (GMountSource *mount_source,
+                         GTlsCertificate *certificate,
+                         GTlsCertificateFlags errors)
+{
+  return FALSE;
+}
+#endif

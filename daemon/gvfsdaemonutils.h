@@ -25,8 +25,6 @@
 
 #include <glib-object.h>
 #include <gmountsource.h>
-#define GCR_API_SUBJECT_TO_CHANGE
-#include <gcr/gcr-base.h>
 
 G_BEGIN_DECLS
 
