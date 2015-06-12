@@ -92,8 +92,8 @@ get_bus_name_and_path_from_uri (char *uri,
     if (*p == '.')
       *p = '/';
 
-  *bus_name_out = g_steal_pointer (&bus_name);
-  *object_path_out = g_steal_pointer (&object_path);
+  *bus_name_out = bus_name;
+  *object_path_out = object_path;
   got_name = TRUE;
 
 out:
