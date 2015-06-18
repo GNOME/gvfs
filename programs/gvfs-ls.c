@@ -271,7 +271,7 @@ show_completed_file (GFile *hit,
   GFile *cwd_f;
   GFile *home;
 
-  if (g_file_is_native (hit))
+  if (g_file_is_native (hit) && !g_str_has_prefix (arg, "file://"))
     {
       cwd = g_get_current_dir ();
       cwd_f = g_file_new_for_path (cwd);
