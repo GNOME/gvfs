@@ -527,6 +527,7 @@ typedef struct
 {
   volatile gint ref_count;
   GSimpleAsyncResult *simple;
+  gboolean in_progress;
   gboolean completed;
 
   GVfsUDisks2Mount *mount;
@@ -541,6 +542,10 @@ typedef struct
 
   gulong mount_op_reply_handler_id;
   guint retry_unmount_timer_id;
+
+  GMountOperationResult reply_result;
+  gint reply_choice;
+  gboolean reply_set;
 } UnmountData;
 
 static UnmountData *
@@ -603,6 +608,7 @@ unmount_data_complete (UnmountData *data,
   else
     g_simple_async_result_complete (data->simple);
 
+  data->in_progress = FALSE;
   data->completed = TRUE;
   unmount_data_unref (data);
 }
@@ -620,11 +626,49 @@ on_retry_timer_cb (gpointer user_data)
   /* we're removing the timeout */
   data->retry_unmount_timer_id = 0;
 
+  if (data->completed || data->in_progress)
+    goto out;
+
   /* timeout expired => try again */
   unmount_do (data, FALSE);
 
  out:
   return FALSE; /* remove timeout */
+}
+
+static void
+mount_op_reply_handle (UnmountData *data)
+{
+  data->reply_set = FALSE;
+
+  if (data->reply_result == G_MOUNT_OPERATION_ABORTED ||
+      (data->reply_result == G_MOUNT_OPERATION_HANDLED &&
+       data->reply_choice == 1))
+    {
+      /* don't show an error dialog here */
+      g_simple_async_result_set_error (data->simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_FAILED_HANDLED,
+                                       "GMountOperation aborted (user should never see this "
+                                       "error since it is G_IO_ERROR_FAILED_HANDLED)");
+      unmount_data_complete (data, TRUE);
+    }
+  else if (data->reply_result == G_MOUNT_OPERATION_HANDLED)
+    {
+      /* user chose force unmount => try again with force_unmount==TRUE */
+      unmount_do (data, TRUE);
+    }
+  else
+    {
+      /* result == G_MOUNT_OPERATION_UNHANDLED => GMountOperation instance doesn't
+       * support :show-processes signal
+       */
+      g_simple_async_result_set_error (data->simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_BUSY,
+                                       _("One or more programs are preventing the unmount operation."));
+      unmount_data_complete (data, TRUE);
+    }
 }
 
 static void
@@ -642,34 +686,11 @@ on_mount_op_reply (GMountOperation       *mount_operation,
   data->mount_op_reply_handler_id = 0;
 
   choice = g_mount_operation_get_choice (mount_operation);
-
-  if (result == G_MOUNT_OPERATION_ABORTED ||
-      (result == G_MOUNT_OPERATION_HANDLED && choice == 1))
-    {
-      /* don't show an error dialog here */
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED_HANDLED,
-                                       "GMountOperation aborted (user should never see this "
-                                       "error since it is G_IO_ERROR_FAILED_HANDLED)");
-      unmount_data_complete (data, TRUE);
-    }
-  else if (result == G_MOUNT_OPERATION_HANDLED)
-    {
-      /* user chose force unmount => try again with force_unmount==TRUE */
-      unmount_do (data, TRUE);
-    }
-  else
-    {
-      /* result == G_MOUNT_OPERATION_UNHANDLED => GMountOperation instance doesn't
-       * support :show-processes signal
-       */
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_BUSY,
-                                       _("One or more programs are preventing the unmount operation."));
-      unmount_data_complete (data, TRUE);
-    }
+  data->reply_result = result;
+  data->reply_choice = choice;
+  data->reply_set = TRUE;
+  if (!data->completed || !data->in_progress)
+    mount_op_reply_handle (data);
 }
 
 static void
@@ -788,6 +809,17 @@ unmount_show_busy (UnmountData  *data,
                    const gchar  *mount_point)
 {
   gchar *escaped_mount_point;
+
+  data->in_progress = FALSE;
+
+  /* We received an reply during an unmount operation which could not complete.
+   * Handle the reply now. */
+  if (data->reply_set)
+    {
+      mount_op_reply_handle (data);
+      return;
+    }
+
   escaped_mount_point = g_strescape (mount_point, NULL);
   gvfs_udisks2_utils_spawn (10, /* timeout in seconds */
                             data->cancellable,
@@ -913,6 +945,8 @@ unmount_do (UnmountData *data,
             gboolean     force)
 {
   GVariantBuilder builder;
+
+  data->in_progress = TRUE;
 
   if (data->mount_operation != NULL)
     gvfs_udisks2_unmount_notify_start (data->mount_operation, 
