@@ -218,7 +218,7 @@ print_mounts (const char *prefix)
 	  uri = g_file_get_uri (mount_root);
 	  if (prefix == NULL ||
 	      g_str_has_prefix (uri, prefix))
-	    g_print ("%s\n", uri);
+	    g_print ("%s%s\n", uri, g_str_has_suffix (uri, "/") ? "" : "/");
 	  g_free (uri);
 	  g_object_unref (mount_root);
 	  g_object_unref (mount);
