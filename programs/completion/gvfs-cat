@@ -25,7 +25,8 @@
 
 __gvfs_multiple_uris() {
     local IFS=$'\n'
-    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local cur
+    _get_comp_words_by_ref -n : cur
 
     COMPREPLY=($(compgen -W '$(gvfs-ls --show-completions "$cur")' -- ""))
 
