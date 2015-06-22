@@ -1119,7 +1119,8 @@ luks_delete_passphrase_cb (GObject      *source,
   MountData *data = user_data;
   GError *error = NULL;
 
-  if (secret_password_clear_finish (result, &error))
+  secret_password_clear_finish (result, &error);
+  if (!error)
     {
       /* with the bad passphrase out of the way, try again */
       g_free (data->passphrase);
