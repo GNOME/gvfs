@@ -158,6 +158,7 @@ release_metadata (GVfsBackendCdda *cdda_backend)
   cdda_backend->tracks = NULL;
 }
 
+#if LIBCDIO_VERSION_NUM < 84
 static char *
 cdtext_string_to_utf8 (const char *string)
 {
@@ -167,6 +168,7 @@ cdtext_string_to_utf8 (const char *string)
   /* CD-text doesn't specify encoding. In case outside ascii, assume latin-1. */
   return g_convert (string, -1, "UTF-8", "ISO-8859-1", NULL, NULL, NULL);
 }
+#endif
 
 static void
 fetch_metadata (GVfsBackendCdda *cdda_backend)
@@ -187,9 +189,9 @@ fetch_metadata (GVfsBackendCdda *cdda_backend)
 
   if (cdtext) {
 #if LIBCDIO_VERSION_NUM >= 84
-    cdda_backend->album_title = cdtext_string_to_utf8 (cdtext_get_const (cdtext, CDTEXT_FIELD_TITLE, 0));
-    cdda_backend->album_artist = cdtext_string_to_utf8 (cdtext_get_const (cdtext, CDTEXT_FIELD_PERFORMER, 0));
-    cdda_backend->genre = cdtext_string_to_utf8 (cdtext_get_const (cdtext, CDTEXT_FIELD_GENRE, 0));
+    cdda_backend->album_title = g_strdup (cdtext_get_const (cdtext, CDTEXT_FIELD_TITLE, 0));
+    cdda_backend->album_artist = g_strdup (cdtext_get_const (cdtext, CDTEXT_FIELD_PERFORMER, 0));
+    cdda_backend->genre = g_strdup (cdtext_get_const (cdtext, CDTEXT_FIELD_GENRE, 0));
 #else
     cdda_backend->album_title = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_TITLE, cdtext));
     cdda_backend->album_artist = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_PERFORMER, cdtext));
@@ -208,8 +210,8 @@ fetch_metadata (GVfsBackendCdda *cdda_backend)
 #endif /* LIBCDIO_VERSION_NUM < 84 */
     if (cdtext) {
 #if LIBCDIO_VERSION_NUM >= 84
-      track->title = cdtext_string_to_utf8 (cdtext_get_const (cdtext, CDTEXT_FIELD_TITLE, cdtrack));
-      track->artist = cdtext_string_to_utf8 (cdtext_get_const (cdtext, CDTEXT_FIELD_PERFORMER, cdtrack));
+      track->title = g_strdup (cdtext_get_const (cdtext, CDTEXT_FIELD_TITLE, cdtrack));
+      track->artist = g_strdup (cdtext_get_const (cdtext, CDTEXT_FIELD_PERFORMER, cdtrack));
 #else
       track->title = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_TITLE, cdtext));
       track->artist = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_PERFORMER, cdtext));
