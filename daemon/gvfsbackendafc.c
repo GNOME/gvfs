@@ -87,6 +87,8 @@ struct _GVfsBackendAfc {
   idevice_t dev;
   afc_client_t afc_cli; /* for ACCESS_MODE_AFC */
 
+  guint force_umount_id;
+
   /* for ACCESS_MODE_HOUSE_ARREST */
   GHashTable *apps; /* hash table of AppInfo */
   instproxy_client_t inst;
@@ -353,6 +355,9 @@ force_umount_idle (gpointer user_data)
 
   g_vfs_backend_force_unmount (G_VFS_BACKEND(afc_backend));
 
+  afc_backend->force_umount_id = 0;
+  g_object_unref (afc_backend);
+
   return G_SOURCE_REMOVE;
 }
 
@@ -372,9 +377,20 @@ _idevice_event_cb (const idevice_event_t *event, void *user_data)
 
   g_print ("Shutting down AFC backend for device uuid %s\n", afc_backend->uuid);
 
-  /* idevice_event_unsubscribe() will terminate the thread _idevice_event_cb
+  /* This might happen if the user manages to unplug/replug/unplug the same device
+   * before the idle runs
+   */
+  if (afc_backend->force_umount_id != 0)
+    {
+      g_print ("AFC device with uuid %s is already being removed",
+               afc_backend->uuid);
+      return;
+    }
+
+  /* idevice_event_unsubscribe () will terminate the thread _idevice_event_cb
    * is running in, so we need to call back into our main loop */
-  g_idle_add(force_umount_idle, afc_backend);
+  afc_backend->force_umount_id = g_idle_add (force_umount_idle,
+                                             g_object_ref (afc_backend));
 }
 
 static gboolean
@@ -758,6 +774,8 @@ g_vfs_backend_afc_unmount (GVfsBackend *backend,
                            GMountSource *mount_source)
 {
   GVfsBackendAfc *self;
+
+  idevice_event_unsubscribe ();
 
   /* FIXME: check on G_MOUNT_UNMOUNT_FORCE flag */
   self = G_VFS_BACKEND_AFC (backend);
@@ -2717,6 +2735,16 @@ g_vfs_backend_afc_finalize (GObject *obj)
 
   self = G_VFS_BACKEND_AFC(obj);
   g_vfs_backend_afc_close_connection (self);
+
+  idevice_event_unsubscribe ();
+  /* After running idevice_event_unsubscribe() we won't get any new event
+   * notifications, but we are also guaranteed that currently running event
+   * callbacks will have completed, so no other thread is going to requeue
+   * an idle after we removed it */
+  if (self->force_umount_id != 0) {
+      g_source_remove(self->force_umount_id);
+      self->force_umount_id = 0;
+  }
 
   if (G_OBJECT_CLASS(g_vfs_backend_afc_parent_class)->finalize)
     (*G_OBJECT_CLASS(g_vfs_backend_afc_parent_class)->finalize) (obj);
