@@ -342,12 +342,7 @@ print_completions (const char *arg)
       strchr (arg, '/') == NULL ||
       !g_file_query_exists (parent, NULL))
     {
-      GMount *mount;
-      mount = g_file_find_enclosing_mount (f, NULL, NULL);
-      if (mount == NULL)
-	print_mounts (unescaped);
-      else
-	g_object_unref (mount);
+      print_mounts (unescaped);
     }
 
   if (parent != NULL)
