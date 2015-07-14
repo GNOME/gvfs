@@ -382,15 +382,15 @@ static int64_t
 archive_entry_determine_size (GVfsArchive          *archive,
 			      struct archive_entry *entry)
 {
-  size_t read, size = 0;
+  size_t read;
   int result;
   const void *block;
-  int64_t offset;
+  int64_t offset, size = 0;
 
   do
     {
       result = archive_read_data_block (archive->archive, &block, &read, &offset);
-      if (result >= ARCHIVE_WARN && result <= ARCHIVE_OK)
+      if (result >= ARCHIVE_FAILED && result <= ARCHIVE_OK)
 	{
 	  if (result < ARCHIVE_OK) {
 	    DEBUG ("archive_read_data_block: result = %d, error = '%s'\n", result, archive_error_string (archive->archive));
@@ -398,12 +398,20 @@ archive_entry_determine_size (GVfsArchive          *archive,
 	    archive_clear_error (archive->archive);
             if (result == ARCHIVE_RETRY)
               continue;
+
+	    /* We don't want to fail the mount job, just because of unknown file
+	     * size (e.g. caused by unsupported archive encryption). */
+	    if (result < ARCHIVE_WARN)
+	      {
+	        size = -1;
+	        break;
+	      }
 	  }
 
 	  size += read;
 	}
     }
-  while (result != ARCHIVE_FATAL && result != ARCHIVE_EOF);
+  while (result >= ARCHIVE_FAILED && result != ARCHIVE_EOF);
 
   if (result == ARCHIVE_FATAL)
     gvfs_archive_set_error_from_errno (archive);
@@ -480,7 +488,9 @@ archive_file_set_info_from_entry (GVfsArchive *         archive,
     {
       size = archive_entry_determine_size (archive, entry);
     }
-  g_file_info_set_size (info, size);
+
+  if (size >= 0)
+    g_file_info_set_size (info, size);
 
   if (file->name[0] == '.')
     g_file_info_set_is_hidden (info, TRUE);
@@ -583,9 +593,9 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
 	  entry_index++;
 	}
     }
-  while (result != ARCHIVE_FATAL && result != ARCHIVE_EOF && !gvfs_archive_in_error (archive));
+  while (result >= ARCHIVE_WARN && result != ARCHIVE_EOF && !gvfs_archive_in_error (archive));
 
-  if (result == ARCHIVE_FATAL)
+  if (result < ARCHIVE_WARN)
     gvfs_archive_set_error_from_errno (archive);
   fixup_dirs (ba->files);
   
@@ -776,7 +786,10 @@ do_open_for_read (GVfsBackend *       backend,
           g_free (entry_pathname);
         }
     }
-  while (result != ARCHIVE_FATAL && result != ARCHIVE_EOF);
+  while (result >= ARCHIVE_WARN && result != ARCHIVE_EOF);
+
+  if (result < ARCHIVE_WARN)
+    gvfs_archive_set_error_from_errno (archive);
 
   if (!gvfs_archive_in_error (archive))
     {
