@@ -339,10 +339,11 @@ look_for_stderr_errors (Connection *conn, GError **error)
           /* Error (real or WOULDBLOCK) or EOF */
           g_set_error_literal (error,
 	                       G_IO_ERROR, G_IO_ERROR_FAILED,
-        	               _("SSH program unexpectedly exited"));
+                               _("Connection failed"));
           return;
         }
-      
+
+      DEBUG ("stderr: %s\n", line);
       if (strstr (line, "Permission denied") != NULL)
         {
           g_set_error_literal (error,
@@ -364,7 +365,8 @@ look_for_stderr_errors (Connection *conn, GError **error)
         	               _("No route to host"));
           return;
         }
-      else if (strstr (line, "Connection refused") != NULL)
+      else if (strstr (line, "Connection refused") != NULL ||
+               strstr (line, "subsystem request failed") != NULL)
         {
           g_set_error_literal (error,
 	                       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
@@ -704,7 +706,7 @@ read_reply_sync (Connection *conn, gsize *len_out, GError **error)
     {
       g_set_error_literal (error,
 			   G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("SSH program unexpectedly exited"));
+                           _("Connection failed"));
       return NULL;
     }
   
