@@ -1,3 +1,11 @@
+Major changes in 1.25.4
+=======================
+* udisks2: Fix a crash when unmounting
+* udisks2: Handle libsecret errors properly to avoid a crash
+* afc: Fix a crash when unmounting and unplugging
+* cdda: Use UTF-8 with libcdio >= 0.84
+* Translation updates
+
 Major changes in 1.25.3
 =======================
 * common: Fix crashes with blank disks
