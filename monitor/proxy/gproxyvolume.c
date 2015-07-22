@@ -258,13 +258,16 @@ update_shadow_mount (GProxyVolume *volume)
     {
       GMount *mount = G_MOUNT (l->data);
       GFile *mount_root;
+      gboolean prefix_matches;
 
       /* don't consider our (possibly) existing shadow mount */
       if (G_IS_PROXY_SHADOW_MOUNT (mount))
         continue;
 
       mount_root = g_mount_get_root (mount);
-      if (g_file_has_prefix (activation_root, mount_root))
+      prefix_matches = g_file_has_prefix (activation_root, mount_root);
+      g_object_unref (mount_root);
+      if (prefix_matches)
         {
           mount_to_shadow = g_object_ref (mount);
           break;
