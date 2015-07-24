@@ -1,3 +1,7 @@
+Major changes in 1.25.4.1
+=========================
+* monitor: Fix memory leak
+
 Major changes in 1.25.4
 =======================
 * udisks2: Fix a crash when unmounting
