@@ -28,6 +28,8 @@ flags = $(AM_CPPFLAGS)
 
 gvfs_gschemas =
 gvfs_gschemas_convert =
+gvfs_gschemas_dist =
+gvfs_gschemas_convert_dist =
 
 # D-BUS service file
 %.service: %.service.in ../config.log
@@ -64,6 +66,8 @@ libexec_PROGRAMS += gvfsd-http gvfsd-dav
 endif
 
 mount_in_files += smb.mount.in smb-browse.mount.in
+gvfs_gschemas_dist += org.gnome.system.smb.gschema.xml
+gvfs_gschemas_convert_dist += gvfs-smb.convert
 if HAVE_SAMBA
 mount_DATA += smb.mount smb-browse.mount
 libexec_PROGRAMS += gvfsd-smb-browse gvfsd-smb
@@ -90,6 +94,8 @@ libexec_PROGRAMS += gvfsd-mtp
 endif
 
 mount_in_files += dns-sd.mount.in
+gvfs_gschemas_dist += org.gnome.system.dns_sd.gschema.xml
+gvfs_gschemas_convert_dist += gvfs-dns-sd.convert
 if HAVE_AVAHI
 mount_DATA += dns-sd.mount
 libexec_PROGRAMS += gvfsd-dnssd
@@ -126,8 +132,8 @@ noinst_DATA = $(mount_DATA:.mount=.localmount)
 EXTRA_DIST = 				\
 	gvfs-daemon.service.in		\
 	$(mount_in_files)		\
-	$(gvfs_gschemas)		\
-	$(gvfs_gschemas_convert_DATA)	\
+	$(gvfs_gschemas_dist)		\
+	$(gvfs_gschemas_convert_dist)	\
 	$(gsettings_ENUM_FILES)		\
 	$(NULL)
 
