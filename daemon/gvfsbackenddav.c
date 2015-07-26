@@ -3394,6 +3394,7 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
   backend_class->mount             = do_mount;
   backend_class->try_query_info    = NULL;
   backend_class->query_info        = do_query_info;
+  backend_class->try_query_fs_info = NULL;
   backend_class->query_fs_info     = do_query_fs_info;
   backend_class->enumerate         = do_enumerate;
   backend_class->try_open_for_read = try_open_for_read;

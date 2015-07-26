@@ -546,6 +546,18 @@ g_vfs_backend_afp_browse_finalize (GObject *object)
   G_OBJECT_CLASS (g_vfs_backend_afp_browse_parent_class)->finalize (object);
 }
 
+static gboolean
+try_query_fs_info (GVfsBackend *backend,
+                   GVfsJobQueryFsInfo *job,
+                   const char *filename,
+                   GFileInfo *info,
+                   GFileAttributeMatcher *matcher)
+{
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "afp");
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  return TRUE;
+}
+
 static void
 g_vfs_backend_afp_browse_class_init (GVfsBackendAfpBrowseClass *klass)
 {
@@ -560,6 +572,7 @@ g_vfs_backend_afp_browse_class_init (GVfsBackendAfpBrowseClass *klass)
   backend_class->try_query_info = try_query_info;
   backend_class->try_enumerate = try_enumerate;
   backend_class->try_mount_mountable = try_mount_mountable;
+  backend_class->try_query_fs_info = try_query_fs_info;
 }
 
 void

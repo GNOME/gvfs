@@ -806,6 +806,18 @@ g_vfs_backend_dns_sd_finalize (GObject *object)
     (*G_OBJECT_CLASS (g_vfs_backend_dns_sd_parent_class)->finalize) (object);
 }
 
+static gboolean
+try_query_fs_info (GVfsBackend *backend,
+                   GVfsJobQueryFsInfo *job,
+                   const char *filename,
+                   GFileInfo *info,
+                   GFileAttributeMatcher *matcher)
+{
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "dns-sd");
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  return TRUE;
+}
+
 static void
 g_vfs_backend_dns_sd_class_init (GVfsBackendDnsSdClass *klass)
 {
@@ -816,6 +828,7 @@ g_vfs_backend_dns_sd_class_init (GVfsBackendDnsSdClass *klass)
 
   backend_class->try_mount        = try_mount;
   backend_class->try_query_info   = try_query_info;
+  backend_class->try_query_fs_info = try_query_fs_info;
   backend_class->try_enumerate    = try_enumerate;
   backend_class->try_create_dir_monitor = try_create_monitor;
   backend_class->try_create_file_monitor = try_create_monitor;

@@ -388,6 +388,8 @@ do_query_fs_info (GVfsBackend *backend,
 
   g_print ("(II) try_query_fs_info (filename = %s) \n", filename);
 
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "localtest");
+
   file = get_g_file_from_local (filename, G_VFS_JOB (job));
 
   if (file) {

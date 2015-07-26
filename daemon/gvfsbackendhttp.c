@@ -674,6 +674,18 @@ try_query_info_on_read (GVfsBackend           *backend,
     return TRUE;
 }
 
+static gboolean
+try_query_fs_info (GVfsBackend *backend,
+                   GVfsJobQueryFsInfo *job,
+                   const char *filename,
+                   GFileInfo *info,
+                   GFileAttributeMatcher *matcher)
+{
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "http");
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  return TRUE;
+}
+
 
 #define DEBUG_MAX_BODY_SIZE (100 * 1024 * 1024)
 
@@ -697,6 +709,7 @@ g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
   backend_class->try_close_read         = try_close_read;
   backend_class->try_query_info         = try_query_info;
   backend_class->try_query_info_on_read = try_query_info_on_read;
+  backend_class->try_query_fs_info      = try_query_fs_info;
 
   /* Initialize the SoupSession, common to all backend instances */
   the_session = soup_session_new_with_options ("user-agent",

@@ -1716,6 +1716,18 @@ out:
   g_vfs_ftp_task_done (&task);
 }
 
+static gboolean
+try_query_fs_info (GVfsBackend *backend,
+                   GVfsJobQueryFsInfo *job,
+                   const char *filename,
+                   GFileInfo *info,
+                   GFileAttributeMatcher *matcher)
+{
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "ftp");
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  return TRUE;
+}
+
 static void
 g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
 {
@@ -1742,6 +1754,7 @@ g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
   backend_class->make_directory = do_make_directory;
   backend_class->move = do_move;
   backend_class->try_query_settable_attributes = try_query_settable_attributes;
+  backend_class->try_query_fs_info = try_query_fs_info;
   backend_class->set_attribute = do_set_attribute;
   backend_class->pull = do_pull;
 }

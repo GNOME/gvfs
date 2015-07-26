@@ -1525,6 +1525,18 @@ try_enumerate (GVfsBackend *backend,
   return TRUE;
 }
 
+static gboolean
+try_query_fs_info (GVfsBackend *backend,
+                   GVfsJobQueryFsInfo *job,
+                   const char *filename,
+                   GFileInfo *info,
+                   GFileAttributeMatcher *matcher)
+{
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "cifs");
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  return TRUE;
+}
+
 static void
 g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
 {
@@ -1544,6 +1556,7 @@ g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
   backend_class->try_close_read = try_close_read;
   backend_class->query_info = do_query_info;
   backend_class->try_query_info = try_query_info;
+  backend_class->try_query_fs_info = try_query_fs_info;
   backend_class->enumerate = do_enumerate;
   backend_class->try_enumerate = try_enumerate;
 }
