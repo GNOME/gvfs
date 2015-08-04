@@ -67,11 +67,11 @@ on_name_acquired (GDBusConnection *connection,
                   const gchar     *name,
                   gpointer         user_data)
 {
-  gboolean no_fuse = GPOINTER_TO_UINT (user_data);
-
   already_acquired = TRUE;
 
 #ifdef HAVE_FUSE
+  gboolean no_fuse = GPOINTER_TO_UINT (user_data);
+
   if (!no_fuse)
     {
       char *fuse_path;
