@@ -278,7 +278,11 @@ has_extension (GVfsBackendSftp *backend, SFTPServerExtensions extension)
 static void
 destroy_connection (Connection *conn)
 {
-  g_hash_table_destroy (conn->expected_replies);
+  if (conn->expected_replies)
+    {
+      g_hash_table_destroy (conn->expected_replies);
+      conn->expected_replies = NULL;
+    }
 
   g_clear_object (&conn->command_stream);
   g_clear_object (&conn->reply_stream_cancellable);
@@ -315,14 +319,6 @@ expected_reply_free (ExpectedReply *reply)
 static void
 g_vfs_backend_sftp_init (GVfsBackendSftp *backend)
 {
-  backend->command_connection.expected_replies = g_hash_table_new_full (NULL,
-                                                                        NULL,
-                                                                        NULL,
-                                                                        (GDestroyNotify)expected_reply_free);
-  backend->data_connection.expected_replies = g_hash_table_new_full (NULL,
-                                                                     NULL,
-                                                                     NULL,
-                                                                     (GDestroyNotify)expected_reply_free);
 }
 
 static void
@@ -1320,6 +1316,9 @@ fail_jobs (Connection *conn, GError *error)
   GHashTableIter iter;
   gpointer key, value;
 
+  if (!connection_is_usable (conn))
+    return;
+
   g_hash_table_iter_init (&iter, conn->expected_replies);
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
@@ -1812,6 +1811,8 @@ setup_connection (GVfsBackend *backend,
 
   connection->op_backend = op_backend;
   connection->command_stream = g_unix_output_stream_new (stdin_fd, TRUE);
+  connection->expected_replies = g_hash_table_new_full (NULL, NULL, NULL,
+                                                        (GDestroyNotify)expected_reply_free);
 
   command = new_command_stream (op_backend, SSH_FXP_INIT);
   g_data_output_stream_put_int32 (command,
