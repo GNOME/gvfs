@@ -374,6 +374,13 @@ look_for_stderr_errors (Connection *conn, GError **error)
         	               _("Host key verification failed"));
           return;
         }
+      else if (strstr (line, "Too many authentication failures") != NULL)
+        {
+          g_set_error_literal (error,
+                               G_IO_ERROR, G_IO_ERROR_FAILED,
+                               _("Too many authentication failures"));
+          return;
+        }
       
       g_free (line);
     }
