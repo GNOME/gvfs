@@ -15,6 +15,7 @@ symlinks =					\
 	gvfs-mkdir				\
 	gvfs-monitor-dir			\
 	gvfs-monitor-file			\
+	gvfs-mount                              \
 	gvfs-move				\
 	gvfs-open				\
 	gvfs-rename				\
