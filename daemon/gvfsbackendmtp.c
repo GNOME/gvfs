@@ -2074,6 +2074,26 @@ do_delete (GVfsBackend *backend,
 
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
+  LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, entry->id);
+  if (file->filetype == LIBMTP_FILETYPE_FOLDER) {
+    LIBMTP_file_t *files;
+    LIBMTP_Clear_Errorstack (device);
+    files = LIBMTP_Get_Files_And_Folders (device, entry->storage, entry->id);
+    if (LIBMTP_Get_Errorstack (device) != NULL) {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
+                                _("Error checking for directory emptiness"));
+      goto exit;
+    }
+
+    if (files != NULL) {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
+                                g_strerror (ENOTEMPTY));
+      DEBUG ("(II) Directory size %d\n", file->filesize);
+      goto exit;
+    }
+  }
 
   int ret = LIBMTP_Delete_Object (device, entry->id);
   if (ret != 0) {
