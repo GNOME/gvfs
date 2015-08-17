@@ -2075,7 +2075,7 @@ g_daemon_file_mount_enclosing_volume (GFile *location,
   data = g_new0 (MountData, 1);
   data->callback = callback;
   if (cancellable)
-    data->cancellable = g_object_ref (data->cancellable);
+    data->cancellable = g_object_ref (cancellable);
   data->user_data = user_data;
   data->file = g_object_ref (location);
   if (mount_operation)
