@@ -1,3 +1,12 @@
+Major changes in 1.25.90
+========================
+* Several bash-completion fixes and improvements
+* mtp: Return ENOTEMPTY if trying to delete a non-empty directory
+* Set filesystem::type for all backends
+* build: Make EXTRA_DIST independent of configure results
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.25.4.1
 =========================
 * monitor: Fix memory leak
