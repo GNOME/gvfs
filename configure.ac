@@ -150,8 +150,6 @@ dnl *** Check if we should build with http backend ***
 dnl **************************************************
 AC_ARG_ENABLE(http, AS_HELP_STRING([--disable-http],[build without http/dav backend]))
 msg_http=no
-HTTP_CFLAGS=
-HTTP_LIBS=
 
 if test "x$enable_http" != "xno"; then
   PKG_CHECK_EXISTS(libsoup-2.4 >= 2.42.0, msg_http=yes)
@@ -197,8 +195,6 @@ dnl *** Check for libudev ***
 dnl *************************
 AC_ARG_ENABLE(udev, AS_HELP_STRING([--disable-udev],[build without libudev]))
 msg_udev=no
-UDEV_CFLAGS=
-UDEV_LIBS=
 
 if test "x$enable_udev" != "xno"; then
   PKG_CHECK_EXISTS(libudev >= 138, msg_udev=yes)
@@ -214,8 +210,6 @@ dnl *** Check for FUSE ***
 dnl **********************
 AC_ARG_ENABLE(fuse, AS_HELP_STRING([--disable-fuse],[build without FUSE support]))
 msg_fuse=no
-FUSE_LIBS=
-FUSE_CFLAGS=
 
 if test "x$enable_fuse" != "xno"; then
   PKG_CHECK_EXISTS(fuse, msg_fuse=yes)
@@ -234,8 +228,6 @@ dnl ************************************
 
 AC_ARG_ENABLE(gdu, AS_HELP_STRING([--disable-gdu],[build without GDU volume monitor]))
 msg_gdu=no
-GDU_LIBS=
-GDU_CFLAGS=
 GDU_REQUIRED=3.0.2
 
 if test "x$enable_gdu" != "xno"; then
@@ -255,8 +247,6 @@ dnl *************************
 
 AC_ARG_ENABLE(udisks2, AS_HELP_STRING([--disable-udisks2],[build without libudisks2]))
 msg_udisks2=no
-UDISKS2_LIBS=
-UDISKS2_CFLAGS=
 UDISKS2_REQUIRED=1.97
 
 if test "x$enable_udisks2" != "xno"; then
@@ -276,8 +266,6 @@ dnl **********************************
 
 AC_ARG_ENABLE(libsystemd_login, AS_HELP_STRING([--disable-libsystemd-login],[build without libsystemd-login]))
 msg_libsystemd_login=no
-LIBSYSTEMD_LOGIN_LIBS=
-LIBSYSTEMD_LOGIN_CFLAGS=
 LIBSYSTEMD_LOGIN_REQUIRED=44
 
 if test "x$enable_libsystemd_login" != "xno"; then
@@ -299,8 +287,6 @@ dnl **********************
 AC_ARG_ENABLE(hal, AS_HELP_STRING([--disable-hal],[build without HAL support]))
 msg_hal=no
 have_hal_fast_init=no
-HAL_LIBS=
-HAL_CFLAGS=
 HAL_REQUIRED=0.5.10
 
 if test "x$enable_hal" != "xno" && test "x$msg_gdu" = "xno"; then
@@ -353,8 +339,6 @@ dnl *** Check if we should build with CDDA backend ***
 dnl **************************************************
 AC_ARG_ENABLE(cdda, AS_HELP_STRING([--disable-cdda],[build without CDDA backend]))
 msg_cdda=no
-CDDA_LIBS=
-CDDA_CFLAGS=
 
 if test "x$enable_cdda" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" = "xyes" \); then
   PKG_CHECK_EXISTS(libcdio_paranoia >= 0.78.2, msg_cdda=yes)
@@ -382,8 +366,6 @@ dnl *** Check if we should build with AFC backend ***
 dnl *************************************************
 AC_ARG_ENABLE(afc, AS_HELP_STRING([--disable-afc],[build without AFC backend]))
 msg_afc=no
-AFC_LIBS=
-AFC_CFLAGS=
 
 if test "x$enable_afc" != "xno" ; then
   PKG_CHECK_EXISTS(libimobiledevice-1.0 >= 1.1.5 libplist >= 0.15, msg_afc=yes)
@@ -404,8 +386,6 @@ dnl *** Check if we should build with GOA volume monitor ***
 dnl ********************************************************
 AC_ARG_ENABLE(goa, AS_HELP_STRING([--disable-goa],[build without GOA volume monitor]))
 msg_goa=no
-GOA_LIBS=
-GOA_CFLAGS=
 
 if test "x$enable_goa" != "xno" ; then
   PKG_CHECK_EXISTS(goa-1.0 >= 3.7.1, msg_goa=yes)
@@ -426,8 +406,6 @@ dnl *** Check for gphoto2 ***
 dnl *************************
 AC_ARG_ENABLE(gphoto2, AS_HELP_STRING([--disable-gphoto2],[build without gphoto2 support]))
 msg_gphoto2=no
-GPHOTO2_LIBS=
-GPHOTO2_CFLAGS=
 
 if test "x$enable_gphoto2" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" = "xyes" \); then
   PKG_CHECK_MODULES(GPHOTO2, libgphoto2 >= 2.4.0, [msg_gphoto2=yes])
@@ -471,8 +449,6 @@ dnl *** Check for GNOME Keyring ***
 dnl *******************************
 AC_ARG_ENABLE(keyring, AS_HELP_STRING([--disable-keyring],[build without GNOME Keyring support]))
 msg_keyring=no
-KEYRING_LIBS=
-KEYRING_CFLAGS=
 
 if test "x$enable_keyring" != "xno"; then
   PKG_CHECK_EXISTS(libsecret-unstable, msg_keyring=yes)
@@ -490,8 +466,6 @@ dnl *** Check if we should build with libbluray ***
 dnl ***********************************************
 AC_ARG_ENABLE(bluray, AS_HELP_STRING([--disable-bluray],[build without bluray metadata support]))
 msg_bluray=no
-BLURAY_CFLAGS=
-BLURAY_LIBS=
 
 if test "x$enable_bluray" != "xno"; then
   PKG_CHECK_EXISTS(libbluray, msg_bluray=yes)
@@ -511,8 +485,6 @@ dnl *** Check for libmtp ***
 dnl *************************
 AC_ARG_ENABLE(libmtp, AS_HELP_STRING([--disable-libmtp],[build without libmtp support]))
 msg_libmtp=no
-LIBMTP_LIBS=
-LIBMTP_CFLAGS=
 
 if test "x$enable_libmtp" != "xno" -a "x$msg_gudev" = "xyes"; then
   PKG_CHECK_EXISTS(libmtp, msg_libmtp=yes)
@@ -610,8 +582,6 @@ dnl ****************************
 
 AC_ARG_ENABLE(gtk, AS_HELP_STRING([--disable-gtk],[build without GTK+]))
 msg_gtk=no
-GTK_LIBS=
-GTK_CFLAGS=
 GTK_REQUIRED=3.0
 
 if test "x$enable_gtk" != "xno"; then
@@ -723,8 +693,6 @@ dnl *** NFS backend ***
 dnl *******************
 AC_ARG_ENABLE(nfs, AS_HELP_STRING([--disable-nfs], [build without NFS support]))
 msg_nfs="no"
-NFS_CFLAGS=
-NFS_LIBS=
 
 if test "x$enable_nfs" != "xno"; then
   PKG_CHECK_EXISTS([libnfs >= 1.9.7], msg_nfs=yes)
