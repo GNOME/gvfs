@@ -1,3 +1,15 @@
+Major changes in 1.24.2
+=======================
+* udisks2: Fix a crash when unmounting
+* udisks2: Handle libsecret errors properly to avoid a crash
+* afc: Fix a crash when unmounting and unplugging
+* monitor: Show notification always when device is unmounted
+* gvfs-open: Fix launching applications over d-bus
+* gvfs-open: Do not alter uris before use
+* mtp: Refresh storage information in query_info
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.24.1
 =======================
 * hal: Fix compilation error and memory leak
