@@ -195,8 +195,7 @@ list (GFile *file)
 
   return res;
 }
-static char*
-shell_quote (const gchar *unquoted_string);
+
 static void
 print_mounts (const char *prefix)
 {
@@ -219,7 +218,7 @@ print_mounts (const char *prefix)
 	  uri = g_file_get_uri (mount_root);
 	  if (prefix == NULL ||
 	      g_str_has_prefix (uri, prefix))
-	    g_print ("%s%s\n", shell_quote (uri), g_str_has_suffix (uri, "/") ? "" : "/");
+	    g_print ("%s%s\n", uri, g_str_has_suffix (uri, "/") ? "" : "/");
 	  g_free (uri);
 	  g_object_unref (mount_root);
 	  g_object_unref (mount);
@@ -254,8 +253,6 @@ shell_quote (const gchar *unquoted_string)
 	g_string_append (dest, "\\'");
       else if (*p == '"')
 	g_string_append (dest, "\\\"");
-      else if (*p == ':')
-	g_string_append (dest, "\\:");
       else
 	g_string_append_c (dest, *p);
 
@@ -274,7 +271,7 @@ show_completed_file (GFile *hit,
   GFile *cwd_f;
   GFile *home;
 
-  if (g_file_is_native (hit) && !g_str_has_prefix (g_shell_unquote(arg, NULL), "file://"))
+  if (g_file_is_native (hit) && !g_str_has_prefix (arg, "file://"))
     {
       cwd = g_get_current_dir ();
       cwd_f = g_file_new_for_path (cwd);
@@ -305,7 +302,7 @@ show_completed_file (GFile *hit,
   else
     display = g_file_get_uri (hit);
 
-  g_print ("%s%s\n", shell_quote (display), (is_dir)?"/":"");
+  g_print ("%s%s\n", display, (is_dir)?"/":"");
   g_free (display);
 }
 
