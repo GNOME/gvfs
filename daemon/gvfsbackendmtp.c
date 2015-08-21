@@ -498,7 +498,7 @@ emit_event_internal (GVfsMonitor *monitor,
 {
   DEBUG ("(III) emit_event_internal (%s, %d)\n", path, event);
 
-  char *dir = g_dirname (path);
+  char *dir = g_path_get_dirname (path);
   const char *monitored_path = g_object_get_data (G_OBJECT (monitor), "gvfsbackendmtp:path");
   if (g_strcmp0 (dir, monitored_path) == 0) {
     DEBUG ("(III) emit_event_internal: Event %d on directory %s for %s\n", event, dir, path);
