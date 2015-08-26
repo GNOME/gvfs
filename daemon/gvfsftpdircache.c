@@ -693,6 +693,8 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
             g_debug ("# unknown listing format\n");
         }
 
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
+
       if (file_type == G_FILE_TYPE_UNKNOWN)
         {
           file_type = type == 'f' ? G_FILE_TYPE_REGULAR :

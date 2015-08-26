@@ -2501,6 +2501,8 @@ parse_attributes (GVfsBackendSftp *backend,
 
     }
 
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
+
   g_file_info_set_file_type (info, type);
   
   if (flags & SSH_FILEXFER_ATTR_ACMODTIME)

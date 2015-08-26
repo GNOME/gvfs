@@ -1507,6 +1507,7 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
   else
     g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
 
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   
   start_pos = g_vfs_afp_reply_get_pos (reply);
 

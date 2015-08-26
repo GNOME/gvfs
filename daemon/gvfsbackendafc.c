@@ -1641,6 +1641,8 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
 
   g_file_info_set_is_hidden (info, hidden);
 
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
+
   /* Check for matching thumbnail in .MISC directory */
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_PREVIEW_ICON) &&
       self->mode == ACCESS_MODE_AFC &&
