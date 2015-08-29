@@ -2080,9 +2080,7 @@ do_delete (GVfsBackend *backend,
     LIBMTP_Clear_Errorstack (device);
     files = LIBMTP_Get_Files_And_Folders (device, entry->storage, entry->id);
     if (LIBMTP_Get_Errorstack (device) != NULL) {
-      g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
-                                _("Error checking for directory emptiness"));
+      fail_job (G_VFS_JOB (job), device);
       goto exit;
     }
 
