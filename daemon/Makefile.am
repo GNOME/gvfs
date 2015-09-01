@@ -50,6 +50,12 @@ libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-lo
 mount_in_files = sftp.mount.in ftp.mount.in ftps.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in
 mount_DATA =  sftp.mount ftp.mount ftps.mount trash.mount computer.mount burn.mount localtest.mount network.mount
 
+mount_in_files +=google.mount.in
+if USE_GOOGLE
+mount_DATA += google.mount
+libexec_PROGRAMS += gvfsd-google
+endif
+
 mount_in_files +=recent.mount.in
 if USE_GTK
 mount_DATA += recent.mount
@@ -434,6 +440,20 @@ else
 gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS) $(HAL_LIBS) \
 		   $(top_builddir)/common/libgvfscommon-hal.la
 endif
+
+gvfsd_google_SOURCES = \
+	gvfsbackendgoogle.c gvfsbackendgoogle.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c
+
+gvfsd_google_CPPFLAGS = \
+	$(flags) \
+	-DBACKEND_HEADER=gvfsbackendgoogle.h \
+	-DDEFAULT_BACKEND_TYPE=google-drive \
+	-DBACKEND_TYPES='"google-drive", G_VFS_TYPE_BACKEND_GOOGLE,' \
+	$(GOOGLE_CFLAGS)
+
+gvfsd_google_LDADD = $(libraries) $(GOOGLE_LIBS)
 
 gvfsd_gphoto2_SOURCES = \
 	gvfsbackendgphoto2.c gvfsbackendgphoto2.h \

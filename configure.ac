@@ -61,7 +61,7 @@ GTK_DOC_CHECK
 DISTCHECK_CONFIGURE_FLAGS="--enable-gtk-doc"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 
-PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.45.0 gobject-2.0 gmodule-no-export-2.0 gio-unix-2.0 gio-2.0])
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.45.7 gobject-2.0 gmodule-no-export-2.0 gio-unix-2.0 gio-2.0])
 
 PKG_CHECK_MODULES([DBUS], [dbus-1])
 
@@ -400,6 +400,26 @@ AC_SUBST(GOA_LIBS)
 AC_SUBST(GOA_CFLAGS)
 
 AM_CONDITIONAL([USE_GOA], [test "$msg_goa" = "yes"])
+
+dnl ****************************************************
+dnl *** Check if we should build with Google backend ***
+dnl ****************************************************
+AC_ARG_ENABLE([google], [AS_HELP_STRING([--disable-google],[build without Google backend])])
+msg_google=no
+
+if test "x$enable_google" != "xno" ; then
+  PKG_CHECK_EXISTS([goa-1.0 >= 3.17.1 libgdata >= 0.17.3], [msg_google=yes])
+
+  if test "x$msg_google" = "xyes"; then
+    PKG_CHECK_MODULES([GOOGLE], [goa-1.0 libgdata])
+    AC_DEFINE([HAVE_GOOGLE], 1, [Define to 1 if Google is going to be built])
+  fi
+fi
+
+AC_SUBST(GOOGLE_LIBS)
+AC_SUBST(GOOGLE_CFLAGS)
+
+AM_CONDITIONAL(USE_GOOGLE, [test "$msg_google" = "yes"])
 
 dnl *************************
 dnl *** Check for gphoto2 ***
@@ -908,6 +928,7 @@ echo "
         hotplug backend:              $msg_hotplug_backend
 
 	Blu-ray metadata support:     $msg_bluray
+	Google support:               $msg_google
         HTTP/WebDAV support:          $msg_http
 	Samba support:	              $msg_samba
 	FUSE support:                 $msg_fuse

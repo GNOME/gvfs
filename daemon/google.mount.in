@@ -1,0 +1,4 @@
+[Mount]
+Type=google-drive
+Exec=@libexecdir@/gvfsd-google
+AutoMount=false
