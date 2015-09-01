@@ -1,3 +1,11 @@
+Major changes in 1.25.91
+========================
+* afp: Change g_error to g_warning for read errors to prevent crash reports
+* dav: Mark files as untrashable to offer correct action in Nautilus
+* gdaemonfile: Fix cancelling of g_file_mount_enclosing_volume
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.25.90
 ========================
 * Several bash-completion fixes and improvements
