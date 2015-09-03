@@ -17,7 +17,7 @@ main (int argc, char *argv[])
   g_vfs_proxy_volume_monitor_daemon_init ();
   return g_vfs_proxy_volume_monitor_daemon_main (argc,
                                                  argv,
-                                                 "org.gtk.Private.AfcVolumeMonitor",
+                                                 "org.gtk.vfs.AfcVolumeMonitor",
                                                  G_VFS_TYPE_AFC_VOLUME_MONITOR);
 }
 

@@ -2,4 +2,4 @@
 Type=http
 Exec=@libexecdir@/gvfsd-http
 AutoMount=true
-DBusName=org.gtk.vfs.mountpoint.http
+DBusName=org.gtk.vfs.mountpoint_http

@@ -1,5 +1,5 @@
 [RemoteVolumeMonitor]
 Name=GProxyVolumeMonitorUDisks2
-DBusName=org.gtk.Private.UDisks2VolumeMonitor
+DBusName=org.gtk.vfs.UDisks2VolumeMonitor
 IsNative=true
 NativePriority=4

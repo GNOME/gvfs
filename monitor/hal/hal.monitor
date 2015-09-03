@@ -1,5 +1,5 @@
 [RemoteVolumeMonitor]
 Name=GProxyVolumeMonitorHal
-DBusName=org.gtk.Private.HalVolumeMonitor
+DBusName=org.gtk.vfs.HalVolumeMonitor
 IsNative=true
 NativePriority=2

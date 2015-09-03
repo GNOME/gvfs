@@ -1,5 +1,5 @@
 [RemoteVolumeMonitor]
 Name=GProxyVolumeMonitorAfc
-DBusName=org.gtk.Private.AfcVolumeMonitor
+DBusName=org.gtk.vfs.AfcVolumeMonitor
 IsNative=false
 

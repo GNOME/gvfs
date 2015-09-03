@@ -1,3 +1,3 @@
 [D-BUS Service]
-Name=org.gtk.Private.GduVolumeMonitor
+Name=org.gtk.vfs.GduVolumeMonitor
 Exec=@libexecdir@/gvfs-gdu-volume-monitor

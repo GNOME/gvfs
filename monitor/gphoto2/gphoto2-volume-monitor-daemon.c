@@ -38,6 +38,6 @@ main (int argc, char *argv[])
   g_vfs_proxy_volume_monitor_daemon_init ();
   return g_vfs_proxy_volume_monitor_daemon_main (argc,
                                                  argv,
-                                                 "org.gtk.Private.GPhoto2VolumeMonitor",
+                                                 "org.gtk.vfs.GPhoto2VolumeMonitor",
                                                  G_TYPE_GPHOTO2_VOLUME_MONITOR);
 }

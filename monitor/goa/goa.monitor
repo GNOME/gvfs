@@ -1,4 +1,4 @@
 [RemoteVolumeMonitor]
 Name=GProxyVolumeMonitorGoa
-DBusName=org.gtk.Private.GoaVolumeMonitor
+DBusName=org.gtk.vfs.GoaVolumeMonitor
 IsNative=false

@@ -30,6 +30,6 @@ main (int argc, char *argv[])
   g_vfs_proxy_volume_monitor_daemon_init ();
   return g_vfs_proxy_volume_monitor_daemon_main (argc,
                                                  argv,
-                                                 "org.gtk.Private.MTPVolumeMonitor",
+                                                 "org.gtk.vfs.MTPVolumeMonitor",
                                                  G_TYPE_MTP_VOLUME_MONITOR);
 }

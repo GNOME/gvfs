@@ -41,6 +41,6 @@ main (int argc, char *argv[])
 
   return g_vfs_proxy_volume_monitor_daemon_main (argc,
                                                  argv,
-                                                 "org.gtk.Private.UDisks2VolumeMonitor",
+                                                 "org.gtk.vfs.UDisks2VolumeMonitor",
                                                  GVFS_TYPE_UDISKS2_VOLUME_MONITOR);
 }

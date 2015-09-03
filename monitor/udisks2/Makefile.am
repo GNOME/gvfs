@@ -45,7 +45,7 @@ remote_volume_monitorsdir = $(datadir)/gvfs/remote-volume-monitors
 remote_volume_monitors_DATA = udisks2.monitor
 
 servicedir       = $(datadir)/dbus-1/services
-service_in_files = org.gtk.Private.UDisks2VolumeMonitor.service.in
+service_in_files = org.gtk.vfs.UDisks2VolumeMonitor.service.in
 service_DATA     = $(service_in_files:.service.in=.service)
 
 $(service_DATA): $(service_in_files) Makefile

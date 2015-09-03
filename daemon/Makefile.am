@@ -261,7 +261,7 @@ gvfsd_smb_browse_SOURCES = \
 gvfsd_smb_browse_CPPFLAGS = \
 	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendsmbbrowse.h \
-	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint.smb_browse \
+	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint_smb_browse \
 	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"smb-network", G_VFS_TYPE_BACKEND_SMB_BROWSE,"smb-server", G_VFS_TYPE_BACKEND_SMB_BROWSE,'
 
@@ -486,7 +486,7 @@ gvfsd_http_SOURCES = \
 gvfsd_http_CPPFLAGS = \
 	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendhttp.h \
-	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint.http \
+	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint_http \
 	-DDEFAULT_BACKEND_TYPE=http \
 	-DMAX_JOB_THREADS=1 \
 	$(HTTP_CFLAGS) \
