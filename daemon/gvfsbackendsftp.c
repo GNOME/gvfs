@@ -205,9 +205,7 @@ struct _GVfsBackendSftp
   Connection command_connection;
   Connection data_connection;
 
-  GMountSource *mount_source; /* Only used/set during mount */
-  int mount_try;
-  gboolean mount_try_again;
+  gboolean force_unmounted;
 };
 
 static void parse_attributes (GVfsBackendSftp *backend,
@@ -1330,6 +1328,11 @@ fail_jobs (Connection *conn, GError *error)
 static void
 fail_jobs_and_unmount (GVfsBackendSftp *backend, GError *error)
 {
+  if (backend->force_unmounted)
+    return;
+
+  backend->force_unmounted = TRUE;
+
   fail_jobs (&backend->command_connection, error);
   fail_jobs (&backend->data_connection, error);
 
