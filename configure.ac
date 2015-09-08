@@ -201,7 +201,7 @@ if test "x$enable_udev" != "xno"; then
 
   if test "x$msg_udev" = "xyes"; then
     PKG_CHECK_MODULES([UDEV], [libudev])
-    AC_DEFINE([HAVE_LIBUDEV], 1, [Define to 1 if libudev availible])
+    AC_DEFINE([HAVE_LIBUDEV], 1, [Define to 1 if libudev is available])
   fi
 fi
 
