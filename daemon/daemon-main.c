@@ -343,13 +343,6 @@ on_name_acquired (GDBusConnection *connection,
   send_spawned (TRUE, NULL, 0, spawned_succeeded_cb, data);
 }
 
-static gboolean
-do_name_acquired (gpointer user_data)
-{
-  on_name_acquired (NULL, NULL, user_data);
-  return FALSE;
-}
-
 void
 daemon_main (int argc,
 	     char *argv[],
