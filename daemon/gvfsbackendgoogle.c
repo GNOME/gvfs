@@ -2537,10 +2537,7 @@ g_vfs_backend_google_replace (GVfsBackend         *_self,
 
   if (g_strcmp0 (filename, "/") == 0)
     {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR,
-                        G_IO_ERROR_NOT_SUPPORTED,
-                        _("Can not create root directory"));
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation unsupported"));
       goto out;
     }
 
