@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <gio/gio.h>
 
 #include <libsoup/soup.h>
@@ -352,6 +353,23 @@ read_send_callback (GObject      *object,
 			       "%s", priv->msg->reason_phrase);
       g_object_unref (task);
       return;
+    }
+  if (priv->range)
+    {
+      gboolean status;
+      goffset start, end;
+
+      status = soup_message_headers_get_content_range (priv->msg->response_headers,
+                                                       &start, &end, NULL);
+      if (!status || start != priv->request_offset)
+      {
+        g_task_return_new_error (task,
+                                 G_IO_ERROR,
+                                 G_IO_ERROR_FAILED,
+                                 _("Error seeking in stream"));
+        g_object_unref (task);
+        return;
+      }
     }
 
   g_input_stream_read_async (priv->stream, rasd->buffer, rasd->count,
