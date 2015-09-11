@@ -150,7 +150,8 @@ send_reply (GVfsJob *job)
   GVfsJobDBus *dbus_job = G_VFS_JOB_DBUS (job);
   GVfsJobDBusClass *class;
 
-  g_debug ("send_reply(%p), failed=%d (%s)\n", job, job->failed, job->failed?job->error->message:"");
+  g_debug ("send_reply(%p), failed=%d (%s)\n", job, job->failed,
+           job->failed ? job->error->message : "");
   
   class = G_VFS_JOB_DBUS_GET_CLASS (job);
   

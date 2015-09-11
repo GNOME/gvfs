@@ -96,7 +96,10 @@ static void
 send_reply (GVfsJob *job)
 {
   GVfsJobRead *op_job = G_VFS_JOB_READ (job);
-  g_debug ("job_read send reply, %"G_GSIZE_FORMAT" bytes\n", op_job->data_count);
+
+  g_debug ("send_reply(%p), bytes=%"G_GSIZE_FORMAT", failed=%d (%s)\n",
+           job, op_job->data_count,
+           job->failed, job->failed ? job->error->message : "");
 
   if (job->failed)
     g_vfs_channel_send_error (G_VFS_CHANNEL (op_job->channel), job->error);

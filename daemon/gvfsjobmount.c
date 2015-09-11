@@ -187,7 +187,8 @@ send_reply (GVfsJob *job)
 {
   GVfsJobMount *op_job = G_VFS_JOB_MOUNT (job);
 
-  g_debug ("send_reply, failed: %d\n", job->failed);
+  g_debug ("send_reply(%p), failed=%d (%s)\n", job, job->failed,
+           job->failed ? job->error->message : "");
   
   if (job->failed)
     mount_failed (op_job, job->error);
