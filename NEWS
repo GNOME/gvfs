@@ -1,3 +1,10 @@
+Major changes in 1.25.92
+========================
+* Add Google Drive backend based on libgdata
+* Make all gvfs daemons own a name under org.gtk.vfs.*
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.25.91
 ========================
 * afp: Change g_error to g_warning for read errors to prevent crash reports
