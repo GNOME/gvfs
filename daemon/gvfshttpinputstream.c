@@ -125,82 +125,6 @@ g_vfs_http_input_stream_ensure_request (GInputStream *stream)
   return priv->req;
 }
 
-/**
- * g_vfs_http_input_stream_send:
- * @stream: a #GVfsHttpInputStream
- * @cancellable: optional #GCancellable object, %NULL to ignore.
- * @error: location to store the error occuring, or %NULL to ignore
- *
- * Synchronously sends the HTTP request associated with @stream, and
- * reads the response headers. Call this after g_vfs_http_input_stream_new()
- * and before the first g_input_stream_read() if you want to check the
- * HTTP status code before you start reading.
- *
- * Return value: %TRUE if msg was successfully sent, %FALSE if not
- **/
-gboolean
-g_vfs_http_input_stream_send (GInputStream  *stream,
-			      GCancellable  *cancellable,
-			      GError       **error)
-{
-  GVfsHttpInputStreamPrivate *priv;
-
-  g_return_val_if_fail (G_VFS_IS_HTTP_INPUT_STREAM (stream), FALSE);
-  priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
-
-  if (priv->stream)
-    return TRUE;
-
-  if (!g_input_stream_set_pending (stream, error))
-    return FALSE;
-  g_vfs_http_input_stream_ensure_request (stream);
-  priv->stream = soup_request_send (priv->req, cancellable, error);
-  g_input_stream_clear_pending (stream);
-
-  return priv->stream != NULL;
-}
-
-static gssize
-g_vfs_http_input_stream_read (GInputStream  *stream,
-			      void          *buffer,
-			      gsize          count,
-			      GCancellable  *cancellable,
-			      GError       **error)
-{
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
-  gssize nread;
-
-  if (!priv->stream)
-    {
-      g_vfs_http_input_stream_ensure_request (stream);
-      priv->stream = soup_request_send (priv->req, cancellable, error);
-      if (!priv->stream)
-	return -1;
-    }
-
-  nread = g_input_stream_read (priv->stream, buffer, count, cancellable, error);
-  if (nread > 0)
-    priv->offset += nread;
-  return nread;
-}
-
-static gboolean
-g_vfs_http_input_stream_close (GInputStream  *stream,
-			       GCancellable  *cancellable,
-			       GError       **error)
-{
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
-
-  if (priv->stream)
-    {
-      if (!g_input_stream_close (priv->stream, cancellable, error))
-	return FALSE;
-      g_clear_object (&priv->stream);
-    }
-
-  return TRUE;
-}
-
 static void
 send_callback (GObject      *object,
 	       GAsyncResult *result,
@@ -590,8 +514,6 @@ g_vfs_http_input_stream_class_init (GVfsHttpInputStreamClass *klass)
   
   gobject_class->finalize = g_vfs_http_input_stream_finalize;
 
-  stream_class->read_fn = g_vfs_http_input_stream_read;
-  stream_class->close_fn = g_vfs_http_input_stream_close;
   stream_class->read_async = g_vfs_http_input_stream_read_async;
   stream_class->read_finish = g_vfs_http_input_stream_read_finish;
   stream_class->close_async = g_vfs_http_input_stream_close_async;

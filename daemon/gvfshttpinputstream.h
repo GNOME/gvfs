@@ -57,10 +57,6 @@ GType g_vfs_http_input_stream_get_type (void) G_GNUC_CONST;
 GInputStream *g_vfs_http_input_stream_new         (SoupSession          *session,
 						   SoupURI              *uri);
 
-gboolean      g_vfs_http_input_stream_send        (GInputStream         *stream,
-						   GCancellable         *cancellable,
-						   GError              **error);
-
 void          g_vfs_http_input_stream_send_async  (GInputStream         *stream,
 						   int                   io_priority,
 						   GCancellable         *cancellable,
