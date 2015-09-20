@@ -750,13 +750,18 @@ g_vfs_ftp_dir_cache_funcs_resolve_default (GVfsFtpTask *      task,
   g_return_val_if_fail (target != NULL, NULL);
  
   if (target[0] == '/')
-    return g_vfs_ftp_file_new_from_ftp (task->backend, target);
+    {
+      new_path = g_string_new (target);
+    }
+  else
+    {
+      new_path = g_string_new (g_vfs_ftp_file_get_ftp_path (file));
+      /* only take directory */
+      match = strrchr (new_path->str, '/');
+      g_string_truncate (new_path, match - new_path->str + 1);
+      g_string_append (new_path, target);
+    }
 
-  new_path = g_string_new (g_vfs_ftp_file_get_ftp_path (file));
-  /* only take directory */
-  match = strrchr (new_path->str, '/');
-  g_string_truncate (new_path, match - new_path->str + 1);
-  g_string_append (new_path, target);
   g_string_append_c (new_path, '/'); /* slash at end makes code easier */
   /* cleanup: remove all double slashes */
   while ((match = strstr (new_path->str, "//")) != NULL)
