@@ -69,17 +69,15 @@ gvfsd_metadata_CFLAFGS = $(UDEV_CFLAGS)
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 servicedir = $(DBUS_SERVICE_DIR)
-service_in_files = gvfs-metadata.service.in
-service_DATA = gvfs-metadata.service
+service_in_files = org.gtk.vfs.Metadata.service.in
+service_DATA = org.gtk.vfs.Metadata.service
 
 EXTRA_DIST =				\
-	gvfs-metadata.service.in	\
+	$(service_in_files)		\
 	dbus-interface.xml		\
 	$(NULL)
 
-clean-local:
-	rm -f gvfs-metadata.service
-
 CLEANFILES =				\
 	$(dbus_built_sources)		\
+	$(service_DATA)			\
 	$(NULL)

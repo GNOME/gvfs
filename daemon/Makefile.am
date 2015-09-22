@@ -36,8 +36,8 @@ gvfs_gschemas_convert_dist =
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 servicedir = $(DBUS_SERVICE_DIR)
-service_in_files = gvfs-daemon.service.in
-service_DATA = gvfs-daemon.service
+service_in_files = org.gtk.vfs.Daemon.service.in
+service_DATA = org.gtk.vfs.Daemon.service
 
 %.mount: %.mount.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
@@ -136,17 +136,18 @@ endif
 noinst_DATA = $(mount_DATA:.mount=.localmount)
 
 EXTRA_DIST = 				\
-	gvfs-daemon.service.in		\
+	$(service_in_files)		\
 	$(mount_in_files)		\
 	$(gvfs_gschemas_dist)		\
 	$(gvfs_gschemas_convert_dist)	\
 	$(gsettings_ENUM_FILES)		\
 	$(NULL)
 
-DISTCLEANFILES = gvfs-daemon.service $(mount_DATA) $(noinst_DATA)
+DISTCLEANFILES = $(mount_DATA) $(noinst_DATA)
 
 CLEANFILES =					\
 	$(gsettings__enum_file)			\
+	$(service_DATA)				\
 	*.gschema.valid
 
 noinst_PROGRAMS =				\
