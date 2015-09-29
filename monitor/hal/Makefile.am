@@ -56,10 +56,27 @@ servicedir       = $(datadir)/dbus-1/services
 service_in_files = org.gtk.vfs.HalVolumeMonitor.service.in
 service_DATA     = $(service_in_files:.service.in=.service)
 
+systemd_userdir = ${prefix}/lib/systemd/user
+systemd_user_in_files = gvfs-hal-volume-monitor.service.in
+systemd_user_DATA = $(systemd_user_in_files:.service.in=.service)
+
 $(service_DATA): $(service_in_files) Makefile
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-clean-local:
-	rm -f *~ *.loT $(BUILT_SOURCES) $(service_DATA)
+$(systemd_user_DATA): $(systemd_user_in_files) Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-EXTRA_DIST = hal-marshal.list $(service_in_files) hal.monitor
+CLEANFILES = \
+	*~ \
+	*.loT \
+	$(BUILT_SOURCES) \
+	$(service_DATA) \
+	$(systemd_user_DATA) \
+	$(NULL)
+
+EXTRA_DIST = \
+	hal-marshal.list \
+	$(service_in_files) \
+	$(systemd_user_in_files) \
+	$(remote_volume_monitors_DATA) \
+	$(NULL)

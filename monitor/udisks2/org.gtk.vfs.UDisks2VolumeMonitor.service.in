@@ -1,3 +1,4 @@
 [D-BUS Service]
 Name=org.gtk.vfs.UDisks2VolumeMonitor
 Exec=@libexecdir@/gvfs-udisks2-volume-monitor
+SystemdService=gvfs-udisks2-volume-monitor.service

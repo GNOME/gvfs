@@ -1,3 +1,4 @@
 [D-BUS Service]
 Name=org.gtk.vfs.GoaVolumeMonitor
 Exec=@libexecdir@/gvfs-goa-volume-monitor
+SystemdService=gvfs-goa-volume-monitor.service

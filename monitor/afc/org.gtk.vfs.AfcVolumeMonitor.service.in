@@ -1,4 +1,5 @@
 [D-BUS Service]
 Name=org.gtk.vfs.AfcVolumeMonitor
 Exec=@libexecdir@/gvfs-afc-volume-monitor
+SystemdService=gvfs-afc-volume-monitor.service
 

@@ -1,0 +1,7 @@
+[Unit]
+Description=Virtual filesystem service - digital camera monitor
+
+[Service]
+ExecStart=@libexecdir@/gvfs-gphoto2-volume-monitor
+Type=dbus
+BusName=org.gtk.vfs.GPhoto2VolumeMonitor

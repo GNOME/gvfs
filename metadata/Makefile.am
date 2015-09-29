@@ -72,12 +72,18 @@ servicedir = $(DBUS_SERVICE_DIR)
 service_in_files = org.gtk.vfs.Metadata.service.in
 service_DATA = org.gtk.vfs.Metadata.service
 
+systemd_userdir = ${prefix}/lib/systemd/user
+systemd_user_in_files = gvfs-metadata.service.in
+systemd_user_DATA = gvfs-metadata.service
+
 EXTRA_DIST =				\
 	$(service_in_files)		\
+	$(systemd_user_in_files)	\
 	dbus-interface.xml		\
 	$(NULL)
 
 CLEANFILES =				\
 	$(dbus_built_sources)		\
 	$(service_DATA)			\
+	$(systemd_user_DATA)		\
 	$(NULL)

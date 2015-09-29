@@ -1,3 +1,4 @@
 [D-BUS Service]
 Name=org.gtk.vfs.GPhoto2VolumeMonitor
 Exec=@libexecdir@/gvfs-gphoto2-volume-monitor
+SystemdService=gvfs-gphoto2-volume-monitor.service

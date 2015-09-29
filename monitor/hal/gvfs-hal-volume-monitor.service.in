@@ -1,0 +1,7 @@
+[Unit]
+Description=Virtual filesystem service - deprecated HAL monitor
+
+[Service]
+ExecStart=@libexecdir@/gvfs-hal-volume-monitor
+Type=dbus
+BusName=org.gtk.vfs.HalVolumeMonitor

@@ -1,0 +1,7 @@
+[Unit]
+Description=Virtual filesystem service - Apple File Conduit monitor
+
+[Service]
+ExecStart=@libexecdir@/gvfs-afc-volume-monitor
+Type=dbus
+BusName=org.gtk.vfs.AfcVolumeMonitor

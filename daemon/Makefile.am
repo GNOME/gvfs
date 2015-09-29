@@ -31,13 +31,17 @@ gvfs_gschemas_convert =
 gvfs_gschemas_dist =
 gvfs_gschemas_convert_dist =
 
-# D-BUS service file
+# D-Bus and systemd service files
 %.service: %.service.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 servicedir = $(DBUS_SERVICE_DIR)
 service_in_files = org.gtk.vfs.Daemon.service.in
 service_DATA = org.gtk.vfs.Daemon.service
+
+systemd_userdir = ${prefix}/lib/systemd/user
+systemd_user_in_files = gvfs-daemon.service.in
+systemd_user_DATA = gvfs-daemon.service
 
 %.mount: %.mount.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
@@ -137,6 +141,7 @@ noinst_DATA = $(mount_DATA:.mount=.localmount)
 
 EXTRA_DIST = 				\
 	$(service_in_files)		\
+	$(systemd_user_in_files)	\
 	$(mount_in_files)		\
 	$(gvfs_gschemas_dist)		\
 	$(gvfs_gschemas_convert_dist)	\
@@ -148,6 +153,7 @@ DISTCLEANFILES = $(mount_DATA) $(noinst_DATA)
 CLEANFILES =					\
 	$(gsettings__enum_file)			\
 	$(service_DATA)				\
+	$(systemd_user_DATA)			\
 	*.gschema.valid
 
 noinst_PROGRAMS =				\
