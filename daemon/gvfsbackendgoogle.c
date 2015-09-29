@@ -1118,6 +1118,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   const gchar *summary;
   gchar *destination_basename = NULL;
   gchar *entry_path = NULL;
+  goffset size;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ copy: %s -> %s, %d\n", source, destination, flags);
@@ -1252,6 +1253,9 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
 
   insert_entry (self, GDATA_ENTRY (new_entry));
   g_hash_table_foreach (self->monitors, emit_create_event, entry_path);
+
+  size = gdata_documents_entry_get_quota_used (new_entry);
+  g_vfs_job_progress_callback (size, size, job);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
  out:
@@ -1726,6 +1730,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   const gchar *title;
   gchar *destination_basename = NULL;
   gchar *entry_path = NULL;
+  goffset size;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ push: %s -> %s, %d\n", local_path, destination, flags);
@@ -1916,6 +1921,8 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
         }
     }
 
+  size = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (new_document));
+  g_vfs_job_progress_callback (size, size, job);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
  out:
