@@ -575,7 +575,7 @@ create_mount_tracker_proxy ()
                                                           &error);
   if (proxy == NULL)
     {
-      g_printerr ("Error creating proxy: %s (%s, %d)\n",
+      g_warning ("Error creating proxy: %s (%s, %d)\n",
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
@@ -599,7 +599,8 @@ fill_mountable_info (GDaemonVfs *vfs)
   gboolean host_is_inet;
   
   proxy = create_mount_tracker_proxy ();
-  g_return_if_fail (proxy != NULL);
+  if (proxy == NULL)
+    return;
 
   error = NULL;
   if (!gvfs_dbus_mount_tracker_call_list_mountable_info_sync (proxy, 
@@ -949,7 +950,8 @@ _g_daemon_vfs_get_mount_info_sync (GMountSpec *spec,
     return info;
   
   proxy = create_mount_tracker_proxy ();
-  g_return_val_if_fail (proxy != NULL, NULL);
+  if (proxy == NULL)
+    return NULL;
   
   if (gvfs_dbus_mount_tracker_call_lookup_mount_sync (proxy,
                                                       g_mount_spec_to_dbus_with_path (spec, path),
@@ -982,7 +984,8 @@ _g_daemon_vfs_get_mount_info_by_fuse_sync (const char *fuse_path,
     return info;
   
   proxy = create_mount_tracker_proxy ();
-  g_return_val_if_fail (proxy != NULL, NULL);
+  if (proxy == NULL)
+    return NULL;
   
   if (gvfs_dbus_mount_tracker_call_lookup_mount_by_fuse_path_sync (proxy,
                                                                    fuse_path,
