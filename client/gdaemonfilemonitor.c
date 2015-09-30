@@ -47,7 +47,7 @@ struct _GDaemonFileMonitor
   char *remote_obj_path;
   char *remote_id;
   GDBusConnection *connection;
-  GVfsDBusMonitor *proxy;
+  GVfsDBusMonitor *proxy;              /* Non-null if we're subscribed */
   GVfsDBusMonitorClient *skeleton;
 };
 
@@ -57,7 +57,7 @@ static void
 g_daemon_file_monitor_finalize (GObject* object)
 {
   GDaemonFileMonitor *daemon_monitor;
-  
+
   daemon_monitor = G_DAEMON_FILE_MONITOR (object);
 
   if (daemon_monitor->skeleton)
@@ -107,7 +107,7 @@ handle_changed (GVfsDBusMonitorClient *object,
   g_mount_spec_unref (spec1);
 
   file2 = NULL;
-  
+
   if (strlen (arg_other_file_path) > 0)
     {
       spec2 = g_mount_spec_from_dbus (arg_other_mount_spec);
@@ -118,9 +118,9 @@ handle_changed (GVfsDBusMonitorClient *object,
   g_file_monitor_emit_event (G_FILE_MONITOR (monitor),
                              file1, file2,
                              arg_event_type);
-  
+
   gvfs_dbus_monitor_client_complete_changed (object, invocation);
-  
+
   return TRUE;
 }
 
@@ -167,94 +167,69 @@ subscribe_cb (GVfsDBusMonitor *proxy,
   g_object_unref (monitor);
 }
 
-static void
-async_proxy_new_cb (GObject *source_object,
-                    GAsyncResult *res,
-                    gpointer user_data)
-{
-  GDaemonFileMonitor* monitor = user_data;
-  GVfsDBusMonitor *proxy;
-  GError *error = NULL;
-
-  proxy = gvfs_dbus_monitor_proxy_new_finish (res, &error);
-  if (proxy == NULL)
-    {
-      g_printerr ("Error creating monitor proxy: %s (%s, %d)\n",
-                  error->message, g_quark_to_string (error->domain), error->code);
-      g_error_free (error);
-      g_clear_object (&monitor->connection);
-      g_object_unref (monitor);
-      return;
-    }
-
-  if (g_file_monitor_is_cancelled (G_FILE_MONITOR (monitor)))
-    {
-      g_clear_object (&monitor->connection);
-      g_object_unref (proxy);
-      g_object_unref (monitor);
-      return;
-    }
-
-  gvfs_dbus_monitor_call_subscribe (proxy,
-                                    monitor->object_path,
-                                    NULL,
-                                    (GAsyncReadyCallback) subscribe_cb,
-                                    monitor);
-  g_object_unref (proxy);
-}
-
-static void
-async_got_connection_cb (GDBusConnection *connection,
-                         GError *io_error,
-                         gpointer callback_data)
-{
-  GDaemonFileMonitor* monitor = callback_data;
-  GError *error;
-
-  if (! connection)
-    {
-      g_printerr ("Error getting connection for monitoring: %s (%s, %d)\n",
-                   io_error->message, g_quark_to_string (io_error->domain), io_error->code);
-      g_object_unref (monitor);
-      return;
-    }
-
-  error = NULL;
-  if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (monitor->skeleton),
-                                         connection,
-                                         monitor->object_path,
-                                         &error))
-    {
-      g_warning ("Error registering path: %s (%s, %d)\n",
-                  error->message, g_quark_to_string (error->domain), error->code);
-      g_error_free (error);
-    }
-
-  monitor->connection = g_object_ref (connection);
-  gvfs_dbus_monitor_proxy_new (connection,
-                               G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
-                               monitor->remote_id,
-                               monitor->remote_obj_path,
-                               NULL,
-                               async_proxy_new_cb,
-                               monitor);
-}
-
 GFileMonitor*
 g_daemon_file_monitor_new (const char *remote_id,
-				const char *remote_obj_path)
+                           const char *remote_obj_path)
 {
   GDaemonFileMonitor* daemon_monitor;
+  GDBusConnection *connection;
+  GError *error = NULL;
+  GVfsDBusMonitor *proxy;
 
   daemon_monitor = g_object_new (G_TYPE_DAEMON_FILE_MONITOR, NULL);
 
   daemon_monitor->remote_id = g_strdup (remote_id);
   daemon_monitor->remote_obj_path = g_strdup (remote_obj_path);
 
-  _g_dbus_connection_get_for_async (daemon_monitor->remote_id,
-                                    async_got_connection_cb,
-                                    g_object_ref (daemon_monitor),
-                                    NULL);
+  daemon_monitor->connection = _g_dbus_connection_get_sync (daemon_monitor->remote_id, NULL, &error);
+  if (daemon_monitor->connection == NULL)
+    {
+      g_printerr ("Error getting connection for monitoring: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
+      g_error_free (error);
+    }
+  else
+    {
+      if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (daemon_monitor->skeleton),
+                                             daemon_monitor->connection,
+                                             daemon_monitor->object_path,
+                                             &error))
+        {
+          g_warning ("Error registering path: %s (%s, %d)\n",
+                     error->message, g_quark_to_string (error->domain), error->code);
+          g_error_free (error);
+        }
+
+      /* This looks like a sync call, but since the remote_id is a
+         unique id we don't actually send any messages */
+      proxy = gvfs_dbus_monitor_proxy_new_sync (daemon_monitor->connection,
+                                                G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                                                daemon_monitor->remote_id,
+                                                daemon_monitor->remote_obj_path,
+                                                NULL,
+                                                &error);
+      if (proxy == NULL)
+        {
+          g_printerr ("Error creating monitor proxy: %s (%s, %d)\n",
+                      error->message, g_quark_to_string (error->domain), error->code);
+          g_error_free (error);
+        }
+      else
+        {
+          /* We set the proxy in the callback, meaning we're subscribed if it is set */
+          gvfs_dbus_monitor_call_subscribe (proxy,
+                                            daemon_monitor->object_path,
+                                            NULL,
+                                            (GAsyncReadyCallback) subscribe_cb,
+                                            g_object_ref (daemon_monitor));
+          g_object_unref (proxy);
+
+          /* At this point it is safe to return the monitor, even if we have not gotten
+             the reply to the subscribe yet, because any i/o we do to the mount such
+             as listing a directory will happen after the mount receives the subscribe
+             message */
+        }
+    }
 
   return G_FILE_MONITOR (daemon_monitor);
 }
