@@ -867,6 +867,8 @@ name_owner_appeared (GProxyVolumeMonitor *monitor)
   GProxyVolume *volume;
   GProxyMount *mount;
 
+  G_LOCK (proxy_vm);
+
   seed_monitor (monitor);
 
   /* emit signals for all the drives/volumes/mounts "added" */
@@ -881,6 +883,8 @@ name_owner_appeared (GProxyVolumeMonitor *monitor)
   g_hash_table_iter_init (&hash_iter, monitor->mounts);
   while (g_hash_table_iter_next (&hash_iter, NULL, (gpointer) &mount))
     signal_emit_in_idle (monitor, "mount-added", mount);
+
+  G_UNLOCK (proxy_vm);
 }
 
 static void
@@ -890,6 +894,8 @@ name_owner_vanished (GProxyVolumeMonitor *monitor)
   GProxyDrive *drive;
   GProxyVolume *volume;
   GProxyMount *mount;
+
+  G_LOCK (proxy_vm);
 
   g_hash_table_iter_init (&hash_iter, monitor->mounts);
   while (g_hash_table_iter_next (&hash_iter, NULL, (gpointer) &mount))
@@ -914,6 +920,8 @@ name_owner_vanished (GProxyVolumeMonitor *monitor)
       signal_emit_in_idle (monitor, "drive-disconnected", drive);
     }
   g_hash_table_remove_all (monitor->drives);
+
+  G_UNLOCK (proxy_vm);
 }
 
 static void
