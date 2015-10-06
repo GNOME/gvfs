@@ -610,7 +610,7 @@ unmount_mounts_cb (GObject      *source_object,
         }
 
       if (data->mount_operation != NULL)
-        gvfs_udisks2_unmount_notify_stop (data->mount_operation);
+        gvfs_udisks2_unmount_notify_stop (data->mount_operation, error != NULL);
 
       /* unmount failed; need to fail the whole eject operation */
       simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
@@ -707,7 +707,7 @@ eject_cb (GObject      *source_object,
       if (error != NULL)
         g_signal_emit_by_name (data->mount_operation, "aborted");
 
-      gvfs_udisks2_unmount_notify_stop (data->mount_operation);
+      gvfs_udisks2_unmount_notify_stop (data->mount_operation, error != NULL);
     }
 
   g_simple_async_result_complete (data->simple);
@@ -849,7 +849,7 @@ power_off_cb (GObject      *source_object,
       if (error != NULL)
         g_signal_emit_by_name (data->mount_operation, "aborted");
 
-      gvfs_udisks2_unmount_notify_stop (data->mount_operation);
+      gvfs_udisks2_unmount_notify_stop (data->mount_operation, error != NULL);
     }
 
   g_simple_async_result_complete (data->simple);

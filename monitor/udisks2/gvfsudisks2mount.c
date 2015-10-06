@@ -529,6 +529,7 @@ typedef struct
   GSimpleAsyncResult *simple;
   gboolean in_progress;
   gboolean completed;
+  gboolean failed;
 
   GVfsUDisks2Mount *mount;
 
@@ -601,7 +602,7 @@ unmount_data_complete (UnmountData *data,
 {
   if (data->mount_operation &&
       !unmount_operation_is_eject (data->mount_operation))
-    gvfs_udisks2_unmount_notify_stop (data->mount_operation);
+    gvfs_udisks2_unmount_notify_stop (data->mount_operation, data->failed);
 
   if (complete_idle)
     g_simple_async_result_complete_in_idle (data->simple);
@@ -651,6 +652,7 @@ mount_op_reply_handle (UnmountData *data)
                                        G_IO_ERROR_FAILED_HANDLED,
                                        "GMountOperation aborted (user should never see this "
                                        "error since it is G_IO_ERROR_FAILED_HANDLED)");
+      data->failed = TRUE;
       unmount_data_complete (data, TRUE);
     }
   else if (data->reply_result == G_MOUNT_OPERATION_HANDLED)
@@ -667,6 +669,7 @@ mount_op_reply_handle (UnmountData *data)
                                        G_IO_ERROR,
                                        G_IO_ERROR_BUSY,
                                        _("One or more programs are preventing the unmount operation."));
+      data->failed = TRUE;
       unmount_data_complete (data, TRUE);
     }
 }
@@ -843,7 +846,11 @@ lock_cb (GObject       *source_object,
   if (!udisks_encrypted_call_lock_finish (encrypted,
                                           res,
                                           &error))
-    g_simple_async_result_take_error (data->simple, error);
+    {
+      g_simple_async_result_take_error (data->simple, error);
+      data->failed = TRUE;
+    }
+
   unmount_data_complete (data, FALSE);
 }
 
@@ -870,6 +877,7 @@ unmount_cb (GObject       *source_object,
           goto out;
         }
       g_simple_async_result_take_error (data->simple, error);
+      data->failed = TRUE;
     }
   else
     {
@@ -911,6 +919,7 @@ umount_command_cb (GObject       *source_object,
                                         &error))
     {
       g_simple_async_result_take_error (data->simple, error);
+      data->failed = TRUE;
       unmount_data_complete (data, FALSE);
       goto out;
     }
@@ -934,6 +943,7 @@ umount_command_cb (GObject       *source_object,
                                    G_IO_ERROR,
                                    G_IO_ERROR_FAILED,
                                    "%s", standard_error);
+  data->failed = TRUE;
   unmount_data_complete (data, FALSE);
 
  out:
@@ -1039,7 +1049,7 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
                                            G_IO_ERROR,
                                            G_IO_ERROR_FAILED,
                                            "No object for D-Bus interface");
-
+          data->failed = TRUE;
           unmount_data_complete (data, FALSE);
           goto out;
         }
@@ -1055,6 +1065,7 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
                                                G_IO_ERROR,
                                                G_IO_ERROR_FAILED,
                                                "No filesystem or encrypted interface on D-Bus object");
+              data->failed = TRUE;
               unmount_data_complete (data, FALSE);
               goto out;
             }
@@ -1071,6 +1082,7 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
                                                    G_IO_ERROR,
                                                    G_IO_ERROR_FAILED,
                                                    "No filesystem interface on D-Bus object for cleartext device");
+                  data->failed = TRUE;
                   unmount_data_complete (data, FALSE);
                   goto out;
                 }

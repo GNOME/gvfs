@@ -801,7 +801,8 @@ gvfs_udisks2_unmount_notify_start (GMountOperation *op,
 }
 
 void
-gvfs_udisks2_unmount_notify_stop (GMountOperation *op)
+gvfs_udisks2_unmount_notify_stop (GMountOperation *op,
+                                  gboolean         unmount_failed)
 {
   gchar *message, *name;
   const gchar *format;
@@ -812,7 +813,7 @@ gvfs_udisks2_unmount_notify_stop (GMountOperation *op)
 
   unmount_notify_stop_timer (data);
 
-  if (data->op_aborted)
+  if (data->op_aborted || unmount_failed)
     return;
 
   name = unmount_notify_get_name (data);

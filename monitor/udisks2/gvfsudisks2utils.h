@@ -57,7 +57,8 @@ void     gvfs_udisks2_unmount_notify_start (GMountOperation *op,
                                             GMount          *mount,
                                             GDrive          *drive,
                                             gboolean         generic_text);
-void     gvfs_udisks2_unmount_notify_stop  (GMountOperation *op);
+void     gvfs_udisks2_unmount_notify_stop  (GMountOperation *op,
+                                            gboolean         unmount_failed);
 
 G_END_DECLS
 
