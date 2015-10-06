@@ -957,7 +957,7 @@ handle_list_monitor_implementations (GVfsDBusDaemon        *object,
 
   impls = g_vfs_list_monitor_implementations ();
 
-  g_variant_builder_init (&builder, G_VARIANT_TYPE_ARRAY);
+  g_variant_builder_init (&builder, G_VARIANT_TYPE ("a(ssbia{sv})"));
 
   for (l = impls; l != NULL; l = l->next)
     {
