@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: 3.8\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-09-28 23:02+0000\n"
-"PO-Revision-Date: 2015-10-07 09:26+0100\n"
+"POT-Creation-Date: 2015-10-07 09:05+0000\n"
+"PO-Revision-Date: 2015-10-07 10:10+0100\n"
 "Last-Translator: Pedro Albuquerque <palbuquerque73@gmail.com>\n"
 "Language-Team: Português <palbuquerque73@gmail.com>\n"
 "Language: pt\n"
@@ -59,7 +59,6 @@ msgid "Error setting file metadata: %s"
 msgstr "Erro ao definir os metadados do ficheiro: %s"
 
 #: ../client/gdaemonfile.c:2651 ../client/gdaemonvfs.c:1311
-#| msgid "Can't find metadata file %s"
 msgid "can't open metadata tree"
 msgstr "impossível abrir a árvore de metadados"
 
@@ -2381,8 +2380,9 @@ msgstr "%s: %s: erro ao ler: %s\n"
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:114
 #, c-format
-msgid "%s: %s: error closing: %s\n"
-msgstr "%s: %s: erro ao fechar: %s\n"
+#| msgid "%s: %s: error closing: %s\n"
+msgid "%s: %s:error closing: %s\n"
+msgstr "%s: %s:erro ao fechar: %s\n"
 
 #: ../programs/gvfs-cat.c:141 ../programs/gvfs-open.c:59
 #: ../programs/gvfs-rm.c:56
