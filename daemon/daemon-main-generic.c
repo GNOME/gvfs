@@ -33,6 +33,9 @@ main (int argc, char *argv[])
 #ifndef BACKEND_USES_GVFS
   g_setenv ("GIO_USE_VFS", "local", TRUE);
 #endif
+#ifdef BACKEND_PRE_SETUP_FUNC
+  BACKEND_PRE_SETUP_FUNC (&argc, &argv);
+#endif
   daemon_init ();
 #ifdef BACKEND_SETUP_FUNC
   BACKEND_SETUP_FUNC ();

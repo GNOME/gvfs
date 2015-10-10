@@ -1,0 +1,4 @@
+[Mount]
+Type=admin
+Exec=/bin/sh -c 'pkexec @libexecdir@/gvfsd-admin --address "$@" $DBUS_SESSION_BUS_ADDRESS'
+AutoMount=true

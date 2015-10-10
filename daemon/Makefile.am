@@ -55,6 +55,12 @@ libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-lo
 mount_in_files = sftp.mount.in ftp.mount.in ftps.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in network.mount.in
 mount_DATA =  sftp.mount ftp.mount ftps.mount trash.mount computer.mount burn.mount localtest.mount network.mount
 
+mount_in_files += admin.mount.in
+if HAVE_ADMIN
+mount_DATA += admin.mount
+libexec_PROGRAMS += gvfsd-admin
+endif
+
 mount_in_files +=google.mount.in
 if USE_GOOGLE
 mount_DATA += google.mount
@@ -147,6 +153,7 @@ EXTRA_DIST = 				\
 	$(gvfs_gschemas_dist)		\
 	$(gvfs_gschemas_convert_dist)	\
 	$(gsettings_ENUM_FILES)		\
+	org.gtk.vfs.file-operations.policy.in.in \
 	$(NULL)
 
 DISTCLEANFILES = $(mount_DATA) $(noinst_DATA)
@@ -155,6 +162,8 @@ CLEANFILES =					\
 	$(gsettings__enum_file)			\
 	$(service_DATA)				\
 	$(systemd_user_DATA)			\
+	$(gvfs_polkit_actions_DATA)		\
+	$(gvfs_polkit_actions_in_files)		\
 	*.gschema.valid
 
 noinst_PROGRAMS =				\
@@ -449,6 +458,20 @@ gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS) $(HAL_LIBS) \
 		   $(top_builddir)/common/libgvfscommon-hal.la
 endif
 
+gvfsd_admin_SOURCES = \
+	gvfsbackendadmin.c gvfsbackendadmin.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c
+
+gvfsd_admin_CPPFLAGS = \
+	$(flags) \
+	-DBACKEND_HEADER=gvfsbackendadmin.h \
+	-DDEFAULT_BACKEND_TYPE=admin \
+	-DBACKEND_TYPES='"admin", G_VFS_TYPE_BACKEND_ADMIN,' \
+	$(ADMIN_CFLAGS)
+
+gvfsd_admin_LDADD = $(libraries) $(ADMIN_LIBS)
+
 gvfsd_google_SOURCES = \
 	gvfsbackendgoogle.c gvfsbackendgoogle.h \
 	daemon-main.c daemon-main.h \
@@ -628,7 +651,6 @@ gvfsd_nfs_CPPFLAGS = \
 
 gvfsd_nfs_LDADD = $(libraries) $(NFS_LIBS)
 
-
 # GSettings stuff
 gsettings_ENUM_NAMESPACE = org.gnome.system.gvfs
 gsettings_ENUM_FILES = $(top_srcdir)/daemon/gvfs-enums.h
@@ -639,3 +661,14 @@ gsettings_SCHEMAS = $(gvfs_gschemas)
 
 gvfs_gschemas_convertdir = $(datadir)/GConf/gsettings
 gvfs_gschemas_convert_DATA = $(gvfs_gschemas_convert)
+
+org.gtk.vfs.file-operations.policy.in: org.gtk.vfs.file-operations.policy.in.in Makefile
+	$(AM_V_GEN) sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
+
+@INTLTOOL_POLICY_RULE@
+gvfs_polkit_actionsdir = $(datadir)/polkit-1/actions
+gvfs_polkit_actions_in_files = org.gtk.vfs.file-operations.policy.in
+gvfs_polkit_actions_DATA = org.gtk.vfs.file-operations.policy
+
+gvfs_polkit_rulesdir = $(datadir)/polkit-1/rules.d
+dist_gvfs_polkit_rules_DATA = org.gtk.vfs.file-operations.rules

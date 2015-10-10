@@ -145,6 +145,24 @@ fi
 
 AC_SEARCH_LIBS([login_tty], [util], [AC_DEFINE([HAVE_LOGIN_TTY],[],[Whether login_tty is available])])
 
+dnl ***************************************************
+dnl *** Check if we should build with admin backend ***
+dnl ***************************************************
+AC_ARG_ENABLE([admin], [AS_HELP_STRING([--disable-admin],[build without admin backend])])
+msg_admin=no
+
+if test "x$enable_admin" != "xno"; then
+  PKG_CHECK_MODULES([ADMIN], [polkit-gobject-1], [msg_admin=yes])
+
+  if test "x$msg_admin" = "xyes"; then
+    AC_DEFINE([HAVE_ADMIN], 1, [Define to 1 if admin backend is going to be built])
+  fi
+fi
+
+AC_SUBST(ADMIN_CFLAGS)
+AC_SUBST(ADMIN_LIBS)
+AM_CONDITIONAL([HAVE_ADMIN], [test "$msg_admin" = "yes"])
+
 dnl **************************************************
 dnl *** Check if we should build with http backend ***
 dnl **************************************************
