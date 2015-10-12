@@ -21,16 +21,16 @@ noinst_PROGRAMS += \
 session.conf: session.conf.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@testdir\@|$(abs_builddir)|" $< > $@
 
-gvfs-daemon.service: $(top_srcdir)/daemon/gvfs-daemon.service.in ../config.log
+org.gtk.vfs.Daemon.service: $(top_srcdir)/daemon/org.gtk.vfs.Daemon.service.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/daemon|" $< > $@
 
-gvfs-metadata.service: $(top_srcdir)/metadata/gvfs-metadata.service.in ../config.log
+org.gtk.vfs.Metadata.service: $(top_srcdir)/metadata/org.gtk.vfs.Metadata.service.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/metadata|" $< > $@
 
 %.monitor:
 	$(AM_V_GEN) ln -s $(top_srcdir)/monitor/$(*F)/$(@F) $@
 
-CONFIG_FILES=session.conf gvfs-daemon.service gvfs-metadata.service
+CONFIG_FILES=session.conf org.gtk.vfs.Daemon.service org.gtk.vfs.Metadata.service
 
 if USE_AFC
 org.gtk.vfs.AfcVolumeMonitor.service: $(top_srcdir)/monitor/afc/org.gtk.vfs.AfcVolumeMonitor.service.in ../config.log
