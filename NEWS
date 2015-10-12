@@ -1,3 +1,14 @@
+Major changes in 1.26.1
+=======================
+* proxyvolumemonitor: Fix crashes when drives/volumes/mounts caches are changed
+* Add a corresponding systemd user service for every D-Bus session service
+* google: Report progress when copying and moving
+* ftp: Return correct file info for absolute symlink paths
+* sftp: Fix crashes when force unmount is proceeded
+* sftp: Fix crashes when data connection setup failed
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.26.0
 =======================
 * Translation updates
