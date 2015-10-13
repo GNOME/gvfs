@@ -46,7 +46,6 @@ struct _GDaemonFileMonitor
   char *object_path;
   char *remote_obj_path;
   char *remote_id;
-  GDBusConnection *connection;
   GVfsDBusMonitor *proxy;              /* Non-null if we're subscribed */
   GVfsDBusMonitorClient *skeleton;
 };
@@ -67,8 +66,6 @@ g_daemon_file_monitor_finalize (GObject* object)
     }
 
   g_clear_object (&daemon_monitor->proxy);
-
-  g_clear_object (&daemon_monitor->connection);
 
   g_free (daemon_monitor->object_path);
   g_free (daemon_monitor->remote_id);
@@ -157,7 +154,6 @@ subscribe_cb (GVfsDBusMonitor *proxy,
       gvfs_dbus_monitor_call_unsubscribe (proxy,
                                           monitor->object_path,
                                           NULL, NULL, NULL);
-      g_clear_object (&monitor->connection);
       g_object_unref (monitor);
       return;
     }
@@ -181,8 +177,8 @@ g_daemon_file_monitor_new (const char *remote_id,
   daemon_monitor->remote_id = g_strdup (remote_id);
   daemon_monitor->remote_obj_path = g_strdup (remote_obj_path);
 
-  daemon_monitor->connection = _g_dbus_connection_get_sync (daemon_monitor->remote_id, NULL, &error);
-  if (daemon_monitor->connection == NULL)
+  connection = _g_dbus_connection_get_sync (daemon_monitor->remote_id, NULL, &error);
+  if (connection == NULL)
     {
       g_printerr ("Error getting connection for monitoring: %s (%s, %d)\n",
                   error->message, g_quark_to_string (error->domain), error->code);
@@ -191,7 +187,7 @@ g_daemon_file_monitor_new (const char *remote_id,
   else
     {
       if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (daemon_monitor->skeleton),
-                                             daemon_monitor->connection,
+                                             connection,
                                              daemon_monitor->object_path,
                                              &error))
         {
@@ -202,7 +198,7 @@ g_daemon_file_monitor_new (const char *remote_id,
 
       /* This looks like a sync call, but since the remote_id is a
          unique id we don't actually send any messages */
-      proxy = gvfs_dbus_monitor_proxy_new_sync (daemon_monitor->connection,
+      proxy = gvfs_dbus_monitor_proxy_new_sync (connection,
                                                 G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                                                 daemon_monitor->remote_id,
                                                 daemon_monitor->remote_obj_path,
