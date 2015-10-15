@@ -886,8 +886,10 @@ build_file_info (GVfsBackendGoogle      *self,
 {
   GFileType file_type;
   GList *authors;
+  GList *links;
   gboolean is_folder = FALSE;
   gboolean is_root = FALSE;
+  gboolean has_parent = FALSE;
   const gchar *etag;
   const gchar *id;
   const gchar *name;
@@ -907,7 +909,9 @@ build_file_info (GVfsBackendGoogle      *self,
   if (entry == self->root)
     is_root = TRUE;
 
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, !is_root);
+  links = gdata_entry_look_up_links (entry, GDATA_LINK_PARENT);
+  has_parent = (links != NULL);
+
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, !is_root);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, is_folder);
@@ -916,6 +920,9 @@ build_file_info (GVfsBackendGoogle      *self,
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_VOLATILE, is_symlink);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, !is_root && has_parent);
+
+  g_file_info_set_is_hidden (info, !has_parent);
 
   if (is_folder)
     {
@@ -1079,6 +1086,7 @@ build_file_info (GVfsBackendGoogle      *self,
   g_free (generated_copy_name);
   g_free (escaped_name);
   g_free (content_type);
+  g_list_free (links);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
