@@ -972,10 +972,7 @@ g_proxy_volume_monitor_constructor (GType                  type,
   klass = G_PROXY_VOLUME_MONITOR_CLASS (g_type_class_peek (type));
   object = g_hash_table_lookup (the_volume_monitors, (gpointer) type);
   if (object != NULL)
-    {
-      g_object_ref (object);
-      goto out;
-    }
+    goto out;
 
   dbus_name = klass->dbus_name;
 
@@ -987,6 +984,10 @@ g_proxy_volume_monitor_constructor (GType                  type,
                                       construct_properties);
 
   monitor = G_PROXY_VOLUME_MONITOR (object);
+
+  monitor->drives = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  monitor->volumes = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  monitor->mounts = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 
   error = NULL;
   monitor->proxy = gvfs_remote_volume_monitor_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
@@ -1022,10 +1023,6 @@ g_proxy_volume_monitor_constructor (GType                  type,
   g_signal_connect (monitor->proxy, "volume-changed", G_CALLBACK (volume_changed), monitor);
   g_signal_connect (monitor->proxy, "volume-removed", G_CALLBACK (volume_removed), monitor);
 
-  monitor->drives = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-  monitor->volumes = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-  monitor->mounts = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-
   /* listen to when the owner of the service appears/disappears */
   g_signal_connect (monitor->proxy, "notify::g-name-owner", G_CALLBACK (name_owner_changed), monitor);
   /* initially seed drives/volumes/mounts if we have an owner */
@@ -1038,12 +1035,12 @@ g_proxy_volume_monitor_constructor (GType                  type,
 
   g_hash_table_insert (the_volume_monitors, (gpointer) type, object);
 
+ out:
   /* Take an extra reference to make the instance live forever - see also
    * the dispose() and finalize() vfuncs
    */
   g_object_ref (object);
 
- out:
   G_UNLOCK (proxy_vm);
   return object;
 }
