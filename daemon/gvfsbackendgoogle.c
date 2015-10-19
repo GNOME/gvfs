@@ -1192,6 +1192,22 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
         }
     }
 
+  etag = gdata_entry_get_etag (source_entry);
+  id = gdata_entry_get_id (source_entry);
+  summary = gdata_entry_get_summary (source_entry);
+
+  /* Fail the job if copy/move operation leads to display name loss.
+   * Use G_IO_ERROR_FAILED instead of _NOT_SUPPORTED to avoid r/w fallback.
+   * See: https://bugzilla.gnome.org/show_bug.cgi?id=755701 */
+  if (g_strcmp0 (id, destination_basename) == 0)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR,
+                                G_IO_ERROR_FAILED,
+                                _("Operation unsupported"));
+      goto out;
+    }
+
   if (destination_not_directory)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY, _("The file is not a directory"));
@@ -1229,10 +1245,6 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
           goto out;
         }
     }
-
-  etag = gdata_entry_get_etag (source_entry);
-  id = gdata_entry_get_id (source_entry);
-  summary = gdata_entry_get_summary (source_entry);
 
   source_entry_type = G_OBJECT_TYPE (source_entry);
   dummy_source_entry = g_object_new (source_entry_type,
