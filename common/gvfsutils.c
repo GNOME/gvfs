@@ -21,7 +21,14 @@
 
 #include <string.h>
 #include <glib.h>
+#include <glib/gstdio.h>
 #include "gvfsutils.h"
+
+#ifdef G_OS_UNIX
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 
 /**
  * gvfs_randomize_string:
@@ -39,4 +46,43 @@ gvfs_randomize_string (char *str,
 
   for (i = 0; i < len; i++)
     str[i] = chars[g_random_int_range (0, strlen(chars))];
+}
+
+/**
+ * gvfs_have_session_bus:
+ *
+ * Returns: %TRUE if we can connect to a session or user bus without
+ *  triggering X11 autolaunching.
+ */
+gboolean
+gvfs_have_session_bus (void)
+{
+  if (g_getenv ("DBUS_SESSION_BUS_ADDRESS") != NULL)
+    return TRUE;
+
+#ifdef G_OS_UNIX
+    {
+      gboolean ret = FALSE;
+      gchar *bus;
+      GStatBuf buf;
+
+      bus = g_build_filename (g_get_user_runtime_dir (), "bus", NULL);
+
+      if (g_stat (bus, &buf) < 0)
+        goto out;
+
+      if (buf.st_uid != geteuid ())
+        goto out;
+
+      if ((buf.st_mode & S_IFMT) != S_IFSOCK)
+        goto out;
+
+      ret = TRUE;
+out:
+      g_free (bus);
+      return ret;
+    }
+#else
+  return FALSE;
+#endif
 }

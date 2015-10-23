@@ -45,6 +45,7 @@
 #include "gvfsmonitorimpl.h"
 #include "gvfsdbus.h"
 #include "gvfsdaemonprotocol.h"
+#include "gvfsutils.h"
 
 G_LOCK_DEFINE_STATIC(proxy_vm);
 
@@ -1412,7 +1413,7 @@ g_proxy_volume_monitor_setup_session_bus_connection (void)
    * without spawning private dbus instances.
    * See bug 526454.
    */
-  if (g_getenv ("DBUS_SESSION_BUS_ADDRESS") == NULL)
+  if (!gvfs_have_session_bus ())
     return FALSE;
 
   if (the_volume_monitors == NULL)

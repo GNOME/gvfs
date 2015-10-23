@@ -40,6 +40,7 @@
 #include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 #include <gvfsdbus.h>
+#include "gvfsutils.h"
 
 typedef struct  {
   char *type;
@@ -1501,7 +1502,7 @@ g_io_module_load (GIOModule *module)
    * without spawning private dbus instances.
    * See bug 526454.
    */
-  if (g_getenv ("DBUS_SESSION_BUS_ADDRESS") == NULL) 
+  if (!gvfs_have_session_bus ())
     return;
 
   /* Make this module resident so that we ground the common

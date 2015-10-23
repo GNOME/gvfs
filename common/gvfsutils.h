@@ -24,6 +24,7 @@ G_BEGIN_DECLS
 
 void         gvfs_randomize_string                  (char             *str,
                                                      int               len);
+gboolean     gvfs_have_session_bus                  (void);
 
 G_END_DECLS
 
