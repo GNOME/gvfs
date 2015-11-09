@@ -1,3 +1,10 @@
+Major changes in 1.26.2
+=======================
+* Accept XDG_RUNTIME_DIR/bus as a valid D-Bus session/user bus
+* google: Fail in-fs copy/move if it leads to display name loss
+* google: Mark files you can't see on the web as hidden
+* Translation updates
+
 Major changes in 1.26.1.1
 =========================
 * file monitor: Fix crashes caused by invalid read
