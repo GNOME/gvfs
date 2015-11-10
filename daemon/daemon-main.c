@@ -381,11 +381,11 @@ daemon_main (int argc,
   name_owner_id = 0;
   /* We want to own *some* name on the org.gtk.vfs.* namespace so that
      filtering for us works from a sandbox */
-  if (mountable_name == NULL)
-    mountable_name = g_strdup_printf ("org.gtk.vfs.mountpoint_%d", getpid ());
+  if (data->mountable_name == NULL)
+    data->mountable_name = g_strdup_printf ("org.gtk.vfs.mountpoint_%d", getpid ());
 
   name_owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
-                                  mountable_name,
+                                  data->mountable_name,
                                   G_BUS_NAME_OWNER_FLAGS_NONE,
                                   NULL,
                                   on_name_acquired,
