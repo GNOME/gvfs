@@ -33,13 +33,6 @@ There is a set of command line programs starting with "gvfs-" that lets you run 
   </maintainer>
   <maintainer>
     <foaf:Person>
-      <foaf:name>Christian Kellner</foaf:name>
-      <foaf:mbox rdf:resource="mailto:gicmo@gnome.org" />
-      <gnome:userid>gicmo</gnome:userid>
-    </foaf:Person>
-  </maintainer>
-  <maintainer>
-    <foaf:Person>
       <foaf:name>Ross Lagerwall</foaf:name>
       <foaf:mbox rdf:resource="mailto:rosslagerwall@gmail.com" />
       <gnome:userid>rossl</gnome:userid>
