@@ -107,7 +107,7 @@ static GDataEntry *resolve_dir (GVfsBackendGoogle  *self,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-DirEntriesKey *
+static DirEntriesKey *
 dir_entries_key_new (const gchar *title_or_id, const gchar *parent_id)
 {
   DirEntriesKey *k;
@@ -131,7 +131,7 @@ dir_entries_key_free (gpointer data)
   g_slice_free (DirEntriesKey, k);
 }
 
-guint
+static guint
 entries_in_folder_hash (gconstpointer key)
 {
   DirEntriesKey *k = (DirEntriesKey *) key;
@@ -143,7 +143,7 @@ entries_in_folder_hash (gconstpointer key)
   return hash1 ^ hash2;
 }
 
-gboolean
+static gboolean
 entries_in_folder_equal (gconstpointer a, gconstpointer b)
 {
   DirEntriesKey *k_a = (DirEntriesKey *) a;
@@ -158,7 +158,7 @@ entries_in_folder_equal (gconstpointer a, gconstpointer b)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-WriteHandle *
+static WriteHandle *
 write_handle_new (GDataEntry *document, GDataUploadStream *stream, const gchar *filename)
 {
   WriteHandle *handle;
