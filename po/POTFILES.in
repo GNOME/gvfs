@@ -49,6 +49,7 @@ daemon/gvfsftpconnection.c
 daemon/gvfsftpdircache.c
 daemon/gvfsftpfile.c
 daemon/gvfsftptask.c
+daemon/gvfshttpinputstream.c
 daemon/gvfsjobcloseread.c
 daemon/gvfsjobclosewrite.c
 daemon/gvfsjobcopy.c
