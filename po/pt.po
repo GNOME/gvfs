@@ -10,14 +10,14 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2015-11-28 00:34+0000\n"
-"PO-Revision-Date: 2015-11-28 09:28+0000\n"
-"Last-Translator:  <>\n"
+"PO-Revision-Date: 2015-11-28 09:30+0000\n"
+"Last-Translator: Pedro Albuquerque <palbuquerque73@gmail.com>\n"
 "Language-Team: Português <palbuquerque73@gmail.com>\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\\n\n"
 "X-Generator: Gtranslator 2.91.6\n"
 
 #: ../client/gdaemonfile.c:467 ../client/gdaemonfile.c:2863
@@ -76,7 +76,8 @@ msgid "Operation not supported"
 msgstr "Operação não é suportada"
 
 #: ../client/gdaemonfileenumerator.c:553 ../client/gdaemonfileenumerator.c:636
-#: ../client/gdaemonfileenumerator.c:687 ../client/gdaemonfileinputstream.c:642
+#: ../client/gdaemonfileenumerator.c:687
+#: ../client/gdaemonfileinputstream.c:642
 #: ../client/gdaemonfileinputstream.c:795
 #: ../client/gdaemonfileinputstream.c:915
 #: ../client/gdaemonfileinputstream.c:1166
@@ -1902,10 +1903,9 @@ msgid "Invalid filename"
 msgstr "Nome de ficheiro inválido"
 
 #: ../daemon/gvfshttpinputstream.c:293
-#, fuzzy
 #| msgid "Error seeking in stream on drive %s"
 msgid "Error seeking in stream"
-msgstr "Erro ao procurar no fluxo na unidade %s"
+msgstr "Erro ao procurar no fluxo"
 
 #: ../daemon/gvfsjobmakesymlink.c:111
 msgid "Symlinks not supported by backend"
