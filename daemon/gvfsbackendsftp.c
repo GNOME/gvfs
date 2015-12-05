@@ -5195,6 +5195,23 @@ try_set_attribute (GVfsBackend *backend,
   return TRUE;
 }
 
+/* Return true if the job is finished or cancelled, failing it if needed. */
+static gboolean
+check_finished_or_cancelled_job (GVfsJob *job)
+{
+  if (g_vfs_job_is_finished (job))
+    return TRUE;
+
+  if (g_vfs_job_is_cancelled (job))
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_CANCELLED,
+                        _("Operation was cancelled"));
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 /* The push sliding window mechanism is based on the one in the OpenSSH sftp
  * client. */
 
@@ -5457,7 +5474,7 @@ push_source_close_cb (GObject *source, GAsyncResult *res, gpointer user_data)
   g_input_stream_close_finish (handle->in, res, NULL);
   g_clear_object (&handle->in);
 
-  if (g_vfs_job_is_finished (handle->job) || g_vfs_job_is_cancelled (handle->job))
+  if (check_finished_or_cancelled_job (handle->job))
     {
       sftp_push_handle_free (handle);
       return;
@@ -5484,7 +5501,7 @@ push_write_reply (GVfsBackendSftp *backend,
 
   handle->num_req--;
 
-  if (g_vfs_job_is_finished (job) || g_vfs_job_is_cancelled (job))
+  if (check_finished_or_cancelled_job (job))
     {
       sftp_push_handle_free (handle);
       return;
@@ -5534,7 +5551,7 @@ push_read_cb (GObject *source, GAsyncResult *res, gpointer user_data)
 
   count = g_input_stream_read_finish (handle->in, res, &error);
 
-  if (g_vfs_job_is_finished (handle->job) || g_vfs_job_is_cancelled (handle->job))
+  if (check_finished_or_cancelled_job (handle->job))
     {
       g_clear_error (&error);
       sftp_push_handle_free (handle);
@@ -6201,7 +6218,7 @@ pull_read_reply (GVfsBackendSftp *backend,
 
   handle->num_req--;
 
-  if (g_vfs_job_is_finished (job) || g_vfs_job_is_cancelled (job))
+  if (check_finished_or_cancelled_job (job))
     {
     }
   else if (reply_type == SSH_FXP_STATUS)
@@ -6283,7 +6300,7 @@ pull_fstat_reply (GVfsBackendSftp *backend,
 {
   SftpPullHandle *handle = user_data;
 
-  if (g_vfs_job_is_finished (job) || g_vfs_job_is_cancelled (job))
+  if (check_finished_or_cancelled_job (job))
     {
       handle->size = PULL_SIZE_INVALID;
       sftp_pull_handle_free (handle);
