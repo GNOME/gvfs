@@ -298,7 +298,7 @@ meta_builder_copy (MetaBuilder *builder,
 		   const char  *dest_path,
 		   guint64      mtime)
 {
-  MetaFile *src, *dest;
+  MetaFile *src, *dest, *temp;
 
   meta_builder_remove (builder, dest_path, mtime);
 
@@ -306,9 +306,15 @@ meta_builder_copy (MetaBuilder *builder,
   if (src == NULL)
     return;
 
-  dest = meta_builder_lookup (builder, dest_path, TRUE);
+  temp = metafile_new (NULL, NULL);
+  meta_file_copy_into (src, temp, mtime);
 
-  meta_file_copy_into (src, dest, mtime);
+  dest = meta_builder_lookup (builder, dest_path, TRUE);
+  dest->data = temp->data;
+  dest->children = temp->children;
+  dest->last_changed = temp->last_changed;
+
+  g_free (temp);
 }
 
 void
