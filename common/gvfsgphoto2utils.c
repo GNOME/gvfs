@@ -125,7 +125,7 @@ g_vfs_get_volume_icon (GUdevDevice *device)
   if (g_udev_device_has_property (device, "ID_MEDIA_PLAYER_ICON_NAME"))
     return g_strdup (g_udev_device_get_property (device, "ID_MEDIA_PLAYER_ICON_NAME"));
   else if (g_udev_device_has_property (device, "ID_MEDIA_PLAYER"))
-    return g_strdup ("multimedia-player");
+    return g_strdup ("phone");
   else
     return g_strdup ("camera-photo");
 }
@@ -136,7 +136,7 @@ g_vfs_get_volume_symbolic_icon (GUdevDevice *device)
   if (g_udev_device_has_property (device, "ID_MEDIA_PLAYER_ICON_NAME"))
     return g_strconcat (g_udev_device_get_property (device, "ID_MEDIA_PLAYER_ICON_NAME"), "-symbolic", NULL);
   else if (g_udev_device_has_property (device, "ID_MEDIA_PLAYER"))
-    return g_strdup ("multimedia-player-symbolic");
+    return g_strdup ("phone-symbolic");
   else
     return g_strdup ("camera-photo-symbolic");
 }
