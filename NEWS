@@ -1,3 +1,15 @@
+Major changes in 1.27.3
+=======================
+* sftp: Fail cancelled jobs
+* metadata: Avoid endless recursion when copying meta files
+* mtp: Use phone icon for MTP devices
+* udisks2: Do not show notification if unmount failed
+* completion: Allow bash completion for gvfs-mount
+* http: Return error if seek was not successful
+* sftp: Handle "Too many authentication failures" error
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.26.2
 =======================
 * Accept XDG_RUNTIME_DIR/bus as a valid D-Bus session/user bus
