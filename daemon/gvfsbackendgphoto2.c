@@ -69,11 +69,6 @@
 #define DEBUG_SHOW_TRACES 1
 #endif
 
-/* showing libgphoto2 output */
-#if 0
-#define DEBUG_SHOW_LIBGPHOTO2_OUTPUT 1
-#endif
-
 /* use this to disable caching */
 #if 0
 #define DEBUG_NO_CACHING 1
@@ -652,22 +647,19 @@ g_vfs_backend_gphoto2_finalize (GObject *object)
 
 /* ------------------------------------------------------------------------------------------------- */
 
-#ifdef DEBUG_SHOW_LIBGPHOTO2_OUTPUT
 static void
-_gphoto2_logger_func (GPLogLevel level, const char *domain, const char *format, va_list args, void *data)
+_gphoto2_logger_func (GPLogLevel level, const char *domain, const char *str, void *data)
 {
-  g_fprintf (stderr, "libgphoto2: %s: ", domain);
-  g_vfprintf (stderr, format, args);
-  va_end (args);
-  g_fprintf (stderr, "\n");
+  g_print ("%s: %s\n", domain, str);
 }
-#endif
 
 static void
 g_vfs_backend_gphoto2_init (GVfsBackendGphoto2 *gphoto2_backend)
 {
   GVfsBackend *backend = G_VFS_BACKEND (gphoto2_backend);
   GMountSpec *mount_spec;
+  const char *debug;
+  GPLogLevel level = -1;
 
   DEBUG ("initing %p\n", gphoto2_backend);
 
@@ -679,9 +671,20 @@ g_vfs_backend_gphoto2_init (GVfsBackendGphoto2 *gphoto2_backend)
   g_vfs_backend_set_mount_spec (backend, mount_spec);
   g_mount_spec_unref (mount_spec);
 
-#ifdef DEBUG_SHOW_LIBGPHOTO2_OUTPUT
-  gp_log_add_func (GP_LOG_ALL, _gphoto2_logger_func, NULL);
-#endif
+  debug = g_getenv ("GVFS_GPHOTO2_DEBUG");
+  if (debug)
+    {
+      if (g_ascii_strcasecmp ("all", debug) == 0 || g_ascii_strcasecmp ("data", debug) == 0)
+        level = GP_LOG_DATA;
+      else if (g_ascii_strcasecmp ("debug", debug) == 0)
+        level = GP_LOG_DEBUG;
+      else if (g_ascii_strcasecmp ("verbose", debug) == 0)
+        level = GP_LOG_VERBOSE;
+      else
+        level = GP_LOG_ERROR;
+
+      gp_log_add_func (level, _gphoto2_logger_func, NULL);
+    }
 }
 
 /* ------------------------------------------------------------------------------------------------- */
