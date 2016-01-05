@@ -57,35 +57,6 @@
 #include "gvfsgphoto2utils.h"
 
 
-/* ------------------------------------------------------------------------------------------------- */
-
-/* showing debug traces */
-#define DEBUG_SHOW_TRACES 1
-#define DEBUG_SHOW_ENUMERATE_TRACES 0
-
-static void
-DEBUG (const gchar *message, ...)
-{
-#if DEBUG_SHOW_TRACES
-  va_list args;
-  va_start (args, message);
-  g_logv (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, message, args);
-  va_end (args);
-#endif
-}
-
-static void
-DEBUG_ENUMERATE (const gchar *message, ...)
-{
-#if DEBUG_SHOW_ENUMERATE_TRACES
-  va_list args;
-  va_start (args, message);
-  g_logv (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, message, args);
-  va_end (args);
-#endif
-}
-
-
 /************************************************
  * Storage constants copied from ptp.h
  *
@@ -192,8 +163,8 @@ add_cache_entry (GVfsBackendMtp *backend,
   CacheEntry *entry = g_new0 (CacheEntry, 1);
   entry->storage = storage;
   entry->id = id;
-  DEBUG ("(II) add_cache_entry: %s: %X, %X\n",
-         path, entry->storage, entry->id);
+  g_debug ("(II) add_cache_entry: %s: %X, %X\n",
+           path, entry->storage, entry->id);
   g_hash_table_replace (backend->file_cache,
                         path, entry);
 }
@@ -232,10 +203,10 @@ add_cache_entries_for_filename (GVfsBackendMtp *backend,
   gchar **elements = g_strsplit_set (path, "/", -1);
   unsigned int ne = g_strv_length (elements);
 
-  DEBUG ("(III) add_cache_entries_for_filename: %s, %u\n", path, ne);
+  g_debug ("(III) add_cache_entries_for_filename: %s, %u\n", path, ne);
 
   if (ne < 2) {
-    DEBUG ("(III) Ignoring query on invalid path\n");
+    g_debug ("(III) Ignoring query on invalid path\n");
     goto exit;
   }
 
@@ -261,7 +232,7 @@ add_cache_entries_for_filename (GVfsBackendMtp *backend,
     }
   }
   if (!storage) {
-    DEBUG ("(III) Ignoring query on invalid storage\n");
+    g_debug ("(III) Ignoring query on invalid storage\n");
     goto exit;
   }
 
@@ -272,7 +243,7 @@ add_cache_entries_for_filename (GVfsBackendMtp *backend,
     LIBMTP_file_t *f =
       LIBMTP_Get_Files_And_Folders (device, storage->id, parent_id);
     while (f != NULL) {
-      DEBUG_ENUMERATE ("(III) query (entity = %s, name = %s)\n", f->filename, elements[i]);
+      g_debug ("(III) query (entity = %s, name = %s)\n", f->filename, elements[i]);
       if (strcmp (f->filename, elements[i]) == 0) {
         file = f;
         f = f->next;
@@ -291,7 +262,7 @@ add_cache_entries_for_filename (GVfsBackendMtp *backend,
       LIBMTP_destroy_file_t (tmp);
     }
     if (!file) {
-      DEBUG ("(III) Ignoring query for non-existent file\n");
+      g_debug ("(III) Ignoring query for non-existent file\n");
       goto exit;
     }
     parent_id = file->item_id;
@@ -300,20 +271,20 @@ add_cache_entries_for_filename (GVfsBackendMtp *backend,
  exit:
   g_strfreev (elements);
 
-  DEBUG ("(III) add_cache_entries_for_filename done\n");
+  g_debug ("(III) add_cache_entries_for_filename done\n");
 }
 
 
 static CacheEntry *get_cache_entry (GVfsBackendMtp *backend,
                                     const char *path)
 {
-  DEBUG ("(III) get_cache_entry: %s\n", path);
+  g_debug ("(III) get_cache_entry: %s\n", path);
   CacheEntry *entry = g_hash_table_lookup (backend->file_cache, path);
   if (!entry) {
     add_cache_entries_for_filename (backend, path);
     entry = g_hash_table_lookup (backend->file_cache, path);
   }
-  DEBUG ("(III) get_cache_entry done: %p\n", entry);
+  g_debug ("(III) get_cache_entry done: %p\n", entry);
   return entry;
 }
 
@@ -334,11 +305,11 @@ static void
 remove_cache_entry (GVfsBackendMtp *backend,
                     const char *path)
 {
-  DEBUG ("(III) remove_cache_entry: %s\n", path);
+  g_debug ("(III) remove_cache_entry: %s\n", path);
   g_hash_table_foreach_remove (backend->file_cache,
                                remove_cache_entry_by_prefix,
                                (gpointer) path);
-  DEBUG ("(III) remove_cache_entry done\n");
+  g_debug ("(III) remove_cache_entry done\n");
 }
 
 
@@ -348,7 +319,7 @@ remove_cache_entry_by_id (GVfsBackendMtp *backend,
 {
   GHashTableIter iter;
   gpointer key, value;
-  DEBUG ("(III) remove_cache_entry_by_id: %X\n", id);
+  g_debug ("(III) remove_cache_entry_by_id: %X\n", id);
 
   g_hash_table_iter_init (&iter, backend->file_cache);
   while (g_hash_table_iter_next (&iter, &key, &value)) {
@@ -367,7 +338,7 @@ remove_cache_entry_by_id (GVfsBackendMtp *backend,
     }
   }
 
-  DEBUG ("(III) remove_cache_entry_by_id done\n");
+  g_debug ("(III) remove_cache_entry_by_id done\n");
 }
 
 
@@ -380,7 +351,7 @@ G_DEFINE_TYPE (GVfsBackendMtp, g_vfs_backend_mtp, G_VFS_TYPE_BACKEND)
 static void
 g_vfs_backend_mtp_init (GVfsBackendMtp *backend)
 {
-  DEBUG ("(I) g_vfs_backend_mtp_init\n");
+  g_debug ("(I) g_vfs_backend_mtp_init\n");
   GMountSpec *mount_spec;
 
   g_mutex_init (&backend->mutex);
@@ -393,7 +364,7 @@ g_vfs_backend_mtp_init (GVfsBackendMtp *backend)
 
   backend->monitors = g_hash_table_new (NULL, NULL);
 
-  DEBUG ("(I) g_vfs_backend_mtp_init done.\n");
+  g_debug ("(I) g_vfs_backend_mtp_init done.\n");
 }
 
 static void
@@ -409,7 +380,7 @@ g_vfs_backend_mtp_finalize (GObject *object)
 {
   GVfsBackendMtp *backend;
 
-  DEBUG ("(I) g_vfs_backend_mtp_finalize\n");
+  g_debug ("(I) g_vfs_backend_mtp_finalize\n");
 
   backend = G_VFS_BACKEND_MTP (object);
 
@@ -423,7 +394,7 @@ g_vfs_backend_mtp_finalize (GObject *object)
 
   (*G_OBJECT_CLASS (g_vfs_backend_mtp_parent_class)->finalize) (object);
 
-  DEBUG ("(I) g_vfs_backend_mtp_finalize done.\n");
+  g_debug ("(I) g_vfs_backend_mtp_finalize done.\n");
 }
 
 
@@ -444,7 +415,7 @@ do_create_dir_monitor (GVfsBackend *backend,
 {
   GVfsBackendMtp *mtp_backend = G_VFS_BACKEND_MTP (backend);
 
-  DEBUG ("(I) create_dir_monitor (%s)\n", filename);
+  g_debug ("(I) create_dir_monitor (%s)\n", filename);
 
   GVfsMonitor *vfs_monitor = g_vfs_monitor_new (backend);
 
@@ -457,7 +428,7 @@ do_create_dir_monitor (GVfsBackend *backend,
   g_object_unref (vfs_monitor);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  DEBUG ("(I) create_dir_monitor done.\n");
+  g_debug ("(I) create_dir_monitor done.\n");
 }
 
 
@@ -474,7 +445,7 @@ do_create_file_monitor (GVfsBackend *backend,
 {
   GVfsBackendMtp *mtp_backend = G_VFS_BACKEND_MTP (backend);
 
-  DEBUG ("(I) create_file_monitor (%s)\n", filename);
+  g_debug ("(I) create_file_monitor (%s)\n", filename);
 
   GVfsMonitor *vfs_monitor = g_vfs_monitor_new (backend);
 
@@ -487,7 +458,7 @@ do_create_file_monitor (GVfsBackend *backend,
   g_object_unref (vfs_monitor);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  DEBUG ("(I) create_file_monitor done.\n");
+  g_debug ("(I) create_file_monitor done.\n");
 }
 
 
@@ -496,20 +467,20 @@ emit_event_internal (GVfsMonitor *monitor,
                      const char *path,
                      GFileMonitorEvent event)
 {
-  DEBUG ("(III) emit_event_internal (%s, %d)\n", path, event);
+  g_debug ("(III) emit_event_internal (%s, %d)\n", path, event);
 
   char *dir = g_path_get_dirname (path);
   const char *monitored_path = g_object_get_data (G_OBJECT (monitor), "gvfsbackendmtp:path");
   if (g_strcmp0 (dir, monitored_path) == 0) {
-    DEBUG ("(III) emit_event_internal: Event %d on directory %s for %s\n", event, dir, path);
+    g_debug ("(III) emit_event_internal: Event %d on directory %s for %s\n", event, dir, path);
     g_vfs_monitor_emit_event (monitor, event, path, NULL);
   } else if (g_strcmp0 (path, monitored_path) == 0) {
-    DEBUG ("(III) emit_event_internal: Event %d on file %s\n", event, path);
+    g_debug ("(III) emit_event_internal: Event %d on file %s\n", event, path);
     g_vfs_monitor_emit_event (monitor, event, path, NULL);
   }
   g_free (dir);
 
-  DEBUG ("(III) emit_event_internal done.\n");
+  g_debug ("(III) emit_event_internal done.\n");
 }
 
 
@@ -518,7 +489,7 @@ emit_create_event (gpointer key,
                    gpointer value,
                    gpointer user_data)
 {
-  DEBUG ("(II) emit_create_event.\n");
+  g_debug ("(II) emit_create_event.\n");
   emit_event_internal (key, user_data, G_FILE_MONITOR_EVENT_CREATED);
 }
 
@@ -528,7 +499,7 @@ emit_delete_event (gpointer key,
                    gpointer value,
                    gpointer user_data)
 {
-  DEBUG ("(II) emit_delete_event.\n");
+  g_debug ("(II) emit_delete_event.\n");
   emit_event_internal (key, user_data, G_FILE_MONITOR_EVENT_DELETED);
 }
 
@@ -571,7 +542,7 @@ static void
 on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer user_data)
 {
   const char *dev_path = g_udev_device_get_device_file (device);
-  DEBUG ("(I) on_uevent (action %s, device %s)\n", action, dev_path);
+  g_debug ("(I) on_uevent (action %s, device %s)\n", action, dev_path);
 
   if (dev_path == NULL) {
     return;
@@ -581,7 +552,7 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
 
   if (g_strcmp0 (op_backend->dev_path, dev_path) == 0 &&
       g_str_equal (action, "remove")) {
-    DEBUG ("(I) on_uevent: Quiting after remove event on device %s\n", dev_path);
+    g_debug ("(I) on_uevent: Quiting after remove event on device %s\n", dev_path);
 
     /* Emit delete events to tell clients files are gone. */
     GHashTableIter iter;
@@ -599,7 +570,7 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
     g_vfs_backend_force_unmount ((GVfsBackend*)op_backend);
   }
 
-  DEBUG ("(I) on_uevent done.\n");
+  g_debug ("(I) on_uevent done.\n");
 }
 
 #if HAVE_LIBMTP_1_1_5
@@ -803,7 +774,7 @@ get_dev_path_and_device_from_host (GVfsJob *job,
   }
   *comma = '/';
   dev_path[strlen (dev_path) -1] = '\0';
-  DEBUG ("(II) get_dev_path_from_host: Parsed '%s' into device name %s\n", host, dev_path);
+  g_debug ("(II) get_dev_path_from_host: Parsed '%s' into device name %s\n", host, dev_path);
 
   /* find corresponding GUdevDevice */
   *device = g_udev_client_query_by_device_file (gudev_client, dev_path);
@@ -828,10 +799,10 @@ do_mount (GVfsBackend *backend,
   GVfsBackendMtp *op_backend = G_VFS_BACKEND_MTP (backend);
   GUdevDevice *device;
 
-  DEBUG ("(I) do_mount\n");
+  g_debug ("(I) do_mount\n");
 
   const char *host = g_mount_spec_get (mount_spec, "host");
-  DEBUG ("(I) do_mount: host=%s\n", host);
+  g_debug ("(I) do_mount: host=%s\n", host);
   if (host == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
                               G_IO_ERROR_FAILED, _("No device specified"));
@@ -894,7 +865,7 @@ do_mount (GVfsBackend *backend,
     g_thread_unref (event_thread);
 #endif
   }
-  DEBUG ("(I) do_mount done.\n");
+  g_debug ("(I) do_mount done.\n");
 }
 
 
@@ -905,7 +876,7 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
 {
   GVfsBackendMtp *op_backend;
 
-  DEBUG ("(I) do_umount\n");
+  g_debug ("(I) do_umount\n");
 
   op_backend = G_VFS_BACKEND_MTP (backend);
 
@@ -940,7 +911,7 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  DEBUG ("(I) do_umount done.\n");
+  g_debug ("(I) do_umount done.\n");
 }
 
 
@@ -957,12 +928,12 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
  */
 LIBMTP_mtpdevice_t *
 get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
-  DEBUG ("(II) get_device: %s\n", id);
+  g_debug ("(II) get_device: %s\n", id);
 
   LIBMTP_mtpdevice_t *device = NULL;
 
   if (G_VFS_BACKEND_MTP (backend)->device != NULL) {
-    DEBUG ("(II) get_device: Returning cached device %p\n", device);
+    g_debug ("(II) get_device: Returning cached device %p\n", device);
     return G_VFS_BACKEND_MTP (backend)->device;
   }
 
@@ -1015,7 +986,7 @@ get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
         goto exit;
       }
 
-      DEBUG ("(II) get_device: Storing device %s\n", name);
+      g_debug ("(II) get_device: Storing device %s\n", name);
       G_VFS_BACKEND_MTP (backend)->device = device;
 
       LIBMTP_Dump_Errorstack (device);
@@ -1044,7 +1015,7 @@ get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
   }
 
  exit:
-  DEBUG ("(II) get_device done.\n");
+  g_debug ("(II) get_device done.\n");
   return device;
 }
 
@@ -1062,7 +1033,7 @@ get_device_info (GVfsBackendMtp *backend, GFileInfo *info)
 
   name = g_mount_spec_get (g_vfs_backend_get_mount_spec (G_VFS_BACKEND (backend)), "host");
 
-  DEBUG_ENUMERATE ("(II) get_device_info: %s\n", name);
+  g_debug ("(II) get_device_info: %s\n", name);
 
   g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
   g_file_info_set_name (info, name);
@@ -1096,7 +1067,7 @@ get_device_info (GVfsBackendMtp *backend, GFileInfo *info)
   if (ret != 0) {
     LIBMTP_Dump_Errorstack (device);
     LIBMTP_Clear_Errorstack (device);
-    DEBUG_ENUMERATE ("(II) get_device_info done with no stores.\n");
+    g_debug ("(II) get_device_info done with no stores.\n");
     return;
   }
   guint64 freeSpace = 0;
@@ -1110,7 +1081,7 @@ get_device_info (GVfsBackendMtp *backend, GFileInfo *info)
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, freeSpace);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, maxSpace);
 
-  DEBUG_ENUMERATE ("(II) get_device_info done.\n");
+  g_debug ("(II) get_device_info done.\n");
 }
 
 
@@ -1122,7 +1093,7 @@ get_device_info (GVfsBackendMtp *backend, GFileInfo *info)
 static void
 get_storage_info (LIBMTP_devicestorage_t *storage, GFileInfo *info) {
 
-  DEBUG_ENUMERATE ("(II) get_storage_info: %X\n", storage->id);
+  g_debug ("(II) get_storage_info: %X\n", storage->id);
 
   char *storage_name = create_storage_name(storage);
   g_file_info_set_name (info, storage_name);
@@ -1167,7 +1138,7 @@ get_storage_info (LIBMTP_devicestorage_t *storage, GFileInfo *info) {
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, storage->MaxCapacity);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "mtpfs");
 
-  DEBUG_ENUMERATE ("(II) get_storage_info done.\n");
+  g_debug ("(II) get_storage_info done.\n");
 }
 
 
@@ -1184,7 +1155,7 @@ get_file_info (GVfsBackend *backend,
   GIcon *icon = NULL;
   char *content_type = NULL;
 
-  DEBUG_ENUMERATE ("(II) get_file_info: %X\n", file->item_id);
+  g_debug ("(II) get_file_info: %X\n", file->item_id);
 
   g_file_info_set_name (info, file->filename);
   g_file_info_set_display_name (info, file->filename);
@@ -1245,7 +1216,7 @@ get_file_info (GVfsBackend *backend,
   }
   g_free (content_type);
 
-  DEBUG_ENUMERATE ("(II) get_file_info done.\n");
+  g_debug ("(II) get_file_info done.\n");
 }
 
 
@@ -1262,7 +1233,7 @@ do_enumerate (GVfsBackend *backend,
   gchar **elements = g_strsplit_set (filename, "/", -1);
   unsigned int ne = g_strv_length (elements);
 
-  DEBUG ("(I) do_enumerate (filename = %s, n_elements = %d)\n", filename, ne);
+  g_debug ("(I) do_enumerate (filename = %s, n_elements = %d)\n", filename, ne);
 
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
@@ -1341,7 +1312,7 @@ do_enumerate (GVfsBackend *backend,
  exit:
   g_strfreev (elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
-  DEBUG ("(I) do_enumerate done.\n");
+  g_debug ("(I) do_enumerate done.\n");
 }
 
 
@@ -1353,7 +1324,7 @@ do_query_info (GVfsBackend *backend,
                GFileInfo *info,
                GFileAttributeMatcher *matcher)
 {
-  DEBUG ("(I) do_query_info (filename = %s)\n", filename);
+  g_debug ("(I) do_query_info (filename = %s)\n", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   gchar **elements = g_strsplit_set (filename, "/", -1);
@@ -1386,7 +1357,7 @@ do_query_info (GVfsBackend *backend,
     }
     for (storage = device->storage; storage != 0; storage = storage->next) {
       if (storage->id == entry->storage) {
-        DEBUG ("(I) found storage %X\n", storage->id);
+        g_debug ("(I) found storage %X\n", storage->id);
         found = TRUE;
         get_storage_info (storage, info);
         break;
@@ -1394,7 +1365,7 @@ do_query_info (GVfsBackend *backend,
     }
 
     if (!found) {
-      DEBUG ("(W) storage %X not found?!\n", entry->storage);
+      g_debug ("(W) storage %X not found?!\n", entry->storage);
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
                                 _("Directory doesn't exist"));
@@ -1430,7 +1401,7 @@ do_query_info (GVfsBackend *backend,
  exit:
   g_strfreev (elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
-  DEBUG ("(I) do_query_info done.\n");
+  g_debug ("(I) do_query_info done.\n");
 }
 
 
@@ -1441,7 +1412,7 @@ do_query_fs_info (GVfsBackend *backend,
 		  GFileInfo *info,
 		  GFileAttributeMatcher *attribute_matcher)
 {
-  DEBUG ("(I) do_query_fs_info (filename = %s)\n", filename);
+  g_debug ("(I) do_query_fs_info (filename = %s)\n", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   gchar **elements = g_strsplit_set (filename, "/", -1);
@@ -1484,7 +1455,7 @@ do_query_fs_info (GVfsBackend *backend,
   g_strfreev (elements);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  DEBUG ("(I) do_query_fs_info done.\n");
+  g_debug ("(I) do_query_fs_info done.\n");
 }
 
 
@@ -1516,7 +1487,7 @@ do_make_directory (GVfsBackend *backend,
                    GVfsJobMakeDirectory *job,
                    const char *filename)
 {
-  DEBUG ("(I) do_make_directory (filename = %s)\n", filename);
+  g_debug ("(I) do_make_directory (filename = %s)\n", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   char *dir_name = g_path_get_dirname (filename);
@@ -1567,7 +1538,7 @@ do_make_directory (GVfsBackend *backend,
   g_free (base_name);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  DEBUG ("(I) do_make_directory done.\n");
+  g_debug ("(I) do_make_directory done.\n");
 }
 
 
@@ -1581,7 +1552,7 @@ do_pull (GVfsBackend *backend,
          GFileProgressCallback progress_callback,
          gpointer progress_callback_data)
 {
-  DEBUG ("(I) do_pull (filename = %s, local_path = %s)\n", source, local_path);
+  g_debug ("(I) do_pull (filename = %s, local_path = %s)\n", source, local_path);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   GFile *local_file = NULL;
@@ -1658,7 +1629,7 @@ do_pull (GVfsBackend *backend,
         goto exit;
       }
       /* Source and Dest are files */
-      DEBUG ("(I) Removing destination.\n");
+      g_debug ("(I) Removing destination.\n");
       GError *error = NULL;
       gboolean ret = g_file_delete (local_file,
                                     G_VFS_JOB (job)->cancellable,
@@ -1709,7 +1680,7 @@ do_pull (GVfsBackend *backend,
 
   /* Attempt to delete object if requested but don't fail it it fails. */
   if (remove_source) {
-    DEBUG ("(I) Removing source.\n");
+    g_debug ("(I) Removing source.\n");
     LIBMTP_Delete_Object (device, entry->id);
     g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
                           emit_delete_event,
@@ -1725,14 +1696,14 @@ do_pull (GVfsBackend *backend,
   g_clear_object (&info);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  DEBUG ("(I) do_pull done.\n");
+  g_debug ("(I) do_pull done.\n");
 }
 
 
 static LIBMTP_filetype_t
 get_filetype_from_info (GFileInfo *info) {
   const char *content_type = g_file_info_get_content_type (info);
-  DEBUG ("(II) get_filetype_from_info (info = %s)\n", content_type);
+  g_debug ("(II) get_filetype_from_info (info = %s)\n", content_type);
 
   LIBMTP_filetype_t ret;
   if (!content_type) {
@@ -1877,7 +1848,7 @@ get_filetype_from_info (GFileInfo *info) {
     LIBMTP_FILETYPE_ALBUM,
   */
 
-  DEBUG ("(II) get_filetype_from_info done.\n");
+  g_debug ("(II) get_filetype_from_info done.\n");
 
   return ret;
 }
@@ -1893,7 +1864,7 @@ do_push (GVfsBackend *backend,
          GFileProgressCallback progress_callback,
          gpointer progress_callback_data)
 {
-  DEBUG ("(I) do_push (filename = %s, local_path = %s)\n", destination, local_path);
+  g_debug ("(I) do_push (filename = %s, local_path = %s)\n", destination, local_path);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   char *dir_name = g_path_get_dirname (destination);
@@ -1983,7 +1954,7 @@ do_push (GVfsBackend *backend,
         goto exit;
       }
       /* Source and Dest are files */
-      DEBUG ("(I) Removing destination.\n");
+      g_debug ("(I) Removing destination.\n");
       int ret = LIBMTP_Delete_Object (device, entry->id);
       if (ret != 0) {
         fail_job (G_VFS_JOB (job), device);
@@ -2029,7 +2000,7 @@ do_push (GVfsBackend *backend,
 
   /* Attempt to delete object if requested but don't fail it it fails. */
   if (remove_source) {
-    DEBUG ("(I) Removing source.\n");
+    g_debug ("(I) Removing source.\n");
     g_file_delete (local_file, G_VFS_JOB (job)->cancellable, NULL);
   }
 
@@ -2047,7 +2018,7 @@ do_push (GVfsBackend *backend,
   g_free (filename);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  DEBUG ("(I) do_push done.\n");
+  g_debug ("(I) do_push done.\n");
 }
 
 
@@ -2056,7 +2027,7 @@ do_delete (GVfsBackend *backend,
             GVfsJobDelete *job,
             const char *filename)
 {
-  DEBUG ("(I) do_delete (filename = %s)\n", filename);
+  g_debug ("(I) do_delete (filename = %s)\n", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
@@ -2088,7 +2059,7 @@ do_delete (GVfsBackend *backend,
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
                                 g_strerror (ENOTEMPTY));
-      DEBUG ("(II) Directory size %d\n", file->filesize);
+      g_debug ("(II) Directory size %" G_GSIZE_FORMAT "\n", file->filesize);
       goto exit;
     }
   }
@@ -2109,7 +2080,7 @@ do_delete (GVfsBackend *backend,
  exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  DEBUG ("(I) do_delete done.\n");
+  g_debug ("(I) do_delete done.\n");
 }
 
 
@@ -2119,7 +2090,7 @@ do_set_display_name (GVfsBackend *backend,
                       const char *filename,
                       const char *display_name)
 {
-  DEBUG ("(I) do_set_display_name '%s' --> '%s'\n", filename, display_name);
+  g_debug ("(I) do_set_display_name '%s' --> '%s'\n", filename, display_name);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
@@ -2169,7 +2140,7 @@ do_set_display_name (GVfsBackend *backend,
  exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  DEBUG ("(I) do_set_display_name done.\n");
+  g_debug ("(I) do_set_display_name done.\n");
 }
 
 
@@ -2186,7 +2157,7 @@ do_open_for_read (GVfsBackend *backend,
     return;
   }
 
-  DEBUG ("(I) do_open_for_read (%s)\n", filename);
+  g_debug ("(I) do_open_for_read (%s)\n", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
@@ -2234,7 +2205,7 @@ do_open_for_read (GVfsBackend *backend,
  exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  DEBUG ("(I) do_open_for_read done.\n");
+  g_debug ("(I) do_open_for_read done.\n");
 }
 #endif /* HAVE_LIBMTP_1_1_6 */
 
@@ -2245,7 +2216,7 @@ do_open_icon_for_read (GVfsBackend *backend,
                        GVfsJobOpenIconForRead *job,
                        const char *icon_id)
 {
-  DEBUG ("(I) do_open_icon_for_read (%s)\n", icon_id);
+  g_debug ("(I) do_open_icon_for_read (%s)\n", icon_id);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   guint id = strtol (icon_id, NULL, 16);
@@ -2259,7 +2230,7 @@ do_open_icon_for_read (GVfsBackend *backend,
     ret = LIBMTP_Get_Thumbnail (G_VFS_BACKEND_MTP (backend)->device, id,
                                 &data, &size);
     if (ret == 0) {
-      DEBUG ("File %X has thumbnail: %u\n", id, size);
+      g_debug ("File %X has thumbnail: %u\n", id, size);
       if (size > 0) {
         bytes = g_byte_array_sized_new (size);
         g_byte_array_append (bytes, data, size);
@@ -2272,7 +2243,7 @@ do_open_icon_for_read (GVfsBackend *backend,
       ret = LIBMTP_Get_Representative_Sample (G_VFS_BACKEND_MTP (backend)->device,
                                               id, sample_data);
       if (ret == 0) {
-        DEBUG ("File %X has sampledata: %u\n", id, sample_data->size);
+        g_debug ("File %X has sampledata: %" G_GSIZE_FORMAT "\n", id, sample_data->size);
         if (sample_data->size > 0) {
           bytes = g_byte_array_sized_new (sample_data->size);
           g_byte_array_append (bytes, (const guint8 *)sample_data->data, sample_data->size);
@@ -2283,7 +2254,7 @@ do_open_icon_for_read (GVfsBackend *backend,
     }
 
     if (!bytes) {
-      DEBUG ("File %X has no thumbnail or sampledata\n", id);
+      g_debug ("File %X has no thumbnail or sampledata\n", id);
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR,
                         G_IO_ERROR_NOT_FOUND,
@@ -2313,7 +2284,7 @@ do_open_icon_for_read (GVfsBackend *backend,
  exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  DEBUG ("(I) do_open_icon_for_read done.\n");
+  g_debug ("(I) do_open_icon_for_read done.\n");
 }
 #endif /* HAVE_LIBMTP_1_1_5 */
 
@@ -2330,7 +2301,7 @@ do_seek_on_read (GVfsBackend *backend,
   goffset old_offset = handle->offset;
   gsize size = handle->size;
 
-  DEBUG ("(I) do_seek_on_read (%X %lu %ld %u)\n", id, old_offset, offset, type);
+  g_debug ("(I) do_seek_on_read (%X %lu %ld %u)\n", id, old_offset, offset, type);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   if (type == G_SEEK_END) {
@@ -2352,7 +2323,7 @@ do_seek_on_read (GVfsBackend *backend,
 
  exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
-  DEBUG ("(I) do_seek_on_read done. (%lu)\n", offset);
+  g_debug ("(I) do_seek_on_read done. (%lu)\n", offset);
 }
 
 
@@ -2367,7 +2338,7 @@ do_read (GVfsBackend *backend,
   uint32_t id = handle->id;
   goffset offset = handle->offset;
 
-  DEBUG ("(I) do_read (%X %lu %lu)\n", id, offset, bytes_requested);
+  g_debug ("(I) do_read (%X %lu %lu)\n", id, offset, bytes_requested);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   uint32_t actual;
@@ -2378,7 +2349,7 @@ do_read (GVfsBackend *backend,
                                        bytes_requested, &temp, &actual);
     if (ret != 0) {
       fail_job (G_VFS_JOB (job), G_VFS_BACKEND_MTP (backend)->device);
-      DEBUG ("(I) job failed.\n");
+      g_debug ("(I) job failed.\n");
       goto exit;
     }
 
@@ -2399,7 +2370,7 @@ do_read (GVfsBackend *backend,
 
  exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
-  DEBUG ("(I) do_read done.\n");
+  g_debug ("(I) do_read done.\n");
 }
 
 static void
@@ -2407,14 +2378,14 @@ do_close_read (GVfsBackend *backend,
                GVfsJobCloseRead *job,
                GVfsBackendHandle opaque_handle)
 {
-  DEBUG ("(I) do_close_read\n");
+  g_debug ("(I) do_close_read\n");
   RWHandle *handle = opaque_handle;
   if (handle->bytes) {
     g_byte_array_unref (handle->bytes);
   }
   g_free(handle);
   g_vfs_job_succeeded (G_VFS_JOB (job));
-  DEBUG ("(I) do_close_read done.\n");
+  g_debug ("(I) do_close_read done.\n");
 }
 
 
@@ -2444,7 +2415,7 @@ do_create (GVfsBackend *backend,
     return;
   }
 
-  DEBUG ("(I) do_create (%s)\n", filename);
+  g_debug ("(I) do_create (%s)\n", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   char *dir_name = g_path_get_dirname (filename);
@@ -2484,14 +2455,14 @@ do_create (GVfsBackend *backend,
   LIBMTP_destroy_file_t (mtpfile);
   if (ret != 0) {
     fail_job (G_VFS_JOB (job), device);
-    DEBUG ("(I) Failed to create empty file.\n");
+    g_debug ("(I) Failed to create empty file.\n");
     goto exit;
   }
 
   ret = LIBMTP_BeginEditObject (device, id);
   if (ret != 0) {
     fail_job (G_VFS_JOB (job), device);
-    DEBUG ("(I) Failed to begin edit.\n");
+    g_debug ("(I) Failed to begin edit.\n");
     goto exit;
   }
 
@@ -2515,7 +2486,7 @@ do_create (GVfsBackend *backend,
   g_free (dir_name);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  DEBUG ("(I) do_create done.\n");
+  g_debug ("(I) do_create done.\n");
 }
 
 
@@ -2532,7 +2503,7 @@ do_append_to (GVfsBackend *backend,
     return;
   }
 
-  DEBUG ("(I) do_append_to (%s)\n", filename);
+  g_debug ("(I) do_append_to (%s)\n", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
@@ -2554,14 +2525,14 @@ do_append_to (GVfsBackend *backend,
   LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, entry->id);
   if (file == NULL) {
     fail_job (G_VFS_JOB (job), device);
-    DEBUG ("(I) Failed to get metadata.\n");
+    g_debug ("(I) Failed to get metadata.\n");
     goto exit;
   }
 
   int ret = LIBMTP_BeginEditObject (device, entry->id);
   if (ret != 0) {
     fail_job (G_VFS_JOB (job), device);
-    DEBUG ("(I) Failed to begin edit.\n");
+    g_debug ("(I) Failed to begin edit.\n");
     goto exit;
   }
 
@@ -2581,7 +2552,7 @@ do_append_to (GVfsBackend *backend,
  exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  DEBUG ("(I) do_append_to done.\n");
+  g_debug ("(I) do_append_to done.\n");
 }
 
 
@@ -2600,7 +2571,7 @@ do_replace (GVfsBackend *backend,
     return;
   }
 
-  DEBUG ("(I) do_replace (%s)\n", filename);
+  g_debug ("(I) do_replace (%s)\n", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
@@ -2620,21 +2591,21 @@ do_replace (GVfsBackend *backend,
   LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, entry->id);
   if (file == NULL) {
     fail_job (G_VFS_JOB (job), device);
-    DEBUG ("(I) Failed to get metadata.\n");
+    g_debug ("(I) Failed to get metadata.\n");
     goto exit;
   }
 
   int ret = LIBMTP_BeginEditObject (device, entry->id);
   if (ret != 0) {
     fail_job (G_VFS_JOB (job), device);
-    DEBUG ("(I) Failed to begin edit.\n");
+    g_debug ("(I) Failed to begin edit.\n");
     goto exit;
   }
 
   ret = LIBMTP_TruncateObject (device, entry->id, 0);
   if (ret != 0) {
     fail_job (G_VFS_JOB (job), device);
-    DEBUG ("(I) Failed to truncate.\n");
+    g_debug ("(I) Failed to truncate.\n");
     goto exit;
   }
 
@@ -2654,7 +2625,7 @@ do_replace (GVfsBackend *backend,
  exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  DEBUG ("(I) do_replace done.\n");
+  g_debug ("(I) do_replace done.\n");
 }
 
 
@@ -2669,14 +2640,14 @@ do_write (GVfsBackend *backend,
   uint32_t id = handle->id;
   goffset offset = handle->offset;
 
-  DEBUG ("(I) do_write (%X %lu %lu)\n", id, offset, buffer_size);
+  g_debug ("(I) do_write (%X %lu %lu)\n", id, offset, buffer_size);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   int ret = LIBMTP_SendPartialObject (G_VFS_BACKEND_MTP (backend)->device, id, offset,
                                       (unsigned char *)buffer, buffer_size);
   if (ret != 0) {
     fail_job (G_VFS_JOB (job), G_VFS_BACKEND_MTP (backend)->device);
-    DEBUG ("(I) job failed.\n");
+    g_debug ("(I) job failed.\n");
     goto exit;
   }
 
@@ -2686,7 +2657,7 @@ do_write (GVfsBackend *backend,
 
  exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
-  DEBUG ("(I) do_write done.\n");
+  g_debug ("(I) do_write done.\n");
 }
 
 
@@ -2702,7 +2673,7 @@ do_seek_on_write (GVfsBackend *backend,
   goffset old_offset = handle->offset;
   gsize size = handle->size;
 
-  DEBUG ("(I) do_seek_on_write (%X %lu %ld %u)\n", id, old_offset, offset, type);
+  g_debug ("(I) do_seek_on_write (%X %lu %ld %u)\n", id, old_offset, offset, type);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   if (type == G_SEEK_END) {
@@ -2724,7 +2695,7 @@ do_seek_on_write (GVfsBackend *backend,
 
  exit:
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
-  DEBUG ("(I) do_seek_on_write done. (%lu)\n", offset);
+  g_debug ("(I) do_seek_on_write done. (%lu)\n", offset);
 }
 
 
@@ -2737,7 +2708,7 @@ do_truncate (GVfsBackend *backend,
   RWHandle *handle = opaque_handle;
   uint32_t id = handle->id;
 
-  DEBUG("(I) do_truncate (%ld)\n", size);
+  g_debug("(I) do_truncate (%ld)\n", size);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   if (LIBMTP_TruncateObject (G_VFS_BACKEND_MTP (backend)->device, id, size) == 0) {
@@ -2745,11 +2716,11 @@ do_truncate (GVfsBackend *backend,
     g_vfs_job_succeeded (G_VFS_JOB (job));
   } else {
     fail_job (G_VFS_JOB (job), G_VFS_BACKEND_MTP (backend)->device);
-    DEBUG ("(I) Failed to truncate.\n");
+    g_debug ("(I) Failed to truncate.\n");
   }
 
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
-  DEBUG ("(I) truncate done.\n");
+  g_debug ("(I) truncate done.\n");
 }
 
 
@@ -2758,7 +2729,7 @@ do_close_write (GVfsBackend *backend,
                 GVfsJobCloseWrite *job,
                 GVfsBackendHandle opaque_handle)
 {
-  DEBUG ("(I) do_close_write\n");
+  g_debug ("(I) do_close_write\n");
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   RWHandle *handle = opaque_handle;
@@ -2774,7 +2745,7 @@ do_close_write (GVfsBackend *backend,
  exit:
   g_free(handle);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
-  DEBUG ("(I) do_close_write done.\n");
+  g_debug ("(I) do_close_write done.\n");
 }
 #endif /* HAVE_LIBMTP_1_1_6 */
 
