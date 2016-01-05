@@ -928,6 +928,7 @@ do_start_write (GVfsFtpTask *task,
                 const char *format,
                 ...)
 {
+  GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (task->job);
   va_list varargs;
 
   /* FIXME: can we honour the flags? */
@@ -946,10 +947,16 @@ do_start_write (GVfsFtpTask *task,
 
   if (!g_vfs_ftp_task_is_in_error (task))
     {
+      GIOStream *stream;
+
       /* don't push the connection back, it's our handle now */
       GVfsFtpConnection *conn = g_vfs_ftp_task_take_connection (task);
       g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (task->job), conn);
       g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (task->job), FALSE);
+
+      stream = g_vfs_ftp_connection_get_data_stream (conn);
+      g_object_set_data_full (G_OBJECT (stream), "g-vfs-backend-ftp-filename",
+                              g_strdup (job->filename), g_free);
     }
 }
 
@@ -1086,11 +1093,21 @@ do_close_write (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
+  GVfsFtpConnection *conn = handle;
+  GIOStream *stream;
+  const gchar *filename;
+  GVfsFtpFile *file;
+
+  stream = g_vfs_ftp_connection_get_data_stream (conn);
+  filename = g_object_get_data (G_OBJECT (stream), "g-vfs-backend-ftp-filename");
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
 
   g_vfs_ftp_task_give_connection (&task, handle);
-
   g_vfs_ftp_task_close_data_connection (&task);
   g_vfs_ftp_task_receive (&task, 0, NULL);
+
+  g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
+  g_vfs_ftp_file_free (file);
 
   g_vfs_ftp_task_done (&task);
 }
