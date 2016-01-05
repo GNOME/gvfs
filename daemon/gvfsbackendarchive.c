@@ -47,14 +47,6 @@
 #define MOUNT_ICON_NAME "drive-removable-media"
 #define MOUNT_SYMBOLIC_ICON_NAME "drive-removable-media-symbolic"
 
-/* #define PRINT_DEBUG  */
-
-#ifdef PRINT_DEBUG
-#define DEBUG g_print
-#else
-#define DEBUG(...)
-#endif
-
 /*** TYPE DEFINITIONS ***/
 
 typedef struct _ArchiveFile ArchiveFile;
@@ -97,7 +89,7 @@ gvfs_archive_open (struct archive *archive,
 {
   GVfsArchive *d = data;
 
-  DEBUG ("OPEN\n");
+  g_debug ("OPEN\n");
   g_assert (d->stream == NULL);
   d->stream = g_file_read (d->file,
 			   d->job->cancellable,
@@ -120,7 +112,7 @@ gvfs_archive_read (struct archive *archive,
 				    d->job->cancellable,
 				    &d->error);
 
-  DEBUG ("READ %d\n", (int) read_bytes);
+  g_debug ("READ %d\n", (int) read_bytes);
   return read_bytes;
 }
 
@@ -145,7 +137,7 @@ gvfs_archive_skip (struct archive *archive,
       g_clear_error (&d->error);
       request = 0;
     }
-  DEBUG ("SEEK %d (%d)\n", (int) request,
+  g_debug ("SEEK %d (%d)\n", (int) request,
       (int) g_seekable_tell (G_SEEKABLE (d->stream)));
 
   return request;
@@ -157,7 +149,7 @@ gvfs_archive_close (struct archive *archive,
 {
   GVfsArchive *d = data;
 
-  DEBUG ("CLOSE\n");
+  g_debug ("CLOSE\n");
   if (!d->stream)
     g_vfs_backend_force_unmount (G_VFS_BACKEND (d->backend));
   g_clear_object (&d->stream);
@@ -190,7 +182,7 @@ gvfs_archive_pop_job (GVfsArchive *archive)
   if (archive->job == NULL)
     return;
 
-  DEBUG ("popping job %s\n", G_OBJECT_TYPE_NAME (archive->job));
+  g_debug ("popping job %s\n", G_OBJECT_TYPE_NAME (archive->job));
   if (archive->error)
     {
       g_vfs_job_failed_from_error (archive->job, archive->error);
@@ -307,7 +299,7 @@ archive_file_get_from_path (ArchiveFile *file, const char *filename, gboolean ad
 
   names = g_strsplit (filename, "/", -1);
 
-  DEBUG ("%s %s\n", add ? "add" : "find", filename);
+  g_debug ("%s %s\n", add ? "add" : "find", filename);
   for (i = 0; file && names[i] != NULL; i++)
     {
       cur = NULL;
@@ -320,7 +312,7 @@ archive_file_get_from_path (ArchiveFile *file, const char *filename, gboolean ad
 	}
       if (cur == NULL && add != FALSE)
 	{
-	  DEBUG ("adding node %s to %s\n", names[i], file->name);
+          g_debug ("adding node %s to %s\n", names[i], file->name);
           cur = g_slice_new0 (ArchiveFile);
           cur->name = g_strdup (names[i]);
           file->children = g_slist_prepend (file->children, cur);
@@ -393,7 +385,7 @@ archive_entry_determine_size (GVfsArchive          *archive,
       if (result >= ARCHIVE_FAILED && result <= ARCHIVE_OK)
 	{
 	  if (result < ARCHIVE_OK) {
-	    DEBUG ("archive_read_data_block: result = %d, error = '%s'\n", result, archive_error_string (archive->archive));
+            g_debug ("archive_read_data_block: result = %d, error = '%s'\n", result, archive_error_string (archive->archive));
 	    archive_set_error (archive->archive, ARCHIVE_OK, "No error");
 	    archive_clear_error (archive->archive);
             if (result == ARCHIVE_RETRY)
@@ -431,7 +423,7 @@ archive_file_set_info_from_entry (GVfsArchive *         archive,
   int64_t size;
   file->info = info;
 
-  DEBUG ("setting up %s (%s)\n", archive_entry_pathname (entry), file->name);
+  g_debug ("setting up %s (%s)\n", archive_entry_pathname (entry), file->name);
 
   g_file_info_set_attribute_uint64 (info,
 				    G_FILE_ATTRIBUTE_TIME_ACCESS,
@@ -573,7 +565,7 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
           char *path;
 
   	  if (result < ARCHIVE_OK) {
-  	    DEBUG ("archive_read_next_header: result = %d, error = '%s'\n", result, archive_error_string (archive->archive));
+            g_debug ("archive_read_next_header: result = %d, error = '%s'\n", result, archive_error_string (archive->archive));
   	    archive_set_error (archive->archive, ARCHIVE_OK, "No error");
   	    archive_clear_error (archive->archive);
             if (result == ARCHIVE_RETRY)
@@ -652,7 +644,7 @@ do_mount (GVfsBackend *backend,
   else
     archive->file = g_file_new_for_commandline_arg (file);
   
-  DEBUG ("Trying to mount %s\n", g_file_get_uri (archive->file));
+  g_debug ("Trying to mount %s\n", g_file_get_uri (archive->file));
 
   info = g_file_query_info (archive->file,
 			    "*",
@@ -678,7 +670,7 @@ do_mount (GVfsBackend *backend,
   /* FIXME: check if this file is an archive */
   
   filename = g_file_get_uri (archive->file);
-  DEBUG ("mounted %s\n", filename);
+  g_debug ("mounted %s\n", filename);
   s = g_uri_escape_string (filename, NULL, FALSE);
   g_free (filename);
   mount_spec = g_mount_spec_new ("archive");
@@ -761,7 +753,7 @@ do_open_for_read (GVfsBackend *       backend,
       if (result >= ARCHIVE_WARN && result <= ARCHIVE_OK)
         {
 	  if (result < ARCHIVE_OK) {
-	    DEBUG ("do_open_for_read: result = %d, error = '%s'\n", result, archive_error_string (archive->archive));
+            g_debug ("do_open_for_read: result = %d, error = '%s'\n", result, archive_error_string (archive->archive));
 	    archive_set_error (archive->archive, ARCHIVE_OK, "No error");
 	    archive_clear_error (archive->archive);
             if (result == ARCHIVE_RETRY)
