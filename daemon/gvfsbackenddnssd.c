@@ -92,7 +92,14 @@ static struct {
           FALSE,
           "network-server-afp",
           "network-server-symbolic"
-	}
+        },
+        {
+          "_nfs._tcp",
+          "nfs",
+          FALSE,
+          "folder-remote-nfs",
+          "folder-remote-symbolic"
+        }
 };
 
 static AvahiClient *global_client = NULL;
