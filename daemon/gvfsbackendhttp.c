@@ -737,10 +737,10 @@ g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
       SoupLogger         *logger;
       SoupLoggerLogLevel  level;
 
-      if (g_ascii_strcasecmp (debug, "all") ||
-          g_ascii_strcasecmp (debug, "body"))
+      if (g_ascii_strcasecmp (debug, "all") == 0 ||
+          g_ascii_strcasecmp (debug, "body") == 0)
         level = SOUP_LOGGER_LOG_BODY;
-      else if (g_ascii_strcasecmp (debug, "header"))
+      else if (g_ascii_strcasecmp (debug, "header") == 0)
         level = SOUP_LOGGER_LOG_HEADERS;
       else
         level = SOUP_LOGGER_LOG_MINIMAL;
