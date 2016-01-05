@@ -1494,6 +1494,7 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
   gint   result = 0;
 
   debug_print ("vfs_write: %s\n", path);
+  debug_print ("vfs_write: flags=%o\n", fi->flags);
 
   if ((file = file_from_full_path (path)))
     {
