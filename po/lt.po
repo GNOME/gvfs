@@ -4,15 +4,15 @@
 # This file is distributed under the same license as the gvfs package.
 # Gintautas Miliauskas <gintas@akl.lt>, 2008.
 # Žygimantas Beručka <zygis@gnome.org>, 2009, 2010.
-# Aurimas Černius <aurisc4@gmail.com>, 2013, 2014, 2015.
+# Aurimas Černius <aurisc4@gmail.com>, 2013, 2014, 2015, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs gnome-2-32\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-12-17 12:46+0000\n"
-"PO-Revision-Date: 2015-12-20 15:05+0200\n"
+"POT-Creation-Date: 2016-01-05 12:52+0000\n"
+"PO-Revision-Date: 2016-01-12 22:32+0200\n"
 "Last-Translator: Aurimas Černius <aurisc4@gmail.com>\n"
 "Language-Team: Lietuvių <gnome-lt@lists.akl.lt>\n"
 "Language: lt\n"
@@ -2593,7 +2593,7 @@ msgid ""
 "Note: just pipe through cat if you need its formatting options\n"
 "like -n, -T or other."
 msgstr ""
-"Pastaba: filtruokite per cat, jei reikia jo formatavimo funkcionalumo,\n"
+"Pastaba: filtruokite per cat, jei reikia jo formatavimo parametrų,\n"
 "kaip -n, -T ar kt.."
 
 #: ../programs/gvfs-cat.c:168 ../programs/gvfs-copy.c:144
@@ -2607,7 +2607,7 @@ msgstr ""
 #: ../programs/gvfs-tree.c:261
 #, c-format
 msgid "Error parsing commandline options: %s\n"
-msgstr "Klaida apdorojant komandų eilutės parinktis: %s\n"
+msgstr "Klaida apdorojant komandų eilutės parametrus: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
