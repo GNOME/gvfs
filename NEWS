@@ -1,3 +1,10 @@
+Major changes in 1.27.4
+=======================
+* dns-sd: Add support for nfs shares
+* Do not print anything from daemons unless debug mode is enabled
+* Several other logging improvements
+* Translation updates
+
 Major changes in 1.27.3
 =======================
 * sftp: Fail cancelled jobs
