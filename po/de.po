@@ -10,7 +10,7 @@
 # Mario Blättermann <mario.blaettermann@gmail.com>, 2009-2013, 2015, 2016.
 # Paul Seyfert <pseyfert@mathphys.fsk.uni-heidelberg.de>, 2011.
 # Christian Kirbach <christian.kirbach@gmail.com>, 2009, 2010, 2011, 2012, 2013.
-# Wolfgang Stöggl <c72578@yahoo.de>, 2014.
+# Wolfgang Stöggl <c72578@yahoo.de>, 2014, 2016.
 # Bernd Homuth <dev@hmt.im>, 2015.
 #
 msgid ""
@@ -18,9 +18,9 @@ msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-01-18 19:52+0000\n"
-"PO-Revision-Date: 2016-01-18 20:55+0100\n"
-"Last-Translator: Mario Blättermann <mario.blaettermann@gmail.com>\n"
+"POT-Creation-Date: 2016-01-21 12:54+0000\n"
+"PO-Revision-Date: 2016-01-21 16:18+0100\n"
+"Last-Translator: Wolfgang Stoeggl <c72578@yahoo.de>\n"
 "Language-Team: Deutsch <gnome-de@gnome.org>\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
@@ -124,8 +124,8 @@ msgstr "Fehler im Datenstromprotokoll: %s"
 #: ../client/gdaemonfileinputstream.c:545
 #: ../client/gdaemonfileinputstream.c:1715
 #: ../client/gdaemonfileoutputstream.c:496
-#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2316
-#: ../daemon/gvfsbackendmtp.c:2688
+#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2322
+#: ../daemon/gvfsbackendmtp.c:2702
 msgid "End of stream"
 msgstr "Ende des Datenstroms"
 
@@ -414,10 +414,10 @@ msgstr "Zugriff verweigert"
 #: ../daemon/gvfsbackendarchive.c:843 ../daemon/gvfsbackendarchive.c:872
 #: ../daemon/gvfsbackendcdda.c:1024 ../daemon/gvfsbackendcomputer.c:639
 #: ../daemon/gvfsbackenddnssd.c:422 ../daemon/gvfsbackendftp.c:778
-#: ../daemon/gvfsbackendftp.c:1155 ../daemon/gvfsbackendmtp.c:1567
-#: ../daemon/gvfsbackendmtp.c:1583 ../daemon/gvfsbackendmtp.c:2037
-#: ../daemon/gvfsbackendmtp.c:2100 ../daemon/gvfsbackendmtp.c:2167
-#: ../daemon/gvfsbackendmtp.c:2513 ../daemon/gvfsbackendnetwork.c:696
+#: ../daemon/gvfsbackendftp.c:1155 ../daemon/gvfsbackendmtp.c:1572
+#: ../daemon/gvfsbackendmtp.c:1588 ../daemon/gvfsbackendmtp.c:2042
+#: ../daemon/gvfsbackendmtp.c:2105 ../daemon/gvfsbackendmtp.c:2173
+#: ../daemon/gvfsbackendmtp.c:2527 ../daemon/gvfsbackendnetwork.c:696
 #: ../daemon/gvfsbackendsmbbrowse.c:1129 ../daemon/gvfsbackendsmbbrowse.c:1196
 #: ../daemon/gvfsbackendsmbbrowse.c:1383 ../daemon/gvfsbackendsmbbrowse.c:1456
 #, c-format
@@ -481,8 +481,8 @@ msgstr "Nicht genug Speicherplatz auf dem Datenträger"
 #: ../daemon/gvfsbackendftp.c:1475 ../daemon/gvfsbackendftp.c:1583
 #: ../daemon/gvfsbackendgoogle.c:1233 ../daemon/gvfsbackendgoogle.c:1561
 #: ../daemon/gvfsbackendgoogle.c:1834 ../daemon/gvfsbackendgoogle.c:2486
-#: ../daemon/gvfsbackendmtp.c:1513 ../daemon/gvfsbackendmtp.c:1645
-#: ../daemon/gvfsbackendmtp.c:1971 ../daemon/gvfsbackendnfs.c:2486
+#: ../daemon/gvfsbackendmtp.c:1518 ../daemon/gvfsbackendmtp.c:1650
+#: ../daemon/gvfsbackendmtp.c:1976 ../daemon/gvfsbackendnfs.c:2486
 #: ../daemon/gvfsbackendsftp.c:4803 ../daemon/gvfsbackendsmb.c:2201
 msgid "Target file already exists"
 msgstr "Zieldatei existiert bereits"
@@ -558,9 +558,9 @@ msgstr "Quelldatei ist ein Ordner"
 msgid "Range lock conflict exists"
 msgstr "Sperrbereichskonflikt vorhanden"
 
-#: ../daemon/gvfsafpvolume.c:2309 ../daemon/gvfsbackendmtp.c:1346
-#: ../daemon/gvfsbackendmtp.c:1371 ../daemon/gvfsbackendmtp.c:1521
-#: ../daemon/gvfsbackendmtp.c:1904 ../daemon/gvfsbackendmtp.c:2438
+#: ../daemon/gvfsafpvolume.c:2309 ../daemon/gvfsbackendmtp.c:1351
+#: ../daemon/gvfsbackendmtp.c:1376 ../daemon/gvfsbackendmtp.c:1526
+#: ../daemon/gvfsbackendmtp.c:1909 ../daemon/gvfsbackendmtp.c:2452
 msgid "Directory doesn't exist"
 msgstr "Ordner existiert nicht"
 
@@ -707,7 +707,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackendafc.c:1009 ../daemon/gvfsbackendarchive.c:744
 #: ../daemon/gvfsbackendcomputer.c:657 ../daemon/gvfsbackendgoogle.c:2186
-#: ../daemon/gvfsbackendgphoto2.c:1805 ../daemon/gvfsbackendmtp.c:2189
+#: ../daemon/gvfsbackendgphoto2.c:1805 ../daemon/gvfsbackendmtp.c:2195
 #: ../daemon/gvfsbackendnfs.c:347 ../daemon/gvfsbackendrecent.c:122
 #: ../daemon/gvfsbackendsmb.c:814 ../daemon/gvfsbackendtrash.c:234
 msgid "Can't open directory"
@@ -734,11 +734,12 @@ msgstr "Nicht unterstützter Suchtyp"
 #: ../daemon/gvfsbackendgoogle.c:1536 ../daemon/gvfsbackendgoogle.c:1764
 #: ../daemon/gvfsbackendgoogle.c:2402 ../daemon/gvfsbackendgoogle.c:2457
 #: ../daemon/gvfsbackendgoogle.c:2481 ../daemon/gvfsbackendgoogle.c:2567
-#: ../daemon/gvfsbackendmtp.c:1930 ../daemon/gvfsbackendmtp.c:2156
-#: ../daemon/gvfsbackendmtp.c:2414 ../daemon/gvfsbackendmtp.c:2502
-#: ../daemon/gvfsbackendmtp.c:2570 ../daemon/gvfsbackendnfs.c:2368
-#: ../daemon/gvfsbackendsftp.c:2110 ../daemon/gvfsbackendsftp.c:5171
-#: ../daemon/gvfsbackendsmb.c:1845 ../daemon/gvfsftptask.c:431
+#: ../daemon/gvfsbackendmtp.c:1935 ../daemon/gvfsbackendmtp.c:2162
+#: ../daemon/gvfsbackendmtp.c:2357 ../daemon/gvfsbackendmtp.c:2428
+#: ../daemon/gvfsbackendmtp.c:2516 ../daemon/gvfsbackendmtp.c:2584
+#: ../daemon/gvfsbackendnfs.c:2368 ../daemon/gvfsbackendsftp.c:2110
+#: ../daemon/gvfsbackendsftp.c:5171 ../daemon/gvfsbackendsmb.c:1845
+#: ../daemon/gvfsftptask.c:431
 msgid "Operation unsupported"
 msgstr "Vorgang wird nicht unterstützt"
 
@@ -799,9 +800,9 @@ msgstr "Ordner kann nicht über einen Ordner kopiert werden"
 #: ../daemon/gvfsbackendafp.c:305 ../daemon/gvfsbackendburn.c:891
 #: ../daemon/gvfsbackenddav.c:2978 ../daemon/gvfsbackendftp.c:1598
 #: ../daemon/gvfsbackendgoogle.c:1244 ../daemon/gvfsbackendgoogle.c:1825
-#: ../daemon/gvfsbackendgoogle.c:1845 ../daemon/gvfsbackendmtp.c:1628
-#: ../daemon/gvfsbackendmtp.c:1651 ../daemon/gvfsbackendmtp.c:1953
-#: ../daemon/gvfsbackendmtp.c:1977
+#: ../daemon/gvfsbackendgoogle.c:1845 ../daemon/gvfsbackendmtp.c:1633
+#: ../daemon/gvfsbackendmtp.c:1656 ../daemon/gvfsbackendmtp.c:1958
+#: ../daemon/gvfsbackendmtp.c:1982
 msgid "Can't recursively copy directory"
 msgstr "Ordner kann nicht rekursiv kopiert werden"
 
@@ -1346,7 +1347,7 @@ msgstr "Fehler beim Anlegen des Dateiobjekts"
 msgid "Error getting file"
 msgstr "Fehler beim Abrufen der Datei"
 
-#: ../daemon/gvfsbackendgphoto2.c:1904 ../daemon/gvfsbackendmtp.c:2279
+#: ../daemon/gvfsbackendgphoto2.c:1904 ../daemon/gvfsbackendmtp.c:2285
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Fehlerhafte Symbolidentifikation »%s«"
@@ -1495,35 +1496,35 @@ msgstr "MTP-Gerät »%s« kann nicht geöffnet werden"
 msgid "Device not found"
 msgstr "Gerät nicht gefunden"
 
-#: ../daemon/gvfsbackendmtp.c:1274 ../daemon/gvfsbackendmtp.c:1382
-#: ../daemon/gvfsbackendmtp.c:1434
+#: ../daemon/gvfsbackendmtp.c:1279 ../daemon/gvfsbackendmtp.c:1387
+#: ../daemon/gvfsbackendmtp.c:1439
 msgid "File not found"
 msgstr "Datei nicht gefunden"
 
-#: ../daemon/gvfsbackendmtp.c:1502
+#: ../daemon/gvfsbackendmtp.c:1507
 msgid "Cannot make directory in this location"
 msgstr "Ordner kann an diesem Ort nicht angelegt werden"
 
-#: ../daemon/gvfsbackendmtp.c:1572 ../daemon/gvfsbackendmtp.c:2042
-#: ../daemon/gvfsbackendmtp.c:2105 ../daemon/gvfsbackendmtp.c:2172
-#: ../daemon/gvfsbackendmtp.c:2518 ../daemon/gvfsbackendmtp.c:2584
+#: ../daemon/gvfsbackendmtp.c:1577 ../daemon/gvfsbackendmtp.c:2047
+#: ../daemon/gvfsbackendmtp.c:2110 ../daemon/gvfsbackendmtp.c:2178
+#: ../daemon/gvfsbackendmtp.c:2532 ../daemon/gvfsbackendmtp.c:2598
 #: ../daemon/gvfsbackendsmbbrowse.c:1192
 msgid "Not a regular file"
 msgstr "Keine gültige Datei"
 
-#: ../daemon/gvfsbackendmtp.c:1618 ../daemon/gvfsbackendmtp.c:1943
+#: ../daemon/gvfsbackendmtp.c:1623 ../daemon/gvfsbackendmtp.c:1948
 msgid "Target is a directory"
 msgstr "Das Ziel ist ein Ordner"
 
-#: ../daemon/gvfsbackendmtp.c:1623 ../daemon/gvfsbackendmtp.c:1948
+#: ../daemon/gvfsbackendmtp.c:1628 ../daemon/gvfsbackendmtp.c:1953
 msgid "Can't merge directories"
 msgstr "Ordner können nicht zusammengeführt werden"
 
-#: ../daemon/gvfsbackendmtp.c:1881 ../daemon/gvfsbackendmtp.c:2430
+#: ../daemon/gvfsbackendmtp.c:1886 ../daemon/gvfsbackendmtp.c:2444
 msgid "Cannot write to this location"
 msgstr "Dieser Ort ist schreibgeschützt"
 
-#: ../daemon/gvfsbackendmtp.c:2261
+#: ../daemon/gvfsbackendmtp.c:2267
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "Keine Vorschau für Objekt »%s«"
@@ -2494,10 +2495,12 @@ msgstr ""
 "Daten werden auf %s geschrieben\n"
 "Stecken Sie nicht vor Abschluss des Vorgangs aus"
 
+# Ausstecken passt zwar häufig, nicht aber für CDROM: Sie dürfen jetzt XY CDROM ausstecken.
+# Daher »entfernen« gewählt.
 #: ../monitor/udisks2/gvfsudisks2utils.c:821
 #, c-format
 msgid "You can now unplug %s\n"
-msgstr "Sie dürfen jetzt %s ausstecken\n"
+msgstr "Sie dürfen jetzt %s entfernen\n"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
