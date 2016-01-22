@@ -56,9 +56,10 @@ servicedir       = $(datadir)/dbus-1/services
 service_in_files = org.gtk.vfs.HalVolumeMonitor.service.in
 service_DATA     = $(service_in_files:.service.in=.service)
 
-systemd_userdir = ${prefix}/lib/systemd/user
 systemd_user_in_files = gvfs-hal-volume-monitor.service.in
+if USE_SYSTEMD_USER_UNITS
 systemd_user_DATA = $(systemd_user_in_files:.service.in=.service)
+endif
 
 $(service_DATA): $(service_in_files) Makefile
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@

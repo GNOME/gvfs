@@ -72,9 +72,10 @@ servicedir = $(DBUS_SERVICE_DIR)
 service_in_files = org.gtk.vfs.Metadata.service.in
 service_DATA = org.gtk.vfs.Metadata.service
 
-systemd_userdir = ${prefix}/lib/systemd/user
 systemd_user_in_files = gvfs-metadata.service.in
+if USE_SYSTEMD_USER_UNITS
 systemd_user_DATA = gvfs-metadata.service
+endif
 
 EXTRA_DIST =				\
 	$(service_in_files)		\

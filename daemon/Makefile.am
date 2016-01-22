@@ -39,9 +39,10 @@ servicedir = $(DBUS_SERVICE_DIR)
 service_in_files = org.gtk.vfs.Daemon.service.in
 service_DATA = org.gtk.vfs.Daemon.service
 
-systemd_userdir = ${prefix}/lib/systemd/user
 systemd_user_in_files = gvfs-daemon.service.in
+if USE_SYSTEMD_USER_UNITS
 systemd_user_DATA = gvfs-daemon.service
+endif
 
 %.mount: %.mount.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@

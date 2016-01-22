@@ -260,6 +260,24 @@ fi
 
 AM_CONDITIONAL(USE_UDISKS2, [test "$msg_udisks2" = "yes"])
 
+dnl ************************************
+dnl *** Check for systemd user units ***
+dnl ************************************
+
+msg_systemd_user_units=no
+
+AC_ARG_WITH([systemduserunitdir],
+            [AS_HELP_STRING([--with-systemduserunitdir=PATH], [Set directory for systemd user units, or 'no' to disable])],
+            [systemd_userdir="$withval"],
+            [systemd_userdir="${prefix}/lib/systemd/user"])
+AC_SUBST([systemd_userdir])
+
+if test "x$systemd_userdir" != "xno"; then
+  PKG_CHECK_MODULES([SYSTEMD], [systemd >= 206], [msg_systemd_user_units=yes], 1)
+fi
+
+AM_CONDITIONAL([USE_SYSTEMD_USER_UNITS], [test "$msg_systemd_user_units" = "yes"])
+
 dnl **********************************
 dnl *** Check for libsystemd-login ***
 dnl **********************************
@@ -949,6 +967,7 @@ echo "
 	Build GDU volume monitor:     $msg_gdu
 	Build udisks2 volume monitor: $msg_udisks2
 	Build GOA volume monitor:     $msg_goa
+        Use systemd user units:       $msg_systemd_user_units
         Use libsystemd-login:         $msg_libsystemd_login
         Use GCR:                      $msg_gcr
 	GNOME Keyring support:        $msg_keyring
