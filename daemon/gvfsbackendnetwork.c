@@ -299,7 +299,7 @@ update_from_files (GVfsBackendNetwork *backend,
         }
     }
 
-  g_list_foreach (old_files, (GFunc)network_file_free, NULL);
+  g_list_free_full (old_files, (GDestroyNotify)network_file_free);
 }
 
 static void
@@ -652,7 +652,7 @@ smb_settings_change_event_cb (GSettings *settings,
     {
       g_signal_handlers_disconnect_by_func (backend->smb_monitor,
 					    notify_smb_files_changed,
-					    backend->smb_monitor);
+					    backend);
       g_file_monitor_cancel (backend->smb_monitor);
       g_object_unref (backend->smb_monitor);
       backend->smb_monitor = NULL;
@@ -948,6 +948,28 @@ g_vfs_backend_network_finalize (GObject *object)
     g_object_unref (backend->smb_settings);
   if (backend->dnssd_settings)
     g_object_unref (backend->dnssd_settings);
+  if (backend->dnssd_monitor)
+    {
+      g_signal_handlers_disconnect_by_func (backend->dnssd_monitor, notify_dnssd_local_changed, backend);
+      g_clear_object (&backend->dnssd_monitor);
+    }
+  if (backend->smb_monitor)
+    {
+      g_signal_handlers_disconnect_by_func (backend->smb_monitor, notify_smb_files_changed, backend);
+      g_clear_object (&backend->smb_monitor);
+    }
+  if (backend->idle_tag)
+    {
+      g_source_remove (backend->idle_tag);
+      backend->idle_tag = 0;
+    }
+  if (backend->files)
+    {
+      g_list_free_full (backend->files, (GDestroyNotify)network_file_free);
+      backend->files = NULL;
+    }
+  g_free (backend->current_workgroup);
+  g_free (backend->extra_domains);
 
   if (G_OBJECT_CLASS (g_vfs_backend_network_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_network_parent_class)->finalize) (object);
