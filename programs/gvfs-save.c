@@ -102,7 +102,7 @@ save (GFile *file)
 	      if (written == -1)
 		{
 		  save_res = FALSE;
-		  g_printerr ("Error writing to stream: %s", error->message);
+		  g_printerr ("Error writing to stream: %s\n", error->message);
 		  g_error_free (error);
 		  goto out;
 		}
@@ -122,6 +122,7 @@ save (GFile *file)
 
  out:
 
+  error = NULL;
   close_res = g_output_stream_close (out, NULL, &error);
   if (!close_res)
     {
