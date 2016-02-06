@@ -692,7 +692,7 @@ on_mount_op_reply (GMountOperation       *mount_operation,
   data->reply_result = result;
   data->reply_choice = choice;
   data->reply_set = TRUE;
-  if (!data->completed || !data->in_progress)
+  if (!data->completed && !data->in_progress)
     mount_op_reply_handle (data);
 }
 
