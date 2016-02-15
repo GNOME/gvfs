@@ -1,3 +1,12 @@
+Major changes in 1.27.90
+========================
+* udisks2: Avoid crashes during unmount
+* ftp: Fix cache invalidation after writing
+* network: Fix crashes when mount failed
+* mtp: Allow reading on more devices
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.27.4
 =======================
 * dns-sd: Add support for nfs shares
