@@ -1,3 +1,12 @@
+Major changes in 1.24.3
+=======================
+* udisks2: Avoid crashes during unmount
+* network: Fix crashes when mount failed
+* metadata: Avoid endless recursion when copying meta files
+* udisks2: Do not show notification if unmount failed
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.24.2
 =======================
 * udisks2: Fix a crash when unmounting
