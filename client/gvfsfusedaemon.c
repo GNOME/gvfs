@@ -2482,7 +2482,6 @@ vfs_destroy (gpointer param)
   mount_list_free ();
   if (subthread_main_loop != NULL) 
     g_main_loop_quit (subthread_main_loop);
-  g_object_unref (gvfs);
 }
 
 static struct fuse_operations vfs_oper =
