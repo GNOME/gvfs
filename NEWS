@@ -1,3 +1,13 @@
+Major changes in 1.26.3
+=======================
+* udisks2: Avoid crashes during unmount
+* ftp: Fix cache invalidation after writing
+* network: Fix crashes when mount failed
+* metadata: Avoid endless recursion when copying meta files
+* udisks2: Do not show notification if unmount failed
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.26.2
 =======================
 * Accept XDG_RUNTIME_DIR/bus as a valid D-Bus session/user bus
