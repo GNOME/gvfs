@@ -601,7 +601,8 @@ unmount_data_complete (UnmountData *data,
                        gboolean     complete_idle)
 {
   if (data->mount_operation &&
-      !unmount_operation_is_eject (data->mount_operation))
+      !unmount_operation_is_eject (data->mount_operation) &&
+      !unmount_operation_is_stop (data->mount_operation))
     gvfs_udisks2_unmount_notify_stop (data->mount_operation, data->failed);
 
   if (complete_idle)
