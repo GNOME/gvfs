@@ -326,13 +326,12 @@ ensure_credentials_cb (GObject *source_object, GAsyncResult *res, gpointer user_
       return;
     }
 
-  g_simple_async_result_set_error (simple,
-                                   G_IO_ERROR,
-                                   G_IO_ERROR_NOT_SUPPORTED,
-                                   _("Unsupported authentication method for %s"),
-                                   goa_account_get_presentation_identity (account));
-  g_simple_async_result_complete_in_idle (simple);
-
+  g_file_mount_enclosing_volume (self->root,
+                                 G_MOUNT_MOUNT_NONE,
+                                 data->mount_operation,
+                                 data->cancellable,
+                                 mount_enclosing_volume_cb,
+                                 simple);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
