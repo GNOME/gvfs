@@ -423,7 +423,6 @@ redirect_handler (SoupMessage *msg, gpointer user_data)
              redirect = TRUE;
          }
 
-#if 0
        else if (msg->status_code == SOUP_STATUS_SEE_OTHER ||
                 msg->status_code == SOUP_STATUS_FOUND)
          {
@@ -436,7 +435,7 @@ redirect_handler (SoupMessage *msg, gpointer user_data)
            soup_message_headers_set_encoding (msg->request_headers,
                                               SOUP_ENCODING_NONE);
          }
-#endif
+
          /* ELSE:
           *
           * Two possibilities:
@@ -454,6 +453,32 @@ redirect_handler (SoupMessage *msg, gpointer user_data)
           * don't redirect on 300, so therefore we shouldn't
           * redirect on 308+ either.
           */
+     }
+   else
+     {
+       if (msg->status_code == SOUP_STATUS_SEE_OTHER)
+         {
+           gchar *method;
+
+           g_object_get (msg, "method", &method, NULL);
+           g_message ("method: %s", method);
+           g_free (method);
+
+           if (msg->method == SOUP_METHOD_GET ||
+               msg->method == SOUP_METHOD_OPTIONS)
+             {
+               /* /\* Redirect using a GET *\/ */
+               /* g_object_set (msg, */
+               /*               SOUP_MESSAGE_METHOD, SOUP_METHOD_GET, */
+               /*               NULL); */
+               /* soup_message_set_request (msg, NULL, */
+               /*                           SOUP_MEMORY_STATIC, NULL, 0); */
+               /* soup_message_headers_set_encoding (msg->request_headers, */
+               /*                                    SOUP_ENCODING_NONE); */
+
+               redirect = TRUE;
+             }
+         }
      }
 
     if (redirect)

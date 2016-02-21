@@ -718,6 +718,9 @@ g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
 
   g_object_set (the_session, "ssl-strict", FALSE, NULL);
 
+  if (soup_auth_negotiate_supported)
+    soup_session_add_feature_by_type (the_session, SOUP_TYPE_AUTH_NEGOTIATE);
+
   /* Cookie handling - stored temporarlly in memory, mostly useful for
    * authentication in WebDAV. */
   cookie_jar = g_object_new (SOUP_TYPE_COOKIE_JAR, NULL);
