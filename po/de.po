@@ -18,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2015-11-11 12:33+0000\n"
-"PO-Revision-Date: 2015-11-11 19:19+0100\n"
+"PO-Revision-Date: 2016-02-22 23:28+0100\n"
 "Last-Translator: Christian Kirbach <christian.kirbach@gmail.com>\n"
 "Language-Team: Deutsch <gnome-de@gnome.org>\n"
 "Language: de_DE\n"
@@ -26,7 +26,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.5\n"
+"X-Generator: Poedit 1.8.7\n"
 
 #: ../client/gdaemonfile.c:462 ../client/gdaemonfile.c:2854
 msgid "Operation not supported, files on different mounts"
@@ -2393,7 +2393,7 @@ msgstr ""
 #: ../monitor/udisks2/gvfsudisks2utils.c:820
 #, c-format
 msgid "You can now unplug %s\n"
-msgstr "Sie dürfen jetzt %s ausstecken\n"
+msgstr "Sie dürfen jetzt %s entfernen\n"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
