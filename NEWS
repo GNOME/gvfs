@@ -1,3 +1,8 @@
+Major changes in 1.27.91
+========================
+* udisks2: Send unmount notification only once when stopping
+* Translation updates
+
 Major changes in 1.27.90
 ========================
 * udisks2: Avoid crashes during unmount
