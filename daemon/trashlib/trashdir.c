@@ -21,6 +21,7 @@ struct OPAQUE_TYPE__TrashDir
   GFile *directory;
   GFile *topdir;
   gboolean is_homedir;
+  GTimeVal mtime;
 
   DirWatch *watch;
   GFileMonitor *monitor;
@@ -46,6 +47,26 @@ compare_basename (gconstpointer a,
   g_free (name_b);
 
   return result;
+}
+
+static void
+trash_dir_query_mtime (TrashDir *dir, GTimeVal *mtime)
+{
+  GFileInfo *info;
+
+  info = g_file_query_info (dir->directory, G_FILE_ATTRIBUTE_TIME_MODIFIED ","
+                                            G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
+                            G_FILE_QUERY_INFO_NONE, NULL, NULL);
+  if (info)
+    {
+      g_file_info_get_modification_time (info, mtime);
+      g_object_unref (info);
+    }
+  else
+    {
+      mtime->tv_sec = 0;
+      mtime->tv_usec = 0;
+    }
 }
 
 static void
@@ -106,6 +127,7 @@ trash_dir_enumerate (TrashDir *dir)
   GFileEnumerator *enumerator;
   GSList *files = NULL;
 
+  trash_dir_query_mtime (dir, &dir->mtime);
   enumerator = g_file_enumerate_children (dir->directory,
                                           G_FILE_ATTRIBUTE_STANDARD_NAME,
                                           G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
@@ -298,9 +320,26 @@ dir_exists (GFile *directory,
   return result;
 }
 
+static gboolean
+trash_dir_is_dirty (TrashDir *dir)
+{
+  GTimeVal mtime;
+
+  trash_dir_query_mtime (dir, &mtime);
+
+  if (mtime.tv_sec == dir->mtime.tv_sec &&
+      mtime.tv_usec == dir->mtime.tv_usec)
+    return FALSE;
+
+  return TRUE;
+}
+
 void
 trash_dir_rescan (TrashDir *dir)
 {
+  if (!trash_dir_is_dirty (dir))
+    return;
+
   if (dir->watch)
     dir_watch_check (dir->watch);
 
