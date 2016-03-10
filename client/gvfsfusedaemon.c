@@ -2347,14 +2347,8 @@ subthread_main (gpointer data)
   g_signal_handlers_disconnect_by_func (volume_monitor, mount_tracker_mounted_cb, NULL);
   g_signal_handlers_disconnect_by_func (volume_monitor, mount_tracker_unmounted_cb, NULL);
 
-  g_main_loop_unref (subthread_main_loop);
-  subthread_main_loop = NULL;
-
   g_object_unref (volume_monitor);
   volume_monitor = NULL;
-
-  /* Tell the main thread to unmount. Using kill() is necessary according to FUSE maintainers. */
-  kill (getpid (), SIGHUP);
 
   return NULL;
 }
@@ -2365,7 +2359,7 @@ name_vanished_handler (GDBusConnection *connection,
                        gpointer user_data)
 {
   /* The daemon died, unmount */
-  g_main_loop_quit (subthread_main_loop);
+  kill (getpid (), SIGHUP);
 }
 
 static void
@@ -2375,7 +2369,7 @@ dbus_connection_closed (GDBusConnection *connection,
                         gpointer user_data)
 {
   /* Session bus died, unmount */
-  g_main_loop_quit (subthread_main_loop);
+  kill (getpid (), SIGHUP);
 }
 
 static void
@@ -2479,9 +2473,15 @@ vfs_destroy (gpointer param)
     g_bus_unwatch_name (daemon_name_watcher);
   g_clear_object (&dbus_conn);
   
-  mount_list_free ();
   if (subthread_main_loop != NULL) 
     g_main_loop_quit (subthread_main_loop);
+
+  if (subthread)
+    g_thread_join (subthread);
+
+  g_clear_pointer (&subthread_main_loop, g_main_loop_unref);
+
+  mount_list_free ();
 }
 
 static struct fuse_operations vfs_oper =
