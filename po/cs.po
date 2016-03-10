@@ -29,12 +29,12 @@ msgstr "Operace není podporována, soubory na rozdílných připojeních"
 #: ../client/gvfsiconloadable.c:301 ../daemon/gvfsjobopenforread.c:183
 #: ../daemon/gvfsjobopenforwrite.c:326
 msgid "Couldn't get stream file descriptor"
-msgstr "Nelze získat popisovač souboru s datovým tokem"
+msgstr "Nelze získat popisovač souboru s datovým proudem"
 
 #: ../client/gdaemonfile.c:1222 ../client/gdaemonfile.c:1294
 #: ../client/gvfsiconloadable.c:127
 msgid "Didn't get stream file descriptor"
-msgstr "Nebyl získán popisovač souboru s datovým tokem"
+msgstr "Nebyl získán popisovač souboru s datovým proudem"
 
 #: ../client/gdaemonfile.c:1415
 #, c-format
@@ -110,7 +110,7 @@ msgstr "Operace byla zrušena"
 #: ../client/gdaemonfileoutputstream.c:1462
 #, c-format
 msgid "Error in stream protocol: %s"
-msgstr "Chyba v protokolu datového toku: %s"
+msgstr "Chyba v protokolu datového proudu: %s"
 
 #: ../client/gdaemonfileinputstream.c:545
 #: ../client/gdaemonfileinputstream.c:1715
@@ -118,16 +118,16 @@ msgstr "Chyba v protokolu datového toku: %s"
 #: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2322
 #: ../daemon/gvfsbackendmtp.c:2702
 msgid "End of stream"
-msgstr "Konec datového toku"
+msgstr "Konec datového proudu"
 
 #: ../client/gdaemonfileinputstream.c:1348
 #: ../client/gdaemonfileoutputstream.c:1028
 msgid "Seek not supported on stream"
-msgstr "Přeskakování v datovém toku není podporováno"
+msgstr "Přeskakování v datovém proudu není podporováno"
 
 #: ../client/gdaemonfileoutputstream.c:1197
 msgid "Truncate not supported on stream"
-msgstr "Zkracování v datovém toku není podporováno"
+msgstr "Zkracování v datovém proudu není podporováno"
 
 #: ../client/gdaemonvfs.c:784
 #, c-format
@@ -254,7 +254,7 @@ msgstr "Spojení bylo neočekávaně přerušeno"
 
 #: ../daemon/gvfsafpconnection.c:1612
 msgid "Got unexpected end of stream"
-msgstr "Neočekávaný konec datového toku"
+msgstr "Neočekávaný konec datového proudu"
 
 #: ../daemon/gvfsafpserver.c:198 ../daemon/gvfsafpserver.c:480
 #, c-format
@@ -1014,7 +1014,7 @@ msgstr "Chyba knihovny paranoia na mechanice %s"
 #: ../daemon/gvfsbackendcdda.c:895
 #, c-format
 msgid "Error seeking in stream on drive %s"
-msgstr "Chyba při přeskakování v datovém toku na mechanice %s"
+msgstr "Chyba při přeskakování v datovém proudu na mechanice %s"
 
 #: ../daemon/gvfsbackendcdda.c:1017 ../daemon/gvfsbackendgphoto2.c:1813
 #, c-format
@@ -1333,7 +1333,7 @@ msgstr "Chybný identifikátor ikony „%s“"
 #: ../daemon/gvfsbackendgphoto2.c:1980 ../daemon/gvfsbackendgphoto2.c:3169
 #, c-format
 msgid "Error seeking in stream on camera %s"
-msgstr "Chyba při přeskakování v datovém toku u fotoaparátu %s"
+msgstr "Chyba při přeskakování v datovém proudu u fotoaparátu %s"
 
 #: ../daemon/gvfsbackendgphoto2.c:2120 ../daemon/gvfsbackendsftp.c:3282
 #: ../daemon/gvfsbackendsmbbrowse.c:1452
@@ -1836,7 +1836,7 @@ msgstr ""
 
 #: ../daemon/gvfsftpconnection.c:211
 msgid "Unexpected end of stream"
-msgstr "Neočekávaný konec datového toku"
+msgstr "Neočekávaný konec datového proudu"
 
 #: ../daemon/gvfsftpconnection.c:227 ../daemon/gvfsftpconnection.c:240
 #: ../daemon/gvfsftptask.c:451 ../daemon/gvfsftptask.c:879
@@ -1900,7 +1900,7 @@ msgstr "Neplatný název souboru"
 #: ../daemon/gvfshttpinputstream.c:293
 #| msgid "Error seeking in stream on drive %s"
 msgid "Error seeking in stream"
-msgstr "Chyba při přeskakování v datovém toku"
+msgstr "Chyba při přeskakování v datovém proudu"
 
 #: ../daemon/gvfsjobmakesymlink.c:111
 msgid "Symlinks not supported by backend"
