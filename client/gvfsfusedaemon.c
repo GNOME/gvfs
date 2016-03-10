@@ -44,6 +44,7 @@
 
 #define FUSE_USE_VERSION 26
 #include <fuse.h>
+#include <fuse_lowlevel.h>
 
 #define DEBUG_ENABLED 0
 
@@ -2524,8 +2525,53 @@ static struct fuse_operations vfs_oper =
 #endif
 };
 
+static void
+set_custom_signal_handlers (void (*handler)(int))
+{
+  struct sigaction sa;
+
+  sigemptyset (&sa.sa_mask);
+  sa.sa_handler = handler;
+  sa.sa_flags = 0;
+
+  sigaction (SIGHUP, &sa, NULL);
+  sigaction (SIGINT, &sa, NULL);
+  sigaction (SIGTERM, &sa, NULL);
+}
+
 gint
 main (gint argc, gchar *argv [])
 {
-  return fuse_main (argc, argv, &vfs_oper, NULL /* user data */);
+  struct fuse *fuse;
+  struct fuse_chan *ch;
+  struct fuse_session *se;
+  char *mountpoint;
+  int multithreaded;
+  int res;
+
+  fuse = fuse_setup (argc, argv, &vfs_oper, sizeof (vfs_oper), &mountpoint,
+                     &multithreaded, NULL /* user data */);
+  if (fuse == NULL)
+    return 1;
+
+  if (multithreaded)
+    res = fuse_loop_mt (fuse);
+  else
+    res = fuse_loop (fuse);
+
+  se = fuse_get_session (fuse);
+  ch = fuse_session_next_chan (se, NULL);
+
+  /* Ignore new signals during exit procedure in order to terminate properly */
+  set_custom_signal_handlers (SIG_IGN);
+  fuse_remove_signal_handlers (se);
+
+  fuse_unmount (mountpoint, ch);
+  fuse_destroy (fuse);
+  free (mountpoint);
+
+  if (res == -1)
+    return 1;
+
+  return 0;
 }
