@@ -57,7 +57,6 @@ typedef struct {
   char *display_name;
   char *id;
   char *icon_path;
-  gboolean hidden;
   house_arrest_client_t house_arrest;
   afc_client_t afc_cli;
 } AppInfo;
@@ -1623,10 +1622,6 @@ g_vfs_backend_afc_set_info_from_app (GVfsBackendAfc *self,
   g_file_info_set_symbolic_icon (info, symbolic_icon);
   g_object_unref (symbolic_icon);
 
-  /* hidden ? */
-  if (app_info && app_info->hidden)
-    g_file_info_set_is_hidden (info, TRUE);
-
   /* name */
   if (app_info != NULL)
     {
@@ -1753,24 +1748,18 @@ g_vfs_backend_load_apps (GVfsBackendAfc *self)
     {
       plist_t app;
       plist_t p_appid;
-      plist_t p_doctypes;
       plist_t p_name;
       plist_t p_sharing;
       char *s_appid;
       char *s_name;
       guint8 b_sharing;
-      gboolean hidden;
       AppInfo *info;
 
       app = plist_array_get_item(apps, i);
       p_appid = plist_dict_get_item (app, "CFBundleIdentifier");
       p_name = plist_dict_get_item (app, "CFBundleDisplayName");
-      p_doctypes = plist_dict_get_item (app, "CFBundleDocumentTypes");
-      if (plist_array_get_size (p_doctypes) == 0)
-        p_doctypes = NULL;
       p_sharing = plist_dict_get_item (app, "UIFileSharingEnabled");
       b_sharing = FALSE;
-      hidden = FALSE;
       if (p_sharing)
         {
           if (plist_get_node_type (p_sharing) == PLIST_BOOLEAN)
@@ -1792,9 +1781,7 @@ g_vfs_backend_load_apps (GVfsBackendAfc *self)
         }
 
       /* Doesn't support documents, or missing metadata? */
-      if (p_doctypes == NULL && !b_sharing)
-        hidden = TRUE;
-      if (p_appid == NULL || p_name == NULL)
+      if (!b_sharing || p_appid == NULL || p_name == NULL)
         {
           continue;
         }
@@ -1815,7 +1802,6 @@ g_vfs_backend_load_apps (GVfsBackendAfc *self)
       info = g_new0 (AppInfo, 1);
       info->display_name = s_name;
       info->id = s_appid;
-      info->hidden = hidden;
 
       info->icon_path = g_vfs_backend_load_icon (self->sbs, info->id);
 
