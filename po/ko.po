@@ -1,11 +1,9 @@
-# -*- compile-command: "ko-po-check ko.po" -*-
-#
 # gvfs korean translation.
 # This file is distributed under the same license as the gvfs package.
 #
 # Young-Ho Cha <ganadist@gmail.com>, 2008.
 # Seong-ho Cho <darkcircle.0426@gmail.com>, 2011, 2012.
-# Changwoo Ryu <cwryu@debian.org>, 2009-2015.
+# Changwoo Ryu <cwryu@debian.org>, 2009-2016.
 #
 # * 용어 번역
 #  * WebDAV (share) - 웹 공유, 웹 공유 디렉터리
@@ -22,8 +20,8 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-09-07 10:17+0000\n"
-"PO-Revision-Date: 2015-09-08 02:04+0900\n"
+"POT-Creation-Date: 2016-03-12 12:46+0000\n"
+"PO-Revision-Date: 2016-03-13 04:37+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: GNOME Korea <gnome-kr@googlegroups.com>\n"
 "Language: Korean\n"
@@ -65,22 +63,22 @@ msgid "Invalid filename %s"
 msgstr "잘못된 파일 이름 %s"
 
 #: ../client/gdaemonfile.c:2663 ../client/gdaemonfile.c:2673
-#: ../client/gdaemonfile.c:2695 ../client/gdaemonvfs.c:1233
-#: ../client/gdaemonvfs.c:1254 ../client/gdaemonvfs.c:1265
-#: ../client/gdaemonvfs.c:1297
+#: ../client/gdaemonfile.c:2695 ../client/gdaemonvfs.c:1237
+#: ../client/gdaemonvfs.c:1258 ../client/gdaemonvfs.c:1269
+#: ../client/gdaemonvfs.c:1301
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "파일 메타데이터를 설정하는 중 오류: %s"
 
-#: ../client/gdaemonfile.c:2664 ../client/gdaemonvfs.c:1255
+#: ../client/gdaemonfile.c:2664 ../client/gdaemonvfs.c:1259
 msgid "can't open metadata tree"
 msgstr "메타데이터 트리를 열 수 없습니다"
 
-#: ../client/gdaemonfile.c:2674 ../client/gdaemonvfs.c:1266
+#: ../client/gdaemonfile.c:2674 ../client/gdaemonvfs.c:1270
 msgid "can't get metadata proxy"
 msgstr "메타데이터 프록시를 알아낼 수 없습니다"
 
-#: ../client/gdaemonfile.c:2696 ../client/gdaemonvfs.c:1298
+#: ../client/gdaemonfile.c:2696 ../client/gdaemonvfs.c:1302
 msgid "values must be string or list of strings"
 msgstr "값은 문자열이거나 문자열의 목록이어야 합니다"
 
@@ -89,8 +87,7 @@ msgid "Operation not supported"
 msgstr "지원하는 동작이 아닙니다"
 
 #: ../client/gdaemonfileenumerator.c:553 ../client/gdaemonfileenumerator.c:636
-#: ../client/gdaemonfileenumerator.c:687
-#: ../client/gdaemonfileinputstream.c:642
+#: ../client/gdaemonfileenumerator.c:687 ../client/gdaemonfileinputstream.c:642
 #: ../client/gdaemonfileinputstream.c:795
 #: ../client/gdaemonfileinputstream.c:915
 #: ../client/gdaemonfileinputstream.c:1166
@@ -100,15 +97,15 @@ msgstr "지원하는 동작이 아닙니다"
 #: ../client/gdaemonfileoutputstream.c:919
 #: ../client/gdaemonfileoutputstream.c:1085
 #: ../client/gdaemonfileoutputstream.c:1267 ../client/gvfsdaemondbus.c:631
-#: ../daemon/gvfsbackendsmb.c:1266 ../daemon/gvfsbackendtest.c:92
-#: ../daemon/gvfsbackendtest.c:125 ../daemon/gvfsbackendtest.c:188
-#: ../daemon/gvfschannel.c:346 ../daemon/gvfsftptask.c:224
-#: ../monitor/gdu/ggdumount.c:1072 ../monitor/proxy/gproxydrive.c:547
-#: ../monitor/proxy/gproxydrive.c:635 ../monitor/proxy/gproxydrive.c:785
-#: ../monitor/proxy/gproxydrive.c:923 ../monitor/proxy/gproxydrive.c:961
-#: ../monitor/proxy/gproxydrive.c:1086 ../monitor/proxy/gproxymount.c:502
-#: ../monitor/proxy/gproxymount.c:587 ../monitor/proxy/gproxyvolume.c:862
-#: ../monitor/proxy/gproxyvolume.c:926
+#: ../daemon/gvfsbackendsftp.c:5207 ../daemon/gvfsbackendsmb.c:1258
+#: ../daemon/gvfsbackendtest.c:92 ../daemon/gvfsbackendtest.c:125
+#: ../daemon/gvfsbackendtest.c:188 ../daemon/gvfschannel.c:346
+#: ../daemon/gvfsftptask.c:224 ../monitor/gdu/ggdumount.c:1072
+#: ../monitor/proxy/gproxydrive.c:547 ../monitor/proxy/gproxydrive.c:635
+#: ../monitor/proxy/gproxydrive.c:785 ../monitor/proxy/gproxydrive.c:923
+#: ../monitor/proxy/gproxydrive.c:961 ../monitor/proxy/gproxydrive.c:1086
+#: ../monitor/proxy/gproxymount.c:502 ../monitor/proxy/gproxymount.c:587
+#: ../monitor/proxy/gproxyvolume.c:862 ../monitor/proxy/gproxyvolume.c:926
 msgid "Operation was cancelled"
 msgstr "동작을 취소했습니다"
 
@@ -127,8 +124,8 @@ msgstr "스트림 프로토콜에 오류: %s"
 #: ../client/gdaemonfileinputstream.c:545
 #: ../client/gdaemonfileinputstream.c:1715
 #: ../client/gdaemonfileoutputstream.c:496
-#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2345
-#: ../daemon/gvfsbackendmtp.c:2717
+#: ../client/gdaemonfileoutputstream.c:1462 ../daemon/gvfsbackendmtp.c:2322
+#: ../daemon/gvfsbackendmtp.c:2702
 msgid "End of stream"
 msgstr "스트림의 끝"
 
@@ -141,7 +138,7 @@ msgstr "스트림에서는 찾기를 지원하지 않습니다"
 msgid "Truncate not supported on stream"
 msgstr "스트림에서는 파일 자르기를 지원하지 않습니다"
 
-#: ../client/gdaemonvfs.c:782
+#: ../client/gdaemonvfs.c:784
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "마운트 정보를 가져오는 중 오류: %s"
@@ -211,39 +208,39 @@ msgstr "GVfsIcon의 입력 데이터 형태가 잘못되었습니다"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "FTP"
-#: ../daemon/daemon-main.c:98
+#: ../daemon/daemon-main.c:100
 #, c-format
 msgid "%s File System Service"
 msgstr "%s 파일 시스템 서비스"
 
-#: ../daemon/daemon-main.c:176 ../programs/gvfs-copy.c:104
+#: ../daemon/daemon-main.c:178 ../programs/gvfs-copy.c:104
 #: ../programs/gvfs-move.c:102 ../programs/gvfs-rename.c:44
 #: ../programs/gvfs-set-attribute.c:107
 #, c-format
 msgid "Error: %s"
 msgstr "오류: %s"
 
-#: ../daemon/daemon-main.c:234
+#: ../daemon/daemon-main.c:236
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "사용법: %s --spawner dbus-id object_path"
 
-#: ../daemon/daemon-main.c:258 ../daemon/daemon-main.c:276
+#: ../daemon/daemon-main.c:260 ../daemon/daemon-main.c:278
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "사용법: %s 키=값 키=값 ..."
 
-#: ../daemon/daemon-main.c:274
+#: ../daemon/daemon-main.c:276
 #, c-format
 msgid "No mount type specified"
 msgstr "마운트 형식을 지정하지 않았습니다"
 
-#: ../daemon/daemon-main.c:306
+#: ../daemon/daemon-main.c:308
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "%s의 마운트 위치에 이미 실행중입니다"
 
-#: ../daemon/daemon-main.c:335
+#: ../daemon/daemon-main.c:337
 msgid "error starting mount daemon"
 msgstr "마운트 데몬 시작하는 중 오류"
 
@@ -289,7 +286,7 @@ msgstr "주어진 암호로 “%s”서버에 로그인할 수 없습니다."
 
 #: ../daemon/gvfsafpserver.c:428 ../daemon/gvfsafpserver.c:650
 #: ../daemon/gvfsafpserver.c:826 ../daemon/gvfsafpserver.c:874
-#: ../daemon/gvfsafpserver.c:990 ../daemon/gvfsafpserver.c:1674
+#: ../daemon/gvfsafpserver.c:990 ../daemon/gvfsafpserver.c:1675
 #, c-format
 msgid "Unable to connect to the server “%s”. A communication problem occurred."
 msgstr "“%s” 서버에 연결할 수 없습니다. 통신 문제가 발생했습니다."
@@ -360,11 +357,11 @@ msgstr "암호 프롬프트를 취소했습니다."
 msgid "Unable to disconnect from the server."
 msgstr "서버에서 연결을 끊을 수 없습니다."
 
-#: ../daemon/gvfsafpserver.c:1366 ../daemon/gvfsafpserver.c:1765
+#: ../daemon/gvfsafpserver.c:1366 ../daemon/gvfsafpserver.c:1766
 msgid "Unable to connect to the server. A communication problem occurred."
 msgstr "서버에 연결할 수 없습니다. 통신 문제가 발생했습니다."
 
-#: ../daemon/gvfsafpserver.c:1721
+#: ../daemon/gvfsafpserver.c:1722
 msgid "Identification not found."
 msgstr "신원 증명 내용이 없습니다."
 
@@ -394,8 +391,10 @@ msgstr "%2$s에서 %1$s을(를) 불러올 수 없습니다"
 #: ../daemon/gvfsafpvolume.c:1569 ../daemon/gvfsafpvolume.c:2015
 #: ../daemon/gvfsafpvolume.c:2143 ../daemon/gvfsafpvolume.c:2305
 #: ../daemon/gvfsafpvolume.c:2525 ../daemon/gvfsbackendafc.c:291
-#: ../daemon/gvfsbackendsftp.c:351 ../daemon/gvfsbackendsftp.c:1090
-#: ../daemon/gvfsbackendsftp.c:2109 ../daemon/gvfsftptask.c:439
+#: ../daemon/gvfsbackendgoogle.c:207 ../daemon/gvfsbackendsftp.c:337
+#: ../daemon/gvfsbackendsftp.c:1083 ../daemon/gvfsbackendsftp.c:2112
+#: ../daemon/gvfsftptask.c:439
+#, c-format
 msgid "Permission denied"
 msgstr "권한이 거부되었습니다"
 
@@ -403,16 +402,16 @@ msgstr "권한이 거부되었습니다"
 #: ../daemon/gvfsafpvolume.c:2529 ../daemon/gvfsbackendafc.c:218
 #: ../daemon/gvfsbackendafc.c:1019 ../daemon/gvfsbackendafpbrowse.c:190
 #: ../daemon/gvfsbackendafpbrowse.c:327 ../daemon/gvfsbackendafpbrowse.c:359
-#: ../daemon/gvfsbackendarchive.c:744 ../daemon/gvfsbackendarchive.c:799
-#: ../daemon/gvfsbackendarchive.c:851 ../daemon/gvfsbackendarchive.c:880
+#: ../daemon/gvfsbackendarchive.c:736 ../daemon/gvfsbackendarchive.c:791
+#: ../daemon/gvfsbackendarchive.c:843 ../daemon/gvfsbackendarchive.c:872
 #: ../daemon/gvfsbackendcdda.c:1024 ../daemon/gvfsbackendcomputer.c:639
-#: ../daemon/gvfsbackenddnssd.c:415 ../daemon/gvfsbackendftp.c:778
-#: ../daemon/gvfsbackendftp.c:1155 ../daemon/gvfsbackendmtp.c:1596
-#: ../daemon/gvfsbackendmtp.c:1612 ../daemon/gvfsbackendmtp.c:2066
-#: ../daemon/gvfsbackendmtp.c:2129 ../daemon/gvfsbackendmtp.c:2196
-#: ../daemon/gvfsbackendmtp.c:2542 ../daemon/gvfsbackendnetwork.c:696
-#: ../daemon/gvfsbackendsmbbrowse.c:1142 ../daemon/gvfsbackendsmbbrowse.c:1209
-#: ../daemon/gvfsbackendsmbbrowse.c:1396 ../daemon/gvfsbackendsmbbrowse.c:1469
+#: ../daemon/gvfsbackenddnssd.c:422 ../daemon/gvfsbackendftp.c:778
+#: ../daemon/gvfsbackendftp.c:1172 ../daemon/gvfsbackendmtp.c:1572
+#: ../daemon/gvfsbackendmtp.c:1588 ../daemon/gvfsbackendmtp.c:2042
+#: ../daemon/gvfsbackendmtp.c:2105 ../daemon/gvfsbackendmtp.c:2173
+#: ../daemon/gvfsbackendmtp.c:2527 ../daemon/gvfsbackendnetwork.c:696
+#: ../daemon/gvfsbackendsmbbrowse.c:1129 ../daemon/gvfsbackendsmbbrowse.c:1196
+#: ../daemon/gvfsbackendsmbbrowse.c:1383 ../daemon/gvfsbackendsmbbrowse.c:1456
 #, c-format
 msgid "File doesn't exist"
 msgstr "파일이 없습니다"
@@ -422,9 +421,9 @@ msgstr "파일이 없습니다"
 #: ../daemon/gvfsbackendafp.c:1341 ../daemon/gvfsbackenddav.c:2291
 #: ../daemon/gvfsbackenddav.c:2954 ../daemon/gvfsbackenddav.c:3234
 #: ../daemon/gvfsbackendftp.c:815 ../daemon/gvfsbackendnfs.c:2476
-#: ../daemon/gvfsbackendsftp.c:2622 ../daemon/gvfsbackendsftp.c:3397
-#: ../daemon/gvfsbackendsftp.c:3725 ../daemon/gvfsbackendsftp.c:4789
-#: ../daemon/gvfsbackendsftp.c:5714
+#: ../daemon/gvfsbackendsftp.c:2627 ../daemon/gvfsbackendsftp.c:3402
+#: ../daemon/gvfsbackendsftp.c:3730 ../daemon/gvfsbackendsftp.c:4794
+#: ../daemon/gvfsbackendsftp.c:5736
 msgid "File is directory"
 msgstr "파일이 디렉터리입니다"
 
@@ -438,7 +437,7 @@ msgstr "대상 파일이 열려 있습니다"
 
 #: ../daemon/gvfsafpvolume.c:688 ../daemon/gvfsbackendafc.c:222
 #: ../daemon/gvfsbackendburn.c:421 ../daemon/gvfsbackenddav.c:2681
-#: ../daemon/gvfsbackendsftp.c:2103
+#: ../daemon/gvfsbackendsftp.c:2106
 msgid "Directory not empty"
 msgstr "디렉터리가 비어있지 않습니다"
 
@@ -447,7 +446,8 @@ msgid "Target object is marked as not deletable (DeleteInhibit)"
 msgstr "대상 객체가 지울 수 없음(DeleteInhibit)으로 표시되었습니다"
 
 #: ../daemon/gvfsafpvolume.c:696 ../daemon/gvfsafpvolume.c:1245
-#: ../daemon/gvfsafpvolume.c:2147
+#: ../daemon/gvfsafpvolume.c:2147 ../daemon/gvfsbackendgoogle.c:213
+#, c-format
 msgid "Target object doesn't exist"
 msgstr "대상 객체가 없습니다"
 
@@ -469,11 +469,13 @@ msgstr "볼륨의 저장공간이 부족합니다"
 #: ../daemon/gvfsbackenddav.c:2642 ../daemon/gvfsbackenddav.c:2750
 #: ../daemon/gvfsbackenddav.c:2887 ../daemon/gvfsbackenddav.c:2963
 #: ../daemon/gvfsbackenddav.c:3001 ../daemon/gvfsbackenddav.c:3225
-#: ../daemon/gvfsbackendftp.c:794 ../daemon/gvfsbackendftp.c:975
-#: ../daemon/gvfsbackendftp.c:1475 ../daemon/gvfsbackendftp.c:1583
-#: ../daemon/gvfsbackendmtp.c:1542 ../daemon/gvfsbackendmtp.c:1674
-#: ../daemon/gvfsbackendmtp.c:2000 ../daemon/gvfsbackendnfs.c:2486
-#: ../daemon/gvfsbackendsftp.c:4798 ../daemon/gvfsbackendsmb.c:2207
+#: ../daemon/gvfsbackendftp.c:794 ../daemon/gvfsbackendftp.c:982
+#: ../daemon/gvfsbackendftp.c:1492 ../daemon/gvfsbackendftp.c:1600
+#: ../daemon/gvfsbackendgoogle.c:1233 ../daemon/gvfsbackendgoogle.c:1561
+#: ../daemon/gvfsbackendgoogle.c:1834 ../daemon/gvfsbackendgoogle.c:2486
+#: ../daemon/gvfsbackendmtp.c:1518 ../daemon/gvfsbackendmtp.c:1650
+#: ../daemon/gvfsbackendmtp.c:1976 ../daemon/gvfsbackendnfs.c:2486
+#: ../daemon/gvfsbackendsftp.c:4803 ../daemon/gvfsbackendsmb.c:2201
 msgid "Target file already exists"
 msgstr "대상 파일이 이미 있습니다"
 
@@ -545,9 +547,9 @@ msgstr "원본 파일은 디렉터리입니다"
 msgid "Range lock conflict exists"
 msgstr "범위 잠금 충돌이 있습니다"
 
-#: ../daemon/gvfsafpvolume.c:2309 ../daemon/gvfsbackendmtp.c:1375
-#: ../daemon/gvfsbackendmtp.c:1400 ../daemon/gvfsbackendmtp.c:1550
-#: ../daemon/gvfsbackendmtp.c:1933 ../daemon/gvfsbackendmtp.c:2467
+#: ../daemon/gvfsafpvolume.c:2309 ../daemon/gvfsbackendmtp.c:1351
+#: ../daemon/gvfsbackendmtp.c:1376 ../daemon/gvfsbackendmtp.c:1526
+#: ../daemon/gvfsbackendmtp.c:1909 ../daemon/gvfsbackendmtp.c:2452
 msgid "Directory doesn't exist"
 msgstr "디렉터리가 없습니다"
 
@@ -633,13 +635,14 @@ msgstr "다시 시도"
 
 #: ../daemon/gvfsbackendafc.c:443 ../daemon/gvfsbackend.c:994
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
-#: ../monitor/udisks2/gvfsudisks2mount.c:783
+#: ../monitor/udisks2/gvfsudisks2mount.c:787
 msgid "Cancel"
 msgstr "취소"
 
-#: ../daemon/gvfsbackendafc.c:461 ../daemon/gvfsbackendarchive.c:645
-#: ../daemon/gvfsbackendarchive.c:674 ../daemon/gvfsbackenddav.c:1848
-#: ../daemon/gvfsbackendhttp.c:256 ../daemon/gvfsbackendsmb.c:732
+#: ../daemon/gvfsbackendafc.c:461 ../daemon/gvfsbackendarchive.c:637
+#: ../daemon/gvfsbackendarchive.c:666 ../daemon/gvfsbackenddav.c:1848
+#: ../daemon/gvfsbackendgoogle.c:1664 ../daemon/gvfsbackendhttp.c:256
+#: ../daemon/gvfsbackendsmb.c:724
 msgid "Invalid mount spec"
 msgstr "잘못된 마운트 spec 파일"
 
@@ -690,11 +693,11 @@ msgstr ""
 "“%s” 장치가 잠겨 있습니다. 장치의 암호를 입력하시고 “다시 시도” 단추를 누르십"
 "시오."
 
-#: ../daemon/gvfsbackendafc.c:1009 ../daemon/gvfsbackendarchive.c:752
-#: ../daemon/gvfsbackendcomputer.c:657 ../daemon/gvfsbackendgphoto2.c:1820
-#: ../daemon/gvfsbackendmtp.c:2218 ../daemon/gvfsbackendnfs.c:347
-#: ../daemon/gvfsbackendrecent.c:122 ../daemon/gvfsbackendsmb.c:822
-#: ../daemon/gvfsbackendtrash.c:234
+#: ../daemon/gvfsbackendafc.c:1009 ../daemon/gvfsbackendarchive.c:744
+#: ../daemon/gvfsbackendcomputer.c:657 ../daemon/gvfsbackendgoogle.c:2186
+#: ../daemon/gvfsbackendgphoto2.c:1805 ../daemon/gvfsbackendmtp.c:2195
+#: ../daemon/gvfsbackendnfs.c:347 ../daemon/gvfsbackendrecent.c:122
+#: ../daemon/gvfsbackendsmb.c:814 ../daemon/gvfsbackendtrash.c:234
 msgid "Can't open directory"
 msgstr "디렉터리를 열 수 없습니다"
 
@@ -702,32 +705,42 @@ msgstr "디렉터리를 열 수 없습니다"
 msgid "Backups are not yet supported."
 msgstr "백업은 아직 지원하지 않습니다."
 
-#: ../daemon/gvfsbackendafc.c:1375 ../daemon/gvfsbackendsmb.c:883
-#: ../daemon/gvfsbackendsmb.c:1362
+#: ../daemon/gvfsbackendafc.c:1375 ../daemon/gvfsbackendsmb.c:875
+#: ../daemon/gvfsbackendsmb.c:1354
 msgid "Unsupported seek type"
 msgstr "지원하지 않는 찾기 형식"
 
-#: ../daemon/gvfsbackendafc.c:2433 ../daemon/gvfsbackendafp.c:1781
-#: ../daemon/gvfsbackendftp.c:1175 ../daemon/gvfsbackendftp.c:1223
-#: ../daemon/gvfsbackendftp.c:1244 ../daemon/gvfsbackendmtp.c:1959
-#: ../daemon/gvfsbackendmtp.c:2185 ../daemon/gvfsbackendmtp.c:2443
-#: ../daemon/gvfsbackendmtp.c:2531 ../daemon/gvfsbackendmtp.c:2599
-#: ../daemon/gvfsbackendnfs.c:2368 ../daemon/gvfsbackendsftp.c:2107
-#: ../daemon/gvfsbackendsftp.c:5166 ../daemon/gvfsbackendsmb.c:1851
+#. Return G_IO_ERROR_NOT_SUPPORTED instead of
+#. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
+#. * fallback copy.
+#.
+#: ../daemon/gvfsbackendafc.c:2435 ../daemon/gvfsbackendafp.c:1781
+#: ../daemon/gvfsbackendftp.c:1192 ../daemon/gvfsbackendftp.c:1240
+#: ../daemon/gvfsbackendftp.c:1261 ../daemon/gvfsbackendgoogle.c:1140
+#: ../daemon/gvfsbackendgoogle.c:1207 ../daemon/gvfsbackendgoogle.c:1228
+#: ../daemon/gvfsbackendgoogle.c:1310 ../daemon/gvfsbackendgoogle.c:1378
+#: ../daemon/gvfsbackendgoogle.c:1536 ../daemon/gvfsbackendgoogle.c:1764
+#: ../daemon/gvfsbackendgoogle.c:2402 ../daemon/gvfsbackendgoogle.c:2457
+#: ../daemon/gvfsbackendgoogle.c:2481 ../daemon/gvfsbackendgoogle.c:2567
+#: ../daemon/gvfsbackendmtp.c:1935 ../daemon/gvfsbackendmtp.c:2162
+#: ../daemon/gvfsbackendmtp.c:2357 ../daemon/gvfsbackendmtp.c:2428
+#: ../daemon/gvfsbackendmtp.c:2516 ../daemon/gvfsbackendmtp.c:2584
+#: ../daemon/gvfsbackendnfs.c:2368 ../daemon/gvfsbackendsftp.c:2110
+#: ../daemon/gvfsbackendsftp.c:5171 ../daemon/gvfsbackendsmb.c:1845
 #: ../daemon/gvfsftptask.c:431
 msgid "Operation unsupported"
 msgstr "지원하는 동작이 아닙니다"
 
-#: ../daemon/gvfsbackendafc.c:2599 ../daemon/gvfsbackenddav.c:2786
-#: ../daemon/gvfsbackendftp.c:1427
+#: ../daemon/gvfsbackendafc.c:2601 ../daemon/gvfsbackenddav.c:2786
+#: ../daemon/gvfsbackendftp.c:1444
 msgid "Backups not supported"
 msgstr "백업을 지원하지 않습니다"
 
 #: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendcomputer.c:958
 #: ../daemon/gvfsbackendcomputer.c:1053 ../daemon/gvfsbackendcomputer.c:1159
 #: ../daemon/gvfsbackendcomputer.c:1249 ../daemon/gvfsbackendcomputer.c:1322
-#: ../daemon/gvfsbackendcomputer.c:1391 ../daemon/gvfsbackendsmbbrowse.c:1137
-#: ../daemon/gvfsbackendsmbbrowse.c:1183
+#: ../daemon/gvfsbackendcomputer.c:1391 ../daemon/gvfsbackendsmbbrowse.c:1124
+#: ../daemon/gvfsbackendsmbbrowse.c:1170
 msgid "Not a mountable file"
 msgstr "마운트 정보 파일이 아닙니다"
 
@@ -745,8 +758,8 @@ msgstr "마운트 정보 파일이 아닙니다"
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: ../daemon/gvfsbackendafpbrowse.c:461 ../daemon/gvfsbackendafp.c:2104
 #: ../daemon/gvfsbackendftp.c:672 ../daemon/gvfsbackendnfs.c:281
-#: ../daemon/gvfsbackendsftp.c:1964 ../daemon/gvfsbackendsmb.c:599
-#: ../daemon/gvfsbackendsmb.c:1536
+#: ../daemon/gvfsbackendsftp.c:1967 ../daemon/gvfsbackendsmb.c:591
+#: ../daemon/gvfsbackendsmb.c:1528
 #, c-format
 msgid "%s on %s"
 msgstr "%s, 위치 %s"
@@ -758,8 +771,8 @@ msgid "%s"
 msgstr "%s"
 
 #: ../daemon/gvfsbackendafpbrowse.c:498 ../daemon/gvfsbackendafp.c:2139
-#: ../daemon/gvfsbackendarchive.c:634 ../daemon/gvfsbackendftp.c:706
-#: ../daemon/gvfsbackendnfs.c:197 ../daemon/gvfsbackendsftp.c:2016
+#: ../daemon/gvfsbackendarchive.c:626 ../daemon/gvfsbackendftp.c:706
+#: ../daemon/gvfsbackendnfs.c:197 ../daemon/gvfsbackendsftp.c:2019
 msgid "No hostname specified"
 msgstr "호스트 이름을 지정하지 않았습니다"
 
@@ -768,20 +781,23 @@ msgid "Apple Filing Protocol Service"
 msgstr "애플 파일링 프로토콜 서비스"
 
 #: ../daemon/gvfsbackendafp.c:286 ../daemon/gvfsbackendburn.c:875
-#: ../daemon/gvfsbackenddav.c:2949 ../daemon/gvfsbackendftp.c:1575
+#: ../daemon/gvfsbackenddav.c:2949 ../daemon/gvfsbackendftp.c:1592
+#: ../daemon/gvfsbackendgoogle.c:1806
 msgid "Can't copy directory over directory"
 msgstr "디렉터리에 디렉터리를 복사할 수 없습니다"
 
 #: ../daemon/gvfsbackendafp.c:305 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackenddav.c:2978 ../daemon/gvfsbackendftp.c:1598
-#: ../daemon/gvfsbackendmtp.c:1657 ../daemon/gvfsbackendmtp.c:1680
-#: ../daemon/gvfsbackendmtp.c:1982 ../daemon/gvfsbackendmtp.c:2006
+#: ../daemon/gvfsbackenddav.c:2978 ../daemon/gvfsbackendftp.c:1615
+#: ../daemon/gvfsbackendgoogle.c:1244 ../daemon/gvfsbackendgoogle.c:1825
+#: ../daemon/gvfsbackendgoogle.c:1845 ../daemon/gvfsbackendmtp.c:1633
+#: ../daemon/gvfsbackendmtp.c:1656 ../daemon/gvfsbackendmtp.c:1958
+#: ../daemon/gvfsbackendmtp.c:1982
 msgid "Can't recursively copy directory"
 msgstr "디렉터리를 되풀이해서 복사할 수 없습니다"
 
 #: ../daemon/gvfsbackendafp.c:489 ../daemon/gvfsbackenddav.c:2826
-#: ../daemon/gvfsbackendnfs.c:2470 ../daemon/gvfsbackendsftp.c:4784
-#: ../daemon/gvfsbackendsmb.c:2196
+#: ../daemon/gvfsbackendnfs.c:2470 ../daemon/gvfsbackendsftp.c:4789
+#: ../daemon/gvfsbackendsmb.c:2190
 msgid "Can't move directory over directory"
 msgstr "디렉터리에 디렉터리를 옮길 수 없습니다"
 
@@ -795,13 +811,13 @@ msgid "Unable to create temporary file (%s)"
 msgstr "임시 파일을 만들 수 없습니다(%s)"
 
 #: ../daemon/gvfsbackendafp.c:1348 ../daemon/gvfsbackenddav.c:2427
-#: ../daemon/gvfsbackendnfs.c:1175 ../daemon/gvfsbackendsftp.c:3740
-#: ../daemon/gvfsbackendsmb.c:1235
+#: ../daemon/gvfsbackendnfs.c:1175 ../daemon/gvfsbackendsftp.c:3745
+#: ../daemon/gvfsbackendsmb.c:1227
 msgid "The file was externally modified"
 msgstr "파일이 외부에서 수정되었습니다"
 
-#: ../daemon/gvfsbackendafp.c:1765 ../daemon/gvfsbackendftp.c:1216
-#: ../daemon/gvfsbackendsftp.c:5176
+#: ../daemon/gvfsbackendafp.c:1765 ../daemon/gvfsbackendftp.c:1233
+#: ../daemon/gvfsbackendsftp.c:5181
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "올바르지 않은 속성 형식(uint32여야 함)"
 
@@ -820,16 +836,19 @@ msgstr "볼륨을 지정하지 않았습니다"
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:356 ../daemon/gvfsbackendsftp.c:2558
+#: ../daemon/gvfsbackendarchive.c:348 ../daemon/gvfsbackendsftp.c:2563
 #: ../daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
 msgstr "/, 위치 %s"
 
-#: ../daemon/gvfsbackendarchive.c:889 ../daemon/gvfsbackendburn.c:679
-#: ../daemon/gvfsbackendcomputer.c:729 ../daemon/gvfsbackenddnssd.c:464
-#: ../daemon/gvfsbackendftp.c:354 ../daemon/gvfsbackendnetwork.c:744
-#: ../daemon/gvfsbackendsftp.c:4276 ../daemon/gvfsftpdircache.c:157
+#: ../daemon/gvfsbackendarchive.c:881 ../daemon/gvfsbackendburn.c:679
+#: ../daemon/gvfsbackendcomputer.c:729 ../daemon/gvfsbackenddnssd.c:471
+#: ../daemon/gvfsbackendftp.c:354 ../daemon/gvfsbackendgoogle.c:684
+#: ../daemon/gvfsbackendgoogle.c:1213 ../daemon/gvfsbackendgoogle.c:1328
+#: ../daemon/gvfsbackendgoogle.c:1469 ../daemon/gvfsbackendnetwork.c:744
+#: ../daemon/gvfsbackendsftp.c:4281 ../daemon/gvfsftpdircache.c:157
+#, c-format
 msgid "The file is not a directory"
 msgstr "파일이 디렉터리가 아닙니다"
 
@@ -847,16 +866,18 @@ msgstr "임시 디렉터리를 만들 수 없습니다"
 #: ../daemon/gvfsbackendburn.c:716 ../daemon/gvfsbackendburn.c:742
 #: ../daemon/gvfsbackendburn.c:780 ../daemon/gvfsbackendburn.c:971
 #: ../daemon/gvfsbackendburn.c:1007 ../daemon/gvfsbackendftp.c:835
-#: ../daemon/gvfsbackendgphoto2.c:1218 ../daemon/gvfsbackendgphoto2.c:2141
-#: ../daemon/gvfsbackendgphoto2.c:2859 ../daemon/gvfsbackendrecent.c:106
-#: ../daemon/gvfsbackendrecent.c:287 ../daemon/gvfsbackendsftp.c:2111
-#: ../daemon/gvfsbackendsftp.c:3274 ../daemon/gvfsbackendsftp.c:3287
-#: ../daemon/gvfsbackendsftp.c:3307 ../daemon/gvfsbackendtrash.c:218
+#: ../daemon/gvfsbackendgoogle.c:650 ../daemon/gvfsbackendgphoto2.c:1203
+#: ../daemon/gvfsbackendgphoto2.c:2126 ../daemon/gvfsbackendgphoto2.c:2844
+#: ../daemon/gvfsbackendrecent.c:106 ../daemon/gvfsbackendrecent.c:287
+#: ../daemon/gvfsbackendsftp.c:2114 ../daemon/gvfsbackendsftp.c:3279
+#: ../daemon/gvfsbackendsftp.c:3292 ../daemon/gvfsbackendsftp.c:3312
+#: ../daemon/gvfsbackendtrash.c:218
 #, c-format
 msgid "No such file or directory"
 msgstr "그런 파일이나 디렉터리가 없습니다"
 
 #: ../daemon/gvfsbackendburn.c:455 ../daemon/gvfsbackendburn.c:903
+#: ../daemon/gvfsbackendgoogle.c:1814
 msgid "Can't copy file over directory"
 msgstr "디렉터리에 파일을 복사할 수 없습니다"
 
@@ -868,12 +889,12 @@ msgstr "CD/DVD 굽기"
 #: ../daemon/gvfsbackendburn.c:752 ../daemon/gvfsbackendburn.c:788
 #: ../daemon/gvfsbackendburn.c:923 ../daemon/gvfsbackendburn.c:985
 #: ../daemon/gvfsbackendburn.c:989 ../daemon/gvfsbackendburn.c:999
-#: ../daemon/gvfsbackendgphoto2.c:2933
+#: ../daemon/gvfsbackendgphoto2.c:2918
 msgid "File exists"
 msgstr "파일이 있습니다"
 
-#: ../daemon/gvfsbackendburn.c:827 ../daemon/gvfsjobcloseread.c:112
-#: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:121
+#: ../daemon/gvfsbackendburn.c:827 ../daemon/gvfsjobcloseread.c:113
+#: ../daemon/gvfsjobclosewrite.c:121 ../daemon/gvfsjobcopy.c:121
 #: ../daemon/gvfsjobcreatemonitor.c:143 ../daemon/gvfsjobcreatemonitor.c:154
 #: ../daemon/gvfsjobcreatemonitor.c:177 ../daemon/gvfsjobcreatemonitor.c:195
 #: ../daemon/gvfsjobdelete.c:108 ../daemon/gvfsjobenumerate.c:272
@@ -884,16 +905,16 @@ msgstr "파일이 있습니다"
 #: ../daemon/gvfsjobopeniconforread.c:104 ../daemon/gvfsjobpollmountable.c:107
 #: ../daemon/gvfsjobpull.c:125 ../daemon/gvfsjobpush.c:125
 #: ../daemon/gvfsjobqueryattributes.c:145 ../daemon/gvfsjobqueryfsinfo.c:116
-#: ../daemon/gvfsjobqueryinfo.c:124 ../daemon/gvfsjobqueryinforead.c:119
-#: ../daemon/gvfsjobqueryinfowrite.c:119 ../daemon/gvfsjobread.c:120
-#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobqueryinfo.c:124 ../daemon/gvfsjobqueryinforead.c:122
+#: ../daemon/gvfsjobqueryinfowrite.c:122 ../daemon/gvfsjobread.c:123
+#: ../daemon/gvfsjobseekread.c:121 ../daemon/gvfsjobseekwrite.c:121
 #: ../daemon/gvfsjobsetattribute.c:130 ../daemon/gvfsjobsetdisplayname.c:111
 #: ../daemon/gvfsjobstartmountable.c:113 ../daemon/gvfsjobstopmountable.c:115
-#: ../daemon/gvfsjobtrash.c:107 ../daemon/gvfsjobtruncate.c:112
+#: ../daemon/gvfsjobtrash.c:107 ../daemon/gvfsjobtruncate.c:113
 #: ../daemon/gvfsjobunmountmountable.c:157
-#: ../daemon/gvfsjobunmountmountable.c:172 ../daemon/gvfsjobwrite.c:120
+#: ../daemon/gvfsjobunmountmountable.c:172 ../daemon/gvfsjobwrite.c:123
 #: ../monitor/gdu/ggdumount.c:1176 ../monitor/gdu/ggdumount.c:1260
-#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1168
+#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1181
 #: ../monitor/udisks2/gvfsudisks2volume.c:1677
 msgid "Operation not supported by backend"
 msgstr "백엔드에서 지원하는 동작이 아닙니다"
@@ -903,19 +924,19 @@ msgid "No such file or directory in target path"
 msgstr "대상 경로에 파일이나 디렉터리가 없습니다"
 
 #: ../daemon/gvfsbackendburn.c:884 ../daemon/gvfsbackenddav.c:2864
-#: ../daemon/gvfsbackendsftp.c:2105 ../daemon/gvfsbackendsftp.c:4964
+#: ../daemon/gvfsbackendsftp.c:2108 ../daemon/gvfsbackendsftp.c:4969
 msgid "Target file exists"
 msgstr "대상 파일이 있습니다"
 
 #: ../daemon/gvfsbackendburn.c:949 ../daemon/gvfsbackendcomputer.c:812
 #: ../daemon/gvfsbackenddav.c:3308 ../daemon/gvfsbackenddav.c:3340
-#: ../daemon/gvfsbackendgphoto2.c:2509 ../daemon/gvfsbackendgphoto2.c:2722
-#: ../daemon/gvfsbackendgphoto2.c:2819 ../daemon/gvfsbackendgphoto2.c:2912
-#: ../daemon/gvfsbackendgphoto2.c:3521 ../daemon/gvfsbackendgphoto2.c:3531
+#: ../daemon/gvfsbackendgphoto2.c:2494 ../daemon/gvfsbackendgphoto2.c:2707
+#: ../daemon/gvfsbackendgphoto2.c:2804 ../daemon/gvfsbackendgphoto2.c:2897
+#: ../daemon/gvfsbackendgphoto2.c:3506 ../daemon/gvfsbackendgphoto2.c:3516
 #: ../daemon/gvfsbackendnfs.c:2418 ../daemon/gvfsbackendnfs.c:2544
-#: ../daemon/gvfsbackendsftp.c:5832 ../daemon/gvfsbackendsftp.c:5864
-#: ../daemon/gvfsbackendsftp.c:5890 ../daemon/gvfsbackendsftp.c:6362
-#: ../daemon/gvfsbackendsftp.c:6424
+#: ../daemon/gvfsbackendsftp.c:5854 ../daemon/gvfsbackendsftp.c:5886
+#: ../daemon/gvfsbackendsftp.c:5912 ../daemon/gvfsbackendsftp.c:6384
+#: ../daemon/gvfsbackendsftp.c:6446
 msgid "Not supported"
 msgstr "지원하지 않음"
 
@@ -925,12 +946,12 @@ msgid "File system is busy"
 msgstr "파일 시스템이 사용 중입니다"
 
 #: ../daemon/gvfsbackend.c:993 ../monitor/gdu/ggdumount.c:922
-#: ../monitor/udisks2/gvfsudisks2mount.c:781
+#: ../monitor/udisks2/gvfsudisks2mount.c:785
 msgid "Unmount Anyway"
 msgstr "그래도 마운트 해제"
 
 #: ../daemon/gvfsbackend.c:996 ../monitor/gdu/ggdumount.c:924
-#: ../monitor/udisks2/gvfsudisks2mount.c:784
+#: ../monitor/udisks2/gvfsudisks2mount.c:788
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -938,20 +959,20 @@ msgstr ""
 "볼륨이 사용 중입니다\n"
 "이 볼륨을 사용하고 있는 프로그램이 있습니다."
 
-#: ../daemon/gvfsbackendcdda.c:358 ../daemon/gvfsbackendgphoto2.c:1527
-#: ../daemon/gvfsbackendmtp.c:845
+#: ../daemon/gvfsbackendcdda.c:358 ../daemon/gvfsbackendgphoto2.c:1512
+#: ../daemon/gvfsbackendmtp.c:816
 msgid "Cannot create gudev client"
 msgstr "gudev 클라이언트를 만들 수 없습니다"
 
-#: ../daemon/gvfsbackendcdda.c:378 ../daemon/gvfsbackendgphoto2.c:1544
+#: ../daemon/gvfsbackendcdda.c:378 ../daemon/gvfsbackendgphoto2.c:1529
 msgid "Cannot connect to the system bus"
 msgstr "시스템 버스에 연결할 수 없습니다"
 
-#: ../daemon/gvfsbackendcdda.c:389 ../daemon/gvfsbackendgphoto2.c:1555
+#: ../daemon/gvfsbackendcdda.c:389 ../daemon/gvfsbackendgphoto2.c:1540
 msgid "Cannot create libhal context"
 msgstr "libhal 컨텍스트를 만들 수 없습니다"
 
-#: ../daemon/gvfsbackendcdda.c:403 ../daemon/gvfsbackendgphoto2.c:1567
+#: ../daemon/gvfsbackendcdda.c:403 ../daemon/gvfsbackendgphoto2.c:1552
 msgid "Cannot initialize libhal"
 msgstr "libhal을 초기화 할 수 없습니다"
 
@@ -1006,7 +1027,7 @@ msgstr "드라이브 %s에서 'paranoia'의 오류"
 msgid "Error seeking in stream on drive %s"
 msgstr "드라이브 %s에서 스트림 찾는 중 오류"
 
-#: ../daemon/gvfsbackendcdda.c:1017 ../daemon/gvfsbackendgphoto2.c:1828
+#: ../daemon/gvfsbackendcdda.c:1017 ../daemon/gvfsbackendgphoto2.c:1813
 #, c-format
 msgid "No such file"
 msgstr "그런 파일이 없습니다"
@@ -1104,7 +1125,7 @@ msgstr "웹 공유"
 #. translators: %s here is the hostname
 #. Translators: %s is the hostname
 #: ../daemon/gvfsbackenddav.c:1565 ../daemon/gvfsbackendftp.c:529
-#: ../daemon/gvfsbackendsftp.c:1136
+#: ../daemon/gvfsbackendsftp.c:1129
 #, c-format
 msgid "Enter password for %s"
 msgstr "%s의 암호를 입력하십시오"
@@ -1122,10 +1143,11 @@ msgstr "웹 공유 디렉터리가 아닙니다"
 msgid "Could not create request"
 msgstr "요청을 만들 수 없습니다"
 
-#: ../daemon/gvfsbackenddav.c:2458 ../daemon/gvfsbackendftp.c:1078
-#: ../daemon/gvfsbackendnfs.c:939 ../daemon/gvfsbackendnfs.c:962
-#: ../daemon/gvfsbackendnfs.c:988 ../daemon/gvfsbackendnfs.c:1388
-#: ../daemon/gvfsbackendsmb.c:1271 ../daemon/gvfsbackendsmb.c:2224
+#: ../daemon/gvfsbackenddav.c:2458 ../daemon/gvfsbackendftp.c:1085
+#: ../daemon/gvfsbackendgoogle.c:2561 ../daemon/gvfsbackendnfs.c:939
+#: ../daemon/gvfsbackendnfs.c:962 ../daemon/gvfsbackendnfs.c:988
+#: ../daemon/gvfsbackendnfs.c:1388 ../daemon/gvfsbackendsmb.c:1263
+#: ../daemon/gvfsbackendsmb.c:2218
 msgid "Backup file creation failed"
 msgstr "백업 파일을 만드는데 실패했습니다"
 
@@ -1137,33 +1159,33 @@ msgstr "디렉터리에 파일을 옮길 수 없습니다"
 msgid "File length changed during transfer"
 msgstr "전송하는 중에 파일 길이가 바뀌었습니다"
 
-#: ../daemon/gvfsbackenddnssd.c:511 ../daemon/gvfsbackendnetwork.c:462
+#: ../daemon/gvfsbackenddnssd.c:518 ../daemon/gvfsbackendnetwork.c:462
 msgid "Local Network"
 msgstr "로컬 네트워크"
 
-#: ../daemon/gvfsbackenddnssd.c:758 ../daemon/gvfsbackendnetwork.c:851
+#: ../daemon/gvfsbackenddnssd.c:765 ../daemon/gvfsbackendnetwork.c:851
 msgid "Can't monitor file or directory."
 msgstr "파일이나 디렉터리를 감시할 수 없습니다."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:776
+#: ../daemon/gvfsbackenddnssd.c:783
 msgid "Dns-SD"
 msgstr "DNS-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:777 ../daemon/gvfsbackendnetwork.c:783
+#: ../daemon/gvfsbackenddnssd.c:784 ../daemon/gvfsbackendnetwork.c:783
 #: ../daemon/gvfsbackendnetwork.c:930 ../daemon/gvfsbackendnetwork.c:931
 msgid "Network"
 msgstr "네트워크"
 
 # 주의: 일부러 순서 바꾸지 않는다
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:526 ../daemon/gvfsbackendsftp.c:1129
+#: ../daemon/gvfsbackendftp.c:526 ../daemon/gvfsbackendsftp.c:1122
 #, c-format
 msgid "Enter password for %s on %s"
 msgstr "%s 사용자, %s 컴퓨터의 암호를 입력하십시오"
 
-#: ../daemon/gvfsbackendftp.c:556 ../daemon/gvfsbackendsftp.c:1153
-#: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmb.c:687
+#: ../daemon/gvfsbackendftp.c:556 ../daemon/gvfsbackendsftp.c:1146
+#: ../daemon/gvfsbackendsmbbrowse.c:1024 ../daemon/gvfsbackendsmb.c:679
 msgid "Password dialog cancelled"
 msgstr "암호 입력 대화상자가 취소되었습니다"
 
@@ -1171,202 +1193,240 @@ msgstr "암호 입력 대화상자가 취소되었습니다"
 msgid "Insufficient permissions"
 msgstr "권한이 없습니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:516
+#: ../daemon/gvfsbackendgoogle.c:1713 ../daemon/gvfsbackendgoogle.c:2235
+#: ../daemon/gvfsbackendgphoto2.c:1846
+msgid "Error getting data from file"
+msgstr "파일 데이터를 가져오는 중 오류"
+
+#: ../daemon/gvfsbackendgoogle.c:2193 ../daemon/gvfsbackendsftp.c:2287
+#: ../daemon/gvfsbackendsftp.c:2694 ../daemon/gvfsbackendsftp.c:2757
+#: ../daemon/gvfsbackendsftp.c:2768 ../daemon/gvfsbackendsftp.c:2826
+#: ../daemon/gvfsbackendsftp.c:2919 ../daemon/gvfsbackendsftp.c:2971
+#: ../daemon/gvfsbackendsftp.c:3026 ../daemon/gvfsbackendsftp.c:3105
+#: ../daemon/gvfsbackendsftp.c:3222 ../daemon/gvfsbackendsftp.c:3355
+#: ../daemon/gvfsbackendsftp.c:3439 ../daemon/gvfsbackendsftp.c:3515
+#: ../daemon/gvfsbackendsftp.c:3527 ../daemon/gvfsbackendsftp.c:3587
+#: ../daemon/gvfsbackendsftp.c:3629 ../daemon/gvfsbackendsftp.c:3817
+#: ../daemon/gvfsbackendsftp.c:3851 ../daemon/gvfsbackendsftp.c:3909
+#: ../daemon/gvfsbackendsftp.c:3968 ../daemon/gvfsbackendsftp.c:4039
+#: ../daemon/gvfsbackendsftp.c:4314 ../daemon/gvfsbackendsftp.c:4385
+#: ../daemon/gvfsbackendsftp.c:4520 ../daemon/gvfsbackendsftp.c:4628
+#: ../daemon/gvfsbackendsftp.c:4690 ../daemon/gvfsbackendsftp.c:4727
+#: ../daemon/gvfsbackendsftp.c:4755 ../daemon/gvfsbackendsftp.c:4869
+#: ../daemon/gvfsbackendsftp.c:4925 ../daemon/gvfsbackendsftp.c:4966
+#: ../daemon/gvfsbackendsftp.c:5002 ../daemon/gvfsbackendsftp.c:5038
+#: ../daemon/gvfsbackendsftp.c:5053 ../daemon/gvfsbackendsftp.c:5068
+#: ../daemon/gvfsbackendsftp.c:5152 ../daemon/gvfsbackendsftp.c:5339
+#: ../daemon/gvfsbackendsftp.c:5376 ../daemon/gvfsbackendsftp.c:5450
+#: ../daemon/gvfsbackendsftp.c:5536 ../daemon/gvfsbackendsftp.c:5620
+#: ../daemon/gvfsbackendsftp.c:5663 ../daemon/gvfsbackendsftp.c:5667
+#: ../daemon/gvfsbackendsftp.c:5784 ../daemon/gvfsbackendsftp.c:5788
+#: ../daemon/gvfsbackendsftp.c:6026 ../daemon/gvfsbackendsftp.c:6239
+#: ../daemon/gvfsbackendsftp.c:6256 ../daemon/gvfsbackendsftp.c:6390
+#: ../daemon/gvfsbackendsftp.c:6418
+msgid "Invalid reply received"
+msgstr "잘못된 응답을 받았습니다"
+
+#: ../daemon/gvfsbackendgoogle.c:2588 ../daemon/gvfsbackendnfs.c:1150
+msgid "Target file is a directory"
+msgstr "대상 파일이 디렉터리입니다"
+
+#: ../daemon/gvfsbackendgoogle.c:2596 ../daemon/gvfsbackendnfs.c:1160
+msgid "Target file is not a regular file"
+msgstr "대상 파일이 일반 파일이 아닙니다"
+
+#: ../daemon/gvfsbackendgoogle.c:2786 ../daemon/gvfsbackendgphoto2.c:3306
+msgid "Error writing file"
+msgstr "파일 쓰는 중 오류"
+
+#: ../daemon/gvfsbackendgphoto2.c:493
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "%s: %d: 디렉터리나 파일이 있습니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:523
+#: ../daemon/gvfsbackendgphoto2.c:500
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "%s: %d: 그런 파일이나 디렉터리가 없습니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:529
+#: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: 잘못된 파일 이름"
 
-#: ../daemon/gvfsbackendgphoto2.c:535
+#: ../daemon/gvfsbackendgphoto2.c:512
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "%s: %d: 지원하지 않음"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:736 ../daemon/gvfsbackendgphoto2.c:742
+#: ../daemon/gvfsbackendgphoto2.c:721 ../daemon/gvfsbackendgphoto2.c:727
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "디지털 카메라(%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:953 ../monitor/gphoto2/ggphoto2volume.c:190
+#: ../daemon/gvfsbackendgphoto2.c:938 ../monitor/gphoto2/ggphoto2volume.c:190
 #, c-format
 msgid "%s Camera"
 msgstr "%s 카메라"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:956 ../monitor/gphoto2/ggphoto2volume.c:185
+#: ../daemon/gvfsbackendgphoto2.c:941 ../monitor/gphoto2/ggphoto2volume.c:185
 #, c-format
 msgid "%s Audio Player"
 msgstr "%s 오디오 재생기"
 
-#: ../daemon/gvfsbackendgphoto2.c:965 ../monitor/gphoto2/ggphoto2volume.c:199
+#: ../daemon/gvfsbackendgphoto2.c:950 ../monitor/gphoto2/ggphoto2volume.c:199
 msgid "Camera"
 msgstr "카메라"
 
-#: ../daemon/gvfsbackendgphoto2.c:967 ../monitor/gphoto2/ggphoto2volume.c:197
+#: ../daemon/gvfsbackendgphoto2.c:952 ../monitor/gphoto2/ggphoto2volume.c:197
 msgid "Audio Player"
 msgstr "오디오 재생기"
 
-#: ../daemon/gvfsbackendgphoto2.c:1583 ../daemon/gvfsbackendmtp.c:837
+#: ../daemon/gvfsbackendgphoto2.c:1568 ../daemon/gvfsbackendmtp.c:808
 msgid "No device specified"
 msgstr "장치를 지정하지 않았습니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:1603
+#: ../daemon/gvfsbackendgphoto2.c:1588
 msgid "Cannot create gphoto2 context"
 msgstr "gphoto2 컨텍스트를 만들 수 없습니다"
 
 # FIXME
-#: ../daemon/gvfsbackendgphoto2.c:1612
+#: ../daemon/gvfsbackendgphoto2.c:1597
 msgid "Error creating camera"
 msgstr "카메라 만들기 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:1624 ../daemon/gvfsbackendgphoto2.c:1633
+#: ../daemon/gvfsbackendgphoto2.c:1609 ../daemon/gvfsbackendgphoto2.c:1618
 msgid "Error loading device information"
 msgstr "장치 정보를 읽는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:1644
+#: ../daemon/gvfsbackendgphoto2.c:1629
 msgid "Error looking up device information"
 msgstr "장치 정보를 찾아보는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:1653
+#: ../daemon/gvfsbackendgphoto2.c:1638
 msgid "Error getting device information"
 msgstr "장치 정보를 가져오는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:1667
+#: ../daemon/gvfsbackendgphoto2.c:1652
 msgid "Error setting up camera communications port"
 msgstr "카메라 통신포트를 설정하는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:1677
+#: ../daemon/gvfsbackendgphoto2.c:1662
 msgid "Error initializing camera"
 msgstr "카메라 초기화 중 오류"
 
 #. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
 #. backend and shouldn't be translated.
-#: ../daemon/gvfsbackendgphoto2.c:1688
+#: ../daemon/gvfsbackendgphoto2.c:1673
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2 마운트, 위치 %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1774
+#: ../daemon/gvfsbackendgphoto2.c:1759
 msgid "No camera specified"
 msgstr "카메라를 지정하지 않았습니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:1836 ../daemon/gvfsbackendgphoto2.c:3562
+#: ../daemon/gvfsbackendgphoto2.c:1821 ../daemon/gvfsbackendgphoto2.c:3547
 msgid "Error creating file object"
 msgstr "파일 개체 만드는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:1851 ../daemon/gvfsbackendgphoto2.c:3593
+#: ../daemon/gvfsbackendgphoto2.c:1836 ../daemon/gvfsbackendgphoto2.c:3578
 msgid "Error getting file"
 msgstr "파일 가져오는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:1861
-msgid "Error getting data from file"
-msgstr "파일 데이터를 가져오는 중 오류"
-
-#: ../daemon/gvfsbackendgphoto2.c:1919 ../daemon/gvfsbackendmtp.c:2308
+#: ../daemon/gvfsbackendgphoto2.c:1904 ../daemon/gvfsbackendmtp.c:2285
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "아이콘 ID 형태가 잘못되었습니다: '%s'"
 
-#: ../daemon/gvfsbackendgphoto2.c:1995 ../daemon/gvfsbackendgphoto2.c:3184
+#: ../daemon/gvfsbackendgphoto2.c:1980 ../daemon/gvfsbackendgphoto2.c:3169
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "카메라 %s에서 스트림 찾는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:2135 ../daemon/gvfsbackendsftp.c:3277
-#: ../daemon/gvfsbackendsmbbrowse.c:1465
+#: ../daemon/gvfsbackendgphoto2.c:2120 ../daemon/gvfsbackendsftp.c:3282
+#: ../daemon/gvfsbackendsmbbrowse.c:1452
 msgid "Not a directory"
 msgstr "디렉터리가 아닙니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:2168
+#: ../daemon/gvfsbackendgphoto2.c:2153
 msgid "Failed to get folder list"
 msgstr "폴더 목록 가져오기 실패"
 
-#: ../daemon/gvfsbackendgphoto2.c:2233
+#: ../daemon/gvfsbackendgphoto2.c:2218
 msgid "Failed to get file list"
 msgstr "파일 목록 가져오기 실패"
 
-#: ../daemon/gvfsbackendgphoto2.c:2521
+#: ../daemon/gvfsbackendgphoto2.c:2506
 msgid "Error creating directory"
 msgstr "디렉터리 만드는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:2734
+#: ../daemon/gvfsbackendgphoto2.c:2719
 msgid "Name already exists"
 msgstr "해당 이름이 이미 있습니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:2745 ../daemon/gvfsbackendgphoto2.c:3413
+#: ../daemon/gvfsbackendgphoto2.c:2730 ../daemon/gvfsbackendgphoto2.c:3398
 msgid "New name too long"
 msgstr "새 이름이 너무 깁니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:2755 ../daemon/gvfsbackendgphoto2.c:3424
+#: ../daemon/gvfsbackendgphoto2.c:2740 ../daemon/gvfsbackendgphoto2.c:3409
 msgid "Error renaming directory"
 msgstr "디렉터리 이름 바꾸는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:2768 ../daemon/gvfsbackendgphoto2.c:3437
+#: ../daemon/gvfsbackendgphoto2.c:2753 ../daemon/gvfsbackendgphoto2.c:3422
 msgid "Error renaming file"
 msgstr "파일 이름 바꾸는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:2832
+#: ../daemon/gvfsbackendgphoto2.c:2817
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "'%s' 디렉터리가 비어있지 않습니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:2843
+#: ../daemon/gvfsbackendgphoto2.c:2828
 msgid "Error deleting directory"
 msgstr "디렉터리 지우는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:2869 ../daemon/gvfsbackendgphoto2.c:3614
+#: ../daemon/gvfsbackendgphoto2.c:2854 ../daemon/gvfsbackendgphoto2.c:3599
 msgid "Error deleting file"
 msgstr "파일 지우는 중 오류"
 
-#: ../daemon/gvfsbackendgphoto2.c:2922
+#: ../daemon/gvfsbackendgphoto2.c:2907
 msgid "Can't write to directory"
 msgstr "디렉터리를 쓸 수 없습니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:2969
+#: ../daemon/gvfsbackendgphoto2.c:2954
 msgid "Cannot allocate new file to append to"
 msgstr "덧붙이려는 새 파일을 할당할 수 없습니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:2984
+#: ../daemon/gvfsbackendgphoto2.c:2969
 msgid "Cannot read file to append to"
 msgstr "덧붙이려는 파일을 읽을 수 없습니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:2995
+#: ../daemon/gvfsbackendgphoto2.c:2980
 msgid "Cannot get data of file to append to"
 msgstr "덧붙이려는 파일의 데이터를 가져올 수 없습니다"
 
-#: ../daemon/gvfsbackendgphoto2.c:3321
-msgid "Error writing file"
-msgstr "파일 쓰는 중 오류"
-
-#: ../daemon/gvfsbackendgphoto2.c:3369
+#: ../daemon/gvfsbackendgphoto2.c:3354
 msgid "Not supported (not same directory)"
 msgstr "지원하지 않음(같은 디렉터리가 아님)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3381
+#: ../daemon/gvfsbackendgphoto2.c:3366
 msgid ""
 "Not supported (the source is a directory, the destination is a directory too)"
 msgstr "지원하지 않음(원본도 디렉터리이고 대상도 디렉터리)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3389
+#: ../daemon/gvfsbackendgphoto2.c:3374
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
 msgstr "지원하지 않음(원본은 디렉터리이고 대상은 이미 있는 파일)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3401
+#: ../daemon/gvfsbackendgphoto2.c:3386
 msgid ""
 "Not supported (the source is a file, but the destination is a directory)"
 msgstr "지원하지 않음(원본은 파일이고 대상은 디렉터리)"
@@ -1380,81 +1440,81 @@ msgstr "HTTP 클라이언트 오류: %s"
 msgid "Directory notification not supported"
 msgstr "디렉터리 알림을 지원하지 않습니다"
 
-#: ../daemon/gvfsbackendmtp.c:549
+#: ../daemon/gvfsbackendmtp.c:520
 msgid "Unknown error."
 msgstr "알 수 없는 오류."
 
-#: ../daemon/gvfsbackendmtp.c:555
+#: ../daemon/gvfsbackendmtp.c:526
 #, c-format
 msgid "libmtp error: %s"
 msgstr "libmtp 오류: %s"
 
-#: ../daemon/gvfsbackendmtp.c:791
+#: ../daemon/gvfsbackendmtp.c:762
 msgid "Unexpected host URI format."
 msgstr "예상치 않은 호스트 URI 형식입니다."
 
-#: ../daemon/gvfsbackendmtp.c:801
+#: ../daemon/gvfsbackendmtp.c:772
 msgid "Malformed host URI."
 msgstr "호스트 URI 형태가 잘못되었습니다."
 
-#: ../daemon/gvfsbackendmtp.c:814
+#: ../daemon/gvfsbackendmtp.c:785
 msgid "Couldn't find matching udev device."
 msgstr "해당하는 UDEV 장치를 찾을 수 없습니다."
 
-#: ../daemon/gvfsbackendmtp.c:980
+#: ../daemon/gvfsbackendmtp.c:951
 msgid "No MTP devices found"
 msgstr "MTP 장치가 없습니다"
 
-#: ../daemon/gvfsbackendmtp.c:985
+#: ../daemon/gvfsbackendmtp.c:956
 msgid "Unable to connect to MTP device"
 msgstr "MTP 장치에 연결할 수 없습니다"
 
-#: ../daemon/gvfsbackendmtp.c:990
+#: ../daemon/gvfsbackendmtp.c:961
 msgid "Unable to allocate memory while detecting MTP devices"
 msgstr "MTP 장치를 검색하는데 메모리를 할당할 수 없습니다"
 
-#: ../daemon/gvfsbackendmtp.c:996
+#: ../daemon/gvfsbackendmtp.c:967
 msgid "Generic libmtp error"
 msgstr "일반 libmtp 오류"
 
-#: ../daemon/gvfsbackendmtp.c:1013
+#: ../daemon/gvfsbackendmtp.c:984
 #, c-format
 msgid "Unable to open MTP device '%s'"
 msgstr "'%s' MTP 장치를 열 수 없습니다"
 
-#: ../daemon/gvfsbackendmtp.c:1033
+#: ../daemon/gvfsbackendmtp.c:1004
 msgid "Device not found"
 msgstr "장치가 없습니다"
 
-#: ../daemon/gvfsbackendmtp.c:1303 ../daemon/gvfsbackendmtp.c:1411
-#: ../daemon/gvfsbackendmtp.c:1463
+#: ../daemon/gvfsbackendmtp.c:1279 ../daemon/gvfsbackendmtp.c:1387
+#: ../daemon/gvfsbackendmtp.c:1439
 msgid "File not found"
 msgstr "파일이 없습니다"
 
-#: ../daemon/gvfsbackendmtp.c:1531
+#: ../daemon/gvfsbackendmtp.c:1507
 msgid "Cannot make directory in this location"
 msgstr "이 위치에 디렉터리를 만들 수 없습니다"
 
-#: ../daemon/gvfsbackendmtp.c:1601 ../daemon/gvfsbackendmtp.c:2071
-#: ../daemon/gvfsbackendmtp.c:2134 ../daemon/gvfsbackendmtp.c:2201
-#: ../daemon/gvfsbackendmtp.c:2547 ../daemon/gvfsbackendmtp.c:2613
-#: ../daemon/gvfsbackendsmbbrowse.c:1205
+#: ../daemon/gvfsbackendmtp.c:1577 ../daemon/gvfsbackendmtp.c:2047
+#: ../daemon/gvfsbackendmtp.c:2110 ../daemon/gvfsbackendmtp.c:2178
+#: ../daemon/gvfsbackendmtp.c:2532 ../daemon/gvfsbackendmtp.c:2598
+#: ../daemon/gvfsbackendsmbbrowse.c:1192
 msgid "Not a regular file"
 msgstr "일반 파일이 아닙니다"
 
-#: ../daemon/gvfsbackendmtp.c:1647 ../daemon/gvfsbackendmtp.c:1972
+#: ../daemon/gvfsbackendmtp.c:1623 ../daemon/gvfsbackendmtp.c:1948
 msgid "Target is a directory"
 msgstr "대상은 디렉터리가 아닙니다"
 
-#: ../daemon/gvfsbackendmtp.c:1652 ../daemon/gvfsbackendmtp.c:1977
+#: ../daemon/gvfsbackendmtp.c:1628 ../daemon/gvfsbackendmtp.c:1953
 msgid "Can't merge directories"
 msgstr "디렉터리를 합칠 수 없습니다"
 
-#: ../daemon/gvfsbackendmtp.c:1910 ../daemon/gvfsbackendmtp.c:2459
+#: ../daemon/gvfsbackendmtp.c:1886 ../daemon/gvfsbackendmtp.c:2444
 msgid "Cannot write to this location"
 msgstr "이 위치에 쓸 수 없습니다"
 
-#: ../daemon/gvfsbackendmtp.c:2290
+#: ../daemon/gvfsbackendmtp.c:2267
 #, c-format
 msgid "No thumbnail for entity '%s'"
 msgstr "'%s' 항목에 대한 섬네일이 없습니다"
@@ -1467,13 +1527,13 @@ msgstr "파일 공유"
 msgid "Remote Login"
 msgstr "원격 로그인"
 
-#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:924
+#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:911
 msgid "Windows Network"
 msgstr "윈도우 네트워크"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:989
+#: ../daemon/gvfsbackendnetwork.c:1011
 msgid "Network Location Monitor"
 msgstr "네트워크 위치 정보"
 
@@ -1490,18 +1550,10 @@ msgstr ""
 "하는 경우입니다"
 
 #: ../daemon/gvfsbackendnfs.c:1046 ../daemon/gvfsbackendnfs.c:1069
-#: ../daemon/gvfsbackendnfs.c:1117 ../daemon/gvfsbackendsftp.c:3660
-#: ../daemon/gvfsbackendsftp.c:5669
+#: ../daemon/gvfsbackendnfs.c:1117 ../daemon/gvfsbackendsftp.c:3665
+#: ../daemon/gvfsbackendsftp.c:5691
 msgid "Unable to create temporary file"
 msgstr "임시 파일을 만들 수 없습니다"
-
-#: ../daemon/gvfsbackendnfs.c:1150
-msgid "Target file is a directory"
-msgstr "대상 파일이 디렉터리입니다"
-
-#: ../daemon/gvfsbackendnfs.c:1160
-msgid "Target file is not a regular file"
-msgstr "대상 파일이 일반 파일이 아닙니다"
 
 #: ../daemon/gvfsbackendnfs.c:2376
 msgid "Invalid attribute type"
@@ -1518,72 +1570,76 @@ msgstr "최근 폴더는 삭제할 수 없습니다"
 msgid "Recent"
 msgstr "최근"
 
-#: ../daemon/gvfsbackendsftp.c:342 ../daemon/gvfsbackendsftp.c:709
+#: ../daemon/gvfsbackendsftp.c:328 ../daemon/gvfsbackendsftp.c:704
 msgid "Connection failed"
 msgstr "연결이 실패했습니다"
 
-#: ../daemon/gvfsbackendsftp.c:358
+#: ../daemon/gvfsbackendsftp.c:344
 msgid "Hostname not known"
 msgstr "호스트 이름을 알 수 없습니다"
 
-#: ../daemon/gvfsbackendsftp.c:365
+#: ../daemon/gvfsbackendsftp.c:351
 msgid "No route to host"
 msgstr "호스트의 경로를 찾을 수 없습니다"
 
-#: ../daemon/gvfsbackendsftp.c:373
+#: ../daemon/gvfsbackendsftp.c:359
 msgid "Connection refused by server"
 msgstr "서버에서 연결이 거부되었습니다"
 
-#: ../daemon/gvfsbackendsftp.c:380
+#: ../daemon/gvfsbackendsftp.c:366
 msgid "Host key verification failed"
 msgstr "호스트 키 확인이 실패했습니다"
 
-#: ../daemon/gvfsbackendsftp.c:553
+#: ../daemon/gvfsbackendsftp.c:373
+msgid "Too many authentication failures"
+msgstr "인증 실패가 너무 많습니다"
+
+#: ../daemon/gvfsbackendsftp.c:548
 msgid "Unable to spawn SSH program"
 msgstr "SSH 프로그램을 실행할 수 없습니다"
 
-#: ../daemon/gvfsbackendsftp.c:569
+#: ../daemon/gvfsbackendsftp.c:564
 #, c-format
 msgid "Unable to spawn SSH program: %s"
 msgstr "SSH 프로그램을 실행할 수 없습니다: %s"
 
-#: ../daemon/gvfsbackendsftp.c:671 ../daemon/gvfsbackendsftp.c:1024
+#: ../daemon/gvfsbackendsftp.c:666 ../daemon/gvfsbackendsftp.c:1017
 msgid "Timed out when logging in"
 msgstr "로그인 할 때 시간 제한이 걸렸습니다"
 
-#: ../daemon/gvfsbackendsftp.c:898
+#: ../daemon/gvfsbackendsftp.c:893
 msgid "Log In Anyway"
 msgstr "그래도 로그인"
 
-#: ../daemon/gvfsbackendsftp.c:898
+#: ../daemon/gvfsbackendsftp.c:893
 msgid "Cancel Login"
 msgstr "로그인 취소"
 
-#: ../daemon/gvfsbackendsftp.c:913
+#: ../daemon/gvfsbackendsftp.c:908
 msgid "Login dialog cancelled"
 msgstr "로그인 대화상자가 취소되었습니다"
 
-#: ../daemon/gvfsbackendsftp.c:932
+#: ../daemon/gvfsbackendsftp.c:927
 msgid "Can't send host identity confirmation"
 msgstr "호스트 신원 확인을 보낼 수 없습니다"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendsftp.c:1126
+#: ../daemon/gvfsbackendsftp.c:1119
 #, c-format
 msgid "Enter passphrase for secure key for %s on %s"
 msgstr "%2$s의 %1$s에 대한 암호문을 입력하십시오"
 
 #. Translators: %s is the hostname
-#: ../daemon/gvfsbackendsftp.c:1133
+#: ../daemon/gvfsbackendsftp.c:1126
 #, c-format
 msgid "Enter passphrase for secure key for %s"
 msgstr "%s의 보안 키에 대한 암호문을 입력하십시오"
 
-#: ../daemon/gvfsbackendsftp.c:1225
+#: ../daemon/gvfsbackendsftp.c:1218
 msgid "Can't send password"
 msgstr "암호를 보낼 수 없습니다"
 
-#: ../daemon/gvfsbackendsftp.c:1241
+#: ../daemon/gvfsbackendsftp.c:1234
 #, c-format
 msgid ""
 "Can't verify the identity of “%s”.\n"
@@ -1598,7 +1654,7 @@ msgstr ""
 "원격 컴퓨터에 전송한 신원은 “%s”입니다. 계속해서 안전한 사용을 보장하려면 시"
 "스템 관리자에게 문의하십시오."
 
-#: ../daemon/gvfsbackendsftp.c:1268
+#: ../daemon/gvfsbackendsftp.c:1261
 #, c-format
 msgid ""
 "The host key for “%s” differs from the key for the IP address “%s”\n"
@@ -1608,145 +1664,117 @@ msgstr ""
 "“%s”의 호스트 키가 IP 주소 “%s”의 키와 다릅니다\n"
 "계속해도 안전하다고 절대적으로 확신한다면, 시스템 관리자에게 문의하십시오."
 
-#: ../daemon/gvfsbackendsftp.c:1351
+#: ../daemon/gvfsbackendsftp.c:1352
 #, c-format
 msgid "The connection is closed (the underlying SSH process exited)"
 msgstr "연결이 닫혔습니다(내부 SSH 프로세스가 끝났습니다)"
 
-#: ../daemon/gvfsbackendsftp.c:1352
+#: ../daemon/gvfsbackendsftp.c:1353
 #, c-format
 msgid "Internal error: Unknown Error"
 msgstr "내부 오류: 알 수 없는 오류"
 
-#: ../daemon/gvfsbackendsftp.c:1864 ../daemon/gvfsbackendsftp.c:1891
+#: ../daemon/gvfsbackendsftp.c:1867 ../daemon/gvfsbackendsftp.c:1894
 msgid "Protocol error"
 msgstr "프로토콜 오류"
 
-#: ../daemon/gvfsbackendsftp.c:2006
+#: ../daemon/gvfsbackendsftp.c:2009
 msgid "Unable to find supported SSH command"
 msgstr "지원되는 SSH 명령을 찾을 수 없습니다"
 
-#: ../daemon/gvfsbackendsftp.c:2284 ../daemon/gvfsbackendsftp.c:2689
-#: ../daemon/gvfsbackendsftp.c:2752 ../daemon/gvfsbackendsftp.c:2763
-#: ../daemon/gvfsbackendsftp.c:2821 ../daemon/gvfsbackendsftp.c:2914
-#: ../daemon/gvfsbackendsftp.c:2966 ../daemon/gvfsbackendsftp.c:3021
-#: ../daemon/gvfsbackendsftp.c:3100 ../daemon/gvfsbackendsftp.c:3217
-#: ../daemon/gvfsbackendsftp.c:3350 ../daemon/gvfsbackendsftp.c:3434
-#: ../daemon/gvfsbackendsftp.c:3510 ../daemon/gvfsbackendsftp.c:3522
-#: ../daemon/gvfsbackendsftp.c:3582 ../daemon/gvfsbackendsftp.c:3624
-#: ../daemon/gvfsbackendsftp.c:3812 ../daemon/gvfsbackendsftp.c:3846
-#: ../daemon/gvfsbackendsftp.c:3904 ../daemon/gvfsbackendsftp.c:3963
-#: ../daemon/gvfsbackendsftp.c:4034 ../daemon/gvfsbackendsftp.c:4309
-#: ../daemon/gvfsbackendsftp.c:4380 ../daemon/gvfsbackendsftp.c:4515
-#: ../daemon/gvfsbackendsftp.c:4623 ../daemon/gvfsbackendsftp.c:4685
-#: ../daemon/gvfsbackendsftp.c:4722 ../daemon/gvfsbackendsftp.c:4750
-#: ../daemon/gvfsbackendsftp.c:4864 ../daemon/gvfsbackendsftp.c:4920
-#: ../daemon/gvfsbackendsftp.c:4961 ../daemon/gvfsbackendsftp.c:4997
-#: ../daemon/gvfsbackendsftp.c:5033 ../daemon/gvfsbackendsftp.c:5048
-#: ../daemon/gvfsbackendsftp.c:5063 ../daemon/gvfsbackendsftp.c:5147
-#: ../daemon/gvfsbackendsftp.c:5317 ../daemon/gvfsbackendsftp.c:5354
-#: ../daemon/gvfsbackendsftp.c:5428 ../daemon/gvfsbackendsftp.c:5514
-#: ../daemon/gvfsbackendsftp.c:5598 ../daemon/gvfsbackendsftp.c:5641
-#: ../daemon/gvfsbackendsftp.c:5645 ../daemon/gvfsbackendsftp.c:5762
-#: ../daemon/gvfsbackendsftp.c:5766 ../daemon/gvfsbackendsftp.c:6004
-#: ../daemon/gvfsbackendsftp.c:6217 ../daemon/gvfsbackendsftp.c:6234
-#: ../daemon/gvfsbackendsftp.c:6368 ../daemon/gvfsbackendsftp.c:6396
-msgid "Invalid reply received"
-msgstr "잘못된 응답을 받았습니다"
-
-#: ../daemon/gvfsbackendsftp.c:2546 ../daemon/gvfsbackendsmb.c:1543
+#: ../daemon/gvfsbackendsftp.c:2551 ../daemon/gvfsbackendsmb.c:1535
 #: ../daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (잘못된 인코딩)"
 
-#: ../daemon/gvfsbackendsftp.c:2631
+#: ../daemon/gvfsbackendsftp.c:2636
 msgid "Failure"
 msgstr "실패"
 
-#: ../daemon/gvfsbackendsftp.c:3043
+#: ../daemon/gvfsbackendsftp.c:3048
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "백업 파일을 만드는 중 오류: %s"
 
-#: ../daemon/gvfsbackendsftp.c:3610 ../daemon/gvfsbackendsftp.c:3786
+#: ../daemon/gvfsbackendsftp.c:3615 ../daemon/gvfsbackendsftp.c:3791
 msgid "backups not supported yet"
 msgstr "백업 파일을 아직 지원하지 않습니다"
 
 #. translators: %s is a server name
-#: ../daemon/gvfsbackendsmbbrowse.c:379
+#: ../daemon/gvfsbackendsmbbrowse.c:370
 #, c-format
 msgid "Password required for %s"
 msgstr "%s에 연결하려면 암호가 필요합니다"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:863 ../daemon/gvfsbackendsmbbrowse.c:906
-#: ../daemon/gvfsbackendsmb.c:544 ../daemon/gvfsbackendsmb.c:585
-#: ../daemon/gvfsbackendsmb.c:768
+#: ../daemon/gvfsbackendsmbbrowse.c:854 ../daemon/gvfsbackendsmbbrowse.c:893
+#: ../daemon/gvfsbackendsmb.c:536 ../daemon/gvfsbackendsmb.c:577
+#: ../daemon/gvfsbackendsmb.c:760
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "내부 오류(%s)"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:933
+#: ../daemon/gvfsbackendsmbbrowse.c:920
 #, c-format
 msgid "Windows shares on %s"
 msgstr "윈도우 공유, 위치 %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmbbrowse.c:1042
+#: ../daemon/gvfsbackendsmbbrowse.c:1029
 #, c-format
 msgid "Failed to retrieve share list from server: %s"
 msgstr "서버에서 공유 목록을 가져오는데 실패했습니다: %s"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1567
+#: ../daemon/gvfsbackendsmbbrowse.c:1554
 msgid "Windows Network File System Service"
 msgstr "윈도우 네트워크 파일 시스템 서비스"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:273
+#: ../daemon/gvfsbackendsmb.c:265
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "%2$s의 %1$s에 연결하려면 암호가 필요합니다"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:692
+#: ../daemon/gvfsbackendsmb.c:684
 #, c-format
 msgid "Failed to mount Windows share: %s"
 msgstr "윈도우 공유를 마운트 하는데 실패했습니다: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1470
+#: ../daemon/gvfsbackendsmb.c:1462
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "백업 파일을 만드는데 실패했습니다: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1876
+#: ../daemon/gvfsbackendsmb.c:1870
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "올바르지 않은 속성 형식(uint64여야 함)"
 
-#: ../daemon/gvfsbackendsmb.c:2047
+#: ../daemon/gvfsbackendsmb.c:2041
 msgid "Can't rename file, filename already exists"
 msgstr "파일 이름이 이미 있어, 파일 이름을 바꿀 수 없습니다"
 
-#: ../daemon/gvfsbackendsmb.c:2098
+#: ../daemon/gvfsbackendsmb.c:2092
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "파일을 지우는 중 오류: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2172
+#: ../daemon/gvfsbackendsmb.c:2166
 #, c-format
 msgid "Error moving file: %s"
 msgstr "파일을 옮기는 중 오류: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2244
+#: ../daemon/gvfsbackendsmb.c:2238
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "대상 파일을 제거하는 중 오류: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2268
+#: ../daemon/gvfsbackendsmb.c:2262
 msgid "Can't recursively move directory"
 msgstr "디렉터리를 되풀이해서 옮길 수 없습니다"
 
-#: ../daemon/gvfsbackendsmb.c:2314
+#: ../daemon/gvfsbackendsmb.c:2308
 msgid "Windows Shares File System Service"
 msgstr "윈도우 공유 파일 시스템 서비스"
 
@@ -1882,6 +1910,10 @@ msgstr "알 수 없는 페이지 형식"
 msgid "Invalid filename"
 msgstr "잘못된 파일 이름"
 
+#: ../daemon/gvfshttpinputstream.c:293
+msgid "Error seeking in stream"
+msgstr "스트림에서 찾는 중 오류"
+
 #: ../daemon/gvfsjobmakesymlink.c:111
 msgid "Symlinks not supported by backend"
 msgstr "백엔드에서 심볼릭 링크를 지원하지 않습니다"
@@ -1890,7 +1922,7 @@ msgstr "백엔드에서 심볼릭 링크를 지원하지 않습니다"
 msgid "Invalid dbus message"
 msgstr "잘못된 DBUS 메시지"
 
-#: ../daemon/gvfsjobunmount.c:123 ../monitor/udisks2/gvfsudisks2utils.c:820
+#: ../daemon/gvfsjobunmount.c:123 ../monitor/udisks2/gvfsudisks2utils.c:821
 #, c-format
 msgid "%s has been unmounted\n"
 msgstr "%s을(를) 마운트 해제했습니다\n"
@@ -1904,34 +1936,38 @@ msgstr ""
 "%s을(를) 마운트 해제하고 있습니다\n"
 "잠시만 기다려 주십시오"
 
-#: ../daemon/main.c:148 ../metadata/meta-daemon.c:377
+#: ../daemon/main.c:150 ../metadata/meta-daemon.c:377
 msgid "Replace old daemon."
 msgstr "이전 데몬을 바꿉니다."
 
-#: ../daemon/main.c:149
+#: ../daemon/main.c:151
 msgid "Don't start fuse."
 msgstr "FUSE를 시작하지 않습니다."
 
-#: ../daemon/main.c:150 ../metadata/meta-daemon.c:378
+#: ../daemon/main.c:152
+msgid "Enable debug output."
+msgstr "디버깅 정보를 출력합니다."
+
+#: ../daemon/main.c:153 ../metadata/meta-daemon.c:378
 msgid "Show program version."
 msgstr "프로그램 버전 표시."
 
-#: ../daemon/main.c:164
+#: ../daemon/main.c:169
 msgid "GVFS Daemon"
 msgstr "GVFS 데몬"
 
-#: ../daemon/main.c:167
+#: ../daemon/main.c:172
 msgid "Main daemon for GVFS"
 msgstr "GVFS 기본 데몬"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:183 ../metadata/meta-daemon.c:404
+#: ../daemon/main.c:189 ../metadata/meta-daemon.c:404
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:185 ../metadata/meta-daemon.c:406
+#: ../daemon/main.c:191 ../metadata/meta-daemon.c:406
 #: ../programs/gvfs-cat.c:170 ../programs/gvfs-cat.c:188
 #: ../programs/gvfs-copy.c:146 ../programs/gvfs-info.c:398
 #: ../programs/gvfs-ls.c:425 ../programs/gvfs-mime.c:97
@@ -1940,31 +1976,31 @@ msgstr "%s: %s"
 #: ../programs/gvfs-monitor-file.c:134 ../programs/gvfs-mount.c:1154
 #: ../programs/gvfs-move.c:144 ../programs/gvfs-open.c:140
 #: ../programs/gvfs-open.c:158 ../programs/gvfs-rename.c:82
-#: ../programs/gvfs-rm.c:72 ../programs/gvfs-save.c:181
+#: ../programs/gvfs-rm.c:72 ../programs/gvfs-save.c:182
 #: ../programs/gvfs-set-attribute.c:151 ../programs/gvfs-trash.c:106
 #: ../programs/gvfs-tree.c:263
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "더 많은 정보를 보려면 \"%s --help\"를 사용하십시오."
 
-#: ../daemon/mount.c:702
+#: ../daemon/mount.c:709
 #, c-format
 msgid "Automount failed: %s"
 msgstr "자동 마운트 실패: %s"
 
-#: ../daemon/mount.c:746 ../daemon/mount.c:807
+#: ../daemon/mount.c:753 ../daemon/mount.c:814
 msgid "The specified location is not mounted"
 msgstr "지정한 위치를 마운트하지 않았습니다"
 
-#: ../daemon/mount.c:751
+#: ../daemon/mount.c:758
 msgid "The specified location is not supported"
 msgstr "지정한 위치를 지원하지 않았습니다"
 
-#: ../daemon/mount.c:875
+#: ../daemon/mount.c:882
 msgid "Location is already mounted"
 msgstr "위치가 이미 마운트되어 있습니다"
 
-#: ../daemon/mount.c:884
+#: ../daemon/mount.c:891
 msgid "Location is not mountable"
 msgstr "위치가 마운트 정보가 아닙니다"
 
@@ -2034,7 +2070,7 @@ msgstr ""
 msgid "Start Anyway"
 msgstr "그래도 시작"
 
-#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:669
+#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:672
 msgid "One or more programs are preventing the unmount operation."
 msgstr "한 개 혹은 그 이상의 프로그램이 마운트 해제 동작을 막고 있습니다."
 
@@ -2080,17 +2116,17 @@ msgstr ""
 "볼륨의 잠금을 해제하려면 암호를 입력하십시오\n"
 "%s 장치에는 암호화된 데이터가 들어 있습니다."
 
-#: ../monitor/goa/goavolume.c:223
+#: ../monitor/goa/goavolume.c:223 ../monitor/goa/goavolume.c:267
 #, c-format
 msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
 msgstr "%s에 대한 org.gnome.OnlineAccounts.Files 값을 가져오는데 실패했습니다"
 
-#: ../monitor/goa/goavolume.c:259
+#: ../monitor/goa/goavolume.c:304
 #, c-format
 msgid "Invalid credentials for %s"
 msgstr "%s에 대한 비밀 값이 잘못되었습니다"
 
-#: ../monitor/goa/goavolume.c:276
+#: ../monitor/goa/goavolume.c:332
 #, c-format
 msgid "Unsupported authentication method for %s"
 msgstr "%s에 대해 지원하지 않는 인증 방식"
@@ -2416,7 +2452,7 @@ msgstr "%s 미디어"
 #. Note that the GUI (Shell, Files) currently use the term
 #. * "Eject" for both GDrive.stop() and GDrive.eject().
 #.
-#: ../monitor/udisks2/gvfsudisks2mount.c:777
+#: ../monitor/udisks2/gvfsudisks2mount.c:781
 msgid "Eject Anyway"
 msgstr "그래도 꺼내기"
 
@@ -2436,7 +2472,7 @@ msgstr ""
 "끝날때까지 연결을 끊지 마십시오"
 
 # 주의: 문자 그대로 "플러그"로 해석하지 마시오. 모든 종류의 저장 장치에 사용됨.
-#: ../monitor/udisks2/gvfsudisks2utils.c:820
+#: ../monitor/udisks2/gvfsudisks2utils.c:821
 #, c-format
 msgid "You can now unplug %s\n"
 msgstr "이제 %s의 연결을 끊어도 됩니다\n"
@@ -2583,7 +2619,7 @@ msgstr ""
 #: ../programs/gvfs-monitor-dir.c:134 ../programs/gvfs-monitor-file.c:132
 #: ../programs/gvfs-mount.c:1152 ../programs/gvfs-move.c:142
 #: ../programs/gvfs-open.c:138 ../programs/gvfs-rename.c:80
-#: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:179
+#: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:180
 #: ../programs/gvfs-set-attribute.c:149 ../programs/gvfs-trash.c:104
 #: ../programs/gvfs-tree.c:261
 #, c-format
@@ -2632,7 +2668,7 @@ msgid "SOURCE"
 msgstr "<원본>"
 
 #: ../programs/gvfs-copy.c:134 ../programs/gvfs-move.c:132
-#: ../programs/gvfs-save.c:168
+#: ../programs/gvfs-save.c:169
 msgid "DEST"
 msgstr "<대상>"
 
@@ -3138,18 +3174,18 @@ msgstr "파일을 여는 중 오류: %s\n"
 msgid "Error reading stdin"
 msgstr "표준 입력을 읽는 중 오류"
 
-#: ../programs/gvfs-save.c:129
+#: ../programs/gvfs-save.c:130
 #, c-format
 msgid "Error closing: %s\n"
 msgstr "닫는 중 오류: %s\n"
 
 #. Translators: The "etag" is a token allowing to verify whether a file has been modified
-#: ../programs/gvfs-save.c:142
+#: ../programs/gvfs-save.c:143
 #, c-format
 msgid "Etag not available\n"
 msgstr "etag가 없습니다\n"
 
-#: ../programs/gvfs-save.c:169
+#: ../programs/gvfs-save.c:170
 msgid "Read from standard input and save to DEST."
 msgstr "표준 입력에서 읽어서 <대상>으로 저장합니다."
 
@@ -3216,21 +3252,3 @@ msgstr "심볼릭 링크, 마운트, 바로 가기를 따라갑니다"
 #: ../programs/gvfs-tree.c:250
 msgid "List contents of directories in a tree-like format."
 msgstr "디렉터리의 내용을 트리 형식으로 봅니다."
-
-#~ msgid "Error creating Avahi resolver: %s"
-#~ msgstr "Avahi resolver를 만드는 중 오류: %s"
-
-#~ msgid "File does not exist"
-#~ msgstr "파일이 없습니다"
-
-#~ msgid "The directory is not empty"
-#~ msgstr "디렉터리가 비어 있지 않습니다"
-
-#~ msgid "Invalid seek type"
-#~ msgstr "잘못된 파일 이동 방식"
-
-#~ msgid "The file is not a mountable"
-#~ msgstr "이 파일은 마운트할 수 없습니다"
-
-#~ msgid "SSH program unexpectedly exited"
-#~ msgstr "SSH 프로그램이 예상치 않게 끝났습니다"
