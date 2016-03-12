@@ -809,7 +809,7 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
   lockdownd_service_descriptor_free (lockdown_service);
 
   dict = NULL;
-  if (house_arrest_send_command (house_arrest, "VendContainer", info->id) != HOUSE_ARREST_E_SUCCESS ||
+  if (house_arrest_send_command (house_arrest, "VendDocuments", info->id) != HOUSE_ARREST_E_SUCCESS ||
       house_arrest_get_result (house_arrest, &dict) != HOUSE_ARREST_E_SUCCESS)
     {
       g_warning ("Failed to set up house arrest for app %s", info->id);
@@ -874,8 +874,13 @@ g_vfs_backend_parse_house_arrest_path (GVfsBackendAfc *self,
     comps = g_strsplit (path + 1, "/", -1);
 
   setup_afc = force_afc_mount;
-  app = g_strdup (comps[0]);
-  s = g_strjoinv ("/", comps + 1);
+  app = comps[0];
+
+  /* Replace the app path with "Documents" so the gvfs
+   * path of afc://<uuid>/org.gnome.test/foo.txt should
+   * correspond to Documents/foo.txt in the app's container */
+  comps[0] = g_strdup ("Documents");
+  s = g_strjoinv ("/", comps);
   if (*s == '\0')
     {
       g_free (s);
@@ -1838,7 +1843,6 @@ g_vfs_backend_afc_enumerate (GVfsBackend *backend,
   char **afcinfo = NULL;
   char *new_path = NULL;
   afc_client_t afc_cli;
-  gboolean hide_non_docs = FALSE;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
@@ -1905,8 +1909,6 @@ g_vfs_backend_afc_enumerate (GVfsBackend *backend,
               g_free (new_path);
               return;
             }
-          if (g_str_equal (new_path, "/"))
-            hide_non_docs = TRUE;
         }
     }
 
@@ -1931,12 +1933,6 @@ g_vfs_backend_afc_enumerate (GVfsBackend *backend,
         {
           info = g_file_info_new ();
           g_vfs_backend_afc_set_info_from_afcinfo (self, info, afcinfo, *ptr, file_path, matcher, flags);
-
-          if (hide_non_docs &&
-              g_str_equal (file_path, "/Documents") == FALSE)
-            {
-              g_file_info_set_is_hidden (info, TRUE);
-            }
 
           g_vfs_job_enumerate_add_info (job, info);
           g_object_unref (G_OBJECT(info));
@@ -1965,7 +1961,6 @@ g_vfs_backend_afc_query_info (GVfsBackend *backend,
   const char *basename, *ptr;
   char **afcinfo = NULL;
   char *new_path;
-  gboolean hide_non_docs = FALSE;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
@@ -2021,7 +2016,6 @@ g_vfs_backend_afc_query_info (GVfsBackend *backend,
               g_vfs_job_succeeded (G_VFS_JOB(job));
               return;
             }
-          hide_non_docs = TRUE;
           if (G_UNLIKELY(g_vfs_backend_afc_check (afc_get_file_info (app_info->afc_cli, new_path, &afcinfo),
                                                   G_VFS_JOB(job))))
             {
@@ -2040,12 +2034,6 @@ g_vfs_backend_afc_query_info (GVfsBackend *backend,
   g_vfs_backend_afc_set_info_from_afcinfo (self, info, afcinfo, basename, new_path ? new_path : path, matcher, flags);
   if (afcinfo)
     g_strfreev (afcinfo);
-  if (hide_non_docs &&
-      (g_str_equal (new_path, "Documents") ||
-       g_str_has_prefix (new_path, "Documents/")))
-    {
-      g_file_info_set_is_hidden (info, TRUE);
-    }
 
   g_free (new_path);
 
