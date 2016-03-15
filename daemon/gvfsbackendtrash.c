@@ -237,6 +237,9 @@ trash_backend_open_for_read (GVfsBackend        *vfs_backend,
     {
       GFile *real;
 
+      if (!backend->file_monitor && !backend->dir_monitor)
+        trash_watcher_rescan (backend->watcher);
+
       real = trash_backend_get_file (backend, filename, NULL, NULL, &error);
 
       if (real)
@@ -403,6 +406,9 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
       TrashItem *item;
       GFile *real;
 
+      if (!backend->file_monitor && !backend->dir_monitor)
+        trash_watcher_rescan (backend->watcher);
+
       real = trash_backend_get_file (backend, filename,
                                      &item, &is_toplevel, &error);
 
@@ -458,6 +464,9 @@ trash_backend_pull (GVfsBackend           *vfs_backend,
       gboolean is_toplevel;
       TrashItem *item;
       GFile *real;
+
+      if (!backend->file_monitor && !backend->dir_monitor)
+        trash_watcher_rescan (backend->watcher);
 
       real = trash_backend_get_file (backend, source, &item,
                                      &is_toplevel, &error);
@@ -716,6 +725,9 @@ trash_backend_query_info (GVfsBackend           *vfs_backend,
   GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (vfs_backend);
 
   g_assert (filename[0] == '/');
+
+  if (!backend->file_monitor && !backend->dir_monitor)
+    trash_watcher_rescan (backend->watcher);
 
   if (filename[1])
     {
