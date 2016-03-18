@@ -800,7 +800,7 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
   house_arrest_client_new (self->dev, lockdown_service, &house_arrest);
   if (house_arrest == NULL)
     {
-      g_warning ("Failed to start house arrest for app %s", info->id);
+      g_warning ("Failed to start house arrest client for app %s", info->id);
       lockdownd_client_free (lockdown_cli);
       lockdownd_service_descriptor_free (lockdown_service);
       return;
