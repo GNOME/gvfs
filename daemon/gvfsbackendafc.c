@@ -854,12 +854,12 @@ static char *
 g_vfs_backend_parse_house_arrest_path (GVfsBackendAfc *self,
                                        gboolean        force_afc_mount,
                                        const char     *path,
+                                       gboolean       *is_doc_root_ret,
                                        char          **new_path)
 {
   char **comps;
-  char *s;
   char *app;
-  gboolean setup_afc;
+  gboolean setup_afc, is_doc_root;
 
   if (path == NULL || *path == '\0' || g_str_equal (path, "/"))
     {
@@ -874,22 +874,17 @@ g_vfs_backend_parse_house_arrest_path (GVfsBackendAfc *self,
 
   setup_afc = force_afc_mount;
   app = comps[0];
+  is_doc_root = (comps[0] != NULL && comps[1] == NULL);
+  if (is_doc_root_ret)
+    *is_doc_root_ret = is_doc_root;
 
   /* Replace the app path with "Documents" so the gvfs
    * path of afc://<uuid>/org.gnome.test/foo.txt should
    * correspond to Documents/foo.txt in the app's container */
   comps[0] = g_strdup ("Documents");
-  s = g_strjoinv ("/", comps);
-  if (*s == '\0')
-    {
-      g_free (s);
-      *new_path = g_strdup ("/");
-    }
-  else
-    {
-      *new_path = s;
-      setup_afc = TRUE;
-    }
+  *new_path = g_strjoinv ("/", comps);
+  if (is_doc_root)
+    setup_afc = TRUE;
   g_strfreev (comps);
 
   if (app != NULL &&
@@ -920,13 +915,11 @@ g_vfs_backend_afc_open_for_read (GVfsBackend *backend,
     {
       char *app;
       AppInfo *info;
+      gboolean is_doc_root;
 
       new_path = NULL;
-      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, &new_path);
-      if (app == NULL)
-        goto is_dir_bail;
-
-      if (g_str_equal (new_path, "/"))
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, &is_doc_root, &new_path);
+      if (app == NULL || is_doc_root)
         goto is_dir_bail;
 
       info = g_hash_table_lookup (self->apps, app);
@@ -1002,7 +995,7 @@ g_vfs_backend_afc_create (GVfsBackend *backend,
     {
       AppInfo *info;
 
-      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, &new_path);
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, NULL, &new_path);
       if (app == NULL)
         {
           g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB(job));
@@ -1068,7 +1061,7 @@ g_vfs_backend_afc_append_to (GVfsBackend *backend,
     {
       AppInfo *info;
 
-      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, &new_path);
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, NULL, &new_path);
       if (app == NULL)
         {
           g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB(job));
@@ -1161,7 +1154,7 @@ g_vfs_backend_afc_replace (GVfsBackend *backend,
     {
       AppInfo *info;
 
-      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &new_path);
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, NULL, &new_path);
       if (app == NULL)
         {
           g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB(job));
@@ -1855,7 +1848,7 @@ g_vfs_backend_afc_enumerate (GVfsBackend *backend,
         }
       g_mutex_unlock (&self->apps_lock);
 
-      app = g_vfs_backend_parse_house_arrest_path (self, TRUE, path, &new_path);
+      app = g_vfs_backend_parse_house_arrest_path (self, TRUE, path, NULL, &new_path);
 
       if (app == NULL)
         {
@@ -1965,6 +1958,7 @@ g_vfs_backend_afc_query_info (GVfsBackend *backend,
   else
     {
       char *app;
+      gboolean is_doc_root;
 
       g_mutex_lock (&self->apps_lock);
       if (g_vfs_backend_load_apps (self) == FALSE)
@@ -1975,7 +1969,7 @@ g_vfs_backend_afc_query_info (GVfsBackend *backend,
         }
       g_mutex_unlock (&self->apps_lock);
 
-      app = g_vfs_backend_parse_house_arrest_path (self, TRUE, path, &new_path);
+      app = g_vfs_backend_parse_house_arrest_path (self, TRUE, path, &is_doc_root, &new_path);
 
       if (app == NULL)
         {
@@ -1995,7 +1989,7 @@ g_vfs_backend_afc_query_info (GVfsBackend *backend,
               g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
               return;
             }
-          if (g_str_equal (new_path, "/"))
+          if (is_doc_root)
             {
               g_free (new_path);
               g_vfs_backend_afc_set_info_from_app (self, info, app_info);
@@ -2062,7 +2056,7 @@ g_vfs_backend_afc_query_fs_info (GVfsBackend *backend,
       AppInfo *info;
 
       new_path = NULL;
-      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, &new_path);
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, NULL, &new_path);
       if (app == NULL)
         {
           g_vfs_backend_afc_check (AFC_E_OP_NOT_SUPPORTED, G_VFS_JOB(job));
@@ -2142,10 +2136,11 @@ g_vfs_backend_afc_set_display_name (GVfsBackend *backend,
     {
       char *app;
       AppInfo *info;
+      gboolean is_doc_root;
 
       new_path = NULL;
-      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &afc_path);
-      if (app == NULL || g_str_equal (afc_path, "/"))
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &is_doc_root, &afc_path);
+      if (app == NULL || is_doc_root)
         {
           g_free (app);
           g_free (afc_path);
@@ -2221,10 +2216,11 @@ g_vfs_backend_afc_set_attribute (GVfsBackend *backend,
     {
       char *app;
       AppInfo *info;
+      gboolean is_doc_root;
 
       new_path = NULL;
-      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &new_path);
-      if (app == NULL || g_str_equal (new_path, "/"))
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &is_doc_root, &new_path);
+      if (app == NULL || is_doc_root)
         {
           g_free (app);
           g_free (new_path);
@@ -2286,7 +2282,7 @@ g_vfs_backend_afc_make_directory (GVfsBackend *backend,
       AppInfo *info;
 
       new_path = NULL;
-      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, &new_path);
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, path, NULL, &new_path);
       if (app == NULL)
         {
           g_free (app);
@@ -2398,17 +2394,18 @@ g_vfs_backend_afc_move (GVfsBackend *backend,
     {
       AppInfo *info;
       char *app_src, *app_dst;
+      gboolean is_doc_root;
 
-      app_src = g_vfs_backend_parse_house_arrest_path (self, FALSE, source, &new_src);
-      if (app_src == NULL || g_str_equal (new_src, "/"))
+      app_src = g_vfs_backend_parse_house_arrest_path (self, FALSE, source, &is_doc_root, &new_src);
+      if (app_src == NULL || is_doc_root)
         {
           g_free (app_src);
           g_free (new_src);
           g_vfs_backend_afc_check (AFC_E_PERM_DENIED, G_VFS_JOB(job));
           return;
         }
-      app_dst = g_vfs_backend_parse_house_arrest_path (self, FALSE, destination, &new_dst);
-      if (app_dst == NULL || g_str_equal (new_dst, "/"))
+      app_dst = g_vfs_backend_parse_house_arrest_path (self, FALSE, destination, &is_doc_root, &new_dst);
+      if (app_dst == NULL || is_doc_root)
         {
           g_free (app_src);
           g_free (new_src);
@@ -2473,10 +2470,11 @@ g_vfs_backend_afc_delete (GVfsBackend *backend,
     {
       char *app;
       AppInfo *info;
+      gboolean is_doc_root;
 
       new_path = NULL;
-      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &new_path);
-      if (app == NULL || g_str_equal (new_path, "/"))
+      app = g_vfs_backend_parse_house_arrest_path (self, FALSE, filename, &is_doc_root, &new_path);
+      if (app == NULL || is_doc_root)
         {
           g_free (app);
           g_free (new_path);
