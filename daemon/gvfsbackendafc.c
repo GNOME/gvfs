@@ -795,7 +795,7 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
   if (lerr != LOCKDOWN_E_SUCCESS)
     {
       lockdownd_client_free (lockdown_cli);
-      g_warning ("Failed to start house arrest for app %s", info->id);
+      g_warning ("Failed to start house arrest for app %s (%d)", info->id, lerr);
       return;
     }
 
