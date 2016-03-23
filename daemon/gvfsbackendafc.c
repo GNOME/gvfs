@@ -157,7 +157,7 @@ g_vfs_backend_afc_close_connection (GVfsBackendAfc *self)
         {
           afc_client_free (self->afc_cli);
         }
-      else
+      else if (self->mode == ACCESS_MODE_HOUSE_ARREST)
         {
           if (self->apps != NULL)
             {
@@ -175,6 +175,10 @@ g_vfs_backend_afc_close_connection (GVfsBackendAfc *self)
               self->sbs = NULL;
             }
           g_mutex_clear (&self->apps_lock);
+        }
+      else
+        {
+          g_assert_not_reached ();
         }
       g_free (self->model);
       self->model = NULL;
@@ -1835,7 +1839,7 @@ g_vfs_backend_afc_enumerate (GVfsBackend *backend,
           return;
         }
     }
-  else
+  else if (self->mode == ACCESS_MODE_HOUSE_ARREST)
     {
       char *app;
 
@@ -1889,6 +1893,10 @@ g_vfs_backend_afc_enumerate (GVfsBackend *backend,
               return;
             }
         }
+    }
+  else
+    {
+      g_assert_not_reached ();
     }
 
   trailing_slash = g_str_has_suffix (new_path ? new_path : path, "/");
@@ -1955,7 +1963,7 @@ g_vfs_backend_afc_query_info (GVfsBackend *backend,
           return;
         }
     }
-  else
+  else if (self->mode == ACCESS_MODE_HOUSE_ARREST)
     {
       char *app;
       gboolean is_doc_root;
@@ -2003,6 +2011,10 @@ g_vfs_backend_afc_query_info (GVfsBackend *backend,
               return;
             }
         }
+    }
+  else
+    {
+      g_assert_not_reached ();
     }
 
   ptr = strrchr (new_path ? new_path : path, '/');
