@@ -51,6 +51,7 @@ typedef enum {
 typedef struct {
   guint64 fd;
   afc_client_t afc_cli;
+  char *app;
 } FileHandle;
 
 typedef struct {
@@ -58,6 +59,7 @@ typedef struct {
   char *id;
   char *icon_path;
   house_arrest_client_t house_arrest;
+  guint num_users;
   afc_client_t afc_cli;
 } AppInfo;
 
@@ -860,6 +862,100 @@ out:
   return !retry;
 }
 
+static FileHandle *
+g_vfs_backend_file_handle_new (GVfsBackendAfc *self,
+                               const char     *app)
+{
+  AppInfo *info;
+  FileHandle *handle;
+
+  handle = g_new0 (FileHandle, 1);
+
+  if (app == NULL)
+    return handle;
+
+  g_mutex_lock (&self->apps_lock);
+  info = g_hash_table_lookup (self->apps, app);
+  info->num_users++;
+  g_mutex_unlock (&self->apps_lock);
+
+  handle->app = g_strdup (app);
+
+  return handle;
+}
+
+static void
+g_vfs_backend_file_handle_free (GVfsBackendAfc *self,
+                                FileHandle     *fh)
+{
+  AppInfo *info;
+
+  if (fh == NULL)
+    return;
+
+  if (fh->app == NULL)
+    goto out;
+
+  g_mutex_lock (&self->apps_lock);
+  info = g_hash_table_lookup (self->apps, fh->app);
+  g_assert (info->num_users != 0);
+  info->num_users--;
+  g_mutex_unlock (&self->apps_lock);
+
+out:
+  if (self->connected)
+    afc_file_close (fh->afc_cli, fh->fd);
+  g_free (fh->app);
+  g_free (fh);
+}
+
+/* If we succeeded in removing access to at least one
+ * HouseArrest service, return TRUE */
+static gboolean
+g_vfs_backend_gc_house_arrest (GVfsBackendAfc *self,
+                               const char     *app)
+{
+  GList *apps, *l;
+  gboolean ret = FALSE;
+
+  g_mutex_lock (&self->apps_lock);
+
+  apps = g_hash_table_get_values (self->apps);
+  /* XXX: We might want to sort the apps so the
+   * oldest used gets cleaned up first */
+
+  for (l = apps; l != NULL; l = l->next)
+    {
+      AppInfo *info = l->data;
+
+      /* Don't close the same app we're trying to
+       * connect to the service, but return as it's
+       * already setup */
+      if (g_strcmp0 (info->id, app) == 0)
+        {
+          g_debug ("A HouseArrest service for '%s' is already setup\n", app);
+          ret = TRUE;
+          break;
+        }
+
+      if (info->afc_cli == NULL ||
+          info->num_users > 0)
+        continue;
+
+      g_clear_pointer (&info->afc_cli, afc_client_free);
+      g_clear_pointer (&info->house_arrest, house_arrest_client_free);
+
+      g_debug ("Managed to free HouseArrest service from '%s', for '%s'\n",
+               info->id, app);
+      ret = TRUE;
+      break;
+    }
+
+  g_mutex_unlock (&self->apps_lock);
+
+  return ret;
+}
+
 /* If force_afc_mount is TRUE, then we'll try to mount
  * the app if there's one in the path, otherwise, we'll hold on */
 static char *
@@ -902,7 +998,12 @@ g_vfs_backend_parse_house_arrest_path (GVfsBackendAfc *self,
   if (app != NULL &&
       setup_afc)
     {
-      g_vfs_backend_setup_afc_for_app (self, app);
+      if (!g_vfs_backend_setup_afc_for_app (self, app))
+        {
+          g_debug ("Ran out of HouseArrest clients for app '%s', trying again\n", app);
+          g_vfs_backend_gc_house_arrest (self, app);
+          g_vfs_backend_setup_afc_for_app (self, app);
+        }
     }
 
   return app;
@@ -919,13 +1020,13 @@ g_vfs_backend_afc_open_for_read (GVfsBackend *backend,
   char *new_path;
   afc_client_t afc_cli;
   FileHandle *handle;
+  char *app = NULL;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
   if (self->mode == ACCESS_MODE_HOUSE_ARREST)
     {
-      char *app;
       AppInfo *info;
       gboolean is_doc_root;
 
@@ -939,7 +1040,6 @@ g_vfs_backend_afc_open_for_read (GVfsBackend *backend,
         goto not_found_bail;
 
       afc_cli = info->afc_cli;
-      g_free (app);
     }
   else
     {
@@ -951,6 +1051,7 @@ g_vfs_backend_afc_open_for_read (GVfsBackend *backend,
     {
 is_dir_bail:
       g_free (new_path);
+      g_free (app);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_IS_DIRECTORY,
                         _("Can't open directory"));
@@ -961,6 +1062,7 @@ is_dir_bail:
     {
 not_found_bail:
       g_free (new_path);
+      g_free (app);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_FOUND,
                         _("File doesn't exist"));
@@ -971,12 +1073,15 @@ not_found_bail:
                                                          new_path ? new_path : path, AFC_FOPEN_RDONLY, &fd),
                                           G_VFS_JOB(job))))
     {
+      g_free (app);
       return;
     }
 
-  handle = g_new0 (FileHandle, 1);
+  handle = g_vfs_backend_file_handle_new (self, app);
   handle->fd = fd;
   handle->afc_cli = afc_cli;
+
+  g_free (app);
 
   g_vfs_job_open_for_read_set_handle (job, handle);
   g_vfs_job_open_for_read_set_can_seek (job, TRUE);
@@ -994,7 +1099,7 @@ g_vfs_backend_afc_create (GVfsBackend *backend,
 {
   uint64_t fd = 0;
   GVfsBackendAfc *self;
-  char *new_path, *app;
+  char *new_path, *app = NULL;
   afc_client_t afc_cli;
   FileHandle *fh;
 
@@ -1016,11 +1121,11 @@ g_vfs_backend_afc_create (GVfsBackend *backend,
       info = g_hash_table_lookup (self->apps, app);
       if (info == NULL)
         {
+          g_free (app);
           g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
           return;
         }
       afc_cli = info->afc_cli;
-      g_free (app);
     }
   else
     {
@@ -1033,14 +1138,17 @@ g_vfs_backend_afc_create (GVfsBackend *backend,
                                           G_VFS_JOB(job))))
     {
       g_free (new_path);
+      g_free (app);
       return;
     }
 
   g_free (new_path);
 
-  fh = g_new0 (FileHandle, 1);
+  fh = g_vfs_backend_file_handle_new (self, app);
   fh->fd = fd;
   fh->afc_cli = afc_cli;
+
+  g_free (app);
 
   g_vfs_job_open_for_write_set_handle (job, fh);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
@@ -1060,7 +1168,7 @@ g_vfs_backend_afc_append_to (GVfsBackend *backend,
   uint64_t fd = 0;
   uint64_t off = 0;
   GVfsBackendAfc *self;
-  char *new_path, *app;
+  char *new_path, *app = NULL;
   afc_client_t afc_cli;
   FileHandle *fh;
 
@@ -1082,11 +1190,11 @@ g_vfs_backend_afc_append_to (GVfsBackend *backend,
       info = g_hash_table_lookup (self->apps, app);
       if (info == NULL)
         {
+          g_free (app);
           g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
           return;
         }
       afc_cli = info->afc_cli;
-      g_free (app);
     }
   else
     {
@@ -1099,6 +1207,7 @@ g_vfs_backend_afc_append_to (GVfsBackend *backend,
                                           G_VFS_JOB(job))))
     {
       g_free (new_path);
+      g_free (app);
       return;
     }
 
@@ -1109,6 +1218,7 @@ g_vfs_backend_afc_append_to (GVfsBackend *backend,
                                           G_VFS_JOB(job))))
     {
       afc_file_close (afc_cli, fd);
+      g_free (app);
       return;
     }
 
@@ -1117,12 +1227,15 @@ g_vfs_backend_afc_append_to (GVfsBackend *backend,
                                           G_VFS_JOB(job))))
     {
       afc_file_close (afc_cli, fd);
+      g_free (app);
       return;
     }
 
-  fh = g_new0 (FileHandle, 1);
+  fh = g_vfs_backend_file_handle_new (self, app);
   fh->fd = fd;
   fh->afc_cli = afc_cli;
+
+  g_free (app);
 
   g_vfs_job_open_for_write_set_handle (job, fh);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
@@ -1143,7 +1256,7 @@ g_vfs_backend_afc_replace (GVfsBackend *backend,
 {
   uint64_t fd = 0;
   GVfsBackendAfc *self;
-  char *new_path, *app;
+  char *new_path, *app = NULL;
   afc_client_t afc_cli;
   FileHandle *fh;
 
@@ -1175,11 +1288,11 @@ g_vfs_backend_afc_replace (GVfsBackend *backend,
       info = g_hash_table_lookup (self->apps, app);
       if (info == NULL)
         {
+          g_free (app);
           g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
           return;
         }
       afc_cli = info->afc_cli;
-      g_free (app);
     }
   else
     {
@@ -1192,14 +1305,17 @@ g_vfs_backend_afc_replace (GVfsBackend *backend,
                                           G_VFS_JOB(job))))
     {
       g_free (new_path);
+      g_free (app);
       return;
     }
 
   g_free (new_path);
 
-  fh = g_new0 (FileHandle, 1);
+  fh = g_vfs_backend_file_handle_new (self, app);
   fh->fd = fd;
   fh->afc_cli = afc_cli;
+
+  g_free (app);
 
   g_vfs_job_open_for_write_set_handle (job, fh);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
@@ -1222,10 +1338,7 @@ g_vfs_backend_afc_close_read (GVfsBackend *backend,
 
   self = G_VFS_BACKEND_AFC(backend);
 
-  if (self->connected)
-    afc_file_close (fh->afc_cli, fh->fd);
-
-  g_free (fh);
+  g_vfs_backend_file_handle_free (self, fh);
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
@@ -1242,10 +1355,7 @@ g_vfs_backend_afc_close_write (GVfsBackend *backend,
 
   self = G_VFS_BACKEND_AFC(backend);
 
-  if (self->connected)
-    afc_file_close(fh->afc_cli, fh->fd);
-
-  g_free (fh);
+  g_vfs_backend_file_handle_free (self, fh);
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
