@@ -773,18 +773,20 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
   plist_t dict, error;
   lockdownd_error_t lerr;
 
+  g_mutex_lock (&self->apps_lock);
+
   info = g_hash_table_lookup (self->apps, id);
 
   if (info == NULL ||
       info->afc_cli != NULL)
-    return;
+    goto out;
 
   /* Load house arrest and afc now! */
   lockdown_cli = NULL;
   if (lockdownd_client_new_with_handshake (self->dev, &lockdown_cli, "gvfsd-afc") != LOCKDOWN_E_SUCCESS)
     {
       g_warning ("Failed to get a lockdown to start house arrest for app %s", info->id);
-      return;
+      goto out;
     }
 
   lerr = lockdownd_start_service (lockdown_cli, "com.apple.mobile.house_arrest", &lockdown_service);
@@ -792,7 +794,7 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
     {
       lockdownd_client_free (lockdown_cli);
       g_warning ("Failed to start house arrest for app %s (%d)", info->id, lerr);
-      return;
+      goto out;
     }
 
   house_arrest = NULL;
@@ -802,7 +804,7 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
       g_warning ("Failed to start house arrest client for app %s", info->id);
       lockdownd_client_free (lockdown_cli);
       lockdownd_service_descriptor_free (lockdown_service);
-      return;
+      goto out;
     }
 
   lockdownd_service_descriptor_free (lockdown_service);
@@ -814,7 +816,7 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
       g_warning ("Failed to set up house arrest for app %s", info->id);
       house_arrest_client_free (house_arrest);
       lockdownd_client_free (lockdown_cli);
-      return;
+      goto out;
     }
   error = plist_dict_get_item (dict, "Error");
   if (error != NULL)
@@ -828,7 +830,7 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
 
       house_arrest_client_free (house_arrest);
       lockdownd_client_free (lockdown_cli);
-      return;
+      goto out;
     }
   plist_free (dict);
 
@@ -840,12 +842,14 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
     {
       g_warning ("Failed to set up afc client for app %s", info->id);
       house_arrest_client_free (house_arrest);
-
-      return;
+      goto out;
     }
 
   info->house_arrest = house_arrest;
   info->afc_cli = afc;
+
+out:
+  g_mutex_unlock (&self->apps_lock);
 }
 
 /* If force_afc_mount is TRUE, then we'll try to mount
