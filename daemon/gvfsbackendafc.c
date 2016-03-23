@@ -761,7 +761,7 @@ is_regular (GVfsBackendAfc *backend,
   return result;
 }
 
-static void
+static gboolean
 g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
                                  const char     *id)
 {
@@ -772,6 +772,7 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
   afc_client_t afc;
   plist_t dict, error;
   lockdownd_error_t lerr;
+  gboolean retry = FALSE;
 
   g_mutex_lock (&self->apps_lock);
 
@@ -792,6 +793,8 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
   lerr = lockdownd_start_service (lockdown_cli, "com.apple.mobile.house_arrest", &lockdown_service);
   if (lerr != LOCKDOWN_E_SUCCESS)
     {
+      if (lerr == LOCKDOWN_E_SERVICE_LIMIT)
+        retry = TRUE;
       lockdownd_client_free (lockdown_cli);
       g_warning ("Failed to start house arrest for app %s (%d)", info->id, lerr);
       goto out;
@@ -850,6 +853,7 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
 
 out:
   g_mutex_unlock (&self->apps_lock);
+  return !retry;
 }
 
 /* If force_afc_mount is TRUE, then we'll try to mount
