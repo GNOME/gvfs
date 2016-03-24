@@ -524,7 +524,7 @@ gvfs_udisks2_drive_enumerate_identifiers (GDrive *_drive)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-typedef void (*UnmountsMountsFunc)  (GDrive              *drive,
+typedef void (*UnmountAndLockFunc)  (GDrive              *drive,
                                      GMountOperation     *mount_operation,
                                      GCancellable        *cancellable,
                                      GAsyncReadyCallback  callback,
@@ -540,13 +540,14 @@ typedef struct {
   GMountUnmountFlags flags;
 
   GList *pending_mounts;
+  GList *pending_encrypted;
 
-  UnmountsMountsFunc on_all_unmounted;
+  UnmountAndLockFunc on_all_unmounted;
   gpointer on_all_unmounted_data;
-} UnmountMountsOp;
+} UnmountAndLockOp;
 
 static void
-free_unmount_mounts_op (UnmountMountsOp *data)
+free_unmount_and_lock_op (UnmountAndLockOp *data)
 {
   g_list_free_full (data->pending_mounts, g_object_unref);
 
@@ -555,25 +556,19 @@ free_unmount_mounts_op (UnmountMountsOp *data)
 }
 
 static void
-unmount_mounts_cb (GObject       *source_object,
-                   GAsyncResult  *res,
-                   gpointer       user_data);
+unmount_cb (GObject       *source_object,
+            GAsyncResult  *res,
+            gpointer       user_data);
 
 static void
-unmount_mounts_do (UnmountMountsOp *data)
-{
-  if (data->pending_mounts == NULL)
-    {
-      data->on_all_unmounted (data->drive,
-                              data->mount_operation,
-                              data->cancellable,
-                              data->callback,
-                              data->user_data,
-                              data->on_all_unmounted_data);
+lock_cb (GObject       *source_object,
+         GAsyncResult  *res,
+         gpointer       user_data);
 
-      free_unmount_mounts_op (data);
-    }
-  else
+static void
+unmount_and_lock_do (UnmountAndLockOp *data)
+{
+  if (data->pending_mounts != NULL)
     {
       GMount *mount;
       mount = data->pending_mounts->data;
@@ -583,17 +578,41 @@ unmount_mounts_do (UnmountMountsOp *data)
                                       data->flags,
                                       data->mount_operation,
                                       data->cancellable,
-                                      unmount_mounts_cb,
+                                      unmount_cb,
                                       data);
+    }
+  else if (data->pending_encrypted != NULL)
+    {
+      UDisksEncrypted *encrypted;
+
+      encrypted = data->pending_encrypted->data;
+      data->pending_encrypted = g_list_remove (data->pending_encrypted, encrypted);
+
+      udisks_encrypted_call_lock (encrypted,
+                                  g_variant_new ("a{sv}", NULL), /* options */
+                                  data->cancellable,
+                                  lock_cb,
+                                  data);
+    }
+  else
+    {
+      data->on_all_unmounted (data->drive,
+                              data->mount_operation,
+                              data->cancellable,
+                              data->callback,
+                              data->user_data,
+                              data->on_all_unmounted_data);
+
+      free_unmount_and_lock_op (data);
     }
 }
 
 static void
-unmount_mounts_cb (GObject      *source_object,
-                   GAsyncResult *res,
-                   gpointer      user_data)
+unmount_cb (GObject      *source_object,
+            GAsyncResult *res,
+            gpointer      user_data)
 {
-  UnmountMountsOp *data = user_data;
+  UnmountAndLockOp *data = user_data;
   GMount *mount = G_MOUNT (source_object);
   GSimpleAsyncResult *simple;
   GError *error = NULL;
@@ -621,31 +640,65 @@ unmount_mounts_cb (GObject      *source_object,
       g_simple_async_result_complete (simple);
       g_object_unref (simple);
 
-      free_unmount_mounts_op (data);
+      free_unmount_and_lock_op (data);
     }
   else
     {
       /* move on to the next mount.. */
-      unmount_mounts_do (data);
+      unmount_and_lock_do (data);
     }
   g_object_unref (mount);
 }
 
 static void
-unmount_mounts (GVfsUDisks2Drive    *drive,
-                GMountUnmountFlags   flags,
-                GMountOperation     *mount_operation,
-                GCancellable        *cancellable,
-                GAsyncReadyCallback  callback,
-                gpointer             user_data,
-                UnmountsMountsFunc   on_all_unmounted,
-                gpointer             on_all_unmounted_data)
+lock_cb (GObject       *source_object,
+         GAsyncResult  *res,
+         gpointer       user_data)
+{
+  UDisksEncrypted *encrypted = UDISKS_ENCRYPTED (source_object);
+  UnmountAndLockOp *data = user_data;
+  GSimpleAsyncResult *simple;
+  GError *error = NULL;
+
+  if (!udisks_encrypted_call_lock_finish (encrypted,
+                                          res,
+                                          &error))
+    {
+      /* lock failed; need to fail the whole eject operation */
+      simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
+                                                     data->callback,
+                                                     data->user_data,
+                                                     error);
+      g_error_free (error);
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+
+      free_unmount_and_lock_op (data);
+    }
+  else
+    {
+      /* move on to the next encrypted.. */
+      unmount_and_lock_do (data);
+    }
+  g_object_unref (encrypted);
+}
+
+static void
+unmount_and_lock (GVfsUDisks2Drive    *drive,
+                  GMountUnmountFlags   flags,
+                  GMountOperation     *mount_operation,
+                  GCancellable        *cancellable,
+                  GAsyncReadyCallback  callback,
+                  gpointer             user_data,
+                  UnmountAndLockFunc   on_all_unmounted,
+                  gpointer             on_all_unmounted_data)
 {
   GMount *mount;
-  UnmountMountsOp *data;
+  UnmountAndLockOp *data;
   GList *l;
+  GSimpleAsyncResult *simple;
 
-  data = g_new0 (UnmountMountsOp, 1);
+  data = g_new0 (UnmountAndLockOp, 1);
   data->drive = g_object_ref (drive);
   data->mount_operation = mount_operation;
   data->cancellable = cancellable;
@@ -659,11 +712,62 @@ unmount_mounts (GVfsUDisks2Drive    *drive,
     {
       GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (l->data);
       mount = g_volume_get_mount (G_VOLUME (volume));
-      if (mount != NULL && g_mount_can_unmount (mount))
-        data->pending_mounts = g_list_prepend (data->pending_mounts, g_object_ref (mount));
+      if (mount != NULL)
+        {
+          if (g_mount_can_unmount (mount))
+            data->pending_mounts = g_list_prepend (data->pending_mounts, g_object_ref (mount));
+        }
+      else
+        {
+          UDisksBlock *block;
+
+          block = gvfs_udisks2_volume_get_block (G_VOLUME (volume));
+          if (block != NULL)
+            {
+              UDisksEncrypted *encrypted;
+              GDBusObject *object;
+
+              object = g_dbus_interface_get_object (G_DBUS_INTERFACE (block));
+              if (object == NULL)
+                {
+                  simple = g_simple_async_result_new_error (G_OBJECT (data->drive),
+                                                            data->callback,
+                                                            data->user_data,
+                                                            G_IO_ERROR,
+                                                            G_IO_ERROR_FAILED,
+                                                            "No object for D-Bus interface");
+                  g_simple_async_result_complete (simple);
+                  g_object_unref (simple);
+
+                  free_unmount_and_lock_op (data);
+                  goto out;
+                }
+
+              encrypted = udisks_object_get_encrypted (UDISKS_OBJECT (object));
+              if (encrypted != NULL)
+                {
+                  UDisksBlock *cleartext_block;
+                  UDisksClient *client;
+
+                  client = gvfs_udisks2_volume_monitor_get_udisks_client (drive->monitor);
+                  cleartext_block = udisks_client_get_cleartext_block (client, block);
+                  if (cleartext_block != NULL)
+                    {
+                      data->pending_encrypted = g_list_prepend (data->pending_encrypted,
+                                                                g_object_ref (encrypted));
+                      g_object_unref (cleartext_block);
+                    }
+
+                  g_object_unref (encrypted);
+                }
+            }
+        }
     }
 
-  unmount_mounts_do (data);
+  unmount_and_lock_do (data);
+
+ out:
+  ;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -770,14 +874,14 @@ gvfs_udisks2_drive_eject_with_operation (GDrive              *_drive,
     }
 
   /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
-  unmount_mounts (drive,
-                  flags,
-                  mount_operation,
-                  cancellable,
-                  callback,
-                  user_data,
-                  gvfs_udisks2_drive_eject_on_all_unmounted,
-                  NULL);
+  unmount_and_lock (drive,
+                    flags,
+                    mount_operation,
+                    cancellable,
+                    callback,
+                    user_data,
+                    gvfs_udisks2_drive_eject_on_all_unmounted,
+                    NULL);
 }
 
 static gboolean
@@ -912,14 +1016,14 @@ gvfs_udisks2_drive_stop (GDrive              *_drive,
     }
 
   /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
-  unmount_mounts (drive,
-                  flags,
-                  mount_operation,
-                  cancellable,
-                  callback,
-                  user_data,
-                  gvfs_udisks2_drive_stop_on_all_unmounted,
-                  NULL);
+  unmount_and_lock (drive,
+                    flags,
+                    mount_operation,
+                    cancellable,
+                    callback,
+                    user_data,
+                    gvfs_udisks2_drive_stop_on_all_unmounted,
+                    NULL);
 }
 
 static gboolean
