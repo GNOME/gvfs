@@ -87,6 +87,30 @@ struct _GVfsUDisks2Volume
   MountData *mount_pending_op;
 };
 
+struct MountData
+{
+  GSimpleAsyncResult *simple;
+
+  GVfsUDisks2Volume *volume;
+  GCancellable *cancellable;
+
+  gulong mount_operation_reply_handler_id;
+  gulong mount_operation_aborted_handler_id;
+  GMountOperation *mount_operation;
+
+  gchar *passphrase;
+
+  gchar *passphrase_from_keyring;
+  GPasswordSave password_save;
+
+  gchar *uuid_of_encrypted_to_unlock;
+  gchar *desc_of_encrypted_to_unlock;
+  UDisksEncrypted *encrypted_to_unlock;
+  UDisksFilesystem *filesystem_to_mount;
+
+  gboolean checked_keyring;
+};
+
 static void gvfs_udisks2_volume_volume_iface_init (GVolumeIface *iface);
 
 static void on_block_changed (GObject    *object,
@@ -584,7 +608,22 @@ on_udisks_client_changed (UDisksClient *client,
                           gpointer      user_data)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (user_data);
+  MountData *data = volume->mount_pending_op;
+
   update_volume_on_event (volume);
+
+  if (data && data->mount_operation_aborted_handler_id && data->encrypted_to_unlock)
+    {
+      UDisksBlock *cleartext_block;
+
+      cleartext_block = udisks_client_get_cleartext_block (client, volume->block);
+      if (cleartext_block != NULL)
+        {
+          g_object_set_data (G_OBJECT (data->mount_operation), "x-udisks2-is-unlocked", GINT_TO_POINTER (1));
+          g_signal_emit_by_name (data->mount_operation, "aborted");
+          g_object_unref (cleartext_block);
+        }
+    }
 }
 
 /* takes ownership of @mount_point if not NULL */
@@ -881,30 +920,6 @@ static SecretSchema luks_passphrase_schema =
   }
 };
 #endif
-
-struct MountData
-{
-  GSimpleAsyncResult *simple;
-
-  GVfsUDisks2Volume *volume;
-  GCancellable *cancellable;
-
-  gulong mount_operation_reply_handler_id;
-  gulong mount_operation_aborted_handler_id;
-  GMountOperation *mount_operation;
-
-  gchar *passphrase;
-
-  gchar *passphrase_from_keyring;
-  GPasswordSave password_save;
-
-  gchar *uuid_of_encrypted_to_unlock;
-  gchar *desc_of_encrypted_to_unlock;
-  UDisksEncrypted *encrypted_to_unlock;
-  UDisksFilesystem *filesystem_to_mount;
-
-  gboolean checked_keyring;
-};
 
 static void
 mount_data_free (MountData *data)
@@ -1269,7 +1284,47 @@ on_mount_operation_reply (GMountOperation       *mount_operation,
 
   if (result != G_MOUNT_OPERATION_HANDLED)
     {
-      if (result == G_MOUNT_OPERATION_ABORTED)
+      if (GPOINTER_TO_INT (g_object_get_data (G_OBJECT (data->mount_operation), "x-udisks2-is-unlocked")) == 1)
+        {
+          UDisksClient *client;
+          UDisksBlock *cleartext_block;
+
+          g_object_set_data (G_OBJECT (data->mount_operation), "x-udisks2-is-unlocked", GINT_TO_POINTER (0));
+
+          client = gvfs_udisks2_volume_monitor_get_udisks_client (data->volume->monitor);
+          cleartext_block = udisks_client_get_cleartext_block (client, data->volume->block);
+          if (cleartext_block != NULL)
+            {
+              UDisksObject *object;
+
+              object = g_dbus_interface_get_object (G_DBUS_INTERFACE (cleartext_block));
+              g_object_unref (cleartext_block);
+              if (object != NULL)
+                {
+                  data->filesystem_to_mount = udisks_object_get_filesystem (object);
+                  if (data->filesystem_to_mount != NULL)
+                    {
+                      do_mount (data);
+                      goto out;
+                    }
+                  else
+                    {
+                      g_simple_async_result_set_error (data->simple,
+                                                       G_IO_ERROR,
+                                                       G_IO_ERROR_FAILED,
+                                                       "No filesystem interface on D-Bus object for cleartext device");
+                    }
+                }
+              else
+                {
+                  g_simple_async_result_set_error (data->simple,
+                                                   G_IO_ERROR,
+                                                   G_IO_ERROR_FAILED,
+                                                   "No object for D-Bus interface");
+                }
+            }
+        }
+      else if (result == G_MOUNT_OPERATION_ABORTED)
         {
           /* The user aborted the operation so consider it "handled" */
           g_simple_async_result_set_error (data->simple,
