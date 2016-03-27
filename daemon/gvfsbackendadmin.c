@@ -143,6 +143,20 @@ check_permission (GVfsBackendAdmin *self,
 }
 
 static void
+complete_job (GVfsJob *job,
+              GError *error)
+{
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (job, error);
+      g_error_free (error);
+      return;
+    }
+
+  g_vfs_job_succeeded (job);
+}
+
+static void
 do_query_info (GVfsBackend *backend,
                GVfsJobQueryInfo *query_info_job,
                const char *filename,
@@ -165,11 +179,7 @@ do_query_info (GVfsBackend *backend,
   g_object_unref (file);
 
   if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
+    goto out;
 
   /* Override read/write flags, since the above call will use access()
    * to determine permissions, which does not honor our privileged
@@ -182,7 +192,9 @@ do_query_info (GVfsBackend *backend,
 
   g_file_info_copy_into (real_info, info);
   g_object_unref (real_info);
-  g_vfs_job_succeeded (job);
+
+ out:
+  complete_job (job, error);
 }
 
 static void
@@ -197,14 +209,7 @@ do_close_write (GVfsBackend *backend,
   g_output_stream_close (stream, job->cancellable, &error);
   g_object_unref (stream);
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -221,16 +226,10 @@ do_write (GVfsBackend *backend,
 
   bytes_written = g_output_stream_write (stream, buffer, buffer_size,
                                          job->cancellable, &error);
+  if (bytes_written > -1)
+    g_vfs_job_write_set_written_size (write_job, bytes_written);
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_write_set_written_size (write_job, bytes_written);
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -254,11 +253,7 @@ do_append_to (GVfsBackend *backend,
   g_object_unref (file);
 
   if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
+    goto out;
 
   seekable = G_SEEKABLE (stream);
 
@@ -267,9 +262,7 @@ do_append_to (GVfsBackend *backend,
   if (error != NULL)
     {
       g_object_unref (stream);
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
+      goto out;
     }
 
   g_vfs_job_open_for_write_set_handle (open_write_job, stream);
@@ -280,7 +273,8 @@ do_append_to (GVfsBackend *backend,
   g_vfs_job_open_for_write_set_initial_offset
     (open_write_job, g_seekable_tell (seekable));
 
-  g_vfs_job_succeeded (job);
+ out:
+  complete_job (job, error);
 }
 
 static void
@@ -304,11 +298,7 @@ do_create (GVfsBackend *backend,
   g_object_unref (file);
 
   if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
+    goto out;
 
   seekable = G_SEEKABLE (stream);
 
@@ -318,7 +308,8 @@ do_create (GVfsBackend *backend,
   g_vfs_job_open_for_write_set_can_truncate
     (open_write_job, g_seekable_can_truncate (seekable));
 
-  g_vfs_job_succeeded (job);
+ out:
+  complete_job (job, error);
 }
 
 static void
@@ -345,11 +336,7 @@ do_replace (GVfsBackend *backend,
   g_object_unref (file);
 
   if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
+    goto out;
 
   seekable = G_SEEKABLE (stream);
 
@@ -359,7 +346,8 @@ do_replace (GVfsBackend *backend,
   g_vfs_job_open_for_write_set_can_truncate
     (open_write_job, g_seekable_can_truncate (seekable));
 
-  g_vfs_job_succeeded (job);
+ out:
+  complete_job (job, error);
 }
 
 static void
@@ -374,14 +362,7 @@ do_close_read (GVfsBackend *backend,
   g_input_stream_close (stream, job->cancellable, &error);
   g_object_unref (stream);
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -398,16 +379,10 @@ do_read (GVfsBackend *backend,
 
   bytes = g_input_stream_read (stream, buffer, bytes_requested,
                                job->cancellable, &error);
+  if (bytes > -1)
+    g_vfs_job_read_set_size (read_job, bytes);
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_read_set_size (read_job, bytes);
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -429,17 +404,15 @@ do_open_for_read (GVfsBackend        *backend,
   g_object_unref (file);
 
   if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
+    goto out;
 
   g_vfs_job_open_for_read_set_handle (open_read_job, stream);
   g_vfs_job_open_for_read_set_can_seek
     (open_read_job,
      g_seekable_can_seek (G_SEEKABLE (stream)));
-  g_vfs_job_succeeded (job);
+
+ out:
+  complete_job (job, error);
 }
 
 static void
@@ -454,14 +427,7 @@ do_truncate (GVfsBackend *backend,
 
   g_seekable_truncate (seekable, size, job->cancellable, &error);
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -475,17 +441,10 @@ do_seek_on_read (GVfsBackend *backend,
   GSeekable *seekable = handle;
   GError *error = NULL;
 
-  g_seekable_seek (seekable, offset, type, job->cancellable, &error);
+  if (g_seekable_seek (seekable, offset, type, job->cancellable, &error))
+    g_vfs_job_seek_read_set_offset (seek_read_job, g_seekable_tell (seekable));
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_seek_read_set_offset (seek_read_job, g_seekable_tell (seekable));
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -499,17 +458,11 @@ do_seek_on_write (GVfsBackend *backend,
   GSeekable *seekable = handle;
   GError *error = NULL;
 
-  g_seekable_seek (seekable, offset, type, job->cancellable, &error);
+  if (g_seekable_seek (seekable, offset, type, job->cancellable, &error))
+    g_vfs_job_seek_write_set_offset (seek_write_job,
+                                     g_seekable_tell (seekable));
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_seek_write_set_offset (seek_write_job, g_seekable_tell (seekable));
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -535,11 +488,7 @@ do_enumerate (GVfsBackend *backend,
   g_object_unref (file);
 
   if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
+    goto out;
 
   while (TRUE)
     {
@@ -547,9 +496,7 @@ do_enumerate (GVfsBackend *backend,
                                       job->cancellable, &error))
         {
           g_object_unref (enumerator);
-          g_vfs_job_failed_from_error (job, error);
-          g_error_free (error);
-          return;
+          goto out;
         }
 
       if (!info)
@@ -562,14 +509,12 @@ do_enumerate (GVfsBackend *backend,
   g_object_unref (enumerator);
 
   if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
+    goto out;
 
-  g_vfs_job_succeeded (job);
   g_vfs_job_enumerate_done (enumerate_job);
+
+ out:
+  complete_job (job, error);
 }
 
 static void
@@ -590,14 +535,7 @@ do_make_directory (GVfsBackend *backend,
   g_file_make_directory (file, job->cancellable, &error);
   g_object_unref (file);
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -618,14 +556,7 @@ do_make_symlink (GVfsBackend *backend,
   g_file_make_symbolic_link (file, symlink_value, job->cancellable, &error);
   g_object_unref (file);
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -652,16 +583,13 @@ do_query_fs_info (GVfsBackend *backend,
   g_object_unref (file);
   g_free (attributes);
 
-  if (error != NULL)
+  if (real_info != NULL)
     {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
+      g_file_info_copy_into (real_info, info);
+      g_object_unref (real_info);
     }
 
-  g_file_info_copy_into (real_info, info);
-  g_object_unref (real_info);
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -714,11 +642,7 @@ create_dir_file_monitor (GVfsBackend *backend,
   g_object_unref (file);
 
   if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
+    goto out;
 
   vfs_monitor = g_vfs_monitor_new (backend);
   g_signal_connect (monitor, "changed",
@@ -731,7 +655,8 @@ create_dir_file_monitor (GVfsBackend *backend,
   g_vfs_job_create_monitor_set_monitor (monitor_job, vfs_monitor);
   g_object_unref (vfs_monitor);
 
-  g_vfs_job_succeeded (job);
+ out:
+  complete_job (job, error);
 }
 
 static void
@@ -773,19 +698,17 @@ do_set_display_name (GVfsBackend *backend,
   g_object_unref (file);
 
   if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
+    goto out;
 
   dirname = g_path_get_dirname (filename);
   new_path = g_build_filename (dirname, display_name, NULL);
 
   g_vfs_job_set_display_name_set_new_path (display_name_job, new_path);
-  g_vfs_job_succeeded (job);
   g_free (dirname);
   g_free (new_path);
+
+ out:
+  complete_job (job, error);
 }
 
 static void
@@ -810,14 +733,7 @@ do_set_attribute (GVfsBackend *backend,
                         job->cancellable, &error);
   g_object_unref (file);
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -837,14 +753,7 @@ do_delete (GVfsBackend *backend,
   g_file_delete (file, job->cancellable, &error);
   g_object_unref (file);
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -874,14 +783,7 @@ do_move (GVfsBackend *backend,
   g_object_unref (src_file);
   g_object_unref (dst_file);
 
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
-
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -902,17 +804,13 @@ do_query_settable_attributes (GVfsBackend *backend,
   attr_list = g_file_query_settable_attributes (file, job->cancellable, &error);
   g_object_unref (file);
 
-  if (error != NULL)
+  if (attr_list != NULL)
     {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
+      g_vfs_job_query_attributes_set_list (query_job, attr_list);
+      g_file_attribute_info_list_unref (attr_list);
     }
 
-  g_vfs_job_query_attributes_set_list (query_job, attr_list);
-  g_file_attribute_info_list_unref (attr_list);
-
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -933,17 +831,13 @@ do_query_writable_namespaces (GVfsBackend *backend,
   attr_list = g_file_query_writable_namespaces (file, job->cancellable, &error);
   g_object_unref (file);
 
-  if (error != NULL)
+  if (attr_list != NULL)
     {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
+      g_vfs_job_query_attributes_set_list (query_job, attr_list);
+      g_file_attribute_info_list_unref (attr_list);
     }
 
-  g_vfs_job_query_attributes_set_list (query_job, attr_list);
-  g_file_attribute_info_list_unref (attr_list);
-
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
@@ -958,14 +852,8 @@ do_mount (GVfsBackend *backend,
   GError *error = NULL;
 
   self->authority = polkit_authority_get_sync (NULL, &error);
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return;
-    }
 
-  g_vfs_job_succeeded (job);
+  complete_job (job, error);
 }
 
 static void
