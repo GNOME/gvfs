@@ -81,12 +81,20 @@ check_permission (GVfsBackendAdmin *self,
 {
   GVfsJobDBus *dbus_job = G_VFS_JOB_DBUS (job);
   GError *error = NULL;
+  GDBusMethodInvocation *invocation;
+  GDBusConnection *connection;
+  GCredentials *credentials;
+  pid_t pid;
+  uid_t uid;
+  PolkitSubject *subject;
+  PolkitAuthorizationResult *result;
+  gboolean is_authorized;
 
-  GDBusMethodInvocation *invocation = dbus_job->invocation;
-  GDBusConnection *connection = g_dbus_method_invocation_get_connection (invocation);
-  GCredentials *credentials = g_dbus_connection_get_peer_credentials (connection);
+  invocation = dbus_job->invocation;
+  connection = g_dbus_method_invocation_get_connection (invocation);
+  credentials = g_dbus_connection_get_peer_credentials (connection);
 
-  pid_t pid = g_credentials_get_unix_pid (credentials, &error);
+  pid = g_credentials_get_unix_pid (credentials, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (job, error);
@@ -94,7 +102,7 @@ check_permission (GVfsBackendAdmin *self,
       return FALSE;
     }
 
-  uid_t uid = g_credentials_get_unix_user (credentials, &error);
+  uid = g_credentials_get_unix_user (credentials, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (job, error);
@@ -105,9 +113,8 @@ check_permission (GVfsBackendAdmin *self,
   /* Only one polkit dialog at a time */
   g_mutex_lock (&self->polkit_mutex);
 
-  PolkitSubject *subject =
-    polkit_unix_process_new_for_owner (pid, 0, uid);
-  PolkitAuthorizationResult *result = polkit_authority_check_authorization_sync
+  subject = polkit_unix_process_new_for_owner (pid, 0, uid);
+  result = polkit_authority_check_authorization_sync
     (self->authority, subject,
      "org.gtk.vfs.file-operations",
      NULL, POLKIT_CHECK_AUTHORIZATION_FLAGS_ALLOW_USER_INTERACTION,
@@ -123,8 +130,7 @@ check_permission (GVfsBackendAdmin *self,
       return FALSE;
     }
 
-  gboolean is_authorized =
-    polkit_authorization_result_get_is_authorized (result) ||
+  is_authorized = polkit_authorization_result_get_is_authorized (result) ||
     polkit_authorization_result_get_is_challenge (result);
 
   g_object_unref (result);
@@ -146,15 +152,16 @@ do_query_info (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (query_info_job);
+  GError *error = NULL;
+  GFile *file;
+  GFileInfo *real_info;
 
   if (!check_permission (self, job))
     return;
 
-  GError *error = NULL;
-  GFile *file = g_file_new_for_path (filename);
-  GFileInfo *real_info = g_file_query_info (file, query_info_job->attributes,
-                                            flags, job->cancellable,
-                                            &error);
+  file = g_file_new_for_path (filename);
+  real_info = g_file_query_info (file, query_info_job->attributes,
+                                 flags, job->cancellable, &error);
   g_object_unref (file);
 
   if (error != NULL)
@@ -185,8 +192,8 @@ do_close_write (GVfsBackend *backend,
 {
   GVfsJob *job = G_VFS_JOB (close_write_job);
   GOutputStream *stream = handle;
-
   GError *error = NULL;
+
   g_output_stream_close (stream, job->cancellable, &error);
   g_object_unref (stream);
 
@@ -209,10 +216,11 @@ do_write (GVfsBackend *backend,
 {
   GVfsJob *job = G_VFS_JOB (write_job);
   GOutputStream *stream = handle;
-
   GError *error = NULL;
-  gssize bytes_written = g_output_stream_write (stream, buffer, buffer_size,
-                                                job->cancellable, &error);
+  gssize bytes_written;
+
+  bytes_written = g_output_stream_write (stream, buffer, buffer_size,
+                                         job->cancellable, &error);
 
   if (error != NULL)
     {
@@ -233,14 +241,16 @@ do_append_to (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (open_write_job);
+  GError *error = NULL;
+  GFile *file;
+  GFileOutputStream *stream;
+  GSeekable *seekable;
 
   if (!check_permission (self, job))
     return;
 
-  GError *error = NULL;
-  GFile *file = g_file_new_for_path (filename);
-  GFileOutputStream *stream = g_file_append_to (file, flags,
-                                                job->cancellable, &error);
+  file = g_file_new_for_path (filename);
+  stream = g_file_append_to (file, flags, job->cancellable, &error);
   g_object_unref (file);
 
   if (error != NULL)
@@ -250,11 +260,10 @@ do_append_to (GVfsBackend *backend,
       return;
     }
 
-  GSeekable *seekable = G_SEEKABLE (stream);
+  seekable = G_SEEKABLE (stream);
 
   /* Seek to the end of the file */
-  g_seekable_seek (seekable, 0, G_SEEK_END,
-                   job->cancellable, &error);
+  g_seekable_seek (seekable, 0, G_SEEK_END, job->cancellable, &error);
   if (error != NULL)
     {
       g_object_unref (stream);
@@ -282,14 +291,16 @@ do_create (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (open_write_job);
+  GError *error = NULL;
+  GFile *file;
+  GFileOutputStream *stream;
+  GSeekable *seekable;
 
   if (!check_permission (self, job))
     return;
 
-  GError *error = NULL;
-  GFile *file = g_file_new_for_path (filename);
-  GFileOutputStream *stream = g_file_create (file, flags,
-                                             job->cancellable, &error);
+  file = g_file_new_for_path (filename);
+  stream = g_file_create (file, flags, job->cancellable, &error);
   g_object_unref (file);
 
   if (error != NULL)
@@ -299,7 +310,7 @@ do_create (GVfsBackend *backend,
       return;
     }
 
-  GSeekable *seekable = G_SEEKABLE (stream);
+  seekable = G_SEEKABLE (stream);
 
   g_vfs_job_open_for_write_set_handle (open_write_job, stream);
   g_vfs_job_open_for_write_set_can_seek
@@ -320,14 +331,17 @@ do_replace (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (open_write_job);
+  GError *error = NULL;
+  GFile *file;
+  GFileOutputStream *stream;
+  GSeekable *seekable;
 
   if (!check_permission (self, job))
     return;
 
-  GError *error = NULL;
-  GFile *file = g_file_new_for_path (filename);
-  GFileOutputStream *stream = g_file_replace (file, etag, make_backup, flags,
-                                              job->cancellable, &error);
+  file = g_file_new_for_path (filename);
+  stream = g_file_replace (file, etag, make_backup, flags,
+                           job->cancellable, &error);
   g_object_unref (file);
 
   if (error != NULL)
@@ -337,7 +351,7 @@ do_replace (GVfsBackend *backend,
       return;
     }
 
-  GSeekable *seekable = G_SEEKABLE (stream);
+  seekable = G_SEEKABLE (stream);
 
   g_vfs_job_open_for_write_set_handle (open_write_job, stream);
   g_vfs_job_open_for_write_set_can_seek
@@ -378,11 +392,12 @@ do_read (GVfsBackend *backend,
          gsize bytes_requested)
 {
   GVfsJob *job = G_VFS_JOB (read_job);
-  GError *error = NULL;
   GInputStream *stream = handle;
+  GError *error = NULL;
+  gssize bytes;
 
-  gssize bytes = g_input_stream_read (stream, buffer, bytes_requested,
-                                      job->cancellable, &error);
+  bytes = g_input_stream_read (stream, buffer, bytes_requested,
+                               job->cancellable, &error);
 
   if (error != NULL)
     {
@@ -402,13 +417,15 @@ do_open_for_read (GVfsBackend        *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (open_read_job);
+  GError *error = NULL;
+  GFile *file;
+  GFileInputStream *stream;
 
   if (!check_permission (self, job))
     return;
 
-  GFile *file = g_file_new_for_path (filename);
-  GError *error = NULL;
-  GFileInputStream *stream = g_file_read (file, job->cancellable, &error);
+  file = g_file_new_for_path (filename);
+  stream = g_file_read (file, job->cancellable, &error);
   g_object_unref (file);
 
   if (error != NULL)
@@ -434,8 +451,8 @@ do_truncate (GVfsBackend *backend,
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (truncate_job);
   GSeekable *seekable = handle;
-
   GError *error = NULL;
+
   g_seekable_truncate (seekable, size, job->cancellable, &error);
 
   if (error != NULL)
@@ -458,10 +475,9 @@ do_seek_on_read (GVfsBackend *backend,
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (seek_read_job);
   GSeekable *seekable = handle;
-
   GError *error = NULL;
-  g_seekable_seek (seekable, offset, type,
-                   job->cancellable, &error);
+
+  g_seekable_seek (seekable, offset, type, job->cancellable, &error);
 
   if (error != NULL)
     {
@@ -484,10 +500,9 @@ do_seek_on_write (GVfsBackend *backend,
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (seek_write_job);
   GSeekable *seekable = handle;
-
   GError *error = NULL;
-  g_seekable_seek (seekable, offset, type,
-                   job->cancellable, &error);
+
+  g_seekable_seek (seekable, offset, type, job->cancellable, &error);
 
   if (error != NULL)
     {
@@ -509,15 +524,17 @@ do_enumerate (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (enumerate_job);
+  GError *error = NULL;
+  GFile *file;
+  GFileEnumerator *enumerator;
+  GFileInfo *info;
 
   if (!check_permission (self, job))
     return;
 
-  GFile *file = g_file_new_for_path (filename);
-  GError *error = NULL;
-  GFileEnumerator *enumerator =
-    g_file_enumerate_children (file, enumerate_job->attributes, flags,
-                               job->cancellable, &error);
+  file = g_file_new_for_path (filename);
+  enumerator = g_file_enumerate_children (file, enumerate_job->attributes,
+                                          flags, job->cancellable, &error);
   g_object_unref (file);
 
   if (error != NULL)
@@ -529,7 +546,6 @@ do_enumerate (GVfsBackend *backend,
 
   while (TRUE)
     {
-      GFileInfo *info;
       if (!g_file_enumerator_iterate (enumerator, &info, NULL,
                                       job->cancellable, &error))
         {
@@ -566,12 +582,13 @@ do_make_directory (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (mkdir_job);
+  GError *error = NULL;
+  GFile *file;
 
   if (!check_permission (self, job))
     return;
 
-  GError *error = NULL;
-  GFile *file = g_file_new_for_path (filename);
+  file = g_file_new_for_path (filename);
 
   g_file_make_directory (file, job->cancellable, &error);
   g_object_unref (file);
@@ -594,12 +611,13 @@ do_make_symlink (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (symlink_job);
+  GError *error = NULL;
+  GFile *file;
 
   if (!check_permission (self, job))
     return;
 
-  GError *error = NULL;
-  GFile *file = g_file_new_for_path (filename);
+  file = g_file_new_for_path (filename);
   g_file_make_symbolic_link (file, symlink_value, job->cancellable, &error);
   g_object_unref (file);
 
@@ -622,16 +640,18 @@ do_query_fs_info (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (query_info_job);
+  GError *error = NULL;
+  GFile *file;
+  char *attributes;
+  GFileInfo *real_info;
 
   if (!check_permission (self, job))
     return;
 
-  GError *error = NULL;
-  GFile *file = g_file_new_for_path (filename);
-  char *attributes = g_file_attribute_matcher_to_string (attribute_matcher);
-  GFileInfo *real_info = g_file_query_filesystem_info
-    (file, attributes,
-     job->cancellable, &error);
+  file = g_file_new_for_path (filename);
+  attributes = g_file_attribute_matcher_to_string (attribute_matcher);
+  real_info = g_file_query_filesystem_info (file, attributes,
+                                            job->cancellable, &error);
   g_object_unref (file);
   g_free (attributes);
 
@@ -654,8 +674,7 @@ monitor_changed (GFileMonitor* monitor,
                  GFileMonitorEvent event_type,
                  GVfsMonitor *vfs_monitor)
 {
-  char *file_path;
-  char *other_file_path;
+  char *file_path, *other_file_path;
 
   file_path = g_file_get_path (file);
   if (other_file)
@@ -681,20 +700,20 @@ create_dir_file_monitor (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (monitor_job);
+  GError *error = NULL;
+  GFile *file;
+  GFileMonitor *monitor;
+  GVfsMonitor *vfs_monitor;
 
   if (!check_permission (self, job))
     return;
 
-  GFile *file = g_file_new_for_path (filename);
-  GError *error = NULL;
-  GFileMonitor *monitor;
+  file = g_file_new_for_path (filename);
 
   if (is_dir_monitor)
-    monitor = g_file_monitor_directory (file, flags,
-                                        job->cancellable, &error);
+    monitor = g_file_monitor_directory (file, flags, job->cancellable, &error);
   else
-    monitor = g_file_monitor_file (file, flags,
-                                   job->cancellable, &error);
+    monitor = g_file_monitor_file (file, flags, job->cancellable, &error);
   g_object_unref (file);
 
   if (error != NULL)
@@ -704,7 +723,7 @@ create_dir_file_monitor (GVfsBackend *backend,
       return;
     }
 
-  GVfsMonitor *vfs_monitor = g_vfs_monitor_new (backend);
+  vfs_monitor = g_vfs_monitor_new (backend);
   g_signal_connect (monitor, "changed",
                     G_CALLBACK (monitor_changed), vfs_monitor);
 
@@ -745,14 +764,15 @@ do_set_display_name (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (display_name_job);
+  GError *error = NULL;
+  GFile *file;
+  char *dirname, *new_path;
 
   if (!check_permission (self, job))
     return;
 
-  GFile *file = g_file_new_for_path (filename);
-  GError *error = NULL;
-  g_file_set_display_name (file, display_name,
-                           job->cancellable, &error);
+  file = g_file_new_for_path (filename);
+  g_file_set_display_name (file, display_name, job->cancellable, &error);
   g_object_unref (file);
 
   if (error != NULL)
@@ -762,7 +782,6 @@ do_set_display_name (GVfsBackend *backend,
       return;
     }
 
-  char *dirname, *new_path;
   dirname = g_path_get_dirname (filename);
   new_path = g_build_filename (dirname, display_name, NULL);
 
@@ -783,12 +802,13 @@ do_set_attribute (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (set_attribute_job);
+  GError *error = NULL;
+  GFile *file;
 
   if (!check_permission (self, job))
     return;
 
-  GFile *file = g_file_new_for_path (filename);
-  GError *error = NULL;
+  file = g_file_new_for_path (filename);
   g_file_set_attribute (file, attribute, type, value_p, flags,
                         job->cancellable, &error);
   g_object_unref (file);
@@ -810,12 +830,13 @@ do_delete (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (delete_job);
+  GError *error = NULL;
+  GFile *file;
 
   if (!check_permission (self, job))
     return;
 
-  GFile *file = g_file_new_for_path (filename);
-  GError *error = NULL;
+  file = g_file_new_for_path (filename);
   g_file_delete (file, job->cancellable, &error);
   g_object_unref (file);
 
@@ -840,13 +861,14 @@ do_move (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (move_job);
+  GError *error = NULL;
+  GFile *src_file, *dst_file;
 
   if (!check_permission (self, job))
     return;
 
-  GFile *src_file = g_file_new_for_path (source);
-  GFile *dst_file = g_file_new_for_path (destination);
-  GError *error = NULL;
+  src_file = g_file_new_for_path (source);
+  dst_file = g_file_new_for_path (destination);
   g_file_move (src_file, dst_file, flags,
                job->cancellable,
                progress_callback, progress_callback_data,
@@ -872,14 +894,15 @@ do_query_settable_attributes (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (query_job);
+  GError *error = NULL;
+  GFile *file;
+  GFileAttributeInfoList *attr_list;
 
   if (!check_permission (self, job))
     return;
 
-  GFile *file = g_file_new_for_path (filename);
-  GError *error = NULL;
-  GFileAttributeInfoList *attr_list =
-    g_file_query_settable_attributes (file, job->cancellable, &error);
+  file = g_file_new_for_path (filename);
+  attr_list = g_file_query_settable_attributes (file, job->cancellable, &error);
   g_object_unref (file);
 
   if (error != NULL)
@@ -902,14 +925,15 @@ do_query_writable_namespaces (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (query_job);
+  GError *error = NULL;
+  GFile *file;
+  GFileAttributeInfoList *attr_list;
 
   if (!check_permission (self, job))
     return;
 
-  GFile *file = g_file_new_for_path (filename);
-  GError *error = NULL;
-  GFileAttributeInfoList *attr_list =
-    g_file_query_writable_namespaces (file, job->cancellable, &error);
+  file = g_file_new_for_path (filename);
+  attr_list = g_file_query_writable_namespaces (file, job->cancellable, &error);
   g_object_unref (file);
 
   if (error != NULL)
@@ -934,8 +958,8 @@ do_mount (GVfsBackend *backend,
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (mount_job);
-
   GError *error = NULL;
+
   self->authority = polkit_authority_get_sync (NULL, &error);
   if (error != NULL)
     {
@@ -1037,17 +1061,21 @@ void
 g_vfs_backend_admin_pre_setup (int *argc,
                                char **argv[])
 {
-  const char *pkexec_uid = g_getenv ("PKEXEC_UID");
+  const char *pkexec_uid;
+  uid_t uid;
+  GError *error = NULL;
+  GOptionContext *context;
+
+  pkexec_uid = g_getenv ("PKEXEC_UID");
   if (pkexec_uid == NULL)
     g_error ("gvfsd-admin must be executed under pkexec");
 
-  uid_t uid = strtol (pkexec_uid, NULL, 10);
+  uid = strtol (pkexec_uid, NULL, 10);
   if ((errno == ERANGE && (uid == LONG_MAX || uid == LONG_MIN))
       || (errno != 0 && uid == 0))
     g_error ("Unable to convert PKEXEC_UID string to uid_t");
 
-  GError *error = NULL;
-  GOptionContext *context = g_option_context_new (NULL);
+  context = g_option_context_new (NULL);
   g_option_context_set_ignore_unknown_options (context, TRUE);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, argc, argv, &error);
