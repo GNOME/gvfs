@@ -994,6 +994,7 @@ g_vfs_backend_admin_class_init (GVfsBackendAdminClass * klass)
   backend_class->make_symlink = do_make_symlink;
   backend_class->query_fs_info = do_query_fs_info;
   backend_class->create_dir_monitor = do_create_dir_monitor;
+  backend_class->create_file_monitor = do_create_file_monitor;
   backend_class->set_display_name = do_set_display_name;
   backend_class->set_attribute = do_set_attribute;
   backend_class->delete = do_delete;
