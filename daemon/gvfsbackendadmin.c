@@ -448,7 +448,6 @@ do_truncate (GVfsBackend *backend,
              GVfsBackendHandle handle,
              goffset size)
 {
-  GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (truncate_job);
   GSeekable *seekable = handle;
   GError *error = NULL;
@@ -472,7 +471,6 @@ do_seek_on_read (GVfsBackend *backend,
                  goffset offset,
                  GSeekType type)
 {
-  GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (seek_read_job);
   GSeekable *seekable = handle;
   GError *error = NULL;
@@ -497,7 +495,6 @@ do_seek_on_write (GVfsBackend *backend,
                   goffset offset,
                   GSeekType type)
 {
-  GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (seek_write_job);
   GSeekable *seekable = handle;
   GError *error = NULL;
