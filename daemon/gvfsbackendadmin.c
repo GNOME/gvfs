@@ -233,6 +233,19 @@ do_write (GVfsBackend *backend,
 }
 
 static void
+set_open_for_write_attributes (GVfsJobOpenForWrite *open_write_job,
+                               GFileOutputStream *stream)
+{
+  GSeekable *seekable = G_SEEKABLE (stream);
+
+  g_vfs_job_open_for_write_set_handle (open_write_job, stream);
+  g_vfs_job_open_for_write_set_can_seek
+    (open_write_job, g_seekable_can_seek (seekable));
+  g_vfs_job_open_for_write_set_can_truncate
+    (open_write_job, g_seekable_can_truncate (seekable));
+}
+
+static void
 do_append_to (GVfsBackend *backend,
               GVfsJobOpenForWrite *open_write_job,
               const char *filename,
@@ -265,11 +278,7 @@ do_append_to (GVfsBackend *backend,
       goto out;
     }
 
-  g_vfs_job_open_for_write_set_handle (open_write_job, stream);
-  g_vfs_job_open_for_write_set_can_seek
-    (open_write_job, g_seekable_can_seek (seekable));
-  g_vfs_job_open_for_write_set_can_truncate
-    (open_write_job, g_seekable_can_truncate (seekable));
+  set_open_for_write_attributes (open_write_job, stream);
   g_vfs_job_open_for_write_set_initial_offset
     (open_write_job, g_seekable_tell (seekable));
 
@@ -288,7 +297,6 @@ do_create (GVfsBackend *backend,
   GError *error = NULL;
   GFile *file;
   GFileOutputStream *stream;
-  GSeekable *seekable;
 
   if (!check_permission (self, job))
     return;
@@ -300,13 +308,7 @@ do_create (GVfsBackend *backend,
   if (error != NULL)
     goto out;
 
-  seekable = G_SEEKABLE (stream);
-
-  g_vfs_job_open_for_write_set_handle (open_write_job, stream);
-  g_vfs_job_open_for_write_set_can_seek
-    (open_write_job, g_seekable_can_seek (seekable));
-  g_vfs_job_open_for_write_set_can_truncate
-    (open_write_job, g_seekable_can_truncate (seekable));
+  set_open_for_write_attributes (open_write_job, stream);
 
  out:
   complete_job (job, error);
@@ -325,7 +327,6 @@ do_replace (GVfsBackend *backend,
   GError *error = NULL;
   GFile *file;
   GFileOutputStream *stream;
-  GSeekable *seekable;
 
   if (!check_permission (self, job))
     return;
@@ -338,13 +339,7 @@ do_replace (GVfsBackend *backend,
   if (error != NULL)
     goto out;
 
-  seekable = G_SEEKABLE (stream);
-
-  g_vfs_job_open_for_write_set_handle (open_write_job, stream);
-  g_vfs_job_open_for_write_set_can_seek
-    (open_write_job, g_seekable_can_seek (seekable));
-  g_vfs_job_open_for_write_set_can_truncate
-    (open_write_job, g_seekable_can_truncate (seekable));
+  set_open_for_write_attributes (open_write_job, stream);
 
  out:
   complete_job (job, error);
