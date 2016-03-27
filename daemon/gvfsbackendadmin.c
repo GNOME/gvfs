@@ -671,25 +671,23 @@ do_set_display_name (GVfsBackend *backend,
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (display_name_job);
   GError *error = NULL;
-  GFile *file;
-  char *dirname, *new_path;
+  GFile *file, *new_file;
+  char *new_path;
 
   if (!check_permission (self, job))
     return;
 
   file = g_file_new_for_path (filename);
-  g_file_set_display_name (file, display_name, job->cancellable, &error);
+  new_file = g_file_set_display_name (file, display_name, job->cancellable, &error);
   g_object_unref (file);
 
   if (error != NULL)
     goto out;
 
-  dirname = g_path_get_dirname (filename);
-  new_path = g_build_filename (dirname, display_name, NULL);
-
+  new_path = g_file_get_path (new_file);
   g_vfs_job_set_display_name_set_new_path (display_name_job, new_path);
-  g_free (dirname);
   g_free (new_path);
+  g_object_unref (new_file);
 
  out:
   complete_job (job, error);
