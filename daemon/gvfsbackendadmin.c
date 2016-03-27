@@ -556,10 +556,10 @@ do_make_symlink (GVfsBackend *backend,
 
 static void
 do_query_fs_info (GVfsBackend *backend,
-		  GVfsJobQueryFsInfo *query_info_job,
-		  const char *filename,
-		  GFileInfo *info,
-		  GFileAttributeMatcher *attribute_matcher)
+                  GVfsJobQueryFsInfo *query_info_job,
+                  const char *filename,
+                  GFileInfo *info,
+                  GFileAttributeMatcher *attribute_matcher)
 {
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (query_info_job);
