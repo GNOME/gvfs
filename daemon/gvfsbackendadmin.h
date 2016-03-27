@@ -1,7 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /* gvfs - extensions for gio
  *
- * Copyright (C) 2015 Cosimo Cecchi <cosimoc@gnome.org>
+ * Copyright (C) 2015, 2016 Cosimo Cecchi <cosimoc@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
