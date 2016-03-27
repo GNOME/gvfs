@@ -256,7 +256,6 @@ do_append_to (GVfsBackend *backend,
   GError *error = NULL;
   GFile *file;
   GFileOutputStream *stream;
-  GSeekable *seekable;
 
   if (!check_permission (self, job))
     return;
@@ -268,19 +267,9 @@ do_append_to (GVfsBackend *backend,
   if (error != NULL)
     goto out;
 
-  seekable = G_SEEKABLE (stream);
-
-  /* Seek to the end of the file */
-  g_seekable_seek (seekable, 0, G_SEEK_END, job->cancellable, &error);
-  if (error != NULL)
-    {
-      g_object_unref (stream);
-      goto out;
-    }
-
   set_open_for_write_attributes (open_write_job, stream);
   g_vfs_job_open_for_write_set_initial_offset
-    (open_write_job, g_seekable_tell (seekable));
+    (open_write_job, g_seekable_tell (G_SEEKABLE (stream)));
 
  out:
   complete_job (job, error);
