@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-06 15:45+0100\n"
-"PO-Revision-Date: 2016-02-06 15:47+0100\n"
+"POT-Creation-Date: 2016-04-07 20:32+0200\n"
+"PO-Revision-Date: 2016-04-07 20:33+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <gnomepl@aviary.pl>\n"
 "Language: pl\n"
@@ -386,7 +386,7 @@ msgstr "Nie można wczytać %s na %s"
 #: ../daemon/gvfsafpvolume.c:1229 ../daemon/gvfsafpvolume.c:1412
 #: ../daemon/gvfsafpvolume.c:1569 ../daemon/gvfsafpvolume.c:2015
 #: ../daemon/gvfsafpvolume.c:2143 ../daemon/gvfsafpvolume.c:2305
-#: ../daemon/gvfsafpvolume.c:2525 ../daemon/gvfsbackendafc.c:291
+#: ../daemon/gvfsafpvolume.c:2525 ../daemon/gvfsbackendafc.c:277
 #: ../daemon/gvfsbackendgoogle.c:207 ../daemon/gvfsbackendsftp.c:337
 #: ../daemon/gvfsbackendsftp.c:1083 ../daemon/gvfsbackendsftp.c:2112
 #: ../daemon/gvfsftptask.c:439
@@ -395,14 +395,14 @@ msgid "Permission denied"
 msgstr "Brak uprawnień"
 
 #: ../daemon/gvfsafpvolume.c:414 ../daemon/gvfsafpvolume.c:1735
-#: ../daemon/gvfsafpvolume.c:2529 ../daemon/gvfsbackendafc.c:218
-#: ../daemon/gvfsbackendafc.c:1019 ../daemon/gvfsbackendafpbrowse.c:190
+#: ../daemon/gvfsafpvolume.c:2529 ../daemon/gvfsbackendafc.c:204
+#: ../daemon/gvfsbackendafc.c:961 ../daemon/gvfsbackendafpbrowse.c:190
 #: ../daemon/gvfsbackendafpbrowse.c:327 ../daemon/gvfsbackendafpbrowse.c:359
 #: ../daemon/gvfsbackendarchive.c:736 ../daemon/gvfsbackendarchive.c:791
 #: ../daemon/gvfsbackendarchive.c:843 ../daemon/gvfsbackendarchive.c:872
 #: ../daemon/gvfsbackendcdda.c:1024 ../daemon/gvfsbackendcomputer.c:639
 #: ../daemon/gvfsbackenddnssd.c:422 ../daemon/gvfsbackendftp.c:778
-#: ../daemon/gvfsbackendftp.c:1155 ../daemon/gvfsbackendmtp.c:1572
+#: ../daemon/gvfsbackendftp.c:1172 ../daemon/gvfsbackendmtp.c:1572
 #: ../daemon/gvfsbackendmtp.c:1588 ../daemon/gvfsbackendmtp.c:2042
 #: ../daemon/gvfsbackendmtp.c:2105 ../daemon/gvfsbackendmtp.c:2173
 #: ../daemon/gvfsbackendmtp.c:2527 ../daemon/gvfsbackendnetwork.c:696
@@ -431,7 +431,7 @@ msgstr "Otwarto za dużo plików"
 msgid "Target file is open"
 msgstr "Plik docelowy jest otwarty"
 
-#: ../daemon/gvfsafpvolume.c:688 ../daemon/gvfsbackendafc.c:222
+#: ../daemon/gvfsafpvolume.c:688 ../daemon/gvfsbackendafc.c:208
 #: ../daemon/gvfsbackendburn.c:421 ../daemon/gvfsbackenddav.c:2681
 #: ../daemon/gvfsbackendsftp.c:2106
 msgid "Directory not empty"
@@ -465,8 +465,8 @@ msgstr "Brak miejsca na woluminie"
 #: ../daemon/gvfsbackenddav.c:2642 ../daemon/gvfsbackenddav.c:2750
 #: ../daemon/gvfsbackenddav.c:2887 ../daemon/gvfsbackenddav.c:2963
 #: ../daemon/gvfsbackenddav.c:3001 ../daemon/gvfsbackenddav.c:3225
-#: ../daemon/gvfsbackendftp.c:794 ../daemon/gvfsbackendftp.c:975
-#: ../daemon/gvfsbackendftp.c:1475 ../daemon/gvfsbackendftp.c:1583
+#: ../daemon/gvfsbackendftp.c:794 ../daemon/gvfsbackendftp.c:982
+#: ../daemon/gvfsbackendftp.c:1492 ../daemon/gvfsbackendftp.c:1600
 #: ../daemon/gvfsbackendgoogle.c:1233 ../daemon/gvfsbackendgoogle.c:1561
 #: ../daemon/gvfsbackendgoogle.c:1834 ../daemon/gvfsbackendgoogle.c:2486
 #: ../daemon/gvfsbackendmtp.c:1518 ../daemon/gvfsbackendmtp.c:1650
@@ -569,54 +569,54 @@ msgstr "Plik jest zablokowany przez innego użytkownika"
 msgid "File is not open for read access"
 msgstr "Plik nie jest otwarty do odczytu"
 
-#: ../daemon/gvfsbackendafc.c:214
+#: ../daemon/gvfsbackendafc.c:200
 msgid "Internal Apple File Control error"
 msgstr "Wewnętrzny błąd Apple File Control"
 
-#: ../daemon/gvfsbackendafc.c:226
+#: ../daemon/gvfsbackendafc.c:212
 msgid "The device did not respond"
 msgstr "Urządzenie nie odpowiedziało"
 
-#: ../daemon/gvfsbackendafc.c:230
+#: ../daemon/gvfsbackendafc.c:216
 msgid "The connection was interrupted"
 msgstr "Połączenie zostało przerwane"
 
-#: ../daemon/gvfsbackendafc.c:234
+#: ../daemon/gvfsbackendafc.c:220
 msgid "Invalid Apple File Control data received"
 msgstr "Otrzymano nieprawidłowe dane Apple File Control"
 
-#: ../daemon/gvfsbackendafc.c:238
+#: ../daemon/gvfsbackendafc.c:224
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "Nieobsłużony błąd Apple File Control (%d)"
 
-#: ../daemon/gvfsbackendafc.c:254
+#: ../daemon/gvfsbackendafc.c:240
 msgid "Listing applications installed on device failed"
 msgstr ""
 "Wyświetlenie listy programów zainstalowanych na urządzeniu się nie powiodło"
 
-#: ../daemon/gvfsbackendafc.c:270
+#: ../daemon/gvfsbackendafc.c:256
 msgid "Accessing application icons on device failed"
 msgstr "Uzyskanie dostępu do ikon programów na urządzeniu się nie powiodło"
 
-#: ../daemon/gvfsbackendafc.c:287
+#: ../daemon/gvfsbackendafc.c:273
 msgid "Lockdown Error: Invalid Argument"
 msgstr "Błąd blokowania: nieprawidłowy parametr"
 
-#: ../daemon/gvfsbackendafc.c:295
+#: ../daemon/gvfsbackendafc.c:281
 msgid "Unable to connect"
 msgstr "Nie można połączyć"
 
-#: ../daemon/gvfsbackendafc.c:299
+#: ../daemon/gvfsbackendafc.c:285
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "Nieobsłużony błąd blokowania (%d)"
 
-#: ../daemon/gvfsbackendafc.c:316
+#: ../daemon/gvfsbackendafc.c:302
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "Błąd biblioteki libimobiledevice: nieprawidłowy parametr"
 
-#: ../daemon/gvfsbackendafc.c:320
+#: ../daemon/gvfsbackendafc.c:306
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
@@ -624,43 +624,43 @@ msgstr ""
 "Błąd biblioteki libimobiledevice: nie odnaleziono urządzenia. Proszę się "
 "upewnić, że usługa usbmuxd jest poprawnie ustawiona."
 
-#: ../daemon/gvfsbackendafc.c:324
+#: ../daemon/gvfsbackendafc.c:310
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Nieobsłużony błąd biblioteki libimobiledevice (%d)"
 
-#: ../daemon/gvfsbackendafc.c:443
+#: ../daemon/gvfsbackendafc.c:429
 msgid "Try again"
 msgstr "Spróbuj ponownie"
 
-#: ../daemon/gvfsbackendafc.c:443 ../daemon/gvfsbackend.c:994
+#: ../daemon/gvfsbackendafc.c:429 ../daemon/gvfsbackend.c:994
 #: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
-#: ../monitor/udisks2/gvfsudisks2mount.c:786
+#: ../monitor/udisks2/gvfsudisks2mount.c:787
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: ../daemon/gvfsbackendafc.c:461 ../daemon/gvfsbackendarchive.c:637
+#: ../daemon/gvfsbackendafc.c:447 ../daemon/gvfsbackendarchive.c:637
 #: ../daemon/gvfsbackendarchive.c:666 ../daemon/gvfsbackenddav.c:1848
 #: ../daemon/gvfsbackendgoogle.c:1664 ../daemon/gvfsbackendhttp.c:256
 #: ../daemon/gvfsbackendsmb.c:724
 msgid "Invalid mount spec"
 msgstr "Nieprawidłowa specyfikacja montowania"
 
-#: ../daemon/gvfsbackendafc.c:467 ../daemon/gvfsbackendafc.c:497
+#: ../daemon/gvfsbackendafc.c:453 ../daemon/gvfsbackendafc.c:483
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "Nieprawidłowe położenie AFC: musi być w formie afc://uuid:port-numer"
 
-#: ../daemon/gvfsbackendafc.c:483
+#: ../daemon/gvfsbackendafc.c:469
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Urządzenie przenośne firmy Apple"
 
-#: ../daemon/gvfsbackendafc.c:488
+#: ../daemon/gvfsbackendafc.c:474
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Urządzenie przenośne firmy Apple, złamane"
 
-#: ../daemon/gvfsbackendafc.c:493
+#: ../daemon/gvfsbackendafc.c:479
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Dokumenty na Urządzeniu przenośnym firmy Apple"
@@ -668,7 +668,7 @@ msgstr "Dokumenty na Urządzeniu przenośnym firmy Apple"
 #. translators:
 #. * This is the device name, with the service being browsed in brackets, eg.:
 #. * Alan Smithee's iPhone (jailbreak)
-#: ../daemon/gvfsbackendafc.c:552
+#: ../daemon/gvfsbackendafc.c:538
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (złamane)"
@@ -676,7 +676,7 @@ msgstr "%s (złamane)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:559 ../monitor/afc/afcvolume.c:184
+#: ../daemon/gvfsbackendafc.c:545 ../monitor/afc/afcvolume.c:185
 #, c-format
 msgid "Documents on %s"
 msgstr "Dokumenty na urządzeniu %s"
@@ -684,7 +684,7 @@ msgstr "Dokumenty na urządzeniu %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:663
+#: ../daemon/gvfsbackendafc.c:600
 #, c-format
 msgid ""
 "The device “%s” is locked. Enter the passcode on the device and click “Try "
@@ -693,7 +693,7 @@ msgstr ""
 "Urządzenie „%s” jest zablokowane. Proszę wprowadzić hasło na urządzeniu i "
 "kliknąć przycisk „Spróbuj ponownie”."
 
-#: ../daemon/gvfsbackendafc.c:1009 ../daemon/gvfsbackendarchive.c:744
+#: ../daemon/gvfsbackendafc.c:951 ../daemon/gvfsbackendarchive.c:744
 #: ../daemon/gvfsbackendcomputer.c:657 ../daemon/gvfsbackendgoogle.c:2186
 #: ../daemon/gvfsbackendgphoto2.c:1805 ../daemon/gvfsbackendmtp.c:2195
 #: ../daemon/gvfsbackendnfs.c:347 ../daemon/gvfsbackendrecent.c:122
@@ -701,11 +701,11 @@ msgstr ""
 msgid "Can't open directory"
 msgstr "Nie można otworzyć katalogu"
 
-#: ../daemon/gvfsbackendafc.c:1212
+#: ../daemon/gvfsbackendafc.c:1154
 msgid "Backups are not yet supported."
 msgstr "Kopie zapasowe nie są jeszcze obsługiwane."
 
-#: ../daemon/gvfsbackendafc.c:1375 ../daemon/gvfsbackendsmb.c:875
+#: ../daemon/gvfsbackendafc.c:1317 ../daemon/gvfsbackendsmb.c:875
 #: ../daemon/gvfsbackendsmb.c:1354
 msgid "Unsupported seek type"
 msgstr "Nieobsługiwany typ wyszukiwania"
@@ -714,9 +714,9 @@ msgstr "Nieobsługiwany typ wyszukiwania"
 #. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
 #. * fallback copy.
 #.
-#: ../daemon/gvfsbackendafc.c:2435 ../daemon/gvfsbackendafp.c:1781
-#: ../daemon/gvfsbackendftp.c:1175 ../daemon/gvfsbackendftp.c:1223
-#: ../daemon/gvfsbackendftp.c:1244 ../daemon/gvfsbackendgoogle.c:1140
+#: ../daemon/gvfsbackendafc.c:2219 ../daemon/gvfsbackendafp.c:1781
+#: ../daemon/gvfsbackendftp.c:1192 ../daemon/gvfsbackendftp.c:1240
+#: ../daemon/gvfsbackendftp.c:1261 ../daemon/gvfsbackendgoogle.c:1140
 #: ../daemon/gvfsbackendgoogle.c:1207 ../daemon/gvfsbackendgoogle.c:1228
 #: ../daemon/gvfsbackendgoogle.c:1310 ../daemon/gvfsbackendgoogle.c:1378
 #: ../daemon/gvfsbackendgoogle.c:1536 ../daemon/gvfsbackendgoogle.c:1764
@@ -731,8 +731,8 @@ msgstr "Nieobsługiwany typ wyszukiwania"
 msgid "Operation unsupported"
 msgstr "Nieobsługiwane działanie"
 
-#: ../daemon/gvfsbackendafc.c:2601 ../daemon/gvfsbackenddav.c:2786
-#: ../daemon/gvfsbackendftp.c:1427
+#: ../daemon/gvfsbackendafc.c:2385 ../daemon/gvfsbackenddav.c:2786
+#: ../daemon/gvfsbackendftp.c:1444
 msgid "Backups not supported"
 msgstr "Kopie zapasowe nie są obsługiwane"
 
@@ -780,13 +780,13 @@ msgid "Apple Filing Protocol Service"
 msgstr "Usługa Apple Filing Protocol"
 
 #: ../daemon/gvfsbackendafp.c:286 ../daemon/gvfsbackendburn.c:875
-#: ../daemon/gvfsbackenddav.c:2949 ../daemon/gvfsbackendftp.c:1575
+#: ../daemon/gvfsbackenddav.c:2949 ../daemon/gvfsbackendftp.c:1592
 #: ../daemon/gvfsbackendgoogle.c:1806
 msgid "Can't copy directory over directory"
 msgstr "Nie można skopiować katalogu na katalog"
 
 #: ../daemon/gvfsbackendafp.c:305 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackenddav.c:2978 ../daemon/gvfsbackendftp.c:1598
+#: ../daemon/gvfsbackenddav.c:2978 ../daemon/gvfsbackendftp.c:1615
 #: ../daemon/gvfsbackendgoogle.c:1244 ../daemon/gvfsbackendgoogle.c:1825
 #: ../daemon/gvfsbackendgoogle.c:1845 ../daemon/gvfsbackendmtp.c:1633
 #: ../daemon/gvfsbackendmtp.c:1656 ../daemon/gvfsbackendmtp.c:1958
@@ -815,7 +815,7 @@ msgstr "Nie można utworzyć pliku tymczasowego (%s)"
 msgid "The file was externally modified"
 msgstr "Plik został zmodyfikowany z zewnątrz"
 
-#: ../daemon/gvfsbackendafp.c:1765 ../daemon/gvfsbackendftp.c:1216
+#: ../daemon/gvfsbackendafp.c:1765 ../daemon/gvfsbackendftp.c:1233
 #: ../daemon/gvfsbackendsftp.c:5181
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "Nieprawidłowy typ atrybutu (oczekiwano uint32)"
@@ -902,8 +902,8 @@ msgstr "Plik istnieje"
 #: ../daemon/gvfsjobopeniconforread.c:104 ../daemon/gvfsjobpollmountable.c:107
 #: ../daemon/gvfsjobpull.c:125 ../daemon/gvfsjobpush.c:125
 #: ../daemon/gvfsjobqueryattributes.c:145 ../daemon/gvfsjobqueryfsinfo.c:116
-#: ../daemon/gvfsjobqueryinfo.c:124 ../daemon/gvfsjobqueryinforead.c:119
-#: ../daemon/gvfsjobqueryinfowrite.c:119 ../daemon/gvfsjobread.c:123
+#: ../daemon/gvfsjobqueryinfo.c:124 ../daemon/gvfsjobqueryinforead.c:122
+#: ../daemon/gvfsjobqueryinfowrite.c:122 ../daemon/gvfsjobread.c:123
 #: ../daemon/gvfsjobseekread.c:121 ../daemon/gvfsjobseekwrite.c:121
 #: ../daemon/gvfsjobsetattribute.c:130 ../daemon/gvfsjobsetdisplayname.c:111
 #: ../daemon/gvfsjobstartmountable.c:113 ../daemon/gvfsjobstopmountable.c:115
@@ -911,8 +911,8 @@ msgstr "Plik istnieje"
 #: ../daemon/gvfsjobunmountmountable.c:157
 #: ../daemon/gvfsjobunmountmountable.c:172 ../daemon/gvfsjobwrite.c:123
 #: ../monitor/gdu/ggdumount.c:1176 ../monitor/gdu/ggdumount.c:1260
-#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1180
-#: ../monitor/udisks2/gvfsudisks2volume.c:1677
+#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1181
+#: ../monitor/udisks2/gvfsudisks2volume.c:1732
 msgid "Operation not supported by backend"
 msgstr "Działanie nieobsługiwane przez mechanizm przetwarzający"
 
@@ -943,12 +943,12 @@ msgid "File system is busy"
 msgstr "System plików jest zajęty"
 
 #: ../daemon/gvfsbackend.c:993 ../monitor/gdu/ggdumount.c:922
-#: ../monitor/udisks2/gvfsudisks2mount.c:784
+#: ../monitor/udisks2/gvfsudisks2mount.c:785
 msgid "Unmount Anyway"
 msgstr "Odmontuj mimo to"
 
 #: ../daemon/gvfsbackend.c:996 ../monitor/gdu/ggdumount.c:924
-#: ../monitor/udisks2/gvfsudisks2mount.c:787
+#: ../monitor/udisks2/gvfsudisks2mount.c:788
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -997,7 +997,7 @@ msgstr "Punkt montowania CDDA na %s"
 #: ../daemon/gvfsbackendcdda.c:467 ../daemon/gvfsbackendcdda.c:988
 #: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:359
+#: ../monitor/udisks2/gvfsudisks2volume.c:383
 #, c-format
 msgid "Audio Disc"
 msgstr "Płyta CD-Audio"
@@ -1141,7 +1141,7 @@ msgstr "Nie jest to zasób WebDAV"
 msgid "Could not create request"
 msgstr "Nie można utworzyć żądania"
 
-#: ../daemon/gvfsbackenddav.c:2458 ../daemon/gvfsbackendftp.c:1078
+#: ../daemon/gvfsbackenddav.c:2458 ../daemon/gvfsbackendftp.c:1085
 #: ../daemon/gvfsbackendgoogle.c:2561 ../daemon/gvfsbackendnfs.c:939
 #: ../daemon/gvfsbackendnfs.c:962 ../daemon/gvfsbackendnfs.c:988
 #: ../daemon/gvfsbackendnfs.c:1388 ../daemon/gvfsbackendsmb.c:1263
@@ -1517,7 +1517,7 @@ msgstr "Brak miniatury dla jednostki „%s”"
 
 #: ../daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
-msgstr "Współdzielenie plików"
+msgstr "Udostępnianie plików"
 
 #: ../daemon/gvfsbackendnetwork.c:173
 msgid "Remote Login"
@@ -1721,7 +1721,7 @@ msgstr "Zasoby Windows na %s"
 #: ../daemon/gvfsbackendsmbbrowse.c:1029
 #, c-format
 msgid "Failed to retrieve share list from server: %s"
-msgstr "Pobranie listy udziałów z serwera się nie powiodło: %s"
+msgstr "Pobranie listy zasobów z serwera się nie powiodło: %s"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1554
 msgid "Windows Network File System Service"
@@ -1775,17 +1775,17 @@ msgstr "Nie można rekursywnie przenieść katalogu"
 msgid "Windows Shares File System Service"
 msgstr "Usługa systemu plików zasobów sieciowych Windows"
 
-#: ../daemon/gvfsbackendtrash.c:399 ../daemon/gvfsbackendtrash.c:455
+#: ../daemon/gvfsbackendtrash.c:402 ../daemon/gvfsbackendtrash.c:461
 msgid "The trash folder may not be deleted"
 msgstr "Katalog kosza nie może zostać usunięty"
 
-#: ../daemon/gvfsbackendtrash.c:416 ../daemon/gvfsbackendtrash.c:469
+#: ../daemon/gvfsbackendtrash.c:422 ../daemon/gvfsbackendtrash.c:478
 msgid "Items in the trash may not be modified"
 msgstr "Elementy w koszu nie mogą być modyfikowane"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:768 ../daemon/gvfsbackendtrash.c:880
+#: ../daemon/gvfsbackendtrash.c:780 ../daemon/gvfsbackendtrash.c:892
 msgid "Trash"
 msgstr "Kosz"
 
@@ -2052,7 +2052,7 @@ msgstr "Napęd bez nazwy (%s)"
 msgid "Unnamed Drive"
 msgstr "Napęd bez nazwy"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:609
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:628
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
@@ -2074,7 +2074,7 @@ msgstr ""
 msgid "Start Anyway"
 msgstr "Uruchom mimo to"
 
-#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:671
+#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:672
 msgid "One or more programs are preventing the unmount operation."
 msgstr "Jeden lub więcej programów powstrzymuje działanie odmontowania."
 
@@ -2458,7 +2458,7 @@ msgstr "Nośnik o rozmiarze %s"
 #. Note that the GUI (Shell, Files) currently use the term
 #. * "Eject" for both GDrive.stop() and GDrive.eject().
 #.
-#: ../monitor/udisks2/gvfsudisks2mount.c:780
+#: ../monitor/udisks2/gvfsudisks2mount.c:781
 msgid "Eject Anyway"
 msgstr "Wysuń mimo to"
 
@@ -2484,7 +2484,7 @@ msgstr "Można teraz wyjąć urządzenie %s\n"
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:279
+#: ../monitor/udisks2/gvfsudisks2volume.c:303
 #, c-format
 msgid "%s Encrypted"
 msgstr "Zaszyfrowane dane o rozmiarze %s"
@@ -2492,41 +2492,41 @@ msgstr "Zaszyfrowane dane o rozmiarze %s"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:291
+#: ../monitor/udisks2/gvfsudisks2volume.c:315
 #, c-format
 msgid "%s Volume"
 msgstr "Wolumin o rozmiarze %s"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:527
+#: ../monitor/udisks2/gvfsudisks2volume.c:551
 msgid "Volume"
 msgstr "Wolumin"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1100
+#: ../monitor/udisks2/gvfsudisks2volume.c:1115
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "Błąd podczas przechowywania hasła w bazie kluczy (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1136
+#: ../monitor/udisks2/gvfsudisks2volume.c:1151
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "Błąd podczas usuwania nieprawidłowego hasła z bazy kluczy (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1201
+#: ../monitor/udisks2/gvfsudisks2volume.c:1216
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr "Odblokowane urządzenie nie posiada rozpoznawalnego systemu plików"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1230
+#: ../monitor/udisks2/gvfsudisks2volume.c:1245
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Hasło szyfrowania dla %s"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1398
+#: ../monitor/udisks2/gvfsudisks2volume.c:1453
 msgid "A passphrase is required to access the volume"
 msgstr "Wymagane jest hasło, aby uzyskać dostęp do woluminu"
 
 #. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1413
+#: ../monitor/udisks2/gvfsudisks2volume.c:1468
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2540,7 +2540,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1582
+#: ../monitor/udisks2/gvfsudisks2volume.c:1637
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
