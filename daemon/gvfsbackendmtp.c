@@ -73,6 +73,12 @@
 
 
 /************************************************
+ * Constants
+ ************************************************/
+
+#define EVENT_POLL_PERIOD { 1, 0 }
+
+/************************************************
  * Private Types
  ************************************************/
 
@@ -588,13 +594,65 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
     }
 
     op_backend->force_unmounted = TRUE;
+    g_atomic_int_set (&op_backend->unmount_started, TRUE);
     g_vfs_backend_force_unmount ((GVfsBackend*)op_backend);
   }
 
   g_debug ("(I) on_uevent done.\n");
 }
 
-#if HAVE_LIBMTP_1_1_5
+#if HAVE_LIBMTP_1_1_12
+static void
+check_event_cb(int ret, LIBMTP_event_t event, uint32_t param1, void *user_data)
+{
+  GVfsBackendMtp *backend = user_data;
+
+  g_debug ("(II) check_event_cb: %d, %d, %d\n", ret, event, param1);
+  backend->event_completed = TRUE;
+
+  if (ret != LIBMTP_HANDLER_RETURN_OK ||
+      g_atomic_int_get (&backend->unmount_started)) {
+    return;
+  }
+
+  EventData *data = g_new(EventData, 1);
+  data->event = event;
+  data->param1 = param1;
+  gboolean tret = g_thread_pool_push (backend->event_pool, data, NULL);
+  g_debug ("(II) check_event_cb push work to pool: %d\n", tret);
+}
+
+static gpointer
+check_event (gpointer user_data)
+{
+  GVfsBackendMtp *backend = user_data;
+
+  LIBMTP_event_t event;
+  while (!g_atomic_int_get (&backend->unmount_started)) {
+    int ret;
+    LIBMTP_mtpdevice_t *device = backend->device;
+    if (backend->event_completed) {
+      g_debug ("(I) check_event: Read event needs to be issued.\n");
+      ret = LIBMTP_Read_Event_Async (device, check_event_cb, backend);
+      if (ret != 0) {
+        g_debug ("(I) check_event: Read_Event_Async failed: %d\n", ret);
+        continue;
+      }
+      backend->event_completed = FALSE;
+    }
+    /*
+     * Return from polling periodically to check for unmount.
+     */
+    struct timeval tv = EVENT_POLL_PERIOD;
+    g_debug ("(I) check_event: Polling for events.\n");
+    ret = LIBMTP_Handle_Events_Timeout_Completed (&tv, &(backend->event_completed));
+    if (ret != 0) {
+      g_debug ("(I) check_event: polling returned error: %d\n", ret);
+    }
+  }
+  return NULL;
+}
+#elif HAVE_LIBMTP_1_1_5
 static gpointer
 check_event (gpointer user_data)
 {
@@ -632,7 +690,9 @@ check_event (gpointer user_data)
   }
   return NULL;
 }
+#endif
 
+#if HAVE_LIBMTP_1_1_5
 void
 handle_event (EventData *ed, GVfsBackendMtp *backend)
 {
@@ -863,7 +923,10 @@ do_mount (GVfsBackend *backend,
     op_backend->hb_id =
       g_timeout_add_seconds (900, (GSourceFunc)mtp_heartbeat, op_backend);
 
-#if HAVE_LIBMTP_1_1_5
+#if HAVE_LIBMTP_1_1_12
+    op_backend->event_completed = TRUE;
+    op_backend->event_thread = g_thread_new ("events", check_event, backend);
+#elif HAVE_LIBMTP_1_1_5
     GWeakRef *event_ref = g_new0 (GWeakRef, 1);
     g_weak_ref_init (event_ref, backend);
     GThread *event_thread = g_thread_new ("events", check_event, event_ref);
@@ -893,6 +956,11 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
   g_mutex_lock (&op_backend->mutex);
 
   g_atomic_int_set (&op_backend->unmount_started, TRUE);
+
+#ifdef HAVE_LIBMTP_1_1_12
+  /* Thread will terminate after flag is set. */
+  g_thread_join (op_backend->event_thread);
+#endif
 
 #if HAVE_LIBMTP_1_1_5
   /* It's no longer safe to handle events. */

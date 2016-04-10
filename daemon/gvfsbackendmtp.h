@@ -69,6 +69,10 @@ struct _GVfsBackendMtp
 #ifdef HAVE_LIBMTP_1_1_5
   GThreadPool *event_pool;
 #endif
+#ifdef HAVE_LIBMTP_1_1_12
+  GThread *event_thread;
+  gboolean event_completed;
+#endif
 };
 
 struct _GVfsBackendMtpClass
