@@ -65,6 +65,10 @@ struct _GVfsBackendMtp
 
   gboolean android_extension;
   gboolean get_partial_object_capability;
+
+#ifdef HAVE_LIBMTP_1_1_5
+  GThreadPool *event_pool;
+#endif
 };
 
 struct _GVfsBackendMtpClass

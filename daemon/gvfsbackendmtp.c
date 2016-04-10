@@ -96,6 +96,13 @@ typedef struct {
   uint32_t id;
 } CacheEntry;
 
+#if HAVE_LIBMTP_1_1_5
+typedef struct {
+  LIBMTP_event_t event;
+  uint32_t param1;
+} EventData;
+#endif
+
 
 /************************************************
  * Static prototypes
@@ -105,6 +112,11 @@ static void
 emit_delete_event (gpointer key,
                    gpointer value,
                    gpointer user_data);
+
+#if HAVE_LIBMTP_1_1_5
+static void
+handle_event (EventData *data, GVfsBackendMtp *backend);
+#endif
 
 
 /************************************************
@@ -364,6 +376,11 @@ g_vfs_backend_mtp_init (GVfsBackendMtp *backend)
 
   backend->monitors = g_hash_table_new (NULL, NULL);
 
+#if HAVE_LIBMTP_1_1_5
+  backend->event_pool = g_thread_pool_new ((GFunc) handle_event,
+                                           backend, 1, FALSE, NULL);
+#endif
+
   g_debug ("(I) g_vfs_backend_mtp_init done.\n");
 }
 
@@ -383,6 +400,10 @@ g_vfs_backend_mtp_finalize (GObject *object)
   g_debug ("(I) g_vfs_backend_mtp_finalize\n");
 
   backend = G_VFS_BACKEND_MTP (object);
+
+#if HAVE_LIBMTP_1_1_5
+  g_thread_pool_free (backend->event_pool, TRUE, TRUE);
+#endif
 
   g_hash_table_foreach (backend->monitors, remove_monitor_weak_ref, backend->monitors);
   g_hash_table_unref (backend->monitors);
@@ -574,8 +595,6 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
 }
 
 #if HAVE_LIBMTP_1_1_5
-static void handle_event (GVfsBackendMtp *backend, LIBMTP_event_t event, uint32_t param1);
-
 static gpointer
 check_event (gpointer user_data)
 {
@@ -603,8 +622,11 @@ check_event (gpointer user_data)
     }
 
     backend = g_weak_ref_get (event_ref);
-    if (backend) {
-      handle_event (backend, event, param1);
+    if (backend && !g_atomic_int_get (&backend->unmount_started)) {
+      EventData *ed = g_new (EventData, 1);
+      ed->event = event;
+      ed->param1 = param1;
+      g_thread_pool_push (backend->event_pool, ed, NULL);
       g_object_unref (backend);
     }
   }
@@ -612,10 +634,14 @@ check_event (gpointer user_data)
 }
 
 void
-handle_event (GVfsBackendMtp *backend, LIBMTP_event_t event, uint32_t param1)
+handle_event (EventData *ed, GVfsBackendMtp *backend)
 {
+  LIBMTP_event_t event = ed->event;
+  uint32_t param1 = ed->param1;
+  g_free (ed);
+
+  g_mutex_lock (&backend->mutex);
   if (!g_atomic_int_get (&backend->unmount_started)) {
-    g_mutex_lock (&backend->mutex);
     switch (event) {
     case LIBMTP_EVENT_STORE_ADDED:
       {
@@ -718,8 +744,8 @@ handle_event (GVfsBackendMtp *backend, LIBMTP_event_t event, uint32_t param1)
     default:
       break;
     }
-    g_mutex_unlock (&backend->mutex);
   }
+  g_mutex_unlock (&backend->mutex);
 }
 #endif
 
@@ -867,6 +893,11 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
   g_mutex_lock (&op_backend->mutex);
 
   g_atomic_int_set (&op_backend->unmount_started, TRUE);
+
+#if HAVE_LIBMTP_1_1_5
+  /* It's no longer safe to handle events. */
+  g_thread_pool_set_max_threads (op_backend->event_pool, 0, NULL);
+#endif
 
   /* Emit delete events to tell clients files are gone. */
   GHashTableIter iter;
