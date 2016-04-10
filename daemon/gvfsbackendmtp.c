@@ -574,6 +574,8 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
 }
 
 #if HAVE_LIBMTP_1_1_5
+static void handle_event (GVfsBackendMtp *backend, LIBMTP_event_t event, uint32_t param1);
+
 static gpointer
 check_event (gpointer user_data)
 {
@@ -600,14 +602,25 @@ check_event (gpointer user_data)
       return NULL;
     }
 
+    backend = g_weak_ref_get (event_ref);
+    if (backend) {
+      handle_event (backend, event, param1);
+      g_object_unref (backend);
+    }
+  }
+  return NULL;
+}
+
+void
+handle_event (GVfsBackendMtp *backend, LIBMTP_event_t event, uint32_t param1)
+{
+  if (!g_atomic_int_get (&backend->unmount_started)) {
+    g_mutex_lock (&backend->mutex);
     switch (event) {
     case LIBMTP_EVENT_STORE_ADDED:
-      backend = g_weak_ref_get (event_ref);
-      if (backend && !g_atomic_int_get (&backend->unmount_started)) {
+      {
         LIBMTP_mtpdevice_t *device = backend->device;
         LIBMTP_devicestorage_t *storage;
-
-        g_mutex_lock (&backend->mutex);
 
         int ret = LIBMTP_Get_Storage (device, LIBMTP_STORAGE_SORTBY_NOTSORTED);
         if (ret != 0) {
@@ -628,30 +641,14 @@ check_event (gpointer user_data)
             }
           }
         }
-
-        g_mutex_unlock (&backend->mutex);
-        g_object_unref (backend);
         break;
-      } else {
-        return NULL;
       }
 #if HAVE_LIBMTP_1_1_6
     case LIBMTP_EVENT_OBJECT_REMOVED:
-      backend = g_weak_ref_get (event_ref);
-      if (backend && !g_atomic_int_get (&backend->unmount_started)) {
-        g_mutex_lock (&backend->mutex);
         remove_cache_entry_by_id (G_VFS_BACKEND_MTP (backend), param1);
-        g_mutex_unlock (&backend->mutex);
-        g_object_unref (backend);
         break;
-      } else {
-        return NULL;
-      }
     case LIBMTP_EVENT_STORE_REMOVED:
-      backend = g_weak_ref_get (event_ref);
-      if (backend && !g_atomic_int_get (&backend->unmount_started)) {
-        g_mutex_lock (&backend->mutex);
-
+      {
         /* Clear the cache entries and emit delete event; first for all
            entries under the storage in question... */
         GHashTableIter iter;
@@ -671,18 +668,10 @@ check_event (gpointer user_data)
 
         /* ... and then for the storage itself */
         remove_cache_entry_by_id (G_VFS_BACKEND_MTP (backend), param1);
-
-        g_mutex_unlock (&backend->mutex);
-        g_object_unref (backend);
         break;
-      } else {
-        return NULL;
       }
     case LIBMTP_EVENT_OBJECT_ADDED:
-      backend = g_weak_ref_get (event_ref);
-      if (backend && !g_atomic_int_get (&backend->unmount_started)) {
-        g_mutex_lock (&backend->mutex);
-
+      {
         LIBMTP_file_t *object = LIBMTP_Get_Filemetadata(backend->device, param1);
         if (object) {
           /* Obtain parent's path by searching cache by object's parent
@@ -723,19 +712,14 @@ check_event (gpointer user_data)
 
           LIBMTP_destroy_file_t (object);
         }
-
-        g_mutex_unlock (&backend->mutex);
-        g_object_unref (backend);
         break;
-      } else {
-        return NULL;
       }
 #endif
     default:
       break;
     }
+    g_mutex_unlock (&backend->mutex);
   }
-  return NULL;
 }
 #endif
 
