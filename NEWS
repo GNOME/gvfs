@@ -1,3 +1,11 @@
+Major changes in 1.28.1
+=======================
+* udisks2: Abort mount operation if volume is unlocked
+* udisks2: Lock unlocked volumes on eject/stop
+* trash: Check modification time to avoid rereading
+* trash: Rescan trash dirs before operations with files
+* Translation updates
+
 Major changes in 1.28.0
 =======================
 * afc: Several fixes for recent iOS versions
