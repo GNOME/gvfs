@@ -786,6 +786,28 @@ read_data_buffer (GDataInputStream *stream)
 }
 
 static gboolean
+get_hostname_from_line (const gchar *buffer,
+                        gchar **hostname_out)
+{
+  gchar *startpos;
+  gchar *endpos;
+
+  /* Parse a line that looks like: "username@hostname's password:". */
+
+  startpos = strchr (buffer, '@');
+  if (!startpos)
+    return FALSE;
+
+  endpos = strchr (buffer, '\'');
+  if (!endpos)
+    return FALSE;
+
+  *hostname_out = g_strndup (startpos + 1, endpos - startpos - 1);
+
+  return TRUE;
+}
+
+static gboolean
 get_hostname_and_fingerprint_from_line (const gchar *buffer,
                                         gchar      **hostname_out,
                                         gchar      **fingerprint_out)
@@ -1104,6 +1126,7 @@ handle_login (GVfsBackend *backend,
                                               &new_password)))
             {
               GAskPasswordFlags flags = G_ASK_PASSWORD_NEED_PASSWORD;
+              gchar *hostname = NULL;
               
               g_debug ("handle_login #%d - asking for password...\n", i);
 
@@ -1115,20 +1138,22 @@ handle_login (GVfsBackend *backend,
 
               g_free (new_password);
               
+              get_hostname_from_line (buffer, &hostname);
+
               if (op_backend->user_specified)
                 if (strcmp (authtype, "publickey") == 0)
                   /* Translators: the first %s is the username, the second the host name */
                   prompt = g_strdup_printf (_("Enter passphrase for secure key for %s on %s"), op_backend->user, op_backend->host);
                 else
                   /* Translators: the first %s is the username, the second the host name */
-                  prompt = g_strdup_printf (_("Enter password for %s on %s"), op_backend->user, op_backend->host);
+                  prompt = g_strdup_printf (_("Enter password for %s on %s"), op_backend->user, hostname ? hostname : op_backend->host);
               else
                 if (strcmp (authtype, "publickey") == 0)
                   /* Translators: %s is the hostname */
                   prompt = g_strdup_printf (_("Enter passphrase for secure key for %s"), op_backend->host);
                 else
                   /* Translators: %s is the hostname */
-                  prompt = g_strdup_printf (_("Enter password for %s"), op_backend->host);
+                  prompt = g_strdup_printf (_("Enter password for %s"), hostname ? hostname : op_backend->host);
 
               if (!g_mount_source_ask_password (mount_source,
                                                 prompt,
