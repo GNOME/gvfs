@@ -854,9 +854,10 @@ get_hostname_and_ip_address (const gchar *buffer,
    * Warning: the ECDSA/RSA host key for 'hostname' differs from the key for the IP address '...'
    * First get the hostname.
    */
-  startpos = strchr (buffer, '\'') + 1;
+  startpos = strchr (buffer, '\'');
   if (!startpos)
     return FALSE;
+  startpos++;
 
   endpos = strchr (startpos, '\'');
   if (!endpos)
@@ -865,12 +866,13 @@ get_hostname_and_ip_address (const gchar *buffer,
   *hostname_out = g_strndup (startpos, endpos - startpos);
 
   /* Then get the ip address. */
-  startpos = strchr (endpos + 1, '\'') + 1;
+  startpos = strchr (endpos + 1, '\'');
   if (!startpos)
     {
       g_free (hostname_out);
       return FALSE;
     }
+  startpos++;
 
   endpos = strchr (startpos, '\'');
   if (!endpos)
