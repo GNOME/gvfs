@@ -608,10 +608,11 @@ on_udisks_client_changed (UDisksClient *client,
                           gpointer      user_data)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (user_data);
-  MountData *data = volume->mount_pending_op;
+  MountData *data;
 
   update_volume_on_event (volume);
 
+  data = volume->mount_pending_op;
   if (data && data->mount_operation_aborted_handler_id && data->encrypted_to_unlock)
     {
       UDisksBlock *cleartext_block;
