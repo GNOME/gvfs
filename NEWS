@@ -1,3 +1,9 @@
+Major changes in 1.29.1
+=======================
+* udisks2: Fix crashes when mounting encrypted volume
+* mtp: Refactor event handling in order to fix unmount crashes
+* Several smaller bugfixes
+
 Major changes in 1.28.1
 =======================
 * udisks2: Abort mount operation if volume is unlocked
