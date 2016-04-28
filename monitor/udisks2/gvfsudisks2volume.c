@@ -1298,7 +1298,7 @@ on_mount_operation_reply (GMountOperation       *mount_operation,
             {
               UDisksObject *object;
 
-              object = g_dbus_interface_get_object (G_DBUS_INTERFACE (cleartext_block));
+              object = UDISKS_OBJECT (g_dbus_interface_get_object (G_DBUS_INTERFACE (cleartext_block)));
               g_object_unref (cleartext_block);
               if (object != NULL)
                 {

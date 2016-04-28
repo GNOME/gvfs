@@ -721,7 +721,7 @@ unmount_and_lock (GVfsUDisks2Drive    *drive,
         {
           UDisksBlock *block;
 
-          block = gvfs_udisks2_volume_get_block (G_VOLUME (volume));
+          block = gvfs_udisks2_volume_get_block (volume);
           if (block != NULL)
             {
               UDisksEncrypted *encrypted;
