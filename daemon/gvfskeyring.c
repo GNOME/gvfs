@@ -119,8 +119,10 @@ build_network_label (const gchar *user,
     {
       s = g_string_new (NULL);
       if (user != NULL)
-	g_string_append_uri_escaped (s, user, G_URI_RESERVED_CHARS_ALLOWED_IN_USERINFO, TRUE);
-        g_string_append (s, "@");
+        {
+          g_string_append_uri_escaped (s, user, G_URI_RESERVED_CHARS_ALLOWED_IN_USERINFO, TRUE);
+          g_string_append (s, "@");
+        }
       g_string_append (s, server);
       if (port != 0)
         g_string_append_printf (s, ":%d", port);
