@@ -213,11 +213,11 @@ g_vfs_backend_localtest_finalize (GObject *object)
 
 	backend = G_VFS_BACKEND_LOCALTEST (object);
 
-    if (backend->test)
-    	g_free ((gpointer)backend->test);  
-  
+	if (backend->test)
+		g_free ((gpointer)backend->test);
+
 	if (G_OBJECT_CLASS (g_vfs_backend_localtest_parent_class)->finalize)
-      (*G_OBJECT_CLASS (g_vfs_backend_localtest_parent_class)->finalize) (object);
+		(*G_OBJECT_CLASS (g_vfs_backend_localtest_parent_class)->finalize) (object);
 }
 
 
