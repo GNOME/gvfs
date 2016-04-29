@@ -531,6 +531,7 @@ static void monitor_try_create (void);
  * dict:string->string  identifiers
  * string               sort_key
  * a{sv}                expansion
+ *      boolean              is-removable
  */
 #define DRIVE_STRUCT_TYPE "(ssssbbbbbbbbuasa{ss}sa{sv})"
 
@@ -546,6 +547,7 @@ drive_to_dbus (GDrive *drive)
   gboolean can_eject;
   gboolean can_poll_for_media;
   gboolean has_media;
+  gboolean is_removable;
   gboolean is_media_removable;
   gboolean is_media_check_automatic;
   gboolean can_start;
@@ -577,6 +579,7 @@ drive_to_dbus (GDrive *drive)
   can_eject = g_drive_can_eject (drive);
   can_poll_for_media = g_drive_can_poll_for_media (drive);
   has_media = g_drive_has_media (drive);
+  is_removable = g_drive_is_removable (drive);
   is_media_removable = g_drive_is_media_removable (drive);
   is_media_check_automatic = g_drive_is_media_check_automatic (drive);
   can_start = g_drive_can_start (drive);
@@ -616,6 +619,7 @@ drive_to_dbus (GDrive *drive)
     }
 
   expansion_builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
+  g_variant_builder_add (expansion_builder, "{sv}", "is-removable", g_variant_new_boolean (is_removable));
   /* left for future expansion without ABI breaks */
 
   for (n = 0; identifiers != NULL && identifiers[n] != NULL; n++)

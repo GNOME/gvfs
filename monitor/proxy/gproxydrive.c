@@ -53,6 +53,7 @@ struct _GProxyDrive {
   gboolean can_poll_for_media;
   gboolean is_media_check_automatic;
   gboolean has_media;
+  gboolean is_removable;
   gboolean is_media_removable;
   gboolean can_start;
   gboolean can_start_degraded;
@@ -141,6 +142,7 @@ g_proxy_drive_new (GProxyVolumeMonitor *volume_monitor)
  * dict:string->string  identifiers
  * string               sort_key
  * a{sv}                expansion
+ *      boolean              is-removable
  */
 #define DRIVE_STRUCT_TYPE "(&s&s&s&sbbbbbbbbuasa{ss}&sa{sv})"
 
@@ -168,6 +170,8 @@ g_proxy_drive_update (GProxyDrive  *drive,
   GVariantIter *iter_volume_ids;
   GVariantIter *iter_identifiers;
   GVariantIter *iter_expansion;
+  GVariant *value;
+  const gchar *key;
 
 
   sort_key = NULL;
@@ -238,7 +242,12 @@ g_proxy_drive_update (GProxyDrive  *drive,
   drive->volume_ids = g_strdupv ((char **) volume_ids->pdata);
   drive->sort_key = g_strdup (sort_key);
 
-  /* TODO: decode expansion, once used */
+  drive->is_removable = FALSE;
+  while (g_variant_iter_loop (iter_expansion, "{sv}", &key, &value))
+    {
+      if (g_str_equal (key, "is-removable"))
+        drive->is_removable = g_variant_get_boolean (value);
+    }
 
  out:
   g_variant_iter_free (iter_volume_ids);
@@ -329,6 +338,19 @@ g_proxy_drive_has_volumes (GDrive *drive)
 
   G_LOCK (proxy_drive);
   res = (proxy_drive->volume_ids != NULL && g_strv_length (proxy_drive->volume_ids) > 0);
+  G_UNLOCK (proxy_drive);
+
+  return res;
+}
+
+static gboolean
+g_proxy_drive_is_removable (GDrive *drive)
+{
+  GProxyDrive *proxy_drive = G_PROXY_DRIVE (drive);
+  gboolean res;
+
+  G_LOCK (proxy_drive);
+  res = proxy_drive->is_removable;
   G_UNLOCK (proxy_drive);
 
   return res;
@@ -1152,6 +1174,7 @@ g_proxy_drive_drive_iface_init (GDriveIface *iface)
   iface->get_symbolic_icon = g_proxy_drive_get_symbolic_icon;
   iface->has_volumes = g_proxy_drive_has_volumes;
   iface->get_volumes = g_proxy_drive_get_volumes;
+  iface->is_removable = g_proxy_drive_is_removable;
   iface->is_media_removable = g_proxy_drive_is_media_removable;
   iface->has_media = g_proxy_drive_has_media;
   iface->is_media_check_automatic = g_proxy_drive_is_media_check_automatic;

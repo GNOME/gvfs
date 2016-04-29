@@ -60,6 +60,7 @@ struct _GVfsUDisks2Drive
   gchar *sort_key;
   gchar *device_file;
   dev_t dev;
+  gboolean is_removable;
   gboolean is_media_removable;
   gboolean has_media;
   gboolean can_eject;
@@ -146,6 +147,7 @@ update_drive (GVfsUDisks2Drive *drive)
   gchar *old_sort_key;
   gchar *old_device_file;
   dev_t old_dev;
+  gboolean old_is_removable;
   gboolean old_is_media_removable;
   gboolean old_has_media;
   gboolean old_can_eject;
@@ -160,6 +162,7 @@ update_drive (GVfsUDisks2Drive *drive)
   /* ---------------------------------------------------------------------------------------------------- */
   /* save old values */
 
+  old_is_removable = drive->is_removable;
   old_is_media_removable = drive->is_media_removable;
   old_has_media = drive->has_media;
   old_can_eject = drive->can_eject;
@@ -175,7 +178,7 @@ update_drive (GVfsUDisks2Drive *drive)
   /* ---------------------------------------------------------------------------------------------------- */
   /* reset */
 
-  drive->is_media_removable = drive->has_media = drive->can_eject = drive->can_stop = FALSE;
+  drive->is_removable = drive->is_media_removable = drive->has_media = drive->can_eject = drive->can_stop = FALSE;
   g_free (drive->name); drive->name = NULL;
   g_free (drive->sort_key); drive->sort_key = NULL;
   g_free (drive->device_file); drive->device_file = NULL;
@@ -199,6 +202,7 @@ update_drive (GVfsUDisks2Drive *drive)
 
   drive->sort_key = g_strdup (udisks_drive_get_sort_key (drive->udisks_drive));
 
+  drive->is_removable = udisks_drive_get_removable (drive->udisks_drive);
   drive->is_media_removable = udisks_drive_get_media_removable (drive->udisks_drive);
   if (drive->is_media_removable)
     {
@@ -294,7 +298,8 @@ update_drive (GVfsUDisks2Drive *drive)
 
   /* ---------------------------------------------------------------------------------------------------- */
   /* compute whether something changed */
-  changed = !((old_is_media_removable == drive->is_media_removable) &&
+  changed = !((old_is_removable == drive->is_removable) &&
+              (old_is_media_removable == drive->is_media_removable) &&
               (old_has_media == drive->has_media) &&
               (old_can_eject == drive->can_eject) &&
               (old_can_stop == drive->can_stop) &&
@@ -431,6 +436,13 @@ gvfs_udisks2_drive_has_volumes (GDrive *_drive)
   gboolean res;
   res = drive->volumes != NULL;
   return res;
+}
+
+static gboolean
+gvfs_udisks2_drive_is_removable (GDrive *_drive)
+{
+  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+  return drive->is_removable;
 }
 
 static gboolean
@@ -1055,6 +1067,7 @@ gvfs_udisks2_drive_drive_iface_init (GDriveIface *iface)
   iface->get_symbolic_icon = gvfs_udisks2_drive_get_symbolic_icon;
   iface->has_volumes = gvfs_udisks2_drive_has_volumes;
   iface->get_volumes = gvfs_udisks2_drive_get_volumes;
+  iface->is_removable = gvfs_udisks2_drive_is_removable;
   iface->is_media_removable = gvfs_udisks2_drive_is_media_removable;
   iface->has_media = gvfs_udisks2_drive_has_media;
   iface->is_media_check_automatic = gvfs_udisks2_drive_is_media_check_automatic;
