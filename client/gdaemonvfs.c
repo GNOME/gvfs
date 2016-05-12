@@ -703,8 +703,7 @@ lookup_mount_info_in_cache (GMountSpec *spec,
 }
 
 static GMountInfo *
-lookup_mount_info_by_fuse_path_in_cache (const char *fuse_path,
-					 char **mount_path)
+lookup_mount_info_by_fuse_path_in_cache (const char *fuse_path)
 {
   GMountInfo *info;
   GList *l;
@@ -717,19 +716,16 @@ lookup_mount_info_by_fuse_path_in_cache (const char *fuse_path,
 
       if (mount_info->fuse_mountpoint != NULL &&
 	  g_str_has_prefix (fuse_path, mount_info->fuse_mountpoint))
-	{
-	  int len = strlen (mount_info->fuse_mountpoint);
-	  if (fuse_path[len] == 0 ||
-	      fuse_path[len] == '/')
-	    {
-	      if (fuse_path[len] == 0)
-		*mount_path = g_strdup ("/");
-	      else
-		*mount_path = g_strdup (fuse_path + len);
-	      info = g_mount_info_ref (mount_info);
-	      break;
-	    }
-	}
+        {
+          int len = strlen (mount_info->fuse_mountpoint);
+          /* empty path always matches. Also check if we have a path
+           * not two paths that accidently share the same prefix */
+          if (fuse_path[len] == 0 || fuse_path[len] == '/')
+            {
+              info = g_mount_info_ref (mount_info);
+              break;
+            }
+        }
     }
   G_UNLOCK (mount_cache);
 
@@ -976,28 +972,27 @@ _g_daemon_vfs_get_mount_info_by_fuse_sync (const char *fuse_path,
   GMountInfo *info;
   int len;
   const char *mount_path_end;
-  GVfsDBusMountTracker *proxy;
+  GVfsDBusMountTracker *proxy = NULL;
   GVariant *iter_mount;
 
-  info = lookup_mount_info_by_fuse_path_in_cache (fuse_path,
-						  mount_path);
-  if (info != NULL)
-    return info;
-  
-  proxy = create_mount_tracker_proxy ();
-  if (proxy == NULL)
-    return NULL;
-  
-  if (gvfs_dbus_mount_tracker_call_lookup_mount_by_fuse_path_sync (proxy,
-                                                                   fuse_path,
-                                                                   &iter_mount,
-                                                                   NULL,
-                                                                   NULL))
+  info = lookup_mount_info_by_fuse_path_in_cache (fuse_path);
+  if (!info)
     {
-      info = handler_lookup_mount_reply (iter_mount, NULL);
-      g_variant_unref (iter_mount);
+      proxy = create_mount_tracker_proxy ();
+      if (proxy == NULL)
+        return NULL;
+
+      if (gvfs_dbus_mount_tracker_call_lookup_mount_by_fuse_path_sync (proxy,
+                                                                       fuse_path,
+                                                                       &iter_mount,
+                                                                       NULL,
+                                                                       NULL))
+        {
+          info = handler_lookup_mount_reply (iter_mount, NULL);
+          g_variant_unref (iter_mount);
+        }
     }
-  
+
   if (info)
     {
       if (info->fuse_mountpoint)
@@ -1020,7 +1015,7 @@ _g_daemon_vfs_get_mount_info_by_fuse_sync (const char *fuse_path,
 	}
     }
 
-  g_object_unref (proxy);
+  g_clear_object (&proxy);
 
   return info;
 }
