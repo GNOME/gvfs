@@ -505,9 +505,9 @@ gvfsd_mtp_CPPFLAGS = \
 	-DDEFAULT_BACKEND_TYPE=mtp \
 	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"mtp", G_VFS_TYPE_BACKEND_MTP,' \
-	$(GUDEV_CFLAGS) $(LIBMTP_CFLAGS)
+	$(GUDEV_CFLAGS) $(LIBMTP_CFLAGS) $(LIBUSB_CFLAGS)
 
-gvfsd_mtp_LDADD = $(libraries) $(GUDEV_LIBS) $(LIBMTP_LIBS) \
+gvfsd_mtp_LDADD = $(libraries) $(GUDEV_LIBS) $(LIBMTP_LIBS) $(LIBUSB_LIBS) \
 		  $(top_builddir)/common/libgvfscommon-gphoto2.la
 
 gvfsd_http_SOURCES = \

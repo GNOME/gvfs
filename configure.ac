@@ -478,6 +478,25 @@ AC_SUBST(BLURAY_CFLAGS)
 AC_SUBST(BLURAY_LIBS)
 AM_CONDITIONAL([HAVE_BLURAY], [test "$msg_bluray" = "yes"])
 
+dnl ************************************************
+dnl *** Check if we should build with libusb-1.0 ***
+dnl ************************************************
+AC_ARG_ENABLE([libusb], [AS_HELP_STRING([--disable-libusb],[build without libusb support])])
+msg_libusb=no
+
+if test "x$enable_libusb" != "xno"; then
+  PKG_CHECK_EXISTS([libusb-1.0 >= 1.0.21], [msg_libusb=yes])
+
+  if test "x$msg_libusb" = "xyes"; then
+    PKG_CHECK_MODULES([LIBUSB], [libusb-1.0 >= 1.0.21])
+    AC_DEFINE([HAVE_LIBUSB], 1, [Define to 1 if libusb is going to be built])
+  fi
+fi
+
+AC_SUBST(LIBUSB_CFLAGS)
+AC_SUBST(LIBUSB_LIBS)
+AM_CONDITIONAL([HAVE_LIBUSB], [test "$msg_libusb" = "yes"])
+
 dnl *************************
 dnl *** Check for libmtp ***
 dnl *************************
@@ -901,6 +920,7 @@ echo "
         Gphoto2 support:              $msg_gphoto2
         MTP support:                  $msg_libmtp
 	Polkit support:               $msg_admin
+        USB support:                  $msg_libusb
 	archive support:              $msg_archive
 	AFC support:                  $msg_afc
         AFP support:                  $msg_afp

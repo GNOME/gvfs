@@ -34,6 +34,9 @@
 #include <gio/gio.h>
 
 #include <libmtp.h>
+#if HAVE_LIBUSB
+#include <libusb.h>
+#endif
 
 #include "gvfsbackendmtp.h"
 #include "gvfsicon.h"
@@ -76,7 +79,11 @@
  * Constants
  ************************************************/
 
+#if HAVE_LIBUSB
+#define EVENT_POLL_PERIOD { 3600, 0 }
+#else
 #define EVENT_POLL_PERIOD { 1, 0 }
+#endif
 
 /************************************************
  * Private Types
@@ -958,6 +965,10 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
   g_mutex_lock (&op_backend->mutex);
 
   g_atomic_int_set (&op_backend->unmount_started, TRUE);
+
+#if HAVE_LIBUSB
+  libusb_interrupt_event_handler (NULL);
+#endif
 
 #ifdef HAVE_LIBMTP_1_1_12
   /* Thread will terminate after flag is set. */
