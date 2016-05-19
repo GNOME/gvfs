@@ -1652,7 +1652,12 @@ g_mount_spec_to_dav_uri (GMountSpec *spec)
     soup_uri_set_scheme (uri, SOUP_URI_SCHEME_HTTP);
 
   soup_uri_set_user (uri, user);
-  soup_uri_set_host (uri, host);
+
+  /* IPv6 host does not include brackets in SoupURI, but GMountSpec host does */
+  if (host[0] == '[')
+    uri->host = g_strndup (host + 1, strlen (host) - 2);
+  else
+    soup_uri_set_host (uri, host);
 
   if (port && (port_num = atoi (port)))
     soup_uri_set_port (uri, port_num);
@@ -1693,7 +1698,15 @@ g_mount_spec_from_dav_uri (GVfsBackendDav *dav_backend,
 
   spec = g_mount_spec_new ("dav");
 
-  g_mount_spec_set (spec, "host", uri->host);
+  /* IPv6 host does not include brackets in SoupURI, but GMountSpec host does */
+  if (strchr (uri->host, ':'))
+    {
+      char *host = g_strdup_printf ("[%s]", uri->host);
+      g_mount_spec_set (spec, "host", host);
+      g_free (host);
+    }
+  else
+    g_mount_spec_set (spec, "host", uri->host);
 
   if (uri->scheme == SOUP_URI_SCHEME_HTTPS)
     ssl = "true";
