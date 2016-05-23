@@ -1,3 +1,11 @@
+Major changes in 1.29.2
+=======================
+* client: Fix missing mount prefix in cached fuse paths
+* monitor: Add g_drive_is_removable() support
+* dav: Fix IPv6 address handling
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.29.1
 =======================
 * udisks2: Fix crashes when mounting encrypted volume
