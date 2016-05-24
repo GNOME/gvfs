@@ -75,7 +75,7 @@ gvfsd_fuse_CFLAGS = \
         -I$(top_srcdir)/common \
         -I$(top_builddir)/common \
         $(GLIB_CFLAGS) $(FUSE_CFLAGS) \
-        -UG_LOG_DOMAIN -DG_LOG_DOMAIN=\"GVFS-FUSE\"
+        -UG_LOG_DOMAIN
 
 gvfsd_fuse_LDADD = \
 	$(top_builddir)/common/libgvfscommon.la \

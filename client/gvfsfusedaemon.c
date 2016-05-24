@@ -41,12 +41,11 @@
 /* stuff from common/ */
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdbus.h>
+#include <gvfsutils.h>
 
 #define FUSE_USE_VERSION 26
 #include <fuse.h>
 #include <fuse_lowlevel.h>
-
-#define DEBUG_ENABLED 0
 
 #define GET_FILE_HANDLE(fi)     ((gpointer) (fi)->fh)
 #define SET_FILE_HANDLE(fi, fh) ((fi)->fh = (guint64) (fh))
@@ -100,31 +99,13 @@ static guint            daemon_name_watcher;
  * ------- */
 
 static void
-debug_print (const gchar *message, ...)
+log_debug (const gchar   *log_domain,
+           GLogLevelFlags log_level,
+           const gchar   *message,
+           gpointer       unused_data)
 {
-#if DEBUG_ENABLED
-
-  static FILE *debug_fhd = NULL;
-  va_list      var_args;
-  char *file;
-
-  if (!debug_fhd)
-    {
-      file = g_build_filename (g_get_home_dir (), "vfs.debug", NULL);
-      debug_fhd = fopen (file, "at");
-      g_free (file);
-    }
-
-  if (!debug_fhd)
-    return;
-  
-  va_start (var_args, message);
-  g_vfprintf (debug_fhd, message, var_args);
-  va_end (var_args);
-  
-  fflush (debug_fhd);
-
-#endif
+  if (gvfs_get_debug ())
+    g_print ("%s", message);
 }
 
 typedef struct {
@@ -257,7 +238,7 @@ file_handle_unref (FileHandle *file_handle)
 static void
 file_handle_close_stream (FileHandle *file_handle)
 {
-  debug_print ("file_handle_close_stream\n");
+  g_debug ("file_handle_close_stream\n");
   if (file_handle->stream)
     {
       switch (file_handle->op)
@@ -634,7 +615,7 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
   GError *error  = NULL;
   gint    result = 0;
 
-  debug_print ("vfs_statfs: %s\n", path);
+  g_debug ("vfs_statfs: %s\n", path);
 
   memset (stbuf, 0, sizeof (*stbuf));
 
@@ -679,7 +660,7 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
       g_object_unref (file);
     }
 
-  debug_print ("vfs_statfs: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_statfs: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -800,13 +781,13 @@ getattr_for_file (GFile *file, struct stat *sbuf)
     {
       if (error)
         {
-          debug_print ("Error from GVFS: %s\n", error->message);
+          g_debug ("Error from GVFS: %s\n", error->message);
           result = -errno_from_error (error);
           g_error_free (error);
         }
       else
         {
-          debug_print ("No file info, but no error from GVFS.\n");
+          g_debug ("No file info, but no error from GVFS.\n");
           result = -EIO;
         }
     }
@@ -847,13 +828,13 @@ getattr_for_file_handle (FileHandle *fh, struct stat *sbuf)
     {
       if (error)
         {
-          debug_print ("Error from GVFS: %s\n", error->message);
+          g_debug ("Error from GVFS: %s\n", error->message);
           result = -errno_from_error (error);
           g_error_free (error);
         }
       else
         {
-          debug_print ("No file info, but no error from GVFS.\n");
+          g_debug ("No file info, but no error from GVFS.\n");
           result = -EIO;
         }
     }
@@ -867,7 +848,7 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
   GFile      *file;
   gint        result = 0;
 
-  debug_print ("vfs_getattr: %s\n", path);
+  g_debug ("vfs_getattr: %s\n", path);
 
   memset (sbuf, 0, sizeof (*sbuf));
 
@@ -950,7 +931,7 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_getattr: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_getattr: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -958,7 +939,7 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
 static gint
 vfs_readlink (const gchar *path, gchar *target, size_t size)
 {
-  debug_print ("vfs_readlink: %s\n", path);
+  g_debug ("vfs_readlink: %s\n", path);
 
   /* This is not implemented because it would allow remote servers to launch
    * symlink attacks on the local machine.  There's not much of a use for
@@ -976,15 +957,15 @@ setup_input_stream (GFile *file, FileHandle *fh)
 
   if (fh->stream)
     {
-      debug_print ("setup_input_stream: have stream\n");
+      g_debug ("setup_input_stream: have stream\n");
 
       if (fh->op == FILE_OP_READ)
         {
-          debug_print ("setup_input_stream: doing read\n");
+          g_debug ("setup_input_stream: doing read\n");
         }
       else
         {
-          debug_print ("setup_input_stream: doing write\n");
+          g_debug ("setup_input_stream: doing write\n");
 
           g_output_stream_close (fh->stream, NULL, NULL);
           g_object_unref (fh->stream);
@@ -995,7 +976,7 @@ setup_input_stream (GFile *file, FileHandle *fh)
 
   if (!fh->stream)
     {
-      debug_print ("setup_input_stream: no stream\n");
+      g_debug ("setup_input_stream: no stream\n");
       fh->stream = g_file_read (file, NULL, &error);
       fh->pos = 0;
     }
@@ -1007,7 +988,7 @@ setup_input_stream (GFile *file, FileHandle *fh)
 
   if (error)
     {
-      debug_print ("setup_input_stream: error\n");
+      g_debug ("setup_input_stream: error\n");
       result = -errno_from_error (error);
       g_error_free (error);
     }
@@ -1073,7 +1054,7 @@ open_common (const gchar *path, struct fuse_file_info *fi, GFile *file, int outp
 
   SET_FILE_HANDLE (fi, fh);
 
-  debug_print ("open_common: flags=%o\n", fi->flags);
+  g_debug ("open_common: flags=%o\n", fi->flags);
 
   /* Set up a stream here, so we can check for errors */
   set_pid_for_file (file);
@@ -1098,7 +1079,7 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
   GFile *file;
   gint   result = 0;
 
-  debug_print ("vfs_open: %s\n", path);
+  g_debug ("vfs_open: %s\n", path);
 
   if (path_is_mount_list (path))
     result = -EISDIR;
@@ -1134,13 +1115,13 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
         {
           if (error)
             {
-              debug_print ("Error from GVFS: %s\n", error->message);
+              g_debug ("Error from GVFS: %s\n", error->message);
               result = -errno_from_error (error);
               g_error_free (error);
             }
           else
             {
-              debug_print ("No file info, but no error from GVFS.\n");
+              g_debug ("No file info, but no error from GVFS.\n");
               result = -EIO;
             }
         }
@@ -1152,7 +1133,7 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_open: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_open: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1163,7 +1144,7 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
   GFile *file;
   gint   result = 0;
 
-  debug_print ("vfs_create: %s\n", path);
+  g_debug ("vfs_create: %s\n", path);
 
   if (path_is_mount_list (path))
     result = -EEXIST;
@@ -1225,7 +1206,7 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_create: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_create: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1235,7 +1216,7 @@ vfs_release (const gchar *path, struct fuse_file_info *fi)
 {
   FileHandle *fh = get_file_handle_from_info (fi);
 
-  debug_print ("vfs_release: %s\n", path);
+  g_debug ("vfs_release: %s\n", path);
 
   if (fh)
     {
@@ -1268,7 +1249,7 @@ read_stream (FileHandle *fh, gchar *output_buf, size_t output_buf_size, off_t of
         {
           /* Can seek */
 
-          debug_print ("read_stream: seeking to offset %d.\n", offset);
+          g_debug ("read_stream: seeking to offset %jd.\n", offset);
 
           if (g_seekable_seek (G_SEEKABLE (input_stream), offset, G_SEEK_SET, NULL, &error))
             {
@@ -1284,7 +1265,7 @@ read_stream (FileHandle *fh, gchar *output_buf, size_t output_buf_size, off_t of
         {
           /* Can skip ahead */
 
-          debug_print ("read_stream: skipping to offset %d.\n", offset);
+          g_debug ("read_stream: skipping to offset %jd.\n", offset);
 
           n_bytes_skipped = g_input_stream_skip (input_stream, offset - fh->pos, NULL, &error);
 
@@ -1308,7 +1289,7 @@ read_stream (FileHandle *fh, gchar *output_buf, size_t output_buf_size, off_t of
         {
           /* Can't seek, can't skip backwards */
 
-          debug_print ("read_stream: can't seek nor skip to offset %d!\n", offset);
+          g_debug ("read_stream: can't seek nor skip to offset %jd!\n", offset);
 
           result = -ENOTSUP;
         }
@@ -1339,7 +1320,7 @@ read_stream (FileHandle *fh, gchar *output_buf, size_t output_buf_size, off_t of
 
       if (n_bytes_read < output_buf_size)
         {
-          debug_print ("read_stream: wanted %d bytes, but got %d.\n", output_buf_size, n_bytes_read);
+          g_debug ("read_stream: wanted %zd bytes, but got %d.\n", output_buf_size, n_bytes_read);
 
           if (error)
             {
@@ -1359,7 +1340,7 @@ vfs_read (const gchar *path, gchar *buf, size_t size,
   GFile *file;
   gint   result = 0;
 
-  debug_print ("vfs_read: %s\n", path);
+  g_debug ("vfs_read: %s\n", path);
 
   if ((file = file_from_full_path (path)))
     {
@@ -1377,7 +1358,7 @@ vfs_read (const gchar *path, gchar *buf, size_t size,
             }
           else
             {
-              debug_print ("vfs_read: failed to setup input_stream!\n");
+              g_debug ("vfs_read: failed to setup input_stream!\n");
             }
 
           g_mutex_unlock (&fh->mutex);
@@ -1396,9 +1377,9 @@ vfs_read (const gchar *path, gchar *buf, size_t size,
     }
 
   if (result < 0)
-    debug_print ("vfs_read: -> %s\n", g_strerror (-result));
+    g_debug ("vfs_read: -> %s\n", g_strerror (-result));
   else
-    debug_print ("vfs_read: -> %d bytes read.\n", result);
+    g_debug ("vfs_read: -> %d bytes read.\n", result);
 
   return result;
 }
@@ -1415,7 +1396,7 @@ write_stream (FileHandle *fh,
   gint           result          = 0;
   GError        *error           = NULL;
 
-  debug_print ("write_stream: %d bytes at offset %d.\n", input_buf_size, offset);
+  g_debug ("write_stream: %zd bytes at offset %ju.\n", input_buf_size, offset);
 
   output_stream = fh->stream;
 
@@ -1494,8 +1475,8 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
   GFile *file;
   gint   result = 0;
 
-  debug_print ("vfs_write: %s\n", path);
-  debug_print ("vfs_write: flags=%o\n", fi->flags);
+  g_debug ("vfs_write: %s\n", path);
+  g_debug ("vfs_write: flags=%o\n", fi->flags);
 
   if ((file = file_from_full_path (path)))
     {
@@ -1528,9 +1509,9 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
     }
 
   if (result < 0)
-    debug_print ("vfs_write: -> %s\n", g_strerror (-result));
+    g_debug ("vfs_write: -> %s\n", g_strerror (-result));
   else
-    debug_print ("vfs_write: -> %d bytes written.\n", result);
+    g_debug ("vfs_write: -> %d bytes written.\n", result);
 
   return result;
 }
@@ -1541,7 +1522,7 @@ vfs_opendir (const gchar *path, struct fuse_file_info *fi)
   GFile *file;
   gint result = 0;
 
-  debug_print ("vfs_opendir: %s\n", path);
+  g_debug ("vfs_opendir: %s\n", path);
 
   if (path_is_mount_list (path))
     {
@@ -1581,13 +1562,13 @@ readdir_for_file (GFile *base_file, gpointer buf, fuse_fill_dir_t filler)
 
       if (error)
         {
-          debug_print ("Error from GVFS: %s\n", error->message);
+          g_debug ("Error from GVFS: %s\n", error->message);
           result = -errno_from_error (error);
           g_error_free (error);
         }
       else
         {
-          debug_print ("No file info, but no error from GVFS.\n");
+          g_debug ("No file info, but no error from GVFS.\n");
           result = -EIO;
         }
 
@@ -1615,7 +1596,7 @@ vfs_readdir (const gchar *path, gpointer buf, fuse_fill_dir_t filler, off_t offs
   GFile       *base_file;
   gint         result = 0;
 
-  debug_print ("vfs_readdir: %s\n", path);
+  g_debug ("vfs_readdir: %s\n", path);
 
   if (path_is_mount_list (path))
     {
@@ -1663,7 +1644,7 @@ vfs_rename (const gchar *old_path, const gchar *new_path)
   GError *error  = NULL;
   gint    result = 0;
 
-  debug_print ("vfs_rename: %s -> %s\n", old_path, new_path);
+  g_debug ("vfs_rename: %s -> %s\n", old_path, new_path);
 
   old_file = file_from_full_path (old_path);
   new_file = file_from_full_path (new_path);
@@ -1682,7 +1663,7 @@ vfs_rename (const gchar *old_path, const gchar *new_path)
 
       if (error)
         {
-          debug_print ("vfs_rename failed: %s\n", error->message);
+          g_debug ("vfs_rename failed: %s\n", error->message);
 
           result = -errno_from_error (error);
           g_error_free (error);
@@ -1708,7 +1689,7 @@ vfs_rename (const gchar *old_path, const gchar *new_path)
   if (new_file)
     g_object_unref (new_file);
 
-  debug_print ("vfs_rename: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_rename: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1720,7 +1701,7 @@ vfs_unlink (const gchar *path)
   GError *error  = NULL;
   gint    result = 0;
 
-  debug_print ("vfs_unlink: %s\n", path);
+  g_debug ("vfs_unlink: %s\n", path);
 
   file = file_from_full_path (path);
 
@@ -1744,7 +1725,7 @@ vfs_unlink (const gchar *path)
 
       if (error)
         {
-          debug_print ("vfs_unlink failed: %s (%s)\n", path, error->message);
+          g_debug ("vfs_unlink failed: %s (%s)\n", path, error->message);
 
           result = -errno_from_error (error);
           g_error_free (error);
@@ -1757,7 +1738,7 @@ vfs_unlink (const gchar *path)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_unlink: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_unlink: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1769,7 +1750,7 @@ vfs_mkdir (const gchar *path, mode_t mode)
   GError *error  = NULL;
   gint    result = 0;
 
-  debug_print ("vfs_mkdir: %s\n", path);
+  g_debug ("vfs_mkdir: %s\n", path);
 
   file = file_from_full_path (path);
 
@@ -1795,7 +1776,7 @@ vfs_mkdir (const gchar *path, mode_t mode)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_mkdir: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_mkdir: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1807,7 +1788,7 @@ vfs_rmdir (const gchar *path)
   GError *error = NULL;
   gint   result = 0;
 
-  debug_print ("vfs_rmdir: %s\n", path);
+  g_debug ("vfs_rmdir: %s\n", path);
 
   file = file_from_full_path (path);
 
@@ -1851,7 +1832,7 @@ vfs_rmdir (const gchar *path)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_rmdir: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_rmdir: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1979,7 +1960,7 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
   GFile  *file;
   gint    result = 0;
 
-  debug_print ("vfs_ftruncate: %s\n", path);
+  g_debug ("vfs_ftruncate: %s\n", path);
 
   file = file_from_full_path (path);
 
@@ -2011,7 +1992,7 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_ftruncate: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_ftruncate: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -2023,7 +2004,7 @@ vfs_truncate (const gchar *path, off_t size)
   GError *error  = NULL;
   gint    result = 0;
 
-  debug_print ("vfs_truncate: %s\n", path);
+  g_debug ("vfs_truncate: %s\n", path);
 
   file = file_from_full_path (path);
 
@@ -2080,7 +2061,7 @@ vfs_truncate (const gchar *path, off_t size)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_truncate: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_truncate: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -2092,7 +2073,7 @@ vfs_symlink (const gchar *path_old, const gchar *path_new)
   GError *error  = NULL;
   gint    result = 0;
 
-  debug_print ("vfs_symlink: %s -> %s\n", path_new, path_old);
+  g_debug ("vfs_symlink: %s -> %s\n", path_new, path_old);
 
   file = file_from_full_path (path_new);
 
@@ -2111,7 +2092,7 @@ vfs_symlink (const gchar *path_old, const gchar *path_new)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_symlink: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_symlink: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -2123,7 +2104,7 @@ vfs_access (const gchar *path, gint mode)
   GError *error  = NULL;
   gint    result = 0;
 
-  debug_print ("vfs_access: %s\n", path);
+  g_debug ("vfs_access: %s\n", path);
 
   file = file_from_full_path (path);
 
@@ -2186,7 +2167,7 @@ vfs_access (const gchar *path, gint mode)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_access: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_access: -> %s\n", g_strerror (-result));
   return result;
 }
 
@@ -2197,7 +2178,7 @@ vfs_utimens (const gchar *path, const struct timespec tv [2])
   GError *error  = NULL;
   gint    result = 0;
 
-  debug_print ("vfs_utimens: %s\n", path);
+  g_debug ("vfs_utimens: %s\n", path);
 
   file = file_from_full_path (path);
 
@@ -2261,7 +2242,7 @@ vfs_utimens (const gchar *path, const struct timespec tv [2])
       result = -ENOENT;
     }
 
-  debug_print ("vfs_utimens: -> %s\n", g_strerror (-result));
+  g_debug ("vfs_utimens: -> %s\n", g_strerror (-result));
   return result;
 }
 
@@ -2394,6 +2375,13 @@ vfs_init (struct fuse_conn_info *conn)
   GVfsDBusMountTracker *proxy;
   GError *error;
   
+  g_log_set_handler (NULL, G_LOG_LEVEL_DEBUG, log_debug, NULL);
+  gvfs_setup_debug_handler ();
+  if (g_getenv ("GVFS_DEBUG_FUSE"))
+    {
+      gvfs_set_debug (TRUE);
+    }
+
   daemon_creation_time = time (NULL);
   daemon_uid = getuid ();
   daemon_gid = getgid ();
