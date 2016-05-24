@@ -38,6 +38,8 @@ from glob import glob
 from gi.repository import GLib, Gio
 
 try:
+    import gi
+    gi.require_version('UMockdev', '1.0')
     from gi.repository import UMockdev
     have_umockdev = subprocess.call(['which', 'umockdev-wrapper'], stdout=subprocess.PIPE) == 0
     # needs >= 0.2.10
