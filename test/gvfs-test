@@ -55,7 +55,7 @@ def find_alternative(cmds):
     '''Find command in cmds array and return the found alternative'''
 
     for cmd in cmds:
-        if subprocess.call(['which', cmd], stdout=subprocess.PIPE) == 0:
+        if subprocess.call(['which', cmd], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0:
             return cmd
 
 in_testbed = os.path.exists('/home/gvfs_sandbox_marker')
