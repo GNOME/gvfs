@@ -103,8 +103,7 @@ on_name_acquired (GDBusConnection *connection,
       g_spawn_async (NULL,
                      argv2,
                      NULL,
-                     G_SPAWN_STDOUT_TO_DEV_NULL |
-                     G_SPAWN_STDERR_TO_DEV_NULL, 
+                     G_SPAWN_LEAVE_DESCRIPTORS_OPEN,
                      NULL, NULL,
                      NULL, NULL);
       
