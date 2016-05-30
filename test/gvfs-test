@@ -51,6 +51,7 @@ except ImportError:
 umockdev_testbed = None
 
 have_twistd = subprocess.call(['which', 'twistd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+have_smbd = subprocess.call(['which', 'smbd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
 def find_alternative(cmds):
     '''Find command in cmds array and return the found alternative'''
@@ -747,6 +748,7 @@ class Ftp(GvfsTestCase):
             self.assertEqual(contents, b'hello world\n')
 
 
+@unittest.skipUnless(have_smbd, 'Samba smbd not installed')
 class Smb(GvfsTestCase):
     def setUp(self):
         '''start local smbd as user if we are not in test bed'''
