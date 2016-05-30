@@ -50,6 +50,7 @@ except ImportError:
 # umockdev environment for gphoto/MTP tests
 umockdev_testbed = None
 
+have_twistd = subprocess.call(['which', 'twistd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
 def find_alternative(cmds):
     '''Find command in cmds array and return the found alternative'''
@@ -564,6 +565,7 @@ Subsystem sftp %(sftp_server)s
             self.unmount(uri)
 
 
+@unittest.skipUnless(have_twistd, 'Twisted twistd not installed')
 class Ftp(GvfsTestCase):
     def setUp(self):
         '''Launch FTP server'''
