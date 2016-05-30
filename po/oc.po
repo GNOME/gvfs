@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: po_gvfs-oc\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-04-29 12:23+0000\n"
+"POT-Creation-Date: 2016-05-24 12:14+0000\n"
 "PO-Revision-Date: 2016-02-28 16:10+0200\n"
 "Last-Translator: Cédric Valmary (totenoc.eu) <cvalmary@yahoo.fr>\n"
 "Language-Team: Tot En Òc\n"
@@ -57,22 +57,22 @@ msgid "Invalid filename %s"
 msgstr "Nom de fichièr invalid : %s"
 
 #: ../client/gdaemonfile.c:2663 ../client/gdaemonfile.c:2673
-#: ../client/gdaemonfile.c:2695 ../client/gdaemonvfs.c:1237
-#: ../client/gdaemonvfs.c:1258 ../client/gdaemonvfs.c:1269
-#: ../client/gdaemonvfs.c:1301
+#: ../client/gdaemonfile.c:2695 ../client/gdaemonvfs.c:1232
+#: ../client/gdaemonvfs.c:1253 ../client/gdaemonvfs.c:1264
+#: ../client/gdaemonvfs.c:1296
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Error al moment de la definicion de las metadonadas del fichièr : %s"
 
-#: ../client/gdaemonfile.c:2664 ../client/gdaemonvfs.c:1259
+#: ../client/gdaemonfile.c:2664 ../client/gdaemonvfs.c:1254
 msgid "can't open metadata tree"
 msgstr "impossible de dobrir l'arborescéncia de las metadonadas"
 
-#: ../client/gdaemonfile.c:2674 ../client/gdaemonvfs.c:1270
+#: ../client/gdaemonfile.c:2674 ../client/gdaemonvfs.c:1265
 msgid "can't get metadata proxy"
 msgstr "impossible de modificar la clau de metadonadas"
 
-#: ../client/gdaemonfile.c:2696 ../client/gdaemonvfs.c:1302
+#: ../client/gdaemonfile.c:2696 ../client/gdaemonvfs.c:1297
 msgid "values must be string or list of strings"
 msgstr ""
 "las valors devon èsser una cadena de caractèrs o una lista de cadenas de "
@@ -97,9 +97,9 @@ msgstr ""
 #: ../daemon/gvfsbackendtest.c:92 ../daemon/gvfsbackendtest.c:125
 #: ../daemon/gvfsbackendtest.c:188 ../daemon/gvfschannel.c:346
 #: ../daemon/gvfsftptask.c:224 ../monitor/gdu/ggdumount.c:1072
-#: ../monitor/proxy/gproxydrive.c:547 ../monitor/proxy/gproxydrive.c:635
-#: ../monitor/proxy/gproxydrive.c:785 ../monitor/proxy/gproxydrive.c:923
-#: ../monitor/proxy/gproxydrive.c:961 ../monitor/proxy/gproxydrive.c:1086
+#: ../monitor/proxy/gproxydrive.c:569 ../monitor/proxy/gproxydrive.c:657
+#: ../monitor/proxy/gproxydrive.c:807 ../monitor/proxy/gproxydrive.c:945
+#: ../monitor/proxy/gproxydrive.c:983 ../monitor/proxy/gproxydrive.c:1108
 #: ../monitor/proxy/gproxymount.c:502 ../monitor/proxy/gproxymount.c:587
 #: ../monitor/proxy/gproxyvolume.c:862 ../monitor/proxy/gproxyvolume.c:926
 msgid "Operation was cancelled"
@@ -134,7 +134,7 @@ msgstr "L'operacion « seek » es pas presa en carga per un flux"
 msgid "Truncate not supported on stream"
 msgstr "La troncatura es pas presa en carga sul flux"
 
-#: ../client/gdaemonvfs.c:784
+#: ../client/gdaemonvfs.c:780
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr ""
@@ -420,8 +420,8 @@ msgstr "Lo fichièr existís pas"
 
 #: ../daemon/gvfsafpvolume.c:418 ../daemon/gvfsafpvolume.c:2533
 #: ../daemon/gvfsbackendafp.c:289 ../daemon/gvfsbackendafp.c:492
-#: ../daemon/gvfsbackendafp.c:1341 ../daemon/gvfsbackenddav.c:2291
-#: ../daemon/gvfsbackenddav.c:2954 ../daemon/gvfsbackenddav.c:3234
+#: ../daemon/gvfsbackendafp.c:1341 ../daemon/gvfsbackenddav.c:2304
+#: ../daemon/gvfsbackenddav.c:2967 ../daemon/gvfsbackenddav.c:3247
 #: ../daemon/gvfsbackendftp.c:815 ../daemon/gvfsbackendnfs.c:2476
 #: ../daemon/gvfsbackendsftp.c:2654 ../daemon/gvfsbackendsftp.c:3429
 #: ../daemon/gvfsbackendsftp.c:3757 ../daemon/gvfsbackendsftp.c:4821
@@ -438,7 +438,7 @@ msgid "Target file is open"
 msgstr "Lo fichièr cibla es dobèrt"
 
 #: ../daemon/gvfsafpvolume.c:688 ../daemon/gvfsbackendafc.c:208
-#: ../daemon/gvfsbackendburn.c:421 ../daemon/gvfsbackenddav.c:2681
+#: ../daemon/gvfsbackendburn.c:421 ../daemon/gvfsbackenddav.c:2694
 #: ../daemon/gvfsbackendsftp.c:2133
 msgid "Directory not empty"
 msgstr "Lo repertòri es pas void"
@@ -467,10 +467,10 @@ msgstr "Pas pro de plaça sul volum"
 
 #: ../daemon/gvfsafpvolume.c:845 ../daemon/gvfsafpvolume.c:1428
 #: ../daemon/gvfsafpvolume.c:1585 ../daemon/gvfsbackendafp.c:296
-#: ../daemon/gvfsbackendafp.c:499 ../daemon/gvfsbackenddav.c:2346
-#: ../daemon/gvfsbackenddav.c:2642 ../daemon/gvfsbackenddav.c:2750
-#: ../daemon/gvfsbackenddav.c:2887 ../daemon/gvfsbackenddav.c:2963
-#: ../daemon/gvfsbackenddav.c:3001 ../daemon/gvfsbackenddav.c:3225
+#: ../daemon/gvfsbackendafp.c:499 ../daemon/gvfsbackenddav.c:2359
+#: ../daemon/gvfsbackenddav.c:2655 ../daemon/gvfsbackenddav.c:2763
+#: ../daemon/gvfsbackenddav.c:2900 ../daemon/gvfsbackenddav.c:2976
+#: ../daemon/gvfsbackenddav.c:3014 ../daemon/gvfsbackenddav.c:3238
 #: ../daemon/gvfsbackendftp.c:794 ../daemon/gvfsbackendftp.c:982
 #: ../daemon/gvfsbackendftp.c:1492 ../daemon/gvfsbackendftp.c:1600
 #: ../daemon/gvfsbackendgoogle.c:1233 ../daemon/gvfsbackendgoogle.c:1561
@@ -644,7 +644,7 @@ msgid "Cancel"
 msgstr "Anullar"
 
 #: ../daemon/gvfsbackendafc.c:447 ../daemon/gvfsbackendarchive.c:637
-#: ../daemon/gvfsbackendarchive.c:666 ../daemon/gvfsbackenddav.c:1848
+#: ../daemon/gvfsbackendarchive.c:666 ../daemon/gvfsbackenddav.c:1861
 #: ../daemon/gvfsbackendgoogle.c:1664 ../daemon/gvfsbackendhttp.c:256
 #: ../daemon/gvfsbackendsmb.c:724
 msgid "Invalid mount spec"
@@ -696,7 +696,7 @@ msgid ""
 "again”."
 msgstr ""
 "Lo periferic « %s » es verrolhat. Picatz lo senhal sul periferic, puèi "
-"clicatz sus « Ensajar tornarmai »."
+"clicatz sus « Ensajar tornamai »."
 
 #: ../daemon/gvfsbackendafc.c:951 ../daemon/gvfsbackendarchive.c:744
 #: ../daemon/gvfsbackendcomputer.c:657 ../daemon/gvfsbackendgoogle.c:2186
@@ -719,7 +719,7 @@ msgstr "Tipe « seek » pas pres en carga"
 #. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
 #. * fallback copy.
 #.
-#: ../daemon/gvfsbackendafc.c:2219 ../daemon/gvfsbackendafp.c:1781
+#: ../daemon/gvfsbackendafc.c:2216 ../daemon/gvfsbackendafp.c:1781
 #: ../daemon/gvfsbackendftp.c:1192 ../daemon/gvfsbackendftp.c:1240
 #: ../daemon/gvfsbackendftp.c:1261 ../daemon/gvfsbackendgoogle.c:1140
 #: ../daemon/gvfsbackendgoogle.c:1207 ../daemon/gvfsbackendgoogle.c:1228
@@ -736,7 +736,7 @@ msgstr "Tipe « seek » pas pres en carga"
 msgid "Operation unsupported"
 msgstr "Operacion pas presa en carga"
 
-#: ../daemon/gvfsbackendafc.c:2385 ../daemon/gvfsbackenddav.c:2786
+#: ../daemon/gvfsbackendafc.c:2382 ../daemon/gvfsbackenddav.c:2799
 #: ../daemon/gvfsbackendftp.c:1444
 msgid "Backups not supported"
 msgstr "Los salvamments son pas preses en carga pel moment."
@@ -785,13 +785,13 @@ msgid "Apple Filing Protocol Service"
 msgstr "Servici de protocòl de partiment de fichièrs d'Apple"
 
 #: ../daemon/gvfsbackendafp.c:286 ../daemon/gvfsbackendburn.c:875
-#: ../daemon/gvfsbackenddav.c:2949 ../daemon/gvfsbackendftp.c:1592
+#: ../daemon/gvfsbackenddav.c:2962 ../daemon/gvfsbackendftp.c:1592
 #: ../daemon/gvfsbackendgoogle.c:1806
 msgid "Can't copy directory over directory"
 msgstr "Impossible d'espotir un repertòri amb un autre repertòri"
 
 #: ../daemon/gvfsbackendafp.c:305 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackenddav.c:2978 ../daemon/gvfsbackendftp.c:1615
+#: ../daemon/gvfsbackenddav.c:2991 ../daemon/gvfsbackendftp.c:1615
 #: ../daemon/gvfsbackendgoogle.c:1244 ../daemon/gvfsbackendgoogle.c:1825
 #: ../daemon/gvfsbackendgoogle.c:1845 ../daemon/gvfsbackendmtp.c:1716
 #: ../daemon/gvfsbackendmtp.c:1739 ../daemon/gvfsbackendmtp.c:2041
@@ -799,7 +799,7 @@ msgstr "Impossible d'espotir un repertòri amb un autre repertòri"
 msgid "Can't recursively copy directory"
 msgstr "Impossible de copiar recursivament un repertòri"
 
-#: ../daemon/gvfsbackendafp.c:489 ../daemon/gvfsbackenddav.c:2826
+#: ../daemon/gvfsbackendafp.c:489 ../daemon/gvfsbackenddav.c:2839
 #: ../daemon/gvfsbackendnfs.c:2470 ../daemon/gvfsbackendsftp.c:4816
 #: ../daemon/gvfsbackendsmb.c:2190
 msgid "Can't move directory over directory"
@@ -814,7 +814,7 @@ msgstr "los salvamments son pas preses en carga"
 msgid "Unable to create temporary file (%s)"
 msgstr "Impossible de crear lo fichièr temporari (%s)"
 
-#: ../daemon/gvfsbackendafp.c:1348 ../daemon/gvfsbackenddav.c:2427
+#: ../daemon/gvfsbackendafp.c:1348 ../daemon/gvfsbackenddav.c:2440
 #: ../daemon/gvfsbackendnfs.c:1175 ../daemon/gvfsbackendsftp.c:3772
 #: ../daemon/gvfsbackendsmb.c:1227
 msgid "The file was externally modified"
@@ -925,13 +925,13 @@ msgstr "Operacion pas presa en carga pel motor"
 msgid "No such file or directory in target path"
 msgstr "Cap de fichièr o de repertòri d'aqueste nom dins lo camin cibla"
 
-#: ../daemon/gvfsbackendburn.c:884 ../daemon/gvfsbackenddav.c:2864
+#: ../daemon/gvfsbackendburn.c:884 ../daemon/gvfsbackenddav.c:2877
 #: ../daemon/gvfsbackendsftp.c:2135 ../daemon/gvfsbackendsftp.c:4996
 msgid "Target file exists"
 msgstr "Lo fichièr cibla existís"
 
 #: ../daemon/gvfsbackendburn.c:949 ../daemon/gvfsbackendcomputer.c:812
-#: ../daemon/gvfsbackenddav.c:3308 ../daemon/gvfsbackenddav.c:3340
+#: ../daemon/gvfsbackenddav.c:3321 ../daemon/gvfsbackenddav.c:3353
 #: ../daemon/gvfsbackendgphoto2.c:2494 ../daemon/gvfsbackendgphoto2.c:2707
 #: ../daemon/gvfsbackendgphoto2.c:2804 ../daemon/gvfsbackendgphoto2.c:2897
 #: ../daemon/gvfsbackendgphoto2.c:3506 ../daemon/gvfsbackendgphoto2.c:3516
@@ -1097,7 +1097,7 @@ msgstr "Impossible d'interrogar lo fichièr"
 msgid "%s on %s%s"
 msgstr "%s sus %s%s"
 
-#: ../daemon/gvfsbackenddav.c:702 ../daemon/gvfsbackenddav.c:1967
+#: ../daemon/gvfsbackenddav.c:702 ../daemon/gvfsbackenddav.c:1980
 #: ../daemon/gvfsbackendhttp.c:202
 #, c-format
 msgid "HTTP Error: %s"
@@ -1115,8 +1115,8 @@ msgstr "Responsa voida"
 msgid "Unexpected reply from server"
 msgstr "Responsa inesperada del servidor"
 
-#: ../daemon/gvfsbackenddav.c:1420 ../daemon/gvfsbackenddav.c:2092
-#: ../daemon/gvfsbackenddav.c:2181 ../daemon/gvfsbackenddav.c:2283
+#: ../daemon/gvfsbackenddav.c:1420 ../daemon/gvfsbackenddav.c:2105
+#: ../daemon/gvfsbackenddav.c:2194 ../daemon/gvfsbackenddav.c:2296
 msgid "Response invalid"
 msgstr "Responsa invalida"
 
@@ -1136,16 +1136,16 @@ msgstr "Picatz lo senhal per %s"
 msgid "Please enter proxy password"
 msgstr "Picatz lo senhal del servidor mandatari"
 
-#: ../daemon/gvfsbackenddav.c:1971 ../daemon/gvfsbackenddav.c:1975
+#: ../daemon/gvfsbackenddav.c:1984 ../daemon/gvfsbackenddav.c:1988
 msgid "Not a WebDAV enabled share"
 msgstr "Aqueste partiment pren pas en carga WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:2046 ../daemon/gvfsbackenddav.c:2136
-#: ../daemon/gvfsbackenddav.c:2209 ../daemon/gvfsbackenddav.c:2317
+#: ../daemon/gvfsbackenddav.c:2059 ../daemon/gvfsbackenddav.c:2149
+#: ../daemon/gvfsbackenddav.c:2222 ../daemon/gvfsbackenddav.c:2330
 msgid "Could not create request"
 msgstr "Impossible de crear la requèsta"
 
-#: ../daemon/gvfsbackenddav.c:2458 ../daemon/gvfsbackendftp.c:1085
+#: ../daemon/gvfsbackenddav.c:2471 ../daemon/gvfsbackendftp.c:1085
 #: ../daemon/gvfsbackendgoogle.c:2561 ../daemon/gvfsbackendnfs.c:939
 #: ../daemon/gvfsbackendnfs.c:962 ../daemon/gvfsbackendnfs.c:988
 #: ../daemon/gvfsbackendnfs.c:1388 ../daemon/gvfsbackendsmb.c:1263
@@ -1153,11 +1153,11 @@ msgstr "Impossible de crear la requèsta"
 msgid "Backup file creation failed"
 msgstr "La creacion del fichièr de salvament a fracassat"
 
-#: ../daemon/gvfsbackenddav.c:2831
+#: ../daemon/gvfsbackenddav.c:2844
 msgid "Can't move over directory"
 msgstr "Impossible d'espotir lo repertòri"
 
-#: ../daemon/gvfsbackenddav.c:3100
+#: ../daemon/gvfsbackenddav.c:3113
 msgid "File length changed during transfer"
 msgstr ""
 
@@ -1871,7 +1871,7 @@ msgstr "Lo nom de fichièr conten de caractèrs invalids."
 
 #: ../daemon/gvfsftptask.c:292
 msgid "The FTP server is busy. Try again later"
-msgstr "Lo servidor FTP es ocupat. Ensajatz tornarmai pus tard"
+msgstr "Lo servidor FTP es ocupat. Ensajatz tornamai pus tard"
 
 #: ../daemon/gvfsftptask.c:298
 msgid "Backend currently unmounting"
@@ -1974,7 +1974,7 @@ msgstr "%s : %s"
 #: ../programs/gvfs-ls.c:425 ../programs/gvfs-mime.c:97
 #: ../programs/gvfs-mime.c:113 ../programs/gvfs-mime.c:120
 #: ../programs/gvfs-mkdir.c:72 ../programs/gvfs-monitor-dir.c:136
-#: ../programs/gvfs-monitor-file.c:134 ../programs/gvfs-mount.c:1154
+#: ../programs/gvfs-monitor-file.c:134 ../programs/gvfs-mount.c:1155
 #: ../programs/gvfs-move.c:144 ../programs/gvfs-open.c:140
 #: ../programs/gvfs-open.c:158 ../programs/gvfs-rename.c:82
 #: ../programs/gvfs-rm.c:72 ../programs/gvfs-save.c:182
@@ -2043,16 +2043,16 @@ msgstr "Monitor de volum GVfs GDU"
 msgid "Floppy Drive"
 msgstr "Lector de disquetas"
 
-#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:286
+#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:290
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "Disc sens nom (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:288
+#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:292
 msgid "Unnamed Drive"
 msgstr "Lector sens nom"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:628
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:640
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
@@ -2627,7 +2627,7 @@ msgstr ""
 #: ../programs/gvfs-info.c:396 ../programs/gvfs-ls.c:423
 #: ../programs/gvfs-mime.c:94 ../programs/gvfs-mkdir.c:70
 #: ../programs/gvfs-monitor-dir.c:134 ../programs/gvfs-monitor-file.c:132
-#: ../programs/gvfs-mount.c:1152 ../programs/gvfs-move.c:142
+#: ../programs/gvfs-mount.c:1153 ../programs/gvfs-move.c:142
 #: ../programs/gvfs-open.c:138 ../programs/gvfs-rename.c:80
 #: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:180
 #: ../programs/gvfs-set-attribute.c:149 ../programs/gvfs-trash.c:104
@@ -2831,7 +2831,7 @@ msgstr "Espacis de nom dels atributs en escritura :\n"
 
 #: ../programs/gvfs-info.c:384 ../programs/gvfs-ls.c:406
 #: ../programs/gvfs-mkdir.c:58 ../programs/gvfs-monitor-dir.c:122
-#: ../programs/gvfs-monitor-file.c:120 ../programs/gvfs-mount.c:1140
+#: ../programs/gvfs-monitor-file.c:120 ../programs/gvfs-mount.c:1141
 #: ../programs/gvfs-rename.c:70 ../programs/gvfs-set-attribute.c:139
 #: ../programs/gvfs-trash.c:92 ../programs/gvfs-tree.c:249
 msgid "LOCATION"
@@ -3059,22 +3059,22 @@ msgstr "Error al moment de la recèrca del punt de montatge òste : %s\n"
 msgid "Error ejecting mount: %s\n"
 msgstr "Error al moment de l'ejeccion del punt de montatge : %s\n"
 
-#: ../programs/gvfs-mount.c:880
+#: ../programs/gvfs-mount.c:881
 #, c-format
 msgid "Error mounting %s: %s\n"
 msgstr "Error al moment del montatge %s : %s\n"
 
-#: ../programs/gvfs-mount.c:895
+#: ../programs/gvfs-mount.c:896
 #, c-format
 msgid "Mounted %s at %s\n"
 msgstr "%s montat sus %s\n"
 
-#: ../programs/gvfs-mount.c:945
+#: ../programs/gvfs-mount.c:946
 #, c-format
 msgid "No volume for device file %s\n"
 msgstr "Pas de volum pel fichièr de periferic %s\n"
 
-#: ../programs/gvfs-mount.c:1141
+#: ../programs/gvfs-mount.c:1142
 msgid "Mount the locations."
 msgstr "Montar los emplaçaments."
 
