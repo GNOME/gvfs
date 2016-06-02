@@ -44,7 +44,7 @@ try:
     have_umockdev = subprocess.call(['which', 'umockdev-wrapper'], stdout=subprocess.PIPE) == 0
     # needs >= 0.2.10
     have_umockdev = have_umockdev and hasattr(UMockdev.Testbed, 'add_from_file')
-except ImportError:
+except (ValueError, ImportError):
     have_umockdev = False
 
 # umockdev environment for gphoto/MTP tests
