@@ -447,14 +447,12 @@ class ArchiveMounter(GvfsTestCase):
 
 
 @unittest.skipUnless(os.getenv('XDG_RUNTIME_DIR'), 'No $XDG_RUNTIME_DIR available')
+@unittest.skipUnless(os.path.exists(os.path.expanduser('~/.ssh/id_rsa')), 'This test needs an existing ~/.ssh/id_rsa')
 class Sftp(GvfsTestCase):
     def setUp(self):
         '''Run ssh server'''
 
         super().setUp()
-
-        self.assertTrue(os.path.exists(os.path.expanduser('~/.ssh/id_rsa')),
-                        'This test needs an existing ~/.ssh/id_rsa')
 
         # find sftp-server
         for dir in ['/usr/local/lib/openssh',
