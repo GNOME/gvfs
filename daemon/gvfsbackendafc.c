@@ -434,7 +434,6 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   afc_error_t aerr;
   const gchar *choices[] = {_("Try again"), _("Cancel"), NULL}; /* keep in sync with the enum above */
   gboolean aborted = FALSE;
-  gchar *message = NULL;
   gint choice;
   gboolean ret;
 
@@ -586,6 +585,8 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   /* now, try to connect with handshake */
   retries = 0;
   do {
+    char *message;
+
     lerr = lockdownd_client_new_with_handshake (self->dev,
                                                 &lockdown_cli,
                                                 "gvfsd-afc");
@@ -606,17 +607,30 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
       break;
 
     aborted = FALSE;
-    if (!message)
-      /* translators:
-       * %s is the device name. 'Try again' is the caption of the button
-       * shown in the dialog which is defined above. */
-      message = g_strdup_printf (_("The device “%s” is locked. Enter the passcode on the device and click “Try again”."), display_name);
+    if (lerr == LOCKDOWN_E_PASSWORD_PROTECTED)
+      {
+        /* translators:
+         * %s is the device name. 'Try again' is the caption of the button
+         * shown in the dialog which is defined above. */
+        message = g_strdup_printf (_("The device “%s” is locked. Enter the passcode on the device and click “Try again”."), display_name);
+      }
+    else if (lerr == LOCKDOWN_E_PAIRING_DIALOG_RESPONSE_PENDING)
+      {
+        /* translators:
+         * %s is the device name. 'Try again' is the caption of the button
+         * shown in the dialog which is defined above. */
+        message = g_strdup_printf (_("The device “%s” is not trusted yet. Select “Trust” on the device and click “Try again”."), display_name);
+      }
+    else
+      g_assert_not_reached ();
 
     ret = g_mount_source_ask_question (src,
                                        message,
                                        choices,
                                        &aborted,
                                        &choice);
+    g_free (message);
+
     if (!ret || aborted || (choice == CHOICE_CANCEL))
       break;
   } while (retries++ < 10);
@@ -627,7 +641,6 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   g_free (display_name);
   display_name = NULL;
-  g_free (message);
 
   if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
     goto out_destroy_dev;
