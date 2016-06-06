@@ -595,7 +595,14 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
         continue;
       }
 
-    if (lerr != LOCKDOWN_E_PASSWORD_PROTECTED)
+    if (lerr == LOCKDOWN_E_USER_DENIED_PAIRING)
+      {
+        aborted = TRUE;
+        break;
+      }
+
+    if (lerr != LOCKDOWN_E_PASSWORD_PROTECTED &&
+        lerr != LOCKDOWN_E_PAIRING_DIALOG_RESPONSE_PENDING)
       break;
 
     aborted = FALSE;
