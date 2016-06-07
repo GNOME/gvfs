@@ -37,6 +37,8 @@ from glob import glob
 
 from gi.repository import GLib, Gio
 
+os.environ['GIO_USE_VFS'] = 'gvfs'
+
 try:
     import gi
     gi.require_version('UMockdev', '1.0')
