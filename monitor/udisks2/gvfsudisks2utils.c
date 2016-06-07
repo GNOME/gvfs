@@ -659,7 +659,6 @@ unmount_notify_timer_cb (gpointer user_data)
 {
   UnmountNotifyData *data = user_data;
   gchar *message, *name;
-  const gchar *format;
 
   data->unmount_timer_id = 0;
 
@@ -672,11 +671,11 @@ unmount_notify_timer_cb (gpointer user_data)
   data->unmount_fired = TRUE;
 
   name = unmount_notify_get_name (data);
-  format = data->generic_text ?
-    _("Unmounting %s\nPlease wait") :
-    _("Writing data to %s\nDon't unplug until finished");
+  if (data->generic_text)
+    message = g_strdup_printf (_("Unmounting %s\nPlease wait"), name);
+  else
+    message = g_strdup_printf (_("Writing data to %s\nDon't unplug until finished"), name);
 
-  message = g_strdup_printf (format, name);
   g_signal_emit_by_name (data->op, "show-unmount-progress",
                          message, -1, -1);
   g_free (message);
@@ -805,7 +804,6 @@ gvfs_udisks2_unmount_notify_stop (GMountOperation *op,
                                   gboolean         unmount_failed)
 {
   gchar *message, *name;
-  const gchar *format;
   UnmountNotifyData *data = g_object_get_data (G_OBJECT (op), "x-udisks2-notify-data");
 
   if (data == NULL)
@@ -817,10 +815,11 @@ gvfs_udisks2_unmount_notify_stop (GMountOperation *op,
     return;
 
   name = unmount_notify_get_name (data);
-  format = data->generic_text ?
-    _("%s has been unmounted\n") : _("You can now unplug %s\n");
+  if (data->generic_text)
+    message = g_strdup_printf (_("%s has been unmounted\n"), name);
+  else
+    message = g_strdup_printf (_("You can now unplug %s\n"), name);
 
-  message = g_strdup_printf (format, name);
   g_signal_emit_by_name (data->op, "show-unmount-progress",
                          message, 0, 0);
 
