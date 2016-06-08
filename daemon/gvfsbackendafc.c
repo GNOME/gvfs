@@ -280,11 +280,19 @@ g_vfs_backend_lockdownd_check (lockdownd_error_t cond, GVfsJob *job)
       break;
     case LOCKDOWN_E_PASSWORD_PROTECTED:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                        _("Permission denied"));
+                        _("The device is password protected"));
       break;
     case LOCKDOWN_E_SSL_ERROR:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_CONNECTION_REFUSED,
                         _("Unable to connect"));
+      break;
+    case LOCKDOWN_E_USER_DENIED_PAIRING:
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_CONNECTION_REFUSED,
+                        _("User refused to trust this computer"));
+      break;
+    case LOCKDOWN_E_PAIRING_DIALOG_RESPONSE_PENDING:
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_CONNECTION_REFUSED,
+                        _("The user has not trusted this computer"));
       break;
     default:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
