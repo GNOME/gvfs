@@ -1458,7 +1458,7 @@ g_vfs_backend_afc_write (GVfsBackend *backend,
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
 
-static int
+static goffset
 g_vfs_backend_afc_seek (GVfsBackendAfc *self,
                         GVfsJob *job,
                         GVfsBackendHandle handle,
@@ -1467,12 +1467,13 @@ g_vfs_backend_afc_seek (GVfsBackendAfc *self,
 {
   int afc_seek_type;
   FileHandle *fh;
+  guint64 new_offset;
 
   if ((afc_seek_type = gvfs_seek_type_to_lseek (type)) == -1)
     {
       g_vfs_job_failed(job, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                        _("Unsupported seek type"));
-      return 1;
+      return -1;
     }
 
   fh = (FileHandle *) handle;
@@ -1480,11 +1481,13 @@ g_vfs_backend_afc_seek (GVfsBackendAfc *self,
   if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_seek (fh->afc_cli,
                                                          fh->fd, offset, afc_seek_type),
                                           job)))
-    {
-      return 1;
-    }
+      return -1;
 
-  return 0;
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_tell (fh->afc_cli, fh->fd, &new_offset),
+                                          job)))
+      return -1;
+
+  return new_offset;
 }
 
 static void
@@ -1495,15 +1498,17 @@ g_vfs_backend_afc_seek_on_read (GVfsBackend *backend,
                                 GSeekType type)
 {
   GVfsBackendAfc *self;
+  goffset new_offset;
 
   g_return_if_fail (handle != NULL);
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
-  if (!g_vfs_backend_afc_seek (self, G_VFS_JOB(job), handle, offset, type))
+  new_offset = g_vfs_backend_afc_seek (self, G_VFS_JOB(job), handle, offset, type);
+  if (new_offset >= 0)
     {
-      g_vfs_job_seek_read_set_offset (job, offset);
+      g_vfs_job_seek_read_set_offset (job, new_offset);
       g_vfs_job_succeeded (G_VFS_JOB(job));
     }
 }
@@ -1516,15 +1521,17 @@ g_vfs_backend_afc_seek_on_write (GVfsBackend *backend,
                                  GSeekType type)
 {
   GVfsBackendAfc *self;
+  goffset new_offset;
 
   g_return_if_fail (handle != NULL);
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
 
-  if (!g_vfs_backend_afc_seek (self, G_VFS_JOB(job), handle, offset, type))
+  new_offset = g_vfs_backend_afc_seek (self, G_VFS_JOB(job), handle, offset, type);
+  if (new_offset >= 0)
     {
-      g_vfs_job_seek_write_set_offset (job, offset);
+      g_vfs_job_seek_write_set_offset (job, new_offset);
       g_vfs_job_succeeded (G_VFS_JOB(job));
     }
 }
