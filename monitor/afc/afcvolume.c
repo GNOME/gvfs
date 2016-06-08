@@ -140,7 +140,10 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
   } while (retries++ < 10);
 
   if (err != IDEVICE_E_SUCCESS)
-    return 0;
+    {
+      g_debug ("Failed to initialise an idevice_t (%d)\n", err);
+      return 0;
+    }
 
   if (self->service != NULL)
     {
