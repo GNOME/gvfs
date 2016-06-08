@@ -616,6 +616,14 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
         break;
       }
 
+    /* An unknown error? Let's try again without prompting */
+    if (lerr == LOCKDOWN_E_UNKNOWN_ERROR)
+      {
+        g_debug ("Got an unknown lockdown error, retrying after a short sleep\n");
+        g_usleep (G_USEC_PER_SEC);
+        continue;
+      }
+
     if (lerr != LOCKDOWN_E_PASSWORD_PROTECTED &&
         lerr != LOCKDOWN_E_PAIRING_DIALOG_RESPONSE_PENDING)
       break;
