@@ -142,32 +142,20 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
   if (err != IDEVICE_E_SUCCESS)
     return 0;
 
-  if (self->service != NULL)
+  lerr = lockdownd_client_new (dev, &lockdown_cli, "gvfs-afc-volume-monitor");
+  if (lerr != LOCKDOWN_E_SUCCESS)
     {
-      if (lockdownd_client_new_with_handshake (dev, &lockdown_cli, "gvfs-afc-volume-monitor") != LOCKDOWN_E_SUCCESS)
-        {
-          idevice_free (dev);
-          return 0;
-        }
+      g_debug ("Failed to create a client with handshake (%d)\n", lerr);
+      idevice_free (dev);
+      return 0;
+    }
+
+  if (g_strcmp0 (self->service, HOUSE_ARREST_SERVICE_PORT) == 0)
+    {
       if (!_g_vfs_afc_volume_check_house_arrest_version (lockdown_cli))
         {
+          g_debug ("Failed to check HouseArrest version\n");
           lockdownd_service_descriptor_free (lockdown_service);
-          idevice_free (dev);
-          return 0;
-        }
-      lerr = lockdownd_start_service(lockdown_cli, "com.apple.mobile.house_arrest", &lockdown_service);
-      lockdownd_service_descriptor_free (lockdown_service);
-      if (lerr != LOCKDOWN_E_SUCCESS)
-        {
-          g_warning ("Couldn't start com.apple.mobile.house_arrest for UUID %s: %d", self->uuid, lerr);
-          idevice_free (dev);
-          return 0;
-        }
-    }
-  else
-    {
-      if (lockdownd_client_new (dev, &lockdown_cli, "gvfs-afc-volume-monitor") != LOCKDOWN_E_SUCCESS)
-        {
           idevice_free (dev);
           return 0;
         }
