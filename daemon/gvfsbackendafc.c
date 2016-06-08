@@ -267,10 +267,15 @@ g_vfs_backend_sbs_check (sbservices_error_t cond, GVfsJob *job)
 }
 
 static int
-g_vfs_backend_lockdownd_check (lockdownd_error_t cond, GVfsJob *job)
+g_vfs_backend_lockdownd_check (lockdownd_error_t  cond,
+                               GVfsJob           *job,
+                               const char        *internal_job)
 {
   if (G_LIKELY(cond == LOCKDOWN_E_SUCCESS))
         return 0;
+
+  g_debug ("Got lockdown error '%d' while doing '%s'\n",
+           cond, internal_job);
 
   switch (cond)
     {
@@ -531,7 +536,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   /* first, connect without handshake to get preliminary information */
   lerr = lockdownd_client_new (self->dev, &lockdown_cli, "gvfsd-afc");
-  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
+  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job), "new client, no handshake")))
     goto out_destroy_dev;
 
   /* try to use pretty device name */
@@ -566,7 +571,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   /* set correct freedesktop icon spec name depending on device model */
   value = NULL;
   lerr = lockdownd_get_value (lockdown_cli, NULL, "DeviceClass", &value);
-  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
+  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job), "getting device class")))
     goto out_destroy_lockdown;
 
   plist_get_string_val (value, &self->model);
@@ -595,6 +600,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   do {
     char *message;
 
+    g_debug ("Lockdown client try #%d", retries);
     lerr = lockdownd_client_new_with_handshake (self->dev,
                                                 &lockdown_cli,
                                                 "gvfsd-afc");
@@ -650,13 +656,13 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   g_free (display_name);
   display_name = NULL;
 
-  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
+  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job), "initial paired client")))
     goto out_destroy_dev;
 
   switch (self->mode) {
     case ACCESS_MODE_AFC:
       lerr = lockdownd_start_service (lockdown_cli, self->service, &lockdown_service);
-      if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
+      if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job), "starting lockdownd")))
         {
           goto out_destroy_lockdown;
         }
@@ -668,7 +674,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
       break;
     case ACCESS_MODE_HOUSE_ARREST:
       lerr = lockdownd_start_service (lockdown_cli, "com.apple.mobile.installation_proxy", &lockdown_service);
-      if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
+      if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job), "starting install proxy")))
         {
           g_warning ("couldn't start inst proxy");
           goto out_destroy_lockdown;
@@ -680,7 +686,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
           goto out_destroy_lockdown;
         }
       lerr = lockdownd_start_service (lockdown_cli, "com.apple.springboardservices", &lockdown_service);
-      if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job))))
+      if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lerr, G_VFS_JOB(job), "starting install services")))
         {
           g_warning ("couldn't start SBServices proxy");
           goto out_destroy_lockdown;
