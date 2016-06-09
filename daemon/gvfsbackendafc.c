@@ -2363,9 +2363,15 @@ g_vfs_backend_afc_set_display_name (GVfsBackend *backend,
       return;
     }
 
-  g_vfs_job_set_display_name_set_new_path (job, new_path);
-  g_free (afc_path);
   g_free (new_path);
+  g_free (afc_path);
+
+  /* The new path, but in the original namespace */
+  dirname = g_path_get_dirname (filename);
+  new_path = g_build_filename (dirname, display_name, NULL);
+  g_vfs_job_set_display_name_set_new_path (job, new_path);
+  g_free (new_path);
+  g_free (dirname);
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
