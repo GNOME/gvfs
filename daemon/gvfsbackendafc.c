@@ -1120,9 +1120,12 @@ not_found_bail:
                                                          new_path ? new_path : path, AFC_FOPEN_RDONLY, &fd),
                                           G_VFS_JOB(job))))
     {
+      g_free (new_path);
       g_free (app);
       return;
     }
+
+  g_free (new_path);
 
   handle = g_vfs_backend_file_handle_new (self, app);
   handle->fd = fd;
@@ -1168,6 +1171,7 @@ g_vfs_backend_afc_create (GVfsBackend *backend,
       info = g_hash_table_lookup (self->apps, app);
       if (info == NULL)
         {
+          g_free (new_path);
           g_free (app);
           g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
           return;
@@ -1237,6 +1241,7 @@ g_vfs_backend_afc_append_to (GVfsBackend *backend,
       info = g_hash_table_lookup (self->apps, app);
       if (info == NULL)
         {
+          g_free (new_path);
           g_free (app);
           g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
           return;
@@ -1335,6 +1340,7 @@ g_vfs_backend_afc_replace (GVfsBackend *backend,
       info = g_hash_table_lookup (self->apps, app);
       if (info == NULL)
         {
+          g_free (new_path);
           g_free (app);
           g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
           return;
@@ -2617,6 +2623,9 @@ g_vfs_backend_afc_move (GVfsBackend *backend,
       info = g_hash_table_lookup (self->apps, app_src);
       if (info == NULL)
         {
+          g_free (app_src);
+          g_free (new_src);
+          g_free (new_dst);
           g_vfs_backend_afc_check (AFC_E_OBJECT_NOT_FOUND, G_VFS_JOB(job));
           return;
         }
