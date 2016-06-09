@@ -780,6 +780,7 @@ is_regular (GVfsBackendAfc *backend,
 
 static gboolean
 g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
+                                 gboolean        last_try,
                                  const char     *id)
 {
   AppInfo *info;
@@ -810,10 +811,14 @@ g_vfs_backend_setup_afc_for_app (GVfsBackendAfc *self,
   lerr = lockdownd_start_service (lockdown_cli, "com.apple.mobile.house_arrest", &lockdown_service);
   if (lerr != LOCKDOWN_E_SUCCESS)
     {
-      if (lerr == LOCKDOWN_E_SERVICE_LIMIT)
-        retry = TRUE;
+      if (lerr == LOCKDOWN_E_SERVICE_LIMIT && !last_try)
+        {
+          retry = TRUE;
+          g_debug ("Failed to start house arrest for app %s (%d)\n", info->id, lerr);
+        }
+      else
+        g_warning ("Failed to start house arrest for app %s (%d)", info->id, lerr);
       lockdownd_client_free (lockdown_cli);
-      g_warning ("Failed to start house arrest for app %s (%d)", info->id, lerr);
       goto out;
     }
 
@@ -1009,11 +1014,11 @@ g_vfs_backend_parse_house_arrest_path (GVfsBackendAfc *self,
   if (app != NULL &&
       setup_afc)
     {
-      if (!g_vfs_backend_setup_afc_for_app (self, app))
+      if (!g_vfs_backend_setup_afc_for_app (self, FALSE, app))
         {
           g_debug ("Ran out of HouseArrest clients for app '%s', trying again\n", app);
           g_vfs_backend_gc_house_arrest (self, app);
-          g_vfs_backend_setup_afc_for_app (self, app);
+          g_vfs_backend_setup_afc_for_app (self, TRUE, app);
         }
     }
 
