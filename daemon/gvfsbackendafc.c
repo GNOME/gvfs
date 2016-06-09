@@ -600,7 +600,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   do {
     char *message;
 
-    g_debug ("Lockdown client try #%d", retries);
+    g_debug ("Lockdown client try #%d\n", retries);
     lerr = lockdownd_client_new_with_handshake (self->dev,
                                                 &lockdown_cli,
                                                 "gvfsd-afc");
