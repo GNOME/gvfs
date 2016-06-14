@@ -55,12 +55,6 @@ void            _g_dbus_connection_get_for_async        (const char             
                                                          GVfsAsyncDBusCallback           callback,
                                                          gpointer                        callback_data,
                                                          GCancellable                   *cancellable);
-void        _g_simple_async_result_complete_with_cancellable
-                                                        (GSimpleAsyncResult             *result,
-                                                         GCancellable                   *cancellable);
-void            _g_simple_async_result_take_error_stripped
-                                                        (GSimpleAsyncResult             *simple,
-                                                         GError                         *error);
 
 gulong          _g_dbus_async_subscribe_cancellable     (GDBusConnection                *connection,
                                                          GCancellable                   *cancellable);
