@@ -1043,11 +1043,10 @@ service_resolver_cb (AvahiServiceResolver   *avahi_resolver,
 typedef struct
 {
   GVfsDnsSdResolver *resolver;
-  GSimpleAsyncResult *simple;
   guint timeout_id;
 } ResolveData;
 
-static void service_resolver_changed (GVfsDnsSdResolver *resolver, ResolveData *data);
+static void service_resolver_changed (GVfsDnsSdResolver *resolver, GTask *task);
 
 static void
 resolve_data_free (ResolveData *data)
@@ -1055,19 +1054,19 @@ resolve_data_free (ResolveData *data)
   if (data->timeout_id > 0)
     g_source_remove (data->timeout_id);
   g_signal_handlers_disconnect_by_func (data->resolver, service_resolver_changed, data);
-  g_object_unref (data->simple);
   g_free (data);
 }
 
 static void
 service_resolver_changed (GVfsDnsSdResolver *resolver,
-                          ResolveData       *data)
+                          GTask *task)
 {
+  ResolveData *data = g_task_get_task_data (task);
+
   if (resolver->is_resolved)
     {
-      g_simple_async_result_set_op_res_gboolean (data->simple, TRUE);
-      g_simple_async_result_complete_in_idle (data->simple);
-      resolve_data_free (data);
+      g_task_return_boolean (task, TRUE);
+      g_object_unref (task);
     }
   else
     {
@@ -1077,66 +1076,60 @@ service_resolver_changed (GVfsDnsSdResolver *resolver,
         }
       else
         {
-          g_simple_async_result_set_error (data->simple,
-                                           G_IO_ERROR,
-                                           G_IO_ERROR_FAILED,
+          g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
           /* Translators:
            * - the first %s refers to the service type
            * - the second %s refers to the service name
            * - the third %s refers to the domain
            */
-                                           _("Error resolving “%s” service “%s” on domain “%s”"),
-                                           data->resolver->service_type,
-                                           data->resolver->service_name,
-                                           data->resolver->domain);
-          g_simple_async_result_complete_in_idle (data->simple);
-          resolve_data_free (data);
+                                   _("Error resolving “%s” service “%s” on domain “%s”"),
+                                   data->resolver->service_type,
+                                   data->resolver->service_name,
+                                   data->resolver->domain);
+          g_object_unref (task);
         }
     }
 }
 
 static gboolean
-service_resolver_timed_out (ResolveData *data)
+service_resolver_timed_out (GTask *task)
 {
+  ResolveData *data = g_task_get_task_data (task);
 
   if (data->resolver->address != NULL)
     {
       /* special case if one of the required TXT records are missing */
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED,
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
       /* Translators:
        * - the first %s refers to the service type
        * - the second %s refers to the service name
        * - the third %s refers to the domain
        * - the fourth %s refers to the required TXT keys
        */
-                                       _("Error resolving “%s” service “%s” on domain “%s”. "
-                                         "One or more TXT records are missing. Keys required: “%s”."),
-                                       data->resolver->service_type,
-                                       data->resolver->service_name,
-                                       data->resolver->domain,
-                                       data->resolver->required_txt_keys);
+                               _("Error resolving “%s” service “%s” on domain “%s”. "
+                                 "One or more TXT records are missing. Keys required: “%s”."),
+                               data->resolver->service_type,
+                               data->resolver->service_name,
+                               data->resolver->domain,
+                               data->resolver->required_txt_keys);
     }
   else
     {
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_TIMED_OUT,
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_TIMED_OUT,
       /* Translators:
        * - the first %s refers to the service type
        * - the second %s refers to the service name
        * - the third %s refers to the domain
        */
-                                       _("Timed out resolving “%s” service “%s” on domain “%s”"),
-                                       data->resolver->service_type,
-                                       data->resolver->service_name,
-                                       data->resolver->domain);
+                               _("Timed out resolving “%s” service “%s” on domain “%s”"),
+                               data->resolver->service_type,
+                               data->resolver->service_name,
+                               data->resolver->domain);
     }
 
-  g_simple_async_result_complete_in_idle (data->simple);
   data->timeout_id = 0;
-  resolve_data_free (data);
+  g_object_unref (task);
+
   return FALSE;
 }
 
@@ -1145,14 +1138,10 @@ g_vfs_dns_sd_resolver_resolve_finish (GVfsDnsSdResolver  *resolver,
                                       GAsyncResult       *res,
                                       GError            **error)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  g_return_val_if_fail (g_task_is_valid (res, resolver), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (res, g_vfs_dns_sd_resolver_resolve), FALSE);
 
-  g_return_val_if_fail (G_VFS_IS_DNS_SD_RESOLVER (resolver), FALSE);
-
-  g_warn_if_fail (g_simple_async_result_get_source_tag (simple) == g_vfs_dns_sd_resolver_resolve);
-  g_simple_async_result_propagate_error (simple, error);
-
-  return g_simple_async_result_get_op_res_gboolean (simple);
+  return g_task_propagate_boolean (G_TASK (res), error);
 }
 
 void
@@ -1162,21 +1151,17 @@ g_vfs_dns_sd_resolver_resolve (GVfsDnsSdResolver  *resolver,
                                gpointer            user_data)
 {
   ResolveData *data;
-  GSimpleAsyncResult *simple;
+  GTask *task;
 
   g_return_if_fail (G_VFS_IS_DNS_SD_RESOLVER (resolver));
 
-  simple = g_simple_async_result_new (G_OBJECT (resolver),
-                                      callback,
-                                      user_data,
-                                      g_vfs_dns_sd_resolver_resolve);
-
+  task = g_task_new (resolver, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_vfs_dns_sd_resolver_resolve);
 
   if (resolver->is_resolved)
     {
-      g_simple_async_result_set_op_res_gboolean (simple, TRUE);
-      g_simple_async_result_complete_in_idle (simple);
-      g_object_unref (simple);
+      g_task_return_boolean (task, TRUE);
+      g_object_unref (task);
       goto out;
     }
 
@@ -1184,15 +1169,16 @@ g_vfs_dns_sd_resolver_resolve (GVfsDnsSdResolver  *resolver,
 
   data = g_new0 (ResolveData, 1);
   data->resolver = resolver;
-  data->simple = simple;
   data->timeout_id = g_timeout_add (resolver->timeout_msec,
                                     (GSourceFunc) service_resolver_timed_out,
-                                    data);
+                                    task);
+
+  g_task_set_task_data (task, data, (GDestroyNotify) resolve_data_free);
 
   g_signal_connect (resolver,
                     "changed",
                     (GCallback) service_resolver_changed,
-                    data);
+                    task);
 
  out:
   ;
