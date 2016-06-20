@@ -1,3 +1,11 @@
+Major changes in 1.29.3
+=======================
+* afc: Many improvements and fixes for iOS support 
+* fuse: Add possibility to enable debug output
+* test: Skip tests if dependencies are missing
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.29.2
 =======================
 * client: Fix missing mount prefix in cached fuse paths
