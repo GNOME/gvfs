@@ -481,6 +481,7 @@ bdmv_metadata_thread (GSimpleAsyncResult *result,
   char *icon;
   char *name;
   const char *lang;
+  char *path;
 
   file = G_FILE (object);
 
@@ -492,6 +493,16 @@ bdmv_metadata_thread (GSimpleAsyncResult *result,
                                    "Device is not a Blu-Ray disc");
       goto error;
     }
+
+  path = g_build_filename (disc_root, "BDMV", NULL);
+  if (!g_file_test (path, G_FILE_TEST_IS_DIR))
+    {
+      error = g_error_new_literal (G_IO_ERROR,
+                                   G_IO_ERROR_FAILED,
+                                   "Device is not a Blu-Ray disc");
+      goto error;
+    }
+  g_free (path);
 
   bd = bd_open (disc_root, NULL);
   g_free (disc_root);
