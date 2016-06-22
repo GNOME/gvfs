@@ -1603,6 +1603,8 @@ try_query_fs_info (GVfsBackend *backend,
 
   g_file_info_set_attribute_string (info,
                                     G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "nfs");
+  g_file_info_set_attribute_boolean (info,
+                                     G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE, TRUE);
 
   if (g_file_attribute_matcher_matches (matcher,
                                         G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||

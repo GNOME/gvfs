@@ -1977,6 +1977,7 @@ g_vfs_backend_google_query_fs_info (GVfsBackend           *_self,
   spec = g_vfs_backend_get_mount_spec (_self);
   type = g_mount_spec_get_type (spec);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, type);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE, TRUE);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 

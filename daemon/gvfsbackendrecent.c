@@ -606,6 +606,9 @@ recent_backend_query_fs_info (GVfsBackend           *vfs_backend,
   g_file_info_set_attribute_string (info,
                                     G_FILE_ATTRIBUTE_FILESYSTEM_TYPE,
                                     "recent");
+  g_file_info_set_attribute_boolean (info,
+                                     G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE,
+                                     FALSE);
 
   g_file_info_set_attribute_boolean (info,
                                      G_FILE_ATTRIBUTE_FILESYSTEM_READONLY,
