@@ -52,7 +52,7 @@ on_icon_file_located (GObject       *source_object,
                       GAsyncResult  *res,
                       gpointer      user_data)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GTask *task = G_TASK (user_data);
   GFile *icon_file;
   GError *error;
 
@@ -62,16 +62,15 @@ on_icon_file_located (GObject       *source_object,
                                                &error);
   if (icon_file != NULL)
     {
-      g_simple_async_result_set_op_res_gpointer (simple, g_file_icon_new (icon_file), NULL);
+      g_task_return_pointer (task, g_file_icon_new (icon_file), g_object_unref);
       g_object_unref (icon_file);
     }
   else
     {
-      g_simple_async_result_set_from_error (simple, error);
-      g_error_free (error);
+      g_task_return_error (task, error);
     }
-  g_simple_async_result_complete (simple);
-  g_object_unref (simple);
+
+  g_object_unref (task);
 }
 
 static void
@@ -79,7 +78,7 @@ on_autorun_loaded (GObject      *source_object,
                    GAsyncResult *res,
                    gpointer      user_data)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GTask *task = G_TASK (user_data);
   GFile *autorun_file;
   gchar *content;
   gchar *relative_icon_path;
@@ -161,9 +160,9 @@ on_autorun_loaded (GObject      *source_object,
 
           _g_find_file_insensitive_async (root,
                                           relative_icon_path,
-                                          NULL,
+                                          g_task_get_cancellable (task),
                                           on_icon_file_located,
-                                          simple);
+                                          task);
 
           g_object_unref (root);
         }
@@ -181,10 +180,8 @@ on_autorun_loaded (GObject      *source_object,
 
   if (error != NULL)
     {
-      g_simple_async_result_set_from_error (simple, error);
-      g_simple_async_result_complete_in_idle (simple);
-      g_object_unref (simple);
-      g_error_free (error);
+      g_task_return_error (task, error);
+      g_object_unref (task);
     }
 
   g_free (relative_icon_path);
@@ -195,7 +192,7 @@ on_autorun_located (GObject      *source_object,
                     GAsyncResult *res,
                     gpointer      user_data)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GTask *task = G_TASK (user_data);
   GFile *autorun_path;
   GError *error;
 
@@ -205,17 +202,15 @@ on_autorun_located (GObject      *source_object,
                                                   &error);
   if (error != NULL)
     {
-      g_simple_async_result_set_from_error (simple, error);
-      g_simple_async_result_complete_in_idle (simple);
-      g_object_unref (simple);
-      g_error_free (error);
+      g_task_return_error (task, error);
+      g_object_unref (task);
     }
   else
     {
       g_file_load_contents_async (autorun_path,
-                                  g_object_get_data (G_OBJECT (simple), "cancellable"),
+                                  g_task_get_cancellable (task),
                                   on_autorun_loaded,
-                                  simple);
+                                  task);
       g_object_unref (autorun_path);
     }
 }
@@ -226,21 +221,16 @@ g_vfs_mount_info_query_autorun_info (GFile               *directory,
                                      GAsyncReadyCallback  callback,
                                      gpointer             user_data)
 {
-  GSimpleAsyncResult *simple;
+  GTask *task;
 
-  simple = g_simple_async_result_new (G_OBJECT (directory),
-                                      callback,
-                                      user_data,
-                                      g_vfs_mount_info_query_autorun_info);
-
-  if (cancellable != NULL)
-    g_object_set_data_full (G_OBJECT (simple), "cancellable", g_object_ref (cancellable), g_object_unref);
+  task = g_task_new (directory, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_vfs_mount_info_query_autorun_info);
 
   _g_find_file_insensitive_async (directory,
                                   "autorun.inf",
                                   cancellable,
                                   on_autorun_located,
-                                  simple);
+                                  task);
 }
 
 GIcon *
@@ -248,20 +238,10 @@ g_vfs_mount_info_query_autorun_info_finish (GFile          *directory,
                                             GAsyncResult   *res,
                                             GError        **error)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
-  GIcon *ret;
+  g_return_val_if_fail (g_task_is_valid (res, directory), NULL);
+  g_return_val_if_fail (g_async_result_is_tagged (res, g_vfs_mount_info_query_autorun_info), NULL);
 
-  g_warn_if_fail (g_simple_async_result_get_source_tag (simple) == g_vfs_mount_info_query_autorun_info);
-
-  ret = NULL;
-
-  if (g_simple_async_result_propagate_error (simple, error))
-    goto out;
-
-  ret = g_simple_async_result_get_op_res_gpointer (simple);
-
- out:
-  return ret;
+  return g_task_propagate_pointer (G_TASK (res), error);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -271,7 +251,7 @@ on_xdg_volume_info_loaded (GObject      *source_object,
                            GAsyncResult *res,
                            gpointer      user_data)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GTask *task = G_TASK (user_data);
   GFile *xdg_volume_info_file;
   gchar *content;
   gsize content_length;
@@ -351,11 +331,9 @@ on_xdg_volume_info_loaded (GObject      *source_object,
           g_themed_icon_append_name (G_THEMED_ICON (icon), "drive");
         }
 
-      g_simple_async_result_set_op_res_gpointer (simple, icon, NULL);
-      g_object_set_data_full (G_OBJECT (simple), "name", name, g_free);
+      g_object_set_data_full (G_OBJECT (task), "name", name, g_free);
+      g_task_return_pointer (task, icon, g_object_unref);
       name = NULL; /* steals name */
-      g_simple_async_result_complete_in_idle (simple);
-      g_object_unref (simple);
     }
 
  out:
@@ -364,12 +342,9 @@ on_xdg_volume_info_loaded (GObject      *source_object,
     g_key_file_free (key_file);
 
   if (error != NULL)
-    {
-      g_simple_async_result_set_from_error (simple, error);
-      g_simple_async_result_complete_in_idle (simple);
-      g_object_unref (simple);
-      g_error_free (error);
-    }
+    g_task_return_error (task, error);
+
+  g_object_unref (task);
 
   g_free (name);
   g_free (icon_name);
@@ -383,19 +358,17 @@ g_vfs_mount_info_query_xdg_volume_info (GFile               *directory,
                                         GAsyncReadyCallback  callback,
                                         gpointer             user_data)
 {
-  GSimpleAsyncResult *simple;
+  GTask *task;
   GFile *file;
 
-  simple = g_simple_async_result_new (G_OBJECT (directory),
-                                      callback,
-                                      user_data,
-                                      g_vfs_mount_info_query_xdg_volume_info);
+  task = g_task_new (directory, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_vfs_mount_info_query_xdg_volume_info);
 
   file = g_file_resolve_relative_path (directory, ".xdg-volume-info");
   g_file_load_contents_async (file,
                               cancellable,
                               on_xdg_volume_info_loaded,
-                              simple);
+                              task);
   g_object_unref (file);
 }
 
@@ -404,23 +377,17 @@ GIcon *g_vfs_mount_info_query_xdg_volume_info_finish (GFile          *directory,
                                                       gchar         **out_name,
                                                       GError        **error)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
-  GIcon *ret;
+  g_return_val_if_fail (g_task_is_valid (res, directory), NULL);
+  g_return_val_if_fail (g_async_result_is_tagged (res, g_vfs_mount_info_query_xdg_volume_info), NULL);
 
-  g_warn_if_fail (g_simple_async_result_get_source_tag (simple) == g_vfs_mount_info_query_xdg_volume_info);
-
-  ret = NULL;
-
-  if (g_simple_async_result_propagate_error (simple, error))
+  if (g_task_had_error (G_TASK (res)))
     goto out;
 
-  ret = g_simple_async_result_get_op_res_gpointer (simple);
-
   if (out_name != NULL)
-    *out_name = g_strdup (g_object_get_data (G_OBJECT (simple), "name"));
+    *out_name = g_strdup (g_object_get_data (G_OBJECT (res), "name"));
 
  out:
-  return ret;
+  return g_task_propagate_pointer (G_TASK (res), error);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -469,8 +436,9 @@ get_icon (const META_DL *meta)
 }
 
 static void
-bdmv_metadata_thread (GSimpleAsyncResult *result,
-                      GObject *object,
+bdmv_metadata_thread (GTask *task,
+                      gpointer object,
+                      gpointer task_data,
                       GCancellable *cancellable)
 {
   BLURAY *bd;
@@ -550,6 +518,9 @@ bdmv_metadata_thread (GSimpleAsyncResult *result,
         icon = g_strdup (get_icon (meta));
     }
 
+  if (name != NULL)
+    g_object_set_data_full (G_OBJECT (task), "name", name, g_free);
+
   /* Set the results */
   if (icon != NULL)
     {
@@ -561,27 +532,22 @@ bdmv_metadata_thread (GSimpleAsyncResult *result,
       icon_file = g_file_resolve_relative_path (file, icon_path);
       g_free (icon_path);
 
-      g_simple_async_result_set_op_res_gpointer (result,
-                                                 g_file_icon_new (icon_file),
-                                                 NULL);
+      g_task_return_pointer (task, g_file_icon_new (icon_file), g_object_unref);
       g_object_unref (icon_file);
     }
   else
     {
-      g_simple_async_result_set_op_res_gpointer (result, NULL, NULL);
+      g_task_return_pointer (task, NULL, NULL);
     }
 
-  if (name != NULL)
-    g_object_set_data_full (G_OBJECT (result), "name", name, g_free);
-
+  g_object_unref (task);
   bd_close (bd);
 
   return;
 
 error:
-  g_simple_async_result_set_from_error (result, error);
-  g_simple_async_result_set_op_res_gpointer (result, NULL, NULL);
-  g_error_free (error);
+  g_task_return_error (task, error);
+  g_object_unref (task);
 }
 #endif /* HAVE_BLURAY */
 
@@ -591,30 +557,17 @@ g_vfs_mount_info_query_bdmv_volume_info (GFile               *directory,
                                          GAsyncReadyCallback  callback,
                                          gpointer             user_data)
 {
+  GTask *task;
+
+  task = g_task_new (directory, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_vfs_mount_info_query_bdmv_volume_info);
+
 #ifdef HAVE_BLURAY
-  GSimpleAsyncResult *simple;
-
-  simple = g_simple_async_result_new (G_OBJECT (directory),
-                                      callback,
-                                      user_data,
-                                      g_vfs_mount_info_query_bdmv_volume_info);
-  g_simple_async_result_run_in_thread (simple,
-                                       (GSimpleAsyncThreadFunc) bdmv_metadata_thread,
-                                       G_PRIORITY_DEFAULT,
-                                       cancellable);
-  g_object_unref (simple);
+  g_task_run_in_thread (task, (GTaskThreadFunc) bdmv_metadata_thread);
 #else
-  GSimpleAsyncResult *simple;
-
-  simple = g_simple_async_result_new (G_OBJECT (directory),
-                                      callback,
-                                      user_data,
-                                      g_vfs_mount_info_query_bdmv_volume_info);
-  g_simple_async_result_set_error (simple,
-                                   G_IO_ERROR,
-                                   G_IO_ERROR_NOT_SUPPORTED,
-                                   "gvfs built without Expat support, no BDMV support");
-  g_object_unref (simple);
+  g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           "gvfs built without Expat support, no BDMV support");
+  g_object_unref (task);
 #endif /* HAVE_BLURAY */
 }
 
@@ -623,23 +576,17 @@ GIcon *g_vfs_mount_info_query_bdmv_volume_info_finish (GFile          *directory
                                                        gchar         **out_name,
                                                        GError        **error)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
-  GIcon *ret;
+  g_return_val_if_fail (g_task_is_valid (res, directory), NULL);
+  g_return_val_if_fail (g_async_result_is_tagged (res, g_vfs_mount_info_query_bdmv_volume_info), NULL);
 
-  g_warn_if_fail (g_simple_async_result_get_source_tag (simple) == g_vfs_mount_info_query_bdmv_volume_info);
-
-  ret = NULL;
-
-  if (g_simple_async_result_propagate_error (simple, error))
+  if (g_task_had_error (G_TASK (res)))
     goto out;
 
-  ret = g_simple_async_result_get_op_res_gpointer (simple);
-
   if (out_name != NULL)
-    *out_name = g_strdup (g_object_get_data (G_OBJECT (simple), "name"));
+    *out_name = g_strdup (g_object_get_data (G_OBJECT (res), "name"));
 
  out:
-  return ret;
+  return g_task_propagate_pointer (G_TASK (res), error);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -661,17 +608,15 @@ find_file_insensitive_exists_callback (GObject *source_object,
 
 typedef struct _InsensitiveFileSearchData
 {
-        GFile *root;
         gchar *original_path;
         gchar **split_path;
         gint index;
         GFileEnumerator *enumerator;
         GFile *current_file;
-
-        GCancellable *cancellable;
-        GAsyncReadyCallback callback;
-        gpointer user_data;
 } InsensitiveFileSearchData;
+
+static void
+clear_find_file_insensitive_state (InsensitiveFileSearchData *data);
 
 static void
 _g_find_file_insensitive_async (GFile              *parent,
@@ -680,20 +625,21 @@ _g_find_file_insensitive_async (GFile              *parent,
                                 GAsyncReadyCallback callback,
                                 gpointer            user_data)
 {
+  GTask *task;
   InsensitiveFileSearchData *data;
   GFile *direct_file = g_file_get_child (parent, name);
 
+  task = g_task_new (parent, cancellable, callback, user_data);
+  g_task_set_source_tag (task, _g_find_file_insensitive_async);
+
   data = g_new0 (InsensitiveFileSearchData, 1);
-  data->cancellable = cancellable;
-  data->callback = callback;
-  data->user_data = user_data;
-  data->root = g_object_ref (parent);
   data->original_path = g_strdup (name);
+  g_task_set_task_data (task, data, (GDestroyNotify)clear_find_file_insensitive_state);
 
   g_file_query_info_async (direct_file, G_FILE_ATTRIBUTE_STANDARD_TYPE,
                            G_FILE_QUERY_INFO_NONE, G_PRIORITY_DEFAULT,
                            cancellable,
-                           find_file_insensitive_exists_callback, data);
+                           find_file_insensitive_exists_callback, task);
 
 
 }
@@ -701,8 +647,6 @@ _g_find_file_insensitive_async (GFile              *parent,
 static void
 clear_find_file_insensitive_state (InsensitiveFileSearchData *data)
 {
-  if (data->root)
-    g_object_unref (data->root);
   g_free (data->original_path);
   if (data->split_path)
     g_strfreev (data->split_path);
@@ -718,32 +662,23 @@ find_file_insensitive_exists_callback (GObject *source_object,
                                        GAsyncResult *res,
                                        gpointer user_data)
 {
+  GTask *task = G_TASK (user_data);
   GFileInfo *info;
-  InsensitiveFileSearchData *data = (InsensitiveFileSearchData *) (user_data);
+  InsensitiveFileSearchData *data = g_task_get_task_data (task);
 
   /* The file exists and can be found with the given path, no need to search. */
   if ((info = g_file_query_info_finish (G_FILE (source_object), res, NULL)))
     {
-      GSimpleAsyncResult *simple;
-
-      simple = g_simple_async_result_new (G_OBJECT (data->root),
-                                          data->callback,
-                                          data->user_data,
-                                          _g_find_file_insensitive_async);
-
-      g_simple_async_result_set_op_res_gpointer (simple, g_object_ref (source_object), g_object_unref);
-      g_simple_async_result_complete_in_idle (simple);
-      g_object_unref (simple);
-      clear_find_file_insensitive_state (data);
+      g_task_return_pointer (task, g_object_ref (source_object), g_object_unref);
+      g_object_unref (task);
       g_object_unref (info);
     }
-
   else
     {
       data->split_path = g_strsplit (data->original_path, G_DIR_SEPARATOR_S, -1);
       data->index = 0;
       data->enumerator = NULL;
-      data->current_file = g_object_ref (data->root);
+      data->current_file = g_object_ref (g_task_get_source_object (task));
 
       /* Skip any empty components due to multiple slashes */
       while (data->split_path[data->index] != NULL &&
@@ -753,39 +688,30 @@ find_file_insensitive_exists_callback (GObject *source_object,
       g_file_enumerate_children_async (data->current_file,
                                        G_FILE_ATTRIBUTE_STANDARD_NAME,
                                        0, G_PRIORITY_DEFAULT,
-                                       data->cancellable,
-                                       enumerated_children_callback, data);
+                                       g_task_get_cancellable (task),
+                                       enumerated_children_callback, task);
     }
-
-  g_object_unref (source_object);
 }
 
 static void
 enumerated_children_callback (GObject *source_object, GAsyncResult *res,
                               gpointer user_data)
 {
+  GTask *task = G_TASK (user_data);
   GFileEnumerator *enumerator;
-  InsensitiveFileSearchData *data = (InsensitiveFileSearchData *) (user_data);
+  InsensitiveFileSearchData *data = g_task_get_task_data (task);
 
   enumerator = g_file_enumerate_children_finish (G_FILE (source_object),
                                                  res, NULL);
 
   if (enumerator == NULL)
     {
-      GSimpleAsyncResult *simple;
       GFile *file;
 
-      simple = g_simple_async_result_new (G_OBJECT (data->root),
-                                          data->callback,
-                                          data->user_data,
-                                          _g_find_file_insensitive_async);
+      file = g_file_get_child (g_task_get_source_object (task), data->original_path);
 
-      file = g_file_get_child (data->root, data->original_path);
-
-      g_simple_async_result_set_op_res_gpointer (simple, g_object_ref (file), g_object_unref);
-      g_simple_async_result_complete_in_idle (simple);
-      g_object_unref (simple);
-      clear_find_file_insensitive_state (data);
+      g_task_return_pointer (task, file, g_object_unref);
+      g_object_unref (task);
       return;
     }
 
@@ -793,16 +719,17 @@ enumerated_children_callback (GObject *source_object, GAsyncResult *res,
   g_file_enumerator_next_files_async (enumerator,
                                       INSENSITIVE_SEARCH_ITEMS_PER_CALLBACK,
                                       G_PRIORITY_DEFAULT,
-                                      data->cancellable,
+                                      g_task_get_cancellable (task),
                                       more_files_callback,
-                                      data);
+                                      task);
 }
 
 static void
 more_files_callback (GObject *source_object, GAsyncResult *res,
                      gpointer user_data)
 {
-  InsensitiveFileSearchData *data = (InsensitiveFileSearchData *) (user_data);
+  GTask *task = G_TASK (user_data);
+  InsensitiveFileSearchData *data = g_task_get_task_data (task);
   GList *files, *l;
   gchar *filename = NULL, *component, *case_folded_name,
     *name_collation_key;
@@ -867,7 +794,7 @@ more_files_callback (GObject *source_object, GAsyncResult *res,
 
       g_file_enumerator_close_async (data->enumerator,
                                      G_PRIORITY_DEFAULT,
-                                     data->cancellable,
+                                     g_task_get_cancellable (task),
                                      NULL, NULL);
       g_object_unref (data->enumerator);
       data->enumerator = NULL;
@@ -887,17 +814,8 @@ more_files_callback (GObject *source_object, GAsyncResult *res,
       if (data->split_path[data->index] == NULL)
        {
           /* Search is complete, file was found */
-          GSimpleAsyncResult *simple;
-
-          simple = g_simple_async_result_new (G_OBJECT (data->root),
-                                              data->callback,
-                                              data->user_data,
-                                              _g_find_file_insensitive_async);
-
-          g_simple_async_result_set_op_res_gpointer (simple, g_object_ref (data->current_file), g_object_unref);
-          g_simple_async_result_complete_in_idle (simple);
-          g_object_unref (simple);
-          clear_find_file_insensitive_state (data);
+          g_task_return_pointer (task, g_object_ref (data->current_file), g_object_unref);
+          g_object_unref (task);
           return;
         }
 
@@ -905,31 +823,23 @@ more_files_callback (GObject *source_object, GAsyncResult *res,
       g_file_enumerate_children_async (data->current_file,
                                        G_FILE_ATTRIBUTE_STANDARD_NAME,
                                        0, G_PRIORITY_DEFAULT,
-                                       data->cancellable,
+                                       g_task_get_cancellable (task),
                                        enumerated_children_callback,
-                                       data);
+                                       task);
       return;
     }
 
   if (end_of_files)
     {
       /* Could not find the given file, abort the search */
-      GSimpleAsyncResult *simple;
       GFile *file;
 
       g_object_unref (data->enumerator);
       data->enumerator = NULL;
 
-      simple = g_simple_async_result_new (G_OBJECT (data->root),
-                                          data->callback,
-                                          data->user_data,
-                                          _g_find_file_insensitive_async);
-
-      file = g_file_get_child (data->root, data->original_path);
-      g_simple_async_result_set_op_res_gpointer (simple, file, g_object_unref);
-      g_simple_async_result_complete_in_idle (simple);
-      g_object_unref (simple);
-      clear_find_file_insensitive_state (data);
+      file = g_file_get_child (g_task_get_source_object (task), data->original_path);
+      g_task_return_pointer (task, file, g_object_unref);
+      g_object_unref (task);
       return;
     }
 
@@ -937,9 +847,9 @@ more_files_callback (GObject *source_object, GAsyncResult *res,
   g_file_enumerator_next_files_async (data->enumerator,
                                       INSENSITIVE_SEARCH_ITEMS_PER_CALLBACK,
                                       G_PRIORITY_DEFAULT,
-                                      data->cancellable,
+                                      g_task_get_cancellable (task),
                                       more_files_callback,
-                                      data);
+                                      task);
 }
 
 static GFile *
@@ -947,16 +857,8 @@ _g_find_file_insensitive_finish (GFile        *parent,
                                  GAsyncResult *result,
                                  GError      **error)
 {
-  GSimpleAsyncResult *simple;
-  GFile *file;
+  g_return_val_if_fail (g_task_is_valid (result, parent), NULL);
+  g_return_val_if_fail (g_async_result_is_tagged (result, _g_find_file_insensitive_async), NULL);
 
-  g_return_val_if_fail (G_IS_SIMPLE_ASYNC_RESULT (result), NULL);
-
-  simple = G_SIMPLE_ASYNC_RESULT (result);
-
-  if (g_simple_async_result_propagate_error (simple, error))
-    return NULL;
-
-  file = G_FILE (g_simple_async_result_get_op_res_gpointer (simple));
-  return g_object_ref (file);
+  return g_task_propagate_pointer (G_TASK (result), error);
 }
