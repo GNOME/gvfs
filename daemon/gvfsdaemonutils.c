@@ -333,6 +333,9 @@ gvfs_accept_certificate (GMountSource *mount_source,
   gboolean handled, aborted = FALSE;
   char *certificate_str, *reason, *message;
 
+  if (certificate == NULL)
+    return FALSE;
+
   certificate_str = certificate_to_string (certificate);
   reason = certificate_flags_to_string (errors);
   message = g_strdup_printf (_("The site's identity can't be verified:"
