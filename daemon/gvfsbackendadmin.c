@@ -114,11 +114,11 @@ check_permission (GVfsBackendAdmin *self,
   g_mutex_lock (&self->polkit_mutex);
 
   subject = polkit_unix_process_new_for_owner (pid, 0, uid);
-  result = polkit_authority_check_authorization_sync
-    (self->authority, subject,
-     "org.gtk.vfs.file-operations",
-     NULL, POLKIT_CHECK_AUTHORIZATION_FLAGS_ALLOW_USER_INTERACTION,
-     NULL, &error);
+  result = polkit_authority_check_authorization_sync (self->authority,
+                                                      subject,
+                                                      "org.gtk.vfs.file-operations",
+                                                      NULL, POLKIT_CHECK_AUTHORIZATION_FLAGS_ALLOW_USER_INTERACTION,
+                                                      NULL, &error);
   g_object_unref (subject);
 
   g_mutex_unlock (&self->polkit_mutex);
@@ -185,14 +185,14 @@ do_query_info (GVfsBackend *backend,
    * to determine permissions, which does not honor our privileged
    * capabilities.
    */
-  g_file_info_set_attribute_boolean
-    (real_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
-  g_file_info_set_attribute_boolean
-    (real_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
-  g_file_info_set_attribute_boolean
-    (real_info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);
-  g_file_info_set_attribute_boolean
-    (real_info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, TRUE);
+  g_file_info_set_attribute_boolean (real_info,
+                                     G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
+  g_file_info_set_attribute_boolean (real_info,
+                                     G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
+  g_file_info_set_attribute_boolean (real_info,
+                                     G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);
+  g_file_info_set_attribute_boolean (real_info,
+                                     G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, TRUE);
 
   g_file_info_copy_into (real_info, info);
   g_object_unref (real_info);
@@ -272,8 +272,8 @@ do_append_to (GVfsBackend *backend,
     goto out;
 
   set_open_for_write_attributes (open_write_job, stream);
-  g_vfs_job_open_for_write_set_initial_offset
-    (open_write_job, g_seekable_tell (G_SEEKABLE (stream)));
+  g_vfs_job_open_for_write_set_initial_offset (open_write_job,
+                                               g_seekable_tell (G_SEEKABLE (stream)));
 
  out:
   complete_job (job, error);
@@ -395,9 +395,8 @@ do_open_for_read (GVfsBackend        *backend,
     goto out;
 
   g_vfs_job_open_for_read_set_handle (open_read_job, stream);
-  g_vfs_job_open_for_read_set_can_seek
-    (open_read_job,
-     g_seekable_can_seek (G_SEEKABLE (stream)));
+  g_vfs_job_open_for_read_set_can_seek (open_read_job,
+                                        g_seekable_can_seek (G_SEEKABLE (stream)));
 
  out:
   complete_job (job, error);
