@@ -981,6 +981,7 @@ echo "
         CDDA support:                 $msg_cdda
         Gphoto2 support:              $msg_gphoto2
         MTP support:                  $msg_libmtp
+	Polkit support:               $msg_admin
 	archive support:              $msg_archive
 	AFC support:                  $msg_afc
         AFP support:                  $msg_afp
