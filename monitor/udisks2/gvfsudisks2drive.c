@@ -536,26 +536,17 @@ gvfs_udisks2_drive_enumerate_identifiers (GDrive *_drive)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-typedef void (*UnmountAndLockFunc)  (GDrive              *drive,
-                                     GMountOperation     *mount_operation,
-                                     GCancellable        *cancellable,
-                                     GAsyncReadyCallback  callback,
-                                     gpointer             user_data,
-                                     gpointer             on_all_unmounted_data);
+typedef void (*UnmountAndLockFunc) (GTask *task);
 
 typedef struct {
-  GDrive *drive;
-  GAsyncReadyCallback callback;
-  gpointer user_data;
-  GMountOperation *mount_operation;
-  GCancellable *cancellable;
   GMountUnmountFlags flags;
 
   GList *pending_mounts;
   GList *pending_encrypted;
 
+  GTask *task;
+
   UnmountAndLockFunc on_all_unmounted;
-  gpointer on_all_unmounted_data;
 } UnmountAndLockOp;
 
 static void
@@ -563,7 +554,6 @@ free_unmount_and_lock_op (UnmountAndLockOp *data)
 {
   g_list_free_full (data->pending_mounts, g_object_unref);
 
-  g_object_unref (data->drive);
   g_free (data);
 }
 
@@ -588,8 +578,8 @@ unmount_and_lock_do (UnmountAndLockOp *data)
 
       g_mount_unmount_with_operation (mount,
                                       data->flags,
-                                      data->mount_operation,
-                                      data->cancellable,
+                                      g_task_get_task_data (data->task),
+                                      g_task_get_cancellable (data->task),
                                       unmount_cb,
                                       data);
     }
@@ -602,19 +592,13 @@ unmount_and_lock_do (UnmountAndLockOp *data)
 
       udisks_encrypted_call_lock (encrypted,
                                   g_variant_new ("a{sv}", NULL), /* options */
-                                  data->cancellable,
+                                  g_task_get_cancellable (data->task),
                                   lock_cb,
                                   data);
     }
   else
     {
-      data->on_all_unmounted (data->drive,
-                              data->mount_operation,
-                              data->cancellable,
-                              data->callback,
-                              data->user_data,
-                              data->on_all_unmounted_data);
-
+      data->on_all_unmounted (g_object_ref (data->task));
       free_unmount_and_lock_op (data);
     }
 }
@@ -626,8 +610,8 @@ unmount_cb (GObject      *source_object,
 {
   UnmountAndLockOp *data = user_data;
   GMount *mount = G_MOUNT (source_object);
-  GSimpleAsyncResult *simple;
   GError *error = NULL;
+  GMountOperation *mount_operation = g_task_get_task_data (data->task);
 
   if (!g_mount_unmount_with_operation_finish (mount, res, &error))
     {
@@ -640,18 +624,11 @@ unmount_cb (GObject      *source_object,
                                _("Failed to eject medium; one or more volumes on the medium are busy."));
         }
 
-      if (data->mount_operation != NULL)
-        gvfs_udisks2_unmount_notify_stop (data->mount_operation, error != NULL);
+      if (mount_operation != NULL)
+        gvfs_udisks2_unmount_notify_stop (mount_operation, error != NULL);
 
       /* unmount failed; need to fail the whole eject operation */
-      simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
-                                                     data->callback,
-                                                     data->user_data,
-                                                     error);
-      g_error_free (error);
-      g_simple_async_result_complete (simple);
-      g_object_unref (simple);
-
+      g_task_return_error (data->task, error);
       free_unmount_and_lock_op (data);
     }
   else
@@ -669,7 +646,6 @@ lock_cb (GObject       *source_object,
 {
   UDisksEncrypted *encrypted = UDISKS_ENCRYPTED (source_object);
   UnmountAndLockOp *data = user_data;
-  GSimpleAsyncResult *simple;
   GError *error = NULL;
 
   if (!udisks_encrypted_call_lock_finish (encrypted,
@@ -677,14 +653,7 @@ lock_cb (GObject       *source_object,
                                           &error))
     {
       /* lock failed; need to fail the whole eject operation */
-      simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
-                                                     data->callback,
-                                                     data->user_data,
-                                                     error);
-      g_error_free (error);
-      g_simple_async_result_complete (simple);
-      g_object_unref (simple);
-
+      g_task_return_error (data->task, error);
       free_unmount_and_lock_op (data);
     }
   else
@@ -698,27 +667,17 @@ lock_cb (GObject       *source_object,
 static void
 unmount_and_lock (GVfsUDisks2Drive    *drive,
                   GMountUnmountFlags   flags,
-                  GMountOperation     *mount_operation,
-                  GCancellable        *cancellable,
-                  GAsyncReadyCallback  callback,
-                  gpointer             user_data,
-                  UnmountAndLockFunc   on_all_unmounted,
-                  gpointer             on_all_unmounted_data)
+                  GTask               *task,
+                  UnmountAndLockFunc   on_all_unmounted)
 {
   GMount *mount;
   UnmountAndLockOp *data;
   GList *l;
-  GSimpleAsyncResult *simple;
 
   data = g_new0 (UnmountAndLockOp, 1);
-  data->drive = g_object_ref (drive);
-  data->mount_operation = mount_operation;
-  data->cancellable = cancellable;
-  data->callback = callback;
-  data->user_data = user_data;
   data->flags = flags;
   data->on_all_unmounted = on_all_unmounted;
-  data->on_all_unmounted_data = on_all_unmounted_data;
+  data->task = task;
 
   for (l = drive->volumes; l != NULL; l = l->next)
     {
@@ -742,15 +701,8 @@ unmount_and_lock (GVfsUDisks2Drive    *drive,
               object = g_dbus_interface_get_object (G_DBUS_INTERFACE (block));
               if (object == NULL)
                 {
-                  simple = g_simple_async_result_new_error (G_OBJECT (data->drive),
-                                                            data->callback,
-                                                            data->user_data,
-                                                            G_IO_ERROR,
-                                                            G_IO_ERROR_FAILED,
-                                                            "No object for D-Bus interface");
-                  g_simple_async_result_complete (simple);
-                  g_object_unref (simple);
-
+                  g_task_return_new_error (data->task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                           "No object for D-Bus interface");
                   free_unmount_and_lock_op (data);
                   goto out;
                 }
@@ -784,72 +736,42 @@ unmount_and_lock (GVfsUDisks2Drive    *drive,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-typedef struct
-{
-  GSimpleAsyncResult *simple;
-
-  GVfsUDisks2Drive *drive;
-  GMountOperation *mount_operation;
-} EjectData;
-
-static void
-eject_data_free (EjectData *data)
-{
-  g_object_unref (data->simple);
-  g_clear_object (&data->drive);
-  g_clear_object (&data->mount_operation);
-
-  g_free (data);
-}
-
 static void
 eject_cb (GObject      *source_object,
           GAsyncResult *res,
           gpointer      user_data)
 {
-  EjectData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  GMountOperation *mount_operation = g_task_get_task_data (task);
   GError *error;
 
   error = NULL;
   if (!udisks_drive_call_eject_finish (UDISKS_DRIVE (source_object), res, &error))
-    {
-      gvfs_udisks2_utils_udisks_error_to_gio_error (error);
-      g_simple_async_result_take_error (data->simple, error);
-    }
+    gvfs_udisks2_utils_udisks_error_to_gio_error (error);
 
-  if (data->mount_operation != NULL)
+  if (mount_operation != NULL)
     {
       /* If we fail send an ::aborted signal to make any notification go away */
       if (error != NULL)
-        g_signal_emit_by_name (data->mount_operation, "aborted");
+        g_signal_emit_by_name (mount_operation, "aborted");
 
-      gvfs_udisks2_unmount_notify_stop (data->mount_operation, error != NULL);
+      gvfs_udisks2_unmount_notify_stop (mount_operation, error != NULL);
     }
 
-  g_simple_async_result_complete (data->simple);
-  eject_data_free (data);
+  if (error)
+    g_task_return_error (task, error);
+  else
+    g_task_return_boolean (task, TRUE);
+
+  g_object_unref (task);
 }
 
 static void
-gvfs_udisks2_drive_eject_on_all_unmounted (GDrive              *_drive,
-                                           GMountOperation     *mount_operation,
-                                           GCancellable        *cancellable,
-                                           GAsyncReadyCallback  callback,
-                                           gpointer             user_data,
-                                           gpointer             on_all_unmounted_data)
+gvfs_udisks2_drive_eject_on_all_unmounted (GTask *task)
 {
-  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (g_task_get_source_object (task));
+  GMountOperation *mount_operation = g_task_get_task_data (task);
   GVariantBuilder builder;
-  EjectData *data;
-
-  data = g_new0 (EjectData, 1);
-  data->simple = g_simple_async_result_new (G_OBJECT (drive),
-                                            callback,
-                                            user_data,
-                                            gvfs_udisks2_drive_eject_on_all_unmounted);
-  data->drive = g_object_ref (drive);
-  if (mount_operation != NULL)
-    data->mount_operation = g_object_ref (mount_operation);
 
   g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
   if (mount_operation == NULL)
@@ -860,9 +782,9 @@ gvfs_udisks2_drive_eject_on_all_unmounted (GDrive              *_drive,
     }
   udisks_drive_call_eject (drive->udisks_drive,
                            g_variant_builder_end (&builder),
-                           cancellable,
+                           g_task_get_cancellable (task),
                            eject_cb,
-                           data);
+                           task);
 }
 
 static void
@@ -874,6 +796,10 @@ gvfs_udisks2_drive_eject_with_operation (GDrive              *_drive,
                                          gpointer             user_data)
 {
   GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+  GTask *task;
+
+  task = g_task_new (drive, cancellable, callback, user_data);
+  g_task_set_source_tag (task, gvfs_udisks2_drive_eject_with_operation);
 
   /* This information is needed in GVfsDdisks2Volume when apps have
    * open files on the device ... we need to know if the button should
@@ -883,17 +809,14 @@ gvfs_udisks2_drive_eject_with_operation (GDrive              *_drive,
     {
       g_object_set_data (G_OBJECT (mount_operation), "x-udisks2-is-eject", GINT_TO_POINTER (1));
       gvfs_udisks2_unmount_notify_start (mount_operation, NULL, _drive);
+      g_task_set_task_data (task, g_object_ref (mount_operation), g_object_unref);
     }
 
   /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
   unmount_and_lock (drive,
                     flags,
-                    mount_operation,
-                    cancellable,
-                    callback,
-                    user_data,
-                    gvfs_udisks2_drive_eject_on_all_unmounted,
-                    NULL);
+                    task,
+                    gvfs_udisks2_drive_eject_on_all_unmounted);
 }
 
 static gboolean
@@ -901,7 +824,10 @@ gvfs_udisks2_drive_eject_with_operation_finish (GDrive        *drive,
                                                 GAsyncResult  *result,
                                                 GError       **error)
 {
-  return !g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
+  g_return_val_if_fail (g_task_is_valid (result, drive), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, gvfs_udisks2_drive_eject_with_operation), FALSE);
+
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void
@@ -926,72 +852,42 @@ gvfs_udisks2_drive_eject_finish (GDrive        *drive,
 
 #if UDISKS_CHECK_VERSION(2,0,90)
 
-typedef struct
-{
-  GSimpleAsyncResult *simple;
-
-  GVfsUDisks2Drive *drive;
-  GMountOperation *mount_operation;
-} StopData;
-
-static void
-stop_data_free (StopData *data)
-{
-  g_object_unref (data->simple);
-  g_clear_object (&data->drive);
-  g_clear_object (&data->mount_operation);
-
-  g_free (data);
-}
-
 static void
 power_off_cb (GObject      *source_object,
               GAsyncResult *res,
               gpointer      user_data)
 {
-  StopData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  GMountOperation *mount_operation = g_task_get_task_data (task);
   GError *error;
 
   error = NULL;
   if (!udisks_drive_call_power_off_finish (UDISKS_DRIVE (source_object), res, &error))
-    {
-      gvfs_udisks2_utils_udisks_error_to_gio_error (error);
-      g_simple_async_result_take_error (data->simple, error);
-    }
+    gvfs_udisks2_utils_udisks_error_to_gio_error (error);
 
-  if (data->mount_operation != NULL)
+  if (mount_operation != NULL)
     {
       /* If we fail send an ::aborted signal to make any notification go away */
       if (error != NULL)
-        g_signal_emit_by_name (data->mount_operation, "aborted");
+        g_signal_emit_by_name (mount_operation, "aborted");
 
-      gvfs_udisks2_unmount_notify_stop (data->mount_operation, error != NULL);
+      gvfs_udisks2_unmount_notify_stop (mount_operation, error != NULL);
     }
 
-  g_simple_async_result_complete (data->simple);
-  stop_data_free (data);
+  if (error)
+    g_task_return_error (task, error);
+  else
+    g_task_return_boolean (task, TRUE);
+
+  g_object_unref (task);
 }
 
 static void
-gvfs_udisks2_drive_stop_on_all_unmounted (GDrive              *_drive,
-                                          GMountOperation     *mount_operation,
-                                          GCancellable        *cancellable,
-                                          GAsyncReadyCallback  callback,
-                                          gpointer             user_data,
-                                          gpointer             on_all_unmounted_data)
+gvfs_udisks2_drive_stop_on_all_unmounted (GTask *task)
 {
-  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+  GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (g_task_get_source_object (task));
+  GMountOperation *mount_operation = g_task_get_task_data (task);
   GVariantBuilder builder;
-  StopData *data;
-
-  data = g_new0 (StopData, 1);
-  data->simple = g_simple_async_result_new (G_OBJECT (drive),
-                                            callback,
-                                            user_data,
-                                            gvfs_udisks2_drive_stop_on_all_unmounted);
-  data->drive = g_object_ref (drive);
-  if (mount_operation != NULL)
-    data->mount_operation = g_object_ref (mount_operation);
 
   g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
   if (mount_operation == NULL)
@@ -1002,9 +898,9 @@ gvfs_udisks2_drive_stop_on_all_unmounted (GDrive              *_drive,
     }
   udisks_drive_call_power_off (drive->udisks_drive,
                                g_variant_builder_end (&builder),
-                               cancellable,
+                               g_task_get_cancellable (task),
                                power_off_cb,
-                               data);
+                               task);
 }
 
 static void
@@ -1016,6 +912,9 @@ gvfs_udisks2_drive_stop (GDrive              *_drive,
                          gpointer             user_data)
 {
   GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (_drive);
+  GTask *task;
+
+  task = g_task_new (drive, cancellable, callback, user_data);
 
   /* This information is needed in GVfsDdisks2Volume when apps have
    * open files on the device ... we need to know if the button should
@@ -1025,17 +924,14 @@ gvfs_udisks2_drive_stop (GDrive              *_drive,
     {
       g_object_set_data (G_OBJECT (mount_operation), "x-udisks2-is-stop", GINT_TO_POINTER (1));
       gvfs_udisks2_unmount_notify_start (mount_operation, NULL, _drive);
+      g_task_set_task_data (task, g_object_ref (mount_operation), g_object_unref);
     }
 
   /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
   unmount_and_lock (drive,
                     flags,
-                    mount_operation,
-                    cancellable,
-                    callback,
-                    user_data,
-                    gvfs_udisks2_drive_stop_on_all_unmounted,
-                    NULL);
+                    task,
+                    gvfs_udisks2_drive_stop_on_all_unmounted);
 }
 
 static gboolean
@@ -1043,7 +939,10 @@ gvfs_udisks2_drive_stop_finish (GDrive        *drive,
                                 GAsyncResult  *result,
                                 GError       **error)
 {
-  return !g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
+  g_return_val_if_fail (g_task_is_valid (result, drive), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, gvfs_udisks2_drive_stop), FALSE);
+
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 #endif /* UDISKS_CHECK_VERSION(2,0,90) */
