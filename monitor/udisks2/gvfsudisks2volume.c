@@ -48,10 +48,7 @@ struct _GVfsUDisks2VolumeClass
   GObjectClass parent_class;
 };
 
-struct MountData;
-typedef struct MountData MountData;
-
-static void mount_cancel_pending_op (MountData *data);
+static void mount_cancel_pending_op (GTask *task);
 
 struct _GVfsUDisks2Volume
 {
@@ -84,16 +81,11 @@ struct _GVfsUDisks2Volume
    * is used to cancel the operation to make possible authentication dialogs go
    * away.
    */
-  MountData *mount_pending_op;
+  GTask *mount_pending_op;
 };
 
-struct MountData
+typedef struct MountData
 {
-  GSimpleAsyncResult *simple;
-
-  GVfsUDisks2Volume *volume;
-  GCancellable *cancellable;
-
   gulong mount_operation_reply_handler_id;
   gulong mount_operation_aborted_handler_id;
   GMountOperation *mount_operation;
@@ -109,7 +101,7 @@ struct MountData
   UDisksFilesystem *filesystem_to_mount;
 
   gboolean checked_keyring;
-};
+} MountData;
 
 static void gvfs_udisks2_volume_volume_iface_init (GVolumeIface *iface);
 
@@ -614,11 +606,13 @@ on_udisks_client_changed (UDisksClient *client,
                           gpointer      user_data)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (user_data);
-  MountData *data;
+  MountData *data = NULL;
 
   update_volume_on_event (volume);
 
-  data = volume->mount_pending_op;
+  if (volume->mount_pending_op)
+    data = g_task_get_task_data (volume->mount_pending_op);
+
   if (data && data->mount_operation_aborted_handler_id && data->encrypted_to_unlock)
     {
       UDisksBlock *cleartext_block;
@@ -926,14 +920,6 @@ static SecretSchema luks_passphrase_schema =
 static void
 mount_data_free (MountData *data)
 {
-  if (data->volume->mount_pending_op == data)
-    data->volume->mount_pending_op = NULL;
-
-  g_object_unref (data->simple);
-
-  g_clear_object (&data->volume);
-  g_clear_object (&data->cancellable);
-
   if (data->mount_operation != NULL)
     {
       if (data->mount_operation_reply_handler_id != 0)
@@ -959,9 +945,11 @@ mount_data_free (MountData *data)
 }
 
 static void
-mount_cancel_pending_op (MountData *data)
+mount_cancel_pending_op (GTask *task)
 {
-  g_cancellable_cancel (data->cancellable);
+  MountData *data = g_task_get_task_data (task);
+
+  g_cancellable_cancel (g_task_get_cancellable (task));
   /* send an ::aborted signal to make the dialog go away */
   if (data->mount_operation != NULL)
     g_signal_emit_by_name (data->mount_operation, "aborted");
@@ -974,7 +962,8 @@ mount_command_cb (GObject       *source_object,
                   GAsyncResult  *res,
                   gpointer       user_data)
 {
-  MountData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  GVfsUDisks2Volume *volume = g_task_get_source_object (task);
   GError *error;
   gint exit_status;
   gchar *standard_error = NULL;
@@ -993,39 +982,30 @@ mount_command_cb (GObject       *source_object,
                                         &standard_error,
                                         &error))
     {
-      g_simple_async_result_take_error (data->simple, error);
-      g_simple_async_result_complete (data->simple);
-      mount_data_free (data);
-      goto out;
+      g_task_return_error (task, error);
     }
-
-  if (WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0)
+  else if (WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0)
     {
-      gvfs_udisks2_volume_monitor_update (data->volume->monitor);
-      g_simple_async_result_complete (data->simple);
-      mount_data_free (data);
-      goto out;
+      gvfs_udisks2_volume_monitor_update (volume->monitor);
+      g_task_return_boolean (task, TRUE);
     }
+  else
+    g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                             "%s", standard_error);
 
-  g_simple_async_result_set_error (data->simple,
-                                   G_IO_ERROR,
-                                   G_IO_ERROR_FAILED,
-                                   "%s", standard_error);
-  g_simple_async_result_complete (data->simple);
-  mount_data_free (data);
-
- out:
+  g_object_unref (task);
   g_free (standard_error);
 }
 
 /* ------------------------------ */
 
 static void
-ensure_autoclear (MountData *data)
+ensure_autoclear (GTask *task)
 {
+  GVfsUDisks2Volume *volume = g_task_get_source_object (task);
   UDisksLoop *loop;
-  loop = udisks_client_get_loop_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (data->volume->monitor),
-                                           data->volume->block);
+  loop = udisks_client_get_loop_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+                                           volume->block);
   if (loop != NULL)
     {
       if (!udisks_loop_get_autoclear (loop) && udisks_loop_get_setup_by_uid (loop) == getuid ())
@@ -1047,7 +1027,8 @@ mount_cb (GObject       *source_object,
           GAsyncResult  *res,
           gpointer       user_data)
 {
-  MountData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  GVfsUDisks2Volume *volume = g_task_get_source_object (task);
   gchar *mount_path;
   GError *error;
 
@@ -1058,24 +1039,24 @@ mount_cb (GObject       *source_object,
                                             &error))
     {
       gvfs_udisks2_utils_udisks_error_to_gio_error (error);
-      g_simple_async_result_take_error (data->simple, error);
-      g_simple_async_result_complete (data->simple);
+      g_task_return_error (task, error);
     }
   else
     {
       /* if mounting worked, ensure that the loop device goes away when unmounted */
-      ensure_autoclear (data);
+      ensure_autoclear (task);
 
-      gvfs_udisks2_volume_monitor_update (data->volume->monitor);
-      g_simple_async_result_complete (data->simple);
+      gvfs_udisks2_volume_monitor_update (volume->monitor);
+      g_task_return_boolean (task, TRUE);
       g_free (mount_path);
     }
-  mount_data_free (data);
+  g_object_unref (task);
 }
 
 static void
-do_mount (MountData *data)
+do_mount (GTask *task)
 {
+  MountData *data = g_task_get_task_data (task);
   GVariantBuilder builder;
 
   g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
@@ -1087,9 +1068,9 @@ do_mount (MountData *data)
     }
   udisks_filesystem_call_mount (data->filesystem_to_mount,
                                 g_variant_builder_end (&builder),
-                                data->cancellable,
+                                g_task_get_cancellable (task),
                                 mount_cb,
-                                data);
+                                task);
 }
 
 /* ------------------------------ */
@@ -1100,31 +1081,27 @@ luks_store_passphrase_cb (GObject      *source,
                           GAsyncResult *result,
                           gpointer      user_data)
 {
-  MountData *data = user_data;
+  GTask *task = G_TASK (user_data);
   GError *error = NULL;
 
   if (secret_password_store_finish (result, &error))
     {
       /* everything is good */
-      do_mount (data);
+      do_mount (task);
     }
   else
     {
       /* report failure */
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED,
-                                       _("Error storing passphrase in keyring (%s)"),
-                                       error->message);
-      g_simple_async_result_complete (data->simple);
-      g_error_free (error);
-      mount_data_free (data);
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               _("Error storing passphrase in keyring (%s)"),
+                               error->message);
+      g_object_unref (task);
     }
 }
 #endif
 
 
-static void do_unlock (MountData *data);
+static void do_unlock (GTask *task);
 
 
 #ifdef HAVE_KEYRING
@@ -1133,7 +1110,8 @@ luks_delete_passphrase_cb (GObject      *source,
                            GAsyncResult *result,
                            gpointer      user_data)
 {
-  MountData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  MountData *data = g_task_get_task_data (task);
   GError *error = NULL;
 
   secret_password_clear_finish (result, &error);
@@ -1142,19 +1120,15 @@ luks_delete_passphrase_cb (GObject      *source,
       /* with the bad passphrase out of the way, try again */
       g_free (data->passphrase);
       data->passphrase = NULL;
-      do_unlock (data);
+      do_unlock (task);
     }
   else
     {
       /* report failure */
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED,
-                                       _("Error deleting invalid passphrase from keyring (%s)"),
-                                       error->message);
-      g_simple_async_result_complete (data->simple);
-      g_error_free (error);
-      mount_data_free (data);
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               _("Error deleting invalid passphrase from keyring (%s)"),
+                               error->message);
+      g_object_unref (task);
     }
 }
 #endif
@@ -1164,7 +1138,9 @@ unlock_cb (GObject       *source_object,
            GAsyncResult  *res,
            gpointer       user_data)
 {
-  MountData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  MountData *data = g_task_get_task_data (task);
+  GVfsUDisks2Volume *volume = g_task_get_source_object (task);
   gchar *cleartext_device = NULL;
   GError *error;
 
@@ -1185,17 +1161,16 @@ unlock_cb (GObject       *source_object,
           g_strcmp0 (data->passphrase, data->passphrase_from_keyring) == 0)
         {
           /* nuke the invalid passphrase from keyring... */
-          secret_password_clear (&luks_passphrase_schema, data->cancellable,
-                                 luks_delete_passphrase_cb, data,
+          secret_password_clear (&luks_passphrase_schema, g_task_get_cancellable (task),
+                                 luks_delete_passphrase_cb, task,
                                  "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
                                  NULL); /* sentinel */
           goto out;
         }
 #endif
       gvfs_udisks2_utils_udisks_error_to_gio_error (error);
-      g_simple_async_result_take_error (data->simple, error);
-      g_simple_async_result_complete (data->simple);
-      mount_data_free (data);
+      g_task_return_error (task, error);
+      g_object_unref (task);
       goto out;
     }
   else
@@ -1203,21 +1178,18 @@ unlock_cb (GObject       *source_object,
       UDisksObject *object;
 
       /* if unlocking worked, ensure that the loop device goes away when locked */
-      ensure_autoclear (data);
+      ensure_autoclear (task);
 
-      gvfs_udisks2_volume_monitor_update (data->volume->monitor);
+      gvfs_udisks2_volume_monitor_update (volume->monitor);
 
-      object = udisks_client_peek_object (gvfs_udisks2_volume_monitor_get_udisks_client (data->volume->monitor),
+      object = udisks_client_peek_object (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
                                           cleartext_device);
       data->filesystem_to_mount = object != NULL ? udisks_object_get_filesystem (object) : NULL;
       if (data->filesystem_to_mount == NULL)
         {
-          g_simple_async_result_set_error (data->simple,
-                                           G_IO_ERROR,
-                                           G_IO_ERROR_FAILED,
-                                           _("The unlocked device does not have a recognizable file system on it"));
-          g_simple_async_result_complete (data->simple);
-          mount_data_free (data);
+          g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                   _("The unlocked device does not have a recognizable file system on it"));
+          g_object_unref (task);
           goto out;
         }
 
@@ -1249,8 +1221,8 @@ unlock_cb (GObject       *source_object,
 
           secret_password_store (&luks_passphrase_schema,
                                  keyring, display_name, data->passphrase,
-                                 data->cancellable,
-                                 luks_store_passphrase_cb, data,
+                                 g_task_get_cancellable (task),
+                                 luks_store_passphrase_cb, task,
                                  "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
                                  NULL); /* sentinel */
           goto out;
@@ -1258,7 +1230,7 @@ unlock_cb (GObject       *source_object,
 #endif
 
       /* OK, ready to rock */
-      do_mount (data);
+      do_mount (task);
     }
 
  out:
@@ -1270,7 +1242,9 @@ on_mount_operation_reply (GMountOperation       *mount_operation,
                           GMountOperationResult result,
                           gpointer              user_data)
 {
-  MountData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  MountData *data = g_task_get_task_data (task);
+  GVfsUDisks2Volume *volume = g_task_get_source_object (task);
 
   /* we got what we wanted; don't listen to any other signals from the mount operation */
   if (data->mount_operation_reply_handler_id != 0)
@@ -1293,8 +1267,8 @@ on_mount_operation_reply (GMountOperation       *mount_operation,
 
           g_object_set_data (G_OBJECT (data->mount_operation), "x-udisks2-is-unlocked", GINT_TO_POINTER (0));
 
-          client = gvfs_udisks2_volume_monitor_get_udisks_client (data->volume->monitor);
-          cleartext_block = udisks_client_get_cleartext_block (client, data->volume->block);
+          client = gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor);
+          cleartext_block = udisks_client_get_cleartext_block (client, volume->block);
           if (cleartext_block != NULL)
             {
               UDisksObject *object;
@@ -1306,44 +1280,35 @@ on_mount_operation_reply (GMountOperation       *mount_operation,
                   data->filesystem_to_mount = udisks_object_get_filesystem (object);
                   if (data->filesystem_to_mount != NULL)
                     {
-                      do_mount (data);
-                      goto out;
+                      do_mount (task);
+                      return;
                     }
                   else
                     {
-                      g_simple_async_result_set_error (data->simple,
-                                                       G_IO_ERROR,
-                                                       G_IO_ERROR_FAILED,
-                                                       "No filesystem interface on D-Bus object for cleartext device");
+                      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                               "No filesystem interface on D-Bus object for cleartext device");
                     }
                 }
               else
                 {
-                  g_simple_async_result_set_error (data->simple,
-                                                   G_IO_ERROR,
-                                                   G_IO_ERROR_FAILED,
-                                                   "No object for D-Bus interface");
+                  g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                           "No object for D-Bus interface");
                 }
             }
         }
       else if (result == G_MOUNT_OPERATION_ABORTED)
         {
           /* The user aborted the operation so consider it "handled" */
-          g_simple_async_result_set_error (data->simple,
-                                           G_IO_ERROR,
-                                           G_IO_ERROR_FAILED_HANDLED,
-                                           "Password dialog aborted (user should never see this error since it is G_IO_ERROR_FAILED_HANDLED)");
+          g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED,
+                                   "Password dialog aborted");
         }
       else
         {
-          g_simple_async_result_set_error (data->simple,
-                                           G_IO_ERROR,
-                                           G_IO_ERROR_PERMISSION_DENIED,
-                                           "Expected G_MOUNT_OPERATION_HANDLED but got %d", result);
+          g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                   "Expected G_MOUNT_OPERATION_HANDLED but got %d", result);
         }
-      g_simple_async_result_complete (data->simple);
-      mount_data_free (data);
-      goto out;
+      g_object_unref (task);
+      return;
     }
 
   data->passphrase = g_strdup (g_mount_operation_get_password (mount_operation));
@@ -1351,10 +1316,7 @@ on_mount_operation_reply (GMountOperation       *mount_operation,
 
   /* Don't save password in keyring just yet - check if it works first */
 
-  do_unlock (data);
-
- out:
-  ;
+  do_unlock (task);
 }
 
 static void
@@ -1365,14 +1327,15 @@ on_mount_operation_aborted (GMountOperation       *mount_operation,
 }
 
 static gboolean
-has_crypttab_passphrase (MountData *data)
+has_crypttab_passphrase (GTask *task)
 {
+  GVfsUDisks2Volume *volume = g_task_get_source_object (task);
   gboolean ret = FALSE;
   GVariantIter iter;
   GVariant *configuration_value;
   const gchar *configuration_type;
 
-  g_variant_iter_init (&iter, udisks_block_get_configuration (data->volume->block));
+  g_variant_iter_init (&iter, udisks_block_get_configuration (volume->block));
   while (g_variant_iter_next (&iter, "(&s@a{sv})", &configuration_type, &configuration_value))
     {
       if (g_strcmp0 (configuration_type, "crypttab") == 0)
@@ -1400,7 +1363,8 @@ luks_find_passphrase_cb (GObject      *source,
                          GAsyncResult *result,
                          gpointer      user_data)
 {
-  MountData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  MountData *data = g_task_get_task_data (task);
   gchar *password;
 
   password = secret_password_lookup_finish (result, NULL);
@@ -1414,19 +1378,20 @@ luks_find_passphrase_cb (GObject      *source,
       data->passphrase_from_keyring = g_strdup (password);
     }
   /* try again */
-  do_unlock (data);
+  do_unlock (task);
 }
 #endif
 
 static void
-do_unlock (MountData *data)
+do_unlock (GTask *task)
 {
+  MountData *data = g_task_get_task_data (task);
   GVariantBuilder builder;
 
   if (data->passphrase == NULL)
     {
       /* If the passphrase is in the crypttab file, no need to ask the user, just use a blank passphrase */
-      if (has_crypttab_passphrase (data))
+      if (has_crypttab_passphrase (task))
         {
           data->passphrase = g_strdup ("");
         }
@@ -1439,8 +1404,8 @@ do_unlock (MountData *data)
           if (!data->checked_keyring)
             {
               data->checked_keyring = TRUE;
-              secret_password_lookup (&luks_passphrase_schema, data->cancellable,
-                                      luks_find_passphrase_cb, data,
+              secret_password_lookup (&luks_passphrase_schema, g_task_get_cancellable (task),
+                                      luks_find_passphrase_cb, task,
                                       "gvfs-luks-uuid", data->uuid_of_encrypted_to_unlock,
                                       NULL); /* sentinel */
               goto out;
@@ -1449,23 +1414,20 @@ do_unlock (MountData *data)
 
           if (data->mount_operation == NULL)
             {
-              g_simple_async_result_set_error (data->simple,
-                                               G_IO_ERROR,
-                                               G_IO_ERROR_FAILED,
-                                               _("A passphrase is required to access the volume"));
-              g_simple_async_result_complete (data->simple);
-              mount_data_free (data);
+              g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                       _("A passphrase is required to access the volume"));
+              g_object_unref (task);
               goto out;
             }
 
           data->mount_operation_reply_handler_id = g_signal_connect (data->mount_operation,
                                                                      "reply",
                                                                      G_CALLBACK (on_mount_operation_reply),
-                                                                     data);
+                                                                     task);
           data->mount_operation_aborted_handler_id = g_signal_connect (data->mount_operation,
                                                                        "aborted",
                                                                        G_CALLBACK (on_mount_operation_aborted),
-                                                                       data);
+                                                                       task);
           /* Translators: This is the message shown to users */
           message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
                                        "The passphrase is needed to access encrypted data on %s."),
@@ -1508,9 +1470,9 @@ do_unlock (MountData *data)
   udisks_encrypted_call_unlock (data->encrypted_to_unlock,
                                 data->passphrase,
                                 g_variant_builder_end (&builder),
-                                data->cancellable,
+                                g_task_get_cancellable (task),
                                 unlock_cb,
-                                data);
+                                task);
  out:
   ;
 }
@@ -1529,41 +1491,38 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
   UDisksBlock *block;
   UDisksFilesystem *filesystem;
   MountData *data;
+  GTask *task;
+
+  task = g_task_new (volume, cancellable, callback, user_data);
+  g_task_set_source_tag (task, gvfs_udisks2_volume_mount);
 
   data = g_new0 (MountData, 1);
-  data->simple = g_simple_async_result_new (G_OBJECT (volume),
-                                            callback,
-                                            user_data,
-                                            gvfs_udisks2_volume_mount);
-  data->volume = g_object_ref (volume);
-  data->cancellable = cancellable != NULL ? g_object_ref (cancellable) : NULL;
   data->mount_operation = mount_operation != NULL ? g_object_ref (mount_operation) : NULL;
+
+  g_task_set_task_data (task, data, (GDestroyNotify)mount_data_free);
 
   if (volume->mount_pending_op != NULL)
     {
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED,
-                                       "A mount operation is already pending");
-      g_simple_async_result_complete (data->simple);
-      mount_data_free (data);
-      goto out;
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               "A mount operation is already pending");
+      g_object_unref (task);
+      return;
     }
-  volume->mount_pending_op = data;
+  volume->mount_pending_op = task;
 
   /* Use the mount(8) command if there is no block device */
   if (volume->block == NULL)
     {
       gchar *escaped_mount_path;
-      escaped_mount_path = g_strescape (g_unix_mount_point_get_mount_path (data->volume->mount_point), NULL);
+      escaped_mount_path = g_strescape (g_unix_mount_point_get_mount_path (volume->mount_point), NULL);
       gvfs_udisks2_utils_spawn (10, /* timeout in seconds */
-                                data->cancellable,
+                                cancellable,
                                 mount_command_cb,
-                                data,
+                                task,
                                 "mount \"%s\"",
                                 escaped_mount_path);
       g_free (escaped_mount_path);
-      goto out;
+      return;
     }
 
   /* if encrypted and already unlocked, just mount the cleartext block device */
@@ -1577,13 +1536,10 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
   object = g_dbus_interface_get_object (G_DBUS_INTERFACE (block));
   if (object == NULL)
     {
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED,
-                                       "No object for D-Bus interface");
-      g_simple_async_result_complete (data->simple);
-      mount_data_free (data);
-      goto out;
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               "No object for D-Bus interface");
+      g_object_unref (task);
+      return;
     }
 
   filesystem = udisks_object_peek_filesystem (UDISKS_OBJECT (object));
@@ -1649,53 +1605,50 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
             }
           data->uuid_of_encrypted_to_unlock = udisks_block_dup_id_uuid (block);
 
-          do_unlock (data);
-          goto out;
+          do_unlock (task);
+          return;
         }
 
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED,
-                                       "No .Filesystem or .Encrypted interface on D-Bus object");
-      g_simple_async_result_complete (data->simple);
-      mount_data_free (data);
-      goto out;
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               "No .Filesystem or .Encrypted interface on D-Bus object");
+      g_object_unref (task);
+      return;
     }
 
   data->filesystem_to_mount = g_object_ref (filesystem);
-  do_mount (data);
-
- out:
-  ;
+  do_mount (task);
 }
 
 static gboolean
-gvfs_udisks2_volume_mount_finish (GVolume       *volume,
+gvfs_udisks2_volume_mount_finish (GVolume       *_volume,
                                   GAsyncResult  *result,
                                   GError       **error)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
-  return !g_simple_async_result_propagate_error (simple, error);
+  GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
+
+  g_return_val_if_fail (g_task_is_valid (result, volume), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, gvfs_udisks2_volume_mount), FALSE);
+
+  if (volume->mount_pending_op == G_TASK (result))
+    volume->mount_pending_op = NULL;
+
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
-
-typedef struct
-{
-  GObject *object;
-  GAsyncReadyCallback callback;
-  gpointer user_data;
-} EjectWrapperOp;
 
 static void
 eject_wrapper_callback (GObject      *source_object,
                         GAsyncResult *res,
                         gpointer      user_data)
 {
-  EjectWrapperOp *data  = user_data;
-  data->callback (data->object, res, data->user_data);
-  g_object_unref (data->object);
-  g_free (data);
+  GTask *task = G_TASK (user_data);
+  GError *error = NULL;
+
+  if (g_drive_eject_with_operation_finish (G_DRIVE (source_object), res, &error))
+    g_task_return_boolean (task, TRUE);
+  else
+    g_task_return_error (task, error);
 }
 
 static void
@@ -1707,33 +1660,20 @@ gvfs_udisks2_volume_eject_with_operation (GVolume              *_volume,
                                           gpointer             user_data)
 {
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
-  GVfsUDisks2Drive *drive;
+  GTask *task;
 
-  drive = NULL;
+  task = g_task_new (_volume, cancellable, callback, user_data);
+  g_task_set_source_tag (task, gvfs_udisks2_volume_eject_with_operation);
+
   if (volume->drive != NULL)
-    drive = g_object_ref (volume->drive);
-
-  if (drive != NULL)
     {
-      EjectWrapperOp *data;
-      data = g_new0 (EjectWrapperOp, 1);
-      data->object = g_object_ref (volume);
-      data->callback = callback;
-      data->user_data = user_data;
-      g_drive_eject_with_operation (G_DRIVE (drive), flags, mount_operation, cancellable, eject_wrapper_callback, data);
-      g_object_unref (drive);
+      g_drive_eject_with_operation (G_DRIVE (volume->drive), flags, mount_operation, cancellable, eject_wrapper_callback, task);
     }
   else
     {
-      GSimpleAsyncResult *simple;
-      simple = g_simple_async_result_new_error (G_OBJECT (volume),
-                                                callback,
-                                                user_data,
-                                                G_IO_ERROR,
-                                                G_IO_ERROR_FAILED,
-                                                _("Operation not supported by backend"));
-      g_simple_async_result_complete (simple);
-      g_object_unref (simple);
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               _("Operation not supported by backend"));
+      g_object_unref (task);
     }
 }
 
@@ -1742,19 +1682,10 @@ gvfs_udisks2_volume_eject_with_operation_finish (GVolume        *_volume,
                                                  GAsyncResult  *result,
                                                  GError       **error)
 {
-  GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
-  gboolean ret = TRUE;
+  g_return_val_if_fail (g_task_is_valid (result, _volume), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, gvfs_udisks2_volume_eject_with_operation), FALSE);
 
-  if (volume->drive != NULL)
-    {
-      ret = g_drive_eject_with_operation_finish (G_DRIVE (volume->drive), result, error);
-    }
-  else
-    {
-      g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
-      ret = FALSE;
-    }
-  return ret;
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void
