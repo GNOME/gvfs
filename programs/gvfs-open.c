@@ -89,8 +89,19 @@ get_bus_name_and_path_from_uri (char *uri,
   bus_name = g_strdup (basename);
   object_path = g_strdup_printf ("/%s", bus_name);
   for (p = object_path; *p != '\0'; p++)
-    if (*p == '.')
-      *p = '/';
+    {
+      if (*p == '.')
+        *p = '/';
+      else if (*p == '-')
+        *p = '_';
+    }
+
+  if (!g_variant_is_object_path (object_path))
+    {
+      g_warning ("Invalid object path \"%s\"", object_path);
+      g_free (object_path);
+      goto out;
+    }
 
   *bus_name_out = g_steal_pointer (&bus_name);
   *object_path_out = g_steal_pointer (&object_path);
