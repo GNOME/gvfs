@@ -87,35 +87,15 @@ if test "x$enable_gcr" != "xno"; then
 fi
 
 dnl ****************************
-dnl *** Checks for intltool  ***
-dnl ****************************
-
-IT_PROG_INTLTOOL([0.35.0])
-GETTEXT_PACKAGE=gvfs
-
-AC_SUBST([GETTEXT_PACKAGE])
-AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[The gettext domain name])
-AM_GLIB_GNU_GETTEXT
-
-dnl ****************************
 dnl *** Checks for gettext   ***
 dnl ****************************
+AM_GNU_GETTEXT_VERSION([0.19.4])
+AM_GNU_GETTEXT([external])
 
-dnl *** disabled by now, using intltool ***
-dnl *** we'll revert when glib-gettexttize will be able
-dnl *** to manage [enconding: UTF-8] in POTIFILES.in
+GETTEXT_PACKAGE=gvfs
+AC_SUBST([GETTEXT_PACKAGE])
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[The gettext domain name])
 
-dnl GETTEXT_PACKAGE=gvfs
-dnl AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [The gettext domain name])
-dnl AC_SUBST(GETTEXT_PACKAGE)
-
-dnl ALL_LINGUAS=""
-
-dnl AM_GLIB_GNU_GETTEXT
-
-dnl LIBS="$LIBS $INTLLIBS"
-
-dnl AM_GLIB_DEFINE_LOCALEDIR(GVFS_LOCALEDIR)
 
 dnl ****************************
 dnl *** Checks for ssh stuff ***
@@ -152,7 +132,7 @@ AC_ARG_ENABLE([admin], [AS_HELP_STRING([--disable-admin],[build without admin ba
 msg_admin=no
 
 if test "x$enable_admin" != "xno"; then
-  PKG_CHECK_MODULES([ADMIN], [polkit-gobject-1], [msg_admin=yes])
+  PKG_CHECK_MODULES([ADMIN], [polkit-gobject-1 >= 0.114], [msg_admin=yes])
 
   if test "x$msg_admin" = "xyes"; then
     AC_DEFINE([HAVE_ADMIN], 1, [Define to 1 if admin backend is going to be built])

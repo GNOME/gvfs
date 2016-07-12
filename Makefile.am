@@ -27,12 +27,6 @@ EXTRA_DIST = \
 	m4			\
 	$(NULL)
 
-DISTCLEANFILES = \
-	intltool-extract	\
-	intltool-merge		\
-	intltool-update		\
-	$(NULL)
-
 distclean-local:
 	if test "$(srcdir)" = "."; then :; else \
 		rm -f ChangeLog; \

@@ -665,7 +665,9 @@ gvfs_gschemas_convert_DATA = $(gvfs_gschemas_convert)
 org.gtk.vfs.file-operations.policy.in: org.gtk.vfs.file-operations.policy.in.in Makefile
 	$(AM_V_GEN) sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-@INTLTOOL_POLICY_RULE@
+org.gtk.vfs.file-operations.policy: org.gtk.vfs.file-operations.policy.in Makefile
+	$(AM_V_GEN) $(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@ || cp $< $@
+
 gvfs_polkit_actionsdir = $(datadir)/polkit-1/actions
 gvfs_polkit_actions_in_files = org.gtk.vfs.file-operations.policy.in
 gvfs_polkit_actions_DATA = org.gtk.vfs.file-operations.policy

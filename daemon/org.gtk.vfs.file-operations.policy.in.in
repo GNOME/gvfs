@@ -9,8 +9,8 @@
   <vendor_url>http://git.gnome.org/browse/gvfs</vendor_url>
 
   <action id="org.gtk.vfs.file-operations-helper">
-    <_description>Perform file operations</_description>
-    <_message>Authentication is required to perform file operations</_message>
+    <description>Perform file operations</description>
+    <message>Authentication is required to perform file operations</message>
     <defaults>
       <allow_any>no</allow_any>
       <allow_inactive>no</allow_inactive>
@@ -20,8 +20,8 @@
   </action>
 
   <action id="org.gtk.vfs.file-operations">
-    <_description>Perform file operations</_description>
-    <_message>Authentication is required to perform file operations</_message>
+    <description>Perform file operations</description>
+    <message>Authentication is required to perform file operations</message>
     <defaults>
       <allow_any>no</allow_any>
       <allow_inactive>no</allow_inactive>
