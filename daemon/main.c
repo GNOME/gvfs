@@ -197,6 +197,9 @@ main (int argc, char *argv[])
 
   g_option_context_free (context);
 
+  if (g_getenv ("GVFS_DEBUG"))
+    debugging = TRUE;
+
   gvfs_set_debug (debugging);
 
   if (show_version)
