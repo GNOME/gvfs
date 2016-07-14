@@ -18,6 +18,7 @@ daemon/gvfsafpconnection.c
 daemon/gvfsafpserver.c
 daemon/gvfsafputils.c
 daemon/gvfsafpvolume.c
+daemon/gvfsbackendadmin.c
 daemon/gvfsbackendafc.c
 daemon/gvfsbackendafpbrowse.c
 daemon/gvfsbackendafp.c
@@ -87,6 +88,7 @@ daemon/gvfsjobunmountmountable.c
 daemon/gvfsjobwrite.c
 daemon/main.c
 daemon/mount.c
+daemon/org.gtk.vfs.file-operations.policy.in.in
 metadata/meta-daemon.c
 monitor/afc/afcvolume.c
 monitor/gdu/gdu-volume-monitor-daemon.c
