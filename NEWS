@@ -1,3 +1,12 @@
+Major changes in 1.29.4
+=======================
+* Introduce an admin gvfs backend based on polkit
+* gvfs-open: Fix spawning of applications with dashses in their app IDs
+* daemon: Fix crashes caused by NULL certificates
+* daemon: Set G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE attribute
+* Several smaller bugfixes and improvements
+* Translation updates
+
 Major changes in 1.29.3
 =======================
 * afc: Many improvements and fixes for iOS support 
