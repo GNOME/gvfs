@@ -404,7 +404,7 @@ AC_ARG_ENABLE([afc], [AS_HELP_STRING([--disable-afc],[build without AFC backend]
 msg_afc=no
 
 if test "x$enable_afc" != "xno" ; then
-  PKG_CHECK_EXISTS([libimobiledevice-1.0 >= 1.1.5 libplist >= 0.15], [msg_afc=yes])
+  PKG_CHECK_EXISTS([libimobiledevice-1.0 >= 1.2 libplist >= 0.15], [msg_afc=yes])
 
   if test "x$msg_afc" = "xyes"; then
     PKG_CHECK_MODULES([AFC], [libimobiledevice-1.0 libplist])
