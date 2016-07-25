@@ -63,33 +63,16 @@ G_DEFINE_TYPE_EXTENDED (GVfsGoaVolume, g_vfs_goa_volume, G_TYPE_OBJECT, 0,
 
 typedef struct
 {
-  GAsyncReadyCallback callback;
-  GCancellable *cancellable;
   GMountOperation *mount_operation;
-  GSimpleAsyncResult *simple;
   gchar *passwd;
-  gpointer user_data;
 } MountOp;
 
 static void
 mount_op_free (MountOp *data)
 {
-  g_clear_object (&data->cancellable);
   g_clear_object (&data->mount_operation);
-  g_object_unref (data->simple);
   g_free (data->passwd);
   g_slice_free (MountOp, data);
-}
-
-static void
-mount_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
-{
-  MountOp *data = user_data;
-
-  if (data->callback != NULL)
-    data->callback (source_object, res, data->user_data);
-
-  mount_op_free (data);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -144,28 +127,31 @@ static void
 find_enclosing_mount_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GFile *root = G_FILE (source_object);
-  GSimpleAsyncResult *simple = user_data;
-  GVfsGoaVolume *self;
+  GTask *task = G_TASK (user_data);
+  GVfsGoaVolume *self = G_VFS_GOA_VOLUME (g_task_get_source_object (task));
   GError *error;
-
-  self = G_VFS_GOA_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
 
   error = NULL;
   g_clear_object (&self->mount);
   self->mount = g_file_find_enclosing_mount_finish (root, res, &error);
   if (self->mount == NULL)
-    g_simple_async_result_take_error (simple, error);
+    {
+      g_task_return_error (task, error);
+    }
   else
-    g_signal_connect (self->mount, "unmounted", G_CALLBACK (mount_unmounted_cb), self);
+    {
+      g_signal_connect (self->mount, "unmounted", G_CALLBACK (mount_unmounted_cb), self);
+      g_task_return_boolean (task, TRUE);
+    }
 
-  g_simple_async_result_complete_in_idle (simple);
+  g_object_unref (task);
 }
 
 static void
 mount_enclosing_volume_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GFile *root = G_FILE (source_object);
-  GSimpleAsyncResult *simple = user_data;
+  GTask *task = G_TASK (user_data);
   GError *error;
 
   error = NULL;
@@ -173,8 +159,8 @@ mount_enclosing_volume_cb (GObject *source_object, GAsyncResult *res, gpointer u
     {
       if (error->code != G_IO_ERROR_ALREADY_MOUNTED)
         {
-          g_simple_async_result_take_error (simple, error);
-          g_simple_async_result_complete_in_idle (simple);
+          g_task_return_error (task, error);
+          g_object_unref (task);
           return;
         }
       else
@@ -188,28 +174,29 @@ mount_enclosing_volume_cb (GObject *source_object, GAsyncResult *res, gpointer u
         }
     }
 
-  g_file_find_enclosing_mount_async (root, G_PRIORITY_DEFAULT, NULL, find_enclosing_mount_cb, simple);
+  g_file_find_enclosing_mount_async (root,
+                                     G_PRIORITY_DEFAULT,
+                                     g_task_get_cancellable (task),
+                                     find_enclosing_mount_cb,
+                                     task);
 }
 
 static void
 get_access_token_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GoaOAuth2Based *oauth2_based = GOA_OAUTH2_BASED (source_object);
-  GSimpleAsyncResult *simple = user_data;
-  GVfsGoaVolume *self;
+  GTask *task = G_TASK (user_data);
+  GVfsGoaVolume *self = G_VFS_GOA_VOLUME (g_task_get_source_object (task));
   GError *error;
   GoaAccount *account;
   GoaFiles *files;
-  MountOp *data;
-
-  self = G_VFS_GOA_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
-  data = g_async_result_get_user_data (G_ASYNC_RESULT (simple));
+  MountOp *data = g_task_get_task_data (task);
 
   error = NULL;
   if (!goa_oauth2_based_call_get_access_token_finish (oauth2_based, &data->passwd, NULL, res, &error))
     {
-      g_simple_async_result_take_error (simple, error);
-      g_simple_async_result_complete_in_idle (simple);
+      g_task_return_error (task, error);
+      g_object_unref (task);
       return;
     }
 
@@ -217,12 +204,10 @@ get_access_token_cb (GObject *source_object, GAsyncResult *res, gpointer user_da
   files = goa_object_peek_files (self->object);
   if (files == NULL)
     {
-      g_simple_async_result_set_error (simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED,
-                                       _("Failed to get org.gnome.OnlineAccounts.Files for %s"),
-                                       goa_account_get_id (account));
-      g_simple_async_result_complete_in_idle (simple);
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               _("Failed to get org.gnome.OnlineAccounts.Files for %s"),
+                               goa_account_get_id (account));
+      g_object_unref (task);
       return;
     }
 
@@ -230,30 +215,27 @@ get_access_token_cb (GObject *source_object, GAsyncResult *res, gpointer user_da
   g_file_mount_enclosing_volume (self->root,
                                  G_MOUNT_MOUNT_NONE,
                                  data->mount_operation,
-                                 data->cancellable,
+                                 g_task_get_cancellable (task),
                                  mount_enclosing_volume_cb,
-                                 simple);
+                                 task);
 }
 
 static void
 get_password_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GoaPasswordBased *passwd_based = GOA_PASSWORD_BASED (source_object);
-  GSimpleAsyncResult *simple = user_data;
-  GVfsGoaVolume *self;
+  GTask *task = G_TASK (user_data);
+  GVfsGoaVolume *self = G_VFS_GOA_VOLUME (g_task_get_source_object (task));
   GError *error;
   GoaAccount *account;
   GoaFiles *files;
-  MountOp *data;
-
-  self = G_VFS_GOA_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
-  data = g_async_result_get_user_data (G_ASYNC_RESULT (simple));
+  MountOp *data = g_task_get_task_data (task);
 
   error = NULL;
   if (!goa_password_based_call_get_password_finish (passwd_based, &data->passwd, res, &error))
     {
-      g_simple_async_result_take_error (simple, error);
-      g_simple_async_result_complete_in_idle (simple);
+      g_task_return_error (task, error);
+      g_object_unref (task);
       return;
     }
 
@@ -261,12 +243,10 @@ get_password_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   files = goa_object_peek_files (self->object);
   if (files == NULL)
     {
-      g_simple_async_result_set_error (simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED,
-                                       _("Failed to get org.gnome.OnlineAccounts.Files for %s"),
-                                       goa_account_get_id (account));
-      g_simple_async_result_complete_in_idle (simple);
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               _("Failed to get org.gnome.OnlineAccounts.Files for %s"),
+                               goa_account_get_id (account));
+      g_object_unref (task);
       return;
     }
 
@@ -274,65 +254,63 @@ get_password_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   g_file_mount_enclosing_volume (self->root,
                                  G_MOUNT_MOUNT_NONE,
                                  data->mount_operation,
-                                 data->cancellable,
+                                 g_task_get_cancellable (task),
                                  mount_enclosing_volume_cb,
-                                 simple);
+                                 task);
 }
 
 static void
 ensure_credentials_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GoaAccount *account = GOA_ACCOUNT (source_object);
-  GSimpleAsyncResult *simple = user_data;
-  GVfsGoaVolume *self;
+  GTask *task = G_TASK (user_data);
+  GVfsGoaVolume *self = G_VFS_GOA_VOLUME (g_task_get_source_object (task));
   GError *error;
   GoaOAuth2Based *oauth2_based;
   GoaPasswordBased *passwd_based;
-  MountOp *data;
-
-  self = G_VFS_GOA_VOLUME (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
-  data = g_async_result_get_user_data (G_ASYNC_RESULT (simple));
 
   error = NULL;
   if (!goa_account_call_ensure_credentials_finish (account, NULL, res, &error))
     {
       if (error->domain == GOA_ERROR && error->code == GOA_ERROR_NOT_AUTHORIZED)
         {
-          g_simple_async_result_set_error (simple,
-                                           G_IO_ERROR,
-                                           G_IO_ERROR_FAILED,
-                                           _("Invalid credentials for %s"),
-                                           goa_account_get_presentation_identity (account));
+          g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                   _("Invalid credentials for %s"),
+                                   goa_account_get_presentation_identity (account));
           g_error_free (error);
         }
       else
-        g_simple_async_result_take_error (simple, error);
+        g_task_return_error (task, error);
 
-      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (task);
       return;
     }
 
   oauth2_based = goa_object_peek_oauth2_based (self->object);
   if (oauth2_based != NULL)
     {
-      goa_oauth2_based_call_get_access_token (oauth2_based, data->cancellable, get_access_token_cb, simple);
+      goa_oauth2_based_call_get_access_token (oauth2_based,
+                                              g_task_get_cancellable (task),
+                                              get_access_token_cb,
+                                              task);
       return;
     }
 
   passwd_based = goa_object_peek_password_based (self->object);
   if (passwd_based != NULL)
     {
-      goa_password_based_call_get_password (passwd_based, "password", data->cancellable, get_password_cb, simple);
+      goa_password_based_call_get_password (passwd_based,
+                                            "password",
+                                            g_task_get_cancellable (task),
+                                            get_password_cb,
+                                            task);
       return;
     }
 
-  g_simple_async_result_set_error (simple,
-                                   G_IO_ERROR,
-                                   G_IO_ERROR_NOT_SUPPORTED,
-                                   _("Unsupported authentication method for %s"),
-                                   goa_account_get_presentation_identity (account));
-  g_simple_async_result_complete_in_idle (simple);
-
+  g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           _("Unsupported authentication method for %s"),
+                           goa_account_get_presentation_identity (account));
+  g_object_unref (task);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -441,44 +419,32 @@ g_vfs_goa_volume_mount (GVolume             *_self,
 {
   GVfsGoaVolume *self = G_VFS_GOA_VOLUME (_self);
   MountOp *data;
-  GSimpleAsyncResult *simple;
+  GTask *task;
   GoaAccount *account;
 
   data = g_slice_new0 (MountOp);
-  simple = g_simple_async_result_new (G_OBJECT (self), mount_cb, data, g_vfs_goa_volume_mount);
-
-  data->simple = simple;
-  data->callback = callback;
-  data->user_data = user_data;
-
-  if (cancellable != NULL)
-    {
-      data->cancellable = g_object_ref (cancellable);
-      g_simple_async_result_set_check_cancellable (simple, cancellable);
-    }
+  task = g_task_new (self, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_vfs_goa_volume_mount);
+  g_task_set_task_data (task, data, (GDestroyNotify) mount_op_free);
 
   /* We ignore the GMountOperation handed to us by the proxy volume
    * monitor because it is set up to emit MountOpAskPassword on
    * ask-password.
    */
   data->mount_operation = g_mount_operation_new ();
-  g_signal_connect (data->mount_operation, "ask-password", G_CALLBACK (mount_operation_ask_password_cb), data);
+  g_signal_connect (data->mount_operation, "ask-password", G_CALLBACK (mount_operation_ask_password_cb), task);
 
   account = goa_object_peek_account (self->object);
-  goa_account_call_ensure_credentials (account, data->cancellable, ensure_credentials_cb, simple);
+  goa_account_call_ensure_credentials (account, cancellable, ensure_credentials_cb, task);
 }
 
 static gboolean
 g_vfs_goa_volume_mount_finish (GVolume *_self, GAsyncResult *res, GError **error)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  g_return_val_if_fail (g_task_is_valid (res, _self), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (res, g_vfs_goa_volume_mount), FALSE);
 
-  g_return_val_if_fail (g_simple_async_result_is_valid (res, G_OBJECT (_self), g_vfs_goa_volume_mount), FALSE);
-
-  if (g_simple_async_result_propagate_error (simple, error))
-    return FALSE;
-
-  return TRUE;
+  return g_task_propagate_boolean (G_TASK (res), error);
 }
 
 static void
