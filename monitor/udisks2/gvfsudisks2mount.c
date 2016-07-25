@@ -525,18 +525,10 @@ gvfs_udisks2_mount_can_eject (GMount *_mount)
 
 typedef struct
 {
-  volatile gint ref_count;
-  GSimpleAsyncResult *simple;
   gboolean in_progress;
-  gboolean completed;
-  gboolean failed;
-
-  GVfsUDisks2Mount *mount;
 
   UDisksEncrypted *encrypted;
   UDisksFilesystem *filesystem;
-
-  GCancellable *cancellable;
 
   GMountOperation *mount_operation;
   GMountUnmountFlags flags;
@@ -549,39 +541,24 @@ typedef struct
   gboolean reply_set;
 } UnmountData;
 
-static UnmountData *
-unmount_data_ref (UnmountData *data)
-{
-  g_atomic_int_inc (&data->ref_count);
-  return data;
-}
-
 static void
-unmount_data_unref (UnmountData *data)
+unmount_data_free (UnmountData *data)
 {
-  if (g_atomic_int_dec_and_test (&data->ref_count))
+  if (data->mount_op_reply_handler_id > 0)
     {
-      g_object_unref (data->simple);
-
-      if (data->mount_op_reply_handler_id > 0)
-        {
-          /* make the operation dialog go away */
-          g_signal_emit_by_name (data->mount_operation, "aborted");
-          g_signal_handler_disconnect (data->mount_operation, data->mount_op_reply_handler_id);
-        }
-      if (data->retry_unmount_timer_id > 0)
-        {
-          g_source_remove (data->retry_unmount_timer_id);
-          data->retry_unmount_timer_id = 0;
-        }
-
-      g_clear_object (&data->mount);
-      g_clear_object (&data->cancellable);
-      g_clear_object (&data->mount_operation);
-      g_clear_object (&data->encrypted);
-      g_clear_object (&data->filesystem);
-      g_free (data);
+      /* make the operation dialog go away */
+      g_signal_emit_by_name (data->mount_operation, "aborted");
+      g_signal_handler_disconnect (data->mount_operation, data->mount_op_reply_handler_id);
     }
+  if (data->retry_unmount_timer_id > 0)
+    {
+      g_source_remove (data->retry_unmount_timer_id);
+      data->retry_unmount_timer_id = 0;
+    }
+
+  g_clear_object (&data->mount_operation);
+  g_clear_object (&data->encrypted);
+  g_clear_object (&data->filesystem);
 }
 
 static gboolean
@@ -597,30 +574,26 @@ unmount_operation_is_stop (GMountOperation *op)
 }
 
 static void
-unmount_data_complete (UnmountData *data,
-                       gboolean     complete_idle)
+umount_completed (GObject    *object,
+                  GParamSpec *pspec,
+                  gpointer    user_data)
 {
+  GTask *task = G_TASK (object);
+  UnmountData *data = g_task_get_task_data (task);
+
   if (data->mount_operation &&
       !unmount_operation_is_eject (data->mount_operation) &&
       !unmount_operation_is_stop (data->mount_operation))
-    gvfs_udisks2_unmount_notify_stop (data->mount_operation, data->failed);
-
-  if (complete_idle)
-    g_simple_async_result_complete_in_idle (data->simple);
-  else
-    g_simple_async_result_complete (data->simple);
-
-  data->in_progress = FALSE;
-  data->completed = TRUE;
-  unmount_data_unref (data);
+    gvfs_udisks2_unmount_notify_stop (data->mount_operation, g_task_had_error (task));
 }
 
-static void unmount_do (UnmountData *data, gboolean force);
+static void unmount_do (GTask *task, gboolean force);
 
 static gboolean
 on_retry_timer_cb (gpointer user_data)
 {
-  UnmountData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  UnmountData *data = g_task_get_task_data (task);
 
   if (data->retry_unmount_timer_id == 0)
     goto out;
@@ -628,19 +601,20 @@ on_retry_timer_cb (gpointer user_data)
   /* we're removing the timeout */
   data->retry_unmount_timer_id = 0;
 
-  if (data->completed || data->in_progress)
+  if (g_task_get_completed (task) || data->in_progress)
     goto out;
 
   /* timeout expired => try again */
-  unmount_do (data, FALSE);
+  unmount_do (task, FALSE);
 
  out:
   return FALSE; /* remove timeout */
 }
 
 static void
-mount_op_reply_handle (UnmountData *data)
+mount_op_reply_handle (GTask *task)
 {
+  UnmountData *data = g_task_get_task_data (task);
   data->reply_set = FALSE;
 
   if (data->reply_result == G_MOUNT_OPERATION_ABORTED ||
@@ -648,30 +622,23 @@ mount_op_reply_handle (UnmountData *data)
        data->reply_choice == 1))
     {
       /* don't show an error dialog here */
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED_HANDLED,
-                                       "GMountOperation aborted (user should never see this "
-                                       "error since it is G_IO_ERROR_FAILED_HANDLED)");
-      data->failed = TRUE;
-      unmount_data_complete (data, TRUE);
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED,
+                               "GMountOperation aborted");
+      g_object_unref (task);
     }
   else if (data->reply_result == G_MOUNT_OPERATION_HANDLED)
     {
       /* user chose force unmount => try again with force_unmount==TRUE */
-      unmount_do (data, TRUE);
+      unmount_do (task, TRUE);
     }
   else
     {
       /* result == G_MOUNT_OPERATION_UNHANDLED => GMountOperation instance doesn't
        * support :show-processes signal
        */
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_BUSY,
-                                       _("One or more programs are preventing the unmount operation."));
-      data->failed = TRUE;
-      unmount_data_complete (data, TRUE);
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_BUSY,
+                               _("One or more programs are preventing the unmount operation."));
+      g_object_unref (task);
     }
 }
 
@@ -680,7 +647,8 @@ on_mount_op_reply (GMountOperation       *mount_operation,
                    GMountOperationResult result,
                    gpointer              user_data)
 {
-  UnmountData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  UnmountData *data = g_task_get_task_data (task);
   gint choice;
 
   /* disconnect the signal handler */
@@ -693,8 +661,8 @@ on_mount_op_reply (GMountOperation       *mount_operation,
   data->reply_result = result;
   data->reply_choice = choice;
   data->reply_set = TRUE;
-  if (!data->completed && !data->in_progress)
-    mount_op_reply_handle (data);
+  if (!g_task_get_completed (task) && !data->in_progress)
+    mount_op_reply_handle (task);
 }
 
 static void
@@ -702,7 +670,8 @@ lsof_command_cb (GObject       *source_object,
                  GAsyncResult  *res,
                  gpointer       user_data)
 {
-  UnmountData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  UnmountData *data = g_task_get_task_data (task);
   GError *error;
   gint exit_status;
   GArray *processes;
@@ -751,7 +720,7 @@ lsof_command_cb (GObject       *source_object,
     }
 
  out:
-  if (!data->completed)
+  if (!g_task_get_completed (task))
     {
       gboolean is_eject;
       gboolean is_stop;
@@ -771,7 +740,7 @@ lsof_command_cb (GObject       *source_object,
           data->mount_op_reply_handler_id = g_signal_connect (data->mount_operation,
                                                               "reply",
                                                               G_CALLBACK (on_mount_op_reply),
-                                                              data);
+                                                              task);
         }
       if (is_eject || is_stop)
         {
@@ -799,19 +768,20 @@ lsof_command_cb (GObject       *source_object,
         {
           data->retry_unmount_timer_id = g_timeout_add_seconds (2,
                                                                 on_retry_timer_cb,
-                                                                data);
+                                                                task);
         }
       g_array_free (processes, TRUE);
       g_free (standard_output);
     }
-  unmount_data_unref (data); /* return ref */
+  g_object_unref (task); /* return ref */
 }
 
 
 static void
-unmount_show_busy (UnmountData  *data,
+unmount_show_busy (GTask        *task,
                    const gchar  *mount_point)
 {
+  UnmountData *data = g_task_get_task_data (task);
   gchar *escaped_mount_point;
 
   data->in_progress = FALSE;
@@ -820,15 +790,15 @@ unmount_show_busy (UnmountData  *data,
    * Handle the reply now. */
   if (data->reply_set)
     {
-      mount_op_reply_handle (data);
+      mount_op_reply_handle (task);
       return;
     }
 
   escaped_mount_point = g_strescape (mount_point, NULL);
   gvfs_udisks2_utils_spawn (10, /* timeout in seconds */
-                            data->cancellable,
+                            g_task_get_cancellable (task),
                             lsof_command_cb,
-                            unmount_data_ref (data),
+                            g_object_ref (task),
                             "lsof -t \"%s\"",
                             escaped_mount_point);
   g_free (escaped_mount_point);
@@ -840,19 +810,18 @@ lock_cb (GObject       *source_object,
          gpointer       user_data)
 {
   UDisksEncrypted *encrypted = UDISKS_ENCRYPTED (source_object);
-  UnmountData *data = user_data;
+  GTask *task = G_TASK (user_data);
   GError *error;
 
   error = NULL;
   if (!udisks_encrypted_call_lock_finish (encrypted,
                                           res,
                                           &error))
-    {
-      g_simple_async_result_take_error (data->simple, error);
-      data->failed = TRUE;
-    }
+    g_task_return_error (task, error);
+  else
+    g_task_return_boolean (task, TRUE);
 
-  unmount_data_complete (data, FALSE);
+  g_object_unref (task);
 }
 
 static void
@@ -861,7 +830,9 @@ unmount_cb (GObject       *source_object,
             gpointer       user_data)
 {
   UDisksFilesystem *filesystem = UDISKS_FILESYSTEM (source_object);
-  UnmountData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  UnmountData *data = g_task_get_task_data (task);
+  GVfsUDisks2Mount *mount = g_task_get_source_object (task);
   GError *error;
 
   error = NULL;
@@ -874,29 +845,29 @@ unmount_cb (GObject       *source_object,
       /* if the user passed in a GMountOperation, then do the GMountOperation::show-processes dance ... */
       if (error->code == G_IO_ERROR_BUSY && data->mount_operation != NULL)
         {
-          unmount_show_busy (data, udisks_filesystem_get_mount_points (filesystem)[0]);
-          goto out;
+          unmount_show_busy (task, udisks_filesystem_get_mount_points (filesystem)[0]);
+          return;
         }
-      g_simple_async_result_take_error (data->simple, error);
-      data->failed = TRUE;
+
+      g_task_return_error (task, error);
+      g_object_unref (task);
     }
   else
     {
-      gvfs_udisks2_volume_monitor_update (data->mount->monitor);
+      gvfs_udisks2_volume_monitor_update (mount->monitor);
       if (data->encrypted != NULL)
         {
           udisks_encrypted_call_lock (data->encrypted,
                                       g_variant_new ("a{sv}", NULL), /* options */
-                                      data->cancellable,
+                                      g_task_get_cancellable (task),
                                       lock_cb,
-                                      data);
-          goto out;
+                                      task);
+          return;
         }
-    }
 
-  unmount_data_complete (data, FALSE);
- out:
-  ;
+      g_task_return_boolean (task, TRUE);
+      g_object_unref (task);
+    }
 }
 
 
@@ -907,7 +878,8 @@ umount_command_cb (GObject       *source_object,
                    GAsyncResult  *res,
                    gpointer       user_data)
 {
-  UnmountData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  GVfsUDisks2Mount *mount = g_task_get_source_object (task);
   GError *error;
   gint exit_status;
   gchar *standard_error = NULL;
@@ -919,16 +891,16 @@ umount_command_cb (GObject       *source_object,
                                         &standard_error,
                                         &error))
     {
-      g_simple_async_result_take_error (data->simple, error);
-      data->failed = TRUE;
-      unmount_data_complete (data, FALSE);
+      g_task_return_error (task, error);
+      g_object_unref (task);
       goto out;
     }
 
   if (WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0)
     {
-      gvfs_udisks2_volume_monitor_update (data->mount->monitor);
-      unmount_data_complete (data, FALSE);
+      gvfs_udisks2_volume_monitor_update (mount->monitor);
+      g_task_return_boolean (task, TRUE);
+      g_object_unref (task);
       goto out;
     }
 
@@ -936,42 +908,44 @@ umount_command_cb (GObject       *source_object,
       (strstr (standard_error, "device is busy") != NULL ||
        strstr (standard_error, "target is busy") != NULL))
     {
-      unmount_show_busy (data, data->mount->mount_path);
+      unmount_show_busy (task, mount->mount_path);
       goto out;
     }
 
-  g_simple_async_result_set_error (data->simple,
-                                   G_IO_ERROR,
-                                   G_IO_ERROR_FAILED,
-                                   "%s", standard_error);
-  data->failed = TRUE;
-  unmount_data_complete (data, FALSE);
+  g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                           "%s", standard_error);
+  g_object_unref (task);
 
  out:
   g_free (standard_error);
 }
 
 static void
-unmount_do (UnmountData *data,
+unmount_do (GTask       *task,
             gboolean     force)
 {
+  UnmountData *data = g_task_get_task_data (task);
+  GVfsUDisks2Mount *mount = g_task_get_source_object (task);
   GVariantBuilder builder;
 
   data->in_progress = TRUE;
 
   if (data->mount_operation != NULL)
-    gvfs_udisks2_unmount_notify_start (data->mount_operation, 
-                                       G_MOUNT (data->mount), NULL);
+    {
+      gvfs_udisks2_unmount_notify_start (data->mount_operation,
+                                         G_MOUNT (g_task_get_source_object (task)), NULL);
+      g_signal_connect (task, "notify::completed", G_CALLBACK (umount_completed), NULL);
+    }
 
   /* Use the umount(8) command if there is no block device / filesystem */
   if (data->filesystem == NULL)
     {
       gchar *escaped_mount_path;
-      escaped_mount_path = g_strescape (data->mount->mount_path, NULL);
+      escaped_mount_path = g_strescape (mount->mount_path, NULL);
       gvfs_udisks2_utils_spawn (10, /* timeout in seconds */
-                                data->cancellable,
+                                g_task_get_cancellable (task),
                                 umount_command_cb,
-                                data,
+                                task,
                                 "umount %s \"%s\"",
                                 force ? "-l " : "",
                                 escaped_mount_path);
@@ -995,9 +969,9 @@ unmount_do (UnmountData *data,
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (data->filesystem), G_MAXINT);
   udisks_filesystem_call_unmount (data->filesystem,
                                   g_variant_builder_end (&builder),
-                                  data->cancellable,
+                                  g_task_get_cancellable (task),
                                   unmount_cb,
-                                  data);
+                                  task);
 
  out:
   ;
@@ -1014,44 +988,41 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
   GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
   UnmountData *data;
   UDisksBlock *block;
+  GTask *task;
 
   /* first emit the ::mount-pre-unmount signal */
   g_signal_emit_by_name (mount->monitor, "mount-pre-unmount", mount);
 
+  task = g_task_new (_mount, cancellable, callback, user_data);
+  g_task_set_source_tag (task, gvfs_udisks2_mount_unmount_with_operation);
+
   data = g_new0 (UnmountData, 1);
-  data->ref_count = 1;
-  data->simple = g_simple_async_result_new (G_OBJECT (mount),
-                                            callback,
-                                            user_data,
-                                            gvfs_udisks2_mount_unmount_with_operation);
-  data->mount = g_object_ref (mount);
-  data->cancellable = cancellable != NULL ? g_object_ref (cancellable) : NULL;
   data->mount_operation = mount_operation != NULL ? g_object_ref (mount_operation) : NULL;
   data->flags = flags;
+
+  g_task_set_task_data (task, data, (GDestroyNotify)unmount_data_free);
 
   if (mount->is_burn_mount)
     {
       /* burn mounts are really never mounted so complete successfully immediately */
-      unmount_data_complete (data, TRUE);
-      goto out;
+      g_task_return_boolean (task, TRUE);
+      g_object_unref (task);
+      return;
     }
 
   block = NULL;
   if (mount->volume != NULL)
-    block = gvfs_udisks2_volume_get_block (data->mount->volume);
+    block = gvfs_udisks2_volume_get_block (mount->volume);
   if (block != NULL)
     {
       GDBusObject *object;
       object = g_dbus_interface_get_object (G_DBUS_INTERFACE (block));
       if (object == NULL)
         {
-          g_simple_async_result_set_error (data->simple,
-                                           G_IO_ERROR,
-                                           G_IO_ERROR_FAILED,
-                                           "No object for D-Bus interface");
-          data->failed = TRUE;
-          unmount_data_complete (data, FALSE);
-          goto out;
+          g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                   "No object for D-Bus interface");
+          g_object_unref (task);
+          return;
         }
       data->filesystem = udisks_object_get_filesystem (UDISKS_OBJECT (object));
       if (data->filesystem == NULL)
@@ -1061,13 +1032,10 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
           data->encrypted = udisks_object_get_encrypted (UDISKS_OBJECT (object));
           if (data->encrypted == NULL)
             {
-              g_simple_async_result_set_error (data->simple,
-                                               G_IO_ERROR,
-                                               G_IO_ERROR_FAILED,
-                                               "No filesystem or encrypted interface on D-Bus object");
-              data->failed = TRUE;
-              unmount_data_complete (data, FALSE);
-              goto out;
+              g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                       "No filesystem or encrypted interface on D-Bus object");
+              g_object_unref (task);
+              return;
             }
 
           cleartext_block = udisks_client_get_cleartext_block (gvfs_udisks2_volume_monitor_get_udisks_client (mount->monitor),
@@ -1078,22 +1046,16 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
               g_object_unref (cleartext_block);
               if (data->filesystem == NULL)
                 {
-                  g_simple_async_result_set_error (data->simple,
-                                                   G_IO_ERROR,
-                                                   G_IO_ERROR_FAILED,
-                                                   "No filesystem interface on D-Bus object for cleartext device");
-                  data->failed = TRUE;
-                  unmount_data_complete (data, FALSE);
-                  goto out;
+                  g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                           "No filesystem interface on D-Bus object for cleartext device");
+                  g_object_unref (task);
+                  return;
                 }
             }
         }
       g_assert (data->filesystem != NULL);
     }
-  unmount_do (data, FALSE /* force */);
-
- out:
-  ;
+  unmount_do (task, FALSE /* force */);
 }
 
 static gboolean
@@ -1101,7 +1063,10 @@ gvfs_udisks2_mount_unmount_with_operation_finish (GMount        *mount,
                                                   GAsyncResult  *result,
                                                   GError       **error)
 {
-  return !g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
+  g_return_val_if_fail (g_task_is_valid (result, mount), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, gvfs_udisks2_mount_unmount_with_operation), FALSE);
+
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1126,22 +1091,18 @@ gvfs_udisks2_mount_unmount_finish (GMount        *mount,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-typedef struct
-{
-  GObject *object;
-  GAsyncReadyCallback callback;
-  gpointer user_data;
-} EjectWrapperOp;
-
 static void
 eject_wrapper_callback (GObject       *source_object,
                         GAsyncResult  *res,
                         gpointer       user_data)
 {
-  EjectWrapperOp *data  = user_data;
-  data->callback (data->object, res, data->user_data);
-  g_object_unref (data->object);
-  g_free (data);
+  GTask *task = G_TASK (user_data);
+  GError *error = NULL;
+
+  if (g_drive_eject_with_operation_finish (G_DRIVE (source_object), res, &error))
+    g_task_return_boolean (task, TRUE);
+  else
+    g_task_return_error (task, error);
 }
 
 static void
@@ -1153,7 +1114,11 @@ gvfs_udisks2_mount_eject_with_operation (GMount              *_mount,
                                          gpointer             user_data)
 {
   GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
+  GTask *task;
   GDrive *drive;
+
+  task = g_task_new (_mount, cancellable, callback, user_data);
+  g_task_set_source_tag (task, gvfs_udisks2_mount_eject_with_operation);
 
   drive = NULL;
   if (mount->volume != NULL)
@@ -1161,25 +1126,13 @@ gvfs_udisks2_mount_eject_with_operation (GMount              *_mount,
 
   if (drive != NULL)
     {
-      EjectWrapperOp *data;
-      data = g_new0 (EjectWrapperOp, 1);
-      data->object = g_object_ref (mount);
-      data->callback = callback;
-      data->user_data = user_data;
-      g_drive_eject_with_operation (drive, flags, mount_operation, cancellable, eject_wrapper_callback, data);
-      g_object_unref (drive);
+      g_drive_eject_with_operation (drive, flags, mount_operation, cancellable, eject_wrapper_callback, task);
     }
   else
     {
-      GSimpleAsyncResult *simple;
-      simple = g_simple_async_result_new_error (G_OBJECT (mount),
-                                                callback,
-                                                user_data,
-                                                G_IO_ERROR,
-                                                G_IO_ERROR_FAILED,
-                                                _("Operation not supported by backend"));
-      g_simple_async_result_complete (simple);
-      g_object_unref (simple);
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               _("Operation not supported by backend"));
+      g_object_unref (task);
     }
 }
 
@@ -1188,25 +1141,10 @@ gvfs_udisks2_mount_eject_with_operation_finish (GMount        *_mount,
                                                 GAsyncResult  *result,
                                                 GError       **error)
 {
-  GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (_mount);
-  gboolean ret = TRUE;
-  GDrive *drive;
+  g_return_val_if_fail (g_task_is_valid (result, _mount), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, gvfs_udisks2_mount_eject_with_operation), FALSE);
 
-  drive = NULL;
-  if (mount->volume != NULL)
-    drive = g_volume_get_drive (G_VOLUME (mount->volume));
-
-  if (drive != NULL)
-    {
-      ret = g_drive_eject_with_operation_finish (drive, result, error);
-      g_object_unref (drive);
-    }
-  else
-    {
-      g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
-      ret = FALSE;
-    }
-  return ret;
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void
@@ -1323,13 +1261,20 @@ gvfs_udisks2_mount_guess_content_type (GMount              *mount,
                                        GAsyncReadyCallback  callback,
                                        gpointer             user_data)
 {
-  GSimpleAsyncResult *simple;
-  simple = g_simple_async_result_new (G_OBJECT (mount),
-                                      callback,
-                                      user_data,
-                                      NULL);
-  g_simple_async_result_complete (simple);
-  g_object_unref (simple);
+  GTask *task;
+  char **type;
+  GError *error = NULL;
+
+  task = g_task_new (mount, cancellable, callback, user_data);
+  g_task_set_source_tag (task, gvfs_udisks2_mount_guess_content_type);
+
+  type = gvfs_udisks2_mount_guess_content_type_sync (mount, FALSE, cancellable, &error);
+  if (error != NULL)
+    g_task_return_error (task, error);
+  else
+    g_task_return_pointer (task, type, (GDestroyNotify)g_strfreev);
+
+  g_object_unref (task);
 }
 
 static gchar **
@@ -1337,7 +1282,10 @@ gvfs_udisks2_mount_guess_content_type_finish (GMount        *mount,
                                               GAsyncResult  *result,
                                               GError       **error)
 {
-  return gvfs_udisks2_mount_guess_content_type_sync (mount, FALSE, NULL, error);
+  g_return_val_if_fail (g_task_is_valid (result, mount), NULL);
+  g_return_val_if_fail (g_async_result_is_tagged (result, gvfs_udisks2_mount_guess_content_type), NULL);
+
+  return g_task_propagate_pointer (G_TASK (result), error);
 }
 /* ---------------------------------------------------------------------------------------------------- */
 
