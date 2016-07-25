@@ -129,12 +129,10 @@ gvfs_udisks2_utils_lookup_fstab_options_value (const gchar *fstab_options,
 
 typedef struct
 {
-  GSimpleAsyncResult *simple; /* borrowed reference */
   GMainContext *main_context; /* may be NULL */
 
   gchar *command_line;
 
-  GCancellable *cancellable;  /* may be NULL */
   gulong cancellable_handler_id;
 
   GPid child_pid;
@@ -148,7 +146,6 @@ typedef struct
   GSource *child_stdout_source;
   GSource *child_stderr_source;
 
-  gboolean timed_out;
   GSource *timeout_source;
 
   GString *child_stdout;
@@ -249,17 +246,8 @@ spawn_data_free (SpawnData *data)
       data->child_stderr_fd = -1;
     }
 
-  if (data->cancellable_handler_id > 0)
-    {
-      g_cancellable_disconnect (data->cancellable, data->cancellable_handler_id);
-      data->cancellable_handler_id = 0;
-    }
-
   if (data->main_context != NULL)
     g_main_context_unref (data->main_context);
-
-  if (data->cancellable != NULL)
-    g_object_unref (data->cancellable);
 
   g_free (data->command_line);
 
@@ -271,14 +259,10 @@ static void
 on_cancelled (GCancellable *cancellable,
               gpointer      user_data)
 {
-  SpawnData *data = user_data;
-  GError *error;
+  GTask *task = G_TASK (user_data);
 
-  error = NULL;
-  g_warn_if_fail (g_cancellable_set_error_if_cancelled (cancellable, &error));
-  g_simple_async_result_take_error (data->simple, error);
-  g_simple_async_result_complete_in_idle (data->simple);
-  g_object_unref (data->simple);
+  g_assert (g_task_return_error_if_cancelled (task));
+  g_object_unref (task);
 }
 
 static gboolean
@@ -286,7 +270,7 @@ read_child_stderr (GIOChannel *channel,
                    GIOCondition condition,
                    gpointer user_data)
 {
-  SpawnData *data = user_data;
+  SpawnData *data = g_task_get_task_data (G_TASK (user_data));
   gchar buf[1024];
   gsize bytes_read;
 
@@ -300,7 +284,7 @@ read_child_stdout (GIOChannel *channel,
                    GIOCondition condition,
                    gpointer user_data)
 {
-  SpawnData *data = user_data;
+  SpawnData *data = g_task_get_task_data (G_TASK (user_data));
   gchar buf[1024];
   gsize bytes_read;
 
@@ -314,7 +298,8 @@ child_watch_cb (GPid     pid,
                 gint     status,
                 gpointer user_data)
 {
-  SpawnData *data = user_data;
+  GTask *task = G_TASK (user_data);
+  SpawnData *data = g_task_get_task_data (task);
   gchar *buf;
   gsize buf_size;
 
@@ -336,23 +321,24 @@ child_watch_cb (GPid     pid,
   data->child_watch_source = NULL;
 
   /* we're done */
-  g_simple_async_result_complete_in_idle (data->simple);
-  g_object_unref (data->simple);
+  g_task_return_boolean (task, TRUE);
+  g_object_unref (task);
 }
 
 static gboolean
 timeout_cb (gpointer user_data)
 {
-  SpawnData *data = user_data;
-
-  data->timed_out = TRUE;
+  GTask *task = G_TASK (user_data);
+  SpawnData *data = g_task_get_task_data (task);
 
   /* ok, timeout is history, make sure we don't free it in spawn_data_free() */
   data->timeout_source = NULL;
 
   /* we're done */
-  g_simple_async_result_complete_in_idle (data->simple);
-  g_object_unref (data->simple);
+  g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_TIMED_OUT,
+                           _("Timed out running command-line `%s'"),
+                           data->command_line);
+  g_object_unref (task);
 
   return FALSE; /* remove source */
 }
@@ -370,17 +356,15 @@ gvfs_udisks2_utils_spawn (guint                timeout_seconds,
   GError *error;
   gint child_argc;
   gchar **child_argv = NULL;
+  GTask *task;
+
+  task = g_task_new (NULL, cancellable, callback, user_data);
+  g_task_set_source_tag (task, gvfs_udisks2_utils_spawn);
 
   data = g_slice_new0 (SpawnData);
-  data->simple = g_simple_async_result_new (NULL,
-                                            callback,
-                                            user_data,
-                                            gvfs_udisks2_utils_spawn);
   data->main_context = g_main_context_get_thread_default ();
   if (data->main_context != NULL)
     g_main_context_ref (data->main_context);
-
-  data->cancellable = cancellable != NULL ? g_object_ref (cancellable) : NULL;
 
   va_start (var_args, command_line_format);
   data->command_line = g_strdup_vprintf (command_line_format, var_args);
@@ -391,25 +375,21 @@ gvfs_udisks2_utils_spawn (guint                timeout_seconds,
   data->child_stdout_fd = -1;
   data->child_stderr_fd = -1;
 
-  /* the life-cycle of SpawnData is tied to its GSimpleAsyncResult */
-  g_simple_async_result_set_op_res_gpointer (data->simple, data, (GDestroyNotify) spawn_data_free);
+  g_task_set_task_data (task, data, (GDestroyNotify)spawn_data_free);
 
   error = NULL;
-  if (data->cancellable != NULL)
+  if (cancellable != NULL)
     {
       /* could already be cancelled */
-      error = NULL;
-      if (g_cancellable_set_error_if_cancelled (data->cancellable, &error))
+      if (g_task_return_error_if_cancelled (task))
         {
-          g_simple_async_result_take_error (data->simple, error);
-          g_simple_async_result_complete_in_idle (data->simple);
-          g_object_unref (data->simple);
+          g_object_unref (task);
           goto out;
         }
 
-      data->cancellable_handler_id = g_cancellable_connect (data->cancellable,
+      data->cancellable_handler_id = g_cancellable_connect (cancellable,
                                                             G_CALLBACK (on_cancelled),
-                                                            data,
+                                                            task,
                                                             NULL);
     }
 
@@ -422,9 +402,8 @@ gvfs_udisks2_utils_spawn (guint                timeout_seconds,
       g_prefix_error (&error,
                       "Error parsing command-line `%s': ",
                       data->command_line);
-      g_simple_async_result_take_error (data->simple, error);
-      g_simple_async_result_complete_in_idle (data->simple);
-      g_object_unref (data->simple);
+      g_task_return_error (task, error);
+      g_object_unref (task);
       goto out;
     }
 
@@ -444,9 +423,8 @@ gvfs_udisks2_utils_spawn (guint                timeout_seconds,
       g_prefix_error (&error,
                       "Error spawning command-line `%s': ",
                       data->command_line);
-      g_simple_async_result_take_error (data->simple, error);
-      g_simple_async_result_complete_in_idle (data->simple);
-      g_object_unref (data->simple);
+      g_task_return_error (task, error);
+      g_object_unref (task);
       goto out;
     }
 
@@ -454,27 +432,27 @@ gvfs_udisks2_utils_spawn (guint                timeout_seconds,
     {
       data->timeout_source = g_timeout_source_new_seconds (timeout_seconds);
       g_source_set_priority (data->timeout_source, G_PRIORITY_DEFAULT);
-      g_source_set_callback (data->timeout_source, timeout_cb, data, NULL);
+      g_source_set_callback (data->timeout_source, timeout_cb, task, NULL);
       g_source_attach (data->timeout_source, data->main_context);
       g_source_unref (data->timeout_source);
     }
 
   data->child_watch_source = g_child_watch_source_new (data->child_pid);
-  g_source_set_callback (data->child_watch_source, (GSourceFunc) child_watch_cb, data, NULL);
+  g_source_set_callback (data->child_watch_source, (GSourceFunc) child_watch_cb, task, NULL);
   g_source_attach (data->child_watch_source, data->main_context);
   g_source_unref (data->child_watch_source);
 
   data->child_stdout_channel = g_io_channel_unix_new (data->child_stdout_fd);
   g_io_channel_set_flags (data->child_stdout_channel, G_IO_FLAG_NONBLOCK, NULL);
   data->child_stdout_source = g_io_create_watch (data->child_stdout_channel, G_IO_IN);
-  g_source_set_callback (data->child_stdout_source, (GSourceFunc) read_child_stdout, data, NULL);
+  g_source_set_callback (data->child_stdout_source, (GSourceFunc) read_child_stdout, task, NULL);
   g_source_attach (data->child_stdout_source, data->main_context);
   g_source_unref (data->child_stdout_source);
 
   data->child_stderr_channel = g_io_channel_unix_new (data->child_stderr_fd);
   g_io_channel_set_flags (data->child_stderr_channel, G_IO_FLAG_NONBLOCK, NULL);
   data->child_stderr_source = g_io_create_watch (data->child_stderr_channel, G_IO_IN);
-  g_source_set_callback (data->child_stderr_source, (GSourceFunc) read_child_stderr, data, NULL);
+  g_source_set_callback (data->child_stderr_source, (GSourceFunc) read_child_stderr, task, NULL);
   g_source_attach (data->child_stderr_source, data->main_context);
   g_source_unref (data->child_stderr_source);
 
@@ -489,29 +467,20 @@ gvfs_udisks2_utils_spawn_finish (GAsyncResult   *res,
                                  gchar         **out_standard_error,
                                  GError        **error)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
   SpawnData *data;
-  gboolean ret = FALSE;
 
-  g_return_val_if_fail (G_IS_ASYNC_RESULT (res), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (g_task_is_valid (res, NULL), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (res, gvfs_udisks2_utils_spawn), FALSE);
 
-  g_warn_if_fail (g_simple_async_result_get_source_tag (simple) == gvfs_udisks2_utils_spawn);
-
-  if (g_simple_async_result_propagate_error (simple, error))
-    goto out;
-
-  data = g_simple_async_result_get_op_res_gpointer (simple);
-
-  if (data->timed_out)
+  data = g_task_get_task_data (G_TASK (res));
+  if (data->cancellable_handler_id > 0)
     {
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_TIMED_OUT,
-                   _("Timed out running command-line “%s”"),
-                   data->command_line);
-      goto out;
+      g_cancellable_disconnect (g_task_get_cancellable (G_TASK (res)), data->cancellable_handler_id);
+      data->cancellable_handler_id = 0;
     }
+
+  if (g_task_had_error (G_TASK (res)))
+    goto out;
 
   if (out_exit_status != NULL)
     *out_exit_status = data->exit_status;
@@ -522,10 +491,8 @@ gvfs_udisks2_utils_spawn_finish (GAsyncResult   *res,
   if (out_standard_error != NULL)
     *out_standard_error = g_strdup (data->child_stderr->str);
 
-  ret = TRUE;
-
  out:
-  return ret;
+  return g_task_propagate_boolean (G_TASK (res), error);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
