@@ -70,28 +70,27 @@ static void
 get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpServer *server = G_VFS_AFP_SERVER (source_object);
-  GSimpleAsyncResult *simple = user_data;
-
+  GTask *task = G_TASK (user_data);
   GVfsBackendAfpBrowse *afp_backend;
   GPtrArray *volumes;
   GError *err = NULL;
-  
-  afp_backend = G_VFS_BACKEND_AFP_BROWSE (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
-  
+
+  afp_backend = G_VFS_BACKEND_AFP_BROWSE (g_task_get_source_object (task));
+
   volumes = g_vfs_afp_server_get_volumes_finish (server, res, &err);
   if (!volumes)
   {
-    g_simple_async_result_take_error (simple, err);
-    goto done;
+    g_task_return_error (task, err);
+    g_object_unref (task);
+    return;
   }
 
   if (afp_backend->volumes)
     g_ptr_array_unref (afp_backend->volumes);
   afp_backend->volumes = volumes;
 
-done:
-  g_simple_async_result_complete (simple);
-  g_object_unref (simple);
+  g_task_return_boolean (task, TRUE);
+  g_object_unref (task);
 }
 
 static void
@@ -100,13 +99,12 @@ update_cache (GVfsBackendAfpBrowse *afp_backend,
               GAsyncReadyCallback callback,
               gpointer user_data)
 {
-  GSimpleAsyncResult *simple;
-  
-  simple = g_simple_async_result_new (G_OBJECT (afp_backend), callback,
-                                      user_data, update_cache);
+  GTask *task;
 
-  g_vfs_afp_server_get_volumes (afp_backend->server, cancellable, get_volumes_cb,
-                                simple); 
+  task = g_task_new (afp_backend, cancellable, callback, user_data);
+  g_task_set_source_tag (task, update_cache);
+
+  g_vfs_afp_server_get_volumes (afp_backend->server, cancellable, get_volumes_cb, task);
 }
 
 static gboolean
@@ -114,18 +112,10 @@ update_cache_finish (GVfsBackendAfpBrowse *afp_backend,
                      GAsyncResult         *res,
                      GError              **error)
 {
-  GSimpleAsyncResult *simple;
-  
-  g_return_val_if_fail (g_simple_async_result_is_valid (res, G_OBJECT (afp_backend),
-                                                        update_cache),
-                        FALSE);
+  g_return_val_if_fail (g_task_is_valid (res, afp_backend), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (res, update_cache), FALSE);
 
-  simple = (GSimpleAsyncResult *)res;
-
-  if (g_simple_async_result_propagate_error (simple, error))
-    return FALSE;
-
-  return TRUE;
+  return g_task_propagate_boolean (G_TASK (res), error);
 }
 
 static GVfsAfpVolumeData *
