@@ -1301,7 +1301,7 @@ static void
 get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpConnection *afp_conn = G_VFS_AFP_CONNECTION (source_object);
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GTask *task = G_TASK (user_data);
 
   GVfsAfpReply *reply;
   GError *err = NULL;
@@ -1313,8 +1313,9 @@ get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   reply = g_vfs_afp_connection_send_command_finish (afp_conn, res, &err);
   if (!reply)
   {
-    g_simple_async_result_take_error (simple, err);
-    goto done;
+    g_task_return_error (task, err);
+    g_object_unref (task);
+    return;
   }
 
   res_code = g_vfs_afp_reply_get_result_code (reply);
@@ -1322,8 +1323,9 @@ get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   {
     g_object_unref (reply);
 
-    g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
-    goto done;
+    g_task_return_error (task, afp_result_code_to_gerror (res_code));
+    g_object_unref (task);
+    return;
   }
 
   /* server time */
@@ -1354,17 +1356,14 @@ get_volumes_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   }
   g_object_unref (reply);
 
-  g_simple_async_result_set_op_res_gpointer (simple, volumes,
-                                             (GDestroyNotify)g_ptr_array_unref);
-done:
-  g_simple_async_result_complete (simple);
-  g_object_unref (simple);
+  g_task_return_pointer (task, volumes, (GDestroyNotify)g_ptr_array_unref);
+  g_object_unref (task);
   return;
 
 invalid_reply:
-  g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                   _("Unable to connect to the server. A communication problem occurred."));
-  goto done;
+  g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Unable to connect to the server. A communication problem occurred."));
+  g_object_unref (task);
 }
 
 /**
@@ -1384,18 +1383,17 @@ g_vfs_afp_server_get_volumes (GVfsAfpServer       *server,
                               gpointer             user_data)
 {
   GVfsAfpCommand *comm;
-  GSimpleAsyncResult *simple;
+  GTask *task;
   
   /* Get Server Parameters */
   comm = g_vfs_afp_command_new (AFP_COMMAND_GET_SRVR_PARMS);
   /* pad byte */
   g_vfs_afp_command_put_byte (comm, 0);
 
-  simple = g_simple_async_result_new (G_OBJECT (server), callback, user_data,
-                                      g_vfs_afp_server_get_volumes);
-  
+  task = g_task_new (server, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_vfs_afp_server_get_volumes);
   g_vfs_afp_connection_send_command (server->priv->conn, comm, NULL, get_volumes_cb,
-                                     cancellable, simple);
+                                     cancellable, task);
 }
 
 /**
@@ -1417,19 +1415,10 @@ g_vfs_afp_server_get_volumes_finish (GVfsAfpServer  *server,
                                      GAsyncResult   *result,
                                      GError         **error)
 {
-  GSimpleAsyncResult *simple;
-  
-  g_return_val_if_fail (g_simple_async_result_is_valid (result,
-                                                        G_OBJECT (server),
-                                                        g_vfs_afp_server_get_volumes),
-                        NULL);
+  g_return_val_if_fail (g_task_is_valid (result, server), NULL);
+  g_return_val_if_fail (g_async_result_is_tagged (result, g_vfs_afp_server_get_volumes), NULL);
 
-  simple = (GSimpleAsyncResult *)result;
-
-  if (g_simple_async_result_propagate_error (simple, error))
-    return NULL;
-
-  return g_ptr_array_ref ((GPtrArray *)g_simple_async_result_get_op_res_gpointer (simple));
+  return g_task_propagate_pointer (G_TASK (result), error);
 }
 
 GVfsAfpVolume *
@@ -1678,37 +1667,23 @@ invalid_reply:
   return FALSE;
 }
 
-typedef struct
-{
-  GVfsAfpMapIDFunction function;
-  char *name;
-} MapIDData;
-
-static void
-map_id_data_free (MapIDData *mid)
-{
-  g_free (mid->name);
-
-  g_slice_free (MapIDData, mid);
-}
-
 static void
 map_id_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpConnection *conn = G_VFS_AFP_CONNECTION (source_object);
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GTask *task = G_TASK (user_data);
+  GVfsAfpMapIDFunction function = GPOINTER_TO_INT (g_task_get_task_data (task));
 
   GVfsAfpReply *reply;
   GError *err = NULL;
-
   AfpResultCode res_code;
-  MapIDData *map_data;
+  gchar *name;
 
   reply = g_vfs_afp_connection_send_command_finish (conn, res, &err);
   if (!reply)
   {
-    g_simple_async_result_take_error (simple, err);
-    g_simple_async_result_complete (simple);
+    g_task_return_error (task, err);
+    g_object_unref (task);
     return;
   }
 
@@ -1718,22 +1693,20 @@ map_id_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
     switch (res_code)
     {
       case AFP_RESULT_ITEM_NOT_FOUND:
-        g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Identification not found."));
+        g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                 _("Identification not found."));
         break;
       default:
-        g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
+        g_task_return_error (task, afp_result_code_to_gerror (res_code));
         break;
     }
 
-    g_simple_async_result_complete (simple);
+    g_object_unref (task);
     return;
   }
 
-  map_data = g_simple_async_result_get_op_res_gpointer (simple);
-  
-  if (map_data->function == GVFS_AFP_MAP_ID_FUNCTION_USER_UUID_TO_UTF8_NAME ||
-      map_data->function == GVFS_AFP_MAP_ID_FUNCTION_GROUP_UUID_TO_UTF8_NAME)
+  if (function == GVFS_AFP_MAP_ID_FUNCTION_USER_UUID_TO_UTF8_NAME ||
+      function == GVFS_AFP_MAP_ID_FUNCTION_GROUP_UUID_TO_UTF8_NAME)
   {
     /* objType */
 	REPLY_READ_UINT32 (reply, NULL);	
@@ -1741,10 +1714,10 @@ map_id_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 	REPLY_READ_UINT32 (reply, NULL);
   }
 
-  if (map_data->function == GVFS_AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME ||
-      map_data->function == GVFS_AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME)
+  if (function == GVFS_AFP_MAP_ID_FUNCTION_USER_ID_TO_NAME ||
+      function == GVFS_AFP_MAP_ID_FUNCTION_GROUP_ID_TO_NAME)
   {
-    REPLY_READ_PASCAL (reply, FALSE, &map_data->name);
+    REPLY_READ_PASCAL (reply, FALSE, &name);
   }
   else
   {
@@ -1752,20 +1725,18 @@ map_id_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 
 	
     REPLY_READ_AFP_NAME (reply, FALSE, &afp_name);
-    map_data->name = g_vfs_afp_name_get_string (afp_name);
+    name = g_vfs_afp_name_get_string (afp_name);
     g_vfs_afp_name_unref (afp_name);
   }
 
-done:
-  g_simple_async_result_complete (simple);
-  g_object_unref (simple);
+  g_task_return_pointer (task, name, g_free);
+  g_object_unref (task);
   return;
 
 invalid_reply:
-  g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                   _("Unable to connect to the server. A communication problem occurred."));
-
-  goto done;
+  g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Unable to connect to the server. A communication problem occurred."));
+  g_object_unref (task);
 }
 
 /**
@@ -1790,8 +1761,7 @@ g_vfs_afp_server_map_id (GVfsAfpServer       *server,
 {
   GVfsAfpServerPrivate *priv;
   GVfsAfpCommand *comm;
-  GSimpleAsyncResult *simple;
-  MapIDData *map_data;
+  GTask *task;
 
   g_return_if_fail (G_VFS_IS_AFP_SERVER (server));
 
@@ -1809,16 +1779,12 @@ g_vfs_afp_server_map_id (GVfsAfpServer       *server,
   else
     g_vfs_afp_command_put_int64 (comm, id);
 
-  simple = g_simple_async_result_new (G_OBJECT (server), callback,
-                                      user_data, g_vfs_afp_server_map_id);
+  task = g_task_new (server, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_vfs_afp_server_map_id);
+  g_task_set_task_data (task, GINT_TO_POINTER (map_function), NULL);
 
-  map_data = g_slice_new0 (MapIDData);
-  map_data->function = map_function;
-  g_simple_async_result_set_op_res_gpointer (simple, map_data,
-                                             (GDestroyNotify)map_id_data_free);
-  
   g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
-                                     map_id_cb, cancellable, simple);
+                                     map_id_cb, cancellable, task);
   g_object_unref (comm);
 }
 
@@ -1843,22 +1809,11 @@ g_vfs_afp_server_map_id_finish (GVfsAfpServer        *server,
                                 GVfsAfpMapIDFunction *map_function,
                                 GError              **error)
 {
-  GSimpleAsyncResult *simple;
-  MapIDData *map_data;
-
-  g_return_val_if_fail (g_simple_async_result_is_valid (res, G_OBJECT (server),
-                                                        g_vfs_afp_server_map_id),
-                        NULL);
-
-  simple = (GSimpleAsyncResult *)res;
-
-  if (g_simple_async_result_propagate_error (simple, error))
-    return NULL;
-
-  map_data = g_simple_async_result_get_op_res_gpointer (simple);
+  g_return_val_if_fail (g_task_is_valid (res, server), NULL);
+  g_return_val_if_fail (g_async_result_is_tagged (res, g_vfs_afp_server_map_id), NULL);
 
   if (map_function)
-    *map_function = map_data->function;
-  
-  return g_strdup (map_data->name);
+    *map_function = GPOINTER_TO_INT (g_task_get_task_data (G_TASK (res)));
+
+  return g_task_propagate_pointer (G_TASK (res), error);
 }
