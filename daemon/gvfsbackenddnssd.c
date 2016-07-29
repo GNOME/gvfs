@@ -124,6 +124,7 @@ struct _GVfsBackendDnsSd
   GList *files; /* list of LinkFiles */
 
   GList *browsers;
+  GList *resolvers;
 };
 
 typedef struct _GVfsBackendDnsSd GVfsBackendDnsSd;
@@ -559,19 +560,19 @@ resolve_callback (AvahiServiceResolver *r,
   char *path;
 
   if (event == AVAHI_RESOLVER_FAILURE)
-    return;
-  
+    goto out;
+
   /* Link-local ipv6 address, can't make a uri from this, ignore */
   if (address->proto == AVAHI_PROTO_INET6 &&
       address->data.ipv6.address[0] == 0xfe &&
       address->data.ipv6.address[1] == 0x80)
-    return;
-  
+    goto out;
+
   file = lookup_link_file_by_name_and_type (backend,
 					    name, type);
 
   if (file != NULL)
-    return;
+    goto out;
 
   file = link_file_new (name, type, domain, host_name, protocol,
 			address, port, txt);
@@ -584,6 +585,10 @@ resolve_callback (AvahiServiceResolver *r,
 			    path,
 			    NULL);
   g_free (path);
+
+ out:
+  backend->resolvers = g_list_remove (backend->resolvers, r);
+  avahi_service_resolver_free (r);
 }
 
 static void
@@ -610,18 +615,15 @@ browse_callback (AvahiServiceBrowser *b,
       
     case AVAHI_BROWSER_NEW:
       client = get_global_avahi_client ();
-      
-      /* We ignore the returned resolver object. In the callback
-	 function we free it. If the server is terminated before
-	 the callback function is called the server will free
-	 the resolver for us. */
-      
+
       sr = avahi_service_resolver_new (client, interface, protocol,
 				       name, type, domain, AVAHI_PROTO_UNSPEC, 0, resolve_callback, backend);
 
       if (sr == NULL) 
 	g_warning ("Failed to resolve service name '%s': %s\n", name, avahi_strerror (avahi_client_errno (client)));
-      
+      else
+	backend->resolvers = g_list_prepend (backend->resolvers, sr);
+
       break;
       
     case AVAHI_BROWSER_REMOVE:
@@ -791,6 +793,9 @@ g_vfs_backend_dns_sd_finalize (GObject *object)
   backend = G_VFS_BACKEND_DNS_SD (object);
 
   dnssd_backends = g_list_remove (dnssd_backends, backend);
+
+  remove_browsers (backend);
+  g_list_free_full (backend->resolvers, (GDestroyNotify)avahi_service_resolver_free);
 
   if (backend->mount_spec)
     g_mount_spec_unref (backend->mount_spec);
