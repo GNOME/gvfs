@@ -61,7 +61,7 @@ GTK_DOC_CHECK
 DISTCHECK_CONFIGURE_FLAGS="--enable-gtk-doc"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 
-PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.49.3 gobject-2.0 gmodule-no-export-2.0 gio-unix-2.0 gio-2.0])
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.49.4 gobject-2.0 gmodule-no-export-2.0 gio-unix-2.0 gio-2.0])
 
 PKG_CHECK_MODULES([DBUS], [dbus-1])
 
@@ -763,25 +763,6 @@ AC_CHECK_DECL(_NL_ADDRESS_COUNTRY_AB3,
               AC_DEFINE(HAVE_NL_ADDRESS_COUNTRY_AB3, 1, Define to 1 if _NL_ADDRESS_COUNTRY_AB3 is declared),,
               [#include <langinfo.h>])
 
-dnl Install bash-completion file?
-AC_ARG_ENABLE([bash-completion],
-	      [AS_HELP_STRING([--disable-bash-completion],
-			      [build without bash-completion support])],
-	      [msg_bash_completion=$enableval],
-	      [msg_bash_completion=yes])
-if test "x$enable_bash_completion" != "xno"; then
-  msg_bash_completion=yes
-fi
-AM_CONDITIONAL([ENABLE_BASHCOMP], [test "$msg_bash_completion" = "yes"])
-
-AC_ARG_WITH([bash-completion-dir],
-	    [AS_HELP_STRING([--with-bash-completion-dir=PATH],
-			    [choose directory for bash-completion file (default=DATADIR/bash-completion/completions)])],
-	    [with_bashcomp_dir=$withval],
-	    [with_bashcomp_dir=$datadir/bash-completion/completions])
-BASHCOMP_DIR=$with_bashcomp_dir
-AC_SUBST(BASHCOMP_DIR)
-
 dnl ==========================================================================
 	
 dnl Globally define_GNU_SOURCE and therefore enable the GNU extensions
@@ -939,7 +920,6 @@ monitor/afc/Makefile
 monitor/mtp/Makefile
 monitor/goa/Makefile
 programs/Makefile
-programs/completion/Makefile
 man/Makefile
 test/Makefile
 po/Makefile.in
@@ -976,7 +956,6 @@ echo "
         Use GCR:                      $msg_gcr
 	GNOME Keyring support:        $msg_keyring
 	GTK+ support:                 $msg_gtk
-	Bash-completion support:      $msg_bash_completion
 	Installed tests:              $msg_installed_tests
 "
 

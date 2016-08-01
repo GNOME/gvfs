@@ -1,19 +1,8 @@
 NULL =
 
-if ENABLE_BASHCOMP
-SUBDIRS = completion
-endif
+bin_in_files = program.in
 
-AM_CPPFLAGS =					\
-	-I$(top_srcdir)				\
-	-I$(top_builddir)			\
-	$(GLIB_CFLAGS) 				\
-	-DGVFS_LOCALEDIR=\""$(localedir)"\"
-
-libraries =					\
-	$(GLIB_LIBS)
-
-bin_PROGRAMS =					\
+bin_SCRIPTS =					\
 	gvfs-mount				\
 	gvfs-cat				\
 	gvfs-open				\
@@ -31,61 +20,58 @@ bin_PROGRAMS =					\
 	gvfs-monitor-dir			\
 	gvfs-mkdir				\
 	gvfs-mime				\
-	$(NULL)
-
-bin_SCRIPTS =					\
 	gvfs-less				\
 	$(NULL)
 
-gvfs_cat_SOURCES = gvfs-cat.c
-gvfs_cat_LDADD = $(libraries)
+gvfs-mount: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio mount|" $< > $@
 
-gvfs_open_SOURCES = gvfs-open.c
-gvfs_open_LDADD = $(libraries)
+gvfs-cat: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio cat|" $< > $@
 
-gvfs_copy_SOURCES = gvfs-copy.c
-gvfs_copy_LDADD = $(libraries)
+gvfs-open: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio open|" $< > $@
 
-gvfs_save_SOURCES = gvfs-save.c
-gvfs_save_LDADD = $(libraries)
+gvfs-save: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio save|" $< > $@
 
-gvfs_info_SOURCES = gvfs-info.c
-gvfs_info_LDADD = $(libraries)
+gvfs-ls: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio list|" $< > $@
 
-gvfs_set_attribute_SOURCES = gvfs-set-attribute.c
-gvfs_set_attribute_LDADD = $(libraries)
+gvfs-tree: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio tree|" $< > $@
 
-gvfs_trash_SOURCES = gvfs-trash.c
-gvfs_trash_LDADD = $(libraries)
+gvfs-info: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio info|" $< > $@
 
-gvfs_rename_SOURCES = gvfs-rename.c
-gvfs_rename_LDADD = $(libraries)
+gvfs-set-attribute: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio set|" $< > $@
 
-gvfs_rm_SOURCES = gvfs-rm.c
-gvfs_rm_LDADD = $(libraries)
+gvfs-trash: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio trash|" $< > $@
 
-gvfs_ls_SOURCES = gvfs-ls.c
-gvfs_ls_LDADD = $(libraries)
+gvfs-rename: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio rename|" $< > $@
 
-gvfs_tree_SOURCES = gvfs-tree.c
-gvfs_tree_LDADD = $(libraries)
+gvfs-rm: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio remove|" $< > $@
 
-gvfs_move_SOURCES = gvfs-move.c
-gvfs_move_LDADD = $(libraries)
+gvfs-copy: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio copy|" $< > $@
 
-gvfs_mount_SOURCES = gvfs-mount.c
-gvfs_mount_LDADD = $(libraries)
+gvfs-move: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio move|" $< > $@
 
-gvfs_monitor_dir_SOURCES = gvfs-monitor-dir.c
-gvfs_monitor_dir_LDADD = $(libraries)
+gvfs-monitor-file: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio monitor|" $< > $@
 
-gvfs_monitor_file_SOURCES = gvfs-monitor-file.c
-gvfs_monitor_file_LDADD = $(libraries)
+gvfs-monitor-dir: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio monitor|" $< > $@
 
-gvfs_mkdir_SOURCES = gvfs-mkdir.c
-gvfs_mkdir_LDADD = $(libraries)
+gvfs-mkdir: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio mkdir|" $< > $@
 
-gvfs_mime_SOURCES = gvfs-mime.c
-gvfs_mime_LDADD = $(libraries)
+gvfs-mime: deprecated.in Makefile
+	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio mime|" $< > $@
 
-EXTRA_DIST = gvfs-less
+EXTRA_DIST = $(bin_in_files)

@@ -1,0 +1,6 @@
+#!/bin/sh
+replacement="@replacement@"
+>&2 echo "This tool has been deprecated, use '$replacement' instead."
+>&2 echo "See 'gio help' for more info."
+>&2 echo
+exec $replacement "$@"
