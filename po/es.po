@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-07-14 09:16+0000\n"
+"POT-Creation-Date: 2016-07-23 19:28+0000\n"
 "PO-Revision-Date: 2016-07-18 11:40+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español; Castellano <gnome-es-list@gnome.org>\n"
@@ -81,8 +81,7 @@ msgid "Operation not supported"
 msgstr "Operación no soportada"
 
 #: ../client/gdaemonfileenumerator.c:553 ../client/gdaemonfileenumerator.c:636
-#: ../client/gdaemonfileenumerator.c:687
-#: ../client/gdaemonfileinputstream.c:642
+#: ../client/gdaemonfileenumerator.c:687 ../client/gdaemonfileinputstream.c:642
 #: ../client/gdaemonfileinputstream.c:795
 #: ../client/gdaemonfileinputstream.c:915
 #: ../client/gdaemonfileinputstream.c:1166
@@ -264,7 +263,7 @@ msgstr "Se obtuvo un final de flujo inesperado"
 #, c-format
 msgid "The server doesn't support passwords longer than %d character."
 msgid_plural "The server doesn't support passwords longer than %d characters."
-msgstr[0] "El servidor no soporta contraseñas de más de %d carácter"
+msgstr[0] "El servidor no soporta contraseñas de más de %d carácter."
 msgstr[1] "El servidor no soporta contraseñas de más de %d caracteres."
 
 #: ../daemon/gvfsafpserver.c:224 ../daemon/gvfsafpserver.c:533
@@ -1480,7 +1479,7 @@ msgstr "URI del equipo mal formado."
 
 #: ../daemon/gvfsbackendmtp.c:855
 msgid "Couldn't find matching udev device."
-msgstr "No se pudo encontrar un dispositivo de udev que coincida"
+msgstr "No se pudo encontrar un dispositivo de udev que coincida."
 
 #: ../daemon/gvfsbackendmtp.c:1034
 msgid "No MTP devices found"
@@ -2862,7 +2861,7 @@ msgstr "UBICACIÓN"
 
 #: ../programs/gvfs-info.c:385
 msgid "Show information about locations."
-msgstr "Mostrar información sobre las ubicaciones"
+msgstr "Mostrar información sobre las ubicaciones."
 
 #: ../programs/gvfs-ls.c:42 ../programs/gvfs-tree.c:37
 msgid "Show hidden files"
@@ -2924,7 +2923,7 @@ msgstr "MANEJADOR"
 
 #: ../programs/gvfs-mime.c:83
 msgid "Get or set the handler for a mime-type."
-msgstr "Establecer u obtener el manejador para un tipo MIME"
+msgstr "Establecer u obtener el manejador para un tipo MIME."
 
 #: ../programs/gvfs-mime.c:95
 msgid "Specify either --query or --set"
@@ -3097,7 +3096,7 @@ msgstr "No existe un volumen para el archivo de dispositivo %s\n"
 
 #: ../programs/gvfs-mount.c:1142
 msgid "Mount the locations."
-msgstr "Montar las ubicaciones"
+msgstr "Montar las ubicaciones."
 
 #: ../programs/gvfs-move.c:48
 msgid "Don't use copy and delete fallback"
@@ -3105,7 +3104,7 @@ msgstr "No usar el modo alternativo de copiar y eliminar"
 
 #: ../programs/gvfs-move.c:133
 msgid "Move one or more files from SOURCE to DEST."
-msgstr "Mover uno o más archivos de ORIGEN a DESTINO"
+msgstr "Mover uno o más archivos de ORIGEN a DESTINO."
 
 #: ../programs/gvfs-move.c:232
 #, c-format
@@ -3135,7 +3134,7 @@ msgstr "NOMBRE-NUEVO"
 
 #: ../programs/gvfs-rename.c:71
 msgid "Rename a file."
-msgstr "Renombrar un archivo"
+msgstr "Renombrar un archivo."
 
 #: ../programs/gvfs-rename.c:117
 #, c-format
@@ -3222,7 +3221,7 @@ msgstr "VALOR"
 
 #: ../programs/gvfs-set-attribute.c:140
 msgid "Set a file attribute of LOCATION."
-msgstr "Establecer el atributo UBICACIÓN de un archivo"
+msgstr "Establecer el atributo UBICACIÓN de un archivo."
 
 #: ../programs/gvfs-set-attribute.c:165
 msgid "Location not specified\n"
@@ -3252,7 +3251,7 @@ msgstr "Vaciar la papelera"
 
 #: ../programs/gvfs-trash.c:93
 msgid "Move files or directories to the trash."
-msgstr "Mover archivos o carpetas compartida a la papelera"
+msgstr "Mover archivos o carpetas compartida a la papelera."
 
 #: ../programs/gvfs-trash.c:130
 #, c-format
