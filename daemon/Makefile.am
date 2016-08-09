@@ -666,7 +666,7 @@ org.gtk.vfs.file-operations.policy.in: org.gtk.vfs.file-operations.policy.in.in 
 	$(AM_V_GEN) sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 org.gtk.vfs.file-operations.policy: org.gtk.vfs.file-operations.policy.in Makefile
-	$(AM_V_GEN) $(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@ || cp $< $@
+	$(AM_V_GEN) XDG_DATA_DIRS=$(top_srcdir) $(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@ || cp $< $@
 
 gvfs_polkit_actionsdir = $(datadir)/polkit-1/actions
 gvfs_polkit_actions_in_files = org.gtk.vfs.file-operations.policy.in

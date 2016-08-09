@@ -132,7 +132,7 @@ AC_ARG_ENABLE([admin], [AS_HELP_STRING([--disable-admin],[build without admin ba
 msg_admin=no
 
 if test "x$enable_admin" != "xno"; then
-  PKG_CHECK_MODULES([ADMIN], [polkit-gobject-1 >= 0.114], [msg_admin=yes])
+  PKG_CHECK_MODULES([ADMIN], [polkit-gobject-1], [msg_admin=yes])
 
   if test "x$msg_admin" = "xyes"; then
     AC_DEFINE([HAVE_ADMIN], 1, [Define to 1 if admin backend is going to be built])

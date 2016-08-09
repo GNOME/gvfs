@@ -25,6 +25,8 @@ EXTRA_DIST = \
 	README.commits		\
 	MAINTAINERS		\
 	m4			\
+	gettext/its/polkit.loc	\
+	gettext/its/polkit.its	\
 	$(NULL)
 
 distclean-local:
