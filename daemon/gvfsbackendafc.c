@@ -640,7 +640,8 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
       {
         /* translators:
          * %s is the device name. 'Try again' is the caption of the button
-         * shown in the dialog which is defined above. */
+         * shown in the dialog which is defined above. 'Trust' is the caption
+         * of the button shown in the device. */
         message = g_strdup_printf (_("The device “%s” is not trusted yet. Select “Trust” on the device and click “Try again”."), display_name);
       }
     else
