@@ -1,3 +1,11 @@
+Major changes in 1.29.90
+========================
+* build: Use upstream gettext instead intltool
+* build: Use autoreconf instead custom script
+* dnssd: Fix crashes when mount failed
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.29.4
 =======================
 * Introduce an admin gvfs backend based on polkit
