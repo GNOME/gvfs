@@ -1,3 +1,13 @@
+Major changes in 1.28.3
+=======================
+* dnssd: Fix crashes when mount failed
+* gvfs-open: Fix spawning of applications with dashses in their app IDs
+* daemon: Fix crashes caused by NULL certificates
+* afc: Many fixes for iOS support
+* client: Fix missing mount prefix in cached fuse paths
+* dav: Fix IPv6 address handling
+* Translation updates
+
 Major changes in 1.28.2
 =======================
 * udisks2: Fix crash when mounting encrypted volume
