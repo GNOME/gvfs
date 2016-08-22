@@ -343,9 +343,10 @@ create_root_file (GVfsBackendArchive *ba)
 
   g_file_info_set_name (info, "/");
   s = g_file_get_basename (ba->file);
-  /* FIXME: this should really be "/ in %s", but can't change
-     due to string freeze. */
-  display_name = g_strdup_printf (_("/ on %s"), s);
+
+  /* Translators: This is the name of the root in a mounted archive file,
+     e.g. "/ in archive.tar.gz" for a file with the name "archive.tar.gz" */
+  display_name = g_strdup_printf (_("/ in %s"), s);
   g_free (s);
   g_file_info_set_display_name (info, display_name);
   g_free (display_name);
