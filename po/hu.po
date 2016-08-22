@@ -9,16 +9,16 @@ msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-08-15 08:14+0000\n"
-"PO-Revision-Date: 2016-08-19 23:53+0200\n"
-"Last-Translator: Balázs Úr <urbalazs@gmail.com>\n"
-"Language-Team: Hungarian <openscope at gmail dot com>\n"
+"POT-Creation-Date: 2016-08-19 21:55+0000\n"
+"PO-Revision-Date: 2016-08-23 00:11+0200\n"
+"Last-Translator: Gabor Kelemen <kelemeng at ubuntu dot com>\n"
+"Language-Team: Hungarian <openscope at googlegroups dot com>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 1.2\n"
+"X-Generator: Lokalize 1.5\n"
 
 #: client/gdaemonfile.c:467 client/gdaemonfile.c:2863
 msgid "Operation not supported, files on different mounts"
@@ -574,7 +574,6 @@ msgid "Lockdown Error: Invalid Argument"
 msgstr "Zárolási hiba: Érvénytelen paraméter"
 
 #: daemon/gvfsbackendafc.c:288
-#| msgid "The device did not respond"
 msgid "The device is password protected"
 msgstr "Az eszköz jelszóval védett"
 
@@ -679,9 +678,6 @@ msgstr ""
 #. * of the button shown in the device.
 #: daemon/gvfsbackendafc.c:645
 #, c-format
-#| msgid ""
-#| "The device “%s” is locked. Enter the passcode on the device and click "
-#| "“Try again”."
 msgid ""
 "The device “%s” is not trusted yet. Select “Trust” on the device and click "
 "“Try again”."
@@ -2648,7 +2644,7 @@ msgstr "CÉL"
 
 #: programs/gvfs-copy.c:135
 msgid "Copy one or more files from SOURCE to DEST."
-msgstr "Fájlok áthelyezése a FORRÁSBÓL a CÉLBA."
+msgstr "Fájlok másolása a FORRÁSBÓL a CÉLBA."
 
 #: programs/gvfs-copy.c:160 programs/gvfs-move.c:158 programs/gvfs-rename.c:96
 msgid "Missing operand\n"
