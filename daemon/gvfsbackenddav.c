@@ -1887,7 +1887,8 @@ do_mount (GVfsBackend  *backend,
   do {
     GFileType file_type;
     SoupURI *cur_uri;
- 
+
+    res = TRUE;
     status = g_vfs_backend_dav_send_message (backend, msg_opts);
     is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
 
@@ -1917,13 +1918,14 @@ do_mount (GVfsBackend  *backend,
             break;
           }
       }
-    is_webdav = is_success && sm_has_header (msg_opts, "DAV");
+
+    is_webdav = sm_has_header (msg_opts, "DAV");
+
+    if (!is_success || !is_webdav)
+      break;
 
     soup_message_headers_clear (msg_opts->response_headers);
     soup_message_body_truncate (msg_opts->response_body);
-
-    if (is_webdav == FALSE)
-      break;
 
     cur_uri = soup_message_get_uri (msg_opts);
     soup_message_set_uri (msg_stat, cur_uri);
@@ -1970,25 +1972,46 @@ do_mount (GVfsBackend  *backend,
      chdir up to (or couldn't chdir up at all) */
 
   /* check if we at all have a good path */
-  if (last_good_path == NULL) 
+  if (last_good_path == NULL)
     {
+      if ((is_success && !is_webdav) ||
+          msg_opts->status_code == SOUP_STATUS_METHOD_NOT_ALLOWED)
+        {
+          /* This means the either: a) OPTIONS request succeeded
+             (which should be the case even for non-existent
+             resources on a webdav enabled share) but we did not
+             get the DAV header. Or b) the OPTIONS request was a
+             METHOD_NOT_ALLOWED (405).
+             Prioritize this error messages, because it seems most
+             useful to the user. */
+          g_vfs_job_failed (G_VFS_JOB (job),
+                            G_IO_ERROR, G_IO_ERROR_FAILED,
+                            _("Not a WebDAV enabled share"));
+        }
+      else if (!is_success || !res)
+        {
+          /* Either the OPTIONS request (is_success) or the PROPFIND
+             request (res) failed. */
+          SoupMessage *target = !is_success ? msg_opts : msg_stat;
+          int error_code = http_error_code_from_status (target->status_code);
 
-      /* TODO: set correct error in case of cancellation */
-      if (!is_success) 
-        g_vfs_job_failed (G_VFS_JOB (job),
-                          G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("HTTP Error: %s"), msg_opts->reason_phrase);
-      else if (!is_webdav)
-        g_vfs_job_failed (G_VFS_JOB (job),
-                          G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Not a WebDAV enabled share"));
+          /* TODO: set correct error in case of cancellation */
+
+          g_vfs_job_failed (G_VFS_JOB (job),
+                            G_IO_ERROR, error_code,
+                            _("HTTP Error: %s"), target->reason_phrase);
+        }
       else
-        g_vfs_job_failed (G_VFS_JOB (job),
-                          G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Not a WebDAV enabled share"));
+        {
+          /* This means, we have a valid DAV header, PROPFIND worked,
+             but it is not a collection!  */
+          g_vfs_job_failed (G_VFS_JOB (job),
+                            G_IO_ERROR, G_IO_ERROR_FAILED,
+                            _("Not a WebDAV enabled share"));
+          /* TODO: STRING CHANGE: change to: Could not find an enclosing directory */
+        }
 
       /* TODO: We leak a bunch of stuff here :-( */
-      /* TODO: STRING CHANGE: change to: Could not find an enclosing directory */
       return;
     }
 
