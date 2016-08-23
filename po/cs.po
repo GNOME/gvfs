@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-08-15 08:14+0000\n"
-"PO-Revision-Date: 2016-08-17 11:50+0200\n"
+"POT-Creation-Date: 2016-08-23 12:39+0000\n"
+"PO-Revision-Date: 2016-08-23 15:20+0200\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: čeština <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -373,8 +373,8 @@ msgstr "Přístup odepřen"
 #: daemon/gvfsafpvolume.c:2529 daemon/gvfsbackendafc.c:210
 #: daemon/gvfsbackendafc.c:1116 daemon/gvfsbackendafpbrowse.c:190
 #: daemon/gvfsbackendafpbrowse.c:327 daemon/gvfsbackendafpbrowse.c:359
-#: daemon/gvfsbackendarchive.c:736 daemon/gvfsbackendarchive.c:791
-#: daemon/gvfsbackendarchive.c:843 daemon/gvfsbackendarchive.c:872
+#: daemon/gvfsbackendarchive.c:737 daemon/gvfsbackendarchive.c:792
+#: daemon/gvfsbackendarchive.c:844 daemon/gvfsbackendarchive.c:873
 #: daemon/gvfsbackendcdda.c:1024 daemon/gvfsbackendcomputer.c:639
 #: daemon/gvfsbackenddnssd.c:423 daemon/gvfsbackendftp.c:778
 #: daemon/gvfsbackendftp.c:1172 daemon/gvfsbackendmtp.c:1656
@@ -619,8 +619,8 @@ msgstr "Zkusit znovu"
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: daemon/gvfsbackendafc.c:465 daemon/gvfsbackendarchive.c:637
-#: daemon/gvfsbackendarchive.c:666 daemon/gvfsbackenddav.c:1861
+#: daemon/gvfsbackendafc.c:465 daemon/gvfsbackendarchive.c:638
+#: daemon/gvfsbackendarchive.c:667 daemon/gvfsbackenddav.c:1861
 #: daemon/gvfsbackendgoogle.c:1664 daemon/gvfsbackendhttp.c:256
 #: daemon/gvfsbackendsmb.c:724
 msgid "Invalid mount spec"
@@ -683,7 +683,7 @@ msgstr ""
 "Zařízení „%s“ se zatím nedůvěřuje. Označte u zařízení „Důvěřovat“ a klikněte "
 "na „Zkusit znovu“."
 
-#: daemon/gvfsbackendafc.c:1105 daemon/gvfsbackendarchive.c:744
+#: daemon/gvfsbackendafc.c:1105 daemon/gvfsbackendarchive.c:745
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2187
 #: daemon/gvfsbackendgphoto2.c:1805 daemon/gvfsbackendmtp.c:2279
 #: daemon/gvfsbackendnfs.c:347 daemon/gvfsbackendrecent.c:122
@@ -760,7 +760,7 @@ msgid "%s"
 msgstr "%s"
 
 #: daemon/gvfsbackendafpbrowse.c:498 daemon/gvfsbackendafp.c:2139
-#: daemon/gvfsbackendarchive.c:626 daemon/gvfsbackendftp.c:706
+#: daemon/gvfsbackendarchive.c:627 daemon/gvfsbackendftp.c:706
 #: daemon/gvfsbackendnfs.c:197 daemon/gvfsbackendsftp.c:2046
 msgid "No hostname specified"
 msgstr "Nebyl zadán název hostitele"
@@ -820,16 +820,14 @@ msgstr "%s jako %s na %s"
 msgid "No volume specified"
 msgstr "Nezadán žádný svazek"
 
-#. FIXME: this should really be "/ in %s", but can't change
-#. due to string freeze.
-#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: daemon/gvfsbackendarchive.c:348 daemon/gvfsbackendsftp.c:2590
-#: daemon/gvfsftpdircache.c:431
+#. Translators: This is the name of the root in a mounted archive file,
+#. e.g. "/ in archive.tar.gz" for a file with the name "archive.tar.gz"
+#: daemon/gvfsbackendarchive.c:349
 #, c-format
-msgid "/ on %s"
-msgstr "/ na %s"
+msgid "/ in %s"
+msgstr "/ v %s"
 
-#: daemon/gvfsbackendarchive.c:881 daemon/gvfsbackendburn.c:679
+#: daemon/gvfsbackendarchive.c:882 daemon/gvfsbackendburn.c:679
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:472
 #: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:684
 #: daemon/gvfsbackendgoogle.c:1213 daemon/gvfsbackendgoogle.c:1328
@@ -1665,6 +1663,12 @@ msgstr "Nezdařilo se nalézt podporovaný příkaz SSH"
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (neplatné kódování)"
+
+#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
+#: daemon/gvfsbackendsftp.c:2590 daemon/gvfsftpdircache.c:431
+#, c-format
+msgid "/ on %s"
+msgstr "/ na %s"
 
 #: daemon/gvfsbackendsftp.c:2663
 msgid "Failure"
