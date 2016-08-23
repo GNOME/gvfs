@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-15 10:03+0200\n"
-"PO-Revision-Date: 2016-08-15 10:05+0200\n"
+"POT-Creation-Date: 2016-08-23 12:39+0000\n"
+"PO-Revision-Date: 2016-08-23 19:37+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -206,7 +206,6 @@ msgid "Usage: %s key=value key=value ..."
 msgstr "Użycie: %s key=wartość key=wartość…"
 
 #: daemon/daemon-main.c:276
-#, c-format
 msgid "No mount type specified"
 msgstr "Nie podano typu montowania"
 
@@ -297,22 +296,18 @@ msgstr ""
 "późniejszej protokołu AFP."
 
 #: daemon/gvfsafpserver.c:915
-#, c-format
 msgid "Permission denied."
 msgstr "Brak uprawnień."
 
 #: daemon/gvfsafpserver.c:920
-#, c-format
 msgid "The command is not supported by the server."
 msgstr "Polecenie nie jest obsługiwane przez serwer."
 
 #: daemon/gvfsafpserver.c:924
-#, c-format
 msgid "Your password has expired."
 msgstr "Hasło wygasło."
 
 #: daemon/gvfsafpserver.c:928
-#, c-format
 msgid "Your password needs to be changed."
 msgstr "Wymagana jest zmiana hasła."
 
@@ -373,7 +368,6 @@ msgstr "Nie można wczytać %s na %s"
 #: daemon/gvfsbackendgoogle.c:207 daemon/gvfsbackendsftp.c:337
 #: daemon/gvfsbackendsftp.c:1107 daemon/gvfsbackendsftp.c:2139
 #: daemon/gvfsftptask.c:439
-#, c-format
 msgid "Permission denied"
 msgstr "Brak uprawnień"
 
@@ -381,8 +375,8 @@ msgstr "Brak uprawnień"
 #: daemon/gvfsafpvolume.c:2529 daemon/gvfsbackendafc.c:210
 #: daemon/gvfsbackendafc.c:1116 daemon/gvfsbackendafpbrowse.c:190
 #: daemon/gvfsbackendafpbrowse.c:327 daemon/gvfsbackendafpbrowse.c:359
-#: daemon/gvfsbackendarchive.c:736 daemon/gvfsbackendarchive.c:791
-#: daemon/gvfsbackendarchive.c:843 daemon/gvfsbackendarchive.c:872
+#: daemon/gvfsbackendarchive.c:737 daemon/gvfsbackendarchive.c:792
+#: daemon/gvfsbackendarchive.c:844 daemon/gvfsbackendarchive.c:873
 #: daemon/gvfsbackendcdda.c:1024 daemon/gvfsbackendcomputer.c:639
 #: daemon/gvfsbackenddnssd.c:423 daemon/gvfsbackendftp.c:778
 #: daemon/gvfsbackendftp.c:1172 daemon/gvfsbackendmtp.c:1656
@@ -391,7 +385,6 @@ msgstr "Brak uprawnień"
 #: daemon/gvfsbackendmtp.c:2611 daemon/gvfsbackendnetwork.c:696
 #: daemon/gvfsbackendsmbbrowse.c:1129 daemon/gvfsbackendsmbbrowse.c:1196
 #: daemon/gvfsbackendsmbbrowse.c:1383 daemon/gvfsbackendsmbbrowse.c:1456
-#, c-format
 msgid "File doesn't exist"
 msgstr "Plik nie istnieje"
 
@@ -426,7 +419,6 @@ msgstr "Obiekt docelowy jest oznaczony jako nieusuwalny (DeleteInhibit)"
 
 #: daemon/gvfsafpvolume.c:696 daemon/gvfsafpvolume.c:1245
 #: daemon/gvfsafpvolume.c:2147 daemon/gvfsbackendgoogle.c:213
-#, c-format
 msgid "Target object doesn't exist"
 msgstr "Obiekt docelowy nie istnieje"
 
@@ -634,8 +626,8 @@ msgstr "Spróbuj ponownie"
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: daemon/gvfsbackendafc.c:465 daemon/gvfsbackendarchive.c:637
-#: daemon/gvfsbackendarchive.c:666 daemon/gvfsbackenddav.c:1861
+#: daemon/gvfsbackendafc.c:465 daemon/gvfsbackendarchive.c:638
+#: daemon/gvfsbackendarchive.c:667 daemon/gvfsbackenddav.c:1861
 #: daemon/gvfsbackendgoogle.c:1664 daemon/gvfsbackendhttp.c:256
 #: daemon/gvfsbackendsmb.c:724
 msgid "Invalid mount spec"
@@ -646,17 +638,14 @@ msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "Nieprawidłowe położenie AFC: musi być w formie afc://uuid:port-numer"
 
 #: daemon/gvfsbackendafc.c:487
-#, c-format
 msgid "Apple Mobile Device"
 msgstr "Urządzenie przenośne firmy Apple"
 
 #: daemon/gvfsbackendafc.c:492
-#, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Urządzenie przenośne firmy Apple, złamane"
 
 #: daemon/gvfsbackendafc.c:497
-#, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Dokumenty na Urządzeniu przenośnym firmy Apple"
 
@@ -701,7 +690,7 @@ msgstr ""
 "Urządzenie „%s” nie jest zaufane. Proszę wybrać „Zaufaj” na urządzeniu "
 "i kliknąć przycisk „Spróbuj ponownie”."
 
-#: daemon/gvfsbackendafc.c:1105 daemon/gvfsbackendarchive.c:744
+#: daemon/gvfsbackendafc.c:1105 daemon/gvfsbackendarchive.c:745
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2187
 #: daemon/gvfsbackendgphoto2.c:1805 daemon/gvfsbackendmtp.c:2279
 #: daemon/gvfsbackendnfs.c:347 daemon/gvfsbackendrecent.c:122
@@ -778,7 +767,7 @@ msgid "%s"
 msgstr "%s"
 
 #: daemon/gvfsbackendafpbrowse.c:498 daemon/gvfsbackendafp.c:2139
-#: daemon/gvfsbackendarchive.c:626 daemon/gvfsbackendftp.c:706
+#: daemon/gvfsbackendarchive.c:627 daemon/gvfsbackendftp.c:706
 #: daemon/gvfsbackendnfs.c:197 daemon/gvfsbackendsftp.c:2046
 msgid "No hostname specified"
 msgstr "Nie podano nazwy komputera"
@@ -838,22 +827,19 @@ msgstr "%s dla %s na %s"
 msgid "No volume specified"
 msgstr "Nie podano woluminu"
 
-#. FIXME: this should really be "/ in %s", but can't change
-#. due to string freeze.
-#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: daemon/gvfsbackendarchive.c:348 daemon/gvfsbackendsftp.c:2590
-#: daemon/gvfsftpdircache.c:431
+#. Translators: This is the name of the root in a mounted archive file,
+#. e.g. "/ in archive.tar.gz" for a file with the name "archive.tar.gz"
+#: daemon/gvfsbackendarchive.c:349
 #, c-format
-msgid "/ on %s"
-msgstr "/ na %s"
+msgid "/ in %s"
+msgstr "/ w %s"
 
-#: daemon/gvfsbackendarchive.c:881 daemon/gvfsbackendburn.c:679
+#: daemon/gvfsbackendarchive.c:882 daemon/gvfsbackendburn.c:679
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:472
 #: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:684
 #: daemon/gvfsbackendgoogle.c:1213 daemon/gvfsbackendgoogle.c:1328
 #: daemon/gvfsbackendgoogle.c:1469 daemon/gvfsbackendnetwork.c:744
 #: daemon/gvfsbackendsftp.c:4308 daemon/gvfsftpdircache.c:157
-#, c-format
 msgid "The file is not a directory"
 msgstr "Plik nie jest katalogiem"
 
@@ -877,7 +863,6 @@ msgstr "Nie można utworzyć tymczasowego katalogu"
 #: daemon/gvfsbackendsftp.c:2141 daemon/gvfsbackendsftp.c:3306
 #: daemon/gvfsbackendsftp.c:3319 daemon/gvfsbackendsftp.c:3339
 #: daemon/gvfsbackendtrash.c:218
-#, c-format
 msgid "No such file or directory"
 msgstr "Nie ma takiego pliku lub katalogu"
 
@@ -1006,7 +991,6 @@ msgstr "Punkt montowania CDDA na %s"
 #: monitor/gdu/ggduvolume.c:349 monitor/hal/ghalmount.c:325
 #: monitor/hal/ghalvolume.c:225 monitor/hal/ghalvolume.c:246
 #: monitor/udisks2/gvfsudisks2volume.c:383
-#, c-format
 msgid "Audio Disc"
 msgstr "Płyta CD-Audio"
 
@@ -1035,12 +1019,10 @@ msgid "Error seeking in stream on drive %s"
 msgstr "Błąd podczas wyszukiwania w strumieniu w napędzie %s"
 
 #: daemon/gvfsbackendcdda.c:1017 daemon/gvfsbackendgphoto2.c:1813
-#, c-format
 msgid "No such file"
 msgstr "Nie ma takiego pliku"
 
 #: daemon/gvfsbackendcdda.c:1031
-#, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Plik nie istnieje lub nie jest ścieżką dźwiękową"
 
@@ -1670,12 +1652,10 @@ msgstr ""
 "się z administratorem systemu."
 
 #: daemon/gvfsbackendsftp.c:1379
-#, c-format
 msgid "The connection is closed (the underlying SSH process exited)"
 msgstr "Zamknięto połączenie (proces SSH nieoczekiwanie zakończył działanie)"
 
 #: daemon/gvfsbackendsftp.c:1380
-#, c-format
 msgid "Internal error: Unknown Error"
 msgstr "Wewnętrzny błąd: nieznany błąd"
 
@@ -1691,6 +1671,12 @@ msgstr "Nie można odnaleźć obsługiwanego polecenia SSH"
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (nieprawidłowe kodowanie)"
+
+#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
+#: daemon/gvfsbackendsftp.c:2590 daemon/gvfsftpdircache.c:431
+#, c-format
+msgid "/ on %s"
+msgstr "/ na %s"
 
 #: daemon/gvfsbackendsftp.c:2663
 msgid "Failure"
@@ -2092,7 +2078,6 @@ msgid "Unnamed Drive"
 msgstr "Napęd bez nazwy"
 
 #: monitor/gdu/ggdudrive.c:561 monitor/udisks2/gvfsudisks2drive.c:640
-#, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
 "Wysunięcie nośnika się nie powiodło; jeden lub więcej woluminów na nośniku "
@@ -2451,7 +2436,6 @@ msgid "Mass Storage Drive"
 msgstr "Napęd pamięci masowej"
 
 #: monitor/hal/ghaldrive.c:662
-#, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr ""
 "Wysunięcie nośnika się nie powiodło; jeden lub więcej woluminów na nośniku "
@@ -2790,7 +2774,6 @@ msgid "mountable"
 msgstr "montowalny"
 
 #: programs/gvfs-info.c:111
-#, c-format
 msgid "attributes:\n"
 msgstr "atrybuty:\n"
 
@@ -2817,12 +2800,10 @@ msgid "type: %s\n"
 msgstr "typ: %s\n"
 
 #: programs/gvfs-info.c:187
-#, c-format
 msgid "size: "
 msgstr "rozmiar: "
 
 #: programs/gvfs-info.c:192
-#, c-format
 msgid "hidden\n"
 msgstr "ukryty\n"
 
@@ -2846,12 +2827,10 @@ msgid "Error getting writable attributes: %s\n"
 msgstr "Błąd podczas pobierania atrybutów zapisu: %s\n"
 
 #: programs/gvfs-info.c:327
-#, c-format
 msgid "Settable attributes:\n"
 msgstr "Atrybuty możliwe do ustawienia:\n"
 
 #: programs/gvfs-info.c:350
-#, c-format
 msgid "Writable attribute namespaces:\n"
 msgstr "Przestrzeń nazw atrybutów możliwych do ustawienia:\n"
 
@@ -2933,12 +2912,10 @@ msgid "Specify either --query or --set"
 msgstr "Należy podać opcję --query lub --set"
 
 #: programs/gvfs-mime.c:112
-#, c-format
 msgid "Must specify a single mime-type.\n"
 msgstr "Należy podać jeden typ MIME.\n"
 
 #: programs/gvfs-mime.c:119
-#, c-format
 msgid "Must specify the mime-type followed by the default handler.\n"
 msgstr "Należy podać typ MIME i domyślny program obsługujący.\n"
 
@@ -2953,22 +2930,18 @@ msgid "Default application for '%s': %s\n"
 msgstr "Domyślny program dla „%s”: %s\n"
 
 #: programs/gvfs-mime.c:145
-#, c-format
 msgid "Registered applications:\n"
 msgstr "Zarejestrowane programy:\n"
 
 #: programs/gvfs-mime.c:147
-#, c-format
 msgid "No registered applications\n"
 msgstr "Brak zarejestrowanych programów\n"
 
 #: programs/gvfs-mime.c:158
-#, c-format
 msgid "Recommended applications:\n"
 msgstr "Zalecane programy:\n"
 
 #: programs/gvfs-mime.c:160
-#, c-format
 msgid "No recommended applications\n"
 msgstr "Brak zalecanych programów\n"
 
@@ -3059,7 +3032,6 @@ msgid "Show extra information"
 msgstr "Wyświetla dodatkowe informacje"
 
 #: programs/gvfs-mount.c:256 programs/gvfs-mount.c:284
-#, c-format
 msgid "Error mounting location: Anonymous access denied\n"
 msgstr "Błąd podczas montowania położenia: odmowa dostępu anonimowego\n"
 
@@ -3200,7 +3172,6 @@ msgstr "Błąd podczas zamykania: %s\n"
 
 #. Translators: The "etag" is a token allowing to verify whether a file has been modified
 #: programs/gvfs-save.c:143
-#, c-format
 msgid "Etag not available\n"
 msgstr "Etykieta etag jest niedostępna\n"
 
