@@ -154,6 +154,13 @@ g_mount_spec_set_with_len_internal (GMountSpec *spec,
   else
     value_copy = (char*) value;
 
+  if (g_str_equal ("prefix", key))
+    {
+      g_mount_spec_set_mount_prefix (spec, value_copy);
+      g_free (value_copy);
+      return;
+    }
+
   for (i = 0; i < spec->items->len; i++)
     {
       GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
