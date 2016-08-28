@@ -2008,8 +2008,7 @@ do_mount (GVfsBackend  *backend,
              but it is not a collection!  */
           g_vfs_job_failed (G_VFS_JOB (job),
                             G_IO_ERROR, G_IO_ERROR_FAILED,
-                            _("Not a WebDAV enabled share"));
-          /* TODO: STRING CHANGE: change to: Could not find an enclosing directory */
+                            _("Could not find an enclosing directory"));
         }
 
       g_object_unref (msg_opts);
