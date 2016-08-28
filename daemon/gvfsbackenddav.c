@@ -1995,7 +1995,8 @@ do_mount (GVfsBackend  *backend,
           SoupMessage *target = !is_success ? msg_opts : msg_stat;
           int error_code = http_error_code_from_status (target->status_code);
 
-          /* TODO: set correct error in case of cancellation */
+          if (error_code == G_IO_ERROR_CANCELLED)
+            error_code = G_IO_ERROR_FAILED_HANDLED;
 
           g_vfs_job_failed (G_VFS_JOB (job),
                             G_IO_ERROR, error_code,
