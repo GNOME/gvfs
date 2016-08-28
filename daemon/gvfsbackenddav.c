@@ -2011,7 +2011,9 @@ do_mount (GVfsBackend  *backend,
           /* TODO: STRING CHANGE: change to: Could not find an enclosing directory */
         }
 
-      /* TODO: We leak a bunch of stuff here :-( */
+      g_object_unref (msg_opts);
+      g_object_unref (msg_stat);
+
       return;
     }
 
