@@ -1,3 +1,9 @@
+Major changes in 1.29.91
+========================
+* dav: Various mount operation fixes
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.29.90
 ========================
 * build: Use upstream gettext instead intltool
