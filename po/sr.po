@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&ke"
 "ywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-08-23 12:39+0000\n"
-"PO-Revision-Date: 2016-08-28 11:03+0200\n"
+"POT-Creation-Date: 2016-08-29 15:35+0000\n"
+"PO-Revision-Date: 2016-08-31 21:03+0200\n"
 "Last-Translator: Мирослав Николић <miroslavnikolic@rocketmail.com>\n"
 "Language-Team: српски <gnome-sr@googlegroups.org>\n"
 "Language: sr\n"
@@ -391,8 +391,8 @@ msgstr "Датотека не постоји"
 
 #: daemon/gvfsafpvolume.c:418 daemon/gvfsafpvolume.c:2533
 #: daemon/gvfsbackendafp.c:289 daemon/gvfsbackendafp.c:492
-#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2307
-#: daemon/gvfsbackenddav.c:2970 daemon/gvfsbackenddav.c:3250
+#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2332
+#: daemon/gvfsbackenddav.c:2995 daemon/gvfsbackenddav.c:3275
 #: daemon/gvfsbackendftp.c:815 daemon/gvfsbackendnfs.c:2478
 #: daemon/gvfsbackendsftp.c:2654 daemon/gvfsbackendsftp.c:3429
 #: daemon/gvfsbackendsftp.c:3757 daemon/gvfsbackendsftp.c:4823
@@ -409,7 +409,7 @@ msgid "Target file is open"
 msgstr "Циљна датотека је отворена"
 
 #: daemon/gvfsafpvolume.c:688 daemon/gvfsbackendafc.c:214
-#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2697
+#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2722
 #: daemon/gvfsbackendsftp.c:2133
 msgid "Directory not empty"
 msgstr "Директоријум није празан"
@@ -437,10 +437,10 @@ msgstr "Нема довољно простора на волумену"
 
 #: daemon/gvfsafpvolume.c:845 daemon/gvfsafpvolume.c:1428
 #: daemon/gvfsafpvolume.c:1585 daemon/gvfsbackendafp.c:296
-#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2362
-#: daemon/gvfsbackenddav.c:2658 daemon/gvfsbackenddav.c:2766
-#: daemon/gvfsbackenddav.c:2903 daemon/gvfsbackenddav.c:2979
-#: daemon/gvfsbackenddav.c:3017 daemon/gvfsbackenddav.c:3241
+#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2387
+#: daemon/gvfsbackenddav.c:2683 daemon/gvfsbackenddav.c:2791
+#: daemon/gvfsbackenddav.c:2928 daemon/gvfsbackenddav.c:3004
+#: daemon/gvfsbackenddav.c:3042 daemon/gvfsbackenddav.c:3266
 #: daemon/gvfsbackendftp.c:794 daemon/gvfsbackendftp.c:982
 #: daemon/gvfsbackendftp.c:1492 daemon/gvfsbackendftp.c:1600
 #: daemon/gvfsbackendgoogle.c:1233 daemon/gvfsbackendgoogle.c:1561
@@ -575,7 +575,6 @@ msgid "Lockdown Error: Invalid Argument"
 msgstr "Грешка у закључавању: Неисправан аргумент"
 
 #: daemon/gvfsbackendafc.c:288
-#| msgid "The device did not respond"
 msgid "The device is password protected"
 msgstr "Уређај је заштићен лозинком"
 
@@ -681,15 +680,12 @@ msgstr ""
 #. * of the button shown in the device.
 #: daemon/gvfsbackendafc.c:645
 #, c-format
-#| msgid ""
-#| "The device “%s” is locked. Enter the passcode on the device and click "
-#| "“Try again”."
 msgid ""
 "The device “%s” is not trusted yet. Select “Trust” on the device and click "
 "“Try again”."
 msgstr ""
-"Уређај „%s“ још није поверљив. Изаберите „Веруј“ на уређају и кликните на „"
-"Покушај поново“."
+"Уређај „%s“ још није поверљив. Изаберите „Веруј“ на уређају и кликните на "
+"„Покушај поново“."
 
 #: daemon/gvfsbackendafc.c:1105 daemon/gvfsbackendarchive.c:745
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2187
@@ -729,7 +725,7 @@ msgstr "Није подржана врста премотавања"
 msgid "Operation unsupported"
 msgstr "Радња није подржана"
 
-#: daemon/gvfsbackendafc.c:2576 daemon/gvfsbackenddav.c:2802
+#: daemon/gvfsbackendafc.c:2576 daemon/gvfsbackenddav.c:2827
 #: daemon/gvfsbackendftp.c:1444
 msgid "Backups not supported"
 msgstr "Резерве нису подржане"
@@ -778,13 +774,13 @@ msgid "Apple Filing Protocol Service"
 msgstr "Еполова услуга протокола подношења"
 
 #: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:875
-#: daemon/gvfsbackenddav.c:2965 daemon/gvfsbackendftp.c:1592
+#: daemon/gvfsbackenddav.c:2990 daemon/gvfsbackendftp.c:1592
 #: daemon/gvfsbackendgoogle.c:1806
 msgid "Can't copy directory over directory"
 msgstr "Не могу да умножим директоријум преко директоријума"
 
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:891
-#: daemon/gvfsbackenddav.c:2994 daemon/gvfsbackendftp.c:1615
+#: daemon/gvfsbackenddav.c:3019 daemon/gvfsbackendftp.c:1615
 #: daemon/gvfsbackendgoogle.c:1244 daemon/gvfsbackendgoogle.c:1825
 #: daemon/gvfsbackendgoogle.c:1845 daemon/gvfsbackendmtp.c:1717
 #: daemon/gvfsbackendmtp.c:1740 daemon/gvfsbackendmtp.c:2042
@@ -792,7 +788,7 @@ msgstr "Не могу да умножим директоријум преко д
 msgid "Can't recursively copy directory"
 msgstr "Не могу да умножим директоријум и његов садржај"
 
-#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2842
+#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2867
 #: daemon/gvfsbackendnfs.c:2472 daemon/gvfsbackendsftp.c:4818
 #: daemon/gvfsbackendsmb.c:2191
 msgid "Can't move directory over directory"
@@ -807,7 +803,7 @@ msgstr "резерве нису подржане"
 msgid "Unable to create temporary file (%s)"
 msgstr "Не могу да направим привремену датотеку (%s)"
 
-#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2443
+#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2468
 #: daemon/gvfsbackendnfs.c:1175 daemon/gvfsbackendsftp.c:3772
 #: daemon/gvfsbackendsmb.c:1227
 msgid "The file was externally modified"
@@ -832,7 +828,6 @@ msgstr "Није одређен волумен"
 #. e.g. "/ in archive.tar.gz" for a file with the name "archive.tar.gz"
 #: daemon/gvfsbackendarchive.c:349
 #, c-format
-#| msgid "/ on %s"
 msgid "/ in %s"
 msgstr "/ у „%s“"
 
@@ -915,13 +910,13 @@ msgstr "Радња није подржана позадинским програ
 msgid "No such file or directory in target path"
 msgstr "Не постоји таква датотека или директоријум у циљној путањи"
 
-#: daemon/gvfsbackendburn.c:884 daemon/gvfsbackenddav.c:2880
+#: daemon/gvfsbackendburn.c:884 daemon/gvfsbackenddav.c:2905
 #: daemon/gvfsbackendsftp.c:2135 daemon/gvfsbackendsftp.c:4998
 msgid "Target file exists"
 msgstr "Циљна датотека већ постоји"
 
 #: daemon/gvfsbackendburn.c:949 daemon/gvfsbackendcomputer.c:812
-#: daemon/gvfsbackenddav.c:3324 daemon/gvfsbackenddav.c:3356
+#: daemon/gvfsbackenddav.c:3349 daemon/gvfsbackenddav.c:3381
 #: daemon/gvfsbackendgphoto2.c:2495 daemon/gvfsbackendgphoto2.c:2708
 #: daemon/gvfsbackendgphoto2.c:2805 daemon/gvfsbackendgphoto2.c:2898
 #: daemon/gvfsbackendgphoto2.c:3507 daemon/gvfsbackendgphoto2.c:3517
@@ -1086,7 +1081,7 @@ msgstr "Не могу да упитам датотеку"
 msgid "%s on %s%s"
 msgstr "%s на %s%s"
 
-#: daemon/gvfsbackenddav.c:702 daemon/gvfsbackenddav.c:1980
+#: daemon/gvfsbackenddav.c:702 daemon/gvfsbackenddav.c:2003
 #: daemon/gvfsbackendhttp.c:202
 #, c-format
 msgid "HTTP Error: %s"
@@ -1104,8 +1099,8 @@ msgstr "Празан одговор"
 msgid "Unexpected reply from server"
 msgstr "Неочекиван одговор са сервера"
 
-#: daemon/gvfsbackenddav.c:1420 daemon/gvfsbackenddav.c:2105
-#: daemon/gvfsbackenddav.c:2197 daemon/gvfsbackenddav.c:2299
+#: daemon/gvfsbackenddav.c:1420 daemon/gvfsbackenddav.c:2130
+#: daemon/gvfsbackenddav.c:2222 daemon/gvfsbackenddav.c:2324
 msgid "Response invalid"
 msgstr "Неисправан одговор"
 
@@ -1125,16 +1120,21 @@ msgstr "Унесите лозинку за %s"
 msgid "Please enter proxy password"
 msgstr "Унесите лозинку посредника"
 
-#: daemon/gvfsbackenddav.c:1984 daemon/gvfsbackenddav.c:1988
+#: daemon/gvfsbackenddav.c:1989
 msgid "Not a WebDAV enabled share"
 msgstr "Ово није ВебДАВ дељење"
 
-#: daemon/gvfsbackenddav.c:2059 daemon/gvfsbackenddav.c:2152
-#: daemon/gvfsbackenddav.c:2225 daemon/gvfsbackenddav.c:2333
+#: daemon/gvfsbackenddav.c:2011
+#| msgid "Could not find enclosing mount"
+msgid "Could not find an enclosing directory"
+msgstr "Не могу да нађем приложени директоријум"
+
+#: daemon/gvfsbackenddav.c:2084 daemon/gvfsbackenddav.c:2177
+#: daemon/gvfsbackenddav.c:2250 daemon/gvfsbackenddav.c:2358
 msgid "Could not create request"
 msgstr "Не могу да направим захтев"
 
-#: daemon/gvfsbackenddav.c:2474 daemon/gvfsbackendftp.c:1085
+#: daemon/gvfsbackenddav.c:2499 daemon/gvfsbackendftp.c:1085
 #: daemon/gvfsbackendgoogle.c:2562 daemon/gvfsbackendnfs.c:939
 #: daemon/gvfsbackendnfs.c:962 daemon/gvfsbackendnfs.c:988
 #: daemon/gvfsbackendnfs.c:1388 daemon/gvfsbackendsmb.c:1263
@@ -1142,11 +1142,11 @@ msgstr "Не могу да направим захтев"
 msgid "Backup file creation failed"
 msgstr "Није успела израда резервне датотеке"
 
-#: daemon/gvfsbackenddav.c:2847
+#: daemon/gvfsbackenddav.c:2872
 msgid "Can't move over directory"
 msgstr "Не могу да преместим преко директоријума"
 
-#: daemon/gvfsbackenddav.c:3116
+#: daemon/gvfsbackenddav.c:3141
 msgid "File length changed during transfer"
 msgstr "Величина датотеке се променила за време преноса"
 
