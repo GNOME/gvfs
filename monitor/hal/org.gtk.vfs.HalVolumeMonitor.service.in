@@ -1,4 +1,0 @@
-[D-BUS Service]
-Name=org.gtk.vfs.HalVolumeMonitor
-Exec=@libexecdir@/gvfs-hal-volume-monitor
-SystemdService=gvfs-hal-volume-monitor.service

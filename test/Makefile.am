@@ -54,13 +54,6 @@ CONFIG_FILES+=org.gtk.vfs.GPhoto2VolumeMonitor.service gphoto2.monitor
 CONFIG_FILES_INSTALLED+=$(top_builddir)/monitor/gphoto2/org.gtk.vfs.GPhoto2VolumeMonitor.service gphoto2.monitor
 endif
 
-if USE_HAL
-org.gtk.vfs.HalVolumeMonitor.service: $(top_srcdir)/monitor/hal/org.gtk.vfs.HalVolumeMonitor.service.in ../config.log
-	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor/hal|" $< > $@
-CONFIG_FILES+=org.gtk.vfs.HalVolumeMonitor.service hal.monitor
-CONFIG_FILES_INSTALLED+=$(top_builddir)/monitor/hal/org.gtk.vfs.HalVolumeMonitor.service hal.monitor
-endif
-
 if USE_UDISKS2
 org.gtk.vfs.UDisks2VolumeMonitor.service: $(top_srcdir)/monitor/udisks2/org.gtk.vfs.UDisks2VolumeMonitor.service.in ../config.log
 	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(abs_top_builddir)/monitor/udisks2|" $< > $@

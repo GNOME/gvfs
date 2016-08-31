@@ -35,76 +35,39 @@
 #include "ggphoto2volumemonitor.h"
 #include "ggphoto2volume.h"
 
-#ifdef HAVE_GUDEV
 #include <gio/gunixmounts.h>
-#else
-#include "hal-pool.h"
-#endif
 
-G_LOCK_DEFINE_STATIC(hal_vm);
+G_LOCK_DEFINE_STATIC(gphoto2_vm);
 
 static GGPhoto2VolumeMonitor *the_volume_monitor = NULL;
-#ifndef HAVE_GUDEV
-static HalPool *pool = NULL;
-#endif
 
 struct _GGPhoto2VolumeMonitor {
   GNativeVolumeMonitor parent;
 
   GUnixMountMonitor *mount_monitor;
 
-#ifdef HAVE_GUDEV
   GUdevClient *gudev_client;
-#else
-  HalPool *pool;
-#endif
 
   GList *last_camera_devices;
 
   GList *camera_volumes;
 };
 
-#ifdef HAVE_GUDEV
 static void on_uevent                (GUdevClient *client, 
                                       gchar *action,
                                       GUdevDevice *device,
                                       gpointer user_data);
-#else
-static void hal_changed              (HalPool    *pool,
-                                      HalDevice  *device,
-                                      gpointer    user_data);
-
-static void update_all (GGPhoto2VolumeMonitor *monitor,
-                        gboolean emit_changes);
-
-static void update_cameras           (GGPhoto2VolumeMonitor *monitor,
-                                      GList **added_volumes,
-                                      GList **removed_volumes);
-#endif
 
 static GList* get_stores_for_camera (const char *bus_num, const char *device_num);
 
 G_DEFINE_TYPE (GGPhoto2VolumeMonitor, g_gphoto2_volume_monitor, G_TYPE_VOLUME_MONITOR)
 
-#ifndef HAVE_GUDEV
-static HalPool *
-get_hal_pool (void)
-{
-  char *cap_only[] = {"camera", "portable_audio_player", "usb_device", NULL};
-
-  if (pool == NULL)
-    pool = hal_pool_new (cap_only);
-
-  return pool;
-}
-#endif
-
 static void
 g_gphoto2_volume_monitor_dispose (GObject *object)
 {
-  G_LOCK (hal_vm);
+  G_LOCK (gphoto2_vm);
   the_volume_monitor = NULL;
-  G_UNLOCK (hal_vm);
+  G_UNLOCK (gphoto2_vm);
 
   if (G_OBJECT_CLASS (g_gphoto2_volume_monitor_parent_class)->dispose)
     (*G_OBJECT_CLASS (g_gphoto2_volume_monitor_parent_class)->dispose) (object);
@@ -117,14 +80,9 @@ g_gphoto2_volume_monitor_finalize (GObject *object)
 
   monitor = G_GPHOTO2_VOLUME_MONITOR (object);
 
-#ifdef HAVE_GUDEV
   g_signal_handlers_disconnect_by_func (monitor->gudev_client, on_uevent, monitor);
 
   g_object_unref (monitor->gudev_client);
-#else
-  g_signal_handlers_disconnect_by_func (monitor->pool, hal_changed, monitor);
-  g_object_unref (monitor->pool);
-#endif
 
   g_list_free_full (monitor->last_camera_devices, g_object_unref);
   g_list_free_full (monitor->camera_volumes, g_object_unref);
@@ -147,12 +105,12 @@ get_volumes (GVolumeMonitor *volume_monitor)
 
   monitor = G_GPHOTO2_VOLUME_MONITOR (volume_monitor);
 
-  G_LOCK (hal_vm);
+  G_LOCK (gphoto2_vm);
 
   l = g_list_copy (monitor->camera_volumes);
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
 
-  G_UNLOCK (hal_vm);
+  G_UNLOCK (gphoto2_vm);
 
   return l;
 }
@@ -174,8 +132,6 @@ get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
 {
   return NULL;
 }
-
-#ifdef HAVE_GUDEV
 
 static void
 gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean do_emit)
@@ -319,21 +275,6 @@ gudev_coldplug_cameras (GGPhoto2VolumeMonitor *monitor)
     }
 }
 
-#else
-
-static void
-hal_changed (HalPool    *pool,
-             HalDevice  *device,
-             gpointer    user_data)
-{
-  GGPhoto2VolumeMonitor *monitor = G_GPHOTO2_VOLUME_MONITOR (user_data);
-
-  /*g_warning ("hal changed");*/
-
-  update_all (monitor, TRUE);
-}
-#endif
-
 static GObject *
 g_gphoto2_volume_monitor_constructor (GType                  type,
                                   guint                  n_construct_properties,
@@ -344,14 +285,14 @@ g_gphoto2_volume_monitor_constructor (GType                  type,
   GGPhoto2VolumeMonitorClass *klass;
   GObjectClass *parent_class;
 
-  G_LOCK (hal_vm);
+  G_LOCK (gphoto2_vm);
   if (the_volume_monitor != NULL)
     {
       object = g_object_ref (the_volume_monitor);
-      G_UNLOCK (hal_vm);
+      G_UNLOCK (gphoto2_vm);
       return object;
     }
-  G_UNLOCK (hal_vm);
+  G_UNLOCK (gphoto2_vm);
 
   /*g_warning ("creating hal vm");*/
 
@@ -366,7 +307,6 @@ g_gphoto2_volume_monitor_constructor (GType                  type,
 
   monitor = G_GPHOTO2_VOLUME_MONITOR (object);
 
-#ifdef HAVE_GUDEV
   const char *subsystems[] = {"usb", NULL};
   monitor->gudev_client = g_udev_client_new (subsystems);
 
@@ -376,23 +316,9 @@ g_gphoto2_volume_monitor_constructor (GType                  type,
 
   gudev_coldplug_cameras (monitor);
 
-#else
-  monitor->pool = g_object_ref (get_hal_pool ());
-
-  g_signal_connect (monitor->pool,
-                    "device_added", G_CALLBACK (hal_changed),
-                    monitor);
-
-  g_signal_connect (monitor->pool,
-                    "device_removed", G_CALLBACK (hal_changed),
-                    monitor);
-
-  update_all (monitor, FALSE);
-#endif
-
-  G_LOCK (hal_vm);
+  G_LOCK (gphoto2_vm);
   the_volume_monitor = monitor;
-  G_UNLOCK (hal_vm);
+  G_UNLOCK (gphoto2_vm);
 
   return object;
 }
@@ -405,13 +331,9 @@ g_gphoto2_volume_monitor_init (GGPhoto2VolumeMonitor *monitor)
 static gboolean
 is_supported (void)
 {
-#ifdef HAVE_GUDEV
   /* Today's Linux desktops pretty much need udev to have anything working, so
    * assume it's there */
   return TRUE;
-#else
-  return get_hal_pool() != NULL;
-#endif
 }
 
 static void
@@ -446,147 +368,6 @@ g_gphoto2_volume_monitor_new (void)
 
   return G_VOLUME_MONITOR (monitor);
 }
-
-#ifndef HAVE_GUDEV
-static void
-diff_sorted_lists (GList         *list1,
-                   GList         *list2,
-                   GCompareFunc   compare,
-                   GList        **added,
-                   GList        **removed)
-{
-  int order;
-
-  *added = *removed = NULL;
-
-  while (list1 != NULL &&
-         list2 != NULL)
-    {
-      order = (*compare) (list1->data, list2->data);
-      if (order < 0)
-        {
-          *removed = g_list_prepend (*removed, list1->data);
-          list1 = list1->next;
-        }
-      else if (order > 0)
-        {
-          *added = g_list_prepend (*added, list2->data);
-          list2 = list2->next;
-        }
-      else
-        { /* same item */
-          list1 = list1->next;
-          list2 = list2->next;
-        }
-    }
-
-  while (list1 != NULL)
-    {
-      *removed = g_list_prepend (*removed, list1->data);
-      list1 = list1->next;
-    }
-  while (list2 != NULL)
-    {
-      *added = g_list_prepend (*added, list2->data);
-      list2 = list2->next;
-    }
-}
-
-static GGPhoto2Volume *
-find_camera_volume_by_udi (GGPhoto2VolumeMonitor *monitor, const char *udi)
-{
-  GList *l;
-
-  for (l = monitor->camera_volumes; l != NULL; l = l->next)
-    {
-      GGPhoto2Volume *volume = l->data;
-
-      if (g_gphoto2_volume_has_udi (volume, udi))
-        return volume;
-    }
-
-  return NULL;
-}
-
-static gint
-hal_device_compare (HalDevice *a, HalDevice *b)
-{
-  return strcmp (hal_device_get_udi (a), hal_device_get_udi (b));
-}
-
-static void
-list_emit (GGPhoto2VolumeMonitor *monitor,
-           const char *monitor_signal,
-           const char *object_signal,
-           GList *objects)
-{
-  GList *l;
-
-  for (l = objects; l != NULL; l = l->next)
-    {
-      g_signal_emit_by_name (monitor, monitor_signal, l->data);
-      if (object_signal)
-        g_signal_emit_by_name (l->data, object_signal);
-    }
-}
-
-typedef struct {
-  GGPhoto2VolumeMonitor *monitor;
-  GList *added_volumes, *removed_volumes;
-} ChangedLists;
-
-
-static gboolean
-emit_lists_in_idle (gpointer data)
-{
-  ChangedLists *lists = data;
-
-  list_emit (lists->monitor,
-             "volume_removed", "removed",
-             lists->removed_volumes);
-  list_emit (lists->monitor,
-             "volume_added", NULL,
-             lists->added_volumes);
-
-  g_list_free_full (lists->removed_volumes, g_object_unref);
-  g_list_free_full (lists->added_volumes, g_object_unref);
-  g_object_unref (lists->monitor);
-  g_free (lists);
-
-  return FALSE;
-}
-
-/* Must be called from idle if emit_changes, with no locks held */
-static void
-update_all (GGPhoto2VolumeMonitor *monitor,
-            gboolean emit_changes)
-{
-  ChangedLists *lists;
-  GList *added_volumes, *removed_volumes;
-
-  added_volumes = NULL;
-  removed_volumes = NULL;
-
-  G_LOCK (hal_vm);
-  update_cameras (monitor, &added_volumes, &removed_volumes);
-  G_UNLOCK (hal_vm);
-
-  if (emit_changes)
-    {
-      lists = g_new0 (ChangedLists, 1);
-      lists->monitor = g_object_ref (monitor);
-      lists->added_volumes = added_volumes;
-      lists->removed_volumes = removed_volumes;
-
-      g_idle_add (emit_lists_in_idle, lists);
-    }
-  else
-    {
-      g_list_free_full (removed_volumes, g_object_unref);
-      g_list_free_full (added_volumes, g_object_unref);
-    }
-}
-#endif
 
 static GList *
 get_stores_for_camera (const char *bus_num, const char *device_num)
@@ -671,162 +452,3 @@ out:
 
   return l;
 }
-
-#ifndef HAVE_GUDEV
-static GList *
-get_stores_for_camera_int (int bus_num, int device_num)
-{
-	GList *ret;
-	char *bus_num_str, *device_num_str;
-
-	bus_num_str = g_strdup_printf ("%d", bus_num);
-	device_num_str = g_strdup_printf ("%d", device_num);
-	ret = get_stores_for_camera (bus_num_str, device_num_str);
-	g_free (bus_num_str);
-	g_free (device_num_str);
-
-	return ret;
-}
-
-static void
-update_cameras (GGPhoto2VolumeMonitor *monitor,
-                GList **added_volumes,
-                GList **removed_volumes)
-{
-  GList *new_camera_devices;
-  GList *new_mtp_devices;
-  GList *removed, *added;
-  GList *l, *ll;
-  GGPhoto2Volume *volume;
-  const char *udi;
-
-  new_mtp_devices = hal_pool_find_by_capability (monitor->pool, "portable_audio_player");
-  for (l = new_mtp_devices; l != NULL; l = ll)
-    {
-      HalDevice *d = l->data;
-      ll = l->next;
-      if (! hal_device_get_property_bool (d, "camera.libgphoto2.support"))
-        {
-          /*g_warning ("ignoring %s", hal_device_get_udi (d));*/
-          /* filter out everything that isn't supported by libgphoto2 */
-          new_mtp_devices = g_list_delete_link (new_mtp_devices, l);
-        }
-    }
-
-  new_camera_devices = hal_pool_find_by_capability (monitor->pool, "camera");
-  new_camera_devices = g_list_concat (new_camera_devices, new_mtp_devices);
-  for (l = new_camera_devices; l != NULL; l = ll)
-    {
-      HalDevice *d = l->data;
-      ll = l->next;
-      /*g_warning ("got %s", hal_device_get_udi (d));*/
-      if (! hal_device_get_property_bool (d, "camera.libgphoto2.support"))
-        {
-          /*g_warning ("ignoring %s", hal_device_get_udi (d));*/
-          /* filter out everything that isn't supported by libgphoto2 */
-          new_camera_devices = g_list_delete_link (new_camera_devices, l);
-        }
-    }
-  g_list_foreach (new_camera_devices, (GFunc) g_object_ref, NULL);
-
-  new_camera_devices = g_list_sort (new_camera_devices, (GCompareFunc) hal_device_compare);
-  diff_sorted_lists (monitor->last_camera_devices,
-                     new_camera_devices, (GCompareFunc) hal_device_compare,
-                     &added, &removed);
-
-  for (l = removed; l != NULL; l = l->next)
-    {
-      HalDevice *d = l->data;
-
-      udi = hal_device_get_udi (d);
-      /*g_warning ("camera removing %s", udi);*/
-
-      volume = find_camera_volume_by_udi (monitor, udi);
-      if (volume != NULL)
-        {
-          g_gphoto2_volume_removed (volume);
-          monitor->camera_volumes = g_list_remove (monitor->camera_volumes, volume);
-          *removed_volumes = g_list_prepend (*removed_volumes, volume);
-        }
-    }
-
-  for (l = added; l != NULL; l = l->next)
-    {
-      HalDevice *d = l->data;
-      int usb_bus_num;
-      int usb_device_num;
-      gboolean found;
-      GList *store_heads, *l;
-      guint num_store_heads;
-
-      /* Look for the device in the added volumes, so as
-       * not to add devices that are both audio players, and cameras */
-      found = FALSE;
-      for (ll = *added_volumes; ll; ll = ll->next)
-        {
-          if (g_gphoto2_volume_has_udi (ll->data, hal_device_get_udi (d)) != FALSE)
-            {
-              found = TRUE;
-              break;
-            }
-        }
-
-      if (found)
-        continue;
-
-      usb_bus_num = hal_device_get_property_int (d, "usb.bus_number");
-#if defined(__linux__)
-      usb_device_num = hal_device_get_property_int (d, "usb.linux.device_number");
-#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-      usb_device_num = hal_device_get_property_int (d, "freebsd.unit");
-#else
-# error "Need OS specific tweaks"
-#endif
-
-      store_heads = get_stores_for_camera_int (usb_bus_num, usb_device_num);
-      num_store_heads = g_list_length (store_heads);
-      for (l = store_heads ; l != NULL; l = l->next)
-        {
-          char *store_path = (char *) l->data;
-          GFile *activation_mount_root;
-          gchar *uri;
-
-          /* If we only have a single store, don't use the store name at all. The backend automatically
-           * prepend the storename; this is to work around bugs with devices (like the iPhone) for which
-           * the store name changes every time the camera is initialized (e.g. mounted).
-           */
-          if (num_store_heads == 1)
-            {
-              uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]", usb_bus_num, usb_device_num);
-            }
-          else
-            {
-              uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]/%s", usb_bus_num, usb_device_num,
-                                     store_path[0] == '/' ? store_path + 1 : store_path);
-            }
-          activation_mount_root = g_file_new_for_uri (uri);
-          g_free (uri);
-
-          udi = hal_device_get_udi (d);
-          volume = g_gphoto2_volume_new (G_VOLUME_MONITOR (monitor),
-                                         d,
-                                         monitor->pool,
-                                         activation_mount_root);
-          if (volume != NULL)
-            {
-              monitor->camera_volumes = g_list_prepend (monitor->camera_volumes, volume);
-              *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
-            }
-
-          if (activation_mount_root != NULL)
-            g_object_unref (activation_mount_root);
-        }
-      g_list_free_full (store_heads, g_free);
-    }
-
-  g_list_free (added);
-  g_list_free (removed);
-  g_list_free_full (monitor->last_camera_devices, g_object_unref);
-  monitor->last_camera_devices = new_camera_devices;
-}
-#endif

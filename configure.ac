@@ -63,8 +63,6 @@ AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.51.0 gobject-2.0 gmodule-no-export-2.0 gio-unix-2.0 gio-2.0])
 
-PKG_CHECK_MODULES([DBUS], [dbus-1])
-
 AC_ARG_WITH([dbus_service_dir],
 	    [AS_HELP_STRING([--with-dbus-service-dir=PATH],[choose directory for dbus service files, [default=PREFIX/share/dbus-1/services]])],
 	    [with_dbus_service_dir="$withval"], [with_dbus_service_dir=$datadir/dbus-1/services])
@@ -298,32 +296,6 @@ fi
 AM_CONDITIONAL(USE_LIBSYSTEMD_LOGIN, [test "$msg_libsystemd_login" = "yes"])
 
 dnl **********************
-dnl *** Check for HAL ***
-dnl **********************
-AC_ARG_ENABLE([hal], [AS_HELP_STRING([--disable-hal],[build without HAL support])])
-msg_hal=no
-have_hal_fast_init=no
-HAL_REQUIRED=0.5.10
-
-if test "x$enable_hal" != "xno" && test "x$msg_gdu" = "xno"; then
-  PKG_CHECK_EXISTS([hal >= $HAL_REQUIRED], [msg_hal=yes])
-
-  if test "x$msg_hal" = "xyes"; then
-    PKG_CHECK_MODULES([HAL],[hal >= $HAL_REQUIRED])
-    AC_DEFINE([HAVE_HAL], 1, [Define to 1 if HAL is available])
-    save_libs="$LIBS"
-    LIBS="$HAL_LIBS"
-    AC_CHECK_LIB([hal], [libhal_get_all_devices_with_properties], [have_hal_fast_init=yes])
-    if test "x$have_hal_fast_init" = "xyes"; then
-      AC_DEFINE([HAVE_HAL_FAST_INIT], 1, [Define to 1 if libhal_get_all_devices_with_properties is available])
-    fi
-    LIBS="$save_libs"
-  fi
-fi
-
-AM_CONDITIONAL([USE_HAL], [test "$msg_hal" = "yes"])
-
-dnl **********************
 dnl *** Check for gudev ***
 dnl **********************
 AC_ARG_ENABLE([gudev], [AS_HELP_STRING([--disable-gudev],[build without gudev support])])
@@ -340,23 +312,13 @@ if test "x$enable_gudev" != "xno"; then
 fi
 AM_CONDITIONAL([USE_GUDEV], [test "$msg_gudev" = "yes"])
 
-if test "x$msg_gudev" = "xyes"; then
-  msg_hotplug_backend="gudev"
-else 
-  if test "x$msg_hal" = "xyes"; then
-    msg_hotplug_backend="hal"
-  else
-    msg_hotplug_backend="none"
-  fi
-fi
-
 dnl **************************************************
 dnl *** Check if we should build with CDDA backend ***
 dnl **************************************************
 AC_ARG_ENABLE([cdda], [AS_HELP_STRING([--disable-cdda],[build without CDDA backend])])
 msg_cdda=no
 
-if test "x$enable_cdda" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" = "xyes" \); then
+if test "x$enable_cdda" != "xno" -a "x$msg_gudev" = "xyes"; then
   PKG_CHECK_EXISTS([libcdio_paranoia >= 0.78.2], [msg_cdda=yes])
 
   if test "x$msg_cdda" = "xyes"; then
@@ -443,10 +405,10 @@ dnl *************************
 AC_ARG_ENABLE([gphoto2], [AS_HELP_STRING([--disable-gphoto2],[build without gphoto2 support])])
 msg_gphoto2=no
 
-if test "x$enable_gphoto2" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" = "xyes" \); then
+if test "x$enable_gphoto2" != "xno" -a "x$msg_gudev" = "xyes"; then
   PKG_CHECK_MODULES([GPHOTO2], [libgphoto2 >= 2.4.0], [msg_gphoto2=yes])
 
-  # Need OS tweaks in hal volume monitor backend
+  # Need OS tweaks in volume monitor backend
   case "$host" in
     *-linux* | *-freebsd* | *-kfreebsd*-gnu)
       use_gphoto2=yes
@@ -469,9 +431,9 @@ if test "x$enable_gphoto2" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" 
       )
     else
       if test "x$enable_gphoto2" = "xyes"; then
-        AC_MSG_ERROR([Cannot build with gphoto2 support. Need OS tweaks in hal volume monitor.])
+        AC_MSG_ERROR([Cannot build with gphoto2 support. Need OS tweaks in volume monitor.])
       else
-        AC_MSG_WARN([Not building with gphoto2 support. Need OS tweaks in hal volume monitor.])
+        AC_MSG_WARN([Not building with gphoto2 support. Need OS tweaks in volume monitor.])
       fi
       msg_gphoto2=no
     fi
@@ -912,7 +874,6 @@ daemon/trashlib/Makefile
 daemon/Makefile
 monitor/Makefile
 monitor/proxy/Makefile
-monitor/hal/Makefile
 monitor/gdu/Makefile
 monitor/udisks2/Makefile
 monitor/gphoto2/Makefile
@@ -931,8 +892,6 @@ echo "gvfs configuration summary:"
 echo "
         gio module directory : $giomodulesdir
 
-        hotplug backend:              $msg_hotplug_backend
-
 	Blu-ray metadata support:     $msg_bluray
 	Google support:               $msg_google
         HTTP/WebDAV support:          $msg_http
@@ -947,7 +906,6 @@ echo "
         AFP support:                  $msg_afp
         NFS support:                  $msg_nfs
         DNS-SD support:               $msg_avahi
-	Build HAL volume monitor:     $msg_hal (with fast init path: $have_hal_fast_init)
 	Build GDU volume monitor:     $msg_gdu
 	Build udisks2 volume monitor: $msg_udisks2
 	Build GOA volume monitor:     $msg_goa

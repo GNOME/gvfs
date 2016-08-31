@@ -97,12 +97,6 @@ monitor/gdu/ggduvolume.c
 monitor/goa/goavolume.c
 monitor/gphoto2/ggphoto2volume.c
 monitor/gphoto2/ggphoto2volumemonitor.c
-monitor/gphoto2/hal-utils.c
-monitor/hal/ghaldrive.c
-monitor/hal/ghalmount.c
-monitor/hal/ghalvolume.c
-monitor/hal/ghalvolumemonitor.c
-monitor/hal/hal-utils.c
 monitor/proxy/gproxydrive.c
 monitor/proxy/gproxymount.c
 monitor/proxy/gproxyvolume.c

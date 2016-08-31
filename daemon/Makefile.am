@@ -444,19 +444,10 @@ gvfsd_cdda_CPPFLAGS = \
 	-DDEFAULT_BACKEND_TYPE=cdda \
 	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"cdda", G_VFS_TYPE_BACKEND_CDDA,' \
-	$(CDDA_CFLAGS)
-if USE_GUDEV
-gvfsd_cdda_CPPFLAGS +=	$(GUDEV_CFLAGS)
-else
-gvfsd_cdda_CPPFLAGS +=	$(HAL_CFLAGS)
-endif
+	$(CDDA_CFLAGS) \
+	$(GUDEV_CFLAGS)
 
-if USE_GUDEV
 gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS) $(GUDEV_LIBS)
-else
-gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS) $(HAL_LIBS) \
-		   $(top_builddir)/common/libgvfscommon-hal.la
-endif
 
 gvfsd_admin_SOURCES = \
 	gvfsbackendadmin.c gvfsbackendadmin.h \
@@ -496,21 +487,12 @@ gvfsd_gphoto2_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendgphoto2.h \
 	-DDEFAULT_BACKEND_TYPE=gphoto2 \
 	-DMAX_JOB_THREADS=1 \
+	-DBACKEND_TYPES='"gphoto2", G_VFS_TYPE_BACKEND_GPHOTO2,' \
 	$(GPHOTO2_CFLAGS) \
-	-DBACKEND_TYPES='"gphoto2", G_VFS_TYPE_BACKEND_GPHOTO2,'
-if USE_GUDEV
-gvfsd_gphoto2_CPPFLAGS += $(GUDEV_CFLAGS)
-else
-gvfsd_gphoto2_CPPFLAGS += $(HAL_CFLAGS)
-endif
+	$(GUDEV_CFLAGS)
 
-if USE_GUDEV
 gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(GUDEV_LIBS) \
 		      $(top_builddir)/common/libgvfscommon-gphoto2.la
-else
-gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(HAL_LIBS) \
-		      $(top_builddir)/common/libgvfscommon-hal.la
-endif
 
 gvfsd_mtp_SOURCES = \
 	gvfsbackendmtp.c gvfsbackendmtp.h \

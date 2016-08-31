@@ -3,29 +3,7 @@ NULL =
 
 libexec_PROGRAMS = gvfs-gphoto2-volume-monitor
 
-BUILT_SOURCES =                                         \
-	hal-marshal.h           hal-marshal.c
-
-hal-marshal.h: hal-marshal.list
-	$(AM_V_GEN) glib-genmarshal $< --prefix=hal_marshal --header > $@
-
-hal-marshal.c: hal-marshal.list
-	$(AM_V_GEN) echo "#include \"hal-marshal.h\"" > $@ && glib-genmarshal $< --prefix=hal_marshal --body >> $@
-
-
-if USE_GUDEV
-gvfs_gphoto2_volume_monitor_SOURCES =
-
-else
 gvfs_gphoto2_volume_monitor_SOURCES =			\
-	hal-utils.c 		hal-utils.h 		\
-	hal-marshal.c		hal-marshal.h		\
-	hal-device.c		hal-device.h		\
-	hal-pool.c		hal-pool.h		\
-	$(NULL)
-endif
-
-gvfs_gphoto2_volume_monitor_SOURCES +=			\
 	gphoto2-volume-monitor-daemon.c			\
 	ggphoto2volume.c	ggphoto2volume.h	\
 	ggphoto2volumemonitor.c	ggphoto2volumemonitor.h	\
@@ -37,15 +15,10 @@ gvfs_gphoto2_volume_monitor_CFLAGS =		\
 	-I$(top_srcdir)/monitor/proxy           \
 	$(GLIB_CFLAGS)                          \
 	$(GPHOTO2_CFLAGS)			\
+	$(GUDEV_CFLAGS)				\
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
 	$(NULL)
-
-if USE_GUDEV
-gvfs_gphoto2_volume_monitor_CFLAGS += $(GUDEV_CFLAGS)
-else
-gvfs_gphoto2_volume_monitor_CFLAGS += $(HAL_CFLAGS)
-endif
 
 gvfs_gphoto2_volume_monitor_LDFLAGS =	\
 	$(NULL)
@@ -53,22 +26,11 @@ gvfs_gphoto2_volume_monitor_LDFLAGS =	\
 gvfs_gphoto2_volume_monitor_LDADD  =		     			      \
 	$(GLIB_LIBS)                                 			      \
 	$(GPHOTO2_LIBS)                              			      \
+	$(GUDEV_LIBS)                                                         \
+	$(top_builddir)/common/libgvfscommon-gphoto2.la                       \
 	$(top_builddir)/common/libgvfscommon.la 			      \
 	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la \
 	$(NULL)
-
-if USE_GUDEV
-gvfs_gphoto2_volume_monitor_LDADD +=                                          \
-	$(GUDEV_LIBS)                                                         \
-	$(top_builddir)/common/libgvfscommon-gphoto2.la                       \
-	$(NULL)
-else
-gvfs_gphoto2_volume_monitor_LDADD +=                                          \
-	$(HAL_LIBS)                                                          \
-	$(top_builddir)/common/libgvfscommon-hal.la                          \
-	$(NULL)
-endif
-
 
 remote_volume_monitorsdir = $(datadir)/gvfs/remote-volume-monitors
 remote_volume_monitors_DATA = gphoto2.monitor
@@ -97,7 +59,6 @@ CLEANFILES = \
 	$(NULL)
 
 EXTRA_DIST = \
-	hal-marshal.list \
 	$(service_in_files) \
 	$(systemd_user_in_files) \
 	$(remote_volume_monitors_DATA) \
