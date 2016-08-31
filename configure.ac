@@ -202,6 +202,23 @@ if test "x$enable_udev" != "xno"; then
 fi
 
 dnl **********************
+dnl *** Check for gudev ***
+dnl **********************
+AC_ARG_ENABLE([gudev], [AS_HELP_STRING([--disable-gudev],[build without gudev support])])
+msg_gudev=no
+GUDEV_REQUIRED=147
+
+if test "x$enable_gudev" != "xno"; then
+  PKG_CHECK_EXISTS([gudev-1.0 >= $GUDEV_REQUIRED], [msg_gudev=yes])
+
+  if test "x$msg_gudev" = "xyes"; then
+    PKG_CHECK_MODULES([GUDEV], [gudev-1.0 >= $GUDEV_REQUIRED])
+    AC_DEFINE([HAVE_GUDEV], 1, [Define to 1 if gudev is available])
+  fi
+fi
+AM_CONDITIONAL([USE_GUDEV], [test "$msg_gudev" = "yes"])
+
+dnl **********************
 dnl *** Check for FUSE ***
 dnl **********************
 AC_ARG_ENABLE([fuse], [AS_HELP_STRING([--disable-fuse],[build without FUSE support])])
@@ -245,7 +262,7 @@ AC_ARG_ENABLE([udisks2], [AS_HELP_STRING([--disable-udisks2],[build without libu
 msg_udisks2=no
 UDISKS2_REQUIRED=1.97
 
-if test "x$enable_udisks2" != "xno"; then
+if test "x$enable_udisks2" != "xno" -a "x$msg_gudev" = "xyes"; then
   PKG_CHECK_EXISTS([udisks2 >= $UDISKS2_REQUIRED], [msg_udisks2=yes])
 
   if test "x$msg_udisks2" = "xyes"; then
@@ -294,23 +311,6 @@ if test "x$enable_libsystemd_login" != "xno"; then
 fi
 
 AM_CONDITIONAL(USE_LIBSYSTEMD_LOGIN, [test "$msg_libsystemd_login" = "yes"])
-
-dnl **********************
-dnl *** Check for gudev ***
-dnl **********************
-AC_ARG_ENABLE([gudev], [AS_HELP_STRING([--disable-gudev],[build without gudev support])])
-msg_gudev=no
-GUDEV_REQUIRED=147
-
-if test "x$enable_gudev" != "xno"; then
-  PKG_CHECK_EXISTS([gudev-1.0 >= $GUDEV_REQUIRED], [msg_gudev=yes])
-
-  if test "x$msg_gudev" = "xyes"; then
-    PKG_CHECK_MODULES([GUDEV], [gudev-1.0 >= $GUDEV_REQUIRED])
-    AC_DEFINE([HAVE_GUDEV], 1, [Define to 1 if gudev is available])
-  fi
-fi
-AM_CONDITIONAL([USE_GUDEV], [test "$msg_gudev" = "yes"])
 
 dnl **************************************************
 dnl *** Check if we should build with CDDA backend ***
