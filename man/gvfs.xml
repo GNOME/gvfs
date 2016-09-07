@@ -59,8 +59,11 @@
                 </itemizedlist>
                 Volume monitors:
                 <itemizedlist>
-                        <listitem><para>gvfs-udisks2-volume-monitor - a udisks-based volume monitor</para></listitem>
                         <listitem><para>gvfs-afc-volume-monitor - a volume monitor for Apple iPhone/iPod Touch devices</para></listitem>
+                        <listitem><para>gvfs-goa-volume-monitor - a volume monitor for GNOME Online Accounts</para></listitem>
+                        <listitem><para>gvfs-gphoto2-volume-monitor - a volume monitor for PTP devices</para></listitem>
+                        <listitem><para>gvfs-mtp-volume-monitor - a volume monitor for MTP devices</para></listitem>
+                        <listitem><para>gvfs-udisks2-volume-monitor - a udisks-based volume monitor</para></listitem>
                 </itemizedlist>
                 Mount backends:
                 <itemizedlist>
