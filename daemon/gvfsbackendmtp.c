@@ -813,7 +813,10 @@ static gboolean
 mtp_heartbeat (GVfsBackendMtp *backend)
 {
   if (g_mutex_trylock (&backend->mutex)) {
-    LIBMTP_Dump_Device_Info(backend->device);
+    char *name = LIBMTP_Get_Friendlyname (backend->device);
+    if (name) {
+      free (name);
+    }
     g_mutex_unlock (&backend->mutex);
   }
   return TRUE;
