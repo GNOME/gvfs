@@ -67,6 +67,7 @@
                 </itemizedlist>
                 Mount backends:
                 <itemizedlist>
+                        <listitem><para>gvfsd-admin - mounts local filesystem with admin privileges</para></listitem>
                         <listitem><para>gvfsd-afc - mounts iPhone/iPod touch volumes</para></listitem>
                         <listitem><para>gvfsd-afp - mounts Apple Filing Protocol volumes</para></listitem>
                         <listitem><para>gvfsd-afp-browse - browses Apple Filing Protocol volumes</para></listitem>
@@ -77,6 +78,7 @@
                         <listitem><para>gvfsd-dav - mounts DAV filesystems</para></listitem>
                         <listitem><para>gvfsd-dnssd - browses dnssd</para></listitem>
                         <listitem><para>gvfsd-ftp - mounts over FTP</para></listitem>
+                        <listitem><para>gvfsd-google - mounts Google Drive shares</para></listitem>
                         <listitem><para>gvfsd-gphoto2 - mounts over PTP</para></listitem>
                         <listitem><para>gvfsd-http - mounts over HTTP</para></listitem>
                         <listitem><para>gvfsd-localtest - a test backend</para></listitem>
