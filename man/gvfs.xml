@@ -54,7 +54,7 @@
                 <para>Main processes:
                 <itemizedlist>
                         <listitem><para>gvfsd - the main gvfs daemon</para></listitem>
-                        <listitem><para>gvfs-fuse-daemon - mounts gvfs as a fuse filesystem</para></listitem>
+                        <listitem><para>gvfsd-fuse - mounts gvfs as a fuse filesystem</para></listitem>
                         <listitem><para>gvfsd-metadata - writes gvfs metadata</para></listitem>
                 </itemizedlist>
                 Volume monitors:
@@ -63,7 +63,7 @@
                         <listitem><para>gvfs-goa-volume-monitor - a volume monitor for GNOME Online Accounts</para></listitem>
                         <listitem><para>gvfs-gphoto2-volume-monitor - a volume monitor for PTP devices</para></listitem>
                         <listitem><para>gvfs-mtp-volume-monitor - a volume monitor for MTP devices</para></listitem>
-                        <listitem><para>gvfs-udisks2-volume-monitor - a udisks-based volume monitor</para></listitem>
+                        <listitem><para>gvfs-udisks2-volume-monitor - a udisks2-based volume monitor</para></listitem>
                 </itemizedlist>
                 Mount backends:
                 <itemizedlist>
