@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&ke"
 "ywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-08-29 15:35+0000\n"
-"PO-Revision-Date: 2016-08-31 21:03+0200\n"
+"POT-Creation-Date: 2016-09-07 09:43+0000\n"
+"PO-Revision-Date: 2016-09-11 08:34+0200\n"
 "Last-Translator: Мирослав Николић <miroslavnikolic@rocketmail.com>\n"
 "Language-Team: српски <gnome-sr@googlegroups.org>\n"
 "Language: sr\n"
@@ -168,7 +168,7 @@ msgstr "Истекло је време приликом разрешавања �
 #: common/gvfsdnssdutils.c:280
 #, c-format
 msgid "Malformed DNS-SD encoded_triple '%s'"
-msgstr "Лоша ДНС-СД шифрофана тројка „%s“"
+msgstr "Лоша ДНС-СД шифрована тројка „%s“"
 
 #: common/gvfsicon.c:250
 #, c-format
@@ -1125,7 +1125,6 @@ msgid "Not a WebDAV enabled share"
 msgstr "Ово није ВебДАВ дељење"
 
 #: daemon/gvfsbackenddav.c:2011
-#| msgid "Could not find enclosing mount"
 msgid "Could not find an enclosing directory"
 msgstr "Не могу да нађем приложени директоријум"
 
@@ -2000,6 +1999,40 @@ msgstr "Ово место је већ прикачено"
 #: daemon/mount.c:891
 msgid "Location is not mountable"
 msgstr "Место се не може прикачити"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:8
+msgid "GVfs"
+msgstr "ГВфс"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:9
+msgid "http://git.gnome.org/browse/gvfs"
+msgstr "http://git.gnome.org/browse/gvfs"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:12
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:23
+msgid "Perform file operations"
+msgstr "Обавите радње над датотеком"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:13
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:24
+msgid "Authentication is required to perform file operations"
+msgstr "Потребно је потврђивање идентитета да бисте обавили радње над датотеком"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:15
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:16
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:26
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:27
+msgid "no"
+msgstr "не"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:17
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:28
+msgid "auth_admin_keep"
+msgstr "аут_админ_задржи"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:19
+msgid "@libexecdir@/gvfsd-admin"
+msgstr "@libexecdir@/gvfsd-admin"
 
 #: metadata/meta-daemon.c:162 metadata/meta-daemon.c:238
 #: metadata/meta-daemon.c:274
