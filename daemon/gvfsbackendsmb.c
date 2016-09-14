@@ -552,7 +552,6 @@ do_mount (GVfsBackend *backend,
   smbc_setFunctionRemoveCachedServer (smb_context, remove_cached_server);
   smbc_setFunctionPurgeCachedServers (smb_context, purge_cached);
 
-  /* FIXME: is strdup() still needed here? -- removed */
   if (op_backend->default_workgroup != NULL)
     smbc_setWorkgroup (smb_context, op_backend->default_workgroup);
 
@@ -565,11 +564,6 @@ do_mount (GVfsBackend *backend,
                                        op_backend->user != NULL);
   smbc_setOptionNoAutoAnonymousLogin (smb_context, TRUE);
 
-  
-#if 0
-  smbc_setOptionDebugToStderr (smb_context, 1);
-#endif
-  
   if (!smbc_init_context (smb_context))
     {
       g_vfs_job_failed (G_VFS_JOB (job),
@@ -671,8 +665,6 @@ do_mount (GVfsBackend *backend,
 
   if (res != 0)
     {
-      op_backend->mount_source = NULL;
-      
       if (op_backend->mount_cancelled) 
         g_vfs_job_failed (G_VFS_JOB (job),
 			  G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED,
