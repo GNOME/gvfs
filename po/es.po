@@ -5,15 +5,15 @@
 # Jorge González <jorgegonz@svn.gnome.org>, 2008, 2009, 2010, 2011, 2012.
 # 
 # 
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011., 2012, 2013, 2014, 2015., 2016.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011., 2012, 2013, 2014, 2015., 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-08-23 12:39+0000\n"
-"PO-Revision-Date: 2016-08-24 10:15+0200\n"
+"POT-Creation-Date: 2016-09-07 09:43+0000\n"
+"PO-Revision-Date: 2016-09-14 17:42+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español; Castellano <gnome-es-list@gnome.org>\n"
 "Language: es\n"
@@ -393,8 +393,8 @@ msgstr "El archivo no existe"
 
 #: daemon/gvfsafpvolume.c:418 daemon/gvfsafpvolume.c:2533
 #: daemon/gvfsbackendafp.c:289 daemon/gvfsbackendafp.c:492
-#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2307
-#: daemon/gvfsbackenddav.c:2970 daemon/gvfsbackenddav.c:3250
+#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2332
+#: daemon/gvfsbackenddav.c:2995 daemon/gvfsbackenddav.c:3275
 #: daemon/gvfsbackendftp.c:815 daemon/gvfsbackendnfs.c:2478
 #: daemon/gvfsbackendsftp.c:2654 daemon/gvfsbackendsftp.c:3429
 #: daemon/gvfsbackendsftp.c:3757 daemon/gvfsbackendsftp.c:4823
@@ -411,7 +411,7 @@ msgid "Target file is open"
 msgstr "El archivo destino esta abierto"
 
 #: daemon/gvfsafpvolume.c:688 daemon/gvfsbackendafc.c:214
-#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2697
+#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2722
 #: daemon/gvfsbackendsftp.c:2133
 msgid "Directory not empty"
 msgstr "La carpeta no está vacía"
@@ -439,10 +439,10 @@ msgstr "No hay espacio suficiente en el volumen"
 
 #: daemon/gvfsafpvolume.c:845 daemon/gvfsafpvolume.c:1428
 #: daemon/gvfsafpvolume.c:1585 daemon/gvfsbackendafp.c:296
-#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2362
-#: daemon/gvfsbackenddav.c:2658 daemon/gvfsbackenddav.c:2766
-#: daemon/gvfsbackenddav.c:2903 daemon/gvfsbackenddav.c:2979
-#: daemon/gvfsbackenddav.c:3017 daemon/gvfsbackenddav.c:3241
+#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2387
+#: daemon/gvfsbackenddav.c:2683 daemon/gvfsbackenddav.c:2791
+#: daemon/gvfsbackenddav.c:2928 daemon/gvfsbackenddav.c:3004
+#: daemon/gvfsbackenddav.c:3042 daemon/gvfsbackenddav.c:3266
 #: daemon/gvfsbackendftp.c:794 daemon/gvfsbackendftp.c:982
 #: daemon/gvfsbackendftp.c:1492 daemon/gvfsbackendftp.c:1600
 #: daemon/gvfsbackendgoogle.c:1233 daemon/gvfsbackendgoogle.c:1561
@@ -730,7 +730,7 @@ msgstr "Tipo de búsqueda no soportado"
 msgid "Operation unsupported"
 msgstr "La operación no está soportada"
 
-#: daemon/gvfsbackendafc.c:2576 daemon/gvfsbackenddav.c:2802
+#: daemon/gvfsbackendafc.c:2576 daemon/gvfsbackenddav.c:2827
 #: daemon/gvfsbackendftp.c:1444
 msgid "Backups not supported"
 msgstr "Respaldos no soportados"
@@ -779,13 +779,13 @@ msgid "Apple Filing Protocol Service"
 msgstr "Servicio de protocolo de archivado de Apple"
 
 #: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:875
-#: daemon/gvfsbackenddav.c:2965 daemon/gvfsbackendftp.c:1592
+#: daemon/gvfsbackenddav.c:2990 daemon/gvfsbackendftp.c:1592
 #: daemon/gvfsbackendgoogle.c:1806
 msgid "Can't copy directory over directory"
 msgstr "No se puede copiar una carpeta sobre otra carpeta"
 
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:891
-#: daemon/gvfsbackenddav.c:2994 daemon/gvfsbackendftp.c:1615
+#: daemon/gvfsbackenddav.c:3019 daemon/gvfsbackendftp.c:1615
 #: daemon/gvfsbackendgoogle.c:1244 daemon/gvfsbackendgoogle.c:1825
 #: daemon/gvfsbackendgoogle.c:1845 daemon/gvfsbackendmtp.c:1717
 #: daemon/gvfsbackendmtp.c:1740 daemon/gvfsbackendmtp.c:2042
@@ -793,7 +793,7 @@ msgstr "No se puede copiar una carpeta sobre otra carpeta"
 msgid "Can't recursively copy directory"
 msgstr "No se puede copiar recursivamente una carpeta"
 
-#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2842
+#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2867
 #: daemon/gvfsbackendnfs.c:2472 daemon/gvfsbackendsftp.c:4818
 #: daemon/gvfsbackendsmb.c:2191
 msgid "Can't move directory over directory"
@@ -808,7 +808,7 @@ msgstr "respaldos no soportados"
 msgid "Unable to create temporary file (%s)"
 msgstr "No se pudo crear el archivo temporal (%s)"
 
-#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2443
+#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2468
 #: daemon/gvfsbackendnfs.c:1175 daemon/gvfsbackendsftp.c:3772
 #: daemon/gvfsbackendsmb.c:1227
 msgid "The file was externally modified"
@@ -833,7 +833,6 @@ msgstr "No se especificó ningún volumen"
 #. e.g. "/ in archive.tar.gz" for a file with the name "archive.tar.gz"
 #: daemon/gvfsbackendarchive.c:349
 #, c-format
-#| msgid "/ on %s"
 msgid "/ in %s"
 msgstr "/ en %s"
 
@@ -916,13 +915,13 @@ msgstr "El backend no soporta la operación"
 msgid "No such file or directory in target path"
 msgstr "El archivo o carpeta no existe en la ruta de destino"
 
-#: daemon/gvfsbackendburn.c:884 daemon/gvfsbackenddav.c:2880
+#: daemon/gvfsbackendburn.c:884 daemon/gvfsbackenddav.c:2905
 #: daemon/gvfsbackendsftp.c:2135 daemon/gvfsbackendsftp.c:4998
 msgid "Target file exists"
 msgstr "El archivo destino ya existe"
 
 #: daemon/gvfsbackendburn.c:949 daemon/gvfsbackendcomputer.c:812
-#: daemon/gvfsbackenddav.c:3324 daemon/gvfsbackenddav.c:3356
+#: daemon/gvfsbackenddav.c:3349 daemon/gvfsbackenddav.c:3381
 #: daemon/gvfsbackendgphoto2.c:2495 daemon/gvfsbackendgphoto2.c:2708
 #: daemon/gvfsbackendgphoto2.c:2805 daemon/gvfsbackendgphoto2.c:2898
 #: daemon/gvfsbackendgphoto2.c:3507 daemon/gvfsbackendgphoto2.c:3517
@@ -1085,7 +1084,7 @@ msgstr "No se puede sondear el archivo"
 msgid "%s on %s%s"
 msgstr "%s en %s%s"
 
-#: daemon/gvfsbackenddav.c:702 daemon/gvfsbackenddav.c:1980
+#: daemon/gvfsbackenddav.c:702 daemon/gvfsbackenddav.c:2003
 #: daemon/gvfsbackendhttp.c:202
 #, c-format
 msgid "HTTP Error: %s"
@@ -1103,8 +1102,8 @@ msgstr "Respuesta vacía"
 msgid "Unexpected reply from server"
 msgstr "Respuesta inesperada del servidor"
 
-#: daemon/gvfsbackenddav.c:1420 daemon/gvfsbackenddav.c:2105
-#: daemon/gvfsbackenddav.c:2197 daemon/gvfsbackenddav.c:2299
+#: daemon/gvfsbackenddav.c:1420 daemon/gvfsbackenddav.c:2130
+#: daemon/gvfsbackenddav.c:2222 daemon/gvfsbackenddav.c:2324
 msgid "Response invalid"
 msgstr "Respuesta no válida"
 
@@ -1124,16 +1123,21 @@ msgstr "Introducir la contraseña para %s"
 msgid "Please enter proxy password"
 msgstr "Introducir la contraseña del proxy"
 
-#: daemon/gvfsbackenddav.c:1984 daemon/gvfsbackenddav.c:1988
+#: daemon/gvfsbackenddav.c:1989
 msgid "Not a WebDAV enabled share"
 msgstr "No es una compartición activada WebDAV"
 
-#: daemon/gvfsbackenddav.c:2059 daemon/gvfsbackenddav.c:2152
-#: daemon/gvfsbackenddav.c:2225 daemon/gvfsbackenddav.c:2333
+#: daemon/gvfsbackenddav.c:2011
+#| msgid "Could not find enclosing mount"
+msgid "Could not find an enclosing directory"
+msgstr "No se pudo encontrar una carpeta adjunta"
+
+#: daemon/gvfsbackenddav.c:2084 daemon/gvfsbackenddav.c:2177
+#: daemon/gvfsbackenddav.c:2250 daemon/gvfsbackenddav.c:2358
 msgid "Could not create request"
 msgstr "No se pudo crear la petición"
 
-#: daemon/gvfsbackenddav.c:2474 daemon/gvfsbackendftp.c:1085
+#: daemon/gvfsbackenddav.c:2499 daemon/gvfsbackendftp.c:1085
 #: daemon/gvfsbackendgoogle.c:2562 daemon/gvfsbackendnfs.c:939
 #: daemon/gvfsbackendnfs.c:962 daemon/gvfsbackendnfs.c:988
 #: daemon/gvfsbackendnfs.c:1388 daemon/gvfsbackendsmb.c:1263
@@ -1141,11 +1145,11 @@ msgstr "No se pudo crear la petición"
 msgid "Backup file creation failed"
 msgstr "Falló la creación del archivo de respaldo"
 
-#: daemon/gvfsbackenddav.c:2847
+#: daemon/gvfsbackenddav.c:2872
 msgid "Can't move over directory"
 msgstr "No se puede mover sobre una carpeta"
 
-#: daemon/gvfsbackenddav.c:3116
+#: daemon/gvfsbackenddav.c:3141
 msgid "File length changed during transfer"
 msgstr "Longitud del archivo modificada durante la transferencia"
 
@@ -1999,6 +2003,40 @@ msgstr "La ubicación ya está montada"
 #: daemon/mount.c:891
 msgid "Location is not mountable"
 msgstr "La ubicación no es montable"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:8
+msgid "GVfs"
+msgstr "GVfs"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:9
+msgid "http://git.gnome.org/browse/gvfs"
+msgstr "http://git.gnome.org/browse/gvfs"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:12
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:23
+msgid "Perform file operations"
+msgstr "Realizar operaciones de archivos"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:13
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:24
+msgid "Authentication is required to perform file operations"
+msgstr "Se necesita autenticación para realizar operaciones de archivos"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:15
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:16
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:26
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:27
+msgid "no"
+msgstr "no"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:17
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:28
+msgid "auth_admin_keep"
+msgstr "auth_admin_keep"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:19
+msgid "@libexecdir@/gvfsd-admin"
+msgstr "@libexecdir@/gvfsd-admin"
 
 #: metadata/meta-daemon.c:162 metadata/meta-daemon.c:238
 #: metadata/meta-daemon.c:274
@@ -3206,12 +3244,6 @@ msgstr "Seguir enlaces simbólicos, puntos de montaje y atajos"
 #: programs/gvfs-tree.c:250
 msgid "List contents of directories in a tree-like format."
 msgstr "Listar los contenidos de las carpeta en una vista de árbol."
-
-#~ msgid "Perform file operations"
-#~ msgstr "Realizar operaciones de archivos"
-
-#~ msgid "Authentication is required to perform file operations"
-#~ msgstr "Se necesita autenticación para realizar operaciones de archivos"
 
 #~| msgid "Error creating directory: %s\n"
 #~ msgid "Error checking for directory emptiness"
