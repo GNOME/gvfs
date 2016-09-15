@@ -82,13 +82,6 @@ struct _GVfsBackendSmb
 	
   gboolean password_in_keyring;
   GPasswordSave password_save;
-  
-  /* Cache */
-  char *cached_server_name;
-  char *cached_share_name;
-  char *cached_domain;
-  char *cached_username;
-  SMBCSRV *cached_server;
 };
 
 
@@ -318,118 +311,6 @@ auth_callback (SMBCCTX *context,
            backend->last_user, backend->last_domain);
 }
 
-/* Add a server to the cache system
- *
- * @param c         pointer to smb context
- * @param srv       pointer to server to add
- * @param server    server name 
- * @param share     share name
- * @param workgroup workgroup used to connect
- * @param username  username used to connect
- * @return          0 on success. 1 on failure.
- *
- */ 
-static int
-add_cached_server (SMBCCTX *context, SMBCSRV *new,
-		   const char *server_name, const char *share_name, 
-		   const char *domain, const char *username)
-{
-  GVfsBackendSmb *backend;
-
-  backend = smbc_getOptionUserData (context);
-  
-  if (backend->cached_server != NULL)
-    return 1;
-
-  backend->cached_server_name = g_strdup (server_name);
-  backend->cached_share_name = g_strdup (share_name);
-  backend->cached_domain = g_strdup (domain);
-  backend->cached_username = g_strdup (username);
-  backend->cached_server = new;
-
-  return 0;
-}
-
-/* Remove cached server
- *
- * @param c         pointer to smb context
- * @param srv       pointer to server to remove
- * @return          0 when found and removed. 1 on failure.
- *
- */ 
-static int
-remove_cached_server(SMBCCTX * context, SMBCSRV * server)
-{
-  GVfsBackendSmb *backend;
-
-  backend = smbc_getOptionUserData (context);
-  
-  if (backend->cached_server == server)
-    {
-      g_free (backend->cached_server_name);
-      backend->cached_server_name = NULL;
-      g_free (backend->cached_share_name);
-      backend->cached_share_name = NULL;
-      g_free (backend->cached_domain);
-      backend->cached_domain = NULL;
-      g_free (backend->cached_username);
-      backend->cached_username = NULL;
-      backend->cached_server = NULL;
-      return 0;
-    }
-  return 1;
-}
-
-
-/* Look up a server in the cache system
- *
- * @param c         pointer to smb context
- * @param server    server name to match
- * @param share     share name to match
- * @param workgroup workgroup to match
- * @param username  username to match
- * @return          pointer to SMBCSRV on success. NULL on failure.
- *
- */ 
-static SMBCSRV *
-get_cached_server (SMBCCTX * context,
-		   const char *server_name, const char *share_name,
-		   const char *domain, const char *username)
-{
-  GVfsBackendSmb *backend;
-
-  backend = smbc_getOptionUserData (context);
-
-  if (backend->cached_server != NULL &&
-      strcmp (backend->cached_server_name, server_name) == 0 &&
-      strcmp (backend->cached_share_name, share_name) == 0 &&
-      strcmp (backend->cached_domain, domain) == 0 &&
-      strcmp (backend->cached_username, username) == 0)
-    return backend->cached_server;
-
-  return NULL;
-}
-
-/* Try to remove all servers from the cache system and disconnect
- *
- * @param c         pointer to smb context
- *
- * @return          0 when found and removed. 1 on failure.
- *
- */ 
-static int
-purge_cached (SMBCCTX * context)
-{
-  GVfsBackendSmb *backend;
-  
-  backend = smbc_getOptionUserData (context);
-
-  if (backend->cached_server)
-    remove_cached_server(context, backend->cached_server);
-  
-  return 0;
-}
-
 #define SUB_DELIM_CHARS  "!$&'()*+,;="
 
 static gboolean
@@ -546,11 +427,6 @@ do_mount (GVfsBackend *backend,
 
   smbc_setDebug (smb_context, debug_val);
   smbc_setFunctionAuthDataWithContext (smb_context, auth_callback);
-  
-  smbc_setFunctionAddCachedServer (smb_context, add_cached_server);
-  smbc_setFunctionGetCachedServer (smb_context, get_cached_server);
-  smbc_setFunctionRemoveCachedServer (smb_context, remove_cached_server);
-  smbc_setFunctionPurgeCachedServers (smb_context, purge_cached);
 
   if (op_backend->default_workgroup != NULL)
     smbc_setWorkgroup (smb_context, op_backend->default_workgroup);
