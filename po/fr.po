@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: gvfs HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-08-29 15:35+0000\n"
-"PO-Revision-Date: 2016-09-04 22:02+0200\n"
+"POT-Creation-Date: 2016-09-07 09:43+0000\n"
+"PO-Revision-Date: 2016-09-15 12:28+0200\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "Language: fr\n"
@@ -23,7 +23,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n>1;\n"
-"X-Generator: Poedit 1.8.8\n"
 
 #: client/gdaemonfile.c:467 client/gdaemonfile.c:2863
 msgid "Operation not supported, files on different mounts"
@@ -2022,6 +2021,42 @@ msgstr "L'emplacement est déjà monté"
 #: daemon/mount.c:891
 msgid "Location is not mountable"
 msgstr "L'emplacement n'est pas « montable »"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:8
+msgid "GVfs"
+msgstr "GVfs"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:9
+msgid "http://git.gnome.org/browse/gvfs"
+msgstr "http://git.gnome.org/browse/gvfs"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:12
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:23
+msgid "Perform file operations"
+msgstr "Effectuer des opérations sur les fichiers"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:13
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:24
+msgid "Authentication is required to perform file operations"
+msgstr ""
+"Il est nécessaire de s'authentifier pour effectuer des opérations sur les "
+"fichiers"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:15
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:16
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:26
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:27
+msgid "no"
+msgstr "no"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:17
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:28
+msgid "auth_admin_keep"
+msgstr "auth_admin_keep"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:19
+msgid "@libexecdir@/gvfsd-admin"
+msgstr "@libexecdir@/gvfsd-admin"
 
 #: metadata/meta-daemon.c:162 metadata/meta-daemon.c:238
 #: metadata/meta-daemon.c:274
