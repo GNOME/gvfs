@@ -95,22 +95,7 @@ find_mount_entry_for_file (GFile *file)
   char *pathname;
 
   pathname = g_file_get_path (file);
-  do
-    {
-      char *slash;
-
-      slash = strrchr (pathname, '/');
-
-      /* leave the leading '/' in place */
-      if (slash == pathname)
-        slash++;
-
-      *slash = '\0';
-
-      entry = g_unix_mount_at (pathname, NULL);
-    }
-  while (entry == NULL && pathname[1]);
-
+  entry = g_unix_mount_for (pathname, NULL);
   g_free (pathname);
 
   /* if the GUnixMount stuff is gummed up, this might fail.  we can't
