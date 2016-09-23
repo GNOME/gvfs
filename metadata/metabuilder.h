@@ -38,9 +38,9 @@ struct _MetaBuilder {
 
 struct _MetaFile {
   char *name;
-  GList *children;
+  GSequence *children;
   gint64 last_changed;
-  GList *data;
+  GSequence *data;
 
   guint32 metadata_pointer;
   guint32 children_pointer;
