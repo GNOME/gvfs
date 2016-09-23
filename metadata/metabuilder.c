@@ -78,8 +78,9 @@ meta_builder_free (MetaBuilder *builder)
 }
 
 static gint
-compare_metafile (gconstpointer  a,
-		  gconstpointer  b)
+compare_metafile (gconstpointer a,
+                  gconstpointer b,
+                  gpointer      user_data)
 {
   const MetaFile *aa, *bb;
 
@@ -89,14 +90,27 @@ compare_metafile (gconstpointer  a,
 }
 
 static gint
-compare_metadata (gconstpointer  a,
-		  gconstpointer  b)
+compare_metadata (gconstpointer a,
+                  gconstpointer b,
+                  gpointer      user_data)
 {
   const MetaData *aa, *bb;
 
   aa = a;
   bb = b;
   return strcmp (aa->key, bb->key);
+}
+
+static void
+metadata_free (MetaData *data)
+{
+  g_free (data->key);
+  if (data->is_list)
+    g_list_free_full (data->values, g_free);
+  else
+    g_free (data->value);
+
+  g_free (data);
 }
 
 MetaFile *
@@ -107,9 +121,10 @@ metafile_new (const char *name,
 
   f = g_new0 (MetaFile, 1);
   f->name = g_strdup (name);
+  f->children = g_sequence_new ((GDestroyNotify)metafile_free);
+  f->data = g_sequence_new ((GDestroyNotify)metadata_free);
   if (parent)
-    parent->children = g_list_insert_sorted (parent->children, f,
-					     compare_metafile);
+    g_sequence_insert_sorted (parent->children, f, compare_metafile, NULL);
 
   return f;
 }
@@ -124,7 +139,7 @@ metadata_new (const char *key,
   data->key = g_strdup (key);
 
   if (file)
-    file->data = g_list_insert_sorted (file->data, data, compare_metadata);
+    g_sequence_insert_sorted (file->data, data, compare_metadata, NULL);
 
   return data;
 }
@@ -152,24 +167,12 @@ metadata_dup (MetaFile *file,
   return new_data;
 }
 
-static void
-metadata_free (MetaData *data)
-{
-  g_free (data->key);
-  if (data->is_list)
-    g_list_free_full (data->values, g_free);
-  else
-    g_free (data->value);
-
-  g_free (data);
-}
-
 void
 metafile_free (MetaFile *file)
 {
   g_free (file->name);
-  g_list_free_full (file->children, (GDestroyNotify)metafile_free);
-  g_list_free_full (file->data, (GDestroyNotify)metadata_free);
+  g_sequence_free (file->children);
+  g_sequence_free (file->data);
   g_free (file);
 }
 
@@ -178,15 +181,20 @@ metafile_lookup_child (MetaFile *metafile,
 		       const char *name,
 		       gboolean create)
 {
-  GList *l;
   MetaFile *child;
+  MetaFile lookup_file;
+  GSequenceIter *lookup_file_iter;
 
-  for (l = metafile->children; l != NULL; l = l->next)
-    {
-      child = l->data;
-      if (strcmp (child->name, name) == 0)
-	return child;
-    }
+  lookup_file.name = (char *)name;
+
+  lookup_file_iter = g_sequence_lookup (metafile->children,
+                                        &lookup_file,
+                                        compare_metafile,
+                                        NULL);
+
+  if (lookup_file_iter)
+    return g_sequence_get (lookup_file_iter);
+
   child = NULL;
   if (create)
     child = metafile_new (name, metafile);
@@ -252,16 +260,22 @@ meta_builder_remove (MetaBuilder *builder,
 
   if (parent != NULL)
     {
-      parent->children = g_list_remove (parent->children, f);
-      metafile_free (f);
+      GSequenceIter *iter;
+
+      iter = g_sequence_lookup (parent->children,
+                                f,
+                                compare_metafile,
+                                NULL);
+      g_sequence_remove (iter);
+
       if (mtime)
 	parent->last_changed = mtime;
     }
   else
     {
       /* Removing root not allowed, just remove children */
-      g_list_free_full (f->children, (GDestroyNotify)metafile_free);
-      f->children = NULL;
+      g_sequence_remove_range (g_sequence_get_begin_iter (f->children),
+                               g_sequence_get_end_iter (f->children));
       if (mtime)
 	f->last_changed = mtime;
     }
@@ -274,19 +288,23 @@ meta_file_copy_into (MetaFile *src,
 		     guint64 mtime)
 {
   MetaFile *src_child, *dest_child;
-  GList *l;
+  GSequenceIter *iter;
 
   if (mtime)
     dest->last_changed = mtime;
   else
     dest->last_changed = src->last_changed;
 
-  for (l = src->data; l != NULL; l = l->next)
-    metadata_dup (dest, l->data);
+  for (iter = g_sequence_get_begin_iter (src->data);
+       iter != g_sequence_get_end_iter (src->data);
+       iter = g_sequence_iter_next (iter))
+    metadata_dup (dest, g_sequence_get (iter));
 
-  for (l = src->children; l != NULL; l = l->next)
+  for (iter = g_sequence_get_begin_iter (src->children);
+       iter != g_sequence_get_end_iter (src->children);
+       iter = g_sequence_iter_next (iter))
     {
-      src_child = l->data;
+      src_child = g_sequence_get (iter);
       dest_child = metafile_new (src_child->name, dest);
       meta_file_copy_into (src_child, dest_child, mtime);
     }
@@ -310,6 +328,8 @@ meta_builder_copy (MetaBuilder *builder,
   meta_file_copy_into (src, temp, mtime);
 
   dest = meta_builder_lookup (builder, dest_path, TRUE);
+  g_sequence_free (dest->data);
+  g_sequence_free (dest->children);
   dest->data = temp->data;
   dest->children = temp->children;
   dest->last_changed = temp->last_changed;
@@ -324,20 +344,31 @@ metafile_set_mtime (MetaFile    *file,
   file->last_changed = mtime;
 }
 
+GSequenceIter *
+metafile_key_lookup_iter (MetaFile *file,
+                          const char *key)
+{
+  MetaData lookup_data;
+
+  lookup_data.key = (char *)key;
+
+  return g_sequence_lookup (file->data,
+                            &lookup_data,
+                            compare_metadata,
+                            NULL);
+}
+
 MetaData *
 metafile_key_lookup (MetaFile *file,
 		     const char *key,
 		     gboolean create)
 {
-  GList *l;
   MetaData *data;
+  GSequenceIter *iter;
 
-  for (l = file->data; l != NULL; l = l->next)
-    {
-      data = l->data;
-      if (strcmp (data->key, key) == 0)
-	return data;
-    }
+  iter = metafile_key_lookup_iter (file, key);
+  if (iter)
+    return g_sequence_get (iter);
 
   data = NULL;
   if (create)
@@ -364,14 +395,11 @@ void
 metafile_key_unset (MetaFile *metafile,
 		    const char *key)
 {
-  MetaData *data;
+  GSequenceIter *iter;
 
-  data = metafile_key_lookup (metafile, key, FALSE);
-  if (data)
-    {
-      metafile->data = g_list_remove (metafile->data, data);
-      metadata_free (data);
-    }
+  iter = metafile_key_lookup_iter (metafile, key);
+  if (iter)
+    g_sequence_remove (iter);
 }
 
 void
@@ -423,7 +451,8 @@ metafile_key_list_add (MetaFile *metafile,
 static void
 metafile_print (MetaFile *file, int indent, char *parent)
 {
-  GList *l, *v;
+  GSequenceIter *iter;
+  GList *v;
   MetaData *data;
   char *dir;
 
@@ -438,9 +467,11 @@ metafile_print (MetaFile *file, int indent, char *parent)
       indent += 3;
     }
 
-  for (l = file->data; l != NULL; l = l->next)
+  for (iter = g_sequence_get_begin_iter (file->data);
+       iter != g_sequence_get_end_iter (file->data);
+       iter = g_sequence_iter_next (iter))
     {
-      data = l->data;
+      data = g_sequence_get (iter);
       g_print ("%*s%s=", indent, "", data->key);
       if (data->is_list)
 	{
@@ -455,9 +486,11 @@ metafile_print (MetaFile *file, int indent, char *parent)
 	g_print ("%s", data->value);
       g_print ("\n");
     }
-  for (l = file->children; l != NULL; l = l->next)
+  for (iter = g_sequence_get_begin_iter (file->children);
+       iter != g_sequence_get_end_iter (file->children);
+       iter = g_sequence_iter_next (iter))
     {
-      metafile_print (l->data, indent, dir);
+      metafile_print (g_sequence_get (iter), indent, dir);
     }
 
   g_free (dir);
@@ -534,7 +567,7 @@ metafile_collect_times (MetaFile *file,
 			gint64 *time_t_min,
 			gint64 *time_t_max)
 {
-  GList *l;
+  GSequenceIter *iter;
   MetaFile *child;
 
   if (*time_t_min == 0)
@@ -545,9 +578,11 @@ metafile_collect_times (MetaFile *file,
   if (file->last_changed > *time_t_max)
     *time_t_max = file->last_changed;
 
-  for (l = file->children; l != NULL; l = l->next)
+  for (iter = g_sequence_get_begin_iter (file->children);
+       iter != g_sequence_get_end_iter (file->children);
+       iter = g_sequence_iter_next (iter))
     {
-      child = l->data;
+      child = g_sequence_get (iter);
       metafile_collect_times (child, time_t_min, time_t_max);
     }
 }
@@ -556,22 +591,26 @@ static void
 metafile_collect_keywords (MetaFile *file,
 			   GHashTable *hash)
 {
-  GList *l;
+  GSequenceIter *iter;
   MetaData *data;
   MetaFile *child;
 
   file->metadata_pointer = 0;
   file->children_pointer = 0;
 
-  for (l = file->data; l != NULL; l = l->next)
+  for (iter = g_sequence_get_begin_iter (file->data);
+       iter != g_sequence_get_end_iter (file->data);
+       iter = g_sequence_iter_next (iter))
     {
-      data = l->data;
+      data = g_sequence_get (iter);
       g_hash_table_insert (hash, data->key, GINT_TO_POINTER (1));
     }
 
-  for (l = file->children; l != NULL; l = l->next)
+  for (iter = g_sequence_get_begin_iter (file->children);
+       iter != g_sequence_get_end_iter (file->children);
+       iter = g_sequence_iter_next (iter))
     {
-      child = l->data;
+      child = g_sequence_get (iter);
       metafile_collect_keywords (child, hash);
     }
 }
@@ -705,7 +744,7 @@ write_children (GString *out,
 {
   GHashTable *strings;
   MetaFile *child, *file;
-  GList *l;
+  GSequenceIter *iter;
   GList *files;
 
   files = g_list_prepend (NULL, builder->root);
@@ -723,11 +762,13 @@ write_children (GString *out,
       if (file->children_pointer != 0)
 	set_uint32 (out, file->children_pointer, out->len);
 
-      append_uint32 (out, g_list_length (file->children), NULL);
+      append_uint32 (out, g_sequence_get_length (file->children), NULL);
 
-      for (l = file->children; l != NULL; l = l->next)
+      for (iter = g_sequence_get_begin_iter (file->children);
+           iter != g_sequence_get_end_iter (file->children);
+           iter = g_sequence_iter_next (iter))
 	{
-	  child = l->data;
+	  child = g_sequence_get (iter);
 
 	  /* No mtime, children or metadata, no need for this
 	     to be in the file */
@@ -756,18 +797,20 @@ write_metadata_for_file (GString *out,
 			 GHashTable *strings,
 			 GHashTable *key_hash)
 {
-  GList *l;
+  GSequenceIter *iter;
   MetaData *data;
   guint32 key;
 
   g_assert (file->metadata_pointer != 0);
   set_uint32 (out, file->metadata_pointer, out->len);
 
-  append_uint32 (out, g_list_length (file->data), NULL);
+  append_uint32 (out, g_sequence_get_length (file->data), NULL);
 
-  for (l = file->data; l != NULL; l = l->next)
+  for (iter = g_sequence_get_begin_iter (file->data);
+       iter != g_sequence_get_end_iter (file->data);
+       iter = g_sequence_iter_next (iter))
     {
-      data = l->data;
+      data = g_sequence_get (iter);
 
       key = GPOINTER_TO_UINT (g_hash_table_lookup (key_hash, data->key));
       if (data->is_list)
@@ -788,7 +831,7 @@ write_metadata (GString *out,
   GHashTable *strings;
   GList *stringvs;
   MetaFile *child, *file;
-  GList *l;
+  GSequenceIter *iter;
   GList *files;
 
   /* Root metadata */
@@ -816,9 +859,11 @@ write_metadata (GString *out,
       strings = string_block_begin ();
       stringvs = stringv_block_begin ();
 
-      for (l = file->children; l != NULL; l = l->next)
+      for (iter = g_sequence_get_begin_iter (file->children);
+           iter != g_sequence_get_end_iter (file->children);
+           iter = g_sequence_iter_next (iter))
 	{
-	  child = l->data;
+	  child = g_sequence_get (iter);
 
 	  if (child->data != NULL)
 	    write_metadata_for_file (out, child,
