@@ -207,7 +207,7 @@ g_vfs_backend_afc_check (afc_error_t cond, GVfsJob *job)
       break;
     case AFC_E_OBJECT_NOT_FOUND:
       g_vfs_job_failed (job, G_IO_ERROR, error,
-                        _("File doesn't exist"));
+                        _("File doesn’t exist"));
       break;
     case AFC_E_DIR_NOT_EMPTY:
       g_vfs_job_failed (job, G_IO_ERROR, error,
@@ -1102,7 +1102,7 @@ is_dir_bail:
       g_free (app);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_IS_DIRECTORY,
-                        _("Can't open directory"));
+                        _("Can’t open directory"));
       return;
     }
 
@@ -1113,7 +1113,7 @@ not_found_bail:
       g_free (app);
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_FOUND,
-                        _("File doesn't exist"));
+                        _("File doesn’t exist"));
       return;
     }
 

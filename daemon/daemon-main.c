@@ -257,7 +257,7 @@ daemon_parse_args (int argc, char *argv[], const char *default_type)
 	  p = strchr (argv[i], '=');
 	  if (p == NULL || p[1] == 0 || p == argv[i])
 	    {
- 	      g_printerr (_("Usage: %s key=value key=value ..."), argv[0]);
+ 	      g_printerr (_("Usage: %s key=value key=value …"), argv[0]);
               g_printerr ("\n");
 	      exit (1);
 	    }
@@ -275,7 +275,7 @@ daemon_parse_args (int argc, char *argv[], const char *default_type)
 	{
 	  g_printerr (_("No mount type specified"));
           g_printerr ("\n");
-	  g_printerr (_("Usage: %s key=value key=value ..."), argv[0]);
+	  g_printerr (_("Usage: %s key=value key=value …"), argv[0]);
           g_printerr ("\n");
 	  exit (1);
 	}

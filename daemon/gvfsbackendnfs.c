@@ -344,7 +344,7 @@ open_for_read_fstat_cb (int err,
           g_vfs_job_failed_literal (job,
                                     G_IO_ERROR,
                                     G_IO_ERROR_IS_DIRECTORY,
-                                    _("Can't open directory"));
+                                    _("Can’t open directory"));
           return;
         }
     }
@@ -2469,7 +2469,7 @@ move_stat_dest_cb (int err,
                 {
                   g_vfs_job_failed_literal (job,
                                             G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-                                            _("Can't move directory over directory"));
+                                            _("Can’t move directory over directory"));
                 }
               else
                 {

@@ -2864,12 +2864,12 @@ do_move (GVfsBackend *backend,
                     g_vfs_job_failed_literal (G_VFS_JOB(job),
                                               G_IO_ERROR,
                                               G_IO_ERROR_WOULD_MERGE,
-                                              _("Can't move directory over directory"));
+                                              _("Can’t move directory over directory"));
                   else
                     g_vfs_job_failed_literal (G_VFS_JOB(job),
                                               G_IO_ERROR,
                                               G_IO_ERROR_IS_DIRECTORY,
-                                              _("Can't move over directory"));
+                                              _("Can’t move over directory"));
                   goto error;
                 }
               else if (source_ft == G_FILE_TYPE_DIRECTORY)
@@ -2987,7 +2987,7 @@ do_copy (GVfsBackend *backend,
                 g_vfs_job_failed_literal (G_VFS_JOB(job),
                                           G_IO_ERROR,
                                           G_IO_ERROR_WOULD_MERGE,
-                                          _("Can't copy directory over directory"));
+                                          _("Can’t copy directory over directory"));
               else
                 g_vfs_job_failed_literal (G_VFS_JOB(job),
                                           G_IO_ERROR,
@@ -3016,7 +3016,7 @@ do_copy (GVfsBackend *backend,
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR,
                                 G_IO_ERROR_WOULD_RECURSE,
-                                _("Can't recursively copy directory"));
+                                _("Can’t recursively copy directory"));
       goto error;
     }
 

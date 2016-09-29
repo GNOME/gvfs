@@ -811,7 +811,7 @@ do_open_for_read (GVfsBackend *backend,
       if ((res == 0) && (S_ISDIR (st.st_mode)))
             g_vfs_job_failed (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                             _("Can't open directory"));
+                             _("Can’t open directory"));
       else
         g_vfs_job_failed_from_errno (G_VFS_JOB (job), olderr);
   }
@@ -2039,7 +2039,7 @@ do_set_display_name (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_EXISTS,
-                        _("Can't rename file, filename already exists"));
+                        _("Can’t rename file, filename already exists"));
       goto out;
     }
 
@@ -2188,7 +2188,7 @@ do_move (GVfsBackend *backend,
 	      g_vfs_job_failed (G_VFS_JOB (job),
 				G_IO_ERROR,
 				G_IO_ERROR_WOULD_MERGE,
-				_("Can't move directory over directory"));
+				_("Can’t move directory over directory"));
 	      g_free (source_uri);
 	      g_free (dest_uri);
 	      return;
@@ -2260,7 +2260,7 @@ do_move (GVfsBackend *backend,
 	  (errsv == EINVAL && source_is_dir))
 	g_vfs_job_failed (G_VFS_JOB (job), 
 			  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-			  _("Can't recursively move directory"));
+			  _("Can’t recursively move directory"));
       else
 	g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
     }

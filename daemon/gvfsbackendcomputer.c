@@ -636,7 +636,7 @@ lookup (GVfsBackendComputer *backend,
  out:
   g_vfs_job_failed (job, G_IO_ERROR,
                     G_IO_ERROR_NOT_FOUND,
-                    _("File doesn't exist"));
+                    _("File doesn’t exist"));
   return NULL;
 }
 
@@ -654,11 +654,11 @@ try_open_for_read (GVfsBackend *backend,
   if (file == &root)
     g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                       G_IO_ERROR_IS_DIRECTORY,
-                      _("Can't open directory"));
+                      _("Can’t open directory"));
   else if (file != NULL)
     g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                       G_IO_ERROR_NOT_SUPPORTED,
-                      _("Can't open mountable file"));
+                      _("Can’t open mountable file"));
   return TRUE;
 }
 
@@ -887,7 +887,7 @@ mount_volume_from_drive (GDrive *drive,
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Can't mount file"));
+                        _("Can’t mount file"));
     }
   
   g_list_free_full (volumes, g_object_unref);
@@ -1005,7 +1005,7 @@ try_mount_mountable (GVfsBackend *backend,
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _("Can't mount file"));
+                            _("Can’t mount file"));
         }
     }
   
@@ -1069,7 +1069,7 @@ try_unmount_mountable (GVfsBackend *backend,
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _("Can't unmount file"));
+                            _("Can’t unmount file"));
         }
     }
   
@@ -1199,7 +1199,7 @@ try_eject_mountable (GVfsBackend *backend,
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _("Can't eject file"));
+                            _("Can’t eject file"));
         }
     }
   
@@ -1266,14 +1266,14 @@ try_start_mountable (GVfsBackend *backend,
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _("Can't start drive"));
+                            _("Can’t start drive"));
         }
     }
   else
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Can't start drive"));
+                        _("Can’t start drive"));
     }
   return TRUE;
 }
@@ -1339,14 +1339,14 @@ try_stop_mountable (GVfsBackend *backend,
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _("Can't stop drive"));
+                            _("Can’t stop drive"));
         }
     }
   else
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Can't stop drive"));
+                        _("Can’t stop drive"));
     }
   return TRUE;
 }
@@ -1403,14 +1403,14 @@ try_poll_mountable (GVfsBackend *backend,
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _("Can't poll file"));
+                            _("Can’t poll file"));
         }
     }
   else
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Can't poll file"));
+                        _("Can’t poll file"));
     }
   return TRUE;
 }

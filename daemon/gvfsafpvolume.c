@@ -137,7 +137,7 @@ g_vfs_afp_volume_mount_sync (GVfsAfpVolume *volume,
     if (res_code == AFP_RESULT_OBJECT_NOT_FOUND)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                           _("Volume doesn't exist"));
+                           _("Volume doesn’t exist"));
       return FALSE;
     }
 
@@ -159,7 +159,7 @@ g_vfs_afp_volume_mount_sync (GVfsAfpVolume *volume,
 generic_error:
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                /* Translators: first %s is volumename and second servername */
-               _("Couldn't load %s on %s"), volume_name,
+               _("Couldn’t load %s on %s"), volume_name,
                g_vfs_afp_server_get_info(priv->server)->server_name);
   return FALSE;
 }
@@ -411,7 +411,7 @@ open_fork_cb (GObject *source_object, GAsyncResult *result, gpointer user_data)
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                         _("File doesn't exist"));
+                                         _("File doesn’t exist"));
         break;
       case AFP_RESULT_OBJECT_TYPE_ERR:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
@@ -693,7 +693,7 @@ delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                  _("Target object doesn't exist"));
+                                  _("Target object doesn’t exist"));
         break;
       case AFP_RESULT_VOL_LOCKED:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
@@ -846,7 +846,7 @@ create_file_cb (GObject *object, GAsyncResult *res, gpointer user_data)
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                  _("Ancestor directory doesn't exist"));
+                                  _("Ancestor directory doesn’t exist"));
         break;
       case AFP_RESULT_VOL_LOCKED:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
@@ -1034,11 +1034,11 @@ make_directory_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                   /* Translators: flat means volume doesn't support directories
                                      (all files are in the volume root) */
-                                  _("Volume is flat and doesn't support directories"));
+                                  _("Volume is flat and doesn’t support directories"));
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                  _("Ancestor directory doesn't exist"));
+                                  _("Ancestor directory doesn’t exist"));
         break;
       case AFP_RESULT_OBJECT_EXISTS:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_EXISTS,
@@ -1230,7 +1230,7 @@ rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         break;
       case AFP_RESULT_CANT_RENAME:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
-                                  _("Can't rename volume"));
+                                  _("Can’t rename volume"));
         break;
       case AFP_RESULT_OBJECT_EXISTS:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_EXISTS,
@@ -1242,7 +1242,7 @@ rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                  _("Target object doesn't exist"));
+                                  _("Target object doesn’t exist"));
         break;
       case AFP_RESULT_VOL_LOCKED:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
@@ -1413,15 +1413,15 @@ move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_dat
         break;
       case AFP_RESULT_CANT_MOVE:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                                         _("Can't move directory into one of its descendants"));
+                                         _("Can’t move directory into one of its descendants"));
         break;
       case AFP_RESULT_INSIDE_SHARE_ERR:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Can't move sharepoint into a shared directory"));
+                                         _("Can’t move sharepoint into a shared directory"));
         break;
       case AFP_RESULT_INSIDE_TRASH_ERR:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                         _("Can't move a shared directory into the Trash"));
+                                         _("Can’t move a shared directory into the Trash"));
         break;
       case AFP_RESULT_OBJECT_EXISTS:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_EXISTS,
@@ -1433,7 +1433,7 @@ move_and_rename_cb (GObject *source_object, GAsyncResult *res, gpointer user_dat
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                         _("Object being moved doesn't exist"));
+                                         _("Object being moved doesn’t exist"));
         break;
       default:
         g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
@@ -1570,7 +1570,7 @@ copy_file_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         break;
       case AFP_RESULT_CALL_NOT_SUPPORTED:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                                         _("Server doesn't support the FPCopyFile operation"));
+                                         _("Server doesn’t support the FPCopyFile operation"));
         break;
       case AFP_RESULT_DENY_CONFLICT:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -1586,7 +1586,7 @@ copy_file_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                         _("Source file and/or destination directory doesn't exist"));
+                                         _("Source file and/or destination directory doesn’t exist"));
         break;
       case AFP_RESULT_OBJECT_TYPE_ERR:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
@@ -1732,7 +1732,7 @@ get_filedir_parms_cb (GObject *source_object, GAsyncResult *result, gpointer use
     {
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                         _("File doesn't exist"));
+                                         _("File doesn’t exist"));
         break;
       default:
         g_simple_async_result_take_error (simple, afp_result_code_to_gerror (res_code));
@@ -2144,7 +2144,7 @@ set_unix_privs_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
         break;
       case AFP_RESULT_OBJECT_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                         _("Target object doesn't exist"));
+                                         _("Target object doesn’t exist"));
         break;
       case AFP_RESULT_VOL_LOCKED:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
@@ -2306,7 +2306,7 @@ enumerate_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
         break;
       case AFP_RESULT_DIR_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                         _("Directory doesn't exist"));
+                                         _("Directory doesn’t exist"));
         break;
       case AFP_RESULT_OBJECT_TYPE_ERR:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY,
@@ -2526,7 +2526,7 @@ close_replace_exchange_files_cb (GObject *source_object, GAsyncResult *res, gpoi
         break;
       case AFP_RESULT_ID_NOT_FOUND:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                         _("File doesn't exist"));
+                                         _("File doesn’t exist"));
         break;
       case AFP_RESULT_OBJECT_TYPE_ERR:
         g_simple_async_result_set_error (simple, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,

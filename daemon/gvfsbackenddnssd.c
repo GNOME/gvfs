@@ -420,7 +420,7 @@ lookup_link_file (GVfsBackendDnsSd *backend,
   out:
   g_vfs_job_failed (job, G_IO_ERROR,
 		    G_IO_ERROR_NOT_FOUND,
-		    _("File doesn't exist"));
+		    _("File doesn’t exist"));
 
   return NULL;
 }
@@ -764,7 +764,7 @@ try_create_monitor (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
 			G_IO_ERROR_NOT_SUPPORTED,
-			_("Can't monitor file or directory."));
+			_("Can’t monitor file or directory."));
       return TRUE;
     }
   

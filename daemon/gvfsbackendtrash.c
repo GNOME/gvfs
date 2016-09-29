@@ -231,7 +231,7 @@ trash_backend_open_for_read (GVfsBackend        *vfs_backend,
 
   if (filename[1] == '\0')
     g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                         _("Can't open directory"));
+                         _("Can’t open directory"));
 
   else
     {

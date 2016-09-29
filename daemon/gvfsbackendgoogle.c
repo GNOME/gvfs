@@ -210,7 +210,7 @@ sanitize_error (GError **error)
     {
       g_warning ("%s", (*error)->message);
       g_clear_error (error);
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("Target object doesn't exist"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("Target object doesn’t exist"));
     }
 }
 
@@ -1241,7 +1241,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
           g_vfs_job_failed (G_VFS_JOB (job),
                             G_IO_ERROR,
                             G_IO_ERROR_WOULD_RECURSE,
-                            _("Can't recursively copy directory"));
+                            _("Can’t recursively copy directory"));
           goto out;
         }
     }
@@ -1803,7 +1803,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
                   g_vfs_job_failed (G_VFS_JOB (job),
                                     G_IO_ERROR,
                                     G_IO_ERROR_WOULD_MERGE,
-                                    _("Can't copy directory over directory"));
+                                    _("Can’t copy directory over directory"));
                   goto out;
                 }
               else
@@ -1811,7 +1811,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
                   g_vfs_job_failed (G_VFS_JOB (job),
                                     G_IO_ERROR,
                                     G_IO_ERROR_IS_DIRECTORY,
-                                    _("Can't copy file over directory"));
+                                    _("Can’t copy file over directory"));
                   goto out;
                 }
             }
@@ -1822,7 +1822,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
                   g_vfs_job_failed (G_VFS_JOB (job),
                                     G_IO_ERROR,
                                     G_IO_ERROR_WOULD_RECURSE,
-                                    _("Can't recursively copy directory"));
+                                    _("Can’t recursively copy directory"));
                   goto out;
                 }
             }
@@ -1842,7 +1842,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
           g_vfs_job_failed (G_VFS_JOB (job),
                             G_IO_ERROR,
                             G_IO_ERROR_WOULD_RECURSE,
-                            _("Can't recursively copy directory"));
+                            _("Can’t recursively copy directory"));
           goto out;
         }
     }
@@ -2184,7 +2184,7 @@ g_vfs_backend_google_open_for_read (GVfsBackend        *_self,
 
   if (GDATA_IS_DOCUMENTS_FOLDER (entry))
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY, _("Can't open directory"));
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY, _("Can’t open directory"));
       goto out;
     }
 

@@ -829,7 +829,7 @@ do_read (GVfsBackend *backend,
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             g_io_error_from_errno (errsv),
                             /* Translators: paranoia is the name of the cd audio reading library */
-                            _("Error from 'paranoia' on drive %s"), cdda_backend->device_path);
+                            _("Error from “paranoia” on drive %s"), cdda_backend->device_path);
           return;
         }
 
@@ -1021,14 +1021,14 @@ do_query_info (GVfsBackend *backend,
 
       if (track_num > cdda_backend->drive->tracks)
         {
-          error = g_error_new (G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("File doesn't exist"));
+          error = g_error_new (G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("File doesn’t exist"));
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           return;
         }
 
       if (! cdio_cddap_track_audiop (cdda_backend->drive, track_num))
         {
-          error = g_error_new (G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("The file does not exist or isn't an audio track"));
+          error = g_error_new (G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("The file does not exist or isn’t an audio track"));
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           return;
         }

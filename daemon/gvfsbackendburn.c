@@ -452,7 +452,7 @@ try_open_for_read (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                        _("Can't copy file over directory"));
+                        _("Can’t copy file over directory"));
       return TRUE;
     }
 
@@ -872,7 +872,7 @@ try_push (GVfsBackend *backend,
                 {
                   g_vfs_job_failed (G_VFS_JOB (job),
                                     G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-                                    _("Can't copy directory over directory"));
+                                    _("Can’t copy directory over directory"));
                   return TRUE;
                 }
               /* continue to would_recurse error */
@@ -888,7 +888,7 @@ try_push (GVfsBackend *backend,
       
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                        _("Can't recursively copy directory"));
+                        _("Can’t recursively copy directory"));
       return TRUE;
     }
 
@@ -900,7 +900,7 @@ try_push (GVfsBackend *backend,
             {
               g_vfs_job_failed (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                                _("Can't copy file over directory"));
+                                _("Can’t copy file over directory"));
               return TRUE;
             }
           else

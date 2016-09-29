@@ -948,7 +948,7 @@ login_answer_yes_no (GMountSource *mount_source,
     {
       g_set_error_literal (error,
                            G_IO_ERROR, G_IO_ERROR_FAILED,
-                           _("Can't send host identity confirmation"));
+                           _("Can’t send host identity confirmation"));
       return FALSE;
     }
 
@@ -1242,7 +1242,7 @@ handle_login (GVfsBackend *backend,
             {
               g_set_error_literal (error,
 	                           G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-        	                   _("Can't send password"));
+        	                   _("Can’t send password"));
               ret_val = FALSE;
               break;
             }
@@ -1258,7 +1258,7 @@ handle_login (GVfsBackend *backend,
 
 	  get_hostname_and_fingerprint_from_line (buffer, &hostname, &fingerprint);
 
-	  message = g_strdup_printf (_("Can't verify the identity of “%s”.\n"
+	  message = g_strdup_printf (_("Can’t verify the identity of “%s”.\n"
 				       "This happens when you log in to a computer the first time.\n\n"
 				       "The identity sent by the remote computer is “%s”. "
 				       "If you want to be absolutely sure it is safe to continue, "
@@ -4815,7 +4815,7 @@ move_lstat_reply (GVfsBackendSftp *backend,
                 g_vfs_job_failed (job,
                                   G_IO_ERROR,
                                   G_IO_ERROR_WOULD_MERGE,
-                                  _("Can't move directory over directory"));
+                                  _("Can’t move directory over directory"));
               else
                 g_vfs_job_failed (job,
                                   G_IO_ERROR,

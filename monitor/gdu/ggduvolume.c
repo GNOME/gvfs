@@ -1095,14 +1095,14 @@ mount_with_mount_operation (MountOpData *data)
       if (gdu_device_is_partition (device))
         {
           message = g_strdup_printf (_("Enter a password to unlock the volume\n"
-                                       "The device \"%s\" contains encrypted data on partition %d."),
+                                       "The device “%s” contains encrypted data on partition %d."),
                                      drive_name,
                                      gdu_device_partition_get_number (device));
         }
       else
         {
           message = g_strdup_printf (_("Enter a password to unlock the volume\n"
-                                       "The device \"%s\" contains encrypted data."),
+                                       "The device “%s” contains encrypted data."),
                                      drive_name);
         }
     }

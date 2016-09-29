@@ -283,7 +283,7 @@ do_copy (CopyData *copy_data)
       {
         if (source_is_dir)
           g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-                                    _("Can't copy directory over directory"));
+                                    _("Can’t copy directory over directory"));
         else
           g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
                                     _("File is directory"));
@@ -302,7 +302,7 @@ do_copy (CopyData *copy_data)
   if (source_is_dir)
   {
     g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                      _("Can't recursively copy directory"));
+                      _("Can’t recursively copy directory"));
     goto error;
   }
 
@@ -486,7 +486,7 @@ do_move (MoveData *move_data)
       {
         if (source_is_dir)
           g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-                                    _("Can't move directory over directory"));
+                                    _("Can’t move directory over directory"));
         else
           g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
                                     _("File is directory"));
@@ -601,7 +601,7 @@ try_set_display_name (GVfsBackend *backend,
   if (is_root (filename))
   {
     g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
-                              _("Can't rename volume"));
+                              _("Can’t rename volume"));
     return TRUE;
   }
 

@@ -230,7 +230,7 @@ g_vfs_decode_dns_sd_triple (const gchar *encoded_triple,
       g_set_error (error,
                    G_IO_ERROR,
                    G_IO_ERROR_INVALID_ARGUMENT,
-                   _("Malformed DNS-SD encoded_triple '%s'"),
+                   _("Malformed DNS-SD encoded_triple “%s”"),
                    encoded_triple);
       goto out;
     }
@@ -260,7 +260,7 @@ g_vfs_decode_dns_sd_triple (const gchar *encoded_triple,
           g_set_error (error,
                        G_IO_ERROR,
                        G_IO_ERROR_INVALID_ARGUMENT,
-                       _("Malformed DNS-SD encoded_triple '%s'"),
+                       _("Malformed DNS-SD encoded_triple “%s”"),
                        encoded_triple);
           goto out;
         }
@@ -277,7 +277,7 @@ g_vfs_decode_dns_sd_triple (const gchar *encoded_triple,
       g_set_error (error,
                    G_IO_ERROR,
                    G_IO_ERROR_INVALID_ARGUMENT,
-                   _("Malformed DNS-SD encoded_triple '%s'"),
+                   _("Malformed DNS-SD encoded_triple “%s”"),
                    encoded_triple);
       goto out;
     }

@@ -734,7 +734,7 @@ do_open_for_read (GVfsBackend *       backend,
       g_vfs_job_failed (G_VFS_JOB (job),
 		        G_IO_ERROR,
 			G_IO_ERROR_NOT_FOUND,
-			_("File doesn't exist"));
+			_("File doesn’t exist"));
       return;
     }
 
@@ -742,7 +742,7 @@ do_open_for_read (GVfsBackend *       backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
 			G_IO_ERROR_IS_DIRECTORY,
-			_("Can't open directory"));
+			_("Can’t open directory"));
       return;
     }
   
@@ -789,7 +789,7 @@ do_open_for_read (GVfsBackend *       backend,
       g_set_error_literal (&archive->error,
 			   G_IO_ERROR,
 			   G_IO_ERROR_NOT_FOUND,
-			   _("File doesn't exist"));
+			   _("File doesn’t exist"));
     }
   gvfs_archive_finish (archive);
 }
@@ -841,7 +841,7 @@ do_query_info (GVfsBackend *backend,
       g_vfs_job_failed (G_VFS_JOB (job),
 		        G_IO_ERROR,
 			G_IO_ERROR_NOT_FOUND,
-			_("File doesn't exist"));
+			_("File doesn’t exist"));
       return;
     }
 
@@ -870,7 +870,7 @@ do_enumerate (GVfsBackend *backend,
       g_vfs_job_failed (G_VFS_JOB (job),
 		        G_IO_ERROR,
 			G_IO_ERROR_NOT_FOUND,
-			_("File doesn't exist"));
+			_("File doesn’t exist"));
       return;
     }
 

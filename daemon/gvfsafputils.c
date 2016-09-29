@@ -121,7 +121,7 @@ afp_result_code_to_gerror (AfpResultCode res_code)
 
   if (res_string)
     return g_error_new (G_IO_ERROR, G_IO_ERROR_FAILED,
-                        _("Got error \"%s\" from server"), res_string);
+                        _("Got error “%s” from server"), res_string);
   else
     return g_error_new (G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Got unknown error code %d from server"), res_code);

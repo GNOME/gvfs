@@ -855,7 +855,7 @@ get_dev_path_and_device_from_host (GVfsJob *job,
     g_free (dev_path);
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("Couldn't find matching udev device."));
+                              _("Couldn’t find matching udev device."));
     return NULL;
   }
 
@@ -1067,7 +1067,7 @@ get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
       if (device == NULL) {
         g_vfs_job_failed (G_VFS_JOB (job),
                           G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Unable to open MTP device '%s'"), name);
+                          _("Unable to open MTP device “%s”"), name);
         g_free (name);
         goto exit;
       }
@@ -1435,7 +1435,7 @@ do_query_info (GVfsBackend *backend,
       LIBMTP_Clear_Errorstack (device);
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                _("Directory doesn't exist"));
+                                _("Directory doesn’t exist"));
       goto exit;
     }
 
@@ -1460,7 +1460,7 @@ do_query_info (GVfsBackend *backend,
       g_debug ("(W) storage %X not found?!\n", entry->storage);
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                _("Directory doesn't exist"));
+                                _("Directory doesn’t exist"));
       goto exit;
     }
   } else {
@@ -1610,7 +1610,7 @@ do_make_directory (GVfsBackend *backend,
   if (!entry) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("Directory doesn't exist"));
+                              _("Directory doesn’t exist"));
     goto exit;
   }
 
@@ -1656,7 +1656,7 @@ do_pull (GVfsBackend *backend,
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File doesn't exist"));
+                              _("File doesn’t exist"));
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -1672,7 +1672,7 @@ do_pull (GVfsBackend *backend,
   if (file == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File doesn't exist"));
+                              _("File doesn’t exist"));
     goto exit;
   }
 
@@ -1712,12 +1712,12 @@ do_pull (GVfsBackend *backend,
       } else if (source_is_dir && dest_is_dir) {
         g_vfs_job_failed_literal (G_VFS_JOB (job),
                                   G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-                                  _("Can't merge directories"));
+                                  _("Can’t merge directories"));
         goto exit;
       } else if (source_is_dir && !dest_is_dir) {
         g_vfs_job_failed_literal (G_VFS_JOB (job),
                                   G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                                  _("Can't recursively copy directory"));
+                                  _("Can’t recursively copy directory"));
         goto exit;
       }
       /* Source and Dest are files */
@@ -1740,7 +1740,7 @@ do_pull (GVfsBackend *backend,
   } else if (source_is_dir) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                              _("Can't recursively copy directory"));
+                              _("Can’t recursively copy directory"));
     goto exit;
   }
 
@@ -1993,7 +1993,7 @@ do_push (GVfsBackend *backend,
   if (!parent) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("Directory doesn't exist"));
+                              _("Directory doesn’t exist"));
     goto exit;
   }
 
@@ -2037,12 +2037,12 @@ do_push (GVfsBackend *backend,
       } else if (source_is_dir && dest_is_dir) {
         g_vfs_job_failed_literal (G_VFS_JOB (job),
                                   G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-                                  _("Can't merge directories"));
+                                  _("Can’t merge directories"));
         goto exit;
       } else if (source_is_dir && !dest_is_dir) {
         g_vfs_job_failed_literal (G_VFS_JOB (job),
                                   G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                                  _("Can't recursively copy directory"));
+                                  _("Can’t recursively copy directory"));
         goto exit;
       }
       /* Source and Dest are files */
@@ -2066,7 +2066,7 @@ do_push (GVfsBackend *backend,
   } else if (source_is_dir) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                              _("Can't recursively copy directory"));
+                              _("Can’t recursively copy directory"));
     goto exit;
   }
 
@@ -2126,7 +2126,7 @@ do_delete (GVfsBackend *backend,
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File doesn't exist"));
+                              _("File doesn’t exist"));
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -2189,7 +2189,7 @@ do_set_display_name (GVfsBackend *backend,
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File doesn't exist"));
+                              _("File doesn’t exist"));
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -2257,7 +2257,7 @@ do_open_for_read (GVfsBackend *backend,
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File doesn't exist"));
+                              _("File doesn’t exist"));
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -2279,7 +2279,7 @@ do_open_for_read (GVfsBackend *backend,
     LIBMTP_destroy_file_t (file);
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                             _("Can't open directory"));
+                             _("Can’t open directory"));
     goto exit;
   }
 
@@ -2351,7 +2351,7 @@ do_open_icon_for_read (GVfsBackend *backend,
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR,
                         G_IO_ERROR_NOT_FOUND,
-                        _("No thumbnail for entity '%s'"),
+                        _("No thumbnail for entity “%s”"),
                         icon_id);
       goto exit;
     }
@@ -2369,7 +2369,7 @@ do_open_icon_for_read (GVfsBackend *backend,
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR,
                       G_IO_ERROR_INVALID_ARGUMENT,
-                      _("Malformed icon identifier '%s'"),
+                      _("Malformed icon identifier “%s”"),
                       icon_id);
     goto exit;
   }
@@ -2536,7 +2536,7 @@ do_create (GVfsBackend *backend,
   if (!entry) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("Directory doesn't exist"));
+                              _("Directory doesn’t exist"));
     goto exit;
   }
 
@@ -2611,7 +2611,7 @@ do_append_to (GVfsBackend *backend,
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File doesn't exist"));
+                              _("File doesn’t exist"));
     goto exit;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),

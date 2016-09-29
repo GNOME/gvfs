@@ -1090,7 +1090,7 @@ read_async_cb (GVfsDBusMount *proxy,
     {
       g_simple_async_result_set_error (orig_result,
                                        G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       _("Couldn't get stream file descriptor"));
+                                       _("Couldn’t get stream file descriptor"));
     }
   else
     {
@@ -1219,7 +1219,7 @@ g_daemon_file_read (GFile *file,
       (fd = g_unix_fd_list_get (fd_list, g_variant_get_handle (fd_id_val), NULL)) == -1)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Didn't get stream file descriptor"));
+			   _("Didn’t get stream file descriptor"));
       return NULL;
     }
 
@@ -1291,7 +1291,7 @@ file_open_write (GFile *file,
       (fd = g_unix_fd_list_get (fd_list, g_variant_get_handle (fd_id_val), NULL)) == -1)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                           _("Didn't get stream file descriptor"));
+                           _("Didn’t get stream file descriptor"));
       return NULL;
     }
 
@@ -2661,7 +2661,7 @@ set_metadata_attribute (GFile *file,
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                    _("Error setting file metadata: %s"),
-                   _("can't open metadata tree"));
+                   _("can’t open metadata tree"));
       return FALSE;
     }
 
@@ -2671,7 +2671,7 @@ set_metadata_attribute (GFile *file,
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                    _("Error setting file metadata: %s"),
-                   _("can't get metadata proxy"));
+                   _("can’t get metadata proxy"));
     }
   else
     {
@@ -3219,7 +3219,7 @@ file_open_write_async_cb (GVfsDBusMount *proxy,
     {
       g_simple_async_result_set_error (orig_result,
                                        G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       _("Couldn't get stream file descriptor"));
+                                       _("Couldn’t get stream file descriptor"));
     }
   else
     {

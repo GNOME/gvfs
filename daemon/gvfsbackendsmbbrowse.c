@@ -1126,7 +1126,7 @@ run_mount_mountable (GVfsBackendSmbBrowse *backend,
   else
     g_set_error_literal (&error,
 			 G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-			 _("File doesn't exist"));
+			 _("File doesn’t exist"));
       
   g_mutex_unlock (&backend->entries_lock);
 
@@ -1193,7 +1193,7 @@ run_open_for_read (GVfsBackendSmbBrowse *backend,
   else
     g_vfs_job_failed (G_VFS_JOB (job),
 		      G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-		      _("File doesn't exist"));
+		      _("File doesn’t exist"));
 }
 
 static void
@@ -1380,7 +1380,7 @@ run_query_info (GVfsBackendSmbBrowse *backend,
   else
     g_vfs_job_failed (G_VFS_JOB (job),
 		      G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-		      _("File doesn't exist"));
+		      _("File doesn’t exist"));
 }
 
 static void
@@ -1453,7 +1453,7 @@ run_enumerate (GVfsBackendSmbBrowse *backend,
       else
 	g_vfs_job_failed (G_VFS_JOB (job),
 			  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-			  _("File doesn't exist"));
+			  _("File doesn’t exist"));
       return;
     }
   

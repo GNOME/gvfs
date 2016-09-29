@@ -195,8 +195,8 @@ dhx2_login (GVfsAfpServer *server,
   {
     /* Translators: %d is a constant, currently hardcoded to 256 */
     g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                 ngettext ("The server doesn't support passwords longer than %d character.",
-                           "The server doesn't support passwords longer than %d characters.",
+                 ngettext ("The server doesn’t support passwords longer than %d character.",
+                           "The server doesn’t support passwords longer than %d characters.",
                            256), 256);
     goto error;
   }
@@ -477,8 +477,8 @@ dhx_login (GVfsAfpServer *server,
   if (strlen (password) > 64)
   {
     g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                 ngettext ("The server doesn't support passwords longer than %d character.",
-                           "The server doesn't support passwords longer than %d characters.",
+                 ngettext ("The server doesn’t support passwords longer than %d character.",
+                           "The server doesn’t support passwords longer than %d characters.",
                            64), 64);
     return FALSE;
   }
@@ -673,7 +673,7 @@ do_login (GVfsAfpServer *server,
     if (!g_slist_find_custom (priv->info.uams, AFP_UAM_NO_USER, (GCompareFunc)g_strcmp0))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                           _("The server “%s” doesn't support anonymous access."),
+                           _("The server “%s” doesn’t support anonymous access."),
                    priv->info.server_name);
       return FALSE;
     }
@@ -698,7 +698,7 @@ do_login (GVfsAfpServer *server,
         case AFP_RESULT_USER_NOT_AUTH:
         case AFP_RESULT_BAD_UAM:
           g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                       _("The server “%s” doesn't support anonymous access."),
+                       _("The server “%s” doesn’t support anonymous access."),
                        priv->info.server_name);
           break;
           
@@ -801,7 +801,7 @@ get_server_info (GVfsAfpServer *server,
     g_object_unref (reply);
     g_set_error (error,
                  G_IO_ERROR, G_IO_ERROR_FAILED,
-                 _("Unable to connect to the server “%s”. The server doesn't support AFP version 3.0 or later."),
+                 _("Unable to connect to the server “%s”. The server doesn’t support AFP version 3.0 or later."),
                  priv->info.server_name);
     return FALSE;
   }

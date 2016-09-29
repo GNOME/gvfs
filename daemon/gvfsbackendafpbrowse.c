@@ -187,7 +187,7 @@ mount_mountable_cb (GObject      *source_object,
   if (!vol_data)
   {
     g_vfs_job_failed (G_VFS_JOB (job),  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      _("File doesn't exist"));
+                      _("File doesn’t exist"));
     return;
   }
 
@@ -324,7 +324,7 @@ try_enumerate (GVfsBackend *backend,
   {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      _("File doesn't exist"));
+                      _("File doesn’t exist"));
     return TRUE;
   }
 
@@ -356,7 +356,7 @@ query_info_cb (GObject      *source_object,
   if (!vol_data)
   {
     g_vfs_job_failed_literal (G_VFS_JOB (job),  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File doesn't exist"));
+                              _("File doesn’t exist"));
     return;
   }
 

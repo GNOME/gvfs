@@ -1085,7 +1085,7 @@ service_resolver_changed (GVfsDnsSdResolver *resolver,
            * - the second %s refers to the service name
            * - the third %s refers to the domain
            */
-                                           _("Error resolving \"%s\" service \"%s\" on domain \"%s\""),
+                                           _("Error resolving “%s” service “%s” on domain “%s”"),
                                            data->resolver->service_type,
                                            data->resolver->service_name,
                                            data->resolver->domain);
@@ -1111,8 +1111,8 @@ service_resolver_timed_out (ResolveData *data)
        * - the third %s refers to the domain
        * - the fourth %s refers to the required TXT keys
        */
-                                       _("Error resolving \"%s\" service \"%s\" on domain \"%s\". "
-                                         "One or more TXT records are missing. Keys required: \"%s\"."),
+                                       _("Error resolving “%s” service “%s” on domain “%s”. "
+                                         "One or more TXT records are missing. Keys required: “%s”."),
                                        data->resolver->service_type,
                                        data->resolver->service_name,
                                        data->resolver->domain,
@@ -1128,7 +1128,7 @@ service_resolver_timed_out (ResolveData *data)
        * - the second %s refers to the service name
        * - the third %s refers to the domain
        */
-                                       _("Timed out resolving \"%s\" service \"%s\" on domain \"%s\""),
+                                       _("Timed out resolving “%s” service “%s” on domain “%s”"),
                                        data->resolver->service_type,
                                        data->resolver->service_name,
                                        data->resolver->domain);

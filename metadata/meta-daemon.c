@@ -159,7 +159,7 @@ handle_set (GVfsMetadata *object,
       g_dbus_method_invocation_return_error (invocation,
                                              G_IO_ERROR,
                                              G_IO_ERROR_NOT_FOUND,
-                                             _("Can't find metadata file %s"),
+                                             _("Can’t find metadata file %s"),
                                              arg_treefile);
       return TRUE;
     }
@@ -235,7 +235,7 @@ handle_remove (GVfsMetadata *object,
       g_dbus_method_invocation_return_error (invocation,
                                              G_IO_ERROR,
                                              G_IO_ERROR_NOT_FOUND,
-                                             _("Can't find metadata file %s"),
+                                             _("Can’t find metadata file %s"),
                                              arg_treefile);
       return TRUE;
     }
@@ -271,7 +271,7 @@ handle_move (GVfsMetadata *object,
       g_dbus_method_invocation_return_error (invocation,
                                              G_IO_ERROR,
                                              G_IO_ERROR_NOT_FOUND,
-                                             _("Can't find metadata file %s"),
+                                             _("Can’t find metadata file %s"),
                                              arg_treefile);
       return TRUE;
     }
@@ -403,7 +403,7 @@ main (int argc, char *argv[])
       /* the second %s is the error message                 */
       g_printerr (_("%s: %s"), g_get_application_name(), error->message);
       g_printerr ("\n");
-      g_printerr (_("Try \"%s --help\" for more information."),
+      g_printerr (_("Try “%s --help” for more information."),
 		  g_get_prgname ());
       g_printerr ("\n");
       g_error_free (error);

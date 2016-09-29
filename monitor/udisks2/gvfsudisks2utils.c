@@ -508,7 +508,7 @@ gvfs_udisks2_utils_spawn_finish (GAsyncResult   *res,
       g_set_error (error,
                    G_IO_ERROR,
                    G_IO_ERROR_TIMED_OUT,
-                   _("Timed out running command-line `%s'"),
+                   _("Timed out running command-line “%s”"),
                    data->command_line);
       goto out;
     }
@@ -674,7 +674,7 @@ unmount_notify_timer_cb (gpointer user_data)
   if (data->generic_text)
     message = g_strdup_printf (_("Unmounting %s\nPlease wait"), name);
   else
-    message = g_strdup_printf (_("Writing data to %s\nDon't unplug until finished"), name);
+    message = g_strdup_printf (_("Writing data to %s\nDon’t unplug until finished"), name);
 
   g_signal_emit_by_name (data->op, "show-unmount-progress",
                          message, -1, -1);

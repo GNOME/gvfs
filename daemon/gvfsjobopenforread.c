@@ -180,7 +180,7 @@ create_reply (GVfsJob *job,
       g_dbus_method_invocation_return_error_literal (invocation,
                                                      G_IO_ERROR,
                                                      G_IO_ERROR_TOO_MANY_OPEN_FILES,
-                                                     _("Couldn't get stream file descriptor"));
+                                                     _("Couldn’t get stream file descriptor"));
       g_object_unref (channel);
       return;
     }

@@ -775,7 +775,7 @@ error_550_permission_or_not_found (GVfsFtpTask *task, gpointer file)
       g_set_error_literal (&task->error,
                            G_IO_ERROR,
                            G_IO_ERROR_NOT_FOUND,
-                           _("File doesn't exist"));
+                           _("File doesn’t exist"));
     }
 }
 
@@ -1169,7 +1169,7 @@ do_query_info (GVfsBackend *backend,
       g_set_error_literal (&task.error,
                            G_IO_ERROR,
                            G_IO_ERROR_NOT_FOUND,
-                           _("File doesn't exist"));
+                           _("File doesn’t exist"));
     }
 
   g_vfs_ftp_task_done (&task);
@@ -1589,7 +1589,7 @@ do_pull_improve_error_message (GVfsFtpTask *task,
 	      if (file_type == G_FILE_TYPE_DIRECTORY)
 		{
 		  g_set_error_literal (&task->error, G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-                                       _("Can't copy directory over directory"));
+                                       _("Can’t copy directory over directory"));
 		  return;
 		}
 	      /* continue to would_recurse error */
@@ -1612,7 +1612,7 @@ do_pull_improve_error_message (GVfsFtpTask *task,
 	}
       
       g_set_error_literal (&task->error, G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                           _("Can't recursively copy directory"));
+                           _("Can’t recursively copy directory"));
     }
 }
 

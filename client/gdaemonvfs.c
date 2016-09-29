@@ -1251,7 +1251,7 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
             {
               g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                            _("Error setting file metadata: %s"),
-                           _("can't open metadata tree"));
+                           _("can’t open metadata tree"));
               res = FALSE;
               error = NULL; /* Don't set further errors */
             }
@@ -1262,7 +1262,7 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
 		{
 		  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			       _("Error setting file metadata: %s"),
-			       _("can't get metadata proxy"));
+			       _("can’t get metadata proxy"));
 		  res = FALSE;
 		  error = NULL; /* Don't set further errors */
 		}

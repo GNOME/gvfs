@@ -258,13 +258,13 @@ certificate_flags_to_string (GTlsCertificateFlags errors)
   if (errors & G_TLS_CERTIFICATE_BAD_IDENTITY)
     g_string_append_printf (reason, "\n\t%s", _("The certificate does not match the identity of the site."));
   if (errors & G_TLS_CERTIFICATE_NOT_ACTIVATED)
-    g_string_append_printf (reason, "\n\t%s", _("The certificate's activation time is in the future."));
+    g_string_append_printf (reason, "\n\t%s", _("The certificate’s activation time is in the future."));
   if (errors & G_TLS_CERTIFICATE_EXPIRED)
     g_string_append_printf (reason, "\n\t%s", _("The certificate has expired."));
   if (errors & G_TLS_CERTIFICATE_REVOKED)
     g_string_append_printf (reason, "\n\t%s", _("The certificate has been revoked."));
   if (errors & G_TLS_CERTIFICATE_INSECURE)
-    g_string_append_printf (reason, "\n\t%s", _("The certificate's algorithm is considered insecure."));
+    g_string_append_printf (reason, "\n\t%s", _("The certificate’s algorithm is considered insecure."));
   if (errors & G_TLS_CERTIFICATE_GENERIC_ERROR)
     g_string_append_printf (reason, "\n\t%s", _("Error occurred when validating the certificate."));
 
@@ -338,7 +338,7 @@ gvfs_accept_certificate (GMountSource *mount_source,
 
   certificate_str = certificate_to_string (certificate);
   reason = certificate_flags_to_string (errors);
-  message = g_strdup_printf (_("The site's identity can't be verified:"
+  message = g_strdup_printf (_("The site’s identity can’t be verified:"
                                "%s\n\n"
                                "%s\n\n"
                                "Are you really sure you would like to continue?"),

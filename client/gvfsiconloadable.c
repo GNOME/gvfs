@@ -124,7 +124,7 @@ g_vfs_icon_load (GLoadableIcon  *icon,
       (fd = g_unix_fd_list_get (fd_list, g_variant_get_handle (fd_id_val), NULL)) == -1)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                           _("Didn't get stream file descriptor"));
+                           _("Didn’t get stream file descriptor"));
       return NULL;
     }
 
@@ -298,7 +298,7 @@ open_icon_read_cb (GVfsDBusMount *proxy,
     {
       g_simple_async_result_set_error (data->result,
                                        G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       _("Couldn't get stream file descriptor"));
+                                       _("Couldn’t get stream file descriptor"));
     }
   else
     {

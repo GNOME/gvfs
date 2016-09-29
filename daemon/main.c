@@ -147,7 +147,7 @@ main (int argc, char *argv[])
   GOptionContext *context;
   const GOptionEntry options[] = {
     { "replace", 'r', 0, G_OPTION_ARG_NONE, &replace,  N_("Replace old daemon."), NULL },
-    { "no-fuse", 0, 0, G_OPTION_ARG_NONE, &no_fuse,  N_("Don't start fuse."), NULL },
+    { "no-fuse", 0, 0, G_OPTION_ARG_NONE, &no_fuse,  N_("Don’t start fuse."), NULL },
     { "debug", 'd', 0, G_OPTION_ARG_NONE, &debugging,  N_("Enable debug output."), NULL },
     { "version", 0, 0, G_OPTION_ARG_NONE, &show_version, N_("Show program version."), NULL},
     { NULL }
@@ -187,7 +187,7 @@ main (int argc, char *argv[])
       /* the second %s is the error message                 */
       g_printerr (_("%s: %s"), g_get_application_name(), error->message);
       g_printerr ("\n");
-      g_printerr (_("Try \"%s --help\" for more information."),
+      g_printerr (_("Try “%s --help” for more information."),
                   g_get_prgname ());
       g_printerr ("\n");
       g_error_free (error);

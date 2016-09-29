@@ -1802,7 +1802,7 @@ do_open_for_read_real (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_IS_DIRECTORY,
-                        _("Can't open directory"));
+                        _("Can’t open directory"));
       goto out;
     }
 
@@ -1901,7 +1901,7 @@ do_open_icon_for_read (GVfsBackend *backend,
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR,
                         G_IO_ERROR_INVALID_ARGUMENT,
-                        _("Malformed icon identifier '%s'"),
+                        _("Malformed icon identifier “%s”"),
                         icon_id);
     }
 }
@@ -2815,7 +2815,7 @@ do_delete (GVfsBackend *backend,
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_EMPTY,
-                            _("Directory '%s' is not empty"), filename);
+                            _("Directory “%s” is not empty"), filename);
           goto out;
         }
       else
@@ -2905,7 +2905,7 @@ do_create_internal (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_IS_DIRECTORY,
-                        _("Can't write to directory"));
+                        _("Can’t write to directory"));
       goto out;
     }
 
