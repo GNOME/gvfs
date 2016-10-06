@@ -752,12 +752,14 @@ should_include_volume_check_mount_points (GVfsUDisks2VolumeMonitor *monitor,
       mount_entry = g_unix_mount_at (mount_point, NULL);
       if (mount_entry != NULL)
         {
-          if (!should_include_mount (monitor, mount_entry))
+          if (should_include_mount (monitor, mount_entry))
             {
               g_unix_mount_free (mount_entry);
-              ret = FALSE;
+              ret = TRUE;
               goto out;
             }
+
+          ret = FALSE;
           g_unix_mount_free (mount_entry);
         }
     }
