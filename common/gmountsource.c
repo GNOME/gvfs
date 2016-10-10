@@ -165,39 +165,32 @@ ask_password_data_free (gpointer _data)
 
 static GVfsDBusMountOperation *
 create_mount_operation_proxy_sync (GMountSource        *source,
-                                   GAsyncReadyCallback  callback,
-                                   gpointer             user_data)
+                                   GError             **error)
 {
   GVfsDBusMountOperation *proxy;
-  GError *error;
+  GError *local_error;
 
   /* If no dbus id specified, reply that we weren't handled */
   if (source->dbus_id[0] == 0)
     { 
-      if (callback != NULL)
-        g_simple_async_report_error_in_idle (G_OBJECT (source),
-                                             callback,
-                                             user_data,
-                                             G_IO_ERROR, G_IO_ERROR_FAILED, 
-                                             "Internal Error"); 
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED, "Internal Error");
       return NULL;
     }
 
-  error = NULL;
+  local_error = NULL;
   /* Synchronously creating a proxy using unique/private d-bus name and not loading properties or connecting signals should not block */
   proxy = gvfs_dbus_mount_operation_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
                                                             G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                                             source->dbus_id,
                                                             source->obj_path,
                                                             NULL,
-                                                            &error);
+                                                            &local_error);
   if (proxy == NULL)
-    if (callback != NULL)
-      g_simple_async_report_take_gerror_in_idle (G_OBJECT (source),
-                                                 callback,
-                                                 user_data,
-                                                 error);
-  
+    {
+      g_dbus_error_strip_remote_error (local_error);
+      g_propagate_error (error, local_error);
+    }
+
   return proxy;
 }
 
@@ -207,18 +200,15 @@ ask_password_reply (GVfsDBusMountOperation *proxy,
                     GAsyncResult *res,
                     gpointer user_data)
 {
-  GSimpleAsyncResult *result;
+  GTask *task;
   AskPasswordData *data;
   gboolean handled, aborted, anonymous;
   guint32 password_save;
   gchar *password, *username, *domain;
   GError *error;
 
-  result = G_SIMPLE_ASYNC_RESULT (user_data);
+  task = G_TASK (user_data);
   handled = TRUE;
-
-  data = g_new0 (AskPasswordData, 1);
-  g_simple_async_result_set_op_res_gpointer (result, data, ask_password_data_free);
 
   error = NULL;
   if (!gvfs_dbus_mount_operation_call_ask_password_finish (proxy,
@@ -232,12 +222,16 @@ ask_password_reply (GVfsDBusMountOperation *proxy,
                                                            res,
                                                            &error))
     {
-      data->aborted = TRUE;
       g_dbus_error_strip_remote_error (error);
-      g_simple_async_result_take_error (result, error);
+      g_task_return_error (task, error);
+    }
+  else if (handled == FALSE)
+    {
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED, "Internal Error");
     }
   else
     {
+      data = g_new0 (AskPasswordData, 1);
       data->aborted = aborted;
 
       if (!anonymous)
@@ -249,19 +243,15 @@ ask_password_reply (GVfsDBusMountOperation *proxy,
       data->password_save = (GPasswordSave)password_save;
       data->anonymous = anonymous;
 
+      g_task_return_pointer (task, data, ask_password_data_free);
+
       /* TODO: handle more args */
       g_free (password);
       g_free (username);
       g_free (domain);
     }
 
-  if (handled == FALSE)
-    {
-      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED, "Internal Error");
-    }
-  
-  g_simple_async_result_complete (result);
-  g_object_unref (result);
+  g_object_unref (task);
 }
 
 void
@@ -273,19 +263,24 @@ g_mount_source_ask_password_async (GMountSource              *source,
                                    GAsyncReadyCallback        callback,
                                    gpointer                   user_data)
 {
-  GSimpleAsyncResult *result;
+  GTask *task;
   GVfsDBusMountOperation *proxy;
-  
-  proxy = create_mount_operation_proxy_sync (source, callback, user_data);
+  GError *error = NULL;
+
+  task = g_task_new (source, NULL, callback, user_data);
+  g_task_set_source_tag (task, g_mount_source_ask_password_async);
+
+  proxy = create_mount_operation_proxy_sync (source, &error);
   if (proxy == NULL)
-    return;
+    {
+      g_task_return_error (task, error);
+      g_object_unref (task);
+      return;
+    }
 
   /* 30 minute timeout */
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_VFS_DBUS_MOUNT_TIMEOUT_MSECS);
 
-  result = g_simple_async_result_new (G_OBJECT (source), callback, user_data, 
-                                      g_mount_source_ask_password_async);
-  
   gvfs_dbus_mount_operation_call_ask_password (proxy,
                                                message_string ? message_string : "",
                                                default_user ? default_user : "",
@@ -293,7 +288,7 @@ g_mount_source_ask_password_async (GMountSource              *source,
                                                flags,
                                                NULL,
                                                (GAsyncReadyCallback) ask_password_reply,
-                                               result);
+                                               task);
   g_object_unref (proxy);
 }
 
@@ -330,14 +325,13 @@ g_mount_source_ask_password_finish (GMountSource  *source,
 				    GPasswordSave *password_save_out)
 {
   AskPasswordData *data, def = { TRUE, };
-  GSimpleAsyncResult *simple;
 
-  simple = G_SIMPLE_ASYNC_RESULT (result);
+  g_return_val_if_fail (g_task_is_valid (result, source), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, g_mount_source_ask_password_async), FALSE);
 
-  if (g_simple_async_result_propagate_error (simple, NULL))
+  data = g_task_propagate_pointer (G_TASK (result), NULL);
+  if (data == NULL)
     data = &def;
-  else
-    data = (AskPasswordData *) g_simple_async_result_get_op_res_gpointer (simple);
 
   if (aborted)
     *aborted = data->aborted;
@@ -521,17 +515,14 @@ ask_question_reply (GVfsDBusMountOperation *proxy,
                     GAsyncResult *res,
                     gpointer user_data)
 {
-  GSimpleAsyncResult *result;
+  GTask *task;
   AskQuestionData *data;
   gboolean handled, aborted;
   guint32 choice;
   GError *error;
-  
-  result = G_SIMPLE_ASYNC_RESULT (user_data);
-  handled = TRUE;
 
-  data = g_new0 (AskQuestionData, 1);
-  g_simple_async_result_set_op_res_gpointer (result, data, g_free);
+  task = G_TASK (user_data);
+  handled = TRUE;
 
   error = NULL;
   if (!gvfs_dbus_mount_operation_call_ask_question_finish (proxy,
@@ -541,23 +532,23 @@ ask_question_reply (GVfsDBusMountOperation *proxy,
                                                            res,
                                                            &error))
     {
-      data->aborted = TRUE;
       g_dbus_error_strip_remote_error (error);
-      g_simple_async_result_take_error (result, error);
+      g_task_return_error (task, error);
+    }
+  else if (handled == FALSE)
+    {
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED, "Internal Error");
     }
   else
     {
+      data = g_new0 (AskQuestionData, 1);
       data->aborted = aborted;
       data->choice = choice;
+
+      g_task_return_pointer (task, data, g_free);
     }
 
-  if (handled == FALSE)
-    {
-      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED, "Internal Error");
-    }
-
-  g_simple_async_result_complete (result);
-  g_object_unref (result);
+  g_object_unref (task);
 }
 
 gboolean
@@ -611,25 +602,30 @@ g_mount_source_ask_question_async (GMountSource       *source,
 				   GAsyncReadyCallback callback,
 				   gpointer            user_data)
 {
-  GSimpleAsyncResult *result;
+  GTask *task;
   GVfsDBusMountOperation *proxy;
-  
-  proxy = create_mount_operation_proxy_sync (source, callback, user_data);
+  GError *error = NULL;
+
+  task = g_task_new (source, NULL, callback, user_data);
+  g_task_set_source_tag (task, g_mount_source_ask_question_async);
+
+  proxy = create_mount_operation_proxy_sync (source, &error);
   if (proxy == NULL)
-    return;
+    {
+      g_task_return_error (task, error);
+      g_object_unref (task);
+      return;
+    }
 
   /* 30 minute timeout */
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_VFS_DBUS_MOUNT_TIMEOUT_MSECS);
 
-  result = g_simple_async_result_new (G_OBJECT (source), callback, user_data, 
-                                      g_mount_source_ask_question_async);
-  
   gvfs_dbus_mount_operation_call_ask_question (proxy,
                                                message_string ? message_string : "",
                                                choices,   
                                                NULL,
                                                (GAsyncReadyCallback) ask_question_reply,
-                                               result);
+                                               task);
   g_object_unref (proxy);
 }
 
@@ -640,14 +636,13 @@ g_mount_source_ask_question_finish (GMountSource *source,
 				    gint         *choice_out)
 {
   AskQuestionData *data, def= { FALSE, };
-  GSimpleAsyncResult *simple;
 
-  simple = G_SIMPLE_ASYNC_RESULT (result);
+  g_return_val_if_fail (g_task_is_valid (result, source), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, g_mount_source_ask_question_async), FALSE);
 
-  if (g_simple_async_result_propagate_error (simple, NULL))
+  data = g_task_propagate_pointer (G_TASK (result), NULL);
+  if (data == NULL)
     data = &def;
-  else
-    data = (AskQuestionData *) g_simple_async_result_get_op_res_gpointer (simple);
 
   if (aborted)
     *aborted = data->aborted;
@@ -721,19 +716,15 @@ show_processes_reply (GVfsDBusMountOperation *proxy,
                       GAsyncResult *res,
                       gpointer user_data)
 {
-  GSimpleAsyncResult *result;
+  GTask *task;
   ShowProcessesData *data;
   gboolean handled, aborted;
   guint32 choice;
   GError *error;
-  
-  result = G_SIMPLE_ASYNC_RESULT (user_data);
+
+  task = G_TASK (user_data);
   handled = TRUE;
 
-  data = g_new0 (ShowProcessesData, 1);
-  g_simple_async_result_set_op_res_gpointer (result, data, g_free);
-
-  
   error = NULL;
   if (!gvfs_dbus_mount_operation_call_show_processes_finish (proxy,
                                                              &handled,
@@ -742,23 +733,23 @@ show_processes_reply (GVfsDBusMountOperation *proxy,
                                                              res,
                                                              &error))
     {
-      data->aborted = TRUE;
       g_dbus_error_strip_remote_error (error);
-      g_simple_async_result_take_error (result, error);
+      g_task_return_error (task, error);
+    }
+  else if (handled == FALSE)
+    {
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED, "Internal Error");
     }
   else
     {
+      data = g_new0 (ShowProcessesData, 1);
       data->aborted = aborted;
       data->choice = choice;
+
+      g_task_return_pointer (task, data, g_free);
     }
 
-  if (handled == FALSE)
-    {
-      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED, "Internal Error");
-    }
-
-  g_simple_async_result_complete (result);
-  g_object_unref (result);
+  g_object_unref (task);
 }
 
 void
@@ -769,21 +760,26 @@ g_mount_source_show_processes_async (GMountSource        *source,
                                      GAsyncReadyCallback  callback,
                                      gpointer             user_data)
 {
-  GSimpleAsyncResult *result;
+  GTask *task;
   GVfsDBusMountOperation *proxy;
   GVariantBuilder builder;
   guint i;
-  
-  proxy = create_mount_operation_proxy_sync (source, callback, user_data);
+  GError *error = NULL;
+
+  task = g_task_new (source, NULL, callback, user_data);
+  g_task_set_source_tag (task, g_mount_source_show_processes_async);
+
+  proxy = create_mount_operation_proxy_sync (source, &error);
   if (proxy == NULL)
-    return;
+    {
+      g_task_return_error (task, error);
+      g_object_unref (task);
+      return;
+    }
 
   /* 30 minute timeout */
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_VFS_DBUS_MOUNT_TIMEOUT_MSECS);
 
-  result = g_simple_async_result_new (G_OBJECT (source), callback, user_data,
-                                      g_mount_source_show_processes_async);
-  
   g_variant_builder_init (&builder, G_VARIANT_TYPE ("ai"));
   for (i = 0; i < processes->len; i++)
     g_variant_builder_add (&builder, "i", 
@@ -795,7 +791,7 @@ g_mount_source_show_processes_async (GMountSource        *source,
                                                  g_variant_builder_end (&builder),
                                                  NULL,
                                                  (GAsyncReadyCallback) show_processes_reply,
-                                                 result);
+                                                 task);
   g_object_unref (proxy);
 }
 
@@ -806,14 +802,13 @@ g_mount_source_show_processes_finish (GMountSource *source,
                                       gint         *choice_out)
 {
   ShowProcessesData *data, def= { FALSE, };
-  GSimpleAsyncResult *simple;
 
-  simple = G_SIMPLE_ASYNC_RESULT (result);
+  g_return_val_if_fail (g_task_is_valid (result, source), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, g_mount_source_show_processes_async), FALSE);
 
-  if (g_simple_async_result_propagate_error (simple, NULL))
+  data = g_task_propagate_pointer (G_TASK (result), NULL);
+  if (data == NULL)
     data = &def;
-  else
-    data = (ShowProcessesData *) g_simple_async_result_get_op_res_gpointer (simple);
 
   if (aborted)
     *aborted = data->aborted;
@@ -951,7 +946,7 @@ g_mount_source_show_unmount_progress (GMountSource *source,
       return;
     }
   
-  proxy = create_mount_operation_proxy_sync (source, NULL, NULL);
+  proxy = create_mount_operation_proxy_sync (source, NULL);
   if (proxy == NULL)
     return;
 
@@ -995,7 +990,7 @@ g_mount_source_abort (GMountSource *source)
 {
   GVfsDBusMountOperation *proxy;
 
-  proxy = create_mount_operation_proxy_sync (source, NULL, NULL);
+  proxy = create_mount_operation_proxy_sync (source, NULL);
   if (proxy == NULL)
     return FALSE;
   
