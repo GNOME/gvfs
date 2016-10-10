@@ -635,7 +635,7 @@ g_mount_source_ask_question_finish (GMountSource *source,
 				    gboolean     *aborted,
 				    gint         *choice_out)
 {
-  AskQuestionData *data, def= { FALSE, };
+  AskQuestionData *data, def = { TRUE, };
 
   g_return_val_if_fail (g_task_is_valid (result, source), FALSE);
   g_return_val_if_fail (g_async_result_is_tagged (result, g_mount_source_ask_question_async), FALSE);
@@ -801,7 +801,7 @@ g_mount_source_show_processes_finish (GMountSource *source,
                                       gboolean     *aborted,
                                       gint         *choice_out)
 {
-  ShowProcessesData *data, def= { FALSE, };
+  ShowProcessesData *data, def = { TRUE, };
 
   g_return_val_if_fail (g_task_is_valid (result, source), FALSE);
   g_return_val_if_fail (g_async_result_is_tagged (result, g_mount_source_show_processes_async), FALSE);
