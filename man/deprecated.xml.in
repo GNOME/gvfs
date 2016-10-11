@@ -7,6 +7,13 @@
         <refentryinfo>
                 <title>@original@</title>
                 <productname>gvfs</productname>
+
+                <author>
+                        <contrib>Developer</contrib>
+                        <firstname>Ondrej</firstname>
+                        <surname>Holy</surname>
+                        <email>oholy@redhat.com</email>
+                </author>
         </refentryinfo>
 
         <refmeta>
