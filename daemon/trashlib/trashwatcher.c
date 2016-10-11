@@ -68,6 +68,12 @@ decide_watch_type (GUnixMountEntry *mount,
   const gchar *fs_type;
   const gchar *mount_path;
 
+  /* Let's assume that home trash is trusted if mount wasn't found.
+   * https://bugzilla.gnome.org/show_bug.cgi?id=747540
+   */
+  if (mount == NULL)
+    return TRASH_WATCHER_TRUSTED;
+
   mount_path = g_unix_mount_get_mount_path (mount);
 
   /* Do not care about mount points without read access to avoid polling, see:
@@ -113,10 +119,15 @@ find_mount_entry_for_file (GFile *file)
 
   g_free (pathname);
 
-  /* if the GUnixMount stuff is gummed up, this might fail.  we can't
-   * really proceed, since decide_watch_type() needs to know this.
+  /* Entry might not be found e.g. for bind mounts, btrfs subvolumes...
+   * https://bugzilla.gnome.org/show_bug.cgi?id=747540
    */
-  g_assert (entry != NULL);
+  if (entry == NULL)
+    {
+      pathname = g_file_get_path (file);
+      g_warning ("Mount entry was not found for %s", pathname);
+      g_free (pathname);
+    }
 
   return entry;
 }
@@ -277,7 +288,8 @@ trash_watcher_new (TrashRoot *root)
                                              g_get_user_data_dir (),
                                              "Trash/files");
 
-  g_unix_mount_free (homedir_mount);
+  if (homedir_mount)
+    g_unix_mount_free (homedir_mount);
   g_object_unref (homedir_trashdir);
   g_object_unref (user_datadir);
 
