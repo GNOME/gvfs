@@ -804,6 +804,12 @@ g_vfs_backend_dns_sd_finalize (GObject *object)
   remove_browsers (backend);
   g_list_free_full (backend->resolvers, (GDestroyNotify)avahi_service_resolver_free);
 
+  if (dnssd_backends == NULL && global_client)
+    {
+      avahi_client_free (global_client);
+      global_client = NULL;
+    }
+
   if (backend->mount_spec)
     g_mount_spec_unref (backend->mount_spec);
   
