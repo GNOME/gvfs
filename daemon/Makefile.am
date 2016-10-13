@@ -396,6 +396,7 @@ gvfsd_dnssd_SOURCES = \
 gvfsd_dnssd_CPPFLAGS = \
 	$(flags) \
 	-DBACKEND_HEADER=gvfsbackenddnssd.h \
+	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint_dnssd \
 	-DDEFAULT_BACKEND_TYPE=dns-sd \
 	-DMAX_JOB_THREADS=1 \
 	$(AVAHI_CFLAGS) \
