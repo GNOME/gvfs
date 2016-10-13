@@ -140,6 +140,7 @@ G_DEFINE_TYPE (GVfsBackendDnsSd, g_vfs_backend_dns_sd, G_VFS_TYPE_BACKEND)
 
 static void add_browsers (GVfsBackendDnsSd *backend);
 static void remove_browsers (GVfsBackendDnsSd *backend);
+static void remove_resolvers (GVfsBackendDnsSd *backend);
 static AvahiClient *get_global_avahi_client (void);
 
 /* Callback for state changes on the Client */
@@ -157,7 +158,8 @@ avahi_client_callback (AvahiClient *client, AvahiClientState state, void *userda
 	{
 	  /* Remove the service browsers from the handles */
 	  g_list_foreach (dnssd_backends, (GFunc)remove_browsers, NULL);
-	  
+	  g_list_foreach (dnssd_backends, (GFunc)remove_resolvers, NULL);
+
 	  /* Destroy old client */
 	  avahi_client_free (client);
 	  global_client = NULL;
@@ -702,6 +704,13 @@ remove_browsers (GVfsBackendDnsSd *backend)
   backend->browsers = NULL;
 }
 
+static void
+remove_resolvers (GVfsBackendDnsSd *backend)
+{
+  g_list_free_full (backend->resolvers, (GDestroyNotify)avahi_service_resolver_free);
+  backend->resolvers = NULL;
+}
+
 static gboolean
 try_mount (GVfsBackend *backend,
            GVfsJobMount *job,
@@ -802,7 +811,7 @@ g_vfs_backend_dns_sd_finalize (GObject *object)
   dnssd_backends = g_list_remove (dnssd_backends, backend);
 
   remove_browsers (backend);
-  g_list_free_full (backend->resolvers, (GDestroyNotify)avahi_service_resolver_free);
+  remove_resolvers (backend);
 
   if (backend->mount_spec)
     g_mount_spec_unref (backend->mount_spec);
