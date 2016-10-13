@@ -700,7 +700,7 @@ add_browsers (GVfsBackendDnsSd *backend)
 static void
 remove_browsers (GVfsBackendDnsSd *backend)
 {
-  g_list_free (backend->browsers);
+  g_list_free_full (backend->browsers, (GDestroyNotify)avahi_service_browser_free);
   backend->browsers = NULL;
 }
 
