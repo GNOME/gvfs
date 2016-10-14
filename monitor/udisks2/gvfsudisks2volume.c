@@ -845,11 +845,6 @@ gvfs_udisks2_volume_is_network_class (GVfsUDisks2Volume *volume)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* can remove this once we depend on gio >= 2.31.19 */
-#ifndef G_VOLUME_IDENTIFIER_KIND_CLASS
-#define G_VOLUME_IDENTIFIER_KIND_CLASS "class"
-#endif
-
 static gchar *
 gvfs_udisks2_volume_get_identifier (GVolume      *_volume,
                                     const gchar  *kind)
