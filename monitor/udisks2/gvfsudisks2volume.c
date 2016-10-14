@@ -237,6 +237,7 @@ update_volume (GVfsUDisks2Volume *volume)
   gboolean old_should_automount;
   gchar *old_name;
   gchar *old_device_file;
+  gchar *old_uuid;
   dev_t old_dev;
   GIcon *old_icon;
   UDisksDrive *udisks_drive;
@@ -251,6 +252,7 @@ update_volume (GVfsUDisks2Volume *volume)
   old_should_automount = volume->should_automount;
   old_name = g_strdup (volume->name);
   old_device_file = g_strdup (volume->device_file);
+  old_uuid = g_strdup (volume->uuid);
   old_dev = volume->dev;
   old_icon = volume->icon != NULL ? g_object_ref (volume->icon) : NULL;
 
@@ -260,6 +262,7 @@ update_volume (GVfsUDisks2Volume *volume)
   volume->can_mount = volume->should_automount = FALSE;
   g_free (volume->name); volume->name = NULL;
   g_free (volume->device_file); volume->device_file = NULL;
+  g_free (volume->uuid); volume->uuid = NULL;
   volume->dev = 0;
   g_clear_object (&volume->icon);
   g_clear_object (&volume->symbolic_icon);
@@ -289,6 +292,7 @@ update_volume (GVfsUDisks2Volume *volume)
 
       volume->dev = udisks_block_get_device_number (block);
       volume->device_file = udisks_block_dup_device (block);
+      volume->uuid = udisks_block_dup_id_uuid (block);
 
       if (strlen (udisks_block_get_id_label (block)) > 0)
         {
@@ -562,6 +566,7 @@ update_volume (GVfsUDisks2Volume *volume)
               (old_should_automount == volume->should_automount) &&
               (g_strcmp0 (old_name, volume->name) == 0) &&
               (g_strcmp0 (old_device_file, volume->device_file) == 0) &&
+              (g_strcmp0 (old_uuid, volume->uuid) == 0) &&
               (old_dev == volume->dev) &&
               g_icon_equal (old_icon, volume->icon)
               );
@@ -571,6 +576,7 @@ update_volume (GVfsUDisks2Volume *volume)
 
   g_free (old_name);
   g_free (old_device_file);
+  g_free (old_uuid);
   if (old_icon != NULL)
     g_object_unref (old_icon);
 
