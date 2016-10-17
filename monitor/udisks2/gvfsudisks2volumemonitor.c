@@ -700,9 +700,6 @@ should_include_mount (GVfsUDisks2VolumeMonitor  *monitor,
   GUnixMountPoint *mount_point;
   gboolean ret;
 
-  if (g_unix_mount_is_system_internal (mount_entry))
-    return FALSE;
-
   /* if mounted at the designated mount point, use that info to decide */
   mount_point = get_mount_point_for_mount (mount_entry);
   if (mount_point != NULL)
