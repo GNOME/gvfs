@@ -583,9 +583,7 @@ get_mount_point_for_mount (GUnixMountEntry *mount_entry)
     {
       GUnixMountPoint *mount_point = l->data;
       if (g_strcmp0 (g_unix_mount_get_mount_path (mount_entry),
-                     g_unix_mount_point_get_mount_path (mount_point)) == 0 &&
-          g_strcmp0 (g_unix_mount_get_device_path (mount_entry),
-                     g_unix_mount_point_get_device_path (mount_point)) == 0)
+                     g_unix_mount_point_get_mount_path (mount_point)) == 0)
         {
           ret = mount_point;
           goto out;
