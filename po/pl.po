@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-10-03 14:33+0000\n"
-"PO-Revision-Date: 2016-10-18 21:45+0200\n"
+"POT-Creation-Date: 2016-10-19 11:16+0000\n"
+"PO-Revision-Date: 2016-10-19 18:29+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -84,7 +84,7 @@ msgstr "Nieobsługiwane działanie"
 #: client/gdaemonfileoutputstream.c:546 client/gdaemonfileoutputstream.c:724
 #: client/gdaemonfileoutputstream.c:919 client/gdaemonfileoutputstream.c:1085
 #: client/gdaemonfileoutputstream.c:1267 client/gvfsdaemondbus.c:631
-#: daemon/gvfsbackendsftp.c:5236 daemon/gvfsbackendsmb.c:1258
+#: daemon/gvfsbackendsftp.c:5236 daemon/gvfsbackendsmb.c:1126
 #: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
 #: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:346
 #: daemon/gvfsftptask.c:224 monitor/gdu/ggdumount.c:1072
@@ -377,7 +377,7 @@ msgstr "Brak uprawnień"
 #: daemon/gvfsbackendafpbrowse.c:327 daemon/gvfsbackendafpbrowse.c:359
 #: daemon/gvfsbackendarchive.c:737 daemon/gvfsbackendarchive.c:792
 #: daemon/gvfsbackendarchive.c:844 daemon/gvfsbackendarchive.c:873
-#: daemon/gvfsbackendcdda.c:1024 daemon/gvfsbackendcomputer.c:639
+#: daemon/gvfsbackendcdda.c:902 daemon/gvfsbackendcomputer.c:639
 #: daemon/gvfsbackenddnssd.c:423 daemon/gvfsbackendftp.c:778
 #: daemon/gvfsbackendftp.c:1172 daemon/gvfsbackendmtp.c:1659
 #: daemon/gvfsbackendmtp.c:1675 daemon/gvfsbackendmtp.c:2129
@@ -446,7 +446,7 @@ msgstr "Brak miejsca na woluminie"
 #: daemon/gvfsbackendgoogle.c:1834 daemon/gvfsbackendgoogle.c:2487
 #: daemon/gvfsbackendmtp.c:1605 daemon/gvfsbackendmtp.c:1737
 #: daemon/gvfsbackendmtp.c:2063 daemon/gvfsbackendnfs.c:2488
-#: daemon/gvfsbackendsftp.c:4832 daemon/gvfsbackendsmb.c:2202
+#: daemon/gvfsbackendsftp.c:4832 daemon/gvfsbackendsmb.c:2070
 msgid "Target file already exists"
 msgstr "Plik docelowy już istnieje"
 
@@ -629,7 +629,7 @@ msgstr "Anuluj"
 #: daemon/gvfsbackendafc.c:465 daemon/gvfsbackendarchive.c:638
 #: daemon/gvfsbackendarchive.c:667 daemon/gvfsbackenddav.c:1861
 #: daemon/gvfsbackendgoogle.c:1664 daemon/gvfsbackendhttp.c:256
-#: daemon/gvfsbackendsmb.c:724
+#: daemon/gvfsbackendsmb.c:592
 msgid "Invalid mount spec"
 msgstr "Nieprawidłowa specyfikacja montowania"
 
@@ -692,9 +692,9 @@ msgstr ""
 
 #: daemon/gvfsbackendafc.c:1105 daemon/gvfsbackendarchive.c:745
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2187
-#: daemon/gvfsbackendgphoto2.c:1805 daemon/gvfsbackendmtp.c:2282
+#: daemon/gvfsbackendgphoto2.c:1492 daemon/gvfsbackendmtp.c:2282
 #: daemon/gvfsbackendnfs.c:347 daemon/gvfsbackendrecent.c:122
-#: daemon/gvfsbackendsmb.c:814 daemon/gvfsbackendtrash.c:234
+#: daemon/gvfsbackendsmb.c:682 daemon/gvfsbackendtrash.c:234
 msgid "Can’t open directory"
 msgstr "Nie można otworzyć katalogu"
 
@@ -702,8 +702,8 @@ msgstr "Nie można otworzyć katalogu"
 msgid "Backups are not yet supported."
 msgstr "Kopie zapasowe nie są jeszcze obsługiwane."
 
-#: daemon/gvfsbackendafc.c:1487 daemon/gvfsbackendsmb.c:875
-#: daemon/gvfsbackendsmb.c:1354
+#: daemon/gvfsbackendafc.c:1487 daemon/gvfsbackendsmb.c:743
+#: daemon/gvfsbackendsmb.c:1222
 msgid "Unsupported seek type"
 msgstr "Nieobsługiwany typ wyszukiwania"
 
@@ -723,7 +723,7 @@ msgstr "Nieobsługiwany typ wyszukiwania"
 #: daemon/gvfsbackendmtp.c:2444 daemon/gvfsbackendmtp.c:2515
 #: daemon/gvfsbackendmtp.c:2603 daemon/gvfsbackendmtp.c:2671
 #: daemon/gvfsbackendnfs.c:2370 daemon/gvfsbackendsftp.c:2137
-#: daemon/gvfsbackendsftp.c:5200 daemon/gvfsbackendsmb.c:1846
+#: daemon/gvfsbackendsftp.c:5200 daemon/gvfsbackendsmb.c:1714
 #: daemon/gvfsftptask.c:431
 msgid "Operation unsupported"
 msgstr "Nieobsługiwane działanie"
@@ -754,8 +754,8 @@ msgstr "To nie jest montowalny plik"
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: daemon/gvfsbackendafpbrowse.c:461 daemon/gvfsbackendafp.c:2104
 #: daemon/gvfsbackendftp.c:672 daemon/gvfsbackendnfs.c:281
-#: daemon/gvfsbackendsftp.c:1994 daemon/gvfsbackendsmb.c:591
-#: daemon/gvfsbackendsmb.c:1528
+#: daemon/gvfsbackendsftp.c:1994 daemon/gvfsbackendsmb.c:461
+#: daemon/gvfsbackendsmb.c:1396
 #, c-format
 msgid "%s on %s"
 msgstr "%s na %s"
@@ -793,7 +793,7 @@ msgstr "Nie można rekursywnie skopiować katalogu"
 
 #: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2867
 #: daemon/gvfsbackendnfs.c:2472 daemon/gvfsbackendsftp.c:4818
-#: daemon/gvfsbackendsmb.c:2191
+#: daemon/gvfsbackendsmb.c:2059
 msgid "Can’t move directory over directory"
 msgstr "Nie można przenieść katalogu na katalog"
 
@@ -808,7 +808,7 @@ msgstr "Nie można utworzyć pliku tymczasowego (%s)"
 
 #: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2468
 #: daemon/gvfsbackendnfs.c:1175 daemon/gvfsbackendsftp.c:3772
-#: daemon/gvfsbackendsmb.c:1227
+#: daemon/gvfsbackendsmb.c:1095
 msgid "The file was externally modified"
 msgstr "Plik został zmodyfikowany z zewnątrz"
 
@@ -857,8 +857,8 @@ msgstr "Nie można utworzyć tymczasowego katalogu"
 #: daemon/gvfsbackendburn.c:716 daemon/gvfsbackendburn.c:742
 #: daemon/gvfsbackendburn.c:780 daemon/gvfsbackendburn.c:971
 #: daemon/gvfsbackendburn.c:1007 daemon/gvfsbackendftp.c:835
-#: daemon/gvfsbackendgoogle.c:650 daemon/gvfsbackendgphoto2.c:1203
-#: daemon/gvfsbackendgphoto2.c:2126 daemon/gvfsbackendgphoto2.c:2845
+#: daemon/gvfsbackendgoogle.c:650 daemon/gvfsbackendgphoto2.c:937
+#: daemon/gvfsbackendgphoto2.c:1813 daemon/gvfsbackendgphoto2.c:2532
 #: daemon/gvfsbackendrecent.c:106 daemon/gvfsbackendrecent.c:287
 #: daemon/gvfsbackendsftp.c:2141 daemon/gvfsbackendsftp.c:3306
 #: daemon/gvfsbackendsftp.c:3319 daemon/gvfsbackendsftp.c:3339
@@ -879,7 +879,7 @@ msgstr "Asystent CD/DVD"
 #: daemon/gvfsbackendburn.c:752 daemon/gvfsbackendburn.c:788
 #: daemon/gvfsbackendburn.c:923 daemon/gvfsbackendburn.c:985
 #: daemon/gvfsbackendburn.c:989 daemon/gvfsbackendburn.c:999
-#: daemon/gvfsbackendgphoto2.c:2919
+#: daemon/gvfsbackendgphoto2.c:2606
 msgid "File exists"
 msgstr "Plik istnieje"
 
@@ -905,7 +905,7 @@ msgstr "Plik istnieje"
 #: daemon/gvfsjobwrite.c:123 monitor/gdu/ggdumount.c:1176
 #: monitor/gdu/ggdumount.c:1260 monitor/gdu/ggduvolume.c:1617
 #: monitor/udisks2/gvfsudisks2mount.c:1181
-#: monitor/udisks2/gvfsudisks2volume.c:1733
+#: monitor/udisks2/gvfsudisks2volume.c:1728
 msgid "Operation not supported by backend"
 msgstr "Działanie nieobsługiwane przez mechanizm przetwarzający"
 
@@ -920,9 +920,9 @@ msgstr "Plik docelowy istnieje"
 
 #: daemon/gvfsbackendburn.c:949 daemon/gvfsbackendcomputer.c:812
 #: daemon/gvfsbackenddav.c:3349 daemon/gvfsbackenddav.c:3381
-#: daemon/gvfsbackendgphoto2.c:2495 daemon/gvfsbackendgphoto2.c:2708
-#: daemon/gvfsbackendgphoto2.c:2805 daemon/gvfsbackendgphoto2.c:2898
-#: daemon/gvfsbackendgphoto2.c:3507 daemon/gvfsbackendgphoto2.c:3517
+#: daemon/gvfsbackendgphoto2.c:2182 daemon/gvfsbackendgphoto2.c:2395
+#: daemon/gvfsbackendgphoto2.c:2492 daemon/gvfsbackendgphoto2.c:2585
+#: daemon/gvfsbackendgphoto2.c:3194 daemon/gvfsbackendgphoto2.c:3204
 #: daemon/gvfsbackendnfs.c:2420 daemon/gvfsbackendnfs.c:2546
 #: daemon/gvfsbackendsftp.c:5883 daemon/gvfsbackendsftp.c:5915
 #: daemon/gvfsbackendsftp.c:5941 daemon/gvfsbackendsftp.c:6413
@@ -949,52 +949,38 @@ msgstr ""
 "Wolumin jest zajęty\n"
 "Jeden lub więcej programów używa wolumin."
 
-#: daemon/gvfsbackendcdda.c:358 daemon/gvfsbackendgphoto2.c:1512
+#: daemon/gvfsbackendcdda.c:288 daemon/gvfsbackendgphoto2.c:1245
 #: daemon/gvfsbackendmtp.c:889
 msgid "Cannot create gudev client"
 msgstr "Nie można utworzyć klienta gudev"
 
-#: daemon/gvfsbackendcdda.c:378 daemon/gvfsbackendgphoto2.c:1529
-msgid "Cannot connect to the system bus"
-msgstr "Nie można połączyć się z magistralą systemową"
-
-#: daemon/gvfsbackendcdda.c:389 daemon/gvfsbackendgphoto2.c:1540
-msgid "Cannot create libhal context"
-msgstr "Nie można utworzyć kontekstu biblioteki libhal"
-
-#: daemon/gvfsbackendcdda.c:403 daemon/gvfsbackendgphoto2.c:1552
-msgid "Cannot initialize libhal"
-msgstr "Nie można zainicjować biblioteki libhal"
-
-#: daemon/gvfsbackendcdda.c:419 daemon/gvfsbackendcdda.c:505
+#: daemon/gvfsbackendcdda.c:302 daemon/gvfsbackendcdda.c:383
 msgid "No drive specified"
 msgstr "Nie podano napędu"
 
-#: daemon/gvfsbackendcdda.c:443
+#: daemon/gvfsbackendcdda.c:321
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "Nie można odnaleźć napędu %s"
 
-#: daemon/gvfsbackendcdda.c:456
+#: daemon/gvfsbackendcdda.c:334
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "Napęd %s nie zawiera plików dźwiękowych"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
-#: daemon/gvfsbackendcdda.c:466
+#: daemon/gvfsbackendcdda.c:344
 #, c-format
 msgid "cdda mount on %s"
 msgstr "Punkt montowania CDDA na %s"
 
-#: daemon/gvfsbackendcdda.c:467 daemon/gvfsbackendcdda.c:988
-#: monitor/gdu/ggduvolume.c:349 monitor/hal/ghalmount.c:325
-#: monitor/hal/ghalvolume.c:225 monitor/hal/ghalvolume.c:246
-#: monitor/udisks2/gvfsudisks2volume.c:383
+#: daemon/gvfsbackendcdda.c:345 daemon/gvfsbackendcdda.c:866
+#: monitor/gdu/ggduvolume.c:349 monitor/udisks2/gvfsudisks2volume.c:383
 msgid "Audio Disc"
 msgstr "Płyta CD-Audio"
 
-#: daemon/gvfsbackendcdda.c:531
+#: daemon/gvfsbackendcdda.c:409
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
@@ -1002,31 +988,31 @@ msgstr[0] "System plików jest zajęty: %d otwarty plik"
 msgstr[1] "System plików jest zajęty: %d otwarte pliki"
 msgstr[2] "System plików jest zajęty: %d otwartych plików"
 
-#: daemon/gvfsbackendcdda.c:723
+#: daemon/gvfsbackendcdda.c:601
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "Nie ma pliku %s w napędzie %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: daemon/gvfsbackendcdda.c:832
+#: daemon/gvfsbackendcdda.c:710
 #, c-format
 msgid "Error from “paranoia” on drive %s"
 msgstr "Błąd od biblioteki „paranoia” w napędzie %s"
 
-#: daemon/gvfsbackendcdda.c:895
+#: daemon/gvfsbackendcdda.c:773
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Błąd podczas wyszukiwania w strumieniu w napędzie %s"
 
-#: daemon/gvfsbackendcdda.c:1017 daemon/gvfsbackendgphoto2.c:1813
+#: daemon/gvfsbackendcdda.c:895 daemon/gvfsbackendgphoto2.c:1500
 msgid "No such file"
 msgstr "Nie ma takiego pliku"
 
-#: daemon/gvfsbackendcdda.c:1031
+#: daemon/gvfsbackendcdda.c:909
 msgid "The file does not exist or isn’t an audio track"
 msgstr "Plik nie istnieje lub nie jest ścieżką dźwiękową"
 
-#: daemon/gvfsbackendcdda.c:1137
+#: daemon/gvfsbackendcdda.c:1015
 msgid "Audio CD File System Service"
 msgstr "Usługa systemu plików CD-Audio"
 
@@ -1138,8 +1124,8 @@ msgstr "Nie można utworzyć żądania"
 #: daemon/gvfsbackenddav.c:2499 daemon/gvfsbackendftp.c:1085
 #: daemon/gvfsbackendgoogle.c:2562 daemon/gvfsbackendnfs.c:939
 #: daemon/gvfsbackendnfs.c:962 daemon/gvfsbackendnfs.c:988
-#: daemon/gvfsbackendnfs.c:1388 daemon/gvfsbackendsmb.c:1263
-#: daemon/gvfsbackendsmb.c:2219
+#: daemon/gvfsbackendnfs.c:1388 daemon/gvfsbackendsmb.c:1131
+#: daemon/gvfsbackendsmb.c:2087
 msgid "Backup file creation failed"
 msgstr "Utworzenie kopii zapasowej pliku się nie powiodło"
 
@@ -1176,7 +1162,7 @@ msgid "Enter password for %s on %s"
 msgstr "Proszę wprowadzić hasło dla %s na %s"
 
 #: daemon/gvfsbackendftp.c:556 daemon/gvfsbackendsftp.c:1173
-#: daemon/gvfsbackendsmbbrowse.c:1024 daemon/gvfsbackendsmb.c:679
+#: daemon/gvfsbackendsmbbrowse.c:1024 daemon/gvfsbackendsmb.c:547
 msgid "Password dialog cancelled"
 msgstr "Anulowano okno dialogowe hasła"
 
@@ -1185,7 +1171,7 @@ msgid "Insufficient permissions"
 msgstr "Niewystarczające uprawnienia"
 
 #: daemon/gvfsbackendgoogle.c:1713 daemon/gvfsbackendgoogle.c:2236
-#: daemon/gvfsbackendgphoto2.c:1846
+#: daemon/gvfsbackendgphoto2.c:1533
 msgid "Error getting data from file"
 msgstr "Błąd podczas pobierania danych z pliku"
 
@@ -1226,197 +1212,175 @@ msgstr "Plik docelowy jest katalogiem"
 msgid "Target file is not a regular file"
 msgstr "Plik docelowy nie jest zwykłym plikiem"
 
-#: daemon/gvfsbackendgoogle.c:2787 daemon/gvfsbackendgphoto2.c:3307
+#: daemon/gvfsbackendgoogle.c:2787 daemon/gvfsbackendgphoto2.c:2994
 msgid "Error writing file"
 msgstr "Błąd podczas zapisywania pliku"
 
-#: daemon/gvfsbackendgphoto2.c:493
+#: daemon/gvfsbackendgphoto2.c:479
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "%s: %d: katalog lub plik już istnieje"
 
-#: daemon/gvfsbackendgphoto2.c:500
+#: daemon/gvfsbackendgphoto2.c:486
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "%s: %d: nie ma takiego pliku lub katalogu"
 
-#: daemon/gvfsbackendgphoto2.c:506
+#: daemon/gvfsbackendgphoto2.c:492
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: nieprawidłowa nazwa pliku"
 
-#: daemon/gvfsbackendgphoto2.c:512
+#: daemon/gvfsbackendgphoto2.c:498
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "%s: %d: nieobsługiwane"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: daemon/gvfsbackendgphoto2.c:721 daemon/gvfsbackendgphoto2.c:727
+#: daemon/gvfsbackendgphoto2.c:686
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Aparat cyfrowy (%s)"
 
-#. Translator: %s is the vendor name, e.g. Panasonic
-#. Translators: %s is the device vendor
-#: daemon/gvfsbackendgphoto2.c:938 monitor/gphoto2/ggphoto2volume.c:190
-#, c-format
-msgid "%s Camera"
-msgstr "Aparat %s"
-
-#. Translator: %s is the vendor name, e.g. Panasonic
-#. Translators: %s is the device vendor
-#: daemon/gvfsbackendgphoto2.c:941 monitor/gphoto2/ggphoto2volume.c:185
-#, c-format
-msgid "%s Audio Player"
-msgstr "Odtwarzacz muzyki %s"
-
-#: daemon/gvfsbackendgphoto2.c:950 monitor/gphoto2/ggphoto2volume.c:199
-msgid "Camera"
-msgstr "Aparat"
-
-#: daemon/gvfsbackendgphoto2.c:952 monitor/gphoto2/ggphoto2volume.c:197
-msgid "Audio Player"
-msgstr "Odtwarzacz muzyki"
-
-#: daemon/gvfsbackendgphoto2.c:1568 daemon/gvfsbackendmtp.c:881
+#: daemon/gvfsbackendgphoto2.c:1259 daemon/gvfsbackendmtp.c:881
 msgid "No device specified"
 msgstr "Nie podano urządzenia"
 
-#: daemon/gvfsbackendgphoto2.c:1588
+#: daemon/gvfsbackendgphoto2.c:1275
 msgid "Cannot create gphoto2 context"
 msgstr "Nie można utworzyć kontekstu biblioteki gphoto2"
 
-#: daemon/gvfsbackendgphoto2.c:1597
+#: daemon/gvfsbackendgphoto2.c:1284
 msgid "Error creating camera"
 msgstr "Błąd podczas tworzenia obiektu aparatu cyfrowego"
 
-#: daemon/gvfsbackendgphoto2.c:1609 daemon/gvfsbackendgphoto2.c:1618
+#: daemon/gvfsbackendgphoto2.c:1296 daemon/gvfsbackendgphoto2.c:1305
 msgid "Error loading device information"
 msgstr "Błąd podczas wczytywania informacji o urządzeniu"
 
-#: daemon/gvfsbackendgphoto2.c:1629
+#: daemon/gvfsbackendgphoto2.c:1316
 msgid "Error looking up device information"
 msgstr "Błąd podczas wyszukiwania informacji o urządzeniu"
 
-#: daemon/gvfsbackendgphoto2.c:1638
+#: daemon/gvfsbackendgphoto2.c:1325
 msgid "Error getting device information"
 msgstr "Błąd podczas pobierania informacji o urządzeniu"
 
-#: daemon/gvfsbackendgphoto2.c:1652
+#: daemon/gvfsbackendgphoto2.c:1339
 msgid "Error setting up camera communications port"
 msgstr "Błąd podczas ustawiania portu komunikacji z aparatem cyfrowym"
 
-#: daemon/gvfsbackendgphoto2.c:1662
+#: daemon/gvfsbackendgphoto2.c:1349
 msgid "Error initializing camera"
 msgstr "Błąd podczas inicjowania aparatu cyfrowego"
 
 #. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
 #. backend and shouldn't be translated.
-#: daemon/gvfsbackendgphoto2.c:1673
+#: daemon/gvfsbackendgphoto2.c:1360
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "Punkt montowania biblioteki gphoto2 na %s"
 
-#: daemon/gvfsbackendgphoto2.c:1759
+#: daemon/gvfsbackendgphoto2.c:1446
 msgid "No camera specified"
 msgstr "Nie podano aparatu cyfrowego"
 
-#: daemon/gvfsbackendgphoto2.c:1821 daemon/gvfsbackendgphoto2.c:3548
+#: daemon/gvfsbackendgphoto2.c:1508 daemon/gvfsbackendgphoto2.c:3235
 msgid "Error creating file object"
 msgstr "Błąd podczas tworzenia obiektu pliku"
 
-#: daemon/gvfsbackendgphoto2.c:1836 daemon/gvfsbackendgphoto2.c:3579
+#: daemon/gvfsbackendgphoto2.c:1523 daemon/gvfsbackendgphoto2.c:3266
 msgid "Error getting file"
 msgstr "Błąd podczas pobierania pliku"
 
-#: daemon/gvfsbackendgphoto2.c:1904 daemon/gvfsbackendmtp.c:2372
+#: daemon/gvfsbackendgphoto2.c:1591 daemon/gvfsbackendmtp.c:2372
 #, c-format
 msgid "Malformed icon identifier “%s”"
 msgstr "Błędnie sformatowany identyfikator ikony „%s”"
 
-#: daemon/gvfsbackendgphoto2.c:1980 daemon/gvfsbackendgphoto2.c:3170
+#: daemon/gvfsbackendgphoto2.c:1667 daemon/gvfsbackendgphoto2.c:2857
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Błąd podczas wyszukiwania w strumieniu w aparacie cyfrowym %s"
 
-#: daemon/gvfsbackendgphoto2.c:2120 daemon/gvfsbackendsftp.c:3309
+#: daemon/gvfsbackendgphoto2.c:1807 daemon/gvfsbackendsftp.c:3309
 #: daemon/gvfsbackendsmbbrowse.c:1452
 msgid "Not a directory"
 msgstr "To nie jest katalog"
 
-#: daemon/gvfsbackendgphoto2.c:2153
+#: daemon/gvfsbackendgphoto2.c:1840
 msgid "Failed to get folder list"
 msgstr "Pobranie listy katalogów się nie powiodło"
 
-#: daemon/gvfsbackendgphoto2.c:2218
+#: daemon/gvfsbackendgphoto2.c:1905
 msgid "Failed to get file list"
 msgstr "Pobranie listy plików się nie powiodło"
 
-#: daemon/gvfsbackendgphoto2.c:2507
+#: daemon/gvfsbackendgphoto2.c:2194
 msgid "Error creating directory"
 msgstr "Błąd podczas tworzenia katalogu"
 
-#: daemon/gvfsbackendgphoto2.c:2720
+#: daemon/gvfsbackendgphoto2.c:2407
 msgid "Name already exists"
 msgstr "Nazwa już istnieje"
 
-#: daemon/gvfsbackendgphoto2.c:2731 daemon/gvfsbackendgphoto2.c:3399
+#: daemon/gvfsbackendgphoto2.c:2418 daemon/gvfsbackendgphoto2.c:3086
 msgid "New name too long"
 msgstr "Nowa nazwa jest za długa"
 
-#: daemon/gvfsbackendgphoto2.c:2741 daemon/gvfsbackendgphoto2.c:3410
+#: daemon/gvfsbackendgphoto2.c:2428 daemon/gvfsbackendgphoto2.c:3097
 msgid "Error renaming directory"
 msgstr "Błąd podczas zmieniania nazwy katalogu"
 
-#: daemon/gvfsbackendgphoto2.c:2754 daemon/gvfsbackendgphoto2.c:3423
+#: daemon/gvfsbackendgphoto2.c:2441 daemon/gvfsbackendgphoto2.c:3110
 msgid "Error renaming file"
 msgstr "Błąd podczas zmieniania nazwy pliku"
 
-#: daemon/gvfsbackendgphoto2.c:2818
+#: daemon/gvfsbackendgphoto2.c:2505
 #, c-format
 msgid "Directory “%s” is not empty"
 msgstr "Katalog „%s” nie jest pusty"
 
-#: daemon/gvfsbackendgphoto2.c:2829
+#: daemon/gvfsbackendgphoto2.c:2516
 msgid "Error deleting directory"
 msgstr "Błąd podczas usuwania katalogu"
 
-#: daemon/gvfsbackendgphoto2.c:2855 daemon/gvfsbackendgphoto2.c:3600
+#: daemon/gvfsbackendgphoto2.c:2542 daemon/gvfsbackendgphoto2.c:3287
 msgid "Error deleting file"
 msgstr "Błąd podczas usuwania pliku"
 
-#: daemon/gvfsbackendgphoto2.c:2908
+#: daemon/gvfsbackendgphoto2.c:2595
 msgid "Can’t write to directory"
 msgstr "Nie można zapisać do katalogu"
 
-#: daemon/gvfsbackendgphoto2.c:2955
+#: daemon/gvfsbackendgphoto2.c:2642
 msgid "Cannot allocate new file to append to"
 msgstr "Nie można przydzielić nowego pliku, aby dodać do"
 
-#: daemon/gvfsbackendgphoto2.c:2970
+#: daemon/gvfsbackendgphoto2.c:2657
 msgid "Cannot read file to append to"
 msgstr "Nie można odczytać pliku, aby dodać do"
 
-#: daemon/gvfsbackendgphoto2.c:2981
+#: daemon/gvfsbackendgphoto2.c:2668
 msgid "Cannot get data of file to append to"
 msgstr "Nie można pobrać danych pliku, aby dodać do"
 
-#: daemon/gvfsbackendgphoto2.c:3355
+#: daemon/gvfsbackendgphoto2.c:3042
 msgid "Not supported (not same directory)"
 msgstr "Nieobsługiwane (nie ten sam katalog)"
 
-#: daemon/gvfsbackendgphoto2.c:3367
+#: daemon/gvfsbackendgphoto2.c:3054
 msgid ""
 "Not supported (the source is a directory, the destination is a directory too)"
 msgstr "Nieobsługiwane (źródło jest katalogiem, i cel też jest katalogiem)"
 
-#: daemon/gvfsbackendgphoto2.c:3375
+#: daemon/gvfsbackendgphoto2.c:3062
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
 msgstr "Nieobsługiwane (źródłem jest katalog, ale celem jest istniejący plik)"
 
-#: daemon/gvfsbackendgphoto2.c:3387
+#: daemon/gvfsbackendgphoto2.c:3074
 msgid ""
 "Not supported (the source is a file, but the destination is a directory)"
 msgstr "Nieobsługiwane (źródłem jest plik, ale celem jest katalog)"
@@ -1671,7 +1635,7 @@ msgstr "Błąd protokołu"
 msgid "Unable to find supported SSH command"
 msgstr "Nie można odnaleźć obsługiwanego polecenia SSH"
 
-#: daemon/gvfsbackendsftp.c:2578 daemon/gvfsbackendsmb.c:1535
+#: daemon/gvfsbackendsftp.c:2578 daemon/gvfsbackendsmb.c:1403
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (nieprawidłowe kodowanie)"
@@ -1702,8 +1666,8 @@ msgid "Password required for %s"
 msgstr "Wymagane hasło dla %s"
 
 #: daemon/gvfsbackendsmbbrowse.c:854 daemon/gvfsbackendsmbbrowse.c:893
-#: daemon/gvfsbackendsmb.c:536 daemon/gvfsbackendsmb.c:577
-#: daemon/gvfsbackendsmb.c:760
+#: daemon/gvfsbackendsmb.c:417 daemon/gvfsbackendsmb.c:447
+#: daemon/gvfsbackendsmb.c:628
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "Wewnętrzny błąd (%s)"
@@ -1726,50 +1690,50 @@ msgid "Windows Network File System Service"
 msgstr "Usługa systemu plików sieci Windows"
 
 #. translators: First %s is a share name, second is a server name
-#: daemon/gvfsbackendsmb.c:265
+#: daemon/gvfsbackendsmb.c:258
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "Wymagane hasło dla zasobu %s na %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: daemon/gvfsbackendsmb.c:684
+#: daemon/gvfsbackendsmb.c:552
 #, c-format
 msgid "Failed to mount Windows share: %s"
 msgstr "Zamontowanie zasobu Windows się nie powiodło: %s"
 
-#: daemon/gvfsbackendsmb.c:1462
+#: daemon/gvfsbackendsmb.c:1330
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Utworzenie pliku kopii zapasowej się nie powiodło: %s"
 
-#: daemon/gvfsbackendsmb.c:1871
+#: daemon/gvfsbackendsmb.c:1739
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Nieprawidłowy typ atrybutu (oczekiwano uint64)"
 
-#: daemon/gvfsbackendsmb.c:2042
+#: daemon/gvfsbackendsmb.c:1910
 msgid "Can’t rename file, filename already exists"
 msgstr "Nie można zmienić nazwy pliku, nazwa pliku już istnieje"
 
-#: daemon/gvfsbackendsmb.c:2093
+#: daemon/gvfsbackendsmb.c:1961
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Błąd podczas usuwania pliku: %s"
 
-#: daemon/gvfsbackendsmb.c:2167
+#: daemon/gvfsbackendsmb.c:2035
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Błąd podczas przenoszenia pliku: %s"
 
-#: daemon/gvfsbackendsmb.c:2239
+#: daemon/gvfsbackendsmb.c:2107
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Błąd podczas usuwania pliku docelowego: %s"
 
-#: daemon/gvfsbackendsmb.c:2263
+#: daemon/gvfsbackendsmb.c:2131
 msgid "Can’t recursively move directory"
 msgstr "Nie można rekursywnie przenieść katalogu"
 
-#: daemon/gvfsbackendsmb.c:2309
+#: daemon/gvfsbackendsmb.c:2177
 msgid "Windows Shares File System Service"
 msgstr "Usługa systemu plików zasobów sieciowych Windows"
 
@@ -2060,7 +2024,7 @@ msgstr "Usługa metadanych dla GVFS"
 msgid "GVfs GDU Volume Monitor"
 msgstr "Monitor woluminów GDU GVFS"
 
-#: monitor/gdu/ggdudrive.c:168 monitor/hal/ghaldrive.c:179
+#: monitor/gdu/ggdudrive.c:168
 msgid "Floppy Drive"
 msgstr "Stacja dyskietek"
 
@@ -2155,325 +2119,6 @@ msgstr "Nieprawidłowe dane uwierzytelniające dla %s"
 msgid "Unsupported authentication method for %s"
 msgstr "Nieobsługiwana metoda uwierzytelniania dla %s"
 
-#: monitor/gphoto2/hal-utils.c:40 monitor/hal/hal-utils.c:40
-msgid "CD-ROM Disc"
-msgstr "Płyta CD-ROM"
-
-#: monitor/gphoto2/hal-utils.c:40 monitor/hal/hal-utils.c:40
-msgid "Blank CD-ROM Disc"
-msgstr "Pusta płyta CD-ROM"
-
-#: monitor/gphoto2/hal-utils.c:41 monitor/hal/hal-utils.c:41
-msgid "CD-R Disc"
-msgstr "Płyta CD-R"
-
-#: monitor/gphoto2/hal-utils.c:41 monitor/hal/hal-utils.c:41
-msgid "Blank CD-R Disc"
-msgstr "Pusta płyta CD-R"
-
-#: monitor/gphoto2/hal-utils.c:42 monitor/hal/hal-utils.c:42
-msgid "CD-RW Disc"
-msgstr "Płyta CD-RW"
-
-#: monitor/gphoto2/hal-utils.c:42 monitor/hal/hal-utils.c:42
-msgid "Blank CD-RW Disc"
-msgstr "Pusta płyta CD-RW"
-
-#: monitor/gphoto2/hal-utils.c:43 monitor/gphoto2/hal-utils.c:45
-#: monitor/hal/hal-utils.c:43 monitor/hal/hal-utils.c:45
-msgid "DVD-ROM Disc"
-msgstr "Płyta DVD-ROM"
-
-#: monitor/gphoto2/hal-utils.c:43 monitor/gphoto2/hal-utils.c:45
-#: monitor/hal/hal-utils.c:43 monitor/hal/hal-utils.c:45
-msgid "Blank DVD-ROM Disc"
-msgstr "Pusta płyta DVD-ROM"
-
-#: monitor/gphoto2/hal-utils.c:44 monitor/hal/hal-utils.c:44
-msgid "DVD-RAM Disc"
-msgstr "Płyta DVD-RAM"
-
-#: monitor/gphoto2/hal-utils.c:44 monitor/hal/hal-utils.c:44
-msgid "Blank DVD-RAM Disc"
-msgstr "Pusta płyta DVD-RAM"
-
-#: monitor/gphoto2/hal-utils.c:46 monitor/hal/hal-utils.c:46
-msgid "DVD-RW Disc"
-msgstr "Płyta DVD-RW"
-
-#: monitor/gphoto2/hal-utils.c:46 monitor/hal/hal-utils.c:46
-msgid "Blank DVD-RW Disc"
-msgstr "Pusta płyta DVD-RW"
-
-#: monitor/gphoto2/hal-utils.c:47 monitor/hal/hal-utils.c:47
-msgid "DVD+R Disc"
-msgstr "Płyta DVD+R"
-
-#: monitor/gphoto2/hal-utils.c:47 monitor/hal/hal-utils.c:47
-msgid "Blank DVD+R Disc"
-msgstr "Pusta płyta DVD+R"
-
-#: monitor/gphoto2/hal-utils.c:48 monitor/hal/hal-utils.c:48
-msgid "DVD+RW Disc"
-msgstr "Płyta DVD+RW"
-
-#: monitor/gphoto2/hal-utils.c:48 monitor/hal/hal-utils.c:48
-msgid "Blank DVD+RW Disc"
-msgstr "Pusta płyta DVD+RW"
-
-#: monitor/gphoto2/hal-utils.c:49 monitor/hal/hal-utils.c:49
-msgid "DVD+R DL Disc"
-msgstr "Płyta DVD+R DL"
-
-#: monitor/gphoto2/hal-utils.c:49 monitor/hal/hal-utils.c:49
-msgid "Blank DVD+R DL Disc"
-msgstr "Pusta płyta DVD+R DL"
-
-#: monitor/gphoto2/hal-utils.c:50 monitor/hal/hal-utils.c:50
-msgid "Blu-Ray Disc"
-msgstr "Płyta Blu-ray"
-
-#: monitor/gphoto2/hal-utils.c:50 monitor/hal/hal-utils.c:50
-msgid "Blank Blu-Ray Disc"
-msgstr "Pusta płyta Blu-ray"
-
-#: monitor/gphoto2/hal-utils.c:51 monitor/hal/hal-utils.c:51
-msgid "Blu-Ray R Disc"
-msgstr "Płyta Blu-ray R"
-
-#: monitor/gphoto2/hal-utils.c:51 monitor/hal/hal-utils.c:51
-msgid "Blank Blu-Ray R Disc"
-msgstr "Pusta płyta Blu-ray R"
-
-#: monitor/gphoto2/hal-utils.c:52 monitor/hal/hal-utils.c:52
-msgid "Blu-Ray RW Disc"
-msgstr "Płyta Blu-ray RW"
-
-#: monitor/gphoto2/hal-utils.c:52 monitor/hal/hal-utils.c:52
-msgid "Blank Blu-Ray RW Disc"
-msgstr "Pusta płyta Blu-ray RW"
-
-#: monitor/gphoto2/hal-utils.c:53 monitor/hal/hal-utils.c:53
-msgid "HD DVD Disc"
-msgstr "Płyta HD DVD"
-
-#: monitor/gphoto2/hal-utils.c:53 monitor/hal/hal-utils.c:53
-msgid "Blank HD DVD Disc"
-msgstr "Pusta płyta HD-DVD"
-
-#: monitor/gphoto2/hal-utils.c:54 monitor/hal/hal-utils.c:54
-msgid "HD DVD-R Disc"
-msgstr "Płyta HD DVD-R"
-
-#: monitor/gphoto2/hal-utils.c:54 monitor/hal/hal-utils.c:54
-msgid "Blank HD DVD-R Disc"
-msgstr "Pusta płyta HD DVD-R"
-
-#: monitor/gphoto2/hal-utils.c:55 monitor/hal/hal-utils.c:55
-msgid "HD DVD-RW Disc"
-msgstr "Płyta HD DVD-RW"
-
-#: monitor/gphoto2/hal-utils.c:55 monitor/hal/hal-utils.c:55
-msgid "Blank HD DVD-RW Disc"
-msgstr "Pusta płyta HD DVD-RW"
-
-#: monitor/gphoto2/hal-utils.c:56 monitor/hal/hal-utils.c:56
-msgid "MO Disc"
-msgstr "Dysk MO"
-
-#: monitor/gphoto2/hal-utils.c:56 monitor/hal/hal-utils.c:56
-msgid "Blank MO Disc"
-msgstr "Pusty dysk MO"
-
-#: monitor/gphoto2/hal-utils.c:57 monitor/hal/hal-utils.c:57
-msgid "Disc"
-msgstr "Płyta"
-
-#: monitor/gphoto2/hal-utils.c:57 monitor/hal/hal-utils.c:57
-msgid "Blank Disc"
-msgstr "Pusta płyta"
-
-#: monitor/hal/ghaldrive.c:127
-msgid "CD-ROM"
-msgstr "CD-ROM"
-
-#: monitor/hal/ghaldrive.c:129
-msgid "CD-R"
-msgstr "CD-R"
-
-#: monitor/hal/ghaldrive.c:131
-msgid "CD-RW"
-msgstr "CD-RW"
-
-#: monitor/hal/ghaldrive.c:135
-msgid "DVD-ROM"
-msgstr "DVD-ROM"
-
-#: monitor/hal/ghaldrive.c:137
-msgid "DVD+R"
-msgstr "DVD+R"
-
-#: monitor/hal/ghaldrive.c:139
-msgid "DVD+RW"
-msgstr "DVD+RW"
-
-#: monitor/hal/ghaldrive.c:141
-msgid "DVD-R"
-msgstr "DVD-R"
-
-#: monitor/hal/ghaldrive.c:143
-msgid "DVD-RW"
-msgstr "DVD-RW"
-
-#: monitor/hal/ghaldrive.c:145
-msgid "DVD-RAM"
-msgstr "DVD-RAM"
-
-#: monitor/hal/ghaldrive.c:148
-msgid "DVD±R"
-msgstr "DVD±R"
-
-#: monitor/hal/ghaldrive.c:151
-msgid "DVD±RW"
-msgstr "DVD±RW"
-
-#: monitor/hal/ghaldrive.c:153
-msgid "HDDVD"
-msgstr "HD DVD"
-
-#: monitor/hal/ghaldrive.c:155
-msgid "HDDVD-r"
-msgstr "HD DVD-R"
-
-#: monitor/hal/ghaldrive.c:157
-msgid "HDDVD-RW"
-msgstr "HD DVD-RW"
-
-#: monitor/hal/ghaldrive.c:159
-msgid "Blu-ray"
-msgstr "Blu-ray"
-
-#: monitor/hal/ghaldrive.c:161
-msgid "Blu-ray-R"
-msgstr "Blu-ray-R"
-
-#: monitor/hal/ghaldrive.c:163
-msgid "Blu-ray-RE"
-msgstr "Blu-ray-RE"
-
-#. translators: This wis something like "CD-ROM/DVD Drive" or
-#. "CD-RW/Blue-ray Drive" depending on the properties of the drive
-#: monitor/hal/ghaldrive.c:169
-#, c-format
-msgid "%s/%s Drive"
-msgstr "Napęd %s/%s"
-
-#. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
-#. depending on the properties of the drive
-#: monitor/hal/ghaldrive.c:175
-#, c-format
-msgid "%s Drive"
-msgstr "Napęd %s"
-
-#: monitor/hal/ghaldrive.c:185
-msgid "Software RAID Drive"
-msgstr "Programowy napęd RAID"
-
-#: monitor/hal/ghaldrive.c:187
-msgid "USB Drive"
-msgstr "Napęd USB"
-
-#: monitor/hal/ghaldrive.c:189
-msgid "ATA Drive"
-msgstr "Napęd ATA"
-
-#: monitor/hal/ghaldrive.c:191
-msgid "SCSI Drive"
-msgstr "Napęd SCSI"
-
-#: monitor/hal/ghaldrive.c:193
-msgid "FireWire Drive"
-msgstr "Napęd FireWire"
-
-#: monitor/hal/ghaldrive.c:197
-msgid "Tape Drive"
-msgstr "Napęd taśmowy"
-
-#: monitor/hal/ghaldrive.c:199
-msgid "CompactFlash Drive"
-msgstr "Karta CompactFlash"
-
-#: monitor/hal/ghaldrive.c:201
-msgid "MemoryStick Drive"
-msgstr "Karta MemoryStick"
-
-#: monitor/hal/ghaldrive.c:203
-msgid "SmartMedia Drive"
-msgstr "Karta SmartMedia"
-
-#: monitor/hal/ghaldrive.c:205
-msgid "SD/MMC Drive"
-msgstr "Karta SD/MMC"
-
-#: monitor/hal/ghaldrive.c:207
-msgid "Zip Drive"
-msgstr "Napęd Zip"
-
-#: monitor/hal/ghaldrive.c:209
-msgid "Jaz Drive"
-msgstr "Napęd Jaz"
-
-#: monitor/hal/ghaldrive.c:211
-msgid "Thumb Drive"
-msgstr "Pamięć przenośna"
-
-#: monitor/hal/ghaldrive.c:214
-msgid "Mass Storage Drive"
-msgstr "Napęd pamięci masowej"
-
-#: monitor/hal/ghaldrive.c:662
-msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr ""
-"Wysunięcie nośnika się nie powiodło; jeden lub więcej woluminów na nośniku "
-"jest zajętych."
-
-#: monitor/hal/ghalmount.c:159 monitor/hal/ghalvolume.c:163
-#, c-format
-msgid "%.1f kB"
-msgstr "%.1f kB"
-
-#: monitor/hal/ghalmount.c:164 monitor/hal/ghalvolume.c:168
-#, c-format
-msgid "%.1f MB"
-msgstr "%.1f MB"
-
-#: monitor/hal/ghalmount.c:169 monitor/hal/ghalvolume.c:173
-#, c-format
-msgid "%.1f GB"
-msgstr "%.1f GB"
-
-#: monitor/hal/ghalmount.c:323 monitor/hal/ghalvolume.c:244
-msgid "Mixed Audio/Data Disc"
-msgstr "Mieszana płyta CD-Audio/Dane"
-
-#. Translators: %s is the size of the mount (e.g. 512 MB)
-#: monitor/hal/ghalmount.c:336
-#, c-format
-msgid "%s Medium"
-msgstr "Nośnik o rozmiarze %s"
-
-#. Translators: %s is the size of the volume (e.g. 512 MB)
-#: monitor/hal/ghalvolume.c:232
-#, c-format
-msgid "%s Encrypted Data"
-msgstr "Zaszyfrowane dane o rozmiarze %s"
-
-#. Translators: %s is the size of the volume (e.g. 512 MB)
-#: monitor/hal/ghalvolume.c:255
-#, c-format
-msgid "%s Media"
-msgstr "Nośnik o rozmiarze %s"
-
 #. Note that the GUI (Shell, Files) currently use the term
 #. * "Eject" for both GDrive.stop() and GDrive.eject().
 #.
@@ -2521,31 +2166,31 @@ msgstr "Wolumin o rozmiarze %s"
 msgid "Volume"
 msgstr "Wolumin"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1116
+#: monitor/udisks2/gvfsudisks2volume.c:1111
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "Błąd podczas przechowywania hasła w bazie kluczy (%s)"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1152
+#: monitor/udisks2/gvfsudisks2volume.c:1147
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "Błąd podczas usuwania nieprawidłowego hasła z bazy kluczy (%s)"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1217
+#: monitor/udisks2/gvfsudisks2volume.c:1212
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr "Odblokowane urządzenie nie ma rozpoznawalnego systemu plików"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1246
+#: monitor/udisks2/gvfsudisks2volume.c:1241
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Hasło szyfrowania dla %s"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1454
+#: monitor/udisks2/gvfsudisks2volume.c:1449
 msgid "A passphrase is required to access the volume"
 msgstr "Wymagane jest hasło, aby uzyskać dostęp do woluminu"
 
 #. Translators: This is the message shown to users
-#: monitor/udisks2/gvfsudisks2volume.c:1469
+#: monitor/udisks2/gvfsudisks2volume.c:1464
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2559,7 +2204,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: monitor/udisks2/gvfsudisks2volume.c:1638
+#: monitor/udisks2/gvfsudisks2volume.c:1633
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
