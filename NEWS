@@ -1,3 +1,12 @@
+Major changes in 1.31.1
+=======================
+* udisks2: Improve handling of volumes with multiple mountpoints
+* man: Various man page updates
+* hal: Drop hal volume monitor
+* programs: Deprecate gvfs utils in favour of new gio tool
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.30.0
 =======================
 * Translation updates
