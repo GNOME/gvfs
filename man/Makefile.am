@@ -87,8 +87,32 @@ man_MANS = \
 	gvfsd-fuse.1 \
 	gvfsd-metadata.1
 
-xml_files = ${patsubst %.1,%.xml,${patsubst %.7,%.xml,$(man_MANS)}}
+EXTRA_DIST = \
+	deprecated.xml.in \
+	gvfsd-fuse.xml \
+	gvfsd-metadata.xml \
+	gvfsd.xml \
+	gvfs-less.xml \
+	gvfs.xml \
+	$(NULL)
 
-EXTRA_DIST = $(xml_files)
-
-CLEANFILES = $(man_MANS)
+CLEANFILES = \
+	$(man_MANS) \
+	gvfs-cat.xml \
+	gvfs-copy.xml \
+	gvfs-info.xml \
+	gvfs-ls.xml \
+	gvfs-mime.xml \
+	gvfs-mkdir.xml \
+	gvfs-monitor-dir.xml \
+	gvfs-monitor-file.xml \
+	gvfs-mount.xml \
+	gvfs-move.xml \
+	gvfs-open.xml \
+	gvfs-rename.xml \
+	gvfs-rm.xml \
+	gvfs-save.xml \
+	gvfs-set-attribute.xml \
+	gvfs-trash.xml \
+	gvfs-tree.xml \
+	$(NULL)

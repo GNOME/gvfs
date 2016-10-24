@@ -1,7 +1,5 @@
 NULL =
 
-bin_in_files = program.in
-
 bin_SCRIPTS =					\
 	gvfs-mount				\
 	gvfs-cat				\
@@ -74,4 +72,27 @@ gvfs-mkdir: deprecated.in Makefile
 gvfs-mime: deprecated.in Makefile
 	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio mime|" $< > $@
 
-EXTRA_DIST = $(bin_in_files)
+EXTRA_DIST = \
+	deprecated.in \
+	gvfs-less \
+	$(NULL)
+
+CLEANFILES = \
+	gvfs-mount \
+	gvfs-cat \
+	gvfs-open \
+	gvfs-save \
+	gvfs-ls \
+	gvfs-tree \
+	gvfs-info \
+	gvfs-set-attribute \
+	gvfs-trash \
+	gvfs-rename \
+	gvfs-rm \
+	gvfs-copy \
+	gvfs-move \
+	gvfs-monitor-file \
+	gvfs-monitor-dir \
+	gvfs-mkdir \
+	gvfs-mime \
+	$(NULL)
