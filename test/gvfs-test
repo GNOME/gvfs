@@ -173,17 +173,17 @@ class GvfsTestCase(unittest.TestCase):
             raise SystemError('command "%s" produced error:\n%s' % (command, err))
 
     def unmount(self, uri):
-        self.program_out_success(['gvfs-mount', '-u', uri])
+        self.program_out_success(['gio', 'mount', '-u', uri])
 
         timeout = 5
         while timeout > 0:
-            (out, err) = self.program_out_err(['gvfs-mount', '-li'])
+            (out, err) = self.program_out_err(['gio', 'mount', '-li'])
             if not re.search('Mount.*' + uri, out):
                 break
             timeout -= 1
             time.sleep(1)
         else:
-            self.fail('gvfs-mount -u %s failed' % uri)
+            self.fail('gio mount -u %s failed' % uri)
 
     @classmethod
     def quote(klass, path):
@@ -192,7 +192,7 @@ class GvfsTestCase(unittest.TestCase):
         return path.replace('%', '%25').replace('/', '%2F').replace(':', '%3A')
 
     def wait_for_gvfs_mount_user_prompt(self, popen):
-        '''Wait for a gvfs-mount Popen process to show an User auth prompt'''
+        '''Wait for a gio mount Popen process to show an User auth prompt'''
 
         empty_timeout = 50
 
@@ -214,7 +214,7 @@ class GvfsTestCase(unittest.TestCase):
         fcntl.fcntl(popen.stdout, fcntl.F_SETFL, flags)
 
     def wait_for_question(self, popen):
-        '''Wait for a gvfs-mount Popen process to show an question prompt'''
+        '''Wait for a gio mount Popen process to show an question prompt'''
 
         empty_timeout = 50
 
@@ -315,17 +315,6 @@ class GvfsTestCase(unittest.TestCase):
         return mo
 
 
-class Programs(GvfsTestCase):
-    '''Test gvfs-* programs'''
-
-    def test_gvfs_info_filesystem(self):
-        '''gvfs-info --filesystem'''
-
-        out = self.program_out_success(['gvfs-info', '-f', '/'])
-        self.assertTrue('filesystem::size:' in out, out)
-        self.assertTrue('filesystem::type:' in out, out)
-
-
 class ArchiveMounter(GvfsTestCase):
     def add_files(self, add_fn):
         '''Add test files to an archive'''
@@ -401,23 +390,23 @@ class ArchiveMounter(GvfsTestCase):
     def do_test_for_archive(self, path):
         # mount it; yes, gvfs expects double quoting
         uri = 'archive://' + self.quote(self.quote('file://' + path))
-        subprocess.check_call(['gvfs-mount', uri])
+        subprocess.check_call(['gio', 'mount', uri])
 
-        # appears in gvfs-mount list
-        (out, err) = self.program_out_err(['gvfs-mount', '-li'])
+        # appears in gio mount list
+        (out, err) = self.program_out_err(['gio', 'mount', '-li'])
         try:
             self.assertTrue('Mount(0)' in out, out)
             self.assertTrue('%s -> %s' % (os.path.basename(path), uri) in out, out)
 
-            # check gvfs-info
-            out = self.program_out_success(['gvfs-info', uri])
+            # check gio info
+            out = self.program_out_success(['gio', 'info', uri])
             self.assertTrue('standard::content-type: inode/directory' in out, out)
             self.assertTrue('access::can-read: TRUE' in out, out)
 
-            # check gvfs-cat
-            out = self.program_out_success(['gvfs-cat', uri + '/hello.txt'])
+            # check gio cat
+            out = self.program_out_success(['gio', 'cat', uri + '/hello.txt'])
             self.assertEqual(out, 'hello\n')
-            out = self.program_out_success(['gvfs-cat', uri + '/stuff/bye.txt'])
+            out = self.program_out_success(['gio', 'cat', uri + '/stuff/bye.txt'])
             self.assertEqual(out, 'bye\n')
         finally:
             self.unmount(uri)
@@ -517,7 +506,7 @@ Subsystem sftp %(sftp_server)s
 
         # mount it
         uri = 'sftp://localhost:22222'
-        subprocess.check_call(['gvfs-mount', uri])
+        subprocess.check_call(['gio', 'mount', uri])
 
         self.do_mount_check(uri)
 
@@ -535,7 +524,7 @@ Subsystem sftp %(sftp_server)s
 
         # try to mount it; should fail as it's an unknown host
         uri = 'sftp://%s:22222' % local_ip
-        (code, out, err) = self.program_code_out_err(['gvfs-mount', uri])
+        (code, out, err) = self.program_code_out_err(['gio', 'mount', uri])
 
         self.assertNotEqual(code, 0)
         # there is nothing in our testbed which would show or answer the
@@ -544,23 +533,23 @@ Subsystem sftp %(sftp_server)s
             self.assertTrue('Login dialog cancelled' in err, err)
 
     def do_mount_check(self, uri):
-        # appears in gvfs-mount list
-        (out, err) = self.program_out_err(['gvfs-mount', '-li'])
+        # appears in gio mount list
+        (out, err) = self.program_out_err(['gio', 'mount', '-li'])
         try:
             self.assertRegex(out, 'Mount\(\d+\):.*localhost -> %s' % uri)
 
-            # check gvfs-info
-            out = self.program_out_success(['gvfs-info', uri])
+            # check gio info
+            out = self.program_out_success(['gio', 'info', uri])
             self.assertRegex(out, 'display name: / .* localhost')
             self.assertTrue('type: directory' in out, out)
             self.assertTrue('access::can-read: TRUE' in out, out)
 
-            # check gvfs-ls
-            out = self.program_out_success(['gvfs-ls', uri + '/home'])
+            # check gio list
+            out = self.program_out_success(['gio', 'list', uri + '/home'])
             self.assertTrue('%s\n' % os.environ['USER'] in out, out)
 
-            # check gvfs-cat
-            out = self.program_out_success(['gvfs-cat', uri + '/etc/passwd'])
+            # check gio cat
+            out = self.program_out_success(['gio', 'cat', uri + '/etc/passwd'])
             self.assertTrue('root:' in out, out)
         finally:
             self.unmount(uri)
@@ -608,7 +597,7 @@ class Ftp(GvfsTestCase):
         '''ftp:// anonymous (CLI with user)'''
 
         uri = 'ftp://anonymous@localhost:2121'
-        subprocess.check_call(['gvfs-mount', uri])
+        subprocess.check_call(['gio', 'mount', uri])
 
         self.do_mount_check_cli(uri, True)
 
@@ -616,7 +605,7 @@ class Ftp(GvfsTestCase):
         '''ftp:// anonymous (CLI with option)'''
 
         uri = 'ftp://localhost:2121'
-        subprocess.check_call(['gvfs-mount', '-a', uri])
+        subprocess.check_call(['gio', 'mount', '-a', uri])
 
         self.do_mount_check_cli(uri, True)
 
@@ -624,7 +613,7 @@ class Ftp(GvfsTestCase):
         '''ftp:// authenticated (CLI)'''
 
         uri = 'ftp://localhost:2121'
-        mount = subprocess.Popen(['gvfs-mount', uri],
+        mount = subprocess.Popen(['gio', 'mount', uri],
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
@@ -647,29 +636,29 @@ class Ftp(GvfsTestCase):
 
         # in test bed, there is nothing interesting in /home/testuser/, and
         # without the test bed we do not know what's in the folder, so skip
-        # gvfs-ls check
+        # gio list check
         self.do_mount_check_cli(uri, False)
 
     def do_mount_check_cli(self, uri, check_contents):
-        # appears in gvfs-mount list
-        (out, err) = self.program_out_err(['gvfs-mount', '-li'])
+        # appears in gio mount list
+        (out, err) = self.program_out_err(['gio', 'mount', '-li'])
         try:
             self.assertRegex(out, 'Mount\(\d+\):.* -> ftp://([a-z0-9]+@)?localhost:2121')
 
-            # check gvfs-info
-            out = self.program_out_success(['gvfs-info', uri])
+            # check gio info
+            out = self.program_out_success(['gio', 'info', uri])
             self.assertRegex(out, 'display name: / .* localhost', out)
             self.assertTrue('type: directory' in out, out)
 
-            # check gvfs-ls
+            # check gio list
             if check_contents:
-                out = self.program_out_success(['gvfs-ls', uri])
+                out = self.program_out_success(['gio', 'list', uri])
                 self.assertEqual(set(out.split()), set(['myfile.txt', 'mydir']))
-                out = self.program_out_success(['gvfs-ls', uri + '/mydir'])
+                out = self.program_out_success(['gio', 'list', uri + '/mydir'])
                 self.assertEqual(out, 'onlyme.txt\n')
 
-                # check gvfs-cat
-                out = self.program_out_success(['gvfs-cat', uri + '/myfile.txt'])
+                # check gio cat
+                out = self.program_out_success(['gio', 'cat', uri + '/myfile.txt'])
                 self.assertEqual(out, 'hello world\n')
         finally:
             self.unmount(uri)
@@ -851,17 +840,17 @@ ncalrpc dir = %(workdir)s/samba
         uri = 'smb://%s/public' % os.uname()[1]
 
         # ensure that this does not ask for any credentials
-        mount = subprocess.Popen(['gvfs-mount', '-a', uri])
+        mount = subprocess.Popen(['gio', 'mount', '-a', uri])
         timeout = 50
         while timeout > 0:
             time.sleep(0.1)
             timeout -= 1
             if mount.poll() is not None:
-                self.assertEqual(mount.returncode, 0, 'gvfs-mount -a %s failed' % uri)
+                self.assertEqual(mount.returncode, 0, 'gio mount -a %s failed' % uri)
                 break
         else:
             mount.terminate()
-            self.fail('timed out waiting for gvfs-mount -a %s' % uri)
+            self.fail('timed out waiting for gio mount -a %s' % uri)
         mount.wait()
 
         self.do_mount_check(uri, False)
@@ -870,7 +859,7 @@ ncalrpc dir = %(workdir)s/samba
         '''smb:// authenticated'''
 
         uri = 'smb://%s@%s/private' % (os.environ['USER'], os.uname()[1])
-        mount = subprocess.Popen(['gvfs-mount', uri],
+        mount = subprocess.Popen(['gio', 'mount', uri],
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
@@ -887,41 +876,41 @@ ncalrpc dir = %(workdir)s/samba
     def do_mount_check(self, uri, writable):
         sharename = uri.split('/')[-1]
 
-        # appears in gvfs-mount list
-        (out, err) = self.program_out_err(['gvfs-mount', '-li'])
+        # appears in gio mount list
+        (out, err) = self.program_out_err(['gio', 'mount', '-li'])
         try:
             self.assertRegex(out, 'Mount\(0\): %s .* smb://.*/%s' % (sharename, sharename))
 
-            # check gvfs-info
-            out = self.program_out_success(['gvfs-info', uri])
+            # check gio info
+            out = self.program_out_success(['gio', 'info', uri])
             self.assertTrue('display name: ' + sharename in out, out)
             self.assertTrue('type: directory' in out, out)
 
-            # check gvfs-ls and gvfs-cat
-            out = self.program_out_success(['gvfs-ls', uri])
+            # check gio list and gio cat
+            out = self.program_out_success(['gio', 'list', uri])
             if sharename == 'public':
                 self.assertEqual(out, 'myfile.txt\n')
 
-                out = self.program_out_success(['gvfs-cat', uri + '/myfile.txt'])
+                out = self.program_out_success(['gio', 'cat', uri + '/myfile.txt'])
                 self.assertEqual(out, 'hello world\n')
             else:
                 self.assertEqual(out, 'mydir\n')
-                self.assertEqual(self.program_out_success(['gvfs-ls', uri + '/mydir']),
+                self.assertEqual(self.program_out_success(['gio', 'list', uri + '/mydir']),
                                  'onlyme.txt\n')
 
-                out = self.program_out_success(['gvfs-cat', uri + '/mydir/onlyme.txt'])
+                out = self.program_out_success(['gio', 'cat', uri + '/mydir/onlyme.txt'])
                 self.assertEqual(out, 'secret\n')
 
             if writable:
                 # should be writable
-                self.program_out_success(['gvfs-copy', '/etc/passwd', uri + '/newfile.txt'])
-                out = self.program_out_success(['gvfs-cat', uri + '/newfile.txt'])
+                self.program_out_success(['gio', 'copy', '/etc/passwd', uri + '/newfile.txt'])
+                out = self.program_out_success(['gio', 'cat', uri + '/newfile.txt'])
                 with open('/etc/passwd') as f:
                     self.assertEqual(out, f.read())
             else:
                 # should not be writable
                 (code, out, err) = self.program_code_out_err(
-                    ['gvfs-copy', '/etc/passwd', uri + '/newfile.txt'])
+                    ['gio', 'copy', '/etc/passwd', uri + '/newfile.txt'])
                 self.assertNotEqual(code, 0)
                 self.assertEqual(out, '')
                 self.assertNotEqual(err, '')
@@ -1032,7 +1021,7 @@ class Drive(GvfsTestCase):
         if umockdev_testbed:
             umockdev_testbed.disable()
 
-        self.monitor = subprocess.Popen(['gvfs-mount', '-oi'],
+        self.monitor = subprocess.Popen(['gio', 'mount', '-oi'],
                                         stdout=subprocess.PIPE)
         # set monitor stdout to non-blocking
         fl = fcntl.fcntl(self.monitor.stdout, fcntl.F_GETFL)
@@ -1077,13 +1066,13 @@ class Drive(GvfsTestCase):
                            'org.freedesktop.udisks2.filesystem-mount-other-seat'])
 
         # now mounting should succeed
-        (out, err) = self.program_out_err(['gvfs-mount', '-d', '/dev/' + dev])
+        (out, err) = self.program_out_err(['gio', 'mount', '-d', '/dev/' + dev])
 
         # should appear as Mount
-        (out, err) = self.program_out_err(['gvfs-mount', '-li'])
+        (out, err) = self.program_out_err(['gio', 'mount', '-li'])
         self.assertEqual(err.strip(), '')
         match = re.search('Mount\(\d+\): bogus-cd -> (file://.*/media/.*/bogus-cd)', out)
-        self.assertTrue(match, 'no Mount found in gvfs-mount -li output:\n' + out)
+        self.assertTrue(match, 'no Mount found in gio mount -li output:\n' + out)
 
         # unmount it again
         self.unmount(match.group(1))
@@ -1192,19 +1181,19 @@ class Drive(GvfsTestCase):
 
         # should fail with only allowing the user to mount removable storage
         self.start_polkit(['org.freedesktop.udisks2.filesystem-mount'])
-        (code, out, err) = self.program_code_out_err(['gvfs-mount', '-d', '/dev/' + dev])
+        (code, out, err) = self.program_code_out_err(['gio', 'mount', '-d', '/dev/' + dev])
         self.assertNotEqual(code, 0)
         self.assertRegex(err, 'Not authorized')
 
         # should succeed with allowing the user to mount system storage
         self.start_polkit(['org.freedesktop.udisks2.filesystem-mount-system'])
-        (out, err) = self.program_out_err(['gvfs-mount', '-d', '/dev/' + dev])
+        (out, err) = self.program_out_err(['gio', 'mount', '-d', '/dev/' + dev])
 
         # should appear as Mount
-        (out, err) = self.program_out_err(['gvfs-mount', '-li'])
+        (out, err) = self.program_out_err(['gio', 'mount', '-li'])
         self.assertEqual(err.strip(), '')
         match = re.search('Mount\(\d+\): testvfat -> (file://.*/media/.*/testvfat)', out)
-        self.assertTrue(match, 'no Mount found in gvfs-mount -li output:\n' + out)
+        self.assertTrue(match, 'no Mount found in gio mount -li output:\n' + out)
 
         # unmount it again
         self.unmount(match.group(1))
@@ -1276,13 +1265,13 @@ pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
 
         # mount it
         self.start_polkit(['org.freedesktop.udisks2.filesystem-mount-system'])
-        (out, err) = self.program_out_err(['gvfs-mount', '-d', '/dev/' + dev])
+        (out, err) = self.program_out_err(['gio', 'mount', '-d', '/dev/' + dev])
 
         # should appear as Mount
-        (out, err) = self.program_out_err(['gvfs-mount', '-li'])
+        (out, err) = self.program_out_err(['gio', 'mount', '-li'])
         self.assertEqual(err.strip(), '')
         match = re.search('Mount\(\d+\): bogus-cd -> (file://.*/media/.*/bogus-cd)', out)
-        self.assertTrue(match, 'no Mount found in gvfs-mount -li output:\n' + out)
+        self.assertTrue(match, 'no Mount found in gio mount -li output:\n' + out)
 
         # should have media player content
         self.assertRegex(out, 'x_content_types:.*x-content/audio-player')
@@ -1486,14 +1475,14 @@ DAVLockDB DAVLock
         '''dav://localhost without credentials'''
 
         uri = 'dav://localhost:8088/public'
-        subprocess.check_call(['gvfs-mount', uri])
+        subprocess.check_call(['gio', 'mount', uri])
         self.do_mount_check(uri, 'hello.txt', 'hi\n')
 
     def test_https_noauth(self):
         '''davs://localhost without credentials'''
 
         uri = 'davs://localhost:4443/public'
-        mount = subprocess.Popen(['gvfs-mount', uri],
+        mount = subprocess.Popen(['gio', 'mount', uri],
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
@@ -1510,7 +1499,7 @@ DAVLockDB DAVLock
 
         uri = 'dav://localhost:8088/secret'
 
-        mount = subprocess.Popen(['gvfs-mount', uri],
+        mount = subprocess.Popen(['gio', 'mount', uri],
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
@@ -1532,7 +1521,7 @@ DAVLockDB DAVLock
 
         uri = 'davs://localhost:4443/secret'
 
-        mount = subprocess.Popen(['gvfs-mount', uri],
+        mount = subprocess.Popen(['gio', 'mount', uri],
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
@@ -1555,32 +1544,32 @@ DAVLockDB DAVLock
         self.do_mount_check(uri, 'restricted.txt', 'dont tell anyone\n')
 
     def do_mount_check(self, uri, testfile, content):
-        # appears in gvfs-mount list
-        (out, err) = self.program_out_err(['gvfs-mount', '-li'])
+        # appears in gio mount list
+        (out, err) = self.program_out_err(['gio', 'mount', '-li'])
         try:
             self.assertRegex(out, 'Mount\(\d+\):.* -> davs?://([a-z0-9]+@)?localhost')
 
-            # check gvfs-info
-            out = self.program_out_success(['gvfs-info', uri])
+            # check gio info
+            out = self.program_out_success(['gio', 'info', uri])
             self.assertRegex(out, 'id::filesystem: dav')
             self.assertTrue('type: directory' in out, out)
 
-            # check gvfs-ls
-            out = self.program_out_success(['gvfs-ls', uri])
+            # check gio list
+            out = self.program_out_success(['gio', 'list', uri])
             self.assertEqual(out.strip(), testfile)
 
-            # check gvfs-cat
-            out = self.program_out_success(['gvfs-cat', uri + '/' + testfile])
+            # check gio cat
+            out = self.program_out_success(['gio', 'cat', uri + '/' + testfile])
             self.assertEqual(out, content)
 
             # create a new file
-            self.program_out_success(['gvfs-copy', uri + '/' + testfile, uri + '/foo'])
-            out = self.program_out_success(['gvfs-cat', uri + '/foo'])
+            self.program_out_success(['gio', 'copy', uri + '/' + testfile, uri + '/foo'])
+            out = self.program_out_success(['gio', 'cat', uri + '/foo'])
             self.assertEqual(out, content)
 
             # remove it again
-            self.program_out_success(['gvfs-rm', uri + '/foo'])
-            out = self.program_out_success(['gvfs-ls', uri])
+            self.program_out_success(['gio', 'remove', uri + '/foo'])
+            out = self.program_out_success(['gio', 'list', uri])
             self.assertFalse('foo' in out.split(), out)
         finally:
             self.unmount(uri)
@@ -1606,7 +1595,7 @@ class Trash(GvfsTestCase):
             # clean up the trash, for predictable test cases
             for f in self.files_in_trash():
                 # print('cleaning up trash:///' + f)
-                subprocess.call(['gvfs-rm', 'trash:///' + f])
+                subprocess.call(['gio', 'remove', 'trash:///' + f])
 
         super().tearDown()
 
@@ -1630,13 +1619,13 @@ class Trash(GvfsTestCase):
 
         # trash it
         del_time = time.time()
-        subprocess.check_call(['gvfs-trash', self.my_file])
+        subprocess.check_call(['gio', 'trash', self.my_file])
         # should now be gone
         self.assertFalse(os.path.exists(self.my_file))
         # and be in the trash
         self.assertEqual(self.files_in_trash(), set(['hello_gvfs_tests.txt']))
 
-        out = self.program_out_success(['gvfs-info', 'trash:///hello_gvfs_tests.txt'])
+        out = self.program_out_success(['gio', 'info', 'trash:///hello_gvfs_tests.txt'])
 
         # has proper original path
         self.assertTrue('trash::orig-path: ' + self.my_file in out, out)
@@ -1709,7 +1698,7 @@ class Trash(GvfsTestCase):
             f.write('hello world\n')
 
         # try to trash it
-        trash = subprocess.Popen(['gvfs-trash', self.my_file], stderr=subprocess.PIPE)
+        trash = subprocess.Popen(['gio', 'trash', self.my_file], stderr=subprocess.PIPE)
         trash.communicate()
 
         if trash.returncode == 0:
