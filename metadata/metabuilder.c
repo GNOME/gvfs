@@ -627,22 +627,22 @@ append_string (GString *out,
 	       GHashTable *string_block)
 {
   guint32 offset;
-  GList *offsets;
+  GQueue *offsets;
 
   append_uint32 (out, 0xdeaddead, &offset);
 
-  if (g_hash_table_lookup_extended (string_block,
-				    string, NULL,
-				    (gpointer *)&offsets))
+  if (!g_hash_table_lookup_extended (string_block,
+                                     string, NULL,
+                                     (gpointer *)&offsets))
     {
-      offsets = g_list_append (offsets, GUINT_TO_POINTER (offset));
-    }
-  else
-    {
+      offsets = g_queue_new ();
+
       g_hash_table_insert (string_block,
-			   (char *)string,
-			   g_list_prepend (NULL, GUINT_TO_POINTER (offset)));
+                           (char *)string,
+                           offsets);
     }
+
+  g_queue_push_tail (offsets, GUINT_TO_POINTER (offset));
 }
 
 static void
@@ -650,7 +650,8 @@ string_block_end (GString *out,
 		  GHashTable *string_block)
 {
   char *string;
-  GList *offsets, *l;
+  GQueue *offsets;
+  GList *l;
   guint32 string_offset, offset;
   GHashTableIter iter;
 
@@ -661,12 +662,12 @@ string_block_end (GString *out,
     {
       string_offset = out->len;
       g_string_append_len (out, string, strlen (string) + 1);
-      for (l = offsets; l != NULL; l = l->next)
+      for (l = g_queue_peek_head_link (offsets); l != NULL; l = l->next)
 	{
 	  offset = GPOINTER_TO_UINT (l->data);
 	  set_uint32 (out, offset, string_offset);
 	}
-      g_list_free (offsets);
+      g_queue_free (offsets);
     }
 
   g_hash_table_destroy (string_block);
@@ -745,14 +746,15 @@ write_children (GString *out,
   GHashTable *strings;
   MetaFile *child, *file;
   GSequenceIter *iter;
-  GList *files;
+  GQueue *files;
 
-  files = g_list_prepend (NULL, builder->root);
+  files = g_queue_new ();
 
-  while (files != NULL)
+  g_queue_push_tail (files, builder->root);
+
+  while (!g_queue_is_empty (files))
     {
-      file = files->data;
-      files = g_list_delete_link (files, files);
+      file = g_queue_pop_head (files);
 
       if (file->children == NULL)
 	continue; /* No children, skip file */
@@ -782,12 +784,14 @@ write_children (GString *out,
 	  append_uint32 (out, 0, &child->metadata_pointer);
 	  append_time_t (out, child->last_changed, builder);
 
-	  if (file->children)
-	    files = g_list_append (files, child);
-	}
+          if (file->children)
+            g_queue_push_tail (files, child);
+        }
 
       string_block_end (out, strings);
     }
+
+  g_queue_free (files);
 }
 
 static void
@@ -832,7 +836,7 @@ write_metadata (GString *out,
   GList *stringvs;
   MetaFile *child, *file;
   GSequenceIter *iter;
-  GList *files;
+  GQueue *files;
 
   /* Root metadata */
   if (builder->root->data != NULL)
@@ -847,11 +851,13 @@ write_metadata (GString *out,
 
   /* the rest, breadth first with all files in one
      dir sharing string block */
-  files = g_list_prepend (NULL, builder->root);
-  while (files != NULL)
+  files = g_queue_new ();
+
+  g_queue_push_tail (files, builder->root);
+
+  while (!g_queue_is_empty (files))
     {
-      file = files->data;
-      files = g_list_delete_link (files, files);
+      file = g_queue_pop_head (files);
 
       if (file->children == NULL)
 	continue; /* No children, skip file */
@@ -870,12 +876,14 @@ write_metadata (GString *out,
 				     &stringvs, strings, key_hash);
 
 	  if (child->children != NULL)
-	    files = g_list_append (files, child);
+	    g_queue_push_tail (files, child);
 	}
 
       stringv_block_end (out, strings, stringvs);
       string_block_end (out, strings);
     }
+
+  g_queue_free (files);
 }
 
 static gboolean
