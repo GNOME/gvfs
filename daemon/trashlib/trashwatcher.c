@@ -113,7 +113,7 @@ find_mount_entry_for_file (GFile *file)
 
       *slash = '\0';
 
-      entry = g_unix_mount_at (pathname, NULL);
+      entry = g_unix_mount_for (pathname, NULL);
     }
   while (entry == NULL && pathname[1]);
 
