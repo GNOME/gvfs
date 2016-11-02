@@ -118,16 +118,18 @@ modify_read_size (GVfsReadChannel *channel,
     real_size = 16*1024;
   else if (channel->read_count <= 4)
     real_size = 32*1024;
-  else
+  else if (channel->read_count <= 5)
     real_size = 64*1024;
+  else
+    real_size = 128*1024;
 
   if (requested_size > real_size)
       real_size = requested_size;
 
   /* Don't do ridicoulously large requests as this
      is just stupid on the network */
-  if (real_size > 128 * 1024)
-    real_size = 128 * 1024;
+  if (real_size > 256 * 1024)
+    real_size = 256 * 1024;
 
   return real_size;
 }
