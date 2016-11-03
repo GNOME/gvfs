@@ -958,9 +958,15 @@ g_vfs_backend_network_finalize (GObject *object)
   g_object_unref (backend->workgroup_symbolic_icon);
   g_object_unref (backend->server_symbolic_icon);
   if (backend->smb_settings)
-    g_object_unref (backend->smb_settings);
+    {
+      g_signal_handlers_disconnect_by_func (backend->smb_settings, smb_settings_change_event_cb, backend);
+      g_clear_object (&backend->smb_settings);
+    }
   if (backend->dnssd_settings)
-    g_object_unref (backend->dnssd_settings);
+    {
+      g_signal_handlers_disconnect_by_func (backend->dnssd_settings, dnssd_settings_change_event_cb, backend);
+      g_clear_object (&backend->dnssd_settings);
+    }
   if (backend->dnssd_monitor)
     {
       g_signal_handlers_disconnect_by_func (backend->dnssd_monitor, notify_dnssd_local_changed, backend);
