@@ -627,7 +627,6 @@ check_event (gpointer user_data)
 {
   GVfsBackendMtp *backend = user_data;
 
-  LIBMTP_event_t event;
   while (!g_atomic_int_get (&backend->unmount_started)) {
     int ret;
     LIBMTP_mtpdevice_t *device = backend->device;
