@@ -148,6 +148,7 @@ EXTRA_DIST = 				\
 	$(gvfs_gschemas_convert_dist)	\
 	$(gsettings_ENUM_FILES)		\
 	org.gtk.vfs.file-operations.policy.in.in \
+	org.gtk.vfs.file-operations.rules \
 	$(NULL)
 
 DISTCLEANFILES = $(mount_DATA) $(noinst_DATA)
@@ -648,9 +649,11 @@ org.gtk.vfs.file-operations.policy.in: org.gtk.vfs.file-operations.policy.in.in 
 org.gtk.vfs.file-operations.policy: org.gtk.vfs.file-operations.policy.in Makefile
 	$(AM_V_GEN) XDG_DATA_DIRS=$(top_srcdir) $(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@ || cp $< $@
 
+if HAVE_ADMIN
 gvfs_polkit_actionsdir = $(datadir)/polkit-1/actions
 gvfs_polkit_actions_in_files = org.gtk.vfs.file-operations.policy.in
 gvfs_polkit_actions_DATA = org.gtk.vfs.file-operations.policy
 
 gvfs_polkit_rulesdir = $(datadir)/polkit-1/rules.d
-dist_gvfs_polkit_rules_DATA = org.gtk.vfs.file-operations.rules
+gvfs_polkit_rules_DATA = org.gtk.vfs.file-operations.rules
+endif
