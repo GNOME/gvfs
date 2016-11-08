@@ -431,6 +431,11 @@ if test "x$enable_google" != "xno" ; then
   if test "x$msg_google" = "xyes"; then
     PKG_CHECK_MODULES([GOOGLE], [goa-1.0 libgdata])
     AC_DEFINE([HAVE_GOOGLE], 1, [Define to 1 if Google is going to be built])
+
+    PKG_CHECK_MODULES(LIBGDATA_0_17_7, libgdata >= 0.17.7,
+        AC_DEFINE(HAVE_LIBGDATA_0_17_7, 1, [Define to 1 if libgdata 0.17.7 is available]),
+        []
+    )
   fi
 fi
 
