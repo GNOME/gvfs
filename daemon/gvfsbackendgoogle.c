@@ -947,10 +947,14 @@ build_file_info (GVfsBackendGoogle      *self,
         }
       else
         {
-          goffset quota_used;
+          goffset size;
 
-          quota_used = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (entry));
-          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE, (guint64) quota_used);
+#if HAVE_LIBGDATA_0_17_7
+          size = gdata_documents_entry_get_file_size (GDATA_DOCUMENTS_ENTRY (entry));
+#else
+          size = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (entry));
+#endif
+          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE, (guint64) size);
         }
     }
 
@@ -1275,7 +1279,11 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   insert_entry (self, GDATA_ENTRY (new_entry));
   g_hash_table_foreach (self->monitors, emit_create_event, entry_path);
 
+#if HAVE_LIBGDATA_0_17_7
+  size = gdata_documents_entry_get_file_size (new_entry);
+#else
   size = gdata_documents_entry_get_quota_used (new_entry);
+#endif
   g_vfs_job_progress_callback (size, size, job);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -1942,7 +1950,11 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
         }
     }
 
+#if HAVE_LIBGDATA_0_17_7
+  size = gdata_documents_entry_get_file_size (GDATA_DOCUMENTS_ENTRY (new_document));
+#else
   size = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (new_document));
+#endif
   g_vfs_job_progress_callback (size, size, job);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
