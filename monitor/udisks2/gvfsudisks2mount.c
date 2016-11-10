@@ -962,7 +962,7 @@ unmount_do (UnmountData *data,
   if (data->mount_operation != NULL)
     gvfs_udisks2_unmount_notify_start (data->mount_operation, 
                                        G_MOUNT (data->mount), NULL,
-                                       (data->filesystem == NULL));
+                                       TRUE);
 
   /* Use the umount(8) command if there is no block device / filesystem */
   if (data->filesystem == NULL)
