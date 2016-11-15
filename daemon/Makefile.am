@@ -263,7 +263,7 @@ gvfsd_localtest_CPPFLAGS = \
 gvfsd_localtest_LDADD = $(libraries)
 
 gvfsd_smb_SOURCES = \
-	gvfsbackendsmb.c gvfsbackendsmb.h \
+	gvfsbackendsmb.c gvfsbackendsmb.h gvfsbackendsmbprivate.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
 
@@ -278,6 +278,7 @@ gvfsd_smb_LDADD = $(SAMBA_LIBS) $(libraries)
 
 gvfsd_smb_browse_SOURCES = \
 	gvfsbackendsmbbrowse.c gvfsbackendsmbbrowse.h \
+	gvfsbackendsmb.c gvfsbackendsmb.h gvfsbackendsmbprivate.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
 
