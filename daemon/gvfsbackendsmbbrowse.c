@@ -541,52 +541,6 @@ purge_cached (SMBCCTX * context)
   return 0;
 }
 
-#define SUB_DELIM_CHARS  "!$&'()*+,;="
-
-static gboolean
-is_valid (char c, const char *reserved_chars_allowed)
-{
-  if (g_ascii_isalnum (c) ||
-      c == '-' ||
-      c == '.' ||
-      c == '_' ||
-      c == '~')
-    return TRUE;
-
-  if (reserved_chars_allowed &&
-      strchr (reserved_chars_allowed, c) != NULL)
-    return TRUE;
-  
-  return FALSE;
-}
-
-static void
-g_string_append_encoded (GString *string,
-			 const char *encoded,
-			 const char *encoded_end,
-			 const char *reserved_chars_allowed)
-{
-  char c;
-  static const gchar hex[16] = "0123456789ABCDEF";
-
-  if (encoded_end == NULL)
-    encoded_end = encoded + strlen (encoded);
-  
-  while (encoded < encoded_end)
-    {
-      c = *encoded++;
-      
-      if (is_valid (c, reserved_chars_allowed))
-	g_string_append_c (string, c);
-      else
-	{
-	  g_string_append_c (string, '%');
-	  g_string_append_c (string, hex[((guchar)c) >> 4]);
-	  g_string_append_c (string, hex[((guchar)c) & 0xf]);
-	}
-    }
-}
-
 static gboolean
 update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
 {
@@ -1297,7 +1251,7 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
 	  entry->smbc_type == SMBC_SERVER)
 	{
 	  uri = g_string_new ("smb://");
-	  g_string_append_encoded (uri, entry->name, NULL, NULL);
+          g_string_append_uri_escaped (uri, entry->name, NULL, FALSE);
 	  g_string_append_c (uri, '/');
 	}
       else
@@ -1305,16 +1259,16 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
 	  mount_spec = get_mount_spec_for_share (backend->server, backend->port, entry->name);
 
 	  uri = g_string_new ("smb://");
-	  g_string_append_encoded (uri, backend->server, NULL, NULL);
+          g_string_append_uri_escaped (uri, backend->server, NULL, FALSE);
 	  g_string_append_c (uri, '/');
-	  g_string_append_encoded (uri, entry->name, NULL, NULL);
+          g_string_append_uri_escaped (uri, entry->name, NULL, FALSE);
 	}
     }
   else
     {
       /* browsing network */
       uri = g_string_new ("smb://");
-      g_string_append_encoded (uri, entry->name, NULL, NULL);
+      g_string_append_uri_escaped (uri, entry->name, NULL, FALSE);
       g_string_append_c (uri, '/');
 
       /* these are auto-mounted, so no CAN_MOUNT/UNMOUNT */

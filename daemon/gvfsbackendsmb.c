@@ -313,44 +313,6 @@ auth_callback (SMBCCTX *context,
 
 #define SUB_DELIM_CHARS  "!$&'()*+,;="
 
-static gboolean
-is_valid (char c, const char *reserved_chars_allowed)
-{
-  if (g_ascii_isalnum (c) ||
-      c == '-' ||
-      c == '.' ||
-      c == '_' ||
-      c == '~')
-    return TRUE;
-
-  if (reserved_chars_allowed &&
-      strchr (reserved_chars_allowed, c) != NULL)
-    return TRUE;
-  
-  return FALSE;
-}
-
-static void
-g_string_append_encoded (GString *string,
-			 const char *encoded,
-			 const char *reserved_chars_allowed)
-{
-  char c;
-  static const gchar hex[16] = "0123456789ABCDEF";
-  
-  while ((c = *encoded++) != 0)
-    {
-      if (is_valid (c, reserved_chars_allowed))
-	g_string_append_c (string, c);
-      else
-	{
-	  g_string_append_c (string, '%');
-	  g_string_append_c (string, hex[((guchar)c) >> 4]);
-	  g_string_append_c (string, hex[((guchar)c) & 0xf]);
-	}
-    }
-}
-
 static GString *
 create_smb_uri_string (const char *server,
 		       int port,
@@ -366,24 +328,24 @@ create_smb_uri_string (const char *server,
   /* IPv6 server includes brackets in GMountSpec, smbclient doesn't */
   if (server[0] == '[')
     {
-      g_string_append_encoded (uri, server + 1, NULL);
+      g_string_append_uri_escaped (uri, server + 1, NULL, FALSE);
       g_string_truncate (uri, uri->len - 3);
     }
   else
-    g_string_append_encoded (uri, server, NULL);
+    g_string_append_uri_escaped (uri, server, NULL, FALSE);
 
   if (port != -1)
     g_string_append_printf (uri, ":%d", port);
   g_string_append_c (uri, '/');
 
   if (share != NULL)
-    g_string_append_encoded (uri, share, NULL);
+    g_string_append_uri_escaped (uri, share, NULL, FALSE);
 
   if (path != NULL)
     {
       if (*path != '/')
 	g_string_append_c (uri, '/');
-      g_string_append_encoded (uri, path, SUB_DELIM_CHARS ":@/");
+      g_string_append_uri_escaped (uri, path, SUB_DELIM_CHARS ":@/", FALSE);
     }
 
   while (uri->len > 0 &&
@@ -1832,9 +1794,7 @@ do_enumerate (GVfsBackend *backend,
 	    {
 	      int stat_res;
 	      g_string_truncate (uri, uri_start_len);
-	      g_string_append_encoded (uri,
-				       dirp->name,
-				       SUB_DELIM_CHARS ":@/");
+              g_string_append_uri_escaped (uri, dirp->name, SUB_DELIM_CHARS ":@/", FALSE);
 
 	      if (matcher == NULL ||
 		  g_file_attribute_matcher_matches_only (matcher, G_FILE_ATTRIBUTE_STANDARD_NAME))
