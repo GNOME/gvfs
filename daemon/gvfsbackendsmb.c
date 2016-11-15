@@ -479,6 +479,8 @@ create_smb_uri_string (const char *server,
   GString *uri;
 
   uri = g_string_new ("smb://");
+  if (server == NULL)
+    return uri;
 
   /* IPv6 server includes brackets in GMountSpec, smbclient doesn't */
   if (server[0] == '[')
@@ -492,7 +494,10 @@ create_smb_uri_string (const char *server,
   if (port != -1)
     g_string_append_printf (uri, ":%d", port);
   g_string_append_c (uri, '/');
-  g_string_append_encoded (uri, share, NULL);
+
+  if (share != NULL)
+    g_string_append_encoded (uri, share, NULL);
+
   if (path != NULL)
     {
       if (*path != '/')
@@ -507,7 +512,7 @@ create_smb_uri_string (const char *server,
   return uri;
 }
 
-static char *
+char *
 create_smb_uri (const char *server,
 		int port,
 		const char *share,

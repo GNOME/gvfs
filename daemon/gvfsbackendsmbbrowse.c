@@ -44,6 +44,7 @@
 #include "gvfsdaemonprotocol.h"
 #include "gvfskeyring.h"
 #include "gmounttracker.h"
+#include "gvfsbackendsmbprivate.h"
 
 #include <libsmbclient.h>
 
@@ -589,7 +590,7 @@ g_string_append_encoded (GString *string,
 static gboolean
 update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
 {
-  GString *uri;
+  char *uri;
   char dirents[1024*4];
   struct smbc_dirent *dirp;
   GList *entries;
@@ -610,22 +611,14 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
   g_debug ("update_cache - updating...\n");
   
   /* Update Cache */
-  uri = g_string_new ("smb://");
-
-  if (backend->server)
-    {
-      g_string_append_encoded (uri, backend->server, NULL, NULL);
-      if (backend->port != -1)
-        g_string_append_printf (uri, ":%d", backend->port);
-      g_string_append_c (uri, '/');
-    }
 
   smbc_opendir = smbc_getFunctionOpendir (backend->smb_context);
   smbc_getdents = smbc_getFunctionGetdents (backend->smb_context);
   smbc_closedir = smbc_getFunctionClosedir (backend->smb_context);
 
-  dir = supplied_dir ? supplied_dir : smbc_opendir (backend->smb_context, uri->str);
-  g_string_free (uri, TRUE);
+  uri = create_smb_uri (backend->server, backend->port, NULL, NULL);
+  dir = supplied_dir ? supplied_dir : smbc_opendir (backend->smb_context, uri);
+  g_free (uri);
   if (dir == NULL)
     {
       entry_errno = errno;
@@ -840,7 +833,7 @@ do_mount (GVfsBackend *backend,
   char *icon;
   char *symbolic_icon;
   gchar *port_str;
-  GString *uri;
+  char *uri;
   gboolean res;
   GMountSpec *browse_mount_spec;
   smbc_opendir_fn smbc_opendir;
@@ -952,17 +945,9 @@ do_mount (GVfsBackend *backend,
   smbc_opendir = smbc_getFunctionOpendir (smb_context);
   smbc_closedir = smbc_getFunctionClosedir (smb_context);
 
-  uri = g_string_new ("smb://");
+  uri = create_smb_uri (op_backend->server, op_backend->port, NULL, NULL);
 
-  if (op_backend->server)
-    {
-      g_string_append_encoded (uri, op_backend->server, NULL, NULL);
-      if (op_backend->port != -1)
-        g_string_append_printf (uri, ":%d", op_backend->port);
-      g_string_append_c (uri, '/');
-    }
-
-  g_debug ("do_mount - URI = %s\n", uri->str);
+  g_debug ("do_mount - URI = %s\n", uri);
 
   do
     {
@@ -971,10 +956,10 @@ do_mount (GVfsBackend *backend,
 
       g_debug ("do_mount - try #%d \n", op_backend->mount_try);
 
-      dir = smbc_opendir (smb_context, uri->str);
+      dir = smbc_opendir (smb_context, uri);
 
       g_debug ("do_mount - [%s; %d] dir = %p, cancelled = %d, errno = [%d] '%s' \n",
-             uri->str, op_backend->mount_try, dir, op_backend->mount_cancelled, 
+             uri, op_backend->mount_try, dir, op_backend->mount_cancelled,
              errno, g_strerror (errno));
 
       if (dir == NULL && 
@@ -1012,7 +997,7 @@ do_mount (GVfsBackend *backend,
     }
   while (op_backend->mount_try_again);
 
-  g_string_free (uri, TRUE);
+  g_free (uri);
 
   op_backend->mount_source = NULL;
 
