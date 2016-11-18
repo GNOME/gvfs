@@ -528,6 +528,7 @@ mount_smb_done_cb (GObject *object,
       g_object_unref (backend->mount_job);
     }  
   g_mutex_unlock (&backend->smb_mount_lock);
+  g_object_unref (backend);
 }
 
 static void
@@ -551,7 +552,7 @@ remount_smb (GVfsBackendNetwork *backend, GVfsJobMount *job)
   file = g_file_new_for_uri (workgroup);
 
   g_file_mount_enclosing_volume (file, G_MOUNT_MOUNT_NONE,
-                                 NULL, NULL, mount_smb_done_cb, backend);
+                                 NULL, NULL, mount_smb_done_cb, g_object_ref (backend));
   g_free (workgroup);
   g_object_unref (file);
 }
