@@ -1,3 +1,17 @@
+Major changes in 1.31.2
+=======================
+* dnssd: Fix crashes and leaks when mount fails
+* network: Fix crashes when mount fails
+* udisks2: Fix misleading notification when unmounting
+* smb: Fix IPv6 uri handling
+* smb: Improve read performance
+* udisks2: Add support for uuid
+* trash: Do not crash if home mount isn't found
+* admin: Fix polkit errors caused by redundant translations
+* Port several parts to GTask
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.31.1
 =======================
 * udisks2: Improve handling of volumes with multiple mountpoints
