@@ -722,10 +722,10 @@ AC_ARG_ENABLE([nfs], [AS_HELP_STRING([--disable-nfs], [build without NFS support
 msg_nfs="no"
 
 if test "x$enable_nfs" != "xno"; then
-  PKG_CHECK_EXISTS([libnfs >= 1.9.7], [msg_nfs=yes])
+  PKG_CHECK_EXISTS([libnfs >= 1.9.8], [msg_nfs=yes])
 
   if test "x$msg_nfs" = "xyes"; then
-    PKG_CHECK_MODULES([NFS],[libnfs >= 1.9.7])
+    PKG_CHECK_MODULES([NFS],[libnfs >= 1.9.8])
     AC_DEFINE([HAVE_NFS], 1, [Define to 1 if nfs is going to be built])
   fi
 fi
