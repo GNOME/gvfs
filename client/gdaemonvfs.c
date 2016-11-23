@@ -1356,16 +1356,11 @@ g_daemon_vfs_local_file_removed (GVfs       *vfs,
       if (proxy)
         {
           metatreefile = meta_tree_get_filename (tree);
-          /* we don't care about the result, let's queue the call and don't block */
-          gvfs_metadata_call_remove (proxy,
-                                     metatreefile,
-                                     tree_path,
-                                     NULL,
-                                     NULL, /* callback */
-                                     NULL);
-          /* flush the call with the expense of sending all queued messages on the connection */
-          g_dbus_connection_flush_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)),
-                                        NULL, NULL);
+          gvfs_metadata_call_remove_sync (proxy,
+                                          metatreefile,
+                                          tree_path,
+                                          NULL,
+                                          NULL);
         }
       
       meta_tree_unref (tree);
@@ -1403,17 +1398,12 @@ g_daemon_vfs_local_file_moved (GVfs       *vfs,
       if (proxy)
         {
           metatreefile = meta_tree_get_filename (tree1);
-          /* we don't care about the result, let's queue the call and don't block */
-          gvfs_metadata_call_move (proxy,
-                                   metatreefile,
-                                   tree_path1,
-                                   tree_path2,
-                                   NULL,
-                                   NULL, /* callback */
-                                   NULL);
-          /* flush the call with the expense of sending all queued messages on the connection */
-          g_dbus_connection_flush_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)),
-                                        NULL, NULL);
+          gvfs_metadata_call_move_sync (proxy,
+                                        metatreefile,
+                                        tree_path1,
+                                        tree_path2,
+                                        NULL,
+                                        NULL);
         }
     }
 
