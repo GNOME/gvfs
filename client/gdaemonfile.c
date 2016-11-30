@@ -2212,10 +2212,7 @@ query_info_fs_async_get_proxy_cb (GVfsDBusMount *proxy,
                                   gpointer callback_data)
 {
   AsyncCallQueryFsInfo *data = callback_data;
-  char *uri;
 
-  uri = g_file_get_uri (data->file);
-  
   data->result = g_object_ref (result);
   
   gvfs_dbus_mount_call_query_filesystem_info (proxy,
@@ -2225,8 +2222,6 @@ query_info_fs_async_get_proxy_cb (GVfsDBusMount *proxy,
                                               (GAsyncReadyCallback) query_fs_info_async_cb,
                                               data);
   data->cancelled_tag = _g_dbus_async_subscribe_cancellable (connection, cancellable);
-  
-  g_free (uri);
 }
 
 static void
