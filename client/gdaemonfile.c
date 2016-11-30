@@ -3279,6 +3279,7 @@ file_open_write_async (GFile                      *file,
   data->mode = mode;
   data->etag = g_strdup (etag ? etag : "");
   data->make_backup = make_backup;
+  data->flags = flags;
   data->io_priority = io_priority;
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
