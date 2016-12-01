@@ -59,6 +59,7 @@
 #include "gvfsjobpush.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfsdaemonutils.h"
+#include "gvfsutils.h"
 
 #ifdef HAVE_AVAHI
 #include "gvfsdnssdutils.h"
@@ -1654,7 +1655,7 @@ g_mount_spec_to_dav_uri (GMountSpec *spec)
   soup_uri_set_user (uri, user);
 
   /* IPv6 host does not include brackets in SoupURI, but GMountSpec host does */
-  if (host[0] == '[')
+  if (gvfs_is_ipv6 (host))
     uri->host = g_strndup (host + 1, strlen (host) - 2);
   else
     soup_uri_set_host (uri, host);

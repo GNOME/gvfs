@@ -326,7 +326,7 @@ create_smb_uri_string (const char *server,
     return uri;
 
   /* IPv6 server includes brackets in GMountSpec, smbclient doesn't */
-  if (server[0] == '[')
+  if (gvfs_is_ipv6 (server))
     {
       g_string_append_uri_escaped (uri, server + 1, NULL, FALSE);
       g_string_truncate (uri, uri->len - 3);

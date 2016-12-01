@@ -30,6 +30,8 @@ gboolean     gvfs_get_debug                         (void);
 void         gvfs_set_debug                         (gboolean          debugging);
 void         gvfs_setup_debug_handler               (void);
 
+gboolean     gvfs_is_ipv6                           (const char       *host);
+
 G_END_DECLS
 
 #endif /* __G_VFS_UTILS_H__ */

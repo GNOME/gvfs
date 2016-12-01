@@ -22,6 +22,7 @@
 
 #include <config.h>
 #include "gvfsuriutils.h"
+#include "gvfsutils.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -264,12 +265,19 @@ g_vfs_encode_uri (GDecodedUri *decoded, gboolean allow_utf8)
 				       G_URI_RESERVED_CHARS_ALLOWED_IN_USERINFO, allow_utf8);
 	  g_string_append_c (uri, '@');
 	}
-      
-      g_string_append_uri_escaped (uri, decoded->host,
-				   /* Allowed unescaped in hostname / ip address */
-				   G_URI_RESERVED_CHARS_SUBCOMPONENT_DELIMITERS ":[]" ,
-				   allow_utf8);
-      
+
+      if (gvfs_is_ipv6 (decoded->host))
+        {
+          g_string_append (uri, decoded->host);
+        }
+      else
+        {
+          g_string_append_uri_escaped (uri, decoded->host,
+                                       /* Allowed unescaped in hostname / ip address */
+                                       G_URI_RESERVED_CHARS_SUBCOMPONENT_DELIMITERS,
+                                       allow_utf8);
+        }
+
       if (decoded->port != -1)
 	{
 	  g_string_append_c (uri, ':');
