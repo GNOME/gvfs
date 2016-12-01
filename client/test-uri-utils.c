@@ -17,6 +17,7 @@ static TestURIs uris[] = {
 	{ "http://windows-host:8080/C:/", "windows-host", 8080 },
 	{ "smb://user:password@192.192.192.192/foobar", "192.192.192.192", -1 },
 	{ "https://d134w4tst3t.s3.amazonaws.com/a?Signature=6VJ9%2BAdPVZ4Z7NnPShRvtDsLofc%3D&Expires=1249330377&AWSAccessKeyId=0EYZF4DV8A7WM0H73602", "d134w4tst3t.s3.amazonaws.com", -1 },
+	{ "dav+sd://foo%3Abar._webdav._tcp.local/", "foo:bar._webdav._tcp.local", -1 },
 };
 
 int main (int argc, char **argv)
