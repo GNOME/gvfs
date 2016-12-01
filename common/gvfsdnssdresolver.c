@@ -1158,6 +1158,14 @@ g_vfs_dns_sd_resolver_resolve (GVfsDnsSdResolver  *resolver,
   task = g_task_new (resolver, cancellable, callback, user_data);
   g_task_set_source_tag (task, g_vfs_dns_sd_resolver_resolve);
 
+  if (resolver->service_type == NULL)
+    {
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               _("Error initializing Avahi resolver"));
+      g_object_unref (task);
+      goto out;
+    }
+
   if (resolver->is_resolved)
     {
       g_task_return_boolean (task, TRUE);
