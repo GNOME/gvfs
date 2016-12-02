@@ -183,7 +183,8 @@ g_vfs_backend_afc_close_connection (GVfsBackendAfc *self)
               sbservices_client_free (self->sbs);
               self->sbs = NULL;
             }
-          g_mutex_clear (&self->apps_lock);
+          if (self->force_umount_id == 0)
+            g_mutex_clear (&self->apps_lock);
         }
       else
         {
