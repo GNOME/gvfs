@@ -42,6 +42,13 @@
 #define G_VFS_BACKEND_AFC_MAX_FILE_SIZE G_MAXINT64
 int g_blocksize = 4096; /* assume this is the default block size */
 
+/* This needs to match with the code in the afc monitor */
+typedef enum {
+  VIRTUAL_PORT_AFC             = 1,
+  VIRTUAL_PORT_AFC_JAILBROKEN  = 2,
+  VIRTUAL_PORT_APPS            = 3
+} VirtualPort;
+
 typedef enum {
   ACCESS_MODE_UNDEFINED = 0,
   ACCESS_MODE_AFC,
@@ -432,7 +439,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   char *tmp;
   char *display_name = NULL;
   lockdownd_service_descriptor_t lockdown_service = NULL;
-  int virtual_port;
+  VirtualPort virtual_port;
   GMountSpec *real_spec;
   GVfsBackendAfc *self;
   int retries;
@@ -481,17 +488,17 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   /* set a generic display name */
   switch (virtual_port) {
-    case 1:
+    case VIRTUAL_PORT_AFC:
       self->mode = ACCESS_MODE_AFC;
       self->service = g_strdup ("com.apple.afc");
       display_name = g_strdup_printf (_("Apple Mobile Device"));
       break;
-    case 2:
+    case VIRTUAL_PORT_AFC_JAILBROKEN:
       self->mode = ACCESS_MODE_AFC;
       self->service = g_strdup_printf ("com.apple.afc%d", virtual_port);
       display_name = g_strdup_printf (_("Apple Mobile Device, Jailbroken"));
       break;
-    case 3:
+    case VIRTUAL_PORT_APPS:
       self->mode = ACCESS_MODE_HOUSE_ARREST;
       self->service = g_strdup ("com.apple.mobile.house_arrest");
       display_name = g_strdup_printf (_("Documents on Apple Mobile Device"));
@@ -513,7 +520,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   g_free (tmp);
 
   /* INFO: Don't ever set the DefaultPort again or everything goes crazy */
-  if (virtual_port != 1)
+  if (virtual_port != VIRTUAL_PORT_AFC)
     {
       tmp = g_strdup_printf ("%d", virtual_port);
       g_mount_spec_set (real_spec, "port", tmp);
@@ -545,17 +552,17 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
       if (display_name)
         {
           switch (virtual_port) {
-            case 1:
+            case VIRTUAL_PORT_AFC:
               g_vfs_backend_set_display_name (G_VFS_BACKEND(self), display_name);
               break;
-            case 2:
+            case VIRTUAL_PORT_AFC_JAILBROKEN:
               g_vfs_backend_set_display_name (G_VFS_BACKEND(self),
               /* translators:
                * This is the device name, with the service being browsed in brackets, eg.:
                * Alan Smithee's iPhone (jailbreak) */
                                               g_strdup_printf (_("%s (jailbreak)"), display_name));
               break;
-            case 3:
+            case VIRTUAL_PORT_APPS:
               g_vfs_backend_set_display_name (G_VFS_BACKEND(self),
               /* translators:
                * This is "Documents on foo" where foo is the device name, eg.:
