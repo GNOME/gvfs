@@ -66,9 +66,7 @@ create_proxy_for_icon (GVfsIcon *vfs_icon,
                                           cancellable,
                                           error);
   
-  if (proxy == NULL)
-    goto out;
-  
+
  out:
   if (mount_info)
     g_mount_info_unref (mount_info);

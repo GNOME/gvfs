@@ -1170,7 +1170,7 @@ g_vfs_dns_sd_resolver_resolve (GVfsDnsSdResolver  *resolver,
     {
       g_task_return_boolean (task, TRUE);
       g_object_unref (task);
-      goto out;
+      return;
     }
 
   ensure_avahi_resolver (resolver);
@@ -1187,9 +1187,6 @@ g_vfs_dns_sd_resolver_resolve (GVfsDnsSdResolver  *resolver,
                     "changed",
                     (GCallback) service_resolver_changed,
                     task);
-
- out:
-  ;
 }
 
 
