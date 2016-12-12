@@ -1,3 +1,12 @@
+Major changes in 1.31.3
+=======================
+* dnssd: Fix crashes for uris with colons
+* trash: Correctly determine fs type for paths with symlinks
+* gdaemonfile: Pass GFileCreateFlags in write operations
+* metadata: Various performance improvements
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.31.2
 =======================
 * dnssd: Fix crashes and leaks when mount fails
