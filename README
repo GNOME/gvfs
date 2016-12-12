@@ -15,7 +15,3 @@ smb, http, dav and others. More backends are planned.
 
 gvfs also contains modules for gio that implement hal volume monitors
 and the gnome uri-scheme handler configuration.
-
-There is a set of command line programs starting with "gvfs-" that
-lets you run commands (like cat, ls, stat, etc) on files in the gvfs
-mounts.

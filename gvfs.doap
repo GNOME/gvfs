@@ -13,9 +13,7 @@ The GVfs model differs from e.g. GnomeVFS in that filesystems must be mounted be
 
 GVfs comes with a set of backends, including trash support, SFTP, SMB, HTTP, DAV, and others.
 
-GVfs also contains modules for GIO that implement volume monitors and the GNOME URI scheme handler configuration.
-
-There is a set of command line programs starting with "gvfs-" that lets you run commands (like cat, ls, stat, etc) on files in the GVfs mounts.</description>
+GVfs also contains modules for GIO that implement volume monitors and the GNOME URI scheme handler configuration.</description>
 
   <homepage rdf:resource="https://wiki.gnome.org/Projects/gvfs" />
   <mailing-list rdf:resource="http://mail.gnome.org/mailman/listinfo/gvfs-list" />
