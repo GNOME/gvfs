@@ -220,7 +220,6 @@ async_got_mount_info (GMountInfo *mount_info,
 
   if (error != NULL)
     {
-      g_dbus_error_strip_remote_error (error);
       g_task_return_error (data->task, g_error_copy (error));
       async_path_call_free (data);
       return;
