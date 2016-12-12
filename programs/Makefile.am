@@ -22,55 +22,55 @@ bin_SCRIPTS =					\
 	$(NULL)
 
 gvfs-mount: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio mount|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|mount|" $< > $@
 
 gvfs-cat: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio cat|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|cat|" $< > $@
 
 gvfs-open: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio open|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|open|" $< > $@
 
 gvfs-save: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio save|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|save|" $< > $@
 
 gvfs-ls: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio list|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|list|" $< > $@
 
 gvfs-tree: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio tree|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|tree|" $< > $@
 
 gvfs-info: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio info|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|info|" $< > $@
 
 gvfs-set-attribute: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio set|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|set|" $< > $@
 
 gvfs-trash: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio trash|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|trash|" $< > $@
 
 gvfs-rename: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio rename|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|rename|" $< > $@
 
 gvfs-rm: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio remove|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|remove|" $< > $@
 
 gvfs-copy: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio copy|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|copy|" $< > $@
 
 gvfs-move: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio move|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|move|" $< > $@
 
 gvfs-monitor-file: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio monitor|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|monitor|" $< > $@
 
 gvfs-monitor-dir: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio monitor|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|monitor|" $< > $@
 
 gvfs-mkdir: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio mkdir|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|mkdir|" $< > $@
 
 gvfs-mime: deprecated.in Makefile
-	$(AM_V_GEN) $(SED) -e "s|\@replacement\@|gio mime|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@command\@|mime|" $< > $@
 
 EXTRA_DIST = \
 	deprecated.in \

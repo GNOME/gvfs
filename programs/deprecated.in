@@ -1,6 +1,14 @@
 #!/bin/sh
-replacement="@replacement@"
+
+replacement="gio @command@"
+help="gio help @command@"
+
 >&2 echo "This tool has been deprecated, use '$replacement' instead."
->&2 echo "See 'gio help' for more info."
+>&2 echo "See '$help' for more info."
 >&2 echo
-exec $replacement "$@"
+
+if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
+  exec $help "$@:2"
+else
+  exec $replacement "$@"
+fi
