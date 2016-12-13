@@ -688,8 +688,6 @@ g_vfs_backend_recent_init (GVfsBackendRecent *backend)
   backend->items = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, (GDestroyNotify)recent_item_free);
   backend->uri_map = g_hash_table_new (g_str_hash, g_str_equal);
 
-  gtk_init (NULL, NULL);
-
   /* translators: This is the name of the backend */
   g_vfs_backend_set_display_name (vfs_backend, _("Recent"));
   g_vfs_backend_set_icon_name (vfs_backend, "document-open-recent");
