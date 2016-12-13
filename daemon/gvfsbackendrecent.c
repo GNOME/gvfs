@@ -12,7 +12,6 @@
 #include "gvfsbackendrecent.h"
 
 #include <glib/gi18n.h> /* _() */
-#include <gtk/gtk.h>
 #include <string.h>
 
 #include "gvfsjobcreatemonitor.h"
@@ -38,7 +37,9 @@ struct OPAQUE_TYPE__GVfsBackendRecent
 {
   GVfsBackend parent_instance;
 
-  GtkRecentManager *recent_manager;
+  GBookmarkFile *bookmarks;
+  gchar *filename;
+  GFileMonitor *monitor;
   GHashTable *uri_map;
   GHashTable *items;
 
@@ -47,6 +48,8 @@ struct OPAQUE_TYPE__GVfsBackendRecent
 };
 
 G_DEFINE_TYPE (GVfsBackendRecent, g_vfs_backend_recent, G_VFS_TYPE_BACKEND);
+
+#define RECENTLY_USED_FILE "recently-used.xbel"
 
 static GVfsMonitor *
 recent_backend_get_file_monitor (GVfsBackendRecent *backend,
@@ -274,9 +277,11 @@ recent_backend_delete (GVfsBackend   *vfs_backend,
       if (item)
         {
           gboolean res;
-          res = gtk_recent_manager_remove_item (backend->recent_manager,
-                                                item->uri,
-                                                &error);
+
+          res = g_bookmark_file_remove_item (backend->bookmarks, item->uri, &error);
+          if (res)
+            res = g_bookmark_file_to_file (backend->bookmarks, backend->filename, &error);
+
           if (res)
             {
               g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -374,15 +379,13 @@ recent_item_free (RecentItem *item)
 }
 
 static gboolean
-recent_item_update (RecentItem    *item,
-                    GtkRecentInfo *info)
+recent_item_update (RecentItem  *item,
+                    const gchar *uri,
+                    const gchar *display_name,
+                    time_t       modified)
 {
   gboolean changed = FALSE;
-  const char *uri;
-  const char *display_name;
-  time_t modified;
 
-  uri = gtk_recent_info_get_uri (info);
   if (g_strcmp0 (item->uri, uri) != 0)
     {
       changed = TRUE;
@@ -393,7 +396,6 @@ recent_item_update (RecentItem    *item,
       item->file = g_file_new_for_uri (item->uri);
     }
 
-  display_name = gtk_recent_info_get_display_name (info);
   if (g_strcmp0 (item->display_name, display_name) != 0)
     {
       changed = TRUE;
@@ -401,7 +403,6 @@ recent_item_update (RecentItem    *item,
       item->display_name = g_strdup (display_name);
     }
 
-  modified = gtk_recent_info_get_modified (info);
   if (item->modified != modified)
     {
       changed = TRUE;
@@ -412,69 +413,130 @@ recent_item_update (RecentItem    *item,
 }
 
 static RecentItem *
-recent_item_new (GtkRecentInfo *info)
+recent_item_new (const gchar *uri,
+                 const gchar *display_name,
+                 time_t       modified)
 {
   RecentItem *item;
   item = g_new0 (RecentItem, 1);
   item->guid = g_dbus_generate_guid ();
 
-  recent_item_update (item, info);
+  recent_item_update (item, uri, display_name, modified);
 
   return item;
+}
+
+static gboolean
+should_include (GBookmarkFile *bookmarks,
+                const gchar   *uri)
+{
+  gchar *mimetype, *filename;
+
+  /* Is public */
+  if (g_bookmark_file_get_is_private (bookmarks, uri, NULL))
+    return FALSE;
+
+  /* Is local */
+  if (g_ascii_strncasecmp (uri, "file:/", 6) != 0)
+    return FALSE;
+
+  /* Is not dir */
+  mimetype = g_bookmark_file_get_mime_type (bookmarks, uri, NULL);
+  if (g_strcmp0 (mimetype, "inode/directory") == 0)
+    {
+      g_free (mimetype);
+      return FALSE;
+    }
+  g_free (mimetype);
+
+  /* Exists */
+  filename = g_filename_from_uri (uri, NULL, NULL);
+  if (!g_file_test (filename, G_FILE_TEST_EXISTS))
+    {
+      g_free (filename);
+      return FALSE;
+    }
+  g_free (filename);
+
+  return TRUE;
+}
+
+static char *
+get_display_name (GBookmarkFile *bookmarks,
+                  const gchar   *uri)
+{
+  gchar *filename, *display_name;
+
+  display_name = g_bookmark_file_get_title (bookmarks, uri, NULL);
+  if (display_name == NULL)
+    {
+      filename = g_filename_from_uri (uri, NULL, NULL);
+      display_name = g_filename_display_basename (filename);
+      g_free (filename);
+    }
+
+  return display_name;
 }
 
 static void
 reload_recent_items (GVfsBackendRecent *backend)
 {
   GVfsMonitor *monitor;
-  GList *items;
-  GList *node;
   GList *added = NULL;
   GList *changed = NULL;
   GList *not_seen_items = NULL;
   GList *l;
+  GError *error = NULL;
+  gchar **uris;
+  gsize uris_len, i;
+
+  g_debug ("reloading recent items\n");
+
+  g_bookmark_file_load_from_file (backend->bookmarks, backend->filename, &error);
+  if (error != NULL)
+    {
+      g_warning ("Unable to load %s: %s", backend->filename, error->message);
+      g_clear_error (&error);
+      g_bookmark_file_free (backend->bookmarks);
+      backend->bookmarks = g_bookmark_file_new ();
+    }
 
   not_seen_items = g_hash_table_get_values (backend->items);
-  items = gtk_recent_manager_get_items (backend->recent_manager);
-  for (node = items; node; node = node->next)
+  uris = g_bookmark_file_get_uris (backend->bookmarks, &uris_len);
+  for (i = 0; i < uris_len; i++)
     {
-      GtkRecentInfo *recent_info = node->data;
-      const char *uri;
+      const char *uri = uris[i];
       const char *guid;
+      char *display_name;
+      time_t modified;
 
-      if (!gtk_recent_info_is_local (recent_info)
-          || gtk_recent_info_get_private_hint (recent_info)
-          || g_strcmp0 (gtk_recent_info_get_mime_type (recent_info), "inode/directory") == 0)
+      if (should_include (backend->bookmarks, uri))
         {
-          gtk_recent_info_unref (recent_info);
-          continue;
-        }
-
-      uri = gtk_recent_info_get_uri (recent_info);
-      guid = g_hash_table_lookup (backend->uri_map, uri);
-      if (gtk_recent_info_exists (recent_info))
-        {
+          display_name = get_display_name (backend->bookmarks, uri);
+          modified = g_bookmark_file_get_modified (backend->bookmarks, uri, NULL);
+          guid = g_hash_table_lookup (backend->uri_map, uri);
           if (guid)
             {
               RecentItem *item;
               item = g_hash_table_lookup (backend->items, guid);
-              if (recent_item_update (item, recent_info))
+              if (recent_item_update (item, uri, display_name, modified))
                 changed = g_list_prepend (changed, item->guid);
               not_seen_items = g_list_remove (not_seen_items, item);
             }
           else
             {
               RecentItem *item;
-              item = recent_item_new (recent_info);
+              item = recent_item_new (uri, display_name, modified);
               added = g_list_prepend (added, item->guid);
               g_hash_table_insert (backend->items, item->guid, item);
               g_hash_table_insert (backend->uri_map, item->uri, item->guid);
             }
+
+          g_free (display_name);
         }
-      gtk_recent_info_unref (recent_info);
     }
 
-  g_list_free (items);
+  g_strfreev (uris);
 
   monitor = recent_backend_get_dir_monitor (backend, FALSE);
 
@@ -510,10 +572,33 @@ reload_recent_items (GVfsBackendRecent *backend)
 }
 
 static void
-on_recent_manager_changed (GtkRecentManager  *manager,
-                           GVfsBackendRecent *backend)
+bookmarks_changed (GFileMonitor      *monitor,
+                   GFile             *file,
+                   GFile             *other_file,
+                   GFileMonitorEvent  event_type,
+                   gpointer           user_data)
 {
-  reload_recent_items (backend);
+  GVfsBackendRecent *backend = G_VFS_BACKEND_RECENT (user_data);
+  gchar *filename;
+
+  switch (event_type)
+    {
+      case G_FILE_MONITOR_EVENT_CREATED:
+      case G_FILE_MONITOR_EVENT_DELETED:
+        filename = g_file_get_path (file);
+        if (g_strcmp0 (filename, backend->filename) != 0)
+          {
+            g_free (filename);
+            break;
+          }
+        g_free (filename);
+      case G_FILE_MONITOR_EVENT_CHANGED:
+        reload_recent_items (backend);
+        break;
+
+      default:
+        break;
+    }
 }
 
 static gboolean
@@ -524,12 +609,23 @@ recent_backend_mount (GVfsBackend  *vfs_backend,
                       gboolean      is_automount)
 {
   GVfsBackendRecent *backend = G_VFS_BACKEND_RECENT (vfs_backend);
+  GError *error = NULL;
+  GFile *file;
 
-  backend->recent_manager = gtk_recent_manager_get_default ();
-  g_signal_connect (backend->recent_manager,
-                    "changed",
-                    G_CALLBACK (on_recent_manager_changed),
-                    backend);
+  backend->bookmarks = g_bookmark_file_new ();
+  backend->filename = g_build_filename (g_get_user_data_dir (), RECENTLY_USED_FILE, NULL);
+
+  file = g_file_new_for_path (backend->filename);
+  backend->monitor = g_file_monitor_file (file, G_FILE_MONITOR_NONE, NULL, &error);
+  g_object_unref (file);
+  if (error != NULL)
+    {
+      g_warning ("Unable to monitor %s: %s", backend->filename, error->message);
+      g_clear_error (&error);
+    }
+  else
+    g_signal_connect (backend->monitor, "changed", G_CALLBACK (bookmarks_changed), backend);
+
   reload_recent_items (backend);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -688,7 +784,13 @@ recent_backend_finalize (GObject *object)
   g_hash_table_destroy (backend->items);
   g_hash_table_destroy (backend->uri_map);
 
-  g_signal_handlers_disconnect_by_func (backend->recent_manager, on_recent_manager_changed, backend);
+  g_clear_pointer (&backend->filename, g_free);
+  g_clear_pointer (&backend->bookmarks, g_bookmark_file_free);
+  if (backend->monitor)
+    {
+      g_signal_handlers_disconnect_by_func (backend->monitor, reload_recent_items, backend);
+      g_clear_object (&backend->monitor);
+    }
 
   if (G_OBJECT_CLASS (g_vfs_backend_recent_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_recent_parent_class)->finalize) (object);

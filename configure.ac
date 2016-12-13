@@ -609,28 +609,6 @@ AC_SUBST(SAMBA_LIBS)
 dnl ==========================================================================
 
 dnl ****************************
-dnl *** Check for GTK        ***
-dnl ****************************
-
-AC_ARG_ENABLE([gtk], [AS_HELP_STRING([--disable-gtk],[build without GTK+])])
-msg_gtk=no
-GTK_REQUIRED=3.0
-
-if test "x$enable_gtk" != "xno"; then
-  PKG_CHECK_EXISTS([gtk+-3.0 >= $GTK_REQUIRED], [msg_gtk=yes])
-
-  if test "x$msg_gtk" = "xyes"; then
-    PKG_CHECK_MODULES([GTK],[gtk+-3.0 >= $GTK_REQUIRED])
-    AC_DEFINE([HAVE_GTK], 1, [Define to 1 if GTK+ is available])
-  fi
-fi
-
-AM_CONDITIONAL([USE_GTK], [test "$msg_gtk" = "yes"])
-
-AC_SUBST(GTK_CFLAGS)
-AC_SUBST(GTK_LIBS)
-
-dnl ****************************
 dnl *** Check for libarchive ***
 dnl ****************************
 
@@ -939,7 +917,6 @@ echo "
         Use libsystemd-login:         $msg_libsystemd_login
         Use GCR:                      $msg_gcr
 	GNOME Keyring support:        $msg_keyring
-	GTK+ support:                 $msg_gtk
 	Installed tests:              $msg_installed_tests
 "
 
