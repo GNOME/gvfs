@@ -145,7 +145,7 @@ send_infos_cb (GVfsDBusEnumerator *proxy,
   if (error != NULL)
     {
       g_dbus_error_strip_remote_error (error);
-      g_warning ("send_infos_cb: %s (%s, %d)\n", error->message, g_quark_to_string (error->domain), error->code);
+      g_debug ("send_infos_cb: %s (%s, %d)\n", error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
 }
@@ -234,7 +234,7 @@ send_done_cb (GVfsDBusEnumerator *proxy,
   if (error != NULL)
     {
       g_dbus_error_strip_remote_error (error);
-      g_warning ("send_done_cb: %s (%s, %d)\n", error->message, g_quark_to_string (error->domain), error->code);
+      g_debug ("send_done_cb: %s (%s, %d)\n", error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
 }
