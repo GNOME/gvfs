@@ -358,7 +358,7 @@ recompute_files (GVfsBackendNetwork *backend)
           else
             {
 	      char *uri = g_file_get_uri (server_file);
-              g_debug ("Couldn't create directory monitor on %s. Error: %s",
+              g_debug ("Couldn't create directory monitor on %s. Error: %s\n",
 	     		 uri, error->message);
 	      g_free (uri);
               g_clear_error (&error);
