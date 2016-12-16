@@ -1,3 +1,12 @@
+Major changes in 1.30.3
+=======================
+* recent: Fix crashes when DISPLAY is not set
+* metadata: Various performance improvements
+* dnssd: Fix crashes and leaks when mount fails
+* network: Fix crashes when mount fails
+* udisks2: Fix misleading notification when unmounting
+* smb: Fix IPv6 uri handling
+
 Major changes in 1.30.2
 =========================
 * trash: Do not crash if home mount isn't found
