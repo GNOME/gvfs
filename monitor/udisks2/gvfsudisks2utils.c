@@ -672,9 +672,9 @@ unmount_notify_timer_cb (gpointer user_data)
 
   name = unmount_notify_get_name (data);
   if (data->generic_text)
-    message = g_strdup_printf (_("Unmounting %s\nPlease wait"), name);
+    message = g_strdup_printf (_("Unmounting %s\nDisconnecting from filesystem."), name);
   else
-    message = g_strdup_printf (_("Writing data to %s\nDon’t unplug until finished"), name);
+    message = g_strdup_printf (_("Writing data to %s\nDevice should not be unplugged."), name);
 
   g_signal_emit_by_name (data->op, "show-unmount-progress",
                          message, -1, -1);
@@ -816,9 +816,9 @@ gvfs_udisks2_unmount_notify_stop (GMountOperation *op,
 
   name = unmount_notify_get_name (data);
   if (data->generic_text)
-    message = g_strdup_printf (_("%s has been unmounted\n"), name);
+    message = g_strdup_printf (_("%s unmounted\nFilesystem has been disconnected."), name);
   else
-    message = g_strdup_printf (_("You can now unplug %s\n"), name);
+    message = g_strdup_printf (_("%s can be safely unplugged\nDevice can be removed."), name);
 
   g_signal_emit_by_name (data->op, "show-unmount-progress",
                          message, 0, 0);
