@@ -55,8 +55,7 @@ gboolean gvfs_udisks2_utils_is_drive_on_our_seat (UDisksDrive *drive);
 
 void     gvfs_udisks2_unmount_notify_start (GMountOperation *op,
                                             GMount          *mount,
-                                            GDrive          *drive,
-                                            gboolean         generic_text);
+                                            GDrive          *drive);
 void     gvfs_udisks2_unmount_notify_stop  (GMountOperation *op,
                                             gboolean         unmount_failed);
 

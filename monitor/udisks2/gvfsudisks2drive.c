@@ -882,7 +882,7 @@ gvfs_udisks2_drive_eject_with_operation (GDrive              *_drive,
   if (mount_operation != NULL)
     {
       g_object_set_data (G_OBJECT (mount_operation), "x-udisks2-is-eject", GINT_TO_POINTER (1));
-      gvfs_udisks2_unmount_notify_start (mount_operation, NULL, _drive, FALSE);
+      gvfs_udisks2_unmount_notify_start (mount_operation, NULL, _drive);
     }
 
   /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
@@ -1024,7 +1024,7 @@ gvfs_udisks2_drive_stop (GDrive              *_drive,
   if (mount_operation != NULL)
     {
       g_object_set_data (G_OBJECT (mount_operation), "x-udisks2-is-stop", GINT_TO_POINTER (1));
-      gvfs_udisks2_unmount_notify_start (mount_operation, NULL, _drive, FALSE);
+      gvfs_udisks2_unmount_notify_start (mount_operation, NULL, _drive);
     }
 
   /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */

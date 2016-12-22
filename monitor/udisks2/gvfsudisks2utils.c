@@ -608,7 +608,6 @@ typedef struct {
 
   GMountOperation *op;
   gboolean op_aborted;
-  gboolean generic_text;
   gboolean show_processes_up;
 
   guint unmount_timer_id;
@@ -671,7 +670,7 @@ unmount_notify_timer_cb (gpointer user_data)
   data->unmount_fired = TRUE;
 
   name = unmount_notify_get_name (data);
-  if (data->generic_text)
+  if (data->mount)
     message = g_strdup_printf (_("Unmounting %s\nDisconnecting from filesystem."), name);
   else
     message = g_strdup_printf (_("Writing data to %s\nDevice should not be unplugged."), name);
@@ -755,8 +754,7 @@ unmount_notify_data_free (gpointer user_data)
 static UnmountNotifyData *
 unmount_notify_data_for_operation (GMountOperation *op,
                                    GMount          *mount,
-                                   GDrive          *drive,
-                                   gboolean         generic_text)
+                                   GDrive          *drive)
 {
   UnmountNotifyData *data;
 
@@ -766,7 +764,6 @@ unmount_notify_data_for_operation (GMountOperation *op,
 
   data = g_slice_new0 (UnmountNotifyData);
   data->op = op;
-  data->generic_text = generic_text;
 
   if (mount)
     data->mount = g_object_ref (mount);
@@ -790,12 +787,11 @@ unmount_notify_data_for_operation (GMountOperation *op,
 void
 gvfs_udisks2_unmount_notify_start (GMountOperation *op,
                                    GMount          *mount,
-                                   GDrive          *drive,
-                                   gboolean         generic_text)
+                                   GDrive          *drive)
 {
   UnmountNotifyData *data;
 
-  data = unmount_notify_data_for_operation (op, mount, drive, generic_text);
+  data = unmount_notify_data_for_operation (op, mount, drive);
   unmount_notify_ensure_timer (data);
 }
 
@@ -815,7 +811,7 @@ gvfs_udisks2_unmount_notify_stop (GMountOperation *op,
     return;
 
   name = unmount_notify_get_name (data);
-  if (data->generic_text)
+  if (data->mount)
     message = g_strdup_printf (_("%s unmounted\nFilesystem has been disconnected."), name);
   else
     message = g_strdup_printf (_("%s can be safely unplugged\nDevice can be removed."), name);
