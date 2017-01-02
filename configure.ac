@@ -760,6 +760,7 @@ AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 dnl ==========================================================================
 dnl Look for various fs info getters
 
+AC_HEADER_MAJOR
 AC_CHECK_HEADERS([sys/statfs.h sys/statvfs.h sys/vfs.h sys/mount.h sys/param.h])
 AC_CHECK_FUNCS(statvfs statfs)
 AC_CHECK_MEMBERS([struct statfs.f_fstypename, struct statfs.f_bavail],,, [#include <sys/types.h>

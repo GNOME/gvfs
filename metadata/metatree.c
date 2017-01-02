@@ -18,6 +18,12 @@
 #include "metadata-dbus.h"
 #include "gvfsdaemonprotocol.h"
 
+#if MAJOR_IN_MKDEV
+#include <sys/mkdev.h>
+#elif MAJOR_IN_SYSMACROS
+#include <sys/sysmacros.h>
+#endif
+
 #define MAGIC "\xda\x1ameta"
 #define MAGIC_LEN 6
 #define MAJOR_VERSION 1

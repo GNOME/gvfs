@@ -36,6 +36,12 @@
 #include <libudev.h>
 #endif
 
+#if MAJOR_IN_MKDEV
+#include <sys/mkdev.h>
+#elif MAJOR_IN_SYSMACROS
+#include <sys/sysmacros.h>
+#endif
+
 #define WRITEOUT_TIMEOUT_SECS 60
 #define WRITEOUT_TIMEOUT_SECS_NFS 15
 
