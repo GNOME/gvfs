@@ -100,6 +100,7 @@ monitor/gphoto2/ggphoto2volumemonitor.c
 monitor/proxy/gproxydrive.c
 monitor/proxy/gproxymount.c
 monitor/proxy/gproxyvolume.c
+monitor/proxy/gvfsproxyvolumemonitordaemon.c
 monitor/udisks2/gvfsudisks2drive.c
 monitor/udisks2/gvfsudisks2mount.c
 monitor/udisks2/gvfsudisks2utils.c

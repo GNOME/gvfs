@@ -1034,7 +1034,7 @@ handle_mount_unmount (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.NotFound",
-                                                  "The given mount was not found");
+                                                  _("The given mount was not found"));
       goto out;
     }
 
@@ -1042,7 +1042,7 @@ handle_mount_unmount (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.Failed",
-                                                  "An operation is already pending");
+                                                  _("An operation is already pending"));
       goto out;
     }
 
@@ -1125,7 +1125,7 @@ handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.NotFound",
-                                                  "No outstanding mount operation");
+                                                  _("No outstanding mount operation"));
       goto out;
     }
 
@@ -1213,7 +1213,7 @@ handle_volume_mount (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.NotFound",
-                                                  "The given volume was not found");
+                                                  _("The given volume was not found"));
       goto out;
     }
 
@@ -1221,7 +1221,7 @@ handle_volume_mount (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.Failed",
-                                                  "An operation is already pending");
+                                                  _("An operation is already pending"));
       goto out;
     }
 
@@ -1320,7 +1320,7 @@ handle_drive_eject (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.NotFound",
-                                                  "The given drive was not found");
+                                                  _("The given drive was not found"));
       goto out;
     }
 
@@ -1328,7 +1328,7 @@ handle_drive_eject (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.Failed",
-                                                  "An operation is already pending");
+                                                  _("An operation is already pending"));
       goto out;
     }
 
@@ -1427,7 +1427,7 @@ handle_drive_stop (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.NotFound",
-                                                  "The given drive was not found");
+                                                  _("The given drive was not found"));
       goto out;
     }
 
@@ -1435,7 +1435,7 @@ handle_drive_stop (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.Failed",
-                                                  "An operation is already pending");
+                                                  _("An operation is already pending"));
       goto out;
     }
 
@@ -1534,7 +1534,7 @@ handle_drive_start (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.NotFound",
-                                                  "The given drive was not found");
+                                                  _("The given drive was not found"));
       goto out;
     }
 
@@ -1542,7 +1542,7 @@ handle_drive_start (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.Failed",
-                                                  "An operation is already pending");
+                                                  _("An operation is already pending"));
       goto out;
     }
 
@@ -1637,7 +1637,7 @@ handle_drive_poll_for_media (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.NotFound",
-                                                  "The given drive was not found");
+                                                  _("The given drive was not found"));
       goto out;
     }
 
@@ -1645,7 +1645,7 @@ handle_drive_poll_for_media (GVfsRemoteVolumeMonitor *object,
     {
       g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.Private.RemoteVolumeMonitor.Failed",
-                                                  "An operation is already pending");
+                                                  _("An operation is already pending"));
       goto out;
     }
 
