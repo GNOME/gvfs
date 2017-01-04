@@ -148,14 +148,11 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
       return;
     }
 
-  if (mount_info->user_visible)
-    {
-      mount = g_daemon_mount_new (mount_info, G_VOLUME_MONITOR (daemon_monitor));
-      daemon_monitor->mounts = g_list_prepend (daemon_monitor->mounts, mount);
+  mount = g_daemon_mount_new (mount_info, G_VOLUME_MONITOR (daemon_monitor));
+  daemon_monitor->mounts = g_list_prepend (daemon_monitor->mounts, mount);
 
-      /* Ref for the signal emission, other ref is owned by volume monitor */
-      g_object_ref (mount);
-    }
+  /* Ref for the signal emission, other ref is owned by volume monitor */
+  g_object_ref (mount);
   
   G_UNLOCK (daemon_vm);
 
@@ -177,8 +174,7 @@ mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
   mount = find_mount_by_mount_info (daemon_monitor, mount_info);
   if (!mount)
     {
-      if (mount_info->user_visible)
-	g_warning (G_STRLOC ": An unknown mount was removed!");
+      g_warning (G_STRLOC ": An unknown mount was removed!");
       
       G_UNLOCK (daemon_vm);
       return;
@@ -203,7 +199,7 @@ g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
 
   _the_daemon_volume_monitor = daemon_monitor;
 
-  daemon_monitor->mount_tracker = g_mount_tracker_new (_g_daemon_vfs_get_async_bus ());
+  daemon_monitor->mount_tracker = g_mount_tracker_new (_g_daemon_vfs_get_async_bus (), TRUE);
 
   g_signal_connect_swapped (daemon_monitor->mount_tracker, "mounted",
 			    (GCallback) mount_added, daemon_monitor);
@@ -215,12 +211,10 @@ g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
 
   for (l = mounts; l != NULL; l = l->next) {
     info = l->data;
-    if (info->user_visible)
-      {
-        mount = g_daemon_mount_new (info, G_VOLUME_MONITOR (daemon_monitor));
-	daemon_monitor->mounts = g_list_prepend (daemon_monitor->mounts, mount);
-      }
-    
+
+    mount = g_daemon_mount_new (info, G_VOLUME_MONITOR (daemon_monitor));
+    daemon_monitor->mounts = g_list_prepend (daemon_monitor->mounts, mount);
+
     g_mount_info_unref (info);
   }
   

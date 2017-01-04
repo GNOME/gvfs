@@ -79,7 +79,8 @@ void        g_mount_info_apply_prefix (GMountInfo *info,
 
 GMountInfo * g_mount_info_from_dbus (GVariant *value);
 
-GMountTracker *g_mount_tracker_new                (GDBusConnection *connection);
+GMountTracker *g_mount_tracker_new                (GDBusConnection *connection,
+                                                   gboolean         user_visible_only);
 GList *        g_mount_tracker_list_mounts        (GMountTracker *tracker);
 GMountInfo *   g_mount_tracker_find_by_mount_spec (GMountTracker *tracker,
 						   GMountSpec    *mount_spec);

@@ -518,7 +518,7 @@ g_vfs_backend_afp_browse_init (GVfsBackendAfpBrowse *object)
 {
   GVfsBackendAfpBrowse *afp_backend = G_VFS_BACKEND_AFP_BROWSE (object);
 
-  afp_backend->mount_tracker = g_mount_tracker_new (NULL);
+  afp_backend->mount_tracker = g_mount_tracker_new (NULL, FALSE);
 
   afp_backend->addr = NULL;
   afp_backend->user = NULL;

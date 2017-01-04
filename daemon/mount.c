@@ -820,21 +820,51 @@ handle_lookup_mount_by_fuse_path (GVfsDBusMountTracker *object,
   return TRUE;
 }
 
+static void
+build_mounts_array (GVariantBuilder *mounts_array,
+                    gboolean user_visible_only)
+{
+  GList *l;
+  VfsMount *mount;
+
+  g_variant_builder_init (mounts_array, G_VARIANT_TYPE (VFS_MOUNT_ARRAY_DBUS_STRUCT_TYPE));
+  for (l = mounts; l != NULL; l = l->next)
+    {
+      mount = l->data;
+
+      if (!user_visible_only || mount->user_visible)
+        g_variant_builder_add_value (mounts_array, vfs_mount_to_dbus (mount));
+    }
+}
+
 static gboolean
 handle_list_mounts (GVfsDBusMountTracker *object,
                     GDBusMethodInvocation *invocation,
                     gpointer user_data)
 {
-  GList *l;
   GVariantBuilder mounts_array;
 
-  g_variant_builder_init (&mounts_array, G_VARIANT_TYPE (VFS_MOUNT_ARRAY_DBUS_STRUCT_TYPE));
-  for (l = mounts; l != NULL; l = l->next)
-    g_variant_builder_add_value (&mounts_array, vfs_mount_to_dbus (l->data));
-  
+  build_mounts_array (&mounts_array, FALSE);
+
   gvfs_dbus_mount_tracker_complete_list_mounts (object, invocation,
                                                 g_variant_builder_end (&mounts_array));
-  
+
+  return TRUE;
+}
+
+static gboolean
+handle_list_mounts2 (GVfsDBusMountTracker *object,
+                     GDBusMethodInvocation *invocation,
+                     gboolean arg_user_visible_only,
+                     gpointer user_data)
+{
+  GVariantBuilder mounts_array;
+
+  build_mounts_array (&mounts_array, arg_user_visible_only);
+
+  gvfs_dbus_mount_tracker_complete_list_mounts2 (object, invocation,
+                                                 g_variant_builder_end (&mounts_array));
+
   return TRUE;
 }
 
@@ -1056,6 +1086,7 @@ mount_init (void)
   g_signal_connect (mount_tracker, "handle-lookup-mount", G_CALLBACK (handle_lookup_mount), NULL);
   g_signal_connect (mount_tracker, "handle-lookup-mount-by-fuse-path", G_CALLBACK (handle_lookup_mount_by_fuse_path), NULL);
   g_signal_connect (mount_tracker, "handle-list-mounts", G_CALLBACK (handle_list_mounts), NULL);
+  g_signal_connect (mount_tracker, "handle-list-mounts2", G_CALLBACK (handle_list_mounts2), NULL);
   g_signal_connect (mount_tracker, "handle-list-mountable-info", G_CALLBACK (handle_list_mountable_info), NULL);
   g_signal_connect (mount_tracker, "handle-list-mount-types", G_CALLBACK (handle_list_mount_types), NULL);
   g_signal_connect (mount_tracker, "handle-unregister-mount", G_CALLBACK (handle_unregister_mount), NULL);

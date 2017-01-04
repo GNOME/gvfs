@@ -36,7 +36,8 @@ enum {
 
 enum {
   PROP_0,
-  PROP_CONNECTION
+  PROP_CONNECTION,
+  PROP_USER_VISIBLE_ONLY
 };
 
 /* TODO: Real P_() */
@@ -53,6 +54,8 @@ struct _GMountTracker
   GList *mounts;
   GDBusConnection *connection;
   GVfsDBusMountTracker *proxy;
+
+  gboolean user_visible_only;
 };
 
 G_DEFINE_TYPE (GMountTracker, g_mount_tracker, G_TYPE_OBJECT)
@@ -309,7 +312,15 @@ g_mount_tracker_class_init (GMountTrackerClass *klass)
 							 P_("The dbus connection to use for ipc."),
 							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
 							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
-  
+
+  g_object_class_install_property (gobject_class,
+                                   PROP_USER_VISIBLE_ONLY,
+                                   g_param_spec_boolean ("user-visible-only",
+                                                         P_("User visible only"),
+                                                         P_("User visible only"),
+                                                         FALSE,
+                                                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+                                                         G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB));
 }
 
 static void
@@ -326,6 +337,9 @@ g_mount_tracker_set_property (GObject         *object,
       g_clear_object (&tracker->connection);
       if (g_value_get_pointer (value))
 	tracker->connection = g_object_ref (g_value_get_pointer (value));
+      break;
+    case PROP_USER_VISIBLE_ONLY:
+      tracker->user_visible_only = g_value_get_boolean (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -345,6 +359,9 @@ g_mount_tracker_get_property (GObject    *object,
     {
     case PROP_CONNECTION:
       g_value_set_pointer (value, tracker->connection);
+      break;
+    case PROP_USER_VISIBLE_ONLY:
+      g_value_set_boolean (value, tracker->user_visible_only);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -375,6 +392,12 @@ g_mount_tracker_add_mount (GMountTracker *tracker,
   
   /* Don't add multiple times */
   if (g_mount_tracker_find (tracker, info))
+    {
+      g_mutex_unlock (&tracker->lock);
+      return;
+    }
+
+  if (tracker->user_visible_only && !info->user_visible)
     {
       g_mutex_unlock (&tracker->lock);
       return;
@@ -475,6 +498,7 @@ init_connection_sync (GMountTracker *tracker)
 {
   GError *error;
   GVariant *iter_mounts;
+  gboolean res;
 
   if (tracker->connection == NULL)
     tracker->connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
@@ -497,7 +521,15 @@ init_connection_sync (GMountTracker *tracker)
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (tracker->proxy), 
                                     G_VFS_DBUS_TIMEOUT_MSECS);
 
-  if (gvfs_dbus_mount_tracker_call_list_mounts_sync (tracker->proxy, &iter_mounts, NULL, NULL))
+  res = gvfs_dbus_mount_tracker_call_list_mounts2_sync (tracker->proxy, tracker->user_visible_only, &iter_mounts, NULL, &error);
+  if (!res)
+    {
+      if (g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
+        res = gvfs_dbus_mount_tracker_call_list_mounts_sync (tracker->proxy, &iter_mounts, NULL, NULL);
+      g_clear_error (&error);
+    }
+
+  if (res)
     {
       list_mounts_reply (tracker, iter_mounts);
       g_variant_unref (iter_mounts);
@@ -534,12 +566,13 @@ g_mount_tracker_constructor (GType                  type,
 }
 
 GMountTracker *
-g_mount_tracker_new (GDBusConnection *connection)
+g_mount_tracker_new (GDBusConnection *connection,
+                     gboolean         user_visible_only)
 {
   GMountTracker *tracker;
 
-  tracker = g_object_new (G_TYPE_MOUNT_TRACKER, "connection", connection, NULL);
-  
+  tracker = g_object_new (G_TYPE_MOUNT_TRACKER, "connection", connection, "user_visible_only", user_visible_only, NULL);
+
   return tracker;
 }
 

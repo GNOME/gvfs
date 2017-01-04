@@ -82,6 +82,10 @@
     <method name="ListMounts">
       <arg type='a(sossssssbay(aya{sv})ay)' name='mounts' direction='out'/>
     </method>
+    <method name="ListMounts2">
+      <arg type='b' name='user_visible_only' direction='in'/>
+      <arg type='a(sossssssbay(aya{sv})ay)' name='mounts' direction='out'/>
+    </method>
     <method name="RegisterMount">
       <arg type='o' name='obj_path' direction='in'/>
       <arg type='s' name='display_name' direction='in'/>
