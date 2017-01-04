@@ -84,6 +84,14 @@
 
 #define SFTP_READ_TIMEOUT 40   /* seconds */
 
+/*
+ * All servers SHOULD support packets of at least 34000 bytes (where the packet
+ * size refers to the full length, including the header above). This should
+ * allow for reads and writes of at most 32768 bytes. For more details, see
+ * draft-ietf-secsh-filexfer-02.txt.
+ */
+#define MAX_BUFFER_SIZE 32768
+
 static GQuark id_q;
 
 typedef enum {
@@ -3928,7 +3936,7 @@ write_reply (GVfsBackendSftp *backend,
     {
       if (result_from_status (job, reply, -1, -1))
         {
-          handle->offset += G_VFS_JOB_WRITE (job)->data_size;
+          handle->offset += G_VFS_JOB_WRITE (job)->written_size;
         }
     }
   else
@@ -3946,16 +3954,19 @@ try_write (GVfsBackend *backend,
   SftpHandle *handle = _handle;
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
+  gsize size;
+
+  size = MIN (buffer_size, MAX_BUFFER_SIZE);
 
   command = new_command_stream (op_backend,
                                 SSH_FXP_WRITE);
   put_data_buffer (command, handle->raw_handle);
   g_data_output_stream_put_uint64 (command, handle->offset, NULL, NULL);
-  g_data_output_stream_put_uint32 (command, buffer_size, NULL, NULL);
+  g_data_output_stream_put_uint32 (command, size, NULL, NULL);
   /* Ideally we shouldn't do this copy, but doing the writes as multiple writes
      caused problems on the read side in openssh */
   g_output_stream_write_all (G_OUTPUT_STREAM (command),
-                             buffer, buffer_size,
+                             buffer, size,
                              NULL, NULL, NULL);
   
   queue_command_stream_and_free (&op_backend->command_connection, command,
@@ -3963,7 +3974,7 @@ try_write (GVfsBackend *backend,
                                  G_VFS_JOB (job), handle);
 
   /* We always write the full size (on success) */
-  g_vfs_job_write_set_written_size (job, buffer_size);
+  g_vfs_job_write_set_written_size (job, size);
 
   return TRUE;
 }
