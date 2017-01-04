@@ -1514,7 +1514,7 @@ send_command_data (GObject *source_object,
   if (res <= 0)
     {
       g_warning ("Error sending command");
-      g_vfs_backend_force_unmount ((GVfsBackend*)conn->op_backend);
+      fail_jobs_and_unmount (conn->op_backend, NULL);
       return;
     }
 
