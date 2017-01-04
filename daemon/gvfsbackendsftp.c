@@ -2140,7 +2140,7 @@ error_message (GIOErrorEnum error)
     case G_IO_ERROR_NOT_FOUND:
       return _("No such file or directory");
     default:
-      return "Unknown reason";
+      return _("Unknown reason");
     }
 }
 
