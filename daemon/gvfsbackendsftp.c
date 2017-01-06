@@ -5254,7 +5254,6 @@ check_finished_or_cancelled_job (GVfsJob *job)
 /* The push sliding window mechanism is based on the one in the OpenSSH sftp
  * client. */
 
-#define PUSH_BLOCKSIZE 32768
 #define PUSH_MAX_REQUESTS 64
 
 typedef struct {
@@ -5280,7 +5279,7 @@ typedef struct {
   char *tempname;
   int temp_count;
 
-  char buffer[PUSH_BLOCKSIZE];
+  char buffer[MAX_BUFFER_SIZE];
 } SftpPushHandle;
 
 typedef struct {
@@ -5344,7 +5343,7 @@ push_enqueue_request (SftpPushHandle *handle)
 {
   g_input_stream_read_async (handle->in,
                              handle->buffer,
-                             PUSH_BLOCKSIZE,
+                             MAX_BUFFER_SIZE,
                              G_PRIORITY_DEFAULT,
                              NULL,
                              push_read_cb, handle);
@@ -5973,7 +5972,6 @@ try_push (GVfsBackend *backend,
  * client. It is complicated because requests can be returned out of order. */
 
 #define PULL_MAX_REQUESTS 64  /* Never have more than this many requests outstanding */
-#define PULL_BLOCKSIZE 32768  /* Request this much data per request */
 #define PULL_SIZE_INCOMPLETE -1  /* Indicates an incomplete fstat() request */
 #define PULL_SIZE_INVALID -2  /* Indicates that no fstat() request is in progress */
 
@@ -6325,8 +6323,8 @@ pull_enqueue_request (SftpPullHandle *handle, guint64 offset, guint32 len)
 static void
 pull_enqueue_next_request (SftpPullHandle *handle)
 {
-  pull_enqueue_request (handle, handle->offset, PULL_BLOCKSIZE);
-  handle->offset += PULL_BLOCKSIZE;
+  pull_enqueue_request (handle, handle->offset, MAX_BUFFER_SIZE);
+  handle->offset += MAX_BUFFER_SIZE;
 }
 
 static void
