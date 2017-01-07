@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-12-18 22:55+0000\n"
-"PO-Revision-Date: 2016-12-30 20:09+0500\n"
+"POT-Creation-Date: 2017-01-06 15:36+0000\n"
+"PO-Revision-Date: 2017-01-07 16:50+0500\n"
 "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
 "Language-Team: Kazakh <kk_KZ@googlegroups.com>\n"
 "Language: kk\n"
@@ -363,8 +363,8 @@ msgid "Permission denied"
 msgstr "Рұқсаты жоқ"
 
 #: daemon/gvfsafpvolume.c:414 daemon/gvfsafpvolume.c:1735
-#: daemon/gvfsafpvolume.c:2529 daemon/gvfsbackendafc.c:210
-#: daemon/gvfsbackendafc.c:1116 daemon/gvfsbackendafpbrowse.c:190
+#: daemon/gvfsafpvolume.c:2529 daemon/gvfsbackendafc.c:217
+#: daemon/gvfsbackendafc.c:1123 daemon/gvfsbackendafpbrowse.c:190
 #: daemon/gvfsbackendafpbrowse.c:327 daemon/gvfsbackendafpbrowse.c:359
 #: daemon/gvfsbackendarchive.c:737 daemon/gvfsbackendarchive.c:792
 #: daemon/gvfsbackendarchive.c:844 daemon/gvfsbackendarchive.c:873
@@ -398,7 +398,7 @@ msgstr ""
 msgid "Target file is open"
 msgstr "Мақсат файлы ашық болып тұр"
 
-#: daemon/gvfsafpvolume.c:688 daemon/gvfsbackendafc.c:214
+#: daemon/gvfsafpvolume.c:688 daemon/gvfsbackendafc.c:221
 #: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2723
 #: daemon/gvfsbackendsftp.c:2133
 msgid "Directory not empty"
@@ -531,65 +531,65 @@ msgstr ""
 msgid "File is not open for read access"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:206
+#: daemon/gvfsbackendafc.c:213
 msgid "Internal Apple File Control error"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:218
+#: daemon/gvfsbackendafc.c:225
 msgid "The device did not respond"
 msgstr "Құрылғы жауап қайтармай тұр"
 
-#: daemon/gvfsbackendafc.c:222
+#: daemon/gvfsbackendafc.c:229
 msgid "The connection was interrupted"
 msgstr "Байланыс үзілген"
 
-#: daemon/gvfsbackendafc.c:226
+#: daemon/gvfsbackendafc.c:233
 msgid "Invalid Apple File Control data received"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:230
+#: daemon/gvfsbackendafc.c:237
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:246
+#: daemon/gvfsbackendafc.c:253
 msgid "Listing applications installed on device failed"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:262
+#: daemon/gvfsbackendafc.c:269
 msgid "Accessing application icons on device failed"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:284
+#: daemon/gvfsbackendafc.c:291
 msgid "Lockdown Error: Invalid Argument"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:288
+#: daemon/gvfsbackendafc.c:295
 msgid "The device is password protected"
 msgstr "Құрылғы парольмен қорғалған"
 
-#: daemon/gvfsbackendafc.c:292
+#: daemon/gvfsbackendafc.c:299
 msgid "Unable to connect"
 msgstr "Байланысу мүмкін емес"
 
-#: daemon/gvfsbackendafc.c:296
+#: daemon/gvfsbackendafc.c:303
 msgid "User refused to trust this computer"
 msgstr "Пайдаланушы бұл компьютерге сенуден бас тартты"
 
-#: daemon/gvfsbackendafc.c:300
+#: daemon/gvfsbackendafc.c:307
 msgid "The user has not trusted this computer"
 msgstr "Пайдаланушы бұл компьютерге сенбеді"
 
-#: daemon/gvfsbackendafc.c:304
+#: daemon/gvfsbackendafc.c:311
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:321
+#: daemon/gvfsbackendafc.c:328
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "libimobiledevice қатесі: Аргумент қате"
 
-#: daemon/gvfsbackendafc.c:325
+#: daemon/gvfsbackendafc.c:332
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
@@ -597,48 +597,48 @@ msgstr ""
 "libimobiledevice қатесі: Құрылғы табылмады. usbmuxd дұрыс орнатылғанына көз "
 "жеткізіңіз."
 
-#: daemon/gvfsbackendafc.c:329
+#: daemon/gvfsbackendafc.c:336
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:448
+#: daemon/gvfsbackendafc.c:455
 msgid "Try again"
 msgstr "Қайтадан көріңіз"
 
-#: daemon/gvfsbackendafc.c:448 daemon/gvfsbackend.c:994
+#: daemon/gvfsbackendafc.c:455 daemon/gvfsbackend.c:994
 #: monitor/gdu/ggdudrive.c:1024 monitor/gdu/ggdumount.c:923
 #: monitor/udisks2/gvfsudisks2mount.c:787
 msgid "Cancel"
 msgstr "Бас тарту"
 
-#: daemon/gvfsbackendafc.c:465 daemon/gvfsbackendarchive.c:638
+#: daemon/gvfsbackendafc.c:472 daemon/gvfsbackendarchive.c:638
 #: daemon/gvfsbackendarchive.c:667 daemon/gvfsbackenddav.c:1862
 #: daemon/gvfsbackendgoogle.c:1664 daemon/gvfsbackendhttp.c:256
 #: daemon/gvfsbackendsmb.c:568
 msgid "Invalid mount spec"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:471 daemon/gvfsbackendafc.c:501
+#: daemon/gvfsbackendafc.c:478 daemon/gvfsbackendafc.c:508
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:487
+#: daemon/gvfsbackendafc.c:494
 msgid "Apple Mobile Device"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:492
+#: daemon/gvfsbackendafc.c:499
 msgid "Apple Mobile Device, Jailbroken"
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:497
+#: daemon/gvfsbackendafc.c:504
 msgid "Documents on Apple Mobile Device"
 msgstr ""
 
 #. translators:
 #. * This is the device name, with the service being browsed in brackets, eg.:
 #. * Alan Smithee's iPhone (jailbreak)
-#: daemon/gvfsbackendafc.c:556
+#: daemon/gvfsbackendafc.c:563
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (jailbreak)"
@@ -646,7 +646,7 @@ msgstr "%s (jailbreak)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: daemon/gvfsbackendafc.c:563 monitor/afc/afcvolume.c:176
+#: daemon/gvfsbackendafc.c:570 monitor/afc/afcvolume.c:176
 #, c-format
 msgid "Documents on %s"
 msgstr ""
@@ -654,7 +654,7 @@ msgstr ""
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: daemon/gvfsbackendafc.c:637
+#: daemon/gvfsbackendafc.c:644
 #, c-format
 msgid ""
 "The device “%s” is locked. Enter the passcode on the device and click “Try "
@@ -665,14 +665,14 @@ msgstr ""
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above. 'Trust' is the caption
 #. * of the button shown in the device.
-#: daemon/gvfsbackendafc.c:645
+#: daemon/gvfsbackendafc.c:652
 #, c-format
 msgid ""
 "The device “%s” is not trusted yet. Select “Trust” on the device and click "
 "“Try again”."
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:1105 daemon/gvfsbackendarchive.c:745
+#: daemon/gvfsbackendafc.c:1112 daemon/gvfsbackendarchive.c:745
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2187
 #: daemon/gvfsbackendgphoto2.c:1492 daemon/gvfsbackendmtp.c:2292
 #: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:122
@@ -680,11 +680,11 @@ msgstr ""
 msgid "Can’t open directory"
 msgstr "Буманы ашу мүмкін емес"
 
-#: daemon/gvfsbackendafc.c:1325
+#: daemon/gvfsbackendafc.c:1332
 msgid "Backups are not yet supported."
 msgstr ""
 
-#: daemon/gvfsbackendafc.c:1487 daemon/gvfsbackendsmb.c:711
+#: daemon/gvfsbackendafc.c:1494 daemon/gvfsbackendsmb.c:711
 #: daemon/gvfsbackendsmb.c:1190
 msgid "Unsupported seek type"
 msgstr ""
@@ -693,7 +693,7 @@ msgstr ""
 #. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
 #. * fallback copy.
 #.
-#: daemon/gvfsbackendafc.c:2409 daemon/gvfsbackendafp.c:1781
+#: daemon/gvfsbackendafc.c:2416 daemon/gvfsbackendafp.c:1781
 #: daemon/gvfsbackendftp.c:1192 daemon/gvfsbackendftp.c:1240
 #: daemon/gvfsbackendftp.c:1261 daemon/gvfsbackendgoogle.c:1140
 #: daemon/gvfsbackendgoogle.c:1207 daemon/gvfsbackendgoogle.c:1228
@@ -710,7 +710,7 @@ msgstr ""
 msgid "Operation unsupported"
 msgstr "Әрекетке қолдау жоқ"
 
-#: daemon/gvfsbackendafc.c:2576 daemon/gvfsbackenddav.c:2828
+#: daemon/gvfsbackendafc.c:2583 daemon/gvfsbackenddav.c:2828
 #: daemon/gvfsbackendftp.c:1444
 msgid "Backups not supported"
 msgstr ""
@@ -1615,6 +1615,10 @@ msgstr "Хаттама қатесі"
 msgid "Unable to find supported SSH command"
 msgstr "Қолдауы бар SSH командасын табу сәтсіз аяқталды"
 
+#: daemon/gvfsbackendsftp.c:2143
+msgid "Unknown reason"
+msgstr "Себебі белгісіз"
+
 #: daemon/gvfsbackendsftp.c:2578 daemon/gvfsbackendsmb.c:1371
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
@@ -1871,7 +1875,7 @@ msgstr ""
 "%s тіркеуден босату\n"
 "Күте тұрыңыз"
 
-#: daemon/main.c:149 metadata/meta-daemon.c:377
+#: daemon/main.c:149 metadata/meta-daemon.c:383
 msgid "Replace old daemon."
 msgstr "Ескі қызметті алмастыру."
 
@@ -1883,7 +1887,7 @@ msgstr "fuse іске қоспау."
 msgid "Enable debug output."
 msgstr ""
 
-#: daemon/main.c:152 metadata/meta-daemon.c:378
+#: daemon/main.c:152 metadata/meta-daemon.c:384
 msgid "Show program version."
 msgstr "Бағдарлама нұсқасын көрсету."
 
@@ -1897,12 +1901,12 @@ msgstr "GVFS үішн басты қызметі"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: daemon/main.c:188 metadata/meta-daemon.c:404
+#: daemon/main.c:188 metadata/meta-daemon.c:410
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: daemon/main.c:190 metadata/meta-daemon.c:406
+#: daemon/main.c:190 metadata/meta-daemon.c:412
 #, c-format
 msgid "Try “%s --help” for more information."
 msgstr "Көбірек білу үшін \"%s --help\" көріңіз."
@@ -1938,33 +1942,33 @@ msgstr "Файл әрекеттерін орындау"
 msgid "Authentication is required to perform file operations"
 msgstr "Файлдық әрекеттерді жасау үшін аутентификация керек"
 
-#: metadata/meta-daemon.c:162 metadata/meta-daemon.c:238
-#: metadata/meta-daemon.c:274
+#: metadata/meta-daemon.c:168 metadata/meta-daemon.c:244
+#: metadata/meta-daemon.c:280
 #, c-format
 msgid "Can’t find metadata file %s"
 msgstr "%s метаақпарат файлын табу мүмкін емес"
 
-#: metadata/meta-daemon.c:180 metadata/meta-daemon.c:192
+#: metadata/meta-daemon.c:186 metadata/meta-daemon.c:198
 msgid "Unable to set metadata key"
 msgstr "Метаақпарат кілтін орнату мүмкін емес"
 
-#: metadata/meta-daemon.c:202
+#: metadata/meta-daemon.c:208
 msgid "Unable to unset metadata key"
 msgstr "Метаақпарат кілт мәнін қайтару мүмкін емес"
 
-#: metadata/meta-daemon.c:248
+#: metadata/meta-daemon.c:254
 msgid "Unable to remove metadata keys"
 msgstr "Метаақпарат кілттерін өшіру мүмкін емес"
 
-#: metadata/meta-daemon.c:285
+#: metadata/meta-daemon.c:291
 msgid "Unable to move metadata keys"
 msgstr "Метаақпарат кілттерін жылжыту мүмкін емес"
 
-#: metadata/meta-daemon.c:388
+#: metadata/meta-daemon.c:394
 msgid "GVFS Metadata Daemon"
 msgstr "GVFS метаақпарат қызметі"
 
-#: metadata/meta-daemon.c:391
+#: metadata/meta-daemon.c:397
 msgid "Metadata daemon for GVFS"
 msgstr "GVFS үшін метаақпарат қызметі"
 
@@ -2054,6 +2058,34 @@ msgstr "%s үшін тіркелу мәліметтері қате"
 #, c-format
 msgid "Unsupported authentication method for %s"
 msgstr "%s үшін аутентификация тәсіліне қолдау жоқ"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1037
+msgid "The given mount was not found"
+msgstr "Көрсетілген тіркелу табылмады"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1045
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1224
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1331
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1438
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1545
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1648
+msgid "An operation is already pending"
+msgstr "Әрекет кезекте тұр"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1128
+msgid "No outstanding mount operation"
+msgstr ""
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1216
+msgid "The given volume was not found"
+msgstr ""
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1323
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1430
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1537
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1640
+msgid "The given drive was not found"
+msgstr "Көрсетілген жетек табылмады"
 
 #. Note that the GUI (Shell, Files) currently use the term
 #. * "Eject" for both GDrive.stop() and GDrive.eject().
