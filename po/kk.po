@@ -1,15 +1,15 @@
 # Kazakh translation for gvfs
 # Copyright (C) 2010 HZ
 # This file is distributed under the same license as the PACKAGE package.
-# Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2010-2016.
+# Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2010-2017.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-01-06 15:36+0000\n"
-"PO-Revision-Date: 2017-01-07 16:50+0500\n"
+"POT-Creation-Date: 2017-01-07 11:51+0000\n"
+"PO-Revision-Date: 2017-01-09 08:45+0500\n"
 "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
 "Language-Team: Kazakh <kk_KZ@googlegroups.com>\n"
 "Language: kk\n"
@@ -292,7 +292,7 @@ msgstr "Рұқсаты жоқ."
 
 #: daemon/gvfsafpserver.c:920
 msgid "The command is not supported by the server."
-msgstr ""
+msgstr "Сервер команданы қолдамайды."
 
 #: daemon/gvfsafpserver.c:924
 msgid "Your password has expired."
@@ -300,7 +300,7 @@ msgstr "Пароліңіздің мерзімі аяқталған."
 
 #: daemon/gvfsafpserver.c:928
 msgid "Your password needs to be changed."
-msgstr ""
+msgstr "Пароліңізді ауыстыру керек."
 
 #. translators: %s here is the hostname
 #: daemon/gvfsafpserver.c:1071
@@ -312,15 +312,15 @@ msgstr "“%s” сервері үшін пароліңізді енгізіңі
 #: daemon/gvfsafpserver.c:1074
 #, c-format
 msgid "Enter your name and password for the server “%s”."
-msgstr ""
+msgstr "\"%s\" сервері үшін пайдаланушы атын және пароліңізді енгізіңіз."
 
 #: daemon/gvfsafpserver.c:1106
 msgid "The password prompt was cancelled."
-msgstr ""
+msgstr "Парольді сұрау сұхбатынан бас тартылды."
 
 #: daemon/gvfsafpserver.c:1224
 msgid "Unable to disconnect from the server."
-msgstr ""
+msgstr "Сервермен байланысты үзу мүмкін емес."
 
 #: daemon/gvfsafpserver.c:1366 daemon/gvfsafpserver.c:1766
 msgid "Unable to connect to the server. A communication problem occurred."
@@ -392,7 +392,7 @@ msgstr "Файл бума болып тұр"
 
 #: daemon/gvfsafpvolume.c:422
 msgid "Too many files open"
-msgstr ""
+msgstr "Тым көп файл ашық болып тұр"
 
 #: daemon/gvfsafpvolume.c:684 daemon/gvfsafpvolume.c:841
 msgid "Target file is open"
@@ -423,7 +423,7 @@ msgstr "Том тек оқу үшін қолжетерлік"
 #: daemon/gvfsafpvolume.c:1581 daemon/gvfsafpvolume.c:2019
 #: daemon/gvfsafpvolume.c:2663
 msgid "Not enough space on volume"
-msgstr ""
+msgstr "Томда орын жетпейді"
 
 #: daemon/gvfsafpvolume.c:845 daemon/gvfsafpvolume.c:1428
 #: daemon/gvfsafpvolume.c:1585 daemon/gvfsbackendafp.c:296
@@ -457,7 +457,7 @@ msgstr "Мақсат бумасы бар болып тұр"
 
 #: daemon/gvfsafpvolume.c:1233 daemon/gvfsbackendafp.c:604
 msgid "Can’t rename volume"
-msgstr ""
+msgstr "Том атын ауыстыру мүмкін емес"
 
 #: daemon/gvfsafpvolume.c:1237
 msgid "Object with that name already exists"
@@ -649,7 +649,7 @@ msgstr "%s (jailbreak)"
 #: daemon/gvfsbackendafc.c:570 monitor/afc/afcvolume.c:176
 #, c-format
 msgid "Documents on %s"
-msgstr ""
+msgstr "%s жеріндегі құжаттар"
 
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
@@ -682,7 +682,7 @@ msgstr "Буманы ашу мүмкін емес"
 
 #: daemon/gvfsbackendafc.c:1332
 msgid "Backups are not yet supported."
-msgstr ""
+msgstr "Қор көшірмелерге әлі қолдау жоқ."
 
 #: daemon/gvfsbackendafc.c:1494 daemon/gvfsbackendsmb.c:711
 #: daemon/gvfsbackendsmb.c:1190
@@ -1271,7 +1271,7 @@ msgstr ""
 
 #: daemon/gvfsbackendgphoto2.c:1523 daemon/gvfsbackendgphoto2.c:3266
 msgid "Error getting file"
-msgstr ""
+msgstr "Файлды алу қатесі"
 
 #: daemon/gvfsbackendgphoto2.c:1591 daemon/gvfsbackendmtp.c:2382
 #, c-format
@@ -1641,7 +1641,7 @@ msgstr "Қор көшірме файлын жасау қатесі: %s"
 
 #: daemon/gvfsbackendsftp.c:3642 daemon/gvfsbackendsftp.c:3818
 msgid "backups not supported yet"
-msgstr ""
+msgstr "қор көшірмелерге әлі қолдау жоқ"
 
 #. translators: %s is a server name
 #: daemon/gvfsbackendsmbbrowse.c:371
@@ -1688,11 +1688,11 @@ msgstr "Windows ортақ бумасын тіркеу сәтсіз: %s"
 #: daemon/gvfsbackendsmb.c:1298
 #, c-format
 msgid "Backup file creation failed: %s"
-msgstr ""
+msgstr "Қор көшірме файлын жасау сәтсіз аяқталды: %s"
 
 #: daemon/gvfsbackendsmb.c:1707
 msgid "Invalid attribute type (uint64 expected)"
-msgstr ""
+msgstr "Атрибут түрі жарамсыз (uint64 күтілген)"
 
 #: daemon/gvfsbackendsmb.c:1876
 msgid "Can’t rename file, filename already exists"
@@ -1864,7 +1864,7 @@ msgstr "Қате dbus хабарламасы"
 #: daemon/gvfsjobunmount.c:123 monitor/udisks2/gvfsudisks2utils.c:819
 #, c-format
 msgid "%s has been unmounted\n"
-msgstr "%s тіркеуден босатылған болып тұр\n"
+msgstr "%s тіркеуден босатылды\n"
 
 #: daemon/gvfsjobunmount.c:141 monitor/udisks2/gvfsudisks2utils.c:675
 #, c-format
@@ -1992,6 +1992,8 @@ msgstr "Атаусыз диск"
 #: monitor/gdu/ggdudrive.c:561 monitor/udisks2/gvfsudisks2drive.c:640
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
+"Тасушыны шығару сәтсіз аяқталды; тасушыдағы бір немесе бірнеше томдар бос "
+"емес."
 
 #: monitor/gdu/ggdudrive.c:1017
 msgid ""
@@ -2078,7 +2080,7 @@ msgstr ""
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1216
 msgid "The given volume was not found"
-msgstr ""
+msgstr "Көрсетілген том табылмады"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1323
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1430
