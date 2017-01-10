@@ -1163,7 +1163,7 @@ g_vfs_dns_sd_resolver_resolve (GVfsDnsSdResolver  *resolver,
       g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
                                _("Error initializing Avahi resolver"));
       g_object_unref (task);
-      goto out;
+      return;
     }
 
   if (resolver->is_resolved)
