@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Jorge González <jorgegonz@svn.gnome.org>, 2008, 2009, 2010, 2011, 2012.
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011, 2012, 2013, 2014, 2015, 2016.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011, 2012, 2013, 2014, 2015, 2016, 2017.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-12-18 22:55+0000\n"
-"PO-Revision-Date: 2016-12-20 16:56+0100\n"
+"POT-Creation-Date: 2017-01-06 15:36+0000\n"
+"PO-Revision-Date: 2017-01-11 10:05+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: es <gnome-es-list@gnome.org>\n"
 "Language: es\n"
@@ -30,13 +30,11 @@ msgstr ""
 #: client/gdaemonfile.c:1093 client/gdaemonfile.c:3217
 #: client/gvfsiconloadable.c:289 daemon/gvfsjobopenforread.c:183
 #: daemon/gvfsjobopenforwrite.c:326
-#| msgid "Couldn't get stream file descriptor"
 msgid "Couldn’t get stream file descriptor"
 msgstr "No se pudo obtener el descriptor del archivo de flujo"
 
 #: client/gdaemonfile.c:1222 client/gdaemonfile.c:1294
 #: client/gvfsiconloadable.c:127
-#| msgid "Didn't get stream file descriptor"
 msgid "Didn’t get stream file descriptor"
 msgstr "No se obtuvo un descriptor del archivo de flujo"
 
@@ -68,7 +66,6 @@ msgid "can’t open metadata tree"
 msgstr "no se puede abrir el árbol de metadatos"
 
 #: client/gdaemonfile.c:2669 client/gdaemonvfs.c:1265
-#| msgid "can't get metadata proxy"
 msgid "can’t get metadata proxy"
 msgstr "no se pudieron obtener los metadatos del proxy"
 
@@ -142,7 +139,6 @@ msgstr "Error al inicializar Avahi: %s"
 #.
 #: common/gvfsdnssdresolver.c:1085
 #, c-format
-#| msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
 msgid "Error resolving “%s” service “%s” on domain “%s”"
 msgstr "Error al resolver «%s» servicio «%s» en el dominio «%s»"
 
@@ -154,9 +150,6 @@ msgstr "Error al resolver «%s» servicio «%s» en el dominio «%s»"
 #.
 #: common/gvfsdnssdresolver.c:1109
 #, c-format
-#| msgid ""
-#| "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
-#| "records are missing. Keys required: \"%s\"."
 msgid ""
 "Error resolving “%s” service “%s” on domain “%s”. One or more TXT records "
 "are missing. Keys required: “%s”."
@@ -175,7 +168,6 @@ msgid "Timed out resolving “%s” service “%s” on domain “%s”"
 msgstr "Expiró el tiempo al resolver «%s» servicio «%s» en el dominio «%s»"
 
 #: common/gvfsdnssdresolver.c:1164
-#| msgid "Error initializing Avahi: %s"
 msgid "Error initializing Avahi resolver"
 msgstr "Error al inicializar el resolutor Avahi"
 
@@ -384,8 +376,8 @@ msgid "Permission denied"
 msgstr "Permiso denegado"
 
 #: daemon/gvfsafpvolume.c:414 daemon/gvfsafpvolume.c:1735
-#: daemon/gvfsafpvolume.c:2529 daemon/gvfsbackendafc.c:210
-#: daemon/gvfsbackendafc.c:1116 daemon/gvfsbackendafpbrowse.c:190
+#: daemon/gvfsafpvolume.c:2529 daemon/gvfsbackendafc.c:217
+#: daemon/gvfsbackendafc.c:1123 daemon/gvfsbackendafpbrowse.c:190
 #: daemon/gvfsbackendafpbrowse.c:327 daemon/gvfsbackendafpbrowse.c:359
 #: daemon/gvfsbackendarchive.c:737 daemon/gvfsbackendarchive.c:792
 #: daemon/gvfsbackendarchive.c:844 daemon/gvfsbackendarchive.c:873
@@ -419,7 +411,7 @@ msgstr "Demasiados archivos abiertos"
 msgid "Target file is open"
 msgstr "El archivo destino esta abierto"
 
-#: daemon/gvfsafpvolume.c:688 daemon/gvfsbackendafc.c:214
+#: daemon/gvfsafpvolume.c:688 daemon/gvfsbackendafc.c:221
 #: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2723
 #: daemon/gvfsbackendsftp.c:2133
 msgid "Directory not empty"
@@ -555,65 +547,65 @@ msgstr "El archivo está bloqueado por otro usuario"
 msgid "File is not open for read access"
 msgstr "El archivo no está abierto para lectura"
 
-#: daemon/gvfsbackendafc.c:206
+#: daemon/gvfsbackendafc.c:213
 msgid "Internal Apple File Control error"
 msgstr "Error de control de archivos interno de Apple"
 
-#: daemon/gvfsbackendafc.c:218
+#: daemon/gvfsbackendafc.c:225
 msgid "The device did not respond"
 msgstr "El dispositivo no respondió"
 
-#: daemon/gvfsbackendafc.c:222
+#: daemon/gvfsbackendafc.c:229
 msgid "The connection was interrupted"
 msgstr "Se interrumpió la conexión"
 
-#: daemon/gvfsbackendafc.c:226
+#: daemon/gvfsbackendafc.c:233
 msgid "Invalid Apple File Control data received"
 msgstr "Se recibieron datos no válidos del control de archivos de Apple"
 
-#: daemon/gvfsbackendafc.c:230
+#: daemon/gvfsbackendafc.c:237
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "Error no manejable de control de archivos de Apple (%d)"
 
-#: daemon/gvfsbackendafc.c:246
+#: daemon/gvfsbackendafc.c:253
 msgid "Listing applications installed on device failed"
 msgstr "Falló al listar las aplicaciones instaladas en el dispositivo"
 
-#: daemon/gvfsbackendafc.c:262
+#: daemon/gvfsbackendafc.c:269
 msgid "Accessing application icons on device failed"
 msgstr "Falló al acceder a los iconos de aplicación en el dispositivo"
 
-#: daemon/gvfsbackendafc.c:284
+#: daemon/gvfsbackendafc.c:291
 msgid "Lockdown Error: Invalid Argument"
 msgstr "Error de bloqueo: argumento no válido"
 
-#: daemon/gvfsbackendafc.c:288
+#: daemon/gvfsbackendafc.c:295
 msgid "The device is password protected"
 msgstr "El dispositivo está protegido con contraseña"
 
-#: daemon/gvfsbackendafc.c:292
+#: daemon/gvfsbackendafc.c:299
 msgid "Unable to connect"
 msgstr "No se pudo conectar"
 
-#: daemon/gvfsbackendafc.c:296
+#: daemon/gvfsbackendafc.c:303
 msgid "User refused to trust this computer"
 msgstr "El usuario ha rechazado confiar en este equipo"
 
-#: daemon/gvfsbackendafc.c:300
+#: daemon/gvfsbackendafc.c:307
 msgid "The user has not trusted this computer"
 msgstr "El usuario no ha confiado en este equipo"
 
-#: daemon/gvfsbackendafc.c:304
+#: daemon/gvfsbackendafc.c:311
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "Error de bloqueo no manejable (%d)"
 
-#: daemon/gvfsbackendafc.c:321
+#: daemon/gvfsbackendafc.c:328
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "Error de libimobiledevice: argumento no válido"
 
-#: daemon/gvfsbackendafc.c:325
+#: daemon/gvfsbackendafc.c:332
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
@@ -621,49 +613,49 @@ msgstr ""
 "Error de libimobiledevice: no se encontró el dispositivo. Asegúrese de que "
 "usbmuxd está configurado correctamente."
 
-#: daemon/gvfsbackendafc.c:329
+#: daemon/gvfsbackendafc.c:336
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Error no manejable de libimobiledevice (%d)"
 
-#: daemon/gvfsbackendafc.c:448
+#: daemon/gvfsbackendafc.c:455
 msgid "Try again"
 msgstr "Intentarlo de nuevo"
 
-#: daemon/gvfsbackendafc.c:448 daemon/gvfsbackend.c:994
+#: daemon/gvfsbackendafc.c:455 daemon/gvfsbackend.c:994
 #: monitor/gdu/ggdudrive.c:1024 monitor/gdu/ggdumount.c:923
 #: monitor/udisks2/gvfsudisks2mount.c:787
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: daemon/gvfsbackendafc.c:465 daemon/gvfsbackendarchive.c:638
+#: daemon/gvfsbackendafc.c:472 daemon/gvfsbackendarchive.c:638
 #: daemon/gvfsbackendarchive.c:667 daemon/gvfsbackenddav.c:1862
 #: daemon/gvfsbackendgoogle.c:1664 daemon/gvfsbackendhttp.c:256
 #: daemon/gvfsbackendsmb.c:568
 msgid "Invalid mount spec"
 msgstr "Especificación de montaje no válida"
 
-#: daemon/gvfsbackendafc.c:471 daemon/gvfsbackendafc.c:501
+#: daemon/gvfsbackendafc.c:478 daemon/gvfsbackendafc.c:508
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr ""
 "Ubicación AFC no válida: debe ser de la forma afc://uuid:número-de-puerto"
 
-#: daemon/gvfsbackendafc.c:487
+#: daemon/gvfsbackendafc.c:494
 msgid "Apple Mobile Device"
 msgstr "Dispositivo móvil de Apple"
 
-#: daemon/gvfsbackendafc.c:492
+#: daemon/gvfsbackendafc.c:499
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Dispositivo móvil de Apple, desbloqueado"
 
-#: daemon/gvfsbackendafc.c:497
+#: daemon/gvfsbackendafc.c:504
 msgid "Documents on Apple Mobile Device"
 msgstr "Documentos en el dispositivo móvil de Apple"
 
 #. translators:
 #. * This is the device name, with the service being browsed in brackets, eg.:
 #. * Alan Smithee's iPhone (jailbreak)
-#: daemon/gvfsbackendafc.c:556
+#: daemon/gvfsbackendafc.c:563
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s («jailbreak»)"
@@ -671,7 +663,7 @@ msgstr "%s («jailbreak»)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: daemon/gvfsbackendafc.c:563 monitor/afc/afcvolume.c:176
+#: daemon/gvfsbackendafc.c:570 monitor/afc/afcvolume.c:176
 #, c-format
 msgid "Documents on %s"
 msgstr "Documentación sobre %s"
@@ -679,7 +671,7 @@ msgstr "Documentación sobre %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: daemon/gvfsbackendafc.c:637
+#: daemon/gvfsbackendafc.c:644
 #, c-format
 msgid ""
 "The device “%s” is locked. Enter the passcode on the device and click “Try "
@@ -692,7 +684,7 @@ msgstr ""
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above. 'Trust' is the caption
 #. * of the button shown in the device.
-#: daemon/gvfsbackendafc.c:645
+#: daemon/gvfsbackendafc.c:652
 #, c-format
 msgid ""
 "The device “%s” is not trusted yet. Select “Trust” on the device and click "
@@ -701,7 +693,7 @@ msgstr ""
 "Todavía no se confía en el dispositivo «%s». Seleccione «Confiar» en el "
 "dispositivo y pulse «Intentarlo de nuevo»."
 
-#: daemon/gvfsbackendafc.c:1105 daemon/gvfsbackendarchive.c:745
+#: daemon/gvfsbackendafc.c:1112 daemon/gvfsbackendarchive.c:745
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2187
 #: daemon/gvfsbackendgphoto2.c:1492 daemon/gvfsbackendmtp.c:2292
 #: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:122
@@ -709,11 +701,11 @@ msgstr ""
 msgid "Can’t open directory"
 msgstr "No se puede abrir la carpeta"
 
-#: daemon/gvfsbackendafc.c:1325
+#: daemon/gvfsbackendafc.c:1332
 msgid "Backups are not yet supported."
 msgstr "Aún no se soportan los respaldos."
 
-#: daemon/gvfsbackendafc.c:1487 daemon/gvfsbackendsmb.c:711
+#: daemon/gvfsbackendafc.c:1494 daemon/gvfsbackendsmb.c:711
 #: daemon/gvfsbackendsmb.c:1190
 msgid "Unsupported seek type"
 msgstr "Tipo de búsqueda no soportado"
@@ -722,7 +714,7 @@ msgstr "Tipo de búsqueda no soportado"
 #. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
 #. * fallback copy.
 #.
-#: daemon/gvfsbackendafc.c:2409 daemon/gvfsbackendafp.c:1781
+#: daemon/gvfsbackendafc.c:2416 daemon/gvfsbackendafp.c:1781
 #: daemon/gvfsbackendftp.c:1192 daemon/gvfsbackendftp.c:1240
 #: daemon/gvfsbackendftp.c:1261 daemon/gvfsbackendgoogle.c:1140
 #: daemon/gvfsbackendgoogle.c:1207 daemon/gvfsbackendgoogle.c:1228
@@ -739,7 +731,7 @@ msgstr "Tipo de búsqueda no soportado"
 msgid "Operation unsupported"
 msgstr "La operación no está soportada"
 
-#: daemon/gvfsbackendafc.c:2576 daemon/gvfsbackenddav.c:2828
+#: daemon/gvfsbackendafc.c:2583 daemon/gvfsbackenddav.c:2828
 #: daemon/gvfsbackendftp.c:1444
 msgid "Backups not supported"
 msgstr "Respaldos no soportados"
@@ -1648,6 +1640,11 @@ msgstr "Error de protocolo"
 msgid "Unable to find supported SSH command"
 msgstr "No se pudo encontrar el comando SSH soportado"
 
+#: daemon/gvfsbackendsftp.c:2143
+#| msgid "Unknown error."
+msgid "Unknown reason"
+msgstr "Razón desconocida"
+
 #: daemon/gvfsbackendsftp.c:2578 daemon/gvfsbackendsmb.c:1371
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
@@ -1910,7 +1907,7 @@ msgstr ""
 "Desmontando %s\n"
 "Espere"
 
-#: daemon/main.c:149 metadata/meta-daemon.c:377
+#: daemon/main.c:149 metadata/meta-daemon.c:383
 msgid "Replace old daemon."
 msgstr "Reemplace el demonio antiguo."
 
@@ -1922,7 +1919,7 @@ msgstr "No iniciar fuse."
 msgid "Enable debug output."
 msgstr "Activar la salida de depuración."
 
-#: daemon/main.c:152 metadata/meta-daemon.c:378
+#: daemon/main.c:152 metadata/meta-daemon.c:384
 msgid "Show program version."
 msgstr "Mostrar la versión del programa."
 
@@ -1936,12 +1933,12 @@ msgstr "Demonio principal para GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: daemon/main.c:188 metadata/meta-daemon.c:404
+#: daemon/main.c:188 metadata/meta-daemon.c:410
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: daemon/main.c:190 metadata/meta-daemon.c:406
+#: daemon/main.c:190 metadata/meta-daemon.c:412
 #, c-format
 msgid "Try “%s --help” for more information."
 msgstr "Pruebe «%s --help» para obtener más información."
@@ -1977,33 +1974,33 @@ msgstr "Realizar operaciones de archivos"
 msgid "Authentication is required to perform file operations"
 msgstr "Se necesita autenticación para realizar operaciones de archivos"
 
-#: metadata/meta-daemon.c:162 metadata/meta-daemon.c:238
-#: metadata/meta-daemon.c:274
+#: metadata/meta-daemon.c:168 metadata/meta-daemon.c:244
+#: metadata/meta-daemon.c:280
 #, c-format
 msgid "Can’t find metadata file %s"
 msgstr "No se puede encontrar el archivo de metadatos %s"
 
-#: metadata/meta-daemon.c:180 metadata/meta-daemon.c:192
+#: metadata/meta-daemon.c:186 metadata/meta-daemon.c:198
 msgid "Unable to set metadata key"
 msgstr "No se puede establecer la clave de metadatos"
 
-#: metadata/meta-daemon.c:202
+#: metadata/meta-daemon.c:208
 msgid "Unable to unset metadata key"
 msgstr "No se puede desestablecer la clave de metadatos"
 
-#: metadata/meta-daemon.c:248
+#: metadata/meta-daemon.c:254
 msgid "Unable to remove metadata keys"
 msgstr "No se pueden quitar las claves de metadatos"
 
-#: metadata/meta-daemon.c:285
+#: metadata/meta-daemon.c:291
 msgid "Unable to move metadata keys"
 msgstr "No se pueden mover las claves de metadatos"
 
-#: metadata/meta-daemon.c:388
+#: metadata/meta-daemon.c:394
 msgid "GVFS Metadata Daemon"
 msgstr "Demonio de metadatos de GVFS"
 
-#: metadata/meta-daemon.c:391
+#: metadata/meta-daemon.c:397
 msgid "Metadata daemon for GVFS"
 msgstr "Demonio de metadatos para GVFS"
 
@@ -2104,6 +2101,39 @@ msgstr "Credenciales no válidas para %s"
 #, c-format
 msgid "Unsupported authentication method for %s"
 msgstr "Método de autenticación no soportado para %s"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1037
+#| msgid "The specified location is not mounted"
+msgid "The given mount was not found"
+msgstr "No se ha encontrado el punto de montaje especificado"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1045
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1224
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1331
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1438
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1545
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1648
+#| msgid "Location is already mounted"
+msgid "An operation is already pending"
+msgstr "Ya hay una operación pendiente"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1128
+#| msgid "error starting mount daemon"
+msgid "No outstanding mount operation"
+msgstr "No hay operaciones de montaje excepcionales"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1216
+#| msgid "No storage volumes found"
+msgid "The given volume was not found"
+msgstr "No se ha encontrado el volumen dado"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1323
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1430
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1537
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1640
+#| msgid "Device not found"
+msgid "The given drive was not found"
+msgstr "No se ha encontrado la unidad dada"
 
 #. Note that the GUI (Shell, Files) currently use the term
 #. * "Eject" for both GDrive.stop() and GDrive.eject().
@@ -2960,9 +2990,6 @@ msgstr "Monitor de volúmenes UDisks de GVfs"
 
 #~ msgid "progress"
 #~ msgstr "progreso"
-
-#~ msgid "No storage volumes found"
-#~ msgstr "No se encontraron volúmenes de almacenamiento"
 
 #~ msgid "Cannot delete this entity"
 #~ msgstr "No se puede eliminar esta entidad"
