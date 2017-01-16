@@ -1877,7 +1877,7 @@ g_daemon_file_input_stream_read_finish (GInputStream              *stream,
 					GError                   **error)
 {
   g_return_val_if_fail (g_task_is_valid (result, stream), -1);
-  g_return_val_if_fail (g_async_result_is_tagged (result, g_daemon_file_input_stream_read_finish), -1);
+  g_return_val_if_fail (g_async_result_is_tagged (result, g_daemon_file_input_stream_read_async), -1);
 
   return g_task_propagate_int (G_TASK (result), error);
 }
@@ -1967,7 +1967,7 @@ g_daemon_file_input_stream_close_finish (GInputStream              *stream,
 					 GError                   **error)
 {
   g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (g_async_result_is_tagged (result, g_daemon_file_input_stream_close_finish), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, g_daemon_file_input_stream_close_async), FALSE);
 
   return g_task_propagate_boolean (G_TASK (result), error);
 }
