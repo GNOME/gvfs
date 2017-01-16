@@ -1,3 +1,12 @@
+Major changes in 1.31.4
+=======================
+* sftp: Limit writes to 32768 bytes
+* udisks2: Improve unmount notifications
+* daemon: Bump maximum read channel buffer size
+* recent: Fix crashes when DISPLAY is not set
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.31.3
 =======================
 * dnssd: Fix crashes for uris with colons
