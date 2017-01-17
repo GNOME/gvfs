@@ -1054,7 +1054,12 @@ open_common (const gchar *path, struct fuse_file_info *fi, GFile *file, int outp
 
   SET_FILE_HANDLE (fi, fh);
 
-  g_debug ("open_common: flags=%o\n", fi->flags);
+  g_debug ("open_common: flags=%o (%s%s%s%s)\n",
+           fi->flags,
+           fi->flags & O_WRONLY ? "O_WRONLY " : "O_RDONLY ",
+           fi->flags & O_RDWR   ? "O_RDWR "   : "",
+           fi->flags & O_APPEND ? "O_APPEND " : "",
+           fi->flags & O_TRUNC  ? "O_TRUNC "  : "");
 
   /* Set up a stream here, so we can check for errors */
   set_pid_for_file (file);
@@ -1476,7 +1481,12 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
   gint   result = 0;
 
   g_debug ("vfs_write: %s\n", path);
-  g_debug ("vfs_write: flags=%o\n", fi->flags);
+  g_debug ("vfs_write: flags=%o (%s%s%s%s)\n",
+           fi->flags,
+           fi->flags & O_WRONLY ? "O_WRONLY " : "O_RDONLY ",
+           fi->flags & O_RDWR   ? "O_RDWR "   : "",
+           fi->flags & O_APPEND ? "O_APPEND " : "",
+           fi->flags & O_TRUNC  ? "O_TRUNC "  : "");
 
   if ((file = file_from_full_path (path)))
     {
