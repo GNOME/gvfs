@@ -31,6 +31,7 @@ typedef struct {
   char *uri;
   char *display_name;
   GFile *file;
+  time_t modified;
 } RecentItem;
 
 struct OPAQUE_TYPE__GVfsBackendRecent
@@ -318,6 +319,9 @@ recent_backend_add_info (RecentItem *item,
   g_file_info_set_attribute_boolean (info,
                                      G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE,
                                      TRUE);
+
+  /* G_FILE_ATTRIBUTE_RECENT_MODIFIED */
+  g_file_info_set_attribute_int64 (info, "recent::modified", item->modified);
 }
 
 static gboolean
@@ -376,6 +380,7 @@ recent_item_update (RecentItem    *item,
   gboolean changed = FALSE;
   const char *uri;
   const char *display_name;
+  time_t modified;
 
   uri = gtk_recent_info_get_uri (info);
   if (g_strcmp0 (item->uri, uri) != 0)
@@ -394,6 +399,13 @@ recent_item_update (RecentItem    *item,
       changed = TRUE;
       g_free (item->display_name);
       item->display_name = g_strdup (display_name);
+    }
+
+  modified = gtk_recent_info_get_modified (info);
+  if (item->modified != modified)
+    {
+      changed = TRUE;
+      item->modified = modified;
     }
 
   return changed;
