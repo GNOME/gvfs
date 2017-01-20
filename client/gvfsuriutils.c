@@ -163,14 +163,29 @@ g_vfs_decode_uri (const char *uri)
 				    authority_end - authority_start, "@");
       if (userinfo_end)
 	{
-	  userinfo_start = authority_start;
+          char *p;
+
+          host_start = userinfo_end + 1;
+          userinfo_start = authority_start;
+
+          /* Applications should not render as clear text any data
+           * after the first colon (":") character found within a userinfo
+           * subcomponent unless the data after the colon is the empty string
+           * (indicating no password). Applications may choose to ignore or
+           * reject such data when it is received as part of a reference and
+           * should reject the storage of such data in unencrypted form.
+           * See https://tools.ietf.org/html/rfc3986
+           */
+          p = memchr (userinfo_start, ':', userinfo_end - userinfo_start);
+          if (p != NULL)
+            userinfo_end = p;
+
 	  decoded->userinfo = g_uri_unescape_segment (userinfo_start, userinfo_end, NULL);
 	  if (decoded->userinfo == NULL)
 	    {
 	      g_vfs_decoded_uri_free (decoded);
 	      return NULL;
 	    }
-	  host_start = userinfo_end + 1;
 	}
       else
 	host_start = authority_start;
