@@ -105,7 +105,7 @@ log_debug (const gchar   *log_domain,
            gpointer       unused_data)
 {
   if (gvfs_get_debug ())
-    g_print ("%s", message);
+    g_print ("fuse: %s", message);
 }
 
 typedef struct {

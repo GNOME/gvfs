@@ -48,10 +48,10 @@ static void
 log_debug (const gchar   *log_domain,
 	   GLogLevelFlags log_level,
 	   const gchar   *message,
-	   gpointer	      unused_data)
+           gpointer       user_data)
 {
   if (gvfs_get_debug ())
-    g_print ("%s", message);
+    g_print ("%s: %s", (const gchar *)user_data, message);
 }
 
 void
@@ -66,7 +66,7 @@ daemon_init (void)
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
   
-  g_log_set_handler (NULL, G_LOG_LEVEL_DEBUG, log_debug, NULL);
+  g_log_set_handler (NULL, G_LOG_LEVEL_DEBUG, log_debug, G_STRINGIFY (DEFAULT_BACKEND_TYPE));
 
   gvfs_setup_debug_handler ();
 
