@@ -104,8 +104,12 @@ log_debug (const gchar   *log_domain,
            const gchar   *message,
            gpointer       unused_data)
 {
+  struct fuse_context *context;
+
+  context = fuse_get_context ();
+
   if (gvfs_get_debug ())
-    g_print ("fuse: %s", message);
+    g_print ("fuse(%u): %s", context ? context->pid : 0, message);
 }
 
 typedef struct {
