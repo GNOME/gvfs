@@ -285,6 +285,7 @@ gvfsd_smb_browse_SOURCES = \
 gvfsd_smb_browse_CPPFLAGS = \
 	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendsmbbrowse.h \
+	-DDEFAULT_BACKEND_TYPE=smb-network \
 	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint_smb_browse \
 	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"smb-network", G_VFS_TYPE_BACKEND_SMB_BROWSE,"smb-server", G_VFS_TYPE_BACKEND_SMB_BROWSE,'
@@ -588,6 +589,7 @@ gvfsd_afp_browse_SOURCES = \
 gvfsd_afp_browse_CPPFLAGS = \
 	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendafpbrowse.h \
+	-DDEFAULT_BACKEND_TYPE=afp-server \
 	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"afp-server", G_VFS_TYPE_BACKEND_AFP_BROWSE,' \
 	$(LIBGCRYPT_CFLAGS)
@@ -612,6 +614,7 @@ gvfsd_afp_SOURCES = \
 gvfsd_afp_CPPFLAGS = \
 	$(flags) \
 	-DBACKEND_HEADER=gvfsbackendafp.h \
+	-DDEFAULT_BACKEND_TYPE=afp-volume \
 	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"afp-volume", G_VFS_TYPE_BACKEND_AFP,' \
 	$(LIBGCRYPT_CFLAGS)
