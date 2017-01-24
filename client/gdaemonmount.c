@@ -303,6 +303,7 @@ bus_get_cb (GObject *source_object,
     }
 
   async_construct_proxy (connection, task);
+  g_object_unref (connection);
 }
 
 static void
