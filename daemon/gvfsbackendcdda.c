@@ -225,6 +225,8 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
       g_udev_device_get_property_as_int (device, "ID_CDROM_MEDIA") != 1))
     {
       g_vfs_backend_force_unmount (G_VFS_BACKEND (cdda_backend));
+
+      g_signal_handlers_disconnect_by_func (cdda_backend->gudev_client, on_uevent, cdda_backend);
     }
 }
 
@@ -416,7 +418,9 @@ do_unmount (GVfsBackend *backend,
 
   release_device (cdda_backend);
   release_metadata (cdda_backend);
-  
+
+  g_signal_handlers_disconnect_by_func (cdda_backend->gudev_client, on_uevent, cdda_backend);
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   //g_warning ("unmounted %p", backend);
