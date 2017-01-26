@@ -46,7 +46,6 @@ struct _GVfsBackendMtp
 
 #ifdef HAVE_GUDEV
   GUdevClient *gudev_client;
-  gulong on_uevent_id;
 #endif
 
   GMutex mutex;

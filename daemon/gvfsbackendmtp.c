@@ -603,6 +603,8 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
     op_backend->force_unmounted = TRUE;
     g_atomic_int_set (&op_backend->unmount_started, TRUE);
     g_vfs_backend_force_unmount ((GVfsBackend*)op_backend);
+
+    g_signal_handlers_disconnect_by_func (op_backend->gudev_client, on_uevent, op_backend);
   }
 
   g_debug ("(I) on_uevent done.\n");
@@ -912,9 +914,7 @@ do_mount (GVfsBackend *backend,
   op_backend->volume_symbolic_icon = g_vfs_get_volume_symbolic_icon (device);
   g_object_unref (device);
 
-  op_backend->on_uevent_id =
-    g_signal_connect_object (op_backend->gudev_client, "uevent",
-                             G_CALLBACK (on_uevent), op_backend, 0);
+  g_signal_connect (op_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), op_backend);
 
   op_backend->file_cache = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 
@@ -994,8 +994,9 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
   g_hash_table_unref (op_backend->file_cache);
 
   g_source_remove (op_backend->hb_id);
-  g_signal_handler_disconnect (op_backend->gudev_client,
-                               op_backend->on_uevent_id);
+
+  g_signal_handlers_disconnect_by_func (op_backend->gudev_client, on_uevent, op_backend);
+
   g_object_unref (op_backend->gudev_client);
   g_clear_pointer (&op_backend->dev_path, g_free);
   g_clear_pointer (&op_backend->volume_name, g_free);
