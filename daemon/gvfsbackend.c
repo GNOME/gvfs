@@ -1046,6 +1046,7 @@ forced_unregister_mount_callback (GVfsDBusMountTracker *proxy,
   g_vfs_daemon_close_active_channels (daemon, backend);
   g_vfs_job_source_closed (G_VFS_JOB_SOURCE (backend));
 
+  g_object_unref (backend);
 }
 
 void
@@ -1053,7 +1054,7 @@ g_vfs_backend_force_unmount (GVfsBackend *backend)
 {
   g_vfs_backend_set_block_requests (backend, TRUE);
   g_vfs_backend_unregister_mount (backend,
-				  (GAsyncReadyCallback) forced_unregister_mount_callback,
-				  backend);
+                                  (GAsyncReadyCallback) forced_unregister_mount_callback,
+                                  g_object_ref (backend));
 }
 
