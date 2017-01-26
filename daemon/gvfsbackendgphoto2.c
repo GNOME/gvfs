@@ -748,6 +748,8 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
       caches_invalidate_all (gphoto2_backend);
 
       g_vfs_backend_force_unmount (G_VFS_BACKEND (gphoto2_backend));
+
+      g_signal_handlers_disconnect_by_func (gphoto2_backend->gudev_client, on_uevent, gphoto2_backend);
     }
 }
 
@@ -1419,6 +1421,18 @@ do_mount (GVfsBackend *backend,
                                                             (GDestroyNotify) gp_list_unref);
 
   g_debug ("  mounted %p\n", gphoto2_backend);
+}
+
+static void
+do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
+            GMountUnmountFlags flags,
+            GMountSource *mount_source)
+{
+  GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (backend);
+
+  g_signal_handlers_disconnect_by_func (gphoto2_backend->gudev_client, on_uevent, gphoto2_backend);
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -3416,7 +3430,8 @@ g_vfs_backend_gphoto2_class_init (GVfsBackendGphoto2Class *klass)
 
   backend_class->try_mount = try_mount;
   backend_class->mount = do_mount;
-   backend_class->open_icon_for_read = do_open_icon_for_read;
+  backend_class->unmount = do_unmount;
+  backend_class->open_icon_for_read = do_open_icon_for_read;
   backend_class->open_for_read = do_open_for_read;
   backend_class->try_read = try_read;
   backend_class->try_seek_on_read = try_seek_on_read;
