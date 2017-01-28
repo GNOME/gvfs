@@ -193,8 +193,8 @@ dhx2_login (GVfsAfpServer *server,
   
   if (strlen (password) > 256)
   {
-    /* Translators: %d is a constant, currently hardcoded to 256 */
     g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                 /* Translators: %d is a constant, currently hardcoded to 256 */
                  ngettext ("The server doesn’t support passwords longer than %d character.",
                            "The server doesn’t support passwords longer than %d characters.",
                            256), 256);

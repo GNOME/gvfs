@@ -474,27 +474,27 @@ get_error_from_gphoto2 (const char *message, int rc)
     {
     case GP_ERROR_FILE_EXISTS:
     case GP_ERROR_DIRECTORY_EXISTS:
-      /* Translator: %s represents a more specific error message and %d the specific error code */
       error = g_error_new (G_IO_ERROR, 
+                           /* Translator: %s represents a more specific error message and %d the specific error code */
                            G_IO_ERROR_EXISTS, _("%s: %d: Directory or file exists"), message, rc);
       break;
 
     case GP_ERROR_FILE_NOT_FOUND:
     case GP_ERROR_DIRECTORY_NOT_FOUND:
-      /* Translator: %s represents a more specific error message and %d the specific error code */
       error = g_error_new (G_IO_ERROR, 
+                           /* Translator: %s represents a more specific error message and %d the specific error code */
                            G_IO_ERROR_NOT_FOUND, _("%s: %d: No such file or directory"), message, rc);
       break;
 
     case GP_ERROR_PATH_NOT_ABSOLUTE:
-      /* Translator: %s represents a more specific error message and %d the specific error code */
       error = g_error_new (G_IO_ERROR, 
+                           /* Translator: %s represents a more specific error message and %d the specific error code */
                            G_IO_ERROR_INVALID_FILENAME, _("%s: %d: Invalid filename"), message, rc);
       break;
 
     case GP_ERROR_NOT_SUPPORTED:
-      /* Translator: %s represents a more specific error message and %d the specific error code */
       error = g_error_new (G_IO_ERROR, 
+                           /* Translator: %s represents a more specific error message and %d the specific error code */
                            G_IO_ERROR_NOT_SUPPORTED, _("%s: %d: Not Supported"), message, rc);
       break;
 
