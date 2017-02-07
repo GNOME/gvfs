@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2017-01-28 00:17+0000\n"
-"PO-Revision-Date: 2017-02-03 17:32+0100\n"
+"PO-Revision-Date: 2017-02-07 12:02+0100\n"
 "Language-Team: Friulian <fur@li.org>\n"
 "Language: fur\n"
 "MIME-Version: 1.0\n"
@@ -21,23 +21,23 @@ msgstr ""
 
 #: client/gdaemonfile.c:467 client/gdaemonfile.c:2736
 msgid "Operation not supported, files on different mounts"
-msgstr ""
+msgstr "Operazion no supuartade, file su montaçs diferents"
 
 #: client/gdaemonfile.c:1030 client/gdaemonfile.c:3092
 #: client/gvfsiconloadable.c:286 daemon/gvfsjobopenforread.c:183
 #: daemon/gvfsjobopenforwrite.c:326
 msgid "Couldn’t get stream file descriptor"
-msgstr ""
+msgstr "Impussibil otignî il descritôr dal file di flus"
 
 #: client/gdaemonfile.c:1146 client/gdaemonfile.c:1218
 #: client/gvfsiconloadable.c:125
 msgid "Didn’t get stream file descriptor"
-msgstr ""
+msgstr "No si à vût il descritôr dal file di flus"
 
 #: client/gdaemonfile.c:1340
 #, c-format
 msgid "Invalid return value from %s"
-msgstr ""
+msgstr "Valôr tornât di %s no valit"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
@@ -195,12 +195,12 @@ msgstr "Erôr: %s"
 #: daemon/daemon-main.c:236
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
-msgstr ""
+msgstr "Ûs: %s --spawner dbus-id percors_dal_ogjet"
 
 #: daemon/daemon-main.c:260 daemon/daemon-main.c:278
 #, c-format
 msgid "Usage: %s key=value key=value …"
-msgstr ""
+msgstr "Ûs: %s clâf=valôr clâf=valôr ..."
 
 #: daemon/daemon-main.c:276
 msgid "No mount type specified"
@@ -225,7 +225,7 @@ msgstr "La conession e je sierade"
 
 #: daemon/gvfsafpconnection.c:904
 msgid "Got EOS"
-msgstr ""
+msgstr "Vût EOS"
 
 #: daemon/gvfsafpconnection.c:1080 daemon/gvfsafpconnection.c:1122
 #: daemon/gvfsftptask.c:399
@@ -411,7 +411,7 @@ msgstr ""
 #: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2723
 #: daemon/gvfsbackendsftp.c:2141
 msgid "Directory not empty"
-msgstr ""
+msgstr "Cartele no vueide"
 
 #: daemon/gvfsafpvolume.c:692
 msgid "Target object is marked as not deletable (DeleteInhibit)"
@@ -426,13 +426,13 @@ msgstr ""
 #: daemon/gvfsafpvolume.c:1049 daemon/gvfsafpvolume.c:1249
 #: daemon/gvfsafpvolume.c:2151
 msgid "Volume is read-only"
-msgstr ""
+msgstr "Volum in dome-leture"
 
 #: daemon/gvfsafpvolume.c:837 daemon/gvfsafpvolume.c:1031
 #: daemon/gvfsafpvolume.c:1581 daemon/gvfsafpvolume.c:2019
 #: daemon/gvfsafpvolume.c:2663
 msgid "Not enough space on volume"
-msgstr ""
+msgstr "No vonde spazi tal volum"
 
 #: daemon/gvfsafpvolume.c:845 daemon/gvfsafpvolume.c:1428
 #: daemon/gvfsafpvolume.c:1585 daemon/gvfsbackendafp.c:296
@@ -458,7 +458,7 @@ msgstr ""
 #. (all files are in the volume root)
 #: daemon/gvfsafpvolume.c:1037
 msgid "Volume is flat and doesn’t support directories"
-msgstr ""
+msgstr "Il volum al è plat e nol supuarte cartelis"
 
 #: daemon/gvfsafpvolume.c:1045
 msgid "Target directory already exists"
@@ -466,11 +466,11 @@ msgstr ""
 
 #: daemon/gvfsafpvolume.c:1233 daemon/gvfsbackendafp.c:604
 msgid "Can’t rename volume"
-msgstr ""
+msgstr "Impussibil cambiâ non al volum"
 
 #: daemon/gvfsafpvolume.c:1237
 msgid "Object with that name already exists"
-msgstr ""
+msgstr "Un ogjet cun chel non al esist za"
 
 #: daemon/gvfsafpvolume.c:1241
 msgid "Target object is marked as not renameable (RenameInhibit)"
@@ -510,7 +510,7 @@ msgstr ""
 
 #: daemon/gvfsafpvolume.c:1593
 msgid "Source file is a directory"
-msgstr ""
+msgstr "Il file sorzint al è une cartele"
 
 #. Translators: range conflict means
 #. requested data are locked by another user
@@ -522,7 +522,7 @@ msgstr ""
 #: daemon/gvfsbackendmtp.c:1474 daemon/gvfsbackendmtp.c:1624
 #: daemon/gvfsbackendmtp.c:2007 daemon/gvfsbackendmtp.c:2550
 msgid "Directory doesn’t exist"
-msgstr ""
+msgstr "La cartele no esist"
 
 #: daemon/gvfsafpvolume.c:2313
 msgid "Target object is not a directory"
@@ -530,7 +530,7 @@ msgstr ""
 
 #: daemon/gvfsafpvolume.c:2659
 msgid "File is not open for write access"
-msgstr ""
+msgstr "Il file nol è viert pal acès in scriture"
 
 #: daemon/gvfsafpvolume.c:2667
 msgid "File is locked by another user"
