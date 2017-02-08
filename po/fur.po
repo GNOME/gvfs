@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2017-01-28 00:17+0000\n"
-"PO-Revision-Date: 2017-02-07 12:02+0100\n"
+"PO-Revision-Date: 2017-02-08 21:23+0100\n"
 "Language-Team: Friulian <fur@li.org>\n"
 "Language: fur\n"
 "MIME-Version: 1.0\n"
@@ -611,13 +611,13 @@ msgstr ""
 
 #: daemon/gvfsbackendafc.c:455
 msgid "Try again"
-msgstr ""
+msgstr "Torne prove"
 
 #: daemon/gvfsbackendafc.c:455 daemon/gvfsbackend.c:994
 #: monitor/gdu/ggdudrive.c:1024 monitor/gdu/ggdumount.c:923
 #: monitor/udisks2/gvfsudisks2mount.c:787
 msgid "Cancel"
-msgstr ""
+msgstr "Anule"
 
 #: daemon/gvfsbackendafc.c:472 daemon/gvfsbackendarchive.c:638
 #: daemon/gvfsbackendarchive.c:667 daemon/gvfsbackenddav.c:1862
@@ -656,7 +656,7 @@ msgstr ""
 #: daemon/gvfsbackendafc.c:570 monitor/afc/afcvolume.c:176
 #, c-format
 msgid "Documents on %s"
-msgstr ""
+msgstr "Documents su %s"
 
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
@@ -667,7 +667,10 @@ msgid ""
 "The device “%s” is locked. Enter the passcode on the device and click “Try "
 "again”."
 msgstr ""
+"Il dispositîf “%s” al è blocât. Scrîf il codiç sul dispositîf e fâs clic su "
+"“Torne prove“."
 
+# Fiducie ?? doprâ chel o alc altri
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above. 'Trust' is the caption
@@ -678,6 +681,8 @@ msgid ""
 "The device “%s” is not trusted yet. Select “Trust” on the device and click "
 "“Try again”."
 msgstr ""
+"Il dispositîf “%s” nol è ancjemò fidât. Selezione “Fidâsi” sul dispositîf e "
+"fâs clic su “Torne prove”"
 
 #: daemon/gvfsbackendafc.c:1112 daemon/gvfsbackendarchive.c:745
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2187
@@ -715,7 +720,7 @@ msgstr ""
 #: daemon/gvfsbackendsftp.c:5211 daemon/gvfsbackendsmb.c:1682
 #: daemon/gvfsftptask.c:431
 msgid "Operation unsupported"
-msgstr ""
+msgstr "Operazion no supuartade"
 
 #: daemon/gvfsbackendafc.c:2583 daemon/gvfsbackenddav.c:2828
 #: daemon/gvfsbackendftp.c:1444
@@ -747,19 +752,19 @@ msgstr ""
 #: daemon/gvfsbackendsmb.c:1364
 #, c-format
 msgid "%s on %s"
-msgstr ""
+msgstr "%s su %s"
 
 #. Translators: %s is the servername
 #: daemon/gvfsbackendafpbrowse.c:465
 #, c-format
 msgid "%s"
-msgstr ""
+msgstr "%s"
 
 #: daemon/gvfsbackendafpbrowse.c:498 daemon/gvfsbackendafp.c:2139
 #: daemon/gvfsbackendarchive.c:627 daemon/gvfsbackendftp.c:706
 #: daemon/gvfsbackendnfs.c:197 daemon/gvfsbackendsftp.c:2054
 msgid "No hostname specified"
-msgstr ""
+msgstr "Nissun non host specificât"
 
 #: daemon/gvfsbackendafpbrowse.c:582 daemon/gvfsbackendafp.c:2234
 msgid "Apple Filing Protocol Service"
@@ -793,7 +798,7 @@ msgstr ""
 #: daemon/gvfsbackendafp.c:1284
 #, c-format
 msgid "Unable to create temporary file (%s)"
-msgstr ""
+msgstr "Impussibil creâ file temporani (%s)"
 
 #: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2469
 #: daemon/gvfsbackendnfs.c:1184 daemon/gvfsbackendsftp.c:3780
@@ -804,24 +809,24 @@ msgstr ""
 #: daemon/gvfsbackendafp.c:1765 daemon/gvfsbackendftp.c:1233
 #: daemon/gvfsbackendsftp.c:5221
 msgid "Invalid attribute type (uint32 expected)"
-msgstr ""
+msgstr "Gjenar di atribût no valit (si spietave uint32)"
 
 #. Translators: first %s is volumename, second username and third servername
 #: daemon/gvfsbackendafp.c:2099
 #, c-format
 msgid "%s for %s on %s"
-msgstr ""
+msgstr "%s par %s su %s"
 
 #: daemon/gvfsbackendafp.c:2148
 msgid "No volume specified"
-msgstr ""
+msgstr "Nissun volum specificât"
 
 #. Translators: This is the name of the root in a mounted archive file,
 #. e.g. "/ in archive.tar.gz" for a file with the name "archive.tar.gz"
 #: daemon/gvfsbackendarchive.c:349
 #, c-format
 msgid "/ in %s"
-msgstr ""
+msgstr "/ in %s"
 
 #: daemon/gvfsbackendarchive.c:882 daemon/gvfsbackendburn.c:679
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
@@ -830,7 +835,7 @@ msgstr ""
 #: daemon/gvfsbackendgoogle.c:1469 daemon/gvfsbackendnetwork.c:745
 #: daemon/gvfsbackendsftp.c:4319 daemon/gvfsftpdircache.c:157
 msgid "The file is not a directory"
-msgstr ""
+msgstr "Il file nol è une cartele"
 
 #. Translators: This is the name of the backend
 #: daemon/gvfsbackendburn.c:346
@@ -839,7 +844,7 @@ msgstr ""
 
 #: daemon/gvfsbackendburn.c:372
 msgid "Unable to create temporary directory"
-msgstr ""
+msgstr "Impussibil creâ la cartele temporanie"
 
 #: daemon/gvfsbackendburn.c:401 daemon/gvfsbackendburn.c:412
 #: daemon/gvfsbackendburn.c:447 daemon/gvfsbackendburn.c:671
@@ -870,7 +875,7 @@ msgstr ""
 #: daemon/gvfsbackendburn.c:989 daemon/gvfsbackendburn.c:999
 #: daemon/gvfsbackendgphoto2.c:2620
 msgid "File exists"
-msgstr ""
+msgstr "Il file al esist"
 
 #: daemon/gvfsbackendburn.c:827 daemon/gvfsjobcloseread.c:113
 #: daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
@@ -896,7 +901,7 @@ msgstr ""
 #: monitor/udisks2/gvfsudisks2mount.c:1180
 #: monitor/udisks2/gvfsudisks2volume.c:1734
 msgid "Operation not supported by backend"
-msgstr ""
+msgstr "Operazion no supuartade dal backend"
 
 #: daemon/gvfsbackendburn.c:852
 msgid "No such file or directory in target path"
@@ -917,17 +922,17 @@ msgstr ""
 #: daemon/gvfsbackendsftp.c:5951 daemon/gvfsbackendsftp.c:6422
 #: daemon/gvfsbackendsftp.c:6484
 msgid "Not supported"
-msgstr ""
+msgstr "No supuartât"
 
 #: daemon/gvfsbackend.c:827 daemon/gvfsjobunmount.c:197
 #: daemon/gvfsjobunmount.c:264
 msgid "File system is busy"
-msgstr ""
+msgstr "Il file system al è ocupât"
 
 #: daemon/gvfsbackend.c:993 monitor/gdu/ggdumount.c:922
 #: monitor/udisks2/gvfsudisks2mount.c:785
 msgid "Unmount Anyway"
-msgstr ""
+msgstr "Dismonte distès"
 
 #: daemon/gvfsbackend.c:996 monitor/gdu/ggdumount.c:924
 #: monitor/udisks2/gvfsudisks2mount.c:788
@@ -935,6 +940,8 @@ msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
 msgstr ""
+"Il volum al è ocupât\n"
+"Une o plui aplicazions a stan tignint il volum ocupât."
 
 #: daemon/gvfsbackendcdda.c:290 daemon/gvfsbackendgphoto2.c:1247
 #: daemon/gvfsbackendmtp.c:897
@@ -943,60 +950,60 @@ msgstr ""
 
 #: daemon/gvfsbackendcdda.c:304 daemon/gvfsbackendcdda.c:385
 msgid "No drive specified"
-msgstr ""
+msgstr "Nissune unitât specificade"
 
 #: daemon/gvfsbackendcdda.c:323
 #, c-format
 msgid "Cannot find drive %s"
-msgstr ""
+msgstr "Impussibil cjatâ la unitât %s"
 
 #: daemon/gvfsbackendcdda.c:336
 #, c-format
 msgid "Drive %s does not contain audio files"
-msgstr ""
+msgstr "La unitât %s no à file audio"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
 #: daemon/gvfsbackendcdda.c:346
 #, c-format
 msgid "cdda mount on %s"
-msgstr ""
+msgstr "montaç cdda su %s"
 
 #: daemon/gvfsbackendcdda.c:347 daemon/gvfsbackendcdda.c:870
 #: monitor/gdu/ggduvolume.c:349 monitor/udisks2/gvfsudisks2volume.c:387
 msgid "Audio Disc"
-msgstr ""
+msgstr "Disc Audio"
 
 #: daemon/gvfsbackendcdda.c:411
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Il file system al è ocupât: %d file viert"
+msgstr[1] "Il file system al è ocupât: %d file vierts"
 
 #: daemon/gvfsbackendcdda.c:605
 #, c-format
 msgid "No such file %s on drive %s"
-msgstr ""
+msgstr "File %s inesistent su pe unitât %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
 #: daemon/gvfsbackendcdda.c:714
 #, c-format
 msgid "Error from “paranoia” on drive %s"
-msgstr ""
+msgstr "Erôr di “paranoia” su pe unitât %s"
 
 #: daemon/gvfsbackendcdda.c:777
 #, c-format
 msgid "Error seeking in stream on drive %s"
-msgstr ""
+msgstr "Erôr tal cirî intal flus su pe unitât %s"
 
 #: daemon/gvfsbackendcdda.c:899 daemon/gvfsbackendgphoto2.c:1514
 msgid "No such file"
-msgstr ""
+msgstr "File inesistent"
 
 #: daemon/gvfsbackendcdda.c:913
 msgid "The file does not exist or isn’t an audio track"
-msgstr ""
+msgstr "Il file nol esist o nol è un toc audio"
 
 #: daemon/gvfsbackendcdda.c:1019
 msgid "Audio CD File System Service"
@@ -1004,11 +1011,11 @@ msgstr ""
 
 #: daemon/gvfsbackendcomputer.c:198 daemon/gvfsbackendcomputer.c:771
 msgid "Computer"
-msgstr ""
+msgstr "Computer"
 
 #: daemon/gvfsbackendcomputer.c:532
 msgid "File System"
-msgstr ""
+msgstr "File System"
 
 #: daemon/gvfsbackendcomputer.c:661
 msgid "Can’t open mountable file"
@@ -1017,31 +1024,31 @@ msgstr ""
 #: daemon/gvfsbackendcomputer.c:858
 #, c-format
 msgid "Internal error: %s"
-msgstr ""
+msgstr "Erôr interni: %s"
 
 #: daemon/gvfsbackendcomputer.c:890 daemon/gvfsbackendcomputer.c:1008
 msgid "Can’t mount file"
-msgstr ""
+msgstr "Impussibil montâ il file"
 
 #: daemon/gvfsbackendcomputer.c:901
 msgid "No medium in the drive"
-msgstr ""
+msgstr "Nissun supuart te unitât"
 
 #: daemon/gvfsbackendcomputer.c:1072
 msgid "Can’t unmount file"
-msgstr ""
+msgstr "Impussibil dismontâ il file"
 
 #: daemon/gvfsbackendcomputer.c:1202
 msgid "Can’t eject file"
-msgstr ""
+msgstr "Impussibil parâ fûr il file"
 
 #: daemon/gvfsbackendcomputer.c:1269 daemon/gvfsbackendcomputer.c:1276
 msgid "Can’t start drive"
-msgstr ""
+msgstr "Impussibil inviâ la unitât"
 
 #: daemon/gvfsbackendcomputer.c:1342 daemon/gvfsbackendcomputer.c:1349
 msgid "Can’t stop drive"
-msgstr ""
+msgstr "Impussibil fermâ la unitât"
 
 #: daemon/gvfsbackendcomputer.c:1406 daemon/gvfsbackendcomputer.c:1413
 msgid "Can’t poll file"
@@ -1053,7 +1060,7 @@ msgstr ""
 #: daemon/gvfsbackenddav.c:498
 #, c-format
 msgid "%s on %s%s"
-msgstr ""
+msgstr "%s su %s%s"
 
 #: daemon/gvfsbackenddav.c:703 daemon/gvfsbackenddav.c:2004
 #: daemon/gvfsbackendhttp.c:202
