@@ -606,9 +606,16 @@ g_vfs_backend_invocation_first_handler (GVfsDBusMount *object,
                                         GDBusMethodInvocation *invocation,
                                         GVfsBackend *backend)
 {
-  g_debug ("backend_dbus_handler %s:%s\n",
+  GDBusConnection *connection;
+  GCredentials *credentials;
+
+  connection = g_dbus_method_invocation_get_connection (invocation);
+  credentials = g_dbus_connection_get_peer_credentials (connection);
+
+  g_debug ("backend_dbus_handler %s:%s (pid=%u)\n",
            g_dbus_method_invocation_get_interface_name (invocation),
-           g_dbus_method_invocation_get_method_name (invocation));
+           g_dbus_method_invocation_get_method_name (invocation),
+           g_credentials_get_unix_pid (credentials, NULL));
 
   if (backend->priv->block_requests)
     {
