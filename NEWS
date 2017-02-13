@@ -1,3 +1,13 @@
+Major changes in 1.31.90
+========================
+* recent: Set G_FILE_ATTRIBUTE_RECENT_MODIFED attribute
+* client: Ignore everything after first colon in userinfo
+* Stability improvements for force unmount procedure
+* Port several parts to GTask
+* Various logging improvements
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.31.4
 =======================
 * sftp: Limit writes to 32768 bytes
