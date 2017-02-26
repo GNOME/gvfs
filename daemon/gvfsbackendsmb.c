@@ -35,6 +35,7 @@
 #include <gio/gio.h>
 
 #include "gvfsbackendsmb.h"
+#include "gvfsbackendsmbprivate.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
