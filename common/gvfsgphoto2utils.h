@@ -26,5 +26,6 @@
 char * g_vfs_get_volume_name (GUdevDevice *device, const char *device_id);
 char * g_vfs_get_volume_icon (GUdevDevice *device);
 char * g_vfs_get_volume_symbolic_icon (GUdevDevice *device);
+char **g_vfs_get_x_content_types (GUdevDevice *device);
 
 #endif
