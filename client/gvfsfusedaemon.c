@@ -2018,7 +2018,7 @@ vfs_truncate (const gchar *path, off_t size)
       if (fh)
         g_mutex_lock (&fh->mutex);
 
-      if (fh->stream && fh->op == FILE_OP_WRITE)
+      if (fh && fh->stream && fh->op == FILE_OP_WRITE)
         {
           result = truncate_stream (file, fh, size);
         }
