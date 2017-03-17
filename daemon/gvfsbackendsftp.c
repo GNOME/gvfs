@@ -878,7 +878,7 @@ get_hostname_and_ip_address (const gchar *buffer,
                              gchar      **hostname_out,
                              gchar      **ip_address_out)
 {
-  char *startpos, *endpos;
+  char *startpos, *endpos, *hostname;
 
   /* Parse a line that looks like:
    * Warning: the ECDSA/RSA host key for 'hostname' differs from the key for the IP address '...'
@@ -893,13 +893,13 @@ get_hostname_and_ip_address (const gchar *buffer,
   if (!endpos)
     return FALSE;
 
-  *hostname_out = g_strndup (startpos, endpos - startpos);
+  hostname = g_strndup (startpos, endpos - startpos);
 
   /* Then get the ip address. */
   startpos = strchr (endpos + 1, '\'');
   if (!startpos)
     {
-      g_free (hostname_out);
+      g_free (hostname);
       return FALSE;
     }
   startpos++;
@@ -907,10 +907,11 @@ get_hostname_and_ip_address (const gchar *buffer,
   endpos = strchr (startpos, '\'');
   if (!endpos)
     {
-      g_free (hostname_out);
+      g_free (hostname);
       return FALSE;
     }
 
+  *hostname_out = hostname;
   *ip_address_out = g_strndup (startpos, endpos - startpos);
 
   return TRUE;
