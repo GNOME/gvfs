@@ -140,3 +140,15 @@ g_vfs_get_volume_symbolic_icon (GUdevDevice *device)
   else
     return g_strdup ("camera-photo-symbolic");
 }
+
+char **
+g_vfs_get_x_content_types (GUdevDevice *device)
+{
+  char *camera_x_content_types[] = {"x-content/image-dcf", NULL};
+  char *media_player_x_content_types[] = {"x-content/audio-player", NULL};
+
+  if (g_udev_device_has_property (device, "ID_MEDIA_PLAYER"))
+    return g_strdupv (media_player_x_content_types);
+  else
+    return g_strdupv (camera_x_content_types);
+}
