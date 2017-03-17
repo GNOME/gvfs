@@ -748,7 +748,7 @@ resolve_dir_and_rebuild (GVfsBackendGoogle  *self,
   GDataEntry *parent;
   GDataEntry *ret_val = NULL;
   GError *local_error;
-  gchar *basename;
+  gchar *basename = NULL;
 
   local_error = NULL;
   parent = resolve_dir (self, filename, &basename, &local_error);
@@ -1184,6 +1184,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
       if (!destination_not_directory)
         {
           g_free (destination_basename);
+          destination_basename = NULL;
 
           error = NULL;
           destination_parent = resolve_dir (self, destination, &destination_basename, &error);
