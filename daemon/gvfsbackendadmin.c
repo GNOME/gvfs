@@ -941,9 +941,9 @@ g_vfs_backend_admin_pre_setup (int *argc,
   if (pkexec_uid == NULL)
     g_error ("gvfsd-admin must be executed under pkexec");
 
+  errno = 0;
   uid = strtol (pkexec_uid, NULL, 10);
-  if ((errno == ERANGE && (uid == LONG_MAX || uid == LONG_MIN))
-      || (errno != 0 && uid == 0))
+  if (errno != 0)
     g_error ("Unable to convert PKEXEC_UID string to uid_t");
 
   context = g_option_context_new (NULL);
