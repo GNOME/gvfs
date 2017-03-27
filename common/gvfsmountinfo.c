@@ -544,7 +544,7 @@ bdmv_metadata_thread (GSimpleAsyncResult *result,
       meta = bd_get_meta (bd);
 
       if (meta != NULL && name == NULL && meta->di_name && *meta->di_name)
-        name = meta->di_name;
+        name = g_strdup (meta->di_name);
 
       if (meta != NULL && icon == NULL)
         icon = g_strdup (get_icon (meta));
