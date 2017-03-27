@@ -564,6 +564,7 @@ bdmv_metadata_thread (GSimpleAsyncResult *result,
       g_simple_async_result_set_op_res_gpointer (result,
                                                  g_file_icon_new (icon_file),
                                                  NULL);
+      g_object_unref (icon_file);
     }
   else
     {
