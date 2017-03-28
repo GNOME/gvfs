@@ -24,20 +24,6 @@ GVfs also contains modules for GIO that implement volume monitors and the GNOME 
 
   <maintainer>
     <foaf:Person>
-      <foaf:name>Alexander Larsson</foaf:name>
-      <foaf:mbox rdf:resource="mailto:alexl@redhat.com" />
-      <gnome:userid>alexl</gnome:userid>
-    </foaf:Person>
-  </maintainer>
-  <maintainer>
-    <foaf:Person>
-      <foaf:name>Ross Lagerwall</foaf:name>
-      <foaf:mbox rdf:resource="mailto:rosslagerwall@gmail.com" />
-      <gnome:userid>rossl</gnome:userid>
-    </foaf:Person>
-  </maintainer>
-  <maintainer>
-    <foaf:Person>
       <foaf:name>Ondrej Holy</foaf:name>
       <foaf:mbox rdf:resource="mailto:oholy@redhat.com" />
       <gnome:userid>oholy</gnome:userid>
