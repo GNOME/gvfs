@@ -1,3 +1,14 @@
+Major changes in 1.28.4
+=======================
+* common: Fix potential crash caused by missing g_strdup
+* fuse: Prevent potential crash if file handle is not set
+* sftp: Prevent potential crash in case of parsing error
+* google: Prevent potential crashes if resolve_dir fails
+* gphoto2: Fix x-content-types setup
+* google: Fix reported file size
+* sftp: Limit writes to 32768 bytes
+* daemon: Bump maximum read channel buffer size
+
 Major changes in 1.28.3
 =======================
 * dnssd: Fix crashes when mount failed
