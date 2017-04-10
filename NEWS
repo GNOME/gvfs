@@ -1,3 +1,13 @@
+Major changes in 1.32.1
+=======================
+* common: Fix potential crash caused by missing g_strdup
+* fuse: Prevent potential crash if file handle is not set
+* sftp: Prevent potential crash in case of parsing error
+* google: Prevent potential crashes if resolve_dir fails
+* gphoto2: Fix x-content-types setup
+* google: Fix reported file size
+* Translation updates
+
 Major changes in 1.32.0
 =======================
 * Translation updates
