@@ -1100,7 +1100,8 @@ handle_login (GVfsBackend *backend,
           g_str_has_suffix (buffer, "Password:")  ||
           g_str_has_prefix (buffer, "Password for ") ||
           g_str_has_prefix (buffer, "Enter Kerberos password") ||
-          g_str_has_prefix (buffer, "Enter passphrase for key"))
+          g_str_has_prefix (buffer, "Enter passphrase for key") ||
+          g_str_has_prefix (buffer, "Enter PASSCODE"))
         {
           gboolean aborted = FALSE;
           gsize bytes_written;
