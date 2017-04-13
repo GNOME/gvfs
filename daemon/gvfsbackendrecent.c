@@ -563,7 +563,7 @@ reload_recent_items (GVfsBackendRecent *backend)
   /* process changes */
   for (l = changed; l; l = l->next)
     {
-      /* FIXME: signals */
+      g_vfs_monitor_emit_event (monitor, G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED, l->data, NULL);
     }
   g_list_free (changed);
 
