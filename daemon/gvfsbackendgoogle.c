@@ -557,18 +557,11 @@ rebuild_entries (GVfsBackendGoogle  *self,
       feed = gdata_documents_service_query_documents (self->service, query, cancellable, NULL, NULL, &local_error);
       if (local_error != NULL)
         {
-          if (succeeded_once)
-            {
-              g_warning ("Unable to query: %s", local_error->message);
-              g_error_free (local_error);
-            }
-          else
-            {
-              sanitize_error (&local_error);
-              g_propagate_error (error, local_error);
-            }
+          sanitize_error (&local_error);
+          g_propagate_error (error, local_error);
+          self->entries_stale = TRUE;
 
-          break;
+          goto out;
         }
 
       if (!succeeded_once)
@@ -598,6 +591,7 @@ rebuild_entries (GVfsBackendGoogle  *self,
 
   self->entries_stale = FALSE;
 
+ out:
   g_clear_object (&feed);
   g_clear_object (&query);
 }
