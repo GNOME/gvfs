@@ -286,7 +286,7 @@ AC_ARG_WITH([systemduserunitdir],
 AC_SUBST([systemd_userdir])
 
 if test "x$systemd_userdir" != "xno"; then
-  PKG_CHECK_MODULES([SYSTEMD], [systemd >= 206], [msg_systemd_user_units=yes], 1)
+  PKG_CHECK_EXISTS([systemd >= 206], [msg_systemd_user_units=yes])
 fi
 
 AM_CONDITIONAL([USE_SYSTEMD_USER_UNITS], [test "$msg_systemd_user_units" = "yes"])
