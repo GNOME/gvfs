@@ -544,69 +544,24 @@ AM_CONDITIONAL(USE_LIBMTP, [test "$msg_libmtp" = "yes"])
 AM_CONDITIONAL(USE_GPHOTO2UTILS,
                [test "$msg_libmtp" = "yes" -o \( "$msg_gphoto2" = "yes" -a "$msg_gudev" = "yes" \)])
 
-dnl ==========================================================================
-dnl Samba 3.0
-
-dnl Samba 4 ships a pc file and requires a non-default include subdir, so pick it up:
-PKG_CHECK_MODULES([SMBCLIENT], [smbclient], [samba_default_cflags="$SMBCLIENT_CFLAGS"], [samba_default_cflags=-I/usr/include])
-
+dnl ***********************
+dnl *** Check for samba ***
+dnl ***********************
 AC_ARG_ENABLE([samba], [AS_HELP_STRING([--disable-samba],[build without samba support])])
-msg_samba="no"
-if test "x$enable_samba" != "xno"; then
-  AC_ARG_WITH([samba-includes], [AS_HELP_STRING([--with-samba-includes=PREFIX],[Location of samba includes.])],
-	      [with_samba_includes="-I$withval"], [with_samba_includes=${samba_default_cflags}])
-  have_samba_includes="no"
-  if test "x${with_samba_includes}" != "x-Ino"; then
-	CPPFLAGS_save="$CPPFLAGS"
+msg_samba=no
 
-	CPPFLAGS="$CPPFLAGS $with_samba_includes"
-	AC_CHECK_HEADER(libsmbclient.h, [ samba_includes="yes" ])
-	CPPFLAGS="$CPPFLAGS_save"
-	
-	if test "x{samba_includes}" != "xno" -a "x${samba_includes}" != "x"; then
-		have_samba_includes="yes"
-		if test "${with_samba_includes}" != "/usr/include" ; then
-			SAMBA_CFLAGS="$with_samba_includes"
-		else
-			SAMBA_CFLAGS=""
-		fi
-	else
-		SAMBA_CFLAGS=""
-	fi
+if test "x$enable_samba" != "xno"; then
+  PKG_CHECK_EXISTS([smbclient], [msg_samba=yes])
+
+  if test "x$msg_samba" = "xyes"; then
+    PKG_CHECK_MODULES([SAMBA], [smbclient])
+    AC_DEFINE([HAVE_SAMBA], 1, [Define to 1 if you have the samba libraries])
   fi
-  AC_ARG_WITH([samba-libs], [AS_HELP_STRING([--with-samba-libs=PREFIX],[Location of Samba libs.])],
-	      [with_samba_libs="$withval"], [with_samba_libs="/usr/lib"])
-  if test "x${with_samba_libs}" != "xno" -a "x${have_samba_includes}" != "xno"; then
-	LDFLAGS_save="$LDFLAGS"
-	
-	LDFLAGS="$LDFLAGS -L$with_samba_libs"
-	AC_CHECK_LIB([smbclient], [smbc_getFunctionStatVFS], [samba_libs="yes"], [samba_libs="no"])
-	LDFLAGS="$LDFLAGS_save"
-	if test "x${samba_libs}" != "xno"; then
-		AC_DEFINE([HAVE_SAMBA],, [Define to 1 if you have the samba libraries])
-		msg_samba="yes"
-                if test x$with_samba_libs != x/usr/lib; then
-                        SAMBA_LIBS="-L$with_samba_libs -lsmbclient"
-                else
-                	SAMBA_LIBS="-lsmbclient"
-                fi
-	else
-		AC_CHECK_LIB([smbclient], [smbc_new_context], [samba_old_libs="yes"], [samba_old_libs="no"])
-		if test "x${samba_old_libs}" != "xno"; then
-		   msg_samba="Too old, need at least samba 3.4.0"
-		fi
-		SAMBA_CFLAGS=""
-		SAMBA_LIBS=""
-	fi
-  fi
-  AC_MSG_CHECKING([for Samba libraries])
-  AC_MSG_RESULT($msg_samba)
 fi
+
 AM_CONDITIONAL([HAVE_SAMBA], [test "$msg_samba" = "yes"])
 AC_SUBST(SAMBA_CFLAGS)
 AC_SUBST(SAMBA_LIBS)
-
-dnl ==========================================================================
 
 dnl ****************************
 dnl *** Check for libarchive ***
