@@ -566,59 +566,18 @@ AC_SUBST(SAMBA_LIBS)
 dnl ****************************
 dnl *** Check for libarchive ***
 dnl ****************************
-
 AC_ARG_ENABLE([archive], [AS_HELP_STRING([--disable-archive],[build without archive support])])
-msg_archive="no"
-if test "x$enable_archive" != "xno"; then
-  AC_ARG_WITH([archive-includes], [AS_HELP_STRING([--with-archive-includes=PREFIX],[Location of archive includes.])],
-	      [with_archive_includes="$withval"], [with_archive_includes="/usr/include"])
-  have_archive_includes="no"
-  if test "x${with_archive_includes}" != "xno"; then
-	CPPFLAGS_save="$CPPFLAGS"
+msg_archive=no
 
-	CPPFLAGS="$CPPFLAGS -I$with_archive_includes"
-	AC_CHECK_HEADER([archive.h], [ archive_includes="yes" ])
-	CPPFLAGS="$CPPFLAGS_save"
-	
-	if test "x{archive_includes}" != "xno" -a "x${archive_includes}" != "x"; then
-		have_archive_includes="yes"
-		if test "${with_archive_includes}" != "/usr/include" ; then
-			ARCHIVE_CFLAGS="-I$with_archive_includes"
-		else
-			ARCHIVE_CFLAGS=""
-		fi
-	else
-		ARCHIVE_CFLAGS=""
-	fi
+if test "x$enable_archive" != "xno"; then
+  PKG_CHECK_EXISTS([libarchive], [msg_archive=yes])
+
+  if test "x$msg_archive" = "xyes"; then
+    PKG_CHECK_MODULES([ARCHIVE], [libarchive])
+    AC_DEFINE([HAVE_ARCHIVE], 1, [Define to 1 if you have the archive libraries])
   fi
-  AC_ARG_WITH([archive-libs], [AS_HELP_STRING([--with-archive-libs=PREFIX], [Location of Archive libs.])],
-	      [with_archive_libs="$withval"], [with_archive_libs="/usr/lib"])
-  if test "x${with_archive_libs}" != "xno" -a "x${have_archive_includes}" != "xno"; then
-	LDFLAGS_save="$LDFLAGS"
-	
-	LDFLAGS="$LDFLAGS -L$with_archive_libs"
-	AC_CHECK_LIB(archive, archive_entry_filetype, archive_libs="yes", archive_libs="no")
-	LDFLAGS="$LDFLAGS_save"
-	if test "x${archive_libs}" != "xno"; then
-		AC_DEFINE([HAVE_ARCHIVE],, [Define to 1 if you have the libarchive library])
-		msg_archive="yes"
-                if test x$with_archive_libs != x/usr/lib; then
-                        ARCHIVE_LIBS="-L$with_archive_libs -larchive"
-                else
-                	ARCHIVE_LIBS="-larchive"
-                fi
-	else
-		AC_CHECK_LIB([archive], [archive_entry_filetype], [archive_old_libs="yes"], [archive_old_libs="no"])
-		if test "x${archive_old_libs}" != "xno"; then
-		   msg_archive="Too old, need at least archive 3.0.22"
-		fi
-		ARCHIVE_CFLAGS=""
-		ARCHIVE_LIBS=""
-	fi
-  fi
-  AC_MSG_CHECKING(for Archive 3.libraries)
-  AC_MSG_RESULT($msg_archive)
 fi
+
 AM_CONDITIONAL([HAVE_ARCHIVE], [test "$msg_archive" = "yes"])
 AC_SUBST(ARCHIVE_CFLAGS)
 AC_SUBST(ARCHIVE_LIBS)
