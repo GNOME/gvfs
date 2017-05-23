@@ -410,8 +410,9 @@ g_mount_source_ask_password (GMountSource *source,
                                      flags,
                                      ask_reply_sync,
                                      &data);
-  
-  g_cond_wait (&data.cond, &data.mutex);
+
+  while (data.result == NULL)
+    g_cond_wait (&data.cond, &data.mutex);
   g_mutex_unlock (&data.mutex);
 
   g_cond_clear (&data.cond);
@@ -572,8 +573,9 @@ g_mount_source_ask_question (GMountSource *source,
 				     choices,
                                      ask_reply_sync,
                                      &data);
-  
-  g_cond_wait (&data.cond, &data.mutex);
+
+  while (data.result == NULL)
+    g_cond_wait (&data.cond, &data.mutex);
   g_mutex_unlock (&data.mutex);
 
   g_cond_clear (&data.cond);
@@ -843,7 +845,8 @@ g_mount_source_show_processes (GMountSource *source,
                                        ask_reply_sync,
                                        &data);
 
-  g_cond_wait (&data.cond, &data.mutex);
+  while (data.result == NULL)
+    g_cond_wait (&data.cond, &data.mutex);
   g_mutex_unlock (&data.mutex);
 
   g_cond_clear (&data.cond);
