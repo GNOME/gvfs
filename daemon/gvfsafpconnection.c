@@ -888,7 +888,7 @@ read_all_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   GInputStream *stream = G_INPUT_STREAM (source_object);
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
-  gsize bytes_read;
+  gssize bytes_read;
   GError *err = NULL;
   ReadAllData *read_data;
 
@@ -1187,7 +1187,7 @@ typedef struct
   gsize count;
   int io_priority;
   GCancellable *cancellable;
-  gssize bytes_written;
+  gsize bytes_written;
 } WriteAllData;
 
 inline static void
