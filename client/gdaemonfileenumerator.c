@@ -397,10 +397,7 @@ _g_task_return_pointer_idle (GTask *task, gpointer result, GDestroyNotify notify
   g_object_set_data (G_OBJECT (task), "_g_task_return_pointer_idle_notify", notify);
 
   source = g_idle_source_new ();
-  g_source_set_priority (source, g_task_get_priority (task));
-  g_source_set_callback (source, (GSourceFunc) _g_task_return_pointer_idle_cb,
-                         g_object_ref (task), g_object_unref);
-  g_source_attach (source, g_task_get_context (task));
+  g_task_attach_source (task, source, (GSourceFunc) _g_task_return_pointer_idle_cb);
   g_source_unref (source);
 }
 
