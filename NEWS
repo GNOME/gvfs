@@ -1,3 +1,12 @@
+Major changes in 1.33.3
+=======================
+* Do not sent user invisible mounts in order to speed up g_volume_monitor_get
+* mtp: Remove avoidance of file push for big files for better performance
+* Various build fixes and cleanups
+* Port several parts to GTask
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.33.1
 ========================
 * recent: Port from GtkRecentManager to GBookmarkFile (drop GTK+ dependency)
