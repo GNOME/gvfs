@@ -835,6 +835,23 @@ do_mount (GVfsBackend *backend,
   GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
   GVfsJob *job = G_VFS_JOB (mount_job);
   GError *error = NULL;
+  GMountSpec *real_spec;
+  const gchar *client;
+
+  client = g_mount_spec_get (mount_spec, "client");
+  if (client == NULL)
+    {
+      g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                                _("Invalid mount spec"));
+      return;
+    }
+
+  g_debug ("client=%s\n", client);
+
+  real_spec = g_mount_spec_new ("admin");
+  g_mount_spec_set (real_spec, "client", client);
+  g_vfs_backend_set_mount_spec (backend, real_spec);
+  g_mount_spec_unref (real_spec);
 
   self->authority = polkit_authority_get_sync (NULL, &error);
 
@@ -880,14 +897,9 @@ static void
 g_vfs_backend_admin_init (GVfsBackendAdmin *self)
 {
   GVfsBackend *backend = G_VFS_BACKEND (self);
-  GMountSpec *mount_spec;
 
   g_mutex_init (&self->polkit_mutex);
   g_vfs_backend_set_user_visible (backend, FALSE);
-
-  mount_spec = g_mount_spec_new ("admin");
-  g_vfs_backend_set_mount_spec (backend, mount_spec);
-  g_mount_spec_unref (mount_spec);
 
   g_vfs_backend_set_icon_name (backend, "folder");
   g_vfs_backend_set_symbolic_icon_name (backend, "folder-symbolic");

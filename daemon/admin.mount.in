@@ -2,4 +2,6 @@
 Type=admin
 # Add a dummy argument after pkexec, or '/bin/sh -c' will eat the first argument in '$@'
 Exec=/bin/sh -c 'pkexec @libexecdir@/gvfsd-admin "$@" --address $DBUS_SESSION_BUS_ADDRESS' gvfsd-admin
-AutoMount=true
+AutoMount=false
+DBusName=org.gtk.vfs.mountpoint_admin
+MountPerClient=true
