@@ -105,7 +105,7 @@ mount_operation_ask_password_cb (GMountOperation   *op,
                                  GAskPasswordFlags  flags,
                                  gpointer           user_data)
 {
-  MountOp *data = user_data;
+  MountOp *data = g_task_get_task_data (user_data);
 
   g_mount_operation_set_password (data->mount_operation, data->passwd);
   g_mount_operation_reply (data->mount_operation, G_MOUNT_OPERATION_HANDLED);
