@@ -100,7 +100,7 @@ http_path_get_basename (const char *path)
     return NULL;
 
   /* remove any leading slashes */
-  while (*path != '\0' && (*path == '/' || *path == ' '))
+  while (*path != '\0' && *path == '/')
     path++;
 
   len = strlen (path);
@@ -111,7 +111,7 @@ http_path_get_basename (const char *path)
   while (len)
     {
       char c = path[len - 1];
-      if (!g_ascii_isspace (c) && c != '/')
+      if (c != '/')
 	break;
 
       len--;
