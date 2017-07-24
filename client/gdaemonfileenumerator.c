@@ -194,7 +194,7 @@ next_files_sync_check (GDaemonFileEnumerator *enumerator)
   g_mutex_unlock (&enumerator->next_files_mutex);
 }
 
-static void
+static gboolean
 handle_done (GVfsDBusEnumerator *object,
              GDBusMethodInvocation *invocation,
              gpointer user_data)
@@ -209,9 +209,11 @@ handle_done (GVfsDBusEnumerator *object,
   g_signal_emit (enumerator, signals[CHANGED], 0);
 
   gvfs_dbus_enumerator_complete_done (object, invocation);
+
+  return TRUE;
 }
 
-static void
+static gboolean
 handle_got_info (GVfsDBusEnumerator *object,
                  GDBusMethodInvocation *invocation,
                  GVariant *arg_infos,
@@ -248,6 +250,8 @@ handle_got_info (GVfsDBusEnumerator *object,
   g_signal_emit (enumerator, signals[CHANGED], 0);
 
   gvfs_dbus_enumerator_complete_got_info (object, invocation);
+
+  return TRUE;
 }
 
 static void
