@@ -1,3 +1,11 @@
+Major changes in 1.33.90
+========================
+* admin: Require mounting for each client explicitly
+* dav: Fix DAV implementation stripping spaces
+* gdaemonfileenumerator: Fix crashes in synchronous enumerator code
+* goa: Fix password-based authentication
+* Translation updates
+
 Major changes in 1.33.3
 =======================
 * Do not sent user invisible mounts in order to speed up g_volume_monitor_get
