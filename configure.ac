@@ -396,6 +396,11 @@ if test "x$enable_google" != "xno" ; then
         AC_DEFINE(HAVE_LIBGDATA_0_17_7, 1, [Define to 1 if libgdata 0.17.7 is available]),
         []
     )
+
+    PKG_CHECK_MODULES(LIBGDATA_0_17_9, libgdata >= 0.17.9,
+        AC_DEFINE(HAVE_LIBGDATA_0_17_9, 1, [Define to 1 if libgdata 0.17.9 is available]),
+        []
+    )
   fi
 fi
 

@@ -43,6 +43,7 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobopenforwrite.h"
+#include "gvfsjobqueryfsinfo.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
 #include "gvfsjobsetdisplayname.h"
@@ -1967,6 +1968,46 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+#if HAVE_LIBGDATA_0_17_9
+static void
+fs_info_cb (GObject      *source_object,
+            GAsyncResult *res,
+            gpointer      user_data)
+{
+  GDataDocumentsService *service = GDATA_DOCUMENTS_SERVICE (source_object);
+  GVfsJobQueryFsInfo *job = G_VFS_JOB_QUERY_FS_INFO (user_data);
+  GError *error = NULL;
+  GDataDocumentsMetadata *metadata;
+  goffset total, used;
+
+  metadata = gdata_documents_service_get_metadata_finish (service, res, &error);
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
+    }
+
+  total = gdata_documents_metadata_get_quota_total (metadata);
+  used = gdata_documents_metadata_get_quota_used (metadata);
+  g_object_unref (metadata);
+
+  if (used >= 0) /* sanity check */
+    g_file_info_set_attribute_uint64 (job->file_info, G_FILE_ATTRIBUTE_FILESYSTEM_USED, used);
+
+  if (total >= 0) /* -1 'total' means unlimited quota, just don't report size in that case */
+    g_file_info_set_attribute_uint64 (job->file_info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, total);
+
+  if (total >= 0 && used >= 0)
+    g_file_info_set_attribute_uint64 (job->file_info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, total - used);
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ out:
+  g_debug ("- query_fs_info\n");
+}
+#endif
+
 static gboolean
 g_vfs_backend_google_query_fs_info (GVfsBackend           *_self,
                                     GVfsJobQueryFsInfo    *job,
@@ -1974,6 +2015,7 @@ g_vfs_backend_google_query_fs_info (GVfsBackend           *_self,
                                     GFileInfo             *info,
                                     GFileAttributeMatcher *matcher)
 {
+  GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (_self);
   GMountSpec *spec;
   const gchar *type;
 
@@ -1985,6 +2027,17 @@ g_vfs_backend_google_query_fs_info (GVfsBackend           *_self,
   type = g_mount_spec_get_type (spec);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, type);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE, TRUE);
+
+#if HAVE_LIBGDATA_0_17_9
+  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_FREE) ||
+      g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_USED))
+    {
+      GCancellable *cancellable = G_VFS_JOB (job)->cancellable;
+      gdata_documents_service_get_metadata_async (self->service, cancellable, fs_info_cb, job);
+      return TRUE;
+    }
+#endif
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
