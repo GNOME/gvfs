@@ -209,7 +209,11 @@ g_vfs_channel_init (GVfsChannel *channel)
       channel->priv->cancellable = g_cancellable_new ();
       channel->priv->reply_stream = g_unix_output_stream_new (socket_fds[0], FALSE);
       channel->priv->remote_fd = socket_fds[1];
-      
+
+      /* Set as nonblocking to be sure that _async methods don't block. */
+      fcntl (socket_fds[0], F_SETFL, O_NONBLOCK);
+      fcntl (socket_fds[1], F_SETFL, O_NONBLOCK);
+
       start_request_reader (channel);
     }
 }
