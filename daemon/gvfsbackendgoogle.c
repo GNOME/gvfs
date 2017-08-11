@@ -58,7 +58,7 @@ struct _GVfsBackendGoogle
   GHashTable *dir_entries;
   GHashTable *monitors;
   GList *dir_collisions;
-  GRecMutex mutex;
+  GRecMutex mutex; /* guards cache */
   GoaClient *client;
   gboolean entries_stale;
   gchar *account_identity;
