@@ -55,6 +55,7 @@ CLEANFILES = \
 	$(NULL)
 
 EXTRA_DIST = \
+	meson.build \
 	$(service_in_files) \
 	$(systemd_user_in_files) \
 	$(remote_volume_monitors_DATA) \

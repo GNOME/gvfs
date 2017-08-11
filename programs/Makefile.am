@@ -75,6 +75,7 @@ gvfs-mime: deprecated.in Makefile
 EXTRA_DIST = \
 	deprecated.in \
 	gvfs-less \
+	meson.build \
 	$(NULL)
 
 CLEANFILES = \

@@ -13,3 +13,5 @@ libtrash_a_SOURCES = \
 	trashwatcher.c	\
 	trashexpunge.h	\
 	trashexpunge.c
+
+EXTRA_DIST = meson.build

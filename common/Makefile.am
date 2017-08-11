@@ -87,6 +87,9 @@ libgvfscommon_gphoto2_la_LIBADD = \
 endif
 
 
-EXTRA_DIST = org.gtk.vfs.xml
+EXTRA_DIST = \
+	org.gtk.vfs.xml \
+	meson.build \
+	$(NULL)
 
 CLEANFILES = $(dbus_built_sources)

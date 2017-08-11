@@ -81,6 +81,8 @@ install-data-local:
 
 EXTRA_DIST =							\
 	dbus-interfaces.xml					\
+	meson.build						\
+	symbol.map						\
 	$(NULL)
 
 CLEANFILES =							\

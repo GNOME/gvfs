@@ -119,4 +119,6 @@ EXTRA_DIST += \
 	files/testcert.pem		\
 	files/powershot.ioctl		\
 	files/powershot.umockdev	\
+	meson.build			\
+	gvfs-all-tests.in		\
 	$(NULL)

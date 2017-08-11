@@ -149,6 +149,7 @@ EXTRA_DIST = 				\
 	$(gsettings_ENUM_FILES)		\
 	org.gtk.vfs.file-operations.policy.in.in \
 	org.gtk.vfs.file-operations.rules \
+	meson.build			\
 	$(NULL)
 
 DISTCLEANFILES = $(mount_DATA) $(noinst_DATA)

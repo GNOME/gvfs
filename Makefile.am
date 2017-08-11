@@ -27,6 +27,10 @@ EXTRA_DIST = \
 	m4			\
 	gettext/its/polkit.loc	\
 	gettext/its/polkit.its	\
+	meson.build		\
+	meson_options.txt	\
+	meson_post_install.py	\
+	po/meson.build		\
 	$(NULL)
 
 distclean-local:

@@ -96,4 +96,6 @@ endif
 
 EXTRA_DIST = \
 	gvfsd-fuse-tmpfiles.conf	\
+	meson.build			\
+	symbol.map			\
 	$(NULL)

@@ -81,6 +81,7 @@ EXTRA_DIST =				\
 	$(service_in_files)		\
 	$(systemd_user_in_files)	\
 	dbus-interface.xml		\
+	meson.build			\
 	$(NULL)
 
 CLEANFILES =				\

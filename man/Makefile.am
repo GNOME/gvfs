@@ -94,6 +94,7 @@ EXTRA_DIST = \
 	gvfsd.xml \
 	gvfs-less.xml \
 	gvfs.xml \
+	meson.build \
 	$(NULL)
 
 CLEANFILES = \

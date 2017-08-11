@@ -1,0 +1,98 @@
+headers = files(
+  'gvfsurimapper.h',
+  'gvfsuriutils.h'
+)
+
+install_headers(
+  headers,
+  subdir: join_paths('gvfs-client', 'gvfs')
+)
+
+# Dynamic client lib
+uri_parser_sources = files(
+  'afpuri.c',
+  'httpuri.c',
+  'smburi.c'
+)
+
+uri_utils = files('gvfsuriutils.c')
+
+sources = uri_parser_sources + uri_utils + files(
+  'gdaemonmount.c',
+  'gdaemonfile.c',
+  'gdaemonfileenumerator.c',
+  'gdaemonfileinputstream.c',
+  'gdaemonfilemonitor.c',
+  'gdaemonfileoutputstream.c',
+  'gdaemonvfs.c',
+  'gdaemonvolumemonitor.c',
+  'gvfsdaemondbus.c',
+  'gvfsiconloadable.c',
+  'gvfsurimapper.c'
+)
+
+cflags = [
+  '-DG_LOG_DOMAIN="@0@"'.format(gvfs_name.to_upper()),
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
+  '-DGVFS_MODULE_DIR="@0@"'.format(join_paths(gvfs_libdir, 'gvfs', 'modules'))
+]
+
+symbol_map = join_paths(meson.current_source_dir(), 'symbol.map')
+
+ldflags = []
+if have_version_script
+  ldflags += '-Wl,--version-script,@0@'.format(symbol_map)
+endif
+
+libgvfsdbus = shared_module(
+  'gvfsdbus',
+  sources: sources,
+  include_directories: top_inc,
+  dependencies: [
+    libgvfscommon_dep,
+    libmetadata_dep
+  ],
+  c_args: cflags,
+  link_args: ldflags,
+  link_depends: symbol_map,
+  install: true,
+  install_rpath: gvfs_rpath,
+  install_dir: gio_module_dir
+)
+
+if enable_devel_utils
+  test_name = 'test-uri-utils'
+
+  executable(
+    test_name,
+    [test_name + '.c'] + uri_utils,
+    include_directories: top_inc,
+    dependencies: glib_deps + [libgvfscommon_dep],
+    c_args: cflags
+  )
+endif
+
+# FUSE daemon
+if enable_fuse
+  # FIXME: reusing USE_LIBSYSTEMD_LOGIN as systemd has no universal header or pkg-config file
+  if enable_libsystemd_login
+    install_data(
+      'gvfsd-fuse-tmpfiles.conf',
+      install_dir: join_paths(gvfs_libdir, 'tmpfiles.d')
+    )
+  endif
+
+  executable(
+    'gvfsd-fuse',
+    'gvfsfusedaemon.c',
+    include_directories: top_inc,
+    dependencies: glib_deps + [
+      fuse_dep,
+      libgvfscommon_dep
+    ],
+    c_args: cflags + ['-UG_LOG_DOMAIN'],
+    install: true,
+    install_rpath: gvfs_rpath,
+    install_dir: gvfs_libexecdir
+  )
+endif

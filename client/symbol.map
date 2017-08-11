@@ -1,0 +1,9 @@
+{
+global:
+  g_vfs_*;
+  g_io_module_load;
+  g_io_module_unload;
+  g_io_module_query;
+local:
+  *;
+};

@@ -24,3 +24,5 @@ endif
 if USE_GOA
 SUBDIRS += goa
 endif
+
+EXTRA_DIST = meson.build
