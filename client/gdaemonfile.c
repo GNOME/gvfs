@@ -389,7 +389,7 @@ g_daemon_file_get_relative_path (GFile *parent,
                                        parent_daemon->path, NULL);
 
       remainder = match_prefix (full_path_descendant, full_path_parent);
-      if (remainder == NULL || *remainder != '/')
+      if (remainder != NULL && *remainder == '/')
         ret = g_strdup (remainder + 1);
       else
         ret = NULL;
