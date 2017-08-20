@@ -1202,7 +1202,7 @@ ms_response_to_fs_info (MsResponse *response,
       g_file_info_set_attribute_uint64 (info,
                                         G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
                                         bytes_avail);
-      if (have_bytes_used)
+      if (have_bytes_used && G_MAXUINT64 - bytes_avail >= bytes_used)
         g_file_info_set_attribute_uint64 (info,
                                          G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,
                                          bytes_avail + bytes_used);

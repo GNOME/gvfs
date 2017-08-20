@@ -645,7 +645,10 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
       if (file_info)
         {
           if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE))
-            stbuf->f_blocks = (g_file_info_get_attribute_uint64 (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) + 4096 - 1) / 4096;
+            {
+              guint64 size = g_file_info_get_attribute_uint64 (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE);
+              stbuf->f_blocks = (size > 0) ? ((size - 1) / 4096 + 1) : 0;
+            }
           if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE))
             stbuf->f_bfree = stbuf->f_bavail = g_file_info_get_attribute_uint64 (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE) / 4096;
 
