@@ -1,3 +1,15 @@
+Major changes in 1.33.91
+========================
+* daemon: Avoid overflowing when querying for filesystem info
+* proxy: Fix shadow mount handling for equal paths
+* gdaemonfile: Fix g_file_equal for different mount_prefix
+* gdaemonfile: Fix relative path handling
+* client: Fix crash when calculating a relative path
+* channel: Set sockets as nonblocking to prevent deadlocks when copying
+* google: Report FS total size and free space
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.33.90
 ========================
 * admin: Require mounting for each client explicitly
