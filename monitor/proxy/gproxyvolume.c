@@ -265,7 +265,8 @@ update_shadow_mount (GProxyVolume *volume)
         continue;
 
       mount_root = g_mount_get_root (mount);
-      prefix_matches = g_file_has_prefix (activation_root, mount_root);
+      prefix_matches = (g_file_has_prefix (activation_root, mount_root) ||
+                        g_file_equal (activation_root, mount_root));
       g_object_unref (mount_root);
       if (prefix_matches)
         {
