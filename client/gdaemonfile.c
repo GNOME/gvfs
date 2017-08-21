@@ -289,8 +289,12 @@ g_daemon_file_equal (GFile *file1,
   GDaemonFile *daemon_file1 = G_DAEMON_FILE (file1);
   GDaemonFile *daemon_file2 = G_DAEMON_FILE (file2);
 
-  return daemon_file1->mount_spec == daemon_file2->mount_spec && 
-    g_str_equal (daemon_file1->path, daemon_file2->path);
+  /* See comment in g_daemon_file_prefix_matches */
+  return (daemon_file1->mount_spec == daemon_file2->mount_spec ||
+          g_mount_spec_match_with_path (daemon_file1->mount_spec,
+                                        daemon_file2->mount_spec,
+                                        daemon_file2->path)) &&
+          g_str_equal (daemon_file1->path, daemon_file2->path);
 }
 
 
