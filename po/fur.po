@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2017-08-21 14:44+0000\n"
-"PO-Revision-Date: 2017-08-24 11:37+0200\n"
+"PO-Revision-Date: 2017-08-24 12:58+0200\n"
 "Last-Translator: Fabio Tomat <f.t.public@gmail.com>\n"
 "Language-Team: Friulian <fur@li.org>\n"
 "Language: fur\n"
@@ -1322,40 +1322,40 @@ msgstr "No si è rivâts a otignî la liste dai file"
 
 #: daemon/gvfsbackendgphoto2.c:2203
 msgid "Error creating directory"
-msgstr ""
+msgstr "Erôr tal creâ la cartele"
 
 #: daemon/gvfsbackendgphoto2.c:2416
 msgid "Name already exists"
-msgstr ""
+msgstr "Il non al esist za"
 
 #: daemon/gvfsbackendgphoto2.c:2427 daemon/gvfsbackendgphoto2.c:3095
 msgid "New name too long"
-msgstr ""
+msgstr "Gnûf non masse lunc"
 
 #: daemon/gvfsbackendgphoto2.c:2437 daemon/gvfsbackendgphoto2.c:3106
 msgid "Error renaming directory"
-msgstr ""
+msgstr "Erôr tal cambiâ non ae cartele"
 
 #: daemon/gvfsbackendgphoto2.c:2450 daemon/gvfsbackendgphoto2.c:3119
 msgid "Error renaming file"
-msgstr ""
+msgstr "Erôr tal cambiâ non al file"
 
 #: daemon/gvfsbackendgphoto2.c:2514
 #, c-format
 msgid "Directory “%s” is not empty"
-msgstr ""
+msgstr "La cartele “%s” no je vueide"
 
 #: daemon/gvfsbackendgphoto2.c:2525
 msgid "Error deleting directory"
-msgstr ""
+msgstr "Erôr tal eliminâ la cartele"
 
 #: daemon/gvfsbackendgphoto2.c:2551 daemon/gvfsbackendgphoto2.c:3296
 msgid "Error deleting file"
-msgstr ""
+msgstr "Erôr tal eliminâ il file"
 
 #: daemon/gvfsbackendgphoto2.c:2604
 msgid "Can’t write to directory"
-msgstr ""
+msgstr "Impussibil scrivi te cartele"
 
 #: daemon/gvfsbackendgphoto2.c:2651
 msgid "Cannot allocate new file to append to"
@@ -1371,28 +1371,33 @@ msgstr ""
 
 #: daemon/gvfsbackendgphoto2.c:3051
 msgid "Not supported (not same directory)"
-msgstr ""
+msgstr "No supuartât (no je la stesse cartele)"
 
 #: daemon/gvfsbackendgphoto2.c:3063
 msgid ""
 "Not supported (the source is a directory, the destination is a directory too)"
 msgstr ""
+"No supuartât (la sorzint e je une cartele, ancje la destinazion e je une "
+"cartele)"
 
 #: daemon/gvfsbackendgphoto2.c:3071
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
 msgstr ""
+"No supuartât (la sorzint e je une cartele, ma la destinazion e je un file "
+"esistent)"
 
 #: daemon/gvfsbackendgphoto2.c:3083
 msgid ""
 "Not supported (the source is a file, but the destination is a directory)"
 msgstr ""
+"No supuartât (la sorzint e je un file, ma la destinazion e je une cartele)"
 
 #: daemon/gvfsbackendhttp.c:198
 #, c-format
 msgid "HTTP Client Error: %s"
-msgstr ""
+msgstr "Erôr client HTTP: %s"
 
 #: daemon/gvfsbackendlocaltest.c:860
 msgid "Directory notification not supported"
@@ -1400,32 +1405,32 @@ msgstr ""
 
 #: daemon/gvfsbackendmtp.c:554
 msgid "Unknown error."
-msgstr ""
+msgstr "Erôr no cognossût."
 
 #: daemon/gvfsbackendmtp.c:560
 #, c-format
 msgid "libmtp error: %s"
-msgstr ""
+msgstr "Erôr libmtp: %s"
 
 #: daemon/gvfsbackendmtp.c:843
 msgid "Unexpected host URI format."
-msgstr ""
+msgstr "Formât URI dal host inspietât"
 
 #: daemon/gvfsbackendmtp.c:853
 msgid "Malformed host URI."
-msgstr ""
+msgstr "URI dal host malformât."
 
 #: daemon/gvfsbackendmtp.c:866
 msgid "Couldn’t find matching udev device."
-msgstr ""
+msgstr "Impussibil cjatâ un dispositîf udev corispondent."
 
 #: daemon/gvfsbackendmtp.c:1048
 msgid "No MTP devices found"
-msgstr ""
+msgstr "Nissun dispositîf MTP cjatât"
 
 #: daemon/gvfsbackendmtp.c:1053
 msgid "Unable to connect to MTP device"
-msgstr ""
+msgstr "Impussibil conetisi al dispositîf MTP"
 
 #: daemon/gvfsbackendmtp.c:1058
 msgid "Unable to allocate memory while detecting MTP devices"
@@ -1433,91 +1438,93 @@ msgstr ""
 
 #: daemon/gvfsbackendmtp.c:1064
 msgid "Generic libmtp error"
-msgstr ""
+msgstr "Erôr libmtp gjeneric"
 
 #: daemon/gvfsbackendmtp.c:1081
 #, c-format
 msgid "Unable to open MTP device “%s”"
-msgstr ""
+msgstr "Impussibil vierzi il dispositîf MTP “%s”"
 
 #: daemon/gvfsbackendmtp.c:1101
 msgid "Device not found"
-msgstr ""
+msgstr "Dispositîf no cjatât"
 
 #: daemon/gvfsbackendmtp.c:1377 daemon/gvfsbackendmtp.c:1485
 #: daemon/gvfsbackendmtp.c:1537
 msgid "File not found"
-msgstr ""
+msgstr "File no cjatât"
 
 #: daemon/gvfsbackendmtp.c:1605
 msgid "Cannot make directory in this location"
-msgstr ""
+msgstr "Impussibil creâ cartelis in cheste posizion"
 
 #: daemon/gvfsbackendmtp.c:1675 daemon/gvfsbackendmtp.c:2133
 #: daemon/gvfsbackendmtp.c:2196 daemon/gvfsbackendmtp.c:2264
 #: daemon/gvfsbackendmtp.c:2618 daemon/gvfsbackendmtp.c:2684
 #: daemon/gvfsbackendsmbbrowse.c:1131
 msgid "Not a regular file"
-msgstr ""
+msgstr "Nol è un file regolâr"
 
 #: daemon/gvfsbackendmtp.c:1721 daemon/gvfsbackendmtp.c:2034
 msgid "Target is a directory"
-msgstr ""
+msgstr "La destinazion e je une cartele"
 
 #: daemon/gvfsbackendmtp.c:1726 daemon/gvfsbackendmtp.c:2039
 msgid "Can’t merge directories"
-msgstr ""
+msgstr "Impussibil unî lis cartelis"
 
 #: daemon/gvfsbackendmtp.c:1984 daemon/gvfsbackendmtp.c:2530
 msgid "Cannot write to this location"
-msgstr ""
+msgstr "Impussibil scrivi in cheste posizion"
 
 #: daemon/gvfsbackendmtp.c:2353
 #, c-format
 msgid "No thumbnail for entity “%s”"
-msgstr ""
+msgstr "Nissune miniature pe entitât “%s”"
 
 #: daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
-msgstr ""
+msgstr "Condivision file"
 
 #: daemon/gvfsbackendnetwork.c:173
 msgid "Remote Login"
-msgstr ""
+msgstr "Acès rimot"
 
 #: daemon/gvfsbackendnetwork.c:333 daemon/gvfsbackendsmbbrowse.c:858
 msgid "Windows Network"
-msgstr ""
+msgstr "Rêt Windows"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
 #: daemon/gvfsbackendnetwork.c:1019
 msgid "Network Location Monitor"
-msgstr ""
+msgstr "Monitor des posizions di rêt"
 
 #: daemon/gvfsbackendnfs.c:242
 msgid "Mount point does not exist"
-msgstr ""
+msgstr "Il pont di montaç nol esist"
 
 #: daemon/gvfsbackendnfs.c:266
 msgid ""
 "Permission denied: Perhaps this host is disallowed or a privileged port is "
 "needed"
 msgstr ""
+"Permès dineât: forsit chest host nol è permetût o e covente une puarte "
+"privilegjade"
 
 #: daemon/gvfsbackendnfs.c:1055 daemon/gvfsbackendnfs.c:1078
 #: daemon/gvfsbackendnfs.c:1126 daemon/gvfsbackendsftp.c:3702
 #: daemon/gvfsbackendsftp.c:5732
 msgid "Unable to create temporary file"
-msgstr ""
+msgstr "Impussibil creâ file temporani"
 
 #: daemon/gvfsbackendnfs.c:2387
 msgid "Invalid attribute type"
-msgstr ""
+msgstr "Gjenar di atribût no valit"
 
 #: daemon/gvfsbackendrecent.c:270
 msgid "The recent folder may not be deleted"
-msgstr ""
+msgstr "La cartele dai resints no pues jessi eliminade"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
