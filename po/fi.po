@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-02-27 16:22+0000\n"
-"PO-Revision-Date: 2017-03-05 13:08+0200\n"
+"POT-Creation-Date: 2017-08-07 10:29+0000\n"
+"PO-Revision-Date: 2017-08-30 19:09+0300\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos+l10n@iki.fi>\n"
 "Language-Team: suomi <lokalisointi-lista@googlegroups.com>\n"
 "Language: fi\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Gtranslator 2.91.7\n"
+"X-Generator: Poedit 1.8.7.1\n"
 "X-POT-Import-Date: 2012-02-19 15:25:18+0000\n"
 
 #: client/gdaemonfile.c:467 client/gdaemonfile.c:2737
@@ -85,28 +85,8 @@ msgid "values must be string or list of strings"
 msgstr "arvojen täytyy olla merkkijonoja tai merkkijonojen luetteloita"
 
 #: client/gdaemonfile.c:2729
-#| msgid "Operation unsupported"
 msgid "Operation not supported"
 msgstr "Toiminto ei tue tuettu"
-
-#: client/gdaemonfileenumerator.c:553 client/gdaemonfileenumerator.c:636
-#: client/gdaemonfileenumerator.c:687 client/gdaemonfileinputstream.c:649
-#: client/gdaemonfileinputstream.c:802 client/gdaemonfileinputstream.c:922
-#: client/gdaemonfileinputstream.c:1173 client/gdaemonfileinputstream.c:1418
-#: client/gdaemonfileoutputstream.c:553 client/gdaemonfileoutputstream.c:731
-#: client/gdaemonfileoutputstream.c:926 client/gdaemonfileoutputstream.c:1092
-#: client/gdaemonfileoutputstream.c:1274 client/gvfsdaemondbus.c:631
-#: daemon/gvfsbackendsftp.c:5247 daemon/gvfsbackendsmb.c:1095
-#: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
-#: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:346
-#: daemon/gvfsftptask.c:224 monitor/gdu/ggdumount.c:1072
-#: monitor/proxy/gproxydrive.c:569 monitor/proxy/gproxydrive.c:657
-#: monitor/proxy/gproxydrive.c:807 monitor/proxy/gproxydrive.c:945
-#: monitor/proxy/gproxydrive.c:983 monitor/proxy/gproxydrive.c:1108
-#: monitor/proxy/gproxymount.c:502 monitor/proxy/gproxymount.c:587
-#: monitor/proxy/gproxyvolume.c:862 monitor/proxy/gproxyvolume.c:926
-msgid "Operation was cancelled"
-msgstr "Toiminto peruttiin"
 
 #: client/gdaemonfileinputstream.c:544 client/gdaemonfileinputstream.c:552
 #: client/gdaemonfileinputstream.c:1686 client/gdaemonfileinputstream.c:1695
@@ -118,9 +98,26 @@ msgstr "Virhe virtaprotokollassa: %s"
 
 #: client/gdaemonfileinputstream.c:552 client/gdaemonfileinputstream.c:1695
 #: client/gdaemonfileoutputstream.c:503 client/gdaemonfileoutputstream.c:1442
-#: daemon/gvfsbackendmtp.c:2420 daemon/gvfsbackendmtp.c:2800
+#: daemon/gvfsbackendmtp.c:2408 daemon/gvfsbackendmtp.c:2788
 msgid "End of stream"
 msgstr "Virta loppui"
+
+#: client/gdaemonfileinputstream.c:649 client/gdaemonfileinputstream.c:802
+#: client/gdaemonfileinputstream.c:922 client/gdaemonfileinputstream.c:1173
+#: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
+#: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
+#: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
+#: daemon/gvfsbackendsftp.c:5249 daemon/gvfsbackendsmb.c:1095
+#: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
+#: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:346
+#: daemon/gvfsftptask.c:224 monitor/gdu/ggdumount.c:1072
+#: monitor/proxy/gproxydrive.c:569 monitor/proxy/gproxydrive.c:657
+#: monitor/proxy/gproxydrive.c:807 monitor/proxy/gproxydrive.c:945
+#: monitor/proxy/gproxydrive.c:983 monitor/proxy/gproxydrive.c:1108
+#: monitor/proxy/gproxymount.c:502 monitor/proxy/gproxymount.c:587
+#: monitor/proxy/gproxyvolume.c:862 monitor/proxy/gproxyvolume.c:926
+msgid "Operation was cancelled"
+msgstr "Toiminto peruttiin"
 
 #: client/gdaemonfileinputstream.c:1355 client/gdaemonfileoutputstream.c:1035
 msgid "Seek not supported on stream"
@@ -227,8 +224,7 @@ msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "Käyttö: %s --spawner dbus-tunniste kohde_polku"
 
 #: daemon/daemon-main.c:260 daemon/daemon-main.c:278
-#, fuzzy, c-format
-#| msgid "Usage: %s key=value key=value ..."
+#, c-format
 msgid "Usage: %s key=value key=value …"
 msgstr "Käyttö: %s avain=arvo avain=arvo …"
 
@@ -275,9 +271,6 @@ msgstr "Odottamaton virtauksen loppu"
 #. Translators: %d is a constant, currently hardcoded to 256
 #: daemon/gvfsafpserver.c:198 daemon/gvfsafpserver.c:480
 #, c-format
-#| msgid "The server doesn't support passwords longer than %d character."
-#| msgid_plural ""
-#| "The server doesn't support passwords longer than %d characters."
 msgid "The server doesn’t support passwords longer than %d character."
 msgid_plural "The server doesn’t support passwords longer than %d characters."
 msgstr[0] "Palvelin ei tue yli %d merkin salasanoja."
@@ -306,7 +299,6 @@ msgstr "Palvelimeen \"%s\" yhdistäminen epäonnistui annetulla salasanalla."
 
 #: daemon/gvfsafpserver.c:676 daemon/gvfsafpserver.c:701
 #, c-format
-#| msgid "The server “%s” doesn't support anonymous access."
 msgid "The server “%s” doesn’t support anonymous access."
 msgstr "Palvelin “%s” ei tue anonyymia käyttöä."
 
@@ -379,7 +371,6 @@ msgstr "Kansioiden huomautukset eivät ole tuettu"
 
 #: daemon/gvfsafputils.c:124
 #, c-format
-#| msgid "Got error \"%s\" from server"
 msgid "Got error “%s” from server"
 msgstr "Vastaanotettiin virhe “%s” palvelimelta"
 
@@ -389,7 +380,6 @@ msgid "Got unknown error code %d from server"
 msgstr "Vastaanotettiin tuntematon virhekoodi %d palvelimelta"
 
 #: daemon/gvfsafpvolume.c:140
-#| msgid "Volume doesn't exist"
 msgid "Volume doesn’t exist"
 msgstr "Taltiota ei ole olemassa"
 
@@ -407,7 +397,7 @@ msgstr "Liitetty %s sijaintiin %s\n"
 #: daemon/gvfsafpvolume.c:2143 daemon/gvfsafpvolume.c:2305
 #: daemon/gvfsafpvolume.c:2525 daemon/gvfsbackendadmin.c:140
 #: daemon/gvfsbackendgoogle.c:207 daemon/gvfsbackendsftp.c:345
-#: daemon/gvfsbackendsftp.c:1115 daemon/gvfsbackendsftp.c:2147
+#: daemon/gvfsbackendsftp.c:1117 daemon/gvfsbackendsftp.c:2149
 #: daemon/gvfsftptask.c:439
 msgid "Permission denied"
 msgstr "Lupa evätty"
@@ -421,12 +411,11 @@ msgstr "Lupa evätty"
 #: daemon/gvfsbackendcdda.c:906 daemon/gvfsbackendcomputer.c:639
 #: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:778
 #: daemon/gvfsbackendftp.c:1172 daemon/gvfsbackendmtp.c:1670
-#: daemon/gvfsbackendmtp.c:1686 daemon/gvfsbackendmtp.c:2140
-#: daemon/gvfsbackendmtp.c:2203 daemon/gvfsbackendmtp.c:2271
-#: daemon/gvfsbackendmtp.c:2625 daemon/gvfsbackendnetwork.c:697
+#: daemon/gvfsbackendmtp.c:1686 daemon/gvfsbackendmtp.c:2128
+#: daemon/gvfsbackendmtp.c:2191 daemon/gvfsbackendmtp.c:2259
+#: daemon/gvfsbackendmtp.c:2613 daemon/gvfsbackendnetwork.c:697
 #: daemon/gvfsbackendsmbbrowse.c:1068 daemon/gvfsbackendsmbbrowse.c:1135
 #: daemon/gvfsbackendsmbbrowse.c:1322 daemon/gvfsbackendsmbbrowse.c:1395
-#| msgid "File doesn't exist"
 msgid "File doesn’t exist"
 msgstr "Tiedostoa ei ole olemassa"
 
@@ -435,9 +424,9 @@ msgstr "Tiedostoa ei ole olemassa"
 #: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2333
 #: daemon/gvfsbackenddav.c:2996 daemon/gvfsbackenddav.c:3276
 #: daemon/gvfsbackendftp.c:815 daemon/gvfsbackendnfs.c:2487
-#: daemon/gvfsbackendsftp.c:2662 daemon/gvfsbackendsftp.c:3437
-#: daemon/gvfsbackendsftp.c:3765 daemon/gvfsbackendsftp.c:4834
-#: daemon/gvfsbackendsftp.c:5775
+#: daemon/gvfsbackendsftp.c:2664 daemon/gvfsbackendsftp.c:3439
+#: daemon/gvfsbackendsftp.c:3767 daemon/gvfsbackendsftp.c:4836
+#: daemon/gvfsbackendsftp.c:5777
 msgid "File is directory"
 msgstr "Tiedosto on kansio"
 
@@ -451,7 +440,7 @@ msgstr "Kohdetiedosto on avoinna"
 
 #: daemon/gvfsafpvolume.c:688 daemon/gvfsbackendafc.c:221
 #: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2723
-#: daemon/gvfsbackendsftp.c:2141
+#: daemon/gvfsbackendsftp.c:2143
 msgid "Directory not empty"
 msgstr "Kansio ei ole tyhjä"
 
@@ -486,11 +475,11 @@ msgstr "Taltiolla ei ole riittävästi tilaa"
 #: daemon/gvfsbackenddav.c:3043 daemon/gvfsbackenddav.c:3267
 #: daemon/gvfsbackendftp.c:794 daemon/gvfsbackendftp.c:982
 #: daemon/gvfsbackendftp.c:1492 daemon/gvfsbackendftp.c:1600
-#: daemon/gvfsbackendgoogle.c:1233 daemon/gvfsbackendgoogle.c:1561
-#: daemon/gvfsbackendgoogle.c:1834 daemon/gvfsbackendgoogle.c:2487
+#: daemon/gvfsbackendgoogle.c:1232 daemon/gvfsbackendgoogle.c:1564
+#: daemon/gvfsbackendgoogle.c:1837 daemon/gvfsbackendgoogle.c:2494
 #: daemon/gvfsbackendmtp.c:1616 daemon/gvfsbackendmtp.c:1748
-#: daemon/gvfsbackendmtp.c:2074 daemon/gvfsbackendnfs.c:2497
-#: daemon/gvfsbackendsftp.c:4843 daemon/gvfsbackendsmb.c:2037
+#: daemon/gvfsbackendmtp.c:2062 daemon/gvfsbackendnfs.c:2497
+#: daemon/gvfsbackendsftp.c:4845 daemon/gvfsbackendsmb.c:2037
 msgid "Target file already exists"
 msgstr "Kohdetiedosto on jo olemassa"
 
@@ -510,7 +499,6 @@ msgid "Target directory already exists"
 msgstr "Kohdekansio on jo olemassa"
 
 #: daemon/gvfsafpvolume.c:1233 daemon/gvfsbackendafp.c:604
-#| msgid "Can't rename volume"
 msgid "Can’t rename volume"
 msgstr "Taltiota ei voi nimetä uudelleen"
 
@@ -543,12 +531,10 @@ msgid "Object being moved is marked as not renameable (RenameInhibit)"
 msgstr ""
 
 #: daemon/gvfsafpvolume.c:1436
-#| msgid "Object being moved doesn't exist"
 msgid "Object being moved doesn’t exist"
 msgstr "Siirrettävää objektia ei ole olemassa"
 
 #: daemon/gvfsafpvolume.c:1573
-#| msgid "Server doesn't support the FPCopyFile operation"
 msgid "Server doesn’t support the FPCopyFile operation"
 msgstr "Palvelin ei tue FPCopyFile-toimintoa"
 
@@ -574,8 +560,7 @@ msgstr ""
 
 #: daemon/gvfsafpvolume.c:2309 daemon/gvfsbackendmtp.c:1449
 #: daemon/gvfsbackendmtp.c:1474 daemon/gvfsbackendmtp.c:1624
-#: daemon/gvfsbackendmtp.c:2007 daemon/gvfsbackendmtp.c:2550
-#| msgid "Directory doesn't exist"
+#: daemon/gvfsbackendmtp.c:2007 daemon/gvfsbackendmtp.c:2538
 msgid "Directory doesn’t exist"
 msgstr "Kansiota ei ole olemassa"
 
@@ -594,6 +579,13 @@ msgstr "Tiedosto on lukittu toiselle käyttäjälle"
 #: daemon/gvfsafpvolume.c:2805
 msgid "File is not open for read access"
 msgstr "Tiedosto ei ole avoinna lukua varten"
+
+#: daemon/gvfsbackendadmin.c:845 daemon/gvfsbackendafc.c:472
+#: daemon/gvfsbackendarchive.c:638 daemon/gvfsbackendarchive.c:667
+#: daemon/gvfsbackenddav.c:1862 daemon/gvfsbackendgoogle.c:1667
+#: daemon/gvfsbackendhttp.c:256 daemon/gvfsbackendsmb.c:569
+msgid "Invalid mount spec"
+msgstr "Virheellinen liitosmäärittely"
 
 #: daemon/gvfsbackendafc.c:213
 msgid "Internal Apple File Control error"
@@ -676,13 +668,6 @@ msgstr "Yritä uudelleen"
 msgid "Cancel"
 msgstr "Peru"
 
-#: daemon/gvfsbackendafc.c:472 daemon/gvfsbackendarchive.c:638
-#: daemon/gvfsbackendarchive.c:667 daemon/gvfsbackenddav.c:1862
-#: daemon/gvfsbackendgoogle.c:1664 daemon/gvfsbackendhttp.c:256
-#: daemon/gvfsbackendsmb.c:569
-msgid "Invalid mount spec"
-msgstr "Virheellinen liitosmäärittely"
-
 #: daemon/gvfsbackendafc.c:478 daemon/gvfsbackendafc.c:508
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "Viallinen AFC-sijainti: täytyy olla muotoa afc://uuid:porttinumero"
@@ -741,11 +726,10 @@ msgstr ""
 "sitten “Yritä uudelleen”."
 
 #: daemon/gvfsbackendafc.c:1112 daemon/gvfsbackendarchive.c:745
-#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2187
-#: daemon/gvfsbackendgphoto2.c:1506 daemon/gvfsbackendmtp.c:2293
-#: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:123
+#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2194
+#: daemon/gvfsbackendgphoto2.c:1501 daemon/gvfsbackendmtp.c:2281
+#: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:126
 #: daemon/gvfsbackendsmb.c:659 daemon/gvfsbackendtrash.c:234
-#| msgid "Can't open directory"
 msgid "Can’t open directory"
 msgstr "Kansiota ei voi avata"
 
@@ -764,18 +748,17 @@ msgstr "Siirtymistyyppi ei ole tuettu"
 #.
 #: daemon/gvfsbackendafc.c:2416 daemon/gvfsbackendafp.c:1781
 #: daemon/gvfsbackendftp.c:1192 daemon/gvfsbackendftp.c:1240
-#: daemon/gvfsbackendftp.c:1261 daemon/gvfsbackendgoogle.c:1140
-#: daemon/gvfsbackendgoogle.c:1207 daemon/gvfsbackendgoogle.c:1228
-#: daemon/gvfsbackendgoogle.c:1310 daemon/gvfsbackendgoogle.c:1378
-#: daemon/gvfsbackendgoogle.c:1536 daemon/gvfsbackendgoogle.c:1764
-#: daemon/gvfsbackendgoogle.c:2403 daemon/gvfsbackendgoogle.c:2458
-#: daemon/gvfsbackendgoogle.c:2482 daemon/gvfsbackendgoogle.c:2568
-#: daemon/gvfsbackendmtp.c:2033 daemon/gvfsbackendmtp.c:2260
-#: daemon/gvfsbackendmtp.c:2455 daemon/gvfsbackendmtp.c:2526
-#: daemon/gvfsbackendmtp.c:2614 daemon/gvfsbackendmtp.c:2682
-#: daemon/gvfsbackendnfs.c:2379 daemon/gvfsbackendsftp.c:2145
-#: daemon/gvfsbackendsftp.c:5211 daemon/gvfsbackendsmb.c:1683
-#: daemon/gvfsftptask.c:431
+#: daemon/gvfsbackendftp.c:1261 daemon/gvfsbackendgoogle.c:1138
+#: daemon/gvfsbackendgoogle.c:1206 daemon/gvfsbackendgoogle.c:1227
+#: daemon/gvfsbackendgoogle.c:1313 daemon/gvfsbackendgoogle.c:1381
+#: daemon/gvfsbackendgoogle.c:1539 daemon/gvfsbackendgoogle.c:1767
+#: daemon/gvfsbackendgoogle.c:2410 daemon/gvfsbackendgoogle.c:2465
+#: daemon/gvfsbackendgoogle.c:2489 daemon/gvfsbackendgoogle.c:2575
+#: daemon/gvfsbackendmtp.c:2248 daemon/gvfsbackendmtp.c:2443
+#: daemon/gvfsbackendmtp.c:2514 daemon/gvfsbackendmtp.c:2602
+#: daemon/gvfsbackendmtp.c:2670 daemon/gvfsbackendnfs.c:2379
+#: daemon/gvfsbackendsftp.c:2147 daemon/gvfsbackendsftp.c:5213
+#: daemon/gvfsbackendsmb.c:1683 daemon/gvfsftptask.c:431
 msgid "Operation unsupported"
 msgstr "Toiminto ei tue tuettu"
 
@@ -805,7 +788,7 @@ msgstr "Ei liitettävissä oleva tiedosto"
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: daemon/gvfsbackendafpbrowse.c:461 daemon/gvfsbackendafp.c:2104
 #: daemon/gvfsbackendftp.c:672 daemon/gvfsbackendnfs.c:290
-#: daemon/gvfsbackendsftp.c:2002 daemon/gvfsbackendsmb.c:438
+#: daemon/gvfsbackendsftp.c:2004 daemon/gvfsbackendsmb.c:438
 #: daemon/gvfsbackendsmb.c:1365
 #, c-format
 msgid "%s on %s"
@@ -819,7 +802,7 @@ msgstr "%s"
 
 #: daemon/gvfsbackendafpbrowse.c:498 daemon/gvfsbackendafp.c:2139
 #: daemon/gvfsbackendarchive.c:627 daemon/gvfsbackendftp.c:706
-#: daemon/gvfsbackendnfs.c:197 daemon/gvfsbackendsftp.c:2054
+#: daemon/gvfsbackendnfs.c:197 daemon/gvfsbackendsftp.c:2056
 msgid "No hostname specified"
 msgstr "Verkkonimeä ei annettu"
 
@@ -829,24 +812,23 @@ msgstr "Apple Filing Protocol -palvelu"
 
 #: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:875
 #: daemon/gvfsbackenddav.c:2991 daemon/gvfsbackendftp.c:1592
-#: daemon/gvfsbackendgoogle.c:1806
-#| msgid "Can't copy directory over directory"
+#: daemon/gvfsbackendgoogle.c:1809
 msgid "Can’t copy directory over directory"
 msgstr "Kansiota ei voi kopioida kansion päälle"
 
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:891
 #: daemon/gvfsbackenddav.c:3020 daemon/gvfsbackendftp.c:1615
-#: daemon/gvfsbackendgoogle.c:1244 daemon/gvfsbackendgoogle.c:1825
-#: daemon/gvfsbackendgoogle.c:1845 daemon/gvfsbackendmtp.c:1731
-#: daemon/gvfsbackendmtp.c:1754 daemon/gvfsbackendmtp.c:2056
-#: daemon/gvfsbackendmtp.c:2080
+#: daemon/gvfsbackendgoogle.c:1243 daemon/gvfsbackendgoogle.c:1828
+#: daemon/gvfsbackendgoogle.c:1848 daemon/gvfsbackendmtp.c:1731
+#: daemon/gvfsbackendmtp.c:1754 daemon/gvfsbackendmtp.c:2044
+#: daemon/gvfsbackendmtp.c:2068
 #, fuzzy
 #| msgid "Can't recursively copy directory"
 msgid "Can’t recursively copy directory"
 msgstr "Kansiota ei voi kopioida rekursiivisesti"
 
 #: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2868
-#: daemon/gvfsbackendnfs.c:2481 daemon/gvfsbackendsftp.c:4829
+#: daemon/gvfsbackendnfs.c:2481 daemon/gvfsbackendsftp.c:4831
 #: daemon/gvfsbackendsmb.c:2026
 #, fuzzy
 #| msgid "Can't move directory over directory"
@@ -863,13 +845,13 @@ msgid "Unable to create temporary file (%s)"
 msgstr "Väliaikaistiedoston (%s) luonti epäonnistui"
 
 #: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2469
-#: daemon/gvfsbackendnfs.c:1184 daemon/gvfsbackendsftp.c:3780
+#: daemon/gvfsbackendnfs.c:1184 daemon/gvfsbackendsftp.c:3782
 #: daemon/gvfsbackendsmb.c:1064
 msgid "The file was externally modified"
 msgstr "Tiedostoa muokattiin muualta"
 
 #: daemon/gvfsbackendafp.c:1765 daemon/gvfsbackendftp.c:1233
-#: daemon/gvfsbackendsftp.c:5221
+#: daemon/gvfsbackendsftp.c:5223
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "Virheellinen määretyyppi (odotettiin uint32:ta)"
 
@@ -892,10 +874,10 @@ msgstr "/ arkistossa %s"
 
 #: daemon/gvfsbackendarchive.c:882 daemon/gvfsbackendburn.c:679
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
-#: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:684
-#: daemon/gvfsbackendgoogle.c:1213 daemon/gvfsbackendgoogle.c:1328
-#: daemon/gvfsbackendgoogle.c:1469 daemon/gvfsbackendnetwork.c:745
-#: daemon/gvfsbackendsftp.c:4319 daemon/gvfsftpdircache.c:157
+#: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:678
+#: daemon/gvfsbackendgoogle.c:1212 daemon/gvfsbackendgoogle.c:1331
+#: daemon/gvfsbackendgoogle.c:1472 daemon/gvfsbackendnetwork.c:745
+#: daemon/gvfsbackendsftp.c:4321 daemon/gvfsftpdircache.c:157
 msgid "The file is not a directory"
 msgstr "Tiedosto ei ole kansio"
 
@@ -913,17 +895,17 @@ msgstr "Väliaikaistiedostoa ei voitu luoda"
 #: daemon/gvfsbackendburn.c:716 daemon/gvfsbackendburn.c:742
 #: daemon/gvfsbackendburn.c:780 daemon/gvfsbackendburn.c:971
 #: daemon/gvfsbackendburn.c:1007 daemon/gvfsbackendftp.c:835
-#: daemon/gvfsbackendgoogle.c:650 daemon/gvfsbackendgphoto2.c:939
-#: daemon/gvfsbackendgphoto2.c:1827 daemon/gvfsbackendgphoto2.c:2546
-#: daemon/gvfsbackendrecent.c:107 daemon/gvfsbackendrecent.c:288
-#: daemon/gvfsbackendsftp.c:2149 daemon/gvfsbackendsftp.c:3314
-#: daemon/gvfsbackendsftp.c:3327 daemon/gvfsbackendsftp.c:3347
+#: daemon/gvfsbackendgoogle.c:644 daemon/gvfsbackendgphoto2.c:934
+#: daemon/gvfsbackendgphoto2.c:1822 daemon/gvfsbackendgphoto2.c:2541
+#: daemon/gvfsbackendrecent.c:110 daemon/gvfsbackendrecent.c:293
+#: daemon/gvfsbackendsftp.c:2151 daemon/gvfsbackendsftp.c:3316
+#: daemon/gvfsbackendsftp.c:3329 daemon/gvfsbackendsftp.c:3349
 #: daemon/gvfsbackendtrash.c:218
 msgid "No such file or directory"
 msgstr "Tiedostoa tai kansiota ei löydy"
 
 #: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:903
-#: daemon/gvfsbackendgoogle.c:1814
+#: daemon/gvfsbackendgoogle.c:1817
 #, fuzzy
 #| msgid "Can't copy file over directory"
 msgid "Can’t copy file over directory"
@@ -937,7 +919,7 @@ msgstr "CD-/DVD-luontityökalu"
 #: daemon/gvfsbackendburn.c:752 daemon/gvfsbackendburn.c:788
 #: daemon/gvfsbackendburn.c:923 daemon/gvfsbackendburn.c:985
 #: daemon/gvfsbackendburn.c:989 daemon/gvfsbackendburn.c:999
-#: daemon/gvfsbackendgphoto2.c:2620
+#: daemon/gvfsbackendgphoto2.c:2615
 msgid "File exists"
 msgstr "Tiedosto on jo olemassa"
 
@@ -972,19 +954,19 @@ msgid "No such file or directory in target path"
 msgstr "Kohdepolulla ei ole haluttua kansiota tai hakemistoa"
 
 #: daemon/gvfsbackendburn.c:884 daemon/gvfsbackenddav.c:2906
-#: daemon/gvfsbackendsftp.c:2143 daemon/gvfsbackendsftp.c:5009
+#: daemon/gvfsbackendsftp.c:2145 daemon/gvfsbackendsftp.c:5011
 msgid "Target file exists"
 msgstr "Kohdetiedosto on jo olemassa"
 
 #: daemon/gvfsbackendburn.c:949 daemon/gvfsbackendcomputer.c:812
 #: daemon/gvfsbackenddav.c:3350 daemon/gvfsbackenddav.c:3382
-#: daemon/gvfsbackendgphoto2.c:2196 daemon/gvfsbackendgphoto2.c:2409
-#: daemon/gvfsbackendgphoto2.c:2506 daemon/gvfsbackendgphoto2.c:2599
-#: daemon/gvfsbackendgphoto2.c:3208 daemon/gvfsbackendgphoto2.c:3218
+#: daemon/gvfsbackendgphoto2.c:2191 daemon/gvfsbackendgphoto2.c:2404
+#: daemon/gvfsbackendgphoto2.c:2501 daemon/gvfsbackendgphoto2.c:2594
+#: daemon/gvfsbackendgphoto2.c:3203 daemon/gvfsbackendgphoto2.c:3213
 #: daemon/gvfsbackendnfs.c:2429 daemon/gvfsbackendnfs.c:2555
-#: daemon/gvfsbackendsftp.c:5893 daemon/gvfsbackendsftp.c:5925
-#: daemon/gvfsbackendsftp.c:5951 daemon/gvfsbackendsftp.c:6422
-#: daemon/gvfsbackendsftp.c:6484
+#: daemon/gvfsbackendsftp.c:5895 daemon/gvfsbackendsftp.c:5927
+#: daemon/gvfsbackendsftp.c:5953 daemon/gvfsbackendsftp.c:6424
+#: daemon/gvfsbackendsftp.c:6486
 msgid "Not supported"
 msgstr "Ei tuettu"
 
@@ -1007,7 +989,7 @@ msgstr ""
 "Taltio on varattu\n"
 "Yksi tai useampi sovellus käyttää taltiota."
 
-#: daemon/gvfsbackendcdda.c:290 daemon/gvfsbackendgphoto2.c:1247
+#: daemon/gvfsbackendcdda.c:290 daemon/gvfsbackendgphoto2.c:1242
 #: daemon/gvfsbackendmtp.c:897
 msgid "Cannot create gudev client"
 msgstr "Gudev-asiakasta ei voi luoda"
@@ -1062,12 +1044,11 @@ msgstr "'Paranoia'-virhe asemasta %s"
 msgid "Error seeking in stream on drive %s"
 msgstr "Virhe siirryttäessä virrassa asemassa %s"
 
-#: daemon/gvfsbackendcdda.c:899 daemon/gvfsbackendgphoto2.c:1514
+#: daemon/gvfsbackendcdda.c:899 daemon/gvfsbackendgphoto2.c:1509
 msgid "No such file"
 msgstr "Tiedostoa ei löydy"
 
 #: daemon/gvfsbackendcdda.c:913
-#| msgid "The file does not exist or isn't an audio track"
 msgid "The file does not exist or isn’t an audio track"
 msgstr "Tiedostoa ei ole olemassa tai se ei ole ääniraita"
 
@@ -1084,7 +1065,6 @@ msgid "File System"
 msgstr "Tiedostojärjestelmä"
 
 #: daemon/gvfsbackendcomputer.c:661
-#| msgid "Can't open mountable file"
 msgid "Can’t open mountable file"
 msgstr "Liitettävää tiedostoa ei voi avata"
 
@@ -1094,7 +1074,6 @@ msgid "Internal error: %s"
 msgstr "Sisäinen virhe: %s"
 
 #: daemon/gvfsbackendcomputer.c:890 daemon/gvfsbackendcomputer.c:1008
-#| msgid "Can't mount file"
 msgid "Can’t mount file"
 msgstr "Tiedostoa ei voi liittää"
 
@@ -1103,22 +1082,18 @@ msgid "No medium in the drive"
 msgstr "Asemassa ei ole mediaa"
 
 #: daemon/gvfsbackendcomputer.c:1072
-#| msgid "Can't unmount file"
 msgid "Can’t unmount file"
 msgstr "Tiedostoa ei voi irrottaa"
 
 #: daemon/gvfsbackendcomputer.c:1202
-#| msgid "Can't eject file"
 msgid "Can’t eject file"
 msgstr "Tiedostoa ei voi poistaa asemasta"
 
 #: daemon/gvfsbackendcomputer.c:1269 daemon/gvfsbackendcomputer.c:1276
-#| msgid "Can't start drive"
 msgid "Can’t start drive"
 msgstr "Asemaa ei voi käynnistää"
 
 #: daemon/gvfsbackendcomputer.c:1342 daemon/gvfsbackendcomputer.c:1349
-#| msgid "Can't stop drive"
 msgid "Can’t stop drive"
 msgstr "Asemaa ei voi pysäyttää"
 
@@ -1166,7 +1141,7 @@ msgstr "WebDAV-jako"
 #. translators: %s here is the hostname
 #. Translators: %s is the hostname
 #: daemon/gvfsbackenddav.c:1566 daemon/gvfsbackendftp.c:529
-#: daemon/gvfsbackendsftp.c:1164
+#: daemon/gvfsbackendsftp.c:1166
 #, c-format
 msgid "Enter password for %s"
 msgstr "Anna kohteen %s salasana"
@@ -1191,7 +1166,7 @@ msgid "Could not create request"
 msgstr "Pyyntöä ei voitu luoda"
 
 #: daemon/gvfsbackenddav.c:2500 daemon/gvfsbackendftp.c:1085
-#: daemon/gvfsbackendgoogle.c:2562 daemon/gvfsbackendnfs.c:948
+#: daemon/gvfsbackendgoogle.c:2569 daemon/gvfsbackendnfs.c:948
 #: daemon/gvfsbackendnfs.c:971 daemon/gvfsbackendnfs.c:997
 #: daemon/gvfsbackendnfs.c:1397 daemon/gvfsbackendsmb.c:1100
 #: daemon/gvfsbackendsmb.c:2054
@@ -1229,12 +1204,12 @@ msgid "Network"
 msgstr "Verkko"
 
 #. Translators: the first %s is the username, the second the host name
-#: daemon/gvfsbackendftp.c:526 daemon/gvfsbackendsftp.c:1157
+#: daemon/gvfsbackendftp.c:526 daemon/gvfsbackendsftp.c:1159
 #, c-format
 msgid "Enter password for %s on %s"
 msgstr "Anna käyttäjän %s salasana palvelimelle %s"
 
-#: daemon/gvfsbackendftp.c:556 daemon/gvfsbackendsftp.c:1181
+#: daemon/gvfsbackendftp.c:556 daemon/gvfsbackendsftp.c:1183
 #: daemon/gvfsbackendsmbbrowse.c:963 daemon/gvfsbackendsmb.c:524
 msgid "Password dialog cancelled"
 msgstr "Salasanakysely peruttiin"
@@ -1243,52 +1218,51 @@ msgstr "Salasanakysely peruttiin"
 msgid "Insufficient permissions"
 msgstr "Oikeudet eivät riitä"
 
-#: daemon/gvfsbackendgoogle.c:1713 daemon/gvfsbackendgoogle.c:2236
-#: daemon/gvfsbackendgphoto2.c:1547
+#: daemon/gvfsbackendgoogle.c:1716 daemon/gvfsbackendgoogle.c:2243
+#: daemon/gvfsbackendgphoto2.c:1542
 msgid "Error getting data from file"
 msgstr "Virhe pyydettäessä tietoja tiedostosta"
 
-#: daemon/gvfsbackendgoogle.c:2194 daemon/gvfsbackendsftp.c:2322
-#: daemon/gvfsbackendsftp.c:2729 daemon/gvfsbackendsftp.c:2792
-#: daemon/gvfsbackendsftp.c:2803 daemon/gvfsbackendsftp.c:2861
-#: daemon/gvfsbackendsftp.c:2954 daemon/gvfsbackendsftp.c:3006
-#: daemon/gvfsbackendsftp.c:3061 daemon/gvfsbackendsftp.c:3140
-#: daemon/gvfsbackendsftp.c:3257 daemon/gvfsbackendsftp.c:3390
-#: daemon/gvfsbackendsftp.c:3474 daemon/gvfsbackendsftp.c:3550
-#: daemon/gvfsbackendsftp.c:3562 daemon/gvfsbackendsftp.c:3622
-#: daemon/gvfsbackendsftp.c:3664 daemon/gvfsbackendsftp.c:3852
-#: daemon/gvfsbackendsftp.c:3886 daemon/gvfsbackendsftp.c:3944
-#: daemon/gvfsbackendsftp.c:4006 daemon/gvfsbackendsftp.c:4077
-#: daemon/gvfsbackendsftp.c:4352 daemon/gvfsbackendsftp.c:4423
-#: daemon/gvfsbackendsftp.c:4558 daemon/gvfsbackendsftp.c:4668
-#: daemon/gvfsbackendsftp.c:4730 daemon/gvfsbackendsftp.c:4767
-#: daemon/gvfsbackendsftp.c:4795 daemon/gvfsbackendsftp.c:4909
-#: daemon/gvfsbackendsftp.c:4965 daemon/gvfsbackendsftp.c:5006
-#: daemon/gvfsbackendsftp.c:5042 daemon/gvfsbackendsftp.c:5078
-#: daemon/gvfsbackendsftp.c:5093 daemon/gvfsbackendsftp.c:5108
-#: daemon/gvfsbackendsftp.c:5192 daemon/gvfsbackendsftp.c:5378
-#: daemon/gvfsbackendsftp.c:5415 daemon/gvfsbackendsftp.c:5489
-#: daemon/gvfsbackendsftp.c:5575 daemon/gvfsbackendsftp.c:5659
-#: daemon/gvfsbackendsftp.c:5702 daemon/gvfsbackendsftp.c:5706
-#: daemon/gvfsbackendsftp.c:5823 daemon/gvfsbackendsftp.c:5827
-#: daemon/gvfsbackendsftp.c:6064 daemon/gvfsbackendsftp.c:6277
-#: daemon/gvfsbackendsftp.c:6294 daemon/gvfsbackendsftp.c:6428
-#: daemon/gvfsbackendsftp.c:6456
+#: daemon/gvfsbackendgoogle.c:2201 daemon/gvfsbackendsftp.c:2324
+#: daemon/gvfsbackendsftp.c:2731 daemon/gvfsbackendsftp.c:2794
+#: daemon/gvfsbackendsftp.c:2805 daemon/gvfsbackendsftp.c:2863
+#: daemon/gvfsbackendsftp.c:2956 daemon/gvfsbackendsftp.c:3008
+#: daemon/gvfsbackendsftp.c:3063 daemon/gvfsbackendsftp.c:3142
+#: daemon/gvfsbackendsftp.c:3259 daemon/gvfsbackendsftp.c:3392
+#: daemon/gvfsbackendsftp.c:3476 daemon/gvfsbackendsftp.c:3552
+#: daemon/gvfsbackendsftp.c:3564 daemon/gvfsbackendsftp.c:3624
+#: daemon/gvfsbackendsftp.c:3666 daemon/gvfsbackendsftp.c:3854
+#: daemon/gvfsbackendsftp.c:3888 daemon/gvfsbackendsftp.c:3946
+#: daemon/gvfsbackendsftp.c:4008 daemon/gvfsbackendsftp.c:4079
+#: daemon/gvfsbackendsftp.c:4354 daemon/gvfsbackendsftp.c:4425
+#: daemon/gvfsbackendsftp.c:4560 daemon/gvfsbackendsftp.c:4670
+#: daemon/gvfsbackendsftp.c:4732 daemon/gvfsbackendsftp.c:4769
+#: daemon/gvfsbackendsftp.c:4797 daemon/gvfsbackendsftp.c:4911
+#: daemon/gvfsbackendsftp.c:4967 daemon/gvfsbackendsftp.c:5008
+#: daemon/gvfsbackendsftp.c:5044 daemon/gvfsbackendsftp.c:5080
+#: daemon/gvfsbackendsftp.c:5095 daemon/gvfsbackendsftp.c:5110
+#: daemon/gvfsbackendsftp.c:5194 daemon/gvfsbackendsftp.c:5380
+#: daemon/gvfsbackendsftp.c:5417 daemon/gvfsbackendsftp.c:5491
+#: daemon/gvfsbackendsftp.c:5577 daemon/gvfsbackendsftp.c:5661
+#: daemon/gvfsbackendsftp.c:5704 daemon/gvfsbackendsftp.c:5708
+#: daemon/gvfsbackendsftp.c:5825 daemon/gvfsbackendsftp.c:5829
+#: daemon/gvfsbackendsftp.c:6066 daemon/gvfsbackendsftp.c:6279
+#: daemon/gvfsbackendsftp.c:6296 daemon/gvfsbackendsftp.c:6430
+#: daemon/gvfsbackendsftp.c:6458
 msgid "Invalid reply received"
 msgstr "Saatiin virheellinen vastaus"
 
-#: daemon/gvfsbackendgoogle.c:2589 daemon/gvfsbackendnfs.c:1159
-#| msgid "Target is a directory"
+#: daemon/gvfsbackendgoogle.c:2596 daemon/gvfsbackendnfs.c:1159
 msgid "Target file is a directory"
 msgstr "Kohde on hakemisto"
 
-#: daemon/gvfsbackendgoogle.c:2597 daemon/gvfsbackendnfs.c:1169
+#: daemon/gvfsbackendgoogle.c:2604 daemon/gvfsbackendnfs.c:1169
 #, fuzzy
 #| msgid "The file is not a mountable"
 msgid "Target file is not a regular file"
 msgstr "Tiedosto ei ole liitettävissä"
 
-#: daemon/gvfsbackendgoogle.c:2787 daemon/gvfsbackendgphoto2.c:3008
+#: daemon/gvfsbackendgoogle.c:2794 daemon/gvfsbackendgphoto2.c:3003
 msgid "Error writing file"
 msgstr "Virhe kirjoitettaessa tiedostoa"
 
@@ -1322,149 +1296,148 @@ msgstr "%s: %d: ei tuettu"
 msgid "Digital Camera (%s)"
 msgstr "Digitaalikamera (%s)"
 
-#: daemon/gvfsbackendgphoto2.c:1261 daemon/gvfsbackendmtp.c:889
+#: daemon/gvfsbackendgphoto2.c:1256 daemon/gvfsbackendmtp.c:889
 msgid "No device specified"
 msgstr "Laitetta ei määritelty"
 
-#: daemon/gvfsbackendgphoto2.c:1277
+#: daemon/gvfsbackendgphoto2.c:1272
 msgid "Cannot create gphoto2 context"
 msgstr "Gphoto2-kontekstia ei voi luoda"
 
-#: daemon/gvfsbackendgphoto2.c:1286
+#: daemon/gvfsbackendgphoto2.c:1281
 msgid "Error creating camera"
 msgstr "Virhe luotaessa kameralaitetta"
 
-#: daemon/gvfsbackendgphoto2.c:1298 daemon/gvfsbackendgphoto2.c:1307
+#: daemon/gvfsbackendgphoto2.c:1293 daemon/gvfsbackendgphoto2.c:1302
 msgid "Error loading device information"
 msgstr "Virhe ladattaessa tietoja laitteesta"
 
-#: daemon/gvfsbackendgphoto2.c:1318
+#: daemon/gvfsbackendgphoto2.c:1313
 msgid "Error looking up device information"
 msgstr "Virhe etsittäessä tietoja laitteesta"
 
-#: daemon/gvfsbackendgphoto2.c:1327
+#: daemon/gvfsbackendgphoto2.c:1322
 msgid "Error getting device information"
 msgstr "Virhe pyydettäessä tietoja laitteesta"
 
-#: daemon/gvfsbackendgphoto2.c:1341
+#: daemon/gvfsbackendgphoto2.c:1336
 msgid "Error setting up camera communications port"
 msgstr "Virhe asetettaessa kameran yhteysporttia"
 
-#: daemon/gvfsbackendgphoto2.c:1351
+#: daemon/gvfsbackendgphoto2.c:1346
 msgid "Error initializing camera"
 msgstr "Virhe alustettaessa kameraa"
 
 #. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
 #. backend and shouldn't be translated.
-#: daemon/gvfsbackendgphoto2.c:1362
+#: daemon/gvfsbackendgphoto2.c:1357
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2-liitos laitteella %s"
 
-#: daemon/gvfsbackendgphoto2.c:1460
+#: daemon/gvfsbackendgphoto2.c:1455
 msgid "No camera specified"
 msgstr "Kameraa ei ole annettu"
 
-#: daemon/gvfsbackendgphoto2.c:1522 daemon/gvfsbackendgphoto2.c:3249
+#: daemon/gvfsbackendgphoto2.c:1517 daemon/gvfsbackendgphoto2.c:3244
 msgid "Error creating file object"
 msgstr "Virhe luotaessa tiedosto-oliota"
 
-#: daemon/gvfsbackendgphoto2.c:1537 daemon/gvfsbackendgphoto2.c:3280
+#: daemon/gvfsbackendgphoto2.c:1532 daemon/gvfsbackendgphoto2.c:3275
 msgid "Error getting file"
 msgstr "Virhe pyydettäessä tiedostoa"
 
-#: daemon/gvfsbackendgphoto2.c:1605 daemon/gvfsbackendmtp.c:2383
+#: daemon/gvfsbackendgphoto2.c:1600 daemon/gvfsbackendmtp.c:2371
 #, fuzzy, c-format
 #| msgid "Malformed icon identifier '%s'"
 msgid "Malformed icon identifier “%s”"
 msgstr "Virheellinen kuvaketunniste ”%s”"
 
-#: daemon/gvfsbackendgphoto2.c:1681 daemon/gvfsbackendgphoto2.c:2871
+#: daemon/gvfsbackendgphoto2.c:1676 daemon/gvfsbackendgphoto2.c:2866
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Virhe siirryttäessä virrassa kamerassa %s"
 
-#: daemon/gvfsbackendgphoto2.c:1821 daemon/gvfsbackendsftp.c:3317
+#: daemon/gvfsbackendgphoto2.c:1816 daemon/gvfsbackendsftp.c:3319
 #: daemon/gvfsbackendsmbbrowse.c:1391
 msgid "Not a directory"
 msgstr "Ei ole kansio"
 
-#: daemon/gvfsbackendgphoto2.c:1854
+#: daemon/gvfsbackendgphoto2.c:1849
 msgid "Failed to get folder list"
 msgstr "Kansioluetteloa ei saatu"
 
-#: daemon/gvfsbackendgphoto2.c:1919
+#: daemon/gvfsbackendgphoto2.c:1914
 msgid "Failed to get file list"
 msgstr "Tiedostoluetteloa ei saatu"
 
-#: daemon/gvfsbackendgphoto2.c:2208
+#: daemon/gvfsbackendgphoto2.c:2203
 msgid "Error creating directory"
 msgstr "Virhe luotaessa kansiota"
 
-#: daemon/gvfsbackendgphoto2.c:2421
+#: daemon/gvfsbackendgphoto2.c:2416
 msgid "Name already exists"
 msgstr "Nimi on jo olemassa"
 
-#: daemon/gvfsbackendgphoto2.c:2432 daemon/gvfsbackendgphoto2.c:3100
+#: daemon/gvfsbackendgphoto2.c:2427 daemon/gvfsbackendgphoto2.c:3095
 msgid "New name too long"
 msgstr "Uusi nimi on liian pitkä"
 
-#: daemon/gvfsbackendgphoto2.c:2442 daemon/gvfsbackendgphoto2.c:3111
+#: daemon/gvfsbackendgphoto2.c:2437 daemon/gvfsbackendgphoto2.c:3106
 msgid "Error renaming directory"
 msgstr "Virhe nimettäessä kansiota uudelleen"
 
-#: daemon/gvfsbackendgphoto2.c:2455 daemon/gvfsbackendgphoto2.c:3124
+#: daemon/gvfsbackendgphoto2.c:2450 daemon/gvfsbackendgphoto2.c:3119
 msgid "Error renaming file"
 msgstr "Virhe nimettäessä tiedostoa uudestaan"
 
-#: daemon/gvfsbackendgphoto2.c:2519
+#: daemon/gvfsbackendgphoto2.c:2514
 #, c-format
-#| msgid "Directory '%s' is not empty"
 msgid "Directory “%s” is not empty"
 msgstr "Kansio “%s” ei ole tyhjä"
 
-#: daemon/gvfsbackendgphoto2.c:2530
+#: daemon/gvfsbackendgphoto2.c:2525
 msgid "Error deleting directory"
 msgstr "Virhe poistettaessa kansiota"
 
-#: daemon/gvfsbackendgphoto2.c:2556 daemon/gvfsbackendgphoto2.c:3301
+#: daemon/gvfsbackendgphoto2.c:2551 daemon/gvfsbackendgphoto2.c:3296
 msgid "Error deleting file"
 msgstr "Virhe poistettaessa tiedostoa"
 
-#: daemon/gvfsbackendgphoto2.c:2609
+#: daemon/gvfsbackendgphoto2.c:2604
 #, fuzzy
 #| msgid "Can't write to directory"
 msgid "Can’t write to directory"
 msgstr "Kansioon ei voi kirjoittaa"
 
-#: daemon/gvfsbackendgphoto2.c:2656
+#: daemon/gvfsbackendgphoto2.c:2651
 msgid "Cannot allocate new file to append to"
 msgstr "Uutta tiedostoa, johon piti lisätä, ei voi varata"
 
-#: daemon/gvfsbackendgphoto2.c:2671
+#: daemon/gvfsbackendgphoto2.c:2666
 msgid "Cannot read file to append to"
 msgstr "Tiedostoa, johon piti lisätä, ei voi lukea"
 
-#: daemon/gvfsbackendgphoto2.c:2682
+#: daemon/gvfsbackendgphoto2.c:2677
 msgid "Cannot get data of file to append to"
 msgstr "Sisältöä tiedostosta, johon piti lisätä, ei saatu"
 
-#: daemon/gvfsbackendgphoto2.c:3056
+#: daemon/gvfsbackendgphoto2.c:3051
 msgid "Not supported (not same directory)"
 msgstr "Ei tuettu (ei ole sama kansio)"
 
-#: daemon/gvfsbackendgphoto2.c:3068
+#: daemon/gvfsbackendgphoto2.c:3063
 msgid ""
 "Not supported (the source is a directory, the destination is a directory too)"
 msgstr "Ei tuettu (lähde ja kohde ovat molemmat kansioita)"
 
-#: daemon/gvfsbackendgphoto2.c:3076
+#: daemon/gvfsbackendgphoto2.c:3071
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
 msgstr "Ei tuettu (lähde on kansio, mutta kohde on olemassa oleva tiedosto)"
 
-#: daemon/gvfsbackendgphoto2.c:3088
+#: daemon/gvfsbackendgphoto2.c:3083
 msgid ""
 "Not supported (the source is a file, but the destination is a directory)"
 msgstr "Ei tuettu (lähde on tiedosto, mutta kohde on kansio)"
@@ -1498,8 +1471,6 @@ msgid "Malformed host URI."
 msgstr ""
 
 #: daemon/gvfsbackendmtp.c:866
-#, fuzzy
-#| msgid "Couldn't find matching udev device."
 msgid "Couldn’t find matching udev device."
 msgstr "Vastaavaa udev-laitetta ei löytynyt."
 
@@ -1521,7 +1492,6 @@ msgstr "Yleinen libmtp-virhe"
 
 #: daemon/gvfsbackendmtp.c:1081
 #, c-format
-#| msgid "Unable to open MTP device '%s'"
 msgid "Unable to open MTP device “%s”"
 msgstr "MTP-laitteen “%s” avaaminen epäonnistui"
 
@@ -1538,27 +1508,26 @@ msgstr "Tiedostoa ei löydy"
 msgid "Cannot make directory in this location"
 msgstr "Tähän sijaintiin ei voi luoda kansiota"
 
-#: daemon/gvfsbackendmtp.c:1675 daemon/gvfsbackendmtp.c:2145
-#: daemon/gvfsbackendmtp.c:2208 daemon/gvfsbackendmtp.c:2276
-#: daemon/gvfsbackendmtp.c:2630 daemon/gvfsbackendmtp.c:2696
+#: daemon/gvfsbackendmtp.c:1675 daemon/gvfsbackendmtp.c:2133
+#: daemon/gvfsbackendmtp.c:2196 daemon/gvfsbackendmtp.c:2264
+#: daemon/gvfsbackendmtp.c:2618 daemon/gvfsbackendmtp.c:2684
 #: daemon/gvfsbackendsmbbrowse.c:1131
 msgid "Not a regular file"
 msgstr "Ei ole tavallinen tiedosto"
 
-#: daemon/gvfsbackendmtp.c:1721 daemon/gvfsbackendmtp.c:2046
+#: daemon/gvfsbackendmtp.c:1721 daemon/gvfsbackendmtp.c:2034
 msgid "Target is a directory"
 msgstr "Kohde on hakemisto"
 
-#: daemon/gvfsbackendmtp.c:1726 daemon/gvfsbackendmtp.c:2051
-#| msgid "Can't merge directories"
+#: daemon/gvfsbackendmtp.c:1726 daemon/gvfsbackendmtp.c:2039
 msgid "Can’t merge directories"
 msgstr "Kansioita ei voi yhdistää"
 
-#: daemon/gvfsbackendmtp.c:1984 daemon/gvfsbackendmtp.c:2542
+#: daemon/gvfsbackendmtp.c:1984 daemon/gvfsbackendmtp.c:2530
 msgid "Cannot write to this location"
 msgstr "Tähän sijaintiin ei voi kirjoittaa"
 
-#: daemon/gvfsbackendmtp.c:2365
+#: daemon/gvfsbackendmtp.c:2353
 #, c-format
 msgid "No thumbnail for entity “%s”"
 msgstr ""
@@ -1592,8 +1561,8 @@ msgid ""
 msgstr ""
 
 #: daemon/gvfsbackendnfs.c:1055 daemon/gvfsbackendnfs.c:1078
-#: daemon/gvfsbackendnfs.c:1126 daemon/gvfsbackendsftp.c:3700
-#: daemon/gvfsbackendsftp.c:5730
+#: daemon/gvfsbackendnfs.c:1126 daemon/gvfsbackendsftp.c:3702
+#: daemon/gvfsbackendsftp.c:5732
 msgid "Unable to create temporary file"
 msgstr "Virhe luotaessa väliaikaistiedostoa"
 
@@ -1603,7 +1572,7 @@ msgstr "Virhe luotaessa väliaikaistiedostoa"
 msgid "Invalid attribute type"
 msgstr "Virheellinen määretyyppi %s\n"
 
-#: daemon/gvfsbackendrecent.c:267
+#: daemon/gvfsbackendrecent.c:270
 #, fuzzy
 #| msgid "The trash folder may not be deleted"
 msgid "The recent folder may not be deleted"
@@ -1611,7 +1580,7 @@ msgstr "Roskakorikansiota ei voi poistaa"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: daemon/gvfsbackendrecent.c:592 daemon/gvfsbackendrecent.c:707
+#: daemon/gvfsbackendrecent.c:688 daemon/gvfsbackendrecent.c:809
 msgid "Recent"
 msgstr ""
 
@@ -1640,58 +1609,55 @@ msgid "Too many authentication failures"
 msgstr "Liian monta epäonnistunutta tunnistautumisyritystä"
 
 #: daemon/gvfsbackendsftp.c:556
-#| msgid "Unable to spawn ssh program"
 msgid "Unable to spawn SSH program"
 msgstr "Ohjelmaa ssh ei voi käynnistää"
 
 #: daemon/gvfsbackendsftp.c:572
 #, c-format
-#| msgid "Unable to spawn ssh program: %s"
 msgid "Unable to spawn SSH program: %s"
 msgstr "Ohjelmaa ssh ei voi käynnistää: %s"
 
-#: daemon/gvfsbackendsftp.c:674 daemon/gvfsbackendsftp.c:1049
+#: daemon/gvfsbackendsftp.c:674 daemon/gvfsbackendsftp.c:1050
 msgid "Timed out when logging in"
 msgstr "Aikakatkaisu kirjauduttaessa"
 
-#: daemon/gvfsbackendsftp.c:925
+#: daemon/gvfsbackendsftp.c:926
 msgid "Log In Anyway"
 msgstr "Kirjaudu joka tapauksessa"
 
-#: daemon/gvfsbackendsftp.c:925
+#: daemon/gvfsbackendsftp.c:926
 msgid "Cancel Login"
 msgstr "Peru kirjautuminen"
 
-#: daemon/gvfsbackendsftp.c:940
+#: daemon/gvfsbackendsftp.c:941
 msgid "Login dialog cancelled"
 msgstr "Kirjautumisikkuna peruttiin"
 
-#: daemon/gvfsbackendsftp.c:959
+#: daemon/gvfsbackendsftp.c:960
 #, fuzzy
 #| msgid "Can't send host identity confirmation"
 msgid "Can’t send host identity confirmation"
 msgstr "Palvelimen tunnistusvahvistusta ei voi lähettää"
 
 #. Translators: the first %s is the username, the second the host name
-#: daemon/gvfsbackendsftp.c:1154
+#: daemon/gvfsbackendsftp.c:1156
 #, fuzzy, c-format
 #| msgid "Enter passphrase for key for ssh on %s"
 msgid "Enter passphrase for secure key for %s on %s"
 msgstr "Anna ssh-avaimen salalause palvelimelle %s"
 
 #. Translators: %s is the hostname
-#: daemon/gvfsbackendsftp.c:1161
+#: daemon/gvfsbackendsftp.c:1163
 #, fuzzy, c-format
 #| msgid "Enter passphrase for key for ssh on %s"
 msgid "Enter passphrase for secure key for %s"
 msgstr "Anna ssh-avaimen salalause palvelimelle %s"
 
-#: daemon/gvfsbackendsftp.c:1253
-#| msgid "Can't send password"
+#: daemon/gvfsbackendsftp.c:1255
 msgid "Can’t send password"
 msgstr "Salasanaa ei voitu lähettää"
 
-#: daemon/gvfsbackendsftp.c:1269
+#: daemon/gvfsbackendsftp.c:1271
 #, fuzzy, c-format
 #| msgid ""
 #| "Can't verify the identity of “%s”.\n"
@@ -1712,7 +1678,7 @@ msgstr ""
 "Palvelimen lähettämä tunniste on \"%s\". Jos haluat olla täysin varma, että "
 "yhdistäminen on turvallista, ota yhteys palvelimen ylläpitäjään."
 
-#: daemon/gvfsbackendsftp.c:1296
+#: daemon/gvfsbackendsftp.c:1298
 #, fuzzy, c-format
 #| msgid ""
 #| "Can't verify the identity of “%s”.\n"
@@ -1731,48 +1697,47 @@ msgstr ""
 "Palvelimen lähettämä tunniste on \"%s\". Jos haluat olla täysin varma, että "
 "yhdistäminen on turvallista, ota yhteys palvelimen ylläpitäjään."
 
-#: daemon/gvfsbackendsftp.c:1387
+#: daemon/gvfsbackendsftp.c:1389
 msgid "The connection is closed (the underlying SSH process exited)"
 msgstr "Yhteys on suljettu (alla toiminut SSH-prosessi sulkeutui)"
 
-#: daemon/gvfsbackendsftp.c:1388
+#: daemon/gvfsbackendsftp.c:1390
 msgid "Internal error: Unknown Error"
 msgstr "Sisäinen virhe: tuntematon virhe"
 
-#: daemon/gvfsbackendsftp.c:1902 daemon/gvfsbackendsftp.c:1929
+#: daemon/gvfsbackendsftp.c:1904 daemon/gvfsbackendsftp.c:1931
 msgid "Protocol error"
 msgstr "Protokollavirhe"
 
-#: daemon/gvfsbackendsftp.c:2044
+#: daemon/gvfsbackendsftp.c:2046
 msgid "Unable to find supported SSH command"
 msgstr "Tuettua SSH-komentoa ei löydy"
 
-#: daemon/gvfsbackendsftp.c:2151
-#| msgid "Unknown error."
+#: daemon/gvfsbackendsftp.c:2153
 msgid "Unknown reason"
 msgstr "Tuntematon syy"
 
-#: daemon/gvfsbackendsftp.c:2586 daemon/gvfsbackendsmb.c:1372
+#: daemon/gvfsbackendsftp.c:2588 daemon/gvfsbackendsmb.c:1372
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (virheellinen koodaus)"
 
 #. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: daemon/gvfsbackendsftp.c:2598 daemon/gvfsftpdircache.c:431
+#: daemon/gvfsbackendsftp.c:2600 daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
 msgstr "/ palvelimella %s"
 
-#: daemon/gvfsbackendsftp.c:2671
+#: daemon/gvfsbackendsftp.c:2673
 msgid "Failure"
 msgstr "Virhe"
 
-#: daemon/gvfsbackendsftp.c:3083
+#: daemon/gvfsbackendsftp.c:3085
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Virhe luotaessa varmuuskopiotiedostoa: %s"
 
-#: daemon/gvfsbackendsftp.c:3650 daemon/gvfsbackendsftp.c:3826
+#: daemon/gvfsbackendsftp.c:3652 daemon/gvfsbackendsftp.c:3828
 msgid "backups not supported yet"
 msgstr "varmuuskopioita ei vielä tueta"
 
@@ -1828,7 +1793,6 @@ msgid "Invalid attribute type (uint64 expected)"
 msgstr "Virheellinen määretyyppi (odotettiin uint64:ää)"
 
 #: daemon/gvfsbackendsmb.c:1877
-#| msgid "Can't rename file, filename already exists"
 msgid "Can’t rename file, filename already exists"
 msgstr "Tiedostoa ei voi nimetä uudelleen, tiedostonimi on jo olemassa"
 
@@ -1884,7 +1848,6 @@ msgid "The certificate does not match the identity of the site."
 msgstr "Varmenne ei vastaa sivuston identiteettiä."
 
 #: daemon/gvfsdaemonutils.c:261
-#| msgid "The certificate's activation time is in the future."
 msgid "The certificate’s activation time is in the future."
 msgstr "Varmenteen aktivointiaika on tulevaisuudessa."
 
@@ -1897,13 +1860,12 @@ msgid "The certificate has been revoked."
 msgstr "Varmenne on kumottu."
 
 #: daemon/gvfsdaemonutils.c:267
-#| msgid "The certificate's algorithm is considered insecure."
 msgid "The certificate’s algorithm is considered insecure."
 msgstr "Varmenteen algoritmi on mielletty turvattomaksi."
 
 #: daemon/gvfsdaemonutils.c:269
 msgid "Error occurred when validating the certificate."
-msgstr ""
+msgstr "Varmennetta vahvistaessa tapahtui virhe."
 
 #: daemon/gvfsdaemonutils.c:331
 msgid "Yes"
@@ -1915,12 +1877,6 @@ msgstr "Ei"
 
 #: daemon/gvfsdaemonutils.c:341
 #, c-format
-#| msgid ""
-#| "The site's identity can't be verified:%s\n"
-#| "\n"
-#| "%s\n"
-#| "\n"
-#| "Are you really sure you would like to continue?"
 msgid ""
 "The site’s identity can’t be verified:%s\n"
 "\n"
@@ -2061,28 +2017,27 @@ msgstr "%s: %s"
 
 #: daemon/main.c:190 metadata/meta-daemon.c:412
 #, c-format
-#| msgid "Try \"%s --help\" for more information."
 msgid "Try “%s --help” for more information."
 msgstr "Saat lisätietoja komennolla “%s --help”."
 
-#: daemon/mount.c:709
+#: daemon/mount.c:711
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Automaattinen liittäminen epäonnistui: %s"
 
-#: daemon/mount.c:753 daemon/mount.c:814
+#: daemon/mount.c:755 daemon/mount.c:831
 msgid "The specified location is not mounted"
 msgstr "Määritelty sijainti ei ole liitetty"
 
-#: daemon/mount.c:758
+#: daemon/mount.c:760
 msgid "The specified location is not supported"
 msgstr "Määritelty sijainti ei ole tuettu"
 
-#: daemon/mount.c:882
+#: daemon/mount.c:943
 msgid "Location is already mounted"
 msgstr "Sijainti on jo liitetty"
 
-#: daemon/mount.c:891
+#: daemon/mount.c:952
 msgid "Location is not mountable"
 msgstr "Sijainti ei ole liitettävissä"
 
@@ -2185,9 +2140,6 @@ msgstr "Levyke"
 
 #: monitor/gdu/ggduvolume.c:1097
 #, c-format
-#| msgid ""
-#| "Enter a password to unlock the volume\n"
-#| "The device \"%s\" contains encrypted data on partition %d."
 msgid ""
 "Enter a password to unlock the volume\n"
 "The device “%s” contains encrypted data on partition %d."
@@ -2197,9 +2149,6 @@ msgstr ""
 
 #: monitor/gdu/ggduvolume.c:1104
 #, c-format
-#| msgid ""
-#| "Enter a password to unlock the volume\n"
-#| "The device %s contains encrypted data."
 msgid ""
 "Enter a password to unlock the volume\n"
 "The device “%s” contains encrypted data."
@@ -2223,7 +2172,6 @@ msgstr ""
 
 #: monitor/goa/goavolume.c:278
 #, c-format
-#| msgid "Invalid return value from %s"
 msgid "Invalid credentials for %s"
 msgstr "Virheelliset tunnistetiedot tilille %s"
 
@@ -2305,6 +2253,8 @@ msgid ""
 "%s unmounted\n"
 "Filesystem has been disconnected."
 msgstr ""
+"%s irrotettu\n"
+"Tiedostojärjestelmän yhteys on katkaistu."
 
 #: monitor/udisks2/gvfsudisks2utils.c:817
 #, c-format
@@ -2341,7 +2291,6 @@ msgstr "Virhe tallentaessa salalausetta avainnippuun (%s)"
 
 #: monitor/udisks2/gvfsudisks2volume.c:1153
 #, c-format
-#| msgid "Error seeking in stream on drive %s"
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "Virhe poistaessa virheellistä tunnuslausetta avainnipusta (%s)"
 
