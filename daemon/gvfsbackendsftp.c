@@ -65,6 +65,7 @@
 #include "gvfsjobprogress.h"
 #include "gvfsjobpush.h"
 #include "gvfsjobpull.h"
+#include "gvfsjobsetattribute.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfsutils.h"
 #include "gvfskeyring.h"
@@ -5172,6 +5173,17 @@ try_query_settable_attributes (GVfsBackend *backend,
 				  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
 				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
   
+  g_file_attribute_info_list_add (list,
+                                  G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                  G_FILE_ATTRIBUTE_TYPE_UINT64,
+                                  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+                                  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+
+  g_file_attribute_info_list_add (list,
+                                  G_FILE_ATTRIBUTE_TIME_ACCESS,
+                                  G_FILE_ATTRIBUTE_TYPE_UINT64,
+                                  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+
   g_vfs_job_query_attributes_set_list (job, list);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_file_attribute_info_list_unref (list);
@@ -5194,6 +5206,74 @@ set_attribute_reply (GVfsBackendSftp *backend,
 		      _("Invalid reply received"));
 }
 
+static void
+set_attribute_stat_reply (GVfsBackendSftp *backend,
+                          int reply_type,
+                          GDataInputStream *reply,
+                          guint32 len,
+                          GVfsJob *job,
+                          gpointer user_data)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+  GVfsJobSetAttribute *op_job = G_VFS_JOB_SET_ATTRIBUTE (job);
+
+  if (reply_type == SSH_FXP_ATTRS)
+    {
+      guint32 mtime;
+      guint32 atime;
+      GFileInfo *info = g_file_info_new ();
+
+      parse_attributes (backend, info, NULL, reply, NULL);
+
+      /* parse_attributes sets either both timestamps or none
+       * so checking one of them is enough. */
+      if (!g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_TIME_MODIFIED))
+        {
+          g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                            _("Operation unsupported"));
+          g_object_unref (info);
+          return;
+        }
+      /* Timestamps must be read as uint64 but sftp only supports uint32 */
+      if (op_job->value.uint64 > G_MAXUINT32)
+        {
+          g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                            _("Value out of range, sftp only supports 32bit timestamps"));
+          g_object_unref (info);
+          return;
+        }
+
+      if (g_strcmp0 (op_job->attribute, G_FILE_ATTRIBUTE_TIME_ACCESS) == 0)
+        {
+          mtime = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
+          atime = op_job->value.uint64;
+        }
+      else
+        {
+          atime = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS);
+          mtime = op_job->value.uint64;
+        }
+
+      g_object_unref (info);
+
+      command = new_command_stream (op_backend, SSH_FXP_SETSTAT);
+      put_string (command, op_job->filename);
+
+      g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_ACMODTIME, NULL, NULL);
+      g_data_output_stream_put_uint32 (command, atime, NULL, NULL);
+      g_data_output_stream_put_uint32 (command, mtime, NULL, NULL);
+      queue_command_stream_and_free (&op_backend->command_connection, command,
+                                     set_attribute_reply,
+                                     G_VFS_JOB (job), NULL);
+    }
+  else if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply, -1, -1);
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply received"));
+}
+
 static gboolean
 try_set_attribute (GVfsBackend *backend,
 		   GVfsJobSetAttribute *job,
@@ -5206,33 +5286,52 @@ try_set_attribute (GVfsBackend *backend,
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
 
-  if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) != 0)
+  if (g_strcmp0 (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0)
+    {
+      if (type != G_FILE_ATTRIBUTE_TYPE_UINT32)
+        {
+          g_vfs_job_failed (G_VFS_JOB (job),
+                            G_IO_ERROR,
+                            G_IO_ERROR_INVALID_ARGUMENT,
+                            _("Invalid attribute type (uint32 expected)"));
+          return TRUE;
+        }
+
+      command = new_command_stream (op_backend,
+                                    SSH_FXP_SETSTAT);
+      put_string (command, filename);
+      g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_PERMISSIONS, NULL, NULL);
+      g_data_output_stream_put_uint32 (command, (*(guint32 *)value_p) & 0777, NULL, NULL);
+      queue_command_stream_and_free (&op_backend->command_connection, command,
+                                     set_attribute_reply,
+                                     G_VFS_JOB (job), NULL);
+    }
+  else if (g_strcmp0 (attribute, G_FILE_ATTRIBUTE_TIME_MODIFIED) == 0 ||
+           g_strcmp0 (attribute, G_FILE_ATTRIBUTE_TIME_ACCESS) == 0)
+    {
+      if (type != G_FILE_ATTRIBUTE_TYPE_UINT64)
+        {
+          g_vfs_job_failed (G_VFS_JOB (job),
+                            G_IO_ERROR,
+                            G_IO_ERROR_INVALID_ARGUMENT,
+                            _("Invalid attribute type (uint64 expected)"));
+          return TRUE;
+        }
+
+      command = new_command_stream (op_backend, SSH_FXP_LSTAT);
+      put_string (command, filename);
+
+      queue_command_stream_and_free (&op_backend->command_connection, command,
+                                     set_attribute_stat_reply,
+                                     G_VFS_JOB (job), NULL);
+    }
+  else
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			_("Operation unsupported"));
-      return TRUE;
+                        G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                        _("Operation unsupported"));
     }
 
-  if (type != G_FILE_ATTRIBUTE_TYPE_UINT32) 
-    {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR,
-                        G_IO_ERROR_INVALID_ARGUMENT,
-                        "%s",
-                        _("Invalid attribute type (uint32 expected)"));
-      return TRUE;
-    }
-
-  command = new_command_stream (op_backend,
-                                SSH_FXP_SETSTAT);
-  put_string (command, filename);
-  g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_PERMISSIONS, NULL, NULL);
-  g_data_output_stream_put_uint32 (command, (*(guint32 *)value_p) & 0777, NULL, NULL);
-  queue_command_stream_and_free (&op_backend->command_connection, command,
-                                 set_attribute_reply,
-                                 G_VFS_JOB (job), NULL);
-  
   return TRUE;
 }
 
