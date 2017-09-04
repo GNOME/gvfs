@@ -1,3 +1,7 @@
+Major changes in 1.33.92
+========================
+* Translation updates
+
 Major changes in 1.33.91
 ========================
 * daemon: Avoid overflowing when querying for filesystem info
