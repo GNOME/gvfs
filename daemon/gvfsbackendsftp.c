@@ -1128,7 +1128,7 @@ handle_login (GVfsBackend *backend,
                                               "sftp",
 					      object,
 					      authtype,
-					      op_backend->port != -1 ?
+                                              op_backend->port != 22 ?
 					      op_backend->port
 					      :
 					      0,
@@ -1324,7 +1324,7 @@ handle_login (GVfsBackend *backend,
                                    "sftp",
 				   object,
 				   authtype,
-				   op_backend->port != -1 ?
+                                   op_backend->port != 22 ?
 				   op_backend->port
 				   :
 				   0, 
@@ -1989,7 +1989,7 @@ do_mount (GVfsBackend *backend,
   if (op_backend->user_specified_in_uri)
     g_mount_spec_set (sftp_mount_spec, "user", op_backend->user);
   g_mount_spec_set (sftp_mount_spec, "host", op_backend->host);
-  if (op_backend->port != -1)
+  if (op_backend->port != 22)
     {
       char *v;
       v = g_strdup_printf ("%d", op_backend->port);
@@ -2059,12 +2059,10 @@ try_mount (GVfsBackend *backend,
     }
 
   port = g_mount_spec_get (mount_spec, "port");
-  op_backend->port = -1;
+  op_backend->port = 22;
   if (port != NULL)
     {
-      int p = atoi (port);
-      if (p != 22)
-        op_backend->port = p;
+      op_backend->port = atoi (port);
     }
   
   user = g_mount_spec_get (mount_spec, "user");
