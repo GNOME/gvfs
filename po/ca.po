@@ -2,14 +2,14 @@
 # Copyright (C) 2008, Free Software Foundation Inc.
 # This file is distributed under the same license as the gvfs package.
 # Gil Forcada <gilforcada@guifi.net>, 2008-2014.
-# Jordi Serratosa <jordis@softcatala.cat>, 2012.
+# Jordi Serratosa <jordis@softcatala.cat>, 2012, 2017.
 # Jordi Mas i Hernàndez <jmas@softcatala.org>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-08-30 16:10+0000\n"
+"POT-Creation-Date: 2017-09-04 16:14+0000\n"
 "PO-Revision-Date: 2017-09-02 23:33+0200\n"
 "Last-Translator: Gil Forcada <gilforcada@guifi.net>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
@@ -1219,7 +1219,7 @@ msgstr "El fitxer destí és un directori"
 
 #: daemon/gvfsbackendgoogle.c:2657 daemon/gvfsbackendnfs.c:1169
 msgid "Target file is not a regular file"
-msgstr "El fitxer destí no es un fitxer normal"
+msgstr "El fitxer destí no és un fitxer normal"
 
 #: daemon/gvfsbackendgoogle.c:2847 daemon/gvfsbackendgphoto2.c:3003
 msgid "Error writing file"
