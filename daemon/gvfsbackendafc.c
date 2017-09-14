@@ -338,6 +338,8 @@ g_vfs_backend_idevice_check (idevice_error_t cond, GVfsJob *job)
       break;
     }
 
+  g_debug ("idevice_new() failed with error '%d'\n", cond);
+
   return 1;
 }
 
@@ -508,6 +510,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
       g_vfs_job_failed (G_VFS_JOB(job), G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Invalid AFC location: must be in the form of "
                           "afc://uuid:port-number"));
+      g_debug ("Failed to mount, the AFC location was in the wrong format");
       return;
   }
 
@@ -663,7 +666,15 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
     g_free (message);
 
     if (!ret || aborted || (choice == CHOICE_CANCEL))
-      break;
+      {
+        if (!ret)
+          g_debug ("g_mount_source_ask_question() failed\n");
+        else if (aborted)
+          g_debug ("g_mount_source_ask_question() aborted\n");
+        else
+          g_debug ("g_mount_source_ask_question() choice was 'cancel'\n");
+        break;
+      }
   } while (retries++ < 10);
 
   /* Now we're done with the old client */
