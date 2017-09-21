@@ -1893,6 +1893,7 @@ do_mount (GVfsBackend  *backend,
     res = TRUE;
     status = g_vfs_backend_dav_send_message (backend, msg_opts);
     is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
+    is_webdav = sm_has_header (msg_opts, "DAV");
 
     /* If SSL is used and the certificate verifies OK, then ssl-strict remains
      * on for all further connections.
@@ -1920,8 +1921,6 @@ do_mount (GVfsBackend  *backend,
             break;
           }
       }
-
-    is_webdav = sm_has_header (msg_opts, "DAV");
 
     if (!is_success || !is_webdav)
       break;
