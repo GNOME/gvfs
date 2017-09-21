@@ -1015,6 +1015,9 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
   if (!res)
     return FALSE;
 
+  /* Use utf8_server_name if it exists */
+  server_name = priv->info.utf8_server_name ? priv->info.utf8_server_name : priv->info.server_name;
+
   olduser = g_strdup (initial_user);
 
   if (initial_user)
@@ -1046,9 +1049,6 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
     }
   }
 
-  /* Use utf8_server_name if it exists */
-  server_name = priv->info.utf8_server_name ? priv->info.utf8_server_name : priv->info.server_name;
-  
   while (TRUE)
   {
     GString *str;
