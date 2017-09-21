@@ -344,7 +344,7 @@ metafile_set_mtime (MetaFile    *file,
   file->last_changed = mtime;
 }
 
-GSequenceIter *
+static GSequenceIter *
 metafile_key_lookup_iter (MetaFile *file,
                           const char *key)
 {
