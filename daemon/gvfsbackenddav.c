@@ -1156,6 +1156,7 @@ ms_response_to_fs_info (MsResponse *response,
   gboolean    have_bytes_avail;
   gboolean    have_bytes_used;
 
+  bytes_avail = bytes_used = 0;
   have_bytes_avail = have_bytes_used = FALSE;
 
   ms_response_get_propstat_iter (response, &iter);
