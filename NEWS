@@ -1,3 +1,10 @@
+Major changes in 1.34.1
+=======================
+* dav: Prevent usage of uninitialized variables
+* afp: Prevent usage of uninitialized variable
+* programs: Remove bashism from gvfs-* wrapper script
+* Translation updates
+
 Major changes in 1.34.0
 =======================
 * Translation updates
