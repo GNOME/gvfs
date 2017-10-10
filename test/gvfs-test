@@ -437,6 +437,7 @@ class ArchiveMounter(GvfsTestCase):
             self.unmount_api(gfile)
 
 
+@unittest.skipUnless(sshd_path != None, 'sshd not installed')
 @unittest.skipUnless(os.getenv('XDG_RUNTIME_DIR'), 'No $XDG_RUNTIME_DIR available')
 @unittest.skipUnless(os.path.exists(os.path.expanduser('~/.ssh/id_rsa')), 'This test needs an existing ~/.ssh/id_rsa')
 class Sftp(GvfsTestCase):
