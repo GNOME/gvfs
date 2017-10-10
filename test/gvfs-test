@@ -43,7 +43,7 @@ try:
     import gi
     gi.require_version('UMockdev', '1.0')
     from gi.repository import UMockdev
-    have_umockdev = subprocess.call(['which', 'umockdev-wrapper'], stdout=subprocess.PIPE) == 0
+    have_umockdev = shutil.which('umockdev-wrapper') != None
     # needs >= 0.2.10
     have_umockdev = have_umockdev and hasattr(UMockdev.Testbed, 'add_from_file')
 except (ValueError, ImportError):
@@ -52,21 +52,21 @@ except (ValueError, ImportError):
 # umockdev environment for gphoto/MTP tests
 umockdev_testbed = None
 
-have_twistd = subprocess.call(['which', 'twistd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
-have_smbd = subprocess.call(['which', 'smbd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+twistd_path = shutil.which('twistd')
+smbd_path = shutil.which('smbd')
 
 def find_alternative(cmds):
     '''Find command in cmds array and return the found alternative'''
 
     for cmd in cmds:
-        if subprocess.call(['which', cmd], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0:
+        if shutil.which(cmd) != None:
             return cmd
 
 in_testbed = os.path.exists('/home/gvfs_sandbox_marker')
 samba_running = subprocess.call(['pidof', 'smbd'], stdout=subprocess.PIPE) == 0
 httpd_cmd = find_alternative(['apache2', 'httpd', 'apachectl'])
 have_httpd = httpd_cmd is not None
-sshd_path = subprocess.check_output(['which', 'sshd'], universal_newlines=True).strip()
+sshd_path = shutil.which('sshd')
 
 local_ip = subprocess.check_output("ip -4 addr | sed -nr '/127\.0\.0/ n; "
                                    "/inet / {  s/^.*inet ([0-9.]+).*$/\\1/; p; q  }'",
@@ -555,7 +555,7 @@ Subsystem sftp %(sftp_server)s
             self.unmount(uri)
 
 
-@unittest.skipUnless(have_twistd, 'Twisted twistd not installed')
+@unittest.skipUnless(twistd_path != None, 'Twisted twistd not installed')
 class Ftp(GvfsTestCase):
     def setUp(self):
         '''Launch FTP server'''
@@ -569,7 +569,7 @@ class Ftp(GvfsTestCase):
             f.write('secret\n')
         os.chmod(secret_path, 0o600)
 
-        self.ftpd = subprocess.Popen(['twistd', '-n', 'ftp', '-p', '2121',
+        self.ftpd = subprocess.Popen([twistd_path, '-n', 'ftp', '-p', '2121',
                                       '-r', self.workdir,
                                       '--auth', 'memory:testuser:pwd1'],
                                      stdout=subprocess.PIPE)
@@ -737,7 +737,7 @@ class Ftp(GvfsTestCase):
             self.assertEqual(contents, b'hello world\n')
 
 
-@unittest.skipUnless(have_smbd, 'Samba smbd not installed')
+@unittest.skipUnless(smbd_path != None, 'Samba smbd not installed')
 class Smb(GvfsTestCase):
     def setUp(self):
         '''start local smbd as user if we are not in test bed'''
@@ -801,7 +801,7 @@ ncalrpc dir = %(workdir)s/samba
        'port': SMB_USER_PORT})
 
         # start smbd
-        self.smbd = subprocess.Popen(['smbd', '-FS', '-s', smbconf],
+        self.smbd = subprocess.Popen([smbd_path, '-FS', '-s', smbconf],
                                      universal_newlines=True,
                                      stdout=subprocess.PIPE)
 
