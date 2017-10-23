@@ -91,7 +91,7 @@ trash_dir_set_files (TrashDir *dir,
           /* new entry.  add it. */
           *old = g_slist_prepend (*old, new->data); /* take reference */
           old = &(*old)->next;
-          trash_root_add_item (dir->root, new->data, dir->is_homedir);
+          trash_root_add_item (dir->root, new->data, dir->topdir, dir->is_homedir);
           new = new->next;
         }
       else if (result > 0)
@@ -164,7 +164,7 @@ trash_dir_changed (GFileMonitor      *monitor,
   TrashDir *dir = user_data;
 
   if (event_type == G_FILE_MONITOR_EVENT_CREATED)
-    trash_root_add_item (dir->root, file, dir->is_homedir);
+    trash_root_add_item (dir->root, file, dir->topdir, dir->is_homedir);
 
   else if (event_type == G_FILE_MONITOR_EVENT_DELETED)
     trash_root_remove_item (dir->root, file, dir->is_homedir);

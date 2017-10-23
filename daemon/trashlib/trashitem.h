@@ -28,6 +28,7 @@ void            trash_root_free              (TrashRoot          *root);
 /* add/remove trash items (safe only from one thread) */
 void            trash_root_add_item          (TrashRoot          *root,
                                               GFile              *file,
+                                              GFile              *topdir,
                                               gboolean            in_homedir);
 void            trash_root_remove_item       (TrashRoot          *root,
                                               GFile              *file,
