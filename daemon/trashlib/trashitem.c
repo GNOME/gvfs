@@ -135,6 +135,7 @@ trash_item_escape_name (GFile    *file,
 
 static void
 trash_item_get_trashinfo (GFile  *path,
+                          GFile  *topdir,
                           GFile **original,
                           char  **date)
 {
@@ -178,13 +179,8 @@ trash_item_get_trashinfo (GFile  *path,
 	  if (g_path_is_absolute (decoded))
 	    *original = g_file_new_for_path (decoded);
 	  else
-	    {
-	      GFile *rootdir;
-	      
-	      rootdir = g_file_get_parent (trashdir);
-	      *original = g_file_get_child (rootdir, decoded);
-	      g_object_unref (rootdir);
-	    }
+	    *original = g_file_get_child (topdir, decoded);
+
 	  g_free (decoded);
 	}
 
@@ -202,8 +198,9 @@ trash_item_get_trashinfo (GFile  *path,
 
 static TrashItem *
 trash_item_new (TrashRoot *root,
-                GFile         *file,
-                gboolean       in_homedir)
+                GFile     *file,
+                GFile     *topdir,
+                gboolean   in_homedir)
 {
   TrashItem *item;
 
@@ -212,7 +209,7 @@ trash_item_new (TrashRoot *root,
   item->ref_count = 1;
   item->file = g_object_ref (file);
   item->escaped_name = trash_item_escape_name (file, in_homedir);
-  trash_item_get_trashinfo (item->file, &item->original, &item->delete_date);
+  trash_item_get_trashinfo (item->file, topdir, &item->original, &item->delete_date);
 
   return item;
 }
@@ -370,11 +367,12 @@ trash_root_free (TrashRoot *root)
 void
 trash_root_add_item (TrashRoot *list,
                      GFile     *file,
+                     GFile     *topdir,
                      gboolean   in_homedir)
 {
   TrashItem *item;
 
-  item = trash_item_new (list, file, in_homedir);
+  item = trash_item_new (list, file, topdir, in_homedir);
 
   g_rw_lock_writer_lock (&list->lock);
 
