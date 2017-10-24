@@ -31,9 +31,8 @@
 #include "gvfsdaemonprotocol.h"
 #include "metadata-dbus.h"
 
-#ifdef HAVE_LIBUDEV
-#define LIBUDEV_I_KNOW_THE_API_IS_SUBJECT_TO_CHANGE
-#include <libudev.h>
+#ifdef HAVE_GUDEV
+#include <gudev/gudev.h>
 #endif
 
 #if MAJOR_IN_MKDEV
@@ -53,6 +52,9 @@ typedef struct {
 
 static GHashTable *tree_infos = NULL;
 static GVfsMetadata *skeleton = NULL;
+#ifdef HAVE_GUDEV
+static GUdevClient *gudev_client = NULL;
+#endif
 
 static void
 tree_info_free (TreeInfo *info)
@@ -309,32 +311,21 @@ handle_get_tree_from_device (GVfsMetadata *object,
 {
   char *res = NULL;
 
-#ifdef HAVE_LIBUDEV
-  dev_t devnum = makedev (arg_major, arg_minor);
-  struct udev_device *dev;
-  const char *uuid, *label;
-  static struct udev *udev;
+#ifdef HAVE_GUDEV
+  GUdevDeviceNumber devnum = makedev (arg_major, arg_minor);
+  GUdevDevice *device;
 
-  if (udev == NULL)
-    udev = udev_new ();
+  if (g_once_init_enter (&gudev_client))
+    g_once_init_leave (&gudev_client, g_udev_client_new (NULL));
 
-  dev = udev_device_new_from_devnum (udev, 'b', devnum);
-  uuid = udev_device_get_property_value (dev, "ID_FS_UUID_ENC");
+  device = g_udev_client_query_by_device_number (gudev_client, G_UDEV_DEVICE_TYPE_BLOCK, devnum);
 
-  res = NULL;
-  if (uuid)
-    {
-      res = g_strconcat ("uuid-", uuid, NULL);
-    }
-  else
-    {
-      label = udev_device_get_property_value (dev, "ID_FS_LABEL_ENC");
+  if (g_udev_device_has_property (device, "ID_FS_UUID_ENC"))
+    res = g_strconcat ("uuid-", g_udev_device_get_property (device, "ID_FS_UUID_ENC"), NULL);
+  else if (g_udev_device_has_property (device, "ID_FS_LABEL_ENC"))
+    res = g_strconcat ("label-", g_udev_device_get_property (device, "ID_FS_LABEL_ENC"), NULL);
 
-      if (label)
-        res = g_strconcat ("label-", label, NULL);
-    }
-
-  udev_device_unref (dev);
+  g_clear_object (&device);
 #endif
 
   gvfs_metadata_complete_get_tree_from_device (object, invocation, res ? res : "");
@@ -485,6 +476,9 @@ main (int argc, char *argv[])
     g_object_unref (conn);
   if (loop != NULL)
     g_main_loop_unref (loop);
+#ifdef HAVE_GUDEV
+  g_clear_object (&gudev_client);
+#endif
 
   return 0;
 }

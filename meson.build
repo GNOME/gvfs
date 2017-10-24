@@ -328,13 +328,6 @@ if enable_dnssd
 endif
 config_h.set('HAVE_AVAHI', enable_dnssd)
 
-# *** Check for libudev ***
-enable_udev = get_option('enable-udev')
-if enable_udev
-  libudev_dep = dependency('libudev', version: '>= 138')
-endif
-config_h.set('HAVE_LIBUDEV', enable_udev)
-
 # *** Check for gudev ***
 enable_gudev = get_option('enable-gudev')
 if enable_gudev

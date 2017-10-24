@@ -26,7 +26,6 @@ option('enable-gudev', type: 'boolean', value: true, description: 'build with gu
 option('enable-keyring', type: 'boolean', value: true, description: 'build with keyring support')
 option('enable-logind', type: 'boolean', value: true, description: 'build with logind support')
 option('enable-libusb', type: 'boolean', value: true, description: 'build with libusb interruption support')
-option('enable-udev', type: 'boolean', value: true, description: 'build with libudev device support')
 
 option('enable-devel-utils', type: 'boolean', value: false, description: 'build with development utility programs')
 option('enable-installed-tests', type: 'boolean', value: false, description: 'enable installed unit tests')

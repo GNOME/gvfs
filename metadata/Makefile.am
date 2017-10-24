@@ -60,9 +60,9 @@ meta_get_tree_SOURCES = meta-get-tree.c
 convert_nautilus_metadata_LDADD = libmetadata.la $(LIBXML_LIBS)
 convert_nautilus_metadata_SOURCES = metadata-nautilus.c
 
-gvfsd_metadata_LDADD = libmetadata.la ../common/libgvfscommon.la $(UDEV_LIBS)
+gvfsd_metadata_LDADD = libmetadata.la ../common/libgvfscommon.la $(GUDEV_LIBS)
 gvfsd_metadata_SOURCES = meta-daemon.c
-gvfsd_metadata_CFLAFGS = $(UDEV_CFLAGS)
+gvfsd_metadata_CFLAGS = $(GUDEV_CFLAGS)
 
 # D-BUS service file
 %.service: %.service.in ../config.log

@@ -62,7 +62,7 @@ executable(
   dependencies: [
     libgvfscommon_dep,
     libmetadata_dep,
-    libudev_dep
+    gudev_dep
   ],
   c_args: cflags,
   install: true,
