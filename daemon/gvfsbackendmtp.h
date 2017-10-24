@@ -23,9 +23,7 @@
 
 #include <gvfsbackend.h>
 #include <gmountspec.h>
-#ifdef HAVE_GUDEV
 #include <gudev/gudev.h>
-#endif
 #include <libmtp.h>
 
 G_BEGIN_DECLS
@@ -44,9 +42,7 @@ struct _GVfsBackendMtp
 {
   GVfsBackend parent_instance;
 
-#ifdef HAVE_GUDEV
   GUdevClient *gudev_client;
-#endif
 
   GMutex mutex;
   LIBMTP_mtpdevice_t *device;
