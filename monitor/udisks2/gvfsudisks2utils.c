@@ -530,7 +530,7 @@ gvfs_udisks2_utils_spawn_finish (GAsyncResult   *res,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-#if defined(HAVE_LIBSYSTEMD_LOGIN)
+#if defined(HAVE_LOGIND)
 #include <systemd/sd-login.h>
 
 static const gchar *

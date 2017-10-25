@@ -362,11 +362,16 @@ if enable_udisks2
 endif
 
 # *** Check for libsystemd-login ***
-enable_libsystemd_login = get_option('enable-libsystemd-login')
-if enable_libsystemd_login
-  libsystemd_login_dep = dependency('libsystemd')
+enable_logind = get_option('enable-logind')
+if enable_logind
+  logind_dep = dependency('libsystemd', required: false)
+  if not logind_dep.found()
+    logind_dep = dependency('libelogind', version: '>= 229', required: false)
+  endif
+
+  assert(logind_dep.found(), 'logind requested but libsystemd nor libelogind not found')
 endif
-config_h.set('HAVE_LIBSYSTEMD_LOGIN', enable_libsystemd_login)
+config_h.set('HAVE_LOGIND', enable_logind)
 
 # *** Check if we should build with AFC backend ***
 enable_afc = get_option('enable-afc')

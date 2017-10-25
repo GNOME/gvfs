@@ -44,8 +44,8 @@ deps = glib_deps + [
   libgvfsproxyvolumemonitordaemon_noin_dep
 ]
 
-if enable_libsystemd_login
-  deps += libsystemd_login_dep
+if enable_logind
+  deps += logind_dep
 endif
 
 if enable_keyring
