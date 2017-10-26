@@ -329,12 +329,12 @@ if enable_http
 endif
 
 # *** Check if we should build with DNS-SD backend ***
-enable_avahi = get_option('enable-avahi')
-if enable_avahi
+enable_dnssd = get_option('enable-dnssd')
+if enable_dnssd
   avahi_client_dep = dependency('avahi-client', version: '>= 0.6')
   avahi_glib_dep = dependency('avahi-glib', version: '>= 0.6')
 endif
-config_h.set('HAVE_AVAHI', enable_avahi)
+config_h.set('HAVE_AVAHI', enable_dnssd)
 
 # *** Check for libudev ***
 enable_udev = get_option('enable-udev')
@@ -414,7 +414,7 @@ endif
 config_h.set10('HAVE_LIBUSB', enable_libusb)
 
 # *** Check for samba ***
-enable_samba = get_option('enable-samba')
+enable_samba = get_option('enable-smb')
 if enable_samba
   smbclient_dep = dependency('smbclient')
 endif
@@ -456,8 +456,8 @@ if enable_gphoto2
 endif
 
 # *** Check for libmtp ***
-enable_libmtp = get_option('enable-libmtp')
-if enable_libmtp
+enable_mtp = get_option('enable-mtp')
+if enable_mtp
   assert(enable_gudev, 'libmtp requested but gudev is required')
 
   libmtp_dep = dependency('libmtp', version: '>= 1.1.0')
@@ -466,7 +466,7 @@ if enable_libmtp
   config_h.set10('HAVE_LIBMTP_1_1_9', libmtp_dep.version().version_compare('>= 1.1.9'))
   config_h.set10('HAVE_LIBMTP_1_1_12', libmtp_dep.version().version_compare('>= 1.1.12'))
 endif
-config_h.set('HAVE_LIBMTP', enable_libmtp)
+config_h.set('HAVE_LIBMTP', enable_mtp)
 
 # *** AFP backend ***
 enable_afp = get_option('enable-afp')

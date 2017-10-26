@@ -16,7 +16,7 @@ if enable_afc
   subdir('afc')
 endif
 
-if enable_libmtp
+if enable_mtp
   subdir('mtp')
 endif
 

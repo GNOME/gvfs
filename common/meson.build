@@ -58,7 +58,7 @@ libgvfscommon_monitor_dep = declare_dependency(
   include_directories: common_inc
 )
 
-if enable_avahi
+if enable_dnssd
   sources = files(
     'gvfsdnssdresolver.c',
     'gvfsdnssdutils.c'
@@ -84,7 +84,7 @@ if enable_avahi
   )
 endif
 
-if enable_libmtp or enable_gphoto2
+if enable_mtp or enable_gphoto2
   libgvfscommon_gphoto2 = static_library(
     'gvfscommon-gphoto2',
     sources: 'gvfsgphoto2utils.c',

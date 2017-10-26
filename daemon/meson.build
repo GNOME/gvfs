@@ -288,7 +288,7 @@ if enable_samba
   mounts += ['smb-browse']
 endif
 
-if enable_avahi
+if enable_dnssd
   sources = files('gvfsbackenddnssd.c')
 
   deps = [
@@ -425,7 +425,7 @@ if enable_gphoto2
   mounts += ['gphoto2']
 endif
 
-if enable_libmtp
+if enable_mtp
   sources = files('gvfsbackendmtp.c')
 
   deps = [
@@ -479,7 +479,7 @@ if enable_http
     '-DMAX_JOB_THREADS=1'
   ]
 
-  if enable_avahi
+  if enable_dnssd
     deps += libgvfscommon_dnssd_dep
 
     cflags += '-DBACKEND_TYPES="dav", G_VFS_TYPE_BACKEND_DAV, "dav+sd", G_VFS_TYPE_BACKEND_DAV, "davs+sd", G_VFS_TYPE_BACKEND_DAV,'
