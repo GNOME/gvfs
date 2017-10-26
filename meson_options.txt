@@ -29,3 +29,4 @@ option('enable-udev', type: 'boolean', value: true, description: 'build with lib
 option('enable-devel-utils', type: 'boolean', value: false, description: 'build with development utility programs')
 option('enable-installed-tests', type: 'boolean', value: false, description: 'enable installed unit tests')
 option('enable-man', type: 'boolean', value: false, description: 'generate man pages')
+option('enable-programs', type: 'boolean', value: false, description: 'generate deprecated programs')

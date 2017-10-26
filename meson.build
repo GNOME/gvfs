@@ -498,7 +498,11 @@ subdir('client')
 subdir('daemon')
 subdir('monitor')
 subdir('po')
-subdir('programs')
+
+enable_programs = get_option('enable-programs')
+if enable_programs
+  subdir('programs')
+endif
 
 enable_man = get_option('enable-man')
 if enable_man
