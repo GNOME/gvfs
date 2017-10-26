@@ -470,10 +470,6 @@ config_h.set('HAVE_LIBMTP', enable_libmtp)
 
 # *** AFP backend ***
 enable_afp = get_option('enable-afp')
-msg_afp = 'false'
-if enable_afp
-  msg_afp = (have_gcrypt ? 'true' : 'partial (crypt support missing! Only anonymous logins)')
-endif
 
 # *** NFS backend ***
 enable_nfs = get_option('enable-nfs')
@@ -521,32 +517,3 @@ meson.add_install_script(
   gvfs_datadir,
   gvfs_libdir
 )
-
-output = '\ngvfs configuration summary:\n\n'
-output += '        gio module directory:         ' + gio_module_dir + '\n\n'
-output += '        Blu-ray metadata support:     ' + enable_bluray.to_string() + '\n'
-output += '        Google support:               ' + enable_google.to_string() + '\n'
-output += '        HTTP/WebDAV support:          ' + enable_http.to_string() + '\n'
-output += '        Samba support:                ' + enable_samba.to_string() + '\n'
-output += '        FUSE support:                 ' + enable_fuse.to_string() + '\n'
-output += '        CDDA support:                 ' + enable_cdda.to_string() + '\n'
-output += '        Gphoto2 support:              ' + enable_gphoto2.to_string() + '\n'
-output += '        MTP support:                  ' + enable_libmtp.to_string() + '\n'
-output += '        Polkit support:               ' + enable_admin.to_string() + '\n'
-output += '        USB support:                  ' + enable_libusb.to_string() + '\n'
-output += '        archive support:              ' + enable_archive.to_string() + '\n'
-output += '        AFC support:                  ' + enable_afc.to_string() + '\n'
-output += '        AFP support:                  ' + msg_afp + '\n'
-output += '        NFS support:                  ' + enable_nfs.to_string() + '\n'
-output += '        DNS-SD support:               ' + enable_avahi.to_string() + '\n'
-output += '        Build GDU volume monitor:     ' + enable_gdu.to_string() + '\n'
-output += '        Build udisks2 volume monitor: ' + enable_udisks2.to_string() + '\n'
-output += '        Build GOA volume monitor:     ' + enable_goa.to_string() + '\n'
-output += '        Use systemd user unit:        ' + have_systemd_user_unit.to_string() + '\n'
-output += '        Use libsystemd-login:         ' + enable_libsystemd_login.to_string() + '\n'
-output += '        Use GCR:                      ' + enable_gcr.to_string() + '\n'
-output += '        GNOME Keyring support:        ' + enable_keyring.to_string() + '\n\n'
-output += '        Generate man pages:           ' + enable_man.to_string() + '\n'
-output += '        Generate utility programs:    ' + enable_devel_utils.to_string() + '\n'
-output += '        Installed tests:              ' + enable_installed_tests.to_string()
-message(output)
