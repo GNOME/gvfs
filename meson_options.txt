@@ -7,7 +7,7 @@ option('enable-afp', type: 'boolean', value: true, description: 'build with afp 
 option('enable-archive', type: 'boolean', value: true, description: 'build with archive backend')
 option('enable-cdda', type: 'boolean', value: true, description: 'build with cdda backend')
 option('enable-dnssd', type: 'boolean', value: true, description: 'build with dnssd backend')
-option('enable-gdu', type: 'boolean', value: true, description: 'build with gdu volume monitor')
+option('enable-gdu', type: 'boolean', value: false, description: 'build with gdu volume monitor')
 option('enable-goa', type: 'boolean', value: true, description: 'build with goa volume monitor')
 option('enable-google', type: 'boolean', value: true, description: 'build with google backend')
 option('enable-gphoto2', type: 'boolean', value: true, description: 'build with gphoto2 backend and volume monitor')
