@@ -144,8 +144,8 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
 #ifdef HAVE_LIBMTP
     if (g_udev_device_get_property_as_boolean (device, "ID_MTP_DEVICE"))
       {
-	/* g_debug ("ignoring device, is MTP"); */
-	return;
+        g_debug ("gudev_add_camera: ignoring device, is MTP");
+        return;
       }
 #endif /* HAVE_LIBMTP */
 
@@ -161,9 +161,9 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
 	return;
     }
 
-    /* g_debug ("gudev_add_camera: camera device %s (bus: %i, device: %i)", 
+    g_debug ("gudev_add_camera: camera device %s (bus: %i, device: %i)",
              g_udev_device_get_device_file (device),
-             usb_bus_num, usb_device_num); */
+             usb_bus_num, usb_device_num);
 
     store_heads = get_stores_for_camera (usb_bus_num, usb_device_num);
     num_store_heads = g_list_length (store_heads);
@@ -186,7 +186,7 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
             uri = g_strdup_printf ("gphoto2://[usb:%s,%s]/%s", usb_bus_num, usb_device_num,
                                    store_path[0] == '/' ? store_path + 1 : store_path);
           }
-        /* g_debug ("gudev_add_camera: ... adding URI for storage head: %s", uri); */
+        g_debug ("gudev_add_camera: ... adding URI for storage head: %s", uri);
         activation_mount_root = g_file_new_for_uri (uri);
         g_free (uri);
 
@@ -216,7 +216,7 @@ gudev_remove_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device)
 
   sysfs_path = g_udev_device_get_sysfs_path (device);
 
-  /* g_debug ("gudev_remove_camera: %s", g_udev_device_get_device_file (device)); */
+  g_debug ("gudev_remove_camera: %s", g_udev_device_get_device_file (device));
 
   for (l = monitor->camera_volumes; l != NULL; l = ll)
     {
@@ -226,7 +226,7 @@ gudev_remove_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device)
 
       if (g_gphoto2_volume_has_path (volume, sysfs_path))
         {
-          /* g_debug ("gudev_remove_camera: found volume %s, deleting", sysfs_path); */
+          g_debug ("gudev_remove_camera: found volume %s, deleting", sysfs_path);
           g_signal_emit_by_name (monitor, "volume_removed", volume);
           g_signal_emit_by_name (volume, "removed");
           g_gphoto2_volume_removed (volume);
@@ -244,7 +244,7 @@ on_uevent (GUdevClient *client,
 {
   GGPhoto2VolumeMonitor *monitor = G_GPHOTO2_VOLUME_MONITOR (user_data);
 
-  /* g_debug ("on_uevent: action=%s, device=%s", action, g_udev_device_get_device_file(device)); */
+  g_debug ("on_uevent: action=%s, device=%s", action, g_udev_device_get_device_file (device));
 
   if (g_strcmp0 (action, "add") == 0 && g_udev_device_has_property (device, "ID_GPHOTO2"))
     gudev_add_camera (monitor, device, TRUE);
@@ -288,8 +288,6 @@ g_gphoto2_volume_monitor_constructor (GType                  type,
       return object;
     }
   G_UNLOCK (gphoto2_vm);
-
-  /*g_warning ("creating hal vm");*/
 
   object = NULL;
 
@@ -428,8 +426,6 @@ get_stores_for_camera (const char *bus_num, const char *device_num)
         basedir = storage_info[i].basedir;
       else
         basedir = "/";
-
-      /* g_debug ("capacitykbytes[%d] = %d", i, (gint) storage_info[i].capacitykbytes); */
 
       l = g_list_prepend (l, g_strdup (basedir));
     }
