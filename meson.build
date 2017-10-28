@@ -49,9 +49,6 @@ set_defines = [
   ['PACKAGE_BUGREPORT', 'http://bugzilla.gnome.org/enter_bug.cgi?product=' + gvfs_name],
   ['PACKAGE_NAME', gvfs_name],
   ['PACKAGE_STRING', '@0@ @1@'.format(gvfs_name, gvfs_version)],
-  ['PACKAGE_TARNAME', gvfs_name],
-  ['PACKAGE_URL', ''],
-  ['PACKAGE_VERSION', gvfs_version],
   ['VERSION', gvfs_version],
   # i18n
   ['GETTEXT_PACKAGE', gvfs_name]
@@ -115,16 +112,6 @@ endif
 
 # headers
 check_headers = [
-  ['HAVE_DLFCN_H', 'dlfcn.h'],
-  ['HAVE_INTTYPES_H', 'inttypes.h'],
-  ['HAVE_MEMORY_H', 'memory.h'],
-  ['HAVE_STDINT_H', 'stdint.h'],
-  ['HAVE_STDLIB_H', 'stdlib.h'],
-  ['HAVE_STRINGS_H', 'strings.h'],
-  ['HAVE_STRING_H', 'string.h'],
-  ['HAVE_SYS_STAT_H', 'sys/stat.h'],
-  ['HAVE_SYS_TYPES_H', 'sys/types.h'],
-  ['HAVE_UNISTD_H', 'unistd.h'],
   # fs + pty
   ['HAVE_SYS_PARAM_H', 'sys/param.h'],
   # fs
@@ -141,7 +128,6 @@ endforeach
 # pty
 check_headers = [
   ['HAVE_STROPTS_H', 'stropts.h'],
-  ['HAVE_SYS_UIO_H', 'sys/uio.h'],
   ['HAVE_SYS_UN_H', 'sys/un.h'],
   ['HAVE_TERMIOS_H', 'termios.h'],
   ['HAVE_UTMP_H', 'utmp.h']
@@ -153,10 +139,6 @@ endforeach
 
 # functions
 check_functions = [
-  # i18n
-  ['HAVE_DCGETTEXT', 'dcgettext'],
-  ['HAVE_GETTEXT', 'gettext'],
-  ['HAVE_ICONV', 'iconv'],
   # pty
   ['HAVE_GETPT', 'getpt'],
   ['HAVE_GRANTPT', 'grantpt'],
@@ -168,13 +150,6 @@ check_functions = [
   ['HAVE_STATFS', 'statfs'],
   ['HAVE_STATVFS', 'statvfs']
 ]
-
-if host_machine.system().contains('darwin')
-  check_functions += [
-    ['HAVE_CFLOCALECOPYCURRENT', 'CFLocaleCopyCurrent'],
-    ['HAVE_CFPREFERENCESCOPYAPPVALUE', 'CFPreferencesCopyAppValue']
-  ]
-endif
 
 foreach func: check_functions
   config_h.set(func[0], cc.has_function(func[1]))
@@ -227,7 +202,6 @@ endforeach
 check_members = [
   # define, typename, membername, prefix
   ['HAVE_STRUCT_STATFS_F_BAVAIL', 'struct statfs', 'f_bavail', 'sys/statfs.h'],
-  ['HAVE_STRUCT_STATFS_F_FSTYPENAME', 'struct statfs', 'f_fstypename', 'sys/statfs.h'],
   ['HAVE_STRUCT_STATVFS_F_BASETYPE', 'struct statvfs', 'f_basetype', 'sys/statvfs.h'],
   ['HAVE_STRUCT_STAT_ST_ATIMENSEC', 'struct stat', 'st_atimensec', 'sys/stat.h'],
   ['HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC', 'struct stat', 'st_atim.tv_nsec', 'sys/stat.h'],
