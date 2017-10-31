@@ -210,7 +210,7 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
 
   if (g_strcmp0 (action, "add") == 0 && g_udev_device_has_property (device, "ID_MTP_DEVICE"))
     gudev_add_device (monitor, device, TRUE);
-  else if (g_strcmp0 (action, "remove") == 0 && g_udev_device_get_device_file (device) != NULL)
+  else if (g_strcmp0 (action, "remove") == 0)
     gudev_remove_device (monitor, device);
   else
     g_debug ("on_uevent: discarding");

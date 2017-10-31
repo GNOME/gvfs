@@ -209,7 +209,7 @@ g_mtp_volume_has_path (GMtpVolume  *volume,
   G_LOCK (mtp_volume);
   res = FALSE;
   if (mtp_volume->device != NULL)
-    res = strcmp (g_udev_device_get_sysfs_path (mtp_volume->device), sysfs_path) == 0;
+    res = g_strcmp0 (g_udev_device_get_sysfs_path (mtp_volume->device), sysfs_path) == 0;
   G_UNLOCK (mtp_volume);
   return res;
 }

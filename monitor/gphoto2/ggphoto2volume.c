@@ -421,7 +421,7 @@ g_gphoto2_volume_has_path (GGPhoto2Volume  *volume,
   G_LOCK (gphoto2_volume);
   res = FALSE;
   if (gphoto2_volume->device != NULL)
-    res = strcmp (g_udev_device_get_sysfs_path   (gphoto2_volume->device), sysfs_path) == 0;
+    res = g_strcmp0 (g_udev_device_get_sysfs_path (gphoto2_volume->device), sysfs_path) == 0;
   G_UNLOCK (gphoto2_volume);
   return res;
 }

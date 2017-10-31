@@ -292,7 +292,7 @@ on_uevent (GUdevClient *client,
 
   if (g_strcmp0 (action, "add") == 0 && g_udev_device_has_property (device, "ID_GPHOTO2"))
     gudev_add_camera (monitor, device, TRUE);
-  else if (g_strcmp0 (action, "remove") == 0 && g_udev_device_get_device_file (device) != NULL)
+  else if (g_strcmp0 (action, "remove") == 0)
     gudev_remove_camera (monitor, device);
   else
     g_debug ("on_uevent: discarding");
