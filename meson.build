@@ -27,10 +27,8 @@ gvfs_pkglibdir = join_paths(gvfs_libdir, gvfs_name)
 
 gvfs_rpath = gvfs_pkglibdir
 
-gvfs_dbus_service_dir = join_paths(gvfs_datadir, 'dbus-1', 'services')
 gvfs_remote_volume_monitors_dir = join_paths(gvfs_pkgdatadir, 'remote-volume-monitors')
 
-gio_module_dir = join_paths(gvfs_libdir, 'gio', 'modules')
 gvfs_mountdir = join_paths(gvfs_pkgdatadir, 'mounts')
 gvfs_schema_dir = join_paths(gvfs_datadir, 'glib-2.0', 'schemas')
 
@@ -236,8 +234,10 @@ add_project_arguments(common_flags, language: 'c')
 ldflag = '-Wl,--version-script'
 have_version_script = host_machine.system().contains('linux') and cc.has_argument(ldflag)
 
+gio_dep = dependency('gio-2.0')
+
 glib_deps = [
-  dependency('gio-2.0'),
+  gio_dep,
   dependency('gio-unix-2.0'),
   dependency('glib-2.0', version: '>= 2.51.0'),
   dependency('gmodule-no-export-2.0'),
@@ -267,18 +267,36 @@ config_h.set('HAVE_GCRYPT', have_gcrypt)
 # *** Check for dbus service dir ***
 dbus_service_dir = get_option('with-dbus-service-dir')
 if dbus_service_dir == ''
-  dbus_service_dir = join_paths(gvfs_datadir, 'dbus-1', 'services')
+  dbus_dep = dependency('dbus-1', required: false)
+  assert(dbus_dep.found(), 'dbus-1 required but not found, please provide a valid D-Bus service dir')
+  dbus_service_dir = dbus_dep.get_pkgconfig_variable('session_bus_services_dir')
 endif
 
-# *** Check for systemd user units ***
-systemd_user_dir = get_option('with-systemduserunitdir')
-have_systemd_user_unit = (systemd_user_dir != 'no')
+gio_module_dir = get_option('with-gio-module-dir')
+if gio_module_dir == ''
+  gio_module_dir = gio_dep.get_pkgconfig_variable('giomoduledir')
+endif
 
-if have_systemd_user_unit
-  systemd_dep = dependency('systemd', version: '>= 206')
+# *** Check for systemd options ***
+systemd_user_unit_dir = get_option('with-systemduserunitdir')
+install_systemd_user_unit_dir = (systemd_user_unit_dir != 'no')
 
-  if systemd_user_dir == ''
-    systemd_user_dir = join_paths(gvfs_libdir, 'systemd', 'user')
+tmp_files_dir = get_option('with-tmpfilesdir')
+install_tmp_files_dir = (tmp_files_dir != 'no')
+
+if install_systemd_user_unit_dir or install_tmp_files_dir
+  if systemd_user_unit_dir == '' or tmp_files_dir == ''
+    systemd_dep = dependency('systemd', version: '>= 206', required: false)
+
+    if install_systemd_user_unit_dir and systemd_user_unit_dir == ''
+      assert(systemd_dep.found(), 'systemd required but not found, please provide a valid systemd user unit dir or disable it')
+      systemd_user_unit_dir = systemd_dep.get_pkgconfig_variable('systemduserunitdir')
+    endif
+
+    if install_tmp_files_dir and tmp_files_dir == ''
+      assert(systemd_dep.found(), 'systemd not found, if you use opentmpfiles please provide a valid systemd user unit dir or disable it')
+      tmp_files_dir = systemd_dep.get_pkgconfig_variable('tmpfilesdir')
+    endif
   endif
 endif
 
@@ -346,10 +364,7 @@ endif
 # *** Check for libsystemd-login ***
 enable_libsystemd_login = get_option('enable-libsystemd-login')
 if enable_libsystemd_login
-  libsystemd_login_dep = dependency('libsystemd', required: false)
-  if not libsystemd_login_dep.found()
-    libsystemd_login_dep = dependency('libsystemd-login', version: '>= 44')
-  endif
+  libsystemd_login_dep = dependency('libsystemd')
 endif
 config_h.set('HAVE_LIBSYSTEMD_LOGIN', enable_libsystemd_login)
 

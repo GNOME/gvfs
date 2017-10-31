@@ -7,18 +7,18 @@ daemon_service = configure_file(
   input: service + '.in',
   output: service,
   install: true,
-  install_dir: gvfs_dbus_service_dir,
+  install_dir: dbus_service_dir,
   configuration: service_conf
 )
 
-if have_systemd_user_unit
+if install_systemd_user_unit_dir
   service = 'gvfs-daemon.service'
 
   configure_file(
     input: service + '.in',
     output: service,
     install: true,
-    install_dir: systemd_user_dir,
+    install_dir: systemd_user_unit_dir,
     configuration: service_conf
   )
 endif

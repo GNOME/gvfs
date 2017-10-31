@@ -1,5 +1,7 @@
-option('with-dbus-service-dir', type: 'string', value: '', description: 'choose directory for dbus service files [default=PREFIX/share/dbus-1/services]')
-option('with-systemduserunitdir', type: 'string', value: '', description: 'choose directory for systemd user units, or \'no\' to disable [default=PREFIX/lib/systemd/user]')
+option('with-dbus-service-dir', type: 'string', value: '', description: 'custom directory for dbus service files')
+option('with-gio-module-dir', type: 'string', value: '', description: 'custom directory for gio modules')
+option('with-systemduserunitdir', type: 'string', value: '', description: 'custom directory for systemd user units, or \'no\' to disable')
+option('with-tmpfilesdir', type: 'string', value: '', description: 'custom directory for tmpfiles.d config files, or \'no\' to disable')
 
 option('enable-admin', type: 'boolean', value: true, description: 'build with admin backend')
 option('enable-afc', type: 'boolean', value: true, description: 'build with afc backend and volume monitor')

@@ -74,11 +74,10 @@ endif
 
 # FUSE daemon
 if enable_fuse
-  # FIXME: reusing USE_LIBSYSTEMD_LOGIN as systemd has no universal header or pkg-config file
-  if enable_libsystemd_login
+  if install_tmp_files_dir
     install_data(
       'gvfsd-fuse-tmpfiles.conf',
-      install_dir: join_paths(gvfs_libdir, 'tmpfiles.d')
+      install_dir: tmp_files_dir
     )
   endif
 
