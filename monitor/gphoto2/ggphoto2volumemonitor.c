@@ -161,7 +161,7 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
 	return;
     }
 
-    g_debug ("gudev_add_camera: camera device %s (bus: %i, device: %i)",
+    g_debug ("gudev_add_camera: camera device %s (bus: %s, device: %s)",
              g_udev_device_get_device_file (device),
              usb_bus_num, usb_device_num);
 
