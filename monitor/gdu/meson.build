@@ -5,6 +5,8 @@ install_data(
   install_dir: gvfs_remote_volume_monitors_dir
 )
 
+service = gvfs_namespace + '.GduVolumeMonitor.service'
+
 gdu_service = configure_file(
   input: service + '.in',
   output: service,
