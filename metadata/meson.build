@@ -1,12 +1,6 @@
-service = gvfs_namespace + '.Metadata.service'
-
-metadata_service = configure_file(
-  input: service + '.in',
-  output: service,
-  install: true,
-  install_dir: dbus_service_dir,
-  configuration: service_conf
-)
+dbus_service = gvfs_namespace + '.Metadata'
+dbus_exec = 'gvfsd-metadata'
+dbus_systemd_service = ''
 
 if install_systemd_user_unit_dir
   service = 'gvfs-metadata.service'
@@ -18,7 +12,22 @@ if install_systemd_user_unit_dir
     install_dir: systemd_user_unit_dir,
     configuration: service_conf
   )
+
+  dbus_systemd_service = 'SystemdService=' + service
 endif
+
+dbus_service_conf = configuration_data()
+dbus_service_conf.set('service', dbus_service)
+dbus_service_conf.set('exec', join_paths(gvfs_libexecdir, dbus_exec))
+dbus_service_conf.set('systemd_service', dbus_systemd_service)
+
+metadata_service = configure_file(
+  input: dbus_service_in,
+  output: dbus_service + '.service',
+  install: true,
+  install_dir: dbus_service_dir,
+  configuration: dbus_service_conf
+)
 
 metadata_dbus = gnome.gdbus_codegen(
   'metadata-dbus',

@@ -277,6 +277,8 @@ if dbus_service_dir == ''
   dbus_service_dir = dbus_dep.get_pkgconfig_variable('session_bus_services_dir')
 endif
 
+dbus_service_in = files('dbus.service.in')
+
 gio_module_dir = get_option('with-gio-module-dir')
 if gio_module_dir == ''
   gio_module_dir = gio_dep.get_pkgconfig_variable('giomoduledir')

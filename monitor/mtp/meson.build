@@ -3,18 +3,12 @@ install_data(
   install_dir: gvfs_remote_volume_monitors_dir
 )
 
-service = gvfs_namespace + '.MTPVolumeMonitor.service'
-
-configure_file(
-  input: service + '.in',
-  output: service,
-  install: true,
-  install_dir: dbus_service_dir,
-  configuration: service_conf
-)
+dbus_service = gvfs_namespace + '.MTPVolumeMonitor'
+dbus_exec = 'gvfs-mtp-volume-monitor'
+dbus_systemd_service = ''
 
 if install_systemd_user_unit_dir
-  service = 'gvfs-mtp-volume-monitor.service'
+  service = dbus_exec + '.service'
 
   configure_file(
     input: service + '.in',
@@ -23,7 +17,22 @@ if install_systemd_user_unit_dir
     install_dir: systemd_user_unit_dir,
     configuration: service_conf
   )
+
+  dbus_systemd_service = 'SystemdService=' + service
 endif
+
+dbus_service_conf = configuration_data()
+dbus_service_conf.set('service', dbus_service)
+dbus_service_conf.set('exec', join_paths(gvfs_libexecdir, dbus_exec))
+dbus_service_conf.set('systemd_service', dbus_systemd_service)
+
+configure_file(
+  input: dbus_service_in,
+  output: dbus_service + '.service',
+  install: true,
+  install_dir: dbus_service_dir,
+  configuration: dbus_service_conf
+)
 
 sources = files(
   'mtp-volume-monitor-daemon.c',

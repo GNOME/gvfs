@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=@service@
+Exec=@exec@
+@systemd_service@
