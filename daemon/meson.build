@@ -525,7 +525,7 @@ if enable_afp
   sources = common_sources + files('gvfsbackendafp.c')
 
   deps = []
-  if have_gcrypt
+  if enable_gcrypt
     deps += libgcrypt_dep
   endif
 

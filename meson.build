@@ -249,20 +249,25 @@ libxml_dep = dependency('libxml-2.0', required: false)
 have_libxml = libxml_dep.found()
 
 # *** Check for libgcrypt ***
-libgcrypt_config = find_program('libgcrypt-config')
-libgcrypt_version = run_command(libgcrypt_config, '--version').stdout().strip()
+enable_gcrypt = get_option('enable-gcrypt')
+if enable_gcrypt
+  libgcrypt_req_version = '>= 1.2.2'
 
-libgcrypt_cflags = run_command(libgcrypt_config, '--cflags').stdout().strip().split()
-libgcrypt_libs = run_command(libgcrypt_config, '--libs').stdout().strip().split()
+  libgcrypt_config = find_program('libgcrypt-config')
+  libgcrypt_version = run_command(libgcrypt_config, '--version').stdout().strip()
 
-libgcrypt_dep = declare_dependency(
-  compile_args: libgcrypt_cflags,
-  link_args: libgcrypt_libs,
-  version: libgcrypt_version
-)
+  assert(libgcrypt_version.version_compare(libgcrypt_req_version), 'gcrypt required but libgcrypt ' + libgcrypt_req_version + ' not found')
 
-have_gcrypt = libgcrypt_version.version_compare('>= 1.2.2')
-config_h.set('HAVE_GCRYPT', have_gcrypt)
+  libgcrypt_cflags = run_command(libgcrypt_config, '--cflags').stdout().strip().split()
+  libgcrypt_libs = run_command(libgcrypt_config, '--libs').stdout().strip().split()
+
+  libgcrypt_dep = declare_dependency(
+    compile_args: libgcrypt_cflags,
+    link_args: libgcrypt_libs,
+    version: libgcrypt_version
+  )
+endif
+config_h.set('HAVE_GCRYPT', enable_gcrypt)
 
 # *** Check for dbus service dir ***
 dbus_service_dir = get_option('with-dbus-service-dir')

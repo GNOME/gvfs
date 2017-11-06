@@ -22,6 +22,7 @@ option('enable-udisks2', type: 'boolean', value: true, description: 'build with 
 option('enable-bluray', type: 'boolean', value: true, description: 'build with bluray metadata support')
 option('enable-fuse', type: 'boolean', value: true, description: 'build with fuse support')
 option('enable-gcr', type: 'boolean', value: true, description: 'build with gcr certificate support')
+option('enable-gcrypt', type: 'boolean', value: true, description: 'build with gcrypt support')
 option('enable-gudev', type: 'boolean', value: true, description: 'build with gudev device support')
 option('enable-keyring', type: 'boolean', value: true, description: 'build with keyring support')
 option('enable-logind', type: 'boolean', value: true, description: 'build with logind support')
