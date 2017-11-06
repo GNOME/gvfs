@@ -46,7 +46,7 @@ deps = glib_deps + [
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-Gdu"',
   '-DGDU_API_IS_SUBJECT_TO_CHANGE',
-  '-DGIO_MODULE_DIR="@0@"'.format(gio_modules_dir),
+  '-DGIO_MODULE_DIR="@0@"'.format(gio_module_dir),
   '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir)
 ]
 
