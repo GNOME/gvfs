@@ -249,7 +249,7 @@ libxml_dep = dependency('libxml-2.0', required: false)
 have_libxml = libxml_dep.found()
 
 # *** Check for libgcrypt ***
-enable_gcrypt = get_option('enable-gcrypt')
+enable_gcrypt = get_option('gcrypt')
 if enable_gcrypt
   libgcrypt_req_version = '>= 1.2.2'
 
@@ -270,7 +270,7 @@ endif
 config_h.set('HAVE_GCRYPT', enable_gcrypt)
 
 # *** Check for dbus service dir ***
-dbus_service_dir = get_option('with-dbus-service-dir')
+dbus_service_dir = get_option('dbus_service_dir')
 if dbus_service_dir == ''
   dbus_dep = dependency('dbus-1', required: false)
   assert(dbus_dep.found(), 'dbus-1 required but not found, please provide a valid D-Bus service dir')
@@ -279,16 +279,16 @@ endif
 
 dbus_service_in = files('dbus.service.in')
 
-gio_module_dir = get_option('with-gio-module-dir')
+gio_module_dir = get_option('gio_module_dir')
 if gio_module_dir == ''
   gio_module_dir = gio_dep.get_pkgconfig_variable('giomoduledir')
 endif
 
 # *** Check for systemd options ***
-systemd_user_unit_dir = get_option('with-systemduserunitdir')
+systemd_user_unit_dir = get_option('systemduserunitdir')
 install_systemd_user_unit_dir = (systemd_user_unit_dir != 'no')
 
-tmp_files_dir = get_option('with-tmpfilesdir')
+tmp_files_dir = get_option('tmpfilesdir')
 install_tmp_files_dir = (tmp_files_dir != 'no')
 
 if install_systemd_user_unit_dir or install_tmp_files_dir
@@ -308,27 +308,27 @@ if install_systemd_user_unit_dir or install_tmp_files_dir
 endif
 
 # *** Check for gcr ***
-enable_gcr = get_option('enable-gcr')
+enable_gcr = get_option('gcr')
 if enable_gcr
   gcr_dep = dependency('gcr-base-3')
 endif
 
 # *** Check if we should build with admin backend ***
-enable_admin = get_option('enable-admin')
+enable_admin = get_option('admin')
 if enable_admin
   libcap_dep = dependency('libcap')
   polkit_gobject_dep = dependency('polkit-gobject-1')
 endif
 
 # *** Check if we should build with http backend ***
-enable_http = get_option('enable-http')
+enable_http = get_option('http')
 if enable_http
   assert(have_libxml, 'http required but libxml-2.0 not found')
   libsoup_dep = dependency('libsoup-2.4', version: '>= 2.42.0')
 endif
 
 # *** Check if we should build with DNS-SD backend ***
-enable_dnssd = get_option('enable-dnssd')
+enable_dnssd = get_option('dnssd')
 if enable_dnssd
   avahi_client_dep = dependency('avahi-client', version: '>= 0.6')
   avahi_glib_dep = dependency('avahi-glib', version: '>= 0.6')
@@ -336,33 +336,33 @@ endif
 config_h.set('HAVE_AVAHI', enable_dnssd)
 
 # *** Check for gudev ***
-enable_gudev = get_option('enable-gudev')
+enable_gudev = get_option('gudev')
 if enable_gudev
   gudev_dep = dependency('gudev-1.0', version: '>= 147')
 endif
 config_h.set('HAVE_GUDEV', enable_gudev)
 
 # *** Check for FUSE ***
-enable_fuse = get_option('enable-fuse')
+enable_fuse = get_option('fuse')
 if enable_fuse
   fuse_dep = dependency('fuse', version: '>= 2.8.0')
 endif
 config_h.set('HAVE_FUSE', enable_fuse)
 
 # *** Check for gnome-disk-utility ***
-enable_gdu = get_option('enable-gdu')
+enable_gdu = get_option('gdu')
 if enable_gdu
   gdu_dep = dependency('gdu', version: '>= 3.0.2')
 endif
 
 # *** Check for udisks2 ***
-enable_udisks2 = get_option('enable-udisks2')
+enable_udisks2 = get_option('udisks2')
 if enable_udisks2
   udisks2_dep = dependency('udisks2', version: '>= 1.97')
 endif
 
 # *** Check for libsystemd-login ***
-enable_logind = get_option('enable-logind')
+enable_logind = get_option('logind')
 if enable_logind
   logind_dep = dependency('libsystemd', required: false)
   if not logind_dep.found()
@@ -374,53 +374,53 @@ endif
 config_h.set('HAVE_LOGIND', enable_logind)
 
 # *** Check if we should build with AFC backend ***
-enable_afc = get_option('enable-afc')
+enable_afc = get_option('afc')
 if enable_afc
   libimobiledevice_dep = dependency('libimobiledevice-1.0', version: '>= 1.2')
   libplist_dep = dependency('libplist', version: '>= 0.15')
 endif
 
 # *** Check if we should build with GOA volume monitor ***
-enable_goa = get_option('enable-goa')
+enable_goa = get_option('goa')
 if enable_goa
   goa_dep = dependency('goa-1.0', version: '>= 3.17.1')
 endif
 
 # *** Check for GNOME Keyring ***
-enable_keyring = get_option('enable-keyring')
+enable_keyring = get_option('keyring')
 if enable_keyring
   libsecret_dep = dependency('libsecret-unstable')
 endif
 config_h.set('HAVE_KEYRING', enable_keyring)
 
 # *** Check if we should build with libbluray ***
-enable_bluray = get_option('enable-bluray')
+enable_bluray = get_option('bluray')
 if enable_bluray
   libbluray_dep = dependency('libbluray')
 endif
 config_h.set('HAVE_BLURAY', enable_bluray)
 
 # *** Check if we should build with libusb-1.0 ***
-enable_libusb = get_option('enable-libusb')
+enable_libusb = get_option('libusb')
 if enable_libusb
   libusb_dep = dependency('libusb-1.0', version: '>= 1.0.21')
 endif
 config_h.set10('HAVE_LIBUSB', enable_libusb)
 
 # *** Check for samba ***
-enable_samba = get_option('enable-smb')
+enable_samba = get_option('smb')
 if enable_samba
   smbclient_dep = dependency('smbclient')
 endif
 
 # *** Check for libarchive ***
-enable_archive = get_option('enable-archive')
+enable_archive = get_option('archive')
 if enable_archive
   libarchive_dep = dependency('libarchive')
 endif
 
 # *** Check if we should build with CDDA backend ***
-enable_cdda = get_option('enable-cdda')
+enable_cdda = get_option('cdda')
 if enable_cdda
   assert(enable_gudev, 'CDDA backend requested but gudev is required')
 
@@ -429,7 +429,7 @@ if enable_cdda
 endif
 
 # *** Check if we should build with Google backend ***
-enable_google = get_option('enable-google')
+enable_google = get_option('google')
 if enable_google
   assert(enable_goa, 'Google backend requested but GOA is required')
 
@@ -439,7 +439,7 @@ if enable_google
 endif
 
 # *** Check for gphoto2 ***
-enable_gphoto2 = get_option('enable-gphoto2')
+enable_gphoto2 = get_option('gphoto2')
 if enable_gphoto2
   assert(enable_gudev, 'gphoto2 requested but gudev is required')
   assert(host_machine.system().contains('linux') or host_machine.system().contains('bsd'),
@@ -450,7 +450,7 @@ if enable_gphoto2
 endif
 
 # *** Check for libmtp ***
-enable_mtp = get_option('enable-mtp')
+enable_mtp = get_option('mtp')
 if enable_mtp
   assert(enable_gudev, 'libmtp requested but gudev is required')
 
@@ -463,17 +463,17 @@ endif
 config_h.set('HAVE_LIBMTP', enable_mtp)
 
 # *** AFP backend ***
-enable_afp = get_option('enable-afp')
+enable_afp = get_option('afp')
 
 # *** NFS backend ***
-enable_nfs = get_option('enable-nfs')
+enable_nfs = get_option('nfs')
 if enable_nfs
   libnfs_dep = dependency('libnfs', version: '>= 1.9.8')
 endif
 
 # *** Enable development utils ***
-enable_devel_utils = get_option('enable-devel-utils')
-enable_installed_tests = get_option('enable-installed-tests')
+enable_devel_utils = get_option('devel_utils')
+enable_installed_tests = get_option('installed_tests')
 
 gnome = import('gnome')
 i18n = import('i18n')
@@ -493,13 +493,11 @@ subdir('daemon')
 subdir('monitor')
 subdir('po')
 
-enable_programs = get_option('enable-programs')
-if enable_programs
+if get_option('deprecated_programs')
   subdir('programs')
 endif
 
-enable_man = get_option('enable-man')
-if enable_man
+if get_option('man')
   subdir('man')
 endif
 

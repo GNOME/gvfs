@@ -1,5 +1,5 @@
 xsltproc = find_program('xsltproc', required: false)
-assert(xsltproc.found(), 'xsltproc is required for enable-man')
+assert(xsltproc.found(), 'xsltproc is required for man pages generation')
 
 xsltproc_cmd = [
   xsltproc,
