@@ -2444,6 +2444,21 @@ do_read (GVfsBackend *backend,
       goto exit;
     }
 
+    /*
+     * Almost all android devices have a bug where they do not enforce
+     * POSIX semantics for read past EOF, leading to undefined
+     * behaviour including device-side hangs. We'd better handle it
+     * here.
+     */
+    if (offset >= handle->size) {
+      g_debug ("(II) skipping read with offset past EOF\n");
+      actual = 0;
+      goto finished;
+    } else if (offset + bytes_requested > handle->size) {
+      g_debug ("(II) reducing bytes_requested to avoid reading past EOF\n");
+      bytes_requested = handle->size - offset;
+    }
+
     unsigned char *temp;
     int ret = LIBMTP_GetPartialObject (G_VFS_BACKEND_MTP (backend)->device, id, offset,
                                        bytes_requested, &temp, &actual);
@@ -2464,6 +2479,7 @@ do_read (GVfsBackend *backend,
     memcpy (buffer, bytes->data + offset, actual);
   }
 
+ finished:
   handle->offset = offset + actual;
   g_vfs_job_read_set_size (job, actual);
   g_vfs_job_succeeded (G_VFS_JOB (job));
