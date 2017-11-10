@@ -4,8 +4,7 @@ project(
   license: 'LGPL2+',
   default_options: [
     'b_lundef=true',
-    'buildtype=debugoptimized',
-    'warning_level=1'
+    'buildtype=debugoptimized'
   ],
   meson_version: '>= 0.43.0'
 )
