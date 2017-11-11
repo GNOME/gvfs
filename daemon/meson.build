@@ -386,6 +386,7 @@ if enable_admin
     input: policy_in,
     output: policy,
     po_dir: po_dir,
+    data_dirs: its_dir,
     install: true,
     install_dir: join_paths(gvfs_datadir, 'polkit-1', 'actions')
   )

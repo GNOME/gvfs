@@ -481,6 +481,7 @@ pkg = import('pkgconfig')
 service_conf = configuration_data()
 service_conf.set('libexecdir', gvfs_libexecdir)
 
+its_dir = join_paths(meson.source_root(), 'gettext')
 po_dir = join_paths(meson.source_root(), 'po')
 
 top_inc = include_directories('.')
