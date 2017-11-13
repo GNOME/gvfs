@@ -311,6 +311,7 @@ enable_gcr = get_option('gcr')
 if enable_gcr
   gcr_dep = dependency('gcr-base-3')
 endif
+config_h.set('HAVE_GCR', enable_gcr)
 
 # *** Check if we should build with admin backend ***
 enable_admin = get_option('admin')
