@@ -1,3 +1,13 @@
+Major changes in 1.35.2
+=======================
+* metadata: Remove udev dependency in favor of gudev
+* build: Enable elogind support in meson
+* build: Port to meson build system
+* gphoto2: Fix volume removal with current udev behavior
+* mtp: Fix volume removal with current udev behavior
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.35.1
 =======================
 * sftp: Add support for setting timestamps
