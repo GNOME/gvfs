@@ -30,6 +30,7 @@ EXTRA_DIST = \
 	meson.build		\
 	meson_options.txt	\
 	meson_post_install.py	\
+	dbus.service.in		\
 	po/meson.build		\
 	$(NULL)
 
