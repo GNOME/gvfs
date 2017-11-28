@@ -336,7 +336,7 @@ timeout_cb (gpointer user_data)
 
   /* we're done */
   g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_TIMED_OUT,
-                           _("Timed out running command-line `%s'"),
+                           _("Timed out running command-line “%s”"),
                            data->command_line);
   g_object_unref (task);
 
