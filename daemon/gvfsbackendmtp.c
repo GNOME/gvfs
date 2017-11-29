@@ -378,6 +378,7 @@ g_vfs_backend_mtp_init (GVfsBackendMtp *backend)
 {
   g_debug ("(I) g_vfs_backend_mtp_init\n");
   GMountSpec *mount_spec;
+  const char *debug;
 
   g_mutex_init (&backend->mutex);
   g_vfs_backend_set_display_name (G_VFS_BACKEND (backend), "mtp");
@@ -393,6 +394,22 @@ g_vfs_backend_mtp_init (GVfsBackendMtp *backend)
   backend->event_pool = g_thread_pool_new ((GFunc) handle_event,
                                            backend, 1, FALSE, NULL);
 #endif
+
+  debug = g_getenv ("GVFS_MTP_DEBUG");
+  if (debug != NULL) {
+    int level;
+
+    if (g_ascii_strcasecmp ("ptp", debug) == 0)
+      level = LIBMTP_DEBUG_PTP;
+    else if (g_ascii_strcasecmp ("usb", debug) == 0)
+      level = LIBMTP_DEBUG_USB | LIBMTP_DEBUG_PTP;
+    else if (g_ascii_strcasecmp ("data", debug) == 0)
+      level = LIBMTP_DEBUG_DATA | LIBMTP_DEBUG_USB | LIBMTP_DEBUG_PTP;
+    else /* "all" */
+      level = LIBMTP_DEBUG_ALL;
+
+    LIBMTP_Set_Debug (level);
+  }
 
   g_debug ("(I) g_vfs_backend_mtp_init done.\n");
 }
