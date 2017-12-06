@@ -178,6 +178,19 @@
       <arg type='i' name='choice' direction='in'/>
       <arg type='b' name='anonymous' direction='in'/>
     </method>
+    <method name="MountOpReply2">
+      <arg type='s' name='mount_op_id' direction='in'/>
+      <arg type='i' name='result' direction='in'/>
+      <arg type='s' name='user_name' direction='in'/>
+      <arg type='s' name='domain' direction='in'/>
+      <arg type='s' name='encoded_password' direction='in'/>
+      <arg type='i' name='password_save' direction='in'/>
+      <arg type='i' name='choice' direction='in'/>
+      <arg type='b' name='anonymous' direction='in'/>
+      <arg type='b' name='hidden_volume' direction='in'/>
+      <arg type='b' name='system_volume' direction='in'/>
+      <arg type='u' name='pim' direction='in'/>
+    </method>
   </interface>
 </node>
 
