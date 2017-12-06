@@ -1079,17 +1079,20 @@ handle_mount_unmount (GVfsRemoteVolumeMonitor *object,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static gboolean
-handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
-                       GDBusMethodInvocation *invocation,
-                       const gchar *arg_mount_op_id,
-                       gint arg_result,
-                       const gchar *arg_user_name,
-                       const gchar *arg_domain,
-                       const gchar *arg_encoded_password,
-                       gint arg_password_save,
-                       gint arg_choice,
-                       gboolean arg_anonymous,
-                       gpointer user_data)
+handle_mount_op_reply2 (GVfsRemoteVolumeMonitor *object,
+                        GDBusMethodInvocation *invocation,
+                        const gchar *arg_mount_op_id,
+                        gint arg_result,
+                        const gchar *arg_user_name,
+                        const gchar *arg_domain,
+                        const gchar *arg_encoded_password,
+                        gint arg_password_save,
+                        gint arg_choice,
+                        gboolean arg_anonymous,
+                        gboolean arg_hidden_volume,
+                        gboolean arg_system_volume,
+                        guint arg_pim,
+                        gpointer user_data)
 {
   char *decoded_password;
   gsize decoded_password_len;
@@ -1097,7 +1100,7 @@ handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
   GMountOperation *mount_operation;
   const gchar *sender;
 
-  print_debug ("in handle_mount_op_reply");
+  print_debug ("in handle_mount_op_reply2");
 
   decoded_password = NULL;
   sender = g_dbus_method_invocation_get_sender (invocation);
@@ -1137,14 +1140,50 @@ handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
   g_mount_operation_set_password_save (mount_operation, arg_password_save);
   g_mount_operation_set_choice (mount_operation, arg_choice);
   g_mount_operation_set_anonymous (mount_operation, arg_anonymous);
+  g_mount_operation_set_is_tcrypt_hidden_volume (mount_operation, arg_hidden_volume);
+  g_mount_operation_set_is_tcrypt_system_volume (mount_operation, arg_system_volume);
+  g_mount_operation_set_pim (mount_operation, arg_pim);
 
   g_mount_operation_reply (mount_operation, arg_result);
 
-  gvfs_remote_volume_monitor_complete_mount_op_reply (object, invocation);
+  /* gvfs_remote_volume_monitor_complete_mount_op_reply2 should be
+   * identical to gvfs_remote_volume_monitor_complete_mount_op_reply,
+   * so it should be ok that we call this from handle_mount_op_reply too.
+   */
+  gvfs_remote_volume_monitor_complete_mount_op_reply2 (object, invocation);
 
  out:
   g_free (decoded_password);
   return TRUE;
+}
+
+static gboolean
+handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
+                       GDBusMethodInvocation *invocation,
+                       const gchar *arg_mount_op_id,
+                       gint arg_result,
+                       const gchar *arg_user_name,
+                       const gchar *arg_domain,
+                       const gchar *arg_encoded_password,
+                       gint arg_password_save,
+                       gint arg_choice,
+                       gboolean arg_anonymous,
+                       gpointer user_data)
+{
+  return handle_mount_op_reply2 (object,
+                                 invocation,
+                                 arg_mount_op_id,
+                                 arg_result,
+                                 arg_user_name,
+                                 arg_domain,
+                                 arg_encoded_password,
+                                 arg_password_save,
+                                 arg_choice,
+                                 arg_anonymous,
+                                 FALSE,
+                                 FALSE,
+                                 0,
+                                 user_data);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1926,6 +1965,7 @@ bus_acquired_handler_cb (GDBusConnection *conn,
       g_signal_connect (monitor_daemon, "handle-drive-start", G_CALLBACK (handle_drive_start), NULL);
       g_signal_connect (monitor_daemon, "handle-drive-stop", G_CALLBACK (handle_drive_stop), NULL);
       g_signal_connect (monitor_daemon, "handle-mount-op-reply", G_CALLBACK (handle_mount_op_reply), NULL);
+      g_signal_connect (monitor_daemon, "handle-mount-op-reply2", G_CALLBACK (handle_mount_op_reply2), NULL);
       g_signal_connect (monitor_daemon, "handle-mount-unmount", G_CALLBACK (handle_mount_unmount), NULL);
       g_signal_connect (monitor_daemon, "handle-volume-mount", G_CALLBACK (handle_volume_mount), NULL);
     }
