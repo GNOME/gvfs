@@ -136,6 +136,9 @@ mount_operation_reply (GMountOperation        *mount_operation,
   gint password_save;
   gint choice;
   gboolean anonymous;
+  gboolean hidden_volume;
+  gboolean system_volume;
+  guint pim;
   
   user_name     = g_mount_operation_get_username (mount_operation);
   domain        = g_mount_operation_get_domain (mount_operation);
@@ -143,6 +146,9 @@ mount_operation_reply (GMountOperation        *mount_operation,
   password_save = g_mount_operation_get_password_save (mount_operation);
   choice        = g_mount_operation_get_choice (mount_operation);
   anonymous     = g_mount_operation_get_anonymous (mount_operation);
+  hidden_volume = g_mount_operation_get_hidden_volume (mount_operation);
+  system_volume = g_mount_operation_get_system_volume (mount_operation);
+  pim           = g_mount_operation_get_pim (mount_operation);
 
   if (user_name == NULL)
     user_name = "";
@@ -166,6 +172,9 @@ mount_operation_reply (GMountOperation        *mount_operation,
                                                   password_save,
                                                   choice,
                                                   anonymous,
+                                                  hidden_volume,
+                                                  system_volume,
+                                                  pim,
                                                   NULL,
                                                   (GAsyncReadyCallback) mount_op_reply_cb,
                                                   data);

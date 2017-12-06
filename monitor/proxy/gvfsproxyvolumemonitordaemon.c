@@ -1089,6 +1089,9 @@ handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
                        gint arg_password_save,
                        gint arg_choice,
                        gboolean arg_anonymous,
+                       gboolean arg_hidden_volume,
+                       gboolean arg_system_volume,
+                       guint arg_pim,
                        gpointer user_data)
 {
   char *decoded_password;
@@ -1137,6 +1140,9 @@ handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
   g_mount_operation_set_password_save (mount_operation, arg_password_save);
   g_mount_operation_set_choice (mount_operation, arg_choice);
   g_mount_operation_set_anonymous (mount_operation, arg_anonymous);
+  g_mount_operation_set_hidden_volume (mount_operation, arg_hidden_volume);
+  g_mount_operation_set_system_volume (mount_operation, arg_system_volume);
+  g_mount_operation_set_pim (mount_operation, arg_pim);
 
   g_mount_operation_reply (mount_operation, arg_result);
 
