@@ -91,6 +91,9 @@ typedef struct MountData
   GMountOperation *mount_operation;
 
   gchar *passphrase;
+  gboolean hidden_volume;
+  gboolean system_volume;
+  guint pim;
 
   gchar *passphrase_from_keyring;
   GPasswordSave password_save;
@@ -290,7 +293,7 @@ update_volume (GVfsUDisks2Volume *volume)
         {
           volume->name = g_strdup (udisks_block_get_id_label (block));
         }
-      else if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_LUKS") == 0)
+      else if (g_strcmp0 (udisks_block_get_id_usage (block), "crypto") == 0)
         {
           s = udisks_client_get_size_for_display (udisks_client, udisks_block_get_size (volume->block), FALSE, FALSE);
           /* Translators: This is used for encrypted volumes.
@@ -499,7 +502,7 @@ update_volume (GVfsUDisks2Volume *volume)
         }
 
       /* Add an emblem, depending on whether the encrypted volume is locked or unlocked */
-      if (g_strcmp0 (udisks_block_get_id_type (volume->block), "crypto_LUKS") == 0)
+      if (g_strcmp0 (udisks_block_get_id_usage (volume->block), "crypto") == 0)
         {
           GEmblem *emblem;
           GIcon *padlock;
@@ -666,8 +669,8 @@ gvfs_udisks2_volume_new (GVfsUDisks2VolumeMonitor   *monitor,
 
   update_volume (volume);
 
-  /* For LUKS devices, we also need to listen for changes on any possible cleartext device */
-  if (volume->block != NULL && g_strcmp0 (udisks_block_get_id_type (volume->block), "crypto_LUKS") == 0)
+  /* For encrypted devices, we also need to listen for changes on any possible cleartext device */
+  if (volume->block != NULL && g_strcmp0 (udisks_block_get_id_usage (volume->block), "crypto") == 0)
     {
       g_signal_connect (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
                         "changed",
@@ -1313,6 +1316,9 @@ on_mount_operation_reply (GMountOperation       *mount_operation,
 
   data->passphrase = g_strdup (g_mount_operation_get_password (mount_operation));
   data->password_save = g_mount_operation_get_password_save (mount_operation);
+  data->hidden_volume = g_mount_operation_get_is_tcrypt_hidden_volume (mount_operation);
+  data->system_volume = g_mount_operation_get_is_tcrypt_system_volume (mount_operation);
+  data->pim = g_mount_operation_get_pim (mount_operation);
 
   /* Don't save password in keyring just yet - check if it works first */
 
@@ -1386,7 +1392,12 @@ static void
 do_unlock (GTask *task)
 {
   MountData *data = g_task_get_task_data (task);
+  GVfsUDisks2Volume *volume = g_task_get_source_object (task);
   GVariantBuilder builder;
+  gboolean handle_as_tcrypt;
+
+  handle_as_tcrypt = g_strcmp0 (udisks_block_get_id_type (volume->block), "crypto_TCRYPT") == 0 ||
+                     g_strcmp0 (udisks_block_get_id_type (volume->block), "crypto_unknown") == 0;
 
   if (data->passphrase == NULL)
     {
@@ -1398,6 +1409,7 @@ do_unlock (GTask *task)
       else
         {
           gchar *message;
+          GAskPasswordFlags  pw_ask_flags;
 
 #ifdef HAVE_KEYRING
           /* check if the passphrase is in the user's keyring */
@@ -1429,9 +1441,18 @@ do_unlock (GTask *task)
                                                                        G_CALLBACK (on_mount_operation_aborted),
                                                                        task);
           /* Translators: This is the message shown to users */
-          message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
-                                       "The passphrase is needed to access encrypted data on %s."),
-                                     data->desc_of_encrypted_to_unlock);
+          if (handle_as_tcrypt)
+            message = g_strdup_printf (_("Set options to unlock the volume\n"
+                                         "The volume %s might be a VeraCrypt volume as it contains random data."),
+                                       data->desc_of_encrypted_to_unlock);
+          else
+            message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
+                                         "The passphrase is needed to access encrypted data on %s."),
+                                       data->desc_of_encrypted_to_unlock);
+
+          pw_ask_flags = G_ASK_PASSWORD_NEED_PASSWORD | G_ASK_PASSWORD_SAVING_SUPPORTED;
+          if (handle_as_tcrypt)
+            pw_ask_flags |= G_ASK_PASSWORD_TCRYPT;
 
           /* NOTE: We (currently) don't offer the user to save the
            * passphrase in the keyring or /etc/crypttab - compared to
@@ -1453,8 +1474,7 @@ do_unlock (GTask *task)
                                  message,
                                  NULL,
                                  NULL,
-                                 G_ASK_PASSWORD_NEED_PASSWORD |
-                                 G_ASK_PASSWORD_SAVING_SUPPORTED);
+                                 pw_ask_flags);
           g_free (message);
           goto out;
         }
@@ -1467,6 +1487,20 @@ do_unlock (GTask *task)
                              "{sv}",
                              "auth.no_user_interaction", g_variant_new_boolean (TRUE));
     }
+
+  if (handle_as_tcrypt)
+    {
+      g_variant_builder_add (&builder,
+                             "{sv}",
+                             "hidden", g_variant_new_boolean (data->hidden_volume));
+      g_variant_builder_add (&builder,
+                             "{sv}",
+                             "system", g_variant_new_boolean (data->system_volume));
+      g_variant_builder_add (&builder,
+                             "{sv}",
+                             "pim", g_variant_new_uint32 (data->pim));
+    }
+
   udisks_encrypted_call_unlock (data->encrypted_to_unlock,
                                 data->passphrase,
                                 g_variant_builder_end (&builder),

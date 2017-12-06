@@ -869,7 +869,7 @@ should_include_volume (GVfsUDisks2VolumeMonitor *monitor,
     }
 
   /* show encrypted volumes... */
-  if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_LUKS") == 0)
+  if (g_strcmp0 (udisks_block_get_id_usage (block), "crypto") == 0)
     {
       UDisksBlock *cleartext_block;
       /* ... unless the volume is unlocked and we don't want to show the cleartext volume */
