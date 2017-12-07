@@ -583,8 +583,10 @@ g_vfs_backend_add_auto_info (GVfsBackend *backend,
     }
 
   if (uri != NULL &&
-      g_file_attribute_matcher_matches (matcher,
-					G_FILE_ATTRIBUTE_THUMBNAIL_PATH))
+      (g_file_attribute_matcher_matches (matcher,
+                                         G_FILE_ATTRIBUTE_THUMBNAIL_PATH) ||
+       g_file_attribute_matcher_matches (matcher,
+                                         G_FILE_ATTRIBUTE_THUMBNAILING_FAILED)))
     get_thumbnail_attributes (uri, info);
   
 }
