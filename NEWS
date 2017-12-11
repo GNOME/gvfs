@@ -1,3 +1,10 @@
+Major changes in 1.35.3
+=======================
+* mtp: Handle read-past-EOF ourselves to prevent hangs
+* Port several parts to GTask
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.35.2
 =======================
 * metadata: Remove udev dependency in favor of gudev
