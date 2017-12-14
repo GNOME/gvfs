@@ -561,9 +561,10 @@ reload_recent_items (GVfsBackendRecent *backend)
   g_list_free (added);
 
   /* process changes */
-  for (l = changed; l; l = l->next)
+  if (monitor)
     {
-      g_vfs_monitor_emit_event (monitor, G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED, l->data, NULL);
+      for (l = changed; l; l = l->next)
+        g_vfs_monitor_emit_event (monitor, G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED, l->data, NULL);
     }
   g_list_free (changed);
 
