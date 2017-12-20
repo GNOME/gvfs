@@ -1525,9 +1525,12 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
   GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
   GDBusObject *object;
   UDisksBlock *block;
+  UDisksClient *client;
   UDisksFilesystem *filesystem;
   MountData *data;
   GTask *task;
+
+  client = gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor);
 
   task = g_task_new (volume, cancellable, callback, user_data);
   g_task_set_source_tag (task, gvfs_udisks2_volume_mount);
@@ -1562,8 +1565,7 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
     }
 
   /* if encrypted and already unlocked, just mount the cleartext block device */
-  block = udisks_client_get_cleartext_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
-                                             volume->block);
+  block = udisks_client_get_cleartext_block (client, volume->block);
   if (block != NULL)
     g_object_unref (block);
   else
@@ -1593,8 +1595,7 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
            * gives us, since this is going to be used to refer to the device even
            * when not plugged in
            */
-          udisks_drive = udisks_client_get_drive_for_block (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
-                                                            block);
+          udisks_drive = udisks_client_get_drive_for_block (client, block);
           if (udisks_drive != NULL)
             {
               gchar *drive_name = NULL;
@@ -1605,8 +1606,7 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
                 UDisksObject *object = (UDisksObject *) g_dbus_interface_get_object (G_DBUS_INTERFACE (udisks_drive));
                 if (object != NULL)
                   {
-                    UDisksObjectInfo *info = udisks_client_get_object_info (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
-                                                                            object);
+                    UDisksObjectInfo *info = udisks_client_get_object_info (client, object);
                     if (info != NULL)
                       {
                         drive_name = g_strdup (udisks_object_info_get_name (info));
@@ -1616,7 +1616,7 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
                   }
               }
 #else
-              udisks_client_get_drive_info (gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor),
+              udisks_client_get_drive_info (client,
                                             udisks_drive,
                                             &drive_name,
                                             &drive_desc,
@@ -1637,7 +1637,11 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
             }
           else
             {
-              data->desc_of_encrypted_to_unlock = udisks_block_dup_preferred_device (block);
+              UDisksLoop *loop = udisks_client_get_loop_for_block (client, block);
+              if (loop != NULL)
+                data->desc_of_encrypted_to_unlock = udisks_loop_dup_backing_file (loop);
+              else
+                data->desc_of_encrypted_to_unlock = udisks_block_dup_preferred_device (block);
             }
           data->uuid_of_encrypted_to_unlock = udisks_block_dup_id_uuid (block);
 
