@@ -89,10 +89,29 @@ config_h.set('HAVE_OPENPTY', have_openpty,
 config_h.set('HAVE_LOGIN_TTY', util_dep.found() and cc.has_function('login_tty', dependencies: util_dep),
              description: 'Whether login_tty is available')
 
+# headers
+check_headers = [
+  # fs + pty
+  ['HAVE_SYS_PARAM_H', 'sys/param.h'],
+  # fs
+  ['HAVE_SYS_MOUNT_H', 'sys/mount.h'],
+  ['HAVE_SYS_STATFS_H', 'sys/statfs.h'],
+  ['HAVE_SYS_STATVFS_H', 'sys/statvfs.h'],
+  ['HAVE_SYS_VFS_H', 'sys/vfs.h']
+]
+
+statfs_includes = ''
+
+foreach header: check_headers
+  has_header = cc.has_header(header[1])
+  config_h.set10(header[0], has_header)
+  if has_header
+    statfs_includes += '#include <@0@>\n'.format(header[1])
+  endif
+endforeach
+
 # if statfs() takes 2 arguments (Posix) or 4 (Solaris)
-statfs_code = '''
-  #include <sys/statfs.h>
-  #include <sys/vfs.h>
+statfs_code = statfs_includes + '''
   int main() {
     struct statfs st;
     @0@;
@@ -106,21 +125,6 @@ elif cc.compiles(statfs_code.format('statfs("/", &st, sizeof (st), 0)'))
 else
   error('unable to determine number of arguments to statfs()')
 endif
-
-# headers
-check_headers = [
-  # fs + pty
-  ['HAVE_SYS_PARAM_H', 'sys/param.h'],
-  # fs
-  ['HAVE_SYS_MOUNT_H', 'sys/mount.h'],
-  ['HAVE_SYS_STATFS_H', 'sys/statfs.h'],
-  ['HAVE_SYS_STATVFS_H', 'sys/statvfs.h'],
-  ['HAVE_SYS_VFS_H', 'sys/vfs.h']
-]
-
-foreach header: check_headers
-  config_h.set10(header[0], cc.has_header(header[1]))
-endforeach
 
 # pty
 check_headers = [
