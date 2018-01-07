@@ -136,10 +136,12 @@ get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
 static void
 gudev_add_device (GMtpVolumeMonitor *monitor, GUdevDevice *device, gboolean do_emit)
 {
+  GList *l;
   GMtpVolume *volume;
-  const char *usb_bus_num, *usb_device_num, *device_path;
+  const char *usb_serial_id, *device_path;
   char *uri;
   GFile *activation_mount_root;
+  gboolean serial_conflict = FALSE;
 
   device_path = g_udev_device_get_device_file (device);
   if (!device_path) {
@@ -148,25 +150,44 @@ gudev_add_device (GMtpVolumeMonitor *monitor, GUdevDevice *device, gboolean do_e
     return;
   }
 
-  usb_bus_num = g_udev_device_get_property (device, "BUSNUM");
-  if (usb_bus_num == NULL) {
-    g_warning ("device %s has no BUSNUM property, ignoring", device_path);
+  /*
+   * We do not use ID_SERIAL_SHORT (the actualy device serial value) as
+   * this field is not populated when an ID_SERIAL has to be synthesized.
+   */
+  usb_serial_id = g_udev_device_get_property (device, "ID_SERIAL");
+  if (usb_serial_id == NULL) {
+    g_warning ("device %s has no ID_SERIAL property, ignoring", device_path);
     return;
   }
 
-  usb_device_num = g_udev_device_get_property (device, "DEVNUM");
-  if (usb_device_num == NULL) {
-    g_warning ("device %s has no DEVNUM property, ignoring", device_path);
-    return;
-  }
-
-  g_debug ("gudev_add_device: device %s (bus: %s, device: %s)",
-           g_udev_device_get_device_file (device),
-           usb_bus_num, usb_device_num);
-
-  uri = g_strdup_printf ("mtp://[usb:%s,%s]", usb_bus_num, usb_device_num);
+  uri = g_strdup_printf ("mtp://%s", usb_serial_id);
   activation_mount_root = g_file_new_for_uri (uri);
   g_free (uri);
+
+  /*
+   * We do not support plugging in multiple devices that lack proper serial
+   * numbers. Linux will attempt to synthesize an ID based on the device
+   * product information, which will avoid collisions between different
+   * types of device, but two identical, serial-less, devices will still
+   * conflict.
+   */
+  for (l = monitor->device_volumes; l != NULL; l = l->next) {
+    GMtpVolume *volume = G_MTP_VOLUME (l->data);
+
+    GFile *existing_root = g_volume_get_activation_root (G_VOLUME (volume));
+    if (g_file_equal (activation_mount_root, existing_root)) {
+      serial_conflict = TRUE;
+    }
+    g_object_unref (existing_root);
+
+    if (serial_conflict) {
+      g_warning ("device %s has an identical ID_SERIAL value to an "
+                 "existing device. Multiple devices are not supported.",
+                 g_udev_device_get_device_file (device));
+      g_object_unref (activation_mount_root);
+      return;
+    }
+  }
 
   volume = g_mtp_volume_new (G_VOLUME_MONITOR (monitor),
                              device,

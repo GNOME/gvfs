@@ -586,7 +586,7 @@ fail_job (GVfsJob *job, LIBMTP_mtpdevice_t *device)
  ************************************************/
 
 static LIBMTP_mtpdevice_t *
-get_device (GVfsBackend *backend, const char *id, GVfsJob *job);
+get_device (GVfsBackend *backend, uint32_t bus_num, uint32_t dev_num , GVfsJob *job);
 
 
 static void
@@ -851,40 +851,61 @@ static char *
 get_dev_path_and_device_from_host (GVfsJob *job,
                                    GUdevClient *gudev_client,
                                    const char *host,
+                                   uint32_t *bus_num,
+                                   uint32_t *dev_num,
                                    GUdevDevice **device)
 {
-  /* turn usb:001,041 string into an udev device name */
-  if (!g_str_has_prefix (host, "[usb:")) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
-                              G_IO_ERROR_NOT_SUPPORTED,
-                              _("Unexpected host URI format."));
-    return NULL;
-  }
+  GList *devices, *l;
+  g_debug ("(II) get_dev_path_from_host: %s\n", host);
 
-  char *comma;
-  char *dev_path = g_strconcat ("/dev/bus/usb/", host + 5, NULL);
-  if ((comma = strchr (dev_path, ',')) == NULL) {
-    g_free (dev_path);
-    g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
-                              G_IO_ERROR_NOT_SUPPORTED,
-                              _("Malformed host URI."));
-    return NULL;
-  }
-  *comma = '/';
-  dev_path[strlen (dev_path) -1] = '\0';
-  g_debug ("(II) get_dev_path_from_host: Parsed '%s' into device name %s\n", host, dev_path);
+  *device = NULL;
 
   /* find corresponding GUdevDevice */
-  *device = g_udev_client_query_by_device_file (gudev_client, dev_path);
-  if (!*device) {
-    g_free (dev_path);
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("Couldn’t find matching udev device."));
-    return NULL;
+  devices = g_udev_client_query_by_subsystem (gudev_client, "usb");
+  for (l = devices; l != NULL; l = l->next) {
+    const char *id = g_udev_device_get_property (l->data, "ID_SERIAL");
+    if (g_strcmp0 (id, host) == 0) {
+      *device = g_object_ref (l->data);
+      *bus_num = g_ascii_strtoull (g_udev_device_get_property (l->data, "BUSNUM"),
+                                   NULL, 10);
+      *dev_num = g_ascii_strtoull (g_udev_device_get_property (l->data, "DEVNUM"),
+                                   NULL, 10);
+      break;
+    }
+  }
+  g_list_free_full (devices, g_object_unref);
+
+  if (*device) {
+    return g_strdup_printf ("/dev/bus/usb/%03u/%03u", *bus_num, *dev_num);
   }
 
-  return dev_path;
+  /* For compatibility, handle old style host specifications. */
+  if (g_str_has_prefix (host, "[usb:")) {
+    /* Split [usb:001,002] into: '[usb', '001', '002', '' */
+    char **elements = g_strsplit_set (host, ":,]", -1);
+    if (g_strv_length (elements) == 4 && elements[3][0] == '\0') {
+      *bus_num = g_ascii_strtoull (elements[1], NULL, 10);
+      *dev_num = g_ascii_strtoull (elements[2], NULL, 10);
+
+      /* These values are non-zero, so zero means a parsing error. */
+      if (*bus_num != 0 && *dev_num != 0) {
+        char *dev_path = g_strdup_printf ("/dev/bus/usb/%s/%s",
+                                          elements[1], elements[2]);
+        *device = g_udev_client_query_by_device_file (gudev_client, dev_path);
+        if (*device) {
+          g_strfreev (elements);
+          return dev_path;
+        }
+        g_free (dev_path);
+      }
+    }
+    g_strfreev (elements);
+  }
+
+  g_vfs_job_failed_literal (G_VFS_JOB (job),
+                            G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                            _("Couldn’t find matching udev device."));
+  return NULL;
 }
 
 static void
@@ -896,6 +917,7 @@ do_mount (GVfsBackend *backend,
 {
   GVfsBackendMtp *op_backend = G_VFS_BACKEND_MTP (backend);
   GUdevDevice *device;
+  uint32_t bus_num, dev_num;
 
   g_debug ("(I) do_mount\n");
 
@@ -918,6 +940,8 @@ do_mount (GVfsBackend *backend,
   char *dev_path = get_dev_path_and_device_from_host (G_VFS_JOB (job),
                                                       op_backend->gudev_client,
                                                       host,
+                                                      &bus_num,
+                                                      &dev_num,
                                                       &device);
   if (dev_path == NULL) {
     g_object_unref (op_backend->gudev_client);
@@ -933,7 +957,7 @@ do_mount (GVfsBackend *backend,
 
   LIBMTP_Init ();
 
-  get_device (backend, host, G_VFS_JOB (job));
+  get_device (backend, bus_num, dev_num, G_VFS_JOB (job));
   if (!G_VFS_JOB (job)->failed) {
     g_signal_connect (op_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), op_backend);
 
@@ -1041,8 +1065,9 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
  * Called with backend mutex lock held.
  */
 LIBMTP_mtpdevice_t *
-get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
-  g_debug ("(II) get_device: %s\n", id);
+get_device (GVfsBackend *backend, uint32_t bus_num, uint32_t dev_num,
+            GVfsJob *job) {
+  g_debug ("(II) get_device: %u,%u\n", bus_num, dev_num);
 
   LIBMTP_mtpdevice_t *device = NULL;
 
@@ -1085,30 +1110,23 @@ get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
   /* Iterate over connected MTP devices */
   int i;
   for (i = 0; i < numrawdevices; i++) {
-    char *name;
-    name = g_strdup_printf ("[usb:%03u,%03u]",
-                            rawdevices[i].bus_location,
-                            rawdevices[i].devnum);
-
-    if (strcmp (id, name) == 0) {
+    if (rawdevices[i].bus_location == bus_num &&
+        rawdevices[i].devnum == dev_num) {
       device = LIBMTP_Open_Raw_Device_Uncached (&rawdevices[i]);
       if (device == NULL) {
         g_vfs_job_failed (G_VFS_JOB (job),
                           G_IO_ERROR, G_IO_ERROR_FAILED,
-                          _("Unable to open MTP device “%s”"), name);
-        g_free (name);
+                          _("Unable to open MTP device “%03u,%03u”"),
+                          bus_num, dev_num);
         goto exit;
       }
 
-      g_debug ("(II) get_device: Storing device %s\n", name);
+      g_debug ("(II) get_device: Storing device %03u,%03u\n", bus_num, dev_num);
       G_VFS_BACKEND_MTP (backend)->device = device;
 
       LIBMTP_Dump_Errorstack (device);
       LIBMTP_Clear_Errorstack (device);
-      g_free (name);
       break;
-    } else {
-      g_free (name);
     }
   }
 
