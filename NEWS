@@ -1,3 +1,10 @@
+Major changes in 1.35.4
+=======================
+* recent: Prevent crash when recent file changed
+* trash: Fix trash::orig-path for relative paths
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.35.3
 =======================
 * mtp: Handle read-past-EOF ourselves to prevent hangs
