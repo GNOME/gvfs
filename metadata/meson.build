@@ -64,15 +64,20 @@ libmetadata_dep = declare_dependency(
   dependencies: glib_deps
 )
 
+metadata_deps = [
+  libmetadata_dep,
+  libgvfscommon_dep
+]
+
+if enable_gudev
+  metadata_deps += gudev_dep
+endif
+
 executable(
   'gvfsd-metadata',
   'meta-daemon.c',
   include_directories: top_inc,
-  dependencies: [
-    libgvfscommon_dep,
-    libmetadata_dep,
-    gudev_dep
-  ],
+  dependencies: metadata_deps,
   c_args: cflags,
   install: true,
   install_rpath: gvfs_rpath,
@@ -93,8 +98,8 @@ if enable_devel_utils
       app + '.c',
       include_directories: top_inc,
       dependencies: [
-        libgvfscommon_dep,
-        libmetadata_dep
+        libmetadata_dep,
+        libgvfscommon_dep
       ],
       c_args: cflags
     )
