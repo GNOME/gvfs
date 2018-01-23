@@ -362,6 +362,7 @@ endif
 # *** Check for udisks2 ***
 enable_udisks2 = get_option('udisks2')
 if enable_udisks2
+  assert(enable_gudev, 'UDisks2 requested but gudev is required')
   udisks2_dep = dependency('udisks2', version: '>= 1.97')
 endif
 
