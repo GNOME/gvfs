@@ -46,11 +46,14 @@ sources = files(
 
 deps = glib_deps + [
   gdu_dep,
-  gudev_dep,
   libgvfscommon_dep,
   libgvfscommon_monitor_dep,
   libgvfsproxyvolumemonitordaemon_noin_dep
 ]
+
+if enable_gudev
+  deps += gudev_dep
+endif
 
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-Gdu"',
