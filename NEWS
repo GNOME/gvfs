@@ -1,3 +1,8 @@
+Major changes in 1.35.90
+========================
+* build: Several FreeBSD related fixes
+* Translation updates
+
 Major changes in 1.35.4
 =======================
 * recent: Prevent crash when recent file changed
