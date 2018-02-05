@@ -1,6 +1,6 @@
 project(
   'gvfs', 'c',
-  version: '1.35.90',
+  version: '1.35.91',
   license: 'LGPL2+',
   default_options: [
     'b_lundef=true',
