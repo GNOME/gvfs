@@ -868,6 +868,21 @@ generate_copy_name (GVfsBackendGoogle *self, GDataEntry *entry)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static gboolean
+is_native_file (GDataEntry *entry)
+{
+  gchar *content_type;
+  gboolean ret = FALSE;
+
+  content_type = get_content_type_from_entry (entry);
+  if (content_type != NULL && g_str_has_prefix (content_type, CONTENT_TYPE_PREFIX_GOOGLE))
+    ret = TRUE;
+
+  g_free (content_type);
+
+  return ret;
+}
+
 static void
 build_file_info (GVfsBackendGoogle      *self,
                  GDataEntry             *entry,
@@ -930,7 +945,7 @@ build_file_info (GVfsBackendGoogle      *self,
       file_type = G_FILE_TYPE_REGULAR;
 
       /* We want native Drive content to open in the browser. */
-      if (content_type != NULL && g_str_has_prefix (content_type, CONTENT_TYPE_PREFIX_GOOGLE))
+      if (is_native_file (entry))
         {
           GDataLink *alternate;
           const gchar *uri;
@@ -1819,6 +1834,14 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
                   goto out;
                 }
             }
+          else if (is_native_file (existing_entry))
+            {
+              g_vfs_job_failed (G_VFS_JOB (job),
+                                G_IO_ERROR,
+                                G_IO_ERROR_NOT_REGULAR_FILE,
+                                _("Target file is not a regular file"));
+              goto out;
+            }
           else
             {
               if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
@@ -2649,7 +2672,7 @@ g_vfs_backend_google_replace (GVfsBackend         *_self,
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY, _("Target file is a directory"));
           goto out;
         }
-      else if (!GDATA_IS_DOCUMENTS_DOCUMENT (existing_entry))
+      else if (is_native_file (existing_entry))
         {
           g_vfs_job_failed (G_VFS_JOB (job),
                             G_IO_ERROR,
