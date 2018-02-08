@@ -72,9 +72,12 @@ mount -n -t tmpfs tmpfs $MNT
 # prepare overlay directories and copy essential configuration
 mkdir -p $MNT/etc/samba $MNT/var/lib/samba/private $MNT/var/cache/samba $MNT/var/log/samba $MNT/home/$CALLING_USER/run $MNT/run_samba $MNT/media
 touch $MNT/etc/fstab $MNT/home/gvfs_sandbox_marker
-cp -a /etc/passwd /etc/shadow /etc/group /etc/hosts /etc/pam* /etc/nsswitch.conf /etc/security/ /etc/init /etc/init.d /etc/systemd /etc/login.defs /etc/dbus-1 /etc/polkit-1 $MNT/etc/
+cp -a /etc/passwd /etc/shadow /etc/group /etc/hosts /etc/pam* /etc/nsswitch.conf /etc/security/ /etc/init.d /etc/systemd /etc/login.defs /etc/dbus-1 /etc/polkit-1 $MNT/etc/
 if [ -d /etc/selinux ]; then
     cp -a /etc/selinux $MNT/etc/
+fi
+if [ -d /etc/init ]; then
+    cp -a /etc/init $MNT/etc/
 fi
 chown -R $CALLING_USER:$CALLING_GROUP $MNT/home/$CALLING_USER
 # ensure we can resolve our hostname
