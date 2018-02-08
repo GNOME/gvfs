@@ -408,7 +408,7 @@ g_proxy_mount_eject_with_operation (GMount              *mount,
     {
       EjectWrapperOp *data;
       data = g_new0 (EjectWrapperOp, 1);
-      data->object = g_object_ref (mount);
+      data->object = G_OBJECT (g_object_ref (mount));
       data->callback = callback;
       data->user_data = user_data;
       g_drive_eject_with_operation (drive, flags, mount_operation, cancellable, eject_wrapper_callback, data);

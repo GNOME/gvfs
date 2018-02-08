@@ -1468,7 +1468,7 @@ try_close_write (GVfsBackend *backend,
   GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (backend);
   WriteHandle *handle = _handle;
 
-  handle->job = g_object_ref (job);
+  handle->job = G_VFS_JOB (g_object_ref (job));
   nfs_fstat64_async (op_backend->ctx, handle->fh, close_stat_cb, handle);
 
   return TRUE;

@@ -809,7 +809,7 @@ gvfs_udisks2_volume_get_drive (GVolume *volume)
   GDrive *drive = NULL;
 
   if (gdu_volume->drive != NULL)
-    drive = g_object_ref (gdu_volume->drive);
+    drive = G_DRIVE (g_object_ref (gdu_volume->drive));
   return drive;
 }
 
@@ -820,7 +820,7 @@ gvfs_udisks2_volume_get_mount (GVolume *volume)
   GMount *mount = NULL;
 
   if (gdu_volume->mount != NULL)
-    mount = g_object_ref (gdu_volume->mount);
+    mount = G_MOUNT (g_object_ref (gdu_volume->mount));
   return mount;
 }
 

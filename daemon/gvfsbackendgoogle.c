@@ -1866,7 +1866,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
 
   if (needs_overwrite)
     {
-      document = g_object_ref (existing_entry);
+      document = GDATA_DOCUMENTS_DOCUMENT (g_object_ref (existing_entry));
       title = gdata_entry_get_title (existing_entry);
 
       error = NULL;

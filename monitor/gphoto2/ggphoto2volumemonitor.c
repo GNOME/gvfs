@@ -283,7 +283,7 @@ g_gphoto2_volume_monitor_constructor (GType                  type,
   G_LOCK (gphoto2_vm);
   if (the_volume_monitor != NULL)
     {
-      object = g_object_ref (the_volume_monitor);
+      object = G_OBJECT (g_object_ref (the_volume_monitor));
       G_UNLOCK (gphoto2_vm);
       return object;
     }

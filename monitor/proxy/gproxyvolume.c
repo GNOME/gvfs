@@ -592,7 +592,7 @@ g_proxy_volume_get_mount (GVolume *volume)
 
   if (proxy_volume->shadow_mount != NULL)
     {
-      mount = g_object_ref (proxy_volume->shadow_mount);
+      mount = G_MOUNT (g_object_ref (proxy_volume->shadow_mount));
     }
   else if (proxy_volume->mount_id != NULL && strlen (proxy_volume->mount_id) > 0)
     {
@@ -648,7 +648,7 @@ g_proxy_volume_eject_with_operation (GVolume             *volume,
     {
       EjectWrapperOp *data;
       data = g_new0 (EjectWrapperOp, 1);
-      data->object = g_object_ref (volume);
+      data->object = G_OBJECT (g_object_ref (volume));
       data->callback = callback;
       data->user_data = user_data;
       g_drive_eject_with_operation (G_DRIVE (drive), flags, mount_operation, cancellable, eject_wrapper_callback, data);

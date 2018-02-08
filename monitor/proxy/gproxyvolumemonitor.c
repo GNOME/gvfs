@@ -336,7 +336,7 @@ get_mount_for_mount_path (const char *mount_path,
       while (g_hash_table_iter_next (&vol_hash_iter, NULL, (gpointer) &candidate_mount)) {
         if (g_proxy_mount_has_mount_path (candidate_mount, mount_path))
           {
-            mount = g_object_ref (candidate_mount);
+            mount = G_MOUNT (g_object_ref (candidate_mount));
             goto out;
           }
       }

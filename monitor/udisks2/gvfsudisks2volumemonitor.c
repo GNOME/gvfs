@@ -267,7 +267,7 @@ get_mount_for_mount_path (const gchar  *mount_path,
           GVfsUDisks2Mount *mount = GVFS_UDISKS2_MOUNT (l->data);
           if (g_strcmp0 (gvfs_udisks2_mount_get_mount_path (mount), mount_path) == 0)
             {
-              ret = g_object_ref (mount);
+              ret = G_MOUNT (g_object_ref (mount));
               goto out;
             }
         }
@@ -289,7 +289,7 @@ gvfs_udisks2_volume_monitor_constructor (GType                  type,
 
   if (the_volume_monitor != NULL)
     {
-      ret = g_object_ref (the_volume_monitor);
+      ret = G_OBJECT (g_object_ref (the_volume_monitor));
       goto out;
     }
 

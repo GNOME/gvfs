@@ -267,7 +267,7 @@ g_proxy_shadow_mount_get_volume (GMount *mount)
   GVolume *volume;
 
   G_LOCK (proxy_shadow_mount);
-  volume = g_object_ref (proxy_shadow_mount->volume);
+  volume = G_VOLUME (g_object_ref (proxy_shadow_mount->volume));
   G_UNLOCK (proxy_shadow_mount);
 
   return volume;
@@ -325,7 +325,7 @@ setup_async_wrapper (GMount *mount,
   AsyncWrapperOp *data;
   
   data = g_new0 (AsyncWrapperOp, 1);
-  data->object = g_object_ref (mount);
+  data->object = G_OBJECT (g_object_ref (mount));
   data->callback = callback;
   data->user_data = user_data;
   return data;
