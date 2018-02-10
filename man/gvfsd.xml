@@ -48,7 +48,7 @@
 
                 <para>The primary task of <command>gvfsd</command> is to
                 act as a mount tracker/manager. It spawns new backends
-                when requested and keeps track fo their lifecycle,
+                when requested and keeps track of their lifecycle,
                 maintaining a list of active mounts and creates direct
                 connections to them.</para>
 
