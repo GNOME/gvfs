@@ -7,15 +7,15 @@
 # Necdet Yücel <necdetyucel@gmail.com>, 2015.
 # Muhammet Kara <muhammetk@gmail.com>, 2011, 2014, 2015, 2016.
 # Çağatay Yiğit Şahin <cyigitsahin@outlook.com>, 2016.
-# Emin Tufan Çetin <etcetin@gmail.com>, 2017.
+# Emin Tufan Çetin <etcetin@gmail.com>, 2017, 2018.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-07-21 16:40+0300\n"
-"PO-Revision-Date: 2017-07-28 09:20+0300\n"
+"POT-Creation-Date: 2017-11-28 15:58+0000\n"
+"PO-Revision-Date: 2018-01-21 12:09+0300\n"
 "Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>\n"
 "Language-Team: Türkçe <gnome-turk@gnome.org>\n"
 "Language: tr\n"
@@ -26,57 +26,57 @@ msgstr ""
 "X-Generator: Gtranslator 2.91.7\n"
 "X-POOTLE-MTIME: 1434405906.000000\n"
 
-#: client/gdaemonfile.c:467 client/gdaemonfile.c:2737
+#: client/gdaemonfile.c:433 client/gdaemonfile.c:2703
 msgid "Operation not supported, files on different mounts"
 msgstr "Dosyalar farklı bağlantılar üzerinde olduğundan işlem desteklenmiyor"
 
-#: client/gdaemonfile.c:1031 client/gdaemonfile.c:3093
+#: client/gdaemonfile.c:997 client/gdaemonfile.c:3059
 #: client/gvfsiconloadable.c:286 daemon/gvfsjobopenforread.c:183
 #: daemon/gvfsjobopenforwrite.c:326
 msgid "Couldn’t get stream file descriptor"
 msgstr "Akış dosyası belirteci alınamadı"
 
-#: client/gdaemonfile.c:1147 client/gdaemonfile.c:1219
+#: client/gdaemonfile.c:1113 client/gdaemonfile.c:1185
 #: client/gvfsiconloadable.c:125
 msgid "Didn’t get stream file descriptor"
 msgstr "Akış dosyası belirteci alınmadı"
 
-#: client/gdaemonfile.c:1341
+#: client/gdaemonfile.c:1307
 #, c-format
 msgid "Invalid return value from %s"
 msgstr "%s işlevinden geçersiz geri dönüş değeri"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: client/gdaemonfile.c:2191 client/gdaemonfile.c:3356
+#: client/gdaemonfile.c:2157 client/gdaemonfile.c:3322
 msgid "Could not find enclosing mount"
 msgstr "Kapsanılan bağlantı bulunamadı"
 
-#: client/gdaemonfile.c:2223
+#: client/gdaemonfile.c:2189
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Geçersiz dosya adı %s"
 
-#: client/gdaemonfile.c:2537 client/gdaemonfile.c:2547
-#: client/gdaemonfile.c:2569 client/gdaemonvfs.c:1235 client/gdaemonvfs.c:1256
+#: client/gdaemonfile.c:2503 client/gdaemonfile.c:2513
+#: client/gdaemonfile.c:2535 client/gdaemonvfs.c:1235 client/gdaemonvfs.c:1256
 #: client/gdaemonvfs.c:1267 client/gdaemonvfs.c:1299
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Dosya üst verisi atanırken hata: %s"
 
-#: client/gdaemonfile.c:2538 client/gdaemonvfs.c:1257
+#: client/gdaemonfile.c:2504 client/gdaemonvfs.c:1257
 msgid "can’t open metadata tree"
 msgstr "üst veri ağacı açılamaz"
 
-#: client/gdaemonfile.c:2548 client/gdaemonvfs.c:1268
+#: client/gdaemonfile.c:2514 client/gdaemonvfs.c:1268
 msgid "can’t get metadata proxy"
 msgstr "üst veri vekili alınamıyor"
 
-#: client/gdaemonfile.c:2570 client/gdaemonvfs.c:1300
+#: client/gdaemonfile.c:2536 client/gdaemonvfs.c:1300
 msgid "values must be string or list of strings"
 msgstr "değerler dizgi veya dizgiler listesi olmalıdır"
 
-#: client/gdaemonfile.c:2729
+#: client/gdaemonfile.c:2695
 msgid "Operation not supported"
 msgstr "İşlem desteklenmiyor"
 
@@ -90,7 +90,7 @@ msgstr "Akış iletişim kuralında hata oluştu: %s"
 
 #: client/gdaemonfileinputstream.c:552 client/gdaemonfileinputstream.c:1695
 #: client/gdaemonfileoutputstream.c:503 client/gdaemonfileoutputstream.c:1442
-#: daemon/gvfsbackendmtp.c:2408 daemon/gvfsbackendmtp.c:2788
+#: daemon/gvfsbackendmtp.c:2408 daemon/gvfsbackendmtp.c:2804
 msgid "End of stream"
 msgstr "Akış sonu"
 
@@ -99,15 +99,10 @@ msgstr "Akış sonu"
 #: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
 #: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
 #: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
-#: daemon/gvfsbackendsftp.c:5249 daemon/gvfsbackendsmb.c:1095
+#: daemon/gvfsbackendsftp.c:5348 daemon/gvfsbackendsmb.c:1095
 #: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
-#: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:346
+#: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:350
 #: daemon/gvfsftptask.c:224 monitor/gdu/ggdumount.c:1072
-#: monitor/proxy/gproxydrive.c:569 monitor/proxy/gproxydrive.c:657
-#: monitor/proxy/gproxydrive.c:807 monitor/proxy/gproxydrive.c:945
-#: monitor/proxy/gproxydrive.c:983 monitor/proxy/gproxydrive.c:1108
-#: monitor/proxy/gproxymount.c:502 monitor/proxy/gproxymount.c:587
-#: monitor/proxy/gproxyvolume.c:862 monitor/proxy/gproxyvolume.c:926
 msgid "Operation was cancelled"
 msgstr "İşlem iptal edildi"
 
@@ -140,7 +135,6 @@ msgstr "Avahi başlatılırken hata: %s"
 #.
 #: common/gvfsdnssdresolver.c:1085
 #, c-format
-#| msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
 msgid "Error resolving “%s” service “%s” on domain “%s”"
 msgstr "“%s”, “%s” hizmeti ile “%s” etki alanı üzerinde çözülürken hata."
 
@@ -152,9 +146,6 @@ msgstr "“%s”, “%s” hizmeti ile “%s” etki alanı üzerinde çözülü
 #.
 #: common/gvfsdnssdresolver.c:1109
 #, c-format
-#| msgid ""
-#| "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
-#| "records are missing. Keys required: \"%s\"."
 msgid ""
 "Error resolving “%s” service “%s” on domain “%s”. One or more TXT records "
 "are missing. Keys required: “%s”."
@@ -169,7 +160,6 @@ msgstr ""
 #.
 #: common/gvfsdnssdresolver.c:1124
 #, c-format
-#| msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
 msgid "Timed out resolving “%s” service “%s” on domain “%s”"
 msgstr "“%s”, “%s” hizmeti ile “%s” etki alanı üzerinde çözülürken zaman aşımı"
 
@@ -180,13 +170,11 @@ msgstr "Avahi çözücüsü başlatılırken hata"
 #: common/gvfsdnssdutils.c:233 common/gvfsdnssdutils.c:263
 #: common/gvfsdnssdutils.c:280
 #, c-format
-#| msgid "Malformed DNS-SD encoded_triple '%s'"
 msgid "Malformed DNS-SD encoded_triple “%s”"
 msgstr "Bozuk DNS-SD encoded_triple “%s”"
 
 #: common/gvfsicon.c:250
 #, c-format
-#| msgid "Can't handle version %d of GVfsIcon encoding"
 msgid "Can’t handle version %d of GVfsIcon encoding"
 msgstr "GVfsIcon kodlamanın %d sürümü işlenemiyor"
 
@@ -229,28 +217,28 @@ msgstr "%s için bağlama noktası zaten çalışıyor"
 msgid "error starting mount daemon"
 msgstr "bağlama hizmeti başlatılırken hata"
 
-#: daemon/gvfsafpconnection.c:784
+#: daemon/gvfsafpconnection.c:781
 msgid "The connection is not opened"
 msgstr "Bağlantı açılmadı"
 
-#: daemon/gvfsafpconnection.c:791
+#: daemon/gvfsafpconnection.c:788
 msgid "The connection is closed"
 msgstr "Bağlantı kapatıldı"
 
-#: daemon/gvfsafpconnection.c:904
+#: daemon/gvfsafpconnection.c:895
 msgid "Got EOS"
 msgstr "EOS Al"
 
-#: daemon/gvfsafpconnection.c:1080 daemon/gvfsafpconnection.c:1122
+#: daemon/gvfsafpconnection.c:1058 daemon/gvfsafpconnection.c:1100
 #: daemon/gvfsftptask.c:399
 msgid "Host closed connection"
 msgstr "Makine bağlantıyı kapattı"
 
-#: daemon/gvfsafpconnection.c:1585
+#: daemon/gvfsafpconnection.c:1519
 msgid "Connection unexpectedly went down"
 msgstr "Bağlantı beklenmeyen şekilde koptu"
 
-#: daemon/gvfsafpconnection.c:1612
+#: daemon/gvfsafpconnection.c:1546
 msgid "Got unexpected end of stream"
 msgstr "Beklenmeyen akış sonu alındı"
 
@@ -272,7 +260,7 @@ msgstr "“%s” sunucunda verilen parolayla oturum açılamadı."
 
 #: daemon/gvfsafpserver.c:428 daemon/gvfsafpserver.c:650
 #: daemon/gvfsafpserver.c:826 daemon/gvfsafpserver.c:874
-#: daemon/gvfsafpserver.c:990 daemon/gvfsafpserver.c:1675
+#: daemon/gvfsafpserver.c:990 daemon/gvfsafpserver.c:1664
 #, c-format
 msgid "Unable to connect to the server “%s”. A communication problem occurred."
 msgstr "“%s” sunucusuna bağlanılamadı. Bir iletişim sorunu oluştu."
@@ -298,9 +286,6 @@ msgstr ""
 
 #: daemon/gvfsafpserver.c:804
 #, c-format
-#| msgid ""
-#| "Unable to connect to the server “%s”. The server doesn't support AFP "
-#| "version 3.0 or later."
 msgid ""
 "Unable to connect to the server “%s”. The server doesn’t support AFP version "
 "3.0 or later."
@@ -344,11 +329,11 @@ msgstr "Parola penceresi iptal edildi."
 msgid "Unable to disconnect from the server."
 msgstr "Sunucu ile bağlantı kesilemedi."
 
-#: daemon/gvfsafpserver.c:1366 daemon/gvfsafpserver.c:1766
+#: daemon/gvfsafpserver.c:1365 daemon/gvfsafpserver.c:1738
 msgid "Unable to connect to the server. A communication problem occurred."
 msgstr "Sunucuya giriş başarısız oldu. Bir iletişim sorunu oluştu."
 
-#: daemon/gvfsafpserver.c:1722
+#: daemon/gvfsafpserver.c:1697
 msgid "Identification not found."
 msgstr "Kimlik kanıtlama bulunamadı."
 
@@ -372,22 +357,22 @@ msgstr "Birim yok"
 msgid "Couldn’t load %s on %s"
 msgstr "%s üzerine %s yüklenemedi"
 
-#: daemon/gvfsafpvolume.c:410 daemon/gvfsafpvolume.c:680
-#: daemon/gvfsafpvolume.c:833 daemon/gvfsafpvolume.c:1027
-#: daemon/gvfsafpvolume.c:1229 daemon/gvfsafpvolume.c:1412
-#: daemon/gvfsafpvolume.c:1569 daemon/gvfsafpvolume.c:2015
-#: daemon/gvfsafpvolume.c:2143 daemon/gvfsafpvolume.c:2305
-#: daemon/gvfsafpvolume.c:2525 daemon/gvfsbackendadmin.c:140
-#: daemon/gvfsbackendgoogle.c:207 daemon/gvfsbackendsftp.c:345
-#: daemon/gvfsbackendsftp.c:1117 daemon/gvfsbackendsftp.c:2149
+#: daemon/gvfsafpvolume.c:398 daemon/gvfsafpvolume.c:659
+#: daemon/gvfsafpvolume.c:803 daemon/gvfsafpvolume.c:984
+#: daemon/gvfsafpvolume.c:1168 daemon/gvfsafpvolume.c:1343
+#: daemon/gvfsafpvolume.c:1495 daemon/gvfsafpvolume.c:1917
+#: daemon/gvfsafpvolume.c:2038 daemon/gvfsafpvolume.c:2193
+#: daemon/gvfsafpvolume.c:2406 daemon/gvfsbackendadmin.c:140
+#: daemon/gvfsbackendgoogle.c:208 daemon/gvfsbackendsftp.c:346
+#: daemon/gvfsbackendsftp.c:1118 daemon/gvfsbackendsftp.c:2150
 #: daemon/gvfsftptask.c:439
 msgid "Permission denied"
 msgstr "İzin verilmedi"
 
-#: daemon/gvfsafpvolume.c:414 daemon/gvfsafpvolume.c:1735
-#: daemon/gvfsafpvolume.c:2529 daemon/gvfsbackendafc.c:217
-#: daemon/gvfsbackendafc.c:1123 daemon/gvfsbackendafpbrowse.c:190
-#: daemon/gvfsbackendafpbrowse.c:327 daemon/gvfsbackendafpbrowse.c:359
+#: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:1656
+#: daemon/gvfsafpvolume.c:2410 daemon/gvfsbackendafc.c:218
+#: daemon/gvfsbackendafc.c:1135 daemon/gvfsbackendafpbrowse.c:180
+#: daemon/gvfsbackendafpbrowse.c:317 daemon/gvfsbackendafpbrowse.c:349
 #: daemon/gvfsbackendarchive.c:737 daemon/gvfsbackendarchive.c:792
 #: daemon/gvfsbackendarchive.c:844 daemon/gvfsbackendarchive.c:873
 #: daemon/gvfsbackendcdda.c:906 daemon/gvfsbackendcomputer.c:639
@@ -395,229 +380,232 @@ msgstr "İzin verilmedi"
 #: daemon/gvfsbackendftp.c:1172 daemon/gvfsbackendmtp.c:1670
 #: daemon/gvfsbackendmtp.c:1686 daemon/gvfsbackendmtp.c:2128
 #: daemon/gvfsbackendmtp.c:2191 daemon/gvfsbackendmtp.c:2259
-#: daemon/gvfsbackendmtp.c:2613 daemon/gvfsbackendnetwork.c:697
+#: daemon/gvfsbackendmtp.c:2629 daemon/gvfsbackendnetwork.c:697
 #: daemon/gvfsbackendsmbbrowse.c:1068 daemon/gvfsbackendsmbbrowse.c:1135
 #: daemon/gvfsbackendsmbbrowse.c:1322 daemon/gvfsbackendsmbbrowse.c:1395
 msgid "File doesn’t exist"
 msgstr "Dosya yok"
 
-#: daemon/gvfsafpvolume.c:418 daemon/gvfsafpvolume.c:2533
+#: daemon/gvfsafpvolume.c:406 daemon/gvfsafpvolume.c:2414
 #: daemon/gvfsbackendafp.c:289 daemon/gvfsbackendafp.c:492
 #: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2333
 #: daemon/gvfsbackenddav.c:2996 daemon/gvfsbackenddav.c:3276
 #: daemon/gvfsbackendftp.c:815 daemon/gvfsbackendnfs.c:2487
-#: daemon/gvfsbackendsftp.c:2664 daemon/gvfsbackendsftp.c:3439
-#: daemon/gvfsbackendsftp.c:3767 daemon/gvfsbackendsftp.c:4836
-#: daemon/gvfsbackendsftp.c:5777
+#: daemon/gvfsbackendsftp.c:2665 daemon/gvfsbackendsftp.c:3440
+#: daemon/gvfsbackendsftp.c:3768 daemon/gvfsbackendsftp.c:4837
+#: daemon/gvfsbackendsftp.c:5876
 msgid "File is directory"
 msgstr "Dosya bir dizin"
 
-#: daemon/gvfsafpvolume.c:422
+#: daemon/gvfsafpvolume.c:410
 msgid "Too many files open"
 msgstr "Çok fazla dosya açık"
 
-#: daemon/gvfsafpvolume.c:684 daemon/gvfsafpvolume.c:841
+#: daemon/gvfsafpvolume.c:663 daemon/gvfsafpvolume.c:811
 msgid "Target file is open"
 msgstr "Hedef dosya açık"
 
-#: daemon/gvfsafpvolume.c:688 daemon/gvfsbackendafc.c:221
+#: daemon/gvfsafpvolume.c:667 daemon/gvfsbackendafc.c:222
 #: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2723
-#: daemon/gvfsbackendsftp.c:2143
+#: daemon/gvfsbackendsftp.c:2144
 msgid "Directory not empty"
 msgstr "Dizin boş değil"
 
-#: daemon/gvfsafpvolume.c:692
+#: daemon/gvfsafpvolume.c:671
 msgid "Target object is marked as not deletable (DeleteInhibit)"
 msgstr "Hedef nesne silinemez olarak işaretlendi (DeleteInhibit)"
 
-#: daemon/gvfsafpvolume.c:696 daemon/gvfsafpvolume.c:1245
-#: daemon/gvfsafpvolume.c:2147 daemon/gvfsbackendgoogle.c:213
+#: daemon/gvfsafpvolume.c:675 daemon/gvfsafpvolume.c:1184
+#: daemon/gvfsafpvolume.c:2042 daemon/gvfsbackendgoogle.c:214
 msgid "Target object doesn’t exist"
 msgstr "Hedef nesne yok"
 
-#: daemon/gvfsafpvolume.c:700 daemon/gvfsafpvolume.c:853
-#: daemon/gvfsafpvolume.c:1049 daemon/gvfsafpvolume.c:1249
-#: daemon/gvfsafpvolume.c:2151
+#: daemon/gvfsafpvolume.c:679 daemon/gvfsafpvolume.c:823
+#: daemon/gvfsafpvolume.c:1006 daemon/gvfsafpvolume.c:1188
+#: daemon/gvfsafpvolume.c:2046
 msgid "Volume is read-only"
 msgstr "Birim salt okunur"
 
-#: daemon/gvfsafpvolume.c:837 daemon/gvfsafpvolume.c:1031
-#: daemon/gvfsafpvolume.c:1581 daemon/gvfsafpvolume.c:2019
-#: daemon/gvfsafpvolume.c:2663
+#: daemon/gvfsafpvolume.c:807 daemon/gvfsafpvolume.c:988
+#: daemon/gvfsafpvolume.c:1507 daemon/gvfsafpvolume.c:1921
+#: daemon/gvfsafpvolume.c:2538
 msgid "Not enough space on volume"
 msgstr "Birimde yeterli boş alan yok"
 
-#: daemon/gvfsafpvolume.c:845 daemon/gvfsafpvolume.c:1428
-#: daemon/gvfsafpvolume.c:1585 daemon/gvfsbackendafp.c:296
+#: daemon/gvfsafpvolume.c:815 daemon/gvfsafpvolume.c:1359
+#: daemon/gvfsafpvolume.c:1511 daemon/gvfsbackendafp.c:296
 #: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2388
 #: daemon/gvfsbackenddav.c:2684 daemon/gvfsbackenddav.c:2792
 #: daemon/gvfsbackenddav.c:2929 daemon/gvfsbackenddav.c:3005
 #: daemon/gvfsbackenddav.c:3043 daemon/gvfsbackenddav.c:3267
 #: daemon/gvfsbackendftp.c:794 daemon/gvfsbackendftp.c:982
 #: daemon/gvfsbackendftp.c:1492 daemon/gvfsbackendftp.c:1600
-#: daemon/gvfsbackendgoogle.c:1232 daemon/gvfsbackendgoogle.c:1564
-#: daemon/gvfsbackendgoogle.c:1837 daemon/gvfsbackendgoogle.c:2494
+#: daemon/gvfsbackendgoogle.c:1233 daemon/gvfsbackendgoogle.c:1565
+#: daemon/gvfsbackendgoogle.c:1838 daemon/gvfsbackendgoogle.c:2547
 #: daemon/gvfsbackendmtp.c:1616 daemon/gvfsbackendmtp.c:1748
 #: daemon/gvfsbackendmtp.c:2062 daemon/gvfsbackendnfs.c:2497
-#: daemon/gvfsbackendsftp.c:4845 daemon/gvfsbackendsmb.c:2037
+#: daemon/gvfsbackendsftp.c:4846 daemon/gvfsbackendsmb.c:2037
 msgid "Target file already exists"
 msgstr "Hedef dosya zaten var"
 
-#: daemon/gvfsafpvolume.c:849 daemon/gvfsafpvolume.c:1041
-#| msgid "Ancestor directory doesn't exist"
+#: daemon/gvfsafpvolume.c:819 daemon/gvfsafpvolume.c:998
 msgid "Ancestor directory doesn’t exist"
 msgstr "Üst dizin yok"
 
 #. Translators: flat means volume doesn't support directories
 #. (all files are in the volume root)
-#: daemon/gvfsafpvolume.c:1037
-#| msgid "Volume is flat and doesn't support directories"
+#: daemon/gvfsafpvolume.c:994
 msgid "Volume is flat and doesn’t support directories"
 msgstr "Birim düzleştirilmiş; ve dizinleri desteklemiyor"
 
-#: daemon/gvfsafpvolume.c:1045
+#: daemon/gvfsafpvolume.c:1002
 msgid "Target directory already exists"
 msgstr "Hedef dizin zaten var"
 
-#: daemon/gvfsafpvolume.c:1233 daemon/gvfsbackendafp.c:604
+#: daemon/gvfsafpvolume.c:1172 daemon/gvfsbackendafp.c:604
 msgid "Can’t rename volume"
 msgstr "Birim yeniden adlandırılamıyor"
 
-#: daemon/gvfsafpvolume.c:1237
+#: daemon/gvfsafpvolume.c:1176
 msgid "Object with that name already exists"
 msgstr "Zaten bu adda bir nesne var"
 
-#: daemon/gvfsafpvolume.c:1241
+#: daemon/gvfsafpvolume.c:1180
 msgid "Target object is marked as not renameable (RenameInhibit)"
 msgstr "Hedef nesne yeniden adlandırılamaz olarak işaretlendi (RenameInhibit)"
 
-#: daemon/gvfsafpvolume.c:1416
-#| msgid "Can't move directory into one of its descendants"
+#: daemon/gvfsafpvolume.c:1347
 msgid "Can’t move directory into one of its descendants"
 msgstr "Dizin, alt dizinlerinden birinin içine taşınamaz"
 
-#: daemon/gvfsafpvolume.c:1420
-#| msgid "Can't move sharepoint into a shared directory"
+#: daemon/gvfsafpvolume.c:1351
 msgid "Can’t move sharepoint into a shared directory"
 msgstr "Paylaşım noktası (sharepoint), paylaşılan bir dizine taşınamaz"
 
-#: daemon/gvfsafpvolume.c:1424
+#: daemon/gvfsafpvolume.c:1355
 msgid "Can’t move a shared directory into the Trash"
 msgstr "Paylaşılan bir dizin, Çöp’e taşınamaz"
 
-#: daemon/gvfsafpvolume.c:1432
+#: daemon/gvfsafpvolume.c:1363
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
 msgstr ""
 "Taşınmakta olan nesne, yeniden adlandırılamaz olarak işaretlenmiş "
 "(RenameInhibit)"
 
-#: daemon/gvfsafpvolume.c:1436
+#: daemon/gvfsafpvolume.c:1367
 msgid "Object being moved doesn’t exist"
 msgstr "Taşınmakta olan nesne yok"
 
-#: daemon/gvfsafpvolume.c:1573
+#: daemon/gvfsafpvolume.c:1499
 msgid "Server doesn’t support the FPCopyFile operation"
 msgstr "Sunucu, FPCopyFile işlemini desteklemiyor"
 
-#: daemon/gvfsafpvolume.c:1577
+#: daemon/gvfsafpvolume.c:1503
 msgid "Unable to open source file for reading"
 msgstr "Kaynak dosya okumak için açılamadı"
 
-#: daemon/gvfsafpvolume.c:1589
+#: daemon/gvfsafpvolume.c:1515
 msgid "Source file and/or destination directory doesn’t exist"
 msgstr "Kaynak dosya ve/veya hedef dizin yok"
 
-#: daemon/gvfsafpvolume.c:1593
+#: daemon/gvfsafpvolume.c:1519
 msgid "Source file is a directory"
 msgstr "Kaynak dosya bir dizindir"
 
 #. Translators: range conflict means
 #. requested data are locked by another user
-#: daemon/gvfsafpvolume.c:2025
+#: daemon/gvfsafpvolume.c:1927
 msgid "Range lock conflict exists"
 msgstr "Aralık kilidi çakışması var"
 
-#: daemon/gvfsafpvolume.c:2309 daemon/gvfsbackendmtp.c:1449
+#: daemon/gvfsafpvolume.c:2197 daemon/gvfsbackendmtp.c:1449
 #: daemon/gvfsbackendmtp.c:1474 daemon/gvfsbackendmtp.c:1624
-#: daemon/gvfsbackendmtp.c:2007 daemon/gvfsbackendmtp.c:2538
+#: daemon/gvfsbackendmtp.c:2007 daemon/gvfsbackendmtp.c:2554
 msgid "Directory doesn’t exist"
 msgstr "Dizin yok"
 
-#: daemon/gvfsafpvolume.c:2313
+#: daemon/gvfsafpvolume.c:2201
 msgid "Target object is not a directory"
 msgstr "Hedef nesne, bir dizin değil"
 
-#: daemon/gvfsafpvolume.c:2659
+#: daemon/gvfsafpvolume.c:2534
 msgid "File is not open for write access"
 msgstr "Dosya, yazma erişimi için açık değil"
 
-#: daemon/gvfsafpvolume.c:2667
+#: daemon/gvfsafpvolume.c:2542
 msgid "File is locked by another user"
 msgstr "Dosya başka bir kullanıcı tarafından kilitlenmiş"
 
-#: daemon/gvfsafpvolume.c:2805
+#: daemon/gvfsafpvolume.c:2674
 msgid "File is not open for read access"
 msgstr "Dosya, okuma erişimi için açık değil"
 
-#: daemon/gvfsbackendafc.c:213
+#: daemon/gvfsbackendadmin.c:845 daemon/gvfsbackendafc.c:475
+#: daemon/gvfsbackendarchive.c:638 daemon/gvfsbackendarchive.c:667
+#: daemon/gvfsbackenddav.c:1863 daemon/gvfsbackendgoogle.c:1668
+#: daemon/gvfsbackendhttp.c:256 daemon/gvfsbackendsmb.c:569
+msgid "Invalid mount spec"
+msgstr "Geçersiz bağlama belirtimi"
+
+#: daemon/gvfsbackendafc.c:214
 msgid "Internal Apple File Control error"
 msgstr "Dahili Apple Dosya Denetim hatası"
 
-#: daemon/gvfsbackendafc.c:225
+#: daemon/gvfsbackendafc.c:226
 msgid "The device did not respond"
 msgstr "Aygıt yanıt vermedi"
 
-#: daemon/gvfsbackendafc.c:229
+#: daemon/gvfsbackendafc.c:230
 msgid "The connection was interrupted"
 msgstr "Bağlantı kesintiye uğradı"
 
-#: daemon/gvfsbackendafc.c:233
+#: daemon/gvfsbackendafc.c:234
 msgid "Invalid Apple File Control data received"
 msgstr "Geçersiz Apple Dosya Denetim verisi alındı"
 
-#: daemon/gvfsbackendafc.c:237
+#: daemon/gvfsbackendafc.c:238
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "İşlenmemiş Apple Dosya Denetim hatası (%d)"
 
-#: daemon/gvfsbackendafc.c:253
+#: daemon/gvfsbackendafc.c:254
 msgid "Listing applications installed on device failed"
 msgstr "Aygıt üzerinde kurulu uygulamaların listelenmesi başarısız oldu"
 
-#: daemon/gvfsbackendafc.c:269
+#: daemon/gvfsbackendafc.c:270
 msgid "Accessing application icons on device failed"
 msgstr "Aygıttaki uygulama simgelerine erişim başarısız oldu"
 
-#: daemon/gvfsbackendafc.c:291
+#: daemon/gvfsbackendafc.c:292
 msgid "Lockdown Error: Invalid Argument"
 msgstr "Kilitleme Hatası: Geçersiz Bağımsız Değişken"
 
-#: daemon/gvfsbackendafc.c:295
+#: daemon/gvfsbackendafc.c:296
 msgid "The device is password protected"
 msgstr "Aygıt parola korumalı"
 
-#: daemon/gvfsbackendafc.c:299
+#: daemon/gvfsbackendafc.c:300
 msgid "Unable to connect"
 msgstr "Bağlanılamıyor"
 
-#: daemon/gvfsbackendafc.c:303
+#: daemon/gvfsbackendafc.c:304
 msgid "User refused to trust this computer"
 msgstr "Kullanıcı bu bilgisayara güvenmeyi reddetti"
 
-#: daemon/gvfsbackendafc.c:307
+#: daemon/gvfsbackendafc.c:308
 msgid "The user has not trusted this computer"
 msgstr "Kullanıcı bu bilgisayara güvenmedi"
 
-#: daemon/gvfsbackendafc.c:311
+#: daemon/gvfsbackendafc.c:312
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "İşlenmemiş Kilitleme hatası (%d)"
 
-#: daemon/gvfsbackendafc.c:328
+#: daemon/gvfsbackendafc.c:329
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "libimobiledevice Hatası: Geçersiz Bağımsız Değişken"
 
-#: daemon/gvfsbackendafc.c:332
+#: daemon/gvfsbackendafc.c:333
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
@@ -625,48 +613,41 @@ msgstr ""
 "libimobiledevice Hatası: Aygıt bulunamadı. usbmuxd’in doğru olarak "
 "kurulduğundan emin olun."
 
-#: daemon/gvfsbackendafc.c:336
+#: daemon/gvfsbackendafc.c:337
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "İşlenmemiş libimobiledevice hatası (%d)"
 
-#: daemon/gvfsbackendafc.c:455
+#: daemon/gvfsbackendafc.c:458
 msgid "Try again"
 msgstr "Yeniden dene"
 
-#: daemon/gvfsbackendafc.c:455 daemon/gvfsbackend.c:1001
+#: daemon/gvfsbackendafc.c:458 daemon/gvfsbackend.c:1011
 #: monitor/gdu/ggdudrive.c:1024 monitor/gdu/ggdumount.c:923
-#: monitor/udisks2/gvfsudisks2mount.c:787
+#: monitor/udisks2/gvfsudisks2mount.c:756
 msgid "Cancel"
 msgstr "İptal"
 
-#: daemon/gvfsbackendafc.c:472 daemon/gvfsbackendarchive.c:638
-#: daemon/gvfsbackendarchive.c:667 daemon/gvfsbackenddav.c:1862
-#: daemon/gvfsbackendgoogle.c:1667 daemon/gvfsbackendhttp.c:256
-#: daemon/gvfsbackendsmb.c:569
-msgid "Invalid mount spec"
-msgstr "Geçersiz bağlama belirtimi"
-
-#: daemon/gvfsbackendafc.c:478 daemon/gvfsbackendafc.c:508
+#: daemon/gvfsbackendafc.c:481 daemon/gvfsbackendafc.c:511
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "Geçersiz AFC konumu: afc://uuid:bağlantı-noktası biçiminde olmalı"
 
-#: daemon/gvfsbackendafc.c:494
+#: daemon/gvfsbackendafc.c:497
 msgid "Apple Mobile Device"
 msgstr "Apple Cep Aygıtı"
 
-#: daemon/gvfsbackendafc.c:499
+#: daemon/gvfsbackendafc.c:502
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Apple Cep Aygıtı, Jailbreak Yapılmış"
 
-#: daemon/gvfsbackendafc.c:504
+#: daemon/gvfsbackendafc.c:507
 msgid "Documents on Apple Mobile Device"
 msgstr "Apple Cep Aygıtındaki Belgeler"
 
 #. translators:
 #. * This is the device name, with the service being browsed in brackets, eg.:
 #. * Alan Smithee's iPhone (jailbreak)
-#: daemon/gvfsbackendafc.c:563
+#: daemon/gvfsbackendafc.c:567
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (jailbreak)"
@@ -674,7 +655,7 @@ msgstr "%s (jailbreak)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: daemon/gvfsbackendafc.c:570 monitor/afc/afcvolume.c:176
+#: daemon/gvfsbackendafc.c:574 monitor/afc/afcvolume.c:176
 #, c-format
 msgid "Documents on %s"
 msgstr "%s üzerindeki belgeler"
@@ -682,7 +663,7 @@ msgstr "%s üzerindeki belgeler"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: daemon/gvfsbackendafc.c:644
+#: daemon/gvfsbackendafc.c:648
 #, c-format
 msgid ""
 "The device “%s” is locked. Enter the passcode on the device and click “Try "
@@ -695,7 +676,7 @@ msgstr ""
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above. 'Trust' is the caption
 #. * of the button shown in the device.
-#: daemon/gvfsbackendafc.c:652
+#: daemon/gvfsbackendafc.c:656
 #, c-format
 msgid ""
 "The device “%s” is not trusted yet. Select “Trust” on the device and click "
@@ -704,19 +685,19 @@ msgstr ""
 "“%s” aygıtına henüz güvenilmiyor. Aygıt üzerinde “Güven”i seçin ve “Yeniden "
 "dene”ye tıklayın."
 
-#: daemon/gvfsbackendafc.c:1112 daemon/gvfsbackendarchive.c:745
-#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2194
+#: daemon/gvfsbackendafc.c:1124 daemon/gvfsbackendarchive.c:745
+#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2247
 #: daemon/gvfsbackendgphoto2.c:1501 daemon/gvfsbackendmtp.c:2281
 #: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:126
 #: daemon/gvfsbackendsmb.c:659 daemon/gvfsbackendtrash.c:234
 msgid "Can’t open directory"
 msgstr "Dizin açılamıyor"
 
-#: daemon/gvfsbackendafc.c:1332
+#: daemon/gvfsbackendafc.c:1344
 msgid "Backups are not yet supported."
 msgstr "Yedekler henüz desteklenmiyor."
 
-#: daemon/gvfsbackendafc.c:1494 daemon/gvfsbackendsmb.c:712
+#: daemon/gvfsbackendafc.c:1506 daemon/gvfsbackendsmb.c:712
 #: daemon/gvfsbackendsmb.c:1191
 msgid "Unsupported seek type"
 msgstr "Atlama türü desteklenmiyor"
@@ -725,28 +706,29 @@ msgstr "Atlama türü desteklenmiyor"
 #. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
 #. * fallback copy.
 #.
-#: daemon/gvfsbackendafc.c:2416 daemon/gvfsbackendafp.c:1781
+#: daemon/gvfsbackendafc.c:2428 daemon/gvfsbackendafp.c:1781
 #: daemon/gvfsbackendftp.c:1192 daemon/gvfsbackendftp.c:1240
-#: daemon/gvfsbackendftp.c:1261 daemon/gvfsbackendgoogle.c:1138
-#: daemon/gvfsbackendgoogle.c:1206 daemon/gvfsbackendgoogle.c:1227
-#: daemon/gvfsbackendgoogle.c:1313 daemon/gvfsbackendgoogle.c:1381
-#: daemon/gvfsbackendgoogle.c:1539 daemon/gvfsbackendgoogle.c:1767
-#: daemon/gvfsbackendgoogle.c:2410 daemon/gvfsbackendgoogle.c:2465
-#: daemon/gvfsbackendgoogle.c:2489 daemon/gvfsbackendgoogle.c:2575
+#: daemon/gvfsbackendftp.c:1261 daemon/gvfsbackendgoogle.c:1139
+#: daemon/gvfsbackendgoogle.c:1207 daemon/gvfsbackendgoogle.c:1228
+#: daemon/gvfsbackendgoogle.c:1314 daemon/gvfsbackendgoogle.c:1382
+#: daemon/gvfsbackendgoogle.c:1540 daemon/gvfsbackendgoogle.c:1768
+#: daemon/gvfsbackendgoogle.c:2463 daemon/gvfsbackendgoogle.c:2518
+#: daemon/gvfsbackendgoogle.c:2542 daemon/gvfsbackendgoogle.c:2628
 #: daemon/gvfsbackendmtp.c:2248 daemon/gvfsbackendmtp.c:2443
-#: daemon/gvfsbackendmtp.c:2514 daemon/gvfsbackendmtp.c:2602
-#: daemon/gvfsbackendmtp.c:2670 daemon/gvfsbackendnfs.c:2379
-#: daemon/gvfsbackendsftp.c:2147 daemon/gvfsbackendsftp.c:5213
-#: daemon/gvfsbackendsmb.c:1683 daemon/gvfsftptask.c:431
+#: daemon/gvfsbackendmtp.c:2530 daemon/gvfsbackendmtp.c:2618
+#: daemon/gvfsbackendmtp.c:2686 daemon/gvfsbackendnfs.c:2379
+#: daemon/gvfsbackendsftp.c:2148 daemon/gvfsbackendsftp.c:5234
+#: daemon/gvfsbackendsftp.c:5332 daemon/gvfsbackendsmb.c:1683
+#: daemon/gvfsftptask.c:431
 msgid "Operation unsupported"
 msgstr "İşlem desteklenmiyor"
 
-#: daemon/gvfsbackendafc.c:2583 daemon/gvfsbackenddav.c:2828
+#: daemon/gvfsbackendafc.c:2595 daemon/gvfsbackenddav.c:2828
 #: daemon/gvfsbackendftp.c:1444
 msgid "Backups not supported"
 msgstr "Yedekler desteklenmiyor"
 
-#: daemon/gvfsbackendafpbrowse.c:218 daemon/gvfsbackendcomputer.c:958
+#: daemon/gvfsbackendafpbrowse.c:208 daemon/gvfsbackendcomputer.c:958
 #: daemon/gvfsbackendcomputer.c:1053 daemon/gvfsbackendcomputer.c:1159
 #: daemon/gvfsbackendcomputer.c:1249 daemon/gvfsbackendcomputer.c:1322
 #: daemon/gvfsbackendcomputer.c:1391 daemon/gvfsbackendsmbbrowse.c:1063
@@ -765,48 +747,47 @@ msgstr "Bağlanılabilir bir dosya değil"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: daemon/gvfsbackendafpbrowse.c:461 daemon/gvfsbackendafp.c:2104
+#: daemon/gvfsbackendafpbrowse.c:451 daemon/gvfsbackendafp.c:2104
 #: daemon/gvfsbackendftp.c:672 daemon/gvfsbackendnfs.c:290
-#: daemon/gvfsbackendsftp.c:2004 daemon/gvfsbackendsmb.c:438
+#: daemon/gvfsbackendsftp.c:2005 daemon/gvfsbackendsmb.c:438
 #: daemon/gvfsbackendsmb.c:1365
 #, c-format
 msgid "%s on %s"
 msgstr "%2$s üzerinde %1$s"
 
 #. Translators: %s is the servername
-#: daemon/gvfsbackendafpbrowse.c:465
+#: daemon/gvfsbackendafpbrowse.c:455
 #, c-format
 msgid "%s"
 msgstr "%s"
 
-#: daemon/gvfsbackendafpbrowse.c:498 daemon/gvfsbackendafp.c:2139
+#: daemon/gvfsbackendafpbrowse.c:488 daemon/gvfsbackendafp.c:2139
 #: daemon/gvfsbackendarchive.c:627 daemon/gvfsbackendftp.c:706
-#: daemon/gvfsbackendnfs.c:197 daemon/gvfsbackendsftp.c:2056
+#: daemon/gvfsbackendnfs.c:197 daemon/gvfsbackendsftp.c:2057
 msgid "No hostname specified"
 msgstr "Makine adı belirtilmemiş"
 
-#: daemon/gvfsbackendafpbrowse.c:582 daemon/gvfsbackendafp.c:2234
+#: daemon/gvfsbackendafpbrowse.c:572 daemon/gvfsbackendafp.c:2234
 msgid "Apple Filing Protocol Service"
 msgstr "Apple Dosyalama Kuralı Hizmeti"
 
 #: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:875
 #: daemon/gvfsbackenddav.c:2991 daemon/gvfsbackendftp.c:1592
-#: daemon/gvfsbackendgoogle.c:1809
+#: daemon/gvfsbackendgoogle.c:1810
 msgid "Can’t copy directory over directory"
 msgstr "Dizin üstüne dizin kopyalanamıyor"
 
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:891
 #: daemon/gvfsbackenddav.c:3020 daemon/gvfsbackendftp.c:1615
-#: daemon/gvfsbackendgoogle.c:1243 daemon/gvfsbackendgoogle.c:1828
-#: daemon/gvfsbackendgoogle.c:1848 daemon/gvfsbackendmtp.c:1731
+#: daemon/gvfsbackendgoogle.c:1244 daemon/gvfsbackendgoogle.c:1829
+#: daemon/gvfsbackendgoogle.c:1849 daemon/gvfsbackendmtp.c:1731
 #: daemon/gvfsbackendmtp.c:1754 daemon/gvfsbackendmtp.c:2044
 #: daemon/gvfsbackendmtp.c:2068
-#| msgid "Can't recursively copy directory"
 msgid "Can’t recursively copy directory"
 msgstr "Dizin özyinelemeli kopyalanamıyor"
 
 #: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2868
-#: daemon/gvfsbackendnfs.c:2481 daemon/gvfsbackendsftp.c:4831
+#: daemon/gvfsbackendnfs.c:2481 daemon/gvfsbackendsftp.c:4832
 #: daemon/gvfsbackendsmb.c:2026
 msgid "Can’t move directory over directory"
 msgstr "Dizin üstüne dizin taşınamıyor"
@@ -821,13 +802,13 @@ msgid "Unable to create temporary file (%s)"
 msgstr "Geçici dosya oluşturulamadı (%s)"
 
 #: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2469
-#: daemon/gvfsbackendnfs.c:1184 daemon/gvfsbackendsftp.c:3782
+#: daemon/gvfsbackendnfs.c:1184 daemon/gvfsbackendsftp.c:3783
 #: daemon/gvfsbackendsmb.c:1064
 msgid "The file was externally modified"
 msgstr "Dosya harici olarak değiştirilmiş"
 
 #: daemon/gvfsbackendafp.c:1765 daemon/gvfsbackendftp.c:1233
-#: daemon/gvfsbackendsftp.c:5223
+#: daemon/gvfsbackendsftp.c:5296
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "Geçersiz öznitelik türü (uint32 bekleniyor)"
 
@@ -850,10 +831,10 @@ msgstr "%s içinde /"
 
 #: daemon/gvfsbackendarchive.c:882 daemon/gvfsbackendburn.c:679
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
-#: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:678
-#: daemon/gvfsbackendgoogle.c:1212 daemon/gvfsbackendgoogle.c:1331
-#: daemon/gvfsbackendgoogle.c:1472 daemon/gvfsbackendnetwork.c:745
-#: daemon/gvfsbackendsftp.c:4321 daemon/gvfsftpdircache.c:157
+#: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:679
+#: daemon/gvfsbackendgoogle.c:1213 daemon/gvfsbackendgoogle.c:1332
+#: daemon/gvfsbackendgoogle.c:1473 daemon/gvfsbackendnetwork.c:745
+#: daemon/gvfsbackendsftp.c:4322 daemon/gvfsftpdircache.c:157
 msgid "The file is not a directory"
 msgstr "Dosya bir dizin değil"
 
@@ -871,17 +852,17 @@ msgstr "Geçiçi dizin oluşturulamadı"
 #: daemon/gvfsbackendburn.c:716 daemon/gvfsbackendburn.c:742
 #: daemon/gvfsbackendburn.c:780 daemon/gvfsbackendburn.c:971
 #: daemon/gvfsbackendburn.c:1007 daemon/gvfsbackendftp.c:835
-#: daemon/gvfsbackendgoogle.c:644 daemon/gvfsbackendgphoto2.c:934
+#: daemon/gvfsbackendgoogle.c:645 daemon/gvfsbackendgphoto2.c:934
 #: daemon/gvfsbackendgphoto2.c:1822 daemon/gvfsbackendgphoto2.c:2541
 #: daemon/gvfsbackendrecent.c:110 daemon/gvfsbackendrecent.c:293
-#: daemon/gvfsbackendsftp.c:2151 daemon/gvfsbackendsftp.c:3316
-#: daemon/gvfsbackendsftp.c:3329 daemon/gvfsbackendsftp.c:3349
+#: daemon/gvfsbackendsftp.c:2152 daemon/gvfsbackendsftp.c:3317
+#: daemon/gvfsbackendsftp.c:3330 daemon/gvfsbackendsftp.c:3350
 #: daemon/gvfsbackendtrash.c:218
 msgid "No such file or directory"
 msgstr "Böyle dosya ya da dizin yok"
 
 #: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:903
-#: daemon/gvfsbackendgoogle.c:1817
+#: daemon/gvfsbackendgoogle.c:1818
 msgid "Can’t copy file over directory"
 msgstr "Dizin üstüne dosya kopyalanamıyor"
 
@@ -918,8 +899,8 @@ msgstr "Dosya var"
 #: daemon/gvfsjobunmountmountable.c:157 daemon/gvfsjobunmountmountable.c:172
 #: daemon/gvfsjobwrite.c:123 monitor/gdu/ggdumount.c:1176
 #: monitor/gdu/ggdumount.c:1260 monitor/gdu/ggduvolume.c:1617
-#: monitor/udisks2/gvfsudisks2mount.c:1180
-#: monitor/udisks2/gvfsudisks2volume.c:1734
+#: monitor/udisks2/gvfsudisks2mount.c:1134
+#: monitor/udisks2/gvfsudisks2volume.c:1675
 msgid "Operation not supported by backend"
 msgstr "Arkayüz tarafından işlem desteklenmiyor"
 
@@ -928,7 +909,7 @@ msgid "No such file or directory in target path"
 msgstr "Hedef yolda böyle dosya ya da dizin yoktur"
 
 #: daemon/gvfsbackendburn.c:884 daemon/gvfsbackenddav.c:2906
-#: daemon/gvfsbackendsftp.c:2145 daemon/gvfsbackendsftp.c:5011
+#: daemon/gvfsbackendsftp.c:2146 daemon/gvfsbackendsftp.c:5012
 msgid "Target file exists"
 msgstr "Hedef dosya var"
 
@@ -938,24 +919,24 @@ msgstr "Hedef dosya var"
 #: daemon/gvfsbackendgphoto2.c:2501 daemon/gvfsbackendgphoto2.c:2594
 #: daemon/gvfsbackendgphoto2.c:3203 daemon/gvfsbackendgphoto2.c:3213
 #: daemon/gvfsbackendnfs.c:2429 daemon/gvfsbackendnfs.c:2555
-#: daemon/gvfsbackendsftp.c:5895 daemon/gvfsbackendsftp.c:5927
-#: daemon/gvfsbackendsftp.c:5953 daemon/gvfsbackendsftp.c:6424
-#: daemon/gvfsbackendsftp.c:6486
+#: daemon/gvfsbackendsftp.c:5994 daemon/gvfsbackendsftp.c:6026
+#: daemon/gvfsbackendsftp.c:6052 daemon/gvfsbackendsftp.c:6523
+#: daemon/gvfsbackendsftp.c:6585
 msgid "Not supported"
 msgstr "Desteklenmiyor"
 
-#: daemon/gvfsbackend.c:834 daemon/gvfsjobunmount.c:197
+#: daemon/gvfsbackend.c:856 daemon/gvfsjobunmount.c:197
 #: daemon/gvfsjobunmount.c:264
 msgid "File system is busy"
 msgstr "Dosya sistemi meşgul"
 
-#: daemon/gvfsbackend.c:1000 monitor/gdu/ggdumount.c:922
-#: monitor/udisks2/gvfsudisks2mount.c:785
+#: daemon/gvfsbackend.c:1010 monitor/gdu/ggdumount.c:922
+#: monitor/udisks2/gvfsudisks2mount.c:754
 msgid "Unmount Anyway"
 msgstr "Gene de Bağı Kes"
 
-#: daemon/gvfsbackend.c:1003 monitor/gdu/ggdumount.c:924
-#: monitor/udisks2/gvfsudisks2mount.c:788
+#: daemon/gvfsbackend.c:1013 monitor/gdu/ggdumount.c:924
+#: monitor/udisks2/gvfsudisks2mount.c:757
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -990,7 +971,7 @@ msgid "cdda mount on %s"
 msgstr "cdda bağı %s üzerinde"
 
 #: daemon/gvfsbackendcdda.c:347 daemon/gvfsbackendcdda.c:870
-#: monitor/gdu/ggduvolume.c:349 monitor/udisks2/gvfsudisks2volume.c:387
+#: monitor/gdu/ggduvolume.c:349 monitor/udisks2/gvfsudisks2volume.c:379
 msgid "Audio Disc"
 msgstr "Ses Diski"
 
@@ -1099,24 +1080,24 @@ msgstr "Boş cevap"
 msgid "Unexpected reply from server"
 msgstr "Sunucudan beklenilmeyen yanıt"
 
-#: daemon/gvfsbackenddav.c:1421 daemon/gvfsbackenddav.c:2131
+#: daemon/gvfsbackenddav.c:1422 daemon/gvfsbackenddav.c:2131
 #: daemon/gvfsbackenddav.c:2223 daemon/gvfsbackenddav.c:2325
 msgid "Response invalid"
 msgstr "Geçersiz cevap"
 
-#: daemon/gvfsbackenddav.c:1564
+#: daemon/gvfsbackenddav.c:1565
 msgid "WebDAV share"
 msgstr "WebDAV paylaşımı"
 
 #. translators: %s here is the hostname
 #. Translators: %s is the hostname
-#: daemon/gvfsbackenddav.c:1566 daemon/gvfsbackendftp.c:529
-#: daemon/gvfsbackendsftp.c:1166
+#: daemon/gvfsbackenddav.c:1567 daemon/gvfsbackendftp.c:529
+#: daemon/gvfsbackendsftp.c:1167
 #, c-format
 msgid "Enter password for %s"
 msgstr "%s için parolayı gir"
 
-#: daemon/gvfsbackenddav.c:1569
+#: daemon/gvfsbackenddav.c:1570
 msgid "Please enter proxy password"
 msgstr "Lütfen vekil sunucu parolasını girin"
 
@@ -1134,7 +1115,7 @@ msgid "Could not create request"
 msgstr "İstek oluşturulamadı"
 
 #: daemon/gvfsbackenddav.c:2500 daemon/gvfsbackendftp.c:1085
-#: daemon/gvfsbackendgoogle.c:2569 daemon/gvfsbackendnfs.c:948
+#: daemon/gvfsbackendgoogle.c:2622 daemon/gvfsbackendnfs.c:948
 #: daemon/gvfsbackendnfs.c:971 daemon/gvfsbackendnfs.c:997
 #: daemon/gvfsbackendnfs.c:1397 daemon/gvfsbackendsmb.c:1100
 #: daemon/gvfsbackendsmb.c:2054
@@ -1168,12 +1149,12 @@ msgid "Network"
 msgstr "Ağ"
 
 #. Translators: the first %s is the username, the second the host name
-#: daemon/gvfsbackendftp.c:526 daemon/gvfsbackendsftp.c:1159
+#: daemon/gvfsbackendftp.c:526 daemon/gvfsbackendsftp.c:1160
 #, c-format
 msgid "Enter password for %s on %s"
 msgstr "%2$s üzerindeki %1$s için parola gir"
 
-#: daemon/gvfsbackendftp.c:556 daemon/gvfsbackendsftp.c:1183
+#: daemon/gvfsbackendftp.c:556 daemon/gvfsbackendsftp.c:1184
 #: daemon/gvfsbackendsmbbrowse.c:963 daemon/gvfsbackendsmb.c:524
 msgid "Password dialog cancelled"
 msgstr "Parola penceresi iptal edildi"
@@ -1182,49 +1163,49 @@ msgstr "Parola penceresi iptal edildi"
 msgid "Insufficient permissions"
 msgstr "Yetersiz izinler"
 
-#: daemon/gvfsbackendgoogle.c:1716 daemon/gvfsbackendgoogle.c:2243
+#: daemon/gvfsbackendgoogle.c:1717 daemon/gvfsbackendgoogle.c:2296
 #: daemon/gvfsbackendgphoto2.c:1542
 msgid "Error getting data from file"
 msgstr "Dosyadan veri alınırken hata"
 
-#: daemon/gvfsbackendgoogle.c:2201 daemon/gvfsbackendsftp.c:2324
-#: daemon/gvfsbackendsftp.c:2731 daemon/gvfsbackendsftp.c:2794
-#: daemon/gvfsbackendsftp.c:2805 daemon/gvfsbackendsftp.c:2863
-#: daemon/gvfsbackendsftp.c:2956 daemon/gvfsbackendsftp.c:3008
-#: daemon/gvfsbackendsftp.c:3063 daemon/gvfsbackendsftp.c:3142
-#: daemon/gvfsbackendsftp.c:3259 daemon/gvfsbackendsftp.c:3392
-#: daemon/gvfsbackendsftp.c:3476 daemon/gvfsbackendsftp.c:3552
-#: daemon/gvfsbackendsftp.c:3564 daemon/gvfsbackendsftp.c:3624
-#: daemon/gvfsbackendsftp.c:3666 daemon/gvfsbackendsftp.c:3854
-#: daemon/gvfsbackendsftp.c:3888 daemon/gvfsbackendsftp.c:3946
-#: daemon/gvfsbackendsftp.c:4008 daemon/gvfsbackendsftp.c:4079
-#: daemon/gvfsbackendsftp.c:4354 daemon/gvfsbackendsftp.c:4425
-#: daemon/gvfsbackendsftp.c:4560 daemon/gvfsbackendsftp.c:4670
-#: daemon/gvfsbackendsftp.c:4732 daemon/gvfsbackendsftp.c:4769
-#: daemon/gvfsbackendsftp.c:4797 daemon/gvfsbackendsftp.c:4911
-#: daemon/gvfsbackendsftp.c:4967 daemon/gvfsbackendsftp.c:5008
-#: daemon/gvfsbackendsftp.c:5044 daemon/gvfsbackendsftp.c:5080
-#: daemon/gvfsbackendsftp.c:5095 daemon/gvfsbackendsftp.c:5110
-#: daemon/gvfsbackendsftp.c:5194 daemon/gvfsbackendsftp.c:5380
-#: daemon/gvfsbackendsftp.c:5417 daemon/gvfsbackendsftp.c:5491
-#: daemon/gvfsbackendsftp.c:5577 daemon/gvfsbackendsftp.c:5661
-#: daemon/gvfsbackendsftp.c:5704 daemon/gvfsbackendsftp.c:5708
-#: daemon/gvfsbackendsftp.c:5825 daemon/gvfsbackendsftp.c:5829
-#: daemon/gvfsbackendsftp.c:6066 daemon/gvfsbackendsftp.c:6279
-#: daemon/gvfsbackendsftp.c:6296 daemon/gvfsbackendsftp.c:6430
-#: daemon/gvfsbackendsftp.c:6458
+#: daemon/gvfsbackendgoogle.c:2254 daemon/gvfsbackendsftp.c:2325
+#: daemon/gvfsbackendsftp.c:2732 daemon/gvfsbackendsftp.c:2795
+#: daemon/gvfsbackendsftp.c:2806 daemon/gvfsbackendsftp.c:2864
+#: daemon/gvfsbackendsftp.c:2957 daemon/gvfsbackendsftp.c:3009
+#: daemon/gvfsbackendsftp.c:3064 daemon/gvfsbackendsftp.c:3143
+#: daemon/gvfsbackendsftp.c:3260 daemon/gvfsbackendsftp.c:3393
+#: daemon/gvfsbackendsftp.c:3477 daemon/gvfsbackendsftp.c:3553
+#: daemon/gvfsbackendsftp.c:3565 daemon/gvfsbackendsftp.c:3625
+#: daemon/gvfsbackendsftp.c:3667 daemon/gvfsbackendsftp.c:3855
+#: daemon/gvfsbackendsftp.c:3889 daemon/gvfsbackendsftp.c:3947
+#: daemon/gvfsbackendsftp.c:4009 daemon/gvfsbackendsftp.c:4080
+#: daemon/gvfsbackendsftp.c:4355 daemon/gvfsbackendsftp.c:4426
+#: daemon/gvfsbackendsftp.c:4561 daemon/gvfsbackendsftp.c:4671
+#: daemon/gvfsbackendsftp.c:4733 daemon/gvfsbackendsftp.c:4770
+#: daemon/gvfsbackendsftp.c:4798 daemon/gvfsbackendsftp.c:4912
+#: daemon/gvfsbackendsftp.c:4968 daemon/gvfsbackendsftp.c:5009
+#: daemon/gvfsbackendsftp.c:5045 daemon/gvfsbackendsftp.c:5081
+#: daemon/gvfsbackendsftp.c:5096 daemon/gvfsbackendsftp.c:5111
+#: daemon/gvfsbackendsftp.c:5206 daemon/gvfsbackendsftp.c:5274
+#: daemon/gvfsbackendsftp.c:5479 daemon/gvfsbackendsftp.c:5516
+#: daemon/gvfsbackendsftp.c:5590 daemon/gvfsbackendsftp.c:5676
+#: daemon/gvfsbackendsftp.c:5760 daemon/gvfsbackendsftp.c:5803
+#: daemon/gvfsbackendsftp.c:5807 daemon/gvfsbackendsftp.c:5924
+#: daemon/gvfsbackendsftp.c:5928 daemon/gvfsbackendsftp.c:6165
+#: daemon/gvfsbackendsftp.c:6378 daemon/gvfsbackendsftp.c:6395
+#: daemon/gvfsbackendsftp.c:6529 daemon/gvfsbackendsftp.c:6557
 msgid "Invalid reply received"
 msgstr "Geçersiz cevap alındı"
 
-#: daemon/gvfsbackendgoogle.c:2596 daemon/gvfsbackendnfs.c:1159
+#: daemon/gvfsbackendgoogle.c:2649 daemon/gvfsbackendnfs.c:1159
 msgid "Target file is a directory"
 msgstr "Hedef dosya bir dizin"
 
-#: daemon/gvfsbackendgoogle.c:2604 daemon/gvfsbackendnfs.c:1169
+#: daemon/gvfsbackendgoogle.c:2657 daemon/gvfsbackendnfs.c:1169
 msgid "Target file is not a regular file"
 msgstr "Hedef dosya normal dosya değil"
 
-#: daemon/gvfsbackendgoogle.c:2794 daemon/gvfsbackendgphoto2.c:3003
+#: daemon/gvfsbackendgoogle.c:2847 daemon/gvfsbackendgphoto2.c:3003
 msgid "Error writing file"
 msgstr "Dosyaya yazılırken hata"
 
@@ -1319,7 +1300,7 @@ msgstr "Bozuk simge belirteci “%s”"
 msgid "Error seeking in stream on camera %s"
 msgstr "Fotograf makinesi %s üzerinde akış içine atlanırken hata"
 
-#: daemon/gvfsbackendgphoto2.c:1816 daemon/gvfsbackendsftp.c:3319
+#: daemon/gvfsbackendgphoto2.c:1816 daemon/gvfsbackendsftp.c:3320
 #: daemon/gvfsbackendsmbbrowse.c:1391
 msgid "Not a directory"
 msgstr "Bir dizin değil"
@@ -1467,7 +1448,7 @@ msgstr "Bu konumda bir dizin oluşturulamaz"
 
 #: daemon/gvfsbackendmtp.c:1675 daemon/gvfsbackendmtp.c:2133
 #: daemon/gvfsbackendmtp.c:2196 daemon/gvfsbackendmtp.c:2264
-#: daemon/gvfsbackendmtp.c:2618 daemon/gvfsbackendmtp.c:2684
+#: daemon/gvfsbackendmtp.c:2634 daemon/gvfsbackendmtp.c:2700
 #: daemon/gvfsbackendsmbbrowse.c:1131
 msgid "Not a regular file"
 msgstr "Düzenli bir dosya değil"
@@ -1480,7 +1461,7 @@ msgstr "Hedef bir dizin"
 msgid "Can’t merge directories"
 msgstr "Dizinler birleştirilemez"
 
-#: daemon/gvfsbackendmtp.c:1984 daemon/gvfsbackendmtp.c:2530
+#: daemon/gvfsbackendmtp.c:1984 daemon/gvfsbackendmtp.c:2546
 msgid "Cannot write to this location"
 msgstr "Bu konuma yazılamaz"
 
@@ -1520,8 +1501,8 @@ msgstr ""
 "ihtiyaç var"
 
 #: daemon/gvfsbackendnfs.c:1055 daemon/gvfsbackendnfs.c:1078
-#: daemon/gvfsbackendnfs.c:1126 daemon/gvfsbackendsftp.c:3702
-#: daemon/gvfsbackendsftp.c:5732
+#: daemon/gvfsbackendnfs.c:1126 daemon/gvfsbackendsftp.c:3703
+#: daemon/gvfsbackendsftp.c:5831
 msgid "Unable to create temporary file"
 msgstr "Geçici dosya oluşturulamadı"
 
@@ -1539,83 +1520,77 @@ msgstr "Geçerli klasör silinmemeli"
 msgid "Recent"
 msgstr "Son kullanılan"
 
-#: daemon/gvfsbackendsftp.c:336 daemon/gvfsbackendsftp.c:712
+#: daemon/gvfsbackendsftp.c:337 daemon/gvfsbackendsftp.c:713
 msgid "Connection failed"
 msgstr "Bağlantı başarısız oldu"
 
-#: daemon/gvfsbackendsftp.c:352
+#: daemon/gvfsbackendsftp.c:353
 msgid "Hostname not known"
 msgstr "Makine adı bilinmiyor"
 
-#: daemon/gvfsbackendsftp.c:359
+#: daemon/gvfsbackendsftp.c:360
 msgid "No route to host"
 msgstr "Makineye ulaşılamıyor"
 
-#: daemon/gvfsbackendsftp.c:367
+#: daemon/gvfsbackendsftp.c:368
 msgid "Connection refused by server"
 msgstr "Bağlantı sunucu tarafından reddedildi"
 
-#: daemon/gvfsbackendsftp.c:374
+#: daemon/gvfsbackendsftp.c:375
 msgid "Host key verification failed"
 msgstr "Makine anahtarının onaylanması başarısız oldu"
 
-#: daemon/gvfsbackendsftp.c:381
+#: daemon/gvfsbackendsftp.c:382
 msgid "Too many authentication failures"
 msgstr "Çok fazla kimlik doğrulama hatası"
 
-#: daemon/gvfsbackendsftp.c:556
+#: daemon/gvfsbackendsftp.c:557
 msgid "Unable to spawn SSH program"
 msgstr "SSH programı oluşturulamadı"
 
-#: daemon/gvfsbackendsftp.c:572
+#: daemon/gvfsbackendsftp.c:573
 #, c-format
 msgid "Unable to spawn SSH program: %s"
 msgstr "SSH programı oluşturulamadı: %s"
 
-#: daemon/gvfsbackendsftp.c:674 daemon/gvfsbackendsftp.c:1050
+#: daemon/gvfsbackendsftp.c:675 daemon/gvfsbackendsftp.c:1051
 msgid "Timed out when logging in"
 msgstr "Giriş yapılırken zaman aşımına uğradı"
 
-#: daemon/gvfsbackendsftp.c:926
+#: daemon/gvfsbackendsftp.c:927
 msgid "Log In Anyway"
 msgstr "Gene de Giriş Yap"
 
-#: daemon/gvfsbackendsftp.c:926
+#: daemon/gvfsbackendsftp.c:927
 msgid "Cancel Login"
 msgstr "Girişi İptal Et"
 
-#: daemon/gvfsbackendsftp.c:941
+#: daemon/gvfsbackendsftp.c:942
 msgid "Login dialog cancelled"
 msgstr "Giriş penceresi iptal edildi"
 
-#: daemon/gvfsbackendsftp.c:960
+#: daemon/gvfsbackendsftp.c:961
 msgid "Can’t send host identity confirmation"
 msgstr "Makine kimlik onayı gönderilemiyor"
 
 #. Translators: the first %s is the username, the second the host name
-#: daemon/gvfsbackendsftp.c:1156
+#: daemon/gvfsbackendsftp.c:1157
 #, c-format
 msgid "Enter passphrase for secure key for %s on %s"
 msgstr "%2$s üzerindeki %1$s için anahtar parolasını gir"
 
 #. Translators: %s is the hostname
-#: daemon/gvfsbackendsftp.c:1163
+#: daemon/gvfsbackendsftp.c:1164
 #, c-format
 msgid "Enter passphrase for secure key for %s"
 msgstr "%s için anahtar parolasını gir"
 
-#: daemon/gvfsbackendsftp.c:1255
+#: daemon/gvfsbackendsftp.c:1256
 msgid "Can’t send password"
 msgstr "Parola gönderilemiyor"
 
-#: daemon/gvfsbackendsftp.c:1271
+#: daemon/gvfsbackendsftp.c:1272
 #, c-format
-#| msgid ""
-#| "Can't verify the identity of “%s”.\n"
-#| "This happens when you log in to a computer the first time.\n"
-#| "\n"
-#| "The identity sent by the remote computer is “%s”. If you want to be "
-#| "absolutely sure it is safe to continue, contact the system administrator."
 msgid ""
 "Can’t verify the identity of “%s”.\n"
 "This happens when you log in to a computer the first time.\n"
@@ -1630,7 +1605,7 @@ msgstr ""
 "için tümüyle güvenli olduğundan emin olmak istiyorsanız, sistem "
 "yöneticisiyle bağlantıya geçin."
 
-#: daemon/gvfsbackendsftp.c:1298
+#: daemon/gvfsbackendsftp.c:1299
 #, c-format
 msgid ""
 "The host key for “%s” differs from the key for the IP address “%s”\n"
@@ -1641,50 +1616,57 @@ msgstr ""
 "Eğer devam etmek için tümüyle güvenli olduğundan emin olmak istiyorsanız, "
 "sistem yöneticinizle bağlantıya geçin."
 
-#: daemon/gvfsbackendsftp.c:1389
+#: daemon/gvfsbackendsftp.c:1390
 msgid "The connection is closed (the underlying SSH process exited)"
 msgstr "Bağlantı kapatıldı (ilgili SSH süreci sonlandırıldı)"
 
-#: daemon/gvfsbackendsftp.c:1390
+#: daemon/gvfsbackendsftp.c:1391
 msgid "Internal error: Unknown Error"
 msgstr "İç hata: Bilinmeyen Hata"
 
-#: daemon/gvfsbackendsftp.c:1904 daemon/gvfsbackendsftp.c:1931
+#: daemon/gvfsbackendsftp.c:1905 daemon/gvfsbackendsftp.c:1932
 msgid "Protocol error"
 msgstr "İletişim kuralı hatası"
 
-#: daemon/gvfsbackendsftp.c:2046
+#: daemon/gvfsbackendsftp.c:2047
 msgid "Unable to find supported SSH command"
 msgstr "Desteknelen SSH komut komutu bulunamadı"
 
-#: daemon/gvfsbackendsftp.c:2153
-#| msgid "Unknown error."
+#: daemon/gvfsbackendsftp.c:2154
 msgid "Unknown reason"
 msgstr "Bilinmeyen neden"
 
-#: daemon/gvfsbackendsftp.c:2588 daemon/gvfsbackendsmb.c:1372
+#: daemon/gvfsbackendsftp.c:2589 daemon/gvfsbackendsmb.c:1372
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr ".(geçersiz kodlama)"
 
 #. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: daemon/gvfsbackendsftp.c:2600 daemon/gvfsftpdircache.c:431
+#: daemon/gvfsbackendsftp.c:2601 daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
 msgstr "%s üzerinde /"
 
-#: daemon/gvfsbackendsftp.c:2673
+#: daemon/gvfsbackendsftp.c:2674
 msgid "Failure"
 msgstr "Başarısız"
 
-#: daemon/gvfsbackendsftp.c:3085
+#: daemon/gvfsbackendsftp.c:3086
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Yedek dosya oluşturulurken hata: %s"
 
-#: daemon/gvfsbackendsftp.c:3652 daemon/gvfsbackendsftp.c:3828
+#: daemon/gvfsbackendsftp.c:3653 daemon/gvfsbackendsftp.c:3829
 msgid "backups not supported yet"
 msgstr "yedekler henüz desteklenmiyor"
+
+#: daemon/gvfsbackendsftp.c:5242
+msgid "Value out of range, sftp only supports 32bit timestamps"
+msgstr "Değer aralık dışında, sftp yalnızca 32bit zaman damgalarını destekler"
+
+#: daemon/gvfsbackendsftp.c:5317 daemon/gvfsbackendsmb.c:1708
+msgid "Invalid attribute type (uint64 expected)"
+msgstr "Geçersiz öznitelik türü (uint64 bekleniyor)"
 
 #. translators: %s is a server name
 #: daemon/gvfsbackendsmbbrowse.c:371
@@ -1733,10 +1715,6 @@ msgstr "%s Windows paylaşımı bağlanamadı"
 msgid "Backup file creation failed: %s"
 msgstr "Yedek dosyası oluşturma başarısız: %s"
 
-#: daemon/gvfsbackendsmb.c:1708
-msgid "Invalid attribute type (uint64 expected)"
-msgstr "Geçersiz öznitelik türü (uint64 bekleniyor)"
-
 #: daemon/gvfsbackendsmb.c:1877
 msgid "Can’t rename file, filename already exists"
 msgstr "Dosya yeniden adlandırılamıyor, dosya adı zaten var"
@@ -1757,7 +1735,6 @@ msgid "Error removing target file: %s"
 msgstr "Hedef dosya silinirken hata: %s"
 
 #: daemon/gvfsbackendsmb.c:2098
-#| msgid "Can't recursively move directory"
 msgid "Can’t recursively move directory"
 msgstr "Dizin özyinelemeli taşınamıyor"
 
@@ -1779,7 +1756,7 @@ msgstr "Çöp içerisindeki ögeler değiştirilmemeli"
 msgid "Trash"
 msgstr "Çöp"
 
-#: daemon/gvfschannel.c:335
+#: daemon/gvfschannel.c:339
 msgid "Channel blocked"
 msgstr "Kanal bloklandı"
 
@@ -1926,7 +1903,7 @@ msgstr ""
 "%s ayrılıyor\n"
 "Lütfen bekleyin"
 
-#: daemon/main.c:149 metadata/meta-daemon.c:383
+#: daemon/main.c:149 metadata/meta-daemon.c:374
 msgid "Replace old daemon."
 msgstr "Eski hizmetin yerine kondu."
 
@@ -1938,7 +1915,7 @@ msgstr "fuse’ü başlatma."
 msgid "Enable debug output."
 msgstr "Hata ayıklama çıktısını etkinleştir."
 
-#: daemon/main.c:152 metadata/meta-daemon.c:384
+#: daemon/main.c:152 metadata/meta-daemon.c:375
 msgid "Show program version."
 msgstr "Programın sürümünü göster."
 
@@ -1952,34 +1929,34 @@ msgstr "GVFS için ana hizmet"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: daemon/main.c:188 metadata/meta-daemon.c:410
+#: daemon/main.c:188 metadata/meta-daemon.c:401
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: daemon/main.c:190 metadata/meta-daemon.c:412
+#: daemon/main.c:190 metadata/meta-daemon.c:403
 #, c-format
 msgid "Try “%s --help” for more information."
 msgstr "Daha çok bilgi için “%s --help” deneyin."
 
-#: daemon/mount.c:709
+#: daemon/mount.c:711
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Kendiliğinden bağlama başarısız oldu: %s"
 
-#: daemon/mount.c:753 daemon/mount.c:814
+#: daemon/mount.c:755 daemon/mount.c:831
 msgid "The specified location is not mounted"
 msgstr "Belirtilen konum bağlanmamış"
 
-#: daemon/mount.c:758
+#: daemon/mount.c:760
 msgid "The specified location is not supported"
 msgstr "Belirtilen konum desteklenmiyor"
 
-#: daemon/mount.c:912
+#: daemon/mount.c:943
 msgid "Location is already mounted"
 msgstr "Konum zaten bağlanmış"
 
-#: daemon/mount.c:921
+#: daemon/mount.c:952
 msgid "Location is not mountable"
 msgstr "Konum bağlanılabilir değil"
 
@@ -1993,33 +1970,33 @@ msgstr "Dosya işlemleri gerçekleştir"
 msgid "Authentication is required to perform file operations"
 msgstr "Dosya işlemleri gerçekleştirmek için yetkilendirme gerekiyor"
 
-#: metadata/meta-daemon.c:168 metadata/meta-daemon.c:244
-#: metadata/meta-daemon.c:280
+#: metadata/meta-daemon.c:170 metadata/meta-daemon.c:246
+#: metadata/meta-daemon.c:282
 #, c-format
 msgid "Can’t find metadata file %s"
 msgstr "Üst veri dosyası %s bulunamıyor"
 
-#: metadata/meta-daemon.c:186 metadata/meta-daemon.c:198
+#: metadata/meta-daemon.c:188 metadata/meta-daemon.c:200
 msgid "Unable to set metadata key"
 msgstr "Üst veri anahtarı atanamadı"
 
-#: metadata/meta-daemon.c:208
+#: metadata/meta-daemon.c:210
 msgid "Unable to unset metadata key"
 msgstr "Üst veri anahtarı ataması alınamıyor"
 
-#: metadata/meta-daemon.c:254
+#: metadata/meta-daemon.c:256
 msgid "Unable to remove metadata keys"
 msgstr "Üst veri anahtarları kaldırılamıyor"
 
-#: metadata/meta-daemon.c:291
+#: metadata/meta-daemon.c:293
 msgid "Unable to move metadata keys"
 msgstr "Üst veri anahtarları taşınamıyor"
 
-#: metadata/meta-daemon.c:394
+#: metadata/meta-daemon.c:385
 msgid "GVFS Metadata Daemon"
 msgstr "GVFS Üst Veri Hizmeti"
 
-#: metadata/meta-daemon.c:397
+#: metadata/meta-daemon.c:388
 msgid "Metadata daemon for GVFS"
 msgstr "GVFS için üst veri hizmeti"
 
@@ -2040,7 +2017,7 @@ msgstr "Adsız Sürücü (%s)"
 msgid "Unnamed Drive"
 msgstr "Adsız Sürücü"
 
-#: monitor/gdu/ggdudrive.c:561 monitor/udisks2/gvfsudisks2drive.c:640
+#: monitor/gdu/ggdudrive.c:561 monitor/udisks2/gvfsudisks2drive.c:624
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
 "Ortamı çıkartma başarısız; ortam üzerindeki bir ya da daha çok birim meşgul."
@@ -2060,7 +2037,7 @@ msgstr ""
 msgid "Start Anyway"
 msgstr "Gene de Başlat"
 
-#: monitor/gdu/ggdumount.c:857 monitor/udisks2/gvfsudisks2mount.c:672
+#: monitor/gdu/ggdumount.c:857 monitor/udisks2/gvfsudisks2mount.c:640
 msgid "One or more programs are preventing the unmount operation."
 msgstr "Bir ya da daha çok program ayırma işlemini engellemektedir."
 
@@ -2135,7 +2112,6 @@ msgid "An operation is already pending"
 msgstr "Bir işlem zaten beklemede"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1128
-#| msgid "error starting mount daemon"
 msgid "No outstanding mount operation"
 msgstr "Tamamlanmamış bağlama işlemi yok"
 
@@ -2153,16 +2129,16 @@ msgstr "Verilen sürücü bulunamadı"
 #. Note that the GUI (Shell, Files) currently use the term
 #. * "Eject" for both GDrive.stop() and GDrive.eject().
 #.
-#: monitor/udisks2/gvfsudisks2mount.c:781
+#: monitor/udisks2/gvfsudisks2mount.c:750
 msgid "Eject Anyway"
 msgstr "Yine de Çıkart"
 
-#: monitor/udisks2/gvfsudisks2utils.c:511
+#: monitor/udisks2/gvfsudisks2utils.c:339
 #, c-format
 msgid "Timed out running command-line “%s”"
 msgstr "“%s” komut satırı çalıştırılmasında zaman aşımı"
 
-#: monitor/udisks2/gvfsudisks2utils.c:674
+#: monitor/udisks2/gvfsudisks2utils.c:641
 #, c-format
 msgid ""
 "Unmounting %s\n"
@@ -2171,7 +2147,7 @@ msgstr ""
 "%s ayrılıyor\n"
 "Dosya sisteminden bağlantı kesiliyor."
 
-#: monitor/udisks2/gvfsudisks2utils.c:676
+#: monitor/udisks2/gvfsudisks2utils.c:643
 #, c-format
 msgid ""
 "Writing data to %s\n"
@@ -2180,7 +2156,7 @@ msgstr ""
 "%s üzerine veri yazılıyor\n"
 "Aygıt çıkartılmamalıdır."
 
-#: monitor/udisks2/gvfsudisks2utils.c:815
+#: monitor/udisks2/gvfsudisks2utils.c:782
 #, c-format
 msgid ""
 "%s unmounted\n"
@@ -2189,7 +2165,7 @@ msgstr ""
 "%s ayrıldı\n"
 "Dosya sistemi bağlantısı kesildi."
 
-#: monitor/udisks2/gvfsudisks2utils.c:817
+#: monitor/udisks2/gvfsudisks2utils.c:784
 #, c-format
 msgid ""
 "%s can be safely unplugged\n"
@@ -2201,7 +2177,7 @@ msgstr ""
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: monitor/udisks2/gvfsudisks2volume.c:307
+#: monitor/udisks2/gvfsudisks2volume.c:299
 #, c-format
 msgid "%s Encrypted"
 msgstr "%s Şifrelendi"
@@ -2209,41 +2185,41 @@ msgstr "%s Şifrelendi"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: monitor/udisks2/gvfsudisks2volume.c:319
+#: monitor/udisks2/gvfsudisks2volume.c:311
 #, c-format
 msgid "%s Volume"
 msgstr "%s Birimi"
 
 #. Translators: Name used for volume
-#: monitor/udisks2/gvfsudisks2volume.c:555
+#: monitor/udisks2/gvfsudisks2volume.c:547
 msgid "Volume"
 msgstr "Birim"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1117
+#: monitor/udisks2/gvfsudisks2volume.c:1096
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "Anahtar için parola saklanırken hata oluştu (%s)"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1153
+#: monitor/udisks2/gvfsudisks2volume.c:1129
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "Anahtar için geçersiz parolanın silinmesinde hata oluştu (%s)"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1218
+#: monitor/udisks2/gvfsudisks2volume.c:1191
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr "Kilidi açılan aygıt üzerinde tanınabilir bir dosya sistemi yok"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1247
+#: monitor/udisks2/gvfsudisks2volume.c:1219
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "%s için şifreleme parolası"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1455
+#: monitor/udisks2/gvfsudisks2volume.c:1418
 msgid "A passphrase is required to access the volume"
 msgstr "Bu birime erişmek için bir parola gerekiyor"
 
 #. Translators: This is the message shown to users
-#: monitor/udisks2/gvfsudisks2volume.c:1470
+#: monitor/udisks2/gvfsudisks2volume.c:1432
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2256,7 +2232,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: monitor/udisks2/gvfsudisks2volume.c:1639
+#: monitor/udisks2/gvfsudisks2volume.c:1595
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
