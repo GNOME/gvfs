@@ -457,6 +457,7 @@ gvfsd_admin_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendadmin.h \
 	-DDEFAULT_BACKEND_TYPE=admin \
 	-DBACKEND_TYPES='"admin", G_VFS_TYPE_BACKEND_ADMIN,' \
+	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint_admin \
 	$(ADMIN_CFLAGS)
 
 gvfsd_admin_LDADD = $(libraries) $(ADMIN_LIBS)

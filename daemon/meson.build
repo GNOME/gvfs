@@ -367,7 +367,8 @@ if enable_admin
   cflags = [
     '-DBACKEND_HEADER=gvfsbackendadmin.h',
     '-DDEFAULT_BACKEND_TYPE=admin',
-    '-DBACKEND_TYPES="admin", G_VFS_TYPE_BACKEND_ADMIN,'
+    '-DBACKEND_TYPES="admin", G_VFS_TYPE_BACKEND_ADMIN,',
+    '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_admin'
   ]
 
   programs += [['gvfsd-admin', sources, deps, cflags]]
