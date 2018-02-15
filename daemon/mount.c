@@ -398,12 +398,22 @@ spawn_mount_handle_spawned (GVfsDBusSpawner *object,
 }
 
 static void
+child_watch_cb (GPid pid,
+                gint status,
+                gpointer user_data)
+{
+  g_spawn_close_pid (pid);
+}
+
+static void
 spawn_mount (MountData *data)
 {
   char *exec;
   GError *error;
   GDBusConnection *connection;
   static int mount_id = 0;
+  gchar **argv = NULL;
+  GPid pid;
 
   data->spawned = TRUE;
   
@@ -448,13 +458,25 @@ spawn_mount (MountData *data)
                           " ",
                           data->obj_path,
                           NULL);
-      if (!g_spawn_command_line_async (exec, &error))
-	{
+
+      /* G_SPAWN_DO_NOT_REAP_CHILD is necessary for admin backend to prevent
+       * double forking causing pkexec failures, see:
+       * https://bugzilla.gnome.org/show_bug.cgi?id=793445
+       */
+      if (!g_shell_parse_argv (exec, NULL, &argv, &error) ||
+          !g_spawn_async (NULL, argv, NULL, G_SPAWN_DO_NOT_REAP_CHILD, NULL, NULL, &pid, &error))
+        {
           g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (data->spawner));
-	  mount_finish (data, error);
-	  g_error_free (error);
-	}
-      
+          mount_finish (data, error);
+          g_error_free (error);
+        }
+      else
+        {
+          g_child_watch_add (pid, child_watch_cb, NULL);
+        }
+
+      g_strfreev (argv);
+
       /* TODO: Add a timeout here to detect spawned app crashing */
       
       g_object_unref (connection);
