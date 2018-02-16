@@ -792,6 +792,7 @@ do_mount (GVfsBackend *backend,
   GMountSpec *browse_mount_spec;
   smbc_opendir_fn smbc_opendir;
   smbc_closedir_fn smbc_closedir;
+  int errsv;
   
   smb_context = smbc_new_context ();
   if (smb_context == NULL)
@@ -903,6 +904,8 @@ do_mount (GVfsBackend *backend,
 
   g_debug ("do_mount - URI = %s\n", uri);
 
+  errsv = 0;
+
   do
     {
       op_backend->mount_try_again = FALSE;
@@ -912,12 +915,13 @@ do_mount (GVfsBackend *backend,
 
       dir = smbc_opendir (smb_context, uri);
 
+      errsv = errno;
       g_debug ("do_mount - [%s; %d] dir = %p, cancelled = %d, errno = [%d] '%s' \n",
              uri, op_backend->mount_try, dir, op_backend->mount_cancelled,
-             errno, g_strerror (errno));
+             errsv, g_strerror (errsv));
 
       if (dir == NULL && 
-          (op_backend->mount_cancelled || (errno != EPERM && errno != EACCES)))
+          (op_backend->mount_cancelled || (errsv != EPERM && errsv != EACCES)))
         {
           g_debug ("do_mount - (errno != EPERM && errno != EACCES), cancelled = %d, breaking\n", op_backend->mount_cancelled);
 	  break;
@@ -965,7 +969,7 @@ do_mount (GVfsBackend *backend,
         g_vfs_job_failed (G_VFS_JOB (job),
 			  G_IO_ERROR, G_IO_ERROR_FAILED,
 			  /* translators: We tried to mount a windows (samba) share, but failed */
-			  _("Failed to retrieve share list from server: %s"), g_strerror (errno));
+			  _("Failed to retrieve share list from server: %s"), g_strerror (errsv));
 
       return;
     }
