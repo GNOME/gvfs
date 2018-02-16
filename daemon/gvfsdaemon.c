@@ -1067,6 +1067,8 @@ g_vfs_daemon_get_blocking_processes (GVfsDaemon *daemon)
   GArray *processes;
   GList *l;
 
+  g_mutex_lock (&daemon->lock);
+
   processes = g_array_new (FALSE, FALSE, sizeof (GPid));
   for (l = daemon->job_sources; l != NULL; l = l->next)
     {
@@ -1077,6 +1079,8 @@ g_vfs_daemon_get_blocking_processes (GVfsDaemon *daemon)
           g_array_append_val (processes, pid);
         }
     }
+
+  g_mutex_unlock (&daemon->lock);
 
   return processes;
 }
@@ -1122,8 +1126,12 @@ g_vfs_daemon_close_active_channels (GVfsDaemon *daemon,
 {
   GList *l;
 
-   for (l = daemon->job_sources; l != NULL; l = l->next)
-      if (G_VFS_IS_CHANNEL (l->data) &&
-          g_vfs_channel_get_backend (G_VFS_CHANNEL (l->data)) == backend)
-        g_vfs_channel_force_close (G_VFS_CHANNEL (l->data));
+  g_mutex_lock (&daemon->lock);
+
+  for (l = daemon->job_sources; l != NULL; l = l->next)
+    if (G_VFS_IS_CHANNEL (l->data) &&
+        g_vfs_channel_get_backend (G_VFS_CHANNEL (l->data)) == backend)
+      g_vfs_channel_force_close (G_VFS_CHANNEL (l->data));
+
+  g_mutex_unlock (&daemon->lock);
 }
