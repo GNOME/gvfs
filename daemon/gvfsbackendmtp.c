@@ -931,14 +931,14 @@ do_mount (GVfsBackend *backend,
   op_backend->volume_symbolic_icon = g_vfs_get_volume_symbolic_icon (device);
   g_object_unref (device);
 
-  g_signal_connect (op_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), op_backend);
-
-  op_backend->file_cache = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-
   LIBMTP_Init ();
 
   get_device (backend, host, G_VFS_JOB (job));
   if (!G_VFS_JOB (job)->failed) {
+    g_signal_connect (op_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), op_backend);
+
+    op_backend->file_cache = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
     GMountSpec *mtp_mount_spec = g_mount_spec_new ("mtp");
     g_mount_spec_set (mtp_mount_spec, "host", host);
     g_vfs_backend_set_mount_spec (backend, mtp_mount_spec);
