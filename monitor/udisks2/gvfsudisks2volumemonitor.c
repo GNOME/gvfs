@@ -1186,6 +1186,37 @@ find_lonely_mount_for_mount_point (GVfsUDisks2VolumeMonitor *monitor,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static const char *
+_udisks_client_get_device_for_part (UDisksClient *client, const char *label, const char *uuid)
+{
+  GList *objects;
+  const char *device = NULL;
+  GList *l;
+
+  objects = g_dbus_object_manager_get_objects (udisks_client_get_object_manager (client));
+  for (l = objects; l != NULL; l = l->next)
+    {
+      UDisksPartition *partition;
+      UDisksBlock *block;
+
+      partition = udisks_object_peek_partition (UDISKS_OBJECT (l->data));
+      block = udisks_object_peek_block (UDISKS_OBJECT (l->data));
+      if (partition == NULL || block == NULL)
+        continue;
+
+      if ((label != NULL && g_strcmp0 (udisks_partition_get_name (partition), label) == 0) ||
+          (uuid != NULL && g_strcmp0 (udisks_partition_get_uuid (partition), uuid) == 0))
+        {
+          device = udisks_block_get_device (block);
+          break;
+        }
+    }
+
+  g_list_free_full (objects, g_object_unref);
+
+  return device;
+}
+
 static GVfsUDisks2Volume *
 find_volume_for_device (GVfsUDisks2VolumeMonitor *monitor,
                         const gchar              *device)
@@ -1212,10 +1243,21 @@ find_volume_for_device (GVfsUDisks2VolumeMonitor *monitor,
       else
         goto out;
     }
+  else if (g_str_has_prefix (device, "PARTLABEL="))
+    {
+      device = _udisks_client_get_device_for_part (monitor->client, device + 10, NULL);
+    }
+  else if (g_str_has_prefix (device, "PARTUUID="))
+    {
+      device = _udisks_client_get_device_for_part (monitor->client, NULL, device + 9);
+    }
   else if (!g_str_has_prefix (device, "/dev/"))
     {
       goto out;
     }
+
+  if (device == NULL)
+    goto out;
 
   if (stat (device, &statbuf) != 0)
     goto out;
@@ -1485,12 +1527,23 @@ mount_point_has_device (GVfsUDisks2VolumeMonitor  *monitor,
       else
         goto out;
     }
+  else if (g_str_has_prefix (device, "PARTLABEL="))
+    {
+      device = _udisks_client_get_device_for_part (monitor->client, device + 10, NULL);
+    }
+  else if (g_str_has_prefix (device, "PARTUUID="))
+    {
+      device = _udisks_client_get_device_for_part (monitor->client, NULL, device + 9);
+    }
   else if (!g_str_has_prefix (device, "/dev/"))
     {
       /* NFS, CIFS and other non-device mounts always have a device */
       ret = TRUE;
       goto out;
     }
+
+  if (device == NULL)
+    goto out;
 
   if (stat (device, &statbuf) != 0)
     goto out;
