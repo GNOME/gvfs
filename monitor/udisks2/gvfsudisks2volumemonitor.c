@@ -1206,7 +1206,7 @@ find_volume_for_device (GVfsUDisks2VolumeMonitor *monitor,
     }
   else if (g_str_has_prefix (device, "UUID="))
     {
-      blocks = udisks_client_get_block_for_uuid (monitor->client, device + 6);
+      blocks = udisks_client_get_block_for_uuid (monitor->client, device + 5);
       if (blocks != NULL)
         device = udisks_block_get_device (UDISKS_BLOCK (blocks->data));
       else
@@ -1479,7 +1479,7 @@ mount_point_has_device (GVfsUDisks2VolumeMonitor  *monitor,
     }
   else if (g_str_has_prefix (device, "UUID="))
     {
-      blocks = udisks_client_get_block_for_uuid (monitor->client, device + 6);
+      blocks = udisks_client_get_block_for_uuid (monitor->client, device + 5);
       if (blocks != NULL)
         device = udisks_block_get_device (UDISKS_BLOCK (blocks->data));
       else
