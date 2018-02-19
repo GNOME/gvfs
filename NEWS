@@ -1,3 +1,11 @@
+Major changes in 1.35.91
+========================
+* mtp: Prevent crashes if device is unplugged during mount operation
+* daemon: Fix admin backend spawning on some systems
+* google: Return error properly when trying to replace native files
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.35.90
 ========================
 * build: Several FreeBSD related fixes
