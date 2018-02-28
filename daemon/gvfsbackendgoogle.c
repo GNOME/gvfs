@@ -2038,7 +2038,6 @@ g_vfs_backend_google_query_fs_info (GVfsBackend           *_self,
                                     GFileInfo             *info,
                                     GFileAttributeMatcher *matcher)
 {
-  GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (_self);
   GMountSpec *spec;
   const gchar *type;
 
@@ -2056,6 +2055,7 @@ g_vfs_backend_google_query_fs_info (GVfsBackend           *_self,
       g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_FREE) ||
       g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_USED))
     {
+      GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (_self);
       GCancellable *cancellable = G_VFS_JOB (job)->cancellable;
       gdata_documents_service_get_metadata_async (self->service, cancellable, fs_info_cb, job);
       return TRUE;
