@@ -385,6 +385,7 @@ do_mount (GVfsBackend *backend,
   gchar *port_str;
   GMountSpec *smb_mount_spec;
   smbc_stat_fn smbc_stat;
+  int errsv;
 
   smb_context = smbc_new_context ();
   if (smb_context == NULL)
@@ -470,6 +471,8 @@ do_mount (GVfsBackend *backend,
   op_backend->mount_try = 0;
   op_backend->password_save = G_PASSWORD_SAVE_NEVER;
 
+  errsv = 0;
+
   do
     {
       op_backend->mount_try_again = FALSE;
@@ -480,14 +483,15 @@ do_mount (GVfsBackend *backend,
       smbc_stat = smbc_getFunctionStat (smb_context);
       res = smbc_stat (smb_context, uri, &st);
 
+      errsv = errno;
       g_debug ("do_mount - [%s; %d] res = %d, cancelled = %d, errno = [%d] '%s' \n",
              uri, op_backend->mount_try, res, op_backend->mount_cancelled,
-             errno, g_strerror (errno));
+             errsv, g_strerror (errsv));
 
       if (res == 0)
         break;
 
-      if (op_backend->mount_cancelled || (errno != EACCES && errno != EPERM))
+      if (op_backend->mount_cancelled || (errsv != EACCES && errsv != EPERM))
         {
           g_debug ("do_mount - (errno != EPERM && errno != EACCES), cancelled = %d, breaking\n", op_backend->mount_cancelled);
           break;
@@ -526,7 +530,7 @@ do_mount (GVfsBackend *backend,
         g_vfs_job_failed (G_VFS_JOB (job),
 			  G_IO_ERROR, G_IO_ERROR_FAILED,
 			  /* translators: We tried to mount a windows (samba) share, but failed */
-			  _("Failed to mount Windows share: %s"), g_strerror (errno));
+			  _("Failed to mount Windows share: %s"), g_strerror (errsv));
 
       return;
     }
