@@ -90,7 +90,6 @@ struct _GVfsBackendSmbBrowse
   GMutex update_cache_lock;
   time_t last_entry_update;
   GList *entries;
-  int entry_errno;
 };
 
 
@@ -548,7 +547,6 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
   char dirents[1024*4];
   struct smbc_dirent *dirp;
   GList *entries;
-  int entry_errno;
   SMBCFILE *dir;
   int res;
   smbc_opendir_fn smbc_opendir;
@@ -557,7 +555,6 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
 
 
   entries = NULL;
-  entry_errno = 0;
   res = -1;
 
   g_mutex_lock (&backend->update_cache_lock);
@@ -575,7 +572,6 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
   g_free (uri);
   if (dir == NULL)
     {
-      entry_errno = errno;
       goto out;
     }
 
@@ -632,7 +628,6 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
   /* Clear old cache */
   g_list_free_full (backend->entries, (GDestroyNotify)browse_entry_free);
   backend->entries = entries;
-  backend->entry_errno = entry_errno;
   backend->last_entry_update = time (NULL);
 
   g_debug ("update_cache - done.\n");
