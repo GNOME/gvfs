@@ -499,11 +499,13 @@ subdir('daemon')
 subdir('monitor')
 subdir('po')
 
-if get_option('deprecated_programs')
+enable_deprecated_programs = get_option('deprecated_programs')
+if enable_deprecated_programs
   subdir('programs')
 endif
 
-if get_option('man')
+enable_man = get_option('man')
+if enable_man
   subdir('man')
 endif
 
@@ -519,3 +521,41 @@ meson.add_install_script(
   gvfs_datadir,
   gvfs_libdir
 )
+
+output = meson.project_name() + ' configuration summary:\n'
+output += '\n'
+output += '  dbus_service_dir: ' + dbus_service_dir + '\n'
+output += '  gio_module_dir: ' + gio_module_dir + '\n'
+output += '  systemduserunitdir: ' + systemd_user_unit_dir + '\n'
+output += '  tmpfilesdir: ' + tmp_files_dir + '\n'
+output += '\n'
+output += '  admin: ' + enable_admin.to_string() + '\n'
+output += '  afc: ' + enable_afc.to_string() + '\n'
+output += '  afp: ' + enable_afp.to_string() + '\n'
+output += '  archive: ' + enable_archive.to_string() + '\n'
+output += '  cdda: ' + enable_cdda.to_string() + '\n'
+output += '  dnssd: ' + enable_dnssd.to_string() + '\n'
+output += '  gdu: ' + enable_gdu.to_string() + '\n'
+output += '  goa: ' + enable_goa.to_string() + '\n'
+output += '  google: ' + enable_google.to_string() + '\n'
+output += '  gphoto2: ' + enable_gphoto2.to_string() + '\n'
+output += '  http: ' + enable_http.to_string() + '\n'
+output += '  mtp: ' + enable_mtp.to_string() + '\n'
+output += '  nfs: ' + enable_nfs.to_string() + '\n'
+output += '  smb: ' + enable_samba.to_string() + '\n'
+output += '  udisks2: ' + enable_udisks2.to_string() + '\n'
+output += '\n'
+output += '  bluray: ' + enable_bluray.to_string() + '\n'
+output += '  fuse: ' + enable_fuse.to_string() + '\n'
+output += '  gcr: ' + enable_gcr.to_string() + '\n'
+output += '  gcrypt: ' + enable_gcrypt.to_string() + '\n'
+output += '  gudev: ' + enable_gudev.to_string() + '\n'
+output += '  keyring: ' + enable_keyring.to_string() + '\n'
+output += '  logind: ' + enable_logind.to_string() + '\n'
+output += '  libusb: ' + enable_libusb.to_string() + '\n'
+output += '\n'
+output += '  deprecated_programs: ' + enable_deprecated_programs.to_string() + '\n'
+output += '  devel_utils: ' + enable_devel_utils.to_string() + '\n'
+output += '  installed_tests: ' + enable_installed_tests.to_string() + '\n'
+output += '  man: ' + enable_man.to_string() + '\n'
+message(output)
