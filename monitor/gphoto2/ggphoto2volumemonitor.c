@@ -139,7 +139,15 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
     GGPhoto2Volume *volume;
     GList *store_heads, *l;
     guint num_store_heads;
-    const char *usb_bus_num, *usb_device_num;
+    const char *usb_bus_num, *usb_device_num, *device_path;
+
+    device_path = g_udev_device_get_device_file (device);
+    if (!device_path)
+      {
+        g_debug ("Ignoring device '%s' without a device file",
+                 g_udev_device_get_sysfs_path (device));
+        return;
+      }
 
 #ifdef HAVE_LIBMTP
     if (g_udev_device_get_property_as_boolean (device, "ID_MTP_DEVICE"))
@@ -150,16 +158,18 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
 #endif /* HAVE_LIBMTP */
 
     usb_bus_num = g_udev_device_get_property (device, "BUSNUM");
-    if (usb_bus_num == NULL) {
-	g_warning("device %s has no BUSNUM property, ignoring", g_udev_device_get_device_file (device));
-	return;
-    }
+    if (usb_bus_num == NULL)
+      {
+        g_warning ("device %s has no BUSNUM property, ignoring", device_path);
+        return;
+      }
 
     usb_device_num = g_udev_device_get_property (device, "DEVNUM");
-    if (usb_device_num == NULL) {
-	g_warning("device %s has no DEVNUM property, ignoring", g_udev_device_get_device_file (device));
-	return;
-    }
+    if (usb_device_num == NULL)
+      {
+        g_warning ("device %s has no DEVNUM property, ignoring", device_path);
+        return;
+      }
 
     g_debug ("gudev_add_camera: camera device %s (bus: %s, device: %s)",
              g_udev_device_get_device_file (device),
