@@ -1,3 +1,19 @@
+Major changes in 1.32.2
+=======================
+* mtp: Prevent crashes if device is unplugged during mount operation
+* trash: Fix trash::orig-path for relative paths
+* mtp: Handle read-past-EOF ourselves to prevent hangs
+* proxy: Fix shadow mount handling for equal paths
+* gdaemonfile: Fix g_file_equal for different mount_prefix
+* gdaemonfile: Fix relative path handling
+* client: Fix crash when calculating a relative path
+* channel: Set sockets as nonblocking to prevent deadlocks when copying
+* afc: Leak mutex when force unmounting
+* dav: Fix DAV implementation stripping spaces
+* goa: Fix password-based authentication
+* google: Do not ignore errors when rebuilding cache
+* Translation updates
+
 Major changes in 1.32.1
 =======================
 * common: Fix potential crash caused by missing g_strdup
