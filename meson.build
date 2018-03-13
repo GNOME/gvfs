@@ -522,7 +522,7 @@ meson.add_install_script(
   gvfs_libdir
 )
 
-output = meson.project_name() + ' configuration summary:\n'
+output = gvfs_name + ' ' + gvfs_version + ' configuration summary:\n'
 output += '\n'
 output += '  dbus_service_dir: ' + dbus_service_dir + '\n'
 output += '  gio_module_dir: ' + gio_module_dir + '\n'
