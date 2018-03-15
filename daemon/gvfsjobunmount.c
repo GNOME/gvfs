@@ -319,9 +319,6 @@ send_reply (GVfsJob *job)
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
   GVfsBackend *backend = op_job->backend;
 
-  g_debug ("send_reply(%p), failed=%d (%s)\n", job, job->failed,
-           job->failed ? job->error->message : "");
-
   if (job->failed)
     {
       g_vfs_backend_set_block_requests (backend, FALSE);
