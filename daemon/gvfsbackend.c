@@ -832,32 +832,35 @@ typedef struct
 {
   GMountSource *mount_source;
 
-  gboolean ret;
-  gboolean aborted;
-  gint choice;
-
   const gchar *message;
   const gchar *choices[3];
 
-  gboolean completed;
+  gboolean no_more_processes;
 
   guint timeout_id;
 } UnmountWithOpData;
 
 static void
-complete_unmount_with_op (GTask *task, gboolean no_more_processes)
+on_show_processes_reply (GMountSource  *mount_source,
+                         GAsyncResult  *res,
+                         gpointer       user_data)
 {
+  GTask *task = G_TASK (user_data);
   UnmountWithOpData *data = g_task_get_task_data (task);
+  gboolean ret, aborted;
+  gint choice;
 
-  g_source_remove (data->timeout_id);
+  if (data->timeout_id != 0)
+    g_source_remove (data->timeout_id);
 
-  if (!no_more_processes && !data->ret)
+  ret = g_mount_source_show_processes_finish (mount_source, res, &aborted, &choice);
+  if (!data->no_more_processes && !ret)
     {
       /*  If the "show-processes" signal wasn't handled */
       g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_BUSY,
                                _("File system is busy"));
     }
-  else if (!no_more_processes && (data->aborted || data->choice == 1))
+  else if (!data->no_more_processes && (aborted || choice == 1))
     {
       g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED,
                                "GMountOperation aborted");
@@ -867,28 +870,7 @@ complete_unmount_with_op (GTask *task, gboolean no_more_processes)
       g_task_return_boolean (task, TRUE);
     }
 
-  data->completed = TRUE;
   g_object_unref (task);
-}
-
-static void
-on_show_processes_reply (GMountSource  *mount_source,
-                         GAsyncResult  *res,
-                         gpointer       user_data)
-{
-  GTask *task = G_TASK (user_data);
-  UnmountWithOpData *data = g_task_get_task_data (task);
-
-  /* Do nothing if we've handled this already */
-  if (data->completed)
-    return;
-
-  data->ret = g_mount_source_show_processes_finish (mount_source,
-                                                    res,
-                                                    &data->aborted,
-                                                    &data->choice);
-
-  complete_unmount_with_op (task, FALSE);
 }
 
 static gboolean
@@ -902,9 +884,11 @@ on_update_processes_timeout (gpointer user_data)
 
   if (!g_vfs_daemon_has_blocking_processes (daemon))
     {
-      /* no more processes, abort mount op */
       g_mount_source_abort (data->mount_source);
-      complete_unmount_with_op (task, TRUE);
+      data->timeout_id = 0;
+      data->no_more_processes = TRUE;
+
+      return G_SOURCE_REMOVE;
     }
   else
     {
@@ -916,10 +900,9 @@ on_update_processes_timeout (gpointer user_data)
                                            (GAsyncReadyCallback) on_show_processes_reply,
                                            task);
       g_array_unref (processes);
-    }
 
-  /* keep timeout around */
-  return TRUE;
+      return G_SOURCE_CONTINUE;
+    }
 }
 
 static void
