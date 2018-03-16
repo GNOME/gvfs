@@ -1132,6 +1132,12 @@ get_device (GVfsBackend *backend, const char *id, GVfsJob *job) {
   G_VFS_BACKEND_MTP (backend)->get_partial_object_capability
     = LIBMTP_Check_Capability (device, LIBMTP_DEVICECAP_GetPartialObject);
 #endif
+#if HAVE_LIBMTP_1_1_15
+  G_VFS_BACKEND_MTP (backend)->move_object_capability
+    = LIBMTP_Check_Capability (device, LIBMTP_DEVICECAP_MoveObject);
+  G_VFS_BACKEND_MTP (backend)->copy_object_capability
+    = LIBMTP_Check_Capability (device, LIBMTP_DEVICECAP_CopyObject);
+#endif
 
  exit:
   g_debug ("(II) get_device done.\n");
@@ -2909,6 +2915,321 @@ do_close_write (GVfsBackend *backend,
 }
 #endif /* HAVE_LIBMTP_1_1_6 */
 
+
+#if HAVE_LIBMTP_1_1_15
+static void
+do_move (GVfsBackend *backend,
+         GVfsJobMove *job,
+         const char *source,
+         const char *destination,
+         GFileCopyFlags flags,
+         GFileProgressCallback progress_callback,
+         gpointer progress_callback_data)
+{
+  if (!G_VFS_BACKEND_MTP (backend)->move_object_capability) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                              _("Operation unsupported"));
+    return;
+  }
+
+  g_debug ("(I) do_move (source = %s, dest = %s)\n", source, destination);
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  char *dir_name = g_path_get_dirname (destination);
+  char *filename = g_path_get_basename (destination);
+
+  gchar **elements = g_strsplit_set (destination, "/", -1);
+  unsigned int ne = g_strv_length (elements);
+
+  if (ne < 3) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                              _("Cannot write to this location"));
+    goto exit;
+  }
+
+  LIBMTP_mtpdevice_t *device;
+  device = G_VFS_BACKEND_MTP (backend)->device;
+
+  CacheEntry *src_entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), source);
+  if (src_entry == NULL) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("File doesn’t exist"));
+    goto exit;
+  } else if (src_entry->id == -1) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                              _("Not a regular file"));
+    goto exit;
+  }
+
+  gboolean source_is_dir = FALSE;
+  uint64_t filesize = 0;
+  LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, src_entry->id);
+  if (file != NULL) {
+    source_is_dir = (file->filetype == LIBMTP_FILETYPE_FOLDER);
+    /*
+     * filesize is 0 for directories. However, given that we will only move
+     * a directory if it's staying on the same storage, then these moves
+     * will always be fast, and will finish too quickly for the progress
+     * value to matter. Moves between storages will be decomposed, with
+     * each file moved separately.
+     */
+    filesize = file->filesize;
+    LIBMTP_destroy_file_t (file);
+  }
+
+  CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), destination);
+  gboolean dest_exists = (entry != NULL && entry->id != -1);
+  gboolean dest_is_dir = FALSE;
+
+  if (dest_exists) {
+    LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, entry->id);
+    if (file != NULL) {
+      dest_is_dir = (file->filetype == LIBMTP_FILETYPE_FOLDER);
+      LIBMTP_destroy_file_t (file);
+    }
+  }
+
+  CacheEntry *parent = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
+  if (!parent) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("Directory doesn’t exist"));
+    goto exit;
+  }
+
+  /* Test all the GIO defined failure conditions */
+  if (dest_exists) {
+    if (flags & G_FILE_COPY_OVERWRITE) {
+      if (!source_is_dir && dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                  _("Target is a directory"));
+        goto exit;
+      } else if (source_is_dir && dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
+                                  _("Can’t merge directories"));
+        goto exit;
+      } else if (source_is_dir && !dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                                  _("Can’t recursively copy directory"));
+        goto exit;
+      }
+      /* Source and Dest are files */
+      g_debug ("(I) Removing destination.\n");
+      int ret = LIBMTP_Delete_Object (device, entry->id);
+      if (ret != 0) {
+        fail_job (G_VFS_JOB (job), device);
+        goto exit;
+      }
+      g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
+                            emit_delete_event,
+                            (char *)destination);
+      remove_cache_entry (G_VFS_BACKEND_MTP (backend),
+                          destination);
+    } else {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                _("Target file already exists"));
+      goto exit;
+    }
+  }
+  /*
+   * There is no special case here for the source being a directory. The device
+   * is quite happy to move a directory around along with its contents.
+   */
+
+  /* Unlike most calls, we must pass 0 for the root directory.*/
+  uint32_t parent_id = (parent->id == -1 ? 0 : parent->id);
+  int ret = LIBMTP_Move_Object (device,
+                                src_entry->id,
+                                parent->storage,
+                                parent_id);
+  if (ret != 0) {
+    fail_job (G_VFS_JOB (job), device);
+    goto exit;
+  }
+
+  if (progress_callback) {
+    progress_callback (filesize, filesize, progress_callback_data);
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
+                        emit_delete_event,
+                        (char *)source);
+  g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
+                        emit_create_event,
+                        (char *)destination);
+
+ exit:
+  g_strfreev (elements);
+  g_free (dir_name);
+  g_free (filename);
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  g_debug ("(I) do_move done.\n");
+}
+
+
+static void
+do_copy (GVfsBackend *backend,
+         GVfsJobCopy *job,
+         const char *source,
+         const char *destination,
+         GFileCopyFlags flags,
+         GFileProgressCallback progress_callback,
+         gpointer progress_callback_data)
+{
+  if (!G_VFS_BACKEND_MTP (backend)->copy_object_capability) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                              _("Operation unsupported"));
+    return;
+  }
+
+  g_debug ("(I) do_copy (source = %s, dest = %s)\n", source, destination);
+  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  char *dir_name = g_path_get_dirname (destination);
+  char *filename = g_path_get_basename (destination);
+
+  gchar **elements = g_strsplit_set (destination, "/", -1);
+  unsigned int ne = g_strv_length (elements);
+
+  if (ne < 3) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                              _("Cannot write to this location"));
+    goto exit;
+  }
+
+  LIBMTP_mtpdevice_t *device;
+  device = G_VFS_BACKEND_MTP (backend)->device;
+
+  CacheEntry *src_entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), source);
+  if (src_entry == NULL) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("File doesn’t exist"));
+    goto exit;
+  } else if (src_entry->id == -1) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                              _("Not a regular file"));
+    goto exit;
+  }
+
+  gboolean source_is_dir = FALSE;
+  uint64_t filesize = 0;
+  LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, src_entry->id);
+  if (file != NULL) {
+    source_is_dir = (file->filetype == LIBMTP_FILETYPE_FOLDER);
+    filesize = file->filesize;
+    LIBMTP_destroy_file_t (file);
+  }
+
+  CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), destination);
+  gboolean dest_exists = (entry != NULL && entry->id != -1);
+  gboolean dest_is_dir = FALSE;
+
+  if (dest_exists) {
+    LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, entry->id);
+    if (file != NULL) {
+      dest_is_dir = (file->filetype == LIBMTP_FILETYPE_FOLDER);
+      LIBMTP_destroy_file_t (file);
+    }
+  }
+
+  CacheEntry *parent = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
+  if (!parent) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              _("Directory doesn’t exist"));
+    goto exit;
+  }
+
+  /* Test all the GIO defined failure conditions */
+  if (dest_exists) {
+    if (flags & G_FILE_COPY_OVERWRITE) {
+      if (!source_is_dir && dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                  _("Target is a directory"));
+        goto exit;
+      } else if (source_is_dir && dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
+                                  _("Can’t merge directories"));
+        goto exit;
+      } else if (source_is_dir && !dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                                  _("Can’t recursively copy directory"));
+        goto exit;
+      }
+      /* Source and Dest are files */
+      g_debug ("(I) Removing destination.\n");
+      int ret = LIBMTP_Delete_Object (device, entry->id);
+      if (ret != 0) {
+        fail_job (G_VFS_JOB (job), device);
+        goto exit;
+      }
+      g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
+                            emit_delete_event,
+                            (char *)destination);
+      remove_cache_entry (G_VFS_BACKEND_MTP (backend),
+                          destination);
+    } else {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                _("Target file already exists"));
+      goto exit;
+    }
+  }
+  /*
+   * There is no special case here for the source being a directory. The device
+   * is quite happy to copy a directory around along with its contents.
+   */
+
+  /* Unlike most calls, we must pass 0 for the root directory.*/
+  uint32_t parent_id = (parent->id == -1) ? 0 : parent->id;
+  int ret = LIBMTP_Copy_Object (device,
+                                src_entry->id,
+                                parent->storage,
+                                parent_id);
+  if (ret != 0) {
+    fail_job (G_VFS_JOB (job), device);
+    goto exit;
+  }
+
+  if (progress_callback) {
+    progress_callback (filesize, filesize, progress_callback_data);
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
+                        emit_create_event,
+                        (char *)destination);
+
+ exit:
+  g_strfreev (elements);
+  g_free (dir_name);
+  g_free (filename);
+  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  g_debug ("(I) do_copy done.\n");
+}
+#endif /* HAVE_LIBMTP_1_1_15 */
+
+
 /************************************************
  * 	  Class init
  *
@@ -2952,5 +3273,9 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->seek_on_write = do_seek_on_write;
   backend_class->truncate = do_truncate;
   backend_class->close_write = do_close_write;
+#endif
+#if HAVE_LIBMTP_1_1_15
+  backend_class->move = do_move;
+  backend_class->copy = do_copy;
 #endif
 }
