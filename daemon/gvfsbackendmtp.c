@@ -1635,6 +1635,59 @@ mtp_progress (uint64_t const sent, uint64_t const total,
 }
 
 
+/**
+ * Validate whether a given combination of source and destination
+ * are valid for copying/moving. If not valid, set the appropriate
+ * error on the job.
+ */
+static gboolean
+validate_source_and_dest (gboolean dest_exists,
+                          gboolean dest_is_dir,
+                          gboolean source_is_dir,
+                          gboolean source_can_be_dir,
+                          GFileCopyFlags flags,
+                          GVfsJob *job)
+{
+  /* Test all the GIO defined failure conditions */
+  if (dest_exists) {
+    if (flags & G_FILE_COPY_OVERWRITE) {
+      if (!source_is_dir && dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                  _("Target is a directory"));
+        return FALSE;
+      } else if (source_is_dir && dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
+                                  _("Can’t merge directories"));
+        return FALSE;
+      } else if (source_is_dir && !dest_is_dir) {
+        g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                                  _("Can’t recursively copy directory"));
+        return FALSE;
+      }
+
+      /* Source can overwrite dest as both are files */
+      return TRUE;
+    } else {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                _("Target file already exists"));
+      return FALSE;
+    }
+  } else if (source_is_dir && !source_can_be_dir) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                              _("Can’t recursively copy directory"));
+    return FALSE;
+  }
+
+  /* Source is valid and dest doesn't exist */
+  return TRUE;
+}
+
+
 static void
 do_make_directory (GVfsBackend *backend,
                    GVfsJobMakeDirectory *job,
@@ -1759,50 +1812,29 @@ do_pull (GVfsBackend *backend,
     g_error_free (error);
   }
 
-  /* Test all the GIO defined failure conditions */
-  if (dest_exists) {
-    gboolean dest_is_dir =
+  gboolean dest_is_dir = dest_exists &&
       g_file_info_get_file_type (local_info) == G_FILE_TYPE_DIRECTORY;
 
-    if (flags & G_FILE_COPY_OVERWRITE) {
-      if (!source_is_dir && dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                                  _("Target is a directory"));
-        goto exit;
-      } else if (source_is_dir && dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-                                  _("Can’t merge directories"));
-        goto exit;
-      } else if (source_is_dir && !dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                                  _("Can’t recursively copy directory"));
-        goto exit;
-      }
-      /* Source and Dest are files */
-      g_debug ("(I) Removing destination.\n");
-      GError *error = NULL;
-      gboolean ret = g_file_delete (local_file,
-                                    G_VFS_JOB (job)->cancellable,
-                                    &error);
-      if (!ret) {
-        g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-        g_error_free (error);
-        goto exit;
-      }
-    } else {
-      g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                G_IO_ERROR, G_IO_ERROR_EXISTS,
-                                _("Target file already exists"));
+  gboolean valid_pull = validate_source_and_dest (dest_exists,
+                                                  dest_is_dir,
+                                                  source_is_dir,
+                                                  FALSE, // source_can_be_dir
+                                                  flags,
+                                                  G_VFS_JOB (job));
+  if (!valid_pull) {
+    goto exit;
+  } else if (dest_exists) {
+    /* Source and Dest are files */
+    g_debug ("(I) Removing destination.\n");
+    GError *error = NULL;
+    gboolean ret = g_file_delete (local_file,
+                                  G_VFS_JOB (job)->cancellable,
+                                  &error);
+    if (!ret) {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       goto exit;
     }
-  } else if (source_is_dir) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                              _("Can’t recursively copy directory"));
-    goto exit;
   }
 
   MtpProgressData mtp_progress_data;
@@ -2075,48 +2107,27 @@ do_push (GVfsBackend *backend,
   gboolean source_is_dir =
     g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY;
 
-  /* Test all the GIO defined failure conditions */
-  if (dest_exists) {
-    if (flags & G_FILE_COPY_OVERWRITE) {
-      if (!source_is_dir && dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                                  _("Target is a directory"));
-        goto exit;
-      } else if (source_is_dir && dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-                                  _("Can’t merge directories"));
-        goto exit;
-      } else if (source_is_dir && !dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                                  _("Can’t recursively copy directory"));
-        goto exit;
-      }
-      /* Source and Dest are files */
-      g_debug ("(I) Removing destination.\n");
-      int ret = LIBMTP_Delete_Object (device, entry->id);
-      if (ret != 0) {
-        fail_job (G_VFS_JOB (job), device);
-        goto exit;
-      }
-      g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
-                            emit_delete_event,
-                            (char *)destination);
-      remove_cache_entry (G_VFS_BACKEND_MTP (backend),
-                          destination);
-    } else {
-      g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                G_IO_ERROR, G_IO_ERROR_EXISTS,
-                                _("Target file already exists"));
+  gboolean valid_push = validate_source_and_dest (dest_exists,
+                                                  dest_is_dir,
+                                                  source_is_dir,
+                                                  FALSE, // source_can_be_dir
+                                                  flags,
+                                                  G_VFS_JOB (job));
+  if (!valid_push) {
+    goto exit;
+  } else if (dest_exists) {
+    /* Source and Dest are files */
+    g_debug ("(I) Removing destination.\n");
+    int ret = LIBMTP_Delete_Object (device, entry->id);
+    if (ret != 0) {
+      fail_job (G_VFS_JOB (job), device);
       goto exit;
     }
-  } else if (source_is_dir) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                              _("Can’t recursively copy directory"));
-    goto exit;
+    g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
+                          emit_delete_event,
+                          (char *)destination);
+    remove_cache_entry (G_VFS_BACKEND_MTP (backend),
+                        destination);
   }
 
   LIBMTP_file_t *mtpfile = LIBMTP_new_file_t ();
@@ -3001,48 +3012,30 @@ do_move (GVfsBackend *backend,
     goto exit;
   }
 
-  /* Test all the GIO defined failure conditions */
-  if (dest_exists) {
-    if (flags & G_FILE_COPY_OVERWRITE) {
-      if (!source_is_dir && dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                                  _("Target is a directory"));
-        goto exit;
-      } else if (source_is_dir && dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-                                  _("Can’t merge directories"));
-        goto exit;
-      } else if (source_is_dir && !dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                                  _("Can’t recursively copy directory"));
-        goto exit;
-      }
-      /* Source and Dest are files */
-      g_debug ("(I) Removing destination.\n");
-      int ret = LIBMTP_Delete_Object (device, entry->id);
-      if (ret != 0) {
-        fail_job (G_VFS_JOB (job), device);
-        goto exit;
-      }
-      g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
-                            emit_delete_event,
-                            (char *)destination);
-      remove_cache_entry (G_VFS_BACKEND_MTP (backend),
-                          destination);
-    } else {
-      g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                G_IO_ERROR, G_IO_ERROR_EXISTS,
-                                _("Target file already exists"));
+  // Only do directory moves on the same storage, where they are fast.
+  gboolean source_can_be_dir = (parent->storage == src_entry->storage);
+  gboolean valid_move = validate_source_and_dest (dest_exists,
+                                                  dest_is_dir,
+                                                  source_is_dir,
+                                                  source_can_be_dir,
+                                                  flags,
+                                                  G_VFS_JOB (job));
+  if (!valid_move) {
+    goto exit;
+  } else if (dest_exists) {
+    /* Source and Dest are files */
+    g_debug ("(I) Removing destination.\n");
+    int ret = LIBMTP_Delete_Object (device, entry->id);
+    if (ret != 0) {
+      fail_job (G_VFS_JOB (job), device);
       goto exit;
     }
+    g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
+                          emit_delete_event,
+                          (char *)destination);
+    remove_cache_entry (G_VFS_BACKEND_MTP (backend),
+                        destination);
   }
-  /*
-   * There is no special case here for the source being a directory. The device
-   * is quite happy to move a directory around along with its contents.
-   */
 
   /* Unlike most calls, we must pass 0 for the root directory.*/
   uint32_t parent_id = (parent->id == -1 ? 0 : parent->id);
@@ -3155,48 +3148,33 @@ do_copy (GVfsBackend *backend,
     goto exit;
   }
 
-  /* Test all the GIO defined failure conditions */
-  if (dest_exists) {
-    if (flags & G_FILE_COPY_OVERWRITE) {
-      if (!source_is_dir && dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                                  _("Target is a directory"));
-        goto exit;
-      } else if (source_is_dir && dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-                                  _("Can’t merge directories"));
-        goto exit;
-      } else if (source_is_dir && !dest_is_dir) {
-        g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-                                  _("Can’t recursively copy directory"));
-        goto exit;
-      }
-      /* Source and Dest are files */
-      g_debug ("(I) Removing destination.\n");
-      int ret = LIBMTP_Delete_Object (device, entry->id);
-      if (ret != 0) {
-        fail_job (G_VFS_JOB (job), device);
-        goto exit;
-      }
-      g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
-                            emit_delete_event,
-                            (char *)destination);
-      remove_cache_entry (G_VFS_BACKEND_MTP (backend),
-                          destination);
-    } else {
-      g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                G_IO_ERROR, G_IO_ERROR_EXISTS,
-                                _("Target file already exists"));
+  /*
+   * We ignore the ability to copy whole folders because we get poor progress
+   * updates in this situation. At least with file-by-file copies, we can
+   * notify as each file completes.
+   */
+  gboolean valid_copy = validate_source_and_dest (dest_exists,
+                                                  dest_is_dir,
+                                                  source_is_dir,
+                                                  FALSE, // source_can_be_dir
+                                                  flags,
+                                                  G_VFS_JOB (job));
+  if (!valid_copy) {
+    goto exit;
+  } else if (dest_exists) {
+    /* Source and Dest are files */
+    g_debug ("(I) Removing destination.\n");
+    int ret = LIBMTP_Delete_Object (device, entry->id);
+    if (ret != 0) {
+      fail_job (G_VFS_JOB (job), device);
       goto exit;
     }
+    g_hash_table_foreach (G_VFS_BACKEND_MTP (backend)->monitors,
+                          emit_delete_event,
+                          (char *)destination);
+    remove_cache_entry (G_VFS_BACKEND_MTP (backend),
+                        destination);
   }
-  /*
-   * There is no special case here for the source being a directory. The device
-   * is quite happy to copy a directory around along with its contents.
-   */
 
   /* Unlike most calls, we must pass 0 for the root directory.*/
   uint32_t parent_id = (parent->id == -1) ? 0 : parent->id;
