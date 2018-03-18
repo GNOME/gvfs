@@ -1181,6 +1181,7 @@ get_device_info (GVfsBackendMtp *backend, GFileInfo *info)
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE);
 
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "mtpfs");
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE, FALSE);
 
   int ret = LIBMTP_Get_Storage (device, LIBMTP_STORAGE_SORTBY_NOTSORTED);
   if (ret != 0) {
@@ -1223,28 +1224,34 @@ get_storage_info (LIBMTP_devicestorage_t *storage, GFileInfo *info) {
   g_file_info_set_content_type (info, "inode/directory");
   g_file_info_set_size (info, 0);
 
-  GIcon *icon;
+  GIcon *icon, *symbolic_icon;
   switch (storage->StorageType) {
   case PTP_ST_FixedROM:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
     icon = g_themed_icon_new_with_default_fallbacks ("drive-harddisk");
+    symbolic_icon = g_themed_icon_new_with_default_fallbacks ("drive-harddisk-symbolic");
     break;
   case PTP_ST_RemovableROM:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
     icon = g_themed_icon_new_with_default_fallbacks ("media-flash-sd");
+    symbolic_icon = g_themed_icon_new_with_default_fallbacks ("media-flash-sd-symbolic");
     break;
   case PTP_ST_RemovableRAM:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, FALSE);
     icon = g_themed_icon_new_with_default_fallbacks ("media-flash-sd");
+    symbolic_icon = g_themed_icon_new_with_default_fallbacks ("media-flash-sd-symbolic");
     break;
   case PTP_ST_FixedRAM:
   default:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, FALSE);
     icon = g_themed_icon_new_with_default_fallbacks ("drive-harddisk");
+    symbolic_icon = g_themed_icon_new_with_default_fallbacks ("drive-harddisk-symbolic");
     break;
   }
   g_file_info_set_icon (info, icon);
+  g_file_info_set_symbolic_icon (info, symbolic_icon);
   g_object_unref (icon);
+  g_object_unref (symbolic_icon);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
@@ -1273,26 +1280,42 @@ get_file_info (GVfsBackend *backend,
                GFileInfo *info,
                LIBMTP_file_t *file) {
   GIcon *icon = NULL;
+  GIcon *symbolic_icon = NULL;
   char *content_type = NULL;
+  char *mount_id = NULL;
+  char *file_id = NULL;
 
   g_debug ("(II) get_file_info: %X\n", file->item_id);
 
   g_file_info_set_name (info, file->filename);
   g_file_info_set_display_name (info, file->filename);
 
+  mount_id = g_mount_spec_to_string (g_vfs_backend_get_mount_spec (G_VFS_BACKEND (backend)));
+  file_id = g_strdup_printf ("%s:%d", mount_id, file->item_id);
+  g_free (mount_id);
+
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ID_FILE, file_id);
+  g_free (file_id);
+
   switch (file->filetype) {
   case LIBMTP_FILETYPE_FOLDER:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, TRUE);
     g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
     g_file_info_set_content_type (info, "inode/directory");
+    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
+                                      "inode/directory");
     icon = g_themed_icon_new ("folder");
+    symbolic_icon = g_themed_icon_new ("folder-symbolic");
     break;
   default:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, FALSE);
     g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
     content_type = g_content_type_guess (file->filename, NULL, 0, NULL);
     g_file_info_set_content_type (info, content_type);
+    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
+                                      content_type);
     icon = g_content_type_get_icon (content_type);
+    symbolic_icon = g_content_type_get_symbolic_icon (content_type);
     break;
   }
 
@@ -1333,6 +1356,10 @@ get_file_info (GVfsBackend *backend,
   if (icon != NULL) {
     g_file_info_set_icon (info, icon);
     g_object_unref (icon);
+  }
+  if (symbolic_icon != NULL) {
+    g_file_info_set_symbolic_icon (info, symbolic_icon);
+    g_object_unref (symbolic_icon);
   }
   g_free (content_type);
 
