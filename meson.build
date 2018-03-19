@@ -267,19 +267,13 @@ endif
 config_h.set('HAVE_GCRYPT', enable_gcrypt)
 
 # *** Check for dbus service dir ***
-dbus_service_dir = get_option('dbus_service_dir')
-if dbus_service_dir == ''
-  dbus_dep = dependency('dbus-1', required: false)
-  assert(dbus_dep.found(), 'dbus-1 required but not found, please provide a valid D-Bus service dir')
-  dbus_service_dir = dbus_dep.get_pkgconfig_variable('session_bus_services_dir')
-endif
+dbus_dep = dependency('dbus-1')
+dbus_service_dir = dbus_dep.get_pkgconfig_variable('session_bus_services_dir', define_variable: ['datadir', gvfs_datadir])
 
 dbus_service_in = files('dbus.service.in')
 
-gio_module_dir = get_option('gio_module_dir')
-if gio_module_dir == ''
-  gio_module_dir = gio_dep.get_pkgconfig_variable('giomoduledir')
-endif
+# *** Check for gio module dir ***
+gio_module_dir = gio_dep.get_pkgconfig_variable('giomoduledir', define_variable: ['libdir', gvfs_libdir])
 
 # *** Check for systemd options ***
 systemd_user_unit_dir = get_option('systemduserunitdir')
@@ -518,8 +512,6 @@ meson.add_install_script(
 
 output = gvfs_name + ' ' + gvfs_version + ' configuration summary:\n'
 output += '\n'
-output += '  dbus_service_dir: ' + dbus_service_dir + '\n'
-output += '  gio_module_dir: ' + gio_module_dir + '\n'
 output += '  systemduserunitdir: ' + systemd_user_unit_dir + '\n'
 output += '  tmpfilesdir: ' + tmp_files_dir + '\n'
 output += '\n'

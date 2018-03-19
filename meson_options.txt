@@ -1,5 +1,3 @@
-option('dbus_service_dir', type: 'string', value: '', description: 'custom directory for dbus service files')
-option('gio_module_dir', type: 'string', value: '', description: 'custom directory for gio modules')
 option('systemduserunitdir', type: 'string', value: '', description: 'custom directory for systemd user units, or \'no\' to disable')
 option('tmpfilesdir', type: 'string', value: '', description: 'custom directory for tmpfiles.d config files, or \'no\' to disable')
 
