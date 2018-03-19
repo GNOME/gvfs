@@ -2,10 +2,7 @@ project(
   'gvfs', 'c',
   version: '1.37.1',
   license: 'LGPL2+',
-  default_options: [
-    'b_lundef=true',
-    'buildtype=debugoptimized'
-  ],
+  default_options: 'buildtype=debugoptimized',
   meson_version: '>= 0.43.0'
 )
 
