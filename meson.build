@@ -515,8 +515,8 @@ configure_file(
 
 meson.add_install_script(
   'meson_post_install.py',
-  gvfs_datadir,
-  gvfs_libdir
+  gvfs_schema_dir,
+  gio_module_dir
 )
 
 output = gvfs_name + ' ' + gvfs_version + ' configuration summary:\n'
