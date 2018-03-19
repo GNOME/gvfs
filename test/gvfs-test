@@ -175,7 +175,7 @@ class GvfsTestCase(unittest.TestCase):
     def unmount(self, uri):
         self.program_out_success(['gio', 'mount', '-u', uri])
 
-        timeout = 5
+        timeout = 10
         while timeout > 0:
             (out, err) = self.program_out_err(['gio', 'mount', '-li'])
             if not re.search('Mount.*' + uri, out):
@@ -264,7 +264,7 @@ class GvfsTestCase(unittest.TestCase):
     def unmount_api(self, gfile):
         '''Umount a mounted Gio.File using the Gio API
 
-        This times out after 5 seconds.
+        This times out after 10 seconds.
         '''
         self.cb_result = None
 
@@ -281,7 +281,7 @@ class GvfsTestCase(unittest.TestCase):
         mount.unmount_with_operation(Gio.MountUnmountFlags.NONE, None, None,
                                      unmount_done, ml)
         # ensure we are timing out
-        GLib.timeout_add_seconds(5, lambda data: ml.quit(), None)
+        GLib.timeout_add_seconds(10, lambda data: ml.quit(), None)
         ml.run()
 
         self.assertNotEqual(self.cb_result, None, 'operation timed out')
