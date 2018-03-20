@@ -86,21 +86,21 @@ config_h.set('HAVE_LOGIN_TTY', util_dep.found() and cc.has_function('login_tty',
 # headers
 check_headers = [
   # fs + pty
-  ['HAVE_SYS_PARAM_H', 'sys/param.h'],
+  'sys/param.h',
   # fs
-  ['HAVE_SYS_MOUNT_H', 'sys/mount.h'],
-  ['HAVE_SYS_STATFS_H', 'sys/statfs.h'],
-  ['HAVE_SYS_STATVFS_H', 'sys/statvfs.h'],
-  ['HAVE_SYS_VFS_H', 'sys/vfs.h']
+  'sys/mount.h',
+  'sys/statfs.h',
+  'sys/statvfs.h',
+  'sys/vfs.h'
 ]
 
 statfs_includes = ''
 
 foreach header: check_headers
-  has_header = cc.has_header(header[1])
-  config_h.set10(header[0], has_header)
+  has_header = cc.has_header(header)
+  config_h.set10('HAVE_' + header.underscorify().to_upper(), has_header)
   if has_header
-    statfs_includes += '#include <@0@>\n'.format(header[1])
+    statfs_includes += '#include <@0@>\n'.format(header)
   endif
 endforeach
 
@@ -122,92 +122,86 @@ endif
 
 # pty
 check_headers = [
-  ['HAVE_STROPTS_H', 'stropts.h'],
-  ['HAVE_SYS_UN_H', 'sys/un.h'],
-  ['HAVE_TERMIOS_H', 'termios.h'],
-  ['HAVE_UTMP_H', 'utmp.h']
+  'stropts.h',
+  'sys/un.h',
+  'termios.h',
+  'utmp.h'
 ]
 
 foreach header: check_headers
-  config_h.set(header[0], cc.has_header(header[1]))
+  config_h.set('HAVE_' + header.underscorify().to_upper(), cc.has_header(header))
 endforeach
 
 # functions
 check_functions = [
   # pty
-  ['HAVE_GETPT', 'getpt'],
-  ['HAVE_GRANTPT', 'grantpt'],
-  ['HAVE_POSIX_OPENPT', 'posix_openpt'],
-  ['HAVE_PTSNAME', 'ptsname'],
-  ['HAVE_PTSNAME_R', 'ptsname_r'],
-  ['HAVE_UNLOCKPT', 'unlockpt'],
+  'getpt',
+  'grantpt',
+  'posix_openpt',
+  'ptsname',
+  'ptsname_r',
+  'unlockpt',
   # fs
-  ['HAVE_STATFS', 'statfs'],
-  ['HAVE_STATVFS', 'statvfs']
+  'statfs',
+  'statvfs'
 ]
 
 foreach func: check_functions
-  config_h.set(func[0], cc.has_function(func[1]))
+  config_h.set('HAVE_' + func.to_upper(), cc.has_function(func))
 endforeach
 
 # symbols
 check_symbols = [
   # i18n
-  ['HAVE_NL_ADDRESS_LANG_TERM', 'langinfo.h', '_NL_ADDRESS_LANG_TERM'],
-  ['HAVE_NL_ADDRESS_COUNTRY_AB3', 'langinfo.h', '_NL_ADDRESS_COUNTRY_AB3']
+  ['_NL_ADDRESS_LANG_TERM', 'langinfo.h'],
+  ['_NL_ADDRESS_COUNTRY_AB3', 'langinfo.h']
 ]
 
 foreach symbol: check_symbols
-  config_h.set(symbol[0], cc.has_header_symbol(symbol[1], symbol[2]))
+  config_h.set('HAVE' + symbol[0], cc.has_header_symbol(symbol[1], symbol[0]))
 endforeach
 
 # fs, check major, minor and makedev functions
-check_major_functions = ['major', 'minor', 'makedev']
-
-check_major_headers = [
-  ['MAJOR_IN_MKDEV', 'sys/mkdev.h'],
-  ['MAJOR_IN_SYSMACROS', 'sys/sysmacros.h']
-]
-
-foreach header: check_major_headers
+foreach name: ['mkdev', 'sysmacros']
   have_major = true
-  foreach function: check_major_functions
-    have_major = have_major and cc.has_header_symbol(header[1], function)
+  header = 'sys/@0@.h'.format(name)
+  foreach func: ['major', 'minor', 'makedev']
+    have_major = have_major and cc.has_header_symbol(header, func)
   endforeach
 
-  config_h.set10(header[0], have_major)
+  config_h.set10('MAJOR_IN_' + name.to_upper(), have_major)
 endforeach
 
 # types
 check_types = [
-  # type, header, fallback type
-  ['gid_t', 'sys/types.h', 'int'],
-  ['pid_t', 'sys/types.h', 'int'],
-  ['size_t', 'sys/types.h', 'unsigned int'],
-  ['uid_t', 'sys/types.h', 'int']
+  # type, fallback type
+  ['gid_t', 'int'],
+  ['pid_t', 'int'],
+  ['size_t', 'unsigned int'],
+  ['uid_t', 'int']
 ]
 
 foreach type: check_types
-  if not cc.has_type(type[0], prefix: '#include<@0@>'.format(type[1]))
-    config_h.set(type[0], type[2])
+  if not cc.has_type(type[0], prefix: '#include<sys/types.h>')
+    config_h.set(type[0], type[1])
   endif
 endforeach
 
 # members
 check_members = [
   # define, typename, membername, prefix
-  ['HAVE_STRUCT_STATFS_F_BAVAIL', 'struct statfs', 'f_bavail', 'sys/statfs.h'],
-  ['HAVE_STRUCT_STATVFS_F_BASETYPE', 'struct statvfs', 'f_basetype', 'sys/statvfs.h'],
-  ['HAVE_STRUCT_STAT_ST_ATIMENSEC', 'struct stat', 'st_atimensec', 'sys/stat.h'],
-  ['HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC', 'struct stat', 'st_atim.tv_nsec', 'sys/stat.h'],
-  ['HAVE_STRUCT_STAT_ST_CTIMENSEC', 'struct stat', 'st_ctimensec', 'sys/stat.h'],
-  ['HAVE_STRUCT_STAT_ST_CTIM_TV_NSEC', 'struct stat', 'st_ctim.tv_nsec', 'sys/stat.h'],
-  ['HAVE_STRUCT_STAT_ST_MTIMENSEC', 'struct stat', 'st_mtimensec', 'sys/stat.h'],
-  ['HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC', 'struct stat', 'st_mtim.tv_nsec', 'sys/stat.h']
+  ['struct statfs', 'f_bavail', 'sys/statfs.h'],
+  ['struct statvfs', 'f_basetype', 'sys/statvfs.h'],
+  ['struct stat', 'st_atimensec', 'sys/stat.h'],
+  ['struct stat', 'st_atim.tv_nsec', 'sys/stat.h'],
+  ['struct stat', 'st_ctimensec', 'sys/stat.h'],
+  ['struct stat', 'st_ctim.tv_nsec', 'sys/stat.h'],
+  ['struct stat', 'st_mtimensec', 'sys/stat.h'],
+  ['struct stat', 'st_mtim.tv_nsec', 'sys/stat.h']
 ]
 
 foreach member: check_members
-  config_h.set(member[0], cc.has_members(member[1], member[2], prefix: '#include<@0@>'.format(member[3])))
+  config_h.set('HAVE_@0@_@1@'.format(member[0].underscorify().to_upper(), member[1].underscorify().to_upper()), cc.has_members(member[0], member[1], prefix: '#include<@0@>'.format(member[2])))
 endforeach
 
 # compiler flags
@@ -427,8 +421,9 @@ if enable_google
   assert(enable_goa, 'Google backend requested but GOA is required')
 
   libgdata_dep = dependency('libgdata', version: '>= 0.17.3')
-  config_h.set10('HAVE_LIBGDATA_0_17_7', libgdata_dep.version().version_compare('>= 0.17.7'))
-  config_h.set10('HAVE_LIBGDATA_0_17_9', libgdata_dep.version().version_compare('>= 0.17.9'))
+  foreach version: ['0.17.7', '0.17.9']
+    config_h.set10('HAVE_LIBGDATA_' + version.underscorify(), libgdata_dep.version().version_compare('>= ' + version))
+  endforeach
 endif
 
 # *** Check for gphoto2 ***
@@ -448,10 +443,9 @@ if enable_mtp
   assert(enable_gudev, 'libmtp requested but gudev is required')
 
   libmtp_dep = dependency('libmtp', version: '>= 1.1.0')
-  config_h.set10('HAVE_LIBMTP_1_1_5', libmtp_dep.version().version_compare('>= 1.1.5'))
-  config_h.set10('HAVE_LIBMTP_1_1_6', libmtp_dep.version().version_compare('>= 1.1.6'))
-  config_h.set10('HAVE_LIBMTP_1_1_9', libmtp_dep.version().version_compare('>= 1.1.9'))
-  config_h.set10('HAVE_LIBMTP_1_1_12', libmtp_dep.version().version_compare('>= 1.1.12'))
+  foreach version: ['1.1.5', '1.1.6', '1.1.9', '1.1.12']
+    config_h.set10('HAVE_LIBMTP_' + version.underscorify(), libmtp_dep.version().version_compare('>= ' + version))
+  endforeach
 endif
 config_h.set('HAVE_LIBMTP', enable_mtp)
 
