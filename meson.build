@@ -39,9 +39,6 @@ config_h = configuration_data()
 # defines
 set_defines = [
   # package
-  ['PACKAGE', gvfs_name],
-  ['PACKAGE_BUGREPORT', 'http://bugzilla.gnome.org/enter_bug.cgi?product=' + gvfs_name],
-  ['PACKAGE_NAME', gvfs_name],
   ['PACKAGE_STRING', '@0@ @1@'.format(gvfs_name, gvfs_version)],
   ['VERSION', gvfs_version],
   # i18n
