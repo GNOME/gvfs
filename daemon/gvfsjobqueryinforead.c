@@ -100,7 +100,10 @@ static void
 send_reply (GVfsJob *job)
 {
   GVfsJobQueryInfoRead *op_job = G_VFS_JOB_QUERY_INFO_READ (job);
-  
+
+  g_debug ("send_reply(%p), failed=%d (%s)\n", job, job->failed,
+           job->failed ? job->error->message : "");
+
   if (job->failed)
     g_vfs_channel_send_error (G_VFS_CHANNEL (op_job->channel), job->error);
   else
