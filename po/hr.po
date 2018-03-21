@@ -6,11 +6,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-03-19 17:47+0000\n"
-"PO-Revision-Date: 2018-03-21 16:14+0100\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+"product=gvfs&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2018-03-21 15:21+0000\n"
+"PO-Revision-Date: 2018-03-21 20:28+0100\n"
 "Last-Translator: gogo <trebelnik2@gmail.com>\n"
 "Language-Team: Croatian <hr@li.org>\n"
+"Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,7 +20,6 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Launchpad-Export-Date: 2018-03-21 14:48+0000\n"
 "X-Generator: Poedit 2.0.6\n"
-"Language: hr\n"
 
 #: client/gdaemonfile.c:433 client/gdaemonfile.c:2703
 msgid "Operation not supported, files on different mounts"
@@ -291,22 +292,18 @@ msgstr ""
 "inačicu 3.0 ili noviju."
 
 #: daemon/gvfsafpserver.c:915
-#, c-format
 msgid "Permission denied."
 msgstr "Pristup odbijen."
 
 #: daemon/gvfsafpserver.c:920
-#, c-format
 msgid "The command is not supported by the server."
 msgstr "Naredba nije podržana od strane poslužitelja."
 
 #: daemon/gvfsafpserver.c:924
-#, c-format
 msgid "Your password has expired."
 msgstr "Vaša lozinka je istekla."
 
 #: daemon/gvfsafpserver.c:928
-#, c-format
 msgid "Your password needs to be changed."
 msgstr "Morate promijeniti svoju lozinku."
 
@@ -368,7 +365,6 @@ msgstr "Nemoguće učitavanje  %s na %s"
 #: daemon/gvfsbackendgoogle.c:208 daemon/gvfsbackendsftp.c:346
 #: daemon/gvfsbackendsftp.c:1118 daemon/gvfsbackendsftp.c:2150
 #: daemon/gvfsftptask.c:439
-#, c-format
 msgid "Permission denied"
 msgstr "Pristup odbijen"
 
@@ -386,7 +382,6 @@ msgstr "Pristup odbijen"
 #: daemon/gvfsbackendmtp.c:2646 daemon/gvfsbackendnetwork.c:697
 #: daemon/gvfsbackendsmbbrowse.c:1067 daemon/gvfsbackendsmbbrowse.c:1134
 #: daemon/gvfsbackendsmbbrowse.c:1321 daemon/gvfsbackendsmbbrowse.c:1394
-#, c-format
 msgid "File doesn’t exist"
 msgstr "Datoteka ne postoji"
 
@@ -421,7 +416,6 @@ msgstr "Ciljani objekt je označen da nije za brisanje (DeleteInhibit)"
 
 #: daemon/gvfsafpvolume.c:675 daemon/gvfsafpvolume.c:1184
 #: daemon/gvfsafpvolume.c:2042 daemon/gvfsbackendgoogle.c:214
-#, c-format
 msgid "Target object doesn’t exist"
 msgstr "Ciljani objekt ne postoji"
 
@@ -626,7 +620,7 @@ msgstr "Nepopravljiva libimobiledevice greška (%d)"
 msgid "Try again"
 msgstr "Pokušaj ponovno"
 
-#: daemon/gvfsbackendafc.c:458 daemon/gvfsbackend.c:1013
+#: daemon/gvfsbackendafc.c:458 daemon/gvfsbackend.c:996
 #: monitor/gdu/ggdudrive.c:1024 monitor/gdu/ggdumount.c:923
 #: monitor/udisks2/gvfsudisks2mount.c:756
 msgid "Cancel"
@@ -637,17 +631,14 @@ msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "Neispravna AFC lokacija: mora biti u obliku afc://uuid:ulaz-broj"
 
 #: daemon/gvfsbackendafc.c:497
-#, c-format
 msgid "Apple Mobile Device"
 msgstr "Apple mobilni uređaj"
 
 #: daemon/gvfsbackendafc.c:502
-#, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Apple mobilni uređaj, Jailbroken"
 
 #: daemon/gvfsbackendafc.c:507
-#, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Dokumenti na Apple mobilnom uređaju"
 
@@ -842,7 +833,6 @@ msgstr "/ u %s"
 #: daemon/gvfsbackendgoogle.c:1228 daemon/gvfsbackendgoogle.c:1347
 #: daemon/gvfsbackendgoogle.c:1488 daemon/gvfsbackendnetwork.c:745
 #: daemon/gvfsbackendsftp.c:4322 daemon/gvfsftpdircache.c:157
-#, c-format
 msgid "The file is not a directory"
 msgstr "Datoteka nije direktorij"
 
@@ -866,7 +856,6 @@ msgstr "Nemoguće stvaranje privremene datoteke"
 #: daemon/gvfsbackendsftp.c:2152 daemon/gvfsbackendsftp.c:3317
 #: daemon/gvfsbackendsftp.c:3330 daemon/gvfsbackendsftp.c:3350
 #: daemon/gvfsbackendtrash.c:218
-#, c-format
 msgid "No such file or directory"
 msgstr "Nema takve datoteke ili direktorija"
 
@@ -934,17 +923,17 @@ msgstr "Odredište već postoji"
 msgid "Not supported"
 msgstr "Nije podržano"
 
-#: daemon/gvfsbackend.c:858 daemon/gvfsjobunmount.c:197
+#: daemon/gvfsbackend.c:861 daemon/gvfsjobunmount.c:197
 #: daemon/gvfsjobunmount.c:264
 msgid "File system is busy"
 msgstr "Datotečni sustav je zauzet"
 
-#: daemon/gvfsbackend.c:1012 monitor/gdu/ggdumount.c:922
+#: daemon/gvfsbackend.c:995 monitor/gdu/ggdumount.c:922
 #: monitor/udisks2/gvfsudisks2mount.c:754
 msgid "Unmount Anyway"
 msgstr "Ipak odmontiraj"
 
-#: daemon/gvfsbackend.c:1015 monitor/gdu/ggdumount.c:924
+#: daemon/gvfsbackend.c:998 monitor/gdu/ggdumount.c:924
 #: monitor/udisks2/gvfsudisks2mount.c:757
 msgid ""
 "Volume is busy\n"
@@ -981,7 +970,6 @@ msgstr "cdda je montiran na %s"
 
 #: daemon/gvfsbackendcdda.c:347 daemon/gvfsbackendcdda.c:870
 #: monitor/gdu/ggduvolume.c:349 monitor/udisks2/gvfsudisks2volume.c:379
-#, c-format
 msgid "Audio Disc"
 msgstr "Glazbeni disk"
 
@@ -1010,12 +998,10 @@ msgid "Error seeking in stream on drive %s"
 msgstr "Greška premotavanja strujanja na uređaju %s"
 
 #: daemon/gvfsbackendcdda.c:899 daemon/gvfsbackendgphoto2.c:1509
-#, c-format
 msgid "No such file"
 msgstr "Takva datoteka ne postoji"
 
 #: daemon/gvfsbackendcdda.c:913
-#, c-format
 msgid "The file does not exist or isn’t an audio track"
 msgstr "Datoteka ne postoji ili nije glazbena datoteka"
 
@@ -1632,12 +1618,10 @@ msgstr ""
 "administratora sustava."
 
 #: daemon/gvfsbackendsftp.c:1390
-#, c-format
 msgid "The connection is closed (the underlying SSH process exited)"
 msgstr "Povezivanje je zatvoreno (izvorni SSH proces se zatvorio)"
 
 #: daemon/gvfsbackendsftp.c:1391
-#, c-format
 msgid "Internal error: Unknown Error"
 msgstr "Unutarnja greška: Nepoznata greška"
 
@@ -1978,6 +1962,16 @@ msgstr "Lokacija je već montirana"
 msgid "Location is not mountable"
 msgstr "Lokacija se ne može montirati"
 
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:12
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:23
+msgid "Perform file operations"
+msgstr "Izvedi radnje datoteke"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:13
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:24
+msgid "Authentication is required to perform file operations"
+msgstr "Ovjera je potrebna za izvođenje radnja datoteke"
+
 #: metadata/meta-daemon.c:170 metadata/meta-daemon.c:246
 #: metadata/meta-daemon.c:282
 #, c-format
@@ -2026,7 +2020,6 @@ msgid "Unnamed Drive"
 msgstr "Bezimeni uređaj"
 
 #: monitor/gdu/ggdudrive.c:561 monitor/udisks2/gvfsudisks2drive.c:624
-#, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
 "Neuspjelo izbacivanje medija; jedan ili više uređaja na mediju su zauzeta."
