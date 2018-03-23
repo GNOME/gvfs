@@ -29,11 +29,16 @@ metadata_service = configure_file(
   configuration: dbus_service_conf
 )
 
-metadata_dbus = gnome.gdbus_codegen(
-  'metadata-dbus',
-  'dbus-interface.xml',
-  interface_prefix: gvfs_namespace + '.',
-  namespace: 'GVfs'
+# FIXME: Ugly workaround that simulates the generation of
+#        two different targets.
+namespace = 'GVfs'
+name = 'metadata-dbus'
+
+dbus_sources = custom_target(
+  name,
+  input: 'dbus-interface.xml',
+  output: [name + '.c', name + '.h'],
+  command: [codegen, gvfs_namespace + '.', name, namespace, meson.current_build_dir(), '@INPUT@', '@OUTPUT@']
 )
 
 sources = files(
@@ -50,7 +55,7 @@ cflags = [
 
 libmetadata = static_library(
   'metadata',
-  sources: sources + [metadata_dbus],
+  sources: sources + [dbus_sources],
   include_directories: [top_inc, common_inc],
   dependencies: glib_deps,
   c_args: cflags,
@@ -58,7 +63,7 @@ libmetadata = static_library(
 )
 
 libmetadata_dep = declare_dependency(
-  sources: metadata_dbus,
+  sources: dbus_sources[1],
   link_with: libmetadata,
   include_directories: include_directories('.'),
   dependencies: glib_deps

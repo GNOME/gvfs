@@ -14,18 +14,23 @@ sources = files(
   'gvfsutils.c'
 )
 
-sources += gnome.gdbus_codegen(
-  'gvfsdbus',
-  gvfs_namespace + '.xml',
-  interface_prefix: gvfs_namespace + '.',
-  namespace: 'GVfsDBus'
+# FIXME: Ugly workaround that simulates the generation of
+#        two different targets.
+namespace = 'GVfsDBus'
+name = namespace.to_lower()
+
+dbus_sources = custom_target(
+  name,
+  input: gvfs_namespace + '.xml',
+  output: [name + '.c', name + '.h'],
+  command: [codegen, gvfs_namespace + '.', name, namespace, meson.current_build_dir(), '@INPUT@', '@OUTPUT@']
 )
 
 cflags = common_cflags + ['-DREMOTE_VOLUME_MONITORS_DIR="@0@"'.format(gvfs_remote_volume_monitors_dir)]
 
 libgvfscommon = shared_library(
   'gvfscommon',
-  sources: sources,
+  sources: sources + [dbus_sources],
   include_directories: top_inc,
   dependencies: glib_deps,
   c_args: cflags,
@@ -34,6 +39,7 @@ libgvfscommon = shared_library(
 )
 
 libgvfscommon_dep = declare_dependency(
+  sources: dbus_sources[1],
   link_with: libgvfscommon,
   include_directories: common_inc
 )
