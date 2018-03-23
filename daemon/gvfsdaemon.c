@@ -1104,6 +1104,7 @@ g_vfs_daemon_has_blocking_processes (GVfsDaemon *daemon)
     {
       if (!G_VFS_IS_JOB_UNMOUNT (l->data))
         {
+          g_debug ("blocking job: %p\n", l->data);
           g_mutex_unlock (&daemon->lock);
           return TRUE;
         }
