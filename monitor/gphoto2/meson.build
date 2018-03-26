@@ -43,10 +43,10 @@ sources = files(
   'ggphoto2volumemonitor.c'
 )
 
-deps = glib_deps + [
+deps = [
+  gio_unix_dep,
+  gobject_dep,
   libgphoto2_dep,
-  gudev_dep,
-  libgvfscommon_dep,
   libgvfscommon_gphoto2_dep,
   libgvfsproxyvolumemonitordaemon_noin_dep
 ]

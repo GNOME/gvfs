@@ -15,7 +15,10 @@ sources = files(
   'gproxyvolumemonitor.c'
 )
 
-deps = glib_deps + [libgvfscommon_dep]
+deps = [
+  gio_unix_dep,
+  libgvfscommon_dep
+]
 
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-RemoteVolumeMonitor"',
@@ -46,6 +49,12 @@ libgioremove_volume_monitor = shared_module(
 
 sources = files('gvfsproxyvolumemonitordaemon.c')
 
+deps = [
+  gio_dep,
+  gio_unix_dep,
+  glib_dep
+]
+
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-RemoteVolumeMonitorDaemon"',
   '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir)
@@ -60,6 +69,7 @@ libgvfsproxyvolumemonitordaemon_noin = static_library(
 )
 
 libgvfsproxyvolumemonitordaemon_noin_dep = declare_dependency(
-  link_with: libgvfsproxyvolumemonitordaemon_noin,
-  include_directories: include_directories('.')
+  include_directories: include_directories('.'),
+  dependencies: gio_dep,
+  link_with: libgvfsproxyvolumemonitordaemon_noin
 )

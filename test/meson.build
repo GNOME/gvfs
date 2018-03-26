@@ -68,12 +68,17 @@ if enable_devel_utils
     'test-query-info-stream'
   ]
 
+  deps = [
+    gio_dep,
+    glib_dep
+  ]
+
   foreach test: tests
     executable(
       test,
       test + '.c',
       include_directories: top_inc,
-      dependencies: glib_deps
+      dependencies: deps
     )
   endforeach
 endif

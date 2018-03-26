@@ -47,6 +47,11 @@ sources = files(
   'metatree.c'
 )
 
+deps = [
+  gio_dep,
+  glib_dep
+]
+
 cflags = [
   '-DDBUS_API_SUBJECT_TO_CHANGE',
   '-DG_LOG_DOMAIN="@0@"'.format(gvfs_name.to_upper()),
@@ -57,32 +62,32 @@ libmetadata = static_library(
   'metadata',
   sources: sources + [dbus_sources],
   include_directories: [top_inc, common_inc],
-  dependencies: glib_deps,
+  dependencies: deps + [gio_unix_dep],
   c_args: cflags,
   pic: true
 )
 
 libmetadata_dep = declare_dependency(
   sources: dbus_sources[1],
-  link_with: libmetadata,
   include_directories: include_directories('.'),
-  dependencies: glib_deps
+  dependencies: deps,
+  link_with: libmetadata
 )
 
-metadata_deps = [
-  libmetadata_dep,
-  libgvfscommon_dep
+deps = [
+  libgvfscommon_dep,
+  libmetadata_dep
 ]
 
 if enable_gudev
-  metadata_deps += gudev_dep
+  deps += gudev_dep
 endif
 
 executable(
   'gvfsd-metadata',
   'meta-daemon.c',
   include_directories: top_inc,
-  dependencies: metadata_deps,
+  dependencies: deps,
   c_args: cflags,
   install: true,
   install_rpath: gvfs_rpath,
@@ -103,8 +108,8 @@ if enable_devel_utils
       app + '.c',
       include_directories: top_inc,
       dependencies: [
-        libmetadata_dep,
-        libgvfscommon_dep
+        libgvfscommon_dep,
+        libmetadata_dep
       ],
       c_args: cflags
     )

@@ -44,9 +44,11 @@ sources = files(
   'ggduvolumemonitor.c'
 )
 
-deps = glib_deps + [
+deps = [
   gdu_dep,
-  libgvfscommon_dep,
+  gio_unix_dep,
+  glib_dep,
+  gobject_dep,
   libgvfscommon_monitor_dep,
   libgvfsproxyvolumemonitordaemon_noin_dep
 ]

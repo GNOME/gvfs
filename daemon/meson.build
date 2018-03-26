@@ -95,7 +95,10 @@ sources = files(
   'gvfswritechannel.c'
 )
 
-deps = glib_deps + socket_deps + [libgvfscommon_dep]
+deps = socket_deps + [
+  gio_unix_dep,
+  libgvfscommon_dep
+]
 
 if enable_gcr
   deps += gcr_dep
@@ -122,10 +125,10 @@ libgvfsdaemon = shared_library(
 )
 
 libgvfsdaemon_dep = declare_dependency(
-  link_with: libgvfsdaemon,
   include_directories: include_directories('.'),
-  dependencies: deps,
-  compile_args: cflags
+  dependencies: libgvfscommon_dep,
+  compile_args: cflags,
+  link_with: libgvfsdaemon
 )
 
 sources = files(
@@ -220,7 +223,7 @@ cflags = [
   '-DMAX_JOB_THREADS=1'
 ]
 
-programs += [['gvfsd-computer', sources, [], cflags]]
+programs += [['gvfsd-computer', sources, [gio_unix_dep], cflags]]
 mounts += ['computer']
 
 sources = files('gvfsbackendnetwork.c')
@@ -245,7 +248,7 @@ cflags = [
   '-DMAX_JOB_THREADS=1'
 ]
 
-programs += [['gvfsd-burn', sources, [], cflags]]
+programs += [['gvfsd-burn', sources, [gio_unix_dep], cflags]]
 mounts += ['burn']
 
 sources = files(
@@ -253,7 +256,10 @@ sources = files(
   'pty_open.c'
 )
 
-deps = socket_deps + [util_dep]
+deps = socket_deps + [
+  gio_unix_dep,
+  util_dep
+]
 
 cflags = [
   '-DBACKEND_HEADER=gvfsbackendsftp.h',
@@ -420,7 +426,7 @@ if enable_gphoto2
   sources = files('gvfsbackendgphoto2.c')
 
   deps = [
-    gudev_dep,
+    gio_unix_dep,
     libgphoto2_dep,
     libgvfscommon_gphoto2_dep
   ]
@@ -440,7 +446,6 @@ if enable_mtp
   sources = files('gvfsbackendmtp.c')
 
   deps = [
-    gudev_dep,
     libgvfscommon_gphoto2_dep,
     libmtp_dep
   ]

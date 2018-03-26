@@ -31,6 +31,12 @@ sources = uri_parser_sources + uri_utils + files(
   'gvfsurimapper.c'
 )
 
+deps = [
+  gio_unix_dep,
+  libgvfscommon_dep,
+  libmetadata_dep
+]
+
 cflags = [
   '-DG_LOG_DOMAIN="@0@"'.format(gvfs_name.to_upper()),
   '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
@@ -48,10 +54,7 @@ libgvfsdbus = shared_module(
   'gvfsdbus',
   sources: sources,
   include_directories: top_inc,
-  dependencies: [
-    libgvfscommon_dep,
-    libmetadata_dep
-  ],
+  dependencies: deps,
   c_args: cflags,
   link_args: ldflags,
   link_depends: symbol_map,
@@ -67,7 +70,7 @@ if enable_devel_utils
     test_name,
     [test_name + '.c'] + uri_utils,
     include_directories: top_inc,
-    dependencies: glib_deps + [libgvfscommon_dep],
+    dependencies: libgvfscommon_dep,
     c_args: cflags
   )
 endif
@@ -81,14 +84,16 @@ if enable_fuse
     )
   endif
 
+  deps = [
+    fuse_dep,
+    libgvfscommon_dep
+  ]
+
   executable(
     'gvfsd-fuse',
     'gvfsfusedaemon.c',
     include_directories: top_inc,
-    dependencies: glib_deps + [
-      fuse_dep,
-      libgvfscommon_dep
-    ],
+    dependencies: deps,
     c_args: cflags + ['-UG_LOG_DOMAIN'],
     install: true,
     install_rpath: gvfs_rpath,

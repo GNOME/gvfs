@@ -6,14 +6,21 @@ sources = files(
   'trashexpunge.c'
 )
 
+deps = [
+  gio_dep,
+  gio_unix_dep,
+  glib_dep
+]
+
 libtrash = static_library(
   'trash',
   sources: sources,
   include_directories: top_inc,
-  dependencies: glib_deps
+  dependencies: deps
 )
 
 libtrash_dep = declare_dependency(
-  link_with: libtrash,
-  include_directories: include_directories('.')
+  include_directories: include_directories('.'),
+  dependencies: gio_dep,
+  link_with: libtrash
 )

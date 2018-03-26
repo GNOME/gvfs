@@ -40,9 +40,10 @@ sources = files(
   'goavolumemonitor.c'
 )
 
-deps = glib_deps + [
+deps = [
+  glib_dep,
   goa_dep,
-  libgvfscommon_dep,
+  gobject_dep,
   libgvfsproxyvolumemonitordaemon_noin_dep
 ]
 

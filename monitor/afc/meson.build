@@ -42,10 +42,11 @@ sources = files(
   'afcvolumemonitor.c'
 )
 
-deps = glib_deps + [
+deps = [
+  glib_dep,
+  gobject_dep,
   libimobiledevice_dep,
   libplist_dep,
-  libgvfscommon_dep,
   libgvfsproxyvolumemonitordaemon_noin_dep
 ]
 

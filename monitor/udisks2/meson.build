@@ -45,12 +45,14 @@ sources = files(
   'gvfsudisks2volumemonitor.c'
 )
 
-deps = glib_deps + [
-  udisks2_dep,
+deps = [
+  gio_unix_dep,
+  glib_dep,
+  gobject_dep,
   gudev_dep,
-  libgvfscommon_dep,
   libgvfscommon_monitor_dep,
-  libgvfsproxyvolumemonitordaemon_noin_dep
+  libgvfsproxyvolumemonitordaemon_noin_dep,
+  udisks2_dep
 ]
 
 if enable_logind

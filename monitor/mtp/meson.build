@@ -40,9 +40,9 @@ sources = files(
   'gmtpvolumemonitor.c'
 )
 
-deps = glib_deps + [
-  gudev_dep,
-  libgvfscommon_dep,
+deps = [
+  gio_unix_dep,
+  gobject_dep,
   libgvfscommon_gphoto2_dep,
   libgvfsproxyvolumemonitordaemon_noin_dep
 ]
