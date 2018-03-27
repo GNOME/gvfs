@@ -31,7 +31,6 @@
 #include "gdaemonfile.h"
 #include <gio/gio.h>
 #include <gvfsdaemonprotocol.h>
-#include <gmodule.h>
 #include "gmountspec.h"
 #include "gvfsurimapper.h"
 #include "gdaemonvolumemonitor.h"

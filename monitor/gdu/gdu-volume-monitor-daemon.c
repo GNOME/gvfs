@@ -25,7 +25,6 @@
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>
-#include <gmodule.h>
 #include <gio/gio.h>
 
 #include <gvfsproxyvolumemonitordaemon.h>

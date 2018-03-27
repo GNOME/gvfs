@@ -6,7 +6,6 @@
 
 #include <config.h>
 #include <glib.h>
-#include <gmodule.h>
 #include <gvfsproxyvolumemonitordaemon.h>
 #include <stdio.h>
 #include <gio/gio.h>

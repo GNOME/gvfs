@@ -22,7 +22,6 @@
 
 #include <config.h>
 #include <string.h>
-#include <gmodule.h>
 #include "gvfsurimapper.h"
 
 G_DEFINE_DYNAMIC_TYPE (GVfsUriMapper, g_vfs_uri_mapper, G_TYPE_OBJECT)
