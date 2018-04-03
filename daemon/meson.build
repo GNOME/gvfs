@@ -251,26 +251,28 @@ cflags = [
 programs += [['gvfsd-burn', sources, [gio_unix_dep], cflags]]
 mounts += ['burn']
 
-sources = files(
-  'gvfsbackendsftp.c',
-  'pty_open.c'
-)
+if enable_sftp
+  sources = files(
+    'gvfsbackendsftp.c',
+    'pty_open.c'
+  )
 
-deps = socket_deps + [
-  gio_unix_dep,
-  util_dep
-]
+  deps = socket_deps + [
+    gio_unix_dep,
+    util_dep
+  ]
 
-cflags = [
-  '-DBACKEND_HEADER=gvfsbackendsftp.h',
-  '-DDEFAULT_BACKEND_TYPE=sftp',
-  '-DBACKEND_TYPES="sftp", G_VFS_TYPE_BACKEND_SFTP,',
-  '-DMAX_JOB_THREADS=1',
-  '-DSSH_PROGRAM="@0@"'.format(find_program('ssh').path())
-]
+  cflags = [
+    '-DBACKEND_HEADER=gvfsbackendsftp.h',
+    '-DDEFAULT_BACKEND_TYPE=sftp',
+    '-DBACKEND_TYPES="sftp", G_VFS_TYPE_BACKEND_SFTP,',
+    '-DMAX_JOB_THREADS=1',
+    '-DSSH_PROGRAM="@0@"'.format(ssh.path())
+  ]
 
-programs += [['gvfsd-sftp', sources, deps, cflags]]
-mounts += ['sftp']
+  programs += [['gvfsd-sftp', sources, deps, cflags]]
+  mounts += ['sftp']
+endif
 
 if enable_samba
   sources = files('gvfsbackendsmb.c')

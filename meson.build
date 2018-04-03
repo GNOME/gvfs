@@ -453,6 +453,13 @@ if enable_nfs
   libnfs_dep = dependency('libnfs', version: '>= 1.9.8')
 endif
 
+# *** SFTP backend ***
+enable_sftp = get_option('sftp')
+if enable_sftp
+  ssh = find_program('ssh', required: false)
+  assert(ssh.found(), 'SFTP backend requested but a ssh client is required')
+endif
+
 # *** Enable development utils ***
 enable_devel_utils = get_option('devel_utils')
 enable_installed_tests = get_option('installed_tests')
@@ -523,6 +530,7 @@ output += '  gphoto2: ' + enable_gphoto2.to_string() + '\n'
 output += '  http: ' + enable_http.to_string() + '\n'
 output += '  mtp: ' + enable_mtp.to_string() + '\n'
 output += '  nfs: ' + enable_nfs.to_string() + '\n'
+output += '  sftp: ' + enable_sftp.to_string() + '\n'
 output += '  smb: ' + enable_samba.to_string() + '\n'
 output += '  udisks2: ' + enable_udisks2.to_string() + '\n'
 output += '\n'
