@@ -471,7 +471,7 @@ enable_installed_tests = get_option('installed_tests')
 # Please see:
 #   https://bugzilla.gnome.org/show_bug.cgi?id=791015
 #   https://github.com/mesonbuild/meson/pull/2930
-codegen = join_paths(meson.source_root(), 'codegen.py')
+codegen = find_program('codegen.py')
 
 gnome = import('gnome')
 i18n = import('i18n')
