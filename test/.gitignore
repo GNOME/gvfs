@@ -1,9 +1,0 @@
-*.monitor
-*.service
-*.test
-session.conf
-benchmark-gvfs-big-files
-benchmark-gvfs-small-files
-benchmark-posix-big-files
-benchmark-posix-small-files
-test-query-info-stream
