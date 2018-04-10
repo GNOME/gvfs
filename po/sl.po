@@ -105,7 +105,7 @@ msgstr "Konec pretoka"
 #: monitor/proxy/gproxymount.c:502 monitor/proxy/gproxymount.c:587
 #: monitor/proxy/gproxyvolume.c:863 monitor/proxy/gproxyvolume.c:927
 msgid "Operation was cancelled"
-msgstr "Opravilo je bilo preklicano."
+msgstr "Opravilo je preklicano."
 
 #: client/gdaemonfileinputstream.c:1355 client/gdaemonfileoutputstream.c:1035
 msgid "Seek not supported on stream"
@@ -113,7 +113,7 @@ msgstr "Iskanje po pretoku ni podprto"
 
 #: client/gdaemonfileoutputstream.c:1204
 msgid "Truncate not supported on stream"
-msgstr "Razčlenitev ni podprta na pretoku"
+msgstr "Razčlenjevanje na pretoku ni podprto"
 
 #: client/gdaemonvfs.c:781
 #, c-format
@@ -127,7 +127,7 @@ msgstr "Neveljaven zapis podrobnosti datoteke"
 #: common/gvfsdnssdresolver.c:208
 #, c-format
 msgid "Error initializing Avahi: %s"
-msgstr "Napaka med začenjanjem Avahi: %s"
+msgstr "Napaka med začenjanjem programa Avahi: %s"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -148,11 +148,9 @@ msgstr "Napaka med razreševanjem storitve »%s« »%s« na domeni »%s«"
 #: common/gvfsdnssdresolver.c:1109
 #, c-format
 msgid ""
-"Error resolving “%s” service “%s” on domain “%s”. One or more TXT records "
-"are missing. Keys required: “%s”."
+"Error resolving “%s” service “%s” on domain “%s”. One or more TXT records are missing. Keys required: “%s”."
 msgstr ""
-"Napaka med razreševanjem storitve »%s« »%s« na domeni »%s«. Manjka en ali "
-"več besedilnih zapisov. Zahtevan ključ: »%s«."
+"Napaka med razreševanjem storitve »%s« »%s« na domeni »%s«. Manjka en ali več besedilnih zapisov. Zahtevan ključ: »%s«."
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -162,7 +160,7 @@ msgstr ""
 #: common/gvfsdnssdresolver.c:1124
 #, c-format
 msgid "Timed out resolving “%s” service “%s” on domain “%s”"
-msgstr "Časovni pretek razreševanja storitve »%s« »%s« na domeni »%s«"
+msgstr "Razreševanje storitve »%s« »%s« na domeni »%s« je časovno poteklo."
 
 #: common/gvfsdnssdresolver.c:1164
 msgid "Error initializing Avahi resolver"
@@ -172,7 +170,7 @@ msgstr "Napaka med začenjanjem razreševalnika Avahi"
 #: common/gvfsdnssdutils.c:280
 #, c-format
 msgid "Malformed DNS-SD encoded_triple “%s”"
-msgstr "Neveljaven zapis DNS-SD predmeta encoded_triple »%s«"
+msgstr "Neveljaven zapis predmeta DNS-SD encoded_triple »%s«"
 
 #: common/gvfsicon.c:250
 #, c-format
@@ -284,20 +282,16 @@ msgstr "Strežnik »%s« ne podpira brezimne prijave."
 #: daemon/gvfsafpserver.c:729
 #, c-format
 msgid ""
-"Unable to connect to the server “%s”. No suitable authentication mechanism "
-"was found."
+"Unable to connect to the server “%s”. No suitable authentication mechanism was found."
 msgstr ""
-"Prijava na strežnik »%s« je spodletela. Ustreznega načina overitve ni mogoče "
-"najti."
+"Prijava na strežnik »%s« je spodletela. Ustreznega načina overitve ni mogoče najti."
 
 #: daemon/gvfsafpserver.c:804
 #, c-format
 msgid ""
-"Unable to connect to the server “%s”. The server doesn’t support AFP version "
-"3.0 or later."
+"Unable to connect to the server “%s”. The server doesn’t support AFP version 3.0 or later."
 msgstr ""
-"Povezava na strežnik »%s« ni uspela. Strežnik ne podpira različice AFP 3.0 "
-"ali novejše."
+"Povezava na strežnik »%s« ni uspela. Strežnik ne podpira različice AFP 3.0 ali novejše."
 
 #: daemon/gvfsafpserver.c:915
 msgid "Permission denied."
@@ -337,8 +331,7 @@ msgstr "Prekinitev povezave s strežnikom je spodletela."
 
 #: daemon/gvfsafpserver.c:1366 daemon/gvfsafpserver.c:1766
 msgid "Unable to connect to the server. A communication problem occurred."
-msgstr ""
-"Povezava na strežnik ni uspela. Prišlo je do težave pri izmenjavi podatkov."
+msgstr "Povezava na strežnik ni uspela. Prišlo je do težave pri izmenjavi podatkov."
 
 #: daemon/gvfsafpserver.c:1722
 msgid "Identification not found."
@@ -2187,8 +2180,8 @@ msgid ""
 "%s can be safely unplugged\n"
 "Device can be removed."
 msgstr ""
-"Naprave %s ni mogoče varno odklopiti.\n"
-"Trenutno naprave ni mogoče odstraniti."
+"Napravo %s je mogoče varno odklopiti.\n"
+"Napravo je mogoče odstraniti."
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2223,7 +2216,7 @@ msgstr "Napaka pri brisanju šifrirnega gesla iz zbirke ključev (%s)"
 
 #: monitor/udisks2/gvfsudisks2volume.c:1218
 msgid "The unlocked device does not have a recognizable file system on it"
-msgstr "Odklenjena naprava ne vsebuje prepoznavnega datotečnega sistema."
+msgstr "Odklenjena naprava je brez prepoznanega datotečnega sistema."
 
 #: monitor/udisks2/gvfsudisks2volume.c:1247
 #, c-format
