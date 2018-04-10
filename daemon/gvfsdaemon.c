@@ -1125,13 +1125,29 @@ g_vfs_daemon_close_active_channels (GVfsDaemon *daemon,
 				    GVfsBackend *backend)
 {
   GList *l;
+  GVfsChannel *channel_to_close;
 
-  g_mutex_lock (&daemon->lock);
+  do
+    {
+      channel_to_close = NULL;
 
-  for (l = daemon->job_sources; l != NULL; l = l->next)
-    if (G_VFS_IS_CHANNEL (l->data) &&
-        g_vfs_channel_get_backend (G_VFS_CHANNEL (l->data)) == backend)
-      g_vfs_channel_force_close (G_VFS_CHANNEL (l->data));
+      g_mutex_lock (&daemon->lock);
+      for (l = daemon->job_sources; l != NULL; l = l->next)
+        {
+          if (G_VFS_IS_CHANNEL (l->data) &&
+              g_vfs_channel_get_backend (G_VFS_CHANNEL (l->data)) == backend)
+            {
+              channel_to_close = g_object_ref (G_VFS_CHANNEL (l->data));
+              break;
+            }
+        }
+      g_mutex_unlock (&daemon->lock);
 
-  g_mutex_unlock (&daemon->lock);
+      if (channel_to_close)
+        {
+          g_vfs_channel_force_close (channel_to_close);
+          g_object_unref (channel_to_close);
+        }
+    }
+  while (channel_to_close != NULL);
 }
