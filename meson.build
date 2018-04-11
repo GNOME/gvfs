@@ -70,7 +70,7 @@ config_h.set('HAVE_SOCKETPAIR', have_socketpair,
              description: 'Define if you have the socketpair function.')
 
 util_dep = cc.find_library('util', required: false)
-config_h.set('HAVE_UTIL_H', cc.has_header('util.h', dependendencies: util_dep))
+config_h.set('HAVE_UTIL_H', cc.has_header('util.h', dependencies: util_dep))
 
 have_openpty = cc.has_function('openpty')
 if not have_openpty
