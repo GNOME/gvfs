@@ -72,10 +72,7 @@ config_h.set('HAVE_SOCKETPAIR', have_socketpair,
 util_dep = cc.find_library('util', required: false)
 config_h.set('HAVE_UTIL_H', cc.has_header('util.h', dependencies: util_dep))
 
-have_openpty = cc.has_function('openpty')
-if not have_openpty
-  have_openpty = util_dep.found() and cc.has_function('openpty', dependencies: util_dep)
-endif
+have_openpty = cc.has_function('openpty', dependencies: util_dep)
 
 config_h.set('HAVE_OPENPTY', have_openpty,
              description: 'Define if you have the openpty function.')
