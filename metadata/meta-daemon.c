@@ -319,13 +319,15 @@ handle_get_tree_from_device (GVfsMetadata *object,
     g_once_init_leave (&gudev_client, g_udev_client_new (NULL));
 
   device = g_udev_client_query_by_device_number (gudev_client, G_UDEV_DEVICE_TYPE_BLOCK, devnum);
+  if (device != NULL)
+    {
+      if (g_udev_device_has_property (device, "ID_FS_UUID_ENC"))
+        res = g_strconcat ("uuid-", g_udev_device_get_property (device, "ID_FS_UUID_ENC"), NULL);
+      else if (g_udev_device_has_property (device, "ID_FS_LABEL_ENC"))
+        res = g_strconcat ("label-", g_udev_device_get_property (device, "ID_FS_LABEL_ENC"), NULL);
 
-  if (g_udev_device_has_property (device, "ID_FS_UUID_ENC"))
-    res = g_strconcat ("uuid-", g_udev_device_get_property (device, "ID_FS_UUID_ENC"), NULL);
-  else if (g_udev_device_has_property (device, "ID_FS_LABEL_ENC"))
-    res = g_strconcat ("label-", g_udev_device_get_property (device, "ID_FS_LABEL_ENC"), NULL);
-
-  g_clear_object (&device);
+      g_clear_object (&device);
+    }
 #endif
 
   gvfs_metadata_complete_get_tree_from_device (object, invocation, res ? res : "");
