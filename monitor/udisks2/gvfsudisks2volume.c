@@ -803,24 +803,24 @@ gvfs_udisks2_volume_should_automount (GVolume *_volume)
 }
 
 static GDrive *
-gvfs_udisks2_volume_get_drive (GVolume *volume)
+gvfs_udisks2_volume_get_drive (GVolume *_volume)
 {
-  GVfsUDisks2Volume *gdu_volume = GVFS_UDISKS2_VOLUME (volume);
+  GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
   GDrive *drive = NULL;
 
-  if (gdu_volume->drive != NULL)
-    drive = G_DRIVE (g_object_ref (gdu_volume->drive));
+  if (volume->drive != NULL)
+    drive = G_DRIVE (g_object_ref (volume->drive));
   return drive;
 }
 
 static GMount *
-gvfs_udisks2_volume_get_mount (GVolume *volume)
+gvfs_udisks2_volume_get_mount (GVolume *_volume)
 {
-  GVfsUDisks2Volume *gdu_volume = GVFS_UDISKS2_VOLUME (volume);
+  GVfsUDisks2Volume *volume = GVFS_UDISKS2_VOLUME (_volume);
   GMount *mount = NULL;
 
-  if (gdu_volume->mount != NULL)
-    mount = G_MOUNT (g_object_ref (gdu_volume->mount));
+  if (volume->mount != NULL)
+    mount = G_MOUNT (g_object_ref (volume->mount));
   return mount;
 }
 

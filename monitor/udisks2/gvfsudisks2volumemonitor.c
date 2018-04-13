@@ -1316,7 +1316,6 @@ update_drives (GVfsUDisks2VolumeMonitor  *monitor,
       drive = find_drive_for_udisks_drive (monitor, udisks_drive);
       if (drive != NULL)
         {
-          /*g_debug ("removing drive %s", gdu_presentable_get_id (p));*/
           gvfs_udisks2_drive_disconnected (drive);
           monitor->drives = g_list_remove (monitor->drives, drive);
           *removed_drives = g_list_prepend (*removed_drives, g_object_ref (drive));
@@ -1331,7 +1330,6 @@ update_drives (GVfsUDisks2VolumeMonitor  *monitor,
       drive = find_drive_for_udisks_drive (monitor, udisks_drive);
       if (drive == NULL)
         {
-          /*g_debug ("adding drive %s", gdu_presentable_get_id (p));*/
           drive = gvfs_udisks2_drive_new (monitor, udisks_drive, coldplug);
           if (udisks_drive != NULL)
             {
@@ -1688,7 +1686,6 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
           gvfs_udisks2_mount_unmounted (mount);
           monitor->mounts = g_list_remove (monitor->mounts, mount);
           *removed_mounts = g_list_prepend (*removed_mounts, g_object_ref (mount));
-          /*g_debug ("removed mount at %s", gvfs_udisks2_mount_get_mount_path (mount));*/
           g_object_unref (mount);
         }
     }
@@ -1704,7 +1701,6 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
         {
           monitor->mounts = g_list_prepend (monitor->mounts, mount);
           *added_mounts = g_list_prepend (*added_mounts, g_object_ref (mount));
-          /*g_debug ("added mount at %s for %p", gvfs_udisks2_mount_get_mount_path (mount), volume);*/
           /* since @mount takes ownership of @mount_entry, don't free it below */
           new_mounts = g_list_remove (new_mounts, mount_entry);
         }

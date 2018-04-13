@@ -113,7 +113,7 @@ gvfs_udisks2_drive_class_init (GVfsUDisks2DriveClass *klass)
 }
 
 static void
-gvfs_udisks2_drive_init (GVfsUDisks2Drive *gdu_drive)
+gvfs_udisks2_drive_init (GVfsUDisks2Drive *drive)
 {
 }
 
