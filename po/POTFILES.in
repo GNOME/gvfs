@@ -90,10 +90,6 @@ daemon/mount.c
 daemon/org.gtk.vfs.file-operations.policy.in.in
 metadata/meta-daemon.c
 monitor/afc/afcvolume.c
-monitor/gdu/gdu-volume-monitor-daemon.c
-monitor/gdu/ggdudrive.c
-monitor/gdu/ggdumount.c
-monitor/gdu/ggduvolume.c
 monitor/goa/goavolume.c
 monitor/gphoto2/ggphoto2volume.c
 monitor/gphoto2/ggphoto2volumemonitor.c

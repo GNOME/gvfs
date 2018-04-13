@@ -41,10 +41,6 @@ if enable_installed_tests
     test_data += [afc_monitor, afc_service]
   endif
 
-  if enable_gdu
-    test_data += [gdu_monitor, gdu_service]
-  endif
-
   if enable_gphoto2
     test_data += [gphoto2_monitor, gphoto2_service]
   endif

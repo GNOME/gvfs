@@ -7,7 +7,6 @@ option('afp', type: 'boolean', value: true, description: 'build with afp backend
 option('archive', type: 'boolean', value: true, description: 'build with archive backend')
 option('cdda', type: 'boolean', value: true, description: 'build with cdda backend')
 option('dnssd', type: 'boolean', value: true, description: 'build with dnssd backend')
-option('gdu', type: 'boolean', value: false, description: 'build with gdu volume monitor')
 option('goa', type: 'boolean', value: true, description: 'build with goa volume monitor')
 option('google', type: 'boolean', value: true, description: 'build with google backend')
 option('gphoto2', type: 'boolean', value: true, description: 'build with gphoto2 backend and volume monitor')

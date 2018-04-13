@@ -330,12 +330,6 @@ if enable_fuse
 endif
 config_h.set('HAVE_FUSE', enable_fuse)
 
-# *** Check for gnome-disk-utility ***
-enable_gdu = get_option('gdu')
-if enable_gdu
-  gdu_dep = dependency('gdu', version: '>= 3.0.2')
-endif
-
 # *** Check for udisks2 ***
 enable_udisks2 = get_option('udisks2')
 if enable_udisks2
@@ -522,7 +516,6 @@ output += '  afp: ' + enable_afp.to_string() + '\n'
 output += '  archive: ' + enable_archive.to_string() + '\n'
 output += '  cdda: ' + enable_cdda.to_string() + '\n'
 output += '  dnssd: ' + enable_dnssd.to_string() + '\n'
-output += '  gdu: ' + enable_gdu.to_string() + '\n'
 output += '  goa: ' + enable_goa.to_string() + '\n'
 output += '  google: ' + enable_google.to_string() + '\n'
 output += '  gphoto2: ' + enable_gphoto2.to_string() + '\n'

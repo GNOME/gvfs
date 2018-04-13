@@ -1,4 +1,0 @@
-[D-BUS Service]
-Name=org.gtk.vfs.GduVolumeMonitor
-Exec=@libexecdir@/gvfs-gdu-volume-monitor
-SystemdService=gvfs-gdu-volume-monitor.service

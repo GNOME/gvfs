@@ -1,9 +1,5 @@
 subdir('proxy')
 
-if enable_gdu
-  subdir('gdu')
-endif
-
 if enable_udisks2
   subdir('udisks2')
 endif

@@ -1,7 +1,0 @@
-[Unit]
-Description=Virtual filesystem service - GNOME Disk Utility monitor
-
-[Service]
-ExecStart=@libexecdir@/gvfs-gdu-volume-monitor
-Type=dbus
-BusName=org.gtk.vfs.GduVolumeMonitor
