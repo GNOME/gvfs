@@ -1,3 +1,15 @@
+Major changes in 1.37.1
+=======================
+* udisks2: Remove optical disc volumes/mounts if drive disappears
+* daemon: Prevent deadlock and invalid read when closing channels
+* metadata: Prevent usage of NULL if GUdevDevice is not found
+* mtp: Implement support for move and copy operations
+* backend: Fix crashes when "Volume is busy" prompt is shown
+* build: Remove autotools
+* build: Various meson-related fixes and improvements
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.36.0
 =======================
 * Translation updates
