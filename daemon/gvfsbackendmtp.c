@@ -109,12 +109,10 @@ typedef struct {
   uint32_t id;
 } CacheEntry;
 
-#if HAVE_LIBMTP_1_1_5
 typedef struct {
   LIBMTP_event_t event;
   uint32_t param1;
 } EventData;
-#endif
 
 
 /************************************************
@@ -126,10 +124,8 @@ emit_delete_event (gpointer key,
                    gpointer value,
                    gpointer user_data);
 
-#if HAVE_LIBMTP_1_1_5
 static void
 handle_event (EventData *data, GVfsBackendMtp *backend);
-#endif
 
 
 /************************************************
@@ -390,10 +386,8 @@ g_vfs_backend_mtp_init (GVfsBackendMtp *backend)
 
   backend->monitors = g_hash_table_new (NULL, NULL);
 
-#if HAVE_LIBMTP_1_1_5
   backend->event_pool = g_thread_pool_new ((GFunc) handle_event,
                                            backend, 1, FALSE, NULL);
-#endif
 
   debug = g_getenv ("GVFS_MTP_DEBUG");
   if (debug != NULL) {
@@ -431,9 +425,7 @@ g_vfs_backend_mtp_finalize (GObject *object)
 
   backend = G_VFS_BACKEND_MTP (object);
 
-#if HAVE_LIBMTP_1_1_5
   g_thread_pool_free (backend->event_pool, TRUE, TRUE);
-#endif
 
   g_hash_table_foreach (backend->monitors, remove_monitor_weak_ref, backend->monitors);
   g_hash_table_unref (backend->monitors);
@@ -627,7 +619,6 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
   g_debug ("(I) on_uevent done.\n");
 }
 
-#if HAVE_LIBMTP_1_1_12
 static void
 check_event_cb(int ret, LIBMTP_event_t event, uint32_t param1, void *user_data)
 {
@@ -677,47 +668,7 @@ check_event (gpointer user_data)
   }
   return NULL;
 }
-#elif HAVE_LIBMTP_1_1_5
-static gpointer
-check_event (gpointer user_data)
-{
-  GWeakRef *event_ref = user_data;
 
-  LIBMTP_event_t event;
-  int ret = 0;
-  while (ret == 0) {
-    uint32_t param1;
-    GVfsBackendMtp *backend;
-
-    backend = g_weak_ref_get (event_ref);
-    if (backend && !g_atomic_int_get (&backend->unmount_started)) {
-      LIBMTP_mtpdevice_t *device = backend->device;
-      g_object_unref (backend);
-      /*
-       * Unavoidable race. We can't hold a reference when
-       * calling Read_Event as it blocks while waiting and
-       * we can't interrupt it in any sane way, so it would
-       * end up preventing finalization of the backend.
-       */
-      ret = LIBMTP_Read_Event (device, &event, &param1);
-    } else {
-      return NULL;
-    }
-
-    backend = g_weak_ref_get (event_ref);
-    if (backend && !g_atomic_int_get (&backend->unmount_started)) {
-      EventData *ed = g_new (EventData, 1);
-      ed->event = event;
-      ed->param1 = param1;
-      g_thread_pool_push (backend->event_pool, ed, NULL);
-      g_object_unref (backend);
-    }
-  }
-  return NULL;
-}
-#endif
-
-#if HAVE_LIBMTP_1_1_5
 void
 handle_event (EventData *ed, GVfsBackendMtp *backend)
 {
@@ -754,7 +705,6 @@ handle_event (EventData *ed, GVfsBackendMtp *backend)
         }
         break;
       }
-#if HAVE_LIBMTP_1_1_6
     case LIBMTP_EVENT_OBJECT_REMOVED:
         remove_cache_entry_by_id (G_VFS_BACKEND_MTP (backend), param1);
         break;
@@ -825,14 +775,12 @@ handle_event (EventData *ed, GVfsBackendMtp *backend)
         }
         break;
       }
-#endif
     default:
       break;
     }
   }
   g_mutex_unlock (&backend->mutex);
 }
-#endif
 
 static gboolean
 mtp_heartbeat (GVfsBackendMtp *backend)
@@ -973,20 +921,8 @@ do_mount (GVfsBackend *backend,
     op_backend->hb_id =
       g_timeout_add_seconds (900, (GSourceFunc)mtp_heartbeat, op_backend);
 
-#if HAVE_LIBMTP_1_1_12
     op_backend->event_completed = TRUE;
     op_backend->event_thread = g_thread_new ("events", check_event, backend);
-#elif HAVE_LIBMTP_1_1_5
-    GWeakRef *event_ref = g_new0 (GWeakRef, 1);
-    g_weak_ref_init (event_ref, backend);
-    GThread *event_thread = g_thread_new ("events", check_event, event_ref);
-    /*
-     * We don't need our ref to the thread, as the libmtp semantics mean
-     * that in the normal case, the thread will block forever when we are
-     * cleanining up before termination, so we can never join the thread.
-     */
-    g_thread_unref (event_thread);
-#endif
   }
   g_debug ("(I) do_mount done.\n");
 }
@@ -1011,15 +947,11 @@ do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
   libusb_interrupt_event_handler (NULL);
 #endif
 
-#ifdef HAVE_LIBMTP_1_1_12
   /* Thread will terminate after flag is set. */
   g_thread_join (op_backend->event_thread);
-#endif
 
-#if HAVE_LIBMTP_1_1_5
   /* It's no longer safe to handle events. */
   g_thread_pool_set_max_threads (op_backend->event_pool, 0, NULL);
-#endif
 
   /* Emit delete events to tell clients files are gone. */
   GHashTableIter iter;
@@ -1146,10 +1078,8 @@ get_device (GVfsBackend *backend, uint32_t bus_num, uint32_t dev_num,
     }
   }
 
-#if HAVE_LIBMTP_1_1_9
   G_VFS_BACKEND_MTP (backend)->get_partial_object_capability
     = LIBMTP_Check_Capability (device, LIBMTP_DEVICECAP_GetPartialObject);
-#endif
 #if HAVE_LIBMTP_1_1_15
   G_VFS_BACKEND_MTP (backend)->move_object_capability
     = LIBMTP_Check_Capability (device, LIBMTP_DEVICECAP_MoveObject);
@@ -1343,8 +1273,6 @@ get_file_info (GVfsBackend *backend,
     break;
   }
 
-
-#if HAVE_LIBMTP_1_1_5
   if (LIBMTP_FILETYPE_IS_IMAGE (file->filetype) ||
       LIBMTP_FILETYPE_IS_VIDEO (file->filetype) ||
       LIBMTP_FILETYPE_IS_AUDIOVIDEO (file->filetype)) {
@@ -1363,7 +1291,6 @@ get_file_info (GVfsBackend *backend,
     g_object_unref (preview);
     g_free (icon_id);
   }
-#endif
 
   g_file_info_set_size (info, file->filesize);
 
@@ -2314,7 +2241,6 @@ do_set_display_name (GVfsBackend *backend,
 }
 
 
-#if HAVE_LIBMTP_1_1_6
 static void
 do_open_for_read (GVfsBackend *backend,
                   GVfsJobOpenForRead *job,
@@ -2378,10 +2304,8 @@ do_open_for_read (GVfsBackend *backend,
 
   g_debug ("(I) do_open_for_read done.\n");
 }
-#endif /* HAVE_LIBMTP_1_1_6 */
 
 
-#if HAVE_LIBMTP_1_1_5
 static void
 do_open_icon_for_read (GVfsBackend *backend,
                        GVfsJobOpenIconForRead *job,
@@ -2457,7 +2381,6 @@ do_open_icon_for_read (GVfsBackend *backend,
 
   g_debug ("(I) do_open_icon_for_read done.\n");
 }
-#endif /* HAVE_LIBMTP_1_1_5 */
 
 
 static void
@@ -2514,7 +2437,6 @@ do_read (GVfsBackend *backend,
 
   uint32_t actual;
   if (handle->handle_type == HANDLE_FILE) {
-#if HAVE_LIBMTP_1_1_6
     if (!G_VFS_BACKEND_MTP (backend)->android_extension &&
         offset > G_MAXUINT32) {
       g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -2549,9 +2471,6 @@ do_read (GVfsBackend *backend,
 
     memcpy (buffer, temp, actual);
     free (temp);
-#else
-    g_assert_not_reached ();
-#endif
   } else {
     GByteArray *bytes = handle->bytes;
     actual = MIN (bytes->len - offset, bytes_requested);
@@ -2584,7 +2503,6 @@ do_close_read (GVfsBackend *backend,
 }
 
 
-#if HAVE_LIBMTP_1_1_6
 static uint16_t
 zero_get_func (void* params,
                void* priv,
@@ -2942,7 +2860,6 @@ do_close_write (GVfsBackend *backend,
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
   g_debug ("(I) do_close_write done.\n");
 }
-#endif /* HAVE_LIBMTP_1_1_6 */
 
 
 #if HAVE_LIBMTP_1_1_15
@@ -3252,16 +3169,11 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->set_display_name = do_set_display_name;
   backend_class->create_dir_monitor = do_create_dir_monitor;
   backend_class->create_file_monitor = do_create_file_monitor;
-#if HAVE_LIBMTP_1_1_6
   backend_class->open_for_read = do_open_for_read;
-#endif
-#if HAVE_LIBMTP_1_1_5
   backend_class->open_icon_for_read = do_open_icon_for_read;
-#endif
   backend_class->seek_on_read = do_seek_on_read;
   backend_class->read = do_read;
   backend_class->close_read = do_close_read;
-#if HAVE_LIBMTP_1_1_6
   backend_class->create = do_create;
   backend_class->append_to = do_append_to;
   backend_class->replace = do_replace;
@@ -3269,7 +3181,6 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->seek_on_write = do_seek_on_write;
   backend_class->truncate = do_truncate;
   backend_class->close_write = do_close_write;
-#endif
 #if HAVE_LIBMTP_1_1_15
   backend_class->move = do_move;
   backend_class->copy = do_copy;

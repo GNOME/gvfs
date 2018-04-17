@@ -63,13 +63,9 @@ struct _GVfsBackendMtp
   gboolean move_object_capability;
   gboolean copy_object_capability;
 
-#ifdef HAVE_LIBMTP_1_1_5
   GThreadPool *event_pool;
-#endif
-#ifdef HAVE_LIBMTP_1_1_12
   GThread *event_thread;
   gboolean event_completed;
-#endif
 };
 
 struct _GVfsBackendMtpClass
