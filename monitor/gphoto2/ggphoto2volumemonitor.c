@@ -139,7 +139,10 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
     GGPhoto2Volume *volume;
     GList *store_heads, *l;
     guint num_store_heads;
-    const char *usb_bus_num, *usb_device_num, *device_path;
+    const char *usb_bus_num, *usb_device_num, *usb_serial_id, *device_path;
+    gchar *prefix;
+    GFile *mount_prefix;
+    gboolean serial_conflict = FALSE;
 
     device_path = g_udev_device_get_device_file (device);
     if (!device_path)
@@ -157,6 +160,17 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
       }
 #endif /* HAVE_LIBMTP */
 
+    /*
+     * We do not use ID_SERIAL_SHORT (the actualy device serial value) as
+     * this field is not populated when an ID_SERIAL has to be synthesized.
+     */
+    usb_serial_id = g_udev_device_get_property (device, "ID_SERIAL");
+    if (usb_serial_id == NULL)
+      {
+        g_warning ("device %s has no ID_SERIAL property, ignoring", device_path);
+        return;
+      }
+
     usb_bus_num = g_udev_device_get_property (device, "BUSNUM");
     if (usb_bus_num == NULL)
       {
@@ -171,9 +185,45 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
         return;
       }
 
-    g_debug ("gudev_add_camera: camera device %s (bus: %s, device: %s)",
+    prefix = g_strdup_printf ("gphoto2://%s", usb_serial_id);
+    mount_prefix = g_file_new_for_uri (prefix);
+    g_free (prefix);
+
+    /*
+     * We do not support plugging in multiple devices that lack proper serial
+     * numbers. Linux will attempt to synthesize an ID based on the device
+     * product information, which will avoid collisions between different
+     * types of device, but two identical, serial-less, devices will still
+     * conflict.
+     */
+    for (l = monitor->camera_volumes; l != NULL; l = l->next)
+      {
+        GGPhoto2Volume *volume = G_GPHOTO2_VOLUME (l->data);
+
+        GFile *existing_root = g_volume_get_activation_root (G_VOLUME (volume));
+        if (g_file_equal (existing_root, mount_prefix) ||
+            g_file_has_prefix (existing_root, mount_prefix))
+          {
+            serial_conflict = TRUE;
+          }
+        g_object_unref (existing_root);
+        if (serial_conflict)
+          {
+            break;
+          }
+      }
+    g_object_unref (mount_prefix);
+    if (serial_conflict)
+      {
+        g_warning ("device %s has an identical ID_SERIAL value to an "
+                   "existing device. Multiple devices are not supported.",
+                   g_udev_device_get_device_file (device));
+        return;
+      }
+
+    g_debug ("gudev_add_camera: camera device %s (id: %s)",
              g_udev_device_get_device_file (device),
-             usb_bus_num, usb_device_num);
+             usb_serial_id);
 
     store_heads = get_stores_for_camera (usb_bus_num, usb_device_num);
     num_store_heads = g_list_length (store_heads);
@@ -189,11 +239,11 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
          */
         if (num_store_heads == 1)
           {
-            uri = g_strdup_printf ("gphoto2://[usb:%s,%s]", usb_bus_num, usb_device_num);
+            uri = g_strdup_printf ("gphoto2://%s", usb_serial_id);
           }
         else
           {
-            uri = g_strdup_printf ("gphoto2://[usb:%s,%s]/%s", usb_bus_num, usb_device_num,
+            uri = g_strdup_printf ("gphoto2://%s/%s", usb_serial_id,
                                    store_path[0] == '/' ? store_path + 1 : store_path);
           }
         g_debug ("gudev_add_camera: ... adding URI for storage head: %s", uri);

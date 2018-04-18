@@ -1210,6 +1210,49 @@ ensure_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, GVfsJob *job)
 
 /* ------------------------------------------------------------------------------------------------- */
 
+static char *
+get_port_from_host (GVfsJob *job,
+                    GUdevClient *gudev_client,
+                    const char *host)
+{
+  guint32 bus_num = 0, dev_num = 0;
+  GList *devices, *l;
+
+  /* find corresponding GUdevDevice */
+  devices = g_udev_client_query_by_subsystem (gudev_client, "usb");
+  for (l = devices; l != NULL; l = l->next)
+    {
+      const char *id = g_udev_device_get_property (l->data, "ID_SERIAL");
+      if (g_strcmp0 (id, host) == 0)
+        {
+          bus_num = g_ascii_strtoull (g_udev_device_get_property (l->data, "BUSNUM"),
+                                      NULL, 10);
+          dev_num = g_ascii_strtoull (g_udev_device_get_property (l->data, "DEVNUM"),
+                                      NULL, 10);
+          break;
+        }
+    }
+  g_list_free_full (devices, g_object_unref);
+
+  if (bus_num && dev_num)
+    {
+      return g_strdup_printf ("usb:%03u,%03u", bus_num, dev_num);
+    }
+
+  /* For compatibility, handle old style host specifications. */
+  if (g_str_has_prefix (host, "[usb:") && host[strlen (host) - 1] == ']')
+    {
+      char *port = g_strdup (host + 1);
+      port[strlen (port) -1] = '\0';
+      return port;
+    }
+
+  g_vfs_job_failed_literal (G_VFS_JOB (job),
+                            G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                            _("Couldn’t find matching udev device."));
+  return NULL;
+}
+
 static void
 do_mount (GVfsBackend *backend,
 	  GVfsJobMount *job,
@@ -1251,16 +1294,16 @@ do_mount (GVfsBackend *backend,
 
   host = g_mount_spec_get (mount_spec, "host");
   g_debug ("  host='%s'\n", host);
-  if (host == NULL || strlen (host) < 3 || host[0] != '[' || host[strlen (host) - 1] != ']')
+
+  char *port = get_port_from_host (G_VFS_JOB (job),
+                                   gphoto2_backend->gudev_client,
+                                   host);
+  if (port == NULL)
     {
-      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No device specified"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      /* Job already set to failed */
       return;
     }
-
-  gphoto2_backend->gphoto2_port = g_strdup (host + 1);
-  gphoto2_backend->gphoto2_port[strlen (gphoto2_backend->gphoto2_port) - 1] = '\0';
+  gphoto2_backend->gphoto2_port = port;
 
   g_debug ("  decoded host='%s'\n", gphoto2_backend->gphoto2_port);
 
