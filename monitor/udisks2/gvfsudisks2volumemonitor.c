@@ -698,7 +698,19 @@ should_include_mount (GVfsUDisks2VolumeMonitor  *monitor,
                       GUnixMountEntry           *mount_entry)
 {
   GUnixMountPoint *mount_point;
+  const gchar *options;
   gboolean ret;
+
+  /* g_unix_mount_get_options works only with libmount,
+   * see https://bugzilla.gnome.org/show_bug.cgi?id=668132
+   */
+  options = g_unix_mount_get_options (mount_entry);
+  if (options != NULL)
+    {
+      ret = should_include (g_unix_mount_get_mount_path (mount_entry),
+                            options);
+      goto out;
+    }
 
   /* if mounted at the designated mount point, use that info to decide */
   mount_point = get_mount_point_for_mount (mount_entry);
@@ -709,9 +721,7 @@ should_include_mount (GVfsUDisks2VolumeMonitor  *monitor,
       goto out;
     }
 
-  /* otherwise, use the mount's info */
-  ret = should_include (g_unix_mount_get_mount_path (mount_entry),
-                        NULL); /* no mount options yet - see bug 668132 */
+  ret = should_include (g_unix_mount_get_mount_path (mount_entry), NULL);
 
  out:
   return ret;
