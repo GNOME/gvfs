@@ -757,7 +757,10 @@ should_include_volume_check_mount_points (GVfsUDisks2VolumeMonitor *monitor,
       mount_entry = g_unix_mount_at (mount_point, NULL);
       if (mount_entry != NULL)
         {
-          if (should_include_mount (monitor, mount_entry))
+          const gchar *root = g_unix_mount_get_root_path (mount_entry);
+
+          if ((root == NULL || g_strcmp0 (root, "/") == 0) &&
+              should_include_mount (monitor, mount_entry))
             {
               g_unix_mount_free (mount_entry);
               ret = TRUE;
@@ -1703,7 +1706,11 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
   for (l = added; l != NULL; l = l->next)
     {
       GUnixMountEntry *mount_entry = l->data;
-      volume = find_volume_for_device (monitor, g_unix_mount_get_device_path (mount_entry));
+      const gchar *root = g_unix_mount_get_root_path (mount_entry);
+
+      volume = NULL;
+      if (root == NULL || g_strcmp0 (root, "/") == 0)
+        volume = find_volume_for_device (monitor, g_unix_mount_get_device_path (mount_entry));
       if (volume == NULL)
         volume = find_fstab_volume_for_mount_entry (monitor, mount_entry);
       mount = gvfs_udisks2_mount_new (monitor, mount_entry, volume); /* adopts mount_entry */
@@ -1735,7 +1742,11 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
         }
       if (gvfs_udisks2_mount_get_volume (mount) == NULL)
         {
-          volume = find_volume_for_device (monitor, g_unix_mount_get_device_path (mount_entry));
+          const gchar *root = g_unix_mount_get_root_path (mount_entry);
+
+          volume = NULL;
+          if (root == NULL || g_strcmp0 (root, "/") == 0)
+            volume = find_volume_for_device (monitor, g_unix_mount_get_device_path (mount_entry));
           if (volume == NULL)
             volume = find_fstab_volume_for_mount_entry (monitor, mount_entry);
           if (volume != NULL)
