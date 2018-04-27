@@ -333,10 +333,6 @@ gvfs_udisks2_mount_new (GVfsUDisks2VolumeMonitor *monitor,
 {
   GVfsUDisks2Mount *mount = NULL;
 
-  /* Ignore internal mounts unless there's a volume */
-  if (volume == NULL && (mount_entry != NULL && !g_unix_mount_guess_should_display (mount_entry)))
-    goto out;
-
   mount = g_object_new (GVFS_TYPE_UDISKS2_MOUNT, NULL);
   mount->monitor = monitor;
   mount->sort_key = g_strdup_printf ("gvfs.time_detected_usec.%" G_GINT64_FORMAT, g_get_real_time ());
@@ -368,8 +364,6 @@ gvfs_udisks2_mount_new (GVfsUDisks2VolumeMonitor *monitor,
     }
 
   update_mount (mount);
-
- out:
 
   return mount;
 }
