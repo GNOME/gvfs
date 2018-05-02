@@ -1936,7 +1936,19 @@ do_delete (GVfsBackend *backend,
     }
 
   if (S_ISDIR (statbuf.st_mode))
-    res = smbc_rmdir (op_backend->smb_context, uri);
+    {
+      res = smbc_rmdir (op_backend->smb_context, uri);
+
+      /* We can't rely on libsmbclient reporting ENOTEMPTY, let's verify that
+       * the dir has been really removed:
+       * https://bugzilla.samba.org/show_bug.cgi?id=13204
+       */
+      if (res == 0 && smbc_stat (op_backend->smb_context, uri, &statbuf) == 0)
+        {
+          res = -1;
+          errno = ENOTEMPTY;
+        }
+    }
   else
     res = smbc_unlink (op_backend->smb_context, uri);
   errsv = errno;
