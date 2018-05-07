@@ -1,3 +1,10 @@
+Major changes in 1.36.2
+=======================
+* udisks2: Remove optical disc volumes/mounts if drive disappears
+* daemon: Prevent deadlock and invalid read when closing channels
+* metadata: Prevent usage of NULL if GUdevDevice is not found
+* Translation updates
+
 Major changes in 1.36.1
 =======================
 * backend: Fix crashes when "Volume is busy" prompt is shown
