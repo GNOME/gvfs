@@ -808,7 +808,7 @@ do_create (GVfsBackend *backend,
   smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
   errno = 0;
   file = smbc_open (op_backend->smb_context, uri,
-		    O_CREAT|O_WRONLY|O_EXCL, 0666);
+                    O_CREAT|O_RDWR|O_EXCL, 0666);
   g_free (uri);
 
   if (file == NULL)
@@ -850,7 +850,7 @@ do_append_to (GVfsBackend *backend,
   smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
   errno = 0;
   file = smbc_open (op_backend->smb_context, uri,
-					O_CREAT|O_WRONLY|O_APPEND, 0666);
+                    O_CREAT|O_RDWR|O_APPEND, 0666);
   g_free (uri);
 
   if (file == NULL)
@@ -916,7 +916,7 @@ open_tmpfile (GVfsBackendSmb *backend,
     smbc_open = smbc_getFunctionOpen (backend->smb_context);
     errno = 0;
     file = smbc_open (backend->smb_context, tmp_uri,
-		      O_CREAT|O_WRONLY|O_EXCL, 0666);
+                      O_CREAT|O_RDWR|O_EXCL, 0666);
   } while (file == NULL && errno == EEXIST);
 
   g_free (dir_uri);
@@ -1040,7 +1040,7 @@ do_replace (GVfsBackend *backend,
   
   errno = 0;
   file = smbc_open (op_backend->smb_context, uri,
-		    O_CREAT|O_WRONLY|O_EXCL, 0);
+                    O_CREAT|O_RDWR|O_EXCL, 0);
   if (file == NULL && errno != EEXIST)
     {
       int errsv = fixup_open_errno (errno);
@@ -1110,7 +1110,7 @@ do_replace (GVfsBackend *backend,
 	  
 	  errno = 0;
 	  file = smbc_open (op_backend->smb_context, uri,
-			    O_CREAT|O_WRONLY|O_TRUNC, 0);
+                            O_CREAT|O_RDWR|O_TRUNC, 0);
 	  if (file == NULL)
 	    {
               int errsv = fixup_open_errno (errno);
