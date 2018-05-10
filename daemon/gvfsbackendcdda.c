@@ -551,6 +551,7 @@ create_header (GVfsBackendCdda *cdda_backend, long *header_size, long content_si
   memcpy (ptr, &var, 4); ptr += 4;
   memcpy (ptr, "INFO", 4); ptr += 4;
 
+#if 0
   if (artist != NULL)
     {
       memcpy (ptr, "IART", 4);
@@ -568,6 +569,7 @@ create_header (GVfsBackendCdda *cdda_backend, long *header_size, long content_si
       strncpy (ptr + 8, title, title_len); 
       ptr += title_len;
     }
+#endif
 
   memcpy (ptr, "ISFT", 4);
   var = software_len - 8;
