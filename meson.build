@@ -482,11 +482,6 @@ subdir('daemon')
 subdir('monitor')
 subdir('po')
 
-enable_deprecated_programs = get_option('deprecated_programs')
-if enable_deprecated_programs
-  subdir('programs')
-endif
-
 enable_man = get_option('man')
 if enable_man
   subdir('man')
@@ -535,7 +530,6 @@ output += '  keyring: ' + enable_keyring.to_string() + '\n'
 output += '  logind: ' + enable_logind.to_string() + '\n'
 output += '  libusb: ' + enable_libusb.to_string() + '\n'
 output += '\n'
-output += '  deprecated_programs: ' + enable_deprecated_programs.to_string() + '\n'
 output += '  devel_utils: ' + enable_devel_utils.to_string() + '\n'
 output += '  installed_tests: ' + enable_installed_tests.to_string() + '\n'
 output += '  man: ' + enable_man.to_string() + '\n'

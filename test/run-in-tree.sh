@@ -9,7 +9,7 @@ fi
 export GVFS_MOUNTABLE_EXTENSION=".localmount"
 export GVFS_MOUNTABLE_DIR=`pwd`/../daemon
 export GVFS_MONITOR_DIR=`pwd`
-export PATH=`pwd`/../programs:/usr/local/sbin:/usr/sbin:/sbin:$PATH
+export PATH=/usr/local/sbin:/usr/sbin:/sbin:$PATH
 export GIO_EXTRA_MODULES=`pwd`/../client/.libs:`pwd`/../monitor/proxy/.libs
 
 # Start a custom session dbus, unless we run under "make check" (test suite

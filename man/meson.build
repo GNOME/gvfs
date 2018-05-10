@@ -15,45 +15,14 @@ xsltproc_cmd = [
 ]
 
 mans = [
-  ['gvfs-cat', 'gio cat'],
-  ['gvfs-copy', 'gio copy'],
-  ['gvfs-info', 'gio info'],
-  ['gvfs-less', ''],
-  ['gvfs-ls', 'gio list'],
-  ['gvfs-mime', 'gio mime'],
-  ['gvfs-mkdir', 'gio mkdir'],
-  ['gvfs-monitor-dir', 'gio monitor'],
-  ['gvfs-monitor-file', 'gio monitor'],
-  ['gvfs-mount', 'gio mount'],
-  ['gvfs-move', 'gio move'],
-  ['gvfs-open', 'gio open'],
-  ['gvfs-rename', 'gio rename'],
-  ['gvfs-rm', 'gio remove'],
-  ['gvfs-save', 'gio save'],
-  ['gvfs-set-attribute', 'gio set'],
-  ['gvfs-trash', 'gio trash'],
-  ['gvfs-tree', 'gio tree'],
-  ['gvfsd', ''],
-  ['gvfsd-fuse', ''],
-  ['gvfsd-metadata', '']
+  'gvfsd',
+  'gvfsd-fuse',
+  'gvfsd-metadata'
 ]
 
 foreach man: mans
-  if man[1].strip() == ''
-    xml = man[0] + '.xml'
-  else
-    conf = configuration_data()
-    conf.set('original', man[0])
-    conf.set('replacement', man[1])
-
-    xml = configure_file(
-      input: 'deprecated.xml.in',
-      output: man[0] + '.xml',
-      configuration: conf
-    )
-  endif
-
-  output = man[0] + '.1'
+  xml = man + '.xml'
+  output = man + '.1'
 
   custom_target(
     output,
