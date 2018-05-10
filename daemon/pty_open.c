@@ -355,7 +355,9 @@ _pty_run_on_pty(int fd, gboolean login,
 
 	/* Change to the requested directory. */
 	if (directory != NULL) {
-		chdir(directory);
+		if (chdir(directory) == -1) {
+			g_warning ("Error changing directory.");
+		}
 	}
 
 #ifdef HAVE_UTMP_H
