@@ -839,7 +839,7 @@ ncalrpc dir = %(workdir)s/samba
     def test_anonymous(self):
         '''smb:// anonymous'''
 
-        uri = 'smb://%s/public' % os.uname()[1]
+        uri = 'smb://%s:%d/public' % (os.uname()[1], SMB_USER_PORT)
 
         # ensure that this does not ask for any credentials
         mount = subprocess.Popen(['gio', 'mount', '-a', uri])
@@ -860,7 +860,7 @@ ncalrpc dir = %(workdir)s/samba
     def test_authenticated(self):
         '''smb:// authenticated'''
 
-        uri = 'smb://%s@%s/private' % (os.environ['USER'], os.uname()[1])
+        uri = 'smb://%s@%s:%d/private' % (os.environ['USER'], os.uname()[1], SMB_USER_PORT)
         mount = subprocess.Popen(['gio', 'mount', uri],
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE,
