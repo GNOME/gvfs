@@ -485,6 +485,7 @@ Subsystem sftp %(sftp_server)s
                                      stderr=subprocess.PIPE)
 
     def tearDown(self):
+        os.unlink(self.authorized_keys)
         if self.sshd.returncode is None:
             self.sshd.terminate()
             self.sshd.wait()
