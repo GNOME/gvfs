@@ -1109,6 +1109,13 @@ ms_response_to_file_info (MsResponse *response,
       icon = g_themed_icon_new ("folder");
       symbolic_icon = g_themed_icon_new ("folder-symbolic");
       file_info_set_content_type (info, "inode/directory");
+
+      /* Ignore file size for directories. Most of the servers don't report it
+       * for directories anyway. However, some servers report total size of
+       * files inside the directory, which is not expected and causes issues
+       * for clients.
+       */
+      g_file_info_remove_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SIZE);
     }
   else
     {
