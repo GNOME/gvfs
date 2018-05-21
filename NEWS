@@ -1,3 +1,13 @@
+Major changes in 1.37.2
+=======================
+* smb: Fix removal of non-empty dir
+* programs: Remove deprecated gvfs utils
+* gdu: Remove libgdu support
+* gphoto2: Switch to a stable device uri
+* mtp: Switch to a stable device uri
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.37.1
 =======================
 * udisks2: Remove optical disc volumes/mounts if drive disappears
