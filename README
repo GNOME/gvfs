@@ -1,1 +1,6 @@
-GVfs is a userspace virtual filesystem implementation for GIO (a library available in GLib). GVfs comes with a set of backends, including trash support, SFTP, SMB, HTTP, DAV, and many others. GVfs also contains modules for GIO that implement volume monitors and persistent metadata storage. There is also FUSE support that provides limited access to the GVfs filesystems for applications not using GIO.
+GVfs is a userspace virtual filesystem implementation for GIO (a library
+available in GLib). GVfs comes with a set of backends, including trash support,
+SFTP, SMB, HTTP, DAV, and many others. GVfs also contains modules for GIO that
+implement volume monitors and persistent metadata storage. There is also FUSE
+support that provides limited access to the GVfs filesystems for applications
+not using GIO.
