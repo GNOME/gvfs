@@ -7,13 +7,7 @@
   <name xml:lang="en">gvfs</name>
   <shortdesc xml:lang="en">Virtual filesystem implementation for GIO</shortdesc>
 
-  <description xml:lang="en">GVfs is a userspace virtual filesystem designed to work with the I/O abstraction of GIO (a library availible in GLib >= 2.15.1). It installs several modules that are automatically used by applications using the APIs of libgio. There is also FUSE support that allows applications not using GIO to access the GVfs filesystems.
-
-The GVfs model differs from e.g. GnomeVFS in that filesystems must be mounted before they are used. There is a master daemon (gvfsd) that handles coordinating mounts, and then each mount is (typically) in its own daemon process (although mounts can share daemon process).
-
-GVfs comes with a set of backends, including trash support, SFTP, SMB, HTTP, DAV, and others.
-
-GVfs also contains modules for GIO that implement volume monitors and the GNOME URI scheme handler configuration.</description>
+  <description xml:lang="en">GVfs is a userspace virtual filesystem implementation for GIO (a library available in GLib). GVfs comes with a set of backends, including trash support, SFTP, SMB, HTTP, DAV, and many others. GVfs also contains modules for GIO that implement volume monitors and persistent metadata storage. There is also FUSE support that provides limited access to the GVfs filesystems for applications not using GIO.</description>
 
   <homepage rdf:resource="https://wiki.gnome.org/Projects/gvfs" />
   <mailing-list rdf:resource="http://mail.gnome.org/mailman/listinfo/gvfs-list" />
