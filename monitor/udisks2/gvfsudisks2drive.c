@@ -915,6 +915,7 @@ gvfs_udisks2_drive_stop (GDrive              *_drive,
   GTask *task;
 
   task = g_task_new (drive, cancellable, callback, user_data);
+  g_task_set_source_tag (task, gvfs_udisks2_drive_stop);
 
   /* This information is needed in GVfsDdisks2Volume when apps have
    * open files on the device ... we need to know if the button should
