@@ -47,16 +47,18 @@ build:
     script:
         - meson -Dinstalled_tests=true _build .
         - ninja -C _build
-        - ninja -C _build install
 
 test:
     stage: test
     before_script:
-        - dnf install -y gnome-desktop-testing
+        - dnf install -y gcc
+                         gnome-desktop-testing
                          mod_ssl
                          python3
                          python-twisted
+                         meson
                          samba
     script:
+        - ninja -C _build install
         - gnome-desktop-testing-runner -d /usr/local/share/ gvfs
     allow_failure: true
