@@ -2500,16 +2500,8 @@ parse_attributes (GVfsBackendSftp *backend,
           GIcon *icon = NULL;
           GIcon *symbolic_icon = NULL;
 
-          if (S_ISDIR(mode))
-            {
-              icon = g_themed_icon_new ("folder");
-              symbolic_icon = g_themed_icon_new ("folder-symbolic");
-            }
-          else if (mimetype)
-            {
-              icon = g_content_type_get_icon (mimetype);
-              symbolic_icon = g_content_type_get_symbolic_icon (mimetype);
-            }
+          icon = g_content_type_get_icon (mimetype);
+          symbolic_icon = g_content_type_get_symbolic_icon (mimetype);
 
           if (icon == NULL)
             icon = g_themed_icon_new ("text-x-generic");

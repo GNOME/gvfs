@@ -1106,9 +1106,12 @@ ms_response_to_file_info (MsResponse *response,
   g_file_info_set_file_type (info, file_type);
   if (file_type == G_FILE_TYPE_DIRECTORY)
     {
-      icon = g_themed_icon_new ("folder");
-      symbolic_icon = g_themed_icon_new ("folder-symbolic");
-      file_info_set_content_type (info, "inode/directory");
+      g_clear_pointer (&mime_type, g_free);
+      mime_type = g_strdup ("inode/directory");
+
+      icon = g_content_type_get_icon (mime_type);
+      symbolic_icon = g_content_type_get_symbolic_icon (mime_type);
+      file_info_set_content_type (info, mime_type);
 
       /* Ignore file size for directories. Most of the servers don't report it
        * for directories anyway. However, some servers report total size of

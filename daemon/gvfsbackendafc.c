@@ -1705,8 +1705,8 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
     {
       if (type == G_FILE_TYPE_DIRECTORY)
         {
-          icon = g_themed_icon_new ("folder");
-          symbolic_icon = g_themed_icon_new ("folder-symbolic");
+          icon = g_content_type_get_icon (content_type);
+          symbolic_icon = g_content_type_get_symbolic_icon (content_type);
         }
       else
         {
@@ -1788,16 +1788,17 @@ g_vfs_backend_afc_set_info_from_app (GVfsBackendAfc *self,
 {
   GIcon *icon;
   GIcon *symbolic_icon;
+  const gchar *content_type = "inode/directory";
 
   /* content-type */
-  g_file_info_set_content_type (info, "inode/directory");
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
+  g_file_info_set_content_type (info, content_type);
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, content_type);
   g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
 
   /* icon */
   if (app_info == NULL || app_info->icon_path == NULL)
     {
-      icon = g_themed_icon_new ("folder");
+      icon = g_content_type_get_icon (content_type);
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
     }
@@ -1813,7 +1814,7 @@ g_vfs_backend_afc_set_info_from_app (GVfsBackendAfc *self,
     }
 
   /* symbolic icon */
-  symbolic_icon = g_themed_icon_new ("folder-symbolic");
+  symbolic_icon = g_content_type_get_symbolic_icon (content_type);
   g_file_info_set_symbolic_icon (info, symbolic_icon);
   g_object_unref (symbolic_icon);
 

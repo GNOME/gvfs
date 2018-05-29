@@ -1255,23 +1255,21 @@ get_file_info (GVfsBackend *backend,
   case LIBMTP_FILETYPE_FOLDER:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, TRUE);
     g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-    g_file_info_set_content_type (info, "inode/directory");
-    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
-                                      "inode/directory");
-    icon = g_themed_icon_new ("folder");
-    symbolic_icon = g_themed_icon_new ("folder-symbolic");
+    content_type = g_strdup ("inode/directory");
     break;
   default:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, FALSE);
     g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
     content_type = g_content_type_guess (file->filename, NULL, 0, NULL);
-    g_file_info_set_content_type (info, content_type);
-    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
-                                      content_type);
-    icon = g_content_type_get_icon (content_type);
-    symbolic_icon = g_content_type_get_symbolic_icon (content_type);
     break;
   }
+
+  g_file_info_set_content_type (info, content_type);
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
+                                    content_type);
+
+  icon = g_content_type_get_icon (content_type);
+  symbolic_icon = g_content_type_get_symbolic_icon (content_type);
 
   if (LIBMTP_FILETYPE_IS_IMAGE (file->filetype) ||
       LIBMTP_FILETYPE_IS_VIDEO (file->filetype) ||
