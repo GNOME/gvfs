@@ -9,4 +9,4 @@ if not os.environ.get('DESTDIR'):
   subprocess.call(['glib-compile-schemas', sys.argv[1]])
 
   print('GIO module cache creation...')
-  subprocess.call(['gio-querymodules', sys.argv[2]])
+  subprocess.call(['gio-querymodules-64', sys.argv[2]])
