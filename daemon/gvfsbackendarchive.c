@@ -329,6 +329,7 @@ create_root_file (GVfsBackendArchive *ba)
 {
   ArchiveFile *root;
   GFileInfo *info;
+  const char *content_type = "inode/directory";
   char *s, *display_name;
   GIcon *icon;
 
@@ -352,8 +353,8 @@ create_root_file (GVfsBackendArchive *ba)
   g_free (display_name);
   g_file_info_set_edit_name (info, "/");
 
-  g_file_info_set_content_type (info, "inode/directory");
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
+  g_file_info_set_content_type (info, content_type);
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, content_type);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
@@ -362,10 +363,10 @@ create_root_file (GVfsBackendArchive *ba)
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE);
 
-  icon = g_themed_icon_new ("folder");
+  icon = g_content_type_get_icon (content_type);
   g_file_info_set_icon (info, icon);
   g_object_unref (icon);
-  icon = g_themed_icon_new ("folder-symbolic");
+  icon = g_content_type_get_symbolic_icon (content_type);
   g_file_info_set_symbolic_icon (info, icon);
   g_object_unref (icon);
 }

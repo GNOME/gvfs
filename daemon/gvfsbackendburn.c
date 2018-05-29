@@ -603,17 +603,19 @@ file_info_from_node (VirtualNode *node,
 
   if (node->type == VIRTUAL_NODE_DIRECTORY)
     {
+      const char *content_type = "inode/directory";
+
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-      icon = g_themed_icon_new ("folder");
+      icon = g_content_type_get_icon (content_type);
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
-      icon = g_themed_icon_new ("folder-symbolic");
+      icon = g_content_type_get_symbolic_icon (content_type);
       g_file_info_set_symbolic_icon (info, icon);
       g_object_unref (icon);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
-      g_file_info_set_content_type (info, "inode/directory"); 
+      g_file_info_set_content_type (info, content_type);
    }
   else
     {

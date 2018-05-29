@@ -896,13 +896,20 @@ g_vfs_backend_admin_class_init (GVfsBackendAdminClass * klass)
 static void
 g_vfs_backend_admin_init (GVfsBackendAdmin *self)
 {
+  GIcon *icon;
   GVfsBackend *backend = G_VFS_BACKEND (self);
+  const gchar *content_type = "inode/directory";
 
   g_mutex_init (&self->polkit_mutex);
   g_vfs_backend_set_user_visible (backend, FALSE);
 
-  g_vfs_backend_set_icon_name (backend, "folder");
-  g_vfs_backend_set_symbolic_icon_name (backend, "folder-symbolic");
+  icon = g_content_type_get_icon (content_type);
+  g_vfs_backend_set_icon (backend, icon);
+  g_object_unref (icon);
+
+  icon = g_content_type_get_symbolic_icon (content_type);
+  g_vfs_backend_set_symbolic_icon (backend, icon);
+  g_object_unref (icon);
 }
 
 #define REQUIRED_CAPS (CAP_TO_MASK(CAP_FOWNER) | \
