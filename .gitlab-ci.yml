@@ -47,7 +47,6 @@ build:
     script:
         - meson -Dinstalled_tests=true _build .
         - ninja -C _build
-        - ninja -C _build install
 
 test:
     stage: test
@@ -58,5 +57,6 @@ test:
                          python-twisted
                          samba
     script:
+        - ninja -C _build install
         - gnome-desktop-testing-runner -d /usr/local/share/ gvfs
     allow_failure: true
