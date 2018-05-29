@@ -224,8 +224,10 @@ have_version_script = host_machine.system().contains('linux') and cc.has_argumen
 
 gio_dep = dependency('gio-2.0')
 gio_unix_dep = dependency('gio-unix-2.0')
-glib_dep = dependency('glib-2.0', version: '>= 2.57.1')
+glib_dep = dependency('glib-2.0', version: '>= 2.51.0')
 gobject_dep = dependency('gobject-2.0')
+
+config_h.set('HAVE_GLIB_2_57_1', glib_dep.version().version_compare('>= 2.57.1'))
 
 # *** Check for libXML ***
 libxml_dep = dependency('libxml-2.0', required: false)
