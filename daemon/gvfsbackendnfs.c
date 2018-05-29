@@ -472,7 +472,6 @@ static void
 set_name_info (GFileInfo *info,
                const char *mimetype,
                const char *basename,
-               gboolean is_directory,
                GFileAttributeMatcher *matcher)
 {
   char *free_mimetype = NULL;
@@ -514,16 +513,8 @@ set_name_info (GFileInfo *info,
       GIcon *icon = NULL;
       GIcon *symbolic_icon = NULL;
 
-      if (is_directory)
-        {
-          icon = g_themed_icon_new ("folder");
-          symbolic_icon = g_themed_icon_new ("folder-symbolic");
-        }
-      else if (mimetype)
-        {
-          icon = g_content_type_get_icon (mimetype);
-          symbolic_icon = g_content_type_get_symbolic_icon (mimetype);
-        }
+      icon = g_content_type_get_icon (mimetype);
+      symbolic_icon = g_content_type_get_symbolic_icon (mimetype);
 
       if (icon == NULL)
         icon = g_themed_icon_new ("text-x-generic");
@@ -1691,7 +1682,6 @@ enumerate_stat_cb (int err,
       set_name_info (new_info,
                      mimetype,
                      g_file_info_get_name (info),
-                     S_ISDIR (st->nfs_mode),
                      handle->op_job->attribute_matcher);
       g_file_info_set_is_symlink (new_info, TRUE);
 
@@ -1882,7 +1872,6 @@ enumerate_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
           set_name_info (info,
                          mimetype,
                          d->name,
-                         type == G_FILE_TYPE_DIRECTORY,
                          op_job->attribute_matcher);
 
           if ((g_file_attribute_matcher_matches (op_job->attribute_matcher,
@@ -2090,7 +2079,6 @@ stat_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
       set_name_info (info,
                      mimetype,
                      basename,
-                     S_ISDIR (st->nfs_mode),
                      op_job->attribute_matcher);
       g_free (basename);
 

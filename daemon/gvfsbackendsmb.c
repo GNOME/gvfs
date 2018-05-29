@@ -1446,8 +1446,8 @@ set_info_from_stat (GVfsBackendSmb *backend,
             }
 	  else
             {
-              icon = g_themed_icon_new ("folder");
-              symbolic_icon = g_themed_icon_new ("folder-symbolic");
+              icon = g_content_type_get_icon (content_type);
+              symbolic_icon = g_content_type_get_symbolic_icon (content_type);
             }
 	}
       else if (basename != NULL)

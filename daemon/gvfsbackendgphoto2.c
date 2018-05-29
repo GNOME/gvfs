@@ -845,18 +845,19 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
   /* handle root directory */
   if (strcmp (full_path, gphoto2_backend->ignore_prefix) == 0 || strcmp (full_path, "/") == 0)
     {
+      const char *directory_mime_type = "inode/directory";
       char *display_name;
       display_name = compute_display_name (gphoto2_backend);
       g_file_info_set_display_name (info, display_name);
       g_file_info_set_name (info, display_name);
       g_free (display_name);
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-      g_file_info_set_content_type (info, "inode/directory");
+      g_file_info_set_content_type (info, directory_mime_type);
       g_file_info_set_size (info, 0);
-      icon = g_themed_icon_new ("folder");
+      icon = g_content_type_get_icon (directory_mime_type);
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
-      icon = g_themed_icon_new ("folder-symbolic");
+      icon = g_content_type_get_symbolic_icon (directory_mime_type);
       g_file_info_set_symbolic_icon (info, icon);
       g_object_unref (icon);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
@@ -903,16 +904,18 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
 
       if (is_folder)
         {
+          const char *directory_mime_type = "inode/directory";
+
           g_file_info_set_name (info, name);
           g_file_info_set_display_name (info, name);
-          icon = g_themed_icon_new ("folder");
+          icon = g_content_type_get_icon (directory_mime_type);
           g_file_info_set_icon (info, icon);
           g_object_unref (icon);
-          icon = g_themed_icon_new ("folder-symbolic");
+          icon = g_content_type_get_symbolic_icon (directory_mime_type);
           g_file_info_set_symbolic_icon (info, icon);
           g_object_unref (icon);
           g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-          g_file_info_set_content_type (info, "inode/directory");
+          g_file_info_set_content_type (info, directory_mime_type);
           g_file_info_set_size (info, 0);
           g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
           g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, gphoto2_backend->can_write);

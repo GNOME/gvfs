@@ -988,18 +988,10 @@ build_file_info (GVfsBackendGoogle      *self,
       g_file_info_set_content_type (info, content_type);
       g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, content_type);
 
-      if (file_type == G_FILE_TYPE_DIRECTORY)
-        {
-          icon = g_themed_icon_new ("folder");
-          symbolic_icon = g_themed_icon_new ("folder-symbolic");
-        }
-      else
-        {
-          icon = g_content_type_get_icon (content_type);
-          symbolic_icon = g_content_type_get_symbolic_icon (content_type);
-        }
-
+      icon = g_content_type_get_icon (content_type);
       g_file_info_set_icon (info, icon);
+
+      symbolic_icon = g_content_type_get_symbolic_icon (content_type);
       g_file_info_set_symbolic_icon (info, symbolic_icon);
 
       g_object_unref (icon);

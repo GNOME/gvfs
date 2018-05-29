@@ -1481,15 +1481,16 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
 
   if (directory)
   {
+    const char *content_type = "inode/directory";
     GIcon *icon;
     
     g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-    g_file_info_set_content_type (info, "inode/directory");
+    g_file_info_set_content_type (info, content_type);
 
-    icon = g_themed_icon_new ("folder");
+    icon = g_content_type_get_icon (content_type);
     g_file_info_set_icon (info, icon);
     g_object_unref (icon);
-    icon = g_themed_icon_new ("folder-symbolic");
+    icon = g_content_type_get_symbolic_icon (content_type);
     g_file_info_set_symbolic_icon (info, icon);
     g_object_unref (icon);
   }
