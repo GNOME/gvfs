@@ -36,9 +36,27 @@ before_script:
                      pkgconf-pkg-config
                      polkit-devel
                      systemd-devel
+                     bzip2
+                     gnome-desktop-testing
+                     mod_ssl
+                     openssh-server
+                     python2-twisted
+                     python3-gobject
+                     python3
+                     samba
 
 build:
     stage: build
+    artifacts:
+        untracked: true
+        expire_in: 1h
     script:
-        - meson _build .
+        - meson --prefix=/usr -Dinstalled_tests=true _build .
         - ninja -C _build
+
+test:
+    stage: test
+    script:
+        - ninja -C _build install
+        - gnome-desktop-testing-runner gvfs
+    allow_failure: true
