@@ -10,6 +10,7 @@ before_script:
                      gcr-devel
                      gettext-devel
                      glib2-devel
+                     gnome-desktop-testing
                      gnome-online-accounts-devel
                      libarchive-devel
                      libbluray-devel
@@ -32,13 +33,28 @@ before_script:
                      libusb-devel
                      libxslt-devel
                      meson
+                     mod_ssl
                      openssh-clients
                      pkgconf-pkg-config
                      polkit-devel
+                     python3-gobject
+                     python3-twisted
+                     python3
+                     samba
                      systemd-devel
 
 build:
     stage: build
+    artifacts:
+        untracked: true
+        expire_in: 1h
     script:
-        - meson _build .
+        - meson -Dinstalled_tests=true _build .
         - ninja -C _build
+
+test:
+    stage: test
+    script:
+        - ninja -C _build install
+        - gnome-desktop-testing-runner -d /usr/local/share/ gvfs
+    allow_failure: true
