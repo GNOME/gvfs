@@ -907,7 +907,6 @@ build_file_info (GVfsBackendGoogle      *self,
   gchar *escaped_name = NULL;
   gchar *content_type = NULL;
   gchar *copy_name = NULL;
-  gchar *generated_copy_name = NULL;
   gint64 atime;
   gint64 ctime;
   gint64 mtime;
@@ -1025,21 +1024,7 @@ build_file_info (GVfsBackendGoogle      *self,
   g_file_info_set_display_name (info, title);
   g_file_info_set_edit_name (info, title);
 
-  generated_copy_name = generate_copy_name (self, entry);
-
-  /* While copying remote Drive content to local storage, we want to
-   * create Link-type desktop files because GLocalFile doesn't know
-   * about shortcuts. That might change in future.
-   */
-  if (file_type == G_FILE_TYPE_SHORTCUT)
-    {
-      copy_name = g_strconcat (generated_copy_name, ".desktop", NULL);
-    }
-  else
-    {
-      copy_name = generated_copy_name;
-      generated_copy_name = NULL;
-    }
+  copy_name = generate_copy_name (self, entry);
 
   /* Sanitize copy-name by replacing slashes with dashes. This is
    * what nautilus does (for desktop files).
@@ -1097,7 +1082,6 @@ build_file_info (GVfsBackendGoogle      *self,
 
  out:
   g_free (copy_name);
-  g_free (generated_copy_name);
   g_free (escaped_name);
   g_free (content_type);
   g_list_free (links);
@@ -2249,6 +2233,8 @@ g_vfs_backend_google_open_for_read (GVfsBackend        *_self,
   GError *error;
   gchar *content_type = NULL;
   gchar *entry_path = NULL;
+  GDataAuthorizationDomain *auth_domain;
+  const gchar *uri;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ open_for_read: %s\n", filename);
@@ -2278,47 +2264,19 @@ g_vfs_backend_google_open_for_read (GVfsBackend        *_self,
       goto out;
     }
 
-  /* While copying remote Drive content to local storage, we want to
-   * create Link-type desktop files because GLocalFile doesn't know
-   * about shortcuts. That might change in future.
-   */
-  if (g_str_has_prefix (content_type, CONTENT_TYPE_PREFIX_GOOGLE))
+  if (is_native_file (entry))
     {
-      GDataLink *alternate;
-      GKeyFile *file;
-      const gchar *title;
-      const gchar *uri;
-      gchar *data;
-      gsize length;
-
-      file = g_key_file_new ();
-
-      title = gdata_entry_get_title (entry);
-      g_key_file_set_string (file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_NAME, title);
-      g_key_file_set_string (file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_TYPE, "Link");
-
-      alternate = gdata_entry_look_up_link (entry, GDATA_LINK_ALTERNATE);
-      uri = gdata_link_get_uri (alternate);
-      g_key_file_set_string (file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_URL, uri);
-
-      data = g_key_file_to_data (file, &length, NULL);
-      stream = g_memory_input_stream_new_from_data (data, (gssize) length, g_free);
-
-      g_key_file_free (file);
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE, _("File is not a regular file"));
+      goto out;
     }
-  else
-    {
-      GDataAuthorizationDomain *auth_domain;
-      const gchar *uri;
 
-      auth_domain = gdata_documents_service_get_primary_authorization_domain ();
-      uri = gdata_entry_get_content_uri (entry);
-      stream = gdata_download_stream_new (GDATA_SERVICE (self->service), auth_domain, uri, cancellable);
-      if (stream == NULL)
-        {
-          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED, _("Error getting data from file"));
-          goto out;
-        }
+  auth_domain = gdata_documents_service_get_primary_authorization_domain ();
+  uri = gdata_entry_get_content_uri (entry);
+  stream = gdata_download_stream_new (GDATA_SERVICE (self->service), auth_domain, uri, cancellable);
+  if (stream == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED, _("Error getting data from file"));
+      goto out;
     }
 
   g_object_set_data_full (G_OBJECT (stream), "g-vfs-backend-google-entry", g_object_ref (entry), g_object_unref);
