@@ -407,6 +407,12 @@ g_vfs_backend_ftp_init (GVfsBackendFtp *ftp)
   g_cond_init (&ftp->cond);
 }
 
+static guint
+g_vfs_backend_ftp_default_port (GVfsBackendFtp *ftp)
+{
+  return (ftp->tls_mode == G_VFS_FTP_TLS_MODE_IMPLICIT) ? 990 : 21;
+}
+
 /* If the initial connection has a verification error, display the certificate
  * to the user and ask whether to proceed. */
 static gboolean
@@ -453,13 +459,16 @@ restart:
       return;
     }
 
-  /* send pre-login commands */
-  g_vfs_ftp_task_receive (&task, 0, NULL);
+  if (ftp->tls_mode != G_VFS_FTP_TLS_MODE_IMPLICIT)
+    {
+      /* For STARTTLS connections, send pre-login commands before TLS handshake */
+      g_vfs_ftp_task_receive (&task, 0, NULL);
+    }
 
   /* Secure the initial connection if necessary. This may result in a prompt
    * for the user. */
   ftp->mount_source = mount_source;
-  if (ftp->use_tls &&
+  if (ftp->tls_mode != G_VFS_FTP_TLS_MODE_NONE &&
       !g_vfs_ftp_task_enable_tls (&task, initial_certificate_cb, ftp))
     {
       ftp->mount_source = NULL;
@@ -467,6 +476,12 @@ restart:
       return;
     }
   ftp->mount_source = NULL;
+
+  if (ftp->tls_mode == G_VFS_FTP_TLS_MODE_IMPLICIT)
+    {
+      /* For implicit-TLS connections, send pre-login commands after TLS handshake */
+      g_vfs_ftp_task_receive (&task, 0, NULL);
+    }
 
   if (!g_vfs_backend_ftp_uses_workaround (ftp, G_VFS_FTP_WORKAROUND_FEAT_AFTER_LOGIN) &&
       !gvfs_backend_ftp_determine_features (&task))
@@ -646,15 +661,17 @@ try_login:
                                    "ftp",
                                    NULL,
                                    NULL,
-                                   port == 21 ? 0 : port,
+                                   port == g_vfs_backend_ftp_default_port(ftp) ? 0 : port,
                                    ftp->password,
                                    password_save);
       g_free (prompt);
     }
 
-  mount_spec = g_mount_spec_new (ftp->use_tls ? "ftps" : "ftp");
+  mount_spec = g_mount_spec_new (ftp->tls_mode == G_VFS_FTP_TLS_MODE_IMPLICIT ? "ftps" :
+                                 ftp->tls_mode == G_VFS_FTP_TLS_MODE_EXPLICIT ? "ftpes" :
+                                 "ftp");
   g_mount_spec_set (mount_spec, "host", g_network_address_get_hostname (addr));
-  if (port != 21)
+  if (port != g_vfs_backend_ftp_default_port(ftp))
     {
       char *port_str = g_strdup_printf ("%u", port);
       g_mount_spec_set (mount_spec, "port", port_str);
@@ -698,6 +715,13 @@ try_mount (GVfsBackend *backend,
   const char *host, *port_str;
   guint port;
 
+  if (strcmp (g_mount_spec_get_type (mount_spec), "ftps") == 0)
+    ftp->tls_mode = G_VFS_FTP_TLS_MODE_IMPLICIT;
+  else if (strcmp (g_mount_spec_get_type (mount_spec), "ftpes") == 0)
+    ftp->tls_mode = G_VFS_FTP_TLS_MODE_EXPLICIT;
+  else
+    ftp->tls_mode = G_VFS_FTP_TLS_MODE_NONE;
+
   host = g_mount_spec_get (mount_spec, "host");
   if (host == NULL)
     {
@@ -706,10 +730,11 @@ try_mount (GVfsBackend *backend,
                        _("No hostname specified"));
       return TRUE;
     }
+
   port_str = g_mount_spec_get (mount_spec, "port");
   if (port_str == NULL)
     {
-      port = 21;
+      port = g_vfs_backend_ftp_default_port(ftp);
     }
   else
     {
@@ -720,12 +745,12 @@ try_mount (GVfsBackend *backend,
   ftp->addr = g_network_address_new (host, port);
   ftp->user = g_strdup (g_mount_spec_get (mount_spec, "user"));
   ftp->has_initial_user = ftp->user != NULL;
-  if (port == 21)
+  if (port == g_vfs_backend_ftp_default_port(ftp))
     ftp->host_display_name = g_strdup (host);
   else
     ftp->host_display_name = g_strdup_printf ("%s:%u", host, port);
-  ftp->use_tls = strcmp (g_mount_spec_get_type (mount_spec), "ftps") == 0;
-  if (ftp->use_tls)
+
+  if (ftp->tls_mode != G_VFS_FTP_TLS_MODE_NONE)
     ftp->server_identity = g_object_ref (ftp->addr);
 
   return FALSE;

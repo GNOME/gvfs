@@ -250,9 +250,12 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
           task->conn = g_vfs_ftp_connection_new (ftp->addr, task->cancellable, &task->error);
           if (G_LIKELY (task->conn != NULL))
             {
-              g_vfs_ftp_task_receive (task, 0, NULL);
-              if (ftp->use_tls)
+              if (ftp->tls_mode != G_VFS_FTP_TLS_MODE_IMPLICIT)
+                g_vfs_ftp_task_receive (task, 0, NULL);
+              if (ftp->tls_mode != G_VFS_FTP_TLS_MODE_NONE)
                 g_vfs_ftp_task_enable_tls (task, reconnect_certificate_cb, ftp);
+              if (ftp->tls_mode == G_VFS_FTP_TLS_MODE_IMPLICIT)
+                g_vfs_ftp_task_receive (task, 0, NULL);
               g_vfs_ftp_task_login (task, ftp->user, ftp->password);
               g_vfs_ftp_task_setup_connection (task);
               if (G_LIKELY (!g_vfs_ftp_task_is_in_error (task)))
@@ -1188,7 +1191,7 @@ g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
   if (g_vfs_ftp_task_is_in_error (task))
     return;
 
-  if (task->backend->use_tls)
+  if (task->backend->tls_mode != G_VFS_FTP_TLS_MODE_NONE)
     g_vfs_ftp_connection_data_connection_enable_tls (task->conn,
                                                      task->backend->server_identity,
                                                      reconnect_certificate_cb,
@@ -1214,11 +1217,13 @@ g_vfs_ftp_task_enable_tls (GVfsFtpTask *task,
   if (g_vfs_ftp_task_is_in_error (task))
     return FALSE;
 
-  if (!g_vfs_ftp_task_send (task, 0, "AUTH TLS"))
+  if (task->backend->tls_mode == G_VFS_FTP_TLS_MODE_EXPLICIT &&
+      !g_vfs_ftp_task_send (task, 0, "AUTH TLS"))
     return FALSE;
 
   if (!g_vfs_ftp_connection_enable_tls (task->conn,
                                         task->backend->server_identity,
+                                        task->backend->tls_mode == G_VFS_FTP_TLS_MODE_IMPLICIT,
                                         cb,
                                         user_data,
                                         task->cancellable,
