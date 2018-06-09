@@ -32,6 +32,12 @@ G_BEGIN_DECLS
 #define G_VFS_FTP_TIMEOUT_IN_SECONDS 30
 
 typedef enum {
+  G_VFS_FTP_TLS_MODE_NONE,              /* plaintext */
+  G_VFS_FTP_TLS_MODE_IMPLICIT,          /* port 990 */
+  G_VFS_FTP_TLS_MODE_EXPLICIT,          /* STARTTLS (RFC 4217) */
+} GVfsFtpTlsMode;
+
+typedef enum {
   G_VFS_FTP_FEATURE_MDTM,
   G_VFS_FTP_FEATURE_SIZE,
   G_VFS_FTP_FEATURE_TVFS,
@@ -92,7 +98,7 @@ struct _GVfsBackendFtp
   char *                host_display_name;
 
   /* ftps support */
-  gboolean              use_tls;
+  GVfsFtpTlsMode        tls_mode;
   GSocketConnectable *  server_identity;        /* Server identity used for verification */
   GTlsCertificate *     certificate;            /* Initial server certificate */
   GTlsCertificateFlags  certificate_errors;     /* Errors received during TLS handshake */
