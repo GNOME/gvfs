@@ -407,6 +407,12 @@ g_vfs_backend_ftp_init (GVfsBackendFtp *ftp)
   g_cond_init (&ftp->cond);
 }
 
+static guint
+g_vfs_backend_ftp_default_port (GVfsBackendFtp *ftp)
+{
+  return (ftp->tls_mode == G_VFS_FTP_TLS_MODE_IMPLICIT) ? 990 : 21;
+}
+
 /* If the initial connection has a verification error, display the certificate
  * to the user and ask whether to proceed. */
 static gboolean
@@ -440,7 +446,7 @@ do_mount (GVfsBackend *backend,
   gboolean aborted, anonymous, break_on_fail;
   GPasswordSave password_save = G_PASSWORD_SAVE_NEVER;
   GNetworkAddress *addr;
-  guint port;
+  guint port, default_port;
 
 restart:
   task.conn = g_vfs_ftp_connection_new (ftp->addr, task.cancellable, &task.error);
@@ -453,14 +459,11 @@ restart:
       return;
     }
 
-  /* send pre-login commands */
-  g_vfs_ftp_task_receive (&task, 0, NULL);
-
-  /* Secure the initial connection if necessary. This may result in a prompt
-   * for the user. */
+  /* Receive the greeting, and secure the initial connection if necessary. This
+   * may result in a prompt for the user.
+   */
   ftp->mount_source = mount_source;
-  if (ftp->use_tls &&
-      !g_vfs_ftp_task_enable_tls (&task, initial_certificate_cb, ftp))
+  if (!g_vfs_ftp_task_initial_handshake (&task, initial_certificate_cb, ftp))
     {
       ftp->mount_source = NULL;
       g_vfs_ftp_task_done (&task);
@@ -484,6 +487,7 @@ restart:
   addr = G_NETWORK_ADDRESS (ftp->addr);
   g_object_ref (addr);
   port = g_network_address_get_port (addr);
+  default_port = g_vfs_backend_ftp_default_port (ftp);
   username = NULL;
   password = NULL;
   break_on_fail = FALSE;
@@ -494,17 +498,17 @@ restart:
       break_on_fail = TRUE;
       goto try_login;
     }
- 
+
   if (g_vfs_keyring_lookup_password (ftp->user,
-                		     g_network_address_get_hostname (addr),
-                		     NULL,
-                		     "ftp",
-                		     NULL,
-                		     NULL,
-                		     port == 21 ? 0 : port,
-                		     &username,
-                		     NULL,
-                		     &password) &&
+                                     g_network_address_get_hostname (addr),
+                                     NULL,
+                                     "ftp",
+                                     NULL,
+                                     NULL,
+                                     (port == default_port) ? 0 : port,
+                                     &username,
+                                     NULL,
+                                     &password) &&
       username != NULL &&
       password != NULL)
     {
@@ -646,15 +650,20 @@ try_login:
                                    "ftp",
                                    NULL,
                                    NULL,
-                                   port == 21 ? 0 : port,
+                                   (port == default_port) ? 0 : port,
                                    ftp->password,
                                    password_save);
       g_free (prompt);
     }
 
-  mount_spec = g_mount_spec_new (ftp->use_tls ? "ftps" : "ftp");
+  if (ftp->tls_mode == G_VFS_FTP_TLS_MODE_IMPLICIT)
+    mount_spec = g_mount_spec_new ("ftpis");
+  else if (ftp->tls_mode == G_VFS_FTP_TLS_MODE_EXPLICIT)
+    mount_spec = g_mount_spec_new ("ftpes");
+  else
+    mount_spec = g_mount_spec_new ("ftp");
   g_mount_spec_set (mount_spec, "host", g_network_address_get_hostname (addr));
-  if (port != 21)
+  if (port != g_vfs_backend_ftp_default_port (ftp))
     {
       char *port_str = g_strdup_printf ("%u", port);
       g_mount_spec_set (mount_spec, "port", port_str);
@@ -695,8 +704,16 @@ try_mount (GVfsBackend *backend,
           gboolean is_automount)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  const char *host, *port_str;
+  const char *type, *host, *port_str;
   guint port;
+
+  type = g_mount_spec_get_type (mount_spec);
+  if (g_strcmp0 (type, "ftps") == 0 || g_strcmp0 (type, "ftpis") == 0)
+    ftp->tls_mode = G_VFS_FTP_TLS_MODE_IMPLICIT;
+  else if (g_strcmp0 (type, "ftpes") == 0)
+    ftp->tls_mode = G_VFS_FTP_TLS_MODE_EXPLICIT;
+  else
+    ftp->tls_mode = G_VFS_FTP_TLS_MODE_NONE;
 
   host = g_mount_spec_get (mount_spec, "host");
   if (host == NULL)
@@ -709,7 +726,7 @@ try_mount (GVfsBackend *backend,
   port_str = g_mount_spec_get (mount_spec, "port");
   if (port_str == NULL)
     {
-      port = 21;
+      port = g_vfs_backend_ftp_default_port (ftp);
     }
   else
     {
@@ -720,12 +737,12 @@ try_mount (GVfsBackend *backend,
   ftp->addr = g_network_address_new (host, port);
   ftp->user = g_strdup (g_mount_spec_get (mount_spec, "user"));
   ftp->has_initial_user = ftp->user != NULL;
-  if (port == 21)
+  if (port == g_vfs_backend_ftp_default_port (ftp))
     ftp->host_display_name = g_strdup (host);
   else
     ftp->host_display_name = g_strdup_printf ("%s:%u", host, port);
-  ftp->use_tls = strcmp (g_mount_spec_get_type (mount_spec), "ftps") == 0;
-  if (ftp->use_tls)
+
+  if (ftp->tls_mode != G_VFS_FTP_TLS_MODE_NONE)
     ftp->server_identity = g_object_ref (ftp->addr);
 
   return FALSE;

@@ -1,0 +1,7 @@
+[Mount]
+Type=ftpis
+Exec=@libexecdir@/gvfsd-ftp
+AutoMount=false
+Scheme=ftpis
+DefaultPort=990
+HostnameIsInetAddress=true

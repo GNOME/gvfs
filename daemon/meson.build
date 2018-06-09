@@ -179,12 +179,12 @@ sources = files(
 cflags = [
   '-DBACKEND_HEADER=gvfsbackendftp.h',
   '-DDEFAULT_BACKEND_TYPE=ftp',
-  '-DBACKEND_TYPES="ftp", G_VFS_TYPE_BACKEND_FTP, "ftps", G_VFS_TYPE_BACKEND_FTP,',
+  '-DBACKEND_TYPES="ftp", G_VFS_TYPE_BACKEND_FTP, "ftps", G_VFS_TYPE_BACKEND_FTP, "ftpes", G_VFS_TYPE_BACKEND_FTP, "ftpis", G_VFS_TYPE_BACKEND_FTP,',
   '-DMAX_JOB_THREADS=10'
 ]
 
 programs += [['gvfsd-ftp', sources, [], cflags]]
-mounts += ['ftp', 'ftps']
+mounts += ['ftp', 'ftps', 'ftpes', 'ftpis']
 
 sources = files('gvfsbackendtrash.c')
 
