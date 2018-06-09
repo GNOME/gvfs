@@ -250,9 +250,7 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
           task->conn = g_vfs_ftp_connection_new (ftp->addr, task->cancellable, &task->error);
           if (G_LIKELY (task->conn != NULL))
             {
-              g_vfs_ftp_task_receive (task, 0, NULL);
-              if (ftp->use_tls)
-                g_vfs_ftp_task_enable_tls (task, reconnect_certificate_cb, ftp);
+              g_vfs_ftp_task_initial_handshake (task, reconnect_certificate_cb, ftp);
               g_vfs_ftp_task_login (task, ftp->user, ftp->password);
               g_vfs_ftp_task_setup_connection (task);
               if (G_LIKELY (!g_vfs_ftp_task_is_in_error (task)))
@@ -1188,7 +1186,7 @@ g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
   if (g_vfs_ftp_task_is_in_error (task))
     return;
 
-  if (task->backend->use_tls)
+  if (task->backend->tls_mode != G_VFS_FTP_TLS_MODE_NONE)
     g_vfs_ftp_connection_data_connection_enable_tls (task->conn,
                                                      task->backend->server_identity,
                                                      reconnect_certificate_cb,
@@ -1198,38 +1196,74 @@ g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
 }
 
 /**
- * g_vfs_ftp_task_enable_tls:
+ * g_vfs_ftp_task_initial_handshake:
  * @task: a task
  * @cb: callback called if there's a verification error
  * @user_data: user data passed to @cb
  *
- * Tries to enable tls on the control connection to an ftp server.
- * If the operation fails, @task will be set into an error state.
+ * Performs the initial handshake with an FTP server, including reading the
+ * greeting and activating TLS.  If the operation fails, @task will be set into
+ * an error state.
  **/
 gboolean
-g_vfs_ftp_task_enable_tls (GVfsFtpTask *task,
-                           CertificateCallback cb,
-                           gpointer user_data)
+g_vfs_ftp_task_initial_handshake (GVfsFtpTask *task,
+                                  CertificateCallback cb,
+                                  gpointer user_data)
 {
   if (g_vfs_ftp_task_is_in_error (task))
     return FALSE;
 
-  if (!g_vfs_ftp_task_send (task, 0, "AUTH TLS"))
-    return FALSE;
+  /* In implicit mode, we do the TLS handshake first, then receive the FTP
+   * greeting. Explicit mode is practically the opposite.
+   */
 
-  if (!g_vfs_ftp_connection_enable_tls (task->conn,
-                                        task->backend->server_identity,
-                                        cb,
-                                        user_data,
-                                        task->cancellable,
-                                        &task->error))
-    return FALSE;
+  if (task->backend->tls_mode == G_VFS_FTP_TLS_MODE_IMPLICIT)
+    {
+      if (!g_vfs_ftp_connection_enable_tls (task->conn,
+                                            task->backend->server_identity,
+                                            TRUE,
+                                            cb,
+                                            user_data,
+                                            task->cancellable,
+                                            &task->error))
+        return FALSE;
 
-  if (!g_vfs_ftp_task_send (task, 0, "PBSZ 0"))
-    return FALSE;
+      if (!g_vfs_ftp_task_receive (task, 0, NULL))
+        return FALSE;
+    }
+  else if (task->backend->tls_mode == G_VFS_FTP_TLS_MODE_EXPLICIT)
+    {
+      if (!g_vfs_ftp_task_receive (task, 0, NULL))
+        return FALSE;
 
-  if (!g_vfs_ftp_task_send (task, 0, "PROT P"))
-    return FALSE;
+      if (!g_vfs_ftp_task_send (task, 0, "AUTH TLS"))
+        return FALSE;
+
+      if (!g_vfs_ftp_connection_enable_tls (task->conn,
+                                            task->backend->server_identity,
+                                            FALSE,
+                                            cb,
+                                            user_data,
+                                            task->cancellable,
+                                            &task->error))
+        return FALSE;
+    }
+  else
+    {
+      if (!g_vfs_ftp_task_receive (task, 0, NULL))
+        return FALSE;
+    }
+
+  /* Request TLS also for the data channels. */
+
+  if (task->backend->tls_mode != G_VFS_FTP_TLS_MODE_NONE)
+    {
+      if (!g_vfs_ftp_task_send (task, 0, "PBSZ 0"))
+        return FALSE;
+
+      if (!g_vfs_ftp_task_send (task, 0, "PROT P"))
+        return FALSE;
+    }
 
   return TRUE;
 }
