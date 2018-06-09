@@ -73,6 +73,7 @@ GIOStream *             g_vfs_ftp_connection_get_data_stream  (GVfsFtpConnection
 
 gboolean                g_vfs_ftp_connection_enable_tls       (GVfsFtpConnection *      conn,
                                                                GSocketConnectable *     server_identity,
+                                                               gboolean                 implicit_tls,
                                                                CertificateCallback      cb,
                                                                gpointer                 user_data,
                                                                GCancellable *           cancellable,
