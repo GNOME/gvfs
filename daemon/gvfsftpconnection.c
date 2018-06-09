@@ -599,6 +599,7 @@ g_vfs_ftp_connection_is_usable (GVfsFtpConnection *conn)
 gboolean
 g_vfs_ftp_connection_enable_tls (GVfsFtpConnection * conn,
                                  GSocketConnectable *server_identity,
+                                 gboolean            implicit_tls,
                                  CertificateCallback cb,
                                  gpointer            user_data,
                                  GCancellable *      cancellable,
@@ -608,7 +609,7 @@ g_vfs_ftp_connection_enable_tls (GVfsFtpConnection * conn,
 
   g_return_val_if_fail (conn != NULL, FALSE);
   g_return_val_if_fail (conn->data == NULL, FALSE);
-  g_return_val_if_fail (!conn->waiting_for_reply, FALSE);
+  g_return_val_if_fail (implicit_tls || !conn->waiting_for_reply, FALSE);
   g_return_val_if_fail (g_buffered_input_stream_get_available (G_BUFFERED_INPUT_STREAM (conn->commands_in)) == 0, FALSE);
 
   secure = g_tls_client_connection_new (conn->commands,
