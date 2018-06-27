@@ -113,11 +113,11 @@ mount_op_reply_cb (GVfsRemoteVolumeMonitor *proxy,
 {
   GError *error = NULL;
   
-  if (!gvfs_remote_volume_monitor_call_mount_op_reply_finish (proxy,
-                                                              res,
-                                                              &error))
+  if (!gvfs_remote_volume_monitor_call_mount_op_reply2_finish (proxy,
+                                                               res,
+                                                               &error))
     {
-      g_warning ("Error from MountOpReply(): %s", error->message);
+      g_warning ("Error from MountOpReply2(): %s", error->message);
       g_error_free (error);
     }
 }
@@ -139,7 +139,7 @@ mount_operation_reply (GMountOperation        *mount_operation,
   gboolean hidden_volume;
   gboolean system_volume;
   guint pim;
-  
+
   user_name     = g_mount_operation_get_username (mount_operation);
   domain        = g_mount_operation_get_domain (mount_operation);
   password      = g_mount_operation_get_password (mount_operation);
@@ -163,21 +163,21 @@ mount_operation_reply (GMountOperation        *mount_operation,
   encoded_password = g_base64_encode ((const guchar *) password, (gsize) (strlen (password) + 1));
 
   proxy = g_proxy_volume_monitor_get_dbus_proxy (data->monitor);
-  gvfs_remote_volume_monitor_call_mount_op_reply (proxy,
-                                                  data->id,
-                                                  result,
-                                                  user_name,
-                                                  domain,
-                                                  encoded_password,
-                                                  password_save,
-                                                  choice,
-                                                  anonymous,
-                                                  hidden_volume,
-                                                  system_volume,
-                                                  pim,
-                                                  NULL,
-                                                  (GAsyncReadyCallback) mount_op_reply_cb,
-                                                  data);
+  gvfs_remote_volume_monitor_call_mount_op_reply2 (proxy,
+                                                   data->id,
+                                                   result,
+                                                   user_name,
+                                                   domain,
+                                                   encoded_password,
+                                                   password_save,
+                                                   choice,
+                                                   anonymous,
+                                                   hidden_volume,
+                                                   system_volume,
+                                                   pim,
+                                                   NULL,
+                                                   (GAsyncReadyCallback) mount_op_reply_cb,
+                                                   data);
   g_object_unref (proxy);
   g_free (encoded_password);
 }
