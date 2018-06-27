@@ -1089,9 +1089,6 @@ handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
                        gint arg_password_save,
                        gint arg_choice,
                        gboolean arg_anonymous,
-                       gboolean arg_hidden_volume,
-                       gboolean arg_system_volume,
-                       guint arg_pim,
                        gpointer user_data)
 {
   char *decoded_password;
@@ -1140,13 +1137,85 @@ handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
   g_mount_operation_set_password_save (mount_operation, arg_password_save);
   g_mount_operation_set_choice (mount_operation, arg_choice);
   g_mount_operation_set_anonymous (mount_operation, arg_anonymous);
+
+  g_mount_operation_reply (mount_operation, arg_result);
+
+  gvfs_remote_volume_monitor_complete_mount_op_reply (object, invocation);
+
+  out:
+  g_free (decoded_password);
+  return TRUE;
+}
+
+static gboolean
+handle_mount_op_reply2 (GVfsRemoteVolumeMonitor *object,
+                        GDBusMethodInvocation *invocation,
+                        const gchar *arg_mount_op_id,
+                        gint arg_result,
+                        const gchar *arg_user_name,
+                        const gchar *arg_domain,
+                        const gchar *arg_encoded_password,
+                        gint arg_password_save,
+                        gint arg_choice,
+                        gboolean arg_anonymous,
+                        gboolean arg_hidden_volume,
+                        gboolean arg_system_volume,
+                        guint arg_pim,
+                        gpointer user_data)
+{
+  char *decoded_password;
+  gsize decoded_password_len;
+  GList *l;
+  GMountOperation *mount_operation;
+  const gchar *sender;
+
+  print_debug ("in handle_mount_op_reply2");
+
+  decoded_password = NULL;
+  sender = g_dbus_method_invocation_get_sender (invocation);
+
+  /* Find the op */
+  mount_operation = NULL;
+
+  for (l = outstanding_mount_op_objects; l != NULL; l = l->next)
+    {
+      GMountOperation *op = G_MOUNT_OPERATION (l->data);
+      const gchar *owner;
+      const gchar *id;
+
+      owner = g_object_get_data (G_OBJECT (op), "mount_op_owner");
+      id = g_object_get_data (G_OBJECT (op), "mount_op_id");
+      if (g_strcmp0 (owner, sender) == 0 && g_strcmp0 (id, arg_mount_op_id) == 0)
+        {
+          print_debug ("found mount_op");
+          mount_operation = op;
+          break;
+        }
+    }
+
+  if (mount_operation == NULL)
+    {
+      g_dbus_method_invocation_return_dbus_error (invocation,
+                                                  "org.gtk.Private.RemoteVolumeMonitor.NotFound",
+                                                  _("No outstanding mount operation"));
+      goto out;
+    }
+
+  decoded_password = (gchar *) g_base64_decode (arg_encoded_password, &decoded_password_len);
+
+  g_mount_operation_set_username (mount_operation, arg_user_name);
+  g_mount_operation_set_domain (mount_operation, arg_domain);
+  g_mount_operation_set_password (mount_operation, decoded_password);
+  g_mount_operation_set_password_save (mount_operation, arg_password_save);
+  g_mount_operation_set_choice (mount_operation, arg_choice);
+  g_mount_operation_set_anonymous (mount_operation, arg_anonymous);
   g_mount_operation_set_is_tcrypt_hidden_volume (mount_operation, arg_hidden_volume);
   g_mount_operation_set_is_tcrypt_system_volume (mount_operation, arg_system_volume);
   g_mount_operation_set_pim (mount_operation, arg_pim);
 
   g_mount_operation_reply (mount_operation, arg_result);
 
-  gvfs_remote_volume_monitor_complete_mount_op_reply (object, invocation);
+  gvfs_remote_volume_monitor_complete_mount_op_reply2 (object, invocation);
 
  out:
   g_free (decoded_password);
@@ -1932,6 +2001,7 @@ bus_acquired_handler_cb (GDBusConnection *conn,
       g_signal_connect (monitor_daemon, "handle-drive-start", G_CALLBACK (handle_drive_start), NULL);
       g_signal_connect (monitor_daemon, "handle-drive-stop", G_CALLBACK (handle_drive_stop), NULL);
       g_signal_connect (monitor_daemon, "handle-mount-op-reply", G_CALLBACK (handle_mount_op_reply), NULL);
+      g_signal_connect (monitor_daemon, "handle-mount-op-reply2", G_CALLBACK (handle_mount_op_reply2), NULL);
       g_signal_connect (monitor_daemon, "handle-mount-unmount", G_CALLBACK (handle_mount_unmount), NULL);
       g_signal_connect (monitor_daemon, "handle-volume-mount", G_CALLBACK (handle_volume_mount), NULL);
     }
