@@ -1395,9 +1395,10 @@ do_unlock (GTask *task)
   GVfsUDisks2Volume *volume = g_task_get_source_object (task);
   GVariantBuilder builder;
   gboolean handle_as_tcrypt;
+  const gchar *type = udisks_block_get_id_type (volume->block);
 
-  handle_as_tcrypt = g_strcmp0 (udisks_block_get_id_type (volume->block), "crypto_TCRYPT") == 0 ||
-                     g_strcmp0 (udisks_block_get_id_type (volume->block), "crypto_unknown") == 0;
+  handle_as_tcrypt = (g_strcmp0 (type, "crypto_TCRYPT") == 0 ||
+                      g_strcmp0 (type, "crypto_unknown") == 0);
 
   if (data->passphrase == NULL)
     {
@@ -1409,7 +1410,7 @@ do_unlock (GTask *task)
       else
         {
           gchar *message;
-          GAskPasswordFlags  pw_ask_flags;
+          GAskPasswordFlags pw_ask_flags;
 
 #ifdef HAVE_KEYRING
           /* check if the passphrase is in the user's keyring */
@@ -1440,16 +1441,23 @@ do_unlock (GTask *task)
                                                                        "aborted",
                                                                        G_CALLBACK (on_mount_operation_aborted),
                                                                        task);
-          /* Translators: This is the message shown to users */
-          if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_unknown") == 0)
+          if (g_strcmp0 (type, "crypto_unknown") == 0)
+            /* Translators: This is the message shown to users. %s is the
+             * description of the volume that is being unlocked  */
             message = g_strdup_printf (_("Set options to unlock the volume\n"
                                          "The volume %s might be a VeraCrypt volume as it contains random data."),
                                        data->desc_of_encrypted_to_unlock);
-          else if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_TCRYPT") == 0)
+
+          else if (g_strcmp0 (type, "crypto_TCRYPT") == 0)
+            /* Translators: This is the message shown to users. %s is the
+             * description of the volume that is being unlocked  */
             message = g_strdup_printf (_("Set options to unlock the volume\n"
                                          "You need to unlock %s to access encrypted data on it."),
                                        data->desc_of_encrypted_to_unlock);
+
           else
+            /* Translators: This is the message shown to users. %s is the
+             * description of the volume that is being unlocked  */
             message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
                                          "The passphrase is needed to access encrypted data on %s."),
                                        data->desc_of_encrypted_to_unlock);
