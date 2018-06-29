@@ -1091,60 +1091,20 @@ handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
                        gboolean arg_anonymous,
                        gpointer user_data)
 {
-  char *decoded_password;
-  gsize decoded_password_len;
-  GList *l;
-  GMountOperation *mount_operation;
-  const gchar *sender;
-
-  print_debug ("in handle_mount_op_reply");
-
-  decoded_password = NULL;
-  sender = g_dbus_method_invocation_get_sender (invocation);
-
-  /* Find the op */
-  mount_operation = NULL;
-
-  for (l = outstanding_mount_op_objects; l != NULL; l = l->next)
-    {
-      GMountOperation *op = G_MOUNT_OPERATION (l->data);
-      const gchar *owner;
-      const gchar *id;
-
-      owner = g_object_get_data (G_OBJECT (op), "mount_op_owner");
-      id = g_object_get_data (G_OBJECT (op), "mount_op_id");
-      if (g_strcmp0 (owner, sender) == 0 && g_strcmp0 (id, arg_mount_op_id) == 0)
-        {
-          print_debug ("found mount_op");
-          mount_operation = op;
-          break;
-        }
-    }
-
-  if (mount_operation == NULL)
-    {
-      g_dbus_method_invocation_return_dbus_error (invocation,
-                                                  "org.gtk.Private.RemoteVolumeMonitor.NotFound",
-                                                  _("No outstanding mount operation"));
-      goto out;
-    }
-
-  decoded_password = (gchar *) g_base64_decode (arg_encoded_password, &decoded_password_len);
-
-  g_mount_operation_set_username (mount_operation, arg_user_name);
-  g_mount_operation_set_domain (mount_operation, arg_domain);
-  g_mount_operation_set_password (mount_operation, decoded_password);
-  g_mount_operation_set_password_save (mount_operation, arg_password_save);
-  g_mount_operation_set_choice (mount_operation, arg_choice);
-  g_mount_operation_set_anonymous (mount_operation, arg_anonymous);
-
-  g_mount_operation_reply (mount_operation, arg_result);
-
-  gvfs_remote_volume_monitor_complete_mount_op_reply (object, invocation);
-
-  out:
-  g_free (decoded_password);
-  return TRUE;
+  return handle_mount_op_reply2 (object,
+                                 invocation,
+                                 arg_mount_op_id,
+                                 arg_result,
+                                 arg_user_name,
+                                 arg_domain,
+                                 arg_encoded_password,
+                                 arg_password_save,
+                                 arg_choice,
+                                 arg_anonymous,
+                                 FALSE,
+                                 FALSE,
+                                 0,
+                                 user_data);
 }
 
 static gboolean
