@@ -1079,35 +1079,6 @@ handle_mount_unmount (GVfsRemoteVolumeMonitor *object,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static gboolean
-handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
-                       GDBusMethodInvocation *invocation,
-                       const gchar *arg_mount_op_id,
-                       gint arg_result,
-                       const gchar *arg_user_name,
-                       const gchar *arg_domain,
-                       const gchar *arg_encoded_password,
-                       gint arg_password_save,
-                       gint arg_choice,
-                       gboolean arg_anonymous,
-                       gpointer user_data)
-{
-  return handle_mount_op_reply2 (object,
-                                 invocation,
-                                 arg_mount_op_id,
-                                 arg_result,
-                                 arg_user_name,
-                                 arg_domain,
-                                 arg_encoded_password,
-                                 arg_password_save,
-                                 arg_choice,
-                                 arg_anonymous,
-                                 FALSE,
-                                 FALSE,
-                                 0,
-                                 user_data);
-}
-
-static gboolean
 handle_mount_op_reply2 (GVfsRemoteVolumeMonitor *object,
                         GDBusMethodInvocation *invocation,
                         const gchar *arg_mount_op_id,
@@ -1180,6 +1151,35 @@ handle_mount_op_reply2 (GVfsRemoteVolumeMonitor *object,
  out:
   g_free (decoded_password);
   return TRUE;
+}
+
+static gboolean
+handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
+                       GDBusMethodInvocation *invocation,
+                       const gchar *arg_mount_op_id,
+                       gint arg_result,
+                       const gchar *arg_user_name,
+                       const gchar *arg_domain,
+                       const gchar *arg_encoded_password,
+                       gint arg_password_save,
+                       gint arg_choice,
+                       gboolean arg_anonymous,
+                       gpointer user_data)
+{
+  return handle_mount_op_reply2 (object,
+                                 invocation,
+                                 arg_mount_op_id,
+                                 arg_result,
+                                 arg_user_name,
+                                 arg_domain,
+                                 arg_encoded_password,
+                                 arg_password_save,
+                                 arg_choice,
+                                 arg_anonymous,
+                                 FALSE,
+                                 FALSE,
+                                 0,
+                                 user_data);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
