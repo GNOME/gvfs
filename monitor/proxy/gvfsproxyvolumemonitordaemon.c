@@ -1146,9 +1146,10 @@ handle_mount_op_reply2 (GVfsRemoteVolumeMonitor *object,
 
   g_mount_operation_reply (mount_operation, arg_result);
 
-  // gvfs_remote_volume_monitor_complete_mount_op_reply2 should be
-  // identical to gvfs_remote_volume_monitor_complete_mount_op_reply,
-  // so it should be ok that we call this from handle_mount_op_reply too.
+  /* gvfs_remote_volume_monitor_complete_mount_op_reply2 should be
+   * identical to gvfs_remote_volume_monitor_complete_mount_op_reply,
+   * so it should be ok that we call this from handle_mount_op_reply too.
+   */
   gvfs_remote_volume_monitor_complete_mount_op_reply2 (object, invocation);
 
  out:
