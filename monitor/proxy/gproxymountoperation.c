@@ -107,27 +107,12 @@ g_proxy_mount_operation_wrap (GMountOperation *op,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-mount_op_reply_cb (GVfsRemoteVolumeMonitor *proxy,
-                   GAsyncResult *res,
-                   gpointer user_data)
-{
-  GError *error = NULL;
-  
-  if (!gvfs_remote_volume_monitor_call_mount_op_reply2_finish (proxy,
-                                                               res,
-                                                               &error))
-    {
-      g_warning ("Error from MountOpReply2(): %s", error->message);
-      g_error_free (error);
-    }
-}
-
-static void
 mount_operation_reply (GMountOperation        *mount_operation,
                        GMountOperationResult  result,
                        gpointer               user_data)
 {
   ProxyMountOpData *data = user_data;
+  GError *error = NULL;
   GVfsRemoteVolumeMonitor *proxy;
   const gchar *user_name;
   const gchar *domain;
@@ -139,6 +124,7 @@ mount_operation_reply (GMountOperation        *mount_operation,
   gboolean hidden_volume;
   gboolean system_volume;
   guint pim;
+  gboolean res;
 
   user_name     = g_mount_operation_get_username (mount_operation);
   domain        = g_mount_operation_get_domain (mount_operation);
@@ -163,21 +149,48 @@ mount_operation_reply (GMountOperation        *mount_operation,
   encoded_password = g_base64_encode ((const guchar *) password, (gsize) (strlen (password) + 1));
 
   proxy = g_proxy_volume_monitor_get_dbus_proxy (data->monitor);
-  gvfs_remote_volume_monitor_call_mount_op_reply2 (proxy,
-                                                   data->id,
-                                                   result,
-                                                   user_name,
-                                                   domain,
-                                                   encoded_password,
-                                                   password_save,
-                                                   choice,
-                                                   anonymous,
-                                                   hidden_volume,
-                                                   system_volume,
-                                                   pim,
-                                                   NULL,
-                                                   (GAsyncReadyCallback) mount_op_reply_cb,
-                                                   data);
+  res = gvfs_remote_volume_monitor_call_mount_op_reply2_sync (proxy,
+                                                              data->id,
+                                                              result,
+                                                              user_name,
+                                                              domain,
+                                                              encoded_password,
+                                                              password_save,
+                                                              choice,
+                                                              anonymous,
+                                                              hidden_volume,
+                                                              system_volume,
+                                                               pim,
+                                                              NULL,
+                                                              &error);
+
+  if (!res && g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
+    {
+      g_clear_error (&error);
+      res = gvfs_remote_volume_monitor_call_mount_op_reply_sync (proxy,
+                                                                 data->id,
+                                                                 result,
+                                                                 user_name,
+                                                                 domain,
+                                                                 encoded_password,
+                                                                 password_save,
+                                                                 choice,
+                                                                 anonymous,
+                                                                 NULL,
+                                                                 &error);
+
+      if (!res)
+        {
+          g_warning ("Error from MountOpReply(): %s", error->message);
+          g_error_free (error);
+        }
+    }
+  else if (!res)
+    {
+      g_warning ("Error from MountOpReply2(): %s", error->message);
+      g_error_free (error);
+    }
+
   g_object_unref (proxy);
   g_free (encoded_password);
 }
