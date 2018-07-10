@@ -1441,26 +1441,10 @@ do_unlock (GTask *task)
                                                                        "aborted",
                                                                        G_CALLBACK (on_mount_operation_aborted),
                                                                        task);
-          if (g_strcmp0 (type, "crypto_unknown") == 0)
-            /* Translators: This is the message shown to users. %s is the
-             * description of the volume that is being unlocked  */
-            message = g_strdup_printf (_("Set options to unlock the volume\n"
-                                         "The volume %s might be a VeraCrypt volume as it contains random data."),
-                                       data->desc_of_encrypted_to_unlock);
 
-          else if (g_strcmp0 (type, "crypto_TCRYPT") == 0)
-            /* Translators: This is the message shown to users. %s is the
-             * description of the volume that is being unlocked  */
-            message = g_strdup_printf (_("Set options to unlock the volume\n"
-                                         "You need to unlock %s to access encrypted data on it."),
-                                       data->desc_of_encrypted_to_unlock);
-
-          else
-            /* Translators: This is the message shown to users. %s is the
-             * description of the volume that is being unlocked  */
-            message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
-                                         "The passphrase is needed to access encrypted data on %s."),
-                                       data->desc_of_encrypted_to_unlock);
+          message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
+                                       "The passphrase is needed to access encrypted data on %s."),
+                                     data->desc_of_encrypted_to_unlock);
 
           pw_ask_flags = G_ASK_PASSWORD_NEED_PASSWORD | G_ASK_PASSWORD_SAVING_SUPPORTED;
           if (handle_as_tcrypt)
