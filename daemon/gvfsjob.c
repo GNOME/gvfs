@@ -33,8 +33,6 @@
 #include "gvfsjob.h"
 #include "gvfsjobsource.h"
 
-G_DEFINE_TYPE (GVfsJob, g_vfs_job, G_TYPE_OBJECT)
-
 /* TODO: Real P_() */
 #define P_(_x) (_x)
 
@@ -54,6 +52,8 @@ struct _GVfsJobPrivate
 {
   int dummy;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (GVfsJob, g_vfs_job, G_TYPE_OBJECT)
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
@@ -90,8 +90,6 @@ g_vfs_job_class_init (GVfsJobClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (GVfsJobPrivate));
-  
   gobject_class->finalize = g_vfs_job_finalize;
   gobject_class->set_property = g_vfs_job_set_property;
   gobject_class->get_property = g_vfs_job_get_property;
@@ -133,7 +131,7 @@ g_vfs_job_class_init (GVfsJobClass *klass)
 static void
 g_vfs_job_init (GVfsJob *job)
 {
-  job->priv = G_TYPE_INSTANCE_GET_PRIVATE (job, G_VFS_TYPE_JOB, GVfsJobPrivate);
+  job->priv = g_vfs_job_get_instance_private (job);
 
   job->cancellable = g_cancellable_new ();
   

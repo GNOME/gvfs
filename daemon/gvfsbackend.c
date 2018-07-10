@@ -101,8 +101,9 @@ static GObject*          g_vfs_backend_constructor           (GType             
 
 
 G_DEFINE_TYPE_WITH_CODE (GVfsBackend, g_vfs_backend, G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (G_VFS_TYPE_JOB_SOURCE,
-						g_vfs_backend_job_source_iface_init))
+                         G_ADD_PRIVATE (GVfsBackend)
+                         G_IMPLEMENT_INTERFACE (G_VFS_TYPE_JOB_SOURCE,
+                                                g_vfs_backend_job_source_iface_init))
 
 
 static GHashTable *registered_backends = NULL;
@@ -169,8 +170,6 @@ g_vfs_backend_class_init (GVfsBackendClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (GVfsBackendPrivate));
-  
   gobject_class->constructor = g_vfs_backend_constructor;
   gobject_class->finalize = g_vfs_backend_finalize;
   gobject_class->set_property = g_vfs_backend_set_property;
@@ -197,7 +196,7 @@ g_vfs_backend_class_init (GVfsBackendClass *klass)
 static void
 g_vfs_backend_init (GVfsBackend *backend)
 {
-  backend->priv = G_TYPE_INSTANCE_GET_PRIVATE (backend, G_VFS_TYPE_BACKEND, GVfsBackendPrivate);
+  backend->priv = g_vfs_backend_get_instance_private (backend);
   backend->priv->icon = NULL;
   backend->priv->symbolic_icon = NULL;
   backend->priv->prefered_filename_encoding = g_strdup ("");

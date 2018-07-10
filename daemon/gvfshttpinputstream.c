@@ -32,11 +32,7 @@
 
 static void g_vfs_http_input_stream_seekable_iface_init (GSeekableIface *seekable_iface);
 
-G_DEFINE_TYPE_WITH_CODE (GVfsHttpInputStream, g_vfs_http_input_stream, G_TYPE_INPUT_STREAM,
-			 G_IMPLEMENT_INTERFACE (G_TYPE_SEEKABLE,
-						g_vfs_http_input_stream_seekable_iface_init))
-
-typedef struct {
+struct GVfsHttpInputStreamPrivate {
   SoupURI *uri;
   SoupSession *session;
   SoupRequest *req;
@@ -46,21 +42,24 @@ typedef struct {
   char *range;
   goffset request_offset;
   goffset offset;
+};
 
-} GVfsHttpInputStreamPrivate;
-#define G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), G_VFS_TYPE_HTTP_INPUT_STREAM, GVfsHttpInputStreamPrivate))
+G_DEFINE_TYPE_WITH_CODE (GVfsHttpInputStream, g_vfs_http_input_stream, G_TYPE_INPUT_STREAM,
+                         G_ADD_PRIVATE (GVfsHttpInputStream)
+                         G_IMPLEMENT_INTERFACE (G_TYPE_SEEKABLE,
+                                                g_vfs_http_input_stream_seekable_iface_init))
 
 static void
 g_vfs_http_input_stream_init (GVfsHttpInputStream *stream)
 {
-  ;
+  stream->priv = g_vfs_http_input_stream_get_instance_private (stream);
 }
 
 static void
 g_vfs_http_input_stream_finalize (GObject *object)
 {
   GVfsHttpInputStream *stream = G_VFS_HTTP_INPUT_STREAM (object);
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
+  GVfsHttpInputStreamPrivate *priv = stream->priv;
 
   g_clear_pointer (&priv->uri, soup_uri_free);
   g_clear_object (&priv->session);
@@ -96,7 +95,7 @@ g_vfs_http_input_stream_new (SoupSession *session,
   GVfsHttpInputStreamPrivate *priv;
 
   stream = g_object_new (G_VFS_TYPE_HTTP_INPUT_STREAM, NULL);
-  priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
+  priv = stream->priv;
 
   priv->session = g_object_ref (session);
   priv->uri = soup_uri_copy (uri);
@@ -107,7 +106,7 @@ g_vfs_http_input_stream_new (SoupSession *session,
 static SoupRequest *
 g_vfs_http_input_stream_ensure_request (GInputStream *stream)
 {
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
+  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM (stream)->priv;
 
   if (!priv->req)
     {
@@ -132,7 +131,7 @@ send_callback (GObject      *object,
 {
   GTask *task = user_data;
   GInputStream *http_stream = g_task_get_source_object (task);
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (http_stream);
+  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM (http_stream)->priv;
   GError *error = NULL;
 
   g_input_stream_clear_pending (http_stream);
@@ -170,7 +169,7 @@ g_vfs_http_input_stream_send_async (GInputStream        *stream,
   GTask *task;
 
   g_return_if_fail (G_VFS_IS_HTTP_INPUT_STREAM (stream));
-  priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
+  priv = G_VFS_HTTP_INPUT_STREAM (stream)->priv;
 
   task = g_task_new (stream, cancellable, callback, user_data);
   g_task_set_priority (task, io_priority);
@@ -223,7 +222,7 @@ read_callback (GObject      *object,
 {
   GTask *task = user_data;
   GInputStream *vfsstream = g_task_get_source_object (task);
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (vfsstream);
+  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM (vfsstream)->priv;
   GError *error = NULL;
   gssize nread;
 
@@ -250,7 +249,7 @@ read_send_callback (GObject      *object,
 {
   GTask *task = user_data;
   GInputStream *vfsstream = g_task_get_source_object (task);
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (vfsstream);
+  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM (vfsstream)->priv;
   ReadAfterSendData *rasd = g_task_get_task_data (task);
   GError *error = NULL;
 
@@ -311,7 +310,7 @@ g_vfs_http_input_stream_read_async (GInputStream        *stream,
 				    GAsyncReadyCallback  callback,
 				    gpointer             user_data)
 {
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
+  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM (stream)->priv;
   GTask *task;
 
   task = g_task_new (stream, cancellable, callback, user_data);
@@ -368,7 +367,7 @@ g_vfs_http_input_stream_close_async (GInputStream       *stream,
 				     GAsyncReadyCallback callback,
 				     gpointer            user_data)
 {
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
+  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM (stream)->priv;
   GTask *task;
 
   task = g_task_new (stream, cancellable, callback, user_data);
@@ -397,7 +396,7 @@ g_vfs_http_input_stream_close_finish (GInputStream  *stream,
 static goffset
 g_vfs_http_input_stream_tell (GSeekable *seekable)
 {
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (seekable);
+  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM (seekable)->priv;
 
   return priv->offset;
 }
@@ -416,7 +415,7 @@ g_vfs_http_input_stream_seek (GSeekable     *seekable,
 			      GError       **error)
 {
   GInputStream *stream = G_INPUT_STREAM (seekable);
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (seekable);
+  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM (seekable)->priv;
 
   if (type == G_SEEK_END && priv->msg)
     {
@@ -497,7 +496,7 @@ g_vfs_http_input_stream_truncate (GSeekable     *seekable,
 SoupMessage *
 g_vfs_http_input_stream_get_message (GInputStream *stream)
 {
-  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM_GET_PRIVATE (stream);
+  GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM (stream)->priv;
 
   g_vfs_http_input_stream_ensure_request (stream);
   return g_object_ref (priv->msg);
@@ -509,9 +508,7 @@ g_vfs_http_input_stream_class_init (GVfsHttpInputStreamClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GInputStreamClass *stream_class = G_INPUT_STREAM_CLASS (klass);
-  
-  g_type_class_add_private (klass, sizeof (GVfsHttpInputStreamPrivate));
-  
+
   gobject_class->finalize = g_vfs_http_input_stream_finalize;
 
   stream_class->read_async = g_vfs_http_input_stream_read_async;

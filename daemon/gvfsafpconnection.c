@@ -624,8 +624,6 @@ enum {
 
 static guint signals[LAST_SIGNAL] = {0,};
 
-G_DEFINE_TYPE (GVfsAfpConnection, g_vfs_afp_connection, G_TYPE_OBJECT);
-
 typedef struct {
   guint8 flags;
   guint8 command;
@@ -679,6 +677,8 @@ struct _GVfsAfpConnectionPrivate
 
   GSList *pending_closes;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (GVfsAfpConnection, g_vfs_afp_connection, G_TYPE_OBJECT);
 
 typedef enum
 {
@@ -797,9 +797,7 @@ g_vfs_afp_connection_init (GVfsAfpConnection *afp_connection)
 {
   GVfsAfpConnectionPrivate *priv;
   
-  afp_connection->priv = priv =  G_TYPE_INSTANCE_GET_PRIVATE (afp_connection,
-                                                              G_VFS_TYPE_AFP_CONNECTION,
-                                                              GVfsAfpConnectionPrivate);
+  afp_connection->priv = priv = g_vfs_afp_connection_get_instance_private (afp_connection);
   priv->kRequestQuanta = -1;
   priv->kServerReplayCacheSize = -1;
 
@@ -832,8 +830,6 @@ static void
 g_vfs_afp_connection_class_init (GVfsAfpConnectionClass *klass)
 {
   GObjectClass* object_class = G_OBJECT_CLASS (klass);
-
-  g_type_class_add_private (klass, sizeof (GVfsAfpConnectionPrivate));
 
   object_class->finalize = g_vfs_afp_connection_finalize;
 

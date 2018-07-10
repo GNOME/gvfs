@@ -32,12 +32,14 @@ G_BEGIN_DECLS
 #define G_VFS_HTTP_INPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_HTTP_INPUT_STREAM, GVfsHttpInputStreamClass))
 
 typedef struct GVfsHttpInputStream         GVfsHttpInputStream;
+typedef struct GVfsHttpInputStreamPrivate  GVfsHttpInputStreamPrivate;
 typedef struct GVfsHttpInputStreamClass    GVfsHttpInputStreamClass;
 
 struct GVfsHttpInputStream
 {
   GInputStream parent;
 
+  GVfsHttpInputStreamPrivate *priv;
 };
 
 struct GVfsHttpInputStreamClass

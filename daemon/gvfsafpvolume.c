@@ -27,9 +27,6 @@
 #include "gvfsafpvolume.h"
 
 
-
-G_DEFINE_TYPE (GVfsAfpVolume, g_vfs_afp_volume, G_TYPE_OBJECT);
-
 struct _GVfsAfpVolumePrivate
 {
   GVfsAfpServer *server;
@@ -40,6 +37,8 @@ struct _GVfsAfpVolumePrivate
   guint16 volume_id;
 };
 
+G_DEFINE_TYPE_WITH_PRIVATE (GVfsAfpVolume, g_vfs_afp_volume, G_TYPE_OBJECT);
+
 static void
 attention_cb (GVfsAfpConnection *conn, guint attention, GVfsAfpVolume *volume);
 
@@ -47,9 +46,8 @@ static void
 g_vfs_afp_volume_init (GVfsAfpVolume *volume)
 {
   GVfsAfpVolumePrivate *priv;
-  
-  volume->priv = priv = G_TYPE_INSTANCE_GET_PRIVATE (volume, G_VFS_TYPE_AFP_VOLUME,
-                                                     GVfsAfpVolumePrivate);
+
+  volume->priv = priv = g_vfs_afp_volume_get_instance_private (volume);
   priv->mounted = FALSE;
 }
 
@@ -72,8 +70,6 @@ g_vfs_afp_volume_class_init (GVfsAfpVolumeClass *klass)
   GObjectClass* object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = g_vfs_afp_volume_finalize;
-
-  g_type_class_add_private (klass, sizeof (GVfsAfpVolumePrivate));
 }
 
 GVfsAfpVolume *

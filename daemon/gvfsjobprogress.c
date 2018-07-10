@@ -37,7 +37,7 @@ struct _GVfsJobProgressPrivate
   gint64 last_time;
 };
 
-G_DEFINE_TYPE (GVfsJobProgress, g_vfs_job_progress, G_VFS_TYPE_JOB_DBUS)
+G_DEFINE_TYPE_WITH_PRIVATE (GVfsJobProgress, g_vfs_job_progress, G_VFS_TYPE_JOB_DBUS)
 
 static void
 g_vfs_job_progress_finalize (GObject *object)
@@ -58,15 +58,13 @@ g_vfs_job_progress_class_init (GVfsJobProgressClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (GVfsJobProgressPrivate));
-  
   gobject_class->finalize = g_vfs_job_progress_finalize;
 }
 
 static void
 g_vfs_job_progress_init (GVfsJobProgress *job)
 {
-  job->priv = G_TYPE_INSTANCE_GET_PRIVATE (job, G_VFS_TYPE_JOB_PROGRESS, GVfsJobProgressPrivate);
+  job->priv = g_vfs_job_progress_get_instance_private (job);
 }
 
 void

@@ -45,10 +45,6 @@
 
 static void g_vfs_channel_job_source_iface_init (GVfsJobSourceIface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (GVfsChannel, g_vfs_channel, G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (G_VFS_TYPE_JOB_SOURCE,
-						g_vfs_channel_job_source_iface_init))
-
 /* TODO: Real P_() */
 #define P_(_x) (_x)
 
@@ -108,6 +104,11 @@ struct _GVfsChannelPrivate
   gsize output_data_pos;
 };
 
+G_DEFINE_TYPE_WITH_CODE (GVfsChannel, g_vfs_channel, G_TYPE_OBJECT,
+                         G_ADD_PRIVATE (GVfsChannel)
+                         G_IMPLEMENT_INTERFACE (G_VFS_TYPE_JOB_SOURCE,
+                                                g_vfs_channel_job_source_iface_init))
+
 static void start_request_reader       (GVfsChannel  *channel);
 static void g_vfs_channel_get_property (GObject      *object,
 					guint         prop_id,
@@ -162,8 +163,6 @@ g_vfs_channel_class_init (GVfsChannelClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (GVfsChannelPrivate));
-  
   gobject_class->finalize = g_vfs_channel_finalize;
   gobject_class->set_property = g_vfs_channel_set_property;
   gobject_class->get_property = g_vfs_channel_get_property;
@@ -195,9 +194,7 @@ g_vfs_channel_init (GVfsChannel *channel)
   int socket_fds[2];
   int ret;
   
-  channel->priv = G_TYPE_INSTANCE_GET_PRIVATE (channel,
-					       G_VFS_TYPE_CHANNEL,
-					       GVfsChannelPrivate);
+  channel->priv = g_vfs_channel_get_instance_private (channel);
   channel->priv->remote_fd = -1;
 
   ret = socketpair (AF_UNIX, SOCK_STREAM, 0, socket_fds);

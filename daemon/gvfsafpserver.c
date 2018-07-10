@@ -35,8 +35,6 @@
 
 #include "gvfsafpserver.h"
 
-G_DEFINE_TYPE (GVfsAfpServer, g_vfs_afp_server, G_TYPE_OBJECT);
-
 struct _GvfsAfpServerPrivate
 {
   GNetworkAddress     *addr;
@@ -49,6 +47,8 @@ struct _GvfsAfpServerPrivate
   guint32             group_id;
   guint64             uuid;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (GVfsAfpServer, g_vfs_afp_server, G_TYPE_OBJECT);
 
 #define AFP_UAM_NO_USER   "No User Authent"
 #define AFP_UAM_DHX       "DHCAST128"
@@ -70,10 +70,9 @@ static void
 g_vfs_afp_server_init (GVfsAfpServer *server)
 {
   GVfsAfpServerPrivate *priv;
-  
-  server->priv = priv = G_TYPE_INSTANCE_GET_PRIVATE (server, G_VFS_TYPE_AFP_SERVER,
-                                                     GVfsAfpServerPrivate);
-  
+
+  server->priv = priv = g_vfs_afp_server_get_instance_private (server);
+
   priv->info.machine_type = NULL;
   priv->info.server_name = NULL;
   priv->info.utf8_server_name = NULL;
@@ -105,8 +104,6 @@ g_vfs_afp_server_class_init (GVfsAfpServerClass *klass)
   GObjectClass* object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = g_vfs_afp_server_finalize;
-
-  g_type_class_add_private (klass, sizeof (GVfsAfpServerPrivate));
 }
 
 static const char *

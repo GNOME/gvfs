@@ -62,7 +62,7 @@ struct _GVfsMonitorPrivate
 /* atomic */
 static volatile gint path_counter = 1;
 
-G_DEFINE_TYPE (GVfsMonitor, g_vfs_monitor, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (GVfsMonitor, g_vfs_monitor, G_TYPE_OBJECT)
 
 static void unsubscribe (Subscriber *subscriber);
 
@@ -118,8 +118,6 @@ g_vfs_monitor_class_init (GVfsMonitorClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (GVfsMonitorPrivate));
-  
   gobject_class->finalize = g_vfs_monitor_finalize;
 }
 
@@ -127,11 +125,9 @@ static void
 g_vfs_monitor_init (GVfsMonitor *monitor)
 {
   gint id;
-  
-  monitor->priv = G_TYPE_INSTANCE_GET_PRIVATE (monitor,
-					       G_TYPE_VFS_MONITOR,
-					       GVfsMonitorPrivate);
-  
+
+  monitor->priv = g_vfs_monitor_get_instance_private (monitor);
+
   id = g_atomic_int_add (&path_counter, 1);
   monitor->priv->object_path = g_strdup_printf (OBJ_PATH_PREFIX"%d", id);
 }
