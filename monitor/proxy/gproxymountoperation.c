@@ -41,6 +41,7 @@ typedef struct
 {
   gchar *id;
   GMountOperation *op;
+  GMountOperationResult *result;
   GProxyVolumeMonitor *monitor;
   gulong reply_handler_id;
 } ProxyMountOpData;
@@ -112,12 +113,77 @@ mount_op_reply_cb (GVfsRemoteVolumeMonitor *proxy,
                    gpointer user_data)
 {
   GError *error = NULL;
-  
+
   if (!gvfs_remote_volume_monitor_call_mount_op_reply2_finish (proxy,
                                                                res,
                                                                &error))
     {
       g_warning ("Error from MountOpReply2(): %s", error->message);
+      g_error_free (error);
+    }
+}
+
+static void
+mount_op_reply2_cb (GVfsRemoteVolumeMonitor *proxy,
+                   GAsyncResult *res,
+                   gpointer user_data)
+{
+  ProxyMountOpData *data = user_data;
+  GError *error = NULL;
+  const gchar *user_name;
+  const gchar *domain;
+  const gchar *password;
+  gchar *encoded_password;
+  gint password_save;
+  gint choice;
+  gboolean anonymous;
+  gboolean ret;
+
+  ret = gvfs_remote_volume_monitor_call_mount_op_reply2_finish (proxy, res, &error);
+  if (!ret)
+    {
+      if (g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
+        {
+          /* The monitor doesn't implement MountOpReply2(), so we fall back to
+           * MountOpReply()
+           */
+          user_name     = g_mount_operation_get_username (data->op);
+          domain        = g_mount_operation_get_domain (data->op);
+          password      = g_mount_operation_get_password (data->op);
+          password_save = g_mount_operation_get_password_save (data->op);
+          choice        = g_mount_operation_get_choice (data->op);
+          anonymous     = g_mount_operation_get_anonymous (data->op);
+
+          if (user_name == NULL)
+            user_name = "";
+          if (domain == NULL)
+            domain = "";
+          if (password == NULL)
+            password = "";
+
+          /* NOTE: this is not to add "security", it's merely to prevent accidental
+           *       exposure of passwords when running dbus-monitor
+           */
+          encoded_password = g_base64_encode ((const guchar *) password, (gsize) (strlen (password) + 1));
+
+          proxy = g_proxy_volume_monitor_get_dbus_proxy (data->monitor);
+
+          gvfs_remote_volume_monitor_call_mount_op_reply (proxy,
+                                                          data->id,
+                                                          *(data->result),
+                                                          user_name,
+                                                          domain,
+                                                          encoded_password,
+                                                          password_save,
+                                                          choice,
+                                                          anonymous,
+                                                          NULL,
+                                                          (GAsyncReadyCallback) mount_op_reply_cb,
+                                                          data);
+        }
+      else
+        g_warning ("Error from MountOpReply2(): %s", error->message);
+
       g_error_free (error);
     }
 }
@@ -139,6 +205,8 @@ mount_operation_reply (GMountOperation        *mount_operation,
   gboolean hidden_volume;
   gboolean system_volume;
   guint pim;
+
+  data->result = &result;
 
   user_name     = g_mount_operation_get_username (mount_operation);
   domain        = g_mount_operation_get_domain (mount_operation);
@@ -176,7 +244,7 @@ mount_operation_reply (GMountOperation        *mount_operation,
                                                    system_volume,
                                                    pim,
                                                    NULL,
-                                                   (GAsyncReadyCallback) mount_op_reply_cb,
+                                                   (GAsyncReadyCallback) mount_op_reply2_cb,
                                                    data);
   g_object_unref (proxy);
   g_free (encoded_password);
