@@ -1444,17 +1444,9 @@ do_unlock (GTask *task)
           if (g_strcmp0 (type, "crypto_unknown") == 0)
             /* Translators: This is the message shown to users. %s is the
              * description of the volume that is being unlocked  */
-            message = g_strdup_printf (_("Set options to unlock the volume\n"
+            message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
                                          "The volume %s might be a VeraCrypt volume as it contains random data."),
                                        data->desc_of_encrypted_to_unlock);
-
-          else if (g_strcmp0 (type, "crypto_TCRYPT") == 0)
-            /* Translators: This is the message shown to users. %s is the
-             * description of the volume that is being unlocked  */
-            message = g_strdup_printf (_("Set options to unlock the volume\n"
-                                         "You need to unlock %s to access encrypted data on it."),
-                                       data->desc_of_encrypted_to_unlock);
-
           else
             /* Translators: This is the message shown to users. %s is the
              * description of the volume that is being unlocked  */
