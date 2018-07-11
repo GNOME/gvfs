@@ -41,10 +41,15 @@ typedef struct
 {
   gchar *id;
   GMountOperation *op;
-  GMountOperationResult *result;
   GProxyVolumeMonitor *monitor;
   gulong reply_handler_id;
 } ProxyMountOpData;
+
+typedef struct
+{
+  ProxyMountOpData *op_data;
+  GMountOperationResult result;
+} MountOpReplyData;
 
 static void
 proxy_mount_op_data_free (ProxyMountOpData *data)
@@ -114,11 +119,11 @@ mount_op_reply_cb (GVfsRemoteVolumeMonitor *proxy,
 {
   GError *error = NULL;
 
-  if (!gvfs_remote_volume_monitor_call_mount_op_reply2_finish (proxy,
-                                                               res,
-                                                               &error))
+  if (!gvfs_remote_volume_monitor_call_mount_op_reply_finish (proxy,
+                                                              res,
+                                                              &error))
     {
-      g_warning ("Error from MountOpReply2(): %s", error->message);
+      g_warning ("Error from MountOpReply(): %s", error->message);
       g_error_free (error);
     }
 }
@@ -128,7 +133,8 @@ mount_op_reply2_cb (GVfsRemoteVolumeMonitor *proxy,
                    GAsyncResult *res,
                    gpointer user_data)
 {
-  ProxyMountOpData *data = user_data;
+  MountOpReplyData *data = user_data;
+  ProxyMountOpData *op_data = data->op_data;
   GError *error = NULL;
   const gchar *user_name;
   const gchar *domain;
@@ -147,12 +153,12 @@ mount_op_reply2_cb (GVfsRemoteVolumeMonitor *proxy,
           /* The monitor doesn't implement MountOpReply2(), so we fall back to
            * MountOpReply()
            */
-          user_name     = g_mount_operation_get_username (data->op);
-          domain        = g_mount_operation_get_domain (data->op);
-          password      = g_mount_operation_get_password (data->op);
-          password_save = g_mount_operation_get_password_save (data->op);
-          choice        = g_mount_operation_get_choice (data->op);
-          anonymous     = g_mount_operation_get_anonymous (data->op);
+          user_name     = g_mount_operation_get_username (op_data->op);
+          domain        = g_mount_operation_get_domain (op_data->op);
+          password      = g_mount_operation_get_password (op_data->op);
+          password_save = g_mount_operation_get_password_save (op_data->op);
+          choice        = g_mount_operation_get_choice (op_data->op);
+          anonymous     = g_mount_operation_get_anonymous (op_data->op);
 
           if (user_name == NULL)
             user_name = "";
@@ -166,11 +172,11 @@ mount_op_reply2_cb (GVfsRemoteVolumeMonitor *proxy,
            */
           encoded_password = g_base64_encode ((const guchar *) password, (gsize) (strlen (password) + 1));
 
-          proxy = g_proxy_volume_monitor_get_dbus_proxy (data->monitor);
+          proxy = g_proxy_volume_monitor_get_dbus_proxy (op_data->monitor);
 
           gvfs_remote_volume_monitor_call_mount_op_reply (proxy,
-                                                          data->id,
-                                                          *(data->result),
+                                                          op_data->id,
+                                                          data->result,
                                                           user_name,
                                                           domain,
                                                           encoded_password,
@@ -179,13 +185,15 @@ mount_op_reply2_cb (GVfsRemoteVolumeMonitor *proxy,
                                                           anonymous,
                                                           NULL,
                                                           (GAsyncReadyCallback) mount_op_reply_cb,
-                                                          data);
+                                                          op_data);
         }
       else
         g_warning ("Error from MountOpReply2(): %s", error->message);
 
       g_error_free (error);
     }
+
+  g_free (data);
 }
 
 static void
@@ -193,7 +201,8 @@ mount_operation_reply (GMountOperation        *mount_operation,
                        GMountOperationResult  result,
                        gpointer               user_data)
 {
-  ProxyMountOpData *data = user_data;
+  ProxyMountOpData *op_data = user_data;
+  MountOpReplyData *data;
   GVfsRemoteVolumeMonitor *proxy;
   const gchar *user_name;
   const gchar *domain;
@@ -206,7 +215,9 @@ mount_operation_reply (GMountOperation        *mount_operation,
   gboolean system_volume;
   guint pim;
 
-  data->result = &result;
+  data = g_new0 (MountOpReplyData, 1);
+  data->op_data = op_data;
+  data->result = result;
 
   user_name     = g_mount_operation_get_username (mount_operation);
   domain        = g_mount_operation_get_domain (mount_operation);
@@ -230,9 +241,9 @@ mount_operation_reply (GMountOperation        *mount_operation,
    */
   encoded_password = g_base64_encode ((const guchar *) password, (gsize) (strlen (password) + 1));
 
-  proxy = g_proxy_volume_monitor_get_dbus_proxy (data->monitor);
+  proxy = g_proxy_volume_monitor_get_dbus_proxy (op_data->monitor);
   gvfs_remote_volume_monitor_call_mount_op_reply2 (proxy,
-                                                   data->id,
+                                                   op_data->id,
                                                    result,
                                                    user_name,
                                                    domain,
