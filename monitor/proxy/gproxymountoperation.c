@@ -49,6 +49,15 @@ typedef struct
 {
   ProxyMountOpData *op_data;
   GMountOperationResult result;
+  const gchar *user_name;
+  const gchar *domain;
+  gchar *encoded_password;
+  gint password_save;
+  gint choice;
+  gboolean anonymous;
+  gboolean hidden_volume;
+  gboolean system_volume;
+  guint pim;
 } MountOpReplyData;
 
 static void
@@ -136,13 +145,6 @@ mount_op_reply2_cb (GVfsRemoteVolumeMonitor *proxy,
   MountOpReplyData *data = user_data;
   ProxyMountOpData *op_data = data->op_data;
   GError *error = NULL;
-  const gchar *user_name;
-  const gchar *domain;
-  const gchar *password;
-  gchar *encoded_password;
-  gint password_save;
-  gint choice;
-  gboolean anonymous;
   gboolean ret;
 
   ret = gvfs_remote_volume_monitor_call_mount_op_reply2_finish (proxy, res, &error);
@@ -153,36 +155,16 @@ mount_op_reply2_cb (GVfsRemoteVolumeMonitor *proxy,
           /* The monitor doesn't implement MountOpReply2(), so we fall back to
            * MountOpReply()
            */
-          user_name     = g_mount_operation_get_username (op_data->op);
-          domain        = g_mount_operation_get_domain (op_data->op);
-          password      = g_mount_operation_get_password (op_data->op);
-          password_save = g_mount_operation_get_password_save (op_data->op);
-          choice        = g_mount_operation_get_choice (op_data->op);
-          anonymous     = g_mount_operation_get_anonymous (op_data->op);
-
-          if (user_name == NULL)
-            user_name = "";
-          if (domain == NULL)
-            domain = "";
-          if (password == NULL)
-            password = "";
-
-          /* NOTE: this is not to add "security", it's merely to prevent accidental
-           *       exposure of passwords when running dbus-monitor
-           */
-          encoded_password = g_base64_encode ((const guchar *) password, (gsize) (strlen (password) + 1));
-
           proxy = g_proxy_volume_monitor_get_dbus_proxy (op_data->monitor);
-
           gvfs_remote_volume_monitor_call_mount_op_reply (proxy,
                                                           op_data->id,
                                                           data->result,
-                                                          user_name,
-                                                          domain,
-                                                          encoded_password,
-                                                          password_save,
-                                                          choice,
-                                                          anonymous,
+                                                          data->user_name,
+                                                          data->domain,
+                                                          data->encoded_password,
+                                                          data->password_save,
+                                                          data->choice,
+                                                          data->anonymous,
                                                           NULL,
                                                           (GAsyncReadyCallback) mount_op_reply_cb,
                                                           op_data);
@@ -193,6 +175,7 @@ mount_op_reply2_cb (GVfsRemoteVolumeMonitor *proxy,
       g_error_free (error);
     }
 
+  g_free (data->encoded_password);
   g_free (data);
 }
 
@@ -204,61 +187,52 @@ mount_operation_reply (GMountOperation        *mount_operation,
   ProxyMountOpData *op_data = user_data;
   MountOpReplyData *data;
   GVfsRemoteVolumeMonitor *proxy;
-  const gchar *user_name;
-  const gchar *domain;
   const gchar *password;
-  gchar *encoded_password;
-  gint password_save;
-  gint choice;
-  gboolean anonymous;
-  gboolean hidden_volume;
-  gboolean system_volume;
-  guint pim;
 
   data = g_new0 (MountOpReplyData, 1);
   data->op_data = op_data;
   data->result = result;
+  data->user_name     = g_mount_operation_get_username (mount_operation);
+  data->domain        = g_mount_operation_get_domain (mount_operation);
+  password            = g_mount_operation_get_password (mount_operation);
+  data->password_save = g_mount_operation_get_password_save (mount_operation);
+  data->choice        = g_mount_operation_get_choice (mount_operation);
+  data->anonymous     = g_mount_operation_get_anonymous (mount_operation);
+  data->hidden_volume = g_mount_operation_get_is_tcrypt_hidden_volume (mount_operation);
+  data->system_volume = g_mount_operation_get_is_tcrypt_system_volume (mount_operation);
+  data->pim           = g_mount_operation_get_pim (mount_operation);
 
-  user_name     = g_mount_operation_get_username (mount_operation);
-  domain        = g_mount_operation_get_domain (mount_operation);
-  password      = g_mount_operation_get_password (mount_operation);
-  password_save = g_mount_operation_get_password_save (mount_operation);
-  choice        = g_mount_operation_get_choice (mount_operation);
-  anonymous     = g_mount_operation_get_anonymous (mount_operation);
-  hidden_volume = g_mount_operation_get_is_tcrypt_hidden_volume (mount_operation);
-  system_volume = g_mount_operation_get_is_tcrypt_system_volume (mount_operation);
-  pim           = g_mount_operation_get_pim (mount_operation);
-
-  if (user_name == NULL)
-    user_name = "";
-  if (domain == NULL)
-    domain = "";
+  if (data->user_name == NULL)
+    data->user_name = "";
+  if (data->domain == NULL)
+    data->domain = "";
   if (password == NULL)
     password = "";
 
   /* NOTE: this is not to add "security", it's merely to prevent accidental exposure
    *       of passwords when running dbus-monitor
    */
-  encoded_password = g_base64_encode ((const guchar *) password, (gsize) (strlen (password) + 1));
+  data->encoded_password = g_base64_encode ((const guchar *) password, (gsize) (strlen (password) + 1));
+
+
 
   proxy = g_proxy_volume_monitor_get_dbus_proxy (op_data->monitor);
   gvfs_remote_volume_monitor_call_mount_op_reply2 (proxy,
                                                    op_data->id,
                                                    result,
-                                                   user_name,
-                                                   domain,
-                                                   encoded_password,
-                                                   password_save,
-                                                   choice,
-                                                   anonymous,
-                                                   hidden_volume,
-                                                   system_volume,
-                                                   pim,
+                                                   data->user_name,
+                                                   data->domain,
+                                                   data->encoded_password,
+                                                   data->password_save,
+                                                   data->choice,
+                                                   data->anonymous,
+                                                   data->hidden_volume,
+                                                   data->system_volume,
+                                                   data->pim,
                                                    NULL,
                                                    (GAsyncReadyCallback) mount_op_reply2_cb,
                                                    data);
   g_object_unref (proxy);
-  g_free (encoded_password);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
