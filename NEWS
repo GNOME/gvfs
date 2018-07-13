@@ -1,3 +1,12 @@
+Major changes in 1.37.4
+=======================
+* udisks2: Support TCRYPT devices
+* google: Do not create .desktop files for native files
+* udisks2: Fix crashes caused by missing source tag
+* udisks2: Handle x-gvfs- options not only for fstab entries
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.37.2
 =======================
 * smb: Fix removal of non-empty dir
