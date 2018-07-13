@@ -1442,14 +1442,12 @@ do_unlock (GTask *task)
                                                                        G_CALLBACK (on_mount_operation_aborted),
                                                                        task);
           if (g_strcmp0 (type, "crypto_unknown") == 0)
-            /* Translators: This is the message shown to users. %s is the
-             * description of the volume that is being unlocked  */
+            /* Translators: %s is the description of the volume that is being unlocked */
             message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
                                          "The volume %s might be a VeraCrypt volume as it contains random data."),
                                        data->desc_of_encrypted_to_unlock);
           else
-            /* Translators: This is the message shown to users. %s is the
-             * description of the volume that is being unlocked  */
+            /* Translators: %s is the description of the volume that is being unlocked */
             message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
                                          "The passphrase is needed to access encrypted data on %s."),
                                        data->desc_of_encrypted_to_unlock);
