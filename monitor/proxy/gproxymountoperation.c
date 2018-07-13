@@ -188,6 +188,7 @@ mount_operation_reply (GMountOperation        *mount_operation,
   gboolean hidden_volume;
   gboolean system_volume;
   guint pim;
+  GVariantBuilder *expansion_builder;
 
   data = g_new0 (MountOpReplyData, 1);
   data->op_data = op_data;
@@ -201,6 +202,14 @@ mount_operation_reply (GMountOperation        *mount_operation,
   hidden_volume       = g_mount_operation_get_is_tcrypt_hidden_volume (mount_operation);
   system_volume       = g_mount_operation_get_is_tcrypt_system_volume (mount_operation);
   pim                 = g_mount_operation_get_pim (mount_operation);
+
+  expansion_builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
+  g_variant_builder_add (expansion_builder, "{sv}", "hidden-volume",
+                         g_variant_new_boolean (hidden_volume));
+  g_variant_builder_add (expansion_builder, "{sv}", "system-volume",
+                         g_variant_new_boolean (system_volume));
+  g_variant_builder_add (expansion_builder, "{sv}", "pim",
+                         g_variant_new_uint32 (pim));
 
   if (data->user_name == NULL)
     data->user_name = "";
@@ -224,12 +233,11 @@ mount_operation_reply (GMountOperation        *mount_operation,
                                                    data->password_save,
                                                    data->choice,
                                                    data->anonymous,
-                                                   hidden_volume,
-                                                   system_volume,
-                                                   pim,
+                                                   g_variant_new ("a{sv}", expansion_builder),
                                                    NULL,
                                                    (GAsyncReadyCallback) mount_op_reply2_cb,
                                                    data);
+  g_variant_builder_unref (expansion_builder);
   g_object_unref (proxy);
 }
 

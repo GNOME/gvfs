@@ -1089,9 +1089,7 @@ handle_mount_op_reply2 (GVfsRemoteVolumeMonitor *object,
                         gint arg_password_save,
                         gint arg_choice,
                         gboolean arg_anonymous,
-                        gboolean arg_hidden_volume,
-                        gboolean arg_system_volume,
-                        guint arg_pim,
+                        GVariant *expansion,
                         gpointer user_data)
 {
   char *decoded_password;
@@ -1099,6 +1097,9 @@ handle_mount_op_reply2 (GVfsRemoteVolumeMonitor *object,
   GList *l;
   GMountOperation *mount_operation;
   const gchar *sender;
+  GVariantIter *iter_expansion;
+  GVariant *value;
+  const gchar *key;
 
   print_debug ("in handle_mount_op_reply2");
 
@@ -1140,9 +1141,20 @@ handle_mount_op_reply2 (GVfsRemoteVolumeMonitor *object,
   g_mount_operation_set_password_save (mount_operation, arg_password_save);
   g_mount_operation_set_choice (mount_operation, arg_choice);
   g_mount_operation_set_anonymous (mount_operation, arg_anonymous);
-  g_mount_operation_set_is_tcrypt_hidden_volume (mount_operation, arg_hidden_volume);
-  g_mount_operation_set_is_tcrypt_system_volume (mount_operation, arg_system_volume);
-  g_mount_operation_set_pim (mount_operation, arg_pim);
+
+  g_variant_get (expansion, "a{sv}", &iter_expansion);
+  while (g_variant_iter_loop (iter_expansion, "{sv}", &key, &value))
+    {
+      if (g_str_equal (key, "hidden-volume"))
+        g_mount_operation_set_is_tcrypt_hidden_volume (mount_operation, g_variant_get_boolean (value));
+      else if (g_str_equal (key, "system-volume"))
+        g_mount_operation_set_is_tcrypt_system_volume (mount_operation, g_variant_get_boolean (value));
+      else if (g_str_equal (key, "pim"))
+        g_mount_operation_set_pim (mount_operation, g_variant_get_uint32 (value));
+      else
+        g_warning ("Unsupported GMountOperation option: %s\n", key);
+    }
+  g_variant_iter_free (iter_expansion);
 
   g_mount_operation_reply (mount_operation, arg_result);
 
@@ -1170,20 +1182,27 @@ handle_mount_op_reply (GVfsRemoteVolumeMonitor *object,
                        gboolean arg_anonymous,
                        gpointer user_data)
 {
-  return handle_mount_op_reply2 (object,
-                                 invocation,
-                                 arg_mount_op_id,
-                                 arg_result,
-                                 arg_user_name,
-                                 arg_domain,
-                                 arg_encoded_password,
-                                 arg_password_save,
-                                 arg_choice,
-                                 arg_anonymous,
-                                 FALSE,
-                                 FALSE,
-                                 0,
-                                 user_data);
+  GVariantBuilder *expansion_builder;
+  gboolean ret;
+
+  expansion_builder = g_variant_builder_new (G_VARIANT_TYPE_VARDICT);
+
+  ret = handle_mount_op_reply2 (object,
+                                invocation,
+                                arg_mount_op_id,
+                                arg_result,
+                                arg_user_name,
+                                arg_domain,
+                                arg_encoded_password,
+                                arg_password_save,
+                                arg_choice,
+                                arg_anonymous,
+                                g_variant_new ("a{sv}", expansion_builder),
+                                user_data);
+
+  g_variant_builder_unref (expansion_builder);
+
+  return ret;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
