@@ -3,7 +3,7 @@ project(
   version: '1.37.90',
   license: 'LGPL2+',
   default_options: 'buildtype=debugoptimized',
-  meson_version: '>= 0.43.0'
+  meson_version: '>= 0.46.0'
 )
 
 gvfs_name = meson.project_name()
@@ -219,8 +219,8 @@ endif
 
 add_project_arguments(common_flags, language: 'c')
 
-ldflag = '-Wl,--version-script'
-have_version_script = host_machine.system().contains('linux') and cc.has_argument(ldflag)
+version_script_ldflag = '-Wl,--version-script'
+have_version_script = cc.has_link_argument('@0@,@1@'.format(version_script_ldflag, join_paths(meson.current_source_dir(), 'client', 'symbol.map')))
 
 gio_dep = dependency('gio-2.0')
 gio_unix_dep = dependency('gio-unix-2.0')
