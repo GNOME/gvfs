@@ -55,9 +55,6 @@ typedef struct
   gint password_save;
   gint choice;
   gboolean anonymous;
-  gboolean hidden_volume;
-  gboolean system_volume;
-  guint pim;
 } MountOpReplyData;
 
 static void
@@ -188,6 +185,9 @@ mount_operation_reply (GMountOperation        *mount_operation,
   MountOpReplyData *data;
   GVfsRemoteVolumeMonitor *proxy;
   const gchar *password;
+  gboolean hidden_volume;
+  gboolean system_volume;
+  guint pim;
 
   data = g_new0 (MountOpReplyData, 1);
   data->op_data = op_data;
@@ -198,9 +198,9 @@ mount_operation_reply (GMountOperation        *mount_operation,
   data->password_save = g_mount_operation_get_password_save (mount_operation);
   data->choice        = g_mount_operation_get_choice (mount_operation);
   data->anonymous     = g_mount_operation_get_anonymous (mount_operation);
-  data->hidden_volume = g_mount_operation_get_is_tcrypt_hidden_volume (mount_operation);
-  data->system_volume = g_mount_operation_get_is_tcrypt_system_volume (mount_operation);
-  data->pim           = g_mount_operation_get_pim (mount_operation);
+  hidden_volume       = g_mount_operation_get_is_tcrypt_hidden_volume (mount_operation);
+  system_volume       = g_mount_operation_get_is_tcrypt_system_volume (mount_operation);
+  pim                 = g_mount_operation_get_pim (mount_operation);
 
   if (data->user_name == NULL)
     data->user_name = "";
@@ -224,9 +224,9 @@ mount_operation_reply (GMountOperation        *mount_operation,
                                                    data->password_save,
                                                    data->choice,
                                                    data->anonymous,
-                                                   data->hidden_volume,
-                                                   data->system_volume,
-                                                   data->pim,
+                                                   hidden_volume,
+                                                   system_volume,
+                                                   pim,
                                                    NULL,
                                                    (GAsyncReadyCallback) mount_op_reply2_cb,
                                                    data);
