@@ -31,7 +31,7 @@ symbol_map = join_paths(meson.current_source_dir(), 'symbol.map')
 
 ldflags = []
 if have_version_script
-  ldflags += '-Wl,--version-script,@0@'.format(symbol_map)
+  ldflags += version_script_ldflag + ',@0@'.format(symbol_map)
 endif
 
 libgioremove_volume_monitor = shared_module(
