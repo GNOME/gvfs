@@ -16,11 +16,39 @@
   <category rdf:resource="http://api.gnome.org/doap-extensions#core" />
   <programming-language>C</programming-language>
 
+  <!-- General -->
   <maintainer>
     <foaf:Person>
       <foaf:name>Ondrej Holy</foaf:name>
       <foaf:mbox rdf:resource="mailto:oholy@redhat.com" />
       <gnome:userid>oholy</gnome:userid>
+    </foaf:Person>
+  </maintainer>
+
+  <!-- AFC -->
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Bastien Nocera</foaf:name>
+      <foaf:mbox rdf:resource="mailto:hadess@hadess.net" />
+      <gnome:userid>hadess</gnome:userid>
+    </foaf:Person>
+  </maintainer>
+
+  <!-- GOA -->
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Debarshi Ray</foaf:name>
+      <foaf:mbox rdf:resource="mailto:debarshir@gnome.org" />
+      <gnome:userid>debarshir</gnome:userid>
+    </foaf:Person>
+  </maintainer>
+
+  <!-- MTP -->
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Philip Langdale</foaf:name>
+      <foaf:mbox rdf:resource="mailto:philipl@overt.org" />
+      <gnome:userid>philipl</gnome:userid>
     </foaf:Person>
   </maintainer>
 </Project>
