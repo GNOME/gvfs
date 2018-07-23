@@ -2866,8 +2866,8 @@ g_vfs_backend_google_dispose (GObject *_self)
   g_clear_object (&self->service);
   g_clear_object (&self->root);
   g_clear_object (&self->client);
-  g_clear_pointer (&self->entries, (GDestroyNotify) g_hash_table_unref);
-  g_clear_pointer (&self->dir_entries, (GDestroyNotify) g_hash_table_unref);
+  g_clear_pointer (&self->entries, g_hash_table_unref);
+  g_clear_pointer (&self->dir_entries, g_hash_table_unref);
 
   G_OBJECT_CLASS (g_vfs_backend_google_parent_class)->dispose (_self);
 }
