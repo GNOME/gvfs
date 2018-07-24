@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2018-07-13 18:36+0000\n"
+"POT-Creation-Date: 2018-07-23 10:56+0000\n"
 "PO-Revision-Date: 2018-07-23 12:28+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: es <gnome-es-list@gnome.org>\n"
@@ -912,7 +912,7 @@ msgstr "El archivo ya existe"
 #: daemon/gvfsjobtrash.c:107 daemon/gvfsjobtruncate.c:113
 #: daemon/gvfsjobunmountmountable.c:157 daemon/gvfsjobunmountmountable.c:172
 #: daemon/gvfsjobwrite.c:123 monitor/udisks2/gvfsudisks2mount.c:1134
-#: monitor/udisks2/gvfsudisks2volume.c:1713
+#: monitor/udisks2/gvfsudisks2volume.c:1711
 msgid "Operation not supported by backend"
 msgstr "El backend no soporta la operación"
 
@@ -1217,7 +1217,6 @@ msgid "Invalid reply received"
 msgstr "Se recibió una respuesta no válida"
 
 #: daemon/gvfsbackendgoogle.c:2269
-#| msgid "Target file is not a regular file"
 msgid "File is not a regular file"
 msgstr "El archivo no es un archivo regular"
 
@@ -2038,26 +2037,26 @@ msgid "The given mount was not found"
 msgstr "No se ha encontrado el punto de montaje especificado"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1045
-#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1263
-#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1370
-#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1477
-#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1584
-#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1687
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1282
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1389
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1496
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1603
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1706
 msgid "An operation is already pending"
 msgstr "Ya hay una operación pendiente"
 
-#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1131
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1132
 msgid "No outstanding mount operation"
 msgstr "No hay operaciones de montaje excepcionales"
 
-#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1255
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1274
 msgid "The given volume was not found"
 msgstr "No se ha encontrado el volumen dado"
 
-#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1362
-#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1469
-#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1576
-#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1679
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1381
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1488
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1595
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1698
 msgid "The given drive was not found"
 msgstr "No se ha encontrado la unidad dada"
 
@@ -2173,13 +2172,9 @@ msgstr "Contraseña de cifrado para %s"
 msgid "A passphrase is required to access the volume"
 msgstr "Se requiere una contraseña para acceder al volumen"
 
-#. Translators: This is the message shown to users. %s is the
-#. * description of the volume that is being unlocked
-#: monitor/udisks2/gvfsudisks2volume.c:1447
+#. Translators: %s is the description of the volume that is being unlocked
+#: monitor/udisks2/gvfsudisks2volume.c:1446
 #, c-format
-#| msgid ""
-#| "Enter a password to unlock the volume\n"
-#| "The device %s contains encrypted data."
 msgid ""
 "Enter a passphrase to unlock the volume\n"
 "The volume %s might be a VeraCrypt volume as it contains random data."
@@ -2187,9 +2182,8 @@ msgstr ""
 "Introduzca una contraseña para desbloquear el volumen\n"
 "El volumen %s puede ser de tipo VeraCrypt, ya que contiene datos cifrados."
 
-#. Translators: This is the message shown to users. %s is the
-#. * description of the volume that is being unlocked
-#: monitor/udisks2/gvfsudisks2volume.c:1453
+#. Translators: %s is the description of the volume that is being unlocked
+#: monitor/udisks2/gvfsudisks2volume.c:1451
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2202,7 +2196,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: monitor/udisks2/gvfsudisks2volume.c:1633
+#: monitor/udisks2/gvfsudisks2volume.c:1631
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
@@ -2753,7 +2747,7 @@ msgstr "Monitor de volúmenes UDisks de GVfs"
 #~ msgstr "MANEJADOR"
 
 #~ msgid "Get or set the handler for a mime-type."
-#~ msgstr "Establecer u obtener el manejador para un tipo MIME."
+#~ msgstr "Establecer u obtener el gestor para un tipo MIME."
 
 #~ msgid "Specify either --query or --set"
 #~ msgstr "Especifique --query o --set"
