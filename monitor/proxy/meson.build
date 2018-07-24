@@ -34,7 +34,7 @@ if have_version_script
   ldflags += '@0@,@1@'.format(version_script_ldflag, symbol_map)
 endif
 
-libgioremove_volume_monitor = shared_module(
+libgioremote_volume_monitor = shared_module(
   'gioremote-volume-monitor',
   sources: sources + [dbus_sources],
   include_directories: top_inc,
