@@ -246,15 +246,10 @@ fill_info (GFileInfo *info, GVfsAfpVolumeData *vol_data, GVfsBackendAfpBrowse *a
   g_mount_spec_set (mount_spec, "user", afp_backend->logged_in_user);
 
   if (g_mount_tracker_has_mount_spec (afp_backend->mount_tracker, mount_spec))
-  {
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, FALSE);
-    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, TRUE);
-  }
   else
-  {
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, TRUE);
-    g_file_info_set_attribute_boolean(info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, FALSE);
-  }
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, FALSE);
   g_mount_spec_unref (mount_spec);
 
   uri = g_strdup_printf ("afp://%s/%s",
