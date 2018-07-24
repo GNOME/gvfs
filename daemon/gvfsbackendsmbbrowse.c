@@ -1277,15 +1277,10 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
     {
       g_file_info_set_file_type (info, G_FILE_TYPE_MOUNTABLE);
       if (g_mount_tracker_has_mount_spec (mount_tracker, mount_spec))
-	{
-	  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, FALSE);
-	  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, TRUE);
-	}
+        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, FALSE);
       else
-	{
-	  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, TRUE);
-	  g_file_info_set_attribute_boolean(info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, FALSE);
-	}
+        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, TRUE);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, FALSE);
       g_mount_spec_unref (mount_spec);
     }
   else
