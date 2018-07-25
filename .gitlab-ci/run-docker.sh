@@ -2,7 +2,7 @@
 
 set -ve
 
-TAG="registry.gitlab.gnome.org/gnome/gvfs/master:v1"
+TAG="registry.gitlab.gnome.org/gnome/gvfs/master:v2"
 
 docker build -t $TAG .
 
