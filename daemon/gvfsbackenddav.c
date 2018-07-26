@@ -66,6 +66,10 @@
 #include "gvfsdnssdresolver.h"
 #endif
 
+/* Overwrite maximal number of connections that libsoup can open in one time in
+   order to prevent backend lockups when too many files is opened concurrently. */
+#define MAX_CONNS 16
+
 typedef struct _MountAuthData MountAuthData;
 
 static void mount_auth_info_free (MountAuthData *info);
@@ -1875,7 +1879,11 @@ do_mount (GVfsBackend  *backend,
   G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base; 
 
   /* Override the HTTP backend's default. */
-  g_object_set (session, "ssl-strict", TRUE, NULL);
+  g_object_set (session,
+                "ssl-strict", TRUE,
+                SOUP_SESSION_MAX_CONNS_PER_HOST, MAX_CONNS,
+                SOUP_SESSION_MAX_CONNS, MAX_CONNS,
+                NULL);
 
   data = &(G_VFS_BACKEND_DAV (backend)->auth_info); 
   data->mount_source = g_object_ref (mount_source);
