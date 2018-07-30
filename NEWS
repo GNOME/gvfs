@@ -1,3 +1,12 @@
+Major changes in 1.37.90
+========================
+* ftp: Add implicit TLS mode
+* dav: Increase max number of connections to prevent lockups
+* smb: Do not claim that mountable can be unmounted
+* build: Add proper linker support check
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.37.4
 =======================
 * udisks2: Support TCRYPT devices
