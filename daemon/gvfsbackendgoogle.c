@@ -55,15 +55,13 @@ struct _GVfsBackendGoogle
   GVfsBackend parent;
   GDataDocumentsService *service;
   GDataEntry *root;
-  GHashTable *entries;
-  GHashTable *dir_entries;
+  GHashTable *entries; /* gchar *entry_id -> GDataEntry */
+  GHashTable *dir_entries; /* DirEntriesKey -> GDataEntry */
   GHashTable *monitors;
   GList *dir_collisions;
   GRecMutex mutex; /* guards cache */
   GoaClient *client;
-  gboolean entries_stale;
   gchar *account_identity;
-  guint entries_stale_timeout;
 };
 
 struct _GVfsBackendGoogleClass
@@ -104,6 +102,7 @@ typedef struct
 
 static GDataEntry *resolve_dir (GVfsBackendGoogle  *self,
                                 const gchar        *filename,
+                                GCancellable       *cancellable,
                                 gchar             **out_basename,
                                 gchar             **out_path,
                                 GError            **error);
@@ -434,12 +433,19 @@ static void
 insert_entry (GVfsBackendGoogle *self,
               GDataEntry        *entry)
 {
+  gint64 *timestamp;
+
+  timestamp = g_new (gint64, 1);
+  *timestamp =  g_get_real_time ();
+  g_object_set_data_full (G_OBJECT (entry), "timestamp", timestamp, g_free);
+
   insert_entry_full (self, entry, TRUE);
 }
 
 static void
-remove_entry (GVfsBackendGoogle *self,
-              GDataEntry        *entry)
+remove_entry_full (GVfsBackendGoogle *self,
+                   GDataEntry        *entry,
+                   gboolean           restore_dir_collisions)
 {
   DirEntriesKey *k;
   GList *l;
@@ -474,17 +480,20 @@ remove_entry (GVfsBackendGoogle *self,
           g_object_unref (entry);
         }
 
-      for (l = self->dir_collisions; l != NULL; l = l->next)
+      if (restore_dir_collisions)
         {
-          GDataEntry *colliding_entry = GDATA_ENTRY (l->data);
-
-          if (insert_entry_full (self, colliding_entry, FALSE))
+          for (l = self->dir_collisions; l != NULL; l = l->next)
             {
-              self->dir_collisions = g_list_remove_link (self->dir_collisions, l);
-              g_debug ("  remove_entry: Restored %p\n", colliding_entry);
-              g_list_free (l);
-              g_object_unref (colliding_entry);
-              break;
+              GDataEntry *colliding_entry = GDATA_ENTRY (l->data);
+
+              if (insert_entry_full (self, colliding_entry, FALSE))
+                {
+                  self->dir_collisions = g_list_remove_link (self->dir_collisions, l);
+                  g_debug ("  remove_entry: Restored %p\n", colliding_entry);
+                  g_list_free (l);
+                  g_object_unref (colliding_entry);
+                  break;
+                }
             }
         }
     }
@@ -492,16 +501,85 @@ remove_entry (GVfsBackendGoogle *self,
 }
 
 static void
-rebuild_entries (GVfsBackendGoogle  *self,
-                 GCancellable       *cancellable,
-                 GError            **error)
+remove_entry (GVfsBackendGoogle *self,
+              GDataEntry        *entry)
+{
+  remove_entry_full (self, entry, TRUE);
+}
+
+static void
+remove_dir (GVfsBackendGoogle *self,
+            GDataEntry        *parent)
+{
+  GHashTableIter iter;
+  GDataEntry *entry;
+  gchar *parent_id;
+  GList *l;
+
+  /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
+  parent_id = g_strdup (gdata_entry_get_id (parent));
+
+  g_hash_table_iter_init (&iter, self->entries);
+  while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &entry))
+    {
+      DirEntriesKey *k;
+
+      k = dir_entries_key_new (gdata_entry_get_id (entry), parent_id);
+      if (g_hash_table_contains (self->dir_entries, k))
+        {
+          g_object_ref (entry);
+          g_hash_table_iter_remove (&iter);
+          remove_entry_full (self, entry, FALSE);
+          g_object_unref (entry);
+        }
+
+      dir_entries_key_free (k);
+    }
+
+  for (l = self->dir_collisions; l != NULL; l = l->next)
+  {
+    GDataEntry *colliding_entry = GDATA_ENTRY (l->data);
+
+    if (insert_entry_full (self, colliding_entry, FALSE))
+      {
+        self->dir_collisions = g_list_remove_link (self->dir_collisions, l);
+        g_debug ("  remove_entry: Restored %p\n", colliding_entry);
+        g_list_free (l);
+        g_object_unref (colliding_entry);
+        break;
+      }
+  }
+
+  g_free (parent_id);
+}
+
+static gboolean
+is_entry_valid (GDataEntry *entry)
+{
+  gint64 *timestamp;
+
+  timestamp = g_object_get_data (G_OBJECT (entry), "timestamp");
+  return (g_get_real_time () - *timestamp < REBUILD_ENTRIES_TIMEOUT * G_USEC_PER_SEC);
+}
+
+static void
+rebuild_dir (GVfsBackendGoogle  *self,
+             GDataEntry         *parent,
+             GCancellable       *cancellable,
+             GError            **error)
 {
   GDataDocumentsFeed *feed = NULL;
   GDataDocumentsQuery *query = NULL;
   gboolean succeeded_once = FALSE;
+  gchar *search;
+  const gchar *parent_id;
 
-  query = gdata_documents_query_new_with_limits (NULL, 1, MAX_RESULTS);
+  parent_id = gdata_entry_get_id (parent);
+
+  search = g_strdup_printf ("'%s' in parents", parent_id);
+  query = gdata_documents_query_new_with_limits (search, 1, MAX_RESULTS);
   gdata_documents_query_set_show_folders (query, TRUE);
+  g_free (search);
 
   while (TRUE)
     {
@@ -515,18 +593,13 @@ rebuild_entries (GVfsBackendGoogle  *self,
         {
           sanitize_error (&local_error);
           g_propagate_error (error, local_error);
-          self->entries_stale = TRUE;
 
           goto out;
         }
 
       if (!succeeded_once)
         {
-          g_hash_table_remove_all (self->entries);
-          g_hash_table_remove_all (self->dir_entries);
-
-          g_list_free_full (self->dir_collisions, g_object_unref);
-          self->dir_collisions = NULL;
+          remove_dir (self, parent);
 
           succeeded_once = TRUE;
         }
@@ -545,8 +618,6 @@ rebuild_entries (GVfsBackendGoogle  *self,
       g_clear_object (&feed);
     }
 
-  self->entries_stale = FALSE;
-
  out:
   g_clear_object (&feed);
   g_clear_object (&query);
@@ -555,24 +626,48 @@ rebuild_entries (GVfsBackendGoogle  *self,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static GDataEntry *
-resolve_child (GVfsBackendGoogle *self,
-               GDataEntry        *parent,
-               const gchar       *basename)
+resolve_child (GVfsBackendGoogle  *self,
+               GDataEntry         *parent,
+               const gchar        *basename,
+               GCancellable       *cancellable,
+               GError            **error)
 {
   DirEntriesKey *k;
   GDataEntry *entry;
   const gchar *parent_id;
+  GError *local_error = NULL;
 
   parent_id = gdata_entry_get_id (parent);
   k = dir_entries_key_new (basename, parent_id);
   entry = g_hash_table_lookup (self->dir_entries, k);
+  // TODO: Rebuild only if dir listing is not valid
+  if (entry == NULL || !is_entry_valid (entry))
+    {
+      rebuild_dir (self, parent, cancellable, &local_error);
+      if (local_error != NULL)
+        {
+          g_propagate_error (error, local_error);
+          goto out;
+        }
+
+      entry = g_hash_table_lookup (self->dir_entries, k);
+      if (entry == NULL)
+        {
+          g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("No such file or directory"));
+          goto out;
+        }
+    }
+
+ out:
   dir_entries_key_free (k);
+
   return entry;
 }
 
 static GDataEntry *
 resolve (GVfsBackendGoogle  *self,
          const gchar        *filename,
+         GCancellable       *cancellable,
          gchar             **out_path,
          GError            **error)
 {
@@ -580,6 +675,8 @@ resolve (GVfsBackendGoogle  *self,
   GDataEntry *ret_val = NULL;
   GError *local_error;
   gchar *basename = NULL;
+
+  g_assert (filename && filename[0] == '/');
 
   if (g_strcmp0 (filename, "/") == 0)
     {
@@ -592,17 +689,17 @@ resolve (GVfsBackendGoogle  *self,
     }
 
   local_error = NULL;
-  parent = resolve_dir (self, filename, &basename, out_path, &local_error);
+  parent = resolve_dir (self, filename, cancellable, &basename, out_path, &local_error);
   if (local_error != NULL)
     {
       g_propagate_error (error, local_error);
       goto out;
     }
 
-  ret_val = resolve_child (self, parent, basename);
+  ret_val = resolve_child (self, parent, basename, cancellable, &local_error);
   if (ret_val == NULL)
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("No such file or directory"));
+      g_propagate_error (error, local_error);
       goto out;
     }
 
@@ -622,6 +719,7 @@ resolve (GVfsBackendGoogle  *self,
 static GDataEntry *
 resolve_dir (GVfsBackendGoogle  *self,
              const gchar        *filename,
+             GCancellable       *cancellable,
              gchar             **out_basename,
              gchar             **out_path,
              GError            **error)
@@ -636,7 +734,7 @@ resolve_dir (GVfsBackendGoogle  *self,
   parent_path = g_path_get_dirname (filename);
 
   local_error = NULL;
-  parent = resolve (self, parent_path, out_path, &local_error);
+  parent = resolve (self, parent_path, cancellable, out_path, &local_error);
   if (local_error != NULL)
     {
       g_propagate_error (error, local_error);
@@ -660,103 +758,6 @@ resolve_dir (GVfsBackendGoogle  *self,
  out:
   g_free (basename);
   g_free (parent_path);
-  return ret_val;
-}
-
-/* ---------------------------------------------------------------------------------------------------- */
-
-static GDataEntry *
-resolve_and_rebuild (GVfsBackendGoogle  *self,
-                     const gchar        *filename,
-                     GCancellable       *cancellable,
-                     gchar             **out_path,
-                     GError            **error)
-{
-  GDataEntry *entry;
-  GDataEntry *ret_val = NULL;
-
-  entry = resolve (self, filename, out_path, NULL);
-  if (entry == NULL)
-    {
-      GError *local_error;
-
-      local_error = NULL;
-      rebuild_entries (self, cancellable, &local_error);
-      if (local_error != NULL)
-        {
-          g_propagate_error (error, local_error);
-          goto out;
-        }
-
-      local_error = NULL;
-      entry = resolve (self, filename, out_path, &local_error);
-      if (local_error != NULL)
-        {
-          g_propagate_error (error, local_error);
-          goto out;
-        }
-    }
-
-  ret_val = entry;
-
- out:
-  return ret_val;
-}
-
-static GDataEntry *
-resolve_dir_and_rebuild (GVfsBackendGoogle  *self,
-                         const gchar        *filename,
-                         GCancellable       *cancellable,
-                         gchar             **out_basename,
-                         gchar             **out_path,
-                         GError            **error)
-{
-  GDataEntry *parent;
-  GDataEntry *ret_val = NULL;
-  GError *local_error;
-  gchar *basename = NULL;
-
-  local_error = NULL;
-  parent = resolve_dir (self, filename, &basename, out_path, &local_error);
-  if (local_error != NULL)
-    {
-      if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY))
-        {
-          g_propagate_error (error, local_error);
-          goto out;
-        }
-      else
-        {
-          g_error_free (local_error);
-        }
-
-      local_error = NULL;
-      rebuild_entries (self, cancellable, &local_error);
-      if (local_error != NULL)
-        {
-          g_propagate_error (error, local_error);
-          goto out;
-        }
-
-      local_error = NULL;
-      parent = resolve_dir (self, filename, &basename, out_path, &local_error);
-      if (local_error != NULL)
-        {
-          g_propagate_error (error, local_error);
-          goto out;
-        }
-    }
-
-  if (out_basename != NULL)
-    {
-      *out_basename = basename;
-      basename = NULL;
-    }
-
-  ret_val = parent;
-
- out:
-  g_free (basename);
   return ret_val;
 }
 
@@ -804,11 +805,11 @@ generate_copy_name (GVfsBackendGoogle *self, GDataEntry *entry, const gchar *ent
 
   title = gdata_entry_get_title (entry);
 
-  parent = resolve_dir (self, entry_path, NULL, NULL, NULL);
+  parent = resolve_dir (self, entry_path, NULL, NULL, NULL, NULL);
   if (parent == NULL)
     goto out;
 
-  existing_entry = resolve_child (self, parent, title);
+  existing_entry = resolve_child (self, parent, title, NULL, NULL);
   if (existing_entry == entry)
     goto out;
 
@@ -1066,8 +1067,6 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   GDataEntry *source_entry;
   GError *error;
   GType source_entry_type;
-  gboolean needs_rebuild = FALSE;
-  gboolean destination_not_directory = FALSE;
   const gchar *etag;
   const gchar *id;
   const gchar *summary;
@@ -1089,56 +1088,21 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
       goto out;
     }
 
-  source_entry = resolve (self, source, NULL, NULL);
-  if (source_entry == NULL)
-    needs_rebuild = TRUE;
-
   error = NULL;
-  destination_parent = resolve_dir (self, destination, &destination_basename, &parent_path, &error);
+  source_entry = resolve (self, source, cancellable, NULL, &error);
   if (error != NULL)
     {
-      if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY))
-        destination_not_directory = TRUE;
-      else
-        needs_rebuild = TRUE;
-
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
+      goto out;
     }
 
-  if (needs_rebuild)
+  destination_parent = resolve_dir (self, destination, cancellable, &destination_basename, &parent_path, &error);
+  if (error != NULL)
     {
-      error = NULL;
-      rebuild_entries (self, cancellable, &error);
-      if (error != NULL)
-        {
-          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-          g_error_free (error);
-          goto out;
-        }
-
-      error = NULL;
-      source_entry = resolve (self, source, NULL, &error);
-      if (error != NULL)
-        {
-          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-          g_error_free (error);
-          goto out;
-        }
-
-      if (!destination_not_directory)
-        {
-          g_free (destination_basename);
-          destination_basename = NULL;
-
-          error = NULL;
-          destination_parent = resolve_dir (self, destination, &destination_basename, &parent_path, &error);
-          if (error != NULL)
-            {
-              g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-              g_error_free (error);
-              goto out;
-            }
-        }
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
     }
 
   etag = gdata_entry_get_etag (source_entry);
@@ -1157,13 +1121,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
       goto out;
     }
 
-  if (destination_not_directory)
-    {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY, _("The file is not a directory"));
-      goto out;
-    }
-
-  existing_entry = resolve_child (self, destination_parent, destination_basename);
+  existing_entry = resolve_child (self, destination_parent, destination_basename, cancellable, NULL);
   if (existing_entry != NULL)
     {
       if (flags & G_FILE_COPY_OVERWRITE)
@@ -1266,7 +1224,7 @@ g_vfs_backend_google_create_dir_monitor (GVfsBackend          *_self,
     }
 
   error = NULL;
-  entry = resolve_and_rebuild (self, filename, cancellable, &entry_path, &error);
+  entry = resolve (self, filename, cancellable, &entry_path, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1317,7 +1275,7 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
   g_debug ("+ delete: %s\n", filename);
 
   error = NULL;
-  entry = resolve_and_rebuild (self, filename, cancellable, &entry_path, &error);
+  entry = resolve (self, filename, cancellable, &entry_path, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1384,17 +1342,6 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static gboolean
-rebuild_entries_timeout_cb (gpointer user_data)
-{
-  GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (user_data);
-
-  self->entries_stale = TRUE;
-  self->entries_stale_timeout = 0;
-
-  return G_SOURCE_REMOVE;
-}
-
 static void
 g_vfs_backend_google_enumerate (GVfsBackend           *_self,
                                 GVfsJobEnumerate      *job,
@@ -1413,29 +1360,8 @@ g_vfs_backend_google_enumerate (GVfsBackend           *_self,
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ enumerate: %s\n", filename);
 
-  if (self->entries_stale_timeout == 0)
-    {
-      self->entries_stale_timeout = g_timeout_add_seconds_full (G_PRIORITY_DEFAULT,
-                                                                REBUILD_ENTRIES_TIMEOUT,
-                                                                rebuild_entries_timeout_cb,
-                                                                g_object_ref (self),
-                                                                g_object_unref);
-    }
-
-  if (self->entries_stale)
-    {
-      error = NULL;
-      rebuild_entries (self, cancellable, &error);
-      if (error != NULL)
-        {
-          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-          g_error_free (error);
-          goto out;
-        }
-    }
-
   error = NULL;
-  entry = resolve (self, filename, &parent_path, &error);
+  entry = resolve (self, filename, cancellable, &parent_path, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1446,6 +1372,15 @@ g_vfs_backend_google_enumerate (GVfsBackend           *_self,
   if (!GDATA_IS_DOCUMENTS_FOLDER (entry))
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY,_("The file is not a directory"));
+      goto out;
+    }
+
+  // TODO: Rebuild only if dir listing is not valid
+  rebuild_dir (self, entry, cancellable, &error);
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       goto out;
     }
 
@@ -1515,7 +1450,7 @@ g_vfs_backend_google_make_directory (GVfsBackend          *_self,
     }
 
   error = NULL;
-  parent = resolve_dir_and_rebuild (self, filename, cancellable, &basename, &parent_path, &error);
+  parent = resolve_dir (self, filename, cancellable, &basename, &parent_path, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1531,7 +1466,7 @@ g_vfs_backend_google_make_directory (GVfsBackend          *_self,
   else
     summary = gdata_entry_get_summary (summary_entry);
 
-  existing_entry = resolve_child (self, parent, basename);
+  existing_entry = resolve_child (self, parent, basename, cancellable, NULL);
   if (existing_entry != NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
@@ -1760,7 +1695,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
     }
 
   error = NULL;
-  destination_parent = resolve_dir_and_rebuild (self, destination, cancellable, &destination_basename, &parent_path, &error);
+  destination_parent = resolve_dir (self, destination, cancellable, &destination_basename, &parent_path, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1768,7 +1703,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
       goto out;
     }
 
-  existing_entry = resolve_child (self, destination_parent, destination_basename);
+  existing_entry = resolve_child (self, destination_parent, destination_basename, cancellable, NULL);
   if (existing_entry != NULL)
     {
       if (flags & G_FILE_COPY_OVERWRITE)
@@ -2049,7 +1984,7 @@ g_vfs_backend_google_query_info (GVfsBackend           *_self,
   g_debug ("+ query_info: %s, %d\n", filename, flags);
 
   error = NULL;
-  entry = resolve_and_rebuild (self, filename, cancellable, &entry_path, &error);
+  entry = resolve (self, filename, cancellable, &entry_path, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -2210,7 +2145,7 @@ g_vfs_backend_google_open_for_read (GVfsBackend        *_self,
   g_debug ("+ open_for_read: %s\n", filename);
 
   error = NULL;
-  entry = resolve_and_rebuild (self, filename, cancellable, &entry_path, &error);
+  entry = resolve (self, filename, cancellable, &entry_path, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -2398,7 +2333,7 @@ g_vfs_backend_google_set_display_name (GVfsBackend           *_self,
   g_debug ("+ set_display_name: %s, %s\n", filename, display_name);
 
   error = NULL;
-  entry = resolve_and_rebuild (self, filename, cancellable, &entry_path, &error);
+  entry = resolve (self, filename, cancellable, &entry_path, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -2470,7 +2405,7 @@ g_vfs_backend_google_create (GVfsBackend         *_self,
     }
 
   error = NULL;
-  parent = resolve_dir_and_rebuild (self, filename, cancellable, &basename, &parent_path, &error);
+  parent = resolve_dir (self, filename, cancellable, &basename, &parent_path, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -2480,7 +2415,7 @@ g_vfs_backend_google_create (GVfsBackend         *_self,
 
   g_debug ("  parent path: %s\n", parent_path);
 
-  existing_entry = resolve_child (self, parent, basename);
+  existing_entry = resolve_child (self, parent, basename, cancellable, NULL);
   if (existing_entry != NULL)
     {
       if (flags & G_FILE_CREATE_REPLACE_DESTINATION)
@@ -2579,7 +2514,7 @@ g_vfs_backend_google_replace (GVfsBackend         *_self,
     }
 
   error = NULL;
-  parent = resolve_dir_and_rebuild (self, filename, cancellable, &basename, &parent_path, &error);
+  parent = resolve_dir (self, filename, cancellable, &basename, &parent_path, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -2589,7 +2524,7 @@ g_vfs_backend_google_replace (GVfsBackend         *_self,
 
   g_debug ("  parent path: %s\n", parent_path);
 
-  existing_entry = resolve_child (self, parent, basename);
+  existing_entry = resolve_child (self, parent, basename, cancellable, NULL);
   if (existing_entry != NULL)
     {
       if (GDATA_IS_DOCUMENTS_FOLDER (existing_entry))
@@ -2811,12 +2746,6 @@ g_vfs_backend_google_dispose (GObject *_self)
 {
   GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (_self);
 
-  if (self->entries_stale_timeout != 0)
-    {
-      g_source_remove (self->entries_stale_timeout);
-      self->entries_stale_timeout = 0;
-    }
-
   if (self->dir_collisions != NULL)
     {
       g_list_free_full (self->dir_collisions, g_object_unref);
@@ -2888,5 +2817,4 @@ g_vfs_backend_google_init (GVfsBackendGoogle *self)
                                              g_object_unref);
   self->monitors = g_hash_table_new (NULL, NULL);
   g_rec_mutex_init (&self->mutex);
-  self->entries_stale = TRUE;
 }
