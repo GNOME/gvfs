@@ -519,6 +519,13 @@ remove_entry (GVfsBackendGoogle *self,
   g_hash_table_remove (self->dir_entries, k);
   dir_entries_key_free (k);
 
+  l = g_list_find (self->dir_collisions, entry);
+  if (l != NULL)
+    {
+      self->dir_collisions = g_list_remove_link (self->dir_collisions, l);
+      g_object_unref (entry);
+    }
+
   for (l = self->dir_collisions; l != NULL; l = l->next)
     {
       GDataEntry *colliding_entry = GDATA_ENTRY (l->data);
