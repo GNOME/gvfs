@@ -510,13 +510,13 @@ remove_entry (GVfsBackendGoogle *self,
   parent_id = get_parent_id (self, entry);
 
   k = dir_entries_key_new (id, parent_id);
-  g_hash_table_remove (self->dir_entries, k);
   g_debug ("  remove_entry: Removed (%s, %s) -> %p\n", id, parent_id, entry);
+  g_hash_table_remove (self->dir_entries, k);
   dir_entries_key_free (k);
 
   k = dir_entries_key_new (title, parent_id);
-  g_hash_table_remove (self->dir_entries, k);
   g_debug ("  remove_entry: Removed (%s, %s) -> %p\n", title, parent_id, entry);
+  g_hash_table_remove (self->dir_entries, k);
   dir_entries_key_free (k);
 
   for (l = self->dir_collisions; l != NULL; l = l->next)
