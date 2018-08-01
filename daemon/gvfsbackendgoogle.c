@@ -1314,16 +1314,26 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
 {
   GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (_self);
   GCancellable *cancellable = G_VFS_JOB (job)->cancellable;
-  GDataAuthorizationDomain *auth_domain;
   GDataEntry *entry;
+  GDataEntry *parent;
+  GDataDocumentsEntry *new_entry = NULL;
   GError *error;
   gchar *entry_path = NULL;
+  GList *parent_ids;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ delete: %s\n", filename);
 
   error = NULL;
   entry = resolve_and_rebuild (self, filename, cancellable, &entry_path, &error);
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
+    }
+
+  parent = resolve_dir (self, filename, cancellable, NULL, NULL, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1339,10 +1349,26 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
       goto out;
     }
 
-  auth_domain = gdata_documents_service_get_primary_authorization_domain ();
+  /* It has to be removed before the actual call to properly invalidate dir entries. */
+  g_object_ref (entry);
+  remove_entry (self, entry);
 
   error = NULL;
-  gdata_service_delete_entry (GDATA_SERVICE (self->service), auth_domain, entry, cancellable, &error);
+
+  /* gdata_documents_service_remove_entry_from_folder seems doesn't work for one parent. */
+  parent_ids = get_parent_ids (self, entry);
+  if (g_list_length (parent_ids) > 1)
+    {
+      new_entry = gdata_documents_service_remove_entry_from_folder (self->service, GDATA_DOCUMENTS_ENTRY (entry), GDATA_DOCUMENTS_FOLDER (parent), cancellable, &error);
+    }
+  else
+    {
+      GDataAuthorizationDomain *auth_domain;
+
+      auth_domain = gdata_documents_service_get_primary_authorization_domain ();
+      gdata_service_delete_entry (GDATA_SERVICE (self->service), auth_domain, entry, cancellable, &error);
+    }
+
   if (error != NULL)
     {
       sanitize_error (&error);
@@ -1351,11 +1377,14 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
       goto out;
     }
 
-  remove_entry (self, entry);
+  if (new_entry)
+    insert_entry (self, GDATA_ENTRY (new_entry));
   g_hash_table_foreach (self->monitors, emit_delete_event, entry_path);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
  out:
+  g_object_unref (entry);
+  g_clear_object (&new_entry);
   g_free (entry_path);
   g_debug ("- delete\n");
   g_rec_mutex_unlock (&self->mutex);
