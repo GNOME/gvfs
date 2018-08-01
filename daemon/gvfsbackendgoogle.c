@@ -877,8 +877,7 @@ build_file_info (GVfsBackendGoogle      *self,
                  GFileQueryInfoFlags     flags,
                  GFileInfo              *info,
                  GFileAttributeMatcher  *matcher,
-                 gboolean                is_symlink,
-                 const gchar            *symlink_name,
+                 const gchar            *filename,
                  const gchar            *entry_path,
                  GError                **error)
 {
@@ -886,6 +885,7 @@ build_file_info (GVfsBackendGoogle      *self,
   GList *authors;
   gboolean is_folder = FALSE;
   gboolean is_root = FALSE;
+  gboolean is_symlink = FALSE;
   const gchar *etag;
   const gchar *id;
   const gchar *name;
@@ -893,6 +893,7 @@ build_file_info (GVfsBackendGoogle      *self,
   gchar *escaped_name = NULL;
   gchar *content_type = NULL;
   gchar *copy_name = NULL;
+  gchar *symlink_name = NULL;
   gint64 atime;
   gint64 ctime;
   gint64 mtime;
@@ -903,6 +904,12 @@ build_file_info (GVfsBackendGoogle      *self,
 
   if (entry == self->root)
     is_root = TRUE;
+
+  if (filename != NULL && g_strcmp0 (entry_path, filename) != 0) /* volatile */
+    {
+      is_symlink = TRUE;
+      symlink_name = g_path_get_basename (filename);
+    }
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, !is_root);
 
@@ -1062,6 +1069,7 @@ build_file_info (GVfsBackendGoogle      *self,
     }
 
  out:
+  g_free (symlink_name);
   g_free (copy_name);
   g_free (escaped_name);
   g_free (content_type);
@@ -1412,10 +1420,12 @@ g_vfs_backend_google_enumerate (GVfsBackend           *_self,
         {
           GFileInfo *info;
           gchar *entry_path;
+          gchar *child_filename;
 
           info = g_file_info_new ();
           entry_path = g_build_path ("/", parent_path, gdata_entry_get_id (GDATA_ENTRY (entry)), NULL);
-          build_file_info (self, entry, flags, info, matcher, FALSE, NULL, entry_path, NULL);
+          child_filename = g_build_filename (filename, gdata_entry_get_id (GDATA_ENTRY (entry)), NULL);
+          build_file_info (self, entry, flags, info, matcher, child_filename, entry_path, NULL);
           g_vfs_job_enumerate_add_info (job, info);
           g_object_unref (info);
           g_free (entry_path);
@@ -1989,9 +1999,7 @@ g_vfs_backend_google_query_info (GVfsBackend           *_self,
   GCancellable *cancellable = G_VFS_JOB (job)->cancellable;
   GDataEntry *entry;
   GError *error;
-  gboolean is_symlink = FALSE;
   gchar *entry_path = NULL;
-  gchar *symlink_name = NULL;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ query_info: %s, %d\n", filename, flags);
@@ -2005,16 +2013,10 @@ g_vfs_backend_google_query_info (GVfsBackend           *_self,
       goto out;
     }
 
-  if (g_strcmp0 (entry_path, filename) != 0) /* volatile */
-    {
-      is_symlink = TRUE;
-      symlink_name = g_path_get_basename (filename);
-    }
-
-  g_debug ("  entry path: %s (%d)\n", entry_path, is_symlink);
+  g_debug ("  entry path: %s\n", entry_path);
 
   error = NULL;
-  build_file_info (self, entry, flags, info, matcher, is_symlink, symlink_name, entry_path, &error);
+  build_file_info (self, entry, flags, info, matcher, filename, entry_path, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -2026,7 +2028,6 @@ g_vfs_backend_google_query_info (GVfsBackend           *_self,
 
  out:
   g_free (entry_path);
-  g_free (symlink_name);
   g_debug ("- query_info\n");
   g_rec_mutex_unlock (&self->mutex);
 }
@@ -2044,10 +2045,8 @@ g_vfs_backend_google_query_info_on_read (GVfsBackend           *_self,
   GDataEntry *entry;
   GError *error;
   GInputStream *stream = G_INPUT_STREAM (handle);
-  gboolean is_symlink = FALSE;
   const gchar *filename;
   gchar *entry_path = NULL;
-  gchar *symlink_name = NULL;
 
   g_debug ("+ query_info_on_read: %p\n", handle);
 
@@ -2055,13 +2054,7 @@ g_vfs_backend_google_query_info_on_read (GVfsBackend           *_self,
   filename = g_object_get_data (G_OBJECT (stream), "g-vfs-backend-google-filename");
   entry_path = g_object_get_data (G_OBJECT (stream), "g-vfs-backend-google-entry-path");
 
-  if (g_strcmp0 (entry_path, filename) != 0) /* volatile */
-    {
-      is_symlink = TRUE;
-      symlink_name = g_path_get_basename (filename);
-    }
-
-  g_debug ("  entry path: %s (%d)\n", entry_path, is_symlink);
+  g_debug ("  entry path: %s\n", entry_path);
 
   error = NULL;
   build_file_info (self,
@@ -2069,8 +2062,7 @@ g_vfs_backend_google_query_info_on_read (GVfsBackend           *_self,
                    G_FILE_QUERY_INFO_NONE,
                    info,
                    matcher,
-                   is_symlink,
-                   symlink_name,
+                   filename,
                    entry_path,
                    &error);
   if (error != NULL)
@@ -2083,7 +2075,6 @@ g_vfs_backend_google_query_info_on_read (GVfsBackend           *_self,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
  out:
-  g_free (symlink_name);
   g_debug ("- query_info_on_read\n");
 }
 
@@ -2099,18 +2090,9 @@ g_vfs_backend_google_query_info_on_write (GVfsBackend           *_self,
   GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (_self);
   GError *error;
   WriteHandle *wh = (WriteHandle *) handle;
-  gboolean is_symlink = FALSE;
-  gchar *symlink_name = NULL;
 
   g_debug ("+ query_info_on_write: %p\n", handle);
-
-  if (g_strcmp0 (wh->entry_path, wh->filename) != 0) /* volatile */
-    {
-      is_symlink = TRUE;
-      symlink_name = g_path_get_basename (wh->filename);
-    }
-
-  g_debug ("  entry path: %s (%d)\n", wh->entry_path, is_symlink);
+  g_debug ("  entry path: %s\n", wh->entry_path);
 
   error = NULL;
   build_file_info (self,
@@ -2118,8 +2100,7 @@ g_vfs_backend_google_query_info_on_write (GVfsBackend           *_self,
                    G_FILE_QUERY_INFO_NONE,
                    info,
                    matcher,
-                   is_symlink,
-                   symlink_name,
+                   wh->filename,
                    wh->entry_path,
                    &error);
   if (error != NULL)
@@ -2132,7 +2113,6 @@ g_vfs_backend_google_query_info_on_write (GVfsBackend           *_self,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
  out:
-  g_free (symlink_name);
   g_debug ("- query_info_on_write\n");
   return TRUE;
 }
