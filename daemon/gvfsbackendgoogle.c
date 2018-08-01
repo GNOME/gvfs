@@ -1314,8 +1314,9 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
 {
   GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (_self);
   GCancellable *cancellable = G_VFS_JOB (job)->cancellable;
-  GDataAuthorizationDomain *auth_domain;
   GDataEntry *entry;
+  GDataEntry *parent;
+  GDataDocumentsEntry *new_entry = NULL;
   GError *error;
   gchar *entry_path = NULL;
 
@@ -1331,6 +1332,14 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
       goto out;
     }
 
+  parent = resolve_dir (self, filename, cancellable, NULL, NULL, &error);
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
+    }
+
   g_debug ("  entry path: %s\n", entry_path);
 
   if (entry == self->root)
@@ -1339,10 +1348,8 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
       goto out;
     }
 
-  auth_domain = gdata_documents_service_get_primary_authorization_domain ();
-
   error = NULL;
-  gdata_service_delete_entry (GDATA_SERVICE (self->service), auth_domain, entry, cancellable, &error);
+  new_entry = gdata_documents_service_remove_entry_from_folder (self->service, GDATA_DOCUMENTS_ENTRY (entry), GDATA_DOCUMENTS_FOLDER (parent), cancellable, &error);
   if (error != NULL)
     {
       sanitize_error (&error);
@@ -1352,10 +1359,13 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
     }
 
   remove_entry (self, entry);
+  if (new_entry)
+    insert_entry (self, GDATA_ENTRY (new_entry));
   g_hash_table_foreach (self->monitors, emit_delete_event, entry_path);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
  out:
+  g_object_unref (new_entry);
   g_free (entry_path);
   g_debug ("- delete\n");
   g_rec_mutex_unlock (&self->mutex);
