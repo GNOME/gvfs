@@ -846,6 +846,31 @@ gvfs_udisks2_volume_is_network_class (GVfsUDisks2Volume *volume)
   return ret;
 }
 
+static gboolean
+gvfs_udisks2_volume_is_loop_class (GVfsUDisks2Volume *volume)
+{
+  UDisksClient *client;
+  UDisksLoop *loop;
+  UDisksObject *object;
+
+  if (volume->block == NULL)
+    return FALSE;
+
+  client = gvfs_udisks2_volume_monitor_get_udisks_client (volume->monitor);
+
+  /* Check if the volume is a loop device */
+  loop = udisks_client_get_loop_for_block (client, volume->block);
+  if (loop != NULL)
+    return TRUE;
+
+  /* Check if the volume is an unlocked encrypted loop device */
+  object = udisks_client_get_object (client, udisks_block_get_crypto_backing_device (volume->block));
+  if (object != NULL && udisks_object_get_loop (object) != NULL)
+    return TRUE;
+
+  return FALSE;
+}
+
 /* ---------------------------------------------------------------------------------------------------- */
 
 static gchar *
@@ -870,7 +895,14 @@ gvfs_udisks2_volume_get_identifier (GVolume      *_volume,
         ret = strlen (uuid) > 0 ? g_strdup (uuid) : NULL;
     }
   if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_CLASS) == 0)
-    ret = g_strdup (gvfs_udisks2_volume_is_network_class (volume) ? "network" : "device");
+    {
+      if (gvfs_udisks2_volume_is_network_class (volume))
+        ret = g_strdup ("network");
+      else if (gvfs_udisks2_volume_is_loop_class (volume))
+        ret = g_strdup ("loop");
+      else
+        ret = g_strdup ("device");
+    }
 
   return ret;
 }
