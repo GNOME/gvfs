@@ -57,6 +57,7 @@ struct _GVfsBackendGoogle
   GDataEntry *root;
   GHashTable *entries; /* gchar *entry_id -> GDataEntry */
   GHashTable *dir_entries; /* DirEntriesKey -> GDataEntry */
+  GHashTable *dir_timestamps; /* gchar *entry_id -> gint64 *timestamp */
   GHashTable *monitors;
   GList *dir_collisions;
   GRecMutex mutex; /* guards cache */
@@ -519,6 +520,8 @@ remove_dir (GVfsBackendGoogle *self,
   /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
   parent_id = g_strdup (gdata_entry_get_id (parent));
 
+  g_hash_table_remove (self->dir_timestamps, parent_id);
+
   g_hash_table_iter_init (&iter, self->entries);
   while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &entry))
     {
@@ -560,6 +563,18 @@ is_entry_valid (GDataEntry *entry)
   return (g_get_real_time () - *timestamp < REBUILD_ENTRIES_TIMEOUT * G_USEC_PER_SEC);
 }
 
+static gboolean
+is_dir_listing_valid (GVfsBackendGoogle *self, GDataEntry *parent)
+{
+  gint64 *timestamp;
+
+  timestamp = g_hash_table_lookup (self->dir_timestamps, gdata_entry_get_id (parent));
+  if (timestamp != NULL)
+    return (g_get_real_time () - *timestamp < REBUILD_ENTRIES_TIMEOUT * G_USEC_PER_SEC);
+
+  return FALSE;
+}
+
 static void
 rebuild_dir (GVfsBackendGoogle  *self,
              GDataEntry         *parent,
@@ -570,9 +585,10 @@ rebuild_dir (GVfsBackendGoogle  *self,
   GDataDocumentsQuery *query = NULL;
   gboolean succeeded_once = FALSE;
   gchar *search;
-  const gchar *parent_id;
+  gchar *parent_id;
 
-  parent_id = gdata_entry_get_id (parent);
+  /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
+  parent_id = g_strdup (gdata_entry_get_id (parent));
 
   search = g_strdup_printf ("'%s' in parents", parent_id);
   query = gdata_documents_query_new_with_limits (search, 1, MAX_RESULTS);
@@ -597,7 +613,13 @@ rebuild_dir (GVfsBackendGoogle  *self,
 
       if (!succeeded_once)
         {
+          gint64 *timestamp;
+
           remove_dir (self, parent);
+
+          timestamp = g_new (gint64, 1);
+          *timestamp = g_get_real_time ();
+          g_hash_table_insert (self->dir_timestamps, g_strdup (parent_id), timestamp);
 
           succeeded_once = TRUE;
         }
@@ -619,6 +641,7 @@ rebuild_dir (GVfsBackendGoogle  *self,
  out:
   g_clear_object (&feed);
   g_clear_object (&query);
+  g_free (parent_id);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -638,8 +661,8 @@ resolve_child (GVfsBackendGoogle  *self,
   parent_id = gdata_entry_get_id (parent);
   k = dir_entries_key_new (basename, parent_id);
   entry = g_hash_table_lookup (self->dir_entries, k);
-  // TODO: Rebuild only if dir listing is not valid
-  if (entry == NULL || !is_entry_valid (entry))
+  if ((entry == NULL && !is_dir_listing_valid (self, parent)) ||
+      (entry != NULL && !is_entry_valid (entry)))
     {
       rebuild_dir (self, parent, cancellable, &local_error);
       if (local_error != NULL)
@@ -649,11 +672,12 @@ resolve_child (GVfsBackendGoogle  *self,
         }
 
       entry = g_hash_table_lookup (self->dir_entries, k);
-      if (entry == NULL)
-        {
-          g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("No such file or directory"));
-          goto out;
-        }
+    }
+
+  if (entry == NULL)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("No such file or directory"));
+      goto out;
     }
 
  out:
@@ -1350,7 +1374,7 @@ g_vfs_backend_google_enumerate (GVfsBackend           *_self,
   GError *error;
   GHashTableIter iter;
   char *parent_path;
-  char *id;
+  char *id = NULL;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ enumerate: %s\n", filename);
@@ -1370,13 +1394,15 @@ g_vfs_backend_google_enumerate (GVfsBackend           *_self,
       goto out;
     }
 
-  // TODO: Rebuild only if dir listing is not valid
-  rebuild_dir (self, entry, cancellable, &error);
-  if (error != NULL)
+  if (!is_dir_listing_valid (self, entry))
     {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      goto out;
+      rebuild_dir (self, entry, cancellable, &error);
+      if (error != NULL)
+        {
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          goto out;
+        }
     }
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -2724,6 +2750,7 @@ g_vfs_backend_google_dispose (GObject *_self)
   g_clear_object (&self->client);
   g_clear_pointer (&self->entries, g_hash_table_unref);
   g_clear_pointer (&self->dir_entries, g_hash_table_unref);
+  g_clear_pointer (&self->dir_timestamps, g_hash_table_unref);
 
   G_OBJECT_CLASS (g_vfs_backend_google_parent_class)->dispose (_self);
 }
@@ -2782,6 +2809,7 @@ g_vfs_backend_google_init (GVfsBackendGoogle *self)
                                              entries_in_folder_equal,
                                              dir_entries_key_free,
                                              g_object_unref);
+  self->dir_timestamps = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
   self->monitors = g_hash_table_new (NULL, NULL);
   g_rec_mutex_init (&self->mutex);
 }
