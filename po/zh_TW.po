@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.11.3\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2018-07-30 15:26+0000\n"
-"PO-Revision-Date: 2018-08-13 19:50+0800\n"
+"POT-Creation-Date: 2018-08-13 11:53+0000\n"
+"PO-Revision-Date: 2018-08-21 23:53+0800\n"
 "Last-Translator: Cheng-Chia Tseng <pswo10680@gmail.com>\n"
 "Language-Team: Chinese (traditional)\n"
 "Language: zh_TW\n"
@@ -480,7 +480,7 @@ msgstr "不能將分享點移動至分享的目錄"
 
 #: daemon/gvfsafpvolume.c:1351
 msgid "Can’t move a shared directory into the Trash"
-msgstr "不能將分享的目錄移動至回收筒"
+msgstr "不能將分享的目錄移動至垃圾桶"
 
 #: daemon/gvfsafpvolume.c:1359
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
@@ -1733,17 +1733,17 @@ msgstr "Windows 分享檔案系統服務"
 
 #: daemon/gvfsbackendtrash.c:402 daemon/gvfsbackendtrash.c:461
 msgid "The trash folder may not be deleted"
-msgstr "回收筒資料來不能刪除"
+msgstr "垃圾桶資料來不能刪除"
 
 #: daemon/gvfsbackendtrash.c:422 daemon/gvfsbackendtrash.c:478
 msgid "Items in the trash may not be modified"
-msgstr "回收筒中的項目不能修改"
+msgstr "垃圾桶中的項目不能修改"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
 #: daemon/gvfsbackendtrash.c:780 daemon/gvfsbackendtrash.c:895
 msgid "Trash"
-msgstr "回收筒"
+msgstr "垃圾桶"
 
 #: daemon/gvfschannel.c:336
 msgid "Channel blocked"
