@@ -1809,6 +1809,10 @@ def start_dbus():
     # run local D-BUS; if we run this in a built tree, use our config to pick
     # up the built services, otherwise the standard session one
     if os.path.exists(dbus_conf):
+        # Prevent test failures caused by attempts to spawn monitors which are
+        # not available in our custom servicedir.
+        env['GVFS_MONITOR_DIR'] = os.path.dirname(dbus_conf)
+
         argv = ['dbus-daemon', '--config-file', dbus_conf, '--print-address=1']
     else:
         argv = ['dbus-daemon', '--session', '--print-address=1']
