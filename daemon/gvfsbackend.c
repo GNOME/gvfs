@@ -609,14 +609,17 @@ g_vfs_backend_invocation_first_handler (GVfsDBusMount *object,
 {
   GDBusConnection *connection;
   GCredentials *credentials;
+  pid_t pid = -1;
 
   connection = g_dbus_method_invocation_get_connection (invocation);
   credentials = g_dbus_connection_get_peer_credentials (connection);
+  if (credentials)
+    pid = g_credentials_get_unix_pid (credentials, NULL);
 
-  g_debug ("backend_dbus_handler %s:%s (pid=%u)\n",
+  g_debug ("backend_dbus_handler %s:%s (pid=%ld)\n",
            g_dbus_method_invocation_get_interface_name (invocation),
            g_dbus_method_invocation_get_method_name (invocation),
-           g_credentials_get_unix_pid (credentials, NULL));
+           (long)pid);
 
   if (backend->priv->block_requests)
     {
