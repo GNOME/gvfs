@@ -1,3 +1,7 @@
+Major changes in 1.38.0
+========================
+* Translation updates
+
 Major changes in 1.37.92
 ========================
 * udisks2: Use loop backing file as description for unlock
