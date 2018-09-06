@@ -57,8 +57,11 @@
 #include "gvfsutils.h"
 
 #include <nfsc/libnfs.h>
+#include <nfsc/libnfs-raw.h>
 #include <nfsc/libnfs-raw-nfs.h>
+#include <nfsc/libnfs-raw-nfs4.h>
 #include <nfsc/libnfs-raw-mount.h>
+
 
 struct _GVfsBackendNfs
 {
@@ -78,6 +81,15 @@ typedef struct
   gpointer tag;               /* tag for fd attached to this source */
   int events;                 /* IO events we're interested in */
 } NfsSource;
+
+struct sync_cb_data {
+	int is_finished;
+	int status;
+	uint64_t offset;
+	void *return_data;
+	int return_int;
+	const char *call;
+};
 
 G_DEFINE_TYPE (GVfsBackendNfs, g_vfs_backend_nfs, G_VFS_TYPE_BACKEND)
 
@@ -166,6 +178,82 @@ nfs_source_dispatch (GSource *source, GSourceFunc callback, gpointer user_data)
 }
 
 static void
+nfs_version_detect_cb (struct rpc_context *mount_context,
+                       int status,
+                       void *data,
+                       void *private_data)
+{
+  struct sync_cb_data *cb_data = private_data;
+
+	cb_data->is_finished = 1;
+	cb_data->status = status;
+	cb_data->return_data = NULL;
+}
+
+static void
+wait_for_reply (struct rpc_context *rpc, struct sync_cb_data *cb_data)
+{
+	struct pollfd pfd;
+	int revents;
+	int ret;
+
+	while (!cb_data->is_finished)
+    {
+		  pfd.fd      = rpc_get_fd (rpc);
+		  pfd.events  = rpc_which_events (rpc);
+		  pfd.revents = 0;
+
+		  ret = poll (&pfd, 1, 100);
+		  if (ret < 0)
+        {
+			    revents = -1;
+		    }
+      else
+        {
+			    revents = pfd.revents;
+		    }
+
+		  if (rpc_service (rpc, revents) < 0)
+        {
+			    cb_data->status = -EIO;
+			    break;
+		    }
+
+		  if (rpc_get_fd (rpc) == -1)
+        {
+			    break;
+		    }
+	  }
+}
+
+static int
+nfs_version_detect (const char *host)
+{
+  struct rpc_context *ctx;
+  struct sync_cb_data cb_data;
+  int version;
+
+  memset (&cb_data, 0, sizeof (cb_data));
+
+  ctx = rpc_init_context ();
+  rpc_connect_port_async (ctx, host, 2049, NFS4_PROGRAM, NFS_V4, nfs_version_detect_cb, &cb_data);
+
+  wait_for_reply (ctx, &cb_data);
+  rpc_destroy_context (ctx);
+
+  if (cb_data.status == RPC_STATUS_SUCCESS)
+    {
+      version = NFS_V4;
+    }
+  else
+    {
+      version = NFS_V3;
+    }
+
+  return version;
+}
+
+static void
 do_mount (GVfsBackend *backend,
           GVfsJobMount *job,
           GMountSpec *mount_spec,
@@ -179,7 +267,7 @@ do_mount (GVfsBackend *backend,
   struct exportnode *export_list, *ptr;
   const char *host, *debug;
   char *basename, *display_name, *export = NULL;
-  int err, debug_val;
+  int err, debug_val, nfs_ver;
   size_t pathlen = strlen (mount_spec->mount_prefix);
   size_t exportlen = SIZE_MAX;
   static GSourceFuncs nfs_source_callbacks = {
@@ -197,56 +285,72 @@ do_mount (GVfsBackend *backend,
                         _("No hostname specified"));
       return;
     }
-  export_list = mount_getexports (host);
 
-  /* Find the shortest matching mount. E.g. if the given mount_prefix is
-   * /some/long/path and there exist two mounts, /some and /some/long, match
-   * against /some. */
-  for (ptr = export_list; ptr; ptr = ptr->ex_next)
+  nfs_ver = nfs_version_detect (host);
+
+  if (nfs_ver == NFS_V4)
     {
-      /* First check that the NFS mount point is a prefix of the mount_prefix. */
-      if (g_str_has_prefix (mount_spec->mount_prefix, ptr->ex_dir))
-        {
-          size_t this_exportlen = strlen (ptr->ex_dir);
+      export = strdup ("/");
+    }
+  else
+    {
+      export_list = mount_getexports (host);
 
-          /* Check if the mount_prefix is longer than the NFS mount point.
-           * E.g. mount_prefix: /mnt/file, mount point: /mnt */
-          if (pathlen > this_exportlen)
+      /* Find the shortest matching mount. E.g. if the given mount_prefix is
+       * /some/long/path and there exist two mounts, /some and /some/long, match
+       * against /some. */
+      for (ptr = export_list; ptr; ptr = ptr->ex_next)
+        {
+          /* First check that the NFS mount point is a prefix of the mount_prefix. */
+          if (g_str_has_prefix (mount_spec->mount_prefix, ptr->ex_dir))
             {
-              /* Check if the mount_prefix has a slash at the correct point.
-               * E.g. if the mount point is /mnt, then it's a match if the
-               * mount_prefix is /mnt/a but not a match if the mount_prefix is
-               * /mnta.  Choose it if it is the shortest found so far. */
-              char *s = mount_spec->mount_prefix + this_exportlen;
-              if (*s == '/' && this_exportlen < exportlen)
+              size_t this_exportlen = strlen (ptr->ex_dir);
+
+              /* Check if the mount_prefix is longer than the NFS mount point.
+               * E.g. mount_prefix: /mnt/file, mount point: /mnt */
+              if (pathlen > this_exportlen)
+                {
+                  /* Check if the mount_prefix has a slash at the correct point.
+                   * E.g. if the mount point is /mnt, then it's a match if the
+                   * mount_prefix is /mnt/a but not a match if the mount_prefix is
+                   * /mnta.  Choose it if it is the shortest found so far. */
+                  char *s = mount_spec->mount_prefix + this_exportlen;
+                  if (*s == '/' && this_exportlen < exportlen)
+                    {
+                      export = ptr->ex_dir;
+                      exportlen = this_exportlen;
+                    }
+                }
+              /* The mount_prefix and NFS mount point are identical.  Choose it if
+               * it is the shortest found so far. */
+              else if (this_exportlen < exportlen)
                 {
                   export = ptr->ex_dir;
                   exportlen = this_exportlen;
                 }
             }
-          /* The mount_prefix and NFS mount point are identical.  Choose it if
-           * it is the shortest found so far. */
-          else if (this_exportlen < exportlen)
-            {
-              export = ptr->ex_dir;
-              exportlen = this_exportlen;
-            }
         }
-    }
 
-  if (!export)
-    {
+      if (!export)
+        {
+          mount_free_export_list (export_list);
+          g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                    G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                    _("Mount point does not exist"));
+          return;
+        }
+
+
+      export = strdup (export);
       mount_free_export_list (export_list);
-      g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                _("Mount point does not exist"));
-      return;
     }
-
-  export = strdup (export);
-  mount_free_export_list (export_list);
 
   op_backend->ctx = nfs_init_context ();
+
+  if (nfs_ver == NFS_V4)
+    {
+      nfs_set_version (op_backend->ctx, NFS_V4);
+    }
 
   debug = g_getenv ("GVFS_NFS_DEBUG");
   if (debug)
