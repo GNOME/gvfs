@@ -377,6 +377,20 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
+  if (nfs_ver == NFS_V4)
+  {
+    struct nfs_stat_64 st;
+    err = nfs_stat64 (op_backend->ctx, mount_spec->mount_prefix, &st);
+
+    if (err)
+    {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                _("Mount point does not exist"));
+      return;
+    }
+  }
+
   source = g_source_new (&nfs_source_callbacks, sizeof (NfsSource));
   nfs_source = (NfsSource *) source;
   nfs_source->ctx = op_backend->ctx;
@@ -523,8 +537,6 @@ try_read (GVfsBackend *backend,
 {
   GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (backend);
   struct nfsfh *fh = _handle;
-
-  printf("try_read\n");
 
   nfs_read_async (op_backend->ctx, fh, bytes_requested, read_cb, job);
   return TRUE;
