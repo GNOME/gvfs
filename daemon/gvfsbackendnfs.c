@@ -447,9 +447,9 @@ open_for_read_fstat_cb (int err,
   if (err == 0)
     {
       GVfsJobOpenForRead *op_job = G_VFS_JOB_OPEN_FOR_READ (job);
-      struct stat *st = data;
+      struct nfs_stat_64 *st = data;
 
-      if (S_ISDIR (st->st_mode))
+      if (S_ISDIR (st->nfs_mode))
         {
           struct nfsfh *fh = op_job->backend_handle;
 
@@ -476,7 +476,7 @@ open_for_read_cb (int err,
       g_vfs_job_open_for_read_set_handle (op_job, data);
       g_vfs_job_open_for_read_set_can_seek (op_job, TRUE);
 
-      nfs_fstat_async (ctx, data, open_for_read_fstat_cb, private_data);
+      nfs_fstat64_async (ctx, data, open_for_read_fstat_cb, private_data);
     }
   else
     {
@@ -523,6 +523,8 @@ try_read (GVfsBackend *backend,
 {
   GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (backend);
   struct nfsfh *fh = _handle;
+
+  printf("try_read\n");
 
   nfs_read_async (op_backend->ctx, fh, bytes_requested, read_cb, job);
   return TRUE;
