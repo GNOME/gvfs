@@ -139,7 +139,7 @@ gudev_add_device (GMtpVolumeMonitor *monitor, GUdevDevice *device, gboolean do_e
   GList *l;
   GMtpVolume *volume;
   const char *usb_serial_id, *device_path;
-  char *uri;
+  char *uri, *usb_serial_id_escaped;
   GFile *activation_mount_root;
   gboolean serial_conflict = FALSE;
 
@@ -160,9 +160,11 @@ gudev_add_device (GMtpVolumeMonitor *monitor, GUdevDevice *device, gboolean do_e
     return;
   }
 
-  uri = g_strdup_printf ("mtp://%s", usb_serial_id);
+  usb_serial_id_escaped = g_uri_escape_string (usb_serial_id, NULL, FALSE);
+  uri = g_strdup_printf ("mtp://%s", usb_serial_id_escaped);
   activation_mount_root = g_file_new_for_uri (uri);
   g_free (uri);
+  g_free (usb_serial_id_escaped);
 
   /*
    * We do not support plugging in multiple devices that lack proper serial
