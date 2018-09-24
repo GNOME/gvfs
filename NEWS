@@ -1,3 +1,11 @@
+Major changes in 1.38.1
+========================
+* gphoto2: Fix mounting for devices with special chars in ID_SERIAL
+* mtp: Fix mounting for devices with special chars in ID_SERIAL
+* smbbrowse: Force NT1 protocol version for workgroup support
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.38.0
 ========================
 * Translation updates
