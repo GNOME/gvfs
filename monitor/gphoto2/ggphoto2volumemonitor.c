@@ -140,7 +140,7 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
     GList *store_heads, *l;
     guint num_store_heads;
     const char *usb_bus_num, *usb_device_num, *usb_serial_id, *device_path;
-    gchar *prefix;
+    gchar *prefix, *usb_serial_id_escaped;
     GFile *mount_prefix;
     gboolean serial_conflict = FALSE;
 
@@ -185,7 +185,8 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
         return;
       }
 
-    prefix = g_strdup_printf ("gphoto2://%s", usb_serial_id);
+    usb_serial_id_escaped = g_uri_escape_string (usb_serial_id, NULL, FALSE);
+    prefix = g_strdup_printf ("gphoto2://%s", usb_serial_id_escaped);
     mount_prefix = g_file_new_for_uri (prefix);
     g_free (prefix);
 
@@ -218,6 +219,7 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
         g_warning ("device %s has an identical ID_SERIAL value to an "
                    "existing device. Multiple devices are not supported.",
                    g_udev_device_get_device_file (device));
+        g_free (usb_serial_id_escaped);
         return;
       }
 
@@ -239,11 +241,11 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
          */
         if (num_store_heads == 1)
           {
-            uri = g_strdup_printf ("gphoto2://%s", usb_serial_id);
+            uri = g_strdup_printf ("gphoto2://%s", usb_serial_id_escaped);
           }
         else
           {
-            uri = g_strdup_printf ("gphoto2://%s/%s", usb_serial_id,
+            uri = g_strdup_printf ("gphoto2://%s/%s", usb_serial_id_escaped,
                                    store_path[0] == '/' ? store_path + 1 : store_path);
           }
         g_debug ("gudev_add_camera: ... adding URI for storage head: %s", uri);
@@ -266,6 +268,7 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
       }
 
     g_list_free_full (store_heads, g_free);
+    g_free (usb_serial_id_escaped);
 }
 
 static void
