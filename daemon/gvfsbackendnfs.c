@@ -345,11 +345,7 @@ do_mount (GVfsBackend *backend,
     }
 
   op_backend->ctx = nfs_init_context ();
-
-  if (nfs_ver == NFS_V4)
-    {
-      nfs_set_version (op_backend->ctx, NFS_V4);
-    }
+  nfs_set_version (op_backend->ctx, nfs_ver);
 
   debug = g_getenv ("GVFS_NFS_DEBUG");
   if (debug)
