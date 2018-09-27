@@ -62,7 +62,6 @@
 #include <nfsc/libnfs-raw-nfs4.h>
 #include <nfsc/libnfs-raw-mount.h>
 
-
 struct _GVfsBackendNfs
 {
   GVfsBackend parent_instance;
@@ -83,12 +82,12 @@ typedef struct
 } NfsSource;
 
 struct sync_cb_data {
-	int is_finished;
-	int status;
-	uint64_t offset;
-	void *return_data;
-	int return_int;
-	const char *call;
+    int is_finished;
+    int status;
+    uint64_t offset;
+    void *return_data;
+    int return_int;
+    const char *call;
 };
 
 G_DEFINE_TYPE (GVfsBackendNfs, g_vfs_backend_nfs, G_VFS_TYPE_BACKEND)
@@ -185,45 +184,45 @@ nfs_version_detect_cb (struct rpc_context *mount_context,
 {
   struct sync_cb_data *cb_data = private_data;
 
-	cb_data->is_finished = 1;
-	cb_data->status = status;
-	cb_data->return_data = NULL;
+    cb_data->is_finished = 1;
+    cb_data->status = status;
+    cb_data->return_data = NULL;
 }
 
 static void
 wait_for_reply (struct rpc_context *rpc, struct sync_cb_data *cb_data)
 {
-	struct pollfd pfd;
-	int revents;
-	int ret;
+    struct pollfd pfd;
+    int revents;
+    int ret;
 
-	while (!cb_data->is_finished)
+    while (!cb_data->is_finished)
     {
-		  pfd.fd      = rpc_get_fd (rpc);
-		  pfd.events  = rpc_which_events (rpc);
-		  pfd.revents = 0;
+          pfd.fd      = rpc_get_fd (rpc);
+          pfd.events  = rpc_which_events (rpc);
+          pfd.revents = 0;
 
-		  ret = poll (&pfd, 1, 100);
-		  if (ret < 0)
+          ret = poll (&pfd, 1, 100);
+          if (ret < 0)
         {
-			    revents = -1;
-		    }
+                revents = -1;
+            }
       else
         {
-			    revents = pfd.revents;
-		    }
+                revents = pfd.revents;
+            }
 
-		  if (rpc_service (rpc, revents) < 0)
+          if (rpc_service (rpc, revents) < 0)
         {
-			    cb_data->status = -EIO;
-			    break;
-		    }
+                cb_data->status = -EIO;
+                break;
+            }
 
-		  if (rpc_get_fd (rpc) == -1)
+          if (rpc_get_fd (rpc) == -1)
         {
-			    break;
-		    }
-	  }
+                break;
+            }
+      }
 }
 
 static int
