@@ -192,36 +192,36 @@ nfs_version_detect_cb (struct rpc_context *mount_context,
 static void
 wait_for_reply (struct rpc_context *rpc, struct sync_cb_data *cb_data)
 {
-    struct pollfd pfd;
-    int revents;
-    int ret;
+  struct pollfd pfd;
+  int revents;
+  int ret;
 
-    while (!cb_data->is_finished)
+  while (!cb_data->is_finished)
     {
-          pfd.fd      = rpc_get_fd (rpc);
-          pfd.events  = rpc_which_events (rpc);
-          pfd.revents = 0;
+      pfd.fd = rpc_get_fd (rpc);
+      pfd.events  = rpc_which_events (rpc);
+      pfd.revents = 0;
 
-          ret = poll (&pfd, 1, 100);
-          if (ret < 0)
+      ret = poll (&pfd, 1, 100);
+      if (ret < 0)
         {
-                revents = -1;
-            }
+          revents = -1;
+        }
       else
         {
-                revents = pfd.revents;
-            }
+          revents = pfd.revents;
+        }
 
-          if (rpc_service (rpc, revents) < 0)
+        if (rpc_service (rpc, revents) < 0)
         {
-                cb_data->status = -EIO;
-                break;
-            }
+          cb_data->status = -EIO;
+          break;
+        }
 
-          if (rpc_get_fd (rpc) == -1)
+        if (rpc_get_fd (rpc) == -1)
         {
-                break;
-            }
+          break;
+        }
       }
 }
 
