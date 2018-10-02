@@ -81,13 +81,14 @@ typedef struct
   int events;                 /* IO events we're interested in */
 } NfsSource;
 
-struct sync_cb_data {
-    int is_finished;
-    int status;
-    uint64_t offset;
-    void *return_data;
-    int return_int;
-    const char *call;
+struct sync_cb_data
+{
+  int is_finished;
+  int status;
+  uint64_t offset;
+  void *return_data;
+  int return_int;
+  const char *call;
 };
 
 G_DEFINE_TYPE (GVfsBackendNfs, g_vfs_backend_nfs, G_VFS_TYPE_BACKEND)
@@ -184,9 +185,9 @@ nfs_version_detect_cb (struct rpc_context *mount_context,
 {
   struct sync_cb_data *cb_data = private_data;
 
-    cb_data->is_finished = 1;
-    cb_data->status = status;
-    cb_data->return_data = NULL;
+  cb_data->is_finished = 1;
+  cb_data->status = status;
+  cb_data->return_data = NULL;
 }
 
 static void
@@ -199,7 +200,7 @@ wait_for_reply (struct rpc_context *rpc, struct sync_cb_data *cb_data)
   while (!cb_data->is_finished)
     {
       pfd.fd = rpc_get_fd (rpc);
-      pfd.events  = rpc_which_events (rpc);
+      pfd.events = rpc_which_events (rpc);
       pfd.revents = 0;
 
       ret = poll (&pfd, 1, 100);
@@ -212,17 +213,17 @@ wait_for_reply (struct rpc_context *rpc, struct sync_cb_data *cb_data)
           revents = pfd.revents;
         }
 
-        if (rpc_service (rpc, revents) < 0)
+      if (rpc_service (rpc, revents) < 0)
         {
           cb_data->status = -EIO;
           break;
         }
 
-        if (rpc_get_fd (rpc) == -1)
+      if (rpc_get_fd (rpc) == -1)
         {
           break;
         }
-      }
+    }
 }
 
 static int
@@ -335,7 +336,7 @@ do_mount (GVfsBackend *backend,
           mount_free_export_list (export_list);
           g_vfs_job_failed_literal (G_VFS_JOB (job),
                                     G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                    _("Mount point does not exist"));
+                                    _ ("Mount point does not exist"));
           return;
         }
 
@@ -373,18 +374,18 @@ do_mount (GVfsBackend *backend,
     }
 
   if (nfs_ver == NFS_V4)
-  {
-    struct nfs_stat_64 st;
-    err = nfs_stat64 (op_backend->ctx, mount_spec->mount_prefix, &st);
-
-    if (err)
     {
-      g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                                _("Mount point does not exist"));
-      return;
+      struct nfs_stat_64 st;
+      err = nfs_stat64 (op_backend->ctx, mount_spec->mount_prefix, &st);
+
+      if (err)
+        {
+          g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                    G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                    _ ("Mount point does not exist"));
+          return;
+        }
     }
-  }
 
   source = g_source_new (&nfs_source_callbacks, sizeof (NfsSource));
   nfs_source = (NfsSource *) source;
