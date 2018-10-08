@@ -1,3 +1,14 @@
+Major changes in 1.39.1
+=======================
+* google: Rework cache for better performance
+* google: Add support for files with multiple parents
+* udisks2: Add a new volume class `loop`
+* gphoto2: Fix mounting for devices with special chars in ID_SERIAL
+* mtp: Fix mounting for devices with special chars in ID_SERIAL
+* smbbrowse: Force NT1 protocol version for workgroup support
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.38.0
 ========================
 * Translation updates
