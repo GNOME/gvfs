@@ -1881,6 +1881,8 @@ do_mount (GVfsBackend  *backend,
   session = G_VFS_BACKEND_HTTP (backend)->session;
   G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base; 
 
+  soup_session_add_feature_by_type (session, SOUP_TYPE_AUTH_NEGOTIATE);
+
   /* Override the HTTP backend's default. */
   g_object_set (session,
                 "ssl-strict", TRUE,
