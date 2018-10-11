@@ -73,6 +73,7 @@ typedef void (*MountCallback) (VfsMountable *mountable,
 
 static GList *mountables = NULL;
 static GList *mounts = NULL;
+static GList *pending = NULL;
 
 static gboolean fuse_available;
 
@@ -268,10 +269,58 @@ mount_data_free (MountData *data)
   g_free (data);
 }
 
+static int
+pending_compare (MountData *a, MountData *b)
+{
+  return g_mount_spec_equal (a->mount_spec, b->mount_spec) ? 0 : 1;
+}
+
+static void
+pending_remove (MountData *data, GError *error)
+{
+  GList *l, *next;
+  MountData *pending_data;
+
+  pending = g_list_remove (pending, data);
+
+  l = pending;
+  while (l != NULL)
+    {
+      next = l->next;
+      pending_data = l->data;
+
+      if (g_mount_spec_equal (pending_data->mount_spec, data->mount_spec))
+        {
+          pending_data->callback (pending_data->mountable, error, pending_data->user_data);
+          mount_data_free (pending_data);
+
+          pending = g_list_delete_link (pending, l);
+        }
+
+      l = next;
+    }
+}
+
+static gboolean
+pending_append (MountData *data)
+{
+  gboolean is_pending = FALSE;
+
+  if (g_list_find_custom (pending, data, (GCompareFunc) pending_compare) != NULL)
+    is_pending = TRUE;
+
+  pending = g_list_append (pending, data);
+
+  return is_pending;
+}
+
 static void
 mount_finish (MountData *data, GError *error)
 {
   data->callback (data->mountable, error, data->user_data);
+
+  pending_remove (data, error);
+
   mount_data_free (data);
 }
 
@@ -501,6 +550,9 @@ mountable_mount (VfsMountable *mountable,
   data->mount_spec = g_mount_spec_ref (mount_spec);
   data->callback = callback;
   data->user_data = user_data;
+
+  if (pending_append (data))
+    return;
 
   if (mountable->dbus_name == NULL)
     spawn_mount (data);
