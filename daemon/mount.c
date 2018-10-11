@@ -73,6 +73,7 @@ typedef void (*MountCallback) (VfsMountable *mountable,
 
 static GList *mountables = NULL;
 static GList *mounts = NULL;
+static GList *ongoing = NULL;
 
 static gboolean fuse_available;
 
@@ -253,6 +254,7 @@ typedef struct {
   char *obj_path;
   gboolean spawned;
   GVfsDBusSpawner *spawner;
+  GList *pending; /* MountData */
 } MountData;
 
 static void spawn_mount (MountData *data);
@@ -264,6 +266,7 @@ mount_data_free (MountData *data)
   g_mount_spec_unref (data->mount_spec);
   g_free (data->obj_path);
   g_clear_object (&data->spawner);
+  g_list_free_full (data->pending, (GDestroyNotify) mount_data_free);
 
   g_free (data);
 }
@@ -271,7 +274,17 @@ mount_data_free (MountData *data)
 static void
 mount_finish (MountData *data, GError *error)
 {
+  GList *l;
+
+  ongoing = g_list_remove (ongoing, data);
+
   data->callback (data->mountable, error, data->user_data);
+  for (l = data->pending; l != NULL; l = l->next)
+    {
+      MountData *pending_data = l->data;
+      pending_data->callback (pending_data->mountable, error, pending_data->user_data);
+    }
+
   mount_data_free (data);
 }
 
@@ -493,6 +506,7 @@ mountable_mount (VfsMountable *mountable,
 		 gpointer user_data)
 {
   MountData *data;
+  GList *l;
 
   data = g_new0 (MountData, 1);
   data->automount = automount;
@@ -501,6 +515,18 @@ mountable_mount (VfsMountable *mountable,
   data->mount_spec = g_mount_spec_ref (mount_spec);
   data->callback = callback;
   data->user_data = user_data;
+
+  for (l = ongoing; l != NULL; l = l->next)
+    {
+      MountData *ongoing_data = l->data;
+      if (g_mount_spec_equal (ongoing_data->mount_spec, mount_spec))
+        {
+          ongoing_data->pending = g_list_append (ongoing_data->pending, data);
+          return;
+        }
+    }
+
+  ongoing = g_list_append (ongoing, data);
 
   if (mountable->dbus_name == NULL)
     spawn_mount (data);
