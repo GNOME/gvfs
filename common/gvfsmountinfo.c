@@ -107,7 +107,7 @@ on_autorun_loaded (GObject      *source_object,
        * has a comma at the end
        **/
       icon_regex = g_regex_new ("icon\\s*=\\s*+([^,\\r\\n]+)",
-                                G_REGEX_CASELESS, 0, NULL);
+                                G_REGEX_CASELESS | G_REGEX_RAW, 0, NULL);
       g_regex_match (icon_regex, content, 0,
                      &match_info);
 
