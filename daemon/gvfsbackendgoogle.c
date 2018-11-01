@@ -789,6 +789,41 @@ resolve_dir (GVfsBackendGoogle  *self,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+#define HELPER_PREFIX "<!-- gvfsd-google "
+#define HELPER_SUFFIX " -->"
+#define MAX_ID_LENGTH 44
+
+static gchar *
+generate_helper_data (GDataEntry *entry, goffset *size)
+{
+  GDataLink *alternate;
+  const gchar *title, *uri, *id;
+  gchar *data;
+
+  id = gdata_entry_get_id (entry);
+  title = gdata_entry_get_title (entry);
+  alternate = gdata_entry_look_up_link (entry, GDATA_LINK_ALTERNATE);
+  uri = gdata_link_get_uri (alternate);
+
+  data = g_strdup_printf (HELPER_PREFIX "%s" HELPER_SUFFIX "\n"
+                          "<!DOCTYPE html>\n"
+                          "<html>\n"
+                          "  <head>\n"
+                          "    <meta http-equiv=\"refresh\" content=\"0; url=%s\">\n"
+                          "    <title>%s</title>\n"
+                          "  </head>\n"
+                          "  <body>\n"
+                          "    <a href=\"%s\">%s</a>\n"
+                          "  </body>\n"
+                          "</html>\n",
+                          id, uri, title, uri, title);
+
+  if (size)
+    *size = strlen (data);
+
+  return data;
+}
+
 static char *
 get_extension_offset (const char *title)
 {
@@ -897,6 +932,7 @@ build_file_info (GVfsBackendGoogle      *self,
   gchar *escaped_name = NULL;
   gchar *content_type = NULL;
   gchar *copy_name = NULL;
+  gchar *generated_copy_name = NULL;
   gchar *symlink_name = NULL;
   gint64 atime;
   gint64 ctime;
@@ -924,6 +960,7 @@ build_file_info (GVfsBackendGoogle      *self,
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, !is_root);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, !is_native_file (entry));
 
   if (is_folder)
     {
@@ -1008,7 +1045,16 @@ build_file_info (GVfsBackendGoogle      *self,
   g_file_info_set_display_name (info, title);
   g_file_info_set_edit_name (info, title);
 
-  copy_name = generate_copy_name (self, entry, entry_path);
+  generated_copy_name = generate_copy_name (self, entry, entry_path);
+  if (is_native_file (entry))
+    {
+      copy_name = g_strconcat (generated_copy_name, ".html", NULL);
+    }
+  else
+    {
+      copy_name = generated_copy_name;
+      generated_copy_name = NULL;
+    }
 
   /* Sanitize copy-name by replacing slashes with dashes. This is
    * what nautilus does (for desktop files).
@@ -1067,6 +1113,7 @@ build_file_info (GVfsBackendGoogle      *self,
  out:
   g_free (symlink_name);
   g_free (copy_name);
+  g_free (generated_copy_name);
   g_free (escaped_name);
   g_free (content_type);
 }
@@ -2146,7 +2193,6 @@ g_vfs_backend_google_open_for_read (GVfsBackend        *_self,
   GError *error;
   gchar *content_type = NULL;
   gchar *entry_path = NULL;
-  GDataAuthorizationDomain *auth_domain;
   const gchar *uri;
 
   g_rec_mutex_lock (&self->mutex);
@@ -2178,17 +2224,24 @@ g_vfs_backend_google_open_for_read (GVfsBackend        *_self,
 
   if (is_native_file (entry))
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE, _("File is not a regular file"));
-      goto out;
-    }
+      gchar *data;
+      goffset size;
 
-  auth_domain = gdata_documents_service_get_primary_authorization_domain ();
-  uri = gdata_entry_get_content_uri (entry);
-  stream = gdata_download_stream_new (GDATA_SERVICE (self->service), auth_domain, uri, cancellable);
-  if (stream == NULL)
+      data = generate_helper_data (entry, &size);
+      stream = g_memory_input_stream_new_from_data (data, size, g_free);
+    }
+  else
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED, _("Error getting data from file"));
-      goto out;
+      GDataAuthorizationDomain *auth_domain;
+
+      auth_domain = gdata_documents_service_get_primary_authorization_domain ();
+      uri = gdata_entry_get_content_uri (entry);
+      stream = gdata_download_stream_new (GDATA_SERVICE (self->service), auth_domain, uri, cancellable);
+      if (stream == NULL)
+        {
+          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED, _("Error getting data from file"));
+          goto out;
+        }
     }
 
   g_object_set_data_full (G_OBJECT (stream), "g-vfs-backend-google-entry", g_object_ref (entry), g_object_unref);
