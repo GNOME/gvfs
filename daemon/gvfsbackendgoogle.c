@@ -969,23 +969,16 @@ build_file_info (GVfsBackendGoogle      *self,
     }
   else
     {
-      content_type = get_content_type_from_entry (entry);
       file_type = G_FILE_TYPE_REGULAR;
 
       /* We want native Drive content to open in the browser. */
       if (is_native_file (entry))
         {
-          GDataLink *alternate;
-          const gchar *uri;
-
-          file_type = G_FILE_TYPE_SHORTCUT;
-          alternate = gdata_entry_look_up_link (entry, GDATA_LINK_ALTERNATE);
-          uri = gdata_link_get_uri (alternate);
-          g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI, uri);
+          content_type =  g_strdup ("text/html");
         }
       else
         {
-          goffset size;
+          content_type = get_content_type_from_entry (entry);
 
 #if HAVE_LIBGDATA_0_17_7
           size = gdata_documents_entry_get_file_size (GDATA_DOCUMENTS_ENTRY (entry));
