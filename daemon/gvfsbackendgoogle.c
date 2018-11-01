@@ -969,12 +969,15 @@ build_file_info (GVfsBackendGoogle      *self,
     }
   else
     {
+      goffset size;
+
       file_type = G_FILE_TYPE_REGULAR;
 
       /* We want native Drive content to open in the browser. */
       if (is_native_file (entry))
         {
           content_type =  g_strdup ("text/html");
+          g_free (generate_helper_data (entry, &size));
         }
       else
         {
@@ -985,8 +988,9 @@ build_file_info (GVfsBackendGoogle      *self,
 #else
           size = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (entry));
 #endif
-          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE, (guint64) size);
         }
+
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE, (guint64) size);
     }
 
   if (is_symlink)
