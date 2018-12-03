@@ -110,6 +110,12 @@ gvfs_udisks2_utils_lookup_fstab_options_value (const gchar *fstab_options,
       const gchar *start;
       guint n;
 
+      /* The code doesn't care about prefix, which may cause problems for
+       * options like "auto" and "noauto". However, this function is only used
+       * with our "x-gvfs-*" options, where mentioned problems are unlikely.
+       * Be careful, that some people rely on this bug and use "comment=x-gvfs-*"
+       * as workaround, see: https://gitlab.gnome.org/GNOME/gvfs/issues/348
+       */
       start = strstr (fstab_options, key);
       if (start != NULL)
         {
