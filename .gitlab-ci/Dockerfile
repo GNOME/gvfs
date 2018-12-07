@@ -5,9 +5,8 @@ RUN dnf install -y avahi-devel avahi-glib-devel dbus-glib-devel docbook-style-xs
 
 RUN dnf install -y --best elfutils-libelf-devel gamin-devel gcc gcc-c++ gdbm gettext git glibc-devel glibc-headers gtk-doc libattr-devel libffi-devel libmount-devel libselinux-devel ninja-build pcre-devel python3-devel systemtap-sdt-devel zlib-devel \
  && dnf clean all \
- && git clone https://gitlab.gnome.org/GNOME/glib.git \
+ && git clone --depth 1 https://gitlab.gnome.org/GNOME/glib.git \
  && cd glib \
- && git checkout a48692300194470f7b77ee0767a9104380d1c83c \
  && meson . _build --prefix=/usr \
  && ninja -C _build \
  && ninja -C _build install \

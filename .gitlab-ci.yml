@@ -1,4 +1,4 @@
-image: registry.gitlab.gnome.org/gnome/gvfs/master:v2
+image: registry.gitlab.gnome.org/gnome/gvfs/master:v3
 
 build:
     stage: build
