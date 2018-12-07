@@ -1,10 +1,12 @@
 #!/bin/bash
 
-set -ve
+TAG="registry.gitlab.gnome.org/gnome/gvfs/master:v3"
 
-TAG="registry.gitlab.gnome.org/gnome/gvfs/master:v2"
+if [[ "$1" == "--no-cache" ]]; then
+  NOCACHE="--no-cache"
+fi
 
-docker build -t $TAG .
+docker build $NOCACHE -t $TAG .
 
 if [[ "$1" == "--push" ]]; then
   docker login registry.gitlab.gnome.org
