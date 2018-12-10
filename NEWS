@@ -1,3 +1,12 @@
+Major changes in 1.39.3
+=======================
+* udisks2: Improve handling of mounts which doesn't point into fs root
+* udisks2: Restore support of comment=x-gvfs-* option
+* daemon: Prevent spawning new daemons if outgoing operation exists
+* common: Prevent crashes on invalid autorun file
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.39.1
 =======================
 * google: Rework cache for better performance
