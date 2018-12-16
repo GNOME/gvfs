@@ -88,14 +88,14 @@ typedef struct _GVfsBackendNetwork GVfsBackendNetwork;
 G_DEFINE_TYPE (GVfsBackendNetwork, g_vfs_backend_network, G_VFS_TYPE_BACKEND);
 
 static NetworkFile *
-network_file_new (const char *file_name, 
-                  const char *display_name, 
-                  const char *target_uri, 
+network_file_new (const char *file_name,
+                  const char *display_name,
+                  const char *target_uri,
                   GIcon      *icon,
                   GIcon      *symbolic_icon)
 {
   NetworkFile *file;
-  
+
   file = g_slice_new0 (NetworkFile);
 
   file->file_name = g_strdup (file_name);
@@ -113,7 +113,7 @@ network_file_free (NetworkFile *file)
   g_free (file->file_name);
   g_free (file->display_name);
   g_free (file->target_uri);
- 
+
   if (file->icon)
     g_object_unref (file->icon);
   if (file->symbolic_icon)
@@ -261,7 +261,7 @@ update_from_files (GVfsBackendNetwork *backend,
           old = oldl->data;
           cmp = sort_file_by_file_name (old, new);
         }
-      
+
       if (cmp == 0)
         {
           if (!network_file_equal (old, new))
@@ -273,7 +273,7 @@ update_from_files (GVfsBackendNetwork *backend,
                                         NULL);
               g_free (file_name);
             }
-          
+
           oldl = oldl->next;
           newl = newl->next;
         }
@@ -303,11 +303,11 @@ update_from_files (GVfsBackendNetwork *backend,
 }
 
 static void
-notify_dnssd_local_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
+notify_dnssd_local_changed (GFileMonitor *monitor, GFile *file, GFile *other_file,
                             GFileMonitorEvent event_type, gpointer user_data);
 
 static void
-notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
+notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file,
                           GFileMonitorEvent event_type, gpointer user_data);
 
 static void
@@ -324,10 +324,10 @@ recompute_files (GVfsBackendNetwork *backend)
 
   files = NULL;
   error = NULL;
-  if (backend->have_smb) 
+  if (backend->have_smb)
     {
       char *workgroup;
-      
+
       /* smb:/// root link */
       file = network_file_new ("smb-root",
                                _("Windows Network"),
@@ -338,9 +338,9 @@ recompute_files (GVfsBackendNetwork *backend)
 
       if (backend->current_workgroup == NULL ||
           backend->current_workgroup[0] == 0)
-        workgroup = g_strconcat ("smb://", DEFAULT_WORKGROUP_NAME, "/", NULL);  
-      else 
-        workgroup = g_strconcat ("smb://", backend->current_workgroup, "/", NULL);    
+        workgroup = g_strconcat ("smb://", DEFAULT_WORKGROUP_NAME, "/", NULL);
+      else
+        workgroup = g_strconcat ("smb://", backend->current_workgroup, "/", NULL);
 
       server_file = g_file_new_for_uri (workgroup);
 
@@ -348,27 +348,27 @@ recompute_files (GVfsBackendNetwork *backend)
       if (backend->smb_monitor == NULL)
         {
           monitor = g_file_monitor_directory (server_file, G_FILE_MONITOR_NONE, NULL, &error);
-          if (monitor) 
+          if (monitor)
             {
-              g_signal_connect (monitor, "changed", 
-                                (GCallback)notify_smb_files_changed, (gpointer)backend); 
+              g_signal_connect (monitor, "changed",
+                                (GCallback)notify_smb_files_changed, (gpointer)backend);
               /* takes ref */
               backend->smb_monitor = monitor;
             }
           else
             {
-	      char *uri = g_file_get_uri (server_file);
+              char *uri = g_file_get_uri (server_file);
               g_debug ("Couldn't create directory monitor on %s. Error: %s\n",
                        uri, error ? error->message : "");
-	      g_free (uri);
+              g_free (uri);
               g_clear_error (&error);
             }
         }
 
       /* children of current workgroup */
-      enumer = g_file_enumerate_children (server_file, 
-                                          NETWORK_FILE_ATTRIBUTES, 
-                                          G_FILE_QUERY_INFO_NONE, 
+      enumer = g_file_enumerate_children (server_file,
+                                          NETWORK_FILE_ATTRIBUTES,
+                                          G_FILE_QUERY_INFO_NONE,
                                           NULL, NULL);
 
       if (enumer != NULL)
@@ -378,9 +378,9 @@ recompute_files (GVfsBackendNetwork *backend)
             {
               file_name = g_strconcat("smb-server-", g_file_info_get_name (info), NULL);
               link_uri = g_strconcat("smb://", g_file_info_get_name (info), "/", NULL);
-              file = network_file_new (file_name, 
-                                       g_file_info_get_display_name (info), 
-                                       link_uri, 
+              file = network_file_new (file_name,
+                                       g_file_info_get_display_name (info),
+                                       link_uri,
                                        backend->server_icon,
                                        backend->server_symbolic_icon);
               files = g_list_prepend (files, file);
@@ -404,31 +404,31 @@ recompute_files (GVfsBackendNetwork *backend)
       server_file = g_file_new_for_uri ("dns-sd://local/");
       /* create directory monitor if we haven't already */
       if (backend->dnssd_monitor == NULL)
-	{
-	  monitor = g_file_monitor_directory (server_file, G_FILE_MONITOR_NONE, NULL, &error);
-	  if (monitor) 
-	    {
-	      g_signal_connect (monitor, "changed", 
-				(GCallback)notify_dnssd_local_changed, (gpointer)backend); 
-	      /* takes ref */
-	      backend->dnssd_monitor = monitor;
-	    }
-	  else
-	    {
-	      char *uri = g_file_get_uri(server_file);
-	      g_warning ("Couldn't create directory monitor on %s. Error: %s", 
-			 uri, error->message);
-	      g_free (uri);
-	      g_clear_error (&error);
-	    }
-	}
-      
+        {
+          monitor = g_file_monitor_directory (server_file, G_FILE_MONITOR_NONE, NULL, &error);
+          if (monitor)
+            {
+              g_signal_connect (monitor, "changed",
+                                (GCallback)notify_dnssd_local_changed, (gpointer)backend);
+              /* takes ref */
+              backend->dnssd_monitor = monitor;
+            }
+          else
+            {
+              char *uri = g_file_get_uri(server_file);
+              g_warning ("Couldn't create directory monitor on %s. Error: %s",
+                         uri, error->message);
+              g_free (uri);
+              g_clear_error (&error);
+            }
+        }
+
       if (backend->local_setting == G_DNS_SD_DISPLAY_MODE_MERGED)
         {
           /* "merged": add local domains to network:/// */
-          enumer = g_file_enumerate_children (server_file, 
-                                              NETWORK_FILE_ATTRIBUTES, 
-                                              G_FILE_QUERY_INFO_NONE, 
+          enumer = g_file_enumerate_children (server_file,
+                                              NETWORK_FILE_ATTRIBUTES,
+                                              G_FILE_QUERY_INFO_NONE,
                                               NULL, NULL);
           if (enumer != NULL)
             {
@@ -438,20 +438,20 @@ recompute_files (GVfsBackendNetwork *backend)
                   file_name = g_strconcat("dnssd-domain-", g_file_info_get_name (info), NULL);
                   link_uri = g_strdup(g_file_info_get_attribute_string (info,
                                       "standard::target-uri"));
-                  file = network_file_new (file_name, 
-					   g_file_info_get_display_name (info), 
-					   link_uri,
-					   backend->server_icon,
-					   backend->server_symbolic_icon);
+                  file = network_file_new (file_name,
+                                           g_file_info_get_display_name (info),
+                                           link_uri,
+                                           backend->server_icon,
+                                           backend->server_symbolic_icon);
                   files = g_list_prepend (files, file);
-		  
+
                   g_free (link_uri);
                   g_free (file_name);
                   g_object_unref (info);
                   info = g_file_enumerator_next_file (enumer, NULL, NULL);
                 }
             }
-	  
+
           g_file_enumerator_close (enumer, NULL, NULL);
           g_object_unref (enumer);
         }
@@ -460,39 +460,39 @@ recompute_files (GVfsBackendNetwork *backend)
           /* "separate": a link to dns-sd://local/ */
           file = network_file_new ("dnssd-local",
                                    _("Local Network"),
-				   "dns-sd://local/",
+                                   "dns-sd://local/",
                                    backend->workgroup_icon,
                                    backend->workgroup_symbolic_icon);
-          files = g_list_prepend (files, file);   
+          files = g_list_prepend (files, file);
         }
-      
+
       g_object_unref (server_file);
-      
+
       /* If gsettings key "extra-domains" (org.gnome.system.dns_sd) is set to a list of domains:
        * links to dns-sd://$domain/ */
       if (backend->extra_domains != NULL &&
-	  backend->extra_domains[0] != 0)
-	{
-	  char **domains;
-	  int i;
-	  domains = g_strsplit (backend->extra_domains, ",", 0);
-	  for (i=0; domains[i] != NULL; i++)
-	    {
-	      file_name = g_strconcat("dnssd-domain-", domains[i], NULL);
-	      link_uri = g_strconcat("dns-sd://", domains[i], "/", NULL);
-	      file = network_file_new (file_name,
-				       domains[i],
-				       link_uri,
-				       backend->workgroup_icon,
-				       backend->workgroup_symbolic_icon);
-	      files = g_list_prepend (files, file);   
-	      g_free (link_uri);
-	      g_free (file_name);
-	    }
-	  g_strfreev (domains);
-	}
+          backend->extra_domains[0] != 0)
+        {
+          char **domains;
+          int i;
+          domains = g_strsplit (backend->extra_domains, ",", 0);
+          for (i=0; domains[i] != NULL; i++)
+            {
+              file_name = g_strconcat("dnssd-domain-", domains[i], NULL);
+              link_uri = g_strconcat("dns-sd://", domains[i], "/", NULL);
+              file = network_file_new (file_name,
+                                       domains[i],
+                                       link_uri,
+                                       backend->workgroup_icon,
+                                       backend->workgroup_symbolic_icon);
+              files = g_list_prepend (files, file);
+              g_free (link_uri);
+              g_free (file_name);
+            }
+          g_strfreev (domains);
+        }
     }
-  
+
   update_from_files (backend, files);
 }
 
@@ -502,7 +502,7 @@ idle_add_recompute (GVfsBackendNetwork *backend)
   backend->idle_tag = 0;
 
   recompute_files (backend);
-  
+
   return FALSE;
 }
 
@@ -515,7 +515,7 @@ mount_smb_done_cb (GObject *object,
   GError *error = NULL;
 
   g_file_mount_enclosing_volume_finish (G_FILE (object), res, &error);
-  
+
   if (error)
     g_error_free (error);
 
@@ -526,7 +526,7 @@ mount_smb_done_cb (GObject *object,
     {
       g_vfs_job_succeeded (G_VFS_JOB (backend->mount_job));
       g_object_unref (backend->mount_job);
-    }  
+    }
   g_mutex_unlock (&backend->smb_mount_lock);
   g_object_unref (backend);
 }
@@ -540,14 +540,14 @@ remount_smb (GVfsBackendNetwork *backend, GVfsJobMount *job)
   if (! g_mutex_trylock (&backend->smb_mount_lock))
     /*  Do nothing when the mount operation is already active  */
     return;
-  
+
   backend->mount_job = job ? g_object_ref (job) : NULL;
 
   if (backend->current_workgroup == NULL ||
       backend->current_workgroup[0] == 0)
-    workgroup = g_strconcat ("smb://", DEFAULT_WORKGROUP_NAME, "/", NULL);  
-  else 
-    workgroup = g_strconcat ("smb://", backend->current_workgroup, "/", NULL);    
+    workgroup = g_strconcat ("smb://", DEFAULT_WORKGROUP_NAME, "/", NULL);
+  else
+    workgroup = g_strconcat ("smb://", backend->current_workgroup, "/", NULL);
 
   file = g_file_new_for_uri (workgroup);
 
@@ -558,11 +558,11 @@ remount_smb (GVfsBackendNetwork *backend, GVfsJobMount *job)
 }
 
 static void
-notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
+notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file,
                           GFileMonitorEvent event_type, gpointer user_data)
 {
   GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(user_data);
-  
+
   switch (event_type)
     {
     case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
@@ -576,14 +576,14 @@ notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file,
       /* in either event, our smb backend is/will be gone. */
       if (backend->idle_tag == 0)
         backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
-      
+
       /* stop monitoring as the backend's gone. */
       if (backend->smb_monitor)
         {
           g_file_monitor_cancel (backend->smb_monitor);
           g_object_unref (backend->smb_monitor);
           backend->smb_monitor = NULL;
-        }  
+        }
       break;
     default:
       break;
@@ -591,7 +591,7 @@ notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file,
 }
 
 static void
-notify_dnssd_local_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
+notify_dnssd_local_changed (GFileMonitor *monitor, GFile *file, GFile *other_file,
                             GFileMonitorEvent event_type, gpointer user_data)
 {
   GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(user_data);
@@ -652,8 +652,8 @@ smb_settings_change_event_cb (GSettings *settings,
   if (backend->smb_monitor)
     {
       g_signal_handlers_disconnect_by_func (backend->smb_monitor,
-					    notify_smb_files_changed,
-					    backend);
+                                            notify_smb_files_changed,
+                                            backend);
       g_file_monitor_cancel (backend->smb_monitor);
       g_object_unref (backend->smb_monitor);
       backend->smb_monitor = NULL;
@@ -680,10 +680,10 @@ lookup_network_file (GVfsBackendNetwork *backend,
 
   if (*file_name == 0)
     return &root;
-  
+
   if (strchr (file_name, '/') != NULL)
     goto out;
-  
+
   for (l = backend->files; l != NULL; l = l->next)
     {
       file = l->data;
@@ -693,8 +693,8 @@ lookup_network_file (GVfsBackendNetwork *backend,
 
   out:
   g_vfs_job_failed (job, G_IO_ERROR,
-		    G_IO_ERROR_NOT_FOUND,
-		    _("File doesn’t exist"));
+                    G_IO_ERROR_NOT_FOUND,
+                    _("File doesn’t exist"));
 
   return NULL;
 }
@@ -709,7 +709,7 @@ file_info_from_file (NetworkFile *file,
   g_file_info_set_name (info, file->file_name);
   g_file_info_set_display_name (info, file->display_name);
 
-  if (file->icon) 
+  if (file->icon)
     g_file_info_set_icon (info, file->icon);
   if (file->symbolic_icon)
     g_file_info_set_symbolic_icon (info, file->symbolic_icon);
@@ -719,7 +719,7 @@ file_info_from_file (NetworkFile *file,
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_VIRTUAL, TRUE);
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI, 
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI,
                                     file->target_uri);
 }
 
@@ -735,8 +735,8 @@ try_enumerate (GVfsBackend *backend,
   GList *l;
   GFileInfo *info;
   file = lookup_network_file (G_VFS_BACKEND_NETWORK (backend),
-			      G_VFS_JOB (job), file_name);
-  
+                              G_VFS_JOB (job), file_name);
+
   if (file != &root)
     {
       if (file != NULL)
@@ -747,7 +747,7 @@ try_enumerate (GVfsBackend *backend,
     }
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
-  
+
   /* Enumerate root */
   for (l = G_VFS_BACKEND_NETWORK (backend)->files; l != NULL; l = l->next)
     {
@@ -759,7 +759,7 @@ try_enumerate (GVfsBackend *backend,
     }
 
   g_vfs_job_enumerate_done (job);
-  
+
   return TRUE;
 }
 
@@ -773,7 +773,7 @@ try_query_info (GVfsBackend *backend,
 {
   NetworkFile *file;
 
-  file = lookup_network_file (G_VFS_BACKEND_NETWORK (backend), 
+  file = lookup_network_file (G_VFS_BACKEND_NETWORK (backend),
                               G_VFS_JOB (job), file_name);
 
   if (file == &root)
@@ -799,7 +799,7 @@ try_query_info (GVfsBackend *backend,
       file_info_from_file (file, info);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
-  
+
   return TRUE;
 }
 
@@ -823,8 +823,8 @@ try_mount (GVfsBackend *backend,
     {
       recompute_files (network_backend);
       g_vfs_job_succeeded (G_VFS_JOB (job));
-    }  
-    
+    }
+
   return TRUE;
 }
 
@@ -848,11 +848,11 @@ try_create_monitor (GVfsBackend *backend,
   if (file != &root)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-			G_IO_ERROR_NOT_SUPPORTED,
-			_("Can’t monitor file or directory."));
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        _("Can’t monitor file or directory."));
       return TRUE;
     }
-  
+
   g_vfs_job_create_monitor_set_monitor (job, network_backend->root_monitor);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -890,7 +890,7 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
   for (i=0; supported_vfs[i]!=NULL; i++)
     {
       if (strcmp(supported_vfs[i], "smb") == 0)
-	network_backend->have_smb = TRUE;
+        network_backend->have_smb = TRUE;
 
       if (strcmp(supported_vfs[i], "dns-sd") == 0)
         network_backend->have_dnssd = TRUE;
@@ -903,11 +903,11 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
       current_workgroup = g_settings_get_string (network_backend->smb_settings, "workgroup");
 
       if (current_workgroup == NULL ||
-          current_workgroup[0] == 0) 
-        /* it's okay if current_workgroup is null here, 
+          current_workgroup[0] == 0)
+        /* it's okay if current_workgroup is null here,
          * it's checked before the NetworkFile is added anyway. */
         network_backend->current_workgroup = NULL;
-      else 
+      else
         network_backend->current_workgroup = current_workgroup;
 
       g_signal_connect (network_backend->smb_settings,
@@ -916,7 +916,7 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
                         network_backend);
     }
 
-  if (network_backend->have_dnssd) 
+  if (network_backend->have_dnssd)
     {
       network_backend->dnssd_settings = g_settings_new ("org.gnome.system.dns_sd");
 
@@ -1000,7 +1000,7 @@ g_vfs_backend_network_class_init (GVfsBackendNetworkClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
-  
+
   gobject_class->finalize = g_vfs_backend_network_finalize;
 
   backend_class->try_mount        = try_mount;
@@ -1011,7 +1011,7 @@ g_vfs_backend_network_class_init (GVfsBackendNetworkClass *klass)
   backend_class->try_create_file_monitor = try_create_monitor;
 }
 
-void 
+void
 g_vfs_network_daemon_init (void)
 {
   /* Translators: this is the friendly name of the 'network://' backend that

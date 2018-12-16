@@ -46,7 +46,7 @@ struct _GVfsBackendNetworkClass
 
 GType g_vfs_backend_network_get_type (void) G_GNUC_CONST;
 
-#define BACKEND_SETUP_FUNC g_vfs_network_daemon_init 
+#define BACKEND_SETUP_FUNC g_vfs_network_daemon_init
 void g_vfs_network_daemon_init (void);
 
 
