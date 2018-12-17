@@ -1,7 +1,7 @@
 sources = files(
   'afcvolumemonitordaemon.c',
   'afcvolume.c',
-  'afcvolumemonitor.c'
+  'afcvolumemonitor.c',
 )
 
 deps = [
@@ -9,13 +9,13 @@ deps = [
   gobject_dep,
   libimobiledevice_dep,
   libplist_dep,
-  libgvfsproxyvolumemonitordaemon_noin_dep
+  libgvfsproxyvolumemonitordaemon_noin_dep,
 ]
 
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-AFC"',
   '-DGIO_MODULE_DIR="@0@"'.format(gio_module_dir),
-  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir)
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
 ]
 
 executable(
@@ -26,5 +26,5 @@ executable(
   c_args: cflags,
   install: true,
   install_rpath: gvfs_rpath,
-  install_dir: gvfs_libexecdir
+  install_dir: gvfs_libexecdir,
 )
