@@ -453,12 +453,6 @@ endif
 enable_devel_utils = get_option('devel_utils')
 enable_installed_tests = get_option('installed_tests')
 
-# FIXME: Opaque target return from gdbus_codegen
-# Please see:
-#   https://bugzilla.gnome.org/show_bug.cgi?id=791015
-#   https://github.com/mesonbuild/meson/pull/2930
-codegen = find_program('codegen.py')
-
 gnome = import('gnome')
 i18n = import('i18n')
 pkg = import('pkgconfig')
