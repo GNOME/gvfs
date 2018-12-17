@@ -3,7 +3,7 @@ project(
   version: '1.39.4',
   license: 'LGPL2+',
   default_options: 'buildtype=debugoptimized',
-  meson_version: '>= 0.46.0'
+  meson_version: '>= 0.46.0',
 )
 
 gvfs_name = meson.project_name()
@@ -40,7 +40,7 @@ set_defines = [
   ['PACKAGE_STRING', '@0@ @1@'.format(gvfs_name, gvfs_version)],
   ['VERSION', gvfs_version],
   # i18n
-  ['GETTEXT_PACKAGE', gvfs_name]
+  ['GETTEXT_PACKAGE', gvfs_name],
 ]
 
 foreach define: set_defines
@@ -86,7 +86,7 @@ check_headers = [
   'sys/mount.h',
   'sys/statfs.h',
   'sys/statvfs.h',
-  'sys/vfs.h'
+  'sys/vfs.h',
 ]
 
 statfs_includes = ''
@@ -120,7 +120,7 @@ check_headers = [
   'stropts.h',
   'sys/un.h',
   'termios.h',
-  'utmp.h'
+  'utmp.h',
 ]
 
 foreach header: check_headers
@@ -138,7 +138,7 @@ check_functions = [
   'unlockpt',
   # fs
   'statfs',
-  'statvfs'
+  'statvfs',
 ]
 
 foreach func: check_functions
@@ -149,7 +149,7 @@ endforeach
 check_symbols = [
   # i18n
   ['_NL_ADDRESS_LANG_TERM', 'langinfo.h'],
-  ['_NL_ADDRESS_COUNTRY_AB3', 'langinfo.h']
+  ['_NL_ADDRESS_COUNTRY_AB3', 'langinfo.h'],
 ]
 
 foreach symbol: check_symbols
@@ -173,7 +173,7 @@ check_types = [
   ['gid_t', 'int'],
   ['pid_t', 'int'],
   ['size_t', 'unsigned int'],
-  ['uid_t', 'int']
+  ['uid_t', 'int'],
 ]
 
 foreach type: check_types
@@ -192,7 +192,7 @@ check_members = [
   ['struct stat', 'st_ctimensec', 'sys/stat.h'],
   ['struct stat', 'st_ctim.tv_nsec', 'sys/stat.h'],
   ['struct stat', 'st_mtimensec', 'sys/stat.h'],
-  ['struct stat', 'st_mtim.tv_nsec', 'sys/stat.h']
+  ['struct stat', 'st_mtim.tv_nsec', 'sys/stat.h'],
 ]
 
 foreach member: check_members
@@ -209,7 +209,7 @@ if gvfs_debug
     '-Wmissing-prototypes',
     '-Wnested-externs',
     '-Wno-sign-compare',
-    '-Wno-strict-aliasing'
+    '-Wno-strict-aliasing',
   ]
 
   common_flags += cc.get_supported_arguments(test_cflags)
@@ -252,7 +252,7 @@ if enable_gcrypt
     libgcrypt_dep = declare_dependency(
       compile_args: libgcrypt_cflags,
       link_args: libgcrypt_libs,
-      version: libgcrypt_version
+      version: libgcrypt_version,
     )
   endif
 endif
@@ -501,13 +501,13 @@ subdir('test')
 
 configure_file(
   output: 'config.h',
-  configuration: config_h
+  configuration: config_h,
 )
 
 meson.add_install_script(
   'meson_post_install.py',
   gvfs_schema_dir,
-  gio_module_dir
+  gio_module_dir,
 )
 
 output = gvfs_name + ' ' + gvfs_version + ' configuration summary:\n'
