@@ -1,6 +1,6 @@
 if enable_installed_tests
-  installed_tests_execdir = join_paths(gvfs_libexecdir, 'installed-tests', gvfs_name)
-  installed_tests_metadir = join_paths(gvfs_datadir, 'installed-tests', gvfs_name)
+  installed_tests_execdir = gvfs_libexecdir / 'installed-tests' / gvfs_name
+  installed_tests_metadir = gvfs_datadir / 'installed-tests' / gvfs_name
 
   tests_conf = configuration_data()
   tests_conf.set('testdir', installed_tests_execdir)
