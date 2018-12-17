@@ -31,14 +31,14 @@ foreach monitor: monitors
   dbus_exec = 'gvfs-@0@-volume-monitor'.format(monitor_name)
   dbus_systemd_service = ''
 
-  if install_systemd_user_unit_dir
+  if install_systemd_systemduserunitdir
     service = dbus_exec + '.service'
 
     configure_file(
       input: monitor_name / service + '.in',
       output: service,
       install: true,
-      install_dir: systemd_user_unit_dir,
+      install_dir: systemd_systemduserunitdir,
       configuration: service_conf,
     )
 
@@ -61,7 +61,7 @@ foreach monitor: monitors
     input: dbus_service_in,
     output: dbus_service + '.service',
     install: true,
-    install_dir: dbus_service_dir,
+    install_dir: dbus_session_bus_services_dir,
     configuration: dbus_service_conf,
   )
 
