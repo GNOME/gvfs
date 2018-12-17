@@ -29,16 +29,12 @@ metadata_service = configure_file(
   install_dir: dbus_session_bus_services_dir,
 )
 
-# FIXME: Ugly workaround that simulates the generation of
-#        two different targets.
-namespace = 'GVfs'
-name = 'metadata-dbus'
-
-dbus_sources = custom_target(
-  name,
-  input: 'dbus-interface.xml',
-  output: [name + '.c', name + '.h'],
-  command: [codegen, gvfs_namespace + '.', name, namespace, meson.current_build_dir(), '@INPUT@', '@OUTPUT@'],
+dbus_sources = gnome.gdbus_codegen(
+  'metadata-dbus',
+  'dbus-interface.xml',
+  interface_prefix: gvfs_namespace + '.',
+  namespace: 'GVfs',
+  autocleanup: 'objects',
 )
 
 sources = files(
