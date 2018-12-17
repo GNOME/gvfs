@@ -227,6 +227,8 @@ gobject_dep = dependency('gobject-2.0')
 
 config_h.set('HAVE_G_UNIX_MOUNT_GET_ROOT_PATH', cc.has_function('g_unix_mount_get_root_path', dependencies: gio_dep))
 
+monitors = []
+
 # *** Check for libXML ***
 libxml_dep = dependency('libxml-2.0', required: false)
 have_libxml = libxml_dep.found()
@@ -335,6 +337,7 @@ enable_udisks2 = get_option('udisks2')
 if enable_udisks2
   assert(enable_gudev, 'UDisks2 requested but gudev is required')
   udisks2_dep = dependency('udisks2', version: '>= 1.97')
+  monitors += [['UDisks2', true]]
 endif
 
 # *** Check for libsystemd-login ***
@@ -354,12 +357,14 @@ enable_afc = get_option('afc')
 if enable_afc
   libimobiledevice_dep = dependency('libimobiledevice-1.0', version: '>= 1.2')
   libplist_dep = dependency('libplist', version: '>= 0.15')
+  monitors += [['Afc', true]]
 endif
 
 # *** Check if we should build with GOA volume monitor ***
 enable_goa = get_option('goa')
 if enable_goa
   goa_dep = dependency('goa-1.0', version: '>= 3.17.1')
+  monitors += [['Goa', false]]
 endif
 
 # *** Check for GNOME Keyring ***
@@ -426,6 +431,7 @@ if enable_gphoto2
 
   libgphoto2_dep = dependency('libgphoto2', version: '>= 2.4.0')
   config_h.set('HAVE_GPHOTO25', libgphoto2_dep.version().version_compare('>= 2.5.0'))
+  monitors += [['GPhoto2', true]]
 endif
 
 # *** Check for libmtp ***
@@ -437,6 +443,7 @@ if enable_mtp
   foreach version: ['1.1.15']
     config_h.set10('HAVE_LIBMTP_' + version.underscorify(), libmtp_dep.version().version_compare('>= ' + version))
   endforeach
+  monitors += [['MTP', false]]
 endif
 config_h.set('HAVE_LIBMTP', enable_mtp)
 
