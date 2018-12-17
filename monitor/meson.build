@@ -16,7 +16,7 @@ foreach monitor: monitors
       output: service,
       install: true,
       install_dir: systemd_user_unit_dir,
-      configuration: service_conf
+      configuration: service_conf,
     )
 
     dbus_systemd_service = 'SystemdService=' + service
@@ -26,7 +26,7 @@ foreach monitor: monitors
 
   install_data(
     monitor_data,
-    install_dir: gvfs_remote_volume_monitors_dir
+    install_dir: gvfs_remote_volume_monitors_dir,
   )
 
   dbus_service_conf = configuration_data()
@@ -39,7 +39,7 @@ foreach monitor: monitors
     output: dbus_service + '.service',
     install: true,
     install_dir: dbus_service_dir,
-    configuration: dbus_service_conf
+    configuration: dbus_service_conf,
   )
 
   if monitor[1]
