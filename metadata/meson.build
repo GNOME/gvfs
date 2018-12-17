@@ -8,9 +8,9 @@ if install_systemd_systemduserunitdir
   configure_file(
     input: service + '.in',
     output: service,
+    configuration: service_conf,
     install: true,
     install_dir: systemd_systemduserunitdir,
-    configuration: service_conf,
   )
 
   dbus_systemd_service = 'SystemdService=' + service
@@ -24,9 +24,9 @@ dbus_service_conf.set('systemd_service', dbus_systemd_service)
 metadata_service = configure_file(
   input: dbus_service_in,
   output: dbus_service + '.service',
+  configuration: dbus_service_conf,
   install: true,
   install_dir: dbus_session_bus_services_dir,
-  configuration: dbus_service_conf,
 )
 
 # FIXME: Ugly workaround that simulates the generation of
