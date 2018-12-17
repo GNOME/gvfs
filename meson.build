@@ -3,7 +3,7 @@ project(
   version: '1.39.4',
   license: 'LGPL2+',
   default_options: 'buildtype=debugoptimized',
-  meson_version: '>= 0.46.0',
+  meson_version: '>= 0.49.0',
 )
 
 gvfs_name = meson.project_name()
@@ -237,24 +237,7 @@ have_libxml = libxml_dep.found()
 # *** Check for libgcrypt ***
 enable_gcrypt = get_option('gcrypt')
 if enable_gcrypt
-  libgcrypt_req_version = '>= 1.2.2'
-
-  libgcrypt_dep = dependency('libgcrypt', version: libgcrypt_req_version, required: false)
-  if not libgcrypt_dep.found()
-    libgcrypt_config = find_program('libgcrypt-config')
-    libgcrypt_version = run_command(libgcrypt_config, '--version').stdout().strip()
-
-    assert(libgcrypt_version.version_compare(libgcrypt_req_version), 'gcrypt required but libgcrypt ' + libgcrypt_req_version + ' not found')
-
-    libgcrypt_cflags = run_command(libgcrypt_config, '--cflags').stdout().strip().split()
-    libgcrypt_libs = run_command(libgcrypt_config, '--libs').stdout().strip().split()
-
-    libgcrypt_dep = declare_dependency(
-      compile_args: libgcrypt_cflags,
-      link_args: libgcrypt_libs,
-      version: libgcrypt_version,
-    )
-  endif
+  libgcrypt_dep = dependency('libgcrypt', version: '>= 1.2.2')
 endif
 config_h.set('HAVE_GCRYPT', enable_gcrypt)
 
