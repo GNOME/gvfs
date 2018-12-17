@@ -22,7 +22,7 @@ deps = [
 
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-RemoteVolumeMonitor"',
-  '-DGIO_MODULE_DIR="@0@"'.format(gio_module_dir),
+  '-DGIO_MODULE_DIR="@0@"'.format(gio_giomoduledir),
   '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
   '-DREMOTE_VOLUME_MONITORS_DIR="@0@"'.format(gvfs_remote_volume_monitors_dir),
 ]
@@ -44,7 +44,7 @@ libgioremote_volume_monitor = shared_module(
   link_depends: symbol_map,
   install: true,
   install_rpath: gvfs_rpath,
-  install_dir: gio_module_dir,
+  install_dir: gio_giomoduledir,
 )
 
 sources = files('gvfsproxyvolumemonitordaemon.c')

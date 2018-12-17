@@ -24,7 +24,6 @@ gvfs_rpath = gvfs_pkglibdir
 gvfs_remote_volume_monitors_dir = gvfs_pkgdatadir / 'remote-volume-monitors'
 
 gvfs_mountdir = gvfs_pkgdatadir / 'mounts'
-gvfs_schema_dir = gvfs_datadir / 'glib-2.0/schemas'
 
 gvfs_namespace = 'org.gtk.vfs'
 
@@ -241,33 +240,44 @@ endif
 config_h.set('HAVE_GCRYPT', enable_gcrypt)
 
 # *** Check for dbus service dir ***
-dbus_dep = dependency('dbus-1')
-dbus_service_dir = dbus_dep.get_pkgconfig_variable('session_bus_services_dir', define_variable: ['datadir', gvfs_datadir])
+dbus_session_bus_services_dir = dependency('dbus-1').get_pkgconfig_variable(
+  'session_bus_services_dir',
+  define_variable: ['datadir', gvfs_datadir],
+)
 
 dbus_service_in = files('dbus.service.in')
 
-# *** Check for gio module dir ***
-gio_module_dir = gio_dep.get_pkgconfig_variable('giomoduledir', define_variable: ['libdir', gvfs_libdir])
+# *** Check for giomoduledir and schemasdir ***
+gio_giomoduledir = gio_dep.get_pkgconfig_variable(
+  'giomoduledir',
+  define_variable: ['libdir', gvfs_libdir],
+)
+
+gio_schemasdir = gio_dep.get_pkgconfig_variable(
+  'schemasdir',
+  define_variable: ['datadir', gvfs_datadir],
+  default: gvfs_datadir / 'glib-2.0/schemas',
+)
 
 # *** Check for systemd options ***
-systemd_user_unit_dir = get_option('systemduserunitdir')
-install_systemd_user_unit_dir = (systemd_user_unit_dir != 'no')
+systemd_systemduserunitdir = get_option('systemduserunitdir')
+install_systemd_systemduserunitdir = (systemd_systemduserunitdir != 'no')
 
-tmp_files_dir = get_option('tmpfilesdir')
-install_tmp_files_dir = (tmp_files_dir != 'no')
+systemd_tmpfilesdir = get_option('tmpfilesdir')
+install_systemd_tmpfilesdir = (systemd_tmpfilesdir != 'no')
 
-if install_systemd_user_unit_dir or install_tmp_files_dir
-  if systemd_user_unit_dir == '' or tmp_files_dir == ''
+if install_systemd_systemduserunitdir or install_systemd_tmpfilesdir
+  if systemd_systemduserunitdir == '' or systemd_tmpfilesdir == ''
     systemd_dep = dependency('systemd', version: '>= 206', required: false)
 
-    if install_systemd_user_unit_dir and systemd_user_unit_dir == ''
+    if install_systemd_systemduserunitdir and systemd_systemduserunitdir == ''
       assert(systemd_dep.found(), 'systemd required but not found, please provide a valid systemd user unit dir or disable it')
-      systemd_user_unit_dir = systemd_dep.get_pkgconfig_variable('systemduserunitdir')
+      systemd_systemduserunitdir = systemd_dep.get_pkgconfig_variable('systemduserunitdir')
     endif
 
-    if install_tmp_files_dir and tmp_files_dir == ''
+    if install_systemd_tmpfilesdir and systemd_tmpfilesdir == ''
       assert(systemd_dep.found(), 'systemd not found, if you use opentmpfiles please provide a valid systemd user unit dir or disable it')
-      tmp_files_dir = systemd_dep.get_pkgconfig_variable('tmpfilesdir')
+      systemd_tmpfilesdir = systemd_dep.get_pkgconfig_variable('tmpfilesdir')
     endif
   endif
 endif
@@ -488,14 +498,14 @@ configure_file(
 
 meson.add_install_script(
   'meson_post_install.py',
-  gvfs_schema_dir,
-  gio_module_dir,
+  gio_schemasdir,
+  gio_giomoduledir,
 )
 
 output = gvfs_name + ' ' + gvfs_version + ' configuration summary:\n'
 output += '\n'
-output += '  systemduserunitdir: ' + systemd_user_unit_dir + '\n'
-output += '  tmpfilesdir: ' + tmp_files_dir + '\n'
+output += '  systemduserunitdir: ' + systemd_systemduserunitdir + '\n'
+output += '  tmpfilesdir: ' + systemd_tmpfilesdir + '\n'
 output += '\n'
 output += '  admin: ' + enable_admin.to_string() + '\n'
 output += '  afc: ' + enable_afc.to_string() + '\n'
