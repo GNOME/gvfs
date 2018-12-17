@@ -5,14 +5,14 @@ dbus_service = gvfs_namespace + '.Daemon'
 dbus_exec = 'gvfsd'
 dbus_systemd_service = ''
 
-if install_systemd_user_unit_dir
+if install_systemd_systemduserunitdir
   service = 'gvfs-daemon.service'
 
   configure_file(
     input: service + '.in',
     output: service,
     install: true,
-    install_dir: systemd_user_unit_dir,
+    install_dir: systemd_systemduserunitdir,
     configuration: service_conf,
   )
 
@@ -28,7 +28,7 @@ daemon_service = configure_file(
   input: dbus_service_in,
   output: dbus_service + '.service',
   install: true,
-  install_dir: dbus_service_dir,
+  install_dir: dbus_session_bus_services_dir,
   configuration: dbus_service_conf,
 )
 
@@ -42,7 +42,7 @@ gnome.mkenums(
   vtail: '  </@type@>',
   ftail: '</schemalist>',
   install_header: true,
-  install_dir: gvfs_schema_dir,
+  install_dir: gio_schemasdir,
 )
 
 sources = files(
@@ -630,7 +630,7 @@ endif
 
 install_data(
   schema_data,
-  install_dir: gvfs_schema_dir,
+  install_dir: gio_schemasdir,
 )
 
 install_data(
