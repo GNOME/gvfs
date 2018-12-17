@@ -27,7 +27,7 @@ cflags = [
   '-DREMOTE_VOLUME_MONITORS_DIR="@0@"'.format(gvfs_remote_volume_monitors_dir),
 ]
 
-symbol_map = join_paths(meson.current_source_dir(), 'symbol.map')
+symbol_map = meson.current_source_dir() / 'symbol.map'
 
 ldflags = []
 if have_version_script
