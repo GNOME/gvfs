@@ -18,7 +18,7 @@ endif
 
 dbus_service_conf = configuration_data()
 dbus_service_conf.set('service', dbus_service)
-dbus_service_conf.set('exec', gvfs_libexecdir / dbus_exec)
+dbus_service_conf.set('exec', gvfs_prefix / gvfs_libexecdir / dbus_exec)
 dbus_service_conf.set('systemd_service', dbus_systemd_service)
 
 metadata_service = configure_file(
@@ -51,7 +51,7 @@ deps = [
 cflags = [
   '-DDBUS_API_SUBJECT_TO_CHANGE',
   '-DG_LOG_DOMAIN="@0@"'.format(gvfs_name.to_upper()),
-  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_prefix / gvfs_localedir),
 ]
 
 libmetadata = static_library(
