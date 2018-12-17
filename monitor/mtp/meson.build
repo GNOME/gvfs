@@ -13,7 +13,7 @@ deps = [
 
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-MTP"',
-  '-DGIO_MODULE_DIR="@0@"'.format(gio_module_dir),
+  '-DGIO_MODULE_DIR="@0@"'.format(gio_giomoduledir),
   '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
 ]
 

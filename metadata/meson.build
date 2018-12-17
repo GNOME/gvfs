@@ -2,14 +2,14 @@ dbus_service = gvfs_namespace + '.Metadata'
 dbus_exec = 'gvfsd-metadata'
 dbus_systemd_service = ''
 
-if install_systemd_user_unit_dir
+if install_systemd_systemduserunitdir
   service = 'gvfs-metadata.service'
 
   configure_file(
     input: service + '.in',
     output: service,
     install: true,
-    install_dir: systemd_user_unit_dir,
+    install_dir: systemd_systemduserunitdir,
     configuration: service_conf,
   )
 
@@ -25,7 +25,7 @@ metadata_service = configure_file(
   input: dbus_service_in,
   output: dbus_service + '.service',
   install: true,
-  install_dir: dbus_service_dir,
+  install_dir: dbus_session_bus_services_dir,
   configuration: dbus_service_conf,
 )
 
