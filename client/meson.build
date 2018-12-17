@@ -39,8 +39,8 @@ deps = [
 
 cflags = [
   '-DG_LOG_DOMAIN="@0@"'.format(gvfs_name.to_upper()),
-  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
-  '-DGVFS_MODULE_DIR="@0@"'.format(gvfs_pkglibdir / 'modules'),
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_prefix / gvfs_localedir),
+  '-DGVFS_MODULE_DIR="@0@"'.format(gvfs_prefix / gvfs_pkglibdir / 'modules'),
 ]
 
 symbol_map = meson.current_source_dir() / 'symbol.map'

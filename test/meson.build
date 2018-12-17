@@ -3,7 +3,7 @@ if enable_installed_tests
   installed_tests_metadir = gvfs_datadir / 'installed-tests' / gvfs_name
 
   tests_conf = configuration_data()
-  tests_conf.set('testdir', installed_tests_execdir)
+  tests_conf.set('testdir', gvfs_prefix / installed_tests_execdir)
 
   configure_file(
     input: 'session.conf.in',

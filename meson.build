@@ -10,20 +10,20 @@ gvfs_name = meson.project_name()
 gvfs_version = meson.project_version()
 
 gvfs_prefix = get_option('prefix')
-gvfs_datadir = gvfs_prefix / get_option('datadir')
-gvfs_libdir = gvfs_prefix / get_option('libdir')
-gvfs_libexecdir = gvfs_prefix / get_option('libexecdir')
-gvfs_localedir = gvfs_prefix / get_option('localedir')
-gvfs_mandir = gvfs_prefix / get_option('mandir')
+gvfs_datadir = get_option('datadir')
+gvfs_libdir = get_option('libdir')
+gvfs_libexecdir = get_option('libexecdir')
+gvfs_localedir = get_option('localedir')
+gvfs_mandir = get_option('mandir')
 
 gvfs_pkgdatadir = gvfs_datadir / gvfs_name
 gvfs_pkglibdir = gvfs_libdir / gvfs_name
 
-gvfs_rpath = gvfs_pkglibdir
+gvfs_rpath = gvfs_prefix / gvfs_pkglibdir
 
 gvfs_remote_volume_monitors_dir = gvfs_pkgdatadir / 'remote-volume-monitors'
 
-gvfs_mountdir = gvfs_pkgdatadir / 'mounts'
+gvfs_mounts_dir = gvfs_pkgdatadir / 'mounts'
 
 gvfs_namespace = 'org.gtk.vfs'
 
@@ -243,7 +243,7 @@ config_h.set('HAVE_GCRYPT', enable_gcrypt)
 # *** Check for dbus service dir ***
 dbus_session_bus_services_dir = dependency('dbus-1').get_pkgconfig_variable(
   'session_bus_services_dir',
-  define_variable: ['datadir', gvfs_datadir],
+  define_variable: ['datadir', gvfs_prefix / gvfs_datadir],
 )
 
 dbus_service_in = files('dbus.service.in')
@@ -251,13 +251,13 @@ dbus_service_in = files('dbus.service.in')
 # *** Check for giomoduledir and schemasdir ***
 gio_giomoduledir = gio_dep.get_pkgconfig_variable(
   'giomoduledir',
-  define_variable: ['libdir', gvfs_libdir],
+  define_variable: ['libdir', gvfs_prefix / gvfs_libdir],
 )
 
 gio_schemasdir = gio_dep.get_pkgconfig_variable(
   'schemasdir',
-  define_variable: ['datadir', gvfs_datadir],
-  default: gvfs_datadir / 'glib-2.0/schemas',
+  define_variable: ['datadir', gvfs_prefix / gvfs_datadir],
+  default: gvfs_prefix / gvfs_datadir / 'glib-2.0/schemas',
 )
 
 # *** Check for systemd options ***
@@ -466,7 +466,7 @@ i18n = import('i18n')
 pkg = import('pkgconfig')
 
 service_conf = configuration_data()
-service_conf.set('libexecdir', gvfs_libexecdir)
+service_conf.set('libexecdir', gvfs_prefix / gvfs_libexecdir)
 
 po_dir = meson.source_root() / 'po'
 
