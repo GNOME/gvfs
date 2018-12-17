@@ -20,7 +20,7 @@ foreach monitor: monitors
 
     configure_file(
       input: monitor_name / service + '.in',
-      output: service,
+      output: '@BASENAME@',
       configuration: service_conf,
       install: true,
       install_dir: systemd_systemduserunitdir,
