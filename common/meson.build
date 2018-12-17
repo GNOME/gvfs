@@ -14,16 +14,11 @@ sources = files(
   'gvfsutils.c',
 )
 
-# FIXME: Ugly workaround that simulates the generation of
-#        two different targets.
-namespace = 'GVfsDBus'
-name = namespace.to_lower()
-
-dbus_sources = custom_target(
-  name,
-  input: gvfs_namespace + '.xml',
-  output: [name + '.c', name + '.h'],
-  command: [codegen, gvfs_namespace + '.', name, namespace, meson.current_build_dir(), '@INPUT@', '@OUTPUT@'],
+dbus_sources = gnome.gdbus_codegen(
+  'gvfsdbus',
+  gvfs_namespace + '.xml',
+  interface_prefix: gvfs_namespace + '.',
+  namespace: 'GVfsDBus',
 )
 
 deps = [
