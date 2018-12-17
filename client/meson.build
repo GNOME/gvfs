@@ -1,18 +1,18 @@
 headers = files(
   'gvfsurimapper.h',
-  'gvfsuriutils.h'
+  'gvfsuriutils.h',
 )
 
 install_headers(
   headers,
-  subdir: join_paths('gvfs-client', 'gvfs')
+  subdir: join_paths('gvfs-client', 'gvfs'),
 )
 
 # Dynamic client lib
 uri_parser_sources = files(
   'afpuri.c',
   'httpuri.c',
-  'smburi.c'
+  'smburi.c',
 )
 
 uri_utils = files('gvfsuriutils.c')
@@ -28,19 +28,19 @@ sources = uri_parser_sources + uri_utils + files(
   'gdaemonvolumemonitor.c',
   'gvfsdaemondbus.c',
   'gvfsiconloadable.c',
-  'gvfsurimapper.c'
+  'gvfsurimapper.c',
 )
 
 deps = [
   gio_unix_dep,
   libgvfscommon_dep,
-  libmetadata_dep
+  libmetadata_dep,
 ]
 
 cflags = [
   '-DG_LOG_DOMAIN="@0@"'.format(gvfs_name.to_upper()),
   '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
-  '-DGVFS_MODULE_DIR="@0@"'.format(join_paths(gvfs_libdir, 'gvfs', 'modules'))
+  '-DGVFS_MODULE_DIR="@0@"'.format(join_paths(gvfs_libdir, 'gvfs', 'modules')),
 ]
 
 symbol_map = join_paths(meson.current_source_dir(), 'symbol.map')
@@ -60,7 +60,7 @@ libgvfsdbus = shared_module(
   link_depends: symbol_map,
   install: true,
   install_rpath: gvfs_rpath,
-  install_dir: gio_module_dir
+  install_dir: gio_module_dir,
 )
 
 if enable_devel_utils
@@ -71,7 +71,7 @@ if enable_devel_utils
     [test_name + '.c'] + uri_utils,
     include_directories: top_inc,
     dependencies: libgvfscommon_dep,
-    c_args: cflags
+    c_args: cflags,
   )
 endif
 
@@ -80,13 +80,13 @@ if enable_fuse
   if install_tmp_files_dir
     install_data(
       'gvfsd-fuse-tmpfiles.conf',
-      install_dir: tmp_files_dir
+      install_dir: tmp_files_dir,
     )
   endif
 
   deps = [
     fuse_dep,
-    libgvfscommon_dep
+    libgvfscommon_dep,
   ]
 
   executable(
@@ -97,6 +97,6 @@ if enable_fuse
     c_args: cflags + ['-UG_LOG_DOMAIN'],
     install: true,
     install_rpath: gvfs_rpath,
-    install_dir: gvfs_libexecdir
+    install_dir: gvfs_libexecdir,
   )
 endif
