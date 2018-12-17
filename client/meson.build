@@ -60,7 +60,7 @@ libgvfsdbus = shared_module(
   link_depends: symbol_map,
   install: true,
   install_rpath: gvfs_rpath,
-  install_dir: gio_module_dir,
+  install_dir: gio_giomoduledir,
 )
 
 if enable_devel_utils
@@ -77,10 +77,10 @@ endif
 
 # FUSE daemon
 if enable_fuse
-  if install_tmp_files_dir
+  if install_systemd_tmpfilesdir
     install_data(
       'gvfsd-fuse-tmpfiles.conf',
-      install_dir: tmp_files_dir,
+      install_dir: systemd_tmpfilesdir,
     )
   endif
 
