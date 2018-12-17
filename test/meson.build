@@ -5,11 +5,9 @@ if enable_installed_tests
   tests_conf = configuration_data()
   tests_conf.set('testdir', installed_tests_execdir)
 
-  session = 'session.conf'
-
   configure_file(
-    input: session + '.in',
-    output: session,
+    input: 'session.conf.in',
+    output: '@BASENAME@',
     configuration: tests_conf,
     install: true,
     install_dir: installed_tests_execdir,
@@ -19,7 +17,7 @@ if enable_installed_tests
 
   configure_file(
     input: all_tests + '.in',
-    output: all_tests + '.test',
+    output: '@BASENAME@.test',
     configuration: tests_conf,
     install: true,
     install_dir: installed_tests_metadir,
