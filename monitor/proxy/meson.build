@@ -23,8 +23,8 @@ deps = [
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-RemoteVolumeMonitor"',
   '-DGIO_MODULE_DIR="@0@"'.format(gio_giomoduledir),
-  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
-  '-DREMOTE_VOLUME_MONITORS_DIR="@0@"'.format(gvfs_remote_volume_monitors_dir),
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_prefix / gvfs_localedir),
+  '-DREMOTE_VOLUME_MONITORS_DIR="@0@"'.format(gvfs_prefix / gvfs_remote_volume_monitors_dir),
 ]
 
 symbol_map = meson.current_source_dir() / 'symbol.map'
@@ -57,7 +57,7 @@ deps = [
 
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-RemoteVolumeMonitorDaemon"',
-  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_prefix / gvfs_localedir),
 ]
 
 libgvfsproxyvolumemonitordaemon_noin = static_library(
