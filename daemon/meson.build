@@ -21,7 +21,7 @@ endif
 
 dbus_service_conf = configuration_data()
 dbus_service_conf.set('service', dbus_service)
-dbus_service_conf.set('exec', gvfs_libexecdir / dbus_exec)
+dbus_service_conf.set('exec', gvfs_prefix / gvfs_libexecdir / dbus_exec)
 dbus_service_conf.set('systemd_service', dbus_systemd_service)
 
 daemon_service = configure_file(
@@ -109,9 +109,9 @@ if enable_keyring
 endif
 
 cflags = [
-  '-DLIBEXEC_DIR="@0@"'.format(gvfs_libexecdir),
-  '-DMOUNTABLE_DIR="@0@"'.format(gvfs_mountdir),
-  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
+  '-DLIBEXEC_DIR="@0@"'.format(gvfs_prefix / gvfs_libexecdir),
+  '-DMOUNTABLE_DIR="@0@"'.format(gvfs_prefix / gvfs_mounts_dir),
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_prefix / gvfs_localedir),
 ]
 
 libgvfsdaemon = shared_library(
@@ -604,7 +604,7 @@ foreach mount: mounts
     output: '@BASENAME@',
     configuration: service_conf,
     install: true,
-    install_dir: gvfs_mountdir,
+    install_dir: gvfs_mounts_dir,
   )
 endforeach
 
