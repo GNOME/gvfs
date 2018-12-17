@@ -30,7 +30,7 @@ foreach man: mans
     output: output,
     command: xsltproc_cmd,
     install: true,
-    install_dir: join_paths(gvfs_mandir, 'man1'),
+    install_dir: gvfs_mandir / 'man1',
   )
 endforeach
 
@@ -43,5 +43,5 @@ custom_target(
   output: output,
   command: xsltproc_cmd,
   install: true,
-  install_dir: join_paths(gvfs_mandir, 'man7'),
+  install_dir: gvfs_mandir / 'man7',
 )
