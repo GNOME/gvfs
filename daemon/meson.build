@@ -164,7 +164,7 @@ cflags = [
   '-DBACKEND_TYPES="localtest", G_VFS_TYPE_BACKEND_LOCALTEST,',
 ]
 
-programs += [['gvfsd-localtest', sources, [], cflags]]
+programs += [['gvfsd-localtest', {'sources': sources, 'c_args': cflags}]]
 mounts += ['localtest']
 
 sources = files(
@@ -183,12 +183,10 @@ cflags = [
   '-DMAX_JOB_THREADS=10',
 ]
 
-programs += [['gvfsd-ftp', sources, [], cflags]]
+programs += [['gvfsd-ftp', {'sources': sources, 'c_args': cflags}]]
 mounts += ['ftp', 'ftps', 'ftpis']
 
 sources = files('gvfsbackendtrash.c')
-
-deps = [libtrash_dep]
 
 cflags = [
   '-DBACKEND_HEADER=gvfsbackendtrash.h',
@@ -197,7 +195,7 @@ cflags = [
   '-DMAX_JOB_THREADS=10',
 ]
 
-programs += [['gvfsd-trash', sources, deps, cflags]]
+programs += [['gvfsd-trash', {'sources': sources, 'dependencies': [libtrash_dep], 'c_args': cflags}]]
 mounts += ['trash']
 
 sources = files('gvfsbackendrecent.c')
@@ -210,7 +208,7 @@ cflags = [
   '-DMAX_JOB_THREADS=10',
 ]
 
-programs += [['gvfsd-recent', sources, [], cflags]]
+programs += [['gvfsd-recent', {'sources': sources, 'c_args': cflags}]]
 mounts += ['recent']
 
 sources = files('gvfsbackendcomputer.c')
@@ -223,7 +221,7 @@ cflags = [
   '-DMAX_JOB_THREADS=1',
 ]
 
-programs += [['gvfsd-computer', sources, [gio_unix_dep], cflags]]
+programs += [['gvfsd-computer', {'sources': sources, 'dependencies': [gio_unix_dep], 'c_args': cflags}]]
 mounts += ['computer']
 
 sources = files('gvfsbackendnetwork.c')
@@ -236,7 +234,7 @@ cflags = [
   '-DMAX_JOB_THREADS=1',
 ]
 
-programs += [['gvfsd-network', sources, [], cflags]]
+programs += [['gvfsd-network', {'sources': sources, 'c_args': cflags}]]
 mounts += ['network']
 
 sources = files('gvfsbackendburn.c')
@@ -248,7 +246,7 @@ cflags = [
   '-DMAX_JOB_THREADS=1',
 ]
 
-programs += [['gvfsd-burn', sources, [gio_unix_dep], cflags]]
+programs += [['gvfsd-burn', {'sources': sources, 'dependencies': [gio_unix_dep], 'c_args': cflags}]]
 mounts += ['burn']
 
 if enable_sftp
@@ -270,14 +268,12 @@ if enable_sftp
     '-DSSH_PROGRAM="@0@"'.format(ssh.path()),
   ]
 
-  programs += [['gvfsd-sftp', sources, deps, cflags]]
+  programs += [['gvfsd-sftp', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['sftp']
 endif
 
 if enable_samba
   sources = files('gvfsbackendsmb.c')
-
-  deps = [smbclient_dep]
 
   cflags = [
     '-DBACKEND_HEADER=gvfsbackendsmb.h',
@@ -286,7 +282,7 @@ if enable_samba
     '-DMAX_JOB_THREADS=1',
   ]
 
-  programs += [['gvfsd-smb', sources, deps, cflags]]
+  programs += [['gvfsd-smb', {'sources': sources, 'dependencies': [smbclient_dep], 'c_args': cflags}]]
   mounts += ['smb']
   schema_data += files('org.gnome.system.smb.gschema.xml')
   convert_data += files('gvfs-smb.convert')
@@ -301,7 +297,7 @@ if enable_samba
     '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_smb_browse',
   ]
 
-  programs += [['gvfsd-smb-browse', sources, deps, cflags]]
+  programs += [['gvfsd-smb-browse', {'sources': sources, 'dependencies': [smbclient_dep], 'c_args': cflags}]]
   mounts += ['smb-browse']
 endif
 
@@ -322,7 +318,7 @@ if enable_dnssd
     '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_dnssd',
   ]
 
-  programs += [['gvfsd-dnssd', sources, deps, cflags]]
+  programs += [['gvfsd-dnssd', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['dns-sd']
   schema_data += files('org.gnome.system.dns_sd.gschema.xml')
   convert_data += files('gvfs-dns-sd.convert')
@@ -330,8 +326,6 @@ endif
 
 if enable_archive
   sources = files('gvfsbackendarchive.c')
-
-  deps = [libarchive_dep]
 
   cflags = [
     '-DBACKEND_HEADER=gvfsbackendarchive.h',
@@ -341,7 +335,7 @@ if enable_archive
     '-DBACKEND_USES_GVFS=1',
   ]
 
-  programs += [['gvfsd-archive', sources, deps, cflags]]
+  programs += [['gvfsd-archive', {'sources': sources, 'dependencies': [libarchive_dep], 'c_args': cflags}]]
   mounts += ['archive']
 endif
 
@@ -360,7 +354,7 @@ if enable_cdda
     '-DMAX_JOB_THREADS=1',
   ]
 
-  programs += [['gvfsd-cdda', sources, deps, cflags]]
+  programs += [['gvfsd-cdda', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['cdda']
 endif
 
@@ -379,7 +373,7 @@ if enable_admin
     '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_admin',
   ]
 
-  programs += [['gvfsd-admin', sources, deps, cflags]]
+  programs += [['gvfsd-admin', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['admin']
 
   policy = gvfs_namespace + '.file-operations.policy'
@@ -419,7 +413,7 @@ if enable_google
     '-DBACKEND_TYPES="google-drive", G_VFS_TYPE_BACKEND_GOOGLE,',
   ]
 
-  programs += [['gvfsd-google', sources, deps, cflags]]
+  programs += [['gvfsd-google', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['google']
 endif
 
@@ -439,7 +433,7 @@ if enable_gphoto2
     '-DMAX_JOB_THREADS=1',
   ]
 
-  programs += [['gvfsd-gphoto2', sources, deps, cflags]]
+  programs += [['gvfsd-gphoto2', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['gphoto2']
 endif
 
@@ -462,7 +456,7 @@ if enable_mtp
     deps += libusb_dep
   endif
 
-  programs += [['gvfsd-mtp', sources, deps, cflags]]
+  programs += [['gvfsd-mtp', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['mtp']
 endif
 
@@ -485,7 +479,7 @@ if enable_http
     '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_http',
   ]
 
-  programs += [['gvfsd-http', sources, deps, cflags]]
+  programs += [['gvfsd-http', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['http']
 
   sources = sources + files('gvfsbackenddav.c')
@@ -506,7 +500,7 @@ if enable_http
     cflags += '-DBACKEND_TYPES="dav", G_VFS_TYPE_BACKEND_DAV,'
   endif
 
-  programs += [['gvfsd-dav', sources, deps, cflags]]
+  programs += [['gvfsd-dav', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['dav']
 endif
 
@@ -526,7 +520,7 @@ if enable_afc
     '-DBACKEND_USES_GVFS=1',
   ]
 
-  programs += [['gvfsd-afc', sources, deps, cflags]]
+  programs += [['gvfsd-afc', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['afc']
 endif
 
@@ -553,7 +547,7 @@ if enable_afp
     '-DMAX_JOB_THREADS=1',
   ]
 
-  programs += [['gvfsd-afp', sources, deps, cflags]]
+  programs += [['gvfsd-afp', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['afp']
 
   sources = common_sources + files('gvfsbackendafpbrowse.c')
@@ -565,14 +559,12 @@ if enable_afp
     '-DMAX_JOB_THREADS=1',
   ]
 
-  programs += [['gvfsd-afp-browse', sources, deps, cflags]]
+  programs += [['gvfsd-afp-browse', {'sources': sources, 'dependencies': deps, 'c_args': cflags}]]
   mounts += ['afp-browse']
 endif
 
 if enable_nfs
   sources = files('gvfsbackendnfs.c')
-
-  deps = [libnfs_dep]
 
   cflags = [
     '-DBACKEND_HEADER=gvfsbackendnfs.h',
@@ -581,17 +573,22 @@ if enable_nfs
     '-DMAX_JOB_THREADS=1',
   ]
 
-  programs += [['gvfsd-nfs', sources, deps, cflags]]
+  programs += [['gvfsd-nfs', {'sources': sources, 'dependencies': [libnfs_dep], 'c_args': cflags}]]
   mounts += ['nfs']
 endif
 
 foreach program: programs
+  options = program[1]
+  kwargs = {
+    'sources': daemon_main_sources + options.get('sources', []),
+    'dependencies': [libgvfsdaemon_dep] + options.get('dependencies', []),
+    'c_args': options.get('c_args', ''),
+  }
+
   executable(
     program[0],
-    daemon_main_sources + program[1],
     include_directories: top_inc,
-    dependencies: [libgvfsdaemon_dep] + program[2],
-    c_args: program[3],
+    kwargs: kwargs,
     install: true,
     install_rpath: gvfs_rpath,
     install_dir: gvfs_libexecdir,
