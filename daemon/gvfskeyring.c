@@ -153,6 +153,10 @@ compare_specificity (gconstpointer  a,
 
   res = g_hash_table_size (attributes_a) - g_hash_table_size (attributes_b);
 
+  /* Prefer the most recent item if they are equal in specificity. */
+  if (res == 0)
+    res = secret_item_get_modified (item_b) - secret_item_get_modified (item_a);
+
   g_hash_table_unref (attributes_a);
   g_hash_table_unref (attributes_b);
 
