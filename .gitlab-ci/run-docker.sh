@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TAG="registry.gitlab.gnome.org/gnome/gvfs/master:v3"
+TAG="registry.gitlab.gnome.org/gnome/gvfs/master:v4"
 
 if [[ "$1" == "--no-cache" ]]; then
   NOCACHE="--no-cache"
