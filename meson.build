@@ -29,6 +29,17 @@ gvfs_namespace = 'org.gtk.vfs'
 
 gvfs_debug = get_option('buildtype').contains('debug')
 
+gnome = import('gnome')
+i18n = import('i18n')
+pkg = import('pkgconfig')
+
+po_dir = meson.current_source_dir() / 'po'
+
+top_inc = include_directories('.')
+
+service_conf = configuration_data()
+service_conf.set('libexecdir', gvfs_prefix / gvfs_libexecdir)
+
 cc = meson.get_compiler('c')
 
 config_h = configuration_data()
@@ -459,17 +470,6 @@ endif
 # *** Enable development utils ***
 enable_devel_utils = get_option('devel_utils')
 enable_installed_tests = get_option('installed_tests')
-
-gnome = import('gnome')
-i18n = import('i18n')
-pkg = import('pkgconfig')
-
-service_conf = configuration_data()
-service_conf.set('libexecdir', gvfs_prefix / gvfs_libexecdir)
-
-po_dir = meson.source_root() / 'po'
-
-top_inc = include_directories('.')
 
 subdir('common')
 subdir('metadata')
