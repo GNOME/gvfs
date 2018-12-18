@@ -213,16 +213,14 @@ endforeach
 common_flags = ['-DHAVE_CONFIG_H']
 
 if gvfs_debug
-  test_cflags = [
+  common_flags += cc.get_supported_arguments([
     '-Wcast-align',
     '-Wmissing-declarations',
     '-Wmissing-prototypes',
     '-Wnested-externs',
     '-Wno-sign-compare',
     '-Wno-strict-aliasing',
-  ]
-
-  common_flags += cc.get_supported_arguments(test_cflags)
+  ])
 endif
 
 add_project_arguments(common_flags, language: 'c')
