@@ -1027,23 +1027,23 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
       anonymous = TRUE;
       goto try_login;
     }
+  }
 
-    else if (g_vfs_keyring_lookup_password (initial_user,
-                                            g_network_address_get_hostname (priv->addr),
-                                            NULL,
-                                            "afp",
-                                            NULL,
-                                            NULL,
-                                            g_network_address_get_port (priv->addr),
-                                            &user,
-                                            NULL,
-                                            &password) &&
-             user != NULL &&
-             password != NULL)
-    {
-      anonymous = FALSE;
-      goto try_login;
-    }
+  if (g_vfs_keyring_lookup_password (initial_user,
+                                     g_network_address_get_hostname (priv->addr),
+                                     NULL,
+                                     "afp",
+                                     NULL,
+                                     NULL,
+                                     g_network_address_get_port (priv->addr),
+                                     &user,
+                                     NULL,
+                                     &password) &&
+      user != NULL &&
+      password != NULL)
+  {
+    anonymous = FALSE;
+    goto try_login;
   }
 
   while (TRUE)
