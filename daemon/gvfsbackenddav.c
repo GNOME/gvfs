@@ -94,6 +94,7 @@ struct _MountAuthData {
 
   SoupSession  *session;
   GMountSource *mount_source;
+  gboolean retrying_after_403;
 
   AuthInfo server_auth;
   AuthInfo proxy_auth;
@@ -1503,10 +1504,12 @@ soup_authenticate_interactive (SoupSession *session,
   char              *new_password;
   char              *prompt;
 
+  data = (MountAuthData *) user_data;
+
+  retrying = (retrying || data->retrying_after_403);
+
   g_debug ("+ soup_authenticate_interactive (%s) \n",
            retrying ? "retrying" : "first auth");
-
-  data = (MountAuthData *) user_data;
 
   new_username = NULL;
   new_password = NULL;
@@ -1912,6 +1915,30 @@ do_mount (GVfsBackend  *backend,
     status = g_vfs_backend_dav_send_message (backend, msg_opts);
     is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
     is_webdav = sm_has_header (msg_opts, "DAV");
+
+    /* Workaround for servers which response with 403 instead of 401 in case of
+     * wrong credentials to let the user specify its credentials again. */
+    if (status == SOUP_STATUS_FORBIDDEN &&
+        (data->server_auth.password != NULL ||
+         data->proxy_auth.password != NULL))
+      {
+        SoupSessionFeature *auth_manager;
+
+        data->retrying_after_403 = TRUE;
+
+        g_clear_pointer (&data->server_auth.username, g_free);
+        data->server_auth.username = g_strdup (mount_base->user);
+        g_clear_pointer (&data->server_auth.password, g_free);
+        g_clear_pointer (&data->proxy_auth.password, g_free);
+
+        auth_manager = soup_session_get_feature (session, SOUP_TYPE_AUTH_MANAGER);
+        soup_auth_manager_clear_cached_credentials (SOUP_AUTH_MANAGER (auth_manager));
+
+        g_object_unref (msg_opts);
+        msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
+
+        continue;
+      }
 
     /* If SSL is used and the certificate verifies OK, then ssl-strict remains
      * on for all further connections.
