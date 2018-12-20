@@ -652,7 +652,6 @@ check_event (gpointer user_data)
       ret = LIBMTP_Read_Event_Async (device, check_event_cb, backend);
       if (ret != 0) {
         g_debug ("(I) check_event: Read_Event_Async failed: %d\n", ret);
-        continue;
       }
       backend->event_completed = FALSE;
     }
