@@ -94,6 +94,7 @@ struct _MountAuthData {
 
   SoupSession  *session;
   GMountSource *mount_source;
+  gboolean fallback;
 
   AuthInfo server_auth;
   AuthInfo proxy_auth;
@@ -1528,7 +1529,7 @@ soup_authenticate_interactive (SoupSession *session,
 
   have_auth = info->username && info->password;
 
-  if (have_auth == FALSE && g_vfs_keyring_is_available ())
+  if (have_auth == FALSE && data->fallback == FALSE && g_vfs_keyring_is_available ())
     {
       SoupURI *uri; 
       SoupURI *uri_free = NULL;
@@ -1567,7 +1568,7 @@ soup_authenticate_interactive (SoupSession *session,
         soup_uri_free (uri_free);
     }
 
-  if (retrying == FALSE && have_auth)
+  if (retrying == FALSE && data->fallback == FALSE && have_auth)
     {
       soup_auth_authenticate (auth, info->username, info->password);
       return;
@@ -1912,6 +1913,30 @@ do_mount (GVfsBackend  *backend,
     status = g_vfs_backend_dav_send_message (backend, msg_opts);
     is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
     is_webdav = sm_has_header (msg_opts, "DAV");
+
+    /* Workaround for servers which response with 403 instead of 401 in case of
+     * wrong credentials to let the user specify its credentials again. */
+    if (status == SOUP_STATUS_FORBIDDEN &&
+        (data->server_auth.password != NULL ||
+         data->proxy_auth.password != NULL))
+      {
+        SoupSessionFeature *auth_manager;
+
+        data->fallback = TRUE;
+
+        g_clear_pointer (&data->server_auth.username, g_free);
+        data->server_auth.username = g_strdup (mount_base->user);
+        g_clear_pointer (&data->server_auth.password, g_free);
+        g_clear_pointer (&data->proxy_auth.password, g_free);
+
+        auth_manager = soup_session_get_feature (session, SOUP_TYPE_AUTH_MANAGER);
+        soup_auth_manager_clear_cached_credentials (SOUP_AUTH_MANAGER (auth_manager));
+
+        g_object_unref (msg_opts);
+        msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
+
+        continue;
+      }
 
     /* If SSL is used and the certificate verifies OK, then ssl-strict remains
      * on for all further connections.
