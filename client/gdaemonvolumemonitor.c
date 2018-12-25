@@ -184,6 +184,8 @@ mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
   
   G_UNLOCK (daemon_vm);
 
+  _g_daemon_vfs_invalidate (mount_info->dbus_id, mount_info->object_path);
+
   g_signal_emit_by_name (daemon_monitor, "mount_removed", mount);
   g_signal_emit_by_name (mount, "unmounted");
   
