@@ -1377,15 +1377,15 @@ msgstr "No es pot escriure en el directori"
 
 #: daemon/gvfsbackendgphoto2.c:2694
 msgid "Cannot allocate new file to append to"
-msgstr "No es pot ubicar el fitxer nou al que afegir"
+msgstr "No es pot ubicar el fitxer nou al qual afegir"
 
 #: daemon/gvfsbackendgphoto2.c:2709
 msgid "Cannot read file to append to"
-msgstr "No es pot llegir el fitxer al que afegir"
+msgstr "No es pot llegir el fitxer al qual afegir"
 
 #: daemon/gvfsbackendgphoto2.c:2720
 msgid "Cannot get data of file to append to"
-msgstr "No es poden obtenir dades del fitxer al que afegir"
+msgstr "No es poden obtenir dades del fitxer al qual afegir"
 
 #: daemon/gvfsbackendgphoto2.c:3094
 msgid "Not supported (not same directory)"
@@ -1802,7 +1802,7 @@ msgstr "El certificat ha vençut."
 
 #: daemon/gvfsdaemonutils.c:265
 msgid "The certificate has been revoked."
-msgstr "S'ha revocat el certificat"
+msgstr "S'ha revocat el certificat."
 
 #: daemon/gvfsdaemonutils.c:267
 msgid "The certificate’s algorithm is considered insecure."
@@ -1833,7 +1833,7 @@ msgstr ""
 "\n"
 "%s\n"
 "\n"
-"Esteu segur que es voleu continuar?"
+"Esteu segur que voleu continuar?"
 
 #: daemon/gvfsftpconnection.c:211
 msgid "Unexpected end of stream"
@@ -1875,7 +1875,7 @@ msgstr "No es poden utilitzar comptes"
 #: daemon/gvfsftptask.c:403
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
-"No es pot obrir una connexió de dades. Potser el tallafocs no ho permet?"
+"No es pot obrir una connexió de dades. Potser el tallafoc no ho permet?"
 
 #: daemon/gvfsftptask.c:407
 msgid "Data connection closed"
