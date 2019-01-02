@@ -130,8 +130,7 @@ check_permission (GVfsBackendAdmin *self,
       return FALSE;
     }
 
-  is_authorized = polkit_authorization_result_get_is_authorized (result) ||
-    polkit_authorization_result_get_is_challenge (result);
+  is_authorized = polkit_authorization_result_get_is_authorized (result);
 
   g_object_unref (result);
 
