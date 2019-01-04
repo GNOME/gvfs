@@ -1,3 +1,7 @@
+// Allows users belonging to wheel group to start gvfsd-admin without
+// authorization. This prevents two authorization requests in a row during
+// the first use. The other requests are caused by the different action used by
+// all gvfsd-admin operations.
 polkit.addRule(function(action, subject) {
         if ((action.id == "org.gtk.vfs.file-operations-helper") &&
             subject.local &&
