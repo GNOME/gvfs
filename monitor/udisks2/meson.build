@@ -29,7 +29,7 @@ cflags = [
   '-DG_LOG_DOMAIN="GVFS-UDisks2"',
   '-DG_DISABLE_DEPRECATED',
   '-DGIO_MODULE_DIR="@0@"'.format(gio_giomoduledir),
-  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_prefix / gvfs_localedir),
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
   '-DUDISKS_API_IS_SUBJECT_TO_CHANGE',
 ]
 

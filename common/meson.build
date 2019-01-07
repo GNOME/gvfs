@@ -28,7 +28,7 @@ deps = [
   gobject_dep,
 ]
 
-cflags = common_cflags + ['-DREMOTE_VOLUME_MONITORS_DIR="@0@"'.format(gvfs_prefix / gvfs_remote_volume_monitors_dir)]
+cflags = common_cflags + ['-DREMOTE_VOLUME_MONITORS_DIR="@0@"'.format(gvfs_remote_volume_monitors_dir)]
 
 libgvfscommon = shared_library(
   'gvfscommon',

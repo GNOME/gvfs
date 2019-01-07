@@ -15,7 +15,7 @@ deps = [
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-AFC"',
   '-DGIO_MODULE_DIR="@0@"'.format(gio_giomoduledir),
-  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_prefix / gvfs_localedir),
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
 ]
 
 executable(
