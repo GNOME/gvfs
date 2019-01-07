@@ -10,9 +10,9 @@ if enable_installed_tests
   configure_file(
     input: session + '.in',
     output: session,
-    configuration: tests_conf,
     install: true,
     install_dir: installed_tests_execdir,
+    configuration: tests_conf,
   )
 
   all_tests = 'gvfs-all-tests'
@@ -20,9 +20,9 @@ if enable_installed_tests
   configure_file(
     input: all_tests + '.in',
     output: all_tests + '.test',
-    configuration: tests_conf,
     install: true,
     install_dir: installed_tests_metadir,
+    configuration: tests_conf,
   )
 
   install_subdir(
