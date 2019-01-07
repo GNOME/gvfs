@@ -10,7 +10,7 @@ if install_systemd_user_unit_dir
     output: service,
     install: true,
     install_dir: systemd_user_unit_dir,
-    configuration: service_conf,
+    configuration: service_conf
   )
 
   dbus_systemd_service = 'SystemdService=' + service
@@ -26,7 +26,7 @@ metadata_service = configure_file(
   output: dbus_service + '.service',
   install: true,
   install_dir: dbus_service_dir,
-  configuration: dbus_service_conf,
+  configuration: dbus_service_conf
 )
 
 # FIXME: Ugly workaround that simulates the generation of
@@ -38,24 +38,24 @@ dbus_sources = custom_target(
   name,
   input: 'dbus-interface.xml',
   output: [name + '.c', name + '.h'],
-  command: [codegen, gvfs_namespace + '.', name, namespace, meson.current_build_dir(), '@INPUT@', '@OUTPUT@'],
+  command: [codegen, gvfs_namespace + '.', name, namespace, meson.current_build_dir(), '@INPUT@', '@OUTPUT@']
 )
 
 sources = files(
   'crc32.c',
   'metabuilder.c',
-  'metatree.c',
+  'metatree.c'
 )
 
 deps = [
   gio_dep,
-  glib_dep,
+  glib_dep
 ]
 
 cflags = [
   '-DDBUS_API_SUBJECT_TO_CHANGE',
   '-DG_LOG_DOMAIN="@0@"'.format(gvfs_name.to_upper()),
-  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir)
 ]
 
 libmetadata = static_library(
@@ -64,19 +64,19 @@ libmetadata = static_library(
   include_directories: [top_inc, common_inc],
   dependencies: deps + [gio_unix_dep],
   c_args: cflags,
-  pic: true,
+  pic: true
 )
 
 libmetadata_dep = declare_dependency(
   sources: dbus_sources[1],
   include_directories: include_directories('.'),
   dependencies: deps,
-  link_with: libmetadata,
+  link_with: libmetadata
 )
 
 deps = [
   libgvfscommon_dep,
-  libmetadata_dep,
+  libmetadata_dep
 ]
 
 if enable_gudev
@@ -91,7 +91,7 @@ executable(
   c_args: cflags,
   install: true,
   install_rpath: gvfs_rpath,
-  install_dir: gvfs_libexecdir,
+  install_dir: gvfs_libexecdir
 )
 
 if enable_devel_utils
@@ -99,7 +99,7 @@ if enable_devel_utils
     'meta-ls',
     'meta-get',
     'meta-set',
-    'meta-get-tree',
+    'meta-get-tree'
   ]
 
   foreach app: apps
@@ -109,9 +109,9 @@ if enable_devel_utils
       include_directories: top_inc,
       dependencies: [
         libgvfscommon_dep,
-        libmetadata_dep,
+        libmetadata_dep
       ],
-      c_args: cflags,
+      c_args: cflags
     )
   endforeach
 
@@ -122,9 +122,9 @@ if enable_devel_utils
       include_directories: top_inc,
       dependencies: [
         libmetadata_dep,
-        libxml_dep,
+        libxml_dep
       ],
-      c_args: cflags,
+      c_args: cflags
     )
   endif
 endif

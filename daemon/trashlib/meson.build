@@ -3,24 +3,24 @@ sources = files(
   'trashdir.c',
   'trashitem.c',
   'trashwatcher.c',
-  'trashexpunge.c',
+  'trashexpunge.c'
 )
 
 deps = [
   gio_dep,
   gio_unix_dep,
-  glib_dep,
+  glib_dep
 ]
 
 libtrash = static_library(
   'trash',
   sources: sources,
   include_directories: top_inc,
-  dependencies: deps,
+  dependencies: deps
 )
 
 libtrash_dep = declare_dependency(
   include_directories: include_directories('.'),
   dependencies: gio_dep,
-  link_with: libtrash,
+  link_with: libtrash
 )

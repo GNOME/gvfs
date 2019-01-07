@@ -13,7 +13,7 @@ if install_systemd_user_unit_dir
     output: service,
     install: true,
     install_dir: systemd_user_unit_dir,
-    configuration: service_conf,
+    configuration: service_conf
   )
 
   dbus_systemd_service = 'SystemdService=' + service
@@ -29,7 +29,7 @@ daemon_service = configure_file(
   output: dbus_service + '.service',
   install: true,
   install_dir: dbus_service_dir,
-  configuration: dbus_service_conf,
+  configuration: dbus_service_conf
 )
 
 gnome.mkenums(
@@ -42,7 +42,7 @@ gnome.mkenums(
   vtail: '  </@type@>',
   ftail: '</schemalist>',
   install_header: true,
-  install_dir: gvfs_schema_dir,
+  install_dir: gvfs_schema_dir
 )
 
 sources = files(
@@ -92,12 +92,12 @@ sources = files(
   'gvfskeyring.c',
   'gvfsmonitor.c',
   'gvfsreadchannel.c',
-  'gvfswritechannel.c',
+  'gvfswritechannel.c'
 )
 
 deps = socket_deps + [
   gio_unix_dep,
-  libgvfscommon_dep,
+  libgvfscommon_dep
 ]
 
 if enable_gcr
@@ -111,7 +111,7 @@ endif
 cflags = [
   '-DLIBEXEC_DIR="@0@"'.format(gvfs_libexecdir),
   '-DMOUNTABLE_DIR="@0@"'.format(gvfs_mountdir),
-  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir)
 ]
 
 libgvfsdaemon = shared_library(
@@ -121,19 +121,19 @@ libgvfsdaemon = shared_library(
   dependencies: deps,
   c_args: cflags,
   install: true,
-  install_dir: gvfs_pkglibdir,
+  install_dir: gvfs_pkglibdir
 )
 
 libgvfsdaemon_dep = declare_dependency(
   include_directories: include_directories('.'),
   dependencies: libgvfscommon_dep,
   compile_args: cflags,
-  link_with: libgvfsdaemon,
+  link_with: libgvfsdaemon
 )
 
 sources = files(
   'main.c',
-  'mount.c',
+  'mount.c'
 )
 
 executable(
@@ -143,12 +143,12 @@ executable(
   dependencies: libgvfsdaemon_dep,
   install: true,
   install_rpath: gvfs_rpath,
-  install_dir: gvfs_libexecdir,
+  install_dir: gvfs_libexecdir
 )
 
 daemon_main_sources = files(
   'daemon-main.c',
-  'daemon-main-generic.c',
+  'daemon-main-generic.c'
 )
 
 programs = []
@@ -161,7 +161,7 @@ sources = files('gvfsbackendlocaltest.c')
 cflags = [
   '-DBACKEND_HEADER=gvfsbackendlocaltest.h',
   '-DDEFAULT_BACKEND_TYPE=localtest',
-  '-DBACKEND_TYPES="localtest", G_VFS_TYPE_BACKEND_LOCALTEST,',
+  '-DBACKEND_TYPES="localtest", G_VFS_TYPE_BACKEND_LOCALTEST,'
 ]
 
 programs += [['gvfsd-localtest', sources, [], cflags]]
@@ -173,14 +173,14 @@ sources = files(
   'gvfsftpdircache.c',
   'gvfsftpfile.c',
   'gvfsftptask.c',
-  'ParseFTPList.c',
+  'ParseFTPList.c'
 )
 
 cflags = [
   '-DBACKEND_HEADER=gvfsbackendftp.h',
   '-DDEFAULT_BACKEND_TYPE=ftp',
   '-DBACKEND_TYPES="ftp", G_VFS_TYPE_BACKEND_FTP, "ftps", G_VFS_TYPE_BACKEND_FTP, "ftpis", G_VFS_TYPE_BACKEND_FTP,',
-  '-DMAX_JOB_THREADS=10',
+  '-DMAX_JOB_THREADS=10'
 ]
 
 programs += [['gvfsd-ftp', sources, [], cflags]]
@@ -194,7 +194,7 @@ cflags = [
   '-DBACKEND_HEADER=gvfsbackendtrash.h',
   '-DDEFAULT_BACKEND_TYPE=trash',
   '-DBACKEND_TYPES="trash", G_VFS_TYPE_BACKEND_TRASH,',
-  '-DMAX_JOB_THREADS=10',
+  '-DMAX_JOB_THREADS=10'
 ]
 
 programs += [['gvfsd-trash', sources, deps, cflags]]
@@ -207,7 +207,7 @@ cflags = [
   '-DDEFAULT_BACKEND_TYPE=recent',
   '-DBACKEND_TYPES="recent", G_VFS_TYPE_BACKEND_RECENT,',
   '-DBACKEND_USES_GVFS=1',
-  '-DMAX_JOB_THREADS=10',
+  '-DMAX_JOB_THREADS=10'
 ]
 
 programs += [['gvfsd-recent', sources, [], cflags]]
@@ -220,7 +220,7 @@ cflags = [
   '-DDEFAULT_BACKEND_TYPE=computer',
   '-DBACKEND_TYPES="computer", G_VFS_TYPE_BACKEND_COMPUTER,',
   '-DBACKEND_USES_GVFS=1',
-  '-DMAX_JOB_THREADS=1',
+  '-DMAX_JOB_THREADS=1'
 ]
 
 programs += [['gvfsd-computer', sources, [gio_unix_dep], cflags]]
@@ -233,7 +233,7 @@ cflags = [
   '-DDEFAULT_BACKEND_TYPE=network',
   '-DBACKEND_TYPES="network", G_VFS_TYPE_BACKEND_NETWORK,',
   '-DBACKEND_USES_GVFS=1',
-  '-DMAX_JOB_THREADS=1',
+  '-DMAX_JOB_THREADS=1'
 ]
 
 programs += [['gvfsd-network', sources, [], cflags]]
@@ -245,7 +245,7 @@ cflags = [
   '-DBACKEND_HEADER=gvfsbackendburn.h',
   '-DDEFAULT_BACKEND_TYPE=burn',
   '-DBACKEND_TYPES="burn", G_VFS_TYPE_BACKEND_BURN,',
-  '-DMAX_JOB_THREADS=1',
+  '-DMAX_JOB_THREADS=1'
 ]
 
 programs += [['gvfsd-burn', sources, [gio_unix_dep], cflags]]
@@ -254,7 +254,7 @@ mounts += ['burn']
 if enable_sftp
   sources = files(
     'gvfsbackendsftp.c',
-    'pty_open.c',
+    'pty_open.c'
   )
 
   deps = socket_deps + [
@@ -267,7 +267,7 @@ if enable_sftp
     '-DDEFAULT_BACKEND_TYPE=sftp',
     '-DBACKEND_TYPES="sftp", G_VFS_TYPE_BACKEND_SFTP,',
     '-DMAX_JOB_THREADS=1',
-    '-DSSH_PROGRAM="@0@"'.format(ssh.path()),
+    '-DSSH_PROGRAM="@0@"'.format(ssh.path())
   ]
 
   programs += [['gvfsd-sftp', sources, deps, cflags]]
@@ -283,7 +283,7 @@ if enable_samba
     '-DBACKEND_HEADER=gvfsbackendsmb.h',
     '-DDEFAULT_BACKEND_TYPE=smb',
     '-DBACKEND_TYPES="smb-share", G_VFS_TYPE_BACKEND_SMB,',
-    '-DMAX_JOB_THREADS=1',
+    '-DMAX_JOB_THREADS=1'
   ]
 
   programs += [['gvfsd-smb', sources, deps, cflags]]
@@ -298,7 +298,7 @@ if enable_samba
     '-DDEFAULT_BACKEND_TYPE=smb-network',
     '-DBACKEND_TYPES="smb-network", G_VFS_TYPE_BACKEND_SMB_BROWSE, "smb-server",  G_VFS_TYPE_BACKEND_SMB_BROWSE,',
     '-DMAX_JOB_THREADS=1',
-    '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_smb_browse',
+    '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_smb_browse'
   ]
 
   programs += [['gvfsd-smb-browse', sources, deps, cflags]]
@@ -311,7 +311,7 @@ if enable_dnssd
   deps = [
     avahi_client_dep,
     avahi_glib_dep,
-    libgvfscommon_dnssd_dep,
+    libgvfscommon_dnssd_dep
   ]
 
   cflags = [
@@ -319,7 +319,7 @@ if enable_dnssd
     '-DDEFAULT_BACKEND_TYPE=dns-sd',
     '-DBACKEND_TYPES="dns-sd", G_VFS_TYPE_BACKEND_DNS_SD,',
     '-DMAX_JOB_THREADS=1',
-    '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_dnssd',
+    '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_dnssd'
   ]
 
   programs += [['gvfsd-dnssd', sources, deps, cflags]]
@@ -338,7 +338,7 @@ if enable_archive
     '-DDEFAULT_BACKEND_TYPE=archive',
     '-DBACKEND_TYPES="archive", G_VFS_TYPE_BACKEND_ARCHIVE,',
     '-DMAX_JOB_THREADS=1',
-    '-DBACKEND_USES_GVFS=1',
+    '-DBACKEND_USES_GVFS=1'
   ]
 
   programs += [['gvfsd-archive', sources, deps, cflags]]
@@ -350,14 +350,14 @@ if enable_cdda
 
   deps = [
     gudev_dep,
-    libcdio_paranoia_dep,
+    libcdio_paranoia_dep
   ]
 
   cflags = [
     '-DBACKEND_HEADER=gvfsbackendcdda.h',
     '-DDEFAULT_BACKEND_TYPE=cdda',
     '-DBACKEND_TYPES="cdda", G_VFS_TYPE_BACKEND_CDDA,',
-    '-DMAX_JOB_THREADS=1',
+    '-DMAX_JOB_THREADS=1'
   ]
 
   programs += [['gvfsd-cdda', sources, deps, cflags]]
@@ -369,14 +369,14 @@ if enable_admin
 
   deps = [
     libcap_dep,
-    polkit_gobject_dep,
+    polkit_gobject_dep
   ]
 
   cflags = [
     '-DBACKEND_HEADER=gvfsbackendadmin.h',
     '-DDEFAULT_BACKEND_TYPE=admin',
     '-DBACKEND_TYPES="admin", G_VFS_TYPE_BACKEND_ADMIN,',
-    '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_admin',
+    '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_admin'
   ]
 
   programs += [['gvfsd-admin', sources, deps, cflags]]
@@ -387,7 +387,7 @@ if enable_admin
   policy_in = configure_file(
     input: policy + '.in.in',
     output: policy + '.in',
-    configuration: service_conf,
+    configuration: service_conf
   )
 
   i18n.merge_file(
@@ -396,12 +396,12 @@ if enable_admin
     output: policy,
     po_dir: po_dir,
     install: true,
-    install_dir: join_paths(gvfs_datadir, 'polkit-1', 'actions'),
+    install_dir: join_paths(gvfs_datadir, 'polkit-1', 'actions')
   )
 
   install_data(
     gvfs_namespace + '.file-operations.rules',
-    install_dir: join_paths(gvfs_datadir, 'polkit-1', 'rules.d'),
+    install_dir: join_paths(gvfs_datadir, 'polkit-1', 'rules.d')
   )
 endif
 
@@ -410,13 +410,13 @@ if enable_google
 
   deps = [
     goa_dep,
-    libgdata_dep,
+    libgdata_dep
   ]
 
   cflags = [
     '-DBACKEND_HEADER=gvfsbackendgoogle.h',
     '-DDEFAULT_BACKEND_TYPE=google-drive',
-    '-DBACKEND_TYPES="google-drive", G_VFS_TYPE_BACKEND_GOOGLE,',
+    '-DBACKEND_TYPES="google-drive", G_VFS_TYPE_BACKEND_GOOGLE,'
   ]
 
   programs += [['gvfsd-google', sources, deps, cflags]]
@@ -429,14 +429,14 @@ if enable_gphoto2
   deps = [
     gio_unix_dep,
     libgphoto2_dep,
-    libgvfscommon_gphoto2_dep,
+    libgvfscommon_gphoto2_dep
   ]
 
   cflags = [
     '-DBACKEND_HEADER=gvfsbackendgphoto2.h',
     '-DDEFAULT_BACKEND_TYPE=gphoto2',
     '-DBACKEND_TYPES="gphoto2", G_VFS_TYPE_BACKEND_GPHOTO2,',
-    '-DMAX_JOB_THREADS=1',
+    '-DMAX_JOB_THREADS=1'
   ]
 
   programs += [['gvfsd-gphoto2', sources, deps, cflags]]
@@ -455,7 +455,7 @@ if enable_mtp
     '-DBACKEND_HEADER=gvfsbackendmtp.h',
     '-DDEFAULT_BACKEND_TYPE=mtp',
     '-DBACKEND_TYPES="mtp", G_VFS_TYPE_BACKEND_MTP,',
-    '-DMAX_JOB_THREADS=1',
+    '-DMAX_JOB_THREADS=1'
   ]
 
   if enable_libusb
@@ -469,12 +469,12 @@ endif
 if enable_http
   sources = files(
     'gvfsbackendhttp.c',
-    'gvfshttpinputstream.c',
+    'gvfshttpinputstream.c'
   )
 
   deps = [
     libsoup_dep,
-    libxml_dep,
+    libxml_dep
   ]
 
   cflags = [
@@ -482,7 +482,7 @@ if enable_http
     '-DDEFAULT_BACKEND_TYPE=http',
     '-DBACKEND_TYPES="http", G_VFS_TYPE_BACKEND_HTTP,',
     '-DMAX_JOB_THREADS=1',
-    '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_http',
+    '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_http'
   ]
 
   programs += [['gvfsd-http', sources, deps, cflags]]
@@ -493,7 +493,7 @@ if enable_http
   cflags = [
     '-DBACKEND_HEADER=gvfsbackenddav.h',
     '-DDEFAULT_BACKEND_TYPE=dav',
-    '-DMAX_JOB_THREADS=1',
+    '-DMAX_JOB_THREADS=1'
   ]
 
   if enable_dnssd
@@ -515,7 +515,7 @@ if enable_afc
 
   deps = [
     libimobiledevice_dep,
-    libplist_dep,
+    libplist_dep
   ]
 
   cflags = [
@@ -523,7 +523,7 @@ if enable_afc
     '-DDEFAULT_BACKEND_TYPE=afc',
     '-DBACKEND_TYPES="afc", G_VFS_TYPE_BACKEND_AFC,',
     '-DMAX_JOB_THREADS=1',
-    '-DBACKEND_USES_GVFS=1',
+    '-DBACKEND_USES_GVFS=1'
   ]
 
   programs += [['gvfsd-afc', sources, deps, cflags]]
@@ -536,7 +536,7 @@ if enable_afp
     'gvfsafputils.c',
     'gvfsafpconnection.c',
     'gvfsafpserver.c',
-    'gvfsafpvolume.c',
+    'gvfsafpvolume.c'
   )
 
   sources = common_sources + files('gvfsbackendafp.c')
@@ -550,7 +550,7 @@ if enable_afp
     '-DBACKEND_HEADER=gvfsbackendafp.h',
     '-DDEFAULT_BACKEND_TYPE=afp-volume',
     '-DBACKEND_TYPES="afp-volume", G_VFS_TYPE_BACKEND_AFP,',
-    '-DMAX_JOB_THREADS=1',
+    '-DMAX_JOB_THREADS=1'
   ]
 
   programs += [['gvfsd-afp', sources, deps, cflags]]
@@ -562,7 +562,7 @@ if enable_afp
     '-DBACKEND_HEADER=gvfsbackendafpbrowse.h',
     '-DDEFAULT_BACKEND_TYPE=afp-server',
     '-DBACKEND_TYPES="afp-server", G_VFS_TYPE_BACKEND_AFP_BROWSE,',
-    '-DMAX_JOB_THREADS=1',
+    '-DMAX_JOB_THREADS=1'
   ]
 
   programs += [['gvfsd-afp-browse', sources, deps, cflags]]
@@ -578,7 +578,7 @@ if enable_nfs
     '-DBACKEND_HEADER=gvfsbackendnfs.h',
     '-DDEFAULT_BACKEND_TYPE=nfs',
     '-DBACKEND_TYPES="nfs", G_VFS_TYPE_BACKEND_NFS,',
-    '-DMAX_JOB_THREADS=1',
+    '-DMAX_JOB_THREADS=1'
   ]
 
   programs += [['gvfsd-nfs', sources, deps, cflags]]
@@ -594,7 +594,7 @@ foreach program: programs
     c_args: program[3],
     install: true,
     install_rpath: gvfs_rpath,
-    install_dir: gvfs_libexecdir,
+    install_dir: gvfs_libexecdir
   )
 endforeach
 
@@ -606,7 +606,7 @@ foreach mount: mounts
     output: name,
     install: true,
     install_dir: gvfs_mountdir,
-    configuration: service_conf,
+    configuration: service_conf
   )
 endforeach
 
@@ -616,7 +616,7 @@ if enable_devel_utils
   cflags = [
     '-DBACKEND_HEADER=gvfsbackendtest.h',
     '-DDEFAULT_BACKEND_TYPE=test',
-    '-DBACKEND_TYPES="test", G_VFS_TYPE_BACKEND_TEST,',
+    '-DBACKEND_TYPES="test", G_VFS_TYPE_BACKEND_TEST,'
   ]
 
   executable(
@@ -624,16 +624,16 @@ if enable_devel_utils
     sources,
     include_directories: top_inc,
     dependencies: libgvfsdaemon_dep,
-    c_args: cflags,
+    c_args: cflags
   )
 endif
 
 install_data(
   schema_data,
-  install_dir: gvfs_schema_dir,
+  install_dir: gvfs_schema_dir
 )
 
 install_data(
   convert_data,
-  install_dir: join_paths(gvfs_datadir, 'GConf', 'gsettings'),
+  install_dir: join_paths(gvfs_datadir, 'GConf', 'gsettings')
 )

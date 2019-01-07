@@ -2,7 +2,7 @@ dbus_sources = gnome.gdbus_codegen(
   'gvfsvolumemonitordbus',
   'dbus-interfaces.xml',
   interface_prefix: 'org.gtk.Private.',
-  namespace: 'GVfs',
+  namespace: 'GVfs'
 )
 
 sources = files(
@@ -12,19 +12,19 @@ sources = files(
   'gproxymountoperation.c',
   'gproxyshadowmount.c',
   'gproxyvolume.c',
-  'gproxyvolumemonitor.c',
+  'gproxyvolumemonitor.c'
 )
 
 deps = [
   gio_unix_dep,
-  libgvfscommon_dep,
+  libgvfscommon_dep
 ]
 
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-RemoteVolumeMonitor"',
   '-DGIO_MODULE_DIR="@0@"'.format(gio_module_dir),
   '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
-  '-DREMOTE_VOLUME_MONITORS_DIR="@0@"'.format(gvfs_remote_volume_monitors_dir),
+  '-DREMOTE_VOLUME_MONITORS_DIR="@0@"'.format(gvfs_remote_volume_monitors_dir)
 ]
 
 symbol_map = join_paths(meson.current_source_dir(), 'symbol.map')
@@ -44,7 +44,7 @@ libgioremote_volume_monitor = shared_module(
   link_depends: symbol_map,
   install: true,
   install_rpath: gvfs_rpath,
-  install_dir: gio_module_dir,
+  install_dir: gio_module_dir
 )
 
 sources = files('gvfsproxyvolumemonitordaemon.c')
@@ -52,12 +52,12 @@ sources = files('gvfsproxyvolumemonitordaemon.c')
 deps = [
   gio_dep,
   gio_unix_dep,
-  glib_dep,
+  glib_dep
 ]
 
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-RemoteVolumeMonitorDaemon"',
-  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
+  '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir)
 ]
 
 libgvfsproxyvolumemonitordaemon_noin = static_library(
@@ -65,11 +65,11 @@ libgvfsproxyvolumemonitordaemon_noin = static_library(
   sources: sources + [dbus_sources],
   include_directories: top_inc,
   dependencies: deps,
-  c_args: cflags,
+  c_args: cflags
 )
 
 libgvfsproxyvolumemonitordaemon_noin_dep = declare_dependency(
   include_directories: include_directories('.'),
   dependencies: gio_dep,
-  link_with: libgvfsproxyvolumemonitordaemon_noin,
+  link_with: libgvfsproxyvolumemonitordaemon_noin
 )

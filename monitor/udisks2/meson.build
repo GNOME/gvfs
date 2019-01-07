@@ -4,7 +4,7 @@ sources = files(
   'gvfsudisks2mount.c',
   'gvfsudisks2utils.c',
   'gvfsudisks2volume.c',
-  'gvfsudisks2volumemonitor.c',
+  'gvfsudisks2volumemonitor.c'
 )
 
 deps = [
@@ -14,7 +14,7 @@ deps = [
   gudev_dep,
   libgvfscommon_monitor_dep,
   libgvfsproxyvolumemonitordaemon_noin_dep,
-  udisks2_dep,
+  udisks2_dep
 ]
 
 if enable_logind
@@ -30,7 +30,7 @@ cflags = [
   '-DG_DISABLE_DEPRECATED',
   '-DGIO_MODULE_DIR="@0@"'.format(gio_module_dir),
   '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
-  '-DUDISKS_API_IS_SUBJECT_TO_CHANGE',
+  '-DUDISKS_API_IS_SUBJECT_TO_CHANGE'
 ]
 
 executable(
@@ -41,5 +41,5 @@ executable(
   c_args: cflags,
   install: true,
   install_rpath: gvfs_rpath,
-  install_dir: gvfs_libexecdir,
+  install_dir: gvfs_libexecdir
 )

@@ -11,13 +11,13 @@ xsltproc_cmd = [
   '--stringparam', 'man.authors.section.enabled', '0',
   '--stringparam', 'man.copyright.section.enabled', '0',
   'http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl',
-  '@INPUT@',
+  '@INPUT@'
 ]
 
 mans = [
   'gvfsd',
   'gvfsd-fuse',
-  'gvfsd-metadata',
+  'gvfsd-metadata'
 ]
 
 foreach man: mans
@@ -30,7 +30,7 @@ foreach man: mans
     output: output,
     command: xsltproc_cmd,
     install: true,
-    install_dir: join_paths(gvfs_mandir, 'man1'),
+    install_dir: join_paths(gvfs_mandir, 'man1')
   )
 endforeach
 
@@ -43,5 +43,5 @@ custom_target(
   output: output,
   command: xsltproc_cmd,
   install: true,
-  install_dir: join_paths(gvfs_mandir, 'man7'),
+  install_dir: join_paths(gvfs_mandir, 'man7')
 )

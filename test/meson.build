@@ -12,7 +12,7 @@ if enable_installed_tests
     output: session,
     install: true,
     install_dir: installed_tests_execdir,
-    configuration: tests_conf,
+    configuration: tests_conf
   )
 
   all_tests = 'gvfs-all-tests'
@@ -22,24 +22,24 @@ if enable_installed_tests
     output: all_tests + '.test',
     install: true,
     install_dir: installed_tests_metadir,
-    configuration: tests_conf,
+    configuration: tests_conf
   )
 
   install_subdir(
     'files',
-    install_dir: installed_tests_execdir,
+    install_dir: installed_tests_execdir
   )
 
   gvfs_test = files('gvfs-test')
 
   test_data = gvfs_test + [
     daemon_service,
-    metadata_service,
+    metadata_service
   ]
 
   install_data(
     test_data + monitors_test_data,
-    install_dir: installed_tests_execdir,
+    install_dir: installed_tests_execdir
   )
 endif
 
@@ -49,12 +49,12 @@ if enable_devel_utils
     'benchmark-gvfs-small-files',
     'benchmark-posix-big-files',
     'benchmark-posix-small-files',
-    'test-query-info-stream',
+    'test-query-info-stream'
   ]
 
   deps = [
     gio_dep,
-    glib_dep,
+    glib_dep
   ]
 
   foreach test: tests
@@ -62,7 +62,7 @@ if enable_devel_utils
       test,
       test + '.c',
       include_directories: top_inc,
-      dependencies: deps,
+      dependencies: deps
     )
   endforeach
 endif
