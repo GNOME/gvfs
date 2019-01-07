@@ -1,3 +1,11 @@
+Major changes in 1.39.4
+=======================
+* keyring: Prefer the most recent item
+* afp: Try to find credentials even if user is not specified
+* dav: Try authenticate again even if 403 was returned
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.39.3
 =======================
 * udisks2: Improve handling of mounts which doesn't point into fs root
