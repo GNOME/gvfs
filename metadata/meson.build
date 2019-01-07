@@ -18,7 +18,7 @@ endif
 
 dbus_service_conf = configuration_data()
 dbus_service_conf.set('service', dbus_service)
-dbus_service_conf.set('exec', gvfs_libexecdir / dbus_exec)
+dbus_service_conf.set('exec', join_paths(gvfs_libexecdir, dbus_exec))
 dbus_service_conf.set('systemd_service', dbus_systemd_service)
 
 metadata_service = configure_file(

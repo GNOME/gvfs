@@ -5,7 +5,7 @@ headers = files(
 
 install_headers(
   headers,
-  subdir: 'gvfs-client/gvfs',
+  subdir: join_paths('gvfs-client', 'gvfs'),
 )
 
 # Dynamic client lib
@@ -40,10 +40,10 @@ deps = [
 cflags = [
   '-DG_LOG_DOMAIN="@0@"'.format(gvfs_name.to_upper()),
   '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
-  '-DGVFS_MODULE_DIR="@0@"'.format(gvfs_pkglibdir / 'modules'),
+  '-DGVFS_MODULE_DIR="@0@"'.format(join_paths(gvfs_libdir, 'gvfs', 'modules')),
 ]
 
-symbol_map = meson.current_source_dir() / 'symbol.map'
+symbol_map = join_paths(meson.current_source_dir(), 'symbol.map')
 
 ldflags = []
 if have_version_script

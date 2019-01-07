@@ -10,21 +10,21 @@ gvfs_name = meson.project_name()
 gvfs_version = meson.project_version()
 
 gvfs_prefix = get_option('prefix')
-gvfs_datadir = gvfs_prefix / get_option('datadir')
-gvfs_libdir = gvfs_prefix / get_option('libdir')
-gvfs_libexecdir = gvfs_prefix / get_option('libexecdir')
-gvfs_localedir = gvfs_prefix / get_option('localedir')
-gvfs_mandir = gvfs_prefix / get_option('mandir')
+gvfs_datadir = join_paths(gvfs_prefix, get_option('datadir'))
+gvfs_libdir = join_paths(gvfs_prefix, get_option('libdir'))
+gvfs_libexecdir = join_paths(gvfs_prefix, get_option('libexecdir'))
+gvfs_localedir = join_paths(gvfs_prefix, get_option('localedir'))
+gvfs_mandir = join_paths(gvfs_prefix, get_option('mandir'))
 
-gvfs_pkgdatadir = gvfs_datadir / gvfs_name
-gvfs_pkglibdir = gvfs_libdir / gvfs_name
+gvfs_pkgdatadir = join_paths(gvfs_datadir, gvfs_name)
+gvfs_pkglibdir = join_paths(gvfs_libdir, gvfs_name)
 
 gvfs_rpath = gvfs_pkglibdir
 
-gvfs_remote_volume_monitors_dir = gvfs_pkgdatadir / 'remote-volume-monitors'
+gvfs_remote_volume_monitors_dir = join_paths(gvfs_pkgdatadir, 'remote-volume-monitors')
 
-gvfs_mountdir = gvfs_pkgdatadir / 'mounts'
-gvfs_schema_dir = gvfs_datadir / 'glib-2.0/schemas'
+gvfs_mountdir = join_paths(gvfs_pkgdatadir, 'mounts')
+gvfs_schema_dir = join_paths(gvfs_datadir, 'glib-2.0', 'schemas')
 
 gvfs_namespace = 'org.gtk.vfs'
 
@@ -218,7 +218,7 @@ endif
 add_project_arguments(common_flags, language: 'c')
 
 version_script_ldflag = '-Wl,--version-script'
-have_version_script = cc.has_link_argument('@0@,@1@'.format(version_script_ldflag, meson.current_source_dir() / 'client/symbol.map'))
+have_version_script = cc.has_link_argument('@0@,@1@'.format(version_script_ldflag, join_paths(meson.current_source_dir(), 'client', 'symbol.map')))
 
 gio_dep = dependency('gio-2.0')
 gio_unix_dep = dependency('gio-unix-2.0')
@@ -456,7 +456,7 @@ pkg = import('pkgconfig')
 service_conf = configuration_data()
 service_conf.set('libexecdir', gvfs_libexecdir)
 
-po_dir = meson.source_root() / 'po'
+po_dir = join_paths(meson.source_root(), 'po')
 
 top_inc = include_directories('.')
 

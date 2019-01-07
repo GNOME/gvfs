@@ -21,7 +21,7 @@ endif
 
 dbus_service_conf = configuration_data()
 dbus_service_conf.set('service', dbus_service)
-dbus_service_conf.set('exec', gvfs_libexecdir / dbus_exec)
+dbus_service_conf.set('exec', join_paths(gvfs_libexecdir, dbus_exec))
 dbus_service_conf.set('systemd_service', dbus_systemd_service)
 
 daemon_service = configure_file(
@@ -396,12 +396,12 @@ if enable_admin
     output: policy,
     po_dir: po_dir,
     install: true,
-    install_dir: gvfs_datadir / 'polkit-1/actions',
+    install_dir: join_paths(gvfs_datadir, 'polkit-1', 'actions'),
   )
 
   install_data(
     gvfs_namespace + '.file-operations.rules',
-    install_dir: gvfs_datadir / 'polkit-1/rules.d',
+    install_dir: join_paths(gvfs_datadir, 'polkit-1', 'rules.d'),
   )
 endif
 
@@ -635,5 +635,5 @@ install_data(
 
 install_data(
   convert_data,
-  install_dir: gvfs_datadir / 'GConf/gsettings',
+  install_dir: join_paths(gvfs_datadir, 'GConf', 'gsettings'),
 )
