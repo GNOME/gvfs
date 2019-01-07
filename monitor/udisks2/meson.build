@@ -28,7 +28,7 @@ endif
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-UDisks2"',
   '-DG_DISABLE_DEPRECATED',
-  '-DGIO_MODULE_DIR="@0@"'.format(gio_giomoduledir),
+  '-DGIO_MODULE_DIR="@0@"'.format(gio_module_dir),
   '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
   '-DUDISKS_API_IS_SUBJECT_TO_CHANGE',
 ]

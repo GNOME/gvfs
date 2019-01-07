@@ -14,7 +14,7 @@ deps = [
 
 cflags = [
   '-DG_LOG_DOMAIN="GVFS-GPhoto2"',
-  '-DGIO_MODULE_DIR="@0@"'.format(gio_giomoduledir),
+  '-DGIO_MODULE_DIR="@0@"'.format(gio_module_dir),
   '-DGVFS_LOCALEDIR="@0@"'.format(gvfs_localedir),
 ]
 
