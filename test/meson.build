@@ -37,8 +37,20 @@ if enable_installed_tests
     metadata_service
   ]
 
+  if enable_afc
+    test_data += [afc_monitor, afc_service]
+  endif
+
+  if enable_gphoto2
+    test_data += [gphoto2_monitor, gphoto2_service]
+  endif
+
+  if enable_udisks2
+    test_data += [udisks2_monitor, udisks2_service]
+  endif
+
   install_data(
-    test_data + monitors_test_data,
+    test_data,
     install_dir: installed_tests_execdir
   )
 endif
