@@ -10,7 +10,7 @@ if install_systemd_systemduserunitdir
 
   configure_file(
     input: service + '.in',
-    output: '@BASENAME@',
+    output: service,
     configuration: service_conf,
     install: true,
     install_dir: systemd_systemduserunitdir,
@@ -386,14 +386,14 @@ if enable_admin
 
   policy_in = configure_file(
     input: policy + '.in.in',
-    output: '@BASENAME@',
+    output: policy + '.in',
     configuration: service_conf,
   )
 
   i18n.merge_file(
     policy,
     input: policy_in,
-    output: '@BASENAME@',
+    output: policy,
     po_dir: po_dir,
     install: true,
     install_dir: gvfs_datadir / 'polkit-1/actions',
@@ -599,9 +599,11 @@ foreach program: programs
 endforeach
 
 foreach mount: mounts
+  name = mount + '.mount'
+
   configure_file(
-    input: mount + '.mount.in',
-    output: '@BASENAME@',
+    input: name + '.in',
+    output: name,
     configuration: service_conf,
     install: true,
     install_dir: gvfs_mountdir,

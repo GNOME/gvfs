@@ -7,7 +7,7 @@ if install_systemd_systemduserunitdir
 
   configure_file(
     input: service + '.in',
-    output: '@BASENAME@',
+    output: service,
     configuration: service_conf,
     install: true,
     install_dir: systemd_systemduserunitdir,
