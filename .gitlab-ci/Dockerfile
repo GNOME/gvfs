@@ -12,3 +12,18 @@ RUN dnf install -y --best elfutils-libelf-devel gamin-devel gcc gcc-c++ gdbm get
  && ninja -C _build install \
  && cd .. \
  && rm -rf glib
+
+# https://gitlab.com/BuildStream/buildstream-docker-images/blob/master/buildstream-fedora/prepare.sh
+# https://gitlab.gnome.org/GNOME/gnome-build-meta/blob/master/.gitlab-ci.yml
+RUN dnf install -y python3 fuse bubblewrap python3-pip python-setuptools python3-devel gcc-c++ bzr git lzip patch ostree python3-gobject quilt make findutils \
+ && dnf clean all \
+ && pip3 install arpy \
+ && git clone https://gitlab.com/BuildStream/buildstream.git \
+ && git -C buildstream/ checkout 10abe77fe8d77385d86f225b503d9185f4ef7f3a \
+ && pip3 install buildstream/ \
+ && git clone https://gitlab.com/BuildStream/bst-external.git \
+ && git -C bst-external/ checkout 0.8.0-0-g762ea216b751bf89ac15350e1cb98542963bbf33 \
+ && pip3 install bst-external/ \
+ && git clone --depth 1 https://gitlab.gnome.org/GNOME/gnome-build-meta.git
+
+COPY buildstream.conf /
