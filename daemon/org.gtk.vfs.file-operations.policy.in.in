@@ -11,7 +11,7 @@
   <!-- This action is used when starting gvfsd-admin. -->
   <action id="org.gtk.vfs.file-operations-helper">
     <description>Perform file operations</description>
-    <message>Authentication is required to perform file operations</message>
+    <message>Authentication is required to run gvfsd-admin daemon</message>
     <defaults>
       <allow_any>no</allow_any>
       <allow_inactive>no</allow_inactive>
