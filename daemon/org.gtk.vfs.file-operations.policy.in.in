@@ -8,6 +8,7 @@
   <vendor>GVfs</vendor>
   <vendor_url>http://git.gnome.org/browse/gvfs</vendor_url>
 
+  <!-- This action is used when starting gvfsd-admin. -->
   <action id="org.gtk.vfs.file-operations-helper">
     <description>Perform file operations</description>
     <message>Authentication is required to perform file operations</message>
@@ -19,6 +20,7 @@
     <annotate key="org.freedesktop.policykit.exec.path">@libexecdir@/gvfsd-admin</annotate>
   </action>
 
+  <!-- This action is used to authorize gvfsd-admin operations. -->
   <action id="org.gtk.vfs.file-operations">
     <description>Perform file operations</description>
     <message>Authentication is required to perform file operations</message>
