@@ -1,7 +1,16 @@
-image: registry.gitlab.gnome.org/gnome/gvfs/master:v4
-
-build:
-    stage: build
+fedora:
+    image: $CI_REGISTRY_IMAGE
     script:
         - meson build --werror
         - ninja -C build
+
+update-image:
+    image: docker:latest
+    services:
+        - docker:dind
+    script:
+        - docker build --tag $CI_REGISTRY_IMAGE .gitlab-ci/
+        - docker tag $CI_REGISTRY_IMAGE "$CI_REGISTRY_IMAGE:v$CI_JOB_ID"
+        - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+        - docker push $CI_REGISTRY_IMAGE
+    when: manual
