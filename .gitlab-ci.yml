@@ -1,28 +1,31 @@
+variables:
+    NAME: "fedora"
+
 fedora:
     stage: build
-    image: registry.gitlab.gnome.org/gnome/gvfs/master:v4
+    image: "$CI_REGISTRY_IMAGE/$NAME"
     script:
         - meson build --werror
         - ninja -C build
 
 gnome-build-meta:
     stage: build
-    image: buildstream/buildstream-fedora:master-123-abef70fe
-    cache:
-        key: bst
-        paths:
-            - "/root/.cache/buildstream"
-    before_script:
-        - pip3 uninstall -y buildstream
-        - git clone https://gitlab.com/BuildStream/buildstream.git
-        - git -C buildstream/ checkout 10abe77fe8d77385d86f225b503d9185f4ef7f3a
-        - pip3 install buildstream/
-        - git clone https://gitlab.com/BuildStream/bst-external.git
-        - git -C bst-external/ checkout 0.8.0-0-g762ea216b751bf89ac15350e1cb98542963bbf33
-        - pip3 install bst-external/
-        - git clone --depth 1 https://gitlab.gnome.org/GNOME/gnome-build-meta.git
+    image: "$CI_REGISTRY_IMAGE/$NAME"
     script:
         - cd gnome-build-meta
-        - bst build --track-all sdk/gvfs.bst
         - bst workspace open --no-checkout sdk/gvfs.bst ..
         - bst build sdk/gvfs.bst
+
+update-image:
+    stage: build
+    image: docker:latest
+    services:
+        - docker:dind
+    script:
+        - docker build --tag "$CI_REGISTRY_IMAGE/$NAME" .gitlab-ci/
+        - docker run --privileged --name $NAME "$CI_REGISTRY_IMAGE/$NAME" bash -c "cd gnome-build-meta && bst build --track-all sdk/gvfs.bst"
+        - docker commit $NAME "$CI_REGISTRY_IMAGE:$NAME"
+        - docker tag "$CI_REGISTRY_IMAGE/$NAME" "$CI_REGISTRY_IMAGE/$NAME:v$CI_JOB_ID"
+        - docker login ${CI_REGISTRY} -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}
+        - docker push "$CI_REGISTRY_IMAGE/$NAME"
+    when: manual
