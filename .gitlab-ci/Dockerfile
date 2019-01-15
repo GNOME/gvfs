@@ -12,3 +12,13 @@ RUN dnf install -y --best elfutils-libelf-devel gamin-devel gcc gcc-c++ gdbm get
  && ninja -C _build install \
  && cd .. \
  && rm -rf glib
+
+RUN git clone https://gitlab.com/BuildStream/buildstream.git \
+ && git -C buildstream/ checkout 10abe77fe8d77385d86f225b503d9185f4ef7f3a \
+ && pip3 install buildstream/ \
+ && git clone https://gitlab.com/BuildStream/bst-external.git \
+ && git -C bst-external/ checkout 0.8.0-0-g762ea216b751bf89ac15350e1cb98542963bbf33 \
+ && pip3 install bst-external/ \
+ && git clone --depth 1 https://gitlab.gnome.org/GNOME/gnome-build-meta.git \
+ && cd gnome-build-meta \
+ && bst build --track-all sdk/gvfs.bst
