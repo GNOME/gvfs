@@ -5,8 +5,9 @@ fedora:
     stage: build
     image: "$CI_REGISTRY_IMAGE/$NAME"
     script:
-        - meson build --werror
-        - ninja -C build
+        - meson -Dinstalled_tests=true --prefix /usr --werror build
+        - ninja -C build install
+        - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner
 
 gnome-build-meta:
     stage: build
