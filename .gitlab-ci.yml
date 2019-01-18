@@ -1,13 +1,31 @@
 variables:
     NAME: "fedora"
 
+stages:
+    - image
+    - build
+    - test
+
 fedora:
     stage: build
     image: "$CI_REGISTRY_IMAGE/$NAME"
+    artifacts:
+        paths:
+            - $CI_PROJECT_DIR
+        expire_in: 1h
     script:
         - meson -Dinstalled_tests=true --prefix /usr --werror build
+        - ninja -C build
+
+test:
+    stage: test
+    image: "$CI_REGISTRY_IMAGE/$NAME"
+    dependencies:
+        - fedora
+    script:
         - ninja -C build install
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner
+    allow_failure: true
 
 gnome-build-meta:
     stage: build
@@ -26,9 +44,10 @@ gnome-build-meta:
         - bst build --track-all sdk/gvfs.bst
         - bst workspace open --no-checkout sdk/gvfs.bst ..
         - bst --no-interactive build sdk/gvfs.bst
+    when: manual
 
 update-image:
-    stage: build
+    stage: image
     image: docker:latest
     services:
         - docker:dind
