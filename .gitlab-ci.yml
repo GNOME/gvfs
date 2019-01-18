@@ -1,12 +1,28 @@
 variables:
     NAME: "fedora"
 
+stages:
+    - build
+    - test
+
 fedora:
     stage: build
     image: "$CI_REGISTRY_IMAGE/$NAME"
+    artifacts:
+        paths:
+            - build/
+        expire_in: 1h
     script:
-        - meson build --werror
+        - meson -Dinstalled_tests=true --prefix /usr --werror build
         - ninja -C build
+
+test:
+    stage: test
+    dependencies:
+        - fedora
+    script:
+        - ninja -C build install
+        - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner
 
 gnome-build-meta:
     stage: build
