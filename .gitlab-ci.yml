@@ -1,5 +1,5 @@
 fedora:
-    image: $CI_REGISTRY_IMAGE
+    image: registry.gitlab.gnome.org/gnome/gvfs:latest
     script:
         - meson -Dinstalled_tests=true --prefix /usr --werror build
         - ninja -C build install
