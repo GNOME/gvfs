@@ -1,3 +1,12 @@
+Major changes in 1.39.90
+========================
+* sftp: Always use port 22 if not specified
+* mtp: Don't retry reading an event after failure
+* admin: Prevent access if any authentication agent isn't available
+* build: Several meson improvements
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.39.4
 =======================
 * keyring: Prefer the most recent item
