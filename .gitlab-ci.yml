@@ -5,7 +5,7 @@ fedora:
         - ninja -C build install
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
 
-gnome-build-meta:
+.gnome-build-meta-template: &gnome-build-meta
     image: buildstream/buildstream-fedora:master-123-abef70fe
     before_script:
         - pip3 uninstall -y buildstream
@@ -21,7 +21,15 @@ gnome-build-meta:
         - bst build --track-all sdk/gvfs.bst
         - bst workspace open --no-checkout sdk/gvfs.bst ..
         - bst --no-interactive build sdk/gvfs.bst
+
+gnome-build-meta-tags:
+    <<: *gnome-build-meta
+    only: [tags]
+
+gnome-build-meta-manual:
+    <<: *gnome-build-meta
     when: manual
+    except: [tags]
 
 update-image:
     image: docker:latest
