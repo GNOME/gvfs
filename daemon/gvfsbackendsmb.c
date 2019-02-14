@@ -417,10 +417,6 @@ do_mount (GVfsBackend *backend,
   if (op_backend->default_workgroup != NULL)
     smbc_setWorkgroup (smb_context, op_backend->default_workgroup);
 
-  /* Initial settings:
-   *   - use Kerberos (always)
-   *   - in case of no username specified, try anonymous login
-   */
   smbc_setOptionUseKerberos (smb_context, 1);
   smbc_setOptionFallbackAfterKerberos (smb_context,
                                        op_backend->user != NULL);
@@ -482,6 +478,12 @@ do_mount (GVfsBackend *backend,
 
   errsv = 0;
 
+  /* If user is not specified, first and second iteration is kerberos resp.
+   * ccache only (this is necessary in order to prevent redundant password
+   * prompts). Consequently, credentials from keyring are tried if available.
+   * Finally, user is prompted over GMountOperation if available. Anonymous is
+   * tried only if explicitely requested over GMountOperation.
+   */
   do
     {
       op_backend->mount_try_again = FALSE;
@@ -509,9 +511,10 @@ do_mount (GVfsBackend *backend,
       /* The first round is Kerberos-only.  Only if this fails do we enable
        * NTLMSSP fallback.
        */
-      if (op_backend->mount_try == 0)
+      if (op_backend->mount_try == 0 &&
+          op_backend->user == NULL)
         {
-          g_debug ("do_mount - after anon, enabling NTLMSSP fallback\n");
+          g_debug ("do_mount - enabling NTLMSSP fallback\n");
           smbc_setOptionFallbackAfterKerberos (op_backend->smb_context, 1);
         }
 
