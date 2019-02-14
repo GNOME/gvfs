@@ -417,6 +417,7 @@ do_mount (GVfsBackend *backend,
   smbc_setOptionFallbackAfterKerberos (smb_context,
                                        op_backend->user != NULL);
   smbc_setOptionNoAutoAnonymousLogin (smb_context, TRUE);
+  smbc_setOptionUseCCache (smb_context, 1);
 
   if (!smbc_init_context (smb_context))
     {
