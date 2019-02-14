@@ -206,6 +206,14 @@ auth_callback (SMBCCTX *context,
       backend->mount_try_again = TRUE;
       g_debug ("auth_callback - kerberos pass\n");
     }
+  else if (backend->mount_try == 1 &&
+           backend->user == NULL &&
+           backend->domain == NULL)
+    {
+      /* Try again if ccache login fails */
+      backend->mount_try_again = TRUE;
+      g_debug ("auth_callback - ccache pass\n");
+    }
   else if (backend->use_anonymous)
     {
       /* Try again if anonymous login fails */
