@@ -1,3 +1,9 @@
+Major changes in 1.39.91
+========================
+* smb: Do not show password prompt when using winbind ccache
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.39.90
 ========================
 * sftp: Always use port 22 if not specified
