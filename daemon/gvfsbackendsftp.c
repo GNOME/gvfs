@@ -538,11 +538,17 @@ spawn_ssh (GVfsBackend *backend,
   if (gvfs_get_debug ())
     {
       const char **arg;
+      GString *cmd;
 
-      g_debug ("spawn_ssh: ");
+      cmd = g_string_new (NULL);
       for (arg = (const char **)args; *arg != NULL; arg++)
-        g_debug ("%s ", *arg);
-      g_debug ("\n");
+        {
+          g_string_append (cmd, *arg);
+          g_string_append (cmd, " ");
+        }
+
+      g_debug ("spawn_ssh: %s\n", cmd->str);
+      g_string_free (cmd, TRUE);
     }
 
 #ifdef USE_PTY
