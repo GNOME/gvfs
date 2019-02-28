@@ -15,6 +15,7 @@
 
 #include "trashitem.h"
 #include "trashdir.h"
+#include <gvfsutils.h>
 
 typedef enum
 {
@@ -211,6 +212,33 @@ trash_mount_remove (TrashMount **mount_ptr)
   g_slice_free (TrashMount, mount);
 }
 
+static gboolean
+should_include (GUnixMountEntry *mount_entry)
+{
+  GUnixMountPoint *mount_point = NULL;
+  const gchar *options;
+  gchar *value;
+  gboolean ret = TRUE;
+
+  mount_point = gvfs_get_mount_point_for_mount (mount_entry);
+  if (mount_point != NULL)
+    options = g_unix_mount_point_get_options (mount_point);
+  else
+    options = g_unix_mount_get_options (mount_entry);
+
+  value = gvfs_lookup_fstab_options_value (options, "x-gvfs-ignore");
+  if (value != NULL)
+    {
+      ret = FALSE;
+      g_free (value);
+    }
+
+  if (mount_point != NULL)
+    g_unix_mount_point_free (mount_point);
+
+  return ret;
+}
+
 static void
 trash_watcher_remount (TrashWatcher *watcher)
 {
@@ -229,7 +257,7 @@ trash_watcher_remount (TrashWatcher *watcher)
     {
       int result;
 
-      if (new && g_unix_mount_is_system_internal (new->data))
+      if (new && (g_unix_mount_is_system_internal (new->data) || !should_include (new->data)))
         {
           g_unix_mount_free (new->data);
           new = new->next;

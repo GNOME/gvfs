@@ -10,6 +10,7 @@ deps = [
   gio_dep,
   gio_unix_dep,
   glib_dep,
+  libgvfscommon_dep,
 ]
 
 libtrash = static_library(
