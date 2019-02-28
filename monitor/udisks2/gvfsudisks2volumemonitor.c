@@ -602,6 +602,13 @@ should_include (const gchar *mount_path,
           g_free (value);
           goto out;
         }
+      value = gvfs_lookup_fstab_options_value (options, "x-gvfs-ignore");
+      if (value != NULL)
+        {
+          ret = FALSE;
+          g_free (value);
+          goto out;
+        }
     }
 
   /* Never display internal mountpoints */
