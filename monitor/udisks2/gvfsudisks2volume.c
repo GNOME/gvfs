@@ -40,6 +40,7 @@
 #include "gvfsudisks2volume.h"
 #include "gvfsudisks2mount.h"
 #include "gvfsudisks2utils.h"
+#include "gvfsutils.h"
 
 typedef struct _GVfsUDisks2VolumeClass GVfsUDisks2VolumeClass;
 
@@ -187,14 +188,14 @@ apply_options_from_fstab (GVfsUDisks2Volume *volume,
   gchar *icon_name;
   gchar *symbolic_icon_name;
 
-  name = gvfs_udisks2_utils_lookup_fstab_options_value (fstab_options, "x-gvfs-name=");
+  name = gvfs_lookup_fstab_options_value (fstab_options, "x-gvfs-name=");
   if (name != NULL)
     {
       g_free (volume->name);
       volume->name = name;
     }
 
-  icon_name = gvfs_udisks2_utils_lookup_fstab_options_value (fstab_options, "x-gvfs-icon=");
+  icon_name = gvfs_lookup_fstab_options_value (fstab_options, "x-gvfs-icon=");
   if (icon_name != NULL)
     {
       g_clear_object (&volume->icon);
@@ -202,7 +203,7 @@ apply_options_from_fstab (GVfsUDisks2Volume *volume,
       g_free (icon_name);
     }
 
-  symbolic_icon_name = gvfs_udisks2_utils_lookup_fstab_options_value (fstab_options, "x-gvfs-symbolic-icon=");
+  symbolic_icon_name = gvfs_lookup_fstab_options_value (fstab_options, "x-gvfs-symbolic-icon=");
   if (symbolic_icon_name != NULL)
     {
       g_clear_object (&volume->symbolic_icon);

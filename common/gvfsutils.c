@@ -145,3 +145,64 @@ gvfs_is_ipv6 (const char *host)
 
   return TRUE;
 }
+
+gchar *
+gvfs_lookup_fstab_options_value (const gchar *fstab_options,
+                                 const gchar *key)
+{
+  gchar *ret = NULL;
+
+  if (fstab_options != NULL)
+    {
+      const gchar *start;
+      guint n;
+
+      /* The code doesn't care about prefix, which may cause problems for
+       * options like "auto" and "noauto". However, this function is only used
+       * with our "x-gvfs-*" options, where mentioned problems are unlikely.
+       * Be careful, that some people rely on this bug and use "comment=x-gvfs-*"
+       * as workaround, see: https://gitlab.gnome.org/GNOME/gvfs/issues/348
+       */
+      start = strstr (fstab_options, key);
+      if (start != NULL)
+        {
+          start += strlen (key);
+          for (n = 0; start[n] != ',' && start[n] != '\0'; n++)
+            ;
+          if (n == 0)
+            ret = g_strdup ("");
+          else if (n >= 1)
+            ret = g_uri_unescape_segment (start, start + n, NULL);
+        }
+    }
+  return ret;
+}
+
+GUnixMountPoint *
+gvfs_get_mount_point_for_mount (GUnixMountEntry *mount_entry)
+{
+  GUnixMountPoint *ret = NULL;
+  GList *mount_points, *l;
+
+  mount_points = g_unix_mount_points_get (NULL);
+  for (l = mount_points; l != NULL; l = l->next)
+    {
+      GUnixMountPoint *mount_point = l->data;
+      if (g_strcmp0 (g_unix_mount_get_mount_path (mount_entry),
+                     g_unix_mount_point_get_mount_path (mount_point)) == 0)
+        {
+          ret = mount_point;
+          goto out;
+        }
+    }
+
+ out:
+  for (l = mount_points; l != NULL; l = l->next)
+    {
+      GUnixMountPoint *mount_point = l->data;
+      if (G_LIKELY (mount_point != ret))
+        g_unix_mount_point_free (mount_point);
+    }
+  g_list_free (mount_points);
+  return ret;
+}

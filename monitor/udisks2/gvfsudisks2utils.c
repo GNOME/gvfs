@@ -99,38 +99,6 @@ gvfs_udisks2_utils_symbolic_icon_from_fs_type (const gchar *fs_type)
   return g_themed_icon_new_with_default_fallbacks (icon_name);
 }
 
-gchar *
-gvfs_udisks2_utils_lookup_fstab_options_value (const gchar *fstab_options,
-                                               const gchar *key)
-{
-  gchar *ret = NULL;
-
-  if (fstab_options != NULL)
-    {
-      const gchar *start;
-      guint n;
-
-      /* The code doesn't care about prefix, which may cause problems for
-       * options like "auto" and "noauto". However, this function is only used
-       * with our "x-gvfs-*" options, where mentioned problems are unlikely.
-       * Be careful, that some people rely on this bug and use "comment=x-gvfs-*"
-       * as workaround, see: https://gitlab.gnome.org/GNOME/gvfs/issues/348
-       */
-      start = strstr (fstab_options, key);
-      if (start != NULL)
-        {
-          start += strlen (key);
-          for (n = 0; start[n] != ',' && start[n] != '\0'; n++)
-            ;
-          if (n == 0)
-            ret = g_strdup ("");
-          else if (n >= 1)
-            ret = g_uri_unescape_segment (start, start + n, NULL);
-        }
-    }
-  return ret;
-}
-
 /* ---------------------------------------------------------------------------------------------------- */
 
 typedef struct

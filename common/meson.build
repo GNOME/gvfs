@@ -43,7 +43,7 @@ libgvfscommon = shared_library(
 libgvfscommon_dep = declare_dependency(
   sources: dbus_sources[1],
   include_directories: common_inc,
-  dependencies: deps,
+  dependencies: deps + [gio_unix_dep],
   link_with: libgvfscommon,
 )
 
