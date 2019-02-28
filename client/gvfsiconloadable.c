@@ -44,18 +44,20 @@ create_proxy_for_icon (GVfsIcon *vfs_icon,
   GVfsDBusMount *proxy;
   GMountInfo *mount_info;
   GDBusConnection *connection;
+  GError *local_error = NULL;
 
+ retry:
   proxy = NULL;
   
   mount_info = _g_daemon_vfs_get_mount_info_sync (vfs_icon->mount_spec,
                                                   "/",
                                                   cancellable,
-                                                  error);
+                                                  &local_error);
   
   if (mount_info == NULL)
     goto out;
 
-  connection = _g_dbus_connection_get_sync (mount_info->dbus_id, cancellable, error);
+  connection = _g_dbus_connection_get_sync (mount_info->dbus_id, cancellable, &local_error);
   if (connection == NULL)
     goto out;
 
@@ -64,14 +66,21 @@ create_proxy_for_icon (GVfsIcon *vfs_icon,
                                           mount_info->dbus_id,
                                           mount_info->object_path,
                                           cancellable,
-                                          error);
+                                          &local_error);
   
 
  out:
   if (mount_info)
     g_mount_info_unref (mount_info);
-  if (error && *error)
-    g_dbus_error_strip_remote_error (*error);
+  if (local_error)
+    {
+      if (g_error_matches (local_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
+        {
+          g_clear_error (&local_error);
+          goto retry;
+        }
+      _g_propagate_error_stripped (error, local_error);
+    }
 
   return proxy;
 }

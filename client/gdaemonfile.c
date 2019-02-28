@@ -400,19 +400,21 @@ create_proxy_for_file2 (GFile *file1,
   GDaemonFile *daemon_file2 = G_DAEMON_FILE (file2);
   GMountInfo *mount_info1, *mount_info2;
   GDBusConnection *connection;
+  GError *local_error = NULL;
 
   if (path1_out)
     *path1_out = NULL;
   if (path2_out)
     *path2_out = NULL;
 
+ retry:
   proxy = NULL;
   mount_info2 = NULL;
   
   mount_info1 = _g_daemon_vfs_get_mount_info_sync (daemon_file1->mount_spec,
                                                    daemon_file1->path,
                                                    cancellable,
-                                                   error);
+                                                   &local_error);
   
   if (mount_info1 == NULL)
     goto out;
@@ -422,7 +424,7 @@ create_proxy_for_file2 (GFile *file1,
       mount_info2 = _g_daemon_vfs_get_mount_info_sync (daemon_file2->mount_spec,
                                                        daemon_file2->path,
                                                        cancellable,
-                                                       error);
+                                                       &local_error);
       if (mount_info2 == NULL)
         goto out;
 
@@ -435,7 +437,7 @@ create_proxy_for_file2 (GFile *file1,
         }
     }
 
-  connection = _g_dbus_connection_get_sync (mount_info1->dbus_id, cancellable, error);
+  connection = _g_dbus_connection_get_sync (mount_info1->dbus_id, cancellable, &local_error);
   if (connection == NULL)
     goto out;
 
@@ -444,7 +446,7 @@ create_proxy_for_file2 (GFile *file1,
                                           mount_info1->dbus_id,
                                           mount_info1->object_path,
                                           cancellable,
-                                          error);
+                                          &local_error);
   
   if (proxy == NULL)
     goto out;
@@ -468,8 +470,15 @@ create_proxy_for_file2 (GFile *file1,
     g_mount_info_unref (mount_info1);
   if (mount_info2)
     g_mount_info_unref (mount_info2);
-  if (error && *error)
-    g_dbus_error_strip_remote_error (*error);
+  if (local_error)
+    {
+      if (g_error_matches (local_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
+        {
+          g_clear_error (&local_error);
+          goto retry;
+        }
+      _g_propagate_error_stripped (error, local_error);
+    }
 
   return proxy;
 }
@@ -2571,7 +2580,6 @@ g_daemon_file_set_attribute (GFile *file,
   if (g_str_has_prefix (attribute, "metadata::"))
     return set_metadata_attribute (file, attribute, type, value_p, cancellable, error);
 
- retry:
   proxy = create_proxy_for_file (file, NULL, &path, NULL, cancellable, error);
   if (proxy == NULL)
     return FALSE;
@@ -2589,13 +2597,6 @@ g_daemon_file_set_attribute (GFile *file,
     {
       if (g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_send_cancelled_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)));
-      else
-      if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
-	{
-	  g_clear_error (&my_error);
-	  g_object_unref (proxy);
-	  goto retry;
-	}
       _g_propagate_error_stripped (error, my_error);
       return FALSE;
     }
@@ -2730,7 +2731,6 @@ file_transfer (GFile                  *source,
         }
     }
   
-retry:
   my_error = NULL;
 
   proxy = create_proxy_for_file2 (file1, file2,
@@ -2849,13 +2849,6 @@ retry:
         {
           _g_dbus_send_cancelled_with_serial_sync (g_dbus_proxy_get_connection (G_DBUS_PROXY (proxy)),
                                                    serial);
-        }
-      else
-      if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
-        {
-          g_clear_error (&my_error);
-          g_clear_object (&proxy);
-          goto retry;
         }
       _g_propagate_error_stripped (error, my_error);
     }
