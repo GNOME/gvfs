@@ -1,3 +1,9 @@
+Major changes in 1.39.92
+========================
+* client: Fix mount info cache invalidation
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.39.91
 ========================
 * smb: Do not show password prompt when using winbind ccache
