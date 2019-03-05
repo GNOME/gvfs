@@ -6,14 +6,17 @@ fedora:
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
 
 .gnome-build-meta-template: &gnome-build-meta
-    image: buildstream/buildstream-fedora:master-123-abef70fe
+    image: "registry.gitlab.com/freedesktop-sdk/infrastructure/freedesktop-sdk-docker-images/amd64:e132e7bf9180b30c6ad0f4b057442cc2f2a0aa86"
+    variables:
+        BST_SHA: '1.2.4-3-g79bbefe26a3fcd13d3de558aed6b5b4d5bc1235a'
+        BST_EXTERNAL_SHA: '0.9.0-0-g63a19e8068bd777bd9cd59b1a9442f9749ea5a85'
     before_script:
         - pip3 uninstall -y buildstream
         - git clone https://gitlab.com/BuildStream/buildstream.git
-        - git -C buildstream/ checkout 10abe77fe8d77385d86f225b503d9185f4ef7f3a
+        - git -C buildstream/ checkout $BST_SHA
         - pip3 install buildstream/
         - git clone https://gitlab.com/BuildStream/bst-external.git
-        - git -C bst-external/ checkout 0.8.0-0-g762ea216b751bf89ac15350e1cb98542963bbf33
+        - git -C bst-external/ checkout $BST_EXTERNAL_SHA
         - pip3 install bst-external/
         - git clone --depth 1 https://gitlab.gnome.org/GNOME/gnome-build-meta.git
     script:
