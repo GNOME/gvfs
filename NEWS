@@ -1,3 +1,12 @@
+Major changes in 1.36.3
+=======================
+* admin: Prevent access if any authentication agent isn't available (CVE-2019-3827)
+* dav: Increase max number of connections to prevent lockups
+* udisks2: Fix crashes caused by missing source tag
+* smb: Use O_RDWR to fix fstat when writing
+* smb: Add workaround to fix removal of non-empty dir
+* Several smaller bugfixes
+
 Major changes in 1.36.2
 =======================
 * udisks2: Remove optical disc volumes/mounts if drive disappears
