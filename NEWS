@@ -1,3 +1,7 @@
+Major changes in 1.40.0
+=======================
+* No changes
+
 Major changes in 1.39.92
 ========================
 * client: Fix mount info cache invalidation
@@ -14,7 +18,7 @@ Major changes in 1.39.90
 ========================
 * sftp: Always use port 22 if not specified
 * mtp: Don't retry reading an event after failure
-* admin: Prevent access if any authentication agent isn't available
+* admin: Prevent access if any authentication agent isn't available (CVE-2019-3827)
 * build: Several meson improvements
 * Several smaller bugfixes
 * Translation updates
