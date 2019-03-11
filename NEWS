@@ -1,3 +1,12 @@
+Major changes in 1.38.2
+=======================
+* mtp: Don't retry reading an event after failure
+* admin: Prevent access if any authentication agent isn't available (CVE-2019-3827)
+* udisks2: Restore support of comment=x-gvfs-* option
+* common: Prevent crashes on invalid autorun file
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.38.1
 ========================
 * gphoto2: Fix mounting for devices with special chars in ID_SERIAL
