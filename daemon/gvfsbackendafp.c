@@ -1778,7 +1778,7 @@ try_set_attribute (GVfsBackend *backend,
   else {
     g_vfs_job_failed (G_VFS_JOB (job),
                       G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                      _("Operation unsupported"));
+                      _("Operation not supported by backend"));
     return TRUE;
   }
 }

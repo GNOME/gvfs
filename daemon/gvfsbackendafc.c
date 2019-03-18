@@ -1341,7 +1341,7 @@ g_vfs_backend_afc_replace (GVfsBackend *backend,
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR,
                         G_IO_ERROR_CANT_CREATE_BACKUP,
-                        _("Backups are not yet supported."));
+                        _("Backups not supported"));
       return;
     }
 
@@ -2426,7 +2426,7 @@ g_vfs_backend_afc_set_attribute (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			_("Operation unsupported"));
+			_("Operation not supported by backend"));
       return;
     }
 
@@ -2602,7 +2602,7 @@ g_vfs_backend_afc_move (GVfsBackend *backend,
           g_vfs_job_failed_literal (G_VFS_JOB (job),
                                     G_IO_ERROR,
                                     G_IO_ERROR_NOT_SUPPORTED,
-                                    "Operation not supported");
+                                    "Operation not supported by backend");
         }
 
       return;

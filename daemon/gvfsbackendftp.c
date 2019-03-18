@@ -1206,7 +1206,7 @@ try_query_settable_attributes (GVfsBackend *backend,
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Operation unsupported"));
+                        _("Operation not supported by backend"));
       return TRUE;
     }    
 
@@ -1254,7 +1254,7 @@ do_set_attribute (GVfsBackend *backend,
           g_set_error_literal (&task.error,
                                G_IO_ERROR,
                                G_IO_ERROR_NOT_SUPPORTED,
-                               _("Operation unsupported"));
+                               _("Operation not supported by backend"));
         }
       else
         {
@@ -1275,7 +1275,7 @@ do_set_attribute (GVfsBackend *backend,
       g_set_error_literal (&task.error,
                            G_IO_ERROR,
                            G_IO_ERROR_NOT_SUPPORTED,
-                           _("Operation unsupported"));
+                           _("Operation not supported by backend"));
     }
 
   g_vfs_ftp_task_done (&task);
@@ -1467,7 +1467,7 @@ do_move (GVfsBackend *backend,
           g_set_error_literal (&task.error,
                                G_IO_ERROR,
                                G_IO_ERROR_NOT_SUPPORTED,
-                               "Operation not supported");
+                               "Operation not supported by backend");
         }
 
       g_vfs_ftp_task_done (&task);
@@ -1675,7 +1675,7 @@ do_pull (GVfsBackend *         backend,
           g_set_error_literal (&task.error,
                                G_IO_ERROR,
                                G_IO_ERROR_NOT_SUPPORTED,
-                               "Operation not supported");
+                               "Operation not supported by backend");
           g_object_unref (info);
           goto out;
         }
