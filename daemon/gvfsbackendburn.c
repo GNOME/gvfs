@@ -851,7 +851,7 @@ try_push (GVfsBackend *backend,
       /* Parent of created file doesn't exist */
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_FOUND,
-                        _("No such file or directory in target path"));
+                        _("No such file or directory"));
       return TRUE;
     }
   
