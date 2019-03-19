@@ -2364,7 +2364,7 @@ try_set_attribute (GVfsBackend *backend,
     {
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                                _("Operation unsupported"));
+                                _("Operation not supported"));
     }
 
   return TRUE;
@@ -2414,7 +2414,7 @@ move_rename_cb (int err,
     {
       g_vfs_job_failed_literal (job,
                                 G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                                _("Not supported"));
+                                _("Operation not supported"));
     }
   else
     {
@@ -2540,7 +2540,7 @@ try_move (GVfsBackend *backend,
     {
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                                _("Not supported"));
+                                _("Operation not supported"));
       return TRUE;
     }
 
