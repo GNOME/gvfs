@@ -3646,7 +3646,7 @@ replace_create_temp_reply (GVfsBackendSftp *backend,
 		 backing up before truncating, but for now error out... */
 	      g_vfs_job_failed (job, G_IO_ERROR,
 				G_IO_ERROR_CANT_CREATE_BACKUP,
-				_("backups not supported yet"));
+				_("Backups not supported"));
 	    }
         }
       else
@@ -3822,7 +3822,7 @@ replace_stat_reply (GVfsBackendSftp *backend,
     {
       if (op_job->make_backup)
         g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_CANT_CREATE_BACKUP,
-                          _("backups not supported yet"));
+                          _("Backups not supported"));
       else
         replace_truncate_original (backend, job);
     }
