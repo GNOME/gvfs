@@ -2426,7 +2426,7 @@ g_vfs_backend_afc_set_attribute (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			_("Operation unsupported"));
+			_("Operation not supported"));
       return;
     }
 

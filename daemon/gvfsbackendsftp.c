@@ -2149,7 +2149,7 @@ error_message (GIOErrorEnum error)
     case G_IO_ERROR_EXISTS:
       return _("Target file exists");
     case G_IO_ERROR_NOT_SUPPORTED:
-      return _("Operation unsupported");
+      return _("Operation not supported");
     case G_IO_ERROR_PERMISSION_DENIED:
       return _("Permission denied");
     case G_IO_ERROR_NOT_FOUND:
@@ -5227,7 +5227,7 @@ set_attribute_stat_reply (GVfsBackendSftp *backend,
       if (!g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_TIME_MODIFIED))
         {
           g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                            _("Operation unsupported"));
+                            _("Operation not supported"));
           g_object_unref (info);
           return;
         }
@@ -5325,7 +5325,7 @@ try_set_attribute (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                        _("Operation unsupported"));
+                        _("Operation not supported"));
     }
 
   return TRUE;
@@ -5987,7 +5987,7 @@ push_source_open_cb (GObject *source, GAsyncResult *res, gpointer user_data)
         {
           /* Fall back to default implementation to improve the error message */
           g_vfs_job_failed (handle->job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                            _("Not supported"));
+                            _("Operation not supported"));
         }
       else
         g_vfs_job_failed_from_error (handle->job, error);
@@ -6019,7 +6019,7 @@ push_source_lstat_cb (GObject *source, GAsyncResult *res, gpointer user_data)
     {
       /* Fall back to default implementation to copy symlink */
       g_vfs_job_failed (handle->job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                        _("Not supported"));
+                        _("Operation not supported"));
       sftp_push_handle_free (handle);
       return;
     }
@@ -6045,7 +6045,7 @@ try_push (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (op_job),
                         G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                        _("Not supported"));
+                        _("Operation not supported"));
       return TRUE;
     }
 
@@ -6516,7 +6516,7 @@ pull_open_reply (GVfsBackendSftp *backend,
         {
           /* Fall back to default implementation to copy non-regular files */
           g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                            _("Not supported"));
+                            _("Operation not supported"));
         }
       else if (replies[1].type == SSH_FXP_STATUS)
         result_from_status (job, replies[1].data, -1, -1);
@@ -6578,7 +6578,7 @@ try_pull (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                        _("Not supported"));
+                        _("Operation not supported"));
       return TRUE;
     }
 

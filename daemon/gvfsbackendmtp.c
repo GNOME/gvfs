@@ -2247,7 +2247,7 @@ do_open_for_read (GVfsBackend *backend,
       !G_VFS_BACKEND_MTP (backend)->get_partial_object_capability) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation unsupported"));
+                              _("Operation not supported"));
     return;
   }
 
@@ -2438,7 +2438,7 @@ do_read (GVfsBackend *backend,
         offset > G_MAXUINT32) {
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                                _("Operation unsupported"));
+                                _("Operation not supported"));
       goto exit;
     }
 
@@ -2521,7 +2521,7 @@ do_create (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation unsupported"));
+                              _("Operation not supported"));
     return;
   }
 
@@ -2609,7 +2609,7 @@ do_append_to (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation unsupported"));
+                              _("Operation not supported"));
     return;
   }
 
@@ -2677,7 +2677,7 @@ do_replace (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation unsupported"));
+                              _("Operation not supported"));
     return;
   }
 
@@ -2872,7 +2872,7 @@ do_move (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->move_object_capability) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation unsupported"));
+                              _("Operation not supported"));
     return;
   }
 
@@ -3015,7 +3015,7 @@ do_copy (GVfsBackend *backend,
   if (!G_VFS_BACKEND_MTP (backend)->copy_object_capability) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation unsupported"));
+                              _("Operation not supported"));
     return;
   }
 

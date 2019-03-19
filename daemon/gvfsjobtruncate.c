@@ -110,7 +110,7 @@ run (GVfsJob *job)
     class->truncate (op_job->backend, op_job, op_job->handle, op_job->size);
   else
     g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                      _("Operation not supported by backend"));
+                      _("Operation not supported"));
 }
 
 static gboolean
