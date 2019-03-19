@@ -122,7 +122,7 @@ run (GVfsJob *job)
   if (class->push == NULL)
     {
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			_("Operation not supported by backend"));
+			_("Operation not supported"));
       return;
     }
 

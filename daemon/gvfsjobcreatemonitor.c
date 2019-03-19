@@ -140,7 +140,7 @@ run (GVfsJob *job)
     {
       if (class->create_dir_monitor == NULL)
 	g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			  _("Operation not supported by backend"));
+			  _("Operation not supported"));
       else
 	class->create_dir_monitor (op_job->backend,
 				   op_job,
@@ -151,7 +151,7 @@ run (GVfsJob *job)
     {
       if (class->create_file_monitor == NULL)
 	g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			  _("Operation not supported by backend"));
+			  _("Operation not supported"));
       else
 	class->create_file_monitor (op_job->backend,
 				    op_job,
@@ -174,7 +174,7 @@ try (GVfsJob *job)
 	  if (class->create_dir_monitor == NULL)
 	    {
 	      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-				_("Operation not supported by backend"));
+				_("Operation not supported"));
 	      return TRUE;
 	    }
 	  return FALSE;	
@@ -192,7 +192,7 @@ try (GVfsJob *job)
 	  if (class->create_file_monitor == NULL)
 	    {
 	      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-				_("Operation not supported by backend"));
+				_("Operation not supported"));
 	      return TRUE;
 	    }
 	  return FALSE;	

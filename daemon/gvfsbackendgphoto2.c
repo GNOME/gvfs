@@ -2234,7 +2234,7 @@ do_make_directory (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Not supported"));
+                        _("Operation not supported"));
       goto out;
     }
 
@@ -2447,7 +2447,7 @@ do_set_display_name (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Not supported"));
+                        _("Operation not supported"));
       goto out;
     }
 
@@ -2544,7 +2544,7 @@ do_delete (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Not supported"));
+                        _("Operation not supported"));
       goto out;
     }
 
@@ -2637,7 +2637,7 @@ do_create_internal (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Not supported"));
+                        _("Operation not supported"));
       goto out;
     }
 
@@ -3246,7 +3246,7 @@ do_pull (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Not supported"));
+                        _("Operation not supported"));
       goto out;
     }
 
@@ -3256,7 +3256,7 @@ do_pull (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
-                        _("Not supported"));
+                        _("Operation not supported"));
       goto out;
     }
 

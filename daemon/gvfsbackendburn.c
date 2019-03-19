@@ -826,7 +826,7 @@ try_push (GVfsBackend *backend,
       /* Fallback to copy & delete for now, fix that up later */
       g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
 				G_IO_ERROR_NOT_SUPPORTED,
-                                _("Operation not supported by backend"));
+                                _("Operation not supported"));
       return TRUE;
     }
 
@@ -948,7 +948,7 @@ try_create_dir_monitor (GVfsBackend *backend,
 {
   g_vfs_job_failed (G_VFS_JOB (job),
                     G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                    _("Not supported"));
+                    _("Operation not supported"));
   return TRUE;
 }
 
