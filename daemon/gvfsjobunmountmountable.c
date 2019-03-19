@@ -154,7 +154,7 @@ run (GVfsJob *job)
       if (class->eject_mountable == NULL)
 	{
 	  g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			    _("Operation not supported by backend"));
+			    _("Operation not supported"));
 	  return;
 	}
       
@@ -169,7 +169,7 @@ run (GVfsJob *job)
       if (class->unmount_mountable == NULL)
 	{
 	  g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			    _("Operation not supported by backend"));
+			    _("Operation not supported"));
 	  return;
 	}
       

@@ -426,7 +426,7 @@ g_vfs_ftp_task_set_error_from_response (GVfsFtpTask *task, guint response)
       case 503: /* Bad sequence of commands. */
       case 504: /* Command not implemented for that parameter. */
         code = G_IO_ERROR_NOT_SUPPORTED;
-        msg = _("Operation unsupported");
+        msg = _("Operation not supported");
         break;
       case 522: /* EPRT: unsupported network protocol */
         code = G_IO_ERROR_NOT_SUPPORTED;
