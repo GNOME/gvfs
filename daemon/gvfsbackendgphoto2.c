@@ -483,7 +483,7 @@ get_error_from_gphoto2 (const char *message, int rc)
     case GP_ERROR_DIRECTORY_NOT_FOUND:
       error = g_error_new (G_IO_ERROR, 
                            /* Translator: %s represents a more specific error message and %d the specific error code */
-                           G_IO_ERROR_NOT_FOUND, _("%s: %d: No such file or directory"), message, rc);
+                           G_IO_ERROR_NOT_FOUND, _("No such file or directory"));
       break;
 
     case GP_ERROR_PATH_NOT_ABSOLUTE:
