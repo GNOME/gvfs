@@ -1341,7 +1341,7 @@ g_vfs_backend_afc_replace (GVfsBackend *backend,
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR,
                         G_IO_ERROR_CANT_CREATE_BACKUP,
-                        _("Backups are not yet supported."));
+                        _("Backups not supported"));
       return;
     }
 

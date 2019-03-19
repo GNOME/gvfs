@@ -1267,7 +1267,7 @@ replace_create_tmp_file_cb (GObject *source_object, GAsyncResult *res, gpointer 
       {
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
                                   G_IO_ERROR_CANT_CREATE_BACKUP,
-                                  _("backups not supported"));
+                                  _("Backups not supported"));
       }
       else
       {
@@ -1356,7 +1356,7 @@ replace_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointe
       {
         g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
                                   G_IO_ERROR_CANT_CREATE_BACKUP,
-                                  _("backups not supported"));
+                                  _("Backups not supported"));
       }
       else
       {
