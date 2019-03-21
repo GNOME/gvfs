@@ -1118,8 +1118,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
        * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
        * fallback copy.
        */
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-      		  _("Operation not supported"));
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
     }
 
@@ -1254,8 +1253,7 @@ g_vfs_backend_google_create_dir_monitor (GVfsBackend          *_self,
 
   if (flags & G_FILE_MONITOR_SEND_MOVED)
     {
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-      		  _("Operation not supported"));
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
     }
 
@@ -1331,8 +1329,7 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
 
   if (entry == self->root)
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-      		  _("Operation not supported"));
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
     }
 
@@ -1486,8 +1483,7 @@ g_vfs_backend_google_make_directory (GVfsBackend          *_self,
 
   if (g_strcmp0 (filename, "/") == 0)
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-      		  _("Operation not supported"));
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
     }
 
@@ -1715,8 +1711,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
        * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
        * fallback copy.
        */
-      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-      		  _("Operation not supported"));
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
     }
 
@@ -2358,8 +2353,7 @@ g_vfs_backend_google_set_display_name (GVfsBackend           *_self,
 
   if (entry == self->root)
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-      		  _("Operation not supported"));
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
     }
 
@@ -2414,8 +2408,7 @@ g_vfs_backend_google_create (GVfsBackend         *_self,
 
   if (g_strcmp0 (filename, "/") == 0)
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-      		  _("Operation not supported"));
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
     }
 
@@ -2524,8 +2517,7 @@ g_vfs_backend_google_replace (GVfsBackend         *_self,
 
   if (g_strcmp0 (filename, "/") == 0)
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-      		  _("Operation not supported"));
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
     }
 
