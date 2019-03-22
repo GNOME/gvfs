@@ -515,6 +515,12 @@ g_vfs_afp_command_put_pascal (GVfsAfpCommand *comm, const char *str)
 {
   size_t len;
 
+  if (str == NULL)
+  {
+    g_vfs_afp_command_put_byte (comm, 0);
+    return;
+  }
+
   len = MIN (strlen (str), 256);
 
   g_vfs_afp_command_put_byte (comm, len);
