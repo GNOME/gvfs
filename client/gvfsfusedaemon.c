@@ -1654,19 +1654,20 @@ vfs_readdir (const gchar *path, gpointer buf, fuse_fill_dir_t filler, off_t offs
 }
 
 static gint
-vfs_rename (const gchar *old_path, const gchar *new_path, unsigned int flags)
+vfs_rename (const gchar *old_path, const gchar *new_path, unsigned int vfs_flags)
 {
   GFile  *old_file;
   GFile  *new_file;
-  GFileCopyFlags g_flags = G_FILE_COPY_OVERWRITE;
+  GFileCopyFlags flags = G_FILE_COPY_OVERWRITE;
   GError *error  = NULL;
   gint    result = 0;
 
   /* Can not implement this flag because limitation of GFile. */
-  if (flags & RENAME_EXCHANGE)
+  if (vfs_flags & RENAME_EXCHANGE)
     return -EINVAL;
-  if (flags & RENAME_NOREPLACE)
-    g_flags = 0;
+
+  if (vfs_flags & RENAME_NOREPLACE)
+    flags = G_FILE_COPY_NONE;
 
   g_debug ("vfs_rename: %s -> %s\n", old_path, new_path);
 
@@ -1683,7 +1684,7 @@ vfs_rename (const gchar *old_path, const gchar *new_path, unsigned int flags)
           file_handle_close_stream (fh);
         }
 
-      g_file_move (old_file, new_file, g_flags, NULL, NULL, NULL, &error);
+      g_file_move (old_file, new_file, flags, NULL, NULL, NULL, &error);
 
       if (error)
         {
