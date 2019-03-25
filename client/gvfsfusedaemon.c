@@ -2559,17 +2559,17 @@ static struct options {
 #define OPTION(t, p) {t, offsetof(struct options, p), 1}
 
 static const struct fuse_opt option_spec[] = {
-  OPTION("big_writes", big_writes),
-  OPTION("-h", show_help),
-  OPTION("--help", show_help),
+  OPTION ("big_writes", big_writes),
+  OPTION ("-h", show_help),
+  OPTION ("--help", show_help),
   FUSE_OPT_END
 };
 
 static void
-show_help(const char *progname)
+show_help (const char *progname)
 {
-  printf("usage: %s [options] <mountpoint>\n\n", progname);
-  printf("Compatibility options:\n"
+  printf ("usage: %s [options] <mountpoint>\n\n", progname);
+  printf ("Compatibility options:\n"
          "    -o big_writes          ignored\n"
          "\n");
 }
@@ -2578,19 +2578,19 @@ gint
 main (gint argc, gchar *argv [])
 {
   int res;
-  struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
+  struct fuse_args args = FUSE_ARGS_INIT (argc, argv);
 
-  if (fuse_opt_parse(&args, &options, option_spec, NULL) == -1)
+  if (fuse_opt_parse (&args, &options, option_spec, NULL) == -1)
     return 1;
 
   if (options.show_help)
     {
-      show_help(argv[0]);
-      fuse_opt_add_arg(&args, "--help");
+      show_help (argv[0]);
+      fuse_opt_add_arg (&args, "--help");
       args.argv[0][0] = '\0';
     }
 
-  res = fuse_main(args.argc, args.argv, &vfs_oper, NULL);
-  fuse_opt_free_args(&args);
+  res = fuse_main (args.argc, args.argv, &vfs_oper, NULL);
+  fuse_opt_free_args (&args);
   return res;
 }
