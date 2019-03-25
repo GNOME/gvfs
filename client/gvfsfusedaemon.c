@@ -2575,9 +2575,9 @@ show_help (const char *progname)
 gint
 main (gint argc, gchar *argv [])
 {
-  int res;
   struct fuse *fuse;
   struct fuse_session *se;
+  int res;
 #if FUSE_VERSION >= 32
   struct fuse_loop_config loop_cfg;
 #endif
