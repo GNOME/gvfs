@@ -96,8 +96,7 @@ on_name_acquired (GDBusConnection *connection,
       argv2[0] = LIBEXEC_DIR "/gvfsd-fuse";
       argv2[1] = fuse_path;
       argv2[2] = "-f";
-      argv2[3] = "-o";
-      argv2[4] = NULL;
+      argv2[3] = NULL;
       
       g_spawn_async (NULL,
                      argv2,
