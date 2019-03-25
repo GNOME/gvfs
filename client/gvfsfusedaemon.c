@@ -43,7 +43,7 @@
 #include <gvfsdbus.h>
 #include <gvfsutils.h>
 
-#define FUSE_USE_VERSION 34
+#define FUSE_USE_VERSION FUSE_VERSION
 #include <fuse.h>
 #include <fuse_lowlevel.h>
 
@@ -2578,7 +2578,9 @@ main (gint argc, gchar *argv [])
   int res;
   struct fuse *fuse;
   struct fuse_session *se;
+#if FUSE_VERSION >= 32
   struct fuse_loop_config loop_cfg;
+#endif
   struct fuse_cmdline_opts opts;
   struct fuse_args args = FUSE_ARGS_INIT (argc, argv);
 
@@ -2600,7 +2602,9 @@ main (gint argc, gchar *argv [])
       show_help (argv[0]);
       printf ("FUSE options:\n");
       fuse_cmdline_help ();
+#if FUSE_VERSION >= 31
       fuse_lib_help (&args);
+#endif
       return 0;
     }
 
@@ -2628,9 +2632,13 @@ main (gint argc, gchar *argv [])
     res = fuse_loop (fuse);
   else
     {
+#if FUSE_VERSION >= 32
       loop_cfg.clone_fd = opts.clone_fd;
       loop_cfg.max_idle_threads = opts.max_idle_threads;
       res = fuse_loop_mt (fuse, &loop_cfg);
+#else
+      res = fuse_loop_mt (fuse, opts.clone_fd);
+#endif
     }
 
   set_custom_signal_handlers (SIG_IGN);
