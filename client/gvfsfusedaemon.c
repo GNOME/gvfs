@@ -2554,15 +2554,12 @@ set_custom_signal_handlers (void (*handler)(int))
 
 static struct options {
   int big_writes;
-  int show_help;
 } options;
 
 #define OPTION(t, p) {t, offsetof(struct options, p), 1}
 
 static const struct fuse_opt option_spec[] = {
   OPTION ("big_writes", big_writes),
-  OPTION ("-h", show_help),
-  OPTION ("--help", show_help),
   FUSE_OPT_END
 };
 
@@ -2579,19 +2576,70 @@ gint
 main (gint argc, gchar *argv [])
 {
   int res;
+  struct fuse *fuse;
+  struct fuse_session *se;
+  struct fuse_loop_config loop_cfg;
+  struct fuse_cmdline_opts opts;
   struct fuse_args args = FUSE_ARGS_INIT (argc, argv);
 
   if (fuse_opt_parse (&args, &options, option_spec, NULL) == -1)
     return 1;
 
-  if (options.show_help)
+  if (fuse_parse_cmdline (&args, &opts) != 0)
+    return 1;
+
+  if (opts.show_version)
     {
-      show_help (argv[0]);
-      fuse_opt_add_arg (&args, "--help");
-      args.argv[0][0] = '\0';
+      printf ("%s\n", PACKAGE_STRING);
+      fuse_lowlevel_version ();
+      return 0;
     }
 
-  res = fuse_main (args.argc, args.argv, &vfs_oper, NULL);
+  if (opts.show_help)
+    {
+      show_help (argv[0]);
+      printf ("FUSE options:\n");
+      fuse_cmdline_help ();
+      fuse_lib_help (&args);
+      return 0;
+    }
+
+  if (!opts.mountpoint)
+    {
+      fprintf (stderr, "error: no mountpoint specified\n");
+      return 1;
+    }
+
+  fuse = fuse_new (&args, &vfs_oper, sizeof (vfs_oper), NULL /* user data */);
+  if (fuse == NULL)
+    return 1;
+
+  if (fuse_mount (fuse, opts.mountpoint) != 0)
+    return 1;
+
+  if (fuse_daemonize (opts.foreground) != 0)
+    return 1;
+
+  se = fuse_get_session (fuse);
+  if (fuse_set_signal_handlers (se) != 0)
+    return 1;
+
+  if (opts.singlethread)
+    res = fuse_loop (fuse);
+  else
+    {
+      loop_cfg.clone_fd = opts.clone_fd;
+      loop_cfg.max_idle_threads = opts.max_idle_threads;
+      res = fuse_loop_mt (fuse, &loop_cfg);
+    }
+
+  set_custom_signal_handlers (SIG_IGN);
+  fuse_remove_signal_handlers (se);
+
+  fuse_unmount (fuse);
+  fuse_destroy (fuse);
+  free (opts.mountpoint);
   fuse_opt_free_args (&args);
+
   return res;
 }
