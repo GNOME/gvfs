@@ -328,7 +328,7 @@ config_h.set('HAVE_GUDEV', enable_gudev)
 # *** Check for FUSE ***
 enable_fuse = get_option('fuse')
 if enable_fuse
-  fuse_dep = dependency('fuse3', version: '>= 3.4.2')
+  fuse_dep = dependency('fuse3', version: '>= 3.0.0')
 endif
 config_h.set('HAVE_FUSE', enable_fuse)
 
