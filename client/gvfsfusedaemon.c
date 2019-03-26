@@ -2028,7 +2028,7 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
 }
 
 static gint
-vfs_truncate (const gchar *path, off_t size, struct fuse_file_info *fi)
+vfs_truncate (const gchar *path, off_t size)
 {
   GFile  *file;
   GError *error  = NULL;
@@ -2094,6 +2094,15 @@ vfs_truncate (const gchar *path, off_t size, struct fuse_file_info *fi)
   g_debug ("vfs_truncate: -> %s\n", g_strerror (-result));
 
   return result;
+}
+
+static gint
+vfs_truncate_dispatch (const gchar *path, off_t size, struct fuse_file_info *fi)
+{
+  if (fi)
+    return vfs_ftruncate (path, size, fi);
+
+  return vfs_truncate (path, size);
 }
 
 static gint
@@ -2527,7 +2536,7 @@ static struct fuse_operations vfs_oper =
   .unlink      = vfs_unlink,
   .mkdir       = vfs_mkdir,
   .rmdir       = vfs_rmdir,
-  .truncate    = vfs_truncate,
+  .truncate    = vfs_truncate_dispatch,
   .symlink     = vfs_symlink,
   .access      = vfs_access,
   .utimens     = vfs_utimens,
