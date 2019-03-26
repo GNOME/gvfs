@@ -43,7 +43,12 @@
 #include <gvfsdbus.h>
 #include <gvfsutils.h>
 
+#if FUSE_VERSION <= 34
 #define FUSE_USE_VERSION FUSE_VERSION
+#else
+#define FUSE_USE_VERSION 34
+#endif
+
 #include <fuse.h>
 #include <fuse_lowlevel.h>
 
