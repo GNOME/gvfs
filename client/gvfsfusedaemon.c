@@ -2635,6 +2635,7 @@ main (gint argc, gchar *argv [])
 #endif
     }
 
+  /* Ignore new signals during exit procedure in order to terminate properly */
   set_custom_signal_handlers (SIG_IGN);
   fuse_remove_signal_handlers (se);
 
