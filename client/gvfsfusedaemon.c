@@ -43,7 +43,8 @@
 #include <gvfsdbus.h>
 #include <gvfsutils.h>
 
-#define FUSE_USE_VERSION 26
+#define FUSE_USE_VERSION 30
+
 #include <fuse.h>
 #include <fuse_lowlevel.h>
 
@@ -850,7 +851,7 @@ getattr_for_file_handle (FileHandle *fh, struct stat *sbuf)
 }
 
 static gint
-vfs_getattr (const gchar *path, struct stat *sbuf)
+vfs_getattr (const gchar *path, struct stat *sbuf, struct fuse_file_info *fi)
 {
   GFile      *file;
   gint        result = 0;
@@ -1592,12 +1593,12 @@ readdir_for_file (GFile *base_file, gpointer buf, fuse_fill_dir_t filler)
       return result;
     }
 
-  filler (buf, ".", NULL, 0);
-  filler (buf, "..", NULL, 0);
+  filler (buf, ".", NULL, 0, 0);
+  filler (buf, "..", NULL, 0, 0);
 
   while ((file_info = g_file_enumerator_next_file (enumerator, NULL, &error)) != NULL)
     {
-      filler (buf, g_file_info_get_name (file_info), NULL, 0);
+      filler (buf, g_file_info_get_name (file_info), NULL, 0, 0);
       g_object_unref (file_info);
     }
 
@@ -1608,7 +1609,7 @@ readdir_for_file (GFile *base_file, gpointer buf, fuse_fill_dir_t filler)
 
 static gint
 vfs_readdir (const gchar *path, gpointer buf, fuse_fill_dir_t filler, off_t offset,
-             struct fuse_file_info *fi)
+             struct fuse_file_info *fi, enum fuse_readdir_flags fl)
 {
   GFile       *base_file;
   gint         result = 0;
@@ -1621,8 +1622,8 @@ vfs_readdir (const gchar *path, gpointer buf, fuse_fill_dir_t filler, off_t offs
 
       /* Mount list */
 
-      filler (buf, ".", NULL, 0);
-      filler (buf, "..", NULL, 0);
+      filler (buf, ".", NULL, 0, 0);
+      filler (buf, "..", NULL, 0, 0);
 
       mount_list_lock ();
 
@@ -1630,7 +1631,7 @@ vfs_readdir (const gchar *path, gpointer buf, fuse_fill_dir_t filler, off_t offs
         {
           MountRecord *mount_record = l->data;
 
-          filler (buf, mount_record->name, NULL, 0);
+          filler (buf, mount_record->name, NULL, 0, 0);
         }
 
       mount_list_unlock ();
@@ -1654,12 +1655,20 @@ vfs_readdir (const gchar *path, gpointer buf, fuse_fill_dir_t filler, off_t offs
 }
 
 static gint
-vfs_rename (const gchar *old_path, const gchar *new_path)
+vfs_rename (const gchar *old_path, const gchar *new_path, unsigned int vfs_flags)
 {
   GFile  *old_file;
   GFile  *new_file;
+  GFileCopyFlags flags = G_FILE_COPY_OVERWRITE;
   GError *error  = NULL;
   gint    result = 0;
+
+  /* Can not implement this flag because limitation of GFile. */
+  if (vfs_flags & RENAME_EXCHANGE)
+    return -EINVAL;
+
+  if (vfs_flags & RENAME_NOREPLACE)
+    flags = G_FILE_COPY_NONE;
 
   g_debug ("vfs_rename: %s -> %s\n", old_path, new_path);
 
@@ -1676,7 +1685,7 @@ vfs_rename (const gchar *old_path, const gchar *new_path)
           file_handle_close_stream (fh);
         }
 
-      g_file_move (old_file, new_file, G_FILE_COPY_OVERWRITE, NULL, NULL, NULL, &error);
+      g_file_move (old_file, new_file, flags, NULL, NULL, NULL, &error);
 
       if (error)
         {
@@ -2084,6 +2093,15 @@ vfs_truncate (const gchar *path, off_t size)
 }
 
 static gint
+vfs_truncate_dispatch (const gchar *path, off_t size, struct fuse_file_info *fi)
+{
+  if (fi)
+    return vfs_ftruncate (path, size, fi);
+
+  return vfs_truncate (path, size);
+}
+
+static gint
 vfs_symlink (const gchar *path_old, const gchar *path_new)
 {
   GFile  *file;
@@ -2189,7 +2207,7 @@ vfs_access (const gchar *path, gint mode)
 }
 
 static gint
-vfs_utimens (const gchar *path, const struct timespec tv [2])
+vfs_utimens (const gchar *path, const struct timespec tv [2], struct fuse_file_info *fi)
 {
   GFile  *file;
   GError *error  = NULL;
@@ -2264,7 +2282,7 @@ vfs_utimens (const gchar *path, const struct timespec tv [2])
 }
 
 static gint
-vfs_chmod (const gchar *path, mode_t mode)
+vfs_chmod (const gchar *path, mode_t mode, struct fuse_file_info *fi)
 {
   GFile  *file;
   GError *error  = NULL;
@@ -2387,7 +2405,7 @@ register_fuse_cb (GVfsDBusMountTracker *proxy,
 }
 
 static gpointer
-vfs_init (struct fuse_conn_info *conn)
+vfs_init (struct fuse_conn_info *conn, struct fuse_config *cfg)
 {
   GVfsDBusMountTracker *proxy;
   GError *error;
@@ -2463,7 +2481,7 @@ vfs_init (struct fuse_conn_info *conn)
   conn->want |= FUSE_CAP_ATOMIC_O_TRUNC;
 
   /* Prevent out-of-order readahead */
-  conn->async_read = 0;
+  conn->want &= ~FUSE_CAP_ASYNC_READ;
 
   /* Use up to a 64KiB write block size.  Only has an effect if -o big_writes
    * is given on the command-line. */
@@ -2514,8 +2532,7 @@ static struct fuse_operations vfs_oper =
   .unlink      = vfs_unlink,
   .mkdir       = vfs_mkdir,
   .rmdir       = vfs_rmdir,
-  .ftruncate   = vfs_ftruncate,
-  .truncate    = vfs_truncate,
+  .truncate    = vfs_truncate_dispatch,
   .symlink     = vfs_symlink,
   .access      = vfs_access,
   .utimens     = vfs_utimens,
@@ -2527,6 +2544,7 @@ static struct fuse_operations vfs_oper =
   .getxattr    = vfs_getxattr,
   .listxattr   = vfs_listxattr,
   .removexattr = vfs_removexattr,
+  .ftruncate   = vfs_ftruncate,
 #endif
 };
 
@@ -2548,35 +2566,65 @@ gint
 main (gint argc, gchar *argv [])
 {
   struct fuse *fuse;
-  struct fuse_chan *ch;
   struct fuse_session *se;
-  char *mountpoint;
-  int multithreaded;
   int res;
+  struct fuse_cmdline_opts opts;
+  struct fuse_args args = FUSE_ARGS_INIT (argc, argv);
 
-  fuse = fuse_setup (argc, argv, &vfs_oper, sizeof (vfs_oper), &mountpoint,
-                     &multithreaded, NULL /* user data */);
+  if (fuse_opt_parse (&args, NULL, NULL, NULL) == -1)
+    return 1;
+
+  if (fuse_parse_cmdline (&args, &opts) != 0)
+    return 1;
+
+  if (opts.show_version)
+    {
+      printf ("%s\n", PACKAGE_STRING);
+      fuse_lowlevel_version ();
+      return 0;
+    }
+
+  if (opts.show_help)
+    {
+      printf ("usage: %s [options] <mountpoint>\n\n", argv[0]);
+      printf ("FUSE options:\n");
+      fuse_cmdline_help ();
+      return 0;
+    }
+
+  if (!opts.mountpoint)
+    {
+      fprintf (stderr, "error: no mountpoint specified\n");
+      return 1;
+    }
+
+  fuse = fuse_new (&args, &vfs_oper, sizeof (vfs_oper), NULL /* user data */);
   if (fuse == NULL)
     return 1;
 
-  if (multithreaded)
-    res = fuse_loop_mt (fuse);
-  else
-    res = fuse_loop (fuse);
+  if (fuse_mount (fuse, opts.mountpoint) != 0)
+    return 1;
+
+  if (fuse_daemonize (opts.foreground) != 0)
+    return 1;
 
   se = fuse_get_session (fuse);
-  ch = fuse_session_next_chan (se, NULL);
+  if (fuse_set_signal_handlers (se) != 0)
+    return 1;
+
+  if (opts.singlethread)
+    res = fuse_loop (fuse);
+  else
+    res = fuse_loop_mt (fuse, opts.clone_fd);
 
   /* Ignore new signals during exit procedure in order to terminate properly */
   set_custom_signal_handlers (SIG_IGN);
   fuse_remove_signal_handlers (se);
 
-  fuse_unmount (mountpoint, ch);
+  fuse_unmount (fuse);
   fuse_destroy (fuse);
-  free (mountpoint);
+  free (opts.mountpoint);
+  fuse_opt_free_args (&args);
 
-  if (res == -1)
-    return 1;
-
-  return 0;
+  return res;
 }
