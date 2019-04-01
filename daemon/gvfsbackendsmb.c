@@ -175,6 +175,8 @@ auth_callback (SMBCCTX *context,
     strncpy (domain_out, backend->domain, domainmaxlen);
   if (backend->user)
     strncpy (username_out, backend->user, unmaxlen);
+  if (username_out != NULL && strcmp(username_out, "anonymous") == 0)
+    backend->use_anonymous = TRUE;
 
   if (backend->mount_cancelled)
     {
@@ -217,7 +219,6 @@ auth_callback (SMBCCTX *context,
   else if (backend->use_anonymous)
     {
       /* Try again if anonymous login fails */
-      backend->use_anonymous = FALSE;
       backend->mount_try_again = TRUE;
       g_debug ("auth_callback - anonymous login pass\n");
     }
