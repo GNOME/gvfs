@@ -146,8 +146,8 @@ typedef struct AskSyncData AskSyncData;
 struct AskSyncData {
 
   /* For sync calls */
-  GMutex mutex;
-  GCond cond;
+  GMainContext *context;
+  GMainLoop *loop;
 
   /* results: */
   GAsyncResult *result;
@@ -375,10 +375,7 @@ ask_reply_sync  (GObject *source_object,
 
   data->result = g_object_ref (res);
 
-  /* Wake up sync call thread */
-  g_mutex_lock (&data->mutex);
-  g_cond_signal (&data->cond);
-  g_mutex_unlock (&data->mutex);
+  g_main_loop_quit (data->loop);
 }
 
 gboolean
@@ -397,11 +394,10 @@ g_mount_source_ask_password (GMountSource *source,
   gboolean handled;
   AskSyncData data;
 
-  memset (&data, 0, sizeof (data));
-  g_mutex_init (&data.mutex);
-  g_cond_init (&data.cond);
-  g_mutex_lock (&data.mutex);
+  data.context = g_main_context_new ();
+  data.loop = g_main_loop_new (data.context, FALSE);
 
+  g_main_context_push_thread_default (data.context);
 
   g_mount_source_ask_password_async (source,
                                      message_string,
@@ -411,13 +407,7 @@ g_mount_source_ask_password (GMountSource *source,
                                      ask_reply_sync,
                                      &data);
 
-  while (data.result == NULL)
-    g_cond_wait (&data.cond, &data.mutex);
-  g_mutex_unlock (&data.mutex);
-
-  g_cond_clear (&data.cond);
-  g_mutex_clear (&data.mutex);
-
+  g_main_loop_run (data.loop);
 
   handled = g_mount_source_ask_password_finish (source,
                                                 data.result,
@@ -427,6 +417,10 @@ g_mount_source_ask_password (GMountSource *source,
                                                 domain_out,
 						anonymous_out,
 						password_save_out);
+
+  g_main_context_pop_thread_default (data.context);
+  g_main_context_unref (data.context);
+  g_main_loop_unref (data.loop);
   g_object_unref (data.result);
 
   return handled;
@@ -562,11 +556,11 @@ g_mount_source_ask_question (GMountSource *source,
   gint choice;
   gboolean handled, aborted;
   AskSyncData data;
-  
-  memset (&data, 0, sizeof (data));
-  g_mutex_init (&data.mutex);
-  g_cond_init (&data.cond);
-  g_mutex_lock (&data.mutex);
+
+  data.context = g_main_context_new ();
+  data.loop = g_main_loop_new (data.context, FALSE);
+
+  g_main_context_push_thread_default (data.context);
 
   g_mount_source_ask_question_async (source,
                                      message,
@@ -574,18 +568,16 @@ g_mount_source_ask_question (GMountSource *source,
                                      ask_reply_sync,
                                      &data);
 
-  while (data.result == NULL)
-    g_cond_wait (&data.cond, &data.mutex);
-  g_mutex_unlock (&data.mutex);
-
-  g_cond_clear (&data.cond);
-  g_mutex_clear (&data.mutex);
+  g_main_loop_run (data.loop);
 
   handled = g_mount_source_ask_question_finish (source,
                                                 data.result,
                                                 &aborted,
                                                 &choice);
-  
+
+  g_main_context_pop_thread_default (data.context);
+  g_main_context_unref (data.context);
+  g_main_loop_unref (data.loop);
   g_object_unref (data.result);
 
   if (aborted_out)
@@ -833,10 +825,10 @@ g_mount_source_show_processes (GMountSource *source,
   gboolean handled, aborted;
   AskSyncData data;
 
-  memset (&data, 0, sizeof (data));
-  g_mutex_init (&data.mutex);
-  g_cond_init (&data.cond);
-  g_mutex_lock (&data.mutex);
+  data.context = g_main_context_new ();
+  data.loop = g_main_loop_new (data.context, FALSE);
+
+  g_main_context_push_thread_default (data.context);
 
   g_mount_source_show_processes_async (source,
                                        message,
@@ -845,18 +837,16 @@ g_mount_source_show_processes (GMountSource *source,
                                        ask_reply_sync,
                                        &data);
 
-  while (data.result == NULL)
-    g_cond_wait (&data.cond, &data.mutex);
-  g_mutex_unlock (&data.mutex);
-
-  g_cond_clear (&data.cond);
-  g_mutex_clear (&data.mutex);
+  g_main_loop_run (data.loop);
 
   handled = g_mount_source_show_processes_finish (source,
                                                   data.result,
                                                   &aborted,
                                                   &choice);
 
+  g_main_context_pop_thread_default (data.context);
+  g_main_context_unref (data.context);
+  g_main_loop_unref (data.loop);
   g_object_unref (data.result);
 
   if (aborted_out)
