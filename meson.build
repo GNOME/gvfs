@@ -170,7 +170,10 @@ foreach name: ['mkdev', 'sysmacros']
   have_major = true
   header = 'sys/@0@.h'.format(name)
   foreach func: ['major', 'minor', 'makedev']
-    have_major = have_major and cc.has_header_symbol(header, func)
+    if not cc.has_header_symbol(header, func)
+      have_major = false
+      break
+    endif
   endforeach
 
   config_h.set10('MAJOR_IN_' + name.to_upper(), have_major)
