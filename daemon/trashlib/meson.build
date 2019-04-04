@@ -20,7 +20,7 @@ libtrash = static_library(
 )
 
 libtrash_dep = declare_dependency(
-  include_directories: include_directories('.'),
+  include_directories: '.',
   dependencies: gio_dep,
   link_with: libtrash,
 )

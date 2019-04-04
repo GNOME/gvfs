@@ -69,7 +69,7 @@ libgvfsproxyvolumemonitordaemon_noin = static_library(
 )
 
 libgvfsproxyvolumemonitordaemon_noin_dep = declare_dependency(
-  include_directories: include_directories('.'),
+  include_directories: '.',
   dependencies: gio_dep,
   link_with: libgvfsproxyvolumemonitordaemon_noin,
 )
