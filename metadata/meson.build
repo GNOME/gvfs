@@ -66,7 +66,7 @@ libmetadata = static_library(
 
 libmetadata_dep = declare_dependency(
   sources: dbus_sources[1],
-  include_directories: include_directories('.'),
+  include_directories: '.',
   dependencies: deps,
   link_with: libmetadata,
 )
