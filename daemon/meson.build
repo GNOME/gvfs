@@ -19,10 +19,11 @@ if install_systemd_systemduserunitdir
   dbus_systemd_service = 'SystemdService=' + service
 endif
 
-dbus_service_conf = configuration_data()
-dbus_service_conf.set('service', dbus_service)
-dbus_service_conf.set('exec', gvfs_prefix / gvfs_libexecdir / dbus_exec)
-dbus_service_conf.set('systemd_service', dbus_systemd_service)
+dbus_service_conf = {
+  'service': dbus_service,
+  'exec': gvfs_prefix / gvfs_libexecdir / dbus_exec,
+  'systemd_service': dbus_systemd_service,
+}
 
 daemon_service = configure_file(
   input: dbus_service_in,
