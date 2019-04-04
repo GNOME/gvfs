@@ -37,8 +37,7 @@ po_dir = meson.current_source_dir() / 'po'
 
 top_inc = include_directories('.')
 
-service_conf = configuration_data()
-service_conf.set('libexecdir', gvfs_prefix / gvfs_libexecdir)
+service_conf = {'libexecdir': gvfs_prefix / gvfs_libexecdir}
 
 cc = meson.get_compiler('c')
 
