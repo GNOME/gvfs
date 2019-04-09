@@ -1,3 +1,8 @@
+Major changes in 1.40.1
+=======================
+* Revert "sftp: Always use port 22 if not specified"
+* Translation updates
+
 Major changes in 1.40.0
 =======================
 * No changes
