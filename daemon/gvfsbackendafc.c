@@ -9,7 +9,6 @@
 
 #include <limits.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -73,7 +72,7 @@ typedef struct {
 struct _GVfsBackendAfc {
   GVfsBackend backend;
 
-  char uuid[41];
+  char *uuid;
   char *service;
   char *model;
   gboolean connected;
@@ -472,16 +471,11 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-                        _("Invalid mount spec"));
-      return;
-    }
-  if (G_UNLIKELY(sscanf(str, "%40s", (char *) &self->uuid) < 1))
-    {
-      g_vfs_job_failed (G_VFS_JOB(job), G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Invalid AFC location: must be in the form of "
                           "afc://uuid:port-number"));
       return;
     }
+  self->uuid = g_strdup (str);
 
   str = g_mount_spec_get (spec, "port");
   if (str == NULL)
@@ -519,9 +513,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   display_name = NULL;
 
   real_spec = g_mount_spec_new ("afc");
-  tmp = g_strdup_printf ("%40s", (char *) &self->uuid);
-  g_mount_spec_set (real_spec, "host", tmp);
-  g_free (tmp);
+  g_mount_spec_set (real_spec, "host", self->uuid);
 
   /* INFO: Don't ever set the DefaultPort again or everything goes crazy */
   if (virtual_port != VIRTUAL_PORT_AFC)
@@ -2751,6 +2743,8 @@ g_vfs_backend_afc_finalize (GObject *obj)
       g_source_remove(self->force_umount_id);
       self->force_umount_id = 0;
   }
+
+  g_free (self->uuid);
 
   if (G_OBJECT_CLASS(g_vfs_backend_afc_parent_class)->finalize)
     (*G_OBJECT_CLASS(g_vfs_backend_afc_parent_class)->finalize) (obj);
