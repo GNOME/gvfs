@@ -357,6 +357,49 @@ get_parent_ids (GVfsBackendGoogle *self,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static gboolean
+is_owner (GVfsBackendGoogle    *self,
+          GDataDocumentsEntry  *entry,
+          GCancellable         *cancellable,
+          GError              **error)
+{
+  GDataFeed *acl_feed;
+  GDataAccessRule *rule;
+  GList *l;
+  gboolean ret_val = FALSE;
+
+  acl_feed = gdata_access_handler_get_rules (GDATA_ACCESS_HANDLER (GDATA_DOCUMENTS_DOCUMENT (entry)),
+                                             GDATA_SERVICE (self->service),
+                                             cancellable,
+                                             NULL,
+                                             NULL,
+                                             error);
+
+  if (error != NULL)
+    goto out;
+
+  for (l = gdata_feed_get_entries (acl_feed); l != NULL; l = l->next)
+    {
+      const gchar *scope_value, *scope_type, *role;
+      rule = GDATA_ACCESS_RULE (l->data);
+      role = gdata_access_rule_get_role (rule);
+      gdata_access_rule_get_scope (rule, &scope_type, &scope_value);
+
+      if (g_strcmp0 (scope_value, self->account_identity) == 0 &&
+          g_strcmp0 (role, GDATA_DOCUMENTS_ACCESS_ROLE_OWNER) == 0)
+        {
+          ret_val = TRUE;
+          goto out;
+        }
+    }
+
+  out:
+   g_clear_object (&acl_feed);
+   return ret_val;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+static gboolean
 insert_entry_full (GVfsBackendGoogle *self,
                    GDataEntry        *entry,
                    gboolean           track_dir_collisions)
@@ -1304,6 +1347,7 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
   GError *error;
   gchar *entry_path = NULL;
   GList *parent_ids;
+  gboolean owner = FALSE;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ delete: %s\n", filename);
@@ -1339,9 +1383,16 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
 
   error = NULL;
 
-  /* gdata_documents_service_remove_entry_from_folder seems doesn't work for one parent. */
+  owner = is_owner (self, GDATA_DOCUMENTS_ENTRY (entry), cancellable, &error);
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
+    }
+
   parent_ids = get_parent_ids (self, entry);
-  if (g_list_length (parent_ids) > 1)
+  if (g_list_length (parent_ids) > 1 || !owner)
     {
       new_entry = gdata_documents_service_remove_entry_from_folder (self->service, GDATA_DOCUMENTS_ENTRY (entry), GDATA_DOCUMENTS_FOLDER (parent), cancellable, &error);
     }
