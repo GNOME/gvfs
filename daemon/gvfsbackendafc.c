@@ -519,9 +519,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   display_name = NULL;
 
   real_spec = g_mount_spec_new ("afc");
-  tmp = g_strdup_printf ("%40s", (char *) &self->uuid);
-  g_mount_spec_set (real_spec, "host", tmp);
-  g_free (tmp);
+  g_mount_spec_set (real_spec, "host", self->uuid);
 
   /* INFO: Don't ever set the DefaultPort again or everything goes crazy */
   if (virtual_port != VIRTUAL_PORT_AFC)
