@@ -1296,6 +1296,7 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
                              GVfsJobDelete *job,
                              const gchar   *filename)
 {
+  size_t parents_list_len;
   GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (_self);
   GCancellable *cancellable = G_VFS_JOB (job)->cancellable;
   GDataEntry *entry;
@@ -1304,6 +1305,8 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
   GError *error;
   gchar *entry_path = NULL;
   GList *parent_ids;
+  GDataFeed* acl_feed;
+  gboolean is_owner = FALSE;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ delete: %s\n", filename);
@@ -1339,18 +1342,46 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
 
   error = NULL;
 
-  /* gdata_documents_service_remove_entry_from_folder seems doesn't work for one parent. */
-  parent_ids = get_parent_ids (self, entry);
-  if (g_list_length (parent_ids) > 1)
+  acl_feed = gdata_access_handler_get_rules (
+      GDATA_ACCESS_HANDLER (GDATA_DOCUMENTS_DOCUMENT (entry)),
+      GDATA_SERVICE (self->service),
+      NULL, NULL, NULL, &error);
+
+  if (error != NULL) 
     {
-      new_entry = gdata_documents_service_remove_entry_from_folder (self->service, GDATA_DOCUMENTS_ENTRY (entry), GDATA_DOCUMENTS_FOLDER (parent), cancellable, &error);
+      g_error ("Error getting ACL feed for document: %s", error->message);
+      g_error_free (error);
+      g_object_unref (entry);
+      g_object_unref (acl_feed);
+      return;
+    };
+
+  GDataAccessRule *rule;
+
+  parent_ids = get_parent_ids (self, entry);
+  parents_list_len = g_list_length (parent_ids);
+
+  for (GList* i = gdata_feed_get_entries(acl_feed); i != NULL; i = i->next)
+    {
+      const gchar *scope_value, *scope_type, *role;
+      rule = GDATA_ACCESS_RULE (i->data);
+      role = gdata_access_rule_get_role (rule);
+      gdata_access_rule_get_scope (rule, &scope_type, &scope_value);
+
+      if (g_strcmp0(scope_value, self->account_identity) == 0 &&
+          g_strcmp0(role, GDATA_DOCUMENTS_ACCESS_ROLE_OWNER) == 0)
+        is_owner = TRUE;
+    }
+
+  if (parents_list_len == 1 && is_owner)
+    {
+      GDataAuthorizationDomain *auth_domain;
+      auth_domain = gdata_documents_service_get_primary_authorization_domain ();
+      gdata_service_delete_entry (GDATA_SERVICE (self->service), auth_domain, entry, cancellable, &error);
     }
   else
     {
-      GDataAuthorizationDomain *auth_domain;
-
-      auth_domain = gdata_documents_service_get_primary_authorization_domain ();
-      gdata_service_delete_entry (GDATA_SERVICE (self->service), auth_domain, entry, cancellable, &error);
+      new_entry = gdata_documents_service_remove_entry_from_folder (self->service, GDATA_DOCUMENTS_ENTRY (entry), GDATA_DOCUMENTS_FOLDER (parent), cancellable, &error);
     }
 
   if (error != NULL)
@@ -1363,6 +1394,7 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
 
   if (new_entry)
     insert_entry (self, GDATA_ENTRY (new_entry));
+
   g_hash_table_foreach (self->monitors, emit_delete_event, entry_path);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -1592,6 +1624,7 @@ g_vfs_backend_google_mount (GVfsBackend  *_self,
       account_identity = goa_account_dup_identity (account);
       provider_type = goa_account_dup_provider_type (account);
 
+      g_debug("####### USER EMAIL  = %s, provider = %s", self->account_identity, provider_type);
       if (g_strcmp0 (provider_type, "google") == 0 &&
           g_strcmp0 (account_identity, self->account_identity) == 0)
         {
