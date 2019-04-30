@@ -957,7 +957,10 @@ g_vfs_backend_admin_pre_setup (int *argc,
 
   pkexec_uid = g_getenv ("PKEXEC_UID");
   if (pkexec_uid == NULL)
-    g_error ("gvfsd-admin must be executed under pkexec");
+    {
+      g_printerr ("gvfsd-admin must be executed under pkexec\n");
+      exit (1);
+    }
 
   errno = 0;
   uid = strtol (pkexec_uid, NULL, 10);
@@ -970,7 +973,11 @@ g_vfs_backend_admin_pre_setup (int *argc,
   g_option_context_parse (context, argc, argv, &error);
   g_option_context_free (context);
   if (error != NULL)
-    g_error ("Can't parse arguments: %s", error->message);
+    {
+      g_printerr ("Can't parse arguments: %s", error->message);
+      g_error_free (error);
+      exit (1);
+    }
 
   acquire_caps (uid);
   g_setenv ("DBUS_SESSION_BUS_ADDRESS", session_address, TRUE);
