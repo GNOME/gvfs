@@ -968,7 +968,7 @@ g_vfs_backend_admin_pre_setup (int *argc,
   g_option_context_set_ignore_unknown_options (context, TRUE);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, argc, argv, &error);
-
+  g_option_context_free (context);
   if (error != NULL)
     g_error ("Can't parse arguments: %s", error->message);
 
