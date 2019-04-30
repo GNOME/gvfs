@@ -955,18 +955,6 @@ g_vfs_backend_admin_pre_setup (int *argc,
   GError *error = NULL;
   GOptionContext *context;
 
-  pkexec_uid = g_getenv ("PKEXEC_UID");
-  if (pkexec_uid == NULL)
-    {
-      g_printerr ("gvfsd-admin must be executed under pkexec\n");
-      exit (1);
-    }
-
-  errno = 0;
-  uid = strtol (pkexec_uid, NULL, 10);
-  if (errno != 0)
-    g_error ("Unable to convert PKEXEC_UID string to uid_t");
-
   context = g_option_context_new (NULL);
   g_option_context_set_ignore_unknown_options (context, TRUE);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
@@ -978,6 +966,18 @@ g_vfs_backend_admin_pre_setup (int *argc,
       g_error_free (error);
       exit (1);
     }
+
+  pkexec_uid = g_getenv ("PKEXEC_UID");
+  if (pkexec_uid == NULL)
+    {
+      g_printerr ("gvfsd-admin must be executed under pkexec\n");
+      exit (1);
+    }
+
+  errno = 0;
+  uid = strtol (pkexec_uid, NULL, 10);
+  if (errno != 0)
+    g_error ("Unable to convert PKEXEC_UID string to uid_t");
 
   acquire_caps (uid);
   g_setenv ("DBUS_SESSION_BUS_ADDRESS", session_address, TRUE);
