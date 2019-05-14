@@ -120,6 +120,13 @@ try (GVfsJob *job)
   GVfsJobMakeDirectory *op_job = G_VFS_JOB_MAKE_DIRECTORY (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
+  if (g_vfs_backend_get_readonly_lockdown (op_job->backend))
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                        _("Filesystem is read-only"));
+      return TRUE;
+    }
+
   if (class->try_make_directory == NULL)
     return FALSE;
   

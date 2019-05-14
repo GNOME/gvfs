@@ -147,15 +147,10 @@ create_reply (GVfsJob *job,
               GDBusMethodInvocation *invocation)
 {
   GVfsJobQueryFsInfo *op_job = G_VFS_JOB_QUERY_FS_INFO (job);
-  const char *type;
 
-  type = g_vfs_backend_get_backend_type (op_job->backend);
-
-  if (type)
-    g_file_info_set_attribute_string (op_job->file_info,
-				      G_FILE_ATTRIBUTE_GVFS_BACKEND,
-				      type);
-
+  g_vfs_backend_add_auto_fs_info (op_job->backend,
+                                  op_job->attribute_matcher,
+                                  op_job->file_info);
   g_file_info_set_attribute_mask (op_job->file_info,
                                   op_job->attribute_matcher);
 

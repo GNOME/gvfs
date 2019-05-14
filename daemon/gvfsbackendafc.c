@@ -2760,6 +2760,8 @@ g_vfs_backend_afc_init (GVfsBackendAfc *self)
     }
 
   g_mutex_init (&self->apps_lock);
+
+  g_vfs_backend_handle_readonly_lockdown (G_VFS_BACKEND (self));
 }
 
 static void
