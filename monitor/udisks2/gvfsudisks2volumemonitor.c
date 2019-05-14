@@ -65,6 +65,9 @@ struct _GVfsUDisks2VolumeMonitor
   /* we keep volumes/mounts for blank and audio discs separate to handle e.g. mixed discs properly */
   GList *disc_volumes;
   GList *disc_mounts;
+
+  GSettings *lockdown_settings;
+  gboolean readonly_lockdown;
 };
 
 static UDisksClient *get_udisks_client_sync (GError **error);
@@ -139,6 +142,8 @@ gvfs_udisks2_volume_monitor_finalize (GObject *object)
 
   g_list_free_full (monitor->disc_volumes, g_object_unref);
   g_list_free_full (monitor->disc_mounts, g_object_unref);
+
+  g_clear_object (&monitor->lockdown_settings);
 
   G_OBJECT_CLASS (gvfs_udisks2_volume_monitor_parent_class)->finalize (object);
 }
@@ -305,6 +310,16 @@ gvfs_udisks2_volume_monitor_constructor (GType                  type,
 }
 
 static void
+lockdown_settings_changed (GSettings *settings,
+                           gchar     *key,
+                           gpointer   user_data)
+{
+  GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
+
+  monitor->readonly_lockdown = g_settings_get_boolean (settings, "disable-writing-to-devices");
+}
+
+static void
 gvfs_udisks2_volume_monitor_init (GVfsUDisks2VolumeMonitor *monitor)
 {
   monitor->gudev_client = g_udev_client_new (NULL); /* don't listen to any changes */
@@ -324,6 +339,15 @@ gvfs_udisks2_volume_monitor_init (GVfsUDisks2VolumeMonitor *monitor)
                     "mountpoints-changed",
                     G_CALLBACK (mountpoints_changed),
                     monitor);
+
+  monitor->lockdown_settings = g_settings_new ("org.gnome.desktop.lockdown");
+  monitor->readonly_lockdown = g_settings_get_boolean (monitor->lockdown_settings,
+                                                       "disable-writing-to-devices");
+  g_signal_connect_object (monitor->lockdown_settings,
+                           "changed",
+                           G_CALLBACK (lockdown_settings_changed),
+                           monitor,
+                           0);
 
   update_all (monitor, FALSE, TRUE);
 }
@@ -384,6 +408,15 @@ gvfs_udisks2_volume_monitor_get_gudev_client (GVfsUDisks2VolumeMonitor *monitor)
 {
   g_return_val_if_fail (GVFS_IS_UDISKS2_VOLUME_MONITOR (monitor), NULL);
   return monitor->gudev_client;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+gboolean
+gvfs_udisks2_volume_monitor_get_readonly_lockdown (GVfsUDisks2VolumeMonitor *monitor)
+{
+  g_return_val_if_fail (GVFS_IS_UDISKS2_VOLUME_MONITOR (monitor), FALSE);
+  return monitor->readonly_lockdown;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
