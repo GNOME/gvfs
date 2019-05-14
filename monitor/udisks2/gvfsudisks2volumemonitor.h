@@ -49,6 +49,7 @@ GVolumeMonitor *gvfs_udisks2_volume_monitor_new               (void);
 UDisksClient   *gvfs_udisks2_volume_monitor_get_udisks_client (GVfsUDisks2VolumeMonitor *monitor);
 void            gvfs_udisks2_volume_monitor_update            (GVfsUDisks2VolumeMonitor *monitor);
 GUdevClient    *gvfs_udisks2_volume_monitor_get_gudev_client  (GVfsUDisks2VolumeMonitor *monitor);
+gboolean        gvfs_udisks2_volume_monitor_get_readonly_lockdown (GVfsUDisks2VolumeMonitor *monitor);
 
 G_END_DECLS
 

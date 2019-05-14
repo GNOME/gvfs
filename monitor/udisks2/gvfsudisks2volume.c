@@ -1093,6 +1093,7 @@ do_mount (GTask *task)
 {
   MountData *data = g_task_get_task_data (task);
   GVariantBuilder builder;
+  GVfsUDisks2Volume *volume = g_task_get_source_object (task);
 
   g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
   if (data->mount_operation == NULL)
@@ -1100,6 +1101,13 @@ do_mount (GTask *task)
       g_variant_builder_add (&builder,
                              "{sv}",
                              "auth.no_user_interaction", g_variant_new_boolean (TRUE));
+    }
+  if (gvfs_udisks2_volume_monitor_get_readonly_lockdown (volume->monitor))
+    {
+      g_variant_builder_add (&builder,
+                             "{sv}",
+                             "options", g_variant_new_string ("ro"));
+
     }
   udisks_filesystem_call_mount (data->filesystem_to_mount,
                                 g_variant_builder_end (&builder),
