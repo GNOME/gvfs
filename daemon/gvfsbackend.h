@@ -516,6 +516,9 @@ void        g_vfs_backend_add_auto_info                  (GVfsBackend           
 							  GFileAttributeMatcher *matcher,
 							  GFileInfo             *info,
 							  const char            *uri);
+void        g_vfs_backend_add_auto_fs_info               (GVfsBackend           *backend,
+                                                          GFileAttributeMatcher *matcher,
+                                                          GFileInfo             *info);
 
 void        g_vfs_backend_set_block_requests             (GVfsBackend           *backend,
                                                           gboolean               value);
@@ -533,6 +536,9 @@ void        g_vfs_backend_unmount_with_operation (GVfsBackend        *backend,
 gboolean    g_vfs_backend_invocation_first_handler       (GVfsDBusMount *object,
                                                           GDBusMethodInvocation *invocation,
                                                           GVfsBackend *backend);
+
+void        g_vfs_backend_handle_readonly_lockdown       (GVfsBackend *backend);
+gboolean    g_vfs_backend_get_readonly_lockdown          (GVfsBackend *backend);
 
 G_END_DECLS
 

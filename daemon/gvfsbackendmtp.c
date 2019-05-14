@@ -379,6 +379,7 @@ g_vfs_backend_mtp_init (GVfsBackendMtp *backend)
   g_mutex_init (&backend->mutex);
   g_vfs_backend_set_display_name (G_VFS_BACKEND (backend), "mtp");
   g_vfs_backend_set_icon_name (G_VFS_BACKEND (backend), "multimedia-player");
+  g_vfs_backend_handle_readonly_lockdown (G_VFS_BACKEND (backend));
 
   mount_spec = g_mount_spec_new ("mtp");
   g_vfs_backend_set_mount_spec (G_VFS_BACKEND (backend), mount_spec);
