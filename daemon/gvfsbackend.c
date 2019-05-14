@@ -80,6 +80,9 @@ struct _GVfsBackendPrivate
   char *default_location;
   GMountSpec *mount_spec;
   gboolean block_requests;
+
+  GSettings *lockdown_settings;
+  gboolean readonly_lockdown;
 };
 
 
@@ -155,7 +158,9 @@ g_vfs_backend_finalize (GObject *object)
   g_free (backend->priv->default_location);
   if (backend->priv->mount_spec)
     g_mount_spec_unref (backend->priv->mount_spec);
-  
+
+  g_clear_object (&backend->priv->lockdown_settings);
+
   if (G_OBJECT_CLASS (g_vfs_backend_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_parent_class)->finalize) (object);
 }
@@ -587,7 +592,29 @@ g_vfs_backend_add_auto_info (GVfsBackend *backend,
        g_file_attribute_matcher_matches (matcher,
                                          G_FILE_ATTRIBUTE_THUMBNAILING_FAILED)))
     get_thumbnail_attributes (uri, info);
-  
+
+  if (backend->priv->readonly_lockdown)
+    {
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
+    }
+}
+
+void
+g_vfs_backend_add_auto_fs_info (GVfsBackend *backend,
+                                GFileAttributeMatcher *matcher,
+                                GFileInfo *info)
+{
+  const char *type;
+
+  type = g_vfs_backend_get_backend_type (backend);
+  if (type)
+    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_GVFS_BACKEND, type);
+
+  if (backend->priv->readonly_lockdown)
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
 }
 
 void
@@ -1046,4 +1073,34 @@ g_vfs_backend_force_unmount (GVfsBackend *backend)
   g_vfs_backend_unregister_mount (backend,
                                   (GAsyncReadyCallback) forced_unregister_mount_callback,
                                   NULL);
+}
+
+static void
+lockdown_settings_changed (GSettings *settings,
+                           gchar     *key,
+                           gpointer   user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (user_data);
+
+  backend->priv->readonly_lockdown = g_settings_get_boolean (settings, "disable-writing-to-devices");
+}
+
+
+void
+g_vfs_backend_handle_readonly_lockdown (GVfsBackend *backend)
+{
+  backend->priv->lockdown_settings = g_settings_new ("org.gnome.desktop.lockdown");
+  backend->priv->readonly_lockdown = g_settings_get_boolean (backend->priv->lockdown_settings,
+                                                             "disable-writing-to-devices");
+  g_signal_connect_object (backend->priv->lockdown_settings,
+                           "changed",
+                           G_CALLBACK (lockdown_settings_changed),
+                           backend,
+                           0);
+}
+
+gboolean
+g_vfs_backend_get_readonly_lockdown (GVfsBackend *backend)
+{
+  return backend->priv->readonly_lockdown;
 }

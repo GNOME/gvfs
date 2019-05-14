@@ -614,6 +614,7 @@ g_vfs_backend_gphoto2_init (GVfsBackendGphoto2 *gphoto2_backend)
   g_mutex_init (&gphoto2_backend->lock);
 
   g_vfs_backend_set_display_name (backend, "gphoto2");
+  g_vfs_backend_handle_readonly_lockdown (G_VFS_BACKEND (backend));
 
   mount_spec = g_mount_spec_new ("gphoto2");
   g_vfs_backend_set_mount_spec (backend, mount_spec);
