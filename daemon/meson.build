@@ -99,6 +99,7 @@ sources = files(
 deps = socket_deps + [
   gio_unix_dep,
   libgvfscommon_dep,
+  gsettings_desktop_schemas_dep,
 ]
 
 if enable_gcr
