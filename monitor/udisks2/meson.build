@@ -15,6 +15,7 @@ deps = [
   libgvfscommon_monitor_dep,
   libgvfsproxyvolumemonitordaemon_noin_dep,
   udisks2_dep,
+  gsettings_desktop_schemas_dep,
 ]
 
 if enable_logind
