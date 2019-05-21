@@ -1,6 +1,6 @@
 project(
   'gvfs', 'c',
-  version: '1.41.2',
+  version: '1.41.3',
   license: 'LGPL2+',
   default_options: 'buildtype=debugoptimized',
   meson_version: '>= 0.50.0',
