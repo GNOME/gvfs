@@ -1,3 +1,13 @@
+Major changes in 1.41.2
+=======================
+* build: Several meson improvements
+* build: Bump required meson version to 0.50.0
+* google: Support deleting shared Google Drive files
+* admin: Prevent core dumps when daemon is manually started
+* afc: Remove assumptions about length of device UUID to support new devices
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.41.1
 =======================
 * gmountsource: Fix deadlocks in synchronous API
