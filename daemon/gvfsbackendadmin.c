@@ -158,19 +158,6 @@ complete_job (GVfsJob *job,
 }
 
 static void
-fix_file_info (GFileInfo *info)
-{
-  /* Override read/write flags, since the above call will use access()
-   * to determine permissions, which does not honor our privileged
-   * capabilities.
-   */
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, TRUE);
-}
-
-static void
 do_query_info (GVfsBackend *backend,
                GVfsJobQueryInfo *query_info_job,
                const char *filename,
@@ -195,7 +182,6 @@ do_query_info (GVfsBackend *backend,
   if (error != NULL)
     goto out;
 
-  fix_file_info (real_info);
   g_file_info_copy_into (real_info, info);
   g_object_unref (real_info);
 
@@ -220,7 +206,6 @@ do_query_info_on_read (GVfsBackend *backend,
   if (error != NULL)
     goto out;
 
-  fix_file_info (real_info);
   g_file_info_copy_into (real_info, info);
   g_object_unref (real_info);
 
@@ -245,7 +230,6 @@ do_query_info_on_write (GVfsBackend *backend,
   if (error != NULL)
     goto out;
 
-  fix_file_info (real_info);
   g_file_info_copy_into (real_info, info);
   g_object_unref (real_info);
 
@@ -977,13 +961,14 @@ acquire_caps (uid_t uid)
   struct __user_cap_header_struct hdr;
   struct __user_cap_data_struct data;
 
-  /* Tell kernel not clear capabilities when dropping root */
-  if (prctl (PR_SET_KEEPCAPS, 1, 0, 0, 0) < 0)
-    g_error ("prctl(PR_SET_KEEPCAPS) failed");
-
-  /* Drop root uid, but retain the required permitted caps */
-  if (setuid (uid) < 0)
+  /* Set euid to user to make dbus work */
+  if (seteuid (uid) < 0)
     g_error ("unable to drop privs");
+
+  /* Set fsuid to still behave like root when working with files */
+  setfsuid (0);
+  if (setfsuid (-1) != 0)
+   g_error ("setfsuid failed");
 
   memset (&hdr, 0, sizeof(hdr));
   hdr.version = _LINUX_CAPABILITY_VERSION;
