@@ -968,7 +968,8 @@ g_vfs_backend_admin_init (GVfsBackendAdmin *self)
 
 #define REQUIRED_CAPS (CAP_TO_MASK(CAP_FOWNER) | \
                        CAP_TO_MASK(CAP_DAC_OVERRIDE) | \
-                       CAP_TO_MASK(CAP_DAC_READ_SEARCH))
+                       CAP_TO_MASK(CAP_DAC_READ_SEARCH) | \
+                       CAP_TO_MASK(CAP_CHOWN))
 
 static void
 acquire_caps (uid_t uid)
