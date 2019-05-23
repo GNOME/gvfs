@@ -42,6 +42,8 @@
 #include "gvfsjobopenforwrite.h"
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobqueryinfo.h"
+#include "gvfsjobqueryinforead.h"
+#include "gvfsjobqueryinfowrite.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
 #include "gvfsjobseekwrite.h"
@@ -156,6 +158,19 @@ complete_job (GVfsJob *job,
 }
 
 static void
+fix_file_info (GFileInfo *info)
+{
+  /* Override read/write flags, since the above call will use access()
+   * to determine permissions, which does not honor our privileged
+   * capabilities.
+   */
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, TRUE);
+}
+
+static void
 do_query_info (GVfsBackend *backend,
                GVfsJobQueryInfo *query_info_job,
                const char *filename,
@@ -180,19 +195,57 @@ do_query_info (GVfsBackend *backend,
   if (error != NULL)
     goto out;
 
-  /* Override read/write flags, since the above call will use access()
-   * to determine permissions, which does not honor our privileged
-   * capabilities.
-   */
-  g_file_info_set_attribute_boolean (real_info,
-                                     G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
-  g_file_info_set_attribute_boolean (real_info,
-                                     G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);
-  g_file_info_set_attribute_boolean (real_info,
-                                     G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, TRUE);
-  g_file_info_set_attribute_boolean (real_info,
-                                     G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, TRUE);
+  fix_file_info (real_info);
+  g_file_info_copy_into (real_info, info);
+  g_object_unref (real_info);
 
+ out:
+  complete_job (job, error);
+}
+
+static void
+do_query_info_on_read (GVfsBackend *backend,
+                       GVfsJobQueryInfoRead *query_info_job,
+                       GVfsBackendHandle handle,
+                       GFileInfo *info,
+                       GFileAttributeMatcher *matcher)
+{
+  GVfsJob *job = G_VFS_JOB (query_info_job);
+  GFileInputStream *stream = handle;
+  GError *error = NULL;
+  GFileInfo *real_info;
+
+  real_info = g_file_input_stream_query_info (stream, query_info_job->attributes,
+                                              job->cancellable, &error);
+  if (error != NULL)
+    goto out;
+
+  fix_file_info (real_info);
+  g_file_info_copy_into (real_info, info);
+  g_object_unref (real_info);
+
+ out:
+  complete_job (job, error);
+}
+
+static void
+do_query_info_on_write (GVfsBackend *backend,
+                        GVfsJobQueryInfoWrite *query_info_job,
+                        GVfsBackendHandle handle,
+                        GFileInfo *info,
+                        GFileAttributeMatcher *matcher)
+{
+  GVfsJob *job = G_VFS_JOB (query_info_job);
+  GFileOutputStream *stream = handle;
+  GError *error = NULL;
+  GFileInfo *real_info;
+
+  real_info = g_file_output_stream_query_info (stream, query_info_job->attributes,
+                                               job->cancellable, &error);
+  if (error != NULL)
+    goto out;
+
+  fix_file_info (real_info);
   g_file_info_copy_into (real_info, info);
   g_object_unref (real_info);
 
@@ -868,6 +921,8 @@ g_vfs_backend_admin_class_init (GVfsBackendAdminClass * klass)
   backend_class->mount = do_mount;
   backend_class->open_for_read = do_open_for_read;
   backend_class->query_info = do_query_info;
+  backend_class->query_info_on_read = do_query_info_on_read;
+  backend_class->query_info_on_write = do_query_info_on_write;
   backend_class->read = do_read;
   backend_class->create = do_create;
   backend_class->append_to = do_append_to;
