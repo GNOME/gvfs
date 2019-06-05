@@ -240,6 +240,22 @@ name_vanished_handler (GDBusConnection *connection,
 }
 
 /*
+ * Authentication observer signal handler that rejects all authentication
+ * mechanisms except for EXTERNAL (credentials-passing), which is the
+ * recommended authentication mechanism for AF_UNIX sockets.
+ */
+static gboolean
+allow_mechanism_cb (GDBusAuthObserver *observer,
+                    const gchar *mechanism,
+                    G_GNUC_UNUSED gpointer user_data)
+{
+  if (g_strcmp0 (mechanism, "EXTERNAL") == 0)
+    return TRUE;
+
+  return FALSE;
+}
+
+/*
  * Authentication observer signal handler that authorizes connections
  * from the same uid as this process. This matches the behaviour of a
  * libdbus DBusServer/DBusConnection when no DBusAllowUnixUserFunction
@@ -298,6 +314,7 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
   daemon->conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
   g_assert (daemon->conn != NULL);
   daemon->auth_observer = g_dbus_auth_observer_new ();
+  g_signal_connect (daemon->auth_observer, "allow-mechanism", G_CALLBACK (allow_mechanism_cb), NULL);
   g_signal_connect (daemon->auth_observer, "authorize-authenticated-peer", G_CALLBACK (authorize_authenticated_peer_cb), NULL);
 
   daemon->daemon_skeleton = gvfs_dbus_daemon_skeleton_new ();
