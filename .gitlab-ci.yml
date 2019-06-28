@@ -7,8 +7,8 @@ fedora:
 
 .gnome-build-meta-template: &gnome-build-meta
     variables:
-        BST_SHA: '1.2.4-3-g79bbefe26a3fcd13d3de558aed6b5b4d5bc1235a'
-        BST_EXTERNAL_SHA: '0.9.0-0-g63a19e8068bd777bd9cd59b1a9442f9749ea5a85'
+        BST_SHA: '1.2.7-0-g08d1694545d1d62295c7beba1fea65a21b93a723'
+        BST_EXTERNAL_SHA: '0.14.0-0-g003f1f1e7ead60627ef4242a6d785704ede44358'
         DOCKER_REGISTRY: "registry.gitlab.com/freedesktop-sdk/infrastructure/freedesktop-sdk-docker-images"
         DOCKER_AMD64: "${DOCKER_REGISTRY}/amd64:e132e7bf9180b30c6ad0f4b057442cc2f2a0aa86"
     image: "${DOCKER_AMD64}"
