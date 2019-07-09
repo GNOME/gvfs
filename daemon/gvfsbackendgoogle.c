@@ -357,50 +357,27 @@ get_parent_ids (GVfsBackendGoogle *self,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static gboolean
-is_owner (GVfsBackendGoogle  *self,
-          GDataEntry         *entry,
-          GCancellable       *cancellable,
-          GError            **error)
+is_owner (GVfsBackendGoogle *self, GDataEntry *entry)
 {
-  GDataFeed *acl_feed;
-  GDataAccessRule *rule;
   GList *l;
-  GError *local_error = NULL;
-  gboolean ret_val = FALSE;
+  GDataGoaAuthorizer *goa_authorizer;
+  GoaAccount *account;
+  const gchar *account_identity;
 
-  acl_feed = gdata_access_handler_get_rules (GDATA_ACCESS_HANDLER (GDATA_DOCUMENTS_ENTRY (entry)),
-                                             GDATA_SERVICE (self->service),
-                                             cancellable,
-                                             NULL,
-                                             NULL,
-                                             &local_error);
+  goa_authorizer = GDATA_GOA_AUTHORIZER (gdata_service_get_authorizer (GDATA_SERVICE (self->service)));
+  account = goa_object_peek_account (gdata_goa_authorizer_get_goa_object (goa_authorizer));
+  account_identity = goa_account_get_identity (account);
 
-  if (local_error != NULL)
+  for (l = gdata_entry_get_authors (entry); l != NULL; l = l->next)
     {
-      sanitize_error (&local_error);
-      g_propagate_error (error, local_error);
+      GDataAuthor *author = GDATA_AUTHOR (l->data);
 
-      goto out;
+      if (g_strcmp0 (gdata_author_get_email_address (author), account_identity) == 0) {
+          return TRUE;
+      }
     }
 
-  for (l = gdata_feed_get_entries (acl_feed); l != NULL; l = l->next)
-    {
-      const gchar *scope_value, *scope_type, *role;
-      rule = GDATA_ACCESS_RULE (l->data);
-      role = gdata_access_rule_get_role (rule);
-      gdata_access_rule_get_scope (rule, &scope_type, &scope_value);
-
-      if (g_strcmp0 (scope_value, self->account_identity) == 0 &&
-          g_strcmp0 (role, GDATA_DOCUMENTS_ACCESS_ROLE_OWNER) == 0)
-        {
-          ret_val = TRUE;
-          goto out;
-        }
-    }
-
-  out:
-   g_clear_object (&acl_feed);
-   return ret_val;
+  return FALSE;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1353,7 +1330,6 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
   GError *error;
   gchar *entry_path = NULL;
   GList *parent_ids;
-  gboolean owner = FALSE;
   guint parent_ids_len;
 
   g_rec_mutex_lock (&self->mutex);
@@ -1390,17 +1366,9 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
 
   error = NULL;
 
-  owner = is_owner (self, GDATA_ENTRY (entry), cancellable, &error);
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      goto out;
-    }
-
   parent_ids = get_parent_ids (self, entry);
   parent_ids_len = g_list_length (parent_ids);
-  if (parent_ids_len > 1 || !owner)
+  if (parent_ids_len > 1 || !is_owner (self, GDATA_ENTRY (entry)))
     {
       /* gdata_documents_service_remove_entry_from_folder () returns the
        * updated entry variable provided as argument with an increased ref.
