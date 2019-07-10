@@ -48,6 +48,14 @@
 #include <fuse.h>
 #include <fuse_lowlevel.h>
 
+#ifndef RENAME_NOREPLACE
+#define RENAME_NOREPLACE (1 << 0)
+#endif
+
+#ifndef RENAME_EXCHANGE
+#define RENAME_EXCHANGE (1 << 1)
+#endif
+
 #define GET_FILE_HANDLE(fi)     ((gpointer) (fi)->fh)
 #define SET_FILE_HANDLE(fi, fh) ((fi)->fh = (guint64) (fh))
 
