@@ -1467,23 +1467,38 @@ g_vfs_backend_google_enumerate (GVfsBackend           *_self,
   while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &entry))
     {
       DirEntriesKey *k;
+      GDataEntry *child;
+      gchar *child_id;
 
-      k = dir_entries_key_new (gdata_entry_get_id (entry), id);
-      if (g_hash_table_contains (self->dir_entries, k))
+      /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
+      child_id = g_strdup (gdata_entry_get_id (entry));
+
+      k = dir_entries_key_new (child_id, id);
+      if ((child = g_hash_table_lookup (self->dir_entries, k)) != NULL)
         {
           GFileInfo *info;
           gchar *entry_path;
           gchar *child_filename;
 
+          /* Be sure that we are not matching title of volatile file */
+          if (g_strcmp0 (child_id, gdata_entry_get_id (child)) != 0)
+            {
+              g_debug ("Skipping %s as it is volatile path for %s\n", child_id, gdata_entry_get_id (child));
+              g_free (child_id);
+              dir_entries_key_free (k);
+              continue;
+            }
+
           info = g_file_info_new ();
-          entry_path = g_build_path ("/", parent_path, gdata_entry_get_id (GDATA_ENTRY (entry)), NULL);
-          child_filename = g_build_filename (filename, gdata_entry_get_id (GDATA_ENTRY (entry)), NULL);
+          entry_path = g_build_path ("/", parent_path, child_id, NULL);
+          child_filename = g_build_filename (filename, child_id, NULL);
           build_file_info (self, entry, flags, info, matcher, child_filename, entry_path, NULL);
           g_vfs_job_enumerate_add_info (job, info);
           g_object_unref (info);
           g_free (entry_path);
         }
 
+      g_free (child_id);
       dir_entries_key_free (k);
     }
 
