@@ -11,8 +11,8 @@ For more info about GVfs see https://wiki.gnome.org/Projects/gvfs.
 
 ## Reporting Bugs
 
-Please report new bugs at https://gitlab.gnome.org/GNOME/gvfs/issues. Old bugs
-can be still found at https://bugzilla.gnome.org/page.cgi?id=browse.html&product=gvfs.
+Bug reports can be found and filed at https://gitlab.gnome.org/GNOME/gvfs/issues.
+For security related issues, please use [security@gnome.org](mailto:security@gnome.org).
 
 ## Ask Questions
 
