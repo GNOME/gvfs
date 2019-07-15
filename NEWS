@@ -1,3 +1,13 @@
+Major changes in 1.41.4
+=======================
+* google: Do not enumerate volatile entries if title matches id
+* build: Add dependency on gsettings-desktop-schemas
+* daemon/udisks2: Handle lockdown option to disable writing
+* fuse: Define RENAME_* macros when they are not defined
+* google: Check ownership in is_owner() without additional HTTP request
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.41.3
 =======================
 * daemon: Only accept EXTERNAL authentication (CVE-2019-12795)
