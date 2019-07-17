@@ -1,3 +1,16 @@
+Major changes in 1.40.2
+=======================
+* daemon: Only accept EXTERNAL authentication (CVE-2019-12795)
+* daemon: Check that the connecting client is the same user (CVE-2019-12795)
+* admin: Ensure correct ownership when moving to file:// uri (CVE-2019-12449)
+* admin: Use fsuid to ensure correct file ownership (CVE-2019-12447)
+* admin: Allow changing file owner (CVE-2019-12447)
+* admin: Add query_info_on_read/write functionality (CVE-2019-12448)
+* afc: Remove assumptions about length of device UUID to support new devices
+* gmountsource: Fix deadlocks in synchronous API
+* afp: Fix afp backend crash when no username supplied
+* Translation updates
+
 Major changes in 1.40.1
 =======================
 * Revert "sftp: Always use port 22 if not specified"
