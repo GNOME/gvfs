@@ -2410,6 +2410,11 @@ g_vfs_backend_google_set_display_name (GVfsBackend           *_self,
       goto out;
     }
 
+  /* The internal ref count has to be increased before removing the entry since
+   * remove_entry_full calls g_object_unref(). */
+  g_object_ref (entry);
+  remove_entry (self, entry);
+
   gdata_entry_set_title (entry, display_name);
   auth_domain = gdata_documents_service_get_primary_authorization_domain ();
 
@@ -2423,7 +2428,6 @@ g_vfs_backend_google_set_display_name (GVfsBackend           *_self,
       goto out;
     }
 
-  remove_entry (self, entry);
   insert_entry (self, new_entry);
   g_hash_table_foreach (self->monitors, emit_attribute_changed_event, entry_path);
   g_vfs_job_set_display_name_set_new_path (job, entry_path);
