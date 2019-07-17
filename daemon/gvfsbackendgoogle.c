@@ -2389,6 +2389,7 @@ g_vfs_backend_google_set_display_name (GVfsBackend           *_self,
   GDataEntry *new_entry = NULL;
   GError *error;
   gchar *entry_path = NULL;
+  gchar *old_display_name = NULL;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ set_display_name: %s, %s\n", filename, display_name);
@@ -2410,6 +2411,7 @@ g_vfs_backend_google_set_display_name (GVfsBackend           *_self,
       goto out;
     }
 
+  old_display_name = g_strdup (gdata_entry_get_title (entry));
   gdata_entry_set_title (entry, display_name);
   auth_domain = gdata_documents_service_get_primary_authorization_domain ();
 
@@ -2423,6 +2425,10 @@ g_vfs_backend_google_set_display_name (GVfsBackend           *_self,
       goto out;
     }
 
+  /* Revert the title of entry back to its initial state, so as to
+   * consistently remove the entries from the cache */
+  gdata_entry_set_title (entry, old_display_name);
+
   remove_entry (self, entry);
   insert_entry (self, new_entry);
   g_hash_table_foreach (self->monitors, emit_attribute_changed_event, entry_path);
@@ -2432,6 +2438,7 @@ g_vfs_backend_google_set_display_name (GVfsBackend           *_self,
  out:
   g_clear_object (&new_entry);
   g_free (entry_path);
+  g_free (old_display_name);
   g_debug ("- set_display_name\n");
   g_rec_mutex_unlock (&self->mutex);
 }
