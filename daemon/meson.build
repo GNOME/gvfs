@@ -121,6 +121,7 @@ libgvfsdaemon = shared_library(
   dependencies: deps,
   c_args: cflags,
   install: true,
+  install_rpath: gvfs_rpath,
   install_dir: gvfs_pkglibdir
 )
 
