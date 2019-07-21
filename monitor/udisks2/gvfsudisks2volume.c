@@ -296,10 +296,20 @@ update_volume (GVfsUDisks2Volume *volume)
       else if (g_strcmp0 (udisks_block_get_id_usage (block), "crypto") == 0)
         {
           s = udisks_client_get_size_for_display (udisks_client, udisks_block_get_size (volume->block), FALSE, FALSE);
-          /* Translators: This is used for encrypted volumes.
-           *              The first %s is the formatted size (e.g. "42.0 MB").
-           */
-          volume->name = g_strdup_printf (_("%s Encrypted"), s);
+          if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_unknown") == 0)
+            {
+              /* Translators: This is used for possibly encrypted volumes.
+               *              The first %s is the formatted size (e.g. "42.0 MB").
+               */
+              volume->name = g_strdup_printf (_("%s Encrypted?"), s);
+            }
+          else
+            {
+              /* Translators: This is used for encrypted volumes.
+               *              The first %s is the formatted size (e.g. "42.0 MB").
+               */
+              volume->name = g_strdup_printf (_("%s Encrypted"), s);
+            }
           g_free (s);
         }
       else
