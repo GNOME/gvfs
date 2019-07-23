@@ -1392,6 +1392,7 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
       sanitize_error (&error);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
+      g_object_unref (entry);
       goto out;
     }
 
@@ -1403,9 +1404,9 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
     insert_entry (self, GDATA_ENTRY (new_entry));
   g_hash_table_foreach (self->monitors, emit_delete_event, entry_path);
   g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_object_unref (entry);
 
  out:
-  g_object_unref (entry);
   g_clear_object (&new_entry);
   g_free (entry_path);
   g_debug ("- delete\n");
