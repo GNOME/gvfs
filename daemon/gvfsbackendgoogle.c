@@ -163,6 +163,31 @@ entries_in_folder_equal (gconstpointer a, gconstpointer b)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static void
+log_dir_entries_hash_table (GVfsBackendGoogle *self) {
+    GHashTable *hash_table;
+    GHashTableIter iter;
+    GDataEntry *entry;
+    DirEntriesKey *key;
+
+    if (!g_getenv ("DEBUG_CACHE"))
+      return;
+
+    hash_table = self->dir_entries;
+    g_hash_table_iter_init (&iter, hash_table);
+    while (g_hash_table_iter_next (&iter, (gpointer *) &key, (gpointer *) &entry))
+      {
+        g_debug ("Actual ID = %s, (%s, %s) -> %p, %d\n",
+                 gdata_entry_get_id (GDATA_ENTRY (entry)),
+                 key->title_or_id,
+                 key->parent_id,
+                 entry,
+                 ((GObject *) entry)->ref_count);
+      }
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static WriteHandle *
 write_handle_new (GDataEntry *document, GDataUploadStream *stream, const gchar *filename, const gchar *entry_path)
 {
@@ -1263,6 +1288,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ copy: %s -> %s, %d\n", source, destination, flags);
+  log_dir_entries_hash_table (self);
 
   if (flags & G_FILE_COPY_BACKUP)
     {
@@ -1436,6 +1462,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   g_free (entry_path);
   g_free (parent_path);
   g_free (parent_id);
+  log_dir_entries_hash_table (self);
   g_debug ("- copy\n");
   g_rec_mutex_unlock (&self->mutex);
 }
