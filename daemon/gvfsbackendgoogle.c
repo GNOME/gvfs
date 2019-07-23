@@ -85,6 +85,8 @@ G_DEFINE_TYPE(GVfsBackendGoogle, g_vfs_backend_google, G_VFS_TYPE_BACKEND)
 
 #define URI_PREFIX "https://www.googleapis.com/drive/v2/files/"
 
+#define SOURCE_ID_PROPERTY_KEY "GVfsSourceID"
+#define DESTINATION_PARENT_ID_PROPERTY_KEY "GVfsDestinationParentID"
 /* ---------------------------------------------------------------------------------------------------- */
 
 typedef struct
@@ -382,6 +384,27 @@ is_owner (GVfsBackendGoogle *self, GDataEntry *entry)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static GList *
+get_property (GDataDocumentsEntry *entry,
+              const gchar         *key,
+              const gchar         *visibility)
+{
+  GList *l = NULL;
+  GList *document_properties;
+  GDataDocumentsProperty *_prop;
+
+  _prop = gdata_documents_property_new (key);
+  gdata_documents_property_set_visibility (_prop, visibility);
+
+  document_properties = gdata_documents_entry_get_document_properties (GDATA_DOCUMENTS_ENTRY (entry));
+  l = g_list_find_custom (document_properties, _prop, (GCompareFunc) gdata_comparable_compare);
+
+  g_clear_object (&_prop);
+  return l;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static gboolean
 insert_entry_full (GVfsBackendGoogle *self,
                    GDataEntry        *entry,
@@ -390,15 +413,19 @@ insert_entry_full (GVfsBackendGoogle *self,
   DirEntriesKey *k;
   GDataEntry *old_entry;
   gboolean insert_title = TRUE;
-  const gchar *id;
+  gchar *id = NULL;
   const gchar *old_id;
   const gchar *title;
-  GList *parent_ids, *l;
+  GList *parent_ids, *l, *p, *q;
 
-  id = gdata_entry_get_id (entry);
+  id = g_strdup (gdata_entry_get_id (entry));
   title = gdata_entry_get_title (entry);
 
   g_hash_table_insert (self->entries, g_strdup (id), g_object_ref (entry));
+
+  p = get_property (GDATA_DOCUMENTS_ENTRY (entry),
+                    SOURCE_ID_PROPERTY_KEY,
+                    GDATA_DOCUMENTS_PROPERTY_VISIBILITY_PUBLIC);
 
   parent_ids = get_parent_ids (self, entry);
   for (l = parent_ids; l != NULL; l = l->next)
@@ -414,6 +441,7 @@ insert_entry_full (GVfsBackendGoogle *self,
       if (old_entry != NULL)
         {
           old_id = gdata_entry_get_id (old_entry);
+          g_debug ("  title collision of %s with: (%s, %s) -> %p\n", id, title, parent_id, old_entry);
           if (g_strcmp0 (old_id, title) == 0)
             {
               insert_title = FALSE;
@@ -450,8 +478,36 @@ insert_entry_full (GVfsBackendGoogle *self,
 
           dir_entries_key_free (k);
         }
+
+      q = get_property (GDATA_DOCUMENTS_ENTRY (entry),
+                        DESTINATION_PARENT_ID_PROPERTY_KEY,
+                        GDATA_DOCUMENTS_PROPERTY_VISIBILITY_PUBLIC);
+
+      if ((p && p->data) && (q && q->data))
+        {
+          const gchar *source_id;
+          const gchar *destination_parent_id;
+
+          source_id = gdata_documents_property_get_value (GDATA_DOCUMENTS_PROPERTY (p->data));
+          destination_parent_id = gdata_documents_property_get_value (GDATA_DOCUMENTS_PROPERTY (q->data));
+
+          if (g_strcmp0 (destination_parent_id, parent_id) == 0)
+            {
+              GDataEntry *volatile_path_entry = NULL;
+
+              k = dir_entries_key_new (source_id, parent_id);
+              volatile_path_entry = g_hash_table_lookup (self->dir_entries, k);
+
+              if (volatile_path_entry == NULL)
+                {
+                  g_hash_table_insert (self->dir_entries, k, g_object_ref (entry));
+                  g_debug ("  insert_entry: Inserted (%s, %s) -> %p\n", source_id, parent_id, entry);
+                }
+            }
+        }
     }
   g_list_free_full (parent_ids, g_free);
+  g_free (id);
 
   return insert_title;
 }
@@ -476,31 +532,77 @@ remove_entry_full (GVfsBackendGoogle *self,
 {
   DirEntriesKey *k;
   GList *l;
-  const gchar *id;
+  gchar *id;
   const gchar *title;
-  GList *parent_ids, *ll;
+  GList *parent_ids, *ll, *p, *q;
 
-  id = gdata_entry_get_id (entry);
+  /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
+  id = g_strdup (gdata_entry_get_id (entry));
   title = gdata_entry_get_title (entry);
 
   g_hash_table_remove (self->entries, id);
+
+  p = get_property (GDATA_DOCUMENTS_ENTRY (entry),
+                    SOURCE_ID_PROPERTY_KEY,
+                    GDATA_DOCUMENTS_PROPERTY_VISIBILITY_PUBLIC);
 
   parent_ids = get_parent_ids (self, entry);
   for (ll = parent_ids; ll != NULL; ll = ll->next)
     {
       gchar *parent_id = ll->data;
+      GDataEntry *child;
 
       g_hash_table_remove (self->dir_timestamps, parent_id);
 
       k = dir_entries_key_new (id, parent_id);
-      g_debug ("  remove_entry: Removed (%s, %s) -> %p\n", id, parent_id, entry);
-      g_hash_table_remove (self->dir_entries, k);
+      if (g_hash_table_remove (self->dir_entries, k))
+        {
+          g_debug ("  remove_entry: Removed (%s, %s) -> %p\n", id, parent_id, entry);
+        }
       dir_entries_key_free (k);
 
       k = dir_entries_key_new (title, parent_id);
-      g_debug ("  remove_entry: Removed (%s, %s) -> %p\n", title, parent_id, entry);
-      g_hash_table_remove (self->dir_entries, k);
+      if ((child = g_hash_table_lookup (self->dir_entries, k)) != NULL)
+        {
+          /* Be sure that we are not matching title/id of volatile file. This
+           * needs to specifically be taken care of while having files with
+           * multiple titles, otherwise we may remove an entry which belonged
+           * to some other file and errorneously decrement the ref count of
+           * that entry (causing seg-faults later). */
+          if (g_strcmp0 (id, gdata_entry_get_id (child)) != 0)
+            {
+              g_debug ("  skipping removal of %s as it is volatile path for %s\n", id, gdata_entry_get_id (child));
+            }
+          else if (g_hash_table_remove (self->dir_entries, k))
+            {
+              g_debug ("  remove_entry: Removed (%s, %s) -> %p\n", title, parent_id, entry);
+            }
+        }
       dir_entries_key_free (k);
+
+      q = get_property (GDATA_DOCUMENTS_ENTRY (entry),
+                        DESTINATION_PARENT_ID_PROPERTY_KEY,
+                        GDATA_DOCUMENTS_PROPERTY_VISIBILITY_PUBLIC);
+
+      if ((p && p->data) && (q && q->data))
+        {
+          const gchar *source_id;
+          const gchar *destination_parent_id;
+
+          source_id = gdata_documents_property_get_value (GDATA_DOCUMENTS_PROPERTY (p->data));
+          destination_parent_id = gdata_documents_property_get_value (GDATA_DOCUMENTS_PROPERTY (q->data));
+
+          if (g_strcmp0 (destination_parent_id, parent_id) == 0)
+            {
+              k = dir_entries_key_new (source_id, parent_id);
+
+              if (g_hash_table_remove (self->dir_entries, k))
+                {
+                  g_debug ("  remove_entry: Removed (%s, %s) -> %p\n", source_id, parent_id, entry);
+                }
+              dir_entries_key_free (k);
+            }
+        }
 
       l = g_list_find (self->dir_collisions, entry);
       if (l != NULL)
@@ -527,6 +629,7 @@ remove_entry_full (GVfsBackendGoogle *self,
         }
     }
   g_list_free_full (parent_ids, g_free);
+  g_free (id);
 }
 
 static void
@@ -554,10 +657,28 @@ remove_dir (GVfsBackendGoogle *self,
   while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &entry))
     {
       DirEntriesKey *k;
+      gchar *id = NULL;
+      GDataEntry *child;
+
+      /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
+      id = g_strdup (gdata_entry_get_id (entry));
 
       k = dir_entries_key_new (gdata_entry_get_id (entry), parent_id);
-      if (g_hash_table_contains (self->dir_entries, k))
+      if ((child = g_hash_table_lookup (self->dir_entries, k)) != NULL)
         {
+          /* Be sure that we are not matching title/id of volatile file. This
+           * needs to specifically be taken care of while having files with
+           * multiple titles, otherwise we may remove an entry which belonged
+           * to some other file and errorneously decrement the ref count of
+           * that entry (causing seg-faults later). */
+          if (g_strcmp0 (id, gdata_entry_get_id (child)) != 0)
+            {
+              g_debug ("Skipping removal of %s as it is volatile path for %s\n", id, gdata_entry_get_id (child));
+              g_free (id);
+              dir_entries_key_free (k);
+              continue;
+            }
+
           g_object_ref (entry);
           g_hash_table_iter_remove (&iter);
           remove_entry_full (self, entry, FALSE);
@@ -565,6 +686,7 @@ remove_dir (GVfsBackendGoogle *self,
         }
 
       dir_entries_key_free (k);
+      g_free (id);
     }
 
   for (l = self->dir_collisions; l != NULL; l = l->next)
@@ -1123,6 +1245,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   GDataDocumentsEntry *dummy_source_entry = NULL;
   GDataDocumentsEntry *new_entry = NULL;
   GDataEntry *destination_parent;
+  GDataEntry *source_parent;
   GDataEntry *existing_entry;
   GDataEntry *source_entry;
   GError *error;
@@ -1130,10 +1253,13 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   const gchar *etag;
   const gchar *id;
   const gchar *summary;
+  const gchar *title;
+  const gchar *dummy_entry_filename;
   gchar *destination_basename = NULL;
   gchar *entry_path = NULL;
   goffset size;
   gchar *parent_path = NULL;
+  gchar *parent_id = NULL;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ copy: %s -> %s, %d\n", source, destination, flags);
@@ -1157,6 +1283,23 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
       goto out;
     }
 
+  if (GDATA_IS_DOCUMENTS_FOLDER (source_entry))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,
+                        G_IO_ERROR_WOULD_RECURSE,
+                        _("Can’t recursively copy directory"));
+      goto out;
+    }
+
+  source_parent = resolve_dir (self, source, cancellable, NULL, NULL, &error);
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
+    }
+
   destination_parent = resolve_dir (self, destination, cancellable, &destination_basename, &parent_path, &error);
   if (error != NULL)
     {
@@ -1165,20 +1308,28 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
       goto out;
     }
 
+  /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
+  parent_id = g_strdup (gdata_entry_get_id (destination_parent));
   etag = gdata_entry_get_etag (source_entry);
   id = gdata_entry_get_id (source_entry);
   summary = gdata_entry_get_summary (source_entry);
+  title = gdata_entry_get_title (source_entry);
 
-  /* Fail the job if copy/move operation leads to display name loss.
-   * Use G_IO_ERROR_FAILED instead of _NOT_SUPPORTED to avoid r/w fallback.
-   * See: https://bugzilla.gnome.org/show_bug.cgi?id=755701 */
-  if (g_strcmp0 (id, destination_basename) == 0)
+  /* When a file is copied to the same folder, Google Drive provides a "Make a
+   * copy" option which creates a new file and changes its title from "Foobar.pdf"
+   * to "Copy of Foobar". But instead here, nautilus does the heavy-lifting and
+   * creates the destination file name as "Foobar (copy).pdf".
+   *
+   * Moreover, just after copy operation, a query_info operation is performed
+   * and it needs the ("Foobar (copy).pdf", parent_id) -> Entry mapping in the
+   * cache. Hence, we set the new entry's filename conditionally. */
+  if (source_parent == destination_parent)
     {
-      g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                G_IO_ERROR,
-                                G_IO_ERROR_FAILED,
-                                _("Operation not supported"));
-      goto out;
+      dummy_entry_filename = destination_basename;
+    }
+  else
+    {
+      dummy_entry_filename = gdata_entry_get_title (source_entry);
     }
 
   existing_entry = resolve_child (self, destination_parent, destination_basename, cancellable, NULL);
@@ -1197,19 +1348,20 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
         }
       else
         {
-          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
-          goto out;
-        }
-    }
-  else
-    {
-      if (GDATA_IS_DOCUMENTS_FOLDER (source_entry))
-        {
-          g_vfs_job_failed (G_VFS_JOB (job),
-                            G_IO_ERROR,
-                            G_IO_ERROR_WOULD_RECURSE,
-                            _("Can’t recursively copy directory"));
-          goto out;
+          /* If the destination_basename matches the volatile path of some
+           * other file (given by existing_entry) and if the titles are
+           * different, copy operation should be allowed. In that case, we will
+           * be having two different entries (each with different titles), but
+           * the stored volatile path (in GDataDocumentsProperty) will be same.
+           *
+           * This isn't an issue since we've already handled those extra
+           * entries in insert_entry_full().
+           */
+          if (g_strcmp0 (gdata_entry_get_title (existing_entry), title) == 0)
+            {
+              g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
+              goto out;
+            }
         }
     }
 
@@ -1218,8 +1370,36 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
                                      "etag", etag,
                                      "id", id,
                                      "summary", summary,
-                                     "title", destination_basename,
+                                     "title", dummy_entry_filename,
                                      NULL);
+
+  /*
+   * When a file is copied inside the same parent, we don't add any
+   * GDataDocumentsProperty on it. This is done so that whenever the new_entry
+   * gets inserted into the cache, it doesn't overwrite the mapping
+   * (source_id, source_parent) -> (GDataEntry of source)
+   * with (source_id, source_parent) -> (GDataEntry of new_entry).
+   *
+   * Moreover, in this case, just after the copy operation, nautilus performs a
+   * query_info searching for the new title of the file (to check whether file
+   * has actually been created). Our new_entry already has its title set to
+   * destination_basename, hence we don't need to add any extra property here.
+   */
+  if (source_parent != destination_parent)
+    {
+      GDataDocumentsProperty *source_id_property, *parent_id_property;
+
+      source_id_property = gdata_documents_property_new (SOURCE_ID_PROPERTY_KEY);
+      gdata_documents_property_set_visibility (source_id_property, GDATA_DOCUMENTS_PROPERTY_VISIBILITY_PUBLIC);
+      gdata_documents_property_set_value (source_id_property, id);
+
+      parent_id_property = gdata_documents_property_new (DESTINATION_PARENT_ID_PROPERTY_KEY);
+      gdata_documents_property_set_visibility (parent_id_property, GDATA_DOCUMENTS_PROPERTY_VISIBILITY_PUBLIC);
+      gdata_documents_property_set_value (parent_id_property, parent_id);
+
+      gdata_documents_entry_add_documents_property (GDATA_DOCUMENTS_ENTRY (dummy_source_entry), source_id_property);
+      gdata_documents_entry_add_documents_property (GDATA_DOCUMENTS_ENTRY (dummy_source_entry), parent_id_property);
+    }
 
   error = NULL;
   new_entry = gdata_documents_service_add_entry_to_folder (self->service,
@@ -1255,6 +1435,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   g_free (destination_basename);
   g_free (entry_path);
   g_free (parent_path);
+  g_free (parent_id);
   g_debug ("- copy\n");
   g_rec_mutex_unlock (&self->mutex);
 }
