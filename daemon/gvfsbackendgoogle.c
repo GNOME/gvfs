@@ -1469,6 +1469,198 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static void
+g_vfs_backend_google_move (GVfsBackend           *_self,
+                           GVfsJobMove           *job,
+                           const gchar           *source,
+                           const gchar           *destination,
+                           GFileCopyFlags         flags,
+                           GFileProgressCallback  progress_callback,
+                           gpointer               progress_callback_data)
+{
+  GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (_self);
+  GCancellable *cancellable = G_VFS_JOB (job)->cancellable;
+  GDataAuthorizationDomain *auth_domain;
+  GDataEntry *new_entry = NULL;
+  GDataEntry *destination_parent;
+  GDataEntry *source_parent;
+  GDataEntry *existing_entry;
+  GDataEntry *source_entry = NULL;
+  GDataLink *source_parent_link;
+  GDataLink *destination_parent_link;
+  GError *error;
+  const gchar *title;
+  gchar *destination_basename = NULL;
+  gchar *entry_path = NULL;
+  gchar *parent_path = NULL;
+  gchar *id = NULL;
+  gchar *source_parent_id = NULL;
+  gchar *destination_parent_id = NULL;
+  goffset size;
+
+  g_rec_mutex_lock (&self->mutex);
+  g_debug ("+ move: %s -> %s, %d\n", source, destination, flags);
+  log_dir_entries_hash_table (self);
+
+  if (flags & G_FILE_COPY_BACKUP)
+    {
+      /* Return G_IO_ERROR_NOT_SUPPORTED instead of
+       * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
+       * fallback copy.
+       */
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
+      goto out;
+    }
+
+  error = NULL;
+  source_entry = resolve (self, source, cancellable, NULL, &error);
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
+    }
+
+  source_parent = resolve_dir (self, source, cancellable, NULL, NULL, &error);
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
+    }
+
+  destination_parent = resolve_dir (self, destination, cancellable, &destination_basename, &parent_path, &error);
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
+    }
+
+  if (source_parent == destination_parent)
+    {
+      #if HAVE_LIBGDATA_0_17_7
+        size = gdata_documents_entry_get_file_size (GDATA_DOCUMENTS_ENTRY (source_entry));
+      #else
+        size = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (source_entry));
+      #endif
+        g_vfs_job_progress_callback (size, size, job);
+        g_vfs_job_succeeded (G_VFS_JOB (job));
+
+      goto out;
+    }
+
+  /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
+  id = g_strdup (gdata_entry_get_id (source_entry));
+  source_parent_id = g_strdup (gdata_entry_get_id (source_parent));
+  destination_parent_id = g_strdup (gdata_entry_get_id (destination_parent));
+
+  title = gdata_entry_get_title (source_entry);
+  auth_domain = gdata_documents_service_get_primary_authorization_domain ();
+
+  existing_entry = resolve_child (self, destination_parent, destination_basename, cancellable, NULL);
+  if (existing_entry != NULL)
+    {
+      if (flags & G_FILE_COPY_OVERWRITE)
+        {
+          /* We don't support overwrites, so we don't need to care
+           * about G_IO_ERROR_IS_DIRECTORY and G_IO_ERROR_WOULD_MERGE.
+           */
+          g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                    G_IO_ERROR,
+                                    G_IO_ERROR_NOT_SUPPORTED,
+                                    _("Operation not supported"));
+          goto out;
+        }
+      else
+        {
+          /* If the destination_basename matches the volatile path of some
+           * other file (given by existing_entry) and if the titles are
+           * different, move operation should be allowed. In that case, we will
+           * be having two different entries (each with different titles), but
+           * the stored volatile path (in GDataDocumentsProperty) will be same.
+           *
+           * This isn't an issue since we've already handled those extra
+           * entries in insert_entry_full().
+           */
+          if (g_strcmp0 (gdata_entry_get_title (existing_entry), title) == 0)
+            {
+              g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
+              goto out;
+            }
+        }
+    }
+
+  /* The internal ref count has to be increased before removing the
+   * source_entry since remove_entry_full calls g_object_unref() internally */
+  g_object_ref (source_entry);
+  remove_entry (self, source_entry);
+
+  source_parent_link = gdata_link_new (g_strconcat (URI_PREFIX, source_parent_id, NULL),
+                                       GDATA_LINK_PARENT);
+  destination_parent_link = gdata_link_new (g_strconcat (URI_PREFIX, destination_parent_id, NULL),
+                                            GDATA_LINK_PARENT);
+
+  if (!gdata_entry_remove_link (source_entry, source_parent_link))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED, _("Error moving file/folder"));
+      g_object_unref (source_entry);
+      g_object_unref (source_parent_link);
+      g_object_unref (destination_parent_link);
+      goto out;
+    }
+
+  gdata_entry_add_link (source_entry, destination_parent_link);
+
+  error = NULL;
+  new_entry = gdata_service_update_entry (GDATA_SERVICE (self->service),
+                                          auth_domain,
+                                          source_entry,
+                                          cancellable,
+                                          &error);
+  if (error != NULL)
+    {
+      sanitize_error (&error);
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      g_object_unref (source_entry);
+      g_object_unref (source_parent_link);
+      g_object_unref (destination_parent_link);
+      goto out;
+    }
+
+  entry_path = g_build_path ("/", parent_path, gdata_entry_get_id (new_entry), NULL);
+  g_debug ("  new entry path: %s\n", entry_path);
+
+  insert_entry (self, new_entry);
+  g_hash_table_foreach (self->monitors, emit_create_event, entry_path);
+
+#if HAVE_LIBGDATA_0_17_7
+  size = gdata_documents_entry_get_file_size (GDATA_DOCUMENTS_ENTRY (new_entry));
+#else
+  size = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (new_entry));
+#endif
+  g_vfs_job_progress_callback (size, size, job);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  g_object_unref (destination_parent_link);
+  g_object_unref (source_entry);
+
+ out:
+  g_clear_object (&new_entry);
+  g_free (destination_basename);
+  g_free (entry_path);
+  g_free (parent_path);
+  g_free (destination_parent_id);
+  g_free (source_parent_id);
+  g_free (id);
+  log_dir_entries_hash_table (self);
+  g_debug ("- move\n");
+  g_rec_mutex_unlock (&self->mutex);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static gboolean
 g_vfs_backend_google_create_dir_monitor (GVfsBackend          *_self,
                                          GVfsJobCreateMonitor *job,
@@ -3099,6 +3291,7 @@ g_vfs_backend_google_class_init (GVfsBackendGoogleClass * klass)
   backend_class->try_close_read = g_vfs_backend_google_close_read;
   backend_class->close_write = g_vfs_backend_google_close_write;
   backend_class->copy = g_vfs_backend_google_copy;
+  backend_class->move = g_vfs_backend_google_move;
   backend_class->create = g_vfs_backend_google_create;
   backend_class->try_create_dir_monitor = g_vfs_backend_google_create_dir_monitor;
   backend_class->delete = g_vfs_backend_google_delete;
