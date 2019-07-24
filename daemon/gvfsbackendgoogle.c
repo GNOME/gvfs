@@ -1331,6 +1331,7 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
   gchar *entry_path = NULL;
   GList *parent_ids;
   guint parent_ids_len;
+  gchar *id = NULL;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ delete: %s\n", filename);
@@ -1342,6 +1343,39 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       goto out;
+    }
+
+  /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
+  id = g_strdup (gdata_entry_get_id (entry));
+
+  if (GDATA_IS_DOCUMENTS_FOLDER (entry))
+    {
+      GHashTableIter iter;
+      DirEntriesKey *key;
+
+      if (!is_dir_listing_valid (self, entry))
+        {
+          rebuild_dir (self, entry, cancellable, &error);
+          if (error != NULL)
+            {
+              g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+              g_error_free (error);
+              goto out;
+            }
+        }
+
+      g_hash_table_iter_init (&iter, self->dir_entries);
+      while (g_hash_table_iter_next (&iter, (gpointer *) &key, NULL))
+        {
+          if (g_strcmp0 (key->parent_id, id) == 0)
+            {
+              g_vfs_job_failed (G_VFS_JOB (job),
+                                G_IO_ERROR,
+                                G_IO_ERROR_NOT_EMPTY,
+                                _("Directory not empty"));
+              goto out;
+            }
+        }
     }
 
   parent = resolve_dir (self, filename, cancellable, NULL, NULL, &error);
@@ -1392,6 +1426,7 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
       sanitize_error (&error);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
+      g_object_unref (entry);
       goto out;
     }
 
@@ -1403,11 +1438,12 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
     insert_entry (self, GDATA_ENTRY (new_entry));
   g_hash_table_foreach (self->monitors, emit_delete_event, entry_path);
   g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_object_unref (entry);
 
  out:
-  g_object_unref (entry);
   g_clear_object (&new_entry);
   g_free (entry_path);
+  g_free (id);
   g_debug ("- delete\n");
   g_rec_mutex_unlock (&self->mutex);
 }
