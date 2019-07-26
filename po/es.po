@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2019-07-19 21:35+0000\n"
-"PO-Revision-Date: 2019-07-24 10:39+0200\n"
+"POT-Creation-Date: 2019-07-25 12:45+0000\n"
+"PO-Revision-Date: 2019-07-26 09:04+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Spanish - Spain <gnome-es-list@gnome.org>\n"
 "Language: es_ES\n"
@@ -84,10 +84,10 @@ msgstr "los valores deben ser cadenas o listas de cadenas"
 #: daemon/gvfsbackendftp.c:1257 daemon/gvfsbackendftp.c:1278
 #: daemon/gvfsbackendgoogle.c:1147 daemon/gvfsbackendgoogle.c:1180
 #: daemon/gvfsbackendgoogle.c:1195 daemon/gvfsbackendgoogle.c:1282
-#: daemon/gvfsbackendgoogle.c:1359 daemon/gvfsbackendgoogle.c:1539
-#: daemon/gvfsbackendgoogle.c:1767 daemon/gvfsbackendgoogle.c:2409
-#: daemon/gvfsbackendgoogle.c:2470 daemon/gvfsbackendgoogle.c:2493
-#: daemon/gvfsbackendgoogle.c:2579 daemon/gvfsbackendgphoto2.c:2238
+#: daemon/gvfsbackendgoogle.c:1393 daemon/gvfsbackendgoogle.c:1575
+#: daemon/gvfsbackendgoogle.c:1803 daemon/gvfsbackendgoogle.c:2445
+#: daemon/gvfsbackendgoogle.c:2506 daemon/gvfsbackendgoogle.c:2529
+#: daemon/gvfsbackendgoogle.c:2615 daemon/gvfsbackendgphoto2.c:2238
 #: daemon/gvfsbackendgphoto2.c:2451 daemon/gvfsbackendgphoto2.c:2548
 #: daemon/gvfsbackendgphoto2.c:2641 daemon/gvfsbackendgphoto2.c:3250
 #: daemon/gvfsbackendgphoto2.c:3260 daemon/gvfsbackendmtp.c:2251
@@ -460,7 +460,7 @@ msgstr "El archivo destino esta abierto"
 
 #: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:221
 #: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2768
-#: daemon/gvfsbackendsftp.c:2148
+#: daemon/gvfsbackendgoogle.c:1375 daemon/gvfsbackendsftp.c:2148
 msgid "Directory not empty"
 msgstr "La carpeta no está vacía"
 
@@ -494,8 +494,8 @@ msgstr "No hay espacio suficiente en el volumen"
 #: daemon/gvfsbackenddav.c:3088 daemon/gvfsbackenddav.c:3312
 #: daemon/gvfsbackendftp.c:811 daemon/gvfsbackendftp.c:999
 #: daemon/gvfsbackendftp.c:1509 daemon/gvfsbackendftp.c:1617
-#: daemon/gvfsbackendgoogle.c:1200 daemon/gvfsbackendgoogle.c:1563
-#: daemon/gvfsbackendgoogle.c:1845 daemon/gvfsbackendgoogle.c:2498
+#: daemon/gvfsbackendgoogle.c:1200 daemon/gvfsbackendgoogle.c:1599
+#: daemon/gvfsbackendgoogle.c:1881 daemon/gvfsbackendgoogle.c:2534
 #: daemon/gvfsbackendmtp.c:1619 daemon/gvfsbackendmtp.c:1662
 #: daemon/gvfsbackendnfs.c:2485 daemon/gvfsbackendsftp.c:4842
 #: daemon/gvfsbackendsmb.c:2065
@@ -598,7 +598,7 @@ msgstr "El archivo no está abierto para lectura"
 
 #: daemon/gvfsbackendadmin.c:926 daemon/gvfsbackendarchive.c:639
 #: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:1880
-#: daemon/gvfsbackendgoogle.c:1666 daemon/gvfsbackendhttp.c:256
+#: daemon/gvfsbackendgoogle.c:1702 daemon/gvfsbackendhttp.c:256
 #: daemon/gvfsbackendsmb.c:585
 msgid "Invalid mount spec"
 msgstr "Especificación de montaje no válida"
@@ -745,7 +745,7 @@ msgstr ""
 "dispositivo y pulse «Intentarlo de nuevo»."
 
 #: daemon/gvfsbackendafc.c:1116 daemon/gvfsbackendarchive.c:746
-#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2221
+#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2257
 #: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2284
 #: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:126
 #: daemon/gvfsbackendsmb.c:675 daemon/gvfsbackendtrash.c:234
@@ -809,14 +809,14 @@ msgstr "Servicio de protocolo de archivado de Apple"
 
 #: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:877
 #: daemon/gvfsbackenddav.c:3036 daemon/gvfsbackendftp.c:1609
-#: daemon/gvfsbackendgoogle.c:1809
+#: daemon/gvfsbackendgoogle.c:1845
 msgid "Can’t copy directory over directory"
 msgstr "No se puede copiar una carpeta sobre otra carpeta"
 
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:893
 #: daemon/gvfsbackenddav.c:3065 daemon/gvfsbackendftp.c:1632
-#: daemon/gvfsbackendgoogle.c:1211 daemon/gvfsbackendgoogle.c:1836
-#: daemon/gvfsbackendgoogle.c:1856 daemon/gvfsbackendmtp.c:1610
+#: daemon/gvfsbackendgoogle.c:1211 daemon/gvfsbackendgoogle.c:1872
+#: daemon/gvfsbackendgoogle.c:1892 daemon/gvfsbackendmtp.c:1610
 #: daemon/gvfsbackendmtp.c:1625
 msgid "Can’t recursively copy directory"
 msgstr "No se puede copiar recursivamente una carpeta"
@@ -863,7 +863,7 @@ msgstr "/ en %s"
 #: daemon/gvfsbackendarchive.c:883 daemon/gvfsbackendburn.c:681
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
 #: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:798
-#: daemon/gvfsbackendgoogle.c:1299 daemon/gvfsbackendgoogle.c:1446
+#: daemon/gvfsbackendgoogle.c:1299 daemon/gvfsbackendgoogle.c:1482
 #: daemon/gvfsbackendnetwork.c:745 daemon/gvfsbackendsftp.c:4318
 #: daemon/gvfsftpdircache.c:157
 #, c-format
@@ -895,7 +895,7 @@ msgid "No such file or directory"
 msgstr "El archivo o carpeta no existe"
 
 #: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:905
-#: daemon/gvfsbackendgoogle.c:1817
+#: daemon/gvfsbackendgoogle.c:1853
 msgid "Can’t copy file over directory"
 msgstr "No se puede copiar un archivo sobre una carpeta"
 
@@ -960,7 +960,7 @@ msgid "cdda mount on %s"
 msgstr "CDDA montado en %s"
 
 #: daemon/gvfsbackendcdda.c:347 daemon/gvfsbackendcdda.c:872
-#: monitor/udisks2/gvfsudisks2volume.c:382
+#: monitor/udisks2/gvfsudisks2volume.c:392
 #, c-format
 msgid "Audio Disc"
 msgstr "Disco de sonido"
@@ -1108,7 +1108,7 @@ msgid "Could not create request"
 msgstr "No se pudo crear la petición"
 
 #: daemon/gvfsbackenddav.c:2545 daemon/gvfsbackendftp.c:1102
-#: daemon/gvfsbackendgoogle.c:2573 daemon/gvfsbackendnfs.c:939
+#: daemon/gvfsbackendgoogle.c:2609 daemon/gvfsbackendnfs.c:939
 #: daemon/gvfsbackendnfs.c:962 daemon/gvfsbackendnfs.c:988
 #: daemon/gvfsbackendnfs.c:1388 daemon/gvfsbackendsmb.c:1116
 #: daemon/gvfsbackendsmb.c:2082
@@ -1156,17 +1156,17 @@ msgstr "Se canceló el diálogo de la contraseña"
 msgid "Insufficient permissions"
 msgstr "Permisos insuficientes"
 
-#: daemon/gvfsbackendgoogle.c:1715 daemon/gvfsbackendgoogle.c:2243
+#: daemon/gvfsbackendgoogle.c:1751 daemon/gvfsbackendgoogle.c:2279
 #: daemon/gvfsbackendgphoto2.c:1589
 msgid "Error getting data from file"
 msgstr "Error al obtener datos del archivo"
 
-#: daemon/gvfsbackendgoogle.c:1826 daemon/gvfsbackendgoogle.c:2607
+#: daemon/gvfsbackendgoogle.c:1862 daemon/gvfsbackendgoogle.c:2643
 #: daemon/gvfsbackendnfs.c:1160
 msgid "Target file is not a regular file"
 msgstr "El archivo de destino no es un archivo regular"
 
-#: daemon/gvfsbackendgoogle.c:2228 daemon/gvfsbackendsftp.c:2329
+#: daemon/gvfsbackendgoogle.c:2264 daemon/gvfsbackendsftp.c:2329
 #: daemon/gvfsbackendsftp.c:2728 daemon/gvfsbackendsftp.c:2791
 #: daemon/gvfsbackendsftp.c:2802 daemon/gvfsbackendsftp.c:2860
 #: daemon/gvfsbackendsftp.c:2953 daemon/gvfsbackendsftp.c:3005
@@ -1195,15 +1195,15 @@ msgstr "El archivo de destino no es un archivo regular"
 msgid "Invalid reply received"
 msgstr "Se recibió una respuesta no válida"
 
-#: daemon/gvfsbackendgoogle.c:2234
+#: daemon/gvfsbackendgoogle.c:2270
 msgid "File is not a regular file"
 msgstr "El archivo no es un archivo regular"
 
-#: daemon/gvfsbackendgoogle.c:2599 daemon/gvfsbackendnfs.c:1150
+#: daemon/gvfsbackendgoogle.c:2635 daemon/gvfsbackendnfs.c:1150
 msgid "Target file is a directory"
 msgstr "El archivo de destino es una carpeta"
 
-#: daemon/gvfsbackendgoogle.c:2792 daemon/gvfsbackendgphoto2.c:3050
+#: daemon/gvfsbackendgoogle.c:2828 daemon/gvfsbackendgphoto2.c:3050
 msgid "Error writing file"
 msgstr "Error al escribir el archivo"
 
@@ -1878,7 +1878,6 @@ msgstr "Error al buscar en el flujo"
 #: daemon/gvfsjobmove.c:147 daemon/gvfsjobopenforwrite.c:236
 #: daemon/gvfsjobpush.c:152 daemon/gvfsjobsetattribute.c:152
 #: daemon/gvfsjobsetdisplayname.c:130 daemon/gvfsjobtrash.c:125
-#| msgid "Volume is read-only"
 msgid "Filesystem is read-only"
 msgstr "El sistema de archivos es de solo lectura"
 
@@ -2074,7 +2073,7 @@ msgid "Eject Anyway"
 msgstr "Expulsar de todas formas"
 
 #: monitor/udisks2/gvfsudisks2mount.c:1128
-#: monitor/udisks2/gvfsudisks2volume.c:1755
+#: monitor/udisks2/gvfsudisks2volume.c:1765
 msgid "Operation not supported by backend"
 msgstr "El backend no soporta la operación"
 
@@ -2119,10 +2118,19 @@ msgstr ""
 "Se puede desconectar %s con seguridad\n"
 "Se puede quitar el dispositivo"
 
+#. Translators: This is used for possibly encrypted volumes.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: monitor/udisks2/gvfsudisks2volume.c:304
+#, c-format
+#| msgid "%s Encrypted"
+msgid "%s Possibly Encrypted"
+msgstr "%s posiblemente cifrados"
+
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: monitor/udisks2/gvfsudisks2volume.c:302
+#: monitor/udisks2/gvfsudisks2volume.c:311
 #, c-format
 msgid "%s Encrypted"
 msgstr "Cifrados %s"
@@ -2130,42 +2138,42 @@ msgstr "Cifrados %s"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: monitor/udisks2/gvfsudisks2volume.c:314
+#: monitor/udisks2/gvfsudisks2volume.c:324
 #, c-format
 msgid "%s Volume"
 msgstr "Volumen de %s"
 
 #. Translators: Name used for volume
-#: monitor/udisks2/gvfsudisks2volume.c:550
+#: monitor/udisks2/gvfsudisks2volume.c:560
 msgid "Volume"
 msgstr "Volumen"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1139
+#: monitor/udisks2/gvfsudisks2volume.c:1149
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "Error al guardar la contraseña en el depósito de claves (%s)"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1172
+#: monitor/udisks2/gvfsudisks2volume.c:1182
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "Error al eliminar la contraseña no válida del depósito de claves (%s)"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1234
+#: monitor/udisks2/gvfsudisks2volume.c:1244
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr ""
 "El dispositivo desbloqueado no contiene un sistema de archivos reconocible"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1262
+#: monitor/udisks2/gvfsudisks2volume.c:1272
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Contraseña de cifrado para %s"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1471
+#: monitor/udisks2/gvfsudisks2volume.c:1481
 msgid "A passphrase is required to access the volume"
 msgstr "Se requiere una contraseña para acceder al volumen"
 
 #. Translators: %s is the description of the volume that is being unlocked
-#: monitor/udisks2/gvfsudisks2volume.c:1486
+#: monitor/udisks2/gvfsudisks2volume.c:1496
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2175,7 +2183,7 @@ msgstr ""
 "El volumen %s puede ser de tipo VeraCrypt, ya que contiene datos cifrados."
 
 #. Translators: %s is the description of the volume that is being unlocked
-#: monitor/udisks2/gvfsudisks2volume.c:1491
+#: monitor/udisks2/gvfsudisks2volume.c:1501
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2188,7 +2196,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: monitor/udisks2/gvfsudisks2volume.c:1671
+#: monitor/udisks2/gvfsudisks2volume.c:1681
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
