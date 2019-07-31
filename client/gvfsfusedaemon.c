@@ -1258,7 +1258,7 @@ read_stream (FileHandle *fh, gchar *output_buf, size_t output_buf_size, off_t of
 {
   GInputStream *input_stream;
   gint          n_bytes_skipped = 0;
-  gint          n_bytes_read    = 0;
+  gsize         n_bytes_read    = 0;
   gint          result          = 0;
   GError       *error           = NULL;
 
@@ -1318,30 +1318,19 @@ read_stream (FileHandle *fh, gchar *output_buf, size_t output_buf_size, off_t of
 
   if (result == 0)
     {
-      while (n_bytes_read < output_buf_size)
-        {
-          gboolean part_result;
-          gsize    part_bytes_read = 0;
+      gboolean read_succeeded = g_input_stream_read_all (input_stream,
+                                                         output_buf,
+                                                         output_buf_size,
+                                                         &n_bytes_read,
+                                                         NULL,
+                                                         &error);
 
-          part_result = g_input_stream_read_all (input_stream,
-                                                 output_buf + n_bytes_read,
-                                                 output_buf_size - n_bytes_read,
-                                                 &part_bytes_read,
-                                                 NULL,
-                                                 &error);
-
-          n_bytes_read += part_bytes_read;
-          fh->pos += part_bytes_read;
-
-          if (!part_result || part_bytes_read == 0)
-            break;
-        }
-
+      fh->pos += n_bytes_read;
       result = n_bytes_read;
 
-      if (n_bytes_read < output_buf_size)
+      if (!read_succeeded)
         {
-          g_debug ("read_stream: wanted %zd bytes, but got %d.\n", output_buf_size, n_bytes_read);
+          g_debug ("read_stream: wanted %zd bytes, but got %zd.\n", output_buf_size, n_bytes_read);
 
           if (error)
             {
@@ -1413,7 +1402,7 @@ write_stream (FileHandle *fh,
               off_t offset)
 {
   GOutputStream *output_stream;
-  gint           n_bytes_written = 0;
+  gsize          n_bytes_written = 0;
   gint           result          = 0;
   GError        *error           = NULL;
 
@@ -1447,28 +1436,17 @@ write_stream (FileHandle *fh,
 
   if (result == 0)
     {
-      while (n_bytes_written < input_buf_size)
-        {
-          gboolean part_result;
-          gsize    part_bytes_written = 0;
+      gboolean write_succeeded = g_output_stream_write_all (output_stream,
+                                                           input_buf,
+                                                           input_buf_size,
+                                                           &n_bytes_written,
+                                                           NULL,
+                                                           &error);
 
-          part_result = g_output_stream_write_all (output_stream,
-                                                   (void *) (input_buf + n_bytes_written),
-                                                   input_buf_size - n_bytes_written,
-                                                   &part_bytes_written,
-                                                   NULL,
-                                                   &error);
-
-          n_bytes_written += part_bytes_written;
-          fh->pos += part_bytes_written;
-
-          if (!part_result)
-            break;
-        }
-
+      fh->pos += n_bytes_written;
       result = n_bytes_written;
 
-      if (n_bytes_written < input_buf_size)
+      if (!write_succeeded)
         {
           if (error)
             {
