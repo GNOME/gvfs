@@ -494,6 +494,7 @@ insert_entry_full (GVfsBackendGoogle *self,
       if (old_entry != NULL)
         {
           old_id = gdata_entry_get_id (old_entry);
+          g_debug ("  title collision of %s with: (%s, %s) -> %p\n", id, title, parent_id, old_entry);
           if (g_strcmp0 (old_id, title) == 0)
             insert_title = FALSE;
           else
@@ -636,8 +637,8 @@ remove_entry_full (GVfsBackendGoogle *self,
       g_hash_table_remove (self->dir_timestamps, parent_id);
 
       k = dir_entries_key_new (id, parent_id);
-      g_debug ("  remove_entry: Removed (%s, %s) -> %p\n", id, parent_id, entry);
-      g_hash_table_remove (self->dir_entries, k);
+      if (g_hash_table_remove (self->dir_entries, k))
+        g_debug ("  remove_entry: Removed (%s, %s) -> %p\n", id, parent_id, entry);
       dir_entries_key_free (k);
 
       k = dir_entries_key_new (title, parent_id);
@@ -2339,6 +2340,7 @@ g_vfs_backend_google_query_info (GVfsBackend           *_self,
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ query_info: %s, %d\n", filename, flags);
+  log_dir_entries (self);
 
   error = NULL;
   entry = resolve (self, filename, cancellable, &entry_path, &error);
