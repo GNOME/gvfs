@@ -1,3 +1,13 @@
+Major changes in 1.41.90
+========================
+* udisks2: Change display name for crypto_unknown devices
+* google: Disable deletion of non-empty directories
+* google: Fix crashes when deleting if the file isn't found
+* google: Fix issue with stale entries remaining after rename operation
+* build: Define gvfs_rpath for libgvfsdaemon.so
+* proxy: Don't leak a GVfsDBusDaemon
+* Translation updates
+
 Major changes in 1.41.4
 =======================
 * google: Do not enumerate volatile entries if title matches id
