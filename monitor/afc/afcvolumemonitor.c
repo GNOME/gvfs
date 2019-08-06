@@ -26,7 +26,7 @@ g_vfs_afc_monitor_create_volume (GVfsAfcVolumeMonitor *self,
 {
   GVfsAfcVolume *volume = NULL;
 
-  g_print ("creating volume for device uuid '%s'\n", uuid);
+  g_debug ("creating volume for device uuid '%s'\n", uuid);
 
   /* Only add the house arrest volume, the default AFC service
    * doesn't contain anything that users should modify */
@@ -63,7 +63,7 @@ g_vfs_afc_monitor_remove_volume (GVfsAfcVolumeMonitor *self,
   volume = find_volume_by_uuid (self, uuid);
   while (volume != NULL)
     {
-      g_print ("removing volume for device uuid '%s'\n", uuid);
+      g_debug ("removing volume for device uuid '%s'\n", uuid);
       self->volumes = g_list_remove (self->volumes, volume);
       g_signal_emit_by_name (self, "volume-removed", volume);
       g_object_unref (volume);
@@ -102,7 +102,7 @@ g_vfs_afc_volume_monitor_constructor (GType type, guint ncps,
 
   idevice_event_subscribe(g_vfs_afc_monitor_idevice_event, self);
 
-  g_print ("Volume monitor alive\n");
+  g_debug ("Volume monitor alive\n");
 
   return G_OBJECT(self);
 }
