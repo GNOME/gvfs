@@ -1751,25 +1751,34 @@ do_enumerate (GVfsBackend *backend,
 	      GFileQueryInfoFlags flags)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  struct stat st;
-  int res;
+  struct stat st = { 0 };
   GError *error;
   SMBCFILE *dir;
-  char dirents[1024*4];
-  struct smbc_dirent *dirp;
   GFileInfo *info;
   GString *uri;
-  int uri_start_len;
   smbc_opendir_fn smbc_opendir;
+  smbc_closedir_fn smbc_closedir;
+#ifndef HAVE_SMBC_READDIRPLUS2
+  int res;
+  char dirents[1024*4];
+  struct smbc_dirent *dirp;
+  int uri_start_len;
   smbc_getdents_fn smbc_getdents;
   smbc_stat_fn smbc_stat;
-  smbc_closedir_fn smbc_closedir;
+#else
+  smbc_readdirplus2_fn smbc_readdirplus2;
+  const struct libsmb_file_info *exstat;
+#endif
 
   uri = create_smb_uri_string (op_backend->server, op_backend->port, op_backend->share, filename);
   
   smbc_opendir = smbc_getFunctionOpendir (op_backend->smb_context);
+#ifndef HAVE_SMBC_READDIRPLUS2
   smbc_getdents = smbc_getFunctionGetdents (op_backend->smb_context);
   smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
+#else
+  smbc_readdirplus2 = smbc_getFunctionReaddirPlus2 (op_backend->smb_context);
+#endif
   smbc_closedir = smbc_getFunctionClosedir (op_backend->smb_context);
   
   dir = smbc_opendir (op_backend->smb_context, uri->str);
@@ -1789,6 +1798,8 @@ do_enumerate (GVfsBackend *backend,
 
   if (uri->str[uri->len - 1] != '/')
     g_string_append_c (uri, '/');
+
+#ifndef HAVE_SMBC_READDIRPLUS2
   uri_start_len = uri->len;
 
   while (TRUE)
@@ -1840,9 +1851,27 @@ do_enumerate (GVfsBackend *backend,
 	  dirp = (struct smbc_dirent *) (((char *)dirp) + dirlen);
 	  res -= dirlen;
 	}
+   }
+#else
+  while ((exstat = smbc_readdirplus2 (op_backend->smb_context, dir, &st)) != NULL)
+    {
+      if ((S_ISREG (st.st_mode) ||
+           S_ISDIR (st.st_mode) ||
+           S_ISLNK (st.st_mode)) &&
+          g_strcmp0 (exstat->name, ".") != 0 &&
+          g_strcmp0 (exstat->name, "..") != 0)
+        {
+          info = g_file_info_new ();
+          set_info_from_stat (op_backend, info, &st, exstat->name, matcher);
+          g_vfs_job_enumerate_add_info (job, info);
+          g_object_unref (info);
+        }
+
+      memset (&st, 0, sizeof (struct stat));
     }
-      
-  res = smbc_closedir (op_backend->smb_context, dir);
+#endif
+
+  smbc_closedir (op_backend->smb_context, dir);
 
   g_vfs_job_enumerate_done (job);
 
