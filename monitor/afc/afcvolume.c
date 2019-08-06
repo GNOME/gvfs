@@ -334,7 +334,7 @@ g_vfs_afc_volume_mount (GVolume             *volume,
   ActivationMountOp *data;
   GFile *root;
 
-  g_print ("g_vfs_afc_volume_mount (can_mount=%d uuid=%s)\n",
+  g_debug ("g_vfs_afc_volume_mount (can_mount=%d uuid=%s)",
            g_vfs_afc_volume_can_mount (volume),
            afc_volume->uuid);
 
