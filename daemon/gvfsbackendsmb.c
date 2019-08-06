@@ -89,10 +89,11 @@ struct _GVfsBackendSmb
 G_DEFINE_TYPE (GVfsBackendSmb, g_vfs_backend_smb, G_VFS_TYPE_BACKEND)
 
 static void set_info_from_stat (GVfsBackendSmb *backend,
-				GFileInfo *info,
-				struct stat *statbuf,
-				const char *basename,
-				GFileAttributeMatcher *matcher);
+                                GFileInfo *info,
+                                struct stat *statbuf,
+                                const struct libsmb_file_info *exstat,
+                                const char *basename,
+                                GFileAttributeMatcher *matcher);
 
 
 static void
@@ -761,8 +762,8 @@ do_query_info_on_read (GVfsBackend *backend,
 
   if (res == 0)
     {
-      set_info_from_stat (op_backend, info, &st, NULL, matcher);
-      
+      set_info_from_stat (op_backend, info, &st, NULL, NULL, matcher);
+
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
   else
@@ -1017,9 +1018,15 @@ copy_file (GVfsBackendSmb *backend,
 }
 
 static char *
-create_etag (struct stat *statbuf)
+create_etag (struct stat *statbuf, const struct libsmb_file_info *exstat)
 {
-  return g_strdup_printf ("%lu", (long unsigned int)statbuf->st_mtime);
+  gulong time;
+
+  g_assert (statbuf || exstat);
+
+  time = (statbuf != NULL) ? statbuf->st_mtime : exstat->mtime_ts.tv_sec;
+
+  return g_strdup_printf ("%lu", time);
 }
 
 static void
@@ -1070,7 +1077,7 @@ do_replace (GVfsBackend *backend,
 	  
 	  if (res == 0)
 	    {
-	      current_etag = create_etag (&original_stat);
+              current_etag = create_etag (&original_stat, NULL);
 	      if (strcmp (etag, current_etag) != 0)
 		{
 		  g_free (current_etag);
@@ -1258,7 +1265,7 @@ do_query_info_on_write (GVfsBackend *backend,
 
   if (res == 0)
     {
-      set_info_from_stat (op_backend, info, &st, NULL, matcher);
+      set_info_from_stat (op_backend, info, &st, NULL, NULL, matcher);
       
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
@@ -1342,7 +1349,7 @@ do_close_write (GVfsBackend *backend,
   if (stat_res == 0)
     {
       char *etag;
-      etag = create_etag (&stat_at_close);
+      etag = create_etag (&stat_at_close, NULL);
       g_vfs_job_close_write_set_etag (job, etag);
       g_free (etag);
     }
@@ -1355,15 +1362,22 @@ do_close_write (GVfsBackend *backend,
 
 static void
 set_info_from_stat (GVfsBackendSmb *backend,
-		    GFileInfo *info,
-		    struct stat *statbuf,
-		    const char *basename,
-		    GFileAttributeMatcher *matcher)
+                    GFileInfo *info,
+                    struct stat *statbuf,
+                    const struct libsmb_file_info *exstat,
+                    const char *basename,
+                    GFileAttributeMatcher *matcher)
 {
   GFileType file_type;
   GTimeVal t;
   char *content_type;
   char *display_name;
+  guint16 mode;
+  guint64 size;
+  gboolean have_statbuf;
+
+  g_assert (statbuf || exstat);
+  have_statbuf = (statbuf != NULL);
 
   if (basename)
     {
@@ -1404,35 +1418,46 @@ set_info_from_stat (GVfsBackendSmb *backend,
   
   file_type = G_FILE_TYPE_UNKNOWN;
 
-  if (S_ISREG (statbuf->st_mode))
+  mode = have_statbuf ? statbuf->st_mode : exstat->attrs;
+  if (S_ISREG (mode))
     file_type = G_FILE_TYPE_REGULAR;
-  else if (S_ISDIR (statbuf->st_mode))
+  else if (S_ISDIR (mode))
     file_type = G_FILE_TYPE_DIRECTORY;
-  else if (S_ISCHR (statbuf->st_mode) ||
-	   S_ISBLK (statbuf->st_mode) ||
-	   S_ISFIFO (statbuf->st_mode)
+  else if (S_ISCHR (mode) ||
+           S_ISBLK (mode) ||
+           S_ISFIFO (mode)
 #ifdef S_ISSOCK
-	   || S_ISSOCK (statbuf->st_mode)
+        || S_ISSOCK (mode)
 #endif
-	   )
+          )
     file_type = G_FILE_TYPE_SPECIAL;
-  else if (S_ISLNK (statbuf->st_mode))
+  else if (S_ISLNK (mode))
     file_type = G_FILE_TYPE_SYMBOLIC_LINK;
 
   g_file_info_set_file_type (info, file_type);
-  g_file_info_set_size (info, statbuf->st_size);
-  g_file_info_set_attribute_uint64 (info,
-                                    G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE,
-                                    statbuf->st_blocks * G_GUINT64_CONSTANT (512));
 
-  t.tv_sec = statbuf->st_mtime;
+  size = have_statbuf ? statbuf->st_size : exstat->size;
+  g_file_info_set_size (info, size);
+
+  if (have_statbuf)
+    g_file_info_set_attribute_uint64 (info,
+                                      G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE,
+                                      statbuf->st_blocks * G_GUINT64_CONSTANT (512));
+
+  t.tv_sec = have_statbuf ? statbuf->st_mtime : exstat->mtime_ts.tv_sec;
+  if (have_statbuf)
+    {
 #if defined (HAVE_STRUCT_STAT_ST_MTIMENSEC)
-  t.tv_usec = statbuf->st_mtimensec / 1000;
+      t.tv_usec = statbuf->st_mtimensec / 1000;
 #elif defined (HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC)
-  t.tv_usec = statbuf->st_mtim.tv_nsec / 1000;
+      t.tv_usec = statbuf->st_mtim.tv_nsec / 1000;
 #else
-  t.tv_usec = 0;
+      t.tv_usec = 0;
 #endif
+    }
+  else
+    t.tv_usec = exstat->mtime_ts.tv_nsec / 1000;
+
   g_file_info_set_modification_time (info, &t);
 
 
@@ -1448,7 +1473,7 @@ set_info_from_stat (GVfsBackendSmb *backend,
 
       content_type = NULL;
       
-      if (S_ISDIR(statbuf->st_mode))
+      if (S_ISDIR (mode))
 	{
 	  content_type = g_strdup ("inode/directory");
 	  if (basename != NULL && strcmp (basename, "/") == 0)
@@ -1492,46 +1517,70 @@ set_info_from_stat (GVfsBackendSmb *backend,
   /* Don't trust n_link, uid, gid, etc returned from libsmb, its just made up.
      These are ok though: */
 
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_DEVICE, statbuf->st_dev);
-  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_INODE, statbuf->st_ino);
+  if (have_statbuf)
+    {
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_DEVICE, statbuf->st_dev);
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_INODE, statbuf->st_ino);
+    }
 
   /* If file is dos-readonly, libsmbclient doesn't set S_IWUSR, we use this to
      trigger ACCESS_WRITE = FALSE. Only set for regular files, see
      https://bugzilla.gnome.org/show_bug.cgi?id=598206   */
-  if (S_ISREG (statbuf->st_mode))
-    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, statbuf->st_mode & S_IWUSR);
+  if (S_ISREG (mode))
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, mode & S_IWUSR);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
 
-  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, statbuf->st_atime);
+  t.tv_sec = have_statbuf ? statbuf->st_atime : exstat->atime_ts.tv_sec;
+  if (have_statbuf)
+    {
 #if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC, statbuf->st_atimensec / 1000);
+      t.tv_usec = statbuf->st_atimensec / 1000);
 #elif defined (HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC)
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC, statbuf->st_atim.tv_nsec / 1000);
+      t.tv_usec = statbuf->st_atim.tv_nsec / 1000;
+#else
+      t.tv_usec = 0;
 #endif
-  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CHANGED, statbuf->st_ctime);
-#if defined (HAVE_STRUCT_STAT_ST_CTIMENSEC)
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_CHANGED_USEC, statbuf->st_ctimensec / 1000);
-#elif defined (HAVE_STRUCT_STAT_ST_CTIM_TV_NSEC)
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_CHANGED_USEC, statbuf->st_ctim.tv_nsec / 1000);
+    }
+  else
+    t.tv_usec = exstat->atime_ts.tv_nsec / 1000;
+
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, t.tv_sec);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC, t.tv_usec);
+
+  t.tv_sec = have_statbuf ? statbuf->st_ctime : exstat->ctime_ts.tv_sec;
+  if (have_statbuf)
+    {
+#if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
+      t.tv_usec = statbuf->st_ctimensec / 1000);
+#elif defined (HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC)
+      t.tv_usec = statbuf->st_ctim.tv_nsec / 1000;
+#else
+      t.tv_usec = 0;
 #endif
+    }
+  else
+    t.tv_usec = exstat->ctime_ts.tv_nsec / 1000;
+
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CHANGED, t.tv_sec);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_CHANGED_USEC, t.tv_usec);
 
   /* Libsmb sets the X bit on files to indicate some special things: */
-  if ((statbuf->st_mode & S_IFDIR) == 0) {
-    
-    if (statbuf->st_mode & S_IXOTH)
-      g_file_info_set_is_hidden (info, TRUE);
-    
-    if (statbuf->st_mode & S_IXUSR)
-      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_IS_ARCHIVE, TRUE);
-    
-    if (statbuf->st_mode & S_IXGRP)
-      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_IS_SYSTEM, TRUE);
-  }
+  if ((mode & S_IFDIR) == 0)
+    {
+      if (mode & S_IXOTH)
+        g_file_info_set_is_hidden (info, TRUE);
+
+      if (mode & S_IXUSR)
+        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_IS_ARCHIVE, TRUE);
+
+      if (mode & S_IXGRP)
+        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_IS_SYSTEM, TRUE);
+    }
 
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_ETAG_VALUE))
     {
-      char *etag = create_etag (statbuf);
+      char *etag = create_etag (statbuf, exstat);
       g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE, etag);
       g_free (etag);
     }
@@ -1561,7 +1610,7 @@ do_query_info (GVfsBackend *backend,
   if (res == 0)
     {
       basename = g_path_get_basename (filename);
-      set_info_from_stat (op_backend, info, &st, basename, matcher);
+      set_info_from_stat (op_backend, info, &st, NULL, basename, matcher);
       g_free (basename);
       
       g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1750,28 +1799,22 @@ do_enumerate (GVfsBackend *backend,
 	      GFileQueryInfoFlags flags)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  struct stat st;
-  int res;
   GError *error;
   SMBCFILE *dir;
-  char dirents[1024*4];
-  struct smbc_dirent *dirp;
+  const struct libsmb_file_info *exstat;
   GFileInfo *info;
-  GString *uri;
-  int uri_start_len;
+  char *uri;
   smbc_opendir_fn smbc_opendir;
-  smbc_getdents_fn smbc_getdents;
-  smbc_stat_fn smbc_stat;
+  smbc_readdirplus_fn smbc_readdirplus;
   smbc_closedir_fn smbc_closedir;
 
-  uri = create_smb_uri_string (op_backend->server, op_backend->port, op_backend->share, filename);
-  
+  uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
+
   smbc_opendir = smbc_getFunctionOpendir (op_backend->smb_context);
-  smbc_getdents = smbc_getFunctionGetdents (op_backend->smb_context);
-  smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
+  smbc_readdirplus = smbc_getFunctionReaddirPlus (op_backend->smb_context);
   smbc_closedir = smbc_getFunctionClosedir (op_backend->smb_context);
-  
-  dir = smbc_opendir (op_backend->smb_context, uri->str);
+
+  dir = smbc_opendir (op_backend->smb_context, uri);
 
   if (dir == NULL)
     {
@@ -1786,72 +1829,29 @@ do_enumerate (GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  if (uri->str[uri->len - 1] != '/')
-    g_string_append_c (uri, '/');
-  uri_start_len = uri->len;
-
-  while (TRUE)
+  while ((exstat = smbc_readdirplus (op_backend->smb_context, dir)) != NULL)
     {
-      res = smbc_getdents (op_backend->smb_context, dir, (struct smbc_dirent *)dirents, sizeof (dirents));
-      if (res <= 0)
-	break;
-      
-      dirp = (struct smbc_dirent *)dirents;
-      while (res > 0)
-	{
-	  unsigned int dirlen;
-
-	  /* TODO: Only do stat if required for flags */
-	  
-	  if ((dirp->smbc_type == SMBC_DIR ||
-	       dirp->smbc_type == SMBC_FILE ||
-	       dirp->smbc_type == SMBC_LINK) &&
-	      strcmp (dirp->name, ".") != 0 &&
-	      strcmp (dirp->name, "..") != 0)
-	    {
-	      int stat_res;
-	      g_string_truncate (uri, uri_start_len);
-              g_string_append_uri_escaped (uri, dirp->name, SUB_DELIM_CHARS ":@/", FALSE);
-
-	      if (matcher == NULL ||
-		  g_file_attribute_matcher_matches_only (matcher, G_FILE_ATTRIBUTE_STANDARD_NAME))
-		{
-		  info = g_file_info_new ();
-		  g_file_info_set_name (info, dirp->name);
-                  g_vfs_job_enumerate_add_info (job, info);
-                  g_object_unref (info);
-		}
-	      else
-		{
-		  stat_res = smbc_stat (op_backend->smb_context,
-							    uri->str, &st);
-		  if (stat_res == 0)
-		    {
-		      info = g_file_info_new ();
-		      set_info_from_stat (op_backend, info, &st, dirp->name, matcher);
-                      g_vfs_job_enumerate_add_info (job, info);
-                      g_object_unref (info);
-		    }
-		}
-	    }
-	  
-	  dirlen = dirp->dirlen;
-	  dirp = (struct smbc_dirent *) (((char *)dirp) + dirlen);
-	  res -= dirlen;
-	}
+      if (strcmp (exstat->name, ".") != 0 &&
+          strcmp (exstat->name, "..") != 0)
+        {
+          info = g_file_info_new ();
+          set_info_from_stat (op_backend, info, NULL, exstat, exstat->name, matcher);
+          g_vfs_job_enumerate_add_info (job, info);
+          g_object_unref (info);
+        }
     }
-      
-  res = smbc_closedir (op_backend->smb_context, dir);
+
+  smbc_closedir (op_backend->smb_context, dir);
 
   g_vfs_job_enumerate_done (job);
 
-  g_string_free (uri, TRUE);
+  g_free (uri);
   return;
-  
+
  error:
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
   g_error_free (error);
-  g_string_free (uri, TRUE);
+  g_free (uri);
 }
 
 static void
