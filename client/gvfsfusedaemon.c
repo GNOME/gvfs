@@ -1330,10 +1330,10 @@ read_stream (FileHandle *fh, gchar *output_buf, size_t output_buf_size, off_t of
 
       if (error != NULL)
         {
-            g_debug ("read_stream: wanted %zd bytes, but got %zd.\n", output_buf_size, n_bytes_read);
+          g_debug ("read_stream: wanted %zd bytes, but got %zd.\n", output_buf_size, n_bytes_read);
 
-            result = -errno_from_error (error);
-            g_error_free (error);
+          result = -errno_from_error (error);
+          g_error_free (error);
         }
     }
 
