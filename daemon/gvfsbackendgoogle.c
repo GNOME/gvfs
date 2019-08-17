@@ -2149,6 +2149,7 @@ g_vfs_backend_google_make_directory (GVfsBackend          *_self,
   GDataEntry *existing_entry;
   GDataEntry *parent;
   GDataEntry *summary_entry;
+  GDataEntry *same_id_entry;
   GError *error;
   const gchar *summary;
   gchar *entry_path = NULL;
@@ -2189,7 +2190,48 @@ g_vfs_backend_google_make_directory (GVfsBackend          *_self,
     }
 
   folder = gdata_documents_folder_new (NULL);
-  gdata_entry_set_title (GDATA_ENTRY (folder), basename);
+
+  /* This case is particularly troublesome. Normally, when we call
+   * make_directory, the title supplied by the user or client is used to create
+   * a file with same title. But strangely, when we're trying to copy a folder
+   * over to another directory (i.e. to a different parent), the copy operation
+   * would return G_IO_ERROR_WOULD_RECURSE. This means that nautilus will
+   * manually create the folders (using make_directory) and copy each file.
+   *
+   * The major issue here is that nautilus calls make_directory with the title
+   * of folder set to ID of the original folder. Suppose, we had a folder "folder1"
+   * which needs to be copied. Now, copy operation would return
+   * G_IO_ERROR_WOULD_RECURSE (if the parents are different), but nautilus will
+   * call make_directory with ID of "folder1" instead of title of "folder1".
+   * Furthermore, nautilus calls query_info on the "filename" argument right
+   * after it has done make_directory hence we need to create a volatile entry
+   * for the folder too.
+   *
+   * Below fix is hack-ish and will fail if we wish to create a folder
+   * whose title equals the ID of any other folder. */
+  if ((same_id_entry = g_hash_table_lookup (self->entries, basename)) != NULL)
+    {
+      GDataDocumentsProperty *source_id_property, *parent_id_property;
+
+      source_id_property = gdata_documents_property_new (SOURCE_ID_PROPERTY_KEY);
+      gdata_documents_property_set_visibility (source_id_property, GDATA_DOCUMENTS_PROPERTY_VISIBILITY_PRIVATE);
+      gdata_documents_property_set_value (source_id_property, basename);
+
+      parent_id_property = gdata_documents_property_new (PARENT_ID_PROPERTY_KEY);
+      gdata_documents_property_set_visibility (parent_id_property, GDATA_DOCUMENTS_PROPERTY_VISIBILITY_PRIVATE);
+      gdata_documents_property_set_value (parent_id_property, gdata_entry_get_id (parent));
+
+      gdata_documents_entry_add_documents_property (GDATA_DOCUMENTS_ENTRY (folder), source_id_property);
+      gdata_documents_entry_add_documents_property (GDATA_DOCUMENTS_ENTRY (folder), parent_id_property);
+
+      gdata_entry_set_title (GDATA_ENTRY (folder), gdata_entry_get_title (same_id_entry));
+
+      g_clear_object (&source_id_property);
+      g_clear_object (&parent_id_property);
+    }
+  else
+    gdata_entry_set_title (GDATA_ENTRY (folder), basename);
+
   gdata_entry_set_summary (GDATA_ENTRY (folder), summary);
 
   error = NULL;
