@@ -723,8 +723,8 @@ remove_entry_full (GVfsBackendGoogle *self,
       g_hash_table_remove (self->dir_timestamps, parent_id);
 
       k = dir_entries_key_new (id, parent_id);
-      g_debug ("  remove_entry: Removed (%s, %s) -> %p\n", id, parent_id, entry);
-      g_hash_table_remove (self->dir_entries, k);
+      if (g_hash_table_remove (self->dir_entries, k))
+        g_debug ("  remove_entry: Removed real      (%s, %s) -> %p\n", id, parent_id, entry);
       dir_entries_key_free (k);
 
       k = dir_entries_key_new (title, parent_id);
@@ -1403,6 +1403,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ copy: %s -> %s, %d\n", source, destination, flags);
+  log_dir_entries (self);
 
   if (flags & G_FILE_COPY_BACKUP)
     {
@@ -1601,6 +1602,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   g_free (destination_basename);
   g_free (entry_path);
   g_free (parent_path);
+  log_dir_entries (self);
   g_debug ("- copy\n");
   g_rec_mutex_unlock (&self->mutex);
 }
@@ -2453,6 +2455,7 @@ g_vfs_backend_google_query_info (GVfsBackend           *_self,
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ query_info: %s, %d\n", filename, flags);
+  log_dir_entries (self);
 
   error = NULL;
   entry = resolve (self, filename, cancellable, &entry_path, &error);
