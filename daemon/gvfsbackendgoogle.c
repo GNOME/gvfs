@@ -163,6 +163,41 @@ entries_in_folder_equal (gconstpointer a, gconstpointer b)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static void
+log_dir_entries (GVfsBackendGoogle *self)
+{
+  GHashTableIter iter;
+  GDataEntry *entry;
+  DirEntriesKey *key;
+  GList *l;
+
+  if (!g_getenv ("GVFS_GOOGLE_DEBUG"))
+    return;
+
+  g_hash_table_iter_init (&iter, self->dir_entries);
+  while (g_hash_table_iter_next (&iter, (gpointer *) &key, (gpointer *) &entry))
+    {
+      g_debug ("  Real ID = %s, (%s, %s) -> %p, %d\n",
+               gdata_entry_get_id (GDATA_ENTRY (entry)),
+               key->title_or_id,
+               key->parent_id,
+               entry,
+               ((GObject *) entry)->ref_count);
+    }
+
+  for (l = self->dir_collisions; l != NULL; l = l->next)
+    {
+      entry = GDATA_ENTRY (l->data);
+      g_debug ("* Real ID = %s, (%s) -> %p, %d\n",
+               gdata_entry_get_id (entry),
+               gdata_entry_get_title (entry),
+               entry,
+               ((GObject *) entry)->ref_count);
+    }
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static WriteHandle *
 write_handle_new (GDataEntry *document, GDataUploadStream *stream, const gchar *filename, const gchar *entry_path)
 {
