@@ -514,13 +514,14 @@ insert_entry_full (GVfsBackendGoogle *self,
 
       k = dir_entries_key_new (id, parent_id);
       g_hash_table_insert (self->dir_entries, k, g_object_ref (entry));
-      g_debug ("  insert_entry: Inserted (%s, %s) -> %p\n", id, parent_id, entry);
+      g_debug ("  insert_entry: Inserted real     (%s, %s) -> %p\n", id, parent_id, entry);
 
       k = dir_entries_key_new (title, parent_id);
       old_entry = g_hash_table_lookup (self->dir_entries, k);
       if (old_entry != NULL)
         {
           old_id = gdata_entry_get_id (old_entry);
+          g_debug ("  title collision of %s with: (%s, %s) -> %p\n", id, title, parent_id, old_entry);
           if (g_strcmp0 (old_id, title) == 0)
             {
               insert_title = FALSE;
@@ -541,18 +542,18 @@ insert_entry_full (GVfsBackendGoogle *self,
           if (old_entry != NULL && track_dir_collisions)
             {
               self->dir_collisions = g_list_prepend (self->dir_collisions, g_object_ref (old_entry));
-              g_debug ("  insert_entry: Ejected (%s, %s, %s) -> %p\n", old_id, title, parent_id, old_entry);
+              g_debug ("  insert_entry: Ejected title    (%s, (%s, %s)) -> %p\n", old_id, title, parent_id, old_entry);
             }
 
           g_hash_table_insert (self->dir_entries, k, g_object_ref (entry));
-          g_debug ("  insert_entry: Inserted (%s, %s) -> %p\n", title, parent_id, entry);
+          g_debug ("  insert_entry: Inserted title    (%s, %s) -> %p\n", title, parent_id, entry);
         }
       else
         {
           if (track_dir_collisions)
             {
               self->dir_collisions = g_list_prepend (self->dir_collisions, g_object_ref (entry));
-              g_debug ("  insert_entry: Skipped (%s, %s, %s) -> %p\n", id, title, parent_id, entry);
+              g_debug ("  insert_entry: Skipped title    (%s, %s, %s) -> %p\n", id, title, parent_id, entry);
             }
 
           dir_entries_key_free (k);
@@ -665,8 +666,8 @@ remove_entry_full (GVfsBackendGoogle *self,
       g_hash_table_remove (self->dir_timestamps, parent_id);
 
       k = dir_entries_key_new (id, parent_id);
-      g_debug ("  remove_entry: Removed (%s, %s) -> %p\n", id, parent_id, entry);
-      g_hash_table_remove (self->dir_entries, k);
+      if (g_hash_table_remove (self->dir_entries, k))
+        g_debug ("  remove_entry: Removed real      (%s, %s) -> %p\n", id, parent_id, entry);
       dir_entries_key_free (k);
 
       k = dir_entries_key_new (title, parent_id);
@@ -1361,6 +1362,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ copy: %s -> %s, %d\n", source, destination, flags);
+  log_dir_entries (self);
 
   if (flags & G_FILE_COPY_BACKUP)
     {
@@ -1533,6 +1535,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   g_free (destination_basename);
   g_free (entry_path);
   g_free (parent_path);
+  log_dir_entries (self);
   g_debug ("- copy\n");
   g_rec_mutex_unlock (&self->mutex);
 }
@@ -2385,6 +2388,7 @@ g_vfs_backend_google_query_info (GVfsBackend           *_self,
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ query_info: %s, %d\n", filename, flags);
+  log_dir_entries (self);
 
   error = NULL;
   entry = resolve (self, filename, cancellable, &entry_path, &error);
