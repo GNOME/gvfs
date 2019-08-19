@@ -1,3 +1,9 @@
+Major changes in 1.41.91
+========================
+* fuse: Remove max_write limit
+* Several smaller bugfixes
+* Translation updates
+
 Major changes in 1.41.90
 ========================
 * udisks2: Change display name for crypto_unknown devices
