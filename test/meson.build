@@ -47,19 +47,28 @@ if enable_devel_utils
     'benchmark-posix-big-files',
     'benchmark-posix-small-files',
     'test-query-info-stream',
+    'google'
   ]
 
   deps = [
     gio_dep,
     glib_dep,
+    libgdata_dep,
+    goa_dep
   ]
 
   foreach test: tests
-    executable(
+    exe = executable(
       test,
       test + '.c',
+      c_args: ['-DG_LOG_DOMAIN="@0@"'.format(test)],
       include_directories: top_inc,
       dependencies: deps,
+    )
+
+    test(
+      test,
+      exe
     )
   endforeach
 endif
