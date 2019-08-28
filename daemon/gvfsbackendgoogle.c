@@ -1237,11 +1237,7 @@ build_file_info (GVfsBackendGoogle      *self,
         {
           goffset size;
 
-#if HAVE_LIBGDATA_0_17_7
           size = gdata_documents_entry_get_file_size (GDATA_DOCUMENTS_ENTRY (entry));
-#else
-          size = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (entry));
-#endif
           g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE, (guint64) size);
         }
     }
@@ -1598,11 +1594,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   insert_entry (self, GDATA_ENTRY (new_entry));
   g_hash_table_foreach (self->monitors, emit_create_event, entry_path);
 
-#if HAVE_LIBGDATA_0_17_7
   size = gdata_documents_entry_get_file_size (new_entry);
-#else
-  size = gdata_documents_entry_get_quota_used (new_entry);
-#endif
   g_vfs_job_progress_callback (size, size, job);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -2621,11 +2613,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
         }
     }
 
-#if HAVE_LIBGDATA_0_17_7
   size = gdata_documents_entry_get_file_size (GDATA_DOCUMENTS_ENTRY (new_document));
-#else
-  size = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (new_document));
-#endif
   g_vfs_job_progress_callback (size, size, job);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -2645,7 +2633,6 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-#if HAVE_LIBGDATA_0_17_9
 static void
 fs_info_cb (GObject      *source_object,
             GAsyncResult *res,
@@ -2683,7 +2670,6 @@ fs_info_cb (GObject      *source_object,
  out:
   g_debug ("- query_fs_info\n");
 }
-#endif
 
 static gboolean
 g_vfs_backend_google_query_fs_info (GVfsBackend           *_self,
@@ -2704,7 +2690,6 @@ g_vfs_backend_google_query_fs_info (GVfsBackend           *_self,
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, type);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE, TRUE);
 
-#if HAVE_LIBGDATA_0_17_9
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||
       g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_FREE) ||
       g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_USED))
@@ -2714,7 +2699,6 @@ g_vfs_backend_google_query_fs_info (GVfsBackend           *_self,
       gdata_documents_service_get_metadata_async (self->service, cancellable, fs_info_cb, job);
       return TRUE;
     }
-#endif
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
