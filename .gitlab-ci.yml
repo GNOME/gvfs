@@ -7,10 +7,11 @@ fedora:
 
 .gnome-build-meta-template: &gnome-build-meta
     variables:
-        BST_SHA: '1.2.7-0-g08d1694545d1d62295c7beba1fea65a21b93a723'
-        BST_EXTERNAL_SHA: '0.14.0-0-g003f1f1e7ead60627ef4242a6d785704ede44358'
+        BST_SHA: '1.4.0-0-gf8ca130adb632614ebff8453fd91d4c96e87221d'
+        BST_EXTERNAL_SHA: '0.18.0-0-g755206670c87a2999132025d24b0d0aacc611ef2'
+        DOCKER_IMAGE_ID: '1a534a96f9144ca8ee87cee1fef97faa7c396533'
         DOCKER_REGISTRY: "registry.gitlab.com/freedesktop-sdk/infrastructure/freedesktop-sdk-docker-images"
-        DOCKER_AMD64: "${DOCKER_REGISTRY}/amd64:e132e7bf9180b30c6ad0f4b057442cc2f2a0aa86"
+        DOCKER_AMD64: "${DOCKER_REGISTRY}/bst14/amd64:${DOCKER_IMAGE_ID}"
     image: "${DOCKER_AMD64}"
     before_script:
         - pip3 uninstall -y buildstream
