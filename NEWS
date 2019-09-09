@@ -1,3 +1,7 @@
+Major changes in 1.42.0
+=======================
+* Translation updates
+
 Major changes in 1.41.91
 ========================
 * fuse: Remove max_write limit
