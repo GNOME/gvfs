@@ -38,6 +38,8 @@ gnome-build-meta-manual:
     except: [tags]
 
 update-image:
+    variables:
+         DOCKER_TLS_CERTDIR: ""
     image: docker:latest
     services:
         - docker:dind
