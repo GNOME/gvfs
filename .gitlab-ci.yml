@@ -47,3 +47,6 @@ update-image:
         - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
         - docker push $CI_REGISTRY_IMAGE
     when: manual
+    only:
+        variables:
+            - $CI_PROJECT_NAMESPACE == "GNOME"
