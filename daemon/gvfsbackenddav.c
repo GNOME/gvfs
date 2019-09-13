@@ -1919,6 +1919,7 @@ do_mount (GVfsBackend  *backend,
     /* Workaround for servers which response with 403 instead of 401 in case of
      * wrong credentials to let the user specify its credentials again. */
     if (status == SOUP_STATUS_FORBIDDEN &&
+        last_good_path == NULL &&
         (data->server_auth.password != NULL ||
          data->proxy_auth.password != NULL))
       {
