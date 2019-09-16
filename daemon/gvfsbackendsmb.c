@@ -1361,7 +1361,6 @@ set_info_from_stat (GVfsBackendSmb *backend,
 		    GFileAttributeMatcher *matcher)
 {
   GFileType file_type;
-  GTimeVal t;
   char *content_type;
   char *display_name;
 
@@ -1425,16 +1424,12 @@ set_info_from_stat (GVfsBackendSmb *backend,
                                     G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE,
                                     statbuf->st_blocks * G_GUINT64_CONSTANT (512));
 
-  t.tv_sec = statbuf->st_mtime;
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, statbuf->st_mtime);
 #if defined (HAVE_STRUCT_STAT_ST_MTIMENSEC)
-  t.tv_usec = statbuf->st_mtimensec / 1000;
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, statbuf->st_mtimensec / 1000);
 #elif defined (HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC)
-  t.tv_usec = statbuf->st_mtim.tv_nsec / 1000;
-#else
-  t.tv_usec = 0;
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, statbuf->st_mtim.tv_nsec / 1000);
 #endif
-  g_file_info_set_modification_time (info, &t);
-
 
   if (g_file_attribute_matcher_matches (matcher,
 					G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE) ||
