@@ -1014,7 +1014,6 @@ ms_response_to_file_info (MsResponse *response,
   guint       status;
   char       *basename;
   const char *text;
-  GTimeVal    tv;
   GFileType   file_type;
   char       *mime_type;
   GIcon      *icon;
@@ -1065,12 +1064,15 @@ ms_response_to_file_info (MsResponse *response,
             }
           else if (node_has_name (node, "creationdate"))
             {
-              if (! g_time_val_from_iso8601 (text, &tv))
+              GDateTime *dt;
+
+              if ((dt = g_date_time_new_from_iso8601 (text, NULL)) == NULL)
                 continue;
 
               g_file_info_set_attribute_uint64 (info,
                                                 G_FILE_ATTRIBUTE_TIME_CREATED,
-                                                tv.tv_sec);
+                                                g_date_time_to_unix (dt));
+              g_date_time_unref (dt);
             }
           else if (node_has_name (node, "getcontenttype"))
             {
@@ -1096,12 +1098,11 @@ ms_response_to_file_info (MsResponse *response,
           else if (node_has_name (node, "getlastmodified"))
             {
               SoupDate *sd;
-              GTimeVal tv;
+
 	      sd = soup_date_new_from_string(text);
 	      if (sd)
 	        {
-		  soup_date_to_timeval (sd, &tv);
-		  g_file_info_set_modification_time (info, &tv);
+                  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, soup_date_to_time_t (sd));
 		  soup_date_free (sd);
 		}
 	    }
