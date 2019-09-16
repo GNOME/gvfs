@@ -2397,11 +2397,11 @@ meta_tree_flush_locked (MetaTree *tree)
 	  /* It shouldn't happen. We failed to write out an updated tree
 	   * probably, therefore all the data are lost. Backup the file and
 	   * reload the tree to avoid further crashes. */
-	  GTimeVal tv;
+	  GDateTime *dt;
 	  char *timestamp, *backup;
 
-	  g_get_current_time (&tv);
-	  timestamp = g_time_val_to_iso8601 (&tv);
+	  dt = g_date_time_new_now_local ();
+	  timestamp = g_date_time_format_iso8601 (dt);
 	  backup = g_strconcat (meta_tree_get_filename (tree), ".backup.",
 				timestamp, NULL);
 	  g_rename (meta_tree_get_filename (tree), backup);
@@ -2414,6 +2414,7 @@ meta_tree_flush_locked (MetaTree *tree)
 
 	  g_free (timestamp);
 	  g_free (backup);
+	  g_date_time_unref (dt);
 
 	  res = meta_tree_refresh_locked (tree, TRUE);
 	  g_assert (res);
