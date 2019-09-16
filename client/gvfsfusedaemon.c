@@ -536,11 +536,11 @@ file_info_get_attribute_as_int (GFileInfo *file_info, const gchar *attribute)
 
 #endif
 
-static guint
+static guint64
 file_info_get_attribute_as_uint (GFileInfo *file_info, const gchar *attribute)
 {
   GFileAttributeType attribute_type;
-  guint              uint_result;
+  guint64            uint_result;
 
   attribute_type = g_file_info_get_attribute_type (file_info, attribute);
 
@@ -738,17 +738,14 @@ file_info_get_stat_mode (GFileInfo *file_info)
 static void
 set_attributes_from_info (GFileInfo *file_info, struct stat *sbuf)
 {
-  GTimeVal mod_time;
-
   sbuf->st_mode = file_info_get_stat_mode (file_info);
   sbuf->st_size = g_file_info_get_size (file_info);
   sbuf->st_uid = daemon_uid;
   sbuf->st_gid = daemon_gid;
 
-  g_file_info_get_modification_time (file_info, &mod_time);
-  sbuf->st_mtime = mod_time.tv_sec;
-  sbuf->st_ctime = mod_time.tv_sec;
-  sbuf->st_atime = mod_time.tv_sec;
+  sbuf->st_mtime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
+  sbuf->st_ctime = sbuf->st_mtime;
+  sbuf->st_atime = sbuf->st_mtime;
 
   if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_TIME_CHANGED))
     sbuf->st_ctime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_CHANGED);
