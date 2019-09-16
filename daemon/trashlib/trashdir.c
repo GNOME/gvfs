@@ -21,7 +21,7 @@ struct OPAQUE_TYPE__TrashDir
   GFile *directory;
   GFile *topdir;
   gboolean is_homedir;
-  GTimeVal mtime;
+  GDateTime *mtime;
 
   DirWatch *watch;
   GFileMonitor *monitor;
@@ -49,24 +49,26 @@ compare_basename (gconstpointer a,
   return result;
 }
 
-static void
-trash_dir_query_mtime (TrashDir *dir, GTimeVal *mtime)
+static GDateTime *
+trash_dir_query_mtime (TrashDir *dir)
 {
   GFileInfo *info;
+  GDateTime *datetime;
 
   info = g_file_query_info (dir->directory, G_FILE_ATTRIBUTE_TIME_MODIFIED ","
                                             G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
                             G_FILE_QUERY_INFO_NONE, NULL, NULL);
   if (info)
     {
-      g_file_info_get_modification_time (info, mtime);
+      datetime = g_file_info_get_modification_date_time (info);
       g_object_unref (info);
     }
   else
     {
-      mtime->tv_sec = 0;
-      mtime->tv_usec = 0;
+      datetime = g_date_time_new_now_local ();
     }
+
+  return datetime;
 }
 
 static void
@@ -127,7 +129,8 @@ trash_dir_enumerate (TrashDir *dir)
   GFileEnumerator *enumerator;
   GSList *files = NULL;
 
-  trash_dir_query_mtime (dir, &dir->mtime);
+  g_clear_pointer (&dir->mtime, g_date_time_unref);
+  dir->mtime = trash_dir_query_mtime (dir);
   enumerator = g_file_enumerate_children (dir->directory,
                                           G_FILE_ATTRIBUTE_STANDARD_NAME,
                                           G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
@@ -231,6 +234,7 @@ trash_dir_destroyed (gpointer user_data)
   g_assert (dir->monitor != NULL);
   g_object_unref (dir->monitor);
   dir->monitor = NULL;
+  g_clear_pointer (&dir->mtime, g_date_time_unref);
 
   trash_dir_empty (dir);
 }
@@ -323,15 +327,15 @@ dir_exists (GFile *directory,
 static gboolean
 trash_dir_is_dirty (TrashDir *dir)
 {
-  GTimeVal mtime;
+  GDateTime *mtime;
+  gboolean retval = TRUE;
 
-  trash_dir_query_mtime (dir, &mtime);
+  mtime = trash_dir_query_mtime (dir);
+  if (g_date_time_compare (mtime, dir->mtime) == 0)
+    retval = FALSE;
+  g_date_time_unref (mtime);
 
-  if (mtime.tv_sec == dir->mtime.tv_sec &&
-      mtime.tv_usec == dir->mtime.tv_usec)
-    return FALSE;
-
-  return TRUE;
+  return retval;
 }
 
 void
