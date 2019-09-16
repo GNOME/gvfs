@@ -807,7 +807,6 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
   CameraFileInfo gp_info;
   char *full_path;
   GFileInfo *cached_info;
-  GTimeVal mtime;
   char *mime_type;
   GIcon *icon;
   unsigned int n;
@@ -1011,12 +1010,10 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
     }
   g_free (mime_type);
 
-  if (gp_info.file.fields & GP_FILE_INFO_MTIME)
-    mtime.tv_sec = gp_info.file.mtime;
-  else
-    mtime.tv_sec = 0;
-  mtime.tv_usec = 0;
-  g_file_info_set_modification_time (info, &mtime);
+  if (gp_info.file.fields & GP_FILE_INFO_MTIME) {
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, gp_info.file.mtime);
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, 0);
+  }
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, gphoto2_backend->can_write);
