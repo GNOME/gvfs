@@ -1787,7 +1787,11 @@ dav_uri_from_dns_sd_resolver (GVfsBackendDav *dav_backend)
 
   soup_uri_set_port (uri, port);
 
-  soup_uri_set_host (uri, address);
+  /* IPv6 host does not include brackets in SoupURI, but GVfsDnsSdResolver host does */
+  if (gvfs_is_ipv6 (address))
+    uri->host = g_strndup (address + 1, strlen (address) - 2);
+  else
+    soup_uri_set_host (uri, address);
 
   if (path != NULL)
     soup_uri_set_path (uri, path);
