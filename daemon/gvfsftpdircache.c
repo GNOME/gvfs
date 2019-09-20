@@ -612,7 +612,7 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
     {
       struct list_result result = { 0, };
       GFileType file_type = G_FILE_TYPE_UNKNOWN;
-      GTimeVal tv = { 0, 0 };
+      time_t mtime;
 
       /* strip trailing \r - ParseFTPList only removes it if the line ends in \r\n,
        * but we stripped the \n already.
@@ -717,16 +717,17 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
       if (result.fe_time.tm_year >= 1900)
               result.fe_time.tm_year -= 1900;
 
-      tv.tv_sec = mktime (&result.fe_time);
-      if (tv.tv_sec != -1)
+      mtime = mktime (&result.fe_time);
+      if (mtime != -1)
         {
-          char *etag = g_strdup_printf ("%ld", tv.tv_sec);
+          char *etag = g_strdup_printf ("%ld", mtime);
           g_file_info_set_attribute_string (info,
                                             G_FILE_ATTRIBUTE_ETAG_VALUE,
                                             etag);
           g_free (etag);
 
-          g_file_info_set_modification_time (info, &tv);
+          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, mtime);
+          g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, 0);
         }
 
       g_vfs_ftp_dir_cache_entry_add (entry, file, info);

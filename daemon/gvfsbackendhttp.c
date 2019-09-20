@@ -583,13 +583,12 @@ file_info_from_message (SoupMessage *msg,
   if (text)
     {
       SoupDate *sd;
-      GTimeVal tv;
 
       sd = soup_date_new_from_string(text);
       if (sd)
         {
-          soup_date_to_timeval (sd, &tv);
-	  g_file_info_set_modification_time (info, &tv);
+          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, soup_date_to_time_t (sd));
+          g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, 0);
           soup_date_free (sd);
         }
     }

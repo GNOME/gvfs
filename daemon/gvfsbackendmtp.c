@@ -1292,8 +1292,8 @@ get_file_info (GVfsBackend *backend,
 
   g_file_info_set_size (info, file->filesize);
 
-  GTimeVal modtime = { file->modificationdate, 0 };
-  g_file_info_set_modification_time (info, &modtime);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, file->modificationdate);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, 0);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, TRUE);

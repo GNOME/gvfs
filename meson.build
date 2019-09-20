@@ -222,7 +222,6 @@ if gvfs_debug
     '-Wnested-externs',
     '-Wno-sign-compare',
     '-Wno-strict-aliasing',
-    '-Wno-error=deprecated-declarations',
   ])
 endif
 
