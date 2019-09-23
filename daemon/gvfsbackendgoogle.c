@@ -542,11 +542,10 @@ remove_dir (GVfsBackendGoogle *self,
 {
   GHashTableIter iter;
   GDataEntry *entry;
-  gchar *parent_id;
+  const gchar *parent_id;
   GList *l;
 
-  /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
-  parent_id = g_strdup (gdata_entry_get_id (parent));
+  parent_id = gdata_entry_get_id (parent);
 
   g_hash_table_remove (self->dir_timestamps, parent_id);
 
@@ -580,8 +579,6 @@ remove_dir (GVfsBackendGoogle *self,
         break;
       }
   }
-
-  g_free (parent_id);
 }
 
 static gboolean
@@ -615,10 +612,9 @@ rebuild_dir (GVfsBackendGoogle  *self,
   GDataDocumentsQuery *query = NULL;
   gboolean succeeded_once = FALSE;
   gchar *search;
-  gchar *parent_id;
+  const gchar *parent_id;
 
-  /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
-  parent_id = g_strdup (gdata_entry_get_id (parent));
+  parent_id = gdata_entry_get_id (parent);
 
   search = g_strdup_printf ("'%s' in parents", parent_id);
   query = gdata_documents_query_new_with_limits (search, 1, MAX_RESULTS);
@@ -671,7 +667,6 @@ rebuild_dir (GVfsBackendGoogle  *self,
  out:
   g_clear_object (&feed);
   g_clear_object (&query);
-  g_free (parent_id);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1463,7 +1458,7 @@ g_vfs_backend_google_enumerate (GVfsBackend           *_self,
   GError *error;
   GHashTableIter iter;
   char *parent_path;
-  char *id = NULL;
+  const gchar *id = NULL;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ enumerate: %s\n", filename);
@@ -1496,18 +1491,16 @@ g_vfs_backend_google_enumerate (GVfsBackend           *_self,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
-  id = g_strdup (gdata_entry_get_id (entry));
+  id = gdata_entry_get_id (entry);
 
   g_hash_table_iter_init (&iter, self->entries);
   while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &entry))
     {
       DirEntriesKey *k;
       GDataEntry *child;
-      gchar *child_id;
+      const gchar *child_id;
 
-      /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
-      child_id = g_strdup (gdata_entry_get_id (entry));
+      child_id = gdata_entry_get_id (entry);
 
       k = dir_entries_key_new (child_id, id);
       if ((child = g_hash_table_lookup (self->dir_entries, k)) != NULL)
@@ -1520,7 +1513,6 @@ g_vfs_backend_google_enumerate (GVfsBackend           *_self,
           if (g_strcmp0 (child_id, gdata_entry_get_id (child)) != 0)
             {
               g_debug ("Skipping %s as it is volatile path for %s\n", child_id, gdata_entry_get_id (child));
-              g_free (child_id);
               dir_entries_key_free (k);
               continue;
             }
@@ -1534,7 +1526,6 @@ g_vfs_backend_google_enumerate (GVfsBackend           *_self,
           g_free (entry_path);
         }
 
-      g_free (child_id);
       dir_entries_key_free (k);
     }
 
@@ -1543,7 +1534,6 @@ g_vfs_backend_google_enumerate (GVfsBackend           *_self,
  out:
   g_debug ("- enumerate\n");
   g_free (parent_path);
-  g_free (id);
   g_rec_mutex_unlock (&self->mutex);
 }
 
