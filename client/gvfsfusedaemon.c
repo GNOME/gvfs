@@ -73,6 +73,9 @@ typedef struct {
   goffset   size;
 } FileHandle;
 
+static char           *mountpoint            = NULL;
+static struct fuse    *fuse                  = NULL;
+
 static GThread        *subthread             = NULL;
 static GMainLoop      *subthread_main_loop   = NULL;
 static GVfs           *gvfs                  = NULL;
@@ -2380,7 +2383,7 @@ register_fuse_cb (GVfsDBusMountTracker *proxy,
 
   if (! gvfs_dbus_mount_tracker_call_register_fuse_finish (proxy, res, &error))
     {
-      g_printerr ("register_fuse_cb: Error sending a message: %s (%s, %d)\n",
+      g_printerr ("gvfsd-fuse: register_fuse_cb: Error sending a message: %s (%s, %d)\n",
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
@@ -2413,10 +2416,10 @@ vfs_init (struct fuse_conn_info *conn)
   dbus_conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   if (! dbus_conn)
     {
-      g_warning ("Failed to connect to the D-BUS daemon: %s (%s, %d)",
-                 error->message, g_quark_to_string (error->domain), error->code);
+      g_printerr ("gvfsd-fuse: Failed to connect to the D-BUS daemon: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
-      return NULL;
+      exit (1);
     }
   
   g_dbus_connection_set_exit_on_close (dbus_conn, FALSE);
@@ -2430,10 +2433,10 @@ vfs_init (struct fuse_conn_info *conn)
                                                   &error);
   if (proxy == NULL)
     {
-      g_printerr ("vfs_init(): Error creating proxy: %s (%s, %d)\n",
+      g_printerr ("gvfsd-fuse: vfs_init(): Error creating proxy: %s (%s, %d)\n",
                   error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
-      return NULL;
+      exit (1);
     }
 
   /* Allow the gvfs daemon autostart */
@@ -2544,13 +2547,31 @@ set_custom_signal_handlers (void (*handler)(int))
   sigaction (SIGTERM, &sa, NULL);
 }
 
+static void
+shutdown_fuse () {
+  struct fuse_chan *ch;
+  struct fuse_session *se;
+
+  if (fuse != NULL && mountpoint != NULL) {
+    /* Ignore new signals during exit procedure in order to terminate properly */
+    set_custom_signal_handlers (SIG_IGN);
+    fuse_remove_signal_handlers (se);
+
+    se = fuse_get_session (fuse);
+    ch = fuse_session_next_chan (se, NULL);
+
+    fuse_unmount (mountpoint, ch);
+    fuse_destroy (fuse);
+    free (mountpoint);
+
+    fuse = NULL;
+    mountpoint = NULL;
+  }
+}
+
 gint
 main (gint argc, gchar *argv [])
 {
-  struct fuse *fuse;
-  struct fuse_chan *ch;
-  struct fuse_session *se;
-  char *mountpoint;
   int multithreaded;
   int res;
 
@@ -2559,21 +2580,12 @@ main (gint argc, gchar *argv [])
   if (fuse == NULL)
     return 1;
 
+  atexit (shutdown_fuse);
+
   if (multithreaded)
     res = fuse_loop_mt (fuse);
   else
     res = fuse_loop (fuse);
-
-  se = fuse_get_session (fuse);
-  ch = fuse_session_next_chan (se, NULL);
-
-  /* Ignore new signals during exit procedure in order to terminate properly */
-  set_custom_signal_handlers (SIG_IGN);
-  fuse_remove_signal_handlers (se);
-
-  fuse_unmount (mountpoint, ch);
-  fuse_destroy (fuse);
-  free (mountpoint);
 
   if (res == -1)
     return 1;
