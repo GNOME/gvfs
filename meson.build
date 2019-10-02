@@ -416,10 +416,7 @@ enable_google = get_option('google')
 if enable_google
   assert(enable_goa, 'Google backend requested but GOA is required')
 
-  libgdata_dep = dependency('libgdata', version: '>= 0.17.3')
-  foreach version: ['0.17.7', '0.17.9']
-    config_h.set10('HAVE_LIBGDATA_' + version.underscorify(), libgdata_dep.version().version_compare('>= ' + version))
-  endforeach
+  libgdata_dep = dependency('libgdata', version: '>= 0.17.11')
 endif
 
 # *** Check for gphoto2 ***
