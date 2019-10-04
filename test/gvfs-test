@@ -1385,7 +1385,7 @@ class Dav(GvfsTestCase):
 
         # some distros have some extra modules which we need to load
         modules = ''
-        for m in ['authn_core', 'authz_core', 'authz_user', 'auth_basic',
+        for m in ['alias', 'authn_core', 'authz_core', 'authz_user', 'auth_basic',
                   'authn_file', 'mpm_prefork', 'unixd', 'dav', 'dav_fs', 'ssl']:
             if os.path.exists(os.path.join(klass.mod_dir, 'mod_%s.so' % m)):
                 modules += 'LoadModule %s_module %s/mod_%s.so\n' % (m, klass.mod_dir, m)
@@ -1419,6 +1419,11 @@ DAVLockDB DAVLock
   AuthUserFile htpasswd
   Require valid-user
 </Directory>
+
+Redirect temp /public_tmpredir /public
+Redirect permanent /public_permredir /public
+Redirect temp /secret_tmpredir /secret
+Redirect permanent /secret_permredir /secret
 ''' % {'mod_dir': klass.mod_dir, 'root': klass.httpd_sandbox, 'modules': modules, 'mydir': my_dir})
 
         # start server
@@ -1488,6 +1493,14 @@ DAVLockDB DAVLock
         subprocess.check_call(['gio', 'mount', uri])
         self.do_mount_check(uri, 'hello.txt', 'hi\n')
 
+    def test_http_noauth_redirect(self):
+        '''dav://localhost without credentials and server redirection'''
+
+        for d in ['public_permredir', 'public_tmpredir']:
+            uri = 'dav://localhost:8088/' + d
+            subprocess.check_call(['gio', 'mount', uri])
+            self.do_mount_check(uri, 'hello.txt', 'hi\n')
+
     def test_https_noauth(self):
         '''davs://localhost without credentials'''
 
@@ -1525,6 +1538,23 @@ DAVLockDB DAVLock
         self.assertEqual(err, b'')
 
         self.do_mount_check(uri, 'restricted.txt', 'dont tell anyone\n')
+
+    def test_http_auth_redirect(self):
+        '''dav://localhost with credentials and server redirection'''
+
+        for d in ['secret_tmpredir', 'secret_permredir']:
+            uri = 'dav://localhost:8088/' + d
+
+            mount = subprocess.Popen(['gio', 'mount', uri],
+                                     stdin=subprocess.PIPE,
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE)
+
+            (out, err) = mount.communicate(b's3kr1t\n')
+            self.assertEqual(mount.returncode, 0)
+            self.assertEqual(err, b'')
+
+            self.do_mount_check(uri, 'restricted.txt', 'dont tell anyone\n')
 
     def test_https_auth(self):
         '''davs://localhost with credentials'''
