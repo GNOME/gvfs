@@ -1035,10 +1035,8 @@ setup_output_stream (GFile *file, FileHandle *fh, int flags)
           fh->stream = g_file_replace (file, NULL, FALSE, 0, NULL, &error);
           fh->size = 0;
         }
-      else if (flags & O_APPEND)
-        fh->stream = g_file_append_to (file, 0, NULL, &error);
       else
-        result = -ENOTSUP;
+        fh->stream = g_file_append_to (file, 0, NULL, &error);
       if (fh->stream)
         fh->pos = g_seekable_tell (G_SEEKABLE (fh->stream));
     }
