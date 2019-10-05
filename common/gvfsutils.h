@@ -20,6 +20,8 @@
 #ifndef __G_VFS_UTILS_H__
 #define __G_VFS_UTILS_H__
 
+#include <gio/gunixmounts.h>
+
 G_BEGIN_DECLS
 
 void         gvfs_randomize_string                  (char             *str,
@@ -31,6 +33,10 @@ void         gvfs_set_debug                         (gboolean          debugging
 void         gvfs_setup_debug_handler               (void);
 
 gboolean     gvfs_is_ipv6                           (const char       *host);
+
+gchar       *gvfs_lookup_fstab_options_value        (const gchar      *fstab_options,
+                                                     const gchar      *key);
+GUnixMountPoint *gvfs_get_mount_point_for_mount     (GUnixMountEntry  *mount_entry);
 
 G_END_DECLS
 
