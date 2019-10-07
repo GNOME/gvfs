@@ -1,3 +1,9 @@
+Major changes in 1.42.1
+=======================
+* dav: Fix mounting when 403 is returned for the parent folder
+* Revert "sftp: Always use port 22 if not specified"
+* Translation updates
+
 Major changes in 1.42.0
 =======================
 * Translation updates
