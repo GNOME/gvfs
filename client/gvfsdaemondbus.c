@@ -365,10 +365,8 @@ cancelled_got_proxy (GObject *source_object,
   g_object_unref (proxy);
 }
 
-/* Might be called on another thread */
-static void
-async_call_cancelled_cb (GCancellable *cancellable,
-                         gpointer _data)
+static gboolean
+async_call_cancelled_cb_on_idle (gpointer _data)
 {
   AsyncCallCancelData *data = _data;
 
@@ -380,6 +378,29 @@ async_call_cancelled_cb (GCancellable *cancellable,
                               NULL,
                               cancelled_got_proxy,
                               GUINT_TO_POINTER (data->serial));  /* not passing "data" in as long it may not exist anymore between async calls */
+
+  return FALSE;
+}
+
+/* Might be called on another thread */
+static void
+async_call_cancelled_cb (GCancellable *cancellable,
+                         gpointer _data)
+{
+  AsyncCallCancelData *data = _data;
+  AsyncCallCancelData *idle_data;
+
+  idle_data = g_new0 (AsyncCallCancelData, 1);
+  idle_data->connection = g_object_ref (data->connection);
+  idle_data->serial = data->serial;
+
+  /* Call on idle to not block g_cancellable_disconnect() as it causes deadlocks
+   * in gdbus codes, see: https://gitlab.gnome.org/GNOME/glib/issues/1023.
+   */
+  g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+                   async_call_cancelled_cb_on_idle,
+                   idle_data,
+                   async_call_cancel_data_free);
 }
 
 gulong
