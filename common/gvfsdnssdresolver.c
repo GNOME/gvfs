@@ -37,6 +37,8 @@
 #include <avahi-glib/glib-watch.h>
 #include <avahi-glib/glib-malloc.h>
 
+#include <net/if.h>
+
 #include "gvfsdnssdutils.h"
 #include "gvfsdnssdresolver.h"
 
@@ -52,6 +54,7 @@ enum
 
   PROP_IS_RESOLVED,
   PROP_ADDRESS,
+  PROP_INTERFACE,
   PROP_PORT,
   PROP_TXT_RECORDS,
 };
@@ -77,6 +80,7 @@ struct _GVfsDnsSdResolver
 
   gboolean is_resolved;
   char *address;
+  gchar *interface;
   guint port;
   char **txt_records;
 
@@ -293,6 +297,10 @@ g_vfs_dns_sd_resolver_get_property (GObject    *object,
       g_value_set_string (value, resolver->address);
       break;
 
+    case PROP_INTERFACE:
+      g_value_set_string (value, resolver->interface);
+      break;
+
     case PROP_PORT:
       g_value_set_uint (value, resolver->port);
       break;
@@ -365,6 +373,7 @@ g_vfs_dns_sd_resolver_finalize (GObject *object)
   g_strfreev (resolver->required_txt_keys_broken_out);
 
   g_free (resolver->address);
+  g_free (resolver->interface);
   g_strfreev (resolver->txt_records);
 
   if (resolver->avahi_resolver != NULL)
@@ -634,6 +643,22 @@ g_vfs_dns_sd_resolver_class_init (GVfsDnsSdResolverClass *klass)
                                                         G_PARAM_STATIC_NICK));
 
   /**
+   * GVfsDnsSdResolver:interface:
+   *
+   * The resolved interface.
+   */
+  g_object_class_install_property (gobject_class,
+                                   PROP_INTERFACE,
+                                   g_param_spec_string ("interface",
+                                                        "Interface",
+                                                        "Interface",
+                                                        NULL,
+                                                        G_PARAM_READABLE |
+                                                        G_PARAM_STATIC_NAME |
+                                                        G_PARAM_STATIC_BLURB |
+                                                        G_PARAM_STATIC_NICK));
+
+  /**
    * GVfsDnsSdResolver:port:
    *
    * The resolved port.
@@ -720,6 +745,13 @@ g_vfs_dns_sd_resolver_get_address (GVfsDnsSdResolver *resolver)
 {
   g_return_val_if_fail (G_VFS_IS_DNS_SD_RESOLVER (resolver), NULL);
   return g_strdup (resolver->address);
+}
+
+gchar *
+g_vfs_dns_sd_resolver_get_interface (GVfsDnsSdResolver *resolver)
+{
+  g_return_val_if_fail (G_VFS_IS_DNS_SD_RESOLVER (resolver), NULL);
+  return g_strdup (resolver->interface);
 }
 
 guint
@@ -883,10 +915,12 @@ set_avahi_data (GVfsDnsSdResolver    *resolver,
                 const char           *host_name,
                 AvahiProtocol         protocol,
                 const AvahiAddress   *a,
+                AvahiIfIndex          interface,
                 uint16_t              port,
                 AvahiStringList      *txt)
 {
   char *address;
+  gchar ifname[IF_NAMESIZE];
   gboolean changed;
   AvahiStringList *l;
   GPtrArray *p;
@@ -924,6 +958,15 @@ set_avahi_data (GVfsDnsSdResolver    *resolver,
     }
 
   g_free (address);
+
+  if_indextoname (interface, ifname);
+  if (safe_strcmp (resolver->interface, ifname) != 0)
+    {
+      g_free (resolver->interface);
+      resolver->interface = g_strdup (ifname);
+      g_object_notify (G_OBJECT (resolver), "interface");
+      changed = TRUE;
+    }
 
   if (resolver->port != port)
     {
@@ -987,6 +1030,14 @@ clear_avahi_data (GVfsDnsSdResolver *resolver)
       changed = TRUE;
     }
 
+  if (resolver->interface != NULL)
+    {
+      g_free (resolver->interface);
+      resolver->interface = NULL;
+      g_object_notify (G_OBJECT (resolver), "interface");
+      changed = TRUE;
+    }
+
   if (resolver->port != 0)
     {
       resolver->port = 0;
@@ -1029,6 +1080,7 @@ service_resolver_cb (AvahiServiceResolver   *avahi_resolver,
                       host_name,
                       protocol,
                       a,
+                      interface,
                       port,
                       txt);
       break;

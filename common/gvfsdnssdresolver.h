@@ -70,6 +70,7 @@ gboolean             g_vfs_dns_sd_resolver_resolve_sync           (GVfsDnsSdReso
 
 gboolean             g_vfs_dns_sd_resolver_is_resolved            (GVfsDnsSdResolver  *resolver);
 gchar               *g_vfs_dns_sd_resolver_get_address            (GVfsDnsSdResolver  *resolver);
+gchar               *g_vfs_dns_sd_resolver_get_interface          (GVfsDnsSdResolver  *resolver);
 guint                g_vfs_dns_sd_resolver_get_port               (GVfsDnsSdResolver  *resolver);
 gchar              **g_vfs_dns_sd_resolver_get_txt_records        (GVfsDnsSdResolver  *resolver);
 gchar               *g_vfs_dns_sd_resolver_lookup_txt_record      (GVfsDnsSdResolver  *resolver,
