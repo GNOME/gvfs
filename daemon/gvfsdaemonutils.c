@@ -163,6 +163,7 @@ gvfs_file_info_populate_content_types (GFileInfo  *info,
 {
   char *free_mimetype = NULL;
   const char *mimetype;
+  gboolean uncertain_content_type = FALSE;
   GIcon *icon;
   GIcon *symbolic_icon;
 
@@ -189,7 +190,7 @@ gvfs_file_info_populate_content_types (GFileInfo  *info,
 	mimetype = "inode/mountable";
 	break;
       case G_FILE_TYPE_REGULAR:
-	free_mimetype = g_content_type_guess (basename, NULL, 0, NULL);
+	free_mimetype = g_content_type_guess (basename, NULL, 0, &uncertain_content_type);
 	mimetype = free_mimetype;
 	break;
       case G_FILE_TYPE_UNKNOWN:
@@ -198,7 +199,8 @@ gvfs_file_info_populate_content_types (GFileInfo  *info,
 	break;
     }
 
-  g_file_info_set_content_type (info, mimetype);
+  if (!uncertain_content_type)
+    g_file_info_set_content_type (info, mimetype);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, mimetype);
 
   icon = g_content_type_get_icon (mimetype);
