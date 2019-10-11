@@ -1593,6 +1593,7 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
   GIcon *icon = NULL;
   GIcon *symbolic_icon = NULL;
   gchar *content_type = NULL;
+  gboolean uncertain_content_type = FALSE;
   char *display_name;
   char *linktarget = NULL;
   char **afctargetinfo = NULL;
@@ -1675,11 +1676,12 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
     }
 
   if (content_type == NULL)
-    content_type = g_content_type_guess (basename, NULL, 0, NULL);
+    content_type = g_content_type_guess (basename, NULL, 0, &uncertain_content_type);
   
   if (content_type)
     {
-      g_file_info_set_content_type (info, content_type);
+      if (!uncertain_content_type)
+        g_file_info_set_content_type (info, content_type);
       g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, content_type);
     }
 
