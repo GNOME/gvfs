@@ -107,6 +107,7 @@ static GDataEntry *resolve_dir (GVfsBackendGoogle  *self,
                                 gchar             **out_basename,
                                 gchar             **out_path,
                                 GError            **error);
+static gboolean is_native_file (GDataEntry *entry);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
@@ -704,6 +705,15 @@ resolve_child (GVfsBackendGoogle  *self,
       entry = g_hash_table_lookup (self->dir_entries, k);
     }
 
+  /* Fallback to find converted native files. */
+  if (entry == NULL && g_str_has_suffix (basename, ".html"))
+    {
+      k->title_or_id[strlen (k->title_or_id) - 5] = '\0';
+      entry = g_hash_table_lookup (self->dir_entries, k);
+      if (entry != NULL && !is_native_file (entry))
+        entry = NULL;
+    }
+
   if (entry == NULL)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("No such file or directory"));
@@ -815,6 +825,78 @@ resolve_dir (GVfsBackendGoogle  *self,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+#define HELPER_PREFIX "<!-- gvfsd-google "
+#define HELPER_SUFFIX " -->"
+#define MAX_ID_LENGTH 44
+
+static gchar *
+generate_helper_data (GDataEntry *entry, goffset *size)
+{
+  GDataLink *alternate;
+  const gchar *title, *uri, *id;
+  gchar *data;
+
+  id = gdata_entry_get_id (entry);
+  title = gdata_entry_get_title (entry);
+  alternate = gdata_entry_look_up_link (entry, GDATA_LINK_ALTERNATE);
+  uri = gdata_link_get_uri (alternate);
+
+  data = g_strdup_printf (HELPER_PREFIX "%s" HELPER_SUFFIX "\n"
+                          "<!DOCTYPE html>\n"
+                          "<html>\n"
+                          "  <head>\n"
+                          "    <meta http-equiv=\"refresh\" content=\"0; url=%s\">\n"
+                          "    <title>%s</title>\n"
+                          "  </head>\n"
+                          "  <body>\n"
+                          "    <a href=\"%s\">%s</a>\n"
+                          "  </body>\n"
+                          "</html>\n",
+                          id, uri, title, uri, title);
+
+  if (size)
+    *size = strlen (data);
+
+  return data;
+}
+
+static gboolean
+is_helper_file (GFile *file, gchar **id, GCancellable *cancellable, GError **error)
+{
+  GFileInputStream *stream = NULL;
+  gchar *buffer = NULL;
+  const gchar *begin, *end;
+  gboolean ret_val = FALSE;
+
+  stream = g_file_read (file, cancellable, error);
+  if (stream == NULL)
+    goto out;
+
+  gint len = strlen (HELPER_PREFIX) + strlen (HELPER_SUFFIX) + MAX_ID_LENGTH + 1;
+  buffer = g_malloc0 (len);
+  if (!g_input_stream_read_all (G_INPUT_STREAM (stream), buffer, len - 1, NULL, cancellable, error))
+      goto out;
+
+  if (strncmp (buffer, HELPER_PREFIX, strlen (HELPER_PREFIX) - 1) != 0)
+    goto out;
+
+  begin = buffer + strlen (HELPER_PREFIX);
+  end = strstr (buffer, HELPER_SUFFIX);
+  if (end == NULL)
+    goto out;
+
+  if (id)
+    *id = g_strndup (begin, end - begin);
+
+  ret_val = TRUE;
+
+ out:
+  g_object_unref (stream);
+  g_free (buffer);
+
+  return ret_val;
+}
+
 static char *
 get_extension_offset (const char *title)
 {
@@ -923,6 +1005,7 @@ build_file_info (GVfsBackendGoogle      *self,
   gchar *escaped_name = NULL;
   gchar *content_type = NULL;
   gchar *copy_name = NULL;
+  gchar *generated_copy_name = NULL;
   gchar *symlink_name = NULL;
   gint64 atime;
   gint64 ctime;
@@ -950,6 +1033,7 @@ build_file_info (GVfsBackendGoogle      *self,
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, !is_root);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, !is_native_file (entry));
 
   if (is_folder)
     {
@@ -958,31 +1042,28 @@ build_file_info (GVfsBackendGoogle      *self,
     }
   else
     {
-      content_type = get_content_type_from_entry (entry);
+      goffset size;
+
       file_type = G_FILE_TYPE_REGULAR;
 
       /* We want native Drive content to open in the browser. */
       if (is_native_file (entry))
         {
-          GDataLink *alternate;
-          const gchar *uri;
-
-          file_type = G_FILE_TYPE_SHORTCUT;
-          alternate = gdata_entry_look_up_link (entry, GDATA_LINK_ALTERNATE);
-          uri = gdata_link_get_uri (alternate);
-          g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI, uri);
+          content_type =  g_strdup ("text/html");
+          g_free (generate_helper_data (entry, &size));
         }
       else
         {
-          goffset size;
+          content_type = get_content_type_from_entry (entry);
 
 #if HAVE_LIBGDATA_0_17_7
           size = gdata_documents_entry_get_file_size (GDATA_DOCUMENTS_ENTRY (entry));
 #else
           size = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (entry));
 #endif
-          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE, (guint64) size);
         }
+
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE, (guint64) size);
     }
 
   if (is_symlink)
@@ -1034,7 +1115,16 @@ build_file_info (GVfsBackendGoogle      *self,
   g_file_info_set_display_name (info, title);
   g_file_info_set_edit_name (info, title);
 
-  copy_name = generate_copy_name (self, entry, entry_path);
+  generated_copy_name = generate_copy_name (self, entry, entry_path);
+  if (is_native_file (entry))
+    {
+      copy_name = g_strconcat (generated_copy_name, ".html", NULL);
+    }
+  else
+    {
+      copy_name = generated_copy_name;
+      generated_copy_name = NULL;
+    }
 
   /* Sanitize copy-name by replacing slashes with dashes. This is
    * what nautilus does (for desktop files).
@@ -1093,6 +1183,7 @@ build_file_info (GVfsBackendGoogle      *self,
  out:
   g_free (symlink_name);
   g_free (copy_name);
+  g_free (generated_copy_name);
   g_free (escaped_name);
   g_free (content_type);
 }
@@ -1790,6 +1881,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   gchar *entry_path = NULL;
   gchar *parent_path = NULL;
   goffset size;
+  gchar *id = NULL;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ push: %s -> %s, %d\n", local_path, destination, flags);
@@ -1896,75 +1988,119 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
 
   g_debug ("  will overwrite: %d\n", needs_overwrite);
 
-  error = NULL;
-  istream = g_file_read (local_file, cancellable, &error);
-  if (error != NULL)
+  if (is_helper_file (local_file, &id, cancellable, &error))
     {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      goto out;
-    }
-
-  content_type = g_file_info_get_content_type (info);
-
-  if (needs_overwrite)
-    {
-      document = GDATA_DOCUMENTS_DOCUMENT (g_object_ref (existing_entry));
-      title = gdata_entry_get_title (existing_entry);
+      GDataEntry *source;
+      GDataAuthorizationDomain *auth_domain;
+      GDataDocumentsEntry *new_entry;
 
       error = NULL;
-      ostream = gdata_documents_service_update_document (self->service,
-                                                         document,
-                                                         title,
-                                                         content_type,
-                                                         cancellable,
-                                                         &error);
+      auth_domain = gdata_documents_service_get_primary_authorization_domain ();
+      source = gdata_service_query_single_entry (GDATA_SERVICE (self->service),
+                                                 auth_domain,
+                                                 id,
+                                                 NULL,
+                                                 GDATA_TYPE_DOCUMENTS_DOCUMENT,
+                                                 cancellable,
+                                                 &error);
+      if (error != NULL)
+        {
+          sanitize_error (&error);
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          goto out;
+        }
+
+      gdata_entry_set_title (source, destination_basename);
+      new_entry = gdata_documents_service_add_entry_to_folder (self->service,
+                                                               GDATA_DOCUMENTS_ENTRY (source),
+                                                               GDATA_DOCUMENTS_FOLDER (destination_parent),
+                                                               cancellable,
+                                                               &error);
+      g_object_unref (source);
+
+      if (error != NULL)
+        {
+          sanitize_error (&error);
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          goto out;
+        }
+
+      new_document = GDATA_DOCUMENTS_DOCUMENT (new_entry);
     }
   else
     {
-      document = gdata_documents_document_new (NULL);
-      title = destination_basename;
-      gdata_entry_set_title (GDATA_ENTRY (document), title);
+      error = NULL;
+      istream = g_file_read (local_file, cancellable, &error);
+      if (error != NULL)
+        {
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          goto out;
+        }
+
+      content_type = g_file_info_get_content_type (info);
+
+      if (needs_overwrite)
+        {
+          document = GDATA_DOCUMENTS_DOCUMENT (g_object_ref (existing_entry));
+          title = gdata_entry_get_title (existing_entry);
+
+          error = NULL;
+          ostream = gdata_documents_service_update_document (self->service,
+                                                             document,
+                                                             title,
+                                                             content_type,
+                                                             cancellable,
+                                                             &error);
+        }
+      else
+        {
+          document = gdata_documents_document_new (NULL);
+          title = destination_basename;
+          gdata_entry_set_title (GDATA_ENTRY (document), title);
+
+          error = NULL;
+          ostream = gdata_documents_service_upload_document (self->service,
+                                                             document,
+                                                             title,
+                                                             content_type,
+                                                             GDATA_DOCUMENTS_FOLDER (destination_parent),
+                                                             cancellable,
+                                                             &error);
+        }
+
+      if (error != NULL)
+        {
+          sanitize_error (&error);
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          goto out;
+        }
 
       error = NULL;
-      ostream = gdata_documents_service_upload_document (self->service,
-                                                         document,
-                                                         title,
-                                                         content_type,
-                                                         GDATA_DOCUMENTS_FOLDER (destination_parent),
-                                                         cancellable,
-                                                         &error);
-    }
+      g_output_stream_splice (G_OUTPUT_STREAM (ostream),
+                              G_INPUT_STREAM (istream),
+                              G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE | G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
+                              cancellable,
+                              &error);
+      if (error != NULL)
+        {
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          goto out;
+        }
 
-  if (error != NULL)
-    {
-      sanitize_error (&error);
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      goto out;
-    }
-
-  error = NULL;
-  g_output_stream_splice (G_OUTPUT_STREAM (ostream),
-                          G_INPUT_STREAM (istream),
-                          G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE | G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
-                          cancellable,
-                          &error);
-  if (error != NULL)
-    {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      goto out;
-    }
-
-  error = NULL;
-  new_document = gdata_documents_service_finish_upload (self->service, ostream, &error);
-  if (error != NULL)
-    {
-      sanitize_error (&error);
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      goto out;
+      error = NULL;
+      new_document = gdata_documents_service_finish_upload (self->service, ostream, &error);
+      if (error != NULL)
+        {
+          sanitize_error (&error);
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          goto out;
+        }
     }
 
   entry_path = g_build_path ("/", parent_path, gdata_entry_get_id (GDATA_ENTRY (new_document)), NULL);
@@ -1988,11 +2124,19 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
         }
     }
 
+  if (is_native_file (GDATA_ENTRY (new_document)))
+    {
+      g_free (generate_helper_data (GDATA_ENTRY (new_document), &size));
+    }
+  else
+    {
 #if HAVE_LIBGDATA_0_17_7
-  size = gdata_documents_entry_get_file_size (GDATA_DOCUMENTS_ENTRY (new_document));
+      size = gdata_documents_entry_get_file_size (GDATA_DOCUMENTS_ENTRY (new_document));
 #else
-  size = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (new_document));
+      size = gdata_documents_entry_get_quota_used (GDATA_DOCUMENTS_ENTRY (new_document));
 #endif
+    }
+
   g_vfs_job_progress_callback (size, size, job);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -2235,7 +2379,6 @@ g_vfs_backend_google_open_for_read (GVfsBackend        *_self,
   GError *error;
   gchar *content_type = NULL;
   gchar *entry_path = NULL;
-  GDataAuthorizationDomain *auth_domain;
   const gchar *uri;
 
   g_rec_mutex_lock (&self->mutex);
@@ -2267,17 +2410,24 @@ g_vfs_backend_google_open_for_read (GVfsBackend        *_self,
 
   if (is_native_file (entry))
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE, _("File is not a regular file"));
-      goto out;
-    }
+      gchar *data;
+      goffset size;
 
-  auth_domain = gdata_documents_service_get_primary_authorization_domain ();
-  uri = gdata_entry_get_content_uri (entry);
-  stream = gdata_download_stream_new (GDATA_SERVICE (self->service), auth_domain, uri, cancellable);
-  if (stream == NULL)
+      data = generate_helper_data (entry, &size);
+      stream = g_memory_input_stream_new_from_data (data, size, g_free);
+    }
+  else
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED, _("Error getting data from file"));
-      goto out;
+      GDataAuthorizationDomain *auth_domain;
+
+      auth_domain = gdata_documents_service_get_primary_authorization_domain ();
+      uri = gdata_entry_get_content_uri (entry);
+      stream = gdata_download_stream_new (GDATA_SERVICE (self->service), auth_domain, uri, cancellable);
+      if (stream == NULL)
+        {
+          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_FAILED, _("Error getting data from file"));
+          goto out;
+        }
     }
 
   g_object_set_data_full (G_OBJECT (stream), "g-vfs-backend-google-entry", g_object_ref (entry), g_object_unref);
