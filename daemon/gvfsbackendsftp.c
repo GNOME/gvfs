@@ -2410,6 +2410,7 @@ parse_attributes (GVfsBackendSftp *backend,
   guint32 mode;
   gboolean has_uid, free_mimetype;
   char *mimetype;
+  gboolean uncertain_content_type;
   
   flags = g_data_input_stream_read_uint32 (reply, NULL, NULL);
 
@@ -2449,6 +2450,7 @@ parse_attributes (GVfsBackendSftp *backend,
       g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, mode);
 
       mimetype = NULL;
+      uncertain_content_type = FALSE;
       if (S_ISREG (mode))
         type = G_FILE_TYPE_REGULAR;
       else if (S_ISDIR (mode))
@@ -2488,14 +2490,15 @@ parse_attributes (GVfsBackendSftp *backend,
         {
           if (basename)
             {
-              mimetype = g_content_type_guess (basename, NULL, 0, NULL);
+              mimetype = g_content_type_guess (basename, NULL, 0, &uncertain_content_type);
               free_mimetype = TRUE;
             }
           else
             mimetype = "application/octet-stream";
         }
-      
-      g_file_info_set_content_type (info, mimetype);
+
+      if (!uncertain_content_type)
+        g_file_info_set_content_type (info, mimetype);
       g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, mimetype);
       
       if (g_file_attribute_matcher_matches (matcher,
