@@ -1361,7 +1361,6 @@ set_info_from_stat (GVfsBackendSmb *backend,
 		    GFileAttributeMatcher *matcher)
 {
   GFileType file_type;
-  char *content_type;
   char *display_name;
 
   if (basename)
@@ -1442,9 +1441,8 @@ set_info_from_stat (GVfsBackendSmb *backend,
     {
       GIcon *icon = NULL;
       GIcon *symbolic_icon = NULL;
+      char *content_type = NULL;
 
-      content_type = NULL;
-      
       if (S_ISDIR(statbuf->st_mode))
 	{
 	  content_type = g_strdup ("inode/directory");
