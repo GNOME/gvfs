@@ -1763,11 +1763,13 @@ dav_uri_from_dns_sd_resolver (GVfsBackendDav *dav_backend)
   char       *user;
   char       *path;
   char       *address;
+  gchar      *interface;
   const char *service_type;
   guint       port;
 
   service_type = g_vfs_dns_sd_resolver_get_service_type (dav_backend->resolver);
   address = g_vfs_dns_sd_resolver_get_address (dav_backend->resolver);
+  interface = g_vfs_dns_sd_resolver_get_interface (dav_backend->resolver);
   port = g_vfs_dns_sd_resolver_get_port (dav_backend->resolver);
   user = g_vfs_dns_sd_resolver_lookup_txt_record (dav_backend->resolver, "u"); /* mandatory */
   path = g_vfs_dns_sd_resolver_lookup_txt_record (dav_backend->resolver, "path"); /* optional */
@@ -1787,7 +1789,20 @@ dav_uri_from_dns_sd_resolver (GVfsBackendDav *dav_backend)
 
   soup_uri_set_port (uri, port);
 
-  soup_uri_set_host (uri, address);
+  /* IPv6 host does not include brackets in SoupURI, but GVfsDnsSdResolver host does */
+  if (gvfs_is_ipv6 (address))
+    {
+      /* Link-local addresses require interface to be specified. */
+      if (g_str_has_prefix (address, "[fe80:") && interface != NULL)
+        {
+          uri->host = g_strconcat (address + 1, interface, NULL);
+          uri->host[strlen (address) - 2] = '%';
+        }
+      else
+        uri->host = g_strndup (address + 1, strlen (address) - 2);
+    }
+  else
+    soup_uri_set_host (uri, address);
 
   if (path != NULL)
     soup_uri_set_path (uri, path);
@@ -1796,6 +1811,7 @@ dav_uri_from_dns_sd_resolver (GVfsBackendDav *dav_backend)
 
 
   g_free (address);
+  g_free (interface);
   g_free (user);
   g_free (path);
 
