@@ -1442,6 +1442,7 @@ set_info_from_stat (GVfsBackendSmb *backend,
       GIcon *icon = NULL;
       GIcon *symbolic_icon = NULL;
       char *content_type = NULL;
+      gboolean uncertain_content_type = FALSE;
 
       if (S_ISDIR(statbuf->st_mode))
 	{
@@ -1459,7 +1460,7 @@ set_info_from_stat (GVfsBackendSmb *backend,
 	}
       else if (basename != NULL)
 	{
-	  content_type = g_content_type_guess (basename, NULL, 0, NULL);
+	  content_type = g_content_type_guess (basename, NULL, 0, &uncertain_content_type);
 	  if (content_type)
             {
               icon = g_content_type_get_icon (content_type);
@@ -1469,7 +1470,12 @@ set_info_from_stat (GVfsBackendSmb *backend,
       
       if (content_type)
 	{
-	  g_file_info_set_content_type (info, content_type);
+	  if (!uncertain_content_type)
+	    g_file_info_set_content_type (info, content_type);
+
+	  g_file_info_set_attribute_string (info,
+					    G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
+					    content_type);
 	  g_free (content_type);
 	}
 
