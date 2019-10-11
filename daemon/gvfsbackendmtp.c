@@ -1236,6 +1236,7 @@ get_file_info (GVfsBackend *backend,
   GIcon *icon = NULL;
   GIcon *symbolic_icon = NULL;
   char *content_type = NULL;
+  gboolean uncertain_content_type = FALSE;
   char *mount_id = NULL;
   char *file_id = NULL;
 
@@ -1260,11 +1261,12 @@ get_file_info (GVfsBackend *backend,
   default:
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, FALSE);
     g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
-    content_type = g_content_type_guess (file->filename, NULL, 0, NULL);
+    content_type = g_content_type_guess (file->filename, NULL, 0, &uncertain_content_type);
     break;
   }
 
-  g_file_info_set_content_type (info, content_type);
+  if (!uncertain_content_type)
+    g_file_info_set_content_type (info, content_type);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
                                     content_type);
 
