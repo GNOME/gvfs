@@ -995,9 +995,12 @@ parse_resourcetype (xmlNodePtr rt)
 }
 
 static inline void
-file_info_set_content_type (GFileInfo *info, const char *type)
+file_info_set_content_type (GFileInfo *info,
+			    const char *type,
+			    gboolean uncertain_content_type)
 {
-  g_file_info_set_content_type (info, type);
+  if (!uncertain_content_type)
+    g_file_info_set_content_type (info, type);
   g_file_info_set_attribute_string (info,
                                     G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
                                     type);
@@ -1016,6 +1019,7 @@ ms_response_to_file_info (MsResponse *response,
   const char *text;
   GFileType   file_type;
   char       *mime_type;
+  gboolean    uncertain_content_type;
   GIcon      *icon;
   GIcon      *symbolic_icon;
   gboolean    have_display_name;
@@ -1031,6 +1035,7 @@ ms_response_to_file_info (MsResponse *response,
 
   file_type = G_FILE_TYPE_REGULAR;
   mime_type = NULL;
+  uncertain_content_type = FALSE;
 
   have_display_name = FALSE;
   ms_response_get_propstat_iter (response, &iter);
@@ -1118,7 +1123,7 @@ ms_response_to_file_info (MsResponse *response,
 
       icon = g_content_type_get_icon (mime_type);
       symbolic_icon = g_content_type_get_symbolic_icon (mime_type);
-      file_info_set_content_type (info, mime_type);
+      file_info_set_content_type (info, mime_type, FALSE);
 
       /* Ignore file size for directories. Most of the servers don't report it
        * for directories anyway. However, some servers report total size of
@@ -1130,7 +1135,7 @@ ms_response_to_file_info (MsResponse *response,
   else
     {
       if (mime_type == NULL)
-        mime_type = g_content_type_guess (basename, NULL, 0, NULL);
+        mime_type = g_content_type_guess (basename, NULL, 0, &uncertain_content_type);
 
       icon = g_content_type_get_icon (mime_type);
       if (G_IS_THEMED_ICON (icon))
@@ -1144,7 +1149,7 @@ ms_response_to_file_info (MsResponse *response,
           g_themed_icon_append_name (G_THEMED_ICON (symbolic_icon), "text-x-generic-symbolic");
         }
 
-      file_info_set_content_type (info, mime_type);
+      file_info_set_content_type (info, mime_type, uncertain_content_type);
     }
 
   if (have_display_name == FALSE)

@@ -475,6 +475,7 @@ set_name_info (GFileInfo *info,
                GFileAttributeMatcher *matcher)
 {
   char *free_mimetype = NULL;
+  gboolean uncertain_content_type = FALSE;
 
   g_file_info_set_name (info, basename);
   if (basename[0] == '.')
@@ -495,14 +496,15 @@ set_name_info (GFileInfo *info,
     {
       if (basename)
         {
-          free_mimetype = g_content_type_guess (basename, NULL, 0, NULL);
+          free_mimetype = g_content_type_guess (basename, NULL, 0, &uncertain_content_type);
           mimetype = free_mimetype;
         }
       else
         mimetype = "application/octet-stream";
     }
 
-  g_file_info_set_content_type (info, mimetype);
+  if (!uncertain_content_type)
+    g_file_info_set_content_type (info, mimetype);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, mimetype);
 
   if (g_file_attribute_matcher_matches (matcher,

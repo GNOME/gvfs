@@ -1608,10 +1608,12 @@ g_vfs_afp_server_fill_info (GVfsAfpServer *server,
     if (!directory)
     {
       char *content_type;
+      gboolean uncertain_content_type;
       GIcon *icon;
 
-      content_type = g_content_type_guess (utf8_name, NULL, 0, NULL);
-      g_file_info_set_content_type (info, content_type);
+      content_type = g_content_type_guess (utf8_name, NULL, 0, &uncertain_content_type);
+      if (!uncertain_content_type)
+        g_file_info_set_content_type (info, content_type);
       g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
                                         content_type);
 
