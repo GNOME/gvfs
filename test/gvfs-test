@@ -52,7 +52,6 @@ except (ValueError, ImportError):
 # umockdev environment for gphoto/MTP tests
 umockdev_testbed = None
 
-twistd_path = shutil.which('twistd')
 smbd_path = shutil.which('smbd')
 
 def find_alternative(cmds):
@@ -67,6 +66,7 @@ samba_running = subprocess.call(['pidof', 'smbd'], stdout=subprocess.PIPE) == 0
 httpd_cmd = find_alternative(['apache2', 'httpd', 'apachectl'])
 have_httpd = httpd_cmd is not None
 sshd_path = shutil.which('sshd')
+twistd_path = find_alternative(['twistd-3', 'twistd3'])
 
 local_ip = subprocess.check_output("ip -4 addr | sed -nr '/127\.0\.0/ n; "
                                    "/inet / {  s/^.*inet ([0-9.]+).*$/\\1/; p; q  }'"
