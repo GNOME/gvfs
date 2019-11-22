@@ -1,3 +1,7 @@
+Major changes in 1.42.2
+=======================
+* gdbus: Add workaround for deadlocks when cancelling jobs
+
 Major changes in 1.42.1
 =======================
 * dav: Fix mounting when 403 is returned for the parent folder
