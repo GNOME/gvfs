@@ -1,3 +1,9 @@
+Major changes in 1.43.2
+=======================
+* gdbus: Add workaround for deadlocks when cancelling jobs
+* smb: Improve enumeration performance
+* test: Port to python3-twisted
+
 Major changes in 1.43.1
 =======================
 * Don't set a content-type that isn't certain
