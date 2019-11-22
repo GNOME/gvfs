@@ -7,20 +7,11 @@ fedora:
 
 .gnome-build-meta-template: &gnome-build-meta
     variables:
-        BST_SHA: '1.4.0-0-gf8ca130adb632614ebff8453fd91d4c96e87221d'
-        BST_EXTERNAL_SHA: '0.18.0-0-g755206670c87a2999132025d24b0d0aacc611ef2'
-        DOCKER_IMAGE_ID: '1a534a96f9144ca8ee87cee1fef97faa7c396533'
+        DOCKER_IMAGE_ID: 'e593f441b6ac7536b0e35a4354dc20c6c123f6b5'
         DOCKER_REGISTRY: "registry.gitlab.com/freedesktop-sdk/infrastructure/freedesktop-sdk-docker-images"
         DOCKER_AMD64: "${DOCKER_REGISTRY}/bst14/amd64:${DOCKER_IMAGE_ID}"
     image: "${DOCKER_AMD64}"
     before_script:
-        - pip3 uninstall -y buildstream
-        - git clone https://gitlab.com/BuildStream/buildstream.git
-        - git -C buildstream/ checkout $BST_SHA
-        - pip3 install buildstream/
-        - git clone https://gitlab.com/BuildStream/bst-external.git
-        - git -C bst-external/ checkout $BST_EXTERNAL_SHA
-        - pip3 install bst-external/
         - git clone --depth 1 https://gitlab.gnome.org/GNOME/gnome-build-meta.git
     script:
         - cd gnome-build-meta
