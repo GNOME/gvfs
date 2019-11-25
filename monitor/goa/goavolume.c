@@ -64,6 +64,7 @@ G_DEFINE_TYPE_EXTENDED (GVfsGoaVolume, g_vfs_goa_volume, G_TYPE_OBJECT, 0,
 typedef struct
 {
   GMountOperation *mount_operation;
+  GMountOperation *mount_operation_orig;
   gchar *passwd;
 } MountOp;
 
@@ -72,6 +73,13 @@ mount_op_free (MountOp *data)
 {
   g_clear_object (&data->mount_operation);
   g_free (data->passwd);
+
+  if (data->mount_operation_orig != NULL)
+    {
+      g_signal_handlers_disconnect_by_data (data->mount_operation_orig, data);
+      g_object_unref (data->mount_operation_orig);
+    }
+
   g_slice_free (MountOp, data);
 }
 
@@ -96,6 +104,88 @@ account_attention_needed_cb (GObject *_object, GParamSpec *pspec, gpointer user_
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
+
+GType g_vfs_goa_mount_operation_get_type (void) G_GNUC_CONST;
+
+typedef struct
+{
+  GMountOperation parent_instance;
+} GVfsGoaMountOperation;
+
+typedef struct
+{
+  GMountOperationClass parent_class;
+} GVfsGoaMountOperationClass;
+
+static GMountOperation *
+g_vfs_goa_mount_operation_new (void)
+{
+  return G_MOUNT_OPERATION (g_object_new (g_vfs_goa_mount_operation_get_type (), NULL));
+}
+
+G_DEFINE_TYPE (GVfsGoaMountOperation, g_vfs_goa_mount_operation, G_TYPE_MOUNT_OPERATION)
+
+static void
+g_vfs_goa_mount_operation_init (GVfsGoaMountOperation *mount_operation)
+{
+}
+
+static void
+g_vfs_goa_mount_operation_ask_question (GMountOperation *op,
+                                        const char *message,
+                                        const char *choices[])
+{
+  /* This is needed to prevent G_MOUNT_OPERATION_UNHANDLED reply in idle. */
+}
+
+static void
+g_vfs_goa_mount_operation_class_init (GVfsGoaMountOperationClass *klass)
+{
+  GMountOperationClass *mount_op_class;
+
+  mount_op_class = G_MOUNT_OPERATION_CLASS (klass);
+  mount_op_class->ask_question  = g_vfs_goa_mount_operation_ask_question;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+static void
+ask_question_reply_cb (GMountOperation      *op,
+                       GMountOperationResult result,
+                       gpointer              user_data)
+{
+  MountOp *data = g_task_get_task_data (user_data);
+
+  g_mount_operation_set_choice (data->mount_operation,
+                                g_mount_operation_get_choice (op));
+  g_mount_operation_reply (data->mount_operation, result);
+}
+
+static void
+mount_operation_ask_question_cb (GMountOperation *op,
+                                 gchar           *message,
+                                 GStrv            choices,
+                                 gpointer         user_data)
+{
+  MountOp *data = g_task_get_task_data (user_data);
+
+  if (data->mount_operation_orig != NULL)
+    {
+      g_signal_connect (data->mount_operation_orig,
+                        "reply",
+                        G_CALLBACK (ask_question_reply_cb),
+                        user_data);
+      g_signal_emit_by_name (data->mount_operation_orig,
+                             "ask-question",
+                             message,
+                             choices);
+    }
+  else
+    {
+      g_mount_operation_reply (data->mount_operation,
+                               G_MOUNT_OPERATION_UNHANDLED);
+    }
+}
 
 static void
 mount_operation_ask_password_cb (GMountOperation   *op,
@@ -412,7 +502,7 @@ g_vfs_goa_volume_get_uuid (GVolume *_self)
 static void
 g_vfs_goa_volume_mount (GVolume             *_self,
                         GMountMountFlags     flags,
-                        GMountOperation     *mount_operation,
+                        GMountOperation     *mount_operation_orig,
                         GCancellable        *cancellable,
                         GAsyncReadyCallback  callback,
                         gpointer             user_data)
@@ -423,6 +513,9 @@ g_vfs_goa_volume_mount (GVolume             *_self,
   GoaAccount *account;
 
   data = g_slice_new0 (MountOp);
+  if (mount_operation_orig != NULL)
+    data->mount_operation_orig = g_object_ref (mount_operation_orig);
+
   task = g_task_new (self, cancellable, callback, user_data);
   g_task_set_source_tag (task, g_vfs_goa_volume_mount);
   g_task_set_task_data (task, data, (GDestroyNotify) mount_op_free);
@@ -431,8 +524,9 @@ g_vfs_goa_volume_mount (GVolume             *_self,
    * monitor because it is set up to emit MountOpAskPassword on
    * ask-password.
    */
-  data->mount_operation = g_mount_operation_new ();
+  data->mount_operation = g_vfs_goa_mount_operation_new ();
   g_signal_connect (data->mount_operation, "ask-password", G_CALLBACK (mount_operation_ask_password_cb), task);
+  g_signal_connect (data->mount_operation, "ask-question", G_CALLBACK (mount_operation_ask_question_cb), task);
 
   account = goa_object_peek_account (self->object);
   goa_account_call_ensure_credentials (account, cancellable, ensure_credentials_cb, task);
