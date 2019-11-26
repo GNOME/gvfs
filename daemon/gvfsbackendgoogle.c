@@ -1436,26 +1436,9 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
       goto out;
     }
 
-  id = gdata_entry_get_id (source_entry);
+  title = gdata_entry_get_title (source_entry);
   source_parent_id = gdata_entry_get_id (source_parent);
   destination_parent_id = gdata_entry_get_id (destination_parent);
-  etag = gdata_entry_get_etag (source_entry);
-  summary = gdata_entry_get_summary (source_entry);
-  title = gdata_entry_get_title (source_entry);
-
-  /* When a file is copied to the same folder, Google Drive provides a "Make a
-   * copy" option which creates a new file and changes its title from "Foobar.pdf"
-   * to "Copy of Foobar". But instead here, nautilus does the heavy-lifting and
-   * creates the destination file name as "Foobar (copy).pdf".
-   *
-   * Moreover, just after copy operation, a query_info operation is performed
-   * and it needs the ("Foobar (copy).pdf", destination_parent_id) -> Entry mapping
-   * in the cache. Hence, we set the new entry's filename conditionally. */
-  if (g_strcmp0 (source_parent_id, destination_parent_id) != 0 &&
-      g_strcmp0 (destination_basename, id) == 0)
-    dummy_entry_filename = gdata_entry_get_title (source_entry);
-  else
-    dummy_entry_filename = destination_basename;
 
   existing_entry = resolve_child (self, destination_parent, destination_basename, cancellable, NULL);
   if (existing_entry != NULL)
@@ -1526,6 +1509,26 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
         }
     }
 
+  /* We again resolve the source_entry after checking existing_entry. This is
+   * because when we try to find existing_entry, resolve_child is called which
+   * internally calls rebuild_dir function. Now, if between the initial
+   * resolution of source_entry and the resolution of existing_entry, the
+   * source_entry gets invalidated (possibly due to elapsing of
+   * REBUILD_ENTRIES_TIMEOUT seconds), rebuild_dir will update the entry
+   * internally in the structures but will free our source_entry. This results
+   * in a segfault in the below step.
+   *
+   * This case was observed when doing the following set of operations:
+   *    copy --> rename copied file (but don't refresh nautilus) --> copy renamed file
+   *    in same directory */
+  source_entry = resolve (self, source, cancellable, NULL, &error);
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
+    }
+
   if (GDATA_IS_DOCUMENTS_FOLDER (source_entry))
     {
       g_vfs_job_failed (G_VFS_JOB (job),
@@ -1535,7 +1538,27 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
       goto out;
     }
 
+  id = gdata_entry_get_id (source_entry);
+  etag = gdata_entry_get_etag (source_entry);
+  summary = gdata_entry_get_summary (source_entry);
+  title = gdata_entry_get_title (source_entry);
+
   source_entry_type = G_OBJECT_TYPE (source_entry);
+
+  /* When a file is copied to the same folder, Google Drive provides a "Make a
+   * copy" option which creates a new file and changes its title from "Foobar.pdf"
+   * to "Copy of Foobar". But instead here, nautilus does the heavy-lifting and
+   * creates the destination file name as "Foobar (copy).pdf".
+   *
+   * Moreover, just after copy operation, a query_info operation is performed
+   * and it needs the ("Foobar (copy).pdf", destination_parent_id) -> Entry mapping
+   * in the cache. Hence, we set the new entry's filename conditionally. */
+  if (g_strcmp0 (source_parent_id, destination_parent_id) != 0 &&
+      g_strcmp0 (destination_basename, id) == 0)
+    dummy_entry_filename = gdata_entry_get_title (source_entry);
+  else
+    dummy_entry_filename = destination_basename;
+
   dummy_source_entry = g_object_new (source_entry_type,
                                      "etag", etag,
                                      "id", id,
