@@ -172,7 +172,10 @@ free_global_avahi_client (void)
   g_list_foreach (resolvers, (GFunc) remove_client_from_resolver, NULL);
 
   /* Destroy client */
-  avahi_client_free (global_client);
+  if (global_client)
+    {
+      avahi_client_free (global_client);
+    }
   global_client = NULL;
   avahi_initialized = FALSE;
 }
