@@ -3602,6 +3602,144 @@ replace_truncate_original (GVfsBackendSftp *backend,
 }
 
 static void
+close_temp_file (GVfsBackendSftp *backend,
+                 SftpHandle *handle,
+                 GVfsJob *job)
+{
+  GDataOutputStream *command;
+
+  command = new_command_stream (backend,
+                                SSH_FXP_CLOSE);
+  put_data_buffer (command, handle->raw_handle);
+  queue_command_stream_and_free (&backend->command_connection, command,
+                                 NULL,
+                                 G_VFS_JOB (job), NULL);
+}
+
+static void
+replace_create_temp_fsetstat_reply (GVfsBackendSftp *backend,
+                                    int reply_type,
+                                    GDataInputStream *reply,
+                                    guint32 len,
+                                    GVfsJob *job,
+                                    gpointer user_data)
+{
+  GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
+  ReplaceData *data = job->backend_data;
+  SftpHandle *handle = user_data;
+  GError *error = NULL;
+
+  if (reply_type == SSH_FXP_STATUS)
+    error_from_status (job, reply, -1, -1, &error);
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply received"));
+
+  if (error != NULL)
+    {
+      if (data->set_ownership &&
+          error->code == G_IO_ERROR_PERMISSION_DENIED)
+        {
+          g_error_free (error);
+
+          close_temp_file (backend, handle, job);
+          delete_temp_file (backend, handle, job);
+          sftp_handle_free (handle);
+
+          /* This was probably due to the fact that the ownership could not be
+             set properly. In this case we change our strategy altogether and
+             simply open/truncate the original file. This is not as secure
+             as the atomit tempfile/move approach, but at least ownership
+             doesn't change */
+          if (!op_job->make_backup)
+            replace_truncate_original (backend, job);
+          else
+            {
+              /* We only do this if make_backup is FALSE, as this version breaks
+                 the backup code. Would like to handle the backup case too by
+                 backing up before truncating, but for now error out... */
+              g_vfs_job_failed (job, G_IO_ERROR,
+                                G_IO_ERROR_CANT_CREATE_BACKUP,
+                                _("Backups not supported"));
+            }
+        }
+      else
+        {
+          g_vfs_job_failed_from_error (job, error);
+          g_error_free (error);
+        }
+      return;
+    }
+
+  g_vfs_job_open_for_write_set_handle (op_job, handle);
+  g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (op_job, TRUE);
+  g_vfs_job_succeeded (job);
+}
+
+static void
+replace_create_temp_fstat_reply (GVfsBackendSftp *backend,
+                                 int reply_type,
+                                 GDataInputStream *reply,
+                                 guint32 len,
+                                 GVfsJob *job,
+                                 gpointer user_data)
+{
+  GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
+  ReplaceData *data = job->backend_data;
+  SftpHandle *handle = user_data;
+  GFileInfo *info;
+  guint32 uid = -1;
+  guint32 gid = -1;
+
+  if (reply_type == SSH_FXP_STATUS ||
+      reply_type != SSH_FXP_ATTRS)
+    {
+      close_temp_file (backend, handle, job);
+      delete_temp_file (backend, handle, job);
+      sftp_handle_free (handle);
+
+      if (reply_type == SSH_FXP_STATUS)
+        result_from_status (job, reply, -1, -1);
+      else
+        g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Invalid reply received"));
+      return;
+    }
+
+  info = g_file_info_new ();
+  parse_attributes (backend, info, NULL, reply, NULL);
+
+  if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_UID) &&
+      g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_GID))
+    {
+      uid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID);
+      gid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID);
+    }
+
+  g_object_unref (info);
+
+  if (uid != data->uid || gid != data->gid)
+    {
+      GDataOutputStream *command;
+
+      command = new_command_stream (backend, SSH_FXP_FSETSTAT);
+      put_data_buffer (command, handle->raw_handle);
+      g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_UIDGID, NULL, NULL);
+      g_data_output_stream_put_uint32 (command, data->uid, NULL, NULL);
+      g_data_output_stream_put_uint32 (command, data->gid, NULL, NULL);
+      queue_command_stream_and_free (&backend->command_connection, command,
+                                     replace_create_temp_fsetstat_reply, job, handle);
+      return;
+    }
+
+  g_vfs_job_open_for_write_set_handle (op_job, handle);
+  g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (op_job, TRUE);
+  g_vfs_job_succeeded (job);
+}
+
+static void
 replace_create_temp_reply (GVfsBackendSftp *backend,
                            int reply_type,
                            GDataInputStream *reply,
@@ -3632,28 +3770,6 @@ replace_create_temp_reply (GVfsBackendSftp *backend,
 
           replace_create_temp (backend, op_job);
         }
-      else if (data->set_ownership &&
-	       error->code == G_IO_ERROR_PERMISSION_DENIED)
-        {
-          g_error_free (error);
-	  
-          /* This was probably due to the fact that the ownership could not be
-             set properly. In this case we change our strategy altogether and
-             simply open/truncate the original file. This is not as secure
-             as the atomit tempfile/move approach, but at least ownership 
-             doesn't change */
-	  if (!op_job->make_backup)
-	    replace_truncate_original (backend, job);
-	  else
-	    {
-	      /* We only do this if make_backup is FALSE, as this version breaks
-		 the backup code. Would like to handle the backup case too by
-		 backing up before truncating, but for now error out... */
-	      g_vfs_job_failed (job, G_IO_ERROR,
-				G_IO_ERROR_CANT_CREATE_BACKUP,
-				_("Backups not supported"));
-	    }
-        }
       else
         {
           g_vfs_job_failed_from_error (job, error);
@@ -3675,7 +3791,18 @@ replace_create_temp_reply (GVfsBackendSftp *backend,
   handle->permissions = data->permissions;
   handle->set_permissions = data->set_permissions;
   handle->make_backup = op_job->make_backup;
-  
+
+  if (data->set_ownership)
+    {
+      GDataOutputStream *command;
+
+      command = new_command_stream (backend, SSH_FXP_FSTAT);
+      put_data_buffer (command, handle->raw_handle);
+      queue_command_stream_and_free (&backend->command_connection, command,
+                                     replace_create_temp_fstat_reply, job, handle);
+      return;
+    }
+
   g_vfs_job_open_for_write_set_handle (op_job, handle);
   g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
   g_vfs_job_open_for_write_set_can_truncate (op_job, TRUE);
@@ -3716,15 +3843,8 @@ replace_create_temp (GVfsBackendSftp *backend,
                                 SSH_FXP_OPEN);
   put_string (command, data->tempname);
   g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_EXCL,  NULL, NULL); /* open flags */
-  g_data_output_stream_put_uint32 (command, (data->set_permissions ? SSH_FILEXFER_ATTR_PERMISSIONS : 0) |
-                                            (data->set_ownership ? SSH_FILEXFER_ATTR_UIDGID : 0), NULL, NULL); /* Attr flags */
-  
-  if (data->set_ownership)
-  {
-    g_data_output_stream_put_uint32 (command, data->uid, NULL, NULL);
-    g_data_output_stream_put_uint32 (command, data->gid, NULL, NULL);
-  }
-  
+  g_data_output_stream_put_uint32 (command, (data->set_permissions ? SSH_FILEXFER_ATTR_PERMISSIONS : 0), NULL, NULL);
+
   if (data->set_permissions)
     g_data_output_stream_put_uint32 (command, data->permissions, NULL, NULL);
   queue_command_stream_and_free (&op_backend->command_connection, command,
