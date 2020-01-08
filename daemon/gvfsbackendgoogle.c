@@ -393,6 +393,30 @@ get_parent_ids (GVfsBackendGoogle *self,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static gint64
+count_files_in_directory_with_title (GVfsBackendGoogle *self,
+                                     const gchar       *entry_title,
+                                     GDataEntry        *directory)
+{
+  gint64 num_same_title_files = 0;
+  GHashTableIter iter;
+  GDataEntry *entry;
+  DirEntriesKey *key;
+
+  g_hash_table_iter_init (&iter, self->dir_entries);
+  while (g_hash_table_iter_next (&iter, (gpointer *) &key, (gpointer *) &entry))
+    {
+      if (g_strcmp0 (entry_title, gdata_entry_get_title (entry)) == 0 &&
+          g_strcmp0 (key->parent_id, gdata_entry_get_id (GDATA_ENTRY (directory))) == 0 &&
+          g_strcmp0 (key->title_or_id, gdata_entry_get_id (entry)) == 0)
+        num_same_title_files++;
+    }
+
+  return num_same_title_files;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static gboolean
 is_owner (GVfsBackendGoogle *self, GDataEntry *entry)
 {
@@ -1392,6 +1416,7 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   const gchar *summary;
   const gchar *title;
   const gchar *dummy_entry_filename;
+  gboolean will_overwrite = FALSE;
   gchar *destination_basename = NULL;
   gchar *entry_path = NULL;
   goffset size;
@@ -1436,32 +1461,40 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
       goto out;
     }
 
+  id = gdata_entry_get_id (source_entry);
   title = gdata_entry_get_title (source_entry);
   source_parent_id = gdata_entry_get_id (source_parent);
   destination_parent_id = gdata_entry_get_id (destination_parent);
 
+  g_debug ("  wants overwrite: %d\n", flags & G_FILE_COPY_OVERWRITE);
+
   existing_entry = resolve_child (self, destination_parent, destination_basename, cancellable, NULL);
   if (existing_entry != NULL)
     {
-      /* We don't support overwrites, so we don't need to care
-       * about G_IO_ERROR_IS_DIRECTORY and G_IO_ERROR_WOULD_MERGE. */
+      gint64 num_same_title_files;
+
+      num_same_title_files = count_files_in_directory_with_title (self,
+                                                                  destination_basename,
+                                                                  destination_parent);
+
+      g_debug ("  count of files with title same as destination_basename: %ld\n", num_same_title_files);
+
       if (flags & G_FILE_COPY_OVERWRITE)
         {
+          if (num_same_title_files > 1)
+            {
+              g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                        G_IO_ERROR,
+                                        G_IO_ERROR_FAILED,
+                                        _("Operation not supported"));
+              goto out;
+            }
+
           /* If the destination-basename matches that of some other entry, we
            * further check if the files have the same ID or not. If the source
            * file as well as the destination file have same ID, we fail the
-           * operation.
-           *
-           * Doing the below check allows us to support the following sequence
-           * of operations -
-           * 1. `gio copy id1 id2/foo`
-           * 2. `gio copy id1 id2/foo`
-           *
-           * Moreover, it disallows operations where foo is the real ID of some
-           * other file existing in folder with ID `id2`. Although, in-practive
-           * we can allow this operation, but later when query_info will be called,
-           * it will resolve to some other entry instead of the expected entry. */
-          if (g_strcmp0 (gdata_entry_get_id (existing_entry), destination_basename) == 0)
+           * operation. */
+          if (g_strcmp0 (gdata_entry_get_id (existing_entry), gdata_entry_get_id (source_entry)) == 0)
             {
               /* We return G_IO_ERROR_FAILED below instead of
                * G_IO_ERROR_NOT_SUPPORTED because _NOT_SUPPORTED implies that the
@@ -1479,35 +1512,116 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
                                         _("Operation not supported"));
               goto out;
             }
-          else if (g_strcmp0 (gdata_entry_get_title (existing_entry), destination_basename) == 0)
+          else if (g_strcmp0 (gdata_entry_get_id (existing_entry), destination_basename) == 0 ||
+                   g_strcmp0 (gdata_entry_get_title (existing_entry), destination_basename) == 0)
+            will_overwrite = TRUE;
+          else
             {
-              /* Case occurs when doing `gio copy ./id1 ./$TITLE$` where $TITLE$ is
-               * the title of file with ID `id1` */
-              g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                        G_IO_ERROR,
-                                        G_IO_ERROR_FAILED,
-                                        _("Operation not supported"));
-              goto out;
+              /* Neither the ID nor the title of existing_entry matches the destination_basename.
+               * This can only happen when destination_basename corresponds to the volatile entry
+               * being pointed to by some other file. We simply ignore it and let the copy
+               * operation to happen. */
             }
         }
       else
         {
-          /* If the destination_basename matches the volatile path of some
-           * other file (given by existing_entry) and if the titles are
-           * different, copy operation should be allowed. In that case, we will
-           * be having two different entries (each with different titles), but
-           * the stored volatile path (in GDataDocumentsProperty) will be same.
+          /* We just check for two conditions here (out of a total of 3 we checked above when
+           * G_FILE_COPY_OVERWRITE is specified). The first condition "num_same_title_files > 0"
+           * checks if we have multiple files with same destination_name in the destination
+           * directory, whereas the second condition specifically checks for the case when we have a
+           * file whose ID is same as that of source file (i.e. the same file with multiple
+           * parents).
            *
-           * This isn't an issue since we've already handled those extra
-           * entries in insert_entry_full().
-           */
-          if (g_strcmp0 (gdata_entry_get_title (existing_entry), title) == 0)
+           * In the case our destination_name matches the volatile entry of some other file, we
+           * simply ignore it and let the copy operation to take place. */
+          if (num_same_title_files > 0 ||
+              g_strcmp0 (gdata_entry_get_id (existing_entry), destination_basename) == 0)
             {
               g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
               goto out;
             }
         }
     }
+
+  /* For the cases like `gio copy id1 ./folder/`, the operation actually resolves to its longer form
+   * `gio copy id1 ./folder/id1`. We cater such cases differently and check if another file with the
+   * same title as that of file with real ID id1 exists in the destination folder. This check allows
+   * us to be as similar to POSIX filesystem operations as possible. This way, we can make
+   * title-based copy-overwrite operations to work in nautilus. */
+  if (g_strcmp0 (destination_basename, id) == 0)
+    {
+      existing_entry = resolve_child (self, destination_parent, title, cancellable, NULL);
+      if (existing_entry != NULL)
+        {
+          gint64 num_same_title_files;
+
+          num_same_title_files = count_files_in_directory_with_title (self, title, destination_parent);
+          g_debug ("  count of same title files: %ld\n", num_same_title_files);
+
+          if (flags & G_FILE_COPY_OVERWRITE)
+            {
+              if (num_same_title_files > 1)
+                {
+                  /* We return G_IO_ERROR_FAILED below instead of
+                   * G_IO_ERROR_NOT_SUPPORTED because _NOT_SUPPORTED implies that the
+                   * operation hasn't been implemented yet, and hence GIO takes a
+                   * fallback to perform the operation. So, for copy operation with
+                   * overwrite, it uses a (replace + read + write) fallback which in
+                   * turn overwrites the file even though we don't support overwrites.
+                   *
+                   * For a concrete case see this discussion:
+                   * https://gitlab.gnome.org/GNOME/gvfs/merge_requests/58#note_584083
+                   */
+                  g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                            G_IO_ERROR,
+                                            G_IO_ERROR_FAILED,
+                                            _("Operation not supported"));
+                  goto out;
+                }
+
+              if (GDATA_IS_DOCUMENTS_FOLDER (existing_entry))
+                {
+                  if (GDATA_IS_DOCUMENTS_FOLDER (source_entry))
+                    {
+                      g_vfs_job_failed (G_VFS_JOB (job),
+                                        G_IO_ERROR,
+                                        G_IO_ERROR_WOULD_MERGE,
+                                        _("Can’t copy directory over directory"));
+                      goto out;
+                    }
+                  else
+                    {
+                      g_vfs_job_failed (G_VFS_JOB (job),
+                                        G_IO_ERROR,
+                                        G_IO_ERROR_IS_DIRECTORY,
+                                        _("Can’t copy file over directory"));
+                      goto out;
+                    }
+                }
+
+              will_overwrite = (num_same_title_files == 1);
+            }
+          else
+            {
+              /* If the title matches the volatile path of some
+               * other file (given by existing_entry) and if the titles are
+               * different, move operation should be allowed. In that case, we will
+               * be having two different entries (each with different titles), but
+               * the stored volatile path (in GDataDocumentsProperty) will be same.
+               *
+               * This isn't an issue since we've already handled those extra
+               * entries in insert_entry_full().
+               */
+              if (num_same_title_files > 0)
+                {
+                  g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
+                  goto out;
+                }
+            }
+        }
+    }
+
+  g_debug ("  will overwrite: %d\n", will_overwrite);
 
   /* We again resolve the source_entry after checking existing_entry. This is
    * because when we try to find existing_entry, resolve_child is called which
@@ -1553,11 +1667,19 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
    * Moreover, just after copy operation, a query_info operation is performed
    * and it needs the ("Foobar (copy).pdf", destination_parent_id) -> Entry mapping
    * in the cache. Hence, we set the new entry's filename conditionally. */
-  if (g_strcmp0 (source_parent_id, destination_parent_id) != 0 &&
-      g_strcmp0 (destination_basename, id) == 0)
+  if (g_strcmp0 (destination_basename, id) == 0)
     dummy_entry_filename = gdata_entry_get_title (source_entry);
   else
-    dummy_entry_filename = destination_basename;
+    {
+      /* Case occurs when trying to overwrite an existing file using destination_basename
+       * set to ID2 in `gio copy ID1 ./folder/ID2`. We need to retain the title of the
+       * source file instead of setting dummy_entry_filename to destination_basename. */
+      if (will_overwrite && existing_entry &&
+          g_strcmp0 (gdata_entry_get_id (existing_entry), destination_basename) == 0)
+        dummy_entry_filename = title;
+      else
+        dummy_entry_filename = destination_basename;
+    }
 
   dummy_source_entry = g_object_new (source_entry_type,
                                      "etag", etag,
@@ -1617,6 +1739,55 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
   insert_entry (self, GDATA_ENTRY (new_entry));
   g_hash_table_foreach (self->monitors, emit_create_event, entry_path);
 
+  if (will_overwrite)
+    {
+      GDataDocumentsEntry *entry_to_remove = NULL;
+      guint parent_ids_len;
+      GList *parent_ids;
+      gchar *existing_entry_path = NULL;
+
+      /* The internal ref count has to be increased before removing the
+       * existing_entry since remove_entry_full calls g_object_unref() internally */
+      g_object_ref (existing_entry);
+      remove_entry (self, existing_entry);
+
+      parent_ids = get_parent_ids (self, existing_entry);
+      parent_ids_len = g_list_length (parent_ids);
+      if (parent_ids_len > 1 || !is_owner (self, GDATA_ENTRY (existing_entry)))
+        {
+          /* gdata_documents_service_remove_entry_from_folder () returns the
+           * updated entry variable provided as argument with an increased ref.
+           * The ref count after the next line shall be 2. */
+          entry_to_remove = gdata_documents_service_remove_entry_from_folder (self->service,
+                                                                              GDATA_DOCUMENTS_ENTRY (existing_entry),
+                                                                              GDATA_DOCUMENTS_FOLDER (destination_parent),
+                                                                              cancellable,
+                                                                              &error);
+        }
+      else
+        {
+          GDataAuthorizationDomain *auth_domain;
+
+          auth_domain = gdata_documents_service_get_primary_authorization_domain ();
+          gdata_service_delete_entry (GDATA_SERVICE (self->service), auth_domain, existing_entry, cancellable, &error);
+        }
+
+      if (error != NULL)
+        {
+          sanitize_error (&error);
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          g_clear_object (&entry_to_remove);
+          goto out;
+        }
+
+      existing_entry_path = g_build_path ("/", parent_path, gdata_entry_get_id (existing_entry), NULL);
+      g_hash_table_foreach (self->monitors, emit_delete_event, existing_entry_path);
+
+      g_object_unref (existing_entry);
+      g_clear_object (&entry_to_remove);
+    }
+
   size = gdata_documents_entry_get_file_size (new_entry);
   g_vfs_job_progress_callback (size, size, job);
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1654,8 +1825,8 @@ g_vfs_backend_google_move (GVfsBackend           *_self,
   GDataLink *source_parent_link = NULL;
   GDataLink *destination_parent_link = NULL;
   GError *error = NULL;
+  gboolean will_overwrite = FALSE;
   const gchar *source_id;
-  const gchar *volatile_entry_id;
   const gchar *source_parent_id;
   const gchar *destination_parent_id;
   const gchar *title;
@@ -1708,90 +1879,198 @@ g_vfs_backend_google_move (GVfsBackend           *_self,
   source_parent_id = gdata_entry_get_id (source_parent);
   destination_parent_id = gdata_entry_get_id (destination_parent);
   title = gdata_entry_get_title (source_entry);
-
-  /* We disallow over-writes to the same file in the same parent directory
-   * since Drive doesn't have any notion of "over-writing" a file. For the
-   * cases like renaming a file using `gio move id1 new_title`, we check using
-   * the below condition, and later update the title of the file conditionally. */
-  if (g_strcmp0 (source_parent_id, destination_parent_id) == 0 &&
-      g_strcmp0 (destination_basename, title) == 0)
-    {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
-      goto out;
-    }
-
   auth_domain = gdata_documents_service_get_primary_authorization_domain ();
 
-  existing_entry = resolve_child (self, destination_parent, source_id, cancellable, NULL);
-  if (existing_entry != NULL && g_strcmp0 (destination_parent_id, source_parent_id) != 0)
-    {
-      DirEntriesKey *key = dir_entries_key_new (source_id, destination_parent_id);
-
-      /* We need to check if the real ID of source_entry being moved clashes with some,
-       * other entry's volatile ID or not. This happens when we're trying to move an entry
-       * but there already exists some tuple (source_id, destination_parent_id) in the
-       * dir_entries hash table. Here, the already present key corresponds to the
-       * volatile_entry_id of some previously copied file. This can happen for the
-       * following operations:
-       *
-       * 1. `gio copy ./id1 ./id2/`                   ("id2" is the real ID of a folder)
-       * 2. `gio move ./id1 ./id2/`
-       *
-       * The first copy operation will create a volatile entry in the
-       * cache i.e. (id1, id2) -> NewEntry. The subsequent move operation will see that there
-       * already exists a tuple (id1, id2), and hence this case will happen. If
-       * volatile_entry_id != NULL, we simply ignore the case and allow the operation
-       * to happen. */
-      if ((volatile_entry_id = get_volatile_entry_id (self, source_entry, key)) == NULL)
-        {
-          /* This case happens when a file has multiple parents and we're trying to
-           * perform a move operation from one parent to another parent (where the
-           * file already exists). Such operation simply doesn't makes sense
-           * since moving the same file here and there has no consequence.
-           * Hence, we return _EXISTS. */
-          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
-          goto out;
-        }
-    }
+  g_debug ("  wants overwrite: %d\n", flags & G_FILE_COPY_OVERWRITE);
 
   existing_entry = resolve_child (self, destination_parent, destination_basename, cancellable, NULL);
   if (existing_entry != NULL)
     {
-      const gchar *existing_entry_id = gdata_entry_get_id (existing_entry);
+      const gchar *existing_entry_id;
+      gint64 num_same_title_files;
 
-      /* If the destination-basename matches that of some other entry, we
-       * further check if the files have the same ID or not. If the source
-       * file as well as the destination file have same ID, we fail the
-       * operation.
+      existing_entry_id = gdata_entry_get_id (existing_entry);
+      num_same_title_files = count_files_in_directory_with_title (self,
+                                                                  destination_basename,
+                                                                  destination_parent);
+
+      g_debug ("  count of files with title same as destination_basename: %ld\n", num_same_title_files);
+
+      /* We don't support overwrites, so we don't need to care
+       * about G_IO_ERROR_IS_DIRECTORY and G_IO_ERROR_WOULD_MERGE.
        *
-       * Doing the below check allows us to support the following sequence
-       * of operations -
-       * 1. `gio copy id1 id2/foo`
-       * 2. `gio move id1 id2/foo`
-       *
-       * Moreover, it disallows operations where foo is the real ID of some
-       * other file existing in folder with ID `id2`. Although, in-practive
-       * we can allow this operation, but later when query_info will be called,
-       * it will resolve to some other entry instead of the expected entry. */
-      if (g_strcmp0 (existing_entry_id, source_id) == 0 ||
-          g_strcmp0 (existing_entry_id, destination_basename) == 0)
+       * Moreover, we don't need to take care of G_IO_ERROR_WOULD_RECURSE
+       * too since changing a Folder's parent on Drive is a matter of
+       * simply changing "parents" property. We don't have to do any
+       * recursive move. */
+      if (flags & G_FILE_COPY_OVERWRITE)
         {
-          /* The reason why we're returning G_IO_ERROR_FAILED here
-           * instead of G_IO_ERROR_NOT_SUPPORTED is because _NOT_SUPPORTED
-           * implies that this operation isn't implemented and it tells GIO
-           * to use some other fallback for it.
-           * So, for move operation, it'll use a copy+delete fallback here.
-           * Since, we don't support backups, so the fallback will end up
-           * removing the source file completely without making any copy, and
-           * we lose the file. Hence, we return G_IO_ERROR_FAILED.
-           */
-          g_vfs_job_failed_literal (G_VFS_JOB (job),
+          if (num_same_title_files > 1)
+            {
+              g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                        G_IO_ERROR,
+                                        G_IO_ERROR_FAILED,
+                                        _("Operation not supported"));
+              goto out;
+            }
+
+          if (GDATA_IS_DOCUMENTS_FOLDER (existing_entry))
+            {
+              if (GDATA_IS_DOCUMENTS_FOLDER (source_entry))
+                {
+                  g_vfs_job_failed (G_VFS_JOB (job),
                                     G_IO_ERROR,
-                                    G_IO_ERROR_FAILED,
-                                    _("Operation not supported"));
-          goto out;
+                                    G_IO_ERROR_WOULD_MERGE,
+                                    _("Can’t copy directory over directory"));
+                  goto out;
+                }
+              else
+                {
+                  g_vfs_job_failed (G_VFS_JOB (job),
+                                    G_IO_ERROR,
+                                    G_IO_ERROR_IS_DIRECTORY,
+                                    _("Can’t copy file over directory"));
+                  goto out;
+                }
+            }
+
+          /* If the destination-basename matches that of some other entry, we
+           * further check if the files have the same ID or not. If the source
+           * file as well as the destination file have same ID, we fail the
+           * operation. */
+          if (g_strcmp0 (existing_entry_id, source_id) == 0)
+            {
+              g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                        G_IO_ERROR,
+                                        G_IO_ERROR_FAILED,
+                                        _("Operation not supported"));
+              goto out;
+            }
+          else if (g_strcmp0 (existing_entry_id, destination_basename) == 0)
+            {
+              if (g_strcmp0 (source_parent_id, destination_parent_id) == 0)
+                {
+                  g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                            G_IO_ERROR,
+                                            G_IO_ERROR_FAILED,
+                                            _("Operation not supported"));
+                  goto out;
+                }
+              else
+                will_overwrite = TRUE;
+            }
+          else if (g_strcmp0 (gdata_entry_get_title (existing_entry), destination_basename) == 0)
+            will_overwrite = TRUE;
+          else
+            {
+              /* Neither the ID nor the title of existing_entry matches the destination_basename.
+               * This can only happen when destination_basename corresponds to the volatile entry
+               * being pointed to by some other file. We simply ignore it and let the move
+               * operation to happen. */
+            }
+        }
+      else
+        {
+          /* We just check for two conditions here (out of a total of 3 we checked above when
+           * G_FILE_COPY_OVERWRITE is specified). The first condition "num_same_title_files > 0"
+           * checks if we have multiple files with same destination_name in the destination
+           * directory, whereas the second condition specifically checks for the case when we have a
+           * file whose ID is same as that of source file (i.e. the same file with multiple
+           * parents).
+           *
+           * In the case our destination_name matches the volatile entry of some other file, we
+           * simply ignore it and let the move operation take place. */
+          if (num_same_title_files > 0 ||
+              g_strcmp0 (gdata_entry_get_id (existing_entry), destination_basename) == 0)
+            {
+              g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
+              goto out;
+            }
         }
     }
+
+  /* For the cases like `gio move id1 ./folder/`, the operation actually resolves to its longer form
+   * `gio move id1 ./folder/id1`. We cater such cases differently and check if another file with the
+   * same title as that of file with real ID id1 exists in the destination folder. This check allows
+   * us to be as similar to POSIX filesystem operations as possible. This way, we can make
+   * title-based move-overwrite operations to work in nautilus. */
+  if (g_strcmp0 (destination_basename, source_id) == 0)
+    {
+      existing_entry = resolve_child (self, destination_parent, title, cancellable, NULL);
+      if (existing_entry != NULL)
+        {
+          gint64 num_same_title_files;
+
+          num_same_title_files = count_files_in_directory_with_title (self,
+                                                                      title,
+                                                                      destination_parent);
+
+          g_debug ("  count of same title files: %ld\n", num_same_title_files);
+
+          if (flags & G_FILE_COPY_OVERWRITE)
+            {
+              if (num_same_title_files > 1)
+                {
+                  /* We return G_IO_ERROR_FAILED below instead of
+                   * G_IO_ERROR_NOT_SUPPORTED because _NOT_SUPPORTED implies that the
+                   * operation hasn't been implemented yet, and hence GIO takes a
+                   * fallback to perform the operation. So, for copy operation with
+                   * overwrite, it uses a (replace + read + write) fallback which in
+                   * turn overwrites the file even though we don't support overwrites.
+                   *
+                   * For a concrete case see this discussion:
+                   * https://gitlab.gnome.org/GNOME/gvfs/merge_requests/58#note_584083
+                   */
+                  g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                            G_IO_ERROR,
+                                            G_IO_ERROR_FAILED,
+                                            _("Operation not supported"));
+                  goto out;
+                }
+
+              if (GDATA_IS_DOCUMENTS_FOLDER (existing_entry))
+                {
+                  if (GDATA_IS_DOCUMENTS_FOLDER (source_entry))
+                    {
+                      g_vfs_job_failed (G_VFS_JOB (job),
+                                        G_IO_ERROR,
+                                        G_IO_ERROR_WOULD_MERGE,
+                                        _("Can’t move directory over directory"));
+                      goto out;
+                    }
+                  else
+                    {
+                      g_vfs_job_failed (G_VFS_JOB (job),
+                                        G_IO_ERROR,
+                                        G_IO_ERROR_IS_DIRECTORY,
+                                        _("Can’t move file over directory"));
+                      goto out;
+                    }
+                }
+
+              will_overwrite = (num_same_title_files == 1);
+            }
+          else
+            {
+              /* If the title matches the volatile path of some
+               * other file (given by existing_entry) and if the titles are
+               * different, move operation should be allowed. In that case, we will
+               * be having two different entries (each with different titles), but
+               * the stored volatile path (in GDataDocumentsProperty) will be same.
+               *
+               * This isn't an issue since we've already handled those extra
+               * entries in insert_entry_full().
+               */
+              if (num_same_title_files > 0)
+                {
+                  g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
+                  goto out;
+                }
+            }
+        }
+    }
+
+  g_debug ("  will overwrite: %d\n", will_overwrite);
 
   /* The internal ref count has to be increased before removing the
    * source_entry since remove_entry_full calls g_object_unref() internally */
@@ -1823,7 +2102,13 @@ g_vfs_backend_google_move (GVfsBackend           *_self,
    * rare case. If you explicity wish to move the file and update the title of
    * the file to its ID, do a move + rename operation. */
   if (g_strcmp0 (destination_basename, source_id) != 0)
-    gdata_entry_set_title (source_entry, destination_basename);
+    {
+      /* When we're trying to overwrite a file using its ID, the destination_basename will be set to
+       * the ID. Instead, we want to have the title to be same as that of source entry. */
+      if (!(will_overwrite && existing_entry &&
+            g_strcmp0 (gdata_entry_get_id (existing_entry), destination_basename) == 0))
+        gdata_entry_set_title (source_entry, destination_basename);
+    }
 
   error = NULL;
   new_entry = gdata_service_update_entry (GDATA_SERVICE (self->service),
@@ -1838,6 +2123,55 @@ g_vfs_backend_google_move (GVfsBackend           *_self,
       g_error_free (error);
       g_object_unref (source_entry);
       goto out;
+    }
+
+  if (will_overwrite)
+    {
+      GDataDocumentsEntry *entry_to_remove = NULL;
+      guint parent_ids_len;
+      GList *parent_ids;
+      gchar *existing_entry_path = NULL;
+
+      /* The internal ref count has to be increased before removing the
+       * existing_entry since remove_entry_full calls g_object_unref() internally */
+      g_object_ref (existing_entry);
+      remove_entry (self, existing_entry);
+
+      parent_ids = get_parent_ids (self, existing_entry);
+      parent_ids_len = g_list_length (parent_ids);
+      if (parent_ids_len > 1 || !is_owner (self, GDATA_ENTRY (existing_entry)))
+        {
+          /* gdata_documents_service_remove_entry_from_folder () returns the
+           * updated entry variable provided as argument with an increased ref.
+           * The ref count after the next line shall be 2. */
+          entry_to_remove = gdata_documents_service_remove_entry_from_folder (self->service,
+                                                                              GDATA_DOCUMENTS_ENTRY (existing_entry),
+                                                                              GDATA_DOCUMENTS_FOLDER (destination_parent),
+                                                                              cancellable,
+                                                                              &error);
+        }
+      else
+        {
+          GDataAuthorizationDomain *auth_domain;
+
+          auth_domain = gdata_documents_service_get_primary_authorization_domain ();
+          gdata_service_delete_entry (GDATA_SERVICE (self->service), auth_domain, existing_entry, cancellable, &error);
+        }
+
+      if (error != NULL)
+        {
+          sanitize_error (&error);
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          g_clear_object (&entry_to_remove);
+          goto out;
+        }
+
+      existing_entry_path = g_build_path ("/", parent_path, gdata_entry_get_id (existing_entry), NULL);
+      g_hash_table_foreach (self->monitors, emit_delete_event, existing_entry_path);
+
+      g_object_unref (existing_entry);
+      g_clear_object (&entry_to_remove);
     }
 
   entry_path = g_build_path ("/", parent_path, gdata_entry_get_id (new_entry), NULL);
@@ -2437,6 +2771,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   gchar *destination_basename = NULL;
   gchar *entry_path = NULL;
   gchar *parent_path = NULL;
+  gchar *local_file_title = NULL;
   goffset size;
 
   g_rec_mutex_lock (&self->mutex);
@@ -2469,6 +2804,8 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
       goto out;
     }
 
+  local_file_title = g_file_info_get_attribute_as_string (info, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME);
+
   error = NULL;
   destination_parent = resolve_dir (self, destination, cancellable, &destination_basename, &parent_path, &error);
   if (error != NULL)
@@ -2481,8 +2818,19 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   existing_entry = resolve_child (self, destination_parent, destination_basename, cancellable, NULL);
   if (existing_entry != NULL)
     {
+      const gchar *existing_entry_id;
+      gint64 num_same_title_files;
+
+      existing_entry_id = gdata_entry_get_id (existing_entry);
+      num_same_title_files = count_files_in_directory_with_title (self,
+                                                                  destination_basename,
+                                                                  destination_parent);
+
+      g_debug ("  count of files with title same as destination_basename: %ld\n", num_same_title_files);
+
       if (flags & G_FILE_COPY_OVERWRITE)
         {
+
           if (GDATA_IS_DOCUMENTS_FOLDER (existing_entry))
             {
               if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
@@ -2522,12 +2870,40 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
                 }
             }
 
-          needs_overwrite = TRUE;
+          if (g_strcmp0 (local_file_title, existing_entry_id) == 0)
+            {
+              /* This corresponds to the operation when a local file has its title set to the
+               * real ID of some file, and that the local file is being pushed with the same title.
+               * We disallow such operation. */
+              g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                        G_IO_ERROR,
+                                        G_IO_ERROR_FAILED,
+                                        _("Operation not supported"));
+              goto out;
+            }
+
+          if (num_same_title_files > 1)
+            {
+              g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                        G_IO_ERROR,
+                                        G_IO_ERROR_FAILED,
+                                        _("Operation not supported"));
+              goto out;
+            }
+
+          if (num_same_title_files == 1 || g_strcmp0 (destination_basename, existing_entry_id) == 0)
+            needs_overwrite = TRUE;
         }
       else
         {
-          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
-          goto out;
+          if (num_same_title_files > 0 ||
+              g_strcmp0 (destination_basename, existing_entry_id) == 0 ||
+              g_strcmp0 (local_file_title, existing_entry_id) == 0)
+            {
+
+              g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS, _("Target file already exists"));
+              goto out;
+            }
         }
     }
   else
@@ -2558,7 +2934,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   if (needs_overwrite)
     {
       document = GDATA_DOCUMENTS_DOCUMENT (g_object_ref (existing_entry));
-      title = gdata_entry_get_title (existing_entry);
+      title = local_file_title;
 
       error = NULL;
       ostream = gdata_documents_service_update_document (self->service,
@@ -2648,6 +3024,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   g_clear_object (&new_document);
   g_clear_object (&ostream);
   g_free (destination_basename);
+  g_free (local_file_title);
   g_free (entry_path);
   g_free (parent_path);
   g_debug ("- push\n");
