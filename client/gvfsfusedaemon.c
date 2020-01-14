@@ -1363,6 +1363,14 @@ vfs_read (const gchar *path, gchar *buf, size_t size,
           if (result == 0)
             {
               result = read_stream (fh, buf, size, offset);
+
+              if (result == -ENOTSUP && offset < fh->pos)
+                {
+                  file_handle_close_stream (fh);
+                  result = setup_input_stream (file, fh);
+                  if (result == 0)
+                    result = read_stream (fh, buf, size, offset);
+                }
             }
           else
             {
