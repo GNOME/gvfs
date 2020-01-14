@@ -564,6 +564,7 @@ file_info_get_attribute_as_uint (GFileInfo *file_info, const gchar *attribute)
 
       default:
         uint_result = 0;
+        g_debug ("attribute: %s type: %d\n", attribute, attribute_type);
         g_assert_not_reached ();
         break;
     }
@@ -743,9 +744,12 @@ set_attributes_from_info (GFileInfo *file_info, struct stat *sbuf)
   sbuf->st_uid = daemon_uid;
   sbuf->st_gid = daemon_gid;
 
-  sbuf->st_mtime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
-  sbuf->st_ctime = sbuf->st_mtime;
-  sbuf->st_atime = sbuf->st_mtime;
+  if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_TIME_MODIFIED))
+    {
+      sbuf->st_mtime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
+      sbuf->st_ctime = sbuf->st_mtime;
+      sbuf->st_atime = sbuf->st_mtime;
+    }
 
   if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_TIME_CHANGED))
     sbuf->st_ctime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_CHANGED);
