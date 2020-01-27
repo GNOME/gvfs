@@ -85,6 +85,7 @@ struct _GVfsDnsSdResolver
   char **txt_records;
 
   AvahiServiceResolver *avahi_resolver;
+  guint start_avahi_resolver_id;
 };
 
 
@@ -245,6 +246,7 @@ start_avahi_resolver (gpointer user_data)
                                                          resolver);
 
 out:
+  resolver->start_avahi_resolver_id = 0;
   g_object_unref (resolver);
   return FALSE;
 }
@@ -252,10 +254,10 @@ out:
 static void
 ensure_avahi_resolver (GVfsDnsSdResolver  *resolver)
 {
-  if (resolver->avahi_resolver != NULL)
+  if (resolver->avahi_resolver != NULL || resolver->start_avahi_resolver_id != 0)
     return;
 
-  g_idle_add (start_avahi_resolver, g_object_ref (resolver));
+  resolver->start_avahi_resolver_id = g_idle_add (start_avahi_resolver, g_object_ref (resolver));
 }
 
 static void
@@ -382,6 +384,8 @@ g_vfs_dns_sd_resolver_finalize (GObject *object)
   if (resolver->avahi_resolver != NULL)
     avahi_service_resolver_free (resolver->avahi_resolver);
 
+  if (resolver->start_avahi_resolver_id != 0)
+    g_source_remove (resolver->start_avahi_resolver_id);
 
   resolvers = g_list_remove (resolvers, resolver);
 
