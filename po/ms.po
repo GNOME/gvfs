@@ -1,0 +1,2199 @@
+# Malay translation for gvfs.
+# Copyright (C) 2020 gvfs's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gvfs package.
+# abuyop <abuyop@gmail.com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gvfs master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
+"POT-Creation-Date: 2020-01-24 15:13+0000\n"
+"PO-Revision-Date: 2020-01-27 03:51+0800\n"
+"Language-Team: Pasukan Terjemahan GNOME Malaysia\n"
+"Language: ms\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Last-Translator: abuyop <abuyop@gmail.com>\n"
+"X-Generator: Poedit 2.0.6\n"
+
+#: client/gdaemonfile.c:435 client/gdaemonfile.c:2704
+msgid "Operation not supported, files on different mounts"
+msgstr "Operasi tidak disokong, fail berada pada lekap berbeza"
+
+#: client/gdaemonfile.c:1006 client/gdaemonfile.c:3052
+#: client/gvfsiconloadable.c:295 daemon/gvfsjobopenforread.c:183
+#: daemon/gvfsjobopenforwrite.c:333
+msgid "Couldn’t get stream file descriptor"
+msgstr "Tidak memperoleh penerang fail strim"
+
+#: client/gdaemonfile.c:1122 client/gdaemonfile.c:1194
+#: client/gvfsiconloadable.c:134
+msgid "Didn’t get stream file descriptor"
+msgstr "Tidak memperoleh penerang fail strim"
+
+#: client/gdaemonfile.c:1316
+#, c-format
+msgid "Invalid return value from %s"
+msgstr "Nilai dikembalikan tidak sah daripada %s"
+
+#. translators: this is an error message when there is no user visible "mount" object
+#. corresponding to a particular path/uri
+#: client/gdaemonfile.c:2166 client/gdaemonfile.c:3315
+msgid "Could not find enclosing mount"
+msgstr "Tidak dapat mencari penutup lekap"
+
+#: client/gdaemonfile.c:2198
+#, c-format
+msgid "Invalid filename %s"
+msgstr "Nama fail %s tidak sah"
+
+#: client/gdaemonfile.c:2512 client/gdaemonfile.c:2522
+#: client/gdaemonfile.c:2544 client/gdaemonvfs.c:1234 client/gdaemonvfs.c:1255
+#: client/gdaemonvfs.c:1266 client/gdaemonvfs.c:1298
+#, c-format
+msgid "Error setting file metadata: %s"
+msgstr "Ralat menetapkan fail data meta: %s"
+
+#: client/gdaemonfile.c:2513 client/gdaemonvfs.c:1256
+msgid "can’t open metadata tree"
+msgstr "tidak dapat buka pepohon data meta"
+
+#: client/gdaemonfile.c:2523 client/gdaemonvfs.c:1267
+msgid "can’t get metadata proxy"
+msgstr "tidak memperoleh proksi data meta"
+
+#: client/gdaemonfile.c:2545 client/gdaemonvfs.c:1299
+msgid "values must be string or list of strings"
+msgstr "nilai mestilah rentetan atau senarai rentetan"
+
+#. Return G_IO_ERROR_NOT_SUPPORTED instead of
+#. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
+#. * fallback copy.
+#.
+#: client/gdaemonfile.c:2696 daemon/gvfsbackendadmin.c:832
+#: daemon/gvfsbackendafc.c:2423 daemon/gvfsbackendafp.c:1781
+#: daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
+#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:3419
+#: daemon/gvfsbackenddav.c:3451 daemon/gvfsbackendftp.c:1209
+#: daemon/gvfsbackendftp.c:1257 daemon/gvfsbackendftp.c:1278
+#: daemon/gvfsbackendgoogle.c:1147 daemon/gvfsbackendgoogle.c:1180
+#: daemon/gvfsbackendgoogle.c:1195 daemon/gvfsbackendgoogle.c:1282
+#: daemon/gvfsbackendgoogle.c:1393 daemon/gvfsbackendgoogle.c:1575
+#: daemon/gvfsbackendgoogle.c:1803 daemon/gvfsbackendgoogle.c:2445
+#: daemon/gvfsbackendgoogle.c:2506 daemon/gvfsbackendgoogle.c:2529
+#: daemon/gvfsbackendgoogle.c:2615 daemon/gvfsbackendgphoto2.c:2238
+#: daemon/gvfsbackendgphoto2.c:2451 daemon/gvfsbackendgphoto2.c:2548
+#: daemon/gvfsbackendgphoto2.c:2641 daemon/gvfsbackendgphoto2.c:3250
+#: daemon/gvfsbackendgphoto2.c:3260 daemon/gvfsbackendmtp.c:2253
+#: daemon/gvfsbackendmtp.c:2444 daemon/gvfsbackendmtp.c:2527
+#: daemon/gvfsbackendmtp.c:2615 daemon/gvfsbackendmtp.c:2683
+#: daemon/gvfsbackendmtp.c:2878 daemon/gvfsbackendmtp.c:3021
+#: daemon/gvfsbackendnfs.c:2369 daemon/gvfsbackendnfs.c:2419
+#: daemon/gvfsbackendnfs.c:2545 daemon/gvfsbackendsftp.c:2154
+#: daemon/gvfsbackendsftp.c:5235 daemon/gvfsbackendsftp.c:5333
+#: daemon/gvfsbackendsftp.c:5995 daemon/gvfsbackendsftp.c:6027
+#: daemon/gvfsbackendsftp.c:6053 daemon/gvfsbackendsftp.c:6524
+#: daemon/gvfsbackendsftp.c:6586 daemon/gvfsbackendsmb.c:1700
+#: daemon/gvfsftptask.c:429 daemon/gvfsjobcloseread.c:113
+#: daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
+#: daemon/gvfsjobcreatemonitor.c:143 daemon/gvfsjobcreatemonitor.c:154
+#: daemon/gvfsjobcreatemonitor.c:177 daemon/gvfsjobcreatemonitor.c:195
+#: daemon/gvfsjobdelete.c:108 daemon/gvfsjobenumerate.c:272
+#: daemon/gvfsjobmakedirectory.c:108 daemon/gvfsjobmount.c:112
+#: daemon/gvfsjobmountmountable.c:138 daemon/gvfsjobmove.c:121
+#: daemon/gvfsjobopenforread.c:120 daemon/gvfsjobopenforwrite.c:184
+#: daemon/gvfsjobopenforwrite.c:198 daemon/gvfsjobopenforwrite.c:212
+#: daemon/gvfsjobopeniconforread.c:104 daemon/gvfsjobpollmountable.c:107
+#: daemon/gvfsjobpull.c:125 daemon/gvfsjobpush.c:125
+#: daemon/gvfsjobqueryattributes.c:145 daemon/gvfsjobqueryfsinfo.c:116
+#: daemon/gvfsjobqueryinfo.c:124 daemon/gvfsjobqueryinforead.c:125
+#: daemon/gvfsjobqueryinfowrite.c:125 daemon/gvfsjobread.c:123
+#: daemon/gvfsjobseekread.c:121 daemon/gvfsjobseekwrite.c:121
+#: daemon/gvfsjobsetattribute.c:130 daemon/gvfsjobsetdisplayname.c:111
+#: daemon/gvfsjobstartmountable.c:113 daemon/gvfsjobstopmountable.c:115
+#: daemon/gvfsjobtrash.c:107 daemon/gvfsjobtruncate.c:113
+#: daemon/gvfsjobunmountmountable.c:157 daemon/gvfsjobunmountmountable.c:172
+#: daemon/gvfsjobwrite.c:123
+msgid "Operation not supported"
+msgstr "Operasi tidak disokong"
+
+#: client/gdaemonfileinputstream.c:544 client/gdaemonfileinputstream.c:552
+#: client/gdaemonfileinputstream.c:1686 client/gdaemonfileinputstream.c:1695
+#: client/gdaemonfileoutputstream.c:495 client/gdaemonfileoutputstream.c:503
+#: client/gdaemonfileoutputstream.c:1433 client/gdaemonfileoutputstream.c:1442
+#, c-format
+msgid "Error in stream protocol: %s"
+msgstr "Ralat dalam protokol strim: %s"
+
+#: client/gdaemonfileinputstream.c:552 client/gdaemonfileinputstream.c:1695
+#: client/gdaemonfileoutputstream.c:503 client/gdaemonfileoutputstream.c:1442
+#: daemon/gvfsbackendmtp.c:2410 daemon/gvfsbackendmtp.c:2801
+msgid "End of stream"
+msgstr "Penghujung strim"
+
+#: client/gdaemonfileinputstream.c:649 client/gdaemonfileinputstream.c:802
+#: client/gdaemonfileinputstream.c:922 client/gdaemonfileinputstream.c:1173
+#: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
+#: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
+#: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
+#: daemon/gvfsbackendsftp.c:5349 daemon/gvfsbackendsmb.c:1111
+#: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
+#: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:347
+#: daemon/gvfsftptask.c:224
+msgid "Operation was cancelled"
+msgstr "Operasi telah dibatalkan"
+
+#: client/gdaemonfileinputstream.c:1355 client/gdaemonfileoutputstream.c:1035
+msgid "Seek not supported on stream"
+msgstr "Jangkau tidak disokong pada strim"
+
+#: client/gdaemonfileoutputstream.c:1204
+msgid "Truncate not supported on stream"
+msgstr "Pangkas tidak disokong pada strim"
+
+#: client/gdaemonvfs.c:780
+#, c-format
+msgid "Error while getting mount info: %s"
+msgstr "Ralat ketika mendapatkan maklumat lekap: %s"
+
+#: common/gvfsdaemonprotocol.c:358
+msgid "Invalid file info format"
+msgstr "Format maklumat fail tidak sah"
+
+#: common/gvfsdnssdresolver.c:215
+#, c-format
+msgid "Error initializing Avahi: %s"
+msgstr "Ralat mengawalkan Avahi: %s"
+
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#.
+#: common/gvfsdnssdresolver.c:1140
+#, c-format
+msgid "Error resolving “%s” service “%s” on domain “%s”"
+msgstr "Ralat meleraikan \"%s\" perkhidmatan \"%s\" pada domain \"%s\""
+
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#. * - the fourth %s refers to the required TXT keys
+#.
+#: common/gvfsdnssdresolver.c:1164
+#, c-format
+msgid ""
+"Error resolving “%s” service “%s” on domain “%s”. One or more TXT records "
+"are missing. Keys required: “%s”."
+msgstr ""
+"Ralat meleraikan \"%s\" perkhidmatan \"%s\" pada domain \"%s\". Satu atau "
+"lebih rekod TXT telah hilang. Kuci diperlukan: \"%s\"."
+
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#.
+#: common/gvfsdnssdresolver.c:1179
+#, c-format
+msgid "Timed out resolving “%s” service “%s” on domain “%s”"
+msgstr ""
+"Had masa meleraikan \"%s\" perkhidmatan \"%s\" pada domain \"%s\" telah tamat"
+
+#: common/gvfsdnssdresolver.c:1219
+msgid "Error initializing Avahi resolver"
+msgstr "Ralat mengawalkan pelearai Avahi"
+
+#: common/gvfsdnssdutils.c:233 common/gvfsdnssdutils.c:263
+#: common/gvfsdnssdutils.c:280
+#, c-format
+msgid "Malformed DNS-SD encoded_triple “%s”"
+msgstr "\"%s\" encoded_triple DNSSD telah cacat"
+
+#: common/gvfsicon.c:250
+#, c-format
+msgid "Can’t handle version %d of GVfsIcon encoding"
+msgstr "Tidak dapat mengendalikan versi %d bagi pengekodan GVfsIcon"
+
+#: common/gvfsicon.c:260
+msgid "Malformed input data for GVfsIcon"
+msgstr "Data input cacat bagi GVSIcon"
+
+#. translators: This is the default daemon's application name,
+#. * the %s is the type of the backend, like "FTP"
+#: daemon/daemon-main.c:100
+#, c-format
+msgid "%s File System Service"
+msgstr "Perkhidmatan Sistem Fail %s"
+
+#: daemon/daemon-main.c:178
+#, c-format
+msgid "Error: %s"
+msgstr "Ralat: %s"
+
+#: daemon/daemon-main.c:236
+#, c-format
+msgid "Usage: %s --spawner dbus-id object_path"
+msgstr "Penggunaan: %s --spawner dbus-id object_path"
+
+#: daemon/daemon-main.c:260 daemon/daemon-main.c:278
+#, c-format
+msgid "Usage: %s key=value key=value …"
+msgstr "Penggunaan: %s key=value key=value …"
+
+#: daemon/daemon-main.c:276
+msgid "No mount type specified"
+msgstr "Tiada jenis lekap ditentukan"
+
+#: daemon/daemon-main.c:308
+#, c-format
+msgid "mountpoint for %s already running"
+msgstr "titik lekap untuk %s sudah dijalankan"
+
+#: daemon/daemon-main.c:337
+msgid "error starting mount daemon"
+msgstr "ralat ketika memulakan daemon lekap"
+
+#: daemon/gvfsafpconnection.c:787
+msgid "The connection is not opened"
+msgstr "Sambungan tidak terbuka"
+
+#: daemon/gvfsafpconnection.c:794
+msgid "The connection is closed"
+msgstr "Sambungan telah ditutup"
+
+#: daemon/gvfsafpconnection.c:897
+msgid "Got EOS"
+msgstr "Dapat EOS"
+
+#: daemon/gvfsafpconnection.c:1060 daemon/gvfsafpconnection.c:1102
+#: daemon/gvfsftptask.c:397
+msgid "Host closed connection"
+msgstr "Hos menutup sambungan"
+
+#: daemon/gvfsafpconnection.c:1521
+msgid "Connection unexpectedly went down"
+msgstr "Sambungan terputus tanpa jangka"
+
+#: daemon/gvfsafpconnection.c:1548
+msgid "Got unexpected end of stream"
+msgstr "Dapat penghujung strim tidak jangka"
+
+#. Translators: %d is a constant, currently hardcoded to 256
+#: daemon/gvfsafpserver.c:195 daemon/gvfsafpserver.c:477
+#, c-format
+msgid "The server doesn’t support passwords longer than %d character."
+msgid_plural "The server doesn’t support passwords longer than %d characters."
+msgstr[0] "Pelayan tidak menyokong kata laluan lebih panjang dari %d aksara."
+msgstr[1] "Pelayan tidak menyokong kata laluan lebih panjang dari %d aksara."
+
+#: daemon/gvfsafpserver.c:221 daemon/gvfsafpserver.c:530
+msgid "An invalid username was provided."
+msgstr "Nama pengguna tidak sah disediakan."
+
+#: daemon/gvfsafpserver.c:390
+#, c-format
+msgid "Unable to login to the server “%s” with the given password."
+msgstr ""
+"Tidak boleh mendaftar masuk ke pelayan '%s\" dengan kata laluan diberikan."
+
+#: daemon/gvfsafpserver.c:425 daemon/gvfsafpserver.c:647
+#: daemon/gvfsafpserver.c:823 daemon/gvfsafpserver.c:871
+#: daemon/gvfsafpserver.c:987 daemon/gvfsafpserver.c:1664
+#, c-format
+msgid "Unable to connect to the server “%s”. A communication problem occurred."
+msgstr "Tidak boleh bersambung ke pelayan \"%s\". Masalah komunikasi berlaku."
+
+#: daemon/gvfsafpserver.c:620
+#, c-format
+msgid "Unable to connect to the server “%s” with the given password."
+msgstr "Tidak boleh bersambung ke pelayan '%s\" dengan kata laluan diberikan."
+
+#: daemon/gvfsafpserver.c:673 daemon/gvfsafpserver.c:698
+#, c-format
+msgid "The server “%s” doesn’t support anonymous access."
+msgstr "Pelayan \"%s\" tidak menyokong capaian awanama."
+
+#: daemon/gvfsafpserver.c:726
+#, c-format
+msgid ""
+"Unable to connect to the server “%s”. No suitable authentication mechanism "
+"was found."
+msgstr ""
+"Tidak boleh bersambung ke pelayan \"%s\". Tiada mekanisma pengesahihan yang "
+"sesuai ditemui."
+
+#: daemon/gvfsafpserver.c:801
+#, c-format
+msgid ""
+"Unable to connect to the server “%s”. The server doesn’t support AFP version "
+"3.0 or later."
+msgstr ""
+"Tidak boleh bersambung ke pelayan \"%s\". Pelayan tidak menyokong versi AFP "
+"3.0 atau yang terkemudian."
+
+#: daemon/gvfsafpserver.c:912
+#, c-format
+msgid "Permission denied."
+msgstr "Keizinan dinafikan."
+
+#: daemon/gvfsafpserver.c:917
+#, c-format
+msgid "The command is not supported by the server."
+msgstr "Perintah tidak disokong oleh pelayan."
+
+#: daemon/gvfsafpserver.c:921
+#, c-format
+msgid "Your password has expired."
+msgstr "Kata laluan anda sudah luput."
+
+#: daemon/gvfsafpserver.c:925
+#, c-format
+msgid "Your password needs to be changed."
+msgstr "Kata laluan anda perlu diubah."
+
+#. translators: %s here is the hostname
+#: daemon/gvfsafpserver.c:1068
+#, c-format
+msgid "Enter your password for the server “%s”."
+msgstr "Masukkan kata laluan anda untuk pelayan \"%s\"."
+
+#. translators: %s here is the hostname
+#: daemon/gvfsafpserver.c:1071
+#, c-format
+msgid "Enter your name and password for the server “%s”."
+msgstr "Masukkan kata laluan anda untuk pelayan \"%s\"."
+
+#: daemon/gvfsafpserver.c:1103
+msgid "The password prompt was cancelled."
+msgstr "Makluman kata laluan telah dibatalkan."
+
+#: daemon/gvfsafpserver.c:1221
+msgid "Unable to disconnect from the server."
+msgstr "Tidak boleh putuskan daripada pelayan."
+
+#: daemon/gvfsafpserver.c:1362 daemon/gvfsafpserver.c:1738
+msgid "Unable to connect to the server. A communication problem occurred."
+msgstr "Tidak boleh bersambung ke pelayan. Masalah komunikasi telah berlaku."
+
+#: daemon/gvfsafpserver.c:1697
+msgid "Identification not found."
+msgstr "Pengenalan tidak ditemui."
+
+#: daemon/gvfsafputils.c:124
+#, c-format
+msgid "Got error “%s” from server"
+msgstr "Dapat ralat \"%s\" daripada pelayan"
+
+#: daemon/gvfsafputils.c:127
+#, c-format
+msgid "Got unknown error code %d from server"
+msgstr "Dapat kod ralat %d yang tidak diketahui dari pelayan"
+
+#: daemon/gvfsafpvolume.c:136
+msgid "Volume doesn’t exist"
+msgstr "Volum tidak wujud"
+
+#. Translators: first %s is volumename and second servername
+#: daemon/gvfsafpvolume.c:158
+#, c-format
+msgid "Couldn’t load %s on %s"
+msgstr "Tidak dapat memuatkan %s pada %s"
+
+#: daemon/gvfsafpvolume.c:394 daemon/gvfsafpvolume.c:655
+#: daemon/gvfsafpvolume.c:799 daemon/gvfsafpvolume.c:980
+#: daemon/gvfsafpvolume.c:1164 daemon/gvfsafpvolume.c:1339
+#: daemon/gvfsafpvolume.c:1491 daemon/gvfsafpvolume.c:1913
+#: daemon/gvfsafpvolume.c:2034 daemon/gvfsafpvolume.c:2189
+#: daemon/gvfsafpvolume.c:2402 daemon/gvfsbackendadmin.c:141
+#: daemon/gvfsbackendgoogle.c:212 daemon/gvfsbackendsftp.c:346
+#: daemon/gvfsbackendsftp.c:1124 daemon/gvfsbackendsftp.c:2156
+#: daemon/gvfsftptask.c:437
+#, c-format
+msgid "Permission denied"
+msgstr "Keizinan dinafikan"
+
+#: daemon/gvfsafpvolume.c:398 daemon/gvfsafpvolume.c:1652
+#: daemon/gvfsafpvolume.c:2406 daemon/gvfsbackendafc.c:217
+#: daemon/gvfsbackendafc.c:1127 daemon/gvfsbackendafpbrowse.c:180
+#: daemon/gvfsbackendafpbrowse.c:312 daemon/gvfsbackendafpbrowse.c:344
+#: daemon/gvfsbackendarchive.c:738 daemon/gvfsbackendarchive.c:793
+#: daemon/gvfsbackendarchive.c:845 daemon/gvfsbackendarchive.c:874
+#: daemon/gvfsbackendcdda.c:908 daemon/gvfsbackendcomputer.c:639
+#: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:795
+#: daemon/gvfsbackendftp.c:1189 daemon/gvfsbackendmtp.c:1718
+#: daemon/gvfsbackendmtp.c:1734 daemon/gvfsbackendmtp.c:2134
+#: daemon/gvfsbackendmtp.c:2197 daemon/gvfsbackendmtp.c:2264
+#: daemon/gvfsbackendmtp.c:2626 daemon/gvfsbackendmtp.c:2905
+#: daemon/gvfsbackendmtp.c:3048 daemon/gvfsbackendnetwork.c:697
+#: daemon/gvfsbackendsmbbrowse.c:1109 daemon/gvfsbackendsmbbrowse.c:1176
+#: daemon/gvfsbackendsmbbrowse.c:1358 daemon/gvfsbackendsmbbrowse.c:1431
+#, c-format
+msgid "File doesn’t exist"
+msgstr "Fail tidak wujud"
+
+#: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2410
+#: daemon/gvfsbackendafp.c:289 daemon/gvfsbackendafp.c:492
+#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2402
+#: daemon/gvfsbackenddav.c:3065 daemon/gvfsbackenddav.c:3345
+#: daemon/gvfsbackendftp.c:832 daemon/gvfsbackendnfs.c:2477
+#: daemon/gvfsbackendsftp.c:2666 daemon/gvfsbackendsftp.c:3441
+#: daemon/gvfsbackendsftp.c:3769 daemon/gvfsbackendsftp.c:4838
+#: daemon/gvfsbackendsftp.c:5877
+msgid "File is directory"
+msgstr "Fail merupakan direktori"
+
+#: daemon/gvfsafpvolume.c:406
+msgid "Too many files open"
+msgstr "Terlalu banyak fail terbuka"
+
+#: daemon/gvfsafpvolume.c:659 daemon/gvfsafpvolume.c:807
+msgid "Target file is open"
+msgstr "Fail sasaran telah dibuka"
+
+#: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:221
+#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2792
+#: daemon/gvfsbackendgoogle.c:1375 daemon/gvfsbackendsftp.c:2150
+msgid "Directory not empty"
+msgstr "Direktori tidak kosong"
+
+#: daemon/gvfsafpvolume.c:667
+msgid "Target object is marked as not deletable (DeleteInhibit)"
+msgstr "Objek sasaran tidak ditanda sebagai tidak boleh padam (DeleteInhibit)"
+
+#: daemon/gvfsafpvolume.c:671 daemon/gvfsafpvolume.c:1180
+#: daemon/gvfsafpvolume.c:2038 daemon/gvfsbackendgoogle.c:218
+#, c-format
+msgid "Target object doesn’t exist"
+msgstr "Objek sasaran tidak wujud"
+
+#: daemon/gvfsafpvolume.c:675 daemon/gvfsafpvolume.c:819
+#: daemon/gvfsafpvolume.c:1002 daemon/gvfsafpvolume.c:1184
+#: daemon/gvfsafpvolume.c:2042
+msgid "Volume is read-only"
+msgstr "Volum adalah baca-sahaja"
+
+#: daemon/gvfsafpvolume.c:803 daemon/gvfsafpvolume.c:984
+#: daemon/gvfsafpvolume.c:1503 daemon/gvfsafpvolume.c:1917
+#: daemon/gvfsafpvolume.c:2534
+msgid "Not enough space on volume"
+msgstr "Ruang dalam volum tidak mencukupi"
+
+#: daemon/gvfsafpvolume.c:811 daemon/gvfsafpvolume.c:1355
+#: daemon/gvfsafpvolume.c:1507 daemon/gvfsbackendafp.c:296
+#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2457
+#: daemon/gvfsbackenddav.c:2753 daemon/gvfsbackenddav.c:2861
+#: daemon/gvfsbackenddav.c:2998 daemon/gvfsbackenddav.c:3074
+#: daemon/gvfsbackenddav.c:3112 daemon/gvfsbackenddav.c:3336
+#: daemon/gvfsbackendftp.c:811 daemon/gvfsbackendftp.c:999
+#: daemon/gvfsbackendftp.c:1509 daemon/gvfsbackendftp.c:1617
+#: daemon/gvfsbackendgoogle.c:1200 daemon/gvfsbackendgoogle.c:1599
+#: daemon/gvfsbackendgoogle.c:1881 daemon/gvfsbackendgoogle.c:2534
+#: daemon/gvfsbackendmtp.c:1621 daemon/gvfsbackendmtp.c:1664
+#: daemon/gvfsbackendnfs.c:2487 daemon/gvfsbackendsftp.c:4847
+#: daemon/gvfsbackendsmb.c:2095
+msgid "Target file already exists"
+msgstr "Fail sasaran sudah wujud"
+
+#: daemon/gvfsafpvolume.c:815 daemon/gvfsafpvolume.c:994
+msgid "Ancestor directory doesn’t exist"
+msgstr "Direktori moyang tidak wujud"
+
+#. Translators: flat means volume doesn't support directories
+#. (all files are in the volume root)
+#: daemon/gvfsafpvolume.c:990
+msgid "Volume is flat and doesn’t support directories"
+msgstr "Volum adalah rata dan tidak menyokong direktori"
+
+#: daemon/gvfsafpvolume.c:998
+msgid "Target directory already exists"
+msgstr "Direktori sasaran sudah wujud"
+
+#: daemon/gvfsafpvolume.c:1168 daemon/gvfsbackendafp.c:604
+msgid "Can’t rename volume"
+msgstr "Tidak dapat menamakan semula volum"
+
+#: daemon/gvfsafpvolume.c:1172
+msgid "Object with that name already exists"
+msgstr "Objek dengan nama tersebut sudah wujud"
+
+#: daemon/gvfsafpvolume.c:1176
+msgid "Target object is marked as not renameable (RenameInhibit)"
+msgstr ""
+"Objek sasaran tidak ditanda sebagai tidak boleh dinamakan semula "
+"(RenameInhibit)"
+
+#: daemon/gvfsafpvolume.c:1343
+msgid "Can’t move directory into one of its descendants"
+msgstr "Tidak dapat mengalihkan direktori ke dalam salah satu keturunannya"
+
+#: daemon/gvfsafpvolume.c:1347
+msgid "Can’t move sharepoint into a shared directory"
+msgstr "Tidak dapat mengalih titik kongsi ke dalam satu direktori terkongsi"
+
+#: daemon/gvfsafpvolume.c:1351
+msgid "Can’t move a shared directory into the Trash"
+msgstr "Tidak dapat mengalih satu direktori terkongsi ke dalam Tong Sampah"
+
+#: daemon/gvfsafpvolume.c:1359
+msgid "Object being moved is marked as not renameable (RenameInhibit)"
+msgstr ""
+"Objek yang dialih telah ditanda sebagai tidak boleh dinamakan semula "
+"(RenameInhibit)"
+
+#: daemon/gvfsafpvolume.c:1363
+msgid "Object being moved doesn’t exist"
+msgstr "Objek yang sedang dialih tidak wujud"
+
+#: daemon/gvfsafpvolume.c:1495
+msgid "Server doesn’t support the FPCopyFile operation"
+msgstr "Pelayan tidak menyokong operasi FPCopyFile"
+
+#: daemon/gvfsafpvolume.c:1499
+msgid "Unable to open source file for reading"
+msgstr "Tidak boleh membuka fail sumber untuk pembacaan"
+
+#: daemon/gvfsafpvolume.c:1511
+msgid "Source file and/or destination directory doesn’t exist"
+msgstr "Fail sumber dan/atau direktori destinasi tidak wujud"
+
+#: daemon/gvfsafpvolume.c:1515
+msgid "Source file is a directory"
+msgstr "Fail sumber merupakan direktori"
+
+#. Translators: range conflict means
+#. requested data are locked by another user
+#: daemon/gvfsafpvolume.c:1923
+msgid "Range lock conflict exists"
+msgstr "Konflik julat kunci wujud"
+
+#: daemon/gvfsafpvolume.c:2193 daemon/gvfsbackendmtp.c:1444
+#: daemon/gvfsbackendmtp.c:1469 daemon/gvfsbackendmtp.c:1672
+#: daemon/gvfsbackendmtp.c:2034 daemon/gvfsbackendmtp.c:2551
+#: daemon/gvfsbackendmtp.c:2946 daemon/gvfsbackendmtp.c:3082
+msgid "Directory doesn’t exist"
+msgstr "Direktori tidak wujud"
+
+#: daemon/gvfsafpvolume.c:2197
+msgid "Target object is not a directory"
+msgstr "Objek sasaran bukanlah direktori"
+
+#: daemon/gvfsafpvolume.c:2530
+msgid "File is not open for write access"
+msgstr "Fail tidak dibuka untuk capaian tulis"
+
+#: daemon/gvfsafpvolume.c:2538
+msgid "File is locked by another user"
+msgstr "Fail dikunci oleh pengguna lain"
+
+#: daemon/gvfsafpvolume.c:2670
+msgid "File is not open for read access"
+msgstr "Fail tidak dibuka untuk capaian baca"
+
+#: daemon/gvfsbackendadmin.c:926 daemon/gvfsbackendarchive.c:639
+#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:1903
+#: daemon/gvfsbackendgoogle.c:1702 daemon/gvfsbackendhttp.c:256
+#: daemon/gvfsbackendsmb.c:585
+msgid "Invalid mount spec"
+msgstr "Spesifikasi lekap tidak sah"
+
+#: daemon/gvfsbackendafc.c:213
+msgid "Internal Apple File Control error"
+msgstr "Ralat Kawalan Fail Apple Dalaman"
+
+#: daemon/gvfsbackendafc.c:225
+msgid "The device did not respond"
+msgstr "Peranti tidak memberi respons"
+
+#: daemon/gvfsbackendafc.c:229
+msgid "The connection was interrupted"
+msgstr "Sambungan telah disampuk"
+
+#: daemon/gvfsbackendafc.c:233
+msgid "Invalid Apple File Control data received"
+msgstr "Data Kawalan Fail Apple yang tidak sah diterima"
+
+#: daemon/gvfsbackendafc.c:237
+#, c-format
+msgid "Unhandled Apple File Control error (%d)"
+msgstr "Ralat Kawalan Fail Apple Tidak Boleh Dikendalikan (%d)"
+
+#: daemon/gvfsbackendafc.c:253
+msgid "Listing applications installed on device failed"
+msgstr "Penyenaraian aplikasi terpasang dalam peranti gagal"
+
+#: daemon/gvfsbackendafc.c:269
+msgid "Accessing application icons on device failed"
+msgstr "Pencapaian ikon aplikasi pada peranti gagal"
+
+#: daemon/gvfsbackendafc.c:291
+msgid "Lockdown Error: Invalid Argument"
+msgstr "Ralat Lockdown: Argumen Tidak Sah"
+
+#: daemon/gvfsbackendafc.c:295
+msgid "The device is password protected"
+msgstr "Peranti dilindungi kata laluan"
+
+#: daemon/gvfsbackendafc.c:299
+msgid "Unable to connect"
+msgstr "Tidak boleh menyambung"
+
+#: daemon/gvfsbackendafc.c:303
+msgid "User refused to trust this computer"
+msgstr "Pengguna tidak mempercayai komputer ini"
+
+#: daemon/gvfsbackendafc.c:307
+msgid "The user has not trusted this computer"
+msgstr "Pengguna tidak mempercayai komputer ini"
+
+#: daemon/gvfsbackendafc.c:311
+#, c-format
+msgid "Unhandled Lockdown error (%d)"
+msgstr "Ralat Lockdown tidak boleh-kendali (%d)"
+
+#: daemon/gvfsbackendafc.c:328
+msgid "libimobiledevice Error: Invalid Argument"
+msgstr "Ralat libimobiledevice: Argumen Tidak Sah"
+
+#: daemon/gvfsbackendafc.c:332
+msgid ""
+"libimobiledevice Error: No device found. Make sure usbmuxd is set up "
+"correctly."
+msgstr ""
+"Ralat libimobiledevice: Tiada peranti ditemui. Pastikan usbmuxd ditetapkan "
+"dengan betul."
+
+#: daemon/gvfsbackendafc.c:336
+#, c-format
+msgid "Unhandled libimobiledevice error (%d)"
+msgstr "Ralat libimobiledevice tidak boleh-kendali (%d)"
+
+#: daemon/gvfsbackendafc.c:457
+msgid "Try again"
+msgstr "Cuba lagi"
+
+#: daemon/gvfsbackendafc.c:457 daemon/gvfsbackend.c:1025
+#: monitor/udisks2/gvfsudisks2mount.c:750
+msgid "Cancel"
+msgstr "Batal"
+
+#: daemon/gvfsbackendafc.c:474 daemon/gvfsbackendafc.c:505
+msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
+msgstr "Lokasi AFC tidak sah: mestilah dalam bentuk afc://uuid:port-number"
+
+#: daemon/gvfsbackendafc.c:491
+#, c-format
+msgid "Apple Mobile Device"
+msgstr "Peranti Mudah Alih Apple"
+
+#: daemon/gvfsbackendafc.c:496
+#, c-format
+msgid "Apple Mobile Device, Jailbroken"
+msgstr "Peranti Mudah Alih Apple, Dipecah Masuk"
+
+#: daemon/gvfsbackendafc.c:501
+#, c-format
+msgid "Documents on Apple Mobile Device"
+msgstr "Dokumen pada Peranti Mudah Alih Apple"
+
+#. translators:
+#. * This is the device name, with the service being browsed in brackets, eg.:
+#. * Alan Smithee's iPhone (jailbreak)
+#: daemon/gvfsbackendafc.c:559
+#, c-format
+msgid "%s (jailbreak)"
+msgstr "%s (dipecah masuk)"
+
+#. translators:
+#. * This is "Documents on foo" where foo is the device name, eg.:
+#. * Documents on Alan Smithee's iPhone
+#: daemon/gvfsbackendafc.c:566 monitor/afc/afcvolume.c:176
+#, c-format
+msgid "Documents on %s"
+msgstr "Dokumen pada %s"
+
+#. translators:
+#. * %s is the device name. 'Try again' is the caption of the button
+#. * shown in the dialog which is defined above.
+#: daemon/gvfsbackendafc.c:640
+#, c-format
+msgid ""
+"The device “%s” is locked. Enter the passcode on the device and click “Try "
+"again”."
+msgstr ""
+"Peranti \"%s\" telah dikunci. Masukkan kod laluan pada peranti dan klik "
+"\"Cuba lagi\"."
+
+#. translators:
+#. * %s is the device name. 'Try again' is the caption of the button
+#. * shown in the dialog which is defined above. 'Trust' is the caption
+#. * of the button shown in the device.
+#: daemon/gvfsbackendafc.c:648
+#, c-format
+msgid ""
+"The device “%s” is not trusted yet. Select “Trust” on the device and click "
+"“Try again”."
+msgstr ""
+"Peranti “%s” tidak dipercayai lagi. Pilih “Percaya” pada peranti dan klik "
+"“Cuba lagi”."
+
+#: daemon/gvfsbackendafc.c:1116 daemon/gvfsbackendarchive.c:746
+#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2257
+#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2286
+#: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:126
+#: daemon/gvfsbackendsmb.c:675 daemon/gvfsbackendtrash.c:234
+msgid "Can’t open directory"
+msgstr "Tidak dapat membuka direktori"
+
+#: daemon/gvfsbackendafc.c:1336 daemon/gvfsbackendafc.c:2590
+#: daemon/gvfsbackendafp.c:1270 daemon/gvfsbackendafp.c:1359
+#: daemon/gvfsbackenddav.c:2897 daemon/gvfsbackendftp.c:1461
+#: daemon/gvfsbackendsftp.c:3654 daemon/gvfsbackendsftp.c:3830
+msgid "Backups not supported"
+msgstr "Sandar tidak disokong"
+
+#: daemon/gvfsbackendafc.c:1498 daemon/gvfsbackendsmb.c:728
+#: daemon/gvfsbackendsmb.c:1207
+msgid "Unsupported seek type"
+msgstr "Jenis jangkau tidak disokong"
+
+#: daemon/gvfsbackendafpbrowse.c:208 daemon/gvfsbackendcomputer.c:958
+#: daemon/gvfsbackendcomputer.c:1053 daemon/gvfsbackendcomputer.c:1159
+#: daemon/gvfsbackendcomputer.c:1249 daemon/gvfsbackendcomputer.c:1322
+#: daemon/gvfsbackendcomputer.c:1391 daemon/gvfsbackendsmbbrowse.c:1104
+#: daemon/gvfsbackendsmbbrowse.c:1150
+msgid "Not a mountable file"
+msgstr "Bukan satu fail boleh lekap"
+
+#. Translators: first %s is username and second serververname
+#. Translators: first %s is volumename and second servername
+#. Translators: the first %s is the username, the second the host name
+#. Translators: This is "<mount point> on <host>" and is used as name for an NFS mount
+#. Translators: This is the name of an SFTP share, like "<user> on <hostname>"
+#. Set the mountspec according to original uri, no matter whether user changes
+#. credentials during mount loop. Nautilus and other gio clients depend
+#. on correct mountspec, setting it to real (different) credentials would
+#. lead to G_IO_ERROR_NOT_MOUNTED errors
+#.
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: daemon/gvfsbackendafpbrowse.c:446 daemon/gvfsbackendafp.c:2104
+#: daemon/gvfsbackendftp.c:681 daemon/gvfsbackendnfs.c:290
+#: daemon/gvfsbackendsftp.c:2011 daemon/gvfsbackendsmb.c:444
+#: daemon/gvfsbackendsmb.c:1379
+#, c-format
+msgid "%s on %s"
+msgstr "%s pada %s"
+
+#. Translators: %s is the servername
+#: daemon/gvfsbackendafpbrowse.c:450
+#, c-format
+msgid "%s"
+msgstr "%s"
+
+#: daemon/gvfsbackendafpbrowse.c:483 daemon/gvfsbackendafp.c:2139
+#: daemon/gvfsbackendarchive.c:628 daemon/gvfsbackendftp.c:723
+#: daemon/gvfsbackendnfs.c:197 daemon/gvfsbackendsftp.c:2063
+msgid "No hostname specified"
+msgstr "Tiada nama hos dinyatakan"
+
+#: daemon/gvfsbackendafpbrowse.c:567 daemon/gvfsbackendafp.c:2234
+msgid "Apple Filing Protocol Service"
+msgstr "Perkhidmatan Protokol Pengisian Apple"
+
+#: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:877
+#: daemon/gvfsbackenddav.c:3060 daemon/gvfsbackendftp.c:1609
+#: daemon/gvfsbackendgoogle.c:1845
+msgid "Can’t copy directory over directory"
+msgstr "Tidak dapat menyalin direktori ke atas direktori"
+
+#: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:893
+#: daemon/gvfsbackenddav.c:3089 daemon/gvfsbackendftp.c:1632
+#: daemon/gvfsbackendgoogle.c:1211 daemon/gvfsbackendgoogle.c:1872
+#: daemon/gvfsbackendgoogle.c:1892 daemon/gvfsbackendmtp.c:1612
+#: daemon/gvfsbackendmtp.c:1627
+msgid "Can’t recursively copy directory"
+msgstr "Tidak dapat menyalin direktori secara rekursif"
+
+#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2937
+#: daemon/gvfsbackendnfs.c:2471 daemon/gvfsbackendsftp.c:4833
+#: daemon/gvfsbackendsmb.c:2084
+msgid "Can’t move directory over directory"
+msgstr "Tidak dapat mengalih direktori ke atas direktori"
+
+#: daemon/gvfsbackendafp.c:1284
+#, c-format
+msgid "Unable to create temporary file (%s)"
+msgstr "Tidak boleh mencipta fail sementara (%s)"
+
+#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2538
+#: daemon/gvfsbackendnfs.c:1177 daemon/gvfsbackendsftp.c:3784
+#: daemon/gvfsbackendsmb.c:1080
+msgid "The file was externally modified"
+msgstr "Fail telah diubah suai secara dalaman"
+
+#: daemon/gvfsbackendafp.c:1765 daemon/gvfsbackendftp.c:1250
+#: daemon/gvfsbackendsftp.c:5297
+msgid "Invalid attribute type (uint32 expected)"
+msgstr "Jenis atribut tidak sah (uint32 dijangka)"
+
+#. Translators: first %s is volumename, second username and third servername
+#: daemon/gvfsbackendafp.c:2099
+#, c-format
+msgid "%s for %s on %s"
+msgstr "%s untuk %s pada %s"
+
+#: daemon/gvfsbackendafp.c:2148
+msgid "No volume specified"
+msgstr "Tiada volum dinyatakan"
+
+#. Translators: This is the name of the root in a mounted archive file,
+#. e.g. "/ in archive.tar.gz" for a file with the name "archive.tar.gz"
+#: daemon/gvfsbackendarchive.c:350
+#, c-format
+msgid "/ in %s"
+msgstr "/ dalam %s"
+
+#: daemon/gvfsbackendarchive.c:883 daemon/gvfsbackendburn.c:681
+#: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
+#: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:798
+#: daemon/gvfsbackendgoogle.c:1299 daemon/gvfsbackendgoogle.c:1482
+#: daemon/gvfsbackendnetwork.c:745 daemon/gvfsbackendsftp.c:4323
+#: daemon/gvfsftpdircache.c:157
+#, c-format
+msgid "The file is not a directory"
+msgstr "Fail bukanlah satu direktori"
+
+#. Translators: This is the name of the backend
+#: daemon/gvfsbackendburn.c:346
+msgid "Burn"
+msgstr "Rakam"
+
+#: daemon/gvfsbackendburn.c:372
+msgid "Unable to create temporary directory"
+msgstr "Tidak boleh mencipta direktori sementara"
+
+#: daemon/gvfsbackendburn.c:401 daemon/gvfsbackendburn.c:412
+#: daemon/gvfsbackendburn.c:447 daemon/gvfsbackendburn.c:673
+#: daemon/gvfsbackendburn.c:718 daemon/gvfsbackendburn.c:744
+#: daemon/gvfsbackendburn.c:782 daemon/gvfsbackendburn.c:854
+#: daemon/gvfsbackendburn.c:973 daemon/gvfsbackendburn.c:1009
+#: daemon/gvfsbackendftp.c:852 daemon/gvfsbackendgoogle.c:709
+#: daemon/gvfsbackendgphoto2.c:938 daemon/gvfsbackendgphoto2.c:1869
+#: daemon/gvfsbackendgphoto2.c:2588 daemon/gvfsbackendrecent.c:110
+#: daemon/gvfsbackendrecent.c:293 daemon/gvfsbackendsftp.c:2158
+#: daemon/gvfsbackendsftp.c:3318 daemon/gvfsbackendsftp.c:3331
+#: daemon/gvfsbackendsftp.c:3351 daemon/gvfsbackendtrash.c:218
+#, c-format
+msgid "No such file or directory"
+msgstr "Tiada fail atau direktori sebegitu"
+
+#: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:905
+#: daemon/gvfsbackendgoogle.c:1853
+msgid "Can’t copy file over directory"
+msgstr "Tidak dapat menyalin fail ke atas direktori"
+
+#. Translators: this is the display name of the backend
+#: daemon/gvfsbackendburn.c:652
+msgid "CD/DVD Creator"
+msgstr "Pencipta CD/DVD"
+
+#: daemon/gvfsbackendburn.c:754 daemon/gvfsbackendburn.c:790
+#: daemon/gvfsbackendburn.c:925 daemon/gvfsbackendburn.c:987
+#: daemon/gvfsbackendburn.c:991 daemon/gvfsbackendburn.c:1001
+#: daemon/gvfsbackendgphoto2.c:2662
+msgid "File exists"
+msgstr "Fail telah wujud"
+
+#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:2975
+#: daemon/gvfsbackendsftp.c:2152 daemon/gvfsbackendsftp.c:5013
+msgid "Target file exists"
+msgstr "Fail sasaran sudah wujud"
+
+#: daemon/gvfsbackend.c:890 daemon/gvfsjobunmount.c:197
+#: daemon/gvfsjobunmount.c:264
+msgid "File system is busy"
+msgstr "Sistem fail sibuk"
+
+#: daemon/gvfsbackend.c:1024 monitor/udisks2/gvfsudisks2mount.c:748
+msgid "Unmount Anyway"
+msgstr "Nyahlekap Jua"
+
+#: daemon/gvfsbackend.c:1027 monitor/udisks2/gvfsudisks2mount.c:751
+msgid ""
+"Volume is busy\n"
+"One or more applications are keeping the volume busy."
+msgstr ""
+"Volum sibuk\n"
+"Satu atau lebih aplikasi yang menyebabkan volum sibuk."
+
+#: daemon/gvfsbackendcdda.c:290 daemon/gvfsbackendgphoto2.c:1289
+#: daemon/gvfsbackendmtp.c:884
+msgid "Cannot create gudev client"
+msgstr "Tidak dapat mencipta klien gudev"
+
+#: daemon/gvfsbackendcdda.c:304 daemon/gvfsbackendcdda.c:385
+msgid "No drive specified"
+msgstr "Tiada pacu dinyatakan"
+
+#: daemon/gvfsbackendcdda.c:323
+#, c-format
+msgid "Cannot find drive %s"
+msgstr "Tidak dapat mencari pemacu %s"
+
+#: daemon/gvfsbackendcdda.c:336
+#, c-format
+msgid "Drive %s does not contain audio files"
+msgstr "Pacu %s tidak mengandungi fail audio"
+
+#. Translator: %s is the device the disc is inserted into. 'cdda' is the name
+#. name of the backend and shouldn't be translated.
+#: daemon/gvfsbackendcdda.c:346
+#, c-format
+msgid "cdda mount on %s"
+msgstr "lekapan cdda pada %s"
+
+#: daemon/gvfsbackendcdda.c:347 daemon/gvfsbackendcdda.c:872
+#: monitor/udisks2/gvfsudisks2volume.c:392
+#, c-format
+msgid "Audio Disc"
+msgstr "Cakera Audio"
+
+#: daemon/gvfsbackendcdda.c:411
+#, c-format
+msgid "File system is busy: %d open file"
+msgid_plural "File system is busy: %d open files"
+msgstr[0] "Sistem fail sibuk: %d fail terbuka"
+msgstr[1] "Sistem fail sibuk: %d fail terbuka"
+
+#: daemon/gvfsbackendcdda.c:607
+#, c-format
+msgid "No such file %s on drive %s"
+msgstr "Tiada fail %s sebegitu pada pemacu %s"
+
+#. Translators: paranoia is the name of the cd audio reading library
+#: daemon/gvfsbackendcdda.c:716
+#, c-format
+msgid "Error from “paranoia” on drive %s"
+msgstr "Ralat dari \"paranoia\" dalam pemacu %s"
+
+#: daemon/gvfsbackendcdda.c:779
+#, c-format
+msgid "Error seeking in stream on drive %s"
+msgstr "Ralat menjangkau strim dalam pemacu %s"
+
+#: daemon/gvfsbackendcdda.c:901 daemon/gvfsbackendgphoto2.c:1556
+#, c-format
+msgid "No such file"
+msgstr "Tiada fail sebegitu"
+
+#: daemon/gvfsbackendcdda.c:915
+#, c-format
+msgid "The file does not exist or isn’t an audio track"
+msgstr "Fail tidak wujud atau bukanlah sebuah trek audio"
+
+#: daemon/gvfsbackendcdda.c:1021
+msgid "Audio CD File System Service"
+msgstr "Perkhidmatan Sistem Fail CD Audio"
+
+#: daemon/gvfsbackendcomputer.c:198 daemon/gvfsbackendcomputer.c:771
+msgid "Computer"
+msgstr "Komputer"
+
+#: daemon/gvfsbackendcomputer.c:532
+msgid "File System"
+msgstr "Sistem Fail"
+
+#: daemon/gvfsbackendcomputer.c:661
+msgid "Can’t open mountable file"
+msgstr "Tidak dapat membuka fail boleh lekap"
+
+#: daemon/gvfsbackendcomputer.c:858
+#, c-format
+msgid "Internal error: %s"
+msgstr "Ralat dalaman: %s"
+
+#: daemon/gvfsbackendcomputer.c:890 daemon/gvfsbackendcomputer.c:1008
+msgid "Can’t mount file"
+msgstr "Tidak melekapkan fail"
+
+#: daemon/gvfsbackendcomputer.c:901
+msgid "No medium in the drive"
+msgstr "Tiada media di dalam pemacu"
+
+#: daemon/gvfsbackendcomputer.c:1072
+msgid "Can’t unmount file"
+msgstr "Tidak dapat menyahlekap fail"
+
+#: daemon/gvfsbackendcomputer.c:1202
+msgid "Can’t eject file"
+msgstr "Tidak dapat melentingkan fail"
+
+#: daemon/gvfsbackendcomputer.c:1269 daemon/gvfsbackendcomputer.c:1276
+msgid "Can’t start drive"
+msgstr "Tidak dapat memulakan pemacu"
+
+#: daemon/gvfsbackendcomputer.c:1342 daemon/gvfsbackendcomputer.c:1349
+msgid "Can’t stop drive"
+msgstr "Tidak dapat menghentikan pemacu"
+
+#: daemon/gvfsbackendcomputer.c:1406 daemon/gvfsbackendcomputer.c:1413
+msgid "Can’t poll file"
+msgstr "Tidak dapat meninjau fail"
+
+#. Translators: This is the name of the WebDAV share constructed as
+#. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
+#. the second %s and only shown if it is not the default http(s) port.
+#: daemon/gvfsbackenddav.c:503
+#, c-format
+msgid "%s on %s%s"
+msgstr "%s pada %s%s"
+
+#: daemon/gvfsbackenddav.c:708 daemon/gvfsbackenddav.c:2073
+#: daemon/gvfsbackendhttp.c:202
+#, c-format
+msgid "HTTP Error: %s"
+msgstr "Ralat HTTP: %s"
+
+#: daemon/gvfsbackenddav.c:725
+msgid "Could not parse response"
+msgstr "Tidak dapat menghuraikan respons"
+
+#: daemon/gvfsbackenddav.c:734
+msgid "Empty response"
+msgstr "Respons kosong"
+
+#: daemon/gvfsbackenddav.c:742
+msgid "Unexpected reply from server"
+msgstr "Balas tidak jangka daripada pelayan"
+
+#: daemon/gvfsbackenddav.c:1444 daemon/gvfsbackenddav.c:2200
+#: daemon/gvfsbackenddav.c:2292 daemon/gvfsbackenddav.c:2394
+msgid "Response invalid"
+msgstr "Respons tidak sah"
+
+#: daemon/gvfsbackenddav.c:1589
+msgid "WebDAV share"
+msgstr "Perkongsian WebDAV"
+
+#. translators: %s here is the hostname
+#. Translators: %s is the hostname
+#: daemon/gvfsbackenddav.c:1591 daemon/gvfsbackendftp.c:533
+#: daemon/gvfsbackendsftp.c:1173
+#, c-format
+msgid "Enter password for %s"
+msgstr "Masukkan kata laluan untuk %s"
+
+#: daemon/gvfsbackenddav.c:1594
+msgid "Please enter proxy password"
+msgstr "Sila masukkan kata laluan proksi"
+
+#: daemon/gvfsbackenddav.c:2059
+msgid "Not a WebDAV enabled share"
+msgstr "Bukan satu perkongsian yang dibenarkan WebDAV"
+
+#: daemon/gvfsbackenddav.c:2081
+msgid "Could not find an enclosing directory"
+msgstr "Tidak dapat mencari direktori tertutup"
+
+#: daemon/gvfsbackenddav.c:2154 daemon/gvfsbackenddav.c:2247
+#: daemon/gvfsbackenddav.c:2320 daemon/gvfsbackenddav.c:2428
+msgid "Could not create request"
+msgstr "Tidak boleh mencipta permintaan"
+
+#: daemon/gvfsbackenddav.c:2569 daemon/gvfsbackendftp.c:1102
+#: daemon/gvfsbackendgoogle.c:2609 daemon/gvfsbackendnfs.c:941
+#: daemon/gvfsbackendnfs.c:964 daemon/gvfsbackendnfs.c:990
+#: daemon/gvfsbackendnfs.c:1390 daemon/gvfsbackendsmb.c:1116
+#: daemon/gvfsbackendsmb.c:2112
+msgid "Backup file creation failed"
+msgstr "Penciptaan fail sandar gagal"
+
+#: daemon/gvfsbackenddav.c:2942
+msgid "Can’t move over directory"
+msgstr "Tidak dapat mengalih ke atas direktori"
+
+#: daemon/gvfsbackenddav.c:3211
+msgid "File length changed during transfer"
+msgstr "Panjang fail berubah semasa pemindahan"
+
+#: daemon/gvfsbackenddnssd.c:521 daemon/gvfsbackendnetwork.c:462
+msgid "Local Network"
+msgstr "Rangkaian Setempat"
+
+#: daemon/gvfsbackenddnssd.c:776 daemon/gvfsbackendnetwork.c:852
+msgid "Can’t monitor file or directory."
+msgstr "Tidak dapat memantau fail atau direktori."
+
+#. TODO: Names, etc
+#: daemon/gvfsbackenddnssd.c:794
+msgid "Dns-SD"
+msgstr "Dns-SD"
+
+#: daemon/gvfsbackenddnssd.c:795 daemon/gvfsbackendnetwork.c:784
+#: daemon/gvfsbackendnetwork.c:932 daemon/gvfsbackendnetwork.c:933
+msgid "Network"
+msgstr "Rangkaian"
+
+#. Translators: the first %s is the username, the second the host name
+#: daemon/gvfsbackendftp.c:530 daemon/gvfsbackendsftp.c:1166
+#, c-format
+msgid "Enter password for %s on %s"
+msgstr "Masukkan kata laluan untuk %s pada %s"
+
+#: daemon/gvfsbackendftp.c:560 daemon/gvfsbackendsftp.c:1190
+#: daemon/gvfsbackendsmbbrowse.c:1004 daemon/gvfsbackendsmb.c:540
+msgid "Password dialog cancelled"
+msgstr "Dialog kata laluan dibatalkan"
+
+#: daemon/gvfsbackendftp.c:786
+msgid "Insufficient permissions"
+msgstr "Keizinan tidak mencukupi"
+
+#: daemon/gvfsbackendgoogle.c:1751 daemon/gvfsbackendgoogle.c:2279
+#: daemon/gvfsbackendgphoto2.c:1589
+msgid "Error getting data from file"
+msgstr "Ralat mendapatkan data dari fail"
+
+#: daemon/gvfsbackendgoogle.c:1862 daemon/gvfsbackendgoogle.c:2643
+#: daemon/gvfsbackendnfs.c:1162
+msgid "Target file is not a regular file"
+msgstr "Fail sasaran bukan fail nalar"
+
+#: daemon/gvfsbackendgoogle.c:2264 daemon/gvfsbackendsftp.c:2331
+#: daemon/gvfsbackendsftp.c:2733 daemon/gvfsbackendsftp.c:2796
+#: daemon/gvfsbackendsftp.c:2807 daemon/gvfsbackendsftp.c:2865
+#: daemon/gvfsbackendsftp.c:2958 daemon/gvfsbackendsftp.c:3010
+#: daemon/gvfsbackendsftp.c:3065 daemon/gvfsbackendsftp.c:3144
+#: daemon/gvfsbackendsftp.c:3261 daemon/gvfsbackendsftp.c:3394
+#: daemon/gvfsbackendsftp.c:3478 daemon/gvfsbackendsftp.c:3554
+#: daemon/gvfsbackendsftp.c:3566 daemon/gvfsbackendsftp.c:3626
+#: daemon/gvfsbackendsftp.c:3668 daemon/gvfsbackendsftp.c:3856
+#: daemon/gvfsbackendsftp.c:3890 daemon/gvfsbackendsftp.c:3948
+#: daemon/gvfsbackendsftp.c:4010 daemon/gvfsbackendsftp.c:4081
+#: daemon/gvfsbackendsftp.c:4356 daemon/gvfsbackendsftp.c:4427
+#: daemon/gvfsbackendsftp.c:4562 daemon/gvfsbackendsftp.c:4672
+#: daemon/gvfsbackendsftp.c:4734 daemon/gvfsbackendsftp.c:4771
+#: daemon/gvfsbackendsftp.c:4799 daemon/gvfsbackendsftp.c:4913
+#: daemon/gvfsbackendsftp.c:4969 daemon/gvfsbackendsftp.c:5010
+#: daemon/gvfsbackendsftp.c:5046 daemon/gvfsbackendsftp.c:5082
+#: daemon/gvfsbackendsftp.c:5097 daemon/gvfsbackendsftp.c:5112
+#: daemon/gvfsbackendsftp.c:5207 daemon/gvfsbackendsftp.c:5275
+#: daemon/gvfsbackendsftp.c:5480 daemon/gvfsbackendsftp.c:5517
+#: daemon/gvfsbackendsftp.c:5591 daemon/gvfsbackendsftp.c:5677
+#: daemon/gvfsbackendsftp.c:5761 daemon/gvfsbackendsftp.c:5804
+#: daemon/gvfsbackendsftp.c:5808 daemon/gvfsbackendsftp.c:5925
+#: daemon/gvfsbackendsftp.c:5929 daemon/gvfsbackendsftp.c:6166
+#: daemon/gvfsbackendsftp.c:6379 daemon/gvfsbackendsftp.c:6396
+#: daemon/gvfsbackendsftp.c:6530 daemon/gvfsbackendsftp.c:6558
+msgid "Invalid reply received"
+msgstr "Balas tidak sah diterima"
+
+#: daemon/gvfsbackendgoogle.c:2270
+msgid "File is not a regular file"
+msgstr "Fail bukan sebuah fail nalar"
+
+#: daemon/gvfsbackendgoogle.c:2635 daemon/gvfsbackendnfs.c:1152
+msgid "Target file is a directory"
+msgstr "Fail sasaran adalah direktori"
+
+#: daemon/gvfsbackendgoogle.c:2828 daemon/gvfsbackendgphoto2.c:3050
+msgid "Error writing file"
+msgstr "Ralat menulis fail"
+
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:479
+#, c-format
+msgid "%s: %d: Directory or file exists"
+msgstr "%s: %d: Fail atau direktori wujud"
+
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:486
+#, c-format
+msgid "%s: %d: No such file or directory"
+msgstr "%s: %d: Tiada fail atau direktori sebegitu"
+
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:492
+#, c-format
+msgid "%s: %d: Invalid filename"
+msgstr "%s: %d: Nama fail tidak sah"
+
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:498
+#, c-format
+msgid "%s: %d: Not Supported"
+msgstr "%s: %d: Tidak Disokong"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: daemon/gvfsbackendgphoto2.c:687
+#, c-format
+msgid "Digital Camera (%s)"
+msgstr "Kamera Digital (%s)"
+
+#: daemon/gvfsbackendgphoto2.c:1256 daemon/gvfsbackendmtp.c:855
+msgid "Couldn’t find matching udev device."
+msgstr "Tidak dapat mencari peranti udev yang sepadan."
+
+#: daemon/gvfsbackendgphoto2.c:1319
+msgid "Cannot create gphoto2 context"
+msgstr "Tidak dapat mencipta konteks gphoto2"
+
+#: daemon/gvfsbackendgphoto2.c:1328
+msgid "Error creating camera"
+msgstr "Ralat mencipta kamera"
+
+#: daemon/gvfsbackendgphoto2.c:1340 daemon/gvfsbackendgphoto2.c:1349
+msgid "Error loading device information"
+msgstr "Ralat memuatkan maklumat peranti"
+
+#: daemon/gvfsbackendgphoto2.c:1360
+msgid "Error looking up device information"
+msgstr "Ralat mencari maklumat peranti"
+
+#: daemon/gvfsbackendgphoto2.c:1369
+msgid "Error getting device information"
+msgstr "Ralat mendapatkan maklumat"
+
+#: daemon/gvfsbackendgphoto2.c:1383
+msgid "Error setting up camera communications port"
+msgstr "Ralat menetapkan port komunikasi kamera"
+
+#: daemon/gvfsbackendgphoto2.c:1393
+msgid "Error initializing camera"
+msgstr "Ralat mengawalkan kamera"
+
+#. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
+#. backend and shouldn't be translated.
+#: daemon/gvfsbackendgphoto2.c:1404
+#, c-format
+msgid "gphoto2 mount on %s"
+msgstr "gphoto2 dilekap pada %s"
+
+#: daemon/gvfsbackendgphoto2.c:1502
+msgid "No camera specified"
+msgstr "Tiada kamera dinyatakan"
+
+#: daemon/gvfsbackendgphoto2.c:1564 daemon/gvfsbackendgphoto2.c:3291
+msgid "Error creating file object"
+msgstr "Ralat mencipta objek fail"
+
+#: daemon/gvfsbackendgphoto2.c:1579 daemon/gvfsbackendgphoto2.c:3322
+msgid "Error getting file"
+msgstr "Ralat mendapatkan fail"
+
+#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2374
+#, c-format
+msgid "Malformed icon identifier “%s”"
+msgstr "Pengecam ikon \"%s\" telah cacat"
+
+#: daemon/gvfsbackendgphoto2.c:1723 daemon/gvfsbackendgphoto2.c:2913
+#, c-format
+msgid "Error seeking in stream on camera %s"
+msgstr "Ralat menjangkau strim pada kamera %s"
+
+#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3321
+#: daemon/gvfsbackendsmbbrowse.c:1427
+msgid "Not a directory"
+msgstr "Bukan sebuah direktori"
+
+#: daemon/gvfsbackendgphoto2.c:1896
+msgid "Failed to get folder list"
+msgstr "Gagal memperoleh senarai folder"
+
+#: daemon/gvfsbackendgphoto2.c:1961
+msgid "Failed to get file list"
+msgstr "Gagal mendapatkan senarai fail"
+
+#: daemon/gvfsbackendgphoto2.c:2250
+msgid "Error creating directory"
+msgstr "Ralat mencipta direktori"
+
+#: daemon/gvfsbackendgphoto2.c:2463
+msgid "Name already exists"
+msgstr "Nama telah wujud"
+
+#: daemon/gvfsbackendgphoto2.c:2474 daemon/gvfsbackendgphoto2.c:3142
+msgid "New name too long"
+msgstr "Nama baharu terlalu panjang"
+
+#: daemon/gvfsbackendgphoto2.c:2484 daemon/gvfsbackendgphoto2.c:3153
+msgid "Error renaming directory"
+msgstr "Ralat menamakan semula direktori"
+
+#: daemon/gvfsbackendgphoto2.c:2497 daemon/gvfsbackendgphoto2.c:3166
+msgid "Error renaming file"
+msgstr "Ralat menamakan semula fail"
+
+#: daemon/gvfsbackendgphoto2.c:2561
+#, c-format
+msgid "Directory “%s” is not empty"
+msgstr "Direktori \"%s\" tidak kosong"
+
+#: daemon/gvfsbackendgphoto2.c:2572
+msgid "Error deleting directory"
+msgstr "Ralat memadam direktori"
+
+#: daemon/gvfsbackendgphoto2.c:2598 daemon/gvfsbackendgphoto2.c:3343
+msgid "Error deleting file"
+msgstr "Ralat memadam fail"
+
+#: daemon/gvfsbackendgphoto2.c:2651
+msgid "Can’t write to directory"
+msgstr "Tidak dapat menulis ke direktori"
+
+#: daemon/gvfsbackendgphoto2.c:2698
+msgid "Cannot allocate new file to append to"
+msgstr "Tidak dapat peruntuk fail baharu yang akan ditambah"
+
+#: daemon/gvfsbackendgphoto2.c:2713
+msgid "Cannot read file to append to"
+msgstr "Tidak dapat membaca fail untuk ditambahkan"
+
+#: daemon/gvfsbackendgphoto2.c:2724
+msgid "Cannot get data of file to append to"
+msgstr "Tidak dapat fail data untuk ditambahkan"
+
+#: daemon/gvfsbackendgphoto2.c:3098
+msgid "Not supported (not same directory)"
+msgstr "Tidak disokong (tidak berada dalam direktori yang sama)"
+
+#: daemon/gvfsbackendgphoto2.c:3110
+msgid ""
+"Not supported (the source is a directory, the destination is a directory too)"
+msgstr ""
+"Tidak disokong (sumber merupakan direktori, destinasi adalah alat direktori "
+"juga)"
+
+#: daemon/gvfsbackendgphoto2.c:3118
+msgid ""
+"Not supported (the source is a directory, but the destination is an existing "
+"file)"
+msgstr ""
+"Tidak disokong (sumber merupakan direktori, tetapi destinasi adalah fail "
+"sedia ada)"
+
+#: daemon/gvfsbackendgphoto2.c:3130
+msgid ""
+"Not supported (the source is a file, but the destination is a directory)"
+msgstr "Tidak disokong (sumber merupakan fail, destinasi adalah direktori)"
+
+#: daemon/gvfsbackendhttp.c:198
+#, c-format
+msgid "HTTP Client Error: %s"
+msgstr "Ralat Klien Pelayan HTML: %s"
+
+#: daemon/gvfsbackendlocaltest.c:860
+msgid "Directory notification not supported"
+msgstr "Pemberitahuan direktori tidak disokong"
+
+#: daemon/gvfsbackendmtp.c:564
+msgid "Unknown error."
+msgstr "Ralat tidak diketahui."
+
+#: daemon/gvfsbackendmtp.c:570
+#, c-format
+msgid "libmtp error: %s"
+msgstr "ralat libmtp: %s"
+
+#: daemon/gvfsbackendmtp.c:876
+msgid "No device specified"
+msgstr "Tiada peranti dinyatakan"
+
+#: daemon/gvfsbackendmtp.c:1022
+msgid "No MTP devices found"
+msgstr "Tiada peranti MTP ditemui"
+
+#: daemon/gvfsbackendmtp.c:1027
+msgid "Unable to connect to MTP device"
+msgstr "Tidak boleh sambung ke peranti MTP"
+
+#: daemon/gvfsbackendmtp.c:1032
+msgid "Unable to allocate memory while detecting MTP devices"
+msgstr "Tidak dapat peruntuk ingatan ketika mengesan peranti MTP"
+
+#: daemon/gvfsbackendmtp.c:1038
+msgid "Generic libmtp error"
+msgstr "Ralat libmtp generik"
+
+#: daemon/gvfsbackendmtp.c:1051
+#, c-format
+msgid "Unable to open MTP device “%03u,%03u”"
+msgstr "Tidak boleh membuka peranti MTP “%03u,%03u”"
+
+#: daemon/gvfsbackendmtp.c:1068
+msgid "Device not found"
+msgstr "Peranti tidak ditemui"
+
+#: daemon/gvfsbackendmtp.c:1372 daemon/gvfsbackendmtp.c:1480
+#: daemon/gvfsbackendmtp.c:1532
+msgid "File not found"
+msgstr "Fail tidak ditemui"
+
+#: daemon/gvfsbackendmtp.c:1602
+msgid "Target is a directory"
+msgstr "Sasaran adalah sebuah direktori"
+
+#: daemon/gvfsbackendmtp.c:1607
+msgid "Can’t merge directories"
+msgstr "Tidak dapat menggabungkan direktori"
+
+#: daemon/gvfsbackendmtp.c:1653
+msgid "Cannot make directory in this location"
+msgstr "Tidak dapat membuat direktori dalam lokasi ini"
+
+#: daemon/gvfsbackendmtp.c:1723 daemon/gvfsbackendmtp.c:2139
+#: daemon/gvfsbackendmtp.c:2202 daemon/gvfsbackendmtp.c:2269
+#: daemon/gvfsbackendmtp.c:2631 daemon/gvfsbackendmtp.c:2697
+#: daemon/gvfsbackendmtp.c:2910 daemon/gvfsbackendmtp.c:3053
+#: daemon/gvfsbackendsmbbrowse.c:1172
+msgid "Not a regular file"
+msgstr "Bukan sebuah fail nalar"
+
+#: daemon/gvfsbackendmtp.c:2011 daemon/gvfsbackendmtp.c:2543
+#: daemon/gvfsbackendmtp.c:2894 daemon/gvfsbackendmtp.c:3037
+msgid "Cannot write to this location"
+msgstr "Tidak dapat menulis ke lokasi ini"
+
+#: daemon/gvfsbackendmtp.c:2356
+#, c-format
+msgid "No thumbnail for entity “%s”"
+msgstr "Tiada lakaran kenit untuk entiti \"%s\""
+
+#: daemon/gvfsbackendnetwork.c:168
+msgid "File Sharing"
+msgstr "Perkongsian Fail"
+
+#: daemon/gvfsbackendnetwork.c:173
+msgid "Remote Login"
+msgstr "Daftar Masuk Jauh"
+
+#: daemon/gvfsbackendnetwork.c:333 daemon/gvfsbackendsmbbrowse.c:896
+msgid "Windows Network"
+msgstr "Rangkaian Windows"
+
+#. Translators: this is the friendly name of the 'network://' backend that
+#. * shows computers in your local network.
+#: daemon/gvfsbackendnetwork.c:1019
+msgid "Network Location Monitor"
+msgstr "Pemantau Lokasi Rangkaian"
+
+#: daemon/gvfsbackendnfs.c:242
+msgid "Mount point does not exist"
+msgstr "Titik lekap tidak wujud"
+
+#: daemon/gvfsbackendnfs.c:266
+msgid ""
+"Permission denied: Perhaps this host is disallowed or a privileged port is "
+"needed"
+msgstr ""
+"Keizinan dinafikan: Mungkin hos tidak diizinkan atau port khusus diperlukan"
+
+#: daemon/gvfsbackendnfs.c:1048 daemon/gvfsbackendnfs.c:1071
+#: daemon/gvfsbackendnfs.c:1119 daemon/gvfsbackendsftp.c:3704
+#: daemon/gvfsbackendsftp.c:5832
+msgid "Unable to create temporary file"
+msgstr "Tidak boleh mencipta fail sementara"
+
+#: daemon/gvfsbackendnfs.c:2377
+msgid "Invalid attribute type"
+msgstr "Jenis atribut tidak sah"
+
+#: daemon/gvfsbackendrecent.c:270
+msgid "The recent folder may not be deleted"
+msgstr "Folder baru-baru ini tidak boleh dipadamkan"
+
+#. Translators: this is the display name of the backend
+#. translators: This is the name of the backend
+#: daemon/gvfsbackendrecent.c:689 daemon/gvfsbackendrecent.c:810
+msgid "Recent"
+msgstr "Baru-baru ini"
+
+#: daemon/gvfsbackendsftp.c:337 daemon/gvfsbackendsftp.c:719
+msgid "Connection failed"
+msgstr "Sambungan gagal"
+
+#: daemon/gvfsbackendsftp.c:353
+msgid "Hostname not known"
+msgstr "Nama hos tidak diketahui"
+
+#: daemon/gvfsbackendsftp.c:360
+msgid "No route to host"
+msgstr "Tiada hala untuk hos"
+
+#: daemon/gvfsbackendsftp.c:368
+msgid "Connection refused by server"
+msgstr "Sambungan dinafikan oleh pelayan"
+
+#: daemon/gvfsbackendsftp.c:375
+msgid "Host key verification failed"
+msgstr "Pengesahan kunci hos gagal"
+
+#: daemon/gvfsbackendsftp.c:382
+msgid "Too many authentication failures"
+msgstr "Terlalu banyak pengesahihan yang gagal"
+
+#: daemon/gvfsbackendsftp.c:563
+msgid "Unable to spawn SSH program"
+msgstr "Tidak boleh hasilkan program SSH"
+
+#: daemon/gvfsbackendsftp.c:579
+#, c-format
+msgid "Unable to spawn SSH program: %s"
+msgstr "Tidak boleh hasilkan program SSH: %s"
+
+#: daemon/gvfsbackendsftp.c:681 daemon/gvfsbackendsftp.c:1057
+msgid "Timed out when logging in"
+msgstr "Masa tamat semasa mendaftar masuk"
+
+#: daemon/gvfsbackendsftp.c:933
+msgid "Log In Anyway"
+msgstr "Daftar Masuk Jua"
+
+#: daemon/gvfsbackendsftp.c:933
+msgid "Cancel Login"
+msgstr "Batal Daftar masuk"
+
+#: daemon/gvfsbackendsftp.c:948
+msgid "Login dialog cancelled"
+msgstr "Dialog daftar masuk dibatalkan"
+
+#: daemon/gvfsbackendsftp.c:967
+msgid "Can’t send host identity confirmation"
+msgstr "Tidak dapat menghantar pengesahan identiti hos"
+
+#. Translators: the first %s is the username, the second the host name
+#: daemon/gvfsbackendsftp.c:1163
+#, c-format
+msgid "Enter passphrase for secure key for %s on %s"
+msgstr "Masukkan frasa laluan untuk kunci selamat %s pada %s"
+
+#. Translators: %s is the hostname
+#: daemon/gvfsbackendsftp.c:1170
+#, c-format
+msgid "Enter passphrase for secure key for %s"
+msgstr "Masukkan frasa laluan untuk kunci selamat %s"
+
+#: daemon/gvfsbackendsftp.c:1262
+msgid "Can’t send password"
+msgstr "Tidak dapat menghantar kata laluan"
+
+#: daemon/gvfsbackendsftp.c:1278
+#, c-format
+msgid ""
+"Can’t verify the identity of “%s”.\n"
+"This happens when you log in to a computer the first time.\n"
+"\n"
+"The identity sent by the remote computer is “%s”. If you want to be "
+"absolutely sure it is safe to continue, contact the system administrator."
+msgstr ""
+"Tidak dapat mengesahkan identiti \"%s\".\n"
+"Ia berlaku ketika anda mendaftar masuk sesebuah komputer buat pertama kali.\n"
+"\n"
+"Identiti dihantar oleh komputer jauh ialah \"%s\". Jika anda mahu benar-"
+"benar pasti adalah selamat untuk teruskan, sila hubungi pentadbir sistem."
+
+#: daemon/gvfsbackendsftp.c:1305
+#, c-format
+msgid ""
+"The host key for “%s” differs from the key for the IP address “%s”\n"
+"If you want to be absolutely sure it is safe to continue, contact the system "
+"administrator."
+msgstr ""
+"Kunci hos untuk “%s” berlainan dari kunci untuk alamat IP “%s”\n"
+"Jika anda mahu pastikan sama ada selamat diteruskan, hubungi pentadbir "
+"sistem."
+
+#: daemon/gvfsbackendsftp.c:1396
+#, c-format
+msgid "The connection is closed (the underlying SSH process exited)"
+msgstr "Sambungan ditutup (SSH proses yang mendasarinya keluar)"
+
+#: daemon/gvfsbackendsftp.c:1397
+#, c-format
+msgid "Internal error: Unknown Error"
+msgstr "Ralat dalaman: Ralat tidak diketahui"
+
+#: daemon/gvfsbackendsftp.c:1911 daemon/gvfsbackendsftp.c:1938
+msgid "Protocol error"
+msgstr "Ralat protokol"
+
+#: daemon/gvfsbackendsftp.c:2053
+msgid "Unable to find supported SSH command"
+msgstr "Tida boleh mencari perintah SSH yang disokong"
+
+#: daemon/gvfsbackendsftp.c:2160
+msgid "Unknown reason"
+msgstr "Sebab tidak diketahui"
+
+#: daemon/gvfsbackendsftp.c:2590 daemon/gvfsbackendsmb.c:1386
+#: daemon/gvfsdaemonutils.c:140
+msgid " (invalid encoding)"
+msgstr " (pengekodan tidak sah)"
+
+#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
+#: daemon/gvfsbackendsftp.c:2602 daemon/gvfsftpdircache.c:431
+#, c-format
+msgid "/ on %s"
+msgstr "/ pada %s"
+
+#: daemon/gvfsbackendsftp.c:2675
+msgid "Failure"
+msgstr "Gagal"
+
+#: daemon/gvfsbackendsftp.c:3087
+#, c-format
+msgid "Error creating backup file: %s"
+msgstr "Ralat mencipta fail sandar: %s"
+
+#: daemon/gvfsbackendsftp.c:5243
+msgid "Value out of range, sftp only supports 32bit timestamps"
+msgstr "Nilai di luar julat, sftp hanya menyokong setem masa 32bit"
+
+#: daemon/gvfsbackendsftp.c:5318 daemon/gvfsbackendsmb.c:1725
+msgid "Invalid attribute type (uint64 expected)"
+msgstr "Jenis atribut tidak sah (dijangka uint64)"
+
+#. translators: %s is a server name
+#: daemon/gvfsbackendsmbbrowse.c:371
+#, c-format
+msgid "Password required for %s"
+msgstr "Kata laluan diperlukan %s"
+
+#: daemon/gvfsbackendsmbbrowse.c:798 daemon/gvfsbackendsmbbrowse.c:837
+#: daemon/gvfsbackendsmb.c:403 daemon/gvfsbackendsmb.c:430
+#: daemon/gvfsbackendsmb.c:621
+#, c-format
+msgid "Internal Error (%s)"
+msgstr "Ralat Dalaman (%s)"
+
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#: daemon/gvfsbackendsmbbrowse.c:905
+#, c-format
+msgid "Windows shares on %s"
+msgstr "Perkongsian Windows pada %s"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: daemon/gvfsbackendsmbbrowse.c:1009
+#, c-format
+msgid "Failed to retrieve share list from server: %s"
+msgstr "Gagal memperoleh senarai kongsi dari pelayan: %s"
+
+#: daemon/gvfsbackendsmbbrowse.c:1530
+msgid "Windows Network File System Service"
+msgstr "Perkhidmatan Sistem Fail Rangkaian Windows"
+
+#. translators: First %s is a share name, second is a server name
+#: daemon/gvfsbackendsmb.c:267
+#, c-format
+msgid "Password required for share %s on %s"
+msgstr "Kata laluan diperlukan untuk berkongsi %s pada %s"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: daemon/gvfsbackendsmb.c:545
+#, c-format
+msgid "Failed to mount Windows share: %s"
+msgstr "Gagal melekap perkongsian WIndows: %s"
+
+#: daemon/gvfsbackendsmb.c:1315
+#, c-format
+msgid "Backup file creation failed: %s"
+msgstr "Penciptaan fail sandar gagal: %s"
+
+#: daemon/gvfsbackendsmb.c:1923
+msgid "Can’t rename file, filename already exists"
+msgstr "Tidak dapat menamakan semula fail, nama fail sudah wujud"
+
+#: daemon/gvfsbackendsmb.c:1974
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "Ralat memadam fail: %s"
+
+#: daemon/gvfsbackendsmb.c:2060
+#, c-format
+msgid "Error moving file: %s"
+msgstr "Ralat mengalih fail: %s"
+
+#: daemon/gvfsbackendsmb.c:2132
+#, c-format
+msgid "Error removing target file: %s"
+msgstr "Ralat membuang fail sasaran: %s"
+
+#: daemon/gvfsbackendsmb.c:2156
+msgid "Can’t recursively move directory"
+msgstr "Tidak dapat mengalih direktori secara rekursif"
+
+#: daemon/gvfsbackendsmb.c:2202
+msgid "Windows Shares File System Service"
+msgstr "Perkhidmatan Sistem Fail Perkongsian Windows"
+
+#: daemon/gvfsbackendtrash.c:402 daemon/gvfsbackendtrash.c:461
+msgid "The trash folder may not be deleted"
+msgstr "Folder tong sampah tidak boleh dipadamkan"
+
+#: daemon/gvfsbackendtrash.c:422 daemon/gvfsbackendtrash.c:478
+msgid "Items in the trash may not be modified"
+msgstr "Item didalam tong sampah tidak boleh diubah suai"
+
+#. Translators: this is the display name of the backend
+#. translators: This is the name of the backend
+#: daemon/gvfsbackendtrash.c:780 daemon/gvfsbackendtrash.c:895
+msgid "Trash"
+msgstr "Tong Sampah"
+
+#: daemon/gvfschannel.c:336
+msgid "Channel blocked"
+msgstr "Saluran disekat"
+
+#: daemon/gvfsdaemonutils.c:251
+msgid "The signing certificate authority is not known."
+msgstr "Autoriti sijil menandatangani tidak diketahui."
+
+#: daemon/gvfsdaemonutils.c:253
+msgid "The certificate does not match the identity of the site."
+msgstr "Sijil tidak sepadan dengan identiti tapak."
+
+#: daemon/gvfsdaemonutils.c:255
+msgid "The certificate’s activation time is in the future."
+msgstr "Masa pengaktifan sijil masih di masa hadapan."
+
+#: daemon/gvfsdaemonutils.c:257
+msgid "The certificate has expired."
+msgstr "Sijil sudah tamat tempoh."
+
+#: daemon/gvfsdaemonutils.c:259
+msgid "The certificate has been revoked."
+msgstr "Sijil telah ditarik balik."
+
+#: daemon/gvfsdaemonutils.c:261
+msgid "The certificate’s algorithm is considered insecure."
+msgstr "Algoritma sijil dianggap tidak selamat."
+
+#: daemon/gvfsdaemonutils.c:263
+msgid "Error occurred when validating the certificate."
+msgstr "Ralat ketika mengesahkan sijil."
+
+#: daemon/gvfsdaemonutils.c:325
+msgid "Yes"
+msgstr "Ya"
+
+#: daemon/gvfsdaemonutils.c:325
+msgid "No"
+msgstr "Tidak"
+
+#: daemon/gvfsdaemonutils.c:335
+#, c-format
+msgid ""
+"The site’s identity can’t be verified:%s\n"
+"\n"
+"%s\n"
+"\n"
+"Are you really sure you would like to continue?"
+msgstr ""
+"Identiti tapak tidak dapat disahkan:%s\n"
+"\n"
+"%s\n"
+"\n"
+"Anda pasti mahu teruskan?"
+
+#: daemon/gvfsftpconnection.c:211
+msgid "Unexpected end of stream"
+msgstr "Penghujung strim luar jangka"
+
+#: daemon/gvfsftpconnection.c:227 daemon/gvfsftpconnection.c:240
+#: daemon/gvfsftptask.c:449 daemon/gvfsftptask.c:877
+msgid "Invalid reply"
+msgstr "Balas tidak sah"
+
+#: daemon/gvfsftpconnection.c:478
+msgid ""
+"Failed to create active FTP connection. Maybe your router does not support "
+"this?"
+msgstr ""
+"Gagal mencipta sambungan FTP aktif. Mungkin penghala anda tidak menyokongnya?"
+
+#: daemon/gvfsftpconnection.c:485
+msgid "Failed to create active FTP connection."
+msgstr "Gagal mencipta sambungan FTP aktif."
+
+#: daemon/gvfsftpfile.c:170
+msgid "Filename contains invalid characters."
+msgstr "Nama fail mengandungi aksara tidak sah."
+
+#: daemon/gvfsftptask.c:290
+msgid "The FTP server is busy. Try again later"
+msgstr "Pelayan FTP sibuk. Cuba lagi kemudian"
+
+#: daemon/gvfsftptask.c:296
+msgid "Backend currently unmounting"
+msgstr "Bahagian belakang buat masa ini dinyahlekapkan"
+
+#: daemon/gvfsftptask.c:393
+msgid "Accounts are unsupported"
+msgstr "Akaun tidak disokong"
+
+#: daemon/gvfsftptask.c:401
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr ""
+"Tidak dapat membuka sambungan data. Mungkin dinding api anda menghalangnya?"
+
+#: daemon/gvfsftptask.c:405
+msgid "Data connection closed"
+msgstr "Sambungan data ditutup"
+
+#: daemon/gvfsftptask.c:412 daemon/gvfsftptask.c:416
+msgid "Operation failed"
+msgstr "Operasi gagal"
+
+#: daemon/gvfsftptask.c:421
+msgid "No space left on server"
+msgstr "Tidak ada ruang lagi dalam pelayan"
+
+#: daemon/gvfsftptask.c:433
+msgid "Unsupported network protocol"
+msgstr "Protokol rangkaian tidak disokong"
+
+#: daemon/gvfsftptask.c:441
+msgid "Page type unknown"
+msgstr "Jenis halaman tidak diketahui"
+
+#: daemon/gvfsftptask.c:445
+msgid "Invalid filename"
+msgstr "Nama fail tidak sah"
+
+#: daemon/gvfshttpinputstream.c:292
+msgid "Error seeking in stream"
+msgstr "Ralat menjangkau dalam strim"
+
+#: daemon/gvfsjobcopy.c:147 daemon/gvfsjobdelete.c:126
+#: daemon/gvfsjobmakedirectory.c:126 daemon/gvfsjobmakesymlink.c:130
+#: daemon/gvfsjobmove.c:147 daemon/gvfsjobopenforwrite.c:236
+#: daemon/gvfsjobpush.c:152 daemon/gvfsjobsetattribute.c:152
+#: daemon/gvfsjobsetdisplayname.c:130 daemon/gvfsjobtrash.c:125
+msgid "Filesystem is read-only"
+msgstr "Sistem fail adalah baca-sahaja"
+
+#: daemon/gvfsjobmakesymlink.c:111
+msgid "Symlinks not supported by backend"
+msgstr "Symlink tidak disokong oleh bahagian belakang"
+
+#: daemon/gvfsjobsetattribute.c:99
+msgid "Invalid dbus message"
+msgstr "Mesej dbus tidak sah"
+
+#: daemon/gvfsjobunmount.c:123
+#, c-format
+msgid "%s has been unmounted\n"
+msgstr "%s telah dinyahlekap\n"
+
+#: daemon/gvfsjobunmount.c:141
+#, c-format
+msgid ""
+"Unmounting %s\n"
+"Please wait"
+msgstr ""
+"Menyahlekapkan %s\n"
+"Tunggu sebentar"
+
+#: daemon/main.c:147 metadata/meta-daemon.c:376
+msgid "Replace old daemon."
+msgstr "Ganti daemon lama."
+
+#: daemon/main.c:148
+msgid "Don’t start fuse."
+msgstr "Jangan mula mencantum."
+
+#: daemon/main.c:149
+msgid "Enable debug output."
+msgstr "Benarkan output nyahpepijat."
+
+#: daemon/main.c:150 metadata/meta-daemon.c:377
+msgid "Show program version."
+msgstr "Tunjuk versi program."
+
+#: daemon/main.c:166
+msgid "GVFS Daemon"
+msgstr "Daemon GVFS"
+
+#: daemon/main.c:169
+msgid "Main daemon for GVFS"
+msgstr "Daemon utama untuk GVFS"
+
+#. Translators: the first %s is the application name,
+#. the second %s is the error message
+#: daemon/main.c:186 metadata/meta-daemon.c:403
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: daemon/main.c:188 metadata/meta-daemon.c:405
+#, c-format
+msgid "Try “%s --help” for more information."
+msgstr "Cuba “%s --help” untuk maklumat lanjut."
+
+#: daemon/mount.c:759
+#, c-format
+msgid "Automount failed: %s"
+msgstr "Auto-lekap gagal: %s"
+
+#: daemon/mount.c:803 daemon/mount.c:879
+msgid "The specified location is not mounted"
+msgstr "Lokasi yang dinyatakan tidak terlekap"
+
+#: daemon/mount.c:808
+msgid "The specified location is not supported"
+msgstr "Lokasi yang dinyatakan tidak disokong"
+
+#: daemon/mount.c:991
+msgid "Location is already mounted"
+msgstr "Lokasi sudah dilekapkan"
+
+#: daemon/mount.c:1000
+msgid "Location is not mountable"
+msgstr "Lokasi tidak boleh lekap"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:13
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:25
+msgid "Perform file operations"
+msgstr "Buat operasi fail"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:14
+msgid "Authentication is required to run gvfsd-admin daemon"
+msgstr "Pengesahihan diperlukan untuk menjalankan daemon gvfsd-admin"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:26
+msgid "Authentication is required to perform file operations"
+msgstr "Pengesahihan diperlukan untuk membuat operasi fail"
+
+#: metadata/meta-daemon.c:170 metadata/meta-daemon.c:246
+#: metadata/meta-daemon.c:282
+#, c-format
+msgid "Can’t find metadata file %s"
+msgstr "Tidak dapat mencari fail data meta %s"
+
+#: metadata/meta-daemon.c:188 metadata/meta-daemon.c:200
+msgid "Unable to set metadata key"
+msgstr "Tidak boleh menetapkan kunci data meta"
+
+#: metadata/meta-daemon.c:210
+msgid "Unable to unset metadata key"
+msgstr "Tidak boleh menyahtetapkan kunci data meta"
+
+#: metadata/meta-daemon.c:256
+msgid "Unable to remove metadata keys"
+msgstr "Tidak boleh membuang kunci data meta"
+
+#: metadata/meta-daemon.c:293
+msgid "Unable to move metadata keys"
+msgstr "Tidak boleh mengalih kunci data meta"
+
+#: metadata/meta-daemon.c:387
+msgid "GVFS Metadata Daemon"
+msgstr "Daemon Data Meta GVFS"
+
+#: metadata/meta-daemon.c:390
+msgid "Metadata daemon for GVFS"
+msgstr "Daemon data meta untuk GVFS"
+
+#: monitor/goa/goavolume.c:208 monitor/goa/goavolume.c:247
+#, c-format
+msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
+msgstr "Gagal mendapatkan org.gnome.OnlineAccounts.Files untuk %s"
+
+#: monitor/goa/goavolume.c:278
+#, c-format
+msgid "Invalid credentials for %s"
+msgstr "Kelayakan untuk %s tidak sah"
+
+#: monitor/goa/goavolume.c:311
+#, c-format
+msgid "Unsupported authentication method for %s"
+msgstr "Kaedah pengesahihan untuk %s tidak disokong"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1037
+msgid "The given mount was not found"
+msgstr "Lekap yang diberi tidak ditemui"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1045
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1282
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1389
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1496
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1603
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1706
+msgid "An operation is already pending"
+msgstr "Satu operasi masih tertangguh"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1132
+msgid "No outstanding mount operation"
+msgstr "Tiada operasi lekap yang belum selesai"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1274
+msgid "The given volume was not found"
+msgstr "Volum yang diberi tidak ditemui"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1381
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1488
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1595
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1698
+msgid "The given drive was not found"
+msgstr "Pemacu yang diberi tidak ditemui"
+
+#: monitor/udisks2/gvfsudisks2drive.c:290
+#, c-format
+msgid "Unnamed Drive (%s)"
+msgstr "Pemacu Tidak Bernama (%s)"
+
+#: monitor/udisks2/gvfsudisks2drive.c:292
+msgid "Unnamed Drive"
+msgstr "Pemacu Tidak Bernama"
+
+#: monitor/udisks2/gvfsudisks2drive.c:624
+#, c-format
+msgid "Failed to eject medium; one or more volumes on the medium are busy."
+msgstr ""
+"Gagal melentingkan media; satu atau lebih volum dalam media masih sibuk."
+
+#: monitor/udisks2/gvfsudisks2mount.c:634
+msgid "One or more programs are preventing the unmount operation."
+msgstr "Satu atau lebih program sedang menghalang operasi nyahlekap."
+
+#. Note that the GUI (Shell, Files) currently use the term
+#. * "Eject" for both GDrive.stop() and GDrive.eject().
+#.
+#: monitor/udisks2/gvfsudisks2mount.c:744
+msgid "Eject Anyway"
+msgstr "Lenting Jua"
+
+#: monitor/udisks2/gvfsudisks2mount.c:1128
+#: monitor/udisks2/gvfsudisks2volume.c:1765
+msgid "Operation not supported by backend"
+msgstr "Operasi tidak disokong oleh bahagian belakang"
+
+#: monitor/udisks2/gvfsudisks2utils.c:345
+#, c-format
+msgid "Timed out running command-line “%s”"
+msgstr "Had masa menjalankan baris-perintah \"%s\" telah tamat"
+
+#: monitor/udisks2/gvfsudisks2utils.c:647
+#, c-format
+msgid ""
+"Unmounting %s\n"
+"Disconnecting from filesystem."
+msgstr ""
+"Menyahlekapkan %s\n"
+"Terputus daripada sistem fail."
+
+#: monitor/udisks2/gvfsudisks2utils.c:649
+#, c-format
+msgid ""
+"Writing data to %s\n"
+"Device should not be unplugged."
+msgstr ""
+"Menulis data ke %s\n"
+"Peranti sepatutnya tidak ditanggalkan."
+
+#: monitor/udisks2/gvfsudisks2utils.c:788
+#, c-format
+msgid ""
+"%s unmounted\n"
+"Filesystem has been disconnected."
+msgstr ""
+"%s telah dinyahlekap\n"
+"Sistem fail telah terputus."
+
+#: monitor/udisks2/gvfsudisks2utils.c:790
+#, c-format
+msgid ""
+"%s can be safely unplugged\n"
+"Device can be removed."
+msgstr ""
+"%s boleh ditanggalkan secara selamat\n"
+"Peranti boleh ditanggalkan."
+
+#. Translators: This is used for possibly encrypted volumes.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: monitor/udisks2/gvfsudisks2volume.c:304
+#, c-format
+msgid "%s Possibly Encrypted"
+msgstr "%s Berkemungkinan Tersulit"
+
+#. Translators: This is used for encrypted volumes.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: monitor/udisks2/gvfsudisks2volume.c:311
+#, c-format
+msgid "%s Encrypted"
+msgstr "%s Disulitkan"
+
+#. Translators: This is used for volume with no filesystem label.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: monitor/udisks2/gvfsudisks2volume.c:324
+#, c-format
+msgid "%s Volume"
+msgstr "Volum %s"
+
+#. Translators: Name used for volume
+#: monitor/udisks2/gvfsudisks2volume.c:560
+msgid "Volume"
+msgstr "Volum"
+
+#: monitor/udisks2/gvfsudisks2volume.c:1149
+#, c-format
+msgid "Error storing passphrase in keyring (%s)"
+msgstr "Ralat menyimpan frasa laluan dalam gelang kunci (%s)"
+
+#: monitor/udisks2/gvfsudisks2volume.c:1182
+#, c-format
+msgid "Error deleting invalid passphrase from keyring (%s)"
+msgstr "Ralat memadam frasa laluan tidak sah dari gelang kunci (%s)"
+
+#: monitor/udisks2/gvfsudisks2volume.c:1244
+msgid "The unlocked device does not have a recognizable file system on it"
+msgstr "Peranti nyahkunci tidak mempunyai sistem fail yang dikenali padanya"
+
+#: monitor/udisks2/gvfsudisks2volume.c:1272
+#, c-format
+msgid "Encryption passphrase for %s"
+msgstr "Penyulitan frasa laluan untuk %s"
+
+#: monitor/udisks2/gvfsudisks2volume.c:1481
+msgid "A passphrase is required to access the volume"
+msgstr "Satu frasa laluan diperlukan untuk mencapai volum"
+
+#. Translators: %s is the description of the volume that is being unlocked
+#: monitor/udisks2/gvfsudisks2volume.c:1496
+#, c-format
+msgid ""
+"Enter a passphrase to unlock the volume\n"
+"The volume %s might be a VeraCrypt volume as it contains random data."
+msgstr ""
+"Masukkan satu frasa laluan untuk menyahkunci volum\n"
+"Volum %s mungkin volum VeraCrypt kerana ia mengandungi data rawak."
+
+#. Translators: %s is the description of the volume that is being unlocked
+#: monitor/udisks2/gvfsudisks2volume.c:1501
+#, c-format
+msgid ""
+"Enter a passphrase to unlock the volume\n"
+"The passphrase is needed to access encrypted data on %s."
+msgstr ""
+"Masukkan frasa laluan untuk menyahkunci volum\n"
+"Frasa laluan perlu capai data tersulit dalam %s."
+
+#. Translators: this is used to describe the drive the encrypted media
+#. * is on - the first %s is the name (such as 'WD 2500JB External'), the
+#. * second %s is the description ('250 GB Hard Disk').
+#.
+#: monitor/udisks2/gvfsudisks2volume.c:1681
+#, c-format
+msgid "%s (%s)"
+msgstr "%s (%s)"
+
+#: monitor/udisks2/udisks2volumemonitordaemon.c:39
+msgid "GVfs UDisks2 Volume Monitor"
+msgstr "Pemantau Volum UDisks2 GVfs"
