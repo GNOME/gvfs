@@ -1,3 +1,13 @@
+Major changes in 1.43.90
+========================
+* google: Add support for move and copy operations
+* google: Several smaller bugfixes and enhancements
+* goa: Add support for certificate prompts
+* sftp: Fix file ownership when replacing
+* dnssd: Prevent crashes after releasing resolver
+* fuse: Prevent abortions if modified time is not set
+* Translation updates
+
 Major changes in 1.43.2
 =======================
 * gdbus: Add workaround for deadlocks when cancelling jobs
