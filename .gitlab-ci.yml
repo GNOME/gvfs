@@ -1,5 +1,5 @@
 fedora:
-    image: registry.gitlab.gnome.org/gnome/gvfs:$TAG
+    image: registry.gitlab.gnome.org/gnome/gvfs:latest
     tags:
         - x86_64
     script:
