@@ -1838,6 +1838,12 @@ def start_dbus():
     flags = fcntl.fcntl(dbus_daemon.stderr, fcntl.F_GETFL)
     fcntl.fcntl(dbus_daemon.stderr, fcntl.F_SETFL, flags | os.O_NONBLOCK)
 
+    # set maximal size for pipes to avoid hangs when too many debug info is printed
+    F_SETPIPE_SZ = 1031
+    pipe_max_size = int(open('/proc/sys/fs/pipe-max-size', 'r').read())
+    fcntl.fcntl(dbus_daemon.stdout, F_SETPIPE_SZ, pipe_max_size)
+    fcntl.fcntl(dbus_daemon.stderr, F_SETPIPE_SZ, pipe_max_size)
+
     return temp_home
 
 
