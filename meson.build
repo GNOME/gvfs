@@ -84,8 +84,7 @@ have_openpty = cc.has_function('openpty', dependencies: util_dep)
 config_h.set('HAVE_OPENPTY', have_openpty,
              description: 'Define if you have the openpty function.')
 
-config_h.set('HAVE_LOGIN_TTY', util_dep.found() and cc.has_function('login_tty', dependencies: util_dep),
-             description: 'Whether login_tty is available')
+config_h.set('HAVE_LOGIN_TTY', cc.has_function('login_tty', dependencies: util_dep), description: 'Whether login_tty is available')
 
 # headers
 check_headers = [
