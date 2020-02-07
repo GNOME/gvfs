@@ -6,6 +6,7 @@ fedora:
         - meson -Dinstalled_tests=true -Ddevel_utils=true -Dman=true --prefix /usr --werror build
         - sudo ninja -C build install
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
+    allow_failure: true
 
 .gnome-build-meta-template: &gnome-build-meta
     variables:
