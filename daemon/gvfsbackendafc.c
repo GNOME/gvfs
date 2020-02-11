@@ -200,40 +200,37 @@ g_vfs_backend_afc_close_connection (GVfsBackendAfc *self)
 static int
 g_vfs_backend_afc_check (afc_error_t cond, GVfsJob *job)
 {
-  GIOErrorEnum error;
-
   if (G_LIKELY(cond == AFC_E_SUCCESS))
         return 0;
 
-  error = g_io_error_from_afc_error (cond);
   switch (cond)
     {
     case AFC_E_INTERNAL_ERROR:
-      g_vfs_job_failed (job, G_IO_ERROR, error,
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Internal Apple File Control error"));
       break;
     case AFC_E_OBJECT_NOT_FOUND:
-      g_vfs_job_failed (job, G_IO_ERROR, error,
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
                         _("File doesn’t exist"));
       break;
     case AFC_E_DIR_NOT_EMPTY:
-      g_vfs_job_failed (job, G_IO_ERROR, error,
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
                         _("Directory not empty"));
       break;
     case AFC_E_OP_TIMEOUT:
-      g_vfs_job_failed (job, G_IO_ERROR, error,
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_TIMED_OUT,
                         _("The device did not respond"));
       break;
     case AFC_E_NOT_ENOUGH_DATA:
-      g_vfs_job_failed (job, G_IO_ERROR, error,
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_CLOSED,
                         _("The connection was interrupted"));
       break;
     case AFC_E_MUX_ERROR:
-      g_vfs_job_failed (job, G_IO_ERROR, error,
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Invalid Apple File Control data received"));
       break;
     default:
-      g_vfs_job_failed (job, G_IO_ERROR, error,
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Unhandled Apple File Control error (%d)"), cond);
       break;
     }
