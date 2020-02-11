@@ -161,6 +161,10 @@ g_vfs_backend_afc_check (afc_error_t cond, GVfsJob *job)
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_CLOSED,
                         _("The connection was interrupted"));
       break;
+    case AFC_E_PERM_DENIED:
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                        _("Permission denied"));
+      break;
     case AFC_E_MUX_ERROR:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Invalid Apple File Control data received"));
