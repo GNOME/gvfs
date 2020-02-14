@@ -332,7 +332,9 @@ gvfs_accept_certificate (GMountSource *mount_source,
 
   certificate_str = certificate_to_string (certificate);
   reason = certificate_flags_to_string (errors);
-  message = g_strdup_printf (_("The site’s identity can’t be verified:"
+
+  /* Translators: The first %s is the reason why verification failed, the second a certificate */
+  message = g_strdup_printf (_("Identity Verification Failed\n"
                                "%s\n\n"
                                "%s\n\n"
                                "Are you really sure you would like to continue?"),

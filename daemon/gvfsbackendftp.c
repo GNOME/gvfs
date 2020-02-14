@@ -527,10 +527,10 @@ restart:
         {
           if (ftp->has_initial_user)
             /* Translators: the first %s is the username, the second the host name */
-            prompt = g_strdup_printf (_("Enter password for %s on %s"), ftp->user, ftp->host_display_name);
+            prompt = g_strdup_printf (_("Authentication Required\nEnter password for “%s” on “%s”:"), ftp->user, ftp->host_display_name);
           else
-            /* translators: %s here is the hostname */
-            prompt = g_strdup_printf (_("Enter password for %s"), ftp->host_display_name);
+            /* Translators: %s here is the hostname */
+            prompt = g_strdup_printf (_("Authentication Required\nEnter user and password for “%s”:"), ftp->host_display_name);
         }
          
       flags = G_ASK_PASSWORD_NEED_PASSWORD;

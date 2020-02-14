@@ -1496,13 +1496,14 @@ do_unlock (GTask *task)
                                                                        task);
           if (g_strcmp0 (type, "crypto_unknown") == 0)
             /* Translators: %s is the description of the volume that is being unlocked */
-            message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
-                                         "The volume %s might be a VeraCrypt volume as it contains random data."),
+            message = g_strdup_printf (_("Authentication Required\n"
+                                         "A passphrase is needed to access encrypted data on “%s”.\n"
+                                         "The volume might be a VeraCrypt volume as it contains random data."),
                                        data->desc_of_encrypted_to_unlock);
           else
             /* Translators: %s is the description of the volume that is being unlocked */
-            message = g_strdup_printf (_("Enter a passphrase to unlock the volume\n"
-                                         "The passphrase is needed to access encrypted data on %s."),
+            message = g_strdup_printf (_("Authentication Required\n"
+                                         "A passphrase is needed to access encrypted data on “%s”."),
                                        data->desc_of_encrypted_to_unlock);
 
           pw_ask_flags = G_ASK_PASSWORD_NEED_PASSWORD | G_ASK_PASSWORD_SAVING_SUPPORTED;

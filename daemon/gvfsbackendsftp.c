@@ -1161,17 +1161,17 @@ handle_login (GVfsBackend *backend,
               if (op_backend->user_specified)
                 if (strcmp (authtype, "publickey") == 0)
                   /* Translators: the first %s is the username, the second the host name */
-                  prompt = g_strdup_printf (_("Enter passphrase for secure key for %s on %s"), op_backend->user, op_backend->host);
+                  prompt = g_strdup_printf (_("Authentication Required\nEnter passphrase for secure key for “%s” on “%s”:"), op_backend->user, op_backend->host);
                 else
                   /* Translators: the first %s is the username, the second the host name */
-                  prompt = g_strdup_printf (_("Enter password for %s on %s"), op_backend->user, hostname ? hostname : op_backend->host);
+                  prompt = g_strdup_printf (_("Authentication Required\nEnter password for “%s” on “%s”:"), op_backend->user, hostname ? hostname : op_backend->host);
               else
                 if (strcmp (authtype, "publickey") == 0)
                   /* Translators: %s is the hostname */
-                  prompt = g_strdup_printf (_("Enter passphrase for secure key for %s"), op_backend->host);
+                  prompt = g_strdup_printf (_("Authentication Required\nEnter passphrase for secure key for “%s”:"), op_backend->host);
                 else
                   /* Translators: %s is the hostname */
-                  prompt = g_strdup_printf (_("Enter password for %s"), hostname ? hostname : op_backend->host);
+                  prompt = g_strdup_printf (_("Authentication Required\nEnter user and password for “%s”:"), hostname ? hostname : op_backend->host);
 
               if (!g_mount_source_ask_password (mount_source,
                                                 prompt,
@@ -1325,8 +1325,10 @@ handle_login (GVfsBackend *backend,
 
 	  get_hostname_and_fingerprint_from_line (buffer, &hostname, &fingerprint);
 
-	  message = g_strdup_printf (_("Can’t verify the identity of “%s”.\n"
-				       "This happens when you log in to a computer the first time.\n\n"
+          /* Translators: the first %s is the hostname, the second the key fingerprint */
+	  message = g_strdup_printf (_("Identity Verification Failed\n"
+				       "Verifying the identity of “%s” failed, this happens when "
+				       "you log in to a computer the first time.\n\n"
 				       "The identity sent by the remote computer is “%s”. "
 				       "If you want to be absolutely sure it is safe to continue, "
 				       "contact the system administrator."),
@@ -1352,7 +1354,9 @@ handle_login (GVfsBackend *backend,
 
           get_hostname_and_ip_address (buffer, &hostname, &ip_address);
 
-          message = g_strdup_printf (_("The host key for “%s” differs from the key for the IP address “%s”\n"
+          /* Translators: the first %s is the hostname, the second is an ip address */
+          message = g_strdup_printf (_("Identity Verification Failed\n"
+                                       "The host key for “%s” differs from the key for the IP address “%s”\n"
                                        "If you want to be absolutely sure it is safe to continue, "
                                        "contact the system administrator."),
                                      hostname ? hostname : op_backend->host,

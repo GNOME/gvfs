@@ -574,7 +574,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
         /* translators:
          * %s is the device name. 'Try again' is the caption of the button
          * shown in the dialog which is defined above. */
-        message = g_strdup_printf (_("The device “%s” is locked. Enter the passcode on the device and click “Try again”."), display_name);
+        message = g_strdup_printf (_("Device Locked\nThe device “%s” is locked.\n\nEnter the passcode on the device and click “Try again”."), display_name);
       }
     else if (lerr == LOCKDOWN_E_PAIRING_DIALOG_RESPONSE_PENDING)
       {
@@ -582,7 +582,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
          * %s is the device name. 'Try again' is the caption of the button
          * shown in the dialog which is defined above. 'Trust' is the caption
          * of the button shown in the device. */
-        message = g_strdup_printf (_("The device “%s” is not trusted yet. Select “Trust” on the device and click “Try again”."), display_name);
+        message = g_strdup_printf (_("Untrusted Device\nThe device “%s” is not trusted yet.\n\nSelect “Trust” on the device and click “Try again”."), display_name);
       }
     else
       g_assert_not_reached ();

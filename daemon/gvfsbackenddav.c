@@ -1587,10 +1587,11 @@ soup_authenticate_interactive (SoupSession *session,
       if (realm == NULL)
         realm = _("WebDAV share");
 
-      prompt = g_strdup_printf (_("Enter password for %s"), realm);
+      /* Translators: %s is the name of the WebDAV share */
+      prompt = g_strdup_printf (_("Authentication Required\nEnter password for “%s”:"), realm);
     }
   else
-    prompt = g_strdup (_("Please enter proxy password"));
+    prompt = g_strdup (_("Authentication Required\nEnter proxy password:"));
 
   if (info->username == NULL)
     pw_ask_flags |= G_ASK_PASSWORD_NEED_USERNAME;

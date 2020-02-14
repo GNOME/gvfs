@@ -1053,22 +1053,17 @@ g_vfs_afp_server_login (GVfsAfpServer *server,
     gboolean aborted;
 
     g_free (prompt);
+    g_clear_error (&err);
 
     str = g_string_new (NULL);
 
-    if (err)
-    {
-      g_string_append_printf (str, "%s\n", err->message);
-      g_clear_error (&err);
-    }
-    
     /* create prompt */
     if (initial_user)
-      /* translators: %s here is the hostname */
-      g_string_append_printf (str, _("Enter your password for the server “%s”."), server_name);
+      /* Translators: the first %s is the username, the second the host name */
+      g_string_append_printf (str, _("Authentication Required\nEnter password for “%s” on “%s”:"), initial_user, server_name);
     else
-      /* translators: %s here is the hostname */
-      g_string_append_printf (str, _("Enter your name and password for the server “%s”."), server_name);
+      /* Translators: %s here is the hostname */
+      g_string_append_printf (str, _("Authentication Required\nEnter user and password for “%s”:"), server_name);
 
     prompt = g_string_free (str, FALSE);
 

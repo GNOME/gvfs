@@ -264,9 +264,19 @@ auth_callback (SMBCCTX *context,
 
           g_debug ("auth_callback - asking for password...\n");
 
-	  /* translators: First %s is a share name, second is a server name */
-	  message = g_strdup_printf (_("Password required for share %s on %s"),
-				     share_name, server_name);
+          if (backend->user)
+            {
+              /* Translators: First %s is a share name, second is a server name */
+              message = g_strdup_printf (_("Authentication Required\nEnter password for share “%s” on “%s”:"),
+                                         share_name, server_name);
+            }
+          else
+            {
+              /* Translators: First %s is a share name, second is a server name */
+              message = g_strdup_printf (_("Authentication Required\nEnter user and password for share “%s” on “%s”:"),
+                                         share_name, server_name);
+            }
+
 	  handled = g_mount_source_ask_password (backend->mount_source,
 						 message,
 						 username_out,

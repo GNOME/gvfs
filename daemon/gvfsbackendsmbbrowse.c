@@ -367,9 +367,19 @@ auth_callback (SMBCCTX *context,
 
           g_debug ("auth_callback - asking for password...\n");
 
-	  /* translators: %s is a server name */
-	  message = g_strdup_printf (_("Password required for %s"),
-				     server_name);
+          if (backend->user)
+            {
+              /* Translators: %s is a server name */
+              message = g_strdup_printf (_("Authentication Required\nEnter password for “%s”:"),
+                                         server_name);
+            }
+          else
+            {
+              /* Translators: %s is a server name */
+              message = g_strdup_printf (_("Authentication Required\nEnter user and password for “%s”:"),
+                                         server_name);
+            }
+
 	  handled = g_mount_source_ask_password (backend->mount_source,
 						 message,
 						 username_out,
