@@ -4,7 +4,7 @@ fedora:
         - x86_64
     script:
         - meson -Dinstalled_tests=true -Ddevel_utils=true -Dman=true --prefix /usr --werror build
-        - ninja -C build install
+        - sudo ninja -C build install
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
     allow_failure: true
 
