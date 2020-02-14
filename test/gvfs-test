@@ -478,6 +478,7 @@ HostKey %(workdir)s/ssh_host_rsa_key
 UsePrivilegeSeparation no
 AuthorizedKeysFile %(authorized_keys)s
 UsePam no
+PasswordAuthentication no
 Subsystem sftp %(sftp_server)s
 ''' % {'workdir': self.workdir, 'sftp_server': sftp_server, 'authorized_keys': self.authorized_keys})
 
