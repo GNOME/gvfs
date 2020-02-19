@@ -35,6 +35,8 @@ update-image:
     variables:
          DOCKER_TLS_CERTDIR: ""
     image: docker:latest
+    tags:
+        - privileged
     services:
         - docker:dind
     script:
