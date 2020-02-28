@@ -10,10 +10,12 @@ fedora:
 
 .gnome-build-meta-template: &gnome-build-meta
     variables:
-        DOCKER_IMAGE_ID: 'e593f441b6ac7536b0e35a4354dc20c6c123f6b5'
+        DOCKER_IMAGE_ID: '80f4a16af18b8641874fe037710dcaad4710ff50'
         DOCKER_REGISTRY: "registry.gitlab.com/freedesktop-sdk/infrastructure/freedesktop-sdk-docker-images"
         DOCKER_AMD64: "${DOCKER_REGISTRY}/bst14/amd64:${DOCKER_IMAGE_ID}"
     image: "${DOCKER_AMD64}"
+    tags:
+        - privileged
     before_script:
         - git clone --depth 1 https://gitlab.gnome.org/GNOME/gnome-build-meta.git
     script:
