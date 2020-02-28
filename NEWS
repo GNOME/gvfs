@@ -1,3 +1,7 @@
+Major changes in 1.43.92
+========================
+* Translation updates
+
 Major changes in 1.43.91
 ========================
 * build: Fix login_tty detection on systems without libutil
