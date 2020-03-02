@@ -407,6 +407,9 @@ update_volume (GVfsUDisks2Volume *volume)
           g_free (media_desc);
           g_clear_object (&media_icon);
           g_clear_object (&media_symbolic_icon);
+          g_free (drive_desc);
+          g_clear_object (&drive_icon);
+          g_clear_object (&drive_symbolic_icon);
 
           /* Only automount drives attached to the same seat as we're running on
            */
