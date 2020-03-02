@@ -1623,7 +1623,7 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
           have_udisks_volume_for_mount_point (monitor, mount_point) ||
           !mount_point_has_device (monitor, mount_point))
         {
-          new_mount_points = g_list_remove_link (new_mount_points, l);
+          new_mount_points = g_list_delete_link (new_mount_points, l);
           g_unix_mount_point_free (mount_point);
         }
     }
