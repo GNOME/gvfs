@@ -211,6 +211,34 @@ trash_mount_remove (TrashMount **mount_ptr)
   g_slice_free (TrashMount, mount);
 }
 
+static gboolean
+ignore_trash_mount (GUnixMountEntry *mount)
+{
+  GUnixMountPoint *mount_point = NULL;
+  const gchar *mount_options;
+  gboolean retval = TRUE;
+
+  if (g_unix_mount_is_system_internal (mount))
+    return TRUE;
+
+  mount_options = g_unix_mount_get_options (mount);
+  if (mount_options == NULL)
+    {
+      mount_point = g_unix_mount_point_at (g_unix_mount_get_mount_path (mount),
+                                           NULL);
+      if (mount_point != NULL)
+        mount_options = g_unix_mount_point_get_options (mount_point);
+    }
+
+  if (mount_options == NULL ||
+      strstr (mount_options, "x-gvfs-notrash") == NULL)
+    retval = FALSE;
+
+  g_clear_pointer (&mount_point, g_unix_mount_point_free);
+
+  return retval;
+}
+
 static void
 trash_watcher_remount (TrashWatcher *watcher)
 {
@@ -229,7 +257,7 @@ trash_watcher_remount (TrashWatcher *watcher)
     {
       int result;
 
-      if (new && g_unix_mount_is_system_internal (new->data))
+      if (new && ignore_trash_mount (new->data))
         {
           g_unix_mount_free (new->data);
           new = new->next;
