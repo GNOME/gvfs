@@ -45,6 +45,10 @@
       <arg type='u' name='minor' direction='in'/>
       <arg type='s' name='tree' direction='out'/>
     </method>
+    <signal name="AttributeChanged">
+      <arg type='s' name='tree_path'/>
+      <arg type='s' name='file_path'/>
+    </signal>
 
   </interface>
 </node>

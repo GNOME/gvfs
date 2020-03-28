@@ -43,6 +43,7 @@
 
 #define WRITEOUT_TIMEOUT_SECS 60
 #define WRITEOUT_TIMEOUT_SECS_NFS 15
+#define WRITEOUT_TIMEOUT_SECS_DBUS 1
 
 typedef struct {
   char *filename;
@@ -50,11 +51,19 @@ typedef struct {
   guint writeout_timeout;
 } TreeInfo;
 
+typedef struct {
+  gchar *treefile;
+  gchar *path;
+  GVfsMetadata *object;
+  guint timeout_id;
+} BusNotificationInfo;
+
 static GHashTable *tree_infos = NULL;
 static GVfsMetadata *skeleton = NULL;
 #ifdef HAVE_GUDEV
 static GUdevClient *gudev_client = NULL;
 #endif
+static GList *dbus_notification_list = NULL;
 
 static void
 tree_info_free (TreeInfo *info)
@@ -105,8 +114,78 @@ flush_single (const gchar *filename,
 }
 
 static void
-flush_all ()
+free_bus_notification_info (BusNotificationInfo *info)
 {
+  dbus_notification_list = g_list_remove (dbus_notification_list,
+                                          info);
+  g_object_unref (info->object);
+  g_source_remove (info->timeout_id);
+  g_free (info->path);
+  g_free (info->treefile);
+  g_free (info);
+}
+
+static gboolean
+notify_attribute_change (gpointer data)
+{
+  BusNotificationInfo *info;
+
+  info = (BusNotificationInfo *) data;
+  gvfs_metadata_emit_attribute_changed (info->object,
+                                        info->treefile,
+                                        info->path);
+  free_bus_notification_info (info);
+  return G_SOURCE_REMOVE;
+}
+
+static void
+emit_attribute_change (GVfsMetadata *object,
+                       const gchar  *treefile,
+                       const gchar  *path)
+{
+  GList *iter;
+  BusNotificationInfo *info;
+
+  for (iter = dbus_notification_list; iter != NULL; iter = iter->next)
+    {
+      info = iter->data;
+      if (g_str_equal (info->treefile, treefile) &&
+          g_str_equal (info->path, path))
+        {
+          break;
+        }
+    }
+  if (iter == NULL)
+    {
+      info = g_new0 (BusNotificationInfo, 1);
+      info->treefile = g_strdup (treefile);
+      info->path = g_strdup (path);
+      info->object = g_object_ref (object);
+      dbus_notification_list = g_list_prepend (dbus_notification_list,
+                                               info);
+    }
+  else
+    {
+      g_source_remove (info->timeout_id);
+    }
+  info->timeout_id = g_timeout_add_seconds (WRITEOUT_TIMEOUT_SECS_DBUS,
+                                            notify_attribute_change,
+                                            info);
+}
+
+static void
+flush_all (gboolean send_pending_notifications)
+{
+  BusNotificationInfo *info;
+
+  while (dbus_notification_list != NULL)
+    {
+      info = (BusNotificationInfo *) dbus_notification_list->data;
+      if (send_pending_notifications)
+        notify_attribute_change (info);
+      else
+        free_bus_notification_info (info);
+    }
   g_hash_table_foreach (tree_infos, (GHFunc) flush_single, NULL);
 }
 
@@ -222,6 +301,7 @@ handle_set (GVfsMetadata *object,
     }
   else
     {
+      emit_attribute_change (object, arg_treefile, arg_path);
       gvfs_metadata_complete_set (object, invocation);
     }
   
@@ -257,6 +337,7 @@ handle_remove (GVfsMetadata *object,
       return TRUE;
     }
 
+  emit_attribute_change (object, arg_treefile, arg_path);
   tree_info_schedule_writeout (info);
   gvfs_metadata_complete_remove (object, invocation);
   
@@ -297,6 +378,8 @@ handle_move (GVfsMetadata *object,
   /* Remove source if copy succeeded (ignoring errors) */
   meta_tree_remove (info->tree, arg_path);
 
+  emit_attribute_change (object, arg_treefile, arg_path);
+  emit_attribute_change (object, arg_treefile, arg_dest_path);
   tree_info_schedule_writeout (info);
   gvfs_metadata_complete_move (object, invocation);
   
@@ -344,7 +427,7 @@ on_name_lost (GDBusConnection *connection,
   GMainLoop *loop = user_data;
 
   /* means that someone has claimed our name (we allow replacement) */
-  flush_all ();
+  flush_all (TRUE);
   g_main_loop_quit (loop);
 }
 
@@ -357,7 +440,7 @@ on_connection_closed (GDBusConnection *connection,
   GMainLoop *loop = user_data;
 
   /* session bus died */
-  flush_all ();
+  flush_all (FALSE);
   g_main_loop_quit (loop);
 }
 
