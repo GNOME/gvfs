@@ -2,14 +2,14 @@
 # Copyright (C) 2005-2006 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gvfs package.
 #
-# Matej Urbančič <mateju@svn.gnome.org>, 2008–2019.
+# Matej Urbančič <mateju@svn.gnome.org>, 2008–2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2019-08-24 17:31+0000\n"
-"PO-Revision-Date: 2019-08-24 19:40+0200\n"
+"POT-Creation-Date: 2020-04-03 20:43+0000\n"
+"PO-Revision-Date: 2020-04-05 23:10+0200\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
 "%100==4 ? 3 : 0);\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 2.2.4\n"
 
 #: client/gdaemonfile.c:435 client/gdaemonfile.c:2704
 msgid "Operation not supported, files on different mounts"
@@ -76,29 +76,33 @@ msgstr "vrednosti morajo biti v nizu ali v seznamu nizov"
 #. * fallback copy.
 #.
 #: client/gdaemonfile.c:2696 daemon/gvfsbackendadmin.c:832
-#: daemon/gvfsbackendafc.c:2421 daemon/gvfsbackendafp.c:1781
+#: daemon/gvfsbackendafc.c:2360 daemon/gvfsbackendafp.c:1781
 #: daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
-#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:3395
-#: daemon/gvfsbackenddav.c:3427 daemon/gvfsbackendftp.c:1209
+#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:3419
+#: daemon/gvfsbackenddav.c:3451 daemon/gvfsbackendftp.c:1209
 #: daemon/gvfsbackendftp.c:1257 daemon/gvfsbackendftp.c:1278
-#: daemon/gvfsbackendgoogle.c:1147 daemon/gvfsbackendgoogle.c:1180
-#: daemon/gvfsbackendgoogle.c:1195 daemon/gvfsbackendgoogle.c:1282
-#: daemon/gvfsbackendgoogle.c:1393 daemon/gvfsbackendgoogle.c:1575
-#: daemon/gvfsbackendgoogle.c:1803 daemon/gvfsbackendgoogle.c:2445
-#: daemon/gvfsbackendgoogle.c:2506 daemon/gvfsbackendgoogle.c:2529
-#: daemon/gvfsbackendgoogle.c:2615 daemon/gvfsbackendgphoto2.c:2238
+#: daemon/gvfsbackendgoogle.c:1435 daemon/gvfsbackendgoogle.c:1489
+#: daemon/gvfsbackendgoogle.c:1512 daemon/gvfsbackendgoogle.c:1578
+#: daemon/gvfsbackendgoogle.c:1850 daemon/gvfsbackendgoogle.c:1913
+#: daemon/gvfsbackendgoogle.c:1946 daemon/gvfsbackendgoogle.c:1956
+#: daemon/gvfsbackendgoogle.c:2027 daemon/gvfsbackendgoogle.c:2222
+#: daemon/gvfsbackendgoogle.c:2333 daemon/gvfsbackendgoogle.c:2516
+#: daemon/gvfsbackendgoogle.c:2786 daemon/gvfsbackendgoogle.c:2881
+#: daemon/gvfsbackendgoogle.c:2890 daemon/gvfsbackendgoogle.c:3463
+#: daemon/gvfsbackendgoogle.c:3524 daemon/gvfsbackendgoogle.c:3547
+#: daemon/gvfsbackendgoogle.c:3633 daemon/gvfsbackendgphoto2.c:2238
 #: daemon/gvfsbackendgphoto2.c:2451 daemon/gvfsbackendgphoto2.c:2548
 #: daemon/gvfsbackendgphoto2.c:2641 daemon/gvfsbackendgphoto2.c:3250
-#: daemon/gvfsbackendgphoto2.c:3260 daemon/gvfsbackendmtp.c:2251
-#: daemon/gvfsbackendmtp.c:2442 daemon/gvfsbackendmtp.c:2525
-#: daemon/gvfsbackendmtp.c:2613 daemon/gvfsbackendmtp.c:2681
-#: daemon/gvfsbackendmtp.c:2876 daemon/gvfsbackendmtp.c:3019
-#: daemon/gvfsbackendnfs.c:2367 daemon/gvfsbackendnfs.c:2417
-#: daemon/gvfsbackendnfs.c:2543 daemon/gvfsbackendsftp.c:2152
-#: daemon/gvfsbackendsftp.c:5230 daemon/gvfsbackendsftp.c:5328
-#: daemon/gvfsbackendsftp.c:5990 daemon/gvfsbackendsftp.c:6022
-#: daemon/gvfsbackendsftp.c:6048 daemon/gvfsbackendsftp.c:6519
-#: daemon/gvfsbackendsftp.c:6581 daemon/gvfsbackendsmb.c:1699
+#: daemon/gvfsbackendgphoto2.c:3260 daemon/gvfsbackendmtp.c:2253
+#: daemon/gvfsbackendmtp.c:2444 daemon/gvfsbackendmtp.c:2527
+#: daemon/gvfsbackendmtp.c:2615 daemon/gvfsbackendmtp.c:2683
+#: daemon/gvfsbackendmtp.c:2878 daemon/gvfsbackendmtp.c:3021
+#: daemon/gvfsbackendnfs.c:2369 daemon/gvfsbackendnfs.c:2419
+#: daemon/gvfsbackendnfs.c:2545 daemon/gvfsbackendsftp.c:2154
+#: daemon/gvfsbackendsftp.c:5355 daemon/gvfsbackendsftp.c:5453
+#: daemon/gvfsbackendsftp.c:6115 daemon/gvfsbackendsftp.c:6147
+#: daemon/gvfsbackendsftp.c:6173 daemon/gvfsbackendsftp.c:6644
+#: daemon/gvfsbackendsftp.c:6706 daemon/gvfsbackendsmb.c:1700
 #: daemon/gvfsftptask.c:429 daemon/gvfsjobcloseread.c:113
 #: daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
 #: daemon/gvfsjobcreatemonitor.c:143 daemon/gvfsjobcreatemonitor.c:154
@@ -132,7 +136,7 @@ msgstr "Napaka v protokolu pretoka: %s"
 
 #: client/gdaemonfileinputstream.c:552 client/gdaemonfileinputstream.c:1695
 #: client/gdaemonfileoutputstream.c:503 client/gdaemonfileoutputstream.c:1442
-#: daemon/gvfsbackendmtp.c:2408 daemon/gvfsbackendmtp.c:2799
+#: daemon/gvfsbackendmtp.c:2410 daemon/gvfsbackendmtp.c:2801
 msgid "End of stream"
 msgstr "Konec pretoka"
 
@@ -141,7 +145,7 @@ msgstr "Konec pretoka"
 #: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
 #: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
 #: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
-#: daemon/gvfsbackendsftp.c:5344 daemon/gvfsbackendsmb.c:1111
+#: daemon/gvfsbackendsftp.c:5469 daemon/gvfsbackendsmb.c:1111
 #: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
 #: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:347
 #: daemon/gvfsftptask.c:224
@@ -165,7 +169,7 @@ msgstr "Napaka med pridobivanjem podrobnosti priklopa: %s"
 msgid "Invalid file info format"
 msgstr "Neveljaven zapis podrobnosti datoteke"
 
-#: common/gvfsdnssdresolver.c:208
+#: common/gvfsdnssdresolver.c:216
 #, c-format
 msgid "Error initializing Avahi: %s"
 msgstr "Napaka med začenjanjem programa Avahi: %s"
@@ -175,7 +179,7 @@ msgstr "Napaka med začenjanjem programa Avahi: %s"
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #.
-#: common/gvfsdnssdresolver.c:1085
+#: common/gvfsdnssdresolver.c:1144
 #, c-format
 msgid "Error resolving “%s” service “%s” on domain “%s”"
 msgstr "Napaka med razreševanjem storitve »%s« »%s« na domeni »%s«"
@@ -186,7 +190,7 @@ msgstr "Napaka med razreševanjem storitve »%s« »%s« na domeni »%s«"
 #. * - the third %s refers to the domain
 #. * - the fourth %s refers to the required TXT keys
 #.
-#: common/gvfsdnssdresolver.c:1109
+#: common/gvfsdnssdresolver.c:1168
 #, c-format
 msgid ""
 "Error resolving “%s” service “%s” on domain “%s”. One or more TXT records "
@@ -200,12 +204,12 @@ msgstr ""
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #.
-#: common/gvfsdnssdresolver.c:1124
+#: common/gvfsdnssdresolver.c:1183
 #, c-format
 msgid "Timed out resolving “%s” service “%s” on domain “%s”"
 msgstr "Razreševanje storitve »%s« »%s« na domeni »%s« je časovno poteklo."
 
-#: common/gvfsdnssdresolver.c:1164
+#: common/gvfsdnssdresolver.c:1223
 msgid "Error initializing Avahi resolver"
 msgstr "Napaka med začenjanjem razreševalnika Avahi"
 
@@ -305,7 +309,7 @@ msgstr "Prijava na strežnik »%s« s podanim geslom ni uspela."
 
 #: daemon/gvfsafpserver.c:425 daemon/gvfsafpserver.c:647
 #: daemon/gvfsafpserver.c:823 daemon/gvfsafpserver.c:871
-#: daemon/gvfsafpserver.c:987 daemon/gvfsafpserver.c:1662
+#: daemon/gvfsafpserver.c:987 daemon/gvfsafpserver.c:1664
 #, c-format
 msgid "Unable to connect to the server “%s”. A communication problem occurred."
 msgstr ""
@@ -380,12 +384,12 @@ msgstr "Vnos gesla je preklican."
 msgid "Unable to disconnect from the server."
 msgstr "Prekinitev povezave s strežnikom je spodletela."
 
-#: daemon/gvfsafpserver.c:1362 daemon/gvfsafpserver.c:1736
+#: daemon/gvfsafpserver.c:1362 daemon/gvfsafpserver.c:1738
 msgid "Unable to connect to the server. A communication problem occurred."
 msgstr ""
 "Povezava na strežnik ni uspela. Prišlo je do težave pri izmenjavi podatkov."
 
-#: daemon/gvfsafpserver.c:1695
+#: daemon/gvfsafpserver.c:1697
 msgid "Identification not found."
 msgstr "Identifikacije ni mogoče najti."
 
@@ -415,26 +419,26 @@ msgstr "Ni mogoče naložiti %s na %s"
 #: daemon/gvfsafpvolume.c:1491 daemon/gvfsafpvolume.c:1913
 #: daemon/gvfsafpvolume.c:2034 daemon/gvfsafpvolume.c:2189
 #: daemon/gvfsafpvolume.c:2402 daemon/gvfsbackendadmin.c:141
-#: daemon/gvfsbackendgoogle.c:212 daemon/gvfsbackendsftp.c:346
-#: daemon/gvfsbackendsftp.c:1124 daemon/gvfsbackendsftp.c:2154
-#: daemon/gvfsftptask.c:437
+#: daemon/gvfsbackendafc.c:166 daemon/gvfsbackendgoogle.c:249
+#: daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1124
+#: daemon/gvfsbackendsftp.c:2156 daemon/gvfsftptask.c:437
 #, c-format
 msgid "Permission denied"
 msgstr "Ni ustreznih dovoljenj"
 
 #: daemon/gvfsafpvolume.c:398 daemon/gvfsafpvolume.c:1652
-#: daemon/gvfsafpvolume.c:2406 daemon/gvfsbackendafc.c:217
-#: daemon/gvfsbackendafc.c:1127 daemon/gvfsbackendafpbrowse.c:180
+#: daemon/gvfsafpvolume.c:2406 daemon/gvfsbackendafc.c:150
+#: daemon/gvfsbackendafc.c:1064 daemon/gvfsbackendafpbrowse.c:180
 #: daemon/gvfsbackendafpbrowse.c:312 daemon/gvfsbackendafpbrowse.c:344
 #: daemon/gvfsbackendarchive.c:738 daemon/gvfsbackendarchive.c:793
 #: daemon/gvfsbackendarchive.c:845 daemon/gvfsbackendarchive.c:874
 #: daemon/gvfsbackendcdda.c:908 daemon/gvfsbackendcomputer.c:639
 #: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:795
-#: daemon/gvfsbackendftp.c:1189 daemon/gvfsbackendmtp.c:1716
-#: daemon/gvfsbackendmtp.c:1732 daemon/gvfsbackendmtp.c:2132
-#: daemon/gvfsbackendmtp.c:2195 daemon/gvfsbackendmtp.c:2262
-#: daemon/gvfsbackendmtp.c:2624 daemon/gvfsbackendmtp.c:2903
-#: daemon/gvfsbackendmtp.c:3046 daemon/gvfsbackendnetwork.c:697
+#: daemon/gvfsbackendftp.c:1189 daemon/gvfsbackendmtp.c:1718
+#: daemon/gvfsbackendmtp.c:1734 daemon/gvfsbackendmtp.c:2134
+#: daemon/gvfsbackendmtp.c:2197 daemon/gvfsbackendmtp.c:2264
+#: daemon/gvfsbackendmtp.c:2626 daemon/gvfsbackendmtp.c:2905
+#: daemon/gvfsbackendmtp.c:3048 daemon/gvfsbackendnetwork.c:697
 #: daemon/gvfsbackendsmbbrowse.c:1109 daemon/gvfsbackendsmbbrowse.c:1176
 #: daemon/gvfsbackendsmbbrowse.c:1358 daemon/gvfsbackendsmbbrowse.c:1431
 #, c-format
@@ -443,12 +447,12 @@ msgstr "Datoteka ne obstaja"
 
 #: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2410
 #: daemon/gvfsbackendafp.c:289 daemon/gvfsbackendafp.c:492
-#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2378
-#: daemon/gvfsbackenddav.c:3041 daemon/gvfsbackenddav.c:3321
-#: daemon/gvfsbackendftp.c:832 daemon/gvfsbackendnfs.c:2475
-#: daemon/gvfsbackendsftp.c:2661 daemon/gvfsbackendsftp.c:3436
-#: daemon/gvfsbackendsftp.c:3764 daemon/gvfsbackendsftp.c:4833
-#: daemon/gvfsbackendsftp.c:5872
+#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2402
+#: daemon/gvfsbackenddav.c:3065 daemon/gvfsbackenddav.c:3345
+#: daemon/gvfsbackendftp.c:832 daemon/gvfsbackendnfs.c:2477
+#: daemon/gvfsbackendsftp.c:2666 daemon/gvfsbackendsftp.c:3441
+#: daemon/gvfsbackendsftp.c:3889 daemon/gvfsbackendsftp.c:4958
+#: daemon/gvfsbackendsftp.c:5997
 msgid "File is directory"
 msgstr "Datoteka je mapa"
 
@@ -460,9 +464,9 @@ msgstr "Odprtih je preveliko število datotek"
 msgid "Target file is open"
 msgstr "Ciljna datoteka je odprta"
 
-#: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:221
-#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2768
-#: daemon/gvfsbackendgoogle.c:1375 daemon/gvfsbackendsftp.c:2148
+#: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
+#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2792
+#: daemon/gvfsbackendgoogle.c:2315 daemon/gvfsbackendsftp.c:2150
 msgid "Directory not empty"
 msgstr "Mapa ni prazna"
 
@@ -471,7 +475,7 @@ msgid "Target object is marked as not deletable (DeleteInhibit)"
 msgstr "Ciljnega predmeta ni mogoče izbrisati (DeleteInhibit)"
 
 #: daemon/gvfsafpvolume.c:671 daemon/gvfsafpvolume.c:1180
-#: daemon/gvfsafpvolume.c:2038 daemon/gvfsbackendgoogle.c:218
+#: daemon/gvfsafpvolume.c:2038 daemon/gvfsbackendgoogle.c:255
 #, c-format
 msgid "Target object doesn’t exist"
 msgstr "Ciljni predmet ne obstaja"
@@ -490,17 +494,18 @@ msgstr "Na nosilcu ni dovolj prostora"
 
 #: daemon/gvfsafpvolume.c:811 daemon/gvfsafpvolume.c:1355
 #: daemon/gvfsafpvolume.c:1507 daemon/gvfsbackendafp.c:296
-#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2433
-#: daemon/gvfsbackenddav.c:2729 daemon/gvfsbackenddav.c:2837
-#: daemon/gvfsbackenddav.c:2974 daemon/gvfsbackenddav.c:3050
-#: daemon/gvfsbackenddav.c:3088 daemon/gvfsbackenddav.c:3312
+#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2457
+#: daemon/gvfsbackenddav.c:2753 daemon/gvfsbackenddav.c:2861
+#: daemon/gvfsbackenddav.c:2998 daemon/gvfsbackenddav.c:3074
+#: daemon/gvfsbackenddav.c:3112 daemon/gvfsbackenddav.c:3336
 #: daemon/gvfsbackendftp.c:811 daemon/gvfsbackendftp.c:999
 #: daemon/gvfsbackendftp.c:1509 daemon/gvfsbackendftp.c:1617
-#: daemon/gvfsbackendgoogle.c:1200 daemon/gvfsbackendgoogle.c:1599
-#: daemon/gvfsbackendgoogle.c:1881 daemon/gvfsbackendgoogle.c:2534
-#: daemon/gvfsbackendmtp.c:1619 daemon/gvfsbackendmtp.c:1662
-#: daemon/gvfsbackendnfs.c:2485 daemon/gvfsbackendsftp.c:4842
-#: daemon/gvfsbackendsmb.c:2065
+#: daemon/gvfsbackendgoogle.c:1540 daemon/gvfsbackendgoogle.c:1617
+#: daemon/gvfsbackendgoogle.c:1986 daemon/gvfsbackendgoogle.c:2066
+#: daemon/gvfsbackendgoogle.c:2540 daemon/gvfsbackendgoogle.c:2904
+#: daemon/gvfsbackendgoogle.c:3552 daemon/gvfsbackendmtp.c:1621
+#: daemon/gvfsbackendmtp.c:1664 daemon/gvfsbackendnfs.c:2487
+#: daemon/gvfsbackendsftp.c:4967 daemon/gvfsbackendsmb.c:2095
 msgid "Target file already exists"
 msgstr "Ciljna datoteka že obstaja"
 
@@ -575,10 +580,10 @@ msgstr "Izvorna datoteka je mapa"
 msgid "Range lock conflict exists"
 msgstr "Obstaja spor obsega zaklepa"
 
-#: daemon/gvfsafpvolume.c:2193 daemon/gvfsbackendmtp.c:1442
-#: daemon/gvfsbackendmtp.c:1467 daemon/gvfsbackendmtp.c:1670
-#: daemon/gvfsbackendmtp.c:2032 daemon/gvfsbackendmtp.c:2549
-#: daemon/gvfsbackendmtp.c:2944 daemon/gvfsbackendmtp.c:3080
+#: daemon/gvfsafpvolume.c:2193 daemon/gvfsbackendmtp.c:1444
+#: daemon/gvfsbackendmtp.c:1469 daemon/gvfsbackendmtp.c:1672
+#: daemon/gvfsbackendmtp.c:2034 daemon/gvfsbackendmtp.c:2551
+#: daemon/gvfsbackendmtp.c:2946 daemon/gvfsbackendmtp.c:3082
 msgid "Directory doesn’t exist"
 msgstr "Mapa ne obstaja"
 
@@ -599,71 +604,71 @@ msgid "File is not open for read access"
 msgstr "Datoteka je odprta z dovoljenji za branje"
 
 #: daemon/gvfsbackendadmin.c:926 daemon/gvfsbackendarchive.c:639
-#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:1880
-#: daemon/gvfsbackendgoogle.c:1702 daemon/gvfsbackendhttp.c:256
+#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:1903
+#: daemon/gvfsbackendgoogle.c:2684 daemon/gvfsbackendhttp.c:256
 #: daemon/gvfsbackendsmb.c:585
 msgid "Invalid mount spec"
 msgstr "Neveljavno določilo priklopa"
 
-#: daemon/gvfsbackendafc.c:213
+#: daemon/gvfsbackendafc.c:146
 msgid "Internal Apple File Control error"
 msgstr "Notranja napaka Apple nadzora datotek"
 
-#: daemon/gvfsbackendafc.c:225
+#: daemon/gvfsbackendafc.c:158
 msgid "The device did not respond"
 msgstr "Naprava se ne odziva"
 
-#: daemon/gvfsbackendafc.c:229
+#: daemon/gvfsbackendafc.c:162
 msgid "The connection was interrupted"
 msgstr "Povezava je bila prekinjena"
 
-#: daemon/gvfsbackendafc.c:233
+#: daemon/gvfsbackendafc.c:170
 msgid "Invalid Apple File Control data received"
 msgstr "Prejeti neveljavni podatki Apple nadzora datotek"
 
-#: daemon/gvfsbackendafc.c:237
+#: daemon/gvfsbackendafc.c:174
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "Prezrta napaka Apple nadzora datotek (%d)"
 
-#: daemon/gvfsbackendafc.c:253
+#: daemon/gvfsbackendafc.c:190
 msgid "Listing applications installed on device failed"
 msgstr "Izpisovanje nameščenih programov je spodletelo"
 
-#: daemon/gvfsbackendafc.c:269
+#: daemon/gvfsbackendafc.c:206
 msgid "Accessing application icons on device failed"
 msgstr "Dostop do ikon programov je spodletel"
 
-#: daemon/gvfsbackendafc.c:291
+#: daemon/gvfsbackendafc.c:228
 msgid "Lockdown Error: Invalid Argument"
 msgstr "Napaka zaklepanja: neveljaven argument"
 
-#: daemon/gvfsbackendafc.c:295
+#: daemon/gvfsbackendafc.c:232
 msgid "The device is password protected"
 msgstr "Naprava je zaščitena z geslom"
 
-#: daemon/gvfsbackendafc.c:299
+#: daemon/gvfsbackendafc.c:236
 msgid "Unable to connect"
 msgstr "Povezava ni uspela"
 
-#: daemon/gvfsbackendafc.c:303
+#: daemon/gvfsbackendafc.c:240
 msgid "User refused to trust this computer"
 msgstr "Uporabnik je zavrnil zaupanje v to napravo"
 
-#: daemon/gvfsbackendafc.c:307
+#: daemon/gvfsbackendafc.c:244
 msgid "The user has not trusted this computer"
 msgstr "Uporabnik ne zaupa tej napravi"
 
-#: daemon/gvfsbackendafc.c:311
+#: daemon/gvfsbackendafc.c:248
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "Neupravljana napaka zaklepanja (%d)"
 
-#: daemon/gvfsbackendafc.c:328
+#: daemon/gvfsbackendafc.c:265
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "Napaka libimobiledevice: neveljaven argument"
 
-#: daemon/gvfsbackendafc.c:332
+#: daemon/gvfsbackendafc.c:269
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
@@ -671,36 +676,36 @@ msgstr ""
 "Napaka libimobiledevice: ni mogoče najti naprave; prepričajte se, da usbmuxd "
 "deluje pravilno."
 
-#: daemon/gvfsbackendafc.c:336
+#: daemon/gvfsbackendafc.c:273
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Prezrta napaka libimobiledevice (%d)"
 
-#: daemon/gvfsbackendafc.c:457
+#: daemon/gvfsbackendafc.c:394
 msgid "Try again"
 msgstr "Poskusi znova"
 
-#: daemon/gvfsbackendafc.c:457 daemon/gvfsbackend.c:1025
+#: daemon/gvfsbackendafc.c:394 daemon/gvfsbackend.c:1025
 #: monitor/udisks2/gvfsudisks2mount.c:750
 msgid "Cancel"
 msgstr "Prekliči"
 
-#: daemon/gvfsbackendafc.c:474 daemon/gvfsbackendafc.c:505
+#: daemon/gvfsbackendafc.c:411 daemon/gvfsbackendafc.c:442
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr ""
 "Neveljavno mesto AFC: zapis mora biti oblikovan kot afc://uuid:port-number"
 
-#: daemon/gvfsbackendafc.c:491
+#: daemon/gvfsbackendafc.c:428
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Naprava Apple Mobile"
 
-#: daemon/gvfsbackendafc.c:496
+#: daemon/gvfsbackendafc.c:433
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "Prenosna Apple naprava, odklenjena"
 
-#: daemon/gvfsbackendafc.c:501
+#: daemon/gvfsbackendafc.c:438
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "Dokumenti na napravi Apple Mobile"
@@ -708,7 +713,7 @@ msgstr "Dokumenti na napravi Apple Mobile"
 #. translators:
 #. * This is the device name, with the service being browsed in brackets, eg.:
 #. * Alan Smithee's iPhone (jailbreak)
-#: daemon/gvfsbackendafc.c:559
+#: daemon/gvfsbackendafc.c:496
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (odklenjeno)"
@@ -716,7 +721,7 @@ msgstr "%s (odklenjeno)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: daemon/gvfsbackendafc.c:566 monitor/afc/afcvolume.c:176
+#: daemon/gvfsbackendafc.c:503 monitor/afc/afcvolume.c:176
 #, c-format
 msgid "Documents on %s"
 msgstr "Dokumenti na napravi %s"
@@ -724,7 +729,7 @@ msgstr "Dokumenti na napravi %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: daemon/gvfsbackendafc.c:640
+#: daemon/gvfsbackendafc.c:577
 #, c-format
 msgid ""
 "The device “%s” is locked. Enter the passcode on the device and click “Try "
@@ -737,7 +742,7 @@ msgstr ""
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above. 'Trust' is the caption
 #. * of the button shown in the device.
-#: daemon/gvfsbackendafc.c:648
+#: daemon/gvfsbackendafc.c:585
 #, c-format
 msgid ""
 "The device “%s” is not trusted yet. Select “Trust” on the device and click "
@@ -746,22 +751,22 @@ msgstr ""
 "Naprava »%s« ni opredeljena kot vredna zaupanja. Izberite možnost »Zaupaj« "
 "na napravi in poskusite znova."
 
-#: daemon/gvfsbackendafc.c:1116 daemon/gvfsbackendarchive.c:746
-#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:2257
-#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2284
+#: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
+#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3275
+#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2286
 #: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:126
 #: daemon/gvfsbackendsmb.c:675 daemon/gvfsbackendtrash.c:234
 msgid "Can’t open directory"
 msgstr "Ni mogoče odpreti mape"
 
-#: daemon/gvfsbackendafc.c:1336 daemon/gvfsbackendafc.c:2588
+#: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2527
 #: daemon/gvfsbackendafp.c:1270 daemon/gvfsbackendafp.c:1359
-#: daemon/gvfsbackenddav.c:2873 daemon/gvfsbackendftp.c:1461
-#: daemon/gvfsbackendsftp.c:3649 daemon/gvfsbackendsftp.c:3825
+#: daemon/gvfsbackenddav.c:2897 daemon/gvfsbackendftp.c:1461
+#: daemon/gvfsbackendsftp.c:3663 daemon/gvfsbackendsftp.c:3950
 msgid "Backups not supported"
 msgstr "Izdelava varnostnih kopij ni podprta"
 
-#: daemon/gvfsbackendafc.c:1498 daemon/gvfsbackendsmb.c:728
+#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:728
 #: daemon/gvfsbackendsmb.c:1207
 msgid "Unsupported seek type"
 msgstr "Nepodprta vrsta iskanja"
@@ -788,7 +793,7 @@ msgstr "Ni priklopna datoteka"
 #: daemon/gvfsbackendafpbrowse.c:446 daemon/gvfsbackendafp.c:2104
 #: daemon/gvfsbackendftp.c:681 daemon/gvfsbackendnfs.c:290
 #: daemon/gvfsbackendsftp.c:2011 daemon/gvfsbackendsmb.c:444
-#: daemon/gvfsbackendsmb.c:1381
+#: daemon/gvfsbackendsmb.c:1379
 #, c-format
 msgid "%s on %s"
 msgstr "%s na %s"
@@ -810,22 +815,23 @@ msgid "Apple Filing Protocol Service"
 msgstr "Storitev Apple Filing Protocol"
 
 #: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:877
-#: daemon/gvfsbackenddav.c:3036 daemon/gvfsbackendftp.c:1609
-#: daemon/gvfsbackendgoogle.c:1845
+#: daemon/gvfsbackenddav.c:3060 daemon/gvfsbackendftp.c:1609
+#: daemon/gvfsbackendgoogle.c:1589 daemon/gvfsbackendgoogle.c:1924
+#: daemon/gvfsbackendgoogle.c:2841
 msgid "Can’t copy directory over directory"
 msgstr "Ni mogoče kopirati mape preko mape"
 
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:893
-#: daemon/gvfsbackenddav.c:3065 daemon/gvfsbackendftp.c:1632
-#: daemon/gvfsbackendgoogle.c:1211 daemon/gvfsbackendgoogle.c:1872
-#: daemon/gvfsbackendgoogle.c:1892 daemon/gvfsbackendmtp.c:1610
-#: daemon/gvfsbackendmtp.c:1625
+#: daemon/gvfsbackenddav.c:3089 daemon/gvfsbackendftp.c:1632
+#: daemon/gvfsbackendgoogle.c:1651 daemon/gvfsbackendgoogle.c:2868
+#: daemon/gvfsbackendgoogle.c:2916 daemon/gvfsbackendmtp.c:1612
+#: daemon/gvfsbackendmtp.c:1627
 msgid "Can’t recursively copy directory"
 msgstr "Ni mogoče kopirati drevesne strukture mape"
 
-#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2913
-#: daemon/gvfsbackendnfs.c:2469 daemon/gvfsbackendsftp.c:4828
-#: daemon/gvfsbackendsmb.c:2054
+#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2937
+#: daemon/gvfsbackendgoogle.c:2038 daemon/gvfsbackendnfs.c:2471
+#: daemon/gvfsbackendsftp.c:4953 daemon/gvfsbackendsmb.c:2084
 msgid "Can’t move directory over directory"
 msgstr "Ni mogoče premakniti mape čez mapo"
 
@@ -834,14 +840,14 @@ msgstr "Ni mogoče premakniti mape čez mapo"
 msgid "Unable to create temporary file (%s)"
 msgstr "Ni mogoče ustvariti začasne datoteke (%s)"
 
-#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2514
-#: daemon/gvfsbackendnfs.c:1175 daemon/gvfsbackendsftp.c:3779
+#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2538
+#: daemon/gvfsbackendnfs.c:1177 daemon/gvfsbackendsftp.c:3904
 #: daemon/gvfsbackendsmb.c:1080
 msgid "The file was externally modified"
 msgstr "Datoteka je bila zunanje spremenjena"
 
 #: daemon/gvfsbackendafp.c:1765 daemon/gvfsbackendftp.c:1250
-#: daemon/gvfsbackendsftp.c:5292
+#: daemon/gvfsbackendsftp.c:5417
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "Neveljavna vrsta atributa (pričakovan je uint32)"
 
@@ -864,9 +870,9 @@ msgstr "/ v %s"
 
 #: daemon/gvfsbackendarchive.c:883 daemon/gvfsbackendburn.c:681
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
-#: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:798
-#: daemon/gvfsbackendgoogle.c:1299 daemon/gvfsbackendgoogle.c:1482
-#: daemon/gvfsbackendnetwork.c:745 daemon/gvfsbackendsftp.c:4318
+#: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:1083
+#: daemon/gvfsbackendgoogle.c:2239 daemon/gvfsbackendgoogle.c:2422
+#: daemon/gvfsbackendnetwork.c:745 daemon/gvfsbackendsftp.c:4443
 #: daemon/gvfsftpdircache.c:157
 #, c-format
 msgid "The file is not a directory"
@@ -886,18 +892,19 @@ msgstr "Ni mogoče ustvariti začasne mape"
 #: daemon/gvfsbackendburn.c:718 daemon/gvfsbackendburn.c:744
 #: daemon/gvfsbackendburn.c:782 daemon/gvfsbackendburn.c:854
 #: daemon/gvfsbackendburn.c:973 daemon/gvfsbackendburn.c:1009
-#: daemon/gvfsbackendftp.c:852 daemon/gvfsbackendgoogle.c:709
+#: daemon/gvfsbackendftp.c:852 daemon/gvfsbackendgoogle.c:994
 #: daemon/gvfsbackendgphoto2.c:938 daemon/gvfsbackendgphoto2.c:1869
 #: daemon/gvfsbackendgphoto2.c:2588 daemon/gvfsbackendrecent.c:110
-#: daemon/gvfsbackendrecent.c:293 daemon/gvfsbackendsftp.c:2156
-#: daemon/gvfsbackendsftp.c:3313 daemon/gvfsbackendsftp.c:3326
-#: daemon/gvfsbackendsftp.c:3346 daemon/gvfsbackendtrash.c:218
+#: daemon/gvfsbackendrecent.c:293 daemon/gvfsbackendsftp.c:2158
+#: daemon/gvfsbackendsftp.c:3318 daemon/gvfsbackendsftp.c:3331
+#: daemon/gvfsbackendsftp.c:3351 daemon/gvfsbackendtrash.c:218
 #, c-format
 msgid "No such file or directory"
 msgstr "Ni take datoteke ali mape"
 
 #: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:905
-#: daemon/gvfsbackendgoogle.c:1853
+#: daemon/gvfsbackendgoogle.c:1597 daemon/gvfsbackendgoogle.c:1932
+#: daemon/gvfsbackendgoogle.c:2849
 msgid "Can’t copy file over directory"
 msgstr "Ni mogoče kopirati datoteke preko mape"
 
@@ -913,8 +920,8 @@ msgstr "CD/DVD zapisovalnik"
 msgid "File exists"
 msgstr "Datoteka obstaja"
 
-#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:2951
-#: daemon/gvfsbackendsftp.c:2150 daemon/gvfsbackendsftp.c:5008
+#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:2975
+#: daemon/gvfsbackendsftp.c:2152 daemon/gvfsbackendsftp.c:5133
 msgid "Target file exists"
 msgstr "Ciljna datoteka obstaja"
 
@@ -1059,7 +1066,7 @@ msgstr "Ni mogoče vrednotiti datoteke"
 msgid "%s on %s%s"
 msgstr "%s na %s%s"
 
-#: daemon/gvfsbackenddav.c:708 daemon/gvfsbackenddav.c:2049
+#: daemon/gvfsbackenddav.c:708 daemon/gvfsbackenddav.c:2073
 #: daemon/gvfsbackendhttp.c:202
 #, c-format
 msgid "HTTP Error: %s"
@@ -1077,53 +1084,53 @@ msgstr "Odziv brez vsebine"
 msgid "Unexpected reply from server"
 msgstr "Nepričakovan odgovor strežnika"
 
-#: daemon/gvfsbackenddav.c:1437 daemon/gvfsbackenddav.c:2176
-#: daemon/gvfsbackenddav.c:2268 daemon/gvfsbackenddav.c:2370
+#: daemon/gvfsbackenddav.c:1444 daemon/gvfsbackenddav.c:2200
+#: daemon/gvfsbackenddav.c:2292 daemon/gvfsbackenddav.c:2394
 msgid "Response invalid"
 msgstr "Neveljaven odziv"
 
-#: daemon/gvfsbackenddav.c:1582
+#: daemon/gvfsbackenddav.c:1589
 msgid "WebDAV share"
 msgstr "Izmenjava WebDAV"
 
 #. translators: %s here is the hostname
 #. Translators: %s is the hostname
-#: daemon/gvfsbackenddav.c:1584 daemon/gvfsbackendftp.c:533
+#: daemon/gvfsbackenddav.c:1591 daemon/gvfsbackendftp.c:533
 #: daemon/gvfsbackendsftp.c:1173
 #, c-format
 msgid "Enter password for %s"
 msgstr "Vnesite geslo za %s"
 
-#: daemon/gvfsbackenddav.c:1587
+#: daemon/gvfsbackenddav.c:1594
 msgid "Please enter proxy password"
 msgstr "Vnesite geslo namestniškega strežnika"
 
-#: daemon/gvfsbackenddav.c:2035
+#: daemon/gvfsbackenddav.c:2059
 msgid "Not a WebDAV enabled share"
 msgstr "Ni podprta WebDAV souporaba"
 
-#: daemon/gvfsbackenddav.c:2057
+#: daemon/gvfsbackenddav.c:2081
 msgid "Could not find an enclosing directory"
 msgstr "Ni mogoče najti določene mape"
 
-#: daemon/gvfsbackenddav.c:2130 daemon/gvfsbackenddav.c:2223
-#: daemon/gvfsbackenddav.c:2296 daemon/gvfsbackenddav.c:2404
+#: daemon/gvfsbackenddav.c:2154 daemon/gvfsbackenddav.c:2247
+#: daemon/gvfsbackenddav.c:2320 daemon/gvfsbackenddav.c:2428
 msgid "Could not create request"
 msgstr "Ni mogoče ustvariti zahteve"
 
-#: daemon/gvfsbackenddav.c:2545 daemon/gvfsbackendftp.c:1102
-#: daemon/gvfsbackendgoogle.c:2609 daemon/gvfsbackendnfs.c:939
-#: daemon/gvfsbackendnfs.c:962 daemon/gvfsbackendnfs.c:988
-#: daemon/gvfsbackendnfs.c:1388 daemon/gvfsbackendsmb.c:1116
-#: daemon/gvfsbackendsmb.c:2082
+#: daemon/gvfsbackenddav.c:2569 daemon/gvfsbackendftp.c:1102
+#: daemon/gvfsbackendgoogle.c:3627 daemon/gvfsbackendnfs.c:941
+#: daemon/gvfsbackendnfs.c:964 daemon/gvfsbackendnfs.c:990
+#: daemon/gvfsbackendnfs.c:1390 daemon/gvfsbackendsmb.c:1116
+#: daemon/gvfsbackendsmb.c:2112
 msgid "Backup file creation failed"
 msgstr "Ni mogoče ustvariti varnostne kopije"
 
-#: daemon/gvfsbackenddav.c:2918
+#: daemon/gvfsbackenddav.c:2942
 msgid "Can’t move over directory"
 msgstr "Ni mogoče premakniti mape čez mapo"
 
-#: daemon/gvfsbackenddav.c:3187
+#: daemon/gvfsbackenddav.c:3211
 msgid "File length changed during transfer"
 msgstr "Dolžina datoteke je bila med prenosom spremenjena."
 
@@ -1160,54 +1167,63 @@ msgstr "Vnos gesla je preklican"
 msgid "Insufficient permissions"
 msgstr "Nezadostna dovoljenja"
 
-#: daemon/gvfsbackendgoogle.c:1751 daemon/gvfsbackendgoogle.c:2279
+#: daemon/gvfsbackendgoogle.c:2046
+msgid "Can’t move file over directory"
+msgstr "Ni mogoče premakniti datoteke prek mape"
+
+#: daemon/gvfsbackendgoogle.c:2088
+msgid "Error moving file/folder"
+msgstr "Napaka med premikanjem datoteke oziroma mape"
+
+#: daemon/gvfsbackendgoogle.c:2733 daemon/gvfsbackendgoogle.c:3297
 #: daemon/gvfsbackendgphoto2.c:1589
 msgid "Error getting data from file"
 msgstr "Napaka med branjem podatkov iz datoteke"
 
-#: daemon/gvfsbackendgoogle.c:1862 daemon/gvfsbackendgoogle.c:2643
-#: daemon/gvfsbackendnfs.c:1160
+#: daemon/gvfsbackendgoogle.c:2858 daemon/gvfsbackendgoogle.c:3661
+#: daemon/gvfsbackendnfs.c:1162
 msgid "Target file is not a regular file"
 msgstr "Ciljna datoteka ni običajna datoteka"
 
-#: daemon/gvfsbackendgoogle.c:2264 daemon/gvfsbackendsftp.c:2329
-#: daemon/gvfsbackendsftp.c:2728 daemon/gvfsbackendsftp.c:2791
-#: daemon/gvfsbackendsftp.c:2802 daemon/gvfsbackendsftp.c:2860
-#: daemon/gvfsbackendsftp.c:2953 daemon/gvfsbackendsftp.c:3005
-#: daemon/gvfsbackendsftp.c:3060 daemon/gvfsbackendsftp.c:3139
-#: daemon/gvfsbackendsftp.c:3256 daemon/gvfsbackendsftp.c:3389
-#: daemon/gvfsbackendsftp.c:3473 daemon/gvfsbackendsftp.c:3549
-#: daemon/gvfsbackendsftp.c:3561 daemon/gvfsbackendsftp.c:3621
-#: daemon/gvfsbackendsftp.c:3663 daemon/gvfsbackendsftp.c:3851
-#: daemon/gvfsbackendsftp.c:3885 daemon/gvfsbackendsftp.c:3943
-#: daemon/gvfsbackendsftp.c:4005 daemon/gvfsbackendsftp.c:4076
-#: daemon/gvfsbackendsftp.c:4351 daemon/gvfsbackendsftp.c:4422
-#: daemon/gvfsbackendsftp.c:4557 daemon/gvfsbackendsftp.c:4667
-#: daemon/gvfsbackendsftp.c:4729 daemon/gvfsbackendsftp.c:4766
-#: daemon/gvfsbackendsftp.c:4794 daemon/gvfsbackendsftp.c:4908
-#: daemon/gvfsbackendsftp.c:4964 daemon/gvfsbackendsftp.c:5005
-#: daemon/gvfsbackendsftp.c:5041 daemon/gvfsbackendsftp.c:5077
-#: daemon/gvfsbackendsftp.c:5092 daemon/gvfsbackendsftp.c:5107
-#: daemon/gvfsbackendsftp.c:5202 daemon/gvfsbackendsftp.c:5270
-#: daemon/gvfsbackendsftp.c:5475 daemon/gvfsbackendsftp.c:5512
-#: daemon/gvfsbackendsftp.c:5586 daemon/gvfsbackendsftp.c:5672
-#: daemon/gvfsbackendsftp.c:5756 daemon/gvfsbackendsftp.c:5799
-#: daemon/gvfsbackendsftp.c:5803 daemon/gvfsbackendsftp.c:5920
-#: daemon/gvfsbackendsftp.c:5924 daemon/gvfsbackendsftp.c:6161
-#: daemon/gvfsbackendsftp.c:6374 daemon/gvfsbackendsftp.c:6391
-#: daemon/gvfsbackendsftp.c:6525 daemon/gvfsbackendsftp.c:6553
+#: daemon/gvfsbackendgoogle.c:3282 daemon/gvfsbackendsftp.c:2331
+#: daemon/gvfsbackendsftp.c:2733 daemon/gvfsbackendsftp.c:2796
+#: daemon/gvfsbackendsftp.c:2807 daemon/gvfsbackendsftp.c:2865
+#: daemon/gvfsbackendsftp.c:2958 daemon/gvfsbackendsftp.c:3010
+#: daemon/gvfsbackendsftp.c:3065 daemon/gvfsbackendsftp.c:3144
+#: daemon/gvfsbackendsftp.c:3261 daemon/gvfsbackendsftp.c:3394
+#: daemon/gvfsbackendsftp.c:3478 daemon/gvfsbackendsftp.c:3554
+#: daemon/gvfsbackendsftp.c:3566 daemon/gvfsbackendsftp.c:3636
+#: daemon/gvfsbackendsftp.c:3706 daemon/gvfsbackendsftp.c:3764
+#: daemon/gvfsbackendsftp.c:3784 daemon/gvfsbackendsftp.c:3976
+#: daemon/gvfsbackendsftp.c:4010 daemon/gvfsbackendsftp.c:4068
+#: daemon/gvfsbackendsftp.c:4130 daemon/gvfsbackendsftp.c:4201
+#: daemon/gvfsbackendsftp.c:4476 daemon/gvfsbackendsftp.c:4547
+#: daemon/gvfsbackendsftp.c:4682 daemon/gvfsbackendsftp.c:4792
+#: daemon/gvfsbackendsftp.c:4854 daemon/gvfsbackendsftp.c:4891
+#: daemon/gvfsbackendsftp.c:4919 daemon/gvfsbackendsftp.c:5033
+#: daemon/gvfsbackendsftp.c:5089 daemon/gvfsbackendsftp.c:5130
+#: daemon/gvfsbackendsftp.c:5166 daemon/gvfsbackendsftp.c:5202
+#: daemon/gvfsbackendsftp.c:5217 daemon/gvfsbackendsftp.c:5232
+#: daemon/gvfsbackendsftp.c:5327 daemon/gvfsbackendsftp.c:5395
+#: daemon/gvfsbackendsftp.c:5600 daemon/gvfsbackendsftp.c:5637
+#: daemon/gvfsbackendsftp.c:5711 daemon/gvfsbackendsftp.c:5797
+#: daemon/gvfsbackendsftp.c:5881 daemon/gvfsbackendsftp.c:5924
+#: daemon/gvfsbackendsftp.c:5928 daemon/gvfsbackendsftp.c:6045
+#: daemon/gvfsbackendsftp.c:6049 daemon/gvfsbackendsftp.c:6286
+#: daemon/gvfsbackendsftp.c:6499 daemon/gvfsbackendsftp.c:6516
+#: daemon/gvfsbackendsftp.c:6650 daemon/gvfsbackendsftp.c:6678
 msgid "Invalid reply received"
 msgstr "Prejet neveljaven odgovor"
 
-#: daemon/gvfsbackendgoogle.c:2270
+#: daemon/gvfsbackendgoogle.c:3288
 msgid "File is not a regular file"
 msgstr "Datoteka ni običajna datoteka"
 
-#: daemon/gvfsbackendgoogle.c:2635 daemon/gvfsbackendnfs.c:1150
+#: daemon/gvfsbackendgoogle.c:3653 daemon/gvfsbackendnfs.c:1152
 msgid "Target file is a directory"
 msgstr "Ciljna datoteka je mapa"
 
-#: daemon/gvfsbackendgoogle.c:2828 daemon/gvfsbackendgphoto2.c:3050
+#: daemon/gvfsbackendgoogle.c:3846 daemon/gvfsbackendgphoto2.c:3050
 msgid "Error writing file"
 msgstr "Napaka med pisanjem datoteke"
 
@@ -1292,7 +1308,7 @@ msgstr "Napaka med ustvarjanjem predmeta datoteke"
 msgid "Error getting file"
 msgstr "Napaka med pridobivanjem datoteke"
 
-#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2372
+#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2374
 #, c-format
 msgid "Malformed icon identifier “%s”"
 msgstr "Neveljavno oblikovano določilo ikone »%s«"
@@ -1302,7 +1318,7 @@ msgstr "Neveljavno oblikovano določilo ikone »%s«"
 msgid "Error seeking in stream on camera %s"
 msgstr "Napaka med iskanjem pretoka na kameri %s"
 
-#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3316
+#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3321
 #: daemon/gvfsbackendsmbbrowse.c:1427
 msgid "Not a directory"
 msgstr "Ni imenik"
@@ -1431,37 +1447,37 @@ msgstr "Ni mogoče odpreti naprave MTP »%03u,%03u«"
 msgid "Device not found"
 msgstr "Naprave ni mogoče najti"
 
-#: daemon/gvfsbackendmtp.c:1370 daemon/gvfsbackendmtp.c:1478
-#: daemon/gvfsbackendmtp.c:1530
+#: daemon/gvfsbackendmtp.c:1372 daemon/gvfsbackendmtp.c:1480
+#: daemon/gvfsbackendmtp.c:1532
 msgid "File not found"
 msgstr "Datoteke ni mogoče najti"
 
-#: daemon/gvfsbackendmtp.c:1600
+#: daemon/gvfsbackendmtp.c:1602
 msgid "Target is a directory"
 msgstr "Ciljna datoteka je mapa"
 
-#: daemon/gvfsbackendmtp.c:1605
+#: daemon/gvfsbackendmtp.c:1607
 msgid "Can’t merge directories"
 msgstr "Ni mogoče združiti map"
 
-#: daemon/gvfsbackendmtp.c:1651
+#: daemon/gvfsbackendmtp.c:1653
 msgid "Cannot make directory in this location"
 msgstr "Mape na tem mestu ni dovoljeno ustvariti."
 
-#: daemon/gvfsbackendmtp.c:1721 daemon/gvfsbackendmtp.c:2137
-#: daemon/gvfsbackendmtp.c:2200 daemon/gvfsbackendmtp.c:2267
-#: daemon/gvfsbackendmtp.c:2629 daemon/gvfsbackendmtp.c:2695
-#: daemon/gvfsbackendmtp.c:2908 daemon/gvfsbackendmtp.c:3051
+#: daemon/gvfsbackendmtp.c:1723 daemon/gvfsbackendmtp.c:2139
+#: daemon/gvfsbackendmtp.c:2202 daemon/gvfsbackendmtp.c:2269
+#: daemon/gvfsbackendmtp.c:2631 daemon/gvfsbackendmtp.c:2697
+#: daemon/gvfsbackendmtp.c:2910 daemon/gvfsbackendmtp.c:3053
 #: daemon/gvfsbackendsmbbrowse.c:1172
 msgid "Not a regular file"
 msgstr "Ni običajna datoteka"
 
-#: daemon/gvfsbackendmtp.c:2009 daemon/gvfsbackendmtp.c:2541
-#: daemon/gvfsbackendmtp.c:2892 daemon/gvfsbackendmtp.c:3035
+#: daemon/gvfsbackendmtp.c:2011 daemon/gvfsbackendmtp.c:2543
+#: daemon/gvfsbackendmtp.c:2894 daemon/gvfsbackendmtp.c:3037
 msgid "Cannot write to this location"
 msgstr "Pisanje na to mesto ni mogoče."
 
-#: daemon/gvfsbackendmtp.c:2354
+#: daemon/gvfsbackendmtp.c:2356
 #, c-format
 msgid "No thumbnail for entity “%s”"
 msgstr "Ni sličice za vnos »%s«"
@@ -1496,13 +1512,13 @@ msgstr ""
 "Dostop je zavrnjen: najverjetneje gostitelj ne dovoli dostopa ali pa je "
 "zahtevan dostop preko določenih vrat"
 
-#: daemon/gvfsbackendnfs.c:1046 daemon/gvfsbackendnfs.c:1069
-#: daemon/gvfsbackendnfs.c:1117 daemon/gvfsbackendsftp.c:3699
-#: daemon/gvfsbackendsftp.c:5827
+#: daemon/gvfsbackendnfs.c:1048 daemon/gvfsbackendnfs.c:1071
+#: daemon/gvfsbackendnfs.c:1119 daemon/gvfsbackendsftp.c:3831
+#: daemon/gvfsbackendsftp.c:5952
 msgid "Unable to create temporary file"
 msgstr "Ni mogoče ustvariti začasne datoteke"
 
-#: daemon/gvfsbackendnfs.c:2375
+#: daemon/gvfsbackendnfs.c:2377
 msgid "Invalid attribute type"
 msgstr "Neveljavna vrsta atributa"
 
@@ -1630,37 +1646,37 @@ msgstr "Napaka v protokolu"
 msgid "Unable to find supported SSH command"
 msgstr "Ni mogoče najti podprtega ukaza SSH"
 
-#: daemon/gvfsbackendsftp.c:2158
+#: daemon/gvfsbackendsftp.c:2160
 msgid "Unknown reason"
 msgstr "Neznana napaka"
 
-#: daemon/gvfsbackendsftp.c:2585 daemon/gvfsbackendsmb.c:1388
+#: daemon/gvfsbackendsftp.c:2590 daemon/gvfsbackendsmb.c:1386
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (neveljavni nabor znakov)"
 
 #. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: daemon/gvfsbackendsftp.c:2597 daemon/gvfsftpdircache.c:431
+#: daemon/gvfsbackendsftp.c:2602 daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
 msgstr "/ na %s"
 
-#: daemon/gvfsbackendsftp.c:2670
+#: daemon/gvfsbackendsftp.c:2675
 msgid "Failure"
 msgstr "Napaka"
 
-#: daemon/gvfsbackendsftp.c:3082
+#: daemon/gvfsbackendsftp.c:3087
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Napaka med ustvarjanjem varnostne datoteke: %s"
 
-#: daemon/gvfsbackendsftp.c:5238
+#: daemon/gvfsbackendsftp.c:5363
 msgid "Value out of range, sftp only supports 32bit timestamps"
 msgstr ""
 "Vrednost je izven dovoljenega obsega; sftp omogoča podporo le 32-bitnim "
 "časovnim žigom"
 
-#: daemon/gvfsbackendsftp.c:5313 daemon/gvfsbackendsmb.c:1724
+#: daemon/gvfsbackendsftp.c:5438 daemon/gvfsbackendsmb.c:1725
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Neveljavna vrsta atributa (pričakovan je uint64)"
 
@@ -1711,30 +1727,30 @@ msgstr "Priklapljanje mape souporabe s sistema Windows je spodletelo: %s"
 msgid "Backup file creation failed: %s"
 msgstr "Ni mogoče ustvariti varnostne kopije: %s"
 
-#: daemon/gvfsbackendsmb.c:1893
+#: daemon/gvfsbackendsmb.c:1923
 msgid "Can’t rename file, filename already exists"
 msgstr "Ni mogoče preimenovati datoteke, izbrano ime že obstaja"
 
-#: daemon/gvfsbackendsmb.c:1944
+#: daemon/gvfsbackendsmb.c:1974
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Napaka med brisanjem datoteke: %s"
 
-#: daemon/gvfsbackendsmb.c:2030
+#: daemon/gvfsbackendsmb.c:2060
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Napaka med premikanjem datoteke: %s"
 
-#: daemon/gvfsbackendsmb.c:2102
+#: daemon/gvfsbackendsmb.c:2132
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Napaka med odstranjevanjem ciljne datoteke: %s"
 
-#: daemon/gvfsbackendsmb.c:2126
+#: daemon/gvfsbackendsmb.c:2156
 msgid "Can’t recursively move directory"
 msgstr "Ni mogoče po strukturi map premakniti mape"
 
-#: daemon/gvfsbackendsmb.c:2172
+#: daemon/gvfsbackendsmb.c:2202
 msgid "Windows Shares File System Service"
 msgstr "Storitev souporabe datotečnega sistema Windows"
 
@@ -1756,43 +1772,43 @@ msgstr "Smeti"
 msgid "Channel blocked"
 msgstr "Blokiran kanal"
 
-#: daemon/gvfsdaemonutils.c:249
+#: daemon/gvfsdaemonutils.c:251
 msgid "The signing certificate authority is not known."
 msgstr "Podpisnik potrdila ni znan."
 
-#: daemon/gvfsdaemonutils.c:251
+#: daemon/gvfsdaemonutils.c:253
 msgid "The certificate does not match the identity of the site."
 msgstr "Potrdilo ni skladno z istovetnostjo strani."
 
-#: daemon/gvfsdaemonutils.c:253
+#: daemon/gvfsdaemonutils.c:255
 msgid "The certificate’s activation time is in the future."
 msgstr "Čas veljavnosti potrdila je v prihodnosti."
 
-#: daemon/gvfsdaemonutils.c:255
+#: daemon/gvfsdaemonutils.c:257
 msgid "The certificate has expired."
 msgstr "Potrdilo je preteklo."
 
-#: daemon/gvfsdaemonutils.c:257
+#: daemon/gvfsdaemonutils.c:259
 msgid "The certificate has been revoked."
 msgstr "Potrdilo je preklicano."
 
-#: daemon/gvfsdaemonutils.c:259
+#: daemon/gvfsdaemonutils.c:261
 msgid "The certificate’s algorithm is considered insecure."
 msgstr "Algoritem potrdila ni varen."
 
-#: daemon/gvfsdaemonutils.c:261
+#: daemon/gvfsdaemonutils.c:263
 msgid "Error occurred when validating the certificate."
 msgstr "Prišlo je do napake med overjanjem potrdila."
 
-#: daemon/gvfsdaemonutils.c:323
+#: daemon/gvfsdaemonutils.c:325
 msgid "Yes"
 msgstr "Da"
 
-#: daemon/gvfsdaemonutils.c:323
+#: daemon/gvfsdaemonutils.c:325
 msgid "No"
 msgstr "Ne"
 
-#: daemon/gvfsdaemonutils.c:333
+#: daemon/gvfsdaemonutils.c:335
 #, c-format
 msgid ""
 "The site’s identity can’t be verified:%s\n"
@@ -2008,18 +2024,18 @@ msgstr "GVFS zadnji program metapodatkov"
 msgid "Metadata daemon for GVFS"
 msgstr "Metapodatkovni ozadnji program za GVFS"
 
-#: monitor/goa/goavolume.c:208 monitor/goa/goavolume.c:247
+#: monitor/goa/goavolume.c:298 monitor/goa/goavolume.c:337
 #, c-format
 msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
 msgstr ""
 "Pridobivanje vrednosti org.gnome.OnlineAccounts.Files za %s je spodletelo"
 
-#: monitor/goa/goavolume.c:278
+#: monitor/goa/goavolume.c:368
 #, c-format
 msgid "Invalid credentials for %s"
 msgstr "Neveljavna poverila za %s"
 
-#: monitor/goa/goavolume.c:311
+#: monitor/goa/goavolume.c:401
 #, c-format
 msgid "Unsupported authentication method for %s"
 msgstr "Nepodprt način overitve za %s"
@@ -2078,7 +2094,7 @@ msgid "Eject Anyway"
 msgstr "Vseeno izvrzi"
 
 #: monitor/udisks2/gvfsudisks2mount.c:1128
-#: monitor/udisks2/gvfsudisks2volume.c:1765
+#: monitor/udisks2/gvfsudisks2volume.c:1768
 msgid "Operation not supported by backend"
 msgstr "Zaledje ne podpira dejanja"
 
@@ -2148,35 +2164,35 @@ msgid "%s Volume"
 msgstr "%s nosilec"
 
 #. Translators: Name used for volume
-#: monitor/udisks2/gvfsudisks2volume.c:560
+#: monitor/udisks2/gvfsudisks2volume.c:563
 msgid "Volume"
 msgstr "Nosilec"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1149
+#: monitor/udisks2/gvfsudisks2volume.c:1152
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "Napaka pri shranjevanju šifrirnega gesla v zbirki ključev (%s)"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1182
+#: monitor/udisks2/gvfsudisks2volume.c:1185
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "Napaka pri brisanju šifrirnega gesla iz zbirke ključev (%s)"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1244
+#: monitor/udisks2/gvfsudisks2volume.c:1247
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr "Odklenjena naprava je brez prepoznanega datotečnega sistema."
 
-#: monitor/udisks2/gvfsudisks2volume.c:1272
+#: monitor/udisks2/gvfsudisks2volume.c:1275
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Šifrirno geslo za %s"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1481
+#: monitor/udisks2/gvfsudisks2volume.c:1484
 msgid "A passphrase is required to access the volume"
 msgstr "Za dostop do nosilca je zahtevano šifrirno geslo"
 
 #. Translators: %s is the description of the volume that is being unlocked
-#: monitor/udisks2/gvfsudisks2volume.c:1496
+#: monitor/udisks2/gvfsudisks2volume.c:1499
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2187,7 +2203,7 @@ msgstr ""
 "naključne podatke."
 
 #. Translators: %s is the description of the volume that is being unlocked
-#: monitor/udisks2/gvfsudisks2volume.c:1501
+#: monitor/udisks2/gvfsudisks2volume.c:1504
 #, c-format
 msgid ""
 "Enter a passphrase to unlock the volume\n"
@@ -2200,7 +2216,7 @@ msgstr ""
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: monitor/udisks2/gvfsudisks2volume.c:1681
+#: monitor/udisks2/gvfsudisks2volume.c:1684
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
