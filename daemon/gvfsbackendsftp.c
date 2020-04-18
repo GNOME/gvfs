@@ -5491,6 +5491,8 @@ typedef struct {
   /* fstat information */
   goffset size;
   guint32 permissions;
+  guint64 mtime;
+  guint64 atime;
 
   /* state */
   goffset offset;
@@ -5640,8 +5642,15 @@ push_close_deleted_file (GVfsBackendSftp *backend,
 }
 
 static void
-push_close_delete_or_succeed (SftpPushHandle *handle)
+push_close_delete_or_succeed (GVfsBackendSftp *backend,
+                              int reply_type,
+                              GDataInputStream *reply,
+                              guint32 len,
+                              GVfsJob *job,
+                              gpointer user_data)
 {
+  SftpPushHandle *handle = user_data;
+
   if (handle->tempname)
     {
       /* If we wrote to a temp file, do delete then rename. */
@@ -5662,15 +5671,52 @@ push_close_delete_or_succeed (SftpPushHandle *handle)
 }
 
 static void
-push_close_restore_permissions (GVfsBackendSftp *backend,
-                                int reply_type,
-                                GDataInputStream *reply,
-                                guint32 len,
-                                GVfsJob *job,
-                                gpointer user_data)
+push_close_restore_permissions (SftpPushHandle *handle)
 {
-  /* We don't care if setting the permissions succeeded or not. */
-  push_close_delete_or_succeed (user_data);
+  gboolean default_perms = (handle->op_job->flags & G_FILE_COPY_TARGET_DEFAULT_PERMS);
+  guint32 flags = SSH_FILEXFER_ATTR_ACMODTIME;
+
+  if (!default_perms)
+    flags |= SSH_FILEXFER_ATTR_PERMISSIONS;
+
+  /* Restore the source file's permissions and timestamps. */
+  GDataOutputStream *command = new_command_stream (handle->backend, SSH_FXP_SETSTAT);
+  put_string (command, handle->tempname ? handle->tempname : handle->op_job->destination);
+  g_data_output_stream_put_uint32 (command, flags, NULL, NULL);
+  if (!default_perms)
+    g_data_output_stream_put_uint32 (command, handle->permissions, NULL, NULL);
+  g_data_output_stream_put_uint32 (command, handle->atime, NULL, NULL);
+  g_data_output_stream_put_uint32 (command, handle->mtime, NULL, NULL);
+  queue_command_stream_and_free (&handle->backend->command_connection, command,
+                                 push_close_delete_or_succeed,
+                                 handle->job, handle);
+}
+
+static void
+push_close_stat_reply (GVfsBackendSftp *backend,
+                       int reply_type,
+                       GDataInputStream *reply,
+                       guint32 len,
+                       GVfsJob *job,
+                       gpointer user_data)
+{
+  SftpPushHandle *handle = user_data;
+
+  if (reply_type == SSH_FXP_ATTRS)
+    {
+      GFileInfo *info = g_file_info_new ();
+
+      parse_attributes (backend, info, NULL, reply, NULL);
+
+      /* Don't fail on error, but fall back to the local atime
+       * (assigned in push_source_fstat_cb). */
+      if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_TIME_ACCESS))
+        handle->atime = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS);
+
+      g_object_unref (info);
+    }
+
+  push_close_restore_permissions (handle);
 }
 
 static void
@@ -5688,19 +5734,19 @@ push_close_write_reply (GVfsBackendSftp *backend,
       guint32 code = read_status_code (reply);
       if (code == SSH_FX_OK)
         {
-          if (handle->op_job->flags & G_FILE_COPY_TARGET_DEFAULT_PERMS)
-            push_close_delete_or_succeed (handle);
-          else
+          /* Atime is COPY_WHEN_MOVED, but not COPY_WITH_FILE. */
+          if (!handle->op_job->remove_source &&
+              !(handle->op_job->flags & G_FILE_COPY_ALL_METADATA))
             {
-              /* Restore the source file's permissions. */
-              GDataOutputStream *command = new_command_stream (backend, SSH_FXP_SETSTAT);
-              put_string (command, handle->tempname ? handle->tempname : handle->op_job->destination);
-              g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_PERMISSIONS, NULL, NULL);
-              g_data_output_stream_put_uint32 (command, handle->permissions, NULL, NULL);
+              GDataOutputStream *command = new_command_stream (backend, SSH_FXP_LSTAT);
+              put_string (command, handle->op_job->destination);
               queue_command_stream_and_free (&backend->command_connection, command,
-                                             push_close_restore_permissions,
+                                             push_close_stat_reply,
                                              job, handle);
+              return;
             }
+
+          push_close_restore_permissions (handle);
           return;
         }
       else
@@ -6070,6 +6116,8 @@ push_source_fstat_cb (GObject *source, GAsyncResult *res, gpointer user_data)
     {
       handle->permissions = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE) & 0777;
       handle->size = g_file_info_get_size (info);
+      handle->mtime = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
+      handle->atime = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS);
 
       command = new_command_stream (handle->backend, SSH_FXP_OPEN);
       put_string (command, handle->op_job->destination);
@@ -6102,7 +6150,9 @@ push_source_open_cb (GObject *source, GAsyncResult *res, gpointer user_data)
 
       g_file_input_stream_query_info_async (fin,
                                             G_FILE_ATTRIBUTE_STANDARD_SIZE ","
-                                            G_FILE_ATTRIBUTE_UNIX_MODE,
+                                            G_FILE_ATTRIBUTE_UNIX_MODE ","
+                                            G_FILE_ATTRIBUTE_TIME_MODIFIED ","
+                                            G_FILE_ATTRIBUTE_TIME_ACCESS,
                                             0, NULL,
                                             push_source_fstat_cb, handle);
     }
@@ -6211,6 +6261,8 @@ typedef struct {
   /* fstat information */
   goffset size;
   guint32 mode;
+  guint64 mtime;
+  guint64 atime;
 
   /* state */
   goffset offset;
@@ -6317,12 +6369,22 @@ pull_close_cb (GObject *source, GAsyncResult *res, gpointer user_data)
     {
       g_vfs_job_progress_callback (handle->n_written, handle->n_written, handle->job);
 
-      if (handle->size >= 0 && !(handle->op_job->flags & G_FILE_COPY_TARGET_DEFAULT_PERMS))
+      if (handle->size >= 0)
         {
           GFileInfo *info = g_file_info_new ();
-          g_file_info_set_attribute_uint32 (info,
-                                            G_FILE_ATTRIBUTE_UNIX_MODE,
-                                            handle->mode);
+          if (!(handle->op_job->flags & G_FILE_COPY_TARGET_DEFAULT_PERMS))
+            g_file_info_set_attribute_uint32 (info,
+                                              G_FILE_ATTRIBUTE_UNIX_MODE,
+                                              handle->mode);
+          g_file_info_set_attribute_uint64 (info,
+                                            G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                            handle->mtime);
+          /* Atime is COPY_WHEN_MOVED, but not COPY_WITH_FILE. */
+          if (handle->op_job->remove_source ||
+              (handle->op_job->flags & G_FILE_COPY_ALL_METADATA))
+            g_file_info_set_attribute_uint64 (info,
+                                              G_FILE_ATTRIBUTE_TIME_ACCESS,
+                                              handle->atime);
           g_file_set_attributes_async (handle->dest,
                                        info,
                                        G_FILE_QUERY_INFO_NONE,
@@ -6573,6 +6635,10 @@ pull_fstat_reply (GVfsBackendSftp *backend,
       handle->size = g_file_info_get_size (info);
       handle->mode = g_file_info_get_attribute_uint32 (info,
                                                        G_FILE_ATTRIBUTE_UNIX_MODE);
+      handle->mtime = g_file_info_get_attribute_uint64 (info,
+                                                        G_FILE_ATTRIBUTE_TIME_MODIFIED);
+      handle->atime = g_file_info_get_attribute_uint64 (info,
+                                                        G_FILE_ATTRIBUTE_TIME_ACCESS);
       g_object_unref (info);
     }
   else
