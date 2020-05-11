@@ -1446,7 +1446,6 @@ stat_location (GVfsBackend  *backend,
   return res;
 }
 
-
 /* ************************************************************************* */
 /* Authentication */
 
@@ -1930,8 +1929,10 @@ do_mount (GVfsBackend  *backend,
 
   last_good_path = NULL;
   msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
-  msg_stat = stat_location_begin (mount_base, FALSE);
 
+  /* The count_children parameter is intentionally set to TRUE to be sure that
+     enumeration is possible: https://gitlab.gnome.org/GNOME/gvfs/-/issues/468 */
+  msg_stat = stat_location_begin (mount_base, TRUE);
 
   do {
     GFileType file_type;
@@ -2012,7 +2013,7 @@ do_mount (GVfsBackend  *backend,
 
     if (is_collection == FALSE)
       break;
-    
+
     /* we have found a new good root, try the parent ... */
     g_free (last_good_path);
     last_good_path = mount_base->path;
