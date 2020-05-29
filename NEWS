@@ -1,3 +1,10 @@
+Major changes in 1.45.2
+=======================
+* metadata: Emit D-Bus signal when metadata are modified
+* sftp: Preserve timestamps during copy and move operations
+* dav: Add support for Negotiate and NTLM authentication
+* Translation updates
+
 Major changes in 1.44.1
 =======================
 * udisks2: Fix several memory leaks
