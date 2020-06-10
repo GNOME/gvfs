@@ -1234,7 +1234,7 @@ meta_builder_write (MetaBuilder *builder,
 
       data = mmap (NULL, RANDOM_TAG_OFFSET + 4, PROT_READ|PROT_WRITE, MAP_SHARED, fd2, 0);
 
-      if (data)
+      if (data != MAP_FAILED)
 	{
 	  old_tag = GUINT32_FROM_BE (*(guint32 *)(data + RANDOM_TAG_OFFSET));
 	  *(guint32 *)(data + ROTATED_OFFSET) = 0xffffffff;
