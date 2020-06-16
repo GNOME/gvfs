@@ -357,7 +357,10 @@ config_h.set('HAVE_LOGIND', enable_logind)
 enable_afc = get_option('afc')
 if enable_afc
   libimobiledevice_dep = dependency('libimobiledevice-1.0', version: '>= 1.2')
-  libplist_dep = dependency('libplist', version: '>= 0.15')
+  libplist_dep = dependency('libplist-2.0', required: false)
+  if not libplist_dep.found()
+    libplist_dep = dependency('libplist', version: '>= 0.15')
+  endif
 endif
 
 # *** Check if we should build with GOA volume monitor ***
