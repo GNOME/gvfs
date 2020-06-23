@@ -606,37 +606,6 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static GUnixMountPoint *
-get_mount_point_for_mount (GUnixMountEntry *mount_entry)
-{
-  GUnixMountPoint *ret = NULL;
-  GList *mount_points, *l;
-
-  mount_points = g_unix_mount_points_get (NULL);
-  for (l = mount_points; l != NULL; l = l->next)
-    {
-      GUnixMountPoint *mount_point = l->data;
-      if (g_strcmp0 (g_unix_mount_get_mount_path (mount_entry),
-                     g_unix_mount_point_get_mount_path (mount_point)) == 0)
-        {
-          ret = mount_point;
-          goto out;
-        }
-    }
-
- out:
-  for (l = mount_points; l != NULL; l = l->next)
-    {
-      GUnixMountPoint *mount_point = l->data;
-      if (G_LIKELY (mount_point != ret))
-        g_unix_mount_point_free (mount_point);
-    }
-  g_list_free (mount_points);
-  return ret;
-}
-
-/* ---------------------------------------------------------------------------------------------------- */
-
 static gboolean
 should_include (const gchar *mount_path,
                 const gchar *options)
@@ -739,7 +708,7 @@ should_include_mount (GVfsUDisks2VolumeMonitor  *monitor,
    * in prior to g_unix_mount_get_options to keep support of "comment=" options,
    * see https://gitlab.gnome.org/GNOME/gvfs/issues/348.
    */
-  mount_point = get_mount_point_for_mount (mount_entry);
+  mount_point = g_unix_mount_point_at (g_unix_mount_get_mount_path (mount_entry), NULL);
   if (mount_point != NULL)
     {
       ret = should_include_mount_point (monitor, mount_point);
