@@ -245,7 +245,21 @@ g_vfs_decode_uri (const char *uri)
 	  decoded->port = -1;
 	}
 
-      decoded->host = g_uri_unescape_segment (host_start, host_end, NULL);
+      /* Let's use the IPv6 address without unescaping. This is needed in order
+       * to prevent g_uri_unescape_segment failures when zone identifier
+       * separated by the bare % as it is defined by RFC 4007 is used here. The
+       * zone identifier should contain just ASCII characters as per RFC 4007,
+       * so it doesn't need to be unescaped. I intentionally don't support here
+       * what is suggested by RFC 6874, which changes the separator to %25 and
+       * at the same time, it suggests that the bare % sign should still be
+       * accepted in user interfaces. Such a thing would make this too complex
+       * and lead to various problems (e.g. it would not be clear what separator
+       * should be used for g_file_get_uri function)...
+       */
+      if (*host_start == '[')
+        decoded->host = g_strndup (host_start, host_end - host_start);
+      else
+        decoded->host = g_uri_unescape_segment (host_start, host_end, NULL);
 
       hier_part_start = authority_end;
     }

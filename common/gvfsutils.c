@@ -129,18 +129,9 @@ gvfs_setup_debug_handler (void)
 gboolean
 gvfs_is_ipv6 (const char *host)
 {
-  const char *p = host;
-
   g_return_val_if_fail (host != NULL, FALSE);
 
-  if (*p != '[')
-    return FALSE;
-
-  while (++p)
-    if (!g_ascii_isxdigit (*p) && *p != ':')
-      break;
-
-  if (*p != ']' || *(p + 1) != '\0')
+  if (*host != '[' || host[strlen (host) - 1] != ']')
     return FALSE;
 
   return TRUE;
