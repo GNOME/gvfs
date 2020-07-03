@@ -30,7 +30,7 @@ typedef struct {
   char *uri;
   char *display_name;
   GFile *file;
-  time_t modified;
+  GDateTime *modified;
 } RecentItem;
 
 struct OPAQUE_TYPE__GVfsBackendRecent
@@ -326,7 +326,8 @@ recent_backend_add_info (RecentItem *item,
                                      TRUE);
 
   /* G_FILE_ATTRIBUTE_RECENT_MODIFIED */
-  g_file_info_set_attribute_int64 (info, "recent::modified", item->modified);
+  g_file_info_set_attribute_int64 (info, "recent::modified",
+                                   g_date_time_to_unix (item->modified));
 }
 
 static gboolean
@@ -375,6 +376,7 @@ recent_item_free (RecentItem *item)
   g_free (item->display_name);
   g_free (item->guid);
   g_clear_object (&item->file);
+  g_date_time_unref (item->modified);
   g_free (item);
 }
 
@@ -382,7 +384,7 @@ static gboolean
 recent_item_update (RecentItem  *item,
                     const gchar *uri,
                     const gchar *display_name,
-                    time_t       modified)
+                    GDateTime   *modified)
 {
   gboolean changed = FALSE;
 
@@ -403,10 +405,11 @@ recent_item_update (RecentItem  *item,
       item->display_name = g_strdup (display_name);
     }
 
-  if (item->modified != modified)
+  if (!g_date_time_equal (item->modified, modified))
     {
       changed = TRUE;
-      item->modified = modified;
+      g_date_time_unref (item->modified);
+      item->modified = g_date_time_ref (modified);
     }
 
   return changed;
@@ -415,11 +418,12 @@ recent_item_update (RecentItem  *item,
 static RecentItem *
 recent_item_new (const gchar *uri,
                  const gchar *display_name,
-                 time_t       modified)
+                 GDateTime   *modified)
 {
   RecentItem *item;
   item = g_new0 (RecentItem, 1);
   item->guid = g_dbus_generate_guid ();
+  item->modified = g_date_time_ref (modified);
 
   recent_item_update (item, uri, display_name, modified);
 
@@ -508,12 +512,12 @@ reload_recent_items (GVfsBackendRecent *backend)
       const char *uri = uris[i];
       const char *guid;
       char *display_name;
-      time_t modified;
+      GDateTime *modified;
 
       if (should_include (backend->bookmarks, uri))
         {
           display_name = get_display_name (backend->bookmarks, uri);
-          modified = g_bookmark_file_get_modified (backend->bookmarks, uri, NULL);
+          modified = g_bookmark_file_get_modified_date_time (backend->bookmarks, uri, NULL);
           guid = g_hash_table_lookup (backend->uri_map, uri);
           if (guid)
             {
