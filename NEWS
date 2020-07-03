@@ -1,3 +1,9 @@
+Major changes in 1.45.3
+=======================
+* client: Add support for zone identifiers in IPv6 addresses
+* afc: Add support for libplist-2.2
+* Translation updates
+
 Major changes in 1.45.2
 =======================
 * metadata: Emit D-Bus signal when metadata are modified
