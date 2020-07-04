@@ -791,6 +791,21 @@ add_metadata (GFile *file,
   g_file_attribute_matcher_unref (matcher);
 }
 
+static void
+add_file (GFile      *file,
+          const char *attributes,
+          GFileInfo  *info)
+{
+  GFileAttributeMatcher *matcher;
+
+  matcher = g_file_attribute_matcher_new (attributes);
+
+  if (g_file_attribute_matcher_matches (matcher, "standard::file"))
+    g_file_info_set_attribute_object (info, "standard::file", G_OBJECT (file));
+
+  g_file_attribute_matcher_unref (matcher);
+}
+
 static GFileInfo *
 g_daemon_file_query_info (GFile                *file,
 			  const char           *attributes,
@@ -840,8 +855,11 @@ g_daemon_file_query_info (GFile                *file,
   g_variant_unref (iter_info);
 
   if (info)
-    add_metadata (file, attributes, info);
-  
+    {
+      add_metadata (file, attributes, info);
+      add_file (file, attributes, info);
+    }
+
   return info;
 }
 
@@ -890,6 +908,7 @@ query_info_async_cb (GVfsDBusMount *proxy,
 
   file = G_FILE (g_task_get_source_object (task));
   add_metadata (file, data->attributes, info);
+  add_file (file, data->attributes, info);
 
   g_task_return_pointer (task, info, g_object_unref);
 
