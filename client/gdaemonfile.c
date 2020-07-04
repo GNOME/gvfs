@@ -840,8 +840,11 @@ g_daemon_file_query_info (GFile                *file,
   g_variant_unref (iter_info);
 
   if (info)
-    add_metadata (file, attributes, info);
-  
+    {
+      add_metadata (file, attributes, info);
+      g_file_info_set_file (info, file);
+    }
+
   return info;
 }
 
@@ -890,6 +893,7 @@ query_info_async_cb (GVfsDBusMount *proxy,
 
   file = G_FILE (g_task_get_source_object (task));
   add_metadata (file, data->attributes, info);
+  g_file_info_set_file (info, file);
 
   g_task_return_pointer (task, info, g_object_unref);
 
