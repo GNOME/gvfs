@@ -33,7 +33,6 @@ sources = uri_parser_sources + uri_utils + files(
 
 deps = [
   gio_unix_dep,
-  libgvfscommon_dep,
   libmetadata_dep,
 ]
 

@@ -47,6 +47,7 @@ sources = files(
 deps = [
   gio_dep,
   glib_dep,
+  libgvfscommon_dep,
 ]
 
 cflags = [
@@ -58,7 +59,7 @@ cflags = [
 libmetadata = static_library(
   'metadata',
   sources: sources + [dbus_sources],
-  include_directories: [top_inc, common_inc],
+  include_directories: top_inc,
   dependencies: deps + [gio_unix_dep],
   c_args: cflags,
   pic: true,
@@ -71,10 +72,7 @@ libmetadata_dep = declare_dependency(
   link_with: libmetadata,
 )
 
-deps = [
-  libgvfscommon_dep,
-  libmetadata_dep,
-]
+deps = [libmetadata_dep]
 
 if enable_gudev
   deps += gudev_dep
@@ -104,10 +102,7 @@ if enable_devel_utils
       app,
       app + '.c',
       include_directories: top_inc,
-      dependencies: [
-        libgvfscommon_dep,
-        libmetadata_dep,
-      ],
+      dependencies: libmetadata_dep,
       c_args: cflags,
     )
   endforeach
