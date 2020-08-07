@@ -1,3 +1,9 @@
+Major changes in 1.45.90
+========================
+* trash: Add support for x-gvfs-notrash option to ignore mounts
+* recent: Port to GDateTime
+* Translation updates
+
 Major changes in 1.45.3
 =======================
 * client: Add support for zone identifiers in IPv6 addresses
