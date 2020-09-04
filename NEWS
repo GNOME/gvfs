@@ -1,3 +1,8 @@
+Major changes in 1.45.92
+========================
+* build: Link libgvfscommon to libmetadata
+* Translation updates
+
 Major changes in 1.45.90
 ========================
 * trash: Add support for x-gvfs-notrash option to ignore mounts
