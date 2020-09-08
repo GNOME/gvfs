@@ -216,6 +216,7 @@ dir_watch_recursive_destroy (gpointer user_data)
       watch->state = FALSE;
     }
 
+  g_file_monitor_cancel (watch->parent_monitor);
   g_object_unref (watch->parent_monitor);
   watch->parent_monitor = NULL;
 }
@@ -271,7 +272,10 @@ dir_watch_free (DirWatch *watch)
   if (watch != NULL)
     {
       if (watch->parent_monitor)
-        g_object_unref (watch->parent_monitor);
+        {
+          g_file_monitor_cancel (watch->parent_monitor);
+          g_object_unref (watch->parent_monitor);
+        }
 
       g_object_unref (watch->directory);
       g_object_unref (watch->topdir);
