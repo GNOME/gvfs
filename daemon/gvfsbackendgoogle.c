@@ -2777,6 +2777,12 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ push: %s -> %s, %d\n", local_path, destination, flags);
 
+  if (remove_source && (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
+      goto out;
+    }
+
   if (flags & G_FILE_COPY_BACKUP)
     {
       /* Return G_IO_ERROR_NOT_SUPPORTED instead of

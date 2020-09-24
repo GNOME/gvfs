@@ -6216,6 +6216,14 @@ try_push (GVfsBackend *backend,
   GFile *source;
   SftpPushHandle *handle;
 
+  if (remove_source && (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE))
+    {
+      g_vfs_job_failed (G_VFS_JOB (op_job),
+                        G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                        _("Operation not supported"));
+      return TRUE;
+    }
+
   if (!connection_is_usable (&op_backend->data_connection))
     {
       g_vfs_job_failed (G_VFS_JOB (op_job),
@@ -6764,6 +6772,14 @@ try_pull (GVfsBackend *backend,
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   SftpPullHandle *handle;
   Command commands[2];
+
+  if (remove_source && (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                        _("Operation not supported"));
+      return TRUE;
+    }
 
   if (!connection_is_usable (&op_backend->data_connection))
     {

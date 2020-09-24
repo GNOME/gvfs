@@ -3477,6 +3477,13 @@ try_push (GVfsBackend *backend,
   GFile *source;
   PushHandle *handle;
 
+  if (remove_source && (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                        _("Operation not supported"));
+      return TRUE;
+    }
+
   handle = g_slice_new0 (PushHandle);
   handle->backend = g_object_ref (backend);
   handle->job = g_object_ref (G_VFS_JOB (job));

@@ -1711,6 +1711,13 @@ do_pull (GVfsBackend *backend,
   GFileInfo *info = NULL;
   guint64 mtime;
 
+  if (remove_source && (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE)) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                      _("Operation not supported"));
+    goto exit;
+  }
+
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), source);
   if (entry == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -2004,6 +2011,13 @@ do_push (GVfsBackend *backend,
   GFileInfo *info = NULL;
   gchar **elements = g_strsplit_set (destination, "/", -1);
   unsigned int ne = g_strv_length (elements);
+
+  if (remove_source && (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE)) {
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                      _("Operation not supported"));
+    goto exit;
+  }
 
   if (ne < 3) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),

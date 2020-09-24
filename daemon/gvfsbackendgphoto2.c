@@ -3243,6 +3243,14 @@ do_pull (GVfsBackend *backend,
 
   split_filename_with_ignore_prefix (gphoto2_backend, source, &dir, &name);
 
+  if (remove_source && (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        _("Operation not supported"));
+      goto out;
+    }
+
   if (remove_source && !gphoto2_backend->can_delete)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
