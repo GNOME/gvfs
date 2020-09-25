@@ -59,7 +59,13 @@ create_proxy_for_icon (GVfsIcon *vfs_icon,
 
   connection = _g_dbus_connection_get_sync (mount_info->dbus_id, cancellable, &local_error);
   if (connection == NULL)
-    goto out;
+    {
+      g_dbus_error_strip_remote_error (local_error);
+      g_warning ("The peer-to-peer connection failed: %s. Your application is "
+                 "probably missing --filesystem=xdg-run/gvfsd privileges.",
+                 local_error->message);
+      goto out;
+    }
 
   proxy = gvfs_dbus_mount_proxy_new_sync (connection,
                                           G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
@@ -242,6 +248,11 @@ async_got_connection_cb (GDBusConnection *connection,
 
   if (connection == NULL)
     {
+      g_dbus_error_strip_remote_error (io_error);
+      g_warning ("The peer-to-peer connection failed: %s. Falling back to the "
+                 "session bus. Your application is probably missing "
+                 "--filesystem=xdg-run/gvfsd privileges.", io_error->message);
+
       g_bus_get (G_BUS_TYPE_SESSION,
                  g_task_get_cancellable (data->task),
                  bus_get_cb,

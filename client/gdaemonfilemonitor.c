@@ -180,8 +180,10 @@ g_daemon_file_monitor_new (const char *remote_id,
   connection = _g_dbus_connection_get_sync (daemon_monitor->remote_id, NULL, &error);
   if (connection == NULL)
     {
-      g_printerr ("Error getting connection for monitoring: %s (%s, %d)\n",
-                  error->message, g_quark_to_string (error->domain), error->code);
+      g_dbus_error_strip_remote_error (error);
+      g_warning ("The peer-to-peer connection failed: %s. Your application is "
+                 "probably missing --filesystem=xdg-run/gvfsd privileges.",
+                 error->message);
       g_error_free (error);
     }
   else

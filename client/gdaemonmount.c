@@ -315,8 +315,11 @@ async_got_connection_cb (GDBusConnection *connection,
 
   if (connection == NULL)
     {
-      /* TODO: we should probably test if we really want a session bus;
-       *       for now, this code is on par with the old dbus code */ 
+      g_dbus_error_strip_remote_error (io_error);
+      g_warning ("The peer-to-peer connection failed: %s. Falling back to the "
+                 "session bus. Your application is probably missing "
+                 "--filesystem=xdg-run/gvfsd privileges.", io_error->message);
+
       g_bus_get (G_BUS_TYPE_SESSION,
                  g_task_get_cancellable (task),
                  bus_get_cb,
