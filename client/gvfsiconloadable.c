@@ -196,20 +196,9 @@ async_proxy_new_cb (GObject *source_object,
 }
 
 static void
-async_got_connection_cb (GDBusConnection *connection,
-                         GError *io_error,
-                         gpointer callback_data)
+async_construct_proxy (GDBusConnection *connection,
+                       AsyncPathCall *data)
 {
-  AsyncPathCall *data = callback_data;
-  
-  if (connection == NULL)
-    {
-      g_dbus_error_strip_remote_error (io_error);
-      g_task_return_error (data->task, io_error);
-      async_path_call_free (data);
-      return;
-    }
-  
   data->connection = g_object_ref (connection);
   gvfs_dbus_mount_proxy_new (connection,
                              G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
@@ -218,6 +207,49 @@ async_got_connection_cb (GDBusConnection *connection,
                              g_task_get_cancellable (data->task),
                              async_proxy_new_cb,
                              data);
+}
+
+
+static void
+bus_get_cb (GObject *source_object,
+            GAsyncResult *res,
+            gpointer user_data)
+{
+  AsyncPathCall *data = user_data;
+  GDBusConnection *connection;
+  GError *error = NULL;
+
+  connection = g_bus_get_finish (res, &error);
+
+  if (connection == NULL)
+    {
+      g_dbus_error_strip_remote_error (error);
+      g_task_return_error (data->task, error);
+      async_path_call_free (data);
+      return;
+    }
+
+  async_construct_proxy (connection, data);
+  g_object_unref (connection);
+}
+
+static void
+async_got_connection_cb (GDBusConnection *connection,
+                         GError *io_error,
+                         gpointer callback_data)
+{
+  AsyncPathCall *data = callback_data;
+
+  if (connection == NULL)
+    {
+      g_bus_get (G_BUS_TYPE_SESSION,
+                 g_task_get_cancellable (data->task),
+                 bus_get_cb,
+                 data);
+      return;
+    }
+
+  async_construct_proxy (connection, data);
 }
 
 static void
