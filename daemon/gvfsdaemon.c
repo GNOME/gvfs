@@ -768,117 +768,19 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
   new_connection_data_free (data);
 }
 
-#ifdef __linux__
-#define USE_ABSTRACT_SOCKETS
-#endif
-
-#ifndef USE_ABSTRACT_SOCKETS
-static gboolean
-test_safe_socket_dir (const char *dirname)
-{
-  struct stat statbuf;
-  
-  if (g_stat (dirname, &statbuf) != 0)
-    return FALSE;
-	
-#ifndef G_PLATFORM_WIN32
-  if (statbuf.st_uid != getuid ())
-    return FALSE;
-  
-  if ((statbuf.st_mode & (S_IRWXG|S_IRWXO)) ||
-      !S_ISDIR (statbuf.st_mode))
-    return FALSE;
-#endif
-
-  return TRUE;
-}
-
-
-static char *
-create_socket_dir (void)
-{
-  char *dirname;
-  long iteration = 0;
-  char *safe_dir;
-  gchar tmp[9];
-  int i;
-  
-  safe_dir = NULL;
-  do
-    {
-      g_free (safe_dir);
-
-      gvfs_randomize_string (tmp, 8);
-      tmp[8] = '\0';
-		
-      dirname = g_strdup_printf ("gvfs-%s-%s",
-				 g_get_user_name (), tmp);
-      safe_dir = g_build_filename (g_get_tmp_dir (), dirname, NULL);
-      g_free (dirname);
-      
-      if (g_mkdir (safe_dir, 0700) < 0)
-	{
-	  switch (errno)
-	    {
-	    case EACCES:
-	      g_error ("I can't write to '%s', daemon init failed",
-		       safe_dir);
-	      break;
-	      
-	    case ENAMETOOLONG:
-	      g_error ("Name '%s' too long your system is broken",
-		       safe_dir);
-	      break;
-	      
-	    case ENOMEM:
-#ifdef ELOOP
-	    case ELOOP:
-#endif
-	    case ENOSPC:
-	    case ENOTDIR:
-	    case ENOENT:
-	      g_error ("Resource problem creating '%s'", safe_dir);
-	      break;
-	      
-	    default: /* carry on going */
-	      break;
-	    }
-	}
-      /* Possible race - so we re-scan. */
-      
-      if (iteration++ == 1000) 
-	g_error ("Cannot find a safe socket path in '%s'", g_get_tmp_dir ());
-    }
-  while (!test_safe_socket_dir (safe_dir));
-
-  return safe_dir;
-}
-#endif
-
 static void
 generate_address (char **address,
-		  char **folder)
+                  char **socket_dir)
 {
-  *address = NULL;
-  *folder = NULL;
+  gchar tmp[9];
 
-#ifdef USE_ABSTRACT_SOCKETS
-  {
-    gchar  tmp[9];
+  *socket_dir = g_build_filename (g_get_user_runtime_dir (), "gvfsd", NULL);
+  g_mkdir (*socket_dir, 0700);
 
-    gvfs_randomize_string (tmp, 8);
-    tmp[8] = '\0';
-    *address = g_strdup_printf ("unix:abstract=/dbus-vfs-daemon/socket-%s", tmp);
-  }
-#else
-  {
-    char *dir;
-    
-    dir = create_socket_dir ();
-    *address = g_strdup_printf ("unix:path=%s/socket", dir);
-    *folder = dir;
-  }
-#endif
+  gvfs_randomize_string (tmp, 8);
+  tmp[8] = '\0';
+
+  *address = g_strdup_printf ("unix:path=%s/socket-%s", *socket_dir, tmp);
 }
 
 static gboolean
