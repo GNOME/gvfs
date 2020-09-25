@@ -181,9 +181,18 @@ g_daemon_file_monitor_new (const char *remote_id,
   if (connection == NULL)
     {
       g_dbus_error_strip_remote_error (error);
-      g_warning ("The peer-to-peer connection failed: %s. Your application is "
-                 "probably missing --filesystem=xdg-run/gvfsd privileges.",
-                 error->message);
+      g_warning ("The peer-to-peer connection failed: %s. Falling back to the "
+                 "session bus. Your application is probably missing "
+                 "--filesystem=xdg-run/gvfsd privileges.", error->message);
+      g_clear_error (&error);
+
+      connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
+    }
+
+  if (connection == NULL)
+    {
+      g_printerr ("Error getting connection for monitoring: %s (%s, %d)\n",
+                  error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
   else
