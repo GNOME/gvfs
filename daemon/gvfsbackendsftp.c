@@ -465,7 +465,7 @@ setup_ssh_environment (void)
 }
 
 static char **
-setup_ssh_commandline (GVfsBackend *backend)
+setup_ssh_commandline (GVfsBackend *backend, const gchar *control_path)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint last_arg;
@@ -488,7 +488,8 @@ setup_ssh_commandline (GVfsBackend *backend)
 #ifndef USE_PTY
       args[last_arg++] = g_strdup ("-oBatchMode yes");
 #endif
-    
+      args[last_arg++] = g_strdup ("-oControlMaster auto");
+      args[last_arg++] = g_strdup_printf ("-oControlPath=%s/%%C", control_path);
     }
   else if (op_backend->client_vendor == SFTP_VENDOR_SSH)
     args[last_arg++] = g_strdup ("-x");
@@ -1841,8 +1842,13 @@ setup_connection (GVfsBackend *backend,
   gboolean res;
   char *extension_name, *extension_data;
   int i;
+  gchar *control_path = NULL;
 
-  args = setup_ssh_commandline (backend);
+  control_path = g_build_filename (g_get_user_runtime_dir (), "gvfsd-sftp", NULL);
+  g_mkdir (control_path, 0700);
+
+  args = setup_ssh_commandline (backend, control_path);
+  g_free (control_path);
 
   if (!spawn_ssh (backend,
 		  args, &pid,
