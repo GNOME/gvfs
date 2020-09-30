@@ -1265,6 +1265,55 @@ handle_login (GVfsBackend *backend,
               break;
             }
         }
+      else if (g_str_has_prefix (buffer, "Verification code") ||
+               g_str_has_prefix (buffer, "One-time password"))
+        {
+          gchar *verification_code = NULL;
+          gboolean aborted = FALSE;
+
+          g_debug ("handle_login #%d - asking for verification code...\n", i);
+
+          if (op_backend->user_specified)
+            /* Translators: the first %s is the username, the second the host name */
+            prompt = g_strdup_printf (_("Enter verification code for %s on %s"),
+                                      op_backend->user, op_backend->host);
+          else
+            /* Translators: %s is the hostname */
+            prompt = g_strdup_printf (_("Enter verification code for %s"),
+                                      op_backend->host);
+
+          if (!g_mount_source_ask_password (mount_source, prompt,
+                                            op_backend->user, NULL,
+                                            G_ASK_PASSWORD_NEED_PASSWORD,
+                                            &aborted, &verification_code,
+                                            NULL, NULL, NULL, NULL) ||
+              aborted)
+            {
+              g_set_error_literal (error, G_IO_ERROR, aborted ?
+                                   G_IO_ERROR_FAILED_HANDLED :
+                                   G_IO_ERROR_PERMISSION_DENIED,
+                                   _("Password dialog cancelled"));
+              ret_val = FALSE;
+              break;
+            }
+          g_free (prompt);
+
+          if (!g_output_stream_write_all (reply_stream, verification_code,
+                                          strlen (verification_code), NULL,
+                                          NULL, NULL) ||
+              !g_output_stream_write_all (reply_stream, "\n", 1, NULL, NULL,
+                                          NULL))
+            {
+              g_free (verification_code);
+              g_set_error_literal (error,
+                                   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                   _("Can’t send password"));
+              ret_val = FALSE;
+              break;
+            }
+
+          g_free (verification_code);
+        }
       else if (g_str_has_prefix (buffer, "The authenticity of host '") ||
                strstr (buffer, "Key fingerprint:") != NULL)
         {
