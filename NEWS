@@ -1,3 +1,8 @@
+Major changes in 1.46.1
+=======================
+* trash: Do not fail when G_FILE_COPY_NO_FALLBACK_FOR_MOVE is used
+* dav: Be sure that enumeration is possible when looking for a root
+
 Major changes in 1.46.0
 =======================
 * No changes
