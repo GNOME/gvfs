@@ -47,6 +47,15 @@ gboolean     gvfs_accept_certificate                (GMountSource *mount_source,
                                                      GTlsCertificate *certificate,
                                                      GTlsCertificateFlags errors);
 
+gssize       gvfs_output_stream_splice              (GOutputStream *stream,
+                                                     GInputStream *source,
+                                                     GOutputStreamSpliceFlags flags,
+                                                     goffset total_size,
+                                                     GFileProgressCallback progress_callback,
+                                                     gpointer progress_callback_data,
+                                                     GCancellable *cancellable,
+                                                     GError **error);
+
 G_END_DECLS
 
 #endif /* __G_VFS_DAEMON_UTILS_H__ */
