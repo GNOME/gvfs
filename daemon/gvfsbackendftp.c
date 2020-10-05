@@ -1533,47 +1533,6 @@ out:
   g_vfs_ftp_task_done (&task);
 }
 
-static gssize
-ftp_output_stream_splice (GOutputStream *output,
-                          GInputStream *input,
-                          goffset total_size,
-                          GFileProgressCallback progress_callback,
-                          gpointer progress_callback_data,
-                          GCancellable *cancellable,
-                          GError **error)
-{
-  gssize n_read, n_written;
-  gssize bytes_copied;
-  char buffer[8192], *p;
-
-  bytes_copied = 0;
-  for (;;) 
-    {
-      n_read = g_input_stream_read (input, buffer, sizeof (buffer), cancellable, error);
-      if (n_read == -1)
-        return -1;
-      if (n_read == 0)
-        break;
-
-      p = buffer;
-      while (n_read > 0)
-        {
-          n_written = g_output_stream_write (output, p, n_read, cancellable, error);
-          if (n_written == -1)
-            return -1;
-
-          p += n_written;
-          n_read -= n_written;
-          bytes_copied += n_written;
-
-          if (progress_callback)
-            progress_callback (bytes_copied, total_size, progress_callback_data);
-        }
-    }
-
-  return bytes_copied;
-}
-
 static void
 do_pull_improve_error_message (GVfsFtpTask *task,
 		               GFile       *dest,
@@ -1735,13 +1694,14 @@ do_pull (GVfsBackend *         backend,
     }
 
   input = g_io_stream_get_input_stream (g_vfs_ftp_connection_get_data_stream (task.conn));
-  ftp_output_stream_splice (output,
-                            input,
-                            total_size,
-                            progress_callback,
-                            progress_callback_data,
-                            task.cancellable,
-                            &task.error);
+  gvfs_output_stream_splice (output,
+                             input,
+                             G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
+                             total_size,
+                             progress_callback,
+                             progress_callback_data,
+                             task.cancellable,
+                             &task.error);
   g_vfs_ftp_task_close_data_connection (&task);
   g_vfs_ftp_task_receive (&task, 0, NULL);
   g_object_unref (output);
