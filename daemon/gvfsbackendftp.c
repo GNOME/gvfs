@@ -1746,7 +1746,7 @@ do_pull (GVfsBackend *         backend,
   g_vfs_ftp_task_receive (&task, 0, NULL);
   g_object_unref (output);
 
-  if (remove_source)
+  if (!g_vfs_ftp_task_is_in_error (&task) && remove_source)
     {
       g_vfs_ftp_task_send (&task,
                 	   G_VFS_FTP_PASS_500,
