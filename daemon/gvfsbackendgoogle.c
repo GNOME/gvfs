@@ -49,6 +49,7 @@
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobwrite.h"
 #include "gvfsmonitor.h"
+#include "gvfsdaemonutils.h"
 
 struct _GVfsBackendGoogle
 {
@@ -2778,7 +2779,6 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   gchar *entry_path = NULL;
   gchar *parent_path = NULL;
   gchar *local_file_title = NULL;
-  goffset size;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ push: %s -> %s, %d\n", local_path, destination, flags);
@@ -2805,7 +2805,8 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   info = g_file_query_info (local_file,
                             G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE","
                             G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME","
-                            G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                            G_FILE_ATTRIBUTE_STANDARD_TYPE","
+                            G_FILE_ATTRIBUTE_STANDARD_SIZE,
                             G_FILE_QUERY_INFO_NONE,
                             cancellable,
                             &error);
@@ -2981,11 +2982,14 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
     }
 
   error = NULL;
-  g_output_stream_splice (G_OUTPUT_STREAM (ostream),
-                          G_INPUT_STREAM (istream),
-                          G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE | G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
-                          cancellable,
-                          &error);
+  gvfs_output_stream_splice (G_OUTPUT_STREAM (ostream),
+                             G_INPUT_STREAM (istream),
+                             G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE | G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
+                             g_file_info_get_size (info),
+                             progress_callback,
+                             progress_callback_data,
+                             cancellable,
+                             &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -3024,8 +3028,6 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
         }
     }
 
-  size = gdata_documents_entry_get_file_size (GDATA_DOCUMENTS_ENTRY (new_document));
-  g_vfs_job_progress_callback (size, size, job);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
  out:

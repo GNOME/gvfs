@@ -361,3 +361,77 @@ gvfs_accept_certificate (GMountSource *mount_source,
   return FALSE;
 }
 #endif
+
+gssize
+gvfs_output_stream_splice (GOutputStream *stream,
+                           GInputStream *source,
+                           GOutputStreamSpliceFlags flags,
+                           goffset total_size,
+                           GFileProgressCallback progress_callback,
+                           gpointer progress_callback_data,
+                           GCancellable *cancellable,
+                           GError **error)
+{
+  gssize n_read, n_written;
+  gsize bytes_copied;
+  char buffer[8192], *p;
+  gboolean res;
+
+  bytes_copied = 0;
+  res = TRUE;
+  do
+    {
+      n_read = g_input_stream_read (source, buffer, sizeof (buffer), cancellable, error);
+      if (n_read == -1)
+        {
+          res = FALSE;
+          break;
+        }
+
+      if (n_read == 0)
+        break;
+
+      p = buffer;
+      while (n_read > 0)
+        {
+          n_written = g_output_stream_write (stream, p, n_read, cancellable, error);
+          if (n_written == -1)
+            {
+              res = FALSE;
+              break;
+            }
+
+          p += n_written;
+          n_read -= n_written;
+          bytes_copied += n_written;
+
+          if (progress_callback)
+            progress_callback (bytes_copied, total_size, progress_callback_data);
+        }
+
+      if (bytes_copied > G_MAXSSIZE)
+        bytes_copied = G_MAXSSIZE;
+    }
+  while (res);
+
+  if (!res)
+    error = NULL; /* Ignore further errors */
+
+  if (flags & G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE)
+    {
+      /* Don't care about errors in source here */
+      g_input_stream_close (source, cancellable, NULL);
+    }
+
+  if (flags & G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET)
+    {
+      /* But write errors on close are bad! */
+      if (!g_output_stream_close (stream, cancellable, error))
+        res = FALSE;
+    }
+
+  if (res)
+    return bytes_copied;
+
+  return -1;
+}
