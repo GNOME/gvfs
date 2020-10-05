@@ -3,7 +3,7 @@ project(
   version: '1.47.1',
   license: 'LGPL2+',
   default_options: 'buildtype=debugoptimized',
-  meson_version: '>= 0.50.0',
+  meson_version: '>= 0.53.0',
 )
 
 gvfs_name = meson.project_name()
@@ -490,37 +490,42 @@ meson.add_install_script(
   gio_giomoduledir,
 )
 
-output = gvfs_name + ' ' + gvfs_version + ' configuration summary:\n'
-output += '\n'
-output += '  systemduserunitdir: ' + systemd_systemduserunitdir + '\n'
-output += '  tmpfilesdir: ' + systemd_tmpfilesdir + '\n'
-output += '\n'
-output += '  admin: ' + enable_admin.to_string() + '\n'
-output += '  afc: ' + enable_afc.to_string() + '\n'
-output += '  afp: ' + enable_afp.to_string() + '\n'
-output += '  archive: ' + enable_archive.to_string() + '\n'
-output += '  cdda: ' + enable_cdda.to_string() + '\n'
-output += '  dnssd: ' + enable_dnssd.to_string() + '\n'
-output += '  goa: ' + enable_goa.to_string() + '\n'
-output += '  google: ' + enable_google.to_string() + '\n'
-output += '  gphoto2: ' + enable_gphoto2.to_string() + '\n'
-output += '  http: ' + enable_http.to_string() + '\n'
-output += '  mtp: ' + enable_mtp.to_string() + '\n'
-output += '  nfs: ' + enable_nfs.to_string() + '\n'
-output += '  sftp: ' + enable_sftp.to_string() + '\n'
-output += '  smb: ' + enable_samba.to_string() + '\n'
-output += '  udisks2: ' + enable_udisks2.to_string() + '\n'
-output += '\n'
-output += '  bluray: ' + enable_bluray.to_string() + '\n'
-output += '  fuse: ' + enable_fuse.to_string() + '\n'
-output += '  gcr: ' + enable_gcr.to_string() + '\n'
-output += '  gcrypt: ' + enable_gcrypt.to_string() + '\n'
-output += '  gudev: ' + enable_gudev.to_string() + '\n'
-output += '  keyring: ' + enable_keyring.to_string() + '\n'
-output += '  logind: ' + enable_logind.to_string() + '\n'
-output += '  libusb: ' + enable_libusb.to_string() + '\n'
-output += '\n'
-output += '  devel_utils: ' + enable_devel_utils.to_string() + '\n'
-output += '  installed_tests: ' + enable_installed_tests.to_string() + '\n'
-output += '  man: ' + enable_man.to_string() + '\n'
-message(output)
+summary({
+  'systemduserunitdir': systemd_systemduserunitdir,
+  'tmpfilesdir': systemd_tmpfilesdir,
+}, section: 'Directories')
+
+summary({
+  'admin': enable_admin,
+  'afc': enable_afc,
+  'afp': enable_afp,
+  'archive': enable_archive,
+  'cdda': enable_cdda,
+  'dnssd': enable_dnssd,
+  'goa': enable_goa,
+  'google': enable_google,
+  'gphoto2': enable_gphoto2,
+  'http': enable_http,
+  'mtp': enable_mtp,
+  'nfs': enable_nfs,
+  'sftp': enable_sftp,
+  'smb': enable_samba,
+  'udisks2': enable_udisks2,
+}, section: 'Backends')
+
+summary({
+  'bluray': enable_bluray,
+  'fuse': enable_fuse,
+  'gcr': enable_gcr,
+  'gcrypt': enable_gcrypt,
+  'gudev': enable_gudev,
+  'keyring': enable_keyring,
+  'logind': enable_logind,
+  'libusb': enable_libusb,
+}, section: 'Dependencies')
+
+summary({
+  'devel_utils': enable_devel_utils,
+  'installed_tests': enable_installed_tests,
+  'man': enable_man,
+})
