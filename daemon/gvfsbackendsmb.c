@@ -49,6 +49,7 @@
 #include "gvfsjobqueryfsinfo.h"
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
+#include "gvfsjobmove.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfsdaemonutils.h"
 #include "gvfsutils.h"
@@ -2041,6 +2042,7 @@ do_move (GVfsBackend *backend,
   smbc_stat_fn smbc_stat;
   smbc_rename_fn smbc_rename;
   smbc_unlink_fn smbc_unlink;
+  goffset size;
 
   
   source_uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, source);
@@ -2062,8 +2064,9 @@ do_move (GVfsBackend *backend,
       g_free (source_uri);
       return;
     }
-  else
-    source_is_dir = S_ISDIR (statbuf.st_mode);
+
+  source_is_dir = S_ISDIR (statbuf.st_mode);
+  size = statbuf.st_size;
 
   dest_uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, destination);
   
@@ -2158,7 +2161,10 @@ do_move (GVfsBackend *backend,
 	g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
     }
   else
-    g_vfs_job_succeeded (G_VFS_JOB (job));
+    {
+      g_vfs_job_progress_callback (size, size, job);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
 }
 
 static void
