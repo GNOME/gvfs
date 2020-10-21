@@ -1298,22 +1298,28 @@ build_file_info (GVfsBackendGoogle      *self,
 
   g_file_info_set_file_type (info, file_type);
 
-  if (is_root)
-    goto out;
-
   id = gdata_entry_get_id (entry);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ID_FILE, id);
 
-  if (is_symlink)
+  if (is_root)
+    name = "/";
+  else if (is_symlink)
     name = symlink_name;
   else
     name = id;
 
   g_file_info_set_name (info, name);
 
-  title = gdata_entry_get_title (entry);
+  if (is_root)
+    title = g_vfs_backend_get_display_name (G_VFS_BACKEND (self));
+  else
+    title = gdata_entry_get_title (entry);
+
   g_file_info_set_display_name (info, title);
   g_file_info_set_edit_name (info, title);
+
+  if (is_root)
+    goto out;
 
   copy_name = generate_copy_name (self, entry, entry_path);
 
