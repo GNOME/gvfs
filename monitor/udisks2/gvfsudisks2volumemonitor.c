@@ -606,6 +606,8 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+
+
 static gboolean
 should_include (const gchar *mount_path,
                 const gchar *options)
@@ -642,9 +644,9 @@ should_include (const gchar *mount_path,
     goto out;
 
   /* Only display things in
-   * - /media; and
+   * - direct subdirectories of /media; and
    * - $HOME; and
-   * - /run/media/$USER
+   * - /media/$USER and /run/media/$USER
    */
 
   /* Hide mounts within a subdirectory starting with a "." - suppose it was a purpose to hide this mount */
@@ -652,7 +654,8 @@ should_include (const gchar *mount_path,
     goto out;
 
   /* Check /media */
-  if (g_str_has_prefix (mount_path, "/media/"))
+  if (g_str_has_prefix (mount_path, "/media/") &&
+      g_strrstr (mount_path, "/") == mount_path + strlen ("/media/") - 1)
     {
       ret = TRUE;
       goto out;
@@ -669,9 +672,17 @@ should_include (const gchar *mount_path,
         }
     }
 
-  /* Check /run/media/$USER/ */
+  /* Check /media/$USER/ and /run/media/$USER/ */
   user_name = g_get_user_name ();
   user_name_len = strlen (user_name);
+  if (strncmp (mount_path, "/media/", sizeof ("/media/") - 1) == 0 &&
+      strncmp (mount_path + sizeof ("/media/") - 1, user_name, user_name_len) == 0 &&
+      mount_path[sizeof ("/media/") - 1 + user_name_len] == '/')
+    {
+      ret = TRUE;
+      goto out;
+    }
+
   if (strncmp (mount_path, "/run/media/", sizeof ("/run/media/") - 1) == 0 &&
       strncmp (mount_path + sizeof ("/run/media/") - 1, user_name, user_name_len) == 0 &&
       mount_path[sizeof ("/run/media/") - 1 + user_name_len] == '/')
