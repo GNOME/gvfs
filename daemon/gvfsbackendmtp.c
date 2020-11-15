@@ -132,6 +132,18 @@ handle_event (EventData *data, GVfsBackendMtp *backend);
  * Storage name helper
  ************************************************/
 
+/**
+ * create_storage_name:
+ *
+ * Returns a unique, printable storage name for a LIBMTP_devicestorage_t
+ * based on its StorageDescription, appending the storage ID if necessary
+ * to make it unique.
+ *
+ * The caller takes ownership of the returned string.
+ * This function never returns NULL strings.
+ *
+ * The passed-in `storage->StorageDescription` may be NULL.
+ */
 static char *create_storage_name (const LIBMTP_devicestorage_t *storage)
 {
   /* The optional post-fixing of storage's name with ID requires us to
@@ -144,6 +156,9 @@ static char *create_storage_name (const LIBMTP_devicestorage_t *storage)
            description; unlikely but possible. */
   gboolean is_unique = TRUE;
   const LIBMTP_devicestorage_t *tmp_storage;
+
+  /* `storage->StorageDescription` may be NULL, so we ensure to only use
+     functions that can handle this, like `g_strcmp0()`. */
 
   /* Forward search for duplicates */
   for (tmp_storage = storage->next; tmp_storage != 0; tmp_storage = tmp_storage->next) {
@@ -167,7 +182,17 @@ static char *create_storage_name (const LIBMTP_devicestorage_t *storage)
   /* If description is unique, we can use it as storage name; otherwise,
      we add storage ID to it */
   if (is_unique) {
-    return g_strdup (storage->StorageDescription);
+    /* Never return a NULL string (`g_strdup` returns NULL on NULL).
+       Use the storage ID on empty strings to avoid duplicate entries
+       for devices with multiple storages without description. */
+    if (storage->StorageDescription && strlen (storage->StorageDescription) > 0) {
+      return g_strdup (storage->StorageDescription);
+    } else {
+      /* Translators: This is shown as the name for MTP devices
+       *              without StorageDescription.
+       *              The %X is the formatted storage ID. */
+      return g_strdup_printf (_("Storage (%X)"), storage->id);
+    }
   } else {
     return g_strdup_printf ("%s (%X)", storage->StorageDescription, storage->id);
   }
