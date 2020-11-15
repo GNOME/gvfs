@@ -139,6 +139,9 @@ static char *create_storage_name (const LIBMTP_devicestorage_t *storage)
      or not. Since this function is called in several places, it is
      safest to perform this check here, each time that storage name needs
      to be created. */
+  /* TODO: The returned name is not unique if suffix-adding happens
+           to introduce a collision with another storage's unsuffixed
+           description; unlikely but possible. */
   gboolean is_unique = TRUE;
   const LIBMTP_devicestorage_t *tmp_storage;
 
