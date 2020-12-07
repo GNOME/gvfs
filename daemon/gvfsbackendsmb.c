@@ -1436,6 +1436,8 @@ set_info_from_stat (GVfsBackendSmb *backend,
   if (g_file_attribute_matcher_matches (matcher,
 					G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE) ||
       g_file_attribute_matcher_matches (matcher,
+                                        G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE) ||
+      g_file_attribute_matcher_matches (matcher,
 					G_FILE_ATTRIBUTE_STANDARD_ICON) ||
       g_file_attribute_matcher_matches (matcher,
 					G_FILE_ATTRIBUTE_STANDARD_SYMBOLIC_ICON))
