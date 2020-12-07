@@ -883,6 +883,40 @@ do_pull (GVfsBackend *backend,
 }
 
 static void
+do_push (GVfsBackend *backend,
+         GVfsJobPush *push_job,
+         const char *destination,
+         const char *local_path,
+         GFileCopyFlags flags,
+         gboolean remove_source,
+         GFileProgressCallback progress_callback,
+         gpointer progress_callback_data)
+{
+  GVfsBackendAdmin *self = G_VFS_BACKEND_ADMIN (backend);
+  GVfsJob *job = G_VFS_JOB (push_job);
+  GError *error = NULL;
+  GFile *src_file, *dst_file;
+
+  if (!check_permission (self, job))
+    return;
+
+  src_file = g_file_new_for_path (local_path);
+  dst_file = g_file_new_for_path (destination);
+
+  if (remove_source)
+    g_file_move (src_file, dst_file, flags, job->cancellable,
+                 progress_callback, progress_callback_data, &error);
+  else
+    g_file_copy (src_file, dst_file, flags, job->cancellable,
+                 progress_callback, progress_callback_data, &error);
+
+  g_object_unref (src_file);
+  g_object_unref (dst_file);
+
+  complete_job (job, error);
+}
+
+static void
 do_query_settable_attributes (GVfsBackend *backend,
                               GVfsJobQueryAttributes *query_job,
                               const char *filename)
@@ -1004,6 +1038,7 @@ g_vfs_backend_admin_class_init (GVfsBackendAdminClass * klass)
   backend_class->move = do_move;
   backend_class->copy = do_copy;
   backend_class->pull = do_pull;
+  backend_class->push = do_push;
   backend_class->query_settable_attributes = do_query_settable_attributes;
   backend_class->query_writable_namespaces = do_query_writable_namespaces;
 }
