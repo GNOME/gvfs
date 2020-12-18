@@ -316,6 +316,14 @@ async_got_connection_cb (GDBusConnection *connection,
   if (connection == NULL)
     {
       g_dbus_error_strip_remote_error (io_error);
+
+      if (g_error_matches (io_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+        {
+          g_task_return_error (task, g_error_copy (io_error));
+          g_object_unref (task);
+          return;
+        }
+
       g_warning ("The peer-to-peer connection failed: %s. Falling back to the "
                  "session bus. Your application is probably missing "
                  "--filesystem=xdg-run/gvfsd privileges.", io_error->message);
