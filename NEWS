@@ -1,3 +1,19 @@
+Major changes in 1.47.1
+=======================
+* mtp: Fix crashes when storage descriptions are not provided
+* trash: Explicitly cancel file monitor to prevent deadlock
+* admin: Add copy and push implementations for better performance
+* client: Add fallback to session bus for synchronous API
+* daemon: Use named sockets to avoid network permission requirement
+* smb: Set fast content type independently of other attributes
+* ftp: Prevent source file removal in case of transfer failure
+* google: Report progress for file transfers from local filesystem
+* sftp: Add support for two factor authentication
+* sftp: Use connection multiplexing instead of multiple connections
+* smb: Report progress when move operation is done
+* google: Set the display name for the root folder also
+* Translation updates
+
 Major changes in 1.46.1
 =======================
 * trash: Do not fail when G_FILE_COPY_NO_FALLBACK_FOR_MOVE is used
