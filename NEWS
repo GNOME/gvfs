@@ -1,3 +1,12 @@
+Major changes in 1.46.2
+=======================
+* ftp: Prevent source file removal in case of transfer failure
+* trash: Explicitly cancel file monitor to prevent deadlock
+* smb: Set fast content type independently of other attributes
+* smb: Report progress when move operation is done
+* google: Set the display name for the root folder also
+* Translation updates
+
 Major changes in 1.46.1
 =======================
 * trash: Do not fail when G_FILE_COPY_NO_FALLBACK_FOR_MOVE is used
