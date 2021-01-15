@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2020-05-29 12:17+0000\n"
+"POT-Creation-Date: 2021-01-08 12:50+0000\n"
 "PO-Revision-Date: 2020-07-12 18:26+0200\n"
 "Last-Translator: Fabio Tomat <f.t.public@gmail.com>\n"
 "Language-Team: Friulian <fur@li.org>\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.3.1\n"
 
-#: client/gdaemonfile.c:435 client/gdaemonfile.c:2704
+#: client/gdaemonfile.c:435 client/gdaemonfile.c:2696
 msgid "Operation not supported, files on different mounts"
 msgstr "Operazion no supuartade, file su montaçs diferents"
 
-#: client/gdaemonfile.c:1006 client/gdaemonfile.c:3052
+#: client/gdaemonfile.c:1006 client/gdaemonfile.c:3044
 #: client/gvfsiconloadable.c:295 daemon/gvfsjobopenforread.c:183
 #: daemon/gvfsjobopenforwrite.c:333
 msgid "Couldn’t get stream file descriptor"
@@ -40,7 +40,7 @@ msgstr "Valôr tornât di %s no valit"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: client/gdaemonfile.c:2166 client/gdaemonfile.c:3315
+#: client/gdaemonfile.c:2166 client/gdaemonfile.c:3307
 msgid "Could not find enclosing mount"
 msgstr "Impussibil cjatâ il montaç includût"
 
@@ -68,61 +68,6 @@ msgstr "impussibil vê proxy metadâts"
 msgid "values must be string or list of strings"
 msgstr "i valôrs a scugnin jessi stringhis o listis di stringhis"
 
-#. Return G_IO_ERROR_NOT_SUPPORTED instead of
-#. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
-#. * fallback copy.
-#.
-#: client/gdaemonfile.c:2696 daemon/gvfsbackendadmin.c:832
-#: daemon/gvfsbackendafc.c:2360 daemon/gvfsbackendafp.c:1781
-#: daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
-#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:3422
-#: daemon/gvfsbackenddav.c:3454 daemon/gvfsbackendftp.c:1209
-#: daemon/gvfsbackendftp.c:1257 daemon/gvfsbackendftp.c:1278
-#: daemon/gvfsbackendgoogle.c:1435 daemon/gvfsbackendgoogle.c:1489
-#: daemon/gvfsbackendgoogle.c:1512 daemon/gvfsbackendgoogle.c:1578
-#: daemon/gvfsbackendgoogle.c:1850 daemon/gvfsbackendgoogle.c:1913
-#: daemon/gvfsbackendgoogle.c:1946 daemon/gvfsbackendgoogle.c:1956
-#: daemon/gvfsbackendgoogle.c:2027 daemon/gvfsbackendgoogle.c:2222
-#: daemon/gvfsbackendgoogle.c:2333 daemon/gvfsbackendgoogle.c:2516
-#: daemon/gvfsbackendgoogle.c:2786 daemon/gvfsbackendgoogle.c:2881
-#: daemon/gvfsbackendgoogle.c:2890 daemon/gvfsbackendgoogle.c:3463
-#: daemon/gvfsbackendgoogle.c:3524 daemon/gvfsbackendgoogle.c:3547
-#: daemon/gvfsbackendgoogle.c:3633 daemon/gvfsbackendgphoto2.c:2238
-#: daemon/gvfsbackendgphoto2.c:2451 daemon/gvfsbackendgphoto2.c:2548
-#: daemon/gvfsbackendgphoto2.c:2641 daemon/gvfsbackendgphoto2.c:3250
-#: daemon/gvfsbackendgphoto2.c:3260 daemon/gvfsbackendmtp.c:2253
-#: daemon/gvfsbackendmtp.c:2444 daemon/gvfsbackendmtp.c:2527
-#: daemon/gvfsbackendmtp.c:2615 daemon/gvfsbackendmtp.c:2683
-#: daemon/gvfsbackendmtp.c:2878 daemon/gvfsbackendmtp.c:3021
-#: daemon/gvfsbackendnfs.c:2369 daemon/gvfsbackendnfs.c:2419
-#: daemon/gvfsbackendnfs.c:2545 daemon/gvfsbackendsftp.c:2154
-#: daemon/gvfsbackendsftp.c:5355 daemon/gvfsbackendsftp.c:5453
-#: daemon/gvfsbackendsftp.c:6165 daemon/gvfsbackendsftp.c:6197
-#: daemon/gvfsbackendsftp.c:6223 daemon/gvfsbackendsftp.c:6710
-#: daemon/gvfsbackendsftp.c:6772 daemon/gvfsbackendsmb.c:1700
-#: daemon/gvfsftptask.c:429 daemon/gvfsjobcloseread.c:113
-#: daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
-#: daemon/gvfsjobcreatemonitor.c:143 daemon/gvfsjobcreatemonitor.c:154
-#: daemon/gvfsjobcreatemonitor.c:177 daemon/gvfsjobcreatemonitor.c:195
-#: daemon/gvfsjobdelete.c:108 daemon/gvfsjobenumerate.c:272
-#: daemon/gvfsjobmakedirectory.c:108 daemon/gvfsjobmount.c:112
-#: daemon/gvfsjobmountmountable.c:138 daemon/gvfsjobmove.c:121
-#: daemon/gvfsjobopenforread.c:120 daemon/gvfsjobopenforwrite.c:184
-#: daemon/gvfsjobopenforwrite.c:198 daemon/gvfsjobopenforwrite.c:212
-#: daemon/gvfsjobopeniconforread.c:104 daemon/gvfsjobpollmountable.c:107
-#: daemon/gvfsjobpull.c:125 daemon/gvfsjobpush.c:125
-#: daemon/gvfsjobqueryattributes.c:145 daemon/gvfsjobqueryfsinfo.c:116
-#: daemon/gvfsjobqueryinfo.c:124 daemon/gvfsjobqueryinforead.c:125
-#: daemon/gvfsjobqueryinfowrite.c:125 daemon/gvfsjobread.c:123
-#: daemon/gvfsjobseekread.c:121 daemon/gvfsjobseekwrite.c:121
-#: daemon/gvfsjobsetattribute.c:130 daemon/gvfsjobsetdisplayname.c:111
-#: daemon/gvfsjobstartmountable.c:113 daemon/gvfsjobstopmountable.c:115
-#: daemon/gvfsjobtrash.c:107 daemon/gvfsjobtruncate.c:113
-#: daemon/gvfsjobunmountmountable.c:157 daemon/gvfsjobunmountmountable.c:172
-#: daemon/gvfsjobwrite.c:123
-msgid "Operation not supported"
-msgstr "Operazion no supuartade"
-
 #: client/gdaemonfileinputstream.c:544 client/gdaemonfileinputstream.c:552
 #: client/gdaemonfileinputstream.c:1686 client/gdaemonfileinputstream.c:1695
 #: client/gdaemonfileoutputstream.c:495 client/gdaemonfileoutputstream.c:503
@@ -133,7 +78,7 @@ msgstr "Erôr intal protocol di flus: %s"
 
 #: client/gdaemonfileinputstream.c:552 client/gdaemonfileinputstream.c:1695
 #: client/gdaemonfileoutputstream.c:503 client/gdaemonfileoutputstream.c:1442
-#: daemon/gvfsbackendmtp.c:2410 daemon/gvfsbackendmtp.c:2801
+#: daemon/gvfsbackendmtp.c:2424 daemon/gvfsbackendmtp.c:2815
 msgid "End of stream"
 msgstr "Fin dal flus"
 
@@ -142,7 +87,7 @@ msgstr "Fin dal flus"
 #: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
 #: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
 #: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
-#: daemon/gvfsbackendsftp.c:5469 daemon/gvfsbackendsmb.c:1111
+#: daemon/gvfsbackendsftp.c:5469 daemon/gvfsbackendsmb.c:1112
 #: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
 #: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:347
 #: daemon/gvfsftptask.c:224
@@ -429,11 +374,11 @@ msgstr "Permès dineât"
 #: daemon/gvfsbackendarchive.c:845 daemon/gvfsbackendarchive.c:874
 #: daemon/gvfsbackendcdda.c:908 daemon/gvfsbackendcomputer.c:639
 #: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:795
-#: daemon/gvfsbackendftp.c:1189 daemon/gvfsbackendmtp.c:1718
-#: daemon/gvfsbackendmtp.c:1734 daemon/gvfsbackendmtp.c:2134
-#: daemon/gvfsbackendmtp.c:2197 daemon/gvfsbackendmtp.c:2264
-#: daemon/gvfsbackendmtp.c:2626 daemon/gvfsbackendmtp.c:2905
-#: daemon/gvfsbackendmtp.c:3048 daemon/gvfsbackendnetwork.c:697
+#: daemon/gvfsbackendftp.c:1189 daemon/gvfsbackendmtp.c:1725
+#: daemon/gvfsbackendmtp.c:1741 daemon/gvfsbackendmtp.c:2148
+#: daemon/gvfsbackendmtp.c:2211 daemon/gvfsbackendmtp.c:2278
+#: daemon/gvfsbackendmtp.c:2640 daemon/gvfsbackendmtp.c:2919
+#: daemon/gvfsbackendmtp.c:3062 daemon/gvfsbackendnetwork.c:697
 #: daemon/gvfsbackendsmbbrowse.c:1109 daemon/gvfsbackendsmbbrowse.c:1176
 #: daemon/gvfsbackendsmbbrowse.c:1358 daemon/gvfsbackendsmbbrowse.c:1431
 #, c-format
@@ -442,8 +387,8 @@ msgstr "Il file nol esist"
 
 #: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2410
 #: daemon/gvfsbackendafp.c:289 daemon/gvfsbackendafp.c:492
-#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2405
-#: daemon/gvfsbackenddav.c:3068 daemon/gvfsbackenddav.c:3348
+#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2406
+#: daemon/gvfsbackenddav.c:3069 daemon/gvfsbackenddav.c:3349
 #: daemon/gvfsbackendftp.c:832 daemon/gvfsbackendnfs.c:2477
 #: daemon/gvfsbackendsftp.c:2666 daemon/gvfsbackendsftp.c:3441
 #: daemon/gvfsbackendsftp.c:3889 daemon/gvfsbackendsftp.c:4958
@@ -460,8 +405,8 @@ msgid "Target file is open"
 msgstr "Il file di destinazion al è viert"
 
 #: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
-#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2795
-#: daemon/gvfsbackendgoogle.c:2315 daemon/gvfsbackendsftp.c:2150
+#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2796
+#: daemon/gvfsbackendgoogle.c:2321 daemon/gvfsbackendsftp.c:2150
 msgid "Directory not empty"
 msgstr "Cartele no vueide"
 
@@ -490,18 +435,18 @@ msgstr "No vonde spazi tal volum"
 
 #: daemon/gvfsafpvolume.c:811 daemon/gvfsafpvolume.c:1355
 #: daemon/gvfsafpvolume.c:1507 daemon/gvfsbackendafp.c:296
-#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2460
-#: daemon/gvfsbackenddav.c:2756 daemon/gvfsbackenddav.c:2864
-#: daemon/gvfsbackenddav.c:3001 daemon/gvfsbackenddav.c:3077
-#: daemon/gvfsbackenddav.c:3115 daemon/gvfsbackenddav.c:3339
+#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2461
+#: daemon/gvfsbackenddav.c:2757 daemon/gvfsbackenddav.c:2865
+#: daemon/gvfsbackenddav.c:3002 daemon/gvfsbackenddav.c:3078
+#: daemon/gvfsbackenddav.c:3116 daemon/gvfsbackenddav.c:3340
 #: daemon/gvfsbackendftp.c:811 daemon/gvfsbackendftp.c:999
 #: daemon/gvfsbackendftp.c:1509 daemon/gvfsbackendftp.c:1617
-#: daemon/gvfsbackendgoogle.c:1540 daemon/gvfsbackendgoogle.c:1617
-#: daemon/gvfsbackendgoogle.c:1986 daemon/gvfsbackendgoogle.c:2066
-#: daemon/gvfsbackendgoogle.c:2540 daemon/gvfsbackendgoogle.c:2904
-#: daemon/gvfsbackendgoogle.c:3552 daemon/gvfsbackendmtp.c:1621
+#: daemon/gvfsbackendgoogle.c:1546 daemon/gvfsbackendgoogle.c:1623
+#: daemon/gvfsbackendgoogle.c:1992 daemon/gvfsbackendgoogle.c:2072
+#: daemon/gvfsbackendgoogle.c:2546 daemon/gvfsbackendgoogle.c:2916
+#: daemon/gvfsbackendgoogle.c:3564 daemon/gvfsbackendmtp.c:1621
 #: daemon/gvfsbackendmtp.c:1664 daemon/gvfsbackendnfs.c:2487
-#: daemon/gvfsbackendsftp.c:4967 daemon/gvfsbackendsmb.c:2095
+#: daemon/gvfsbackendsftp.c:4967 daemon/gvfsbackendsmb.c:2100
 msgid "Target file already exists"
 msgstr "Il file di destinazion al esist za"
 
@@ -579,8 +524,8 @@ msgstr "Al esist un conflit dal bloc di interval"
 
 #: daemon/gvfsafpvolume.c:2193 daemon/gvfsbackendmtp.c:1444
 #: daemon/gvfsbackendmtp.c:1469 daemon/gvfsbackendmtp.c:1672
-#: daemon/gvfsbackendmtp.c:2034 daemon/gvfsbackendmtp.c:2551
-#: daemon/gvfsbackendmtp.c:2946 daemon/gvfsbackendmtp.c:3082
+#: daemon/gvfsbackendmtp.c:2048 daemon/gvfsbackendmtp.c:2565
+#: daemon/gvfsbackendmtp.c:2960 daemon/gvfsbackendmtp.c:3096
 msgid "Directory doesn’t exist"
 msgstr "La cartele no esist"
 
@@ -600,10 +545,68 @@ msgstr "Il file al è blocât di un altri utent"
 msgid "File is not open for read access"
 msgstr "Il file nol è viert pal acès in leture"
 
+#. Return G_IO_ERROR_NOT_SUPPORTED instead of
+#. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
+#. * fallback copy.
+#.
+#: daemon/gvfsbackendadmin.c:832 daemon/gvfsbackendafc.c:2360
+#: daemon/gvfsbackendafp.c:1781 daemon/gvfsbackendburn.c:829
+#: daemon/gvfsbackendburn.c:951 daemon/gvfsbackendcomputer.c:812
+#: daemon/gvfsbackenddav.c:3423 daemon/gvfsbackenddav.c:3455
+#: daemon/gvfsbackenddav.c:3483 daemon/gvfsbackendftp.c:1209
+#: daemon/gvfsbackendftp.c:1257 daemon/gvfsbackendftp.c:1278
+#: daemon/gvfsbackendftp.c:1665 daemon/gvfsbackendgoogle.c:1441
+#: daemon/gvfsbackendgoogle.c:1495 daemon/gvfsbackendgoogle.c:1518
+#: daemon/gvfsbackendgoogle.c:1584 daemon/gvfsbackendgoogle.c:1856
+#: daemon/gvfsbackendgoogle.c:1919 daemon/gvfsbackendgoogle.c:1952
+#: daemon/gvfsbackendgoogle.c:1962 daemon/gvfsbackendgoogle.c:2033
+#: daemon/gvfsbackendgoogle.c:2228 daemon/gvfsbackendgoogle.c:2339
+#: daemon/gvfsbackendgoogle.c:2522 daemon/gvfsbackendgoogle.c:2788
+#: daemon/gvfsbackendgoogle.c:2798 daemon/gvfsbackendgoogle.c:2893
+#: daemon/gvfsbackendgoogle.c:2902 daemon/gvfsbackendgoogle.c:3475
+#: daemon/gvfsbackendgoogle.c:3536 daemon/gvfsbackendgoogle.c:3559
+#: daemon/gvfsbackendgoogle.c:3645 daemon/gvfsbackendgphoto2.c:2238
+#: daemon/gvfsbackendgphoto2.c:2451 daemon/gvfsbackendgphoto2.c:2548
+#: daemon/gvfsbackendgphoto2.c:2641 daemon/gvfsbackendgphoto2.c:3250
+#: daemon/gvfsbackendgphoto2.c:3258 daemon/gvfsbackendgphoto2.c:3268
+#: daemon/gvfsbackendmtp.c:1717 daemon/gvfsbackendmtp.c:2018
+#: daemon/gvfsbackendmtp.c:2267 daemon/gvfsbackendmtp.c:2458
+#: daemon/gvfsbackendmtp.c:2541 daemon/gvfsbackendmtp.c:2629
+#: daemon/gvfsbackendmtp.c:2697 daemon/gvfsbackendmtp.c:2892
+#: daemon/gvfsbackendmtp.c:3035 daemon/gvfsbackendnfs.c:2369
+#: daemon/gvfsbackendnfs.c:2419 daemon/gvfsbackendnfs.c:2545
+#: daemon/gvfsbackendsftp.c:2154 daemon/gvfsbackendsftp.c:5355
+#: daemon/gvfsbackendsftp.c:5453 daemon/gvfsbackendsftp.c:6165
+#: daemon/gvfsbackendsftp.c:6197 daemon/gvfsbackendsftp.c:6223
+#: daemon/gvfsbackendsftp.c:6231 daemon/gvfsbackendsftp.c:6718
+#: daemon/gvfsbackendsftp.c:6780 daemon/gvfsbackendsftp.c:6788
+#: daemon/gvfsbackendsmb.c:1703 daemon/gvfsftptask.c:429
+#: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121
+#: daemon/gvfsjobcopy.c:121 daemon/gvfsjobcreatemonitor.c:143
+#: daemon/gvfsjobcreatemonitor.c:154 daemon/gvfsjobcreatemonitor.c:177
+#: daemon/gvfsjobcreatemonitor.c:195 daemon/gvfsjobdelete.c:108
+#: daemon/gvfsjobenumerate.c:272 daemon/gvfsjobmakedirectory.c:108
+#: daemon/gvfsjobmount.c:112 daemon/gvfsjobmountmountable.c:138
+#: daemon/gvfsjobmove.c:121 daemon/gvfsjobopenforread.c:120
+#: daemon/gvfsjobopenforwrite.c:184 daemon/gvfsjobopenforwrite.c:198
+#: daemon/gvfsjobopenforwrite.c:212 daemon/gvfsjobopeniconforread.c:104
+#: daemon/gvfsjobpollmountable.c:107 daemon/gvfsjobpull.c:125
+#: daemon/gvfsjobpush.c:125 daemon/gvfsjobqueryattributes.c:145
+#: daemon/gvfsjobqueryfsinfo.c:116 daemon/gvfsjobqueryinfo.c:124
+#: daemon/gvfsjobqueryinforead.c:125 daemon/gvfsjobqueryinfowrite.c:125
+#: daemon/gvfsjobread.c:123 daemon/gvfsjobseekread.c:121
+#: daemon/gvfsjobseekwrite.c:121 daemon/gvfsjobsetattribute.c:130
+#: daemon/gvfsjobsetdisplayname.c:111 daemon/gvfsjobstartmountable.c:113
+#: daemon/gvfsjobstopmountable.c:115 daemon/gvfsjobtrash.c:107
+#: daemon/gvfsjobtruncate.c:113 daemon/gvfsjobunmountmountable.c:157
+#: daemon/gvfsjobunmountmountable.c:172 daemon/gvfsjobwrite.c:123
+msgid "Operation not supported"
+msgstr "Operazion no supuartade"
+
 #: daemon/gvfsbackendadmin.c:926 daemon/gvfsbackendarchive.c:639
-#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:1903
-#: daemon/gvfsbackendgoogle.c:2684 daemon/gvfsbackendhttp.c:256
-#: daemon/gvfsbackendsmb.c:585
+#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:1902
+#: daemon/gvfsbackendgoogle.c:2690 daemon/gvfsbackendhttp.c:256
+#: daemon/gvfsbackendsmb.c:586
 msgid "Invalid mount spec"
 msgstr "Specifiche di montaç no valide"
 
@@ -750,22 +753,22 @@ msgstr ""
 "fâs clic su “Torne prove”."
 
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
-#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3275
-#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2286
+#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3287
+#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2300
 #: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:126
-#: daemon/gvfsbackendsmb.c:675 daemon/gvfsbackendtrash.c:234
+#: daemon/gvfsbackendsmb.c:676 daemon/gvfsbackendtrash.c:234
 msgid "Can’t open directory"
 msgstr "Impussibil vierzi la cartele"
 
 #: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2527
 #: daemon/gvfsbackendafp.c:1270 daemon/gvfsbackendafp.c:1359
-#: daemon/gvfsbackenddav.c:2900 daemon/gvfsbackendftp.c:1461
+#: daemon/gvfsbackenddav.c:2901 daemon/gvfsbackendftp.c:1461
 #: daemon/gvfsbackendsftp.c:3663 daemon/gvfsbackendsftp.c:3950
 msgid "Backups not supported"
 msgstr "Backup no supuartâts"
 
-#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:728
-#: daemon/gvfsbackendsmb.c:1207
+#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:729
+#: daemon/gvfsbackendsmb.c:1208
 msgid "Unsupported seek type"
 msgstr "Gjenar di posizionament/ricercje no supuartât"
 
@@ -790,8 +793,8 @@ msgstr "Nol è un file montabil"
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: daemon/gvfsbackendafpbrowse.c:446 daemon/gvfsbackendafp.c:2104
 #: daemon/gvfsbackendftp.c:681 daemon/gvfsbackendnfs.c:290
-#: daemon/gvfsbackendsftp.c:2011 daemon/gvfsbackendsmb.c:444
-#: daemon/gvfsbackendsmb.c:1379
+#: daemon/gvfsbackendsftp.c:2011 daemon/gvfsbackendsmb.c:445
+#: daemon/gvfsbackendsmb.c:1380
 #, c-format
 msgid "%s on %s"
 msgstr "%s su %s"
@@ -813,23 +816,23 @@ msgid "Apple Filing Protocol Service"
 msgstr "Servizi Apple Filing Protocol"
 
 #: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:877
-#: daemon/gvfsbackenddav.c:3063 daemon/gvfsbackendftp.c:1609
-#: daemon/gvfsbackendgoogle.c:1589 daemon/gvfsbackendgoogle.c:1924
-#: daemon/gvfsbackendgoogle.c:2841
+#: daemon/gvfsbackenddav.c:3064 daemon/gvfsbackendftp.c:1609
+#: daemon/gvfsbackendgoogle.c:1595 daemon/gvfsbackendgoogle.c:1930
+#: daemon/gvfsbackendgoogle.c:2853
 msgid "Can’t copy directory over directory"
 msgstr "Impussibil copiâ la cartele sore la cartele"
 
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:893
-#: daemon/gvfsbackenddav.c:3092 daemon/gvfsbackendftp.c:1632
-#: daemon/gvfsbackendgoogle.c:1651 daemon/gvfsbackendgoogle.c:2868
-#: daemon/gvfsbackendgoogle.c:2916 daemon/gvfsbackendmtp.c:1612
+#: daemon/gvfsbackenddav.c:3093 daemon/gvfsbackendftp.c:1632
+#: daemon/gvfsbackendgoogle.c:1657 daemon/gvfsbackendgoogle.c:2880
+#: daemon/gvfsbackendgoogle.c:2928 daemon/gvfsbackendmtp.c:1612
 #: daemon/gvfsbackendmtp.c:1627
 msgid "Can’t recursively copy directory"
 msgstr "Impussibil copiâ in maniere ricorsive la cartele"
 
-#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2940
-#: daemon/gvfsbackendgoogle.c:2038 daemon/gvfsbackendnfs.c:2471
-#: daemon/gvfsbackendsftp.c:4953 daemon/gvfsbackendsmb.c:2084
+#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2941
+#: daemon/gvfsbackendgoogle.c:2044 daemon/gvfsbackendnfs.c:2471
+#: daemon/gvfsbackendsftp.c:4953 daemon/gvfsbackendsmb.c:2089
 msgid "Can’t move directory over directory"
 msgstr "Impussibil spostâ la cartele sore la cartele"
 
@@ -838,9 +841,9 @@ msgstr "Impussibil spostâ la cartele sore la cartele"
 msgid "Unable to create temporary file (%s)"
 msgstr "Impussibil creâ file temporani (%s)"
 
-#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2541
+#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2542
 #: daemon/gvfsbackendnfs.c:1177 daemon/gvfsbackendsftp.c:3904
-#: daemon/gvfsbackendsmb.c:1080
+#: daemon/gvfsbackendsmb.c:1081
 msgid "The file was externally modified"
 msgstr "Il file al è stât modificât di difûr di chi"
 
@@ -869,7 +872,7 @@ msgstr "/ in %s"
 #: daemon/gvfsbackendarchive.c:883 daemon/gvfsbackendburn.c:681
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
 #: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:1083
-#: daemon/gvfsbackendgoogle.c:2239 daemon/gvfsbackendgoogle.c:2422
+#: daemon/gvfsbackendgoogle.c:2245 daemon/gvfsbackendgoogle.c:2428
 #: daemon/gvfsbackendnetwork.c:745 daemon/gvfsbackendsftp.c:4443
 #: daemon/gvfsftpdircache.c:157
 #, c-format
@@ -901,8 +904,8 @@ msgid "No such file or directory"
 msgstr "File o cartele inesistent"
 
 #: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:905
-#: daemon/gvfsbackendgoogle.c:1597 daemon/gvfsbackendgoogle.c:1932
-#: daemon/gvfsbackendgoogle.c:2849
+#: daemon/gvfsbackendgoogle.c:1603 daemon/gvfsbackendgoogle.c:1938
+#: daemon/gvfsbackendgoogle.c:2861
 msgid "Can’t copy file over directory"
 msgstr "Impussibil copiâ il file sore de cartele"
 
@@ -918,7 +921,7 @@ msgstr "Creadôr di CD/DVD"
 msgid "File exists"
 msgstr "Il file al esist"
 
-#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:2978
+#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:2979
 #: daemon/gvfsbackendsftp.c:2152 daemon/gvfsbackendsftp.c:5133
 msgid "Target file exists"
 msgstr "Il file di destinazion al esist"
@@ -1062,7 +1065,7 @@ msgstr "Impussibil controlâ in maniere sistematiche il file"
 msgid "%s on %s%s"
 msgstr "%s su %s%s"
 
-#: daemon/gvfsbackenddav.c:708 daemon/gvfsbackenddav.c:2076
+#: daemon/gvfsbackenddav.c:708 daemon/gvfsbackenddav.c:2077
 #: daemon/gvfsbackendhttp.c:202
 #, c-format
 msgid "HTTP Error: %s"
@@ -1080,53 +1083,53 @@ msgstr "Rispueste vueide"
 msgid "Unexpected reply from server"
 msgstr "Rispueste dal servidôr inspietade"
 
-#: daemon/gvfsbackenddav.c:1444 daemon/gvfsbackenddav.c:2203
-#: daemon/gvfsbackenddav.c:2295 daemon/gvfsbackenddav.c:2397
+#: daemon/gvfsbackenddav.c:1444 daemon/gvfsbackenddav.c:2204
+#: daemon/gvfsbackenddav.c:2296 daemon/gvfsbackenddav.c:2398
 msgid "Response invalid"
 msgstr "Rispueste no valide"
 
-#: daemon/gvfsbackenddav.c:1589
+#: daemon/gvfsbackenddav.c:1588
 msgid "WebDAV share"
 msgstr "Condivision WebDAV"
 
 #. translators: %s here is the hostname
 #. Translators: %s is the hostname
-#: daemon/gvfsbackenddav.c:1591 daemon/gvfsbackendftp.c:533
+#: daemon/gvfsbackenddav.c:1590 daemon/gvfsbackendftp.c:533
 #: daemon/gvfsbackendsftp.c:1173
 #, c-format
 msgid "Enter password for %s"
 msgstr "Inserìs la password par %s"
 
-#: daemon/gvfsbackenddav.c:1594
+#: daemon/gvfsbackenddav.c:1593
 msgid "Please enter proxy password"
 msgstr "Inserìs la pasword dal proxy"
 
-#: daemon/gvfsbackenddav.c:2062
+#: daemon/gvfsbackenddav.c:2063
 msgid "Not a WebDAV enabled share"
 msgstr "No je une condivision WebDAV abilitade"
 
-#: daemon/gvfsbackenddav.c:2084
+#: daemon/gvfsbackenddav.c:2085
 msgid "Could not find an enclosing directory"
 msgstr "Impussibil cjatâ une cartele includude"
 
-#: daemon/gvfsbackenddav.c:2157 daemon/gvfsbackenddav.c:2250
-#: daemon/gvfsbackenddav.c:2323 daemon/gvfsbackenddav.c:2431
+#: daemon/gvfsbackenddav.c:2158 daemon/gvfsbackenddav.c:2251
+#: daemon/gvfsbackenddav.c:2324 daemon/gvfsbackenddav.c:2432
 msgid "Could not create request"
 msgstr "Impussibil creâ la richieste"
 
-#: daemon/gvfsbackenddav.c:2572 daemon/gvfsbackendftp.c:1102
-#: daemon/gvfsbackendgoogle.c:3627 daemon/gvfsbackendnfs.c:941
+#: daemon/gvfsbackenddav.c:2573 daemon/gvfsbackendftp.c:1102
+#: daemon/gvfsbackendgoogle.c:3639 daemon/gvfsbackendnfs.c:941
 #: daemon/gvfsbackendnfs.c:964 daemon/gvfsbackendnfs.c:990
-#: daemon/gvfsbackendnfs.c:1390 daemon/gvfsbackendsmb.c:1116
-#: daemon/gvfsbackendsmb.c:2112
+#: daemon/gvfsbackendnfs.c:1390 daemon/gvfsbackendsmb.c:1117
+#: daemon/gvfsbackendsmb.c:2117
 msgid "Backup file creation failed"
 msgstr "Creazion dal file di backup falide"
 
-#: daemon/gvfsbackenddav.c:2945
+#: daemon/gvfsbackenddav.c:2946
 msgid "Can’t move over directory"
 msgstr "Impussibil spostâ sore de cartele"
 
-#: daemon/gvfsbackenddav.c:3214
+#: daemon/gvfsbackenddav.c:3215
 msgid "File length changed during transfer"
 msgstr "Lungjece dal file cambiade dilunc il trasferiment"
 
@@ -1155,7 +1158,7 @@ msgid "Enter password for %s on %s"
 msgstr "Inserî la password par %s su %s"
 
 #: daemon/gvfsbackendftp.c:560 daemon/gvfsbackendsftp.c:1190
-#: daemon/gvfsbackendsmbbrowse.c:1004 daemon/gvfsbackendsmb.c:540
+#: daemon/gvfsbackendsmbbrowse.c:1004 daemon/gvfsbackendsmb.c:541
 msgid "Password dialog cancelled"
 msgstr "Dialic de password anulât"
 
@@ -1163,25 +1166,25 @@ msgstr "Dialic de password anulât"
 msgid "Insufficient permissions"
 msgstr "Permès insuficients"
 
-#: daemon/gvfsbackendgoogle.c:2046
+#: daemon/gvfsbackendgoogle.c:2052
 msgid "Can’t move file over directory"
 msgstr "Impussibil spostâ il file sore de cartele"
 
-#: daemon/gvfsbackendgoogle.c:2088
+#: daemon/gvfsbackendgoogle.c:2094
 msgid "Error moving file/folder"
 msgstr "Erôr tal spostâ il file/cartele"
 
-#: daemon/gvfsbackendgoogle.c:2733 daemon/gvfsbackendgoogle.c:3297
+#: daemon/gvfsbackendgoogle.c:2739 daemon/gvfsbackendgoogle.c:3309
 #: daemon/gvfsbackendgphoto2.c:1589
 msgid "Error getting data from file"
 msgstr "Erôr tal otignî i dâts dal file"
 
-#: daemon/gvfsbackendgoogle.c:2858 daemon/gvfsbackendgoogle.c:3661
+#: daemon/gvfsbackendgoogle.c:2870 daemon/gvfsbackendgoogle.c:3673
 #: daemon/gvfsbackendnfs.c:1162
 msgid "Target file is not a regular file"
 msgstr "Il file di destinazion nol è un file regolâr"
 
-#: daemon/gvfsbackendgoogle.c:3282 daemon/gvfsbackendsftp.c:2331
+#: daemon/gvfsbackendgoogle.c:3294 daemon/gvfsbackendsftp.c:2331
 #: daemon/gvfsbackendsftp.c:2733 daemon/gvfsbackendsftp.c:2796
 #: daemon/gvfsbackendsftp.c:2807 daemon/gvfsbackendsftp.c:2865
 #: daemon/gvfsbackendsftp.c:2958 daemon/gvfsbackendsftp.c:3010
@@ -1205,21 +1208,21 @@ msgstr "Il file di destinazion nol è un file regolâr"
 #: daemon/gvfsbackendsftp.c:5757 daemon/gvfsbackendsftp.c:5843
 #: daemon/gvfsbackendsftp.c:5927 daemon/gvfsbackendsftp.c:5970
 #: daemon/gvfsbackendsftp.c:5974 daemon/gvfsbackendsftp.c:6091
-#: daemon/gvfsbackendsftp.c:6095 daemon/gvfsbackendsftp.c:6338
-#: daemon/gvfsbackendsftp.c:6561 daemon/gvfsbackendsftp.c:6578
-#: daemon/gvfsbackendsftp.c:6716 daemon/gvfsbackendsftp.c:6744
+#: daemon/gvfsbackendsftp.c:6095 daemon/gvfsbackendsftp.c:6346
+#: daemon/gvfsbackendsftp.c:6569 daemon/gvfsbackendsftp.c:6586
+#: daemon/gvfsbackendsftp.c:6724 daemon/gvfsbackendsftp.c:6752
 msgid "Invalid reply received"
 msgstr "Ricevude repliche no valide"
 
-#: daemon/gvfsbackendgoogle.c:3288
+#: daemon/gvfsbackendgoogle.c:3300
 msgid "File is not a regular file"
 msgstr "Il file nol è un file regolâr"
 
-#: daemon/gvfsbackendgoogle.c:3653 daemon/gvfsbackendnfs.c:1152
+#: daemon/gvfsbackendgoogle.c:3665 daemon/gvfsbackendnfs.c:1152
 msgid "Target file is a directory"
 msgstr "Il file di destinazion e je une cartele"
 
-#: daemon/gvfsbackendgoogle.c:3846 daemon/gvfsbackendgphoto2.c:3050
+#: daemon/gvfsbackendgoogle.c:3858 daemon/gvfsbackendgphoto2.c:3050
 msgid "Error writing file"
 msgstr "Erôr tal scrivi il file"
 
@@ -1296,15 +1299,15 @@ msgstr "Montaç gphoto2 su %s"
 msgid "No camera specified"
 msgstr "Nissune fotocjamare specificade"
 
-#: daemon/gvfsbackendgphoto2.c:1564 daemon/gvfsbackendgphoto2.c:3291
+#: daemon/gvfsbackendgphoto2.c:1564 daemon/gvfsbackendgphoto2.c:3299
 msgid "Error creating file object"
 msgstr "Erôr tal creâ l'ogjet dal file"
 
-#: daemon/gvfsbackendgphoto2.c:1579 daemon/gvfsbackendgphoto2.c:3322
+#: daemon/gvfsbackendgphoto2.c:1579 daemon/gvfsbackendgphoto2.c:3330
 msgid "Error getting file"
 msgstr "Erôr tal otignî il file"
 
-#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2374
+#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2388
 #, c-format
 msgid "Malformed icon identifier “%s”"
 msgstr "Identificadôr de icone “%s” malformât"
@@ -1356,7 +1359,7 @@ msgstr "La cartele “%s” no je vueide"
 msgid "Error deleting directory"
 msgstr "Erôr tal eliminâ la cartele"
 
-#: daemon/gvfsbackendgphoto2.c:2598 daemon/gvfsbackendgphoto2.c:3343
+#: daemon/gvfsbackendgphoto2.c:2598 daemon/gvfsbackendgphoto2.c:3351
 msgid "Error deleting file"
 msgstr "Erôr tal eliminâ il file"
 
@@ -1465,20 +1468,20 @@ msgstr "Impussibil unî lis cartelis"
 msgid "Cannot make directory in this location"
 msgstr "Impussibil creâ cartelis in cheste posizion"
 
-#: daemon/gvfsbackendmtp.c:1723 daemon/gvfsbackendmtp.c:2139
-#: daemon/gvfsbackendmtp.c:2202 daemon/gvfsbackendmtp.c:2269
-#: daemon/gvfsbackendmtp.c:2631 daemon/gvfsbackendmtp.c:2697
-#: daemon/gvfsbackendmtp.c:2910 daemon/gvfsbackendmtp.c:3053
+#: daemon/gvfsbackendmtp.c:1730 daemon/gvfsbackendmtp.c:2153
+#: daemon/gvfsbackendmtp.c:2216 daemon/gvfsbackendmtp.c:2283
+#: daemon/gvfsbackendmtp.c:2645 daemon/gvfsbackendmtp.c:2711
+#: daemon/gvfsbackendmtp.c:2924 daemon/gvfsbackendmtp.c:3067
 #: daemon/gvfsbackendsmbbrowse.c:1172
 msgid "Not a regular file"
 msgstr "Nol è un file regolâr"
 
-#: daemon/gvfsbackendmtp.c:2011 daemon/gvfsbackendmtp.c:2543
-#: daemon/gvfsbackendmtp.c:2894 daemon/gvfsbackendmtp.c:3037
+#: daemon/gvfsbackendmtp.c:2025 daemon/gvfsbackendmtp.c:2557
+#: daemon/gvfsbackendmtp.c:2908 daemon/gvfsbackendmtp.c:3051
 msgid "Cannot write to this location"
 msgstr "Impussibil scrivi in cheste posizion"
 
-#: daemon/gvfsbackendmtp.c:2356
+#: daemon/gvfsbackendmtp.c:2370
 #, c-format
 msgid "No thumbnail for entity “%s”"
 msgstr "Nissune miniature pe entitât “%s”"
@@ -1529,7 +1532,7 @@ msgstr "La cartele dai resints no pues jessi eliminade"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: daemon/gvfsbackendrecent.c:689 daemon/gvfsbackendrecent.c:810
+#: daemon/gvfsbackendrecent.c:693 daemon/gvfsbackendrecent.c:814
 msgid "Recent"
 msgstr "Resint"
 
@@ -1650,7 +1653,7 @@ msgstr "Impussibil cjatâ un comant SSH supuartât"
 msgid "Unknown reason"
 msgstr "Motîf no cognossût"
 
-#: daemon/gvfsbackendsftp.c:2590 daemon/gvfsbackendsmb.c:1386
+#: daemon/gvfsbackendsftp.c:2590 daemon/gvfsbackendsmb.c:1387
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (codifiche no valide)"
@@ -1674,7 +1677,7 @@ msgstr "Erôr tal creâ il file di backup: %s"
 msgid "Value out of range, sftp only supports 32bit timestamps"
 msgstr "Valôr fûr dal interval, sftp al supuarte dome datis e oris a 32-bit"
 
-#: daemon/gvfsbackendsftp.c:5438 daemon/gvfsbackendsmb.c:1725
+#: daemon/gvfsbackendsftp.c:5438 daemon/gvfsbackendsmb.c:1728
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Gjenar di atribût no valit (si spietave uint64)"
 
@@ -1685,8 +1688,8 @@ msgid "Password required for %s"
 msgstr "Password necessarie par %s"
 
 #: daemon/gvfsbackendsmbbrowse.c:798 daemon/gvfsbackendsmbbrowse.c:837
-#: daemon/gvfsbackendsmb.c:403 daemon/gvfsbackendsmb.c:430
-#: daemon/gvfsbackendsmb.c:621
+#: daemon/gvfsbackendsmb.c:404 daemon/gvfsbackendsmb.c:431
+#: daemon/gvfsbackendsmb.c:622
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "Erôr interni (%s)"
@@ -1709,46 +1712,46 @@ msgid "Windows Network File System Service"
 msgstr "Servizi di filesystem di rêt di Windows"
 
 #. translators: First %s is a share name, second is a server name
-#: daemon/gvfsbackendsmb.c:267
+#: daemon/gvfsbackendsmb.c:268
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "E covente une password pe condivision %s su %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: daemon/gvfsbackendsmb.c:545
+#: daemon/gvfsbackendsmb.c:546
 #, c-format
 msgid "Failed to mount Windows share: %s"
 msgstr "No si è rivâts a montâ la condivision di Windows: %s"
 
-#: daemon/gvfsbackendsmb.c:1315
+#: daemon/gvfsbackendsmb.c:1316
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Creazion dal file di backup falide: %s"
 
-#: daemon/gvfsbackendsmb.c:1923
+#: daemon/gvfsbackendsmb.c:1926
 msgid "Can’t rename file, filename already exists"
 msgstr "Impussibil cambiâ non al file, il non dal file al esist za"
 
-#: daemon/gvfsbackendsmb.c:1974
+#: daemon/gvfsbackendsmb.c:1977
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Erôr tal eliminâ il file: %s"
 
-#: daemon/gvfsbackendsmb.c:2060
+#: daemon/gvfsbackendsmb.c:2064
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Erôr tal spostâ il file: %s"
 
-#: daemon/gvfsbackendsmb.c:2132
+#: daemon/gvfsbackendsmb.c:2137
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Erôr tal gjavâ il file di destinazion: %s"
 
-#: daemon/gvfsbackendsmb.c:2156
+#: daemon/gvfsbackendsmb.c:2161
 msgid "Can’t recursively move directory"
 msgstr "Impussibil spostâ in maniere ricorsive la cartele"
 
-#: daemon/gvfsbackendsmb.c:2202
+#: daemon/gvfsbackendsmb.c:2210
 msgid "Windows Shares File System Service"
 msgstr "Servizi di filesystem des condivisions di Windows"
 
@@ -1815,7 +1818,7 @@ msgid ""
 "\n"
 "Are you really sure you would like to continue?"
 msgstr ""
-"La indentitât dal sît no pues jessi verificade:%s\n"
+"La identitât dal sît no pues jessi verificade:%s\n"
 "\n"
 "%s\n"
 "\n"
