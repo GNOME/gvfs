@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2020-12-16 10:30+0000\n"
-"PO-Revision-Date: 2020-12-18 11:51+0100\n"
+"POT-Creation-Date: 2021-01-09 17:42+0000\n"
+"PO-Revision-Date: 2021-01-15 12:53+0100\n"
 "Last-Translator: Fabio Tomat <f.t.public@gmail.com>\n"
 "Language-Team: Friulian <fur@li.org>\n"
 "Language: fur\n"
@@ -18,53 +18,53 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.4.2\n"
 
-#: client/gdaemonfile.c:435 client/gdaemonfile.c:2710
+#: client/gdaemonfile.c:435 client/gdaemonfile.c:2718
 msgid "Operation not supported, files on different mounts"
 msgstr "Operazion no supuartade, file su montaçs diferents"
 
-#: client/gdaemonfile.c:1020 client/gdaemonfile.c:3058
-#: client/gvfsiconloadable.c:343 daemon/gvfsjobopenforread.c:183
+#: client/gdaemonfile.c:1028 client/gdaemonfile.c:3066
+#: client/gvfsiconloadable.c:351 daemon/gvfsjobopenforread.c:183
 #: daemon/gvfsjobopenforwrite.c:333
 msgid "Couldn’t get stream file descriptor"
 msgstr "Impussibil otignî il descritôr dal file di flus"
 
-#: client/gdaemonfile.c:1136 client/gdaemonfile.c:1208
+#: client/gdaemonfile.c:1144 client/gdaemonfile.c:1216
 #: client/gvfsiconloadable.c:145
 msgid "Didn’t get stream file descriptor"
 msgstr "No si à vût il descritôr dal file di flus"
 
-#: client/gdaemonfile.c:1330
+#: client/gdaemonfile.c:1338
 #, c-format
 msgid "Invalid return value from %s"
 msgstr "Valôr tornât di %s no valit"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: client/gdaemonfile.c:2180 client/gdaemonfile.c:3321
+#: client/gdaemonfile.c:2188 client/gdaemonfile.c:3329
 msgid "Could not find enclosing mount"
 msgstr "Impussibil cjatâ il montaç includût"
 
-#: client/gdaemonfile.c:2212
+#: client/gdaemonfile.c:2220
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Non file %s no valit"
 
-#: client/gdaemonfile.c:2526 client/gdaemonfile.c:2536
-#: client/gdaemonfile.c:2558 client/gdaemonvfs.c:1234 client/gdaemonvfs.c:1255
+#: client/gdaemonfile.c:2534 client/gdaemonfile.c:2544
+#: client/gdaemonfile.c:2566 client/gdaemonvfs.c:1234 client/gdaemonvfs.c:1255
 #: client/gdaemonvfs.c:1266 client/gdaemonvfs.c:1298
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Erôr tal stabilî i metadâts dal file: %s"
 
-#: client/gdaemonfile.c:2527 client/gdaemonvfs.c:1256
+#: client/gdaemonfile.c:2535 client/gdaemonvfs.c:1256
 msgid "can’t open metadata tree"
 msgstr "impussibil vierzi arbul metadâts"
 
-#: client/gdaemonfile.c:2537 client/gdaemonvfs.c:1267
+#: client/gdaemonfile.c:2545 client/gdaemonvfs.c:1267
 msgid "can’t get metadata proxy"
 msgstr "impussibil vê proxy metadâts"
 
-#: client/gdaemonfile.c:2559 client/gdaemonvfs.c:1299
+#: client/gdaemonfile.c:2567 client/gdaemonvfs.c:1299
 msgid "values must be string or list of strings"
 msgstr "i valôrs a scugnin jessi stringhis o listis di stringhis"
 
@@ -78,7 +78,7 @@ msgstr "Erôr intal protocol di flus: %s"
 
 #: client/gdaemonfileinputstream.c:552 client/gdaemonfileinputstream.c:1695
 #: client/gdaemonfileoutputstream.c:503 client/gdaemonfileoutputstream.c:1442
-#: daemon/gvfsbackendmtp.c:2452 daemon/gvfsbackendmtp.c:2843
+#: daemon/gvfsbackendmtp.c:2453 daemon/gvfsbackendmtp.c:2844
 msgid "End of stream"
 msgstr "Fin dal flus"
 
@@ -374,11 +374,11 @@ msgstr "Permès dineât"
 #: daemon/gvfsbackendarchive.c:845 daemon/gvfsbackendarchive.c:874
 #: daemon/gvfsbackendcdda.c:908 daemon/gvfsbackendcomputer.c:639
 #: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:795
-#: daemon/gvfsbackendftp.c:1189 daemon/gvfsbackendmtp.c:1753
-#: daemon/gvfsbackendmtp.c:1769 daemon/gvfsbackendmtp.c:2176
-#: daemon/gvfsbackendmtp.c:2239 daemon/gvfsbackendmtp.c:2306
-#: daemon/gvfsbackendmtp.c:2668 daemon/gvfsbackendmtp.c:2947
-#: daemon/gvfsbackendmtp.c:3090 daemon/gvfsbackendnetwork.c:697
+#: daemon/gvfsbackendftp.c:1189 daemon/gvfsbackendmtp.c:1754
+#: daemon/gvfsbackendmtp.c:1770 daemon/gvfsbackendmtp.c:2177
+#: daemon/gvfsbackendmtp.c:2240 daemon/gvfsbackendmtp.c:2307
+#: daemon/gvfsbackendmtp.c:2669 daemon/gvfsbackendmtp.c:2948
+#: daemon/gvfsbackendmtp.c:3091 daemon/gvfsbackendnetwork.c:697
 #: daemon/gvfsbackendsmbbrowse.c:1109 daemon/gvfsbackendsmbbrowse.c:1176
 #: daemon/gvfsbackendsmbbrowse.c:1358 daemon/gvfsbackendsmbbrowse.c:1431
 #, c-format
@@ -444,8 +444,8 @@ msgstr "No vonde spazi tal volum"
 #: daemon/gvfsbackendgoogle.c:1547 daemon/gvfsbackendgoogle.c:1624
 #: daemon/gvfsbackendgoogle.c:1993 daemon/gvfsbackendgoogle.c:2073
 #: daemon/gvfsbackendgoogle.c:2547 daemon/gvfsbackendgoogle.c:2917
-#: daemon/gvfsbackendgoogle.c:3566 daemon/gvfsbackendmtp.c:1649
-#: daemon/gvfsbackendmtp.c:1692 daemon/gvfsbackendnfs.c:2487
+#: daemon/gvfsbackendgoogle.c:3566 daemon/gvfsbackendmtp.c:1650
+#: daemon/gvfsbackendmtp.c:1693 daemon/gvfsbackendnfs.c:2487
 #: daemon/gvfsbackendsftp.c:5022 daemon/gvfsbackendsmb.c:2100
 msgid "Target file already exists"
 msgstr "Il file di destinazion al esist za"
@@ -522,10 +522,10 @@ msgstr "Il file sorzint al è une cartele"
 msgid "Range lock conflict exists"
 msgstr "Al esist un conflit dal bloc di interval"
 
-#: daemon/gvfsafpvolume.c:2193 daemon/gvfsbackendmtp.c:1472
-#: daemon/gvfsbackendmtp.c:1497 daemon/gvfsbackendmtp.c:1700
-#: daemon/gvfsbackendmtp.c:2076 daemon/gvfsbackendmtp.c:2593
-#: daemon/gvfsbackendmtp.c:2988 daemon/gvfsbackendmtp.c:3124
+#: daemon/gvfsafpvolume.c:2193 daemon/gvfsbackendmtp.c:1473
+#: daemon/gvfsbackendmtp.c:1498 daemon/gvfsbackendmtp.c:1701
+#: daemon/gvfsbackendmtp.c:2077 daemon/gvfsbackendmtp.c:2594
+#: daemon/gvfsbackendmtp.c:2989 daemon/gvfsbackendmtp.c:3125
 msgid "Directory doesn’t exist"
 msgstr "La cartele no esist"
 
@@ -569,11 +569,11 @@ msgstr "Il file nol è viert pal acès in leture"
 #: daemon/gvfsbackendgphoto2.c:2451 daemon/gvfsbackendgphoto2.c:2548
 #: daemon/gvfsbackendgphoto2.c:2641 daemon/gvfsbackendgphoto2.c:3250
 #: daemon/gvfsbackendgphoto2.c:3258 daemon/gvfsbackendgphoto2.c:3268
-#: daemon/gvfsbackendmtp.c:1745 daemon/gvfsbackendmtp.c:2046
-#: daemon/gvfsbackendmtp.c:2295 daemon/gvfsbackendmtp.c:2486
-#: daemon/gvfsbackendmtp.c:2569 daemon/gvfsbackendmtp.c:2657
-#: daemon/gvfsbackendmtp.c:2725 daemon/gvfsbackendmtp.c:2920
-#: daemon/gvfsbackendmtp.c:3063 daemon/gvfsbackendnfs.c:2369
+#: daemon/gvfsbackendmtp.c:1746 daemon/gvfsbackendmtp.c:2047
+#: daemon/gvfsbackendmtp.c:2296 daemon/gvfsbackendmtp.c:2487
+#: daemon/gvfsbackendmtp.c:2570 daemon/gvfsbackendmtp.c:2658
+#: daemon/gvfsbackendmtp.c:2726 daemon/gvfsbackendmtp.c:2921
+#: daemon/gvfsbackendmtp.c:3064 daemon/gvfsbackendnfs.c:2369
 #: daemon/gvfsbackendnfs.c:2419 daemon/gvfsbackendnfs.c:2545
 #: daemon/gvfsbackendsftp.c:2209 daemon/gvfsbackendsftp.c:5410
 #: daemon/gvfsbackendsftp.c:5508 daemon/gvfsbackendsftp.c:6220
@@ -754,7 +754,7 @@ msgstr ""
 
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3289
-#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2328
+#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2329
 #: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:126
 #: daemon/gvfsbackendsmb.c:676 daemon/gvfsbackendtrash.c:234
 msgid "Can’t open directory"
@@ -825,8 +825,8 @@ msgstr "Impussibil copiâ la cartele sore la cartele"
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:893
 #: daemon/gvfsbackenddav.c:3093 daemon/gvfsbackendftp.c:1591
 #: daemon/gvfsbackendgoogle.c:1658 daemon/gvfsbackendgoogle.c:2881
-#: daemon/gvfsbackendgoogle.c:2929 daemon/gvfsbackendmtp.c:1640
-#: daemon/gvfsbackendmtp.c:1655
+#: daemon/gvfsbackendgoogle.c:2929 daemon/gvfsbackendmtp.c:1641
+#: daemon/gvfsbackendmtp.c:1656
 msgid "Can’t recursively copy directory"
 msgstr "Impussibil copiâ in maniere ricorsive la cartele"
 
@@ -1308,7 +1308,7 @@ msgstr "Erôr tal creâ l'ogjet dal file"
 msgid "Error getting file"
 msgstr "Erôr tal otignî il file"
 
-#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2416
+#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2417
 #, c-format
 msgid "Malformed icon identifier “%s”"
 msgstr "Identificadôr de icone “%s” malformât"
@@ -1460,37 +1460,37 @@ msgstr "Impussibil vierzi il dispositîf MTP “%03u,%03u”"
 msgid "Device not found"
 msgstr "Dispositîf no cjatât"
 
-#: daemon/gvfsbackendmtp.c:1400 daemon/gvfsbackendmtp.c:1508
-#: daemon/gvfsbackendmtp.c:1560
+#: daemon/gvfsbackendmtp.c:1401 daemon/gvfsbackendmtp.c:1509
+#: daemon/gvfsbackendmtp.c:1561
 msgid "File not found"
 msgstr "File no cjatât"
 
-#: daemon/gvfsbackendmtp.c:1630
+#: daemon/gvfsbackendmtp.c:1631
 msgid "Target is a directory"
 msgstr "La destinazion e je une cartele"
 
-#: daemon/gvfsbackendmtp.c:1635
+#: daemon/gvfsbackendmtp.c:1636
 msgid "Can’t merge directories"
 msgstr "Impussibil unî lis cartelis"
 
-#: daemon/gvfsbackendmtp.c:1681
+#: daemon/gvfsbackendmtp.c:1682
 msgid "Cannot make directory in this location"
 msgstr "Impussibil creâ cartelis in cheste posizion"
 
-#: daemon/gvfsbackendmtp.c:1758 daemon/gvfsbackendmtp.c:2181
-#: daemon/gvfsbackendmtp.c:2244 daemon/gvfsbackendmtp.c:2311
-#: daemon/gvfsbackendmtp.c:2673 daemon/gvfsbackendmtp.c:2739
-#: daemon/gvfsbackendmtp.c:2952 daemon/gvfsbackendmtp.c:3095
+#: daemon/gvfsbackendmtp.c:1759 daemon/gvfsbackendmtp.c:2182
+#: daemon/gvfsbackendmtp.c:2245 daemon/gvfsbackendmtp.c:2312
+#: daemon/gvfsbackendmtp.c:2674 daemon/gvfsbackendmtp.c:2740
+#: daemon/gvfsbackendmtp.c:2953 daemon/gvfsbackendmtp.c:3096
 #: daemon/gvfsbackendsmbbrowse.c:1172
 msgid "Not a regular file"
 msgstr "Nol è un file regolâr"
 
-#: daemon/gvfsbackendmtp.c:2053 daemon/gvfsbackendmtp.c:2585
-#: daemon/gvfsbackendmtp.c:2936 daemon/gvfsbackendmtp.c:3079
+#: daemon/gvfsbackendmtp.c:2054 daemon/gvfsbackendmtp.c:2586
+#: daemon/gvfsbackendmtp.c:2937 daemon/gvfsbackendmtp.c:3080
 msgid "Cannot write to this location"
 msgstr "Impussibil scrivi in cheste posizion"
 
-#: daemon/gvfsbackendmtp.c:2398
+#: daemon/gvfsbackendmtp.c:2399
 #, c-format
 msgid "No thumbnail for entity “%s”"
 msgstr "Nissune miniature pe entitât “%s”"
@@ -1839,7 +1839,7 @@ msgid ""
 "\n"
 "Are you really sure you would like to continue?"
 msgstr ""
-"La indentitât dal sît no pues jessi verificade:%s\n"
+"La identitât dal sît no pues jessi verificade:%s\n"
 "\n"
 "%s\n"
 "\n"
