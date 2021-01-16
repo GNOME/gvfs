@@ -2020,11 +2020,11 @@ msgstr "Realitza operacions de fitxer"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:14
 msgid "Authentication is required to run gvfsd-admin daemon"
-msgstr "Cal autenticació per executar el dimoni gvfsd-admin"
+msgstr "Cal autenticació per a executar el dimoni gvfsd-admin"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:26
 msgid "Authentication is required to perform file operations"
-msgstr "Cal autenticació per realitzar operacions de fitxer"
+msgstr "Cal autenticació per a realitzar operacions de fitxer"
 
 #: metadata/meta-daemon.c:249 metadata/meta-daemon.c:326
 #: metadata/meta-daemon.c:363
@@ -2225,7 +2225,7 @@ msgstr "Contrasenya d'encriptació per a %s"
 
 #: monitor/udisks2/gvfsudisks2volume.c:1484
 msgid "A passphrase is required to access the volume"
-msgstr "Fa falta una contrasenya per accedir al volum"
+msgstr "Fa falta una contrasenya per a accedir al volum"
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1499
@@ -2245,7 +2245,7 @@ msgid ""
 "The passphrase is needed to access encrypted data on %s."
 msgstr ""
 "Introduïu la contrasenya per desbloquejar el volum.\n"
-"Fa falta la contrasenya per accedir a les dades encriptades de %s."
+"Fa falta la contrasenya per a accedir a les dades encriptades de %s."
 
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
