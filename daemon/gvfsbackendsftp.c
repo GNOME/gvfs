@@ -4793,6 +4793,9 @@ try_query_fs_info (GVfsBackend *backend,
                                     G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "sftp");
   g_file_info_set_attribute_boolean (info,
                                      G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE, TRUE);
+  g_file_info_set_attribute_uint32 (info,
+                                    G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW,
+                                    G_FILESYSTEM_PREVIEW_TYPE_IF_ALWAYS);
 
   if (has_extension (op_backend, SFTP_EXT_OPENSSH_STATVFS) &&
       (g_file_attribute_matcher_matches (matcher,

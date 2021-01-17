@@ -1033,6 +1033,7 @@ try_query_fs_info (GVfsBackend *backend,
 {
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "burn");
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE, FALSE);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW, G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   return TRUE;
 }
