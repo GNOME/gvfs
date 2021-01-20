@@ -14,6 +14,9 @@ For more info about GVfs see https://wiki.gnome.org/Projects/gvfs.
 Bug reports can be found and filed at https://gitlab.gnome.org/GNOME/gvfs/issues.
 For security-related issues, please use https://security.gnome.org/.
 
+See https://wiki.gnome.org/Projects/gvfs/debugging for info about getting debug
+logs.
+
 ## Ask Questions
 
 For questions use gvfs mailing list [gvfs-list@gnome.org](mailto:gvfs-list@gnome.org).
