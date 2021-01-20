@@ -7,7 +7,7 @@ implement volume monitors and persistent metadata storage. There is also FUSE
 support that provides limited access to the GVfs filesystems for applications
 not using GIO.
 
-For more info about GVfs see https://wiki.gnome.org/Projects/gvfs.
+For more info about GVfs, see https://wiki.gnome.org/Projects/gvfs.
 
 ## Reporting Bugs
 
@@ -21,4 +21,4 @@ logs.
 
 For questions use gvfs mailing list [gvfs-list@gnome.org](mailto:gvfs-list@gnome.org).
 See https://mail.gnome.org/mailman/listinfo/gvfs-list for subscription info.
-Alternatively you use irc://irc.gnome.org/nautilus.
+Alternatively, irc://irc.gnome.org/nautilus can be used.
