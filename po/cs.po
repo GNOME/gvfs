@@ -7,7 +7,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs\n"
+"Project-Id-Version: gvfs gnome-3-38\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
 "POT-Creation-Date: 2020-01-31 15:49+0000\n"
 "PO-Revision-Date: 2021-01-22 17:44+0100\n"
