@@ -80,8 +80,6 @@ G_DEFINE_TYPE(GVfsBackendGoogle, g_vfs_backend_google, G_VFS_TYPE_BACKEND)
 
 #define CONTENT_TYPE_PREFIX_GOOGLE "application/vnd.google-apps"
 
-#define MAX_RESULTS 50
-
 #define REBUILD_ENTRIES_TIMEOUT 60 /* s */
 
 #define URI_PREFIX "https://www.googleapis.com/drive/v2/files/"
@@ -907,7 +905,7 @@ rebuild_dir (GVfsBackendGoogle  *self,
   parent_id = g_strdup (gdata_entry_get_id (parent));
 
   search = g_strdup_printf ("'%s' in parents", parent_id);
-  query = gdata_documents_query_new_with_limits (search, 1, MAX_RESULTS);
+  query = gdata_documents_query_new_with_limits (search, 1, G_MAXUINT);
   gdata_documents_query_set_show_folders (query, TRUE);
   g_free (search);
 
