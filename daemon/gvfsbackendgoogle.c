@@ -1088,8 +1088,26 @@ resolve (GVfsBackendGoogle  *self,
   ret_val = resolve_child (self, parent, basename, cancellable, &local_error);
   if (ret_val == NULL)
     {
-      g_propagate_error (error, local_error);
-      goto out;
+      /* This fallback provides volatile entries for URIs which was used
+       * before My Drive folder was added in the root. */
+      if (parent == self->root)
+        {
+          g_clear_error (&local_error);
+          ret_val = resolve_child (self, self->home, basename, cancellable, &local_error);
+          if (ret_val != NULL && out_path != NULL)
+            {
+              gchar *tmp;
+              tmp = g_build_path ("/", *out_path, gdata_entry_get_id (self->home), NULL);
+              g_free (*out_path);
+              *out_path = tmp;
+            }
+        }
+
+      if (ret_val == NULL)
+        {
+          g_propagate_error (error, local_error);
+          goto out;
+        }
     }
 
   if (out_path != NULL)
