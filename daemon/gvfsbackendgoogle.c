@@ -1312,6 +1312,10 @@ build_file_info (GVfsBackendGoogle      *self,
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, !is_root && !is_home && !is_shared_with_me_dir);
 
+  can_edit = gdata_documents_entry_can_edit (GDATA_DOCUMENTS_ENTRY (entry));
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, !is_root && !is_shared_with_me_dir && can_edit);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
+
   if (is_folder)
     {
       content_type = g_strdup ("inode/directory");
