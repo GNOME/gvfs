@@ -1306,7 +1306,7 @@ pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
             time.sleep(0.1)
 
         # wait a bit more to see whether we catch some stragglers
-        time.sleep(0.2)
+        time.sleep(0.7)
         out2 = self.monitor.stdout.read()
         if out2:
             out += out2
