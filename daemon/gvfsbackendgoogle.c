@@ -58,11 +58,13 @@ struct _GVfsBackendGoogle
   GDataEntry *root;
   GDataEntry *home;
   GDataEntry *shared_with_me_dir;
+  GDataEntry *shared_drives_dir;
   GHashTable *entries; /* gchar *entry_id -> GDataEntry */
   GHashTable *dir_entries; /* DirEntriesKey -> GDataEntry */
   GHashTable *dir_timestamps; /* gchar *entry_id -> gint64 *timestamp */
   GHashTable *monitors;
   GList *dir_collisions;
+  GList *shared_drives;
   GRecMutex mutex; /* guards cache */
   GoaClient *client;
   gchar *account_identity;
@@ -91,6 +93,7 @@ G_DEFINE_TYPE(GVfsBackendGoogle, g_vfs_backend_google, G_VFS_TYPE_BACKEND)
 
 #define ROOT_ID "GVfsRoot"
 #define SHARED_WITH_ME_ID "GVfsSharedWithMe"
+#define SHARED_DRIVES_ID "GVfsSharedDrives"
 /* ---------------------------------------------------------------------------------------------------- */
 
 typedef struct
@@ -931,6 +934,48 @@ is_dir_listing_valid (GVfsBackendGoogle *self, GDataEntry *parent)
 }
 
 static void
+rebuild_shared_drives_dir (GVfsBackendGoogle  *self,
+                           GCancellable       *cancellable,
+                           GError            **error)
+
+{
+  GDataAuthorizationDomain *auth_domain;
+  GList *l;
+  gint64 *timestamp;
+
+  auth_domain = gdata_documents_service_get_primary_authorization_domain ();
+
+  remove_dir (self, self->shared_drives_dir);
+
+  for (l = self->shared_drives; l != NULL; l = l->next)
+    {
+      GDataDocumentsDrive *drive = GDATA_DOCUMENTS_DRIVE (l->data);
+      GDataEntry *entry = NULL;
+
+      entry = gdata_service_query_single_entry (GDATA_SERVICE (self->service),
+                                                auth_domain,
+                                                gdata_entry_get_id (GDATA_ENTRY (drive)),
+                                                NULL,
+                                                GDATA_TYPE_DOCUMENTS_FOLDER,
+                                                cancellable,
+                                                error);
+      if (entry == NULL)
+        return;
+
+      /* Replace "My Drive" title by the real name of the Drive. */
+      gdata_entry_set_title (entry, gdata_documents_drive_get_name (drive));
+
+      insert_custom_entry (self, entry, SHARED_DRIVES_ID);
+
+      g_object_unref (entry);
+    }
+
+  timestamp = g_new (gint64, 1);
+  *timestamp = g_get_real_time ();
+  g_hash_table_insert (self->dir_timestamps, SHARED_DRIVES_ID, timestamp);
+}
+
+static void
 rebuild_dir (GVfsBackendGoogle  *self,
              GDataEntry         *parent,
              GCancellable       *cancellable,
@@ -941,6 +986,12 @@ rebuild_dir (GVfsBackendGoogle  *self,
   gboolean succeeded_once = FALSE;
   gchar *search;
   gchar *parent_id;
+
+  if (parent == self->shared_drives_dir)
+    {
+      rebuild_shared_drives_dir (self, cancellable, error);
+      return;
+    }
 
   /* g_strdup() is necessary to prevent segfault because gdata_entry_get_id() calls g_free() */
   parent_id = g_strdup (gdata_entry_get_id (parent));
@@ -1285,6 +1336,7 @@ build_file_info (GVfsBackendGoogle      *self,
   gsize i;
   gboolean is_shared_with_me_dir = (entry == self->shared_with_me_dir);
   gboolean is_home = (entry == self->home);
+  gboolean is_shared_drives_dir = (entry == self->shared_drives_dir);
   gboolean can_edit;
 
   if (GDATA_IS_DOCUMENTS_FOLDER (entry))
@@ -1302,7 +1354,8 @@ build_file_info (GVfsBackendGoogle      *self,
   /* TODO: It is not always possible to rename, delete, or list children.
    * However, the proper implementation of gdata_documents_entry_can_rename/
    * _delete/_list_children would require port to Google Drive API v3. */
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, !is_root && !is_home && !is_shared_with_me_dir);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME,
+                                     !is_root && !is_home && !is_shared_with_me_dir && !is_shared_drives_dir);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, is_folder);
 
@@ -1310,10 +1363,12 @@ build_file_info (GVfsBackendGoogle      *self,
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_VOLATILE, is_symlink);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, !is_root && !is_home && !is_shared_with_me_dir);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE,
+                                     !is_root && !is_home && !is_shared_with_me_dir && !is_shared_drives_dir);
 
   can_edit = gdata_documents_entry_can_edit (GDATA_DOCUMENTS_ENTRY (entry));
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, !is_root && !is_shared_with_me_dir && can_edit);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
+                                     !is_root && !is_shared_with_me_dir && !is_shared_drives_dir && can_edit);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
 
   if (is_folder)
@@ -1376,6 +1431,11 @@ build_file_info (GVfsBackendGoogle      *self,
           icon = g_themed_icon_new_with_default_fallbacks ("folder-publicshare");
           symbolic_icon = g_themed_icon_new_with_default_fallbacks ("folder-publicshare-symbolic");
         }
+      else if (is_shared_drives_dir)
+        {
+          icon = g_themed_icon_new_with_default_fallbacks ("folder-remote");
+          symbolic_icon = g_themed_icon_new_with_default_fallbacks ("folder-remote-symbolic");
+        }
       else
         {
           icon = g_content_type_get_icon (content_type);
@@ -1407,7 +1467,7 @@ build_file_info (GVfsBackendGoogle      *self,
   g_file_info_set_display_name (info, title);
   g_file_info_set_edit_name (info, title);
 
-  if (is_root || is_home || is_shared_with_me_dir)
+  if (is_root || is_home || is_shared_with_me_dir || is_shared_drives_dir)
     goto out;
 
   copy_name = generate_copy_name (self, entry, entry_path);
@@ -1556,8 +1616,9 @@ g_vfs_backend_google_copy (GVfsBackend           *_self,
       goto out;
     }
 
-  if (source_entry == self->root || source_parent == self->root ||
-      destination_parent == self->root || destination_parent == self->shared_with_me_dir)
+  if (source_entry == self->root || source_parent == self->root || source_parent == self->shared_drives_dir ||
+      destination_parent == self->root || destination_parent == self->shared_with_me_dir ||
+      destination_parent == self->shared_drives_dir)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
@@ -1977,8 +2038,9 @@ g_vfs_backend_google_move (GVfsBackend           *_self,
       goto out;
     }
 
-  if (source_entry == self->root || source_parent == self->root ||
-      destination_parent == self->root || destination_parent == self->shared_with_me_dir)
+  if (source_entry == self->root || source_parent == self->root || source_parent == self->shared_drives_dir ||
+      destination_parent == self->root || destination_parent == self->shared_with_me_dir ||
+      destination_parent == self->shared_drives_dir)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
@@ -2440,7 +2502,8 @@ g_vfs_backend_google_delete (GVfsBackend   *_self,
 
   g_debug ("  entry path: %s\n", entry_path);
 
-  if (entry == self->root || entry == self->home || entry == self->shared_with_me_dir)
+  if (entry == self->root || entry == self->home || entry == self->shared_with_me_dir ||
+      entry == self->shared_drives_dir || parent == self->shared_drives_dir)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
@@ -2773,6 +2836,48 @@ g_vfs_backend_google_make_directory (GVfsBackend          *_self,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static GList *
+query_shared_drives (GVfsBackendGoogle  *self,
+                     GCancellable       *cancellable,
+                     GError            **error)
+{
+  GDataDocumentsDriveQuery *query;
+  GList *shared_drives = NULL;
+
+  query = gdata_documents_drive_query_new (NULL);
+  while (TRUE)
+    {
+      GDataDocumentsFeed *feed;
+      GList *entries;
+
+      feed = gdata_documents_service_query_drives (self->service,
+                                                   query,
+                                                   cancellable,
+                                                   NULL,
+                                                   NULL,
+                                                   error);
+      if (feed == NULL)
+        break;
+
+      entries = gdata_feed_get_entries (GDATA_FEED (feed));
+      if (entries == NULL)
+        {
+          g_object_unref (feed);
+          break;
+        }
+
+      shared_drives = g_list_concat (shared_drives,
+                                     g_list_copy_deep (entries, (GCopyFunc) g_object_ref, NULL));
+
+      gdata_query_next_page (GDATA_QUERY (query));
+      g_object_unref (feed);
+    }
+
+  g_clear_object (&query);
+
+  return shared_drives;
+}
+
 static void
 g_vfs_backend_google_mount (GVfsBackend  *_self,
                             GVfsJobMount *job,
@@ -2865,6 +2970,23 @@ g_vfs_backend_google_mount (GVfsBackend  *_self,
   /* Translators: This is the "Shared with me" folder on https://drive.google.com. */
   gdata_entry_set_title (self->shared_with_me_dir, _("Shared with me"));
   insert_custom_entry (self, self->shared_with_me_dir, ROOT_ID);
+
+  self->shared_drives = query_shared_drives (self, cancellable, &error);
+  if (error != NULL)
+    {
+      sanitize_error (&error);
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
+    }
+
+  if (self->shared_drives)
+    {
+      self->shared_drives_dir = GDATA_ENTRY (gdata_documents_folder_new (SHARED_DRIVES_ID));
+      /* Translators: This is the "Shared drives" folder on https://drive.google.com. */
+      gdata_entry_set_title (self->shared_drives_dir, _("Shared drives"));
+      insert_custom_entry (self, self->shared_drives_dir, ROOT_ID);
+    }
 
   /* TODO: Make it work with GOA volume monitor resp. shadow mounts. */
   g_vfs_backend_set_default_location (_self, gdata_entry_get_id (self->home));
@@ -2987,7 +3109,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
       goto out;
     }
 
-  if (destination_parent == self->root || destination_parent == self->shared_with_me_dir)
+  if (destination_parent == self->root || destination_parent == self->shared_with_me_dir || destination_parent == self->shared_drives_dir)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
@@ -3621,6 +3743,7 @@ g_vfs_backend_google_set_display_name (GVfsBackend           *_self,
   GDataAuthorizationDomain *auth_domain;
   GDataEntry *entry;
   GDataEntry *new_entry = NULL;
+  GDataEntry *parent;
   GError *error;
   gchar *entry_path = NULL;
 
@@ -3638,7 +3761,15 @@ g_vfs_backend_google_set_display_name (GVfsBackend           *_self,
 
   g_debug ("  entry path: %s\n", entry_path);
 
-  if (entry == self->root || entry == self->home || entry == self->shared_with_me_dir)
+  parent = resolve_dir (self, filename, cancellable, NULL, NULL, &error);
+  if (error != NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto out;
+    }
+
+  if (entry == self->root || entry == self->home || entry == self->shared_with_me_dir || parent == self->shared_drives_dir)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
@@ -3716,7 +3847,7 @@ g_vfs_backend_google_create (GVfsBackend         *_self,
 
   g_debug ("  parent path: %s\n", parent_path);
 
-  if (parent == self->root || parent == self->shared_with_me_dir)
+  if (parent == self->root || parent == self->shared_with_me_dir || parent == self->shared_drives_dir)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
@@ -3831,7 +3962,7 @@ g_vfs_backend_google_replace (GVfsBackend         *_self,
 
   g_debug ("  parent path: %s\n", parent_path);
 
-  if (parent == self->root || parent == self->shared_with_me_dir)
+  if (parent == self->root || parent == self->shared_with_me_dir || parent == self->shared_drives_dir)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
       goto out;
@@ -4069,6 +4200,8 @@ g_vfs_backend_google_dispose (GObject *_self)
   g_clear_object (&self->root);
   g_clear_object (&self->home);
   g_clear_object (&self->shared_with_me_dir);
+  g_clear_object (&self->shared_drives_dir);
+  g_clear_list (&self->shared_drives, g_object_unref);
   g_clear_object (&self->client);
   g_clear_pointer (&self->entries, g_hash_table_unref);
   g_clear_pointer (&self->dir_entries, g_hash_table_unref);
