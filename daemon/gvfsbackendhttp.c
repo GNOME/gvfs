@@ -1,6 +1,7 @@
 /* GIO - GLib Input, Output and Streaming Library
  *
  * Copyright (C) 2008 Red Hat, Inc.
+ * Copyright (C) 2021 Igalia S.L.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -51,7 +52,7 @@
 #include "gvfsdaemonprotocol.h"
 #include "gvfsdaemonutils.h"
 
-static SoupSession *the_session;
+static SoupSession *the_session = NULL;
 
 G_DEFINE_TYPE (GVfsBackendHttp, g_vfs_backend_http, G_VFS_TYPE_BACKEND)
 
@@ -63,7 +64,7 @@ g_vfs_backend_http_finalize (GObject *object)
   backend = G_VFS_BACKEND_HTTP (object);
 
   if (backend->mount_base)
-    soup_uri_free (backend->mount_base);
+    g_uri_unref (backend->mount_base);
 
   g_object_unref (backend->session);
 
@@ -77,16 +78,87 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
 {
   g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);
 
-  backend->session = g_object_ref (the_session);
+  /* attempt to use libsoup's default values */
+  backend->session = g_object_ref (http_try_init_session (-1, -1));
 }
 
 /* ************************************************************************* */
 /* public utility functions */
 
-SoupURI *
+GUri *
 http_backend_get_mount_base (GVfsBackend *backend)
 {
   return  G_VFS_BACKEND_HTTP (backend)->mount_base;
+}
+
+#define DEBUG_MAX_BODY_SIZE (100 * 1024 * 1024)
+
+/* initializes the session singleton; if max_conns is lower than 0, the
+ * libsoup defaults are used for max-conns and max-conns-per-host, this
+ * is called in the instance constructor, so if they are to be overridden,
+ * all one has to do is make sure to call it with the desired values before
+ * any instance is created (most likely in the class constructor of the
+ * derived class, see dav backend)
+ */
+SoupSession *
+http_try_init_session (gint max_conns, gint max_conns_per_host)
+{
+  const char *debug;
+  SoupSessionFeature *cookie_jar;
+
+  if (the_session)
+    return the_session;
+
+  /* Initialize the SoupSession, common to all backend instances */
+  if (max_conns < 0)
+    the_session = soup_session_new_with_options ("user-agent",
+                                                 "gvfs/" VERSION, NULL);
+  else
+    the_session = soup_session_new_with_options ("user-agent",
+                                                 "gvfs/" VERSION,
+                                                 "max-conns",
+                                                 max_conns,
+                                                 "max-conns-per-host",
+                                                 max_conns_per_host,
+                                                 NULL);
+
+  /* Cookie handling - stored temporarlly in memory, mostly useful for
+   * authentication in WebDAV. */
+  cookie_jar = g_object_new (SOUP_TYPE_COOKIE_JAR, NULL);
+  soup_session_add_feature (the_session, cookie_jar);
+  g_object_unref (cookie_jar);
+
+  /* Send Accept-Language header (see bug 166795) */
+  soup_session_set_accept_language_auto (the_session, TRUE);
+
+  /* Prevent connection timeouts during long operations like COPY. */
+  soup_session_set_timeout (the_session, 0);
+
+  /* Logging */
+  debug = g_getenv ("GVFS_HTTP_DEBUG");
+  if (debug)
+    {
+      SoupLogger *logger;
+      SoupLoggerLogLevel level;
+
+      if (g_ascii_strcasecmp (debug, "all") == 0 ||
+          g_ascii_strcasecmp (debug, "body") == 0)
+        level = SOUP_LOGGER_LOG_BODY;
+      else if (g_ascii_strcasecmp (debug, "header") == 0)
+        level = SOUP_LOGGER_LOG_HEADERS;
+      else
+        level = SOUP_LOGGER_LOG_MINIMAL;
+
+      logger = soup_logger_new (level);
+      g_object_set (G_OBJECT (logger),
+                    "max-body-size",
+                    DEBUG_MAX_BODY_SIZE,
+                    NULL);
+      soup_session_add_feature (the_session, SOUP_SESSION_FEATURE (logger));
+      g_object_unref (logger);
+    }
+
+  return the_session;
 }
 
 char *
@@ -138,7 +210,7 @@ http_uri_get_basename (const char *uri_str)
 
   basename = http_path_get_basename (uri_str);
 
-  decoded = soup_uri_decode (basename);
+  decoded = g_uri_unescape_string (basename, NULL);
   g_free (basename);
 
   return decoded;
@@ -148,13 +220,6 @@ int
 http_error_code_from_status (guint status)
 {
   switch (status) {
-
-  case SOUP_STATUS_CANT_RESOLVE:
-  case SOUP_STATUS_CANT_RESOLVE_PROXY:
-    return G_IO_ERROR_HOST_NOT_FOUND;
-
-  case SOUP_STATUS_CANCELLED:
-    return G_IO_ERROR_CANCELLED;
 
   case SOUP_STATUS_UNAUTHORIZED:
   case SOUP_STATUS_PAYMENT_REQUIRED:
@@ -184,45 +249,27 @@ http_error_code_from_status (guint status)
 void
 http_job_failed (GVfsJob *job, SoupMessage *msg)
 {
-  switch (msg->status_code) {
+  switch (soup_message_get_status(msg)) {
 
   case SOUP_STATUS_NOT_FOUND:
     g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              msg->reason_phrase);
+                              soup_message_get_reason_phrase(msg));
     break;
 
   case SOUP_STATUS_UNAUTHORIZED:
   case SOUP_STATUS_PAYMENT_REQUIRED:
   case SOUP_STATUS_FORBIDDEN:
     g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                      _("HTTP Client Error: %s"), msg->reason_phrase);
+                      _("HTTP Client Error: %s"),
+                      soup_message_get_reason_phrase(msg));
     break;
   default:
     g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("HTTP Error: %s"), msg->reason_phrase);
+                      _("HTTP Error: %s"),
+                      soup_message_get_reason_phrase(msg));
   }
 }
 
-guint
-http_backend_send_message (GVfsBackend *backend,
-                           SoupMessage *msg)
-{
-  GVfsBackendHttp *op_backend = G_VFS_BACKEND_HTTP (backend);
-
-  return soup_session_send_message (op_backend->session, msg);
-}
-
-void
-http_backend_queue_message (GVfsBackend         *backend,
-                            SoupMessage         *msg,
-                            SoupSessionCallback  callback,
-                            gpointer             user_data)
-{
-  GVfsBackendHttp *op_backend = G_VFS_BACKEND_HTTP (backend);
-
-  soup_session_queue_message (op_backend->session, msg,
-                              callback, user_data);
-}
 /* ************************************************************************* */
 /* virtual functions overrides */
 
@@ -235,8 +282,8 @@ try_mount (GVfsBackend  *backend,
 {
   GVfsBackendHttp *op_backend;
   const char      *uri_str;
-  char            *path;
-  SoupURI         *uri;
+  const char      *path;
+  GUri            *uri;
   GMountSpec      *real_mount_spec;
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
@@ -245,7 +292,7 @@ try_mount (GVfsBackend  *backend,
   uri_str = g_mount_spec_get (mount_spec, "uri");
 
   if (uri_str)
-    uri = soup_uri_new (uri_str);
+    uri = g_uri_parse (uri_str, SOUP_HTTP_URI_FLAGS, NULL);
 
   g_debug ("+ try_mount: %s\n", uri_str ? uri_str : "(null)");
 
@@ -260,12 +307,11 @@ try_mount (GVfsBackend  *backend,
   real_mount_spec = g_mount_spec_new ("http");
   g_mount_spec_set (real_mount_spec, "uri", uri_str);
 
-  if (uri->path != NULL)
+  path = g_uri_get_path (uri);
+  if (path[0])
     {
-      path = g_uri_unescape_string (uri->path, "/");
       g_free (real_mount_spec->mount_prefix);
       real_mount_spec->mount_prefix = g_mount_spec_canonicalize_path (path);
-      g_free (path);
     }
 
   g_vfs_backend_set_mount_spec (backend, real_mount_spec);
@@ -309,7 +355,7 @@ open_for_read_ready (GObject      *source_object,
     }
 
   msg = g_vfs_http_input_stream_get_message (stream);
-  if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
+  if (!SOUP_STATUS_IS_SUCCESSFUL (soup_message_get_status (msg)))
     {
       http_job_failed (G_VFS_JOB (job), msg);
       g_object_unref (msg);
@@ -330,7 +376,7 @@ try_open_for_read (GVfsBackend        *backend,
                    GVfsJobOpenForRead *job,
                    const char         *filename)
 {
-  SoupURI *uri;
+  GUri *uri;
 
   uri = http_backend_get_mount_base (backend);
   http_backend_open_for_read (backend, G_VFS_JOB (job), uri);
@@ -341,7 +387,7 @@ try_open_for_read (GVfsBackend        *backend,
 void
 http_backend_open_for_read (GVfsBackend *backend,
 			    GVfsJob     *job,
-			    SoupURI     *uri)
+			    GUri        *uri)
 {
   GVfsBackendHttp *op_backend;
   GInputStream    *stream;
@@ -507,7 +553,7 @@ file_info_from_message (SoupMessage *msg,
 
   /* prefer the filename from the Content-Disposition (rfc2183) header
      if one if present. See bug 551298. */
-  if (soup_message_headers_get_content_disposition (msg->response_headers,
+  if (soup_message_headers_get_content_disposition (soup_message_get_response_headers (msg),
                                                     NULL, &params))
     {
       const char *name = g_hash_table_lookup (params, "filename");
@@ -520,10 +566,10 @@ file_info_from_message (SoupMessage *msg,
 
   if (basename == NULL)
     {
-      const SoupURI *uri;
+      GUri *uri;
 
       uri = soup_message_get_uri (msg);
-      basename = http_uri_get_basename (uri->path);
+      basename = http_uri_get_basename (g_uri_get_path (uri));
     }
 
   g_debug ("basename:%s\n", basename);
@@ -540,12 +586,12 @@ file_info_from_message (SoupMessage *msg,
   g_free (basename);
   g_free (ed_name);
 
-  if (soup_message_headers_get_encoding (msg->response_headers) == SOUP_ENCODING_CONTENT_LENGTH)
+  if (soup_message_headers_get_encoding (soup_message_get_response_headers (msg)) == SOUP_ENCODING_CONTENT_LENGTH)
     {
       goffset start, end, length;
       gboolean ret;
 
-      ret = soup_message_headers_get_content_range (msg->response_headers,
+      ret = soup_message_headers_get_content_range (soup_message_get_response_headers (msg),
                                                     &start, &end, &length);
       if (ret && length != -1)
         {
@@ -553,14 +599,14 @@ file_info_from_message (SoupMessage *msg,
         }
       else if (!ret)
         {
-          length = soup_message_headers_get_content_length (msg->response_headers);
+          length = soup_message_headers_get_content_length (soup_message_get_response_headers (msg));
           g_file_info_set_size (info, length);
         }
     }
 
   g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
 
-  text = soup_message_headers_get_content_type (msg->response_headers, NULL);
+  text = soup_message_headers_get_content_type (soup_message_get_response_headers (msg), NULL);
   if (text)
     {
       GIcon *icon;
@@ -578,23 +624,25 @@ file_info_from_message (SoupMessage *msg,
     }
 
 
-  text = soup_message_headers_get_one (msg->response_headers,
+  text = soup_message_headers_get_one (soup_message_get_response_headers (msg),
                                        "Last-Modified");
   if (text)
     {
-      SoupDate *sd;
+      GDateTime *gd;
 
-      sd = soup_date_new_from_string(text);
-      if (sd)
+      gd = soup_date_time_new_from_http_string (text);
+      if (gd)
         {
-          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, soup_date_to_time_t (sd));
+          g_file_info_set_attribute_uint64 (info,
+                                            G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                            g_date_time_to_unix (gd));
           g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, 0);
-          soup_date_free (sd);
+          g_date_time_unref (gd);
         }
     }
 
 
-  text = soup_message_headers_get_one (msg->response_headers,
+  text = soup_message_headers_get_one (soup_message_get_response_headers (msg),
                                        "ETag");
   if (text)
     {
@@ -605,19 +653,25 @@ file_info_from_message (SoupMessage *msg,
 }
 
 static void
-query_info_ready (SoupSession *session,
-                  SoupMessage *msg,
-                  gpointer     user_data)
+query_info_ready (GObject      *object,
+                  GAsyncResult *result,
+                  gpointer      user_data)
 {
-  GFileAttributeMatcher *matcher;
-  GVfsJobQueryInfo      *job;
-  GFileInfo             *info;
+  GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
+  GFileAttributeMatcher *matcher = job->attribute_matcher;
+  GFileInfo *info = job->file_info;
+  GInputStream *res;
+  GError *error = NULL;
+  SoupMessage *msg = G_VFS_JOB (job)->backend_data;
 
-  job     = G_VFS_JOB_QUERY_INFO (user_data);
-  info    = job->file_info;
-  matcher = job->attribute_matcher;
+  res = soup_session_send_finish (SOUP_SESSION (object), result, &error);
+  if (!res)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      return;
+    }
 
-  if (! SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
+  if (!SOUP_STATUS_IS_SUCCESSFUL (soup_message_get_status (msg)))
     {
       http_job_failed (G_VFS_JOB (job), msg);
       return;
@@ -625,9 +679,10 @@ query_info_ready (SoupSession *session,
 
   file_info_from_message (msg, info, matcher);
 
+  g_object_unref (res);
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
-
 
 static gboolean
 try_query_info (GVfsBackend           *backend,
@@ -637,8 +692,9 @@ try_query_info (GVfsBackend           *backend,
                 GFileInfo             *info,
                 GFileAttributeMatcher *attribute_matcher)
 {
+  GVfsBackendHttp *op_backend = G_VFS_BACKEND_HTTP (backend);
   SoupMessage *msg;
-  SoupURI     *uri;
+  GUri *uri;
 
   if (g_file_attribute_matcher_matches_only (attribute_matcher,
                                              G_FILE_ATTRIBUTE_THUMBNAIL_PATH))
@@ -650,7 +706,10 @@ try_query_info (GVfsBackend           *backend,
   uri = http_backend_get_mount_base (backend);
   msg = soup_message_new_from_uri (SOUP_METHOD_HEAD, uri);
 
-  http_backend_queue_message (backend, msg, query_info_ready, job);
+  g_vfs_job_set_backend_data (G_VFS_JOB (job), msg, NULL);
+
+  soup_session_send_async (op_backend->session, msg, G_PRIORITY_DEFAULT,
+                           NULL, query_info_ready, job);
 
   return TRUE;
 }
@@ -687,15 +746,9 @@ try_query_fs_info (GVfsBackend *backend,
   return TRUE;
 }
 
-
-#define DEBUG_MAX_BODY_SIZE (100 * 1024 * 1024)
-
 static void
 g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
 {
-  const char         *debug;
-  SoupSessionFeature *cookie_jar;
-
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsBackendClass *backend_class;
 
@@ -711,43 +764,4 @@ g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
   backend_class->try_query_info         = try_query_info;
   backend_class->try_query_info_on_read = try_query_info_on_read;
   backend_class->try_query_fs_info      = try_query_fs_info;
-
-  /* Initialize the SoupSession, common to all backend instances */
-  the_session = soup_session_new_with_options ("user-agent",
-                                               "gvfs/" VERSION,
-                                               NULL);
-
-  g_object_set (the_session, "ssl-strict", FALSE, NULL);
-
-  /* Cookie handling - stored temporarlly in memory, mostly useful for
-   * authentication in WebDAV. */
-  cookie_jar = g_object_new (SOUP_TYPE_COOKIE_JAR, NULL);
-  soup_session_add_feature (the_session, cookie_jar);
-  g_object_unref (cookie_jar);
-
-  /* Send Accept-Language header (see bug 166795) */
-  g_object_set (the_session, "accept-language-auto", TRUE, NULL);
-
-  /* Prevent connection timeouts during long operations like COPY. */
-  g_object_set (the_session, "timeout", 0, NULL);
-
-  /* Logging */
-  debug = g_getenv ("GVFS_HTTP_DEBUG");
-  if (debug)
-    {
-      SoupLogger         *logger;
-      SoupLoggerLogLevel  level;
-
-      if (g_ascii_strcasecmp (debug, "all") == 0 ||
-          g_ascii_strcasecmp (debug, "body") == 0)
-        level = SOUP_LOGGER_LOG_BODY;
-      else if (g_ascii_strcasecmp (debug, "header") == 0)
-        level = SOUP_LOGGER_LOG_HEADERS;
-      else
-        level = SOUP_LOGGER_LOG_MINIMAL;
-
-      logger = soup_logger_new (level, DEBUG_MAX_BODY_SIZE);
-      soup_session_add_feature (the_session, SOUP_SESSION_FEATURE (logger));
-      g_object_unref (logger);
-    }
 }

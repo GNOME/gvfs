@@ -310,7 +310,7 @@ endif
 enable_http = get_option('http')
 if enable_http
   assert(have_libxml, 'http required but libxml-2.0 not found')
-  libsoup_dep = dependency('libsoup-2.4', version: '>= 2.58.0')
+  libsoup_dep = dependency('libsoup-3.0', version: '>= 3.0.0')
 endif
 
 # *** Check if we should build with DNS-SD backend ***

@@ -1,6 +1,7 @@
 /* gvfshttpinputstream.c: seekable wrapper around SoupRequestHTTP
  *
  * Copyright (C) 2006, 2007, 2012 Red Hat, Inc.
+ * Copyright (C) 2021 Igalia S.L.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,13 +30,13 @@
 #include <libsoup/soup.h>
 
 #include "gvfshttpinputstream.h"
+#include "gvfsbackendhttp.h"
 
 static void g_vfs_http_input_stream_seekable_iface_init (GSeekableIface *seekable_iface);
 
 struct GVfsHttpInputStreamPrivate {
-  SoupURI *uri;
+  GUri *uri;
   SoupSession *session;
-  SoupRequest *req;
   SoupMessage *msg;
   GInputStream *stream;
 
@@ -61,9 +62,8 @@ g_vfs_http_input_stream_finalize (GObject *object)
   GVfsHttpInputStream *stream = G_VFS_HTTP_INPUT_STREAM (object);
   GVfsHttpInputStreamPrivate *priv = stream->priv;
 
-  g_clear_pointer (&priv->uri, soup_uri_free);
+  g_clear_pointer (&priv->uri, g_uri_unref);
   g_clear_object (&priv->session);
-  g_clear_object (&priv->req);
   g_clear_object (&priv->msg);
   g_clear_object (&priv->stream);
   g_free (priv->range);
@@ -74,7 +74,7 @@ g_vfs_http_input_stream_finalize (GObject *object)
 /**
  * g_vfs_http_input_stream_new:
  * @session: a #SoupSession
- * @uri: a #SoupURI
+ * @uri: a #GUri
  * 
  * Prepares to send a GET request for @uri on @session, and returns a
  * #GInputStream that can be used to read the response.
@@ -89,7 +89,7 @@ g_vfs_http_input_stream_finalize (GObject *object)
  **/
 GInputStream *
 g_vfs_http_input_stream_new (SoupSession *session,
-			     SoupURI     *uri)
+			     GUri     *uri)
 {
   GVfsHttpInputStream *stream;
   GVfsHttpInputStreamPrivate *priv;
@@ -98,30 +98,27 @@ g_vfs_http_input_stream_new (SoupSession *session,
   priv = stream->priv;
 
   priv->session = g_object_ref (session);
-  priv->uri = soup_uri_copy (uri);
+  priv->uri = g_uri_ref (uri);
 
   return G_INPUT_STREAM (stream);
 }
 
-static SoupRequest *
-g_vfs_http_input_stream_ensure_request (GInputStream *stream)
+static SoupMessage *
+g_vfs_http_input_stream_ensure_msg (GInputStream *stream)
 {
   GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM (stream)->priv;
 
-  if (!priv->req)
+  if (!priv->msg)
     {
-      GError *error = NULL;
-
-      priv->req = soup_session_request_uri (priv->session, priv->uri, &error);
-      g_assert_no_error (error);
-      priv->msg = soup_request_http_get_message (SOUP_REQUEST_HTTP (priv->req));
+      priv->msg = soup_message_new_from_uri (SOUP_METHOD_GET, priv->uri);
       priv->offset = 0;
     }
 
   if (priv->range)
-    soup_message_headers_replace (priv->msg->request_headers, "Range", priv->range);
+    soup_message_headers_replace (soup_message_get_request_headers (priv->msg),
+                                  "Range", priv->range);
 
-  return priv->req;
+  return priv->msg;
 }
 
 static void
@@ -136,7 +133,7 @@ send_callback (GObject      *object,
 
   g_input_stream_clear_pending (http_stream);
 
-  priv->stream = soup_request_send_finish (SOUP_REQUEST (object), result, &error);
+  priv->stream = soup_session_send_finish (SOUP_SESSION (object), result, &error);
   if (priv->stream)
     g_task_return_boolean (task, TRUE);
   else
@@ -188,9 +185,9 @@ g_vfs_http_input_stream_send_async (GInputStream        *stream,
       return;
     }
 
-  g_vfs_http_input_stream_ensure_request (stream);
-  soup_request_send_async (priv->req, cancellable,
-			   send_callback, task);
+  g_vfs_http_input_stream_ensure_msg (stream);
+  soup_session_send_async (priv->session, priv->msg, G_PRIORITY_DEFAULT,
+                           cancellable, send_callback, task);
 }
 
 /**
@@ -253,16 +250,16 @@ read_send_callback (GObject      *object,
   ReadAfterSendData *rasd = g_task_get_task_data (task);
   GError *error = NULL;
 
-  priv->stream = soup_request_send_finish (SOUP_REQUEST (object), result, &error);
+  priv->stream = soup_session_send_finish (SOUP_SESSION (object), result, &error);
   if (!priv->stream)
     {
       g_task_return_error (task, error);
       g_object_unref (task);
       return;
     }
-  if (!SOUP_STATUS_IS_SUCCESSFUL (priv->msg->status_code))
+  if (!SOUP_STATUS_IS_SUCCESSFUL (soup_message_get_status (priv->msg)))
     {
-      if (priv->msg->status_code == SOUP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE)
+      if (soup_message_get_status (priv->msg) == SOUP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE)
         {
           g_input_stream_close (priv->stream, NULL, NULL);
           g_task_return_int (task, 0);
@@ -271,9 +268,9 @@ read_send_callback (GObject      *object,
           return;
         }
       g_task_return_new_error (task,
-			       SOUP_HTTP_ERROR,
-			       priv->msg->status_code,
-			       "%s", priv->msg->reason_phrase);
+                               G_IO_ERROR,
+                               http_error_code_from_status (soup_message_get_status (priv->msg)),
+                               _("HTTP Error: %s"), soup_message_get_reason_phrase (priv->msg));
       g_object_unref (task);
       return;
     }
@@ -282,7 +279,7 @@ read_send_callback (GObject      *object,
       gboolean status;
       goffset start, end;
 
-      status = soup_message_headers_get_content_range (priv->msg->response_headers,
+      status = soup_message_headers_get_content_range (soup_message_get_response_headers (priv->msg),
                                                        &start, &end, NULL);
       if (!status || start != priv->request_offset)
       {
@@ -325,9 +322,9 @@ g_vfs_http_input_stream_read_async (GInputStream        *stream,
       rasd->count = count;
       g_task_set_task_data (task, rasd, g_free);
 
-      g_vfs_http_input_stream_ensure_request (stream);
-      soup_request_send_async (priv->req, cancellable,
-			       read_send_callback, task);
+      g_vfs_http_input_stream_ensure_msg (stream);
+      soup_session_send_async (priv->session, priv->msg, G_PRIORITY_DEFAULT,
+                               cancellable, read_send_callback, task);
       return;
     }
 
@@ -419,7 +416,7 @@ g_vfs_http_input_stream_seek (GSeekable     *seekable,
 
   if (type == G_SEEK_END && priv->msg)
     {
-      goffset content_length = soup_message_headers_get_content_length (priv->msg->response_headers);
+      goffset content_length = soup_message_headers_get_content_length (soup_message_get_response_headers (priv->msg));
 
       if (content_length)
 	{
@@ -498,7 +495,7 @@ g_vfs_http_input_stream_get_message (GInputStream *stream)
 {
   GVfsHttpInputStreamPrivate *priv = G_VFS_HTTP_INPUT_STREAM (stream)->priv;
 
-  g_vfs_http_input_stream_ensure_request (stream);
+  g_vfs_http_input_stream_ensure_msg (stream);
   return g_object_ref (priv->msg);
 }
 

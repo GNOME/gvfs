@@ -1,4 +1,5 @@
 /* Copyright (C) 2006, 2007, 2012 Red Hat, Inc.
+ * Copyright (C) 2021 Igalia S.L.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -57,7 +58,7 @@ struct GVfsHttpInputStreamClass
 GType g_vfs_http_input_stream_get_type (void) G_GNUC_CONST;
 
 GInputStream *g_vfs_http_input_stream_new         (SoupSession          *session,
-						   SoupURI              *uri);
+                                                   GUri                 *uri);
 
 void          g_vfs_http_input_stream_send_async  (GInputStream         *stream,
 						   int                   io_priority,

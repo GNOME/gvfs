@@ -1,6 +1,7 @@
 /* GIO - GLib Input, Output and Streaming Library
  * 
  * Copyright (C) 2008 Red Hat, Inc.
+ * Copyright (C) 2021 Igalia S.L.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -49,7 +50,7 @@ struct _GVfsBackendHttp
 {
   GVfsBackend parent_instance;
 
-  SoupURI     *mount_base;
+  GUri        *mount_base;
   SoupSession *session;
 };
 
@@ -61,19 +62,14 @@ char *        http_path_get_basename         (const char *path_str);
 
 int           http_error_code_from_status    (guint status);
 
-SoupURI *     http_backend_get_mount_base    (GVfsBackend *backend);
+SoupSession * http_try_init_session          (gint max_conns,
+                                              gint max_conns_per_host);
 
-guint         http_backend_send_message      (GVfsBackend *backend,
-                                              SoupMessage *msg);
-
-void          http_backend_queue_message     (GVfsBackend         *backend,
-                                              SoupMessage         *msg,
-                                              SoupSessionCallback  callback,
-                                              gpointer             user_data);
+GUri *        http_backend_get_mount_base    (GVfsBackend *backend);
 
 void          http_backend_open_for_read     (GVfsBackend         *backend,
 					      GVfsJob             *job,
-					      SoupURI             *uri);
+					      GUri                *uri);
 
 void          http_job_failed                (GVfsJob             *job,
 					      SoupMessage         *msg);
