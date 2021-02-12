@@ -437,7 +437,7 @@ get_udisks_client_sync (GError **error)
 {
   static UDisksClient *_client = NULL;
   static GError *_error = NULL;
-  static volatile gsize initialized = 0;
+  static gsize initialized = 0;
 
   if (g_once_init_enter (&initialized))
     {
