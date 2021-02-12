@@ -170,7 +170,7 @@ GVfsMetadata *
 meta_tree_get_metadata_proxy ()
 {
   static GVfsMetadata *proxy = NULL;
-  static volatile gsize initialized = 0;
+  static gsize initialized = 0;
 
   if (g_once_init_enter (&initialized))
     {
