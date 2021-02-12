@@ -1,3 +1,12 @@
+Major changes in 1.47.90
+========================
+* google: Add Shared drives folder
+* google: Add Shared with me folder
+* google: Improve performance for folders with large number of files
+* daemon: Set filesystem::use-preview explicitly and consistently
+* daemon: Unify and shorten strings for prompt dialog titles
+* Translation updates
+
 Major changes in 1.47.1
 =======================
 * mtp: Fix crashes when storage descriptions are not provided
