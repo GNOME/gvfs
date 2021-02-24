@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the gvfs package.
 # Proxecto Trasno - Adaptación do software libre á lingua galega:  Se desexas
 # colaborar connosco, podes atopar máis información en http://www.trasno.net
+#
 # Ignacio Casal Quinteiro <icq@svn.gnome.org>, 2008.
 # Mancomún - Centro de Referencia e Servizos de Software Libre <g11n@mancomun.org>, 2009.
 # Antón Méixome <meixome@mancomun.org>, 2009.
@@ -10,15 +11,14 @@
 # Fran Diéguez <frandieguez@gnome.org>, 2009, 2010, 2011, 2012.
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2012.
 # Fran Dieguez <frandieguez@gnome.org>, 2012-2021.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs-master-po-gl-70600.merged\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2021-02-12 13:52+0000\n"
-"PO-Revision-Date: 2021-02-12 20:02+0100\n"
+"POT-Creation-Date: 2021-02-12 19:07+0000\n"
+"PO-Revision-Date: 2021-02-23 20:33+0100\n"
 "Last-Translator: Fran Dieguez <frandieguez@gnome.org>\n"
-"Language-Team: Galician <proxecto@trasno.gal>\n"
+"Language-Team: Proxecto Trasno <proxecto@trasno.gal>\n"
 "Language: gl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -72,7 +72,7 @@ msgstr "non é posíbel abrir o árbore de metadatos"
 
 #: client/gdaemonfile.c:2545 client/gdaemonvfs.c:1267
 msgid "can’t get metadata proxy"
-msgstr "non é posíbel obter o proxi de metadatos"
+msgstr "non é posíbel obter o proxy de metadatos"
 
 #: client/gdaemonfile.c:2567 client/gdaemonvfs.c:1299
 msgid "values must be string or list of strings"
@@ -246,7 +246,7 @@ msgstr "Obtívose un fin inesperado do fluxo"
 #, c-format
 msgid "The server doesn’t support passwords longer than %d character."
 msgid_plural "The server doesn’t support passwords longer than %d characters."
-msgstr[0] "O servidor non admite contrasinais máis grandes que %d caracter."
+msgstr[0] "O servidor non admite contrasinais máis grandes que %d carácter."
 msgstr[1] "O servidor non admite contrasinais máis grandes que %d caracteres."
 
 #: daemon/gvfsafpserver.c:221 daemon/gvfsafpserver.c:530
@@ -515,7 +515,7 @@ msgstr "Non é posíbel mover un cartafol compartido ao Lixo"
 #: daemon/gvfsafpvolume.c:1359
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
 msgstr ""
-"O obxecto que se está movendo está marcado como non reoneábel "
+"O obxecto que se está movendo está marcado como non renomeábel "
 "(«RenameInhibit»)"
 
 #: daemon/gvfsafpvolume.c:1363
@@ -704,7 +704,7 @@ msgstr ""
 #: daemon/gvfsbackendafc.c:273
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
-msgstr "Produciuse un erro non xestionábel en libimobiledevice (%d)"
+msgstr "Produciuse un erro non suxestionábel en libimobiledevice (%d)"
 
 #: daemon/gvfsbackendafc.c:394
 msgid "Try again"
@@ -1137,7 +1137,7 @@ msgid ""
 "Enter proxy password:"
 msgstr ""
 "Requírese autenticación\n"
-"Escriba o contrasinal do proxi:"
+"Escriba o contrasinal do proxy:"
 
 #: daemon/gvfsbackenddav.c:2064
 msgid "Not a WebDAV enabled share"
@@ -1211,7 +1211,6 @@ msgstr "Compartido comigo"
 
 #. Translators: This is the "Shared drives" folder on https://drive.google.com.
 #: daemon/gvfsbackendgoogle.c:2987
-#| msgid "Unnamed Drive"
 msgid "Shared drives"
 msgstr "Unidades compartidas"
 
@@ -1493,7 +1492,7 @@ msgstr "Erro xenérico de libmtp"
 #: daemon/gvfsbackendmtp.c:1079
 #, c-format
 msgid "Unable to open MTP device “%03u,%03u”"
-msgstr "Non foi poisíbel abrir o dispositivo MTP «%03u,%03u»"
+msgstr "Non foi posíbel abrir o dispositivo MTP «%03u,%03u»"
 
 #: daemon/gvfsbackendmtp.c:1096
 msgid "Device not found"
@@ -1684,8 +1683,8 @@ msgid ""
 "The identity sent by the remote computer is “%s”. If you want to be "
 "absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
-"Verificación de identidade fallida\n"
-"A verificación de identidad de «%s», isto acontece cando se rexistra nun "
+"Verificación de identidade errada\n"
+"A verificación de identidade de «%s», isto acontece cando se rexistra nun "
 "computador por primeira vez.\n"
 "\n"
 "A identidade enviada polo computador remoto é %s. Se quere ter a certeza "
@@ -1701,7 +1700,7 @@ msgid ""
 "If you want to be absolutely sure it is safe to continue, contact the system "
 "administrator."
 msgstr ""
-"Verificación de identidade fallida\n"
+"Verificación de identidade errada\n"
 "A chave do equipo para «%s» difire fronte a chave do enderezo IP «%s»\n"
 "Se quere continuar pero non ten certeza de que sexa seguro, consulte co seu "
 "administrador de sistemas."
@@ -1714,7 +1713,7 @@ msgstr "A conexión está pechada (o proceso SSH subxacente morreu)"
 #: daemon/gvfsbackendsftp.c:1451
 #, c-format
 msgid "Internal error: Unknown Error"
-msgstr "Erro interno: Erro desconocido"
+msgstr "Erro interno: Erro descoñecido"
 
 #: daemon/gvfsbackendsftp.c:1970 daemon/gvfsbackendsftp.c:1997
 msgid "Protocol error"
@@ -1790,7 +1789,7 @@ msgid ""
 "Enter password for share “%s” on “%s”:"
 msgstr ""
 "Autenticación requirida\n"
-"Escriba o contrasinal para acompartir «%s» en «%s»:"
+"Escriba o contrasinal para compartir «%s» en «%s»:"
 
 #. Translators: First %s is a share name, second is a server name
 #: daemon/gvfsbackendsmb.c:276
@@ -1800,7 +1799,7 @@ msgid ""
 "Enter user and password for share “%s” on “%s”:"
 msgstr ""
 "Autenticación requirida\n"
-"Escriba o usuario e contrasinal para acompartir «%s» en «%s»:"
+"Escriba o usuario e contrasinal para compartir «%s» en «%s»:"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: daemon/gvfsbackendsmb.c:556
@@ -1905,7 +1904,7 @@ msgid ""
 "\n"
 "Are you really sure you would like to continue?"
 msgstr ""
-"Verificación de identidade fallida: \n"
+"Verificación de identidade errada: \n"
 "%s\n"
 "\n"
 "%s\n"
@@ -2077,7 +2076,7 @@ msgstr "Levar a cabo operacións de ficheiros"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:14
 msgid "Authentication is required to run gvfsd-admin daemon"
-msgstr "Requírese autenticación para executar o demonio gvfsd-admin"
+msgstr "Requírese autenticación para executar o demo gvfsd-admin"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:26
 msgid "Authentication is required to perform file operations"
@@ -2219,7 +2218,7 @@ msgid ""
 "Filesystem has been disconnected."
 msgstr ""
 "%s desmontado\n"
-"O sistema de ficheiros foi desconetado."
+"O sistema de ficheiros foi desconectado."
 
 #: monitor/udisks2/gvfsudisks2utils.c:790
 #, c-format
