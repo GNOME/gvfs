@@ -1,6 +1,6 @@
 // Allows users belonging to wheel group to start gvfsd-admin without
 // authorization. This prevents redundant password prompt when starting
-// gvfsd-admin. The gvfsd-admin causes another password prompts to be shown
+// gvfsd-admin. The gvfsd-admin causes another password prompt to be shown
 // for each client process using the different action id and for the subject
 // based on the client process.
 polkit.addRule(function(action, subject) {
