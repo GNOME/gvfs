@@ -580,7 +580,6 @@ typedef struct {
   GDrive *drive;
 
   GMountOperation *op;
-  gboolean op_aborted;
   gboolean show_processes_up;
 
   guint unmount_timer_id;
@@ -688,13 +687,6 @@ unmount_notify_op_show_processes (UnmountNotifyData *data)
 }
 
 static void
-unmount_notify_op_aborted (UnmountNotifyData *data)
-{
-  unmount_notify_stop_timer (data);
-  data->op_aborted = TRUE;
-}
-
-static void
 unmount_notify_op_reply (UnmountNotifyData *data,
                          GMountOperationResult result)
 {
@@ -704,7 +696,7 @@ unmount_notify_op_reply (UnmountNotifyData *data,
 
   if ((result == G_MOUNT_OPERATION_HANDLED && data->show_processes_up && choice == 1) ||
       result == G_MOUNT_OPERATION_ABORTED)
-    unmount_notify_op_aborted (data);
+    unmount_notify_stop_timer (data);
   else if (result == G_MOUNT_OPERATION_HANDLED)
     unmount_notify_ensure_timer (data);
 
@@ -748,7 +740,7 @@ unmount_notify_data_for_operation (GMountOperation *op,
                           unmount_notify_data_free);
 
   g_signal_connect_swapped (data->op, "aborted",
-                            G_CALLBACK (unmount_notify_op_aborted), data);
+                            G_CALLBACK (unmount_notify_stop_timer), data);
   g_signal_connect_swapped (data->op, "show-processes",
                             G_CALLBACK (unmount_notify_op_show_processes), data);
   g_signal_connect_swapped (data->op, "reply",
@@ -780,7 +772,7 @@ gvfs_udisks2_unmount_notify_stop (GMountOperation *op,
 
   unmount_notify_stop_timer (data);
 
-  if (data->op_aborted || unmount_failed)
+  if (unmount_failed)
     return;
 
   name = unmount_notify_get_name (data);
