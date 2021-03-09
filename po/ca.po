@@ -8,9 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2021-02-12 13:52+0000\n"
+"POT-Creation-Date: 2021-03-07 19:46+0000\n"
 "PO-Revision-Date: 2020-12-22 12:10+0100\n"
-"Last-Translator: Miquel-Àngel Burgos i Fradeja <miquel.angel.burgos@gmail.com>\n"
+"Last-Translator: Miquel-Àngel Burgos i Fradeja <miquel.angel.burgos@gmail."
+"com>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -41,8 +42,7 @@ msgstr "No s'ha obtingut el descriptor de fitxer del flux"
 msgid "Invalid return value from %s"
 msgstr "%s ha retornat un valor no vàlid"
 
-#. translators: this is an error message when there is no user visible "mount"
-#. object
+#. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
 #: client/gdaemonfile.c:2188 client/gdaemonfile.c:3329
 msgid "Could not find enclosing mount"
@@ -125,6 +125,7 @@ msgstr "S'ha produït un error en inicialitzar l'Avahi: %s"
 #. * - the first %s refers to the service type
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
+#.
 #: common/gvfsdnssdresolver.c:1144
 #, c-format
 msgid "Error resolving “%s” service “%s” on domain “%s”"
@@ -136,6 +137,7 @@ msgstr ""
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #. * - the fourth %s refers to the required TXT keys
+#.
 #: common/gvfsdnssdresolver.c:1168
 #, c-format
 msgid ""
@@ -149,6 +151,7 @@ msgstr ""
 #. * - the first %s refers to the service type
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
+#.
 #: common/gvfsdnssdresolver.c:1183
 #, c-format
 msgid "Timed out resolving “%s” service “%s” on domain “%s”"
@@ -256,8 +259,7 @@ msgstr ""
 #: daemon/gvfsafpserver.c:823 daemon/gvfsafpserver.c:871
 #: daemon/gvfsafpserver.c:987 daemon/gvfsafpserver.c:1659
 #, c-format
-msgid ""
-"Unable to connect to the server “%s”. A communication problem occurred."
+msgid "Unable to connect to the server “%s”. A communication problem occurred."
 msgstr ""
 "No s'ha pogut connectar al servidor «%s». S'ha produït un problema de "
 "comunicació."
@@ -285,8 +287,8 @@ msgstr ""
 #: daemon/gvfsafpserver.c:801
 #, c-format
 msgid ""
-"Unable to connect to the server “%s”. The server doesn’t support AFP version"
-" 3.0 or later."
+"Unable to connect to the server “%s”. The server doesn’t support AFP version "
+"3.0 or later."
 msgstr ""
 "No s'ha pogut connectar al servidor «%s». El servidor no implementa la "
 "versió 3.0 o superior de l'AFP."
@@ -314,22 +316,26 @@ msgstr "Heu de canviar la contrasenya."
 #. Translators: the first %s is the username, the second the host name
 #: daemon/gvfsafpserver.c:1063 daemon/gvfsbackendftp.c:530
 #: daemon/gvfsbackendsftp.c:1167
-#, c-format, fuzzy
+#, c-format
 msgid ""
 "Authentication Required\n"
 "Enter password for “%s” on “%s”:"
-msgstr "Cal autenticació Introdueix la contrasenya de «%s» a «%s»:"
+msgstr ""
+"Cal autenticació\n"
+"Introduïu la contrasenya de «%s» a «%s»:"
 
 #. Translators: %s here is the hostname
 #. Translators: %s is the hostname
 #. Translators: %s is a server name
 #: daemon/gvfsafpserver.c:1066 daemon/gvfsbackendftp.c:533
 #: daemon/gvfsbackendsftp.c:1174 daemon/gvfsbackendsmbbrowse.c:379
-#, c-format, fuzzy
+#, c-format
 msgid ""
 "Authentication Required\n"
 "Enter user and password for “%s”:"
-msgstr "Cal autenticació Introdueix l'usuari i la contrasenya per a «%s»:"
+msgstr ""
+"Cal autenticació\n"
+"Introduïu l'usuari i la contrasenya per a «%s»:"
 
 #: daemon/gvfsafpserver.c:1098
 msgid "The password prompt was cancelled."
@@ -342,8 +348,7 @@ msgstr "No s'ha pogut desconnectar del servidor."
 #: daemon/gvfsafpserver.c:1357 daemon/gvfsafpserver.c:1733
 msgid "Unable to connect to the server. A communication problem occurred."
 msgstr ""
-"No s'ha pogut connectar al servidor. S'ha produït un problema de "
-"comunicació."
+"No s'ha pogut connectar al servidor. S'ha produït un problema de comunicació."
 
 #: daemon/gvfsafpserver.c:1692
 msgid "Identification not found."
@@ -563,6 +568,7 @@ msgstr "El fitxer no està obert en mode lectura"
 #. Return G_IO_ERROR_NOT_SUPPORTED instead of
 #. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
 #. * fallback copy.
+#.
 #: daemon/gvfsbackendadmin.c:862 daemon/gvfsbackendafc.c:2361
 #: daemon/gvfsbackendafp.c:1781 daemon/gvfsbackendburn.c:829
 #: daemon/gvfsbackendburn.c:951 daemon/gvfsbackendcomputer.c:812
@@ -692,8 +698,8 @@ msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
 msgstr ""
-"S'ha produït un error de la libimobiledevice: no s'ha trobat cap dispositiu."
-" Assegureu-vos que l'usbmuxd és configurat correctament."
+"S'ha produït un error de la libimobiledevice: no s'ha trobat cap dispositiu. "
+"Assegureu-vos que l'usbmuxd és configurat correctament."
 
 #: daemon/gvfsbackendafc.c:273
 #, c-format
@@ -712,8 +718,8 @@ msgstr "Cancel·la"
 #: daemon/gvfsbackendafc.c:411 daemon/gvfsbackendafc.c:442
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr ""
-"La ubicació de l'AFC no és vàlida: s'ha d'expressar en el format "
-"afc://uuid:número-port"
+"La ubicació de l'AFC no és vàlida: s'ha d'expressar en el format afc://uuid:"
+"número-port"
 
 #: daemon/gvfsbackendafc.c:428
 #, c-format
@@ -810,15 +816,14 @@ msgstr "No és un fitxer muntable"
 #. Translators: first %s is username and second serververname
 #. Translators: first %s is volumename and second servername
 #. Translators: the first %s is the username, the second the host name
-#. Translators: This is "<mount point> on <host>" and is used as name for an
-#. NFS mount
+#. Translators: This is "<mount point> on <host>" and is used as name for an NFS mount
 #. Translators: This is the name of an SFTP share, like "<user> on <hostname>"
 #. Set the mountspec according to original uri, no matter whether user changes
 #. credentials during mount loop. Nautilus and other gio clients depend
 #. on correct mountspec, setting it to real (different) credentials would
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
-#. Translators: This is "<sharename> on <servername>" and is used as name for
-#. an SMB share
+#.
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: daemon/gvfsbackendafpbrowse.c:446 daemon/gvfsbackendafp.c:2105
 #: daemon/gvfsbackendftp.c:681 daemon/gvfsbackendnfs.c:290
 #: daemon/gvfsbackendsftp.c:2070 daemon/gvfsbackendsmb.c:455
@@ -1124,7 +1129,6 @@ msgstr "Recurs compartit de WebDAV"
 #. Translators: %s is a server name
 #: daemon/gvfsbackenddav.c:1591 daemon/gvfsbackendsmbbrowse.c:373
 #, c-format
-#| msgid "Authentication is required to perform file operations"
 msgid ""
 "Authentication Required\n"
 "Enter password for “%s”:"
@@ -1205,14 +1209,12 @@ msgstr "No es pot moure al directori"
 msgid "Error moving file/folder"
 msgstr "S'ha produït un error en moure el fitxer o directori"
 
-#. Translators: This is the "Shared with me" folder on
-#. https://drive.google.com.
+#. Translators: This is the "Shared with me" folder on https://drive.google.com.
 #: daemon/gvfsbackendgoogle.c:2971
 msgid "Shared with me"
 msgstr "Compartits amb mi"
 
-#. Translators: This is the "Shared drives" folder on
-#. https://drive.google.com.
+#. Translators: This is the "Shared drives" folder on https://drive.google.com.
 #: daemon/gvfsbackendgoogle.c:2987
 msgid "Shared drives"
 msgstr "Unitats compartides"
@@ -1269,29 +1271,25 @@ msgstr "El fitxer destí és un directori"
 msgid "Error writing file"
 msgstr "S'ha produït un error en escriure el fitxer"
 
-#. Translator: %s represents a more specific error message and %d the specific
-#. error code
+#. Translator: %s represents a more specific error message and %d the specific error code
 #: daemon/gvfsbackendgphoto2.c:479
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "%s: %d: ja existeix el directori o el fitxer"
 
-#. Translator: %s represents a more specific error message and %d the specific
-#. error code
+#. Translator: %s represents a more specific error message and %d the specific error code
 #: daemon/gvfsbackendgphoto2.c:486
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "%s: %d: no existeix el fitxer o directori"
 
-#. Translator: %s represents a more specific error message and %d the specific
-#. error code
+#. Translator: %s represents a more specific error message and %d the specific error code
 #: daemon/gvfsbackendgphoto2.c:492
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: nom de fitxer no vàlid"
 
-#. Translator: %s represents a more specific error message and %d the specific
-#. error code
+#. Translator: %s represents a more specific error message and %d the specific error code
 #: daemon/gvfsbackendgphoto2.c:498
 #, c-format
 msgid "%s: %d: Not Supported"
@@ -1336,8 +1334,7 @@ msgstr ""
 msgid "Error initializing camera"
 msgstr "S'ha produït un error en inicialitzar la càmera"
 
-#. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the
-#. name of the
+#. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
 #. backend and shouldn't be translated.
 #: daemon/gvfsbackendgphoto2.c:1404
 #, c-format
@@ -1434,14 +1431,13 @@ msgstr "No està implementat (no són en el mateix directori)"
 
 #: daemon/gvfsbackendgphoto2.c:3110
 msgid ""
-"Not supported (the source is a directory, the destination is a directory "
-"too)"
+"Not supported (the source is a directory, the destination is a directory too)"
 msgstr "No està implementat (l'origen i la destinació són directoris)"
 
 #: daemon/gvfsbackendgphoto2.c:3118
 msgid ""
-"Not supported (the source is a directory, but the destination is an existing"
-" file)"
+"Not supported (the source is a directory, but the destination is an existing "
+"file)"
 msgstr ""
 "No està implementat (l'origen és un directori i la destinació un fitxer "
 "existent)"
@@ -1648,21 +1644,23 @@ msgstr "No es pot enviar la confirmació de la identitat de l'amfitrió"
 
 #. Translators: the first %s is the username, the second the host name
 #: daemon/gvfsbackendsftp.c:1164
-#, fuzzy, c-format
-#| msgid "Enter passphrase for secure key for %s on %s"
+#, c-format
 msgid ""
 "Authentication Required\n"
 "Enter passphrase for secure key for “%s” on “%s”:"
-msgstr "Introduïu la contrasenya per a la clau segura de %s a %s"
+msgstr ""
+"Cal autenticació\n"
+"Introduïu la contrasenya per a la clau segura de «%s» a «%s»:"
 
 #. Translators: %s is the hostname
 #: daemon/gvfsbackendsftp.c:1171
-#, fuzzy, c-format
-#| msgid "Enter passphrase for secure key for %s"
+#, c-format
 msgid ""
 "Authentication Required\n"
 "Enter passphrase for secure key for “%s”:"
-msgstr "Introduïu la contrasenya per a la clau segura a %s"
+msgstr ""
+"Cal autenticació\n"
+"Introduïu la contrasenya per a la clau segura a «%s»:"
 
 #: daemon/gvfsbackendsftp.c:1263 daemon/gvfsbackendsftp.c:1310
 msgid "Can’t send password"
@@ -1682,36 +1680,35 @@ msgstr "Introduïu el codi de verificació de %s"
 
 #. Translators: the first %s is the hostname, the second the key fingerprint
 #: daemon/gvfsbackendsftp.c:1329
-#, fuzzy, c-format
-#| msgid ""
-#| "Can’t verify the identity of “%s”.\n"
-#| "This happens when you log in to a computer the first time.\n"
-#| "\n"
-#| "The identity sent by the remote computer is “%s”. If you want to be absolutely sure it is safe to continue, contact the system administrator."
+#, c-format
 msgid ""
 "Identity Verification Failed\n"
-"Verifying the identity of “%s” failed, this happens when you log in to a computer the first time.\n"
+"Verifying the identity of “%s” failed, this happens when you log in to a "
+"computer the first time.\n"
 "\n"
-"The identity sent by the remote computer is “%s”. If you want to be absolutely sure it is safe to continue, contact the system administrator."
+"The identity sent by the remote computer is “%s”. If you want to be "
+"absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
-"No es pot verificar la identitat de «%s».\n"
-"Això passa quan entreu a un ordinador per primera vegada.\n"
+"Ha fallat la verificació de la identitat\n"
+"No es pot verificar la identitat de «%s», això passa quan entreu a un ordinador "
+"per primera vegada.\n"
 "\n"
-"La identitat que ha enviat l'ordinador remot és «%s». Si voleu assegurar-vos que és segur continuar, contacteu amb l'administrador del sistema."
+"La identitat que ha enviat l'ordinador remot és «%s». Si voleu assegurar-vos "
+"que és segur continuar, contacteu amb l'administrador del sistema."
 
 #. Translators: the first %s is the hostname, the second is an ip address
 #: daemon/gvfsbackendsftp.c:1358
-#, fuzzy, c-format
-#| msgid ""
-#| "The host key for “%s” differs from the key for the IP address “%s”\n"
-#| "If you want to be absolutely sure it is safe to continue, contact the system administrator."
+#, c-format
 msgid ""
 "Identity Verification Failed\n"
 "The host key for “%s” differs from the key for the IP address “%s”\n"
-"If you want to be absolutely sure it is safe to continue, contact the system administrator."
+"If you want to be absolutely sure it is safe to continue, contact the system "
+"administrator."
 msgstr ""
+"Ha fallat la verificació de la identitat\n"
 "La clau de l'amfitrió per «%s» difereix de la clau per l'adreça IP «%s»\n"
-"Si voleu assegurar-vos que és segur continuar, contacteu amb l'administrador del sistema."
+"Si voleu assegurar-vos que és segur continuar, contacteu amb l'administrador "
+"del sistema."
 
 #: daemon/gvfsbackendsftp.c:1450
 #, c-format
@@ -1740,8 +1737,7 @@ msgstr "Motiu desconegut"
 msgid " (invalid encoding)"
 msgstr " (codificació incorrecta)"
 
-#. Translators: This is the name of the root of an SFTP share, like "/ on
-#. <hostname>"
+#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
 #: daemon/gvfsbackendsftp.c:2661 daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
@@ -1791,22 +1787,23 @@ msgstr "Servei de sistema de fitxers en xarxa de Windows"
 
 #. Translators: First %s is a share name, second is a server name
 #: daemon/gvfsbackendsmb.c:270
-#, c-format, fuzzy
+#, c-format
 msgid ""
 "Authentication Required\n"
 "Enter password for share “%s” on “%s”:"
 msgstr ""
-"Cal autenticació Introdueix la contrasenya per a la compartició «%s» a «%s»:"
+"Cal autenticació\n"
+"Introduïu la contrasenya per a la compartició «%s» a «%s»:"
 
 #. Translators: First %s is a share name, second is a server name
 #: daemon/gvfsbackendsmb.c:276
-#, c-format, fuzzy
+#, c-format
 msgid ""
 "Authentication Required\n"
 "Enter user and password for share “%s” on “%s”:"
 msgstr ""
-"Cal autenticació Introduïu l'usuari i la contrasenya per a la compartició "
-"«%s» a «%s»:"
+"Cal autenticació\n"
+"Introduïu l'usuari i la contrasenya per a la compartició «%s» a «%s»:"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: daemon/gvfsbackendsmb.c:556
@@ -1900,16 +1897,9 @@ msgstr "Sí"
 msgid "No"
 msgstr "No"
 
-#. Translators: The first %s is the reason why verification failed, the second
-#. a certificate
+#. Translators: The first %s is the reason why verification failed, the second a certificate
 #: daemon/gvfsdaemonutils.c:337
-#, fuzzy, c-format
-#| msgid ""
-#| "The site’s identity can’t be verified:%s\n"
-#| "\n"
-#| "%s\n"
-#| "\n"
-#| "Are you really sure you would like to continue?"
+#, c-format
 msgid ""
 "Identity Verification Failed\n"
 "%s\n"
@@ -1918,7 +1908,8 @@ msgid ""
 "\n"
 "Are you really sure you would like to continue?"
 msgstr ""
-"La identitat del lloc no es pot verificar:%s\n"
+"Ha fallat la verificació de la identitat\n"
+"%s\n"
 "\n"
 "%s\n"
 "\n"
@@ -1938,8 +1929,8 @@ msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr ""
-"No s'ha pogut crear una connexió FTP activa. Potser el vostre encaminador no"
-" ho permet?"
+"No s'ha pogut crear una connexió FTP activa. Potser el vostre encaminador no "
+"ho permet?"
 
 #: daemon/gvfsftpconnection.c:485
 msgid "Failed to create active FTP connection."
@@ -2189,6 +2180,7 @@ msgstr "Algun programa impedeix realitzar l'operació de desmuntatge."
 
 #. Note that the GUI (Shell, Files) currently use the term
 #. * "Eject" for both GDrive.stop() and GDrive.eject().
+#.
 #: monitor/udisks2/gvfsudisks2mount.c:744
 msgid "Eject Anyway"
 msgstr "Expulsa igualment"
@@ -2241,6 +2233,7 @@ msgstr ""
 
 #. Translators: This is used for possibly encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
 #: monitor/udisks2/gvfsudisks2volume.c:304
 #, c-format
 msgid "%s Possibly Encrypted"
@@ -2248,6 +2241,7 @@ msgstr "%s està possiblement encriptat"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
 #: monitor/udisks2/gvfsudisks2volume.c:311
 #, c-format
 msgid "%s Encrypted"
@@ -2255,6 +2249,7 @@ msgstr "Encriptats %s"
 
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
 #: monitor/udisks2/gvfsudisks2volume.c:324
 #, c-format
 msgid "%s Volume"
@@ -2300,7 +2295,8 @@ msgid ""
 "The volume might be a VeraCrypt volume as it contains random data."
 msgstr ""
 "Cal autenticació\n"
-"Cal una contrasenya per a accedir a les dades encriptades a «%s».El volum pot ser un volum VeraCrypt, ja que conté dades aleatòries."
+"Cal una contrasenya per a accedir a les dades encriptades a «%s».El volum "
+"pot ser un volum VeraCrypt, ja que conté dades aleatòries."
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1505
@@ -2315,6 +2311,7 @@ msgstr ""
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
+#.
 #: monitor/udisks2/gvfsudisks2volume.c:1685
 #, c-format
 msgid "%s (%s)"
