@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2021-02-12 13:52+0000\n"
-"PO-Revision-Date: 2021-02-25 16:12+0200\n"
+"POT-Creation-Date: 2021-02-25 14:14+0000\n"
+"PO-Revision-Date: 2021-03-09 14:05+0200\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos+l10n@iki.fi>\n"
 "Language-Team: suomi <lokalisointi-lista@googlegroups.com>\n"
 "Language: fi\n"
@@ -772,7 +772,7 @@ msgstr "Asiakirjat laitteessa %s"
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
 #: daemon/gvfsbackendafc.c:577
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The device “%s” is locked. Enter the passcode on the device and click "
 #| "“Try again”."
@@ -782,15 +782,17 @@ msgid ""
 "\n"
 "Enter the passcode on the device and click “Try again”."
 msgstr ""
-"Laite '%s' on suojattu salasanalla. Kirjoita laitteen salasana ja napsauta "
-"Yritä uudelleen -painiketta."
+"Laite lukittu\n"
+"Laite “%s” on lukittu.\n"
+"\n"
+"Kirjoita salasana laitteelle ja napsauta “Yritä uudelleen”."
 
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above. 'Trust' is the caption
 #. * of the button shown in the device.
 #: daemon/gvfsbackendafc.c:585
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The device “%s” is not trusted yet. Select “Trust” on the device and "
 #| "click “Try again”."
@@ -800,8 +802,10 @@ msgid ""
 "\n"
 "Select “Trust” on the device and click “Try again”."
 msgstr ""
-"Laite “%s” ei ole vielä luotettu. Valitse “Luota” laitteelta ja napsauta "
-"sitten “Yritä uudelleen”."
+"Laite ei ole luotettu\n"
+"Laitteeseen “%s” ei luoteta vielä.\n"
+"\n"
+"Valitse “Luota” laitteen kohdalta ja napsauta “Yritä uudelleen”."
 
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
@@ -1150,7 +1154,6 @@ msgstr "WebDAV-jako"
 #. Translators: %s is a server name
 #: daemon/gvfsbackenddav.c:1591 daemon/gvfsbackendsmbbrowse.c:373
 #, c-format
-#| msgid "Authentication is required to perform file operations"
 msgid ""
 "Authentication Required\n"
 "Enter password for “%s”:"
@@ -1159,7 +1162,6 @@ msgstr ""
 "Kirjoita salasana jaolle “%s”:"
 
 #: daemon/gvfsbackenddav.c:1594
-#| msgid "Please enter proxy password"
 msgid ""
 "Authentication Required\n"
 "Enter proxy password:"
@@ -1603,10 +1605,8 @@ msgid "Unable to create temporary file"
 msgstr "Virhe luotaessa väliaikaistiedostoa"
 
 #: daemon/gvfsbackendnfs.c:2380
-#, fuzzy
-#| msgid "Invalid attribute type %s\n"
 msgid "Invalid attribute type"
-msgstr "Virheellinen määretyyppi %s\n"
+msgstr "Virheellinen määretyyppi"
 
 #: daemon/gvfsbackendrecent.c:270
 #, fuzzy
@@ -1677,21 +1677,25 @@ msgstr "Palvelimen tunnistusvahvistusta ei voi lähettää"
 
 #. Translators: the first %s is the username, the second the host name
 #: daemon/gvfsbackendsftp.c:1164
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter passphrase for secure key for %s on %s"
 msgid ""
 "Authentication Required\n"
 "Enter passphrase for secure key for “%s” on “%s”:"
-msgstr "Anna salaisen avaimen salalause käyttäjälle %s palvelimelle %s"
+msgstr ""
+"Tunnistautuminen vaaditaan\n"
+"Anna käyttäjän “%s” salaisen avaimen tunnuslause palvelimelle “%s”:"
 
 #. Translators: %s is the hostname
 #: daemon/gvfsbackendsftp.c:1171
-#, fuzzy, c-format
+#, c-format
 #| msgid "Enter passphrase for secure key for %s"
 msgid ""
 "Authentication Required\n"
 "Enter passphrase for secure key for “%s”:"
-msgstr "Anna salaisen avaimen salalause palvelimelle %s"
+msgstr ""
+"Tunnistautuminen vaaditaan\n"
+"Anna salaisen avaimen tunnuslause palvelimelle “%s”:"
 
 #: daemon/gvfsbackendsftp.c:1263 daemon/gvfsbackendsftp.c:1310
 msgid "Can’t send password"
@@ -1699,27 +1703,19 @@ msgstr "Salasanaa ei voitu lähettää"
 
 #. Translators: the first %s is the username, the second the host name
 #: daemon/gvfsbackendsftp.c:1278
-#, fuzzy, c-format
-#| msgid "Enter password for %s on %s"
+#, c-format
 msgid "Enter verification code for %s on %s"
-msgstr "Anna käyttäjän %s salasana palvelimelle %s"
+msgstr "Anna käyttäjän %s vahvistuskoodi palvelimelle %s"
 
 #. Translators: %s is the hostname
 #: daemon/gvfsbackendsftp.c:1282
-#, fuzzy, c-format
-#| msgid "Enter password for %s"
+#, c-format
 msgid "Enter verification code for %s"
-msgstr "Anna kohteen %s salasana"
+msgstr "Anna vahvistuskoodi palvelimelle %s"
 
 #. Translators: the first %s is the hostname, the second the key fingerprint
 #: daemon/gvfsbackendsftp.c:1329
-#, fuzzy, c-format
-#| msgid ""
-#| "Can’t verify the identity of “%s”.\n"
-#| "This happens when you log in to a computer the first time.\n"
-#| "\n"
-#| "The identity sent by the remote computer is “%s”. If you want to be "
-#| "absolutely sure it is safe to continue, contact the system administrator."
+#, c-format
 msgid ""
 "Identity Verification Failed\n"
 "Verifying the identity of “%s” failed, this happens when you log in to a "
@@ -1728,15 +1724,16 @@ msgid ""
 "The identity sent by the remote computer is “%s”. If you want to be "
 "absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
-"Palvelimen “%s” identiteettiä ei voitu vahvistaa.\n"
-"Tämä tapahtuu, kun kirjaudut palvelimelle ensimmäistä kertaa.\n"
+"Identiteetin vahvistaminen epäonnistui\n"
+"Palvelimen “%s” identiteetin vahvistaminen ei onnistunut. Tämä tapahtuu, kun "
+"kirjaudut palvelimelle ensimmäistä kertaa.\n"
 "\n"
 "Palvelimen lähettämä tunniste on “%s”. Jos haluat olla täysin varma, että "
 "yhdistäminen on turvallista, ota yhteys palvelimen ylläpitäjään."
 
 #. Translators: the first %s is the hostname, the second is an ip address
 #: daemon/gvfsbackendsftp.c:1358
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "Can't verify the identity of “%s”.\n"
 #| "This happens when you log in to a computer the first time.\n"
@@ -1749,11 +1746,10 @@ msgid ""
 "If you want to be absolutely sure it is safe to continue, contact the system "
 "administrator."
 msgstr ""
-"Palvelimen ”%s” identiteettiä ei voitu vahvistaa.\n"
-"Tämä tapahtuu, kun kirjaudut palvelimelle ensimmäistä kertaa.\n"
-"\n"
-"Palvelimen lähettämä tunniste on \"%s\". Jos haluat olla täysin varma, että "
-"yhdistäminen on turvallista, ota yhteys palvelimen ylläpitäjään."
+"Identiteetin vahvistaminen epäonnistui\n"
+"Isäntäavain palvelimelle “%s” eroaa IP-osoitteen “%s” avaimesta\n"
+"Jos haluat olla täysin varma, että yhdistäminen on turvallista, ota yhteys "
+"palvelimen ylläpitäjään."
 
 #: daemon/gvfsbackendsftp.c:1450
 #, c-format
@@ -1880,8 +1876,6 @@ msgid "Error removing target file: %s"
 msgstr "Virhe poistettaessa kohdetiedostoa: %s"
 
 #: daemon/gvfsbackendsmb.c:2172
-#, fuzzy
-#| msgid "Can't recursively move directory"
 msgid "Can’t recursively move directory"
 msgstr "Kansiota ei voi siirtää rekursiivisesti"
 
@@ -1945,7 +1939,7 @@ msgstr "Ei"
 
 #. Translators: The first %s is the reason why verification failed, the second a certificate
 #: daemon/gvfsdaemonutils.c:337
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The site’s identity can’t be verified:%s\n"
 #| "\n"
@@ -1960,7 +1954,8 @@ msgid ""
 "\n"
 "Are you really sure you would like to continue?"
 msgstr ""
-"Sivuston identiteettiä ei voida varmentaa:%s\n"
+"Identiteetin vahvistaminen epäonnistui\n"
+"%s\n"
 "\n"
 "%s\n"
 "\n"
@@ -2337,30 +2332,25 @@ msgstr "Taltion käyttö vaatii salalauseen"
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1499
-#, fuzzy, c-format
-#| msgid ""
-#| "Enter a passphrase to unlock the volume\n"
-#| "The volume %s might be a VeraCrypt volume as it contains random data."
+#, c-format
 msgid ""
 "Authentication Required\n"
 "A passphrase is needed to access encrypted data on “%s”.\n"
 "The volume might be a VeraCrypt volume as it contains random data."
 msgstr ""
-"Anna tunnuslause avataksesi taltion lukituksen\n"
-"Taltio %s saattaa olla VeraCrypt-taltio, sillä se sisältää satunnaisdataa."
+"Tunnistautuminen vaaditaan\n"
+"Anna tunnuslause avataksesi taltion “%s” salauksen\n"
+"Taltio saattaa olla VeraCrypt-taltio, sillä se sisältää satunnaisdataa."
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1505
-#, fuzzy, c-format
-#| msgid ""
-#| "Enter a passphrase to unlock the volume\n"
-#| "The passphrase is needed to access encrypted data on %s."
+#, c-format
 msgid ""
 "Authentication Required\n"
 "A passphrase is needed to access encrypted data on “%s”."
 msgstr ""
-"Syötä salalause taltion avaamiseksi\n"
-"Salalause tarvitaan salatun tiedon käyttämiseksi laitteella %s."
+"Tunnistautuminen vaaditaan\n"
+"Anna tunnuslause avataksesi taltion “%s” salauksen."
 
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
