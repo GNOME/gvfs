@@ -87,14 +87,6 @@ struct _GVfsDaemon
   gboolean lost_main_daemon;
 };
 
-typedef struct {
-  GVfsDaemon *daemon;
-  char *socket_dir;
-  GDBusServer *server;
-  
-  GDBusConnection *conn;
-} NewConnectionData;
-
 static guint signals[LAST_SIGNAL] = { 0 };
 
 static void              g_vfs_daemon_get_property (GObject        *object,
@@ -653,25 +645,6 @@ g_vfs_daemon_queue_job (GVfsDaemon *daemon,
 }
 
 static void
-new_connection_data_free (void *memory)
-{
-  NewConnectionData *data = memory;
-  gchar *socket;
-  
-  /* Remove the socket and dir after connected */
-  if (data->socket_dir)
-    {
-      socket = g_strdup_printf ("%s/socket", data->socket_dir);
-      g_unlink (socket);
-      g_free (socket);
-      rmdir (data->socket_dir);
-      g_free (data->socket_dir);
-    }
-
-  g_free (data);
-}
-
-static void
 peer_unregister_skeleton (const gchar *obj_path,
                           RegisteredPath *reg_path,
                           GDBusConnection *dbus_conn)
@@ -721,21 +694,19 @@ peer_connection_closed (GDBusConnection *connection,
   daemon_skeleton = g_object_get_data (G_OBJECT (connection), "daemon_skeleton");
   /* daemon_skeleton should be always valid in this case */
   g_dbus_interface_skeleton_unexport (G_DBUS_INTERFACE_SKELETON (daemon_skeleton));
-  
-  g_hash_table_remove (daemon->client_connections, connection);
 
   /* Unexport the registered interface skeletons */
   g_hash_table_foreach (daemon->registered_paths, (GHFunc) peer_unregister_skeleton, connection);
 
   /* The peer-to-peer connection was disconnected */
   g_signal_handlers_disconnect_by_data (connection, user_data);
-  g_object_unref (connection);
+
+  g_hash_table_remove (daemon->client_connections, connection);
 }
 
 static void
 daemon_peer_connection_setup (GVfsDaemon *daemon,
-                              GDBusConnection *dbus_conn,
-			      NewConnectionData *data)
+                              GDBusConnection *dbus_conn)
 {
   GVfsDBusDaemon *daemon_skeleton;
   GError *error;
@@ -752,35 +723,35 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
       g_warning ("Failed to accept client: %s, %s (%s, %d)", "object registration failed", 
                  error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
-      g_object_unref (data->conn);
-      goto error_out;
+      return;
     }
-  g_object_set_data_full (G_OBJECT (data->conn), "daemon_skeleton", daemon_skeleton, (GDestroyNotify) g_object_unref);
-  
+  g_object_set_data_full (G_OBJECT (dbus_conn), "daemon_skeleton",
+                          daemon_skeleton, (GDestroyNotify) g_object_unref);
+
   /* Export registered interface skeletons on this new connection */
   g_hash_table_foreach (daemon->registered_paths, (GHFunc) peer_register_skeleton, dbus_conn);
   
   g_hash_table_insert (daemon->client_connections, g_object_ref (dbus_conn), NULL);
 
-  g_signal_connect (data->conn, "closed", G_CALLBACK (peer_connection_closed), data->daemon);
-
- error_out:
-  new_connection_data_free (data);
+  g_signal_connect (dbus_conn, "closed", G_CALLBACK (peer_connection_closed), daemon);
 }
 
 static void
-generate_address (char **address,
-                  char **socket_dir)
+generate_address (gchar **address, gchar **socket_path)
 {
-  gchar tmp[9];
+  gchar tmp[16] = "socket-";
+  gchar *socket_dir;
 
-  *socket_dir = g_build_filename (g_get_user_runtime_dir (), "gvfsd", NULL);
-  g_mkdir (*socket_dir, 0700);
+  gvfs_randomize_string (tmp + 7, 8);
+  tmp[15] = '\0';
 
-  gvfs_randomize_string (tmp, 8);
-  tmp[8] = '\0';
+  socket_dir = g_build_filename (g_get_user_runtime_dir (), "gvfsd", NULL);
+  g_mkdir (socket_dir, 0700);
 
-  *address = g_strdup_printf ("unix:path=%s/socket-%s", *socket_dir, tmp);
+  *socket_path = g_build_filename (socket_dir, tmp, NULL);
+  *address = g_strdup_printf ("unix:path=%s", *socket_path);
+
+  g_free (socket_dir);
 }
 
 static gboolean
@@ -788,14 +759,9 @@ daemon_new_connection_func (GDBusServer *server,
                             GDBusConnection *connection,
                             gpointer user_data)
 {
-  NewConnectionData *data;
+  GVfsDaemon *daemon = user_data;
 
-  data = user_data;
-
-  /* Take ownership */
-  data->conn = g_object_ref (connection);
-
-  daemon_peer_connection_setup (data->daemon, data->conn, data);
+  daemon_peer_connection_setup (daemon, connection);
 
   /* Kill the server, no more need for it */
   g_dbus_server_stop (server);
@@ -813,16 +779,10 @@ handle_get_connection (GVfsDBusDaemon *object,
   GDBusServer *server;
   GError *error;
   gchar *address1;
-  NewConnectionData *data;
-  char *socket_dir;
+  gchar *socket_path;
   gchar *guid;
-  
-  generate_address (&address1, &socket_dir);
 
-  data = g_new (NewConnectionData, 1);
-  data->daemon = daemon;
-  data->socket_dir = socket_dir;
-  data->conn = NULL;
+  generate_address (&address1, &socket_path);
 
   guid = g_dbus_generate_guid ();
   error = NULL;
@@ -843,21 +803,22 @@ handle_get_connection (GVfsDBusDaemon *object,
     }
 
   g_dbus_server_start (server);
-  data->server = server;
 
-  g_signal_connect (server, "new-connection", G_CALLBACK (daemon_new_connection_func), data);
-  
+  g_signal_connect (server, "new-connection", G_CALLBACK (daemon_new_connection_func), daemon);
+
   gvfs_dbus_daemon_complete_get_connection (object,
                                             invocation,
                                             address1,
                                             "");
 
   g_free (address1);
+  g_free (socket_path);
   return TRUE;
 
  error_out:
-  new_connection_data_free (data);
   g_free (address1);
+  g_unlink (socket_path);
+  g_free (socket_path);
   return TRUE;
 }
 
