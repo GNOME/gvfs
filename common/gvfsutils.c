@@ -136,3 +136,9 @@ gvfs_is_ipv6 (const char *host)
 
   return TRUE;
 }
+
+gchar *
+gvfs_get_socket_dir (void)
+{
+  return g_build_filename (g_get_user_runtime_dir (), "gvfsd", NULL);
+}

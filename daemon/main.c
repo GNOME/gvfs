@@ -143,6 +143,7 @@ main (int argc, char *argv[])
   guint name_owner_id;
   GBusNameOwnerFlags flags;
   GOptionContext *context;
+  gchar *socket_dir;
   const GOptionEntry options[] = {
     { "replace", 'r', 0, G_OPTION_ARG_NONE, &replace,  N_("Replace old daemon."), NULL },
     { "no-fuse", 0, 0, G_OPTION_ARG_NONE, &no_fuse,  N_("Don’t start fuse."), NULL },
@@ -211,6 +212,11 @@ main (int argc, char *argv[])
   daemon = g_vfs_daemon_new (TRUE, replace);
   if (daemon == NULL)
     return 1;
+
+  /* This is needed for gvfsd-admin to ensure correct ownership. */
+  socket_dir = gvfs_get_socket_dir ();
+  g_mkdir (socket_dir, 0700);
+  g_free (socket_dir);
 
   g_signal_connect (daemon, "shutdown",
 		    G_CALLBACK (daemon_shutdown), loop);
