@@ -95,6 +95,15 @@ check_permission (GVfsBackendAdmin *self,
   invocation = dbus_job->invocation;
   connection = g_dbus_method_invocation_get_connection (invocation);
   credentials = g_dbus_connection_get_peer_credentials (connection);
+  if (!credentials)
+    {
+      g_warning ("The admin backend doesn't work with the session bus "
+                 "fallback. Your application is probably missing "
+                 "--filesystem=xdg-run/gvfsd privileges.");
+      g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                                _("Operation not supported"));
+      return FALSE;
+    }
 
   pid = g_credentials_get_unix_pid (credentials, &error);
   if (error != NULL)
