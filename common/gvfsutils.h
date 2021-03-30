@@ -31,6 +31,7 @@ void         gvfs_set_debug                         (gboolean          debugging
 void         gvfs_setup_debug_handler               (void);
 
 gboolean     gvfs_is_ipv6                           (const char       *host);
+gchar *      gvfs_get_socket_dir                    (void);
 
 G_END_DECLS
 

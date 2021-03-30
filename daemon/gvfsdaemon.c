@@ -745,8 +745,7 @@ generate_address (gchar **address, gchar **socket_path)
   gvfs_randomize_string (tmp + 7, 8);
   tmp[15] = '\0';
 
-  socket_dir = g_build_filename (g_get_user_runtime_dir (), "gvfsd", NULL);
-  g_mkdir (socket_dir, 0700);
+  socket_dir = gvfs_get_socket_dir ();
 
   *socket_path = g_build_filename (socket_dir, tmp, NULL);
   *address = g_strdup_printf ("unix:path=%s", *socket_path);
