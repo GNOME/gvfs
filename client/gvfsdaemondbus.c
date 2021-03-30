@@ -31,12 +31,14 @@
 #include <errno.h>
 
 #include <glib/gi18n-lib.h>
+#include <glib/gstdio.h>
 
 #include <gio/gio.h>
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
 #include <gdaemonvfs.h>
 #include <gvfsdbus.h>
+#include <gvfsutils.h>
 
 /* Extra vfs-specific data for GDBusConnections */
 typedef struct {
@@ -156,6 +158,7 @@ set_connection_for_async (GDBusConnection *connection, const char *dbus_id)
 typedef struct {
   char *dbus_id;
 
+  GVfsDBusDaemon *proxy;
   GDBusConnection *connection;
   GCancellable *cancellable;
 
@@ -174,6 +177,7 @@ async_call_finish (AsyncDBusCall *async_call)
 			  async_call->io_error, 
 			  async_call->callback_data);
 
+  g_clear_object (&async_call->proxy);
   g_clear_object (&async_call->connection);
   g_clear_object (&async_call->cancellable);
   g_clear_error (&async_call->io_error);
@@ -261,31 +265,66 @@ async_get_connection_response (GVfsDBusDaemon *proxy,
 }
 
 static void
+socket_dir_query_info_cb (GObject *source_object,
+                          GAsyncResult *res,
+                          gpointer user_data)
+{
+  AsyncDBusCall *async_call = user_data;
+  g_autoptr (GFileInfo) socket_dir_info = NULL;
+
+  socket_dir_info = g_file_query_info_finish (G_FILE (source_object),
+                                              res,
+                                              &async_call->io_error);
+  if (socket_dir_info == NULL ||
+      !g_file_info_get_attribute_boolean (socket_dir_info,
+                                          G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))
+    {
+      if (!async_call->io_error)
+        async_call->io_error = g_error_new_literal (G_IO_ERROR,
+                                                    G_IO_ERROR_PERMISSION_DENIED,
+                                                    _("Permission denied"));
+
+      async_call_finish (async_call);
+      return;
+    }
+
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (async_call->proxy), G_VFS_DBUS_TIMEOUT_MSECS);
+
+  gvfs_dbus_daemon_call_get_connection (async_call->proxy,
+                                        async_call->cancellable,
+                                        (GAsyncReadyCallback) async_get_connection_response,
+                                        async_call);
+}
+
+static void
 open_connection_async_cb (GObject *source_object,
                           GAsyncResult *res,
                           gpointer user_data)
 {
-  GVfsDBusDaemon *proxy;
   AsyncDBusCall *async_call = user_data;
   GError *error = NULL;
- 
-  proxy = gvfs_dbus_daemon_proxy_new_finish (res, &error);
-  if (proxy == NULL)
+  g_autofree gchar *socket_dir_path = NULL;
+  g_autoptr (GFile) socket_dir = NULL;
+
+  async_call->proxy = gvfs_dbus_daemon_proxy_new_finish (res, &error);
+  if (async_call->proxy == NULL)
     {
       async_call->io_error = g_error_copy (error);
       g_error_free (error);
       async_call_finish (async_call);
       return;
     }
-  
-  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_VFS_DBUS_TIMEOUT_MSECS);
-  
-  gvfs_dbus_daemon_call_get_connection (proxy,
-                                        async_call->cancellable,
-                                        (GAsyncReadyCallback) async_get_connection_response,
-                                        async_call);
-  
-  g_object_unref (proxy);
+
+  /* This is needed to prevent socket leaks. */
+  socket_dir_path = gvfs_get_socket_dir ();
+  socket_dir = g_file_new_for_path (socket_dir_path);
+  g_file_query_info_async (socket_dir,
+                           G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
+                           G_FILE_QUERY_INFO_NONE,
+                           G_PRIORITY_DEFAULT,
+                           async_call->cancellable,
+                           socket_dir_query_info_cb,
+                           user_data);
 }
 
 static void
@@ -522,6 +561,9 @@ _g_dbus_connection_get_sync (const char *dbus_id,
   gchar *address1;
   GVfsDBusDaemon *daemon_proxy;
   gboolean res;
+  g_autofree gchar *socket_dir_path = NULL;
+  g_autoptr (GFile) socket_dir = NULL;
+  g_autoptr (GFileInfo) socket_dir_info = NULL;
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -590,6 +632,26 @@ _g_dbus_connection_get_sync (const char *dbus_id,
                                                   error);
   if (daemon_proxy == NULL)
     return NULL;
+
+  /* This is needed to prevent socket leaks. */
+  socket_dir_path = gvfs_get_socket_dir ();
+  socket_dir = g_file_new_for_path (socket_dir_path);
+  socket_dir_info = g_file_query_info (socket_dir,
+                                       G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
+                                       G_FILE_QUERY_INFO_NONE,
+                                       cancellable,
+                                       error);
+  if (socket_dir_info == NULL ||
+      !g_file_info_get_attribute_boolean (socket_dir_info,
+                                          G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))
+    {
+      if (error && !*error)
+        *error = g_error_new_literal (G_IO_ERROR,
+                                      G_IO_ERROR_PERMISSION_DENIED,
+                                      _("Permission denied"));
+
+      return NULL;
+    }
 
   address1 = NULL;
   res = gvfs_dbus_daemon_call_get_connection_sync (daemon_proxy,
