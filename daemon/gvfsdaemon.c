@@ -780,6 +780,7 @@ handle_get_connection (GVfsDBusDaemon *object,
   gchar *address1;
   gchar *socket_path;
   gchar *guid;
+  const char *pkexec_uid;
 
   generate_address (&address1, &socket_path);
 
@@ -802,6 +803,18 @@ handle_get_connection (GVfsDBusDaemon *object,
     }
 
   g_dbus_server_start (server);
+
+  /* This is needed for gvfsd-admin to ensure correct ownership. */
+  pkexec_uid = g_getenv ("PKEXEC_UID");
+  if (pkexec_uid != NULL)
+    {
+      uid_t uid;
+
+      uid = strtol (pkexec_uid, NULL, 10);
+      if (uid != 0)
+        if (chown (socket_path, uid, (gid_t)-1) < 0)
+          g_warning ("Failed to change socket ownership: %s", g_strerror (errno));
+    }
 
   g_signal_connect (server, "new-connection", G_CALLBACK (daemon_new_connection_func), daemon);
 
