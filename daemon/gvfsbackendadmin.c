@@ -1094,8 +1094,10 @@ acquire_caps (uid_t uid)
 }
 
 static char *session_address = NULL;
+static char *runtime_dir = NULL;
 static GOptionEntry entries[] = {
   { "address", 0, 0, G_OPTION_ARG_STRING, &session_address, "DBus session address", NULL },
+  { "dir", 0, 0, G_OPTION_ARG_STRING, &runtime_dir, "Runtime dir", NULL },
   { NULL }
 };
 
@@ -1134,4 +1136,7 @@ g_vfs_backend_admin_pre_setup (int *argc,
 
   acquire_caps (uid);
   g_setenv ("DBUS_SESSION_BUS_ADDRESS", session_address, TRUE);
+
+  if (runtime_dir)
+    g_setenv ("XDG_RUNTIME_DIR", runtime_dir, TRUE);
 }
