@@ -4,6 +4,7 @@ fedora:
         entrypoint: ["/bin/sh", "-c"]
     tags:
         - x86_64
+        - ipv6
     script:
         - meson -Dinstalled_tests=true -Ddevel_utils=true -Dman=true -Dafc=true --prefix /usr --werror build
         - sudo ninja -C build install
