@@ -2202,7 +2202,7 @@ msgid ""
 "Disconnecting from filesystem."
 msgstr ""
 "S'està desmuntant %s\n"
-"Se l'està desconnectant del sistema de fitxers."
+"S'està desconnectant del sistema de fitxers."
 
 #: monitor/udisks2/gvfsudisks2utils.c:649
 #, c-format
@@ -2306,7 +2306,7 @@ msgid ""
 "A passphrase is needed to access encrypted data on “%s”."
 msgstr ""
 "Cal autenticació.\n"
-"Fa falta la contrasenya per a accedir a les dades encriptades de %s."
+"Fa falta la contrasenya per a accedir a les dades encriptades de «%s»."
 
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
