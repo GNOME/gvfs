@@ -281,12 +281,12 @@ if install_systemd_systemduserunitdir or install_systemd_tmpfilesdir
 
     if install_systemd_systemduserunitdir and systemd_systemduserunitdir == ''
       assert(systemd_dep.found(), 'systemd required but not found, please provide a valid systemd user unit dir or disable it')
-      systemd_systemduserunitdir = systemd_dep.get_pkgconfig_variable('systemduserunitdir')
+      systemd_systemduserunitdir = systemd_dep.get_pkgconfig_variable('systemduserunitdir', define_variable: ['prefix', gvfs_prefix])
     endif
 
     if install_systemd_tmpfilesdir and systemd_tmpfilesdir == ''
       assert(systemd_dep.found(), 'systemd not found, if you use opentmpfiles please provide a valid systemd user unit dir or disable it')
-      systemd_tmpfilesdir = systemd_dep.get_pkgconfig_variable('tmpfilesdir')
+      systemd_tmpfilesdir = systemd_dep.get_pkgconfig_variable('tmpfilesdir', define_variable: ['prefix', gvfs_prefix])
     endif
   endif
 endif
