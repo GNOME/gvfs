@@ -1,3 +1,11 @@
+Major changes in 1.48.1
+=======================
+* build: Use install prefix in systemd files paths
+* client: Prevent socket leaks if socket dir is inaccessible from client
+* admin: Fix regressions caused by port to named sockets
+* udisks2: Report unmount progress after showing blocking processes
+* Translation updates
+
 Major changes in 1.48.0
 =======================
 * Translation updates
