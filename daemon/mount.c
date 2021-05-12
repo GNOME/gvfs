@@ -415,6 +415,30 @@ child_watch_cb (GPid pid,
                 gint status,
                 gpointer user_data)
 {
+  MountData *data = user_data;
+  GError *error = NULL;
+  gint code = 0;
+
+  if (!g_spawn_check_exit_status (status, &error))
+    {
+      if (error->domain == G_SPAWN_EXIT_ERROR)
+        code = error->code;
+
+      g_clear_error (&error);
+    }
+
+  /* GVfs daemons always exit with 0, but gvfsd-admin is spawned over pkexec,
+   * which can fail when the authentication dialog is dismissed for example.
+   */
+  if (code == 126 || code == 127)
+    {
+      error = g_error_new_literal (G_IO_ERROR,
+                                   G_IO_ERROR_PERMISSION_DENIED,
+                                   _("Permission denied"));
+      mount_finish (data, error);
+      g_error_free (error);
+    }
+
   g_spawn_close_pid (pid);
 }
 
@@ -485,7 +509,7 @@ spawn_mount (MountData *data)
         }
       else
         {
-          g_child_watch_add (pid, child_watch_cb, NULL);
+          g_child_watch_add (pid, child_watch_cb, data);
         }
 
       g_strfreev (argv);
