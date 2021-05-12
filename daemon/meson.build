@@ -374,8 +374,15 @@ if enable_admin
     install_dir: gvfs_datadir / 'polkit-1/actions',
   )
 
-  install_data(
-    gvfs_namespace + '.file-operations.rules',
+  rules = gvfs_namespace + '.file-operations.rules'
+
+  rules_conf = configuration_data()
+  rules_conf.set('PRIVILEGED_GROUP', privileged_group)
+
+  configure_file(
+    input: rules + '.in',
+    output: rules,
+    configuration: rules_conf,
     install_dir: gvfs_datadir / 'polkit-1/rules.d',
   )
 endif

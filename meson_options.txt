@@ -1,5 +1,6 @@
 option('systemduserunitdir', type: 'string', value: '', description: 'custom directory for systemd user units, or \'no\' to disable')
 option('tmpfilesdir', type: 'string', value: '', description: 'custom directory for tmpfiles.d config files, or \'no\' to disable')
+option('privileged_group', type: 'string', value: 'wheel', description: 'custom name for group that has elevated permissions')
 
 option('admin', type: 'boolean', value: true, description: 'build with admin backend')
 option('afc', type: 'boolean', value: true, description: 'build with afc backend and volume monitor')

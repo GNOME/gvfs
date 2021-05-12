@@ -299,6 +299,7 @@ endif
 config_h.set('HAVE_GCR', enable_gcr)
 
 # *** Check if we should build with admin backend ***
+privileged_group = get_option('privileged_group')
 enable_admin = get_option('admin')
 if enable_admin
   libcap_dep = dependency('libcap')
@@ -493,7 +494,8 @@ meson.add_install_script(
 summary({
   'systemduserunitdir': systemd_systemduserunitdir,
   'tmpfilesdir': systemd_tmpfilesdir,
-}, section: 'Directories')
+  'privileged_group': privileged_group,
+}, section: 'Configuration')
 
 summary({
   'admin': enable_admin,
