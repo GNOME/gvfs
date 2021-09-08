@@ -9,7 +9,7 @@
 msgid ""
 msgstr "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2021-02-12 13:52+0000\n"
+"POT-Creation-Date: 2021-04-23 06:45+0000\n"
 "PO-Revision-Date: 2021-2-20 10:00+0100\n"
 "Last-Translator: Asier Sarasua Garmendia <asiersarasua@ni.eus>\n"
 "Language-Team: Basque <librezale@librezale.eus>\n"
@@ -107,6 +107,20 @@ msgstr "Trunkatzea ez da onartzen korrontean"
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Errorea muntaiaren informazioa lortzean: %s"
+
+#: client/gvfsdaemondbus.c:285 client/gvfsdaemondbus.c:651
+#: daemon/gvfsafpvolume.c:394 daemon/gvfsafpvolume.c:655
+#: daemon/gvfsafpvolume.c:799 daemon/gvfsafpvolume.c:980
+#: daemon/gvfsafpvolume.c:1164 daemon/gvfsafpvolume.c:1339
+#: daemon/gvfsafpvolume.c:1491 daemon/gvfsafpvolume.c:1913
+#: daemon/gvfsafpvolume.c:2034 daemon/gvfsafpvolume.c:2189
+#: daemon/gvfsafpvolume.c:2402 daemon/gvfsbackendadmin.c:150
+#: daemon/gvfsbackendafc.c:166 daemon/gvfsbackendgoogle.c:256
+#: daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1125
+#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:437
+#, c-format
+msgid "Permission denied"
+msgstr "Baimena ukatuta"
 
 #: common/gvfsdaemonprotocol.c:358
 msgid "Invalid file info format"
@@ -355,19 +369,6 @@ msgstr "Bolumena ez da existitzen"
 msgid "Couldn’t load %s on %s"
 msgstr "Ezin izan da “%s” kargatu “%s”(e)n"
 
-#: daemon/gvfsafpvolume.c:394 daemon/gvfsafpvolume.c:655
-#: daemon/gvfsafpvolume.c:799 daemon/gvfsafpvolume.c:980
-#: daemon/gvfsafpvolume.c:1164 daemon/gvfsafpvolume.c:1339
-#: daemon/gvfsafpvolume.c:1491 daemon/gvfsafpvolume.c:1913
-#: daemon/gvfsafpvolume.c:2034 daemon/gvfsafpvolume.c:2189
-#: daemon/gvfsafpvolume.c:2402 daemon/gvfsbackendadmin.c:141
-#: daemon/gvfsbackendafc.c:166 daemon/gvfsbackendgoogle.c:256
-#: daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1125
-#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:437
-#, c-format
-msgid "Permission denied"
-msgstr "Baimena ukatuta"
-
 #: daemon/gvfsafpvolume.c:398 daemon/gvfsafpvolume.c:1652
 #: daemon/gvfsafpvolume.c:2406 daemon/gvfsbackendafc.c:150
 #: daemon/gvfsbackendafc.c:1064 daemon/gvfsbackendafpbrowse.c:180
@@ -546,64 +547,64 @@ msgstr "Fitxategia ez da irakurtzeko atzipenarekin ireki"
 #. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
 #. * fallback copy.
 #.
-#: daemon/gvfsbackendadmin.c:862 daemon/gvfsbackendafc.c:2361
-#: daemon/gvfsbackendafp.c:1781 daemon/gvfsbackendburn.c:829
-#: daemon/gvfsbackendburn.c:951 daemon/gvfsbackendcomputer.c:812
-#: daemon/gvfsbackenddav.c:3427 daemon/gvfsbackenddav.c:3459
-#: daemon/gvfsbackenddav.c:3487 daemon/gvfsbackendftp.c:1209
-#: daemon/gvfsbackendftp.c:1257 daemon/gvfsbackendftp.c:1278
-#: daemon/gvfsbackendftp.c:1624 daemon/gvfsbackendgoogle.c:1590
-#: daemon/gvfsbackendgoogle.c:1623 daemon/gvfsbackendgoogle.c:1652
-#: daemon/gvfsbackendgoogle.c:1675 daemon/gvfsbackendgoogle.c:1741
-#: daemon/gvfsbackendgoogle.c:2013 daemon/gvfsbackendgoogle.c:2045
-#: daemon/gvfsbackendgoogle.c:2084 daemon/gvfsbackendgoogle.c:2117
-#: daemon/gvfsbackendgoogle.c:2127 daemon/gvfsbackendgoogle.c:2198
-#: daemon/gvfsbackendgoogle.c:2393 daemon/gvfsbackendgoogle.c:2508
-#: daemon/gvfsbackendgoogle.c:2733 daemon/gvfsbackendgoogle.c:3069
-#: daemon/gvfsbackendgoogle.c:3079 daemon/gvfsbackendgoogle.c:3114
-#: daemon/gvfsbackendgoogle.c:3181 daemon/gvfsbackendgoogle.c:3190
-#: daemon/gvfsbackendgoogle.c:3774 daemon/gvfsbackendgoogle.c:3835
-#: daemon/gvfsbackendgoogle.c:3852 daemon/gvfsbackendgoogle.c:3864
-#: daemon/gvfsbackendgoogle.c:3950 daemon/gvfsbackendgoogle.c:3967
-#: daemon/gvfsbackendgphoto2.c:2238 daemon/gvfsbackendgphoto2.c:2451
-#: daemon/gvfsbackendgphoto2.c:2548 daemon/gvfsbackendgphoto2.c:2641
-#: daemon/gvfsbackendgphoto2.c:3250 daemon/gvfsbackendgphoto2.c:3258
-#: daemon/gvfsbackendgphoto2.c:3268 daemon/gvfsbackendmtp.c:1746
-#: daemon/gvfsbackendmtp.c:2047 daemon/gvfsbackendmtp.c:2296
-#: daemon/gvfsbackendmtp.c:2487 daemon/gvfsbackendmtp.c:2570
-#: daemon/gvfsbackendmtp.c:2658 daemon/gvfsbackendmtp.c:2726
-#: daemon/gvfsbackendmtp.c:2921 daemon/gvfsbackendmtp.c:3064
-#: daemon/gvfsbackendnfs.c:2372 daemon/gvfsbackendnfs.c:2422
-#: daemon/gvfsbackendnfs.c:2548 daemon/gvfsbackendsftp.c:2213
-#: daemon/gvfsbackendsftp.c:5417 daemon/gvfsbackendsftp.c:5515
-#: daemon/gvfsbackendsftp.c:6227 daemon/gvfsbackendsftp.c:6259
-#: daemon/gvfsbackendsftp.c:6285 daemon/gvfsbackendsftp.c:6293
-#: daemon/gvfsbackendsftp.c:6780 daemon/gvfsbackendsftp.c:6842
-#: daemon/gvfsbackendsftp.c:6850 daemon/gvfsbackendsmb.c:1714
-#: daemon/gvfsftptask.c:429 daemon/gvfsjobcloseread.c:113
-#: daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
-#: daemon/gvfsjobcreatemonitor.c:143 daemon/gvfsjobcreatemonitor.c:154
-#: daemon/gvfsjobcreatemonitor.c:177 daemon/gvfsjobcreatemonitor.c:195
-#: daemon/gvfsjobdelete.c:108 daemon/gvfsjobenumerate.c:272
-#: daemon/gvfsjobmakedirectory.c:108 daemon/gvfsjobmount.c:112
-#: daemon/gvfsjobmountmountable.c:138 daemon/gvfsjobmove.c:121
-#: daemon/gvfsjobopenforread.c:120 daemon/gvfsjobopenforwrite.c:184
-#: daemon/gvfsjobopenforwrite.c:198 daemon/gvfsjobopenforwrite.c:212
-#: daemon/gvfsjobopeniconforread.c:104 daemon/gvfsjobpollmountable.c:107
-#: daemon/gvfsjobpull.c:125 daemon/gvfsjobpush.c:125
-#: daemon/gvfsjobqueryattributes.c:145 daemon/gvfsjobqueryfsinfo.c:116
-#: daemon/gvfsjobqueryinfo.c:124 daemon/gvfsjobqueryinforead.c:125
-#: daemon/gvfsjobqueryinfowrite.c:125 daemon/gvfsjobread.c:123
-#: daemon/gvfsjobseekread.c:121 daemon/gvfsjobseekwrite.c:121
-#: daemon/gvfsjobsetattribute.c:130 daemon/gvfsjobsetdisplayname.c:111
-#: daemon/gvfsjobstartmountable.c:113 daemon/gvfsjobstopmountable.c:115
-#: daemon/gvfsjobtrash.c:107 daemon/gvfsjobtruncate.c:113
-#: daemon/gvfsjobunmountmountable.c:157 daemon/gvfsjobunmountmountable.c:172
-#: daemon/gvfsjobwrite.c:123
+#: daemon/gvfsbackendadmin.c:104 daemon/gvfsbackendadmin.c:871
+#: daemon/gvfsbackendafc.c:2361 daemon/gvfsbackendafp.c:1781
+#: daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
+#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:3427
+#: daemon/gvfsbackenddav.c:3459 daemon/gvfsbackenddav.c:3487
+#: daemon/gvfsbackendftp.c:1209 daemon/gvfsbackendftp.c:1257
+#: daemon/gvfsbackendftp.c:1278 daemon/gvfsbackendftp.c:1624
+#: daemon/gvfsbackendgoogle.c:1590 daemon/gvfsbackendgoogle.c:1623
+#: daemon/gvfsbackendgoogle.c:1652 daemon/gvfsbackendgoogle.c:1675
+#: daemon/gvfsbackendgoogle.c:1741 daemon/gvfsbackendgoogle.c:2013
+#: daemon/gvfsbackendgoogle.c:2045 daemon/gvfsbackendgoogle.c:2084
+#: daemon/gvfsbackendgoogle.c:2117 daemon/gvfsbackendgoogle.c:2127
+#: daemon/gvfsbackendgoogle.c:2198 daemon/gvfsbackendgoogle.c:2393
+#: daemon/gvfsbackendgoogle.c:2508 daemon/gvfsbackendgoogle.c:2733
+#: daemon/gvfsbackendgoogle.c:3069 daemon/gvfsbackendgoogle.c:3079
+#: daemon/gvfsbackendgoogle.c:3114 daemon/gvfsbackendgoogle.c:3181
+#: daemon/gvfsbackendgoogle.c:3190 daemon/gvfsbackendgoogle.c:3774
+#: daemon/gvfsbackendgoogle.c:3835 daemon/gvfsbackendgoogle.c:3852
+#: daemon/gvfsbackendgoogle.c:3864 daemon/gvfsbackendgoogle.c:3950
+#: daemon/gvfsbackendgoogle.c:3967 daemon/gvfsbackendgphoto2.c:2238
+#: daemon/gvfsbackendgphoto2.c:2451 daemon/gvfsbackendgphoto2.c:2548
+#: daemon/gvfsbackendgphoto2.c:2641 daemon/gvfsbackendgphoto2.c:3250
+#: daemon/gvfsbackendgphoto2.c:3258 daemon/gvfsbackendgphoto2.c:3268
+#: daemon/gvfsbackendmtp.c:1746 daemon/gvfsbackendmtp.c:2047
+#: daemon/gvfsbackendmtp.c:2296 daemon/gvfsbackendmtp.c:2487
+#: daemon/gvfsbackendmtp.c:2570 daemon/gvfsbackendmtp.c:2658
+#: daemon/gvfsbackendmtp.c:2726 daemon/gvfsbackendmtp.c:2921
+#: daemon/gvfsbackendmtp.c:3064 daemon/gvfsbackendnfs.c:2372
+#: daemon/gvfsbackendnfs.c:2422 daemon/gvfsbackendnfs.c:2548
+#: daemon/gvfsbackendsftp.c:2213 daemon/gvfsbackendsftp.c:5417
+#: daemon/gvfsbackendsftp.c:5515 daemon/gvfsbackendsftp.c:6227
+#: daemon/gvfsbackendsftp.c:6259 daemon/gvfsbackendsftp.c:6285
+#: daemon/gvfsbackendsftp.c:6293 daemon/gvfsbackendsftp.c:6780
+#: daemon/gvfsbackendsftp.c:6842 daemon/gvfsbackendsftp.c:6850
+#: daemon/gvfsbackendsmb.c:1714 daemon/gvfsftptask.c:429
+#: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121
+#: daemon/gvfsjobcopy.c:121 daemon/gvfsjobcreatemonitor.c:143
+#: daemon/gvfsjobcreatemonitor.c:154 daemon/gvfsjobcreatemonitor.c:177
+#: daemon/gvfsjobcreatemonitor.c:195 daemon/gvfsjobdelete.c:108
+#: daemon/gvfsjobenumerate.c:272 daemon/gvfsjobmakedirectory.c:108
+#: daemon/gvfsjobmount.c:112 daemon/gvfsjobmountmountable.c:138
+#: daemon/gvfsjobmove.c:121 daemon/gvfsjobopenforread.c:120
+#: daemon/gvfsjobopenforwrite.c:184 daemon/gvfsjobopenforwrite.c:198
+#: daemon/gvfsjobopenforwrite.c:212 daemon/gvfsjobopeniconforread.c:104
+#: daemon/gvfsjobpollmountable.c:107 daemon/gvfsjobpull.c:125
+#: daemon/gvfsjobpush.c:125 daemon/gvfsjobqueryattributes.c:145
+#: daemon/gvfsjobqueryfsinfo.c:116 daemon/gvfsjobqueryinfo.c:124
+#: daemon/gvfsjobqueryinforead.c:125 daemon/gvfsjobqueryinfowrite.c:125
+#: daemon/gvfsjobread.c:123 daemon/gvfsjobseekread.c:121
+#: daemon/gvfsjobseekwrite.c:121 daemon/gvfsjobsetattribute.c:130
+#: daemon/gvfsjobsetdisplayname.c:111 daemon/gvfsjobstartmountable.c:113
+#: daemon/gvfsjobstopmountable.c:115 daemon/gvfsjobtrash.c:107
+#: daemon/gvfsjobtruncate.c:113 daemon/gvfsjobunmountmountable.c:157
+#: daemon/gvfsjobunmountmountable.c:172 daemon/gvfsjobwrite.c:123
 msgid "Operation not supported"
 msgstr "Eragiketa ez dago onartuta"
 
-#: daemon/gvfsbackendadmin.c:990 daemon/gvfsbackendarchive.c:639
+#: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639
 #: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:1903
 #: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:256
 #: daemon/gvfsbackendsmb.c:596
@@ -612,7 +613,7 @@ msgstr "Muntaiaren zehaztapen baliogabea"
 
 #: daemon/gvfsbackendafc.c:146
 msgid "Internal Apple File Control error"
-msgstr "Apple-ren fitxategi-kontrol (AFC) barneko errorea"
+msgstr "Applen fitxategi-kontrol (AFC) barneko errorea"
 
 #: daemon/gvfsbackendafc.c:158
 msgid "The device did not respond"
@@ -624,12 +625,12 @@ msgstr "Konexioa eten egin da"
 
 #: daemon/gvfsbackendafc.c:170
 msgid "Invalid Apple File Control data received"
-msgstr "Baliogabeko Apple-ren fitxategi-kontrolaren (AFC) datuak jaso dira"
+msgstr "Baliogabeko Applen fitxategi-kontrolaren (AFC) datuak jaso dira"
 
 #: daemon/gvfsbackendafc.c:174
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
-msgstr "Apple-ren fitxategi-kontrol (AFC) kudeatu gabeko errorea (%d)"
+msgstr "Applen fitxategi-kontrol (AFC) kudeatu gabeko errorea (%d)"
 
 #: daemon/gvfsbackendafc.c:190
 msgid "Listing applications installed on device failed"
@@ -815,7 +816,7 @@ msgstr "Ez da ostalari-izenik zehaztu"
 
 #: daemon/gvfsbackendafpbrowse.c:568 daemon/gvfsbackendafp.c:2235
 msgid "Apple Filing Protocol Service"
-msgstr "'Apple Filing Protocol'-aren zerbitzua"
+msgstr "'Apple Filing Protocol' zerbitzua"
 
 #: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:877
 #: daemon/gvfsbackenddav.c:3068 daemon/gvfsbackendftp.c:1568
@@ -1758,7 +1759,7 @@ msgstr "Autentifikazioa behar da\n"
 #: daemon/gvfsbackendsmb.c:556
 #, c-format
 msgid "Failed to mount Windows share: %s"
-msgstr "Huts egin du Windows-en partekatzea muntatzean: %s"
+msgstr "Huts egin du Windowsen partekatzea muntatzean: %s"
 
 #: daemon/gvfsbackendsmb.c:1326
 #, c-format
@@ -1959,38 +1960,38 @@ msgid ""
 msgstr "%s desmuntatzen\n"
 "Itxaron"
 
-#: daemon/main.c:147 metadata/meta-daemon.c:459
+#: daemon/main.c:148 metadata/meta-daemon.c:459
 msgid "Replace old daemon."
 msgstr "Ordeztu daemon zaharra."
 
-#: daemon/main.c:148
+#: daemon/main.c:149
 msgid "Don’t start fuse."
 msgstr "Ez hasi fuse."
 
-#: daemon/main.c:149
+#: daemon/main.c:150
 msgid "Enable debug output."
 msgstr "Gaitu arazketaren irteera."
 
-#: daemon/main.c:150 metadata/meta-daemon.c:460
+#: daemon/main.c:151 metadata/meta-daemon.c:460
 msgid "Show program version."
 msgstr "Erakutsi programaren bertsioa."
 
-#: daemon/main.c:166
+#: daemon/main.c:167
 msgid "GVFS Daemon"
 msgstr "GVFS daemona"
 
-#: daemon/main.c:169
+#: daemon/main.c:170
 msgid "Main daemon for GVFS"
 msgstr "GVFSren daemon nagusia"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: daemon/main.c:186 metadata/meta-daemon.c:486
+#: daemon/main.c:187 metadata/meta-daemon.c:486
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: daemon/main.c:188 metadata/meta-daemon.c:488
+#: daemon/main.c:189 metadata/meta-daemon.c:488
 #, c-format
 msgid "Try “%s --help” for more information."
 msgstr "Saiatu “%s --help” informazio gehiagorako."
@@ -2137,7 +2138,7 @@ msgstr "Motorrak ez du eragiketa onartzen"
 msgid "Timed out running command-line “%s”"
 msgstr "Denbora iraungituta “%s” komando-lerroaren exekuzioan"
 
-#: monitor/udisks2/gvfsudisks2utils.c:647
+#: monitor/udisks2/gvfsudisks2utils.c:646
 #, c-format
 msgid ""
 "Unmounting %s\n"
@@ -2145,7 +2146,7 @@ msgid ""
 msgstr "“%s” desmuntatzen\n"
 "Fitxategi-sistematik deskonektatzen."
 
-#: monitor/udisks2/gvfsudisks2utils.c:649
+#: monitor/udisks2/gvfsudisks2utils.c:648
 #, c-format
 msgid ""
 "Writing data to %s\n"
@@ -2153,7 +2154,7 @@ msgid ""
 msgstr "Idatzi datuak %s(e)n\n"
 "Ez deskonektatu amaitu arte."
 
-#: monitor/udisks2/gvfsudisks2utils.c:788
+#: monitor/udisks2/gvfsudisks2utils.c:780
 #, c-format
 msgid ""
 "%s unmounted\n"
@@ -2161,7 +2162,7 @@ msgid ""
 msgstr "%s desmuntatuta\n"
 "Fitxategi-sistema deskonektatu egin da."
 
-#: monitor/udisks2/gvfsudisks2utils.c:790
+#: monitor/udisks2/gvfsudisks2utils.c:782
 #, c-format
 msgid ""
 "%s can be safely unplugged\n"
