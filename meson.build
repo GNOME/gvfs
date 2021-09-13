@@ -44,16 +44,16 @@ cc = meson.get_compiler('c')
 config_h = configuration_data()
 
 # defines
-set_defines = [
+set_defines = {
   # package
-  ['PACKAGE_STRING', '@0@ @1@'.format(gvfs_name, gvfs_version)],
-  ['VERSION', gvfs_version],
+  'PACKAGE_STRING': '@0@ @1@'.format(gvfs_name, gvfs_version),
+  'VERSION': gvfs_version,
   # i18n
-  ['GETTEXT_PACKAGE', gvfs_name],
-]
+  'GETTEXT_PACKAGE': gvfs_name,
+}
 
-foreach define: set_defines
-  config_h.set_quoted(define[0], define[1])
+foreach define, value: set_defines
+  config_h.set_quoted(define, value)
 endforeach
 
 # Globally define_GNU_SOURCE and therefore enable the GNU extensions
@@ -179,17 +179,17 @@ foreach name: ['mkdev', 'sysmacros']
 endforeach
 
 # types
-check_types = [
+check_types = {
   # type, fallback type
-  ['gid_t', 'int'],
-  ['pid_t', 'int'],
-  ['size_t', 'unsigned int'],
-  ['uid_t', 'int'],
-]
+  'gid_t': 'int',
+  'pid_t': 'int',
+  'size_t': 'unsigned int',
+  'uid_t': 'int',
+}
 
-foreach type: check_types
-  if not cc.has_type(type[0], prefix: '#include<sys/types.h>')
-    config_h.set(type[0], type[1])
+foreach type, value: check_types
+  if not cc.has_type(type, prefix: '#include<sys/types.h>')
+    config_h.set(type, value)
   endif
 endforeach
 

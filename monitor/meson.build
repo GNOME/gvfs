@@ -1,33 +1,33 @@
 subdir('proxy')
 
 # [[service name suffix, install monitor test data]]
-monitors = []
+monitors = {}
 
 if enable_afc
-  monitors += [['Afc', true]]
+  monitors += {'Afc': true}
 endif
 
 if enable_goa
-  monitors += [['Goa', false]]
+  monitors += {'Goa': false}
 endif
 
 if enable_gphoto2
-  monitors += [['GPhoto2', true]]
+  monitors += {'GPhoto2': true}
 endif
 
 if enable_mtp
-  monitors += [['MTP', false]]
+  monitors += {'MTP': false}
 endif
 
 if enable_udisks2
-  monitors += [['UDisks2', true]]
+  monitors += {'UDisks2': true}
 endif
 
 monitors_test_data = []
-foreach monitor: monitors
-  monitor_name = monitor[0].to_lower()
+foreach monitor, monitor_test: monitors
+  monitor_name = monitor.to_lower()
 
-  dbus_service = '@0@.@1@VolumeMonitor'.format(gvfs_namespace, monitor[0])
+  dbus_service = '@0@.@1@VolumeMonitor'.format(gvfs_namespace, monitor)
   dbus_exec = 'gvfs-@0@-volume-monitor'.format(monitor_name)
   dbus_systemd_service = ''
 
@@ -66,7 +66,7 @@ foreach monitor: monitors
     install_dir: dbus_session_bus_services_dir,
   )
 
-  if monitor[1]
+  if monitor_test
     monitors_test_data += [monitor_data, monitor_service]
   endif
 

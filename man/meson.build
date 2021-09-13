@@ -14,20 +14,20 @@ xsltproc_cmd = [
   '@INPUT@',
 ]
 
-mans = [
-  ['gvfs', '7'],
-  ['gvfsd', '1'],
-  ['gvfsd-fuse', '1'],
-  ['gvfsd-metadata', '1'],
-]
+mans = {
+  'gvfs': '7',
+  'gvfsd': '1',
+  'gvfsd-fuse': '1',
+  'gvfsd-metadata': '1',
+}
 
-foreach man: mans
+foreach program, section: mans
   custom_target(
-    man[0] + man[1],
-    input: man[0] + '.xml',
-    output: '@BASENAME@.' + man[1],
+    program + section,
+    input: program + '.xml',
+    output: '@BASENAME@.' + section,
     command: xsltproc_cmd,
     install: true,
-    install_dir: gvfs_mandir / ('man' + man[1]),
+    install_dir: gvfs_mandir / ('man' + section),
   )
 endforeach
