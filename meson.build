@@ -3,7 +3,7 @@ project(
   version: '1.49.1',
   license: 'LGPL2+',
   default_options: 'buildtype=debugoptimized',
-  meson_version: '>= 0.55.0',
+  meson_version: '>= 0.56.0',
 )
 
 gvfs_name = meson.project_name()
@@ -249,23 +249,23 @@ endif
 config_h.set('HAVE_GCRYPT', enable_gcrypt)
 
 # *** Check for dbus service dir ***
-dbus_session_bus_services_dir = dependency('dbus-1').get_pkgconfig_variable(
-  'session_bus_services_dir',
-  define_variable: ['datadir', gvfs_prefix / gvfs_datadir],
+dbus_session_bus_services_dir = dependency('dbus-1').get_variable(
+  pkgconfig: 'session_bus_services_dir',
+  pkgconfig_define: ['datadir', gvfs_prefix / gvfs_datadir],
 )
 
 dbus_service_in = files('dbus.service.in')
 
 # *** Check for giomoduledir and schemasdir ***
-gio_giomoduledir = gio_dep.get_pkgconfig_variable(
-  'giomoduledir',
-  define_variable: ['libdir', gvfs_prefix / gvfs_libdir],
+gio_giomoduledir = gio_dep.get_variable(
+  pkgconfig: 'giomoduledir',
+  pkgconfig_define: ['libdir', gvfs_prefix / gvfs_libdir],
 )
 
-gio_schemasdir = gio_dep.get_pkgconfig_variable(
-  'schemasdir',
-  define_variable: ['datadir', gvfs_prefix / gvfs_datadir],
-  default: gvfs_prefix / gvfs_datadir / 'glib-2.0/schemas',
+gio_schemasdir = gio_dep.get_variable(
+  pkgconfig: 'schemasdir',
+  pkgconfig_define: ['datadir', gvfs_prefix / gvfs_datadir],
+  default_value: gvfs_prefix / gvfs_datadir / 'glib-2.0/schemas',
 )
 
 # *** Check for systemd options ***
@@ -281,12 +281,12 @@ if install_systemd_systemduserunitdir or install_systemd_tmpfilesdir
 
     if install_systemd_systemduserunitdir and systemd_systemduserunitdir == ''
       assert(systemd_dep.found(), 'systemd required but not found, please provide a valid systemd user unit dir or disable it')
-      systemd_systemduserunitdir = systemd_dep.get_pkgconfig_variable('systemduserunitdir', define_variable: ['prefix', gvfs_prefix])
+      systemd_systemduserunitdir = systemd_dep.get_variable(pkgconfig: 'systemduserunitdir', pkgconfig_define: ['prefix', gvfs_prefix])
     endif
 
     if install_systemd_tmpfilesdir and systemd_tmpfilesdir == ''
       assert(systemd_dep.found(), 'systemd not found, if you use opentmpfiles please provide a valid systemd user unit dir or disable it')
-      systemd_tmpfilesdir = systemd_dep.get_pkgconfig_variable('tmpfilesdir', define_variable: ['prefix', gvfs_prefix])
+      systemd_tmpfilesdir = systemd_dep.get_variable(pkgconfig: 'tmpfilesdir', pkgconfig_define: ['prefix', gvfs_prefix])
     endif
   endif
 endif
