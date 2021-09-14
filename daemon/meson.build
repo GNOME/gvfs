@@ -359,30 +359,23 @@ if enable_admin
 
   policy = gvfs_namespace + '.file-operations.policy'
 
-  policy_in = configure_file(
-    input: policy + '.in.in',
-    output: '@BASENAME@',
-    configuration: service_conf,
-  )
-
   i18n.merge_file(
     policy,
-    input: policy_in,
+    input: configure_file(
+      input: policy + '.in.in',
+      output: '@BASENAME@',
+      configuration: service_conf,
+    ),
     output: '@BASENAME@',
     po_dir: po_dir,
     install: true,
     install_dir: gvfs_datadir / 'polkit-1/actions',
   )
 
-  rules = gvfs_namespace + '.file-operations.rules'
-
-  rules_conf = configuration_data()
-  rules_conf.set('PRIVILEGED_GROUP', privileged_group)
-
   configure_file(
-    input: rules + '.in',
-    output: rules,
-    configuration: rules_conf,
+    input: gvfs_namespace + '.file-operations.rules.in',
+    output: '@BASENAME@',
+    configuration: {'PRIVILEGED_GROUP': privileged_group},
     install_dir: gvfs_datadir / 'polkit-1/rules.d',
   )
 endif
