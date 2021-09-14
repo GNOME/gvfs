@@ -128,7 +128,7 @@ libgvfsdaemon = shared_library(
 )
 
 libgvfsdaemon_dep = declare_dependency(
-  include_directories: include_directories('.'),
+  include_directories: '.',
   dependencies: libgvfscommon_dep,
   compile_args: cflags,
   link_with: libgvfsdaemon,
