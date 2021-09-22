@@ -5,3 +5,4 @@ Description=Virtual filesystem service - GNOME Online Accounts monitor
 ExecStart=@libexecdir@/gvfs-goa-volume-monitor
 Type=dbus
 BusName=org.gtk.vfs.GoaVolumeMonitor
+Slice=session.slice

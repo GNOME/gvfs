@@ -5,3 +5,4 @@ Description=Virtual filesystem service - Media Transfer Protocol monitor
 ExecStart=@libexecdir@/gvfs-mtp-volume-monitor
 Type=dbus
 BusName=org.gtk.vfs.MTPVolumeMonitor
+Slice=session.slice

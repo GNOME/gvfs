@@ -5,3 +5,4 @@ Description=Virtual filesystem metadata service
 ExecStart=@libexecdir@/gvfsd-metadata
 Type=dbus
 BusName=org.gtk.vfs.Metadata
+Slice=session.slice

@@ -5,3 +5,4 @@ Description=Virtual filesystem service
 ExecStart=@libexecdir@/gvfsd
 Type=dbus
 BusName=org.gtk.vfs.Daemon
+Slice=session.slice

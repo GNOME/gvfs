@@ -5,3 +5,4 @@ Description=Virtual filesystem service - disk device monitor
 ExecStart=@libexecdir@/gvfs-udisks2-volume-monitor
 Type=dbus
 BusName=org.gtk.vfs.UDisks2VolumeMonitor
+Slice=session.slice
