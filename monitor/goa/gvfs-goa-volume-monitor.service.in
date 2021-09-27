@@ -1,5 +1,6 @@
 [Unit]
 Description=Virtual filesystem service - GNOME Online Accounts monitor
+PartOf=graphical-session.target
 
 [Service]
 ExecStart=@libexecdir@/gvfs-goa-volume-monitor

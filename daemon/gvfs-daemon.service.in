@@ -1,5 +1,6 @@
 [Unit]
 Description=Virtual filesystem service
+PartOf=graphical-session.target
 
 [Service]
 ExecStart=@libexecdir@/gvfsd

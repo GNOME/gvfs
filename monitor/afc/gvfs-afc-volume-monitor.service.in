@@ -1,5 +1,6 @@
 [Unit]
 Description=Virtual filesystem service - Apple File Conduit monitor
+PartOf=graphical-session.target
 
 [Service]
 ExecStart=@libexecdir@/gvfs-afc-volume-monitor

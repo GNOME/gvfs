@@ -1,5 +1,6 @@
 [Unit]
 Description=Virtual filesystem service - disk device monitor
+PartOf=graphical-session.target
 
 [Service]
 ExecStart=@libexecdir@/gvfs-udisks2-volume-monitor
