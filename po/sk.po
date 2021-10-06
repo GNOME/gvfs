@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2021-04-23 06:45+0000\n"
-"PO-Revision-Date: 2021-06-11 14:16+0200\n"
+"POT-Creation-Date: 2021-06-11 12:16+0000\n"
+"PO-Revision-Date: 2021-10-06 13:08+0200\n"
 "Last-Translator: Dušan Kazik <prescott66@gmail.com>\n"
 "Language-Team: Slovak <gnome-sk-list@gnome.org>\n"
 "Language: sk\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0;\n"
-"X-Generator: Poedit 2.4.3\n"
+"X-Generator: Poedit 3.0\n"
 
 #: client/gdaemonfile.c:435 client/gdaemonfile.c:2718
 msgid "Operation not supported, files on different mounts"
@@ -121,7 +121,7 @@ msgstr "Chyba pri získavaní informácií o pripojení: %s"
 #: daemon/gvfsafpvolume.c:2402 daemon/gvfsbackendadmin.c:150
 #: daemon/gvfsbackendafc.c:166 daemon/gvfsbackendgoogle.c:256
 #: daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1125
-#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:437
+#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:437 daemon/mount.c:437
 #, c-format
 msgid "Permission denied"
 msgstr "Prístup zamietnutý"
@@ -1698,13 +1698,7 @@ msgstr "Zadajte overovací kód pre %s"
 #  hostname/host; fingerprint
 #. Translators: the first %s is the hostname, the second the key fingerprint
 #: daemon/gvfsbackendsftp.c:1329
-#, fuzzy, c-format
-#| msgid ""
-#| "Can’t verify the identity of “%s”.\n"
-#| "This happens when you log in to a computer the first time.\n"
-#| "\n"
-#| "The identity sent by the remote computer is “%s”. If you want to be "
-#| "absolutely sure it is safe to continue, contact the system administrator."
+#, c-format
 msgid ""
 "Identity Verification Failed\n"
 "Verifying the identity of “%s” failed, this happens when you log in to a "
@@ -1713,8 +1707,9 @@ msgid ""
 "The identity sent by the remote computer is “%s”. If you want to be "
 "absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
-"Nie je možné overiť totožnosť pre „%s“.\n"
-"Overenie prebehne pri prvom prihlásení k počítaču.\n"
+"Zlyhalo overenie totožnosti\n"
+"Overenie totožnosti „%s“ zlyhalo. Overenie prebehne pri prvom prihlásení k "
+"počítaču.\n"
 "\n"
 "Totožnosť odoslaná vzdialeným počítačom je „%s“. Ak chcete mať absolútnu "
 "istotu, že je bezpečné pokračovať, kontaktujte vášho správcu systému."
@@ -1723,17 +1718,14 @@ msgstr ""
 #  hostname/host; fingerprint
 #. Translators: the first %s is the hostname, the second is an ip address
 #: daemon/gvfsbackendsftp.c:1358
-#, fuzzy, c-format
-#| msgid ""
-#| "The host key for “%s” differs from the key for the IP address “%s”\n"
-#| "If you want to be absolutely sure it is safe to continue, contact the "
-#| "system administrator."
+#, c-format
 msgid ""
 "Identity Verification Failed\n"
 "The host key for “%s” differs from the key for the IP address “%s”\n"
 "If you want to be absolutely sure it is safe to continue, contact the system "
 "administrator."
 msgstr ""
+"Zlyhalo overenie totožnosti\n"
 "Kľúč hostiteľa pre „%s“ je odlišný od kľúča pre IP adresu „%s“\n"
 "Ak sa chcete uistiť, že je úplne bezpečný a môžete pokračovať, kontaktuje "
 "správcu systému."
@@ -2082,24 +2074,24 @@ msgstr "%s: %s"
 msgid "Try “%s --help” for more information."
 msgstr "Viac informácii získate po zadaní „%s --help“."
 
-#: daemon/mount.c:759
+#: daemon/mount.c:783
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Automatické pripojenie zlyhalo: %s"
 
-#: daemon/mount.c:803 daemon/mount.c:879
+#: daemon/mount.c:827 daemon/mount.c:903
 msgid "The specified location is not mounted"
 msgstr "Uvedené umiestnenie nie je pripojené"
 
-#: daemon/mount.c:808
+#: daemon/mount.c:832
 msgid "The specified location is not supported"
 msgstr "Uvedené umiestnenie nie je podporované"
 
-#: daemon/mount.c:991
+#: daemon/mount.c:1015
 msgid "Location is already mounted"
 msgstr "Umiestnenie je už pripojené"
 
-#: daemon/mount.c:1000
+#: daemon/mount.c:1024
 msgid "Location is not mountable"
 msgstr "Umiestnenie nie je pripojiteľné"
 
@@ -2316,17 +2308,15 @@ msgstr "Pre prístup k zväzku sa požaduje heslo"
 # tu som skončil
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1499
-#, fuzzy, c-format
-#| msgid ""
-#| "Enter a passphrase to unlock the volume\n"
-#| "The volume %s might be a VeraCrypt volume as it contains random data."
+#, c-format
 msgid ""
 "Authentication Required\n"
 "A passphrase is needed to access encrypted data on “%s”.\n"
 "The volume might be a VeraCrypt volume as it contains random data."
 msgstr ""
-"Zadajte heslo na odomknutie zväzku\n"
-"Zariadenie %s môže byť zväzkom VeraCrypt, pretože obsahuje náhodné údaje."
+"Vyžaduje sa overenie totožnosti\n"
+"Je potrebné heslo na prístup k šifrovaným údajom na zväzku „%s“.\n"
+"Zväzok môže byť zväzkom VeraCrypt, pretože obsahuje náhodné údaje."
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1505
