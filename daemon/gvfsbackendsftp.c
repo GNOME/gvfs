@@ -1106,10 +1106,10 @@ handle_login (GVfsBackend *backend,
       if (g_str_has_suffix (buffer, "password: ") ||
           g_str_has_suffix (buffer, "Password: ") ||
           g_str_has_suffix (buffer, "Password:")  ||
-          g_str_has_prefix (buffer, "Password for ") ||
-          g_str_has_prefix (buffer, "Enter Kerberos password") ||
-          g_str_has_prefix (buffer, "Enter passphrase for key") ||
-          g_str_has_prefix (buffer, "Enter PASSCODE"))
+          strstr (buffer, "Password for ") ||
+          strstr (buffer, "Enter Kerberos password") ||
+          strstr (buffer, "Enter passphrase for key") ||
+          strstr (buffer, "Enter PASSCODE"))
         {
           gboolean aborted = FALSE;
           gsize bytes_written;
@@ -1265,8 +1265,8 @@ handle_login (GVfsBackend *backend,
               break;
             }
         }
-      else if (g_str_has_prefix (buffer, "Verification code") ||
-               g_str_has_prefix (buffer, "One-time password"))
+      else if (strstr (buffer, "Verification code") ||
+               strstr (buffer, "One-time password"))
         {
           gchar *verification_code = NULL;
           gboolean aborted = FALSE;
