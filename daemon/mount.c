@@ -419,7 +419,7 @@ child_watch_cb (GPid pid,
   GError *error = NULL;
   gint code = 0;
 
-  if (!g_spawn_check_exit_status (status, &error))
+  if (!g_spawn_check_wait_status (status, &error))
     {
       if (error->domain == G_SPAWN_EXIT_ERROR)
         code = error->code;

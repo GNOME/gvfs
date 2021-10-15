@@ -231,7 +231,7 @@ have_version_script = cc.has_link_argument('@0@,@1@'.format(version_script_ldfla
 
 gio_dep = dependency('gio-2.0')
 gio_unix_dep = dependency('gio-unix-2.0')
-glib_dep = dependency('glib-2.0', version: '>= 2.65.1')
+glib_dep = dependency('glib-2.0', version: '>= 2.70.0')
 gobject_dep = dependency('gobject-2.0')
 gsettings_desktop_schemas_dep = dependency('gsettings-desktop-schemas', version: '>= 3.33.0')
 
