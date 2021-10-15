@@ -13,6 +13,16 @@ RUN dnf install -y --nogpg --best elfutils-libelf-devel gcc gcc-c++ gdbm gettext
  && cd .. \
  && rm -rf glib
 
+RUN dnf install -y --nogpg libnghttp2-devel \
+ && dnf clean all \
+ && git clone --depth 1 https://gitlab.gnome.org/GNOME/libsoup.git \
+ && cd libsoup \
+ && meson . _build --prefix=/usr \
+ && ninja -C _build \
+ && ninja -C _build install \
+ && cd .. \
+ && rm -rf libsoup
+
 RUN sed -i -e 's/# %wheel/%wheel/' /etc/sudoers
 RUN useradd -G wheel -m user
 RUN passwd -d user
