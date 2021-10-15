@@ -14,6 +14,16 @@ RUN dnf builddep --nogpg -y glib \
  && cd .. \
  && rm -rf glib
 
+RUN dnf builddep --nogpg -y glib-networking \
+ && dnf clean all \
+ && git clone --depth 1 https://gitlab.gnome.org/GNOME/glib-networking.git \
+ && cd glib-networking \
+ && meson . _build --prefix=/usr \
+ && ninja -C _build \
+ && ninja -C _build install \
+ && cd .. \
+ && rm -rf glib-networking
+
 RUN dnf builddep --nogpg -y libsoup \
  && dnf install -y --nogpg libnghttp2-devel \
  && dnf clean all \
