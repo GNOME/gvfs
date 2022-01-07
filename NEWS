@@ -1,3 +1,11 @@
+Major changes in 1.49.1
+=======================
+* sftp: Adapt on new OpenSSH password prompts
+* build: Set of improvements for meson
+* Add PartOf=graphical-session.target to all systemd units
+* Move systemd services to session slice
+* Translation updates
+
 Major changes in 1.48.1
 =======================
 * build: Use install prefix in systemd files paths
