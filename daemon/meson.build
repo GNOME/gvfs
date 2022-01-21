@@ -360,7 +360,6 @@ if enable_admin
   policy = gvfs_namespace + '.file-operations.policy'
 
   i18n.merge_file(
-    policy,
     input: configure_file(
       input: policy + '.in.in',
       output: '@BASENAME@',
