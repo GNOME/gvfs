@@ -1,5 +1,5 @@
 # gvfs ja.po.
-# Copyright (C) 2008-2013, 2020 Free Software Foundation, Inc.
+# Copyright (C) 2008-2013, 2020, 2022 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gvfs package.
 # Takeshi AIHANA <takeshi.aihana@gmail.com>, 2008, 2009.
 # Shushi Kurose <md81bird@hitaki.net>, 2010.
@@ -8,14 +8,14 @@
 # Hajime Taira <htaira@redhat.com>, 2012.
 # Nishio Futoshi <fut_nis@d3.dion.ne.jp>, 2012.
 # Jiro Matsuzawa <jmatsuzawa@gnome.org>, 2013.
-# sicklylife <translation@sicklylife.jp>, 2020.
+# sicklylife <translation@sicklylife.jp>, 2020, 2022.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
 "POT-Creation-Date: 2021-02-12 13:52+0000\n"
-"PO-Revision-Date: 2020-02-09 00:00+0900\n"
+"PO-Revision-Date: 2022-01-30 21:00+0900\n"
 "Last-Translator: sicklylife <translation@sicklylife.jp>\n"
 "Language-Team: Japanese <gnome-translation@gnome.gr.jp>\n"
 "Language: ja\n"
@@ -315,6 +315,8 @@ msgid ""
 "Authentication Required\n"
 "Enter password for “%s” on “%s”:"
 msgstr ""
+"認証が必要です\n"
+"“%2$s”の“%1$s”のパスワードを入力してください:"
 
 #. Translators: %s here is the hostname
 #. Translators: %s is the hostname
@@ -326,6 +328,8 @@ msgid ""
 "Authentication Required\n"
 "Enter user and password for “%s”:"
 msgstr ""
+"認証が必要です\n"
+"“%s”のユーザー名とパスワードを入力してください:"
 
 #: daemon/gvfsafpserver.c:1098
 msgid "The password prompt was cancelled."
@@ -744,36 +748,32 @@ msgstr "%s 上のドキュメント"
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
 #: daemon/gvfsbackendafc.c:577
-#, fuzzy, c-format
-#| msgid ""
-#| "The device “%s” is locked. Enter the passcode on the device and click "
-#| "“Try again”."
+#, c-format
 msgid ""
 "Device Locked\n"
 "The device “%s” is locked.\n"
 "\n"
 "Enter the passcode on the device and click “Try again”."
 msgstr ""
-"デバイス“%s”はロックされています。デバイスのパスコードを入力し、“もう一度試"
-"す”をクリックしてください。"
+"デバイス“%s”はロックされています。\n"
+"\n"
+"デバイスのパスコードを入力し、“もう一度試す”をクリックしてください。"
 
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above. 'Trust' is the caption
 #. * of the button shown in the device.
 #: daemon/gvfsbackendafc.c:585
-#, fuzzy, c-format
-#| msgid ""
-#| "The device “%s” is not trusted yet. Select “Trust” on the device and "
-#| "click “Try again”."
+#, c-format
 msgid ""
 "Untrusted Device\n"
 "The device “%s” is not trusted yet.\n"
 "\n"
 "Select “Trust” on the device and click “Try again”."
 msgstr ""
-"デバイス“%s”はまだ信頼されていません。デバイスで“信頼”を選択し、“もう一度試"
-"す”をクリックしてください。"
+"デバイス“%s”はまだ信頼されていません。\n"
+"\n"
+"デバイスで“信頼”を選択し、“もう一度試す”をクリックしてください。"
 
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
@@ -1117,20 +1117,21 @@ msgstr "WebDAV 共有"
 #. Translators: %s is the name of the WebDAV share
 #. Translators: %s is a server name
 #: daemon/gvfsbackenddav.c:1591 daemon/gvfsbackendsmbbrowse.c:373
-#, fuzzy, c-format
-#| msgid "Authentication is required to perform file operations"
+#, c-format
 msgid ""
 "Authentication Required\n"
 "Enter password for “%s”:"
-msgstr "ファイル操作の実行には認証が必要です"
+msgstr ""
+"認証が必要です\n"
+"“%s”のパスワードを入力してください:"
 
 #: daemon/gvfsbackenddav.c:1594
-#, fuzzy
-#| msgid "Please enter proxy password"
 msgid ""
 "Authentication Required\n"
 "Enter proxy password:"
-msgstr "プロキシのパスワードを入力してください"
+msgstr ""
+"認証が必要です\n"
+"プロキシのパスワードを入力してください:"
 
 #: daemon/gvfsbackenddav.c:2064
 msgid "Not a WebDAV enabled share"
@@ -1204,10 +1205,8 @@ msgstr ""
 
 #. Translators: This is the "Shared drives" folder on https://drive.google.com.
 #: daemon/gvfsbackendgoogle.c:2987
-#, fuzzy
-#| msgid "Unnamed Drive"
 msgid "Shared drives"
-msgstr "名前のないドライブ"
+msgstr "共有ドライブ"
 
 #: daemon/gvfsbackendgoogle.c:3021 daemon/gvfsbackendgoogle.c:3599
 #: daemon/gvfsbackendgphoto2.c:1589
@@ -1449,7 +1448,7 @@ msgstr "フォルダー通知はサポートしていません"
 #: daemon/gvfsbackendmtp.c:194
 #, c-format
 msgid "Storage (%X)"
-msgstr ""
+msgstr "ストレージ (%X)"
 
 #: daemon/gvfsbackendmtp.c:592
 msgid "Unknown error."
@@ -1628,21 +1627,23 @@ msgstr "ホストの身元を確認できません"
 
 #. Translators: the first %s is the username, the second the host name
 #: daemon/gvfsbackendsftp.c:1164
-#, fuzzy, c-format
-#| msgid "Enter passphrase for secure key for %s on %s"
+#, c-format
 msgid ""
 "Authentication Required\n"
 "Enter passphrase for secure key for “%s” on “%s”:"
-msgstr "%2$s の %1$s のセキュアキーのパスフレーズを入力してください"
+msgstr ""
+"認証が必要です\n"
+"“%2$s”の“%1$s”のセキュアキーのパスフレーズを入力してください:"
 
 #. Translators: %s is the hostname
 #: daemon/gvfsbackendsftp.c:1171
-#, fuzzy, c-format
-#| msgid "Enter passphrase for secure key for %s"
+#, c-format
 msgid ""
 "Authentication Required\n"
 "Enter passphrase for secure key for “%s”:"
-msgstr "%s のセキュアキーのパスフレーズを入力してください"
+msgstr ""
+"認証が必要です\n"
+"“%s”のセキュアキーのパスフレーズを入力してください:"
 
 #: daemon/gvfsbackendsftp.c:1263 daemon/gvfsbackendsftp.c:1310
 msgid "Can’t send password"
@@ -1650,17 +1651,15 @@ msgstr "パスワードを送信できません"
 
 #. Translators: the first %s is the username, the second the host name
 #: daemon/gvfsbackendsftp.c:1278
-#, fuzzy, c-format
-#| msgid "Enter password for %s on %s"
+#, c-format
 msgid "Enter verification code for %s on %s"
-msgstr "%2$s の %1$s のパスワードを入力してください"
+msgstr "%2$s の %1$s の確認コードを入力してください"
 
 #. Translators: %s is the hostname
 #: daemon/gvfsbackendsftp.c:1282
-#, fuzzy, c-format
-#| msgid "Unsupported authentication method for %s"
+#, c-format
 msgid "Enter verification code for %s"
-msgstr "%s の認証方法をサポートしていません"
+msgstr "%s の確認コードを入力してください"
 
 #. Translators: the first %s is the hostname, the second the key fingerprint
 #: daemon/gvfsbackendsftp.c:1329
@@ -1788,6 +1787,8 @@ msgid ""
 "Authentication Required\n"
 "Enter password for share “%s” on “%s”:"
 msgstr ""
+"認証が必要です\n"
+"“%2$s”の共有名“%1$s”のパスワードを入力してください:"
 
 #. Translators: First %s is a share name, second is a server name
 #: daemon/gvfsbackendsmb.c:276
@@ -1796,6 +1797,8 @@ msgid ""
 "Authentication Required\n"
 "Enter user and password for share “%s” on “%s”:"
 msgstr ""
+"認証が必要です\n"
+"“%2$s”の共有名“%1$s”のユーザー名とパスワードを入力してください:"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: daemon/gvfsbackendsmb.c:556
@@ -1891,13 +1894,7 @@ msgstr "いいえ"
 
 #. Translators: The first %s is the reason why verification failed, the second a certificate
 #: daemon/gvfsdaemonutils.c:337
-#, fuzzy, c-format
-#| msgid ""
-#| "The site’s identity can’t be verified:%s\n"
-#| "\n"
-#| "%s\n"
-#| "\n"
-#| "Are you really sure you would like to continue?"
+#, c-format
 msgid ""
 "Identity Verification Failed\n"
 "%s\n"
@@ -1906,7 +1903,8 @@ msgid ""
 "\n"
 "Are you really sure you would like to continue?"
 msgstr ""
-"サイトの識別情報を確認できません:%s\n"
+"本人確認に失敗しました\n"
+"%s\n"
 "\n"
 "%s\n"
 "\n"
@@ -2281,31 +2279,26 @@ msgstr "このボリュームにアクセスするにはパスフレーズが必
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1499
-#, fuzzy, c-format
-#| msgid ""
-#| "Enter a passphrase to unlock the volume\n"
-#| "The volume %s might be a VeraCrypt volume as it contains random data."
+#, c-format
 msgid ""
 "Authentication Required\n"
 "A passphrase is needed to access encrypted data on “%s”.\n"
 "The volume might be a VeraCrypt volume as it contains random data."
 msgstr ""
-"ボリュームのロックを解除するパスフレーズを入力してください\n"
-"ボリューム %s はランダムデータを含んでいるため、VeraCrypt ボリュームである可"
-"能性があります。"
+"認証が必要です\n"
+"パスフレーズは“%s”上の暗号化されたデータへのアクセスに必要です。\n"
+"ボリュームがランダムデータを含んでいるため VeraCrypt ボリュームである可能"
+"性があります。"
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1505
-#, fuzzy, c-format
-#| msgid ""
-#| "Enter a passphrase to unlock the volume\n"
-#| "The passphrase is needed to access encrypted data on %s."
+#, c-format
 msgid ""
 "Authentication Required\n"
 "A passphrase is needed to access encrypted data on “%s”."
 msgstr ""
-"ボリュームのロックを解除するパスフレーズを入力してください\n"
-"パスフレーズは、 %s 上の暗号化されたデータへのアクセスに必要です。"
+"認証が必要です\n"
+"パスフレーズは“%s”上の暗号化されたデータへのアクセスに必要です。"
 
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
