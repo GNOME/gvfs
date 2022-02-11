@@ -1,3 +1,10 @@
+Major changes in 1.49.90
+========================
+* http/dav: Port to libsoup3 (Daniel Kolesa)
+* http: Do not silently accept invalid certificates (Daniel Kolesa)
+* build: Remove incorrect i18n.merge_file argument to fix build (Ondrej Holy)
+* Translation updates
+
 Major changes in 1.49.1
 =======================
 * sftp: Adapt on new OpenSSH password prompts
