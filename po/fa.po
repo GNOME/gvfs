@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2021-02-12 13:52+0000\n"
-"PO-Revision-Date: 2021-09-22 17:56+0330\n"
+"POT-Creation-Date: 2022-02-02 10:02+0000\n"
+"PO-Revision-Date: 2022-03-08 13:02+0330\n"
 "Last-Translator: Danial Behzadi <dani.behzi@ubuntu.com>\n"
 "Language-Team: Persian <>\n"
 "Language: fa\n"
@@ -18,22 +18,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.0\n"
 
 #: client/gdaemonfile.c:435 client/gdaemonfile.c:2718
 msgid "Operation not supported, files on different mounts"
-msgstr ""
+msgstr "عملیات پشتیانی نشده. پرونده‌ها جاهای مختلفی سوار شده‌اند"
 
 #: client/gdaemonfile.c:1028 client/gdaemonfile.c:3066
 #: client/gvfsiconloadable.c:351 daemon/gvfsjobopenforread.c:183
 #: daemon/gvfsjobopenforwrite.c:333
 msgid "Couldn’t get stream file descriptor"
-msgstr ""
+msgstr "نتوانست توصیفگر پروندهٔ جریانی را بگیرد"
 
 #: client/gdaemonfile.c:1144 client/gdaemonfile.c:1216
 #: client/gvfsiconloadable.c:145
 msgid "Didn’t get stream file descriptor"
-msgstr ""
+msgstr "توصیفگر پروندهٔ جریانی را نگرفت"
 
 #: client/gdaemonfile.c:1338
 #, c-format
@@ -101,15 +101,27 @@ msgid "Seek not supported on stream"
 msgstr "جست‌وجو در این جریان پشتیبانی نمی‌شود"
 
 #: client/gdaemonfileoutputstream.c:1204
-#, fuzzy
-#| msgid "Seek not supported on stream"
 msgid "Truncate not supported on stream"
-msgstr "جست‌وجو در این جریان پشتیبانی نمی‌شود"
+msgstr "هرس روی جریان پشتیبانی نمی‌شود"
 
 #: client/gdaemonvfs.c:780
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "خطا درهنگام دریافت اطلاعات سوارکردن: %s"
+
+#: client/gvfsdaemondbus.c:285 client/gvfsdaemondbus.c:651
+#: daemon/gvfsafpvolume.c:394 daemon/gvfsafpvolume.c:655
+#: daemon/gvfsafpvolume.c:799 daemon/gvfsafpvolume.c:980
+#: daemon/gvfsafpvolume.c:1164 daemon/gvfsafpvolume.c:1339
+#: daemon/gvfsafpvolume.c:1491 daemon/gvfsafpvolume.c:1913
+#: daemon/gvfsafpvolume.c:2034 daemon/gvfsafpvolume.c:2189
+#: daemon/gvfsafpvolume.c:2402 daemon/gvfsbackendadmin.c:150
+#: daemon/gvfsbackendafc.c:166 daemon/gvfsbackendgoogle.c:256
+#: daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1125
+#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:437 daemon/mount.c:437
+#, c-format
+msgid "Permission denied"
+msgstr "اجازه داده نشد"
 
 #: common/gvfsdaemonprotocol.c:358
 msgid "Invalid file info format"
@@ -128,7 +140,7 @@ msgstr "خطا هنگام تنظیم اولیهٔ Avahi: %s"
 #: common/gvfsdnssdresolver.c:1144
 #, c-format
 msgid "Error resolving “%s” service “%s” on domain “%s”"
-msgstr ""
+msgstr "خطا در یافتن خدمت «%s» «%s» روی دامنهٔ «%s»"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -142,6 +154,8 @@ msgid ""
 "Error resolving “%s” service “%s” on domain “%s”. One or more TXT records are "
 "missing. Keys required: “%s”."
 msgstr ""
+"خطا در یافتن خدمت «%s» «%s» روی دامنهٔ «%s». یکی یا بیش‌تر از رکوردهای TXT وجود "
+"ندارند. کلیدهای مورد نیاز: «%s»."
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -151,29 +165,26 @@ msgstr ""
 #: common/gvfsdnssdresolver.c:1183
 #, c-format
 msgid "Timed out resolving “%s” service “%s” on domain “%s”"
-msgstr ""
+msgstr "پایان زمان یافتن خدمت «%s» «%s» روی دامنهٔ «%s»"
 
 #: common/gvfsdnssdresolver.c:1223
-#, fuzzy
-#| msgid "Error initializing Avahi: %s"
 msgid "Error initializing Avahi resolver"
-msgstr "خطا هنگام تنظیم اولیهٔ Avahi: %s"
+msgstr "خطای راه‌اندازی نخستین یابندهٔ Avahi"
 
 #: common/gvfsdnssdutils.c:233 common/gvfsdnssdutils.c:263
 #: common/gvfsdnssdutils.c:280
 #, c-format
 msgid "Malformed DNS-SD encoded_triple “%s”"
-msgstr ""
+msgstr "DNS-SD encoded_triple بدریخت «%s»"
 
 #: common/gvfsicon.c:250
-#, fuzzy, c-format
-#| msgid "Can't handle version %d of GVfsIcon encoding"
+#, c-format
 msgid "Can’t handle version %d of GVfsIcon encoding"
-msgstr "نمی‌توان با رمزنگاری نسخه %Id از GVfsIcon کار کرد"
+msgstr "نمی‌توان نگارش %Id از رمزگذاری GVfsIcon را مدیریت کرد"
 
 #: common/gvfsicon.c:260
 msgid "Malformed input data for GVfsIcon"
-msgstr ""
+msgstr "داده‌ّای ورودی بدریخت برای GVfsIcon"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "FTP"
@@ -190,17 +201,16 @@ msgstr "خطا: %s"
 #: daemon/daemon-main.c:236
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
-msgstr ""
+msgstr "استفاده: ‪%s --spawner dbus-id object_path"
 
 #: daemon/daemon-main.c:260 daemon/daemon-main.c:278
-#, fuzzy, c-format
+#, c-format
 msgid "Usage: %s key=value key=value …"
-msgstr "گرفتن مقدار KEY"
+msgstr "استفاده: ‪%s key=value key=value …"
 
 #: daemon/daemon-main.c:276
-#, fuzzy
 msgid "No mount type specified"
-msgstr "هیچ گرداننده مرجعی مشخص نشده"
+msgstr "هیچ گونهٔ سوار کردنی مشخّص نشده"
 
 #: daemon/daemon-main.c:308
 #, c-format
@@ -241,7 +251,7 @@ msgstr "انتهای غیرمنتظرهٔ جریان دریافت شد"
 #, c-format
 msgid "The server doesn’t support passwords longer than %d character."
 msgid_plural "The server doesn’t support passwords longer than %d characters."
-msgstr[0] ""
+msgstr[0] "کارساز از گذرواژه‌های بلندتر از %Id نویسه پشتیبانی نمی‌کند."
 
 #: daemon/gvfsafpserver.c:221 daemon/gvfsafpserver.c:530
 msgid "An invalid username was provided."
@@ -250,24 +260,24 @@ msgstr "نام‌کاربری نامعتبری ارائه شده."
 #: daemon/gvfsafpserver.c:390
 #, c-format
 msgid "Unable to login to the server “%s” with the given password."
-msgstr ""
+msgstr "ناتوان در ورود به کارساز «%s» با گذرواژهٔ داده شده."
 
 #: daemon/gvfsafpserver.c:425 daemon/gvfsafpserver.c:647
 #: daemon/gvfsafpserver.c:823 daemon/gvfsafpserver.c:871
 #: daemon/gvfsafpserver.c:987 daemon/gvfsafpserver.c:1659
 #, c-format
 msgid "Unable to connect to the server “%s”. A communication problem occurred."
-msgstr ""
+msgstr "ناتوان در وصل شدن به کارساز «%s». مشکلی ارتباطی رخ داد."
 
 #: daemon/gvfsafpserver.c:620
 #, c-format
 msgid "Unable to connect to the server “%s” with the given password."
-msgstr ""
+msgstr "ناتوان در وصل شدن به کارساز «%s» با گذرواژهٔ داده شده."
 
 #: daemon/gvfsafpserver.c:673 daemon/gvfsafpserver.c:698
 #, c-format
 msgid "The server “%s” doesn’t support anonymous access."
-msgstr ""
+msgstr "کارساز «%s» از دسترسی ناشناس پشتیبانی نمی‌کند."
 
 #: daemon/gvfsafpserver.c:726
 #, c-format
@@ -275,6 +285,7 @@ msgid ""
 "Unable to connect to the server “%s”. No suitable authentication mechanism "
 "was found."
 msgstr ""
+"ناتوان در وصل شدن به کارساز «%s». هیچ سازوکار تأیید هویت مناسبی پیدا نشد."
 
 #: daemon/gvfsafpserver.c:801
 #, c-format
@@ -282,6 +293,8 @@ msgid ""
 "Unable to connect to the server “%s”. The server doesn’t support AFP version "
 "3.0 or later."
 msgstr ""
+"ناتوان در وصل شدن به کارساز «%s». کارساز از نگارش ۳٫۰ یا بالاتر AFP پشتیبانی "
+"نمی‌کند."
 
 #: daemon/gvfsafpserver.c:912
 #, c-format
@@ -311,6 +324,8 @@ msgid ""
 "Authentication Required\n"
 "Enter password for “%s” on “%s”:"
 msgstr ""
+"نیاز به تأیید هویت\n"
+"گذرواژهٔ «%s» روی «%s» را وارد کنید:"
 
 #. Translators: %s here is the hostname
 #. Translators: %s is the hostname
@@ -322,6 +337,8 @@ msgid ""
 "Authentication Required\n"
 "Enter user and password for “%s”:"
 msgstr ""
+"نیاز به تأیید هویت\n"
+"کاربر و گذرواژهٔ «%s» را وارد کنید:"
 
 #: daemon/gvfsafpserver.c:1098
 msgid "The password prompt was cancelled."
@@ -333,7 +350,7 @@ msgstr "ناتوان در قطع شدن از کارساز."
 
 #: daemon/gvfsafpserver.c:1357 daemon/gvfsafpserver.c:1733
 msgid "Unable to connect to the server. A communication problem occurred."
-msgstr ""
+msgstr "ناتوان در وصل شدن به کارساز. مشکلی ارتباطی رخ داد."
 
 #: daemon/gvfsafpserver.c:1692
 msgid "Identification not found."
@@ -347,7 +364,7 @@ msgstr "خطای «%s» از کارساز دریافت شد"
 #: daemon/gvfsafputils.c:127
 #, c-format
 msgid "Got unknown error code %d from server"
-msgstr ""
+msgstr "رمز خطای ناشناختهٔ %Id از کارساز گرفته شد"
 
 #: daemon/gvfsafpvolume.c:136
 msgid "Volume doesn’t exist"
@@ -357,20 +374,7 @@ msgstr "حجم وجود ندارد"
 #: daemon/gvfsafpvolume.c:158
 #, c-format
 msgid "Couldn’t load %s on %s"
-msgstr ""
-
-#: daemon/gvfsafpvolume.c:394 daemon/gvfsafpvolume.c:655
-#: daemon/gvfsafpvolume.c:799 daemon/gvfsafpvolume.c:980
-#: daemon/gvfsafpvolume.c:1164 daemon/gvfsafpvolume.c:1339
-#: daemon/gvfsafpvolume.c:1491 daemon/gvfsafpvolume.c:1913
-#: daemon/gvfsafpvolume.c:2034 daemon/gvfsafpvolume.c:2189
-#: daemon/gvfsafpvolume.c:2402 daemon/gvfsbackendadmin.c:141
-#: daemon/gvfsbackendafc.c:166 daemon/gvfsbackendgoogle.c:256
-#: daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1125
-#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:437
-#, c-format
-msgid "Permission denied"
-msgstr "اجازه داده نشد"
+msgstr "نتوانست %s را روی %s بار کند"
 
 #: daemon/gvfsafpvolume.c:398 daemon/gvfsafpvolume.c:1652
 #: daemon/gvfsafpvolume.c:2406 daemon/gvfsbackendafc.c:150
@@ -393,8 +397,8 @@ msgstr "پرونده وجود ندارد"
 
 #: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2410
 #: daemon/gvfsbackendafp.c:289 daemon/gvfsbackendafp.c:492
-#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2410
-#: daemon/gvfsbackenddav.c:3073 daemon/gvfsbackenddav.c:3353
+#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2558
+#: daemon/gvfsbackenddav.c:3320 daemon/gvfsbackenddav.c:3524
 #: daemon/gvfsbackendftp.c:832 daemon/gvfsbackendnfs.c:2480
 #: daemon/gvfsbackendsftp.c:2725 daemon/gvfsbackendsftp.c:3500
 #: daemon/gvfsbackendsftp.c:3948 daemon/gvfsbackendsftp.c:5020
@@ -411,14 +415,14 @@ msgid "Target file is open"
 msgstr "پرونده هدف باز است"
 
 #: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
-#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2800
+#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3012
 #: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendsftp.c:2209
 msgid "Directory not empty"
 msgstr "شاخه خالی نیست"
 
 #: daemon/gvfsafpvolume.c:667
 msgid "Target object is marked as not deletable (DeleteInhibit)"
-msgstr ""
+msgstr "شی هدف به عنوان حذف نشدنی نشانه‌گذاری شده (DeleteInhibit)"
 
 #: daemon/gvfsafpvolume.c:671 daemon/gvfsafpvolume.c:1180
 #: daemon/gvfsafpvolume.c:2038 daemon/gvfsbackendgoogle.c:262
@@ -440,10 +444,10 @@ msgstr "فضای کافی در حجم وجود ندارد"
 
 #: daemon/gvfsafpvolume.c:811 daemon/gvfsafpvolume.c:1355
 #: daemon/gvfsafpvolume.c:1507 daemon/gvfsbackendafp.c:296
-#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2465
-#: daemon/gvfsbackenddav.c:2761 daemon/gvfsbackenddav.c:2869
-#: daemon/gvfsbackenddav.c:3006 daemon/gvfsbackenddav.c:3082
-#: daemon/gvfsbackenddav.c:3120 daemon/gvfsbackenddav.c:3344
+#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2626
+#: daemon/gvfsbackenddav.c:2974 daemon/gvfsbackenddav.c:3099
+#: daemon/gvfsbackenddav.c:3251 daemon/gvfsbackenddav.c:3329
+#: daemon/gvfsbackenddav.c:3373 daemon/gvfsbackenddav.c:3514
 #: daemon/gvfsbackendftp.c:811 daemon/gvfsbackendftp.c:999
 #: daemon/gvfsbackendftp.c:1509 daemon/gvfsbackendftp.c:1576
 #: daemon/gvfsbackendgoogle.c:1703 daemon/gvfsbackendgoogle.c:1780
@@ -463,7 +467,7 @@ msgstr "شاخهٔ بالاتر وجود ندارد"
 #. (all files are in the volume root)
 #: daemon/gvfsafpvolume.c:990
 msgid "Volume is flat and doesn’t support directories"
-msgstr ""
+msgstr "حجم مسطّح بوده و از شاخه‌ها پشتیبانی نمی‌کند"
 
 #: daemon/gvfsafpvolume.c:998
 msgid "Target directory already exists"
@@ -479,27 +483,24 @@ msgstr "شی با آن نام از قبل وجود دارد"
 
 #: daemon/gvfsafpvolume.c:1176
 msgid "Target object is marked as not renameable (RenameInhibit)"
-msgstr ""
+msgstr "شی هدف به عنوان تغییرنام نشدنی نشانه‌گذاری شده (RenameInhibit)"
 
 #: daemon/gvfsafpvolume.c:1343
-#, fuzzy
-#| msgid "Can't move directory over directory"
 msgid "Can’t move directory into one of its descendants"
-msgstr "نمی‌توان شاخه را روی شاخه جابه‌جا کرد"
+msgstr "نمی‌توان شاخه را به یکی از نوادگانش جابه‌جا کرد"
 
 #: daemon/gvfsafpvolume.c:1347
-#, fuzzy
-#| msgid "Can't move directory over directory"
 msgid "Can’t move sharepoint into a shared directory"
-msgstr "نمی‌توان شاخه را روی شاخه جابه‌جا کرد"
+msgstr "نمی‌توان نقطهٔ هم‌رسانی را به شاخه‌ای هم‌رسانده جابه‌جا کرد"
 
 #: daemon/gvfsafpvolume.c:1351
 msgid "Can’t move a shared directory into the Trash"
-msgstr ""
+msgstr "نمی‌توان شاخه‌ای هم‌رسانده را به زباله‌دان فرستاد"
 
 #: daemon/gvfsafpvolume.c:1359
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
 msgstr ""
+"شی در حال جابه‌جایی به عنوان تغییرنام نشدنی نشانه‌گذاری شده (RenameInhibit)"
 
 #: daemon/gvfsafpvolume.c:1363
 msgid "Object being moved doesn’t exist"
@@ -525,7 +526,7 @@ msgstr "پرونده هدف یک شاخه است"
 #. requested data are locked by another user
 #: daemon/gvfsafpvolume.c:1923
 msgid "Range lock conflict exists"
-msgstr ""
+msgstr "تداخل قفل دامنه وجود دارد"
 
 #: daemon/gvfsafpvolume.c:2193 daemon/gvfsbackendmtp.c:1473
 #: daemon/gvfsbackendmtp.c:1498 daemon/gvfsbackendmtp.c:1701
@@ -544,7 +545,7 @@ msgstr "پرونده برای دسترسی نوشتن باز نیست"
 
 #: daemon/gvfsafpvolume.c:2538
 msgid "File is locked by another user"
-msgstr ""
+msgstr "پرونده به دست کاربری دیگر قفل شده"
 
 #: daemon/gvfsafpvolume.c:2670
 msgid "File is not open for read access"
@@ -554,66 +555,66 @@ msgstr "پرونده برای دسترسیِ خواندن باز نیست"
 #. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
 #. * fallback copy.
 #.
-#: daemon/gvfsbackendadmin.c:862 daemon/gvfsbackendafc.c:2361
-#: daemon/gvfsbackendafp.c:1781 daemon/gvfsbackendburn.c:829
-#: daemon/gvfsbackendburn.c:951 daemon/gvfsbackendcomputer.c:812
-#: daemon/gvfsbackenddav.c:3427 daemon/gvfsbackenddav.c:3459
-#: daemon/gvfsbackenddav.c:3487 daemon/gvfsbackendftp.c:1209
-#: daemon/gvfsbackendftp.c:1257 daemon/gvfsbackendftp.c:1278
-#: daemon/gvfsbackendftp.c:1624 daemon/gvfsbackendgoogle.c:1590
-#: daemon/gvfsbackendgoogle.c:1623 daemon/gvfsbackendgoogle.c:1652
-#: daemon/gvfsbackendgoogle.c:1675 daemon/gvfsbackendgoogle.c:1741
-#: daemon/gvfsbackendgoogle.c:2013 daemon/gvfsbackendgoogle.c:2045
-#: daemon/gvfsbackendgoogle.c:2084 daemon/gvfsbackendgoogle.c:2117
-#: daemon/gvfsbackendgoogle.c:2127 daemon/gvfsbackendgoogle.c:2198
-#: daemon/gvfsbackendgoogle.c:2393 daemon/gvfsbackendgoogle.c:2508
-#: daemon/gvfsbackendgoogle.c:2733 daemon/gvfsbackendgoogle.c:3069
-#: daemon/gvfsbackendgoogle.c:3079 daemon/gvfsbackendgoogle.c:3114
-#: daemon/gvfsbackendgoogle.c:3181 daemon/gvfsbackendgoogle.c:3190
-#: daemon/gvfsbackendgoogle.c:3774 daemon/gvfsbackendgoogle.c:3835
-#: daemon/gvfsbackendgoogle.c:3852 daemon/gvfsbackendgoogle.c:3864
-#: daemon/gvfsbackendgoogle.c:3950 daemon/gvfsbackendgoogle.c:3967
-#: daemon/gvfsbackendgphoto2.c:2238 daemon/gvfsbackendgphoto2.c:2451
-#: daemon/gvfsbackendgphoto2.c:2548 daemon/gvfsbackendgphoto2.c:2641
-#: daemon/gvfsbackendgphoto2.c:3250 daemon/gvfsbackendgphoto2.c:3258
-#: daemon/gvfsbackendgphoto2.c:3268 daemon/gvfsbackendmtp.c:1746
-#: daemon/gvfsbackendmtp.c:2047 daemon/gvfsbackendmtp.c:2296
-#: daemon/gvfsbackendmtp.c:2487 daemon/gvfsbackendmtp.c:2570
-#: daemon/gvfsbackendmtp.c:2658 daemon/gvfsbackendmtp.c:2726
-#: daemon/gvfsbackendmtp.c:2921 daemon/gvfsbackendmtp.c:3064
-#: daemon/gvfsbackendnfs.c:2372 daemon/gvfsbackendnfs.c:2422
-#: daemon/gvfsbackendnfs.c:2548 daemon/gvfsbackendsftp.c:2213
-#: daemon/gvfsbackendsftp.c:5417 daemon/gvfsbackendsftp.c:5515
-#: daemon/gvfsbackendsftp.c:6227 daemon/gvfsbackendsftp.c:6259
-#: daemon/gvfsbackendsftp.c:6285 daemon/gvfsbackendsftp.c:6293
-#: daemon/gvfsbackendsftp.c:6780 daemon/gvfsbackendsftp.c:6842
-#: daemon/gvfsbackendsftp.c:6850 daemon/gvfsbackendsmb.c:1714
-#: daemon/gvfsftptask.c:429 daemon/gvfsjobcloseread.c:113
-#: daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
-#: daemon/gvfsjobcreatemonitor.c:143 daemon/gvfsjobcreatemonitor.c:154
-#: daemon/gvfsjobcreatemonitor.c:177 daemon/gvfsjobcreatemonitor.c:195
-#: daemon/gvfsjobdelete.c:108 daemon/gvfsjobenumerate.c:272
-#: daemon/gvfsjobmakedirectory.c:108 daemon/gvfsjobmount.c:112
-#: daemon/gvfsjobmountmountable.c:138 daemon/gvfsjobmove.c:121
-#: daemon/gvfsjobopenforread.c:120 daemon/gvfsjobopenforwrite.c:184
-#: daemon/gvfsjobopenforwrite.c:198 daemon/gvfsjobopenforwrite.c:212
-#: daemon/gvfsjobopeniconforread.c:104 daemon/gvfsjobpollmountable.c:107
-#: daemon/gvfsjobpull.c:125 daemon/gvfsjobpush.c:125
-#: daemon/gvfsjobqueryattributes.c:145 daemon/gvfsjobqueryfsinfo.c:116
-#: daemon/gvfsjobqueryinfo.c:124 daemon/gvfsjobqueryinforead.c:125
-#: daemon/gvfsjobqueryinfowrite.c:125 daemon/gvfsjobread.c:123
-#: daemon/gvfsjobseekread.c:121 daemon/gvfsjobseekwrite.c:121
-#: daemon/gvfsjobsetattribute.c:130 daemon/gvfsjobsetdisplayname.c:111
-#: daemon/gvfsjobstartmountable.c:113 daemon/gvfsjobstopmountable.c:115
-#: daemon/gvfsjobtrash.c:107 daemon/gvfsjobtruncate.c:113
-#: daemon/gvfsjobunmountmountable.c:157 daemon/gvfsjobunmountmountable.c:172
-#: daemon/gvfsjobwrite.c:123
+#: daemon/gvfsbackendadmin.c:104 daemon/gvfsbackendadmin.c:871
+#: daemon/gvfsbackendafc.c:2361 daemon/gvfsbackendafp.c:1781
+#: daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
+#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:3599
+#: daemon/gvfsbackenddav.c:3631 daemon/gvfsbackenddav.c:3659
+#: daemon/gvfsbackendftp.c:1209 daemon/gvfsbackendftp.c:1257
+#: daemon/gvfsbackendftp.c:1278 daemon/gvfsbackendftp.c:1624
+#: daemon/gvfsbackendgoogle.c:1590 daemon/gvfsbackendgoogle.c:1623
+#: daemon/gvfsbackendgoogle.c:1652 daemon/gvfsbackendgoogle.c:1675
+#: daemon/gvfsbackendgoogle.c:1741 daemon/gvfsbackendgoogle.c:2013
+#: daemon/gvfsbackendgoogle.c:2045 daemon/gvfsbackendgoogle.c:2084
+#: daemon/gvfsbackendgoogle.c:2117 daemon/gvfsbackendgoogle.c:2127
+#: daemon/gvfsbackendgoogle.c:2198 daemon/gvfsbackendgoogle.c:2393
+#: daemon/gvfsbackendgoogle.c:2508 daemon/gvfsbackendgoogle.c:2733
+#: daemon/gvfsbackendgoogle.c:3069 daemon/gvfsbackendgoogle.c:3079
+#: daemon/gvfsbackendgoogle.c:3114 daemon/gvfsbackendgoogle.c:3181
+#: daemon/gvfsbackendgoogle.c:3190 daemon/gvfsbackendgoogle.c:3774
+#: daemon/gvfsbackendgoogle.c:3835 daemon/gvfsbackendgoogle.c:3852
+#: daemon/gvfsbackendgoogle.c:3864 daemon/gvfsbackendgoogle.c:3950
+#: daemon/gvfsbackendgoogle.c:3967 daemon/gvfsbackendgphoto2.c:2238
+#: daemon/gvfsbackendgphoto2.c:2451 daemon/gvfsbackendgphoto2.c:2548
+#: daemon/gvfsbackendgphoto2.c:2641 daemon/gvfsbackendgphoto2.c:3250
+#: daemon/gvfsbackendgphoto2.c:3258 daemon/gvfsbackendgphoto2.c:3268
+#: daemon/gvfsbackendmtp.c:1746 daemon/gvfsbackendmtp.c:2047
+#: daemon/gvfsbackendmtp.c:2296 daemon/gvfsbackendmtp.c:2487
+#: daemon/gvfsbackendmtp.c:2570 daemon/gvfsbackendmtp.c:2658
+#: daemon/gvfsbackendmtp.c:2726 daemon/gvfsbackendmtp.c:2921
+#: daemon/gvfsbackendmtp.c:3064 daemon/gvfsbackendnfs.c:2372
+#: daemon/gvfsbackendnfs.c:2422 daemon/gvfsbackendnfs.c:2548
+#: daemon/gvfsbackendsftp.c:2213 daemon/gvfsbackendsftp.c:5417
+#: daemon/gvfsbackendsftp.c:5515 daemon/gvfsbackendsftp.c:6227
+#: daemon/gvfsbackendsftp.c:6259 daemon/gvfsbackendsftp.c:6285
+#: daemon/gvfsbackendsftp.c:6293 daemon/gvfsbackendsftp.c:6780
+#: daemon/gvfsbackendsftp.c:6842 daemon/gvfsbackendsftp.c:6850
+#: daemon/gvfsbackendsmb.c:1714 daemon/gvfsftptask.c:429
+#: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121
+#: daemon/gvfsjobcopy.c:121 daemon/gvfsjobcreatemonitor.c:143
+#: daemon/gvfsjobcreatemonitor.c:154 daemon/gvfsjobcreatemonitor.c:177
+#: daemon/gvfsjobcreatemonitor.c:195 daemon/gvfsjobdelete.c:108
+#: daemon/gvfsjobenumerate.c:272 daemon/gvfsjobmakedirectory.c:108
+#: daemon/gvfsjobmount.c:112 daemon/gvfsjobmountmountable.c:138
+#: daemon/gvfsjobmove.c:121 daemon/gvfsjobopenforread.c:120
+#: daemon/gvfsjobopenforwrite.c:184 daemon/gvfsjobopenforwrite.c:198
+#: daemon/gvfsjobopenforwrite.c:212 daemon/gvfsjobopeniconforread.c:104
+#: daemon/gvfsjobpollmountable.c:107 daemon/gvfsjobpull.c:125
+#: daemon/gvfsjobpush.c:125 daemon/gvfsjobqueryattributes.c:145
+#: daemon/gvfsjobqueryfsinfo.c:116 daemon/gvfsjobqueryinfo.c:124
+#: daemon/gvfsjobqueryinforead.c:125 daemon/gvfsjobqueryinfowrite.c:125
+#: daemon/gvfsjobread.c:123 daemon/gvfsjobseekread.c:121
+#: daemon/gvfsjobseekwrite.c:121 daemon/gvfsjobsetattribute.c:130
+#: daemon/gvfsjobsetdisplayname.c:111 daemon/gvfsjobstartmountable.c:113
+#: daemon/gvfsjobstopmountable.c:115 daemon/gvfsjobtrash.c:107
+#: daemon/gvfsjobtruncate.c:113 daemon/gvfsjobunmountmountable.c:157
+#: daemon/gvfsjobunmountmountable.c:172 daemon/gvfsjobwrite.c:123
 msgid "Operation not supported"
 msgstr "عملیات پشتیبانی نمی‌شود"
 
-#: daemon/gvfsbackendadmin.c:990 daemon/gvfsbackendarchive.c:639
-#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:1903
-#: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:256
+#: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639
+#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2009
+#: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:303
 #: daemon/gvfsbackendsmb.c:596
 msgid "Invalid mount spec"
 msgstr "تنظیمات سوارکردن نامعتبر"
@@ -637,7 +638,7 @@ msgstr "یک دادهٔ نامعتبر از کنترل پروندهٔ اپل د�
 #: daemon/gvfsbackendafc.c:174
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
-msgstr ""
+msgstr "خطای مدیریت نشدهٔ واپایش پروندهٔ اپل (%Id)"
 
 #: daemon/gvfsbackendafc.c:190
 msgid "Listing applications installed on device failed"
@@ -657,15 +658,15 @@ msgstr "افزاره با گذرواژه محافظت شده"
 
 #: daemon/gvfsbackendafc.c:236
 msgid "Unable to connect"
-msgstr ""
+msgstr "ناتوان در وصل شدن"
 
 #: daemon/gvfsbackendafc.c:240
 msgid "User refused to trust this computer"
-msgstr ""
+msgstr "کاربر از اعتماد به این رایانه سر باز زد"
 
 #: daemon/gvfsbackendafc.c:244
 msgid "The user has not trusted this computer"
-msgstr ""
+msgstr "کاربر به این رایانه اعتماد ندارد"
 
 #: daemon/gvfsbackendafc.c:248
 #, c-format
@@ -681,6 +682,8 @@ msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
 msgstr ""
+"خطای libimobiledevice: هیچ افزاره‌ای پیدا نشد. مطمئن شوید که usbmuxd به درستی "
+"برپا شده."
 
 #: daemon/gvfsbackendafc.c:273
 #, c-format
@@ -698,7 +701,7 @@ msgstr "لغو"
 
 #: daemon/gvfsbackendafc.c:411 daemon/gvfsbackendafc.c:442
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
-msgstr ""
+msgstr "مکان AFC نامعتبر: باید در قالب ‪afc://uuid:port-number‬ باشد"
 
 #: daemon/gvfsbackendafc.c:428
 #, c-format
@@ -742,6 +745,10 @@ msgid ""
 "\n"
 "Enter the passcode on the device and click “Try again”."
 msgstr ""
+"افزاره قفل شده\n"
+"افزارهٔ «%s» قفل شده است.\n"
+"\n"
+"رمز عبور را روی افزاره وارد کرده و «تلاش دوباره» را بزنید."
 
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
@@ -755,6 +762,10 @@ msgid ""
 "\n"
 "Select “Trust” on the device and click “Try again”."
 msgstr ""
+"افزارهٔ اعتماد نشده\n"
+"افزارهٔ «%s» مورد اعتماد نیست.\n"
+"\n"
+"«اعتماد» را روی دستگاه گزیده و «تلاش دوباره» را بزنید."
 
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
@@ -766,7 +777,7 @@ msgstr "نمی‌توان شاخه را گشود"
 
 #: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528
 #: daemon/gvfsbackendafp.c:1270 daemon/gvfsbackendafp.c:1359
-#: daemon/gvfsbackenddav.c:2905 daemon/gvfsbackendftp.c:1461
+#: daemon/gvfsbackenddav.c:3139 daemon/gvfsbackendftp.c:1461
 #: daemon/gvfsbackendsftp.c:3722 daemon/gvfsbackendsftp.c:4009
 msgid "Backups not supported"
 msgstr "پشتیبان‌ها پشتیبانی نمی‌شود"
@@ -816,26 +827,25 @@ msgid "No hostname specified"
 msgstr "هیچ نام میزبانی مشخص نشده است"
 
 #: daemon/gvfsbackendafpbrowse.c:568 daemon/gvfsbackendafp.c:2235
-#, fuzzy
 msgid "Apple Filing Protocol Service"
-msgstr "پروتکل\tمنبع IP\tدرگاه/خدمت\tوضعیت\n"
+msgstr "خدمت شیوه‌نامهٔ پروندهٔ اپل"
 
 #: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:877
-#: daemon/gvfsbackenddav.c:3068 daemon/gvfsbackendftp.c:1568
+#: daemon/gvfsbackenddav.c:3315 daemon/gvfsbackendftp.c:1568
 #: daemon/gvfsbackendgoogle.c:1752 daemon/gvfsbackendgoogle.c:2095
 #: daemon/gvfsbackendgoogle.c:3141
 msgid "Can’t copy directory over directory"
 msgstr "نمي‌توان شاخه را روی شاخه رونوشت کرد"
 
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:893
-#: daemon/gvfsbackenddav.c:3097 daemon/gvfsbackendftp.c:1591
+#: daemon/gvfsbackenddav.c:3344 daemon/gvfsbackendftp.c:1591
 #: daemon/gvfsbackendgoogle.c:1814 daemon/gvfsbackendgoogle.c:3168
 #: daemon/gvfsbackendgoogle.c:3216 daemon/gvfsbackendmtp.c:1641
 #: daemon/gvfsbackendmtp.c:1656
 msgid "Can’t recursively copy directory"
 msgstr "نمی‌توان شاخه را بارگشتی رونوشت کرد"
 
-#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2945
+#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:3179
 #: daemon/gvfsbackendgoogle.c:2209 daemon/gvfsbackendnfs.c:2474
 #: daemon/gvfsbackendsftp.c:5015 daemon/gvfsbackendsmb.c:2100
 msgid "Can’t move directory over directory"
@@ -846,7 +856,7 @@ msgstr "نمی‌توان شاخه را روی شاخه جابه‌جا کرد"
 msgid "Unable to create temporary file (%s)"
 msgstr "ایجاد پروندخ موقت امکان‌پذیر نبود (%s)"
 
-#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2546
+#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2729
 #: daemon/gvfsbackendnfs.c:1177 daemon/gvfsbackendsftp.c:3963
 #: daemon/gvfsbackendsmb.c:1091
 msgid "The file was externally modified"
@@ -926,7 +936,7 @@ msgstr "سازنده سی‌دی/دی‌وی‌دی"
 msgid "File exists"
 msgstr "پرونده وجود دارد"
 
-#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:2983
+#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:3223
 #: daemon/gvfsbackendsftp.c:2211 daemon/gvfsbackendsftp.c:5195
 msgid "Target file exists"
 msgstr "پرونده مقصد وجود دارد"
@@ -970,9 +980,9 @@ msgstr "گرداننده %s حاوی پرونده‌های صوتی نیست"
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
 #: daemon/gvfsbackendcdda.c:346
-#, fuzzy, c-format
+#, c-format
 msgid "cdda mount on %s"
-msgstr "جابه‌جایی پنجره به فضای کاری ۴"
+msgstr "cdda سوار شده روی %s"
 
 #: daemon/gvfsbackendcdda.c:347 daemon/gvfsbackendcdda.c:872
 #: monitor/udisks2/gvfsudisks2volume.c:392
@@ -1058,55 +1068,56 @@ msgid "Can’t stop drive"
 msgstr "نمی‌توان گرداننده را متوقّف کرد"
 
 #: daemon/gvfsbackendcomputer.c:1406 daemon/gvfsbackendcomputer.c:1413
-#, fuzzy
 msgid "Can’t poll file"
-msgstr "نمی‌توان پرونده خاص را رونوشت کرد"
+msgstr "نتوانست پرونده را بگیرد"
 
 #. Translators: This is the name of the WebDAV share constructed as
 #. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
 #. the second %s and only shown if it is not the default http(s) port.
-#: daemon/gvfsbackenddav.c:503
+#: daemon/gvfsbackenddav.c:539
 #, c-format
 msgid "%s on %s%s"
 msgstr "%s روی %s%s"
 
-#: daemon/gvfsbackenddav.c:708 daemon/gvfsbackenddav.c:2078
-#: daemon/gvfsbackendhttp.c:202
+#: daemon/gvfsbackenddav.c:753 daemon/gvfsbackenddav.c:2197
+#: daemon/gvfsbackendhttp.c:268 daemon/gvfshttpinputstream.c:273
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "خطای اچ‌تی‌تی‌پی: %s"
 
-#: daemon/gvfsbackenddav.c:725
+#: daemon/gvfsbackenddav.c:768
 msgid "Could not parse response"
 msgstr "نمی‌توان پاسخ را تجزیه کرد"
 
-#: daemon/gvfsbackenddav.c:734
+#: daemon/gvfsbackenddav.c:777
 msgid "Empty response"
 msgstr "پاسخ خالی"
 
-#: daemon/gvfsbackenddav.c:742
+#: daemon/gvfsbackenddav.c:785
 msgid "Unexpected reply from server"
 msgstr "پاسخ غیرمنتظره توسط کارساز"
 
-#: daemon/gvfsbackenddav.c:1444 daemon/gvfsbackenddav.c:2205
-#: daemon/gvfsbackenddav.c:2300 daemon/gvfsbackenddav.c:2402
+#: daemon/gvfsbackenddav.c:1529 daemon/gvfsbackenddav.c:2327
+#: daemon/gvfsbackenddav.c:2425 daemon/gvfsbackenddav.c:2550
 msgid "Response invalid"
 msgstr "پاسخ نامعتبر"
 
-#: daemon/gvfsbackenddav.c:1588
+#: daemon/gvfsbackenddav.c:1675
 msgid "WebDAV share"
 msgstr "اشتراک WebDAV"
 
 #. Translators: %s is the name of the WebDAV share
 #. Translators: %s is a server name
-#: daemon/gvfsbackenddav.c:1591 daemon/gvfsbackendsmbbrowse.c:373
+#: daemon/gvfsbackenddav.c:1678 daemon/gvfsbackendsmbbrowse.c:373
 #, c-format
 msgid ""
 "Authentication Required\n"
 "Enter password for “%s”:"
 msgstr ""
+"نیاز به تأیید هویت\n"
+"گذرواژهٔ «%s» را وارد کنید:"
 
-#: daemon/gvfsbackenddav.c:1594
+#: daemon/gvfsbackenddav.c:1681
 msgid ""
 "Authentication Required\n"
 "Enter proxy password:"
@@ -1114,22 +1125,20 @@ msgstr ""
 "نیاز به تأیید هویت\n"
 "گذرواژهٔ پیشکار را وارد کنید:"
 
-#: daemon/gvfsbackenddav.c:2064
+#: daemon/gvfsbackenddav.c:2186
 msgid "Not a WebDAV enabled share"
 msgstr "یک اشتراک WebDAV فعال شده نیست"
 
-#: daemon/gvfsbackenddav.c:2086
-#, fuzzy
-#| msgid "Could not find enclosing mount"
+#: daemon/gvfsbackenddav.c:2206
 msgid "Could not find an enclosing directory"
-msgstr "نمی‌توان سوار کردن ضمیمه را پیدا کرد"
+msgstr "نتوانست شاخه‌ای داخلی را بیابد"
 
-#: daemon/gvfsbackenddav.c:2159 daemon/gvfsbackenddav.c:2255
-#: daemon/gvfsbackenddav.c:2328 daemon/gvfsbackenddav.c:2436
+#: daemon/gvfsbackenddav.c:2283 daemon/gvfsbackenddav.c:2382
+#: daemon/gvfsbackenddav.c:2456 daemon/gvfsbackenddav.c:2584
 msgid "Could not create request"
 msgstr "نمی‌توان درخواست را ساخت"
 
-#: daemon/gvfsbackenddav.c:2577 daemon/gvfsbackendftp.c:1102
+#: daemon/gvfsbackenddav.c:2763 daemon/gvfsbackendftp.c:1102
 #: daemon/gvfsbackendgoogle.c:3944 daemon/gvfsbackendnfs.c:941
 #: daemon/gvfsbackendnfs.c:964 daemon/gvfsbackendnfs.c:990
 #: daemon/gvfsbackendnfs.c:1390 daemon/gvfsbackendsmb.c:1127
@@ -1137,13 +1146,9 @@ msgstr "نمی‌توان درخواست را ساخت"
 msgid "Backup file creation failed"
 msgstr "ایجاد پروندهٔ پشتیبان شکست خورد"
 
-#: daemon/gvfsbackenddav.c:2950
+#: daemon/gvfsbackenddav.c:3184
 msgid "Can’t move over directory"
 msgstr "نمی‌توان روی شاخه جابه‌جا کرد"
-
-#: daemon/gvfsbackenddav.c:3219
-msgid "File length changed during transfer"
-msgstr ""
 
 #: daemon/gvfsbackenddnssd.c:521 daemon/gvfsbackendnetwork.c:462
 msgid "Local Network"
@@ -1184,7 +1189,7 @@ msgstr "خطای جابه‌جایی پرونده/شاخه"
 #. Translators: This is the "Shared with me" folder on https://drive.google.com.
 #: daemon/gvfsbackendgoogle.c:2971
 msgid "Shared with me"
-msgstr ""
+msgstr "هم‌رسانده با من"
 
 #. Translators: This is the "Shared drives" folder on https://drive.google.com.
 #: daemon/gvfsbackendgoogle.c:2987
@@ -1275,7 +1280,7 @@ msgstr "دوربین دیجیتالی (%s)"
 
 #: daemon/gvfsbackendgphoto2.c:1256 daemon/gvfsbackendmtp.c:883
 msgid "Couldn’t find matching udev device."
-msgstr ""
+msgstr "نتوانست افزارهٔ udev مطابقی بیابد."
 
 #: daemon/gvfsbackendgphoto2.c:1319
 msgid "Cannot create gphoto2 context"
@@ -1386,7 +1391,7 @@ msgstr "نمی‌توان روی شاخه نوشت"
 
 #: daemon/gvfsbackendgphoto2.c:2698
 msgid "Cannot allocate new file to append to"
-msgstr ""
+msgstr "نمی‌توان پرونده‌ای جدید برای افزودن تخصیص داد"
 
 #: daemon/gvfsbackendgphoto2.c:2713
 msgid "Cannot read file to append to"
@@ -1403,19 +1408,19 @@ msgstr "پشتیبانی نمی‌شود (شاخه غیرهمانند)"
 #: daemon/gvfsbackendgphoto2.c:3110
 msgid ""
 "Not supported (the source is a directory, the destination is a directory too)"
-msgstr ""
+msgstr "پشتیبانی نشده (مبدأ شاخه است. مقصد هم شاخه است)"
 
 #: daemon/gvfsbackendgphoto2.c:3118
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
-msgstr ""
+msgstr "پشتیبانی نشده (مبدأ شاخه است، ولی مقصد پرونده‌ای موجود است)"
 
 #: daemon/gvfsbackendgphoto2.c:3130
 msgid "Not supported (the source is a file, but the destination is a directory)"
-msgstr ""
+msgstr "پشتیبانی نشده (مبدأ پرونده است، ولی مقصد شاخه است)"
 
-#: daemon/gvfsbackendhttp.c:198
+#: daemon/gvfsbackendhttp.c:263
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "خطا در کارگیر اچ‌تی‌تی‌پی: %s"
@@ -1455,16 +1460,16 @@ msgstr "ناتوان در وصل شدن به افزارهٔ MTP"
 
 #: daemon/gvfsbackendmtp.c:1060
 msgid "Unable to allocate memory while detecting MTP devices"
-msgstr ""
+msgstr "ناتوان در تخصیص حافظه هنگام تشخیص دادن افزاره‌های MTP"
 
 #: daemon/gvfsbackendmtp.c:1066
 msgid "Generic libmtp error"
-msgstr ""
+msgstr "خطای عمومی libmtp"
 
 #: daemon/gvfsbackendmtp.c:1079
 #, c-format
 msgid "Unable to open MTP device “%03u,%03u”"
-msgstr ""
+msgstr "ناتوان در گشودن افزارهٔ MTP «%I03u,%I03u»"
 
 #: daemon/gvfsbackendmtp.c:1096
 msgid "Device not found"
@@ -1503,7 +1508,7 @@ msgstr "نمی‌توان روی این مکان نوشت"
 #: daemon/gvfsbackendmtp.c:2399
 #, c-format
 msgid "No thumbnail for entity “%s”"
-msgstr ""
+msgstr "هیچ بندانگشتی‌ای برای موجودیت «%s» وجود ندارد"
 
 #: daemon/gvfsbackendnetwork.c:168
 msgid "File Sharing"
@@ -1531,7 +1536,7 @@ msgstr "نقطهٔ اتّصال وجود ندارد"
 msgid ""
 "Permission denied: Perhaps this host is disallowed or a privileged port is "
 "needed"
-msgstr ""
+msgstr "اجازه رد شد: شاید این میزبان مجاز نبوده یا نیاز به درگاهی ممتاز است"
 
 #: daemon/gvfsbackendnfs.c:1048 daemon/gvfsbackendnfs.c:1071
 #: daemon/gvfsbackendnfs.c:1119 daemon/gvfsbackendsftp.c:3890
@@ -1544,10 +1549,8 @@ msgid "Invalid attribute type"
 msgstr "گونهٔ مشخّصهٔ نامعتبر"
 
 #: daemon/gvfsbackendrecent.c:270
-#, fuzzy
-#| msgid "The trash folder may not be deleted"
 msgid "The recent folder may not be deleted"
-msgstr "پوشهٔ زباله‌دان را نمی‌توان حذف کرد"
+msgstr "ممکن است شاخهٔ خیر حذف نشده باشد"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
@@ -1580,14 +1583,13 @@ msgid "Too many authentication failures"
 msgstr "شکست‌های تأیید هویت بیش از حد"
 
 #: daemon/gvfsbackendsftp.c:564
-#, fuzzy
 msgid "Unable to spawn SSH program"
-msgstr "نمی‌توان برنامه ssh را spawn کرد"
+msgstr "ناتوان در زایش برنامهٔ SSH"
 
 #: daemon/gvfsbackendsftp.c:580
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to spawn SSH program: %s"
-msgstr "نمی‌توان برنامه ssh را spawn کرد: %s"
+msgstr "ناتوان در زایش برنامهٔ SSH: %s"
 
 #: daemon/gvfsbackendsftp.c:682 daemon/gvfsbackendsftp.c:1058
 msgid "Timed out when logging in"
@@ -1611,12 +1613,13 @@ msgstr "نمی‌توان تاییدیهٔ هویت میزبان را فرستا
 
 #. Translators: the first %s is the username, the second the host name
 #: daemon/gvfsbackendsftp.c:1164
-#, fuzzy, c-format
-#| msgid "Enter passphrase for key for ssh on %s"
+#, c-format
 msgid ""
 "Authentication Required\n"
 "Enter passphrase for secure key for “%s” on “%s”:"
-msgstr "عبارت‌رمز برای کلید برای ssh روی %s را وارد کنید"
+msgstr ""
+"نیاز به تأیید هویت\n"
+"عبارت عبور را برای کلید امن «%s» روی «%s» وارد کنید:"
 
 #. Translators: %s is the hostname
 #: daemon/gvfsbackendsftp.c:1171
@@ -1625,6 +1628,8 @@ msgid ""
 "Authentication Required\n"
 "Enter passphrase for secure key for “%s”:"
 msgstr ""
+"نیاز به تأیید هویت\n"
+"عبارت عبور را برای کلید امن «%s» وارد کنید:"
 
 #: daemon/gvfsbackendsftp.c:1263 daemon/gvfsbackendsftp.c:1310
 msgid "Can’t send password"
@@ -1644,13 +1649,7 @@ msgstr "رمز تأیید %s را وارد کنید"
 
 #. Translators: the first %s is the hostname, the second the key fingerprint
 #: daemon/gvfsbackendsftp.c:1329
-#, fuzzy, c-format
-#| msgid ""
-#| "The identity of the remote computer (%s) is unknown.\n"
-#| "This happens when you log in to a computer the first time.\n"
-#| "\n"
-#| "The identity sent by the remote computer is %s. If you want to be "
-#| "absolutely sure it is safe to continue, contact the system administrator."
+#, c-format
 msgid ""
 "Identity Verification Failed\n"
 "Verifying the identity of “%s” failed, this happens when you log in to a "
@@ -1659,37 +1658,32 @@ msgid ""
 "The identity sent by the remote computer is “%s”. If you want to be "
 "absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
-"هویت رایانه دوردست (%s) شناخته شده نیست.\n"
-"این زمانی که برای اولین بار به یک رایانه متصل می‌شوید اتفاق می‌افتد.\n"
+"تأیید هویت شکست خورد\n"
+"تأیید هویت «%s» شکست خورد. این اتّفاق هنگام نخستین ورودتان به یک رایانه رخ "
+"می‌دهد.\n"
 "\n"
-"هویتی که توسط رایانه دوردست ارسال شده است %s است. اگر می‌خواهید کاملا مطمئن "
-"باشید ادامه‌دهید، و با مدیر سامانه تماس بگیرید."
+"هویت ارسالی از رایانهٔ دوردست «%s» است. اگر می‌خواهید از امن بودن ادامه به طور "
+"کامل مطمئن شوید، با مدیر سامانه تماس بگیرید."
 
 #. Translators: the first %s is the hostname, the second is an ip address
 #: daemon/gvfsbackendsftp.c:1358
-#, fuzzy, c-format
-#| msgid ""
-#| "The identity of the remote computer (%s) is unknown.\n"
-#| "This happens when you log in to a computer the first time.\n"
-#| "\n"
-#| "The identity sent by the remote computer is %s. If you want to be "
-#| "absolutely sure it is safe to continue, contact the system administrator."
+#, c-format
 msgid ""
 "Identity Verification Failed\n"
 "The host key for “%s” differs from the key for the IP address “%s”\n"
 "If you want to be absolutely sure it is safe to continue, contact the system "
 "administrator."
 msgstr ""
-"هویت رایانه دوردست (%s) شناخته شده نیست.\n"
-"این زمانی که برای اولین بار به یک رایانه متصل می‌شوید اتفاق می‌افتد.\n"
+"تأیید هویت شکست خورد\n"
+"کلید میزبان «%s» با کلید نشانی آی‌پی «%s» متفاوت است.\n"
 "\n"
-"هویتی که توسط رایانه دوردست ارسال شده است %s است. اگر می‌خواهید کاملا مطمئن "
-"باشید ادامه‌دهید، و با مدیر سامانه تماس بگیرید."
+"اگر می‌خواهید از امن بودن ادامه به طور کامل مطمئن شوید، با مدیر سامانه تماس "
+"بگیرید."
 
 #: daemon/gvfsbackendsftp.c:1450
 #, c-format
 msgid "The connection is closed (the underlying SSH process exited)"
-msgstr ""
+msgstr "اتّصال بسته شده (فرایند SSH زیرین، خارج شد)"
 
 #: daemon/gvfsbackendsftp.c:1451
 #, c-format
@@ -1701,10 +1695,8 @@ msgid "Protocol error"
 msgstr "خطای قرارداد"
 
 #: daemon/gvfsbackendsftp.c:2112
-#, fuzzy
-#| msgid "Unable to find supported ssh command"
 msgid "Unable to find supported SSH command"
-msgstr "نمی‌توان یک فرمان معتبر SSH پیدا کرد"
+msgstr "ناتوان در یافتن فرمان SSH پشتیبانی شده"
 
 #: daemon/gvfsbackendsftp.c:2219
 msgid "Unknown reason"
@@ -1732,7 +1724,7 @@ msgstr "خطا هنگام ساخت پرونده پشتیبان: %s"
 
 #: daemon/gvfsbackendsftp.c:5425
 msgid "Value out of range, sftp only supports 32bit timestamps"
-msgstr ""
+msgstr "مقدار خارج از دامنه. sftp تنها از برچسب‌های زمانی ۳۲بیتی پشتیبانی می‌کند"
 
 #: daemon/gvfsbackendsftp.c:5500 daemon/gvfsbackendsmb.c:1739
 msgid "Invalid attribute type (uint64 expected)"
@@ -1754,16 +1746,13 @@ msgstr "اشتراک‌های ویندوز روی %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: daemon/gvfsbackendsmbbrowse.c:1019
-#, fuzzy, c-format
-#| msgid "Failed to retrieve share list from server"
+#, c-format
 msgid "Failed to retrieve share list from server: %s"
-msgstr "دریافت فهرست اشتراک از کارساز ممکن نبود"
+msgstr "شکست در دریافت سیاههٔ هم‌رسانی از کارساز: %s"
 
 #: daemon/gvfsbackendsmbbrowse.c:1541
-#, fuzzy
-#| msgid "Windows Network Filesystem Service"
 msgid "Windows Network File System Service"
-msgstr "خدمت سامانه‌پروندهٔ شبکهٔ ویندوز"
+msgstr "خدمت سامانهٔ پروندهٔ شبکهٔ ویندوز"
 
 #. Translators: First %s is a share name, second is a server name
 #: daemon/gvfsbackendsmb.c:270
@@ -1772,6 +1761,8 @@ msgid ""
 "Authentication Required\n"
 "Enter password for share “%s” on “%s”:"
 msgstr ""
+"نیاز به تأیید هویت\n"
+"برای هم‌رسانی «%s» روی «%s» گذواژه را وارد کنید:"
 
 #. Translators: First %s is a share name, second is a server name
 #: daemon/gvfsbackendsmb.c:276
@@ -1780,13 +1771,14 @@ msgid ""
 "Authentication Required\n"
 "Enter user and password for share “%s” on “%s”:"
 msgstr ""
+"نیاز به تأیید هویت\n"
+"برای هم‌رسانی «%s» روی «%s» کاربر و گذواژه را وارد کنید:"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: daemon/gvfsbackendsmb.c:556
-#, fuzzy, c-format
-#| msgid "Failed to mount Windows share"
+#, c-format
 msgid "Failed to mount Windows share: %s"
-msgstr "سوارکردن اشتراک ویندوز شکست خورد"
+msgstr "شکست در سوارکردن هم‌رسانی ویندوز: %s"
 
 #: daemon/gvfsbackendsmb.c:1326
 #, c-format
@@ -1794,10 +1786,8 @@ msgid "Backup file creation failed: %s"
 msgstr "ساخت پرونده پشتیبان شکست خورد: %s"
 
 #: daemon/gvfsbackendsmb.c:1937
-#, fuzzy
-#| msgid "Can't rename file, filename already exists"
 msgid "Can’t rename file, filename already exists"
-msgstr "تغییر نام پرونده ممکن نیست، نام پرونده از قبل وجود دارد"
+msgstr "نمی‌توان نام پرونده را تغییر داد. نام پرونده از پیش وجود دارد"
 
 #: daemon/gvfsbackendsmb.c:1988
 #, c-format
@@ -1815,16 +1805,12 @@ msgid "Error removing target file: %s"
 msgstr "خطا هنگام حذف پرونده هدف: %s"
 
 #: daemon/gvfsbackendsmb.c:2172
-#, fuzzy
-#| msgid "Can't recursively move directory"
 msgid "Can’t recursively move directory"
-msgstr "نمی‌توان بطور پی‌درپی شاخه را جابه‌جا کرد"
+msgstr "نمی‌توان شاخه را به صورت برگشتی جابه‌جا کرد"
 
 #: daemon/gvfsbackendsmb.c:2221
-#, fuzzy
-#| msgid "Windows Network Filesystem Service"
 msgid "Windows Shares File System Service"
-msgstr "خدمت سامانه‌پروندهٔ شبکهٔ ویندوز"
+msgstr "خدمت سامانهٔ پروندهٔ هم‌رسانی ویندوز"
 
 #: daemon/gvfsbackendtrash.c:402 daemon/gvfsbackendtrash.c:461
 msgid "The trash folder may not be deleted"
@@ -1846,15 +1832,15 @@ msgstr "کانال مسدود شد"
 
 #: daemon/gvfsdaemonutils.c:251
 msgid "The signing certificate authority is not known."
-msgstr ""
+msgstr "اعتبار گواهینامهٔ امضا ناشناخته است."
 
 #: daemon/gvfsdaemonutils.c:253
 msgid "The certificate does not match the identity of the site."
-msgstr ""
+msgstr "گواهینامه با هویت پایگاه مطابق نیست."
 
 #: daemon/gvfsdaemonutils.c:255
 msgid "The certificate’s activation time is in the future."
-msgstr ""
+msgstr "زمان فعّال‌سازی گواهینامه در آینده است."
 
 #: daemon/gvfsdaemonutils.c:257
 msgid "The certificate has expired."
@@ -1862,15 +1848,15 @@ msgstr "گواهی منسوخ شده."
 
 #: daemon/gvfsdaemonutils.c:259
 msgid "The certificate has been revoked."
-msgstr ""
+msgstr "گواهینامه باطل شده است."
 
 #: daemon/gvfsdaemonutils.c:261
 msgid "The certificate’s algorithm is considered insecure."
-msgstr ""
+msgstr "الگوریتم گواهینامه ناامن است."
 
 #: daemon/gvfsdaemonutils.c:263
 msgid "Error occurred when validating the certificate."
-msgstr ""
+msgstr "خطا هنگام اعتبارسنجی گواهینامه."
 
 #: daemon/gvfsdaemonutils.c:325
 msgid "Yes"
@@ -1891,6 +1877,12 @@ msgid ""
 "\n"
 "Are you really sure you would like to continue?"
 msgstr ""
+"تأیید هویت شکست خورد\n"
+"%s\n"
+"\n"
+"%s\n"
+"\n"
+"مطمئنید که می‌خواهید ادامه دهید؟"
 
 #: daemon/gvfsftpconnection.c:211
 msgid "Unexpected end of stream"
@@ -1906,6 +1898,7 @@ msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr ""
+"شکست در ایجاد اتّصال فعّال FTP. شاید مسیریابتان از این کار پشتیبانی نمی‌کند؟"
 
 #: daemon/gvfsftpconnection.c:485
 msgid "Failed to create active FTP connection."
@@ -1921,7 +1914,7 @@ msgstr "کارساز FTP مشغول است. بعدا امتحان کنید"
 
 #: daemon/gvfsftptask.c:296
 msgid "Backend currently unmounting"
-msgstr ""
+msgstr "پسانه در حال پیاده شدن است"
 
 #: daemon/gvfsftptask.c:393
 msgid "Accounts are unsupported"
@@ -1955,7 +1948,7 @@ msgstr "نوع صفحه ناشناس است"
 msgid "Invalid filename"
 msgstr "نام پرونده صحيح نيست"
 
-#: daemon/gvfshttpinputstream.c:292
+#: daemon/gvfshttpinputstream.c:289
 msgid "Error seeking in stream"
 msgstr "خطای جویش در جریان"
 
@@ -1986,76 +1979,78 @@ msgid ""
 "Unmounting %s\n"
 "Please wait"
 msgstr ""
+"در حال پیاده کردن %s\n"
+"لطفاً شکیبا باشید"
 
-#: daemon/main.c:147 metadata/meta-daemon.c:459
+#: daemon/main.c:148 metadata/meta-daemon.c:459
 msgid "Replace old daemon."
 msgstr "جایگزینی شبح قدیمی."
 
-#: daemon/main.c:148
+#: daemon/main.c:149
 msgid "Don’t start fuse."
 msgstr "آغاز نکردن fuse."
 
-#: daemon/main.c:149
+#: daemon/main.c:150
 msgid "Enable debug output."
 msgstr "به کار انداختن خروجی رفع اشکال."
 
-#: daemon/main.c:150 metadata/meta-daemon.c:460
+#: daemon/main.c:151 metadata/meta-daemon.c:460
 msgid "Show program version."
 msgstr "نمایش نگارش برنامه."
 
-#: daemon/main.c:166
+#: daemon/main.c:167
 msgid "GVFS Daemon"
 msgstr "شبح GVFS"
 
-#: daemon/main.c:169
+#: daemon/main.c:170
 msgid "Main daemon for GVFS"
 msgstr "شبح اصلی برای GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: daemon/main.c:186 metadata/meta-daemon.c:486
+#: daemon/main.c:187 metadata/meta-daemon.c:486
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: daemon/main.c:188 metadata/meta-daemon.c:488
+#: daemon/main.c:189 metadata/meta-daemon.c:488
 #, c-format
 msgid "Try “%s --help” for more information."
 msgstr "برای اطّلاعات بیش‌تر \"%s --help\" را بیازمایید."
 
-#: daemon/mount.c:759
+#: daemon/mount.c:783
 #, c-format
 msgid "Automount failed: %s"
 msgstr "سوارکردن خودکار شکست خورد: %s"
 
-#: daemon/mount.c:803 daemon/mount.c:879
+#: daemon/mount.c:827 daemon/mount.c:903
 msgid "The specified location is not mounted"
 msgstr "مکان مشخص شده سوار نشده است"
 
-#: daemon/mount.c:808
+#: daemon/mount.c:832
 msgid "The specified location is not supported"
 msgstr "مکان مشخص شده پشتیبانی نمی‌شود"
 
-#: daemon/mount.c:991
+#: daemon/mount.c:1015
 msgid "Location is already mounted"
 msgstr "مکان ازقبل سوار شده است"
 
-#: daemon/mount.c:1000
+#: daemon/mount.c:1024
 msgid "Location is not mountable"
 msgstr "مکان قابل سوار کردن نیست"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:13
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:25
 msgid "Perform file operations"
-msgstr ""
+msgstr "انجام عملیات پرونده"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:14
 msgid "Authentication is required to run gvfsd-admin daemon"
-msgstr ""
+msgstr "برای اجرای gvfsd-admin نیاز به تأیید هویت است"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:26
 msgid "Authentication is required to perform file operations"
-msgstr ""
+msgstr "برای اجرای عملیات پرونده نیاز به تأیید هویت است"
 
 #: metadata/meta-daemon.c:249 metadata/meta-daemon.c:326
 #: metadata/meta-daemon.c:363
@@ -2065,50 +2060,46 @@ msgstr "نمی‌توان پروندهٔ فرادادهٔ %s را یافت"
 
 #: metadata/meta-daemon.c:267 metadata/meta-daemon.c:279
 msgid "Unable to set metadata key"
-msgstr ""
+msgstr "ناتوان در تنظیم کلید فراداده"
 
 #: metadata/meta-daemon.c:289
 msgid "Unable to unset metadata key"
-msgstr ""
+msgstr "ناتوان در ناتنظیم کلید فراداده"
 
 #: metadata/meta-daemon.c:336
 msgid "Unable to remove metadata keys"
-msgstr ""
+msgstr "ناتوان در برداشتن کلید فراداده"
 
 #: metadata/meta-daemon.c:374
 msgid "Unable to move metadata keys"
-msgstr ""
+msgstr "ناتوان در جابه‌جایی کلید فراداده"
 
 #: metadata/meta-daemon.c:470
-#, fuzzy
 msgid "GVFS Metadata Daemon"
-msgstr "نسخه پشتیبانی نشدهٔ دایمون"
+msgstr "شبح فرادادهٔ GVFS"
 
 #: metadata/meta-daemon.c:473
 msgid "Metadata daemon for GVFS"
-msgstr ""
+msgstr "شبح فراداده برای GVFS"
 
 #: monitor/goa/goavolume.c:298 monitor/goa/goavolume.c:337
 #, c-format
 msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
-msgstr ""
+msgstr "شکست در گرفتن org.gnome.OnlineAccounts.Files برای %s"
 
 #: monitor/goa/goavolume.c:368
-#, fuzzy, c-format
-#| msgid "Invalid return value from %s"
+#, c-format
 msgid "Invalid credentials for %s"
-msgstr "مقدار برگشتی نامعتبر برای %s"
+msgstr "اعتبارنامهٔ نامعتبر برای %s"
 
 #: monitor/goa/goavolume.c:401
 #, c-format
 msgid "Unsupported authentication method for %s"
-msgstr ""
+msgstr "روش تأیید هویت پشتیبانی نشده برای %s"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1037
-#, fuzzy
-#| msgid "The specified location is not mounted"
 msgid "The given mount was not found"
-msgstr "مکان مشخص شده سوار نشده است"
+msgstr "حجم سوارشدهٔ داده شده پیدا نشد"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1045
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1282
@@ -2120,14 +2111,12 @@ msgid "An operation is already pending"
 msgstr "عملیات از پیش منتظر است"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1132
-#, fuzzy
-#| msgid "error starting mount daemon"
 msgid "No outstanding mount operation"
-msgstr "خطا درهنگام آغاز کردن شبح سوارکردن"
+msgstr "بدون عملیات سوار کردن ممتاز"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1274
 msgid "The given volume was not found"
-msgstr ""
+msgstr "حجم داده شده پیدا نشد"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1381
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1488
@@ -2148,11 +2137,11 @@ msgstr "گرداننده بدون‌نام"
 #: monitor/udisks2/gvfsudisks2drive.c:624
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
-msgstr ""
+msgstr "شکست در بیرون دادن واسطه. یکی یا بیش‌تر از حجم‌های روی واسطه مشغولند."
 
 #: monitor/udisks2/gvfsudisks2mount.c:634
 msgid "One or more programs are preventing the unmount operation."
-msgstr ""
+msgstr "یک یا بیش‌تر برنامه از عملیات پیاده سازی جلوگیری می‌کند."
 
 #. Note that the GUI (Shell, Files) currently use the term
 #. * "Eject" for both GDrive.stop() and GDrive.eject().
@@ -2169,35 +2158,43 @@ msgstr "عملیات توسط پسانه پشتیبانی نمی‌شود"
 #: monitor/udisks2/gvfsudisks2utils.c:345
 #, c-format
 msgid "Timed out running command-line “%s”"
-msgstr ""
+msgstr "زمان اجرای خط فرمان «%s» پایان یافت"
 
-#: monitor/udisks2/gvfsudisks2utils.c:647
+#: monitor/udisks2/gvfsudisks2utils.c:646
 #, c-format
 msgid ""
 "Unmounting %s\n"
 "Disconnecting from filesystem."
 msgstr ""
+"در حال پیاده کردن %s\n"
+"در حال قطع شدن از سامانه‌پرونده."
 
-#: monitor/udisks2/gvfsudisks2utils.c:649
+#: monitor/udisks2/gvfsudisks2utils.c:648
 #, c-format
 msgid ""
 "Writing data to %s\n"
 "Device should not be unplugged."
 msgstr ""
+"در حال نوشتن داده‌ها روی %s\n"
+"افزاره نباید کشیده شود."
 
-#: monitor/udisks2/gvfsudisks2utils.c:788
+#: monitor/udisks2/gvfsudisks2utils.c:780
 #, c-format
 msgid ""
 "%s unmounted\n"
 "Filesystem has been disconnected."
 msgstr ""
+"%s پیاده شد\n"
+"سامانه‌پرونده می‌تواند قطع شود."
 
-#: monitor/udisks2/gvfsudisks2utils.c:790
+#: monitor/udisks2/gvfsudisks2utils.c:782
 #, c-format
 msgid ""
 "%s can be safely unplugged\n"
 "Device can be removed."
 msgstr ""
+"%s می‌تواند به طور امن کشیده شود\n"
+"افزاره می‌تواند برداشته شود."
 
 #. Translators: This is used for possibly encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2259,6 +2256,9 @@ msgid ""
 "A passphrase is needed to access encrypted data on “%s”.\n"
 "The volume might be a VeraCrypt volume as it contains random data."
 msgstr ""
+"نیاز به تأیید هویت\n"
+"برای دسترسی به داده‌های رمزنگاشتهٔ روی «%s» تیاز به یک عبارت عبور است.\n"
+"از آن‌جا که حجم شامل داده‌های کاتوره‌ایست، ممکن است یک حجم VeraCrypt باشد."
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1505
@@ -2267,6 +2267,8 @@ msgid ""
 "Authentication Required\n"
 "A passphrase is needed to access encrypted data on “%s”."
 msgstr ""
+"نیاز به تأیید هویت\n"
+"برای دسترسی به داده‌های رمزنگاشتهٔ روی «%s» تیاز به یک عبارت عبور است."
 
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
