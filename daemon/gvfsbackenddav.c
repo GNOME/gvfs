@@ -2224,7 +2224,6 @@ do_mount (GVfsBackend  *backend,
   tmp = mount_base;
   mount_base = dav_uri_dup_with (mount_base, last_good_path, NULL);
   g_uri_unref (tmp);
-  g_clear_pointer (&G_VFS_BACKEND_HTTP (backend)->mount_base, g_uri_unref);
   G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base;
   g_free (last_good_path);
 
