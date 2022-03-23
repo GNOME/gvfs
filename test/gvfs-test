@@ -128,7 +128,11 @@ class GvfsTestCase(unittest.TestCase):
 
         prog = subprocess.Popen(argv, stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE, universal_newlines=True)
-        (out, err) = prog.communicate()
+        try:
+            (out, err) = prog.communicate(timeout=30)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
         return (prog.returncode, out, err)
 
     def program_out_err(self, argv):
@@ -510,7 +514,7 @@ Subsystem sftp %(sftp_server)s
 
         # mount it
         uri = 'sftp://localhost:22222'
-        subprocess.check_call(['gio', 'mount', uri])
+        subprocess.check_call(['gio', 'mount', uri], timeout=30)
 
         self.do_mount_check(uri)
 
