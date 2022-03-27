@@ -322,23 +322,6 @@ message_should_apply_redir_ref (SoupMessage *msg)
 }
 
 static GUri *
-dav_uri_dup_with (GUri *uri, const char *path, const char *userinfo)
-{
-  if (!path && !userinfo)
-    return g_uri_ref (uri);
-
-  return g_uri_build (g_uri_get_flags (uri),
-                      g_uri_get_scheme (uri),
-                      userinfo ? userinfo : g_uri_get_userinfo (uri),
-                      g_uri_get_host (uri),
-                      g_uri_get_port (uri),
-                      path ? path : g_uri_get_path (uri),
-                      g_uri_get_query (uri),
-                      g_uri_get_fragment (uri));
-}
-
-
-static GUri *
 g_vfs_backend_dav_uri_for_path (GVfsBackend *backend,
                                 const char  *path,
                                 gboolean     is_dir)
@@ -369,7 +352,7 @@ g_vfs_backend_dav_uri_for_path (GVfsBackend *backend,
   else
     new_path = g_build_path ("/", g_uri_get_path (mount_base), fn_encoded, "/", NULL);
 
-  uri = dav_uri_dup_with (mount_base, new_path, NULL);
+  uri = soup_uri_copy (mount_base, SOUP_URI_PATH, new_path, SOUP_URI_NONE);
 
   g_free (fn_encoded);
   g_free (new_path);
@@ -432,7 +415,10 @@ g_vfs_backend_dav_redirect (SoupSession  *session,
     }
 
   tmp = new_uri;
-  new_uri = dav_uri_dup_with (new_uri, NULL, g_uri_get_userinfo (old_uri));
+  new_uri = soup_uri_copy (new_uri,
+                           SOUP_URI_USER, g_uri_get_user (old_uri),
+                           SOUP_URI_AUTH_PARAMS, g_uri_get_auth_params (old_uri),
+                           SOUP_URI_NONE);
   g_uri_unref (tmp);
 
   /* Check if this is a trailing slash redirect (i.e. /a/b to /a/b/),
@@ -2141,7 +2127,7 @@ do_mount (GVfsBackend  *backend,
     new_path = path_get_parent_dir (last_good_path);
 
     tmp = mount_base;
-    mount_base = dav_uri_dup_with (mount_base, new_path, NULL);
+    mount_base = soup_uri_copy (mount_base, SOUP_URI_PATH, new_path, SOUP_URI_NONE);
     g_uri_unref (tmp);
     G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base;
 
@@ -2222,7 +2208,7 @@ do_mount (GVfsBackend  *backend,
 
   /* Set the working path in mount path */
   tmp = mount_base;
-  mount_base = dav_uri_dup_with (mount_base, last_good_path, NULL);
+  mount_base = soup_uri_copy (mount_base, SOUP_URI_PATH, last_good_path, SOUP_URI_NONE);
   g_uri_unref (tmp);
   G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base;
   g_free (last_good_path);
