@@ -110,6 +110,7 @@ struct _GVfsBackendDav
   GVfsBackendHttp parent_instance;
 
   MountAuthData auth_info;
+  gchar *last_good_path;
 
   /* Used for user-verified secure connections. */
   GTlsCertificate *certificate;
@@ -378,13 +379,86 @@ g_vfs_backend_dav_stream_skip (GInputStream *stream, GError **error)
   return TRUE;
 }
 
-/* redirection */
-static GInputStream *
-g_vfs_backend_dav_redirect (SoupSession  *session,
-                            SoupMessage  *msg,
-                            GError      **error)
+static void
+g_vfs_backend_dav_setup_display_name (GVfsBackend *backend)
 {
-  GInputStream *res;
+  GVfsBackendDav *dav_backend;
+  GUri           *mount_base;
+  char           *display_name;
+  char            port[7] = {0, };
+  gint            gport;
+
+  dav_backend = G_VFS_BACKEND_DAV (backend);
+
+#ifdef HAVE_AVAHI
+  if (dav_backend->resolver != NULL)
+    {
+      const char *name;
+      name = g_vfs_dns_sd_resolver_get_service_name (dav_backend->resolver);
+      g_vfs_backend_set_display_name (backend, name);
+      return;
+    }
+#endif
+
+  mount_base = http_backend_get_mount_base (backend);
+
+  gport = g_uri_get_port (mount_base);
+  if ((gport > 0) && (gport != 80) && (gport != 443))
+    g_snprintf (port, sizeof (port), ":%u", g_uri_get_port (mount_base));
+
+  if (g_uri_get_user (mount_base) != NULL)
+    /* Translators: This is the name of the WebDAV share constructed as
+       "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
+       the second %s and only shown if it is not the default http(s) port. */
+    display_name = g_strdup_printf (_("%s on %s%s"),
+                                    g_uri_get_user (mount_base),
+                                    g_uri_get_host (mount_base),
+                                    port);
+  else
+    display_name = g_strdup_printf ("%s%s",
+                                    g_uri_get_host (mount_base),
+                                    port);
+
+  g_vfs_backend_set_display_name (backend, display_name);
+  g_free (display_name);
+}
+
+static gboolean
+accept_certificate (SoupMessage *msg,
+                    GTlsCertificate *certificate,
+                    GTlsCertificateFlags errors,
+                    gpointer user_data)
+{
+  GVfsBackendDav *dav = G_VFS_BACKEND_DAV (user_data);
+
+  return (errors == dav->certificate_errors &&
+          g_tls_certificate_is_same (certificate, dav->certificate));
+}
+
+static void
+dav_message_connect_signals (SoupMessage *message, GVfsBackend *backend)
+{
+  GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (backend);
+
+  /* we always have to connect this as the message can be
+   * re-sent with a differently set certificate_errors field
+   */
+  g_signal_connect (message, "accept-certificate",
+                    G_CALLBACK (accept_certificate), backend);
+
+  g_signal_connect (message, "authenticate",
+                    G_CALLBACK (soup_authenticate),
+                    &dav_backend->auth_info);
+}
+
+static void
+dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_data)
+{
+  SoupSession *session = SOUP_SESSION (source);
+  SoupMessage *msg = soup_session_get_async_result_message (session, ret);
+  GInputStream *body;
+  GError *error = NULL;
+  GTask *task = user_data;
   const char *new_loc;
   GUri *new_uri;
   GUri *old_uri;
@@ -392,26 +466,28 @@ g_vfs_backend_dav_redirect (SoupSession  *session,
   guint status;
   gboolean redirect;
 
-  res = soup_session_send (session, msg, NULL, error);
-  if (!res)
-    return NULL;
+  body = soup_session_send_finish (session, ret, &error);
+
+  if (!body)
+    goto return_error;
 
   status = soup_message_get_status (msg);
+
   if (!SOUP_STATUS_IS_REDIRECTION (status))
-    return res;
+    goto return_body;
 
   new_loc = soup_message_headers_get_one (soup_message_get_response_headers (msg),
                                           "Location");
   if (new_loc == NULL)
-    return res;
+    goto return_body;
 
   old_uri = soup_message_get_uri (msg);
   new_uri = g_uri_parse_relative (old_uri, new_loc,
-                                  SOUP_HTTP_URI_FLAGS, error);
+                                  SOUP_HTTP_URI_FLAGS, &error);
   if (new_uri == NULL)
     {
-      g_object_unref (res);
-      return NULL;
+      g_object_unref (body);
+      goto return_error;
     }
 
   tmp = new_uri;
@@ -475,125 +551,77 @@ g_vfs_backend_dav_redirect (SoupSession  *session,
   if (!redirect)
     {
       g_uri_unref (new_uri);
-      return res;
+      goto return_body;
     }
 
-  if (!g_vfs_backend_dav_stream_skip (res, error))
+  if (!g_vfs_backend_dav_stream_skip (body, &error))
     {
-      g_object_unref (res);
-      return NULL;
+      g_object_unref (body);
+      goto return_error;
     }
 
-  g_object_unref (res);
+  g_object_unref (body);
 
   soup_message_set_uri (msg, new_uri);
+  g_uri_unref (new_uri);
 
-  return g_vfs_backend_dav_redirect (session, msg, error);
-}
+  /* recurse */
+  soup_session_send_async (session, msg, G_PRIORITY_DEFAULT, NULL,
+                           dav_send_async_with_redir_cb, g_object_ref (task));
+  goto return_done;
 
-static void
-g_vfs_backend_dav_setup_display_name (GVfsBackend *backend)
-{
-  GVfsBackendDav *dav_backend;
-  GUri           *mount_base;
-  char           *display_name;
-  char            port[7] = {0, };
-  gint            gport;
+return_body:
+  g_task_return_pointer (task, body, g_object_unref);
+  goto return_done;
 
-  dav_backend = G_VFS_BACKEND_DAV (backend);
+return_error:
+  g_task_return_error (task, error);
 
-#ifdef HAVE_AVAHI
-  if (dav_backend->resolver != NULL)
-    {
-      const char *name;
-      name = g_vfs_dns_sd_resolver_get_service_name (dav_backend->resolver);
-      g_vfs_backend_set_display_name (backend, name);
-      return;
-    }
-#endif
-
-  mount_base = http_backend_get_mount_base (backend);
-
-  gport = g_uri_get_port (mount_base);
-  if ((gport > 0) && (gport != 80) && (gport != 443))
-    g_snprintf (port, sizeof (port), ":%u", g_uri_get_port (mount_base));
-
-  if (g_uri_get_user (mount_base) != NULL)
-    /* Translators: This is the name of the WebDAV share constructed as
-       "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
-       the second %s and only shown if it is not the default http(s) port. */
-    display_name = g_strdup_printf (_("%s on %s%s"),
-                                    g_uri_get_user (mount_base),
-                                    g_uri_get_host (mount_base),
-                                    port);
-  else
-    display_name = g_strdup_printf ("%s%s",
-                                    g_uri_get_host (mount_base),
-                                    port);
-
-  g_vfs_backend_set_display_name (backend, display_name);
-  g_free (display_name);
-}
-
-static gboolean
-accept_certificate (SoupMessage         *msg,
-                    GTlsCertificate     *certificate,
-                    GTlsCertificateFlags errors,
-                    gpointer             user_data)
-{
-  GVfsBackendDav *dav = G_VFS_BACKEND_DAV (user_data);
-
-  return (errors == dav->certificate_errors &&
-          g_tls_certificate_is_same (certificate, dav->certificate));
-}
-
-static void
-dav_message_connect_signals (SoupMessage *message, GVfsBackend *backend)
-{
-  GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (backend);
-
-  /* we always have to connect this as the message can be
-   * re-sent with a differently set certificate_errors field
-   */
-  g_signal_connect (message, "accept-certificate",
-                    G_CALLBACK (accept_certificate), backend);
-
-  g_signal_connect (message, "authenticate",
-                    G_CALLBACK (soup_authenticate),
-                    &dav_backend->auth_info);
-}
-
-static GInputStream *
-g_vfs_backend_dav_send (GVfsBackend *backend,
-                        SoupMessage *message,
-                        gboolean     cb_connect,
-                        GError     **error)
-{
-  SoupSession *session = G_VFS_BACKEND_HTTP (backend)->session;
-
-  /* We have our own custom redirect handler */
-  soup_message_set_flags (message, SOUP_MESSAGE_NO_REDIRECT);
-
-  if (cb_connect)
-    dav_message_connect_signals (message, backend);
-
-  return g_vfs_backend_dav_redirect (session, message, error);
+return_done:
+  g_object_unref (task);
 }
 
 static void
 g_vfs_backend_dav_send_async (GVfsBackend *backend,
                               SoupMessage *message,
-                              gboolean     cb_connect,
                               GAsyncReadyCallback callback,
                               gpointer user_data)
 {
   SoupSession *session = G_VFS_BACKEND_HTTP (backend)->session;
+  GTask *task = g_task_new (backend, NULL, callback, user_data);
 
-  if (cb_connect)
-    dav_message_connect_signals (message, backend);
+  g_task_set_source_tag (task, g_vfs_backend_dav_send_async);
+  g_task_set_task_data (task, g_object_ref (message), g_object_unref);
+
+  soup_message_set_flags (message, SOUP_MESSAGE_NO_REDIRECT);
 
   soup_session_send_async (session, message, G_PRIORITY_DEFAULT, NULL,
-                           callback, user_data);
+                           dav_send_async_with_redir_cb, task);
+}
+
+static GInputStream *
+g_vfs_backend_dav_send_finish (GVfsBackend   *backend,
+                               GAsyncResult  *result,
+                               GError       **error)
+{
+  g_return_val_if_fail (G_VFS_IS_BACKEND (backend), NULL);
+  g_return_val_if_fail (G_IS_ASYNC_RESULT (result), NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (g_task_is_valid (result, backend), NULL);
+  g_return_val_if_fail (g_async_result_is_tagged (result, g_vfs_backend_dav_send_async), NULL);
+
+  return g_task_propagate_pointer (G_TASK (result), error);
+}
+
+static SoupMessage *
+g_vfs_backend_dav_get_async_result_message (GVfsBackend  *backend,
+                                            GAsyncResult *result)
+{
+  g_return_val_if_fail (G_VFS_IS_BACKEND (backend), NULL);
+  g_return_val_if_fail (G_IS_ASYNC_RESULT (result), NULL);
+  g_return_val_if_fail (g_task_is_valid (result, backend), NULL);
+
+  return g_task_get_task_data (G_TASK (result));
 }
 
 /* ************************************************************************* */
@@ -1365,8 +1393,8 @@ propfind_request_new (GVfsBackend     *backend,
 }
 
 static SoupMessage *
-stat_location_begin (GUri      *uri,
-                     gboolean   count_children)
+stat_location_start (GUri *uri,
+                     gboolean count_children)
 {
   SoupMessage       *msg;
   const char        *depth;
@@ -1406,11 +1434,11 @@ stat_location_begin (GUri      *uri,
 }
 
 static gboolean
-stat_location_finish (SoupMessage  *msg,
-                      GInputStream *body,
-                      GFileType    *target_type,
-                      gint64       *target_size,
-                      guint        *num_children)
+stat_location_end (SoupMessage *msg,
+                   GInputStream *body,
+                   GFileType *target_type,
+                   gint64 *target_size,
+                   guint *num_children)
 {
   Multistatus  ms;
   xmlNodeIter  iter;
@@ -1465,56 +1493,143 @@ stat_location_finish (SoupMessage  *msg,
   return res;
 }
 
-static gboolean
-stat_location (GVfsBackend  *backend,
-               GUri         *uri,
-               GFileType    *target_type,
-               gint64       *target_size,
-               guint        *num_children,
-               GError      **error)
+typedef struct _StatLocationData {
+  GUri *uri;
+  GFileType target_type;
+  gint64 target_size;
+  guint num_children;
+} StatLocationData;
+
+static void
+stat_location_data_free (gpointer p)
 {
-  SoupMessage *msg;
+  g_uri_unref (((StatLocationData *)p)->uri);
+  g_slice_free (StatLocationData, p);
+}
+
+static void
+stat_location_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  SoupMessage *msg = g_vfs_backend_dav_get_async_result_message (backend, result);
+  GTask *task = user_data;
+  StatLocationData *data = g_task_get_task_data (task);
   GInputStream *body;
+  GError *error = NULL;
   guint status;
-  gboolean count_children;
   gboolean res;
 
-  count_children = num_children != NULL;
-  msg = stat_location_begin (uri, count_children);
-  if (msg == NULL)
-    return FALSE;
-
-  body = g_vfs_backend_dav_send (backend, msg, TRUE, error);
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
 
   if (!body)
     {
       g_object_unref (msg);
-      return FALSE;
+      g_task_return_error (task, error);
+      g_object_unref (task);
+      return;
     }
 
   status = soup_message_get_status (msg);
   if (status != SOUP_STATUS_MULTI_STATUS)
     {
-      g_set_error_literal (error,
-                           G_IO_ERROR,
+      error = g_error_new (G_IO_ERROR,
                            http_error_code_from_status (status),
+                           _("HTTP Error: %s"),
                            soup_message_get_reason_phrase (msg));
 
       g_object_unref (msg);
+      g_task_return_error (task, error);
       g_object_unref (body);
-      return FALSE;
+      g_object_unref (task);
+      return;
     }
 
-  res = stat_location_finish (msg, body, target_type, target_size, num_children);
+  res = stat_location_end (msg, body, &data->target_type,
+                           &data->target_size, &data->num_children);
   g_object_unref (msg);
   g_object_unref (body);
 
   if (res == FALSE)
-    g_set_error_literal (error,
-                         G_IO_ERROR, G_IO_ERROR_FAILED,
-                         _("Response invalid"));
+    {
+      error = g_error_new (G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Response invalid"));
+      g_task_return_error (task, error);
+    }
+  else
+    g_task_return_boolean (task, TRUE);
 
-  return res;
+  g_object_unref (task);
+}
+
+static void
+stat_location_async (GVfsBackend *backend,
+                     GUri *uri,
+                     gboolean count_children,
+                     GAsyncReadyCallback callback,
+                     gpointer user_data)
+{
+  GTask *task;
+  SoupMessage *msg;
+  StatLocationData *data;
+
+  task = g_task_new (backend, NULL, callback, user_data);
+  data = g_slice_new (StatLocationData);
+  data->uri = g_uri_ref (uri);
+
+  g_task_set_source_tag (task, stat_location_async);
+  g_task_set_task_data (task, data, stat_location_data_free);
+
+  msg = stat_location_start (uri, count_children);
+  if (msg == NULL)
+    {
+      g_task_return_boolean (task, FALSE);
+      g_object_unref (task);
+      return;
+    }
+
+  dav_message_connect_signals (msg, backend);
+
+  g_vfs_backend_dav_send_async (backend, msg, stat_location_cb, task);
+}
+
+static gboolean
+stat_location_finish (GVfsBackend *backend,
+                      GFileType *target_type,
+                      gint64 *target_size,
+                      guint *num_children,
+                      GAsyncResult *result,
+                      GError **error)
+{
+  g_return_val_if_fail (G_VFS_IS_BACKEND (backend), FALSE);
+  g_return_val_if_fail (G_IS_ASYNC_RESULT (result), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (g_task_is_valid (result, backend), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (result, stat_location_async), FALSE);
+
+   if (g_task_propagate_boolean (G_TASK (result), error))
+     {
+       StatLocationData *data = g_task_get_task_data (G_TASK (result));
+       if (target_type) *target_type = data->target_type;
+       if (target_size) *target_size = data->target_size;
+       if (num_children) *num_children = data->num_children;
+       return TRUE;
+     }
+
+  return FALSE;
+}
+
+static GUri *
+stat_location_async_get_uri (GVfsBackend *backend, GAsyncResult *result)
+{
+  StatLocationData *data;
+
+  g_return_val_if_fail (G_VFS_IS_BACKEND (backend), NULL);
+  g_return_val_if_fail (G_IS_ASYNC_RESULT (result), NULL);
+  g_return_val_if_fail (g_task_is_valid (result, backend), NULL);
+
+  data = g_task_get_task_data (G_TASK (result));
+  return data->uri;
+
 }
 
 /* ************************************************************************* */
@@ -1930,31 +2045,312 @@ dns_sd_resolver_changed (GVfsDnsSdResolver *resolver,
 
 /* ************************************************************************* */
 /* Backend Functions */
+
 static void
-do_mount (GVfsBackend  *backend,
-          GVfsJobMount *job,
-          GMountSpec   *mount_spec,
-          GMountSource *mount_source,
-          gboolean      is_automount)
+mount_success (GVfsBackend *backend, GVfsJob *job)
 {
   GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (backend);
-  MountAuthData  *data;
-  SoupSession    *session;
-  SoupMessage    *msg_opts;
-  SoupMessage    *msg_stat;
-  GUri           *mount_base;
-  GUri           *tmp;
-  GError         *error = NULL;
-  guint           status;
-  gboolean        is_success;
-  gboolean        is_webdav;
-  gboolean        is_collection;
-  gboolean        sig_opts = TRUE;
-  gboolean        sig_stat = TRUE;
-  gboolean        res;
-  char           *last_good_path;
-  const char     *host;
-  const char     *type;
+  GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (backend);
+  GMountSpec *mount_spec;
+  GUri *tmp;
+
+  /* Save the auth info in the keyring */
+  keyring_save_authinfo (&(dav_backend->auth_info.server_auth), http_backend->mount_base, FALSE);
+  /* TODO: save proxy auth */
+
+  /* Set the working path in mount path */
+  tmp = http_backend->mount_base;
+  http_backend->mount_base = soup_uri_copy (tmp, SOUP_URI_PATH,
+                                            dav_backend->last_good_path,
+                                            SOUP_URI_NONE);
+  g_uri_unref (tmp);
+  g_clear_pointer (&dav_backend->last_good_path, g_free);
+
+  /* dup the mountspec, but only copy known fields */
+  mount_spec = g_mount_spec_from_dav_uri (dav_backend, http_backend->mount_base);
+
+  g_vfs_backend_set_mount_spec (backend, mount_spec);
+  g_vfs_backend_set_icon_name (backend, "folder-remote");
+  g_vfs_backend_set_symbolic_icon_name (backend, "folder-remote-symbolic");
+  
+  g_vfs_backend_dav_setup_display_name (backend);
+  
+  /* cleanup */
+  g_mount_spec_unref (mount_spec);
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_debug ("- mount\n");
+}
+
+static void try_mount_opts_cb (GObject *source, GAsyncResult *result, gpointer user_data);
+
+static void
+try_mount_stat_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (backend);
+  GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (backend);
+  GVfsJobMount *job = user_data;
+  SoupMessage *msg_stat = g_vfs_backend_dav_get_async_result_message (backend, result);
+  SoupMessage *msg_opts;
+  GInputStream *body;
+  GError *error = NULL;
+  GFileType file_type;
+  gboolean res;
+  gboolean is_collection;
+  GUri *tmp;
+  char *new_path;
+
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
+
+  if (body == NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      goto clear_msg;
+    }
+
+  res = stat_location_end (msg_stat, body, &file_type, NULL, NULL);
+  is_collection = res && file_type == G_FILE_TYPE_DIRECTORY;
+
+  if (!g_vfs_backend_dav_stream_skip (body, &error))
+    {
+      g_object_unref (body);
+      if (dav_backend->last_good_path == NULL)
+        g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      else
+        mount_success (backend, G_VFS_JOB (job));
+      g_error_free (error);
+      goto clear_msg;
+    }
+
+  g_object_unref (body);
+
+  soup_message_headers_clear (soup_message_get_response_headers (msg_stat));
+
+  g_debug (" [%s] webdav: %d, collection %d [res: %d]\n",
+           g_uri_get_path (http_backend->mount_base), TRUE, is_collection, res);
+
+  if ((is_collection == FALSE) && (dav_backend->last_good_path != NULL))
+    {
+      mount_success (backend, G_VFS_JOB (job));
+      goto clear_msg;
+    }
+  else if (res == FALSE)
+    {
+      int error_code = http_error_code_from_status (soup_message_get_status (msg_stat));
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, error_code,
+                        _("HTTP Error: %s"),
+                        soup_message_get_reason_phrase (msg_stat));
+      goto clear_msg;
+    }
+  else if (is_collection == FALSE)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Could not find an enclosing directory"));
+      goto clear_msg;
+    }
+
+  /* we have found a new good root, try the parent ... */
+  g_free (dav_backend->last_good_path);
+  dav_backend->last_good_path = g_strdup (g_uri_get_path (http_backend->mount_base));
+  new_path = path_get_parent_dir (dav_backend->last_good_path);
+
+  tmp = http_backend->mount_base;
+  http_backend->mount_base = soup_uri_copy (tmp, SOUP_URI_PATH, new_path, SOUP_URI_NONE);
+  g_uri_unref (tmp);
+
+  g_free (new_path);
+
+  /* if we have found a root that is good then we assume
+     that we also have obtained to correct credentials
+     and we switch the auth handler. This will prevent us
+     from asking for *different* credentials *again* if the
+     server should response with 401 for some of the parent
+     collections. See also bug #677753 */
+  dav_backend->auth_info.interactive = FALSE;
+
+  /* break out */
+  if (g_strcmp0 (dav_backend->last_good_path, "/") == 0)
+    {
+      mount_success (backend, G_VFS_JOB (job));
+      goto clear_msg;
+    }
+
+  /* else loop the whole thing from options */
+
+  msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS,
+                                        http_backend->mount_base);
+
+  dav_message_connect_signals (msg_opts, backend);
+
+  g_vfs_backend_dav_send_async (backend, msg_opts, try_mount_opts_cb, job);
+
+clear_msg:
+  g_object_unref (msg_stat);
+}
+
+static void
+try_mount_opts_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (backend);
+  GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (backend);
+  GVfsJobMount *job = user_data;
+  SoupMessage *msg_opts = g_vfs_backend_dav_get_async_result_message (backend, result);
+  SoupMessage *msg_stat;
+  GInputStream *body;
+  GError *error = NULL;
+  GUri *cur_uri;
+  guint status;
+  gboolean is_success, is_webdav;
+
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
+
+  /* If SSL is used and the certificate verifies OK, then ssl-strict remains
+   * on for all further connections.
+   * If SSL is used and the certificate does not verify OK, then the user
+   * gets a chance to override it. If they do, ssl-strict is disabled but
+   * the certificate is stored, and checked on each subsequent connection to
+   * ensure that it hasn't changed. */
+  if (g_error_matches (error, G_TLS_ERROR, G_TLS_ERROR_BAD_CERTIFICATE) &&
+      !dav_backend->certificate_errors)
+    {
+      GTlsCertificate *certificate;
+      GTlsCertificateFlags errors;
+
+      certificate = soup_message_get_tls_peer_certificate (msg_opts);
+      errors = soup_message_get_tls_peer_certificate_errors (msg_opts);
+      if (gvfs_accept_certificate (dav_backend->auth_info.mount_source, certificate, errors))
+        {
+          g_clear_error (&error);
+          dav_backend->certificate = g_object_ref (certificate);
+          dav_backend->certificate_errors = errors;
+
+          /* re-send the opts message; re-create since we're still in its cb */
+          g_object_unref (msg_opts);
+          msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS,
+                                                http_backend->mount_base);
+
+          dav_message_connect_signals (msg_opts, backend);
+
+          g_vfs_backend_dav_send_async (backend, msg_opts,
+                                        try_mount_opts_cb, job);
+          return;
+        }
+    }
+
+  /* message failed, propagate the error */
+  if (!body)
+    {
+      if (dav_backend->last_good_path == NULL)
+        g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      else
+        mount_success (backend, G_VFS_JOB (job));
+      g_error_free (error);
+      goto clear_msgs;
+    }
+
+  status = soup_message_get_status (msg_opts);
+
+  /* Workaround for servers which response with 403 instead of 401 in case of
+   * wrong credentials to let the user specify its credentials again. */
+  if (status == SOUP_STATUS_FORBIDDEN &&
+      dav_backend->last_good_path == NULL &&
+      (dav_backend->auth_info.server_auth.password != NULL ||
+       dav_backend->auth_info.proxy_auth.password != NULL))
+    {
+      SoupSessionFeature *auth_manager;
+
+      dav_backend->auth_info.retrying_after_403 = TRUE;
+
+      g_clear_pointer (&dav_backend->auth_info.server_auth.username, g_free);
+      dav_backend->auth_info.server_auth.username = g_strdup (g_uri_get_user (http_backend->mount_base));
+      g_clear_pointer (&dav_backend->auth_info.server_auth.password, g_free);
+      g_clear_pointer (&dav_backend->auth_info.proxy_auth.password, g_free);
+
+      auth_manager = soup_session_get_feature (http_backend->session, SOUP_TYPE_AUTH_MANAGER);
+      soup_auth_manager_clear_cached_credentials (SOUP_AUTH_MANAGER (auth_manager));
+
+      /* re-send the opts message; re-create since we're still in its cb */
+      g_object_unref (msg_opts);
+      msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS,
+                                            http_backend->mount_base);
+
+      dav_message_connect_signals (msg_opts, backend);
+
+      g_vfs_backend_dav_send_async (backend, msg_opts, try_mount_opts_cb, job);
+      return;
+    }
+
+  is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
+  is_webdav = sm_has_header (msg_opts, "DAV");
+
+  if ((is_success && !is_webdav) || (status == SOUP_STATUS_METHOD_NOT_ALLOWED))
+    {
+      if (dav_backend->last_good_path == NULL)
+        g_vfs_job_failed (G_VFS_JOB (job),
+                          G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Not a WebDAV enabled share"));
+      else
+        mount_success (backend, G_VFS_JOB (job));
+      goto clear_msgs;
+    }
+  else if (!is_success)
+    {
+      int error_code = http_error_code_from_status (soup_message_get_status (msg_opts));
+
+      if (dav_backend->last_good_path == NULL)
+        g_vfs_job_failed (G_VFS_JOB (job),
+                          G_IO_ERROR, error_code,
+                          _("HTTP Error: %s"),
+                          soup_message_get_reason_phrase (msg_opts));
+      else
+        mount_success (backend, G_VFS_JOB (job));
+      goto clear_msgs;
+    }
+
+  if (!g_vfs_backend_dav_stream_skip (body, &error))
+    {
+      if (dav_backend->last_good_path == NULL)
+        g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      else
+        mount_success (backend, G_VFS_JOB (job));
+      g_error_free (error);
+      goto clear_msgs;
+    }
+
+  g_object_unref (body);
+
+  cur_uri = soup_message_get_uri (msg_opts);
+
+  /* The count_children parameter is intentionally set to TRUE to be sure that
+     enumeration is possible: https://gitlab.gnome.org/GNOME/gvfs/-/issues/468 */
+  msg_stat = stat_location_start (cur_uri, TRUE);
+
+  dav_message_connect_signals (msg_stat, backend);
+
+  g_vfs_backend_dav_send_async (backend, msg_stat, try_mount_stat_cb, job);
+
+clear_msgs:
+  g_object_unref (msg_opts);
+}
+
+static gboolean
+try_mount (GVfsBackend  *backend,
+           GVfsJobMount *job,
+           GMountSpec   *mount_spec,
+           GMountSource *mount_source,
+           gboolean      is_automount)
+{
+  GVfsBackendDav  *dav_backend = G_VFS_BACKEND_DAV (backend);
+  GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (backend);
+  SoupMessage     *msg_opts;
+  GUri            *mount_base;
+  const char      *host;
+  const char      *type;
 
   g_debug ("+ mount\n");
 
@@ -1965,6 +2361,7 @@ do_mount (GVfsBackend  *backend,
   /* resolve DNS-SD style URIs */
   if ((strcmp (type, "dav+sd") == 0 || strcmp (type, "davs+sd") == 0) && host != NULL)
     {
+      GError *error = NULL;
       dav_backend->resolver = g_vfs_dns_sd_resolver_new_for_encoded_triple (host, "u");
 
       if (!g_vfs_dns_sd_resolver_resolve_sync (dav_backend->resolver,
@@ -1973,7 +2370,7 @@ do_mount (GVfsBackend  *backend,
         {
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
-          return;
+          return TRUE;
         }
       g_signal_connect (dav_backend->resolver,
                         "changed",
@@ -1993,242 +2390,29 @@ do_mount (GVfsBackend  *backend,
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_INVALID_ARGUMENT,
                         _("Invalid mount spec"));
-      return;
+      return TRUE;
     }
 
-  session = G_VFS_BACKEND_HTTP (backend)->session;
-  G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base;
+  http_backend->mount_base = mount_base;
 
-  soup_session_add_feature_by_type (session, SOUP_TYPE_AUTH_NEGOTIATE);
-  soup_session_add_feature_by_type (session, SOUP_TYPE_AUTH_NTLM);
+  soup_session_add_feature_by_type (http_backend->session,
+                                    SOUP_TYPE_AUTH_NEGOTIATE);
+  soup_session_add_feature_by_type (http_backend->session,
+                                    SOUP_TYPE_AUTH_NTLM);
 
-  data = &(G_VFS_BACKEND_DAV (backend)->auth_info); 
-  data->mount_source = g_object_ref (mount_source);
-  data->server_auth.username = g_strdup (g_uri_get_user (mount_base));
-  data->server_auth.pw_save = G_PASSWORD_SAVE_NEVER;
-  data->proxy_auth.pw_save = G_PASSWORD_SAVE_NEVER;
-  data->interactive = TRUE;
+  dav_backend->auth_info.mount_source = g_object_ref (mount_source);
+  dav_backend->auth_info.server_auth.username = g_strdup (g_uri_get_user (mount_base));
+  dav_backend->auth_info.server_auth.pw_save = G_PASSWORD_SAVE_NEVER;
+  dav_backend->auth_info.proxy_auth.pw_save = G_PASSWORD_SAVE_NEVER;
+  dav_backend->auth_info.interactive = TRUE;
 
-  last_good_path = NULL;
+  dav_backend->last_good_path = NULL;
+
   msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
+  dav_message_connect_signals (msg_opts, backend);
 
-  /* The count_children parameter is intentionally set to TRUE to be sure that
-     enumeration is possible: https://gitlab.gnome.org/GNOME/gvfs/-/issues/468 */
-  msg_stat = stat_location_begin (mount_base, TRUE);
-
-  do {
-    GInputStream *body;
-    GFileType file_type;
-    GUri *cur_uri;
-    char *new_path;
-
-    res = TRUE;
-    body = g_vfs_backend_dav_send (backend, msg_opts, sig_opts, &error);
-    sig_opts = FALSE;
-    status = body ? soup_message_get_status (msg_opts) : SOUP_STATUS_NONE;
-    is_success = body && SOUP_STATUS_IS_SUCCESSFUL (status);
-    is_webdav = sm_has_header (msg_opts, "DAV");
-
-    /* Workaround for servers which response with 403 instead of 401 in case of
-     * wrong credentials to let the user specify its credentials again. */
-    if (status == SOUP_STATUS_FORBIDDEN &&
-        last_good_path == NULL &&
-        (data->server_auth.password != NULL ||
-         data->proxy_auth.password != NULL))
-      {
-        SoupSessionFeature *auth_manager;
-
-        data->retrying_after_403 = TRUE;
-
-        g_clear_pointer (&data->server_auth.username, g_free);
-        data->server_auth.username = g_strdup (g_uri_get_user (mount_base));
-        g_clear_pointer (&data->server_auth.password, g_free);
-        g_clear_pointer (&data->proxy_auth.password, g_free);
-
-        auth_manager = soup_session_get_feature (session, SOUP_TYPE_AUTH_MANAGER);
-        soup_auth_manager_clear_cached_credentials (SOUP_AUTH_MANAGER (auth_manager));
-
-        g_object_unref (msg_opts);
-        msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
-
-        continue;
-      }
-
-    /* If SSL is used and the certificate verifies OK, then ssl-strict remains
-     * on for all further connections.
-     * If SSL is used and the certificate does not verify OK, then the user
-     * gets a chance to override it. If they do, ssl-strict is disabled but
-     * the certificate is stored, and checked on each subsequent connection to
-     * ensure that it hasn't changed. */
-    if (g_error_matches (error, G_TLS_ERROR, G_TLS_ERROR_BAD_CERTIFICATE) &&
-        !dav_backend->certificate_errors)
-      {
-        GTlsCertificate *certificate;
-        GTlsCertificateFlags errors;
-
-        certificate = soup_message_get_tls_peer_certificate (msg_opts);
-        errors = soup_message_get_tls_peer_certificate_errors (msg_opts);
-        if (gvfs_accept_certificate (mount_source, certificate, errors))
-          {
-            g_clear_error (&error);
-            dav_backend->certificate = g_object_ref (certificate);
-            dav_backend->certificate_errors = errors;
-            continue;
-          }
-        else
-          {
-            /* break the loop, if last_good_path is NULL then the error is
-             * propagated, otherwise it is cleared later by the else branch
-             */
-            break;
-          }
-      }
-
-    if (!is_success || !is_webdav)
-      break;
-
-    if (!g_vfs_backend_dav_stream_skip (body, &error))
-      {
-        g_object_unref (body);
-        break;
-      }
-
-    g_object_unref (body);
-
-    soup_message_headers_clear (soup_message_get_response_headers (msg_opts));
-
-    cur_uri = soup_message_get_uri (msg_opts);
-    soup_message_set_uri (msg_stat, cur_uri);
-
-    body = g_vfs_backend_dav_send (backend, msg_stat, sig_stat, NULL);
-    sig_stat = FALSE;
-    res = stat_location_finish (msg_stat, body, &file_type, NULL, NULL);
-    is_collection = res && file_type == G_FILE_TYPE_DIRECTORY;
-
-    if (body && !g_vfs_backend_dav_stream_skip (body, &error))
-      {
-        g_object_unref (body);
-        break;
-      }
-
-    g_clear_object (&body);
-
-    soup_message_headers_clear (soup_message_get_response_headers (msg_stat));
-
-    g_debug (" [%s] webdav: %d, collection %d [res: %d]\n",
-             g_uri_get_path (mount_base), is_webdav, is_collection, res);
-
-    if (is_collection == FALSE)
-      break;
-
-    /* we have found a new good root, try the parent ... */
-    g_free (last_good_path);
-    last_good_path = g_strdup (g_uri_get_path (mount_base));
-    new_path = path_get_parent_dir (last_good_path);
-
-    tmp = mount_base;
-    mount_base = soup_uri_copy (mount_base, SOUP_URI_PATH, new_path, SOUP_URI_NONE);
-    g_uri_unref (tmp);
-    G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base;
-
-    g_free (new_path);
-
-    soup_message_set_uri (msg_opts, mount_base);
-
-    /* if we have found a root that is good then we assume
-       that we also have obtained to correct credentials
-       and we switch the auth handler. This will prevent us
-       from asking for *different* credentials *again* if the
-       server should response with 401 for some of the parent
-       collections. See also bug #677753 */
-    data->interactive = FALSE;
-
-  } while (g_strcmp0 (last_good_path, "/") != 0);
-
-  /* we either encountered an error or we have
-     reached the end of paths we are allowed to
-     chdir up to (or couldn't chdir up at all) */
-
-  /* check if we at all have a good path */
-  if (last_good_path == NULL)
-    {
-      if (error)
-        {
-          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-          g_error_free (error);
-        }
-      else if ((is_success && !is_webdav) ||
-               soup_message_get_status (msg_opts) == SOUP_STATUS_METHOD_NOT_ALLOWED)
-        {
-          /* This means the either: a) OPTIONS request succeeded
-             (which should be the case even for non-existent
-             resources on a webdav enabled share) but we did not
-             get the DAV header. Or b) the OPTIONS request was a
-             METHOD_NOT_ALLOWED (405).
-             Prioritize this error messages, because it seems most
-             useful to the user. */
-          g_vfs_job_failed (G_VFS_JOB (job),
-                            G_IO_ERROR, G_IO_ERROR_FAILED,
-                            _("Not a WebDAV enabled share"));
-        }
-      else if (!is_success || !res)
-        {
-          /* Either the OPTIONS request (is_success) or the PROPFIND
-             request (res) failed. */
-          SoupMessage *target = !is_success ? msg_opts : msg_stat;
-          int error_code = http_error_code_from_status (soup_message_get_status (target));
-
-          g_vfs_job_failed (G_VFS_JOB (job),
-                            G_IO_ERROR, error_code,
-                            _("HTTP Error: %s"),
-                            soup_message_get_reason_phrase (target));
-        }
-      else
-        {
-          /* This means, we have a valid DAV header, PROPFIND worked,
-             but it is not a collection!  */
-          g_vfs_job_failed (G_VFS_JOB (job),
-                            G_IO_ERROR, G_IO_ERROR_FAILED,
-                            _("Could not find an enclosing directory"));
-        }
-
-      g_object_unref (msg_opts);
-      g_object_unref (msg_stat);
-
-      return;
-    }
-  else if (error)
-    g_error_free (error);
-
-  /* Success! We are mounted */	
-  /* Save the auth info in the keyring */
-
-  keyring_save_authinfo (&(data->server_auth), mount_base, FALSE);
-  /* TODO: save proxy auth */
-
-  /* Set the working path in mount path */
-  tmp = mount_base;
-  mount_base = soup_uri_copy (mount_base, SOUP_URI_PATH, last_good_path, SOUP_URI_NONE);
-  g_uri_unref (tmp);
-  G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base;
-  g_free (last_good_path);
-
-  /* dup the mountspec, but only copy known fields */
-  mount_spec = g_mount_spec_from_dav_uri (dav_backend, mount_base);
-
-  g_vfs_backend_set_mount_spec (backend, mount_spec);
-  g_vfs_backend_set_icon_name (backend, "folder-remote");
-  g_vfs_backend_set_symbolic_icon_name (backend, "folder-remote-symbolic");
-  
-  g_vfs_backend_dav_setup_display_name (backend);
-  
-  /* cleanup */
-  g_mount_spec_unref (mount_spec);
-  g_object_unref (msg_opts);
-  g_object_unref (msg_stat);
-
-  g_vfs_job_succeeded (G_VFS_JOB (job));
-  g_debug ("- mount\n");
+  g_vfs_backend_dav_send_async (backend, msg_opts, try_mount_opts_cb, job);
+  return TRUE;
 }
 
 static PropName ls_propnames[] = {
@@ -2244,34 +2428,18 @@ static PropName ls_propnames[] = {
 
 /* *** query_info () *** */
 static void
-do_query_info (GVfsBackend           *backend,
-               GVfsJobQueryInfo      *job,
-               const char            *filename,
-               GFileQueryInfoFlags    flags,
-               GFileInfo             *info,
-               GFileAttributeMatcher *matcher)
+try_query_info_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
-  SoupMessage *msg;
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  SoupMessage *msg = g_vfs_backend_dav_get_async_result_message (backend, result);
+  GVfsJobQueryInfo *job = user_data;
   GInputStream *body;
+  GError *error = NULL;
   Multistatus ms;
   xmlNodeIter iter;
   gboolean res;
-  GError *error = NULL;
 
-  g_debug ("Query info %s\n", filename);
-
-  msg = propfind_request_new (backend, filename, 0, ls_propnames);
-  if (msg == NULL)
-    {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_FAILED,
-                        _("Could not create request"));
-      return;
-    }
-
-  message_add_redirect_header (msg, flags);
-
-  body = g_vfs_backend_dav_send (backend, msg, TRUE, &error);
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
 
   if (!body)
     goto error;
@@ -2318,6 +2486,36 @@ do_query_info (GVfsBackend           *backend,
   g_object_unref (msg);
 }
 
+static gboolean
+try_query_info (GVfsBackend *backend,
+                GVfsJobQueryInfo *job,
+                const char *filename,
+                GFileQueryInfoFlags flags,
+                GFileInfo *info,
+                GFileAttributeMatcher *matcher)
+{
+  SoupMessage *msg;
+
+  g_debug ("Query info %s\n", filename);
+
+  msg = propfind_request_new (backend, filename, 0, ls_propnames);
+  if (msg == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Could not create request"));
+      return TRUE;
+    }
+
+  message_add_redirect_header (msg, flags);
+
+  dav_message_connect_signals (msg, backend);
+
+  g_vfs_backend_dav_send_async (backend, msg, try_query_info_cb, job);
+
+  return TRUE;
+}
+
 static PropName fs_info_propnames[] = {
   {"quota-available-bytes", NULL},
   {"quota-used-bytes",      NULL},
@@ -2325,51 +2523,18 @@ static PropName fs_info_propnames[] = {
 };
 
 static void
-do_query_fs_info (GVfsBackend           *backend,
-                  GVfsJobQueryFsInfo    *job,
-                  const char            *filename,
-                  GFileInfo             *info,
-                  GFileAttributeMatcher *attribute_matcher)
+try_query_fs_info_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
-  SoupMessage *msg;
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  SoupMessage *msg = g_vfs_backend_dav_get_async_result_message (backend, result);
+  GVfsJobQueryFsInfo *job = user_data;
   GInputStream *body;
+  GError *error = NULL;
   Multistatus ms;
   xmlNodeIter iter;
   gboolean res;
-  GError *error = NULL;
 
-  g_file_info_set_attribute_string (info,
-                                    G_FILE_ATTRIBUTE_FILESYSTEM_TYPE,
-                                    "webdav");
-  g_file_info_set_attribute_boolean (info,
-                                     G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE,
-                                     TRUE);
-  g_file_info_set_attribute_uint32 (info,
-                                    G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW,
-                                    G_FILESYSTEM_PREVIEW_TYPE_IF_ALWAYS);
-
-  if (! (g_file_attribute_matcher_matches (attribute_matcher,
-                                           G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||
-         g_file_attribute_matcher_matches (attribute_matcher,
-                                           G_FILE_ATTRIBUTE_FILESYSTEM_USED) ||
-         g_file_attribute_matcher_matches (attribute_matcher,
-                                           G_FILE_ATTRIBUTE_FILESYSTEM_FREE)))
-    {
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-      return;
-    }
-
-  msg = propfind_request_new (backend, filename, 0, fs_info_propnames);
-  if (msg == NULL)
-    {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_FAILED,
-                        _("Could not create request"));
-
-      return;
-    }
-
-  body = g_vfs_backend_dav_send (backend, msg, TRUE, &error);
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
 
   if (!body)
     goto error;
@@ -2392,7 +2557,7 @@ do_query_fs_info (GVfsBackend           *backend,
 
       if (response.is_target)
         {
-          ms_response_to_fs_info (&response, info);
+          ms_response_to_fs_info (&response, job->file_info);
           res = TRUE;
         }
 
@@ -2416,36 +2581,67 @@ do_query_fs_info (GVfsBackend           *backend,
   g_object_unref (msg);
 }
 
-/* *** enumerate *** */
-static void
-do_enumerate (GVfsBackend           *backend,
-              GVfsJobEnumerate      *job,
-              const char            *filename,
-              GFileAttributeMatcher *matcher,
-              GFileQueryInfoFlags    flags)
+static gboolean
+try_query_fs_info (GVfsBackend *backend,
+                   GVfsJobQueryFsInfo *job,
+                   const char *filename,
+                   GFileInfo *info,
+                   GFileAttributeMatcher *attribute_matcher)
 {
   SoupMessage *msg;
-  GInputStream *body;
-  Multistatus ms;
-  xmlNodeIter iter;
-  gboolean res;
-  GError *error = NULL;
 
-  g_debug ("+ do_enumerate: %s\n", filename);
+  g_file_info_set_attribute_string (info,
+                                    G_FILE_ATTRIBUTE_FILESYSTEM_TYPE,
+                                    "webdav");
+  g_file_info_set_attribute_boolean (info,
+                                     G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE,
+                                     TRUE);
+  g_file_info_set_attribute_uint32 (info,
+                                    G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW,
+                                    G_FILESYSTEM_PREVIEW_TYPE_IF_ALWAYS);
 
-  msg = propfind_request_new (backend, filename, 1, ls_propnames);
+  if (! (g_file_attribute_matcher_matches (attribute_matcher,
+                                           G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||
+         g_file_attribute_matcher_matches (attribute_matcher,
+                                           G_FILE_ATTRIBUTE_FILESYSTEM_USED) ||
+         g_file_attribute_matcher_matches (attribute_matcher,
+                                           G_FILE_ATTRIBUTE_FILESYSTEM_FREE)))
+    {
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+      return TRUE;
+    }
+
+  msg = propfind_request_new (backend, filename, 0, fs_info_propnames);
   if (msg == NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Could not create request"));
-      
-      return;
+      return TRUE;
     }
 
-  message_add_redirect_header (msg, flags);
+  dav_message_connect_signals (msg, backend);
 
-  body = g_vfs_backend_dav_send (backend, msg, TRUE, &error);
+  g_vfs_backend_dav_send_async (backend, msg, try_query_fs_info_cb, job);
+
+  return TRUE;
+}
+
+/* *** enumerate *** */
+
+static void
+try_enumerate_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  SoupMessage *msg = g_vfs_backend_dav_get_async_result_message (backend, result);
+  GVfsJobEnumerate *job = user_data;
+  GInputStream *body;
+  GError *error = NULL;
+  Multistatus ms;
+  xmlNodeIter iter;
+  gboolean res;
+
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
 
   if (!body)
     goto error;
@@ -2491,6 +2687,34 @@ do_enumerate (GVfsBackend           *backend,
   g_object_unref (msg);
 }
 
+static gboolean
+try_enumerate (GVfsBackend *backend,
+               GVfsJobEnumerate *job,
+               const char *filename,
+               GFileAttributeMatcher *matcher,
+               GFileQueryInfoFlags flags)
+{
+  SoupMessage *msg;
+
+  g_debug ("+ try_enumerate: %s\n", filename);
+
+  msg = propfind_request_new (backend, filename, 1, ls_propnames);
+  if (msg == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Could not create request"));
+      return TRUE;
+    }
+
+  message_add_redirect_header (msg, flags);
+  dav_message_connect_signals (msg, backend);
+
+  g_vfs_backend_dav_send_async (backend, msg, try_enumerate_cb, job);
+
+  return TRUE;
+}
+
 /* ************************************************************************* */
 /*  */
 
@@ -2525,7 +2749,7 @@ try_open_stat_done (GObject      *source,
       return;
     }
 
-  res = stat_location_finish (msg, body, &target_type, NULL, NULL);
+  res = stat_location_end (msg, body, &target_type, NULL, NULL);
   g_object_unref (body);
 
   if (res == FALSE)
@@ -2559,7 +2783,7 @@ try_open_for_read (GVfsBackend        *backend,
   GUri *uri;
 
   uri = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
-  msg = stat_location_begin (uri, FALSE);
+  msg = stat_location_start (uri, FALSE);
   g_uri_unref (uri);
 
   if (msg == NULL)
@@ -2571,8 +2795,11 @@ try_open_for_read (GVfsBackend        *backend,
       return FALSE;
     }
 
+  dav_message_connect_signals (msg, backend);
+
   g_vfs_job_set_backend_data (G_VFS_JOB (job), backend, NULL);
-  g_vfs_backend_dav_send_async (backend, msg, TRUE, try_open_stat_done, job);
+  soup_session_send_async (G_VFS_BACKEND_HTTP (backend)->session, msg,
+                           G_PRIORITY_DEFAULT, NULL, try_open_stat_done, job);
 
   return TRUE;
 }
@@ -2651,7 +2878,11 @@ try_create (GVfsBackend *backend,
 
   g_vfs_job_set_backend_data (G_VFS_JOB (job), msg, NULL);
 
-  g_vfs_backend_dav_send_async (backend, msg, TRUE, try_create_tested_existence, job);
+  dav_message_connect_signals (msg, backend);
+
+  soup_session_send_async (G_VFS_BACKEND_HTTP (backend)->session, msg,
+                           G_PRIORITY_DEFAULT, NULL,
+                           try_create_tested_existence, job);
 
   return TRUE;
 }
@@ -2760,12 +2991,14 @@ try_replace (GVfsBackend *backend,
       msg = soup_message_new_from_uri (SOUP_METHOD_HEAD, uri);
       g_uri_unref (uri);
 
+      dav_message_connect_signals (msg, backend);
+
       soup_message_headers_append (soup_message_get_request_headers (msg),
                                    "If-Match", etag);
 
       g_vfs_job_set_backend_data (G_VFS_JOB (job), op_backend, NULL);
-      g_vfs_backend_dav_send_async (backend, msg, TRUE,
-                                    try_replace_checked_etag, job);
+      soup_session_send_async (op_backend->session, msg, G_PRIORITY_DEFAULT,
+                               NULL, try_replace_checked_etag, job);
 
       return TRUE;
     }
@@ -2829,6 +3062,7 @@ try_write (GVfsBackend *backend,
   return TRUE;
 }
 
+/* this does not invoke libsoup API, so it can be synchronous/threaded */
 static void
 do_seek_on_write (GVfsBackend *backend,
                   GVfsJobSeekWrite *job,
@@ -2851,6 +3085,7 @@ do_seek_on_write (GVfsBackend *backend,
     }
 }
 
+/* this does not invoke libsoup API, so it can be synchronous/threaded */
 static void
 do_truncate (GVfsBackend *backend,
              GVfsJobTruncate *job,
@@ -2914,34 +3149,32 @@ try_close_write (GVfsBackend *backend,
   g_object_ref (msg);
   g_object_set_data (G_OBJECT (stream), "-gvfs-stream-msg", NULL);
 
+  dav_message_connect_signals (msg, backend);
+
   g_output_stream_close (stream, NULL, NULL);
   bytes = g_memory_output_stream_steal_as_bytes (G_MEMORY_OUTPUT_STREAM (stream));
   g_object_unref (stream);
 
   soup_message_set_request_body_from_bytes (msg, NULL, bytes);
-  g_vfs_backend_dav_send_async (backend, msg, TRUE,
-                                try_close_write_sent, job);
+  soup_session_send_async (G_VFS_BACKEND_HTTP (backend)->session, msg,
+                           G_PRIORITY_DEFAULT, NULL, try_close_write_sent, job);
   g_bytes_unref (bytes);
 
   return TRUE;
 }
 
 static void
-do_make_directory (GVfsBackend          *backend,
-                   GVfsJobMakeDirectory *job,
-                   const char           *filename)
+make_directory_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  GVfsJobMakeDirectory *job = user_data;
+  SoupMessage *msg = g_vfs_backend_dav_get_async_result_message (backend, result);
   GInputStream *body;
-  SoupMessage *msg;
-  GUri *uri;
   GError *error = NULL;
   guint status;
 
-  uri = g_vfs_backend_dav_uri_for_path (backend, filename, TRUE);
-  msg = soup_message_new_from_uri (SOUP_METHOD_MKCOL, uri);
-  g_uri_unref (uri);
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
 
-  body = g_vfs_backend_dav_send (backend, msg, TRUE, &error);
   if (!body)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -2966,47 +3199,41 @@ do_make_directory (GVfsBackend          *backend,
   g_object_unref (msg);
 }
 
-static void
-do_delete (GVfsBackend   *backend,
-           GVfsJobDelete *job,
-           const char    *filename)
+static gboolean
+try_make_directory (GVfsBackend *backend,
+                    GVfsJobMakeDirectory *job,
+                    const char *filename)
 {
-  GInputStream *body;
   SoupMessage *msg;
   GUri *uri;
-  GFileType file_type;
-  gboolean res;
-  guint num_children;
-  guint status;
+
+  uri = g_vfs_backend_dav_uri_for_path (backend, filename, TRUE);
+  msg = soup_message_new_from_uri (SOUP_METHOD_MKCOL, uri);
+  g_uri_unref (uri);
+
+  dav_message_connect_signals (msg, backend);
+
+  g_vfs_backend_dav_send_async (backend, msg, make_directory_cb, job);
+  return TRUE;
+}
+
+static void
+try_delete_send_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  GVfsJobDelete *job = user_data;
+  SoupMessage *msg = g_vfs_backend_dav_get_async_result_message (backend, result);
+  GInputStream *body;
   GError *error = NULL;
+  guint status;
 
-  uri = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
-  res = stat_location (backend, uri, &file_type, NULL, &num_children, &error);
-  if (res == FALSE)
-    {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      g_uri_unref (uri);
-      return;
-    }
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
 
-  if (file_type == G_FILE_TYPE_DIRECTORY && num_children)
-    {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
-                        _("Directory not empty"));
-      g_uri_unref (uri);
-      return;
-    }
-
-  msg = soup_message_new_from_uri (SOUP_METHOD_DELETE, uri);
-  body = g_vfs_backend_dav_send (backend, msg, TRUE, &error);
   if (!body)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       g_object_unref (msg);
-      g_uri_unref (uri);
       return;
     }
 
@@ -3016,40 +3243,77 @@ do_delete (GVfsBackend   *backend,
   else
     g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  g_uri_unref (uri);
   g_object_unref (msg);
   g_object_unref (body);
 }
 
 static void
-do_set_display_name (GVfsBackend           *backend,
-                     GVfsJobSetDisplayName *job,
-                     const char            *filename,
-                     const char            *display_name)
+try_delete_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
-  GInputStream *body;
-  SoupMessage *msg;
-  GUri *source;
-  GUri *target;
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  GVfsJobDelete *job = user_data;
+  SoupMessage *msg = NULL;
+  GFileType file_type;
+  guint num_children;
+  GError *error = NULL;
+  gboolean res;
+  GUri *uri = stat_location_async_get_uri (backend, result);
+
+  res = stat_location_finish (backend, &file_type, NULL,
+                              &num_children, result, &error);
+  if (res == FALSE)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_clear_error (&error);
+      return;
+    }
+
+  if (file_type == G_FILE_TYPE_DIRECTORY && num_children)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
+                        _("Directory not empty"));
+      return;
+    }
+
+  msg = soup_message_new_from_uri (SOUP_METHOD_DELETE, uri);
+
+  dav_message_connect_signals (msg, backend);
+
+  g_vfs_backend_dav_send_async (backend, msg, try_delete_send_cb, job);
+}
+
+static gboolean
+try_delete (GVfsBackend *backend, GVfsJobDelete *job, const char *filename)
+{
+  GUri *uri;
+
+  uri = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
+  stat_location_async (backend, uri, TRUE, try_delete_cb, job);
+  return TRUE;
+}
+
+typedef struct _TrySetDisplayNameData {
+  GVfsJobSetDisplayName *job;
   char *target_path;
-  char *dirname;
+} TrySetDisplayNameData;
+
+static void
+try_set_display_name_cb (GObject *source, GAsyncResult *result,
+                         gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  TrySetDisplayNameData *data = user_data;
+  SoupMessage *msg = g_vfs_backend_dav_get_async_result_message (backend, result);
+  GInputStream *body;
   GError *error = NULL;
   guint status;
 
-  source = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
-  msg = soup_message_new_from_uri (SOUP_METHOD_MOVE, source);
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
 
-  dirname = g_path_get_dirname (filename);
-  target_path = g_build_filename (dirname, display_name, NULL);
-  target = g_vfs_backend_dav_uri_for_path (backend, target_path, FALSE);
-
-  message_add_destination_header (msg, target);
-  message_add_overwrite_header (msg, FALSE);
-
-  body = g_vfs_backend_dav_send (backend, msg, TRUE, &error);
   if (!body)
     {
-      http_job_failed (G_VFS_JOB (job), msg);
+      http_job_failed (G_VFS_JOB (data->job), msg);
       goto error;
     }
 
@@ -3073,46 +3337,287 @@ do_set_display_name (GVfsBackend           *backend,
 
   if (SOUP_STATUS_IS_SUCCESSFUL (status))
     {
-      g_debug ("new target_path: %s\n", target_path);
-      g_vfs_job_set_display_name_set_new_path (job, target_path);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
+      g_debug ("new target_path: %s\n", data->target_path);
+      g_vfs_job_set_display_name_set_new_path (data->job, data->target_path);
+      g_vfs_job_succeeded (G_VFS_JOB (data->job));
     }
   else if (status == SOUP_STATUS_PRECONDITION_FAILED ||
            SOUP_STATUS_IS_REDIRECTION (status))
-    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+    g_vfs_job_failed (G_VFS_JOB (data->job), G_IO_ERROR,
                       G_IO_ERROR_EXISTS,
                       _("Target file already exists"));
   else
-    http_job_failed (G_VFS_JOB (job), msg);
+    http_job_failed (G_VFS_JOB (data->job), msg);
 
   g_object_unref (body);
 
- error:
+error:
+  g_clear_error (&error);
   g_object_unref (msg);
-  g_free (dirname);
-  g_free (target_path);
-  g_uri_unref (target);
-  g_uri_unref (source);
+  g_free (data->target_path);
+  g_slice_free (TrySetDisplayNameData, data);
 }
 
-static void
-do_move (GVfsBackend *backend,
-         GVfsJobMove *job,
-         const char *source,
-         const char *destination,
-         GFileCopyFlags flags,
-         GFileProgressCallback progress_callback,
-         gpointer progress_callback_data)
+static gboolean
+try_set_display_name (GVfsBackend *backend,
+                      GVfsJobSetDisplayName *job,
+                      const char *filename,
+                      const char *display_name)
 {
-  GInputStream *body = NULL;
+  SoupMessage *msg;
+  GUri *source;
+  GUri *target;
+  TrySetDisplayNameData *data = g_slice_new (TrySetDisplayNameData);
+  char *dirname;
+
+  source = g_vfs_backend_dav_uri_for_path (backend, filename, FALSE);
+  msg = soup_message_new_from_uri (SOUP_METHOD_MOVE, source);
+
+  dirname = g_path_get_dirname (filename);
+  data->target_path = g_build_filename (dirname, display_name, NULL);
+  target = g_vfs_backend_dav_uri_for_path (backend, data->target_path, FALSE);
+
+  message_add_destination_header (msg, target);
+  message_add_overwrite_header (msg, FALSE);
+
+  data->job = job;
+  g_free (dirname);
+  g_uri_unref (target);
+  g_uri_unref (source);
+
+  dav_message_connect_signals (msg, backend);
+
+  g_vfs_backend_dav_send_async (backend, msg, try_set_display_name_cb, data);
+
+  return TRUE;
+}
+
+typedef struct _CopyData {
+  GVfsJob *job;
   SoupMessage *msg;
   GUri *source_uri;
   GUri *target_uri;
-  guint status;
-  GFileType source_ft, target_ft;
-  GError *error = NULL;
-  gboolean res, stat_res;
+  GFileProgressCallback progress_callback;
+  gpointer progress_callback_data;
   gint64 file_size;
+  GFileType source_ft;
+  GFileType target_ft;
+  GFileCopyFlags flags;
+  gboolean source_res;
+  gboolean target_res;
+} CopyData;
+
+static void
+copy_data_free (gpointer data)
+{
+  CopyData *p = data;
+  g_clear_pointer (&p->source_uri, g_uri_unref);
+  g_clear_pointer (&p->target_uri, g_uri_unref);
+  g_clear_object (&p->msg);
+  g_slice_free (CopyData, p);
+}
+
+static void
+try_move_do_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  CopyData *data = user_data;
+  GInputStream *body;
+  GError *error = NULL;
+  guint status;
+
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
+
+  if (!body)
+    {
+      g_vfs_job_failed_from_error (data->job, error);
+      copy_data_free (data);
+      g_clear_error (&error);
+      return;
+    }
+
+  /* See try_set_display_name () for the explanation of the PRECONDITION_FAILED
+   * and IS_REDIRECTION handling below. */
+  status = soup_message_get_status (data->msg);
+
+  if (SOUP_STATUS_IS_SUCCESSFUL (status))
+    {
+      if (data->source_res && data->progress_callback)
+        data->progress_callback (data->file_size, data->file_size,
+                                 data->progress_callback_data);
+      g_vfs_job_succeeded (data->job);
+    }
+  else if (status == SOUP_STATUS_PRECONDITION_FAILED ||
+           SOUP_STATUS_IS_REDIRECTION (status))
+    g_vfs_job_failed (data->job, G_IO_ERROR,
+                      G_IO_ERROR_EXISTS,
+                      _("Target file already exists"));
+  else
+    http_job_failed (data->job, data->msg);
+
+  copy_data_free (data);
+}
+
+static void
+try_move_do (GVfsBackend *backend, CopyData *data)
+{
+  message_add_destination_header (data->msg, data->target_uri);
+  message_add_overwrite_header (data->msg, data->flags & G_FILE_COPY_OVERWRITE);
+  g_vfs_backend_dav_send_async (backend, data->msg, try_move_do_cb, data);
+}
+
+static void
+try_move_target_delete_cb (GObject *source, GAsyncResult *result,
+                           gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  SoupMessage *msg = g_vfs_backend_dav_get_async_result_message (backend, result);
+  CopyData *data = user_data;
+  GInputStream *body;
+  GError *error = NULL;
+  guint status;
+
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
+
+  if (!body)
+    {
+      g_vfs_job_failed_from_error (data->job, error);
+      copy_data_free (data);
+      g_object_unref (msg);
+      g_clear_error (&error);
+      return;
+    }
+
+  status = soup_message_get_status (msg);
+  if (!SOUP_STATUS_IS_SUCCESSFUL (status))
+    {
+      http_job_failed (data->job, msg);
+      g_object_unref (msg);
+      copy_data_free (data);
+      return;
+    }
+
+  g_object_unref (body);
+  g_object_unref (msg);
+
+  try_move_do (backend, data);
+}
+
+static void
+try_move_source_stat_cb (GObject *source, GAsyncResult *result,
+                         gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  CopyData *data = user_data;
+  GError *error = NULL;
+
+  data->source_res = stat_location_finish (backend, &data->source_ft,
+                                           &data->file_size, NULL,
+                                           result, &error);
+
+  if (data->target_res)
+    {
+      if (data->flags & G_FILE_COPY_OVERWRITE)
+        {
+          if (data->source_res)
+            {
+              if (data->target_ft == G_FILE_TYPE_DIRECTORY)
+                {
+                  if (data->source_ft == G_FILE_TYPE_DIRECTORY)
+                    g_vfs_job_failed_literal (G_VFS_JOB(data->job),
+                                              G_IO_ERROR,
+                                              G_IO_ERROR_WOULD_MERGE,
+                                              _("Can’t move directory over directory"));
+                  else
+                    g_vfs_job_failed_literal (G_VFS_JOB(data->job),
+                                              G_IO_ERROR,
+                                              G_IO_ERROR_IS_DIRECTORY,
+                                              _("Can’t move over directory"));
+                  copy_data_free (data);
+                  return;
+                }
+              else if (data->source_ft == G_FILE_TYPE_DIRECTORY)
+                {
+                  /* Overwriting a file with a directory, first remove the
+                   * file */
+                  SoupMessage *msg;
+
+                  msg = soup_message_new_from_uri (SOUP_METHOD_DELETE,
+                                                   data->target_uri);
+
+                  dav_message_connect_signals (msg, backend);
+
+                  g_vfs_backend_dav_send_async (backend, msg,
+                                                try_move_target_delete_cb,
+                                                data);
+                  return;
+                }
+            }
+          else
+            {
+              g_vfs_job_failed_from_error (data->job, error);
+              copy_data_free (data);
+              g_clear_error (&error);
+              return;
+            }
+        }
+      else
+        {
+          g_vfs_job_failed_literal (G_VFS_JOB(data->job),
+                                    G_IO_ERROR,
+                                    G_IO_ERROR_EXISTS,
+                                    _("Target file exists"));
+          copy_data_free (data);
+          g_clear_error (&error);
+          return;
+        }
+    }
+
+  try_move_do (backend, data);
+}
+
+static void
+try_move_target_stat_cb (GObject *source, GAsyncResult *result,
+                         gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  CopyData *data = user_data;
+  gboolean res;
+  GError *error = NULL;
+
+  res = stat_location_finish (backend, &data->target_ft, NULL, NULL,
+                              result, &error);
+
+  if (!res && !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+    {
+      g_vfs_job_failed_from_error (data->job, error);
+      g_clear_error (&error);
+      copy_data_free (data);
+      return;
+    }
+
+  g_clear_error (&error);
+
+  data->target_res = res;
+
+  stat_location_async (backend, data->source_uri, FALSE,
+                       try_move_source_stat_cb, data);
+}
+
+static gboolean
+try_move (GVfsBackend *backend,
+          GVfsJobMove *job,
+          const char *source,
+          const char *destination,
+          GFileCopyFlags flags,
+          GFileProgressCallback progress_callback,
+          gpointer progress_callback_data)
+{
+  CopyData *data = g_slice_new0 (CopyData);
+  data->job = G_VFS_JOB (job);
+  data->flags = flags;
+  data->progress_callback = progress_callback;
+  data->progress_callback_data = progress_callback_data;
 
   if (flags & G_FILE_COPY_BACKUP)
     {
@@ -3133,136 +3638,173 @@ do_move (GVfsBackend *backend,
                                     "Operation not supported");
         }
 
+      copy_data_free (data);
+      return TRUE;
+    }
+
+  data->source_uri = g_vfs_backend_dav_uri_for_path (backend, source, FALSE);
+  data->msg = soup_message_new_from_uri (SOUP_METHOD_MOVE, data->source_uri);
+  data->target_uri = g_vfs_backend_dav_uri_for_path (backend, destination, FALSE);
+
+  dav_message_connect_signals (data->msg, backend);
+
+  stat_location_async (backend, data->target_uri, FALSE,
+                       try_move_target_stat_cb, data);
+  return TRUE;
+}
+
+static void
+try_copy_do_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  CopyData *data = user_data;
+  GInputStream *body;
+  GError *error = NULL;
+  guint status;
+
+  body = g_vfs_backend_dav_send_finish (backend, result, &error);
+
+  if (!body)
+    {
+      g_vfs_job_failed_from_error (data->job, error);
+      copy_data_free (data);
       return;
     }
 
-  source_uri = g_vfs_backend_dav_uri_for_path (backend, source, FALSE);
-  msg = soup_message_new_from_uri (SOUP_METHOD_MOVE, source_uri);
-  target_uri = g_vfs_backend_dav_uri_for_path (backend, destination, FALSE);
-
-  res = stat_location (backend, target_uri, &target_ft, NULL, NULL, &error);
-  if (!res && !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+  /* See try_set_display_name () for the explanation of the PRECONDITION_FAILED
+   * and IS_REDIRECTION handling below. */
+  status = soup_message_get_status (data->msg);
+  if (SOUP_STATUS_IS_SUCCESSFUL (status))
     {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      goto error;
+      if (data->progress_callback)
+        data->progress_callback (data->file_size, data->file_size,
+                                 data->progress_callback_data);
+      g_vfs_job_succeeded (data->job);
     }
-  g_clear_error (&error);
+  else if (status == SOUP_STATUS_PRECONDITION_FAILED ||
+           SOUP_STATUS_IS_REDIRECTION (status))
+    g_vfs_job_failed (data->job, G_IO_ERROR,
+                      G_IO_ERROR_EXISTS,
+                      _("Target file already exists"));
+  else
+    http_job_failed (data->job, data->msg);
 
-  stat_res = stat_location (backend, source_uri, &source_ft, &file_size, NULL, &error);
-  if (res)
+  g_object_unref (body);
+  copy_data_free (data);
+}
+
+static void
+try_copy_target_stat_cb (GObject *source, GAsyncResult *result,
+                         gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  CopyData *data = user_data;
+  GError *error = NULL;
+
+  data->target_res = stat_location_finish (backend, &data->target_ft,
+                                           NULL, NULL, result, &error);
+
+  if (data->target_res)
     {
-      if (flags & G_FILE_COPY_OVERWRITE)
+      if (data->flags & G_FILE_COPY_OVERWRITE)
         {
-          if (stat_res)
+          if (data->target_ft == G_FILE_TYPE_DIRECTORY)
             {
-              if (target_ft == G_FILE_TYPE_DIRECTORY)
-                {
-                  if (source_ft == G_FILE_TYPE_DIRECTORY)
-                    g_vfs_job_failed_literal (G_VFS_JOB(job),
-                                              G_IO_ERROR,
-                                              G_IO_ERROR_WOULD_MERGE,
-                                              _("Can’t move directory over directory"));
-                  else
-                    g_vfs_job_failed_literal (G_VFS_JOB(job),
-                                              G_IO_ERROR,
-                                              G_IO_ERROR_IS_DIRECTORY,
-                                              _("Can’t move over directory"));
-                  goto error;
-                }
-              else if (source_ft == G_FILE_TYPE_DIRECTORY)
-                {
-                  /* Overwriting a file with a directory, first remove the
-                   * file */
-                  SoupMessage *msg;
-
-                  msg = soup_message_new_from_uri (SOUP_METHOD_DELETE,
-                                                   target_uri);
-                  body = g_vfs_backend_dav_send (backend, msg, TRUE, &error);
-                  if (!body)
-                    {
-                      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-                      goto error;
-                    }
-
-                  status = soup_message_get_status (msg);
-                  if (!SOUP_STATUS_IS_SUCCESSFUL (status))
-                    {
-                      http_job_failed (G_VFS_JOB (job), msg);
-                      goto error;
-                    }
-                  g_object_unref (body);
-                  g_object_unref (msg);
-                }
-            }
-          else
-            {
-              g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-              goto error;
+              if (data->source_ft == G_FILE_TYPE_DIRECTORY)
+                g_vfs_job_failed_literal (G_VFS_JOB(data->job),
+                                          G_IO_ERROR,
+                                          G_IO_ERROR_WOULD_MERGE,
+                                          _("Can’t copy directory over directory"));
+              else
+                g_vfs_job_failed_literal (G_VFS_JOB(data->job),
+                                          G_IO_ERROR,
+                                          G_IO_ERROR_IS_DIRECTORY,
+                                          _("File is directory"));
+              copy_data_free (data);
+              return;
             }
         }
       else
         {
-          g_vfs_job_failed_literal (G_VFS_JOB(job),
+          g_vfs_job_failed_literal (data->job,
                                     G_IO_ERROR,
                                     G_IO_ERROR_EXISTS,
-                                    _("Target file exists"));
-          goto error;
+                                    _("Target file already exists"));
+          copy_data_free (data);
+          return;
         }
     }
-
-  message_add_destination_header (msg, target_uri);
-  message_add_overwrite_header (msg, flags & G_FILE_COPY_OVERWRITE);
-
-  body = g_vfs_backend_dav_send (backend, msg, TRUE, &error);
-  if (!body)
+  else if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
     {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      goto error;
+      g_vfs_job_failed_from_error (data->job, error);
+      g_clear_error (&error);
+      copy_data_free (data);
+      return;
     }
 
-  /* See do_set_display_name () for the explanation of the PRECONDITION_FAILED
-   * and IS_REDIRECTION handling below. */
-  status = soup_message_get_status (msg);
-  if (SOUP_STATUS_IS_SUCCESSFUL (status))
-    {
-      if (stat_res && progress_callback)
-        progress_callback (file_size, file_size, progress_callback_data);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-  else if (status == SOUP_STATUS_PRECONDITION_FAILED ||
-           SOUP_STATUS_IS_REDIRECTION (status))
-    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-                      G_IO_ERROR_EXISTS,
-                      _("Target file already exists"));
-  else
-    http_job_failed (G_VFS_JOB (job), msg);
-
- error:
-  g_clear_object (&body);
-  g_object_unref (msg);
   g_clear_error (&error);
-  g_uri_unref (source_uri);
-  g_uri_unref (target_uri);
+
+  if (data->source_ft == G_FILE_TYPE_DIRECTORY)
+    {
+      g_vfs_job_failed_literal (data->job,
+                                G_IO_ERROR,
+                                G_IO_ERROR_WOULD_RECURSE,
+                                _("Can’t recursively copy directory"));
+      copy_data_free (data);
+      return;
+    }
+
+  data->msg = soup_message_new_from_uri (SOUP_METHOD_COPY, data->source_uri);
+  message_add_destination_header (data->msg, data->target_uri);
+  message_add_overwrite_header (data->msg, data->flags & G_FILE_COPY_OVERWRITE);
+
+  dav_message_connect_signals (data->msg, backend);
+
+  g_vfs_backend_dav_send_async (backend, data->msg, try_copy_do_cb, data);
 }
 
 static void
-do_copy (GVfsBackend *backend,
-         GVfsJobCopy *job,
-         const char *source,
-         const char *destination,
-         GFileCopyFlags flags,
-         GFileProgressCallback progress_callback,
-         gpointer progress_callback_data)
+try_copy_source_stat_cb (GObject *source, GAsyncResult *result,
+                         gpointer user_data)
 {
-  GInputStream *body;
-  SoupMessage *msg;
-  GUri *source_uri;
-  GUri *target_uri;
-  guint status;
-  GFileType source_ft, target_ft;
-  GError *error = NULL;
+  GVfsBackend *backend = G_VFS_BACKEND (source);
+  CopyData *data = user_data;
   gboolean res;
-  gint64 file_size;
+  GError *error = NULL;
+
+  res = stat_location_finish (backend, &data->source_ft, &data->file_size,
+                              NULL, result, &error);
+
+  if (!res)
+    {
+      g_vfs_job_failed_from_error (data->job, error);
+      g_clear_error (&error);
+      copy_data_free (data);
+      return;
+    }
+
+  g_clear_error (&error);
+
+  data->source_res = res;
+
+  stat_location_async (backend, data->target_uri, FALSE,
+                       try_copy_target_stat_cb, data);
+}
+
+static gboolean
+try_copy (GVfsBackend *backend,
+          GVfsJobCopy *job,
+          const char *source,
+          const char *destination,
+          GFileCopyFlags flags,
+          GFileProgressCallback progress_callback,
+          gpointer progress_callback_data)
+{
+  CopyData *data = g_slice_new0 (CopyData);
+  data->job = G_VFS_JOB (job);
+  data->flags = flags;
+  data->progress_callback = progress_callback;
+  data->progress_callback_data = progress_callback_data;
 
   if (flags & G_FILE_COPY_BACKUP)
     {
@@ -3273,99 +3815,17 @@ do_copy (GVfsBackend *backend,
                                 G_IO_ERROR,
                                 G_IO_ERROR_NOT_SUPPORTED,
                                 "Operation not supported");
-      return;
+
+      copy_data_free (data);
+      return TRUE;
     }
 
-  source_uri = g_vfs_backend_dav_uri_for_path (backend, source, FALSE);
-  target_uri = g_vfs_backend_dav_uri_for_path (backend, destination, FALSE);
+  data->source_uri = g_vfs_backend_dav_uri_for_path (backend, source, FALSE);
+  data->target_uri = g_vfs_backend_dav_uri_for_path (backend, destination, FALSE);
 
-  res = stat_location (backend, source_uri, &source_ft, &file_size, NULL, &error);
-  if (!res)
-    {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      goto error;
-    }
-
-  res = stat_location (backend, target_uri, &target_ft, NULL, NULL, &error);
-  if (res)
-    {
-      if (flags & G_FILE_COPY_OVERWRITE)
-        {
-          if (target_ft == G_FILE_TYPE_DIRECTORY)
-            {
-              if (source_ft == G_FILE_TYPE_DIRECTORY)
-                g_vfs_job_failed_literal (G_VFS_JOB(job),
-                                          G_IO_ERROR,
-                                          G_IO_ERROR_WOULD_MERGE,
-                                          _("Can’t copy directory over directory"));
-              else
-                g_vfs_job_failed_literal (G_VFS_JOB(job),
-                                          G_IO_ERROR,
-                                          G_IO_ERROR_IS_DIRECTORY,
-                                          _("File is directory"));
-              goto error;
-            }
-        }
-      else
-        {
-          g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                    G_IO_ERROR,
-                                    G_IO_ERROR_EXISTS,
-                                    _("Target file already exists"));
-          goto error;
-        }
-    }
-  else if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
-    {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      goto error;
-    }
-
-  if (source_ft == G_FILE_TYPE_DIRECTORY)
-    {
-      g_vfs_job_failed_literal (G_VFS_JOB (job),
-                                G_IO_ERROR,
-                                G_IO_ERROR_WOULD_RECURSE,
-                                _("Can’t recursively copy directory"));
-      goto error;
-    }
-
-  msg = soup_message_new_from_uri (SOUP_METHOD_COPY, source_uri);
-  message_add_destination_header (msg, target_uri);
-  message_add_overwrite_header (msg, flags & G_FILE_COPY_OVERWRITE);
-
-  body = g_vfs_backend_dav_send (backend, msg, TRUE, &error);
-  if (!body)
-    {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_object_unref (msg);
-      goto error;
-    }
-
-  /* See do_set_display_name () for the explanation of the PRECONDITION_FAILED
-   * and IS_REDIRECTION handling below. */
-  status = soup_message_get_status (msg);
-  if (SOUP_STATUS_IS_SUCCESSFUL (status))
-    {
-      if (progress_callback)
-        progress_callback (file_size, file_size, progress_callback_data);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-  else if (status == SOUP_STATUS_PRECONDITION_FAILED ||
-           SOUP_STATUS_IS_REDIRECTION (status))
-    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-                      G_IO_ERROR_EXISTS,
-                      _("Target file already exists"));
-  else
-    http_job_failed (G_VFS_JOB (job), msg);
-
-  g_object_unref (body);
-  g_object_unref (msg);
-
-error:
-  g_clear_error (&error);
-  g_uri_unref (source_uri);
-  g_uri_unref (target_uri);
+  stat_location_async (backend, data->source_uri, FALSE,
+                       try_copy_source_stat_cb, data);
+  return TRUE;
 }
 
 #define CHUNK_SIZE 65536
@@ -3459,7 +3919,7 @@ static void
 push_done (GObject *source, GAsyncResult *result, gpointer user_data)
 {
   GInputStream *body;
-  GVfsJob *job = G_VFS_JOB (user_data);;
+  GVfsJob *job = G_VFS_JOB (user_data);
   GError *error = NULL;
 
   body = soup_session_send_finish (SOUP_SESSION (source), result, &error);
@@ -3488,7 +3948,7 @@ push_stat_dest_cb (GObject *source, GAsyncResult *result, gpointer user_data)
       return;
     }
 
-  if (stat_location_finish (handle->msg, body, &type, NULL, NULL))
+  if (stat_location_end (handle->msg, body, &type, NULL, NULL))
     {
       if (!(handle->op_job->flags & G_FILE_COPY_OVERWRITE))
         {
@@ -3527,8 +3987,11 @@ push_stat_dest_cb (GObject *source, GAsyncResult *result, gpointer user_data)
   g_signal_connect (handle->msg, "finished",
                     G_CALLBACK (push_finished), handle);
 
-  g_vfs_backend_dav_send_async (handle->backend, handle->msg, TRUE,
-                                push_done, handle->job);
+  dav_message_connect_signals (handle->msg, handle->backend);
+
+  soup_session_send_async (G_VFS_BACKEND_HTTP (handle->backend)->session,
+                           handle->msg, G_PRIORITY_DEFAULT,
+                           NULL, push_done, handle->job);
 }
 
 static void
@@ -3545,9 +4008,13 @@ push_source_fstat_cb (GObject *source, GAsyncResult *res, gpointer user_data)
       handle->size = g_file_info_get_size (info);
       g_object_unref (info);
 
-      handle->msg = stat_location_begin (handle->uri, FALSE);
-      g_vfs_backend_dav_send_async (handle->backend, handle->msg, TRUE,
-                                    push_stat_dest_cb, handle);
+      handle->msg = stat_location_start (handle->uri, FALSE);
+
+      dav_message_connect_signals (handle->msg, handle->backend);
+
+      soup_session_send_async (G_VFS_BACKEND_HTTP (handle->backend)->session,
+                               handle->msg, G_PRIORITY_DEFAULT, NULL,
+                               push_stat_dest_cb, handle);
     }
   else
     {
@@ -3675,26 +4142,23 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
 
   backend_class = G_VFS_BACKEND_CLASS (klass); 
 
-  backend_class->try_mount         = NULL;
-  backend_class->mount             = do_mount;
-  backend_class->try_query_info    = NULL;
-  backend_class->query_info        = do_query_info;
-  backend_class->try_query_fs_info = NULL;
-  backend_class->query_fs_info     = do_query_fs_info;
-  backend_class->enumerate         = do_enumerate;
-  backend_class->try_open_for_read = try_open_for_read;
-  backend_class->try_create        = try_create;
-  backend_class->try_replace       = try_replace;
-  backend_class->try_write         = try_write;
-  backend_class->seek_on_write     = do_seek_on_write;
-  backend_class->truncate          = do_truncate;
-  backend_class->try_close_write   = try_close_write;
-  backend_class->make_directory    = do_make_directory;
-  backend_class->delete            = do_delete;
-  backend_class->set_display_name  = do_set_display_name;
-  backend_class->move              = do_move;
-  backend_class->copy              = do_copy;
-  backend_class->try_push          = try_push;
+  backend_class->try_mount            = try_mount;
+  backend_class->try_query_info       = try_query_info;
+  backend_class->try_query_fs_info    = try_query_fs_info;
+  backend_class->try_enumerate        = try_enumerate;
+  backend_class->try_open_for_read    = try_open_for_read;
+  backend_class->try_create           = try_create;
+  backend_class->try_replace          = try_replace;
+  backend_class->try_write            = try_write;
+  backend_class->seek_on_write        = do_seek_on_write;
+  backend_class->truncate             = do_truncate;
+  backend_class->try_close_write      = try_close_write;
+  backend_class->try_make_directory   = try_make_directory;
+  backend_class->try_delete           = try_delete;
+  backend_class->try_set_display_name = try_set_display_name;
+  backend_class->try_move             = try_move;
+  backend_class->try_copy             = try_copy;
+  backend_class->try_push             = try_push;
 
   /* override the maximum number of connections, since the libsoup defaults
    * of 10 and 2 respectively are too low and may cause backend lockups when
