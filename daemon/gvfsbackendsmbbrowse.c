@@ -967,8 +967,14 @@ do_mount (GVfsBackend *backend,
              uri, op_backend->mount_try, dir, op_backend->mount_cancelled,
              errsv, g_strerror (errsv));
 
-      if (dir == NULL && 
-          (op_backend->mount_cancelled || (errsv != EPERM && errsv != EACCES)))
+      if (errsv == EINVAL && op_backend->mount_try == 0 && op_backend->user == NULL)
+        {
+          /* EINVAL is "expected" when kerberos is misconfigured, see:
+           * https://gitlab.gnome.org/GNOME/gvfs/-/issues/611
+           */
+        }
+      else if (dir == NULL &&
+               (op_backend->mount_cancelled || (errsv != EPERM && errsv != EACCES)))
         {
           g_debug ("do_mount - (errno != EPERM && errno != EACCES), cancelled = %d, breaking\n", op_backend->mount_cancelled);
 	  break;
