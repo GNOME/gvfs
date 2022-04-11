@@ -513,7 +513,13 @@ do_mount (GVfsBackend *backend,
       if (res == 0)
         break;
 
-      if (op_backend->mount_cancelled || (errsv != EACCES && errsv != EPERM))
+      if (errsv == EINVAL && op_backend->mount_try <= 1 && op_backend->user == NULL)
+        {
+          /* EINVAL is "expected" when kerberos/ccache is misconfigured, see:
+           * https://gitlab.gnome.org/GNOME/gvfs/-/issues/611
+           */
+        }
+      else if (op_backend->mount_cancelled || (errsv != EACCES && errsv != EPERM))
         {
           g_debug ("do_mount - (errno != EPERM && errno != EACCES), cancelled = %d, breaking\n", op_backend->mount_cancelled);
           break;
