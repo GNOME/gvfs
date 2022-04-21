@@ -2338,6 +2338,68 @@ clear_msgs:
   g_object_unref (msg_opts);
 }
 
+static void
+try_mount_send_opts (GVfsJobMount *job)
+{
+  GVfsBackendDav  *dav_backend = G_VFS_BACKEND_DAV (job->backend);
+  GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (job->backend);
+  SoupMessage     *msg_opts;
+
+  if (http_backend->mount_base == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_INVALID_ARGUMENT,
+                        _("Invalid mount spec"));
+      return;
+    }
+
+  soup_session_add_feature_by_type (http_backend->session,
+                                    SOUP_TYPE_AUTH_NEGOTIATE);
+  soup_session_add_feature_by_type (http_backend->session,
+                                    SOUP_TYPE_AUTH_NTLM);
+
+  dav_backend->auth_info.mount_source = g_object_ref (job->mount_source);
+  dav_backend->auth_info.server_auth.username = g_strdup (g_uri_get_user (http_backend->mount_base));
+  dav_backend->auth_info.server_auth.password = NULL;
+  dav_backend->auth_info.server_auth.pw_save = G_PASSWORD_SAVE_NEVER;
+  dav_backend->auth_info.proxy_auth.pw_save = G_PASSWORD_SAVE_NEVER;
+  dav_backend->auth_info.interactive = TRUE;
+
+  dav_backend->last_good_path = NULL;
+
+  msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, http_backend->mount_base);
+  dav_message_connect_signals (msg_opts, job->backend);
+
+  g_vfs_backend_dav_send_async (job->backend, msg_opts, try_mount_opts_cb, job);
+}
+
+static void
+try_mount_resolve_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+  GVfsJobMount *job = user_data;
+  GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (job->backend);
+  GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (job->backend);
+  GError *error = NULL;
+
+  if (!g_vfs_dns_sd_resolver_resolve_finish (dav_backend->resolver,
+                                             result,
+                                             &error))
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      return;
+    }
+
+  g_signal_connect (dav_backend->resolver,
+                    "changed",
+                    (GCallback) dns_sd_resolver_changed,
+                    dav_backend);
+
+  http_backend->mount_base = dav_uri_from_dns_sd_resolver (dav_backend);
+
+  try_mount_send_opts (job);
+}
+
 static gboolean
 try_mount (GVfsBackend  *backend,
            GVfsJobMount *job,
@@ -2347,8 +2409,6 @@ try_mount (GVfsBackend  *backend,
 {
   GVfsBackendDav  *dav_backend = G_VFS_BACKEND_DAV (backend);
   GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (backend);
-  SoupMessage     *msg_opts;
-  GUri            *mount_base;
   const char      *host;
   const char      *type;
 
@@ -2361,57 +2421,20 @@ try_mount (GVfsBackend  *backend,
   /* resolve DNS-SD style URIs */
   if ((strcmp (type, "dav+sd") == 0 || strcmp (type, "davs+sd") == 0) && host != NULL)
     {
-      GError *error = NULL;
       dav_backend->resolver = g_vfs_dns_sd_resolver_new_for_encoded_triple (host, "u");
 
-      if (!g_vfs_dns_sd_resolver_resolve_sync (dav_backend->resolver,
-                                               NULL,
-                                               &error))
-        {
-          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-          g_error_free (error);
-          return TRUE;
-        }
-      g_signal_connect (dav_backend->resolver,
-                        "changed",
-                        (GCallback) dns_sd_resolver_changed,
-                        dav_backend);
-
-      mount_base = dav_uri_from_dns_sd_resolver (dav_backend);
+      g_vfs_dns_sd_resolver_resolve (dav_backend->resolver,
+                                     G_VFS_JOB (job)->cancellable,
+                                     try_mount_resolve_cb,
+                                     job);
     }
   else
 #endif
     {
-      mount_base = g_mount_spec_to_dav_uri (mount_spec);
+      http_backend->mount_base = g_mount_spec_to_dav_uri (mount_spec);
+      try_mount_send_opts (job);
     }
 
-  if (mount_base == NULL)
-    {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-                        G_IO_ERROR_INVALID_ARGUMENT,
-                        _("Invalid mount spec"));
-      return TRUE;
-    }
-
-  http_backend->mount_base = mount_base;
-
-  soup_session_add_feature_by_type (http_backend->session,
-                                    SOUP_TYPE_AUTH_NEGOTIATE);
-  soup_session_add_feature_by_type (http_backend->session,
-                                    SOUP_TYPE_AUTH_NTLM);
-
-  dav_backend->auth_info.mount_source = g_object_ref (mount_source);
-  dav_backend->auth_info.server_auth.username = g_strdup (g_uri_get_user (mount_base));
-  dav_backend->auth_info.server_auth.pw_save = G_PASSWORD_SAVE_NEVER;
-  dav_backend->auth_info.proxy_auth.pw_save = G_PASSWORD_SAVE_NEVER;
-  dav_backend->auth_info.interactive = TRUE;
-
-  dav_backend->last_good_path = NULL;
-
-  msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
-  dav_message_connect_signals (msg_opts, backend);
-
-  g_vfs_backend_dav_send_async (backend, msg_opts, try_mount_opts_cb, job);
   return TRUE;
 }
 
