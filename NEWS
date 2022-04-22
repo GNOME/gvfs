@@ -1,3 +1,11 @@
+Major changes in 1.50.1
+=======================
+* dav: Drop user from URI as a workaround for Nextcloud bug (Ondrej Holy)
+* dav: Port DNS-SD resolver to async API to fix hangs when mounting (Ondrej Holy)
+* smb: Ignore EINVAL for kerberos/ccache login (Ondrej Holy)
+* dav: Rewrite to libsoup async API to fix crashes (Daniel Kolesa)
+* dav: Do not lose userinfo when copying URIs (Daniel Kolesa)
+
 Major changes in 1.50.0
 =======================
 * Translation updates
