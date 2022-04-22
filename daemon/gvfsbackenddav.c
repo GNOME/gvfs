@@ -1845,7 +1845,6 @@ g_mount_spec_to_dav_uri (GMountSpec *spec)
 {
   GUri           *uri;
   const char     *host;
-  const char     *user;
   const char     *port;
   const char     *ssl;
   const char     *path;
@@ -1855,7 +1854,6 @@ g_mount_spec_to_dav_uri (GMountSpec *spec)
   gint            port_num;
 
   host = g_mount_spec_get (spec, "host");
-  user = g_mount_spec_get (spec, "user");
   port = g_mount_spec_get (spec, "port");
   ssl  = g_mount_spec_get (spec, "ssl");
   path = spec->mount_prefix;
@@ -1882,16 +1880,17 @@ g_mount_spec_to_dav_uri (GMountSpec *spec)
 
   path_str = dav_uri_encode (path);
 
-  uri = g_uri_build_with_user (SOUP_HTTP_URI_FLAGS,
-                               scheme,
-                               user,
-                               NULL,
-                               NULL,
-                               host_str,
-                               port_num,
-                               path_str,
-                               NULL,
-                               NULL);
+  /* A username is not part of URI as a workaround for:
+   * https://gitlab.gnome.org/GNOME/gvfs/-/issues/617.
+   */
+  uri = g_uri_build (SOUP_HTTP_URI_FLAGS,
+                     scheme,
+                     NULL,
+                     host_str,
+                     port_num,
+                     path_str,
+                     NULL,
+                     NULL);
 
   g_free (host_str);
   g_free (path_str);
@@ -1906,7 +1905,6 @@ g_mount_spec_from_dav_uri (GVfsBackendDav *dav_backend,
   GMountSpec *spec;
   char *local_path;
   gboolean ssl;
-  const gchar *user;
   gint port_num;
 
 #ifdef HAVE_AVAHI
@@ -1944,10 +1942,6 @@ g_mount_spec_from_dav_uri (GVfsBackendDav *dav_backend,
   ssl = !strcmp (g_uri_get_scheme (uri), "https");
 
   g_mount_spec_set (spec, "ssl", ssl ? "true" : "false");
-
-  user = g_uri_get_user (uri);
-  if (user != NULL)
-    g_mount_spec_set (spec, "user", user);
 
   port_num = g_uri_get_port (uri);
   if (port_num > 0 && port_num != (ssl ? 443 : 80))
@@ -2047,7 +2041,7 @@ dns_sd_resolver_changed (GVfsDnsSdResolver *resolver,
 /* Backend Functions */
 
 static void
-mount_success (GVfsBackend *backend, GVfsJob *job)
+mount_success (GVfsBackend *backend, GVfsJobMount *job)
 {
   GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (backend);
   GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (backend);
@@ -2068,6 +2062,14 @@ mount_success (GVfsBackend *backend, GVfsJob *job)
 
   /* dup the mountspec, but only copy known fields */
   mount_spec = g_mount_spec_from_dav_uri (dav_backend, http_backend->mount_base);
+
+  /* A username is not part of URI as a workaround for:
+   * https://gitlab.gnome.org/GNOME/gvfs/-/issues/617
+   * So it has to be restored here in order to avoid:
+   * https://gitlab.gnome.org/GNOME/gvfs/-/issues/614
+   */
+  g_mount_spec_set (mount_spec, "user",
+                    g_mount_spec_get (job->mount_spec, "user"));
 
   g_vfs_backend_set_mount_spec (backend, mount_spec);
   g_vfs_backend_set_icon_name (backend, "folder-remote");
@@ -2119,7 +2121,7 @@ try_mount_stat_cb (GObject *source, GAsyncResult *result, gpointer user_data)
       if (dav_backend->last_good_path == NULL)
         g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       else
-        mount_success (backend, G_VFS_JOB (job));
+        mount_success (backend, job);
       g_error_free (error);
       goto clear_msg;
     }
@@ -2133,7 +2135,7 @@ try_mount_stat_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 
   if ((is_collection == FALSE) && (dav_backend->last_good_path != NULL))
     {
-      mount_success (backend, G_VFS_JOB (job));
+      mount_success (backend, job);
       goto clear_msg;
     }
   else if (res == FALSE)
@@ -2175,7 +2177,7 @@ try_mount_stat_cb (GObject *source, GAsyncResult *result, gpointer user_data)
   /* break out */
   if (g_strcmp0 (dav_backend->last_good_path, "/") == 0)
     {
-      mount_success (backend, G_VFS_JOB (job));
+      mount_success (backend, job);
       goto clear_msg;
     }
 
@@ -2248,7 +2250,7 @@ try_mount_opts_cb (GObject *source, GAsyncResult *result, gpointer user_data)
       if (dav_backend->last_good_path == NULL)
         g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       else
-        mount_success (backend, G_VFS_JOB (job));
+        mount_success (backend, job);
       g_error_free (error);
       goto clear_msgs;
     }
@@ -2295,7 +2297,7 @@ try_mount_opts_cb (GObject *source, GAsyncResult *result, gpointer user_data)
                           G_IO_ERROR, G_IO_ERROR_FAILED,
                           _("Not a WebDAV enabled share"));
       else
-        mount_success (backend, G_VFS_JOB (job));
+        mount_success (backend, job);
       goto clear_msgs;
     }
   else if (!is_success)
@@ -2308,7 +2310,7 @@ try_mount_opts_cb (GObject *source, GAsyncResult *result, gpointer user_data)
                           _("HTTP Error: %s"),
                           soup_message_get_reason_phrase (msg_opts));
       else
-        mount_success (backend, G_VFS_JOB (job));
+        mount_success (backend, job);
       goto clear_msgs;
     }
 
@@ -2317,7 +2319,7 @@ try_mount_opts_cb (GObject *source, GAsyncResult *result, gpointer user_data)
       if (dav_backend->last_good_path == NULL)
         g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       else
-        mount_success (backend, G_VFS_JOB (job));
+        mount_success (backend, job);
       g_error_free (error);
       goto clear_msgs;
     }
@@ -2344,6 +2346,7 @@ try_mount_send_opts (GVfsJobMount *job)
   GVfsBackendDav  *dav_backend = G_VFS_BACKEND_DAV (job->backend);
   GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (job->backend);
   SoupMessage     *msg_opts;
+  const gchar     *user;
 
   if (http_backend->mount_base == NULL)
     {
@@ -2358,8 +2361,10 @@ try_mount_send_opts (GVfsJobMount *job)
   soup_session_add_feature_by_type (http_backend->session,
                                     SOUP_TYPE_AUTH_NTLM);
 
+  user = g_mount_spec_get (job->mount_spec, "user");
+
   dav_backend->auth_info.mount_source = g_object_ref (job->mount_source);
-  dav_backend->auth_info.server_auth.username = g_strdup (g_uri_get_user (http_backend->mount_base));
+  dav_backend->auth_info.server_auth.username = g_strdup (user);
   dav_backend->auth_info.server_auth.password = NULL;
   dav_backend->auth_info.server_auth.pw_save = G_PASSWORD_SAVE_NEVER;
   dav_backend->auth_info.proxy_auth.pw_save = G_PASSWORD_SAVE_NEVER;
