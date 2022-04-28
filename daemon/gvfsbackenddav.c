@@ -382,15 +382,14 @@ g_vfs_backend_dav_stream_skip (GInputStream *stream, GError **error)
 static void
 g_vfs_backend_dav_setup_display_name (GVfsBackend *backend)
 {
-  GVfsBackendDav *dav_backend;
   GUri           *mount_base;
   char           *display_name;
   char            port[7] = {0, };
   gint            gport;
 
-  dav_backend = G_VFS_BACKEND_DAV (backend);
-
 #ifdef HAVE_AVAHI
+  GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (backend);
+
   if (dav_backend->resolver != NULL)
     {
       const char *name;
@@ -2378,6 +2377,7 @@ try_mount_send_opts (GVfsJobMount *job)
   g_vfs_backend_dav_send_async (job->backend, msg_opts, try_mount_opts_cb, job);
 }
 
+#ifdef HAVE_AVAHI
 static void
 try_mount_resolve_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
@@ -2404,6 +2404,7 @@ try_mount_resolve_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 
   try_mount_send_opts (job);
 }
+#endif
 
 static gboolean
 try_mount (GVfsBackend  *backend,
@@ -2412,17 +2413,18 @@ try_mount (GVfsBackend  *backend,
            GMountSource *mount_source,
            gboolean      is_automount)
 {
-  GVfsBackendDav  *dav_backend = G_VFS_BACKEND_DAV (backend);
   GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (backend);
-  const char      *host;
-  const char      *type;
 
   g_debug ("+ mount\n");
+
+#ifdef HAVE_AVAHI
+  GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (backend);
+  const char *host;
+  const char *type;
 
   host = g_mount_spec_get (mount_spec, "host");
   type = g_mount_spec_get (mount_spec, "type");
 
-#ifdef HAVE_AVAHI
   /* resolve DNS-SD style URIs */
   if ((strcmp (type, "dav+sd") == 0 || strcmp (type, "davs+sd") == 0) && host != NULL)
     {
