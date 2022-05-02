@@ -307,7 +307,7 @@ try_mount (GVfsBackend  *backend,
   real_mount_spec = g_mount_spec_new ("http");
   g_mount_spec_set (real_mount_spec, "uri", uri_str);
 
-  path = g_uri_get_path (uri);
+  path = g_uri_unescape_string (g_uri_get_path (uri), "/");
   if (path[0])
     {
       g_free (real_mount_spec->mount_prefix);
