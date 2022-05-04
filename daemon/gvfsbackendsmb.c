@@ -80,7 +80,6 @@ struct _GVfsBackendSmb
   int mount_try;
   gboolean mount_try_again;
   gboolean mount_cancelled;
-  gboolean use_anonymous;
 	
   gboolean password_in_keyring;
   GPasswordSave password_save;
@@ -215,13 +214,6 @@ auth_callback (SMBCCTX *context,
       backend->mount_try_again = TRUE;
       g_debug ("auth_callback - ccache pass\n");
     }
-  else if (backend->use_anonymous)
-    {
-      /* Try again if anonymous login fails */
-      backend->use_anonymous = FALSE;
-      backend->mount_try_again = TRUE;
-      g_debug ("auth_callback - anonymous login pass\n");
-    }
   else
     {
       gboolean in_keyring = FALSE;
@@ -304,10 +296,13 @@ auth_callback (SMBCCTX *context,
       /* Try again if this fails */
       backend->mount_try_again = TRUE;
 
+      smbc_setOptionNoAutoAnonymousLogin (backend->smb_context,
+                                          !anonymous);
+
       if (anonymous)
         {
-          backend->use_anonymous = TRUE;
           backend->password_save = FALSE;
+          g_debug ("auth_callback - anonymous enabled\n");
         }
       else
         {
@@ -534,12 +529,6 @@ do_mount (GVfsBackend *backend,
           g_debug ("do_mount - enabling NTLMSSP fallback\n");
           smbc_setOptionFallbackAfterKerberos (op_backend->smb_context, 1);
         }
-
-      /* If the AskPassword reply requested anonymous login, enable the
-       * anonymous fallback and try again.
-       */
-      smbc_setOptionNoAutoAnonymousLogin (op_backend->smb_context,
-                                          !op_backend->use_anonymous);
 
       op_backend->mount_try ++;
     }
