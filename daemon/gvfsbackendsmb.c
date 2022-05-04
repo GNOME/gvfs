@@ -78,7 +78,6 @@ struct _GVfsBackendSmb
   
   GMountSource *mount_source; /* Only used/set during mount */
   int mount_try;
-  gboolean mount_try_again;
   gboolean mount_cancelled;
 	
   gboolean password_in_keyring;
@@ -202,16 +201,12 @@ auth_callback (SMBCCTX *context,
       backend->user == NULL &&
       backend->domain == NULL)
     {
-      /* Try again if kerberos login fails */
-      backend->mount_try_again = TRUE;
       g_debug ("auth_callback - kerberos pass\n");
     }
   else if (backend->mount_try == 1 &&
            backend->user == NULL &&
            backend->domain == NULL)
     {
-      /* Try again if ccache login fails */
-      backend->mount_try_again = TRUE;
       g_debug ("auth_callback - ccache pass\n");
     }
   else
@@ -292,9 +287,6 @@ auth_callback (SMBCCTX *context,
 	      goto out;
 	    }
 	}
-
-      /* Try again if this fails */
-      backend->mount_try_again = TRUE;
 
       smbc_setOptionNoAutoAnonymousLogin (backend->smb_context,
                                           !anonymous);
@@ -492,7 +484,6 @@ do_mount (GVfsBackend *backend,
    */
   do
     {
-      op_backend->mount_try_again = FALSE;
       op_backend->mount_cancelled = FALSE;
 
       g_debug ("do_mount - try #%d \n", op_backend->mount_try);
@@ -532,7 +523,7 @@ do_mount (GVfsBackend *backend,
 
       op_backend->mount_try ++;
     }
-  while (op_backend->mount_try_again);
+  while (TRUE);
   
   g_free (uri);
   
