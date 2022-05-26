@@ -1,3 +1,11 @@
+Major changes in 1.48.2
+=======================
+* smb: Rework anonymous handling to avoid EINVAL (Ondrej Holy)
+* smb: Ignore EINVAL for kerberos/ccache login (Ondrej Holy)
+* sftp: Adapt on new OpenSSH password prompts (Ondrej Holy)
+* build: Remove incorrect i18n.merge_file argument to fix build (Ondrej Holy)
+* Translation updates
+
 Major changes in 1.48.1
 =======================
 * build: Use install prefix in systemd files paths
