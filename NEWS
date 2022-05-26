@@ -1,3 +1,9 @@
+Major changes in 1.50.2
+=======================
+* smb: Rework anonymous handling to avoid EINVAL (Ondrej Holy)
+* http: Unescape prefix to fix handling of encoded URIs (Ondrej Holy)
+* build: Fix build without Avahi support (Ondrej Holy)
+
 Major changes in 1.50.1
 =======================
 * dav: Drop user from URI as a workaround for Nextcloud bug (Ondrej Holy)
