@@ -518,7 +518,8 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
   else if (message_should_apply_redir_ref (msg))
     {
       if (status == SOUP_STATUS_MOVED_PERMANENTLY ||
-          status == SOUP_STATUS_TEMPORARY_REDIRECT)
+          status == SOUP_STATUS_TEMPORARY_REDIRECT ||
+          status == SOUP_STATUS_PERMANENT_REDIRECT)
         {
           const char *method = soup_message_get_method (msg);
 
@@ -534,7 +535,7 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
          *
          *   1) It's a non-redirecty 3xx response (300, 304,
          *      305, 306)
-         *   2) It's some newly-defined 3xx response (308+)
+         *   2) It's some newly-defined 3xx response (309+)
          *
          * We ignore both of these cases. In the first,
          * redirecting would be explicitly wrong, and in the
@@ -543,7 +544,7 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
          * 2616 says unrecognized status codes should be
          * treated as the equivalent to the x00 code, and we
          * don't redirect on 300, so therefore we shouldn't
-         * redirect on 308+ either.
+         * redirect on 309+ either.
          */
     }
 
