@@ -464,22 +464,22 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
   GUri *tmp;
   guint status;
   gboolean redirect;
-
+g_print ("%s %d\n", __func__, 1);
   body = soup_session_send_finish (session, ret, &error);
 
   if (!body)
     goto return_error;
-
+g_print ("%s %d\n", __func__, 2);
   status = soup_message_get_status (msg);
 
   if (!SOUP_STATUS_IS_REDIRECTION (status))
     goto return_body;
-
+g_print ("%s %d\n", __func__, 3);
   new_loc = soup_message_headers_get_one (soup_message_get_response_headers (msg),
                                           "Location");
   if (new_loc == NULL)
     goto return_body;
-
+g_print ("%s %d\n", __func__, 4);
   old_uri = soup_message_get_uri (msg);
   new_uri = g_uri_parse_relative (old_uri, new_loc,
                                   SOUP_HTTP_URI_FLAGS, &error);
@@ -488,14 +488,14 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
       g_object_unref (body);
       goto return_error;
     }
-
+g_print ("%s %d\n", __func__, 5);
   tmp = new_uri;
   new_uri = soup_uri_copy (new_uri,
                            SOUP_URI_USER, g_uri_get_user (old_uri),
                            SOUP_URI_AUTH_PARAMS, g_uri_get_auth_params (old_uri),
                            SOUP_URI_NONE);
   g_uri_unref (tmp);
-
+g_print ("%s : %s -> %s\n", __func__, g_uri_to_string (old_uri), g_uri_to_string (new_uri));
   /* Check if this is a trailing slash redirect (i.e. /a/b to /a/b/),
    * redirect it right away
    */
@@ -503,7 +503,7 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
   if (redirect)
     {
       const char *dest;
-
+g_print ("%s %d\n", __func__, 6);
       dest = soup_message_headers_get_one (soup_message_get_request_headers (msg),
                                            "Destination");
       if (dest && g_str_has_suffix (dest, "/") == FALSE)
@@ -517,6 +517,7 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
     }
   else if (message_should_apply_redir_ref (msg))
     {
+g_print ("%s %d\n", __func__, 7);
       if (status == SOUP_STATUS_MOVED_PERMANENTLY ||
           status == SOUP_STATUS_TEMPORARY_REDIRECT ||
           status == SOUP_STATUS_PERMANENT_REDIRECT)
@@ -553,13 +554,13 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
       g_uri_unref (new_uri);
       goto return_body;
     }
-
+g_print ("%s %d\n", __func__,9);
   if (!g_vfs_backend_dav_stream_skip (body, &error))
     {
       g_object_unref (body);
       goto return_error;
     }
-
+g_print ("%s %d\n", __func__, 10);
   g_object_unref (body);
 
   soup_message_set_uri (msg, new_uri);
