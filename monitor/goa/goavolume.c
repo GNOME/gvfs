@@ -99,8 +99,6 @@ account_attention_needed_cb (GObject *_object, GParamSpec *pspec, gpointer user_
           g_clear_object (&self->mount);
         }
     }
-  else
-    g_volume_mount (G_VOLUME (self), G_MOUNT_MOUNT_NONE, NULL, NULL, NULL, NULL);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
