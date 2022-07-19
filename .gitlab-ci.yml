@@ -11,6 +11,12 @@ fedora:
           -Ddevel_utils=true
           -Dman=true
           -Dafc=true
+          -Darchive=true
+          -Dsftp=true
+          -Dsmb=true
+          -Dudisks2=true
+          -Dhttp=true
+          -Dgphoto2=true
           --prefix /usr --werror build
         - sudo ninja -C build install
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
