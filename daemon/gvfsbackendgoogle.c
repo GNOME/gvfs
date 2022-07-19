@@ -105,10 +105,18 @@ typedef struct
 typedef struct
 {
   GDataEntry *document;
-  GDataUploadStream *stream;
+  GInputStream *istream;
+  GDataUploader *uploader;
   gchar *filename;
   gchar *entry_path;
 } WriteHandle;
+
+typedef struct
+{
+  GFileProgressCallback cb;
+  goffset total_size;
+  gpointer data;
+} ProgressCallbackData;
 
 static GDataEntry *resolve_dir (GVfsBackendGoogle  *self,
                                 const gchar        *filename,
@@ -206,7 +214,7 @@ log_dir_entries (GVfsBackendGoogle *self)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static WriteHandle *
-write_handle_new (GDataEntry *document, GDataUploadStream *stream, const gchar *filename, const gchar *entry_path)
+write_handle_new (GDataEntry *document, GDataUploader *uploader, const gchar *filename, const gchar *entry_path)
 {
   WriteHandle *handle;
 
@@ -215,11 +223,11 @@ write_handle_new (GDataEntry *document, GDataUploadStream *stream, const gchar *
   if (document != NULL)
     handle->document = g_object_ref (document);
 
-  if (stream != NULL)
+  if (uploader != NULL)
     {
-      handle->stream = g_object_ref (stream);
+      handle->uploader = g_object_ref (uploader);
       if (handle->document == NULL)
-        handle->document = g_object_ref (gdata_upload_stream_get_entry (stream));
+        handle->document = g_object_ref (gdata_uploader_get_entry (uploader));
     }
 
   handle->filename = g_strdup (filename);
@@ -237,7 +245,8 @@ write_handle_free (gpointer data)
     return;
 
   g_clear_object (&handle->document);
-  g_clear_object (&handle->stream);
+  g_clear_object (&handle->uploader);
+  g_clear_object (&handle->istream);
   g_free (handle->filename);
   g_free (handle->entry_path);
   g_slice_free (WriteHandle, handle);
@@ -3030,6 +3039,18 @@ g_vfs_backend_google_open_icon_for_read (GVfsBackend            *_self,
   g_debug ("- open_icon_for_read\n");
 }
 
+static void
+total_written_cb (GObject    *gobject,
+                  GParamSpec *pspec,
+                  gpointer    user_data)
+{
+  ProgressCallbackData *data = user_data;
+  gsize current_num_bytes;
+
+  g_object_get (gobject, "total-written", &current_num_bytes, NULL);
+  data->cb (current_num_bytes, data->total_size, data->data);
+}
+
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
@@ -3048,7 +3069,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   GDataDocumentsDocument *new_document = NULL;
   GDataEntry *destination_parent;
   GDataEntry *existing_entry;
-  GDataUploadStream *ostream = NULL;
+  GDataUploader *uploader = NULL;
   GError *error;
   GFile *local_file = NULL;
   GFileInputStream *istream = NULL;
@@ -3060,6 +3081,8 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   gchar *entry_path = NULL;
   gchar *parent_path = NULL;
   gchar *local_file_title = NULL;
+  GBytes *response = NULL;
+  ProgressCallbackData *cb_data = NULL;
 
   g_rec_mutex_lock (&self->mutex);
   g_debug ("+ push: %s -> %s, %d\n", local_path, destination, flags);
@@ -3237,12 +3260,11 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
       title = local_file_title;
 
       error = NULL;
-      ostream = gdata_documents_service_update_document (self->service,
-                                                         document,
-                                                         title,
-                                                         content_type,
-                                                         cancellable,
-                                                         &error);
+      uploader = gdata_documents_service_update_document (self->service,
+                                                          document,
+                                                          title,
+                                                          content_type,
+                                                          &error);
     }
   else
     {
@@ -3251,13 +3273,12 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
       gdata_entry_set_title (GDATA_ENTRY (document), title);
 
       error = NULL;
-      ostream = gdata_documents_service_upload_document (self->service,
-                                                         document,
-                                                         title,
-                                                         content_type,
-                                                         GDATA_DOCUMENTS_FOLDER (destination_parent),
-                                                         cancellable,
-                                                         &error);
+      uploader = gdata_documents_service_upload_document (self->service,
+                                                          document,
+                                                          title,
+                                                          content_type,
+                                                          GDATA_DOCUMENTS_FOLDER (destination_parent),
+                                                          &error);
     }
 
   if (error != NULL)
@@ -3269,14 +3290,21 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
     }
 
   error = NULL;
-  gvfs_output_stream_splice (G_OUTPUT_STREAM (ostream),
-                             G_INPUT_STREAM (istream),
-                             G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE | G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
-                             g_file_info_get_size (info),
-                             progress_callback,
-                             progress_callback_data,
-                             cancellable,
-                             &error);
+  gdata_uploader_set_input (uploader, G_INPUT_STREAM (istream));
+
+  if (progress_callback != NULL)
+    {
+      cb_data = g_new0 (ProgressCallbackData, 1);
+      cb_data->cb = progress_callback;
+      cb_data->data = progress_callback_data;
+      cb_data->total_size = g_file_info_get_size (info);
+      g_signal_connect_data (G_OBJECT (uploader), "notify::total-written",
+                             G_CALLBACK (total_written_cb),
+                             cb_data, (GClosureNotify) g_free, 0);
+    }
+
+  response = gdata_uploader_send (uploader, cancellable, NULL, &error);
+
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -3285,7 +3313,7 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
     }
 
   error = NULL;
-  new_document = gdata_documents_service_finish_upload (self->service, ostream, &error);
+  new_document = gdata_documents_service_finish_upload (self->service, uploader, response, &error);
   if (error != NULL)
     {
       sanitize_error (&error);
@@ -3323,7 +3351,8 @@ g_vfs_backend_google_push (GVfsBackend           *_self,
   g_clear_object (&istream);
   g_clear_object (&local_file);
   g_clear_object (&new_document);
-  g_clear_object (&ostream);
+  g_clear_object (&uploader);
+  g_clear_pointer (&response, g_bytes_unref);
   g_free (destination_basename);
   g_free (local_file_title);
   g_free (entry_path);
@@ -3924,7 +3953,7 @@ g_vfs_backend_google_replace (GVfsBackend         *_self,
   GDataDocumentsEntry *new_document = NULL;
   GDataEntry *existing_entry;
   GDataEntry *parent;
-  GDataUploadStream *stream = NULL;
+  GDataUploader *uploader = NULL;
   GError *error;
   WriteHandle *handle;
   gboolean needs_overwrite = FALSE;
@@ -4001,12 +4030,11 @@ g_vfs_backend_google_replace (GVfsBackend         *_self,
       content_type = get_content_type_from_entry (existing_entry);
 
       error = NULL;
-      stream = gdata_documents_service_update_document (self->service,
-                                                        GDATA_DOCUMENTS_DOCUMENT (existing_entry),
-                                                        title,
-                                                        content_type,
-                                                        cancellable,
-                                                        &error);
+      uploader = gdata_documents_service_update_document (self->service,
+                                                          GDATA_DOCUMENTS_DOCUMENT (existing_entry),
+                                                          title,
+                                                          content_type,
+                                                          &error);
       if (error != NULL)
         {
           sanitize_error (&error);
@@ -4015,7 +4043,7 @@ g_vfs_backend_google_replace (GVfsBackend         *_self,
           goto out;
         }
 
-      handle = write_handle_new (NULL, stream, filename, entry_path);
+      handle = write_handle_new (NULL, uploader, filename, entry_path);
     }
   else
     {
@@ -4051,7 +4079,7 @@ g_vfs_backend_google_replace (GVfsBackend         *_self,
  out:
   g_clear_object (&document);
   g_clear_object (&new_document);
-  g_clear_object (&stream);
+  g_clear_object (&uploader);
   g_free (basename);
   g_free (content_type);
   g_free (entry_path);
@@ -4071,13 +4099,14 @@ g_vfs_backend_google_write (GVfsBackend       *_self,
 {
   GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (_self);
   GCancellable *cancellable = G_VFS_JOB (job)->cancellable;
-  GError *error;
+  GError *error = NULL;
   WriteHandle *wh = (WriteHandle *) handle;
-  gssize nwrite;
+  GBytes *response;
+  gsize nwrite;
 
   g_debug ("+ write: %p\n", handle);
 
-  if (wh->stream == NULL)
+  if (wh->uploader == NULL)
     {
       const gchar *title;
       gchar *content_type = NULL;
@@ -4086,13 +4115,11 @@ g_vfs_backend_google_write (GVfsBackend       *_self,
       content_type = g_content_type_guess (title, (const guchar *) buffer, buffer_size, NULL);
       g_debug ("  content-type: %s\n", content_type);
 
-      error = NULL;
-      wh->stream = gdata_documents_service_update_document (self->service,
-                                                            GDATA_DOCUMENTS_DOCUMENT (wh->document),
-                                                            title,
-                                                            content_type,
-                                                            cancellable,
-                                                            &error);
+      wh->uploader = gdata_documents_service_update_document (self->service,
+                                                              GDATA_DOCUMENTS_DOCUMENT (wh->document),
+                                                              title,
+                                                              content_type,
+                                                              &error);
       g_free (content_type);
 
       if (error != NULL)
@@ -4102,23 +4129,24 @@ g_vfs_backend_google_write (GVfsBackend       *_self,
           g_error_free (error);
           goto out;
         }
+
+      wh->istream = g_memory_input_stream_new ();
+      gdata_uploader_set_input (wh->uploader, G_INPUT_STREAM (wh->istream));
     }
 
-  g_debug ("  writing to stream: %p\n", wh->stream);
+  g_debug ("  writing to uploader: %p\n", wh->uploader);
   g_debug ("  entry path: %s\n", wh->entry_path);
 
   error = NULL;
-  nwrite = g_output_stream_write (G_OUTPUT_STREAM (wh->stream),
-                                  buffer,
-                                  buffer_size,
-                                  cancellable,
-                                  &error);
+  g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (wh->istream), buffer, buffer_size, NULL);
+  response = gdata_uploader_send (wh->uploader, cancellable, &nwrite, &error);
   if (error != NULL)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       goto out;
     }
+  g_bytes_unref (response);
 
   g_hash_table_foreach (self->monitors, emit_changed_event, wh->entry_path);
   g_vfs_job_write_set_written_size (job, (gsize) nwrite);
@@ -4136,27 +4164,13 @@ g_vfs_backend_google_close_write (GVfsBackend       *_self,
                                   GVfsBackendHandle  handle)
 {
   GVfsBackendGoogle *self = G_VFS_BACKEND_GOOGLE (_self);
-  GCancellable *cancellable = G_VFS_JOB (job)->cancellable;
   GDataDocumentsDocument *new_document = NULL;
-  GError *error;
+  GError *error = NULL;
   WriteHandle *wh = (WriteHandle *) handle;
 
   g_debug ("+ close_write: %p\n", handle);
 
-  if (!g_output_stream_is_closed (G_OUTPUT_STREAM (wh->stream)))
-    {
-      error = NULL;
-      g_output_stream_close (G_OUTPUT_STREAM (wh->stream), cancellable, &error);
-      if (error != NULL)
-        {
-          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-          g_error_free (error);
-          goto out;
-        }
-    }
-
-  error = NULL;
-  new_document = gdata_documents_service_finish_upload (self->service, wh->stream, &error);
+  new_document = gdata_documents_service_finish_upload (self->service, wh->uploader, NULL, &error);
   if (error != NULL)
     {
       sanitize_error (&error);
