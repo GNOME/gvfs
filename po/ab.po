@@ -1,16 +1,9 @@
-# Copyright (C) 2022 The Abkhazian language development fund named after Bagrat Shinkuba
-# This file is distributed under the same license as the gvfs package.
-# Нанба Наала <naala-nanba@rambler.ru>, 2022.
-#
-
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
 "POT-Creation-Date: 2022-07-19 13:37+0000\n"
-"PO-Revision-Date: 2022-07-22 16:00+0000\n"
 "Last-Translator: Нанба Наала <naala-nanba@rambler.ru>\n"
-"Language-Team: Abkhazian <LL@li.org>\n"
+"Language-Team: Abkhazian <ab@li.org>\n"
 "Language: ab\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -796,7 +789,7 @@ msgstr ""
 #: daemon/gvfsbackendafpbrowse.c:450
 #, c-format
 msgid "%s"
-msgstr ""
+msgstr "%s"
 
 #: daemon/gvfsbackendafpbrowse.c:483 daemon/gvfsbackendafp.c:2140
 #: daemon/gvfsbackendarchive.c:628 daemon/gvfsbackendftp.c:723
@@ -860,7 +853,7 @@ msgstr ""
 #: daemon/gvfsbackendarchive.c:350
 #, c-format
 msgid "/ in %s"
-msgstr ""
+msgstr "/ аҟны %s"
 
 #: daemon/gvfsbackendarchive.c:883 daemon/gvfsbackendburn.c:681
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
@@ -1136,7 +1129,7 @@ msgstr ""
 #. TODO: Names, etc
 #: daemon/gvfsbackenddnssd.c:794
 msgid "Dns-SD"
-msgstr ""
+msgstr "Dns-SD"
 
 #: daemon/gvfsbackenddnssd.c:795 daemon/gvfsbackendnetwork.c:784
 #: daemon/gvfsbackendnetwork.c:933 daemon/gvfsbackendnetwork.c:934
@@ -1809,7 +1802,7 @@ msgstr ""
 
 #: daemon/gvfsdaemonutils.c:261
 msgid "The certificate’s algorithm is considered insecure."
-msgstr ""
+msgstr "Асертификат алгоритм ишәарҭоуп ҳәа иԥхьаӡоуп."
 
 #: daemon/gvfsdaemonutils.c:263
 msgid "Error occurred when validating the certificate."
@@ -1817,7 +1810,7 @@ msgstr ""
 
 #: daemon/gvfsdaemonutils.c:325
 msgid "Yes"
-msgstr ""
+msgstr "Ааи"
 
 #: daemon/gvfsdaemonutils.c:325
 msgid "No"
@@ -1959,7 +1952,7 @@ msgstr ""
 #: daemon/main.c:187 metadata/meta-daemon.c:486
 #, c-format
 msgid "%s: %s"
-msgstr ""
+msgstr "%s: %s"
 
 #: daemon/main.c:189 metadata/meta-daemon.c:488
 #, c-format
@@ -1981,11 +1974,11 @@ msgstr ""
 
 #: daemon/mount.c:1015
 msgid "Location is already mounted"
-msgstr ""
+msgstr "Аҭыӡҭыԥ аҿакуп"
 
 #: daemon/mount.c:1024
 msgid "Location is not mountable"
-msgstr ""
+msgstr "Аҭыӡҭыԥ иаҿаркуа иреиԥшӡам"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:13
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:25
@@ -2076,11 +2069,11 @@ msgstr ""
 #: monitor/udisks2/gvfsudisks2drive.c:290
 #, c-format
 msgid "Unnamed Drive (%s)"
-msgstr ""
+msgstr "Ихьӡыдоу аиҿартәыра (%s)"
 
 #: monitor/udisks2/gvfsudisks2drive.c:292
 msgid "Unnamed Drive"
-msgstr ""
+msgstr " Ихьӡыдоу аиҿартәыра"
 
 #: monitor/udisks2/gvfsudisks2drive.c:624
 #, c-format
@@ -2212,64 +2205,8 @@ msgstr ""
 #: monitor/udisks2/gvfsudisks2volume.c:1685
 #, c-format
 msgid "%s (%s)"
-msgstr ""
+msgstr "%s (%s)"
 
 #: monitor/udisks2/udisks2volumemonitordaemon.c:39
 msgid "GVfs UDisks2 Volume Monitor"
 msgstr ""
-
-#: llvm.lang:22
-msgid "LLVM IR"
-msgstr "LLVM IR"
-
-#: Adwaita-dark.xml:20
-msgid "Adwaita Dark"
-msgstr "Adwaita Dark"
-
-#: Adwaita.xml:20
-msgid "Adwaita"
-msgstr "Adwaita"
-
-#: cobalt-light.xml:20
-msgid "Cobalt Light"
-msgstr "Cobalt Light"
-
-#: cobalt.xml:25
-msgid "Cobalt"
-msgstr "Cobalt"
-
-#: oblivion.xml:23
-msgid "Oblivion"
-msgstr "Oblivion"
-
-#: solarized-dark.xml:23
-msgid "Solarized Dark"
-msgstr "Solarized Dark"
-
-#: solarized-light.xml:23
-msgid "Solarized Light"
-msgstr "Solarized Light"
-
-#: tango.xml:23
-msgid "Tango"
-msgstr "Tango"
-
-#: gtksourceview/gtksourceencoding.c:156+gtksourceview/gtksourceencoding.c:170+gtksourceview/gtksourceencoding.c:277
-msgid "Baltic"
-msgstr "Абалтикатә"
-
-#: gtksourceview/gtksourceencoding.c:160+gtksourceview/gtksourceencoding.c:234+gtksourceview/gtksourceencoding.c:275
-msgid "Arabic"
-msgstr "Арабтәи"
-
-#: gtksourceview/gtksourceencoding.c:194
-msgid "Armenian"
-msgstr "Аермантә"
-
-#: gtksourceview/gtksourceencoding.c:221
-msgid "Georgian"
-msgstr "қырҭтәылатәи"
-
-#: gtksourceview/gtksourceencoding.c:628
-msgid "['UTF-8', 'CURRENT', 'ISO-8859-15', 'UTF-16']"
-msgstr "['UTF-8', 'CURRENT', 'ISO-8859-15', 'UTF-16']"
