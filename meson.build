@@ -3,7 +3,7 @@ project(
   version: '1.51.1',
   license: 'LGPL2+',
   default_options: 'buildtype=debugoptimized',
-  meson_version: '>= 0.56.0',
+  meson_version: '>= 0.57.0',
 )
 
 gvfs_name = meson.project_name()
@@ -481,10 +481,9 @@ configure_file(
   configuration: config_h,
 )
 
-meson.add_install_script(
-  'meson_post_install.py',
-  gio_schemasdir,
-  gio_giomoduledir,
+gnome.post_install(
+  glib_compile_schemas: true,
+  gio_querymodules: gio_giomoduledir,
 )
 
 summary({
