@@ -79,7 +79,7 @@ on_name_acquired (GDBusConnection *connection,
       char *argv2[6];
       
       /* Use the old .gvfs location as fallback, not .cache/gvfs */
-      if (g_get_user_runtime_dir() == g_get_user_cache_dir ())
+      if (g_strcmp0 (g_get_user_runtime_dir(), g_get_user_cache_dir ()) == 0)
         fuse_path = g_build_filename (g_get_home_dir(), ".gvfs", NULL);
       else
         fuse_path = g_build_filename (g_get_user_runtime_dir (), "gvfs", NULL);
