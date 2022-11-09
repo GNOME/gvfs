@@ -19,6 +19,4 @@ logs.
 
 ## Ask Questions
 
-For questions use gvfs mailing list [gvfs-list@gnome.org](mailto:gvfs-list@gnome.org).
-See https://mail.gnome.org/mailman/listinfo/gvfs-list for subscription info.
-Alternatively, irc://irc.gnome.org/nautilus can be used.
+For questions use [GNOME Discourse](https://discourse.gnome.org/).
