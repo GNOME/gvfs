@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2022-10-03 08:31+0000\n"
+"POT-Creation-Date: 2022-10-31 11:13+0000\n"
 "Last-Translator: Нанба Наала <naala-nanba@rambler.ru>\n"
 "Language-Team: Abkhazian <daniel.abzakh@gmail.com>\n"
 "Language: ab\n"
@@ -1003,7 +1003,7 @@ msgstr "Акомпиутер"
 
 #: daemon/gvfsbackendcomputer.c:532
 msgid "File System"
-msgstr ""
+msgstr "Афаилтә система"
 
 #: daemon/gvfsbackendcomputer.c:661
 msgid "Can’t open mountable file"
@@ -1815,7 +1815,7 @@ msgstr "Ааи"
 
 #: daemon/gvfsdaemonutils.c:325
 msgid "No"
-msgstr ""
+msgstr "Мап"
 
 #. Translators: The first %s is the reason why verification failed, the second a certificate
 #: daemon/gvfsdaemonutils.c:337
@@ -1951,9 +1951,9 @@ msgstr ""
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
 #: daemon/main.c:187 metadata/meta-daemon.c:486
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s"
-msgstr "«%s»: %s"
+msgstr "%s: %s"
 
 #: daemon/main.c:189 metadata/meta-daemon.c:488
 #, c-format
