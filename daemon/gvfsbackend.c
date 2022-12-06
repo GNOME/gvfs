@@ -524,6 +524,8 @@ get_thumbnail_attributes (const char *uri,
   GChecksum *checksum;
   char *filename;
   char *basename;
+  const char *size_dirs[4] = { "xx-large", "x-large", "large", "normal" };
+  gsize i;
 
   checksum = g_checksum_new (G_CHECKSUM_MD5);
   g_checksum_update (checksum, (const guchar *) uri, strlen (uri));
@@ -531,34 +533,31 @@ get_thumbnail_attributes (const char *uri,
   basename = g_strconcat (g_checksum_get_string (checksum), ".png", NULL);
   g_checksum_free (checksum);
 
-  filename = g_build_filename (g_get_user_cache_dir (),
-                               "thumbnails", "large", basename,
-                               NULL);
+  for (i = 0; i < G_N_ELEMENTS (size_dirs); i++)
+    {
+      filename = g_build_filename (g_get_user_cache_dir (),
+                                   "thumbnails", size_dirs[i], basename,
+                                   NULL);
+      if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
+        break;
 
-  if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
+      g_clear_pointer (&filename, g_free);
+    }
+
+  if (filename)
     g_file_info_set_attribute_byte_string (info, G_FILE_ATTRIBUTE_THUMBNAIL_PATH, filename);
   else
     {
-      g_free (filename);
       filename = g_build_filename (g_get_user_cache_dir (),
-                                   "thumbnails", "normal", basename,
+                                   "thumbnails", "fail",
+                                   "gnome-thumbnail-factory",
+                                   basename,
                                    NULL);
 
       if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
-        g_file_info_set_attribute_byte_string (info, G_FILE_ATTRIBUTE_THUMBNAIL_PATH, filename);
-      else
-        {
-          g_free (filename);
-          filename = g_build_filename (g_get_user_cache_dir (),
-                                       "thumbnails", "fail",
-                                       "gnome-thumbnail-factory",
-                                       basename,
-                                       NULL);
-
-          if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
-            g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_THUMBNAILING_FAILED, TRUE);
-        }
+        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_THUMBNAILING_FAILED, TRUE);
     }
+
   g_free (basename);
   g_free (filename);
 }
