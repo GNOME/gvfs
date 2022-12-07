@@ -149,7 +149,7 @@ chmod 4550 /home/$CALLING_USER/rootsh
 
 # we must start udisksd in our private mount environment, so that gvfs and
 # udisks agree to the same view of mounts
-$UDISKSD --no-debug --replace &
+$UDISKSD --replace &
 UDISKS_PID=\$!
 
 echo "Running commmand in testbed: \$ARGS"
