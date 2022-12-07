@@ -1612,6 +1612,7 @@ class Trash(GvfsTestCase):
 
     def files_in_trash(self):
         files = set()
+        time.sleep(0.3)
         enum = self.gfile_trash.enumerate_children('*', Gio.FileQueryInfoFlags.NONE, None)
         while True:
             info = enum.next_file(None)
