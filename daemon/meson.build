@@ -256,7 +256,7 @@ if enable_sftp
     '-DDEFAULT_BACKEND_TYPE=sftp',
     '-DBACKEND_TYPES="sftp", G_VFS_TYPE_BACKEND_SFTP,',
     '-DMAX_JOB_THREADS=1',
-    '-DSSH_PROGRAM="@0@"'.format(ssh.full_path()),
+    '-DSSH_PROGRAM="ssh"',
   ]
 
   programs += {'gvfsd-sftp': {'sources': sources, 'dependencies': deps, 'c_args': cflags}}

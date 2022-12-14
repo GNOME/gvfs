@@ -457,10 +457,6 @@ endif
 
 # *** SFTP backend ***
 enable_sftp = get_option('sftp')
-if enable_sftp
-  ssh = find_program('ssh', required: false)
-  assert(ssh.found(), 'SFTP backend requested but a ssh client is required')
-endif
 
 # *** Enable development utils ***
 enable_devel_utils = get_option('devel_utils')
