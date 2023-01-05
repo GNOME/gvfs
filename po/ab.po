@@ -1173,7 +1173,7 @@ msgstr ""
 #: daemon/gvfsbackendgoogle.c:3158 daemon/gvfsbackendgoogle.c:3984
 #: daemon/gvfsbackendnfs.c:1162
 msgid "Target file is not a regular file"
-msgstr ""
+msgstr "Ахықәкыратә фаил имаоиоу фаилӡам"
 
 #: daemon/gvfsbackendgoogle.c:3584 daemon/gvfsbackendsftp.c:2390
 #: daemon/gvfsbackendsftp.c:2792 daemon/gvfsbackendsftp.c:2855
@@ -1211,7 +1211,7 @@ msgstr ""
 
 #: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendnfs.c:1152
 msgid "Target file is a directory"
-msgstr ""
+msgstr "Ахықәкыратә фаил хьӡынҵаӡам"
 
 #: daemon/gvfsbackendgoogle.c:4169 daemon/gvfsbackendgphoto2.c:3050
 msgid "Error writing file"
@@ -1655,7 +1655,7 @@ msgstr ""
 
 #: daemon/gvfsbackendsftp.c:2219
 msgid "Unknown reason"
-msgstr ""
+msgstr "Еилкаам амзыз"
 
 #: daemon/gvfsbackendsftp.c:2649 daemon/gvfsbackendsmb.c:1383
 #: daemon/gvfsdaemonutils.c:140
@@ -1953,7 +1953,7 @@ msgstr ""
 #: daemon/main.c:187 metadata/meta-daemon.c:486
 #, c-format
 msgid "%s: %s"
-msgstr "%s: %s"
+msgstr "«%s»: %s"
 
 #: daemon/main.c:189 metadata/meta-daemon.c:488
 #, c-format
