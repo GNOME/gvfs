@@ -1091,6 +1091,9 @@ open_common (const gchar *path, struct fuse_file_info *fi, GFile *file, int outp
 
   g_mutex_unlock (&fh->mutex);
 
+  if (result < 0)
+    file_handle_unref (fh);
+
   /* The added reference to the file handle is released in vfs_release() */
   return result;
 }
