@@ -231,6 +231,7 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
           if (g_vfs_ftp_connection_is_usable (task->conn))
             break;
 
+          ftp->connections--;
           g_vfs_ftp_connection_free (task->conn);
           task->conn = NULL;
         }
