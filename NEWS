@@ -1,3 +1,14 @@
+Major changes in 1.50.3
+=======================
+* dav: Prevent usage of NULL when user is not specified (Ondrej Holy)
+* ftp: Fix hangs when the connection is released (wangrong)
+* fuse: Decrease file handle reference when open file fail (wangrong)
+* sftp: PATH-expand the ssh client (Alex Stewart)
+* test: Several smaller enhancements (Sébastien Bacher)
+* backend: Add support for xx-large and x-large thumbnails (Ondrej Holy)
+* goa: Prevent automounts when resuming from suspension (Ondrej Holy)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.50.2
 =======================
 * smb: Rework anonymous handling to avoid EINVAL (Ondrej Holy)
