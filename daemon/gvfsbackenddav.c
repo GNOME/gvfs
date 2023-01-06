@@ -2046,6 +2046,7 @@ mount_success (GVfsBackend *backend, GVfsJobMount *job)
   GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (backend);
   GMountSpec *mount_spec;
   GUri *tmp;
+  const gchar *user;
 
   /* Save the auth info in the keyring */
   keyring_save_authinfo (&(dav_backend->auth_info.server_auth), http_backend->mount_base, FALSE);
@@ -2067,8 +2068,9 @@ mount_success (GVfsBackend *backend, GVfsJobMount *job)
    * So it has to be restored here in order to avoid:
    * https://gitlab.gnome.org/GNOME/gvfs/-/issues/614
    */
-  g_mount_spec_set (mount_spec, "user",
-                    g_mount_spec_get (job->mount_spec, "user"));
+  user = g_mount_spec_get (job->mount_spec, "user");
+  if (user != NULL)
+    g_mount_spec_set (mount_spec, "user", user);
 
   g_vfs_backend_set_mount_spec (backend, mount_spec);
   g_vfs_backend_set_icon_name (backend, "folder-remote");
