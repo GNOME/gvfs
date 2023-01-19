@@ -44,6 +44,12 @@ struct OPAQUE_TYPE__GVfsBackendTrash
 
 G_DEFINE_TYPE (GVfsBackendTrash, g_vfs_backend_trash, G_VFS_TYPE_BACKEND);
 
+static gboolean
+is_root (const char *filename)
+{
+  return (filename[0] == '/' && filename[1] == '\0');
+}
+
 static GVfsMonitor *
 trash_backend_get_file_monitor (GVfsBackendTrash  *backend,
                                 gboolean           create)
@@ -229,7 +235,7 @@ trash_backend_open_for_read (GVfsBackend        *vfs_backend,
   GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (vfs_backend);
   GError *error = NULL;
 
-  if (filename[1] == '\0')
+  if (is_root (filename))
     g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
                          _("Can’t open directory"));
 
@@ -397,7 +403,7 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
   GError *error = NULL;
   g_debug ("before job: %d\n", G_OBJECT(job)->ref_count);
 
-  if (filename[1] == '\0')
+  if (is_root (filename))
     g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                          _("The trash folder may not be deleted"));
   else
@@ -456,7 +462,7 @@ trash_backend_pull (GVfsBackend           *vfs_backend,
   GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (vfs_backend);
   GError *error = NULL;
 
-  if (source[1] == '\0')
+  if (is_root (source))
     g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                          _("The trash folder may not be deleted"));
   else
@@ -683,7 +689,7 @@ trash_backend_enumerate (GVfsBackend           *vfs_backend,
 
   trash_watcher_rescan (backend->watcher);
 
-  if (filename[1])
+  if (!is_root (filename))
     trash_backend_enumerate_non_root (backend, job, filename,
                                       attribute_matcher, flags);
   else
@@ -729,7 +735,7 @@ trash_backend_query_info (GVfsBackend           *vfs_backend,
   if (!backend->file_monitor && !backend->dir_monitor)
     trash_watcher_rescan (backend->watcher);
 
-  if (filename[1])
+  if (!is_root (filename))
     {
       GError *error = NULL;
       gboolean is_toplevel;
@@ -832,7 +838,7 @@ trash_backend_create_dir_monitor (GVfsBackend          *vfs_backend,
   GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (vfs_backend);
   GVfsMonitor *monitor;
 
-  if (filename[1])
+  if (!is_root (filename))
     monitor = g_vfs_monitor_new (vfs_backend);
   else
     monitor = trash_backend_get_dir_monitor (backend, TRUE);
@@ -853,7 +859,7 @@ trash_backend_create_file_monitor (GVfsBackend          *vfs_backend,
   GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (vfs_backend);
   GVfsMonitor *monitor;
 
-  if (filename[1])
+  if (!is_root (filename))
     monitor = g_vfs_monitor_new (vfs_backend);
   else
     monitor = trash_backend_get_file_monitor (backend, TRUE);
