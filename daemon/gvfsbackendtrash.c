@@ -227,7 +227,7 @@ trash_backend_get_file (GVfsBackendTrash  *backend,
 }
 
 /* ======================= method implementations ======================= */
-static gboolean
+static void
 trash_backend_open_for_read (GVfsBackend        *vfs_backend,
                              GVfsJobOpenForRead *job,
                              const char         *filename)
@@ -261,18 +261,16 @@ trash_backend_open_for_read (GVfsBackend        *vfs_backend,
               g_vfs_job_open_for_read_set_can_seek (job, TRUE);
               g_vfs_job_succeeded (G_VFS_JOB (job));
 
-              return TRUE;
+              return;
             }
         }
     }
 
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
   g_error_free (error);
-
-  return TRUE;
 }
 
-static gboolean
+static void
 trash_backend_read (GVfsBackend       *backend,
                     GVfsJobRead       *job,
                     GVfsBackendHandle  handle,
@@ -290,16 +288,14 @@ trash_backend_read (GVfsBackend       *backend,
       g_vfs_job_read_set_size (job, bytes);
       g_vfs_job_succeeded (G_VFS_JOB (job));
 
-      return TRUE;
+      return;
     }
 
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
   g_error_free (error);
-
-  return TRUE;
 }
 
-static gboolean
+static void
 trash_backend_seek_on_read (GVfsBackend       *backend,
                             GVfsJobSeekRead   *job,
                             GVfsBackendHandle  handle,
@@ -313,13 +309,11 @@ trash_backend_seek_on_read (GVfsBackend       *backend,
       g_vfs_job_seek_read_set_offset (job, g_seekable_tell (handle));
       g_vfs_job_succeeded (G_VFS_JOB (job));
 
-      return TRUE;
+      return;
     }
 
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
   g_error_free (error);
-
-  return TRUE;
 }
 
 static void
@@ -349,7 +343,7 @@ trash_backend_query_info_on_read (GVfsBackend           *backend,
     }
 }
 
-static gboolean
+static void
 trash_backend_close_read (GVfsBackend       *backend,
                           GVfsJobCloseRead  *job,
                           GVfsBackendHandle  handle)
@@ -361,15 +355,13 @@ trash_backend_close_read (GVfsBackend       *backend,
       g_vfs_job_succeeded (G_VFS_JOB (job));
       g_object_unref (handle);
 
-      return TRUE;
+      return;
     }
 
   g_object_unref (handle);
 
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
   g_error_free (error);
-
-  return TRUE;
 }
 
 static gboolean
@@ -394,7 +386,7 @@ trash_backend_schedule_thaw (GVfsBackendTrash *backend)
                                             backend);
 }
 
-static gboolean
+static void
 trash_backend_delete (GVfsBackend   *vfs_backend,
                       GVfsJobDelete *job,
                       const char    *filename)
@@ -435,7 +427,7 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
                   g_vfs_job_succeeded (G_VFS_JOB (job));
                   trash_item_unref (item);
 
-                  return TRUE;
+                  return;
                 }
             }
 
@@ -445,11 +437,9 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
 
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
   g_error_free (error);
-  
-  return TRUE;
 }
 
-static gboolean
+static void
 trash_backend_pull (GVfsBackend           *vfs_backend,
                     GVfsJobPull           *job,
                     const gchar           *source,
@@ -505,7 +495,7 @@ trash_backend_pull (GVfsBackend           *vfs_backend,
                   trash_item_unref (item);
                   g_object_unref (real);
 
-                  return TRUE;
+                  return;
                 }
             }
 
@@ -517,8 +507,6 @@ trash_backend_pull (GVfsBackend           *vfs_backend,
 
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
   g_error_free (error);
-  
-  return TRUE;
 }
 
 static void
@@ -676,7 +664,7 @@ trash_backend_enumerate_non_root (GVfsBackendTrash      *backend,
   g_error_free (error);
 }
 
-static gboolean
+static void
 trash_backend_enumerate (GVfsBackend           *vfs_backend,
                          GVfsJobEnumerate      *job,
                          const char            *filename,
@@ -694,11 +682,9 @@ trash_backend_enumerate (GVfsBackend           *vfs_backend,
                                       attribute_matcher, flags);
   else
     trash_backend_enumerate_root (backend, job, attribute_matcher, flags);
-
-  return TRUE;
 }
 
-static gboolean
+static void
 trash_backend_mount (GVfsBackend  *vfs_backend,
                      GVfsJobMount *job,
                      GMountSpec   *mount_spec,
@@ -716,11 +702,9 @@ trash_backend_mount (GVfsBackend  *vfs_backend,
   backend->watcher = trash_watcher_new (backend->root);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
-
-  return TRUE;
 }
 
-static gboolean
+static void
 trash_backend_query_info (GVfsBackend           *vfs_backend,
                           GVfsJobQueryInfo      *job,
                           const char            *filename,
@@ -764,7 +748,7 @@ trash_backend_query_info (GVfsBackend           *vfs_backend,
               trash_item_unref (item);
               g_object_unref (real_info);
 
-              return TRUE;
+              return;
             }
 
           trash_item_unref (item);
@@ -798,8 +782,6 @@ trash_backend_query_info (GVfsBackend           *vfs_backend,
 
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
-
-  return TRUE;
 }
 
 static gboolean
@@ -926,17 +908,17 @@ g_vfs_backend_trash_class_init (GVfsBackendTrashClass *class)
 
   gobject_class->finalize = trash_backend_finalize;
 
-  backend_class->try_mount = trash_backend_mount;
-  backend_class->try_open_for_read = trash_backend_open_for_read;
-  backend_class->try_read = trash_backend_read;
-  backend_class->try_seek_on_read = trash_backend_seek_on_read;
+  backend_class->mount = trash_backend_mount;
+  backend_class->open_for_read = trash_backend_open_for_read;
+  backend_class->read = trash_backend_read;
+  backend_class->seek_on_read = trash_backend_seek_on_read;
   backend_class->query_info_on_read = trash_backend_query_info_on_read;
-  backend_class->try_close_read = trash_backend_close_read;
-  backend_class->try_query_info = trash_backend_query_info;
+  backend_class->close_read = trash_backend_close_read;
+  backend_class->query_info = trash_backend_query_info;
   backend_class->try_query_fs_info = trash_backend_query_fs_info;
-  backend_class->try_enumerate = trash_backend_enumerate;
-  backend_class->try_delete = trash_backend_delete;
-  backend_class->try_pull = trash_backend_pull;
+  backend_class->enumerate = trash_backend_enumerate;
+  backend_class->delete = trash_backend_delete;
+  backend_class->pull = trash_backend_pull;
   backend_class->try_create_dir_monitor = trash_backend_create_dir_monitor;
   backend_class->try_create_file_monitor = trash_backend_create_file_monitor;
 }
