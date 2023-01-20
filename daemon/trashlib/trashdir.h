@@ -15,9 +15,6 @@
 
 typedef struct          OPAQUE_TYPE__TrashDir    TrashDir;
 
-typedef void (*trash_dir_ui_hook) (TrashDir *dir,
-                                   GFile    *directory);
-
 TrashDir               *trash_dir_new           (TrashRoot  *root,
                                                  gboolean    watching,
                                                  gboolean    is_homedir,
@@ -30,7 +27,5 @@ void                    trash_dir_free          (TrashDir   *dir);
 void                    trash_dir_watch         (TrashDir   *dir);
 void                    trash_dir_unwatch       (TrashDir   *dir);
 void                    trash_dir_rescan        (TrashDir   *dir);
-
-void                    trash_dir_set_ui_hook   (trash_dir_ui_hook ui_hook);
 
 #endif /* _trashdir_h_ */

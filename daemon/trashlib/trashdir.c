@@ -373,8 +373,6 @@ trash_dir_rescan (TrashDir *dir)
     trash_dir_empty (dir);
 }
 
-static trash_dir_ui_hook ui_hook;
-
 TrashDir *
 trash_dir_new (TrashRoot  *root,
                gboolean    watching,
@@ -411,18 +409,9 @@ trash_dir_new (TrashRoot  *root,
   else
     dir->watch = NULL;
 
-  if (ui_hook)
-    ui_hook (dir, dir->directory);
-
   g_free (rel);
 
   return dir;
-}
-
-void
-trash_dir_set_ui_hook (trash_dir_ui_hook _ui_hook)
-{
-  ui_hook = _ui_hook;
 }
 
 void
