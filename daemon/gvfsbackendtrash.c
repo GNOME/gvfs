@@ -839,10 +839,15 @@ trash_backend_create_dir_monitor (GVfsBackend          *vfs_backend,
   GVfsMonitor *monitor;
 
   if (!is_root (filename))
-    monitor = g_vfs_monitor_new (vfs_backend);
-  else
-    monitor = trash_backend_get_dir_monitor (backend, TRUE);
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        _("Operation not supported"));
+      return TRUE;
+    }
 
+  monitor = trash_backend_get_dir_monitor (backend, TRUE);
   g_vfs_job_create_monitor_set_monitor (job, monitor);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_object_unref (monitor);
@@ -860,10 +865,15 @@ trash_backend_create_file_monitor (GVfsBackend          *vfs_backend,
   GVfsMonitor *monitor;
 
   if (!is_root (filename))
-    monitor = g_vfs_monitor_new (vfs_backend);
-  else
-    monitor = trash_backend_get_file_monitor (backend, TRUE);
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        _("Operation not supported"));
+      return TRUE;
+    }
 
+  monitor = trash_backend_get_file_monitor (backend, TRUE);
   g_vfs_job_create_monitor_set_monitor (job, monitor);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_object_unref (monitor);
