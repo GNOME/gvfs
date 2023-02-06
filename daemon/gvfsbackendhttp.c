@@ -706,6 +706,10 @@ try_query_info (GVfsBackend           *backend,
   uri = http_backend_get_mount_base (backend);
   msg = soup_message_new_from_uri (SOUP_METHOD_HEAD, uri);
 
+  /* Disable encoding in order to retrieve the size of the full file. */
+  soup_message_headers_replace (soup_message_get_request_headers (msg),
+                                "Accept-Encoding", "identity");
+
   g_vfs_job_set_backend_data (G_VFS_JOB (job), msg, NULL);
 
   soup_session_send_async (op_backend->session, msg, G_PRIORITY_DEFAULT,
@@ -723,6 +727,25 @@ try_query_info_on_read (GVfsBackend           *backend,
                         GFileAttributeMatcher *attribute_matcher)
 {
     SoupMessage *msg = g_vfs_http_input_stream_get_message (G_INPUT_STREAM (handle));
+
+    const gchar *encoding;
+
+    /* In case encoding is set, Content-Length will report the compressed size,
+     * but we want to report the complete size of the file to the user. This 
+     * will cause try_query_info() to be invoked, hence reporting the size
+     * without compression enabled.
+     */
+    encoding = soup_message_headers_get_one (soup_message_get_response_headers (msg),
+                                             "Content-Encoding");
+    if (encoding != NULL &&
+        g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_STANDARD_SIZE))
+      {
+        g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                                  G_IO_ERROR_NOT_SUPPORTED,
+                                  _("Operation not supported"));
+        g_object_unref (msg);
+        return TRUE;
+      }
 
     file_info_from_message (msg, info, attribute_matcher);
     g_object_unref (msg);
