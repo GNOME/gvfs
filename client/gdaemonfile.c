@@ -2680,6 +2680,7 @@ file_transfer (GFile                  *source,
   gboolean dest_is_daemon;
   gboolean native_transfer;
   gboolean send_progress;
+  gboolean flatpak_sandbox;
   GVfsDBusMount *proxy;
   gchar *path1, *path2;
   GDBusConnection *connection;
@@ -2695,13 +2696,14 @@ file_transfer (GFile                  *source,
   source_is_daemon = G_IS_DAEMON_FILE (source);
   dest_is_daemon   = G_IS_DAEMON_FILE (destination);
   send_progress    = progress_callback != NULL;
+  flatpak_sandbox  = g_file_test ("/.flatpak-info", G_FILE_TEST_EXISTS);
   serial           = 0;
 
   if (source_is_daemon && dest_is_daemon)
     native_transfer = TRUE;
-  else if (dest_is_daemon && !source_is_daemon)
+  else if (dest_is_daemon && !source_is_daemon && !flatpak_sandbox)
     local_path = g_file_get_path (source);
-  else if (source_is_daemon && !dest_is_daemon)
+  else if (source_is_daemon && !dest_is_daemon && !flatpak_sandbox)
     local_path = g_file_get_path (destination);
   else
     {
