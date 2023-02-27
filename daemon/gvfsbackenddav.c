@@ -3888,7 +3888,7 @@ push_handle_free (PushHandle *handle)
     }
   g_object_unref (handle->backend);
   g_object_unref (handle->job);
-  g_object_unref (handle->msg);
+  g_clear_object (&handle->msg);
   g_uri_unref (handle->uri);
 
   g_slice_free (PushHandle, handle);
