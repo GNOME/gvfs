@@ -2713,15 +2713,6 @@ file_transfer (GFile                  *source,
       return FALSE;
     }
 
-  if (!native_transfer && local_path == NULL)
-    {
-      /* This will cause the fallback code to be involved */
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                           _("Operation not supported, files on different mounts"));
-      return FALSE;
-
-    }
-
   if (send_progress)
     obj_path = g_strdup_printf ("/org/gtk/vfs/callback/%p", &obj_path);
   else
