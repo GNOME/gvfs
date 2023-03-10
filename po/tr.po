@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2023-01-25 20:37+0000\n"
-"PO-Revision-Date: 2023-02-20 19:26+0300\n"
+"POT-Creation-Date: 2023-02-22 11:53+0000\n"
+"PO-Revision-Date: 2023-03-06 20:35+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Türkçe <gnome-turk@gnome.org>\n"
 "Language: tr\n"
@@ -585,37 +585,38 @@ msgstr "Dosya, okuma erişimi için açık değil"
 #: daemon/gvfsbackendgphoto2.c:2451 daemon/gvfsbackendgphoto2.c:2548
 #: daemon/gvfsbackendgphoto2.c:2641 daemon/gvfsbackendgphoto2.c:3250
 #: daemon/gvfsbackendgphoto2.c:3258 daemon/gvfsbackendgphoto2.c:3268
-#: daemon/gvfsbackendmtp.c:1746 daemon/gvfsbackendmtp.c:2047
-#: daemon/gvfsbackendmtp.c:2296 daemon/gvfsbackendmtp.c:2487
-#: daemon/gvfsbackendmtp.c:2570 daemon/gvfsbackendmtp.c:2658
-#: daemon/gvfsbackendmtp.c:2726 daemon/gvfsbackendmtp.c:2921
-#: daemon/gvfsbackendmtp.c:3064 daemon/gvfsbackendnfs.c:2372
-#: daemon/gvfsbackendnfs.c:2422 daemon/gvfsbackendnfs.c:2548
-#: daemon/gvfsbackendsftp.c:2213 daemon/gvfsbackendsftp.c:5417
-#: daemon/gvfsbackendsftp.c:5515 daemon/gvfsbackendsftp.c:6227
-#: daemon/gvfsbackendsftp.c:6259 daemon/gvfsbackendsftp.c:6285
-#: daemon/gvfsbackendsftp.c:6293 daemon/gvfsbackendsftp.c:6780
-#: daemon/gvfsbackendsftp.c:6842 daemon/gvfsbackendsftp.c:6850
-#: daemon/gvfsbackendsmb.c:1700 daemon/gvfsftptask.c:430
-#: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121
-#: daemon/gvfsjobcopy.c:121 daemon/gvfsjobcreatemonitor.c:143
-#: daemon/gvfsjobcreatemonitor.c:154 daemon/gvfsjobcreatemonitor.c:177
-#: daemon/gvfsjobcreatemonitor.c:195 daemon/gvfsjobdelete.c:108
-#: daemon/gvfsjobenumerate.c:272 daemon/gvfsjobmakedirectory.c:108
-#: daemon/gvfsjobmount.c:112 daemon/gvfsjobmountmountable.c:138
-#: daemon/gvfsjobmove.c:121 daemon/gvfsjobopenforread.c:120
-#: daemon/gvfsjobopenforwrite.c:184 daemon/gvfsjobopenforwrite.c:198
-#: daemon/gvfsjobopenforwrite.c:212 daemon/gvfsjobopeniconforread.c:104
-#: daemon/gvfsjobpollmountable.c:107 daemon/gvfsjobpull.c:125
-#: daemon/gvfsjobpush.c:125 daemon/gvfsjobqueryattributes.c:145
-#: daemon/gvfsjobqueryfsinfo.c:116 daemon/gvfsjobqueryinfo.c:124
-#: daemon/gvfsjobqueryinforead.c:125 daemon/gvfsjobqueryinfowrite.c:125
-#: daemon/gvfsjobread.c:123 daemon/gvfsjobseekread.c:121
-#: daemon/gvfsjobseekwrite.c:121 daemon/gvfsjobsetattribute.c:130
-#: daemon/gvfsjobsetdisplayname.c:111 daemon/gvfsjobstartmountable.c:113
-#: daemon/gvfsjobstopmountable.c:115 daemon/gvfsjobtrash.c:107
-#: daemon/gvfsjobtruncate.c:113 daemon/gvfsjobunmountmountable.c:157
-#: daemon/gvfsjobunmountmountable.c:172 daemon/gvfsjobwrite.c:123
+#: daemon/gvfsbackendhttp.c:745 daemon/gvfsbackendmtp.c:1746
+#: daemon/gvfsbackendmtp.c:2047 daemon/gvfsbackendmtp.c:2296
+#: daemon/gvfsbackendmtp.c:2487 daemon/gvfsbackendmtp.c:2570
+#: daemon/gvfsbackendmtp.c:2658 daemon/gvfsbackendmtp.c:2726
+#: daemon/gvfsbackendmtp.c:2921 daemon/gvfsbackendmtp.c:3064
+#: daemon/gvfsbackendnfs.c:2372 daemon/gvfsbackendnfs.c:2422
+#: daemon/gvfsbackendnfs.c:2548 daemon/gvfsbackendsftp.c:2213
+#: daemon/gvfsbackendsftp.c:5417 daemon/gvfsbackendsftp.c:5515
+#: daemon/gvfsbackendsftp.c:6227 daemon/gvfsbackendsftp.c:6259
+#: daemon/gvfsbackendsftp.c:6285 daemon/gvfsbackendsftp.c:6293
+#: daemon/gvfsbackendsftp.c:6780 daemon/gvfsbackendsftp.c:6842
+#: daemon/gvfsbackendsftp.c:6850 daemon/gvfsbackendsmb.c:1700
+#: daemon/gvfsftptask.c:430 daemon/gvfsjobcloseread.c:113
+#: daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
+#: daemon/gvfsjobcreatemonitor.c:143 daemon/gvfsjobcreatemonitor.c:154
+#: daemon/gvfsjobcreatemonitor.c:177 daemon/gvfsjobcreatemonitor.c:195
+#: daemon/gvfsjobdelete.c:108 daemon/gvfsjobenumerate.c:272
+#: daemon/gvfsjobmakedirectory.c:108 daemon/gvfsjobmount.c:112
+#: daemon/gvfsjobmountmountable.c:138 daemon/gvfsjobmove.c:121
+#: daemon/gvfsjobopenforread.c:120 daemon/gvfsjobopenforwrite.c:184
+#: daemon/gvfsjobopenforwrite.c:198 daemon/gvfsjobopenforwrite.c:212
+#: daemon/gvfsjobopeniconforread.c:104 daemon/gvfsjobpollmountable.c:107
+#: daemon/gvfsjobpull.c:125 daemon/gvfsjobpush.c:125
+#: daemon/gvfsjobqueryattributes.c:145 daemon/gvfsjobqueryfsinfo.c:116
+#: daemon/gvfsjobqueryinfo.c:124 daemon/gvfsjobqueryinforead.c:125
+#: daemon/gvfsjobqueryinfowrite.c:125 daemon/gvfsjobread.c:123
+#: daemon/gvfsjobseekread.c:121 daemon/gvfsjobseekwrite.c:121
+#: daemon/gvfsjobsetattribute.c:130 daemon/gvfsjobsetdisplayname.c:111
+#: daemon/gvfsjobstartmountable.c:113 daemon/gvfsjobstopmountable.c:115
+#: daemon/gvfsjobtrash.c:107 daemon/gvfsjobtruncate.c:113
+#: daemon/gvfsjobunmountmountable.c:157 daemon/gvfsjobunmountmountable.c:172
+#: daemon/gvfsjobwrite.c:123
 msgid "Operation not supported"
 msgstr "İşlem desteklenmiyor"
 
@@ -2060,7 +2061,7 @@ msgstr "Dosya işlemleri gerçekleştir"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:14
 msgid "Authentication is required to run gvfsd-admin daemon"
-msgstr "Dosya işlemleri gerçekleştirmek için kimlik denetimi gerekiyor"
+msgstr "Dosya işlemleri gerçekleştirmek için kimlik doğrulaması gerekiyor"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:26
 msgid "Authentication is required to perform file operations"
@@ -2109,7 +2110,7 @@ msgstr "%s için geçersiz kullanıcı bilgisi"
 #: monitor/goa/goavolume.c:399
 #, c-format
 msgid "Unsupported authentication method for %s"
-msgstr "%s için desteklenmeyen kimlik denetimi yöntemi"
+msgstr "%s için desteklenmeyen kimlik doğrulama yöntemi"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1037
 msgid "The given mount was not found"
