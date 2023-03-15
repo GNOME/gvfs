@@ -440,7 +440,7 @@ if enable_mtp
   assert(enable_gudev, 'libmtp requested but gudev is required')
 
   libmtp_dep = dependency('libmtp', version: '>= 1.1.12')
-  foreach version: ['1.1.15']
+  foreach version: ['1.1.15', '1.1.21']
     config_h.set10('HAVE_LIBMTP_' + version.underscorify(), libmtp_dep.version().version_compare('>= ' + version))
   endforeach
 endif

@@ -1379,6 +1379,7 @@ do_enumerate (GVfsBackend *backend,
     if (ret != 0) {
       LIBMTP_Dump_Errorstack (device);
       LIBMTP_Clear_Errorstack (device);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
       goto success;
     }
     for (storage = device->storage; storage != 0; storage = storage->next) {
@@ -1395,6 +1396,7 @@ do_enumerate (GVfsBackend *backend,
 
       g_free (storage_name);
     }
+    g_vfs_job_succeeded (G_VFS_JOB (job));
   } else {
     CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend),
                                          filename);
@@ -1412,13 +1414,54 @@ do_enumerate (GVfsBackend *backend,
     remove_cache_entry (G_VFS_BACKEND_MTP (backend), remove_prefix);
     g_free (remove_prefix);
 
-    LIBMTP_file_t *files;
     LIBMTP_Clear_Errorstack (device);
+
+#if HAVE_LIBMTP_1_1_21
+    uint32_t *handlers = NULL;
+    int count = LIBMTP_Get_Children (device, entry->storage, entry->id, &handlers);
+
+    if (count < 0) {
+      fail_job (G_VFS_JOB (job), device);
+      goto exit;
+    }
+
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+
+    for (int i = 0; i < count; i++) {
+      LIBMTP_file_t *file;
+
+      // Get metadata for one file, if it fails, try next file
+      file = LIBMTP_Get_Filemetadata (device, handlers[i]);
+      if (file == NULL) {
+        continue;
+      }
+      info = g_file_info_new ();
+      get_file_info (backend, device, info, file);
+      g_vfs_job_enumerate_add_info (job, info);
+      g_object_unref (info);
+
+      add_cache_entry (G_VFS_BACKEND_MTP (backend),
+                       g_build_filename (filename, file->filename, NULL),
+                       file->storage_id,
+                       file->item_id);
+
+      LIBMTP_destroy_file_t (file);
+    }
+
+    if (handlers) {
+      g_free (handlers);
+    }
+#else
+    LIBMTP_file_t *files;
+
     files = LIBMTP_Get_Files_And_Folders (device, entry->storage, entry->id);
     if (files == NULL && LIBMTP_Get_Errorstack (device) != NULL) {
       fail_job (G_VFS_JOB (job), device);
       goto exit;
     }
+
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+
     while (files != NULL) {
       LIBMTP_file_t *file = files;
       files = files->next;
@@ -1435,11 +1478,11 @@ do_enumerate (GVfsBackend *backend,
 
       LIBMTP_destroy_file_t (file);
     }
+#endif
   }
 
  success:
   g_vfs_job_enumerate_done (job);
-  g_vfs_job_succeeded (G_VFS_JOB (job));
 
  exit:
   g_strfreev (elements);
