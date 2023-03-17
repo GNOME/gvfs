@@ -1,3 +1,11 @@
+Major changes in 1.50.4
+=======================
+* dav: Prevent usage of NULL for nonexistent source file (Ondrej Holy)
+* client: Fix copy/move operation from/to Flatpak sandbox (Ondrej Holy)
+* http: Report original sizes regardless of compression usage (Lucas Chollet)
+* Fix string comparison on various places (Sergio Costas Rodriguez)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.50.3
 =======================
 * dav: Prevent usage of NULL when user is not specified (Ondrej Holy)
