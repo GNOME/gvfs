@@ -2026,7 +2026,7 @@ msgstr "%s: %s"
 #: daemon/main.c:189 metadata/meta-daemon.c:488
 #, c-format
 msgid "Try “%s --help” for more information."
-msgstr "За повече информация използвайте: „%s --help“."
+msgstr "За повече информация изпълнете „%s --help“."
 
 #: daemon/mount.c:783
 #, c-format
