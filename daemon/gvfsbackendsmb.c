@@ -1892,6 +1892,9 @@ do_set_display_name (GVfsBackend *backend,
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   char *from_uri, *to_uri;
+  g_autofree char *basename = NULL;
+  g_autofree char *old_name_case = NULL;
+  g_autofree char *new_name_case = NULL;
   char *dirname, *new_path;
   int res, errsv;
   struct stat st;
@@ -1899,6 +1902,7 @@ do_set_display_name (GVfsBackend *backend,
   smbc_stat_fn smbc_stat;
 
   dirname = g_path_get_dirname (filename);
+  basename = g_path_get_basename (filename);
 
   /* TODO: display name is in utf8, atm we assume libsmb uris
      are in utf8, but this might not be true if the user changed
@@ -1910,18 +1914,25 @@ do_set_display_name (GVfsBackend *backend,
   from_uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, filename);
   to_uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, new_path);
   
-
-  /* We can't rely on libsmbclient reporting EEXIST, let's always stat first.
-   * https://bugzilla.gnome.org/show_bug.cgi?id=616645
+  /* If we are simply changing the case of an existing file, we don't need to
+   * worry about overwriting another file.
    */
-  smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
-  res = smbc_stat (op_backend->smb_context, to_uri, &st);
-  if (res == 0)
+  old_name_case = g_utf8_casefold (basename, -1);
+  new_name_case = g_utf8_casefold (display_name, -1);
+  if (g_strcmp0 (old_name_case, new_name_case) != 0)
     {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_EXISTS,
-                        _("Can’t rename file, filename already exists"));
-      goto out;
+      /* We can't rely on libsmbclient reporting EEXIST, let's always stat first.
+       * https://bugzilla.gnome.org/show_bug.cgi?id=616645
+       */
+      smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
+      res = smbc_stat (op_backend->smb_context, to_uri, &st);
+      if (res == 0)
+        {
+          g_vfs_job_failed (G_VFS_JOB (job),
+                            G_IO_ERROR, G_IO_ERROR_EXISTS,
+                            _("Can’t rename file, filename already exists"));
+          goto out;
+        }
     }
 
   smbc_rename = smbc_getFunctionRename (op_backend->smb_context);
