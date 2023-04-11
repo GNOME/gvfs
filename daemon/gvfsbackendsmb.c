@@ -1892,8 +1892,6 @@ do_set_display_name (GVfsBackend *backend,
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   char *from_uri, *to_uri;
-  g_autofree char *from_uri_case = NULL;
-  g_autofree char *to_uri_case = NULL;
   char *dirname, *new_path;
   int res, errsv;
   struct stat st;
@@ -1918,12 +1916,7 @@ do_set_display_name (GVfsBackend *backend,
    */
   smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
   res = smbc_stat (op_backend->smb_context, to_uri, &st);
-  /* But still allow renaming if the existing file is the original file.
-   * In other words if the case is changing.
-   */
-  from_uri_case = g_utf8_casefold (from_uri, -1);
-  to_uri_case = g_utf8_casefold (to_uri, -1);
-  if (res == 0 && g_strcmp0 (from_uri_case, to_uri_case) != 0)
+  if (res == 0)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_EXISTS,
