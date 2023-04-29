@@ -638,6 +638,11 @@ on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer use
                            (char *)path);
     }
 
+    /* Finally, emit delete event to tell the clients the device root file is gone. */
+    g_hash_table_foreach (op_backend->monitors,
+                          emit_delete_event,
+                          (char *)"/");
+
     op_backend->force_unmounted = TRUE;
     g_atomic_int_set (&op_backend->unmount_started, TRUE);
     g_vfs_backend_force_unmount ((GVfsBackend*)op_backend);
