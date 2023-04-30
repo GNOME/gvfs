@@ -1,22 +1,15 @@
-# GVfs
+# GVfs :file_folder:
 
-GVfs is a userspace virtual filesystem implementation for GIO (a library
-available in GLib). GVfs comes with a set of backends, including trash support,
-SFTP, SMB, HTTP, DAV, and many others. GVfs also contains modules for GIO that
-implement volume monitors and persistent metadata storage. There is also FUSE
-support that provides limited access to the GVfs filesystems for applications
-not using GIO.
+GVfs is a userspace virtual filesystem implementation for GIO (a library available in GLib). It provides an extensive set of backends, including support for trash, SFTP, SMB, HTTP, DAV, and more. GVfs also includes GIO modules that implement volume monitors and persistent metadata storage. In addition, there's FUSE support to allow limited access to GVfs filesystems for applications that don't use GIO.
 
-For more info about GVfs, see https://wiki.gnome.org/Projects/gvfs.
+For more information about GVfs, visit the [GNOME project page](https://wiki.gnome.org/Projects/gvfs).
 
-## Reporting Bugs
+## :beetle: Reporting Bugs
 
-Bug reports can be found and filed at https://gitlab.gnome.org/GNOME/gvfs/issues.
-For security-related issues, please use https://security.gnome.org/.
+You can find and file bug reports on the [GNOME GitLab page](https://gitlab.gnome.org/GNOME/gvfs/issues). For security-related issues, please use the [GNOME Security page](https://security.gnome.org/).
 
-See https://wiki.gnome.org/Projects/gvfs/debugging for info about getting debug
-logs.
+For guidance on obtaining debug logs, refer to the [GVfs debugging wiki](https://wiki.gnome.org/Projects/gvfs/debugging).
 
-## Ask Questions
+## :question: Ask Questions
 
-For questions use [GNOME Discourse](https://discourse.gnome.org/).
+If you have any questions, please use [GNOME Discourse](https://discourse.gnome.org/).
