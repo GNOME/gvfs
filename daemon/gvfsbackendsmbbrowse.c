@@ -93,8 +93,6 @@ struct _GVfsBackendSmbBrowse
   GList *entries;
 };
 
-
-static GHashTable *server_cache = NULL;
 static GMountTracker *mount_tracker = NULL;
 
 typedef struct {
@@ -167,42 +165,6 @@ browse_entry_free (BrowseEntry *entry)
   g_free (entry->name);
   g_free (entry->comment);
   g_free (entry);
-}
-
-static gboolean
-cached_server_equal (gconstpointer  _a,
-		     gconstpointer  _b)
-{
-  const CachedServer *a = _a;
-  const CachedServer *b = _b;
-
-  return
-    strcmp (a->server_name, b->server_name) == 0 &&
-    strcmp (a->share_name, b->share_name) == 0 &&
-    strcmp (a->domain, b->domain) == 0 &&
-    strcmp (a->username, b->username) == 0;
-}
-
-static guint
-cached_server_hash (gconstpointer key)
-{
-  const CachedServer *server = key;
-
-  return
-    g_str_hash (server->server_name) ^
-    g_str_hash (server->share_name) ^
-    g_str_hash (server->domain) ^
-    g_str_hash (server->username);
-}
-
-static void
-cached_server_free (CachedServer *server)
-{
-  g_free (server->server_name);
-  g_free (server->share_name);
-  g_free (server->domain);
-  g_free (server->username);
-  g_free (server);
 }
 
 static void
@@ -424,131 +386,6 @@ auth_callback (SMBCCTX *context,
   backend->last_password = g_strdup (password_out);
   g_debug ("auth_callback - out: last_user = '%s', last_domain = '%s'\n",
            backend->last_user, backend->last_domain);
-}
-
-/* Add a server to the cache system
- *
- * @param c         pointer to smb context
- * @param srv       pointer to server to add
- * @param server    server name 
- * @param share     share name
- * @param workgroup workgroup used to connect
- * @param username  username used to connect
- * @return          0 on success. 1 on failure.
- *
- */ 
-static int
-add_cached_server (SMBCCTX *context, SMBCSRV *new,
-		   const char *server_name, const char *share_name, 
-		   const char *domain, const char *username)
-{
-  CachedServer *cached_server;
-
-  cached_server = g_new (CachedServer, 1);
-  cached_server->server_name = g_strdup (server_name);
-  cached_server->share_name = g_strdup (share_name);
-  cached_server->domain = g_strdup (domain);
-  cached_server->username = g_strdup (username);
-
-  g_debug ("adding cached server '%s'\\'%s', user '%s';'%s' with data %p\n",
-           server_name ? server_name : "NULL",
-           share_name ? share_name : "(no share)",
-           domain ? domain : "(no domain)",
-           username ? username : "NULL",
-           new);
-
-  if (server_cache == NULL)
-    server_cache = g_hash_table_new_full (cached_server_hash, cached_server_equal,
-					  (GDestroyNotify)cached_server_free, NULL);
-
-  g_hash_table_insert (server_cache, cached_server, new);
-
-  return 0;
-}
-
-static gboolean
-remove_cb (gpointer  key,
-	   gpointer  value,
-	   gpointer  user_data)
-{
-  return value == user_data;
-}
-
-/* Remove cached server
- *
- * @param c         pointer to smb context
- * @param srv       pointer to server to remove
- * @return          0 when found and removed. 1 on failure.
- *
- */ 
-static int
-remove_cached_server (SMBCCTX * context, SMBCSRV * server)
-{
-  guint num;
-
-  if (server_cache)
-    {
-      g_debug ("removing cached servers with data %p\n", server);
-      num = g_hash_table_foreach_remove (server_cache, remove_cb, server);
-      if (num != 0)
-	return 0;
-    }
-
-  return 1;
-}
-
-/* Look up a server in the cache system
- *
- * @param c         pointer to smb context
- * @param server    server name to match
- * @param share     share name to match
- * @param workgroup workgroup to match
- * @param username  username to match
- * @return          pointer to SMBCSRV on success. NULL on failure.
- *
- */ 
-static SMBCSRV *
-get_cached_server (SMBCCTX * context,
-		   const char *server_name, const char *share_name,
-		   const char *domain, const char *username)
-{
-  const CachedServer key = {
-    (char *)server_name,
-    (char *)share_name,
-    (char *)domain,
-    (char *)username
-  };
-  SMBCSRV *ret = NULL;
-
-  g_debug ("looking up cached server '%s'\\'%s', user '%s';'%s'\n",
-           server_name ? server_name : "NULL",
-           share_name ? share_name : "(no share)",
-           domain ? domain : "(no domain)",
-           username ? username : "NULL");
-
-  if (server_cache)
-    ret = g_hash_table_lookup (server_cache, &key);
-
-  g_debug ("  returning %p\n", ret);
-  return ret;
-}
-
-/* Try to remove all servers from the cache system and disconnect
- *
- * @param c         pointer to smb context
- *
- * @return          0 when found and removed. 1 on failure.
- *
- */ 
-static int
-purge_cached (SMBCCTX * context)
-{
-  g_debug ("purging server cache\n");
-
-  if (server_cache)
-    g_hash_table_remove_all (server_cache);
-  
-  return 0;
 }
 
 static gboolean
@@ -820,11 +657,6 @@ do_mount (GVfsBackend *backend,
   smbc_setDebug (smb_context, debug_val);
   smbc_setFunctionAuthDataWithContext (smb_context, auth_callback);
   
-  smbc_setFunctionAddCachedServer (smb_context, add_cached_server);
-  smbc_setFunctionGetCachedServer (smb_context, get_cached_server);
-  smbc_setFunctionRemoveCachedServer (smb_context, remove_cached_server);
-  smbc_setFunctionPurgeCachedServers (smb_context, purge_cached);
-  
   if (op_backend->default_workgroup != NULL)
     smbc_setWorkgroup (smb_context, op_backend->default_workgroup);
 
@@ -989,10 +821,6 @@ do_mount (GVfsBackend *backend,
           if (res)
             break;
         }
-	else {
-	  /*  Purge the cache, we need to have clean playground for next auth try  */
-	  purge_cached (smb_context);
-	}
 
       /* The first round is Kerberos-only.  Only if this fails do we enable
        * NTLMSSP fallback (turning off anonymous fallback, which we've
