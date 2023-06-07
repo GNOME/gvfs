@@ -36,6 +36,10 @@ struct OPAQUE_TYPE__GVfsBackendTrash
   GVfsMonitor *file_monitor;
   GVfsMonitor *dir_monitor;
 
+  GMainContext *worker_context;
+  GMainLoop *worker_loop;
+  GThread *worker_thread;
+
   TrashWatcher *watcher;
   TrashRoot *root;
 
@@ -43,6 +47,94 @@ struct OPAQUE_TYPE__GVfsBackendTrash
 };
 
 G_DEFINE_TYPE (GVfsBackendTrash, g_vfs_backend_trash, G_VFS_TYPE_BACKEND);
+
+typedef struct
+{
+  GSourceFunc source_func;
+  gpointer user_data;
+  GMutex mutex;
+  GCond cond;
+  gboolean completed;
+} ContextInvokeData;
+
+static gboolean
+source_func_wrapper (gpointer user_data)
+{
+  ContextInvokeData *data = user_data;
+
+  g_mutex_lock (&data->mutex);
+
+  while (data->source_func (data->user_data));
+  data->completed = TRUE;
+
+  g_cond_signal (&data->cond);
+  g_mutex_unlock (&data->mutex);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+trash_backend_worker_thread_queue_and_wait (GVfsBackendTrash *backend,
+                                            GSourceFunc       source_func)
+{
+  ContextInvokeData data;
+
+  data.source_func = source_func;
+  data.user_data = backend;
+
+  g_mutex_init (&data.mutex);
+  g_cond_init (&data.cond);
+  data.completed = FALSE;
+
+  g_mutex_lock (&data.mutex);
+
+  g_main_context_invoke (backend->worker_context,
+                         source_func_wrapper,
+                         &data);
+
+  while (!data.completed)
+    {
+      g_cond_wait (&data.cond, &data.mutex);
+    }
+
+  g_mutex_unlock (&data.mutex);
+
+  g_mutex_clear (&data.mutex);
+  g_cond_clear (&data.cond);
+}
+
+static void
+trash_backend_worker_thread_queue (GVfsBackendTrash *backend,
+                                   GSourceFunc       source_func)
+{
+  g_main_context_invoke (backend->worker_context, source_func, backend);
+}
+
+static gboolean
+watch_func (gpointer user_data)
+{
+  GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (user_data);
+
+  trash_watcher_watch (backend->watcher);
+
+  return G_SOURCE_REMOVE;
+}
+
+static gboolean
+rescan_func (gpointer user_data)
+{
+  GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (user_data);
+
+  trash_watcher_rescan (backend->watcher);
+
+  return G_SOURCE_REMOVE;
+}
+
+static gboolean
+ready_func (gpointer user_data)
+{
+  return G_SOURCE_REMOVE;
+}
 
 static gboolean
 is_root (const char *filename)
@@ -63,7 +155,7 @@ trash_backend_get_file_monitor (GVfsBackendTrash  *backend,
        * no possibility here for creating more than one new monitor.
        */
       if (backend->dir_monitor == NULL)
-        trash_watcher_watch (backend->watcher);
+        trash_backend_worker_thread_queue (backend, watch_func);
 
       backend->file_monitor = g_vfs_monitor_new (G_VFS_BACKEND (backend));
     }
@@ -84,7 +176,7 @@ trash_backend_get_dir_monitor (GVfsBackendTrash *backend,
        * no possibility here for creating more than one new monitor.
        */
       if (backend->file_monitor == NULL)
-        trash_watcher_watch (backend->watcher);
+        trash_backend_worker_thread_queue (backend, watch_func);
 
       backend->dir_monitor = g_vfs_monitor_new (G_VFS_BACKEND (backend));
     }
@@ -164,7 +256,6 @@ trash_backend_item_count_changed (gpointer user_data)
     }
 }
 
-
 static GFile *
 trash_backend_get_file (GVfsBackendTrash  *backend,
                         const char        *filename,
@@ -176,6 +267,8 @@ trash_backend_get_file (GVfsBackendTrash  *backend,
   gboolean is_top;
   TrashItem *item;
   GFile *file;
+
+  trash_backend_worker_thread_queue_and_wait (backend, rescan_func);
 
   file = NULL;
   filename++;
@@ -242,9 +335,6 @@ trash_backend_open_for_read (GVfsBackend        *vfs_backend,
   else
     {
       GFile *real;
-
-      if (!backend->file_monitor && !backend->dir_monitor)
-        trash_watcher_rescan (backend->watcher);
 
       real = trash_backend_get_file (backend, filename, NULL, NULL, &error);
 
@@ -404,9 +494,6 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
       TrashItem *item;
       GFile *real;
 
-      if (!backend->file_monitor && !backend->dir_monitor)
-        trash_watcher_rescan (backend->watcher);
-
       real = trash_backend_get_file (backend, filename,
                                      &item, &is_toplevel, &error);
 
@@ -460,9 +547,6 @@ trash_backend_pull (GVfsBackend           *vfs_backend,
       gboolean is_toplevel;
       TrashItem *item;
       GFile *real;
-
-      if (!backend->file_monitor && !backend->dir_monitor)
-        trash_watcher_rescan (backend->watcher);
 
       real = trash_backend_get_file (backend, source, &item,
                                      &is_toplevel, &error);
@@ -585,6 +669,8 @@ trash_backend_enumerate_root (GVfsBackendTrash      *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
+  trash_backend_worker_thread_queue_and_wait (backend, rescan_func);
+
   items = trash_root_get_items (backend->root);
 
   for (node = items; node; node = node->next)
@@ -675,13 +761,36 @@ trash_backend_enumerate (GVfsBackend           *vfs_backend,
 
   g_assert (filename[0] == '/');
 
-  trash_watcher_rescan (backend->watcher);
-
   if (!is_root (filename))
     trash_backend_enumerate_non_root (backend, job, filename,
                                       attribute_matcher, flags);
   else
     trash_backend_enumerate_root (backend, job, attribute_matcher, flags);
+}
+
+static gpointer
+thread_func (gpointer user_data)
+{
+  GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (user_data);
+
+  g_main_context_push_thread_default (backend->worker_context);
+  backend->worker_loop = g_main_loop_new (backend->worker_context, FALSE);
+
+  backend->root = trash_root_new (trash_backend_item_created,
+                                  trash_backend_item_deleted,
+                                  trash_backend_item_count_changed,
+                                  backend);
+  backend->watcher = trash_watcher_new (backend->root);
+
+  g_main_loop_run (backend->worker_loop);
+
+  trash_watcher_free (backend->watcher);
+  trash_root_free (backend->root);
+
+  g_main_context_pop_thread_default (backend->worker_context);
+  g_main_loop_unref (backend->worker_loop);
+
+  return NULL;
 }
 
 static void
@@ -695,11 +804,12 @@ trash_backend_mount (GVfsBackend  *vfs_backend,
 
   backend->file_monitor = NULL;
   backend->dir_monitor = NULL;
-  backend->root = trash_root_new (trash_backend_item_created,
-                                  trash_backend_item_deleted,
-                                  trash_backend_item_count_changed,
-                                  backend);
-  backend->watcher = trash_watcher_new (backend->root);
+
+  backend->worker_context = g_main_context_new ();
+  backend->worker_thread = g_thread_new ("Trash Worker Thread",
+                                         thread_func,
+                                         backend);
+  trash_backend_worker_thread_queue_and_wait (backend, ready_func);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
@@ -715,9 +825,6 @@ trash_backend_query_info (GVfsBackend           *vfs_backend,
   GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (vfs_backend);
 
   g_assert (filename[0] == '/');
-
-  if (!backend->file_monitor && !backend->dir_monitor)
-    trash_watcher_rescan (backend->watcher);
 
   if (!is_root (filename))
     {
@@ -761,6 +868,8 @@ trash_backend_query_info (GVfsBackend           *vfs_backend,
     {
       GIcon *icon;
       int n_items;
+
+      trash_backend_worker_thread_queue_and_wait (backend, rescan_func);
 
       n_items = trash_root_get_n_items (backend->root);
 
@@ -878,9 +987,6 @@ trash_backend_finalize (GObject *object)
   if (backend->dir_monitor)
     g_object_unref (backend->dir_monitor);
   backend->dir_monitor = NULL;
-
-  trash_watcher_free (backend->watcher);
-  trash_root_free (backend->root);
 }
 
 static void
