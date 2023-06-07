@@ -29,7 +29,6 @@ struct OPAQUE_TYPE__TrashRoot
   gpointer user_data;
 
   GHashTable *item_table;
-  gboolean is_homedir;
   int old_size;
 };
 
