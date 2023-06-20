@@ -568,11 +568,9 @@ unmount_operation_is_stop (GMountOperation *op)
 }
 
 static void
-umount_completed (GObject    *object,
-                  GParamSpec *pspec,
-                  gpointer    user_data)
+umount_completed (gpointer user_data)
 {
-  GTask *task = G_TASK (object);
+  GTask *task = G_TASK (user_data);
   UnmountData *data = g_task_get_task_data (task);
 
   if (data->mount_operation &&
@@ -813,7 +811,15 @@ lock_cb (GObject       *source_object,
                                           &error))
     g_task_return_error (task, error);
   else
-    g_task_return_boolean (task, TRUE);
+    {
+      /* Call the unmount_completed function explicitly here as it is too
+       * late to emit show-unmount-progress signal from the notify::completed
+       * callback.
+       */
+      umount_completed (task);
+
+      g_task_return_boolean (task, TRUE);
+    }
 
   g_object_unref (task);
 }
@@ -859,6 +865,12 @@ unmount_cb (GObject       *source_object,
           return;
         }
 
+      /* Call the unmount_completed function explicitly here as it is too
+       * late to emit show-unmount-progress signal from the notify::completed
+       * callback.
+       */
+      umount_completed (task);
+
       g_task_return_boolean (task, TRUE);
       g_object_unref (task);
     }
@@ -893,6 +905,13 @@ umount_command_cb (GObject       *source_object,
   if (WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0)
     {
       gvfs_udisks2_volume_monitor_update (mount->monitor);
+
+      /* Call the unmount_completed function explicitly here as it is too
+       * late to emit show-unmount-progress signal from the notify::completed
+       * callback.
+       */
+      umount_completed (task);
+
       g_task_return_boolean (task, TRUE);
       g_object_unref (task);
       goto out;
@@ -928,7 +947,7 @@ unmount_do (GTask       *task,
     {
       gvfs_udisks2_unmount_notify_start (data->mount_operation,
                                          G_MOUNT (g_task_get_source_object (task)), NULL);
-      g_signal_connect (task, "notify::completed", G_CALLBACK (umount_completed), NULL);
+      g_signal_connect_swapped (task, "notify::completed", G_CALLBACK (umount_completed), task);
     }
 
   /* Use the umount(8) command if there is no block device / filesystem */
