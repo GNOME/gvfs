@@ -1351,8 +1351,10 @@ pkill --signal HUP udevd || pkill --signal HUP systemd-udevd
 
         if self.mock_polkit:
             # for some reason, terminating the shell doesn't terminate the
-            # polkitd running in it, so kill that separately
-            self.root_command('kill `pidof -x /home/test_polkitd.py`')
+            # polkitd running in it, so kill that separately.
+            # The apparently redundant [] is to stop pkill from
+            # killing itself or its sudo parent.
+            self.root_command('pkill -e -f "/home/test_polkitd[.]py"')
             self.mock_polkit.terminate()
             self.mock_polkit.wait()
             self.mock_polkit = None
