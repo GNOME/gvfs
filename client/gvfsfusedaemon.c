@@ -2559,6 +2559,8 @@ main (gint argc, gchar *argv [])
   struct fuse_cmdline_opts opts;
   struct fuse_args args = FUSE_ARGS_INIT (argc, argv);
 
+  setlocale (LC_ALL, "");
+
   if (fuse_opt_parse (&args, NULL, NULL, NULL) == -1)
     return 1;
 
