@@ -84,7 +84,9 @@ decide_watch_type (GUnixMountEntry *mount,
 
   fs_type = g_unix_mount_get_fs_type (mount);
 
-  if (strcmp (fs_type, "nfs") == 0)
+  if (g_strcmp0 (fs_type, "nfs") == 0 ||
+      g_strcmp0 (fs_type, "nfs4") == 0 ||
+      g_strcmp0 (fs_type, "cifs") == 0)
     return TRASH_WATCHER_WATCH;
   else
     return TRASH_WATCHER_TRUSTED;
