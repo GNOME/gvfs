@@ -47,6 +47,7 @@ typedef struct {
 
 typedef struct _ThreadLocalConnections ThreadLocalConnections;
 static void free_local_connections (ThreadLocalConnections *local);
+static void invalidate_local_connection (const char *dbus_id, GError **error);
 
 static GPrivate local_connections = G_PRIVATE_INIT((GDestroyNotify)free_local_connections);
 
@@ -248,7 +249,13 @@ async_get_connection_response (GVfsDBusDaemon *proxy,
                                                      res,
                                                      &error))
     {
-      async_call->io_error = g_error_copy (error);
+      /* If the error indicates that the dbus_id is invalid,
+       * we invalidate the caches, and then caller needs to retry.
+       */
+      if (g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_SERVICE_UNKNOWN))
+        invalidate_local_connection (async_call->dbus_id, &async_call->io_error);
+      else
+        async_call->io_error = g_error_copy (error);
       g_error_free (error);
       g_free (address1);
       async_call_finish (async_call);
@@ -359,6 +366,14 @@ _g_dbus_connection_get_for_async (const char *dbus_id,
     open_connection_async (async_call);
   else
     {
+      if (g_dbus_connection_is_closed (async_call->connection))
+        {
+          /* The mount for this connection died, we invalidate
+           * the caches, and then caller needs to retry.
+           */
+          invalidate_local_connection (async_call->dbus_id, &async_call->io_error);
+          async_call->connection = NULL;
+        }
       async_call_finish (async_call);
     }
 }
@@ -653,16 +668,27 @@ _g_dbus_connection_get_sync (const char *dbus_id,
       return NULL;
     }
 
+  local_error = NULL;
   address1 = NULL;
   res = gvfs_dbus_daemon_call_get_connection_sync (daemon_proxy,
                                                    &address1,
                                                    NULL,
                                                    cancellable,
-                                                   error);
+                                                   &local_error);
   g_object_unref (daemon_proxy);
 
   if (!res)
     {
+      /* If the error indicates that the dbus_id is invalid,
+       * we invalidate the caches, and then caller needs to retry.
+       */
+      if (g_error_matches (local_error, G_DBUS_ERROR, G_DBUS_ERROR_SERVICE_UNKNOWN))
+        {
+          invalidate_local_connection (dbus_id, error);
+          g_error_free (local_error);
+        }
+      else
+        g_propagate_error (error, local_error);
       g_free (address1);
       return NULL;
     }

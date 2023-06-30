@@ -178,7 +178,9 @@ g_daemon_file_monitor_new (const char *remote_id,
   daemon_monitor->remote_obj_path = g_strdup (remote_obj_path);
 
   connection = _g_dbus_connection_get_sync (daemon_monitor->remote_id, NULL, &error);
-  if (connection == NULL && !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+  if (connection == NULL &&
+      !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED) &&
+      !g_error_matches (error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
     {
       g_dbus_error_strip_remote_error (error);
       g_warning ("The peer-to-peer connection failed: %s. Falling back to the "

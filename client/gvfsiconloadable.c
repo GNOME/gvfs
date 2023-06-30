@@ -58,7 +58,9 @@ create_proxy_for_icon (GVfsIcon *vfs_icon,
     goto out;
 
   connection = _g_dbus_connection_get_sync (mount_info->dbus_id, cancellable, &local_error);
-  if (connection == NULL && !g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+  if (connection == NULL &&
+      !g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED) &&
+      !g_error_matches (local_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
     {
       g_dbus_error_strip_remote_error (local_error);
       g_warning ("The peer-to-peer connection failed: %s. Falling back to the "
@@ -244,6 +246,8 @@ bus_get_cb (GObject *source_object,
   g_object_unref (connection);
 }
 
+static void async_got_mount_info (GMountInfo *mount_info, gpointer _data, GError *error);
+
 static void
 async_got_connection_cb (GDBusConnection *connection,
                          GError *io_error,
@@ -259,6 +263,17 @@ async_got_connection_cb (GDBusConnection *connection,
         {
           g_task_return_error (data->task, g_error_copy (io_error));
           async_path_call_free (data);
+          return;
+        }
+      else if (g_error_matches (io_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
+        {
+          GVfsIcon *vfs_icon = g_task_get_source_object (data->task);
+
+          g_mount_info_unref (data->mount_info);
+          _g_daemon_vfs_get_mount_info_async (vfs_icon->mount_spec,
+                                              "/",
+                                              async_got_mount_info,
+                                              data);
           return;
         }
 
