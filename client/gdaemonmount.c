@@ -317,7 +317,8 @@ async_got_connection_cb (GDBusConnection *connection,
     {
       g_dbus_error_strip_remote_error (io_error);
 
-      if (g_error_matches (io_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+      if (g_error_matches (io_error, G_IO_ERROR, G_IO_ERROR_CANCELLED) ||
+          g_error_matches (io_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
         {
           g_task_return_error (task, g_error_copy (io_error));
           g_object_unref (task);
