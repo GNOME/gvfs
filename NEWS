@@ -1,3 +1,14 @@
+Major changes in 1.50.5
+=======================
+* smbbrowse: Fix empty device listing after unrelated mount failure (Ondrej Holy)
+* udisks: Fix missing unmount notifications (Ondrej Holy)
+* trash: Fix nfs4 and cifs monitoring (re2zero)
+* smb: Allow renaming a file to the same name with a different case (Corey Berla)
+* mtp: Emit delete event on device disconnection (António Fernandes)
+* trash: Fix wrongly reported item-count (rong wang)
+* Some other fixes and improvements (Sebastien Bacher, Simon McVittie, wangrong)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.50.4
 =======================
 * dav: Prevent usage of NULL for nonexistent source file (Ondrej Holy)
