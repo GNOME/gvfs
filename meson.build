@@ -4,6 +4,7 @@ project(
   license: 'LGPL2+',
   default_options: 'buildtype=debugoptimized',
   meson_version: '>= 0.57.0',
+  default_options: ['warning_level=1']
 )
 
 gvfs_name = meson.project_name()
