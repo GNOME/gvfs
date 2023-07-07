@@ -32,6 +32,7 @@
 #include <string.h>
 #include <errno.h>
 #include <signal.h>
+#include <locale.h>
 
 #include <glib.h>
 #include <glib/gi18n.h>
