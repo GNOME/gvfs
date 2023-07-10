@@ -1,6 +1,6 @@
 <schemalist>
   <schema id="org.gnome.system.dns_sd" path="/org/gnome/system/dns-sd/">
-    <key name="display-local" enum="org.gnome.system.gvfs.GDnsSdDisplayMode">
+    <key name="display-local" enum="org.gnome.system.gvfs.GVfsBackendNetworkDisplayMode">
       <default>'merged'</default>
       <summary>How to display local DNS-SD services</summary>
       <description>How DNS-SD services are displayed in the "network:///" location. Possible values are "merged", "separate" (the Local Network folder) and "disabled".</description>
