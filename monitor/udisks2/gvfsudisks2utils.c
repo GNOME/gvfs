@@ -709,6 +709,7 @@ unmount_notify_data_free (gpointer user_data)
   UnmountNotifyData *data = user_data;
 
   unmount_notify_stop_timer (data);
+  g_signal_handlers_disconnect_by_data (data->op, data);
 
   g_clear_object (&data->mount);
   g_clear_object (&data->drive);
