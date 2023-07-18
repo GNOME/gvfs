@@ -145,6 +145,9 @@ g_vfs_daemon_finalize (GObject *object)
 
   daemon = G_VFS_DAEMON (object);
 
+  if (daemon->thread_pool != NULL)
+    g_thread_pool_free (daemon->thread_pool, TRUE, FALSE);
+
   /* There may be some jobs outstanding if we've been force unmounted. */
   if (daemon->jobs)
     g_warning ("daemon->jobs != NULL when finalizing daemon!");

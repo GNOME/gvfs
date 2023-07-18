@@ -331,6 +331,7 @@ gudev_coldplug_cameras (GGPhoto2VolumeMonitor *monitor)
         if (g_udev_device_has_property (d, "ID_GPHOTO2"))
             gudev_add_camera (monitor, d, FALSE);
     }
+    g_list_free_full (usb_devices, g_object_unref);
 }
 
 static GObject *

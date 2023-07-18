@@ -902,14 +902,7 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
       network_backend->smb_settings = g_settings_new ("org.gnome.system.smb");
 
       current_workgroup = g_settings_get_string (network_backend->smb_settings, "workgroup");
-
-      if (current_workgroup == NULL ||
-          current_workgroup[0] == 0) 
-        /* it's okay if current_workgroup is null here, 
-         * it's checked before the NetworkFile is added anyway. */
-        network_backend->current_workgroup = NULL;
-      else 
-        network_backend->current_workgroup = current_workgroup;
+      network_backend->current_workgroup = current_workgroup;
 
       g_signal_connect (network_backend->smb_settings,
                         "change-event",

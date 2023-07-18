@@ -640,7 +640,7 @@ _g_find_file_insensitive_async (GFile              *parent,
                            G_FILE_QUERY_INFO_NONE, G_PRIORITY_DEFAULT,
                            cancellable,
                            find_file_insensitive_exists_callback, task);
-
+  g_object_unref (direct_file);
 
 }
 
