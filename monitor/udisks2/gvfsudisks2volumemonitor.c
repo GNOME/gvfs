@@ -442,6 +442,9 @@ get_udisks_client_sync (GError **error)
   if (g_once_init_enter (&initialized))
     {
       _client = udisks_client_new_sync (NULL, &_error);
+      if (_error != NULL)
+        g_warning ("Failed to connect to UDisks: %s", _error->message);
+
       g_once_init_leave (&initialized, 1);
     }
 
