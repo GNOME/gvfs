@@ -66,7 +66,6 @@ struct _GVfsBackendNetwork
   /* SMB Stuff */
   gboolean have_smb;
   char *current_workgroup;
-  GFileMonitor *smb_monitor;
   GMutex smb_mount_lock;
   GVfsJobMount *mount_job;
 
@@ -307,10 +306,6 @@ notify_dnssd_local_changed (GFileMonitor *monitor, GFile *file, GFile *other_fil
                             GFileMonitorEvent event_type, gpointer user_data);
 
 static void
-notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
-                          GFileMonitorEvent event_type, gpointer user_data);
-
-static void
 recompute_files (GVfsBackendNetwork *backend)
 {
   GFile *server_file;
@@ -343,27 +338,6 @@ recompute_files (GVfsBackendNetwork *backend)
         workgroup = g_strconcat ("smb://", backend->current_workgroup, "/", NULL);    
 
       server_file = g_file_new_for_uri (workgroup);
-
-      /* recreate monitor if our workgroup changed or we don't have a monitor */
-      if (backend->smb_monitor == NULL)
-        {
-          monitor = g_file_monitor_directory (server_file, G_FILE_MONITOR_NONE, NULL, &error);
-          if (monitor) 
-            {
-              g_signal_connect (monitor, "changed", 
-                                (GCallback)notify_smb_files_changed, (gpointer)backend); 
-              /* takes ref */
-              backend->smb_monitor = monitor;
-            }
-          else
-            {
-	      char *uri = g_file_get_uri (server_file);
-              g_debug ("Couldn't create directory monitor on %s. Error: %s\n",
-                       uri, error ? error->message : "");
-	      g_free (uri);
-              g_clear_error (&error);
-            }
-        }
 
       /* children of current workgroup */
       enumer = g_file_enumerate_children (server_file, 
@@ -559,39 +533,6 @@ remount_smb (GVfsBackendNetwork *backend, GVfsJobMount *job)
 }
 
 static void
-notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
-                          GFileMonitorEvent event_type, gpointer user_data)
-{
-  GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(user_data);
-  
-  switch (event_type)
-    {
-    case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
-    case G_FILE_MONITOR_EVENT_CREATED:
-    case G_FILE_MONITOR_EVENT_DELETED:
-      if (backend->idle_tag == 0)
-        backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
-      break;
-    case G_FILE_MONITOR_EVENT_PRE_UNMOUNT:
-    case G_FILE_MONITOR_EVENT_UNMOUNTED:
-      /* in either event, our smb backend is/will be gone. */
-      if (backend->idle_tag == 0)
-        backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
-      
-      /* stop monitoring as the backend's gone. */
-      if (backend->smb_monitor)
-        {
-          g_file_monitor_cancel (backend->smb_monitor);
-          g_object_unref (backend->smb_monitor);
-          backend->smb_monitor = NULL;
-        }  
-      break;
-    default:
-      break;
-    }
-}
-
-static void
 notify_dnssd_local_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
                             GFileMonitorEvent event_type, gpointer user_data)
 {
@@ -648,17 +589,6 @@ smb_settings_change_event_cb (GSettings *settings,
 
   g_free (backend->current_workgroup);
   backend->current_workgroup = g_settings_get_string (settings, "workgroup");
-
-  /* cancel the smb monitor */
-  if (backend->smb_monitor)
-    {
-      g_signal_handlers_disconnect_by_func (backend->smb_monitor,
-					    notify_smb_files_changed,
-					    backend);
-      g_file_monitor_cancel (backend->smb_monitor);
-      g_object_unref (backend->smb_monitor);
-      backend->smb_monitor = NULL;
-    }
 
   remount_smb (backend, NULL);
 
@@ -967,11 +897,6 @@ g_vfs_backend_network_finalize (GObject *object)
     {
       g_signal_handlers_disconnect_by_func (backend->dnssd_monitor, notify_dnssd_local_changed, backend);
       g_clear_object (&backend->dnssd_monitor);
-    }
-  if (backend->smb_monitor)
-    {
-      g_signal_handlers_disconnect_by_func (backend->smb_monitor, notify_smb_files_changed, backend);
-      g_clear_object (&backend->smb_monitor);
     }
   if (backend->idle_tag)
     {
