@@ -435,6 +435,7 @@ create_root_file_info (GVfsBackendFtp *ftp)
 
   g_file_info_set_content_type (info, "inode/directory");
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
+  g_file_info_set_is_symlink (info, FALSE);
 
   icon = g_themed_icon_new ("folder-remote");
   g_file_info_set_icon (info, icon);
@@ -670,6 +671,8 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
           g_file_info_set_is_symlink (info, TRUE);
           g_free (link);
         }
+      else
+        g_file_info_set_is_symlink (info, FALSE);
 
       g_file_info_set_size (info, g_ascii_strtoull (result.fe_size, NULL, 10));
 
