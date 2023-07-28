@@ -494,7 +494,10 @@ mount_smb_done_cb (GObject *object,
   if (error)
     g_error_free (error);
 
-  recompute_files (backend);
+  if (backend->idle_tag == 0)
+    {
+      backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+    }
 
   /*  We've been spawned from try_mount  */
   if (backend->mount_job)
