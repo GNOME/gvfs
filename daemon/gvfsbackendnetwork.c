@@ -399,7 +399,8 @@ recompute_files (GVfsBackendNetwork *backend)
       g_free (workgroup);
     }
 
-  if (backend->have_dnssd)
+  if (backend->have_dnssd &&
+      backend->local_setting != G_DNS_SD_DISPLAY_MODE_DISABLED)
     {
       server_file = g_file_new_for_uri ("dns-sd://local/");
       /* create directory monitor if we haven't already */
