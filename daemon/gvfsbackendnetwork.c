@@ -487,12 +487,8 @@ mount_smb_done_cb (GObject *object,
                    gpointer user_data)
 {
   GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(user_data);
-  GError *error = NULL;
 
-  g_file_mount_enclosing_volume_finish (G_FILE (object), res, &error);
-  
-  if (error)
-    g_error_free (error);
+  g_file_mount_enclosing_volume_finish (G_FILE (object), res, NULL);
 
   if (backend->idle_tag == 0)
     {
