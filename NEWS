@@ -1,3 +1,9 @@
+Major changes in 1.50.6
+=======================
+* udisks2: Disconnect signal handlers to fix crashes when unmounting (Ondrej Holy)
+* fuse: Include missing locale.h header (Ondrej Holy)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.50.5
 =======================
 * smbbrowse: Fix empty device listing after unrelated mount failure (Ondrej Holy)
