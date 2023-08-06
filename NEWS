@@ -1,3 +1,11 @@
+Major changes in 1.51.90
+========================
+* Fix various memory leaks (wang xiaomeng)
+* udisks2: Disconnect signal handlers to fix crashes when unmounting (Ondrej Holy)
+* fuse: Include missing locale.h header (Ondrej Holy)
+* Some other fixes and improvements (Ondrej Holy)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.51.1
 =======================
 * trash: Run blocking methods on a thread to avoid hangs (Ondrej Holy)
