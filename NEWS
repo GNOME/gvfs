@@ -1,3 +1,8 @@
+Major changes in 1.51.91
+========================
+* sftp/ftp: Ensure that is-symlink is always set to avoid warnings (Sébastien Noel)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.51.90
 ========================
 * Fix various memory leaks (wang xiaomeng)
