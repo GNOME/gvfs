@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: po_gvfs-oc\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2021-05-13 14:35+0000\n"
-"PO-Revision-Date: 2021-12-02 15:46+0100\n"
+"POT-Creation-Date: 2023-01-25 20:37+0000\n"
+"PO-Revision-Date: 2023-09-07 18:55+0200\n"
 "Last-Translator: Quentin PAGÈS\n"
 "Language-Team: Tot En Òc\n"
 "Language: oc\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.3.2\n"
 "X-Launchpad-Export-Date: 2015-05-20 16:56+0000\n"
 "X-Project-Style: gnome\n"
 
@@ -97,7 +97,7 @@ msgstr "Fin de flux"
 #: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
 #: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
 #: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
-#: daemon/gvfsbackendsftp.c:5531 daemon/gvfsbackendsmb.c:1122
+#: daemon/gvfsbackendsftp.c:5531 daemon/gvfsbackendsmb.c:1108
 #: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
 #: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:347
 #: daemon/gvfsftptask.c:224
@@ -127,7 +127,7 @@ msgstr ""
 #: daemon/gvfsafpvolume.c:2402 daemon/gvfsbackendadmin.c:150
 #: daemon/gvfsbackendafc.c:166 daemon/gvfsbackendgoogle.c:256
 #: daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1125
-#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:437
+#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:438 daemon/mount.c:437
 #, c-format
 msgid "Permission denied"
 msgstr "Autorizacion refusada"
@@ -250,7 +250,7 @@ msgid "Got EOS"
 msgstr "EOS (fin de flux) obtengut"
 
 #: daemon/gvfsafpconnection.c:1060 daemon/gvfsafpconnection.c:1102
-#: daemon/gvfsftptask.c:397
+#: daemon/gvfsftptask.c:398
 msgid "Host closed connection"
 msgstr "L'òste a tampat la connexion"
 
@@ -407,16 +407,16 @@ msgstr "Impossible de cargar %s sus %s"
 #: daemon/gvfsbackendmtp.c:2240 daemon/gvfsbackendmtp.c:2307
 #: daemon/gvfsbackendmtp.c:2669 daemon/gvfsbackendmtp.c:2948
 #: daemon/gvfsbackendmtp.c:3091 daemon/gvfsbackendnetwork.c:697
-#: daemon/gvfsbackendsmbbrowse.c:1119 daemon/gvfsbackendsmbbrowse.c:1186
-#: daemon/gvfsbackendsmbbrowse.c:1368 daemon/gvfsbackendsmbbrowse.c:1441
+#: daemon/gvfsbackendsmbbrowse.c:1125 daemon/gvfsbackendsmbbrowse.c:1192
+#: daemon/gvfsbackendsmbbrowse.c:1374 daemon/gvfsbackendsmbbrowse.c:1447
 #, c-format
 msgid "File doesn’t exist"
 msgstr "Lo fichièr existís pas"
 
 #: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2410
 #: daemon/gvfsbackendafp.c:289 daemon/gvfsbackendafp.c:492
-#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2410
-#: daemon/gvfsbackenddav.c:3073 daemon/gvfsbackenddav.c:3353
+#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2799
+#: daemon/gvfsbackenddav.c:3754 daemon/gvfsbackenddav.c:4001
 #: daemon/gvfsbackendftp.c:832 daemon/gvfsbackendnfs.c:2480
 #: daemon/gvfsbackendsftp.c:2725 daemon/gvfsbackendsftp.c:3500
 #: daemon/gvfsbackendsftp.c:3948 daemon/gvfsbackendsftp.c:5020
@@ -433,7 +433,7 @@ msgid "Target file is open"
 msgstr "Lo fichièr cibla es dobèrt"
 
 #: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
-#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2800
+#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3307
 #: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendsftp.c:2209
 msgid "Directory not empty"
 msgstr "Lo repertòri es pas void"
@@ -462,10 +462,10 @@ msgstr "Pas pro de plaça sul volum"
 
 #: daemon/gvfsafpvolume.c:811 daemon/gvfsafpvolume.c:1355
 #: daemon/gvfsafpvolume.c:1507 daemon/gvfsbackendafp.c:296
-#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2465
-#: daemon/gvfsbackenddav.c:2761 daemon/gvfsbackenddav.c:2869
-#: daemon/gvfsbackenddav.c:3006 daemon/gvfsbackenddav.c:3082
-#: daemon/gvfsbackenddav.c:3120 daemon/gvfsbackenddav.c:3344
+#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2870
+#: daemon/gvfsbackenddav.c:3224 daemon/gvfsbackenddav.c:3380
+#: daemon/gvfsbackenddav.c:3486 daemon/gvfsbackenddav.c:3720
+#: daemon/gvfsbackenddav.c:3764 daemon/gvfsbackenddav.c:3991
 #: daemon/gvfsbackendftp.c:811 daemon/gvfsbackendftp.c:999
 #: daemon/gvfsbackendftp.c:1509 daemon/gvfsbackendftp.c:1576
 #: daemon/gvfsbackendgoogle.c:1703 daemon/gvfsbackendgoogle.c:1780
@@ -473,7 +473,7 @@ msgstr "Pas pro de plaça sul volum"
 #: daemon/gvfsbackendgoogle.c:2757 daemon/gvfsbackendgoogle.c:3204
 #: daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1650
 #: daemon/gvfsbackendmtp.c:1693 daemon/gvfsbackendnfs.c:2490
-#: daemon/gvfsbackendsftp.c:5029 daemon/gvfsbackendsmb.c:2111
+#: daemon/gvfsbackendsftp.c:5029 daemon/gvfsbackendsmb.c:2097
 msgid "Target file already exists"
 msgstr "Lo fichièr cibla existís ja"
 
@@ -586,8 +586,8 @@ msgstr "Lo fichièr es pas dobèrt per un accès en lectura"
 #: daemon/gvfsbackendadmin.c:104 daemon/gvfsbackendadmin.c:871
 #: daemon/gvfsbackendafc.c:2361 daemon/gvfsbackendafp.c:1781
 #: daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
-#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:3427
-#: daemon/gvfsbackenddav.c:3459 daemon/gvfsbackenddav.c:3487
+#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:4083
+#: daemon/gvfsbackenddav.c:4115 daemon/gvfsbackenddav.c:4143
 #: daemon/gvfsbackendftp.c:1209 daemon/gvfsbackendftp.c:1257
 #: daemon/gvfsbackendftp.c:1278 daemon/gvfsbackendftp.c:1624
 #: daemon/gvfsbackendgoogle.c:1590 daemon/gvfsbackendgoogle.c:1623
@@ -617,7 +617,7 @@ msgstr "Lo fichièr es pas dobèrt per un accès en lectura"
 #: daemon/gvfsbackendsftp.c:6259 daemon/gvfsbackendsftp.c:6285
 #: daemon/gvfsbackendsftp.c:6293 daemon/gvfsbackendsftp.c:6780
 #: daemon/gvfsbackendsftp.c:6842 daemon/gvfsbackendsftp.c:6850
-#: daemon/gvfsbackendsmb.c:1714 daemon/gvfsftptask.c:429
+#: daemon/gvfsbackendsmb.c:1700 daemon/gvfsftptask.c:430
 #: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121
 #: daemon/gvfsjobcopy.c:121 daemon/gvfsjobcreatemonitor.c:143
 #: daemon/gvfsjobcreatemonitor.c:154 daemon/gvfsjobcreatemonitor.c:177
@@ -641,9 +641,9 @@ msgid "Operation not supported"
 msgstr "Operacion pas presa en carga"
 
 #: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639
-#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:1903
-#: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:256
-#: daemon/gvfsbackendsmb.c:596
+#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2356
+#: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:303
+#: daemon/gvfsbackendsmb.c:582
 msgid "Invalid mount spec"
 msgstr "Especificacion de montatge invalida"
 
@@ -722,7 +722,7 @@ msgstr "Error libimobiledevice pas gerida (%d)"
 msgid "Try again"
 msgstr "Tornar ensajar"
 
-#: daemon/gvfsbackendafc.c:394 daemon/gvfsbackend.c:1025
+#: daemon/gvfsbackendafc.c:394 daemon/gvfsbackend.c:1024
 #: monitor/udisks2/gvfsudisks2mount.c:750
 msgid "Cancel"
 msgstr "Anullar"
@@ -802,27 +802,27 @@ msgstr ""
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
 #: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2329
 #: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:126
-#: daemon/gvfsbackendsmb.c:686 daemon/gvfsbackendtrash.c:234
+#: daemon/gvfsbackendsmb.c:672 daemon/gvfsbackendtrash.c:234
 msgid "Can’t open directory"
 msgstr "Impossible de dobrir lo repertòri"
 
 #: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528
 #: daemon/gvfsbackendafp.c:1270 daemon/gvfsbackendafp.c:1359
-#: daemon/gvfsbackenddav.c:2905 daemon/gvfsbackendftp.c:1461
+#: daemon/gvfsbackenddav.c:3661 daemon/gvfsbackendftp.c:1461
 #: daemon/gvfsbackendsftp.c:3722 daemon/gvfsbackendsftp.c:4009
 msgid "Backups not supported"
 msgstr "Los salvamments son pas preses en carga pel moment"
 
-#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:739
-#: daemon/gvfsbackendsmb.c:1218
+#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:725
+#: daemon/gvfsbackendsmb.c:1204
 msgid "Unsupported seek type"
 msgstr "Tipe « seek » pas pres en carga"
 
 #: daemon/gvfsbackendafpbrowse.c:208 daemon/gvfsbackendcomputer.c:958
 #: daemon/gvfsbackendcomputer.c:1053 daemon/gvfsbackendcomputer.c:1159
 #: daemon/gvfsbackendcomputer.c:1249 daemon/gvfsbackendcomputer.c:1322
-#: daemon/gvfsbackendcomputer.c:1391 daemon/gvfsbackendsmbbrowse.c:1114
-#: daemon/gvfsbackendsmbbrowse.c:1160
+#: daemon/gvfsbackendcomputer.c:1391 daemon/gvfsbackendsmbbrowse.c:1120
+#: daemon/gvfsbackendsmbbrowse.c:1166
 msgid "Not a mountable file"
 msgstr "Es pas un fichièr que pòt èsser montat"
 
@@ -839,8 +839,8 @@ msgstr "Es pas un fichièr que pòt èsser montat"
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: daemon/gvfsbackendafpbrowse.c:446 daemon/gvfsbackendafp.c:2105
 #: daemon/gvfsbackendftp.c:681 daemon/gvfsbackendnfs.c:290
-#: daemon/gvfsbackendsftp.c:2070 daemon/gvfsbackendsmb.c:455
-#: daemon/gvfsbackendsmb.c:1390
+#: daemon/gvfsbackendsftp.c:2070 daemon/gvfsbackendsmb.c:442
+#: daemon/gvfsbackendsmb.c:1376
 #, c-format
 msgid "%s on %s"
 msgstr "%s sus %s"
@@ -862,7 +862,7 @@ msgid "Apple Filing Protocol Service"
 msgstr "Servici de protocòl de partiment de fichièrs d'Apple"
 
 #: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:877
-#: daemon/gvfsbackenddav.c:3068 daemon/gvfsbackendftp.c:1568
+#: daemon/gvfsbackenddav.c:3749 daemon/gvfsbackendftp.c:1568
 #: daemon/gvfsbackendgoogle.c:1752 daemon/gvfsbackendgoogle.c:2095
 #: daemon/gvfsbackendgoogle.c:3141
 #, fuzzy
@@ -871,7 +871,7 @@ msgid "Can’t copy directory over directory"
 msgstr "Impossible d'espotir un repertòri amb un autre repertòri"
 
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:893
-#: daemon/gvfsbackenddav.c:3097 daemon/gvfsbackendftp.c:1591
+#: daemon/gvfsbackenddav.c:3784 daemon/gvfsbackendftp.c:1591
 #: daemon/gvfsbackendgoogle.c:1814 daemon/gvfsbackendgoogle.c:3168
 #: daemon/gvfsbackendgoogle.c:3216 daemon/gvfsbackendmtp.c:1641
 #: daemon/gvfsbackendmtp.c:1656
@@ -880,9 +880,9 @@ msgstr "Impossible d'espotir un repertòri amb un autre repertòri"
 msgid "Can’t recursively copy directory"
 msgstr "Impossible de copiar recursivament un repertòri"
 
-#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2945
+#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:3562
 #: daemon/gvfsbackendgoogle.c:2209 daemon/gvfsbackendnfs.c:2474
-#: daemon/gvfsbackendsftp.c:5015 daemon/gvfsbackendsmb.c:2100
+#: daemon/gvfsbackendsftp.c:5015 daemon/gvfsbackendsmb.c:2086
 #, fuzzy
 #| msgid "Can't move directory over directory"
 msgid "Can’t move directory over directory"
@@ -893,9 +893,9 @@ msgstr "Impossible de desplaçar un repertòri sus un repertòri de meteis nom"
 msgid "Unable to create temporary file (%s)"
 msgstr "Impossible de crear lo fichièr temporari (%s)"
 
-#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2546
+#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2977
 #: daemon/gvfsbackendnfs.c:1177 daemon/gvfsbackendsftp.c:3963
-#: daemon/gvfsbackendsmb.c:1091
+#: daemon/gvfsbackendsmb.c:1077
 msgid "The file was externally modified"
 msgstr "Lo fichièr es estat modificat d'un biais extèrne"
 
@@ -958,10 +958,8 @@ msgstr "Aqueste fichièr o aqueste repertòri existís pas"
 #: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:905
 #: daemon/gvfsbackendgoogle.c:1760 daemon/gvfsbackendgoogle.c:2103
 #: daemon/gvfsbackendgoogle.c:3149
-#, fuzzy
-#| msgid "Can't copy file over directory"
 msgid "Can’t copy file over directory"
-msgstr "Impossible d'espotir un repertòri amb un fichièr"
+msgstr "Impossible de copiar un fichièr par dessús un repertòri"
 
 #. Translators: this is the display name of the backend
 #: daemon/gvfsbackendburn.c:652
@@ -975,21 +973,21 @@ msgstr "Creator de CD/DVD"
 msgid "File exists"
 msgstr "Lo fichièr existís"
 
-#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:2983
+#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:3601
 #: daemon/gvfsbackendsftp.c:2211 daemon/gvfsbackendsftp.c:5195
 msgid "Target file exists"
 msgstr "Lo fichièr cibla existís"
 
-#: daemon/gvfsbackend.c:890 daemon/gvfsjobunmount.c:197
+#: daemon/gvfsbackend.c:889 daemon/gvfsjobunmount.c:197
 #: daemon/gvfsjobunmount.c:264
 msgid "File system is busy"
 msgstr "Lo sistèma de fichièrs es ocupat"
 
-#: daemon/gvfsbackend.c:1024 monitor/udisks2/gvfsudisks2mount.c:748
+#: daemon/gvfsbackend.c:1023 monitor/udisks2/gvfsudisks2mount.c:748
 msgid "Unmount Anyway"
 msgstr "Desmontar çaquelà"
 
-#: daemon/gvfsbackend.c:1027 monitor/udisks2/gvfsudisks2mount.c:751
+#: daemon/gvfsbackend.c:1026 monitor/udisks2/gvfsudisks2mount.c:751
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -1116,48 +1114,50 @@ msgstr "Impossible d'interrogar lo fichièr"
 #. Translators: This is the name of the WebDAV share constructed as
 #. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
 #. the second %s and only shown if it is not the default http(s) port.
-#: daemon/gvfsbackenddav.c:503
+#: daemon/gvfsbackenddav.c:412
 #, c-format
 msgid "%s on %s%s"
 msgstr "%s sus %s%s"
 
-#: daemon/gvfsbackenddav.c:708 daemon/gvfsbackenddav.c:2078
-#: daemon/gvfsbackendhttp.c:202
+#: daemon/gvfsbackenddav.c:766 daemon/gvfsbackenddav.c:1536
+#: daemon/gvfsbackenddav.c:2147 daemon/gvfsbackenddav.c:2311
+#: daemon/gvfsbackendhttp.c:268 daemon/gvfshttpinputstream.c:273
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "Error HTTP : %s"
 
-#: daemon/gvfsbackenddav.c:725
+#: daemon/gvfsbackenddav.c:781
 msgid "Could not parse response"
 msgstr "Impossible d'analisar la responsa"
 
-#: daemon/gvfsbackenddav.c:734
+#: daemon/gvfsbackenddav.c:790
 msgid "Empty response"
 msgstr "Responsa voida"
 
-#: daemon/gvfsbackenddav.c:742
+#: daemon/gvfsbackenddav.c:798
 msgid "Unexpected reply from server"
 msgstr "Responsa inesperada del servidor"
 
-#: daemon/gvfsbackenddav.c:1444 daemon/gvfsbackenddav.c:2205
-#: daemon/gvfsbackenddav.c:2300 daemon/gvfsbackenddav.c:2402
+#: daemon/gvfsbackenddav.c:1554 daemon/gvfsbackenddav.c:2512
+#: daemon/gvfsbackenddav.c:2607 daemon/gvfsbackenddav.c:2791
+#, c-format
 msgid "Response invalid"
 msgstr "Responsa invalida"
 
-#: daemon/gvfsbackenddav.c:1588
+#: daemon/gvfsbackenddav.c:1775
 msgid "WebDAV share"
 msgstr "Partiment WebDAV"
 
 #. Translators: %s is the name of the WebDAV share
 #. Translators: %s is a server name
-#: daemon/gvfsbackenddav.c:1591 daemon/gvfsbackendsmbbrowse.c:373
+#: daemon/gvfsbackenddav.c:1778 daemon/gvfsbackendsmbbrowse.c:373
 #, c-format
 msgid ""
 "Authentication Required\n"
 "Enter password for “%s”:"
 msgstr ""
 
-#: daemon/gvfsbackenddav.c:1594
+#: daemon/gvfsbackenddav.c:1781
 msgid ""
 "Authentication Required\n"
 "Enter proxy password:"
@@ -1165,36 +1165,32 @@ msgstr ""
 "Autentificacion requerida\n"
 "Picatz lo senhal del servidor mandatari :"
 
-#: daemon/gvfsbackenddav.c:2064
-msgid "Not a WebDAV enabled share"
-msgstr "Aqueste partiment pren pas en carga WebDAV"
-
-#: daemon/gvfsbackenddav.c:2086
+#: daemon/gvfsbackenddav.c:2155
 #, fuzzy
 #| msgid "Could not find enclosing mount"
 msgid "Could not find an enclosing directory"
 msgstr "Impossible de trobar lo punt de montatge òste"
 
-#: daemon/gvfsbackenddav.c:2159 daemon/gvfsbackenddav.c:2255
-#: daemon/gvfsbackenddav.c:2328 daemon/gvfsbackenddav.c:2436
+#: daemon/gvfsbackenddav.c:2299
+msgid "Not a WebDAV enabled share"
+msgstr "Aqueste partiment pren pas en carga WebDAV"
+
+#: daemon/gvfsbackenddav.c:2538 daemon/gvfsbackenddav.c:2651
+#: daemon/gvfsbackenddav.c:2738 daemon/gvfsbackenddav.c:2825
 msgid "Could not create request"
 msgstr "Impossible de crear la requèsta"
 
-#: daemon/gvfsbackenddav.c:2577 daemon/gvfsbackendftp.c:1102
+#: daemon/gvfsbackenddav.c:3011 daemon/gvfsbackendftp.c:1102
 #: daemon/gvfsbackendgoogle.c:3944 daemon/gvfsbackendnfs.c:941
 #: daemon/gvfsbackendnfs.c:964 daemon/gvfsbackendnfs.c:990
-#: daemon/gvfsbackendnfs.c:1390 daemon/gvfsbackendsmb.c:1127
-#: daemon/gvfsbackendsmb.c:2128
+#: daemon/gvfsbackendnfs.c:1390 daemon/gvfsbackendsmb.c:1113
+#: daemon/gvfsbackendsmb.c:2114
 msgid "Backup file creation failed"
 msgstr "La creacion del fichièr de salvament a fracassat"
 
-#: daemon/gvfsbackenddav.c:2950
+#: daemon/gvfsbackenddav.c:3567
 msgid "Can’t move over directory"
 msgstr "Impossible d'espotir lo repertòri"
-
-#: daemon/gvfsbackenddav.c:3219
-msgid "File length changed during transfer"
-msgstr ""
 
 #: daemon/gvfsbackenddnssd.c:521 daemon/gvfsbackendnetwork.c:462
 msgid "Local Network"
@@ -1215,8 +1211,8 @@ msgid "Network"
 msgstr "Ret"
 
 #: daemon/gvfsbackendftp.c:560 daemon/gvfsbackendsftp.c:1191
-#: daemon/gvfsbackendsftp.c:1295 daemon/gvfsbackendsmbbrowse.c:1014
-#: daemon/gvfsbackendsmb.c:551
+#: daemon/gvfsbackendsftp.c:1295 daemon/gvfsbackendsmbbrowse.c:1020
+#: daemon/gvfsbackendsmb.c:537
 msgid "Password dialog cancelled"
 msgstr "La demanda de picada del senhal es estada anullada"
 
@@ -1225,10 +1221,8 @@ msgid "Insufficient permissions"
 msgstr "Autorizacions insufisentas"
 
 #: daemon/gvfsbackendgoogle.c:2217
-#, fuzzy
-#| msgid "Can't move over directory"
 msgid "Can’t move file over directory"
-msgstr "Impossible d'espotir lo repertòri"
+msgstr "Impossible de desplaçar un fichièr per dessús un repertòri"
 
 #: daemon/gvfsbackendgoogle.c:2259
 msgid "Error moving file/folder"
@@ -1252,7 +1246,7 @@ msgstr "Error al moment de l'obtencion de las donadas del fichièr"
 #: daemon/gvfsbackendgoogle.c:3158 daemon/gvfsbackendgoogle.c:3984
 #: daemon/gvfsbackendnfs.c:1162
 msgid "Target file is not a regular file"
-msgstr ""
+msgstr "Lo fichièr cibla es pas un fichièr estandard"
 
 #: daemon/gvfsbackendgoogle.c:3584 daemon/gvfsbackendsftp.c:2390
 #: daemon/gvfsbackendsftp.c:2792 daemon/gvfsbackendsftp.c:2855
@@ -1392,7 +1386,7 @@ msgid "Error seeking in stream on camera %s"
 msgstr "Error de desplaçament dins lo flux sus l'aparelh de fòto %s"
 
 #: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3380
-#: daemon/gvfsbackendsmbbrowse.c:1437
+#: daemon/gvfsbackendsmbbrowse.c:1443
 msgid "Not a directory"
 msgstr "Es pas un repertòri"
 
@@ -1476,7 +1470,7 @@ msgid ""
 msgstr ""
 "Pas pres en carga (la font es un fichièr, mas la destinacion es un repertòri)"
 
-#: daemon/gvfsbackendhttp.c:198
+#: daemon/gvfsbackendhttp.c:263
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "Error del client HTTP : %s"
@@ -1553,7 +1547,7 @@ msgstr "Impossible de crear un repertòri a aqueste emplaçament"
 #: daemon/gvfsbackendmtp.c:2245 daemon/gvfsbackendmtp.c:2312
 #: daemon/gvfsbackendmtp.c:2674 daemon/gvfsbackendmtp.c:2740
 #: daemon/gvfsbackendmtp.c:2953 daemon/gvfsbackendmtp.c:3096
-#: daemon/gvfsbackendsmbbrowse.c:1182
+#: daemon/gvfsbackendsmbbrowse.c:1188
 msgid "Not a regular file"
 msgstr "Es pas un fichièr estandard"
 
@@ -1587,7 +1581,7 @@ msgstr "Vista generala de la ret"
 
 #: daemon/gvfsbackendnfs.c:242
 msgid "Mount point does not exist"
-msgstr ""
+msgstr "Lo punt de montatge existís pas"
 
 #: daemon/gvfsbackendnfs.c:266
 msgid ""
@@ -1774,7 +1768,7 @@ msgstr "Impossible de trobar una comanda SSH presa en carga"
 msgid "Unknown reason"
 msgstr "Rason desconeguda"
 
-#: daemon/gvfsbackendsftp.c:2649 daemon/gvfsbackendsmb.c:1397
+#: daemon/gvfsbackendsftp.c:2649 daemon/gvfsbackendsmb.c:1383
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (encodatge invalid)"
@@ -1798,13 +1792,13 @@ msgstr "Error de creacion del fichièr de salvament : %s"
 msgid "Value out of range, sftp only supports 32bit timestamps"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:5500 daemon/gvfsbackendsmb.c:1739
+#: daemon/gvfsbackendsftp.c:5500 daemon/gvfsbackendsmb.c:1725
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Tipe d'atribut invalid (uint64 esperat)"
 
 #: daemon/gvfsbackendsmbbrowse.c:808 daemon/gvfsbackendsmbbrowse.c:847
-#: daemon/gvfsbackendsmb.c:414 daemon/gvfsbackendsmb.c:441
-#: daemon/gvfsbackendsmb.c:632
+#: daemon/gvfsbackendsmb.c:401 daemon/gvfsbackendsmb.c:428
+#: daemon/gvfsbackendsmb.c:618
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "Error intèrna (%s)"
@@ -1817,17 +1811,17 @@ msgid "Windows shares on %s"
 msgstr "Partiments Windows sus %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: daemon/gvfsbackendsmbbrowse.c:1019
+#: daemon/gvfsbackendsmbbrowse.c:1025
 #, c-format
 msgid "Failed to retrieve share list from server: %s"
 msgstr "L'obtencion de la lista dels partiments del servidor a fracassat : %s"
 
-#: daemon/gvfsbackendsmbbrowse.c:1541
+#: daemon/gvfsbackendsmbbrowse.c:1547
 msgid "Windows Network File System Service"
 msgstr "Servici de sistèma de fichièrs ret Windows"
 
 #. Translators: First %s is a share name, second is a server name
-#: daemon/gvfsbackendsmb.c:270
+#: daemon/gvfsbackendsmb.c:257
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -1835,7 +1829,7 @@ msgid ""
 msgstr ""
 
 #. Translators: First %s is a share name, second is a server name
-#: daemon/gvfsbackendsmb.c:276
+#: daemon/gvfsbackendsmb.c:263
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -1843,42 +1837,42 @@ msgid ""
 msgstr ""
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: daemon/gvfsbackendsmb.c:556
+#: daemon/gvfsbackendsmb.c:542
 #, c-format
 msgid "Failed to mount Windows share: %s"
 msgstr "Impossible de montar lo partiment Windows : %s"
 
-#: daemon/gvfsbackendsmb.c:1326
+#: daemon/gvfsbackendsmb.c:1312
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "La creacion del fichièr de salvament a fracassat : %s"
 
-#: daemon/gvfsbackendsmb.c:1937
+#: daemon/gvfsbackendsmb.c:1923
 msgid "Can’t rename file, filename already exists"
 msgstr "Impossible de renomenar lo fichièr, lo nom de fichièr existís ja"
 
-#: daemon/gvfsbackendsmb.c:1988
+#: daemon/gvfsbackendsmb.c:1974
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Error al moment de la supression del fichièr : %s"
 
-#: daemon/gvfsbackendsmb.c:2075
+#: daemon/gvfsbackendsmb.c:2061
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Error al moment del desplaçament del fichièr : %s"
 
-#: daemon/gvfsbackendsmb.c:2148
+#: daemon/gvfsbackendsmb.c:2134
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Error al moment de la supression del fichièr cibla : %s"
 
-#: daemon/gvfsbackendsmb.c:2172
+#: daemon/gvfsbackendsmb.c:2158
 #, fuzzy
 #| msgid "Can't recursively move directory"
 msgid "Can’t recursively move directory"
 msgstr "Impossible de desplaçar un repertòri d'un biais recursiu"
 
-#: daemon/gvfsbackendsmb.c:2221
+#: daemon/gvfsbackendsmb.c:2207
 msgid "Windows Shares File System Service"
 msgstr "Servici de sistèma de fichièrs de partiment Windows"
 
@@ -1902,7 +1896,7 @@ msgstr "Canal blocat"
 
 #: daemon/gvfsdaemonutils.c:251
 msgid "The signing certificate authority is not known."
-msgstr ""
+msgstr "L'autoritat de signatura de certificat es desconeguda."
 
 #: daemon/gvfsdaemonutils.c:253
 msgid "The certificate does not match the identity of the site."
@@ -1953,7 +1947,7 @@ msgid "Unexpected end of stream"
 msgstr "Fin de flux inesperat"
 
 #: daemon/gvfsftpconnection.c:227 daemon/gvfsftpconnection.c:240
-#: daemon/gvfsftptask.c:449 daemon/gvfsftptask.c:877
+#: daemon/gvfsftptask.c:450 daemon/gvfsftptask.c:878
 msgid "Invalid reply"
 msgstr "Responsa invalida"
 
@@ -1973,49 +1967,49 @@ msgstr "Fracàs de la creacion d'una connexion FTP activa."
 msgid "Filename contains invalid characters."
 msgstr "Lo nom de fichièr conten de caractèrs invalids."
 
-#: daemon/gvfsftptask.c:290
+#: daemon/gvfsftptask.c:291
 msgid "The FTP server is busy. Try again later"
 msgstr "Lo servidor FTP es ocupat. Ensajatz tornamai pus tard"
 
-#: daemon/gvfsftptask.c:296
+#: daemon/gvfsftptask.c:297
 msgid "Backend currently unmounting"
 msgstr ""
 
-#: daemon/gvfsftptask.c:393
+#: daemon/gvfsftptask.c:394
 msgid "Accounts are unsupported"
 msgstr "Los comptes son pas preses en carga"
 
-#: daemon/gvfsftptask.c:401
+#: daemon/gvfsftptask.c:402
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
 "Impossible de dobrir una connexion de donadas. Benlèu que vòstre parafuòc "
 "empacha aquesta accion ?"
 
-#: daemon/gvfsftptask.c:405
+#: daemon/gvfsftptask.c:406
 msgid "Data connection closed"
 msgstr "Connexion de donadas tampada"
 
-#: daemon/gvfsftptask.c:412 daemon/gvfsftptask.c:416
+#: daemon/gvfsftptask.c:413 daemon/gvfsftptask.c:417
 msgid "Operation failed"
 msgstr "L'operacion a fracassat"
 
-#: daemon/gvfsftptask.c:421
+#: daemon/gvfsftptask.c:422
 msgid "No space left on server"
 msgstr "Pas mai d'espaci disponible sul servidor"
 
-#: daemon/gvfsftptask.c:433
+#: daemon/gvfsftptask.c:434
 msgid "Unsupported network protocol"
 msgstr "Protocòl ret pas pres en carga"
 
-#: daemon/gvfsftptask.c:441
+#: daemon/gvfsftptask.c:442
 msgid "Page type unknown"
 msgstr "Tipe de pagina desconegut"
 
-#: daemon/gvfsftptask.c:445
+#: daemon/gvfsftptask.c:446
 msgid "Invalid filename"
 msgstr "Nom de fichièr invalid"
 
-#: daemon/gvfshttpinputstream.c:292
+#: daemon/gvfshttpinputstream.c:289
 msgid "Error seeking in stream"
 msgstr "Error de desplaçament dins lo flux"
 
@@ -2085,24 +2079,24 @@ msgstr "%s : %s"
 msgid "Try “%s --help” for more information."
 msgstr "Ensajatz « %s --help » per obténer mai d'entresenhas."
 
-#: daemon/mount.c:759
+#: daemon/mount.c:783
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Lo montatge automatic a fracassat : %s"
 
-#: daemon/mount.c:803 daemon/mount.c:879
+#: daemon/mount.c:827 daemon/mount.c:903
 msgid "The specified location is not mounted"
 msgstr "L'emplaçament indicat es pas montat"
 
-#: daemon/mount.c:808
+#: daemon/mount.c:832
 msgid "The specified location is not supported"
 msgstr "L'emplaçament indicat es pas pres en carga"
 
-#: daemon/mount.c:991
+#: daemon/mount.c:1015
 msgid "Location is already mounted"
 msgstr "L'emplaçament es ja montat"
 
-#: daemon/mount.c:1000
+#: daemon/mount.c:1024
 msgid "Location is not mountable"
 msgstr "L'emplaçament es pas « montable »"
 
@@ -2149,17 +2143,17 @@ msgstr "Demòni de metadonadas GVFS"
 msgid "Metadata daemon for GVFS"
 msgstr "Demòni de metadonadas per GVFS"
 
-#: monitor/goa/goavolume.c:298 monitor/goa/goavolume.c:337
+#: monitor/goa/goavolume.c:296 monitor/goa/goavolume.c:335
 #, c-format
 msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
 msgstr "Impossible d'obténer org.gnome.OnlineAccounts.Files per %s"
 
-#: monitor/goa/goavolume.c:368
+#: monitor/goa/goavolume.c:366
 #, c-format
 msgid "Invalid credentials for %s"
 msgstr "Informacions d'autentificacion pas validas per %s"
 
-#: monitor/goa/goavolume.c:401
+#: monitor/goa/goavolume.c:399
 #, c-format
 msgid "Unsupported authentication method for %s"
 msgstr "Metòde d'autentificacion pas pres en carga per %s"
