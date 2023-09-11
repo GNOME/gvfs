@@ -482,6 +482,16 @@ idle_add_recompute (GVfsBackendNetwork *backend)
 }
 
 static void
+schedule_recompute (GVfsBackendNetwork *backend)
+{
+  /* Don't re-issue recomputes if we've already queued one. */
+  if (backend->idle_tag == 0)
+    {
+      backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+    }
+}
+
+static void
 mount_smb_done_cb (GObject *object,
                    GAsyncResult *res,
                    gpointer user_data)
@@ -490,10 +500,7 @@ mount_smb_done_cb (GObject *object,
 
   g_file_mount_enclosing_volume_finish (G_FILE (object), res, NULL);
 
-  if (backend->idle_tag == 0)
-    {
-      backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
-    }
+  schedule_recompute (backend);
 
   /*  We've been spawned from try_mount  */
   if (backend->mount_job)
@@ -541,14 +548,12 @@ notify_dnssd_local_changed (GFileMonitor *monitor, GFile *file, GFile *other_fil
     case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
     case G_FILE_MONITOR_EVENT_CREATED:
     case G_FILE_MONITOR_EVENT_DELETED:
-      if (backend->idle_tag == 0)
-        backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+      schedule_recompute (backend);
       break;
     case G_FILE_MONITOR_EVENT_PRE_UNMOUNT:
     case G_FILE_MONITOR_EVENT_UNMOUNTED:
       /* in either event, our dns-sd backend is/will be gone. */
-      if (backend->idle_tag == 0)
-        backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+      schedule_recompute (backend);
       /* stop monitoring as the backend's gone. */
       g_file_monitor_cancel (backend->dnssd_monitor);
       g_object_unref (backend->dnssd_monitor);
@@ -571,9 +576,7 @@ dnssd_settings_change_event_cb (GSettings *settings,
   backend->extra_domains = g_settings_get_string (settings, "extra-domains");
   backend->local_setting = g_settings_get_enum (settings, "display-local");
 
-  /* don't re-issue recomputes if we've already queued one. */
-  if (backend->idle_tag == 0)
-    backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+  schedule_recompute (backend);
 
   return FALSE;
 }
