@@ -411,7 +411,7 @@ recompute_files (GVfsBackendNetwork *backend)
               info = g_file_enumerator_next_file (enumer, NULL, NULL);
               while (info != NULL)
                 {
-                  file_name = g_strconcat("dnssd-domain-", g_file_info_get_name (info), NULL);
+                  file_name = g_strconcat ("dnssd-server-", g_file_info_get_name (info), NULL);
                   link_uri = g_strdup(g_file_info_get_attribute_string (info,
                                       "standard::target-uri"));
                   file = network_file_new (file_name, 
