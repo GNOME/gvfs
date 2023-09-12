@@ -351,7 +351,8 @@ recompute_files (GVfsBackendNetwork *backend)
           while (info != NULL)
             {
               file_name = g_strconcat("smb-server-", g_file_info_get_name (info), NULL);
-              link_uri = g_strconcat("smb://", g_file_info_get_name (info), "/", NULL);
+              link_uri = g_strdup (g_file_info_get_attribute_string (info,
+                                                                     G_FILE_ATTRIBUTE_STANDARD_TARGET_URI));
               file = network_file_new (file_name, 
                                        g_file_info_get_display_name (info), 
                                        link_uri, 
