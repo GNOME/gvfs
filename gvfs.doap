@@ -10,8 +10,8 @@
   <description xml:lang="en">GVfs is a userspace virtual filesystem implementation for GIO (a library available in GLib). GVfs comes with a set of backends, including trash support, SFTP, SMB, HTTP, DAV, and many others. GVfs also contains modules for GIO that implement volume monitors and persistent metadata storage. There is also FUSE support that provides limited access to the GVfs filesystems for applications not using GIO.</description>
 
   <homepage rdf:resource="https://wiki.gnome.org/Projects/gvfs" />
-  <mailing-list rdf:resource="https://discourse.gnome.org" />
-  <download-page rdf:resource="http://download.gnome.org/sources/gvfs/" />
+  <developer-forum rdf:resource="https://discourse.gnome.org/tag/gvfs" />
+  <download-page rdf:resource="https://download.gnome.org/sources/gvfs/" />
   <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/gvfs/issues/" />
   <category rdf:resource="http://api.gnome.org/doap-extensions#core" />
   <programming-language>C</programming-language>
@@ -44,6 +44,7 @@
   </maintainer>
 
   <!-- MTP -->
+<!--
   <maintainer>
     <foaf:Person>
       <foaf:name>Philip Langdale</foaf:name>
@@ -51,4 +52,5 @@
       <gnome:userid>philipl</gnome:userid>
     </foaf:Person>
   </maintainer>
+-->
 </Project>
