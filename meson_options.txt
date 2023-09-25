@@ -17,6 +17,7 @@ option('nfs', type: 'boolean', value: true, description: 'build with nfs backend
 option('sftp', type: 'boolean', value: true, description: 'build with sftp backend')
 option('smb', type: 'boolean', value: true, description: 'build with smb backends')
 option('udisks2', type: 'boolean', value: true, description: 'build with udisks2 volume monitor')
+option('wsdd', type: 'boolean', value: true, description: 'build with wsdd backend')
 
 option('bluray', type: 'boolean', value: true, description: 'build with bluray metadata support')
 option('fuse', type: 'boolean', value: true, description: 'build with fuse support')

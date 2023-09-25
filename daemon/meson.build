@@ -541,6 +541,31 @@ if enable_nfs
   mounts += ['nfs']
 endif
 
+if enable_wsdd
+  deps = [
+    gio_unix_dep
+  ]
+
+  sources = files(
+    'gvfswsdddevice.c',
+    'gvfswsddservice.c',
+    'gvfsbackendwsdd.c',
+  )
+
+  cflags = [
+    '-DBACKEND_HEADER=gvfsbackendwsdd.h',
+    '-DDEFAULT_BACKEND_TYPE=wsdd',
+    '-DBACKEND_TYPES="wsdd", G_VFS_TYPE_BACKEND_WSDD,',
+    '-DMAX_JOB_THREADS=1',
+    '-DMOUNTABLE_DBUS_NAME=' + gvfs_namespace + '.mountpoint_wsdd',
+    '-DWSDD_PROGRAM="wsdd"',
+  ]
+
+  programs += {'gvfsd-wsdd': {'sources': sources, 'dependencies': deps, 'c_args': cflags}}
+  mounts += ['wsdd']
+  schema_data += files('org.gnome.system.wsdd.gschema.xml')
+endif
+
 foreach program, options: programs
   kwargs = {
     'sources': daemon_main_sources + options.get('sources', []),

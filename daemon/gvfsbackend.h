@@ -37,6 +37,8 @@ G_BEGIN_DECLS
 #define G_VFS_IS_BACKEND_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_BACKEND))
 #define G_VFS_BACKEND_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_BACKEND, GVfsBackendClass))
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (GVfsBackend, g_object_unref)
+
 typedef struct _GVfsBackendPrivate GVfsBackendPrivate;
 typedef struct _GVfsBackendClass   GVfsBackendClass;
 

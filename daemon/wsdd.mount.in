@@ -1,0 +1,4 @@
+[Mount]
+Type=wsdd
+Exec=@libexecdir@/gvfsd-wsdd
+AutoMount=true

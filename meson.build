@@ -459,6 +459,9 @@ endif
 # *** SFTP backend ***
 enable_sftp = get_option('sftp')
 
+# *** WSDD backend ***
+enable_wsdd = get_option('wsdd')
+
 # *** Enable development utils ***
 enable_devel_utils = get_option('devel_utils')
 enable_installed_tests = get_option('installed_tests')
@@ -509,6 +512,7 @@ summary({
   'sftp': enable_sftp,
   'smb': enable_samba,
   'udisks2': enable_udisks2,
+  'wsdd': enable_wsdd,
 }, section: 'Backends')
 
 summary({
