@@ -135,6 +135,9 @@ network_file_equal (NetworkFile *a,
   if (g_strcmp0 (a->display_name, b->display_name) != 0)
     return FALSE;
 
+  if (g_strcmp0 (a->target_uri, b->target_uri) != 0)
+    return FALSE;
+
   return TRUE;
 }
 
