@@ -256,15 +256,16 @@ network_file_append_service_name (NetworkFile *file)
   file->display_name = name;
 }
 
-static void
-uniquify_display_names (GVfsBackendNetwork *backend)
+static GList *
+uniquify_display_names (GList *files)
 {
   GHashTable *names;
   GList *l;
 
   names = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
-
-  for (l = backend->files; l != NULL; l = l->next)
+  files = g_list_sort (files, (GCompareFunc)sort_file_by_file_name);
+  l = files;
+  while (l != NULL)
     {
       NetworkFile *prev_file;
       NetworkFile *file = l->data;
@@ -272,6 +273,30 @@ uniquify_display_names (GVfsBackendNetwork *backend)
       prev_file = g_hash_table_lookup (names, file->display_name);
       if (prev_file != NULL)
         {
+          /* The smb:// services come from 3 different backends (ie. dnssd,
+           * smbbrowse, wsdd). It is not desired to list the same service
+           * several times. The problem is that each backend uses different URIs
+           * (e.g. "smb://foo.local:445", "smb://foo", "smb://127.0.0.1").
+           * Resolving URIs just for their comparison doesn't sound like a good
+           * idea. Let's make an assumption that the files with the same display
+           * name and the same scheme point to the same service. Let's keep just
+           * the first one.
+           */
+          if (g_strcmp0 (g_uri_peek_scheme (prev_file->target_uri),
+                         g_uri_peek_scheme (file->target_uri)) == 0)
+            {
+              GList *next = l->next;
+
+              g_debug ("Skipping %s in favor of %s\n",
+                       file->file_name,
+                       prev_file->file_name);
+
+              network_file_free (file);
+              files = g_list_delete_link (files, l);
+              l = next;
+              continue;
+            }
+
           prev_file->num_duplicates++;
           /* only change the first file once */
           if (prev_file->num_duplicates == 1)
@@ -279,9 +304,13 @@ uniquify_display_names (GVfsBackendNetwork *backend)
           network_file_append_service_name (file);
         }
       g_hash_table_replace (names, g_strdup (file->display_name), file);
+
+      l = l->next;
     }
 
   g_hash_table_destroy (names);
+
+  return files;
 }
 
 static void
@@ -295,9 +324,7 @@ update_from_files (GVfsBackendNetwork *backend,
   int cmp;
 
   old_files = backend->files;
-  backend->files = g_list_sort (files, (GCompareFunc)sort_file_by_file_name);
-
-  uniquify_display_names (backend);
+  backend->files = uniquify_display_names (files);
 
   /* Generate change events */
   oldl = old_files;
