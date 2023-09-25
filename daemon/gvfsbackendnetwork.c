@@ -132,12 +132,7 @@ network_file_equal (NetworkFile *a,
   if (!g_icon_equal (a->symbolic_icon, b->symbolic_icon))
     return FALSE;
 
-  if ((a->display_name != NULL && b->display_name == NULL) ||
-      (a->display_name == NULL && b->display_name != NULL))
-    return FALSE;
-
-  if ((a->display_name != NULL && b->display_name != NULL) &&
-      strcmp (a->display_name, b->display_name) != 0)
+  if (g_strcmp0 (a->display_name, b->display_name) != 0)
     return FALSE;
 
   return TRUE;
