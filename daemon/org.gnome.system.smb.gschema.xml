@@ -1,5 +1,10 @@
 <schemalist>
   <schema id="org.gnome.system.smb" path="/org/gnome/system/smb/">
+    <key name="display-mode" enum="org.gnome.system.gvfs.GVfsBackendNetworkDisplayMode">
+      <default>'separate'</default>
+      <summary>How to display SMB devices</summary>
+      <description>How SMB devices are displayed in the "network:///" location. Possible values are "merged", "separate" (the Windows Network folder) and "disabled".</description>
+    </key>
     <key name="workgroup" type="s">
       <default>''</default>
       <summary>SMB workgroup</summary>
