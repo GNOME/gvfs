@@ -662,10 +662,11 @@ try_enumerate (GVfsBackend *backend,
                GFileAttributeMatcher *attribute_matcher,
                GFileQueryInfoFlags flags)
 {
+  GVfsBackendNetwork *network_backend = G_VFS_BACKEND_NETWORK (backend);
   NetworkFile *file;
   GList *l;
   GFileInfo *info;
-  file = lookup_network_file (G_VFS_BACKEND_NETWORK (backend),
+  file = lookup_network_file (network_backend,
 			      G_VFS_JOB (job), file_name);
   
   if (file != &root)
@@ -678,9 +679,15 @@ try_enumerate (GVfsBackend *backend,
     }
 
   g_vfs_job_succeeded (G_VFS_JOB(job));
+
+  /* The smb backend doesn't support monitoring, so let's recompute here. */
+  if (network_backend->have_smb)
+    {
+      recompute_files (network_backend);
+    }
   
   /* Enumerate root */
-  for (l = G_VFS_BACKEND_NETWORK (backend)->files; l != NULL; l = l->next)
+  for (l = network_backend->files; l != NULL; l = l->next)
     {
       file = l->data;
       info = g_file_info_new ();
