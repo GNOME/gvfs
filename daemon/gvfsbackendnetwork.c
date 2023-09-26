@@ -71,7 +71,7 @@ struct _GVfsBackendNetwork
 
   /* DNS-SD Stuff */
   gboolean have_dnssd;
-  GDnsSdDisplayMode local_setting;
+  GVfsBackendNetworkDisplayMode dnssd_display_mode;
   char *extra_domains;
   GFileMonitor *dnssd_monitor;
 
@@ -412,7 +412,7 @@ recompute_files (GVfsBackendNetwork *backend)
     }
 
   if (backend->have_dnssd &&
-      backend->local_setting != G_DNS_SD_DISPLAY_MODE_DISABLED)
+      backend->dnssd_display_mode != G_VFS_BACKEND_NETWORK_DISPLAY_MODE_DISABLED)
     {
       server_file = g_file_new_for_uri ("dns-sd://local/");
       /* create directory monitor if we haven't already */
@@ -436,7 +436,7 @@ recompute_files (GVfsBackendNetwork *backend)
 	    }
 	}
       
-      if (backend->local_setting == G_DNS_SD_DISPLAY_MODE_MERGED)
+      if (backend->dnssd_display_mode == G_VFS_BACKEND_NETWORK_DISPLAY_MODE_MERGED)
         {
           files = network_files_from_directory (files,
                                                 server_file,
@@ -588,7 +588,7 @@ dnssd_settings_change_event_cb (GSettings *settings,
 
   g_free (backend->extra_domains);
   backend->extra_domains = g_settings_get_string (settings, "extra-domains");
-  backend->local_setting = g_settings_get_enum (settings, "display-local");
+  backend->dnssd_display_mode = g_settings_get_enum (settings, "display-local");
 
   schedule_recompute (backend);
 
@@ -868,7 +868,7 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
     {
       network_backend->dnssd_settings = g_settings_new ("org.gnome.system.dns_sd");
 
-      network_backend->local_setting = g_settings_get_enum (network_backend->dnssd_settings, "display-local");
+      network_backend->dnssd_display_mode = g_settings_get_enum (network_backend->dnssd_settings, "display-local");
       network_backend->extra_domains = g_settings_get_string (network_backend->dnssd_settings, "extra-domains");
 
       g_signal_connect (network_backend->dnssd_settings,
