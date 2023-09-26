@@ -106,6 +106,69 @@ network_file_new (const char *file_name,
   return file;
 }
 
+static GList *
+network_files_from_enumerator (GList *files,
+                               GFileEnumerator *enumerator,
+                               const gchar *prefix,
+                               GIcon *icon,
+                               GIcon *symbolic_icon)
+{
+  GFileInfo *info = NULL;
+
+  g_return_val_if_fail (enumerator != NULL, files);
+
+  info = g_file_enumerator_next_file (enumerator, NULL, NULL);
+  while (info != NULL)
+    {
+      g_autofree gchar *file_name = NULL;
+      const gchar *uri;
+      NetworkFile *file;
+
+      file_name = g_strconcat (prefix, g_file_info_get_name (info), NULL);
+      uri = g_file_info_get_attribute_string (info,
+                                              G_FILE_ATTRIBUTE_STANDARD_TARGET_URI);
+      file = network_file_new (file_name,
+                               g_file_info_get_display_name (info),
+                               uri,
+                               icon,
+                               symbolic_icon);
+      files = g_list_prepend (files, file);
+
+      g_object_unref (info);
+      info = g_file_enumerator_next_file (enumerator, NULL, NULL);
+    }
+
+  return files;
+}
+
+static GList *
+network_files_from_directory (GList *files,
+                              GFile *directory,
+                              const gchar *prefix,
+                              GIcon *icon,
+                              GIcon *symbolic_icon)
+{
+  g_autoptr (GFileEnumerator) enumerator = NULL;
+
+  g_return_val_if_fail (directory != NULL, files);
+
+  enumerator = g_file_enumerate_children (directory,
+                                          NETWORK_FILE_ATTRIBUTES,
+                                          G_FILE_QUERY_INFO_NONE,
+                                          NULL,
+                                          NULL);
+  if (enumerator != NULL)
+    {
+      return network_files_from_enumerator (files,
+                                            enumerator,
+                                            prefix,
+                                            icon,
+                                            symbolic_icon);
+    }
+
+  return files;
+}
+
 static void
 network_file_free (NetworkFile *file)
 {
@@ -308,7 +371,6 @@ recompute_files (GVfsBackendNetwork *backend)
 {
   GFile *server_file;
   GFileEnumerator *enumer;
-  GFileInfo *info;
   GFileMonitor *monitor;
   GError *error;
   GList *files;
@@ -338,34 +400,11 @@ recompute_files (GVfsBackendNetwork *backend)
       server_file = g_file_new_for_uri (workgroup);
 
       /* children of current workgroup */
-      enumer = g_file_enumerate_children (server_file, 
-                                          NETWORK_FILE_ATTRIBUTES, 
-                                          G_FILE_QUERY_INFO_NONE, 
-                                          NULL, NULL);
-
-      if (enumer != NULL)
-        {
-          info = g_file_enumerator_next_file (enumer, NULL, NULL);
-          while (info != NULL)
-            {
-              file_name = g_strconcat("smb-server-", g_file_info_get_name (info), NULL);
-              link_uri = g_strdup (g_file_info_get_attribute_string (info,
-                                                                     G_FILE_ATTRIBUTE_STANDARD_TARGET_URI));
-              file = network_file_new (file_name, 
-                                       g_file_info_get_display_name (info), 
-                                       link_uri, 
-                                       backend->server_icon,
-                                       backend->server_symbolic_icon);
-              files = g_list_prepend (files, file);
-
-              g_free (link_uri);
-              g_free (file_name);
-              g_object_unref (info);
-              info = g_file_enumerator_next_file (enumer, NULL, NULL);
-            }
-          g_file_enumerator_close (enumer, NULL, NULL);
-          g_object_unref (enumer);
-        }
+      files = network_files_from_directory (files,
+                                            server_file,
+                                            "smb-server-",
+                                            backend->server_icon,
+                                            backend->server_symbolic_icon);
 
       g_object_unref (server_file);
 
@@ -399,35 +438,11 @@ recompute_files (GVfsBackendNetwork *backend)
       
       if (backend->local_setting == G_DNS_SD_DISPLAY_MODE_MERGED)
         {
-          /* "merged": add local domains to network:/// */
-          enumer = g_file_enumerate_children (server_file, 
-                                              NETWORK_FILE_ATTRIBUTES, 
-                                              G_FILE_QUERY_INFO_NONE, 
-                                              NULL, NULL);
-          if (enumer != NULL)
-            {
-              info = g_file_enumerator_next_file (enumer, NULL, NULL);
-              while (info != NULL)
-                {
-                  file_name = g_strconcat ("dnssd-server-", g_file_info_get_name (info), NULL);
-                  link_uri = g_strdup(g_file_info_get_attribute_string (info,
-                                      "standard::target-uri"));
-                  file = network_file_new (file_name, 
-					   g_file_info_get_display_name (info), 
-					   link_uri,
-					   backend->server_icon,
-					   backend->server_symbolic_icon);
-                  files = g_list_prepend (files, file);
-		  
-                  g_free (link_uri);
-                  g_free (file_name);
-                  g_object_unref (info);
-                  info = g_file_enumerator_next_file (enumer, NULL, NULL);
-                }
-            }
-	  
-          g_file_enumerator_close (enumer, NULL, NULL);
-          g_object_unref (enumer);
+          files = network_files_from_directory (files,
+                                                server_file,
+                                                "dnssd-server-",
+                                                backend->server_icon,
+                                                backend->server_symbolic_icon);
         }
       else
         {
