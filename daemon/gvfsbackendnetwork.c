@@ -76,6 +76,12 @@ struct _GVfsBackendNetwork
   char *extra_domains;
   GFileMonitor *dnssd_monitor;
 
+  /* WSDD */
+  gboolean have_wsdd;
+  GVfsBackendNetworkDisplayMode wsdd_display_mode;
+  GFileMonitor *wsdd_monitor;
+  GSettings *wsdd_settings;
+
   /* Icons */
   GIcon *workgroup_icon; /* GThemedIcon = "network-workgroup" */
   GIcon *server_icon; /* GThemedIcon = "network-server" */
@@ -393,6 +399,12 @@ update_from_files (GVfsBackendNetwork *backend,
 static void
 notify_dnssd_local_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
                             GFileMonitorEvent event_type, gpointer user_data);
+static void
+wsdd_monitor_changed_cb (GFileMonitor *monitor,
+                         GFile *file,
+                         GFile *other_file,
+                         GFileMonitorEvent event_type,
+                         gpointer user_data);
 
 static void
 recompute_files (GVfsBackendNetwork *backend)
@@ -556,7 +568,61 @@ recompute_files (GVfsBackendNetwork *backend)
 	  g_strfreev (domains);
 	}
     }
-  
+
+  if (backend->have_wsdd &&
+      backend->wsdd_display_mode != G_VFS_BACKEND_NETWORK_DISPLAY_MODE_DISABLED)
+    {
+      server_file = g_file_new_for_uri ("wsdd:///");
+
+      if (backend->wsdd_monitor == NULL)
+        {
+          monitor = g_file_monitor_directory (server_file,
+                                              G_FILE_MONITOR_NONE,
+                                              NULL,
+                                              &error);
+          if (monitor)
+            {
+              g_signal_connect (monitor,
+                                "changed",
+                                G_CALLBACK (wsdd_monitor_changed_cb),
+                                backend);
+
+              backend->dnssd_monitor = monitor;
+            }
+          else
+            {
+              gchar *uri = g_file_get_uri (server_file);
+
+              g_warning ("Couldn't create directory monitor on %s. Error: %s",
+                         uri,
+                         error->message);
+
+              g_free (uri);
+              g_clear_error (&error);
+            }
+        }
+
+      if (backend->wsdd_display_mode == G_VFS_BACKEND_NETWORK_DISPLAY_MODE_MERGED)
+        {
+          files = network_files_from_directory (files,
+                                                server_file,
+                                                "wsdd-server-",
+                                                backend->server_icon,
+                                                backend->server_symbolic_icon);
+        }
+      else
+        {
+          file = network_file_new ("wsdd-root",
+                                   _("WSDD Network"),
+                                   "wsdd:///",
+                                   backend->workgroup_icon,
+                                   backend->workgroup_symbolic_icon);
+          files = g_list_prepend (files, file);
+        }
+
+      g_object_unref (server_file);
+    }
+
   update_from_files (backend, files);
 }
 
@@ -745,6 +811,41 @@ smb_settings_change_event_cb (GSettings *settings,
     {
       schedule_recompute (backend);
     }
+
+  return FALSE;
+}
+
+static void
+wsdd_monitor_changed_cb (GFileMonitor *monitor,
+                         GFile *file,
+                         GFile *other_file,
+                         GFileMonitorEvent event_type,
+                         gpointer user_data)
+{
+  GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK (user_data);
+
+  switch (event_type)
+    {
+      case G_FILE_MONITOR_EVENT_UNMOUNTED:
+        g_clear_object (&backend->wsdd_monitor);
+
+      default:
+        schedule_recompute (backend);
+        break;
+    }
+}
+
+static gboolean
+wsdd_settings_change_event_cb (GSettings *settings,
+                               gpointer keys,
+                               gint n_keys,
+                               gpointer user_data)
+{
+  GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK (user_data);
+
+  backend->wsdd_display_mode = g_settings_get_enum (settings, "display-mode");
+
+  schedule_recompute (backend);
 
   return FALSE;
 }
@@ -981,6 +1082,8 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
 
   network_backend->have_smb = FALSE;
   network_backend->have_dnssd = FALSE;
+  network_backend->have_wsdd = FALSE;
+
   for (i=0; supported_vfs[i]!=NULL; i++)
     {
       if (strcmp(supported_vfs[i], "smb") == 0)
@@ -988,6 +1091,9 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
 
       if (strcmp(supported_vfs[i], "dns-sd") == 0)
         network_backend->have_dnssd = TRUE;
+
+      if (g_strcmp0 (supported_vfs[i], "wsdd") == 0)
+        network_backend->have_wsdd = TRUE;
     }
 
   if (network_backend->have_smb)
@@ -1012,6 +1118,19 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
       g_signal_connect (network_backend->dnssd_settings,
                         "change-event",
                         G_CALLBACK (dnssd_settings_change_event_cb),
+                        network_backend);
+    }
+
+  if (network_backend->have_wsdd)
+    {
+      network_backend->wsdd_settings = g_settings_new ("org.gnome.system.wsdd");
+
+      network_backend->wsdd_display_mode = g_settings_get_enum (network_backend->wsdd_settings,
+                                                                "display-mode");
+
+      g_signal_connect (network_backend->wsdd_settings,
+                        "change-event",
+                        G_CALLBACK (wsdd_settings_change_event_cb),
                         network_backend);
     }
 
@@ -1059,6 +1178,19 @@ g_vfs_backend_network_finalize (GObject *object)
       g_signal_handlers_disconnect_by_func (backend->dnssd_monitor, notify_dnssd_local_changed, backend);
       g_clear_object (&backend->dnssd_monitor);
     }
+
+  if (backend->wsdd_settings)
+    {
+      g_signal_handlers_disconnect_by_func (backend->wsdd_settings, wsdd_settings_change_event_cb, backend);
+      g_clear_object (&backend->wsdd_settings);
+    }
+
+  if (backend->wsdd_monitor)
+    {
+      g_signal_handlers_disconnect_by_func (backend->wsdd_monitor, wsdd_monitor_changed_cb, backend);
+      g_clear_object (&backend->wsdd_monitor);
+    }
+
   if (backend->idle_tag)
     {
       g_source_remove (backend->idle_tag);
