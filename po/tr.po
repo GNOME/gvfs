@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2023-07-18 09:04+0000\n"
-"PO-Revision-Date: 2023-07-02 15:42+0300\n"
+"POT-Creation-Date: 2023-09-01 10:56+0000\n"
+"PO-Revision-Date: 2023-09-28 01:20+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Türkçe <takim@gnome.org.tr>\n"
 "Language: tr\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.3.2\n"
 "X-POOTLE-MTIME: 1434405906.000000\n"
 
 #: client/gdaemonfile.c:435
@@ -94,7 +94,7 @@ msgstr "Akış sonu"
 #: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
 #: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
 #: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
-#: daemon/gvfsbackendsftp.c:5531 daemon/gvfsbackendsmb.c:1108
+#: daemon/gvfsbackendsftp.c:5534 daemon/gvfsbackendsmb.c:1108
 #: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
 #: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:347
 #: daemon/gvfsftptask.c:224
@@ -406,9 +406,9 @@ msgstr "Dosya yok"
 #: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2799
 #: daemon/gvfsbackenddav.c:3754 daemon/gvfsbackenddav.c:4001
 #: daemon/gvfsbackendftp.c:832 daemon/gvfsbackendnfs.c:2480
-#: daemon/gvfsbackendsftp.c:2725 daemon/gvfsbackendsftp.c:3500
-#: daemon/gvfsbackendsftp.c:3948 daemon/gvfsbackendsftp.c:5020
-#: daemon/gvfsbackendsftp.c:6105
+#: daemon/gvfsbackendsftp.c:2728 daemon/gvfsbackendsftp.c:3503
+#: daemon/gvfsbackendsftp.c:3951 daemon/gvfsbackendsftp.c:5023
+#: daemon/gvfsbackendsftp.c:6108
 msgid "File is directory"
 msgstr "Dosya bir dizin"
 
@@ -461,7 +461,7 @@ msgstr "Birimde yeterli boş alan yok"
 #: daemon/gvfsbackendgoogle.c:2757 daemon/gvfsbackendgoogle.c:3204
 #: daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1698
 #: daemon/gvfsbackendmtp.c:1741 daemon/gvfsbackendnfs.c:2490
-#: daemon/gvfsbackendsftp.c:5029 daemon/gvfsbackendsmb.c:2108
+#: daemon/gvfsbackendsftp.c:5032 daemon/gvfsbackendsmb.c:2108
 msgid "Target file already exists"
 msgstr "Hedef dosya zaten var"
 
@@ -592,11 +592,11 @@ msgstr "Dosya, okuma erişimi için açık değil"
 #: daemon/gvfsbackendmtp.c:2969 daemon/gvfsbackendmtp.c:3112
 #: daemon/gvfsbackendnfs.c:2372 daemon/gvfsbackendnfs.c:2422
 #: daemon/gvfsbackendnfs.c:2548 daemon/gvfsbackendsftp.c:2213
-#: daemon/gvfsbackendsftp.c:5417 daemon/gvfsbackendsftp.c:5515
-#: daemon/gvfsbackendsftp.c:6227 daemon/gvfsbackendsftp.c:6259
-#: daemon/gvfsbackendsftp.c:6285 daemon/gvfsbackendsftp.c:6293
-#: daemon/gvfsbackendsftp.c:6780 daemon/gvfsbackendsftp.c:6842
-#: daemon/gvfsbackendsftp.c:6850 daemon/gvfsbackendsmb.c:1700
+#: daemon/gvfsbackendsftp.c:5420 daemon/gvfsbackendsftp.c:5518
+#: daemon/gvfsbackendsftp.c:6230 daemon/gvfsbackendsftp.c:6262
+#: daemon/gvfsbackendsftp.c:6288 daemon/gvfsbackendsftp.c:6296
+#: daemon/gvfsbackendsftp.c:6783 daemon/gvfsbackendsftp.c:6845
+#: daemon/gvfsbackendsftp.c:6853 daemon/gvfsbackendsmb.c:1700
 #: daemon/gvfsbackendtrash.c:937 daemon/gvfsbackendtrash.c:963
 #: daemon/gvfsftptask.c:430 daemon/gvfsjobcloseread.c:113
 #: daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
@@ -787,7 +787,7 @@ msgstr "Dizin açılamıyor"
 #: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528
 #: daemon/gvfsbackendafp.c:1270 daemon/gvfsbackendafp.c:1359
 #: daemon/gvfsbackenddav.c:3661 daemon/gvfsbackendftp.c:1461
-#: daemon/gvfsbackendsftp.c:3722 daemon/gvfsbackendsftp.c:4009
+#: daemon/gvfsbackendsftp.c:3725 daemon/gvfsbackendsftp.c:4012
 msgid "Backups not supported"
 msgstr "Yedekler desteklenmiyor"
 
@@ -856,7 +856,7 @@ msgstr "Dizin özyinelemeli kopyalanamıyor"
 
 #: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:3562
 #: daemon/gvfsbackendgoogle.c:2209 daemon/gvfsbackendnfs.c:2474
-#: daemon/gvfsbackendsftp.c:5015 daemon/gvfsbackendsmb.c:2097
+#: daemon/gvfsbackendsftp.c:5018 daemon/gvfsbackendsmb.c:2097
 msgid "Can’t move directory over directory"
 msgstr "Dizin üstüne dizin taşınamıyor"
 
@@ -866,13 +866,13 @@ msgid "Unable to create temporary file (%s)"
 msgstr "Geçici dosya oluşturulamadı (%s)"
 
 #: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2977
-#: daemon/gvfsbackendnfs.c:1177 daemon/gvfsbackendsftp.c:3963
+#: daemon/gvfsbackendnfs.c:1177 daemon/gvfsbackendsftp.c:3966
 #: daemon/gvfsbackendsmb.c:1077
 msgid "The file was externally modified"
 msgstr "Dosya harici olarak değiştirilmiş"
 
 #: daemon/gvfsbackendafp.c:1765 daemon/gvfsbackendftp.c:1250
-#: daemon/gvfsbackendsftp.c:5479
+#: daemon/gvfsbackendsftp.c:5482
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "Geçersiz öznitelik türü (uint32 bekleniyor)"
 
@@ -897,7 +897,7 @@ msgstr "%s içinde /"
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
 #: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:1204
 #: daemon/gvfsbackendgoogle.c:2410 daemon/gvfsbackendgoogle.c:2637
-#: daemon/gvfsbackendnetwork.c:745 daemon/gvfsbackendsftp.c:4502
+#: daemon/gvfsbackendnetwork.c:745 daemon/gvfsbackendsftp.c:4505
 #: daemon/gvfsftpdircache.c:157
 #, c-format
 msgid "The file is not a directory"
@@ -921,8 +921,8 @@ msgstr "Geçiçi dizin oluşturulamadı"
 #: daemon/gvfsbackendgphoto2.c:938 daemon/gvfsbackendgphoto2.c:1869
 #: daemon/gvfsbackendgphoto2.c:2588 daemon/gvfsbackendrecent.c:110
 #: daemon/gvfsbackendrecent.c:293 daemon/gvfsbackendsftp.c:2217
-#: daemon/gvfsbackendsftp.c:3377 daemon/gvfsbackendsftp.c:3390
-#: daemon/gvfsbackendsftp.c:3410 daemon/gvfsbackendtrash.c:317
+#: daemon/gvfsbackendsftp.c:3380 daemon/gvfsbackendsftp.c:3393
+#: daemon/gvfsbackendsftp.c:3413 daemon/gvfsbackendtrash.c:317
 #, c-format
 msgid "No such file or directory"
 msgstr "Böyle dosya ya da dizin yok"
@@ -946,7 +946,7 @@ msgid "File exists"
 msgstr "Dosya var"
 
 #: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:3601
-#: daemon/gvfsbackendsftp.c:2211 daemon/gvfsbackendsftp.c:5195
+#: daemon/gvfsbackendsftp.c:2211 daemon/gvfsbackendsftp.c:5198
 msgid "Target file exists"
 msgstr "Hedef dosya var"
 
@@ -1218,32 +1218,32 @@ msgid "Target file is not a regular file"
 msgstr "Hedef dosya normal dosya değil"
 
 #: daemon/gvfsbackendgoogle.c:3584 daemon/gvfsbackendsftp.c:2390
-#: daemon/gvfsbackendsftp.c:2792 daemon/gvfsbackendsftp.c:2855
-#: daemon/gvfsbackendsftp.c:2866 daemon/gvfsbackendsftp.c:2924
-#: daemon/gvfsbackendsftp.c:3017 daemon/gvfsbackendsftp.c:3069
-#: daemon/gvfsbackendsftp.c:3124 daemon/gvfsbackendsftp.c:3203
-#: daemon/gvfsbackendsftp.c:3320 daemon/gvfsbackendsftp.c:3453
-#: daemon/gvfsbackendsftp.c:3537 daemon/gvfsbackendsftp.c:3613
-#: daemon/gvfsbackendsftp.c:3625 daemon/gvfsbackendsftp.c:3695
-#: daemon/gvfsbackendsftp.c:3765 daemon/gvfsbackendsftp.c:3823
-#: daemon/gvfsbackendsftp.c:3843 daemon/gvfsbackendsftp.c:4035
-#: daemon/gvfsbackendsftp.c:4069 daemon/gvfsbackendsftp.c:4127
-#: daemon/gvfsbackendsftp.c:4189 daemon/gvfsbackendsftp.c:4260
-#: daemon/gvfsbackendsftp.c:4535 daemon/gvfsbackendsftp.c:4606
-#: daemon/gvfsbackendsftp.c:4741 daemon/gvfsbackendsftp.c:4854
-#: daemon/gvfsbackendsftp.c:4916 daemon/gvfsbackendsftp.c:4953
-#: daemon/gvfsbackendsftp.c:4981 daemon/gvfsbackendsftp.c:5095
-#: daemon/gvfsbackendsftp.c:5151 daemon/gvfsbackendsftp.c:5192
-#: daemon/gvfsbackendsftp.c:5228 daemon/gvfsbackendsftp.c:5264
-#: daemon/gvfsbackendsftp.c:5279 daemon/gvfsbackendsftp.c:5294
-#: daemon/gvfsbackendsftp.c:5389 daemon/gvfsbackendsftp.c:5457
-#: daemon/gvfsbackendsftp.c:5664 daemon/gvfsbackendsftp.c:5701
-#: daemon/gvfsbackendsftp.c:5819 daemon/gvfsbackendsftp.c:5905
-#: daemon/gvfsbackendsftp.c:5989 daemon/gvfsbackendsftp.c:6032
-#: daemon/gvfsbackendsftp.c:6036 daemon/gvfsbackendsftp.c:6153
-#: daemon/gvfsbackendsftp.c:6157 daemon/gvfsbackendsftp.c:6408
-#: daemon/gvfsbackendsftp.c:6631 daemon/gvfsbackendsftp.c:6648
-#: daemon/gvfsbackendsftp.c:6786 daemon/gvfsbackendsftp.c:6814
+#: daemon/gvfsbackendsftp.c:2795 daemon/gvfsbackendsftp.c:2858
+#: daemon/gvfsbackendsftp.c:2869 daemon/gvfsbackendsftp.c:2927
+#: daemon/gvfsbackendsftp.c:3020 daemon/gvfsbackendsftp.c:3072
+#: daemon/gvfsbackendsftp.c:3127 daemon/gvfsbackendsftp.c:3206
+#: daemon/gvfsbackendsftp.c:3323 daemon/gvfsbackendsftp.c:3456
+#: daemon/gvfsbackendsftp.c:3540 daemon/gvfsbackendsftp.c:3616
+#: daemon/gvfsbackendsftp.c:3628 daemon/gvfsbackendsftp.c:3698
+#: daemon/gvfsbackendsftp.c:3768 daemon/gvfsbackendsftp.c:3826
+#: daemon/gvfsbackendsftp.c:3846 daemon/gvfsbackendsftp.c:4038
+#: daemon/gvfsbackendsftp.c:4072 daemon/gvfsbackendsftp.c:4130
+#: daemon/gvfsbackendsftp.c:4192 daemon/gvfsbackendsftp.c:4263
+#: daemon/gvfsbackendsftp.c:4538 daemon/gvfsbackendsftp.c:4609
+#: daemon/gvfsbackendsftp.c:4744 daemon/gvfsbackendsftp.c:4857
+#: daemon/gvfsbackendsftp.c:4919 daemon/gvfsbackendsftp.c:4956
+#: daemon/gvfsbackendsftp.c:4984 daemon/gvfsbackendsftp.c:5098
+#: daemon/gvfsbackendsftp.c:5154 daemon/gvfsbackendsftp.c:5195
+#: daemon/gvfsbackendsftp.c:5231 daemon/gvfsbackendsftp.c:5267
+#: daemon/gvfsbackendsftp.c:5282 daemon/gvfsbackendsftp.c:5297
+#: daemon/gvfsbackendsftp.c:5392 daemon/gvfsbackendsftp.c:5460
+#: daemon/gvfsbackendsftp.c:5667 daemon/gvfsbackendsftp.c:5704
+#: daemon/gvfsbackendsftp.c:5822 daemon/gvfsbackendsftp.c:5908
+#: daemon/gvfsbackendsftp.c:5992 daemon/gvfsbackendsftp.c:6035
+#: daemon/gvfsbackendsftp.c:6039 daemon/gvfsbackendsftp.c:6156
+#: daemon/gvfsbackendsftp.c:6160 daemon/gvfsbackendsftp.c:6411
+#: daemon/gvfsbackendsftp.c:6634 daemon/gvfsbackendsftp.c:6651
+#: daemon/gvfsbackendsftp.c:6789 daemon/gvfsbackendsftp.c:6817
 msgid "Invalid reply received"
 msgstr "Geçersiz cevap alındı"
 
@@ -1350,7 +1350,7 @@ msgstr "Bozuk simge belirteci “%s”"
 msgid "Error seeking in stream on camera %s"
 msgstr "Fotograf makinesi %s üzerinde akış içine atlanırken hata"
 
-#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3380
+#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3383
 #: daemon/gvfsbackendsmbbrowse.c:1271
 msgid "Not a directory"
 msgstr "Bir dizin değil"
@@ -1553,8 +1553,8 @@ msgstr ""
 "ihtiyaç var"
 
 #: daemon/gvfsbackendnfs.c:1048 daemon/gvfsbackendnfs.c:1071
-#: daemon/gvfsbackendnfs.c:1119 daemon/gvfsbackendsftp.c:3890
-#: daemon/gvfsbackendsftp.c:6060
+#: daemon/gvfsbackendnfs.c:1119 daemon/gvfsbackendsftp.c:3893
+#: daemon/gvfsbackendsftp.c:6063
 msgid "Unable to create temporary file"
 msgstr "Geçici dosya oluşturulamadı"
 
@@ -1716,31 +1716,31 @@ msgstr "Desteknelen SSH komut komutu bulunamadı"
 msgid "Unknown reason"
 msgstr "Bilinmeyen neden"
 
-#: daemon/gvfsbackendsftp.c:2649 daemon/gvfsbackendsmb.c:1383
+#: daemon/gvfsbackendsftp.c:2652 daemon/gvfsbackendsmb.c:1383
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (geçersiz kodlama)"
 
 #. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: daemon/gvfsbackendsftp.c:2661 daemon/gvfsftpdircache.c:431
+#: daemon/gvfsbackendsftp.c:2664 daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
 msgstr "%s üzerinde /"
 
-#: daemon/gvfsbackendsftp.c:2734
+#: daemon/gvfsbackendsftp.c:2737
 msgid "Failure"
 msgstr "Başarısız"
 
-#: daemon/gvfsbackendsftp.c:3146
+#: daemon/gvfsbackendsftp.c:3149
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Yedek dosya oluşturulurken hata: %s"
 
-#: daemon/gvfsbackendsftp.c:5425
+#: daemon/gvfsbackendsftp.c:5428
 msgid "Value out of range, sftp only supports 32bit timestamps"
 msgstr "Değer aralık dışında, sftp yalnızca 32bit zaman damgalarını destekler"
 
-#: daemon/gvfsbackendsftp.c:5500 daemon/gvfsbackendsmb.c:1725
+#: daemon/gvfsbackendsftp.c:5503 daemon/gvfsbackendsmb.c:1725
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Geçersiz öznitelik türü (uint64 bekleniyor)"
 
@@ -1912,8 +1912,8 @@ msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr ""
-"Etkin FTP bağlantısı oluşturulamadı. Belki yönlendiriciniz bunu "
-"desteklemiyordur?"
+"Etkin FTP bağlantısı oluşturulamadı. Yönlendiriciniz bunu desteklemiyor "
+"olabilir mi?"
 
 #: daemon/gvfsftpconnection.c:485
 msgid "Failed to create active FTP connection."
