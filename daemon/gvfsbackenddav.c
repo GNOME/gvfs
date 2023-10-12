@@ -1964,7 +1964,6 @@ static GUri *
 dav_uri_from_dns_sd_resolver (GVfsBackendDav *dav_backend)
 {
   GUri       *uri;
-  char       *user;
   char       *path;
   char       *address;
   char       *host;
@@ -1977,7 +1976,6 @@ dav_uri_from_dns_sd_resolver (GVfsBackendDav *dav_backend)
   address = g_vfs_dns_sd_resolver_get_address (dav_backend->resolver);
   interface = g_vfs_dns_sd_resolver_get_interface (dav_backend->resolver);
   port = g_vfs_dns_sd_resolver_get_port (dav_backend->resolver);
-  user = g_vfs_dns_sd_resolver_lookup_txt_record (dav_backend->resolver, "u"); /* mandatory */
   path = g_vfs_dns_sd_resolver_lookup_txt_record (dav_backend->resolver, "path"); /* optional */
 
   /* TODO: According to http://www.dns-sd.org/ServiceTypes.html
@@ -2004,20 +2002,20 @@ dav_uri_from_dns_sd_resolver (GVfsBackendDav *dav_backend)
   else
     host = g_strdup (address);
 
-  uri = g_uri_build_with_user (SOUP_HTTP_URI_FLAGS,
-                               scheme,
-                               user,
-                               NULL,
-                               NULL,
-                               host,
-                               port,
-                               path,
-                               NULL,
-                               NULL);
+  /* A username is not part of URI as a workaround for:
+   * https://gitlab.gnome.org/GNOME/gvfs/-/issues/617.
+   */
+  uri = g_uri_build (SOUP_HTTP_URI_FLAGS,
+                     scheme,
+                     NULL,
+                     host,
+                     port,
+                     path,
+                     NULL,
+                     NULL);
 
   g_free (address);
   g_free (interface);
-  g_free (user);
   g_free (path);
   g_free (host);
 
@@ -2342,12 +2340,12 @@ clear_msgs:
 }
 
 static void
-try_mount_send_opts (GVfsJobMount *job)
+try_mount_send_opts (GVfsJobMount *job,
+                     const gchar *user)
 {
   GVfsBackendDav  *dav_backend = G_VFS_BACKEND_DAV (job->backend);
   GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (job->backend);
   SoupMessage     *msg_opts;
-  const gchar     *user;
 
   if (http_backend->mount_base == NULL)
     {
@@ -2361,8 +2359,6 @@ try_mount_send_opts (GVfsJobMount *job)
                                     SOUP_TYPE_AUTH_NEGOTIATE);
   soup_session_add_feature_by_type (http_backend->session,
                                     SOUP_TYPE_AUTH_NTLM);
-
-  user = g_mount_spec_get (job->mount_spec, "user");
 
   dav_backend->auth_info.mount_source = g_object_ref (job->mount_source);
   dav_backend->auth_info.server_auth.username = g_strdup (user);
@@ -2387,6 +2383,7 @@ try_mount_resolve_cb (GObject *source, GAsyncResult *result, gpointer user_data)
   GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (job->backend);
   GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (job->backend);
   GError *error = NULL;
+  gchar *user;
 
   if (!g_vfs_dns_sd_resolver_resolve_finish (dav_backend->resolver,
                                              result,
@@ -2404,7 +2401,9 @@ try_mount_resolve_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 
   http_backend->mount_base = dav_uri_from_dns_sd_resolver (dav_backend);
 
-  try_mount_send_opts (job);
+  user = g_vfs_dns_sd_resolver_lookup_txt_record (dav_backend->resolver, "u");
+  try_mount_send_opts (job, user);
+  g_free (user);
 }
 #endif
 
@@ -2441,7 +2440,7 @@ try_mount (GVfsBackend  *backend,
 #endif
     {
       http_backend->mount_base = g_mount_spec_to_dav_uri (mount_spec);
-      try_mount_send_opts (job);
+      try_mount_send_opts (job, g_mount_spec_get (mount_spec, "user"));
     }
 
   return TRUE;
