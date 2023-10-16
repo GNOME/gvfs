@@ -178,6 +178,7 @@ do_mount (GVfsBackend *backend,
   NfsSource *nfs_source;
   struct exportnode *export_list, *ptr;
   const char *host, *debug;
+  g_autofree gchar *libnfs_host = NULL;
   char *basename, *display_name, *export = NULL;
   int err, debug_val;
   size_t pathlen = strlen (mount_spec->mount_prefix);
@@ -197,7 +198,13 @@ do_mount (GVfsBackend *backend,
                         _("No hostname specified"));
       return;
     }
-  export_list = mount_getexports (host);
+
+  /* The libnfs library doesn't use brackets for IPv6 addresses. */
+  if (gvfs_is_ipv6 (host))
+    libnfs_host = g_strndup (host + 1, strlen (host) - 2);
+  else
+    libnfs_host = g_strdup (host);
+  export_list = mount_getexports (libnfs_host);
 
   /* Find the shortest matching mount. E.g. if the given mount_prefix is
    * /some/long/path and there exist two mounts, /some and /some/long, match
@@ -256,7 +263,7 @@ do_mount (GVfsBackend *backend,
 
   nfs_set_debug (op_backend->ctx, debug_val);
 
-  err = nfs_mount (op_backend->ctx, host, export);
+  err = nfs_mount (op_backend->ctx, libnfs_host, export);
   if (err)
     {
       if (err == -EACCES)
