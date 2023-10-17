@@ -2,8 +2,6 @@ fedora:
     image:
         name: registry.gitlab.gnome.org/gnome/gvfs:latest
         entrypoint: ["/bin/sh", "-c"]
-    tags:
-        - x86_64
     script:
         # The httpd process fails with "(98)Address already in use: AH00072:
         # make_sock: could not bind to address 127.0.0.1:8088" error. It used to
