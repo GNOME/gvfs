@@ -25,24 +25,6 @@
     </foaf:Person>
   </maintainer>
 
-  <!-- AFC -->
-  <maintainer>
-    <foaf:Person>
-      <foaf:name>Bastien Nocera</foaf:name>
-      <foaf:mbox rdf:resource="mailto:hadess@hadess.net" />
-      <gnome:userid>hadess</gnome:userid>
-    </foaf:Person>
-  </maintainer>
-
-  <!-- GOA -->
-  <maintainer>
-    <foaf:Person>
-      <foaf:name>Debarshi Ray</foaf:name>
-      <foaf:mbox rdf:resource="mailto:debarshir@gnome.org" />
-      <gnome:userid>debarshir</gnome:userid>
-    </foaf:Person>
-  </maintainer>
-
   <!-- MTP -->
 <!--
   <maintainer>
