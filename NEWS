@@ -1,3 +1,10 @@
+Major changes in 1.52.1
+=======================
+* client: Prevent returning invalid mount cache entries (rong wang)
+* dav: Fix authentication issues when DNS-SD URIs are used (Ondrej Holy)
+* nfs: Fix IPv6 URI handling (Ondrej Holy)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.52.0
 =======================
 * Translation updates (GNOME Translation Project contributors)
