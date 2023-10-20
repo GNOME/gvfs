@@ -1,3 +1,11 @@
+Major changes in 1.50.7
+=======================
+* client: Prevent returning invalid mount cache entries (rong wang)
+* dav: Fix authentication issues when DNS-SD URIs are used (Ondrej Holy)
+* nfs: Fix IPv6 URI handling (Ondrej Holy)
+* sftp/ftp: Ensure that is-symlink is always set to avoid warnings (Sébastien Noel)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.50.6
 =======================
 * udisks2: Disconnect signal handlers to fix crashes when unmounting (Ondrej Holy)
