@@ -2164,9 +2164,22 @@ do_move (GVfsBackend *backend,
 	  /* Unfortunately libsmbclient doesn't correctly return EXDEV, but falls back
 	     to EINVAL, so we try to guess when this happens: */
 	  (errsv == EINVAL && source_is_dir))
-	g_vfs_job_failed (G_VFS_JOB (job), 
-			  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-			  _("Can’t recursively move directory"));
+        {
+          if (source_is_dir)
+            {
+              g_vfs_job_failed (G_VFS_JOB (job),
+                                G_IO_ERROR,
+                                G_IO_ERROR_WOULD_RECURSE,
+                                _("Can’t recursively move directory"));
+            }
+          else
+            {
+              g_vfs_job_failed (G_VFS_JOB (job),
+                                G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                _("Operation not supported"));
+            }
+        }
       else
 	g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
     }
