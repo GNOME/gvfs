@@ -1,6 +1,6 @@
 FROM fedora:latest
 
-RUN dnf install --nogpg -y dnf-plugins-core git gnome-desktop-testing dbus-daemon python3-twisted python3-gobject procps-ng bzip2 httpd mod_ssl openssh-server passwd gcc-c++ \
+RUN dnf install --nogpg -y dnf-plugins-core git gnome-desktop-testing dbus-daemon python3-twisted python3-gobject procps-ng bzip2 httpd mod_ssl openssh-server passwd gcc-c++ gcr-devel \
  && dnf builddep --nogpg -y gvfs \
  && dnf clean all
 
