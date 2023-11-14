@@ -295,7 +295,7 @@ endif
 # *** Check for gcr ***
 enable_gcr = get_option('gcr')
 if enable_gcr
-  gcr_dep = dependency('gcr-base-3')
+  gcr_dep = dependency('gcr-4')
 endif
 config_h.set('HAVE_GCR', enable_gcr)
 

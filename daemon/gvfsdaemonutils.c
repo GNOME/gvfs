@@ -37,7 +37,7 @@
 #include <gio/gio.h>
 #ifdef HAVE_GCR
 #define GCR_API_SUBJECT_TO_CHANGE
-#include <gcr/gcr-base.h>
+#include <gcr/gcr.h>
 #endif
 #include "gvfsdaemonutils.h"
 #include "gvfsdaemonprotocol.h"
@@ -274,8 +274,8 @@ certificate_to_string (GTlsCertificate *certificate)
 {
   GByteArray *certificate_data;
   GcrCertificate *simple_certificate;
-  GDate *date;
-  char date_str[32];
+  GDateTime *date;
+  gchar *date_str;
   char *subject_name, *issuer_name, *fingerprint, *certificate_str;
 
   g_object_get (certificate, "certificate", &certificate_data, NULL);
@@ -283,8 +283,8 @@ certificate_to_string (GTlsCertificate *certificate)
 						          certificate_data->len);
 
   date = gcr_certificate_get_expiry_date (simple_certificate);
-  g_date_strftime (date_str, 32, "%x", date);
-  g_date_free (date);
+  date_str = g_date_time_format (date, "%x");
+  g_date_time_unref (date);
 
   subject_name = gcr_certificate_get_subject_name (simple_certificate);
   issuer_name = gcr_certificate_get_issuer_name (simple_certificate);
@@ -301,6 +301,7 @@ certificate_to_string (GTlsCertificate *certificate)
                                      fingerprint);
   g_object_unref (simple_certificate);
   g_byte_array_unref (certificate_data);
+  g_free (date_str);
   g_free (subject_name);
   g_free (issuer_name);
   g_free (fingerprint);
