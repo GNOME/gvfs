@@ -492,6 +492,10 @@ do_mount (GVfsBackend *backend,
    */
   do
     {
+      /* The mount_try_again variable is here to avoid livelock in cases when
+       * EPERM is returned immediately without calling the auth_callback
+       * function. See: https://gitlab.gnome.org/GNOME/gvfs/-/issues/703.
+       */
       op_backend->mount_try_again = FALSE;
       op_backend->mount_cancelled = FALSE;
 
