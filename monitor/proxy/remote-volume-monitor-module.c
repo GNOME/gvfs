@@ -37,7 +37,8 @@ void
 g_io_module_load (GIOModule *module)
 {
   /* see gvfsproxyvolumemonitor.c:g_vfs_proxy_volume_monitor_daemon_init() */
-  if (g_getenv ("GVFS_REMOTE_VOLUME_MONITOR_IGNORE") != NULL)
+  if (g_getenv ("GVFS_REMOTE_VOLUME_MONITOR_IGNORE") != NULL ||
+      g_strcmp0 (g_getenv ("GIO_USE_VFS"), "local") == 0)
     goto out;
 
   /* We make this module resident since we *may* hold on to an instance
@@ -64,7 +65,8 @@ out:
 void
 g_io_module_unload (GIOModule *module)
 {
-  if (g_getenv ("GVFS_REMOTE_VOLUME_MONITOR_IGNORE") != NULL)
+  if (g_getenv ("GVFS_REMOTE_VOLUME_MONITOR_IGNORE") != NULL ||
+      g_strcmp0 (g_getenv ("GIO_USE_VFS"), "local") == 0)
     goto out;
 
   g_proxy_volume_monitor_unload_cleanup ();
