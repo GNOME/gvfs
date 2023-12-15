@@ -549,6 +549,7 @@ if enable_wsdd
   sources = files(
     'gvfswsdddevice.c',
     'gvfswsddservice.c',
+    'gvfswsddresolver.c',
     'gvfsbackendwsdd.c',
   )
 

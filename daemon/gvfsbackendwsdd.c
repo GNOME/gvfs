@@ -29,6 +29,7 @@
 #include "gvfsbackendwsdd.h"
 #include "gvfswsdddevice.h"
 #include "gvfswsddservice.h"
+#include "gvfswsddresolver.h"
 
 #include "gvfsdaemonprotocol.h"
 #include "gvfsjobcreatemonitor.h"
@@ -42,6 +43,8 @@ struct _GVfsBackendWsdd
   GVfsBackend parent_instance;
 
   GVfsWsddService *wsdd_service;
+  GVfsWsddResolver *wsdd_resolver;
+
   GVfsMonitor *root_monitor;
 };
 
@@ -56,7 +59,8 @@ is_root (const gchar *filename)
 }
 
 static void
-file_info_from_wsdd_device (GVfsWsddDevice *device,
+file_info_from_wsdd_device (GVfsBackendWsdd *wsdd_backend,
+                            GVfsWsddDevice *device,
                             GFileInfo *info)
 {
   g_autoptr(GIcon) icon = NULL;
@@ -91,7 +95,14 @@ file_info_from_wsdd_device (GVfsWsddDevice *device,
                                      G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH,
                                      FALSE);
 
-  address = g_vfs_wsdd_device_get_first_address (device);
+  address = g_vfs_wsdd_resolver_get_address (wsdd_backend->wsdd_resolver,
+                                             device);
+  if (address == NULL)
+    {
+      address = g_vfs_wsdd_device_get_first_address (device);
+      g_vfs_wsdd_resolver_resolve (wsdd_backend->wsdd_resolver, device);
+    }
+
   uri = g_strconcat ("smb://", address, "/", NULL);
   g_file_info_set_attribute_string (info,
                                     G_FILE_ATTRIBUTE_STANDARD_TARGET_URI,
@@ -131,6 +142,21 @@ device_changed_cb (GVfsWsddService *wsdd_service,
 }
 
 static void
+device_resolved_cb (GVfsWsddResolver *wsdd_resolver,
+                    const gchar *uuid,
+                    gpointer user_data)
+{
+  GVfsBackendWsdd *wsdd_backend = G_VFS_BACKEND_WSDD (user_data);
+  g_autofree gchar *path = NULL;
+
+  path = g_strconcat ("/", uuid, NULL);
+  g_vfs_monitor_emit_event (wsdd_backend->root_monitor,
+                            G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
+                            path,
+                            NULL);
+}
+
+static void
 try_mount_service_cb (GObject* source_object,
                       GAsyncResult* result,
                       gpointer user_data)
@@ -150,6 +176,12 @@ try_mount_service_cb (GObject* source_object,
   g_signal_connect (wsdd_backend->wsdd_service,
                     "device-changed",
                     G_CALLBACK (device_changed_cb),
+                    wsdd_backend);
+
+  wsdd_backend->wsdd_resolver = g_vfs_wsdd_resolver_new ();
+  g_signal_connect (wsdd_backend->wsdd_resolver,
+                    "device-resolved",
+                    G_CALLBACK (device_resolved_cb),
                     wsdd_backend);
 
   wsdd_backend->root_monitor = g_vfs_monitor_new (job->backend);
@@ -305,7 +337,7 @@ try_enumerate (GVfsBackend *backend,
       g_autoptr(GFileInfo) info = NULL;
 
       info = g_file_info_new ();
-      file_info_from_wsdd_device (l->data, info);
+      file_info_from_wsdd_device (wsdd_backend, l->data, info);
       g_vfs_job_enumerate_add_info (job, info);
     }
 
@@ -360,6 +392,13 @@ g_vfs_backend_wsdd_finalize (GObject *object)
       g_signal_handlers_disconnect_by_data (wsdd_backend->wsdd_service,
                                             wsdd_backend);
       g_clear_object (&wsdd_backend->wsdd_service);
+    }
+
+  if (wsdd_backend->wsdd_resolver != NULL)
+    {
+      g_signal_handlers_disconnect_by_data (wsdd_backend->wsdd_resolver,
+                                            wsdd_backend);
+      g_clear_object (&wsdd_backend->wsdd_resolver);
     }
 
   g_clear_object (&wsdd_backend->root_monitor);
