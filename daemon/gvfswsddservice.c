@@ -34,7 +34,9 @@
 #define SOCKET_NAME "wsdd"
 #define CONNECT_TIMEOUT 10
 #define LIST_COMMAND "list\n"
+#define PROBE_COMMAND "clear\nprobe\n"
 #define RELOAD_TIMEOUT 15
+#define PROBE_TIMEOUT 5
 
 struct _GVfsWsddService
 {
@@ -50,6 +52,10 @@ struct _GVfsWsddService
   guint reload_source_id;
   GList *devices;
   GList *new_devices;
+
+  GNetworkMonitor *network_monitor;
+  guint probe_source_id;
+  gboolean network_changed;
 
   gboolean extra_debug;
 
@@ -76,6 +82,7 @@ G_DEFINE_TYPE_WITH_CODE (GVfsWsddService,
                          G_IMPLEMENT_INTERFACE (G_TYPE_ASYNC_INITABLE,
                                                 async_initable_iface_init))
 
+static gboolean probe_devices (gpointer user_data);
 static gboolean reload_devices (gpointer user_data);
 
 static void
@@ -103,6 +110,14 @@ g_vfs_wsdd_service_finalize (GObject *object)
 
   g_clear_list (&service->devices, (GDestroyNotify)g_object_unref);
   g_clear_list (&service->new_devices, (GDestroyNotify)g_object_unref);
+
+  if (service->network_monitor != NULL)
+    {
+      g_signal_handlers_disconnect_by_data (service->network_monitor, service);
+      g_clear_object (&service->network_monitor);
+    }
+
+  g_clear_handle_id (&service->probe_source_id, g_source_remove);
 
   g_clear_object (&service->cancellable);
   g_clear_error (&service->error);
@@ -178,11 +193,81 @@ g_vfs_wsdd_service_new_finish (GAsyncResult *result,
 }
 
 static void
-schedule_reload_devices (GVfsWsddService *service)
+schedule_reload_or_probe_devices (GVfsWsddService *service)
 {
-  service->reload_source_id = g_timeout_add_seconds (RELOAD_TIMEOUT,
-                                                     reload_devices,
-                                                     service);
+  g_clear_handle_id (&service->probe_source_id, g_source_remove);
+  g_clear_handle_id (&service->reload_source_id, g_source_remove);
+
+  if (service->network_changed)
+    {
+      service->probe_source_id = g_timeout_add_seconds (PROBE_TIMEOUT,
+                                                        probe_devices,
+                                                        service);
+    }
+  else
+    {
+      service->reload_source_id = g_timeout_add_seconds (RELOAD_TIMEOUT,
+                                                         reload_devices,
+                                                         service);
+    }
+}
+
+static void
+probe_devices_cb (GObject* source_object,
+                  GAsyncResult* result,
+                  gpointer user_data)
+{
+  GVfsWsddService *service = G_VFS_WSDD_SERVICE (user_data);
+  g_autoptr(GError) error = NULL;
+
+  g_output_stream_write_all_finish (G_OUTPUT_STREAM (source_object),
+                                    result,
+                                    NULL,
+                                    &error);
+  if (error != NULL)
+    {
+      g_warning ("Writing to wsdd socket failed: %s\n",  error->message);
+
+      if (service->error == NULL)
+        {
+          g_set_error (&service->error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_FAILED,
+                       _("Communication with the underlying wsdd daemon failed."));
+        }
+
+      g_object_unref (service);
+
+      return;
+    }
+
+  schedule_reload_or_probe_devices (service);
+
+  g_object_unref (service);
+}
+
+static gboolean
+probe_devices (gpointer user_data)
+{
+  GVfsWsddService *service = G_VFS_WSDD_SERVICE (user_data);
+
+  service->probe_source_id = 0;
+  service->network_changed = FALSE;
+
+  if (service->extra_debug)
+    {
+      g_debug ("Probing for devices\n");
+    }
+
+  g_output_stream_write_all_async (service->output_stream,
+                                   PROBE_COMMAND,
+                                   strlen (PROBE_COMMAND),
+                                   G_PRIORITY_DEFAULT,
+                                   service->cancellable,
+                                   probe_devices_cb,
+                                   g_object_ref (service));
+
+  return G_SOURCE_REMOVE;
 }
 
 static void
@@ -239,7 +324,7 @@ reload_devices_finish (GVfsWsddService *service)
         }
     }
 
-  schedule_reload_devices (service);
+  schedule_reload_or_probe_devices (service);
 
   g_list_free_full (old_devices, g_object_unref);
   g_object_unref (service);
@@ -387,6 +472,28 @@ reload_devices (gpointer user_data)
 }
 
 static void
+network_changed_cb (GNetworkMonitor *network_monitor,
+                    gboolean available,
+                    gpointer user_data)
+{
+  GVfsWsddService *service = G_VFS_WSDD_SERVICE (user_data);
+
+  if (!service->network_changed)
+    {
+      g_debug ("Network change detected\n");
+    }
+
+  service->network_changed = TRUE;
+
+  /* (Re)schedule only if none of those operations is running already. */
+  if (service->reload_source_id != 0 ||
+      service->probe_source_id != 0)
+    {
+      schedule_reload_or_probe_devices (service);
+    }
+}
+
+static void
 child_watch_cb (GPid pid,
                 gint status,
                 gpointer user_data)
@@ -396,6 +503,7 @@ child_watch_cb (GPid pid,
   g_warning ("The wsdd daemon exited unexpectedly.");
 
   g_clear_handle_id (&service->reload_source_id, g_source_remove);
+  g_clear_handle_id (&service->probe_source_id, g_source_remove);
 
   g_clear_error (&service->error);
   g_set_error (&service->error,
@@ -522,13 +630,24 @@ initable_init (GInitable *initable,
           return FALSE;
         }
     }
+  else
+    {
+      /* Force probe devices when the daemon is already running. */
+      service->network_changed = TRUE;
+    }
 
   service->socket_connection = g_socket_connection_factory_create_connection (service->socket);
   service->input_stream = g_io_stream_get_input_stream (G_IO_STREAM (service->socket_connection));
   service->data_input_stream = g_data_input_stream_new (service->input_stream);
   service->output_stream = g_io_stream_get_output_stream (G_IO_STREAM (service->socket_connection));
 
-  schedule_reload_devices (service);
+  schedule_reload_or_probe_devices (service);
+
+  service->network_monitor = g_network_monitor_get_default ();
+  g_signal_connect (service->network_monitor,
+                    "network-changed",
+                    G_CALLBACK (network_changed_cb),
+                    service);
 
   return TRUE;
 }
