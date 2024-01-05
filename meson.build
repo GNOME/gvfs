@@ -2,9 +2,11 @@ project(
   'gvfs', 'c',
   version: '1.53.2',
   license: 'LGPL2+',
-  default_options: 'buildtype=debugoptimized',
+  default_options: [
+    'buildtype=debugoptimized',
+    'warning_level=1',
+  ],
   meson_version: '>= 0.57.0',
-  default_options: ['warning_level=1']
 )
 
 gvfs_name = meson.project_name()
