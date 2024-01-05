@@ -1,14 +1,14 @@
 # Georgian translation for gvfs.
 # Copyright (C) 2023 gvfs's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gvfs package.
-# Ekaterine Papava <papava.e@gtu.ge>, 2023.
+# Ekaterine Papava <papava.e@gtu.ge>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2023-08-16 18:38+0000\n"
-"PO-Revision-Date: 2023-08-18 19:57+0200\n"
+"POT-Creation-Date: 2024-01-04 14:13+0000\n"
+"PO-Revision-Date: 2024-01-05 18:44+0100\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: Georgian <(nothing)>\n"
 "Language: ka\n"
@@ -23,49 +23,49 @@ msgid "Operation not supported, files on different mounts"
 msgstr ""
 "ოპერაცია მხარდაჭერილი არაა, რადგან ფაილები სხვადასხვა მიმაგრების წერტილზეა"
 
-#: client/gdaemonfile.c:1028 client/gdaemonfile.c:3059
-#: client/gvfsiconloadable.c:351 daemon/gvfsjobopenforread.c:183
+#: client/gdaemonfile.c:1043 client/gdaemonfile.c:3074
+#: client/gvfsiconloadable.c:366 daemon/gvfsjobopenforread.c:183
 #: daemon/gvfsjobopenforwrite.c:333
 msgid "Couldn’t get stream file descriptor"
 msgstr "ნაკადის ფაილის დესკრიპტორის მიღება შეუძლებელია"
 
-#: client/gdaemonfile.c:1144 client/gdaemonfile.c:1216
-#: client/gvfsiconloadable.c:145
+#: client/gdaemonfile.c:1159 client/gdaemonfile.c:1231
+#: client/gvfsiconloadable.c:147
 msgid "Didn’t get stream file descriptor"
 msgstr "ნაკადის ფაილის დესკრიპტორი არ მიმიღია"
 
-#: client/gdaemonfile.c:1338
+#: client/gdaemonfile.c:1353
 #, c-format
 msgid "Invalid return value from %s"
 msgstr "%s-ის მიერ დაბრუნებული მნიშვნელობა არასწორია"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: client/gdaemonfile.c:2188 client/gdaemonfile.c:3322
+#: client/gdaemonfile.c:2203 client/gdaemonfile.c:3337
 msgid "Could not find enclosing mount"
 msgstr "მიმაგრების წერტილი ვერ ვიპოვე"
 
-#: client/gdaemonfile.c:2220
+#: client/gdaemonfile.c:2235
 #, c-format
 msgid "Invalid filename %s"
 msgstr "ფაილის არასწორი სახელი: %s"
 
-#: client/gdaemonfile.c:2534 client/gdaemonfile.c:2544
-#: client/gdaemonfile.c:2566 client/gdaemonvfs.c:1234 client/gdaemonvfs.c:1255
+#: client/gdaemonfile.c:2549 client/gdaemonfile.c:2559
+#: client/gdaemonfile.c:2581 client/gdaemonvfs.c:1234 client/gdaemonvfs.c:1255
 #: client/gdaemonvfs.c:1266 client/gdaemonvfs.c:1298
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "ფაილის მეტაონაცემების შენახვის შეცდომა: %s"
 
-#: client/gdaemonfile.c:2535 client/gdaemonvfs.c:1256
+#: client/gdaemonfile.c:2550 client/gdaemonvfs.c:1256
 msgid "can’t open metadata tree"
 msgstr "მეტამონაცემების ხის გახსნის შეცდომა"
 
-#: client/gdaemonfile.c:2545 client/gdaemonvfs.c:1267
+#: client/gdaemonfile.c:2560 client/gdaemonvfs.c:1267
 msgid "can’t get metadata proxy"
 msgstr "მეტამონაცემების პროქსის მიღების შეცდომა"
 
-#: client/gdaemonfile.c:2567 client/gdaemonvfs.c:1299
+#: client/gdaemonfile.c:2582 client/gdaemonvfs.c:1299
 msgid "values must be string or list of strings"
 msgstr "მნიშვნელობები სტრიქონები ან სტრიქონების სიები უნდა იყოს"
 
@@ -88,7 +88,7 @@ msgstr "ნაკადის დასასრული"
 #: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
 #: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
 #: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
-#: daemon/gvfsbackendsftp.c:5531 daemon/gvfsbackendsmb.c:1108
+#: daemon/gvfsbackendsftp.c:5534 daemon/gvfsbackendsmb.c:1121
 #: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
 #: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:347
 #: daemon/gvfsftptask.c:224
@@ -108,7 +108,7 @@ msgstr "ნაკადის მოკვეთა მხარდაუჭე�
 msgid "Error while getting mount info: %s"
 msgstr "მიმაგრების ინფორმაციის მიღების შეცდომა: %s"
 
-#: client/gvfsdaemondbus.c:285 client/gvfsdaemondbus.c:651
+#: client/gvfsdaemondbus.c:292 client/gvfsdaemondbus.c:666
 #: daemon/gvfsafpvolume.c:394 daemon/gvfsafpvolume.c:655
 #: daemon/gvfsafpvolume.c:799 daemon/gvfsafpvolume.c:980
 #: daemon/gvfsafpvolume.c:1164 daemon/gvfsafpvolume.c:1339
@@ -390,7 +390,7 @@ msgstr "%s-ის ჩატვირთვა %s-ზე შეუძლებე
 #: daemon/gvfsbackendmtp.c:1818 daemon/gvfsbackendmtp.c:2225
 #: daemon/gvfsbackendmtp.c:2288 daemon/gvfsbackendmtp.c:2355
 #: daemon/gvfsbackendmtp.c:2717 daemon/gvfsbackendmtp.c:2996
-#: daemon/gvfsbackendmtp.c:3139 daemon/gvfsbackendnetwork.c:697
+#: daemon/gvfsbackendmtp.c:3139 daemon/gvfsbackendnetwork.c:883
 #: daemon/gvfsbackendsmbbrowse.c:953 daemon/gvfsbackendsmbbrowse.c:1020
 #: daemon/gvfsbackendsmbbrowse.c:1202 daemon/gvfsbackendsmbbrowse.c:1275
 #, c-format
@@ -399,12 +399,12 @@ msgstr "ფაილი არ არსებობს"
 
 #: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2410
 #: daemon/gvfsbackendafp.c:289 daemon/gvfsbackendafp.c:492
-#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2799
-#: daemon/gvfsbackenddav.c:3754 daemon/gvfsbackenddav.c:4001
-#: daemon/gvfsbackendftp.c:832 daemon/gvfsbackendnfs.c:2480
-#: daemon/gvfsbackendsftp.c:2725 daemon/gvfsbackendsftp.c:3500
-#: daemon/gvfsbackendsftp.c:3948 daemon/gvfsbackendsftp.c:5020
-#: daemon/gvfsbackendsftp.c:6105
+#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2798
+#: daemon/gvfsbackenddav.c:3753 daemon/gvfsbackenddav.c:4000
+#: daemon/gvfsbackendftp.c:832 daemon/gvfsbackendnfs.c:2487
+#: daemon/gvfsbackendsftp.c:2728 daemon/gvfsbackendsftp.c:3503
+#: daemon/gvfsbackendsftp.c:3951 daemon/gvfsbackendsftp.c:5023
+#: daemon/gvfsbackendsftp.c:6108
 msgid "File is directory"
 msgstr "ფაილი საქაღალდეა"
 
@@ -417,7 +417,7 @@ msgid "Target file is open"
 msgstr "სამიზნე ფაილი უკვე ღიაა"
 
 #: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
-#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3307
+#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3306
 #: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendsftp.c:2209
 msgid "Directory not empty"
 msgstr "საქაღალდე ცარიელი არაა"
@@ -446,18 +446,18 @@ msgstr "საცავზე არასაკმარისი ადგი�
 
 #: daemon/gvfsafpvolume.c:811 daemon/gvfsafpvolume.c:1355
 #: daemon/gvfsafpvolume.c:1507 daemon/gvfsbackendafp.c:296
-#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2870
-#: daemon/gvfsbackenddav.c:3224 daemon/gvfsbackenddav.c:3380
-#: daemon/gvfsbackenddav.c:3486 daemon/gvfsbackenddav.c:3720
-#: daemon/gvfsbackenddav.c:3764 daemon/gvfsbackenddav.c:3991
+#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2869
+#: daemon/gvfsbackenddav.c:3223 daemon/gvfsbackenddav.c:3379
+#: daemon/gvfsbackenddav.c:3485 daemon/gvfsbackenddav.c:3719
+#: daemon/gvfsbackenddav.c:3763 daemon/gvfsbackenddav.c:3990
 #: daemon/gvfsbackendftp.c:811 daemon/gvfsbackendftp.c:999
 #: daemon/gvfsbackendftp.c:1509 daemon/gvfsbackendftp.c:1576
 #: daemon/gvfsbackendgoogle.c:1703 daemon/gvfsbackendgoogle.c:1780
 #: daemon/gvfsbackendgoogle.c:2157 daemon/gvfsbackendgoogle.c:2237
 #: daemon/gvfsbackendgoogle.c:2757 daemon/gvfsbackendgoogle.c:3204
 #: daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1698
-#: daemon/gvfsbackendmtp.c:1741 daemon/gvfsbackendnfs.c:2490
-#: daemon/gvfsbackendsftp.c:5029 daemon/gvfsbackendsmb.c:2108
+#: daemon/gvfsbackendmtp.c:1741 daemon/gvfsbackendnfs.c:2497
+#: daemon/gvfsbackendsftp.c:5032 daemon/gvfsbackendsmb.c:2121
 msgid "Target file already exists"
 msgstr "სამიზნე ფაილი უკვე არსებობს"
 
@@ -562,8 +562,8 @@ msgstr "ფაილი წასაკითხად არ გახსნი
 #: daemon/gvfsbackendadmin.c:104 daemon/gvfsbackendadmin.c:871
 #: daemon/gvfsbackendafc.c:2361 daemon/gvfsbackendafp.c:1781
 #: daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
-#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:4083
-#: daemon/gvfsbackenddav.c:4115 daemon/gvfsbackenddav.c:4143
+#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:4082
+#: daemon/gvfsbackenddav.c:4114 daemon/gvfsbackenddav.c:4142
 #: daemon/gvfsbackendftp.c:1209 daemon/gvfsbackendftp.c:1257
 #: daemon/gvfsbackendftp.c:1278 daemon/gvfsbackendftp.c:1624
 #: daemon/gvfsbackendgoogle.c:1590 daemon/gvfsbackendgoogle.c:1623
@@ -587,41 +587,41 @@ msgstr "ფაილი წასაკითხად არ გახსნი
 #: daemon/gvfsbackendmtp.c:2535 daemon/gvfsbackendmtp.c:2618
 #: daemon/gvfsbackendmtp.c:2706 daemon/gvfsbackendmtp.c:2774
 #: daemon/gvfsbackendmtp.c:2969 daemon/gvfsbackendmtp.c:3112
-#: daemon/gvfsbackendnfs.c:2372 daemon/gvfsbackendnfs.c:2422
-#: daemon/gvfsbackendnfs.c:2548 daemon/gvfsbackendsftp.c:2213
-#: daemon/gvfsbackendsftp.c:5417 daemon/gvfsbackendsftp.c:5515
-#: daemon/gvfsbackendsftp.c:6227 daemon/gvfsbackendsftp.c:6259
-#: daemon/gvfsbackendsftp.c:6285 daemon/gvfsbackendsftp.c:6293
-#: daemon/gvfsbackendsftp.c:6780 daemon/gvfsbackendsftp.c:6842
-#: daemon/gvfsbackendsftp.c:6850 daemon/gvfsbackendsmb.c:1700
-#: daemon/gvfsbackendtrash.c:937 daemon/gvfsbackendtrash.c:963
-#: daemon/gvfsftptask.c:430 daemon/gvfsjobcloseread.c:113
-#: daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
-#: daemon/gvfsjobcreatemonitor.c:143 daemon/gvfsjobcreatemonitor.c:154
-#: daemon/gvfsjobcreatemonitor.c:177 daemon/gvfsjobcreatemonitor.c:195
-#: daemon/gvfsjobdelete.c:108 daemon/gvfsjobenumerate.c:272
-#: daemon/gvfsjobmakedirectory.c:108 daemon/gvfsjobmount.c:112
-#: daemon/gvfsjobmountmountable.c:138 daemon/gvfsjobmove.c:121
-#: daemon/gvfsjobopenforread.c:120 daemon/gvfsjobopenforwrite.c:184
-#: daemon/gvfsjobopenforwrite.c:198 daemon/gvfsjobopenforwrite.c:212
-#: daemon/gvfsjobopeniconforread.c:104 daemon/gvfsjobpollmountable.c:107
-#: daemon/gvfsjobpull.c:125 daemon/gvfsjobpush.c:125
-#: daemon/gvfsjobqueryattributes.c:145 daemon/gvfsjobqueryfsinfo.c:116
-#: daemon/gvfsjobqueryinfo.c:124 daemon/gvfsjobqueryinforead.c:125
-#: daemon/gvfsjobqueryinfowrite.c:125 daemon/gvfsjobread.c:123
-#: daemon/gvfsjobseekread.c:121 daemon/gvfsjobseekwrite.c:121
-#: daemon/gvfsjobsetattribute.c:130 daemon/gvfsjobsetdisplayname.c:111
-#: daemon/gvfsjobstartmountable.c:113 daemon/gvfsjobstopmountable.c:115
-#: daemon/gvfsjobtrash.c:107 daemon/gvfsjobtruncate.c:113
-#: daemon/gvfsjobunmountmountable.c:157 daemon/gvfsjobunmountmountable.c:172
-#: daemon/gvfsjobwrite.c:123
+#: daemon/gvfsbackendnfs.c:2379 daemon/gvfsbackendnfs.c:2429
+#: daemon/gvfsbackendnfs.c:2555 daemon/gvfsbackendsftp.c:2213
+#: daemon/gvfsbackendsftp.c:5420 daemon/gvfsbackendsftp.c:5518
+#: daemon/gvfsbackendsftp.c:6230 daemon/gvfsbackendsftp.c:6262
+#: daemon/gvfsbackendsftp.c:6288 daemon/gvfsbackendsftp.c:6296
+#: daemon/gvfsbackendsftp.c:6783 daemon/gvfsbackendsftp.c:6845
+#: daemon/gvfsbackendsftp.c:6853 daemon/gvfsbackendsmb.c:1713
+#: daemon/gvfsbackendsmb.c:2193 daemon/gvfsbackendtrash.c:937
+#: daemon/gvfsbackendtrash.c:963 daemon/gvfsftptask.c:430
+#: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121
+#: daemon/gvfsjobcopy.c:121 daemon/gvfsjobcreatemonitor.c:143
+#: daemon/gvfsjobcreatemonitor.c:154 daemon/gvfsjobcreatemonitor.c:177
+#: daemon/gvfsjobcreatemonitor.c:195 daemon/gvfsjobdelete.c:108
+#: daemon/gvfsjobenumerate.c:272 daemon/gvfsjobmakedirectory.c:108
+#: daemon/gvfsjobmount.c:112 daemon/gvfsjobmountmountable.c:138
+#: daemon/gvfsjobmove.c:121 daemon/gvfsjobopenforread.c:120
+#: daemon/gvfsjobopenforwrite.c:184 daemon/gvfsjobopenforwrite.c:198
+#: daemon/gvfsjobopenforwrite.c:212 daemon/gvfsjobopeniconforread.c:104
+#: daemon/gvfsjobpollmountable.c:107 daemon/gvfsjobpull.c:125
+#: daemon/gvfsjobpush.c:125 daemon/gvfsjobqueryattributes.c:145
+#: daemon/gvfsjobqueryfsinfo.c:116 daemon/gvfsjobqueryinfo.c:124
+#: daemon/gvfsjobqueryinforead.c:125 daemon/gvfsjobqueryinfowrite.c:125
+#: daemon/gvfsjobread.c:123 daemon/gvfsjobseekread.c:121
+#: daemon/gvfsjobseekwrite.c:121 daemon/gvfsjobsetattribute.c:130
+#: daemon/gvfsjobsetdisplayname.c:111 daemon/gvfsjobstartmountable.c:113
+#: daemon/gvfsjobstopmountable.c:115 daemon/gvfsjobtrash.c:107
+#: daemon/gvfsjobtruncate.c:113 daemon/gvfsjobunmountmountable.c:157
+#: daemon/gvfsjobunmountmountable.c:172 daemon/gvfsjobwrite.c:123
 msgid "Operation not supported"
 msgstr "ოპერაცია მხარდაუჭერელია"
 
 #: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639
-#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2356
+#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2354
 #: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:303
-#: daemon/gvfsbackendsmb.c:582
+#: daemon/gvfsbackendsmb.c:595
 msgid "Invalid mount spec"
 msgstr "მიმაგრების არასწორი სპეციფიკაცია"
 
@@ -776,20 +776,20 @@ msgstr ""
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
 #: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2377
-#: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:126
-#: daemon/gvfsbackendsmb.c:672 daemon/gvfsbackendtrash.c:333
+#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendrecent.c:126
+#: daemon/gvfsbackendsmb.c:685 daemon/gvfsbackendtrash.c:333
 msgid "Can’t open directory"
 msgstr "საქაღალდის გახსნის შეცდომა"
 
 #: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528
 #: daemon/gvfsbackendafp.c:1270 daemon/gvfsbackendafp.c:1359
-#: daemon/gvfsbackenddav.c:3661 daemon/gvfsbackendftp.c:1461
-#: daemon/gvfsbackendsftp.c:3722 daemon/gvfsbackendsftp.c:4009
+#: daemon/gvfsbackenddav.c:3660 daemon/gvfsbackendftp.c:1461
+#: daemon/gvfsbackendsftp.c:3725 daemon/gvfsbackendsftp.c:4012
 msgid "Backups not supported"
 msgstr "მარქაფები მხარდაუჭერელია"
 
-#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:725
-#: daemon/gvfsbackendsmb.c:1204
+#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:738
+#: daemon/gvfsbackendsmb.c:1217
 msgid "Unsupported seek type"
 msgstr "გადახვევის მხარდაუჭერელი ტიპი"
 
@@ -813,9 +813,9 @@ msgstr "არამიმაგრებადი ფაილი"
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: daemon/gvfsbackendafpbrowse.c:446 daemon/gvfsbackendafp.c:2105
-#: daemon/gvfsbackendftp.c:681 daemon/gvfsbackendnfs.c:290
-#: daemon/gvfsbackendsftp.c:2070 daemon/gvfsbackendsmb.c:442
-#: daemon/gvfsbackendsmb.c:1376
+#: daemon/gvfsbackendftp.c:681 daemon/gvfsbackendnfs.c:297
+#: daemon/gvfsbackendsftp.c:2070 daemon/gvfsbackendsmb.c:450
+#: daemon/gvfsbackendsmb.c:1389
 #, c-format
 msgid "%s on %s"
 msgstr "%s %s-ზე"
@@ -828,7 +828,7 @@ msgstr "%s"
 
 #: daemon/gvfsbackendafpbrowse.c:483 daemon/gvfsbackendafp.c:2140
 #: daemon/gvfsbackendarchive.c:628 daemon/gvfsbackendftp.c:723
-#: daemon/gvfsbackendnfs.c:197 daemon/gvfsbackendsftp.c:2122
+#: daemon/gvfsbackendnfs.c:198 daemon/gvfsbackendsftp.c:2122
 msgid "No hostname specified"
 msgstr "ჰოსტის სახელი მითითებული არაა"
 
@@ -837,23 +837,23 @@ msgid "Apple Filing Protocol Service"
 msgstr "Apple Filing Protocol-ის სერვისი"
 
 #: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:877
-#: daemon/gvfsbackenddav.c:3749 daemon/gvfsbackendftp.c:1568
+#: daemon/gvfsbackenddav.c:3748 daemon/gvfsbackendftp.c:1568
 #: daemon/gvfsbackendgoogle.c:1752 daemon/gvfsbackendgoogle.c:2095
 #: daemon/gvfsbackendgoogle.c:3141
 msgid "Can’t copy directory over directory"
 msgstr "საქაღალდის საქაღალდეზე კოპირება შეუძლებელია"
 
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:893
-#: daemon/gvfsbackenddav.c:3784 daemon/gvfsbackendftp.c:1591
+#: daemon/gvfsbackenddav.c:3783 daemon/gvfsbackendftp.c:1591
 #: daemon/gvfsbackendgoogle.c:1814 daemon/gvfsbackendgoogle.c:3168
 #: daemon/gvfsbackendgoogle.c:3216 daemon/gvfsbackendmtp.c:1689
 #: daemon/gvfsbackendmtp.c:1704
 msgid "Can’t recursively copy directory"
 msgstr "საქაღალდის რეკურსიულად კოპირება შეუძლებელია"
 
-#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:3562
-#: daemon/gvfsbackendgoogle.c:2209 daemon/gvfsbackendnfs.c:2474
-#: daemon/gvfsbackendsftp.c:5015 daemon/gvfsbackendsmb.c:2097
+#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:3561
+#: daemon/gvfsbackendgoogle.c:2209 daemon/gvfsbackendnfs.c:2481
+#: daemon/gvfsbackendsftp.c:5018 daemon/gvfsbackendsmb.c:2110
 msgid "Can’t move directory over directory"
 msgstr "საქაღალდის საქაღალდეზე გადატანა შეუძლებელია"
 
@@ -862,14 +862,14 @@ msgstr "საქაღალდის საქაღალდეზე გა�
 msgid "Unable to create temporary file (%s)"
 msgstr "დროებითი ფაილის შექმნის შეცდომა (%s)"
 
-#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2977
-#: daemon/gvfsbackendnfs.c:1177 daemon/gvfsbackendsftp.c:3963
-#: daemon/gvfsbackendsmb.c:1077
+#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2976
+#: daemon/gvfsbackendnfs.c:1184 daemon/gvfsbackendsftp.c:3966
+#: daemon/gvfsbackendsmb.c:1090
 msgid "The file was externally modified"
 msgstr "ფაილი გარედან შეიცვალა"
 
 #: daemon/gvfsbackendafp.c:1765 daemon/gvfsbackendftp.c:1250
-#: daemon/gvfsbackendsftp.c:5479
+#: daemon/gvfsbackendsftp.c:5482
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "ატრიბუტის არასწორი ტიპი (მოველოდი uint32-ს)"
 
@@ -894,7 +894,7 @@ msgstr "/ %s-ში"
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
 #: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:1204
 #: daemon/gvfsbackendgoogle.c:2410 daemon/gvfsbackendgoogle.c:2637
-#: daemon/gvfsbackendnetwork.c:745 daemon/gvfsbackendsftp.c:4502
+#: daemon/gvfsbackendnetwork.c:932 daemon/gvfsbackendsftp.c:4505
 #: daemon/gvfsftpdircache.c:157
 #, c-format
 msgid "The file is not a directory"
@@ -918,8 +918,8 @@ msgstr "დროებითი საქაღალდის შექმნ�
 #: daemon/gvfsbackendgphoto2.c:938 daemon/gvfsbackendgphoto2.c:1869
 #: daemon/gvfsbackendgphoto2.c:2588 daemon/gvfsbackendrecent.c:110
 #: daemon/gvfsbackendrecent.c:293 daemon/gvfsbackendsftp.c:2217
-#: daemon/gvfsbackendsftp.c:3377 daemon/gvfsbackendsftp.c:3390
-#: daemon/gvfsbackendsftp.c:3410 daemon/gvfsbackendtrash.c:317
+#: daemon/gvfsbackendsftp.c:3380 daemon/gvfsbackendsftp.c:3393
+#: daemon/gvfsbackendsftp.c:3413 daemon/gvfsbackendtrash.c:317
 #, c-format
 msgid "No such file or directory"
 msgstr "ფაილი ან საქაღალდე არ არსებობს"
@@ -942,8 +942,8 @@ msgstr "CD/DVD-ების შემქმნელი"
 msgid "File exists"
 msgstr "ფაილი უკვე არსებობს"
 
-#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:3601
-#: daemon/gvfsbackendsftp.c:2211 daemon/gvfsbackendsftp.c:5195
+#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:3600
+#: daemon/gvfsbackendsftp.c:2211 daemon/gvfsbackendsftp.c:5198
 msgid "Target file exists"
 msgstr "სამიზნე ფაილი უკვე არსებობს"
 
@@ -1087,7 +1087,7 @@ msgid "%s on %s%s"
 msgstr "%s %s%s-ზე"
 
 #: daemon/gvfsbackenddav.c:766 daemon/gvfsbackenddav.c:1536
-#: daemon/gvfsbackenddav.c:2147 daemon/gvfsbackenddav.c:2311
+#: daemon/gvfsbackenddav.c:2145 daemon/gvfsbackenddav.c:2309
 #: daemon/gvfsbackendhttp.c:268 daemon/gvfshttpinputstream.c:273
 #, c-format
 msgid "HTTP Error: %s"
@@ -1105,8 +1105,8 @@ msgstr "პასუხი ცარელია"
 msgid "Unexpected reply from server"
 msgstr "სერვერის მოულოდნელი პასუხი"
 
-#: daemon/gvfsbackenddav.c:1554 daemon/gvfsbackenddav.c:2512
-#: daemon/gvfsbackenddav.c:2607 daemon/gvfsbackenddav.c:2791
+#: daemon/gvfsbackenddav.c:1554 daemon/gvfsbackenddav.c:2511
+#: daemon/gvfsbackenddav.c:2606 daemon/gvfsbackenddav.c:2790
 #, c-format
 msgid "Response invalid"
 msgstr "არასწორი პასუხი"
@@ -1134,36 +1134,36 @@ msgstr ""
 "აუცილებელია ავთენტიკაცია\n"
 "შეიყვანეთ პროქსის პაროლი:"
 
-#: daemon/gvfsbackenddav.c:2155
+#: daemon/gvfsbackenddav.c:2153
 msgid "Could not find an enclosing directory"
 msgstr "მშობელი საქაღალდე აღმოჩენილი არაა"
 
-#: daemon/gvfsbackenddav.c:2299
+#: daemon/gvfsbackenddav.c:2297
 msgid "Not a WebDAV enabled share"
 msgstr "არ წარმოადგენს გაზიარებულს, რომელსაც WebDAV-ის მხარდაჭერა ჩართული აქვს"
 
-#: daemon/gvfsbackenddav.c:2538 daemon/gvfsbackenddav.c:2651
-#: daemon/gvfsbackenddav.c:2738 daemon/gvfsbackenddav.c:2825
+#: daemon/gvfsbackenddav.c:2537 daemon/gvfsbackenddav.c:2650
+#: daemon/gvfsbackenddav.c:2737 daemon/gvfsbackenddav.c:2824
 msgid "Could not create request"
 msgstr "მოთხოვნის სექმნა შეუძლებელია"
 
-#: daemon/gvfsbackenddav.c:3011 daemon/gvfsbackendftp.c:1102
-#: daemon/gvfsbackendgoogle.c:3944 daemon/gvfsbackendnfs.c:941
-#: daemon/gvfsbackendnfs.c:964 daemon/gvfsbackendnfs.c:990
-#: daemon/gvfsbackendnfs.c:1390 daemon/gvfsbackendsmb.c:1113
-#: daemon/gvfsbackendsmb.c:2125
+#: daemon/gvfsbackenddav.c:3010 daemon/gvfsbackendftp.c:1102
+#: daemon/gvfsbackendgoogle.c:3944 daemon/gvfsbackendnfs.c:948
+#: daemon/gvfsbackendnfs.c:971 daemon/gvfsbackendnfs.c:997
+#: daemon/gvfsbackendnfs.c:1397 daemon/gvfsbackendsmb.c:1126
+#: daemon/gvfsbackendsmb.c:2138
 msgid "Backup file creation failed"
 msgstr "მარქაფის ფაილის შექმნის შეცდომა"
 
-#: daemon/gvfsbackenddav.c:3567
+#: daemon/gvfsbackenddav.c:3566
 msgid "Can’t move over directory"
 msgstr "საქაღალდის გადატანის შეცდომა"
 
-#: daemon/gvfsbackenddnssd.c:521 daemon/gvfsbackendnetwork.c:462
+#: daemon/gvfsbackenddnssd.c:521 daemon/gvfsbackendnetwork.c:538
 msgid "Local Network"
 msgstr "ლოკალური ქსელი"
 
-#: daemon/gvfsbackenddnssd.c:776 daemon/gvfsbackendnetwork.c:852
+#: daemon/gvfsbackenddnssd.c:776 daemon/gvfsbackendnetwork.c:1047
 msgid "Can’t monitor file or directory."
 msgstr "ფაილის/საქაღალდის მონიტორინგი შეუძლებელია."
 
@@ -1172,14 +1172,14 @@ msgstr "ფაილის/საქაღალდის მონიტორ�
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: daemon/gvfsbackenddnssd.c:795 daemon/gvfsbackendnetwork.c:784
-#: daemon/gvfsbackendnetwork.c:926 daemon/gvfsbackendnetwork.c:927
+#: daemon/gvfsbackenddnssd.c:795 daemon/gvfsbackendnetwork.c:978
+#: daemon/gvfsbackendnetwork.c:1137 daemon/gvfsbackendnetwork.c:1138
 msgid "Network"
 msgstr "ქსელი"
 
 #: daemon/gvfsbackendftp.c:560 daemon/gvfsbackendsftp.c:1191
 #: daemon/gvfsbackendsftp.c:1295 daemon/gvfsbackendsmbbrowse.c:848
-#: daemon/gvfsbackendsmb.c:537
+#: daemon/gvfsbackendsmb.c:550
 msgid "Password dialog cancelled"
 msgstr "პაროლის ფანჯარა დახურულია"
 
@@ -1211,37 +1211,37 @@ msgid "Error getting data from file"
 msgstr "ფაილიდან მონაცემების მიღების შეცდომა"
 
 #: daemon/gvfsbackendgoogle.c:3158 daemon/gvfsbackendgoogle.c:3984
-#: daemon/gvfsbackendnfs.c:1162
+#: daemon/gvfsbackendnfs.c:1169
 msgid "Target file is not a regular file"
 msgstr "სამიზნე საქაღალდე ჩვეულებრივი არაა"
 
 #: daemon/gvfsbackendgoogle.c:3584 daemon/gvfsbackendsftp.c:2390
-#: daemon/gvfsbackendsftp.c:2792 daemon/gvfsbackendsftp.c:2855
-#: daemon/gvfsbackendsftp.c:2866 daemon/gvfsbackendsftp.c:2924
-#: daemon/gvfsbackendsftp.c:3017 daemon/gvfsbackendsftp.c:3069
-#: daemon/gvfsbackendsftp.c:3124 daemon/gvfsbackendsftp.c:3203
-#: daemon/gvfsbackendsftp.c:3320 daemon/gvfsbackendsftp.c:3453
-#: daemon/gvfsbackendsftp.c:3537 daemon/gvfsbackendsftp.c:3613
-#: daemon/gvfsbackendsftp.c:3625 daemon/gvfsbackendsftp.c:3695
-#: daemon/gvfsbackendsftp.c:3765 daemon/gvfsbackendsftp.c:3823
-#: daemon/gvfsbackendsftp.c:3843 daemon/gvfsbackendsftp.c:4035
-#: daemon/gvfsbackendsftp.c:4069 daemon/gvfsbackendsftp.c:4127
-#: daemon/gvfsbackendsftp.c:4189 daemon/gvfsbackendsftp.c:4260
-#: daemon/gvfsbackendsftp.c:4535 daemon/gvfsbackendsftp.c:4606
-#: daemon/gvfsbackendsftp.c:4741 daemon/gvfsbackendsftp.c:4854
-#: daemon/gvfsbackendsftp.c:4916 daemon/gvfsbackendsftp.c:4953
-#: daemon/gvfsbackendsftp.c:4981 daemon/gvfsbackendsftp.c:5095
-#: daemon/gvfsbackendsftp.c:5151 daemon/gvfsbackendsftp.c:5192
-#: daemon/gvfsbackendsftp.c:5228 daemon/gvfsbackendsftp.c:5264
-#: daemon/gvfsbackendsftp.c:5279 daemon/gvfsbackendsftp.c:5294
-#: daemon/gvfsbackendsftp.c:5389 daemon/gvfsbackendsftp.c:5457
-#: daemon/gvfsbackendsftp.c:5664 daemon/gvfsbackendsftp.c:5701
-#: daemon/gvfsbackendsftp.c:5819 daemon/gvfsbackendsftp.c:5905
-#: daemon/gvfsbackendsftp.c:5989 daemon/gvfsbackendsftp.c:6032
-#: daemon/gvfsbackendsftp.c:6036 daemon/gvfsbackendsftp.c:6153
-#: daemon/gvfsbackendsftp.c:6157 daemon/gvfsbackendsftp.c:6408
-#: daemon/gvfsbackendsftp.c:6631 daemon/gvfsbackendsftp.c:6648
-#: daemon/gvfsbackendsftp.c:6786 daemon/gvfsbackendsftp.c:6814
+#: daemon/gvfsbackendsftp.c:2795 daemon/gvfsbackendsftp.c:2858
+#: daemon/gvfsbackendsftp.c:2869 daemon/gvfsbackendsftp.c:2927
+#: daemon/gvfsbackendsftp.c:3020 daemon/gvfsbackendsftp.c:3072
+#: daemon/gvfsbackendsftp.c:3127 daemon/gvfsbackendsftp.c:3206
+#: daemon/gvfsbackendsftp.c:3323 daemon/gvfsbackendsftp.c:3456
+#: daemon/gvfsbackendsftp.c:3540 daemon/gvfsbackendsftp.c:3616
+#: daemon/gvfsbackendsftp.c:3628 daemon/gvfsbackendsftp.c:3698
+#: daemon/gvfsbackendsftp.c:3768 daemon/gvfsbackendsftp.c:3826
+#: daemon/gvfsbackendsftp.c:3846 daemon/gvfsbackendsftp.c:4038
+#: daemon/gvfsbackendsftp.c:4072 daemon/gvfsbackendsftp.c:4130
+#: daemon/gvfsbackendsftp.c:4192 daemon/gvfsbackendsftp.c:4263
+#: daemon/gvfsbackendsftp.c:4538 daemon/gvfsbackendsftp.c:4609
+#: daemon/gvfsbackendsftp.c:4744 daemon/gvfsbackendsftp.c:4857
+#: daemon/gvfsbackendsftp.c:4919 daemon/gvfsbackendsftp.c:4956
+#: daemon/gvfsbackendsftp.c:4984 daemon/gvfsbackendsftp.c:5098
+#: daemon/gvfsbackendsftp.c:5154 daemon/gvfsbackendsftp.c:5195
+#: daemon/gvfsbackendsftp.c:5231 daemon/gvfsbackendsftp.c:5267
+#: daemon/gvfsbackendsftp.c:5282 daemon/gvfsbackendsftp.c:5297
+#: daemon/gvfsbackendsftp.c:5392 daemon/gvfsbackendsftp.c:5460
+#: daemon/gvfsbackendsftp.c:5667 daemon/gvfsbackendsftp.c:5704
+#: daemon/gvfsbackendsftp.c:5822 daemon/gvfsbackendsftp.c:5908
+#: daemon/gvfsbackendsftp.c:5992 daemon/gvfsbackendsftp.c:6035
+#: daemon/gvfsbackendsftp.c:6039 daemon/gvfsbackendsftp.c:6156
+#: daemon/gvfsbackendsftp.c:6160 daemon/gvfsbackendsftp.c:6411
+#: daemon/gvfsbackendsftp.c:6634 daemon/gvfsbackendsftp.c:6651
+#: daemon/gvfsbackendsftp.c:6789 daemon/gvfsbackendsftp.c:6817
 msgid "Invalid reply received"
 msgstr "მიღებულია პასუხი არასწორია"
 
@@ -1249,7 +1249,7 @@ msgstr "მიღებულია პასუხი არასწორი�
 msgid "File is not a regular file"
 msgstr "ფაილი ჩვეულებრივი არაა"
 
-#: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendnfs.c:1152
+#: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendnfs.c:1159
 msgid "Target file is a directory"
 msgstr "სამიზნე ფაილი საქაღალდეა"
 
@@ -1348,7 +1348,7 @@ msgstr "არასწორი ხატულის იდენტიფი�
 msgid "Error seeking in stream on camera %s"
 msgstr "კამერაზე \"%s\" ნაკადის გადახვევის შეცდომა"
 
-#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3380
+#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3383
 #: daemon/gvfsbackendsmbbrowse.c:1271
 msgid "Not a directory"
 msgstr "არ წარმოადგეს საქაღალდეს"
@@ -1521,42 +1521,47 @@ msgstr "აქ ჩაწერა შეუძლებელია"
 msgid "No thumbnail for entity “%s”"
 msgstr "ობიექტისთვის „%s“ მინიატურა არ არსებობს"
 
-#: daemon/gvfsbackendnetwork.c:168
+#: daemon/gvfsbackendnetwork.c:235
 msgid "File Sharing"
 msgstr "ფაილების გაზიარება"
 
-#: daemon/gvfsbackendnetwork.c:173
+#: daemon/gvfsbackendnetwork.c:240
 msgid "Remote Login"
 msgstr "დაშორებული ჰოსტი"
 
-#: daemon/gvfsbackendnetwork.c:333 daemon/gvfsbackendsmbbrowse.c:738
+#: daemon/gvfsbackendnetwork.c:493 daemon/gvfsbackendsmbbrowse.c:738
 msgid "Windows Network"
 msgstr "Windows-ის ქსელი"
 
+#: daemon/gvfsbackendnetwork.c:616
+#| msgid "Network"
+msgid "WSDD Network"
+msgstr "WSDD ქსელი"
+
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: daemon/gvfsbackendnetwork.c:1013
+#: daemon/gvfsbackendnetwork.c:1232
 msgid "Network Location Monitor"
 msgstr "ქსელური მდებარეობის მონიტორი"
 
-#: daemon/gvfsbackendnfs.c:242
+#: daemon/gvfsbackendnfs.c:249
 msgid "Mount point does not exist"
 msgstr "მიმაგრების წერტილი არ არსებობს"
 
-#: daemon/gvfsbackendnfs.c:266
+#: daemon/gvfsbackendnfs.c:273
 msgid ""
 "Permission denied: Perhaps this host is disallowed or a privileged port is "
 "needed"
 msgstr ""
 "წვდომა აკრძალულია: ჰოსტი აკრძალულია ან აუცილებელია პრივილეგირებული პორტი"
 
-#: daemon/gvfsbackendnfs.c:1048 daemon/gvfsbackendnfs.c:1071
-#: daemon/gvfsbackendnfs.c:1119 daemon/gvfsbackendsftp.c:3890
-#: daemon/gvfsbackendsftp.c:6060
+#: daemon/gvfsbackendnfs.c:1055 daemon/gvfsbackendnfs.c:1078
+#: daemon/gvfsbackendnfs.c:1126 daemon/gvfsbackendsftp.c:3893
+#: daemon/gvfsbackendsftp.c:6063
 msgid "Unable to create temporary file"
 msgstr "დროებითი ფაილის შექმნის შეცდომა"
 
-#: daemon/gvfsbackendnfs.c:2380
+#: daemon/gvfsbackendnfs.c:2387
 msgid "Invalid attribute type"
 msgstr "ატრიბუტის არასწორი ტიპი"
 
@@ -1715,39 +1720,39 @@ msgstr "მხარდაჭერილი SSH ბრძანება ვე
 msgid "Unknown reason"
 msgstr "უცნობი მიზეზი"
 
-#: daemon/gvfsbackendsftp.c:2649 daemon/gvfsbackendsmb.c:1383
+#: daemon/gvfsbackendsftp.c:2652 daemon/gvfsbackendsmb.c:1396
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (არასწორი კოდირება)"
 
 #. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: daemon/gvfsbackendsftp.c:2661 daemon/gvfsftpdircache.c:431
+#: daemon/gvfsbackendsftp.c:2664 daemon/gvfsftpdircache.c:431
 #, c-format
 msgid "/ on %s"
 msgstr "/ %s-ზე"
 
-#: daemon/gvfsbackendsftp.c:2734
+#: daemon/gvfsbackendsftp.c:2737
 msgid "Failure"
 msgstr "წარუმატებელი"
 
-#: daemon/gvfsbackendsftp.c:3146
+#: daemon/gvfsbackendsftp.c:3149
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "მარქაფის ფაილის შექმნის შეცდომა: %s"
 
-#: daemon/gvfsbackendsftp.c:5425
+#: daemon/gvfsbackendsftp.c:5428
 msgid "Value out of range, sftp only supports 32bit timestamps"
 msgstr ""
 "მნიშვნელობა დიაპაზონს გარეთაა. SFTP-ს მხოლოდ 32-ბიტანი დროის შტამპების "
 "მხარდაჭერა გააჩნია"
 
-#: daemon/gvfsbackendsftp.c:5500 daemon/gvfsbackendsmb.c:1725
+#: daemon/gvfsbackendsftp.c:5503 daemon/gvfsbackendsmb.c:1738
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "ატრიბუტის არასწორი ტიპი (მოველოდი uint64-ს)"
 
 #: daemon/gvfsbackendsmbbrowse.c:645 daemon/gvfsbackendsmbbrowse.c:679
-#: daemon/gvfsbackendsmb.c:401 daemon/gvfsbackendsmb.c:428
-#: daemon/gvfsbackendsmb.c:618
+#: daemon/gvfsbackendsmb.c:409 daemon/gvfsbackendsmb.c:436
+#: daemon/gvfsbackendsmb.c:631
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "შიდა შეცდომა (%s)"
@@ -1770,7 +1775,7 @@ msgid "Windows Network File System Service"
 msgstr "Windows-ის ქსელური ფაილური სისტემის სერვისი"
 
 #. Translators: First %s is a share name, second is a server name
-#: daemon/gvfsbackendsmb.c:257
+#: daemon/gvfsbackendsmb.c:262
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -1780,7 +1785,7 @@ msgstr ""
 "შეიყვანეთ პაროლი გაზიარებულისთვის \"%s\"-სთვის \"%s\"-ზე:"
 
 #. Translators: First %s is a share name, second is a server name
-#: daemon/gvfsbackendsmb.c:263
+#: daemon/gvfsbackendsmb.c:268
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -1790,41 +1795,41 @@ msgstr ""
 "შეიყვანეთ მომხმარებელი და პაროლი გაზიარებულისთვის \"%s\"-სთვის \"%s\"-ზე:"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: daemon/gvfsbackendsmb.c:542
+#: daemon/gvfsbackendsmb.c:555
 #, c-format
 msgid "Failed to mount Windows share: %s"
 msgstr "Windows-ის გაზიარებულის მიმაგრების შეცდომა: %s"
 
-#: daemon/gvfsbackendsmb.c:1312
+#: daemon/gvfsbackendsmb.c:1325
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "მარქაფის ფაილის შექმნის შეცდომა: %s"
 
-#: daemon/gvfsbackendsmb.c:1933
+#: daemon/gvfsbackendsmb.c:1946
 msgid "Can’t rename file, filename already exists"
 msgstr ""
 "ფაილის სახელის გადარქმევა შეუძლებელია, რადგან ფაილის სახელი უკვე არსებობს"
 
-#: daemon/gvfsbackendsmb.c:1985
+#: daemon/gvfsbackendsmb.c:1998
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "ფაილის წაშლის შეცდომა: %s"
 
-#: daemon/gvfsbackendsmb.c:2072
+#: daemon/gvfsbackendsmb.c:2085
 #, c-format
 msgid "Error moving file: %s"
 msgstr "ფაილის გადატანის შეცდომა: %s"
 
-#: daemon/gvfsbackendsmb.c:2145
+#: daemon/gvfsbackendsmb.c:2158
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "სამიზნე ფაილის წაშლა შეუძლებელია: %s"
 
-#: daemon/gvfsbackendsmb.c:2169
+#: daemon/gvfsbackendsmb.c:2186
 msgid "Can’t recursively move directory"
 msgstr "რეკურსიულად საქაღალდის გადატანა შეუძლებელია"
 
-#: daemon/gvfsbackendsmb.c:2218
+#: daemon/gvfsbackendsmb.c:2244
 msgid "Windows Shares File System Service"
 msgstr "Windows-ის რესურსების ფაილური სისტემის სერვისი"
 
@@ -1874,16 +1879,16 @@ msgstr "სერტიფიკატის ალგორითმი მი�
 msgid "Error occurred when validating the certificate."
 msgstr "სერტიფიკატის ვალიდაციის შეცდომა."
 
-#: daemon/gvfsdaemonutils.c:325
+#: daemon/gvfsdaemonutils.c:326
 msgid "Yes"
 msgstr "დიახ"
 
-#: daemon/gvfsdaemonutils.c:325
+#: daemon/gvfsdaemonutils.c:326
 msgid "No"
 msgstr "არა"
 
 #. Translators: The first %s is the reason why verification failed, the second a certificate
-#: daemon/gvfsdaemonutils.c:337
+#: daemon/gvfsdaemonutils.c:338
 #, c-format
 msgid ""
 "Identity Verification Failed\n"
