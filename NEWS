@@ -1,3 +1,8 @@
+Major changes in 1.52.2
+=======================
+* smb: Fix livelock when mounting share without enough permissions (Ondrej Holy)
+* smb: Fix moving files across filesystem boundaries (Ondrej Holy)
+
 Major changes in 1.52.1
 =======================
 * client: Prevent returning invalid mount cache entries (rong wang)
