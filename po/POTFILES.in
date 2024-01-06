@@ -42,6 +42,7 @@ daemon/gvfsbackendsmbbrowse.c
 daemon/gvfsbackendsmb.c
 daemon/gvfsbackendtest.c
 daemon/gvfsbackendtrash.c
+daemon/gvfsbackendwsdd.c
 daemon/gvfschannel.c
 daemon/gvfsdaemon.c
 daemon/gvfsdaemonutils.c
@@ -85,8 +86,12 @@ daemon/gvfsjobtruncate.c
 daemon/gvfsjobunmount.c
 daemon/gvfsjobunmountmountable.c
 daemon/gvfsjobwrite.c
+daemon/gvfswsddservice.c
 daemon/main.c
 daemon/mount.c
+daemon/org.gnome.system.dns_sd.gschema.xml
+daemon/org.gnome.system.smb.gschema.xml
+daemon/org.gnome.system.wsdd.gschema.xml
 daemon/org.gtk.vfs.file-operations.policy.in.in
 metadata/meta-daemon.c
 monitor/afc/afcvolume.c
