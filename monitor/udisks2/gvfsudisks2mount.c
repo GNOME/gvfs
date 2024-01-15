@@ -953,16 +953,17 @@ unmount_do (GTask       *task,
   /* Use the umount(8) command if there is no block device / filesystem */
   if (data->filesystem == NULL)
     {
-      gchar *escaped_mount_path;
-      escaped_mount_path = g_strescape (mount->mount_path, NULL);
+      gchar *quoted_path;
+
+      quoted_path = g_shell_quote (mount->mount_path);
       gvfs_udisks2_utils_spawn (10, /* timeout in seconds */
                                 g_task_get_cancellable (task),
                                 umount_command_cb,
                                 task,
-                                "umount %s \"%s\"",
+                                "umount %s %s",
                                 force ? "-l " : "",
-                                escaped_mount_path);
-      g_free (escaped_mount_path);
+                                quoted_path);
+      g_free (quoted_path);
       goto out;
     }
 
