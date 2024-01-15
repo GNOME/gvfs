@@ -26,7 +26,6 @@
   </maintainer>
 
   <!-- MTP -->
-<!--
   <maintainer>
     <foaf:Person>
       <foaf:name>Philip Langdale</foaf:name>
@@ -34,5 +33,4 @@
       <gnome:userid>philipl</gnome:userid>
     </foaf:Person>
   </maintainer>
--->
 </Project>
