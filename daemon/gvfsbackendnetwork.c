@@ -46,6 +46,7 @@ typedef struct {
   char *file_name;
   char *display_name;
   char *target_uri;
+  GRefString *content_type;
   GIcon *icon;
   GIcon *symbolic_icon;
   guint num_duplicates;
@@ -97,6 +98,7 @@ static NetworkFile *
 network_file_new (const char *file_name, 
                   const char *display_name, 
                   const char *target_uri, 
+                  const char *content_type,
                   GIcon      *icon,
                   GIcon      *symbolic_icon)
 {
@@ -107,6 +109,7 @@ network_file_new (const char *file_name,
   file->file_name = g_strdup (file_name);
   file->display_name = g_strdup (display_name);
   file->target_uri = g_strdup (target_uri);
+  file->content_type = g_ref_string_new_intern (content_type);
   file->icon = g_object_ref (icon);
   file->symbolic_icon = g_object_ref (symbolic_icon);
 
@@ -137,6 +140,7 @@ network_files_from_enumerator (GList *files,
       file = network_file_new (file_name,
                                g_file_info_get_display_name (info),
                                uri,
+                               g_file_info_get_content_type (info),
                                icon,
                                symbolic_icon);
       files = g_list_prepend (files, file);
@@ -182,6 +186,7 @@ network_file_free (NetworkFile *file)
   g_free (file->file_name);
   g_free (file->display_name);
   g_free (file->target_uri);
+  g_ref_string_release (file->content_type);
  
   if (file->icon)
     g_object_unref (file->icon);
@@ -467,6 +472,7 @@ recompute_files (GVfsBackendNetwork *backend)
                       file = network_file_new (file_name,
                                                g_file_info_get_display_name (workgroup_info),
                                                workgroup_target,
+                                               g_file_info_get_content_type (workgroup_info),
                                                backend->workgroup_icon,
                                                backend->workgroup_symbolic_icon);
                       files = g_list_prepend (files, file);
@@ -492,6 +498,7 @@ recompute_files (GVfsBackendNetwork *backend)
           file = network_file_new ("smb-root",
                                    _("Windows Network"),
                                    "smb:///",
+                                   "inode/directory",
                                    backend->workgroup_icon,
                                    backend->workgroup_symbolic_icon);
           files = g_list_prepend (files, file);
@@ -537,6 +544,7 @@ recompute_files (GVfsBackendNetwork *backend)
           file = network_file_new ("dnssd-local",
                                    _("Local Network"),
 				   "dns-sd://local/",
+                                   "inode/directory",
                                    backend->workgroup_icon,
                                    backend->workgroup_symbolic_icon);
           files = g_list_prepend (files, file);   
@@ -559,6 +567,7 @@ recompute_files (GVfsBackendNetwork *backend)
 	      file = network_file_new (file_name,
 				       domains[i],
 				       link_uri,
+                                       "inode/directory",
 				       backend->workgroup_icon,
 				       backend->workgroup_symbolic_icon);
 	      files = g_list_prepend (files, file);   
@@ -615,6 +624,7 @@ recompute_files (GVfsBackendNetwork *backend)
           file = network_file_new ("wsdd-root",
                                    _("WSDD Network"),
                                    "wsdd:///",
+                                   "inode/directory",
                                    backend->workgroup_icon,
                                    backend->workgroup_symbolic_icon);
           files = g_list_prepend (files, file);
@@ -901,6 +911,7 @@ file_info_from_file (NetworkFile *file,
     g_file_info_set_symbolic_icon (info, file->symbolic_icon);
 
   g_file_info_set_file_type (info, G_FILE_TYPE_SHORTCUT);
+  g_file_info_set_content_type (info, file->content_type);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
