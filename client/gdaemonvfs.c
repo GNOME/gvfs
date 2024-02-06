@@ -1358,11 +1358,12 @@ g_daemon_vfs_local_file_removed (GVfs       *vfs,
       if (proxy)
         {
           metatreefile = meta_tree_get_filename (tree);
-          gvfs_metadata_call_remove_sync (proxy,
-                                          metatreefile,
-                                          tree_path,
-                                          NULL,
-                                          NULL);
+          gvfs_metadata_call_remove (proxy,
+                                     metatreefile,
+                                     tree_path,
+                                     NULL,
+                                     NULL,
+                                     NULL);
         }
       
       meta_tree_unref (tree);
@@ -1400,12 +1401,13 @@ g_daemon_vfs_local_file_moved (GVfs       *vfs,
       if (proxy)
         {
           metatreefile = meta_tree_get_filename (tree1);
-          gvfs_metadata_call_move_sync (proxy,
-                                        metatreefile,
-                                        tree_path1,
-                                        tree_path2,
-                                        NULL,
-                                        NULL);
+          gvfs_metadata_call_move (proxy,
+                                   metatreefile,
+                                   tree_path1,
+                                   tree_path2,
+                                   NULL,
+                                   NULL,
+                                   NULL);
         }
     }
 
