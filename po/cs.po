@@ -8,9 +8,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2024-01-06 16:42+0000\n"
-"PO-Revision-Date: 2024-01-22 17:48+0100\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
+"POT-Creation-Date: 2024-01-22 16:50+0000\n"
+"PO-Revision-Date: 2024-02-07 16:26+0100\n"
 "Last-Translator: Daniel Rusek <mail@asciiwolf.com>\n"
 "Language-Team: čeština <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -2093,6 +2093,8 @@ msgid ""
 "values are \"merged\", \"separate\" (the Local Network folder) and "
 "\"disabled\"."
 msgstr ""
+"Jak se zobrazují služby DNS-SD v umístění „network:///“. Možné hodnoty jsou "
+"„merged“, „separate“ (složka Místní síť) a „disabled“."
 
 #: daemon/org.gnome.system.dns_sd.gschema.xml:10
 msgid "Extra domains to look for DNS-SD services in"
@@ -2103,6 +2105,8 @@ msgid ""
 "Comma separated list of DNS-SD domains that should be visible in the "
 "\"network:///\" location."
 msgstr ""
+"Čárkami oddělený seznam domén DNS-SD, které by měly být viditelné v umístění "
+"„network:///“."
 
 #: daemon/org.gnome.system.smb.gschema.xml:5
 msgid "How to display SMB devices"
@@ -2114,6 +2118,8 @@ msgid ""
 "values are \"merged\", \"separate\" (the Windows Network folder) and "
 "\"disabled\"."
 msgstr ""
+"Jak se zobrazují zařízení SMB v umístění „network:///“. Možné hodnoty jsou "
+"„merged“, „separate“ (složka Síť Windows) a „disabled“."
 
 #: daemon/org.gnome.system.smb.gschema.xml:10
 msgid "SMB workgroup"
@@ -2125,6 +2131,9 @@ msgid ""
 "order for a new workgroup to fully take effect the user may need to log out "
 "and log back in."
 msgstr ""
+"Pracovní skupina nebo doména sítě Windows, které je uživatel součástí. Aby "
+"se nová pracovní skupina plně projevila, bude se uživatel možná muset "
+"odhlásit a znovu přihlásit."
 
 #: daemon/org.gnome.system.wsdd.gschema.xml:5
 msgid "How to display WSDD devices"
@@ -2136,6 +2145,8 @@ msgid ""
 "values are \"merged\", \"separate\" (the WSDD Network folder) and "
 "\"disabled\"."
 msgstr ""
+"Jak se zobrazují zařízení WSDD v umístění „network:///“. Možné hodnoty jsou "
+"„merged“, „separate“ (složka Síť WSDD) a „disabled“."
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:13
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:25
@@ -2250,7 +2261,7 @@ msgstr "Jeden nebo více programů znemožňují provést odpojení."
 msgid "Eject Anyway"
 msgstr "Přesto vysunout"
 
-#: monitor/udisks2/gvfsudisks2mount.c:1147
+#: monitor/udisks2/gvfsudisks2mount.c:1148
 #: monitor/udisks2/gvfsudisks2volume.c:1769
 msgid "Operation not supported by backend"
 msgstr "Operace není podpůrnou vrstvou podporována"
