@@ -66,14 +66,14 @@ have_socketpair = cc.has_function('socketpair')
 socket_deps = []
 
 if not have_socketpair
-  socket_dep = cc.find_library(
-    'socket',
-    has_function: 'socketpair',
-    required: false,
-  )
-  socket_deps += socket_dep
-  have_socketpair = socket_dep.found()
+  socket_dep = cc.find_library('socket', required: false)
+  have_socketpair = socket_dep.found() and cc.has_function('socketpair', dependencies: socket_dep)
+
+  if have_socketpair
+    socket_deps += socket_dep
+  endif
 endif
+
 config_h.set('HAVE_SOCKETPAIR', have_socketpair,
              description: 'Define if you have the socketpair function.')
 
