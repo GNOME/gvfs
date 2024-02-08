@@ -33,4 +33,13 @@
       <gnome:userid>philipl</gnome:userid>
     </foaf:Person>
   </maintainer>
+
+  <!-- OneDrive -->
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Jan-Michael Brummer</foaf:name>
+      <foaf:mbox rdf:resource="mailto:jan-michael.brummer1@volkswagen.de" />
+      <gnome:userid>jbrummer</gnome:userid>
+    </foaf:Person>
+  </maintainer>
 </Project>
