@@ -1,3 +1,12 @@
+Major changes in 1.53.90
+========================
+* daemon: Add OneDrive support based on msgraph library (Jan-Michael Brummer)
+* client: Reduce synchronous metadata methods calls to improve performance (Corey Berla)
+* network: Provide standard::content-type and access::can-rename attributes (António Fernandes)
+* build: Fix unknown arguments error on systems that don't use GNU C library (Ondrej Holy)
+* udisks2: Fix unmounting of mount paths that contain non-ASCII characters (Ondrej Holy)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.53.1
 =======================
 * daemon: Add WS-Discovery support based on wsdd daemon (Ondrej Holy)
