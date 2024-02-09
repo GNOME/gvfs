@@ -14,6 +14,7 @@ option('gphoto2', type: 'boolean', value: true, description: 'build with gphoto2
 option('http', type: 'boolean', value: true, description: 'build with http/dav backends')
 option('mtp', type: 'boolean', value: true, description: 'build with mtp backend and volume monitor')
 option('nfs', type: 'boolean', value: true, description: 'build with nfs backend')
+option('onedrive', type: 'boolean', value: true, description: 'build with OneDrive backend')
 option('sftp', type: 'boolean', value: true, description: 'build with sftp backend')
 option('smb', type: 'boolean', value: true, description: 'build with smb backends')
 option('udisks2', type: 'boolean', value: true, description: 'build with udisks2 volume monitor')

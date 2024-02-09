@@ -395,6 +395,25 @@ if enable_google
   mounts += ['google']
 endif
 
+if enable_onedrive
+  sources = files(
+    'gvfsbackendonedrive.c',
+  )
+  deps = [
+    goa_dep,
+    msgraph_dep
+  ]
+
+  cflags = [
+    '-DBACKEND_HEADER=gvfsbackendonedrive.h',
+    '-DDEFAULT_BACKEND_TYPE=onedrive',
+    '-DBACKEND_TYPES="onedrive", G_VFS_TYPE_BACKEND_ONEDRIVE,',
+  ]
+
+  programs += {'gvfsd-onedrive': {'sources': sources, 'dependencies': deps, 'c_args': cflags}}
+  mounts += ['onedrive']
+endif
+
 if enable_gphoto2
   deps = [
     gio_unix_dep,

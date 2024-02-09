@@ -36,6 +36,7 @@ daemon/gvfsbackendlocaltest.c
 daemon/gvfsbackendmtp.c
 daemon/gvfsbackendnetwork.c
 daemon/gvfsbackendnfs.c
+daemon/gvfsbackendonedrive.c
 daemon/gvfsbackendrecent.c
 daemon/gvfsbackendsftp.c
 daemon/gvfsbackendsmbbrowse.c

@@ -1,0 +1,4 @@
+[Mount]
+Type=onedrive
+Exec=@libexecdir@/gvfsd-onedrive
+AutoMount=false

@@ -426,6 +426,14 @@ if enable_google
   libgdata_dep = dependency('libgdata', version: '>= 0.18.0')
 endif
 
+# *** Check if we should build with OneDrive backend ***
+enable_onedrive = get_option('onedrive')
+if enable_onedrive
+  assert(enable_goa, 'OneDrive backend requested but GOA is required')
+
+  msgraph_dep = dependency('msgraph-0.1')
+endif
+
 # *** Check for gphoto2 ***
 enable_gphoto2 = get_option('gphoto2')
 if enable_gphoto2
@@ -511,6 +519,7 @@ summary({
   'http': enable_http,
   'mtp': enable_mtp,
   'nfs': enable_nfs,
+  'onedrive': enable_onedrive,
   'sftp': enable_sftp,
   'smb': enable_samba,
   'udisks2': enable_udisks2,
