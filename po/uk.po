@@ -8,9 +8,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2024-01-04 14:13+0000\n"
-"PO-Revision-Date: 2024-01-04 20:51+0200\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
+"POT-Creation-Date: 2024-02-09 12:29+0000\n"
+"PO-Revision-Date: 2024-02-12 23:40+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <kde-i18n-uk@kde.org>\n"
 "Language: uk\n"
@@ -395,7 +395,7 @@ msgstr "Не вдалося завантажити %s на %s"
 #: daemon/gvfsbackendmtp.c:1818 daemon/gvfsbackendmtp.c:2225
 #: daemon/gvfsbackendmtp.c:2288 daemon/gvfsbackendmtp.c:2355
 #: daemon/gvfsbackendmtp.c:2717 daemon/gvfsbackendmtp.c:2996
-#: daemon/gvfsbackendmtp.c:3139 daemon/gvfsbackendnetwork.c:883
+#: daemon/gvfsbackendmtp.c:3139 daemon/gvfsbackendnetwork.c:893
 #: daemon/gvfsbackendsmbbrowse.c:953 daemon/gvfsbackendsmbbrowse.c:1020
 #: daemon/gvfsbackendsmbbrowse.c:1202 daemon/gvfsbackendsmbbrowse.c:1275
 #, c-format
@@ -423,7 +423,8 @@ msgstr "Відкрито цільовий файл"
 
 #: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
 #: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3306
-#: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendsftp.c:2209
+#: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendonedrive.c:918
+#: daemon/gvfsbackendsftp.c:2209
 msgid "Directory not empty"
 msgstr "Каталог не порожній"
 
@@ -462,6 +463,7 @@ msgstr "Не вистачає місця на томі"
 #: daemon/gvfsbackendgoogle.c:2757 daemon/gvfsbackendgoogle.c:3204
 #: daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1698
 #: daemon/gvfsbackendmtp.c:1741 daemon/gvfsbackendnfs.c:2497
+#: daemon/gvfsbackendonedrive.c:1071 daemon/gvfsbackendonedrive.c:1637
 #: daemon/gvfsbackendsftp.c:5032 daemon/gvfsbackendsmb.c:2121
 msgid "Target file already exists"
 msgstr "Файл призначення вже існує"
@@ -593,14 +595,19 @@ msgstr "Файл не відкрито з доступом для читання
 #: daemon/gvfsbackendmtp.c:2706 daemon/gvfsbackendmtp.c:2774
 #: daemon/gvfsbackendmtp.c:2969 daemon/gvfsbackendmtp.c:3112
 #: daemon/gvfsbackendnfs.c:2379 daemon/gvfsbackendnfs.c:2429
-#: daemon/gvfsbackendnfs.c:2555 daemon/gvfsbackendsftp.c:2213
-#: daemon/gvfsbackendsftp.c:5420 daemon/gvfsbackendsftp.c:5518
-#: daemon/gvfsbackendsftp.c:6230 daemon/gvfsbackendsftp.c:6262
-#: daemon/gvfsbackendsftp.c:6288 daemon/gvfsbackendsftp.c:6296
-#: daemon/gvfsbackendsftp.c:6783 daemon/gvfsbackendsftp.c:6845
-#: daemon/gvfsbackendsftp.c:6853 daemon/gvfsbackendsmb.c:1713
-#: daemon/gvfsbackendsmb.c:2193 daemon/gvfsbackendtrash.c:937
-#: daemon/gvfsbackendtrash.c:963 daemon/gvfsftptask.c:430
+#: daemon/gvfsbackendnfs.c:2555 daemon/gvfsbackendonedrive.c:829
+#: daemon/gvfsbackendonedrive.c:928 daemon/gvfsbackendonedrive.c:1050
+#: daemon/gvfsbackendonedrive.c:1552 daemon/gvfsbackendonedrive.c:1604
+#: daemon/gvfsbackendonedrive.c:1620 daemon/gvfsbackendonedrive.c:1632
+#: daemon/gvfsbackendonedrive.c:1783 daemon/gvfsbackendonedrive.c:1799
+#: daemon/gvfsbackendsftp.c:2213 daemon/gvfsbackendsftp.c:5420
+#: daemon/gvfsbackendsftp.c:5518 daemon/gvfsbackendsftp.c:6230
+#: daemon/gvfsbackendsftp.c:6262 daemon/gvfsbackendsftp.c:6288
+#: daemon/gvfsbackendsftp.c:6296 daemon/gvfsbackendsftp.c:6783
+#: daemon/gvfsbackendsftp.c:6845 daemon/gvfsbackendsftp.c:6853
+#: daemon/gvfsbackendsmb.c:1713 daemon/gvfsbackendsmb.c:2193
+#: daemon/gvfsbackendtrash.c:937 daemon/gvfsbackendtrash.c:963
+#: daemon/gvfsbackendwsdd.c:363 daemon/gvfsftptask.c:430
 #: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121
 #: daemon/gvfsjobcopy.c:121 daemon/gvfsjobcreatemonitor.c:143
 #: daemon/gvfsjobcreatemonitor.c:154 daemon/gvfsjobcreatemonitor.c:177
@@ -626,7 +633,7 @@ msgstr "Підтримки дії не передбачено"
 #: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639
 #: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2354
 #: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:303
-#: daemon/gvfsbackendsmb.c:595
+#: daemon/gvfsbackendonedrive.c:1148 daemon/gvfsbackendsmb.c:595
 msgid "Invalid mount spec"
 msgstr "Неправильна специфікація монтування"
 
@@ -782,15 +789,17 @@ msgstr ""
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
 #: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2377
-#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendrecent.c:126
-#: daemon/gvfsbackendsmb.c:685 daemon/gvfsbackendtrash.c:333
+#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendonedrive.c:1394
+#: daemon/gvfsbackendrecent.c:126 daemon/gvfsbackendsmb.c:685
+#: daemon/gvfsbackendtrash.c:333
 msgid "Can’t open directory"
 msgstr "Не вдалося відкрити каталог"
 
 #: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528
 #: daemon/gvfsbackendafp.c:1270 daemon/gvfsbackendafp.c:1359
 #: daemon/gvfsbackenddav.c:3660 daemon/gvfsbackendftp.c:1461
-#: daemon/gvfsbackendsftp.c:3725 daemon/gvfsbackendsftp.c:4012
+#: daemon/gvfsbackendonedrive.c:1777 daemon/gvfsbackendsftp.c:3725
+#: daemon/gvfsbackendsftp.c:4012
 msgid "Backups not supported"
 msgstr "Резервні копії не підтримуються"
 
@@ -900,8 +909,9 @@ msgstr "/ у %s"
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
 #: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:1204
 #: daemon/gvfsbackendgoogle.c:2410 daemon/gvfsbackendgoogle.c:2637
-#: daemon/gvfsbackendnetwork.c:932 daemon/gvfsbackendsftp.c:4505
-#: daemon/gvfsftpdircache.c:157
+#: daemon/gvfsbackendnetwork.c:944 daemon/gvfsbackendonedrive.c:666
+#: daemon/gvfsbackendonedrive.c:845 daemon/gvfsbackendonedrive.c:981
+#: daemon/gvfsbackendsftp.c:4505 daemon/gvfsftpdircache.c:157
 #, c-format
 msgid "The file is not a directory"
 msgstr "Цей файл не є каталогом"
@@ -922,10 +932,11 @@ msgstr "Не вдається створити тимчасовий катало
 #: daemon/gvfsbackendburn.c:973 daemon/gvfsbackendburn.c:1009
 #: daemon/gvfsbackendftp.c:852 daemon/gvfsbackendgoogle.c:1097
 #: daemon/gvfsbackendgphoto2.c:938 daemon/gvfsbackendgphoto2.c:1869
-#: daemon/gvfsbackendgphoto2.c:2588 daemon/gvfsbackendrecent.c:110
-#: daemon/gvfsbackendrecent.c:293 daemon/gvfsbackendsftp.c:2217
-#: daemon/gvfsbackendsftp.c:3380 daemon/gvfsbackendsftp.c:3393
-#: daemon/gvfsbackendsftp.c:3413 daemon/gvfsbackendtrash.c:317
+#: daemon/gvfsbackendgphoto2.c:2588 daemon/gvfsbackendonedrive.c:583
+#: daemon/gvfsbackendrecent.c:110 daemon/gvfsbackendrecent.c:293
+#: daemon/gvfsbackendsftp.c:2217 daemon/gvfsbackendsftp.c:3380
+#: daemon/gvfsbackendsftp.c:3393 daemon/gvfsbackendsftp.c:3413
+#: daemon/gvfsbackendtrash.c:317
 #, c-format
 msgid "No such file or directory"
 msgstr "Немає такого файлу чи каталогу"
@@ -1166,11 +1177,11 @@ msgstr "Помилка при створенні резервної копії �
 msgid "Can’t move over directory"
 msgstr "Неможливо пересунути поверх каталогу"
 
-#: daemon/gvfsbackenddnssd.c:521 daemon/gvfsbackendnetwork.c:538
+#: daemon/gvfsbackenddnssd.c:521 daemon/gvfsbackendnetwork.c:545
 msgid "Local Network"
 msgstr "Локальна мережа"
 
-#: daemon/gvfsbackenddnssd.c:776 daemon/gvfsbackendnetwork.c:1047
+#: daemon/gvfsbackenddnssd.c:776 daemon/gvfsbackendnetwork.c:1060
 msgid "Can’t monitor file or directory."
 msgstr "Не вдалося виконати стеження за станом файлу чи каталогу."
 
@@ -1179,8 +1190,8 @@ msgstr "Не вдалося виконати стеження за станом 
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: daemon/gvfsbackenddnssd.c:795 daemon/gvfsbackendnetwork.c:978
-#: daemon/gvfsbackendnetwork.c:1137 daemon/gvfsbackendnetwork.c:1138
+#: daemon/gvfsbackenddnssd.c:795 daemon/gvfsbackendnetwork.c:990
+#: daemon/gvfsbackendnetwork.c:1150 daemon/gvfsbackendnetwork.c:1151
 msgid "Network"
 msgstr "Мережа"
 
@@ -1203,7 +1214,7 @@ msgid "Error moving file/folder"
 msgstr "Помилка при переміщенні файла або теки"
 
 #. Translators: This is the "Shared with me" folder on https://drive.google.com.
-#: daemon/gvfsbackendgoogle.c:2971
+#: daemon/gvfsbackendgoogle.c:2971 daemon/gvfsbackendonedrive.c:1188
 msgid "Shared with me"
 msgstr "Оприлюднено для вас"
 
@@ -1213,7 +1224,7 @@ msgid "Shared drives"
 msgstr "Спільні диски"
 
 #: daemon/gvfsbackendgoogle.c:3021 daemon/gvfsbackendgoogle.c:3599
-#: daemon/gvfsbackendgphoto2.c:1589
+#: daemon/gvfsbackendgphoto2.c:1589 daemon/gvfsbackendonedrive.c:1222
 msgid "Error getting data from file"
 msgstr "Помилка при отриманні даних від файлу"
 
@@ -1257,6 +1268,7 @@ msgid "File is not a regular file"
 msgstr "Файл є не звичайним файлом"
 
 #: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendnfs.c:1159
+#: daemon/gvfsbackendonedrive.c:1808
 msgid "Target file is a directory"
 msgstr "Файлом призначення є каталог"
 
@@ -1494,7 +1506,8 @@ msgid "Device not found"
 msgstr "Пристрій не знайдено"
 
 #: daemon/gvfsbackendmtp.c:1408 daemon/gvfsbackendmtp.c:1557
-#: daemon/gvfsbackendmtp.c:1609
+#: daemon/gvfsbackendmtp.c:1609 daemon/gvfsbackendwsdd.c:262
+#: daemon/gvfsbackendwsdd.c:320
 msgid "File not found"
 msgstr "Файл не знайдено"
 
@@ -1528,26 +1541,25 @@ msgstr "Не вдалося виконати запис до цього місц
 msgid "No thumbnail for entity “%s”"
 msgstr "Немає мініатюри для запису «%s»"
 
-#: daemon/gvfsbackendnetwork.c:235
+#: daemon/gvfsbackendnetwork.c:240
 msgid "File Sharing"
 msgstr "Оприлюднення файлів"
 
-#: daemon/gvfsbackendnetwork.c:240
+#: daemon/gvfsbackendnetwork.c:245
 msgid "Remote Login"
 msgstr "Віддалений вхід"
 
-#: daemon/gvfsbackendnetwork.c:493 daemon/gvfsbackendsmbbrowse.c:738
+#: daemon/gvfsbackendnetwork.c:499 daemon/gvfsbackendsmbbrowse.c:738
 msgid "Windows Network"
 msgstr "Мережа Windows"
 
-#: daemon/gvfsbackendnetwork.c:616
-#| msgid "Network"
+#: daemon/gvfsbackendnetwork.c:625
 msgid "WSDD Network"
 msgstr "Мережа WSDD"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: daemon/gvfsbackendnetwork.c:1232
+#: daemon/gvfsbackendnetwork.c:1245
 msgid "Network Location Monitor"
 msgstr "Огляд мережі"
 
@@ -1572,6 +1584,10 @@ msgstr "Не вдається створити тимчасовий файл"
 #: daemon/gvfsbackendnfs.c:2387
 msgid "Invalid attribute type"
 msgstr "Некоректний тип атрибута"
+
+#: daemon/gvfsbackendonedrive.c:1180
+msgid "My Files"
+msgstr "Мої файли"
 
 #: daemon/gvfsbackendrecent.c:270
 msgid "The recent folder may not be deleted"
@@ -1853,6 +1869,16 @@ msgstr "Елементи у смітнику не можуть змінюват�
 msgid "Trash"
 msgstr "Смітник"
 
+#: daemon/gvfsbackendwsdd.c:327
+#| msgid "The file is not a directory"
+msgid "File is not a directory"
+msgstr "Цей файл не є каталогом"
+
+#: daemon/gvfsbackendwsdd.c:379
+#| msgid "WSDD Network"
+msgid "WS-Discovery Network"
+msgstr "Мережа WS-Discovery"
+
 #: daemon/gvfschannel.c:336
 msgid "Channel blocked"
 msgstr "Канал заблоковано"
@@ -2011,6 +2037,27 @@ msgstr ""
 "Демонтування %s\n"
 "Заждіть"
 
+#: daemon/gvfswsddservice.c:236 daemon/gvfswsddservice.c:379
+#: daemon/gvfswsddservice.c:436
+#, c-format
+msgid "Communication with the underlying wsdd daemon failed."
+msgstr "Не вдалося здійснити обмін даними з базовою фоновою службою wsdd."
+
+#: daemon/gvfswsddservice.c:512
+#, c-format
+msgid "The underlying wsdd daemon exited unexpectedly."
+msgstr "Базова фонова служба wsdd неочікувано завершила роботу."
+
+#: daemon/gvfswsddservice.c:597
+#, c-format
+msgid "Failed to spawn the underlying wsdd daemon."
+msgstr "Не вдалося запустити базову фонову службу wsdd."
+
+#: daemon/gvfswsddservice.c:628
+#, c-format
+msgid "Failed to establish connection with the underlying wsdd daemon."
+msgstr "Не вдалося встановити з'єднання з базовою фоновою службою wsdd."
+
 #: daemon/main.c:148 metadata/meta-daemon.c:459
 msgid "Replace old daemon."
 msgstr "Замінити старий демон."
@@ -2067,6 +2114,71 @@ msgstr "Адреса вже підключена"
 #: daemon/mount.c:1024
 msgid "Location is not mountable"
 msgstr "Адреса не є монтованою"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:5
+msgid "How to display local DNS-SD services"
+msgstr "Спосіб показу локальних служб DNS-SD"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:6
+msgid ""
+"How DNS-SD services are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the Local Network folder) and "
+"\"disabled\"."
+msgstr ""
+"Спосіб показу служб DNS-SD за адресою «network:///». Можливі значення:"
+" «merged», «separate» (тека «Локальна мережа») та «disabled»."
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:10
+msgid "Extra domains to look for DNS-SD services in"
+msgstr "Додаткові домени для пошуку служб DNS-SD"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:11
+msgid ""
+"Comma separated list of DNS-SD domains that should be visible in the "
+"\"network:///\" location."
+msgstr ""
+"Список відокремлених комами доменів DNS-SD, які має бути показано за адресою"
+" «network:///»."
+
+#: daemon/org.gnome.system.smb.gschema.xml:5
+msgid "How to display SMB devices"
+msgstr "Спосіб показу пристроїв SMB"
+
+#: daemon/org.gnome.system.smb.gschema.xml:6
+msgid ""
+"How SMB devices are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the Windows Network folder) and "
+"\"disabled\"."
+msgstr ""
+"Спосіб показу пристроїв SMB за адресою «network:///». Можливі значення:"
+" «merged», «separate» (тека «Мережа Windows») та «disabled»."
+
+#: daemon/org.gnome.system.smb.gschema.xml:10
+msgid "SMB workgroup"
+msgstr "Робоча група SMB"
+
+#: daemon/org.gnome.system.smb.gschema.xml:11
+msgid ""
+"The Windows networking workgroup or domain that the user is part of. In "
+"order for a new workgroup to fully take effect the user may need to log out "
+"and log back in."
+msgstr ""
+"Робоча група або домен мережі Windows, частиною якого є користувач. Для"
+" набуття чинності новою робочою групою користувачеві, можливо, слід вийти із"
+" системи і увійти до неї знову."
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:5
+msgid "How to display WSDD devices"
+msgstr "Спосіб показу пристроїв WSDD"
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:6
+msgid ""
+"How WSDD devices are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the WSDD Network folder) and "
+"\"disabled\"."
+msgstr ""
+"Спосіб показу пристроїв WSDD за адресою «network:///». Можливі значення:"
+" «merged», «separate» (тека «Мережа WSDD») та «disabled»."
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:13
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:25
@@ -2181,7 +2293,7 @@ msgstr "Одна або більше програм заважають відк�
 msgid "Eject Anyway"
 msgstr "Однаково витягнути"
 
-#: monitor/udisks2/gvfsudisks2mount.c:1147
+#: monitor/udisks2/gvfsudisks2mount.c:1148
 #: monitor/udisks2/gvfsudisks2volume.c:1769
 msgid "Operation not supported by backend"
 msgstr "Дія не підтримується драйвером"
