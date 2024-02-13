@@ -460,27 +460,32 @@ trash_root_get_n_items (TrashRoot *root)
   return size;
 }
 
+static GFile *
+get_random_directory (GFile *parent)
+{
+  guint32 unique = g_random_int ();
+  char buffer[16];
+
+  g_file_make_directory_with_parents (parent, NULL, NULL);
+
+  g_snprintf (buffer, 16, "%u", unique);
+  return g_file_get_child (parent, buffer);
+}
+
 gboolean
 trash_item_delete (TrashItem  *item,
                    GError    **error)
 {
   gboolean success;
   GFile *expunged;
-  guint unique;
   guint i;
 
   expunged = g_file_resolve_relative_path (item->file,
                                            "../../expunged");
-  g_file_make_directory_with_parents (expunged, NULL, NULL);
-  unique = g_random_int ();
 
   for (success = FALSE, i = 0; !success && i < 1000; i++)
     {
-      GFile *temp_name;
-      char buffer[16];
-
-      g_sprintf (buffer, "%u", unique + i);
-      temp_name = g_file_get_child (expunged, buffer);
+      g_autoptr (GFile) temp_name = get_random_directory (expunged);
 
       /* "restore" the item into the expunged folder */
       if (trash_item_restore (item, temp_name,
@@ -490,8 +495,6 @@ trash_item_delete (TrashItem  *item,
           trash_expunge (expunged);
           success = TRUE;
         }
-
-      g_object_unref (temp_name);
     }
 
   g_object_unref (expunged);
