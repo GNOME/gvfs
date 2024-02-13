@@ -486,8 +486,16 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
   g_debug ("before job: %d\n", G_OBJECT(job)->ref_count);
 
   if (is_root (filename))
-    g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                         _("The trash folder may not be deleted"));
+    {
+      trash_backend_worker_thread_queue_and_wait (backend, rescan_func);
+      if (trash_root_empty_trash (backend->root, &error))
+        {
+          trash_backend_schedule_thaw (backend);
+          g_vfs_job_succeeded (G_VFS_JOB (job));
+
+          return;
+        }
+    }
   else
     {
       gboolean is_toplevel;

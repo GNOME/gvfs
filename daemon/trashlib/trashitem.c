@@ -472,6 +472,74 @@ get_random_directory (GFile *parent)
   return g_file_get_child (parent, buffer);
 }
 
+static gboolean
+move_dir_to_expunged (GFile      *topdir,
+                      const char *child_name)
+{
+  g_autoptr (GFile) source_dir = NULL;
+  g_autoptr (GFile) dest_dir = NULL;
+  g_autoptr (GFile) expunged = NULL;
+  gboolean result;
+  GFileCopyFlags flags = G_FILE_COPY_OVERWRITE | G_FILE_COPY_NOFOLLOW_SYMLINKS | G_FILE_COPY_NO_FALLBACK_FOR_MOVE;
+
+  source_dir = g_file_get_child (topdir, child_name);
+  expunged = g_file_get_child (topdir, "expunged");
+  dest_dir = get_random_directory (expunged);
+
+  result = g_file_move (source_dir, dest_dir, flags, NULL, NULL, NULL, NULL);
+
+  if (result)
+    trash_expunge (expunged);
+
+  return result;
+}
+
+gboolean
+trash_root_empty_trash (TrashRoot  *root,
+                        GError    **error)
+{
+  gpointer value;
+  g_autoptr (GHashTable) trashes = NULL;
+  GHashTableIter iter;
+  gboolean result = TRUE;
+
+  trashes = g_hash_table_new_full (g_file_hash, (GEqualFunc) g_file_equal, g_object_unref, NULL);
+
+  g_rw_lock_writer_lock (&root->lock);
+
+  if (g_hash_table_size (root->item_table) == 0)
+    {
+      g_rw_lock_writer_unlock (&root->lock);
+      return TRUE;
+    }
+
+  g_hash_table_iter_init (&iter, root->item_table);
+  while (g_hash_table_iter_next (&iter, NULL, &value) && result)
+    {
+      TrashItem *item = value;
+      g_autoptr (GFile) topdir = g_file_resolve_relative_path (item->file, "../../");
+
+      if (g_hash_table_lookup (trashes, topdir))
+        continue;
+
+      result = move_dir_to_expunged (topdir, "files");
+      if (result)
+        result = move_dir_to_expunged (topdir, "info");
+
+      g_hash_table_insert (trashes, g_steal_pointer (&topdir), item);
+    }
+
+  if (result)
+    g_hash_table_remove_all (root->item_table);
+
+  g_rw_lock_writer_unlock (&root->lock);
+
+  if (!result)
+    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, "Failed to empty trash");
+
+  return result;
+}
+
 gboolean
 trash_item_delete (TrashItem  *item,
                    GError    **error)

@@ -57,5 +57,7 @@ gboolean        trash_item_restore           (TrashItem          *item,
                                               GFile              *dest,
 					      GFileCopyFlags      flags,
                                               GError            **error);
+gboolean        trash_root_empty_trash       (TrashRoot          *root,
+                                              GError            **error);
 
 #endif /* _trashitem_h_ */
