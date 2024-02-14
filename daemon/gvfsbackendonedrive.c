@@ -491,7 +491,7 @@ rebuild_shared_with_me_dir (GVfsBackendOnedrive  *self,
 
   timestamp = g_new (gint64, 1);
   *timestamp = g_get_real_time ();
-  g_hash_table_insert (self->dir_timestamps, SHARED_WITH_ME_ID, timestamp);
+  g_hash_table_insert (self->dir_timestamps, g_strdup (SHARED_WITH_ME_ID), timestamp);
 
   for (GList *l = items; l != NULL; l = l->next)
     {
