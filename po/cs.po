@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
-"POT-Creation-Date: 2024-01-22 16:50+0000\n"
-"PO-Revision-Date: 2024-02-07 16:26+0100\n"
+"POT-Creation-Date: 2024-02-09 12:29+0000\n"
+"PO-Revision-Date: 2024-02-14 01:14+0100\n"
 "Last-Translator: Daniel Rusek <mail@asciiwolf.com>\n"
 "Language-Team: čeština <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -392,7 +392,7 @@ msgstr "Nelze načíst %s na %s"
 #: daemon/gvfsbackendmtp.c:1818 daemon/gvfsbackendmtp.c:2225
 #: daemon/gvfsbackendmtp.c:2288 daemon/gvfsbackendmtp.c:2355
 #: daemon/gvfsbackendmtp.c:2717 daemon/gvfsbackendmtp.c:2996
-#: daemon/gvfsbackendmtp.c:3139 daemon/gvfsbackendnetwork.c:883
+#: daemon/gvfsbackendmtp.c:3139 daemon/gvfsbackendnetwork.c:893
 #: daemon/gvfsbackendsmbbrowse.c:953 daemon/gvfsbackendsmbbrowse.c:1020
 #: daemon/gvfsbackendsmbbrowse.c:1202 daemon/gvfsbackendsmbbrowse.c:1275
 #, c-format
@@ -420,7 +420,8 @@ msgstr "Cílový soubor je otevřen"
 
 #: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
 #: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3306
-#: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendsftp.c:2209
+#: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendonedrive.c:918
+#: daemon/gvfsbackendsftp.c:2209
 msgid "Directory not empty"
 msgstr "Složka není prázdná"
 
@@ -459,6 +460,7 @@ msgstr "Na svazku není dostatek místa"
 #: daemon/gvfsbackendgoogle.c:2757 daemon/gvfsbackendgoogle.c:3204
 #: daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1698
 #: daemon/gvfsbackendmtp.c:1741 daemon/gvfsbackendnfs.c:2497
+#: daemon/gvfsbackendonedrive.c:1071 daemon/gvfsbackendonedrive.c:1637
 #: daemon/gvfsbackendsftp.c:5032 daemon/gvfsbackendsmb.c:2121
 msgid "Target file already exists"
 msgstr "Cílový soubor už existuje"
@@ -587,41 +589,45 @@ msgstr "Soubor není otevřen pro přístup ke čtení"
 #: daemon/gvfsbackendmtp.c:2706 daemon/gvfsbackendmtp.c:2774
 #: daemon/gvfsbackendmtp.c:2969 daemon/gvfsbackendmtp.c:3112
 #: daemon/gvfsbackendnfs.c:2379 daemon/gvfsbackendnfs.c:2429
-#: daemon/gvfsbackendnfs.c:2555 daemon/gvfsbackendsftp.c:2213
-#: daemon/gvfsbackendsftp.c:5420 daemon/gvfsbackendsftp.c:5518
-#: daemon/gvfsbackendsftp.c:6230 daemon/gvfsbackendsftp.c:6262
-#: daemon/gvfsbackendsftp.c:6288 daemon/gvfsbackendsftp.c:6296
-#: daemon/gvfsbackendsftp.c:6783 daemon/gvfsbackendsftp.c:6845
-#: daemon/gvfsbackendsftp.c:6853 daemon/gvfsbackendsmb.c:1713
-#: daemon/gvfsbackendsmb.c:2193 daemon/gvfsbackendtrash.c:937
-#: daemon/gvfsbackendtrash.c:963 daemon/gvfsbackendwsdd.c:363
-#: daemon/gvfsftptask.c:430 daemon/gvfsjobcloseread.c:113
-#: daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
-#: daemon/gvfsjobcreatemonitor.c:143 daemon/gvfsjobcreatemonitor.c:154
-#: daemon/gvfsjobcreatemonitor.c:177 daemon/gvfsjobcreatemonitor.c:195
-#: daemon/gvfsjobdelete.c:108 daemon/gvfsjobenumerate.c:272
-#: daemon/gvfsjobmakedirectory.c:108 daemon/gvfsjobmount.c:112
-#: daemon/gvfsjobmountmountable.c:138 daemon/gvfsjobmove.c:121
-#: daemon/gvfsjobopenforread.c:120 daemon/gvfsjobopenforwrite.c:184
-#: daemon/gvfsjobopenforwrite.c:198 daemon/gvfsjobopenforwrite.c:212
-#: daemon/gvfsjobopeniconforread.c:104 daemon/gvfsjobpollmountable.c:107
-#: daemon/gvfsjobpull.c:125 daemon/gvfsjobpush.c:125
-#: daemon/gvfsjobqueryattributes.c:145 daemon/gvfsjobqueryfsinfo.c:116
-#: daemon/gvfsjobqueryinfo.c:124 daemon/gvfsjobqueryinforead.c:125
-#: daemon/gvfsjobqueryinfowrite.c:125 daemon/gvfsjobread.c:123
-#: daemon/gvfsjobseekread.c:121 daemon/gvfsjobseekwrite.c:121
-#: daemon/gvfsjobsetattribute.c:130 daemon/gvfsjobsetdisplayname.c:111
-#: daemon/gvfsjobstartmountable.c:113 daemon/gvfsjobstopmountable.c:115
-#: daemon/gvfsjobtrash.c:107 daemon/gvfsjobtruncate.c:113
-#: daemon/gvfsjobunmountmountable.c:157 daemon/gvfsjobunmountmountable.c:172
-#: daemon/gvfsjobwrite.c:123
+#: daemon/gvfsbackendnfs.c:2555 daemon/gvfsbackendonedrive.c:829
+#: daemon/gvfsbackendonedrive.c:928 daemon/gvfsbackendonedrive.c:1050
+#: daemon/gvfsbackendonedrive.c:1552 daemon/gvfsbackendonedrive.c:1604
+#: daemon/gvfsbackendonedrive.c:1620 daemon/gvfsbackendonedrive.c:1632
+#: daemon/gvfsbackendonedrive.c:1783 daemon/gvfsbackendonedrive.c:1799
+#: daemon/gvfsbackendsftp.c:2213 daemon/gvfsbackendsftp.c:5420
+#: daemon/gvfsbackendsftp.c:5518 daemon/gvfsbackendsftp.c:6230
+#: daemon/gvfsbackendsftp.c:6262 daemon/gvfsbackendsftp.c:6288
+#: daemon/gvfsbackendsftp.c:6296 daemon/gvfsbackendsftp.c:6783
+#: daemon/gvfsbackendsftp.c:6845 daemon/gvfsbackendsftp.c:6853
+#: daemon/gvfsbackendsmb.c:1713 daemon/gvfsbackendsmb.c:2193
+#: daemon/gvfsbackendtrash.c:937 daemon/gvfsbackendtrash.c:963
+#: daemon/gvfsbackendwsdd.c:363 daemon/gvfsftptask.c:430
+#: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121
+#: daemon/gvfsjobcopy.c:121 daemon/gvfsjobcreatemonitor.c:143
+#: daemon/gvfsjobcreatemonitor.c:154 daemon/gvfsjobcreatemonitor.c:177
+#: daemon/gvfsjobcreatemonitor.c:195 daemon/gvfsjobdelete.c:108
+#: daemon/gvfsjobenumerate.c:272 daemon/gvfsjobmakedirectory.c:108
+#: daemon/gvfsjobmount.c:112 daemon/gvfsjobmountmountable.c:138
+#: daemon/gvfsjobmove.c:121 daemon/gvfsjobopenforread.c:120
+#: daemon/gvfsjobopenforwrite.c:184 daemon/gvfsjobopenforwrite.c:198
+#: daemon/gvfsjobopenforwrite.c:212 daemon/gvfsjobopeniconforread.c:104
+#: daemon/gvfsjobpollmountable.c:107 daemon/gvfsjobpull.c:125
+#: daemon/gvfsjobpush.c:125 daemon/gvfsjobqueryattributes.c:145
+#: daemon/gvfsjobqueryfsinfo.c:116 daemon/gvfsjobqueryinfo.c:124
+#: daemon/gvfsjobqueryinforead.c:125 daemon/gvfsjobqueryinfowrite.c:125
+#: daemon/gvfsjobread.c:123 daemon/gvfsjobseekread.c:121
+#: daemon/gvfsjobseekwrite.c:121 daemon/gvfsjobsetattribute.c:130
+#: daemon/gvfsjobsetdisplayname.c:111 daemon/gvfsjobstartmountable.c:113
+#: daemon/gvfsjobstopmountable.c:115 daemon/gvfsjobtrash.c:107
+#: daemon/gvfsjobtruncate.c:113 daemon/gvfsjobunmountmountable.c:157
+#: daemon/gvfsjobunmountmountable.c:172 daemon/gvfsjobwrite.c:123
 msgid "Operation not supported"
 msgstr "Operace není podporována"
 
 #: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639
 #: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2354
 #: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:303
-#: daemon/gvfsbackendsmb.c:595
+#: daemon/gvfsbackendonedrive.c:1148 daemon/gvfsbackendsmb.c:595
 msgid "Invalid mount spec"
 msgstr "Neplatné určení připojení"
 
@@ -775,15 +781,17 @@ msgstr ""
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
 #: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2377
-#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendrecent.c:126
-#: daemon/gvfsbackendsmb.c:685 daemon/gvfsbackendtrash.c:333
+#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendonedrive.c:1394
+#: daemon/gvfsbackendrecent.c:126 daemon/gvfsbackendsmb.c:685
+#: daemon/gvfsbackendtrash.c:333
 msgid "Can’t open directory"
 msgstr "Nelze otevřít složku"
 
 #: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528
 #: daemon/gvfsbackendafp.c:1270 daemon/gvfsbackendafp.c:1359
 #: daemon/gvfsbackenddav.c:3660 daemon/gvfsbackendftp.c:1461
-#: daemon/gvfsbackendsftp.c:3725 daemon/gvfsbackendsftp.c:4012
+#: daemon/gvfsbackendonedrive.c:1777 daemon/gvfsbackendsftp.c:3725
+#: daemon/gvfsbackendsftp.c:4012
 msgid "Backups not supported"
 msgstr "Zálohy nejsou podporovány"
 
@@ -893,8 +901,9 @@ msgstr "/ v %s"
 #: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
 #: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:1204
 #: daemon/gvfsbackendgoogle.c:2410 daemon/gvfsbackendgoogle.c:2637
-#: daemon/gvfsbackendnetwork.c:932 daemon/gvfsbackendsftp.c:4505
-#: daemon/gvfsftpdircache.c:157
+#: daemon/gvfsbackendnetwork.c:944 daemon/gvfsbackendonedrive.c:666
+#: daemon/gvfsbackendonedrive.c:845 daemon/gvfsbackendonedrive.c:981
+#: daemon/gvfsbackendsftp.c:4505 daemon/gvfsftpdircache.c:157
 #, c-format
 msgid "The file is not a directory"
 msgstr "Soubor není složkou"
@@ -915,10 +924,11 @@ msgstr "Nezdařilo se vytvoření dočasné složky"
 #: daemon/gvfsbackendburn.c:973 daemon/gvfsbackendburn.c:1009
 #: daemon/gvfsbackendftp.c:852 daemon/gvfsbackendgoogle.c:1097
 #: daemon/gvfsbackendgphoto2.c:938 daemon/gvfsbackendgphoto2.c:1869
-#: daemon/gvfsbackendgphoto2.c:2588 daemon/gvfsbackendrecent.c:110
-#: daemon/gvfsbackendrecent.c:293 daemon/gvfsbackendsftp.c:2217
-#: daemon/gvfsbackendsftp.c:3380 daemon/gvfsbackendsftp.c:3393
-#: daemon/gvfsbackendsftp.c:3413 daemon/gvfsbackendtrash.c:317
+#: daemon/gvfsbackendgphoto2.c:2588 daemon/gvfsbackendonedrive.c:583
+#: daemon/gvfsbackendrecent.c:110 daemon/gvfsbackendrecent.c:293
+#: daemon/gvfsbackendsftp.c:2217 daemon/gvfsbackendsftp.c:3380
+#: daemon/gvfsbackendsftp.c:3393 daemon/gvfsbackendsftp.c:3413
+#: daemon/gvfsbackendtrash.c:317
 #, c-format
 msgid "No such file or directory"
 msgstr "Neexistuje žádný takový soubor nebo složka"
@@ -1159,11 +1169,11 @@ msgstr "Selhala tvorba záložního souboru"
 msgid "Can’t move over directory"
 msgstr "Nelze přesunout nad složku"
 
-#: daemon/gvfsbackenddnssd.c:521 daemon/gvfsbackendnetwork.c:538
+#: daemon/gvfsbackenddnssd.c:521 daemon/gvfsbackendnetwork.c:545
 msgid "Local Network"
 msgstr "Místní síť"
 
-#: daemon/gvfsbackenddnssd.c:776 daemon/gvfsbackendnetwork.c:1047
+#: daemon/gvfsbackenddnssd.c:776 daemon/gvfsbackendnetwork.c:1060
 msgid "Can’t monitor file or directory."
 msgstr "Nelze sledovat soubor nebo složku."
 
@@ -1172,8 +1182,8 @@ msgstr "Nelze sledovat soubor nebo složku."
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: daemon/gvfsbackenddnssd.c:795 daemon/gvfsbackendnetwork.c:978
-#: daemon/gvfsbackendnetwork.c:1137 daemon/gvfsbackendnetwork.c:1138
+#: daemon/gvfsbackenddnssd.c:795 daemon/gvfsbackendnetwork.c:990
+#: daemon/gvfsbackendnetwork.c:1150 daemon/gvfsbackendnetwork.c:1151
 msgid "Network"
 msgstr "Síť"
 
@@ -1196,7 +1206,7 @@ msgid "Error moving file/folder"
 msgstr "Chyba při přesouvání souboru/složky"
 
 #. Translators: This is the "Shared with me" folder on https://drive.google.com.
-#: daemon/gvfsbackendgoogle.c:2971
+#: daemon/gvfsbackendgoogle.c:2971 daemon/gvfsbackendonedrive.c:1188
 msgid "Shared with me"
 msgstr "Sdílet se mnou"
 
@@ -1206,7 +1216,7 @@ msgid "Shared drives"
 msgstr "Sdílené disky"
 
 #: daemon/gvfsbackendgoogle.c:3021 daemon/gvfsbackendgoogle.c:3599
-#: daemon/gvfsbackendgphoto2.c:1589
+#: daemon/gvfsbackendgphoto2.c:1589 daemon/gvfsbackendonedrive.c:1222
 msgid "Error getting data from file"
 msgstr "Chyba při získávání dat ze souboru"
 
@@ -1250,6 +1260,7 @@ msgid "File is not a regular file"
 msgstr "Soubor není běžným souborem"
 
 #: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendnfs.c:1159
+#: daemon/gvfsbackendonedrive.c:1808
 msgid "Target file is a directory"
 msgstr "Cílový soubor je složkou"
 
@@ -1521,25 +1532,25 @@ msgstr "Do tohoto místa nelze zapisovat"
 msgid "No thumbnail for entity “%s”"
 msgstr "K entitě „%s“ neexistuje žádný náhled"
 
-#: daemon/gvfsbackendnetwork.c:235
+#: daemon/gvfsbackendnetwork.c:240
 msgid "File Sharing"
 msgstr "Sdílení souborů"
 
-#: daemon/gvfsbackendnetwork.c:240
+#: daemon/gvfsbackendnetwork.c:245
 msgid "Remote Login"
 msgstr "Vzdálené přihlášení"
 
-#: daemon/gvfsbackendnetwork.c:493 daemon/gvfsbackendsmbbrowse.c:738
+#: daemon/gvfsbackendnetwork.c:499 daemon/gvfsbackendsmbbrowse.c:738
 msgid "Windows Network"
 msgstr "Síť Windows"
 
-#: daemon/gvfsbackendnetwork.c:616
+#: daemon/gvfsbackendnetwork.c:625
 msgid "WSDD Network"
 msgstr "Síť WSDD"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: daemon/gvfsbackendnetwork.c:1232
+#: daemon/gvfsbackendnetwork.c:1245
 msgid "Network Location Monitor"
 msgstr "Sledování síťových umístění"
 
@@ -1564,6 +1575,10 @@ msgstr "Nelze vytvořit dočasný soubor"
 #: daemon/gvfsbackendnfs.c:2387
 msgid "Invalid attribute type"
 msgstr "Neplatný typ atributu"
+
+#: daemon/gvfsbackendonedrive.c:1180
+msgid "My Files"
+msgstr "Mé soubory"
 
 #: daemon/gvfsbackendrecent.c:270
 msgid "The recent folder may not be deleted"
