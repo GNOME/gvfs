@@ -1499,6 +1499,7 @@ close_read_cb (GObject      *source_object,
   GError *error = NULL;
   GInputStream *stream = G_INPUT_STREAM (source_object);
   GVfsJobCloseRead *job = G_VFS_JOB_CLOSE_READ (user_data);
+  ReadHandle *rh = job->handle;
 
   g_input_stream_close_finish (stream, res, &error);
   if (error != NULL)
@@ -1510,7 +1511,7 @@ close_read_cb (GObject      *source_object,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
 out:
-  g_object_unref (stream);
+  read_handle_free (rh);
   g_debug ("- close_read\n");
 }
 
@@ -1525,7 +1526,6 @@ g_vfs_backend_onedrive_try_close_read (GVfsBackend       *backend,
   g_debug ("+ close_read: %p\n", handle);
 
   g_input_stream_close_async (rh->stream, G_PRIORITY_DEFAULT, cancellable, close_read_cb, job);
-  read_handle_free (rh);
   return TRUE;
 }
 
