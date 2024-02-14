@@ -1469,7 +1469,8 @@ g_vfs_backend_onedrive_seek_on_read (GVfsBackend       *_self,
 {
   GCancellable *cancellable = G_VFS_JOB (job)->cancellable;
   GError *error = NULL;
-  GInputStream *stream = G_INPUT_STREAM (handle);
+  ReadHandle *rh = (ReadHandle *)handle;
+  GInputStream *stream = rh->stream;
   goffset cur_offset;
 
   g_debug ("+ seek_on_read: %p\n", handle);
