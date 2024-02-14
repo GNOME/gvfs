@@ -424,9 +424,9 @@ remove_dir (GVfsBackendOnedrive *self,
 {
   GHashTableIter iter;
   MsgDriveItem *item;
-  g_autofree char *parent_id = NULL;
+  const char *parent_id = NULL;
 
-  parent_id = g_strdup (msg_drive_item_get_id (parent));
+  parent_id = msg_drive_item_get_id (parent);
 
   g_hash_table_remove (self->dir_timestamps, parent_id);
 
