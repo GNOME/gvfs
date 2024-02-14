@@ -692,6 +692,8 @@ build_file_info (GVfsBackendOnedrive    *self,
   GFileType file_type;
   const char *id;
   const char *name;
+  const char *user;
+  const char *etag;
   gboolean is_folder = FALSE;
   gboolean is_root = FALSE;
   gboolean is_home = (item == self->home);
@@ -778,10 +780,15 @@ build_file_info (GVfsBackendOnedrive    *self,
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED, msg_drive_item_get_created (item));
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, msg_drive_item_get_modified (item));
 
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_USER_REAL, msg_drive_item_get_user (item));
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_USER, msg_drive_item_get_user (item));
+  user = msg_drive_item_get_user (item);
+  if (user)  {
+    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_USER_REAL, user);
+    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_USER, user);
+  }
 
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE, msg_drive_item_get_etag (item));
+  etag = msg_drive_item_get_etag (item);
+  if (etag)
+    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE, etag);
 
   if (!is_folder)
     {
