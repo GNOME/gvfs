@@ -781,10 +781,8 @@ build_file_info (GVfsBackendOnedrive    *self,
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, msg_drive_item_get_modified (item));
 
   user = msg_drive_item_get_user (item);
-  if (user)  {
+  if (user)
     g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_USER_REAL, user);
-    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_USER, user);
-  }
 
   etag = msg_drive_item_get_etag (item);
   if (etag)
