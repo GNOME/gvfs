@@ -33,7 +33,7 @@
 
 #define SOCKET_NAME "wsdd"
 #define CONNECT_TIMEOUT 10
-#define LIST_COMMAND "list\n"
+#define LIST_COMMAND "list pub:Computer\n"
 #define PROBE_COMMAND "clear\nprobe\n"
 #define RELOAD_TIMEOUT 15
 #define PROBE_TIMEOUT 5
