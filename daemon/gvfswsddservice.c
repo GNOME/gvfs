@@ -526,7 +526,7 @@ initable_init (GInitable *initable,
   const gchar *debug;
 
   debug = g_getenv ("GVFS_WSDD_DEBUG");
-  service->extra_debug = gvfs_get_debug ();
+  service->extra_debug = (debug != NULL);
 
   service->socket = g_socket_new (G_SOCKET_FAMILY_UNIX,
                                   G_SOCKET_TYPE_STREAM,
