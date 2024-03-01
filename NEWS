@@ -1,3 +1,9 @@
+Major changes in 1.53.91
+========================
+* onedrive: Fix several issues (Jan-Michael Brummer)
+* wsdd: List just devices of pub:Computer type to filter out unwanted devices (Ondrej Holy)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.53.90
 ========================
 * daemon: Add OneDrive support based on msgraph library (Jan-Michael Brummer)
