@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
-"POT-Creation-Date: 2024-02-09 12:29+0000\n"
-"PO-Revision-Date: 2024-02-25 14:59+0200\n"
+"POT-Creation-Date: 2024-02-25 13:00+0000\n"
+"PO-Revision-Date: 2024-03-08 23:08+0200\n"
 "Last-Translator: Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>\n"
 "Language-Team: Latvian <lata-l10n@googlegroups.com>\n"
 "Language: lv\n"
@@ -410,7 +410,7 @@ msgstr "Datne neeksistē"
 #: daemon/gvfsbackendsftp.c:3951 daemon/gvfsbackendsftp.c:5023
 #: daemon/gvfsbackendsftp.c:6108
 msgid "File is directory"
-msgstr "Datne ir direktorija"
+msgstr "Datne ir direktorijs"
 
 #: daemon/gvfsafpvolume.c:406
 msgid "Too many files open"
@@ -422,10 +422,10 @@ msgstr "Mērķa datne ir atvērta"
 
 #: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
 #: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3306
-#: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendonedrive.c:918
+#: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendonedrive.c:923
 #: daemon/gvfsbackendsftp.c:2209
 msgid "Directory not empty"
-msgstr "Direktorija nav tukša"
+msgstr "Direktorijs nav tukšs"
 
 #: daemon/gvfsafpvolume.c:667
 msgid "Target object is marked as not deletable (DeleteInhibit)"
@@ -462,28 +462,28 @@ msgstr "Sējumā nepietiekami brīvas vietas"
 #: daemon/gvfsbackendgoogle.c:2757 daemon/gvfsbackendgoogle.c:3204
 #: daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1698
 #: daemon/gvfsbackendmtp.c:1741 daemon/gvfsbackendnfs.c:2497
-#: daemon/gvfsbackendonedrive.c:1071 daemon/gvfsbackendonedrive.c:1637
+#: daemon/gvfsbackendonedrive.c:1076 daemon/gvfsbackendonedrive.c:1643
 #: daemon/gvfsbackendsftp.c:5032 daemon/gvfsbackendsmb.c:2121
 msgid "Target file already exists"
 msgstr "Mērķa datne jau eksistē"
 
 #: daemon/gvfsafpvolume.c:815 daemon/gvfsafpvolume.c:994
 msgid "Ancestor directory doesn’t exist"
-msgstr "Vecāka direktorija neeksistē"
+msgstr "Vecāka direktorijs neeksistē"
 
 #. Translators: flat means volume doesn't support directories
 #. (all files are in the volume root)
 #: daemon/gvfsafpvolume.c:990
 msgid "Volume is flat and doesn’t support directories"
-msgstr "Sējums ir plakans un neatbalsta mapes"
+msgstr "Sējums ir plakans un neatbalsta direktorijus"
 
 #: daemon/gvfsafpvolume.c:998
 msgid "Target directory already exists"
-msgstr "Mērķa direktorija jau eksistē"
+msgstr "Mērķa direktorijs jau eksistē"
 
 #: daemon/gvfsafpvolume.c:1168 daemon/gvfsbackendafp.c:604
 msgid "Can’t rename volume"
-msgstr "Nevar pārsaukt sējumu"
+msgstr "Nevar pārdēvēt sējumu"
 
 #: daemon/gvfsafpvolume.c:1172
 msgid "Object with that name already exists"
@@ -491,11 +491,11 @@ msgstr "Objekts ar tādu nosaukumu jau eksistē"
 
 #: daemon/gvfsafpvolume.c:1176
 msgid "Target object is marked as not renameable (RenameInhibit)"
-msgstr "Mērķa objekts ir marķēts kā nepārsaucams (RenameInhibit)"
+msgstr "Mērķa objekts ir marķēts kā nepārdēvējams (RenameInhibit)"
 
 #: daemon/gvfsafpvolume.c:1343
 msgid "Can’t move directory into one of its descendants"
-msgstr "Nevar pārvietot direktoriju kādā no tās apakšdirektorijām"
+msgstr "Nevar pārvietot direktoriju kādā no tā apakšdirektorijiem"
 
 #: daemon/gvfsafpvolume.c:1347
 msgid "Can’t move sharepoint into a shared directory"
@@ -507,7 +507,7 @@ msgstr "Nevar pārvietot koplietotu direktoriju uz miskasti"
 
 #: daemon/gvfsafpvolume.c:1359
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
-msgstr "Pārvietojamais objekts ir marķēts kā nepārsaucams (RenameInhibit)"
+msgstr "Pārvietojamais objekts ir marķēts kā nepārdēvējams (RenameInhibit)"
 
 #: daemon/gvfsafpvolume.c:1363
 msgid "Object being moved doesn’t exist"
@@ -523,11 +523,11 @@ msgstr "Nevar atvērt avota datni lasīšanai"
 
 #: daemon/gvfsafpvolume.c:1511
 msgid "Source file and/or destination directory doesn’t exist"
-msgstr "Avota datne un/vai mērķa direktorija neeksistē"
+msgstr "Avota datne un/vai mērķa direktorijs neeksistē"
 
 #: daemon/gvfsafpvolume.c:1515
 msgid "Source file is a directory"
-msgstr "Avota datne ir direktorija"
+msgstr "Avota datne ir direktorijs"
 
 #. Translators: range conflict means
 #. requested data are locked by another user
@@ -540,11 +540,11 @@ msgstr "Ir apgabala slēdžu konflikti"
 #: daemon/gvfsbackendmtp.c:2125 daemon/gvfsbackendmtp.c:2642
 #: daemon/gvfsbackendmtp.c:3037 daemon/gvfsbackendmtp.c:3173
 msgid "Directory doesn’t exist"
-msgstr "Direktorija neeksistē"
+msgstr "Direktorijs neeksistē"
 
 #: daemon/gvfsafpvolume.c:2197
 msgid "Target object is not a directory"
-msgstr "Mērķa objekts nav direktorija"
+msgstr "Mērķa objekts nav direktorijs"
 
 #: daemon/gvfsafpvolume.c:2530
 msgid "File is not open for write access"
@@ -591,11 +591,11 @@ msgstr "Datne nav atvērta lasīšanas piekļuvei"
 #: daemon/gvfsbackendmtp.c:2706 daemon/gvfsbackendmtp.c:2774
 #: daemon/gvfsbackendmtp.c:2969 daemon/gvfsbackendmtp.c:3112
 #: daemon/gvfsbackendnfs.c:2379 daemon/gvfsbackendnfs.c:2429
-#: daemon/gvfsbackendnfs.c:2555 daemon/gvfsbackendonedrive.c:829
-#: daemon/gvfsbackendonedrive.c:928 daemon/gvfsbackendonedrive.c:1050
-#: daemon/gvfsbackendonedrive.c:1552 daemon/gvfsbackendonedrive.c:1604
-#: daemon/gvfsbackendonedrive.c:1620 daemon/gvfsbackendonedrive.c:1632
-#: daemon/gvfsbackendonedrive.c:1783 daemon/gvfsbackendonedrive.c:1799
+#: daemon/gvfsbackendnfs.c:2555 daemon/gvfsbackendonedrive.c:834
+#: daemon/gvfsbackendonedrive.c:933 daemon/gvfsbackendonedrive.c:1055
+#: daemon/gvfsbackendonedrive.c:1558 daemon/gvfsbackendonedrive.c:1610
+#: daemon/gvfsbackendonedrive.c:1626 daemon/gvfsbackendonedrive.c:1638
+#: daemon/gvfsbackendonedrive.c:1789 daemon/gvfsbackendonedrive.c:1805
 #: daemon/gvfsbackendsftp.c:2213 daemon/gvfsbackendsftp.c:5420
 #: daemon/gvfsbackendsftp.c:5518 daemon/gvfsbackendsftp.c:6230
 #: daemon/gvfsbackendsftp.c:6262 daemon/gvfsbackendsftp.c:6288
@@ -629,7 +629,7 @@ msgstr "Darbība nav atbalstīta"
 #: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639
 #: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2354
 #: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:303
-#: daemon/gvfsbackendonedrive.c:1148 daemon/gvfsbackendsmb.c:595
+#: daemon/gvfsbackendonedrive.c:1153 daemon/gvfsbackendsmb.c:595
 msgid "Invalid mount spec"
 msgstr "Nederīga montēšanas specifikācija"
 
@@ -783,7 +783,7 @@ msgstr ""
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
 #: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2377
-#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendonedrive.c:1394
+#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendonedrive.c:1399
 #: daemon/gvfsbackendrecent.c:126 daemon/gvfsbackendsmb.c:685
 #: daemon/gvfsbackendtrash.c:333
 msgid "Can’t open directory"
@@ -792,7 +792,7 @@ msgstr "Nevar atvērt direktoriju"
 #: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528
 #: daemon/gvfsbackendafp.c:1270 daemon/gvfsbackendafp.c:1359
 #: daemon/gvfsbackenddav.c:3660 daemon/gvfsbackendftp.c:1461
-#: daemon/gvfsbackendonedrive.c:1777 daemon/gvfsbackendsftp.c:3725
+#: daemon/gvfsbackendonedrive.c:1783 daemon/gvfsbackendsftp.c:3725
 #: daemon/gvfsbackendsftp.c:4012
 msgid "Backups not supported"
 msgstr "Rezerves kopijas nav atbalstītas"
@@ -850,7 +850,7 @@ msgstr "Apple Filing Protocol serviss"
 #: daemon/gvfsbackendgoogle.c:1752 daemon/gvfsbackendgoogle.c:2095
 #: daemon/gvfsbackendgoogle.c:3141
 msgid "Can’t copy directory over directory"
-msgstr "Nevar uzkopēt direktoriju pa virsu direktorijai"
+msgstr "Nevar uzkopēt direktoriju pa virsu direktorijam"
 
 #: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:893
 #: daemon/gvfsbackenddav.c:3783 daemon/gvfsbackendftp.c:1591
@@ -864,7 +864,7 @@ msgstr "Nevar rekursīvi kopēt direktoriju"
 #: daemon/gvfsbackendgoogle.c:2209 daemon/gvfsbackendnfs.c:2481
 #: daemon/gvfsbackendsftp.c:5018 daemon/gvfsbackendsmb.c:2110
 msgid "Can’t move directory over directory"
-msgstr "Nevar pārvietot direktoriju pa virsu direktorijai"
+msgstr "Nevar pārvietot direktoriju pa virsu direktorijam"
 
 #: daemon/gvfsbackendafp.c:1284
 #, c-format
@@ -904,11 +904,11 @@ msgstr "/ arhīvā %s"
 #: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:1204
 #: daemon/gvfsbackendgoogle.c:2410 daemon/gvfsbackendgoogle.c:2637
 #: daemon/gvfsbackendnetwork.c:944 daemon/gvfsbackendonedrive.c:666
-#: daemon/gvfsbackendonedrive.c:845 daemon/gvfsbackendonedrive.c:981
+#: daemon/gvfsbackendonedrive.c:850 daemon/gvfsbackendonedrive.c:986
 #: daemon/gvfsbackendsftp.c:4505 daemon/gvfsftpdircache.c:157
 #, c-format
 msgid "The file is not a directory"
-msgstr "Datne nav direktorija"
+msgstr "Datne nav direktorijs"
 
 #. Translators: This is the name of the backend
 #: daemon/gvfsbackendburn.c:346
@@ -933,13 +933,13 @@ msgstr "Neizdevās izveidot pagaidu direktoriju"
 #: daemon/gvfsbackendtrash.c:317
 #, c-format
 msgid "No such file or directory"
-msgstr "Nav tādas datnes vai direktorijas"
+msgstr "Nav tādas datnes vai direktorija"
 
 #: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:905
 #: daemon/gvfsbackendgoogle.c:1760 daemon/gvfsbackendgoogle.c:2103
 #: daemon/gvfsbackendgoogle.c:3149
 msgid "Can’t copy file over directory"
-msgstr "Nevar nokopēt datni pāri mapei"
+msgstr "Nevar kopēt datni virsū direktorijam"
 
 #. Translators: this is the display name of the backend
 #: daemon/gvfsbackendburn.c:652
@@ -1169,7 +1169,7 @@ msgstr "Neizdevās izveidot rezerves kopijas datni"
 
 #: daemon/gvfsbackenddav.c:3566
 msgid "Can’t move over directory"
-msgstr "Nevar pārvietot virsū mapei"
+msgstr "Nevar pārvietot virsū direktorijam"
 
 #: daemon/gvfsbackenddnssd.c:521 daemon/gvfsbackendnetwork.c:545
 msgid "Local Network"
@@ -1201,14 +1201,14 @@ msgstr "Nepietiekamas atļaujas"
 
 #: daemon/gvfsbackendgoogle.c:2217
 msgid "Can’t move file over directory"
-msgstr "Datni nevar pārvietot virsū mapei"
+msgstr "Nevar pārvietot datni virsū direktorijam"
 
 #: daemon/gvfsbackendgoogle.c:2259
 msgid "Error moving file/folder"
 msgstr "Kļūda, pārvietojot datni vai mapi"
 
 #. Translators: This is the "Shared with me" folder on https://drive.google.com.
-#: daemon/gvfsbackendgoogle.c:2971 daemon/gvfsbackendonedrive.c:1188
+#: daemon/gvfsbackendgoogle.c:2971 daemon/gvfsbackendonedrive.c:1193
 msgid "Shared with me"
 msgstr "Ar mani kopīgotie"
 
@@ -1218,7 +1218,7 @@ msgid "Shared drives"
 msgstr "Kopīgotie diski"
 
 #: daemon/gvfsbackendgoogle.c:3021 daemon/gvfsbackendgoogle.c:3599
-#: daemon/gvfsbackendgphoto2.c:1589 daemon/gvfsbackendonedrive.c:1222
+#: daemon/gvfsbackendgphoto2.c:1589 daemon/gvfsbackendonedrive.c:1227
 msgid "Error getting data from file"
 msgstr "Kļūda, saņemot datus no datnes"
 
@@ -1262,9 +1262,9 @@ msgid "File is not a regular file"
 msgstr "Datne nav parasta datne"
 
 #: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendnfs.c:1159
-#: daemon/gvfsbackendonedrive.c:1808
+#: daemon/gvfsbackendonedrive.c:1814
 msgid "Target file is a directory"
-msgstr "Mērķa datne is direktorija"
+msgstr "Mērķa datne is direktorijs"
 
 #: daemon/gvfsbackendgoogle.c:4169 daemon/gvfsbackendgphoto2.c:3050
 msgid "Error writing file"
@@ -1274,13 +1274,13 @@ msgstr "Kļūda, rakstot datnē"
 #: daemon/gvfsbackendgphoto2.c:479
 #, c-format
 msgid "%s: %d: Directory or file exists"
-msgstr "%s: %d: direktorija vai datne eksistē"
+msgstr "%s: %d: direktorijs vai datne eksistē"
 
 #. Translator: %s represents a more specific error message and %d the specific error code
 #: daemon/gvfsbackendgphoto2.c:486
 #, c-format
 msgid "%s: %d: No such file or directory"
-msgstr "%s: %d: nav tādas datnes vai direktorijas"
+msgstr "%s: %d: nav tādas datnes vai direktorija"
 
 #. Translator: %s represents a more specific error message and %d the specific error code
 #: daemon/gvfsbackendgphoto2.c:492
@@ -1388,16 +1388,16 @@ msgstr "Nosaukums par garu"
 
 #: daemon/gvfsbackendgphoto2.c:2484 daemon/gvfsbackendgphoto2.c:3153
 msgid "Error renaming directory"
-msgstr "Kļūda, pārsaucot direktoriju"
+msgstr "Kļūda, pārdēvējot direktoriju"
 
 #: daemon/gvfsbackendgphoto2.c:2497 daemon/gvfsbackendgphoto2.c:3166
 msgid "Error renaming file"
-msgstr "Kļūda, pārsaucot datni"
+msgstr "Kļūda, pārdēvējot datni"
 
 #: daemon/gvfsbackendgphoto2.c:2561
 #, c-format
 msgid "Directory “%s” is not empty"
-msgstr "Direktorija “%s” nav tukša"
+msgstr "Direktorijs “%s” nav tukšs"
 
 #: daemon/gvfsbackendgphoto2.c:2572
 msgid "Error deleting directory"
@@ -1425,23 +1425,23 @@ msgstr "Nevar saņemt datus par datni, pie kuras pievienot"
 
 #: daemon/gvfsbackendgphoto2.c:3098
 msgid "Not supported (not same directory)"
-msgstr "Nav atbalstīts (nav tā pati direktorija)"
+msgstr "Nav atbalstīts (nav tas pats direktorijs)"
 
 #: daemon/gvfsbackendgphoto2.c:3110
 msgid ""
 "Not supported (the source is a directory, the destination is a directory too)"
-msgstr "Nav atbalstīts (avots ir direktorija, bet mērķis arī ir direktorija)"
+msgstr "Nav atbalstīts (avots ir direktorijs, bet mērķis arī ir direktorijs)"
 
 #: daemon/gvfsbackendgphoto2.c:3118
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
-msgstr "Nav atbalstīts (avots ir direktorija, bet mērķis ir esoša datne)"
+msgstr "Nav atbalstīts (avots ir direktorijs, bet mērķis ir esoša datne)"
 
 #: daemon/gvfsbackendgphoto2.c:3130
 msgid ""
 "Not supported (the source is a file, but the destination is a directory)"
-msgstr "Nav atbalstīts (avots ir datne, bet mērķis ir direktorija)"
+msgstr "Nav atbalstīts (avots ir datne, bet mērķis ir direktorijs)"
 
 #: daemon/gvfsbackendhttp.c:263
 #, c-format
@@ -1450,7 +1450,7 @@ msgstr "HTTP klienta kļūda: %s"
 
 #: daemon/gvfsbackendlocaltest.c:861
 msgid "Directory notification not supported"
-msgstr "Direktorijas paziņojumi nav atbalstīti"
+msgstr "Direktorija paziņojumi nav atbalstīti"
 
 #. Translators: This is shown as the name for MTP devices
 #. *              without StorageDescription.
@@ -1506,11 +1506,11 @@ msgstr "Datne nav atrasta"
 
 #: daemon/gvfsbackendmtp.c:1679
 msgid "Target is a directory"
-msgstr "Mērķis is direktorija"
+msgstr "Mērķis is direktorijs"
 
 #: daemon/gvfsbackendmtp.c:1684
 msgid "Can’t merge directories"
-msgstr "Nevar apvienot direktorijas"
+msgstr "Nevar apvienot direktorijus"
 
 #: daemon/gvfsbackendmtp.c:1730
 msgid "Cannot make directory in this location"
@@ -1540,14 +1540,13 @@ msgstr "Datņu koplietošana"
 
 #: daemon/gvfsbackendnetwork.c:245
 msgid "Remote Login"
-msgstr "Attālinātā pieteikšanās"
+msgstr "Attālā pieteikšanās"
 
 #: daemon/gvfsbackendnetwork.c:499 daemon/gvfsbackendsmbbrowse.c:738
 msgid "Windows Network"
 msgstr "Windows tīkls"
 
 #: daemon/gvfsbackendnetwork.c:625
-#| msgid "Network"
 msgid "WSDD Network"
 msgstr "WSDD tīkls"
 
@@ -1579,7 +1578,7 @@ msgstr "Neizdevās izveidot pagaidu datni"
 msgid "Invalid attribute type"
 msgstr "Nederīgs atribūta tips"
 
-#: daemon/gvfsbackendonedrive.c:1180
+#: daemon/gvfsbackendonedrive.c:1185
 msgid "My Files"
 msgstr "Manas datnes"
 
@@ -1697,7 +1696,7 @@ msgstr ""
 "\"%s\" identitātes pārbaudīšana neizdevās. Tas parasti notiek pirmo reizi "
 "ierakstoties datorā.\n"
 "\n"
-"Identitāte, kas tika nosūtīta uz attālināto datoru ir \"%s\". Ja jūs "
+"Identitāte, kas tika nosūtīta uz attālo datoru ir \"%s\". Ja "
 "vēlaties pilnībā pārliecināties, ka ir droši turpināt, sazinieties ar "
 "sistēmas administratoru."
 
@@ -1823,7 +1822,7 @@ msgstr "Neizdevās izveidot rezerves kopijas datni: %s"
 
 #: daemon/gvfsbackendsmb.c:1946
 msgid "Can’t rename file, filename already exists"
-msgstr "Nevar pārsaukt datni, šāds nosaukums jau eksistē"
+msgstr "Nevar pārdēvēt datni, šāds nosaukums jau eksistē"
 
 #: daemon/gvfsbackendsmb.c:1998
 #, c-format
@@ -1863,12 +1862,10 @@ msgid "Trash"
 msgstr "Miskaste"
 
 #: daemon/gvfsbackendwsdd.c:327
-#| msgid "The file is not a directory"
 msgid "File is not a directory"
-msgstr "Datne nav direktorija"
+msgstr "Datne nav direktorijs"
 
 #: daemon/gvfsbackendwsdd.c:379
-#| msgid "Windows Network"
 msgid "WS-Discovery Network"
 msgstr "WS-Discovery tīkls"
 
@@ -2117,8 +2114,8 @@ msgid ""
 "values are \"merged\", \"separate\" (the Local Network folder) and "
 "\"disabled\"."
 msgstr ""
-"Kā DNS-SD pakalpojumi tiek parādīti “network:///” vietā. Iespējamās vērtības"
-" ir “merged”, “separate” (lokālā tīkla mape) un “disabled”."
+"Kā DNS-SD pakalpojumi tiek parādīti “network:///” vietā. Iespējamās vērtības "
+"ir “merged”, “separate” (lokālā tīkla mape) un “disabled”."
 
 #: daemon/org.gnome.system.dns_sd.gschema.xml:10
 msgid "Extra domains to look for DNS-SD services in"
@@ -2129,8 +2126,8 @@ msgid ""
 "Comma separated list of DNS-SD domains that should be visible in the "
 "\"network:///\" location."
 msgstr ""
-"Ar komatu atdalīts saraksts ar DNS-SD domēniem, kuriem būtu jābūt redzamiem"
-" vietā ”network:///“."
+"Ar komatu atdalīts saraksts ar DNS-SD domēniem, kuriem būtu jābūt redzamiem "
+"vietā ”network:///“."
 
 #: daemon/org.gnome.system.smb.gschema.xml:5
 msgid "How to display SMB devices"
@@ -2142,8 +2139,8 @@ msgid ""
 "values are \"merged\", \"separate\" (the Windows Network folder) and "
 "\"disabled\"."
 msgstr ""
-"Kā SMB ierīces tiek parādīti “network:///” vietā. Iespējamās vērtības ir"
-" “merged”, “separate” (Windows tīkla mape) un “disabled”."
+"Kā SMB ierīces tiek parādīti “network:///” vietā. Iespējamās vērtības ir "
+"“merged”, “separate” (Windows tīkla mape) un “disabled”."
 
 #: daemon/org.gnome.system.smb.gschema.xml:10
 msgid "SMB workgroup"
@@ -2155,9 +2152,9 @@ msgid ""
 "order for a new workgroup to fully take effect the user may need to log out "
 "and log back in."
 msgstr ""
-"Windows tīkla darba grupa vai domēns, kurā atrodas lietotājs. Lai jaunā darba"
-" grupa pilnībā stātos spēkā, lietotājam vajadzēs izrakstīties un atkal"
-" ierakstīties."
+"Windows tīkla darba grupa vai domēns, kurā atrodas lietotājs. Lai jaunā "
+"darba grupa pilnībā stātos spēkā, lietotājam vajadzēs izrakstīties un atkal "
+"ierakstīties."
 
 #: daemon/org.gnome.system.wsdd.gschema.xml:5
 msgid "How to display WSDD devices"
@@ -2169,8 +2166,8 @@ msgid ""
 "values are \"merged\", \"separate\" (the WSDD Network folder) and "
 "\"disabled\"."
 msgstr ""
-"Kā WSDD ierīces tiek parādīti “network:///” vietā. Iespējamās vērtības ir"
-" “merged”, “separate” (WSDD tīkla mape) un “disabled”."
+"Kā WSDD ierīces tiek parādīti “network:///” vietā. Iespējamās vērtības ir "
+"“merged”, “separate” (WSDD tīkla mape) un “disabled”."
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:13
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:25
