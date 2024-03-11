@@ -68,7 +68,11 @@ struct _GVfsUDisks2VolumeMonitor
 
   GSettings *lockdown_settings;
   gboolean readonly_lockdown;
+
+  gint update_id;
 };
+
+#define UPDATE_TIMEOUT 100 /* ms */
 
 static UDisksClient *get_udisks_client_sync (GError **error);
 
@@ -147,6 +151,8 @@ gvfs_udisks2_volume_monitor_finalize (GObject *object)
   g_list_free_full (monitor->disc_mounts, g_object_unref);
 
   g_clear_object (&monitor->lockdown_settings);
+
+  g_clear_handle_id (&monitor->update_id, g_source_remove);
 
   G_OBJECT_CLASS (gvfs_udisks2_volume_monitor_parent_class)->finalize (object);
 }
@@ -425,12 +431,33 @@ gvfs_udisks2_volume_monitor_get_readonly_lockdown (GVfsUDisks2VolumeMonitor *mon
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static gboolean
+update_func (gpointer user_data)
+{
+  GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
+
+  monitor->update_id = 0;
+
+  update_all (monitor, TRUE, FALSE);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+schedule_update (GVfsUDisks2VolumeMonitor *monitor)
+{
+  if (monitor->update_id != 0)
+    return;
+
+  monitor->update_id = g_timeout_add (UPDATE_TIMEOUT, update_func, monitor);
+}
+
 void
 gvfs_udisks2_volume_monitor_update (GVfsUDisks2VolumeMonitor *monitor)
 {
   g_return_if_fail (GVFS_IS_UDISKS2_VOLUME_MONITOR (monitor));
   udisks_client_settle (monitor->client);
-  update_all (monitor, TRUE, FALSE);
+  schedule_update (monitor);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -532,7 +559,7 @@ on_client_changed (UDisksClient  *client,
                    gpointer       user_data)
 {
   GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
-  update_all (monitor, TRUE, FALSE);
+  schedule_update (monitor);
 }
 
 static void
@@ -540,7 +567,7 @@ mountpoints_changed (GUnixMountMonitor *mount_monitor,
                      gpointer           user_data)
 {
   GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
-  update_all (monitor, TRUE, FALSE);
+  schedule_update (monitor);
 }
 
 static void
@@ -548,7 +575,7 @@ mounts_changed (GUnixMountMonitor *mount_monitor,
                 gpointer           user_data)
 {
   GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (user_data);
-  update_all (monitor, TRUE, FALSE);
+  schedule_update (monitor);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
