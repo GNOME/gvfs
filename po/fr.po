@@ -2084,7 +2084,7 @@ msgstr "Échec du lancement du démon wsdd sous-jacent."
 #, c-format
 msgid "Failed to establish connection with the underlying wsdd daemon."
 msgstr ""
-"Échec de l’établissement d’une connexion avec le démon wsdd sous-jacent."
+"Échec lors de l’établissement d’une connexion avec le démon wsdd sous-jacent."
 
 #: daemon/main.c:148 metadata/meta-daemon.c:459
 msgid "Replace old daemon."
@@ -2145,7 +2145,7 @@ msgstr "L’emplacement n’est pas « montable »"
 
 #: daemon/org.gnome.system.dns_sd.gschema.xml:5
 msgid "How to display local DNS-SD services"
-msgstr "Comment afficher les services DNS-SD locaux"
+msgstr "Affichage des services DNS-SD locaux"
 
 #: daemon/org.gnome.system.dns_sd.gschema.xml:6
 msgid ""
@@ -2154,8 +2154,8 @@ msgid ""
 "\"disabled\"."
 msgstr ""
 "Indique comment les services DNS-SD sont affichés dans l’emplacement "
-"« network:/// ». Les valeurs possibles sont « fusionnés », « séparés » (le "
-"dossier Réseau local) et « désactivés »."
+"« network:/// ». Les valeurs possibles sont « merged » (fusionnés), « separate » (séparés) (le "
+"dossier Réseau local) et « disabled » (désactivés)."
 
 #: daemon/org.gnome.system.dns_sd.gschema.xml:10
 msgid "Extra domains to look for DNS-SD services in"
@@ -2171,7 +2171,7 @@ msgstr ""
 
 #: daemon/org.gnome.system.smb.gschema.xml:5
 msgid "How to display SMB devices"
-msgstr "Comment afficher les appareils SMB"
+msgstr "Affichage des appareils SMB"
 
 #: daemon/org.gnome.system.smb.gschema.xml:6
 msgid ""
@@ -2180,8 +2180,8 @@ msgid ""
 "\"disabled\"."
 msgstr ""
 "Indique comment les appareils SMB sont affichés dans l’emplacement "
-"« network:/// ». Les valeurs possibles sont « fusionnés », « séparés » (le "
-"dossier Réseau Windows) et « désactivés »."
+"« network:/// ». Les valeurs possibles sont « merged » (fusionnés), « separate » (séparés) (le "
+"dossier Réseau Windows) et « disabled » (désactivés)."
 
 #: daemon/org.gnome.system.smb.gschema.xml:10
 msgid "SMB workgroup"
@@ -2199,7 +2199,7 @@ msgstr ""
 
 #: daemon/org.gnome.system.wsdd.gschema.xml:5
 msgid "How to display WSDD devices"
-msgstr "Comment afficher les appareils WSDD"
+msgstr "Affichage des appareils WSDD"
 
 #: daemon/org.gnome.system.wsdd.gschema.xml:6
 msgid ""
@@ -2208,8 +2208,8 @@ msgid ""
 "\"disabled\"."
 msgstr ""
 "Indique comment les appareils WSDD sont affichés dans l’emplacement "
-"« network:/// ». Les valeurs possibles sont « fusionnés », « séparés » (le "
-"dossier Réseau WSDD) et « désactivés »."
+"« network:/// ». Les valeurs possibles sont « merged » (fusionnés), « separate » (séparés) (le "
+"dossier Réseau WSDD) et « disabled » (désactivés)."
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:13
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:25
