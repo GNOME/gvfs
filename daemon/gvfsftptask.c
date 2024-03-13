@@ -794,12 +794,20 @@ static GSocketAddress *
 g_vfs_ftp_task_create_remote_address (GVfsFtpTask *task, guint port)
 {
   GSocketAddress *old, *new;
+  GInetSocketAddress *old_inet;
 
   old = g_vfs_ftp_connection_get_address (task->conn, &task->error);
   if (old == NULL)
     return NULL;
   g_assert (G_IS_INET_SOCKET_ADDRESS (old));
-  new = g_inet_socket_address_new (g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (old)), port);
+  old_inet = G_INET_SOCKET_ADDRESS (old);
+
+  new = g_object_new (G_TYPE_INET_SOCKET_ADDRESS,
+                      "address", g_inet_socket_address_get_address (old_inet),
+                      "port", port,
+                      "flowinfo", g_inet_socket_address_get_flowinfo (old_inet),
+                      "scope-id", g_inet_socket_address_get_scope_id (old_inet),
+                      NULL);
 
   return new;
 }
