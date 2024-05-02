@@ -40,7 +40,7 @@
 
 #define DEFAULT_WORKGROUP_NAME "X-GNOME-DEFAULT-WORKGROUP"
 
-#define NETWORK_FILE_ATTRIBUTES "standard::name,standard::display-name,standard::target-uri"
+#define NETWORK_FILE_ATTRIBUTES "standard::name,standard::display-name,standard::target-uri,standard::content-type"
 
 typedef struct {
   char *file_name;
