@@ -443,6 +443,7 @@ file_info_from_file (LinkFile *file,
     g_file_info_set_symbolic_icon (info, file->symbolic_icon);
 
   g_file_info_set_file_type (info, G_FILE_TYPE_SHORTCUT);
+  g_file_info_set_content_type (info, "inode/directory");
   g_file_info_set_size(info, 0);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
