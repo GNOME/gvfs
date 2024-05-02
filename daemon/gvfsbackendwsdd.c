@@ -78,6 +78,7 @@ file_info_from_wsdd_device (GVfsBackendWsdd *wsdd_backend,
   g_file_info_set_symbolic_icon (info, symbolic_icon);
 
   g_file_info_set_file_type (info, G_FILE_TYPE_SHORTCUT);
+  g_file_info_set_content_type (info, "inode/directory");
   g_file_info_set_attribute_boolean (info,
                                      G_FILE_ATTRIBUTE_STANDARD_IS_VIRTUAL,
                                      TRUE);
