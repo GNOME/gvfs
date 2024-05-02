@@ -3342,8 +3342,9 @@ meta_lookup_cache_lookup_path (MetaLookupCache *cache,
       char *e;
       struct stat statbuf;
 
-      g_stat (g_get_home_dir(), &statbuf);
-      homedir_data_storage.device = statbuf.st_dev;
+      if (g_stat (g_get_home_dir(), &statbuf) == 0)
+        homedir_data_storage.device = statbuf.st_dev;
+
       e = canonicalize_filename (g_get_home_dir());
       homedir_data_storage.expanded_path = expand_all_symlinks (e, NULL);
       g_free (e);
