@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
-"POT-Creation-Date: 2024-03-31 10:25+0000\n"
-"PO-Revision-Date: 2024-04-04 18:34-0300\n"
+"POT-Creation-Date: 2024-04-29 18:22+0000\n"
+"PO-Revision-Date: 2024-05-14 20:26-0300\n"
 "Last-Translator: Leônidas Araújo <leorusvellt@hotmail.com>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
@@ -2119,6 +2119,72 @@ msgstr "A localização já está montada"
 #: daemon/mount.c:1024
 msgid "Location is not mountable"
 msgstr "A localização não está montada"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:5
+msgid "How to display local DNS-SD services"
+msgstr "Como exibir serviços DNS-SD locais"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:6
+msgid ""
+"How DNS-SD services are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the Local Network folder) and "
+"\"disabled\"."
+msgstr ""
+"Como os serviços DNS-SD são exibidos no local \"network:///\". Os valores "
+"possíveis são \"merged\", \"separate\" (a pasta Rede Local) e \"disabled\"."
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:10
+msgid "Extra domains to look for DNS-SD services in"
+msgstr "Domínios extras para procurar serviços DNS-SD"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:11
+msgid ""
+"Comma separated list of DNS-SD domains that should be visible in the "
+"\"network:///\" location."
+msgstr ""
+"Lista separada por vírgulas de domínios DNS-SD que devem estar visíveis no "
+"local \"network:///\"."
+
+#: daemon/org.gnome.system.smb.gschema.xml:5
+msgid "How to display SMB devices"
+msgstr "Como exibir dispositivos SMB"
+
+#: daemon/org.gnome.system.smb.gschema.xml:6
+msgid ""
+"How SMB devices are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the Windows Network folder) and "
+"\"disabled\"."
+msgstr ""
+"Como os dispositivos SMB são exibidos no local \"network:///\". Os valores "
+"possíveis são \"merged\", \"separate\" (a pasta Rede do Windows) e "
+"\"disabled\"."
+
+#: daemon/org.gnome.system.smb.gschema.xml:10
+msgid "SMB workgroup"
+msgstr "Grupo de trabalho SMB"
+
+#: daemon/org.gnome.system.smb.gschema.xml:11
+msgid ""
+"The Windows networking workgroup or domain that the user is part of. In "
+"order for a new workgroup to fully take effect the user may need to log out "
+"and log back in."
+msgstr ""
+"O grupo de trabalho ou domínio de rede do Windows do qual o usuário faz "
+"parte. Para que um novo grupo de trabalho tenha efeito completo, o usuário "
+"pode precisar sair e fazer login novamente."
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:5
+msgid "How to display WSDD devices"
+msgstr "Como exibir dispositivos WSDD"
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:6
+msgid ""
+"How WSDD devices are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the WSDD Network folder) and "
+"\"disabled\"."
+msgstr ""
+"Como os dispositivos WSDD são exibidos no local \"network:///\". Os valores "
+"possíveis são \"merged\", \"separate\" (a pasta da rede WSDD) e \"disabled\"."
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:13
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:25
