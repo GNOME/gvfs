@@ -1,3 +1,10 @@
+Major changes in 1.54.1
+=======================
+* network: Request content-type attribute to suppress critical errors (Ondrej Holy)
+* metadata: Check g_stat result to avoid using of uninitialized value (Ondrej Holy)
+* ftp: Fix data connection to IPv6 link-local address (Ben Wolsieffer)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.54.0
 =======================
 * Translation updates (GNOME Translation Project contributors)
