@@ -91,12 +91,15 @@ static void update_mounts            (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **added_mounts,
                                       GList                    **removed_mounts,
                                       gboolean                   coldplug);
+
+#if defined(HAVE_BURN) || defined(HAVE_CDDA)
 static void update_discs             (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **added_volumes,
                                       GList                    **removed_volumes,
                                       GList                    **added_mounts,
                                       GList                    **removed_mounts,
                                       gboolean                   coldplug);
+#endif
 
 
 static void on_client_changed (UDisksClient *client,
@@ -570,10 +573,13 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
   update_volumes (monitor, &added_volumes, &removed_volumes, coldplug);
   update_fstab_volumes (monitor, &added_volumes, &removed_volumes, coldplug);
   update_mounts (monitor, &added_mounts, &removed_mounts, coldplug);
+
+#if defined(HAVE_BURN) || defined(HAVE_CDDA)
   update_discs (monitor,
                 &added_volumes, &removed_volumes,
                 &added_mounts, &removed_mounts,
                 coldplug);
+#endif
 
   if (emit_changes)
     {
@@ -973,6 +979,7 @@ should_include_drive (GVfsUDisks2VolumeMonitor *monitor,
   return ret;
 }
 
+#if defined(HAVE_BURN) || defined(HAVE_CDDA)
 static gboolean
 should_include_disc (GVfsUDisks2VolumeMonitor *monitor,
                      UDisksDrive              *drive)
@@ -993,6 +1000,7 @@ should_include_disc (GVfsUDisks2VolumeMonitor *monitor,
 
   return ret;
 }
+#endif
 
 /* ---------------------------------------------------------------------------------------------------- */
 
@@ -1018,6 +1026,7 @@ block_compare (UDisksBlock *a, UDisksBlock *b)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+#if defined(HAVE_BURN) || defined(HAVE_CDDA)
 static GVfsUDisks2Volume *
 find_disc_volume_for_block (GVfsUDisks2VolumeMonitor *monitor,
                             UDisksBlock              *block)
@@ -1038,6 +1047,7 @@ find_disc_volume_for_block (GVfsUDisks2VolumeMonitor *monitor,
  out:
   return ret;
 }
+#endif
 
 /* ---------------------------------------------------------------------------------------------------- */
 
@@ -1807,6 +1817,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+#if defined(HAVE_BURN) || defined(HAVE_CDDA)
 static void
 update_discs (GVfsUDisks2VolumeMonitor  *monitor,
               GList                    **added_volumes,
@@ -1962,5 +1973,6 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
 
   g_list_free_full (objects, g_object_unref);
 }
+#endif
 
 /* ---------------------------------------------------------------------------------------------------- */
