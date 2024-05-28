@@ -386,11 +386,13 @@ update_volume (GVfsUDisks2Volume *volume)
               g_free (volume->name);
               volume->name = g_strdup (media_desc);
             }
+#ifdef HAVE_CDDA
           else if (volume->activation_root != NULL && g_file_has_uri_scheme (volume->activation_root, "cdda"))
             {
               g_free (volume->name);
               volume->name = g_strdup (_("Audio Disc"));
             }
+#endif
 
           volume->icon = media_icon != NULL ? g_object_ref (media_icon) : NULL;
           volume->symbolic_icon = media_symbolic_icon != NULL ? g_object_ref (media_symbolic_icon) : NULL;

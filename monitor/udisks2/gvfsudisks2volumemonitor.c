@@ -973,6 +973,25 @@ should_include_drive (GVfsUDisks2VolumeMonitor *monitor,
   return ret;
 }
 
+static gboolean
+should_include_disc (GVfsUDisks2VolumeMonitor *monitor,
+                     UDisksDrive              *drive)
+{
+  gboolean ret = FALSE;
+
+  /* only consider blank and audio discs */
+
+  if (udisks_drive_get_optical_blank (drive))
+    ret = TRUE;
+
+#ifdef HAVE_CDDA
+  if (udisks_drive_get_optical_num_audio_tracks (drive) > 0)
+    ret = TRUE;
+#endif
+
+  return ret;
+}
+
 /* ---------------------------------------------------------------------------------------------------- */
 
 static gint
@@ -1830,9 +1849,7 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
       if (!should_include_drive (monitor, udisks_drive))
         continue;
 
-      /* only consider blank and audio discs */
-      if (!(udisks_drive_get_optical_blank (udisks_drive) ||
-            udisks_drive_get_optical_num_audio_tracks (udisks_drive) > 0))
+      if (!should_include_disc (monitor, udisks_drive))
         continue;
 
       block = udisks_client_get_block_for_drive (monitor->client, udisks_drive, FALSE);
@@ -1881,19 +1898,23 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
           udisks_drive = udisks_client_get_drive_for_block (monitor->client, block);
           if (udisks_drive != NULL)
             {
-              gchar *uri;
+              gchar *uri = NULL;
               GFile *activation_root;
 
               if (udisks_drive_get_optical_blank (udisks_drive))
                 {
                   uri = g_strdup ("burn://");
                 }
-              else
+
+#ifdef HAVE_CDDA
+              if (udisks_drive_get_optical_num_audio_tracks (udisks_drive) > 0)
                 {
                   gchar *basename = g_path_get_basename (udisks_block_get_device (block));
                   uri = g_strdup_printf ("cdda://%s", basename);
                   g_free (basename);
                 }
+#endif
+
               activation_root = g_file_new_for_uri (uri);
               volume = gvfs_udisks2_volume_new (monitor,
                                                 block,
