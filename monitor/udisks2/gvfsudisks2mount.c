@@ -74,7 +74,9 @@ struct _GVfsUDisks2Mount
   gchar *mount_entry_name;
   gchar *mount_entry_fs_type;
 
+#ifdef HAVE_BURN
   gboolean is_burn_mount;
+#endif
 
   GIcon *autorun_icon;
   gboolean searched_for_autorun;
@@ -345,6 +347,7 @@ gvfs_udisks2_mount_new (GVfsUDisks2VolumeMonitor *monitor,
       mount->mount_path = g_strdup (g_unix_mount_get_mount_path (mount_entry));
       mount->root = g_file_new_for_path (mount->mount_path);
     }
+#ifdef HAVE_BURN
   else
     {
       /* burn:/// mount (the only mounts we support with mount_entry == NULL) */
@@ -353,6 +356,7 @@ gvfs_udisks2_mount_new (GVfsUDisks2VolumeMonitor *monitor,
       mount->root = g_file_new_for_uri ("burn:///");
       mount->is_burn_mount = TRUE;
     }
+#endif
 
   /* need to set the volume only when the mount is fully constructed */
   mount->volume = volume;
@@ -1016,6 +1020,7 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
 
   g_task_set_task_data (task, data, (GDestroyNotify)unmount_data_free);
 
+#ifdef HAVE_BURN
   if (mount->is_burn_mount)
     {
       /* burn mounts are really never mounted so complete successfully immediately */
@@ -1023,6 +1028,7 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
       g_object_unref (task);
       return;
     }
+#endif
 
   block = NULL;
   if (mount->volume != NULL)
@@ -1195,6 +1201,7 @@ gvfs_udisks2_mount_guess_content_type_sync (GMount        *_mount,
 
   p = g_ptr_array_new ();
 
+#ifdef HAVE_BURN
   /* doesn't make sense to probe blank discs - look at the disc type instead */
   if (mount->is_burn_mount)
     {
@@ -1219,6 +1226,7 @@ gvfs_udisks2_mount_guess_content_type_sync (GMount        *_mount,
         }
     }
   else
+#endif
     {
       /* sniff content type */
       x_content_types = g_content_type_guess_for_tree (mount->root);

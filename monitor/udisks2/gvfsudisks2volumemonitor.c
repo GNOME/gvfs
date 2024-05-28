@@ -981,8 +981,10 @@ should_include_disc (GVfsUDisks2VolumeMonitor *monitor,
 
   /* only consider blank and audio discs */
 
+#ifdef HAVE_BURN
   if (udisks_drive_get_optical_blank (drive))
     ret = TRUE;
+#endif
 
 #ifdef HAVE_CDDA
   if (udisks_drive_get_optical_num_audio_tracks (drive) > 0)
@@ -1901,10 +1903,12 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
               gchar *uri = NULL;
               GFile *activation_root;
 
+#ifdef HAVE_BURN
               if (udisks_drive_get_optical_blank (udisks_drive))
                 {
                   uri = g_strdup ("burn://");
                 }
+#endif
 
 #ifdef HAVE_CDDA
               if (udisks_drive_get_optical_num_audio_tracks (udisks_drive) > 0)
@@ -1927,6 +1931,7 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
                   monitor->disc_volumes = g_list_prepend (monitor->disc_volumes, volume);
                   *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
 
+#ifdef HAVE_BURN
                   if (udisks_drive_get_optical_blank (udisks_drive))
                     {
                       mount = gvfs_udisks2_mount_new (monitor,
@@ -1938,6 +1943,7 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
                           *added_mounts = g_list_prepend (*added_mounts, g_object_ref (mount));
                         }
                     }
+#endif
                 }
 
               g_object_unref (activation_root);

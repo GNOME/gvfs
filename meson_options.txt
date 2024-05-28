@@ -6,6 +6,7 @@ option('admin', type: 'boolean', value: true, description: 'build with admin bac
 option('afc', type: 'boolean', value: true, description: 'build with afc backend and volume monitor')
 option('afp', type: 'boolean', value: true, description: 'build with afp backends')
 option('archive', type: 'boolean', value: true, description: 'build with archive backend')
+option('burn', type: 'boolean', value: false, description: 'build with burn backend')
 option('cdda', type: 'boolean', value: true, description: 'build with cdda backend')
 option('dnssd', type: 'boolean', value: true, description: 'build with dnssd backend')
 option('goa', type: 'boolean', value: true, description: 'build with goa volume monitor')
