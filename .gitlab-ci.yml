@@ -20,6 +20,7 @@ fedora:
           -Dudisks2=true
           -Dhttp=true
           -Dgphoto2=true
+          -Dcdda=true
           --prefix /usr --werror build
         - sudo ninja -C build install
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
