@@ -398,8 +398,6 @@ config_h.set10('HAVE_LIBUSB', enable_libusb)
 enable_samba = get_option('smb')
 if enable_samba
   smbclient_dep = dependency('smbclient')
-
-  config_h.set('HAVE_SMBC_SETOPTIONPROTOCOLS', cc.has_function('smbc_setOptionProtocols', dependencies: smbclient_dep))
   config_h.set('HAVE_SMBC_READDIRPLUS2', cc.has_function('smbc_readdirplus2', dependencies: smbclient_dep))
 endif
 
