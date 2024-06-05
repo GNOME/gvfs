@@ -45,7 +45,6 @@
 #include "gvfskeyring.h"
 #include "gmounttracker.h"
 #include "gvfsbackendsmbprivate.h"
-#include "gvfsutils.h"
 
 #include <libsmbclient.h>
 
@@ -689,47 +688,6 @@ do_mount (GVfsBackend *backend,
     op_backend->server = g_strdup (smbc_getWorkgroup (smb_context));
   else
     op_backend->server = g_strdup (op_backend->mounted_server);
-
-#ifdef HAVE_SMBC_SETOPTIONPROTOCOLS
-  /* Force NT1 protocol version if server can't be resolved (i.e. is not
-   * hostname, nor IP address). This is needed for workgroup support, because
-   * "client max protocol" has been changed from NT1 to SMB3 in recent samba
-   * versions.
-   */
-
-  if (op_backend->server != NULL)
-    {
-      GResolver *resolver;
-      GList *addresses;
-      GError *error = NULL;
-      gchar *server;
-
-      resolver = g_resolver_get_default ();
-
-      /* IPv6 server includes brackets in GMountSpec, GResolver doesn't */
-      if (gvfs_is_ipv6 (op_backend->server))
-        server = g_strndup (op_backend->server + 1, strlen (op_backend->server) - 2);
-      else
-        server = g_strdup (op_backend->server);
-
-      addresses = g_resolver_lookup_by_name (resolver, server, NULL, &error);
-      if (addresses == NULL)
-        {
-          if (error != NULL)
-            {
-              g_debug ("%s\n", error->message);
-              g_error_free (error);
-            }
-
-          g_debug ("Forcing NT1 protocol version\n");
-          smbc_setOptionProtocols (smb_context, "NT1", "NT1");
-        }
-
-      g_resolver_free_addresses (addresses);
-      g_object_unref (resolver);
-      g_free (server);
-    }
-#endif
 
   icon = NULL;
   symbolic_icon = NULL;
