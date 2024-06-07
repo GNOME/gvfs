@@ -711,7 +711,12 @@ should_include_mount (GVfsUDisks2VolumeMonitor  *monitor,
 {
   GUnixMountPoint *mount_point;
   const gchar *options;
-  gboolean ret;
+  gboolean ret = FALSE;
+
+  if (g_strcmp0 (g_unix_mount_get_fs_type (mount_entry), "autofs") == 0)
+    {
+      goto out;
+    }
 
   /* If mounted at the designated mount point, use g_unix_mount_point_get_options
    * in prior to g_unix_mount_get_options to keep support of "comment=" options,
