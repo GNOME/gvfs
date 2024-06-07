@@ -649,7 +649,7 @@ should_include (const gchar *mount_path,
   gboolean ret = FALSE;
   const gchar *home_dir = NULL;
   const gchar *user_name;
-  gsize user_name_len;
+  const gchar *p;
 
   g_return_val_if_fail (mount_path != NULL, FALSE);
 
@@ -677,22 +677,9 @@ should_include (const gchar *mount_path,
   if (g_unix_is_mount_path_system_internal (mount_path))
     goto out;
 
-  /* Only display things in
-   * - /media; and
-   * - $HOME; and
-   * - /run/media/$USER
-   */
-
   /* Hide mounts within a subdirectory starting with a "." - suppose it was a purpose to hide this mount */
   if (g_strstr_len (mount_path, -1, "/.") != NULL)
     goto out;
-
-  /* Check /media */
-  if (g_str_has_prefix (mount_path, "/media/"))
-    {
-      ret = TRUE;
-      goto out;
-    }
 
   /* Check home dir */
   home_dir = g_get_home_dir ();
@@ -705,15 +692,23 @@ should_include (const gchar *mount_path,
         }
     }
 
-  /* Check /run/media/$USER/ */
-  user_name = g_get_user_name ();
-  user_name_len = strlen (user_name);
-  if (strncmp (mount_path, "/run/media/", sizeof ("/run/media/") - 1) == 0 &&
-      strncmp (mount_path + sizeof ("/run/media/") - 1, user_name, user_name_len) == 0 &&
-      mount_path[sizeof ("/run/media/") - 1 + user_name_len] == '/')
+  /* Display mounts that are direct descendants of /media/ resp. /run/media/,
+   * or mounts with /media/$USER/ resp. /run/media/$USER/ prefix.
+   */
+  p = mount_path;
+  if (g_str_has_prefix (p, "/run/"))
+    p += sizeof ("/run") - 1;
+  if (g_str_has_prefix (p, "/media/"))
     {
-      ret = TRUE;
-      goto out;
+      p += sizeof ("/media/") - 1;
+
+      user_name = g_get_user_name ();
+      if ((g_str_has_prefix (p, user_name) && p[strlen (user_name)] == '/') ||
+          g_strrstr (p, "/") == NULL)
+        {
+          ret = TRUE;
+          goto out;
+        }
     }
 
  out:
