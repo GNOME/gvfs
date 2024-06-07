@@ -1571,6 +1571,20 @@ do_query_info (GVfsBackend *backend,
   saved_errno = errno;
   g_free (uri);
 
+  /* Create dummy stat for root dir where access is denied */
+  if (saved_errno == EACCES || saved_errno == EPERM)
+    {
+      /* Check if the file name is part of the user's mount path */
+      if (g_str_equal (filename, "/") ||
+          (g_str_has_prefix (op_backend->path, filename) &&
+           op_backend->path[strlen (filename)] == '/'))
+        {
+          st.st_mode = S_IFDIR | 0500;
+
+          res = saved_errno = 0;
+        }
+    }
+
   if (res == 0)
     {
       basename = g_path_get_basename (filename);
