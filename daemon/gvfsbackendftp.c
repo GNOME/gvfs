@@ -1612,6 +1612,7 @@ do_pull (GVfsBackend *         backend,
   GInputStream *input;
   GOutputStream *output;
   goffset total_size = 0;
+  guint64 mtime = 0;
   
   src = g_vfs_ftp_file_new_from_gvfs (ftp, source);
   dest = g_file_new_for_path (local_path);
@@ -1656,6 +1657,7 @@ do_pull (GVfsBackend *         backend,
       if (info)
         {
           total_size = g_file_info_get_size (info);
+          mtime = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
           g_object_unref (info);
         }
     }
@@ -1705,6 +1707,15 @@ do_pull (GVfsBackend *         backend,
   g_vfs_ftp_task_close_data_connection (&task);
   g_vfs_ftp_task_receive (&task, 0, NULL);
   g_object_unref (output);
+
+  /* Ignore errors here. Failure to copy metadata is not a hard error */
+  if (!g_vfs_ftp_task_is_in_error (&task) && mtime)
+    {
+      g_file_set_attribute_uint64 (dest,
+                                   G_FILE_ATTRIBUTE_TIME_MODIFIED, mtime,
+                                   G_FILE_QUERY_INFO_NONE,
+                                   task.cancellable, NULL);
+    }
 
   if (!g_vfs_ftp_task_is_in_error (&task) && remove_source)
     {
