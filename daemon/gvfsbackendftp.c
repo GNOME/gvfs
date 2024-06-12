@@ -107,6 +107,7 @@ gvfs_backend_ftp_determine_features (GVfsFtpTask *task)
     { "UTF8", G_VFS_FTP_FEATURE_UTF8 },
     { "AUTH TLS", G_VFS_FTP_FEATURE_AUTH_TLS },
     { "AUTH SSL", G_VFS_FTP_FEATURE_AUTH_SSL },
+    { "MFMT", G_VFS_FTP_FEATURE_MFMT },
   };
   guint i, j;
   char **reply;
@@ -1201,23 +1202,38 @@ try_query_settable_attributes (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GFileAttributeInfoList *list;
 
-  if (!g_vfs_backend_ftp_has_feature (ftp, G_VFS_FTP_FEATURE_CHMOD))
-    {    
+  list = g_file_attribute_info_list_new ();
+
+  if (g_vfs_backend_ftp_has_feature (ftp, G_VFS_FTP_FEATURE_CHMOD))
+    {
+      g_file_attribute_info_list_add (list,
+                                      G_FILE_ATTRIBUTE_UNIX_MODE,
+                                      G_FILE_ATTRIBUTE_TYPE_UINT32,
+                                      G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+                                      G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+    }
+
+  if (g_vfs_backend_ftp_has_feature (ftp, G_VFS_FTP_FEATURE_MFMT))
+    {
+      g_file_attribute_info_list_add (list,
+                                      G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                      G_FILE_ATTRIBUTE_TYPE_UINT64,
+                                      G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+                                      G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+    }
+
+  if (list->n_infos == 0)
+    {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
                         _("Operation not supported"));
+
+      g_file_attribute_info_list_unref (list);
+
       return TRUE;
-    }    
+    }
 
-  list = g_file_attribute_info_list_new ();
-
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_UNIX_MODE,
-				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
-				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
-  
   g_vfs_job_query_attributes_set_list (job, list);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_file_attribute_info_list_unref (list);
@@ -1240,7 +1256,8 @@ do_set_attribute (GVfsBackend *backend,
 
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
 
-  if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0)
+  if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0 &&
+      g_vfs_backend_ftp_has_feature (ftp, G_VFS_FTP_FEATURE_CHMOD))
     {
       if (type != G_FILE_ATTRIBUTE_TYPE_UINT32) 
         {
@@ -1248,13 +1265,6 @@ do_set_attribute (GVfsBackend *backend,
                                G_IO_ERROR,
                                G_IO_ERROR_INVALID_ARGUMENT,
                                _("Invalid attribute type (uint32 expected)"));
-        }
-      else if (!g_vfs_backend_ftp_has_feature (ftp, G_VFS_FTP_FEATURE_CHMOD))
-        {
-          g_set_error_literal (&task.error,
-                               G_IO_ERROR,
-                               G_IO_ERROR_NOT_SUPPORTED,
-                               _("Operation not supported"));
         }
       else
         {
@@ -1268,6 +1278,37 @@ do_set_attribute (GVfsBackend *backend,
             {
               g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
             }
+        }
+    }
+  else if (g_strcmp0 (attribute, G_FILE_ATTRIBUTE_TIME_MODIFIED) == 0 &&
+           g_vfs_backend_ftp_has_feature (ftp, G_VFS_FTP_FEATURE_MFMT))
+    {
+      if (type != G_FILE_ATTRIBUTE_TYPE_UINT64)
+        {
+          g_vfs_job_failed (G_VFS_JOB (job),
+                            G_IO_ERROR,
+                            G_IO_ERROR_INVALID_ARGUMENT,
+                            _("Invalid attribute type (uint64 expected)"));
+        }
+      else
+        {
+          GDateTime *dt;
+          gchar *value;
+
+          dt = g_date_time_new_from_unix_utc (*(guint64 *)value_p);
+          value = g_date_time_format (dt, "%Y%m%d%H%M%S");
+
+          if (g_vfs_ftp_task_send (&task,
+                                   0,
+                                   "MFMT %s %s",
+                                   value,
+                                   g_vfs_ftp_file_get_ftp_path (file)))
+            {
+              g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
+            }
+
+          g_date_time_unref (dt);
+          g_free (value);
         }
     }
   else
