@@ -630,7 +630,9 @@ resolve (GVfsBackendOnedrive  *self,
 
   if (out_path != NULL)
     {
-      *out_path = g_build_path ("/", *out_path, msg_drive_item_get_id (ret_val), NULL);
+      char *tmp  = g_build_path ("/", *out_path, msg_drive_item_get_id (ret_val), NULL);
+      g_free (*out_path);
+      *out_path = tmp;
     }
 
  out:
@@ -1108,7 +1110,7 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
   GMountSpec *real_mount_spec;
   GError *error = NULL;
   GList *accounts = NULL;
-  GList *drives;
+  g_autolist (MsgDrive) drives = NULL;
   GList *l = NULL;
   const char *host = NULL;
 
@@ -1198,6 +1200,7 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
   real_mount_spec = g_mount_spec_new ("onedrive");
   g_mount_spec_set (real_mount_spec, "host", self->account_identity);
   g_vfs_backend_set_mount_spec (_self, real_mount_spec);
+  g_mount_spec_unref (real_mount_spec);
 
   g_vfs_backend_set_display_name (_self, self->account_identity);
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1871,8 +1874,6 @@ static void
 g_vfs_backend_onedrive_dispose (GObject *_self)
 {
   GVfsBackendOnedrive *self = G_VFS_BACKEND_ONEDRIVE (_self);
-
-  g_clear_object (&self->client);
 
   g_clear_object (&self->service);
   g_clear_object (&self->root);
