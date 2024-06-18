@@ -315,6 +315,49 @@ g_vfs_ftp_dir_cache_resolve_symlink (GVfsFtpDirCache *  cache,
   return result;
 }
 
+/* Try to obtain correct mtime using the MDTM command if time is 00:00:00. */
+static void
+g_vfs_ftp_dir_cache_fix_mtime (GVfsFtpTask *      task,
+                               const GVfsFtpFile *file,
+                               GFileInfo *        info)
+{
+  g_autoptr(GDateTime) dt = NULL;
+  g_auto(GStrv) reply = NULL;
+  struct tm tm = { 0 };
+  gint num;
+  time_t mtime;
+
+  if (!g_vfs_backend_ftp_has_feature (task->backend, G_VFS_FTP_FEATURE_MDTM))
+    return;
+
+  if (g_file_info_get_file_type (info) != G_FILE_TYPE_REGULAR)
+    return;
+
+  dt = g_file_info_get_modification_date_time (info);
+  if (g_date_time_get_hour (dt) != 0 ||
+      g_date_time_get_minute (dt) != 0 ||
+      g_date_time_get_second (dt) != 0)
+    return;
+
+  if (g_vfs_ftp_task_send_and_check (task, 0, NULL, NULL, &reply, "MDTM %s", g_vfs_ftp_file_get_ftp_path (file)) != 213)
+    {
+      g_vfs_ftp_task_clear_error (task);
+      return;
+    }
+
+  num = sscanf (reply[0] + 4, "%4d%2d%2d%2d%2d%2d", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec);
+  if (num != 6)
+    return;
+
+  tm.tm_year -= 1900;
+  tm.tm_mon -= 1;
+  mtime = timegm (&tm);
+  if (mtime == -1)
+    return;
+
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, mtime);
+}
+
 GFileInfo *
 g_vfs_ftp_dir_cache_lookup_file (GVfsFtpDirCache *  cache,
                                  GVfsFtpTask *      task,
@@ -328,6 +371,7 @@ g_vfs_ftp_dir_cache_lookup_file (GVfsFtpDirCache *  cache,
   g_return_val_if_fail (file != NULL, NULL);
 
   info = g_vfs_ftp_dir_cache_lookup_file_internal (cache, task, file, 0);
+  g_vfs_ftp_dir_cache_fix_mtime (task, file, info);
 
   if (info != NULL && resolve_symlinks)
     info = g_vfs_ftp_dir_cache_resolve_symlink (cache, task, file, info, 0);
@@ -373,6 +417,9 @@ g_vfs_ftp_dir_cache_lookup_dir (GVfsFtpDirCache *  cache,
   while (g_hash_table_iter_next (&iter, &file, &info))
     {
       g_object_ref (info);
+
+      g_vfs_ftp_dir_cache_fix_mtime (task, file, info);
+
       if (resolve_symlinks)
         info = g_vfs_ftp_dir_cache_resolve_symlink (cache, task, file, info, stamp);
       g_assert (!g_vfs_ftp_task_is_in_error (task));
