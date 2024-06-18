@@ -715,12 +715,12 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
 
       /* Workaround:
        * result.fetime.tm_year contains actual year instead of offset-from-1900,
-       * which mktime expects.
+       * which timegm expects.
        */
       if (result.fe_time.tm_year >= 1900)
               result.fe_time.tm_year -= 1900;
 
-      mtime = mktime (&result.fe_time);
+      mtime = timegm (&result.fe_time);
       if (mtime != -1)
         {
           char *etag = g_strdup_printf ("%ld", mtime);
