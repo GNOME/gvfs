@@ -36,6 +36,7 @@
 #include "gvfsjobcloseread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
+#include "gvfsjobseekwrite.h"
 #include "gvfsmonitor.h"
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobopenforwrite.h"
@@ -1493,6 +1494,32 @@ g_vfs_backend_onedrive_seek_on_read (GVfsBackend       *_self,
 }
 
 static void
+g_vfs_backend_onedrive_seek_on_write (GVfsBackend       *backend,
+                                      GVfsJobSeekWrite  *job,
+                                      GVfsBackendHandle  handle,
+                                      goffset            offset,
+                                      GSeekType          type)
+{
+  WriteHandle *wh = handle;
+  g_autoptr (GError) error = NULL;
+
+  g_debug ("+ seek_on_write: %p\n", handle);
+
+  if (g_seekable_seek (G_SEEKABLE (wh->stream), offset, job->seek_type, NULL, &error))
+    {
+      g_vfs_job_seek_write_set_offset (job, g_seekable_tell (G_SEEKABLE (wh->stream)));
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else
+    {
+      g_warning ("Could not seek: %s", error->message);
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    }
+
+  g_debug ("- seek_on_write\n");
+}
+
+static void
 close_read_cb (GObject      *source_object,
                GAsyncResult *res,
                gpointer      user_data)
@@ -1676,6 +1703,7 @@ g_vfs_backend_onedrive_create (GVfsBackend         *_self,
 
   handle = write_handle_new (new_item, stream, filename, item_path);
   g_vfs_job_open_for_write_set_handle (job, handle);
+  g_vfs_job_open_for_write_set_can_seek (job, TRUE);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
  out:
@@ -1863,6 +1891,7 @@ g_vfs_backend_onedrive_replace (GVfsBackend         *_self,
     }
 
   g_vfs_job_open_for_write_set_handle (job, handle);
+  g_vfs_job_open_for_write_set_can_seek (job, TRUE);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
 out:
@@ -1925,6 +1954,7 @@ g_vfs_backend_onedrive_class_init (GVfsBackendOnedriveClass *klass)
   backend_class->try_query_info_on_read = g_vfs_backend_onedrive_try_query_info_on_read;
   backend_class->try_query_info_on_write = g_vfs_backend_onedrive_try_query_info_on_write;
   backend_class->seek_on_read = g_vfs_backend_onedrive_seek_on_read;
+  backend_class->seek_on_write = g_vfs_backend_onedrive_seek_on_write;
   backend_class->set_display_name = g_vfs_backend_onedrive_set_display_name;
   backend_class->try_read = g_vfs_backend_onedrive_try_read;
   backend_class->replace = g_vfs_backend_onedrive_replace;
