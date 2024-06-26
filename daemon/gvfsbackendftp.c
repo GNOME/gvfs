@@ -691,7 +691,8 @@ try_login:
   ftp->connections = 1;
   ftp->max_connections = G_MAXUINT;
   ftp->queue = g_queue_new ();
- 
+  ftp->root = g_vfs_ftp_file_new_from_ftp (ftp, "/");
+
   g_object_unref (addr);
   g_vfs_ftp_task_done (&task);
 }
@@ -756,6 +757,9 @@ do_unmount (GVfsBackend *   backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpConnection *conn;
+
+  /* Freed early to avoid finalize not being called due to circular references */
+  g_clear_pointer (&ftp->root, g_vfs_ftp_file_free);
 
   g_mutex_lock (&ftp->mutex);
   while ((conn = g_queue_pop_head (ftp->queue)))
@@ -1339,6 +1343,9 @@ do_set_display_name (GVfsBackend *backend,
   original = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
   dir = g_vfs_ftp_file_new_parent (original);
   now = g_vfs_ftp_file_new_child (dir, display_name, &task.error);
+
+  /* Rename a directory that has been "opened" by CWD may fail, so cd to root first */
+  g_vfs_ftp_task_try_cd (&task, ftp->root);
   g_vfs_ftp_task_send (&task,
                        G_VFS_FTP_PASS_300 | G_VFS_FTP_FAIL_200,
                        "RNFR %s", g_vfs_ftp_file_get_ftp_path (original));
@@ -1511,7 +1518,8 @@ do_move (GVfsBackend *backend,
         }
     }
 
-
+  /* Rename a directory that has been "opened" by CWD may fail, so cd to root first */
+  g_vfs_ftp_task_try_cd (&task, ftp->root);
   if (!g_vfs_ftp_task_send_and_check (&task,
                                  G_VFS_FTP_PASS_300 | G_VFS_FTP_FAIL_200,
                                  rnfr_handlers,

@@ -28,8 +28,6 @@
 G_BEGIN_DECLS
 
 
-typedef struct _GVfsFtpFile GVfsFtpFile;
-
 GVfsFtpFile *     g_vfs_ftp_file_new_from_gvfs          (GVfsBackendFtp *       ftp,
                                                          const char *           gvfs_path);
 GVfsFtpFile *     g_vfs_ftp_file_new_from_ftp           (GVfsBackendFtp *       ftp,

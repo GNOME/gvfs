@@ -75,6 +75,7 @@ typedef enum {
 /* forward declarations */
 typedef struct _GVfsFtpDirCache GVfsFtpDirCache;
 typedef struct _GVfsFtpDirFuncs GVfsFtpDirFuncs;
+typedef struct _GVfsFtpFile GVfsFtpFile;
 
 #define G_VFS_TYPE_BACKEND_FTP         (g_vfs_backend_ftp_get_type ())
 #define G_VFS_BACKEND_FTP(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_BACKEND_FTP, GVfsBackendFtp))
@@ -96,6 +97,7 @@ struct _GVfsBackendFtp
   gboolean              has_initial_user;
   char *                password;	        /* password or NULL for anonymous */
   char *                host_display_name;
+  GVfsFtpFile *         root;
 
   /* ftps support */
   GVfsFtpTlsMode        tls_mode;
