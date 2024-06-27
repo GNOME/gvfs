@@ -30,7 +30,7 @@ option('keyring', type: 'boolean', value: true, description: 'build with keyring
 option('logind', type: 'boolean', value: true, description: 'build with logind support')
 option('libusb', type: 'boolean', value: true, description: 'build with libusb interruption support')
 
-option('deprecated_apis', type: 'boolean', value: true, description: 'install deprecated api headers')
+option('deprecated_apis', type: 'boolean', value: false, description: 'install deprecated api headers')
 option('devel_utils', type: 'boolean', value: false, description: 'build with development utility programs')
 option('installed_tests', type: 'boolean', value: false, description: 'enable installed unit tests')
 option('man', type: 'boolean', value: false, description: 'generate man pages')
