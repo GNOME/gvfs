@@ -1,3 +1,17 @@
+Major changes in 1.54.2
+=======================
+* ftp: Change cwd to root before renaming to prevent failures (rong wang)
+* udisks2: Ignore autofs mounts to prevent duplicated entries (Ondrej Holy)
+* ftp: Use timegm instead of mktime to not shift dates by timezone (Ondrej Holy)
+* ftp: Preserve mtime when copying to local (Ondrej Holy)
+* build: Add deprecated_apis option to control installation of headers (Ondrej Holy)
+* dav: Disable query_info_on_read method to fix mtime preservation (Ondrej Holy)
+* network: Disable usage of smbbrowse backend by default (Ondrej Holy)
+* smbbrowse: Don't enforce NT1 to fix mounting in certain cases (Ondrej Holy)
+* onedrive: Fix various memory leaks (Jan-Michael Brummer)
+* build: Disable burn backend by default (Ondrej Holy)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.54.1
 =======================
 * network: Request content-type attribute to suppress critical errors (Ondrej Holy)
