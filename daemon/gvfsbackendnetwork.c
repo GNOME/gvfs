@@ -596,7 +596,7 @@ recompute_files (GVfsBackendNetwork *backend)
                                 G_CALLBACK (wsdd_monitor_changed_cb),
                                 backend);
 
-              backend->dnssd_monitor = monitor;
+              backend->wsdd_monitor = monitor;
             }
           else
             {
