@@ -382,6 +382,39 @@ create_smb_uri (const char *server,
 }
 
 static void
+set_default_location_to_topmost_dir (GVfsBackend  *backend,
+                                     const char   *mount_path)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  struct stat st;
+  char *uri;
+  int res;
+  char *last_good_path, *new_path;
+  smbc_stat_fn smbc_stat;
+
+  smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
+  last_good_path = g_strdup (mount_path);
+
+  while (!g_str_equal (last_good_path, "/"))
+    {
+      new_path = g_path_get_dirname (last_good_path);
+      uri = create_smb_uri (op_backend->server, op_backend->port, op_backend->share, new_path);
+      res = smbc_stat (op_backend->smb_context, uri, &st);
+      g_free (uri);
+      if (res != 0)
+        {
+          g_free (new_path);
+          break;
+        }
+      g_free (last_good_path);
+      last_good_path = new_path;
+    }
+
+  g_vfs_backend_set_default_location (backend, last_good_path);
+  g_free (last_good_path);
+}
+
+static void
 do_mount (GVfsBackend *backend,
 	  GVfsJobMount *job,
 	  GMountSpec *mount_spec,
@@ -560,7 +593,7 @@ do_mount (GVfsBackend *backend,
   /* Mount was successful */
   g_debug ("do_mount - login successful\n");
 
-  g_vfs_backend_set_default_location (backend, op_backend->path);
+  set_default_location_to_topmost_dir (backend, op_backend->path);
   g_vfs_keyring_save_password (op_backend->last_user,
 			       op_backend->server,
 			       op_backend->last_domain,
