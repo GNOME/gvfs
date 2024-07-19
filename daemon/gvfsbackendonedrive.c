@@ -700,6 +700,7 @@ build_file_info (GVfsBackendOnedrive    *self,
   gboolean is_root = FALSE;
   gboolean is_home = (item == self->home);
   gboolean is_shared_with_me = (item == self->shared_with_me_dir);
+  gboolean uncertain_content_type;
 
   if (MSG_IS_DRIVE_ITEM_FOLDER (item))
     is_folder = TRUE;
@@ -726,6 +727,12 @@ build_file_info (GVfsBackendOnedrive    *self,
       goffset size;
 
       mime_type = g_strdup (msg_drive_item_file_get_mime_type (MSG_DRIVE_ITEM_FILE (item)));
+      if (mime_type == NULL || g_str_equal (mime_type, "application/octet-stream"))
+        {
+          g_free (mime_type);
+          mime_type = g_content_type_guess (msg_drive_item_get_name (item), NULL, 0, &uncertain_content_type);
+        }
+
       file_type = G_FILE_TYPE_REGULAR;
 
       size = msg_drive_item_get_size (item);
@@ -738,7 +745,9 @@ build_file_info (GVfsBackendOnedrive    *self,
       g_autoptr (GIcon) icon = NULL;
       g_autoptr (GIcon) symbolic_icon = NULL;
 
-      g_file_info_set_content_type (info, mime_type);
+      if (!uncertain_content_type)
+        g_file_info_set_content_type (info, mime_type);
+
       g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, mime_type);
 
       if (is_home)
