@@ -741,7 +741,7 @@ static void
 set_attributes_from_info (GFileInfo *file_info, struct stat *sbuf)
 {
   sbuf->st_mode = file_info_get_stat_mode (file_info);
-  sbuf->st_size = g_file_info_get_size (file_info);
+  sbuf->st_size = g_file_info_get_attribute_uint64 (file_info, G_FILE_ATTRIBUTE_STANDARD_SIZE);
   sbuf->st_uid = daemon_uid;
   sbuf->st_gid = daemon_gid;
 
