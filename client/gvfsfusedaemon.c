@@ -1014,6 +1014,8 @@ setup_input_stream (GFile *file, FileHandle *fh)
   return result;
 }
 
+#define _g_file_edit(file, flags, cancellable, error) g_file_append_to(file, flags | (1 << 15), cancellable, error)
+
 static gint
 setup_output_stream (GFile *file, FileHandle *fh, int flags)
 {
@@ -1043,7 +1045,7 @@ setup_output_stream (GFile *file, FileHandle *fh, int flags)
       else if (flags & O_APPEND)
         fh->stream = g_file_append_to (file, 0, NULL, &error);
       else
-        result = -ENOTSUP;
+        fh->stream = _g_file_edit (file, 0, NULL, &error);
       if (fh->stream)
         fh->pos = g_seekable_tell (G_SEEKABLE (fh->stream));
     }
