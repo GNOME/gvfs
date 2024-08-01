@@ -57,6 +57,8 @@ G_DEFINE_TYPE_WITH_CODE (GDaemonFile, g_daemon_file, G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_FILE,
 						g_daemon_file_file_iface_init))
 
+#define PRIVATE_EDIT_FLAG (1 << 15)
+
 static void
 g_daemon_file_finalize (GObject *object)
 {
@@ -1244,7 +1246,10 @@ g_daemon_file_append_to (GFile *file,
                          GCancellable *cancellable,
                          GError **error)
 {
-  return file_open_write (file, 1, "", FALSE, flags, cancellable, error);
+  if (flags & PRIVATE_EDIT_FLAG)
+    return file_open_write (file, 3, "", FALSE, flags, cancellable, error);
+  else
+    return file_open_write (file, 1, "", FALSE, flags, cancellable, error);
 }
 
 static GFileOutputStream *
@@ -3145,7 +3150,10 @@ g_daemon_file_append_to_async (GFile                      *file,
   g_task_set_source_tag (task, g_daemon_file_append_to_async);
   g_task_set_priority (task, io_priority);
 
-  file_open_write_async (file, task, 1, "", FALSE, flags);
+  if (flags & PRIVATE_EDIT_FLAG)
+    file_open_write_async (file, task, 3, "", FALSE, flags);
+  else
+    file_open_write_async (file, task, 1, "", FALSE, flags);
 }
 
 static GFileOutputStream *
