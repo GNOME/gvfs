@@ -213,6 +213,14 @@ struct _GVfsBackendClass
 				 const char *etag,
 				 gboolean make_backup,
 				 GFileCreateFlags flags);
+  gboolean (*try_edit)          (GVfsBackend *backend,
+                                 GVfsJobOpenForWrite *job,
+                                 const char *filename,
+                                 GFileCreateFlags flags);
+  void     (*edit)              (GVfsBackend *backend,
+                                 GVfsJobOpenForWrite *job,
+                                 const char *filename,
+                                 GFileCreateFlags flags);
   void     (*close_write)       (GVfsBackend *backend,
 				 GVfsJobCloseWrite *job,
 				 GVfsBackendHandle handle);

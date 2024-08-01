@@ -220,6 +220,20 @@ run (GVfsJob *job)
 		      op_job->make_backup,
 		      op_job->flags);
     }
+  else if (op_job->mode == OPEN_FOR_WRITE_EDIT)
+    {
+      if (class->edit == NULL)
+        {
+          g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                            _("Operation not supported"));
+          return;
+        }
+
+      class->edit (op_job->backend,
+                   op_job,
+                   op_job->filename,
+                   op_job->flags);
+    }
   else
     g_assert_not_reached (); /* Handled in try */
 }
@@ -265,6 +279,15 @@ try (GVfsJob *job)
 				 op_job->etag,
 				 op_job->make_backup,
 				 op_job->flags);
+    }
+  else if (op_job->mode == OPEN_FOR_WRITE_EDIT)
+    {
+      if (class->try_edit == NULL)
+        return FALSE;
+      return class->try_edit (op_job->backend,
+                              op_job,
+                              op_job->filename,
+                              op_job->flags);
     }
   else
     {
