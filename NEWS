@@ -1,3 +1,12 @@
+Major changes in 1.55.90
+========================
+* fuse: Fill stat info during readdir to improve performance (Ondrej Holy, Jan Palus)
+* smb: Fix access over FUSE when root dir is not accessible (rong wang)
+* onedrive: Guess mime type locally if not set by the server (Jan-Michael Brummer)
+* trash: Add support for x-gvfs-trash mount option (Ondrej Holy)
+* onedrive: Add seek on write functionality (Jan-Michael Brummer)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.55.1
 =======================
 * ftp: Change cwd to root before renaming to prevent failures (rong wang)
