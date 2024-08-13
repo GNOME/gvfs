@@ -159,6 +159,28 @@ items_in_folder_equal (gconstpointer a, gconstpointer b)
   return FALSE;
 }
 
+static char *
+get_full_item_id (MsgDriveItem *item)
+{
+  const char *drive_id = msg_drive_item_get_drive_id (item);
+
+  if (!drive_id)
+    drive_id = "";
+
+  return g_strconcat (drive_id, msg_drive_item_get_id (item), NULL);
+}
+
+static char *
+get_full_parent_id (MsgDriveItem *item)
+{
+  const char *drive_id = msg_drive_item_get_drive_id (item);
+
+  if (!drive_id)
+    drive_id = "";
+
+  return g_strconcat (drive_id, msg_drive_item_get_parent_id (item), NULL);
+}
+
 static void
 log_dir_items (GVfsBackendOnedrive *self)
 {
@@ -172,8 +194,10 @@ log_dir_items (GVfsBackendOnedrive *self)
   g_hash_table_iter_init (&iter, self->dir_items);
   while (g_hash_table_iter_next (&iter, (gpointer *) &key, (gpointer *) &item))
     {
+      g_autofree char *id = get_full_item_id (MSG_DRIVE_ITEM (item));
+
       g_debug ("  Real ID = %s, (%s, %s) -> %p, %d\n",
-               msg_drive_item_get_id (MSG_DRIVE_ITEM (item)),
+               id,
                key->name_or_id,
                key->parent_id,
                item,
@@ -325,8 +349,8 @@ insert_item (GVfsBackendOnedrive *self,
              MsgDriveItem        *item)
 {
   DirItemsKey *k;
-  const char *id;
-  const char *parent_id;
+  g_autofree char *id = NULL;
+  g_autofree char *parent_id = NULL;
   const char *name;
   gint64 *timestamp;
 
@@ -336,11 +360,11 @@ insert_item (GVfsBackendOnedrive *self,
   g_object_set_data_full (G_OBJECT (item), "timestamp", timestamp, g_free);
 
   /* Add item to items hash */
-  id = msg_drive_item_get_id (item);
+  id = get_full_item_id (item);
   g_hash_table_insert (self->items, g_strdup (id), g_object_ref (item));
 
   /* Add item to parent dir item hash */
-  parent_id = msg_drive_item_get_parent_id (item);
+  parent_id = get_full_parent_id (item);
   k = dir_items_key_new (id, parent_id);
   g_hash_table_insert (self->dir_items, k, g_object_ref (item));
   g_debug ("  insert_item: Inserted real     (%s, %s) -> %p\n", id, parent_id, item);
@@ -359,10 +383,9 @@ insert_custom_item (GVfsBackendOnedrive *self,
                     const char          *parent_id)
 {
   DirItemsKey *k;
-  const char *id;
+  g_autofree char *id = get_full_item_id (item);
   const char *name;
 
-  id = msg_drive_item_get_id (item);
   name = msg_drive_item_get_name (item);
 
   g_hash_table_insert (self->items, g_strdup (id), g_object_ref (item));
@@ -385,11 +408,11 @@ remove_item_full (GVfsBackendOnedrive *self,
                   MsgDriveItem        *item)
 {
   DirItemsKey *k;
-  const char *id;
+  g_autofree char *id = NULL;
+  g_autofree char *parent_id = NULL;
   const char *name;
-  const char *parent_id;
 
-  id = msg_drive_item_get_id (item);
+  id = get_full_item_id (item);
   name = msg_drive_item_get_name (item);
 
   /* Remove item from hash */
@@ -398,7 +421,7 @@ remove_item_full (GVfsBackendOnedrive *self,
   if (is_shared_with_me (item))
     g_hash_table_remove (self->dir_timestamps, SHARED_WITH_ME_ID);
 
-  parent_id = msg_drive_item_get_parent_id (item);
+  parent_id = get_full_parent_id (item);
   g_hash_table_remove (self->dir_timestamps, parent_id);
 
   k = dir_items_key_new (id, parent_id);
@@ -425,9 +448,9 @@ remove_dir (GVfsBackendOnedrive *self,
 {
   GHashTableIter iter;
   MsgDriveItem *item;
-  const char *parent_id = NULL;
+  g_autofree char *parent_id = NULL;
 
-  parent_id = msg_drive_item_get_id (parent);
+  parent_id = get_full_item_id (parent);
 
   g_hash_table_remove (self->dir_timestamps, parent_id);
 
@@ -435,8 +458,10 @@ remove_dir (GVfsBackendOnedrive *self,
   while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &item))
     {
       DirItemsKey *k;
+      g_autofree char *id = NULL;
 
-      k = dir_items_key_new (msg_drive_item_get_id (item), parent_id);
+      id = get_full_item_id (item);
+      k = dir_items_key_new (id, parent_id);
       if (g_hash_table_lookup (self->dir_items, k) != NULL)
         {
           g_object_ref (item);
@@ -466,11 +491,13 @@ is_dir_listing_valid (GVfsBackendOnedrive *self,
                       MsgDriveItem        *parent)
 {
   gint64 *timestamp;
+  g_autofree char *id = NULL;
 
   if (parent == self->root)
     return TRUE;
 
-  timestamp = g_hash_table_lookup (self->dir_timestamps, msg_drive_item_get_id (parent));
+  id = get_full_item_id (parent);
+  timestamp = g_hash_table_lookup (self->dir_timestamps, id);
   if (timestamp != NULL)
     return (g_get_real_time () - *timestamp < REBUILD_ENTRIES_TIMEOUT * G_USEC_PER_SEC);
 
@@ -514,6 +541,7 @@ rebuild_dir (GVfsBackendOnedrive  *self,
   GList *items;
   GError *local_error = NULL;
   gint64 *timestamp;
+  g_autofree char *id = NULL;
 
   if (parent == self->shared_with_me_dir)
     {
@@ -533,7 +561,8 @@ rebuild_dir (GVfsBackendOnedrive  *self,
 
   timestamp = g_new (gint64, 1);
   *timestamp = g_get_real_time ();
-  g_hash_table_insert (self->dir_timestamps, g_strdup (msg_drive_item_get_id (parent)), timestamp);
+  id = get_full_item_id (parent);
+  g_hash_table_insert (self->dir_timestamps, id, timestamp);
 
   for (GList *l = items; l != NULL; l = l->next)
     {
@@ -555,10 +584,10 @@ resolve_child (GVfsBackendOnedrive  *self,
   GError *local_error = NULL;
   DirItemsKey *k;
   MsgDriveItem *item;
-  const char *parent_id;
+  g_autofree char *parent_id = NULL;
   gboolean is_shared_with_me_dir = (parent == self->shared_with_me_dir);
 
-  parent_id = msg_drive_item_get_id (parent);
+  parent_id = get_full_item_id (parent);
   k = dir_items_key_new (basename, parent_id);
 
   item = g_hash_table_lookup (self->dir_items, k);
@@ -631,7 +660,8 @@ resolve (GVfsBackendOnedrive  *self,
 
   if (out_path != NULL)
     {
-      char *tmp  = g_build_path ("/", *out_path, msg_drive_item_get_id (ret_val), NULL);
+      g_autofree char *id = get_full_item_id (ret_val);
+      char *tmp  = g_build_path ("/", *out_path, id, NULL);
       g_free (*out_path);
       *out_path = tmp;
     }
@@ -693,7 +723,7 @@ build_file_info (GVfsBackendOnedrive    *self,
 {
   g_autofree char *mime_type = NULL;
   GFileType file_type;
-  const char *id;
+  g_autofree char *id = NULL;
   const char *name;
   const char *user;
   const char *etag;
@@ -773,7 +803,7 @@ build_file_info (GVfsBackendOnedrive    *self,
 
   g_file_info_set_file_type (info, file_type);
 
-  id = msg_drive_item_get_id (item);
+  id = get_full_item_id (item);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ID_FILE, id);
 
   if (is_root)
@@ -900,7 +930,7 @@ g_vfs_backend_onedrive_delete (GVfsBackend   *_self,
       goto out;
     }
 
-  id = g_strdup (msg_drive_item_get_id (item));
+  id = get_full_item_id (item);
 
   parent = resolve_dir (self, filename, cancellable, NULL, NULL, &error);
   if (error != NULL)
@@ -1012,7 +1042,7 @@ g_vfs_backend_onedrive_enumerate (GVfsBackend           *_self,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  id = g_strdup (msg_drive_item_get_id (item));
+  id = get_full_item_id (item);
   is_shared_with_me_dir = (item == self->shared_with_me_dir);
 
   g_hash_table_iter_init (&iter, self->items);
@@ -1021,7 +1051,7 @@ g_vfs_backend_onedrive_enumerate (GVfsBackend           *_self,
       DirItemsKey *k;
       g_autofree char *child_id = NULL;
 
-      child_id = g_strdup (msg_drive_item_get_id (child));
+      child_id = get_full_item_id (child);
       k = dir_items_key_new (child_id, id);
 
       if ((is_shared_with_me_dir && is_shared_with_me (child)) ||
