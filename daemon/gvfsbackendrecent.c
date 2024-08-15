@@ -50,6 +50,7 @@ struct OPAQUE_TYPE__GVfsBackendRecent
 G_DEFINE_TYPE (GVfsBackendRecent, g_vfs_backend_recent, G_VFS_TYPE_BACKEND);
 
 #define RECENTLY_USED_FILE "recently-used.xbel"
+#define ENUMERATOR_NUM_FILES 100
 
 static GVfsMonitor *
 recent_backend_get_file_monitor (GVfsBackendRecent *backend,
@@ -342,6 +343,15 @@ recent_backend_enumerate (GVfsBackend           *vfs_backend,
   gpointer key, value;
 
   g_assert (filename[0] == '/');
+
+  if (filename[1] != '\0')
+    {
+      /* Ignore subdirectories in recents */
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+      g_vfs_job_enumerate_done (job);
+
+      return TRUE;
+    }
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
