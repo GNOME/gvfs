@@ -1211,6 +1211,7 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
       MsgDrive *drive = NULL;
       MsgDriveItem *item = NULL;
       g_autoptr (GError) local_error = NULL;
+      const char *drive_name = NULL;
 
       drive = MSG_DRIVE (l->data);
       item = msg_drive_service_get_root (self->service, drive, cancellable, &local_error);
@@ -1223,6 +1224,15 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
       if (!self->home)
         {
           self->home = item;
+        }
+
+      drive_name = msg_drive_get_name (drive);
+      if (drive_name)
+        {
+          msg_drive_item_set_name (item, drive_name);
+        }
+      else
+        {
           msg_drive_item_set_name (item, _("My Files"));
         }
 
