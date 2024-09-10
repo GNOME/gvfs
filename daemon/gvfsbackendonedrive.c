@@ -730,7 +730,7 @@ build_file_info (GVfsBackendOnedrive    *self,
   gboolean is_root = FALSE;
   gboolean is_home = (item == self->home);
   gboolean is_shared_with_me = (item == self->shared_with_me_dir);
-  gboolean uncertain_content_type;
+  gboolean uncertain_content_type = FALSE;
 
   if (MSG_IS_DRIVE_ITEM_FOLDER (item))
     is_folder = TRUE;
