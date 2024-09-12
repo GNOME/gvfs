@@ -457,7 +457,11 @@ gvfs_udisks2_volume_monitor_update (GVfsUDisks2VolumeMonitor *monitor)
 {
   g_return_if_fail (GVFS_IS_UDISKS2_VOLUME_MONITOR (monitor));
   udisks_client_settle (monitor->client);
-  schedule_update (monitor);
+
+  if (monitor->update_id != 0)
+    g_source_remove (monitor->update_id);
+
+  update_func (monitor);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
