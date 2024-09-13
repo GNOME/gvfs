@@ -1,3 +1,10 @@
+Major changes in 1.54.3
+=======================
+* onedrive: Set name of drive root (Jan-Michael Brummer)
+* onedrive: Handle multiple drives with same IDs (Jan-Michael Brummer)
+* onedrive: Guess mime type locally if not set by the server (Jan-Michael Brummer)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.54.2
 =======================
 * ftp: Change cwd to root before renaming to prevent failures (rong wang)
