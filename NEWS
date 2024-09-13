@@ -1,3 +1,10 @@
+Major changes in 1.56.0
+=======================
+* udisks2: Run update synchronously for internal changes (Ondrej Holy)
+* onedrive: Set name of drive root (Jan-Michael Brummer)
+* onedrive: Handle multiple drives with same IDs (Jan-Michael Brummer)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.55.90
 ========================
 * fuse: Fill stat info during readdir to improve performance (Ondrej Holy, Jan Palus)
