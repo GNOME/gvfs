@@ -1218,7 +1218,18 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
       item = msg_drive_service_get_root (self->service, drive, cancellable, &local_error);
       if (local_error)
         {
-          g_warning ("Could not get root: %s", local_error->message);
+          if (g_strcmp0 (local_error->message, "ObjectHandle is Invalid") == 0)
+            {
+              /* Reduce log level for this specific message as there can
+               * be drives which aren't iterable.... problem report created.
+               * https://gitlab.gnome.org/GNOME/gvfs/-/issues/763
+               */
+              g_debug ("Could not get root: %s", local_error->message);
+            }
+          else
+            {
+              g_warning ("Could not get root: %s", local_error->message);
+            }
           continue;
         }
 
