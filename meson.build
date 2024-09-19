@@ -429,7 +429,7 @@ enable_onedrive = get_option('onedrive')
 if enable_onedrive
   assert(enable_goa, 'OneDrive backend requested but GOA is required')
 
-  msgraph_dep = dependency('msgraph-0.1')
+  msgraph_dep = dependency('msgraph-1', version: '>= 0.3.0')
 endif
 
 # *** Check for gphoto2 ***
