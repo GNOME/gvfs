@@ -3221,6 +3221,10 @@ make_directory_cb (GObject *source, GAsyncResult *result, gpointer user_data)
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_EXISTS,
                         _("Target file already exists"));
+    else if (status == SOUP_STATUS_CONFLICT)
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_FOUND,
+                        _("No such file or directory"));
     else
       http_job_failed (G_VFS_JOB (job), msg);
   else
