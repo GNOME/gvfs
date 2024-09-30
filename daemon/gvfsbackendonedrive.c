@@ -540,7 +540,6 @@ rebuild_dir (GVfsBackendOnedrive  *self,
   GList *items;
   GError *local_error = NULL;
   gint64 *timestamp;
-  g_autofree char *id = NULL;
 
   if (parent == self->shared_with_me_dir)
     {
@@ -560,8 +559,7 @@ rebuild_dir (GVfsBackendOnedrive  *self,
 
   timestamp = g_new (gint64, 1);
   *timestamp = g_get_real_time ();
-  id = get_full_item_id (parent);
-  g_hash_table_insert (self->dir_timestamps, id, timestamp);
+  g_hash_table_insert (self->dir_timestamps, get_full_item_id (parent), timestamp);
 
   for (GList *l = items; l != NULL; l = l->next)
     {
