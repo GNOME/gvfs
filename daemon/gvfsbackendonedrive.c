@@ -658,8 +658,7 @@ resolve (GVfsBackendOnedrive  *self,
 
   if (out_path != NULL)
     {
-      g_autofree char *id = get_full_item_id (ret_val);
-      char *tmp  = g_build_path ("/", *out_path, id, NULL);
+      char *tmp = g_build_path ("/", *out_path, msg_drive_item_get_name (ret_val), NULL);
       g_free (*out_path);
       *out_path = tmp;
     }
@@ -1124,7 +1123,7 @@ g_vfs_backend_onedrive_make_directory (GVfsBackend          *_self,
       goto out;
     }
 
-  item_path = g_build_path ("/", parent_path, msg_drive_item_get_id (new_folder), NULL);
+  item_path = g_build_path ("/", parent_path, msg_drive_item_get_name (new_folder), NULL);
   g_debug ("  new item path: %s\n", item_path);
 
   insert_item (self, new_folder);
@@ -1745,7 +1744,7 @@ g_vfs_backend_onedrive_create (GVfsBackend         *_self,
       goto out;
     }
 
-  item_path = g_build_path ("/", parent_path, msg_drive_item_get_id (new_item), NULL);
+  item_path = g_build_path ("/", parent_path, msg_drive_item_get_name (new_item), NULL);
   g_debug ("  new item path: %s\n", item_path);
 
   insert_item (self, new_item);
@@ -1911,7 +1910,7 @@ g_vfs_backend_onedrive_replace (GVfsBackend         *_self,
 
   if (needs_overwrite)
     {
-      item_path = g_build_path ("/", parent_path, msg_drive_item_get_id (existing_item), NULL);
+      item_path = g_build_path ("/", parent_path, msg_drive_item_get_name (existing_item), NULL);
       g_debug ("  existing item path: %s\n", item_path);
 
       error = NULL;
@@ -1939,7 +1938,7 @@ g_vfs_backend_onedrive_replace (GVfsBackend         *_self,
           goto out;
         }
 
-      item_path = g_build_filename (parent_path, msg_drive_item_get_id (MSG_DRIVE_ITEM (item)), NULL);
+      item_path = g_build_filename (parent_path, msg_drive_item_get_name (MSG_DRIVE_ITEM (item)), NULL);
       g_debug ("  new item path: %s\n", item_path);
 
       insert_item (self, MSG_DRIVE_ITEM (new_item));
