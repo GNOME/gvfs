@@ -1906,7 +1906,15 @@ g_vfs_backend_onedrive_replace (GVfsBackend         *_self,
       insert_item (self, MSG_DRIVE_ITEM (new_item));
       g_hash_table_foreach (self->monitors, emit_create_event, item_path);
 
-      handle = write_handle_new (MSG_DRIVE_ITEM (new_item), NULL, filename, item_path);
+      stream = msg_drive_service_update (self->service, new_item, cancellable, &error);
+      if (error != NULL)
+        {
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          goto out;
+        }
+
+      handle = write_handle_new (MSG_DRIVE_ITEM (new_item), stream, filename, item_path);
     }
 
   g_vfs_job_open_for_write_set_handle (job, handle);
