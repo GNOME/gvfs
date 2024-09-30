@@ -796,6 +796,16 @@ build_file_info (GVfsBackendOnedrive    *self,
       g_file_info_set_symbolic_icon (info, symbolic_icon);
     }
 
+  if (msg_drive_item_is_shared (item))
+    {
+      g_autoptr (GStrvBuilder) emblems_builder = g_strv_builder_new ();
+      g_auto (GStrv) emblems = NULL;
+
+      g_strv_builder_add (emblems_builder, "folder-remote");
+      emblems = g_strv_builder_end (emblems_builder);
+      g_file_info_set_attribute_stringv (info, "metadata::emblems", emblems);
+    }
+
   g_file_info_set_file_type (info, file_type);
 
   id = get_full_item_id (item);
