@@ -678,10 +678,8 @@ resolve_dir (GVfsBackendOnedrive  *self,
   MsgDriveItem *parent;
   MsgDriveItem *ret_val = NULL;
   GError *local_error = NULL;
-  g_autofree char *basename = NULL;
   g_autofree char *parent_path = NULL;
 
-  basename = g_path_get_basename (filename);
   parent_path = g_path_get_dirname (filename);
 
   parent = resolve (self, parent_path, cancellable, out_path, &local_error);
@@ -699,8 +697,7 @@ resolve_dir (GVfsBackendOnedrive  *self,
 
   if (out_basename != NULL)
     {
-      *out_basename = basename;
-      basename = NULL;
+      *out_basename = g_path_get_basename (filename);
     }
 
   ret_val = parent;
