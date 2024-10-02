@@ -1148,6 +1148,7 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
   g_autolist (MsgDrive) drives = NULL;
   GList *l = NULL;
   const char *host = NULL;
+  const char *user = NULL;
 
   g_debug ("+ mount\n");
 
@@ -1159,7 +1160,8 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
     }
 
   host = g_mount_spec_get (spec, "host");
-  self->account_identity = g_strdup (host);
+  user = g_mount_spec_get (spec, "user");
+  self->account_identity = g_strconcat (user, "@", host, NULL);
 
   accounts = goa_client_get_accounts (self->client);
   for (l = accounts; l != NULL; l = l->next)
@@ -1170,7 +1172,7 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
       const char *provider_type = NULL;
 
       account = goa_object_get_account (object);
-      account_identity = goa_account_get_identity (account);
+      account_identity = goa_account_get_presentation_identity (account);
       provider_type = goa_account_get_provider_type (account);
 
       if (g_strcmp0 (provider_type, "ms_graph") == 0 &&
@@ -1254,7 +1256,8 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
   g_vfs_backend_set_default_location (_self, msg_drive_item_get_name (self->home));
 
   real_mount_spec = g_mount_spec_new ("onedrive");
-  g_mount_spec_set (real_mount_spec, "host", self->account_identity);
+  g_mount_spec_set (real_mount_spec, "host", host);
+  g_mount_spec_set (real_mount_spec, "user", user);
   g_vfs_backend_set_mount_spec (_self, real_mount_spec);
   g_mount_spec_unref (real_mount_spec);
 

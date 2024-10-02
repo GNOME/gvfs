@@ -368,7 +368,7 @@ endif
 # *** Check if we should build with GOA volume monitor ***
 enable_goa = get_option('goa')
 if enable_goa
-  goa_dep = dependency('goa-1.0', version: '>= 3.17.1')
+  goa_dep = dependency('goa-1.0', version: '>= 3.53.1')
 endif
 
 # *** Check for GNOME Keyring ***
