@@ -31,6 +31,7 @@
 #include "gvfswsdddevice.h"
 #include "gvfsutils.h"
 
+#define SYSTEM_SOCKET_PATH "/run/wsdd.socket"
 #define SOCKET_NAME "wsdd"
 #define CONNECT_TIMEOUT 10
 #define LIST_COMMAND "list pub:Computer\n"
@@ -539,15 +540,29 @@ initable_init (GInitable *initable,
       return FALSE;
     }
 
-  socket_dir = gvfs_get_socket_dir ();
-  socket_path = g_build_filename (socket_dir, SOCKET_NAME, NULL);
-  service->socket_address = g_unix_socket_address_new (socket_path);
-
-  /* Try to connect to the already running wsdd daemon. */
+  /* Try to connect to the socket-activated service. */
+  service->socket_address = g_unix_socket_address_new (SYSTEM_SOCKET_PATH);
   g_socket_connect (service->socket,
                     service->socket_address,
                     cancellable,
                     &local_error);
+
+  if (local_error != NULL)
+    {
+      /* Fall back to spawning our own wsdd daemon. */
+      g_clear_error (&local_error);
+      g_clear_object (&service->socket_address);
+      socket_dir = gvfs_get_socket_dir ();
+      socket_path = g_build_filename (socket_dir, SOCKET_NAME, NULL);
+      service->socket_address = g_unix_socket_address_new (socket_path);
+
+      /* Try to connect to the already running wsdd daemon. */
+      g_socket_connect (service->socket,
+                        service->socket_address,
+                        cancellable,
+                        &local_error);
+    }
+
   if (local_error != NULL)
     {
       gchar *args[7] = { 0 };
