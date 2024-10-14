@@ -1325,6 +1325,9 @@ create_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
     }
   else
     {
+      if (op_job->mode == OPEN_FOR_WRITE_CREATE && -err == EISDIR)
+        err = -EEXIST;
+
       g_vfs_job_failed_from_errno (job, -err);
     }
 }
