@@ -727,15 +727,18 @@ write_handle_free (WriteHandle *handle)
 }
 
 static void
-append_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
+open_for_write_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
 {
   GVfsJob *job = G_VFS_JOB (private_data);
+  GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
+
   if (err == 0)
     {
-      GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
       WriteHandle *handle = g_slice_new0 (WriteHandle);
 
       handle->fh = data;
+      g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
+      g_vfs_job_open_for_write_set_can_truncate (op_job, TRUE);
       g_vfs_job_open_for_write_set_handle (op_job, handle);
       g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
       g_vfs_job_open_for_write_set_can_truncate (op_job, TRUE);
@@ -743,8 +746,27 @@ append_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
     }
   else
     {
+      if (op_job->mode == OPEN_FOR_WRITE_CREATE && -err == EISDIR)
+        err = -EEXIST;
+
       g_vfs_job_failed_from_errno (job, -err);
     }
+}
+
+static void
+open_for_write (GVfsBackend *backend,
+                GVfsJobOpenForWrite *job,
+                const char *filename,
+                GFileCreateFlags flags,
+                int open_flags)
+{
+  GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (backend);
+
+  nfs_create_async (op_backend->ctx,
+                    filename,
+                    open_flags,
+                    (flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
+                    open_for_write_cb, job);
 }
 
 static gboolean
@@ -753,13 +775,19 @@ try_append_to (GVfsBackend *backend,
                const char *filename,
                GFileCreateFlags flags)
 {
-  GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (backend);
+  open_for_write (backend, job, filename, flags, O_APPEND);
 
-  nfs_create_async (op_backend->ctx,
-                    filename,
-                    O_APPEND,
-                    (flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
-                    append_cb, job);
+  return TRUE;
+}
+
+static gboolean
+try_edit (GVfsBackend *backend,
+          GVfsJobOpenForWrite *job,
+          const char *filename,
+          GFileCreateFlags flags)
+{
+  open_for_write (backend, job, filename, flags, 0);
+
   return TRUE;
 }
 
@@ -1307,44 +1335,14 @@ try_replace (GVfsBackend *backend,
   return TRUE;
 }
 
-static void
-create_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
-{
-  GVfsJob *job = G_VFS_JOB (private_data);
-
-  if (err == 0)
-    {
-      GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
-      WriteHandle *handle = g_slice_new0 (WriteHandle);
-
-      handle->fh = data;
-      g_vfs_job_open_for_write_set_handle (op_job, handle);
-      g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
-      g_vfs_job_open_for_write_set_can_truncate (op_job, TRUE);
-      g_vfs_job_succeeded (job);
-    }
-  else
-    {
-      if (op_job->mode == OPEN_FOR_WRITE_CREATE && -err == EISDIR)
-        err = -EEXIST;
-
-      g_vfs_job_failed_from_errno (job, -err);
-    }
-}
-
 static gboolean
 try_create (GVfsBackend *backend,
             GVfsJobOpenForWrite *job,
             const char *filename,
             GFileCreateFlags flags)
 {
-  GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (backend);
+  open_for_write (backend, job, filename, flags, O_EXCL);
 
-  nfs_create_async (op_backend->ctx,
-                    filename,
-                    O_EXCL,
-                    (flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
-                    create_cb, job);
   return TRUE;
 }
 
@@ -2583,6 +2581,7 @@ g_vfs_backend_nfs_class_init (GVfsBackendNfsClass *klass)
   backend_class->try_make_symlink = try_make_symlink;
   backend_class->try_create = try_create;
   backend_class->try_append_to = try_append_to;
+  backend_class->try_edit = try_edit;
   backend_class->try_replace = try_replace;
   backend_class->try_write = try_write;
   backend_class->try_query_info_on_write = try_query_info_on_write;
