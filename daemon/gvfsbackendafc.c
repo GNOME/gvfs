@@ -1101,6 +1101,7 @@ g_vfs_backend_afc_create (GVfsBackend *backend,
   char *new_path, *app = NULL;
   afc_client_t afc_cli;
   FileHandle *fh;
+  char **afcinfo = NULL;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
@@ -1131,6 +1132,16 @@ g_vfs_backend_afc_create (GVfsBackend *backend,
     {
       afc_cli = self->afc_cli;
       new_path = NULL;
+    }
+
+  if (afc_get_file_info (afc_cli, new_path ? new_path : path, &afcinfo) == AFC_E_SUCCESS)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_EXISTS,
+                        _("Target file already exists"));
+      g_strfreev (afcinfo);
+      g_free (new_path);
+      g_free (app);
+      return;
     }
 
   if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_open (afc_cli,
