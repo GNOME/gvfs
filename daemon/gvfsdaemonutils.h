@@ -56,6 +56,8 @@ gssize       gvfs_output_stream_splice              (GOutputStream *stream,
                                                      GCancellable *cancellable,
                                                      GError **error);
 
+int          gvfs_mode_from_flags (GFileCreateFlags flags);
+
 G_END_DECLS
 
 #endif /* __G_VFS_DAEMON_UTILS_H__ */

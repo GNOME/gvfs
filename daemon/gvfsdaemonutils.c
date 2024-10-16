@@ -438,3 +438,9 @@ gvfs_output_stream_splice (GOutputStream *stream,
 
   return -1;
 }
+
+int
+gvfs_mode_from_flags (GFileCreateFlags flags)
+{
+  return (flags & G_FILE_CREATE_PRIVATE) ? 0600 : 0666;
+}
