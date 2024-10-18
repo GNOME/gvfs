@@ -1,3 +1,12 @@
+Major changes in 1.56.1
+=======================
+* udisks2: Increasing reference count when updating volume to fix crashes (Ondrej Holy)
+* onedrive: Use names instead of id for events to fix monitoring (Jan-Michael Brummer)
+* onedrive: Add missing replace stream to fix crashes (Jan-Michael Brummer)
+* onedrive: Fix double free during cache rebuild to fix crashes (Jan-Michael Brummer)
+* dav: Recognize the 409 status to fix creation of parent directories (Michael Terry)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.56.0
 =======================
 * udisks2: Run update synchronously for internal changes (Ondrej Holy)
