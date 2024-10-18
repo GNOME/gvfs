@@ -1,3 +1,9 @@
+Major changes in 1.54.4
+=======================
+* udisks2: Increasing reference count when updating volume to fix crashes (Ondrej Holy)
+* onedrive: Add missing replace stream to fix crashes (Jan-Michael Brummer)
+* onedrive: Fix double free during cache rebuild to fix crashes (Jan-Michael Brummer)
+
 Major changes in 1.54.3
 =======================
 * onedrive: Set name of drive root (Jan-Michael Brummer)
