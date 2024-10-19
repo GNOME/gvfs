@@ -7,10 +7,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gvfs&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-09-07 18:36+0000\n"
-"PO-Revision-Date: 2012-09-23 23:21+0700\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
+"POT-Creation-Date: 2024-07-26 07:27+0000\n"
+"PO-Revision-Date: 2024-10-19 16:55+0700\n"
 "Last-Translator: Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
 "Language-Team: Thai <thai-l10n@googlegroups.com>\n"
 "Language: th\n"
@@ -18,128 +17,123 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.5\n"
 
-#: ../client/gdaemonfile.c:416 ../client/gdaemonfile.c:2767
+#: client/gdaemonfile.c:435
 msgid "Operation not supported, files on different mounts"
-msgstr "ไม่รองรับการกระทำนี้ เนื่องจากแฟ้มอยู่ใต้จุดเมานท์คนละจุดกัน"
+msgstr "ไม่รองรับการกระทำนี้ เนื่องจากไฟล์อยู่ใต้จุดเมานท์คนละจุดกัน"
 
-#: ../client/gdaemonfile.c:1034 ../client/gdaemonfile.c:3110
-#: ../client/gvfsiconloadable.c:304
-msgid "Couldn't get stream file descriptor"
+#: client/gdaemonfile.c:1043 client/gdaemonfile.c:3074 client/gvfsiconloadable.c:366
+#: daemon/gvfsjobopenforread.c:183 daemon/gvfsjobopenforwrite.c:333
+msgid "Couldn’t get stream file descriptor"
 msgstr "ไม่สามารถหยิบ file descriptor ของสตรีมมาใช้ได้"
 
-#: ../client/gdaemonfile.c:1163 ../client/gdaemonfile.c:1235
-#: ../client/gvfsiconloadable.c:129
-msgid "Didn't get stream file descriptor"
-msgstr "ไม่สามารถหยิบ file descriptor ของสตรีมมาใช้ได้"
+#: client/gdaemonfile.c:1159 client/gdaemonfile.c:1231 client/gvfsiconloadable.c:147
+msgid "Didn’t get stream file descriptor"
+msgstr "ไม่ได้หยิบ file descriptor ของสตรีมมาใช้"
 
-#: ../client/gdaemonfile.c:1356
+#: client/gdaemonfile.c:1353
 #, c-format
 msgid "Invalid return value from %s"
 msgstr "มีการคืนค่าที่ไม่ถูกต้องจาก %s"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:2241
+#: client/gdaemonfile.c:2203 client/gdaemonfile.c:3337
 msgid "Could not find enclosing mount"
 msgstr "ไม่สามารถหาจุดเมานท์ที่บรรจุ"
 
-#: ../client/gdaemonfile.c:2277
+#: client/gdaemonfile.c:2235
 #, c-format
 msgid "Invalid filename %s"
-msgstr "ชื่อแฟ้ม %s ใช้ไม่ได้"
+msgstr "ชื่อไฟล์ %s ใช้ไม่ได้"
 
-#: ../client/gdaemonfile.c:2609 ../client/gdaemonvfs.c:1290
-#: ../client/gdaemonvfs.c:1342
+#: client/gdaemonfile.c:2549 client/gdaemonfile.c:2559 client/gdaemonfile.c:2581
+#: client/gdaemonvfs.c:1234 client/gdaemonvfs.c:1255 client/gdaemonvfs.c:1266
+#: client/gdaemonvfs.c:1298
 #, c-format
 msgid "Error setting file metadata: %s"
-msgstr "เกิดข้อผิดพลาดขณะกำหนดค่าข้อมูลกำกับแฟ้ม: %s"
+msgstr "เกิดข้อผิดพลาดขณะกำหนดค่าข้อมูลกำกับไฟล์: %s"
 
-#: ../client/gdaemonfile.c:2610 ../client/gdaemonvfs.c:1343
+#: client/gdaemonfile.c:2550 client/gdaemonvfs.c:1256
+msgid "can’t open metadata tree"
+msgstr "ไม่สามารถเปิดต้นไม้ข้อมูลกำกับ"
+
+#: client/gdaemonfile.c:2560 client/gdaemonvfs.c:1267
+msgid "can’t get metadata proxy"
+msgstr "ไม่สามารถอ่านพร็อกซีสำหรับข้อมูลกำกับ"
+
+#: client/gdaemonfile.c:2582 client/gdaemonvfs.c:1299
 msgid "values must be string or list of strings"
 msgstr "ค่าที่กำหนดต้องเป็นข้อความหรือรายการของข้อความ"
 
-#: ../client/gdaemonfileenumerator.c:529 ../client/gdaemonfileenumerator.c:612
-#: ../client/gdaemonfileenumerator.c:663
-#: ../client/gdaemonfileinputstream.c:630
-#: ../client/gdaemonfileinputstream.c:783
-#: ../client/gdaemonfileinputstream.c:901
-#: ../client/gdaemonfileinputstream.c:1149
-#: ../client/gdaemonfileinputstream.c:1391
-#: ../client/gdaemonfileoutputstream.c:506
-#: ../client/gdaemonfileoutputstream.c:681
-#: ../client/gdaemonfileoutputstream.c:873
-#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:726
-#: ../daemon/gvfsbackendobexftp.c:1111 ../daemon/gvfsbackendobexftp.c:1132
-#: ../daemon/gvfsbackendobexftp.c:1251 ../daemon/gvfsbackendobexftp.c:1388
-#: ../daemon/gvfsbackendobexftp.c:1452 ../daemon/gvfsbackendobexftp.c:1654
-#: ../daemon/gvfsbackendobexftp.c:1761 ../daemon/gvfsbackendobexftp.c:1923
-#: ../daemon/gvfsbackendobexftp.c:1950 ../daemon/gvfsbackendobexftp.c:2009
-#: ../daemon/gvfsbackendobexftp.c:2031 ../daemon/gvfsbackendobexftp.c:2094
-#: ../daemon/gvfsbackendobexftp.c:2113 ../daemon/gvfsbackendsmb.c:1180
-#: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:322
-#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1070
-#: ../monitor/proxy/gproxydrive.c:547 ../monitor/proxy/gproxydrive.c:635
-#: ../monitor/proxy/gproxydrive.c:785 ../monitor/proxy/gproxydrive.c:923
-#: ../monitor/proxy/gproxydrive.c:961 ../monitor/proxy/gproxydrive.c:1086
-#: ../monitor/proxy/gproxymount.c:501 ../monitor/proxy/gproxymount.c:586
-#: ../monitor/proxy/gproxyvolume.c:853 ../monitor/proxy/gproxyvolume.c:916
-msgid "Operation was cancelled"
-msgstr "ปฏิบัติการถูกยกเลิก"
-
-#: ../client/gdaemonfileinputstream.c:527
-#: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1684
-#: ../client/gdaemonfileinputstream.c:1694
-#: ../client/gdaemonfileoutputstream.c:450
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1236
-#: ../client/gdaemonfileoutputstream.c:1246
+#: client/gdaemonfileinputstream.c:544 client/gdaemonfileinputstream.c:552
+#: client/gdaemonfileinputstream.c:1686 client/gdaemonfileinputstream.c:1695
+#: client/gdaemonfileoutputstream.c:495 client/gdaemonfileoutputstream.c:503
+#: client/gdaemonfileoutputstream.c:1433 client/gdaemonfileoutputstream.c:1442
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "เกิดข้อผิดพลาดในโพรโทคอลของสตรีม: %s"
 
-#: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1694
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1246
+#: client/gdaemonfileinputstream.c:552 client/gdaemonfileinputstream.c:1695
+#: client/gdaemonfileoutputstream.c:503 client/gdaemonfileoutputstream.c:1442
+#: daemon/gvfsbackendmtp.c:2501 daemon/gvfsbackendmtp.c:2892
 msgid "End of stream"
 msgstr "จบสตรีม"
 
-#: ../client/gdaemonfileinputstream.c:1330
-#: ../client/gdaemonfileoutputstream.c:981
+#: client/gdaemonfileinputstream.c:649 client/gdaemonfileinputstream.c:802
+#: client/gdaemonfileinputstream.c:922 client/gdaemonfileinputstream.c:1173
+#: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
+#: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
+#: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
+#: daemon/gvfsbackendsftp.c:5534 daemon/gvfsbackendsmb.c:1121 daemon/gvfsbackendtest.c:92
+#: daemon/gvfsbackendtest.c:125 daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:347
+#: daemon/gvfsftptask.c:224
+msgid "Operation was cancelled"
+msgstr "ปฏิบัติการถูกยกเลิก"
+
+#: client/gdaemonfileinputstream.c:1355 client/gdaemonfileoutputstream.c:1035
 msgid "Seek not supported on stream"
 msgstr "ไม่รองรับการเลื่อนตำแหน่งในสตรีม"
 
-#: ../client/gdaemonvfs.c:814
+#: client/gdaemonfileoutputstream.c:1204
+msgid "Truncate not supported on stream"
+msgstr "ไม่รองรับการตัดทอนข้อมูลในสตรีม"
+
+#: client/gdaemonvfs.c:780
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลการเมานท์: %s"
 
-#: ../common/gvfsdaemonprotocol.c:349
-msgid "Invalid file info format"
-msgstr "รูปแบบของข้อมูลเกี่ยวกับแฟ้มผิดพลาด"
+#: client/gvfsdaemondbus.c:292 client/gvfsdaemondbus.c:666 daemon/gvfsafpvolume.c:394
+#: daemon/gvfsafpvolume.c:655 daemon/gvfsafpvolume.c:799 daemon/gvfsafpvolume.c:980
+#: daemon/gvfsafpvolume.c:1164 daemon/gvfsafpvolume.c:1339 daemon/gvfsafpvolume.c:1491
+#: daemon/gvfsafpvolume.c:1913 daemon/gvfsafpvolume.c:2034 daemon/gvfsafpvolume.c:2189
+#: daemon/gvfsafpvolume.c:2402 daemon/gvfsbackendadmin.c:150 daemon/gvfsbackendafc.c:166
+#: daemon/gvfsbackendgoogle.c:256 daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1125
+#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:438 daemon/mount.c:437
+#, c-format
+msgid "Permission denied"
+msgstr "ไม่ได้รับอนุญาต"
 
-#: ../common/gvfsdnssdresolver.c:209
+#: common/gvfsdaemonprotocol.c:358
+msgid "Invalid file info format"
+msgstr "รูปแบบของข้อมูลเกี่ยวกับไฟล์ผิดพลาด"
+
+#: common/gvfsdnssdresolver.c:216
 #, c-format
 msgid "Error initializing Avahi: %s"
 msgstr "เกิดข้อผิดพลาดขณะตั้งค่าเริ่มต้น Avahi: %s"
-
-#: ../common/gvfsdnssdresolver.c:255
-#, c-format
-msgid "Error creating Avahi resolver: %s"
-msgstr "เกิดข้อผิดพลาดขณะสร้างตัวหาที่อยู่ของ Avahi: %s"
 
 #. Translators:
 #. * - the first %s refers to the service type
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #.
-#: ../common/gvfsdnssdresolver.c:1100
+#: common/gvfsdnssdresolver.c:1144
 #, c-format
-msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr "เกิดข้อผิดพลาดขณะเปิดหาบริการ \"%s\" ชื่อ \"%s\" ที่โดเมน \"%s\""
+msgid "Error resolving “%s” service “%s” on domain “%s”"
+msgstr "เกิดข้อผิดพลาดขณะเปิดหาบริการ “%s” ชื่อ “%s” ที่โดเมน “%s”"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -147,466 +141,528 @@ msgstr "เกิดข้อผิดพลาดขณะเปิดหาบ
 #. * - the third %s refers to the domain
 #. * - the fourth %s refers to the required TXT keys
 #.
-#: ../common/gvfsdnssdresolver.c:1126
+#: common/gvfsdnssdresolver.c:1168
 #, c-format
 msgid ""
-"Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
-"records are missing. Keys required: \"%s\"."
+"Error resolving “%s” service “%s” on domain “%s”. One or more TXT records are missing. Keys "
+"required: “%s”."
 msgstr ""
-"เกิดข้อผิดพลาดขณะเปิดหาบริการ \"%s\" ชื่อ \"%s\" ที่โดเมน \"%s\" ระเบียน TXT "
-"อย่างน้อยหนึ่งรายการหายไป คีย์ที่ต้องการคือ \"%s\""
+"เกิดข้อผิดพลาดขณะเปิดหาบริการ “%s” ชื่อ “%s” ที่โดเมน “%s” ระเบียน TXT อย่างน้อยหนึ่งรายการหายไป คีย์ที่ต้องการคือ “%s”"
 
 #. Translators:
 #. * - the first %s refers to the service type
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #.
-#: ../common/gvfsdnssdresolver.c:1143
+#: common/gvfsdnssdresolver.c:1183
 #, c-format
-msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr "หมดเวลาคอยขณะเปิดหาบริการ \"%s\" ชื่อ \"%s\" ที่โดเมน \"%s\""
+msgid "Timed out resolving “%s” service “%s” on domain “%s”"
+msgstr "หมดเวลาคอยขณะเปิดหาบริการ “%s” ชื่อ “%s” ที่โดเมน “%s”"
 
-#: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
-#: ../common/gvfsdnssdutils.c:280
-#, c-format
-msgid "Malformed dns-sd encoded_triple '%s'"
-msgstr "encoded_triple '%s' ของ dns-sd ผิดรูปแบบ"
+#: common/gvfsdnssdresolver.c:1223
+msgid "Error initializing Avahi resolver"
+msgstr "เกิดข้อผิดพลาดขณะตั้งค่าเริ่มต้นตัวแปลงที่อยู่ของ Avahi"
 
-#: ../common/gvfsicon.c:250
+#: common/gvfsdnssdutils.c:233 common/gvfsdnssdutils.c:263 common/gvfsdnssdutils.c:280
 #, c-format
-msgid "Can't handle version %d of GVfsIcon encoding"
+msgid "Malformed DNS-SD encoded_triple “%s”"
+msgstr "encoded_triple “%s” ของ DNS-SD ผิดรูปแบบ"
+
+#: common/gvfsicon.c:250
+#, c-format
+msgid "Can’t handle version %d of GVfsIcon encoding"
 msgstr "ไม่สามารถจัดการกับรหัสของ GVfsIcon รุ่น %d ได้"
 
-#: ../common/gvfsicon.c:260
+#: common/gvfsicon.c:260
 msgid "Malformed input data for GVfsIcon"
 msgstr "ข้อมูลเข้าสำหรับ GVfsIcon ผิดรูปแบบ"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "FTP"
-#: ../daemon/daemon-main.c:100
+#: daemon/daemon-main.c:100
 #, c-format
 msgid "%s File System Service"
-msgstr "บริการระบบแฟ้ม %s"
+msgstr "บริการระบบไฟล์ %s"
 
-#: ../daemon/daemon-main.c:178 ../programs/gvfs-copy.c:90
-#: ../programs/gvfs-move.c:78 ../programs/gvfs-rename.c:36
-#: ../programs/gvfs-set-attribute.c:105
+#: daemon/daemon-main.c:178
 #, c-format
 msgid "Error: %s"
 msgstr "ผิดพลาด: %s"
 
-#: ../daemon/daemon-main.c:236
+#: daemon/daemon-main.c:236
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "วิธีใช้: %s --spawner dbus-id object_path"
 
-#: ../daemon/daemon-main.c:260 ../daemon/daemon-main.c:278
+#: daemon/daemon-main.c:260 daemon/daemon-main.c:278
 #, c-format
-msgid "Usage: %s key=value key=value ..."
-msgstr "วิธีใช้: %s key=value key=value ..."
+msgid "Usage: %s key=value key=value …"
+msgstr "วิธีใช้: %s key=value key=value …"
 
-#: ../daemon/daemon-main.c:276
-#, c-format
+#: daemon/daemon-main.c:276
 msgid "No mount type specified"
 msgstr "ไม่ได้ระบุชนิดของการเมานท์"
 
-#: ../daemon/daemon-main.c:308
+#: daemon/daemon-main.c:308
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "จุดเมานท์สำหรับ %s ได้ทำงานอยู่แล้ว"
 
-#: ../daemon/daemon-main.c:329
+#: daemon/daemon-main.c:337
 msgid "error starting mount daemon"
 msgstr "เกิดข้อผิดพลาดขณะตั้งต้นดีมอนสำหรับเมานท์"
 
-#: ../daemon/gvfsafpconnection.c:764
+#: daemon/gvfsafpconnection.c:787
 msgid "The connection is not opened"
 msgstr "การเชื่อมต่อยังไม่ได้เปิด"
 
-#: ../daemon/gvfsafpconnection.c:771
+#: daemon/gvfsafpconnection.c:794
 msgid "The connection is closed"
 msgstr "การเชื่อมต่อถูกปิดไปแล้ว"
 
-#: ../daemon/gvfsafpconnection.c:1545
-msgid "Connection unexpectedly went down"
-msgstr "การเชื่อมต่อขาดช่วงกะทันหัน"
-
-#: ../daemon/gvfsafpconnection.c:1572
+#: daemon/gvfsafpconnection.c:897
 msgid "Got EOS"
 msgstr "ได้รับ EOS"
 
-#: ../daemon/gvfsafpserver.c:198 ../daemon/gvfsafpserver.c:480
+#: daemon/gvfsafpconnection.c:1060 daemon/gvfsafpconnection.c:1102 daemon/gvfsftptask.c:398
+msgid "Host closed connection"
+msgstr "โฮสต์ปิดการเชื่อมต่อ"
+
+#: daemon/gvfsafpconnection.c:1521
+msgid "Connection unexpectedly went down"
+msgstr "การเชื่อมต่อขาดช่วงกะทันหัน"
+
+#: daemon/gvfsafpconnection.c:1548
+msgid "Got unexpected end of stream"
+msgstr "พบจุดจบของสตรีมโดยไม่คาดหมาย"
+
+#. Translators: %d is a constant, currently hardcoded to 256
+#: daemon/gvfsafpserver.c:195 daemon/gvfsafpserver.c:477
 #, c-format
-msgid "The server doesn't support passwords longer than %d character."
-msgid_plural "The server doesn't support passwords longer than %d characters."
+msgid "The server doesn’t support passwords longer than %d character."
+msgid_plural "The server doesn’t support passwords longer than %d characters."
 msgstr[0] "เซิร์ฟเวอร์ไม่รองรับรหัสผ่านที่ยาวกว่า %d ตัวอักษร"
 
-#: ../daemon/gvfsafpserver.c:224 ../daemon/gvfsafpserver.c:533
+#: daemon/gvfsafpserver.c:221 daemon/gvfsafpserver.c:530
 msgid "An invalid username was provided."
 msgstr "ชื่อผู้ใช้ไม่ถูกต้อง"
 
-#: ../daemon/gvfsafpserver.c:393
+#: daemon/gvfsafpserver.c:390
 #, c-format
 msgid "Unable to login to the server “%s” with the given password."
 msgstr "ไม่สามารถเข้าระบบที่เซิร์ฟเวอร์ “%s” ด้วยรหัสผ่านที่ให้มา"
 
-#: ../daemon/gvfsafpserver.c:428 ../daemon/gvfsafpserver.c:650
-#: ../daemon/gvfsafpserver.c:825 ../daemon/gvfsafpserver.c:873
-#: ../daemon/gvfsafpserver.c:989 ../daemon/gvfsafpserver.c:1672
+#: daemon/gvfsafpserver.c:425 daemon/gvfsafpserver.c:647 daemon/gvfsafpserver.c:823
+#: daemon/gvfsafpserver.c:871 daemon/gvfsafpserver.c:987 daemon/gvfsafpserver.c:1659
 #, c-format
 msgid "Unable to connect to the server “%s”. A communication problem occurred."
 msgstr "ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์ “%s” เนื่องจากมีปัญหาการสื่อสารเกิดขึ้น"
 
-#: ../daemon/gvfsafpserver.c:623
+#: daemon/gvfsafpserver.c:620
 #, c-format
 msgid "Unable to connect to the server “%s” with the given password."
 msgstr "ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์ “%s” ด้วยรหัสผ่านที่ให้มา"
 
-#: ../daemon/gvfsafpserver.c:676 ../daemon/gvfsafpserver.c:701
+#: daemon/gvfsafpserver.c:673 daemon/gvfsafpserver.c:698
 #, c-format
-msgid "The server “%s” doesn't support anonymous access."
+msgid "The server “%s” doesn’t support anonymous access."
 msgstr "เซิร์ฟเวอร์ “%s” ไม่รองรับการเข้าถึงแบบนิรนาม"
 
-#: ../daemon/gvfsafpserver.c:729
+#: daemon/gvfsafpserver.c:726
 #, c-format
-msgid ""
-"Unable to connect to the server “%s”. No suitable authentication mechanism "
-"was found."
+msgid "Unable to connect to the server “%s”. No suitable authentication mechanism was found."
 msgstr "ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์ “%s” เนื่องจากไม่พบกลไกการยืนยันตัวบุคคลที่เหมาะสม"
 
-#: ../daemon/gvfsafpserver.c:803
+#: daemon/gvfsafpserver.c:801
 #, c-format
-msgid ""
-"Unable to connect to the server “%s”. The server doesn't support AFP version "
-"3.0 or later."
-msgstr ""
-"ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์ “%s” เนื่องจากเซิร์ฟเวอร์ไม่รองรับ AFP รุ่น 3.0 หรือใหม่กว่า"
+msgid "Unable to connect to the server “%s”. The server doesn’t support AFP version 3.0 or later."
+msgstr "ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์ “%s” เนื่องจากเซิร์ฟเวอร์ไม่รองรับ AFP รุ่น 3.0 หรือใหม่กว่า"
 
-#: ../daemon/gvfsafpserver.c:914
+#: daemon/gvfsafpserver.c:912
 #, c-format
 msgid "Permission denied."
 msgstr "ไม่ได้รับอนุญาต"
 
-#: ../daemon/gvfsafpserver.c:919
+#: daemon/gvfsafpserver.c:917
 #, c-format
 msgid "The command is not supported by the server."
 msgstr "เซิร์ฟเวอร์ไม่รองรับคำสั่งนี้"
 
-#: ../daemon/gvfsafpserver.c:923
+#: daemon/gvfsafpserver.c:921
 #, c-format
 msgid "Your password has expired."
 msgstr "รหัสผ่านของคุณหมดอายุแล้ว"
 
-#: ../daemon/gvfsafpserver.c:927
+#: daemon/gvfsafpserver.c:925
 #, c-format
 msgid "Your password needs to be changed."
 msgstr "คุณต้องเปลี่ยนรหัสผ่านของคุณ"
 
-#. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:1070
+#. Translators: the first %s is the username, the second the host name
+#: daemon/gvfsafpserver.c:1063 daemon/gvfsbackendftp.c:530 daemon/gvfsbackendsftp.c:1167
 #, c-format
-msgid "Enter your password for the server “%s”."
-msgstr "กรุณาป้อนรหัสผ่านของคุณสำหรับเซิร์ฟเวอร์ “%s”"
+msgid ""
+"Authentication Required\n"
+"Enter password for “%s” on “%s”:"
+msgstr ""
+"ต้องยืนยันตัวตน\n"
+"ใส่รหัสผ่านสำหรับ “%s” ที่ “%s”:"
 
-#. translators: %s here is the hostname
-#: ../daemon/gvfsafpserver.c:1073
+#. Translators: %s here is the hostname
+#. Translators: %s is the hostname
+#. Translators: %s is a server name
+#: daemon/gvfsafpserver.c:1066 daemon/gvfsbackendftp.c:533 daemon/gvfsbackendsftp.c:1174
+#: daemon/gvfsbackendsmbbrowse.c:340
 #, c-format
-msgid "Enter your name and password for the server “%s”."
-msgstr "กรุณาป้อนชื่อและรหัสผ่านของคุณสำหรับเซิร์ฟเวอร์ “%s”"
+msgid ""
+"Authentication Required\n"
+"Enter user and password for “%s”:"
+msgstr ""
+"ต้องยืนยันตัวตน\n"
+"ใส่ผู้ใช้และรหัสผ่านสำหรับ “%s”:"
 
-#: ../daemon/gvfsafpserver.c:1105
+#: daemon/gvfsafpserver.c:1098
 msgid "The password prompt was cancelled."
 msgstr "คำถามรหัสผ่านถูกยกเลิก"
 
-#: ../daemon/gvfsafpserver.c:1222
+#: daemon/gvfsafpserver.c:1216
 msgid "Unable to disconnect from the server."
 msgstr "ไม่สามารถตัดการเชื่อมต่อจากเซิร์ฟเวอร์"
 
-#: ../daemon/gvfsafpserver.c:1364 ../daemon/gvfsafpserver.c:1763
+#: daemon/gvfsafpserver.c:1357 daemon/gvfsafpserver.c:1733
 msgid "Unable to connect to the server. A communication problem occurred."
 msgstr "ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์ เนื่องจากมีปัญหาการสื่อสารเกิดขึ้น"
 
-#: ../daemon/gvfsafpserver.c:1719
+#: daemon/gvfsafpserver.c:1692
 msgid "Identification not found."
 msgstr "ไม่พบชื่อนี้"
 
-#: ../daemon/gvfsafputils.c:124
+#: daemon/gvfsafputils.c:124
 #, c-format
-msgid "Got error \"%s\" from server"
-msgstr "ได้รับข้อผิดพลาด \"%s\" จากเซิร์ฟเวอร์"
+msgid "Got error “%s” from server"
+msgstr "ได้รับข้อผิดพลาด “%s” จากเซิร์ฟเวอร์"
 
-#: ../daemon/gvfsafputils.c:127
+#: daemon/gvfsafputils.c:127
 #, c-format
 msgid "Got unknown error code %d from server"
 msgstr "ได้รับรหัสข้อผิดพลาด %d ที่ไม่รู้จักจากเซิร์ฟเวอร์"
 
-#: ../daemon/gvfsafpvolume.c:145
+#: daemon/gvfsafpvolume.c:136
+msgid "Volume doesn’t exist"
+msgstr "ไม่มีโวลุมอยู่"
+
+#. Translators: first %s is volumename and second servername
+#: daemon/gvfsafpvolume.c:158
 #, c-format
-msgid "Couldn't load %s on %s"
+msgid "Couldn’t load %s on %s"
 msgstr "ไม่สามารถโหลด %s ที่ %s"
 
-#: ../daemon/gvfsafpvolume.c:390 ../daemon/gvfsafpvolume.c:668
-#: ../daemon/gvfsafpvolume.c:821 ../daemon/gvfsafpvolume.c:1015
-#: ../daemon/gvfsafpvolume.c:1215 ../daemon/gvfsafpvolume.c:1398
-#: ../daemon/gvfsafpvolume.c:1555 ../daemon/gvfsafpvolume.c:2001
-#: ../daemon/gvfsafpvolume.c:2127 ../daemon/gvfsafpvolume.c:2289
-#: ../daemon/gvfsafpvolume.c:2509 ../daemon/gvfsbackendafc.c:286
-#: ../daemon/gvfsbackendsftp.c:307 ../daemon/gvfsbackendsftp.c:1827
-#: ../daemon/gvfsftptask.c:399
-msgid "Permission denied"
-msgstr "ไม่ได้รับอนุญาต"
-
-#: ../daemon/gvfsafpvolume.c:394 ../daemon/gvfsafpvolume.c:1721
-#: ../daemon/gvfsafpvolume.c:2513 ../daemon/gvfsbackendafc.c:976
-#: ../daemon/gvfsbackendafpbrowse.c:190 ../daemon/gvfsbackendafpbrowse.c:327
-#: ../daemon/gvfsbackendafpbrowse.c:359 ../daemon/gvfsbackendarchive.c:652
-#: ../daemon/gvfsbackendarchive.c:700 ../daemon/gvfsbackendarchive.c:752
-#: ../daemon/gvfsbackendarchive.c:781 ../daemon/gvfsbackendcdda.c:1012
-#: ../daemon/gvfsbackendcomputer.c:638 ../daemon/gvfsbackenddnssd.c:415
-#: ../daemon/gvfsbackendftp.c:1068 ../daemon/gvfsbackendnetwork.c:696
-#: ../daemon/gvfsbackendsmbbrowse.c:1100 ../daemon/gvfsbackendsmbbrowse.c:1167
-#: ../daemon/gvfsbackendsmbbrowse.c:1354 ../daemon/gvfsbackendsmbbrowse.c:1427
+#: daemon/gvfsafpvolume.c:398 daemon/gvfsafpvolume.c:1652 daemon/gvfsafpvolume.c:2406
+#: daemon/gvfsbackendafc.c:150 daemon/gvfsbackendafc.c:1064 daemon/gvfsbackendafpbrowse.c:180
+#: daemon/gvfsbackendafpbrowse.c:312 daemon/gvfsbackendafpbrowse.c:344
+#: daemon/gvfsbackendarchive.c:738 daemon/gvfsbackendarchive.c:793 daemon/gvfsbackendarchive.c:845
+#: daemon/gvfsbackendarchive.c:874 daemon/gvfsbackendcdda.c:908 daemon/gvfsbackendcomputer.c:639
+#: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:799 daemon/gvfsbackendftp.c:1193
+#: daemon/gvfsbackendmtp.c:1802 daemon/gvfsbackendmtp.c:1818 daemon/gvfsbackendmtp.c:2225
+#: daemon/gvfsbackendmtp.c:2288 daemon/gvfsbackendmtp.c:2355 daemon/gvfsbackendmtp.c:2717
+#: daemon/gvfsbackendmtp.c:2996 daemon/gvfsbackendmtp.c:3139 daemon/gvfsbackendnetwork.c:893
+#: daemon/gvfsbackendsmbbrowse.c:911 daemon/gvfsbackendsmbbrowse.c:978
+#: daemon/gvfsbackendsmbbrowse.c:1160 daemon/gvfsbackendsmbbrowse.c:1233
 #, c-format
-msgid "File doesn't exist"
-msgstr "ไม่มีแฟ้มอยู่"
+msgid "File doesn’t exist"
+msgstr "ไม่มีไฟล์อยู่"
 
-#: ../daemon/gvfsafpvolume.c:398 ../daemon/gvfsafpvolume.c:468
-#: ../daemon/gvfsafpvolume.c:2517 ../daemon/gvfsbackendafp.c:277
-#: ../daemon/gvfsbackendafp.c:478 ../daemon/gvfsbackendafp.c:1310
-#: ../daemon/gvfsbackenddav.c:2250 ../daemon/gvfsbackendftp.c:774
-#: ../daemon/gvfsbackendsftp.c:2339 ../daemon/gvfsbackendsftp.c:3055
-#: ../daemon/gvfsbackendsftp.c:3394 ../daemon/gvfsbackendsftp.c:4262
+#: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2410 daemon/gvfsbackendafp.c:289
+#: daemon/gvfsbackendafp.c:492 daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2798
+#: daemon/gvfsbackenddav.c:3753 daemon/gvfsbackenddav.c:4000 daemon/gvfsbackendftp.c:836
+#: daemon/gvfsbackendnfs.c:2487 daemon/gvfsbackendsftp.c:2728 daemon/gvfsbackendsftp.c:3503
+#: daemon/gvfsbackendsftp.c:3951 daemon/gvfsbackendsftp.c:5023 daemon/gvfsbackendsftp.c:6108
 msgid "File is directory"
-msgstr "แฟ้มเป็นไดเรกทอรี"
+msgstr "ไฟล์เป็นไดเรกทอรี"
 
-#: ../daemon/gvfsafpvolume.c:402
+#: daemon/gvfsafpvolume.c:406
 msgid "Too many files open"
-msgstr "เปิดแฟ้มมากเกินไป"
+msgstr "เปิดไฟล์มากเกินไป"
 
-#: ../daemon/gvfsafpvolume.c:672 ../daemon/gvfsafpvolume.c:829
+#: daemon/gvfsafpvolume.c:659 daemon/gvfsafpvolume.c:807
 msgid "Target file is open"
-msgstr "แฟ้มปลายทางกำลังเปิดอยู่"
+msgstr "ไฟล์ปลายทางกำลังเปิดอยู่"
 
-#: ../daemon/gvfsafpvolume.c:676 ../daemon/gvfsbackendburn.c:421
-#: ../daemon/gvfsbackenddav.c:2599 ../daemon/gvfsbackendsftp.c:1821
+#: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154 daemon/gvfsbackendburn.c:421
+#: daemon/gvfsbackenddav.c:3306 daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendonedrive.c:925
+#: daemon/gvfsbackendsftp.c:2209
 msgid "Directory not empty"
 msgstr "ไดเรกทอรีไม่ว่าง"
 
-#: ../daemon/gvfsafpvolume.c:680
+#: daemon/gvfsafpvolume.c:667
 msgid "Target object is marked as not deletable (DeleteInhibit)"
 msgstr "อ็อบเจกต์ปลายทางถูกทำเครื่องหมายห้ามลบ (DeleteInhibit) ไว้"
 
-#: ../daemon/gvfsafpvolume.c:684 ../daemon/gvfsafpvolume.c:1231
-#: ../daemon/gvfsafpvolume.c:2131
-msgid "Target object doesn't exist"
+#: daemon/gvfsafpvolume.c:671 daemon/gvfsafpvolume.c:1180 daemon/gvfsafpvolume.c:2038
+#: daemon/gvfsbackendgoogle.c:262
+#, c-format
+msgid "Target object doesn’t exist"
 msgstr "อ็อบเจกต์ปลายทางไม่มีอยู่"
 
-#: ../daemon/gvfsafpvolume.c:688 ../daemon/gvfsafpvolume.c:841
-#: ../daemon/gvfsafpvolume.c:1035 ../daemon/gvfsafpvolume.c:1235
-#: ../daemon/gvfsafpvolume.c:2135
+#: daemon/gvfsafpvolume.c:675 daemon/gvfsafpvolume.c:819 daemon/gvfsafpvolume.c:1002
+#: daemon/gvfsafpvolume.c:1184 daemon/gvfsafpvolume.c:2042
 msgid "Volume is read-only"
 msgstr "โวลุมอ่านได้อย่างเดียว"
 
-#: ../daemon/gvfsafpvolume.c:825 ../daemon/gvfsafpvolume.c:1019
-#: ../daemon/gvfsafpvolume.c:1567 ../daemon/gvfsafpvolume.c:2005
-#: ../daemon/gvfsafpvolume.c:2647
+#: daemon/gvfsafpvolume.c:803 daemon/gvfsafpvolume.c:984 daemon/gvfsafpvolume.c:1503
+#: daemon/gvfsafpvolume.c:1917 daemon/gvfsafpvolume.c:2534
 msgid "Not enough space on volume"
 msgstr "มีที่ว่างไม่พอในโวลุม"
 
-#: ../daemon/gvfsafpvolume.c:833 ../daemon/gvfsafpvolume.c:1414
-#: ../daemon/gvfsafpvolume.c:1571 ../daemon/gvfsbackendafp.c:284
-#: ../daemon/gvfsbackendafp.c:485 ../daemon/gvfsbackenddav.c:2306
-#: ../daemon/gvfsbackenddav.c:2559 ../daemon/gvfsbackenddav.c:2670
-#: ../daemon/gvfsbackendftp.c:753 ../daemon/gvfsbackendftp.c:934
-#: ../daemon/gvfsbackendftp.c:1373 ../daemon/gvfsbackendftp.c:1553
-#: ../daemon/gvfsbackendsftp.c:4271 ../daemon/gvfsbackendsmb.c:2099
+#: daemon/gvfsafpvolume.c:811 daemon/gvfsafpvolume.c:1355 daemon/gvfsafpvolume.c:1507
+#: daemon/gvfsbackendafp.c:296 daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2869
+#: daemon/gvfsbackenddav.c:3223 daemon/gvfsbackenddav.c:3379 daemon/gvfsbackenddav.c:3485
+#: daemon/gvfsbackenddav.c:3719 daemon/gvfsbackenddav.c:3763 daemon/gvfsbackenddav.c:3990
+#: daemon/gvfsbackendftp.c:815 daemon/gvfsbackendftp.c:1003 daemon/gvfsbackendftp.c:1516
+#: daemon/gvfsbackendftp.c:1584 daemon/gvfsbackendgoogle.c:1703 daemon/gvfsbackendgoogle.c:1780
+#: daemon/gvfsbackendgoogle.c:2157 daemon/gvfsbackendgoogle.c:2237 daemon/gvfsbackendgoogle.c:2757
+#: daemon/gvfsbackendgoogle.c:3204 daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1698
+#: daemon/gvfsbackendmtp.c:1741 daemon/gvfsbackendnfs.c:2497 daemon/gvfsbackendonedrive.c:1078
+#: daemon/gvfsbackendonedrive.c:1646 daemon/gvfsbackendsftp.c:5032 daemon/gvfsbackendsmb.c:2121
 msgid "Target file already exists"
-msgstr "มีแฟ้มปลายทางอยู่ก่อนแล้ว"
+msgstr "มีไฟล์ปลายทางอยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsafpvolume.c:837 ../daemon/gvfsafpvolume.c:1027
-msgid "Ancestor directory doesn't exist"
+#: daemon/gvfsafpvolume.c:815 daemon/gvfsafpvolume.c:994
+msgid "Ancestor directory doesn’t exist"
 msgstr "ไดเรกทอรีระดับบนไม่มีอยู่"
 
-#: ../daemon/gvfsafpvolume.c:1023
-msgid "Volume is flat and doesn't support directories"
+#. Translators: flat means volume doesn't support directories
+#. (all files are in the volume root)
+#: daemon/gvfsafpvolume.c:990
+msgid "Volume is flat and doesn’t support directories"
 msgstr "โวลุมเป็นแบบแบนและไม่รองรับการใช้ไดเรกทอรี"
 
-#: ../daemon/gvfsafpvolume.c:1031
+#: daemon/gvfsafpvolume.c:998
 msgid "Target directory already exists"
 msgstr "มีไดเรกทอรีปลายทางอยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsafpvolume.c:1219 ../daemon/gvfsbackendafp.c:590
-msgid "Can't rename volume"
+#: daemon/gvfsafpvolume.c:1168 daemon/gvfsbackendafp.c:604
+msgid "Can’t rename volume"
 msgstr "ไม่สามารถเปลี่ยนชื่อโวลุม"
 
-#: ../daemon/gvfsafpvolume.c:1223
+#: daemon/gvfsafpvolume.c:1172
 msgid "Object with that name already exists"
 msgstr "มีอ็อบเจกต์ชื่อนี้อยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsafpvolume.c:1227
+#: daemon/gvfsafpvolume.c:1176
 msgid "Target object is marked as not renameable (RenameInhibit)"
 msgstr "อ็อบเจกต์ปลายทางถูกทำเครื่องหมายห้ามเปลี่ยนชื่อ (RenameInhibit) ไว้"
 
-#: ../daemon/gvfsafpvolume.c:1402
-msgid "Can't move directory into one of its descendants"
+#: daemon/gvfsafpvolume.c:1343
+msgid "Can’t move directory into one of its descendants"
 msgstr "ไม่สามารถย้ายไดเรกทอรีไปยังไดเรกทอรีระดับล่างได้"
 
-#: ../daemon/gvfsafpvolume.c:1406
-msgid "Can't move sharepoint into a shared directory"
+#: daemon/gvfsafpvolume.c:1347
+msgid "Can’t move sharepoint into a shared directory"
 msgstr "ไม่สามารถย้ายจุดใช้ร่วมไปยังไดเรกทอรีใช้ร่วมได้"
 
-#: ../daemon/gvfsafpvolume.c:1410
-msgid "Can't move a shared directory into the Trash"
+#: daemon/gvfsafpvolume.c:1351
+msgid "Can’t move a shared directory into the Trash"
 msgstr "ไม่สามารถย้ายไดเรกทอรีใช้ร่วมไปลงถังขยะได้"
 
-#: ../daemon/gvfsafpvolume.c:1418
+#: daemon/gvfsafpvolume.c:1359
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
 msgstr "อ็อบเจกต์ที่จะย้ายถูกทำเครื่องหมายห้ามเปลี่ยนชื่อ (RenameInhibit) ไว้"
 
-#: ../daemon/gvfsafpvolume.c:1422
-msgid "Object being moved doesn't exist"
+#: daemon/gvfsafpvolume.c:1363
+msgid "Object being moved doesn’t exist"
 msgstr "อ็อบเจกต์ที่จะย้ายไม่มีอยู่"
 
-#: ../daemon/gvfsafpvolume.c:1559
-msgid "Server doesn't support the FPCopyFile operation"
+#: daemon/gvfsafpvolume.c:1495
+msgid "Server doesn’t support the FPCopyFile operation"
 msgstr "เซิร์ฟเวอร์ไม่รองรับการกระทำ FPCopyFile"
 
-#: ../daemon/gvfsafpvolume.c:1563
+#: daemon/gvfsafpvolume.c:1499
 msgid "Unable to open source file for reading"
-msgstr "ไม่สามารถเปิดแฟ้มต้นทางเพื่ออ่านได้"
+msgstr "ไม่สามารถเปิดไฟล์ต้นทางเพื่ออ่านได้"
 
-#: ../daemon/gvfsafpvolume.c:1575
-msgid "Source file and/or destination directory doesn't exist"
-msgstr "แฟ้มต้นทาง และ/หรือ ไดเรกทอรีปลายทางไม่มีอยู่"
+#: daemon/gvfsafpvolume.c:1511
+msgid "Source file and/or destination directory doesn’t exist"
+msgstr "ไฟล์ต้นทาง และ/หรือ ไดเรกทอรีปลายทางไม่มีอยู่"
 
-#: ../daemon/gvfsafpvolume.c:1579
+#: daemon/gvfsafpvolume.c:1515
 msgid "Source file is a directory"
-msgstr "แฟ้มต้นทางเป็นไดเรกทอรี"
+msgstr "ไฟล์ต้นทางเป็นไดเรกทอรี"
 
-#: ../daemon/gvfsafpvolume.c:2009
+#. Translators: range conflict means
+#. requested data are locked by another user
+#: daemon/gvfsafpvolume.c:1923
 msgid "Range lock conflict exists"
-msgstr "มีข้อขัดแย้งในการล็อคเป็นช่วง"
+msgstr "มีข้อขัดแย้งในการล็อกเป็นช่วง"
 
-#: ../daemon/gvfsafpvolume.c:2293
-msgid "Directory doesn't exist"
+#: daemon/gvfsafpvolume.c:2193 daemon/gvfsbackendmtp.c:1521 daemon/gvfsbackendmtp.c:1546
+#: daemon/gvfsbackendmtp.c:1749 daemon/gvfsbackendmtp.c:2125 daemon/gvfsbackendmtp.c:2642
+#: daemon/gvfsbackendmtp.c:3037 daemon/gvfsbackendmtp.c:3173
+msgid "Directory doesn’t exist"
 msgstr "ไดเรกทอรีไม่มีอยู่"
 
-#: ../daemon/gvfsafpvolume.c:2297
+#: daemon/gvfsafpvolume.c:2197
 msgid "Target object is not a directory"
 msgstr "อ็อบเจกต์ปลายทางไม่ใช่ไดเรกทอรี"
 
-#: ../daemon/gvfsafpvolume.c:2643
+#: daemon/gvfsafpvolume.c:2530
 msgid "File is not open for write access"
-msgstr "แฟ้มไม่ได้เปิดไว้แบบให้เขียนได้"
+msgstr "ไฟล์ไม่ได้เปิดไว้แบบให้เขียนได้"
 
-#: ../daemon/gvfsafpvolume.c:2651
+#: daemon/gvfsafpvolume.c:2538
 msgid "File is locked by another user"
-msgstr "แฟ้มถูกล็อคโดยผู้ใช้อื่น"
+msgstr "ไฟล์ถูกล็อกโดยผู้ใช้อื่น"
 
-#: ../daemon/gvfsafpvolume.c:2790
+#: daemon/gvfsafpvolume.c:2670
 msgid "File is not open for read access"
-msgstr "แฟ้มไม่ได้เปิดไว้แบบให้อ่านได้"
+msgstr "ไฟล์ไม่ได้เปิดไว้แบบให้อ่านได้"
 
-#: ../daemon/gvfsbackendafc.c:209
+#. Return G_IO_ERROR_NOT_SUPPORTED instead of
+#. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
+#. * fallback copy.
+#.
+#: daemon/gvfsbackendadmin.c:104 daemon/gvfsbackendadmin.c:871 daemon/gvfsbackendafc.c:2361
+#: daemon/gvfsbackendafp.c:1781 daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
+#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:4082 daemon/gvfsbackenddav.c:4114
+#: daemon/gvfsbackenddav.c:4142 daemon/gvfsbackendftp.c:1213 daemon/gvfsbackendftp.c:1261
+#: daemon/gvfsbackendftp.c:1282 daemon/gvfsbackendftp.c:1633 daemon/gvfsbackendgoogle.c:1590
+#: daemon/gvfsbackendgoogle.c:1623 daemon/gvfsbackendgoogle.c:1652 daemon/gvfsbackendgoogle.c:1675
+#: daemon/gvfsbackendgoogle.c:1741 daemon/gvfsbackendgoogle.c:2013 daemon/gvfsbackendgoogle.c:2045
+#: daemon/gvfsbackendgoogle.c:2084 daemon/gvfsbackendgoogle.c:2117 daemon/gvfsbackendgoogle.c:2127
+#: daemon/gvfsbackendgoogle.c:2198 daemon/gvfsbackendgoogle.c:2393 daemon/gvfsbackendgoogle.c:2508
+#: daemon/gvfsbackendgoogle.c:2733 daemon/gvfsbackendgoogle.c:3069 daemon/gvfsbackendgoogle.c:3079
+#: daemon/gvfsbackendgoogle.c:3114 daemon/gvfsbackendgoogle.c:3181 daemon/gvfsbackendgoogle.c:3190
+#: daemon/gvfsbackendgoogle.c:3774 daemon/gvfsbackendgoogle.c:3835 daemon/gvfsbackendgoogle.c:3852
+#: daemon/gvfsbackendgoogle.c:3864 daemon/gvfsbackendgoogle.c:3950 daemon/gvfsbackendgoogle.c:3967
+#: daemon/gvfsbackendgphoto2.c:2238 daemon/gvfsbackendgphoto2.c:2451 daemon/gvfsbackendgphoto2.c:2548
+#: daemon/gvfsbackendgphoto2.c:2641 daemon/gvfsbackendgphoto2.c:3250 daemon/gvfsbackendgphoto2.c:3258
+#: daemon/gvfsbackendgphoto2.c:3268 daemon/gvfsbackendhttp.c:745 daemon/gvfsbackendmtp.c:1794
+#: daemon/gvfsbackendmtp.c:2095 daemon/gvfsbackendmtp.c:2344 daemon/gvfsbackendmtp.c:2535
+#: daemon/gvfsbackendmtp.c:2618 daemon/gvfsbackendmtp.c:2706 daemon/gvfsbackendmtp.c:2774
+#: daemon/gvfsbackendmtp.c:2969 daemon/gvfsbackendmtp.c:3112 daemon/gvfsbackendnfs.c:2379
+#: daemon/gvfsbackendnfs.c:2429 daemon/gvfsbackendnfs.c:2555 daemon/gvfsbackendonedrive.c:836
+#: daemon/gvfsbackendonedrive.c:935 daemon/gvfsbackendonedrive.c:1057
+#: daemon/gvfsbackendonedrive.c:1561 daemon/gvfsbackendonedrive.c:1613
+#: daemon/gvfsbackendonedrive.c:1629 daemon/gvfsbackendonedrive.c:1641
+#: daemon/gvfsbackendonedrive.c:1792 daemon/gvfsbackendonedrive.c:1808 daemon/gvfsbackendsftp.c:2213
+#: daemon/gvfsbackendsftp.c:5420 daemon/gvfsbackendsftp.c:5518 daemon/gvfsbackendsftp.c:6230
+#: daemon/gvfsbackendsftp.c:6262 daemon/gvfsbackendsftp.c:6288 daemon/gvfsbackendsftp.c:6296
+#: daemon/gvfsbackendsftp.c:6783 daemon/gvfsbackendsftp.c:6845 daemon/gvfsbackendsftp.c:6853
+#: daemon/gvfsbackendsmb.c:1713 daemon/gvfsbackendsmb.c:2193 daemon/gvfsbackendtrash.c:937
+#: daemon/gvfsbackendtrash.c:963 daemon/gvfsbackendwsdd.c:364 daemon/gvfsftptask.c:430
+#: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
+#: daemon/gvfsjobcreatemonitor.c:143 daemon/gvfsjobcreatemonitor.c:154
+#: daemon/gvfsjobcreatemonitor.c:177 daemon/gvfsjobcreatemonitor.c:195 daemon/gvfsjobdelete.c:108
+#: daemon/gvfsjobenumerate.c:272 daemon/gvfsjobmakedirectory.c:108 daemon/gvfsjobmount.c:112
+#: daemon/gvfsjobmountmountable.c:138 daemon/gvfsjobmove.c:121 daemon/gvfsjobopenforread.c:120
+#: daemon/gvfsjobopenforwrite.c:184 daemon/gvfsjobopenforwrite.c:198 daemon/gvfsjobopenforwrite.c:212
+#: daemon/gvfsjobopeniconforread.c:104 daemon/gvfsjobpollmountable.c:107 daemon/gvfsjobpull.c:125
+#: daemon/gvfsjobpush.c:125 daemon/gvfsjobqueryattributes.c:145 daemon/gvfsjobqueryfsinfo.c:116
+#: daemon/gvfsjobqueryinfo.c:124 daemon/gvfsjobqueryinforead.c:125 daemon/gvfsjobqueryinfowrite.c:125
+#: daemon/gvfsjobread.c:123 daemon/gvfsjobseekread.c:121 daemon/gvfsjobseekwrite.c:121
+#: daemon/gvfsjobsetattribute.c:130 daemon/gvfsjobsetdisplayname.c:111
+#: daemon/gvfsjobstartmountable.c:113 daemon/gvfsjobstopmountable.c:115 daemon/gvfsjobtrash.c:107
+#: daemon/gvfsjobtruncate.c:113 daemon/gvfsjobunmountmountable.c:157
+#: daemon/gvfsjobunmountmountable.c:172 daemon/gvfsjobwrite.c:123
+msgid "Operation not supported"
+msgstr "ไม่รองรับปฏิบัติการนี้"
+
+#: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639 daemon/gvfsbackendarchive.c:668
+#: daemon/gvfsbackenddav.c:2354 daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:303
+#: daemon/gvfsbackendonedrive.c:1155 daemon/gvfsbackendsmb.c:595
+msgid "Invalid mount spec"
+msgstr "ข้อกำหนดการเมานท์ผิดพลาด"
+
+#: daemon/gvfsbackendafc.c:146
 msgid "Internal Apple File Control error"
 msgstr "เกิดข้อผิดพลาดภายในของ Apple File Control"
 
-#: ../daemon/gvfsbackendafc.c:213 ../daemon/gvfsbackendftp.c:737
-msgid "File does not exist"
-msgstr "ไม่มีแฟ้มอยู่"
-
-#: ../daemon/gvfsbackendafc.c:217
-msgid "The directory is not empty"
-msgstr "ไดเรกทอรีไม่ว่าง"
-
-#: ../daemon/gvfsbackendafc.c:221
+#: daemon/gvfsbackendafc.c:158
 msgid "The device did not respond"
 msgstr "อุปกรณ์ไม่ตอบสนอง"
 
-#: ../daemon/gvfsbackendafc.c:225
+#: daemon/gvfsbackendafc.c:162
 msgid "The connection was interrupted"
 msgstr "การเชื่อมต่อถูกขัดจังหวะ"
 
-#: ../daemon/gvfsbackendafc.c:229
+#: daemon/gvfsbackendafc.c:170
 msgid "Invalid Apple File Control data received"
 msgstr "ได้รับข้อมูล Apple File Control ที่ใช้ไม่ได้"
 
-#: ../daemon/gvfsbackendafc.c:233
+#: daemon/gvfsbackendafc.c:174
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
 msgstr "เกิดข้อผิดพลาดของ Apple File Contol ที่ไม่ได้รองรับไว้ (%d)"
 
-#: ../daemon/gvfsbackendafc.c:249
+#: daemon/gvfsbackendafc.c:190
 msgid "Listing applications installed on device failed"
 msgstr "รวบรวมรายชื่อโปรแกรมที่ติดตั้งอยู่ในอุปกรณ์ไม่สำเร็จ"
 
-#: ../daemon/gvfsbackendafc.c:265
+#: daemon/gvfsbackendafc.c:206
 msgid "Accessing application icons on device failed"
 msgstr "อ่านไอคอนของโปรแกรมที่ติดตั้งอยู่ในอุปกรณ์ไม่สำเร็จ"
 
-#: ../daemon/gvfsbackendafc.c:282
+#: daemon/gvfsbackendafc.c:228
 msgid "Lockdown Error: Invalid Argument"
 msgstr "ข้อผิดพลาดของการจำกัดการใช้งาน: อาร์กิวเมนต์ไม่ถูกต้อง"
 
-#: ../daemon/gvfsbackendafc.c:290
+#: daemon/gvfsbackendafc.c:232
+msgid "The device is password protected"
+msgstr "อุปกรณ์นี้มีการป้องกันด้วยรหัสผ่าน"
+
+#: daemon/gvfsbackendafc.c:236
 msgid "Unable to connect"
 msgstr "ไม่สามารถเชื่อมต่อ"
 
-#: ../daemon/gvfsbackendafc.c:293
+#: daemon/gvfsbackendafc.c:240
+msgid "User refused to trust this computer"
+msgstr "ผู้ใช้ปฏิเสธไม่เชื่อถือคอมพิวเตอร์เครื่องนี้"
+
+#: daemon/gvfsbackendafc.c:244
+msgid "The user has not trusted this computer"
+msgstr "ผู้ใช้ยังไม่ได้เชื่อถือคอมพิวเตอร์เครื่องนี้"
+
+#: daemon/gvfsbackendafc.c:248
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
 msgstr "เกิดข้อผิดพลาดที่ไม่ได้รองรับของการจำกัดการใช้งาน (%d)"
 
-#: ../daemon/gvfsbackendafc.c:310
+#: daemon/gvfsbackendafc.c:265
 msgid "libimobiledevice Error: Invalid Argument"
 msgstr "ข้อผิดพลาดเกี่ยวกับ libimobiledevice: อาร์กิวเมนต์ไม่ถูกต้อง"
 
-#: ../daemon/gvfsbackendafc.c:314
-msgid ""
-"libimobiledevice Error: No device found. Make sure usbmuxd is set up "
-"correctly."
-msgstr ""
-"ข้อผิดพลาดเกี่ยวกับ libimobiledevice: ไม่พบอุปกรณ์ กรุณาตรวจสอบให้แน่ใจว่าได้ติดตั้ง usbmuxd "
-"ไว้อย่างถูกต้อง"
+#: daemon/gvfsbackendafc.c:269
+msgid "libimobiledevice Error: No device found. Make sure usbmuxd is set up correctly."
+msgstr "ข้อผิดพลาดเกี่ยวกับ libimobiledevice: ไม่พบอุปกรณ์ กรุณาตรวจสอบให้แน่ใจว่าได้ติดตั้ง usbmuxd ไว้อย่างถูกต้อง"
 
-#: ../daemon/gvfsbackendafc.c:318
+#: daemon/gvfsbackendafc.c:273
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "เกิดข้อผิดพลาดที่ไม่ได้รองรับเกี่ยวกับ libimobiledevice (%d)"
 
-#: ../daemon/gvfsbackendafc.c:416
+#: daemon/gvfsbackendafc.c:394
 msgid "Try again"
 msgstr "ลองใหม่"
 
-#: ../daemon/gvfsbackendafc.c:416 ../daemon/gvfsbackend.c:968
-#: ../monitor/gdu/ggdudrive.c:1024 ../monitor/gdu/ggdumount.c:923
-#: ../monitor/udisks2/gvfsudisks2mount.c:736
+#: daemon/gvfsbackendafc.c:394 daemon/gvfsbackend.c:1024 monitor/udisks2/gvfsudisks2mount.c:752
 msgid "Cancel"
 msgstr "ยกเลิก"
 
-#: ../daemon/gvfsbackendafc.c:434 ../daemon/gvfsbackendarchive.c:554
-#: ../daemon/gvfsbackendarchive.c:583 ../daemon/gvfsbackenddav.c:1828
-#: ../daemon/gvfsbackendhttp.c:309 ../daemon/gvfsbackendobexftp.c:885
-#: ../daemon/gvfsbackendobexftp.c:901 ../daemon/gvfsbackendobexftp.c:920
-#: ../daemon/gvfsbackendsmb.c:663
-msgid "Invalid mount spec"
-msgstr "ข้อกำหนดการเมานท์ผิดพลาด"
-
-#: ../daemon/gvfsbackendafc.c:440 ../daemon/gvfsbackendafc.c:470
+#: daemon/gvfsbackendafc.c:411 daemon/gvfsbackendafc.c:442
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "ตำแหน่ง AFC ไม่ถูกต้อง: ต้องอยู่ในรูป afc://uuid:หมายเลขพอร์ต"
 
-#: ../daemon/gvfsbackendafc.c:456
+#: daemon/gvfsbackendafc.c:428
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "อุปกรณ์ติดตามตัวของแอปเปิล"
 
-#: ../daemon/gvfsbackendafc.c:461
+#: daemon/gvfsbackendafc.c:433
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
 msgstr "อุปกรณ์ติดตามตัวของแอปเปิล แหกคุกแล้ว"
 
-#: ../daemon/gvfsbackendafc.c:466
+#: daemon/gvfsbackendafc.c:438
 #, c-format
 msgid "Documents on Apple Mobile Device"
 msgstr "เอกสารในอุปกรณ์ติดตามตัวของแอปเปิล"
@@ -614,7 +670,7 @@ msgstr "เอกสารในอุปกรณ์ติดตามตัว
 #. translators:
 #. * This is the device name, with the service being browsed in brackets, eg.:
 #. * Alan Smithee's iPhone (jailbreak)
-#: ../daemon/gvfsbackendafc.c:525
+#: daemon/gvfsbackendafc.c:496
 #, c-format
 msgid "%s (jailbreak)"
 msgstr "%s (แหกคุก)"
@@ -622,7 +678,7 @@ msgstr "%s (แหกคุก)"
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
 #. * Documents on Alan Smithee's iPhone
-#: ../daemon/gvfsbackendafc.c:532 ../monitor/afc/afcvolume.c:128
+#: daemon/gvfsbackendafc.c:503 monitor/afc/afcvolume.c:176
 #, c-format
 msgid "Documents on %s"
 msgstr "เอกสารใน %s"
@@ -630,44 +686,65 @@ msgstr "เอกสารใน %s"
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
-#: ../daemon/gvfsbackendafc.c:627
+#: daemon/gvfsbackendafc.c:577
 #, c-format
 msgid ""
-"The device “%s” is locked. Enter the passcode on the device and click “Try "
-"again”."
-msgstr "อุปกรณ์ “%s” ถูกล็อคไว้ กรุณาป้อนรหัสผ่านของอุปกรณ์แล้วคลิก “ลองใหม่”"
+"Device Locked\n"
+"The device “%s” is locked.\n"
+"\n"
+"Enter the passcode on the device and click “Try again”."
+msgstr ""
+"อุปกรณ์ถูกล็อกไว้\n"
+"อุปกรณ์ “%s” ถูกล็อกไว้\n"
+"\n"
+"กรุณาป้อนรหัสผ่านของอุปกรณ์แล้วคลิก “ลองใหม่”"
 
-#: ../daemon/gvfsbackendafc.c:966 ../daemon/gvfsbackendarchive.c:660
-#: ../daemon/gvfsbackendcomputer.c:656 ../daemon/gvfsbackendgphoto2.c:1856
-#: ../daemon/gvfsbackendobexftp.c:1097 ../daemon/gvfsbackendrecent.c:121
-#: ../daemon/gvfsbackendsmb.c:719 ../daemon/gvfsbackendtrash.c:232
-msgid "Can't open directory"
+#. translators:
+#. * %s is the device name. 'Try again' is the caption of the button
+#. * shown in the dialog which is defined above. 'Trust' is the caption
+#. * of the button shown in the device.
+#: daemon/gvfsbackendafc.c:585
+#, c-format
+msgid ""
+"Untrusted Device\n"
+"The device “%s” is not trusted yet.\n"
+"\n"
+"Select “Trust” on the device and click “Try again”."
+msgstr ""
+"ไม่ได้เชื่อถืออุปกรณ์\n"
+"ยังไม่ได้เชื่อถืออุปกรณ์ “%s”\n"
+"\n"
+"กรุณาเลือก “เชื่อถือ” ที่อุปกรณ์แล้วคลิก “ลองใหม่”"
+
+#: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746 daemon/gvfsbackendcomputer.c:657
+#: daemon/gvfsbackendgoogle.c:3577 daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2377
+#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendonedrive.c:1402 daemon/gvfsbackendrecent.c:126
+#: daemon/gvfsbackendsmb.c:685 daemon/gvfsbackendtrash.c:333
+msgid "Can’t open directory"
 msgstr "ไม่สามารถเปิดไดเรกทอรี"
 
-#: ../daemon/gvfsbackendafc.c:1167 ../daemon/gvfsbackendafc.c:2531
-msgid "Backups are not yet supported."
-msgstr "ยังไม่รองรับการสำรองแฟ้ม"
+#: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528 daemon/gvfsbackendafp.c:1270
+#: daemon/gvfsbackendafp.c:1359 daemon/gvfsbackenddav.c:3660 daemon/gvfsbackendftp.c:1468
+#: daemon/gvfsbackendonedrive.c:1786 daemon/gvfsbackendsftp.c:3725 daemon/gvfsbackendsftp.c:4012
+msgid "Backups not supported"
+msgstr "ไม่รองรับการสำรองไฟล์"
 
-#: ../daemon/gvfsbackendafc.c:1339
-msgid "Invalid seek type"
-msgstr "ชนิดการเลื่อนตำแหน่งไม่ถูกต้อง"
+#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:738 daemon/gvfsbackendsmb.c:1217
+msgid "Unsupported seek type"
+msgstr "ไม่รองรับการเลื่อนตำแหน่งวิธีนี้"
 
-#: ../daemon/gvfsbackendafc.c:2368 ../daemon/gvfsbackendafp.c:1749
-#: ../daemon/gvfsbackendftp.c:1088 ../daemon/gvfsbackendftp.c:1136
-#: ../daemon/gvfsbackendftp.c:1157 ../daemon/gvfsbackendsftp.c:1825
-#: ../daemon/gvfsbackendsftp.c:4619 ../daemon/gvfsbackendsmb.c:1736
-#: ../daemon/gvfsftptask.c:391
-msgid "Operation unsupported"
-msgstr "ไม่รองรับปฏิบัติการนี้"
-
-#: ../daemon/gvfsbackendafpbrowse.c:218 ../daemon/gvfsbackendsmbbrowse.c:1095
-#: ../daemon/gvfsbackendsmbbrowse.c:1141
-msgid "The file is not a mountable"
-msgstr "แฟ้มเมานท์ไม่ได้"
+#: daemon/gvfsbackendafpbrowse.c:208 daemon/gvfsbackendcomputer.c:958
+#: daemon/gvfsbackendcomputer.c:1053 daemon/gvfsbackendcomputer.c:1159
+#: daemon/gvfsbackendcomputer.c:1249 daemon/gvfsbackendcomputer.c:1322
+#: daemon/gvfsbackendcomputer.c:1391 daemon/gvfsbackendsmbbrowse.c:906
+#: daemon/gvfsbackendsmbbrowse.c:952
+msgid "Not a mountable file"
+msgstr "ไม่ใช่ไฟล์สำหรับเมานท์"
 
 #. Translators: first %s is username and second serververname
 #. Translators: first %s is volumename and second servername
 #. Translators: the first %s is the username, the second the host name
+#. Translators: This is "<mount point> on <host>" and is used as name for an NFS mount
 #. Translators: This is the name of an SFTP share, like "<user> on <hostname>"
 #. Set the mountspec according to original uri, no matter whether user changes
 #. credentials during mount loop. Nautilus and other gio clients depend
@@ -675,178 +752,136 @@ msgstr "แฟ้มเมานท์ไม่ได้"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendafpbrowse.c:461 ../daemon/gvfsbackendafp.c:2066
-#: ../daemon/gvfsbackendftp.c:634 ../daemon/gvfsbackendobexftp.c:705
-#: ../daemon/gvfsbackendsftp.c:1686 ../daemon/gvfsbackendsmb.c:554
-#: ../daemon/gvfsbackendsmb.c:1433
+#: daemon/gvfsbackendafpbrowse.c:446 daemon/gvfsbackendafp.c:2105 daemon/gvfsbackendftp.c:681
+#: daemon/gvfsbackendnfs.c:297 daemon/gvfsbackendsftp.c:2070 daemon/gvfsbackendsmb.c:450
+#: daemon/gvfsbackendsmb.c:1389
 #, c-format
 msgid "%s on %s"
 msgstr "%s ที่ %s"
 
 #. Translators: %s is the servername
-#: ../daemon/gvfsbackendafpbrowse.c:465
+#: daemon/gvfsbackendafpbrowse.c:450
 #, c-format
 msgid "%s"
 msgstr "%s"
 
-#: ../daemon/gvfsbackendafpbrowse.c:498 ../daemon/gvfsbackendafp.c:2101
-#: ../daemon/gvfsbackendarchive.c:543 ../daemon/gvfsbackendftp.c:668
-#: ../daemon/gvfsbackendsftp.c:1738
+#: daemon/gvfsbackendafpbrowse.c:483 daemon/gvfsbackendafp.c:2140 daemon/gvfsbackendarchive.c:628
+#: daemon/gvfsbackendftp.c:724 daemon/gvfsbackendnfs.c:198 daemon/gvfsbackendsftp.c:2122
 msgid "No hostname specified"
 msgstr "ไม่ได้ระบุชื่อโฮสต์"
 
-#: ../daemon/gvfsbackendafpbrowse.c:568 ../daemon/gvfsbackendafp.c:2192
+#: daemon/gvfsbackendafpbrowse.c:568 daemon/gvfsbackendafp.c:2235
 msgid "Apple Filing Protocol Service"
 msgstr "บริการ Apple Filing Protocol"
 
-#: ../daemon/gvfsbackendafp.c:274 ../daemon/gvfsbackendburn.c:875
-#: ../daemon/gvfsbackendftp.c:1545 ../daemon/gvfsbackendobexftp.c:1805
-msgid "Can't copy directory over directory"
+#: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:877 daemon/gvfsbackenddav.c:3748
+#: daemon/gvfsbackendftp.c:1576 daemon/gvfsbackendgoogle.c:1752 daemon/gvfsbackendgoogle.c:2095
+#: daemon/gvfsbackendgoogle.c:3141
+msgid "Can’t copy directory over directory"
 msgstr "ไม่สามารถคัดลอกไดเรกทอรีทับไดเรกทอรี"
 
-#: ../daemon/gvfsbackendafp.c:293 ../daemon/gvfsbackendburn.c:891
-#: ../daemon/gvfsbackendftp.c:1568 ../daemon/gvfsbackendobexftp.c:1820
-msgid "Can't recursively copy directory"
+#: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:893 daemon/gvfsbackenddav.c:3783
+#: daemon/gvfsbackendftp.c:1599 daemon/gvfsbackendgoogle.c:1814 daemon/gvfsbackendgoogle.c:3168
+#: daemon/gvfsbackendgoogle.c:3216 daemon/gvfsbackendmtp.c:1689 daemon/gvfsbackendmtp.c:1704
+msgid "Can’t recursively copy directory"
 msgstr "ไม่สามารถคัดลอกไดเรกทอรีทั้งยวง"
 
-#: ../daemon/gvfsbackendafp.c:475 ../daemon/gvfsbackendsftp.c:4257
-#: ../daemon/gvfsbackendsmb.c:2088
-msgid "Can't move directory over directory"
+#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:3561 daemon/gvfsbackendgoogle.c:2209
+#: daemon/gvfsbackendnfs.c:2481 daemon/gvfsbackendsftp.c:5018 daemon/gvfsbackendsmb.c:2110
+msgid "Can’t move directory over directory"
 msgstr "ไม่สามารถย้ายไดเรกทอรีทับไดเรกทอรี"
 
-#: ../daemon/gvfsbackendafp.c:1229 ../daemon/gvfsbackendafp.c:1328
-msgid "backups not supported"
-msgstr "ไม่รองรับการสำรองแฟ้ม"
-
-#: ../daemon/gvfsbackendafp.c:1243
+#: daemon/gvfsbackendafp.c:1284
 #, c-format
 msgid "Unable to create temporary file (%s)"
-msgstr "ไม่สามารถสร้างแฟ้มชั่วคราว (%s)"
+msgstr "ไม่สามารถสร้างไฟล์ชั่วคราว (%s)"
 
-#: ../daemon/gvfsbackendafp.c:1317 ../daemon/gvfsbackenddav.c:2379
-#: ../daemon/gvfsbackendsftp.c:3407 ../daemon/gvfsbackendsmb.c:1149
+#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2976 daemon/gvfsbackendnfs.c:1184
+#: daemon/gvfsbackendsftp.c:3966 daemon/gvfsbackendsmb.c:1090
 msgid "The file was externally modified"
-msgstr "แฟ้มถูกเปลี่ยนแปลงจากโปรแกรมภายนอก"
+msgstr "ไฟล์ถูกเปลี่ยนแปลงจากโปรแกรมภายนอก"
 
-#: ../daemon/gvfsbackendafp.c:1733 ../daemon/gvfsbackendftp.c:1129
-#: ../daemon/gvfsbackendsftp.c:4629
+#: daemon/gvfsbackendafp.c:1765 daemon/gvfsbackendftp.c:1254 daemon/gvfsbackendsftp.c:5482
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "ชนิดของแอตทริบิวต์ผิดพลาด (ต้องการชนิด uint32)"
 
 #. Translators: first %s is volumename, second username and third servername
-#: ../daemon/gvfsbackendafp.c:2061
+#: daemon/gvfsbackendafp.c:2100
 #, c-format
 msgid "%s for %s on %s"
 msgstr "%s ในนาม %s ที่ %s"
 
-#: ../daemon/gvfsbackendafp.c:2110
+#: daemon/gvfsbackendafp.c:2149
 msgid "No volume specified"
 msgstr "ไม่ได้ระบุโวลุม"
 
-#. FIXME: this should really be "/ in %s", but can't change
-#. due to string freeze.
-#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:331 ../daemon/gvfsbackendsftp.c:2275
-#: ../daemon/gvfsftpdircache.c:431
+#. Translators: This is the name of the root in a mounted archive file,
+#. e.g. "/ in archive.tar.gz" for a file with the name "archive.tar.gz"
+#: daemon/gvfsbackendarchive.c:350
 #, c-format
-msgid "/ on %s"
+msgid "/ in %s"
 msgstr "/ ที่ %s"
 
-#: ../daemon/gvfsbackendarchive.c:790 ../daemon/gvfsbackendburn.c:679
-#: ../daemon/gvfsbackendcomputer.c:728 ../daemon/gvfsbackenddnssd.c:464
-#: ../daemon/gvfsbackendftp.c:351 ../daemon/gvfsbackendnetwork.c:744
-#: ../daemon/gvfsbackendsftp.c:3867 ../daemon/gvfsftpdircache.c:157
+#: daemon/gvfsbackendarchive.c:883 daemon/gvfsbackendburn.c:681 daemon/gvfsbackendcomputer.c:729
+#: daemon/gvfsbackenddnssd.c:475 daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:1204
+#: daemon/gvfsbackendgoogle.c:2410 daemon/gvfsbackendgoogle.c:2637 daemon/gvfsbackendnetwork.c:944
+#: daemon/gvfsbackendonedrive.c:668 daemon/gvfsbackendonedrive.c:852 daemon/gvfsbackendonedrive.c:988
+#: daemon/gvfsbackendsftp.c:4505 daemon/gvfsftpdircache.c:157
+#, c-format
 msgid "The file is not a directory"
-msgstr "แฟ้มดังกล่าวไม่ใช่ไดเรกทอรี"
+msgstr "ไฟล์ดังกล่าวไม่ใช่ไดเรกทอรี"
 
 #. Translators: This is the name of the backend
-#: ../daemon/gvfsbackendburn.c:346
+#: daemon/gvfsbackendburn.c:346
 msgid "Burn"
 msgstr "เขียนแผ่น"
 
-#: ../daemon/gvfsbackendburn.c:372
+#: daemon/gvfsbackendburn.c:372
 msgid "Unable to create temporary directory"
 msgstr "ไม่สามารถสร้างไดเรกทอรีชั่วคราว"
 
-#: ../daemon/gvfsbackendburn.c:401 ../daemon/gvfsbackendburn.c:412
-#: ../daemon/gvfsbackendburn.c:447 ../daemon/gvfsbackendburn.c:671
-#: ../daemon/gvfsbackendburn.c:716 ../daemon/gvfsbackendburn.c:742
-#: ../daemon/gvfsbackendburn.c:780 ../daemon/gvfsbackendburn.c:971
-#: ../daemon/gvfsbackendburn.c:1007 ../daemon/gvfsbackendftp.c:794
-#: ../daemon/gvfsbackendgphoto2.c:1238 ../daemon/gvfsbackendgphoto2.c:2177
-#: ../daemon/gvfsbackendgphoto2.c:2900 ../daemon/gvfsbackendrecent.c:105
-#: ../daemon/gvfsbackendrecent.c:259 ../daemon/gvfsbackendsftp.c:1829
-#: ../daemon/gvfsbackendsftp.c:2935 ../daemon/gvfsbackendsftp.c:2948
-#: ../daemon/gvfsbackendsftp.c:2968 ../daemon/gvfsbackendtrash.c:216
+#: daemon/gvfsbackendburn.c:401 daemon/gvfsbackendburn.c:412 daemon/gvfsbackendburn.c:447
+#: daemon/gvfsbackendburn.c:673 daemon/gvfsbackendburn.c:718 daemon/gvfsbackendburn.c:744
+#: daemon/gvfsbackendburn.c:782 daemon/gvfsbackendburn.c:854 daemon/gvfsbackendburn.c:973
+#: daemon/gvfsbackendburn.c:1009 daemon/gvfsbackendftp.c:856 daemon/gvfsbackendgoogle.c:1097
+#: daemon/gvfsbackendgphoto2.c:938 daemon/gvfsbackendgphoto2.c:1869 daemon/gvfsbackendgphoto2.c:2588
+#: daemon/gvfsbackendonedrive.c:583 daemon/gvfsbackendrecent.c:110 daemon/gvfsbackendrecent.c:293
+#: daemon/gvfsbackendsftp.c:2217 daemon/gvfsbackendsftp.c:3380 daemon/gvfsbackendsftp.c:3393
+#: daemon/gvfsbackendsftp.c:3413 daemon/gvfsbackendtrash.c:317
 #, c-format
 msgid "No such file or directory"
-msgstr "ไม่มีแฟ้มหรือไดเรกทอรีดังกล่าว"
+msgstr "ไม่มีไฟล์หรือไดเรกทอรีดังกล่าว"
 
-#: ../daemon/gvfsbackendburn.c:455 ../daemon/gvfsbackendburn.c:903
-#: ../daemon/gvfsbackendobexftp.c:1836
-msgid "Can't copy file over directory"
-msgstr "ไม่สามารถคัดลอกแฟ้มทับไดเรกทอรี"
+#: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:905 daemon/gvfsbackendgoogle.c:1760
+#: daemon/gvfsbackendgoogle.c:2103 daemon/gvfsbackendgoogle.c:3149
+msgid "Can’t copy file over directory"
+msgstr "ไม่สามารถคัดลอกไฟล์ทับไดเรกทอรี"
 
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendburn.c:650
+#: daemon/gvfsbackendburn.c:652
 msgid "CD/DVD Creator"
 msgstr "แบ็กเอนด์เขียนซีดี/ดีวีดี"
 
-#: ../daemon/gvfsbackendburn.c:752 ../daemon/gvfsbackendburn.c:788
-#: ../daemon/gvfsbackendburn.c:923 ../daemon/gvfsbackendburn.c:985
-#: ../daemon/gvfsbackendburn.c:989 ../daemon/gvfsbackendburn.c:999
-#: ../daemon/gvfsbackendgphoto2.c:2974
+#: daemon/gvfsbackendburn.c:754 daemon/gvfsbackendburn.c:790 daemon/gvfsbackendburn.c:925
+#: daemon/gvfsbackendburn.c:987 daemon/gvfsbackendburn.c:991 daemon/gvfsbackendburn.c:1001
+#: daemon/gvfsbackendgphoto2.c:2662
 msgid "File exists"
-msgstr "แฟ้มมีอยู่แล้ว"
+msgstr "ไฟล์มีอยู่แล้ว"
 
-#: ../daemon/gvfsbackendburn.c:827 ../daemon/gvfsjobcloseread.c:112
-#: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:121
-#: ../daemon/gvfsjobcreatemonitor.c:143 ../daemon/gvfsjobcreatemonitor.c:154
-#: ../daemon/gvfsjobcreatemonitor.c:177 ../daemon/gvfsjobcreatemonitor.c:195
-#: ../daemon/gvfsjobdelete.c:108 ../daemon/gvfsjobenumerate.c:268
-#: ../daemon/gvfsjobmakedirectory.c:108 ../daemon/gvfsjobmount.c:112
-#: ../daemon/gvfsjobmountmountable.c:138 ../daemon/gvfsjobmove.c:121
-#: ../daemon/gvfsjobopenforread.c:120 ../daemon/gvfsjobopenforwrite.c:132
-#: ../daemon/gvfsjobopenforwrite.c:146 ../daemon/gvfsjobopenforwrite.c:160
-#: ../daemon/gvfsjobopeniconforread.c:104 ../daemon/gvfsjobpollmountable.c:107
-#: ../daemon/gvfsjobpull.c:125 ../daemon/gvfsjobpush.c:125
-#: ../daemon/gvfsjobqueryattributes.c:145 ../daemon/gvfsjobqueryfsinfo.c:116
-#: ../daemon/gvfsjobqueryinfo.c:124 ../daemon/gvfsjobqueryinforead.c:119
-#: ../daemon/gvfsjobqueryinfowrite.c:119 ../daemon/gvfsjobread.c:120
-#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
-#: ../daemon/gvfsjobsetattribute.c:130 ../daemon/gvfsjobsetdisplayname.c:111
-#: ../daemon/gvfsjobstartmountable.c:113 ../daemon/gvfsjobstopmountable.c:115
-#: ../daemon/gvfsjobtrash.c:107 ../daemon/gvfsjobunmountmountable.c:157
-#: ../daemon/gvfsjobunmountmountable.c:172 ../daemon/gvfsjobwrite.c:120
-#: ../monitor/gdu/ggdumount.c:1174 ../monitor/gdu/ggdumount.c:1258
-#: ../monitor/gdu/ggduvolume.c:1617 ../monitor/udisks2/gvfsudisks2mount.c:1108
-#: ../monitor/udisks2/gvfsudisks2volume.c:1566
-msgid "Operation not supported by backend"
-msgstr "แบ็กเอนด์ไม่รองรับปฏิบัติการ"
-
-#: ../daemon/gvfsbackendburn.c:852
-msgid "No such file or directory in target path"
-msgstr "ไม่มีแฟ้มหรือไดเรกทอรีดังกล่าวในพาธปลายทาง"
-
-#: ../daemon/gvfsbackendburn.c:884 ../daemon/gvfsbackendobexftp.c:1813
-#: ../daemon/gvfsbackendobexftp.c:1844 ../daemon/gvfsbackendsftp.c:1823
-#: ../daemon/gvfsbackendsftp.c:4427
+#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:3600 daemon/gvfsbackendsftp.c:2211
+#: daemon/gvfsbackendsftp.c:5198
 msgid "Target file exists"
-msgstr "มีแฟ้มปลายทางอยู่แล้ว"
+msgstr "มีไฟล์ปลายทางอยู่แล้ว"
 
-#: ../daemon/gvfsbackendburn.c:949 ../daemon/gvfsbackendcomputer.c:811
-#: ../daemon/gvfsbackendgphoto2.c:2550 ../daemon/gvfsbackendgphoto2.c:2763
-#: ../daemon/gvfsbackendgphoto2.c:2860 ../daemon/gvfsbackendgphoto2.c:2953
-msgid "Not supported"
-msgstr "ไม่รองรับ"
+#: daemon/gvfsbackend.c:889 daemon/gvfsjobunmount.c:197 daemon/gvfsjobunmount.c:264
+msgid "File system is busy"
+msgstr "ระบบไฟล์ใช้งานอยู่"
 
-#: ../daemon/gvfsbackend.c:967 ../monitor/gdu/ggdumount.c:922
-#: ../monitor/udisks2/gvfsudisks2mount.c:734
+#: daemon/gvfsbackend.c:1023 monitor/udisks2/gvfsudisks2mount.c:750
 msgid "Unmount Anyway"
 msgstr "เลิกเมานท์ต่อไป"
 
-#: ../daemon/gvfsbackend.c:970 ../monitor/gdu/ggdumount.c:924
-#: ../monitor/udisks2/gvfsudisks2mount.c:737
+#: daemon/gvfsbackend.c:1026 monitor/udisks2/gvfsudisks2mount.c:753
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -854,787 +889,1003 @@ msgstr ""
 "โวลุมมีการใช้งานอยู่\n"
 "มีโปรแกรมตั้งแต่หนึ่งโปรแกรมขึ้นไปใช้งานโวลุมอยู่"
 
-#: ../daemon/gvfsbackendcdda.c:354 ../daemon/gvfsbackendgphoto2.c:1548
+#: daemon/gvfsbackendcdda.c:290 daemon/gvfsbackendgphoto2.c:1289 daemon/gvfsbackendmtp.c:917
 msgid "Cannot create gudev client"
 msgstr "ไม่สามารถสร้างบริบทสำหรับ gudev"
 
-#: ../daemon/gvfsbackendcdda.c:374 ../daemon/gvfsbackendgphoto2.c:1566
-msgid "Cannot connect to the system bus"
-msgstr "ไม่สามารถเชื่อมต่อไปยังบัสระบบ"
-
-#: ../daemon/gvfsbackendcdda.c:385 ../daemon/gvfsbackendgphoto2.c:1578
-msgid "Cannot create libhal context"
-msgstr "ไม่สามารถสร้างบริบทสำหรับ libhal"
-
-#: ../daemon/gvfsbackendcdda.c:399 ../daemon/gvfsbackendgphoto2.c:1591
-msgid "Cannot initialize libhal"
-msgstr "ไม่สามารถตั้งต้น libhal"
-
-#: ../daemon/gvfsbackendcdda.c:415 ../daemon/gvfsbackendcdda.c:501
+#: daemon/gvfsbackendcdda.c:304 daemon/gvfsbackendcdda.c:385
 msgid "No drive specified"
-msgstr "ไม่ได้ระบุไดรว์"
+msgstr "ไม่ได้ระบุไดรฟ์"
 
-#: ../daemon/gvfsbackendcdda.c:439
+#: daemon/gvfsbackendcdda.c:323
 #, c-format
 msgid "Cannot find drive %s"
-msgstr "หาไดรว์ %s ไม่พบ"
+msgstr "หาไดรฟ์ %s ไม่พบ"
 
-#: ../daemon/gvfsbackendcdda.c:452
+#: daemon/gvfsbackendcdda.c:336
 #, c-format
 msgid "Drive %s does not contain audio files"
-msgstr "ไดรว์ %s ไม่ได้บรรจุแฟ้มเสียง"
+msgstr "ไดรฟ์ %s ไม่ได้บรรจุไฟล์เสียง"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
-#: ../daemon/gvfsbackendcdda.c:462
+#: daemon/gvfsbackendcdda.c:346
 #, c-format
 msgid "cdda mount on %s"
 msgstr "การเมานท์ cdda ที่ %s"
 
-#: ../daemon/gvfsbackendcdda.c:463 ../daemon/gvfsbackendcdda.c:984
-#: ../monitor/gdu/ggduvolume.c:349 ../monitor/hal/ghalmount.c:325
-#: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
-#: ../monitor/udisks2/gvfsudisks2volume.c:308
+#: daemon/gvfsbackendcdda.c:347 daemon/gvfsbackendcdda.c:872 monitor/udisks2/gvfsudisks2volume.c:393
 #, c-format
 msgid "Audio Disc"
 msgstr "แผ่นเพลง"
 
-#: ../daemon/gvfsbackendcdda.c:527
+#: daemon/gvfsbackendcdda.c:411
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
-msgstr[0] "ระบบแฟ้มถูกใช้งานอยู่: เปิดแฟ้มอยู่ %d แฟ้ม"
+msgstr[0] "ระบบไฟล์ถูกใช้งานอยู่: เปิดไฟล์อยู่ %d ไฟล์"
 
-#: ../daemon/gvfsbackendcdda.c:719
+#: daemon/gvfsbackendcdda.c:607
 #, c-format
 msgid "No such file %s on drive %s"
-msgstr "ไม่มีแฟ้ม %s ที่ว่าในไดรว์ %s"
+msgstr "ไม่มีไฟล์ %s ที่ว่าในไดรฟ์ %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:828
+#: daemon/gvfsbackendcdda.c:716
 #, c-format
-msgid "Error from 'paranoia' on drive %s"
-msgstr "เกิดข้อผิดพลาดจาก 'paranoia' ที่ไดรว์ %s"
+msgid "Error from “paranoia” on drive %s"
+msgstr "เกิดข้อผิดพลาดจาก “paranoia” ที่ไดรฟ์ %s"
 
-#: ../daemon/gvfsbackendcdda.c:891
+#: daemon/gvfsbackendcdda.c:779
 #, c-format
 msgid "Error seeking in stream on drive %s"
-msgstr "เกิดข้อผิดพลาดขณะเลื่อนตำแหน่งในสตรีมที่ไดรว์ %s"
+msgstr "เกิดข้อผิดพลาดขณะเลื่อนตำแหน่งในสตรีมที่ไดรฟ์ %s"
 
-#: ../daemon/gvfsbackendcdda.c:1005 ../daemon/gvfsbackendgphoto2.c:1864
+#: daemon/gvfsbackendcdda.c:901 daemon/gvfsbackendgphoto2.c:1556
 #, c-format
 msgid "No such file"
-msgstr "ไม่มีแฟ้มดังกล่าว"
+msgstr "ไม่มีไฟล์ดังกล่าว"
 
-#: ../daemon/gvfsbackendcdda.c:1019
+#: daemon/gvfsbackendcdda.c:915
 #, c-format
-msgid "The file does not exist or isn't an audio track"
-msgstr "ไม่มีแฟ้มดังกล่าวอยู่ หรือไม่ใช่ร่องเสียง"
+msgid "The file does not exist or isn’t an audio track"
+msgstr "ไม่มีไฟล์ดังกล่าวอยู่ หรือไม่ใช่ร่องเสียง"
 
-#: ../daemon/gvfsbackendcdda.c:1125
+#: daemon/gvfsbackendcdda.c:1021
 msgid "Audio CD File System Service"
-msgstr "บริการระบบแฟ้มซีดีเพลง"
+msgstr "บริการระบบไฟล์ซีดีเพลง"
 
-#: ../daemon/gvfsbackendcomputer.c:198 ../daemon/gvfsbackendcomputer.c:770
+#: daemon/gvfsbackendcomputer.c:198 daemon/gvfsbackendcomputer.c:771
 msgid "Computer"
 msgstr "คอมพิวเตอร์"
 
-#: ../daemon/gvfsbackendcomputer.c:531
+#: daemon/gvfsbackendcomputer.c:532
 msgid "File System"
-msgstr "ระบบแฟ้ม"
+msgstr "ระบบไฟล์"
 
-#: ../daemon/gvfsbackendcomputer.c:660
-msgid "Can't open mountable file"
-msgstr "ไม่สามารถเปิดแฟ้มสำหรับเมานท์"
+#: daemon/gvfsbackendcomputer.c:661
+msgid "Can’t open mountable file"
+msgstr "ไม่สามารถเปิดไฟล์สำหรับเมานท์"
 
-#: ../daemon/gvfsbackendcomputer.c:857 ../daemon/gvfsbackendsftp.c:1158
+#: daemon/gvfsbackendcomputer.c:858
 #, c-format
 msgid "Internal error: %s"
 msgstr "เกิดข้อผิดพลาดภายใน: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:889 ../daemon/gvfsbackendcomputer.c:1008
-msgid "Can't mount file"
-msgstr "ไม่สามารถเมาทน์แฟ้ม"
+#: daemon/gvfsbackendcomputer.c:890 daemon/gvfsbackendcomputer.c:1008
+msgid "Can’t mount file"
+msgstr "ไม่สามารถเมานท์ไฟล์"
 
-#: ../daemon/gvfsbackendcomputer.c:901
+#: daemon/gvfsbackendcomputer.c:901
 msgid "No medium in the drive"
-msgstr "ไม่มีสื่อในไดรว์"
+msgstr "ไม่มีสื่อในไดรฟ์"
 
-#: ../daemon/gvfsbackendcomputer.c:958 ../daemon/gvfsbackendcomputer.c:1053
-#: ../daemon/gvfsbackendcomputer.c:1159 ../daemon/gvfsbackendcomputer.c:1249
-#: ../daemon/gvfsbackendcomputer.c:1322 ../daemon/gvfsbackendcomputer.c:1391
-msgid "Not a mountable file"
-msgstr "ไม่ใช่แฟ้มสำหรับเมานท์"
+#: daemon/gvfsbackendcomputer.c:1072
+msgid "Can’t unmount file"
+msgstr "ไม่สามารถเลิกเมานท์ไฟล์"
 
-#: ../daemon/gvfsbackendcomputer.c:1072
-msgid "Can't unmount file"
-msgstr "ไม่สามารถเลิกเมาทน์แฟ้ม"
+#: daemon/gvfsbackendcomputer.c:1202
+msgid "Can’t eject file"
+msgstr "ไม่สามารถดันไฟล์ออก"
 
-#: ../daemon/gvfsbackendcomputer.c:1202
-msgid "Can't eject file"
-msgstr "ไม่สามารถดันแฟ้มออก"
+#: daemon/gvfsbackendcomputer.c:1269 daemon/gvfsbackendcomputer.c:1276
+msgid "Can’t start drive"
+msgstr "ไม่สามารถเริ่มทำงานไดรฟ์"
 
-#: ../daemon/gvfsbackendcomputer.c:1269 ../daemon/gvfsbackendcomputer.c:1276
-msgid "Can't start drive"
-msgstr "ไม่สามารถเริ่มทำงานไดรว์"
+#: daemon/gvfsbackendcomputer.c:1342 daemon/gvfsbackendcomputer.c:1349
+msgid "Can’t stop drive"
+msgstr "ไม่สามารถหยุดทำงานไดรฟ์"
 
-#: ../daemon/gvfsbackendcomputer.c:1342 ../daemon/gvfsbackendcomputer.c:1349
-msgid "Can't stop drive"
-msgstr "ไม่สามารถหยุดทำงานไดรว์"
-
-#: ../daemon/gvfsbackendcomputer.c:1406 ../daemon/gvfsbackendcomputer.c:1413
-msgid "Can't poll file"
-msgstr "ไม่สามารถ poll แฟ้ม"
+#: daemon/gvfsbackendcomputer.c:1406 daemon/gvfsbackendcomputer.c:1413
+msgid "Can’t poll file"
+msgstr "ไม่สามารถ poll ไฟล์"
 
 #. Translators: This is the name of the WebDAV share constructed as
 #. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
 #. the second %s and only shown if it is not the default http(s) port.
-#: ../daemon/gvfsbackenddav.c:485
+#: daemon/gvfsbackenddav.c:412
 #, c-format
 msgid "%s on %s%s"
 msgstr "%s ที่ %s%s"
 
-#: ../daemon/gvfsbackenddav.c:677 ../daemon/gvfsbackenddav.c:1918
-#: ../daemon/gvfsbackendhttp.c:255
+#: daemon/gvfsbackenddav.c:766 daemon/gvfsbackenddav.c:1536 daemon/gvfsbackenddav.c:2145
+#: daemon/gvfsbackenddav.c:2309 daemon/gvfsbackendhttp.c:268 daemon/gvfshttpinputstream.c:273
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "ข้อผิดพลาด HTTP: %s"
 
-#: ../daemon/gvfsbackenddav.c:694
+#: daemon/gvfsbackenddav.c:781
 msgid "Could not parse response"
 msgstr "ไม่สามารถแจงคำตอบ"
 
-#: ../daemon/gvfsbackenddav.c:703
+#: daemon/gvfsbackenddav.c:790
 msgid "Empty response"
 msgstr "คำตอบว่างเปล่า"
 
-#: ../daemon/gvfsbackenddav.c:711
+#: daemon/gvfsbackenddav.c:798
 msgid "Unexpected reply from server"
 msgstr "ได้รับคำตอบที่ไม่คาดหมายจากเซิร์ฟเวอร์"
 
-#: ../daemon/gvfsbackenddav.c:1402 ../daemon/gvfsbackenddav.c:2048
-#: ../daemon/gvfsbackenddav.c:2135 ../daemon/gvfsbackenddav.c:2242
+#: daemon/gvfsbackenddav.c:1554 daemon/gvfsbackenddav.c:2511 daemon/gvfsbackenddav.c:2606
+#: daemon/gvfsbackenddav.c:2790
+#, c-format
 msgid "Response invalid"
 msgstr "คำตอบใช้ไม่ได้"
 
-#: ../daemon/gvfsbackenddav.c:1545
+#: daemon/gvfsbackenddav.c:1775
 msgid "WebDAV share"
 msgstr "การเปิดให้ใช้ร่วมผ่าน WebDAV"
 
-#. translators: %s here is the hostname
-#. Translators: %s is the hostname
-#: ../daemon/gvfsbackenddav.c:1547 ../daemon/gvfsbackendftp.c:491
-#: ../daemon/gvfsbackendsftp.c:964
+#. Translators: %s is the name of the WebDAV share
+#. Translators: %s is a server name
+#: daemon/gvfsbackenddav.c:1778 daemon/gvfsbackendsmbbrowse.c:334
 #, c-format
-msgid "Enter password for %s"
-msgstr "กรุณาป้อนรหัสผ่านสำหรับ %s"
+msgid ""
+"Authentication Required\n"
+"Enter password for “%s”:"
+msgstr ""
+"ต้องยืนยันตัวตน\n"
+"ใส่รหัสผ่านสำหรับ “%s”:"
 
-#: ../daemon/gvfsbackenddav.c:1550
-msgid "Please enter proxy password"
-msgstr "กรุณาป้อนรหัสผ่านสำหรับพร็อกซี"
+#: daemon/gvfsbackenddav.c:1781
+msgid ""
+"Authentication Required\n"
+"Enter proxy password:"
+msgstr ""
+"ต้องยืนยันตัวตน\n"
+"ป้อนรหัสผ่านสำหรับพร็อกซี:"
 
-#: ../daemon/gvfsbackenddav.c:1922 ../daemon/gvfsbackenddav.c:1926
+#: daemon/gvfsbackenddav.c:2153
+msgid "Could not find an enclosing directory"
+msgstr "ไม่สามารถหาไดเรกทอรีที่บรรจุ"
+
+#: daemon/gvfsbackenddav.c:2297
 msgid "Not a WebDAV enabled share"
 msgstr "ไม่ใช่แหล่งใช้ร่วมที่ใช้ WebDAV ได้"
 
-#: ../daemon/gvfsbackenddav.c:2002 ../daemon/gvfsbackenddav.c:2090
-#: ../daemon/gvfsbackenddav.c:2163 ../daemon/gvfsbackenddav.c:2276
+#: daemon/gvfsbackenddav.c:2537 daemon/gvfsbackenddav.c:2650 daemon/gvfsbackenddav.c:2737
+#: daemon/gvfsbackenddav.c:2824
 msgid "Could not create request"
 msgstr "ไม่สามารถสร้างคำร้องขอ"
 
-#: ../daemon/gvfsbackenddav.c:2410 ../daemon/gvfsbackendsmb.c:1185
-#: ../daemon/gvfsbackendsmb.c:2116
+#: daemon/gvfsbackenddav.c:3010 daemon/gvfsbackendftp.c:1106 daemon/gvfsbackendgoogle.c:3944
+#: daemon/gvfsbackendnfs.c:948 daemon/gvfsbackendnfs.c:971 daemon/gvfsbackendnfs.c:997
+#: daemon/gvfsbackendnfs.c:1397 daemon/gvfsbackendsmb.c:1126 daemon/gvfsbackendsmb.c:2138
 msgid "Backup file creation failed"
-msgstr "สร้างแฟ้มสำรองไม่สำเร็จ"
+msgstr "สร้างไฟล์สำรองไม่สำเร็จ"
 
-#: ../daemon/gvfsbackenddnssd.c:511 ../daemon/gvfsbackendnetwork.c:462
+#: daemon/gvfsbackenddav.c:3566
+msgid "Can’t move over directory"
+msgstr "ไม่สามารถย้ายทับไดเรกทอรี"
+
+#: daemon/gvfsbackenddnssd.c:522 daemon/gvfsbackendnetwork.c:545
 msgid "Local Network"
 msgstr "เครือข่ายท้องถิ่น"
 
-#: ../daemon/gvfsbackenddnssd.c:758 ../daemon/gvfsbackendnetwork.c:851
-msgid "Can't monitor file or directory."
-msgstr "ไม่สามารถเฝ้าสังเกตแฟ้มหรือไดเรกทอรี"
+#: daemon/gvfsbackenddnssd.c:777 daemon/gvfsbackendnetwork.c:1060
+msgid "Can’t monitor file or directory."
+msgstr "ไม่สามารถเฝ้าสังเกตไฟล์หรือไดเรกทอรี"
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:776
+#: daemon/gvfsbackenddnssd.c:795
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:777 ../daemon/gvfsbackendnetwork.c:783
-#: ../daemon/gvfsbackendnetwork.c:918 ../daemon/gvfsbackendnetwork.c:919
+#: daemon/gvfsbackenddnssd.c:796 daemon/gvfsbackendnetwork.c:990 daemon/gvfsbackendnetwork.c:1150
+#: daemon/gvfsbackendnetwork.c:1151
 msgid "Network"
 msgstr "เครือข่าย"
 
-#. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:488 ../daemon/gvfsbackendsftp.c:957
-#, c-format
-msgid "Enter password for %s on %s"
-msgstr "กรุณาป้อนรหัสผ่านสำหรับ %s ที่ %s"
-
-#: ../daemon/gvfsbackendftp.c:518 ../daemon/gvfsbackendsftp.c:981
-#: ../daemon/gvfsbackendsmbbrowse.c:1001 ../daemon/gvfsbackendsmb.c:620
+#: daemon/gvfsbackendftp.c:560 daemon/gvfsbackendsftp.c:1191 daemon/gvfsbackendsftp.c:1295
+#: daemon/gvfsbackendsmbbrowse.c:806 daemon/gvfsbackendsmb.c:550
 msgid "Password dialog cancelled"
 msgstr "กล่องโต้ตอบรหัสผ่านถูกยกเลิก"
 
-#: ../daemon/gvfsbackendftp.c:728
+#: daemon/gvfsbackendftp.c:790
 msgid "Insufficient permissions"
 msgstr "ได้รับอนุญาตสิทธิ์ไม่เพียงพอ"
 
-#: ../daemon/gvfsbackendftp.c:982 ../daemon/gvfsbackendftp.c:1336
-#: ../daemon/gvfsbackendsftp.c:3260
-msgid "backups not supported yet"
-msgstr "ยังไม่รองรับการสำรองแฟ้ม"
+#: daemon/gvfsbackendgoogle.c:2217
+msgid "Can’t move file over directory"
+msgstr "ไม่สามารถย้ายไฟล์ทับไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:507
+#: daemon/gvfsbackendgoogle.c:2259
+msgid "Error moving file/folder"
+msgstr "เกิดข้อผิดพลาดขณะย้ายไฟล์/โฟลเดอร์"
+
+#. Translators: This is the "Shared with me" folder on https://drive.google.com.
+#: daemon/gvfsbackendgoogle.c:2971 daemon/gvfsbackendonedrive.c:1195
+msgid "Shared with me"
+msgstr "ใช้ร่วมกับฉัน"
+
+#. Translators: This is the "Shared drives" folder on https://drive.google.com.
+#: daemon/gvfsbackendgoogle.c:2987
+msgid "Shared drives"
+msgstr "ไดรฟ์ที่ใช้ร่วมกัน"
+
+#: daemon/gvfsbackendgoogle.c:3021 daemon/gvfsbackendgoogle.c:3599 daemon/gvfsbackendgphoto2.c:1589
+#: daemon/gvfsbackendonedrive.c:1230
+msgid "Error getting data from file"
+msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลจากไฟล์"
+
+#: daemon/gvfsbackendgoogle.c:3158 daemon/gvfsbackendgoogle.c:3984 daemon/gvfsbackendnfs.c:1169
+msgid "Target file is not a regular file"
+msgstr "ไฟล์ปลายทางไม่ใช่ไฟล์ปกติ"
+
+#: daemon/gvfsbackendgoogle.c:3584 daemon/gvfsbackendsftp.c:2390 daemon/gvfsbackendsftp.c:2795
+#: daemon/gvfsbackendsftp.c:2858 daemon/gvfsbackendsftp.c:2869 daemon/gvfsbackendsftp.c:2927
+#: daemon/gvfsbackendsftp.c:3020 daemon/gvfsbackendsftp.c:3072 daemon/gvfsbackendsftp.c:3127
+#: daemon/gvfsbackendsftp.c:3206 daemon/gvfsbackendsftp.c:3323 daemon/gvfsbackendsftp.c:3456
+#: daemon/gvfsbackendsftp.c:3540 daemon/gvfsbackendsftp.c:3616 daemon/gvfsbackendsftp.c:3628
+#: daemon/gvfsbackendsftp.c:3698 daemon/gvfsbackendsftp.c:3768 daemon/gvfsbackendsftp.c:3826
+#: daemon/gvfsbackendsftp.c:3846 daemon/gvfsbackendsftp.c:4038 daemon/gvfsbackendsftp.c:4072
+#: daemon/gvfsbackendsftp.c:4130 daemon/gvfsbackendsftp.c:4192 daemon/gvfsbackendsftp.c:4263
+#: daemon/gvfsbackendsftp.c:4538 daemon/gvfsbackendsftp.c:4609 daemon/gvfsbackendsftp.c:4744
+#: daemon/gvfsbackendsftp.c:4857 daemon/gvfsbackendsftp.c:4919 daemon/gvfsbackendsftp.c:4956
+#: daemon/gvfsbackendsftp.c:4984 daemon/gvfsbackendsftp.c:5098 daemon/gvfsbackendsftp.c:5154
+#: daemon/gvfsbackendsftp.c:5195 daemon/gvfsbackendsftp.c:5231 daemon/gvfsbackendsftp.c:5267
+#: daemon/gvfsbackendsftp.c:5282 daemon/gvfsbackendsftp.c:5297 daemon/gvfsbackendsftp.c:5392
+#: daemon/gvfsbackendsftp.c:5460 daemon/gvfsbackendsftp.c:5667 daemon/gvfsbackendsftp.c:5704
+#: daemon/gvfsbackendsftp.c:5822 daemon/gvfsbackendsftp.c:5908 daemon/gvfsbackendsftp.c:5992
+#: daemon/gvfsbackendsftp.c:6035 daemon/gvfsbackendsftp.c:6039 daemon/gvfsbackendsftp.c:6156
+#: daemon/gvfsbackendsftp.c:6160 daemon/gvfsbackendsftp.c:6411 daemon/gvfsbackendsftp.c:6634
+#: daemon/gvfsbackendsftp.c:6651 daemon/gvfsbackendsftp.c:6789 daemon/gvfsbackendsftp.c:6817
+msgid "Invalid reply received"
+msgstr "ได้รับคำตอบที่ใช้ไม่ได้"
+
+#: daemon/gvfsbackendgoogle.c:3590
+msgid "File is not a regular file"
+msgstr "ไฟล์ไม่ใช่ไฟล์ปกติ"
+
+#: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendnfs.c:1159 daemon/gvfsbackendonedrive.c:1817
+msgid "Target file is a directory"
+msgstr "ไฟล์ปลายทางเป็นไดเรกทอรี"
+
+#: daemon/gvfsbackendgoogle.c:4169 daemon/gvfsbackendgphoto2.c:3050
+msgid "Error writing file"
+msgstr "เกิดข้อผิดพลาดขณะเขียนไฟล์"
+
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:479
 #, c-format
 msgid "%s: %d: Directory or file exists"
-msgstr "%s: %d: มีแฟ้มหรือไดเรกทอรีอยู่ก่อนแล้ว"
+msgstr "%s: %d: มีไฟล์หรือไดเรกทอรีอยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsbackendgphoto2.c:514
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:486
 #, c-format
 msgid "%s: %d: No such file or directory"
-msgstr "%s: %d: ไม่มีแฟ้มหรือไดเรกทอรีดังกล่าว"
+msgstr "%s: %d: ไม่มีไฟล์หรือไดเรกทอรีดังกล่าว"
 
-#: ../daemon/gvfsbackendgphoto2.c:520
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:492
 #, c-format
 msgid "%s: %d: Invalid filename"
-msgstr "%s: %d: ชื่อแฟ้มใช้ไม่ได้"
+msgstr "%s: %d: ชื่อไฟล์ใช้ไม่ได้"
 
-#: ../daemon/gvfsbackendgphoto2.c:526
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:498
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "%s: %d: ไม่รองรับ"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:738 ../daemon/gvfsbackendgphoto2.c:744
+#: daemon/gvfsbackendgphoto2.c:687
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "กล้องดิจิทัล (%s)"
 
-#. Translator: %s is the vendor name, e.g. Panasonic
-#. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:972 ../monitor/gphoto2/ggphoto2volume.c:197
-#: ../monitor/gphoto2/ggphoto2volume.c:299
-#, c-format
-msgid "%s Camera"
-msgstr "กล้อง %s"
+#: daemon/gvfsbackendgphoto2.c:1256 daemon/gvfsbackendmtp.c:888
+msgid "Couldn’t find matching udev device."
+msgstr "ไม่พบอุปกรณ์ udev ที่ตรงกัน"
 
-#. Translator: %s is the vendor name, e.g. Panasonic
-#. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:975 ../monitor/gphoto2/ggphoto2volume.c:192
-#: ../monitor/gphoto2/ggphoto2volume.c:294
-#, c-format
-msgid "%s Audio Player"
-msgstr "เครื่องเล่นเพลง %s"
-
-#: ../daemon/gvfsbackendgphoto2.c:984 ../monitor/gphoto2/ggphoto2volume.c:203
-#: ../monitor/gphoto2/ggphoto2volume.c:308
-msgid "Camera"
-msgstr "กล้อง"
-
-#: ../daemon/gvfsbackendgphoto2.c:986 ../monitor/gphoto2/ggphoto2volume.c:306
-msgid "Audio Player"
-msgstr "เครื่องเล่นเพลง"
-
-#: ../daemon/gvfsbackendgphoto2.c:1607
-msgid "No device specified"
-msgstr "ไม่ได้ระบุอุปกรณ์"
-
-#: ../daemon/gvfsbackendgphoto2.c:1628
+#: daemon/gvfsbackendgphoto2.c:1319
 msgid "Cannot create gphoto2 context"
 msgstr "ไม่สามารถสร้างบริบทสำหรับ gphoto2"
 
-#: ../daemon/gvfsbackendgphoto2.c:1638
+#: daemon/gvfsbackendgphoto2.c:1328
 msgid "Error creating camera"
 msgstr "เกิดข้อผิดพลาดขณะสร้างอ็อบเจกต์กล้องถ่ายรูป"
 
-#: ../daemon/gvfsbackendgphoto2.c:1651 ../daemon/gvfsbackendgphoto2.c:1661
+#: daemon/gvfsbackendgphoto2.c:1340 daemon/gvfsbackendgphoto2.c:1349
 msgid "Error loading device information"
 msgstr "เกิดข้อผิดพลาดขณะโหลดข้อมูลอุปกรณ์"
 
-#: ../daemon/gvfsbackendgphoto2.c:1673
+#: daemon/gvfsbackendgphoto2.c:1360
 msgid "Error looking up device information"
 msgstr "เกิดข้อผิดพลาดขณะหาข้อมูลอุปกรณ์"
 
-#: ../daemon/gvfsbackendgphoto2.c:1683
+#: daemon/gvfsbackendgphoto2.c:1369
 msgid "Error getting device information"
 msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลอุปกรณ์"
 
-#: ../daemon/gvfsbackendgphoto2.c:1698
+#: daemon/gvfsbackendgphoto2.c:1383
 msgid "Error setting up camera communications port"
 msgstr "เกิดข้อผิดพลาดขณะกำหนดค่าพอร์ตสื่อสารของกล้องถ่ายรูป"
 
-#: ../daemon/gvfsbackendgphoto2.c:1709
+#: daemon/gvfsbackendgphoto2.c:1393
 msgid "Error initializing camera"
 msgstr "เกิดข้อผิดพลาดขณะตั้งค่าเริ่มต้นของกล้องถ่ายรูป"
 
 #. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
 #. backend and shouldn't be translated.
-#: ../daemon/gvfsbackendgphoto2.c:1724
+#: daemon/gvfsbackendgphoto2.c:1404
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "การเมานท์ gphoto2 ที่ %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1810
+#: daemon/gvfsbackendgphoto2.c:1502
 msgid "No camera specified"
 msgstr "ไม่ได้ระบุกล้องถ่ายรูป"
 
-#: ../daemon/gvfsbackendgphoto2.c:1872
+#: daemon/gvfsbackendgphoto2.c:1564 daemon/gvfsbackendgphoto2.c:3299
 msgid "Error creating file object"
-msgstr "เกิดข้อผิดพลาดขณะสร้างอ็อบเจกต์แฟ้ม"
+msgstr "เกิดข้อผิดพลาดขณะสร้างอ็อบเจกต์ไฟล์"
 
-#: ../daemon/gvfsbackendgphoto2.c:1887
+#: daemon/gvfsbackendgphoto2.c:1579 daemon/gvfsbackendgphoto2.c:3330
 msgid "Error getting file"
-msgstr "เกิดข้อผิดพลาดขณะหยิบแฟ้มมาใช้"
+msgstr "เกิดข้อผิดพลาดขณะหยิบไฟล์มาใช้"
 
-#: ../daemon/gvfsbackendgphoto2.c:1897
-msgid "Error getting data from file"
-msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลจากแฟ้ม"
-
-#: ../daemon/gvfsbackendgphoto2.c:1955
+#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2465
 #, c-format
-msgid "Malformed icon identifier '%s'"
-msgstr "ตัวระบุไอคอน '%s' ผิดรูปแบบ"
+msgid "Malformed icon identifier “%s”"
+msgstr "ตัวระบุไอคอน “%s” ผิดรูปแบบ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2031 ../daemon/gvfsbackendgphoto2.c:3224
+#: daemon/gvfsbackendgphoto2.c:1723 daemon/gvfsbackendgphoto2.c:2913
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "เกิดข้อผิดพลาดขณะเลื่อนตำแหน่งในสตรีมที่กล้องถ่ายรูป %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2171 ../daemon/gvfsbackendsftp.c:2938
-#: ../daemon/gvfsbackendsmbbrowse.c:1423
+#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3383 daemon/gvfsbackendsmbbrowse.c:1229
 msgid "Not a directory"
 msgstr "ไม่ใช่ไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2204
+#: daemon/gvfsbackendgphoto2.c:1896
 msgid "Failed to get folder list"
 msgstr "ดึงรายชื่อโฟลเดอร์ไม่สำเร็จ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2270
+#: daemon/gvfsbackendgphoto2.c:1961
 msgid "Failed to get file list"
-msgstr "ดึงรายชื่อแฟ้มไม่สำเร็จ"
+msgstr "ดึงรายชื่อไฟล์ไม่สำเร็จ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2562
+#: daemon/gvfsbackendgphoto2.c:2250
 msgid "Error creating directory"
 msgstr "เกิดข้อผิดพลาดขณะสร้างไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2775
+#: daemon/gvfsbackendgphoto2.c:2463
 msgid "Name already exists"
 msgstr "มีชื่อซ้ำอยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsbackendgphoto2.c:2786 ../daemon/gvfsbackendgphoto2.c:3419
+#: daemon/gvfsbackendgphoto2.c:2474 daemon/gvfsbackendgphoto2.c:3142
 msgid "New name too long"
 msgstr "ชื่อใหม่ยาวเกินไป"
 
-#: ../daemon/gvfsbackendgphoto2.c:2796 ../daemon/gvfsbackendgphoto2.c:3430
+#: daemon/gvfsbackendgphoto2.c:2484 daemon/gvfsbackendgphoto2.c:3153
 msgid "Error renaming directory"
 msgstr "เกิดข้อผิดพลาดขณะเปลี่ยนชื่อไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2809 ../daemon/gvfsbackendgphoto2.c:3443
+#: daemon/gvfsbackendgphoto2.c:2497 daemon/gvfsbackendgphoto2.c:3166
 msgid "Error renaming file"
-msgstr "เกิดข้อผิดพลาดขณะเปลี่ยนชื่อแฟ้ม"
+msgstr "เกิดข้อผิดพลาดขณะเปลี่ยนชื่อไฟล์"
 
-#: ../daemon/gvfsbackendgphoto2.c:2873
+#: daemon/gvfsbackendgphoto2.c:2561
 #, c-format
-msgid "Directory '%s' is not empty"
-msgstr "ไดเรกทอรี '%s' ไม่ว่าง"
+msgid "Directory “%s” is not empty"
+msgstr "ไดเรกทอรี “%s” ไม่ว่าง"
 
-#: ../daemon/gvfsbackendgphoto2.c:2884
+#: daemon/gvfsbackendgphoto2.c:2572
 msgid "Error deleting directory"
 msgstr "เกิดข้อผิดพลาดขณะลบไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2910
+#: daemon/gvfsbackendgphoto2.c:2598 daemon/gvfsbackendgphoto2.c:3351
 msgid "Error deleting file"
-msgstr "เกิดข้อผิดพลาดขณะลบแฟ้ม"
+msgstr "เกิดข้อผิดพลาดขณะลบไฟล์"
 
-#: ../daemon/gvfsbackendgphoto2.c:2963
-msgid "Can't write to directory"
+#: daemon/gvfsbackendgphoto2.c:2651
+msgid "Can’t write to directory"
 msgstr "ไม่สามารถเขียนลงในไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:3010
+#: daemon/gvfsbackendgphoto2.c:2698
 msgid "Cannot allocate new file to append to"
-msgstr "ไม่สามารถสร้างแฟ้มใหม่เพื่อเขียนต่อท้าย"
+msgstr "ไม่สามารถสร้างไฟล์ใหม่เพื่อเขียนต่อท้าย"
 
-#: ../daemon/gvfsbackendgphoto2.c:3025
+#: daemon/gvfsbackendgphoto2.c:2713
 msgid "Cannot read file to append to"
-msgstr "ไม่สามารถอ่านแฟ้มที่จะเขียนต่อท้าย"
+msgstr "ไม่สามารถอ่านไฟล์ที่จะเขียนต่อท้าย"
 
-#: ../daemon/gvfsbackendgphoto2.c:3036
+#: daemon/gvfsbackendgphoto2.c:2724
 msgid "Cannot get data of file to append to"
-msgstr "ไม่สามารถอ่านข้อมูลจากแฟ้มที่จะเขียนต่อท้าย"
+msgstr "ไม่สามารถอ่านข้อมูลจากไฟล์ที่จะเขียนต่อท้าย"
 
-#: ../daemon/gvfsbackendgphoto2.c:3327
-msgid "Error writing file"
-msgstr "เกิดข้อผิดพลาดขณะเขียนแฟ้ม"
-
-#: ../daemon/gvfsbackendgphoto2.c:3375
+#: daemon/gvfsbackendgphoto2.c:3098
 msgid "Not supported (not same directory)"
 msgstr "ไม่รองรับ (ไม่ใช่ไดเรกทอรีเดียวกัน)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3387
-msgid ""
-"Not supported (the source is a directory, the destination is a directory too)"
+#: daemon/gvfsbackendgphoto2.c:3110
+msgid "Not supported (the source is a directory, the destination is a directory too)"
 msgstr "ไม่รองรับ (ต้นทางเป็นไดเรกทอรี ปลายทางก็เป็นไดเรกทอรี)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3395
-msgid ""
-"Not supported (the source is a directory, but the destination is an existing "
-"file)"
-msgstr "ไม่รองรับ (ต้นทางเป็นไดเรกทอรี แต่ปลายทางเป็นแฟ้มที่มีอยู่)"
+#: daemon/gvfsbackendgphoto2.c:3118
+msgid "Not supported (the source is a directory, but the destination is an existing file)"
+msgstr "ไม่รองรับ (ต้นทางเป็นไดเรกทอรี แต่ปลายทางเป็นไฟล์ที่มีอยู่)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3407
-msgid ""
-"Not supported (the source is a file, but the destination is a directory)"
-msgstr "ไม่รองรับ (ต้นทางเป็นแฟ้ม แต่ปลายทางเป็นไดเรกทอรี)"
+#: daemon/gvfsbackendgphoto2.c:3130
+msgid "Not supported (the source is a file, but the destination is a directory)"
+msgstr "ไม่รองรับ (ต้นทางเป็นไฟล์ แต่ปลายทางเป็นไดเรกทอรี)"
 
-#: ../daemon/gvfsbackendhttp.c:251
+#: daemon/gvfsbackendhttp.c:263
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "ข้อผิดพลาดของลูกข่าย HTTP: %s"
 
-#: ../daemon/gvfsbackendlocaltest.c:856
+#: daemon/gvfsbackendlocaltest.c:861
 msgid "Directory notification not supported"
 msgstr "ไม่รองรับการแจ้งเหตุไดเรกทอรี"
 
-#: ../daemon/gvfsbackendnetwork.c:168
-msgid "File Sharing"
-msgstr "การใช้แฟ้มร่วมกัน"
+#. Translators: This is shown as the name for MTP devices
+#. *              without StorageDescription.
+#. *              The %X is the formatted storage ID.
+#: daemon/gvfsbackendmtp.c:194
+#, c-format
+msgid "Storage (%X)"
+msgstr "หน่วยเก็บข้อมูล (%X)"
 
-#: ../daemon/gvfsbackendnetwork.c:173
+#: daemon/gvfsbackendmtp.c:592
+msgid "Unknown error."
+msgstr "ข้อผิดพลาดไม่ทราบสาเหตุ"
+
+#: daemon/gvfsbackendmtp.c:598
+#, c-format
+msgid "libmtp error: %s"
+msgstr "ข้อผิดพลาดของ libmtp: %s"
+
+#: daemon/gvfsbackendmtp.c:909
+msgid "No device specified"
+msgstr "ไม่ได้ระบุอุปกรณ์"
+
+#: daemon/gvfsbackendmtp.c:1055
+msgid "No MTP devices found"
+msgstr "ไม่พบอุปกรณ์ MTP"
+
+#: daemon/gvfsbackendmtp.c:1060
+msgid "Unable to connect to MTP device"
+msgstr "ไม่สามารถเชื่อมต่ออุปกรณ์ MTP"
+
+#: daemon/gvfsbackendmtp.c:1065
+msgid "Unable to allocate memory while detecting MTP devices"
+msgstr "ไม่สามารถจัดสรรหน่วยความจำขณะตรวจหาอุปกรณ์ MTP"
+
+#: daemon/gvfsbackendmtp.c:1071
+msgid "Generic libmtp error"
+msgstr "ข้อผิดพลาดทั่วไปของ libmtp"
+
+#: daemon/gvfsbackendmtp.c:1084
+#, c-format
+msgid "Unable to open MTP device “%03u,%03u”"
+msgstr "ไม่สามารถเปิดอุปกรณ์ MTP “%03u,%03u”"
+
+#: daemon/gvfsbackendmtp.c:1101
+msgid "Device not found"
+msgstr "ไม่พบอุปกรณ์นี้"
+
+#: daemon/gvfsbackendmtp.c:1408 daemon/gvfsbackendmtp.c:1557 daemon/gvfsbackendmtp.c:1609
+#: daemon/gvfsbackendwsdd.c:263 daemon/gvfsbackendwsdd.c:321
+msgid "File not found"
+msgstr "ไม่พบไฟล์นี้"
+
+#: daemon/gvfsbackendmtp.c:1679
+msgid "Target is a directory"
+msgstr "เป้าหมายเป็นไดเรกทอรี"
+
+#: daemon/gvfsbackendmtp.c:1684
+msgid "Can’t merge directories"
+msgstr "ไม่สามารถผสานไดเรกทอรี"
+
+#: daemon/gvfsbackendmtp.c:1730
+msgid "Cannot make directory in this location"
+msgstr "ไม่สามารถสร้างไดเรกทอรีในตำแหน่งนี้"
+
+#: daemon/gvfsbackendmtp.c:1807 daemon/gvfsbackendmtp.c:2230 daemon/gvfsbackendmtp.c:2293
+#: daemon/gvfsbackendmtp.c:2360 daemon/gvfsbackendmtp.c:2722 daemon/gvfsbackendmtp.c:2788
+#: daemon/gvfsbackendmtp.c:3001 daemon/gvfsbackendmtp.c:3144 daemon/gvfsbackendsmbbrowse.c:974
+msgid "Not a regular file"
+msgstr "ไม่ใช่ไฟล์ปกติ"
+
+#: daemon/gvfsbackendmtp.c:2102 daemon/gvfsbackendmtp.c:2634 daemon/gvfsbackendmtp.c:2985
+#: daemon/gvfsbackendmtp.c:3128
+msgid "Cannot write to this location"
+msgstr "ไม่สามารถเขียนลงในตำแหน่งนี้"
+
+#: daemon/gvfsbackendmtp.c:2447
+#, c-format
+msgid "No thumbnail for entity “%s”"
+msgstr "ไม่พบภาพย่อสำหรับเอนทิตี “%s”"
+
+#: daemon/gvfsbackendnetwork.c:240
+msgid "File Sharing"
+msgstr "การใช้ไฟล์ร่วมกัน"
+
+#: daemon/gvfsbackendnetwork.c:245
 msgid "Remote Login"
 msgstr "การเข้าระบบระยะไกล"
 
-#: ../daemon/gvfsbackendnetwork.c:333 ../daemon/gvfsbackendsmbbrowse.c:896
+#: daemon/gvfsbackendnetwork.c:499 daemon/gvfsbackendsmbbrowse.c:696
 msgid "Windows Network"
-msgstr "เครือข่ายวินโดวส์"
+msgstr "เครือข่าย Windows"
+
+#: daemon/gvfsbackendnetwork.c:625
+msgid "WSDD Network"
+msgstr "เครือข่าย WSDD"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:976
+#: daemon/gvfsbackendnetwork.c:1245
 msgid "Network Location Monitor"
 msgstr "หน้าต่างเฝ้าสังเกตตำแหน่งในเครือข่าย"
 
-#: ../daemon/gvfsbackendobexftp.c:914
-msgid "USB support missing. Please contact your software vendor"
-msgstr "ไม่มีส่วนรองรับ USB กรุณาติดต่อผู้จัดแจกซอฟต์แวร์ของคุณ"
+#: daemon/gvfsbackendnfs.c:249
+msgid "Mount point does not exist"
+msgstr "ไม่มีจุดเมานท์อยู่"
 
-#: ../daemon/gvfsbackendobexftp.c:1036
-msgid "Connection to the device lost"
-msgstr "การเชื่อมต่อไปยังอุปกรณ์ถูกตัดขาด"
+#: daemon/gvfsbackendnfs.c:273
+msgid "Permission denied: Perhaps this host is disallowed or a privileged port is needed"
+msgstr "ไม่ได้รับอนุญาต: อาจเป็นเพราะโฮสต์นี้ไม่ได้รับอนุญาต หรือต้องใช้พอร์ตที่มีสิทธิ์ขั้นสูง"
 
-#: ../daemon/gvfsbackendobexftp.c:1533
-msgid "Device requires a software update"
-msgstr "อุปกรณ์ต้องการซอฟต์แวร์รุ่นใหม่"
+#: daemon/gvfsbackendnfs.c:1055 daemon/gvfsbackendnfs.c:1078 daemon/gvfsbackendnfs.c:1126
+#: daemon/gvfsbackendsftp.c:3893 daemon/gvfsbackendsftp.c:6063
+msgid "Unable to create temporary file"
+msgstr "ไม่สามารถสร้างไฟล์ชั่วคราว"
 
-#: ../daemon/gvfsbackendobexftp.c:1881 ../daemon/gvfsbackendsmb.c:1990
-#, c-format
-msgid "Error deleting file: %s"
-msgstr "เกิดข้อผิดพลาดขณะลบแฟ้ม: %s"
+#: daemon/gvfsbackendnfs.c:2387
+msgid "Invalid attribute type"
+msgstr "ชนิดของแอตทริบิวต์ผิดพลาด"
 
-#: ../daemon/gvfsbackendrecent.c:238
+#: daemon/gvfsbackendonedrive.c:1187
+msgid "My Files"
+msgstr "ไฟล์ของฉัน"
+
+#: daemon/gvfsbackendrecent.c:270
 msgid "The recent folder may not be deleted"
 msgstr "ไม่สามารถลบโฟลเดอร์เอกสารล่าสุดได้"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendrecent.c:548 ../daemon/gvfsbackendrecent.c:662
+#: daemon/gvfsbackendrecent.c:693 daemon/gvfsbackendrecent.c:814
 msgid "Recent"
 msgstr "เอกสารล่าสุด"
 
-#: ../daemon/gvfsbackendsftp.c:299 ../daemon/gvfsbackendsftp.c:654
-msgid "ssh program unexpectedly exited"
-msgstr "โปรแกรม ssh จบการทำงานกะทันหัน"
+#: daemon/gvfsbackendsftp.c:337 daemon/gvfsbackendsftp.c:720
+msgid "Connection failed"
+msgstr "การเชื่อมต่อล้มเหลว"
 
-#: ../daemon/gvfsbackendsftp.c:314
+#: daemon/gvfsbackendsftp.c:353
 msgid "Hostname not known"
 msgstr "ไม่รู้จักชื่อโฮสต์"
 
-#: ../daemon/gvfsbackendsftp.c:321
+#: daemon/gvfsbackendsftp.c:360
 msgid "No route to host"
 msgstr "ไม่มีเส้นทางไปยังโฮสต์"
 
-#: ../daemon/gvfsbackendsftp.c:328
+#: daemon/gvfsbackendsftp.c:368
 msgid "Connection refused by server"
 msgstr "เซิร์ฟเวอร์ปฏิเสธการเชื่อมต่อ"
 
-#: ../daemon/gvfsbackendsftp.c:335
+#: daemon/gvfsbackendsftp.c:375
 msgid "Host key verification failed"
 msgstr "การตรวจสอบกุญแจสำหรับโฮสต์ไม่ผ่าน"
 
-#: ../daemon/gvfsbackendsftp.c:498
-msgid "Unable to spawn ssh program"
-msgstr "ไม่สามารถ spawn โปรแกรม ssh"
+#: daemon/gvfsbackendsftp.c:382
+msgid "Too many authentication failures"
+msgstr "ยืนยันตัวตนไม่ผ่านหลายครั้งเกินไป"
 
-#: ../daemon/gvfsbackendsftp.c:514
+#: daemon/gvfsbackendsftp.c:564
+msgid "Unable to spawn SSH program"
+msgstr "ไม่สามารถ spawn โปรแกรม SSH"
+
+#: daemon/gvfsbackendsftp.c:580
 #, c-format
-msgid "Unable to spawn ssh program: %s"
-msgstr "ไม่สามารถ spawn โปรแกรม ssh: %s"
+msgid "Unable to spawn SSH program: %s"
+msgstr "ไม่สามารถ spawn โปรแกรม SSH: %s"
 
-#: ../daemon/gvfsbackendsftp.c:616 ../daemon/gvfsbackendsftp.c:874
+#: daemon/gvfsbackendsftp.c:682 daemon/gvfsbackendsftp.c:1058
 msgid "Timed out when logging in"
 msgstr "หมดเวลาขณะเข้าระบบ"
 
-#. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendsftp.c:954
-#, c-format
-msgid "Enter passphrase for secure key for %s on %s"
-msgstr "กรุณาป้อนวลีรหัสผ่านสำหรับกุญแจนิรภัยของ %s ที่ %s"
-
-#. Translators: %s is the hostname
-#: ../daemon/gvfsbackendsftp.c:961
-#, c-format
-msgid "Enter passphrase for secure key for %s"
-msgstr "กรุณาป้อนวลีรหัสผ่านสำหรับกุญแจนิรภัยของ %s"
-
-#: ../daemon/gvfsbackendsftp.c:1044
-msgid "Can't send password"
-msgstr "ไม่สามารถส่งรหัสผ่าน"
-
-#: ../daemon/gvfsbackendsftp.c:1052
+#: daemon/gvfsbackendsftp.c:934
 msgid "Log In Anyway"
 msgstr "เข้าระบบต่อไป"
 
-#: ../daemon/gvfsbackendsftp.c:1052
+#: daemon/gvfsbackendsftp.c:934
 msgid "Cancel Login"
 msgstr "ยกเลิกการเข้าระบบ"
 
-#: ../daemon/gvfsbackendsftp.c:1061
-#, c-format
-msgid ""
-"Can't verify the identity of “%s”.\n"
-"This happens when you log in to a computer the first time.\n"
-"\n"
-"The identity sent by the remote computer is “%s”. If you want to be "
-"absolutely sure it is safe to continue, contact the system administrator."
-msgstr ""
-"ไม่สามารถตรวจสอบเอกลักษณ์ของ “%s”\n"
-"เหตุการณ์นี้จะเกิดเมื่อคุณเข้าระบบไปยังคอมพิวเตอร์อื่นเป็นครั้งแรก\n"
-"\n"
-"ข้อความบอกเอกลักษณ์ที่เครื่องฝั่งโน้นส่งมาคือ “%s”  ถ้าคุณต้องการมั่นใจว่าปลอดภัยที่จะดำเนินการต่อ "
-"กรุณาติดต่อผู้ดูแลระบบ"
-
-#: ../daemon/gvfsbackendsftp.c:1080
+#: daemon/gvfsbackendsftp.c:949
 msgid "Login dialog cancelled"
 msgstr "กล่องโต้ตอบเข้าระบบถูกยกเลิก"
 
-#: ../daemon/gvfsbackendsftp.c:1100
-msgid "Can't send host identity confirmation"
+#: daemon/gvfsbackendsftp.c:968
+msgid "Can’t send host identity confirmation"
 msgstr "ไม่สามารถส่งคำยืนยันเอกลักษณ์โฮสต์"
 
-#: ../daemon/gvfsbackendsftp.c:1638 ../daemon/gvfsbackendsftp.c:1661
+#. Translators: the first %s is the username, the second the host name
+#: daemon/gvfsbackendsftp.c:1164
+#, c-format
+msgid ""
+"Authentication Required\n"
+"Enter passphrase for secure key for “%s” on “%s”:"
+msgstr ""
+"ต้องยืนยันตัวตน\n"
+"กรุณาป้อนวลีรหัสผ่านสำหรับกุญแจนิรภัยของ “%s” ที่ “%s”:"
+
+#. Translators: %s is the hostname
+#: daemon/gvfsbackendsftp.c:1171
+#, c-format
+msgid ""
+"Authentication Required\n"
+"Enter passphrase for secure key for “%s”:"
+msgstr ""
+"ต้องยืนยันตัวตน\n"
+"กรุณาป้อนวลีรหัสผ่านสำหรับกุญแจนิรภัยของ “%s”:"
+
+#: daemon/gvfsbackendsftp.c:1263 daemon/gvfsbackendsftp.c:1310
+msgid "Can’t send password"
+msgstr "ไม่สามารถส่งรหัสผ่าน"
+
+#. Translators: the first %s is the username, the second the host name
+#: daemon/gvfsbackendsftp.c:1278
+#, c-format
+msgid "Enter verification code for %s on %s"
+msgstr "กรุณาป้อนรหัสตรวจสอบสำหรับ %s ที่ %s"
+
+#. Translators: %s is the hostname
+#: daemon/gvfsbackendsftp.c:1282
+#, c-format
+msgid "Enter verification code for %s"
+msgstr "กรุณาป้อนรหัสตรวจสอบสำหรับ %s"
+
+#. Translators: the first %s is the hostname, the second the key fingerprint
+#: daemon/gvfsbackendsftp.c:1329
+#, c-format
+msgid ""
+"Identity Verification Failed\n"
+"Verifying the identity of “%s” failed, this happens when you log in to a computer the first time.\n"
+"\n"
+"The identity sent by the remote computer is “%s”. If you want to be absolutely sure it is safe to "
+"continue, contact the system administrator."
+msgstr ""
+"การตรวจสอบเอกลักษณ์ล้มเหลว\n"
+"การตรวจสอบเอกลักษณ์ของ “%s” ล้มเหลว เหตุการณ์นี้จะเกิดเมื่อคุณเข้าระบบไปยังคอมพิวเตอร์อื่นเป็นครั้งแรก\n"
+"\n"
+"ข้อความบอกเอกลักษณ์ที่เครื่องฝั่งโน้นส่งมาคือ “%s”  ถ้าคุณต้องการมั่นใจว่าปลอดภัยที่จะดำเนินการต่อ กรุณาติดต่อผู้ดูแลระบบ"
+
+#. Translators: the first %s is the hostname, the second is an ip address
+#: daemon/gvfsbackendsftp.c:1358
+#, c-format
+msgid ""
+"Identity Verification Failed\n"
+"The host key for “%s” differs from the key for the IP address “%s”\n"
+"If you want to be absolutely sure it is safe to continue, contact the system administrator."
+msgstr ""
+"การตรวจสอบเอกลักษณ์ล้มเหลว\n"
+"กุญแจโฮสต์สำหรับ “%s” แตกต่างจากกุญแจสำหรับที่อยู่ไอพี “%s”\n"
+"ถ้าคุณต้องการมั่นใจว่าปลอดภัยที่จะดำเนินการต่อ กรุณาติดต่อผู้ดูแลระบบ"
+
+#: daemon/gvfsbackendsftp.c:1450
+#, c-format
+msgid "The connection is closed (the underlying SSH process exited)"
+msgstr "การเชื่อมต่อถูกปิดแล้ว (โปรเซส SSH ที่ยังค้างอยู่เลิกทำงานแล้ว)"
+
+#: daemon/gvfsbackendsftp.c:1451
+#, c-format
+msgid "Internal error: Unknown Error"
+msgstr "เกิดข้อผิดพลาดภายใน: ข้อผิดพลาดไม่ทราบสาเหตุ"
+
+#: daemon/gvfsbackendsftp.c:1970 daemon/gvfsbackendsftp.c:1997
 msgid "Protocol error"
 msgstr "โพรโทคอลผิดพลาด"
 
-#: ../daemon/gvfsbackendsftp.c:1728
-msgid "Unable to find supported ssh command"
-msgstr "ไม่พบคำสั่ง ssh ที่รองรับ"
+#: daemon/gvfsbackendsftp.c:2112
+msgid "Unable to find supported SSH command"
+msgstr "ไม่พบคำสั่ง SSH ที่รองรับ"
 
-#: ../daemon/gvfsbackendsftp.c:2002 ../daemon/gvfsbackendsftp.c:2404
-#: ../daemon/gvfsbackendsftp.c:2463 ../daemon/gvfsbackendsftp.c:2474
-#: ../daemon/gvfsbackendsftp.c:2530 ../daemon/gvfsbackendsftp.c:2616
-#: ../daemon/gvfsbackendsftp.c:2666 ../daemon/gvfsbackendsftp.c:2712
-#: ../daemon/gvfsbackendsftp.c:2787 ../daemon/gvfsbackendsftp.c:2894
-#: ../daemon/gvfsbackendsftp.c:3011 ../daemon/gvfsbackendsftp.c:3092
-#: ../daemon/gvfsbackendsftp.c:3164 ../daemon/gvfsbackendsftp.c:3176
-#: ../daemon/gvfsbackendsftp.c:3232 ../daemon/gvfsbackendsftp.c:3274
-#: ../daemon/gvfsbackendsftp.c:3459 ../daemon/gvfsbackendsftp.c:3491
-#: ../daemon/gvfsbackendsftp.c:3546 ../daemon/gvfsbackendsftp.c:3603
-#: ../daemon/gvfsbackendsftp.c:3900 ../daemon/gvfsbackendsftp.c:3967
-#: ../daemon/gvfsbackendsftp.c:4100 ../daemon/gvfsbackendsftp.c:4160
-#: ../daemon/gvfsbackendsftp.c:4195 ../daemon/gvfsbackendsftp.c:4223
-#: ../daemon/gvfsbackendsftp.c:4331 ../daemon/gvfsbackendsftp.c:4385
-#: ../daemon/gvfsbackendsftp.c:4424 ../daemon/gvfsbackendsftp.c:4458
-#: ../daemon/gvfsbackendsftp.c:4492 ../daemon/gvfsbackendsftp.c:4507
-#: ../daemon/gvfsbackendsftp.c:4522 ../daemon/gvfsbackendsftp.c:4600
-msgid "Invalid reply received"
-msgstr "ได้รับคำตอบที่ใช้ไม่ได้"
+#: daemon/gvfsbackendsftp.c:2219
+msgid "Unknown reason"
+msgstr "ไม่ทราบสาเหตุ"
 
-#: ../daemon/gvfsbackendsftp.c:2263 ../daemon/gvfsbackendsmb.c:1440
-#: ../daemon/gvfsdaemonutils.c:136
+#: daemon/gvfsbackendsftp.c:2652 daemon/gvfsbackendsmb.c:1396 daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (รหัสอักขระผิดรูปแบบ)"
 
-#: ../daemon/gvfsbackendsftp.c:2348
+#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
+#: daemon/gvfsbackendsftp.c:2664 daemon/gvfsftpdircache.c:431
+#, c-format
+msgid "/ on %s"
+msgstr "/ ที่ %s"
+
+#: daemon/gvfsbackendsftp.c:2737
 msgid "Failure"
 msgstr "ล้มเหลว"
 
-#: ../daemon/gvfsbackendsftp.c:2732
+#: daemon/gvfsbackendsftp.c:3149
 #, c-format
 msgid "Error creating backup file: %s"
-msgstr "เกิดข้อผิดพลาดขณะสร้างแฟ้มสำรอง: %s"
+msgstr "เกิดข้อผิดพลาดขณะสร้างไฟล์สำรอง: %s"
 
-#: ../daemon/gvfsbackendsftp.c:3336
-msgid "Unable to create temporary file"
-msgstr "ไม่สามารถสร้างแฟ้มชั่วคราว"
+#: daemon/gvfsbackendsftp.c:5428
+msgid "Value out of range, sftp only supports 32bit timestamps"
+msgstr "ค่าอยู่นอกช่วง sftp รองรับเฉพาะตราเวลาแบบ 32 บิตเท่านั้น"
 
-#. translators: %s is a server name
-#: ../daemon/gvfsbackendsmbbrowse.c:375
-#, c-format
-msgid "Password required for %s"
-msgstr "ต้องใช้รหัสผ่านสำหรับ %s"
+#: daemon/gvfsbackendsftp.c:5503 daemon/gvfsbackendsmb.c:1738
+msgid "Invalid attribute type (uint64 expected)"
+msgstr "ชนิดของแอตทริบิวต์ผิดพลาด (ต้องการชนิด uint64)"
 
-#. translators: Name for the location that lists the smb shares
-#. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:905
-#, c-format
-msgid "Windows shares on %s"
-msgstr "แหล่งใช้ร่วมของวินโดวส์ที่ %s"
-
-#. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmbbrowse.c:1007
-msgid "Failed to retrieve share list from server"
-msgstr "ไม่สามารถดึงรายชื่อแหล่งใช้ร่วมจากเซิร์ฟเวอร์"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:1163
-msgid "Not a regular file"
-msgstr "ไม่ใช่แฟ้มปกติ"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:1513
-msgid "Windows Network File System Service"
-msgstr "บริการระบบแฟ้มในเครือข่ายของวินโดวส์"
-
-#. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:238
-#, c-format
-msgid "Password required for share %s on %s"
-msgstr "ต้องใช้รหัสผ่านในการเข้าใช้แหล่งใช้ร่วม %s ที่ %s"
-
-#: ../daemon/gvfsbackendsmb.c:494 ../daemon/gvfsbackendsmb.c:540
+#: daemon/gvfsbackendsmbbrowse.c:644 daemon/gvfsbackendsmbbrowse.c:678 daemon/gvfsbackendsmb.c:409
+#: daemon/gvfsbackendsmb.c:436 daemon/gvfsbackendsmb.c:631
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "เกิดข้อผิดพลาดภายใน (%s)"
 
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#: daemon/gvfsbackendsmbbrowse.c:705
+#, c-format
+msgid "Windows shares on %s"
+msgstr "แหล่งใช้ร่วมของ Windows ที่ %s"
+
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:625
-msgid "Failed to mount Windows share"
-msgstr "เมาทน์แหล่งใช้ร่วมของวินโดวส์ไม่สำเร็จ"
+#: daemon/gvfsbackendsmbbrowse.c:811
+#, c-format
+msgid "Failed to retrieve share list from server: %s"
+msgstr "ไม่สามารถดึงรายชื่อแหล่งใช้ร่วมจากเซิร์ฟเวอร์: %s"
 
-#: ../daemon/gvfsbackendsmb.c:789 ../daemon/gvfsbackendsmb.c:1285
-msgid "Unsupported seek type"
-msgstr "ไม่รองรับการเลื่อนตำแหน่งวิธีนี้"
+#: daemon/gvfsbackendsmbbrowse.c:1333
+msgid "Windows Network File System Service"
+msgstr "บริการระบบไฟล์ในเครือข่ายของ Windows"
 
-#: ../daemon/gvfsbackendsmb.c:1377
+#. Translators: First %s is a share name, second is a server name
+#: daemon/gvfsbackendsmb.c:262
+#, c-format
+msgid ""
+"Authentication Required\n"
+"Enter password for share “%s” on “%s”:"
+msgstr ""
+"ต้องยืนยันตัวตน\n"
+"กรุณาป้อนรหัสผ่านสำหรับแหล่งใช้ร่วม “%s” ที่ “%s”:"
+
+#. Translators: First %s is a share name, second is a server name
+#: daemon/gvfsbackendsmb.c:268
+#, c-format
+msgid ""
+"Authentication Required\n"
+"Enter user and password for share “%s” on “%s”:"
+msgstr ""
+"ต้องยืนยันตัวตน\n"
+"กรุณาป้อนผู้ใช้และรหัสผ่านสำหรับแหล่งใช้ร่วม “%s” ที่ “%s”:"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: daemon/gvfsbackendsmb.c:555
+#, c-format
+msgid "Failed to mount Windows share: %s"
+msgstr "เมาทน์แหล่งใช้ร่วมของ Windows ไม่สำเร็จ: %s"
+
+#: daemon/gvfsbackendsmb.c:1325
 #, c-format
 msgid "Backup file creation failed: %s"
-msgstr "สร้างแฟ้มสำรองไม่สำเร็จ: %s"
+msgstr "สร้างไฟล์สำรองไม่สำเร็จ: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1751
-msgid "Invalid attribute type (uint64 expected)"
-msgstr "ชนิดของแอตทริบิวต์ผิดพลาด (ต้องการชนิด uint64)"
+#: daemon/gvfsbackendsmb.c:1946
+msgid "Can’t rename file, filename already exists"
+msgstr "ไม่สามารถเปลี่ยนชื่อไฟล์ มีไฟล์ชื่อนี้อยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsbackendsmb.c:1939
-msgid "Can't rename file, filename already exists"
-msgstr "ไม่สามารถเปลี่ยนชื่อแฟ้ม มีแฟ้มชื่อนี้อยู่ก่อนแล้ว"
+#: daemon/gvfsbackendsmb.c:1998
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "เกิดข้อผิดพลาดขณะลบไฟล์: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2064
+#: daemon/gvfsbackendsmb.c:2085
 #, c-format
 msgid "Error moving file: %s"
-msgstr "เกิดข้อผิดพลาดขณะย้ายแฟ้ม: %s"
+msgstr "เกิดข้อผิดพลาดขณะย้ายไฟล์: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2136
+#: daemon/gvfsbackendsmb.c:2158
 #, c-format
 msgid "Error removing target file: %s"
-msgstr "เกิดข้อผิดพลาดขณะลบแฟ้มปลายทาง: %s"
+msgstr "เกิดข้อผิดพลาดขณะลบไฟล์ปลายทาง: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2160
-msgid "Can't recursively move directory"
+#: daemon/gvfsbackendsmb.c:2186
+msgid "Can’t recursively move directory"
 msgstr "ไม่สามารถย้ายไดเรกทอรีทั้งยวง"
 
-#: ../daemon/gvfsbackendsmb.c:2204
+#: daemon/gvfsbackendsmb.c:2244
 msgid "Windows Shares File System Service"
-msgstr "บริการระบบแฟ้มแหล่งใช้ร่วมของวินโดวส์"
+msgstr "บริการระบบไฟล์แหล่งใช้ร่วมของ Windows"
 
-#: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
+#: daemon/gvfsbackendtrash.c:490 daemon/gvfsbackendtrash.c:544
 msgid "The trash folder may not be deleted"
 msgstr "ไม่สามารถลบโฟลเดอร์ถังขยะได้"
 
-#: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
+#: daemon/gvfsbackendtrash.c:507 daemon/gvfsbackendtrash.c:558
 msgid "Items in the trash may not be modified"
 msgstr "ไม่สามารถเปลี่ยนแปลงรายการในถังขยะได้"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:755 ../daemon/gvfsbackendtrash.c:867
+#: daemon/gvfsbackendtrash.c:879 daemon/gvfsbackendtrash.c:999
 msgid "Trash"
 msgstr "ถังขยะ"
 
-#: ../daemon/gvfsftpconnection.c:180
+#: daemon/gvfsbackendwsdd.c:328
+msgid "File is not a directory"
+msgstr "ไฟล์ไม่ใช่ไดเรกทอรี"
+
+#: daemon/gvfsbackendwsdd.c:380
+msgid "WS-Discovery Network"
+msgstr "เครือข่าย WS-Discovery"
+
+#: daemon/gvfschannel.c:336
+msgid "Channel blocked"
+msgstr "ช่องสัญญาณถูกปิดกั้น"
+
+#: daemon/gvfsdaemonutils.c:251
+msgid "The signing certificate authority is not known."
+msgstr "ไม่รู้จักผู้ออกใบรับรองที่ทำการลงนาม"
+
+#: daemon/gvfsdaemonutils.c:253
+msgid "The certificate does not match the identity of the site."
+msgstr "ใบรับรองนี้ไม่ตรงกับเอกลักษณ์ของไซต์"
+
+#: daemon/gvfsdaemonutils.c:255
+msgid "The certificate’s activation time is in the future."
+msgstr "เวลาเริ่มต้นของใบรับรองนี้เป็นเวลาในอนาคต"
+
+#: daemon/gvfsdaemonutils.c:257
+msgid "The certificate has expired."
+msgstr "ใบรับรองนี้หมดอายุแล้ว"
+
+#: daemon/gvfsdaemonutils.c:259
+msgid "The certificate has been revoked."
+msgstr "ใบรับรองนี้ถูกเพิกถอนไปแล้ว"
+
+#: daemon/gvfsdaemonutils.c:261
+msgid "The certificate’s algorithm is considered insecure."
+msgstr "อัลกอริทึมของใบรับรองนี้ถูกพิจารณาว่าไม่ปลอดภัย"
+
+#: daemon/gvfsdaemonutils.c:263
+msgid "Error occurred when validating the certificate."
+msgstr "เกิดข้อผิดพลาดขณะตรวจสอบใบรับรอง"
+
+#: daemon/gvfsdaemonutils.c:326
+msgid "Yes"
+msgstr "ใช่"
+
+#: daemon/gvfsdaemonutils.c:326
+msgid "No"
+msgstr "ไม่"
+
+#. Translators: The first %s is the reason why verification failed, the second a certificate
+#: daemon/gvfsdaemonutils.c:338
+#, c-format
+msgid ""
+"Identity Verification Failed\n"
+"%s\n"
+"\n"
+"%s\n"
+"\n"
+"Are you really sure you would like to continue?"
+msgstr ""
+"การตรวจสอบเอกลักษณ์ล้มเหลว\n"
+"%s\n"
+"\n"
+"%s\n"
+"\n"
+"คุณแน่ใจหรือไม่ว่าต้องการไปต่อ?"
+
+#: daemon/gvfsftpconnection.c:211
 msgid "Unexpected end of stream"
 msgstr "พบจุดจบของสตรีมโดยไม่คาดหมาย"
 
-#: ../daemon/gvfsftpconnection.c:196 ../daemon/gvfsftpconnection.c:209
-#: ../daemon/gvfsftptask.c:411 ../daemon/gvfsftptask.c:839
+#: daemon/gvfsftpconnection.c:227 daemon/gvfsftpconnection.c:240 daemon/gvfsftptask.c:450
+#: daemon/gvfsftptask.c:886
 msgid "Invalid reply"
 msgstr "ได้รับคำตอบที่ใช้ไม่ได้"
 
-#: ../daemon/gvfsftpconnection.c:392
-msgid ""
-"Failed to create active FTP connection. Maybe your router does not support "
-"this?"
+#: daemon/gvfsftpconnection.c:478
+msgid "Failed to create active FTP connection. Maybe your router does not support this?"
 msgstr "เปิดการเชื่อมต่อ FTP แบบแอกทีฟไม่สำเร็จ บางทีเราเตอร์ของคุณอาจไม่รองรับ"
 
-#: ../daemon/gvfsftpconnection.c:399
+#: daemon/gvfsftpconnection.c:485
 msgid "Failed to create active FTP connection."
 msgstr "เปิดการเชื่อมต่อ FTP แบบแอกทีฟไม่สำเร็จ"
 
-#: ../daemon/gvfsftpfile.c:170
+#: daemon/gvfsftpfile.c:170
 msgid "Filename contains invalid characters."
-msgstr "ชื่อแฟ้มมีอักขระที่ห้ามใช้"
+msgstr "ชื่อไฟล์มีอักขระที่ห้ามใช้"
 
-#: ../daemon/gvfsftptask.c:261
+#: daemon/gvfsftptask.c:291
 msgid "The FTP server is busy. Try again later"
 msgstr "เซิร์ฟเวอร์ FTP ไม่ว่าง กรุณาลองใหม่ภายหลัง"
 
-#: ../daemon/gvfsftptask.c:355
+#: daemon/gvfsftptask.c:297
+msgid "Backend currently unmounting"
+msgstr "ขณะนี้แบ็กเอนด์กำลังเลิกเมานท์"
+
+#: daemon/gvfsftptask.c:394
 msgid "Accounts are unsupported"
 msgstr "ไม่รองรับการเข้าระบบผ่านบัญชีผู้ใช้"
 
-#: ../daemon/gvfsftptask.c:359
-msgid "Host closed connection"
-msgstr "โฮสต์ปิดการเชื่อมต่อ"
-
-#: ../daemon/gvfsftptask.c:363
+#: daemon/gvfsftptask.c:402
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "ไม่สามารถเปิดการเชื่อมต่อเพื่อรับส่งข้อมูล บางทีไฟร์วอลล์ของคุณอาจปิดกั้นไว้"
 
-#: ../daemon/gvfsftptask.c:367
+#: daemon/gvfsftptask.c:406
 msgid "Data connection closed"
 msgstr "การเชื่อมต่อเพื่อรับส่งข้อมูลถูกปิด"
 
-#: ../daemon/gvfsftptask.c:374 ../daemon/gvfsftptask.c:378
+#: daemon/gvfsftptask.c:413 daemon/gvfsftptask.c:417
 msgid "Operation failed"
 msgstr "ปฏิบัติการล้มเหลว"
 
-#: ../daemon/gvfsftptask.c:383
+#: daemon/gvfsftptask.c:422
 msgid "No space left on server"
 msgstr "ไม่มีที่ว่างเหลือในเซิร์ฟเวอร์"
 
-#: ../daemon/gvfsftptask.c:395
+#: daemon/gvfsftptask.c:434
 msgid "Unsupported network protocol"
 msgstr "ไม่รองรับโพรโทคอลเครือข่ายนี้"
 
-#: ../daemon/gvfsftptask.c:403
+#: daemon/gvfsftptask.c:442
 msgid "Page type unknown"
 msgstr "ได้รับชนิดของเพจที่ไม่รู้จัก"
 
-#: ../daemon/gvfsftptask.c:407
+#: daemon/gvfsftptask.c:446
 msgid "Invalid filename"
-msgstr "ชื่อแฟ้มใช้ไม่ได้"
+msgstr "ชื่อไฟล์ใช้ไม่ได้"
 
-#: ../daemon/gvfsjobmakesymlink.c:111
+#: daemon/gvfshttpinputstream.c:289
+msgid "Error seeking in stream"
+msgstr "เกิดข้อผิดพลาดขณะเลื่อนตำแหน่งในสตรีม"
+
+#: daemon/gvfsjobcopy.c:147 daemon/gvfsjobdelete.c:126 daemon/gvfsjobmakedirectory.c:126
+#: daemon/gvfsjobmakesymlink.c:130 daemon/gvfsjobmove.c:147 daemon/gvfsjobopenforwrite.c:236
+#: daemon/gvfsjobpush.c:152 daemon/gvfsjobsetattribute.c:152 daemon/gvfsjobsetdisplayname.c:130
+#: daemon/gvfsjobtrash.c:125
+msgid "Filesystem is read-only"
+msgstr "ระบบไฟล์อ่านได้อย่างเดียว"
+
+#: daemon/gvfsjobmakesymlink.c:111
 msgid "Symlinks not supported by backend"
 msgstr "แบ็กเอนด์ไม่รองรับการใช้จุดเชื่อมโยง"
 
-#: ../daemon/gvfsjobsetattribute.c:99
+#: daemon/gvfsjobsetattribute.c:99
 msgid "Invalid dbus message"
 msgstr "ข้อความ dbus ใช้ไม่ได้"
 
-#: ../daemon/gvfsjobunmount.c:123 ../monitor/udisks2/gvfsudisks2utils.c:805
+#: daemon/gvfsjobunmount.c:123
 #, c-format
 msgid "%s has been unmounted\n"
 msgstr "%s เลิกเมานท์แล้ว\n"
 
-#: ../daemon/gvfsjobunmount.c:141 ../monitor/udisks2/gvfsudisks2utils.c:659
+#: daemon/gvfsjobunmount.c:141
 #, c-format
 msgid ""
 "Unmounting %s\n"
@@ -1643,526 +1894,307 @@ msgstr ""
 "กำลังเลิกเมานท์ %s\n"
 "กรุณารอสักครู่"
 
-#: ../daemon/gvfsjobunmount.c:197
-msgid "File system is busy"
-msgstr "ระบบแฟ้มใช้งานอยู่"
+#: daemon/gvfswsddservice.c:236 daemon/gvfswsddservice.c:379 daemon/gvfswsddservice.c:436
+#, c-format
+msgid "Communication with the underlying wsdd daemon failed."
+msgstr "การติดต่อกับดีมอน wsdd ที่ค้างอยู่ล้มเหลว"
 
-#: ../daemon/main.c:133 ../metadata/meta-daemon.c:445
+#: daemon/gvfswsddservice.c:512
+#, c-format
+msgid "The underlying wsdd daemon exited unexpectedly."
+msgstr "ดีมอน wsdd ที่ค้างอยู่เลิกทำงานโดยไม่คาดคิด"
+
+#: daemon/gvfswsddservice.c:597
+#, c-format
+msgid "Failed to spawn the underlying wsdd daemon."
+msgstr "spawn ดีมอน wsdd ที่ค้างอยู่ไม่สำเร็จ"
+
+#: daemon/gvfswsddservice.c:628
+#, c-format
+msgid "Failed to establish connection with the underlying wsdd daemon."
+msgstr "สร้างการเชื่อมต่อกับดีมอน wsdd ที่ค้างอยู่ไม่สำเร็จ"
+
+#: daemon/main.c:148 metadata/meta-daemon.c:459
 msgid "Replace old daemon."
 msgstr "แทนที่ดีมอนเดิม"
 
-#: ../daemon/main.c:134
-msgid "Don't start fuse."
+#: daemon/main.c:149
+msgid "Don’t start fuse."
 msgstr "ไม่ต้องเรียก fuse ทำงาน"
 
-#: ../daemon/main.c:148
+#: daemon/main.c:150
+msgid "Enable debug output."
+msgstr "เปิดใช้เอาต์พุตสำหรับดีบั๊ก"
+
+#: daemon/main.c:151 metadata/meta-daemon.c:460
+msgid "Show program version."
+msgstr "แสดงรุ่นของโปรแกรม"
+
+#: daemon/main.c:167
 msgid "GVFS Daemon"
 msgstr "ดีมอน GVFS"
 
-#: ../daemon/main.c:151
+#: daemon/main.c:170
 msgid "Main daemon for GVFS"
 msgstr "ดีมอนหลักสำหรับ GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:166 ../metadata/meta-daemon.c:470
+#: daemon/main.c:187 metadata/meta-daemon.c:486
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:168 ../metadata/meta-daemon.c:472
-#: ../programs/gvfs-cat.c:170 ../programs/gvfs-cat.c:182
-#: ../programs/gvfs-copy.c:133 ../programs/gvfs-info.c:389
-#: ../programs/gvfs-ls.c:416 ../programs/gvfs-mime.c:97
-#: ../programs/gvfs-mime.c:107 ../programs/gvfs-mime.c:114
-#: ../programs/gvfs-mkdir.c:71 ../programs/gvfs-monitor-dir.c:126
-#: ../programs/gvfs-monitor-file.c:125 ../programs/gvfs-mount.c:1063
-#: ../programs/gvfs-move.c:121 ../programs/gvfs-open.c:78
-#: ../programs/gvfs-open.c:90 ../programs/gvfs-rename.c:75
-#: ../programs/gvfs-rm.c:72 ../programs/gvfs-save.c:178
-#: ../programs/gvfs-set-attribute.c:151 ../programs/gvfs-trash.c:71
-#: ../programs/gvfs-tree.c:262
+#: daemon/main.c:189 metadata/meta-daemon.c:488
 #, c-format
-msgid "Try \"%s --help\" for more information."
-msgstr "ลองใช้ \"%s --help\" เพื่อดูรายละเอียดเพิ่มเติม"
+msgid "Try “%s --help” for more information."
+msgstr "ลองใช้ “%s --help” เพื่อดูรายละเอียดเพิ่มเติม"
 
-#: ../daemon/mount.c:693
+#: daemon/mount.c:783
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Automount ล้มเหลว: %s"
 
-#: ../daemon/mount.c:737 ../daemon/mount.c:798
+#: daemon/mount.c:827 daemon/mount.c:903
 msgid "The specified location is not mounted"
 msgstr "ตำแหน่งที่ระบุไม่ได้ถูกเมานท์"
 
-#: ../daemon/mount.c:742
+#: daemon/mount.c:832
 msgid "The specified location is not supported"
 msgstr "ไม่รองรับตำแหน่งที่ระบุ"
 
-#: ../daemon/mount.c:866
+#: daemon/mount.c:1015
 msgid "Location is already mounted"
 msgstr "ตำแหน่งถูกเมานท์ไว้ก่อนแล้ว"
 
-#: ../daemon/mount.c:875
+#: daemon/mount.c:1024
 msgid "Location is not mountable"
 msgstr "ตำแหน่งไม่สามารถเมานท์ได้"
 
-#: ../metadata/meta-daemon.c:133 ../metadata/meta-daemon.c:253
-#: ../metadata/meta-daemon.c:302 ../metadata/meta-daemon.c:337
-#: ../metadata/meta-daemon.c:373
-#, c-format
-msgid "Can't find metadata file %s"
-msgstr "หาแฟ้มข้อมูลกำกับ %s ไม่พบ"
+#: daemon/org.gnome.system.dns_sd.gschema.xml:5
+msgid "How to display local DNS-SD services"
+msgstr "รูปแบบการแสดงผลบริการ DNS-SD ท้องถิ่น"
 
-#: ../metadata/meta-daemon.c:151 ../metadata/meta-daemon.c:163
+#: daemon/org.gnome.system.dns_sd.gschema.xml:6
+msgid ""
+"How DNS-SD services are displayed in the \"network:///\" location. Possible values are \"merged\", "
+"\"separate\" (the Local Network folder) and \"disabled\"."
+msgstr ""
+"กำหนดรูปแบบการแสดงผลบริการ DNS-SD ในตำแหน่ง \"network:///\" ค่าที่ใช้ได้คือ \"merged\", \"separate\" "
+"(โฟลเดอร์ \"เครือข่ายท้องถิ่น\") และ \"disabled\""
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:10
+msgid "Extra domains to look for DNS-SD services in"
+msgstr "โดเมนเพิ่มเติมที่จะมองหาบริการ DNS-SD"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:11
+msgid ""
+"Comma separated list of DNS-SD domains that should be visible in the \"network:///\" location."
+msgstr "รายชื่อโดเมน DNS-SD คั่นด้วยเครื่องหมายลูกน้ำ ที่ต้องการให้แสดงในตำแหน่ง \"network:///\""
+
+#: daemon/org.gnome.system.smb.gschema.xml:5
+msgid "How to display SMB devices"
+msgstr "รูปแบบการแสดงผลอุปกรณ์ SMB"
+
+#: daemon/org.gnome.system.smb.gschema.xml:6
+msgid ""
+"How SMB devices are displayed in the \"network:///\" location. Possible values are \"merged\", "
+"\"separate\" (the Windows Network folder) and \"disabled\"."
+msgstr ""
+"กำหนดรูปแบบการแสดงผลอุปกรณ์ SMB ในตำแหน่ง \"network:///\" ค่าที่ใช้ได้คือ \"merged\", \"separate\" (โฟลเดอร์ "
+"\"เครือข่าย Windows\") และ \"disabled\""
+
+#: daemon/org.gnome.system.smb.gschema.xml:10
+msgid "SMB workgroup"
+msgstr "เวิร์กกรุ๊ป SMB"
+
+#: daemon/org.gnome.system.smb.gschema.xml:11
+msgid ""
+"The Windows networking workgroup or domain that the user is part of. In order for a new workgroup "
+"to fully take effect the user may need to log out and log back in."
+msgstr ""
+"เวิร์กกรุ๊ปหรือโดเมนในระบบเครือข่ายของ Windows ซึ่งมีผู้ใช้เป็นส่วนหนึ่งอยู่ด้วย เพื่อให้เวิร์กกรุ๊ปใหม่มีผลอย่างเต็มที่ "
+"ผู้ใช้อาจจะต้องออกจากระบบแล้วกลับเข้าระบบใหม่"
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:5
+msgid "How to display WSDD devices"
+msgstr "รูปแบบการแสดงผลอุปกรณ์ WSDD"
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:6
+msgid ""
+"How WSDD devices are displayed in the \"network:///\" location. Possible values are \"merged\", "
+"\"separate\" (the WSDD Network folder) and \"disabled\"."
+msgstr ""
+"กำหนดรูปแบบการแสดงผลอุปกรณ์ WSDD ในตำแหน่ง \"network:///\" ค่าที่ใช้ได้คือ \"merged\", \"separate\" (โฟลเดอร์ "
+"\"เครือข่าย WSDD\") และ \"disabled\""
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:13
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:25
+msgid "Perform file operations"
+msgstr "สั่งการกระทำเกี่ยวกับไฟล์"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:14
+msgid "Authentication is required to run gvfsd-admin daemon"
+msgstr "ต้องยืนยันตัวตนเพื่อเรียกใช้ดีมอน gvfsd-admin"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:26
+msgid "Authentication is required to perform file operations"
+msgstr "ต้องยืนยันตัวตนเพื่อสั่งการกระทำเกี่ยวกับไฟล์"
+
+#: metadata/meta-daemon.c:249 metadata/meta-daemon.c:326 metadata/meta-daemon.c:363
+#, c-format
+msgid "Can’t find metadata file %s"
+msgstr "หาไฟล์ข้อมูลกำกับ %s ไม่พบ"
+
+#: metadata/meta-daemon.c:267 metadata/meta-daemon.c:279
 msgid "Unable to set metadata key"
 msgstr "ไม่สามารถกำหนดคีย์ข้อมูลกำกับ"
 
-#: ../metadata/meta-daemon.c:173 ../metadata/meta-daemon.c:312
+#: metadata/meta-daemon.c:289
 msgid "Unable to unset metadata key"
 msgstr "ไม่สามารถล้างค่าคีย์ข้อมูลกำกับ"
 
-#: ../metadata/meta-daemon.c:347
+#: metadata/meta-daemon.c:336
 msgid "Unable to remove metadata keys"
 msgstr "ไม่สามารถลบคีย์ข้อมูลกำกับ"
 
-#: ../metadata/meta-daemon.c:384
+#: metadata/meta-daemon.c:374
 msgid "Unable to move metadata keys"
 msgstr "ไม่สามารถย้ายคีย์ข้อมูลกำกับ"
 
-#: ../metadata/meta-daemon.c:455
+#: metadata/meta-daemon.c:470
 msgid "GVFS Metadata Daemon"
 msgstr "ดีมอนข้อมูลกำกับ GVFS"
 
-#: ../metadata/meta-daemon.c:458
+#: metadata/meta-daemon.c:473
 msgid "Metadata daemon for GVFS"
 msgstr "ดีมอนข้อมูลกำกับสำหรับ GVFS"
 
-#: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
-msgid "GVfs GDU Volume Monitor"
-msgstr "เครื่องมือเฝ้าสังเกตโวลุม GDU ของ GVfs"
+#: monitor/goa/goavolume.c:296 monitor/goa/goavolume.c:335
+#, c-format
+msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
+msgstr "ไม่สามารถอ่าน org.gnome.OnlineAccounts.Files สำหรับ %s"
 
-#: ../monitor/gdu/ggdudrive.c:168 ../monitor/hal/ghaldrive.c:179
-msgid "Floppy Drive"
-msgstr "ไดรว์ฟลอปปี้"
+#: monitor/goa/goavolume.c:366
+#, c-format
+msgid "Invalid credentials for %s"
+msgstr "ข้อมูลลับไม่ถูกต้องสำหรับ %s"
 
-#: ../monitor/gdu/ggdudrive.c:258 ../monitor/udisks2/gvfsudisks2drive.c:200
+#: monitor/goa/goavolume.c:399
+#, c-format
+msgid "Unsupported authentication method for %s"
+msgstr "%s ไม่รองรับวิธีการยืนยันตัวตนนี้"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1037
+msgid "The given mount was not found"
+msgstr "ไม่พบตำแหน่งเมานท์ที่ระบุ"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1045
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1282
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1389
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1496
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1603
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1706
+msgid "An operation is already pending"
+msgstr "มีการกระทำที่คอยอยู่แล้ว"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1132
+msgid "No outstanding mount operation"
+msgstr "ไม่มีการเมานท์ที่กำลังทำอยู่"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1274
+msgid "The given volume was not found"
+msgstr "ไม่พบโวลุมที่ระบุ"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1381
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1488
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1595
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1698
+msgid "The given drive was not found"
+msgstr "ไม่พบไดรฟ์ที่ระบุ"
+
+#: monitor/udisks2/gvfsudisks2drive.c:290
 #, c-format
 msgid "Unnamed Drive (%s)"
-msgstr "ไดรว์ไม่มีชื่อ (%s)"
+msgstr "ไดรฟ์ไม่มีชื่อ (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:260 ../monitor/udisks2/gvfsudisks2drive.c:202
+#: monitor/udisks2/gvfsudisks2drive.c:292
 msgid "Unnamed Drive"
-msgstr "ไดรว์ไม่มีชื่อ"
+msgstr "ไดรฟ์ไม่มีชื่อ"
 
-#: ../monitor/gdu/ggdudrive.c:561 ../monitor/udisks2/gvfsudisks2drive.c:505
+#: monitor/udisks2/gvfsudisks2drive.c:624
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr "ไม่สามารถดันสื่อออก: มีโวลุมตั้งแต่หนึ่งโวลุมขึ้นไปในสื่อกำลังถูกใช้งานอยู่"
 
-#: ../monitor/gdu/ggdudrive.c:1017
-msgid ""
-"Start drive in degraded mode?\n"
-"Starting a drive in degraded mode means that the drive is no longer tolerant "
-"to failures. Data on the drive may be irrevocably lost if a component fails."
-msgstr ""
-"จะเปิดใช้ไดรว์ในโหมดคุณภาพต่ำหรือไม่?\n"
-"การเปิดใช้ไดรว์ในโหมดคุณภาพต่ำหมายความว่า ไดรว์จะไม่ยืดหยุ่นต่อความผิดพลาดอีกต่อไป "
-"ข้อมูลในไดรว์อาจสูญหายโดยไม่สามารถกู้คืนได้ถ้ามีองค์ประกอบใดองค์ประกอบหนึ่งทำงานผิดพลาด"
-
-#: ../monitor/gdu/ggdudrive.c:1023
-msgid "Start Anyway"
-msgstr "เปิดใช้ต่อไป"
-
-#: ../monitor/gdu/ggdumount.c:857 ../monitor/udisks2/gvfsudisks2mount.c:649
+#: monitor/udisks2/gvfsudisks2mount.c:636
 msgid "One or more programs are preventing the unmount operation."
 msgstr "มีโปรแกรมตั้งแต่หนึ่งโปรแกรมขึ้นไปขัดขวางการเลิกเมานท์อยู่"
 
-#: ../monitor/gdu/ggdumount.c:985
-msgid "Cannot get LUKS cleartext slave"
-msgstr "ไม่สามารถนำ LUKS cleartext slave มาใช้ได้"
-
-#: ../monitor/gdu/ggdumount.c:1007
-#, c-format
-msgid "Cannot get LUKS cleartext slave from path `%s'"
-msgstr "ไม่สามารถนำ LUKS cleartext slave จากพาธ `%s' มาใช้ได้"
-
-#: ../monitor/gdu/ggduvolume.c:337
-msgid "Floppy Disk"
-msgstr "แผ่นฟลอปปี้"
-
-#: ../monitor/gdu/ggduvolume.c:1097
-#, c-format
-msgid ""
-"Enter a password to unlock the volume\n"
-"The device \"%s\" contains encrypted data on partition %d."
-msgstr ""
-"กรุณาป้อนรหัสผ่านเพื่อปลดล็อคโวลุม\n"
-"อุปกรณ์ \"%s\" มีข้อมูลที่เข้ารหัสลับอยู่ในพาร์ทิชันที่ %d"
-
-#: ../monitor/gdu/ggduvolume.c:1104
-#, c-format
-msgid ""
-"Enter a password to unlock the volume\n"
-"The device \"%s\" contains encrypted data."
-msgstr ""
-"กรุณาป้อนรหัสผ่านเพื่อปลดล็อคโวลุม\n"
-"อุปกรณ์ \"%s\" มีข้อมูลที่เข้ารหัสลับไว้"
-
-#: ../monitor/gdu/ggduvolume.c:1111
-#, c-format
-msgid ""
-"Enter a password to unlock the volume\n"
-"The device %s contains encrypted data."
-msgstr ""
-"กรุณาป้อนรหัสผ่านเพื่อปลดล็อคโวลุม\n"
-"อุปกรณ์ \"%s\" มีข้อมูลที่เข้ารหัสลับไว้"
-
-#: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
-msgid "CD-ROM Disc"
-msgstr "แผ่น CD-ROM"
-
-#: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
-msgid "Blank CD-ROM Disc"
-msgstr "แผ่น CD-ROM เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:41 ../monitor/hal/hal-utils.c:41
-msgid "CD-R Disc"
-msgstr "แผ่น CD-R"
-
-#: ../monitor/gphoto2/hal-utils.c:41 ../monitor/hal/hal-utils.c:41
-msgid "Blank CD-R Disc"
-msgstr "แผ่น CD-R เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
-msgid "CD-RW Disc"
-msgstr "แผ่น CD-RW"
-
-#: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
-msgid "Blank CD-RW Disc"
-msgstr "แผ่น CD-RW เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
-#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
-msgid "DVD-ROM Disc"
-msgstr "แผ่น DVD-ROM"
-
-#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
-#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
-msgid "Blank DVD-ROM Disc"
-msgstr "แผ่น DVD-ROM เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:44 ../monitor/hal/hal-utils.c:44
-msgid "DVD-RAM Disc"
-msgstr "แผ่น DVD-RAM"
-
-#: ../monitor/gphoto2/hal-utils.c:44 ../monitor/hal/hal-utils.c:44
-msgid "Blank DVD-RAM Disc"
-msgstr "แผ่น DVD-RAM เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
-msgid "DVD-RW Disc"
-msgstr "แผ่น DVD-RW"
-
-#: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
-msgid "Blank DVD-RW Disc"
-msgstr "แผ่น DVD-RW เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:47 ../monitor/hal/hal-utils.c:47
-msgid "DVD+R Disc"
-msgstr "แผ่น DVD+R"
-
-#: ../monitor/gphoto2/hal-utils.c:47 ../monitor/hal/hal-utils.c:47
-msgid "Blank DVD+R Disc"
-msgstr "แผ่น DVD+R เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
-msgid "DVD+RW Disc"
-msgstr "แผ่น DVD+RW"
-
-#: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
-msgid "Blank DVD+RW Disc"
-msgstr "แผ่น DVD+RW เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:49 ../monitor/hal/hal-utils.c:49
-msgid "DVD+R DL Disc"
-msgstr "แผ่น DVD+R DL"
-
-#: ../monitor/gphoto2/hal-utils.c:49 ../monitor/hal/hal-utils.c:49
-msgid "Blank DVD+R DL Disc"
-msgstr "แผ่น DVD+R DL เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:50 ../monitor/hal/hal-utils.c:50
-msgid "Blu-Ray Disc"
-msgstr "แผ่น Blu-Ray"
-
-#: ../monitor/gphoto2/hal-utils.c:50 ../monitor/hal/hal-utils.c:50
-msgid "Blank Blu-Ray Disc"
-msgstr "แผ่น Blu-Ray เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:51 ../monitor/hal/hal-utils.c:51
-msgid "Blu-Ray R Disc"
-msgstr "แผ่น Blu-Ray R"
-
-#: ../monitor/gphoto2/hal-utils.c:51 ../monitor/hal/hal-utils.c:51
-msgid "Blank Blu-Ray R Disc"
-msgstr "แผ่น Blu-Ray R เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:52 ../monitor/hal/hal-utils.c:52
-msgid "Blu-Ray RW Disc"
-msgstr "แผ่น Blu-Ray RW"
-
-#: ../monitor/gphoto2/hal-utils.c:52 ../monitor/hal/hal-utils.c:52
-msgid "Blank Blu-Ray RW Disc"
-msgstr "แผ่น Blu-Ray RW เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:53 ../monitor/hal/hal-utils.c:53
-msgid "HD DVD Disc"
-msgstr "แผ่น HD DVD"
-
-#: ../monitor/gphoto2/hal-utils.c:53 ../monitor/hal/hal-utils.c:53
-msgid "Blank HD DVD Disc"
-msgstr "แผ่น HD DVD เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:54 ../monitor/hal/hal-utils.c:54
-msgid "HD DVD-R Disc"
-msgstr "แผ่น HD DVD-R"
-
-#: ../monitor/gphoto2/hal-utils.c:54 ../monitor/hal/hal-utils.c:54
-msgid "Blank HD DVD-R Disc"
-msgstr "แผ่น HD DVD-R เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:55 ../monitor/hal/hal-utils.c:55
-msgid "HD DVD-RW Disc"
-msgstr "แผ่น HD DVD-RW"
-
-#: ../monitor/gphoto2/hal-utils.c:55 ../monitor/hal/hal-utils.c:55
-msgid "Blank HD DVD-RW Disc"
-msgstr "แผ่น HD DVD-RW เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:56 ../monitor/hal/hal-utils.c:56
-msgid "MO Disc"
-msgstr "แผ่น MO"
-
-#: ../monitor/gphoto2/hal-utils.c:56 ../monitor/hal/hal-utils.c:56
-msgid "Blank MO Disc"
-msgstr "แผ่น MO เปล่า"
-
-#: ../monitor/gphoto2/hal-utils.c:57 ../monitor/hal/hal-utils.c:57
-msgid "Disc"
-msgstr "แผ่น"
-
-#: ../monitor/gphoto2/hal-utils.c:57 ../monitor/hal/hal-utils.c:57
-msgid "Blank Disc"
-msgstr "แผ่นเปล่า"
-
-#: ../monitor/hal/ghaldrive.c:127
-msgid "CD-ROM"
-msgstr "CD-ROM"
-
-#: ../monitor/hal/ghaldrive.c:129
-msgid "CD-R"
-msgstr "CD-R"
-
-#: ../monitor/hal/ghaldrive.c:131
-msgid "CD-RW"
-msgstr "CD-RW"
-
-#: ../monitor/hal/ghaldrive.c:135
-msgid "DVD-ROM"
-msgstr "DVD-ROM"
-
-#: ../monitor/hal/ghaldrive.c:137
-msgid "DVD+R"
-msgstr "DVD+R"
-
-#: ../monitor/hal/ghaldrive.c:139
-msgid "DVD+RW"
-msgstr "DVD+RW"
-
-#: ../monitor/hal/ghaldrive.c:141
-msgid "DVD-R"
-msgstr "DVD-R"
-
-#: ../monitor/hal/ghaldrive.c:143
-msgid "DVD-RW"
-msgstr "DVD-RW"
-
-#: ../monitor/hal/ghaldrive.c:145
-msgid "DVD-RAM"
-msgstr "DVD-RAM"
-
-#: ../monitor/hal/ghaldrive.c:148
-msgid "DVD±R"
-msgstr "DVD±R"
-
-#: ../monitor/hal/ghaldrive.c:151
-msgid "DVD±RW"
-msgstr "DVD±RW"
-
-#: ../monitor/hal/ghaldrive.c:153
-msgid "HDDVD"
-msgstr "HDDVD"
-
-#: ../monitor/hal/ghaldrive.c:155
-msgid "HDDVD-r"
-msgstr "HDDVD-r"
-
-#: ../monitor/hal/ghaldrive.c:157
-msgid "HDDVD-RW"
-msgstr "HDDVD-RW"
-
-#: ../monitor/hal/ghaldrive.c:159
-msgid "Blu-ray"
-msgstr "Blu-ray"
-
-#: ../monitor/hal/ghaldrive.c:161
-msgid "Blu-ray-R"
-msgstr "Blu-ray-R"
-
-#: ../monitor/hal/ghaldrive.c:163
-msgid "Blu-ray-RE"
-msgstr "Blu-ray-RE"
-
-#. translators: This wis something like "CD-ROM/DVD Drive" or
-#. "CD-RW/Blue-ray Drive" depending on the properties of the drive
-#: ../monitor/hal/ghaldrive.c:169
-#, c-format
-msgid "%s/%s Drive"
-msgstr "ไดรว์ %s/%s"
-
-#. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
-#. depending on the properties of the drive
-#: ../monitor/hal/ghaldrive.c:175
-#, c-format
-msgid "%s Drive"
-msgstr "ไดรว์ %s"
-
-#: ../monitor/hal/ghaldrive.c:185
-msgid "Software RAID Drive"
-msgstr "ไดรว์ RAID แบบซอฟต์แวร์"
-
-#: ../monitor/hal/ghaldrive.c:187
-msgid "USB Drive"
-msgstr "ไดรว์ USB"
-
-#: ../monitor/hal/ghaldrive.c:189
-msgid "ATA Drive"
-msgstr "ไดรว์ ATA"
-
-#: ../monitor/hal/ghaldrive.c:191
-msgid "SCSI Drive"
-msgstr "ไดรว์ SCSI"
-
-#: ../monitor/hal/ghaldrive.c:193
-msgid "FireWire Drive"
-msgstr "ไดรว์ไฟร์ไวร์"
-
-#: ../monitor/hal/ghaldrive.c:197
-msgid "Tape Drive"
-msgstr "ไดรว์เทป"
-
-#: ../monitor/hal/ghaldrive.c:199
-msgid "CompactFlash Drive"
-msgstr "ไดรว์ CompactFlash"
-
-#: ../monitor/hal/ghaldrive.c:201
-msgid "MemoryStick Drive"
-msgstr "ไดรว์ MemoryStick"
-
-#: ../monitor/hal/ghaldrive.c:203
-msgid "SmartMedia Drive"
-msgstr "ไดรว์ SmartMedia"
-
-#: ../monitor/hal/ghaldrive.c:205
-msgid "SD/MMC Drive"
-msgstr "ไดรว์ SD/MMC"
-
-#: ../monitor/hal/ghaldrive.c:207
-msgid "Zip Drive"
-msgstr "ไดรว์ Zip"
-
-#: ../monitor/hal/ghaldrive.c:209
-msgid "Jaz Drive"
-msgstr "ไดรว์ Jaz"
-
-#: ../monitor/hal/ghaldrive.c:211
-msgid "Thumb Drive"
-msgstr "Thumb Drive"
-
-#: ../monitor/hal/ghaldrive.c:214
-msgid "Mass Storage Drive"
-msgstr "ไดรว์แหล่งเก็บข้อมูล"
-
-#: ../monitor/hal/ghaldrive.c:662
-#, c-format
-msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr "ไม่สามารถดันสื่อออก: มีโวลุมตั้งแต่หนึ่งโวลุมขึ้นไปในสื่อกำลังถูกใช้งานอยู่"
-
-#: ../monitor/hal/ghalmount.c:159 ../monitor/hal/ghalvolume.c:163
-#, c-format
-msgid "%.1f kB"
-msgstr "%.1f kB"
-
-#: ../monitor/hal/ghalmount.c:164 ../monitor/hal/ghalvolume.c:168
-#, c-format
-msgid "%.1f MB"
-msgstr "%.1f MB"
-
-#: ../monitor/hal/ghalmount.c:169 ../monitor/hal/ghalvolume.c:173
-#, c-format
-msgid "%.1f GB"
-msgstr "%.1f GB"
-
-#: ../monitor/hal/ghalmount.c:323 ../monitor/hal/ghalvolume.c:244
-msgid "Mixed Audio/Data Disc"
-msgstr "แผ่นผสมเพลง/ข้อมูล"
-
-#. Translators: %s is the size of the mount (e.g. 512 MB)
-#: ../monitor/hal/ghalmount.c:336
-#, c-format
-msgid "%s Medium"
-msgstr "สื่อขนาด %s"
-
-#. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../monitor/hal/ghalvolume.c:232
-#, c-format
-msgid "%s Encrypted Data"
-msgstr "ข้อมูลเข้ารหัสลับ %s"
-
-#. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../monitor/hal/ghalvolume.c:255
-#, c-format
-msgid "%s Media"
-msgstr "สื่อขนาด %s"
-
-#: ../monitor/udisks2/gvfsudisks2mount.c:730
+#. Note that the GUI (Shell, Files) currently use the term
+#. * "Eject" for both GDrive.stop() and GDrive.eject().
+#.
+#: monitor/udisks2/gvfsudisks2mount.c:746
 msgid "Eject Anyway"
 msgstr "เอาสื่อออกต่อไป"
 
-#: ../monitor/udisks2/gvfsudisks2utils.c:494
-#, c-format
-msgid "Timed out running command-line `%s'"
-msgstr "หมดเวลาคอยขณะเรียกบรรทัดคำสั่ง `%s'"
+#: monitor/udisks2/gvfsudisks2mount.c:1154 monitor/udisks2/gvfsudisks2volume.c:1771
+msgid "Operation not supported by backend"
+msgstr "แบ็กเอนด์ไม่รองรับปฏิบัติการ"
 
-#: ../monitor/udisks2/gvfsudisks2utils.c:660
+#: monitor/udisks2/gvfsudisks2utils.c:345
+#, c-format
+msgid "Timed out running command-line “%s”"
+msgstr "หมดเวลาคอยขณะเรียกบรรทัดคำสั่ง “%s”"
+
+#: monitor/udisks2/gvfsudisks2utils.c:646
+#, c-format
+msgid ""
+"Unmounting %s\n"
+"Disconnecting from filesystem."
+msgstr ""
+"กำลังเลิกเมานท์ %s\n"
+"กำลังตัดการเชื่อมต่อกับระบบไฟล์"
+
+#: monitor/udisks2/gvfsudisks2utils.c:648
 #, c-format
 msgid ""
 "Writing data to %s\n"
-"Don't unplug until finished"
+"Device should not be unplugged."
 msgstr ""
 "กำลังเขียนข้อมูลลงใน %s\n"
-"กรุณาอย่าเพิ่งถอดออกจนกว่าจะเสร็จ"
+"กรุณาอย่าเพิ่งถอดอุปกรณ์ออก"
 
-#: ../monitor/udisks2/gvfsudisks2utils.c:805
+#: monitor/udisks2/gvfsudisks2utils.c:784
 #, c-format
-msgid "You can now unplug %s\n"
-msgstr "คุณสามารถถอด %s ได้แล้ว\n"
+msgid ""
+"%s unmounted\n"
+"Filesystem has been disconnected."
+msgstr ""
+"เลิกเมานท์ %s แล้ว\n"
+"ตัดการเชื่อมต่อกับระบบไฟล์เรียบร้อยแล้ว"
+
+#: monitor/udisks2/gvfsudisks2utils.c:786
+#, c-format
+msgid ""
+"%s can be safely unplugged\n"
+"Device can be removed."
+msgstr ""
+"%s สามารถถอดออกได้อย่างปลอดภัยแล้ว\n"
+"คุณสามารถนำอุปกรณ์ออกได้"
+
+#. Translators: This is used for possibly encrypted volumes.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: monitor/udisks2/gvfsudisks2volume.c:304
+#, c-format
+msgid "%s Possibly Encrypted"
+msgstr "%s คาดว่าเข้ารหัสลับ"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:254
+#: monitor/udisks2/gvfsudisks2volume.c:311
 #, c-format
 msgid "%s Encrypted"
 msgstr "%s เข้ารหัสลับ"
@@ -2170,704 +2202,886 @@ msgstr "%s เข้ารหัสลับ"
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:267
+#: monitor/udisks2/gvfsudisks2volume.c:324
 #, c-format
 msgid "%s Volume"
 msgstr "โวลุม %s"
 
 #. Translators: Name used for volume
-#: ../monitor/udisks2/gvfsudisks2volume.c:444
+#: monitor/udisks2/gvfsudisks2volume.c:565
 msgid "Volume"
 msgstr "โวลุม"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1008
+#: monitor/udisks2/gvfsudisks2volume.c:1154
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "เกิดข้อผิดพลาดขณะเก็บวลีรหัสผ่านเข้าในพวงกุญแจ (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1043
+#: monitor/udisks2/gvfsudisks2volume.c:1187
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "เกิดข้อผิดพลาดขณะลบวลีรหัสผ่านที่ผิดพลาดออกจากพวงกุญแจ (%s)"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1108
+#: monitor/udisks2/gvfsudisks2volume.c:1249
 msgid "The unlocked device does not have a recognizable file system on it"
-msgstr "อุปกรณ์ที่ปลดล็อคแล้วไม่ได้มีระบบแฟ้มที่รู้จักอยู่ในนั้น"
+msgstr "อุปกรณ์ที่ปลดล็อกแล้วไม่ได้มีระบบไฟล์ที่รู้จักอยู่ในนั้น"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1137
+#: monitor/udisks2/gvfsudisks2volume.c:1277
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "วลีรหัสผ่านสำหรับเข้ารหัสลับสำหรับ %s"
 
-#: ../monitor/udisks2/gvfsudisks2volume.c:1305
+#: monitor/udisks2/gvfsudisks2volume.c:1486
 msgid "A passphrase is required to access the volume"
 msgstr "ต้องการวลีรหัสผ่านเพื่อเข้าใช้โวลุม"
 
-#. Translators: This is the message shown to users
-#: ../monitor/udisks2/gvfsudisks2volume.c:1320
+#. Translators: %s is the description of the volume that is being unlocked
+#: monitor/udisks2/gvfsudisks2volume.c:1501
 #, c-format
 msgid ""
-"Enter a passphrase to unlock the volume\n"
-"The passphrase is needed to access encrypted data on %s."
+"Authentication Required\n"
+"A passphrase is needed to access encrypted data on “%s”.\n"
+"The volume might be a VeraCrypt volume as it contains random data."
 msgstr ""
-"กรุณาป้อนวลีรหัสผ่านเพื่อปลดล็อคโวลุม\n"
-"ต้องใช้วลีรหัสผ่านเพื่อเข้าถึงข้อมูลที่เข้ารหัสลับใน %s"
+"ต้องยืนยันตัวตน\n"
+"ต้องใช้วลีรหัสผ่านเพื่อเข้าถึงข้อมูลที่เข้ารหัสลับใน “%s”\n"
+"โวลุมอาจจะเป็นโวลุม VeraCrypt เนื่องจากมีข้อมูลแบบสุ่มอยู่ด้วย"
 
-#. drive_icon
-#. media_desc
-#. media_icon
+#. Translators: %s is the description of the volume that is being unlocked
+#: monitor/udisks2/gvfsudisks2volume.c:1507
+#, c-format
+msgid ""
+"Authentication Required\n"
+"A passphrase is needed to access encrypted data on “%s”."
+msgstr ""
+"ต้องยืนยันตัวตน\n"
+"ต้องใช้วลีรหัสผ่านเพื่อเข้าถึงข้อมูลที่เข้ารหัสลับใน “%s”"
+
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: ../monitor/udisks2/gvfsudisks2volume.c:1471
+#: monitor/udisks2/gvfsudisks2volume.c:1687
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
 
-#: ../monitor/udisks2/udisks2volumemonitordaemon.c:40
+#: monitor/udisks2/udisks2volumemonitordaemon.c:39
 msgid "GVfs UDisks2 Volume Monitor"
 msgstr "เครื่องมือเฝ้าสังเกตโวลุม UDisks2 ของ GVfs"
 
-#. Translators: the first %s is the program name, the second one
-#. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-cat.c:58
 #, c-format
-msgid "%s: %s: error opening file: %s\n"
-msgstr "%s: %s: เกิดข้อผิดพลาดขณะเปิดแฟ้ม: %s\n"
+#~ msgid "Error creating Avahi resolver: %s"
+#~ msgstr "เกิดข้อผิดพลาดขณะสร้างตัวหาที่อยู่ของ Avahi: %s"
 
-#. Translators: the first %s is the program name, the
-#. second one is the URI of the file.
-#: ../programs/gvfs-cat.c:82
 #, c-format
-msgid "%s: %s, error writing to stdout"
-msgstr "%s: %s, เกิดข้อผิดพลาดขณะเขียน stdout"
+#~ msgid "Enter your password for the server “%s”."
+#~ msgstr "กรุณาป้อนรหัสผ่านของคุณสำหรับเซิร์ฟเวอร์ “%s”"
 
-#. Translators: the first %s is the program name, the second one
-#. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-cat.c:95
 #, c-format
-msgid "%s: %s: error reading: %s\n"
-msgstr "%s: %s: เกิดข้อผิดพลาดขณะอ่าน: %s\n"
+#~ msgid "Enter your name and password for the server “%s”."
+#~ msgstr "กรุณาป้อนชื่อและรหัสผ่านของคุณสำหรับเซิร์ฟเวอร์ “%s”"
 
-#. Translators: the first %s is the program name, the second one
-#. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-cat.c:114
+#~ msgid "The directory is not empty"
+#~ msgstr "ไดเรกทอรีไม่ว่าง"
+
+#~ msgid "Backups are not yet supported."
+#~ msgstr "ยังไม่รองรับการสำรองแฟ้ม"
+
+#~ msgid "Invalid seek type"
+#~ msgstr "ชนิดการเลื่อนตำแหน่งไม่ถูกต้อง"
+
+#~ msgid "No such file or directory in target path"
+#~ msgstr "ไม่มีแฟ้มหรือไดเรกทอรีดังกล่าวในพาธปลายทาง"
+
+#~ msgid "Not supported"
+#~ msgstr "ไม่รองรับ"
+
+#~ msgid "Cannot connect to the system bus"
+#~ msgstr "ไม่สามารถเชื่อมต่อไปยังบัสระบบ"
+
+#~ msgid "Cannot create libhal context"
+#~ msgstr "ไม่สามารถสร้างบริบทสำหรับ libhal"
+
+#~ msgid "Cannot initialize libhal"
+#~ msgstr "ไม่สามารถตั้งต้น libhal"
+
+#~ msgid "backups not supported yet"
+#~ msgstr "ยังไม่รองรับการสำรองแฟ้ม"
+
 #, c-format
-msgid "%s: %s:error closing: %s\n"
-msgstr "%s: %s: เกิดข้อผิดพลาดขณะปิด: %s\n"
+#~ msgid "%s Camera"
+#~ msgstr "กล้อง %s"
 
-#: ../programs/gvfs-cat.c:143 ../programs/gvfs-open.c:61
-#: ../programs/gvfs-rm.c:58
-msgid "FILE"
-msgstr "FILE"
-
-#. Translators: this message will appear after the usage string
-#. and before the list of options.
-#: ../programs/gvfs-cat.c:146
-msgid "Concatenate files and print to the standard output."
-msgstr "ต่อเนื้อหาของแฟ้มต่างๆ เข้าด้วยกัน แล้วพิมพ์ออกทางเอาต์พุตมาตรฐาน"
-
-#: ../programs/gvfs-cat.c:147
-msgid ""
-"gvfs-cat works just like the traditional cat utility, but using gvfs\n"
-"locations instead of local files: for example you can use something\n"
-"like smb://server/resource/file.txt as location."
-msgstr ""
-"gvfs-cat ทำงานคล้ายกับโปรแกรม cat ดั้งเดิม เพียงแต่ใช้ตำแหน่งของ gvfs แทนแฟ้มในเครื่อง\n"
-"ตัวอย่างเช่น คุณสามารถใช้ตำแหน่งในลักษณะ smb://server/resource/file.txt ได้"
-
-#: ../programs/gvfs-cat.c:151
-msgid ""
-"Note: just pipe through cat if you need its formatting options\n"
-"like -n, -T or other."
-msgstr ""
-"หมายเหตุ: คุณสามารถส่งผ่านไปป์ต่อให้คำสั่ง cat ได้ ถ้าต้องการใช้ตัวเลือกการจัดรูปแบบบางอย่าง\n"
-"เช่น -n, -T และอื่นๆ"
-
-#: ../programs/gvfs-cat.c:168 ../programs/gvfs-copy.c:131
-#: ../programs/gvfs-info.c:387 ../programs/gvfs-ls.c:414
-#: ../programs/gvfs-mime.c:94 ../programs/gvfs-mkdir.c:69
-#: ../programs/gvfs-monitor-dir.c:124 ../programs/gvfs-monitor-file.c:123
-#: ../programs/gvfs-mount.c:1061 ../programs/gvfs-move.c:119
-#: ../programs/gvfs-open.c:76 ../programs/gvfs-rename.c:73
-#: ../programs/gvfs-rm.c:70 ../programs/gvfs-save.c:176
-#: ../programs/gvfs-set-attribute.c:149 ../programs/gvfs-trash.c:69
-#: ../programs/gvfs-tree.c:260
 #, c-format
-msgid "Error parsing commandline options: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะแจงตัวเลือกในบรรทัดคำสั่ง: %s\n"
+#~ msgid "%s Audio Player"
+#~ msgstr "เครื่องเล่นเพลง %s"
 
-#. Translators: the %s is the program name. This error message
-#. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:180 ../programs/gvfs-open.c:88
+#~ msgid "Camera"
+#~ msgstr "กล้อง"
+
+#~ msgid "Audio Player"
+#~ msgstr "เครื่องเล่นเพลง"
+
+#~ msgid "USB support missing. Please contact your software vendor"
+#~ msgstr "ไม่มีส่วนรองรับ USB กรุณาติดต่อผู้จัดแจกซอฟต์แวร์ของคุณ"
+
+#~ msgid "Connection to the device lost"
+#~ msgstr "การเชื่อมต่อไปยังอุปกรณ์ถูกตัดขาด"
+
+#~ msgid "Device requires a software update"
+#~ msgstr "อุปกรณ์ต้องการซอฟต์แวร์รุ่นใหม่"
+
+#~ msgid "ssh program unexpectedly exited"
+#~ msgstr "โปรแกรม ssh จบการทำงานกะทันหัน"
+
 #, c-format
-msgid "%s: missing locations"
-msgstr "%s: ไม่ได้ระบุตำแหน่ง"
+#~ msgid "Password required for %s"
+#~ msgstr "ต้องใช้รหัสผ่านสำหรับ %s"
 
-#: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
-msgid "No target directory"
-msgstr "ไม่มีไดเรกทอรีปลายทาง"
-
-#: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
-msgid "Show progress"
-msgstr "แสดงความคืบหน้า"
-
-#: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
-msgid "Prompt before overwrite"
-msgstr "ถามก่อนเขียนทับ"
-
-#: ../programs/gvfs-copy.c:47
-msgid "Preserve all attributes"
-msgstr "รักษาแอตทริบิวต์ทั้งหมด"
-
-#: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
-#: ../programs/gvfs-save.c:43
-msgid "Backup existing destination files"
-msgstr "สำรองแฟ้มปลายทางที่มีอยู่เดิมด้วย"
-
-#: ../programs/gvfs-copy.c:49
-msgid "Never follow symbolic links"
-msgstr "ไม่ต้องเดินไปตามลิงก์สัญลักษณ์"
-
-#: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
 #, c-format
-msgid "progress"
-msgstr "ความคืบหน้า"
+#~ msgid "Password required for share %s on %s"
+#~ msgstr "ต้องใช้รหัสผ่านในการเข้าใช้แหล่งใช้ร่วม %s ที่ %s"
 
-#: ../programs/gvfs-copy.c:121 ../programs/gvfs-move.c:109
-msgid "SOURCE"
-msgstr "SOURCE"
+#~ msgid "GVfs GDU Volume Monitor"
+#~ msgstr "เครื่องมือเฝ้าสังเกตโวลุม GDU ของ GVfs"
 
-#: ../programs/gvfs-copy.c:121 ../programs/gvfs-move.c:109
-#: ../programs/gvfs-save.c:165
-msgid "DEST"
-msgstr "DEST"
+#~ msgid "Floppy Drive"
+#~ msgstr "ไดรว์ฟลอปปี้"
 
-#: ../programs/gvfs-copy.c:122
-msgid "Copy one or more files from SOURCE to DEST."
-msgstr "คัดลอกแฟ้มตั้งแต่หนึ่งแฟ้มขึ้นไปจาก SOURCE (ต้นทาง) ไปยัง DEST (ปลายทาง)"
+#~ msgid ""
+#~ "Start drive in degraded mode?\n"
+#~ "Starting a drive in degraded mode means that the drive is no longer tolerant to failures. Data "
+#~ "on the drive may be irrevocably lost if a component fails."
+#~ msgstr ""
+#~ "จะเปิดใช้ไดรว์ในโหมดคุณภาพต่ำหรือไม่?\n"
+#~ "การเปิดใช้ไดรว์ในโหมดคุณภาพต่ำหมายความว่า ไดรว์จะไม่ยืดหยุ่นต่อความผิดพลาดอีกต่อไป "
+#~ "ข้อมูลในไดรว์อาจสูญหายโดยไม่สามารถกู้คืนได้ถ้ามีองค์ประกอบใดองค์ประกอบหนึ่งทำงานผิดพลาด"
 
-#: ../programs/gvfs-copy.c:141 ../programs/gvfs-move.c:129
-#: ../programs/gvfs-rename.c:83
-msgid "Missing operand\n"
-msgstr "ไม่มีโอเปอแรนด์\n"
+#~ msgid "Start Anyway"
+#~ msgstr "เปิดใช้ต่อไป"
 
-#: ../programs/gvfs-copy.c:149 ../programs/gvfs-move.c:137
-msgid "Too many arguments\n"
-msgstr "อาร์กิวเมนต์มากเกินไป\n"
+#~ msgid "Cannot get LUKS cleartext slave"
+#~ msgstr "ไม่สามารถนำ LUKS cleartext slave มาใช้ได้"
 
-#: ../programs/gvfs-copy.c:158 ../programs/gvfs-move.c:146
 #, c-format
-msgid "Target %s is not a directory\n"
-msgstr "เป้าหมาย %s ไม่ใช่ไดเรกทอรี\n"
+#~ msgid "Cannot get LUKS cleartext slave from path `%s'"
+#~ msgstr "ไม่สามารถนำ LUKS cleartext slave จากพาธ `%s' มาใช้ได้"
 
-#: ../programs/gvfs-copy.c:203
+#~ msgid "Floppy Disk"
+#~ msgstr "แผ่นฟลอปปี้"
+
 #, c-format
-msgid "overwrite %s?"
-msgstr "เขียนทับ %s หรือไม่?"
+#~ msgid ""
+#~ "Enter a password to unlock the volume\n"
+#~ "The device \"%s\" contains encrypted data on partition %d."
+#~ msgstr ""
+#~ "กรุณาป้อนรหัสผ่านเพื่อปลดล็อคโวลุม\n"
+#~ "อุปกรณ์ \"%s\" มีข้อมูลที่เข้ารหัสลับอยู่ในพาร์ทิชันที่ %d"
 
-#: ../programs/gvfs-copy.c:217
 #, c-format
-msgid "Error copying file %s: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะคัดลอกแฟ้ม %s: %s\n"
+#~ msgid ""
+#~ "Enter a password to unlock the volume\n"
+#~ "The device \"%s\" contains encrypted data."
+#~ msgstr ""
+#~ "กรุณาป้อนรหัสผ่านเพื่อปลดล็อคโวลุม\n"
+#~ "อุปกรณ์ \"%s\" มีข้อมูลที่เข้ารหัสลับไว้"
 
-#: ../programs/gvfs-info.c:37
-msgid "List writable attributes"
-msgstr "แสดงแอตทริบิวต์ที่เขียนได้"
-
-#: ../programs/gvfs-info.c:38
-msgid "Get file system info"
-msgstr "อ่านข้อมูลเกี่ยวกับระบบแฟ้ม"
-
-#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
-msgid "The attributes to get"
-msgstr "แอตทริบิวต์ต่างๆ ที่จะอ่าน"
-
-#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
-msgid "ATTRIBUTES"
-msgstr "ATTRIBUTES"
-
-#: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
-#: ../programs/gvfs-set-attribute.c:37
-msgid "Don't follow symbolic links"
-msgstr "ไม่ต้องเดินไปตามลิงก์สัญลักษณ์"
-
-#: ../programs/gvfs-info.c:50
-msgid "invalid type"
-msgstr "ชนิดไม่ถูกต้อง"
-
-#: ../programs/gvfs-info.c:53
-msgid "unknown"
-msgstr "ไม่ทราบ"
-
-#: ../programs/gvfs-info.c:56
-msgid "regular"
-msgstr "แฟ้มปกติ"
-
-#: ../programs/gvfs-info.c:59
-msgid "directory"
-msgstr "ไดเรกทอรี"
-
-#: ../programs/gvfs-info.c:62
-msgid "symlink"
-msgstr "ลิงก์สัญลักษณ์"
-
-#: ../programs/gvfs-info.c:65
-msgid "special"
-msgstr "แฟ้มพิเศษ"
-
-#: ../programs/gvfs-info.c:68
-msgid "shortcut"
-msgstr "จุดลัด"
-
-#: ../programs/gvfs-info.c:71
-msgid "mountable"
-msgstr "เมานท์ได้"
-
-#: ../programs/gvfs-info.c:109
 #, c-format
-msgid "attributes:\n"
-msgstr "แอตทริบิวต์:\n"
+#~ msgid ""
+#~ "Enter a password to unlock the volume\n"
+#~ "The device %s contains encrypted data."
+#~ msgstr ""
+#~ "กรุณาป้อนรหัสผ่านเพื่อปลดล็อคโวลุม\n"
+#~ "อุปกรณ์ \"%s\" มีข้อมูลที่เข้ารหัสลับไว้"
 
-#. Translators: This is a noun and represents and attribute of a file
-#: ../programs/gvfs-info.c:156
+#~ msgid "CD-ROM Disc"
+#~ msgstr "แผ่น CD-ROM"
+
+#~ msgid "Blank CD-ROM Disc"
+#~ msgstr "แผ่น CD-ROM เปล่า"
+
+#~ msgid "CD-R Disc"
+#~ msgstr "แผ่น CD-R"
+
+#~ msgid "Blank CD-R Disc"
+#~ msgstr "แผ่น CD-R เปล่า"
+
+#~ msgid "CD-RW Disc"
+#~ msgstr "แผ่น CD-RW"
+
+#~ msgid "Blank CD-RW Disc"
+#~ msgstr "แผ่น CD-RW เปล่า"
+
+#~ msgid "DVD-ROM Disc"
+#~ msgstr "แผ่น DVD-ROM"
+
+#~ msgid "Blank DVD-ROM Disc"
+#~ msgstr "แผ่น DVD-ROM เปล่า"
+
+#~ msgid "DVD-RAM Disc"
+#~ msgstr "แผ่น DVD-RAM"
+
+#~ msgid "Blank DVD-RAM Disc"
+#~ msgstr "แผ่น DVD-RAM เปล่า"
+
+#~ msgid "DVD-RW Disc"
+#~ msgstr "แผ่น DVD-RW"
+
+#~ msgid "Blank DVD-RW Disc"
+#~ msgstr "แผ่น DVD-RW เปล่า"
+
+#~ msgid "DVD+R Disc"
+#~ msgstr "แผ่น DVD+R"
+
+#~ msgid "Blank DVD+R Disc"
+#~ msgstr "แผ่น DVD+R เปล่า"
+
+#~ msgid "DVD+RW Disc"
+#~ msgstr "แผ่น DVD+RW"
+
+#~ msgid "Blank DVD+RW Disc"
+#~ msgstr "แผ่น DVD+RW เปล่า"
+
+#~ msgid "DVD+R DL Disc"
+#~ msgstr "แผ่น DVD+R DL"
+
+#~ msgid "Blank DVD+R DL Disc"
+#~ msgstr "แผ่น DVD+R DL เปล่า"
+
+#~ msgid "Blu-Ray Disc"
+#~ msgstr "แผ่น Blu-Ray"
+
+#~ msgid "Blank Blu-Ray Disc"
+#~ msgstr "แผ่น Blu-Ray เปล่า"
+
+#~ msgid "Blu-Ray R Disc"
+#~ msgstr "แผ่น Blu-Ray R"
+
+#~ msgid "Blank Blu-Ray R Disc"
+#~ msgstr "แผ่น Blu-Ray R เปล่า"
+
+#~ msgid "Blu-Ray RW Disc"
+#~ msgstr "แผ่น Blu-Ray RW"
+
+#~ msgid "Blank Blu-Ray RW Disc"
+#~ msgstr "แผ่น Blu-Ray RW เปล่า"
+
+#~ msgid "HD DVD Disc"
+#~ msgstr "แผ่น HD DVD"
+
+#~ msgid "Blank HD DVD Disc"
+#~ msgstr "แผ่น HD DVD เปล่า"
+
+#~ msgid "HD DVD-R Disc"
+#~ msgstr "แผ่น HD DVD-R"
+
+#~ msgid "Blank HD DVD-R Disc"
+#~ msgstr "แผ่น HD DVD-R เปล่า"
+
+#~ msgid "HD DVD-RW Disc"
+#~ msgstr "แผ่น HD DVD-RW"
+
+#~ msgid "Blank HD DVD-RW Disc"
+#~ msgstr "แผ่น HD DVD-RW เปล่า"
+
+#~ msgid "MO Disc"
+#~ msgstr "แผ่น MO"
+
+#~ msgid "Blank MO Disc"
+#~ msgstr "แผ่น MO เปล่า"
+
+#~ msgid "Disc"
+#~ msgstr "แผ่น"
+
+#~ msgid "Blank Disc"
+#~ msgstr "แผ่นเปล่า"
+
+#~ msgid "CD-ROM"
+#~ msgstr "CD-ROM"
+
+#~ msgid "CD-R"
+#~ msgstr "CD-R"
+
+#~ msgid "CD-RW"
+#~ msgstr "CD-RW"
+
+#~ msgid "DVD-ROM"
+#~ msgstr "DVD-ROM"
+
+#~ msgid "DVD+R"
+#~ msgstr "DVD+R"
+
+#~ msgid "DVD+RW"
+#~ msgstr "DVD+RW"
+
+#~ msgid "DVD-R"
+#~ msgstr "DVD-R"
+
+#~ msgid "DVD-RW"
+#~ msgstr "DVD-RW"
+
+#~ msgid "DVD-RAM"
+#~ msgstr "DVD-RAM"
+
+#~ msgid "DVD±R"
+#~ msgstr "DVD±R"
+
+#~ msgid "DVD±RW"
+#~ msgstr "DVD±RW"
+
+#~ msgid "HDDVD"
+#~ msgstr "HDDVD"
+
+#~ msgid "HDDVD-r"
+#~ msgstr "HDDVD-r"
+
+#~ msgid "HDDVD-RW"
+#~ msgstr "HDDVD-RW"
+
+#~ msgid "Blu-ray"
+#~ msgstr "Blu-ray"
+
+#~ msgid "Blu-ray-R"
+#~ msgstr "Blu-ray-R"
+
+#~ msgid "Blu-ray-RE"
+#~ msgstr "Blu-ray-RE"
+
 #, c-format
-msgid "display name: %s\n"
-msgstr "ชื่อสำหรับแสดงผล: %s\n"
+#~ msgid "%s/%s Drive"
+#~ msgstr "ไดรว์ %s/%s"
 
-#. Translators: This is a noun and represents and attribute of a file
-#: ../programs/gvfs-info.c:161
 #, c-format
-msgid "edit name: %s\n"
-msgstr "ชื่อสำหรับแก้ไข: %s\n"
+#~ msgid "%s Drive"
+#~ msgstr "ไดรว์ %s"
 
-#: ../programs/gvfs-info.c:167
+#~ msgid "Software RAID Drive"
+#~ msgstr "ไดรว์ RAID แบบซอฟต์แวร์"
+
+#~ msgid "USB Drive"
+#~ msgstr "ไดรว์ USB"
+
+#~ msgid "ATA Drive"
+#~ msgstr "ไดรว์ ATA"
+
+#~ msgid "SCSI Drive"
+#~ msgstr "ไดรว์ SCSI"
+
+#~ msgid "FireWire Drive"
+#~ msgstr "ไดรว์ไฟร์ไวร์"
+
+#~ msgid "Tape Drive"
+#~ msgstr "ไดรว์เทป"
+
+#~ msgid "CompactFlash Drive"
+#~ msgstr "ไดรว์ CompactFlash"
+
+#~ msgid "MemoryStick Drive"
+#~ msgstr "ไดรว์ MemoryStick"
+
+#~ msgid "SD/MMC Drive"
+#~ msgstr "ไดรว์ SD/MMC"
+
+#~ msgid "Zip Drive"
+#~ msgstr "ไดรว์ Zip"
+
+#~ msgid "Jaz Drive"
+#~ msgstr "ไดรว์ Jaz"
+
+#~ msgid "Thumb Drive"
+#~ msgstr "Thumb Drive"
+
+#~ msgid "Mass Storage Drive"
+#~ msgstr "ไดรว์แหล่งเก็บข้อมูล"
+
 #, c-format
-msgid "name: %s\n"
-msgstr "ชื่อ: %s\n"
+#~ msgid "Failed to eject media; one or more volumes on the media are busy."
+#~ msgstr "ไม่สามารถดันสื่อออก: มีโวลุมตั้งแต่หนึ่งโวลุมขึ้นไปในสื่อกำลังถูกใช้งานอยู่"
 
-#: ../programs/gvfs-info.c:174
 #, c-format
-msgid "type: %s\n"
-msgstr "ชนิด: %s\n"
+#~ msgid "%.1f kB"
+#~ msgstr "%.1f kB"
 
-#: ../programs/gvfs-info.c:180
 #, c-format
-msgid "size: "
-msgstr "ขนาด: "
+#~ msgid "%.1f MB"
+#~ msgstr "%.1f MB"
 
-#: ../programs/gvfs-info.c:185
 #, c-format
-msgid "hidden\n"
-msgstr "ซ่อน\n"
+#~ msgid "%.1f GB"
+#~ msgstr "%.1f GB"
 
-#: ../programs/gvfs-info.c:270
-msgid "Copy with file"
-msgstr "คัดลอกไปพร้อมกับแฟ้ม"
+#~ msgid "Mixed Audio/Data Disc"
+#~ msgstr "แผ่นผสมเพลง/ข้อมูล"
 
-#: ../programs/gvfs-info.c:274
-msgid "Keep with file when moved"
-msgstr "ติดตามไปกับแฟ้มเมื่อย้าย"
-
-#: ../programs/gvfs-info.c:311
 #, c-format
-msgid "Error getting writable attributes: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลแอตทริบิวต์ที่เขียนได้: %s\n"
+#~ msgid "%s Medium"
+#~ msgstr "สื่อขนาด %s"
 
-#: ../programs/gvfs-info.c:316
 #, c-format
-msgid "Settable attributes:\n"
-msgstr "แอตทริบิวต์ที่กำหนดค่าได้:\n"
+#~ msgid "%s Encrypted Data"
+#~ msgstr "ข้อมูลเข้ารหัสลับ %s"
 
-#: ../programs/gvfs-info.c:339
 #, c-format
-msgid "Writable attribute namespaces:\n"
-msgstr "namespace ของแอตทริบิวต์ที่เขียนได้:\n"
+#~ msgid "%s Media"
+#~ msgstr "สื่อขนาด %s"
 
-#: ../programs/gvfs-info.c:375 ../programs/gvfs-ls.c:397
-#: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-monitor-dir.c:112
-#: ../programs/gvfs-monitor-file.c:111 ../programs/gvfs-mount.c:1049
-#: ../programs/gvfs-rename.c:64 ../programs/gvfs-set-attribute.c:139
-#: ../programs/gvfs-trash.c:57 ../programs/gvfs-tree.c:248
-msgid "LOCATION"
-msgstr "LOCATION"
-
-#: ../programs/gvfs-info.c:376
-msgid "Show information about locations."
-msgstr "แสดงข้อมูลเกี่ยวกับตำแหน่งที่ตั้ง"
-
-#: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
-msgid "Show hidden files"
-msgstr "แสดงแฟ้มซ่อน"
-
-#: ../programs/gvfs-ls.c:41
-msgid "Use a long listing format"
-msgstr "ใช้รูปแบบการแสดงรายชื่อแบบยาว"
-
-#: ../programs/gvfs-ls.c:42
-msgid "Show completions"
-msgstr "แสดงการเติมชื่อ"
-
-#: ../programs/gvfs-ls.c:42
-msgid "PREFIX"
-msgstr "PREFIX"
-
-#: ../programs/gvfs-ls.c:166 ../programs/gvfs-ls.c:174
-#: ../programs/gvfs-rename.c:97
 #, c-format
-msgid "Error: %s\n"
-msgstr "ผิดพลาด: %s\n"
+#~ msgid "You can now unplug %s\n"
+#~ msgstr "คุณสามารถถอด %s ได้แล้ว\n"
 
-#: ../programs/gvfs-ls.c:398
-msgid "List the contents of the locations."
-msgstr "แสดงรายชื่อของเนื้อหาต่างๆ ที่ตำแหน่งที่กำหนด"
-
-#: ../programs/gvfs-ls.c:399
-msgid ""
-"gvfs-ls is similar to the traditional ls utility, but using gvfs\n"
-"locations instead of local files: for example you can use something\n"
-"like smb://server/resource/file.txt as location. File attributes can\n"
-"be specified with their gvfs name, e.g. standard::icon."
-msgstr ""
-"gvfs-ls ทำงานคล้ายกับโปรแกรม ls ดั้งเดิม เพียงแต่ใช้ตำแหน่งของ gvfs แทนแฟ้มในเครื่อง\n"
-"ตัวอย่างเช่น คุณสามารถใช้ตำแหน่งในลักษณะ smb://server/resource/file.txt ได้\n"
-"แอตทริบิวต์ของแฟ้มสามารถระบุได้ด้วยชื่อแบบ gvfs เช่น standard::icon"
-
-#: ../programs/gvfs-mime.c:36
-msgid "Query handler for mime-type"
-msgstr "สอบถามตัวจัดการสำหรับชนิด mime"
-
-#: ../programs/gvfs-mime.c:37
-msgid "Set handler for mime-type"
-msgstr "กำหนดตัวจัดการสำหรับชนิด mime"
-
-#: ../programs/gvfs-mime.c:82
-msgid "MIMETYPE"
-msgstr "MIMETYPE"
-
-#: ../programs/gvfs-mime.c:82
-msgid "HANDLER"
-msgstr "HANDLER"
-
-#: ../programs/gvfs-mime.c:83
-msgid "Get or set the handler for a mime-type."
-msgstr "อ่านหรือกำหนดตัวจัดการสำหรับชนิด MIME"
-
-#: ../programs/gvfs-mime.c:95
-msgid "Specify either --query or --set"
-msgstr "กรุณาระบุ --query หรือ --set อย่างใดอย่างหนึ่ง"
-
-#: ../programs/gvfs-mime.c:106
 #, c-format
-msgid "Must specify a single mime-type.\n"
-msgstr "ต้องระบุชนิด MIME หนึ่งชนิด\n"
+#~ msgid "%s: %s: error opening file: %s\n"
+#~ msgstr "%s: %s: เกิดข้อผิดพลาดขณะเปิดแฟ้ม: %s\n"
 
-#: ../programs/gvfs-mime.c:113
 #, c-format
-msgid "Must specify the mime-type followed by the default handler.\n"
-msgstr "ต้องระบุชนิด MIME ตามด้วยตัวจัดการปริยาย\n"
+#~ msgid "%s: %s, error writing to stdout"
+#~ msgstr "%s: %s, เกิดข้อผิดพลาดขณะเขียน stdout"
 
-#: ../programs/gvfs-mime.c:128
 #, c-format
-msgid "No default applications for '%s'\n"
-msgstr "ไม่มีโปรแกรมปริยายสำหรับ '%s'\n"
+#~ msgid "%s: %s: error reading: %s\n"
+#~ msgstr "%s: %s: เกิดข้อผิดพลาดขณะอ่าน: %s\n"
 
-#: ../programs/gvfs-mime.c:134
 #, c-format
-msgid "Default application for '%s': %s\n"
-msgstr "โปรแกรมปริยายสำหรับ '%s': %s\n"
+#~ msgid "%s: %s:error closing: %s\n"
+#~ msgstr "%s: %s: เกิดข้อผิดพลาดขณะปิด: %s\n"
 
-#: ../programs/gvfs-mime.c:139
+#~ msgid "FILE"
+#~ msgstr "FILE"
+
+#~ msgid "Concatenate files and print to the standard output."
+#~ msgstr "ต่อเนื้อหาของแฟ้มต่างๆ เข้าด้วยกัน แล้วพิมพ์ออกทางเอาต์พุตมาตรฐาน"
+
+#~ msgid ""
+#~ "gvfs-cat works just like the traditional cat utility, but using gvfs\n"
+#~ "locations instead of local files: for example you can use something\n"
+#~ "like smb://server/resource/file.txt as location."
+#~ msgstr ""
+#~ "gvfs-cat ทำงานคล้ายกับโปรแกรม cat ดั้งเดิม เพียงแต่ใช้ตำแหน่งของ gvfs แทนแฟ้มในเครื่อง\n"
+#~ "ตัวอย่างเช่น คุณสามารถใช้ตำแหน่งในลักษณะ smb://server/resource/file.txt ได้"
+
+#~ msgid ""
+#~ "Note: just pipe through cat if you need its formatting options\n"
+#~ "like -n, -T or other."
+#~ msgstr ""
+#~ "หมายเหตุ: คุณสามารถส่งผ่านไปป์ต่อให้คำสั่ง cat ได้ ถ้าต้องการใช้ตัวเลือกการจัดรูปแบบบางอย่าง\n"
+#~ "เช่น -n, -T และอื่นๆ"
+
 #, c-format
-msgid "Registered applications:\n"
-msgstr "โปรแกรมที่ลงทะเบียนไว้:\n"
+#~ msgid "Error parsing commandline options: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะแจงตัวเลือกในบรรทัดคำสั่ง: %s\n"
 
-#: ../programs/gvfs-mime.c:141
 #, c-format
-msgid "No registered applications\n"
-msgstr "ไม่มีโปรแกรมที่ลงทะเบียนไว้\n"
+#~ msgid "%s: missing locations"
+#~ msgstr "%s: ไม่ได้ระบุตำแหน่ง"
 
-#: ../programs/gvfs-mime.c:152
+#~ msgid "No target directory"
+#~ msgstr "ไม่มีไดเรกทอรีปลายทาง"
+
+#~ msgid "Prompt before overwrite"
+#~ msgstr "ถามก่อนเขียนทับ"
+
+#~ msgid "Preserve all attributes"
+#~ msgstr "รักษาแอตทริบิวต์ทั้งหมด"
+
+#~ msgid "Backup existing destination files"
+#~ msgstr "สำรองแฟ้มปลายทางที่มีอยู่เดิมด้วย"
+
+#~ msgid "Never follow symbolic links"
+#~ msgstr "ไม่ต้องเดินไปตามลิงก์สัญลักษณ์"
+
 #, c-format
-msgid "Recommended applications:\n"
-msgstr "โปรแกรมที่แนะนำ:\n"
+#~ msgid "progress"
+#~ msgstr "ความคืบหน้า"
 
-#: ../programs/gvfs-mime.c:154
+#~ msgid "SOURCE"
+#~ msgstr "SOURCE"
+
+#~ msgid "DEST"
+#~ msgstr "DEST"
+
+#~ msgid "Copy one or more files from SOURCE to DEST."
+#~ msgstr "คัดลอกแฟ้มตั้งแต่หนึ่งแฟ้มขึ้นไปจาก SOURCE (ต้นทาง) ไปยัง DEST (ปลายทาง)"
+
+#~ msgid "Missing operand\n"
+#~ msgstr "ไม่มีโอเปอแรนด์\n"
+
+#~ msgid "Too many arguments\n"
+#~ msgstr "อาร์กิวเมนต์มากเกินไป\n"
+
 #, c-format
-msgid "No recommended applications\n"
-msgstr "ไม่มีโปรแกรมที่แนะนำ\n"
+#~ msgid "overwrite %s?"
+#~ msgstr "เขียนทับ %s หรือไม่?"
 
-#: ../programs/gvfs-mime.c:174
 #, c-format
-msgid "Failed to load info for handler '%s'\n"
-msgstr "โหลดข้อมูลสำหรับตัวจัดการ '%s' ไม่สำเร็จ\n"
+#~ msgid "Error copying file %s: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะคัดลอกแฟ้ม %s: %s\n"
 
-#: ../programs/gvfs-mime.c:180
+#~ msgid "List writable attributes"
+#~ msgstr "แสดงแอตทริบิวต์ที่เขียนได้"
+
+#~ msgid "Get file system info"
+#~ msgstr "อ่านข้อมูลเกี่ยวกับระบบแฟ้ม"
+
+#~ msgid "The attributes to get"
+#~ msgstr "แอตทริบิวต์ต่างๆ ที่จะอ่าน"
+
+#~ msgid "ATTRIBUTES"
+#~ msgstr "ATTRIBUTES"
+
+#~ msgid "Don't follow symbolic links"
+#~ msgstr "ไม่ต้องเดินไปตามลิงก์สัญลักษณ์"
+
+#~ msgid "invalid type"
+#~ msgstr "ชนิดไม่ถูกต้อง"
+
+#~ msgid "unknown"
+#~ msgstr "ไม่ทราบ"
+
+#~ msgid "regular"
+#~ msgstr "แฟ้มปกติ"
+
+#~ msgid "directory"
+#~ msgstr "ไดเรกทอรี"
+
+#~ msgid "symlink"
+#~ msgstr "ลิงก์สัญลักษณ์"
+
+#~ msgid "special"
+#~ msgstr "แฟ้มพิเศษ"
+
+#~ msgid "shortcut"
+#~ msgstr "จุดลัด"
+
+#~ msgid "mountable"
+#~ msgstr "เมานท์ได้"
+
 #, c-format
-msgid "Failed to set '%s' as the default handler for '%s': %s\n"
-msgstr "กำหนด '%s' เป็นตัวจัดการปริยายสำหรับ '%s' ไม่สำเร็จ: %s\n"
+#~ msgid "attributes:\n"
+#~ msgstr "แอตทริบิวต์:\n"
 
-#: ../programs/gvfs-mkdir.c:33
-msgid "Create parent directories"
-msgstr "สร้างไดเรกทอรีแม่ด้วย"
-
-#: ../programs/gvfs-mkdir.c:58
-msgid "Create directories."
-msgstr "สร้างไดเรกทอรี"
-
-#: ../programs/gvfs-mkdir.c:89 ../programs/gvfs-mkdir.c:98
 #, c-format
-msgid "Error creating directory: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะสร้างไดเรกทอรี: %s\n"
+#~ msgid "display name: %s\n"
+#~ msgstr "ชื่อสำหรับแสดงผล: %s\n"
 
-#: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
-msgid "Don't send single MOVED events"
-msgstr "ไม่ต้องส่งเหตุการณ์ MOVED เดี่ยวๆ"
-
-#: ../programs/gvfs-monitor-dir.c:113
-msgid "Monitor directories for changes."
-msgstr "เฝ้าสังเกตความเปลี่ยนแปลงของไดเรกทอรี"
-
-#: ../programs/gvfs-monitor-file.c:112
-msgid "Monitor files for changes."
-msgstr "เฝ้าสังเกตความเปลี่ยนแปลงของแฟ้ม"
-
-#: ../programs/gvfs-mount.c:57
-msgid "Mount as mountable"
-msgstr "เมาทน์ตามที่กำหนดให้เมานท์ได้"
-
-#: ../programs/gvfs-mount.c:58
-msgid "Mount volume with device file"
-msgstr "เมาทน์โวลุมด้วยแฟ้มอุปกรณ์"
-
-#: ../programs/gvfs-mount.c:58
-msgid "DEVICE"
-msgstr "DEVICE"
-
-#: ../programs/gvfs-mount.c:59
-msgid "Unmount"
-msgstr "เลิกเมานท์"
-
-#: ../programs/gvfs-mount.c:60
-msgid "Eject"
-msgstr "เอาสื่อออก"
-
-#: ../programs/gvfs-mount.c:61
-msgid "Unmount all mounts with the given scheme"
-msgstr "เลิกเมานท์จุดเมานท์ทั้งหมดที่มี scheme ที่กำหนด"
-
-#: ../programs/gvfs-mount.c:61
-msgid "SCHEME"
-msgstr "SCHEME"
-
-#. Translator: List here is a verb as in 'List all mounts'
-#: ../programs/gvfs-mount.c:63
-msgid "List"
-msgstr "แสดงรายชื่อ"
-
-#: ../programs/gvfs-mount.c:64
-msgid "Monitor events"
-msgstr "เฝ้าสังเกตเหตุการณ์ต่างๆ"
-
-#: ../programs/gvfs-mount.c:65
-msgid "Show extra information"
-msgstr "แสดงข้อมูลเพิ่มเติม"
-
-#: ../programs/gvfs-mount.c:169 ../programs/gvfs-mount.c:193
 #, c-format
-msgid "Error mounting location: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะเมานท์ตำแหน่ง: %s\n"
+#~ msgid "edit name: %s\n"
+#~ msgstr "ชื่อสำหรับแก้ไข: %s\n"
 
-#: ../programs/gvfs-mount.c:253
 #, c-format
-msgid "Error unmounting mount: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะเลิกเมานท์จุดเมานท์: %s\n"
+#~ msgid "name: %s\n"
+#~ msgstr "ชื่อ: %s\n"
 
-#: ../programs/gvfs-mount.c:276 ../programs/gvfs-mount.c:325
 #, c-format
-msgid "Error finding enclosing mount: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะหาจุดเมานท์ที่บรรจุ: %s\n"
+#~ msgid "type: %s\n"
+#~ msgstr "ชนิด: %s\n"
 
-#: ../programs/gvfs-mount.c:302
 #, c-format
-msgid "Error ejecting mount: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะเอาสื่อที่จุดเมานท์ออก: %s\n"
+#~ msgid "size: "
+#~ msgstr "ขนาด: "
 
-#: ../programs/gvfs-mount.c:786
 #, c-format
-msgid "Error mounting %s: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะเมานท์ %s: %s\n"
+#~ msgid "hidden\n"
+#~ msgstr "ซ่อน\n"
 
-#: ../programs/gvfs-mount.c:801
+#~ msgid "Copy with file"
+#~ msgstr "คัดลอกไปพร้อมกับแฟ้ม"
+
+#~ msgid "Keep with file when moved"
+#~ msgstr "ติดตามไปกับแฟ้มเมื่อย้าย"
+
 #, c-format
-msgid "Mounted %s at %s\n"
-msgstr "เมานท์ %s ที่ %s แล้ว\n"
+#~ msgid "Error getting writable attributes: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลแอตทริบิวต์ที่เขียนได้: %s\n"
 
-#: ../programs/gvfs-mount.c:852
 #, c-format
-msgid "No volume for device file %s\n"
-msgstr "ไม่มีโวลุมสำหรับแฟ้มอุปกรณ์ %s\n"
+#~ msgid "Settable attributes:\n"
+#~ msgstr "แอตทริบิวต์ที่กำหนดค่าได้:\n"
 
-#: ../programs/gvfs-mount.c:1050
-msgid "Mount the locations."
-msgstr "เมานท์ตำแหน่งที่ตั้ง"
-
-#: ../programs/gvfs-move.c:110
-msgid "Move one or more files from SOURCE to DEST."
-msgstr "ย้ายแฟ้มตั้งแต่หนึ่งแฟ้มขึ้นไปจาก SOURCE (ต้นทาง) ไปยัง DEST (ปลายทาง)"
-
-#: ../programs/gvfs-move.c:199
 #, c-format
-msgid "Error moving file %s: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะย้ายแฟ้ม %s: %s\n"
+#~ msgid "Writable attribute namespaces:\n"
+#~ msgstr "namespace ของแอตทริบิวต์ที่เขียนได้:\n"
 
-#. Translators: this message will appear after the usage string
-#. and before the list of options.
-#: ../programs/gvfs-open.c:64
-msgid ""
-"Open files with the default application that\n"
-"is registered to handle files of this type."
-msgstr ""
-"เปิดแฟ้มด้วยโปรแกรมปริยายที่ลงทะเบียนไว้\n"
-"สำหรับจัดการแฟ้มชนิดนี้"
+#~ msgid "LOCATION"
+#~ msgstr "LOCATION"
 
-#. Translators: the first %s is the program name, the second one
-#. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:120
+#~ msgid "Show information about locations."
+#~ msgstr "แสดงข้อมูลเกี่ยวกับตำแหน่งที่ตั้ง"
+
+#~ msgid "Show hidden files"
+#~ msgstr "แสดงแฟ้มซ่อน"
+
+#~ msgid "Use a long listing format"
+#~ msgstr "ใช้รูปแบบการแสดงรายชื่อแบบยาว"
+
+#~ msgid "Show completions"
+#~ msgstr "แสดงการเติมชื่อ"
+
+#~ msgid "PREFIX"
+#~ msgstr "PREFIX"
+
 #, c-format
-msgid "%s: %s: error opening location: %s\n"
-msgstr "%s: %s: เกิดข้อผิดพลาดขณะเปิดตำแหน่ง: %s\n"
+#~ msgid "Error: %s\n"
+#~ msgstr "ผิดพลาด: %s\n"
 
-#: ../programs/gvfs-rename.c:64
-msgid "NEW-NAME"
-msgstr "NEW-NAME"
+#~ msgid "List the contents of the locations."
+#~ msgstr "แสดงรายชื่อของเนื้อหาต่างๆ ที่ตำแหน่งที่กำหนด"
 
-#: ../programs/gvfs-rename.c:65
-msgid "Rename a file."
-msgstr "เปลี่ยนชื่อแฟ้ม"
+#~ msgid ""
+#~ "gvfs-ls is similar to the traditional ls utility, but using gvfs\n"
+#~ "locations instead of local files: for example you can use something\n"
+#~ "like smb://server/resource/file.txt as location. File attributes can\n"
+#~ "be specified with their gvfs name, e.g. standard::icon."
+#~ msgstr ""
+#~ "gvfs-ls ทำงานคล้ายกับโปรแกรม ls ดั้งเดิม เพียงแต่ใช้ตำแหน่งของ gvfs แทนแฟ้มในเครื่อง\n"
+#~ "ตัวอย่างเช่น คุณสามารถใช้ตำแหน่งในลักษณะ smb://server/resource/file.txt ได้\n"
+#~ "แอตทริบิวต์ของแฟ้มสามารถระบุได้ด้วยชื่อแบบ gvfs เช่น standard::icon"
 
-#: ../programs/gvfs-rename.c:104
+#~ msgid "Query handler for mime-type"
+#~ msgstr "สอบถามตัวจัดการสำหรับชนิด mime"
+
+#~ msgid "Set handler for mime-type"
+#~ msgstr "กำหนดตัวจัดการสำหรับชนิด mime"
+
+#~ msgid "MIMETYPE"
+#~ msgstr "MIMETYPE"
+
+#~ msgid "HANDLER"
+#~ msgstr "HANDLER"
+
+#~ msgid "Get or set the handler for a mime-type."
+#~ msgstr "อ่านหรือกำหนดตัวจัดการสำหรับชนิด MIME"
+
+#~ msgid "Specify either --query or --set"
+#~ msgstr "กรุณาระบุ --query หรือ --set อย่างใดอย่างหนึ่ง"
+
 #, c-format
-msgid "Rename successful. New uri: %s\n"
-msgstr "เปลี่ยนชื่อสำเร็จแล้ว URI ใหม่: %s\n"
+#~ msgid "Must specify a single mime-type.\n"
+#~ msgstr "ต้องระบุชนิด MIME หนึ่งชนิด\n"
 
-#: ../programs/gvfs-rm.c:34 ../programs/gvfs-trash.c:34
-msgid "Ignore nonexistent files, never prompt"
-msgstr "ไม่ต้องสนใจแฟ้มที่ไม่มีอยู่ ไม่ต้องถาม"
-
-#: ../programs/gvfs-rm.c:59
-msgid "Delete the given files."
-msgstr "ลบแฟ้มที่กำหนด"
-
-#: ../programs/gvfs-save.c:44
-msgid "Only create if not existing"
-msgstr "สร้างเมื่อไม่มีอยู่เท่านั้น"
-
-#: ../programs/gvfs-save.c:45
-msgid "Append to end of file"
-msgstr "เขียนต่อท้ายแฟ้ม"
-
-#: ../programs/gvfs-save.c:46
-msgid "When creating, restrict access to the current user"
-msgstr "เมื่อสร้าง ให้จำกัดการเข้าถึงเฉพาะสำหรับผู้ใช้ปัจจุบันเท่านั้น"
-
-#. Translators: The "etag" is a token allowing to verify whether a file has been modified
-#: ../programs/gvfs-save.c:48
-msgid "Print new etag at end"
-msgstr "พิมพ์ etag ใหม่เมื่อจบการทำงาน"
-
-#. Translators: The "etag" is a token allowing to verify whether a file has been modified
-#: ../programs/gvfs-save.c:50
-msgid "The etag of the file being overwritten"
-msgstr "etag ของแฟ้มที่จะถูกเขียนทับ"
-
-#: ../programs/gvfs-save.c:50
-msgid "ETAG"
-msgstr "ETAG"
-
-#: ../programs/gvfs-save.c:78
 #, c-format
-msgid "Error opening file: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะเปิดแฟ้ม: %s\n"
+#~ msgid "Must specify the mime-type followed by the default handler.\n"
+#~ msgstr "ต้องระบุชนิด MIME ตามด้วยตัวจัดการปริยาย\n"
 
-#: ../programs/gvfs-save.c:111
-msgid "Error reading stdin"
-msgstr "เกิดข้อผิดพลาดขณะอ่าน stdin"
-
-#: ../programs/gvfs-save.c:124
 #, c-format
-msgid "Error closing: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะปิด: %s\n"
+#~ msgid "No default applications for '%s'\n"
+#~ msgstr "ไม่มีโปรแกรมปริยายสำหรับ '%s'\n"
 
-#. Translators: The "etag" is a token allowing to verify whether a file has been modified
-#: ../programs/gvfs-save.c:137
 #, c-format
-msgid "Etag not available\n"
-msgstr "แฟ้มไม่มี etag\n"
+#~ msgid "Default application for '%s': %s\n"
+#~ msgstr "โปรแกรมปริยายสำหรับ '%s': %s\n"
 
-#: ../programs/gvfs-save.c:166
-msgid "Read from standard input and save to DEST."
-msgstr "อ่านข้อมูลจากอินพุตมาตรฐานแล้วบันทึกลง DEST (ปลายทาง)"
-
-#: ../programs/gvfs-set-attribute.c:36
-msgid "Type of the attribute"
-msgstr "ชนิดของแอตทริบิวต์"
-
-#: ../programs/gvfs-set-attribute.c:36
-msgid "TYPE"
-msgstr "TYPE"
-
-#: ../programs/gvfs-set-attribute.c:139
-msgid "ATTRIBUTE"
-msgstr "ATTRIBUTE"
-
-#: ../programs/gvfs-set-attribute.c:139
-msgid "VALUE"
-msgstr "VALUE"
-
-#: ../programs/gvfs-set-attribute.c:140
-msgid "Set a file attribute of LOCATION."
-msgstr "กำหนดแอตทริบิวต์แฟ้มของ LOCATION (ตำแหน่ง)"
-
-#: ../programs/gvfs-set-attribute.c:159
-msgid "Location not specified\n"
-msgstr "ไม่ได้ระบุตำแหน่ง\n"
-
-#: ../programs/gvfs-set-attribute.c:167
-msgid "Attribute not specified\n"
-msgstr "ไม่ได้ระบุแอตทริบิวต์\n"
-
-#: ../programs/gvfs-set-attribute.c:176
-msgid "Value not specified\n"
-msgstr "ไม่ได้ระบุค่า\n"
-
-#: ../programs/gvfs-set-attribute.c:219
 #, c-format
-msgid "Invalid attribute type %s\n"
-msgstr "ชนิดของแอตทริบิวต์ %s ผิดพลาด\n"
+#~ msgid "Registered applications:\n"
+#~ msgstr "โปรแกรมที่ลงทะเบียนไว้:\n"
 
-#: ../programs/gvfs-set-attribute.c:229
 #, c-format
-msgid "Error setting attribute: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะกำหนดแอตทริบิวต์: %s\n"
+#~ msgid "No registered applications\n"
+#~ msgstr "ไม่มีโปรแกรมที่ลงทะเบียนไว้\n"
 
-#: ../programs/gvfs-trash.c:58
-msgid "Move files or directories to the trash."
-msgstr "ย้ายแฟ้มหรือไดเรกทอรีไปลงถังขยะ"
-
-#: ../programs/gvfs-trash.c:89
 #, c-format
-msgid "Error trashing file: %s\n"
-msgstr "เกิดข้อผิดพลาดขณะย้ายแฟ้มไปลงถังขยะ: %s\n"
+#~ msgid "Recommended applications:\n"
+#~ msgstr "โปรแกรมที่แนะนำ:\n"
 
-#: ../programs/gvfs-tree.c:37
-msgid "Follow symbolic links, mounts and shortcuts"
-msgstr "เดินไปตามลิงก์สัญลักษณ์, จุดเมานท์ และจุดลัดต่างๆ"
+#, c-format
+#~ msgid "No recommended applications\n"
+#~ msgstr "ไม่มีโปรแกรมที่แนะนำ\n"
 
-#: ../programs/gvfs-tree.c:249
-msgid "List contents of directories in a tree-like format."
-msgstr "แสดงเนื้อหาของไดเรกทอรีในรูปแบบคล้ายโครงสร้างต้นไม้"
+#, c-format
+#~ msgid "Failed to load info for handler '%s'\n"
+#~ msgstr "โหลดข้อมูลสำหรับตัวจัดการ '%s' ไม่สำเร็จ\n"
+
+#, c-format
+#~ msgid "Failed to set '%s' as the default handler for '%s': %s\n"
+#~ msgstr "กำหนด '%s' เป็นตัวจัดการปริยายสำหรับ '%s' ไม่สำเร็จ: %s\n"
+
+#~ msgid "Create parent directories"
+#~ msgstr "สร้างไดเรกทอรีแม่ด้วย"
+
+#, c-format
+#~ msgid "Error creating directory: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะสร้างไดเรกทอรี: %s\n"
+
+#~ msgid "Don't send single MOVED events"
+#~ msgstr "ไม่ต้องส่งเหตุการณ์ MOVED เดี่ยวๆ"
+
+#~ msgid "Monitor directories for changes."
+#~ msgstr "เฝ้าสังเกตความเปลี่ยนแปลงของไดเรกทอรี"
+
+#~ msgid "Monitor files for changes."
+#~ msgstr "เฝ้าสังเกตความเปลี่ยนแปลงของแฟ้ม"
+
+#~ msgid "Mount as mountable"
+#~ msgstr "เมาทน์ตามที่กำหนดให้เมานท์ได้"
+
+#~ msgid "Mount volume with device file"
+#~ msgstr "เมาทน์โวลุมด้วยแฟ้มอุปกรณ์"
+
+#~ msgid "DEVICE"
+#~ msgstr "DEVICE"
+
+#~ msgid "Unmount"
+#~ msgstr "เลิกเมานท์"
+
+#~ msgid "Eject"
+#~ msgstr "เอาสื่อออก"
+
+#~ msgid "Unmount all mounts with the given scheme"
+#~ msgstr "เลิกเมานท์จุดเมานท์ทั้งหมดที่มี scheme ที่กำหนด"
+
+#~ msgid "SCHEME"
+#~ msgstr "SCHEME"
+
+#~ msgid "List"
+#~ msgstr "แสดงรายชื่อ"
+
+#~ msgid "Monitor events"
+#~ msgstr "เฝ้าสังเกตเหตุการณ์ต่างๆ"
+
+#~ msgid "Show extra information"
+#~ msgstr "แสดงข้อมูลเพิ่มเติม"
+
+#, c-format
+#~ msgid "Error mounting location: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะเมานท์ตำแหน่ง: %s\n"
+
+#, c-format
+#~ msgid "Error unmounting mount: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะเลิกเมานท์จุดเมานท์: %s\n"
+
+#, c-format
+#~ msgid "Error finding enclosing mount: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะหาจุดเมานท์ที่บรรจุ: %s\n"
+
+#, c-format
+#~ msgid "Error ejecting mount: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะเอาสื่อที่จุดเมานท์ออก: %s\n"
+
+#, c-format
+#~ msgid "Error mounting %s: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะเมานท์ %s: %s\n"
+
+#, c-format
+#~ msgid "Mounted %s at %s\n"
+#~ msgstr "เมานท์ %s ที่ %s แล้ว\n"
+
+#, c-format
+#~ msgid "No volume for device file %s\n"
+#~ msgstr "ไม่มีโวลุมสำหรับแฟ้มอุปกรณ์ %s\n"
+
+#~ msgid "Mount the locations."
+#~ msgstr "เมานท์ตำแหน่งที่ตั้ง"
+
+#~ msgid "Move one or more files from SOURCE to DEST."
+#~ msgstr "ย้ายแฟ้มตั้งแต่หนึ่งแฟ้มขึ้นไปจาก SOURCE (ต้นทาง) ไปยัง DEST (ปลายทาง)"
+
+#, c-format
+#~ msgid "Error moving file %s: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะย้ายแฟ้ม %s: %s\n"
+
+#~ msgid ""
+#~ "Open files with the default application that\n"
+#~ "is registered to handle files of this type."
+#~ msgstr ""
+#~ "เปิดแฟ้มด้วยโปรแกรมปริยายที่ลงทะเบียนไว้\n"
+#~ "สำหรับจัดการแฟ้มชนิดนี้"
+
+#, c-format
+#~ msgid "%s: %s: error opening location: %s\n"
+#~ msgstr "%s: %s: เกิดข้อผิดพลาดขณะเปิดตำแหน่ง: %s\n"
+
+#~ msgid "NEW-NAME"
+#~ msgstr "NEW-NAME"
+
+#~ msgid "Rename a file."
+#~ msgstr "เปลี่ยนชื่อแฟ้ม"
+
+#, c-format
+#~ msgid "Rename successful. New uri: %s\n"
+#~ msgstr "เปลี่ยนชื่อสำเร็จแล้ว URI ใหม่: %s\n"
+
+#~ msgid "Ignore nonexistent files, never prompt"
+#~ msgstr "ไม่ต้องสนใจแฟ้มที่ไม่มีอยู่ ไม่ต้องถาม"
+
+#~ msgid "Delete the given files."
+#~ msgstr "ลบแฟ้มที่กำหนด"
+
+#~ msgid "Only create if not existing"
+#~ msgstr "สร้างเมื่อไม่มีอยู่เท่านั้น"
+
+#~ msgid "Append to end of file"
+#~ msgstr "เขียนต่อท้ายแฟ้ม"
+
+#~ msgid "When creating, restrict access to the current user"
+#~ msgstr "เมื่อสร้าง ให้จำกัดการเข้าถึงเฉพาะสำหรับผู้ใช้ปัจจุบันเท่านั้น"
+
+#~ msgid "Print new etag at end"
+#~ msgstr "พิมพ์ etag ใหม่เมื่อจบการทำงาน"
+
+#~ msgid "The etag of the file being overwritten"
+#~ msgstr "etag ของแฟ้มที่จะถูกเขียนทับ"
+
+#~ msgid "ETAG"
+#~ msgstr "ETAG"
+
+#, c-format
+#~ msgid "Error opening file: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะเปิดแฟ้ม: %s\n"
+
+#~ msgid "Error reading stdin"
+#~ msgstr "เกิดข้อผิดพลาดขณะอ่าน stdin"
+
+#, c-format
+#~ msgid "Error closing: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะปิด: %s\n"
+
+#, c-format
+#~ msgid "Etag not available\n"
+#~ msgstr "แฟ้มไม่มี etag\n"
+
+#~ msgid "Read from standard input and save to DEST."
+#~ msgstr "อ่านข้อมูลจากอินพุตมาตรฐานแล้วบันทึกลง DEST (ปลายทาง)"
+
+#~ msgid "Type of the attribute"
+#~ msgstr "ชนิดของแอตทริบิวต์"
+
+#~ msgid "TYPE"
+#~ msgstr "TYPE"
+
+#~ msgid "ATTRIBUTE"
+#~ msgstr "ATTRIBUTE"
+
+#~ msgid "VALUE"
+#~ msgstr "VALUE"
+
+#~ msgid "Set a file attribute of LOCATION."
+#~ msgstr "กำหนดแอตทริบิวต์แฟ้มของ LOCATION (ตำแหน่ง)"
+
+#~ msgid "Location not specified\n"
+#~ msgstr "ไม่ได้ระบุตำแหน่ง\n"
+
+#~ msgid "Attribute not specified\n"
+#~ msgstr "ไม่ได้ระบุแอตทริบิวต์\n"
+
+#~ msgid "Value not specified\n"
+#~ msgstr "ไม่ได้ระบุค่า\n"
+
+#, c-format
+#~ msgid "Error setting attribute: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะกำหนดแอตทริบิวต์: %s\n"
+
+#~ msgid "Move files or directories to the trash."
+#~ msgstr "ย้ายแฟ้มหรือไดเรกทอรีไปลงถังขยะ"
+
+#, c-format
+#~ msgid "Error trashing file: %s\n"
+#~ msgstr "เกิดข้อผิดพลาดขณะย้ายแฟ้มไปลงถังขยะ: %s\n"
+
+#~ msgid "Follow symbolic links, mounts and shortcuts"
+#~ msgstr "เดินไปตามลิงก์สัญลักษณ์, จุดเมานท์ และจุดลัดต่างๆ"
+
+#~ msgid "List contents of directories in a tree-like format."
+#~ msgstr "แสดงเนื้อหาของไดเรกทอรีในรูปแบบคล้ายโครงสร้างต้นไม้"
 
 #~ msgid "Can't contact session bus"
 #~ msgstr "ไม่สามารถติดต่อกับบัสของวาระ"
@@ -2910,12 +3124,6 @@ msgstr "แสดงเนื้อหาของไดเรกทอรีใ
 
 #~ msgid "AFP shares on %s"
 #~ msgstr "แหล่งใช้ร่วมแบบ AFP ที่ %s"
-
-#~ msgid "File is a directory"
-#~ msgstr "แฟ้มเป็นไดเรกทอรี"
-
-#~ msgid "ID not found"
-#~ msgstr "ไม่พบ ID นี้"
 
 #~ msgid "Couldn't create temporary file (%s)"
 #~ msgstr "ไม่สามารถสร้างแฟ้มชั่วคราว (%s)"
@@ -2980,9 +3188,6 @@ msgstr "แสดงเนื้อหาของไดเรกทอรีใ
 #~ msgid "- get/set handler for <mimetype>"
 #~ msgstr "- อ่าน/กำหนดตัวจัดการสำหรับ <mimetype>"
 
-#~ msgid "files"
-#~ msgstr "แฟ้ม"
-
 #~ msgid "%s: %s: error launching application: %s\n"
 #~ msgstr "%s: %s: เกิดข้อผิดพลาดขณะเรียกโปรแกรม: %s\n"
 
@@ -2995,12 +3200,9 @@ msgstr "แสดงเนื้อหาของไดเรกทอรีใ
 #~ msgid "Create backup"
 #~ msgstr "สร้างแฟ้มสำรอง"
 
-#~ msgid ""
-#~ "attribute type [string, bytestring, boolean, uint32, int32, uint64, "
-#~ "int64, stringv, unset]"
+#~ msgid "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, stringv, unset]"
 #~ msgstr ""
-#~ "ชนิดของแอตทริบิวต์ [string, bytestring, boolean, uint32, int32, uint64, "
-#~ "int64, stringv, unset]"
+#~ "ชนิดของแอตทริบิวต์ [string, bytestring, boolean, uint32, int32, uint64, int64, stringv, unset]"
 
 #~ msgid " <location> <attribute> <values> - set attribute"
 #~ msgstr " <location> <attribute> <values> - กำหนดแอตทริบิวต์"
