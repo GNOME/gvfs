@@ -2817,7 +2817,7 @@ do_replace (GVfsBackend *backend,
   handle->handle_type = HANDLE_FILE;
   handle->id = entry->id;
   handle->offset = 0;
-  handle->size = file->filesize;
+  handle->size = 0;
 
   LIBMTP_destroy_file_t (file);
 
