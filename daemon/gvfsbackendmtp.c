@@ -2856,6 +2856,10 @@ do_write (GVfsBackend *backend,
   }
 
   handle->offset = offset + buffer_size;
+  if (handle->offset > handle->size) {
+    handle->size = handle->offset;
+  }
+
   g_vfs_job_write_set_written_size (job, buffer_size);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
