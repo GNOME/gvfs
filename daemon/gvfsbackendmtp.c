@@ -102,6 +102,9 @@ typedef struct {
 
   /* For previews only */
   GByteArray *bytes;
+
+  /* For write only */
+  GVfsJobOpenForWriteMode mode;
 } RWHandle;
 
 typedef struct {
@@ -2675,6 +2678,7 @@ do_create (GVfsBackend *backend,
   handle->id = id;
   handle->offset = 0;
   handle->size = 0;
+  handle->mode = job->mode;
 
   g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
   g_vfs_job_open_for_write_set_can_truncate (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
@@ -2745,6 +2749,7 @@ do_append_to (GVfsBackend *backend,
   handle->id = entry->id;
   handle->offset = file->filesize;
   handle->size = file->filesize;
+  handle->mode = job->mode;
 
   LIBMTP_destroy_file_t (file);
 
@@ -2818,6 +2823,7 @@ do_replace (GVfsBackend *backend,
   handle->id = entry->id;
   handle->offset = 0;
   handle->size = 0;
+  handle->mode = job->mode;
 
   LIBMTP_destroy_file_t (file);
 
@@ -2846,6 +2852,10 @@ do_write (GVfsBackend *backend,
 
   g_debug ("(I) do_write (%X %lu %lu)\n", id, offset, buffer_size);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
+
+  if (handle->mode == OPEN_FOR_WRITE_APPEND) {
+    offset = handle->size;
+  }
 
   int ret = LIBMTP_SendPartialObject (G_VFS_BACKEND_MTP (backend)->device, id, offset,
                                       (unsigned char *)buffer, buffer_size);
