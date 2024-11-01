@@ -34,3 +34,4 @@ option('deprecated_apis', type: 'boolean', value: false, description: 'install d
 option('devel_utils', type: 'boolean', value: false, description: 'build with development utility programs')
 option('installed_tests', type: 'boolean', value: false, description: 'enable installed unit tests')
 option('man', type: 'boolean', value: false, description: 'generate man pages')
+option('unit_tests', type: 'boolean', value: false, description: 'build with unit tests')

@@ -67,3 +67,7 @@ if enable_devel_utils
     )
   endforeach
 endif
+
+if enable_unit_tests
+  subdir('unit')
+endif
