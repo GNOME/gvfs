@@ -480,6 +480,7 @@ config_h.set('HAVE_BURN', enable_burn)
 enable_deprecated_apis = get_option('deprecated_apis')
 enable_devel_utils = get_option('devel_utils')
 enable_installed_tests = get_option('installed_tests')
+enable_unit_tests = get_option('unit_tests')
 
 subdir('common')
 subdir('metadata')
