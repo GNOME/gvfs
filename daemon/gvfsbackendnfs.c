@@ -727,7 +727,10 @@ write_handle_free (WriteHandle *handle)
 }
 
 static void
-append_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
+append_create_cb (int err,
+                  struct nfs_context *ctx,
+                  void *data,
+                  void *private_data)
 {
   GVfsJob *job = G_VFS_JOB (private_data);
   if (err == 0)
@@ -747,6 +750,42 @@ append_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
     }
 }
 
+static void
+append_stat_cb (int err,
+                struct nfs_context *ctx,
+                void *data,
+                void *private_data)
+{
+  GVfsJob *job = G_VFS_JOB (private_data);
+  GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
+  GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (op_job->backend);
+
+  if (err == 0)
+    {
+      struct nfs_stat_64 *st = data;
+
+      if (S_ISDIR (st->nfs_mode))
+        {
+          g_vfs_job_failed_literal (job,
+                                    G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                    _("Target file is a directory"));
+          return;
+        }
+    }
+  else if (err != -ENOENT)
+    {
+      g_vfs_job_failed_from_errno (job, -err);
+      return;
+    }
+
+  nfs_create_async (op_backend->ctx,
+                    op_job->filename,
+                    O_APPEND,
+                    (op_job->flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
+                    append_create_cb,
+                    job);
+}
+
 static gboolean
 try_append_to (GVfsBackend *backend,
                GVfsJobOpenForWrite *job,
@@ -755,11 +794,9 @@ try_append_to (GVfsBackend *backend,
 {
   GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (backend);
 
-  nfs_create_async (op_backend->ctx,
-                    filename,
-                    O_APPEND,
-                    (flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
-                    append_cb, job);
+  /* Check for existing directory because libnfs doesn't fail in this case. */
+  nfs_stat64_async (op_backend->ctx, filename, append_stat_cb, job);
+
   return TRUE;
 }
 
