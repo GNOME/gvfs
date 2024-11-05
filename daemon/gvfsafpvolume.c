@@ -807,6 +807,7 @@ create_file_cb (GObject *object, GAsyncResult *res, gpointer user_data)
                                  _("Target file is open"));
         break;
       case AFP_RESULT_OBJECT_EXISTS:
+      case AFP_RESULT_OBJECT_TYPE_ERR:
         g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_EXISTS,
                                  _("Target file already exists"));
         break;
