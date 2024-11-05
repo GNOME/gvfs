@@ -21,9 +21,12 @@ fedora:
           -Dhttp=true
           -Dgphoto2=true
           -Dcdda=true
+          -Dunit_tests=true
           --prefix /usr --werror build
         - sudo ninja -C build install
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
+        - gio mount localtest:///
+        - ./build/test/unit/write localtest:///tmp/
     allow_failure: true
 
 update-image:
