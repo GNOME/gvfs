@@ -14,9 +14,11 @@ fedora:
           -Ddevel_utils=true
           -Dman=true
           -Dburn=true
+          -Dunit_tests=true
           --prefix /usr --werror build
         - sudo ninja -C build install
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
+        - dbus-run-session -- sh -c "gio mount localtest:/// && build/test/unit/outputstream localtest:///tmp/"
     allow_failure: true
 
 update-image:
