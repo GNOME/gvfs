@@ -118,6 +118,10 @@ handle_changed (GVfsDBusMonitorClient *object,
 
   gvfs_dbus_monitor_client_complete_changed (object, invocation);
 
+  g_object_unref (file1);
+  if (file2)
+    g_object_unref (file2);
+
   return TRUE;
 }
 
