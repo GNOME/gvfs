@@ -912,20 +912,22 @@ do_append_to (GVfsBackend *backend,
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), fixup_open_errno (errno));
   else
     {
-      handle = g_new0 (SmbWriteHandle, 1);
-      handle->file = file;
-
       smbc_lseek = smbc_getFunctionLseek (op_backend->smb_context);
       initial_offset = smbc_lseek (op_backend->smb_context, file,
 						       0, SEEK_CUR);
       if (initial_offset == (off_t) -1)
-	g_vfs_job_open_for_write_set_can_seek (job, FALSE);
-      else
-	{
-	  g_vfs_job_open_for_write_set_initial_offset (job, initial_offset);
-	  g_vfs_job_open_for_write_set_can_seek (job, TRUE);
-	  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
-	}
+        {
+          g_vfs_job_failed_from_errno (G_VFS_JOB (job),
+                                       fixup_open_errno (errno));
+          return;
+        }
+
+      handle = g_new0 (SmbWriteHandle, 1);
+      handle->file = file;
+
+      g_vfs_job_open_for_write_set_initial_offset (job, initial_offset);
+      g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+      g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
       g_vfs_job_open_for_write_set_handle (job, handle);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
