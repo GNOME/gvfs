@@ -732,7 +732,7 @@ gvfs_udisks2_volume_set_mount (GVfsUDisks2Volume *volume,
         gvfs_udisks2_mount_unset_volume (volume->mount, volume);
 
       volume->mount = mount;
-
+      update_volume (volume);
       emit_changed (volume);
     }
 }
@@ -744,6 +744,7 @@ gvfs_udisks2_volume_unset_mount (GVfsUDisks2Volume *volume,
   if (volume->mount == mount)
     {
       volume->mount = NULL;
+      update_volume (volume);
       emit_changed (volume);
     }
 }
