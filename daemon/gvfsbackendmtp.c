@@ -2610,10 +2610,10 @@ zero_get_func (void* params,
 
 
 static void
-do_create (GVfsBackend *backend,
-           GVfsJobOpenForWrite *job,
-           const char *filename,
-           GFileCreateFlags flags)
+open_for_write (GVfsBackend *backend,
+                GVfsJobOpenForWrite *job,
+                const char *filename,
+                GFileCreateFlags flags)
 {
   if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
@@ -2622,7 +2622,7 @@ do_create (GVfsBackend *backend,
     return;
   }
 
-  g_debug ("(I) do_create (%s)\n", filename);
+  g_debug ("(I) open_for_write (%s)\n", filename);
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   char *dir_name = g_path_get_dirname (filename);
@@ -2639,55 +2639,77 @@ do_create (GVfsBackend *backend,
   }
 
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
-  if (entry != NULL) {
+  if (job->mode == OPEN_FOR_WRITE_CREATE &&
+      entry != NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_EXISTS,
                               _("Target file already exists"));
     goto exit;
   }
 
-  CacheEntry *parent = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
-  if (parent == NULL) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("Directory doesn’t exist"));
-    goto exit;
-  }
-
   LIBMTP_mtpdevice_t *device;
   device = G_VFS_BACKEND_MTP (backend)->device;
+  LIBMTP_file_t *file;
 
-  LIBMTP_file_t *mtpfile = LIBMTP_new_file_t ();
-  mtpfile->filename = strdup (basename);
-  mtpfile->parent_id = parent->id;
-  mtpfile->storage_id = parent->storage;
-  mtpfile->filetype = LIBMTP_FILETYPE_UNKNOWN;
-  mtpfile->filesize = 0;
+  if (entry == NULL) {
+    CacheEntry *parent = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
+    if (parent == NULL) {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                _("Directory doesn’t exist"));
+      goto exit;
+    }
 
-  int ret = LIBMTP_Send_File_From_Handler (device, zero_get_func, NULL,
-                                           mtpfile, NULL, NULL);
-  uint32_t id = mtpfile->item_id;
-  LIBMTP_destroy_file_t (mtpfile);
-  if (ret != 0) {
-    fail_job (G_VFS_JOB (job), device);
-    g_debug ("(I) Failed to create empty file.\n");
-    goto exit;
+    file = LIBMTP_new_file_t ();
+    file->filename = strdup (basename);
+    file->parent_id = parent->id;
+    file->storage_id = parent->storage;
+    file->filetype = LIBMTP_FILETYPE_UNKNOWN;
+    file->filesize = 0;
+
+    int ret = LIBMTP_Send_File_From_Handler (device, zero_get_func, NULL,
+                                             file, NULL, NULL);
+    if (ret != 0) {
+      LIBMTP_destroy_file_t (file);
+      fail_job (G_VFS_JOB (job), device);
+      g_debug ("(I) Failed to create empty file.\n");
+      goto exit;
+    }
+  } else {
+    file = LIBMTP_Get_Filemetadata (device, entry->id);
+    if (file == NULL) {
+      fail_job (G_VFS_JOB (job), device);
+      g_debug ("(I) Failed to get metadata.\n");
+      goto exit;
+    }
+
+    if (file->filetype == LIBMTP_FILETYPE_FOLDER) {
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                _("File is a directory"));
+      LIBMTP_destroy_file_t (file);
+      goto exit;
+    }
   }
 
-  ret = LIBMTP_BeginEditObject (device, id);
+  int ret = LIBMTP_BeginEditObject (device, file->item_id);
   if (ret != 0) {
     fail_job (G_VFS_JOB (job), device);
     g_debug ("(I) Failed to begin edit.\n");
+    LIBMTP_destroy_file_t (file);
     goto exit;
   }
 
   RWHandle *handle = g_new0(RWHandle, 1);
   handle->handle_type = HANDLE_FILE;
-  handle->id = id;
-  handle->offset = 0;
-  handle->size = 0;
+  handle->id = file->item_id;
+  handle->offset = (job->mode == OPEN_FOR_WRITE_APPEND) ? file->filesize : 0;
+  handle->size = file->filesize;
   handle->mode = job->mode;
 
+  LIBMTP_destroy_file_t (file);
+
+  g_vfs_job_open_for_write_set_initial_offset (job, handle->offset);
   g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
   g_vfs_job_open_for_write_set_can_truncate (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
@@ -2702,7 +2724,17 @@ do_create (GVfsBackend *backend,
   g_free (dir_name);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  g_debug ("(I) do_create done.\n");
+  g_debug ("(I) open_for_write done.\n");
+}
+
+
+static void
+do_create (GVfsBackend *backend,
+           GVfsJobOpenForWrite *job,
+           const char *filename,
+           GFileCreateFlags flags)
+{
+  open_for_write (backend, job, filename, flags);
 }
 
 
@@ -2712,73 +2744,17 @@ do_append_to (GVfsBackend *backend,
               const char *filename,
               GFileCreateFlags flags)
 {
-  if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                              _("Operation not supported"));
-    return;
-  }
+  open_for_write (backend, job, filename, flags);
+}
 
-  g_debug ("(I) do_append_to (%s)\n", filename);
-  g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
-  CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
-  if (entry == NULL) {
-    g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
-    do_create(backend, job, filename, flags);
-    return;
-  } else if (entry->id == -1) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                              _("Not a regular file"));
-    goto exit;
-  }
-
-  LIBMTP_mtpdevice_t *device;
-  device = G_VFS_BACKEND_MTP (backend)->device;
-
-  LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, entry->id);
-  if (file == NULL) {
-    fail_job (G_VFS_JOB (job), device);
-    g_debug ("(I) Failed to get metadata.\n");
-    goto exit;
-  }
-
-  if (file->filetype == LIBMTP_FILETYPE_FOLDER) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                              _("File is a directory"));
-    LIBMTP_destroy_file_t (file);
-    goto exit;
-  }
-
-  int ret = LIBMTP_BeginEditObject (device, entry->id);
-  if (ret != 0) {
-    fail_job (G_VFS_JOB (job), device);
-    g_debug ("(I) Failed to begin edit.\n");
-    LIBMTP_destroy_file_t (file);
-    goto exit;
-  }
-
-  RWHandle *handle = g_new0(RWHandle, 1);
-  handle->handle_type = HANDLE_FILE;
-  handle->id = entry->id;
-  handle->offset = file->filesize;
-  handle->size = file->filesize;
-  handle->mode = job->mode;
-
-  LIBMTP_destroy_file_t (file);
-
-  g_vfs_job_open_for_write_set_initial_offset (job, handle->offset);
-  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
-  g_vfs_job_open_for_write_set_can_truncate (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
-  g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
-  g_vfs_job_succeeded (G_VFS_JOB (job));
-
- exit:
-  g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
-
-  g_debug ("(I) do_append_to done.\n");
+static void
+do_edit (GVfsBackend *backend,
+         GVfsJobOpenForWrite *job,
+         const char *filename,
+         GFileCreateFlags flags)
+{
+  open_for_write (backend, job, filename, flags);
 }
 
 
@@ -3340,6 +3316,7 @@ g_vfs_backend_mtp_class_init (GVfsBackendMtpClass *klass)
   backend_class->close_read = do_close_read;
   backend_class->create = do_create;
   backend_class->append_to = do_append_to;
+  backend_class->edit = do_edit;
   backend_class->replace = do_replace;
   backend_class->write = do_write;
   backend_class->seek_on_write = do_seek_on_write;
