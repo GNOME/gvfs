@@ -926,7 +926,12 @@ do_append_to (GVfsBackend *backend,
       handle->file = file;
 
       g_vfs_job_open_for_write_set_initial_offset (job, initial_offset);
-      g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+
+      /* The O_APPEND flag is not properly supported by the libsmbclient library
+       * when seeking. See:
+       * https://github.com/samba-team/samba/blob/e4e3f05/source3/libsmb/libsmb_file.c#L162-L183
+       */
+      g_vfs_job_open_for_write_set_can_seek (job, FALSE);
       g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
       g_vfs_job_open_for_write_set_handle (job, handle);
       g_vfs_job_succeeded (G_VFS_JOB (job));
