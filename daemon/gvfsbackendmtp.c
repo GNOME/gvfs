@@ -2744,6 +2744,14 @@ do_append_to (GVfsBackend *backend,
     goto exit;
   }
 
+  if (file->filetype == LIBMTP_FILETYPE_FOLDER) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                              _("File is a directory"));
+    LIBMTP_destroy_file_t (file);
+    goto exit;
+  }
+
   int ret = LIBMTP_BeginEditObject (device, entry->id);
   if (ret != 0) {
     fail_job (G_VFS_JOB (job), device);
@@ -2808,6 +2816,14 @@ do_replace (GVfsBackend *backend,
   if (file == NULL) {
     fail_job (G_VFS_JOB (job), device);
     g_debug ("(I) Failed to get metadata.\n");
+    goto exit;
+  }
+
+  if (file->filetype == LIBMTP_FILETYPE_FOLDER) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                              _("File is a directory"));
+    LIBMTP_destroy_file_t (file);
     goto exit;
   }
 
