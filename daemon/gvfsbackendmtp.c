@@ -2837,6 +2837,31 @@ do_replace (GVfsBackend *backend,
   g_debug ("(I) do_replace done.\n");
 }
 
+#define PAD_BLOCK_SIZE 1024
+
+static int
+pad_file (GVfsBackend *backend,
+          uint32_t id,
+          goffset offset,
+          gsize size)
+{
+  unsigned char zero_buffer[PAD_BLOCK_SIZE] = { 0 };
+  gsize written;
+  int ret;
+
+  for (written = 0; written < size; written += PAD_BLOCK_SIZE)
+    {
+      ret = LIBMTP_SendPartialObject (G_VFS_BACKEND_MTP (backend)->device,
+                                      id,
+                                      offset + written,
+                                      zero_buffer,
+                                      MIN (size - written, PAD_BLOCK_SIZE));
+      if (ret != 0)
+        break;
+    }
+
+  return ret;
+}
 
 static void
 do_write (GVfsBackend *backend,
@@ -2854,6 +2879,15 @@ do_write (GVfsBackend *backend,
 
   if (handle->mode == OPEN_FOR_WRITE_APPEND) {
     offset = handle->size;
+  }
+
+  if (offset > handle->size) {
+    int ret = pad_file (backend, id, handle->size, offset - handle->size);
+    if (ret != 0) {
+      fail_job (G_VFS_JOB (job), G_VFS_BACKEND_MTP (backend)->device);
+      g_debug ("(I) job failed.\n");
+      goto exit;
+    }
   }
 
   int ret = LIBMTP_SendPartialObject (G_VFS_BACKEND_MTP (backend)->device, id, offset,
