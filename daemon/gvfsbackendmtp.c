@@ -2769,6 +2769,7 @@ do_append_to (GVfsBackend *backend,
 
   LIBMTP_destroy_file_t (file);
 
+  g_vfs_job_open_for_write_set_initial_offset (job, handle->offset);
   g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
   g_vfs_job_open_for_write_set_can_truncate (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
