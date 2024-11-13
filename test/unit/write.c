@@ -925,6 +925,9 @@ main (int argc, char *argv[])
   g_test_add_data_func ("/write/append-seek",
                         test_dir,
                         test_append_seek);
+  g_test_add_data_func ("/write/append-tell",
+                        test_dir,
+                        test_append_tell);
   g_test_add_data_func ("/write/append-truncate",
                         test_dir,
                         test_append_truncate);
