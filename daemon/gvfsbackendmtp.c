@@ -2756,6 +2756,7 @@ do_append_to (GVfsBackend *backend,
   if (ret != 0) {
     fail_job (G_VFS_JOB (job), device);
     g_debug ("(I) Failed to begin edit.\n");
+    LIBMTP_destroy_file_t (file);
     goto exit;
   }
 
