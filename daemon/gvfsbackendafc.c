@@ -1169,7 +1169,7 @@ g_vfs_backend_afc_create (GVfsBackend *backend,
   return;
 }
 
-/* Callback to open a possibly-existing file for writing. */
+/* Callback to open a possibly-existing file for appending. */
 static void
 g_vfs_backend_afc_append_to (GVfsBackend *backend,
                              GVfsJobOpenForWrite *job,
@@ -1215,7 +1215,8 @@ g_vfs_backend_afc_append_to (GVfsBackend *backend,
     }
 
   if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_open (afc_cli,
-                                                         new_path ? new_path : path, AFC_FOPEN_RW, &fd),
+                                                         new_path ? new_path : path,
+                                                         AFC_FOPEN_APPEND, &fd),
                                           G_VFS_JOB(job))))
     {
       g_free (new_path);
@@ -1224,15 +1225,6 @@ g_vfs_backend_afc_append_to (GVfsBackend *backend,
     }
 
   g_free (new_path);
-
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_seek (afc_cli,
-                                                         fd, 0, SEEK_END),
-                                          G_VFS_JOB(job))))
-    {
-      afc_file_close (afc_cli, fd);
-      g_free (app);
-      return;
-    }
 
   if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_tell (afc_cli,
                                                          fd, &off),
