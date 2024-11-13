@@ -835,6 +835,7 @@ typedef struct {
   char *uri;
   char *tmp_uri;
   char *backup_uri;
+  GVfsJobOpenForWriteMode mode;
 } SmbWriteHandle;
 
 static void
@@ -879,6 +880,7 @@ do_create (GVfsBackend *backend,
     {
       handle = g_new0 (SmbWriteHandle, 1);
       handle->file = file;
+      handle->mode = job->mode;
 
       g_vfs_job_open_for_write_set_can_seek (job, TRUE);
       g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
@@ -924,6 +926,7 @@ do_append_to (GVfsBackend *backend,
 
       handle = g_new0 (SmbWriteHandle, 1);
       handle->file = file;
+      handle->mode = job->mode;
 
       g_vfs_job_open_for_write_set_initial_offset (job, initial_offset);
 
@@ -1196,6 +1199,7 @@ do_replace (GVfsBackend *backend,
   handle->uri = uri;
   handle->tmp_uri = tmp_uri;
   handle->backup_uri = backup_uri;
+  handle->mode = job->mode;
   
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
   g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
@@ -1284,9 +1288,26 @@ do_truncate (GVfsBackend *backend,
 
   smbc_ftruncate = smbc_getFunctionFtruncate (op_backend->smb_context);
   if (smbc_ftruncate (op_backend->smb_context, handle->file, size) == -1)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
-  else
-    g_vfs_job_succeeded (G_VFS_JOB (job));
+    {
+      g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
+      return;
+    }
+
+  if (handle->mode == OPEN_FOR_WRITE_APPEND)
+    {
+      smbc_lseek_fn smbc_lseek;
+      off_t res;
+
+      smbc_lseek = smbc_getFunctionLseek (op_backend->smb_context);
+      res = smbc_lseek (op_backend->smb_context, handle->file, size, SEEK_SET);
+      if (res == (off_t)-1)
+        {
+          g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
+          return;
+        }
+    }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static void
