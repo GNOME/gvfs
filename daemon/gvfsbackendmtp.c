@@ -2716,10 +2716,9 @@ do_append_to (GVfsBackend *backend,
 
   CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
   if (entry == NULL) {
-    g_vfs_job_failed_literal (G_VFS_JOB (job),
-                              G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                              _("File doesn’t exist"));
-    goto exit;
+    g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
+    do_create(backend, job, filename, flags);
+    return;
   } else if (entry->id == -1) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
