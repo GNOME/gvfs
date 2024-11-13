@@ -2638,8 +2638,16 @@ do_create (GVfsBackend *backend,
     goto exit;
   }
 
-  CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
-  if (!entry) {
+  CacheEntry *entry = get_cache_entry (G_VFS_BACKEND_MTP (backend), filename);
+  if (entry != NULL) {
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_EXISTS,
+                              _("Target file already exists"));
+    goto exit;
+  }
+
+  CacheEntry *parent = get_cache_entry (G_VFS_BACKEND_MTP (backend), dir_name);
+  if (parent == NULL) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
                               _("Directory doesn’t exist"));
@@ -2651,8 +2659,8 @@ do_create (GVfsBackend *backend,
 
   LIBMTP_file_t *mtpfile = LIBMTP_new_file_t ();
   mtpfile->filename = strdup (basename);
-  mtpfile->parent_id = entry->id;
-  mtpfile->storage_id = entry->storage;
+  mtpfile->parent_id = parent->id;
+  mtpfile->storage_id = parent->storage;
   mtpfile->filetype = LIBMTP_FILETYPE_UNKNOWN;
   mtpfile->filesize = 0;
 
