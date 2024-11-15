@@ -108,20 +108,10 @@ copy_file_info_into (GFileInfo *src, GFileInfo *dest)
   g_strfreev (attrs);
 }
 
-typedef enum
-{
-  AFP_HANDLE_TYPE_READ_FILE,
-  AFP_HANDLE_TYPE_CREATE_FILE,
-  AFP_HANDLE_TYPE_REPLACE_FILE_TEMP,
-  AFP_HANDLE_TYPE_REPLACE_FILE_DIRECT,
-  AFP_HANDLE_TYPE_APPEND_TO_FILE
-} AfpHandleType;
-
 typedef struct
 {
   GVfsBackendAfp *backend;
-  
-  AfpHandleType type;
+
   gint16 fork_refnum;
   gint64 offset;
 
@@ -129,7 +119,7 @@ typedef struct
   gint64 size;
   GVfsJobOpenForWriteMode mode;
 
-  /* Used if type == AFP_HANDLE_TYPE_REPLACE_FILE_TEMP */
+  /* For replace only */
   char *filename;
   char *tmp_filename;
   gboolean make_backup;
@@ -1038,7 +1028,7 @@ try_close_write (GVfsBackend *backend,
   GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
   AfpHandle *afp_handle = (AfpHandle *)handle;
   
-  if (afp_handle->type == AFP_HANDLE_TYPE_REPLACE_FILE_TEMP)
+  if (afp_handle->tmp_filename != NULL)
   {
     g_vfs_afp_volume_exchange_files (afp_backend->volume, afp_handle->filename,
                                      afp_handle->tmp_filename, 
@@ -1089,7 +1079,6 @@ create_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_da
   }
 
   afp_handle = afp_handle_new (afp_backend, fork_refnum);
-  afp_handle->type = AFP_HANDLE_TYPE_CREATE_FILE;
   afp_handle->mode = job->mode;
   
   g_vfs_job_open_for_write_set_handle (job, (GVfsBackendHandle) afp_handle);
@@ -1190,14 +1179,12 @@ replace_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
   /* Replace using temporary file */
   if (tmp_filename)
   {
-    afp_handle->type = AFP_HANDLE_TYPE_REPLACE_FILE_TEMP;
     afp_handle->filename = g_strdup (job->filename);
     afp_handle->tmp_filename = g_strdup (tmp_filename);
     afp_handle->make_backup = job->make_backup;
   }
   else
   {
-    afp_handle->type = AFP_HANDLE_TYPE_REPLACE_FILE_DIRECT;
     g_vfs_afp_volume_set_fork_size (volume,
                                     fork_refnum,
                                     0,
@@ -1414,7 +1401,6 @@ append_to_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user
   }
 
   afp_handle = afp_handle_new (afp_backend, fork_refnum);
-  afp_handle->type = AFP_HANDLE_TYPE_APPEND_TO_FILE;
   afp_handle->mode = job->mode;
   g_vfs_job_open_for_write_set_handle (job, (GVfsBackendHandle) afp_handle);
   
@@ -1457,7 +1443,6 @@ read_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
   }
 
   afp_handle = afp_handle_new (afp_backend, fork_refnum);
-  afp_handle->type = AFP_HANDLE_TYPE_READ_FILE;
   
   g_vfs_job_open_for_read_set_handle (job, (GVfsBackendHandle) afp_handle);
   g_vfs_job_open_for_read_set_can_seek (job, TRUE);
