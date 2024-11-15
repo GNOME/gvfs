@@ -1072,31 +1072,6 @@ close_write_get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpoint
 
   close_fork (volume, G_VFS_JOB (job), afp_handle);
 }
-  
-static void
-close_replace_set_fork_size_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
-{
-  GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
-  GVfsJobCloseWrite *job = G_VFS_JOB_CLOSE_WRITE (user_data);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
-  AfpHandle *afp_handle = (AfpHandle *)job->handle;
-
-  GError *err = NULL;
-
-  if (!g_vfs_afp_volume_set_fork_size_finish (volume, res, &err))
-  {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
-    g_error_free (err);
-    afp_handle_free (afp_handle);
-    return;
-  }
-
-  /* Get ETAG */
-  g_vfs_afp_volume_get_fork_parms (afp_backend->volume, afp_handle->fork_refnum,
-                                   AFP_FILE_BITMAP_MOD_DATE_BIT,
-                                   G_VFS_JOB (job)->cancellable,
-                                   close_write_get_fork_parms_cb, job);
-}
 
 static gboolean
 try_close_write (GVfsBackend *backend,
@@ -1112,12 +1087,6 @@ try_close_write (GVfsBackend *backend,
                                      afp_handle->tmp_filename, 
                                      G_VFS_JOB (job)->cancellable,
                                      close_replace_exchange_files_cb, job);
-  }
-  else if (afp_handle->type == AFP_HANDLE_TYPE_REPLACE_FILE_DIRECT)
-  {
-    g_vfs_afp_volume_set_fork_size (afp_backend->volume, afp_handle->fork_refnum,
-                                    afp_handle->size, G_VFS_JOB (job)->cancellable,
-                                    close_replace_set_fork_size_cb, job);
   }
   else
   {
@@ -1208,6 +1177,32 @@ try_create (GVfsBackend *backend,
 }
 
 static void
+replace_set_fork_size_cb (GObject *source_object,
+                          GAsyncResult *res,
+                          gpointer user_data)
+{
+  GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
+  GVfsJobTruncate *job = G_VFS_JOB_TRUNCATE (user_data);
+  AfpHandle *afp_handle = (AfpHandle *)job->handle;
+  GError *err = NULL;
+
+  if (!g_vfs_afp_volume_set_fork_size_finish (volume, res, &err))
+  {
+    g_vfs_afp_volume_close_fork (volume,
+                                 afp_handle->fork_refnum,
+                                 G_VFS_JOB (job)->cancellable,
+                                 NULL,
+                                 NULL);
+    afp_handle_free (afp_handle);
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    return;
+  }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
 replace_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
@@ -1228,6 +1223,12 @@ replace_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
 
   afp_handle = afp_handle_new (afp_backend, fork_refnum);
   afp_handle->mode = job->mode;
+
+  g_vfs_job_open_for_write_set_handle (job, (GVfsBackendHandle) afp_handle);
+  g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
+  g_vfs_job_open_for_write_set_initial_offset (job, 0);
+
   tmp_filename = g_object_get_data (G_OBJECT (job), "TempFilename");
   /* Replace using temporary file */
   if (tmp_filename)
@@ -1238,12 +1239,16 @@ replace_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
     afp_handle->make_backup = job->make_backup;
   }
   else
+  {
     afp_handle->type = AFP_HANDLE_TYPE_REPLACE_FILE_DIRECT;
-    
-  g_vfs_job_open_for_write_set_handle (job, (GVfsBackendHandle) afp_handle);
-  g_vfs_job_open_for_write_set_can_seek (job, TRUE);
-  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
-  g_vfs_job_open_for_write_set_initial_offset (job, 0);
+    g_vfs_afp_volume_set_fork_size (volume,
+                                    fork_refnum,
+                                    0,
+                                    G_VFS_JOB (job)->cancellable,
+                                    replace_set_fork_size_cb,
+                                    job);
+    return;
+  }
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
