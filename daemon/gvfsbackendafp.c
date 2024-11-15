@@ -1061,7 +1061,40 @@ try_close_read (GVfsBackend *backend,
 }
 
 static void
-create_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+open_for_write_get_fork_parms_cb (GObject *source_object,
+                                  GAsyncResult *res,
+                                  gpointer user_data)
+{
+  GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
+  GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
+  AfpHandle *afp_handle = (AfpHandle *)job->backend_handle;
+  GFileInfo *info;
+  GError *err = NULL;
+  goffset size;
+
+  info = g_vfs_afp_volume_get_fork_parms_finish (volume, res, &err);
+  if (!info)
+  {
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
+    g_error_free (err);
+    afp_handle_free (afp_handle);
+    return;
+  }
+
+  size = g_file_info_get_size (info);
+  g_object_unref (info);
+
+  afp_handle->offset = size;
+  afp_handle->size = size;
+  g_vfs_job_open_for_write_set_initial_offset (job, size);
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
+open_for_write_open_fork_cb (GObject *source_object,
+                             GAsyncResult *res,
+                             gpointer user_data)
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
   GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
@@ -1084,28 +1117,63 @@ create_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_da
   g_vfs_job_open_for_write_set_handle (job, (GVfsBackendHandle) afp_handle);
   g_vfs_job_open_for_write_set_can_seek (job, TRUE);
   g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
-  g_vfs_job_open_for_write_set_initial_offset (job, 0);
+
+  if (job->mode == OPEN_FOR_WRITE_APPEND)
+    {
+      g_vfs_afp_volume_get_fork_parms (afp_backend->volume,
+                                       afp_handle->fork_refnum,
+                                       AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT,
+                                       G_VFS_JOB (job)->cancellable,
+                                       open_for_write_get_fork_parms_cb,
+                                       job);
+      return ;
+    }
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static void
-create_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+open_for_write_create_file_cb (GObject *source_object,
+                               GAsyncResult *res,
+                               gpointer user_data)
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
   GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
 
   GError *err = NULL;
 
-  if (!g_vfs_afp_volume_create_file_finish (volume, res, &err))
+  if (!g_vfs_afp_volume_create_file_finish (volume, res, &err) &&
+      (job->mode == OPEN_FOR_WRITE_CREATE ||
+       !g_error_matches (err, G_IO_ERROR, G_IO_ERROR_EXISTS)))
   {
     g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
     g_error_free (err);
     return;
   }
 
-  g_vfs_afp_volume_open_fork (volume, job->filename, AFP_ACCESS_MODE_WRITE_BIT, 0,
-                              G_VFS_JOB (job)->cancellable, create_open_fork_cb, job);
+  g_clear_error (&err);
+  g_vfs_afp_volume_open_fork (volume,
+                              job->filename,
+                              AFP_ACCESS_MODE_WRITE_BIT,
+                              0,
+                              G_VFS_JOB (job)->cancellable,
+                              open_for_write_open_fork_cb,
+                              job);
+}
+
+static void
+open_for_write (GVfsBackend *backend,
+                GVfsJobOpenForWrite *job,
+                const char *filename)
+{
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+
+  g_vfs_afp_volume_create_file (afp_backend->volume,
+                                filename,
+                                FALSE,
+                                G_VFS_JOB (job)->cancellable,
+                                open_for_write_create_file_cb,
+                                job);
 }
 
 static gboolean
@@ -1114,10 +1182,7 @@ try_create (GVfsBackend *backend,
             const char *filename,
             GFileCreateFlags flags)
 {
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
-
-  g_vfs_afp_volume_create_file (afp_backend->volume, filename, FALSE,
-                                G_VFS_JOB (job)->cancellable, create_cb, job);
+  open_for_write (backend, job, filename);
 
   return TRUE;
 }
@@ -1344,83 +1409,25 @@ try_replace (GVfsBackend *backend,
   return TRUE;
 }
 
-static void
-append_to_get_fork_parms_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
-{
-  GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
-  GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
-  AfpHandle *afp_handle = (AfpHandle *)job->backend_handle;
-
-  GFileInfo *info;
-  GError *err = NULL;
-  goffset size;
-
-  info = g_vfs_afp_volume_get_fork_parms_finish (volume, res, &err);
-  if (!info)
-  {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), err); 
-    g_error_free (err);
-    afp_handle_free (afp_handle);
-    return;
-  }
-
-  size = g_file_info_get_size (info);
-  g_object_unref (info);
-
-  afp_handle->offset = size;
-  afp_handle->size = size;
-  g_vfs_job_open_for_write_set_initial_offset (job, size);
-  g_vfs_job_open_for_write_set_can_seek (job, TRUE);
-  g_vfs_job_open_for_write_set_can_truncate (job, TRUE);
-
-  g_vfs_job_succeeded (G_VFS_JOB (job));
-}
-
-static void
-append_to_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
-{
-  GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
-  GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
-
-  gint16 fork_refnum;
-  GError *err = NULL;
-  AfpHandle *afp_handle;
-
-  if (!g_vfs_afp_volume_open_fork_finish (volume, res, &fork_refnum, NULL, &err))
-  {
-    /* Create file if it doesn't exist */
-    if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
-      try_create (G_VFS_BACKEND (afp_backend), job, job->filename, job->flags);
-    
-    else
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
-    
-    g_error_free (err);
-    return;
-  }
-
-  afp_handle = afp_handle_new (afp_backend, fork_refnum);
-  afp_handle->mode = job->mode;
-  g_vfs_job_open_for_write_set_handle (job, (GVfsBackendHandle) afp_handle);
-  
-  g_vfs_afp_volume_get_fork_parms (afp_backend->volume, afp_handle->fork_refnum,
-                                   AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT,
-                                   G_VFS_JOB (job)->cancellable,
-                                   append_to_get_fork_parms_cb, job);
-}
-
 static gboolean
 try_append_to (GVfsBackend *backend,
                GVfsJobOpenForWrite *job,
                const char *filename,
                GFileCreateFlags flags)
 {
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
+  open_for_write (backend, job, filename);
 
-  g_vfs_afp_volume_open_fork (afp_backend->volume, job->filename,
-                              AFP_ACCESS_MODE_WRITE_BIT, 0,
-                              G_VFS_JOB (job)->cancellable, append_to_open_fork_cb, job);
+  return TRUE;
+}
+
+static gboolean
+try_edit (GVfsBackend *backend,
+          GVfsJobOpenForWrite *job,
+          const char *filename,
+          GFileCreateFlags flags)
+{
+  open_for_write (backend, job, filename);
+
   return TRUE;
 }
 
@@ -2171,6 +2178,7 @@ g_vfs_backend_afp_class_init (GVfsBackendAfpClass *klass)
   backend_class->try_read = try_read;
   backend_class->try_seek_on_read = try_seek_on_read;
   backend_class->try_append_to = try_append_to;
+  backend_class->try_edit = try_edit;
   backend_class->try_create = try_create;
   backend_class->try_replace = try_replace;
   backend_class->try_write = try_write;
