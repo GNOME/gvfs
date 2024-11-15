@@ -25,8 +25,8 @@ fedora:
           --prefix /usr --werror build
         - sudo ninja -C build install
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
-        - gio mount localtest:///
-        - ./build/test/unit/write localtest:///tmp/
+        - sudo dnf install dbus-daemon
+        - dbus-run-session -- sh -c "gio mount localtest:/// && build/test/unit/write localtest:///tmp/"
     allow_failure: true
 
 update-image:
