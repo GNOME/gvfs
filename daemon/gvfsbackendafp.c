@@ -719,37 +719,6 @@ try_write (GVfsBackend *backend,
   return TRUE;
 }
 
-static void
-seek_on_write_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
-{
-  GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
-  GVfsJobSeekWrite *job = G_VFS_JOB_SEEK_WRITE (user_data);
-  AfpHandle *afp_handle = (AfpHandle *)job->handle;
-
-  GError *err = NULL;
-  GFileInfo *info;
-  gsize size;
-
-  info = g_vfs_afp_volume_get_fork_parms_finish (volume, res, &err);
-  if (!info)
-  {
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), err);
-    g_error_free (err);
-    return;
-  }
-  
-  size = g_file_info_get_size (info);
-  g_object_unref (info);
-
-  afp_handle->offset = size + job->requested_offset;
-
-  if (afp_handle->offset < 0)
-    afp_handle->offset = 0;
-
-  g_vfs_job_seek_write_set_offset (job, afp_handle->offset);
-  g_vfs_job_succeeded (G_VFS_JOB (job));
-}
-
 static gboolean
 try_seek_on_write (GVfsBackend *backend,
                    GVfsJobSeekWrite *job,
@@ -757,39 +726,27 @@ try_seek_on_write (GVfsBackend *backend,
                    goffset    offset,
                    GSeekType  type)
 {
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (backend);
   AfpHandle *afp_handle = (AfpHandle *)handle;
 
-  if (afp_handle->type == AFP_HANDLE_TYPE_REPLACE_FILE_DIRECT ||
-      job->seek_type != G_SEEK_END)
+  switch (job->seek_type)
   {
-    switch (job->seek_type)
-    {
-      case G_SEEK_CUR:
-        afp_handle->offset += job->requested_offset;
-        break;
-      case G_SEEK_SET:
-        afp_handle->offset = job->requested_offset;
-        break;
-      case G_SEEK_END:
-        afp_handle->offset = afp_handle->size + job->requested_offset;
-        break;
-    }
-
-    if (afp_handle->offset < 0)
-      afp_handle->offset = 0;
-
-    g_vfs_job_seek_write_set_offset (job, afp_handle->offset);
-    g_vfs_job_succeeded (G_VFS_JOB (job));
+    case G_SEEK_CUR:
+      afp_handle->offset += job->requested_offset;
+      break;
+    case G_SEEK_SET:
+      afp_handle->offset = job->requested_offset;
+      break;
+    case G_SEEK_END:
+      afp_handle->offset = afp_handle->size + job->requested_offset;
+      break;
   }
-  
-  else
-  {
-    g_vfs_afp_volume_get_fork_parms (afp_backend->volume, afp_handle->fork_refnum,
-                                     AFP_FILE_BITMAP_EXT_DATA_FORK_LEN_BIT,
-                                     G_VFS_JOB (job)->cancellable, seek_on_write_cb, job);
-  }
-    
+
+  if (afp_handle->offset < 0)
+    afp_handle->offset = 0;
+
+  g_vfs_job_seek_write_set_offset (job, afp_handle->offset);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
   return TRUE;
 }
 
