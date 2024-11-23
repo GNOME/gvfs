@@ -3023,7 +3023,8 @@ do_move (GVfsBackend *backend,
   g_mutex_lock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   char *dir_name = g_path_get_dirname (destination);
-  char *filename = g_path_get_basename (destination);
+  char *src_name = g_path_get_basename (source);
+  char *dest_name = g_path_get_basename (destination);
 
   gchar **elements = g_strsplit_set (destination, "/", -1);
   unsigned int ne = g_strv_length (elements);
@@ -3112,15 +3113,38 @@ do_move (GVfsBackend *backend,
                         destination);
   }
 
-  /* Unlike most calls, we must pass 0 for the root directory.*/
-  uint32_t parent_id = (parent->id == -1 ? 0 : parent->id);
-  int ret = LIBMTP_Move_Object (device,
-                                src_entry->id,
-                                parent->storage,
-                                parent_id);
-  if (ret != 0) {
-    fail_job (G_VFS_JOB (job), device);
-    goto exit;
+  // If file names are different, rename it first
+  if (g_strcmp0 (src_name, dest_name) != 0) {
+    g_debug ("(I) do_move: File names different, attempting rename from '%s' to '%s'\n", 
+             src_name, dest_name);
+    LIBMTP_file_t *file = LIBMTP_Get_Filemetadata (device, src_entry->id);
+    if (file != NULL) {
+      int ret = LIBMTP_Set_File_Name (device, file, dest_name);
+      LIBMTP_destroy_file_t (file);
+      
+      if (ret != 0) {
+        fail_job (G_VFS_JOB (job), device);
+        goto exit;
+      }
+    }
+  }
+  
+  // Determine whether it is a move within the same directory
+  char *src_dir = g_path_get_dirname (source);
+  gboolean same_dir = (g_strcmp0 (src_dir, dir_name) == 0);
+  g_free (src_dir);
+
+  if (!same_dir) {
+    /* Unlike most calls, we must pass 0 for the root directory.*/
+    uint32_t parent_id = (parent->id == -1 ? 0 : parent->id);
+    int ret = LIBMTP_Move_Object (device,
+                                  src_entry->id,
+                                  parent->storage,
+                                  parent_id);
+    if (ret != 0) {
+      fail_job (G_VFS_JOB (job), device);
+      goto exit;
+    }
   }
 
   if (progress_callback) {
@@ -3139,7 +3163,8 @@ do_move (GVfsBackend *backend,
  exit:
   g_strfreev (elements);
   g_free (dir_name);
-  g_free (filename);
+  g_free (src_name);
+  g_free (dest_name);
   g_mutex_unlock (&G_VFS_BACKEND_MTP (backend)->mutex);
 
   g_debug ("(I) do_move done.\n");
