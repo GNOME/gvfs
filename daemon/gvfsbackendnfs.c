@@ -759,11 +759,10 @@ append_stat_cb (int err,
   GVfsJob *job = G_VFS_JOB (private_data);
   GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
   GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (op_job->backend);
+  struct nfs_stat_64 *st = data;
 
   if (err == 0)
     {
-      struct nfs_stat_64 *st = data;
-
       if (S_ISDIR (st->nfs_mode))
         {
           g_vfs_job_failed_literal (job,
@@ -778,6 +777,7 @@ append_stat_cb (int err,
       return;
     }
 
+  g_vfs_job_open_for_write_set_initial_offset (op_job, st->nfs_size);
   nfs_create_async (op_backend->ctx,
                     op_job->filename,
                     O_APPEND,
