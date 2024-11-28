@@ -305,6 +305,7 @@ do_enumerate (GVfsBackend *backend,
 	  while ((info = g_file_enumerator_next_file (enumerator, G_VFS_JOB (job)->cancellable, &error)) != NULL) {
     	  g_print ("  (II) try_enumerate (filename = %s): file '%s' \n", filename, g_file_info_get_attribute_string(info, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME));
     	  g_vfs_job_enumerate_add_info (job, info);
+    	  g_object_unref (info);
       }
 	  if (error) {
 		  g_print ("  (EE) try_enumerate: error: %s \n", error->message);
