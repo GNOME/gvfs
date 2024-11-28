@@ -1482,12 +1482,6 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
   gint   result = 0;
 
   g_debug ("vfs_write: %s\n", path);
-  g_debug ("vfs_write: flags=%o (%s%s%s%s)\n",
-           fi->flags,
-           fi->flags & O_WRONLY ? "O_WRONLY " : "O_RDONLY ",
-           fi->flags & O_RDWR   ? "O_RDWR "   : "",
-           fi->flags & O_APPEND ? "O_APPEND " : "",
-           fi->flags & O_TRUNC  ? "O_TRUNC "  : "");
 
   if ((file = file_from_full_path (path)))
     {
