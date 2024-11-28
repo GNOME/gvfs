@@ -1072,9 +1072,10 @@ open_common (const gchar *path, struct fuse_file_info *fi, GFile *file, int outp
 
   SET_FILE_HANDLE (fi, fh);
 
-  g_debug ("open_common: flags=%o (%s%s%s%s)\n",
+  g_debug ("open_common: flags=%o (%s%s%s%s%s)\n",
            fi->flags,
-           fi->flags & O_WRONLY ? "O_WRONLY " : "O_RDONLY ",
+           fi->flags & O_RDONLY ? "O_RDONLY " : "",
+           fi->flags & O_WRONLY ? "O_WRONLY " : "",
            fi->flags & O_RDWR   ? "O_RDWR "   : "",
            fi->flags & O_APPEND ? "O_APPEND " : "",
            fi->flags & O_TRUNC  ? "O_TRUNC "  : "");
