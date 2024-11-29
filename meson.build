@@ -238,8 +238,6 @@ glib_dep = dependency('glib-2.0', version: '>= 2.83.0')
 gobject_dep = dependency('gobject-2.0')
 gsettings_desktop_schemas_dep = dependency('gsettings-desktop-schemas', version: '>= 3.33.0')
 
-config_h.set('HAVE_G_UNIX_MOUNT_GET_ROOT_PATH', cc.has_function('g_unix_mount_get_root_path', dependencies: gio_dep))
-
 # *** Check for libXML ***
 libxml_dep = dependency('libxml-2.0', required: false)
 have_libxml = libxml_dep.found()
