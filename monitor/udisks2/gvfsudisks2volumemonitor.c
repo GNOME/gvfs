@@ -738,17 +738,19 @@ should_include_mount (GVfsUDisks2VolumeMonitor  *monitor,
   GUnixMountPoint *mount_point;
   const gchar *options;
   gboolean ret = FALSE;
+  const gchar *mount_path;
 
-  if (g_strcmp0 (g_unix_mount_get_fs_type (mount_entry), "autofs") == 0)
+  if (g_strcmp0 (g_unix_mount_entry_get_fs_type (mount_entry), "autofs") == 0)
     {
       goto out;
     }
 
   /* If mounted at the designated mount point, use g_unix_mount_point_get_options
-   * in prior to g_unix_mount_get_options to keep support of "comment=" options,
-   * see https://gitlab.gnome.org/GNOME/gvfs/issues/348.
+   * in prior to g_unix_mount_entry_get_options to keep support of "comment="
+   * options, see https://gitlab.gnome.org/GNOME/gvfs/issues/348.
    */
-  mount_point = g_unix_mount_point_at (g_unix_mount_get_mount_path (mount_entry), NULL);
+  mount_path = g_unix_mount_entry_get_mount_path (mount_entry);
+  mount_point = g_unix_mount_point_at (mount_path, NULL);
   if (mount_point != NULL)
     {
       ret = should_include_mount_point (monitor, mount_point);
@@ -756,18 +758,17 @@ should_include_mount (GVfsUDisks2VolumeMonitor  *monitor,
       goto out;
     }
 
-  /* g_unix_mount_get_options works only with libmount,
+  /* g_unix_mount_entry_get_options works only with libmount,
    * see https://bugzilla.gnome.org/show_bug.cgi?id=668132
    */
-  options = g_unix_mount_get_options (mount_entry);
+  options = g_unix_mount_entry_get_options (mount_entry);
   if (options != NULL)
     {
-      ret = should_include (g_unix_mount_get_mount_path (mount_entry),
-                            options);
+      ret = should_include (mount_path, options);
       goto out;
     }
 
-  ret = should_include (g_unix_mount_get_mount_path (mount_entry), NULL);
+  ret = should_include (mount_path, NULL);
 
  out:
   return ret;
@@ -800,21 +801,21 @@ should_include_volume_check_mount_points (GVfsUDisks2VolumeMonitor *monitor,
       const gchar *mount_point = mount_points[n];
       GUnixMountEntry *mount_entry;
 
-      mount_entry = g_unix_mount_at (mount_point, NULL);
+      mount_entry = g_unix_mount_entry_at (mount_point, NULL);
       if (mount_entry != NULL)
         {
-          const gchar *root = g_unix_mount_get_root_path (mount_entry);
+          const gchar *root = g_unix_mount_entry_get_root_path (mount_entry);
 
           if ((root == NULL || g_strcmp0 (root, "/") == 0) &&
               should_include_mount (monitor, mount_entry))
             {
-              g_unix_mount_free (mount_entry);
+              g_unix_mount_entry_free (mount_entry);
               ret = TRUE;
               goto out;
             }
 
           ret = FALSE;
-          g_unix_mount_free (mount_entry);
+          g_unix_mount_entry_free (mount_entry);
         }
     }
 
@@ -1156,7 +1157,7 @@ mount_point_matches_mount_entry (GUnixMountPoint *mount_point,
   gchar *mp_entry = NULL;
 
   mp_path = g_strdup (g_unix_mount_point_get_mount_path (mount_point));
-  mp_entry = g_strdup (g_unix_mount_get_mount_path (mount_entry));
+  mp_entry = g_strdup (g_unix_mount_entry_get_mount_path (mount_entry));
 
   if (g_str_has_suffix (mp_path, "/"))
     mp_path[strlen(mp_path) - 1] = '\0';
@@ -1740,7 +1741,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
         cur_mounts = g_list_prepend (cur_mounts, mount_entry);
     }
 
-  new_mounts = g_unix_mounts_get (NULL);
+  new_mounts = g_unix_mount_entries_get (NULL);
   /* remove mounts we want to ignore - we do it here so we get to reevaluate
    * on the next update whether they should still be ignored
    */
@@ -1750,21 +1751,28 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
       ll = l->next;
       if (!should_include_mount (monitor, mount_entry))
         {
-          g_unix_mount_free (mount_entry);
+          g_unix_mount_entry_free (mount_entry);
           new_mounts = g_list_delete_link (new_mounts, l);
         }
     }
 
-  cur_mounts = g_list_sort (cur_mounts, (GCompareFunc) g_unix_mount_compare);
-  new_mounts = g_list_sort (new_mounts, (GCompareFunc) g_unix_mount_compare);
+  cur_mounts = g_list_sort (cur_mounts,
+                            (GCompareFunc) g_unix_mount_entry_compare);
+  new_mounts = g_list_sort (new_mounts,
+                            (GCompareFunc) g_unix_mount_entry_compare);
   diff_sorted_lists (cur_mounts,
-                     new_mounts, (GCompareFunc) g_unix_mount_compare,
-                     &added, &removed, &unchanged);
+                     new_mounts,
+                     (GCompareFunc) g_unix_mount_entry_compare,
+                     &added,
+                     &removed,
+                     &unchanged);
 
   for (l = removed; l != NULL; l = l->next)
     {
       GUnixMountEntry *mount_entry = l->data;
-      mount = find_mount_by_mount_path (monitor, g_unix_mount_get_mount_path (mount_entry));
+      const gchar *mount_path = g_unix_mount_entry_get_mount_path (mount_entry);
+
+      mount = find_mount_by_mount_path (monitor, mount_path);
       if (mount != NULL)
         {
           gvfs_udisks2_mount_unmounted (mount);
@@ -1777,11 +1785,13 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
   for (l = added; l != NULL; l = l->next)
     {
       GUnixMountEntry *mount_entry = l->data;
-      const gchar *root = g_unix_mount_get_root_path (mount_entry);
+      const gchar *root = g_unix_mount_entry_get_root_path (mount_entry);
+      const gchar *device_path;
 
+      device_path =  g_unix_mount_entry_get_device_path (mount_entry);
       volume = NULL;
       if (root == NULL || g_strcmp0 (root, "/") == 0)
-        volume = find_volume_for_device (monitor, g_unix_mount_get_device_path (mount_entry));
+        volume = find_volume_for_device (monitor, device_path);
       if (volume == NULL)
         volume = find_fstab_volume_for_mount_entry (monitor, mount_entry);
       mount = gvfs_udisks2_mount_new (monitor, mount_entry, volume); /* adopts mount_entry */
@@ -1805,19 +1815,23 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
   for (l = unchanged; l != NULL; l = l->next)
     {
       GUnixMountEntry *mount_entry = l->data;
-      mount = find_mount_by_mount_path (monitor, g_unix_mount_get_mount_path (mount_entry));
+      const gchar *mount_path = g_unix_mount_entry_get_mount_path (mount_entry);
+
+      mount = find_mount_by_mount_path (monitor, mount_path);
       if (mount == NULL)
         {
-          g_warning ("No mount object for path %s", g_unix_mount_get_mount_path (mount_entry));
+          g_warning ("No mount object for path %s", mount_path);
           continue;
         }
       if (gvfs_udisks2_mount_get_volume (mount) == NULL)
         {
-          const gchar *root = g_unix_mount_get_root_path (mount_entry);
+          const gchar *root = g_unix_mount_entry_get_root_path (mount_entry);
+          const gchar *device_path;
 
+          device_path = g_unix_mount_entry_get_device_path (mount_entry);
           volume = NULL;
           if (root == NULL || g_strcmp0 (root, "/") == 0)
-            volume = find_volume_for_device (monitor, g_unix_mount_get_device_path (mount_entry));
+            volume = find_volume_for_device (monitor, device_path);
           if (volume == NULL)
             volume = find_fstab_volume_for_mount_entry (monitor, mount_entry);
           if (volume != NULL)
@@ -1829,7 +1843,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
   g_list_free (removed);
   g_list_free (unchanged);
 
-  g_list_free_full (new_mounts, (GDestroyNotify) g_unix_mount_free);
+  g_list_free_full (new_mounts, (GDestroyNotify) g_unix_mount_entry_free);
 
   g_list_free (cur_mounts);
 }

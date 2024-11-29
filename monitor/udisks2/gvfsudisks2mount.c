@@ -121,6 +121,7 @@ gvfs_udisks2_mount_finalize (GObject *object)
   g_free (mount->mount_path);
 
   g_free (mount->mount_entry_name);
+  g_free (mount->mount_entry_fs_type);
 
   if (mount->autorun_icon != NULL)
     g_object_unref (mount->autorun_icon);
@@ -257,7 +258,7 @@ update_mount (GVfsUDisks2Mount *mount)
         mount->icon = g_object_ref (mount->autorun_icon);
       else
         {
-          mount->icon = gvfs_udisks2_utils_icon_from_fs_type (g_unix_mount_get_fs_type (mount->mount_entry));
+          mount->icon = gvfs_udisks2_utils_icon_from_fs_type (mount->mount_entry_fs_type);
         }
 
       g_free (mount->name);
@@ -270,7 +271,7 @@ update_mount (GVfsUDisks2Mount *mount)
       else
         mount->name = g_strdup (mount->mount_entry_name);
 
-      mount->symbolic_icon = gvfs_udisks2_utils_symbolic_icon_from_fs_type (g_unix_mount_get_fs_type (mount->mount_entry));
+      mount->symbolic_icon = gvfs_udisks2_utils_symbolic_icon_from_fs_type (mount->mount_entry_fs_type);
     }
 
   /* compute whether something changed */
@@ -342,9 +343,10 @@ gvfs_udisks2_mount_new (GVfsUDisks2VolumeMonitor *monitor,
   if (mount_entry != NULL)
     {
       mount->mount_entry = mount_entry; /* takes ownership */
-      mount->mount_entry_name = g_unix_mount_guess_name (mount_entry);
-      mount->device_file = g_strdup (g_unix_mount_get_device_path (mount_entry));
-      mount->mount_path = g_strdup (g_unix_mount_get_mount_path (mount_entry));
+      mount->mount_entry_name = g_unix_mount_entry_guess_name (mount_entry);
+      mount->mount_entry_fs_type = g_strdup (g_unix_mount_entry_get_fs_type (mount_entry));
+      mount->device_file = g_strdup (g_unix_mount_entry_get_device_path (mount_entry));
+      mount->mount_path = g_strdup (g_unix_mount_entry_get_mount_path (mount_entry));
       mount->root = g_file_new_for_path (mount->mount_path);
     }
 #ifdef HAVE_BURN
