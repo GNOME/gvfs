@@ -803,11 +803,7 @@ should_include_volume_check_mount_points (GVfsUDisks2VolumeMonitor *monitor,
       mount_entry = g_unix_mount_at (mount_point, NULL);
       if (mount_entry != NULL)
         {
-          const gchar *root = NULL;
-
-#ifdef HAVE_G_UNIX_MOUNT_GET_ROOT_PATH
-          root = g_unix_mount_get_root_path (mount_entry);
-#endif
+          const gchar *root = g_unix_mount_get_root_path (mount_entry);
 
           if ((root == NULL || g_strcmp0 (root, "/") == 0) &&
               should_include_mount (monitor, mount_entry))
@@ -1781,11 +1777,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
   for (l = added; l != NULL; l = l->next)
     {
       GUnixMountEntry *mount_entry = l->data;
-      const gchar *root = NULL;
-
-#ifdef HAVE_G_UNIX_MOUNT_GET_ROOT_PATH
-      root = g_unix_mount_get_root_path (mount_entry);
-#endif
+      const gchar *root = g_unix_mount_get_root_path (mount_entry);
 
       volume = NULL;
       if (root == NULL || g_strcmp0 (root, "/") == 0)
@@ -1821,11 +1813,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
         }
       if (gvfs_udisks2_mount_get_volume (mount) == NULL)
         {
-          const gchar *root = NULL;
-
-#ifdef HAVE_G_UNIX_MOUNT_GET_ROOT_PATH
-          root = g_unix_mount_get_root_path (mount_entry);
-#endif
+          const gchar *root = g_unix_mount_get_root_path (mount_entry);
 
           volume = NULL;
           if (root == NULL || g_strcmp0 (root, "/") == 0)
