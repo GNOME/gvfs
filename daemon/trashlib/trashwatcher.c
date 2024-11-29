@@ -74,7 +74,7 @@ decide_watch_type (GUnixMountEntry *mount,
   if (mount == NULL)
     return TRASH_WATCHER_TRUSTED;
 
-  mount_path = g_unix_mount_get_mount_path (mount);
+  mount_path = g_unix_mount_entry_get_mount_path (mount);
 
   /* Do not care about mount points without read access to avoid polling, see:
    * https://bugzilla.gnome.org/show_bug.cgi?id=522314
@@ -82,7 +82,7 @@ decide_watch_type (GUnixMountEntry *mount,
   if (access (mount_path, R_OK) != 0)
     return TRASH_WATCHER_NO_WATCH;
 
-  fs_type = g_unix_mount_get_fs_type (mount);
+  fs_type = g_unix_mount_entry_get_fs_type (mount);
 
   if (g_strcmp0 (fs_type, "nfs") == 0 ||
       g_strcmp0 (fs_type, "nfs4") == 0 ||
@@ -115,7 +115,7 @@ find_mount_entry_for_file (GFile *file)
 
       *slash = '\0';
 
-      entry = g_unix_mount_for (pathname, NULL);
+      entry = g_unix_mount_entry_for (pathname, NULL);
     }
   while (entry == NULL && pathname[1]);
 
@@ -167,7 +167,7 @@ trash_mount_insert (TrashWatcher      *watcher,
   gboolean watching;
   TrashMount *mount;
 
-  mountpoint = g_unix_mount_get_mount_path (mount_entry);
+  mountpoint = g_unix_mount_entry_get_mount_path (mount_entry);
 
   mount = g_slice_new (TrashMount);
   mount->mount_entry = mount_entry;
@@ -209,7 +209,7 @@ trash_mount_remove (TrashMount **mount_ptr)
   /* detach from list */
   *mount_ptr = mount->next;
 
-  g_unix_mount_free (mount->mount_entry);
+  g_unix_mount_entry_free (mount->mount_entry);
   g_slice_free (TrashMount, mount);
 }
 
@@ -219,11 +219,12 @@ ignore_trash_mount (GUnixMountEntry *mount)
   GUnixMountPoint *mount_point = NULL;
   const gchar *mount_options;
 
-  mount_options = g_unix_mount_get_options (mount);
+  mount_options = g_unix_mount_entry_get_options (mount);
   if (mount_options == NULL)
     {
-      mount_point = g_unix_mount_point_at (g_unix_mount_get_mount_path (mount),
-                                           NULL);
+      const gchar *mount_path = g_unix_mount_entry_get_mount_path (mount);
+
+      mount_point = g_unix_mount_point_at (mount_path, NULL);
       if (mount_point != NULL)
         mount_options = g_unix_mount_point_get_options (mount_point);
 
@@ -239,7 +240,7 @@ ignore_trash_mount (GUnixMountEntry *mount)
         return TRUE;
     }
 
-  if (g_unix_mount_is_system_internal (mount))
+  if (g_unix_mount_entry_is_system_internal (mount))
     return TRUE;
 
   return FALSE;
@@ -252,8 +253,8 @@ trash_watcher_remount (TrashWatcher *watcher)
   GList *mounts;
   GList *new;
 
-  mounts = g_unix_mounts_get (NULL);
-  mounts = g_list_sort (mounts, (GCompareFunc) g_unix_mount_compare);
+  mounts = g_unix_mount_entries_get (NULL);
+  mounts = g_list_sort (mounts, (GCompareFunc) g_unix_mount_entry_compare);
 
   old = &watcher->mounts;
   new = mounts;
@@ -265,13 +266,13 @@ trash_watcher_remount (TrashWatcher *watcher)
 
       if (new && ignore_trash_mount (new->data))
         {
-          g_unix_mount_free (new->data);
+          g_unix_mount_entry_free (new->data);
           new = new->next;
           continue;
         }
 
       if ((result = (new == NULL) - (*old == NULL)) == 0)
-        result = g_unix_mount_compare (new->data, (*old)->mount_entry);
+        result = g_unix_mount_entry_compare (new->data, (*old)->mount_entry);
 
       if (result < 0)
         {
@@ -287,7 +288,7 @@ trash_watcher_remount (TrashWatcher *watcher)
       else
         {
           /* match.  no change. */
-          g_unix_mount_free (new->data);
+          g_unix_mount_entry_free (new->data);
 
           old = &(*old)->next;
           new = new->next;
@@ -323,7 +324,7 @@ trash_watcher_new (TrashRoot *root)
                                              "Trash/files");
 
   if (homedir_mount)
-    g_unix_mount_free (homedir_mount);
+    g_unix_mount_entry_free (homedir_mount);
   g_object_unref (homedir_trashdir);
   g_object_unref (user_datadir);
 
