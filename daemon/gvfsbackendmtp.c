@@ -1116,6 +1116,10 @@ get_device (GVfsBackend *backend, uint32_t bus_num, uint32_t dev_num,
 
   G_VFS_BACKEND_MTP (backend)->get_partial_object_capability
     = LIBMTP_Check_Capability (device, LIBMTP_DEVICECAP_GetPartialObject);
+  G_VFS_BACKEND_MTP (backend)->send_partial_object_capability
+    = LIBMTP_Check_Capability (device, LIBMTP_DEVICECAP_SendPartialObject);
+  G_VFS_BACKEND_MTP (backend)->edit_objects_capability
+    = LIBMTP_Check_Capability (device, LIBMTP_DEVICECAP_EditObjects);
 #if HAVE_LIBMTP_1_1_15
   G_VFS_BACKEND_MTP (backend)->move_object_capability
     = LIBMTP_Check_Capability (device, LIBMTP_DEVICECAP_MoveObject);
@@ -2340,8 +2344,7 @@ do_open_for_read (GVfsBackend *backend,
                   GVfsJobOpenForRead *job,
                   const char *filename)
 {
-  if (!G_VFS_BACKEND_MTP (backend)->android_extension &&
-      !G_VFS_BACKEND_MTP (backend)->get_partial_object_capability) {
+  if (!G_VFS_BACKEND_MTP (backend)->get_partial_object_capability) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                               _("Operation not supported"));
@@ -2615,7 +2618,10 @@ open_for_write (GVfsBackend *backend,
                 const char *filename,
                 GFileCreateFlags flags)
 {
-  if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
+  // We also check for LIBMTP_SendPartialObject() support since do_write()
+  // may use it.
+  if (!G_VFS_BACKEND_MTP (backend)->send_partial_object_capability ||
+      !G_VFS_BACKEND_MTP (backend)->edit_objects_capability) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                               _("Operation not supported"));
@@ -2766,7 +2772,7 @@ do_replace (GVfsBackend *backend,
             gboolean make_backup,
             GFileCreateFlags flags)
 {
-  if (!G_VFS_BACKEND_MTP (backend)->android_extension) {
+  if (!G_VFS_BACKEND_MTP (backend)->edit_objects_capability) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                               _("Operation not supported"));
