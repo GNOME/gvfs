@@ -15,3 +15,8 @@ For security-related issues, please use https://security.gnome.org/.
 ## Ask Questions
 
 For questions use [GNOME Discourse](https://discourse.gnome.org/).
+
+## Contributing Code
+
+Please see the [Contribution Guidelines](CONTRIBUTING.md) for information on how
+to start contributing to GVfs.
