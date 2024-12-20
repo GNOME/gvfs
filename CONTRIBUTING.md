@@ -11,3 +11,8 @@ GVfs source repository is at https://gitlab.gnome.org/GNOME/gvfs.
 See https://wiki.gnome.org/GitLab for general information about GitLab workflow
 for code contribution. GVfs still uses linear GIT history without merge commits,
 please see general commit guidelines at https://wiki.gnome.org/Git/CommitMessages.
+
+## Developer Documentation
+
+For more info about GVfs internals, please check out our
+[Developer Documentation](docs/documentation.md).
