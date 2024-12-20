@@ -80,7 +80,7 @@ of some services:
 The project consists of three more or less independent parts. Those parts
 comprise of one or more daemons. Everything is glued together using D-Bus, it's
 best to illustrate implementation details on the
-[gvfs D-Bus interface](https://git.gnome.org/browse/gvfs/tree/common/org.gtk.vfs.xml).
+[gvfs D-Bus interface](https://gitlab.gnome.org/GNOME/gvfs/-/raw/master/common/org.gtk.vfs.xml).
 
 Since GVfs is implemented as a GIO extension point, its libraries are loaded in
 every process. This may be expensive and GVfs may need some time to initialize,
@@ -93,10 +93,8 @@ communicating with the gvfs server side through D-Bus.
 Volume monitors provide a set of `GDrive`/`GVolume`/`GMount` objects
 representing physical device or service hierarchy. So-called native volume
 monitors provide access to locally available devices, i.e. those appearing in
-`/dev` and mountable by standard POSIX ways (`mount`, `umount`). GVfs provides
-several implementations of those (`hal`, `gdu`, `udisks2`) and only one can be
-active. This is determined by a priority number; the highest priority monitor
-is used.
+`/dev` and mountable by standard POSIX ways (`mount`, `umount`). Currently,
+GVfs provides only one native monitor (`udisks2`).
 
 Every volume monitor possesses its own process, communicating with the client
 side through `GProxyVolumeMonitor` infrastructure over D-Bus (see the note about
@@ -131,7 +129,7 @@ majority of fixes go there.
 
 David Zeuthen wrote a nice document describing what is exposed to the UI and how
 to control it:
-[/monitor/udisks2/what-is-shown.txt](https://git.gnome.org/browse/gvfs/plain/monitor/udisks2/what-is-shown.txt)
+[/monitor/udisks2/what-is-shown.txt](https://gitlab.gnome.org/GNOME/gvfs/raw/master/monitor/udisks2/what-is-shown.txt)
 
 ## Core VFS Daemon
 
@@ -250,7 +248,7 @@ version respectively). This call is more heavyweight and runs in a thread pool.
 That way, the backend could handle multiple requests simultaneously. Daemon
 thread pool is on the daemon (process, see below) basis and the maximum number
 of threads is controlled by the `MAX_JOB_THREADS` define during compilation
-(see `Makefile.am`).
+(see `meson.build`).
 
 When talking about backends, let's see how objects are organized. A daemon
 instance represents the process itself. Daemon can handle one or more mounts
@@ -425,8 +423,8 @@ progress callback specified in the original `GDaemonFile` call.
 
 Since the open-read-write-close operations are used as a copy fallback by GIO,
 it's recommended to have these methods implemented to maintain a degree of
-universality. This is impossible for some backends though (`obex`, `mtp`) where
-the full file has to be always transferred.
+universality. This is impossible for some backends though (e.g. `mtp`) where the
+full file has to be always transferred.
 
 Unlike file copy, which handles data blocks internally, the
 `GDaemonFile.read()`, `GDaemonFile.create()`, and similar methods are returning
@@ -605,11 +603,9 @@ indexing; not sure if there are any drivers for that nowadays.
 
 ## Tools
 
-While not a part of the architecture, there's a bunch of command-line tools
-providing convenient access to GIO resources. Imitating well-known POSIX
-commands, taking URI instead of filenames. They're all using GIO API, nothing
-GVfs-specific; the name `gvfs-*` is misleading. In the future, they may be moved
-to the glib source tree.
+GLib distributes `gio` cmd tool providing convenient access to GIO resources.
+Imitating well-known POSIX commands, taking URI instead of filenames. This is
+useful for testing.
 
 ## Tests
 
@@ -625,18 +621,9 @@ The test suite is able to run in several modes; the most useful is the in-tree
 sandboxed mode, which starts its own D-Bus session bus and uses the binaries
 from the source tree. More advanced tests are available when executed as root.
 
-Distributors are encouraged to use and integrate this test suite into their
-infrastructure and report any oddities and problems upstream. We expect the
-test suite to improve over time.
-
-For more details, please contact [Martin Pitt](mailto:martin.pitt@ubuntu.com)
-as the test suite creator.
-
 # What's missing?
 
-* Describe `GDaemonFileInputStream` and `GDaemonFileOutputStream` in detail
 * Icon extensions
-* Describe `GVfsChannel` machinery
 
 # FAQ
 
@@ -653,7 +640,7 @@ Tunneling D-Bus connections can be treated as a security risk and is disabled
 AFAIK. You won't be able to access any active mounts; they all need to be opened
 again within the new session.
 
-The right solution would be to provide a proxy root backend through `PolicyKit`.
+The right solution is to use `admin://` backend that is based on `PolicyKit`.
 
 ## Writing your own backend
 
