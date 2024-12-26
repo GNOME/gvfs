@@ -779,6 +779,11 @@ do_mount (GVfsBackend *backend,
           if (res)
             break;
         }
+      else
+        {
+          /* Purge the cache, we need to have clean playground for next auth try */
+          smbc_getFunctionPurgeCachedServers (smb_context)(smb_context);
+        }
 
       /* The first round is Kerberos-only.  Only if this fails do we enable
        * NTLMSSP fallback (turning off anonymous fallback, which we've
