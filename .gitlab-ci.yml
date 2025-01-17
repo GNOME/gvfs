@@ -1,4 +1,9 @@
+stages:
+    - prepare
+    - build
+
 fedora:
+    stage: build
     image:
         name: registry.gitlab.gnome.org/gnome/gvfs:latest
         entrypoint: ["/bin/sh", "-c"]
@@ -24,6 +29,7 @@ fedora:
         - tags
 
 update-image:
+    stage: prepare
     variables:
          STORAGE_DRIVER: vfs
          BUILDAH_FORMAT: docker
