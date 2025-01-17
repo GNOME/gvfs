@@ -20,6 +20,8 @@ fedora:
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
         - dbus-run-session -- sh -c "gio mount localtest:/// && build/test/unit/outputstream localtest:///tmp/"
     allow_failure: true
+    except:
+        - tags
 
 update-image:
     variables:
