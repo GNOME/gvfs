@@ -2,6 +2,9 @@ stages:
     - prepare
     - build
 
+variables:
+    MESON_BUILD_DIR: _build
+
 fedora:
     stage: build
     image:
@@ -20,10 +23,10 @@ fedora:
           -Dman=true
           -Dburn=true
           -Dunit_tests=true
-          --prefix /usr --werror build
-        - sudo ninja -C build install
+          --prefix /usr --werror $MESON_BUILD_DIR
+        - sudo ninja -C $MESON_BUILD_DIR install
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
-        - dbus-run-session -- sh -c "gio mount localtest:/// && build/test/unit/outputstream localtest:///tmp/"
+        - dbus-run-session -- sh -c "gio mount localtest:/// && $MESON_BUILD_DIR/test/unit/outputstream localtest:///tmp/"
     allow_failure: true
     except:
         - tags
