@@ -1,3 +1,14 @@
+Major changes in 1.57.1
+=======================
+* nfs: Support libnfs 6 (Jan Alexander Steffens)
+* onedrive: Support Sharepoint drives (Jan-Michael Brummer)
+* trash/udisks: Port from g_unix_mount_ to g_unix_mount_entry_ (Ondrej Holy)
+* afp/mtp/nfs/sftp/smb: Add edit mode implementation (Ondrej Holy)
+* fuse: Use edit mode when neither O_TRUNC, nor O_APPEND is used (Ondrej Holy)
+* afp/mtp/nfs/smb: Various output stream related fixes (Ondrej Holy)
+* udisks2: Update volume when setting/unsetting mount (Ondrej Holy)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.56.1
 =======================
 * udisks2: Increasing reference count when updating volume to fix crashes (Ondrej Holy)
