@@ -2747,7 +2747,7 @@ do_append_to (GVfsBackend *backend,
   if (file->filetype == LIBMTP_FILETYPE_FOLDER) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                              _("File is a directory"));
+                              _("Target file is a directory"));
     LIBMTP_destroy_file_t (file);
     goto exit;
   }
@@ -2824,7 +2824,7 @@ do_replace (GVfsBackend *backend,
   if (file->filetype == LIBMTP_FILETYPE_FOLDER) {
     g_vfs_job_failed_literal (G_VFS_JOB (job),
                               G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                              _("File is a directory"));
+                              _("Target file is a directory"));
     LIBMTP_destroy_file_t (file);
     goto exit;
   }
