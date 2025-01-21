@@ -2534,8 +2534,9 @@ do_read (GVfsBackend *backend,
 
   uint32_t actual;
   if (handle->handle_type == HANDLE_FILE) {
-    if (!G_VFS_BACKEND_MTP (backend)->android_extension &&
-        offset > G_MAXUINT32) {
+    if ( !G_VFS_BACKEND_MTP (backend)->get_partial_object_capability ||
+        (!G_VFS_BACKEND_MTP (backend)->android_extension &&
+         offset > G_MAXUINT32)) {
       g_vfs_job_failed_literal (G_VFS_JOB (job),
                                 G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                 _("Operation not supported"));
