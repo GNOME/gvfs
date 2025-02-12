@@ -44,7 +44,7 @@
 
 #define GOA_API_IS_SUBJECT_TO_CHANGE
 #include <goa/goa.h>
-#include <msg/msg.h>
+#include <msg.h>
 
 #include <stdio.h>
 
