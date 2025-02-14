@@ -1,6 +1,6 @@
 fedora:
     image:
-        name: registry.gitlab.gnome.org/gnome/gvfs:latest
+        name: registry.gitlab.gnome.org/gnome/gvfs:v4367193
         entrypoint: ["/bin/sh", "-c"]
     script:
         # The httpd process fails with "(98)Address already in use: AH00072:
