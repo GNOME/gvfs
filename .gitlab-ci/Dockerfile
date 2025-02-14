@@ -1,6 +1,6 @@
 FROM fedora:rawhide
 
-RUN dnf install -y dnf-plugins-core git gnome-desktop-testing dbus-daemon python3-twisted python3-gobject procps-ng bzip2 httpd mod_ssl openssh-server passwd gcc-c++ gcr-devel \
+RUN dnf install -y --allowerasing dnf-plugins-core git gnome-desktop-testing dbus-daemon python3-twisted python3-gobject procps-ng bzip2 httpd mod_ssl openssh-server passwd gcc-c++ gcr-devel \
  && dnf builddep -y gvfs \
  && dnf clean all
 
