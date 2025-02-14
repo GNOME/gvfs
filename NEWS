@@ -1,3 +1,8 @@
+Major changes in 1.57.2
+=======================
+* onedrive: Use presentation id as host to adapt to the change in GOA (Jan-Michael Brummer)
+* onedrive: Fix incorrect include path for msgraph header (sid)
+
 Major changes in 1.57.1
 =======================
 * nfs: Support libnfs 6 (Jan Alexander Steffens)
