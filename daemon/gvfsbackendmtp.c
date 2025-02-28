@@ -2849,7 +2849,7 @@ pad_file (GVfsBackend *backend,
 {
   unsigned char zero_buffer[PAD_BLOCK_SIZE] = { 0 };
   gsize written;
-  int ret;
+  int ret = 0;
 
   for (written = 0; written < size; written += PAD_BLOCK_SIZE)
     {
