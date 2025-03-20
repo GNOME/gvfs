@@ -2474,11 +2474,17 @@ vfs_init (struct fuse_conn_info *conn, struct fuse_config *cfg)
   subthread_main_loop = g_main_loop_new (NULL, FALSE);
   subthread = g_thread_new ("gvfs-fuse-sub", (GThreadFunc) subthread_main, NULL);
 
+#ifdef HAVE_FUSE_FEATURE_FLAG_FUNCS
   /* Indicate O_TRUNC support for open() */
-  conn->want |= FUSE_CAP_ATOMIC_O_TRUNC;
+  fuse_set_feature_flag(conn, FUSE_CAP_ATOMIC_O_TRUNC);
 
   /* Prevent out-of-order readahead */
+  fuse_unset_feature_flag(conn, FUSE_CAP_ASYNC_READ);
+#else
+  /* Same as above for libfuse <3.17 */
+  conn->want |= FUSE_CAP_ATOMIC_O_TRUNC;
   conn->want &= ~FUSE_CAP_ASYNC_READ;
+#endif
 
   return NULL;
 }
