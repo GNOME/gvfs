@@ -381,7 +381,7 @@ meta_tree_init (MetaTree *tree)
   retried = FALSE;
  retry:
   tree->on_nfs = meta_builder_is_on_nfs (tree->filename);
-  fd = safe_open (tree, tree->filename, O_RDONLY);
+  fd = safe_open (tree, tree->filename, O_RDONLY | O_CLOEXEC);
   if (fd == -1)
     {
       errsv = errno;
@@ -1139,10 +1139,12 @@ meta_journal_open (MetaTree *tree, const char *filename, gboolean for_write, gui
   g_assert (sizeof (MetaJournalHeader) == 20);
   retried = FALSE;
 
+  open_flags = O_CLOEXEC;
+
   if (for_write)
-    open_flags = O_RDWR;
+    open_flags |= O_RDWR;
   else
-    open_flags = O_RDONLY;
+    open_flags |= O_RDONLY;
 
  retry:
   journal_filename = meta_builder_get_journal_filename (filename, tag);
