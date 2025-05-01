@@ -10,7 +10,7 @@ option('burn', type: 'boolean', value: false, description: 'build with burn back
 option('cdda', type: 'boolean', value: true, description: 'build with cdda backend')
 option('dnssd', type: 'boolean', value: true, description: 'build with dnssd backend')
 option('goa', type: 'boolean', value: true, description: 'build with goa volume monitor')
-option('google', type: 'boolean', value: true, description: 'build with google backend')
+option('google', type: 'boolean', value: false, description: 'build with google backend')
 option('gphoto2', type: 'boolean', value: true, description: 'build with gphoto2 backend and volume monitor')
 option('http', type: 'boolean', value: true, description: 'build with http/dav backends')
 option('mtp', type: 'boolean', value: true, description: 'build with mtp backend and volume monitor')
