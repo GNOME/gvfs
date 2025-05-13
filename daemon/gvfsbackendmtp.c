@@ -1420,7 +1420,7 @@ do_enumerate (GVfsBackend *backend,
     LIBMTP_Clear_Errorstack (device);
 
 #if HAVE_LIBMTP_1_1_21
-    uint32_t *handlers = NULL;
+    g_autofree uint32_t *handlers = NULL;
     int count = LIBMTP_Get_Children (device, entry->storage, entry->id, &handlers);
 
     if (count < 0) {
@@ -1432,6 +1432,9 @@ do_enumerate (GVfsBackend *backend,
 
     for (int i = 0; i < count; i++) {
       LIBMTP_file_t *file;
+
+      if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
+        goto exit;
 
       // Get metadata for one file, if it fails, try next file
       file = LIBMTP_Get_Filemetadata (device, handlers[i]);
@@ -1451,9 +1454,6 @@ do_enumerate (GVfsBackend *backend,
       LIBMTP_destroy_file_t (file);
     }
 
-    if (handlers) {
-      g_free (handlers);
-    }
 #else
     LIBMTP_file_t *files;
 
