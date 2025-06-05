@@ -1159,9 +1159,15 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
       goto out;
     }
 
+  /* There may be no "user" for a custom PresentationIdentity, so we need to
+   * ensure we match the spec with the account.
+   */
   host = g_mount_spec_get (spec, "host");
   user = g_mount_spec_get (spec, "user");
-  self->account_identity = g_strconcat (user, "@", host, NULL);
+  if (user != NULL)
+    self->account_identity = g_strconcat (user, "@", host, NULL);
+  else
+    self->account_identity = g_strdup (host);
 
   accounts = goa_client_get_accounts (self->client);
   for (l = accounts; l != NULL; l = l->next)
@@ -1257,7 +1263,8 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
 
   real_mount_spec = g_mount_spec_new ("onedrive");
   g_mount_spec_set (real_mount_spec, "host", host);
-  g_mount_spec_set (real_mount_spec, "user", user);
+  if (user != NULL)
+    g_mount_spec_set (real_mount_spec, "user", user);
   g_vfs_backend_set_mount_spec (_self, real_mount_spec);
   g_mount_spec_unref (real_mount_spec);
 
