@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
 "POT-Creation-Date: 2024-07-26 07:27+0000\n"
-"PO-Revision-Date: 2024-05-19 23:33+0200\n"
+"PO-Revision-Date: 2025-08-22 23:33+0200\n"
 "Last-Translator: Jordi Mas i Hernàndez <jmas@softcatala.org>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "Language: ca\n"
@@ -67,7 +67,7 @@ msgstr "no es pot obrir l'arbre de metadades"
 
 #: client/gdaemonfile.c:2560 client/gdaemonvfs.c:1267
 msgid "can’t get metadata proxy"
-msgstr "no s'ha pogut obtenir el servidor intermediari metadades"
+msgstr "no s'ha pogut obtenir el servidor intermediari de metadades"
 
 #: client/gdaemonfile.c:2582 client/gdaemonvfs.c:1299
 msgid "values must be string or list of strings"
@@ -172,7 +172,7 @@ msgstr ""
 
 #: common/gvfsdnssdresolver.c:1223
 msgid "Error initializing Avahi resolver"
-msgstr "S'ha produït un error en inicialitzar l'Avahi: %s"
+msgstr "S'ha produït un error en inicialitzar el resoledor Avahi"
 
 #: common/gvfsdnssdutils.c:233 common/gvfsdnssdutils.c:263
 #: common/gvfsdnssdutils.c:280
@@ -1641,7 +1641,7 @@ msgstr "Ha fallat la verificació de la clau de l'ordinador"
 
 #: daemon/gvfsbackendsftp.c:382
 msgid "Too many authentication failures"
-msgstr "Ha fallat massa cops la verificació"
+msgstr "Hi ha massa errors d'autenticació"
 
 #: daemon/gvfsbackendsftp.c:564
 msgid "Unable to spawn SSH program"
