@@ -58,7 +58,7 @@ struct _GVfsUDisks2VolumeMonitor
   GUdevClient *gudev_client;
   GUnixMountMonitor *mount_monitor;
 
-  GList *drives;
+  GHashTable *drives_by_udisks_drive; /* UDisksDrive * ~> GVfsUDisks2Drive * */
   GList *volumes;
   GList *fstab_volumes;
   GList *mounts;
@@ -142,7 +142,7 @@ gvfs_udisks2_volume_monitor_finalize (GObject *object)
   g_clear_object (&monitor->client);
   g_clear_object (&monitor->gudev_client);
 
-  g_list_free_full (monitor->drives, g_object_unref);
+  g_clear_pointer (&monitor->drives_by_udisks_drive, g_hash_table_unref);
   g_list_free_full (monitor->volumes, g_object_unref);
   g_list_free_full (monitor->fstab_volumes, g_object_unref);
   g_list_free_full (monitor->mounts, g_object_unref);
@@ -186,10 +186,16 @@ static GList *
 get_connected_drives (GVolumeMonitor *_monitor)
 {
   GVfsUDisks2VolumeMonitor *monitor = GVFS_UDISKS2_VOLUME_MONITOR (_monitor);
-  GList *ret;
+  GList *ret = NULL;
+  GHashTableIter iter;
+  gpointer value = NULL;
 
-  ret = g_list_copy (monitor->drives);
-  g_list_foreach (ret, (GFunc) g_object_ref, NULL);
+  g_hash_table_iter_init (&iter, monitor->drives_by_udisks_drive);
+  while (g_hash_table_iter_next (&iter, NULL, &value))
+    {
+      GVfsUDisks2Drive *drive = value;
+      ret = g_list_prepend (ret, g_object_ref (drive));
+    }
   return ret;
 }
 
@@ -332,6 +338,8 @@ lockdown_settings_changed (GSettings *settings,
 static void
 gvfs_udisks2_volume_monitor_init (GVfsUDisks2VolumeMonitor *monitor)
 {
+  monitor->drives_by_udisks_drive = g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, g_object_unref);
+
   monitor->gudev_client = g_udev_client_new (NULL); /* don't listen to any changes */
 
   monitor->client = get_udisks_client_sync (NULL);
@@ -1033,20 +1041,6 @@ should_include_disc (GVfsUDisks2VolumeMonitor *monitor,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static gint
-udisks_drive_compare (UDisksDrive *a, UDisksDrive *b)
-{
-  GDBusObject *oa = g_dbus_interface_get_object (G_DBUS_INTERFACE (a));
-  GDBusObject *ob = g_dbus_interface_get_object (G_DBUS_INTERFACE (b));
-  /* Either or both of oa, ob can be NULL for the case where a drive
-   * is removed but we still hold a reference to the drive interface
-   */
-  if (oa != NULL && ob != NULL)
-    return g_strcmp0 (g_dbus_object_get_object_path (oa), g_dbus_object_get_object_path (ob));
-  else
-    return (const gchar*) ob - (const gchar*) oa;
-}
-
-static gint
 block_compare (UDisksBlock *a, UDisksBlock *b)
 {
   return g_strcmp0 (udisks_block_get_device (a), udisks_block_get_device (b));
@@ -1083,21 +1077,21 @@ static GVfsUDisks2Drive *
 find_drive_for_udisks_drive (GVfsUDisks2VolumeMonitor *monitor,
                              UDisksDrive              *udisks_drive)
 {
-  GVfsUDisks2Drive *ret = NULL;
-  GList *l;
+  return g_hash_table_lookup (monitor->drives_by_udisks_drive, udisks_drive);
+}
 
-  for (l = monitor->drives; l != NULL; l = l->next)
-    {
-      GVfsUDisks2Drive *drive = GVFS_UDISKS2_DRIVE (l->data);
-      if (gvfs_udisks2_drive_get_udisks_drive (drive) == udisks_drive)
-        {
-          ret = drive;
-          goto out;
-        }
-    }
+static void
+add_drive (GVfsUDisks2VolumeMonitor *monitor,
+           GVfsUDisks2Drive         *drive)
+{
+  g_hash_table_insert (monitor->drives_by_udisks_drive, gvfs_udisks2_drive_get_udisks_drive (drive), g_object_ref (drive));
+}
 
- out:
-  return ret;
+static void
+remove_drive (GVfsUDisks2VolumeMonitor *monitor,
+              GVfsUDisks2Drive         *drive)
+{
+  g_hash_table_remove (monitor->drives_by_udisks_drive, gvfs_udisks2_drive_get_udisks_drive (drive));
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1359,76 +1353,56 @@ update_drives (GVfsUDisks2VolumeMonitor  *monitor,
                GList                    **removed_drives,
                gboolean                   coldplug)
 {
-  GList *cur_udisks_drives;
-  GList *new_udisks_drives;
-  GList *removed, *added;
-  GList *l;
+  GHashTable *cur_udisks_drives; /* UDisksDrive * ~> GVfsUDisks2Drive * */
+  GHashTableIter iter;
+  gpointer key = NULL, value = NULL;
   GVfsUDisks2Drive *drive;
-  GList *objects;
+  GList *objects, *l;
 
   objects = g_dbus_object_manager_get_objects (udisks_client_get_object_manager (monitor->client));
 
-  cur_udisks_drives = NULL;
-  for (l = monitor->drives; l != NULL; l = l->next)
+  cur_udisks_drives = g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, g_object_unref);
+
+  g_hash_table_iter_init (&iter, monitor->drives_by_udisks_drive);
+  while (g_hash_table_iter_next (&iter, &key, &value))
     {
-      cur_udisks_drives = g_list_prepend (cur_udisks_drives,
-                                          gvfs_udisks2_drive_get_udisks_drive (GVFS_UDISKS2_DRIVE (l->data)));
+      g_hash_table_insert (cur_udisks_drives, key, g_object_ref (GVFS_UDISKS2_DRIVE (value)));
     }
 
   /* remove devices we want to ignore - we do it here so we get to reevaluate
    * on the next update whether they should still be ignored
    */
-  new_udisks_drives = NULL;
   for (l = objects; l != NULL; l = l->next)
     {
       UDisksDrive *udisks_drive = udisks_object_peek_drive (UDISKS_OBJECT (l->data));
       if (udisks_drive == NULL)
         continue;
       if (should_include_drive (monitor, udisks_drive))
-        new_udisks_drives = g_list_prepend (new_udisks_drives, udisks_drive);
-    }
-
-  cur_udisks_drives = g_list_sort (cur_udisks_drives, (GCompareFunc) udisks_drive_compare);
-  new_udisks_drives = g_list_sort (new_udisks_drives, (GCompareFunc) udisks_drive_compare);
-  diff_sorted_lists (cur_udisks_drives,
-                     new_udisks_drives, (GCompareFunc) udisks_drive_compare,
-                     &added, &removed, NULL);
-
-  for (l = removed; l != NULL; l = l->next)
-    {
-      UDisksDrive *udisks_drive = UDISKS_DRIVE (l->data);
-
-      drive = find_drive_for_udisks_drive (monitor, udisks_drive);
-      if (drive != NULL)
         {
-          gvfs_udisks2_drive_disconnected (drive);
-          monitor->drives = g_list_remove (monitor->drives, drive);
-          *removed_drives = g_list_prepend (*removed_drives, g_object_ref (drive));
-          g_object_unref (drive);
-        }
-    }
-
-  for (l = added; l != NULL; l = l->next)
-    {
-      UDisksDrive *udisks_drive = UDISKS_DRIVE (l->data);
-
-      drive = find_drive_for_udisks_drive (monitor, udisks_drive);
-      if (drive == NULL)
-        {
-          drive = gvfs_udisks2_drive_new (monitor, udisks_drive, coldplug);
-          if (udisks_drive != NULL)
+          /* not in currently known drives => add it */
+          if (!g_hash_table_remove (cur_udisks_drives, udisks_drive))
             {
-              monitor->drives = g_list_prepend (monitor->drives, drive);
-              *added_drives = g_list_prepend (*added_drives, g_object_ref (drive));
+              drive = gvfs_udisks2_drive_new (monitor, udisks_drive, coldplug);
+              if (drive != NULL)
+                {
+                  add_drive (monitor, drive);
+                  *added_drives = g_list_prepend (*added_drives, g_steal_pointer (&drive));
+                }
             }
         }
     }
 
-  g_list_free (added);
-  g_list_free (removed);
+  /* which left are removed */
+  g_hash_table_iter_init (&iter, cur_udisks_drives);
+  while (g_hash_table_iter_next (&iter, NULL, &value))
+    {
+      drive = value;
+      gvfs_udisks2_drive_disconnected (drive);
+      *removed_drives = g_list_prepend (*removed_drives, g_object_ref (drive));
+      remove_drive (monitor, drive);
+    }
 
-  g_list_free (cur_udisks_drives);
-  g_list_free (new_udisks_drives);
+  g_hash_table_unref (cur_udisks_drives);
 
   g_list_free_full (objects, g_object_unref);
 }
