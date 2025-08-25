@@ -229,9 +229,8 @@ get_mounts (GVolumeMonitor *_monitor)
   while (g_hash_table_iter_next (&iter, &key, NULL))
     {
       GVfsUDisks2Mount *mount = key;
-      ret = g_list_prepend (ret, mount);
+      ret = g_list_prepend (ret, g_object_ref (mount));
     }
-  g_list_foreach (ret, (GFunc) g_object_ref, NULL);
   return ret;
 }
 
