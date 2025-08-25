@@ -192,19 +192,18 @@ get_volumes (GVolumeMonitor *_monitor)
   g_hash_table_iter_init (&iter, monitor->volumes);
   while (g_hash_table_iter_next (&iter, &key, NULL))
     {
-      ret = g_list_prepend (ret, key);
+      ret = g_list_prepend (ret, g_object_ref (key));
     }
   g_hash_table_iter_init (&iter, monitor->fstab_volumes);
   while (g_hash_table_iter_next (&iter, &key, NULL))
     {
-      ret = g_list_prepend (ret, key);
+      ret = g_list_prepend (ret, g_object_ref (key));
     }
   g_hash_table_iter_init (&iter, monitor->disc_volumes);
   while (g_hash_table_iter_next (&iter, &key, NULL))
     {
-      ret = g_list_prepend (ret, key);
+      ret = g_list_prepend (ret, g_object_ref (key));
     }
-  g_list_foreach (ret, (GFunc) g_object_ref, NULL);
   return ret;
 }
 
