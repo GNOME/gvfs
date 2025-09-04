@@ -1069,6 +1069,13 @@ meta_builder_create_new_journal (const char *filename, guint32 random_tag)
 			     out->str, out->len,
 			     NULL);
 
+  /* Ensure journal file has secure permissions consistent with tree files */
+  if (res && chmod (journal_name, 0600) != 0)
+    {
+      g_warning ("Failed to set permissions on journal file %s: %s",
+                 journal_name, g_strerror (errno));
+    }
+
   g_free (journal_name);
   g_string_free (out, TRUE);
 
