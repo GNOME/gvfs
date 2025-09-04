@@ -203,7 +203,15 @@ fetch_metadata (GVfsBackendCdda *cdda_backend)
       track->artist = cdtext_string_to_utf8 (cdtext_get_const (CDTEXT_PERFORMER, cdtext));
 #endif /* LIBCDIO_VERSION_NUM >= 84 */
     }
-    track->duration = cdio_get_track_sec_count (cdio, cdtrack) / CDIO_CD_FRAMES_PER_SEC;
+    /* Use reliable LSN-based calculation instead of buggy cdio_get_track_sec_count */
+    lsn_t first_lsn = cdio_get_track_lsn (cdio, cdtrack);
+    lsn_t last_lsn = cdio_get_track_last_lsn (cdio, cdtrack);
+    
+    if (first_lsn != CDIO_INVALID_LSN && last_lsn != CDIO_INVALID_LSN && last_lsn >= first_lsn) {
+      track->duration = (last_lsn - first_lsn + 1) / CDIO_CD_FRAMES_PER_SEC;
+    } else {
+      track->duration = 0;
+    }
 
     cdda_backend->tracks = g_list_append (cdda_backend->tracks, track);
   }
