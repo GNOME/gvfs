@@ -1,5 +1,5 @@
 # gvfs ja.po.
-# Copyright (C) 2008-2013, 2020, 2022 Free Software Foundation, Inc.
+# Copyright (C) 2008-2013, 2020, 2022, 2025 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gvfs package.
 # Takeshi AIHANA <takeshi.aihana@gmail.com>, 2008, 2009.
 # Shushi Kurose <md81bird@hitaki.net>, 2010.
@@ -9,68 +9,70 @@
 # Nishio Futoshi <fut_nis@d3.dion.ne.jp>, 2012.
 # Jiro Matsuzawa <jmatsuzawa@gnome.org>, 2013.
 # sicklylife <translation@sicklylife.jp>, 2020, 2022.
+# Makoto Sakaguchi <ycco34vx@gmail.com>, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues\n"
-"POT-Creation-Date: 2021-02-12 13:52+0000\n"
-"PO-Revision-Date: 2022-03-12 15:30+0900\n"
-"Last-Translator: sicklylife <translation@sicklylife.jp>\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
+"POT-Creation-Date: 2025-07-15 06:51+0000\n"
+"PO-Revision-Date: 2025-07-27 05:27+0900\n"
+"Last-Translator: Makoto Sakaguchi <ycco34vx@gmail.com>\n"
 "Language-Team: Japanese <gnome-translation@gnome.gr.jp>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.6\n"
 
-#: client/gdaemonfile.c:435 client/gdaemonfile.c:2718
+#: client/gdaemonfile.c:437
 msgid "Operation not supported, files on different mounts"
-msgstr "サポートしていない操作です (ファイルが別々のマウント先にあります)"
+msgstr "操作がサポートされていません。ファイルが異なるマウント先にあります"
 
-#: client/gdaemonfile.c:1028 client/gdaemonfile.c:3066
-#: client/gvfsiconloadable.c:351 daemon/gvfsjobopenforread.c:183
-#: daemon/gvfsjobopenforwrite.c:333
+#: client/gdaemonfile.c:1045 client/gdaemonfile.c:3079
+#: client/gvfsiconloadable.c:366 daemon/gvfsjobopenforread.c:183
+#: daemon/gvfsjobopenforwrite.c:356
 msgid "Couldn’t get stream file descriptor"
-msgstr "ストリームファイルのディスクリプターを取得できませんでした"
+msgstr "ストリームファイル記述子を取得できませんでした"
 
-#: client/gdaemonfile.c:1144 client/gdaemonfile.c:1216
-#: client/gvfsiconloadable.c:145
+#: client/gdaemonfile.c:1161 client/gdaemonfile.c:1233
+#: client/gvfsiconloadable.c:147
 msgid "Didn’t get stream file descriptor"
-msgstr "ストリームファイルのディスクリプターを取得しませんでした"
+msgstr "ストリームファイル記述子を取得しませんでした"
 
-#: client/gdaemonfile.c:1338
+#: client/gdaemonfile.c:1358
 #, c-format
 msgid "Invalid return value from %s"
-msgstr "%s からの不正な戻り値"
+msgstr "%s からの戻り値が無効です"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: client/gdaemonfile.c:2188 client/gdaemonfile.c:3329
+#: client/gdaemonfile.c:2208 client/gdaemonfile.c:3345
 msgid "Could not find enclosing mount"
-msgstr "関連するマウントが見つかりませんでした"
+msgstr "対応するマウントが見つかりませんでした"
 
-#: client/gdaemonfile.c:2220
+#: client/gdaemonfile.c:2240
 #, c-format
 msgid "Invalid filename %s"
-msgstr "不正なファイル名: %s"
+msgstr "無効なファイル名 %s"
 
-#: client/gdaemonfile.c:2534 client/gdaemonfile.c:2544
-#: client/gdaemonfile.c:2566 client/gdaemonvfs.c:1234 client/gdaemonvfs.c:1255
+#: client/gdaemonfile.c:2554 client/gdaemonfile.c:2564
+#: client/gdaemonfile.c:2586 client/gdaemonvfs.c:1234 client/gdaemonvfs.c:1255
 #: client/gdaemonvfs.c:1266 client/gdaemonvfs.c:1298
 #, c-format
 msgid "Error setting file metadata: %s"
-msgstr "ファイルのメタデータ設定中にエラーが発生しました: %s"
+msgstr "ファイルメタデータの設定エラー: %s"
 
-#: client/gdaemonfile.c:2535 client/gdaemonvfs.c:1256
+#: client/gdaemonfile.c:2555 client/gdaemonvfs.c:1256
 msgid "can’t open metadata tree"
 msgstr "メタデータツリーを開けません"
 
-#: client/gdaemonfile.c:2545 client/gdaemonvfs.c:1267
+#: client/gdaemonfile.c:2565 client/gdaemonvfs.c:1267
 msgid "can’t get metadata proxy"
 msgstr "メタデータプロキシを取得できません"
 
-#: client/gdaemonfile.c:2567 client/gdaemonvfs.c:1299
+#: client/gdaemonfile.c:2587 client/gdaemonvfs.c:1299
 msgid "values must be string or list of strings"
 msgstr "値は文字列または文字列リストである必要があります"
 
@@ -80,20 +82,20 @@ msgstr "値は文字列または文字列リストである必要があります
 #: client/gdaemonfileoutputstream.c:1433 client/gdaemonfileoutputstream.c:1442
 #, c-format
 msgid "Error in stream protocol: %s"
-msgstr "ストリームのプロトコルでエラーが発生しました: %s"
+msgstr "ストリームプロトコルエラー: %s"
 
 #: client/gdaemonfileinputstream.c:552 client/gdaemonfileinputstream.c:1695
 #: client/gdaemonfileoutputstream.c:503 client/gdaemonfileoutputstream.c:1442
-#: daemon/gvfsbackendmtp.c:2453 daemon/gvfsbackendmtp.c:2844
+#: daemon/gvfsbackendmtp.c:2504 daemon/gvfsbackendmtp.c:2941
 msgid "End of stream"
-msgstr "ストリームの末尾"
+msgstr "ストリーム終端"
 
 #: client/gdaemonfileinputstream.c:649 client/gdaemonfileinputstream.c:802
 #: client/gdaemonfileinputstream.c:922 client/gdaemonfileinputstream.c:1173
 #: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
 #: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
 #: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
-#: daemon/gvfsbackendsftp.c:5531 daemon/gvfsbackendsmb.c:1122
+#: daemon/gvfsbackendsftp.c:5521 daemon/gvfsbackendsmb.c:1160
 #: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
 #: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:347
 #: daemon/gvfsftptask.c:224
@@ -102,25 +104,39 @@ msgstr "操作がキャンセルされました"
 
 #: client/gdaemonfileinputstream.c:1355 client/gdaemonfileoutputstream.c:1035
 msgid "Seek not supported on stream"
-msgstr "ストリーム上のシークはサポートしていません"
+msgstr "ストリームでシークはサポートされていません"
 
 #: client/gdaemonfileoutputstream.c:1204
 msgid "Truncate not supported on stream"
-msgstr "ストリームの切りつめはサポートしていません"
+msgstr "ストリームで切り詰めはサポートされていません"
 
 #: client/gdaemonvfs.c:780
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "マウント情報の取得中にエラーが発生しました: %s"
 
+#: client/gvfsdaemondbus.c:292 client/gvfsdaemondbus.c:666
+#: daemon/gvfsafpvolume.c:394 daemon/gvfsafpvolume.c:655
+#: daemon/gvfsafpvolume.c:799 daemon/gvfsafpvolume.c:981
+#: daemon/gvfsafpvolume.c:1165 daemon/gvfsafpvolume.c:1340
+#: daemon/gvfsafpvolume.c:1492 daemon/gvfsafpvolume.c:1914
+#: daemon/gvfsafpvolume.c:2035 daemon/gvfsafpvolume.c:2190
+#: daemon/gvfsafpvolume.c:2403 daemon/gvfsbackendadmin.c:150
+#: daemon/gvfsbackendafc.c:166 daemon/gvfsbackendgoogle.c:256
+#: daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1125
+#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:438 daemon/mount.c:437
+#, c-format
+msgid "Permission denied"
+msgstr "アクセス権限がありません"
+
 #: common/gvfsdaemonprotocol.c:358
 msgid "Invalid file info format"
-msgstr "不正なファイル情報形式"
+msgstr "無効なファイル情報形式"
 
 #: common/gvfsdnssdresolver.c:216
 #, c-format
 msgid "Error initializing Avahi: %s"
-msgstr "Avahi のデーモンを初期化するときにエラーが発生しました: %s"
+msgstr "Avahi の初期化エラー: %s"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -130,7 +146,7 @@ msgstr "Avahi のデーモンを初期化するときにエラーが発生しま
 #: common/gvfsdnssdresolver.c:1144
 #, c-format
 msgid "Error resolving “%s” service “%s” on domain “%s”"
-msgstr "“%s”な“%s”というサービスは“%s”というドメインにはありません"
+msgstr "ドメイン “%3$s” のサービス “%2$s” (“%1$s”) の解決エラー"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -144,8 +160,8 @@ msgid ""
 "Error resolving “%s” service “%s” on domain “%s”. One or more TXT records "
 "are missing. Keys required: “%s”."
 msgstr ""
-"“%s”な“%s”というサービスは“%s”というドメインにはありませんでした: 一つ以上の "
-"TXT レコードが不足しています: 必要なキーは“%s”です。"
+"ドメイン “%3$s” のサービス “%2$s” (“%1$s”) の解決エラー。1つ以上の TXT レコー"
+"ドが見つかりません。必要なキー: “%4$s”。"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -156,8 +172,7 @@ msgstr ""
 #, c-format
 msgid "Timed out resolving “%s” service “%s” on domain “%s”"
 msgstr ""
-"“%s”な“%s”というサービスを“%s”というドメインから検索しましたがタイムアウトに"
-"なりました"
+"ドメイン “%3$s” のサービス “%2$s” (“%1$s”) の解決がタイムアウトしました"
 
 #: common/gvfsdnssdresolver.c:1223
 msgid "Error initializing Avahi resolver"
@@ -167,23 +182,23 @@ msgstr "Avahi リゾルバの初期化中にエラーが発生しました"
 #: common/gvfsdnssdutils.c:280
 #, c-format
 msgid "Malformed DNS-SD encoded_triple “%s”"
-msgstr "DNS-SD の encoded_triple の形式が間違っています: “%s”"
+msgstr "不正な形式の DNS-SD encoded_triple “%s”"
 
 #: common/gvfsicon.c:250
 #, c-format
 msgid "Can’t handle version %d of GVfsIcon encoding"
-msgstr "バージョン %d の GVfsIcon 型エンコーディングはサポートしていません"
+msgstr "GVfsIcon エンコーディングのバージョン %d を処理できません"
 
 #: common/gvfsicon.c:260
 msgid "Malformed input data for GVfsIcon"
-msgstr "GVfsIcon 型の入力データ形式が間違っています"
+msgstr "GVfsIcon の入力データが不正な形式です"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "FTP"
 #: daemon/daemon-main.c:100
 #, c-format
 msgid "%s File System Service"
-msgstr "%s のファイルシステムサービス"
+msgstr "%s ファイルシステムサービス"
 
 #: daemon/daemon-main.c:178
 #, c-format
@@ -193,29 +208,29 @@ msgstr "エラー: %s"
 #: daemon/daemon-main.c:236
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
-msgstr "用法: %s --spawner dbus-id object_path"
+msgstr "使用法: %s --spawner dbus-id object_path"
 
 #: daemon/daemon-main.c:260 daemon/daemon-main.c:278
 #, c-format
 msgid "Usage: %s key=value key=value …"
-msgstr "用法: %s key=value key=value …"
+msgstr "使用法: %s key=value key=value …"
 
 #: daemon/daemon-main.c:276
 msgid "No mount type specified"
-msgstr "マウントの種類が指定されていません"
+msgstr "マウントタイプが指定されていません"
 
 #: daemon/daemon-main.c:308
 #, c-format
 msgid "mountpoint for %s already running"
-msgstr "%s 用のマウントポイントはすでに使用中です"
+msgstr "%s のマウントポイントはすでに実行中です"
 
 #: daemon/daemon-main.c:337
 msgid "error starting mount daemon"
-msgstr "マウントデーモンの起動中にエラーが発生しました"
+msgstr "マウントデーモンの開始中にエラーが発生しました"
 
 #: daemon/gvfsafpconnection.c:787
 msgid "The connection is not opened"
-msgstr "接続が開いていません"
+msgstr "接続が開かれていません"
 
 #: daemon/gvfsafpconnection.c:794
 msgid "The connection is closed"
@@ -223,10 +238,10 @@ msgstr "接続が閉じています"
 
 #: daemon/gvfsafpconnection.c:897
 msgid "Got EOS"
-msgstr "EOS を受けとりました"
+msgstr "EOS を受信しました"
 
 #: daemon/gvfsafpconnection.c:1060 daemon/gvfsafpconnection.c:1102
-#: daemon/gvfsftptask.c:397
+#: daemon/gvfsftptask.c:398
 msgid "Host closed connection"
 msgstr "ホストが接続を閉じました"
 
@@ -236,47 +251,48 @@ msgstr "接続が予期せず切断されました"
 
 #: daemon/gvfsafpconnection.c:1548
 msgid "Got unexpected end of stream"
-msgstr "予期せぬストリームの末尾を受け取りました"
+msgstr "予期しないストリーム終了を受信しました"
 
 #. Translators: %d is a constant, currently hardcoded to 256
 #: daemon/gvfsafpserver.c:195 daemon/gvfsafpserver.c:477
 #, c-format
 msgid "The server doesn’t support passwords longer than %d character."
 msgid_plural "The server doesn’t support passwords longer than %d characters."
-msgstr[0] "サーバーが %d 文字より長いパスワードをサポートしていません。"
+msgstr[0] "サーバーは %d 文字を超えるパスワードをサポートしていません。"
 
 #: daemon/gvfsafpserver.c:221 daemon/gvfsafpserver.c:530
 msgid "An invalid username was provided."
-msgstr "有効ではないユーザー名が入力されました。"
+msgstr "無効なユーザー名が入力されました。"
 
 #: daemon/gvfsafpserver.c:390
 #, c-format
 msgid "Unable to login to the server “%s” with the given password."
-msgstr "そのパスワードでは、サーバー“%s”にログインできません。"
+msgstr "指定されたパスワードではサーバー “%s” にログインできません。"
 
 #: daemon/gvfsafpserver.c:425 daemon/gvfsafpserver.c:647
 #: daemon/gvfsafpserver.c:823 daemon/gvfsafpserver.c:871
 #: daemon/gvfsafpserver.c:987 daemon/gvfsafpserver.c:1659
 #, c-format
 msgid "Unable to connect to the server “%s”. A communication problem occurred."
-msgstr "サーバー“%s”に接続できません。通信に問題が生じました。"
+msgstr "サーバー “%s” に接続できません。通信に問題が発生しました。"
 
 #: daemon/gvfsafpserver.c:620
 #, c-format
 msgid "Unable to connect to the server “%s” with the given password."
-msgstr "そのパスワードでは、サーバー“%s”に接続できません。"
+msgstr "指定されたパスワードではサーバー “%s” に接続できません。"
 
 #: daemon/gvfsafpserver.c:673 daemon/gvfsafpserver.c:698
 #, c-format
 msgid "The server “%s” doesn’t support anonymous access."
-msgstr "サーバー“%s”は匿名でのアクセスをサポートしていません。"
+msgstr "サーバー “%s” は匿名アクセスをサポートしていません。"
 
 #: daemon/gvfsafpserver.c:726
 #, c-format
 msgid ""
 "Unable to connect to the server “%s”. No suitable authentication mechanism "
 "was found."
-msgstr "サーバー“%s”に接続できません。適切な認証方法が見つかりませんでした。"
+msgstr ""
+"サーバー “%s” に接続できません。適切な認証メカニズムが見つかりませんでした。"
 
 #: daemon/gvfsafpserver.c:801
 #, c-format
@@ -284,13 +300,13 @@ msgid ""
 "Unable to connect to the server “%s”. The server doesn’t support AFP version "
 "3.0 or later."
 msgstr ""
-"サーバー“%s”に接続できません。サーバーは AFP バージョン 3.0 以降をサポートし"
-"ていません。"
+"サーバー “%s” に接続できません。サーバーは AFP バージョン 3.0 以降をサポート"
+"していません。"
 
 #: daemon/gvfsafpserver.c:912
 #, c-format
 msgid "Permission denied."
-msgstr "権限がありません。"
+msgstr "アクセス権限がありません。"
 
 #: daemon/gvfsafpserver.c:917
 #, c-format
@@ -300,15 +316,15 @@ msgstr "サーバーでサポートされていないコマンドです。"
 #: daemon/gvfsafpserver.c:921
 #, c-format
 msgid "Your password has expired."
-msgstr "あなたのパスワードは期限切れです。"
+msgstr "パスワードの有効期限が切れています。"
 
 #: daemon/gvfsafpserver.c:925
 #, c-format
 msgid "Your password needs to be changed."
-msgstr "あなたのパスワードを変更する必要があります。"
+msgstr "パスワードを変更する必要があります。"
 
 #. Translators: the first %s is the username, the second the host name
-#: daemon/gvfsafpserver.c:1063 daemon/gvfsbackendftp.c:530
+#: daemon/gvfsafpserver.c:1063 daemon/gvfsbackendftp.c:531
 #: daemon/gvfsbackendsftp.c:1167
 #, c-format
 msgid ""
@@ -316,20 +332,20 @@ msgid ""
 "Enter password for “%s” on “%s”:"
 msgstr ""
 "認証が必要です\n"
-"“%2$s”の“%1$s”のパスワードを入力してください:"
+"“%s” @ “%s” のパスワードを入力してください:"
 
 #. Translators: %s here is the hostname
 #. Translators: %s is the hostname
 #. Translators: %s is a server name
-#: daemon/gvfsafpserver.c:1066 daemon/gvfsbackendftp.c:533
-#: daemon/gvfsbackendsftp.c:1174 daemon/gvfsbackendsmbbrowse.c:379
+#: daemon/gvfsafpserver.c:1066 daemon/gvfsbackendftp.c:534
+#: daemon/gvfsbackendsftp.c:1174 daemon/gvfsbackendsmbbrowse.c:340
 #, c-format
 msgid ""
 "Authentication Required\n"
 "Enter user and password for “%s”:"
 msgstr ""
 "認証が必要です\n"
-"“%s”のユーザー名とパスワードを入力してください:"
+"“%s” のユーザー名とパスワードを入力してください:"
 
 #: daemon/gvfsafpserver.c:1098
 msgid "The password prompt was cancelled."
@@ -350,12 +366,12 @@ msgstr "識別情報が見つかりません。"
 #: daemon/gvfsafputils.c:124
 #, c-format
 msgid "Got error “%s” from server"
-msgstr "サーバーがエラー“%s”を返しました"
+msgstr "サーバーからエラー “%s” を受信しました"
 
 #: daemon/gvfsafputils.c:127
 #, c-format
 msgid "Got unknown error code %d from server"
-msgstr "サーバーが未知のエラーコード %d を返しました"
+msgstr "サーバーから未知のエラーコード %d を受信しました"
 
 #: daemon/gvfsafpvolume.c:136
 msgid "Volume doesn’t exist"
@@ -367,209 +383,195 @@ msgstr "ボリュームがありません"
 msgid "Couldn’t load %s on %s"
 msgstr "%2$s 上の %1$s を読み込めませんでした"
 
-#: daemon/gvfsafpvolume.c:394 daemon/gvfsafpvolume.c:655
-#: daemon/gvfsafpvolume.c:799 daemon/gvfsafpvolume.c:980
-#: daemon/gvfsafpvolume.c:1164 daemon/gvfsafpvolume.c:1339
-#: daemon/gvfsafpvolume.c:1491 daemon/gvfsafpvolume.c:1913
-#: daemon/gvfsafpvolume.c:2034 daemon/gvfsafpvolume.c:2189
-#: daemon/gvfsafpvolume.c:2402 daemon/gvfsbackendadmin.c:141
-#: daemon/gvfsbackendafc.c:166 daemon/gvfsbackendgoogle.c:256
-#: daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1125
-#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:437
-#, c-format
-msgid "Permission denied"
-msgstr "権限がありません"
-
-#: daemon/gvfsafpvolume.c:398 daemon/gvfsafpvolume.c:1652
-#: daemon/gvfsafpvolume.c:2406 daemon/gvfsbackendafc.c:150
+#: daemon/gvfsafpvolume.c:398 daemon/gvfsafpvolume.c:1653
+#: daemon/gvfsafpvolume.c:2407 daemon/gvfsbackendafc.c:150
 #: daemon/gvfsbackendafc.c:1064 daemon/gvfsbackendafpbrowse.c:180
 #: daemon/gvfsbackendafpbrowse.c:312 daemon/gvfsbackendafpbrowse.c:344
 #: daemon/gvfsbackendarchive.c:738 daemon/gvfsbackendarchive.c:793
 #: daemon/gvfsbackendarchive.c:845 daemon/gvfsbackendarchive.c:874
 #: daemon/gvfsbackendcdda.c:908 daemon/gvfsbackendcomputer.c:639
-#: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:795
-#: daemon/gvfsbackendftp.c:1189 daemon/gvfsbackendmtp.c:1754
-#: daemon/gvfsbackendmtp.c:1770 daemon/gvfsbackendmtp.c:2177
-#: daemon/gvfsbackendmtp.c:2240 daemon/gvfsbackendmtp.c:2307
-#: daemon/gvfsbackendmtp.c:2669 daemon/gvfsbackendmtp.c:2948
-#: daemon/gvfsbackendmtp.c:3091 daemon/gvfsbackendnetwork.c:697
-#: daemon/gvfsbackendsmbbrowse.c:1119 daemon/gvfsbackendsmbbrowse.c:1186
-#: daemon/gvfsbackendsmbbrowse.c:1368 daemon/gvfsbackendsmbbrowse.c:1441
+#: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:800
+#: daemon/gvfsbackendftp.c:1194 daemon/gvfsbackendmtp.c:1805
+#: daemon/gvfsbackendmtp.c:1821 daemon/gvfsbackendmtp.c:2228
+#: daemon/gvfsbackendmtp.c:2291 daemon/gvfsbackendmtp.c:2358
+#: daemon/gvfsbackendmtp.c:3045 daemon/gvfsbackendmtp.c:3188
+#: daemon/gvfsbackendnetwork.c:893 daemon/gvfsbackendsmbbrowse.c:911
+#: daemon/gvfsbackendsmbbrowse.c:978 daemon/gvfsbackendsmbbrowse.c:1160
+#: daemon/gvfsbackendsmbbrowse.c:1233
 #, c-format
 msgid "File doesn’t exist"
-msgstr "ファイルがありません"
+msgstr "ファイルが存在しません"
 
-#: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2410
-#: daemon/gvfsbackendafp.c:289 daemon/gvfsbackendafp.c:492
-#: daemon/gvfsbackendafp.c:1341 daemon/gvfsbackenddav.c:2410
-#: daemon/gvfsbackenddav.c:3073 daemon/gvfsbackenddav.c:3353
-#: daemon/gvfsbackendftp.c:832 daemon/gvfsbackendnfs.c:2480
-#: daemon/gvfsbackendsftp.c:2725 daemon/gvfsbackendsftp.c:3500
-#: daemon/gvfsbackendsftp.c:3948 daemon/gvfsbackendsftp.c:5020
-#: daemon/gvfsbackendsftp.c:6105
+#: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2411
+#: daemon/gvfsbackendafp.c:280 daemon/gvfsbackendafp.c:483
+#: daemon/gvfsbackendafp.c:1361 daemon/gvfsbackenddav.c:2798
+#: daemon/gvfsbackenddav.c:3757 daemon/gvfsbackenddav.c:4004
+#: daemon/gvfsbackendftp.c:837 daemon/gvfsbackendnfs.c:2609
+#: daemon/gvfsbackendsftp.c:2728 daemon/gvfsbackendsftp.c:3437
+#: daemon/gvfsbackendsftp.c:3938 daemon/gvfsbackendsftp.c:5010
+#: daemon/gvfsbackendsftp.c:6095
 msgid "File is directory"
-msgstr "ファイルがフォルダーです"
+msgstr "ファイルはディレクトリです"
 
 #: daemon/gvfsafpvolume.c:406
 msgid "Too many files open"
-msgstr "ファイルを開き過ぎています"
+msgstr "開いているファイルが多すぎます"
 
 #: daemon/gvfsafpvolume.c:659 daemon/gvfsafpvolume.c:807
 msgid "Target file is open"
-msgstr "対象のファイルはオープンされています"
+msgstr "対象のファイルが開かれています"
 
 #: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
-#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:2800
-#: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendsftp.c:2209
+#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3310
+#: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendonedrive.c:960
+#: daemon/gvfsbackendsftp.c:2209
 msgid "Directory not empty"
-msgstr "フォルダーが空ではありません"
+msgstr "ディレクトリが空ではありません"
 
 #: daemon/gvfsafpvolume.c:667
 msgid "Target object is marked as not deletable (DeleteInhibit)"
-msgstr "対象のオブジェクトは削除可能とマークされていません (DeleteInhibit)"
+msgstr "対象のオブジェクトは削除不可としてマークされています (DeleteInhibit)"
 
-#: daemon/gvfsafpvolume.c:671 daemon/gvfsafpvolume.c:1180
-#: daemon/gvfsafpvolume.c:2038 daemon/gvfsbackendgoogle.c:262
+#: daemon/gvfsafpvolume.c:671 daemon/gvfsafpvolume.c:1181
+#: daemon/gvfsafpvolume.c:2039 daemon/gvfsbackendgoogle.c:262
 #, c-format
 msgid "Target object doesn’t exist"
-msgstr "対象のオブジェクトがありません"
+msgstr "対象のオブジェクトが存在しません"
 
-#: daemon/gvfsafpvolume.c:675 daemon/gvfsafpvolume.c:819
-#: daemon/gvfsafpvolume.c:1002 daemon/gvfsafpvolume.c:1184
-#: daemon/gvfsafpvolume.c:2042
+#: daemon/gvfsafpvolume.c:675 daemon/gvfsafpvolume.c:820
+#: daemon/gvfsafpvolume.c:1003 daemon/gvfsafpvolume.c:1185
+#: daemon/gvfsafpvolume.c:2043
 msgid "Volume is read-only"
 msgstr "ボリュームは読み取り専用です"
 
-#: daemon/gvfsafpvolume.c:803 daemon/gvfsafpvolume.c:984
-#: daemon/gvfsafpvolume.c:1503 daemon/gvfsafpvolume.c:1917
-#: daemon/gvfsafpvolume.c:2534
+#: daemon/gvfsafpvolume.c:803 daemon/gvfsafpvolume.c:985
+#: daemon/gvfsafpvolume.c:1504 daemon/gvfsafpvolume.c:1918
+#: daemon/gvfsafpvolume.c:2535
 msgid "Not enough space on volume"
-msgstr "ボリュームに十分な空き容量がありません"
+msgstr "ボリュームの容量が不足しています"
 
-#: daemon/gvfsafpvolume.c:811 daemon/gvfsafpvolume.c:1355
-#: daemon/gvfsafpvolume.c:1507 daemon/gvfsbackendafp.c:296
-#: daemon/gvfsbackendafp.c:499 daemon/gvfsbackenddav.c:2465
-#: daemon/gvfsbackenddav.c:2761 daemon/gvfsbackenddav.c:2869
-#: daemon/gvfsbackenddav.c:3006 daemon/gvfsbackenddav.c:3082
-#: daemon/gvfsbackenddav.c:3120 daemon/gvfsbackenddav.c:3344
-#: daemon/gvfsbackendftp.c:811 daemon/gvfsbackendftp.c:999
-#: daemon/gvfsbackendftp.c:1509 daemon/gvfsbackendftp.c:1576
+#: daemon/gvfsafpvolume.c:812 daemon/gvfsafpvolume.c:1356
+#: daemon/gvfsafpvolume.c:1508 daemon/gvfsbackendafp.c:287
+#: daemon/gvfsbackendafp.c:490 daemon/gvfsbackenddav.c:2869
+#: daemon/gvfsbackenddav.c:3223 daemon/gvfsbackenddav.c:3383
+#: daemon/gvfsbackenddav.c:3489 daemon/gvfsbackenddav.c:3723
+#: daemon/gvfsbackenddav.c:3767 daemon/gvfsbackenddav.c:3994
+#: daemon/gvfsbackendftp.c:816 daemon/gvfsbackendftp.c:1004
+#: daemon/gvfsbackendftp.c:1557 daemon/gvfsbackendftp.c:1625
 #: daemon/gvfsbackendgoogle.c:1703 daemon/gvfsbackendgoogle.c:1780
 #: daemon/gvfsbackendgoogle.c:2157 daemon/gvfsbackendgoogle.c:2237
 #: daemon/gvfsbackendgoogle.c:2757 daemon/gvfsbackendgoogle.c:3204
-#: daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1650
-#: daemon/gvfsbackendmtp.c:1693 daemon/gvfsbackendnfs.c:2490
-#: daemon/gvfsbackendsftp.c:5029 daemon/gvfsbackendsmb.c:2111
+#: daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1701
+#: daemon/gvfsbackendmtp.c:1744 daemon/gvfsbackendmtp.c:2646
+#: daemon/gvfsbackendnfs.c:2619 daemon/gvfsbackendonedrive.c:1113
+#: daemon/gvfsbackendonedrive.c:1740 daemon/gvfsbackendsftp.c:5019
+#: daemon/gvfsbackendsmb.c:2192
 msgid "Target file already exists"
-msgstr "対象のファイルがすでに存在します"
+msgstr "対象のファイルはすでに存在します"
 
-#: daemon/gvfsafpvolume.c:815 daemon/gvfsafpvolume.c:994
+#: daemon/gvfsafpvolume.c:816 daemon/gvfsafpvolume.c:995
 msgid "Ancestor directory doesn’t exist"
 msgstr "親フォルダーが存在しません"
 
 #. Translators: flat means volume doesn't support directories
 #. (all files are in the volume root)
-#: daemon/gvfsafpvolume.c:990
+#: daemon/gvfsafpvolume.c:991
 msgid "Volume is flat and doesn’t support directories"
-msgstr "ボリュームはフラットで、フォルダーをサポートしていません"
+msgstr "ボリュームはフラット構造でディレクトリをサポートしていません"
 
-#: daemon/gvfsafpvolume.c:998
+#: daemon/gvfsafpvolume.c:999
 msgid "Target directory already exists"
-msgstr "対象のフォルダーがすでに存在します"
+msgstr "対象のディレクトリがすでに存在します"
 
-#: daemon/gvfsafpvolume.c:1168 daemon/gvfsbackendafp.c:604
+#: daemon/gvfsafpvolume.c:1169 daemon/gvfsbackendafp.c:595
 msgid "Can’t rename volume"
 msgstr "ボリュームの名前を変更できません"
 
-#: daemon/gvfsafpvolume.c:1172
+#: daemon/gvfsafpvolume.c:1173
 msgid "Object with that name already exists"
 msgstr "その名前のオブジェクトはすでに存在します"
 
-#: daemon/gvfsafpvolume.c:1176
+#: daemon/gvfsafpvolume.c:1177
 msgid "Target object is marked as not renameable (RenameInhibit)"
-msgstr ""
-"対象のオブジェクトは名前の変更可能とマークされていません (RenameInhibit)"
+msgstr "対象オブジェクトは名前変更不可としてマークされています (RenameInhibit)"
 
-#: daemon/gvfsafpvolume.c:1343
+#: daemon/gvfsafpvolume.c:1344
 msgid "Can’t move directory into one of its descendants"
-msgstr "フォルダーをその配下のフォルダーに移動できません"
+msgstr "ディレクトリをその子孫の中に移動することはできません"
 
-#: daemon/gvfsafpvolume.c:1347
+#: daemon/gvfsafpvolume.c:1348
 msgid "Can’t move sharepoint into a shared directory"
-msgstr "共有ポイントを共有フォルダー内に移動できません"
+msgstr "共有ポイントを共有ディレクトリに移動することはできません"
 
-#: daemon/gvfsafpvolume.c:1351
+#: daemon/gvfsafpvolume.c:1352
 msgid "Can’t move a shared directory into the Trash"
-msgstr "共有フォルダーはゴミ箱に移動できません"
+msgstr "共有ディレクトリはゴミ箱に移動できません"
 
-#: daemon/gvfsafpvolume.c:1359
+#: daemon/gvfsafpvolume.c:1360
 msgid "Object being moved is marked as not renameable (RenameInhibit)"
 msgstr ""
-"移動しているオブジェクトは名前の変更可能とマークされていません "
-"(RenameInhibit)"
+"移動されるオブジェクトは名前変更不可としてマークされています (RenameInhibit)"
 
-#: daemon/gvfsafpvolume.c:1363
+#: daemon/gvfsafpvolume.c:1364
 msgid "Object being moved doesn’t exist"
-msgstr "移動しているオブジェクトが存在しません"
+msgstr "移動されるオブジェクトが存在しません"
 
-#: daemon/gvfsafpvolume.c:1495
+#: daemon/gvfsafpvolume.c:1496
 msgid "Server doesn’t support the FPCopyFile operation"
-msgstr "サーバーが FPCopyFile 操作をサポートしていません"
+msgstr "サーバーは FPCopyFile 操作をサポートしていません"
 
-#: daemon/gvfsafpvolume.c:1499
+#: daemon/gvfsafpvolume.c:1500
 msgid "Unable to open source file for reading"
-msgstr "コピー元ファイルを読み込み用にオープンできません"
+msgstr "元ファイルを読み取り用に開くことができません"
 
-#: daemon/gvfsafpvolume.c:1511
+#: daemon/gvfsafpvolume.c:1512
 msgid "Source file and/or destination directory doesn’t exist"
-msgstr ""
-"コピー元のファイルおよびコピー先のフォルダーのいずれか、または両方が存在しま"
-"せん"
+msgstr "元ファイルや宛先ディレクトリが存在しません"
 
-#: daemon/gvfsafpvolume.c:1515
+#: daemon/gvfsafpvolume.c:1516
 msgid "Source file is a directory"
-msgstr "コピー元ファイルはフォルダーです"
+msgstr "元ファイルはディレクトリです"
 
 #. Translators: range conflict means
 #. requested data are locked by another user
-#: daemon/gvfsafpvolume.c:1923
+#: daemon/gvfsafpvolume.c:1924
 msgid "Range lock conflict exists"
-msgstr "Range lock conflict が存在します"
+msgstr "範囲ロックが競合しています"
 
-#: daemon/gvfsafpvolume.c:2193 daemon/gvfsbackendmtp.c:1473
-#: daemon/gvfsbackendmtp.c:1498 daemon/gvfsbackendmtp.c:1701
-#: daemon/gvfsbackendmtp.c:2077 daemon/gvfsbackendmtp.c:2594
-#: daemon/gvfsbackendmtp.c:2989 daemon/gvfsbackendmtp.c:3125
+#: daemon/gvfsafpvolume.c:2194 daemon/gvfsbackendmtp.c:1524
+#: daemon/gvfsbackendmtp.c:1549 daemon/gvfsbackendmtp.c:1752
+#: daemon/gvfsbackendmtp.c:2128 daemon/gvfsbackendmtp.c:2659
+#: daemon/gvfsbackendmtp.c:3086 daemon/gvfsbackendmtp.c:3222
 msgid "Directory doesn’t exist"
-msgstr "フォルダーが存在しません"
+msgstr "ディレクトリが存在しません"
 
-#: daemon/gvfsafpvolume.c:2197
+#: daemon/gvfsafpvolume.c:2198
 msgid "Target object is not a directory"
-msgstr "対象のオブジェクトはフォルダーではありません"
+msgstr "対象のオブジェクトはディレクトリではありません"
 
-#: daemon/gvfsafpvolume.c:2530
+#: daemon/gvfsafpvolume.c:2531
 msgid "File is not open for write access"
-msgstr "書き込みアクセスに対してファイルがオープンされません"
+msgstr "ファイルが書き込み用に開かれていません"
 
-#: daemon/gvfsafpvolume.c:2538
+#: daemon/gvfsafpvolume.c:2539
 msgid "File is locked by another user"
-msgstr "ファイルは他のユーザーによってロックされています"
+msgstr "ファイルが他のユーザーによってロックされています"
 
-#: daemon/gvfsafpvolume.c:2670
+#: daemon/gvfsafpvolume.c:2671
 msgid "File is not open for read access"
-msgstr "読み取りアクセスに対してファイルがオープンされません"
+msgstr "ファイルが読み取り用に開かれていません"
 
 #. Return G_IO_ERROR_NOT_SUPPORTED instead of
 #. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
 #. * fallback copy.
 #.
-#: daemon/gvfsbackendadmin.c:862 daemon/gvfsbackendafc.c:2361
-#: daemon/gvfsbackendafp.c:1781 daemon/gvfsbackendburn.c:829
-#: daemon/gvfsbackendburn.c:951 daemon/gvfsbackendcomputer.c:812
-#: daemon/gvfsbackenddav.c:3427 daemon/gvfsbackenddav.c:3459
-#: daemon/gvfsbackenddav.c:3487 daemon/gvfsbackendftp.c:1209
-#: daemon/gvfsbackendftp.c:1257 daemon/gvfsbackendftp.c:1278
-#: daemon/gvfsbackendftp.c:1624 daemon/gvfsbackendgoogle.c:1590
+#: daemon/gvfsbackendadmin.c:104 daemon/gvfsbackendadmin.c:871
+#: daemon/gvfsbackendafc.c:2361 daemon/gvfsbackendafp.c:1743
+#: daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
+#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:4086
+#: daemon/gvfsbackenddav.c:4118 daemon/gvfsbackenddav.c:4146
+#: daemon/gvfsbackendftp.c:1234 daemon/gvfsbackendftp.c:1323
+#: daemon/gvfsbackendftp.c:1674 daemon/gvfsbackendgoogle.c:1590
 #: daemon/gvfsbackendgoogle.c:1623 daemon/gvfsbackendgoogle.c:1652
 #: daemon/gvfsbackendgoogle.c:1675 daemon/gvfsbackendgoogle.c:1741
 #: daemon/gvfsbackendgoogle.c:2013 daemon/gvfsbackendgoogle.c:2045
@@ -585,27 +587,34 @@ msgstr "読み取りアクセスに対してファイルがオープンされま
 #: daemon/gvfsbackendgphoto2.c:2238 daemon/gvfsbackendgphoto2.c:2451
 #: daemon/gvfsbackendgphoto2.c:2548 daemon/gvfsbackendgphoto2.c:2641
 #: daemon/gvfsbackendgphoto2.c:3250 daemon/gvfsbackendgphoto2.c:3258
-#: daemon/gvfsbackendgphoto2.c:3268 daemon/gvfsbackendmtp.c:1746
-#: daemon/gvfsbackendmtp.c:2047 daemon/gvfsbackendmtp.c:2296
-#: daemon/gvfsbackendmtp.c:2487 daemon/gvfsbackendmtp.c:2570
-#: daemon/gvfsbackendmtp.c:2658 daemon/gvfsbackendmtp.c:2726
-#: daemon/gvfsbackendmtp.c:2921 daemon/gvfsbackendmtp.c:3064
-#: daemon/gvfsbackendnfs.c:2372 daemon/gvfsbackendnfs.c:2422
-#: daemon/gvfsbackendnfs.c:2548 daemon/gvfsbackendsftp.c:2213
-#: daemon/gvfsbackendsftp.c:5417 daemon/gvfsbackendsftp.c:5515
-#: daemon/gvfsbackendsftp.c:6227 daemon/gvfsbackendsftp.c:6259
-#: daemon/gvfsbackendsftp.c:6285 daemon/gvfsbackendsftp.c:6293
-#: daemon/gvfsbackendsftp.c:6780 daemon/gvfsbackendsftp.c:6842
-#: daemon/gvfsbackendsftp.c:6850 daemon/gvfsbackendsmb.c:1714
-#: daemon/gvfsftptask.c:429 daemon/gvfsjobcloseread.c:113
-#: daemon/gvfsjobclosewrite.c:121 daemon/gvfsjobcopy.c:121
-#: daemon/gvfsjobcreatemonitor.c:143 daemon/gvfsjobcreatemonitor.c:154
-#: daemon/gvfsjobcreatemonitor.c:177 daemon/gvfsjobcreatemonitor.c:195
-#: daemon/gvfsjobdelete.c:108 daemon/gvfsjobenumerate.c:272
-#: daemon/gvfsjobmakedirectory.c:108 daemon/gvfsjobmount.c:112
-#: daemon/gvfsjobmountmountable.c:138 daemon/gvfsjobmove.c:121
-#: daemon/gvfsjobopenforread.c:120 daemon/gvfsjobopenforwrite.c:184
-#: daemon/gvfsjobopenforwrite.c:198 daemon/gvfsjobopenforwrite.c:212
+#: daemon/gvfsbackendgphoto2.c:3268 daemon/gvfsbackendhttp.c:745
+#: daemon/gvfsbackendmtp.c:1797 daemon/gvfsbackendmtp.c:2098
+#: daemon/gvfsbackendmtp.c:2347 daemon/gvfsbackendmtp.c:2538
+#: daemon/gvfsbackendmtp.c:2621 daemon/gvfsbackendmtp.c:2772
+#: daemon/gvfsbackendmtp.c:3018 daemon/gvfsbackendmtp.c:3161
+#: daemon/gvfsbackendnfs.c:2501 daemon/gvfsbackendnfs.c:2551
+#: daemon/gvfsbackendnfs.c:2677 daemon/gvfsbackendonedrive.c:871
+#: daemon/gvfsbackendonedrive.c:970 daemon/gvfsbackendonedrive.c:1092
+#: daemon/gvfsbackendonedrive.c:1655 daemon/gvfsbackendonedrive.c:1707
+#: daemon/gvfsbackendonedrive.c:1723 daemon/gvfsbackendonedrive.c:1735
+#: daemon/gvfsbackendonedrive.c:1895 daemon/gvfsbackendonedrive.c:1911
+#: daemon/gvfsbackendsftp.c:2213 daemon/gvfsbackendsftp.c:5407
+#: daemon/gvfsbackendsftp.c:5505 daemon/gvfsbackendsftp.c:6217
+#: daemon/gvfsbackendsftp.c:6249 daemon/gvfsbackendsftp.c:6275
+#: daemon/gvfsbackendsftp.c:6283 daemon/gvfsbackendsftp.c:6770
+#: daemon/gvfsbackendsftp.c:6832 daemon/gvfsbackendsftp.c:6840
+#: daemon/gvfsbackendsmb.c:1784 daemon/gvfsbackendsmb.c:2264
+#: daemon/gvfsbackendtrash.c:937 daemon/gvfsbackendtrash.c:963
+#: daemon/gvfsbackendwsdd.c:364 daemon/gvfsftptask.c:430
+#: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121
+#: daemon/gvfsjobcopy.c:121 daemon/gvfsjobcreatemonitor.c:143
+#: daemon/gvfsjobcreatemonitor.c:154 daemon/gvfsjobcreatemonitor.c:177
+#: daemon/gvfsjobcreatemonitor.c:195 daemon/gvfsjobdelete.c:108
+#: daemon/gvfsjobenumerate.c:272 daemon/gvfsjobmakedirectory.c:108
+#: daemon/gvfsjobmount.c:112 daemon/gvfsjobmountmountable.c:138
+#: daemon/gvfsjobmove.c:121 daemon/gvfsjobopenforread.c:120
+#: daemon/gvfsjobopenforwrite.c:184 daemon/gvfsjobopenforwrite.c:198
+#: daemon/gvfsjobopenforwrite.c:212 daemon/gvfsjobopenforwrite.c:228
 #: daemon/gvfsjobopeniconforread.c:104 daemon/gvfsjobpollmountable.c:107
 #: daemon/gvfsjobpull.c:125 daemon/gvfsjobpush.c:125
 #: daemon/gvfsjobqueryattributes.c:145 daemon/gvfsjobqueryfsinfo.c:116
@@ -618,51 +627,51 @@ msgstr "読み取りアクセスに対してファイルがオープンされま
 #: daemon/gvfsjobunmountmountable.c:157 daemon/gvfsjobunmountmountable.c:172
 #: daemon/gvfsjobwrite.c:123
 msgid "Operation not supported"
-msgstr "サポートしていない操作です"
+msgstr "この操作はサポートされていません"
 
-#: daemon/gvfsbackendadmin.c:990 daemon/gvfsbackendarchive.c:639
-#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:1903
-#: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:256
-#: daemon/gvfsbackendsmb.c:596
+#: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639
+#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2354
+#: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:303
+#: daemon/gvfsbackendonedrive.c:1192 daemon/gvfsbackendsmb.c:628
 msgid "Invalid mount spec"
-msgstr "マウントの仕様が間違っています"
+msgstr "マウント指定が無効です"
 
 #: daemon/gvfsbackendafc.c:146
 msgid "Internal Apple File Control error"
-msgstr "Apple ファイルコントロールの内部エラー"
+msgstr "Apple File Control 内部エラー"
 
 #: daemon/gvfsbackendafc.c:158
 msgid "The device did not respond"
-msgstr "デバイスが応答していません"
+msgstr "デバイスからの応答がありません"
 
 #: daemon/gvfsbackendafc.c:162
 msgid "The connection was interrupted"
-msgstr "接続に割り込みがありました"
+msgstr "接続が中断されました"
 
 #: daemon/gvfsbackendafc.c:170
 msgid "Invalid Apple File Control data received"
-msgstr "無効な Apple ファイルコントロールデータを受信しました"
+msgstr "無効な Apple File Control データを受信しました"
 
 #: daemon/gvfsbackendafc.c:174
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
-msgstr "Apple ファイルコントロールの処理できないエラー (%d)"
+msgstr "未処理の Apple File Control エラー (%d)"
 
 #: daemon/gvfsbackendafc.c:190
 msgid "Listing applications installed on device failed"
-msgstr "デバイスにインストールされたアプリケーション一覧の作成に失敗しました"
+msgstr "デバイスのアプリケーション一覧の取得に失敗しました"
 
 #: daemon/gvfsbackendafc.c:206
 msgid "Accessing application icons on device failed"
-msgstr "デバイスのアプリケーションアイコンへのアクセスに失敗しました"
+msgstr "デバイスのアプリケーションアイコンにアクセスできませんでした"
 
 #: daemon/gvfsbackendafc.c:228
 msgid "Lockdown Error: Invalid Argument"
-msgstr "ロックダウンエラー: 引数が間違っています"
+msgstr "ロックダウンエラー: 引数が無効です"
 
 #: daemon/gvfsbackendafc.c:232
 msgid "The device is password protected"
-msgstr "デバイスはパスワードで保護されています"
+msgstr "デバイスがパスワードで保護されています"
 
 #: daemon/gvfsbackendafc.c:236
 msgid "Unable to connect"
@@ -679,11 +688,11 @@ msgstr "ユーザーがこのコンピューターを信頼していません"
 #: daemon/gvfsbackendafc.c:248
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
-msgstr "処理できないロックダウンエラー (%d)"
+msgstr "未処理のロックダウンエラー (%d)"
 
 #: daemon/gvfsbackendafc.c:265
 msgid "libimobiledevice Error: Invalid Argument"
-msgstr "libimobiledevice エラー: 引数が間違っています"
+msgstr "libimobiledevice エラー: 引数が無効です"
 
 #: daemon/gvfsbackendafc.c:269
 msgid ""
@@ -696,21 +705,20 @@ msgstr ""
 #: daemon/gvfsbackendafc.c:273
 #, c-format
 msgid "Unhandled libimobiledevice error (%d)"
-msgstr "libimobiledevice の処理できないエラー (%d)"
+msgstr "未処理の libimobiledevice エラー (%d)"
 
 #: daemon/gvfsbackendafc.c:394
 msgid "Try again"
-msgstr "もう一度試す"
+msgstr "再試行"
 
-#: daemon/gvfsbackendafc.c:394 daemon/gvfsbackend.c:1025
-#: monitor/udisks2/gvfsudisks2mount.c:750
+#: daemon/gvfsbackendafc.c:394 daemon/gvfsbackend.c:1024
+#: monitor/udisks2/gvfsudisks2mount.c:754
 msgid "Cancel"
 msgstr "キャンセル"
 
 #: daemon/gvfsbackendafc.c:411 daemon/gvfsbackendafc.c:442
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
-msgstr ""
-"AFC の場所が間違っています: afc://uuid:port-number の形式である必要があります"
+msgstr "無効な AFC の場所です: afc://uuid:ポート番号 の形式で指定してください"
 
 #: daemon/gvfsbackendafc.c:428
 #, c-format
@@ -720,7 +728,7 @@ msgstr "Apple モバイルデバイス"
 #: daemon/gvfsbackendafc.c:433
 #, c-format
 msgid "Apple Mobile Device, Jailbroken"
-msgstr "Apple モバイルデバイス (Jailbrake 済)"
+msgstr "Apple モバイルデバイス (脱獄済み)"
 
 #: daemon/gvfsbackendafc.c:438
 #, c-format
@@ -733,7 +741,7 @@ msgstr "Apple モバイルデバイス上のドキュメント"
 #: daemon/gvfsbackendafc.c:496
 #, c-format
 msgid "%s (jailbreak)"
-msgstr "%s (jailbreak)"
+msgstr "%s (脱獄)"
 
 #. translators:
 #. * This is "Documents on foo" where foo is the device name, eg.:
@@ -755,9 +763,10 @@ msgid ""
 "\n"
 "Enter the passcode on the device and click “Try again”."
 msgstr ""
-"デバイス“%s”はロックされています。\n"
+"ロックされたデバイス\n"
+"デバイス “%s” はロックされています。\n"
 "\n"
-"デバイスのパスコードを入力し、“もう一度試す”をクリックしてください。"
+"デバイスでパスコードを入力して “再試行” をクリックしてください。"
 
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
@@ -771,37 +780,40 @@ msgid ""
 "\n"
 "Select “Trust” on the device and click “Try again”."
 msgstr ""
-"デバイス“%s”はまだ信頼されていません。\n"
+"信頼されていないデバイス\n"
+"デバイス “%s” はまだ信頼されていません。\n"
 "\n"
-"デバイスで“信頼”を選択し、“もう一度試す”をクリックしてください。"
+"デバイスで “信頼” を選択して “再試行” をクリックしてください。"
 
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
-#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2329
-#: daemon/gvfsbackendnfs.c:356 daemon/gvfsbackendrecent.c:126
-#: daemon/gvfsbackendsmb.c:686 daemon/gvfsbackendtrash.c:234
+#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2380
+#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendonedrive.c:1461
+#: daemon/gvfsbackendrecent.c:126 daemon/gvfsbackendsmb.c:718
+#: daemon/gvfsbackendtrash.c:333
 msgid "Can’t open directory"
-msgstr "フォルダーを開けません"
+msgstr "ディレクトリを開けません"
 
 #: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528
-#: daemon/gvfsbackendafp.c:1270 daemon/gvfsbackendafp.c:1359
-#: daemon/gvfsbackenddav.c:2905 daemon/gvfsbackendftp.c:1461
-#: daemon/gvfsbackendsftp.c:3722 daemon/gvfsbackendsftp.c:4009
+#: daemon/gvfsbackendafp.c:1290 daemon/gvfsbackendafp.c:1379
+#: daemon/gvfsbackenddav.c:3664 daemon/gvfsbackendftp.c:1509
+#: daemon/gvfsbackendonedrive.c:1889 daemon/gvfsbackendsftp.c:3712
+#: daemon/gvfsbackendsftp.c:3999
 msgid "Backups not supported"
-msgstr "バックアップはサポートしていません"
+msgstr "バックアップはサポートされていません"
 
-#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:739
-#: daemon/gvfsbackendsmb.c:1218
+#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:771
+#: daemon/gvfsbackendsmb.c:1257
 msgid "Unsupported seek type"
-msgstr "サポートしていないシークの種類です"
+msgstr "サポートされていないシーク種別"
 
 #: daemon/gvfsbackendafpbrowse.c:208 daemon/gvfsbackendcomputer.c:958
 #: daemon/gvfsbackendcomputer.c:1053 daemon/gvfsbackendcomputer.c:1159
 #: daemon/gvfsbackendcomputer.c:1249 daemon/gvfsbackendcomputer.c:1322
-#: daemon/gvfsbackendcomputer.c:1391 daemon/gvfsbackendsmbbrowse.c:1114
-#: daemon/gvfsbackendsmbbrowse.c:1160
+#: daemon/gvfsbackendcomputer.c:1391 daemon/gvfsbackendsmbbrowse.c:906
+#: daemon/gvfsbackendsmbbrowse.c:952
 msgid "Not a mountable file"
-msgstr "マウント可能なファイルは存在しません"
+msgstr "マウント可能なファイルではありません"
 
 #. Translators: first %s is username and second serververname
 #. Translators: first %s is volumename and second servername
@@ -814,10 +826,10 @@ msgstr "マウント可能なファイルは存在しません"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: daemon/gvfsbackendafpbrowse.c:446 daemon/gvfsbackendafp.c:2105
-#: daemon/gvfsbackendftp.c:681 daemon/gvfsbackendnfs.c:290
-#: daemon/gvfsbackendsftp.c:2070 daemon/gvfsbackendsmb.c:455
-#: daemon/gvfsbackendsmb.c:1390
+#: daemon/gvfsbackendafpbrowse.c:446 daemon/gvfsbackendafp.c:2067
+#: daemon/gvfsbackendftp.c:682 daemon/gvfsbackendnfs.c:297
+#: daemon/gvfsbackendsftp.c:2070 daemon/gvfsbackendsmb.c:483
+#: daemon/gvfsbackendsmb.c:1446
 #, c-format
 msgid "%s on %s"
 msgstr "%2$s 上の %1$s"
@@ -828,60 +840,60 @@ msgstr "%2$s 上の %1$s"
 msgid "%s"
 msgstr "%s"
 
-#: daemon/gvfsbackendafpbrowse.c:483 daemon/gvfsbackendafp.c:2140
-#: daemon/gvfsbackendarchive.c:628 daemon/gvfsbackendftp.c:723
-#: daemon/gvfsbackendnfs.c:197 daemon/gvfsbackendsftp.c:2122
+#: daemon/gvfsbackendafpbrowse.c:483 daemon/gvfsbackendafp.c:2102
+#: daemon/gvfsbackendarchive.c:628 daemon/gvfsbackendftp.c:725
+#: daemon/gvfsbackendnfs.c:198 daemon/gvfsbackendsftp.c:2122
 msgid "No hostname specified"
 msgstr "ホスト名が指定されていません"
 
-#: daemon/gvfsbackendafpbrowse.c:568 daemon/gvfsbackendafp.c:2235
+#: daemon/gvfsbackendafpbrowse.c:568 daemon/gvfsbackendafp.c:2198
 msgid "Apple Filing Protocol Service"
-msgstr "Apple ファイルプロトコルサービス"
+msgstr "Apple Filing Protocol サービス"
 
-#: daemon/gvfsbackendafp.c:286 daemon/gvfsbackendburn.c:877
-#: daemon/gvfsbackenddav.c:3068 daemon/gvfsbackendftp.c:1568
+#: daemon/gvfsbackendafp.c:277 daemon/gvfsbackendburn.c:877
+#: daemon/gvfsbackenddav.c:3752 daemon/gvfsbackendftp.c:1617
 #: daemon/gvfsbackendgoogle.c:1752 daemon/gvfsbackendgoogle.c:2095
 #: daemon/gvfsbackendgoogle.c:3141
 msgid "Can’t copy directory over directory"
-msgstr "フォルダーがフォルダーの上書きになるコピーはできません"
+msgstr "ディレクトリをディレクトリに上書きコピーできません"
 
-#: daemon/gvfsbackendafp.c:305 daemon/gvfsbackendburn.c:893
-#: daemon/gvfsbackenddav.c:3097 daemon/gvfsbackendftp.c:1591
+#: daemon/gvfsbackendafp.c:296 daemon/gvfsbackendburn.c:893
+#: daemon/gvfsbackenddav.c:3787 daemon/gvfsbackendftp.c:1640
 #: daemon/gvfsbackendgoogle.c:1814 daemon/gvfsbackendgoogle.c:3168
-#: daemon/gvfsbackendgoogle.c:3216 daemon/gvfsbackendmtp.c:1641
-#: daemon/gvfsbackendmtp.c:1656
+#: daemon/gvfsbackendgoogle.c:3216 daemon/gvfsbackendmtp.c:1692
+#: daemon/gvfsbackendmtp.c:1707
 msgid "Can’t recursively copy directory"
-msgstr "フォルダーを再帰的にコピーできません"
+msgstr "ディレクトリを再帰的にコピーできません"
 
-#: daemon/gvfsbackendafp.c:489 daemon/gvfsbackenddav.c:2945
-#: daemon/gvfsbackendgoogle.c:2209 daemon/gvfsbackendnfs.c:2474
-#: daemon/gvfsbackendsftp.c:5015 daemon/gvfsbackendsmb.c:2100
+#: daemon/gvfsbackendafp.c:480 daemon/gvfsbackenddav.c:3565
+#: daemon/gvfsbackendgoogle.c:2209 daemon/gvfsbackendnfs.c:2603
+#: daemon/gvfsbackendsftp.c:5005 daemon/gvfsbackendsmb.c:2181
 msgid "Can’t move directory over directory"
-msgstr "フォルダーがフォルダーの上書きになる移動はできません"
+msgstr "ディレクトリをディレクトリに上書き移動できません"
 
-#: daemon/gvfsbackendafp.c:1284
+#: daemon/gvfsbackendafp.c:1304
 #, c-format
 msgid "Unable to create temporary file (%s)"
 msgstr "一時ファイルを生成できません (%s)"
 
-#: daemon/gvfsbackendafp.c:1348 daemon/gvfsbackenddav.c:2546
-#: daemon/gvfsbackendnfs.c:1177 daemon/gvfsbackendsftp.c:3963
-#: daemon/gvfsbackendsmb.c:1091
+#: daemon/gvfsbackendafp.c:1368 daemon/gvfsbackenddav.c:2976
+#: daemon/gvfsbackendnfs.c:1313 daemon/gvfsbackendsftp.c:3953
+#: daemon/gvfsbackendsmb.c:1129
 msgid "The file was externally modified"
-msgstr "そのファイルは他のプロセスで変更されました"
+msgstr "ファイルが外部で変更されました"
 
-#: daemon/gvfsbackendafp.c:1765 daemon/gvfsbackendftp.c:1250
-#: daemon/gvfsbackendsftp.c:5479
+#: daemon/gvfsbackendafp.c:1727 daemon/gvfsbackendftp.c:1271
+#: daemon/gvfsbackendsftp.c:5469
 msgid "Invalid attribute type (uint32 expected)"
-msgstr "無効な属性タイプ (uint32 であるべき)"
+msgstr "無効な属性タイプ (uint32 が必要)"
 
 #. Translators: first %s is volumename, second username and third servername
-#: daemon/gvfsbackendafp.c:2100
+#: daemon/gvfsbackendafp.c:2062
 #, c-format
 msgid "%s for %s on %s"
-msgstr "%3$s 上の %2$s が使用する %1$s"
+msgstr "%1$s (%3$s 上の%2$s)"
 
-#: daemon/gvfsbackendafp.c:2149
+#: daemon/gvfsbackendafp.c:2111
 msgid "No volume specified"
 msgstr "ボリュームが指定されていません"
 
@@ -893,14 +905,15 @@ msgid "/ in %s"
 msgstr "%s の / (ルート)"
 
 #: daemon/gvfsbackendarchive.c:883 daemon/gvfsbackendburn.c:681
-#: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:474
-#: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:1204
+#: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:475
+#: daemon/gvfsbackendftp.c:355 daemon/gvfsbackendgoogle.c:1204
 #: daemon/gvfsbackendgoogle.c:2410 daemon/gvfsbackendgoogle.c:2637
-#: daemon/gvfsbackendnetwork.c:745 daemon/gvfsbackendsftp.c:4502
-#: daemon/gvfsftpdircache.c:157
+#: daemon/gvfsbackendnetwork.c:944 daemon/gvfsbackendonedrive.c:695
+#: daemon/gvfsbackendonedrive.c:887 daemon/gvfsbackendonedrive.c:1023
+#: daemon/gvfsbackendsftp.c:4492 daemon/gvfsftpdircache.c:157
 #, c-format
 msgid "The file is not a directory"
-msgstr "そのファイルはフォルダーではありません"
+msgstr "ファイルはディレクトリではありません"
 
 #. Translators: This is the name of the backend
 #: daemon/gvfsbackendburn.c:346
@@ -909,28 +922,29 @@ msgstr "Burn"
 
 #: daemon/gvfsbackendburn.c:372
 msgid "Unable to create temporary directory"
-msgstr "一時フォルダーを生成できません"
+msgstr "一時ディレクトリを生成できません"
 
 #: daemon/gvfsbackendburn.c:401 daemon/gvfsbackendburn.c:412
 #: daemon/gvfsbackendburn.c:447 daemon/gvfsbackendburn.c:673
 #: daemon/gvfsbackendburn.c:718 daemon/gvfsbackendburn.c:744
 #: daemon/gvfsbackendburn.c:782 daemon/gvfsbackendburn.c:854
 #: daemon/gvfsbackendburn.c:973 daemon/gvfsbackendburn.c:1009
-#: daemon/gvfsbackendftp.c:852 daemon/gvfsbackendgoogle.c:1097
-#: daemon/gvfsbackendgphoto2.c:938 daemon/gvfsbackendgphoto2.c:1869
-#: daemon/gvfsbackendgphoto2.c:2588 daemon/gvfsbackendrecent.c:110
+#: daemon/gvfsbackenddav.c:3227 daemon/gvfsbackendftp.c:857
+#: daemon/gvfsbackendgoogle.c:1097 daemon/gvfsbackendgphoto2.c:938
+#: daemon/gvfsbackendgphoto2.c:1869 daemon/gvfsbackendgphoto2.c:2588
+#: daemon/gvfsbackendonedrive.c:612 daemon/gvfsbackendrecent.c:110
 #: daemon/gvfsbackendrecent.c:293 daemon/gvfsbackendsftp.c:2217
-#: daemon/gvfsbackendsftp.c:3377 daemon/gvfsbackendsftp.c:3390
-#: daemon/gvfsbackendsftp.c:3410 daemon/gvfsbackendtrash.c:218
+#: daemon/gvfsbackendsftp.c:3380 daemon/gvfsbackendsftp.c:3393
+#: daemon/gvfsbackendsftp.c:3413 daemon/gvfsbackendtrash.c:317
 #, c-format
 msgid "No such file or directory"
-msgstr "そのようなファイルやフォルダーはありません"
+msgstr "そのようなファイルやディレクトリはありません"
 
 #: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:905
 #: daemon/gvfsbackendgoogle.c:1760 daemon/gvfsbackendgoogle.c:2103
 #: daemon/gvfsbackendgoogle.c:3149
 msgid "Can’t copy file over directory"
-msgstr "ファイルがフォルダーの上書きになるコピーはできません"
+msgstr "ファイルがディレクトリの上書きとなるコピーはできません"
 
 #. Translators: this is the display name of the backend
 #: daemon/gvfsbackendburn.c:652
@@ -944,32 +958,32 @@ msgstr "CD/DVD クリエーター"
 msgid "File exists"
 msgstr "ファイルが存在します"
 
-#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:2983
-#: daemon/gvfsbackendsftp.c:2211 daemon/gvfsbackendsftp.c:5195
+#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:3604
+#: daemon/gvfsbackendsftp.c:2211 daemon/gvfsbackendsftp.c:5185
 msgid "Target file exists"
-msgstr "転送先にファイルが存在します"
+msgstr "対象のファイルはすでに存在します"
 
-#: daemon/gvfsbackend.c:890 daemon/gvfsjobunmount.c:197
+#: daemon/gvfsbackend.c:889 daemon/gvfsjobunmount.c:197
 #: daemon/gvfsjobunmount.c:264
 msgid "File system is busy"
 msgstr "ファイルシステムは使用中です"
 
-#: daemon/gvfsbackend.c:1024 monitor/udisks2/gvfsudisks2mount.c:748
+#: daemon/gvfsbackend.c:1023 monitor/udisks2/gvfsudisks2mount.c:752
 msgid "Unmount Anyway"
 msgstr "とにかくアンマウントする"
 
-#: daemon/gvfsbackend.c:1027 monitor/udisks2/gvfsudisks2mount.c:751
+#: daemon/gvfsbackend.c:1026 monitor/udisks2/gvfsudisks2mount.c:755
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
 msgstr ""
 "ボリュームは使用中です\n"
-"一つ以上のアプリケーションがボリュームを使用中です。"
+"1 つ以上のアプリケーションがボリュームを使用中です。"
 
 #: daemon/gvfsbackendcdda.c:290 daemon/gvfsbackendgphoto2.c:1289
-#: daemon/gvfsbackendmtp.c:912
+#: daemon/gvfsbackendmtp.c:920
 msgid "Cannot create gudev client"
-msgstr "gudev クライアントを生成できません"
+msgstr "gudev クライアントを作成できません"
 
 #: daemon/gvfsbackendcdda.c:304 daemon/gvfsbackendcdda.c:385
 msgid "No drive specified"
@@ -978,12 +992,12 @@ msgstr "ドライブが指定されていません"
 #: daemon/gvfsbackendcdda.c:323
 #, c-format
 msgid "Cannot find drive %s"
-msgstr "%s というドライブは見つかりません"
+msgstr "ドライブ %s は見つかりません"
 
 #: daemon/gvfsbackendcdda.c:336
 #, c-format
 msgid "Drive %s does not contain audio files"
-msgstr "%s というドライブにはオーディオファイルはありません"
+msgstr "ドライブ %s にはオーディオファイルが含まれていません"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
@@ -993,7 +1007,7 @@ msgid "cdda mount on %s"
 msgstr "cdda が %s にマウントしました"
 
 #: daemon/gvfsbackendcdda.c:347 daemon/gvfsbackendcdda.c:872
-#: monitor/udisks2/gvfsudisks2volume.c:392
+#: monitor/udisks2/gvfsudisks2volume.c:393
 #, c-format
 msgid "Audio Disc"
 msgstr "オーディオディスク"
@@ -1002,23 +1016,23 @@ msgstr "オーディオディスク"
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
-msgstr[0] "ファイルシステムは使用中です: %d 個のファイルが開いたままです"
+msgstr[0] "ファイルシステムは使用中です: %d 個のファイルが開かれています"
 
 #: daemon/gvfsbackendcdda.c:607
 #, c-format
 msgid "No such file %s on drive %s"
-msgstr "%s というファイルは %s というドライブにありません"
+msgstr "ドライブ %s 上にファイル %s は存在しません"
 
 #. Translators: paranoia is the name of the cd audio reading library
 #: daemon/gvfsbackendcdda.c:716
 #, c-format
 msgid "Error from “paranoia” on drive %s"
-msgstr "ドライブ (%s) の“paranoia”でエラーが発生しました"
+msgstr "ドライブ %s で “paranoia” からエラーが発生しました"
 
 #: daemon/gvfsbackendcdda.c:779
 #, c-format
 msgid "Error seeking in stream on drive %s"
-msgstr "ドライブ (%s) のストリームをシークするときにエラーが発生しました"
+msgstr "ドライブ %s のストリームのシーク中にエラーが発生しました"
 
 #: daemon/gvfsbackendcdda.c:901 daemon/gvfsbackendgphoto2.c:1556
 #, c-format
@@ -1028,11 +1042,11 @@ msgstr "そのようなファイルはありません"
 #: daemon/gvfsbackendcdda.c:915
 #, c-format
 msgid "The file does not exist or isn’t an audio track"
-msgstr "そのファイルは存在しないか、またはオーディオトラックではありません"
+msgstr "ファイルが存在しないか、オーディオトラックではありません"
 
 #: daemon/gvfsbackendcdda.c:1021
 msgid "Audio CD File System Service"
-msgstr "オーディオ CD のファイルシステムサービス"
+msgstr "オーディオ CD ファイルシステムサービス"
 
 #: daemon/gvfsbackendcomputer.c:198 daemon/gvfsbackendcomputer.c:771
 msgid "Computer"
@@ -1049,7 +1063,7 @@ msgstr "マウント可能なファイルを開けません"
 #: daemon/gvfsbackendcomputer.c:858
 #, c-format
 msgid "Internal error: %s"
-msgstr "システム内部のエラー: %s"
+msgstr "内部エラー: %s"
 
 #: daemon/gvfsbackendcomputer.c:890 daemon/gvfsbackendcomputer.c:1008
 msgid "Can’t mount file"
@@ -1077,55 +1091,57 @@ msgstr "ドライブを停止できません"
 
 #: daemon/gvfsbackendcomputer.c:1406 daemon/gvfsbackendcomputer.c:1413
 msgid "Can’t poll file"
-msgstr "ファイルを poll できません"
+msgstr "ファイルをポーリングできません"
 
 #. Translators: This is the name of the WebDAV share constructed as
 #. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
 #. the second %s and only shown if it is not the default http(s) port.
-#: daemon/gvfsbackenddav.c:503
+#: daemon/gvfsbackenddav.c:412
 #, c-format
 msgid "%s on %s%s"
 msgstr "%2$s%3$s 上の %1$s"
 
-#: daemon/gvfsbackenddav.c:708 daemon/gvfsbackenddav.c:2078
-#: daemon/gvfsbackendhttp.c:202
+#: daemon/gvfsbackenddav.c:766 daemon/gvfsbackenddav.c:1536
+#: daemon/gvfsbackenddav.c:2145 daemon/gvfsbackenddav.c:2309
+#: daemon/gvfsbackendhttp.c:268 daemon/gvfshttpinputstream.c:273
 #, c-format
 msgid "HTTP Error: %s"
-msgstr "HTTP のエラー: %s"
+msgstr "HTTP エラー: %s"
 
-#: daemon/gvfsbackenddav.c:725
+#: daemon/gvfsbackenddav.c:781
 msgid "Could not parse response"
 msgstr "応答メッセージを解析できませんでした"
 
-#: daemon/gvfsbackenddav.c:734
+#: daemon/gvfsbackenddav.c:790
 msgid "Empty response"
 msgstr "応答メッセージが空です"
 
-#: daemon/gvfsbackenddav.c:742
+#: daemon/gvfsbackenddav.c:798
 msgid "Unexpected reply from server"
-msgstr "サーバーからの想定外のリプライです"
+msgstr "サーバーからの予期しない返信"
 
-#: daemon/gvfsbackenddav.c:1444 daemon/gvfsbackenddav.c:2205
-#: daemon/gvfsbackenddav.c:2300 daemon/gvfsbackenddav.c:2402
+#: daemon/gvfsbackenddav.c:1554 daemon/gvfsbackenddav.c:2511
+#: daemon/gvfsbackenddav.c:2606 daemon/gvfsbackenddav.c:2790
+#, c-format
 msgid "Response invalid"
-msgstr "応答メッセージが間違っています"
+msgstr "応答メッセージが不正です"
 
-#: daemon/gvfsbackenddav.c:1588
+#: daemon/gvfsbackenddav.c:1775
 msgid "WebDAV share"
 msgstr "WebDAV 共有"
 
 #. Translators: %s is the name of the WebDAV share
 #. Translators: %s is a server name
-#: daemon/gvfsbackenddav.c:1591 daemon/gvfsbackendsmbbrowse.c:373
+#: daemon/gvfsbackenddav.c:1778 daemon/gvfsbackendsmbbrowse.c:334
 #, c-format
 msgid ""
 "Authentication Required\n"
 "Enter password for “%s”:"
 msgstr ""
 "認証が必要です\n"
-"“%s”のパスワードを入力してください:"
+"“%s” のパスワードを入力してください:"
 
-#: daemon/gvfsbackenddav.c:1594
+#: daemon/gvfsbackenddav.c:1781
 msgid ""
 "Authentication Required\n"
 "Enter proxy password:"
@@ -1133,75 +1149,76 @@ msgstr ""
 "認証が必要です\n"
 "プロキシのパスワードを入力してください:"
 
-#: daemon/gvfsbackenddav.c:2064
-msgid "Not a WebDAV enabled share"
-msgstr "WebDAV 共有は利用できません"
-
-#: daemon/gvfsbackenddav.c:2086
+#: daemon/gvfsbackenddav.c:2153
 msgid "Could not find an enclosing directory"
-msgstr "関連するフォルダーが見つかりませんでした"
+msgstr "親ディレクトリが見つかりませんでした"
 
-#: daemon/gvfsbackenddav.c:2159 daemon/gvfsbackenddav.c:2255
-#: daemon/gvfsbackenddav.c:2328 daemon/gvfsbackenddav.c:2436
+#: daemon/gvfsbackenddav.c:2297
+msgid "Not a WebDAV enabled share"
+msgstr "WebDAV 対応の共有ではありません"
+
+#: daemon/gvfsbackenddav.c:2537 daemon/gvfsbackenddav.c:2650
+#: daemon/gvfsbackenddav.c:2737 daemon/gvfsbackenddav.c:2824
 msgid "Could not create request"
-msgstr "要求メッセージを生成できませんでした"
+msgstr "要求メッセージを作成できませんでした"
 
-#: daemon/gvfsbackenddav.c:2577 daemon/gvfsbackendftp.c:1102
-#: daemon/gvfsbackendgoogle.c:3944 daemon/gvfsbackendnfs.c:941
-#: daemon/gvfsbackendnfs.c:964 daemon/gvfsbackendnfs.c:990
-#: daemon/gvfsbackendnfs.c:1390 daemon/gvfsbackendsmb.c:1127
-#: daemon/gvfsbackendsmb.c:2128
+#: daemon/gvfsbackenddav.c:3010 daemon/gvfsbackendftp.c:1107
+#: daemon/gvfsbackendgoogle.c:3944 daemon/gvfsbackendnfs.c:1069
+#: daemon/gvfsbackendnfs.c:1092 daemon/gvfsbackendnfs.c:1118
+#: daemon/gvfsbackendnfs.c:1519 daemon/gvfsbackendsmb.c:1165
+#: daemon/gvfsbackendsmb.c:2209
 msgid "Backup file creation failed"
 msgstr "バックアップファイルの作成に失敗しました"
 
-#: daemon/gvfsbackenddav.c:2950
+#: daemon/gvfsbackenddav.c:3570
 msgid "Can’t move over directory"
-msgstr "フォルダーの上書きになる移動はできません"
+msgstr "ディレクトリをまたいで移動できません"
 
-#: daemon/gvfsbackenddav.c:3219
-msgid "File length changed during transfer"
-msgstr "転送中にファイルの長さが変更されました"
-
-#: daemon/gvfsbackenddnssd.c:521 daemon/gvfsbackendnetwork.c:462
+#: daemon/gvfsbackenddnssd.c:522 daemon/gvfsbackendnetwork.c:545
 msgid "Local Network"
 msgstr "ローカルネットワーク"
 
-#: daemon/gvfsbackenddnssd.c:776 daemon/gvfsbackendnetwork.c:852
+#: daemon/gvfsbackenddnssd.c:777 daemon/gvfsbackendnetwork.c:1060
 msgid "Can’t monitor file or directory."
-msgstr "ファイルまたはフォルダーを監視できません。"
+msgstr "ファイルまたはディレクトリを監視できません。"
 
 #. TODO: Names, etc
-#: daemon/gvfsbackenddnssd.c:794
+#: daemon/gvfsbackenddnssd.c:795
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: daemon/gvfsbackenddnssd.c:795 daemon/gvfsbackendnetwork.c:784
-#: daemon/gvfsbackendnetwork.c:933 daemon/gvfsbackendnetwork.c:934
+#: daemon/gvfsbackenddnssd.c:796 daemon/gvfsbackendnetwork.c:990
+#: daemon/gvfsbackendnetwork.c:1150 daemon/gvfsbackendnetwork.c:1151
 msgid "Network"
 msgstr "ネットワーク"
 
-#: daemon/gvfsbackendftp.c:560 daemon/gvfsbackendsftp.c:1191
-#: daemon/gvfsbackendsftp.c:1295 daemon/gvfsbackendsmbbrowse.c:1014
-#: daemon/gvfsbackendsmb.c:551
+#: daemon/gvfsbackendftp.c:561 daemon/gvfsbackendsftp.c:1191
+#: daemon/gvfsbackendsftp.c:1295 daemon/gvfsbackendsmbbrowse.c:806
+#: daemon/gvfsbackendsmb.c:583
 msgid "Password dialog cancelled"
 msgstr "パスワードダイアログがキャンセルされました"
 
-#: daemon/gvfsbackendftp.c:786
+#: daemon/gvfsbackendftp.c:791
 msgid "Insufficient permissions"
-msgstr "パーミッションが足りません"
+msgstr "権限が不十分です"
+
+#: daemon/gvfsbackendftp.c:1295 daemon/gvfsbackendsftp.c:5490
+#: daemon/gvfsbackendsmb.c:1809
+msgid "Invalid attribute type (uint64 expected)"
+msgstr "無効な属性タイプ (uint64 が必要)"
 
 #: daemon/gvfsbackendgoogle.c:2217
 msgid "Can’t move file over directory"
-msgstr "フォルダーの上書きになるファイルの移動はできません"
+msgstr "ファイルをディレクトリ間で移動できません"
 
 #: daemon/gvfsbackendgoogle.c:2259
 msgid "Error moving file/folder"
 msgstr "ファイル/フォルダーの移動中にエラーが発生しました"
 
 #. Translators: This is the "Shared with me" folder on https://drive.google.com.
-#: daemon/gvfsbackendgoogle.c:2971
+#: daemon/gvfsbackendgoogle.c:2971 daemon/gvfsbackendonedrive.c:1253
 msgid "Shared with me"
-msgstr ""
+msgstr "共有アイテム"
 
 #. Translators: This is the "Shared drives" folder on https://drive.google.com.
 #: daemon/gvfsbackendgoogle.c:2987
@@ -1209,52 +1226,54 @@ msgid "Shared drives"
 msgstr "共有ドライブ"
 
 #: daemon/gvfsbackendgoogle.c:3021 daemon/gvfsbackendgoogle.c:3599
-#: daemon/gvfsbackendgphoto2.c:1589
+#: daemon/gvfsbackendgphoto2.c:1589 daemon/gvfsbackendonedrive.c:1289
 msgid "Error getting data from file"
-msgstr "ファイルのデータ取得中にエラーが発生しました"
+msgstr "ファイルからデータを取得中にエラーが発生しました"
 
 #: daemon/gvfsbackendgoogle.c:3158 daemon/gvfsbackendgoogle.c:3984
-#: daemon/gvfsbackendnfs.c:1162
+#: daemon/gvfsbackendnfs.c:1298
 msgid "Target file is not a regular file"
 msgstr "対象のファイルは通常のファイルではありません"
 
 #: daemon/gvfsbackendgoogle.c:3584 daemon/gvfsbackendsftp.c:2390
-#: daemon/gvfsbackendsftp.c:2792 daemon/gvfsbackendsftp.c:2855
-#: daemon/gvfsbackendsftp.c:2866 daemon/gvfsbackendsftp.c:2924
-#: daemon/gvfsbackendsftp.c:3017 daemon/gvfsbackendsftp.c:3069
-#: daemon/gvfsbackendsftp.c:3124 daemon/gvfsbackendsftp.c:3203
-#: daemon/gvfsbackendsftp.c:3320 daemon/gvfsbackendsftp.c:3453
-#: daemon/gvfsbackendsftp.c:3537 daemon/gvfsbackendsftp.c:3613
-#: daemon/gvfsbackendsftp.c:3625 daemon/gvfsbackendsftp.c:3695
-#: daemon/gvfsbackendsftp.c:3765 daemon/gvfsbackendsftp.c:3823
-#: daemon/gvfsbackendsftp.c:3843 daemon/gvfsbackendsftp.c:4035
-#: daemon/gvfsbackendsftp.c:4069 daemon/gvfsbackendsftp.c:4127
-#: daemon/gvfsbackendsftp.c:4189 daemon/gvfsbackendsftp.c:4260
-#: daemon/gvfsbackendsftp.c:4535 daemon/gvfsbackendsftp.c:4606
-#: daemon/gvfsbackendsftp.c:4741 daemon/gvfsbackendsftp.c:4854
-#: daemon/gvfsbackendsftp.c:4916 daemon/gvfsbackendsftp.c:4953
-#: daemon/gvfsbackendsftp.c:4981 daemon/gvfsbackendsftp.c:5095
-#: daemon/gvfsbackendsftp.c:5151 daemon/gvfsbackendsftp.c:5192
-#: daemon/gvfsbackendsftp.c:5228 daemon/gvfsbackendsftp.c:5264
-#: daemon/gvfsbackendsftp.c:5279 daemon/gvfsbackendsftp.c:5294
-#: daemon/gvfsbackendsftp.c:5389 daemon/gvfsbackendsftp.c:5457
-#: daemon/gvfsbackendsftp.c:5664 daemon/gvfsbackendsftp.c:5701
-#: daemon/gvfsbackendsftp.c:5819 daemon/gvfsbackendsftp.c:5905
-#: daemon/gvfsbackendsftp.c:5989 daemon/gvfsbackendsftp.c:6032
-#: daemon/gvfsbackendsftp.c:6036 daemon/gvfsbackendsftp.c:6153
-#: daemon/gvfsbackendsftp.c:6157 daemon/gvfsbackendsftp.c:6408
-#: daemon/gvfsbackendsftp.c:6631 daemon/gvfsbackendsftp.c:6648
-#: daemon/gvfsbackendsftp.c:6786 daemon/gvfsbackendsftp.c:6814
+#: daemon/gvfsbackendsftp.c:2795 daemon/gvfsbackendsftp.c:2858
+#: daemon/gvfsbackendsftp.c:2869 daemon/gvfsbackendsftp.c:2927
+#: daemon/gvfsbackendsftp.c:3020 daemon/gvfsbackendsftp.c:3072
+#: daemon/gvfsbackendsftp.c:3127 daemon/gvfsbackendsftp.c:3206
+#: daemon/gvfsbackendsftp.c:3323 daemon/gvfsbackendsftp.c:3483
+#: daemon/gvfsbackendsftp.c:3603 daemon/gvfsbackendsftp.c:3615
+#: daemon/gvfsbackendsftp.c:3685 daemon/gvfsbackendsftp.c:3755
+#: daemon/gvfsbackendsftp.c:3813 daemon/gvfsbackendsftp.c:3833
+#: daemon/gvfsbackendsftp.c:4025 daemon/gvfsbackendsftp.c:4059
+#: daemon/gvfsbackendsftp.c:4117 daemon/gvfsbackendsftp.c:4179
+#: daemon/gvfsbackendsftp.c:4250 daemon/gvfsbackendsftp.c:4525
+#: daemon/gvfsbackendsftp.c:4596 daemon/gvfsbackendsftp.c:4731
+#: daemon/gvfsbackendsftp.c:4844 daemon/gvfsbackendsftp.c:4906
+#: daemon/gvfsbackendsftp.c:4943 daemon/gvfsbackendsftp.c:4971
+#: daemon/gvfsbackendsftp.c:5085 daemon/gvfsbackendsftp.c:5141
+#: daemon/gvfsbackendsftp.c:5182 daemon/gvfsbackendsftp.c:5218
+#: daemon/gvfsbackendsftp.c:5254 daemon/gvfsbackendsftp.c:5269
+#: daemon/gvfsbackendsftp.c:5284 daemon/gvfsbackendsftp.c:5379
+#: daemon/gvfsbackendsftp.c:5447 daemon/gvfsbackendsftp.c:5654
+#: daemon/gvfsbackendsftp.c:5691 daemon/gvfsbackendsftp.c:5809
+#: daemon/gvfsbackendsftp.c:5895 daemon/gvfsbackendsftp.c:5979
+#: daemon/gvfsbackendsftp.c:6022 daemon/gvfsbackendsftp.c:6026
+#: daemon/gvfsbackendsftp.c:6143 daemon/gvfsbackendsftp.c:6147
+#: daemon/gvfsbackendsftp.c:6398 daemon/gvfsbackendsftp.c:6621
+#: daemon/gvfsbackendsftp.c:6638 daemon/gvfsbackendsftp.c:6776
+#: daemon/gvfsbackendsftp.c:6804
 msgid "Invalid reply received"
-msgstr "無効なリプライを受信しました"
+msgstr "無効な応答を受信しました"
 
 #: daemon/gvfsbackendgoogle.c:3590
 msgid "File is not a regular file"
 msgstr "ファイルが通常のファイルではありません"
 
-#: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendnfs.c:1152
+#: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendmtp.c:2689
+#: daemon/gvfsbackendmtp.c:2803 daemon/gvfsbackendnfs.c:802
+#: daemon/gvfsbackendnfs.c:1288 daemon/gvfsbackendonedrive.c:1920
 msgid "Target file is a directory"
-msgstr "対象のファイルはフォルダーです"
+msgstr "対象のファイルはディレクトリです"
 
 #: daemon/gvfsbackendgoogle.c:4169 daemon/gvfsbackendgphoto2.c:3050
 msgid "Error writing file"
@@ -1264,25 +1283,25 @@ msgstr "ファイルの書き込み中にエラーが発生しました"
 #: daemon/gvfsbackendgphoto2.c:479
 #, c-format
 msgid "%s: %d: Directory or file exists"
-msgstr "%s: %d: フォルダーまたはファイルが存在します"
+msgstr "%s: %d: ディレクトリまたはファイルがすでに存在します"
 
 #. Translator: %s represents a more specific error message and %d the specific error code
 #: daemon/gvfsbackendgphoto2.c:486
 #, c-format
 msgid "%s: %d: No such file or directory"
-msgstr "%s: %d: そのようなファイルやフォルダーはありません"
+msgstr "%s: %d: そのようなファイルやディレクトリはありません"
 
 #. Translator: %s represents a more specific error message and %d the specific error code
 #: daemon/gvfsbackendgphoto2.c:492
 #, c-format
 msgid "%s: %d: Invalid filename"
-msgstr "%s: %d: ファイル名が間違っています"
+msgstr "%s: %d: 不正なファイル名"
 
 #. Translator: %s represents a more specific error message and %d the specific error code
 #: daemon/gvfsbackendgphoto2.c:498
 #, c-format
 msgid "%s: %d: Not Supported"
-msgstr "%s: %d: 未サポートです"
+msgstr "%s: %d: サポートされていません"
 
 #. Translator: %s represents the device, e.g. usb:001,042
 #: daemon/gvfsbackendgphoto2.c:687
@@ -1290,44 +1309,44 @@ msgstr "%s: %d: 未サポートです"
 msgid "Digital Camera (%s)"
 msgstr "デジタルカメラ (%s)"
 
-#: daemon/gvfsbackendgphoto2.c:1256 daemon/gvfsbackendmtp.c:883
+#: daemon/gvfsbackendgphoto2.c:1256 daemon/gvfsbackendmtp.c:891
 msgid "Couldn’t find matching udev device."
-msgstr "一致する udev デバイスを見つけられませんでした。"
+msgstr "一致する udev デバイスが見つかりませんでした。"
 
 #: daemon/gvfsbackendgphoto2.c:1319
 msgid "Cannot create gphoto2 context"
-msgstr "gphoto2 のコンテキストを生成できません"
+msgstr "gphoto2 コンテキストを作成できません"
 
 #: daemon/gvfsbackendgphoto2.c:1328
 msgid "Error creating camera"
-msgstr "カメラオブジェクトを生成できません"
+msgstr "カメラオブジェクトを作成中にエラーが発生しました"
 
 #: daemon/gvfsbackendgphoto2.c:1340 daemon/gvfsbackendgphoto2.c:1349
 msgid "Error loading device information"
-msgstr "デバイス情報の読み込み中にエラーが発生しました"
+msgstr "デバイス情報を読み込み中にエラーが発生しました"
 
 #: daemon/gvfsbackendgphoto2.c:1360
 msgid "Error looking up device information"
-msgstr "デバイス情報の検索中にエラーが発生しました"
+msgstr "デバイス情報を検索中にエラーが発生しました"
 
 #: daemon/gvfsbackendgphoto2.c:1369
 msgid "Error getting device information"
-msgstr "デバイス情報の取得中にエラーが発生しました"
+msgstr "デバイス情報を取得中にエラーが発生しました"
 
 #: daemon/gvfsbackendgphoto2.c:1383
 msgid "Error setting up camera communications port"
-msgstr "カメラに接続するポートの設定中にエラーが発生しました"
+msgstr "カメラ通信用ポートを設定中にエラーが発生しました"
 
 #: daemon/gvfsbackendgphoto2.c:1393
 msgid "Error initializing camera"
-msgstr "カメラのオブジェクトを初期化するときにエラーが発生しました"
+msgstr "カメラオブジェクトを初期化中にエラーが発生しました"
 
 #. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
 #. backend and shouldn't be translated.
 #: daemon/gvfsbackendgphoto2.c:1404
 #, c-format
 msgid "gphoto2 mount on %s"
-msgstr "gphoto2 が %s にマウントしました"
+msgstr "gphoto2 を %s にマウントしました"
 
 #: daemon/gvfsbackendgphoto2.c:1502
 msgid "No camera specified"
@@ -1335,26 +1354,26 @@ msgstr "カメラが指定されていません"
 
 #: daemon/gvfsbackendgphoto2.c:1564 daemon/gvfsbackendgphoto2.c:3299
 msgid "Error creating file object"
-msgstr "ファイルオブジェクトの生成中にエラーが発生しました"
+msgstr "ファイルオブジェクトを作成中にエラーが発生しました"
 
 #: daemon/gvfsbackendgphoto2.c:1579 daemon/gvfsbackendgphoto2.c:3330
 msgid "Error getting file"
 msgstr "ファイル取得中にエラーが発生しました"
 
-#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2417
+#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2468
 #, c-format
 msgid "Malformed icon identifier “%s”"
-msgstr "アイコンの識別子の形式が間違っています: “%s”"
+msgstr "アイコン識別子 “%s” が不正です。"
 
 #: daemon/gvfsbackendgphoto2.c:1723 daemon/gvfsbackendgphoto2.c:2913
 #, c-format
 msgid "Error seeking in stream on camera %s"
-msgstr "カメラ (%s) のストリームを検索するときにエラーが発生しました"
+msgstr "カメラ %s のストリームをシーク中にエラーが発生しました"
 
-#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3380
-#: daemon/gvfsbackendsmbbrowse.c:1437
+#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3383
+#: daemon/gvfsbackendsmbbrowse.c:1229
 msgid "Not a directory"
-msgstr "フォルダーではありません"
+msgstr "ディレクトリではありません"
 
 #: daemon/gvfsbackendgphoto2.c:1896
 msgid "Failed to get folder list"
@@ -1366,11 +1385,11 @@ msgstr "ファイル一覧の取得に失敗しました"
 
 #: daemon/gvfsbackendgphoto2.c:2250
 msgid "Error creating directory"
-msgstr "フォルダーの作成中にエラーが発生しました"
+msgstr "ディレクトリを作成中にエラーが発生しました"
 
 #: daemon/gvfsbackendgphoto2.c:2463
 msgid "Name already exists"
-msgstr "すでに存在します"
+msgstr "名前はすでに存在します"
 
 #: daemon/gvfsbackendgphoto2.c:2474 daemon/gvfsbackendgphoto2.c:3142
 msgid "New name too long"
@@ -1378,7 +1397,7 @@ msgstr "新しい名前が長すぎます"
 
 #: daemon/gvfsbackendgphoto2.c:2484 daemon/gvfsbackendgphoto2.c:3153
 msgid "Error renaming directory"
-msgstr "フォルダー名の変更中にエラーが発生しました"
+msgstr "ディレクトリ名の変更中にエラーが発生しました"
 
 #: daemon/gvfsbackendgphoto2.c:2497 daemon/gvfsbackendgphoto2.c:3166
 msgid "Error renaming file"
@@ -1387,11 +1406,11 @@ msgstr "ファイル名の変更中にエラーが発生しました"
 #: daemon/gvfsbackendgphoto2.c:2561
 #, c-format
 msgid "Directory “%s” is not empty"
-msgstr "フォルダー (%s) は空ではありません"
+msgstr "ディレクトリ “%s” は空ではありません"
 
 #: daemon/gvfsbackendgphoto2.c:2572
 msgid "Error deleting directory"
-msgstr "フォルダーの削除中にエラーが発生しました"
+msgstr "ディレクトリの削除中にエラーが発生しました"
 
 #: daemon/gvfsbackendgphoto2.c:2598 daemon/gvfsbackendgphoto2.c:3351
 msgid "Error deleting file"
@@ -1399,168 +1418,177 @@ msgstr "ファイルの削除中にエラーが発生しました"
 
 #: daemon/gvfsbackendgphoto2.c:2651
 msgid "Can’t write to directory"
-msgstr "フォルダーに書き込めません"
+msgstr "ディレクトリに書き込めません"
 
 #: daemon/gvfsbackendgphoto2.c:2698
 msgid "Cannot allocate new file to append to"
-msgstr "追加先の新しいファイルを確保できません"
+msgstr "追記用の新しいファイルを割り当てられません"
 
 #: daemon/gvfsbackendgphoto2.c:2713
 msgid "Cannot read file to append to"
-msgstr "追加先のファイルを読み込めません"
+msgstr "追記先のファイルを読み取れません"
 
 #: daemon/gvfsbackendgphoto2.c:2724
 msgid "Cannot get data of file to append to"
-msgstr "追加先のファイルのデータを取得できません"
+msgstr "追記先のファイルのデータを取得できません"
 
 #: daemon/gvfsbackendgphoto2.c:3098
 msgid "Not supported (not same directory)"
-msgstr "未サポートです (同じフォルダーではありません)"
+msgstr "サポートされていません (同一ディレクトリではありません)"
 
 #: daemon/gvfsbackendgphoto2.c:3110
 msgid ""
 "Not supported (the source is a directory, the destination is a directory too)"
-msgstr "未サポートです (転送元と転送先の双方がフォルダー)"
+msgstr "サポートされていません (転送元と宛先の双方がディレクトリ)"
 
 #: daemon/gvfsbackendgphoto2.c:3118
 msgid ""
 "Not supported (the source is a directory, but the destination is an existing "
 "file)"
-msgstr "未サポートです (転送元がフォルダーで転送先にファイルが存在)"
+msgstr "サポートされていません (転送元がディレクトリで宛先が既存のファイル)"
 
 #: daemon/gvfsbackendgphoto2.c:3130
 msgid ""
 "Not supported (the source is a file, but the destination is a directory)"
-msgstr "未サポートです (転送元がファイルで転送先がフォルダー)"
+msgstr "サポートされていません (転送元がファイルで宛先がディレクトリ)"
 
-#: daemon/gvfsbackendhttp.c:198
+#: daemon/gvfsbackendhttp.c:263
 #, c-format
 msgid "HTTP Client Error: %s"
-msgstr "HTTP クライアントのエラー: %s"
+msgstr "HTTP クライアントエラー: %s"
 
-#: daemon/gvfsbackendlocaltest.c:861
+#: daemon/gvfsbackendlocaltest.c:862
 msgid "Directory notification not supported"
-msgstr "フォルダー通知はサポートしていません"
+msgstr "ディレクトリ通知はサポートされていません"
 
 #. Translators: This is shown as the name for MTP devices
 #. *              without StorageDescription.
 #. *              The %X is the formatted storage ID.
-#: daemon/gvfsbackendmtp.c:194
+#: daemon/gvfsbackendmtp.c:197
 #, c-format
 msgid "Storage (%X)"
 msgstr "ストレージ (%X)"
 
-#: daemon/gvfsbackendmtp.c:592
+#: daemon/gvfsbackendmtp.c:595
 msgid "Unknown error."
-msgstr "不明なエラー"
+msgstr "不明なエラー。"
 
-#: daemon/gvfsbackendmtp.c:598
+#: daemon/gvfsbackendmtp.c:601
 #, c-format
 msgid "libmtp error: %s"
 msgstr "libmtp エラー: %s"
 
-#: daemon/gvfsbackendmtp.c:904
+#: daemon/gvfsbackendmtp.c:912
 msgid "No device specified"
 msgstr "デバイスが指定されていません"
 
-#: daemon/gvfsbackendmtp.c:1050
+#: daemon/gvfsbackendmtp.c:1058
 msgid "No MTP devices found"
-msgstr "MTP デバイスが見つかりませんでした"
+msgstr "MTP デバイスが見つかりません"
 
-#: daemon/gvfsbackendmtp.c:1055
+#: daemon/gvfsbackendmtp.c:1063
 msgid "Unable to connect to MTP device"
 msgstr "MTP デバイスに接続できません"
 
-#: daemon/gvfsbackendmtp.c:1060
+#: daemon/gvfsbackendmtp.c:1068
 msgid "Unable to allocate memory while detecting MTP devices"
-msgstr "MTP デバイス検出中にメモリを割り当てることはできません"
+msgstr "MTP デバイスの検出中にメモリを確保できません"
 
-#: daemon/gvfsbackendmtp.c:1066
+#: daemon/gvfsbackendmtp.c:1074
 msgid "Generic libmtp error"
 msgstr "一般的な libmtp エラー"
 
-#: daemon/gvfsbackendmtp.c:1079
+#: daemon/gvfsbackendmtp.c:1087
 #, c-format
 msgid "Unable to open MTP device “%03u,%03u”"
-msgstr "MTP デバイス“%03u,%03u”を開けません"
+msgstr "MTP デバイス “%03u,%03u” を開けません"
 
-#: daemon/gvfsbackendmtp.c:1096
+#: daemon/gvfsbackendmtp.c:1104
 msgid "Device not found"
 msgstr "デバイスが見つかりません"
 
-#: daemon/gvfsbackendmtp.c:1401 daemon/gvfsbackendmtp.c:1509
-#: daemon/gvfsbackendmtp.c:1561
+#: daemon/gvfsbackendmtp.c:1411 daemon/gvfsbackendmtp.c:1560
+#: daemon/gvfsbackendmtp.c:1612 daemon/gvfsbackendwsdd.c:263
+#: daemon/gvfsbackendwsdd.c:321
 msgid "File not found"
 msgstr "ファイルが見つかりません"
 
-#: daemon/gvfsbackendmtp.c:1631
-msgid "Target is a directory"
-msgstr "対象がフォルダーです"
-
-#: daemon/gvfsbackendmtp.c:1636
-msgid "Can’t merge directories"
-msgstr "フォルダーをマージできません"
-
 #: daemon/gvfsbackendmtp.c:1682
-msgid "Cannot make directory in this location"
-msgstr "ここにはフォルダーを作成できません"
+msgid "Target is a directory"
+msgstr "対象がディレクトリです"
 
-#: daemon/gvfsbackendmtp.c:1759 daemon/gvfsbackendmtp.c:2182
-#: daemon/gvfsbackendmtp.c:2245 daemon/gvfsbackendmtp.c:2312
-#: daemon/gvfsbackendmtp.c:2674 daemon/gvfsbackendmtp.c:2740
-#: daemon/gvfsbackendmtp.c:2953 daemon/gvfsbackendmtp.c:3096
-#: daemon/gvfsbackendsmbbrowse.c:1182
+#: daemon/gvfsbackendmtp.c:1687
+msgid "Can’t merge directories"
+msgstr "ディレクトリをマージできません"
+
+#: daemon/gvfsbackendmtp.c:1733
+msgid "Cannot make directory in this location"
+msgstr "この場所にディレクトリを作成できません"
+
+#: daemon/gvfsbackendmtp.c:1810 daemon/gvfsbackendmtp.c:2233
+#: daemon/gvfsbackendmtp.c:2296 daemon/gvfsbackendmtp.c:2363
+#: daemon/gvfsbackendmtp.c:2786 daemon/gvfsbackendmtp.c:3050
+#: daemon/gvfsbackendmtp.c:3193 daemon/gvfsbackendsmbbrowse.c:974
 msgid "Not a regular file"
 msgstr "通常のファイルではありません"
 
-#: daemon/gvfsbackendmtp.c:2054 daemon/gvfsbackendmtp.c:2586
-#: daemon/gvfsbackendmtp.c:2937 daemon/gvfsbackendmtp.c:3080
+#: daemon/gvfsbackendmtp.c:2105 daemon/gvfsbackendmtp.c:2637
+#: daemon/gvfsbackendmtp.c:3034 daemon/gvfsbackendmtp.c:3177
 msgid "Cannot write to this location"
-msgstr "ここには書き込めません"
+msgstr "この場所には書き込めません"
 
-#: daemon/gvfsbackendmtp.c:2399
+#: daemon/gvfsbackendmtp.c:2450
 #, c-format
 msgid "No thumbnail for entity “%s”"
-msgstr "エンティティ“%s”のサムネイルはありません"
+msgstr "エンティティ “%s” のサムネイルがありません"
 
-#: daemon/gvfsbackendnetwork.c:168
+#: daemon/gvfsbackendnetwork.c:240
 msgid "File Sharing"
 msgstr "ファイル共有"
 
-#: daemon/gvfsbackendnetwork.c:173
+#: daemon/gvfsbackendnetwork.c:245
 msgid "Remote Login"
 msgstr "リモートログイン"
 
-#: daemon/gvfsbackendnetwork.c:333 daemon/gvfsbackendsmbbrowse.c:906
+#: daemon/gvfsbackendnetwork.c:499 daemon/gvfsbackendsmbbrowse.c:696
 msgid "Windows Network"
 msgstr "Windows ネットワーク"
 
+#: daemon/gvfsbackendnetwork.c:625
+msgid "WSDD Network"
+msgstr "WSDD ネットワーク"
+
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: daemon/gvfsbackendnetwork.c:1020
+#: daemon/gvfsbackendnetwork.c:1245
 msgid "Network Location Monitor"
-msgstr "ネットワークの場所の監視"
+msgstr "ネットワークロケーションモニター"
 
-#: daemon/gvfsbackendnfs.c:242
+#: daemon/gvfsbackendnfs.c:249
 msgid "Mount point does not exist"
 msgstr "マウントポイントが存在しません"
 
-#: daemon/gvfsbackendnfs.c:266
+#: daemon/gvfsbackendnfs.c:273
 msgid ""
 "Permission denied: Perhaps this host is disallowed or a privileged port is "
 "needed"
 msgstr ""
-"権限がありません: このホストが許可されていない、または特権ポートが必要です"
+"権限がありません: このホストは許可されていないか、特権ポートが必要な可能性が"
+"あります"
 
-#: daemon/gvfsbackendnfs.c:1048 daemon/gvfsbackendnfs.c:1071
-#: daemon/gvfsbackendnfs.c:1119 daemon/gvfsbackendsftp.c:3890
-#: daemon/gvfsbackendsftp.c:6060
+#: daemon/gvfsbackendnfs.c:1184 daemon/gvfsbackendnfs.c:1207
+#: daemon/gvfsbackendnfs.c:1255 daemon/gvfsbackendsftp.c:3880
+#: daemon/gvfsbackendsftp.c:6050
 msgid "Unable to create temporary file"
-msgstr "一時ファイルを生成できません"
+msgstr "一時ファイルを作成できません"
 
-#: daemon/gvfsbackendnfs.c:2380
+#: daemon/gvfsbackendnfs.c:2509
 msgid "Invalid attribute type"
-msgstr "無効な属性タイプです"
+msgstr "無効な属性タイプ"
+
+#: daemon/gvfsbackendonedrive.c:1245
+msgid "My Files"
+msgstr "個人ファイル"
 
 #: daemon/gvfsbackendrecent.c:270
 msgid "The recent folder may not be deleted"
@@ -1590,11 +1618,11 @@ msgstr "サーバーが接続を拒否しました"
 
 #: daemon/gvfsbackendsftp.c:375
 msgid "Host key verification failed"
-msgstr "ホストの鍵を検証できませんでした"
+msgstr "ホスト鍵の検証に失敗しました"
 
 #: daemon/gvfsbackendsftp.c:382
 msgid "Too many authentication failures"
-msgstr "認証に失敗した回数が多すぎます"
+msgstr "認証失敗の回数が多すぎます"
 
 #: daemon/gvfsbackendsftp.c:564
 msgid "Unable to spawn SSH program"
@@ -1615,15 +1643,15 @@ msgstr "とにかくログインする"
 
 #: daemon/gvfsbackendsftp.c:934
 msgid "Cancel Login"
-msgstr "ログインをキャンセルする"
+msgstr "ログインをキャンセル"
 
 #: daemon/gvfsbackendsftp.c:949
 msgid "Login dialog cancelled"
-msgstr "ログインのダイアログがキャンセルされました"
+msgstr "ログインダイアログがキャンセルされました"
 
 #: daemon/gvfsbackendsftp.c:968
 msgid "Can’t send host identity confirmation"
-msgstr "ホストの身元を確認できません"
+msgstr "ホストの身元確認を送信できません"
 
 #. Translators: the first %s is the username, the second the host name
 #: daemon/gvfsbackendsftp.c:1164
@@ -1633,7 +1661,7 @@ msgid ""
 "Enter passphrase for secure key for “%s” on “%s”:"
 msgstr ""
 "認証が必要です\n"
-"“%2$s”の“%1$s”のセキュアキーのパスフレーズを入力してください:"
+"“%2$s” 上の “%1$s” 用のセキュアキーのパスフレーズを入力してください:"
 
 #. Translators: %s is the hostname
 #: daemon/gvfsbackendsftp.c:1171
@@ -1643,7 +1671,7 @@ msgid ""
 "Enter passphrase for secure key for “%s”:"
 msgstr ""
 "認証が必要です\n"
-"“%s”のセキュアキーのパスフレーズを入力してください:"
+"“%s” のセキュアキーのパスフレーズを入力してください:"
 
 #: daemon/gvfsbackendsftp.c:1263 daemon/gvfsbackendsftp.c:1310
 msgid "Can’t send password"
@@ -1653,13 +1681,13 @@ msgstr "パスワードを送信できません"
 #: daemon/gvfsbackendsftp.c:1278
 #, c-format
 msgid "Enter verification code for %s on %s"
-msgstr "%2$s の %1$s の確認コードを入力してください"
+msgstr "%2$s の %1$s の認証コードを入力してください"
 
 #. Translators: %s is the hostname
 #: daemon/gvfsbackendsftp.c:1282
 #, c-format
 msgid "Enter verification code for %s"
-msgstr "%s の確認コードを入力してください"
+msgstr "%s の認証コードを入力してください"
 
 #. Translators: the first %s is the hostname, the second the key fingerprint
 #: daemon/gvfsbackendsftp.c:1329
@@ -1672,11 +1700,11 @@ msgid ""
 "The identity sent by the remote computer is “%s”. If you want to be "
 "absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
-"“%s”の ID を検証できません。\n"
-"これは、初めてコンピューターにログインしたときに発生します。\n"
+"本人確認に失敗しました\n"
+"“%s” の本人確認に失敗しました。これは初回ログイン時によく発生します。\n"
 "\n"
-"リモートコンピューターが送信してきた ID は“%s”です。続けても安全かどうか確認"
-"したい場合は、システム管理者に連絡してください。"
+"リモートコンピューターから送信された識別情報は “%s” です。続行しても安全であ"
+"ることを確実にしたい場合は、システム管理者にお問い合わせください。"
 
 #. Translators: the first %s is the hostname, the second is an ip address
 #: daemon/gvfsbackendsftp.c:1358
@@ -1687,161 +1715,169 @@ msgid ""
 "If you want to be absolutely sure it is safe to continue, contact the system "
 "administrator."
 msgstr ""
+"本人確認に失敗しました\n"
+"“%s” のホスト鍵が、IP アドレス “%s” の鍵と異なります。\n"
+"続行しても安全であることを確実にしたい場合は、システム管理者にお問い合わせく"
+"ださい。"
 
 #: daemon/gvfsbackendsftp.c:1450
 #, c-format
 msgid "The connection is closed (the underlying SSH process exited)"
-msgstr "接続が閉じられました (下層の SSH プロセスが終了しました)"
+msgstr "接続が切断されました (SSH プロセスが終了しました)"
 
 #: daemon/gvfsbackendsftp.c:1451
 #, c-format
 msgid "Internal error: Unknown Error"
-msgstr "システム内部のエラー: 不明なエラーです"
+msgstr "内部エラー: 不明なエラー"
 
 #: daemon/gvfsbackendsftp.c:1970 daemon/gvfsbackendsftp.c:1997
 msgid "Protocol error"
-msgstr "プロトコルのエラーです"
+msgstr "プロトコルエラー"
 
 #: daemon/gvfsbackendsftp.c:2112
 msgid "Unable to find supported SSH command"
-msgstr "SSH コマンドが見つかりません"
+msgstr "サポートされている SSH コマンドが見つかりません"
 
 #: daemon/gvfsbackendsftp.c:2219
 msgid "Unknown reason"
 msgstr "理由は不明です"
 
-#: daemon/gvfsbackendsftp.c:2649 daemon/gvfsbackendsmb.c:1397
+#: daemon/gvfsbackendsftp.c:2652 daemon/gvfsbackendsmb.c:1453
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (無効なエンコーディング)"
 
 #. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: daemon/gvfsbackendsftp.c:2661 daemon/gvfsftpdircache.c:431
+#: daemon/gvfsbackendsftp.c:2664 daemon/gvfsftpdircache.c:478
 #, c-format
 msgid "/ on %s"
 msgstr "%s の / (ルート)"
 
-#: daemon/gvfsbackendsftp.c:2734
+#: daemon/gvfsbackendsftp.c:2737
 msgid "Failure"
 msgstr "失敗"
 
-#: daemon/gvfsbackendsftp.c:3146
+#: daemon/gvfsbackendsftp.c:3149
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "バックアップファイルの作成中にエラーが発生しました: %s"
 
-#: daemon/gvfsbackendsftp.c:5425
+#: daemon/gvfsbackendsftp.c:5415
 msgid "Value out of range, sftp only supports 32bit timestamps"
 msgstr ""
-"値が範囲外です (sftp は 32bit のタイムスタンプのみをサポートしています)"
+"値が範囲外です。SFTP は 32 ビットのタイムスタンプのみサポートしています"
 
-#: daemon/gvfsbackendsftp.c:5500 daemon/gvfsbackendsmb.c:1739
-msgid "Invalid attribute type (uint64 expected)"
-msgstr "無効な属性タイプ (uint64 であるべき)"
-
-#: daemon/gvfsbackendsmbbrowse.c:808 daemon/gvfsbackendsmbbrowse.c:847
-#: daemon/gvfsbackendsmb.c:414 daemon/gvfsbackendsmb.c:441
-#: daemon/gvfsbackendsmb.c:632
+#: daemon/gvfsbackendsmbbrowse.c:644 daemon/gvfsbackendsmbbrowse.c:678
+#: daemon/gvfsbackendsmb.c:442 daemon/gvfsbackendsmb.c:469
+#: daemon/gvfsbackendsmb.c:664
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "内部エラー (%s)"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: daemon/gvfsbackendsmbbrowse.c:915
+#: daemon/gvfsbackendsmbbrowse.c:705
 #, c-format
 msgid "Windows shares on %s"
 msgstr "%s 上の Windows 共有"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: daemon/gvfsbackendsmbbrowse.c:1019
+#: daemon/gvfsbackendsmbbrowse.c:811
 #, c-format
 msgid "Failed to retrieve share list from server: %s"
-msgstr "サーバーから共有リストを取得できませんでした: %s"
+msgstr "サーバーから共有一覧の取得に失敗しました: %s"
 
-#: daemon/gvfsbackendsmbbrowse.c:1541
+#: daemon/gvfsbackendsmbbrowse.c:1333
 msgid "Windows Network File System Service"
 msgstr "Windows ネットワークのファイルシステムサービス"
 
 #. Translators: First %s is a share name, second is a server name
-#: daemon/gvfsbackendsmb.c:270
+#: daemon/gvfsbackendsmb.c:262
 #, c-format
 msgid ""
 "Authentication Required\n"
 "Enter password for share “%s” on “%s”:"
 msgstr ""
 "認証が必要です\n"
-"“%2$s”の共有名“%1$s”のパスワードを入力してください:"
+"“%2$s” の共有名 “%1$s” のパスワードを入力してください:"
 
 #. Translators: First %s is a share name, second is a server name
-#: daemon/gvfsbackendsmb.c:276
+#: daemon/gvfsbackendsmb.c:268
 #, c-format
 msgid ""
 "Authentication Required\n"
 "Enter user and password for share “%s” on “%s”:"
 msgstr ""
 "認証が必要です\n"
-"“%2$s”の共有名“%1$s”のユーザー名とパスワードを入力してください:"
+"“%2$s” の共有名 “%1$s” のユーザー名とパスワードを入力してください:"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: daemon/gvfsbackendsmb.c:556
+#: daemon/gvfsbackendsmb.c:588
 #, c-format
 msgid "Failed to mount Windows share: %s"
 msgstr "Windows 共有をマウントできませんでした: %s"
 
-#: daemon/gvfsbackendsmb.c:1326
+#: daemon/gvfsbackendsmb.c:1382
 #, c-format
 msgid "Backup file creation failed: %s"
-msgstr "バックアップファイルの生成に失敗しました: %s"
+msgstr "バックアップファイルの作成に失敗しました: %s"
 
-#: daemon/gvfsbackendsmb.c:1937
+#: daemon/gvfsbackendsmb.c:2017
 msgid "Can’t rename file, filename already exists"
-msgstr "ファイルがすでに存在するため名前を変更できません"
+msgstr "ファイル名を変更できません。ファイル名がすでに存在します"
 
-#: daemon/gvfsbackendsmb.c:1988
+#: daemon/gvfsbackendsmb.c:2069
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "ファイルの削除中にエラーが発生しました: %s"
 
-#: daemon/gvfsbackendsmb.c:2075
+#: daemon/gvfsbackendsmb.c:2156
 #, c-format
 msgid "Error moving file: %s"
 msgstr "ファイルの移動中にエラーが発生しました: %s"
 
-#: daemon/gvfsbackendsmb.c:2148
+#: daemon/gvfsbackendsmb.c:2229
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "対象ファイルの削除中にエラーが発生しました: %s"
 
-#: daemon/gvfsbackendsmb.c:2172
+#: daemon/gvfsbackendsmb.c:2257
 msgid "Can’t recursively move directory"
 msgstr "フォルダーを再帰的に移動できません"
 
-#: daemon/gvfsbackendsmb.c:2221
+#: daemon/gvfsbackendsmb.c:2316
 msgid "Windows Shares File System Service"
 msgstr "Windows 共有のファイルシステムサービス"
 
-#: daemon/gvfsbackendtrash.c:402 daemon/gvfsbackendtrash.c:461
+#: daemon/gvfsbackendtrash.c:490 daemon/gvfsbackendtrash.c:544
 msgid "The trash folder may not be deleted"
 msgstr "ゴミ箱フォルダーは削除できません"
 
-#: daemon/gvfsbackendtrash.c:422 daemon/gvfsbackendtrash.c:478
+#: daemon/gvfsbackendtrash.c:507 daemon/gvfsbackendtrash.c:558
 msgid "Items in the trash may not be modified"
 msgstr "ゴミ箱の中にあるアイテムは変更できません"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: daemon/gvfsbackendtrash.c:780 daemon/gvfsbackendtrash.c:895
+#: daemon/gvfsbackendtrash.c:879 daemon/gvfsbackendtrash.c:999
 msgid "Trash"
 msgstr "ゴミ箱"
 
+#: daemon/gvfsbackendwsdd.c:328
+msgid "File is not a directory"
+msgstr "ファイルはディレクトリではありません"
+
+#: daemon/gvfsbackendwsdd.c:380
+msgid "WS-Discovery Network"
+msgstr "WS-Discovery ネットワーク"
+
 #: daemon/gvfschannel.c:336
 msgid "Channel blocked"
-msgstr ""
+msgstr "チャンネルがブロックされています"
 
 #: daemon/gvfsdaemonutils.c:251
 msgid "The signing certificate authority is not known."
-msgstr "署名している認証局が未知です。"
+msgstr "署名証明書の発行元が未知です。"
 
 #: daemon/gvfsdaemonutils.c:253
 msgid "The certificate does not match the identity of the site."
@@ -1861,22 +1897,22 @@ msgstr "証明書が失効しています。"
 
 #: daemon/gvfsdaemonutils.c:261
 msgid "The certificate’s algorithm is considered insecure."
-msgstr "証明書のアルゴリズムは安全ではないものと見なされています。"
+msgstr "証明書のアルゴリズムが安全でないと見なされています。"
 
 #: daemon/gvfsdaemonutils.c:263
 msgid "Error occurred when validating the certificate."
 msgstr "証明書の検証中にエラーが発生しました。"
 
-#: daemon/gvfsdaemonutils.c:325
+#: daemon/gvfsdaemonutils.c:326
 msgid "Yes"
 msgstr "はい"
 
-#: daemon/gvfsdaemonutils.c:325
+#: daemon/gvfsdaemonutils.c:326
 msgid "No"
 msgstr "いいえ"
 
 #. Translators: The first %s is the reason why verification failed, the second a certificate
-#: daemon/gvfsdaemonutils.c:337
+#: daemon/gvfsdaemonutils.c:338
 #, c-format
 msgid ""
 "Identity Verification Failed\n"
@@ -1895,78 +1931,76 @@ msgstr ""
 
 #: daemon/gvfsftpconnection.c:211
 msgid "Unexpected end of stream"
-msgstr "予期せぬストリームの末尾です"
+msgstr "ストリームが予期せず終了しました"
 
 #: daemon/gvfsftpconnection.c:227 daemon/gvfsftpconnection.c:240
-#: daemon/gvfsftptask.c:449 daemon/gvfsftptask.c:877
+#: daemon/gvfsftptask.c:450 daemon/gvfsftptask.c:886
 msgid "Invalid reply"
-msgstr "無効なリプライ"
+msgstr "無効な応答"
 
 #: daemon/gvfsftpconnection.c:478
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr ""
-"アクティブな FTP 接続を作成できません。おそらくルーターがこれをサポートしてい"
-"ない可能性があります。"
+"アクティブ FTP 接続の確立に失敗しました。おそらくルーターがこの機能をサポート"
+"していない可能性があります?"
 
 #: daemon/gvfsftpconnection.c:485
 msgid "Failed to create active FTP connection."
-msgstr "アクティブな FTP 接続を作成できませんでした。"
+msgstr "アクティブ FTP 接続の確立に失敗しました。"
 
 #: daemon/gvfsftpfile.c:170
 msgid "Filename contains invalid characters."
 msgstr "ファイル名に無効な文字が含まれています。"
 
-#: daemon/gvfsftptask.c:290
+#: daemon/gvfsftptask.c:291
 msgid "The FTP server is busy. Try again later"
-msgstr "FTP サーバーがビジーです。後でもう一度試してください。"
+msgstr "FTP サーバーがビジー状態です。後で再試行してください"
 
-#: daemon/gvfsftptask.c:296
+#: daemon/gvfsftptask.c:297
 msgid "Backend currently unmounting"
-msgstr "バックエンドが現在アンマウント中です"
+msgstr "バックエンドをアンマウントしています"
 
-#: daemon/gvfsftptask.c:393
+#: daemon/gvfsftptask.c:394
 msgid "Accounts are unsupported"
 msgstr "アカウントがサポートされていません"
 
-#: daemon/gvfsftptask.c:401
+#: daemon/gvfsftptask.c:402
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
-msgstr ""
-"データの接続を開始できません (おそらくファイアウォールが邪魔していると思われ"
-"ます)"
+msgstr "データ接続を確立できません。おそらくファイアウォールで阻止されている?"
 
-#: daemon/gvfsftptask.c:405
+#: daemon/gvfsftptask.c:406
 msgid "Data connection closed"
-msgstr "データの接続を閉じました"
+msgstr "データ接続を閉じました"
 
-#: daemon/gvfsftptask.c:412 daemon/gvfsftptask.c:416
+#: daemon/gvfsftptask.c:413 daemon/gvfsftptask.c:417
 msgid "Operation failed"
 msgstr "操作に失敗しました"
 
-#: daemon/gvfsftptask.c:421
+#: daemon/gvfsftptask.c:422
 msgid "No space left on server"
-msgstr "サーバーの容量が足りません"
+msgstr "サーバーに空き容量がありません"
 
-#: daemon/gvfsftptask.c:433
+#: daemon/gvfsftptask.c:434
 msgid "Unsupported network protocol"
-msgstr "サポートしていないネットワークプロトコルです"
+msgstr "サポートされていないネットワークプロトコル"
 
-#: daemon/gvfsftptask.c:441
+#: daemon/gvfsftptask.c:442
 msgid "Page type unknown"
 msgstr "ページの種類が不明です"
 
-#: daemon/gvfsftptask.c:445
+#: daemon/gvfsftptask.c:446
 msgid "Invalid filename"
-msgstr "不正なファイル名です"
+msgstr "無効なファイル名"
 
-#: daemon/gvfshttpinputstream.c:292
+#: daemon/gvfshttpinputstream.c:289
 msgid "Error seeking in stream"
 msgstr "ストリームのシーク中にエラーが発生しました"
 
 #: daemon/gvfsjobcopy.c:147 daemon/gvfsjobdelete.c:126
 #: daemon/gvfsjobmakedirectory.c:126 daemon/gvfsjobmakesymlink.c:130
-#: daemon/gvfsjobmove.c:147 daemon/gvfsjobopenforwrite.c:236
+#: daemon/gvfsjobmove.c:147 daemon/gvfsjobopenforwrite.c:250
 #: daemon/gvfsjobpush.c:152 daemon/gvfsjobsetattribute.c:152
 #: daemon/gvfsjobsetdisplayname.c:130 daemon/gvfsjobtrash.c:125
 msgid "Filesystem is read-only"
@@ -1978,7 +2012,7 @@ msgstr "バックエンドはシンボリックリンクをサポートしてい
 
 #: daemon/gvfsjobsetattribute.c:99
 msgid "Invalid dbus message"
-msgstr "無効な D-Bus のメッセージ"
+msgstr "無効な D-Bus メッセージ"
 
 #: daemon/gvfsjobunmount.c:123
 #, c-format
@@ -1994,62 +2028,150 @@ msgstr ""
 "%s をアンマウントしています\n"
 "しばらくお待ちください"
 
-#: daemon/main.c:147 metadata/meta-daemon.c:459
-msgid "Replace old daemon."
-msgstr "古いデーモンを置きかえる"
+#: daemon/gvfswsddservice.c:236 daemon/gvfswsddservice.c:379
+#: daemon/gvfswsddservice.c:436
+#, c-format
+msgid "Communication with the underlying wsdd daemon failed."
+msgstr "基盤となる wsdd デーモンとの通信に失敗しました。"
 
-#: daemon/main.c:148
-msgid "Don’t start fuse."
-msgstr "fuse を起動しない"
+#: daemon/gvfswsddservice.c:512
+#, c-format
+msgid "The underlying wsdd daemon exited unexpectedly."
+msgstr "基盤となる wsdd デーモンが予期せず終了しました。"
+
+#: daemon/gvfswsddservice.c:597
+#, c-format
+msgid "Failed to spawn the underlying wsdd daemon."
+msgstr "基盤となる wsdd デーモンの起動に失敗しました。"
+
+#: daemon/gvfswsddservice.c:628
+#, c-format
+msgid "Failed to establish connection with the underlying wsdd daemon."
+msgstr "基盤となる wsdd デーモンとの接続に失敗しました。"
+
+#: daemon/main.c:148 metadata/meta-daemon.c:459
+msgid "Replace old daemon."
+msgstr "古いデーモンを置き換える。"
 
 #: daemon/main.c:149
+msgid "Don’t start fuse."
+msgstr "FUSE を開始しない。"
+
+#: daemon/main.c:150
 msgid "Enable debug output."
-msgstr "デバッグ出力を有効にする"
+msgstr "デバッグ出力を有効にする。"
 
-#: daemon/main.c:150 metadata/meta-daemon.c:460
+#: daemon/main.c:151 metadata/meta-daemon.c:460
 msgid "Show program version."
-msgstr "プログラムのバージョンを表示する"
+msgstr "プログラムのバージョンを表示する。"
 
-#: daemon/main.c:166
+#: daemon/main.c:167
 msgid "GVFS Daemon"
 msgstr "GVFS デーモン"
 
-#: daemon/main.c:169
+#: daemon/main.c:170
 msgid "Main daemon for GVFS"
 msgstr "GVFS のメインデーモン"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: daemon/main.c:186 metadata/meta-daemon.c:486
+#: daemon/main.c:187 metadata/meta-daemon.c:486
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: daemon/main.c:188 metadata/meta-daemon.c:488
+#: daemon/main.c:189 metadata/meta-daemon.c:488
 #, c-format
 msgid "Try “%s --help” for more information."
-msgstr "詳細は“%s --help”の出力を確認してください"
+msgstr "詳細は “%s --help” の出力を確認してください。"
 
-#: daemon/mount.c:759
+#: daemon/mount.c:783
 #, c-format
 msgid "Automount failed: %s"
 msgstr "自動マウントに失敗しました: %s"
 
-#: daemon/mount.c:803 daemon/mount.c:879
+#: daemon/mount.c:827 daemon/mount.c:903
 msgid "The specified location is not mounted"
 msgstr "指定した場所はマウントされていません"
 
-#: daemon/mount.c:808
+#: daemon/mount.c:832
 msgid "The specified location is not supported"
 msgstr "指定した場所はサポートしていません"
 
-#: daemon/mount.c:991
+#: daemon/mount.c:1015
 msgid "Location is already mounted"
 msgstr "その場所はすでにマウントされています"
 
-#: daemon/mount.c:1000
+#: daemon/mount.c:1024
 msgid "Location is not mountable"
 msgstr "その場所はマウントできません"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:5
+msgid "How to display local DNS-SD services"
+msgstr "ローカル DNS-SD サービスを表示する方法"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:6
+msgid ""
+"How DNS-SD services are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the Local Network folder) and "
+"\"disabled\"."
+msgstr ""
+"\"network:///\" の場所での DNS-SD サービスの表示方法を設定します。設定値: "
+"\"merged\" (統合表示)、\"separate\" (ローカルネットワークフォルダーとして表"
+"示)、\"disabled\" (表示しない)。"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:10
+msgid "Extra domains to look for DNS-SD services in"
+msgstr "DNS-SD サービス検索用の追加ドメイン"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:11
+msgid ""
+"Comma separated list of DNS-SD domains that should be visible in the "
+"\"network:///\" location."
+msgstr ""
+"\"network:///\" の場所に表示する DNS-SD ドメインをカンマ区切りで指定します。"
+
+#: daemon/org.gnome.system.smb.gschema.xml:5
+msgid "How to display SMB devices"
+msgstr "SMB デバイスを表示する方法"
+
+#: daemon/org.gnome.system.smb.gschema.xml:6
+msgid ""
+"How SMB devices are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the Windows Network folder) and "
+"\"disabled\"."
+msgstr ""
+"SMB デバイスが \"network:///\" の場所でどのように表示されるかを設定します。設"
+"定可能な値は \"merged\" (統合)、\"separate\" (Windows ネットワークフォル"
+"ダー)、\"disabled\" (無効) です。"
+
+#: daemon/org.gnome.system.smb.gschema.xml:10
+msgid "SMB workgroup"
+msgstr "SMBワークグループ"
+
+#: daemon/org.gnome.system.smb.gschema.xml:11
+msgid ""
+"The Windows networking workgroup or domain that the user is part of. In "
+"order for a new workgroup to fully take effect the user may need to log out "
+"and log back in."
+msgstr ""
+"ユーザーが所属する Windows ネットワークのワークグループまたはドメインです。新"
+"しいワークグループを完全に有効にするには、ユーザーがログアウトしてから再度ロ"
+"グインする必要がある場合があります。"
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:5
+msgid "How to display WSDD devices"
+msgstr "WSSDデバイスの表示方法"
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:6
+msgid ""
+"How WSDD devices are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the WSDD Network folder) and "
+"\"disabled\"."
+msgstr ""
+"WSSD デバイスが \"network:///\" の場所でどのように表示されるかを設定します。"
+"設定可能な値は \"merged\" (統合)、\"separate\" (WSSD ネットワークフォル"
+"ダー)、\"disabled\" (無効) です。"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:13
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:25
@@ -2062,7 +2184,7 @@ msgstr "gvfsd-admin デーモンを実行するには認証が必要です"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:26
 msgid "Authentication is required to perform file operations"
-msgstr "ファイル操作の実行には認証が必要です"
+msgstr "ファイル操作を実行するには認証が必要です"
 
 #: metadata/meta-daemon.c:249 metadata/meta-daemon.c:326
 #: metadata/meta-daemon.c:363
@@ -2072,19 +2194,19 @@ msgstr "メタデータファイル %s が見つかりません"
 
 #: metadata/meta-daemon.c:267 metadata/meta-daemon.c:279
 msgid "Unable to set metadata key"
-msgstr "メタデータの値を設定できませんでした"
+msgstr "メタデータキーを設定できません"
 
 #: metadata/meta-daemon.c:289
 msgid "Unable to unset metadata key"
-msgstr "メタデータの値を解除できませんでした"
+msgstr "メタデータキーを解除できません"
 
 #: metadata/meta-daemon.c:336
 msgid "Unable to remove metadata keys"
-msgstr "メタデータの値を削除できませんでした"
+msgstr "メタデータキーを削除できません"
 
 #: metadata/meta-daemon.c:374
 msgid "Unable to move metadata keys"
-msgstr "メタデータの値を移動できませんでした"
+msgstr "メタデータキーを移動できません"
 
 #: metadata/meta-daemon.c:470
 msgid "GVFS Metadata Daemon"
@@ -2094,24 +2216,24 @@ msgstr "GVFS メタデータデーモン"
 msgid "Metadata daemon for GVFS"
 msgstr "GVFS のメタデータデーモン"
 
-#: monitor/goa/goavolume.c:298 monitor/goa/goavolume.c:337
+#: monitor/goa/goavolume.c:296 monitor/goa/goavolume.c:335
 #, c-format
 msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
-msgstr "%s の org.gnome.OnlineAccounts.Files 取得に失敗しました"
+msgstr "%s の org.gnome.OnlineAccounts.Files の取得に失敗しました"
 
-#: monitor/goa/goavolume.c:368
+#: monitor/goa/goavolume.c:366
 #, c-format
 msgid "Invalid credentials for %s"
 msgstr "%s の資格情報が無効です"
 
-#: monitor/goa/goavolume.c:401
+#: monitor/goa/goavolume.c:399
 #, c-format
 msgid "Unsupported authentication method for %s"
-msgstr "%s の認証方法をサポートしていません"
+msgstr "%s でサポートされていない認証方式です"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1037
 msgid "The given mount was not found"
-msgstr "指定したマウントが見つかりませんでした"
+msgstr "指定されたマウントが見つかりません"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1045
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1282
@@ -2120,7 +2242,7 @@ msgstr "指定したマウントが見つかりませんでした"
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1603
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1706
 msgid "An operation is already pending"
-msgstr ""
+msgstr "操作はすでに実行中です"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1132
 msgid "No outstanding mount operation"
@@ -2128,14 +2250,14 @@ msgstr "未処理のマウント操作はありません"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1274
 msgid "The given volume was not found"
-msgstr "指定したボリュームが見つかりませんでした"
+msgstr "指定されたボリュームが見つかりません"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1381
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1488
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1595
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1698
 msgid "The given drive was not found"
-msgstr "指定したドライブが見つかりませんでした"
+msgstr "指定されたドライブが見つかりません"
 
 #: monitor/udisks2/gvfsudisks2drive.c:290
 #, c-format
@@ -2150,60 +2272,65 @@ msgstr "名前のないドライブ"
 #, c-format
 msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
-"メディアを取り出せませんでした (メディアで一つ以上のボリュームが使用中です)"
+"メディアの取り出しに失敗しました。メディア上の 1 つ以上のボリュームが使用中で"
+"す。"
 
-#: monitor/udisks2/gvfsudisks2mount.c:634
+#: monitor/udisks2/gvfsudisks2mount.c:638
 msgid "One or more programs are preventing the unmount operation."
-msgstr "アンマウント操作を妨げるプログラムが一つ以上あります。"
+msgstr "1 つ以上のプログラムがアンマウント操作を妨げています。"
 
 #. Note that the GUI (Shell, Files) currently use the term
 #. * "Eject" for both GDrive.stop() and GDrive.eject().
 #.
-#: monitor/udisks2/gvfsudisks2mount.c:744
+#: monitor/udisks2/gvfsudisks2mount.c:748
 msgid "Eject Anyway"
 msgstr "とにかく取り出す"
 
-#: monitor/udisks2/gvfsudisks2mount.c:1128
-#: monitor/udisks2/gvfsudisks2volume.c:1769
+#: monitor/udisks2/gvfsudisks2mount.c:1156
+#: monitor/udisks2/gvfsudisks2volume.c:1777
 msgid "Operation not supported by backend"
 msgstr "バックエンドでサポートしていない操作です"
 
 #: monitor/udisks2/gvfsudisks2utils.c:345
 #, c-format
 msgid "Timed out running command-line “%s”"
-msgstr "実行中の次のコマンドラインがタイムアウトしました: “%s”"
+msgstr "コマンドライン “%s” の実行がタイムアウトしました"
 
-#: monitor/udisks2/gvfsudisks2utils.c:647
+#: monitor/udisks2/gvfsudisks2utils.c:646
 #, c-format
 msgid ""
 "Unmounting %s\n"
 "Disconnecting from filesystem."
 msgstr ""
-"%s をアンマウント中です\n"
-"ファイルシステムから切断しています"
+"%s をアンマウント中\n"
+"ファイルシステムから切断しています。"
 
-#: monitor/udisks2/gvfsudisks2utils.c:649
+#: monitor/udisks2/gvfsudisks2utils.c:648
 #, c-format
 msgid ""
 "Writing data to %s\n"
 "Device should not be unplugged."
 msgstr ""
-"%s にデータを書込み中です\n"
-"デバイスを取り外さないでください"
+"%s にデータを書き込み中\n"
+"デバイスを取り外さないでください。"
 
-#: monitor/udisks2/gvfsudisks2utils.c:788
+#: monitor/udisks2/gvfsudisks2utils.c:784
 #, c-format
 msgid ""
 "%s unmounted\n"
 "Filesystem has been disconnected."
-msgstr "%s をアンマウントしました"
+msgstr ""
+"%s をアンマウントしました\n"
+"ファイルシステムが切断されました。"
 
-#: monitor/udisks2/gvfsudisks2utils.c:790
+#: monitor/udisks2/gvfsudisks2utils.c:786
 #, c-format
 msgid ""
 "%s can be safely unplugged\n"
 "Device can be removed."
-msgstr "%s は安全に取り外すことができます"
+msgstr ""
+"%s は安全に取り外すことができます\n"
+"デバイスを取り外すことができます。"
 
 #. Translators: This is used for possibly encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2211,7 +2338,7 @@ msgstr "%s は安全に取り外すことができます"
 #: monitor/udisks2/gvfsudisks2volume.c:304
 #, c-format
 msgid "%s Possibly Encrypted"
-msgstr "%s おそらく暗号済み"
+msgstr "%s おそらく暗号化済み"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2219,7 +2346,7 @@ msgstr "%s おそらく暗号済み"
 #: monitor/udisks2/gvfsudisks2volume.c:311
 #, c-format
 msgid "%s Encrypted"
-msgstr "%s 暗号済み"
+msgstr "%s 暗号化済み"
 
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2230,38 +2357,36 @@ msgid "%s Volume"
 msgstr "%s ボリューム"
 
 #. Translators: Name used for volume
-#: monitor/udisks2/gvfsudisks2volume.c:563
+#: monitor/udisks2/gvfsudisks2volume.c:565
 msgid "Volume"
 msgstr "ボリューム"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1152
+#: monitor/udisks2/gvfsudisks2volume.c:1160
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "キーリング (%s) にパスフレーズを保存するときにエラーが発生しました"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1185
+#: monitor/udisks2/gvfsudisks2volume.c:1193
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr ""
 "キーリング (%s) から無効なパスフレーズを削除するときにエラーが発生しました"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1247
+#: monitor/udisks2/gvfsudisks2volume.c:1255
 msgid "The unlocked device does not have a recognizable file system on it"
-msgstr ""
-"ロックが解除されたデバイスには、その上に認識できるファイルシステムがありませ"
-"ん"
+msgstr "ロック解除されたデバイスに認識可能なファイルシステムがありません"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1275
+#: monitor/udisks2/gvfsudisks2volume.c:1283
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "%s の暗号化パスフレーズ"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1484
+#: monitor/udisks2/gvfsudisks2volume.c:1492
 msgid "A passphrase is required to access the volume"
-msgstr "このボリュームにアクセスするにはパスフレーズが必要です"
+msgstr "ボリュームにアクセスするにはパスフレーズが必要です"
 
 #. Translators: %s is the description of the volume that is being unlocked
-#: monitor/udisks2/gvfsudisks2volume.c:1499
+#: monitor/udisks2/gvfsudisks2volume.c:1507
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -2269,32 +2394,35 @@ msgid ""
 "The volume might be a VeraCrypt volume as it contains random data."
 msgstr ""
 "認証が必要です\n"
-"パスフレーズは“%s”上の暗号化されたデータへのアクセスに必要です。\n"
-"ボリュームがランダムデータを含んでいるため VeraCrypt ボリュームである可能"
-"性があります。"
+"“%s” の暗号化されたデータにアクセスするにはパスフレーズが必要です。\n"
+"このボリュームにはランダムなデータが含まれているため、VeraCrypt ボリュームの"
+"可能性があります。"
 
 #. Translators: %s is the description of the volume that is being unlocked
-#: monitor/udisks2/gvfsudisks2volume.c:1505
+#: monitor/udisks2/gvfsudisks2volume.c:1513
 #, c-format
 msgid ""
 "Authentication Required\n"
 "A passphrase is needed to access encrypted data on “%s”."
 msgstr ""
 "認証が必要です\n"
-"パスフレーズは“%s”上の暗号化されたデータへのアクセスに必要です。"
+"“%s” の暗号化されたデータにアクセスするにはパスフレーズが必要です。"
 
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
 #.
-#: monitor/udisks2/gvfsudisks2volume.c:1685
+#: monitor/udisks2/gvfsudisks2volume.c:1693
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
 
 #: monitor/udisks2/udisks2volumemonitordaemon.c:39
 msgid "GVfs UDisks2 Volume Monitor"
-msgstr "GVfs UDisks2 ボリュームの監視"
+msgstr "GVfs UDisks2 ボリュームモニター"
+
+#~ msgid "File length changed during transfer"
+#~ msgstr "転送中にファイルの長さが変更されました"
 
 #~ msgid "Enter your password for the server “%s”."
 #~ msgstr "サーバー“%s”のパスワードを入力してください。"
@@ -2604,9 +2732,6 @@ msgstr "GVfs UDisks2 ボリュームの監視"
 
 #~ msgid "AFP shares on %s"
 #~ msgstr "%s 上の AFP 共有"
-
-#~ msgid "File is a directory"
-#~ msgstr "ファイルはディレクトリです"
 
 #~ msgid "Couldn't create temporary file (%s)"
 #~ msgstr "一時ファイルを生成できません (%s)"
