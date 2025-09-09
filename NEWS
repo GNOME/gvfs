@@ -1,3 +1,17 @@
+Major changes in 1.58.0
+=======================
+* mtp: Allow cancelling ongoing folder enumerations
+* wsdd: Use socket-activated service if available
+* onedrive: Set emblem for remote data
+* fix: Add file rename support in MTP backend move operation
+* mtp: Fix -Wmaybe-uninitialized warning in pad_file
+* fuse: use fuse_(un)set_feature_flag for libfuse 3.17+
+* smbbrowse: Purge server cache for next auth try
+* metatree: Open files with O_CLOEXEC
+* cdda: Fix incorrect track duration for 99-track CDs
+* metadata: Fix journal file permissions inconsistency (#808)
+* dav: recognize 308 Permanent Redirect
+
 Major changes in 1.57.2
 =======================
 * onedrive: Use presentation id as host to adapt to the change in GOA (Jan-Michael Brummer)
