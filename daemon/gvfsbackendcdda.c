@@ -213,8 +213,10 @@ fetch_metadata (GVfsBackendCdda *cdda_backend)
       track->duration = 0;
     }
 
-    cdda_backend->tracks = g_list_append (cdda_backend->tracks, track);
+    cdda_backend->tracks = g_list_prepend (cdda_backend->tracks, track);
   }
+
+  cdda_backend->tracks = g_list_reverse (cdda_backend->tracks);
 
   cdio_destroy (cdio);
 }
