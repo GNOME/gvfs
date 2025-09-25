@@ -1127,6 +1127,13 @@ get_device (GVfsBackend *backend, uint32_t bus_num, uint32_t dev_num,
     = LIBMTP_Check_Capability (device, LIBMTP_DEVICECAP_CopyObject);
 #endif
 
+  // Some devices don't have the Android extension listed.
+  // But if they have all the Android-specific extensions assume they support the same capabilities.
+  G_VFS_BACKEND_MTP (backend)->android_extension |=
+       G_VFS_BACKEND_MTP (backend)->get_partial_object_capability
+    && G_VFS_BACKEND_MTP (backend)->send_partial_object_capability
+    && G_VFS_BACKEND_MTP (backend)->edit_objects_capability;
+
  exit:
   g_debug ("(II) get_device done.\n");
   return device;
