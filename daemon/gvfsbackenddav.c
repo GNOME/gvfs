@@ -3874,6 +3874,7 @@ typedef struct {
 
   /* Local file */
   GInputStream *in;
+  GDateTime *modified;
   goffset size;
 
   /* Remote file */
@@ -3889,6 +3890,10 @@ push_handle_free (PushHandle *handle)
     {
       g_input_stream_close_async (handle->in, 0, NULL, NULL, NULL);
       g_object_unref (handle->in);
+    }
+  if (handle->modified)
+    {
+      g_date_time_unref (handle->modified);
     }
   g_object_unref (handle->backend);
   g_object_unref (handle->job);
@@ -4014,6 +4019,20 @@ push_stat_dest_cb (GObject *source, GAsyncResult *result, gpointer user_data)
   handle->msg = soup_message_new_from_uri (SOUP_METHOD_PUT, handle->uri);
   push_setup_message (handle);
 
+  if (handle->modified)
+    {
+      /* For servers that support it, use the X-OC-Mtime header to preserve
+       * the last modified time of the file */
+      gchar *string;
+
+      string = g_strdup_printf ("%" G_GINT64_FORMAT, g_date_time_to_unix (handle->modified));
+      soup_message_headers_append (soup_message_get_request_headers (handle->msg),
+                                   "X-OC-Mtime",
+                                   string);
+
+      g_free (string);
+    }
+
   soup_message_set_request_body (handle->msg, NULL, handle->in, handle->size);
 
   g_signal_connect (handle->msg, "restarted",
@@ -4041,6 +4060,7 @@ push_source_fstat_cb (GObject *source, GAsyncResult *res, gpointer user_data)
   info = g_file_input_stream_query_info_finish (fin, res, &error);
   if (info)
     {
+      handle->modified = g_file_info_get_modification_date_time (info);
       handle->size = g_file_info_get_size (info);
       g_object_unref (info);
 
@@ -4074,7 +4094,7 @@ push_source_open_cb (GObject *source, GAsyncResult *res, gpointer user_data)
       handle->in = G_INPUT_STREAM (fin);
 
       g_file_input_stream_query_info_async (fin,
-                                            G_FILE_ATTRIBUTE_STANDARD_SIZE,
+                                            G_FILE_ATTRIBUTE_STANDARD_SIZE "," G_FILE_ATTRIBUTE_TIME_MODIFIED,
                                             0, handle->job->cancellable,
                                             push_source_fstat_cb, handle);
     }
