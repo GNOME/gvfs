@@ -173,10 +173,10 @@ main (int argc,
 	  if (type == META_KEY_TYPE_NONE)
 	    g_print ("%s Not set\n", key);
 	  else if (type == META_KEY_TYPE_STRING)
-	    g_print ("%s=%s\n", key, meta_tree_lookup_string (tree, path, key));
+	    g_print ("%s=%s\n", key, meta_tree_lookup_string (tree, tree_path, key));
 	  else
 	    {
-	      strings = meta_tree_lookup_stringv (tree, path, key);
+	      strings = meta_tree_lookup_stringv (tree, tree_path, key);
 	      g_print ("%s=[", key);
 	      for (j = 0; strings[j] != NULL; j++)
 		{
