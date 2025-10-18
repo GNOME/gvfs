@@ -1999,7 +1999,7 @@ msgstr "Όχι"
 
 #. Translators: The first %s is the reason why verification failed, the second a certificate
 #: daemon/gvfsdaemonutils.c:338
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The site’s identity can’t be verified:%s\n"
 #| "\n"
@@ -2098,10 +2098,9 @@ msgstr "Σφάλμα αναζήτησης στη ροή"
 #: daemon/gvfsjobmove.c:147 daemon/gvfsjobopenforwrite.c:250
 #: daemon/gvfsjobpush.c:152 daemon/gvfsjobsetattribute.c:152
 #: daemon/gvfsjobsetdisplayname.c:130 daemon/gvfsjobtrash.c:125
-#, fuzzy
 #| msgid "Volume is read-only"
 msgid "Filesystem is read-only"
-msgstr "Ο τόμος είναι μόνο για ανάγνωση"
+msgstr "Το σύστημα αρχείων είναι μόνο για ανάγνωση"
 
 #: daemon/gvfsjobmakesymlink.c:111
 msgid "Symlinks not supported by backend"
@@ -2436,10 +2435,10 @@ msgstr ""
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
 #.
 #: monitor/udisks2/gvfsudisks2volume.c:304
-#, fuzzy, c-format
+#, c-format
 #| msgid "%s Encrypted"
 msgid "%s Possibly Encrypted"
-msgstr "%s κρυπτογραφημένα"
+msgstr "%s Πιθανώς κρυπτογραφημένα"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
@@ -2487,7 +2486,7 @@ msgstr "Ένα συνθηματικό είναι απαραίτητο για π�
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1507
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "Enter a passphrase to unlock the volume\n"
 #| "The volume %s might be a VeraCrypt volume as it contains random data."
@@ -2496,12 +2495,13 @@ msgid ""
 "A passphrase is needed to access encrypted data on “%s”.\n"
 "The volume might be a VeraCrypt volume as it contains random data."
 msgstr ""
-"Εισάγετε τον κωδικό πρόσβασης για να ξεκλειδώσετε τον τόμο\n"
-"Η συσκευή %s μπορεί να είναι τόμος VeraCrypt καθώς περιέχει τυχαία δεδομένα."
+"Απαιτείται Πιστοποίηση\n"
+"Απαιτείται συνθηματική φράση για πρόσβαση σε κρυπτογραφημένα δεδομένα στο «%s».\n"
+"Ο τόμος μπορεί να είναι τόμος VeraCrypt καθώς περιέχει τυχαία δεδομένα."
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1513
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "Enter a passphrase to unlock the volume\n"
 #| "The passphrase is needed to access encrypted data on %s."
@@ -2509,8 +2509,8 @@ msgid ""
 "Authentication Required\n"
 "A passphrase is needed to access encrypted data on “%s”."
 msgstr ""
-"Εισάγετε το συνθηματικό για να ξεκλειδώσετε τον τόμο\n"
-"Το συνθηματικό χρειάζεται για τη πρόσβαση σε κρυπτογραφημένα δεδομένα στο %s."
+"Απαιτείται Πιστοποίηση\n"
+"Απαιτείται συνθηματική φράση για πρόσβαση σε κρυπτογραφημένα δεδομένα στο «%s»."
 
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
@@ -3587,9 +3587,8 @@ msgstr "Παρακολούθηση τόμου GVfs UDisks2"
 #~ msgid "Query info not supported on stream"
 #~ msgstr "Η αναζήτηση δεν υποστηρίζεται στη ροή δεδομένων"
 
-#, fuzzy
 #~ msgid "Can't pull trash"
-#~ msgstr "Αδυναμία διαγραφής των απορριμμάτων"
+#~ msgstr "Αδυναμία ανάκτησης απορριμάτων"
 
 #~ msgid "dns-sd"
 #~ msgstr "dns-sd"
