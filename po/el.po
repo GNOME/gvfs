@@ -11,16 +11,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: el\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
-"POT-Creation-Date: 2025-10-17 08:42+0000\n"
-"PO-Revision-Date: 2019-01-24 23:53+0200\n"
-"Last-Translator: Efstathios Iosifidis <iosifidis@opensuse.org>\n"
+"POT-Creation-Date: 2025-10-19 01:10+0000\n"
+"PO-Revision-Date: 2025-10-19 10:44+0300\n"
+"Last-Translator: Efstathios Iosifidis <eiosifidis@gnome.org>\n"
 "Language-Team: Ελληνικά <>\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.5.7\n"
+"X-Generator: Poedit 3.7\n"
 "X-Project-Style: gnome\n"
 
 #: client/gdaemonfile.c:437
@@ -354,7 +354,6 @@ msgid ""
 msgstr ""
 "Απαιτείται Πιστοποίηση\n"
 "Εισάγετε χρήστη και συνθηματικό για το «%s»:"
-
 
 # #-#-#-#-#  gdm.gnome-2-20.el.po (el)  #-#-#-#-#
 #
@@ -776,9 +775,6 @@ msgstr "Έγγραφα σε %s"
 #. * shown in the dialog which is defined above.
 #: daemon/gvfsbackendafc.c:577
 #, c-format
-#| msgid ""
-#| "The device “%s” is locked. Enter the passcode on the device and click "
-#| "“Try again”."
 msgid ""
 "Device Locked\n"
 "The device “%s” is locked.\n"
@@ -796,9 +792,6 @@ msgstr ""
 #. * of the button shown in the device.
 #: daemon/gvfsbackendafc.c:585
 #, c-format
-#| msgid ""
-#| "The device “%s” is not trusted yet. Select “Trust” on the device and "
-#| "click “Try again”."
 msgid ""
 "Untrusted Device\n"
 "The device “%s” is not trusted yet.\n"
@@ -1168,7 +1161,6 @@ msgstr "Κοινή χρήση WebDAV"
 #. Translators: %s is a server name
 #: daemon/gvfsbackenddav.c:1779 daemon/gvfsbackendsmbbrowse.c:334
 #, c-format
-#| msgid "Authentication is required to perform file operations"
 msgid ""
 "Authentication Required\n"
 "Enter password for “%s”:"
@@ -1178,7 +1170,6 @@ msgstr ""
 
 #
 #: daemon/gvfsbackenddav.c:1782
-#| msgid "Please enter proxy password"
 msgid ""
 "Authentication Required\n"
 "Enter proxy password:"
@@ -1247,8 +1238,8 @@ msgid "Invalid attribute type (uint64 expected)"
 msgstr "Άκυρος τύπος γνωρίσματος (αναμένονταν uint64)"
 
 #: daemon/gvfsbackendgoogle.c:2217
-msgid "Can't move file over directory"
-msgstr "Αδυναμία μετακίνησης αρχείου πάνω από κατάλογο"
+msgid "Can’t move file over directory"
+msgstr "Δεν είναι δυνατή η μετακίνηση του αρχείου στον κατάλογο"
 
 #: daemon/gvfsbackendgoogle.c:2259
 msgid "Error moving file/folder"
@@ -1261,7 +1252,6 @@ msgstr "Κοινόχρηστα με εμένα"
 
 #. Translators: This is the "Shared drives" folder on https://drive.google.com.
 #: daemon/gvfsbackendgoogle.c:2987
-#| msgid "SmartMedia Drive"
 msgid "Shared drives"
 msgstr "Κοινόχρηστοι δίσκοι"
 
@@ -1611,7 +1601,6 @@ msgid "Windows Network"
 msgstr "Δίκτυο Windows"
 
 #: daemon/gvfsbackendnetwork.c:625
-#| msgid "Network"
 msgid "WSDD Network"
 msgstr "Δίκτυο WSDD"
 
@@ -1645,7 +1634,6 @@ msgid "Invalid attribute type"
 msgstr "Μη έγκυρος τύπος γνωρίσματος"
 
 #: daemon/gvfsbackendonedrive.c:1255
-#| msgid "files"
 msgid "My Files"
 msgstr "Τα αρχεία μου"
 
@@ -1717,7 +1705,6 @@ msgstr "Αδυναμία αποστολής επιβεβαίωσης ταυτό�
 #. Translators: the first %s is the username, the second the host name
 #: daemon/gvfsbackendsftp.c:1164
 #, c-format
-#| msgid "Enter passphrase for secure key for %s on %s"
 msgid ""
 "Authentication Required\n"
 "Enter passphrase for secure key for “%s” on “%s”:"
@@ -1728,7 +1715,6 @@ msgstr ""
 #. Translators: %s is the hostname
 #: daemon/gvfsbackendsftp.c:1171
 #, c-format
-#| msgid "Enter passphrase for secure key for %s"
 msgid ""
 "Authentication Required\n"
 "Enter passphrase for secure key for “%s”:"
@@ -1743,26 +1729,18 @@ msgstr "Αδυναμία αποστολής συνθηματικού"
 #. Translators: the first %s is the username, the second the host name
 #: daemon/gvfsbackendsftp.c:1278
 #, c-format
-#| msgid "Enter password for %s on %s"
 msgid "Enter verification code for %s on %s"
 msgstr "Εισάγετε κωδικό επαλήθευσης για τον %s στο %s"
 
 #. Translators: %s is the hostname
 #: daemon/gvfsbackendsftp.c:1282
 #, c-format
-#| msgid "Unsupported authentication method for %s"
 msgid "Enter verification code for %s"
 msgstr "Εισάγετε κωδικό επαλήθευσης για το %s"
 
 #. Translators: the first %s is the hostname, the second the key fingerprint
 #: daemon/gvfsbackendsftp.c:1329
 #, c-format
-#| msgid ""
-#| "Can’t verify the identity of “%s”.\n"
-#| "This happens when you log in to a computer the first time.\n"
-#| "\n"
-#| "The identity sent by the remote computer is “%s”. If you want to be "
-#| "absolutely sure it is safe to continue, contact the system administrator."
 msgid ""
 "Identity Verification Failed\n"
 "Verifying the identity of “%s” failed, this happens when you log in to a "
@@ -1782,10 +1760,6 @@ msgstr ""
 #. Translators: the first %s is the hostname, the second is an ip address
 #: daemon/gvfsbackendsftp.c:1358
 #, c-format
-#| msgid ""
-#| "The host key for “%s” differs from the key for the IP address “%s”\n"
-#| "If you want to be absolutely sure it is safe to continue, contact the "
-#| "system administrator."
 msgid ""
 "Identity Verification Failed\n"
 "The host key for “%s” differs from the key for the IP address “%s”\n"
@@ -1793,8 +1767,8 @@ msgid ""
 "administrator."
 msgstr ""
 "Αποτυχία Επαλήθευσης Ταυτότητας\n"
-"Το κλειδί οικοδεσπότη για το «%s» διαφέρει από το κλειδί για τη διεύθυνση "
-"IP «%s»\n"
+"Το κλειδί οικοδεσπότη για το «%s» διαφέρει από το κλειδί για τη διεύθυνση IP "
+"«%s»\n"
 "Εάν θέλετε να είστε απόλυτα σίγουροι ότι είναι ασφαλές να συνεχίσετε, "
 "επικοινωνήστε με τον διαχειριστή του συστήματος."
 
@@ -1948,12 +1922,10 @@ msgid "Trash"
 msgstr "Απορρίμματα"
 
 #: daemon/gvfsbackendwsdd.c:328
-#| msgid "The file is not a directory"
 msgid "File is not a directory"
 msgstr "Το αρχείο δεν είναι κατάλογος"
 
 #: daemon/gvfsbackendwsdd.c:380
-#| msgid "Windows Network"
 msgid "WS-Discovery Network"
 msgstr "Δίκτυο WS-Discovery"
 
@@ -2000,12 +1972,6 @@ msgstr "Όχι"
 #. Translators: The first %s is the reason why verification failed, the second a certificate
 #: daemon/gvfsdaemonutils.c:338
 #, c-format
-#| msgid ""
-#| "The site’s identity can’t be verified:%s\n"
-#| "\n"
-#| "%s\n"
-#| "\n"
-#| "Are you really sure you would like to continue?"
 msgid ""
 "Identity Verification Failed\n"
 "%s\n"
@@ -2098,7 +2064,6 @@ msgstr "Σφάλμα αναζήτησης στη ροή"
 #: daemon/gvfsjobmove.c:147 daemon/gvfsjobopenforwrite.c:250
 #: daemon/gvfsjobpush.c:152 daemon/gvfsjobsetattribute.c:152
 #: daemon/gvfsjobsetdisplayname.c:130 daemon/gvfsjobtrash.c:125
-#| msgid "Volume is read-only"
 msgid "Filesystem is read-only"
 msgstr "Το σύστημα αρχείων είναι μόνο για ανάγνωση"
 
@@ -2214,9 +2179,8 @@ msgid ""
 "values are \"merged\", \"separate\" (the Local Network folder) and "
 "\"disabled\"."
 msgstr ""
-"Πώς εμφανίζονται οι υπηρεσίες DNS-SD στη θέση \"network:///\". Πιθανές "
-"τιμές είναι \"merged\", \"separate\" (ο φάκελος Τοπικό Δίκτυο) και "
-"\"disabled\"."
+"Πώς εμφανίζονται οι υπηρεσίες DNS-SD στη θέση \"network:///\". Πιθανές τιμές "
+"είναι \"merged\", \"separate\" (ο φάκελος Τοπικό Δίκτυο) και \"disabled\"."
 
 #: daemon/org.gnome.system.dns_sd.gschema.xml:10
 msgid "Extra domains to look for DNS-SD services in"
@@ -2253,8 +2217,8 @@ msgid ""
 "order for a new workgroup to fully take effect the user may need to log out "
 "and log back in."
 msgstr ""
-"Η ομάδα εργασίας ή domain δικτύωσης Windows στην οποία ανήκει ο χρήστης. "
-"Για να τεθεί πλήρως σε ισχύ μια νέα ομάδα εργασίας, ο χρήστης μπορεί να "
+"Η ομάδα εργασίας ή domain δικτύωσης Windows στην οποία ανήκει ο χρήστης. Για "
+"να τεθεί πλήρως σε ισχύ μια νέα ομάδα εργασίας, ο χρήστης μπορεί να "
 "χρειαστεί να αποσυνδεθεί και να συνδεθεί ξανά."
 
 #: daemon/org.gnome.system.wsdd.gschema.xml:5
@@ -2436,7 +2400,6 @@ msgstr ""
 #.
 #: monitor/udisks2/gvfsudisks2volume.c:304
 #, c-format
-#| msgid "%s Encrypted"
 msgid "%s Possibly Encrypted"
 msgstr "%s Πιθανώς κρυπτογραφημένα"
 
@@ -2487,30 +2450,26 @@ msgstr "Ένα συνθηματικό είναι απαραίτητο για π�
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1507
 #, c-format
-#| msgid ""
-#| "Enter a passphrase to unlock the volume\n"
-#| "The volume %s might be a VeraCrypt volume as it contains random data."
 msgid ""
 "Authentication Required\n"
 "A passphrase is needed to access encrypted data on “%s”.\n"
 "The volume might be a VeraCrypt volume as it contains random data."
 msgstr ""
 "Απαιτείται Πιστοποίηση\n"
-"Απαιτείται συνθηματική φράση για πρόσβαση σε κρυπτογραφημένα δεδομένα στο «%s».\n"
+"Απαιτείται συνθηματική φράση για πρόσβαση σε κρυπτογραφημένα δεδομένα στο "
+"«%s».\n"
 "Ο τόμος μπορεί να είναι τόμος VeraCrypt καθώς περιέχει τυχαία δεδομένα."
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1513
 #, c-format
-#| msgid ""
-#| "Enter a passphrase to unlock the volume\n"
-#| "The passphrase is needed to access encrypted data on %s."
 msgid ""
 "Authentication Required\n"
 "A passphrase is needed to access encrypted data on “%s”."
 msgstr ""
 "Απαιτείται Πιστοποίηση\n"
-"Απαιτείται συνθηματική φράση για πρόσβαση σε κρυπτογραφημένα δεδομένα στο «%s»."
+"Απαιτείται συνθηματική φράση για πρόσβαση σε κρυπτογραφημένα δεδομένα στο "
+"«%s»."
 
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
