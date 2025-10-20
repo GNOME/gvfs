@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
-"POT-Creation-Date: 2025-08-25 11:42+0000\n"
-"PO-Revision-Date: 2025-09-01 23:07+0300\n"
+"POT-Creation-Date: 2025-10-18 21:57+0000\n"
+"PO-Revision-Date: 2025-10-19 01:07+0300\n"
 "Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
 "Language-Team: Türkçe <takim@gnome.org.tr>\n"
 "Language: tr\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.7\n"
+"X-Generator: Poedit 3.8\n"
 "X-POOTLE-MTIME: 1434405906.000000\n"
 
 #: client/gdaemonfile.c:437
@@ -214,6 +214,7 @@ msgid "Usage: %s key=value key=value …"
 msgstr "Kullanım: %s anahtar=değer anahtar=değer …"
 
 #: daemon/daemon-main.c:276
+#, c-format
 msgid "No mount type specified"
 msgstr "Belirtilmiş bağlama türü yok"
 
@@ -290,7 +291,7 @@ msgid ""
 "Unable to connect to the server “%s”. No suitable authentication mechanism "
 "was found."
 msgstr ""
-"“%s” sunucusuna giriş başarısız oldu. Uygun bir kimlik doğrulama mekanizması "
+"“%s” sunucusuna bağlanılamadı. Uygun bir kimlik doğrulama mekanizması "
 "bulunamadı."
 
 #: daemon/gvfsafpserver.c:801
@@ -299,8 +300,7 @@ msgid ""
 "Unable to connect to the server “%s”. The server doesn’t support AFP version "
 "3.0 or later."
 msgstr ""
-"“%s” sunucusuna giriş başarısız oldu. Sunucu AFP 3.0 veya üzerini "
-"desteklemiyor."
+"“%s” sunucusuna bağlanılamadı. Sunucu AFP 3.0 veya üzerini desteklemiyor."
 
 #: daemon/gvfsafpserver.c:912
 #, c-format
@@ -356,7 +356,7 @@ msgstr "Sunucu ile bağlantı kesilemedi."
 
 #: daemon/gvfsafpserver.c:1357 daemon/gvfsafpserver.c:1733
 msgid "Unable to connect to the server. A communication problem occurred."
-msgstr "Sunucuya giriş başarısız oldu. Bir iletişim sorunu oluştu."
+msgstr "Sunucuya bağlanılamadı. Bir iletişim sorunu oluştu."
 
 #: daemon/gvfsafpserver.c:1692
 msgid "Identification not found."
@@ -388,7 +388,7 @@ msgstr "%s üzerine %s yüklenemedi"
 #: daemon/gvfsbackendafpbrowse.c:312 daemon/gvfsbackendafpbrowse.c:344
 #: daemon/gvfsbackendarchive.c:738 daemon/gvfsbackendarchive.c:793
 #: daemon/gvfsbackendarchive.c:845 daemon/gvfsbackendarchive.c:874
-#: daemon/gvfsbackendcdda.c:908 daemon/gvfsbackendcomputer.c:639
+#: daemon/gvfsbackendcdda.c:916 daemon/gvfsbackendcomputer.c:639
 #: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:800
 #: daemon/gvfsbackendftp.c:1194 daemon/gvfsbackendmtp.c:1805
 #: daemon/gvfsbackendmtp.c:1821 daemon/gvfsbackendmtp.c:2228
@@ -403,8 +403,8 @@ msgstr "Dosya yok"
 
 #: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2411
 #: daemon/gvfsbackendafp.c:280 daemon/gvfsbackendafp.c:483
-#: daemon/gvfsbackendafp.c:1361 daemon/gvfsbackenddav.c:2798
-#: daemon/gvfsbackenddav.c:3757 daemon/gvfsbackenddav.c:4004
+#: daemon/gvfsbackendafp.c:1361 daemon/gvfsbackenddav.c:2799
+#: daemon/gvfsbackenddav.c:3758 daemon/gvfsbackenddav.c:4005
 #: daemon/gvfsbackendftp.c:837 daemon/gvfsbackendnfs.c:2609
 #: daemon/gvfsbackendsftp.c:2728 daemon/gvfsbackendsftp.c:3437
 #: daemon/gvfsbackendsftp.c:3938 daemon/gvfsbackendsftp.c:5010
@@ -421,7 +421,7 @@ msgid "Target file is open"
 msgstr "Hedef dosya açık"
 
 #: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
-#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3310
+#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3311
 #: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendonedrive.c:970
 #: daemon/gvfsbackendsftp.c:2209
 msgid "Directory not empty"
@@ -451,10 +451,10 @@ msgstr "Birimde yeterli boş alan yok"
 
 #: daemon/gvfsafpvolume.c:812 daemon/gvfsafpvolume.c:1356
 #: daemon/gvfsafpvolume.c:1508 daemon/gvfsbackendafp.c:287
-#: daemon/gvfsbackendafp.c:490 daemon/gvfsbackenddav.c:2869
-#: daemon/gvfsbackenddav.c:3223 daemon/gvfsbackenddav.c:3383
-#: daemon/gvfsbackenddav.c:3489 daemon/gvfsbackenddav.c:3723
-#: daemon/gvfsbackenddav.c:3767 daemon/gvfsbackenddav.c:3994
+#: daemon/gvfsbackendafp.c:490 daemon/gvfsbackenddav.c:2870
+#: daemon/gvfsbackenddav.c:3224 daemon/gvfsbackenddav.c:3384
+#: daemon/gvfsbackenddav.c:3490 daemon/gvfsbackenddav.c:3724
+#: daemon/gvfsbackenddav.c:3768 daemon/gvfsbackenddav.c:3995
 #: daemon/gvfsbackendftp.c:816 daemon/gvfsbackendftp.c:1004
 #: daemon/gvfsbackendftp.c:1557 daemon/gvfsbackendftp.c:1625
 #: daemon/gvfsbackendgoogle.c:1703 daemon/gvfsbackendgoogle.c:1780
@@ -568,8 +568,8 @@ msgstr "Dosya, okuma erişimi için açık değil"
 #: daemon/gvfsbackendadmin.c:104 daemon/gvfsbackendadmin.c:871
 #: daemon/gvfsbackendafc.c:2361 daemon/gvfsbackendafp.c:1743
 #: daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
-#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:4086
-#: daemon/gvfsbackenddav.c:4118 daemon/gvfsbackenddav.c:4146
+#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:4087
+#: daemon/gvfsbackenddav.c:4119 daemon/gvfsbackenddav.c:4147
 #: daemon/gvfsbackendftp.c:1234 daemon/gvfsbackendftp.c:1323
 #: daemon/gvfsbackendftp.c:1674 daemon/gvfsbackendgoogle.c:1590
 #: daemon/gvfsbackendgoogle.c:1623 daemon/gvfsbackendgoogle.c:1652
@@ -630,7 +630,7 @@ msgid "Operation not supported"
 msgstr "İşlem desteklenmiyor"
 
 #: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639
-#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2354
+#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2355
 #: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:303
 #: daemon/gvfsbackendonedrive.c:1202 daemon/gvfsbackendsmb.c:628
 msgid "Invalid mount spec"
@@ -795,7 +795,7 @@ msgstr "Dizin açılamıyor"
 
 #: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528
 #: daemon/gvfsbackendafp.c:1290 daemon/gvfsbackendafp.c:1379
-#: daemon/gvfsbackenddav.c:3664 daemon/gvfsbackendftp.c:1509
+#: daemon/gvfsbackenddav.c:3665 daemon/gvfsbackendftp.c:1509
 #: daemon/gvfsbackendonedrive.c:1899 daemon/gvfsbackendsftp.c:3712
 #: daemon/gvfsbackendsftp.c:3999
 msgid "Backups not supported"
@@ -850,21 +850,21 @@ msgid "Apple Filing Protocol Service"
 msgstr "Apple Dosyalama Kuralı Hizmeti"
 
 #: daemon/gvfsbackendafp.c:277 daemon/gvfsbackendburn.c:877
-#: daemon/gvfsbackenddav.c:3752 daemon/gvfsbackendftp.c:1617
+#: daemon/gvfsbackenddav.c:3753 daemon/gvfsbackendftp.c:1617
 #: daemon/gvfsbackendgoogle.c:1752 daemon/gvfsbackendgoogle.c:2095
 #: daemon/gvfsbackendgoogle.c:3141
 msgid "Can’t copy directory over directory"
 msgstr "Dizin üstüne dizin kopyalanamıyor"
 
 #: daemon/gvfsbackendafp.c:296 daemon/gvfsbackendburn.c:893
-#: daemon/gvfsbackenddav.c:3787 daemon/gvfsbackendftp.c:1640
+#: daemon/gvfsbackenddav.c:3788 daemon/gvfsbackendftp.c:1640
 #: daemon/gvfsbackendgoogle.c:1814 daemon/gvfsbackendgoogle.c:3168
 #: daemon/gvfsbackendgoogle.c:3216 daemon/gvfsbackendmtp.c:1692
 #: daemon/gvfsbackendmtp.c:1707
 msgid "Can’t recursively copy directory"
 msgstr "Dizin özyinelemeli kopyalanamıyor"
 
-#: daemon/gvfsbackendafp.c:480 daemon/gvfsbackenddav.c:3565
+#: daemon/gvfsbackendafp.c:480 daemon/gvfsbackenddav.c:3566
 #: daemon/gvfsbackendgoogle.c:2209 daemon/gvfsbackendnfs.c:2603
 #: daemon/gvfsbackendsftp.c:5005 daemon/gvfsbackendsmb.c:2181
 msgid "Can’t move directory over directory"
@@ -875,7 +875,7 @@ msgstr "Dizin üstüne dizin taşınamıyor"
 msgid "Unable to create temporary file (%s)"
 msgstr "Geçici dosya oluşturulamadı (%s)"
 
-#: daemon/gvfsbackendafp.c:1368 daemon/gvfsbackenddav.c:2976
+#: daemon/gvfsbackendafp.c:1368 daemon/gvfsbackenddav.c:2977
 #: daemon/gvfsbackendnfs.c:1313 daemon/gvfsbackendsftp.c:3953
 #: daemon/gvfsbackendsmb.c:1129
 msgid "The file was externally modified"
@@ -928,7 +928,7 @@ msgstr "Geçiçi dizin oluşturulamadı"
 #: daemon/gvfsbackendburn.c:718 daemon/gvfsbackendburn.c:744
 #: daemon/gvfsbackendburn.c:782 daemon/gvfsbackendburn.c:854
 #: daemon/gvfsbackendburn.c:973 daemon/gvfsbackendburn.c:1009
-#: daemon/gvfsbackenddav.c:3227 daemon/gvfsbackendftp.c:857
+#: daemon/gvfsbackenddav.c:3228 daemon/gvfsbackendftp.c:857
 #: daemon/gvfsbackendgoogle.c:1097 daemon/gvfsbackendgphoto2.c:938
 #: daemon/gvfsbackendgphoto2.c:1869 daemon/gvfsbackendgphoto2.c:2588
 #: daemon/gvfsbackendonedrive.c:612 daemon/gvfsbackendrecent.c:110
@@ -957,7 +957,7 @@ msgstr "CD/DVD Oluşturucu"
 msgid "File exists"
 msgstr "Dosya var"
 
-#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:3604
+#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:3605
 #: daemon/gvfsbackendsftp.c:2211 daemon/gvfsbackendsftp.c:5185
 msgid "Target file exists"
 msgstr "Hedef dosya var"
@@ -979,71 +979,71 @@ msgstr ""
 "Birim meşgul\n"
 "Bir ya da daha çok uygulama birimi meşgul tutuyor."
 
-#: daemon/gvfsbackendcdda.c:290 daemon/gvfsbackendgphoto2.c:1289
+#: daemon/gvfsbackendcdda.c:298 daemon/gvfsbackendgphoto2.c:1289
 #: daemon/gvfsbackendmtp.c:920
 msgid "Cannot create gudev client"
 msgstr "gudev istemcisi oluşturulamıyor"
 
-#: daemon/gvfsbackendcdda.c:304 daemon/gvfsbackendcdda.c:385
+#: daemon/gvfsbackendcdda.c:312 daemon/gvfsbackendcdda.c:393
 msgid "No drive specified"
 msgstr "Sürücü belirtilmemiş"
 
-#: daemon/gvfsbackendcdda.c:323
+#: daemon/gvfsbackendcdda.c:331
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "%s sürücüsü bulunamıyor"
 
-#: daemon/gvfsbackendcdda.c:336
+#: daemon/gvfsbackendcdda.c:344
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "Sürücü %s ses dosyaları içermiyor"
 
 #. Translator: %s is the device the disc is inserted into. 'cdda' is the name
 #. name of the backend and shouldn't be translated.
-#: daemon/gvfsbackendcdda.c:346
+#: daemon/gvfsbackendcdda.c:354
 #, c-format
 msgid "cdda mount on %s"
 msgstr "cdda bağı %s üzerinde"
 
-#: daemon/gvfsbackendcdda.c:347 daemon/gvfsbackendcdda.c:872
+#: daemon/gvfsbackendcdda.c:355 daemon/gvfsbackendcdda.c:880
 #: monitor/udisks2/gvfsudisks2volume.c:393
 #, c-format
 msgid "Audio Disc"
 msgstr "Ses Diski"
 
-#: daemon/gvfsbackendcdda.c:411
+#: daemon/gvfsbackendcdda.c:419
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "Dosya sistemi meşgul: %d açık dosya"
 
-#: daemon/gvfsbackendcdda.c:607
+#: daemon/gvfsbackendcdda.c:615
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "%2$s sürücüsü üzerinde %1$s dosyası yok"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: daemon/gvfsbackendcdda.c:716
+#: daemon/gvfsbackendcdda.c:724
 #, c-format
 msgid "Error from “paranoia” on drive %s"
 msgstr "%s sürücüsünde “paranoia” kaynaklı hata oluştu"
 
-#: daemon/gvfsbackendcdda.c:779
+#: daemon/gvfsbackendcdda.c:787
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "%s sürücüsünde akışta atlama hatası"
 
-#: daemon/gvfsbackendcdda.c:901 daemon/gvfsbackendgphoto2.c:1556
+#: daemon/gvfsbackendcdda.c:909 daemon/gvfsbackendgphoto2.c:1556
 #, c-format
 msgid "No such file"
 msgstr "Böyle dosya yok"
 
-#: daemon/gvfsbackendcdda.c:915
+#: daemon/gvfsbackendcdda.c:923
 #, c-format
 msgid "The file does not exist or isn’t an audio track"
 msgstr "Dosya yok ya da bir ses parçası değil"
 
-#: daemon/gvfsbackendcdda.c:1021
+#: daemon/gvfsbackendcdda.c:1029
 msgid "Audio CD File System Service"
 msgstr "Ses CD’si Dosya Sistemi Hizmeti"
 
@@ -1100,38 +1100,38 @@ msgstr "Dosya yoklanamıyor"
 msgid "%s on %s%s"
 msgstr "%s üzerinde %s%s"
 
-#: daemon/gvfsbackenddav.c:766 daemon/gvfsbackenddav.c:1536
-#: daemon/gvfsbackenddav.c:2145 daemon/gvfsbackenddav.c:2309
+#: daemon/gvfsbackenddav.c:767 daemon/gvfsbackenddav.c:1537
+#: daemon/gvfsbackenddav.c:2146 daemon/gvfsbackenddav.c:2310
 #: daemon/gvfsbackendhttp.c:268 daemon/gvfshttpinputstream.c:273
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP Hatası: %s"
 
-#: daemon/gvfsbackenddav.c:781
+#: daemon/gvfsbackenddav.c:782
 msgid "Could not parse response"
 msgstr "Cevap ayrıştırılamadı"
 
-#: daemon/gvfsbackenddav.c:790
+#: daemon/gvfsbackenddav.c:791
 msgid "Empty response"
 msgstr "Boş cevap"
 
-#: daemon/gvfsbackenddav.c:798
+#: daemon/gvfsbackenddav.c:799
 msgid "Unexpected reply from server"
 msgstr "Sunucudan beklenilmeyen yanıt"
 
-#: daemon/gvfsbackenddav.c:1554 daemon/gvfsbackenddav.c:2511
-#: daemon/gvfsbackenddav.c:2606 daemon/gvfsbackenddav.c:2790
+#: daemon/gvfsbackenddav.c:1555 daemon/gvfsbackenddav.c:2512
+#: daemon/gvfsbackenddav.c:2607 daemon/gvfsbackenddav.c:2791
 #, c-format
 msgid "Response invalid"
 msgstr "Geçersiz cevap"
 
-#: daemon/gvfsbackenddav.c:1775
+#: daemon/gvfsbackenddav.c:1776
 msgid "WebDAV share"
 msgstr "WebDAV paylaşımı"
 
 #. Translators: %s is the name of the WebDAV share
 #. Translators: %s is a server name
-#: daemon/gvfsbackenddav.c:1778 daemon/gvfsbackendsmbbrowse.c:334
+#: daemon/gvfsbackenddav.c:1779 daemon/gvfsbackendsmbbrowse.c:334
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -1140,7 +1140,7 @@ msgstr ""
 "Kimlik Doğrulaması Gerekli\n"
 "“%s” için parolayı gir:"
 
-#: daemon/gvfsbackenddav.c:1781
+#: daemon/gvfsbackenddav.c:1782
 msgid ""
 "Authentication Required\n"
 "Enter proxy password:"
@@ -1148,20 +1148,20 @@ msgstr ""
 "Kimlik Doğrulaması Gerekli\n"
 "Vekil parolasını gir:"
 
-#: daemon/gvfsbackenddav.c:2153
+#: daemon/gvfsbackenddav.c:2154
 msgid "Could not find an enclosing directory"
 msgstr "Kapsayan dizin bulunamadı"
 
-#: daemon/gvfsbackenddav.c:2297
+#: daemon/gvfsbackenddav.c:2298
 msgid "Not a WebDAV enabled share"
 msgstr "Paylaşımı etkinleştirilmiş bir WebDAV yok"
 
-#: daemon/gvfsbackenddav.c:2537 daemon/gvfsbackenddav.c:2650
-#: daemon/gvfsbackenddav.c:2737 daemon/gvfsbackenddav.c:2824
+#: daemon/gvfsbackenddav.c:2538 daemon/gvfsbackenddav.c:2651
+#: daemon/gvfsbackenddav.c:2738 daemon/gvfsbackenddav.c:2825
 msgid "Could not create request"
 msgstr "İstek oluşturulamadı"
 
-#: daemon/gvfsbackenddav.c:3010 daemon/gvfsbackendftp.c:1107
+#: daemon/gvfsbackenddav.c:3011 daemon/gvfsbackendftp.c:1107
 #: daemon/gvfsbackendgoogle.c:3944 daemon/gvfsbackendnfs.c:1069
 #: daemon/gvfsbackendnfs.c:1092 daemon/gvfsbackendnfs.c:1118
 #: daemon/gvfsbackendnfs.c:1519 daemon/gvfsbackendsmb.c:1165
@@ -1169,7 +1169,7 @@ msgstr "İstek oluşturulamadı"
 msgid "Backup file creation failed"
 msgstr "Yedek dosyası oluşturulamadı"
 
-#: daemon/gvfsbackenddav.c:3570
+#: daemon/gvfsbackenddav.c:3571
 msgid "Can’t move over directory"
 msgstr "Dizin üstüne taşınamaz"
 
