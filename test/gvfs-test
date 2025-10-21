@@ -1004,6 +1004,7 @@ class Drive(GvfsTestCase):
         # we cannot write to a scsi_debug CD drive, so write it into it in hard
         # disk mode
         dev = self.create_host(PTYPE_DISK)
+        self.root_command('udevadm wait -t10 --settle /dev/%s' % dev)
 
         # put test.iso onto disk
         img = os.path.join(my_dir, 'files', fname)
@@ -1020,7 +1021,13 @@ class Drive(GvfsTestCase):
         ctx = GLib.MainContext().default()
         while ctx.iteration(False):
             pass
-        self.monitor.stdout.read()
+
+        # Let a few seconds the gio monitor settle and detect the removal.
+        for _ in range(20):
+            out = self.monitor.stdout.read()
+            if out and b"Drive disconnected" in out:
+                break
+            time.sleep(0.2)
 
     def setUp(self):
         super().setUp()
