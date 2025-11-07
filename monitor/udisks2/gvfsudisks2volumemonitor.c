@@ -86,6 +86,7 @@ static void update_drives            (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **removed_drives,
                                       gboolean                   coldplug);
 static void update_volumes           (GVfsUDisks2VolumeMonitor  *monitor,
+                                      GHashTable                *mount_entries,
                                       GList                    **added_volumes,
                                       GList                    **removed_volumes,
                                       gboolean                   coldplug);
@@ -94,6 +95,7 @@ static void update_fstab_volumes     (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **removed_volumes,
                                       gboolean                   coldplug);
 static void update_mounts            (GVfsUDisks2VolumeMonitor  *monitor,
+                                      GHashTable                *mount_entries,
                                       GList                    **added_mounts,
                                       GList                    **removed_mounts,
                                       gboolean                   coldplug);
@@ -643,6 +645,20 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
   GList *added_drives, *removed_drives;
   GList *added_volumes, *removed_volumes;
   GList *added_mounts, *removed_mounts;
+  GList *entries, *link;
+  GHashTable *mount_entries; /* gchar *path ~> GUnixMountEntry * */
+
+  mount_entries = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, (GDestroyNotify) g_unix_mount_entry_free);
+
+  /* move mount entries into a hash table */
+  entries = g_unix_mount_entries_get (NULL);
+  for (link = entries; link != NULL; link = g_list_next (link))
+    {
+      GUnixMountEntry *mount_entry = link->data;
+      g_hash_table_insert (mount_entries, (gpointer) g_unix_mount_entry_get_mount_path (mount_entry), mount_entry);
+    }
+  /* the mount_entries took ownership of the mount entry objects */
+  g_list_free (entries);
 
   added_drives = NULL;
   removed_drives = NULL;
@@ -652,9 +668,9 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
   removed_mounts = NULL;
 
   update_drives (monitor, &added_drives, &removed_drives, coldplug);
-  update_volumes (monitor, &added_volumes, &removed_volumes, coldplug);
+  update_volumes (monitor, mount_entries, &added_volumes, &removed_volumes, coldplug);
   update_fstab_volumes (monitor, &added_volumes, &removed_volumes, coldplug);
-  update_mounts (monitor, &added_mounts, &removed_mounts, coldplug);
+  update_mounts (monitor, mount_entries, &added_mounts, &removed_mounts, coldplug);
 
 #if defined(HAVE_BURN) || defined(HAVE_CDDA)
   update_discs (monitor,
@@ -693,6 +709,7 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
   g_list_free_full (added_volumes, g_object_unref);
   g_list_free_full (removed_mounts, g_object_unref);
   g_list_free_full (added_mounts, g_object_unref);
+  g_hash_table_unref (mount_entries);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1388,28 +1405,16 @@ update_drives (GVfsUDisks2VolumeMonitor  *monitor,
 
 static void
 update_volumes (GVfsUDisks2VolumeMonitor  *monitor,
+                GHashTable                *mount_entries, /* gchar *path ~> GUnixMountEntry * */
                 GList                    **added_volumes,
                 GList                    **removed_volumes,
                 gboolean                   coldplug)
 {
   GHashTable *cur_block_volumes; /* UDisksBlock * ~> GVfsUDisks2Volume * */
-  GHashTable *mount_entries; /* gchar *path ~> GUnixMountEntry * */
   GHashTableIter iter;
   gpointer key = NULL, value = NULL;
   GVfsUDisks2Volume *volume;
   GList *objects, *l;
-
-  mount_entries = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, (GDestroyNotify) g_unix_mount_entry_free);
-
-  /* move mount entries into a hash table */
-  objects = g_unix_mount_entries_get (NULL);
-  for (l = objects; l != NULL; l = g_list_next (l))
-    {
-      GUnixMountEntry *mount_entry = l->data;
-      g_hash_table_insert (mount_entries, (gpointer) g_unix_mount_entry_get_mount_path (mount_entry), mount_entry);
-    }
-  /* the mount_entries took ownership of the mount entry objects */
-  g_list_free (objects);
 
   objects = g_dbus_object_manager_get_objects (udisks_client_get_object_manager (monitor->client));
 
@@ -1467,7 +1472,6 @@ update_volumes (GVfsUDisks2VolumeMonitor  *monitor,
     }
 
   g_hash_table_unref (cur_block_volumes);
-  g_hash_table_unref (mount_entries);
 
   g_list_free_full (objects, g_object_unref);
 }
@@ -1676,6 +1680,7 @@ gvfs_mount_entry_equal (gconstpointer ptr1,
 
 static void
 update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
+               GHashTable                *mount_entries, /* gchar *path ~> GUnixMountEntry * */
                GList                    **added_mounts,
                GList                    **removed_mounts,
                gboolean                   coldplug)
@@ -1683,8 +1688,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
   GHashTable *cur_mounts; /* GUnixMountEntry * ~> GVfsUDisks2Mount * */
   GHashTableIter iter;
   gpointer value = NULL;
-  GList *new_mounts, *l;
-  GList *unchanged = NULL; /* GVfsUDisks2Mount * */
+  GList *l, *unchanged = NULL; /* GVfsUDisks2Mount * */
   GVfsUDisks2Mount *mount;
   GVfsUDisks2Volume *volume;
 
@@ -1701,13 +1705,13 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
         g_hash_table_insert (cur_mounts, mount_entry, g_object_ref (mount));
     }
 
-  new_mounts = g_unix_mount_entries_get (NULL);
   /* skip mounts we want to ignore - we do it here so we get to reevaluate
    * on the next update whether they should still be ignored
    */
-  for (l = new_mounts; l != NULL; l = g_list_next (l))
+  g_hash_table_iter_init (&iter, mount_entries);
+  while (g_hash_table_iter_next (&iter, NULL, &value))
     {
-      GUnixMountEntry *mount_entry = l->data;
+      GUnixMountEntry *mount_entry = value;
       if (should_include_mount (monitor, mount_entry))
         {
           mount = g_hash_table_lookup (cur_mounts, mount_entry);
@@ -1721,7 +1725,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
               const gchar *root = g_unix_mount_entry_get_root_path (mount_entry);
               const gchar *device_path;
 
-              /* since @mount takes ownership of @mount_entry, create a copy to not free it below */
+              /* since @mount takes ownership of @mount_entry, create a copy to not free it from the mount_entries */
               mount_entry = g_unix_mount_entry_copy (mount_entry);
               device_path = g_unix_mount_entry_get_device_path (mount_entry);
               volume = NULL;
@@ -1781,7 +1785,6 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
     }
 
   g_list_free_full (unchanged, g_object_unref);
-  g_list_free_full (new_mounts, (GDestroyNotify) g_unix_mount_entry_free);
 
   g_hash_table_unref (cur_mounts);
 }
