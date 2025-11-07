@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: po_gvfs-oc\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
-"POT-Creation-Date: 2025-10-23 14:06+0000\n"
-"PO-Revision-Date: 2025-10-24 20:07+0200\n"
+"POT-Creation-Date: 2025-10-26 00:03+0000\n"
+"PO-Revision-Date: 2025-11-07 19:06+0100\n"
 "Last-Translator: Quentin PAGÈS\n"
 "Language-Team: Tot En Òc\n"
 "Language: oc\n"
@@ -18,8 +18,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-DamnedLies-Scope: partial\n"
 "X-Generator: Poedit 3.8\n"
+"X-DamnedLies-Scope: partial\n"
 "X-Launchpad-Export-Date: 2015-05-20 16:56+0000\n"
 "X-Project-Style: gnome\n"
 
@@ -146,10 +146,9 @@ msgstr "Error al moment de l'inicializacion d'Avahi : %s"
 #. * - the third %s refers to the domain
 #.
 #: common/gvfsdnssdresolver.c:1144
-#, fuzzy, c-format
-#| msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
+#, c-format
 msgid "Error resolving “%s” service “%s” on domain “%s”"
-msgstr "Error de resolucion del servici %s « %s » dins lo domeni « %s »"
+msgstr "Error de resolucion del servici %s « %s » sul domeni « %s »"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -158,10 +157,7 @@ msgstr "Error de resolucion del servici %s « %s » dins lo domeni « %s »"
 #. * - the fourth %s refers to the required TXT keys
 #.
 #: common/gvfsdnssdresolver.c:1168
-#, fuzzy, c-format
-#| msgid ""
-#| "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
-#| "records are missing. Keys required: \"%s\"."
+#, c-format
 msgid ""
 "Error resolving “%s” service “%s” on domain “%s”. One or more TXT records "
 "are missing. Keys required: “%s”."
@@ -192,8 +188,7 @@ msgid "Malformed DNS-SD encoded_triple “%s”"
 msgstr "« %s » DNS-SD encoded_triple mal format"
 
 #: common/gvfsicon.c:250
-#, fuzzy, c-format
-#| msgid "Can't handle version %d of GVfsIcon encoding"
+#, c-format
 msgid "Can’t handle version %d of GVfsIcon encoding"
 msgstr "Impossible de gerir la version %d de l'encodatge GVfsIcon"
 
@@ -511,8 +506,6 @@ msgid "Target object is marked as not renameable (RenameInhibit)"
 msgstr "L'objècte cibla es marcat coma pas renomenable (RenameInhibit)"
 
 #: daemon/gvfsafpvolume.c:1344
-#, fuzzy
-#| msgid "Can't move directory into one of its descendants"
 msgid "Can’t move directory into one of its descendants"
 msgstr "Impossible de desplaçar un repertòri dins un de sos descendents"
 
@@ -544,8 +537,6 @@ msgid "Unable to open source file for reading"
 msgstr "Impossible de dobrir lo fichièr font en mòde lectura"
 
 #: daemon/gvfsafpvolume.c:1512
-#, fuzzy
-#| msgid "Source file and/or destination directory doesn't exist"
 msgid "Source file and/or destination directory doesn’t exist"
 msgstr "Lo fichièr font e/o lo repertòri de destinacion existís pas"
 
@@ -777,36 +768,34 @@ msgstr "Documents sus %s"
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above.
 #: daemon/gvfsbackendafc.c:577
-#, fuzzy, c-format
-#| msgid ""
-#| "The device “%s” is locked. Enter the passcode on the device and click "
-#| "“Try again”."
+#, c-format
 msgid ""
 "Device Locked\n"
 "The device “%s” is locked.\n"
 "\n"
 "Enter the passcode on the device and click “Try again”."
 msgstr ""
-"Lo periferic « %s » es verrolhat. Picatz lo senhal sul periferic, puèi "
-"clicatz sus « Ensajar tornamai »."
+"Aparelh verrolhat\n"
+"L’aparelh « %s » es verrolhat.\n"
+"\n"
+"Picatz lo còde sus l’aparel e clicatz sus « Tornar ensajar »."
 
 #. translators:
 #. * %s is the device name. 'Try again' is the caption of the button
 #. * shown in the dialog which is defined above. 'Trust' is the caption
 #. * of the button shown in the device.
 #: daemon/gvfsbackendafc.c:585
-#, fuzzy, c-format
-#| msgid ""
-#| "The device “%s” is locked. Enter the passcode on the device and click "
-#| "“Try again”."
+#, c-format
 msgid ""
 "Untrusted Device\n"
 "The device “%s” is not trusted yet.\n"
 "\n"
 "Select “Trust” on the device and click “Try again”."
 msgstr ""
-"Lo periferic « %s » es verrolhat. Picatz lo senhal sul periferic, puèi "
-"clicatz sus « Ensajar tornamai »."
+"Aparelh non aprobat\n"
+"L'aparelh « %s » es pas encara fisable.\n"
+"\n"
+"Seleccionatz « Far fisança » sus l'aparelh e clicatz sus « Tornar ensajar »."
 
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
 #: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
@@ -1174,10 +1163,8 @@ msgstr ""
 "Picatz lo senhal del servidor mandatari :"
 
 #: daemon/gvfsbackenddav.c:2154
-#, fuzzy
-#| msgid "Could not find enclosing mount"
 msgid "Could not find an enclosing directory"
-msgstr "Impossible de trobar lo punt de montatge òste"
+msgstr "Impossible de trobar un repertòri parent"
 
 #: daemon/gvfsbackenddav.c:2298
 msgid "Not a WebDAV enabled share"
@@ -1336,8 +1323,6 @@ msgid "Digital Camera (%s)"
 msgstr "Aparelh de fòto (%s)"
 
 #: daemon/gvfsbackendgphoto2.c:1256 daemon/gvfsbackendmtp.c:891
-#, fuzzy
-#| msgid "Couldn't find matching udev device."
 msgid "Couldn’t find matching udev device."
 msgstr "Impossible de trobar un periferic udev correspondent."
 
@@ -1607,6 +1592,8 @@ msgid ""
 "Permission denied: Perhaps this host is disallowed or a privileged port is "
 "needed"
 msgstr ""
+"Permission refusada : benlèu aqueste òste es pas autorizat o cal un pòrt "
+"privilegiat"
 
 #: daemon/gvfsbackendnfs.c:1184 daemon/gvfsbackendnfs.c:1207
 #: daemon/gvfsbackendnfs.c:1255 daemon/gvfsbackendsftp.c:3880
@@ -1682,8 +1669,6 @@ msgid "Login dialog cancelled"
 msgstr "La bóstia de dialòg de connexion es estada anullada"
 
 #: daemon/gvfsbackendsftp.c:968
-#, fuzzy
-#| msgid "Can't send host identity confirmation"
 msgid "Can’t send host identity confirmation"
 msgstr "Impossible de mandar la confirmacion de l'identitat de l'òste"
 
@@ -1725,13 +1710,7 @@ msgstr "Picatz lo còdi de verificacion per %s"
 
 #. Translators: the first %s is the hostname, the second the key fingerprint
 #: daemon/gvfsbackendsftp.c:1329
-#, fuzzy, c-format
-#| msgid ""
-#| "Can't verify the identity of “%s”.\n"
-#| "This happens when you log in to a computer the first time.\n"
-#| "\n"
-#| "The identity sent by the remote computer is “%s”. If you want to be "
-#| "absolutely sure it is safe to continue, contact the system administrator."
+#, c-format
 msgid ""
 "Identity Verification Failed\n"
 "Verifying the identity of “%s” failed, this happens when you log in to a "
@@ -1740,39 +1719,32 @@ msgid ""
 "The identity sent by the remote computer is “%s”. If you want to be "
 "absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
-"Impossible de verificar l'identitat de « %s ».\n"
-"Aquò se produtz quand vos connectatz a un ordenador pel primièr còp.\n"
+"Verificacion de l'identitat fracassada\n"
+"La verificacion de l'identitat de « %s » a fracassat, aquò se produtz quand "
+"vos connectatz a un ordenador pel primièr còp.\n"
 "\n"
-"L'identitat enviada per l'ordenador distant es « %s ». Se volètz èsser "
-"absoludament certan qu'es segur de contunhar, contactatz vòstre "
-"administrator del sistèma."
+"L'identitat mandada per l'ordenador distant es « %s ». Se volètz èsser "
+"absoludament segur que podètz contunhar sens dangièr, contactatz "
+"l'administrator sistèma."
 
 #. Translators: the first %s is the hostname, the second is an ip address
 #: daemon/gvfsbackendsftp.c:1358
-#, fuzzy, c-format
-#| msgid ""
-#| "Can't verify the identity of “%s”.\n"
-#| "This happens when you log in to a computer the first time.\n"
-#| "\n"
-#| "The identity sent by the remote computer is “%s”. If you want to be "
-#| "absolutely sure it is safe to continue, contact the system administrator."
+#, c-format
 msgid ""
 "Identity Verification Failed\n"
 "The host key for “%s” differs from the key for the IP address “%s”\n"
 "If you want to be absolutely sure it is safe to continue, contact the system "
 "administrator."
 msgstr ""
-"Impossible de verificar l'identitat de « %s ».\n"
-"Aquò se produtz quand vos connectatz a un ordenador pel primièr còp.\n"
-"\n"
-"L'identitat enviada per l'ordenador distant es « %s ». Se volètz èsser "
-"absoludament certan qu'es segur de contunhar, contactatz vòstre "
-"administrator del sistèma."
+"Verificacion de l'identitat fracassada\n"
+"La clau d'òste per « %s » es diferenta de la clau per l'adreça IP « %s »\n"
+"Se volètz èsser absoludament segur que podètz contunhar sens dangièr, "
+"contactatz l'administrator del sistèma."
 
 #: daemon/gvfsbackendsftp.c:1450
 #, c-format
 msgid "The connection is closed (the underlying SSH process exited)"
-msgstr ""
+msgstr "La connexion es barrada (lo processus SSH sosjacent s'es acabat)"
 
 #: daemon/gvfsbackendsftp.c:1451
 #, c-format
@@ -1814,6 +1786,7 @@ msgstr "Error de creacion del fichièr de salvament : %s"
 #: daemon/gvfsbackendsftp.c:5415
 msgid "Value out of range, sftp only supports 32bit timestamps"
 msgstr ""
+"Valor fòra de portada, sftp supòrta solament los orodatatges de 32 bits"
 
 #: daemon/gvfsbackendsmbbrowse.c:644 daemon/gvfsbackendsmbbrowse.c:678
 #: daemon/gvfsbackendsmb.c:442 daemon/gvfsbackendsmb.c:469
@@ -1846,6 +1819,8 @@ msgid ""
 "Authentication Required\n"
 "Enter password for share “%s” on “%s”:"
 msgstr ""
+"Autentificacion requerida\n"
+"Picatz lo senhal pel partiment « %s » sus « %s » :"
 
 #. Translators: First %s is a share name, second is a server name
 #: daemon/gvfsbackendsmb.c:268
@@ -1854,6 +1829,8 @@ msgid ""
 "Authentication Required\n"
 "Enter user and password for share “%s” on “%s”:"
 msgstr ""
+"Autentificacion requerida\n"
+"Picatz lo nom utilizaire e lo senhal pel partiment « %s » sus « %s » :"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: daemon/gvfsbackendsmb.c:588
@@ -1886,8 +1863,6 @@ msgid "Error removing target file: %s"
 msgstr "Error al moment de la supression del fichièr cibla : %s"
 
 #: daemon/gvfsbackendsmb.c:2257
-#, fuzzy
-#| msgid "Can't recursively move directory"
 msgid "Can’t recursively move directory"
 msgstr "Impossible de desplaçar un repertòri d'un biais recursiu"
 
@@ -1914,10 +1889,8 @@ msgid "File is not a directory"
 msgstr "Lo fichièr es pas un repertòri"
 
 #: daemon/gvfsbackendwsdd.c:380
-#, fuzzy
-#| msgid "Windows Network"
 msgid "WS-Discovery Network"
-msgstr "Ret Windows"
+msgstr "Descobèrta ret WS"
 
 #: daemon/gvfschannel.c:336
 msgid "Channel blocked"
@@ -1970,6 +1943,12 @@ msgid ""
 "\n"
 "Are you really sure you would like to continue?"
 msgstr ""
+"La verificacion de l'identitat a fracassat\n"
+"%s\n"
+"\n"
+"%s\n"
+"\n"
+"Volètz vertadièrament contunhar ?"
 
 #: daemon/gvfsftpconnection.c:211
 msgid "Unexpected end of stream"
@@ -2076,22 +2055,22 @@ msgstr ""
 #: daemon/gvfswsddservice.c:437
 #, c-format
 msgid "Communication with the underlying wsdd daemon failed."
-msgstr ""
+msgstr "La comunicacion amb lo demòni wsdd sosjacent a fracassat."
 
 #: daemon/gvfswsddservice.c:513
 #, c-format
 msgid "The underlying wsdd daemon exited unexpectedly."
-msgstr ""
+msgstr "Lo demòni wsdd sosjacent s'es arrestat d'un biais imprevist."
 
 #: daemon/gvfswsddservice.c:612
 #, c-format
 msgid "Failed to spawn the underlying wsdd daemon."
-msgstr ""
+msgstr "Fracàs al moment de generar lo demòni wsdd sosjacent."
 
 #: daemon/gvfswsddservice.c:643
 #, c-format
 msgid "Failed to establish connection with the underlying wsdd daemon."
-msgstr ""
+msgstr "Fracàs de l'establiment de la connexion amb lo demòni wsdd sosjacent."
 
 #: daemon/main.c:148 metadata/meta-daemon.c:459
 msgid "Replace old daemon."
@@ -2157,7 +2136,7 @@ msgstr "Realizar las operacions suls fichièrs"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:14
 msgid "Authentication is required to run gvfsd-admin daemon"
-msgstr ""
+msgstr "Una autentificacion es requesida per aviar lo demòni gvfsd-admin"
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:26
 msgid "Authentication is required to perform file operations"
@@ -2222,10 +2201,8 @@ msgid "An operation is already pending"
 msgstr "Una operacion ja en espèra"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1132
-#, fuzzy
-#| msgid "error starting mount daemon"
 msgid "No outstanding mount operation"
-msgstr "error al moment de l'aviada del demòni de montatge"
+msgstr "Cap d'operacion de montatge en cors"
 
 #: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1274
 msgid "The given volume was not found"
@@ -2376,6 +2353,10 @@ msgid ""
 "A passphrase is needed to access encrypted data on “%s”.\n"
 "The volume might be a VeraCrypt volume as it contains random data."
 msgstr ""
+"Autentificacion requesida\n"
+"Una frasa secrèta es necessària per accedir a las donadas chifradas sus "
+"« %s ».\n"
+"Lo volum poiriá èsser un volum VeraCrypt perque conten de donadas aleatòrias."
 
 #. Translators: %s is the description of the volume that is being unlocked
 #: monitor/udisks2/gvfsudisks2volume.c:1513
