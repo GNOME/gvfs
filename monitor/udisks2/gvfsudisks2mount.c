@@ -123,6 +123,9 @@ gvfs_udisks2_mount_finalize (GObject *object)
   g_free (mount->mount_entry_name);
   g_free (mount->mount_entry_fs_type);
 
+  if (mount->mount_entry != NULL)
+    g_unix_mount_entry_free (mount->mount_entry);
+
   if (mount->autorun_icon != NULL)
     g_object_unref (mount->autorun_icon);
 
