@@ -468,6 +468,8 @@ bdmv_metadata_thread (GTask *task,
       error = g_error_new_literal (G_IO_ERROR,
                                    G_IO_ERROR_FAILED,
                                    "Device is not a Blu-Ray disc");
+      g_free (path);
+      g_free (disc_root);
       goto error;
     }
   g_free (path);
