@@ -562,6 +562,7 @@ unmount_data_free (UnmountData *data)
   g_clear_object (&data->mount_operation);
   g_clear_object (&data->encrypted);
   g_clear_object (&data->filesystem);
+  g_free (data);
 }
 
 static gboolean
