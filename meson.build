@@ -6,7 +6,7 @@ project(
     'buildtype=debugoptimized',
     'warning_level=1',
   ],
-  meson_version: '>= 0.57.0',
+  meson_version: '>= 0.60.0',
 )
 
 gvfs_name = meson.project_name()
