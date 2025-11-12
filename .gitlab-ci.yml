@@ -46,6 +46,7 @@ fedora-test:
           -Ddevel_utils=true
           -Dman=true
           -Dburn=true
+          -Dgoogle=true
           -Dunit_tests=true
           --prefix /usr --werror $MESON_BUILD_DIR
         - sudo ninja -C $MESON_BUILD_DIR install
