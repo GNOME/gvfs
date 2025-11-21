@@ -255,8 +255,26 @@ trash_watcher_remount_do (TrashWatcher *watcher)
   TrashMount **old;
   GList *mounts;
   GList *new;
+  GList *iter;
+  GList *next;
 
   mounts = g_unix_mount_entries_get (NULL);
+
+  /* Filter out before sorting to reduce CPU usage in case of many mounts */
+  iter = mounts;
+  while (iter != NULL)
+    {
+      next = iter->next;
+
+      if (ignore_trash_mount (iter->data))
+        {
+          g_unix_mount_entry_free (iter->data);
+          mounts = g_list_delete_link (mounts, iter);
+        }
+
+      iter = next;
+    }
+
   mounts = g_list_sort (mounts, (GCompareFunc) g_unix_mount_entry_compare);
 
   old = &watcher->mounts;
@@ -266,13 +284,6 @@ trash_watcher_remount_do (TrashWatcher *watcher)
   while (*old || new)
     {
       int result;
-
-      if (new && ignore_trash_mount (new->data))
-        {
-          g_unix_mount_entry_free (new->data);
-          new = new->next;
-          continue;
-        }
 
       if ((result = (new == NULL) - (*old == NULL)) == 0)
         result = g_unix_mount_entry_compare (new->data, (*old)->mount_entry);
