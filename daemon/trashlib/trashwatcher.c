@@ -142,6 +142,7 @@ struct OPAQUE_TYPE__TrashWatcher
 
   GUnixMountMonitor *mount_monitor;
   TrashMount *mounts;
+  guint update_id;
 
   TrashDir *homedir_trashdir;
   WatchType homedir_type;
@@ -157,6 +158,8 @@ struct _TrashMount
 
   TrashMount *next;
 };
+
+#define UPDATE_TIMEOUT 1000 /* ms */
 
 static void
 trash_mount_insert (TrashWatcher      *watcher,
@@ -247,7 +250,7 @@ ignore_trash_mount (GUnixMountEntry *mount)
 }
 
 static void
-trash_watcher_remount (TrashWatcher *watcher)
+trash_watcher_remount_do (TrashWatcher *watcher)
 {
   TrashMount **old;
   GList *mounts;
@@ -298,6 +301,29 @@ trash_watcher_remount (TrashWatcher *watcher)
   g_list_free (mounts);
 }
 
+static gboolean
+trash_watcher_remount_timeout (gpointer user_data)
+{
+  TrashWatcher *watcher = user_data;
+
+  watcher->update_id = 0;
+
+  trash_watcher_remount_do (watcher);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+trash_watcher_remount (TrashWatcher *watcher)
+{
+  if (watcher->update_id != 0)
+    return;
+
+  watcher->update_id = g_timeout_add (UPDATE_TIMEOUT,
+                                      trash_watcher_remount_timeout,
+                                      watcher);
+}
+
 TrashWatcher *
 trash_watcher_new (TrashRoot *root)
 {
@@ -310,6 +336,7 @@ trash_watcher_new (TrashRoot *root)
   watcher->root = root;
   watcher->mounts = NULL;
   watcher->watching = FALSE;
+  watcher->update_id = 0;
   watcher->mount_monitor = g_unix_mount_monitor_get ();
   g_signal_connect_swapped (watcher->mount_monitor, "mounts_changed",
                             G_CALLBACK (trash_watcher_remount), watcher);
@@ -328,7 +355,7 @@ trash_watcher_new (TrashRoot *root)
   g_object_unref (homedir_trashdir);
   g_object_unref (user_datadir);
 
-  trash_watcher_remount (watcher);
+  trash_watcher_remount_do (watcher);
 
   return watcher;
 }
@@ -336,6 +363,8 @@ trash_watcher_new (TrashRoot *root)
 void
 trash_watcher_free (TrashWatcher *watcher)
 {
+  g_clear_handle_id (&watcher->update_id, g_source_remove);
+
   /* We just leak everything here, as this is not normally hit.
      This used to be a g_assert_not_reached(), and that got hit when
      mounting the trash backend failed due to the trash already being
@@ -386,6 +415,12 @@ void
 trash_watcher_rescan (TrashWatcher *watcher)
 {
   TrashMount *mount;
+
+  if (watcher->update_id != 0)
+    {
+      g_source_remove (watcher->update_id);
+      trash_watcher_remount_timeout (watcher);
+    }
 
   if (!watcher->watching || watcher->homedir_type != TRASH_WATCHER_TRUSTED)
     trash_dir_rescan (watcher->homedir_trashdir);
