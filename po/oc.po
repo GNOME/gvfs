@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: po_gvfs-oc\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
-"POT-Creation-Date: 2025-10-26 00:03+0000\n"
-"PO-Revision-Date: 2025-11-07 19:06+0100\n"
+"POT-Creation-Date: 2025-11-25 12:23+0000\n"
+"PO-Revision-Date: 2025-11-30 18:19+0100\n"
 "Last-Translator: Quentin PAGÈS\n"
 "Language-Team: Tot En Òc\n"
 "Language: oc\n"
@@ -2129,6 +2129,74 @@ msgstr "L'emplaçament es ja montat"
 msgid "Location is not mountable"
 msgstr "L'emplaçament es pas « montable »"
 
+#: daemon/org.gnome.system.dns_sd.gschema.xml:5
+msgid "How to display local DNS-SD services"
+msgstr "Cossí afichar los servicis de DNS-SD locals"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:6
+msgid ""
+"How DNS-SD services are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the Local Network folder) and "
+"\"disabled\"."
+msgstr ""
+"Cossí s'afichan los servicis DNS-SD dins l'emplaçament « network:/// ». Las "
+"valors possiblas son « merged » (fusionat), « separate » (separat, lo "
+"dorsièr Ret Local) e « disabled » (desactivat)."
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:10
+msgid "Extra domains to look for DNS-SD services in"
+msgstr "Domenis suplementaris ont cercar de servicis DNS-SD"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:11
+msgid ""
+"Comma separated list of DNS-SD domains that should be visible in the "
+"\"network:///\" location."
+msgstr ""
+"Lista separada per de virgulas dels domenis DNS-SD que deurián èsser "
+"visibles dins l'emplaçament « network:/// »."
+
+#: daemon/org.gnome.system.smb.gschema.xml:5
+msgid "How to display SMB devices"
+msgstr "Cossí afichar los periferics SMB"
+
+#: daemon/org.gnome.system.smb.gschema.xml:6
+msgid ""
+"How SMB devices are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the Windows Network folder) and "
+"\"disabled\"."
+msgstr ""
+"Cossí los periferics SMB s'afichan dins l'emplaçament « network:/// ». Las "
+"valors possiblas son « merged » (fusionats), « separate » (separats, lo "
+"dorsièr Retalh Windows) e « disabled » (desactivat)."
+
+#: daemon/org.gnome.system.smb.gschema.xml:10
+msgid "SMB workgroup"
+msgstr "Grop de trabalh SMB"
+
+#: daemon/org.gnome.system.smb.gschema.xml:11
+msgid ""
+"The Windows networking workgroup or domain that the user is part of. In "
+"order for a new workgroup to fully take effect the user may need to log out "
+"and log back in."
+msgstr ""
+"Lo grop de trabalh o domeni de ret Windows que l'utilizaire ne fa partida. "
+"Per qu'un grop de trabalh novèl prenga plenament efièch, l'utilizaire pòt "
+"aver besonh de se desconnectar e de se tornar connectar."
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:5
+msgid "How to display WSDD devices"
+msgstr "Cossí afichar los periferics WSDD"
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:6
+msgid ""
+"How WSDD devices are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the WSDD Network folder) and "
+"\"disabled\"."
+msgstr ""
+"Cossí los dispositius WSDD s'afichan dins l'emplaçament « network:/// ». Las "
+"valors possiblas son « merged » (fusionats), « separate » (separats, lo "
+"dorsièr Ret WSDD) e « disabled » (desactivat)."
+
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:13
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:25
 msgid "Perform file operations"
@@ -2695,7 +2763,7 @@ msgstr "Monitor de volum GVfs UDisks2"
 #~ "d'utilizacion sul mèdia."
 
 #~ msgid "%.1f kB"
-#~ msgstr "%.1f Ko"
+#~ msgstr "%.1f ko"
 
 #~ msgid "%.1f MB"
 #~ msgstr "%.1f Mo"
