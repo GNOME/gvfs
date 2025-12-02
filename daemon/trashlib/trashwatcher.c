@@ -159,7 +159,7 @@ struct _TrashMount
   TrashMount *next;
 };
 
-#define UPDATE_TIMEOUT 1000 /* ms */
+#define UPDATE_TIMEOUT 100 /* ms */
 
 static void
 trash_mount_insert (TrashWatcher      *watcher,
@@ -349,7 +349,7 @@ trash_watcher_remount (TrashWatcher *watcher)
   if (watcher->update_id != 0)
     return;
 
-  watcher->update_id = g_timeout_add (UPDATE_TIMEOUT,
+  watcher->update_id = g_timeout_add (UPDATE_TIMEOUT * g_random_double_range (0.5, 5),
                                       trash_watcher_remount_timeout,
                                       watcher);
 }
