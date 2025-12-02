@@ -280,12 +280,22 @@ trash_watcher_remount_do (TrashWatcher *watcher)
       if (result < 0)
         {
           /* new entry.  add it. */
+          g_debug ("trash_watcher_remount_do: insert %s %s %s\n",
+                   g_unix_mount_entry_get_device_path (new->data),
+                   g_unix_mount_entry_get_mount_path (new->data),
+                   g_unix_mount_entry_get_fs_type (new->data));
+
           trash_mount_insert (watcher, &old, new->data);
           new = new->next;
         }
       else if (result > 0)
         {
           /* old entry.  remove it. */
+          g_debug ("trash_watcher_remount_do: remove %s %s %s\n",
+                   g_unix_mount_entry_get_device_path ((*old)->mount_entry),
+                   g_unix_mount_entry_get_mount_path ((*old)->mount_entry),
+                   g_unix_mount_entry_get_fs_type ((*old)->mount_entry));
+
           trash_mount_remove (old);
         }
       else
@@ -306,6 +316,8 @@ trash_watcher_remount_timeout (gpointer user_data)
 {
   TrashWatcher *watcher = user_data;
 
+  g_debug ("trash_watcher_remount_timeout\n");
+
   watcher->update_id = 0;
 
   trash_watcher_remount_do (watcher);
@@ -316,6 +328,8 @@ trash_watcher_remount_timeout (gpointer user_data)
 static void
 trash_watcher_remount (TrashWatcher *watcher)
 {
+  g_debug ("trash_watcher_remount\n");
+
   if (watcher->update_id != 0)
     return;
 
