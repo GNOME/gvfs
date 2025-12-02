@@ -1,3 +1,15 @@
+Major changes in 1.59.1
+=======================
+* mtp: replace Android extension checks with capability checks (Raul Tambre)
+* cdda: Fix duration of last track for some media (Bastien Nocera)
+* dav: Add X-OC-Mtime header on push to preserve last modified time (Lawrence Murray)
+* udisks2: Use hash tables in the volume monitor to improve performance (Milan Crha)
+* onedrive: Check for identity instead of presentation identity (Jan-Michael Brummer)
+* build: Disable google option and mark as deprecated (Jeremy Bícha, Ondrej Holy)
+* Fix various memory leaks (Milan Crha)
+* Some other fixes (wangrong, Jan-Michael Brummer, Simon Poirier)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.58.0
 =======================
 * mtp: Allow cancelling ongoing folder enumerations
