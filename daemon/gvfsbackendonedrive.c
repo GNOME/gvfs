@@ -1182,7 +1182,7 @@ g_vfs_backend_onedrive_mount (GVfsBackend  *_self,
       const char *provider_type = NULL;
 
       account = goa_object_get_account (object);
-      account_identity = goa_account_get_presentation_identity (account);
+      account_identity = goa_account_get_identity (account);
       provider_type = goa_account_get_provider_type (account);
 
       if (g_strcmp0 (provider_type, "ms_graph") == 0 &&
