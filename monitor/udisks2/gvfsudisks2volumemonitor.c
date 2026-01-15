@@ -59,12 +59,12 @@ struct _GVfsUDisks2VolumeMonitor
   GUnixMountMonitor *mount_monitor;
 
   GHashTable *drives_by_udisks_drive; /* UDisksDrive * ~> GVfsUDisks2Drive * */
-  GHashTable *volumes; /* GVfsUDisks2Volume * */
+  GHashTable *volumes; /* GVfsUDisks2Volume * ~> guint64 *dev_id */
   GHashTable *volumes_by_dev_id; /* guint64 *dev_id ~> GVfsUDisks2Volume * */
   GHashTable *fstab_volumes; /* GVfsUDisks2Volume * */
   GHashTable *mounts; /* gchar *path ~> GVfsUDisks2Mount * */
   /* we keep volumes/mounts for blank and audio discs separate to handle e.g. mixed discs properly */
-  GHashTable *disc_volumes;
+  GHashTable *disc_volumes; /* GVfsUDisks2Volume * ~> guint64 *dev_id */
   GHashTable *disc_volumes_by_dev_id; /* guint64 *dev_id ~> GVfsUDisks2Volume * */
   GHashTable *disc_mounts; /* GVfsUDisks2Mount * */
 
@@ -129,6 +129,73 @@ gvfs_dev_id_new (dev_t dev_id)
   guint64 *id = g_new0 (guint64, 1);
   *id = (guint64) dev_id;
   return id;
+}
+
+/* It removes the @volume from @volumes_by_dev_id and if the @volumes
+ * contains a different volume with the same dev_id, then it's added
+ * into the @volumes_by_dev_id. It does not modify the @volumes itself.
+ */
+static void
+gvfs_remove_volume_with_dev_id (GHashTable        *volumes_by_dev_id, /* guint64 *(dev_id) ~> GVfsUDisks2Volume * */
+                                GVfsUDisks2Volume *volume)
+{
+  GVfsUDisks2Volume *existing_volume;
+  guint64 dev_id = (guint64) gvfs_udisks2_volume_get_dev (volume);
+
+  if (dev_id == 0)
+    return;
+
+  existing_volume = g_hash_table_lookup (volumes_by_dev_id, &dev_id);
+  if (existing_volume == volume)
+    g_hash_table_remove (volumes_by_dev_id, &dev_id);
+}
+
+static void
+volume_changed (GVfsUDisks2VolumeMonitor *monitor,
+                GVfsUDisks2Volume *volume,
+                gpointer user_data)
+{
+  GHashTable *volumes = NULL;
+  GHashTable *volumes_by_dev_id = NULL;
+  guint64 *pdev_id;
+
+  /* in case something else invokes the signal with a different volume instance type */
+  if (!GVFS_IS_UDISKS2_VOLUME (volume))
+    return;
+
+  pdev_id = g_hash_table_lookup (monitor->volumes, volume);
+  if (pdev_id != NULL)
+    {
+      volumes = monitor->volumes;
+      volumes_by_dev_id = monitor->volumes_by_dev_id;
+    }
+  else
+    {
+      pdev_id = g_hash_table_lookup (monitor->disc_volumes, volume);
+      if (pdev_id != NULL)
+        {
+          volumes = monitor->disc_volumes;
+          volumes_by_dev_id = monitor->disc_volumes_by_dev_id;
+        }
+    }
+
+  /* it had been found in one of the volume hashes */
+  if (volumes_by_dev_id != NULL)
+    {
+      dev_t new_dev_id = gvfs_udisks2_volume_get_dev (volume);
+      /* update the dev_id information, if it changed */
+      if (*pdev_id != (guint64) new_dev_id)
+        {
+          guint64 stack_dev_id = *pdev_id;
+
+          g_object_ref (volume);
+          g_hash_table_remove (volumes_by_dev_id, &stack_dev_id);
+          g_hash_table_insert (volumes, g_object_ref (volume), gvfs_dev_id_new (new_dev_id));
+          if (new_dev_id != 0)
+            g_hash_table_insert (volumes_by_dev_id, gvfs_dev_id_new (new_dev_id), g_object_ref (volume));
+          g_object_unref (volume);
+        }
+    }
 }
 
 /* this mimics g_str_hash(), except it ignores the trailing slash in the path */
@@ -430,11 +497,11 @@ static void
 gvfs_udisks2_volume_monitor_init (GVfsUDisks2VolumeMonitor *monitor)
 {
   monitor->drives_by_udisks_drive = g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, g_object_unref);
-  monitor->volumes = g_hash_table_new_full (g_direct_hash, g_direct_equal, g_object_unref, NULL);
+  monitor->volumes = g_hash_table_new_full (g_direct_hash, g_direct_equal, g_object_unref, g_free);
   monitor->volumes_by_dev_id = g_hash_table_new_full (g_int64_hash, g_int64_equal, g_free, g_object_unref);
   monitor->fstab_volumes = g_hash_table_new_full (g_direct_hash, g_direct_equal, g_object_unref, NULL);
   monitor->mounts = g_hash_table_new_full (gvfs_mount_path_str_hash, gvfs_mount_path_str_equal, g_free, g_object_unref);
-  monitor->disc_volumes = g_hash_table_new_full (g_direct_hash, g_direct_equal, g_object_unref, NULL);
+  monitor->disc_volumes = g_hash_table_new_full (g_direct_hash, g_direct_equal, g_object_unref, g_free);
   monitor->disc_volumes_by_dev_id = g_hash_table_new_full (g_int64_hash, g_int64_equal, g_free, g_object_unref);
   monitor->disc_mounts = g_hash_table_new_full (g_direct_hash, g_direct_equal, g_object_unref, NULL);
 
@@ -454,6 +521,10 @@ gvfs_udisks2_volume_monitor_init (GVfsUDisks2VolumeMonitor *monitor)
   g_signal_connect (monitor->mount_monitor,
                     "mountpoints-changed",
                     G_CALLBACK (mountpoints_changed),
+                    monitor);
+  g_signal_connect (monitor,
+                    "volume-changed",
+                    G_CALLBACK (volume_changed),
                     monitor);
 
   monitor->lockdown_settings = g_settings_new ("org.gnome.desktop.lockdown");
@@ -1123,16 +1194,18 @@ static void
 add_disc_volume (GVfsUDisks2VolumeMonitor *monitor,
                  GVfsUDisks2Volume        *volume)
 {
-  g_hash_table_add (monitor->disc_volumes, g_object_ref (volume));
-  g_hash_table_insert (monitor->disc_volumes_by_dev_id, gvfs_dev_id_new (gvfs_udisks2_volume_get_dev (volume)), g_object_ref (volume));
+  dev_t dev_id = gvfs_udisks2_volume_get_dev (volume);
+
+  g_hash_table_insert (monitor->disc_volumes, g_object_ref (volume), gvfs_dev_id_new (dev_id));
+  if (dev_id != 0)
+    g_hash_table_insert (monitor->disc_volumes_by_dev_id, gvfs_dev_id_new (dev_id), g_object_ref (volume));
 }
 
 static void
 remove_disc_volume (GVfsUDisks2VolumeMonitor *monitor,
                     GVfsUDisks2Volume        *volume)
 {
-  guint64 dev_id = (guint64) gvfs_udisks2_volume_get_dev (volume);
-  g_hash_table_remove (monitor->disc_volumes_by_dev_id, &dev_id);
+  gvfs_remove_volume_with_dev_id (monitor->disc_volumes_by_dev_id, volume);
   g_hash_table_remove (monitor->disc_volumes, volume);
 }
 #endif
@@ -1166,8 +1239,11 @@ static void
 add_volume (GVfsUDisks2VolumeMonitor *monitor,
             GVfsUDisks2Volume        *volume)
 {
-  g_hash_table_add (monitor->volumes, g_object_ref (volume));
-  g_hash_table_insert (monitor->volumes_by_dev_id, gvfs_dev_id_new (gvfs_udisks2_volume_get_dev (volume)), g_object_ref (volume));
+  dev_t dev_id = gvfs_udisks2_volume_get_dev (volume);
+
+  g_hash_table_insert (monitor->volumes, g_object_ref (volume), gvfs_dev_id_new (dev_id));
+  if (dev_id != 0)
+    g_hash_table_insert (monitor->volumes_by_dev_id, gvfs_dev_id_new (dev_id), g_object_ref (volume));
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1176,8 +1252,7 @@ static void
 remove_volume (GVfsUDisks2VolumeMonitor *monitor,
                GVfsUDisks2Volume        *volume)
 {
-  guint64 dev_id = (guint64) gvfs_udisks2_volume_get_dev (volume);
-  g_hash_table_remove (monitor->volumes_by_dev_id, &dev_id);
+  gvfs_remove_volume_with_dev_id (monitor->volumes_by_dev_id, volume);
   g_hash_table_remove (monitor->volumes, volume);
 }
 
