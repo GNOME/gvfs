@@ -92,6 +92,7 @@ static void update_volumes           (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **removed_volumes,
                                       gboolean                   coldplug);
 static void update_fstab_volumes     (GVfsUDisks2VolumeMonitor  *monitor,
+                                      GHashTable                *mount_points_by_path, /* gchar *path ~> GUnixMountPoint * */
                                       GList                    **added_volumes,
                                       GList                    **removed_volumes,
                                       gboolean                   coldplug);
@@ -755,7 +756,7 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
 
   update_drives (monitor, &added_drives, &removed_drives, coldplug);
   update_volumes (monitor, mount_entries, mount_points_by_path, &added_volumes, &removed_volumes, coldplug);
-  update_fstab_volumes (monitor, &added_volumes, &removed_volumes, coldplug);
+  update_fstab_volumes (monitor, mount_points_by_path, &added_volumes, &removed_volumes, coldplug);
   update_mounts (monitor, mount_entries, mount_points_by_path, &added_mounts, &removed_mounts, coldplug);
 
 #if defined(HAVE_BURN) || defined(HAVE_CDDA)
@@ -1669,15 +1670,8 @@ mount_point_has_device (GVfsUDisks2VolumeMonitor  *monitor,
 }
 
 static void
-free_nonnull_unix_mount_point (gpointer ptr)
-{
-  GUnixMountPoint *mount_point = ptr;
-  if (mount_point != NULL)
-    g_unix_mount_point_free (mount_point);
-}
-
-static void
 update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
+                      GHashTable                *mount_points_by_path, /* gchar *path ~> GUnixMountPoint * */
                       GList                    **added_volumes,
                       GList                    **removed_volumes,
                       gboolean                   coldplug)
@@ -1685,7 +1679,6 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
   GHashTable *cur_mount_points; /* GUnixMountPoint * ~> GVfsUDisks2Volume * */
   GHashTableIter iter;
   gpointer key = NULL, value = NULL;
-  GList *new_mount_points, *l;
   GVfsUDisks2Volume *volume;
 
   cur_mount_points = g_hash_table_new_full (gvfs_mount_point_hash, gvfs_mount_point_equal, NULL, g_object_unref);
@@ -1700,10 +1693,10 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
         g_hash_table_insert (cur_mount_points, mount_point, g_object_ref (volume));
     }
 
-  new_mount_points = g_unix_mount_points_get (NULL);
-  for (l = new_mount_points; l != NULL; l = g_list_next (l))
+  g_hash_table_iter_init (&iter, mount_points_by_path);
+  while (g_hash_table_iter_next (&iter, NULL, &value))
     {
-      GUnixMountPoint *mount_point = l->data;
+      GUnixMountPoint *mount_point = value;
 
       /* use the mount points that we want to include */
       if (should_include_mount_point (monitor, mount_point) &&
@@ -1715,7 +1708,7 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
             {
               volume = gvfs_udisks2_volume_new (monitor,
                                                 NULL,        /* block */
-                                                mount_point,
+                                                g_unix_mount_point_copy (mount_point), /* adopts the mount_point */
                                                 NULL,        /* drive */
                                                 NULL,        /* activation_root */
                                                 coldplug);
@@ -1732,7 +1725,6 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
 
                   g_hash_table_add (monitor->fstab_volumes, g_object_ref (volume));
                   *added_volumes = g_list_prepend (*added_volumes, g_steal_pointer (&volume));
-                  l->data = NULL;
                 }
             }
         }
@@ -1747,8 +1739,6 @@ update_fstab_volumes (GVfsUDisks2VolumeMonitor  *monitor,
       *removed_volumes = g_list_prepend (*removed_volumes, g_object_ref (volume));
       g_hash_table_remove (monitor->fstab_volumes, volume);
     }
-
-  g_list_free_full (new_mount_points, free_nonnull_unix_mount_point);
 
   g_hash_table_unref (cur_mount_points);
 }
