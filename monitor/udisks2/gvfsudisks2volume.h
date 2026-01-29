@@ -47,7 +47,9 @@ void               gvfs_udisks2_volume_removed     (GVfsUDisks2Volume          *
 
 UDisksBlock       *gvfs_udisks2_volume_get_block       (GVfsUDisks2Volume      *volume);
 GUnixMountPoint   *gvfs_udisks2_volume_get_mount_point (GVfsUDisks2Volume      *volume);
+GVfsUDisks2Drive  *gvfs_udisks2_volume_get_udisks2_drive (GVfsUDisks2Volume    *volume);
 dev_t              gvfs_udisks2_volume_get_dev         (GVfsUDisks2Volume      *volume);
+GVfsUDisks2Drive  *gvfs_udisks2_volume_get_udisks2_drive (GVfsUDisks2Volume    *volume);
 
 void               gvfs_udisks2_volume_set_mount   (GVfsUDisks2Volume          *volume,
                                                     GVfsUDisks2Mount           *mount);

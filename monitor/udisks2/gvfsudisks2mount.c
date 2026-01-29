@@ -367,7 +367,6 @@ gvfs_udisks2_mount_new (GVfsUDisks2VolumeMonitor *monitor,
   mount->volume = volume;
   if (mount->volume != NULL)
     {
-      gvfs_udisks2_volume_set_mount (volume, mount);
       /* this is for piggy backing on the name and icon of the associated volume */
       g_signal_connect (mount->volume, "changed", G_CALLBACK (on_volume_changed), mount);
     }
@@ -382,7 +381,6 @@ gvfs_udisks2_mount_unmounted (GVfsUDisks2Mount *mount)
 {
   if (mount->volume != NULL)
     {
-      gvfs_udisks2_volume_unset_mount (mount->volume, mount);
       g_signal_handlers_disconnect_by_func (mount->volume, on_volume_changed, mount);
       mount->volume = NULL;
       emit_changed (mount);
@@ -412,7 +410,6 @@ gvfs_udisks2_mount_set_volume (GVfsUDisks2Mount   *mount,
       mount->volume = volume;
       if (mount->volume != NULL)
         {
-          gvfs_udisks2_volume_set_mount (volume, mount);
           /* this is for piggy backing on the name and icon of the associated volume */
           g_signal_connect (mount->volume, "changed", G_CALLBACK (on_volume_changed), mount);
         }

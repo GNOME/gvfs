@@ -378,11 +378,8 @@ void
 gvfs_udisks2_drive_set_volume (GVfsUDisks2Drive  *drive,
                                GVfsUDisks2Volume *volume)
 {
-  if (g_list_find (drive->volumes, volume) == NULL)
-    {
-      drive->volumes = g_list_prepend (drive->volumes, volume);
-      emit_changed (drive);
-    }
+  g_return_if_fail (g_list_find (drive->volumes, volume) == NULL);
+  drive->volumes = g_list_prepend (drive->volumes, volume);
 }
 
 void
@@ -391,11 +388,8 @@ gvfs_udisks2_drive_unset_volume (GVfsUDisks2Drive  *drive,
 {
   GList *l;
   l = g_list_find (drive->volumes, volume);
-  if (l != NULL)
-    {
-      drive->volumes = g_list_delete_link (drive->volumes, l);
-      emit_changed (drive);
-    }
+  g_return_if_fail (l != NULL);
+  drive->volumes = g_list_delete_link (drive->volumes, l);
 }
 
 static GIcon *
