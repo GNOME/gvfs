@@ -59,7 +59,8 @@ typedef struct _GVfsGoaVolumeClass GVfsGoaVolumeClass;
 
 GType g_vfs_goa_volume_get_type (void) G_GNUC_CONST;
 
-GVolume *g_vfs_goa_volume_new (GoaObject *object, const gchar *uuid);
+GVolume  *g_vfs_goa_volume_new    (GoaObject *object, const gchar *uuid);
+gboolean  g_vfs_goa_volume_update (GVfsGoaVolume *self);
 
 G_END_DECLS
 
