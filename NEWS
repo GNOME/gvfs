@@ -1,3 +1,11 @@
+Major changes in 1.58.1
+=======================
+* cdda: Fix duration of last track for some media (Bastien Nocera)
+* build: Fix build when google option is disabled (Ondrej Holy)
+* Fix various memory leaks (Milan Crha)
+* Some other fixes (wangrong, Jan-Michael Brummer, Simon Poirier)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.58.0
 =======================
 * mtp: Allow cancelling ongoing folder enumerations
