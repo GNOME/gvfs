@@ -14,6 +14,16 @@ RUN dnf install -y rest0.7-devel uhttpmock-devel gobject-introspection-devel \
  && cd .. \
  && rm -rf msgraph
 
+RUN dnf install -y rest-devel \
+ && dnf clean all \
+ && git clone --depth 1 https://gitlab.gnome.org/GNOME/gnome-online-accounts \
+ && cd gnome-online-accounts \
+ && meson . build --prefix=/usr -Dgtk_doc=false \
+ && ninja -C build \
+ && ninja -C build install \
+ && cd .. \
+ && rm -rf gnome-online-accounts
+
 RUN sed -i -e 's/# %wheel/%wheel/' /etc/sudoers
 RUN useradd -G wheel -m user
 RUN passwd -d user
