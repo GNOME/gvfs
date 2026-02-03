@@ -730,7 +730,7 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
   for (link = entries; link != NULL; link = g_list_next (link))
     {
       GUnixMountEntry *mount_entry = link->data;
-      g_hash_table_insert (mount_entries, (gpointer) g_unix_mount_entry_get_mount_path (mount_entry), mount_entry);
+      g_hash_table_replace (mount_entries, (gpointer) g_unix_mount_entry_get_mount_path (mount_entry), mount_entry);
     }
   /* the mount_entries took ownership of the mount entry objects */
   g_list_free (entries);
@@ -742,7 +742,7 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
   for (link = points; link != NULL; link = g_list_next (link))
     {
       GUnixMountPoint *mount_point = link->data;
-      g_hash_table_insert (mount_points_by_path, (gpointer) g_unix_mount_point_get_mount_path (mount_point), mount_point);
+      g_hash_table_replace (mount_points_by_path, (gpointer) g_unix_mount_point_get_mount_path (mount_point), mount_point);
     }
   /* the mount_points_by_path took ownership of the mount point objects */
   g_list_free (points);
