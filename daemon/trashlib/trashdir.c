@@ -16,7 +16,7 @@
 struct OPAQUE_TYPE__TrashDir
 {
   TrashRoot *root;
-  GSList *items;
+  GHashTable *items; /* basename -> GFile */
 
   GFile *directory;
   GFile *topdir;
@@ -26,28 +26,6 @@ struct OPAQUE_TYPE__TrashDir
   DirWatch *watch;
   GFileMonitor *monitor;
 };
-
-static gint
-compare_basename (gconstpointer a,
-                  gconstpointer b)
-{
-  GFile *file_a, *file_b;
-  char *name_a, *name_b;
-  gint result;
-
-  file_a = (GFile *) a;
-  file_b = (GFile *) b;
-
-  name_a = g_file_get_basename (file_a);
-  name_b = g_file_get_basename (file_b);
-
-  result = strcmp (name_a, name_b);
-
-  g_free (name_a);
-  g_free (name_b);
-
-  return result;
-}
 
 static GDateTime *
 trash_dir_query_mtime (TrashDir *dir)
@@ -68,47 +46,36 @@ trash_dir_query_mtime (TrashDir *dir)
 }
 
 static void
-trash_dir_set_files (TrashDir *dir,
-                     GSList   *items)
+trash_dir_set_files (TrashDir   *dir,
+                     GHashTable *items)
 {
-  GSList **old, *new;
+  GHashTableIter iter;
+  gpointer key, value;
 
-  items = g_slist_sort (items, (GCompareFunc) compare_basename);
-  old = &dir->items;
-  new = items;
-
-  while (new || *old)
+  g_hash_table_iter_init (&iter, dir->items);
+  while (g_hash_table_iter_next (&iter, &key, &value))
     {
-      int result;
-
-      if ((result = (new == NULL) - (*old == NULL)) == 0)
-        result = compare_basename (new->data, (*old)->data);
-
-      if (result < 0)
-        {
-          /* new entry.  add it. */
-          *old = g_slist_prepend (*old, new->data); /* take reference */
-          old = &(*old)->next;
-          trash_root_add_item (dir->root, new->data, dir->topdir, dir->is_homedir);
-          new = new->next;
-        }
-      else if (result > 0)
+      if (!g_hash_table_contains (items, key))
         {
           /* old entry.  remove it. */
-          trash_root_remove_item (dir->root, (*old)->data, dir->is_homedir);
-          g_object_unref ((*old)->data);
-          *old = g_slist_delete_link (*old, *old);
-        }
-      else
-        {
-          /* match.  no change. */
-          old = &(*old)->next;
-          g_object_unref (new->data);
-          new = new->next;
+          trash_root_remove_item (dir->root, value, dir->is_homedir);
+          g_hash_table_iter_remove (&iter);
         }
     }
 
-  g_slist_free (items);
+  g_hash_table_iter_init (&iter, items);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      if (!g_hash_table_contains (dir->items, key))
+        {
+          /* new entry.  add it. */
+          g_hash_table_iter_steal (&iter);
+          g_hash_table_insert (dir->items, key, value);
+          trash_root_add_item (dir->root, value, dir->topdir, dir->is_homedir);
+        }
+    }
+
+  g_hash_table_unref (items);
 
   trash_root_thaw (dir->root);
 }
@@ -116,17 +83,24 @@ trash_dir_set_files (TrashDir *dir,
 static void
 trash_dir_empty (TrashDir *dir)
 {
-  trash_dir_set_files (dir, NULL);
+  GHashTable *empty;
+
+  empty = g_hash_table_new (g_str_hash, g_str_equal);
+  trash_dir_set_files (dir, empty);
 }
 
 static void
 trash_dir_enumerate (TrashDir *dir)
 {
   GFileEnumerator *enumerator;
-  GSList *files = NULL;
+  GHashTable *files = NULL;
 
   g_clear_pointer (&dir->mtime, g_date_time_unref);
   dir->mtime = trash_dir_query_mtime (dir);
+
+  files = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                 g_free, g_object_unref);
+
   enumerator = g_file_enumerate_children (dir->directory,
                                           G_FILE_ATTRIBUTE_STANDARD_NAME,
                                           G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
@@ -139,10 +113,11 @@ trash_dir_enumerate (TrashDir *dir)
       while ((info = g_file_enumerator_next_file (enumerator, NULL, NULL)))
         {
           GFile *file;
+          const gchar *name;
 
-          file = g_file_get_child (dir->directory,
-                                   g_file_info_get_name (info));
-          files = g_slist_prepend (files, file);
+          name = g_file_info_get_name (info);
+          file = g_file_get_child (dir->directory, name);
+          g_hash_table_insert (files, g_strdup (name), file);
 
           g_object_unref (info);
         }
@@ -164,24 +139,20 @@ trash_dir_changed (GFileMonitor      *monitor,
 
   if (event_type == G_FILE_MONITOR_EVENT_CREATED)
     {
-      dir->items = g_slist_insert_sorted (dir->items,
-                                          g_object_ref (file),
-                                          (GCompareFunc) compare_basename);
-      trash_root_add_item (dir->root, file, dir->topdir, dir->is_homedir);
+      g_autofree gchar *name = g_file_get_basename (file);
+
+      if (!g_hash_table_contains (dir->items, name))
+        {
+          g_hash_table_insert (dir->items, g_steal_pointer (&name), g_object_ref (file));
+          trash_root_add_item (dir->root, file, dir->topdir, dir->is_homedir);
+        }
     }
 
   else if (event_type == G_FILE_MONITOR_EVENT_DELETED)
     {
-      GSList *node;
+      g_autofree char *name = g_file_get_basename (file);
 
-      node = g_slist_find_custom (dir->items,
-                                  file,
-                                  (GCompareFunc) compare_basename);
-      if (node)
-        {
-          g_object_unref (node->data);
-          dir->items = g_slist_delete_link (dir->items, node);
-        }
+      g_hash_table_remove (dir->items, name);
       trash_root_remove_item (dir->root, file, dir->is_homedir);
     }
 
@@ -392,7 +363,8 @@ trash_dir_new (TrashRoot  *root,
   dir = g_slice_new (TrashDir);
 
   dir->root = root;
-  dir->items = NULL;
+  dir->items = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                      g_free, g_object_unref);
   dir->topdir = g_file_new_for_path (mount_point);
   dir->directory = g_file_get_child (dir->topdir, rel);
   dir->monitor = NULL;
@@ -423,7 +395,7 @@ trash_dir_free (TrashDir *dir)
   if (dir->monitor)
     g_object_unref (dir->monitor);
 
-  trash_dir_set_files (dir, NULL);
+  g_hash_table_unref (dir->items);
 
   g_object_unref (dir->directory);
   g_object_unref (dir->topdir);
