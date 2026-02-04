@@ -491,7 +491,7 @@ find_entry_unlocked (GVfsBackendSmbBrowse *backend,
 {
   BrowseEntry *entry, *found;
   GList *l;
-  char *end;
+  const char *end;
   int len;
   char *normalized;
 
