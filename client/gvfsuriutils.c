@@ -163,7 +163,7 @@ g_vfs_decode_uri (const char *uri)
 				    authority_end - authority_start, "@");
       if (userinfo_end)
 	{
-          char *p;
+          const char *p;
 
           host_start = userinfo_end + 1;
           userinfo_start = authority_start;
