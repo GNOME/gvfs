@@ -805,8 +805,8 @@ static gboolean
 get_hostname_from_line (const gchar *buffer,
                         gchar **hostname_out)
 {
-  gchar *startpos;
-  gchar *endpos;
+  const gchar *startpos;
+  const gchar *endpos;
 
   /* Parse a line that looks like: "username@hostname's password:". */
 
@@ -828,9 +828,9 @@ get_hostname_and_fingerprint_from_line (const gchar *buffer,
                                         gchar      **hostname_out,
                                         gchar      **fingerprint_out)
 {
-  gchar *pos;
-  gchar *startpos;
-  gchar *endpos;
+  const gchar *pos;
+  const gchar *startpos;
+  const gchar *endpos;
   gchar *hostname = NULL;
   gchar *fingerprint = NULL;
   
@@ -886,7 +886,8 @@ get_hostname_and_ip_address (const gchar *buffer,
                              gchar      **hostname_out,
                              gchar      **ip_address_out)
 {
-  char *startpos, *endpos, *hostname;
+  const char *startpos, *endpos;
+  char *hostname;
 
   /* Parse a line that looks like:
    * Warning: the ECDSA/RSA host key for 'hostname' differs from the key for the IP address '...'
@@ -982,7 +983,8 @@ get_authtype_from_password_line (const char *password_line)
 static char *
 get_object_from_password_line (const char *password_line)
 {
-  char *chr, *ptr, *object = NULL;
+  const char *chr, *ptr;
+  char *object = NULL;
 
   if (g_str_has_prefix (password_line, "Enter passphrase for key"))
     {
