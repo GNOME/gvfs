@@ -2946,13 +2946,14 @@ read_contents (int fd)
 static char *
 mountinfo_unescape (const char *escaped)
 {
+  const char *p;
   char *res, *s;
   char c;
   gsize len;
 
-  s = strchr (escaped, ' ');
-  if (s)
-    len = s - escaped;
+  p = strchr (escaped, ' ');
+  if (p)
+    len = p - escaped;
   else
     len = strlen (escaped);
   res = malloc (len + 1);
