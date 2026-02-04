@@ -1221,11 +1221,11 @@ resolve_dir (GVfsBackendGoogle  *self,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static char *
+static const char *
 get_extension_offset (const char *title)
 {
-  gchar *end;
-  gchar *end2;
+  const gchar *end;
+  const gchar *end2;
 
   end = strrchr (title, '.');
 
@@ -1257,7 +1257,7 @@ generate_copy_name (GVfsBackendGoogle *self, GDataEntry *entry, const gchar *ent
   const gchar *id;
   const gchar *title;
   gchar *extension = NULL;
-  gchar *extension_offset;
+  const gchar *extension_offset;
   gchar *ret_val = NULL;
   gchar *title_without_extension = NULL;
 
@@ -1276,7 +1276,7 @@ generate_copy_name (GVfsBackendGoogle *self, GDataEntry *entry, const gchar *ent
   if (extension_offset != NULL && extension_offset != title_without_extension)
     {
       extension = g_strdup (extension_offset);
-      *extension_offset = '\0';
+      title_without_extension[extension_offset - title_without_extension] = '\0';
     }
 
   id = gdata_entry_get_id (entry);
