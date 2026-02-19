@@ -867,7 +867,7 @@ fail:
 static GVfsFtpMethod
 g_vfs_ftp_task_setup_data_connection_pasv (GVfsFtpTask *task, GVfsFtpMethod method)
 {
-  guint ip1, ip2, ip3, ip4, port1, port2;
+  guint port1, port2;
   char **reply;
   const char *s;
   GSocketAddress *addr;
@@ -883,10 +883,8 @@ g_vfs_ftp_task_setup_data_connection_pasv (GVfsFtpTask *task, GVfsFtpMethod meth
    */
   for (s = reply[0]; *s; s++)
     {
-      if (sscanf (s, "%u,%u,%u,%u,%u,%u",
-        	 &ip1, &ip2, &ip3, &ip4,
-        	 &port1, &port2) == 6)
-       break;
+      if (sscanf (s, "%*u,%*u,%*u,%*u,%u,%u", &port1, &port2) == 2)
+        break;
     }
   if (*s == 0)
     {
@@ -897,52 +895,16 @@ g_vfs_ftp_task_setup_data_connection_pasv (GVfsFtpTask *task, GVfsFtpMethod meth
     }
   g_strfreev (reply);
 
-  if (method == G_VFS_FTP_METHOD_PASV || method == G_VFS_FTP_METHOD_ANY)
-    {
-      guint8 ip[4];
-      GInetAddress *inet_addr;
-
-      ip[0] = ip1;
-      ip[1] = ip2;
-      ip[2] = ip3;
-      ip[3] = ip4;
-      inet_addr = g_inet_address_new_from_bytes (ip, G_SOCKET_FAMILY_IPV4);
-      addr = g_inet_socket_address_new (inet_addr, port1 << 8 | port2);
-      g_object_unref (inet_addr);
-
-      success = g_vfs_ftp_connection_open_data_connection (task->conn,
-                                                           addr,
-                                                           task->cancellable,
-                                                           &task->error);
-      g_object_unref (addr);
-      if (success)
-        return G_VFS_FTP_METHOD_PASV;
-      if (g_vfs_ftp_task_is_in_error (task) && method != G_VFS_FTP_METHOD_ANY)
-        return G_VFS_FTP_METHOD_ANY;
-
-      g_vfs_ftp_task_clear_error (task);
-    }
-
-  if (method == G_VFS_FTP_METHOD_PASV_ADDR || method == G_VFS_FTP_METHOD_ANY)
-    {
-      /* Workaround code:
-       * Various ftp servers aren't setup correctly when behind a NAT. They report
-       * their own IP address (like 10.0.0.4) and not the address in front of the
-       * NAT. But this is likely the same address that we connected to with our
-       * command connetion. So if the address given by PASV fails, we fall back
-       * to the address of the command stream.
-       */
-      addr = g_vfs_ftp_task_create_remote_address (task, port1 << 8 | port2);
-      if (addr == NULL)
-        return G_VFS_FTP_METHOD_ANY;
-      success = g_vfs_ftp_connection_open_data_connection (task->conn,
-                                                           addr,
-                                                           task->cancellable,
-                                                           &task->error);
-      g_object_unref (addr);
-      if (success)
-        return G_VFS_FTP_METHOD_PASV_ADDR;
-    }
+  addr = g_vfs_ftp_task_create_remote_address (task, port1 << 8 | port2);
+  if (addr == NULL)
+    return G_VFS_FTP_METHOD_ANY;
+  success = g_vfs_ftp_connection_open_data_connection (task->conn,
+                                                       addr,
+                                                       task->cancellable,
+                                                       &task->error);
+  g_object_unref (addr);
+  if (success)
+    return G_VFS_FTP_METHOD_PASV;
 
   return G_VFS_FTP_METHOD_ANY;
 }
@@ -1138,7 +1100,6 @@ g_vfs_ftp_task_setup_data_connection (GVfsFtpTask *task)
     [G_VFS_FTP_METHOD_ANY]       = g_vfs_ftp_task_setup_data_connection_any,
     [G_VFS_FTP_METHOD_EPSV]      = g_vfs_ftp_task_setup_data_connection_epsv,
     [G_VFS_FTP_METHOD_PASV]      = g_vfs_ftp_task_setup_data_connection_pasv,
-    [G_VFS_FTP_METHOD_PASV_ADDR] = g_vfs_ftp_task_setup_data_connection_pasv,
     [G_VFS_FTP_METHOD_EPRT]      = g_vfs_ftp_task_setup_data_connection_eprt,
     [G_VFS_FTP_METHOD_PORT]      = g_vfs_ftp_task_setup_data_connection_port
   };
@@ -1169,7 +1130,6 @@ g_vfs_ftp_task_setup_data_connection (GVfsFtpTask *task)
         [G_VFS_FTP_METHOD_ANY] = "any",
         [G_VFS_FTP_METHOD_EPSV] = "EPSV",
         [G_VFS_FTP_METHOD_PASV] = "PASV",
-        [G_VFS_FTP_METHOD_PASV_ADDR] = "PASV with workaround",
         [G_VFS_FTP_METHOD_EPRT] = "EPRT",
         [G_VFS_FTP_METHOD_PORT] = "PORT"
       };
