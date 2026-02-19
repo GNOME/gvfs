@@ -50,7 +50,8 @@ g_mount_spec_new (const char *type)
   spec->ref_count = 1;
   spec->items = g_array_new (FALSE, TRUE, sizeof (GMountSpecItem));
   spec->mount_prefix = g_strdup ("/");
-  
+  spec->is_valid = TRUE;
+
   if (type != NULL)
     g_mount_spec_set (spec, "type", type);
   
@@ -67,6 +68,7 @@ g_mount_spec_new_from_data (GArray *items,
   spec = g_new0 (GMountSpec, 1);
   spec->ref_count = 1;
   spec->items = items;
+  spec->is_valid = TRUE;
   if (mount_prefix == NULL)
     spec->mount_prefix = g_strdup ("/");
   else
@@ -128,6 +130,9 @@ add_item (GMountSpec *spec,
   item.key = g_strdup (key);
   item.value = value;
 
+  if (!g_utf8_validate (value, -1, NULL))
+    spec->is_valid = FALSE;
+
   g_array_append_val (spec->items, item);
 }
 
@@ -168,6 +173,8 @@ g_mount_spec_set_with_len_internal (GMountSpec *spec,
 	{
 	  g_free (item->value);
 	  item->value = value_copy;
+          if (!g_utf8_validate (value_copy, -1, NULL))
+            spec->is_valid = FALSE;
 	  return;
 	}
     }
@@ -215,7 +222,9 @@ g_mount_spec_copy (GMountSpec *spec)
       GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
       g_mount_spec_set (copy, item->key, item->value);
     }
-  
+
+  copy->is_valid = spec->is_valid;
+
   return copy;
 }
 
@@ -431,7 +440,13 @@ g_mount_spec_get_type (GMountSpec *spec)
 {
   return g_mount_spec_get (spec, "type");
 }
- 
+
+gboolean
+g_mount_spec_get_is_valid (GMountSpec *spec)
+{
+  return spec->is_valid;
+}
+
 char *
 g_mount_spec_to_string (GMountSpec *spec)
 {
