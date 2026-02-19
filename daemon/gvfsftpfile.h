@@ -27,9 +27,9 @@
 
 G_BEGIN_DECLS
 
-
 GVfsFtpFile *     g_vfs_ftp_file_new_from_gvfs          (GVfsBackendFtp *       ftp,
-                                                         const char *           gvfs_path);
+                                                         const char *           gvfs_path,
+                                                         GError **              error);
 GVfsFtpFile *     g_vfs_ftp_file_new_from_ftp           (GVfsBackendFtp *       ftp,
                                                          const char *           ftp_path);
 GVfsFtpFile *     g_vfs_ftp_file_new_parent             (const GVfsFtpFile *    file);
