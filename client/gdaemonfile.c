@@ -409,6 +409,13 @@ create_proxy_for_file2 (GFile *file1,
   if (path2_out)
     *path2_out = NULL;
 
+  if (!g_mount_spec_get_is_valid (daemon_file1->mount_spec) ||
+      (daemon_file2 && !g_mount_spec_get_is_valid (daemon_file2->mount_spec)))
+    {
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME, _("Filename contains invalid characters."));
+      return NULL;
+    }
+
  retry:
   proxy = NULL;
   mount_info2 = NULL;
@@ -693,6 +700,14 @@ create_proxy_for_file_async (GFile *file,
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   AsyncProxyCreate *data;
+
+  if (!g_mount_spec_get_is_valid (daemon_file->mount_spec))
+    {
+      g_task_return_error (task, g_error_new_literal (G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
+                                                      _("Filename contains invalid characters.")));
+      g_object_unref (task);
+      return;
+    }
 
   data = g_new0 (AsyncProxyCreate, 1);
   data->task = task;
@@ -1987,6 +2002,16 @@ g_daemon_file_mount_enclosing_volume (GFile *location,
 
   task = g_task_new (location, cancellable, callback, user_data);
   g_task_set_source_tag (task, g_daemon_file_mount_enclosing_volume);
+
+  if (!g_mount_spec_get_is_valid (G_DAEMON_FILE (location)->mount_spec))
+    {
+      g_task_return_error (task,
+                           g_error_new_literal (G_IO_ERROR,
+                                                G_IO_ERROR_INVALID_FILENAME,
+                                                _("Filename contains invalid characters.")));
+      g_object_unref (task);
+      return;
+    }
 
   data = g_new0 (MountData, 1);
 

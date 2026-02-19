@@ -38,6 +38,7 @@ typedef struct {
   GArray *items;
   char *mount_prefix;
   gboolean is_unique;
+  gboolean is_valid;
 } GMountSpec;
 
 GMountSpec *g_mount_spec_new               (const char      *type);
@@ -74,6 +75,7 @@ gboolean    g_mount_spec_match_with_path   (GMountSpec      *mount,
 const char *g_mount_spec_get               (GMountSpec      *spec,
 					    const char      *key);
 const char *g_mount_spec_get_type          (GMountSpec      *spec);
+gboolean    g_mount_spec_get_is_valid      (GMountSpec      *spec);
 
 char *      g_mount_spec_to_string         (GMountSpec      *spec);
 
