@@ -872,9 +872,14 @@ do_open_for_read (GVfsBackend *backend,
                                                          error_550_permission_or_not_found, 
                                                          NULL };
 
-  g_vfs_ftp_task_setup_data_connection (&task);
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename, &task.error);
+  if (file == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
 
+  g_vfs_ftp_task_setup_data_connection (&task);
   g_vfs_ftp_task_send_and_check (&task,
                                  G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
                                  open_read_handlers,
@@ -993,7 +998,13 @@ do_create (GVfsBackend *backend,
   GFileInfo *info;
   GVfsFtpFile *file;
 
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename, &task.error);
+  if (file == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
+
   info = g_vfs_ftp_dir_cache_lookup_file (ftp->dir_cache, &task, file, FALSE);
   if (info)
     {
@@ -1023,7 +1034,13 @@ do_append (GVfsBackend *backend,
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *file;
 
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename, &task.error);
+  if (file == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
+
   do_start_write (&task, flags, "APPE %s", g_vfs_ftp_file_get_ftp_path (file));
   g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
   g_vfs_ftp_file_free (file);
@@ -1045,14 +1062,25 @@ do_replace (GVfsBackend *backend,
   static const GVfsFtpErrorFunc rnfr_handlers[] = { error_550_permission_or_not_found,
                                                     NULL };
 
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename, &task.error);
+  if (file == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
 
   if (make_backup)
     {
       GFileInfo *info;
       char *backup_path = g_strconcat (filename, "~", NULL);
-      backupfile = g_vfs_ftp_file_new_from_gvfs (ftp, backup_path);
+      backupfile = g_vfs_ftp_file_new_from_gvfs (ftp, backup_path, &task.error);
       g_free (backup_path);
+      if (backupfile == NULL)
+        {
+          g_vfs_ftp_file_free (file);
+          g_vfs_ftp_task_done (&task);
+          return;
+        }
 
       info = g_vfs_ftp_dir_cache_lookup_file (ftp->dir_cache, &task, file, FALSE);
 
@@ -1122,7 +1150,7 @@ do_close_write (GVfsBackend *backend,
 
   stream = g_vfs_ftp_connection_get_data_stream (conn);
   filename = g_object_get_data (G_OBJECT (stream), "g-vfs-backend-ftp-filename");
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename, NULL);
 
   g_vfs_ftp_task_give_connection (&task, handle);
   g_vfs_ftp_task_close_data_connection (&task);
@@ -1174,8 +1202,14 @@ do_query_info (GVfsBackend *backend,
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *file;
   GFileInfo *real;
- 
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename, &task.error);
+  if (file == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
+
   real = g_vfs_ftp_dir_cache_lookup_file (ftp->dir_cache,
                                           &task,
                                           file,
@@ -1258,7 +1292,12 @@ do_set_attribute (GVfsBackend *backend,
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *file;
 
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename, &task.error);
+  if (file == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
 
   if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0 &&
       g_vfs_backend_ftp_has_feature (ftp, G_VFS_FTP_FEATURE_CHMOD))
@@ -1339,7 +1378,13 @@ do_enumerate (GVfsBackend *backend,
   GVfsFtpFile *dir;
   GList *list, *walk;
 
-  dir = g_vfs_ftp_file_new_from_gvfs (ftp, dirname);
+  dir = g_vfs_ftp_file_new_from_gvfs (ftp, dirname, &task.error);
+  if (dir == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
+
   list = g_vfs_ftp_dir_cache_lookup_dir (ftp->dir_cache,
                                          &task,
                                          dir,
@@ -1381,9 +1426,22 @@ do_set_display_name (GVfsBackend *backend,
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *original, *dir, *now;
 
-  original = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  original = g_vfs_ftp_file_new_from_gvfs (ftp, filename, &task.error);
+  if (original == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
+
   dir = g_vfs_ftp_file_new_parent (original);
   now = g_vfs_ftp_file_new_child (dir, display_name, &task.error);
+  if (now == NULL)
+    {
+      g_vfs_ftp_file_free (original);
+      g_vfs_ftp_file_free (dir);
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
 
   /* Rename a directory that has been "opened" by CWD may fail, so cd to root first */
   g_vfs_ftp_task_try_cd (&task, ftp->root);
@@ -1416,7 +1474,13 @@ do_delete (GVfsBackend *backend,
 
   /* We try file deletion first. If that fails, we try directory deletion.
    * The file-first-then-directory order has been decided by coin-toss. */
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename, &task.error);
+  if (file == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
+
   response = g_vfs_ftp_task_send (&task,
                 		  G_VFS_FTP_PASS_500,
                 		  "DELE %s", g_vfs_ftp_file_get_ftp_path (file));
@@ -1464,7 +1528,13 @@ do_make_directory (GVfsBackend *backend,
   GVfsFtpFile *file;
   static const GVfsFtpErrorFunc make_directory_handlers[] = { error_550_exists, error_550_parent_not_found, NULL };
 
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename, &task.error);
+  if (file == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
+
   g_vfs_ftp_task_send_and_check (&task,
                                  0,
                                  make_directory_handlers,
@@ -1495,6 +1565,21 @@ do_move (GVfsBackend *backend,
   static const GVfsFtpErrorFunc rnfr_handlers[] = { error_550_permission_or_not_found,
                                                     NULL };
 
+  srcfile = g_vfs_ftp_file_new_from_gvfs (ftp, source, &task.error);
+  if (srcfile == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
+
+  destfile = g_vfs_ftp_file_new_from_gvfs (ftp, destination, &task.error);
+  if (destfile == NULL)
+    {
+      g_vfs_ftp_file_free (srcfile);
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
+
   /* FIXME: what about G_FILE_COPY_NOFOLLOW_SYMLINKS and G_FILE_COPY_ALL_METADATA? */
 
   if (flags & G_FILE_COPY_BACKUP)
@@ -1522,8 +1607,6 @@ do_move (GVfsBackend *backend,
       return;
     }
 
-  srcfile = g_vfs_ftp_file_new_from_gvfs (ftp, source);
-  destfile = g_vfs_ftp_file_new_from_gvfs (ftp, destination);
   if (g_vfs_ftp_task_try_cd (&task, destfile))
     {
       char *basename = g_path_get_basename (source);
@@ -1662,8 +1745,14 @@ do_pull (GVfsBackend *         backend,
   GOutputStream *output;
   goffset total_size = 0;
   guint64 mtime = 0;
-  
-  src = g_vfs_ftp_file_new_from_gvfs (ftp, source);
+
+  src = g_vfs_ftp_file_new_from_gvfs (ftp, source, &task.error);
+  if (src == NULL)
+    {
+      g_vfs_ftp_task_done (&task);
+      return;
+    }
+
   dest = g_file_new_for_path (local_path);
 
   if (remove_source && (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE))
