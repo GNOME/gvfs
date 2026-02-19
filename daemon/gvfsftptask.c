@@ -809,6 +809,7 @@ g_vfs_ftp_task_create_remote_address (GVfsFtpTask *task, guint port)
                       "scope-id", g_inet_socket_address_get_scope_id (old_inet),
                       NULL);
 
+  g_object_unref (old);
   return new;
 }
 
