@@ -63,9 +63,8 @@
  * GVfsFtpMethod:
  * @G_VFS_FTP_METHOD_UNKNOWN: method has not yet been determined
  * @G_VFS_FTP_METHOD_EPSV: use EPSV command
- * @G_VFS_FTP_METHOD_PASV: use PASV command
- * @G_VFS_FTP_METHOD_PASV_ADDR: use PASV command, but ignore the returned 
- *                              address and only use it's port
+ * @G_VFS_FTP_METHOD_PASV: use PASV command, but ignore the returned address
+ *                         and only use it's port (bounce attack prevention)
  * @G_VFS_FTP_METHOD_EPRT: use the EPRT command
  * @G_VFS_FTP_METHOD_PORT: use the PORT command
  *
