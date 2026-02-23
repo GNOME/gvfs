@@ -135,9 +135,12 @@ int ParseFTPList(const char *line, struct list_state *state,
               {
                 guint64 seconds;
 		time_t t;
+                struct tm *tm;
                 sscanf(p+1, "%"G_GUINT64_FORMAT, &seconds);
 		t = seconds;
-		result->fe_time = *localtime (&t);
+                tm = localtime (&t);
+                if (tm != NULL)
+                  result->fe_time = *tm;
               }
             }
           }
@@ -1155,8 +1158,13 @@ int ParseFTPList(const char *line, struct list_state *state,
        
           if (!state->now_time)
           {
+            struct tm *tm;
             state->now_time = time (NULL);
-	    state->now_tm = *localtime (&state->now_time);
+            tm = localtime (&state->now_time);
+            if (tm != NULL)
+              state->now_tm = *tm;
+            else
+              memset (&state->now_tm, 0, sizeof (state->now_tm));
           }
 
           result->fe_time.tm_year = state->now_tm.tm_year;
@@ -1631,8 +1639,13 @@ int ParseFTPList(const char *line, struct list_state *state,
                 result->fe_time.tm_min = atoi(p+3);
                 if (!state->now_time)
                 {
-		  state->now_time = time (NULL);
-		  state->now_tm = *localtime (&state->now_time);
+                  struct tm *tm;
+                  state->now_time = time (NULL);
+                  tm = localtime (&state->now_time);
+                  if (tm != NULL)
+                    state->now_tm = *tm;
+                  else
+                    memset (&state->now_tm, 0, sizeof (state->now_tm));
                 }
                 result->fe_time.tm_year = state->now_tm.tm_year;
                 if ( (( state->now_tm.tm_mon  << 4) + state->now_tm.tm_mday) <
