@@ -1199,7 +1199,8 @@ int ParseFTPList(const char *line, struct list_state *state,
              This can give proper result for cases like "aaa -> bbb -> ccc". */
           guint32 fe_size = atoi(result->fe_size);
 
-          if (result->fe_fnlen > (fe_size + 4) &&
+          if (fe_size <= result->fe_fnlen - 4 &&
+              result->fe_fnlen > (fe_size + 4) &&
               strncmp(result->fe_fname + result->fe_fnlen - fe_size - 4 , " -> ", 4) == 0)
           {
             result->fe_lname = result->fe_fname + (result->fe_fnlen - fe_size);
