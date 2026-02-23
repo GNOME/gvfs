@@ -259,7 +259,7 @@ typedef struct {
   gboolean is_dirty;
 } WriteHandle;
 
-/* how much more memory to ask for when using g_realloc() when writing a file */
+/* how much more memory to ask for when using g_try_realloc() when writing a file */
 #define WRITE_INCREMENT 4096
 
 typedef struct {
@@ -2857,8 +2857,20 @@ do_write (GVfsBackend *backend,
   if (handle->cursor + buffer_size > handle->allocated_size)
     {
       unsigned long int new_allocated_size;
+      gchar *new_data;
+
       new_allocated_size = ((handle->cursor + buffer_size) / WRITE_INCREMENT + 1) * WRITE_INCREMENT;
-      handle->data = g_realloc (handle->data, new_allocated_size);
+      new_data = g_try_realloc (handle->data, new_allocated_size);
+      if (new_data == NULL)
+        {
+          g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                    G_IO_ERROR,
+                                    G_IO_ERROR_FAILED,
+                                    _("Error writing file"));
+          return;
+        }
+
+      handle->data = g_steal_pointer (&new_data);
       handle->allocated_size = new_allocated_size;
       g_debug ("    allocated_size is now %ld bytes)\n", handle->allocated_size);
     }
@@ -2936,8 +2948,20 @@ do_truncate (GVfsBackend *backend,
   if (size > handle->allocated_size)
     {
       unsigned long int new_allocated_size;
+      gchar *new_data;
+
       new_allocated_size = (size / WRITE_INCREMENT + 1) * WRITE_INCREMENT;
-      handle->data = g_realloc (handle->data, new_allocated_size);
+      new_data = g_try_realloc (handle->data, new_allocated_size);
+      if (new_data == NULL)
+        {
+          g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                    G_IO_ERROR,
+                                    G_IO_ERROR_FAILED,
+                                    _("Error writing file"));
+          return;
+        }
+
+      handle->data = g_steal_pointer (&new_data);
       handle->allocated_size = new_allocated_size;
       g_debug ("    allocated_size is now %ld bytes)\n", handle->allocated_size);
     }
