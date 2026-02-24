@@ -519,6 +519,7 @@ g_vfs_ftp_dir_cache_funcs_lookup_uncached (GVfsFtpTask *      task,
       g_file_info_set_name (info, tmp);
       g_free (tmp);
 
+      g_file_info_set_is_symlink (info, FALSE);
       gvfs_file_info_populate_default (info, g_vfs_ftp_file_get_gvfs_path (file), G_FILE_TYPE_DIRECTORY);
 
       g_file_info_set_is_hidden (info, TRUE);
@@ -537,6 +538,7 @@ g_vfs_ftp_dir_cache_funcs_lookup_uncached (GVfsFtpTask *      task,
       g_file_info_set_name (info, tmp);
       g_free (tmp);
 
+      g_file_info_set_is_symlink (info, FALSE);
       gvfs_file_info_populate_default (info, g_vfs_ftp_file_get_gvfs_path (file), G_FILE_TYPE_REGULAR);
 
       g_file_info_set_size (info, g_ascii_strtoull (reply[0] + 4, NULL, 0));
