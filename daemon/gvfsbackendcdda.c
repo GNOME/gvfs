@@ -396,7 +396,7 @@ try_mount (GVfsBackend *backend,
    */
   host = g_mount_spec_get (mount_spec, "host");
   //g_warning ("tm host=%s", host);
-  if (host == NULL)
+  if (host == NULL || strstr (host, "..") != NULL)
     {
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No drive specified"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
