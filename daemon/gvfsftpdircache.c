@@ -254,7 +254,7 @@ g_vfs_ftp_dir_cache_resolve_symlink (GVfsFtpDirCache *  cache,
   link = g_vfs_ftp_file_copy (file);
   do {
       target = g_file_info_get_symlink_target (info);
-      if (target == NULL)
+      if (target == NULL || target[0] == '\0')
         {
           /* This happens when bad servers don't report a symlink target.
            * We now want to figure out if this is a directory or regular file,
@@ -713,7 +713,12 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
         {
           char *link;
 
-          link = g_strndup (result.fe_lname, result.fe_lnlen);
+          /* Malformed listing may leave fe_lname NULL / fe_lnlen 0 */
+          if (result.fe_lname != NULL && result.fe_lnlen > 0)
+            link = g_strndup (result.fe_lname, result.fe_lnlen);
+          else
+            link = g_strdup ("");
+
           g_file_info_set_symlink_target (info, link);
           g_file_info_set_is_symlink (info, TRUE);
           g_free (link);
