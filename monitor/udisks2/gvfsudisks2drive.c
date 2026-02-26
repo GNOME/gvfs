@@ -381,7 +381,6 @@ gvfs_udisks2_drive_set_volume (GVfsUDisks2Drive  *drive,
   if (g_list_find (drive->volumes, volume) == NULL)
     {
       drive->volumes = g_list_prepend (drive->volumes, volume);
-      emit_changed (drive);
     }
 }
 
@@ -394,7 +393,6 @@ gvfs_udisks2_drive_unset_volume (GVfsUDisks2Drive  *drive,
   if (l != NULL)
     {
       drive->volumes = g_list_delete_link (drive->volumes, l);
-      emit_changed (drive);
     }
 }
 
