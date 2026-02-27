@@ -57,6 +57,7 @@ struct _GVfsMonitorPrivate
   GMountSpec *mount_spec;
   char *object_path;
   GList *subscribers;
+  GMutex subscribers_lock;
 };
 
 /* atomic */
@@ -64,6 +65,7 @@ static volatile gint path_counter = 1;
 
 G_DEFINE_TYPE_WITH_PRIVATE (GVfsMonitor, g_vfs_monitor, G_TYPE_OBJECT)
 
+/* Must be called with monitor->priv->subscribers_lock held. */
 static void unsubscribe (Subscriber *subscriber);
 
 static void
@@ -81,12 +83,15 @@ backend_died (GVfsMonitor *monitor,
 
   monitor->priv->backend = NULL;
 
+  g_mutex_lock (&monitor->priv->subscribers_lock);
+
   while (monitor->priv->subscribers != NULL)
     {
       subscriber = monitor->priv->subscribers->data;
       unsubscribe (subscriber);
     }
 
+  g_mutex_unlock (&monitor->priv->subscribers_lock);
   g_object_unref (G_OBJECT (monitor));
 }
 
@@ -108,6 +113,8 @@ g_vfs_monitor_finalize (GObject *object)
   g_mount_spec_unref (monitor->priv->mount_spec);
   
   g_free (monitor->priv->object_path);
+
+  g_mutex_clear (&monitor->priv->subscribers_lock);
   
   if (G_OBJECT_CLASS (g_vfs_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_monitor_parent_class)->finalize) (object);
@@ -130,6 +137,8 @@ g_vfs_monitor_init (GVfsMonitor *monitor)
 
   id = g_atomic_int_add (&path_counter, 1);
   monitor->priv->object_path = g_strdup_printf (OBJ_PATH_PREFIX"%d", id);
+
+  g_mutex_init (&monitor->priv->subscribers_lock);
 }
 
 static gboolean
@@ -167,7 +176,9 @@ subscriber_connection_closed (GDBusConnection *connection,
   GVfsMonitor *monitor = subscriber->monitor;
 
   g_object_ref (monitor); /* Keep alive during possible last remove */
+  g_mutex_lock (&monitor->priv->subscribers_lock);
   unsubscribe (subscriber);
+  g_mutex_unlock (&monitor->priv->subscribers_lock);
   g_object_unref (monitor);
 }
 
@@ -187,7 +198,9 @@ handle_subscribe (GVfsDBusMonitor *object,
   
   g_signal_connect (subscriber->connection, "closed", G_CALLBACK (subscriber_connection_closed), subscriber);
 
+  g_mutex_lock (&monitor->priv->subscribers_lock);
   monitor->priv->subscribers = g_list_prepend (monitor->priv->subscribers, subscriber);
+  g_mutex_unlock (&monitor->priv->subscribers_lock);
   
   gvfs_dbus_monitor_complete_subscribe (object, invocation);
   
@@ -204,6 +217,8 @@ handle_unsubscribe (GVfsDBusMonitor *object,
   GList *l;
 
   g_object_ref (monitor); /* Keep alive during possible last remove */
+  g_mutex_lock (&monitor->priv->subscribers_lock);
+
   for (l = monitor->priv->subscribers; l != NULL; l = l->next)
     {
       subscriber = l->data;
@@ -217,6 +232,8 @@ handle_unsubscribe (GVfsDBusMonitor *object,
           break;
         }
     }
+
+  g_mutex_unlock (&monitor->priv->subscribers_lock);
   g_object_unref (monitor);
 
   gvfs_dbus_monitor_complete_unsubscribe (object, invocation);
@@ -354,6 +371,8 @@ g_vfs_monitor_emit_event (GVfsMonitor       *monitor,
   GList *l;
   Subscriber *subscriber;
 
+  g_mutex_lock (&monitor->priv->subscribers_lock);
+
   for (l = monitor->priv->subscribers; l != NULL; l = l->next)
     {
       EmitEventData *data;
@@ -374,4 +393,6 @@ g_vfs_monitor_emit_event (GVfsMonitor       *monitor,
                                           (GAsyncReadyCallback) got_proxy_cb,
                                           data);
     }
+
+  g_mutex_unlock (&monitor->priv->subscribers_lock);
 }
