@@ -164,7 +164,11 @@ subscriber_connection_closed (GDBusConnection *connection,
                               GError          *error,
                               Subscriber      *subscriber)
 {
+  GVfsMonitor *monitor = subscriber->monitor;
+
+  g_object_ref (monitor); /* Keep alive during possible last remove */
   unsubscribe (subscriber);
+  g_object_unref (monitor);
 }
 
 static gboolean
