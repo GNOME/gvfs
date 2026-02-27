@@ -1,3 +1,16 @@
+Major changes in 1.58.2
+=======================
+* client: Fix use-after-free when creating async proxy failed (Ondrej Holy)
+* daemon: Fix race on subscribers list when on thread (Ondrej Holy)
+* ftp: Validate fe_size when parsing symlink target (Ondrej Holy)
+* ftp: Check localtime() return value before use (Ondrej Holy)
+* CVE-2026-28295: ftp: Use control connection address for PASV data (Ondrej Holy)
+* CVE-2026-28296: ftp: Reject paths containing CR/LF characters (Ondrej Holy)
+* gphoto2: Use g_try_realloc() instead of g_realloc() (Ondrej Holy)
+* cdda: Reject path traversal in mount URI host (Ondrej Holy)
+* client: Fail when URI has invalid UTF-8 chars (Ondrej Holy)
+* Some other fixes (correctmost, Ondrej Holy)
+
 Major changes in 1.58.1
 =======================
 * cdda: Fix duration of last track for some media (Bastien Nocera)
