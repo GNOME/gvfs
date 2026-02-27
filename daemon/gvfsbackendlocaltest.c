@@ -368,11 +368,14 @@ do_query_info (GVfsBackend *backend,
   if (info2) {
       g_file_info_copy_into (info2, info);
       g_object_unref (info2);
-      g_object_unref (file);
       inject_error (backend, G_VFS_JOB (job), GVFS_JOB_QUERY_INFO);
       g_print ("(II) try_query_info success. \n");
   } else
 	  g_print ("(EE) try_query_info failed. \n");
+
+  if (file) {
+      g_object_unref (file);
+  }
 }
 
 
