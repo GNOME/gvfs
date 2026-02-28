@@ -1,3 +1,13 @@
+Major changes in 1.56.2
+=======================
+* CVE-2026-28295: ftp: Use control connection address for PASV data (Ondrej Holy)
+* CVE-2026-28296: ftp: Reject paths containing CR/LF characters (Ondrej Holy)
+* nfs: Support libnfs 6 (Jan Alexander Steffens)
+* onedrive: Fix incorrect include path for msgraph header (sid)
+* afp/mtp/nfs/smb: Various output stream related fixes (Ondrej Holy)
+* udisks2: Update volume when setting/unsetting mount (Ondrej Holy)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.56.1
 =======================
 * udisks2: Increasing reference count when updating volume to fix crashes (Ondrej Holy)
