@@ -649,7 +649,7 @@ async_got_connection_cb (GDBusConnection *connection,
         {
           GDaemonFile *daemon_file = g_task_get_source_object (data->task);
 
-          g_mount_info_unref (data->mount_info);
+          g_clear_pointer (&data->mount_info, g_mount_info_unref);
           _g_daemon_vfs_get_mount_info_async (daemon_file->mount_spec,
                                               daemon_file->path,
                                               async_got_mount_info,
