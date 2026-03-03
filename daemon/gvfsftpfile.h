@@ -31,7 +31,8 @@ GVfsFtpFile *     g_vfs_ftp_file_new_from_gvfs          (GVfsBackendFtp *       
                                                          const char *           gvfs_path,
                                                          GError **              error);
 GVfsFtpFile *     g_vfs_ftp_file_new_from_ftp           (GVfsBackendFtp *       ftp,
-                                                         const char *           ftp_path);
+                                                         const char *           ftp_path,
+                                                         GError **              error);
 GVfsFtpFile *     g_vfs_ftp_file_new_parent             (const GVfsFtpFile *    file);
 GVfsFtpFile *     g_vfs_ftp_file_new_child              (const GVfsFtpFile *    parent,
                                                          const char *           display_name,

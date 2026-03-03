@@ -307,7 +307,7 @@ g_vfs_backend_create_file_from_reply (GVfsBackendFtp *ftp, const char *name)
       g_debug ("# warning: filename didn't contain space after final quote\n");
     }
 
-  file = g_vfs_ftp_file_new_from_ftp (ftp, unescaped->str);
+  file = g_vfs_ftp_file_new_from_ftp (ftp, unescaped->str, NULL);
 
   g_string_free (unescaped, TRUE);
   return file;
@@ -691,7 +691,7 @@ try_login:
   ftp->connections = 1;
   ftp->max_connections = G_MAXUINT;
   ftp->queue = g_queue_new ();
-  ftp->root = g_vfs_ftp_file_new_from_ftp (ftp, "/");
+  ftp->root = g_vfs_ftp_file_new_from_ftp (ftp, "/", NULL);
 
   g_object_unref (addr);
   g_vfs_ftp_task_done (&task);

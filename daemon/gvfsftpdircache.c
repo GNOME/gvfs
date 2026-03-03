@@ -270,15 +270,15 @@ g_vfs_ftp_dir_cache_resolve_symlink (GVfsFtpDirCache *  cache,
       g_object_unref (info);
       if (link == NULL)
         {
-          g_vfs_ftp_task_clear_error (task);
-          return original;
+          g_object_unref (original);
+          return NULL;
         }
       info = g_vfs_ftp_dir_cache_lookup_file_internal (cache, task, link, stamp);
       if (info == NULL)
         {
           g_vfs_ftp_file_free (link);
-          g_vfs_ftp_task_clear_error (task);
-          return original;
+          g_object_unref (original);
+          return NULL;
         }
     }
   while (g_file_info_get_is_symlink (info) && lookups++ < 8);
@@ -422,6 +422,12 @@ g_vfs_ftp_dir_cache_lookup_dir (GVfsFtpDirCache *  cache,
 
       if (resolve_symlinks)
         info = g_vfs_ftp_dir_cache_resolve_symlink (cache, task, file, info, stamp);
+      if (info == NULL)
+        {
+          g_list_free_full (result, g_object_unref);
+          return NULL;
+        }
+
       g_assert (!g_vfs_ftp_task_is_in_error (task));
       result = g_list_prepend (result, info);
     }
@@ -847,7 +853,7 @@ g_vfs_ftp_dir_cache_funcs_resolve_default (GVfsFtpTask *      task,
   /* remove trailing / */
   g_string_set_size (new_path, new_path->len - 1);
 
-  link = g_vfs_ftp_file_new_from_ftp (task->backend, new_path->str);
+  link = g_vfs_ftp_file_new_from_ftp (task->backend, new_path->str, &task->error);
   g_string_free (new_path, TRUE);
   return link;
 }

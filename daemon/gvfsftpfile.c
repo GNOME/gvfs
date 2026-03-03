@@ -103,18 +103,28 @@ g_vfs_ftp_file_new_from_gvfs (GVfsBackendFtp *ftp, const char *gvfs_path, GError
  * g_vfs_ftp_file_new_from_ftp:
  * @ftp: the ftp backend this file is to be used on
  * @ftp_path: ftp path to create the file from
+ * @error: location to take an eventual error or %NULL
  *
- * Constructs a new #GVfsFtpFile representing the given ftp path.
+ * Constructs a new #GVfsFtpFile representing the given ftp path. If the
+ * display name is invalid, @error is set and %NULL is returned.
  *
- * Returns: a new file
+ * Returns: a new file or %NULL on error
  **/
 GVfsFtpFile *
-g_vfs_ftp_file_new_from_ftp (GVfsBackendFtp *ftp, const char *ftp_path)
+g_vfs_ftp_file_new_from_ftp (GVfsBackendFtp *ftp, const char *ftp_path, GError **error)
 {
   GVfsFtpFile *file;
 
   g_return_val_if_fail (G_VFS_IS_BACKEND_FTP (ftp), NULL);
   g_return_val_if_fail (ftp_path != NULL, NULL);
+
+  if (strpbrk (ftp_path, "\r\n") != NULL)
+    {
+      g_set_error_literal (error,
+                           G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
+                           _("Filename contains invalid characters."));
+      return NULL;
+    }
 
   file = g_slice_new (GVfsFtpFile);
   file->backend = g_object_ref (ftp);
