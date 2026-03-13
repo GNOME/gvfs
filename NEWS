@@ -1,3 +1,8 @@
+Major changes in 1.56.3
+=======================
+* ci: Add release service support (Ondrej Holy)
+* CVE-2026-28296: ftp: Reject paths with CR/LF in g_vfs_ftp_file_new_from_ftp (Ondrej Holy)
+
 Major changes in 1.56.2
 =======================
 * CVE-2026-28295: ftp: Use control connection address for PASV data (Ondrej Holy)
