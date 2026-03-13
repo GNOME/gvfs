@@ -1,3 +1,7 @@
+Major changes in 1.58.4
+=======================
+* Re-release of 1.58.3 due to incorrect release tag; no code changes.
+
 Major changes in 1.58.3
 =======================
 * CVE-2026-28296: ftp: Reject paths with CR/LF in g_vfs_ftp_file_new_from_ftp (Ondrej Holy)
