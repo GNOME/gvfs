@@ -1,3 +1,8 @@
+Major changes in 1.58.3
+=======================
+* CVE-2026-28296: ftp: Reject paths with CR/LF in g_vfs_ftp_file_new_from_ftp (Ondrej Holy)
+* monitor: Do not load monitors when GIO_USE_VFS=local (Ondrej Holy)
+
 Major changes in 1.58.2
 =======================
 * client: Fix use-after-free when creating async proxy failed (Ondrej Holy)
