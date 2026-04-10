@@ -120,6 +120,8 @@ g_vfs_afp_reply_finalize (GObject *object)
 
   if (reply->free_data)
     g_free (reply->data);
+
+  G_OBJECT_CLASS (g_vfs_afp_reply_parent_class)->finalize (object);
 }
 
 static void
