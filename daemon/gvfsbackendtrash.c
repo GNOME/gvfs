@@ -987,6 +987,8 @@ trash_backend_finalize (GObject *object)
   if (backend->dir_monitor)
     g_object_unref (backend->dir_monitor);
   backend->dir_monitor = NULL;
+
+  G_OBJECT_CLASS (g_vfs_backend_trash_parent_class)->finalize (object);
 }
 
 static void
