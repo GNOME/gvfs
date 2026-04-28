@@ -1,0 +1,2323 @@
+# Lao translation for gvfs.
+# Copyright (C) 2025 gvfs's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gvfs package.
+# bone NI <bounkirdni@gmail.com>,  2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gvfs master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
+"POT-Creation-Date: 2025-09-13 06:27+0000\n"
+"PO-Revision-Date: 2025-09-13 06:27+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Lao <lo@li.org>\n"
+"Language: lo\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: client/gdaemonfile.c:437
+msgid "Operation not supported, files on different mounts"
+msgstr "ການດຳເນີນການບໍ່ຮອງຮັບ, ໄຟລ໌ຢູ່ຄົນລະຈຸດເຊື່ອມຕໍ່"
+
+#: client/gdaemonfile.c:1045 client/gdaemonfile.c:3079
+#: client/gvfsiconloadable.c:366 daemon/gvfsjobopenforread.c:183
+#: daemon/gvfsjobopenforwrite.c:356
+msgid "Couldn’t get stream file descriptor"
+msgstr "ບໍ່ສາມາດຮັບຕົວອະທິບາຍໄຟລ໌ສະຕຣີມໄດ້"
+
+#: client/gdaemonfile.c:1161 client/gdaemonfile.c:1233
+#: client/gvfsiconloadable.c:147
+msgid "Didn’t get stream file descriptor"
+msgstr "ບໍ່ໄດ້ຮັບຕົວອະທິບາຍໄຟລ໌ສະຕຣີມ"
+
+#: client/gdaemonfile.c:1358
+#, c-format
+msgid "Invalid return value from %s"
+msgstr "ຄ່າທີ່ສົ່ງຄືນຈາກ %s ບໍ່ຖືກຕ້ອງ"
+
+#. translators: this is an error message when there is no user visible "mount" object
+#. corresponding to a particular path/uri
+#: client/gdaemonfile.c:2208 client/gdaemonfile.c:3345
+msgid "Could not find enclosing mount"
+msgstr "ບໍ່ສາມາດຊອກຫາຈຸດເຊື່ອມຕໍ່ທີ່ຄອບຄຸມໄດ້"
+
+#: client/gdaemonfile.c:2240
+#, c-format
+msgid "Invalid filename %s"
+msgstr "ຊື່ໄຟລ໌ %s ບໍ່ຖືກຕ້ອງ"
+
+#: client/gdaemonfile.c:2554 client/gdaemonfile.c:2564
+#: client/gdaemonfile.c:2586 client/gdaemonvfs.c:1234 client/gdaemonvfs.c:1255
+#: client/gdaemonvfs.c:1266 client/gdaemonvfs.c:1298
+#, c-format
+msgid "Error setting file metadata: %s"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຕັ້ງຄ່າເມຕາເດຕາຂອງໄຟລ໌: %s"
+
+#: client/gdaemonfile.c:2555 client/gdaemonvfs.c:1256
+msgid "can’t open metadata tree"
+msgstr "ບໍ່ສາມາດເປີດຕົ້ນໄມ້ເມຕາເດຕາໄດ້"
+
+#: client/gdaemonfile.c:2565 client/gdaemonvfs.c:1267
+msgid "can’t get metadata proxy"
+msgstr "ບໍ່ສາມາດຮັບພຣັອກຊີເມຕາເດຕາໄດ້"
+
+#: client/gdaemonfile.c:2587 client/gdaemonvfs.c:1299
+msgid "values must be string or list of strings"
+msgstr "ຄ່າຕ້ອງເປັນສະຕຣິງ ຫຼື ລາຍການຂອງສະຕຣິງ"
+
+#: client/gdaemonfileinputstream.c:544 client/gdaemonfileinputstream.c:552
+#: client/gdaemonfileinputstream.c:1686 client/gdaemonfileinputstream.c:1695
+#: client/gdaemonfileoutputstream.c:495 client/gdaemonfileoutputstream.c:503
+#: client/gdaemonfileoutputstream.c:1433 client/gdaemonfileoutputstream.c:1442
+#, c-format
+msgid "Error in stream protocol: %s"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນໂປຣໂຕຄໍສະຕຣີມ: %s"
+
+#: client/gdaemonfileinputstream.c:552 client/gdaemonfileinputstream.c:1695
+#: client/gdaemonfileoutputstream.c:503 client/gdaemonfileoutputstream.c:1442
+#: daemon/gvfsbackendmtp.c:2504 daemon/gvfsbackendmtp.c:2941
+msgid "End of stream"
+msgstr "ຈົບສະຕຣີມ"
+
+#: client/gdaemonfileinputstream.c:649 client/gdaemonfileinputstream.c:802
+#: client/gdaemonfileinputstream.c:922 client/gdaemonfileinputstream.c:1173
+#: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
+#: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
+#: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
+#: daemon/gvfsbackendsftp.c:5521 daemon/gvfsbackendsmb.c:1160
+#: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
+#: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:347
+#: daemon/gvfsftptask.c:224
+msgid "Operation was cancelled"
+msgstr "ການດຳເນີນການຖືກຍົກເລີກແລ້ວ"
+
+#: client/gdaemonfileinputstream.c:1355 client/gdaemonfileoutputstream.c:1035
+msgid "Seek not supported on stream"
+msgstr "ການຊອກຫາບໍ່ຮອງຮັບໃນສະຕຣີມ"
+
+#: client/gdaemonfileoutputstream.c:1204
+msgid "Truncate not supported on stream"
+msgstr "ການຕັດທອນບໍ່ຮອງຮັບໃນສະຕຣີມ"
+
+#: client/gdaemonvfs.c:780
+#, c-format
+msgid "Error while getting mount info: %s"
+msgstr "ເກີດຂໍ້ຜິດພາດຂະນະກຳລັງຮັບຂໍ້ມູນຈຸດເຊື່ອມຕໍ່: %s"
+
+#: client/gvfsdaemondbus.c:292 client/gvfsdaemondbus.c:666
+#: daemon/gvfsafpvolume.c:394 daemon/gvfsafpvolume.c:655
+#: daemon/gvfsafpvolume.c:799 daemon/gvfsafpvolume.c:981
+#: daemon/gvfsafpvolume.c:1165 daemon/gvfsafpvolume.c:1340
+#: daemon/gvfsafpvolume.c:1492 daemon/gvfsafpvolume.c:1914
+#: daemon/gvfsafpvolume.c:2035 daemon/gvfsafpvolume.c:2190
+#: daemon/gvfsafpvolume.c:2403 daemon/gvfsbackendadmin.c:150
+#: daemon/gvfsbackendafc.c:166 daemon/gvfsbackendgoogle.c:256
+#: daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1125
+#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsftptask.c:438 daemon/mount.c:437
+#, c-format
+msgid "Permission denied"
+msgstr "ການອະນຸຍາດຖືກປະຕິເສດ"
+
+#: common/gvfsdaemonprotocol.c:358
+msgid "Invalid file info format"
+msgstr "ຮູບແບບຂໍ້ມູນໄຟລ໌ບໍ່ຖືກຕ້ອງ"
+
+#: common/gvfsdnssdresolver.c:216
+#, c-format
+msgid "Error initializing Avahi: %s"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການເລີ່ມຕົ້ນ Avahi: %s"
+
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#.
+#: common/gvfsdnssdresolver.c:1144
+#, c-format
+msgid "Error resolving “%s” service “%s” on domain “%s”"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການແກ້ໄຂບໍລິການ “%s” ຊື່ “%s” ໃນໂດເມນ “%s”"
+
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#. * - the fourth %s refers to the required TXT keys
+#.
+#: common/gvfsdnssdresolver.c:1168
+#, c-format
+msgid ""
+"Error resolving “%s” service “%s” on domain “%s”. One or more TXT records "
+"are missing. Keys required: “%s”."
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການແກ້ໄຂບໍລິການ “%s” ຊື່ “%s” ໃນໂດເມນ “%s”. ບັນທຶກ TXT ໜຶ່ງລາຍການ ຫຼື ຫຼາຍກວ່ານັ້ນຫາຍໄປ. ຄີທີ່ຕ້ອງການ: “%s”."
+
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#.
+#: common/gvfsdnssdresolver.c:1183
+#, c-format
+msgid "Timed out resolving “%s” service “%s” on domain “%s”"
+msgstr "ໝົດເວລາໃນການແກ້ໄຂບໍລິການ “%s” ຊື່ “%s” ໃນໂດເມນ “%s”"
+
+#: common/gvfsdnssdresolver.c:1223
+msgid "Error initializing Avahi resolver"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການເລີ່ມຕົ້ນຕົວແກ້ໄຂ Avahi"
+
+#: common/gvfsdnssdutils.c:233 common/gvfsdnssdutils.c:263
+#: common/gvfsdnssdutils.c:280
+#, c-format
+msgid "Malformed DNS-SD encoded_triple “%s”"
+msgstr "ຮູບແບບ encoded_triple ຂອງ DNS-SD “%s” ບໍ່ຖືກຕ້ອງ"
+
+#: common/gvfsicon.c:250
+#, c-format
+msgid "Can’t handle version %d of GVfsIcon encoding"
+msgstr "ບໍ່ສາມາດຈັດການການເຂົ້າລະຫັດ GVfsIcon ເວີຊັນ %d ໄດ້"
+
+#: common/gvfsicon.c:260
+msgid "Malformed input data for GVfsIcon"
+msgstr "ຂໍ້ມູນປ້ອນເຂົ້າສຳລັບ GVfsIcon ມີຮູບແບບບໍ່ຖືກຕ້ອງ"
+
+#. translators: This is the default daemon's application name,
+#. * the %s is the type of the backend, like "FTP"
+#: daemon/daemon-main.c:100
+#, c-format
+msgid "%s File System Service"
+msgstr "ບໍລິການລະບົບໄຟລ໌ %s"
+
+#: daemon/daemon-main.c:178
+#, c-format
+msgid "Error: %s"
+msgstr "ຂໍ້ຜິດພາດ: %s"
+
+#: daemon/daemon-main.c:236
+#, c-format
+msgid "Usage: %s --spawner dbus-id object_path"
+msgstr "ການນຳໃຊ້: %s --spawner dbus-id object_path"
+
+#: daemon/daemon-main.c:260 daemon/daemon-main.c:278
+#, c-format
+msgid "Usage: %s key=value key=value …"
+msgstr "ການນຳໃຊ້: %s key=value key=value …"
+
+#: daemon/daemon-main.c:276
+msgid "No mount type specified"
+msgstr "ບໍ່ໄດ້ລະບຸປະເພດຈຸດເຊື່ອມຕໍ່"
+
+#: daemon/daemon-main.c:308
+#, c-format
+msgid "mountpoint for %s already running"
+msgstr "ຈຸດເຊື່ອມຕໍ່ສຳລັບ %s ກຳລັງເຮັດວຽກຢູ່ແລ້ວ"
+
+#: daemon/daemon-main.c:337
+msgid "error starting mount daemon"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການເລີ່ມຕົ້ນເດມອນຈຸດເຊື່ອມຕໍ່"
+
+#: daemon/gvfsafpconnection.c:787
+msgid "The connection is not opened"
+msgstr "ການເຊື່ອມຕໍ່ບໍ່ໄດ້ຖືກເປີດ"
+
+#: daemon/gvfsafpconnection.c:794
+msgid "The connection is closed"
+msgstr "ການເຊື່ອມຕໍ່ຖືກປິດແລ້ວ"
+
+#: daemon/gvfsafpconnection.c:897
+msgid "Got EOS"
+msgstr "ໄດ້ຮັບ EOS"
+
+#: daemon/gvfsafpconnection.c:1060 daemon/gvfsafpconnection.c:1102
+#: daemon/gvfsftptask.c:398
+msgid "Host closed connection"
+msgstr "ໂຮສຕ໌ປິດການເຊື່ອມຕໍ່ແລ້ວ"
+
+#: daemon/gvfsafpconnection.c:1521
+msgid "Connection unexpectedly went down"
+msgstr "ການເຊື່ອມຕໍ່ຂາດໄປຢ່າງບໍ່ຄາດຄິດ"
+
+#: daemon/gvfsafpconnection.c:1548
+msgid "Got unexpected end of stream"
+msgstr "ໄດ້ຮັບການສິ້ນສຸດຂອງສະຕຣີມຢ່າງບໍ່ຄາດຄິດ"
+
+#. Translators: %d is a constant, currently hardcoded to 256
+#: daemon/gvfsafpserver.c:195 daemon/gvfsafpserver.c:477
+#, c-format
+msgid "The server doesn’t support passwords longer than %d character."
+msgstr "ເຊີບເວີບໍ່ຮອງຮັບລະຫັດຜ່ານທີ່ຍາວກວ່າ %d ຕົວອັກສອນ."
+
+#: daemon/gvfsafpserver.c:221 daemon/gvfsafpserver.c:530
+msgid "An invalid username was provided."
+msgstr "ຊື່ຜູ້ໃຊ້ທີ່ລະບຸບໍ່ຖືກຕ້ອງ."
+
+#: daemon/gvfsafpserver.c:390
+#, c-format
+msgid "Unable to login to the server “%s” with the given password."
+msgstr "ບໍ່ສາມາດເຂົ້າສູ່ລະບົບເຊີບເວີ “%s” ດ້ວຍລະຫັດຜ່ານທີ່ລະບຸໄດ້."
+
+#: daemon/gvfsafpserver.c:425 daemon/gvfsafpserver.c:647
+#: daemon/gvfsafpserver.c:823 daemon/gvfsafpserver.c:871
+#: daemon/gvfsafpserver.c:987 daemon/gvfsafpserver.c:1659
+#, c-format
+msgid "Unable to connect to the server “%s”. A communication problem occurred."
+msgstr "ບໍ່ສາມາດເຊື່ອມຕໍ່ກັບເຊີບເວີ “%s” ໄດ້. ເກີດບັນຫາໃນການສື່ສານ."
+
+#: daemon/gvfsafpserver.c:620
+#, c-format
+msgid "Unable to connect to the server “%s” with the given password."
+msgstr "ບໍ່ສາມາດເຊື່ອມຕໍ່ກັບເຊີບເວີ “%s” ດ້ວຍລະຫັດຜ່ານທີ່ລະບຸໄດ້."
+
+#: daemon/gvfsafpserver.c:673 daemon/gvfsafpserver.c:698
+#, c-format
+msgid "The server “%s” doesn’t support anonymous access."
+msgstr "ເຊີບເວີ “%s” ບໍ່ຮອງຮັບການເຂົ້າເຖິງແບບບໍ່ລະບຸຊື່."
+
+#: daemon/gvfsafpserver.c:726
+#, c-format
+msgid ""
+"Unable to connect to the server “%s”. No suitable authentication mechanism "
+"was found."
+msgstr "ບໍ່ສາມາດເຊື່ອມຕໍ່ກັບເຊີບເວີ “%s” ໄດ້. ບໍ່ພົບກົນໄກການຢືນຢັນຕົວຕົນທີ່ເໝາະສົມ."
+
+#: daemon/gvfsafpserver.c:801
+#, c-format
+msgid ""
+"Unable to connect to the server “%s”. The server doesn’t support AFP version "
+"3.0 or later."
+msgstr "ບໍ່ສາມາດເຊື່ອມຕໍ່ກັບເຊີບເວີ “%s” ໄດ້. ເຊີບເວີບໍ່ຮອງຮັບ AFP ເວີຊັນ 3.0 ຫຼື ສູງກວ່າ."
+
+#: daemon/gvfsafpserver.c:912
+#, c-format
+msgid "Permission denied."
+msgstr "ການອະນຸຍາດຖືກປະຕິເສດ."
+
+#: daemon/gvfsafpserver.c:917
+#, c-format
+msgid "The command is not supported by the server."
+msgstr "ຄຳສັ່ງນີ້ບໍ່ຖືກຮອງຮັບໂດຍເຊີບເວີ."
+
+#: daemon/gvfsafpserver.c:921
+#, c-format
+msgid "Your password has expired."
+msgstr "ລະຫັດຜ່ານຂອງທ່ານໝົດອາຍຸແລ້ວ."
+
+#: daemon/gvfsafpserver.c:925
+#, c-format
+msgid "Your password needs to be changed."
+msgstr "ຕ້ອງປ່ຽນລະຫັດຜ່ານຂອງທ່ານ."
+
+#. Translators: the first %s is the username, the second the host name
+#: daemon/gvfsafpserver.c:1063 daemon/gvfsbackendftp.c:531
+#: daemon/gvfsbackendsftp.c:1167
+#, c-format
+msgid ""
+"Authentication Required\n"
+"Enter password for “%s” on “%s”:"
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນ\nປ້ອນລະຫັດຜ່ານສຳລັບ “%s” ເທິງ “%s”:"
+
+#. Translators: %s here is the hostname
+#. Translators: %s is the hostname
+#. Translators: %s is a server name
+#: daemon/gvfsafpserver.c:1066 daemon/gvfsbackendftp.c:534
+#: daemon/gvfsbackendsftp.c:1174 daemon/gvfsbackendsmbbrowse.c:340
+#, c-format
+msgid ""
+"Authentication Required\n"
+"Enter user and password for “%s”:"
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນ\nປ້ອນຊື່ຜູ້ໃຊ້ ແລະ ລະຫັດຜ່ານສຳລັບ “%s”:"
+
+#: daemon/gvfsafpserver.c:1098
+msgid "The password prompt was cancelled."
+msgstr "ການຮ້ອງຂໍລະຫັດຜ່ານຖືກຍົກເລີກແລ້ວ."
+
+#: daemon/gvfsafpserver.c:1216
+msgid "Unable to disconnect from the server."
+msgstr "ບໍ່ສາມາດຕັດການເຊື່ອມຕໍ່ຈາກເຊີບເວີໄດ້."
+
+#: daemon/gvfsafpserver.c:1357 daemon/gvfsafpserver.c:1733
+msgid "Unable to connect to the server. A communication problem occurred."
+msgstr "ບໍ່ສາມາດເຊື່ອມຕໍ່ກັບເຊີບເວີໄດ້. ເກີດບັນຫາໃນການສື່ສານ."
+
+#: daemon/gvfsafpserver.c:1692
+msgid "Identification not found."
+msgstr "ບໍ່ພົບການລະບຸຕົວຕົນ."
+
+#: daemon/gvfsafputils.c:124
+#, c-format
+msgid "Got error “%s” from server"
+msgstr "ໄດ້ຮັບຂໍ້ຜິດພາດ “%s” ຈາກເຊີບເວີ"
+
+#: daemon/gvfsafputils.c:127
+#, c-format
+msgid "Got unknown error code %d from server"
+msgstr "ໄດ້ຮັບລະຫັດຂໍ້ຜິດພາດທີ່ບໍ່ຮູ້ຈັກ %d ຈາກເຊີບເວີ"
+
+#: daemon/gvfsafpvolume.c:136
+msgid "Volume doesn’t exist"
+msgstr "ໂວລຸມບໍ່ມີຢູ່"
+
+#. Translators: first %s is volumename and second servername
+#: daemon/gvfsafpvolume.c:158
+#, c-format
+msgid "Couldn’t load %s on %s"
+msgstr "ບໍ່ສາມາດໂຫຼດ %s ເທິງ %s ໄດ້"
+
+#: daemon/gvfsafpvolume.c:398 daemon/gvfsafpvolume.c:1653
+#: daemon/gvfsafpvolume.c:2407 daemon/gvfsbackendafc.c:150
+#: daemon/gvfsbackendafc.c:1064 daemon/gvfsbackendafpbrowse.c:180
+#: daemon/gvfsbackendafpbrowse.c:312 daemon/gvfsbackendafpbrowse.c:344
+#: daemon/gvfsbackendarchive.c:738 daemon/gvfsbackendarchive.c:793
+#: daemon/gvfsbackendarchive.c:845 daemon/gvfsbackendarchive.c:874
+#: daemon/gvfsbackendcdda.c:916 daemon/gvfsbackendcomputer.c:639
+#: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:800
+#: daemon/gvfsbackendftp.c:1194 daemon/gvfsbackendmtp.c:1805
+#: daemon/gvfsbackendmtp.c:1821 daemon/gvfsbackendmtp.c:2228
+#: daemon/gvfsbackendmtp.c:2291 daemon/gvfsbackendmtp.c:2358
+#: daemon/gvfsbackendmtp.c:3046 daemon/gvfsbackendmtp.c:3213
+#: daemon/gvfsbackendnetwork.c:893 daemon/gvfsbackendsmbbrowse.c:916
+#: daemon/gvfsbackendsmbbrowse.c:983 daemon/gvfsbackendsmbbrowse.c:1165
+#: daemon/gvfsbackendsmbbrowse.c:1238
+#, c-format
+msgid "File doesn’t exist"
+msgstr "ໄຟລ໌ບໍ່ມີຢູ່"
+
+#: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2411
+#: daemon/gvfsbackendafp.c:280 daemon/gvfsbackendafp.c:483
+#: daemon/gvfsbackendafp.c:1361 daemon/gvfsbackenddav.c:2799
+#: daemon/gvfsbackenddav.c:3758 daemon/gvfsbackenddav.c:4005
+#: daemon/gvfsbackendftp.c:837 daemon/gvfsbackendnfs.c:2609
+#: daemon/gvfsbackendsftp.c:2728 daemon/gvfsbackendsftp.c:3437
+#: daemon/gvfsbackendsftp.c:3938 daemon/gvfsbackendsftp.c:5010
+#: daemon/gvfsbackendsftp.c:6095
+msgid "File is directory"
+msgstr "ໄຟລ໌ເປັນໄດເຣັກທໍຣີ"
+
+#: daemon/gvfsafpvolume.c:406
+msgid "Too many files open"
+msgstr "ມີການເປີດໄຟລ໌ຫຼາຍເກີນໄປ"
+
+#: daemon/gvfsafpvolume.c:659 daemon/gvfsafpvolume.c:807
+msgid "Target file is open"
+msgstr "ໄຟລ໌ເປົ້າໝາຍກຳລັງເປີດຢູ່"
+
+#: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
+#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3311
+#: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendonedrive.c:970
+#: daemon/gvfsbackendsftp.c:2209
+msgid "Directory not empty"
+msgstr "ໄດເຣັກທໍຣີບໍ່ວ່າງ"
+
+#: daemon/gvfsafpvolume.c:667
+msgid "Target object is marked as not deletable (DeleteInhibit)"
+msgstr "ວັດຖຸເປົ້າໝາຍຖືກໝາຍວ່າບໍ່ສາມາດລຶບໄດ້ (DeleteInhibit)"
+
+#: daemon/gvfsafpvolume.c:671 daemon/gvfsafpvolume.c:1181
+#: daemon/gvfsafpvolume.c:2039 daemon/gvfsbackendgoogle.c:262
+#, c-format
+msgid "Target object doesn’t exist"
+msgstr "ວັດຖຸເປົ້າໝາຍບໍ່ມີຢູ່"
+
+#: daemon/gvfsafpvolume.c:675 daemon/gvfsafpvolume.c:820
+#: daemon/gvfsafpvolume.c:1003 daemon/gvfsafpvolume.c:1185
+#: daemon/gvfsafpvolume.c:2043
+msgid "Volume is read-only"
+msgstr "ໂວລຸມເປັນແບບອ່ານຢ່າງດຽວ"
+
+#: daemon/gvfsafpvolume.c:803 daemon/gvfsafpvolume.c:985
+#: daemon/gvfsafpvolume.c:1504 daemon/gvfsafpvolume.c:1918
+#: daemon/gvfsafpvolume.c:2535
+msgid "Not enough space on volume"
+msgstr "ພື້ນທີ່ໃນໂວລຸມບໍ່ພຽງພໍ"
+
+#: daemon/gvfsafpvolume.c:812 daemon/gvfsafpvolume.c:1356
+#: daemon/gvfsafpvolume.c:1508 daemon/gvfsbackendafp.c:287
+#: daemon/gvfsbackendafp.c:490 daemon/gvfsbackenddav.c:2870
+#: daemon/gvfsbackenddav.c:3224 daemon/gvfsbackenddav.c:3384
+#: daemon/gvfsbackenddav.c:3490 daemon/gvfsbackenddav.c:3724
+#: daemon/gvfsbackenddav.c:3768 daemon/gvfsbackenddav.c:3995
+#: daemon/gvfsbackendftp.c:816 daemon/gvfsbackendftp.c:1004
+#: daemon/gvfsbackendftp.c:1557 daemon/gvfsbackendftp.c:1625
+#: daemon/gvfsbackendgoogle.c:1703 daemon/gvfsbackendgoogle.c:1780
+#: daemon/gvfsbackendgoogle.c:2157 daemon/gvfsbackendgoogle.c:2237
+#: daemon/gvfsbackendgoogle.c:2757 daemon/gvfsbackendgoogle.c:3204
+#: daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1701
+#: daemon/gvfsbackendmtp.c:1744 daemon/gvfsbackendmtp.c:2646
+#: daemon/gvfsbackendnfs.c:2619 daemon/gvfsbackendonedrive.c:1123
+#: daemon/gvfsbackendonedrive.c:1750 daemon/gvfsbackendsftp.c:5019
+#: daemon/gvfsbackendsmb.c:2192
+msgid "Target file already exists"
+msgstr "ໄຟລ໌ເປົ້າໝາຍມີຢູ່ແລ້ວ"
+
+#: daemon/gvfsafpvolume.c:816 daemon/gvfsafpvolume.c:995
+msgid "Ancestor directory doesn’t exist"
+msgstr "ໄດເຣັກທໍຣີແມ່ບໍ່ມີຢູ່"
+
+#. Translators: flat means volume doesn't support directories
+#. (all files are in the volume root)
+#: daemon/gvfsafpvolume.c:991
+msgid "Volume is flat and doesn’t support directories"
+msgstr "ໂວລຸມເປັນແບບແບນ ແລະ ບໍ່ຮອງຮັບໄດເຣັກທໍຣີ"
+
+#: daemon/gvfsafpvolume.c:999
+msgid "Target directory already exists"
+msgstr "ໄດເຣັກທໍຣີເປົ້າໝາຍມີຢູ່ແລ້ວ"
+
+#: daemon/gvfsafpvolume.c:1169 daemon/gvfsbackendafp.c:595
+msgid "Can’t rename volume"
+msgstr "ບໍ່ສາມາດປ່ຽນຊື່ໂວລຸມໄດ້"
+
+#: daemon/gvfsafpvolume.c:1173
+msgid "Object with that name already exists"
+msgstr "ວັດຖຸທີ່ມີຊື່ນັ້ນມີຢູ່ແລ້ວ"
+
+#: daemon/gvfsafpvolume.c:1177
+msgid "Target object is marked as not renameable (RenameInhibit)"
+msgstr "ວັດຖຸເປົ້າໝາຍຖືກໝາຍວ່າບໍ່ສາມາດປ່ຽນຊື່ໄດ້ (RenameInhibit)"
+
+#: daemon/gvfsafpvolume.c:1344
+msgid "Can’t move directory into one of its descendants"
+msgstr "ບໍ່ສາມາດຍ້າຍໄດເຣັກທໍຣີເຂົ້າໄປໃນໄດເຣັກທໍຣີຍ່ອຍຂອງມັນເອງໄດ້"
+
+#: daemon/gvfsafpvolume.c:1348
+msgid "Can’t move sharepoint into a shared directory"
+msgstr "ບໍ່ສາມາດຍ້າຍຈຸດແບ່ງປັນເຂົ້າໄປໃນໄດເຣັກທໍຣີທີ່ຖືກແບ່ງປັນໄດ້"
+
+#: daemon/gvfsafpvolume.c:1352
+msgid "Can’t move a shared directory into the Trash"
+msgstr "ບໍ່ສາມາດຍ້າຍໄດເຣັກທໍຣີທີ່ຖືກແບ່ງປັນໄປທີ່ຖັງຂີ້ເຫຍື້ອໄດ້"
+
+#: daemon/gvfsafpvolume.c:1360
+msgid "Object being moved is marked as not renameable (RenameInhibit)"
+msgstr "ວັດຖຸທີ່ກຳລັງຍ້າຍຖືກໝາຍວ່າບໍ່ສາມາດປ່ຽນຊື່ໄດ້ (RenameInhibit)"
+
+#: daemon/gvfsafpvolume.c:1364
+msgid "Object being moved doesn’t exist"
+msgstr "ວັດຖຸທີ່ກຳລັງຍ້າຍບໍ່ມີຢູ່"
+
+#: daemon/gvfsafpvolume.c:1496
+msgid "Server doesn’t support the FPCopyFile operation"
+msgstr "ເຊີບເວີບໍ່ຮອງຮັບການດຳເນີນການ FPCopyFile"
+
+#: daemon/gvfsafpvolume.c:1500
+msgid "Unable to open source file for reading"
+msgstr "ບໍ່ສາມາດເປີດໄຟລ໌ຕົ້ນທາງເພື່ອອ່ານໄດ້"
+
+#: daemon/gvfsafpvolume.c:1512
+msgid "Source file and/or destination directory doesn’t exist"
+msgstr "ໄຟລ໌ຕົ້ນທາງ ແລະ/ຫຼື ໄດເຣັກທໍຣີປາຍທາງບໍ່ມີຢູ່"
+
+#: daemon/gvfsafpvolume.c:1516
+msgid "Source file is a directory"
+msgstr "ໄຟລ໌ຕົ້ນທາງເປັນໄດເຣັກທໍຣີ"
+
+#. Translators: range conflict means
+#. requested data are locked by another user
+#: daemon/gvfsafpvolume.c:1924
+msgid "Range lock conflict exists"
+msgstr "ເກີດຂໍ້ຂັດແຍ່ງໃນການລັອກຊ່ວງຂໍ້ມູນ"
+
+#: daemon/gvfsafpvolume.c:2194 daemon/gvfsbackendmtp.c:1524
+#: daemon/gvfsbackendmtp.c:1549 daemon/gvfsbackendmtp.c:1752
+#: daemon/gvfsbackendmtp.c:2128 daemon/gvfsbackendmtp.c:2659
+#: daemon/gvfsbackendmtp.c:3087 daemon/gvfsbackendmtp.c:3247
+msgid "Directory doesn’t exist"
+msgstr "ໄດເຣັກທໍຣີບໍ່ມີຢູ່"
+
+#: daemon/gvfsafpvolume.c:2198
+msgid "Target object is not a directory"
+msgstr "ວັດຖຸເປົ້າໝາຍບໍ່ແມ່ນໄດເຣັກທໍຣີ"
+
+#: daemon/gvfsafpvolume.c:2531
+msgid "File is not open for write access"
+msgstr "ໄຟລ໌ບໍ່ໄດ້ເປີດເພື່ອການເຂົ້າເຖິງແບບຂຽນ"
+
+#: daemon/gvfsafpvolume.c:2539
+msgid "File is locked by another user"
+msgstr "ໄຟລ໌ຖືກລັອກໂດຍຜູ້ໃຊ້ອື່ນ"
+
+#: daemon/gvfsafpvolume.c:2671
+msgid "File is not open for read access"
+msgstr "ໄຟລ໌ບໍ່ໄດ້ເປີດເພື່ອການເຂົ້າເຖິງແບບອ່ານ"
+
+#. Return G_IO_ERROR_NOT_SUPPORTED instead of
+#. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
+#. * fallback copy.
+#.
+#: daemon/gvfsbackendadmin.c:104 daemon/gvfsbackendadmin.c:871
+#: daemon/gvfsbackendafc.c:2361 daemon/gvfsbackendafp.c:1743
+#: daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
+#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:4087
+#: daemon/gvfsbackenddav.c:4119 daemon/gvfsbackenddav.c:4147
+#: daemon/gvfsbackendftp.c:1234 daemon/gvfsbackendftp.c:1323
+#: daemon/gvfsbackendftp.c:1674 daemon/gvfsbackendgoogle.c:1590
+#: daemon/gvfsbackendgoogle.c:1623 daemon/gvfsbackendgoogle.c:1652
+#: daemon/gvfsbackendgoogle.c:1675 daemon/gvfsbackendgoogle.c:1741
+#: daemon/gvfsbackendgoogle.c:2013 daemon/gvfsbackendgoogle.c:2045
+#: daemon/gvfsbackendgoogle.c:2084 daemon/gvfsbackendgoogle.c:2117
+#: daemon/gvfsbackendgoogle.c:2127 daemon/gvfsbackendgoogle.c:2198
+#: daemon/gvfsbackendgoogle.c:2393 daemon/gvfsbackendgoogle.c:2508
+#: daemon/gvfsbackendgoogle.c:2733 daemon/gvfsbackendgoogle.c:3069
+#: daemon/gvfsbackendgoogle.c:3079 daemon/gvfsbackendgoogle.c:3114
+#: daemon/gvfsbackendgoogle.c:3181 daemon/gvfsbackendgoogle.c:3190
+#: daemon/gvfsbackendgoogle.c:3774 daemon/gvfsbackendgoogle.c:3835
+#: daemon/gvfsbackendgoogle.c:3852 daemon/gvfsbackendgoogle.c:3864
+#: daemon/gvfsbackendgoogle.c:3950 daemon/gvfsbackendgoogle.c:3967
+#: daemon/gvfsbackendgphoto2.c:2238 daemon/gvfsbackendgphoto2.c:2451
+#: daemon/gvfsbackendgphoto2.c:2548 daemon/gvfsbackendgphoto2.c:2641
+#: daemon/gvfsbackendgphoto2.c:3250 daemon/gvfsbackendgphoto2.c:3258
+#: daemon/gvfsbackendgphoto2.c:3268 daemon/gvfsbackendhttp.c:745
+#: daemon/gvfsbackendmtp.c:1797 daemon/gvfsbackendmtp.c:2098
+#: daemon/gvfsbackendmtp.c:2347 daemon/gvfsbackendmtp.c:2538
+#: daemon/gvfsbackendmtp.c:2621 daemon/gvfsbackendmtp.c:2772
+#: daemon/gvfsbackendmtp.c:3018 daemon/gvfsbackendmtp.c:3186
+#: daemon/gvfsbackendnfs.c:2501 daemon/gvfsbackendnfs.c:2551
+#: daemon/gvfsbackendnfs.c:2677 daemon/gvfsbackendonedrive.c:881
+#: daemon/gvfsbackendonedrive.c:980 daemon/gvfsbackendonedrive.c:1102
+#: daemon/gvfsbackendonedrive.c:1665 daemon/gvfsbackendonedrive.c:1717
+#: daemon/gvfsbackendonedrive.c:1733 daemon/gvfsbackendonedrive.c:1745
+#: daemon/gvfsbackendonedrive.c:1905 daemon/gvfsbackendonedrive.c:1921
+#: daemon/gvfsbackendsftp.c:2213 daemon/gvfsbackendsftp.c:5407
+#: daemon/gvfsbackendsftp.c:5505 daemon/gvfsbackendsftp.c:6217
+#: daemon/gvfsbackendsftp.c:6249 daemon/gvfsbackendsftp.c:6275
+#: daemon/gvfsbackendsftp.c:6283 daemon/gvfsbackendsftp.c:6770
+#: daemon/gvfsbackendsftp.c:6832 daemon/gvfsbackendsftp.c:6840
+#: daemon/gvfsbackendsmb.c:1784 daemon/gvfsbackendsmb.c:2264
+#: daemon/gvfsbackendtrash.c:937 daemon/gvfsbackendtrash.c:963
+#: daemon/gvfsbackendwsdd.c:364 daemon/gvfsftptask.c:430
+#: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121
+#: daemon/gvfsjobcopy.c:121 daemon/gvfsjobcreatemonitor.c:143
+#: daemon/gvfsjobcreatemonitor.c:154 daemon/gvfsjobcreatemonitor.c:177
+#: daemon/gvfsjobcreatemonitor.c:195 daemon/gvfsjobdelete.c:108
+#: daemon/gvfsjobenumerate.c:272 daemon/gvfsjobmakedirectory.c:108
+#: daemon/gvfsjobmount.c:112 daemon/gvfsjobmountmountable.c:138
+#: daemon/gvfsjobmove.c:121 daemon/gvfsjobopenforread.c:120
+#: daemon/gvfsjobopenforwrite.c:184 daemon/gvfsjobopenforwrite.c:198
+#: daemon/gvfsjobopenforwrite.c:212 daemon/gvfsjobopenforwrite.c:228
+#: daemon/gvfsjobopeniconforread.c:104 daemon/gvfsjobpollmountable.c:107
+#: daemon/gvfsjobpull.c:125 daemon/gvfsjobpush.c:125
+#: daemon/gvfsjobqueryattributes.c:145 daemon/gvfsjobqueryfsinfo.c:116
+#: daemon/gvfsjobqueryinfo.c:124 daemon/gvfsjobqueryinforead.c:125
+#: daemon/gvfsjobqueryinfowrite.c:125 daemon/gvfsjobread.c:123
+#: daemon/gvfsjobseekread.c:121 daemon/gvfsjobseekwrite.c:121
+#: daemon/gvfsjobsetattribute.c:130 daemon/gvfsjobsetdisplayname.c:111
+#: daemon/gvfsjobstartmountable.c:113 daemon/gvfsjobstopmountable.c:115
+#: daemon/gvfsjobtrash.c:107 daemon/gvfsjobtruncate.c:113
+#: daemon/gvfsjobunmountmountable.c:157 daemon/gvfsjobunmountmountable.c:172
+#: daemon/gvfsjobwrite.c:123
+msgid "Operation not supported"
+msgstr "ການດຳເນີນການບໍ່ຮອງຮັບ"
+
+#: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639
+#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2355
+#: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:303
+#: daemon/gvfsbackendonedrive.c:1202 daemon/gvfsbackendsmb.c:628
+msgid "Invalid mount spec"
+msgstr "ຂໍ້ມູນຈຸດເຊື່ອມຕໍ່ບໍ່ຖືກຕ້ອງ"
+
+#: daemon/gvfsbackendafc.c:146
+msgid "Internal Apple File Control error"
+msgstr "ເກີດຂໍ້ຜິດພາດພາຍໃນຂອງ Apple File Control"
+
+#: daemon/gvfsbackendafc.c:158
+msgid "The device did not respond"
+msgstr "ອຸປະກອນບໍ່ຕອບສະໜອງ"
+
+#: daemon/gvfsbackendafc.c:162
+msgid "The connection was interrupted"
+msgstr "ການເຊື່ອມຕໍ່ຖືກຂັດຈັງຫວະ"
+
+#: daemon/gvfsbackendafc.c:170
+msgid "Invalid Apple File Control data received"
+msgstr "ໄດ້ຮັບຂໍ້ມູນ Apple File Control ທີ່ບໍ່ຖືກຕ້ອງ"
+
+#: daemon/gvfsbackendafc.c:174
+#, c-format
+msgid "Unhandled Apple File Control error (%d)"
+msgstr "ຂໍ້ຜິດພາດ Apple File Control ທີ່ບໍ່ໄດ້ຈັດການ (%d)"
+
+#: daemon/gvfsbackendafc.c:190
+msgid "Listing applications installed on device failed"
+msgstr "ການສະແດງລາຍການແອັບພລິເຄຊັນທີ່ຕິດຕັ້ງໃນອຸປະກອນລົ້ມເຫຼວ"
+
+#: daemon/gvfsbackendafc.c:206
+msgid "Accessing application icons on device failed"
+msgstr "ການເຂົ້າເຖິງໄອຄອນແອັບພລິເຄຊັນໃນອຸປະກອນລົ້ມເຫຼວ"
+
+#: daemon/gvfsbackendafc.c:228
+msgid "Lockdown Error: Invalid Argument"
+msgstr "ຂໍ້ຜິດພາດການລັອກດາວ: ອາກິວເມັນບໍ່ຖືກຕ້ອງ"
+
+#: daemon/gvfsbackendafc.c:232
+msgid "The device is password protected"
+msgstr "ອຸປະກອນຖືກປ້ອງກັນດ້ວຍລະຫັດຜ່ານ"
+
+#: daemon/gvfsbackendafc.c:236
+msgid "Unable to connect"
+msgstr "ບໍ່ສາມາດເຊື່ອມຕໍ່ໄດ້"
+
+#: daemon/gvfsbackendafc.c:240
+msgid "User refused to trust this computer"
+msgstr "ຜູ້ໃຊ້ປະຕິເສດທີ່ຈະເຊື່ອຖືຄອມພິວເຕີນີ້"
+
+#: daemon/gvfsbackendafc.c:244
+msgid "The user has not trusted this computer"
+msgstr "ຜູ້ໃຊ້ຍັງບໍ່ໄດ້ເຊື່ອຖືຄອມພິວເຕີນີ້"
+
+#: daemon/gvfsbackendafc.c:248
+#, c-format
+msgid "Unhandled Lockdown error (%d)"
+msgstr "ຂໍ້ຜິດພາດການລັອກດາວທີ່ບໍ່ໄດ້ຈັດການ (%d)"
+
+#: daemon/gvfsbackendafc.c:265
+msgid "libimobiledevice Error: Invalid Argument"
+msgstr "ຂໍ້ຜິດພາດ libimobiledevice: ອາກິວເມັນບໍ່ຖືກຕ້ອງ"
+
+#: daemon/gvfsbackendafc.c:269
+msgid ""
+"libimobiledevice Error: No device found. Make sure usbmuxd is set up "
+"correctly."
+msgstr "ຂໍ້ຜິດພາດ libimobiledevice: ບໍ່ພົບອຸປະກອນ. ກະລຸນາກວດສອບວ່າ usbmuxd ຖືກຕັ້ງຄ່າຢ່າງຖືກຕ້ອງ."
+
+#: daemon/gvfsbackendafc.c:273
+#, c-format
+msgid "Unhandled libimobiledevice error (%d)"
+msgstr "ຂໍ້ຜິດພາດ libimobiledevice ທີ່ບໍ່ໄດ້ຈັດການ (%d)"
+
+#: daemon/gvfsbackendafc.c:394
+msgid "Try again"
+msgstr "ລອງໃໝ່"
+
+#: daemon/gvfsbackendafc.c:394 daemon/gvfsbackend.c:1024
+#: monitor/udisks2/gvfsudisks2mount.c:754
+msgid "Cancel"
+msgstr "ຍົກເລີກ"
+
+#: daemon/gvfsbackendafc.c:411 daemon/gvfsbackendafc.c:442
+msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
+msgstr "ທີ່ຢູ່ AFC ບໍ່ຖືກຕ້ອງ: ຕ້ອງຢູ່ໃນຮູບແບບ afc://uuid:port-number"
+
+#: daemon/gvfsbackendafc.c:428
+#, c-format
+msgid "Apple Mobile Device"
+msgstr "ອຸປະກອນມືຖື Apple"
+
+#: daemon/gvfsbackendafc.c:433
+#, c-format
+msgid "Apple Mobile Device, Jailbroken"
+msgstr "ອຸປະກອນມືຖື Apple, ເຈລເບຣກແລ້ວ"
+
+#: daemon/gvfsbackendafc.c:438
+#, c-format
+msgid "Documents on Apple Mobile Device"
+msgstr "ເອກະສານໃນອຸປະກອນມືຖື Apple"
+
+#. translators:
+#. * This is the device name, with the service being browsed in brackets, eg.:
+#. * Alan Smithee's iPhone (jailbreak)
+#: daemon/gvfsbackendafc.c:496
+#, c-format
+msgid "%s (jailbreak)"
+msgstr "%s (ເຈລເບຣກ)"
+
+#. translators:
+#. * This is "Documents on foo" where foo is the device name, eg.:
+#. * Documents on Alan Smithee's iPhone
+#: daemon/gvfsbackendafc.c:503 monitor/afc/afcvolume.c:176
+#, c-format
+msgid "Documents on %s"
+msgstr "ເອກະສານໃນ %s"
+
+#. translators:
+#. * %s is the device name. 'Try again' is the caption of the button
+#. * shown in the dialog which is defined above.
+#: daemon/gvfsbackendafc.c:577
+#, c-format
+msgid ""
+"Device Locked\n"
+"The device “%s” is locked.\n"
+"\n"
+"Enter the passcode on the device and click “Try again”."
+msgstr "ອຸປະກອນຖືກລັອກ\nອຸປະກອນ “%s” ຖືກລັອກ.\n\nກະລຸນາປ້ອນລະຫັດຜ່ານໃນອຸປະກອນແລ້ວກົດ “ລອງໃໝ່”."
+
+#. translators:
+#. * %s is the device name. 'Try again' is the caption of the button
+#. * shown in the dialog which is defined above. 'Trust' is the caption
+#. * of the button shown in the device.
+#: daemon/gvfsbackendafc.c:585
+#, c-format
+msgid ""
+"Untrusted Device\n"
+"The device “%s” is not trusted yet.\n"
+"\n"
+"Select “Trust” on the device and click “Try again”."
+msgstr "ອຸປະກອນບໍ່ໜ້າເຊື່ອຖື\nອຸປະກອນ “%s” ຍັງບໍ່ໄດ້ຮັບການເຊື່ອຖື.\n\nກະລຸນາເລືອກ “ເຊື່ອຖື” ໃນອຸປະກອນແລ້ວກົດ “ລອງໃໝ່”."
+
+#: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
+#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
+#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2380
+#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendonedrive.c:1471
+#: daemon/gvfsbackendrecent.c:126 daemon/gvfsbackendsmb.c:718
+#: daemon/gvfsbackendtrash.c:333
+msgid "Can’t open directory"
+msgstr "ບໍ່ສາມາດເປີດໄດເຣັກທໍຣີໄດ້"
+
+#: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528
+#: daemon/gvfsbackendafp.c:1290 daemon/gvfsbackendafp.c:1379
+#: daemon/gvfsbackenddav.c:3665 daemon/gvfsbackendftp.c:1509
+#: daemon/gvfsbackendonedrive.c:1899 daemon/gvfsbackendsftp.c:3712
+#: daemon/gvfsbackendsftp.c:3999
+msgid "Backups not supported"
+msgstr "ການສຳຮອງຂໍ້ມູນບໍ່ຮອງຮັບ"
+
+#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:771
+#: daemon/gvfsbackendsmb.c:1257
+msgid "Unsupported seek type"
+msgstr "ປະເພດການຊອກຫາບໍ່ຮອງຮັບ"
+
+#: daemon/gvfsbackendafpbrowse.c:208 daemon/gvfsbackendcomputer.c:958
+#: daemon/gvfsbackendcomputer.c:1053 daemon/gvfsbackendcomputer.c:1159
+#: daemon/gvfsbackendcomputer.c:1249 daemon/gvfsbackendcomputer.c:1322
+#: daemon/gvfsbackendcomputer.c:1391 daemon/gvfsbackendsmbbrowse.c:911
+#: daemon/gvfsbackendsmbbrowse.c:957
+msgid "Not a mountable file"
+msgstr "ບໍ່ແມ່ນໄຟລ໌ທີ່ສາມາດເຊື່ອມຕໍ່ໄດ້"
+
+#. Translators: first %s is username and second serververname
+#. Translators: first %s is volumename and second servername
+#. Translators: the first %s is the username, the second the host name
+#. Translators: This is "<mount point> on <host>" and is used as name for an NFS mount
+#. Translators: This is the name of an SFTP share, like "<user> on <hostname>"
+#. Set the mountspec according to original uri, no matter whether user changes
+#. credentials during mount loop. Nautilus and other gio clients depend
+#. on correct mountspec, setting it to real (different) credentials would
+#. lead to G_IO_ERROR_NOT_MOUNTED errors
+#.
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: daemon/gvfsbackendafpbrowse.c:446 daemon/gvfsbackendafp.c:2067
+#: daemon/gvfsbackendftp.c:682 daemon/gvfsbackendnfs.c:297
+#: daemon/gvfsbackendsftp.c:2070 daemon/gvfsbackendsmb.c:483
+#: daemon/gvfsbackendsmb.c:1446
+#, c-format
+msgid "%s on %s"
+msgstr "%s ເທິງ %s"
+
+#. Translators: %s is the servername
+#: daemon/gvfsbackendafpbrowse.c:450
+#, c-format
+msgid "%s"
+msgstr "%s"
+
+#: daemon/gvfsbackendafpbrowse.c:483 daemon/gvfsbackendafp.c:2102
+#: daemon/gvfsbackendarchive.c:628 daemon/gvfsbackendftp.c:725
+#: daemon/gvfsbackendnfs.c:198 daemon/gvfsbackendsftp.c:2122
+msgid "No hostname specified"
+msgstr "ບໍ່ໄດ້ລະບຸຊື່ໂຮສຕ໌"
+
+#: daemon/gvfsbackendafpbrowse.c:568 daemon/gvfsbackendafp.c:2198
+msgid "Apple Filing Protocol Service"
+msgstr "ບໍລິການໂປຣໂຕຄໍການຈັດເກັບໄຟລ໌ຂອງ Apple"
+
+#: daemon/gvfsbackendafp.c:277 daemon/gvfsbackendburn.c:877
+#: daemon/gvfsbackenddav.c:3753 daemon/gvfsbackendftp.c:1617
+#: daemon/gvfsbackendgoogle.c:1752 daemon/gvfsbackendgoogle.c:2095
+#: daemon/gvfsbackendgoogle.c:3141
+msgid "Can’t copy directory over directory"
+msgstr "ບໍ່ສາມາດສຳເນົາໄດເຣັກທໍຣີທັບໄດເຣັກທໍຣີໄດ້"
+
+#: daemon/gvfsbackendafp.c:296 daemon/gvfsbackendburn.c:893
+#: daemon/gvfsbackenddav.c:3788 daemon/gvfsbackendftp.c:1640
+#: daemon/gvfsbackendgoogle.c:1814 daemon/gvfsbackendgoogle.c:3168
+#: daemon/gvfsbackendgoogle.c:3216 daemon/gvfsbackendmtp.c:1692
+#: daemon/gvfsbackendmtp.c:1707
+msgid "Can’t recursively copy directory"
+msgstr "ບໍ່ສາມາດສຳເນົາໄດເຣັກທໍຣີແບບຊ້ຳຊ້ອນໄດ້"
+
+#: daemon/gvfsbackendafp.c:480 daemon/gvfsbackenddav.c:3566
+#: daemon/gvfsbackendgoogle.c:2209 daemon/gvfsbackendnfs.c:2603
+#: daemon/gvfsbackendsftp.c:5005 daemon/gvfsbackendsmb.c:2181
+msgid "Can’t move directory over directory"
+msgstr "ບໍ່ສາມາດຍ້າຍໄດເຣັກທໍຣີທັບໄດເຣັກທໍຣີໄດ້"
+
+#: daemon/gvfsbackendafp.c:1304
+#, c-format
+msgid "Unable to create temporary file (%s)"
+msgstr "ບໍ່ສາມາດສ້າງໄຟລ໌ຊົ່ວຄາວໄດ້ (%s)"
+
+#: daemon/gvfsbackendafp.c:1368 daemon/gvfsbackenddav.c:2977
+#: daemon/gvfsbackendnfs.c:1313 daemon/gvfsbackendsftp.c:3953
+#: daemon/gvfsbackendsmb.c:1129
+msgid "The file was externally modified"
+msgstr "ໄຟລ໌ຖືກແກ້ໄຂຈາກພາຍນອກ"
+
+#: daemon/gvfsbackendafp.c:1727 daemon/gvfsbackendftp.c:1271
+#: daemon/gvfsbackendsftp.c:5469
+msgid "Invalid attribute type (uint32 expected)"
+msgstr "ປະເພດຄຸນລັກສະນະບໍ່ຖືກຕ້ອງ (ຄາດວ່າເປັນ uint32)"
+
+#. Translators: first %s is volumename, second username and third servername
+#: daemon/gvfsbackendafp.c:2062
+#, c-format
+msgid "%s for %s on %s"
+msgstr "%s ສຳລັບ %s ເທິງ %s"
+
+#: daemon/gvfsbackendafp.c:2111
+msgid "No volume specified"
+msgstr "ບໍ່ໄດ້ລະບຸໂວລຸມ"
+
+#. Translators: This is the name of the root in a mounted archive file,
+#. e.g. "/ in archive.tar.gz" for a file with the name "archive.tar.gz"
+#: daemon/gvfsbackendarchive.c:350
+#, c-format
+msgid "/ in %s"
+msgstr "/ ໃນ %s"
+
+#: daemon/gvfsbackendarchive.c:883 daemon/gvfsbackendburn.c:681
+#: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:475
+#: daemon/gvfsbackendftp.c:355 daemon/gvfsbackendgoogle.c:1204
+#: daemon/gvfsbackendgoogle.c:2410 daemon/gvfsbackendgoogle.c:2637
+#: daemon/gvfsbackendnetwork.c:944 daemon/gvfsbackendonedrive.c:695
+#: daemon/gvfsbackendonedrive.c:897 daemon/gvfsbackendonedrive.c:1033
+#: daemon/gvfsbackendsftp.c:4492 daemon/gvfsftpdircache.c:157
+#, c-format
+msgid "The file is not a directory"
+msgstr "ໄຟລ໌ນີ້ບໍ່ແມ່ນໄດເຣັກທໍຣີ"
+
+#. Translators: This is the name of the backend
+#: daemon/gvfsbackendburn.c:346
+msgid "Burn"
+msgstr "ເຜົາໄຟລ໌"
+
+#: daemon/gvfsbackendburn.c:372
+msgid "Unable to create temporary directory"
+msgstr "ບໍ່ສາມາດສ້າງໄດເຣັກທໍຣີຊົ່ວຄາວໄດ້"
+
+#: daemon/gvfsbackendburn.c:401 daemon/gvfsbackendburn.c:412
+#: daemon/gvfsbackendburn.c:447 daemon/gvfsbackendburn.c:673
+#: daemon/gvfsbackendburn.c:718 daemon/gvfsbackendburn.c:744
+#: daemon/gvfsbackendburn.c:782 daemon/gvfsbackendburn.c:854
+#: daemon/gvfsbackendburn.c:973 daemon/gvfsbackendburn.c:1009
+#: daemon/gvfsbackenddav.c:3228 daemon/gvfsbackendftp.c:857
+#: daemon/gvfsbackendgoogle.c:1097 daemon/gvfsbackendgphoto2.c:938
+#: daemon/gvfsbackendgphoto2.c:1869 daemon/gvfsbackendgphoto2.c:2588
+#: daemon/gvfsbackendonedrive.c:612 daemon/gvfsbackendrecent.c:110
+#: daemon/gvfsbackendrecent.c:293 daemon/gvfsbackendsftp.c:2217
+#: daemon/gvfsbackendsftp.c:3380 daemon/gvfsbackendsftp.c:3393
+#: daemon/gvfsbackendsftp.c:3413 daemon/gvfsbackendtrash.c:317
+#, c-format
+msgid "No such file or directory"
+msgstr "ບໍ່ມີໄຟລ໌ ຫຼື ໄດເຣັກທໍຣີດັ່ງກ່າວ"
+
+#: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:905
+#: daemon/gvfsbackendgoogle.c:1760 daemon/gvfsbackendgoogle.c:2103
+#: daemon/gvfsbackendgoogle.c:3149
+msgid "Can’t copy file over directory"
+msgstr "ບໍ່ສາມາດສຳເນົາໄຟລ໌ທັບໄດເຣັກທໍຣີໄດ້"
+
+#. Translators: this is the display name of the backend
+#: daemon/gvfsbackendburn.c:652
+msgid "CD/DVD Creator"
+msgstr "ຕົວສ້າງ CD/DVD"
+
+#: daemon/gvfsbackendburn.c:754 daemon/gvfsbackendburn.c:790
+#: daemon/gvfsbackendburn.c:925 daemon/gvfsbackendburn.c:987
+#: daemon/gvfsbackendburn.c:991 daemon/gvfsbackendburn.c:1001
+#: daemon/gvfsbackendgphoto2.c:2662
+msgid "File exists"
+msgstr "ໄຟລ໌ມີຢູ່ແລ້ວ"
+
+#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:3605
+#: daemon/gvfsbackendsftp.c:2211 daemon/gvfsbackendsftp.c:5185
+msgid "Target file exists"
+msgstr "ໄຟລ໌ເປົ້າໝາຍມີຢູ່ແລ້ວ"
+
+#: daemon/gvfsbackend.c:889 daemon/gvfsjobunmount.c:197
+#: daemon/gvfsjobunmount.c:264
+msgid "File system is busy"
+msgstr "ລະບົບໄຟລ໌ກຳລັງບໍ່ວ່າງ"
+
+#: daemon/gvfsbackend.c:1023 monitor/udisks2/gvfsudisks2mount.c:752
+msgid "Unmount Anyway"
+msgstr "ຍົກເລີກການເຊື່ອມຕໍ່ຕໍ່ໄປ"
+
+#: daemon/gvfsbackend.c:1026 monitor/udisks2/gvfsudisks2mount.c:755
+msgid ""
+"Volume is busy\n"
+"One or more applications are keeping the volume busy."
+msgstr "ໂວລຸມກຳລັງບໍ່ວ່າງ\nມີແອັບພລິເຄຊັນໜຶ່ງ ຫຼື ຫຼາຍກວ່ານັ້ນກຳລັງເຮັດໃຫ້ໂວລຸມບໍ່ວ່າງ."
+
+#: daemon/gvfsbackendcdda.c:298 daemon/gvfsbackendgphoto2.c:1289
+#: daemon/gvfsbackendmtp.c:920
+msgid "Cannot create gudev client"
+msgstr "ບໍ່ສາມາດສ້າງ gudev client ໄດ້"
+
+#: daemon/gvfsbackendcdda.c:312 daemon/gvfsbackendcdda.c:393
+msgid "No drive specified"
+msgstr "ບໍ່ໄດ້ລະບຸໄດຣຟ໌"
+
+#: daemon/gvfsbackendcdda.c:331
+#, c-format
+msgid "Cannot find drive %s"
+msgstr "ບໍ່ສາມາດຊອກຫາໄດຣຟ໌ %s ໄດ້"
+
+#: daemon/gvfsbackendcdda.c:344
+#, c-format
+msgid "Drive %s does not contain audio files"
+msgstr "ໄດຣຟ໌ %s ບໍ່ມີໄຟລ໌ສຽງ"
+
+#. Translator: %s is the device the disc is inserted into. 'cdda' is the name
+#. name of the backend and shouldn't be translated.
+#: daemon/gvfsbackendcdda.c:354
+#, c-format
+msgid "cdda mount on %s"
+msgstr "ຈຸດເຊື່ອມຕໍ່ cdda ເທິງ %s"
+
+#: daemon/gvfsbackendcdda.c:355 daemon/gvfsbackendcdda.c:880
+#: monitor/udisks2/gvfsudisks2volume.c:393
+#, c-format
+msgid "Audio Disc"
+msgstr "ແຜ່ນສຽງ"
+
+#: daemon/gvfsbackendcdda.c:419
+#, c-format
+msgid "File system is busy: %d open file"
+msgstr "ລະບົບໄຟລ໌ກຳລັງບໍ່ວ່າງ: ມີ %d ໄຟລ໌ເປີດຢູ່"
+
+#: daemon/gvfsbackendcdda.c:615
+#, c-format
+msgid "No such file %s on drive %s"
+msgstr "ບໍ່ມີໄຟລ໌ %s ໃນໄດຣຟ໌ %s"
+
+#. Translators: paranoia is the name of the cd audio reading library
+#: daemon/gvfsbackendcdda.c:724
+#, c-format
+msgid "Error from “paranoia” on drive %s"
+msgstr "ເກີດຂໍ້ຜິດພາດຈາກ “paranoia” ໃນໄດຣຟ໌ %s"
+
+#: daemon/gvfsbackendcdda.c:787
+#, c-format
+msgid "Error seeking in stream on drive %s"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຊອກຫາໃນສະຕຣີມຂອງໄດຣຟ໌ %s"
+
+#: daemon/gvfsbackendcdda.c:909 daemon/gvfsbackendgphoto2.c:1556
+#, c-format
+msgid "No such file"
+msgstr "ບໍ່ມີໄຟລ໌ດັ່ງກ່າວ"
+
+#: daemon/gvfsbackendcdda.c:923
+#, c-format
+msgid "The file does not exist or isn’t an audio track"
+msgstr "ໄຟລ໌ບໍ່ມີຢູ່ ຫຼື ບໍ່ແມ່ນແທຣັກສຽງ"
+
+#: daemon/gvfsbackendcdda.c:1029
+msgid "Audio CD File System Service"
+msgstr "ບໍລິການລະບົບໄຟລ໌ Audio CD"
+
+#: daemon/gvfsbackendcomputer.c:198 daemon/gvfsbackendcomputer.c:771
+msgid "Computer"
+msgstr "ຄອມພິວເຕີ"
+
+#: daemon/gvfsbackendcomputer.c:532
+msgid "File System"
+msgstr "ລະບົບໄຟລ໌"
+
+#: daemon/gvfsbackendcomputer.c:661
+msgid "Can’t open mountable file"
+msgstr "ບໍ່ສາມາດເປີດໄຟລ໌ທີ່ເຊື່ອມຕໍ່ໄດ້"
+
+#: daemon/gvfsbackendcomputer.c:858
+#, c-format
+msgid "Internal error: %s"
+msgstr "ຂໍ້ຜິດພາດພາຍໃນ: %s"
+
+#: daemon/gvfsbackendcomputer.c:890 daemon/gvfsbackendcomputer.c:1008
+msgid "Can’t mount file"
+msgstr "ບໍ່ສາມາດເຊື່ອມຕໍ່ໄຟລ໌ໄດ້"
+
+#: daemon/gvfsbackendcomputer.c:901
+msgid "No medium in the drive"
+msgstr "ບໍ່ມີສື່ໃນໄດຣຟ໌"
+
+#: daemon/gvfsbackendcomputer.c:1072
+msgid "Can’t unmount file"
+msgstr "ບໍ່ສາມາດຍົກເລີກການເຊື່ອມຕໍ່ໄຟລ໌ໄດ້"
+
+#: daemon/gvfsbackendcomputer.c:1202
+msgid "Can’t eject file"
+msgstr "ບໍ່ສາມາດເອົາໄຟລ໌ອອກໄດ້"
+
+#: daemon/gvfsbackendcomputer.c:1269 daemon/gvfsbackendcomputer.c:1276
+msgid "Can’t start drive"
+msgstr "ບໍ່ສາມາດເລີ່ມໄດຣຟ໌ໄດ້"
+
+#: daemon/gvfsbackendcomputer.c:1342 daemon/gvfsbackendcomputer.c:1349
+msgid "Can’t stop drive"
+msgstr "ບໍ່ສາມາດຢຸດໄດຣຟ໌ໄດ້"
+
+#: daemon/gvfsbackendcomputer.c:1406 daemon/gvfsbackendcomputer.c:1413
+msgid "Can’t poll file"
+msgstr "ບໍ່ສາມາດສອບຖາມໄຟລ໌ໄດ້"
+
+#. Translators: This is the name of the WebDAV share constructed as
+#. "WebDAV as <username> on <hostname>:<port>"; the ":<port>" part is
+#. the second %s and only shown if it is not the default http(s) port.
+#: daemon/gvfsbackenddav.c:412
+#, c-format
+msgid "%s on %s%s"
+msgstr "%s ເທິງ %s%s"
+
+#: daemon/gvfsbackenddav.c:767 daemon/gvfsbackenddav.c:1537
+#: daemon/gvfsbackenddav.c:2146 daemon/gvfsbackenddav.c:2310
+#: daemon/gvfsbackendhttp.c:268 daemon/gvfshttpinputstream.c:273
+#, c-format
+msgid "HTTP Error: %s"
+msgstr "ຂໍ້ຜິດພາດ HTTP: %s"
+
+#: daemon/gvfsbackenddav.c:782
+msgid "Could not parse response"
+msgstr "ບໍ່ສາມາດວິເຄາະການຕອບກັບໄດ້"
+
+#: daemon/gvfsbackenddav.c:791
+msgid "Empty response"
+msgstr "ການຕອບກັບວ່າງເປົ່າ"
+
+#: daemon/gvfsbackenddav.c:799
+msgid "Unexpected reply from server"
+msgstr "ການຕອບກັບທີ່ບໍ່ຄາດຄິດຈາກເຊີບເວີ"
+
+#: daemon/gvfsbackenddav.c:1555 daemon/gvfsbackenddav.c:2512
+#: daemon/gvfsbackenddav.c:2607 daemon/gvfsbackenddav.c:2791
+#, c-format
+msgid "Response invalid"
+msgstr "ການຕອບກັບບໍ່ຖືກຕ້ອງ"
+
+#: daemon/gvfsbackenddav.c:1776
+msgid "WebDAV share"
+msgstr "ການແບ່ງປັນ WebDAV"
+
+#. Translators: %s is the name of the WebDAV share
+#. Translators: %s is a server name
+#: daemon/gvfsbackenddav.c:1779 daemon/gvfsbackendsmbbrowse.c:334
+#, c-format
+msgid ""
+"Authentication Required\n"
+"Enter password for “%s”:"
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນ\nປ້ອນລະຫັດຜ່ານສຳລັບ “%s”:"
+
+#: daemon/gvfsbackenddav.c:1782
+msgid ""
+"Authentication Required\n"
+"Enter proxy password:"
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນ\nປ້ອນລະຫັດຜ່ານພຣັອກຊີ:"
+
+#: daemon/gvfsbackenddav.c:2154
+msgid "Could not find an enclosing directory"
+msgstr "ບໍ່ສາມາດຊອກຫາໄດເຣັກທໍຣີທີ່ຄອບຄຸມໄດ້"
+
+#: daemon/gvfsbackenddav.c:2298
+msgid "Not a WebDAV enabled share"
+msgstr "ບໍ່ແມ່ນການແບ່ງປັນທີ່ເປີດໃຊ້ WebDAV"
+
+#: daemon/gvfsbackenddav.c:2538 daemon/gvfsbackenddav.c:2651
+#: daemon/gvfsbackenddav.c:2738 daemon/gvfsbackenddav.c:2825
+msgid "Could not create request"
+msgstr "ບໍ່ສາມາດສ້າງຄຳຮ້ອງຂໍໄດ້"
+
+#: daemon/gvfsbackenddav.c:3011 daemon/gvfsbackendftp.c:1107
+#: daemon/gvfsbackendgoogle.c:3944 daemon/gvfsbackendnfs.c:1069
+#: daemon/gvfsbackendnfs.c:1092 daemon/gvfsbackendnfs.c:1118
+#: daemon/gvfsbackendnfs.c:1519 daemon/gvfsbackendsmb.c:1165
+#: daemon/gvfsbackendsmb.c:2209
+msgid "Backup file creation failed"
+msgstr "ການສ້າງໄຟລ໌ສຳຮອງລົ້ມເຫຼວ"
+
+#: daemon/gvfsbackenddav.c:3571
+msgid "Can’t move over directory"
+msgstr "ບໍ່ສາມາດຍ້າຍທັບໄດເຣັກທໍຣີໄດ້"
+
+#: daemon/gvfsbackenddnssd.c:522 daemon/gvfsbackendnetwork.c:545
+msgid "Local Network"
+msgstr "ເຄືອຂ່າຍທ້ອງຖິ່ນ"
+
+#: daemon/gvfsbackenddnssd.c:777 daemon/gvfsbackendnetwork.c:1060
+msgid "Can’t monitor file or directory."
+msgstr "ບໍ່ສາມາດຕິດຕາມໄຟລ໌ ຫຼື ໄດເຣັກທໍຣີໄດ້."
+
+#. TODO: Names, etc
+#: daemon/gvfsbackenddnssd.c:795
+msgid "Dns-SD"
+msgstr "Dns-SD"
+
+#: daemon/gvfsbackenddnssd.c:796 daemon/gvfsbackendnetwork.c:990
+#: daemon/gvfsbackendnetwork.c:1150 daemon/gvfsbackendnetwork.c:1151
+msgid "Network"
+msgstr "ເຄືອຂ່າຍ"
+
+#: daemon/gvfsbackendftp.c:561 daemon/gvfsbackendsftp.c:1191
+#: daemon/gvfsbackendsftp.c:1295 daemon/gvfsbackendsmbbrowse.c:811
+#: daemon/gvfsbackendsmb.c:583
+msgid "Password dialog cancelled"
+msgstr "ກ່ອງໂຕ້ຕອບລະຫັດຜ່ານຖືກຍົກເລີກແລ້ວ"
+
+#: daemon/gvfsbackendftp.c:791
+msgid "Insufficient permissions"
+msgstr "ສິດບໍ່ພຽງພໍ"
+
+#: daemon/gvfsbackendftp.c:1295 daemon/gvfsbackendsftp.c:5490
+#: daemon/gvfsbackendsmb.c:1809
+msgid "Invalid attribute type (uint64 expected)"
+msgstr "ປະເພດຄຸນລັກສະນະບໍ່ຖືກຕ້ອງ (ຄາດວ່າເປັນ uint64)"
+
+#: daemon/gvfsbackendgoogle.c:2217
+msgid "Can’t move file over directory"
+msgstr "ບໍ່ສາມາດຍ້າຍໄຟລ໌ທັບໄດເຣັກທໍຣີໄດ້"
+
+#: daemon/gvfsbackendgoogle.c:2259
+msgid "Error moving file/folder"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຍ້າຍໄຟລ໌/ໂຟນເດີ"
+
+#. Translators: This is the "Shared with me" folder on https://drive.google.com.
+#: daemon/gvfsbackendgoogle.c:2971 daemon/gvfsbackendonedrive.c:1263
+msgid "Shared with me"
+msgstr "ແບ່ງປັນກັບຂ້ອຍ"
+
+#. Translators: This is the "Shared drives" folder on https://drive.google.com.
+#: daemon/gvfsbackendgoogle.c:2987
+msgid "Shared drives"
+msgstr "ໄດຣຟ໌ທີ່ແບ່ງປັນ"
+
+#: daemon/gvfsbackendgoogle.c:3021 daemon/gvfsbackendgoogle.c:3599
+#: daemon/gvfsbackendgphoto2.c:1589 daemon/gvfsbackendonedrive.c:1299
+msgid "Error getting data from file"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຮັບຂໍ້ມູນຈາກໄຟລ໌"
+
+#: daemon/gvfsbackendgoogle.c:3158 daemon/gvfsbackendgoogle.c:3984
+#: daemon/gvfsbackendnfs.c:1298
+msgid "Target file is not a regular file"
+msgstr "ໄຟລ໌ເປົ້າໝາຍບໍ່ແມ່ນໄຟລ໌ທົ່ວໄປ"
+
+#: daemon/gvfsbackendgoogle.c:3584 daemon/gvfsbackendsftp.c:2390
+#: daemon/gvfsbackendsftp.c:2795 daemon/gvfsbackendsftp.c:2858
+#: daemon/gvfsbackendsftp.c:2869 daemon/gvfsbackendsftp.c:2927
+#: daemon/gvfsbackendsftp.c:3020 daemon/gvfsbackendsftp.c:3072
+#: daemon/gvfsbackendsftp.c:3127 daemon/gvfsbackendsftp.c:3206
+#: daemon/gvfsbackendsftp.c:3323 daemon/gvfsbackendsftp.c:3483
+#: daemon/gvfsbackendsftp.c:3603 daemon/gvfsbackendsftp.c:3615
+#: daemon/gvfsbackendsftp.c:3685 daemon/gvfsbackendsftp.c:3755
+#: daemon/gvfsbackendsftp.c:3813 daemon/gvfsbackendsftp.c:3833
+#: daemon/gvfsbackendsftp.c:4025 daemon/gvfsbackendsftp.c:4059
+#: daemon/gvfsbackendsftp.c:4117 daemon/gvfsbackendsftp.c:4179
+#: daemon/gvfsbackendsftp.c:4250 daemon/gvfsbackendsftp.c:4525
+#: daemon/gvfsbackendsftp.c:4596 daemon/gvfsbackendsftp.c:4731
+#: daemon/gvfsbackendsftp.c:4844 daemon/gvfsbackendsftp.c:4906
+#: daemon/gvfsbackendsftp.c:4943 daemon/gvfsbackendsftp.c:4971
+#: daemon/gvfsbackendsftp.c:5085 daemon/gvfsbackendsftp.c:5141
+#: daemon/gvfsbackendsftp.c:5182 daemon/gvfsbackendsftp.c:5218
+#: daemon/gvfsbackendsftp.c:5254 daemon/gvfsbackendsftp.c:5269
+#: daemon/gvfsbackendsftp.c:5284 daemon/gvfsbackendsftp.c:5379
+#: daemon/gvfsbackendsftp.c:5447 daemon/gvfsbackendsftp.c:5654
+#: daemon/gvfsbackendsftp.c:5691 daemon/gvfsbackendsftp.c:5809
+#: daemon/gvfsbackendsftp.c:5895 daemon/gvfsbackendsftp.c:5979
+#: daemon/gvfsbackendsftp.c:6022 daemon/gvfsbackendsftp.c:6026
+#: daemon/gvfsbackendsftp.c:6143 daemon/gvfsbackendsftp.c:6147
+#: daemon/gvfsbackendsftp.c:6398 daemon/gvfsbackendsftp.c:6621
+#: daemon/gvfsbackendsftp.c:6638 daemon/gvfsbackendsftp.c:6776
+#: daemon/gvfsbackendsftp.c:6804
+msgid "Invalid reply received"
+msgstr "ໄດ້ຮັບການຕອບກັບທີ່ບໍ່ຖືກຕ້ອງ"
+
+#: daemon/gvfsbackendgoogle.c:3590
+msgid "File is not a regular file"
+msgstr "ໄຟລ໌ບໍ່ແມ່ນໄຟລ໌ທົ່ວໄປ"
+
+#: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendmtp.c:2689
+#: daemon/gvfsbackendmtp.c:2803 daemon/gvfsbackendnfs.c:802
+#: daemon/gvfsbackendnfs.c:1288 daemon/gvfsbackendonedrive.c:1930
+msgid "Target file is a directory"
+msgstr "ໄຟລ໌ເປົ້າໝາຍເປັນໄດເຣັກທໍຣີ"
+
+#: daemon/gvfsbackendgoogle.c:4169 daemon/gvfsbackendgphoto2.c:3050
+msgid "Error writing file"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຂຽນໄຟລ໌"
+
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:479
+#, c-format
+msgid "%s: %d: Directory or file exists"
+msgstr "%s: %d: ໄດເຣັກທໍຣີ ຫຼື ໄຟລ໌ມີຢູ່ແລ້ວ"
+
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:486
+#, c-format
+msgid "%s: %d: No such file or directory"
+msgstr "%s: %d: ບໍ່ມີໄຟລ໌ ຫຼື ໄດເຣັກທໍຣີດັ່ງກ່າວ"
+
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:492
+#, c-format
+msgid "%s: %d: Invalid filename"
+msgstr "%s: %d: ຊື່ໄຟລ໌ບໍ່ຖືກຕ້ອງ"
+
+#. Translator: %s represents a more specific error message and %d the specific error code
+#: daemon/gvfsbackendgphoto2.c:498
+#, c-format
+msgid "%s: %d: Not Supported"
+msgstr "%s: %d: ບໍ່ຮອງຮັບ"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: daemon/gvfsbackendgphoto2.c:687
+#, c-format
+msgid "Digital Camera (%s)"
+msgstr "ກ້ອງດິຈິຕອນ (%s)"
+
+#: daemon/gvfsbackendgphoto2.c:1256 daemon/gvfsbackendmtp.c:891
+msgid "Couldn’t find matching udev device."
+msgstr "ບໍ່ສາມາດຊອກຫາອຸປະກອນ udev ທີ່ກົງກັນໄດ້."
+
+#: daemon/gvfsbackendgphoto2.c:1319
+msgid "Cannot create gphoto2 context"
+msgstr "ບໍ່ສາມາດສ້າງ gphoto2 context ໄດ້"
+
+#: daemon/gvfsbackendgphoto2.c:1328
+msgid "Error creating camera"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການສ້າງກ້ອງ"
+
+#: daemon/gvfsbackendgphoto2.c:1340 daemon/gvfsbackendgphoto2.c:1349
+msgid "Error loading device information"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດຂໍ້ມູນອຸປະກອນ"
+
+#: daemon/gvfsbackendgphoto2.c:1360
+msgid "Error looking up device information"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຊອກຫາຂໍ້ມູນອຸປະກອນ"
+
+#: daemon/gvfsbackendgphoto2.c:1369
+msgid "Error getting device information"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຮັບຂໍ້ມູນອຸປະກອນ"
+
+#: daemon/gvfsbackendgphoto2.c:1383
+msgid "Error setting up camera communications port"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຕັ້ງຄ່າພອດສື່ສານຂອງກ້ອງ"
+
+#: daemon/gvfsbackendgphoto2.c:1393
+msgid "Error initializing camera"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການເລີ່ມຕົ້ນກ້ອງ"
+
+#. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
+#. backend and shouldn't be translated.
+#: daemon/gvfsbackendgphoto2.c:1404
+#, c-format
+msgid "gphoto2 mount on %s"
+msgstr "ຈຸດເຊື່ອມຕໍ່ gphoto2 ເທິງ %s"
+
+#: daemon/gvfsbackendgphoto2.c:1502
+msgid "No camera specified"
+msgstr "ບໍ່ໄດ້ລະບຸກ້ອງ"
+
+#: daemon/gvfsbackendgphoto2.c:1564 daemon/gvfsbackendgphoto2.c:3299
+msgid "Error creating file object"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການສ້າງວັດຖຸໄຟລ໌"
+
+#: daemon/gvfsbackendgphoto2.c:1579 daemon/gvfsbackendgphoto2.c:3330
+msgid "Error getting file"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຮັບໄຟລ໌"
+
+#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2468
+#, c-format
+msgid "Malformed icon identifier “%s”"
+msgstr "ຕົວລະບຸໄອຄອນ “%s” ມີຮູບແບບບໍ່ຖືກຕ້ອງ"
+
+#: daemon/gvfsbackendgphoto2.c:1723 daemon/gvfsbackendgphoto2.c:2913
+#, c-format
+msgid "Error seeking in stream on camera %s"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຊອກຫາໃນສະຕຣີມຂອງກ້ອງ %s"
+
+#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3383
+#: daemon/gvfsbackendsmbbrowse.c:1234
+msgid "Not a directory"
+msgstr "ບໍ່ແມ່ນໄດເຣັກທໍຣີ"
+
+#: daemon/gvfsbackendgphoto2.c:1896
+msgid "Failed to get folder list"
+msgstr "ການຮັບລາຍການໂຟນເດີລົ້ມເຫຼວ"
+
+#: daemon/gvfsbackendgphoto2.c:1961
+msgid "Failed to get file list"
+msgstr "ການຮັບລາຍການໄຟລ໌ລົ້ມເຫຼວ"
+
+#: daemon/gvfsbackendgphoto2.c:2250
+msgid "Error creating directory"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການສ້າງໄດເຣັກທໍຣີ"
+
+#: daemon/gvfsbackendgphoto2.c:2463
+msgid "Name already exists"
+msgstr "ຊື່ມີຢູ່ແລ້ວ"
+
+#: daemon/gvfsbackendgphoto2.c:2474 daemon/gvfsbackendgphoto2.c:3142
+msgid "New name too long"
+msgstr "ຊື່ໃໝ່ຍາວເກີນໄປ"
+
+#: daemon/gvfsbackendgphoto2.c:2484 daemon/gvfsbackendgphoto2.c:3153
+msgid "Error renaming directory"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການປ່ຽນຊື່ໄດເຣັກທໍຣີ"
+
+#: daemon/gvfsbackendgphoto2.c:2497 daemon/gvfsbackendgphoto2.c:3166
+msgid "Error renaming file"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການປ່ຽນຊື່ໄຟລ໌"
+
+#: daemon/gvfsbackendgphoto2.c:2561
+#, c-format
+msgid "Directory “%s” is not empty"
+msgstr "ໄດເຣັກທໍຣີ “%s” ບໍ່ວ່າງ"
+
+#: daemon/gvfsbackendgphoto2.c:2572
+msgid "Error deleting directory"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການລຶບໄດເຣັກທໍຣີ"
+
+#: daemon/gvfsbackendgphoto2.c:2598 daemon/gvfsbackendgphoto2.c:3351
+msgid "Error deleting file"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການລຶບໄຟລ໌"
+
+#: daemon/gvfsbackendgphoto2.c:2651
+msgid "Can’t write to directory"
+msgstr "ບໍ່ສາມາດຂຽນໃສ່ໄດເຣັກທໍຣີໄດ້"
+
+#: daemon/gvfsbackendgphoto2.c:2698
+msgid "Cannot allocate new file to append to"
+msgstr "ບໍ່ສາມາດຈັດສັນໄຟລ໌ໃໝ່ເພື່ອຕໍ່ທ້າຍໄດ້"
+
+#: daemon/gvfsbackendgphoto2.c:2713
+msgid "Cannot read file to append to"
+msgstr "ບໍ່ສາມາດອ່ານໄຟລ໌ເພື່ອຕໍ່ທ້າຍໄດ້"
+
+#: daemon/gvfsbackendgphoto2.c:2724
+msgid "Cannot get data of file to append to"
+msgstr "ບໍ່ສາມາດຮັບຂໍ້ມູນຂອງໄຟລ໌ເພື່ອຕໍ່ທ້າຍໄດ້"
+
+#: daemon/gvfsbackendgphoto2.c:3098
+msgid "Not supported (not same directory)"
+msgstr "ບໍ່ຮອງຮັບ (ບໍ່ແມ່ນໄດເຣັກທໍຣີດຽວກັນ)"
+
+#: daemon/gvfsbackendgphoto2.c:3110
+msgid ""
+"Not supported (the source is a directory, the destination is a directory too)"
+msgstr "ບໍ່ຮອງຮັບ (ຕົ້ນທາງເປັນໄດເຣັກທໍຣີ, ປາຍທາງກໍເປັນໄດເຣັກທໍຣີ)"
+
+#: daemon/gvfsbackendgphoto2.c:3118
+msgid ""
+"Not supported (the source is a directory, but the destination is an existing "
+"file)"
+msgstr "ບໍ່ຮອງຮັບ (ຕົ້ນທາງເປັນໄດເຣັກທໍຣີ, ແຕ່ປາຍທາງເປັນໄຟລ໌ທີ່ມີຢູ່ແລ້ວ)"
+
+#: daemon/gvfsbackendgphoto2.c:3130
+msgid ""
+"Not supported (the source is a file, but the destination is a directory)"
+msgstr "ບໍ່ຮອງຮັບ (ຕົ້ນທາງເປັນໄຟລ໌, ແຕ່ປາຍທາງເປັນໄດເຣັກທໍຣີ)"
+
+#: daemon/gvfsbackendhttp.c:263
+#, c-format
+msgid "HTTP Client Error: %s"
+msgstr "ຂໍ້ຜິດພາດຂອງ HTTP Client: %s"
+
+#: daemon/gvfsbackendlocaltest.c:862
+msgid "Directory notification not supported"
+msgstr "ການແຈ້ງເຕືອນໄດເຣັກທໍຣີບໍ່ຮອງຮັບ"
+
+#. Translators: This is shown as the name for MTP devices
+#. *              without StorageDescription.
+#. *              The %X is the formatted storage ID.
+#: daemon/gvfsbackendmtp.c:197
+#, c-format
+msgid "Storage (%X)"
+msgstr "ບ່ອນເກັບຂໍ້ມູນ (%X)"
+
+#: daemon/gvfsbackendmtp.c:595
+msgid "Unknown error."
+msgstr "ຂໍ້ຜິດພາດທີ່ບໍ່ຮູ້ຈັກ."
+
+#: daemon/gvfsbackendmtp.c:601
+#, c-format
+msgid "libmtp error: %s"
+msgstr "ຂໍ້ຜິດພາດ libmtp: %s"
+
+#: daemon/gvfsbackendmtp.c:912
+msgid "No device specified"
+msgstr "ບໍ່ໄດ້ລະບຸອຸປະກອນ"
+
+#: daemon/gvfsbackendmtp.c:1058
+msgid "No MTP devices found"
+msgstr "ບໍ່ພົບອຸປະກອນ MTP"
+
+#: daemon/gvfsbackendmtp.c:1063
+msgid "Unable to connect to MTP device"
+msgstr "ບໍ່ສາມາດເຊື່ອມຕໍ່ກັບອຸປະກອນ MTP ໄດ້"
+
+#: daemon/gvfsbackendmtp.c:1068
+msgid "Unable to allocate memory while detecting MTP devices"
+msgstr "ບໍ່ສາມາດຈັດສັນໜ່ວຍຄວາມຈຳໃນຂະນະກວດຫາອຸປະກອນ MTP ໄດ້"
+
+#: daemon/gvfsbackendmtp.c:1074
+msgid "Generic libmtp error"
+msgstr "ຂໍ້ຜິດພາດທົ່ວໄປຂອງ libmtp"
+
+#: daemon/gvfsbackendmtp.c:1087
+#, c-format
+msgid "Unable to open MTP device “%03u,%03u”"
+msgstr "ບໍ່ສາມາດເປີດອຸປະກອນ MTP “%03u,%03u” ໄດ້"
+
+#: daemon/gvfsbackendmtp.c:1104
+msgid "Device not found"
+msgstr "ບໍ່ພົບອຸປະກອນ"
+
+#: daemon/gvfsbackendmtp.c:1411 daemon/gvfsbackendmtp.c:1560
+#: daemon/gvfsbackendmtp.c:1612 daemon/gvfsbackendwsdd.c:263
+#: daemon/gvfsbackendwsdd.c:321
+msgid "File not found"
+msgstr "ບໍ່ພົບໄຟລ໌"
+
+#: daemon/gvfsbackendmtp.c:1682
+msgid "Target is a directory"
+msgstr "ເປົ້າໝາຍເປັນໄດເຣັກທໍຣີ"
+
+#: daemon/gvfsbackendmtp.c:1687
+msgid "Can’t merge directories"
+msgstr "ບໍ່ສາມາດຮວມໄດເຣັກທໍຣີໄດ້"
+
+#: daemon/gvfsbackendmtp.c:1733
+msgid "Cannot make directory in this location"
+msgstr "ບໍ່ສາມາດສ້າງໄດເຣັກທໍຣີໃນທີ່ຢູ່ນີ້ໄດ້"
+
+#: daemon/gvfsbackendmtp.c:1810 daemon/gvfsbackendmtp.c:2233
+#: daemon/gvfsbackendmtp.c:2296 daemon/gvfsbackendmtp.c:2363
+#: daemon/gvfsbackendmtp.c:2786 daemon/gvfsbackendmtp.c:3051
+#: daemon/gvfsbackendmtp.c:3218 daemon/gvfsbackendsmbbrowse.c:979
+msgid "Not a regular file"
+msgstr "ບໍ່ແມ່ນໄຟລ໌ທົ່ວໄປ"
+
+#: daemon/gvfsbackendmtp.c:2105 daemon/gvfsbackendmtp.c:2637
+#: daemon/gvfsbackendmtp.c:3035 daemon/gvfsbackendmtp.c:3202
+msgid "Cannot write to this location"
+msgstr "ບໍ່ສາມາດຂຽນໃສ່ທີ່ຢູ່ນີ້ໄດ້"
+
+#: daemon/gvfsbackendmtp.c:2450
+#, c-format
+msgid "No thumbnail for entity “%s”"
+msgstr "ບໍ່ມີຮູບຕົວຢ່າງສຳລັບລາຍການ “%s”"
+
+#: daemon/gvfsbackendnetwork.c:240
+msgid "File Sharing"
+msgstr "ການແບ່ງປັນໄຟລ໌"
+
+#: daemon/gvfsbackendnetwork.c:245
+msgid "Remote Login"
+msgstr "ເຂົ້າສູ່ລະບົບໄລຍະໄກ"
+
+#: daemon/gvfsbackendnetwork.c:499 daemon/gvfsbackendsmbbrowse.c:696
+msgid "Windows Network"
+msgstr "ເຄືອຂ່າຍ Windows"
+
+#: daemon/gvfsbackendnetwork.c:625
+msgid "WSDD Network"
+msgstr "ເຄືອຂ່າຍ WSDD"
+
+#. Translators: this is the friendly name of the 'network://' backend that
+#. * shows computers in your local network.
+#: daemon/gvfsbackendnetwork.c:1245
+msgid "Network Location Monitor"
+msgstr "ຕົວຕິດຕາມທີ່ຢູ່ເຄືອຂ່າຍ"
+
+#: daemon/gvfsbackendnfs.c:249
+msgid "Mount point does not exist"
+msgstr "ຈຸດເຊື່ອມຕໍ່ບໍ່ມີຢູ່"
+
+#: daemon/gvfsbackendnfs.c:273
+msgid ""
+"Permission denied: Perhaps this host is disallowed or a privileged port is "
+"needed"
+msgstr "ການອະນຸຍາດຖືກປະຕິເສດ: ບາງທີໂຮສຕ໌ນີ້ອາດບໍ່ໄດ້ຮັບອະນຸຍາດ ຫຼື ຕ້ອງການພອດທີ່ມີສິດພິເສດ"
+
+#: daemon/gvfsbackendnfs.c:1184 daemon/gvfsbackendnfs.c:1207
+#: daemon/gvfsbackendnfs.c:1255 daemon/gvfsbackendsftp.c:3880
+#: daemon/gvfsbackendsftp.c:6050
+msgid "Unable to create temporary file"
+msgstr "ບໍ່ສາມາດສ້າງໄຟລ໌ຊົ່ວຄາວໄດ້"
+
+#: daemon/gvfsbackendnfs.c:2509
+msgid "Invalid attribute type"
+msgstr "ປະເພດຄຸນລັກສະນະບໍ່ຖືກຕ້ອງ"
+
+#: daemon/gvfsbackendonedrive.c:1255
+msgid "My Files"
+msgstr "ໄຟລ໌ຂອງຂ້ອຍ"
+
+#: daemon/gvfsbackendrecent.c:270
+msgid "The recent folder may not be deleted"
+msgstr "ໂຟນເດີຫຼ້າສຸດບໍ່ສາມາດລຶບໄດ້"
+
+#. Translators: this is the display name of the backend
+#. translators: This is the name of the backend
+#: daemon/gvfsbackendrecent.c:693 daemon/gvfsbackendrecent.c:814
+msgid "Recent"
+msgstr "ຫຼ້າສຸດ"
+
+#: daemon/gvfsbackendsftp.c:337 daemon/gvfsbackendsftp.c:720
+msgid "Connection failed"
+msgstr "ການເຊື່ອມຕໍ່ລົ້ມເຫຼວ"
+
+#: daemon/gvfsbackendsftp.c:353
+msgid "Hostname not known"
+msgstr "ບໍ່ຮູ້ຈັກຊື່ໂຮສຕ໌"
+
+#: daemon/gvfsbackendsftp.c:360
+msgid "No route to host"
+msgstr "ບໍ່ມີເສັ້ນທາງໄປຫາໂຮສຕ໌"
+
+#: daemon/gvfsbackendsftp.c:368
+msgid "Connection refused by server"
+msgstr "ການເຊື່ອມຕໍ່ຖືກປະຕິເສດໂດຍເຊີບເວີ"
+
+#: daemon/gvfsbackendsftp.c:375
+msgid "Host key verification failed"
+msgstr "ການຢືນຢັນຄີຂອງໂຮສຕ໌ລົ້ມເຫຼວ"
+
+#: daemon/gvfsbackendsftp.c:382
+msgid "Too many authentication failures"
+msgstr "ການຢືນຢັນຕົວຕົນລົ້ມເຫຼວຫຼາຍຄັ້ງເກີນໄປ"
+
+#: daemon/gvfsbackendsftp.c:564
+msgid "Unable to spawn SSH program"
+msgstr "ບໍ່ສາມາດເປີດໂປຣແກຣມ SSH ໄດ້"
+
+#: daemon/gvfsbackendsftp.c:580
+#, c-format
+msgid "Unable to spawn SSH program: %s"
+msgstr "ບໍ່ສາມາດເປີດໂປຣແກຣມ SSH ໄດ້: %s"
+
+#: daemon/gvfsbackendsftp.c:682 daemon/gvfsbackendsftp.c:1058
+msgid "Timed out when logging in"
+msgstr "ໝົດເວລາໃນການເຂົ້າສູ່ລະບົບ"
+
+#: daemon/gvfsbackendsftp.c:934
+msgid "Log In Anyway"
+msgstr "ເຂົ້າສູ່ລະບົບຕໍ່ໄປ"
+
+#: daemon/gvfsbackendsftp.c:934
+msgid "Cancel Login"
+msgstr "ຍົກເລີກການເຂົ້າສູ່ລະບົບ"
+
+#: daemon/gvfsbackendsftp.c:949
+msgid "Login dialog cancelled"
+msgstr "ກ່ອງໂຕ້ຕອບການເຂົ້າສູ່ລະບົບຖືກຍົກເລີກແລ້ວ"
+
+#: daemon/gvfsbackendsftp.c:968
+msgid "Can’t send host identity confirmation"
+msgstr "ບໍ່ສາມາດສົ່ງການຢືນຢັນຕົວຕົນຂອງໂຮສຕ໌ໄດ້"
+
+#. Translators: the first %s is the username, the second the host name
+#: daemon/gvfsbackendsftp.c:1164
+#, c-format
+msgid ""
+"Authentication Required\n"
+"Enter passphrase for secure key for “%s” on “%s”:"
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນ\nປ້ອນວະລີຜ່ານສຳລັບຄີທີ່ປອດໄພຂອງ “%s” ເທິງ “%s”:"
+
+#. Translators: %s is the hostname
+#: daemon/gvfsbackendsftp.c:1171
+#, c-format
+msgid ""
+"Authentication Required\n"
+"Enter passphrase for secure key for “%s”:"
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນ\nປ້ອນວະລີຜ່ານສຳລັບຄີທີ່ປອດໄພຂອງ “%s”:"
+
+#: daemon/gvfsbackendsftp.c:1263 daemon/gvfsbackendsftp.c:1310
+msgid "Can’t send password"
+msgstr "ບໍ່ສາມາດສົ່ງລະຫັດຜ່ານໄດ້"
+
+#. Translators: the first %s is the username, the second the host name
+#: daemon/gvfsbackendsftp.c:1278
+#, c-format
+msgid "Enter verification code for %s on %s"
+msgstr "ປ້ອນລະຫັດຢືນຢັນສຳລັບ %s ເທິງ %s"
+
+#. Translators: %s is the hostname
+#: daemon/gvfsbackendsftp.c:1282
+#, c-format
+msgid "Enter verification code for %s"
+msgstr "ປ້ອນລະຫັດຢືນຢັນສຳລັບ %s"
+
+#. Translators: the first %s is the hostname, the second the key fingerprint
+#: daemon/gvfsbackendsftp.c:1329
+#, c-format
+msgid ""
+"Identity Verification Failed\n"
+"Verifying the identity of “%s” failed, this happens when you log in to a "
+"computer the first time.\n"
+"\n"
+"The identity sent by the remote computer is “%s”. If you want to be "
+"absolutely sure it is safe to continue, contact the system administrator."
+msgstr "ການຢືນຢັນຕົວຕົນລົ້ມເຫຼວ\nການຢືນຢັນຕົວຕົນຂອງ “%s” ລົ້ມເຫຼວ, ສິ່ງນີ້ຈະເກີດຂຶ້ນເມື່ອທ່ານເຂົ້າສູ່ລະບົບຄອມພິວເຕີເປັນຄັ້ງທຳອິດ.\n\nຕົວຕົນທີ່ສົ່ງມາຈາກຄອມພິວເຕີໄລຍະໄກແມ່ນ “%s”. ຫາກທ່ານຕ້ອງການຄວາມແນ່ໃຈຢ່າງແທ້ຈິງວ່າມັນປອດໄພທີ່ຈະດຳເນີນການຕໍ່, ກະລຸນາຕິດຕໍ່ຜູ້ເບິ່ງແຍງລະບົບ."
+
+#. Translators: the first %s is the hostname, the second is an ip address
+#: daemon/gvfsbackendsftp.c:1358
+#, c-format
+msgid ""
+"Identity Verification Failed\n"
+"The host key for “%s” differs from the key for the IP address “%s”\n"
+"If you want to be absolutely sure it is safe to continue, contact the system "
+"administrator."
+msgstr "ການຢືນຢັນຕົວຕົນລົ້ມເຫຼວ\nຄີຂອງໂຮສຕ໌ສຳລັບ “%s” ແຕກຕ່າງຈາກຄີຂອງທີ່ຢູ່ IP “%s”\nຫາກທ່ານຕ້ອງການຄວາມແນ່ໃຈຢ່າງແທ້ຈິງວ່າມັນປອດໄພທີ່ຈະດຳເນີນການຕໍ່, ກະລຸນາຕິດຕໍ່ຜູ້ເບິ່ງແຍງລະບົບ."
+
+#: daemon/gvfsbackendsftp.c:1450
+#, c-format
+msgid "The connection is closed (the underlying SSH process exited)"
+msgstr "ການເຊື່ອມຕໍ່ຖືກປິດແລ້ວ (ໂປຣເຊສ SSH ທີ່ຢູ່ເບື້ອງຫຼັງໄດ້ອອກໄປແລ້ວ)"
+
+#: daemon/gvfsbackendsftp.c:1451
+#, c-format
+msgid "Internal error: Unknown Error"
+msgstr "ຂໍ້ຜິດພາດພາຍໃນ: ຂໍ້ຜິດພາດທີ່ບໍ່ຮູ້ຈັກ"
+
+#: daemon/gvfsbackendsftp.c:1970 daemon/gvfsbackendsftp.c:1997
+msgid "Protocol error"
+msgstr "ຂໍ້ຜິດພາດຂອງໂປຣໂຕຄໍ"
+
+#: daemon/gvfsbackendsftp.c:2112
+msgid "Unable to find supported SSH command"
+msgstr "ບໍ່ສາມາດຊອກຫາຄຳສັ່ງ SSH ທີ່ຮອງຮັບໄດ້"
+
+#: daemon/gvfsbackendsftp.c:2219
+msgid "Unknown reason"
+msgstr "ເຫດຜົນທີ່ບໍ່ຮູ້ຈັກ"
+
+#: daemon/gvfsbackendsftp.c:2652 daemon/gvfsbackendsmb.c:1453
+#: daemon/gvfsdaemonutils.c:140
+msgid " (invalid encoding)"
+msgstr " (ການເຂົ້າລະຫັດບໍ່ຖືກຕ້ອງ)"
+
+#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
+#: daemon/gvfsbackendsftp.c:2664 daemon/gvfsftpdircache.c:478
+#, c-format
+msgid "/ on %s"
+msgstr "/ ເທິງ %s"
+
+#: daemon/gvfsbackendsftp.c:2737
+msgid "Failure"
+msgstr "ລົ້ມເຫຼວ"
+
+#: daemon/gvfsbackendsftp.c:3149
+#, c-format
+msgid "Error creating backup file: %s"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການສ້າງໄຟລ໌ສຳຮອງ: %s"
+
+#: daemon/gvfsbackendsftp.c:5415
+msgid "Value out of range, sftp only supports 32bit timestamps"
+msgstr "ຄ່ານອກຂອບເຂດ, sftp ຮອງຮັບສະແຕມເວລາແບບ 32 ບິດເທົ່ານັ້ນ"
+
+#: daemon/gvfsbackendsmbbrowse.c:644 daemon/gvfsbackendsmbbrowse.c:678
+#: daemon/gvfsbackendsmb.c:442 daemon/gvfsbackendsmb.c:469
+#: daemon/gvfsbackendsmb.c:664
+#, c-format
+msgid "Internal Error (%s)"
+msgstr "ຂໍ້ຜິດພາດພາຍໃນ (%s)"
+
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#: daemon/gvfsbackendsmbbrowse.c:705
+#, c-format
+msgid "Windows shares on %s"
+msgstr "ການແບ່ງປັນຂອງ Windows ເທິງ %s"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: daemon/gvfsbackendsmbbrowse.c:816
+#, c-format
+msgid "Failed to retrieve share list from server: %s"
+msgstr "ການດຶງລາຍການແບ່ງປັນຈາກເຊີບເວີລົ້ມເຫຼວ: %s"
+
+#: daemon/gvfsbackendsmbbrowse.c:1338
+msgid "Windows Network File System Service"
+msgstr "ບໍລິການລະບົບໄຟລ໌ເຄືອຂ່າຍ Windows"
+
+#. Translators: First %s is a share name, second is a server name
+#: daemon/gvfsbackendsmb.c:262
+#, c-format
+msgid ""
+"Authentication Required\n"
+"Enter password for share “%s” on “%s”:"
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນ\nປ້ອນລະຫັດຜ່ານສຳລັບການແບ່ງປັນ “%s” ເທິງ “%s”:"
+
+#. Translators: First %s is a share name, second is a server name
+#: daemon/gvfsbackendsmb.c:268
+#, c-format
+msgid ""
+"Authentication Required\n"
+"Enter user and password for share “%s” on “%s”:"
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນ\nປ້ອນຊື່ຜູ້ໃຊ້ ແລະ ລະຫັດຜ່ານສຳລັບການແບ່ງປັນ “%s” ເທິງ “%s”:"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: daemon/gvfsbackendsmb.c:588
+#, c-format
+msgid "Failed to mount Windows share: %s"
+msgstr "ການເຊື່ອມຕໍ່ການແບ່ງປັນຂອງ Windows ລົ້ມເຫຼວ: %s"
+
+#: daemon/gvfsbackendsmb.c:1382
+#, c-format
+msgid "Backup file creation failed: %s"
+msgstr "ການສ້າງໄຟລ໌ສຳຮອງລົ້ມເຫຼວ: %s"
+
+#: daemon/gvfsbackendsmb.c:2017
+msgid "Can’t rename file, filename already exists"
+msgstr "ບໍ່ສາມາດປ່ຽນຊື່ໄຟລ໌ໄດ້, ຊື່ໄຟລ໌ມີຢູ່ແລ້ວ"
+
+#: daemon/gvfsbackendsmb.c:2069
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການລຶບໄຟລ໌: %s"
+
+#: daemon/gvfsbackendsmb.c:2156
+#, c-format
+msgid "Error moving file: %s"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຍ້າຍໄຟລ໌: %s"
+
+#: daemon/gvfsbackendsmb.c:2229
+#, c-format
+msgid "Error removing target file: %s"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການລຶບໄຟລ໌ເປົ້າໝາຍ: %s"
+
+#: daemon/gvfsbackendsmb.c:2257
+msgid "Can’t recursively move directory"
+msgstr "ບໍ່ສາມາດຍ້າຍໄດເຣັກທໍຣີແບບຊ້ຳຊ້ອນໄດ້"
+
+#: daemon/gvfsbackendsmb.c:2316
+msgid "Windows Shares File System Service"
+msgstr "ບໍລິການລະບົບໄຟລ໌ການແບ່ງປັນຂອງ Windows"
+
+#: daemon/gvfsbackendtrash.c:490 daemon/gvfsbackendtrash.c:544
+msgid "The trash folder may not be deleted"
+msgstr "ໂຟນເດີຖັງຂີ້ເຫຍື້ອບໍ່ສາມາດລຶບໄດ້"
+
+#: daemon/gvfsbackendtrash.c:507 daemon/gvfsbackendtrash.c:558
+msgid "Items in the trash may not be modified"
+msgstr "ລາຍການໃນຖັງຂີ້ເຫຍື້ອບໍ່ສາມາດແກ້ໄຂໄດ້"
+
+#. Translators: this is the display name of the backend
+#. translators: This is the name of the backend
+#: daemon/gvfsbackendtrash.c:879 daemon/gvfsbackendtrash.c:999
+msgid "Trash"
+msgstr "ຖັງຂີ້ເຫຍື້ອ"
+
+#: daemon/gvfsbackendwsdd.c:328
+msgid "File is not a directory"
+msgstr "ໄຟລ໌ບໍ່ແມ່ນໄດເຣັກທໍຣີ"
+
+#: daemon/gvfsbackendwsdd.c:380
+msgid "WS-Discovery Network"
+msgstr "ເຄືອຂ່າຍ WS-Discovery"
+
+#: daemon/gvfschannel.c:336
+msgid "Channel blocked"
+msgstr "ຊ່ອງສັນຍານຖືກບລັອກ"
+
+#: daemon/gvfsdaemonutils.c:251
+msgid "The signing certificate authority is not known."
+msgstr "ບໍ່ຮູ້ຈັກອົງກອນອອກໃບຮັບຮອງທີ່ລົງລາຍເຊັນ."
+
+#: daemon/gvfsdaemonutils.c:253
+msgid "The certificate does not match the identity of the site."
+msgstr "ໃບຮັບຮອງບໍ່ກົງກັບຕົວຕົນຂອງເວັບໄຊ."
+
+#: daemon/gvfsdaemonutils.c:255
+msgid "The certificate’s activation time is in the future."
+msgstr "ເວລາເປີດໃຊ້ງານຂອງໃບຮັບຮອງຢູ່ໃນອະນາຄົດ."
+
+#: daemon/gvfsdaemonutils.c:257
+msgid "The certificate has expired."
+msgstr "ໃບຮັບຮອງໝົດອາຍຸແລ້ວ."
+
+#: daemon/gvfsdaemonutils.c:259
+msgid "The certificate has been revoked."
+msgstr "ໃບຮັບຮອງຖືກຖອນຄືນແລ້ວ."
+
+#: daemon/gvfsdaemonutils.c:261
+msgid "The certificate’s algorithm is considered insecure."
+msgstr "ອັນກໍຣິທຶມຂອງໃບຮັບຮອງຖືວ່າບໍ່ປອດໄພ."
+
+#: daemon/gvfsdaemonutils.c:263
+msgid "Error occurred when validating the certificate."
+msgstr "ເກີດຂໍ້ຜິດພາດໃນຂະນະກວດສອບຄວາມຖືກຕ້ອງຂອງໃບຮັບຮອງ."
+
+#: daemon/gvfsdaemonutils.c:326
+msgid "Yes"
+msgstr "ແມ່ນ"
+
+#: daemon/gvfsdaemonutils.c:326
+msgid "No"
+msgstr "ບໍ່"
+
+#. Translators: The first %s is the reason why verification failed, the second a certificate
+#: daemon/gvfsdaemonutils.c:338
+#, c-format
+msgid ""
+"Identity Verification Failed\n"
+"%s\n"
+"\n"
+"%s\n"
+"\n"
+"Are you really sure you would like to continue?"
+msgstr "ການຢືນຢັນຕົວຕົນລົ້ມເຫຼວ\n%s\n\n%s\n\nທ່ານແນ່ໃຈແທ້ບໍ່ວ່າຕ້ອງການດຳເນີນການຕໍ່ໄປ?"
+
+#: daemon/gvfsftpconnection.c:211
+msgid "Unexpected end of stream"
+msgstr "ການສິ້ນສຸດຂອງສະຕຣີມທີ່ບໍ່ຄາດຄິດ"
+
+#: daemon/gvfsftpconnection.c:227 daemon/gvfsftpconnection.c:240
+#: daemon/gvfsftptask.c:450 daemon/gvfsftptask.c:886
+msgid "Invalid reply"
+msgstr "ການຕອບກັບບໍ່ຖືກຕ້ອງ"
+
+#: daemon/gvfsftpconnection.c:478
+msgid ""
+"Failed to create active FTP connection. Maybe your router does not support "
+"this?"
+msgstr "ການສ້າງການເຊື່ອມຕໍ່ FTP ແບບ active ລົ້ມເຫຼວ. ບາງທີເຣົາເຕີຂອງທ່ານອາດບໍ່ຮອງຮັບສິ່ງນີ້?"
+
+#: daemon/gvfsftpconnection.c:485
+msgid "Failed to create active FTP connection."
+msgstr "ການສ້າງການເຊື່ອມຕໍ່ FTP ແບບ active ລົ້ມເຫຼວ."
+
+#: daemon/gvfsftpfile.c:170
+msgid "Filename contains invalid characters."
+msgstr "ຊື່ໄຟລ໌ມີຕົວອັກສອນທີ່ບໍ່ຖືກຕ້ອງ."
+
+#: daemon/gvfsftptask.c:291
+msgid "The FTP server is busy. Try again later"
+msgstr "ເຊີບເວີ FTP ກຳລັງບໍ່ວ່າງ. ກະລຸນາລອງໃໝ່ອີກຄັ້ງ"
+
+#: daemon/gvfsftptask.c:297
+msgid "Backend currently unmounting"
+msgstr "Backend ກຳລັງຍົກເລີກການເຊື່ອມຕໍ່"
+
+#: daemon/gvfsftptask.c:394
+msgid "Accounts are unsupported"
+msgstr "ບັນຊີບໍ່ຮອງຮັບ"
+
+#: daemon/gvfsftptask.c:402
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "ບໍ່ສາມາດເປີດການເຊື່ອມຕໍ່ຂໍ້ມູນໄດ້. ບາງທີໄຟວໍຂອງທ່ານອາດປ້ອງກັນສິ່ງນີ້?"
+
+#: daemon/gvfsftptask.c:406
+msgid "Data connection closed"
+msgstr "ການເຊື່ອມຕໍ່ຂໍ້ມູນຖືກປິດແລ້ວ"
+
+#: daemon/gvfsftptask.c:413 daemon/gvfsftptask.c:417
+msgid "Operation failed"
+msgstr "ການດຳເນີນການລົ້ມເຫຼວ"
+
+#: daemon/gvfsftptask.c:422
+msgid "No space left on server"
+msgstr "ບໍ່ມີພື້ນທີ່ເຫຼືອໃນເຊີບເວີ"
+
+#: daemon/gvfsftptask.c:434
+msgid "Unsupported network protocol"
+msgstr "ໂປຣໂຕຄໍເຄືອຂ່າຍບໍ່ຮອງຮັບ"
+
+#: daemon/gvfsftptask.c:442
+msgid "Page type unknown"
+msgstr "ປະເພດໜ້າບໍ່ຮູ້ຈັກ"
+
+#: daemon/gvfsftptask.c:446
+msgid "Invalid filename"
+msgstr "ຊື່ໄຟລ໌ບໍ່ຖືກຕ້ອງ"
+
+#: daemon/gvfshttpinputstream.c:289
+msgid "Error seeking in stream"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການຊອກຫາໃນສະຕຣີມ"
+
+#: daemon/gvfsjobcopy.c:147 daemon/gvfsjobdelete.c:126
+#: daemon/gvfsjobmakedirectory.c:126 daemon/gvfsjobmakesymlink.c:130
+#: daemon/gvfsjobmove.c:147 daemon/gvfsjobopenforwrite.c:250
+#: daemon/gvfsjobpush.c:152 daemon/gvfsjobsetattribute.c:152
+#: daemon/gvfsjobsetdisplayname.c:130 daemon/gvfsjobtrash.c:125
+msgid "Filesystem is read-only"
+msgstr "ລະບົບໄຟລ໌ເປັນແບບອ່ານຢ່າງດຽວ"
+
+#: daemon/gvfsjobmakesymlink.c:111
+msgid "Symlinks not supported by backend"
+msgstr "Symlinks ບໍ່ຮອງຮັບໂດຍ backend"
+
+#: daemon/gvfsjobsetattribute.c:99
+msgid "Invalid dbus message"
+msgstr "ຂໍ້ຄວາມ dbus ບໍ່ຖືກຕ້ອງ"
+
+#: daemon/gvfsjobunmount.c:123
+#, c-format
+msgid "%s has been unmounted\n"
+msgstr "%s ຖືກຍົກເລີກການເຊື່ອມຕໍ່ແລ້ວ\n"
+
+#: daemon/gvfsjobunmount.c:141
+#, c-format
+msgid ""
+"Unmounting %s\n"
+"Please wait"
+msgstr "ກຳລັງຍົກເລີກການເຊື່ອມຕໍ່ %s\nກະລຸນາລໍຖ້າ"
+
+#: daemon/gvfswsddservice.c:237 daemon/gvfswsddservice.c:380
+#: daemon/gvfswsddservice.c:437
+#, c-format
+msgid "Communication with the underlying wsdd daemon failed."
+msgstr "ການສື່ສານກັບເດມອນ wsdd ທີ່ຢູ່ເບື້ອງຫຼັງລົ້ມເຫຼວ."
+
+#: daemon/gvfswsddservice.c:513
+#, c-format
+msgid "The underlying wsdd daemon exited unexpectedly."
+msgstr "ເດມອນ wsdd ທີ່ຢູ່ເບື້ອງຫຼັງໄດ້ອອກໄປຢ່າງບໍ່ຄາດຄິດ."
+
+#: daemon/gvfswsddservice.c:612
+#, c-format
+msgid "Failed to spawn the underlying wsdd daemon."
+msgstr "ການເປີດເດມອນ wsdd ທີ່ຢູ່ເບື້ອງຫຼັງລົ້ມເຫຼວ."
+
+#: daemon/gvfswsddservice.c:643
+#, c-format
+msgid "Failed to establish connection with the underlying wsdd daemon."
+msgstr "ການສ້າງການເຊື່ອມຕໍ່ກັບເດມອນ wsdd ທີ່ຢູ່ເບື້ອງຫຼັງລົ້ມເຫຼວ."
+
+#: daemon/main.c:148 metadata/meta-daemon.c:459
+msgid "Replace old daemon."
+msgstr "ແທນທີ່ເດມອນເກົ່າ."
+
+#: daemon/main.c:149
+msgid "Don’t start fuse."
+msgstr "ຢ່າເລີ່ມ fuse."
+
+#: daemon/main.c:150
+msgid "Enable debug output."
+msgstr "ເປີດໃຊ້ການສະແດງຜົນດີບັກ."
+
+#: daemon/main.c:151 metadata/meta-daemon.c:460
+msgid "Show program version."
+msgstr "ສະແດງເວີຊັນຂອງໂປຣແກຣມ."
+
+#: daemon/main.c:167
+msgid "GVFS Daemon"
+msgstr "ເດມອນ GVFS"
+
+#: daemon/main.c:170
+msgid "Main daemon for GVFS"
+msgstr "ເດມອນຫຼັກສຳລັບ GVFS"
+
+#. Translators: the first %s is the application name,
+#. the second %s is the error message
+#: daemon/main.c:187 metadata/meta-daemon.c:486
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: daemon/main.c:189 metadata/meta-daemon.c:488
+#, c-format
+msgid "Try “%s --help” for more information."
+msgstr "ລອງໃຊ້ “%s --help” ເພື່ອຂໍ້ມູນເພີ່ມເຕີມ."
+
+#: daemon/mount.c:783
+#, c-format
+msgid "Automount failed: %s"
+msgstr "ການເຊື່ອມຕໍ່ອັດຕະໂນມັດລົ້ມເຫຼວ: %s"
+
+#: daemon/mount.c:827 daemon/mount.c:903
+msgid "The specified location is not mounted"
+msgstr "ທີ່ຢູ່ທີ່ລະບຸບໍ່ໄດ້ຖືກເຊື່ອມຕໍ່"
+
+#: daemon/mount.c:832
+msgid "The specified location is not supported"
+msgstr "ທີ່ຢູ່ທີ່ລະບຸບໍ່ຮອງຮັບ"
+
+#: daemon/mount.c:1015
+msgid "Location is already mounted"
+msgstr "ທີ່ຢູ່ຖືກເຊື່ອມຕໍ່ຢູ່ແລ້ວ"
+
+#: daemon/mount.c:1024
+msgid "Location is not mountable"
+msgstr "ທີ່ຢູ່ບໍ່ສາມາດເຊື່ອມຕໍ່ໄດ້"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:5
+msgid "How to display local DNS-SD services"
+msgstr "ວິທີສະແດງບໍລິການ DNS-SD ທ້ອງຖິ່ນ"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:6
+msgid ""
+"How DNS-SD services are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the Local Network folder) and "
+"\"disabled\"."
+msgstr "ວິທີທີ່ບໍລິການ DNS-SD ຖືກສະແດງໃນທີ່ຢູ່ \"network:///\" ຄ່າທີ່ເປັນໄປໄດ້ແມ່ນ \"merged\" (ຮວມ), \"separate\" (ໂຟນເດີເຄືອຂ່າຍທ້ອງຖິ່ນ) ແລະ \"disabled\" (ປິດໃຊ້ງານ)."
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:10
+msgid "Extra domains to look for DNS-SD services in"
+msgstr "ໂດເມນເພີ່ມເຕີມເພື່ອຊອກຫາບໍລິການ DNS-SD"
+
+#: daemon/org.gnome.system.dns_sd.gschema.xml:11
+msgid ""
+"Comma separated list of DNS-SD domains that should be visible in the "
+"\"network:///\" location."
+msgstr "ລາຍການໂດເມນ DNS-SD ທີ່ແຍກດ້ວຍເຄື່ອງໝາຍຈຸດ ເຊິ່ງຄວນຈະເຫັນໄດ້ໃນທີ່ຢູ່ \"network:///\"."
+
+#: daemon/org.gnome.system.smb.gschema.xml:5
+msgid "How to display SMB devices"
+msgstr "ວິທີສະແດງອຸປະກອນ SMB"
+
+#: daemon/org.gnome.system.smb.gschema.xml:6
+msgid ""
+"How SMB devices are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the Windows Network folder) and "
+"\"disabled\"."
+msgstr "ວິທີທີ່ອຸປະກອນ SMB ຖືກສະແດງໃນທີ່ຢູ່ \"network:///\" ຄ່າທີ່ເປັນໄປໄດ້ແມ່ນ \"merged\" (ຮວມ), \"separate\" (ໂຟນເດີເຄືອຂ່າຍ Windows) ແລະ \"disabled\" (ປິດໃຊ້ງານ)."
+
+#: daemon/org.gnome.system.smb.gschema.xml:10
+msgid "SMB workgroup"
+msgstr "ກຸ່ມເຮັດວຽກ SMB"
+
+#: daemon/org.gnome.system.smb.gschema.xml:11
+msgid ""
+"The Windows networking workgroup or domain that the user is part of. In "
+"order for a new workgroup to fully take effect the user may need to log out "
+"and log back in."
+msgstr "ກຸ່ມເຮັດວຽກ ຫຼື ໂດເມນຂອງເຄືອຂ່າຍ Windows ທີ່ຜູ້ໃຊ້ເປັນສ່ວນໜຶ່ງ. ເພື່ອໃຫ້ກຸ່ມເຮັດວຽກໃໝ່ມີຜົນສົມບູນ, ຜູ້ໃຊ້ອາດຕ້ອງອອກຈາກລະບົບແລ້ວເຂົ້າສູ່ລະບົບໃໝ່."
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:5
+msgid "How to display WSDD devices"
+msgstr "ວິທີສະແດງອຸປະກອນ WSDD"
+
+#: daemon/org.gnome.system.wsdd.gschema.xml:6
+msgid ""
+"How WSDD devices are displayed in the \"network:///\" location. Possible "
+"values are \"merged\", \"separate\" (the WSDD Network folder) and "
+"\"disabled\"."
+msgstr "ວິທີທີ່ອຸປະກອນ WSDD ຖືກສະແດງໃນທີ່ຢູ່ \"network:///\" ຄ່າທີ່ເປັນໄປໄດ້ແມ່ນ \"merged\" (ຮວມ), \"separate\" (ໂຟນເດີເຄືອຂ່າຍ WSDD) ແລະ \"disabled\" (ປິດໃຊ້ງານ)."
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:13
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:25
+msgid "Perform file operations"
+msgstr "ດຳເນີນການກັບໄຟລ໌"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:14
+msgid "Authentication is required to run gvfsd-admin daemon"
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນເພື່ອເປີດເດມອນ gvfsd-admin"
+
+#: daemon/org.gtk.vfs.file-operations.policy.in.in:26
+msgid "Authentication is required to perform file operations"
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນເພື່ອດຳເນີນການກັບໄຟລ໌"
+
+#: metadata/meta-daemon.c:249 metadata/meta-daemon.c:326
+#: metadata/meta-daemon.c:363
+#, c-format
+msgid "Can’t find metadata file %s"
+msgstr "ບໍ່ສາມາດຊອກຫາໄຟລ໌ເມຕາເດຕາ %s ໄດ້"
+
+#: metadata/meta-daemon.c:267 metadata/meta-daemon.c:279
+msgid "Unable to set metadata key"
+msgstr "ບໍ່ສາມາດຕັ້ງຄ່າຄີເມຕາເດຕາໄດ້"
+
+#: metadata/meta-daemon.c:289
+msgid "Unable to unset metadata key"
+msgstr "ບໍ່ສາມາດຍົກເລີກການຕັ້ງຄ່າຄີເມຕາເດຕາໄດ້"
+
+#: metadata/meta-daemon.c:336
+msgid "Unable to remove metadata keys"
+msgstr "ບໍ່ສາມາດລຶບຄີເມຕາເດຕາໄດ້"
+
+#: metadata/meta-daemon.c:374
+msgid "Unable to move metadata keys"
+msgstr "ບໍ່ສາມາດຍ້າຍຄີເມຕາເດຕາໄດ້"
+
+#: metadata/meta-daemon.c:470
+msgid "GVFS Metadata Daemon"
+msgstr "ເດມອນເມຕາເດຕາ GVFS"
+
+#: metadata/meta-daemon.c:473
+msgid "Metadata daemon for GVFS"
+msgstr "ເດມອນເມຕາເດຕາສຳລັບ GVFS"
+
+#: monitor/goa/goavolume.c:296 monitor/goa/goavolume.c:335
+#, c-format
+msgid "Failed to get org.gnome.OnlineAccounts.Files for %s"
+msgstr "ການຮັບ org.gnome.OnlineAccounts.Files ສຳລັບ %s ລົ້ມເຫຼວ"
+
+#: monitor/goa/goavolume.c:366
+#, c-format
+msgid "Invalid credentials for %s"
+msgstr "ຂໍ້ມູນປະຈຳຕົວສຳລັບ %s ບໍ່ຖືກຕ້ອງ"
+
+#: monitor/goa/goavolume.c:399
+#, c-format
+msgid "Unsupported authentication method for %s"
+msgstr "ວິທີການຢືນຢັນຕົວຕົນສຳລັບ %s ບໍ່ຮອງຮັບ"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1037
+msgid "The given mount was not found"
+msgstr "ບໍ່ພົບຈຸດເຊື່ອມຕໍ່ທີ່ລະບຸ"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1045
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1282
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1389
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1496
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1603
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1706
+msgid "An operation is already pending"
+msgstr "ມີການດຳເນີນການທີ່ຄ້າງຢູ່ແລ້ວ"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1132
+msgid "No outstanding mount operation"
+msgstr "ບໍ່ມີການດຳເນີນການເຊື່ອມຕໍ່ທີ່ຄ້າງຢູ່"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1274
+msgid "The given volume was not found"
+msgstr "ບໍ່ພົບໂວລຸມທີ່ລະບຸ"
+
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1381
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1488
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1595
+#: monitor/proxy/gvfsproxyvolumemonitordaemon.c:1698
+msgid "The given drive was not found"
+msgstr "ບໍ່ພົບໄດຣຟ໌ທີ່ລະບຸ"
+
+#: monitor/udisks2/gvfsudisks2drive.c:290
+#, c-format
+msgid "Unnamed Drive (%s)"
+msgstr "ໄດຣຟ໌ບໍ່ມີຊື່ (%s)"
+
+#: monitor/udisks2/gvfsudisks2drive.c:292
+msgid "Unnamed Drive"
+msgstr "ໄດຣຟ໌ບໍ່ມີຊື່"
+
+#: monitor/udisks2/gvfsudisks2drive.c:624
+#, c-format
+msgid "Failed to eject medium; one or more volumes on the medium are busy."
+msgstr "ການເອົາສື່ອອກລົ້ມເຫຼວ; ມີໂວລຸມໜຶ່ງ ຫຼື ຫຼາຍກວ່ານັ້ນໃນສື່ກຳລັງບໍ່ວ່າງ."
+
+#: monitor/udisks2/gvfsudisks2mount.c:638
+msgid "One or more programs are preventing the unmount operation."
+msgstr "ມີໂປຣແກຣມໜຶ່ງ ຫຼື ຫຼາຍກວ່ານັ້ນກຳລັງຂັດຂວາງການຍົກເລີກການເຊື່ອມຕໍ່."
+
+#. Note that the GUI (Shell, Files) currently use the term
+#. * "Eject" for both GDrive.stop() and GDrive.eject().
+#.
+#: monitor/udisks2/gvfsudisks2mount.c:748
+msgid "Eject Anyway"
+msgstr "ເອົາອອກຕໍ່ໄປ"
+
+#: monitor/udisks2/gvfsudisks2mount.c:1156
+#: monitor/udisks2/gvfsudisks2volume.c:1777
+msgid "Operation not supported by backend"
+msgstr "ການດຳເນີນການບໍ່ຮອງຮັບໂດຍ backend"
+
+#: monitor/udisks2/gvfsudisks2utils.c:345
+#, c-format
+msgid "Timed out running command-line “%s”"
+msgstr "ໝົດເວລາໃນການເປີດຄຳສັ່ງ “%s”"
+
+#: monitor/udisks2/gvfsudisks2utils.c:646
+#, c-format
+msgid ""
+"Unmounting %s\n"
+"Disconnecting from filesystem."
+msgstr "ກຳລັງຍົກເລີກການເຊື່ອມຕໍ່ %s\nກຳລັງຕັດການເຊື່ອມຕໍ່ຈາກລະບົບໄຟລ໌."
+
+#: monitor/udisks2/gvfsudisks2utils.c:648
+#, c-format
+msgid ""
+"Writing data to %s\n"
+"Device should not be unplugged."
+msgstr "ກຳລັງຂຽນຂໍ້ມູນໃສ່ %s\nບໍ່ຄວນຖອດອຸປະກອນອອກ."
+
+#: monitor/udisks2/gvfsudisks2utils.c:784
+#, c-format
+msgid ""
+"%s unmounted\n"
+"Filesystem has been disconnected."
+msgstr "%s ຖືກຍົກເລີກການເຊື່ອມຕໍ່ແລ້ວ\nລະບົບໄຟລ໌ຖືກຕັດການເຊື່ອມຕໍ່ແລ້ວ."
+
+#: monitor/udisks2/gvfsudisks2utils.c:786
+#, c-format
+msgid ""
+"%s can be safely unplugged\n"
+"Device can be removed."
+msgstr "ສາມາດຖອດ %s ອອກໄດ້ຢ່າງປອດໄພ\nສາມາດເອົາອຸປະກອນອອກໄດ້."
+
+#. Translators: This is used for possibly encrypted volumes.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: monitor/udisks2/gvfsudisks2volume.c:304
+#, c-format
+msgid "%s Possibly Encrypted"
+msgstr "%s ອາດຈະຖືກເຂົ້າລະຫັດ"
+
+#. Translators: This is used for encrypted volumes.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: monitor/udisks2/gvfsudisks2volume.c:311
+#, c-format
+msgid "%s Encrypted"
+msgstr "%s ຖືກເຂົ້າລະຫັດ"
+
+#. Translators: This is used for volume with no filesystem label.
+#. *              The first %s is the formatted size (e.g. "42.0 MB").
+#.
+#: monitor/udisks2/gvfsudisks2volume.c:324
+#, c-format
+msgid "%s Volume"
+msgstr "ໂວລຸມ %s"
+
+#. Translators: Name used for volume
+#: monitor/udisks2/gvfsudisks2volume.c:565
+msgid "Volume"
+msgstr "ໂວລຸມ"
+
+#: monitor/udisks2/gvfsudisks2volume.c:1160
+#, c-format
+msgid "Error storing passphrase in keyring (%s)"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການເກັບວະລີຜ່ານໃນ keyring (%s)"
+
+#: monitor/udisks2/gvfsudisks2volume.c:1193
+#, c-format
+msgid "Error deleting invalid passphrase from keyring (%s)"
+msgstr "ເກີດຂໍ້ຜິດພາດໃນການລຶບວະລີຜ່ານທີ່ບໍ່ຖືກຕ້ອງອອກຈາກ keyring (%s)"
+
+#: monitor/udisks2/gvfsudisks2volume.c:1255
+msgid "The unlocked device does not have a recognizable file system on it"
+msgstr "ອຸປະກອນທີ່ປົດລັອກແລ້ວບໍ່ມີລະບົບໄຟລ໌ທີ່ສາມາດຮັບຮູ້ໄດ້"
+
+#: monitor/udisks2/gvfsudisks2volume.c:1283
+#, c-format
+msgid "Encryption passphrase for %s"
+msgstr "ວະລີຜ່ານການເຂົ້າລະຫັດສຳລັບ %s"
+
+#: monitor/udisks2/gvfsudisks2volume.c:1492
+msgid "A passphrase is required to access the volume"
+msgstr "ຕ້ອງການວະລີຜ່ານເພື່ອເຂົ້າເຖິງໂວລຸມ"
+
+#. Translators: %s is the description of the volume that is being unlocked
+#: monitor/udisks2/gvfsudisks2volume.c:1507
+#, c-format
+msgid ""
+"Authentication Required\n"
+"A passphrase is needed to access encrypted data on “%s”.\n"
+"The volume might be a VeraCrypt volume as it contains random data."
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນ\nຕ້ອງການວະລີຜ່ານເພື່ອເຂົ້າເຖິງຂໍ້ມູນທີ່ເຂົ້າລະຫັດໃນ “%s”.\nໂວລຸມນີ້ອາດເປັນໂວລຸມ VeraCrypt ເນື່ອງຈາກມັນມີຂໍ້ມູນແບບສຸ່ມ."
+
+#. Translators: %s is the description of the volume that is being unlocked
+#: monitor/udisks2/gvfsudisks2volume.c:1513
+#, c-format
+msgid ""
+"Authentication Required\n"
+"A passphrase is needed to access encrypted data on “%s”."
+msgstr "ຕ້ອງການການຢືນຢັນຕົວຕົນ\nຕ້ອງການວະລີຜ່ານເພື່ອເຂົ້າເຖິງຂໍ້ມູນທີ່ເຂົ້າລະຫັດໃນ “%s”."
+
+#. Translators: this is used to describe the drive the encrypted media
+#. * is on - the first %s is the name (such as 'WD 2500JB External'), the
+#. * second %s is the description ('250 GB Hard Disk').
+#.
+#: monitor/udisks2/gvfsudisks2volume.c:1693
+#, c-format
+msgid "%s (%s)"
+msgstr "%s (%s)"
+
+#: monitor/udisks2/udisks2volumemonitordaemon.c:39
+msgid "GVfs UDisks2 Volume Monitor"
+msgstr "ຕົວຕິດຕາມໂວລຸມ GVfs UDisks2"
