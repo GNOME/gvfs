@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
 "POT-Creation-Date: 2026-03-03 08:49+0000\n"
-"PO-Revision-Date: 2026-04-23 22:18+0200\n"
+"PO-Revision-Date: 2026-04-29 23:20+0200\n"
 "Last-Translator: Jose Riha <jose1711@gmail.com>\n"
 "Language-Team: Slovak <gnome-sk-list@gnome.org>\n"
 "Language: sk\n"
@@ -1197,7 +1197,7 @@ msgstr "Nie je povolené sprístupnenie WebDAV"
 #: daemon/gvfsbackenddav.c:2538 daemon/gvfsbackenddav.c:2651
 #: daemon/gvfsbackenddav.c:2738 daemon/gvfsbackenddav.c:2825
 msgid "Could not create request"
-msgstr "Nepodarilo sa vytvoriť požiadávku"
+msgstr "Nepodarilo sa vytvoriť požiadavku"
 
 #: daemon/gvfsbackenddav.c:3011 daemon/gvfsbackendftp.c:1134
 #: daemon/gvfsbackendgoogle.c:3944 daemon/gvfsbackendnfs.c:1069
