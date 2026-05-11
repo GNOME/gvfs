@@ -636,16 +636,25 @@ g_vfs_backend_invocation_first_handler (GVfsDBusMount *object,
   GDBusConnection *connection;
   GCredentials *credentials;
   pid_t pid = -1;
+  g_autofree gchar *comm = NULL;
 
   connection = g_dbus_method_invocation_get_connection (invocation);
   credentials = g_dbus_connection_get_peer_credentials (connection);
   if (credentials)
     pid = g_credentials_get_unix_pid (credentials, NULL);
 
-  g_debug ("backend_dbus_handler %s:%s (pid=%ld)\n",
-           g_dbus_method_invocation_get_interface_name (invocation),
-           g_dbus_method_invocation_get_method_name (invocation),
-           (long)pid);
+  if (pid > 0)
+    {
+      g_autofree gchar *comm_path = g_strdup_printf ("/proc/%ld/comm", (long)pid);
+
+      if (g_file_get_contents (comm_path, &comm, NULL, NULL))
+        g_strstrip (comm);
+    }
+
+  g_debug ("backend_dbus_handler %s:%s (pid=%ld comm=%s)\n",
+            g_dbus_method_invocation_get_interface_name (invocation),
+            g_dbus_method_invocation_get_method_name (invocation),
+            (long)pid, comm ? comm : "");
 
   if (backend->priv->block_requests)
     {
