@@ -141,6 +141,7 @@ struct OPAQUE_TYPE__TrashWatcher
   TrashRoot *root;
 
   GUnixMountMonitor *mount_monitor;
+  gulong mounts_changed_id;
   GHashTable *mounts; /* mount_path -> TrashMount */
   guint update_id;
 
@@ -341,8 +342,7 @@ trash_watcher_new (TrashRoot *root)
   watcher->watching = FALSE;
   watcher->update_id = 0;
   watcher->mount_monitor = g_unix_mount_monitor_get ();
-  g_signal_connect_swapped (watcher->mount_monitor, "mounts_changed",
-                            G_CALLBACK (trash_watcher_remount), watcher);
+  watcher->mounts_changed_id = 0;
 
   user_datadir = g_file_new_for_path (g_get_user_data_dir ());
   homedir_trashdir = g_file_get_child (user_datadir, "Trash/files");
@@ -380,8 +380,16 @@ trash_watcher_watch (TrashWatcher *watcher)
   GHashTableIter iter;
   gpointer value;
 
+  g_debug ("trash_watcher_watch\n");
+
   if (watcher->watching)
     return;
+
+  watcher->mounts_changed_id =
+    g_signal_connect_swapped (watcher->mount_monitor, "mounts_changed",
+                              G_CALLBACK (trash_watcher_remount), watcher);
+
+  trash_watcher_remount_do (watcher);
 
   if (watcher->homedir_type != TRASH_WATCHER_NO_WATCH)
     trash_dir_watch (watcher->homedir_trashdir);
@@ -406,8 +414,16 @@ trash_watcher_unwatch (TrashWatcher *watcher)
   GHashTableIter iter;
   gpointer value;
 
+  g_debug ("trash_watcher_unwatch\n");
+
   if (!watcher->watching)
     return;
+
+  g_signal_handler_disconnect (watcher->mount_monitor,
+                               watcher->mounts_changed_id);
+  watcher->mounts_changed_id = 0;
+
+  g_clear_handle_id (&watcher->update_id, g_source_remove);
 
   if (watcher->homedir_type != TRASH_WATCHER_NO_WATCH)
     trash_dir_unwatch (watcher->homedir_trashdir);
@@ -432,7 +448,9 @@ trash_watcher_rescan (TrashWatcher *watcher)
   GHashTableIter iter;
   gpointer value;
 
-  if (watcher->update_id != 0)
+  if (!watcher->watching)
+    trash_watcher_remount_do (watcher);
+  else if (watcher->update_id != 0)
     {
       g_source_remove (watcher->update_id);
       trash_watcher_remount_timeout (watcher);
