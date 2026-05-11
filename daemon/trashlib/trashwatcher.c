@@ -380,7 +380,8 @@ trash_watcher_watch (TrashWatcher *watcher)
   GHashTableIter iter;
   gpointer value;
 
-  g_assert (!watcher->watching);
+  if (watcher->watching)
+    return;
 
   if (watcher->homedir_type != TRASH_WATCHER_NO_WATCH)
     trash_dir_watch (watcher->homedir_trashdir);
@@ -405,7 +406,8 @@ trash_watcher_unwatch (TrashWatcher *watcher)
   GHashTableIter iter;
   gpointer value;
 
-  g_assert (watcher->watching);
+  if (!watcher->watching)
+    return;
 
   if (watcher->homedir_type != TRASH_WATCHER_NO_WATCH)
     trash_dir_unwatch (watcher->homedir_trashdir);
