@@ -144,6 +144,7 @@ struct OPAQUE_TYPE__TrashWatcher
   gulong mounts_changed_id;
   GHashTable *mounts; /* mount_path -> TrashMount */
   guint update_id;
+  guint64 last_mount_time;
 
   TrashDir *homedir_trashdir;
   WatchType homedir_type;
@@ -248,7 +249,10 @@ trash_watcher_remount_do (TrashWatcher *watcher)
   gpointer key, value;
   const char *mount_path;
 
-  mounts = g_unix_mount_entries_get (NULL);
+  if (!g_unix_mount_entries_changed_since (watcher->last_mount_time))
+    return;
+
+  mounts = g_unix_mount_entries_get (&watcher->last_mount_time);
   mount_paths = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
   for (l = mounts; l != NULL; l = l->next)
@@ -341,6 +345,7 @@ trash_watcher_new (TrashRoot *root)
   watcher->mounts = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
   watcher->watching = FALSE;
   watcher->update_id = 0;
+  watcher->last_mount_time = 0;
   watcher->mount_monitor = g_unix_mount_monitor_get ();
   watcher->mounts_changed_id = 0;
 
