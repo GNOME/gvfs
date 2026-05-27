@@ -496,6 +496,18 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
                            SOUP_URI_NONE);
   g_uri_unref (tmp);
 
+  /* Prevent HTTPS downgrade redirect to HTTP on the same host */
+  if (g_ascii_strcasecmp (g_uri_get_scheme (old_uri), "https") == 0 &&
+      g_ascii_strcasecmp (g_uri_get_scheme (new_uri), "http") == 0 &&
+      g_ascii_strcasecmp (g_uri_get_host (old_uri), g_uri_get_host (new_uri)) == 0)
+    {
+      tmp = new_uri;
+      new_uri = soup_uri_copy (new_uri,
+                               SOUP_URI_SCHEME, "https",
+                               SOUP_URI_NONE);
+      g_uri_unref (tmp);
+    }
+
   /* Check if this is a trailing slash redirect (i.e. /a/b to /a/b/),
    * redirect it right away
    */
