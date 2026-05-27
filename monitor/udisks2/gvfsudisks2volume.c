@@ -705,7 +705,10 @@ void
 gvfs_udisks2_volume_removed (GVfsUDisks2Volume *volume)
 {
   if (volume->mount_pending_op != NULL)
-    mount_cancel_pending_op (volume->mount_pending_op);
+    {
+      mount_cancel_pending_op (volume->mount_pending_op);
+      volume->mount_pending_op = NULL;
+    }
 
   if (volume->mount != NULL)
     {
