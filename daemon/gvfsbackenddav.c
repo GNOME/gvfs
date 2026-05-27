@@ -536,9 +536,9 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
           const char *method = soup_message_get_method (msg);
 
           /* Only cross-site redirect safe methods */
-          if (method == SOUP_METHOD_GET &&
-              method == SOUP_METHOD_HEAD &&
-              method == SOUP_METHOD_OPTIONS &&
+          if (method == SOUP_METHOD_GET ||
+              method == SOUP_METHOD_HEAD ||
+              method == SOUP_METHOD_OPTIONS ||
               method == SOUP_METHOD_PROPFIND)
             redirect = TRUE;
         }
