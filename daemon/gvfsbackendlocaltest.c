@@ -158,6 +158,7 @@ get_g_file_info_from_local (const char *filename, GFile *file,
 		if (info == NULL) {
 		    g_print (" (EE) get_g_file_info_from_local (filename = '%s'): g_file_query_info failed: %s \n", filename, error->message);
 		    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+		    g_error_free (error);
 		    return NULL;
 		}
 	}
