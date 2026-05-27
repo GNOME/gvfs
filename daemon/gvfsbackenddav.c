@@ -574,6 +574,7 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
 
   g_object_unref (body);
 
+  soup_message_headers_remove (soup_message_get_request_headers (msg), "Authorization");
   soup_message_set_uri (msg, new_uri);
   g_uri_unref (new_uri);
 
