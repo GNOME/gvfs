@@ -566,6 +566,15 @@ do_mount (GVfsBackend *backend,
           g_debug ("do_mount - enabling NTLMSSP fallback\n");
           smbc_setOptionFallbackAfterKerberos (op_backend->smb_context, 1);
         }
+      else if (op_backend->mount_try == 1 &&
+               op_backend->user == NULL)
+        {
+          /* Samba 4.24 can return EINVAL with UseCCache enabled and missing
+           * kerberos ccache, which blocks NTLM/anonymous fallback, see:
+           * https://gitlab.gnome.org/GNOME/gvfs/-/work_items/857
+           */
+           smbc_setOptionUseCCache (op_backend->smb_context, 0);
+        }
 
       op_backend->mount_try ++;
     }
