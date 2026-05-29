@@ -286,6 +286,22 @@ auth_callback (SMBCCTX *context,
     {
       /* Try again if kerberos login + anonymous fallback fails */
       backend->mount_try_again = TRUE;
+      g_debug ("auth_callback - kerberos pass\n");
+    }
+  else if (backend->mount_try == 1 &&
+           backend->user == NULL &&
+           backend->domain == NULL)
+    {
+      /* Try again if ccache login fails */
+      backend->mount_try_again = TRUE;
+      g_debug ("auth_callback - ccache pass\n");
+    }
+  else if (backend->mount_try == 2 &&
+           backend->user == NULL &&
+           backend->domain == NULL)
+    {
+      /* Try again if anonymous login fails */
+      backend->mount_try_again = TRUE;
       g_debug ("auth_callback - anonymous pass\n");
     }
   else
@@ -757,9 +773,9 @@ do_mount (GVfsBackend *backend,
              uri, op_backend->mount_try, dir, op_backend->mount_cancelled,
              errsv, g_strerror (errsv));
 
-      if (errsv == EINVAL && op_backend->mount_try == 0 && op_backend->user == NULL)
+      if (errsv == EINVAL && op_backend->mount_try <= 1 && op_backend->user == NULL)
         {
-          /* EINVAL is "expected" when kerberos is misconfigured, see:
+          /* EINVAL is "expected" when kerberos/ccache is misconfigured, see:
            * https://gitlab.gnome.org/GNOME/gvfs/-/issues/611
            */
         }
@@ -789,10 +805,24 @@ do_mount (GVfsBackend *backend,
        * NTLMSSP fallback (turning off anonymous fallback, which we've
        * already tried and failed with).
        */
-      if (op_backend->mount_try == 0)
+      if (op_backend->mount_try == 0 &&
+          op_backend->user == NULL)
         {
           g_debug ("do_mount - after anon, enabling NTLMSSP fallback\n");
           smbc_setOptionFallbackAfterKerberos (op_backend->smb_context, 1);
+        }
+      else if (op_backend->mount_try == 1 &&
+               op_backend->user == NULL)
+        {
+          /* Samba 4.24 can return EINVAL with UseCCache enabled and missing
+           * kerberos ccache, which blocks NTLM/anonymous fallback, see:
+           * https://gitlab.gnome.org/GNOME/gvfs/-/work_items/857
+           */
+          smbc_setOptionUseCCache (op_backend->smb_context, 0);
+        }
+      else if (op_backend->mount_try == 2 &&
+               op_backend->user == NULL)
+        {
           smbc_setOptionNoAutoAnonymousLogin (op_backend->smb_context, 1);
         }
       op_backend->mount_try++;
