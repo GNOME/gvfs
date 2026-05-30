@@ -648,9 +648,9 @@ on_mount_op_reply (GMountOperation       *mount_operation,
 }
 
 static void
-lsof_command_cb (GObject       *source_object,
-                 GAsyncResult  *res,
-                 gpointer       user_data)
+busy_processes_command_cb (GObject       *source_object,
+                           GAsyncResult  *res,
+                           gpointer       user_data)
 {
   GTask *task = G_TASK (user_data);
   UnmountData *data = g_task_get_task_data (task);
@@ -671,15 +671,18 @@ lsof_command_cb (GObject       *source_object,
                                         NULL, /* gchar **out_standard_error */
                                         &error))
     {
-      g_printerr ("Error launching lsof(1): %s (%s, %d)\n",
-                  error->message, g_quark_to_string (error->domain), error->code);
+      g_printerr ("Error launching %s(1): %s (%s, %d)\n",
+                  BUSY_PROCESS_COMMAND,
+                  error->message,
+                  g_quark_to_string (error->domain),
+                  error->code);
       g_error_free (error);
       goto out;
     }
 
   if (!(WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0))
     {
-      g_printerr ("lsof(1) did not exit normally\n");
+      g_printerr ("%s(1) did not exit normally\n", BUSY_PROCESS_COMMAND);
       goto out;
     }
 
@@ -711,9 +714,9 @@ lsof_command_cb (GObject       *source_object,
       is_stop = unmount_operation_is_stop (data->mount_operation);
 
       /* We want to emit the 'show-processes' signal even if launching
-       * lsof(1) failed or if it didn't return any PIDs. This is because
-       * it won't show e.g. root-owned processes operating on files
-       * on the mount point.
+       * lsof(1) or fuser(1) failed or if it didn't return any PIDs. This
+       * is because it won't show e.g. root-owned processes operating on
+       * files on the mount point.
        *
        * (unfortunately there's no way to convey that it failed)
        */
@@ -779,9 +782,9 @@ unmount_show_busy (GTask        *task,
   escaped_mount_point = g_strescape (mount_point, NULL);
   gvfs_udisks2_utils_spawn (10, /* timeout in seconds */
                             g_task_get_cancellable (task),
-                            lsof_command_cb,
+                            busy_processes_command_cb,
                             g_object_ref (task),
-                            "lsof -t \"%s\"",
+                            BUSY_PROCESS_SPAWN,
                             escaped_mount_point);
   g_free (escaped_mount_point);
 }

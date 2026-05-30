@@ -343,6 +343,15 @@ if enable_udisks2
   udisks2_dep = dependency('udisks2', version: '>= 1.97')
 endif
 
+# *** Check which command should be used to check processes blocking umount ***
+busy_processes_command = get_option('busy_processes_command')
+config_h.set_quoted('BUSY_PROCESS_COMMAND', busy_processes_command)
+if busy_processes_command == 'lsof'
+  config_h.set('BUSY_PROCESS_SPAWN', '"lsof -t \"%s\""')
+elif busy_processes_command == 'fuser'
+  config_h.set('BUSY_PROCESS_SPAWN', '"fuser -m \"%s\""')
+endif
+
 # *** Check for libsystemd-login ***
 enable_logind = get_option('logind')
 if enable_logind
@@ -500,6 +509,7 @@ gnome.post_install(
 )
 
 summary({
+  'busy_processes_command': busy_processes_command,
   'systemduserunitdir': systemd_systemduserunitdir,
   'tmpfilesdir': systemd_tmpfilesdir,
   'privileged_group': privileged_group,

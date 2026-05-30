@@ -1,3 +1,4 @@
+option('busy_processes_command', type: 'combo', choices: ['lsof', 'fuser'], value: 'lsof', description: 'Command used to detect processes blocking unmount')
 option('systemduserunitdir', type: 'string', value: '', description: 'custom directory for systemd user units, or \'no\' to disable')
 option('tmpfilesdir', type: 'string', value: '', description: 'custom directory for tmpfiles.d config files, or \'no\' to disable')
 option('privileged_group', type: 'string', value: 'wheel', description: 'custom name for group that has elevated permissions')
