@@ -35,6 +35,8 @@
 
 #define KEY_IS_LIST_MASK (1<<31)
 
+static gboolean path_has_prefix (const char *path, const char *prefix);
+
 static GRWLock metatree_lock;
 
 typedef enum {
@@ -2840,6 +2842,7 @@ struct _MetaLookupCache {
   dev_t last_parent_dev;
   char *last_parent_mountpoint;
   char *last_parent_mountpoint_extra_prefix;
+  dev_t last_parent_mountpoint_dev;
 
   dev_t last_device;
   char *last_device_tree;
@@ -3162,8 +3165,13 @@ find_mountpoint_for (MetaLookupCache *cache,
   g_assert (cache->last_parent_expanded != NULL);
   g_assert (strcmp (cache->last_parent_expanded, first_dir) == 0);
 
-  if (cache->last_parent_mountpoint != NULL)
+  if (cache->last_parent_mountpoint != NULL &&
+      cache->last_parent_mountpoint_dev == dev &&
+      path_has_prefix (file, cache->last_parent_mountpoint))
     goto out; /* Cache hit! */
+
+  g_clear_pointer (&cache->last_parent_mountpoint, g_free);
+  g_clear_pointer (&cache->last_parent_mountpoint_extra_prefix, g_free);
 
   dir = g_strdup (first_dir);
   last = g_strdup (file);
@@ -3176,6 +3184,7 @@ find_mountpoint_for (MetaLookupCache *cache,
 	  g_free (dir);
 	  cache->last_parent_mountpoint = last;
 	  cache->last_parent_mountpoint_extra_prefix = get_extra_prefix_for_mount (last);
+	  cache->last_parent_mountpoint_dev = dev;
 	  break;
 	}
 
