@@ -105,13 +105,13 @@ g_vfs_job_set_attribute_new_handle (GVfsDBusMount *object,
                       "invocation", invocation,
                       NULL);
 
-  job->backend = backend;
   job->filename = g_strdup (arg_path_data);
   job->attribute = attribute;
   job->value = value;
   job->type = type;
   job->flags = arg_flags;
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -122,7 +122,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobSetAttribute *op_job = G_VFS_JOB_SET_ATTRIBUTE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->set_attribute == NULL)
     {
@@ -131,7 +131,7 @@ run (GVfsJob *job)
       return;
     }
   
-  class->set_attribute (op_job->backend,
+  class->set_attribute (job->backend,
 			op_job,
 			op_job->filename,
 			op_job->attribute,
@@ -144,9 +144,9 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobSetAttribute *op_job = G_VFS_JOB_SET_ATTRIBUTE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
-  if (g_vfs_backend_get_readonly_lockdown (op_job->backend))
+  if (g_vfs_backend_get_readonly_lockdown (job->backend))
     {
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                         _("Filesystem is read-only"));
@@ -156,7 +156,7 @@ try (GVfsJob *job)
   if (class->try_set_attribute == NULL)
     return FALSE;
   
-  return class->try_set_attribute (op_job->backend,
+  return class->try_set_attribute (job->backend,
 				   op_job,
 				   op_job->filename,
 				   op_job->attribute,

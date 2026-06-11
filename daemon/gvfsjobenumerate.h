@@ -43,7 +43,6 @@ struct _GVfsJobEnumerate
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
   char *filename;
   char *object_path;
   char *attributes;

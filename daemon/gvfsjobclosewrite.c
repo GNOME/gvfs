@@ -81,9 +81,9 @@ g_vfs_job_close_write_new (GVfsWriteChannel *channel,
 		      NULL);
 
   job->channel = g_object_ref (channel);
-  job->backend = backend;
   job->handle = handle;
   
+  G_VFS_JOB (job)->backend = backend;
   return G_VFS_JOB (job);
 }
 
@@ -113,7 +113,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobCloseWrite *op_job = G_VFS_JOB_CLOSE_WRITE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->close_write == NULL)
     {
@@ -122,7 +122,7 @@ run (GVfsJob *job)
       return;
     }
   
-  class->close_write (op_job->backend,
+  class->close_write (job->backend,
 		      op_job,
 		      op_job->handle);
 }
@@ -131,12 +131,12 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobCloseWrite *op_job = G_VFS_JOB_CLOSE_WRITE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
   
   if (class->try_close_write == NULL)
     return FALSE;
   
-  return class->try_close_write (op_job->backend,
+  return class->try_close_write (job->backend,
 				 op_job,
 				 op_job->handle);
 }

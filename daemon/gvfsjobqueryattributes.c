@@ -89,10 +89,10 @@ g_vfs_job_query_settable_attributes_new_handle (GVfsDBusMount *object,
                       "invocation", invocation,
                       NULL);
  
-  job->backend = backend;
   job->filename = g_strdup (arg_path_data);
   job->namespaces = FALSE;
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -115,10 +115,10 @@ g_vfs_job_query_writable_namespaces_new_handle (GVfsDBusMount *object,
                       "invocation", invocation,
                       NULL);
  
-  job->backend = backend;
   job->filename = g_strdup (arg_path_data);
   job->namespaces = TRUE;
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -129,7 +129,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobQueryAttributes *op_job = G_VFS_JOB_QUERY_ATTRIBUTES (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
   void (*cb) (GVfsBackend *backend,
 	      GVfsJobQueryAttributes *job,
 	      const char *filename);
@@ -146,7 +146,7 @@ run (GVfsJob *job)
       return;
     }
       
-  cb (op_job->backend,
+  cb (job->backend,
       op_job,
       op_job->filename);
 }
@@ -155,7 +155,7 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobQueryAttributes *op_job = G_VFS_JOB_QUERY_ATTRIBUTES (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
   gboolean (*cb) (GVfsBackend *backend,
 		  GVfsJobQueryAttributes *job,
 		  const char *filename);
@@ -168,7 +168,7 @@ try (GVfsJob *job)
   if (cb == NULL)
     return FALSE;
       
-  return cb (op_job->backend,
+  return cb (job->backend,
 	     op_job,
 	     op_job->filename);
 }

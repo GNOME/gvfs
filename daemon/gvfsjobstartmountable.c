@@ -92,9 +92,9 @@ g_vfs_job_start_mountable_new_handle (GVfsDBusMount *object,
                       NULL);
 
   job->filename = g_strdup (arg_path_data);
-  job->backend = backend;
   job->mount_source = g_mount_source_new (arg_dbus_id, arg_obj_path);
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -105,7 +105,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobStartMountable *op_job = G_VFS_JOB_START_MOUNTABLE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->start_mountable == NULL)
     {
@@ -114,7 +114,7 @@ run (GVfsJob *job)
       return;
     }
 
-  class->start_mountable (op_job->backend,
+  class->start_mountable (job->backend,
 			  op_job,
 			  op_job->filename,
 			  op_job->mount_source);
@@ -124,12 +124,12 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobStartMountable *op_job = G_VFS_JOB_START_MOUNTABLE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->try_start_mountable == NULL)
     return FALSE;
 
-  return class->try_start_mountable (op_job->backend,
+  return class->try_start_mountable (job->backend,
 				     op_job,
 				     op_job->filename,
 				     op_job->mount_source);

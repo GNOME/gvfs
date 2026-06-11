@@ -44,7 +44,6 @@ struct _GVfsJobPull
 {
   GVfsJobProgress parent_instance;
 
-  GVfsBackend *backend;
   char *source;
   char *local_path;
   GFileCopyFlags flags;

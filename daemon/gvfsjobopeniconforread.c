@@ -82,9 +82,9 @@ g_vfs_job_open_icon_for_read_new_handle (GVfsDBusMount *object,
   job_open_for_read = G_VFS_JOB_OPEN_FOR_READ (job);
 
   job->icon_id = g_strdup (arg_path_data);
-  job_open_for_read->backend = backend;
   job_open_for_read->read_icon = TRUE;
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -95,8 +95,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobOpenIconForRead *op_job = G_VFS_JOB_OPEN_ICON_FOR_READ (job);
-  GVfsJobOpenForRead *op_job_open_for_read = G_VFS_JOB_OPEN_FOR_READ (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job_open_for_read->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->open_icon_for_read == NULL)
     {
@@ -105,7 +104,7 @@ run (GVfsJob *job)
       return;
     }
 
-  class->open_icon_for_read (op_job_open_for_read->backend,
+  class->open_icon_for_read (job->backend,
                              op_job,
                              op_job->icon_id);
 }
@@ -114,13 +113,12 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobOpenIconForRead *op_job = G_VFS_JOB_OPEN_ICON_FOR_READ (job);
-  GVfsJobOpenForRead *op_job_open_for_read = G_VFS_JOB_OPEN_FOR_READ (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job_open_for_read->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->try_open_icon_for_read == NULL)
     return FALSE;
 
-  return class->try_open_icon_for_read (op_job_open_for_read->backend,
+  return class->try_open_icon_for_read (job->backend,
                                         op_job,
                                         op_job->icon_id);
 }

@@ -60,7 +60,6 @@ struct _GVfsJobOpenForWrite
   gboolean make_backup;
   GFileCreateFlags flags;
   
-  GVfsBackend *backend;
   GVfsBackendHandle backend_handle;
 
   guint can_seek : 1;

@@ -43,7 +43,6 @@ struct _GVfsJobTrash
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
   char *filename;
 };
 

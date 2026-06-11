@@ -100,12 +100,12 @@ g_vfs_job_enumerate_new_handle (GVfsDBusMount *object,
   
   job->object_path = g_strdup (arg_obj_path);
   job->filename = g_strdup (arg_path_data);
-  job->backend = backend;
   job->attributes = g_strdup (arg_attributes);
   job->attribute_matcher = g_file_attribute_matcher_new (arg_attributes);
   job->flags = arg_flags;
   job->uri = g_strdup (arg_uri);
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -193,7 +193,7 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
       g_free (escaped_name);
     }
   
-  g_vfs_backend_add_auto_info (job->backend,
+  g_vfs_backend_add_auto_info (G_VFS_JOB (job)->backend,
 			       job->attribute_matcher,
 			       info,
 			       uri);
@@ -264,7 +264,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobEnumerate *op_job = G_VFS_JOB_ENUMERATE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->enumerate == NULL)
     {
@@ -273,7 +273,7 @@ run (GVfsJob *job)
       return;
     }
   
-  class->enumerate (op_job->backend,
+  class->enumerate (job->backend,
 		    op_job,
 		    op_job->filename,
 		    op_job->attribute_matcher,
@@ -284,12 +284,12 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobEnumerate *op_job = G_VFS_JOB_ENUMERATE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
   
   if (class->try_enumerate == NULL)
     return FALSE;
   
-  return class->try_enumerate (op_job->backend,
+  return class->try_enumerate (job->backend,
 			       op_job,
 			       op_job->filename,
 			       op_job->attribute_matcher,

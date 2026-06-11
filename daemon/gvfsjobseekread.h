@@ -43,7 +43,6 @@ struct _GVfsJobSeekRead
   GVfsJob parent_instance;
 
   GVfsReadChannel *channel;
-  GVfsBackend *backend;
   GVfsBackendHandle handle;
   GSeekType seek_type;
   goffset requested_offset;

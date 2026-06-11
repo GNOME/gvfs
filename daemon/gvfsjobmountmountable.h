@@ -43,7 +43,6 @@ struct _GVfsJobMountMountable
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
   char *filename;
   GMountSource *mount_source;
 

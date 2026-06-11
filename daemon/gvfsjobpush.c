@@ -98,7 +98,6 @@ g_vfs_job_push_new_handle (GVfsDBusMount *object,
 
   job->destination = g_strdup (arg_path_data);
   job->local_path = g_strdup (arg_local_path);
-  job->backend = backend;
   job->flags = arg_flags;
   progress_job->send_progress = arg_send_progress;
   job->remove_source = arg_remove_source;
@@ -106,6 +105,7 @@ g_vfs_job_push_new_handle (GVfsDBusMount *object,
   if (strcmp (arg_progress_obj_path, "/org/gtk/vfs/void") != 0)
     progress_job->callback_obj_path = g_strdup (arg_progress_obj_path);
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -117,7 +117,7 @@ run (GVfsJob *job)
 {
   GVfsJobPush *op_job = G_VFS_JOB_PUSH (job);
   GVfsJobProgress *progress_job = G_VFS_JOB_PROGRESS (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->push == NULL)
     {
@@ -128,7 +128,7 @@ run (GVfsJob *job)
 
   g_vfs_job_progress_construct_proxy (job);
   
-  class->push (op_job->backend,
+  class->push (job->backend,
                op_job,
                op_job->destination,
                op_job->local_path,
@@ -143,10 +143,10 @@ try (GVfsJob *job)
 {
   GVfsJobPush *op_job = G_VFS_JOB_PUSH (job);
   GVfsJobProgress *progress_job = G_VFS_JOB_PROGRESS (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
   gboolean res;
 
-  if (g_vfs_backend_get_readonly_lockdown (op_job->backend))
+  if (g_vfs_backend_get_readonly_lockdown (job->backend))
     {
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                         _("Filesystem is read-only"));
@@ -158,7 +158,7 @@ try (GVfsJob *job)
 
   g_vfs_job_progress_construct_proxy (job);
   
-  res = class->try_push (op_job->backend,
+  res = class->try_push (job->backend,
                          op_job,
                          op_job->destination,
                          op_job->local_path,

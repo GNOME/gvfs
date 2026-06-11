@@ -43,7 +43,6 @@ struct _GVfsJobStopMountable
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
   char *filename;
   GMountUnmountFlags flags;
   GMountSource *mount_source;

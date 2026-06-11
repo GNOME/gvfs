@@ -46,7 +46,7 @@ g_vfs_job_mount_finalize (GObject *object)
 
   g_mount_spec_unref (job->mount_spec);
   g_object_unref (job->mount_source);
-  g_object_unref (job->backend);
+  g_object_unref (G_VFS_JOB (job)->backend);
   g_clear_object (&job->object);
   g_clear_object (&job->invocation);
   
@@ -89,7 +89,7 @@ g_vfs_job_mount_new (GMountSpec *spec,
   job->is_automount = is_automount;
   /* Ref the backend so we're sure its alive
      during the whole job request. */
-  job->backend = g_object_ref (backend);
+  G_VFS_JOB (job)->backend = g_object_ref (backend);
   if (object != NULL && invocation != NULL)
     {
       job->object = g_object_ref (object);
@@ -103,7 +103,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobMount *op_job = G_VFS_JOB_MOUNT (job);
-  GVfsBackend *backend = op_job->backend;
+  GVfsBackend *backend = job->backend;
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (backend);
 
   if (class->mount == NULL)
@@ -124,7 +124,7 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobMount *op_job = G_VFS_JOB_MOUNT (job);
-  GVfsBackend *backend = op_job->backend;
+  GVfsBackend *backend = job->backend;
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (backend);
   gboolean result;
 
@@ -149,7 +149,7 @@ mount_failed (GVfsJobMount *op_job, GError *error)
   else
     g_debug ("Mount failed: %s\n", error->message);
 
-  backend = g_object_ref (op_job->backend);
+  backend = g_object_ref (G_VFS_JOB (op_job)->backend);
   g_vfs_job_emit_finished (G_VFS_JOB (op_job));
   
   /* Remove failed backend from daemon */
@@ -192,7 +192,7 @@ send_reply (GVfsJob *job)
   if (job->failed)
     mount_failed (op_job, job->error);
   else
-    g_vfs_backend_register_mount (op_job->backend,
+    g_vfs_backend_register_mount (job->backend,
                                   (GAsyncReadyCallback) register_mount_callback,
 				  job);
 }

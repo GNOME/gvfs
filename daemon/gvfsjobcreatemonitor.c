@@ -93,9 +93,9 @@ create_monitor_new_handle (GVfsDBusMount *object,
   
   job->is_directory = is_directory;
   job->filename = g_strdup (arg_path_data);
-  job->backend = backend;
   job->flags = arg_flags;
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -134,7 +134,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobCreateMonitor *op_job = G_VFS_JOB_CREATE_MONITOR (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (op_job->is_directory)
     {
@@ -142,7 +142,7 @@ run (GVfsJob *job)
 	g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 			  _("Operation not supported"));
       else
-	class->create_dir_monitor (op_job->backend,
+	class->create_dir_monitor (job->backend,
 				   op_job,
 				   op_job->filename,
 				   op_job->flags);
@@ -153,7 +153,7 @@ run (GVfsJob *job)
 	g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 			  _("Operation not supported"));
       else
-	class->create_file_monitor (op_job->backend,
+	class->create_file_monitor (job->backend,
 				    op_job,
 				    op_job->filename,
 				    op_job->flags);
@@ -165,7 +165,7 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobCreateMonitor *op_job = G_VFS_JOB_CREATE_MONITOR (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (op_job->is_directory)
     {
@@ -180,7 +180,7 @@ try (GVfsJob *job)
 	  return FALSE;	
 	}
   
-      return class->try_create_dir_monitor (op_job->backend,
+      return class->try_create_dir_monitor (job->backend,
 					    op_job,
 					    op_job->filename,
 					    op_job->flags);
@@ -198,7 +198,7 @@ try (GVfsJob *job)
 	  return FALSE;	
 	}
   
-      return class->try_create_file_monitor (op_job->backend,
+      return class->try_create_file_monitor (job->backend,
 					     op_job,
 					     op_job->filename,
 					     op_job->flags);

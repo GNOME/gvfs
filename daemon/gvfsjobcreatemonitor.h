@@ -45,7 +45,6 @@ struct _GVfsJobCreateMonitor
   GVfsJobDBus parent_instance;
 
   gboolean is_directory;
-  GVfsBackend *backend;
   char *filename;
   GFileMonitorFlags flags;
 

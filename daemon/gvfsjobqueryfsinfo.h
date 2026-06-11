@@ -43,7 +43,6 @@ struct _GVfsJobQueryFsInfo
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
   char *filename;
   GFileAttributeMatcher *attribute_matcher;
 

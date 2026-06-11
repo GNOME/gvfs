@@ -197,7 +197,7 @@ copy_delete_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
   CopyData *copy_data = user_data;
   GVfsJobCopy *job = copy_data->job;
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (G_VFS_JOB (job)->backend);
 
   GError *err = NULL;
   
@@ -217,7 +217,7 @@ static void
 do_copy (CopyData *copy_data)
 {
   GVfsJobCopy *job = copy_data->job;
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (G_VFS_JOB (job)->backend);
   
   GFileInfo *info;
   GError *err = NULL;
@@ -424,7 +424,7 @@ static void
 do_move (MoveData *move_data)
 {
   GVfsJobMove *job = move_data->job;
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (G_VFS_JOB (job)->backend);
   
   GFileInfo *info;
   GError *err = NULL;
@@ -1098,7 +1098,7 @@ open_for_write_open_fork_cb (GObject *source_object,
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
   GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (G_VFS_JOB (job)->backend);
 
   gint16 fork_refnum;
   GError *err = NULL;
@@ -1218,7 +1218,7 @@ replace_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_d
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
   GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (G_VFS_JOB (job)->backend);
 
   gint16 fork_refnum;
   GError *err = NULL;
@@ -1336,7 +1336,7 @@ replace_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpointe
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
   GVfsJobOpenForWrite *job = G_VFS_JOB_OPEN_FOR_WRITE (user_data);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (G_VFS_JOB (job)->backend);
 
   GError *err = NULL;
   GFileInfo *info;
@@ -1436,7 +1436,7 @@ read_open_fork_cb (GObject *source_object, GAsyncResult *res, gpointer user_data
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
   GVfsJobOpenForRead *job = G_VFS_JOB_OPEN_FOR_READ (user_data);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (G_VFS_JOB (job)->backend);
 
   GError *err = NULL;
   gint16 fork_refnum;
@@ -1538,7 +1538,7 @@ enumerate_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
   GVfsJobEnumerate *job = G_VFS_JOB_ENUMERATE (user_data);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (G_VFS_JOB (job)->backend);
 
   GPtrArray *infos;
   GError *err = NULL;
@@ -1877,7 +1877,7 @@ query_info_get_filedir_parms_cb (GObject *source_object, GAsyncResult *res, gpoi
 {
   GVfsAfpVolume *volume = G_VFS_AFP_VOLUME (source_object);
   GVfsJobQueryInfo *job = G_VFS_JOB_QUERY_INFO (user_data);
-  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (job->backend);
+  GVfsBackendAfp *afp_backend = G_VFS_BACKEND_AFP (G_VFS_JOB (job)->backend);
   
   GFileInfo *info;
   GError *err = NULL;

@@ -43,7 +43,6 @@ struct _GVfsJobQueryInfoWrite
   GVfsJob parent_instance;
 
   GVfsWriteChannel *channel;
-  GVfsBackend *backend;
   GVfsBackendHandle handle;
   char *attributes;
   GFileAttributeMatcher *attribute_matcher;

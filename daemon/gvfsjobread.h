@@ -43,7 +43,6 @@ struct _GVfsJobRead
   GVfsJob parent_instance;
 
   GVfsReadChannel *channel;
-  GVfsBackend *backend;
   GVfsBackendHandle handle;
   gsize bytes_requested;
   char *buffer;

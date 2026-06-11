@@ -43,7 +43,6 @@ struct _GVfsJobPollMountable
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
   char *filename;
 };
 

@@ -43,7 +43,6 @@ struct _GVfsJobDelete
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
   char *filename;
 };
 

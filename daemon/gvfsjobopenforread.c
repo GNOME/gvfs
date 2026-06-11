@@ -99,9 +99,9 @@ g_vfs_job_open_for_read_new_handle (GVfsDBusMount *object,
                       NULL);
   
   job->filename = g_strdup (arg_path_data);
-  job->backend = backend;
   job->pid = arg_pid;
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -112,7 +112,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobOpenForRead *op_job = G_VFS_JOB_OPEN_FOR_READ (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->open_for_read == NULL)
     {
@@ -121,7 +121,7 @@ run (GVfsJob *job)
       return;
     }
   
-  class->open_for_read (op_job->backend,
+  class->open_for_read (job->backend,
 			op_job,
 			op_job->filename);
 }
@@ -130,12 +130,12 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobOpenForRead *op_job = G_VFS_JOB_OPEN_FOR_READ (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->try_open_for_read == NULL)
     return FALSE;
   
-  return class->try_open_for_read (op_job->backend,
+  return class->try_open_for_read (job->backend,
 				   op_job,
 				   op_job->filename);
 }
@@ -170,7 +170,7 @@ create_reply (GVfsJob *job,
 
   g_assert (open_job->backend_handle != NULL);
 
-  channel = g_vfs_read_channel_new (open_job->backend,
+  channel = g_vfs_read_channel_new (G_VFS_JOB (open_job)->backend,
                                     open_job->pid);
 
   remote_fd = g_vfs_channel_steal_remote_fd (G_VFS_CHANNEL (channel));

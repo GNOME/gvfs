@@ -2357,8 +2357,8 @@ static void
 try_mount_send_opts (GVfsJobMount *job,
                      const gchar *user)
 {
-  GVfsBackendDav  *dav_backend = G_VFS_BACKEND_DAV (job->backend);
-  GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (job->backend);
+  GVfsBackendDav  *dav_backend = G_VFS_BACKEND_DAV (G_VFS_JOB (job)->backend);
+  GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (G_VFS_JOB (job)->backend);
   SoupMessage     *msg_opts;
 
   if (http_backend->mount_base == NULL)
@@ -2384,9 +2384,9 @@ try_mount_send_opts (GVfsJobMount *job,
   dav_backend->last_good_path = NULL;
 
   msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, http_backend->mount_base);
-  dav_message_connect_signals (msg_opts, job->backend);
+  dav_message_connect_signals (msg_opts, G_VFS_JOB (job)->backend);
 
-  g_vfs_backend_dav_send_async (job->backend, msg_opts, try_mount_opts_cb, job);
+  g_vfs_backend_dav_send_async (G_VFS_JOB (job)->backend, msg_opts, try_mount_opts_cb, job);
 }
 
 #ifdef HAVE_AVAHI
@@ -2394,8 +2394,8 @@ static void
 try_mount_resolve_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
   GVfsJobMount *job = user_data;
-  GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (job->backend);
-  GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (job->backend);
+  GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (G_VFS_JOB (job)->backend);
+  GVfsBackendHttp *http_backend = G_VFS_BACKEND_HTTP (G_VFS_JOB (job)->backend);
   GError *error = NULL;
   gchar *user;
 

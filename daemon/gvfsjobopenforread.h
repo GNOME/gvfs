@@ -43,7 +43,6 @@ struct _GVfsJobOpenForRead
   GVfsJobDBus parent_instance;
 
   char *filename;
-  GVfsBackend *backend;
   GVfsBackendHandle backend_handle;
   gboolean can_seek;
   GVfsReadChannel *read_channel;

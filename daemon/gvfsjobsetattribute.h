@@ -44,8 +44,6 @@ struct _GVfsJobSetAttribute
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
-
   char *filename;
   char *attribute;
   GFileAttributeType type;

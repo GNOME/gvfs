@@ -43,7 +43,6 @@ struct _GVfsJobWrite
   GVfsJob parent_instance;
 
   GVfsWriteChannel *channel;
-  GVfsBackend *backend;
   GVfsBackendHandle handle;
   char *data;
   gsize data_size;

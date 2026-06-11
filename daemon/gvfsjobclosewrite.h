@@ -44,7 +44,6 @@ struct _GVfsJobCloseWrite
 
   char *etag;
   GVfsWriteChannel *channel;
-  GVfsBackend *backend;
   GVfsBackendHandle handle;
 };
 

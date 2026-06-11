@@ -43,7 +43,6 @@ struct _GVfsJobMount
 {
   GVfsJob parent_instance;
 
-  GVfsBackend *backend;
   gboolean is_automount;
   GMountSpec *mount_spec;
   GMountSource *mount_source;

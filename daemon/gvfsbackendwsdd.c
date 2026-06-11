@@ -163,7 +163,7 @@ try_mount_service_cb (GObject* source_object,
                       gpointer user_data)
 {
   GVfsJobMount *job = G_VFS_JOB_MOUNT (user_data);
-  GVfsBackendWsdd *wsdd_backend = G_VFS_BACKEND_WSDD (job->backend);
+  GVfsBackendWsdd *wsdd_backend = G_VFS_BACKEND_WSDD (G_VFS_JOB (job)->backend);
   g_autoptr (GError) error = NULL;
 
   wsdd_backend->wsdd_service = g_vfs_wsdd_service_new_finish (result, &error);
@@ -185,7 +185,7 @@ try_mount_service_cb (GObject* source_object,
                     G_CALLBACK (device_resolved_cb),
                     wsdd_backend);
 
-  wsdd_backend->root_monitor = g_vfs_monitor_new (job->backend);
+  wsdd_backend->root_monitor = g_vfs_monitor_new (G_VFS_JOB (job)->backend);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }

@@ -41,6 +41,7 @@ typedef struct _GVfsJobClass   GVfsJobClass;
 
 /* Defined here to avoid circular includes */
 typedef struct _GVfsJobSource GVfsJobSource;
+typedef struct _GVfsBackend GVfsBackend;
 
 struct _GVfsJob
 {
@@ -56,7 +57,9 @@ struct _GVfsJob
   guint finished : 1;
   GError *error;
   GCancellable *cancellable;
-  
+
+  GVfsBackend *backend;
+
   GVfsJobPrivate *priv;
 };
 

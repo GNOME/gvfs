@@ -43,7 +43,6 @@ struct _GVfsJobUnmountMountable
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
   char *filename;
   gboolean eject;
   GMountUnmountFlags flags;

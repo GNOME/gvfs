@@ -92,12 +92,12 @@ g_vfs_job_query_fs_info_new_handle (GVfsDBusMount *object,
                       NULL);
 
   job->filename = g_strdup (arg_path_data);
-  job->backend = backend;
   job->attribute_matcher = g_file_attribute_matcher_new (arg_attributes);
   
   job->file_info = g_file_info_new ();
   g_file_info_set_attribute_mask (job->file_info, job->attribute_matcher);
   
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -108,7 +108,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobQueryFsInfo *op_job = G_VFS_JOB_QUERY_FS_INFO (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->query_fs_info == NULL)
     {
@@ -117,7 +117,7 @@ run (GVfsJob *job)
       return;
     }
   
-  class->query_fs_info (op_job->backend,
+  class->query_fs_info (job->backend,
 			op_job,
 			op_job->filename,
 			op_job->file_info,
@@ -128,12 +128,12 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobQueryFsInfo *op_job = G_VFS_JOB_QUERY_FS_INFO (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->try_query_fs_info == NULL)
     return FALSE;
   
-  return class->try_query_fs_info (op_job->backend,
+  return class->try_query_fs_info (job->backend,
 				 op_job,
 				 op_job->filename,
 				 op_job->file_info,
@@ -148,7 +148,7 @@ create_reply (GVfsJob *job,
 {
   GVfsJobQueryFsInfo *op_job = G_VFS_JOB_QUERY_FS_INFO (job);
 
-  g_vfs_backend_add_auto_fs_info (op_job->backend,
+  g_vfs_backend_add_auto_fs_info (job->backend,
                                   op_job->attribute_matcher,
                                   op_job->file_info);
   g_file_info_set_attribute_mask (op_job->file_info,

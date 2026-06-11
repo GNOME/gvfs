@@ -81,12 +81,12 @@ g_vfs_job_seek_write_new (GVfsWriteChannel *channel,
   job = g_object_new (G_VFS_TYPE_JOB_SEEK_WRITE,
 		      NULL);
 
-  job->backend = backend;
   job->channel = g_object_ref (channel);
   job->handle = handle;
   job->requested_offset = offset;
   job->seek_type = seek_type;
  
+  G_VFS_JOB (job)->backend = backend;
   return G_VFS_JOB (job);
 }
 
@@ -113,7 +113,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobSeekWrite *op_job = G_VFS_JOB_SEEK_WRITE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->seek_on_write == NULL)
     {
@@ -122,7 +122,7 @@ run (GVfsJob *job)
       return;
     }
       
-  class->seek_on_write (op_job->backend,
+  class->seek_on_write (job->backend,
 			op_job,
 			op_job->handle,
 			op_job->requested_offset,
@@ -133,12 +133,12 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobSeekWrite *op_job = G_VFS_JOB_SEEK_WRITE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->try_seek_on_write == NULL)
     return FALSE;
   
-  return class->try_seek_on_write (op_job->backend,
+  return class->try_seek_on_write (job->backend,
 				   op_job,
 				   op_job->handle,
 				   op_job->requested_offset,

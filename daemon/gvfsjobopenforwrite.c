@@ -110,10 +110,10 @@ open_for_write_new_handle_common (GVfsDBusMount *object,
     job->etag = g_strdup (arg_etag);
   job->make_backup = arg_make_backup;
   job->flags = arg_flags;
-  job->backend = backend;
   job->pid = arg_pid;
   job->version = version;
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -174,7 +174,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (op_job->mode == OPEN_FOR_WRITE_CREATE)
     {
@@ -185,7 +185,7 @@ run (GVfsJob *job)
 	  return;
 	}
       
-      class->create (op_job->backend,
+      class->create (job->backend,
 		     op_job,
 		     op_job->filename,
 		     op_job->flags);
@@ -199,7 +199,7 @@ run (GVfsJob *job)
 	  return;
 	}
       
-      class->append_to (op_job->backend,
+      class->append_to (job->backend,
 			op_job,
 			op_job->filename,
 			op_job->flags);
@@ -213,7 +213,7 @@ run (GVfsJob *job)
 	  return;
 	}
       
-      class->replace (op_job->backend,
+      class->replace (job->backend,
 		      op_job,
 		      op_job->filename,
 		      op_job->etag,
@@ -229,7 +229,7 @@ run (GVfsJob *job)
           return;
         }
 
-      class->edit (op_job->backend,
+      class->edit (job->backend,
                    op_job,
                    op_job->filename,
                    op_job->flags);
@@ -242,9 +242,9 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
-  if (g_vfs_backend_get_readonly_lockdown (op_job->backend))
+  if (g_vfs_backend_get_readonly_lockdown (job->backend))
     {
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                         _("Filesystem is read-only"));
@@ -255,7 +255,7 @@ try (GVfsJob *job)
     {
       if (class->try_create == NULL)
 	return FALSE;
-      return class->try_create (op_job->backend,
+      return class->try_create (job->backend,
 				op_job,
 				op_job->filename,
 				op_job->flags);
@@ -264,7 +264,7 @@ try (GVfsJob *job)
     {
       if (class->try_append_to == NULL)
 	return FALSE;
-      return class->try_append_to (op_job->backend,
+      return class->try_append_to (job->backend,
 				   op_job,
 				   op_job->filename,
 				   op_job->flags);
@@ -273,7 +273,7 @@ try (GVfsJob *job)
     {
       if (class->try_replace == NULL)
 	return FALSE;
-      return class->try_replace (op_job->backend,
+      return class->try_replace (job->backend,
 				 op_job,
 				 op_job->filename,
 				 op_job->etag,
@@ -284,7 +284,7 @@ try (GVfsJob *job)
     {
       if (class->try_edit == NULL)
         return FALSE;
-      return class->try_edit (op_job->backend,
+      return class->try_edit (job->backend,
                               op_job,
                               op_job->filename,
                               op_job->flags);
@@ -343,7 +343,7 @@ create_reply (GVfsJob *job,
 
   g_assert (open_job->backend_handle != NULL);
 
-  channel = g_vfs_write_channel_new (open_job->backend,
+  channel = g_vfs_write_channel_new (G_VFS_JOB (open_job)->backend,
                                      open_job->pid);
 
   remote_fd = g_vfs_channel_steal_remote_fd (G_VFS_CHANNEL (channel));

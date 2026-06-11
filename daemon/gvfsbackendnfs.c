@@ -815,7 +815,7 @@ open_for_write_stat_cb (int err,
       g_vfs_job_open_for_write_set_initial_offset (op_job, st->nfs_size);
     }
 
-  open_for_write_create (op_job->backend,
+  open_for_write_create (G_VFS_JOB (op_job)->backend,
                          op_job,
                          op_job->filename,
                          op_job->flags,
@@ -1046,7 +1046,7 @@ replace_backup_chown_cb (int err,
   if (err == 0 || err == -EPERM)
     {
       GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
-      GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (op_job->backend);
+      GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (G_VFS_JOB (op_job)->backend);
 
 #ifdef LIBNFS_API_V2
       nfs_open2_async (op_backend->ctx,
@@ -1080,7 +1080,7 @@ replace_backup_cb (gboolean success, void *private_data)
   if (success)
     {
       GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
-      GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (op_job->backend);
+      GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (G_VFS_JOB (op_job)->backend);
       nfs_chown_async (op_backend->ctx,
                        handle->backup_filename, handle->uid, handle->gid,
                        replace_backup_chown_cb, handle);
@@ -1125,7 +1125,7 @@ replace_truncate (struct nfs_context *ctx, WriteHandle *handle)
 {
   GVfsJob *job = handle->job;
   GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
-  GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (op_job->backend);
+  GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (G_VFS_JOB (op_job)->backend);
 
   g_free (handle->filename);
   g_free (handle->tempname);
@@ -1273,7 +1273,7 @@ replace_stat_cb (int err,
   if (err == 0)
     {
       GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
-      GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (op_job->backend);
+      GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (G_VFS_JOB (op_job)->backend);
       struct nfs_stat_64 *st = data;
 
       /* Fail if we're not replacing the destination and the destination is a
@@ -2203,7 +2203,7 @@ stat_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
 
       if (!strcmp (op_job->filename, "/"))
         {
-          GMountSpec *mount_spec = g_vfs_backend_get_mount_spec (op_job->backend);
+          GMountSpec *mount_spec = g_vfs_backend_get_mount_spec (G_VFS_JOB (op_job)->backend);
           basename = g_path_get_basename (mount_spec->mount_prefix);
         }
       else

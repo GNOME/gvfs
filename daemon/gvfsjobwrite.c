@@ -83,7 +83,6 @@ g_vfs_job_write_new (GVfsWriteChannel *channel,
   job = g_object_new (G_VFS_TYPE_JOB_WRITE,
 		      NULL);
 
-  job->backend = backend;
   job->channel = g_object_ref (channel);
   job->handle = handle;
   /* Takes ownership */
@@ -91,6 +90,7 @@ g_vfs_job_write_new (GVfsWriteChannel *channel,
   job->data_size = data_size;
   job->written_size = 0;
   
+  G_VFS_JOB (job)->backend = backend;
   return G_VFS_JOB (job);
 }
 
@@ -115,7 +115,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobWrite *op_job = G_VFS_JOB_WRITE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->write == NULL)
     {
@@ -124,7 +124,7 @@ run (GVfsJob *job)
       return;
     }
       
-  class->write (op_job->backend,
+  class->write (job->backend,
 		op_job,
 		op_job->handle,
 		op_job->data,
@@ -135,12 +135,12 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobWrite *op_job = G_VFS_JOB_WRITE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->try_write == NULL)
     return FALSE;
 
-  return class->try_write (op_job->backend,
+  return class->try_write (job->backend,
 			   op_job,
 			   op_job->handle,
 			   op_job->data,

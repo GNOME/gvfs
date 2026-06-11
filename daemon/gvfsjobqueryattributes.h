@@ -43,8 +43,6 @@ struct _GVfsJobQueryAttributes
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
-
   char *filename;
   gboolean namespaces;
   

@@ -94,10 +94,10 @@ g_vfs_job_unmount_new_handle (GVfsDBusMount *object,
                       "invocation", invocation,
                       NULL);
 
-  job->backend = backend;
   job->flags = arg_flags;
   job->mount_source = g_mount_source_new (arg_dbus_id, arg_obj_path);
   
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -121,7 +121,7 @@ unmount_progress_clear (GVfsJobUnmount *op_job)
   g_debug ("gvfsjobunmount progress clear\n");
 
   message = g_strdup_printf (_("%s has been unmounted\n"),
-                             g_vfs_backend_get_display_name (op_job->backend));
+                             g_vfs_backend_get_display_name (G_VFS_JOB (op_job)->backend));
   g_mount_source_show_unmount_progress (op_job->mount_source,
                                         message, 0, 0);
   g_free (message);
@@ -139,7 +139,7 @@ unmount_progress_timeout (gpointer user_data)
   g_debug ("gvfsjobunmount progress timeout reached\n");
 
   message = g_strdup_printf (_("Unmounting %s\nPlease wait"),
-                             g_vfs_backend_get_display_name (op_job->backend));
+                             g_vfs_backend_get_display_name (G_VFS_JOB (op_job)->backend));
   /* TODO: report estimated bytes and time left */
   g_mount_source_show_unmount_progress (op_job->mount_source,
                                         message, -1, -1);
@@ -162,14 +162,14 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->unmount == NULL)
     return;
 
   unmount_progress_start (op_job);
 
-  class->unmount (op_job->backend,
+  class->unmount (job->backend,
 		  op_job,
                   op_job->flags,
                   op_job->mount_source);
@@ -180,8 +180,8 @@ run (GVfsJob *job)
 static gboolean
 job_finish_immediately_if_possible (GVfsJobUnmount *op_job)
 {
-  GVfsBackend      *backend = op_job->backend;
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackend      *backend = G_VFS_JOB (op_job)->backend;
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (G_VFS_JOB (op_job)->backend);
   gboolean is_busy;
   gboolean force_unmount;
 
@@ -207,7 +207,7 @@ unmount_cb (GVfsBackend  *backend,
             gpointer      user_data)
 {
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (user_data);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (G_VFS_JOB (op_job)->backend);
   gboolean should_unmount;
   gboolean finished;
   GError *error = NULL;
@@ -230,7 +230,7 @@ unmount_cb (GVfsBackend  *backend,
       gboolean run_in_thread = TRUE;
 
       if (class->try_unmount != NULL)
-	run_in_thread = ! class->try_unmount (op_job->backend,
+	run_in_thread = ! class->try_unmount (G_VFS_JOB (op_job)->backend,
 					      op_job,
 					      op_job->flags,
 					      op_job->mount_source);
@@ -248,8 +248,8 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
-  GVfsBackend    *backend = op_job->backend;
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackend    *backend = job->backend;
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
   gboolean is_busy;
   gboolean force_unmount;
 
@@ -273,7 +273,7 @@ try (GVfsJob *job)
   if (job_finish_immediately_if_possible (op_job))
     return TRUE;
   else if (class->try_unmount != NULL)
-    return class->try_unmount (op_job->backend,
+    return class->try_unmount (job->backend,
 			       op_job,
 			       op_job->flags,
 			       op_job->mount_source);
@@ -317,7 +317,7 @@ static void
 send_reply (GVfsJob *job)
 {
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
-  GVfsBackend *backend = op_job->backend;
+  GVfsBackend *backend = job->backend;
 
   if (job->failed)
     {

@@ -43,7 +43,6 @@ struct _GVfsJobSetDisplayName
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
   char *filename;
   char *display_name;
 

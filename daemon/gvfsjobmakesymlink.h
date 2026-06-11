@@ -43,7 +43,6 @@ struct _GVfsJobMakeSymlink
 {
   GVfsJobDBus parent_instance;
 
-  GVfsBackend *backend;
   char *filename;
   char *symlink_value;
 };

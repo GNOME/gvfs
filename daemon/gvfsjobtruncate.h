@@ -41,7 +41,6 @@ struct _GVfsJobTruncate
   GVfsJob parent_instance;
 
   GVfsWriteChannel *channel;
-  GVfsBackend *backend;
   GVfsBackendHandle handle;
   goffset size;
 };

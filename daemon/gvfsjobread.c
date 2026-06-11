@@ -82,12 +82,12 @@ g_vfs_job_read_new (GVfsReadChannel *channel,
   job = g_object_new (G_VFS_TYPE_JOB_READ,
 		      NULL);
 
-  job->backend = backend;
   job->channel = g_object_ref (channel);
   job->handle = handle;
   job->buffer = g_malloc (bytes_requested);
   job->bytes_requested = bytes_requested;
   
+  G_VFS_JOB (job)->backend = backend;
   return G_VFS_JOB (job);
 }
 
@@ -115,7 +115,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobRead *op_job = G_VFS_JOB_READ (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->read == NULL)
     {
@@ -124,7 +124,7 @@ run (GVfsJob *job)
       return;
     }
       
-  class->read (op_job->backend,
+  class->read (job->backend,
 	       op_job,
 	       op_job->handle,
 	       op_job->buffer,
@@ -135,12 +135,12 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobRead *op_job = G_VFS_JOB_READ (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->try_read == NULL)
     return FALSE;
 
-  return class->try_read (op_job->backend,
+  return class->try_read (job->backend,
 			  op_job,
 			  op_job->handle,
 			  op_job->buffer,

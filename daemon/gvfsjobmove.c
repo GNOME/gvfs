@@ -96,12 +96,12 @@ g_vfs_job_move_new_handle (GVfsDBusMount *object,
 
   job->source = g_strdup (arg_path1_data);
   job->destination = g_strdup (arg_path2_data);
-  job->backend = backend;
   job->flags = arg_flags;
   if (strcmp (arg_progress_obj_path, "/org/gtk/vfs/void") != 0)
     progress_job->callback_obj_path = g_strdup (arg_progress_obj_path);
   progress_job->send_progress = progress_job->callback_obj_path != NULL;
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -113,7 +113,7 @@ run (GVfsJob *job)
 {
   GVfsJobMove *op_job = G_VFS_JOB_MOVE (job);
   GVfsJobProgress *progress_job = G_VFS_JOB_PROGRESS (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->move == NULL)
     {
@@ -124,7 +124,7 @@ run (GVfsJob *job)
   
   g_vfs_job_progress_construct_proxy (job);
   
-  class->move (op_job->backend,
+  class->move (job->backend,
 	       op_job,
 	       op_job->source,
 	       op_job->destination,
@@ -138,10 +138,10 @@ try (GVfsJob *job)
 {
   GVfsJobMove *op_job = G_VFS_JOB_MOVE (job);
   GVfsJobProgress *progress_job = G_VFS_JOB_PROGRESS (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
   gboolean res;
 
-  if (g_vfs_backend_get_readonly_lockdown (op_job->backend))
+  if (g_vfs_backend_get_readonly_lockdown (job->backend))
     {
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                         _("Filesystem is read-only"));
@@ -153,7 +153,7 @@ try (GVfsJob *job)
   
   g_vfs_job_progress_construct_proxy (job);
   
-  res = class->try_move (op_job->backend,
+  res = class->try_move (job->backend,
 			 op_job,
 			 op_job->source,
 			 op_job->destination,

@@ -98,7 +98,6 @@ g_vfs_job_pull_new_handle (GVfsDBusMount *object,
 
   job->source = g_strdup (arg_path_data);
   job->local_path = g_strdup (arg_local_path);
-  job->backend = backend;
   job->flags = arg_flags;
   progress_job->send_progress = arg_send_progress;
   job->remove_source = arg_remove_source;
@@ -106,6 +105,7 @@ g_vfs_job_pull_new_handle (GVfsDBusMount *object,
   if (strcmp (arg_progress_obj_path, "/org/gtk/vfs/void") != 0)
     progress_job->callback_obj_path = g_strdup (arg_progress_obj_path);
 
+  G_VFS_JOB (job)->backend = backend;
   g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (backend), G_VFS_JOB (job));
   g_object_unref (job);
 
@@ -117,7 +117,7 @@ run (GVfsJob *job)
 {
   GVfsJobPull *op_job = G_VFS_JOB_PULL (job);
   GVfsJobProgress *progress_job = G_VFS_JOB_PROGRESS (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->pull == NULL)
     {
@@ -128,7 +128,7 @@ run (GVfsJob *job)
 
   g_vfs_job_progress_construct_proxy (job);
   
-  class->pull (op_job->backend,
+  class->pull (job->backend,
                op_job,
                op_job->source,
                op_job->local_path,
@@ -143,7 +143,7 @@ try (GVfsJob *job)
 {
   GVfsJobPull *op_job = G_VFS_JOB_PULL (job);
   GVfsJobProgress *progress_job = G_VFS_JOB_PROGRESS (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
   gboolean res;
 
   if (class->try_pull == NULL)
@@ -151,7 +151,7 @@ try (GVfsJob *job)
 
   g_vfs_job_progress_construct_proxy (job);
   
-  res = class->try_pull (op_job->backend,
+  res = class->try_pull (job->backend,
                          op_job,
                          op_job->source,
                          op_job->local_path,

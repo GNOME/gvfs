@@ -83,7 +83,6 @@ g_vfs_job_query_info_write_new (GVfsWriteChannel *channel,
   job = g_object_new (G_VFS_TYPE_JOB_QUERY_INFO_WRITE,
 		      NULL);
 
-  job->backend = backend;
   job->channel = g_object_ref (channel);
   job->handle = handle;
   job->attributes = g_strdup (attrs);
@@ -92,6 +91,7 @@ g_vfs_job_query_info_write_new (GVfsWriteChannel *channel,
   job->file_info = g_file_info_new ();
   g_file_info_set_attribute_mask (job->file_info, job->attribute_matcher);
   
+  G_VFS_JOB (job)->backend = backend;
   return G_VFS_JOB (job);
 }
 
@@ -117,7 +117,7 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobQueryInfoWrite *op_job = G_VFS_JOB_QUERY_INFO_WRITE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->query_info_on_write == NULL)
     {
@@ -126,7 +126,7 @@ run (GVfsJob *job)
       return;
     }
       
-  class->query_info_on_write (op_job->backend,
+  class->query_info_on_write (job->backend,
 			      op_job,
 			      op_job->handle,
 			      op_job->file_info,
@@ -137,12 +137,12 @@ static gboolean
 try (GVfsJob *job)
 {
   GVfsJobQueryInfoWrite *op_job = G_VFS_JOB_QUERY_INFO_WRITE (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (job->backend);
 
   if (class->try_query_info_on_write == NULL)
     return FALSE;
   
-  return class->try_query_info_on_write (op_job->backend,
+  return class->try_query_info_on_write (job->backend,
 					 op_job,
 					 op_job->handle,
 					 op_job->file_info,
