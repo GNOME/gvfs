@@ -103,9 +103,12 @@ g_vfs_monitor_finalize (GObject *object)
   monitor = G_VFS_MONITOR (object);
 
   if (monitor->priv->backend)
-    g_object_weak_unref (G_OBJECT (monitor->priv->backend),
-			 (GWeakNotify)backend_died,
-			 monitor);
+    {
+      g_vfs_backend_monitor_destroyed (monitor->priv->backend);
+      g_object_weak_unref (G_OBJECT (monitor->priv->backend),
+                           (GWeakNotify)backend_died,
+                           monitor);
+    }
 
   g_vfs_daemon_unregister_path (monitor->priv->daemon, monitor->priv->object_path);
   g_object_unref (monitor->priv->daemon);
@@ -287,6 +290,8 @@ g_vfs_monitor_new (GVfsBackend *backend)
 			      monitor->priv->object_path,
 			      register_path_cb,
 			      monitor);
+
+  g_vfs_backend_monitor_created (backend);
 
   return monitor;  
 }

@@ -81,10 +81,16 @@ struct _GVfsBackendPrivate
   GMountSpec *mount_spec;
   gboolean block_requests;
 
+  gboolean autounmount;
+  guint idle_id;
+  guint active_monitors;
+
   GSettings *lockdown_settings;
   gboolean readonly_lockdown;
 };
 
+
+#define AUTOUNMOUNT_TIMEOUT 600 /* seconds */
 
 /* TODO: Real P_() */
 #define P_(_x) (_x)
@@ -158,6 +164,8 @@ g_vfs_backend_finalize (GObject *object)
   g_free (backend->priv->default_location);
   if (backend->priv->mount_spec)
     g_mount_spec_unref (backend->priv->mount_spec);
+
+  g_clear_handle_id (&backend->priv->idle_id, g_source_remove);
 
   g_clear_object (&backend->priv->lockdown_settings);
 
@@ -1081,6 +1089,64 @@ g_vfs_backend_force_unmount (GVfsBackend *backend)
   g_vfs_backend_unregister_mount (backend,
                                   (GAsyncReadyCallback) forced_unregister_mount_callback,
                                   NULL);
+}
+
+static gboolean
+idle_unmount_cb (gpointer user_data)
+{
+  GVfsBackend *backend = G_VFS_BACKEND (user_data);
+
+  backend->priv->idle_id = 0;
+
+  if (backend->priv->block_requests)
+    return G_SOURCE_REMOVE;
+
+  g_debug ("autounmount: idle timeout expired, force unmounting\n");
+  g_vfs_backend_force_unmount (backend);
+
+  return G_SOURCE_REMOVE;
+}
+
+void
+g_vfs_backend_set_autounmount (GVfsBackend *backend,
+                               gboolean     autounmount)
+{
+  g_debug ("g_vfs_backend_set_autounmount: %d\n", autounmount);
+  backend->priv->autounmount = autounmount;
+}
+
+void
+g_vfs_backend_update_idle_timeout (GVfsBackend *backend)
+{
+  if (!backend->priv->autounmount || backend->priv->block_requests)
+    return;
+
+  GVfsDaemon *daemon = backend->priv->daemon;
+
+  g_clear_handle_id (&backend->priv->idle_id, g_source_remove);
+
+  if (backend->priv->active_monitors == 0 &&
+      !g_vfs_daemon_has_pending_jobs (daemon, backend) &&
+      !g_vfs_daemon_has_open_channels (daemon, backend))
+    backend->priv->idle_id = g_timeout_add_seconds (AUTOUNMOUNT_TIMEOUT,
+                                                    idle_unmount_cb,
+                                                    backend);
+}
+
+void
+g_vfs_backend_monitor_created (GVfsBackend *backend)
+{
+  backend->priv->active_monitors++;
+  g_vfs_backend_update_idle_timeout (backend);
+}
+
+void
+g_vfs_backend_monitor_destroyed (GVfsBackend *backend)
+{
+  g_return_if_fail (backend->priv->active_monitors > 0);
+
+  backend->priv->active_monitors--;
+  g_vfs_backend_update_idle_timeout (backend);
 }
 
 static void

@@ -80,6 +80,10 @@ void        g_vfs_daemon_initiate_mount  (GVfsDaemon                    *daemon,
 					  GDBusMethodInvocation         *invocation);
 GArray     *g_vfs_daemon_get_blocking_processes (GVfsDaemon             *daemon);
 gboolean    g_vfs_daemon_has_blocking_processes (GVfsDaemon *daemon);
+gboolean    g_vfs_daemon_has_pending_jobs (GVfsDaemon  *daemon,
+                                           GVfsBackend *backend);
+gboolean    g_vfs_daemon_has_open_channels (GVfsDaemon  *daemon,
+                                            GVfsBackend *backend);
 void        g_vfs_daemon_run_job_in_thread      (GVfsDaemon             *daemon,
 						 GVfsJob                *job);
 void       g_vfs_daemon_close_active_channels (GVfsDaemon                *daemon,

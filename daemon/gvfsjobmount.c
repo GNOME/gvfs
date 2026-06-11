@@ -171,6 +171,8 @@ register_mount_callback (GVfsBackend *backend,
     }
   else
     {
+      g_vfs_backend_update_idle_timeout (backend);
+
       if (op_job->invocation && op_job->object)
         gvfs_dbus_mountable_complete_mount (op_job->object, op_job->invocation);
 

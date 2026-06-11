@@ -550,6 +550,12 @@ gboolean    g_vfs_backend_invocation_first_handler       (GVfsDBusMount *object,
 void        g_vfs_backend_handle_readonly_lockdown       (GVfsBackend *backend);
 gboolean    g_vfs_backend_get_readonly_lockdown          (GVfsBackend *backend);
 
+void        g_vfs_backend_set_autounmount               (GVfsBackend           *backend,
+                                                         gboolean               autounmount);
+void        g_vfs_backend_update_idle_timeout           (GVfsBackend           *backend);
+void        g_vfs_backend_monitor_created               (GVfsBackend           *backend);
+void        g_vfs_backend_monitor_destroyed             (GVfsBackend           *backend);
+
 G_END_DECLS
 
 #endif /* __G_VFS_BACKEND_H__ */

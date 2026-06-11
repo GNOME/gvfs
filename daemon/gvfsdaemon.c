@@ -450,6 +450,11 @@ static void
 job_source_closed_callback (GVfsJobSource *job_source,
 			    GVfsDaemon *daemon)
 {
+  GVfsBackend *backend = NULL;
+
+  if (G_VFS_IS_CHANNEL (job_source))
+    backend = g_vfs_channel_get_backend (G_VFS_CHANNEL (job_source));
+
   g_mutex_lock (&daemon->lock);
   
   daemon->job_sources = g_list_remove (daemon->job_sources,
@@ -468,6 +473,9 @@ job_source_closed_callback (GVfsJobSource *job_source,
     daemon_schedule_exit (daemon);
   
   g_mutex_unlock (&daemon->lock);
+
+  if (backend != NULL)
+    g_vfs_backend_update_idle_timeout (backend);
 }
 
 static void
@@ -621,7 +629,10 @@ job_finished_callback (GVfsJob *job,
   g_mutex_lock (&daemon->lock);
   daemon->jobs = g_list_remove (daemon->jobs, job);
   g_mutex_unlock (&daemon->lock);
-  
+
+  if (job->backend != NULL)
+    g_vfs_backend_update_idle_timeout (job->backend);
+
   g_object_unref (job);
 }
 
@@ -638,7 +649,10 @@ g_vfs_daemon_queue_job (GVfsDaemon *daemon,
   g_mutex_lock (&daemon->lock);
   daemon->jobs = g_list_prepend (daemon->jobs, job);
   g_mutex_unlock (&daemon->lock);
-  
+
+  if (job->backend != NULL)
+    g_vfs_backend_update_idle_timeout (job->backend);
+
   /* Can we start the job immediately / async */
   if (!g_vfs_job_try (job))
     {
@@ -1034,6 +1048,49 @@ g_vfs_daemon_has_blocking_processes (GVfsDaemon *daemon)
       if (!G_VFS_IS_JOB_UNMOUNT (l->data))
         {
           g_debug ("blocking job: %p\n", l->data);
+          g_mutex_unlock (&daemon->lock);
+          return TRUE;
+        }
+    }
+  g_mutex_unlock (&daemon->lock);
+
+  return FALSE;
+}
+
+gboolean
+g_vfs_daemon_has_pending_jobs (GVfsDaemon  *daemon,
+                               GVfsBackend *backend)
+{
+  GList *l;
+
+  g_mutex_lock (&daemon->lock);
+  for (l = daemon->jobs; l != NULL; l = l->next)
+    {
+      GVfsJob *job = G_VFS_JOB (l->data);
+
+      if (job->backend == backend)
+        {
+          g_mutex_unlock (&daemon->lock);
+          return TRUE;
+        }
+    }
+  g_mutex_unlock (&daemon->lock);
+
+  return FALSE;
+}
+
+gboolean
+g_vfs_daemon_has_open_channels (GVfsDaemon  *daemon,
+                                GVfsBackend *backend)
+{
+  GList *l;
+
+  g_mutex_lock (&daemon->lock);
+  for (l = daemon->job_sources; l != NULL; l = l->next)
+    {
+      if (G_VFS_IS_CHANNEL (l->data) &&
+          g_vfs_channel_get_backend (G_VFS_CHANNEL (l->data)) == backend)
+        {
           g_mutex_unlock (&daemon->lock);
           return TRUE;
         }
