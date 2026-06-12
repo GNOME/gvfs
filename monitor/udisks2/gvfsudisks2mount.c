@@ -74,10 +74,6 @@ struct _GVfsUDisks2Mount
   gchar *mount_entry_name;
   gchar *mount_entry_fs_type;
 
-#ifdef HAVE_BURN
-  gboolean is_burn_mount;
-#endif
-
   GIcon *autorun_icon;
   gboolean searched_for_autorun;
 
@@ -352,16 +348,6 @@ gvfs_udisks2_mount_new (GVfsUDisks2VolumeMonitor *monitor,
       mount->mount_path = g_strdup (g_unix_mount_entry_get_mount_path (mount_entry));
       mount->root = g_file_new_for_path (mount->mount_path);
     }
-#ifdef HAVE_BURN
-  else
-    {
-      /* burn:/// mount (the only mounts we support with mount_entry == NULL) */
-      mount->device_file = NULL;
-      mount->mount_path = NULL;
-      mount->root = g_file_new_for_uri ("burn:///");
-      mount->is_burn_mount = TRUE;
-    }
-#endif
 
   /* need to set the volume only when the mount is fully constructed */
   mount->volume = volume;
@@ -1020,16 +1006,6 @@ gvfs_udisks2_mount_unmount_with_operation (GMount              *_mount,
 
   g_task_set_task_data (task, data, (GDestroyNotify)unmount_data_free);
 
-#ifdef HAVE_BURN
-  if (mount->is_burn_mount)
-    {
-      /* burn mounts are really never mounted so complete successfully immediately */
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
-      return;
-    }
-#endif
-
   block = NULL;
   if (mount->volume != NULL)
     block = gvfs_udisks2_volume_get_block (mount->volume);
@@ -1201,41 +1177,13 @@ gvfs_udisks2_mount_guess_content_type_sync (GMount        *_mount,
 
   p = g_ptr_array_new ();
 
-#ifdef HAVE_BURN
-  /* doesn't make sense to probe blank discs - look at the disc type instead */
-  if (mount->is_burn_mount)
+  /* sniff content type */
+  x_content_types = g_content_type_guess_for_tree (mount->root);
+  if (x_content_types != NULL)
     {
-      GDrive *drive;
-      drive = gvfs_udisks2_mount_get_drive (_mount);
-      if (drive != NULL)
-        {
-          UDisksDrive *udisks_drive = gvfs_udisks2_drive_get_udisks_drive (GVFS_UDISKS2_DRIVE (drive));;
-          const gchar *media = udisks_drive_get_media (udisks_drive);
-          if (media != NULL)
-            {
-              if (g_str_has_prefix (media, "optical_dvd"))
-                g_ptr_array_add (p, g_strdup ("x-content/blank-dvd"));
-              else if (g_str_has_prefix (media, "optical_hddvd"))
-                g_ptr_array_add (p, g_strdup ("x-content/blank-hddvd"));
-              else if (g_str_has_prefix (media, "optical_bd"))
-                g_ptr_array_add (p, g_strdup ("x-content/blank-bd"));
-              else
-                g_ptr_array_add (p, g_strdup ("x-content/blank-cd")); /* assume CD */
-            }
-          g_object_unref (drive);
-        }
-    }
-  else
-#endif
-    {
-      /* sniff content type */
-      x_content_types = g_content_type_guess_for_tree (mount->root);
-      if (x_content_types != NULL)
-        {
-          for (n = 0; x_content_types[n] != NULL; n++)
-            g_ptr_array_add (p, g_strdup (x_content_types[n]));
-          g_strfreev (x_content_types);
-        }
+      for (n = 0; x_content_types[n] != NULL; n++)
+        g_ptr_array_add (p, g_strdup (x_content_types[n]));
+      g_strfreev (x_content_types);
     }
 
   if (mount->device_file != NULL)

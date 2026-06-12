@@ -107,7 +107,7 @@ static void update_mounts            (GVfsUDisks2VolumeMonitor  *monitor,
                                       GHashTable                *changed_mounts,
                                       gboolean                   coldplug);
 
-#if defined(HAVE_BURN) || defined(HAVE_CDDA)
+#if defined(HAVE_CDDA)
 static void update_discs             (GVfsUDisks2VolumeMonitor  *monitor,
                                       GList                    **added_volumes,
                                       GList                    **removed_volumes,
@@ -788,7 +788,7 @@ update_all (GVfsUDisks2VolumeMonitor *monitor,
   update_fstab_volumes (monitor, mount_points_by_path, &added_volumes, &removed_volumes, changed_volumes, coldplug);
   update_mounts (monitor, mount_entries, mount_points_by_path, &added_mounts, &removed_mounts, changed_volumes, changed_mounts, coldplug);
 
-#if defined(HAVE_BURN) || defined(HAVE_CDDA)
+#if defined(HAVE_CDDA)
   update_discs (monitor,
                 &added_volumes, &removed_volumes,
                 &added_mounts, &removed_mounts,
@@ -1207,24 +1207,17 @@ should_include_drive (GVfsUDisks2VolumeMonitor *monitor,
   return ret;
 }
 
-#if defined(HAVE_BURN) || defined(HAVE_CDDA)
+#if defined(HAVE_CDDA)
 static gboolean
 should_include_disc (GVfsUDisks2VolumeMonitor *monitor,
                      UDisksDrive              *drive)
 {
   gboolean ret = FALSE;
 
-  /* only consider blank and audio discs */
+  /* only consider audio discs */
 
-#ifdef HAVE_BURN
-  if (udisks_drive_get_optical_blank (drive))
-    ret = TRUE;
-#endif
-
-#ifdef HAVE_CDDA
   if (udisks_drive_get_optical_num_audio_tracks (drive) > 0)
     ret = TRUE;
-#endif
 
   return ret;
 }
@@ -1232,7 +1225,7 @@ should_include_disc (GVfsUDisks2VolumeMonitor *monitor,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-#if defined(HAVE_BURN) || defined(HAVE_CDDA)
+#if defined(HAVE_CDDA)
 static void
 add_disc_volume (GVfsUDisks2VolumeMonitor *monitor,
                  GVfsUDisks2Volume        *volume)
@@ -1959,7 +1952,7 @@ update_mounts (GVfsUDisks2VolumeMonitor  *monitor,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-#if defined(HAVE_BURN) || defined(HAVE_CDDA)
+#if defined(HAVE_CDDA)
 static void
 update_discs (GVfsUDisks2VolumeMonitor  *monitor,
               GList                    **added_volumes,
@@ -2025,13 +2018,6 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
                   gchar *uri = NULL;
                   GFile *activation_root;
 
-#ifdef HAVE_BURN
-                  if (udisks_drive_get_optical_blank (udisks_drive))
-                    {
-                      uri = g_strdup ("burn://");
-                    }
-#endif
-
 #ifdef HAVE_CDDA
                   if (udisks_drive_get_optical_num_audio_tracks (udisks_drive) > 0)
                     {
@@ -2056,22 +2042,6 @@ update_discs (GVfsUDisks2VolumeMonitor  *monitor,
                           gvfs_udisks2_drive_set_volume (drive, volume);
                           g_hash_table_add (changed_drives, g_object_ref (drive));
                         }
-#ifdef HAVE_BURN
-                      if (udisks_drive_get_optical_blank (udisks_drive))
-                        {
-                          mount = gvfs_udisks2_mount_new (monitor,
-                                                          NULL, /* GUnixMountEntry */
-                                                          volume);
-                          if (mount != NULL)
-                            {
-                              gvfs_udisks2_volume_set_mount (volume, mount);
-                              g_hash_table_add (changed_volumes, g_object_ref (volume));
-                              g_hash_table_add (changed_mounts, g_object_ref (mount));
-                              g_hash_table_add (monitor->disc_mounts, g_object_ref (mount));
-                              *added_mounts = g_list_prepend (*added_mounts, g_steal_pointer (&mount));
-                            }
-                        }
-#endif
                       add_disc_volume (monitor, volume);
                       *added_volumes = g_list_prepend (*added_volumes, g_steal_pointer (&volume));
                     }

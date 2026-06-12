@@ -470,10 +470,6 @@ enable_sftp = get_option('sftp')
 # *** WSDD backend ***
 enable_wsdd = get_option('wsdd')
 
-# *** burn backend ***
-enable_burn = get_option('burn')
-config_h.set('HAVE_BURN', enable_burn)
-
 # *** Enable development utils ***
 enable_deprecated_apis = get_option('deprecated_apis')
 enable_devel_utils = get_option('devel_utils')
@@ -515,7 +511,6 @@ summary({
   'afc': enable_afc,
   'afp': enable_afp,
   'archive': enable_archive,
-  'burn': enable_burn,
   'cdda': enable_cdda,
   'dnssd': enable_dnssd,
   'goa': enable_goa,
