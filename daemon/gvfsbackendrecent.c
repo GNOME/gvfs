@@ -43,7 +43,7 @@ struct OPAQUE_TYPE__GVfsBackendRecent
   GHashTable *uri_map;
   GHashTable *items;
 
-  GVfsMonitor *dir_monitor;
+  GWeakRef dir_monitor;
 };
 
 G_DEFINE_TYPE (GVfsBackendRecent, g_vfs_backend_recent, G_VFS_TYPE_BACKEND);
@@ -54,15 +54,16 @@ static GVfsMonitor *
 recent_backend_get_dir_monitor (GVfsBackendRecent *backend,
                                 gboolean           create)
 {
-  if (backend->dir_monitor == NULL && create == FALSE)
-    return NULL;
+  GVfsMonitor *monitor;
 
-  else if (backend->dir_monitor == NULL)
-    {
-      backend->dir_monitor = g_vfs_monitor_new (G_VFS_BACKEND (backend));
-    }
+  monitor = g_weak_ref_get (&backend->dir_monitor);
+  if (monitor != NULL || create == FALSE)
+    return monitor;
 
-  return g_object_ref (backend->dir_monitor);
+  monitor = g_vfs_monitor_new (G_VFS_BACKEND (backend));
+  g_weak_ref_set (&backend->dir_monitor, monitor);
+
+  return monitor;
 }
 
 static GFile *
@@ -745,7 +746,7 @@ recent_backend_finalize (GObject *object)
 {
   GVfsBackendRecent *backend = G_VFS_BACKEND_RECENT (object);
 
-  g_clear_object (&backend->dir_monitor);
+  g_weak_ref_clear (&backend->dir_monitor);
 
   g_hash_table_destroy (backend->items);
   g_hash_table_destroy (backend->uri_map);
@@ -767,6 +768,8 @@ g_vfs_backend_recent_init (GVfsBackendRecent *backend)
 {
   GVfsBackend *vfs_backend = G_VFS_BACKEND (backend);
   GMountSpec *mount_spec;
+
+  g_weak_ref_init (&backend->dir_monitor, NULL);
 
   backend->items = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, (GDestroyNotify)recent_item_free);
   backend->uri_map = g_hash_table_new (g_str_hash, g_str_equal);
