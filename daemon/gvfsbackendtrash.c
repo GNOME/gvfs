@@ -844,6 +844,8 @@ trash_backend_mount (GVfsBackend  *vfs_backend,
                                          backend);
   trash_backend_worker_thread_queue_and_wait (backend, ready_func);
 
+  g_vfs_backend_set_autounmount (vfs_backend, TRUE);
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
