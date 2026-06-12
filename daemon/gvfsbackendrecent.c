@@ -43,33 +43,12 @@ struct OPAQUE_TYPE__GVfsBackendRecent
   GHashTable *uri_map;
   GHashTable *items;
 
-  GVfsMonitor *file_monitor;
   GVfsMonitor *dir_monitor;
 };
 
 G_DEFINE_TYPE (GVfsBackendRecent, g_vfs_backend_recent, G_VFS_TYPE_BACKEND);
 
 #define RECENTLY_USED_FILE "recently-used.xbel"
-
-static GVfsMonitor *
-recent_backend_get_file_monitor (GVfsBackendRecent *backend,
-                                 gboolean           create)
-{
-  if (backend->file_monitor == NULL && create == FALSE)
-    return NULL;
-
-  else if (backend->file_monitor == NULL)
-    {
-      /* 'create' is only ever set in the main thread, so we will have
-       * no possibility here for creating more than one new monitor.
-       */
-      /* FIXME */
-
-      backend->file_monitor = g_vfs_monitor_new (G_VFS_BACKEND (backend));
-    }
-
-  return g_object_ref (backend->file_monitor);
-}
 
 static GVfsMonitor *
 recent_backend_get_dir_monitor (GVfsBackendRecent *backend,
@@ -746,31 +725,14 @@ recent_backend_create_dir_monitor (GVfsBackend          *vfs_backend,
   GVfsMonitor *monitor;
 
   if (filename[1])
-    monitor = g_vfs_monitor_new (vfs_backend);
-  else
-    monitor = recent_backend_get_dir_monitor (backend, TRUE);
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                        _("Operation not supported"));
+      return TRUE;
+    }
 
-  g_vfs_job_create_monitor_set_monitor (job, monitor);
-  g_vfs_job_succeeded (G_VFS_JOB (job));
-  g_object_unref (monitor);
-
-  return TRUE;
-}
-
-static gboolean
-recent_backend_create_file_monitor (GVfsBackend          *vfs_backend,
-                                    GVfsJobCreateMonitor *job,
-                                    const char           *filename,
-                                    GFileMonitorFlags     flags)
-{
-  GVfsBackendRecent *backend = G_VFS_BACKEND_RECENT (vfs_backend);
-  GVfsMonitor *monitor;
-
-  if (filename[1])
-    monitor = g_vfs_monitor_new (vfs_backend);
-  else
-    monitor = recent_backend_get_file_monitor (backend, TRUE);
-
+  monitor = recent_backend_get_dir_monitor (backend, TRUE);
   g_vfs_job_create_monitor_set_monitor (job, monitor);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_object_unref (monitor);
@@ -784,7 +746,6 @@ recent_backend_finalize (GObject *object)
   GVfsBackendRecent *backend = G_VFS_BACKEND_RECENT (object);
 
   g_clear_object (&backend->dir_monitor);
-  g_clear_object (&backend->file_monitor);
 
   g_hash_table_destroy (backend->items);
   g_hash_table_destroy (backend->uri_map);
@@ -840,5 +801,4 @@ g_vfs_backend_recent_class_init (GVfsBackendRecentClass *class)
   backend_class->try_enumerate = recent_backend_enumerate;
   backend_class->try_delete = recent_backend_delete;
   backend_class->try_create_dir_monitor = recent_backend_create_dir_monitor;
-  backend_class->try_create_file_monitor = recent_backend_create_file_monitor;
 }
