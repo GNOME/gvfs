@@ -1009,6 +1009,9 @@ do_mount (GVfsBackend *backend,
 
   self->authority = polkit_authority_get_sync (NULL, &error);
 
+  if (error == NULL)
+    g_vfs_backend_set_autounmount (backend, TRUE);
+
   complete_job (job, error);
 }
 
