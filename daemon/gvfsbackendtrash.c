@@ -148,12 +148,6 @@ rescan_func (gpointer user_data)
 }
 
 static gboolean
-ready_func (gpointer user_data)
-{
-  return G_SOURCE_REMOVE;
-}
-
-static gboolean
 is_root (const char *filename)
 {
   return (filename[0] == '/' && filename[1] == '\0');
@@ -842,7 +836,6 @@ trash_backend_mount (GVfsBackend  *vfs_backend,
   backend->worker_thread = g_thread_new ("Trash Worker Thread",
                                          thread_func,
                                          backend);
-  trash_backend_worker_thread_queue_and_wait (backend, ready_func);
 
   g_vfs_backend_set_autounmount (vfs_backend, TRUE);
 
