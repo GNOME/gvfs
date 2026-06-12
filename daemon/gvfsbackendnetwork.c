@@ -57,7 +57,7 @@ static NetworkFile root = { "/" };
 struct _GVfsBackendNetwork
 {
   GVfsBackend parent_instance;
-  GVfsMonitor *root_monitor;
+  GWeakRef root_monitor;
   GMountSpec *mount_spec;
   GList *files; /* list of NetworkFiles */
   int idle_tag;
@@ -333,9 +333,14 @@ update_from_files (GVfsBackendNetwork *backend,
   char *file_name;
   NetworkFile *old, *new;
   int cmp;
+  GVfsMonitor *monitor;
 
   old_files = backend->files;
   backend->files = uniquify_display_names (files);
+
+  monitor = g_weak_ref_get (&backend->root_monitor);
+  if (monitor == NULL)
+    goto out;
 
   /* Generate change events */
   oldl = old_files;
@@ -366,7 +371,7 @@ update_from_files (GVfsBackendNetwork *backend,
           if (!network_file_equal (old, new))
             {
               file_name = g_strconcat ("/", new->file_name, NULL);
-              g_vfs_monitor_emit_event (backend->root_monitor,
+              g_vfs_monitor_emit_event (monitor,
                                         G_FILE_MONITOR_EVENT_CHANGED,
                                         file_name,
                                         NULL);
@@ -379,7 +384,7 @@ update_from_files (GVfsBackendNetwork *backend,
       else if (cmp < 0)
         {
           file_name = g_strconcat ("/", old->file_name, NULL);
-          g_vfs_monitor_emit_event (backend->root_monitor,
+          g_vfs_monitor_emit_event (monitor,
                                     G_FILE_MONITOR_EVENT_DELETED,
                                     file_name,
                                     NULL);
@@ -389,7 +394,7 @@ update_from_files (GVfsBackendNetwork *backend,
       else
         {
           file_name = g_strconcat ("/", new->file_name, NULL);
-          g_vfs_monitor_emit_event (backend->root_monitor,
+          g_vfs_monitor_emit_event (monitor,
                                     G_FILE_MONITOR_EVENT_CREATED,
                                     file_name,
                                     NULL);
@@ -398,6 +403,9 @@ update_from_files (GVfsBackendNetwork *backend,
         }
     }
 
+  g_object_unref (monitor);
+
+ out:
   g_list_free_full (old_files, (GDestroyNotify)network_file_free);
 }
 
@@ -1020,8 +1028,6 @@ try_mount (GVfsBackend *backend,
 {
   GVfsBackendNetwork *network_backend = G_VFS_BACKEND_NETWORK (backend);
 
-  network_backend->root_monitor = g_vfs_monitor_new (backend);
-
   if (network_backend->have_smb &&
       network_backend->smb_display_mode == G_VFS_BACKEND_NETWORK_DISPLAY_MODE_MERGED)
     {
@@ -1061,8 +1067,20 @@ try_create_monitor (GVfsBackend *backend,
       return TRUE;
     }
   
-  g_vfs_job_create_monitor_set_monitor (job, network_backend->root_monitor);
-  g_vfs_job_succeeded (G_VFS_JOB (job));
+  {
+    GVfsMonitor *monitor;
+
+    monitor = g_weak_ref_get (&network_backend->root_monitor);
+    if (monitor == NULL)
+      {
+        monitor = g_vfs_monitor_new (backend);
+        g_weak_ref_set (&network_backend->root_monitor, monitor);
+      }
+
+    g_vfs_job_create_monitor_set_monitor (job, monitor);
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+    g_object_unref (monitor);
+  }
 
   return TRUE;
 }
@@ -1090,6 +1108,7 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
   int i;
 
   g_mutex_init (&network_backend->smb_mount_lock);
+  g_weak_ref_init (&network_backend->root_monitor, NULL);
 
   supported_vfs = g_vfs_get_supported_uri_schemes (g_vfs_get_default ());
 
@@ -1171,7 +1190,7 @@ g_vfs_backend_network_finalize (GObject *object)
 
   g_mutex_clear (&backend->smb_mount_lock);
   g_mount_spec_unref (backend->mount_spec);
-  g_object_unref (backend->root_monitor);
+  g_weak_ref_clear (&backend->root_monitor);
   g_object_unref (backend->workgroup_icon);
   g_object_unref (backend->server_icon);
   g_object_unref (backend->workgroup_symbolic_icon);
