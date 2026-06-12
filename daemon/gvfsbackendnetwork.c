@@ -1028,6 +1028,8 @@ try_mount (GVfsBackend *backend,
 {
   GVfsBackendNetwork *network_backend = G_VFS_BACKEND_NETWORK (backend);
 
+  g_vfs_backend_set_autounmount (backend, TRUE);
+
   if (network_backend->have_smb &&
       network_backend->smb_display_mode == G_VFS_BACKEND_NETWORK_DISPLAY_MODE_MERGED)
     {
