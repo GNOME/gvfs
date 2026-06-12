@@ -1,15 +1,3 @@
-if enable_deprecated_apis
-  headers = files(
-    'gvfsurimapper.h',
-    'gvfsuriutils.h',
-  )
-
-  install_headers(
-    headers,
-    subdir: 'gvfs-client/gvfs',
-  )
-endif
-
 # Dynamic client lib
 uri_parser_sources = files(
   'afpuri.c',

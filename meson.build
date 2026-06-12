@@ -471,7 +471,6 @@ enable_sftp = get_option('sftp')
 enable_wsdd = get_option('wsdd')
 
 # *** Enable development utils ***
-enable_deprecated_apis = get_option('deprecated_apis')
 enable_devel_utils = get_option('devel_utils')
 enable_installed_tests = get_option('installed_tests')
 enable_unit_tests = get_option('unit_tests')
@@ -538,7 +537,6 @@ summary({
 }, section: 'Dependencies')
 
 summary({
-  'deprecated_apis': enable_deprecated_apis,
   'devel_utils': enable_devel_utils,
   'installed_tests': enable_installed_tests,
   'man': enable_man,
