@@ -93,6 +93,13 @@
  */
 #define MAX_BUFFER_SIZE 32768
 
+/* Limit on SFTP reply packet size to prevent OOM from buggy servers.
+ * Matches MAX_PACKET_LEN used by OpenSSH and libssh2.  Note that SSH
+ * transport already caps individual packets, but an SFTP message can
+ * span multiple SSH packets, so this provides an additional safeguard.
+ */
+#define MAX_REPLY_SIZE (256 * 1024)
+
 static GQuark id_q;
 
 typedef enum {
@@ -722,7 +729,14 @@ read_reply_sync (Connection *conn, gsize *len_out, GError **error)
     }
   
   len = GUINT32_FROM_BE (len);
-  
+  if (len > MAX_REPLY_SIZE)
+    {
+      g_debug ("Server sent oversized packet (%u bytes)", len);
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Invalid reply received"));
+      return NULL;
+    }
+
   array = g_byte_array_sized_new (len);
 
   if (!g_input_stream_read_all (conn->reply_stream,
@@ -1552,6 +1566,16 @@ read_reply_async_got_len  (GObject *source_object,
       return;
     }
   conn->reply_size = GUINT32_FROM_BE (conn->reply_size);
+  if (conn->reply_size > MAX_REPLY_SIZE)
+    {
+      GError *error = NULL;
+
+      g_debug ("Server sent oversized packet (%u bytes)", conn->reply_size);
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Invalid reply received"));
+      fail_jobs_and_unmount (conn->op_backend, error);
+      return;
+    }
 
   conn->reply_size_read = 0;
   conn->reply = g_malloc (conn->reply_size);
