@@ -240,6 +240,8 @@ ask_password_reply (GVfsDBusMountOperation *proxy,
           data->username = *username == 0 ? NULL : g_strdup (username);
           data->domain = *domain == 0 ? NULL : g_strdup (domain);
         }
+      if (password_save > G_PASSWORD_SAVE_PERMANENTLY)
+        password_save = G_PASSWORD_SAVE_NEVER;
       data->password_save = (GPasswordSave)password_save;
       data->anonymous = anonymous;
 
