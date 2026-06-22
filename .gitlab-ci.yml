@@ -45,6 +45,7 @@ fedora-test:
           -Dinstalled_tests=true
           -Ddevel_utils=true
           -Dman=true
+          -Dafp=true
           -Darchive=true
           -Dgoogle=true
           -Dunit_tests=true
