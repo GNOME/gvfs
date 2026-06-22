@@ -590,7 +590,8 @@ fail_job (GVfsJob *job, LIBMTP_mtpdevice_t *device)
   LIBMTP_error_t *error = LIBMTP_Get_Errorstack (device);
 
   if (error) {
-    text = g_strrstr (error->error_text, ":") + 1;
+    const char *colon = g_strrstr (error->error_text, ":");
+    text = colon ? colon + 1 : error->error_text;
   } else {
     text = _("Unknown error.");
   }
