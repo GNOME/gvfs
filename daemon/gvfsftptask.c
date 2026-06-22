@@ -23,7 +23,7 @@
 #include <config.h>
 
 #include <stdio.h> /* for sscanf() */
-#include <stdlib.h> /* for exit() */
+#include <stdlib.h>
 
 #include <glib/gi18n.h>
 
@@ -273,9 +273,15 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
               ftp->max_connections = MIN (ftp->max_connections, maybe_max_connections);
               if (ftp->max_connections == 0)
                 {
-                  g_debug ("no more connections left, exiting...\n");
-                  /* FIXME: shut down properly */
-                  exit (0);
+                  g_debug ("no more connections left, unmounting...\n");
+                  g_vfs_ftp_task_clear_error (task);
+                  task->error = g_error_new_literal (G_IO_ERROR,
+                                                     G_IO_ERROR_FAILED,
+                                                     _("The connection is closed"));
+                  g_cond_broadcast (&ftp->cond);
+                  g_mutex_unlock (&ftp->mutex);
+                  g_vfs_backend_force_unmount (G_VFS_BACKEND (ftp));
+                  goto out_unlocked;
                 }
             }
 
