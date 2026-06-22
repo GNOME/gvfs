@@ -1113,7 +1113,8 @@ g_vfs_backend_onedrive_make_directory (GVfsBackend          *_self,
   g_debug ("  parent path: %s\n", parent_path);
   if (parent == self->shared_with_me_dir)
     {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                        _("Operation not supported"));
       goto out;
     }
 
