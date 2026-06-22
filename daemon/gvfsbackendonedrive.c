@@ -1676,7 +1676,6 @@ g_vfs_backend_onedrive_set_display_name (GVfsBackend           *_self,
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
-      g_object_unref (item);
       goto out;
     }
 
