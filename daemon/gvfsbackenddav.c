@@ -450,6 +450,22 @@ dav_message_connect_signals (SoupMessage *message, GVfsBackend *backend)
                     &dav_backend->auth_info);
 }
 
+/* Matches SOUP_SESSION_MAX_RESEND_COUNT from libsoup. */
+#define MAX_REDIRECTS 20
+
+typedef struct {
+  SoupMessage *msg;
+  guint redirect_count;
+} RedirectData;
+
+static void
+redirect_data_free (gpointer p)
+{
+  RedirectData *data = p;
+  g_object_unref (data->msg);
+  g_slice_free (RedirectData, p);
+}
+
 static void
 dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_data)
 {
@@ -574,6 +590,16 @@ dav_send_async_with_redir_cb (GObject *source, GAsyncResult *ret, gpointer user_
 
   g_object_unref (body);
 
+  RedirectData *data = g_task_get_task_data (task);
+  if (data->redirect_count >= MAX_REDIRECTS)
+    {
+      g_uri_unref (new_uri);
+      error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_FAILED,
+                                   _("Unexpected reply from server"));
+      goto return_error;
+    }
+  data->redirect_count++;
+
   soup_message_headers_remove (soup_message_get_request_headers (msg), "Authorization");
   soup_message_set_uri (msg, new_uri);
   g_uri_unref (new_uri);
@@ -602,9 +628,12 @@ g_vfs_backend_dav_send_async (GVfsBackend *backend,
 {
   SoupSession *session = G_VFS_BACKEND_HTTP (backend)->session;
   GTask *task = g_task_new (backend, NULL, callback, user_data);
+  RedirectData *data = g_slice_new0 (RedirectData);
+
+  data->msg = g_object_ref (message);
 
   g_task_set_source_tag (task, g_vfs_backend_dav_send_async);
-  g_task_set_task_data (task, g_object_ref (message), g_object_unref);
+  g_task_set_task_data (task, data, redirect_data_free);
 
   soup_message_set_flags (message, SOUP_MESSAGE_NO_REDIRECT);
 
@@ -630,11 +659,15 @@ static SoupMessage *
 g_vfs_backend_dav_get_async_result_message (GVfsBackend  *backend,
                                             GAsyncResult *result)
 {
+  RedirectData *data;
+
   g_return_val_if_fail (G_VFS_IS_BACKEND (backend), NULL);
   g_return_val_if_fail (G_IS_ASYNC_RESULT (result), NULL);
   g_return_val_if_fail (g_task_is_valid (result, backend), NULL);
 
-  return g_task_get_task_data (G_TASK (result));
+  data = g_task_get_task_data (G_TASK (result));
+
+  return data->msg;
 }
 
 /* ************************************************************************* */
