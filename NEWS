@@ -1,3 +1,15 @@
+Major changes in 1.61.1
+=======================
+* udisks2: Add build option to select busy-processes command (Guido Falsi, Ondrej Holy)
+* smb: Fix authentication fallback broken with Samba 4.24 (Ondrej Holy)
+* build: Mark AFP and archive backends as deprecated (Ondrej Holy)
+* build: Remove burn backend and deprecated apis (Ondrej Holy)
+* udisks2: Fix multi-seat drive filtering (Edgar Makarov)
+* trash: Various fixes and performance improvements (Ondrej Holy)
+* dav: Fix redirect handling to prevent HTTPS downgrade and credential leakage (luxluth)
+* Some other fixes (Ondrej Holy, John D. Blair, Maximiliano Sandoval, correctmost, Alynx Zhou)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.60.0
 =======================
 * CVE-2026-28296: ftp: Reject paths with CR/LF in g_vfs_ftp_file_new_from_ftp (Ondrej Holy)
