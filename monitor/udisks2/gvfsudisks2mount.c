@@ -671,18 +671,24 @@ busy_processes_command_cb (GObject       *source_object,
                                         NULL, /* gchar **out_standard_error */
                                         &error))
     {
-      g_printerr ("Error launching %s(1): %s (%s, %d)\n",
-                  BUSY_PROCESS_COMMAND,
-                  error->message,
-                  g_quark_to_string (error->domain),
-                  error->code);
+      g_warning ("Error launching %s(1): %s (%s, %d)\n",
+                 BUSY_PROCESS_COMMAND,
+                 error->message,
+                 g_quark_to_string (error->domain),
+                 error->code);
       g_error_free (error);
       goto out;
     }
 
-  if (!(WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0))
+  if (!WIFEXITED (exit_status))
     {
-      g_printerr ("%s(1) did not exit normally\n", BUSY_PROCESS_COMMAND);
+      g_warning ("%s(1) killed by signal %d\n", BUSY_PROCESS_COMMAND, WTERMSIG (exit_status));
+      goto out;
+    }
+  if (WEXITSTATUS (exit_status) != 0)
+    {
+      /* A non-zero exit is expected when no processes are using the mount */
+      g_debug ("%s(1) exited with status %d\n", BUSY_PROCESS_COMMAND, WEXITSTATUS (exit_status));
       goto out;
     }
 
