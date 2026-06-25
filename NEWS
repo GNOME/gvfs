@@ -1,3 +1,10 @@
+Major changes in 1.60.1
+=======================
+* smb: Fix authentication fallback broken with Samba 4.24 (Ondrej Holy)
+* dav: Fix redirect handling to prevent HTTPS downgrade and credential leakage (luxluth)
+* Some other fixes (Ondrej Holy, John D. Blair, Maximiliano Sandoval, correctmost, Alynx Zhou)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.60.0
 =======================
 * CVE-2026-28296: ftp: Reject paths with CR/LF in g_vfs_ftp_file_new_from_ftp (Ondrej Holy)
