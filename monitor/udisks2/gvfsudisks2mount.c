@@ -696,10 +696,16 @@ busy_processes_command_cb (GObject       *source_object,
         break;
 
       pid = strtol (p, &endp, 10);
-      if (pid == 0 && p == endp)
-        break;
+      if (p == endp)
+        {
+          /* strtol made no progress: skip one non-numeric character so the
+           * loop doesn't stall and subsequent PIDs are not lost. */
+          p++;
+          continue;
+        }
 
-      g_array_append_val (processes, pid);
+      if (pid != 0)
+        g_array_append_val (processes, pid);
 
       p = endp;
     }
