@@ -473,6 +473,8 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
 	    }
 		  
 	  dirlen = dirp->dirlen;
+	  if (dirlen == 0 || dirlen > (unsigned int) res)
+	    break;
 	  dirp = (struct smbc_dirent *) (((char *)dirp) + dirlen);
 	  res -= dirlen;
 	}

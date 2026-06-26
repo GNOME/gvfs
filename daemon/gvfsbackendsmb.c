@@ -1941,6 +1941,8 @@ do_enumerate (GVfsBackend *backend,
 	    }
 	  
 	  dirlen = dirp->dirlen;
+	  if (dirlen == 0 || dirlen > (unsigned int) res)
+	    break;
 	  dirp = (struct smbc_dirent *) (((char *)dirp) + dirlen);
 	  res -= dirlen;
 	}
