@@ -1239,7 +1239,7 @@ handle_login (GVfsBackend *backend,
 
 	      op_backend->user_specified = TRUE;
 	      
-	      g_free (op_backend->tmp_password);
+	      gvfs_free_password (op_backend->tmp_password);
 	      op_backend->tmp_password = new_password;
 	      new_password = NULL;
 	      
@@ -1415,7 +1415,7 @@ handle_login (GVfsBackend *backend,
   g_debug ("handle_login #%d - ret_val: %d\n", i, ret_val);
 
   g_free (object);
-  g_free (new_password);
+  gvfs_free_password (new_password);
   g_object_unref (prompt_stream);
   g_object_unref (reply_stream);
   return ret_val;
@@ -2074,7 +2074,7 @@ do_mount (GVfsBackend *backend,
       destroy_connection (&op_backend->data_connection);
     }
 
-  g_clear_pointer (&op_backend->tmp_password, g_free);
+  g_clear_pointer (&op_backend->tmp_password, gvfs_free_password);
 
   sftp_mount_spec = g_mount_spec_new ("sftp");
   if (op_backend->user_specified_in_uri)

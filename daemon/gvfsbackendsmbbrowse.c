@@ -35,6 +35,7 @@
 #include <gio/gio.h>
 
 #include "gvfsbackendsmbbrowse.h"
+#include "gvfsutils.h"
 #include "gvfsjobmountmountable.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
@@ -175,10 +176,13 @@ g_vfs_backend_smb_browse_finalize (GObject *object)
 
   g_free (backend->user);
   g_free (backend->domain);
+  gvfs_free_password (backend->last_password);
+  g_free (backend->last_user);
+  g_free (backend->last_domain);
   g_free (backend->mounted_server);
   g_free (backend->server);
   g_free (backend->default_workgroup);
-  
+
   g_mutex_clear (&backend->entries_lock);
   g_mutex_clear (&backend->update_cache_lock);
 
@@ -391,11 +395,14 @@ auth_callback (SMBCCTX *context,
 	strncpy (domain_out, ask_domain, domainmaxlen);
 
     out:
-      g_free (ask_password);
+      gvfs_free_password (ask_password);
       g_free (ask_user);
       g_free (ask_domain);
     }
 
+  g_free (backend->last_user);
+  g_free (backend->last_domain);
+  gvfs_free_password (backend->last_password);
   backend->last_user = g_strdup (username_out);
   backend->last_domain = g_strdup (domain_out);
   backend->last_password = g_strdup (password_out);

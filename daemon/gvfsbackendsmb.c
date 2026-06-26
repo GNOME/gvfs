@@ -108,7 +108,10 @@ g_vfs_backend_smb_finalize (GObject *object)
   g_free (backend->domain);
   g_free (backend->path);
   g_free (backend->default_workgroup);
-  
+  gvfs_free_password (backend->last_password);
+  g_free (backend->last_user);
+  g_free (backend->last_domain);
+
   if (G_OBJECT_CLASS (g_vfs_backend_smb_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_smb_parent_class)->finalize) (object);
 }
@@ -314,11 +317,14 @@ auth_callback (SMBCCTX *context,
         }
 
     out:
-      g_free (ask_password);
+      gvfs_free_password (ask_password);
       g_free (ask_user);
       g_free (ask_domain);
     }
 
+  g_free (backend->last_user);
+  g_free (backend->last_domain);
+  gvfs_free_password (backend->last_password);
   backend->last_user = g_strdup (username_out);
   backend->last_domain = g_strdup (domain_out);
   backend->last_password = g_strdup (password_out);

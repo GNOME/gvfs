@@ -33,6 +33,16 @@ void         gvfs_setup_debug_handler               (void);
 gboolean     gvfs_is_ipv6                           (const char       *host);
 gchar *      gvfs_get_socket_dir                    (void);
 
+static inline void
+gvfs_free_password (gpointer str)
+{
+  if (str != NULL)
+    {
+      explicit_bzero (str, strlen (str));
+      g_free (str);
+    }
+}
+
 G_END_DECLS
 
 #endif /* __G_VFS_UTILS_H__ */
