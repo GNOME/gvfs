@@ -36,6 +36,7 @@
 #include <gio/gio.h>
 
 #include "gvfsbackendftp.h"
+#include "gvfsutils.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
@@ -391,7 +392,7 @@ g_vfs_backend_ftp_finalize (GObject *object)
   g_mutex_clear (&ftp->mutex);
 
   g_free (ftp->user);
-  g_free (ftp->password);
+  gvfs_free_password (ftp->password);
 
   g_clear_object (&ftp->server_identity);
   g_clear_object (&ftp->certificate);
@@ -570,17 +571,17 @@ restart:
      
 try_login:
       g_free (ftp->user);
-      g_free (ftp->password);
+      gvfs_free_password (ftp->password);
       if (anonymous)
         {
           g_free (username);
-          g_free (password);
+          gvfs_free_password (password);
           ftp->user = g_strdup ("anonymous");
           ftp->password = g_strdup ("");
           if (g_vfs_ftp_task_login (&task, "anonymous", "") != 0)
             break;
           g_free (ftp->user);
-          g_free (ftp->password);
+          gvfs_free_password (ftp->password);
           ftp->user = NULL;
           ftp->password = NULL;
         }
