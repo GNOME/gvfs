@@ -26,6 +26,7 @@
 #include <gio/gio.h>
 #include <gvfsdbus.h>
 #include "gvfsdaemonprotocol.h"
+#include "gvfsutils.h"
 
 #include <string.h>
 
@@ -157,7 +158,7 @@ static void
 ask_password_data_free (gpointer _data)
 {
   AskPasswordData *data = (AskPasswordData *) _data;
-  g_free (data->password);
+  gvfs_free_password (data->password);
   g_free (data->username);
   g_free (data->domain);
   g_free (data);
@@ -248,7 +249,7 @@ ask_password_reply (GVfsDBusMountOperation *proxy,
       g_task_return_pointer (task, data, ask_password_data_free);
 
       /* TODO: handle more args */
-      g_free (password);
+      gvfs_free_password (password);
       g_free (username);
       g_free (domain);
     }
