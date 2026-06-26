@@ -491,6 +491,35 @@ g_vfs_ftp_connection_accept_data_connection (GVfsFtpConnection *conn,
   if (accepted == NULL)
     return FALSE;
 
+  /* Verify that the connecting party is the FTP server, not an
+   * attacker that raced to connect to our listen socket. */
+  {
+    GSocketAddress *peer_addr, *server_addr;
+    GInetAddress *peer_inet, *server_inet;
+    gboolean addr_match = FALSE;
+
+    peer_addr = g_socket_get_remote_address (accepted, NULL);
+    server_addr = g_socket_connection_get_remote_address (conn->connection, NULL);
+
+    if (peer_addr && server_addr)
+      {
+        peer_inet = g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (peer_addr));
+        server_inet = g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (server_addr));
+        addr_match = g_inet_address_equal (peer_inet, server_inet);
+      }
+
+    g_clear_object (&peer_addr);
+    g_clear_object (&server_addr);
+
+    if (!addr_match)
+      {
+        g_object_unref (accepted);
+        g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                             _("Failed to create active FTP connection."));
+        return FALSE;
+      }
+  }
+
   conn->data = G_IO_STREAM (g_socket_connection_factory_create_connection (accepted));
   g_object_unref (accepted);
   enable_nodelay (G_SOCKET_CONNECTION (conn->data));
