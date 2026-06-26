@@ -1665,11 +1665,14 @@ meta_tree_lookup_stringv   (MetaTree                         *tree,
     {
       stringv = verify_array_block (tree, ent->value,
 				    sizeof (guint32));
-      num_strings = GUINT32_FROM_BE (stringv->num_strings);
-      res = g_new (char *, num_strings + 1);
-      for (i = 0; i < num_strings; i++)
-	res[i] = g_strdup (verify_string (tree, stringv->strings[i]));
-      res[i] = NULL;
+      if (stringv)
+	{
+	  num_strings = GUINT32_FROM_BE (stringv->num_strings);
+	  res = g_new (char *, num_strings + 1);
+	  for (i = 0; i < num_strings; i++)
+	    res[i] = g_strdup (verify_string (tree, stringv->strings[i]));
+	  res[i] = NULL;
+	}
     }
 
  out:
@@ -2090,6 +2093,9 @@ enumerate_data (MetaTree *tree,
 	{
 	  stringv = verify_array_block (tree, ent->value,
 					sizeof (guint32));
+	  if (stringv == NULL)
+	    continue;
+
 	  num_strings = GUINT32_FROM_BE (stringv->num_strings);
 
 	  if (num_strings < 10)
