@@ -22,7 +22,6 @@ daemon/gvfsbackendafc.c
 daemon/gvfsbackendafpbrowse.c
 daemon/gvfsbackendafp.c
 daemon/gvfsbackendarchive.c
-daemon/gvfsbackendburn.c
 daemon/gvfsbackend.c
 daemon/gvfsbackendcdda.c
 daemon/gvfsbackendcomputer.c
