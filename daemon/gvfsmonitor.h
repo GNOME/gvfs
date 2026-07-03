@@ -53,7 +53,7 @@ struct _GVfsMonitorClass
   
 };
 
-GType g_vfs_monitor_get_type (void) G_GNUC_CONST;
+GType g_vfs_monitor_get_type (void) G_GNUC_PURE;
 
 GVfsMonitor* g_vfs_monitor_new             (GVfsBackend       *backend);
 const char * g_vfs_monitor_get_object_path (GVfsMonitor       *monitor);

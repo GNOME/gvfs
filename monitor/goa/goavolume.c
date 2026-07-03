@@ -104,7 +104,7 @@ account_attention_needed_cb (GObject *_object, GParamSpec *pspec, gpointer user_
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-GType g_vfs_goa_mount_operation_get_type (void) G_GNUC_CONST;
+GType g_vfs_goa_mount_operation_get_type (void) G_GNUC_PURE;
 
 typedef struct
 {

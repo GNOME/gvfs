@@ -54,7 +54,7 @@ struct _GVfsJobStopMountableClass
   GVfsJobDBusClass parent_class;
 };
 
-GType g_vfs_job_stop_mountable_get_type (void) G_GNUC_CONST;
+GType g_vfs_job_stop_mountable_get_type (void) G_GNUC_PURE;
 
 gboolean g_vfs_job_stop_mountable_new_handle (GVfsDBusMount         *object,
                                               GDBusMethodInvocation *invocation,

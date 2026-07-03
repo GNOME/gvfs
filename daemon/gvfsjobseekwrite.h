@@ -55,7 +55,7 @@ struct _GVfsJobSeekWriteClass
   GVfsJobClass parent_class;
 };
 
-GType g_vfs_job_seek_write_get_type (void) G_GNUC_CONST;
+GType g_vfs_job_seek_write_get_type (void) G_GNUC_PURE;
 
 GVfsJob *g_vfs_job_seek_write_new        (GVfsWriteChannel  *channel,
 					  GVfsBackendHandle  handle,

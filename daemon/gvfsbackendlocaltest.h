@@ -88,7 +88,7 @@ struct _GVfsBackendLocalTestClass
   GVfsBackendClass parent_class;
 };
 
-GType g_vfs_backend_localtest_get_type (void) G_GNUC_CONST;
+GType g_vfs_backend_localtest_get_type (void) G_GNUC_PURE;
 
 G_END_DECLS
 

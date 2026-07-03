@@ -30,7 +30,7 @@ struct _GVfsAfcVolumeClass {
   GObjectClass parent_class;
 };
 
-GType g_vfs_afc_volume_get_type (void) G_GNUC_CONST;
+GType g_vfs_afc_volume_get_type (void) G_GNUC_PURE;
 
 GVfsAfcVolume *g_vfs_afc_volume_new (GVolumeMonitor *monitor,
                                      const char     *uuid,
