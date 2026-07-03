@@ -87,7 +87,7 @@ struct _GVfsBackendComputer
 
   GVolumeMonitor *volume_monitor;
 
-  GVfsMonitor *root_monitor;
+  GWeakRef root_monitor;
   
   GList *files;
   
@@ -183,8 +183,8 @@ g_vfs_backend_computer_finalize (GObject *object)
       backend->recompute_idle_tag = 0;
     }
 
-  g_object_unref (backend->root_monitor);
-  
+  g_weak_ref_clear (&backend->root_monitor);
+
   if (G_OBJECT_CLASS (g_vfs_backend_computer_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_computer_parent_class)->finalize) (object);
 }
@@ -194,7 +194,9 @@ g_vfs_backend_computer_init (GVfsBackendComputer *computer_backend)
 {
   GVfsBackend *backend = G_VFS_BACKEND (computer_backend);
   GMountSpec *mount_spec;
-  
+
+  g_weak_ref_init (&computer_backend->root_monitor, NULL);
+
   g_vfs_backend_set_display_name (backend, _("Computer"));
   g_vfs_backend_set_icon_name (backend, "computer");
   g_vfs_backend_set_symbolic_icon_name (backend, "computer-symbolic");
@@ -249,10 +251,15 @@ update_from_files (GVfsBackendComputer *backend,
   char *filename;
   ComputerFile *old, *new;
   int cmp;
+  GVfsMonitor *monitor;
 
   old_files = backend->files;
   backend->files = files;
-  
+
+  monitor = g_weak_ref_get (&backend->root_monitor);
+  if (monitor == NULL)
+    goto out;
+
   /* Generate change events */
   oldl = old_files;
   newl = files;
@@ -282,7 +289,7 @@ update_from_files (GVfsBackendComputer *backend,
           if (!computer_file_equal (old, new))
             {
               filename = g_strconcat ("/", new->filename, NULL);
-              g_vfs_monitor_emit_event (backend->root_monitor,
+              g_vfs_monitor_emit_event (monitor,
                                         G_FILE_MONITOR_EVENT_CHANGED,
                                         filename,
                                         NULL);
@@ -295,7 +302,7 @@ update_from_files (GVfsBackendComputer *backend,
       else if (cmp < 0)
         {
           filename = g_strconcat ("/", old->filename, NULL);
-          g_vfs_monitor_emit_event (backend->root_monitor,
+          g_vfs_monitor_emit_event (monitor,
                                     G_FILE_MONITOR_EVENT_DELETED,
                                     filename,
                                     NULL);
@@ -305,7 +312,7 @@ update_from_files (GVfsBackendComputer *backend,
       else
         {
           filename = g_strconcat ("/", new->filename, NULL);
-          g_vfs_monitor_emit_event (backend->root_monitor,
+          g_vfs_monitor_emit_event (monitor,
                                     G_FILE_MONITOR_EVENT_CREATED,
                                     filename,
                                     NULL);
@@ -313,7 +320,10 @@ update_from_files (GVfsBackendComputer *backend,
           newl = newl->next;
         }
     }
-  
+
+  g_object_unref (monitor);
+
+ out:
   g_list_foreach (old_files, (GFunc)computer_file_free, NULL);
 }
 
@@ -596,8 +606,6 @@ try_mount (GVfsBackend *backend,
                            backend,
                            NULL, 0);
 
-  computer_backend->root_monitor = g_vfs_monitor_new (backend);
-  
   recompute_files (computer_backend);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -799,6 +807,7 @@ try_create_dir_monitor (GVfsBackend *backend,
 {
   ComputerFile *file;
   GVfsBackendComputer *computer_backend;
+  GVfsMonitor *monitor;
 
   computer_backend = G_VFS_BACKEND_COMPUTER (backend);
 
@@ -810,13 +819,20 @@ try_create_dir_monitor (GVfsBackend *backend,
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
 			G_IO_ERROR_NOT_SUPPORTED,
 			_("Operation not supported"));
-      
+
       return TRUE;
     }
-  
-  g_vfs_job_create_monitor_set_monitor (job,
-                                        computer_backend->root_monitor);
+
+  monitor = g_weak_ref_get (&computer_backend->root_monitor);
+  if (monitor == NULL)
+    {
+      monitor = g_vfs_monitor_new (backend);
+      g_weak_ref_set (&computer_backend->root_monitor, monitor);
+    }
+
+  g_vfs_job_create_monitor_set_monitor (job, monitor);
   g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_object_unref (monitor);
 
   return TRUE;
 }
