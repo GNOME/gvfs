@@ -43,7 +43,7 @@ struct _GDaemonMountClass {
    GObjectClass parent_class;
 };
 
-GType g_daemon_mount_get_type (void) G_GNUC_CONST;
+GType g_daemon_mount_get_type (void) G_GNUC_PURE;
 
 GDaemonMount *g_daemon_mount_new            (GMountInfo     *mount_info,
                                              GVolumeMonitor *volume_monitor);

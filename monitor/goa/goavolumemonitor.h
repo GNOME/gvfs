@@ -54,7 +54,7 @@ G_BEGIN_DECLS
 typedef struct _GVfsGoaVolumeMonitor GVfsGoaVolumeMonitor;
 typedef struct _GVfsGoaVolumeMonitorClass GVfsGoaVolumeMonitorClass;
 
-GType g_vfs_goa_volume_monitor_get_type (void) G_GNUC_CONST;
+GType g_vfs_goa_volume_monitor_get_type (void) G_GNUC_PURE;
 
 GVolumeMonitor *g_vfs_goa_volume_monitor_new (void);
 

@@ -264,7 +264,7 @@ AfpResultCode   g_vfs_afp_reply_get_result_code   (GVfsAfpReply *reply);
 goffset         g_vfs_afp_reply_get_pos           (GVfsAfpReply *reply);
 gsize           g_vfs_afp_reply_get_size          (GVfsAfpReply *reply);
 
-GType           g_vfs_afp_reply_get_type         (void) G_GNUC_CONST;
+GType           g_vfs_afp_reply_get_type         (void) G_GNUC_PURE;
 
 
 /*
@@ -304,7 +304,7 @@ char*           g_vfs_afp_command_get_data     (GVfsAfpCommand *comm);
 
 void            g_vfs_afp_command_set_buffer   (GVfsAfpCommand *comm, char *buf, gsize size);
 
-GType           g_vfs_afp_command_get_type (void) G_GNUC_CONST;
+GType           g_vfs_afp_command_get_type (void) G_GNUC_PURE;
 
 
 
@@ -336,7 +336,7 @@ struct _GVfsAfpConnection
 };
 
 
-GType g_vfs_afp_connection_get_type (void) G_GNUC_CONST;
+GType g_vfs_afp_connection_get_type (void) G_GNUC_PURE;
 
 GVfsAfpReply*      g_vfs_afp_query_server_info            (GSocketConnectable *addr,
                                                            GCancellable *cancellable,

@@ -51,7 +51,7 @@ struct _GVfsJobTruncateClass
   GVfsJobClass parent_class;
 };
 
-GType g_vfs_job_truncate_get_type (void) G_GNUC_CONST;
+GType g_vfs_job_truncate_get_type (void) G_GNUC_PURE;
 
 GVfsJob *g_vfs_job_truncate_new (GVfsWriteChannel  *channel,
                                  GVfsBackendHandle  handle,

@@ -42,7 +42,7 @@ G_BEGIN_DECLS
 typedef struct _GVfsDnsSdResolver        GVfsDnsSdResolver;
 typedef struct _GVfsDnsSdResolverClass   GVfsDnsSdResolverClass;
 
-GType                g_vfs_dns_sd_resolver_get_type               (void) G_GNUC_CONST;
+GType                g_vfs_dns_sd_resolver_get_type               (void) G_GNUC_PURE;
 GVfsDnsSdResolver   *g_vfs_dns_sd_resolver_new_for_encoded_triple (const gchar        *encoded_triple,
                                                                    const gchar        *required_txt_keys);
 GVfsDnsSdResolver   *g_vfs_dns_sd_resolver_new_for_service        (const gchar        *service_name,

@@ -42,7 +42,7 @@ struct _GVfsBackendGphoto2Class
   GVfsBackendClass parent_class;
 };
 
-GType g_vfs_backend_gphoto2_get_type (void) G_GNUC_CONST;
+GType g_vfs_backend_gphoto2_get_type (void) G_GNUC_PURE;
   
 GVfsBackendGphoto2 *g_vfs_backend_gphoto2_new (void);
 

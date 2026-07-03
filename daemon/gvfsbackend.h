@@ -470,7 +470,7 @@ struct _GVfsBackendClass
 				    const char *filename);
 };
 
-GType g_vfs_backend_get_type (void) G_GNUC_CONST;
+GType g_vfs_backend_get_type (void) G_GNUC_PURE;
 
 void  g_vfs_register_backend       (GType               backend_type,
 				    const char         *type);

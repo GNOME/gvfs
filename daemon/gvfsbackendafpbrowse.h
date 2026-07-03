@@ -37,7 +37,7 @@ G_BEGIN_DECLS
 typedef struct _GVfsBackendAfpBrowseClass GVfsBackendAfpBrowseClass;
 typedef struct _GVfsBackendAfpBrowse GVfsBackendAfpBrowse;
 
-GType g_vfs_backend_afp_browse_get_type (void) G_GNUC_CONST;
+GType g_vfs_backend_afp_browse_get_type (void) G_GNUC_PURE;
 
 #define BACKEND_SETUP_FUNC g_vfs_afp_browse_daemon_init
 void g_vfs_afp_browse_daemon_init (void);

@@ -50,7 +50,7 @@ struct _GVfsJobSourceIface
 
 };
 
-GType g_vfs_job_source_get_type (void) G_GNUC_CONST;
+GType g_vfs_job_source_get_type (void) G_GNUC_PURE;
 
 void g_vfs_job_source_new_job (GVfsJobSource *job_source,
 			       GVfsJob       *job);

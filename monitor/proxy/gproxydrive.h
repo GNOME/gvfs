@@ -43,7 +43,7 @@ struct _GProxyDriveClass {
    GObjectClass parent_class;
 };
 
-GType         g_proxy_drive_get_type     (void) G_GNUC_CONST;
+GType         g_proxy_drive_get_type     (void) G_GNUC_PURE;
 void          g_proxy_drive_register     (GIOModule           *module);
 GProxyDrive  *g_proxy_drive_new          (GProxyVolumeMonitor *volume_monitor);
 void          g_proxy_drive_update       (GProxyDrive         *drive,

@@ -63,7 +63,7 @@ struct _GProxyVolumeMonitorClass {
   int is_supported_nr;
 };
 
-GType g_proxy_volume_monitor_get_type (void) G_GNUC_CONST;
+GType g_proxy_volume_monitor_get_type (void) G_GNUC_PURE;
 
 void             g_proxy_volume_monitor_register          (GIOModule           *module);
 GProxyDrive     *g_proxy_volume_monitor_get_drive_for_id  (GProxyVolumeMonitor *volume_monitor,

@@ -52,7 +52,7 @@ struct _GVfsJobDeleteClass
   GVfsJobDBusClass parent_class;
 };
 
-GType g_vfs_job_delete_get_type (void) G_GNUC_CONST;
+GType g_vfs_job_delete_get_type (void) G_GNUC_PURE;
 
 gboolean g_vfs_job_delete_new_handle (GVfsDBusMount         *object,
                                       GDBusMethodInvocation *invocation,

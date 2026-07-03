@@ -54,7 +54,7 @@ struct _GVfsBackendHttp
   SoupSession *session;
 };
 
-GType         g_vfs_backend_http_get_type    (void) G_GNUC_CONST;
+GType         g_vfs_backend_http_get_type    (void) G_GNUC_PURE;
 
 char *        http_uri_get_basename          (const char *uri_str);
 

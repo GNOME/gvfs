@@ -35,7 +35,7 @@ G_BEGIN_DECLS
 #define GVFS_UDISKS2_VOLUME(o)    (G_TYPE_CHECK_INSTANCE_CAST ((o), GVFS_TYPE_UDISKS2_VOLUME, GVfsUDisks2Volume))
 #define GVFS_IS_UDISKS2_VOLUME(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), GVFS_TYPE_UDISKS2_VOLUME))
 
-GType              gvfs_udisks2_volume_get_type    (void) G_GNUC_CONST;
+GType              gvfs_udisks2_volume_get_type    (void) G_GNUC_PURE;
 
 GVfsUDisks2Volume *gvfs_udisks2_volume_new         (GVfsUDisks2VolumeMonitor   *monitor,
                                                     UDisksBlock                *block,

@@ -56,7 +56,7 @@ struct _GVfsJobQueryInfoReadClass
   GVfsJobClass parent_class;
 };
 
-GType g_vfs_job_query_info_read_get_type (void) G_GNUC_CONST;
+GType g_vfs_job_query_info_read_get_type (void) G_GNUC_PURE;
 
 GVfsJob *g_vfs_job_query_info_read_new (GVfsReadChannel   *channel,
 					GVfsBackendHandle  handle,

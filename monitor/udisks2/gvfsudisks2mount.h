@@ -36,7 +36,7 @@ G_BEGIN_DECLS
 #define GVFS_IS_UDISKS2_MOUNT(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), GVFS_TYPE_UDISKS2_MOUNT))
 
 
-GType             gvfs_udisks2_mount_get_type       (void) G_GNUC_CONST;
+GType             gvfs_udisks2_mount_get_type       (void) G_GNUC_PURE;
 GVfsUDisks2Mount *gvfs_udisks2_mount_new            (GVfsUDisks2VolumeMonitor *monitor,
                                                      GUnixMountEntry          *mount_entry,
                                                      GVfsUDisks2Volume        *volume);
