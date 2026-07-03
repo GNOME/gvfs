@@ -52,7 +52,7 @@ G_BEGIN_DECLS
 typedef struct _GVfsBackendAdmin GVfsBackendAdmin;
 typedef struct _GVfsBackendAdminClass GVfsBackendAdminClass;
 
-GType g_vfs_backend_admin_get_type (void) G_GNUC_CONST;
+GType g_vfs_backend_admin_get_type (void) G_GNUC_PURE;
 
 void g_vfs_backend_admin_pre_setup (int *argc, char **argv[]);
 

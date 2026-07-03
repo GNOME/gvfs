@@ -45,7 +45,7 @@ struct _GVfsWriteChannelClass
   GVfsChannelClass parent_class;
 };
 
-GType g_vfs_write_channel_get_type (void) G_GNUC_CONST;
+GType g_vfs_write_channel_get_type (void) G_GNUC_PURE;
 
 GVfsWriteChannel *g_vfs_write_channel_new              (GVfsBackend      *backend,
                                                         GPid              actual_consumer);

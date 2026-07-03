@@ -55,7 +55,7 @@ struct _GVfsJobProgressClass
   GVfsJobDBusClass parent_class;
 };
 
-GType g_vfs_job_progress_get_type (void) G_GNUC_CONST;
+GType g_vfs_job_progress_get_type (void) G_GNUC_PURE;
 
 void g_vfs_job_progress_callback (goffset current_num_bytes,
                                   goffset total_num_bytes,
