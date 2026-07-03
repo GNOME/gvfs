@@ -608,6 +608,8 @@ try_mount (GVfsBackend *backend,
 
   recompute_files (computer_backend);
 
+  g_vfs_backend_set_autounmount (backend, TRUE);
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   return TRUE;
