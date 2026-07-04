@@ -55,7 +55,7 @@ struct GVfsHttpInputStreamClass
   void (*_g_reserved5) (void);
 };
 
-GType g_vfs_http_input_stream_get_type (void) G_GNUC_PURE;
+GType g_vfs_http_input_stream_get_type (void);
 
 GInputStream *g_vfs_http_input_stream_new         (SoupSession          *session,
                                                    GUri                 *uri);

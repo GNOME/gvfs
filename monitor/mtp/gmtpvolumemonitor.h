@@ -42,7 +42,7 @@ struct _GMtpVolumeMonitorClass {
   GVolumeMonitorClass parent_class;
 };
 
-GType g_mtp_volume_monitor_get_type (void) G_GNUC_PURE;
+GType g_mtp_volume_monitor_get_type (void);
 
 GVolumeMonitor *g_mtp_volume_monitor_new          (void);
 void            g_mtp_volume_monitor_force_update (GMtpVolumeMonitor *monitor);

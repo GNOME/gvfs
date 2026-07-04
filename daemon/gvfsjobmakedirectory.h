@@ -52,7 +52,7 @@ struct _GVfsJobMakeDirectoryClass
   GVfsJobDBusClass parent_class;
 };
 
-GType g_vfs_job_make_directory_get_type (void) G_GNUC_PURE;
+GType g_vfs_job_make_directory_get_type (void);
 
 gboolean g_vfs_job_make_directory_new_handle (GVfsDBusMount         *object,
                                               GDBusMethodInvocation *invocation,

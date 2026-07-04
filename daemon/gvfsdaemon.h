@@ -56,7 +56,7 @@ typedef GDBusInterfaceSkeleton *  (*GVfsRegisterPathCallback)  (GDBusConnection 
                                                                 const char      *obj_path,
                                                                 gpointer         data);
 
-GType g_vfs_daemon_get_type (void) G_GNUC_PURE;
+GType g_vfs_daemon_get_type (void);
 
 GVfsDaemon *g_vfs_daemon_new             (gboolean                       main_daemon,
 					  gboolean                       replace);

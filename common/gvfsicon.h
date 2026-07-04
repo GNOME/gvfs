@@ -56,7 +56,7 @@ struct _GVfsIconClass
   GObjectClass parent_class;
 };
 
-GType  g_vfs_icon_get_type        (void) G_GNUC_PURE;
+GType  g_vfs_icon_get_type        (void);
 
 GIcon *g_vfs_icon_new             (GMountSpec  *mount_spec,
                                    const gchar *icon_id);

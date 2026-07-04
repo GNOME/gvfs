@@ -53,7 +53,7 @@ G_BEGIN_DECLS
 typedef struct _GVfsBackendGoogle GVfsBackendGoogle;
 typedef struct _GVfsBackendGoogleClass GVfsBackendGoogleClass;
 
-GType g_vfs_backend_google_get_type (void) G_GNUC_PURE;
+GType g_vfs_backend_google_get_type (void);
 
 G_END_DECLS
 

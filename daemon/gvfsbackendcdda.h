@@ -42,7 +42,7 @@ struct _GVfsBackendCddaClass
   GVfsBackendClass parent_class;
 };
 
-GType g_vfs_backend_cdda_get_type (void) G_GNUC_PURE;
+GType g_vfs_backend_cdda_get_type (void);
   
 GVfsBackendCdda *g_vfs_backend_cdda_new (void);
 

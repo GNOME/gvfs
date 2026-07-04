@@ -65,7 +65,7 @@ struct _GVfsChannelClass
 			      GVfsJob *job);
 };
 
-GType g_vfs_channel_get_type (void) G_GNUC_PURE;
+GType g_vfs_channel_get_type (void);
 
 int               g_vfs_channel_steal_remote_fd    (GVfsChannel                   *channel);
 GVfsBackend    *  g_vfs_channel_get_backend        (GVfsChannel                   *channel);

@@ -72,7 +72,7 @@ print_debug (const gchar *format, ...)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-GType g_proxy_mount_operation_get_type (void) G_GNUC_PURE;
+GType g_proxy_mount_operation_get_type (void);
 
 typedef struct
 {

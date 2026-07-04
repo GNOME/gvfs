@@ -53,7 +53,7 @@ struct _GVfsJobMakeSymlinkClass
   GVfsJobDBusClass parent_class;
 };
 
-GType g_vfs_job_make_symlink_get_type (void) G_GNUC_PURE;
+GType g_vfs_job_make_symlink_get_type (void);
 
 gboolean g_vfs_job_make_symlink_new_handle (GVfsDBusMount         *object,
                                             GDBusMethodInvocation *invocation,

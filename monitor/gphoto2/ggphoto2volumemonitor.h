@@ -44,7 +44,7 @@ struct _GGPhoto2VolumeMonitorClass {
   GVolumeMonitorClass parent_class;
 };
 
-GType g_gphoto2_volume_monitor_get_type (void) G_GNUC_PURE;
+GType g_gphoto2_volume_monitor_get_type (void);
 
 GVolumeMonitor *g_gphoto2_volume_monitor_new                          (void);
 void            g_gphoto2_volume_monitor_force_update                 (GGPhoto2VolumeMonitor *monitor);

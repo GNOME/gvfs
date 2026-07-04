@@ -65,7 +65,7 @@ struct _GMountTrackerClass
 		     GMountInfo *info);
 };
 
-GType g_mount_tracker_get_type (void) G_GNUC_PURE;
+GType g_mount_tracker_get_type (void);
 
 gboolean    g_mount_info_equal        (GMountInfo *info1,
 				       GMountInfo *info2);

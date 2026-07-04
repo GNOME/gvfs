@@ -43,7 +43,7 @@ struct _GVfsBackendDnsSdClass
   GVfsBackendClass parent_class;
 };
 
-GType g_vfs_backend_dns_sd_get_type (void) G_GNUC_PURE;
+GType g_vfs_backend_dns_sd_get_type (void);
 
 G_END_DECLS
 

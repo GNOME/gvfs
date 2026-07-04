@@ -41,7 +41,7 @@ struct _GMtpVolumeClass {
    GObjectClass parent_class;
 };
 
-GType g_mtp_volume_get_type (void) G_GNUC_PURE;
+GType g_mtp_volume_get_type (void);
 
 GMtpVolume *g_mtp_volume_new      (GVolumeMonitor *volume_monitor,
                                    GUdevDevice    *device,

@@ -77,7 +77,7 @@ struct _GVfsJobClass
   gboolean (*try)    (GVfsJob *job);
 };
 
-GType g_vfs_job_get_type (void) G_GNUC_PURE;
+GType g_vfs_job_get_type (void);
 
 void     g_vfs_job_set_backend_data  (GVfsJob     *job,
 				      gpointer     backend_data,

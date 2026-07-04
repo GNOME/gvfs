@@ -37,7 +37,7 @@ G_BEGIN_DECLS
 typedef struct _GVfsBackendAfpClass GVfsBackendAfpClass;
 typedef struct _GVfsBackendAfp GVfsBackendAfp;
 
-GType g_vfs_backend_afp_get_type (void) G_GNUC_PURE;
+GType g_vfs_backend_afp_get_type (void);
 
 #define BACKEND_SETUP_FUNC g_vfs_afp_daemon_init
 void g_vfs_afp_daemon_init (void);

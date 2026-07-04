@@ -52,7 +52,7 @@ struct _GVfsJobTrashClass
   GVfsJobDBusClass parent_class;
 };
 
-GType g_vfs_job_trash_get_type (void) G_GNUC_PURE;
+GType g_vfs_job_trash_get_type (void);
 
 gboolean g_vfs_job_trash_new_handle (GVfsDBusMount         *object,
                                      GDBusMethodInvocation *invocation,

@@ -60,7 +60,7 @@ struct _GVfsJobEnumerateClass
   GVfsJobDBusClass parent_class;
 };
 
-GType g_vfs_job_enumerate_get_type (void) G_GNUC_PURE;
+GType g_vfs_job_enumerate_get_type (void);
 
 gboolean g_vfs_job_enumerate_new_handle (GVfsDBusMount         *object,
                                          GDBusMethodInvocation *invocation,

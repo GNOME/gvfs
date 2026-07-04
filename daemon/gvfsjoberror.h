@@ -51,7 +51,7 @@ struct _GVfsJobErrorClass
   GVfsJobClass parent_class;
 };
 
-GType g_vfs_job_error_get_type (void) G_GNUC_PURE;
+GType g_vfs_job_error_get_type (void);
 
 GVfsJob *g_vfs_job_error_new (GVfsChannel   *channel,
 			      GError *error);
