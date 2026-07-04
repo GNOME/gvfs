@@ -50,7 +50,7 @@ struct _GVfsAfpVolume
   GVfsAfpVolumePrivate *priv;
 };
 
-GType g_vfs_afp_volume_get_type (void) G_GNUC_PURE;
+GType g_vfs_afp_volume_get_type (void);
 
 GVfsAfpVolume *g_vfs_afp_volume_new                 (GVfsAfpServer *server, GVfsAfpConnection *conn);
 

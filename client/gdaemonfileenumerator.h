@@ -44,7 +44,7 @@ struct _GDaemonFileEnumeratorClass
   GFileEnumeratorClass parent_class;
 };
 
-GType g_daemon_file_enumerator_get_type (void) G_GNUC_PURE;
+GType g_daemon_file_enumerator_get_type (void);
 
 GDaemonFileEnumerator *g_daemon_file_enumerator_new                 (GFile *file,
                                                                      GVfsDBusMount *proxy,

@@ -55,7 +55,7 @@ struct _GVfsJobUnmountMountableClass
   GVfsJobDBusClass parent_class;
 };
 
-GType g_vfs_job_unmount_mountable_get_type (void) G_GNUC_PURE;
+GType g_vfs_job_unmount_mountable_get_type (void);
 
 gboolean g_vfs_job_unmount_mountable_new_handle (GVfsDBusMount         *object,
                                                  GDBusMethodInvocation *invocation,

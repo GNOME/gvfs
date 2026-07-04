@@ -43,7 +43,7 @@ struct _GProxyMountClass {
    GObjectClass parent_class;
 };
 
-GType         g_proxy_mount_get_type (void) G_GNUC_PURE;
+GType         g_proxy_mount_get_type (void);
 void          g_proxy_mount_register (GIOModule           *module);
 GProxyMount  *g_proxy_mount_new      (GProxyVolumeMonitor *volume_monitor);
 void          g_proxy_mount_update   (GProxyMount         *mount,

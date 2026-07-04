@@ -42,7 +42,7 @@ struct _GDaemonFileInputStreamClass
   GFileInputStreamClass parent_class;
 };
 
-GType g_daemon_file_input_stream_get_type (void) G_GNUC_PURE;
+GType g_daemon_file_input_stream_get_type (void);
 
 GFileInputStream *g_daemon_file_input_stream_new (int fd,
 						  gboolean can_seek);

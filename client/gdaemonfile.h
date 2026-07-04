@@ -52,7 +52,7 @@ struct _GDaemonFile
   char *path;
 };
 
-GType g_daemon_file_get_type (void) G_GNUC_PURE;
+GType g_daemon_file_get_type (void);
   
 GFile * g_daemon_file_new (GMountSpec *mount_spec,
 			   const char *path);

@@ -53,7 +53,7 @@ struct _GVfsJobCloseWriteClass
   GVfsJobClass parent_class;
 };
 
-GType g_vfs_job_close_write_get_type (void) G_GNUC_PURE;
+GType g_vfs_job_close_write_get_type (void);
 
 GVfsJob *g_vfs_job_close_write_new (GVfsWriteChannel   *channel,
 				    GVfsBackendHandle  handle,

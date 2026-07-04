@@ -86,7 +86,7 @@ char *      g_mount_spec_canonicalize_path (const char      *path);
 
 
 #define G_TYPE_MOUNT_SPEC (g_type_mount_spec_get_gtype ())
-GType g_type_mount_spec_get_gtype (void) G_GNUC_PURE;
+GType g_type_mount_spec_get_gtype (void);
 
 G_END_DECLS
 

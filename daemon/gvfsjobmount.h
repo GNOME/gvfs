@@ -56,7 +56,7 @@ struct _GVfsJobMountClass
   GVfsJobClass parent_class;
 };
 
-GType g_vfs_job_mount_get_type (void) G_GNUC_PURE;
+GType g_vfs_job_mount_get_type (void);
 
 GVfsJob *g_vfs_job_mount_new (GMountSpec  *spec,
 			      GMountSource *source,

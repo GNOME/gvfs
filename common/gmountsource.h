@@ -49,7 +49,7 @@ typedef void   (*RequestMountSpecCallback)   (GMountSource *source,
 					      GError *error,
 					      gpointer data);
 
-GType g_mount_source_get_type (void) G_GNUC_PURE;
+GType g_mount_source_get_type (void);
 
 GMountSource *g_mount_source_new                      (const char                *dbus_id,
 						       const char                *obj_path);

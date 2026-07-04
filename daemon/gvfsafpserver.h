@@ -73,7 +73,7 @@ struct _GVfsAfpServer
   GVfsAfpServerPrivate *priv;
 };
 
-GType              g_vfs_afp_server_get_type             (void) G_GNUC_PURE;
+GType              g_vfs_afp_server_get_type             (void);
 
 GVfsAfpServer*     g_vfs_afp_server_new                  (GNetworkAddress *addr);
 

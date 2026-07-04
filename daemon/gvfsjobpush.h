@@ -56,7 +56,7 @@ struct _GVfsJobPushClass
   GVfsJobProgressClass parent_class;
 };
 
-GType g_vfs_job_push_get_type (void) G_GNUC_PURE;
+GType g_vfs_job_push_get_type (void);
 
 gboolean g_vfs_job_push_new_handle (GVfsDBusMount         *object,
                                     GDBusMethodInvocation *invocation,

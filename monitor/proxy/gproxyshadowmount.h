@@ -43,7 +43,7 @@ struct _GProxyShadowMountClass {
    GObjectClass parent_class;
 };
 
-GType              g_proxy_shadow_mount_get_type            (void) G_GNUC_PURE;
+GType              g_proxy_shadow_mount_get_type            (void);
 void               g_proxy_shadow_mount_register            (GIOModule           *module);
 GProxyShadowMount *g_proxy_shadow_mount_new                 (GProxyVolumeMonitor *volume_monitor,
                                                              GProxyVolume        *volume,

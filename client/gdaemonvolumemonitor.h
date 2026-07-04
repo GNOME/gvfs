@@ -48,7 +48,7 @@ struct _GDaemonVolumeMonitorClass {
 
 };
 
-GType g_daemon_volume_monitor_get_type (void) G_GNUC_PURE;
+GType g_daemon_volume_monitor_get_type (void);
 void g_daemon_volume_monitor_register_types (GTypeModule *type_module);
 
 GVolumeMonitor *g_daemon_volume_monitor_new (void);
