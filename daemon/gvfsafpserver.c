@@ -1384,7 +1384,7 @@ g_vfs_afp_server_get_volumes (GVfsAfpServer       *server,
 
   task = g_task_new (server, cancellable, callback, user_data);
   g_task_set_source_tag (task, g_vfs_afp_server_get_volumes);
-  g_vfs_afp_connection_send_command (server->priv->conn, comm, NULL, get_volumes_cb,
+  g_vfs_afp_connection_send_command (server->priv->conn, comm, NULL, 0, get_volumes_cb,
                                      cancellable, task);
 }
 
@@ -1778,7 +1778,7 @@ g_vfs_afp_server_map_id (GVfsAfpServer       *server,
   g_task_set_source_tag (task, g_vfs_afp_server_map_id);
   g_task_set_task_data (task, GINT_TO_POINTER (map_function), NULL);
 
-  g_vfs_afp_connection_send_command (priv->conn, comm, NULL,
+  g_vfs_afp_connection_send_command (priv->conn, comm, NULL, 0,
                                      map_id_cb, cancellable, task);
   g_object_unref (comm);
 }

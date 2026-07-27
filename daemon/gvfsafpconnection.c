@@ -711,6 +711,8 @@ typedef struct
   
   GVfsAfpCommand *command;
   char           *reply_buf;
+  gsize           reply_buf_size;
+  GError         *error;
   GTask *task;
 
   GVfsAfpConnection *conn;
@@ -769,6 +771,7 @@ free_request_data (RequestData *req_data)
 {
   if (req_data->command)
     g_object_unref (req_data->command);
+  g_clear_error (&req_data->error);
   if (req_data->task)
     g_object_unref (req_data->task);
 
@@ -962,6 +965,97 @@ read_all_finish (GInputStream *stream,
   return g_task_propagate_boolean (G_TASK (res), error);
 }
 
+typedef struct
+{
+  gsize count;
+  gsize bytes_skipped;
+} SkipAllData;
+
+static void
+free_skip_all_data (SkipAllData *skip_data)
+{
+  g_slice_free (SkipAllData, skip_data);
+}
+
+static void skip_all_async (GInputStream        *stream,
+                            gsize                count,
+                            int                  io_priority,
+                            GCancellable        *cancellable,
+                            GAsyncReadyCallback  callback,
+                            gpointer             user_data);
+
+static void
+skip_all_cb (GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GInputStream *stream = G_INPUT_STREAM (source_object);
+  GTask *task = G_TASK (user_data);
+  gssize bytes_skipped;
+  GError *err = NULL;
+  SkipAllData *skip_data = g_task_get_task_data (task);
+
+  bytes_skipped = g_input_stream_skip_finish (stream, res, &err);
+  if (bytes_skipped == -1)
+  {
+    g_task_return_error (task, err);
+    g_object_unref (task);
+    return;
+  }
+  else if (bytes_skipped == 0)
+  {
+    g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_CLOSED, _("Got EOS"));
+    g_object_unref (task);
+    return;
+  }
+
+  skip_data->bytes_skipped += bytes_skipped;
+  if (skip_data->bytes_skipped < skip_data->count)
+  {
+    g_input_stream_skip_async (stream,
+                               skip_data->count - skip_data->bytes_skipped,
+                               g_task_get_priority (task), g_task_get_cancellable (task),
+                               skip_all_cb, task);
+    return;
+  }
+
+  g_task_return_boolean (task, TRUE);
+  g_object_unref (task);
+}
+
+static void
+skip_all_async (GInputStream        *stream,
+                gsize                count,
+                int                  io_priority,
+                GCancellable        *cancellable,
+                GAsyncReadyCallback  callback,
+                gpointer             user_data)
+{
+  SkipAllData *skip_data;
+  GTask *task;
+
+  task = g_task_new (stream, cancellable, callback, user_data);
+  g_task_set_source_tag (task, skip_all_async);
+  g_task_set_priority (task, io_priority);
+
+  skip_data = g_slice_new0 (SkipAllData);
+  skip_data->count = count;
+
+  g_task_set_task_data (task, skip_data, (GDestroyNotify)free_skip_all_data);
+
+  g_input_stream_skip_async (stream, count, io_priority, cancellable,
+                             skip_all_cb, task);
+}
+
+static gboolean
+skip_all_finish (GInputStream *stream,
+                 GAsyncResult *res,
+                 GError      **error)
+{
+  g_return_val_if_fail (g_task_is_valid (res, stream), FALSE);
+  g_return_val_if_fail (g_async_result_is_tagged (res, skip_all_async), FALSE);
+
+  return g_task_propagate_boolean (G_TASK (res), error);
+}
+
 static void
 dispatch_reply (GVfsAfpConnection *afp_connection)
 {
@@ -1017,13 +1111,20 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
                                       GUINT_TO_POINTER ((guint)dsi_header->requestID));
       if (req_data)
       {
-        GVfsAfpReply *reply;
+        if (req_data->error)
+        {
+          g_task_return_error (req_data->task, g_steal_pointer (&req_data->error));
+        }
+        else
+        {
+          GVfsAfpReply *reply;
 
-        reply = g_vfs_afp_reply_new (dsi_header->errorCode, priv->reply_buf,
-                                     dsi_header->totalDataLength, priv->free_reply_buf);
-        priv->free_reply_buf = FALSE;
+          reply = g_vfs_afp_reply_new (dsi_header->errorCode, priv->reply_buf,
+                                       dsi_header->totalDataLength, priv->free_reply_buf);
+          priv->free_reply_buf = FALSE;
 
-        g_task_return_pointer (req_data->task, reply, g_object_unref);
+          g_task_return_pointer (req_data->task, reply, g_object_unref);
+        }
 
         g_hash_table_remove (priv->request_hash,
                              GUINT_TO_POINTER ((guint)dsi_header->requestID));
@@ -1036,6 +1137,43 @@ dispatch_reply (GVfsAfpConnection *afp_connection)
   }
 }
     
+static void
+skip_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
+{
+  GInputStream *input = G_INPUT_STREAM (object);
+  GVfsAfpConnection *afp_connection = G_VFS_AFP_CONNECTION (user_data);
+  GVfsAfpConnectionPrivate *priv = afp_connection->priv;
+
+  gboolean result;
+  GError *err = NULL;
+
+  if (g_atomic_int_get (&priv->atomic_state) == STATE_PENDING_CLOSE)
+  {
+    if (!priv->send_loop_running)
+      close_connection (afp_connection);
+    return;
+  }
+
+  result = skip_all_finish (input, res, &err);
+  if (!result)
+  {
+    if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_CLOSED) ||
+        g_error_matches (err, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED))
+    {
+      g_message (_("Host closed connection"));
+    }
+    else
+    {
+      g_warning ("FAIL!!! \"%s\"\n", err->message);
+    }
+    exit (0);
+  }
+
+  dispatch_reply (afp_connection);
+
+  read_reply (afp_connection);
+}
+
 static void
 read_data_cb (GObject *object, GAsyncResult *res, gpointer user_data)
 {
@@ -1124,8 +1262,19 @@ read_dsi_header_cb (GObject *object, GAsyncResult *res, gpointer user_data)
                                     GUINT_TO_POINTER ((guint)dsi_header->requestID));
     if (req_data && req_data->reply_buf)
     {
-        priv->reply_buf = req_data->reply_buf;
-        priv->free_reply_buf = FALSE;
+      if (dsi_header->totalDataLength > req_data->reply_buf_size)
+      {
+        g_set_error (&req_data->error,
+                     G_IO_ERROR, G_IO_ERROR_FAILED,
+                     _("Invalid reply received"));
+        skip_all_async (input, dsi_header->totalDataLength, 0,
+                        priv->read_cancellable, skip_data_cb,
+                        afp_conn);
+        return;
+      }
+
+      priv->reply_buf = req_data->reply_buf;
+      priv->free_reply_buf = FALSE;
     }
     else
     {
@@ -1448,6 +1597,7 @@ void
 g_vfs_afp_connection_send_command (GVfsAfpConnection   *afp_connection,
                                    GVfsAfpCommand      *command,
                                    char                *reply_buf,
+                                   gsize                reply_buf_size,
                                    GAsyncReadyCallback  callback,
                                    GCancellable        *cancellable,
                                    gpointer             user_data)
@@ -1471,6 +1621,7 @@ g_vfs_afp_connection_send_command (GVfsAfpConnection   *afp_connection,
   req_data->type = REQUEST_TYPE_COMMAND;
   req_data->command = g_object_ref (command);
   req_data->reply_buf = reply_buf;
+  req_data->reply_buf_size = reply_buf_size;
   req_data->conn = afp_connection;
   req_data->task = task;
 
@@ -1616,7 +1767,7 @@ g_vfs_afp_connection_send_command_sync (GVfsAfpConnection *afp_connection,
 
   sync_data_init (&sync_data, afp_connection, NULL);
 
-  g_vfs_afp_connection_send_command (afp_connection, command, NULL,
+  g_vfs_afp_connection_send_command (afp_connection, command, NULL, 0,
                                      send_command_sync_cb, cancellable, &sync_data);
 
   sync_data_wait (&sync_data);
