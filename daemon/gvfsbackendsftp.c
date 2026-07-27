@@ -2892,7 +2892,12 @@ read_reply (GVfsBackendSftp *backend,
     }
   
   count = g_data_input_stream_read_uint32 (reply, NULL, NULL);
-  count = MIN (count, G_VFS_JOB_READ (job)->bytes_requested);
+  if (count > G_VFS_JOB_READ (job)->bytes_requested)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply received"));
+      return;
+    }
 
   if (!g_input_stream_read_all (G_INPUT_STREAM (reply),
                                 G_VFS_JOB_READ (job)->buffer, count,
