@@ -2575,6 +2575,14 @@ do_read (GVfsBackend *backend,
       goto exit;
     }
 
+    if (actual > bytes_requested) {
+      free (temp);
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_FAILED,
+                                _("Invalid reply received"));
+      goto exit;
+    }
+
     memcpy (buffer, temp, actual);
     free (temp);
   } else {
