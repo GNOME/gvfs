@@ -26,7 +26,7 @@
 typedef GVfsBackendClass GVfsBackendRecentClass;
 
 typedef struct {
-  char *guid;
+  char *id;
   char *uri;
   char *display_name;
   GFile *file;
@@ -284,7 +284,7 @@ recent_backend_add_info (RecentItem *item,
 {
   g_assert (item != NULL);
 
-  g_file_info_set_name (info, item->guid);
+  g_file_info_set_name (info, item->id);
   g_file_info_set_display_name (info, item->display_name);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI, item->uri);
 
@@ -353,7 +353,7 @@ recent_item_free (RecentItem *item)
 {
   g_free (item->uri);
   g_free (item->display_name);
-  g_free (item->guid);
+  g_free (item->id);
   g_clear_object (&item->file);
   g_date_time_unref (item->modified);
   g_free (item);
@@ -401,7 +401,7 @@ recent_item_new (const gchar *uri,
 {
   RecentItem *item;
   item = g_new0 (RecentItem, 1);
-  item->guid = g_compute_checksum_for_string (G_CHECKSUM_SHA256, uri, -1);
+  item->id = g_compute_checksum_for_string (G_CHECKSUM_SHA256, uri, -1);
   item->modified = g_date_time_ref (modified);
 
   recent_item_update (item, uri, display_name, modified);
@@ -489,7 +489,7 @@ reload_recent_items (GVfsBackendRecent *backend)
   for (i = 0; i < uris_len; i++)
     {
       const char *uri = uris[i];
-      const char *guid;
+      const char *id;
       char *display_name;
       GDateTime *modified;
 
@@ -497,20 +497,20 @@ reload_recent_items (GVfsBackendRecent *backend)
         {
           display_name = get_display_name (backend->bookmarks, uri);
           modified = g_bookmark_file_get_modified_date_time (backend->bookmarks, uri, NULL);
-          guid = g_hash_table_lookup (backend->uri_map, uri);
-          if (guid)
+          id = g_hash_table_lookup (backend->uri_map, uri);
+          if (id)
             {
               RecentItem *item;
-              item = g_hash_table_lookup (backend->items, guid);
+              item = g_hash_table_lookup (backend->items, id);
               if (recent_item_update (item, uri, display_name, modified))
-                changed = g_list_prepend (changed, item->guid);
+                changed = g_list_prepend (changed, item->id);
               not_seen_items = g_list_remove (not_seen_items, item);
             }
           else
             {
               RecentItem *item;
               item = recent_item_new (uri, display_name, modified);
-              if (g_hash_table_contains (backend->items, item->guid))
+              if (g_hash_table_contains (backend->items, item->id))
                 {
                   g_debug ("recent: hash collision for '%s', discarding", uri);
 
@@ -518,9 +518,9 @@ reload_recent_items (GVfsBackendRecent *backend)
                 }
               else
                 {
-                  added = g_list_prepend (added, item->guid);
-                  g_hash_table_insert (backend->items, item->guid, item);
-                  g_hash_table_insert (backend->uri_map, item->uri, item->guid);
+                  added = g_list_prepend (added, item->id);
+                  g_hash_table_insert (backend->items, item->id, item);
+                  g_hash_table_insert (backend->uri_map, item->uri, item->id);
                 }
             }
 
@@ -537,9 +537,9 @@ reload_recent_items (GVfsBackendRecent *backend)
     {
       RecentItem *item = l->data;
       g_hash_table_remove (backend->uri_map, item->uri);
-      g_hash_table_steal (backend->items, item->guid);
+      g_hash_table_steal (backend->items, item->id);
       if (monitor)
-        g_vfs_monitor_emit_event (monitor, G_FILE_MONITOR_EVENT_DELETED, item->guid, NULL);
+        g_vfs_monitor_emit_event (monitor, G_FILE_MONITOR_EVENT_DELETED, item->id, NULL);
       recent_item_free (item);
     }
   g_list_free (not_seen_items);
