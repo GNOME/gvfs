@@ -510,9 +510,18 @@ reload_recent_items (GVfsBackendRecent *backend)
             {
               RecentItem *item;
               item = recent_item_new (uri, display_name, modified);
-              added = g_list_prepend (added, item->guid);
-              g_hash_table_insert (backend->items, item->guid, item);
-              g_hash_table_insert (backend->uri_map, item->uri, item->guid);
+              if (g_hash_table_contains (backend->items, item->guid))
+                {
+                  g_debug ("recent: hash collision for '%s', discarding", uri);
+
+                  recent_item_free (item);
+                }
+              else
+                {
+                  added = g_list_prepend (added, item->guid);
+                  g_hash_table_insert (backend->items, item->guid, item);
+                  g_hash_table_insert (backend->uri_map, item->uri, item->guid);
+                }
             }
 
           g_free (display_name);
