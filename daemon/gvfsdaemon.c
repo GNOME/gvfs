@@ -44,6 +44,7 @@
 #include <gvfsjobopenforwrite.h>
 #include <gvfsjobunmount.h>
 #include <gvfsmonitorimpl.h>
+#include <gvfsbackend.h>
 
 enum {
   PROP_0
@@ -439,10 +440,32 @@ daemon_schedule_exit (GVfsDaemon *daemon)
 }
 
 static void
+backend_activity_finished_cb (GVfsJob *job, GVfsBackend *backend)
+{
+  g_vfs_backend_activity_finished (backend);
+}
+
+static void
 job_source_new_job_callback (GVfsJobSource *job_source,
 			     GVfsJob *job,
 			     GVfsDaemon *daemon)
 {
+  GVfsBackend *backend = NULL;
+
+  if (G_VFS_IS_BACKEND (job_source))
+    backend = G_VFS_BACKEND (job_source);
+  else if (G_VFS_IS_CHANNEL (job_source))
+    backend = g_vfs_channel_get_backend (G_VFS_CHANNEL (job_source));
+
+  if (backend != NULL)
+    {
+      g_vfs_backend_activity_started (backend);
+      g_signal_connect_data (job, "finished",
+                             G_CALLBACK (backend_activity_finished_cb),
+                             g_object_ref (backend),
+                             (GClosureNotify) g_object_unref,
+                             0);
+    }
   g_vfs_daemon_queue_job (daemon, job);
 }
 
@@ -450,6 +473,11 @@ static void
 job_source_closed_callback (GVfsJobSource *job_source,
 			    GVfsDaemon *daemon)
 {
+  GVfsBackend *backend = NULL;
+
+  if (G_VFS_IS_CHANNEL (job_source))
+    backend = g_vfs_channel_get_backend (G_VFS_CHANNEL (job_source));
+
   g_mutex_lock (&daemon->lock);
   
   daemon->job_sources = g_list_remove (daemon->job_sources,
@@ -468,6 +496,9 @@ job_source_closed_callback (GVfsJobSource *job_source,
     daemon_schedule_exit (daemon);
   
   g_mutex_unlock (&daemon->lock);
+
+  if (backend != NULL)
+    g_vfs_backend_activity_finished (backend);
 }
 
 static void
@@ -603,6 +634,9 @@ job_new_source_callback (GVfsJob *job,
 			 GVfsDaemon *daemon)
 {
   g_vfs_daemon_add_job_source (daemon, job_source);
+
+  if (G_VFS_IS_CHANNEL (job_source))
+    g_vfs_backend_activity_started (g_vfs_channel_get_backend (G_VFS_CHANNEL (job_source)));
 }
 
 /* NOTE: Might be emitted on a thread */
