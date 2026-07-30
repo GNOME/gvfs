@@ -214,6 +214,23 @@ default and are only spawned on first use. Automounted mounts need to be of type
 hidden from `GDaemonVolumeMonitor`, and neither the mount tracker is propagating
 their presence.
 
+### Auto-unmounting
+
+Some automounted backends stay alive for the entire session once accessed, even
+if never used again. Backends can opt in to automatic unmounting after a period
+of inactivity by calling `g_vfs_backend_set_autounmount(backend, TRUE)` during
+the mount operation. Once opted in, the backend is considered idle when all of
+the following are true:
+
+* no jobs are currently queued or running for this backend,
+* no open channels (file read/write handles) exist for this backend,
+* no active `GVfsMonitor` instances are attached to this backend.
+
+When the backend becomes idle, a timeout of 600 seconds starts. If the backend
+remains idle until the timeout expires, it is force-unmounted. Clients that
+attempt to access the backend after unmount receive `G_VFS_ERROR_RETRY`, which
+causes the client library to transparently re-mount and retry the operation.
+
 ### GFile methods
 
 Most of `GFile` methods are implemented in `GDaemonFile` class, on the client
@@ -380,6 +397,16 @@ closed.
 When the backend emits a change event, `GVfsMonitor` calls the
 `org.gtk.vfs.MonitorClient.Changed()` method, and the client side
 `GDaemonFileMonitor` emits an event to the original client.
+
+Backends that support auto-unmounting must hold their root `GVfsMonitor`
+instance via `GWeakRef` rather than a strong reference. A strong reference
+would keep the monitor alive indefinitely, preventing the idle counter from
+ever reaching zero and blocking auto-unmount. With a weak reference the monitor
+is released as soon as the last subscriber disconnects. Backends create the
+monitor lazily on the first `try_create_dir_monitor()` (or
+`try_create_file_monitor()`) call and store it with `g_weak_ref_set()`; on
+subsequent calls `g_weak_ref_get()` either returns the existing monitor or
+triggers lazy creation again.
 
 ### GMountOperation proxy
 
