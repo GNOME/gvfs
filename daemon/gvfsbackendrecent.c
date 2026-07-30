@@ -401,7 +401,7 @@ recent_item_new (const gchar *uri,
 {
   RecentItem *item;
   item = g_new0 (RecentItem, 1);
-  item->guid = g_dbus_generate_guid ();
+  item->guid = g_compute_checksum_for_string (G_CHECKSUM_SHA256, uri, -1);
   item->modified = g_date_time_ref (modified);
 
   recent_item_update (item, uri, display_name, modified);
