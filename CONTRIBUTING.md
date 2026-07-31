@@ -16,4 +16,6 @@ https://handbook.gnome.org/development/commit-messages.html.
 ## Developer Documentation
 
 For more info about GVfs internals, please check out our
-[Developer Documentation](docs/documentation.md).
+[Developer Documentation](docs/documentation.md). See also the
+[Debugging Guide](docs/debugging.md) for tips on collecting debug logs,
+testing custom builds, and spawning backends manually.
