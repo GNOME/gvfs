@@ -1,3 +1,14 @@
+Major changes in 1.61.90
+========================
+* admin/computer/http/network/recent/trash: Enable auto-unmount (Ondrej Holy)
+* daemon: Add auto-unmount support for idle backends (Ondrej Holy)
+* build: Drop G_GNUC_PURE from *_get_type() functions (Philip Withnall)
+* afp/dav/ftp/mtp/sftp: Harden input validation (Ondrej Holy)
+* common: Clear password strings from memory before freeing (Ondrej Holy)
+* mtp/onedrive/smb: Fix crashes in onedrive, mtp, and smb backends (Ondrej Holy)
+* Some other fixes (Ondrej Holy, Anders Jonsson)
+* Translation updates (GNOME Translation Project contributors)
+
 Major changes in 1.61.1
 =======================
 * udisks2: Add build option to select busy-processes command (Guido Falsi, Ondrej Holy)
