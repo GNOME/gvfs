@@ -207,22 +207,13 @@ trash_mount_free (TrashMount *mount)
 }
 
 static gboolean
-ignore_trash_mount (GUnixMountEntry *mount)
+ignore_trash_mount (GUnixMountEntry *mount,
+                    GHashTable      *mount_points_by_path) /* gchar *path ~> GUnixMountPoint * */
 {
-  GUnixMountPoint *mount_point = NULL;
   const gchar *mount_options;
+  gboolean is_system_internal;
 
   mount_options = g_unix_mount_entry_get_options (mount);
-  if (mount_options == NULL)
-    {
-      const gchar *mount_path = g_unix_mount_entry_get_mount_path (mount);
-
-      mount_point = g_unix_mount_point_at (mount_path, NULL);
-      if (mount_point != NULL)
-        mount_options = g_unix_mount_point_get_options (mount_point);
-
-      g_clear_pointer (&mount_point, g_unix_mount_point_free);
-    }
 
   if (mount_options != NULL)
     {
@@ -233,18 +224,54 @@ ignore_trash_mount (GUnixMountEntry *mount)
         return TRUE;
     }
 
-  if (g_unix_mount_entry_is_system_internal (mount))
-    return TRUE;
+  is_system_internal = g_unix_mount_entry_is_system_internal (mount);
 
-  return FALSE;
+  if (mount_options == NULL || is_system_internal)
+    {
+      GUnixMountPoint *mount_point;
+      const gchar *mount_path = g_unix_mount_entry_get_mount_path (mount);
+      const gchar *fstab_options = NULL;
+
+      /* The x-gvfs-* options are userspace-only mount options: the kernel does
+       * not know about them, so they never appear in /proc/self/mountinfo.
+       * libmount can only report them from /run/mount/utab, which requires the
+       * filesystem to have been mounted by mount(8) and that file to have
+       * survived since boot; filesystems mounted by systemd, by the initrd or
+       * by an image-based OS carry no utab entry at all. So fall back to the
+       * fstab entry for this mount path.
+       *
+       * The mount_options == NULL case is the pre-existing fallback path, kept
+       * unchanged for platforms whose mount entries carry no options at all.
+       * The system-internal case is the new one, and is deliberately limited to
+       * that branch, which would ignore the mount anyway, so that this stays in
+       * sync with the identical check in GIO, see ignore_trash_mount() in
+       * glocalfile.c.
+       */
+      mount_point = g_hash_table_lookup (mount_points_by_path, mount_path);
+      if (mount_point != NULL)
+        fstab_options = g_unix_mount_point_get_options (mount_point);
+
+      if (fstab_options != NULL)
+        {
+          if (strstr (fstab_options, "x-gvfs-trash") != NULL)
+            return FALSE;
+
+          if (strstr (fstab_options, "x-gvfs-notrash") != NULL)
+            return TRUE;
+        }
+    }
+
+  return is_system_internal;
 }
 
 static void
 trash_watcher_remount_do (TrashWatcher *watcher)
 {
   GHashTable *mount_paths;
+  GHashTable *mount_points_by_path; /* gchar *path ~> GUnixMountPoint * */
   GHashTableIter iter;
   GList *mounts;
+  GList *points;
   GList *l;
   gpointer key, value;
   const char *mount_path;
@@ -255,11 +282,32 @@ trash_watcher_remount_do (TrashWatcher *watcher)
   mounts = g_unix_mount_entries_get (&watcher->last_mount_time);
   mount_paths = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
+  mount_points_by_path = g_hash_table_new_full (g_str_hash, g_str_equal, NULL,
+                                                (GDestroyNotify) g_unix_mount_point_free);
+
+  /* Move the fstab mount points into a hash table, so that ignore_trash_mount()
+   * does not have to call g_unix_mount_point_at() per mount entry: that
+   * function deep-copies the whole mount point list on every call
+   * (g_unix_mount_points_get() caches the fstab parse itself, but not the
+   * copy) and then throws all but one entry away.
+   */
+  points = g_unix_mount_points_get (NULL);
+  for (l = points; l != NULL; l = l->next)
+    {
+      GUnixMountPoint *mount_point = l->data;
+
+      g_hash_table_replace (mount_points_by_path,
+                            (gpointer) g_unix_mount_point_get_mount_path (mount_point),
+                            mount_point);
+    }
+  /* the mount_points_by_path took ownership of the mount point objects */
+  g_list_free (points);
+
   for (l = mounts; l != NULL; l = l->next)
     {
       g_autoptr(GUnixMountEntry) mount_entry = l->data;
 
-      if (ignore_trash_mount (mount_entry))
+      if (ignore_trash_mount (mount_entry, mount_points_by_path))
         {
           g_debug ("trash_watcher_remount_do: ignore %s %s %s\n",
                    g_unix_mount_entry_get_device_path (mount_entry),
@@ -283,6 +331,7 @@ trash_watcher_remount_do (TrashWatcher *watcher)
     }
 
   g_list_free (mounts);
+  g_hash_table_destroy (mount_points_by_path);
 
   g_hash_table_iter_init (&iter, watcher->mounts);
   while (g_hash_table_iter_next (&iter, &key, &value))
