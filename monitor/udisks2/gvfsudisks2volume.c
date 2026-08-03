@@ -104,6 +104,7 @@ typedef struct MountData
   UDisksFilesystem *filesystem_to_mount;
 
   gboolean checked_keyring;
+  gboolean readonly;
 } MountData;
 
 static void gvfs_udisks2_volume_volume_iface_init (GVolumeIface *iface);
@@ -1120,7 +1121,8 @@ do_mount (GTask *task)
                              "{sv}",
                              "auth.no_user_interaction", g_variant_new_boolean (TRUE));
     }
-  if (gvfs_udisks2_volume_monitor_get_readonly_lockdown (volume->monitor))
+  if (data->readonly ||
+      gvfs_udisks2_volume_monitor_get_readonly_lockdown (volume->monitor))
     {
       g_variant_builder_add (&builder,
                              "{sv}",
@@ -1596,6 +1598,7 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
 
   data = g_new0 (MountData, 1);
   data->mount_operation = mount_operation != NULL ? g_object_ref (mount_operation) : NULL;
+  data->readonly = (flags & G_MOUNT_MOUNT_READ_ONLY) != 0;
 
   g_task_set_task_data (task, data, (GDestroyNotify)mount_data_free);
 
@@ -1612,12 +1615,16 @@ gvfs_udisks2_volume_mount (GVolume             *_volume,
   if (volume->block == NULL)
     {
       gchar *escaped_mount_path;
+      const gchar *mount_options;
+
       escaped_mount_path = g_strescape (g_unix_mount_point_get_mount_path (volume->mount_point), NULL);
+      mount_options = data->readonly ? "-o ro" : "";
       gvfs_udisks2_utils_spawn (10, /* timeout in seconds */
                                 cancellable,
                                 mount_command_cb,
                                 task,
-                                "mount \"%s\"",
+                                "mount %s\"%s\"",
+                                mount_options,
                                 escaped_mount_path);
       g_free (escaped_mount_path);
       return;
