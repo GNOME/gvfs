@@ -191,6 +191,7 @@ cflags = [
   '-DBACKEND_HEADER=gvfsbackendtrash.h',
   '-DDEFAULT_BACKEND_TYPE=trash',
   '-DBACKEND_TYPES="trash", G_VFS_TYPE_BACKEND_TRASH,',
+  '-DBACKEND_USES_GVFS=1',
   '-DMAX_JOB_THREADS=10',
 ]
 
