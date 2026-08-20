@@ -3537,6 +3537,7 @@ try_move_do_cb (GObject *source, GAsyncResult *result, gpointer user_data)
   else
     http_job_failed (data->job, data->msg);
 
+  g_object_unref (body);
   copy_data_free (data);
 }
 
@@ -3574,6 +3575,7 @@ try_move_target_delete_cb (GObject *source, GAsyncResult *result,
   if (!SOUP_STATUS_IS_SUCCESSFUL (status))
     {
       http_job_failed (data->job, msg);
+      g_object_unref (body);
       g_object_unref (msg);
       copy_data_free (data);
       return;
