@@ -2330,6 +2330,7 @@ try_mount_opts_cb (GObject *source, GAsyncResult *result, gpointer user_data)
       dav_message_connect_signals (msg_opts, backend);
 
       g_vfs_backend_dav_send_async (backend, msg_opts, try_mount_opts_cb, job);
+      g_object_unref (body);
       return;
     }
 
@@ -2370,8 +2371,6 @@ try_mount_opts_cb (GObject *source, GAsyncResult *result, gpointer user_data)
       goto clear_msgs;
     }
 
-  g_object_unref (body);
-
   cur_uri = soup_message_get_uri (msg_opts);
 
   /* The count_children parameter is intentionally set to TRUE to be sure that
@@ -2383,6 +2382,7 @@ try_mount_opts_cb (GObject *source, GAsyncResult *result, gpointer user_data)
   g_vfs_backend_dav_send_async (backend, msg_stat, try_mount_stat_cb, job);
 
 clear_msgs:
+  g_clear_object (&body);
   g_object_unref (msg_opts);
 }
 
