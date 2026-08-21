@@ -52,16 +52,18 @@ libgvfsdbus = shared_module(
   install_dir: gio_giomoduledir,
 )
 
-if enable_devel_utils
+if enable_unit_tests
   test_name = 'test-uri-utils'
 
-  executable(
+  test_uri_utils = executable(
     test_name,
     [test_name + '.c'] + uri_utils,
     include_directories: top_inc,
     dependencies: libgvfscommon_dep,
     c_args: cflags,
   )
+
+  test(test_name, test_uri_utils)
 endif
 
 # FUSE daemon

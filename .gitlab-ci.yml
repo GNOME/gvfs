@@ -50,6 +50,7 @@ fedora-test:
           -Dgoogle=true
           -Dunit_tests=true
           --prefix /usr --werror $MESON_BUILD_DIR
+        - meson test -C $MESON_BUILD_DIR
         - sudo ninja -C $MESON_BUILD_DIR install
         - GIO_USE_VOLUME_MONITOR=unix gnome-desktop-testing-runner gvfs
         - dbus-run-session -- sh -c "gio mount localtest:/// && $MESON_BUILD_DIR/test/unit/outputstream localtest:///tmp/"
