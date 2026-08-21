@@ -8,6 +8,7 @@ typedef struct {
 	const char *uri;
 	const char *expected_host;
 	guint expected_port;
+	const char *expected_uri;
 } TestURIs;
 
 static TestURIs uris[] = {
@@ -15,7 +16,7 @@ static TestURIs uris[] = {
 	{ "http://test:443/", "test", 443 },
 	{ "http://test/", "test", -1 },
 	{ "http://windows-host:8080/C:/", "windows-host", 8080 },
-	{ "smb://user:password@192.192.192.192/foobar", "192.192.192.192", -1 },
+	{ "smb://user:password@192.192.192.192/foobar", "192.192.192.192", -1, "smb://user@192.192.192.192/foobar" },
 	{ "https://d134w4tst3t.s3.amazonaws.com/a?Signature=6VJ9%2BAdPVZ4Z7NnPShRvtDsLofc%3D&Expires=1249330377&AWSAccessKeyId=0EYZF4DV8A7WM0H73602", "d134w4tst3t.s3.amazonaws.com", -1 },
 	{ "dav+sd://foo%3Abar._webdav._tcp.local/", "foo:bar._webdav._tcp.local", -1 },
 };
@@ -26,6 +27,7 @@ int main (int argc, char **argv)
 
 	for (i = 0; i < G_N_ELEMENTS (uris); i++) {
 		GDecodedUri *decoded;
+		const char *expected_uri;
 		char *encoded;
 
 		decoded = g_vfs_decode_uri (uris[i].uri);
@@ -43,9 +45,10 @@ int main (int argc, char **argv)
 			g_vfs_decoded_uri_free (decoded);
 			return 1;
 		}
+		expected_uri = uris[i].expected_uri ? uris[i].expected_uri : uris[i].uri;
 		encoded = g_vfs_encode_uri (decoded, TRUE);
-		if (encoded == NULL || strcmp (encoded, uris[i].uri) != 0) {
-			g_warning ("Failed to re-encode \"%s\" from '%s'", uris[i].uri, encoded);
+		if (encoded == NULL || strcmp (encoded, expected_uri) != 0) {
+			g_warning ("Wrong re-encoding for \"%s\" (got '%s', expected '%s')", uris[i].uri, encoded, expected_uri);
 			g_vfs_decoded_uri_free (decoded);
 			g_free (encoded);
 			return 1;
