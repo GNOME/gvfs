@@ -1,3 +1,11 @@
+Major changes in 1.61.91
+========================
+* trash: Fix metadata handling when restoring or emptying (Liu Zhangjian)
+* trash: Honour x-gvfs-trash/x-gvfs-notrash from fstab mount points (Nick)
+* dav: Fix response body leaks to prevent hangs (Miroslav Prasil, Ondrej Holy)
+* Some other fixes (Ladislav Michl, correctmost)
+* Translation updates (luming zh, Vasil Pupkin)
+
 Major changes in 1.61.90
 ========================
 * admin/computer/http/network/recent/trash: Enable auto-unmount (Ondrej Holy)
