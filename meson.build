@@ -306,6 +306,7 @@ if enable_admin
   libcap_dep = dependency('libcap')
   polkit_gobject_dep = dependency('polkit-gobject-1', version: '>= 0.114')
 endif
+config_h.set('HAVE_ADMIN', enable_admin)
 
 # *** Check if we should build with http backend ***
 enable_http = get_option('http')
