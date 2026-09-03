@@ -26,7 +26,9 @@
 #include <sys/socket.h>
 #include <sys/errno.h>
 #include <errno.h>
+#ifdef HAVE_ADMIN
 #include <sys/fsuid.h>
+#endif
 #include <sys/un.h>
 #include <unistd.h>
 #include <string.h>
@@ -784,13 +786,16 @@ handle_get_connection (GVfsDBusDaemon *object,
   gchar *address1;
   gchar *socket_path;
   gchar *guid;
+#ifdef HAVE_ADMIN
   const char *pkexec_uid;
   uid_t old_fsuid = -1;
+#endif
 
   generate_address (&address1, &socket_path);
 
   guid = g_dbus_generate_guid ();
 
+#ifdef HAVE_ADMIN
   /* When running as gvfsd-admin via pkexec, temporarily set the filesystem UID
    * to the invoking user so the socket is created with the correct ownership
    * directly, avoiding the need for a separate ownership change operation. */
@@ -803,6 +808,7 @@ handle_get_connection (GVfsDBusDaemon *object,
       if (uid != 0)
         old_fsuid = setfsuid (uid);
     }
+#endif
 
   error = NULL;
   server = g_dbus_server_new_sync (address1,
@@ -813,9 +819,11 @@ handle_get_connection (GVfsDBusDaemon *object,
                                    &error);
   g_free (guid);
 
+#ifdef HAVE_ADMIN
   /* Restore the original filesystem UID */
   if (old_fsuid != (uid_t)-1)
     setfsuid (old_fsuid);
+#endif
 
   if (server == NULL)
     {
