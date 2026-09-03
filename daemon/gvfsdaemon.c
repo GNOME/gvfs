@@ -26,6 +26,7 @@
 #include <sys/socket.h>
 #include <sys/errno.h>
 #include <errno.h>
+#include <sys/fsuid.h>
 #include <sys/un.h>
 #include <unistd.h>
 #include <string.h>
@@ -784,10 +785,25 @@ handle_get_connection (GVfsDBusDaemon *object,
   gchar *socket_path;
   gchar *guid;
   const char *pkexec_uid;
+  uid_t old_fsuid = -1;
 
   generate_address (&address1, &socket_path);
 
   guid = g_dbus_generate_guid ();
+
+  /* When running as gvfsd-admin via pkexec, temporarily set the filesystem UID
+   * to the invoking user so the socket is created with the correct ownership
+   * directly, avoiding the need for a separate ownership change operation. */
+  pkexec_uid = g_getenv ("PKEXEC_UID");
+  if (pkexec_uid != NULL)
+    {
+      uid_t uid;
+
+      uid = strtol (pkexec_uid, NULL, 10);
+      if (uid != 0)
+        old_fsuid = setfsuid (uid);
+    }
+
   error = NULL;
   server = g_dbus_server_new_sync (address1,
                                    G_DBUS_SERVER_FLAGS_NONE,
@@ -796,6 +812,10 @@ handle_get_connection (GVfsDBusDaemon *object,
                                    NULL, /* GCancellable */
                                    &error);
   g_free (guid);
+
+  /* Restore the original filesystem UID */
+  if (old_fsuid != (uid_t)-1)
+    setfsuid (old_fsuid);
 
   if (server == NULL)
     {
@@ -806,18 +826,6 @@ handle_get_connection (GVfsDBusDaemon *object,
     }
 
   g_dbus_server_start (server);
-
-  /* This is needed for gvfsd-admin to ensure correct ownership. */
-  pkexec_uid = g_getenv ("PKEXEC_UID");
-  if (pkexec_uid != NULL)
-    {
-      uid_t uid;
-
-      uid = strtol (pkexec_uid, NULL, 10);
-      if (uid != 0)
-        if (chown (socket_path, uid, (gid_t)-1) < 0)
-          g_warning ("Failed to change socket ownership: %s", g_strerror (errno));
-    }
 
   g_signal_connect (server, "new-connection", G_CALLBACK (daemon_new_connection_func), daemon);
 
