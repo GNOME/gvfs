@@ -1,3 +1,7 @@
+Major changes in 1.62.0
+=======================
+* CVE-2026-88924: admin: Set socket ownership before creation (Ondrej Holy)
+
 Major changes in 1.61.91
 ========================
 * trash: Fix metadata handling when restoring or emptying (Liu Zhangjian)
