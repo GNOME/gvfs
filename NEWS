@@ -1,3 +1,11 @@
+Major changes in 1.60.3
+=======================
+* CVE-2026-88924: admin: Set socket ownership before creation (Ondrej Holy)
+* trash: Fix metadata handling when restoring or emptying (Liu Zhangjian)
+* dav: Fix response body leaks to prevent hangs (Miroslav Prasil, Ondrej Holy)
+* Some other fixes (correctmost)
+* Translation updates (Patrik Sivek)
+
 Major changes in 1.60.2
 =======================
 * build: Drop G_GNUC_PURE from *_get_type() functions (Philip Withnall)
