@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.31.x\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gvfs/issues/\n"
-"POT-Creation-Date: 2026-03-03 08:49+0000\n"
-"PO-Revision-Date: 2026-05-05 19:51+0200\n"
+"POT-Creation-Date: 2026-09-03 13:20+0000\n"
+"PO-Revision-Date: 2026-10-08 10:25+0200\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian bokmål <i18n-nb@lister.ping.uio.no>\n"
 "Language: nb\n"
@@ -42,7 +42,8 @@ msgstr "Fant ikke fildeskriptor for strøm"
 msgid "Invalid return value from %s"
 msgstr "Ugyldig returverdi fra %s"
 
-#. translators: this is an error message when there is no user visible "mount" object
+#. translators: this is an error message when there is no user visible "mount"
+#. object
 #. corresponding to a particular path/uri
 #: client/gdaemonfile.c:2233 client/gdaemonfile.c:3370
 msgid "Could not find enclosing mount"
@@ -82,7 +83,7 @@ msgstr "Feil i protokoll for strøm: %s"
 
 #: client/gdaemonfileinputstream.c:552 client/gdaemonfileinputstream.c:1695
 #: client/gdaemonfileoutputstream.c:503 client/gdaemonfileoutputstream.c:1442
-#: daemon/gvfsbackendmtp.c:2514 daemon/gvfsbackendmtp.c:2955
+#: daemon/gvfsbackendmtp.c:2515 daemon/gvfsbackendmtp.c:2964
 msgid "End of stream"
 msgstr "Slutt på strømmen"
 
@@ -91,7 +92,7 @@ msgstr "Slutt på strømmen"
 #: client/gdaemonfileinputstream.c:1418 client/gdaemonfileoutputstream.c:553
 #: client/gdaemonfileoutputstream.c:731 client/gdaemonfileoutputstream.c:926
 #: client/gdaemonfileoutputstream.c:1092 client/gdaemonfileoutputstream.c:1274
-#: daemon/gvfsbackendsftp.c:5523 daemon/gvfsbackendsmb.c:1160
+#: daemon/gvfsbackendsftp.c:5560 daemon/gvfsbackendsmb.c:1175
 #: daemon/gvfsbackendtest.c:92 daemon/gvfsbackendtest.c:125
 #: daemon/gvfsbackendtest.c:188 daemon/gvfschannel.c:347
 #: daemon/gvfsftptask.c:224
@@ -119,8 +120,8 @@ msgstr "Feil ved henting av informasjon om monteringspunkt: %s"
 #: daemon/gvfsafpvolume.c:2035 daemon/gvfsafpvolume.c:2190
 #: daemon/gvfsafpvolume.c:2403 daemon/gvfsbackendadmin.c:150
 #: daemon/gvfsbackendafc.c:166 daemon/gvfsbackendgoogle.c:256
-#: daemon/gvfsbackendsftp.c:346 daemon/gvfsbackendsftp.c:1127
-#: daemon/gvfsbackendsftp.c:2217 daemon/gvfsftptask.c:438 daemon/mount.c:437
+#: daemon/gvfsbackendsftp.c:353 daemon/gvfsbackendsftp.c:1146
+#: daemon/gvfsbackendsftp.c:2246 daemon/gvfsftptask.c:444 daemon/mount.c:437
 #, c-format
 msgid "Permission denied"
 msgstr "Tilgang nektet"
@@ -138,7 +139,6 @@ msgstr "Feil ved initiering av Avahi: %s"
 #. * - the first %s refers to the service type
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
-#.
 #: common/gvfsdnssdresolver.c:1144
 #, c-format
 msgid "Error resolving “%s” service “%s” on domain “%s”"
@@ -149,7 +149,6 @@ msgstr "Feil i oppslag av «%s» tjeneste «%s» på domene «%s»"
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #. * - the fourth %s refers to the required TXT keys
-#.
 #: common/gvfsdnssdresolver.c:1168
 #, c-format
 msgid ""
@@ -163,7 +162,6 @@ msgstr ""
 #. * - the first %s refers to the service type
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
-#.
 #: common/gvfsdnssdresolver.c:1183
 #, c-format
 msgid "Timed out resolving “%s” service “%s” on domain “%s”"
@@ -224,28 +222,62 @@ msgstr "monteringspunkt for %s kjører allerede"
 msgid "error starting mount daemon"
 msgstr "feil under oppstart av monteringstjenesten"
 
-#: daemon/gvfsafpconnection.c:787
+#: daemon/gvfsafpconnection.c:792
 msgid "The connection is not opened"
 msgstr "Tilkoblingen er ikke åpnet"
 
-#: daemon/gvfsafpconnection.c:794
+#: daemon/gvfsafpconnection.c:799 daemon/gvfsftptask.c:280
 msgid "The connection is closed"
 msgstr "Tilkoblingen er lukket"
 
-#: daemon/gvfsafpconnection.c:897
+#: daemon/gvfsafpconnection.c:902 daemon/gvfsafpconnection.c:1005
 msgid "Got EOS"
 msgstr "Fikk EOS"
 
-#: daemon/gvfsafpconnection.c:1060 daemon/gvfsafpconnection.c:1102
-#: daemon/gvfsftptask.c:398
+#: daemon/gvfsafpconnection.c:1163 daemon/gvfsafpconnection.c:1200
+#: daemon/gvfsafpconnection.c:1242 daemon/gvfsftptask.c:404
 msgid "Host closed connection"
 msgstr "Vert lukket forbindelsen"
 
-#: daemon/gvfsafpconnection.c:1521
+#: daemon/gvfsafpconnection.c:1269 daemon/gvfsbackendgoogle.c:3584
+#: daemon/gvfsbackendmtp.c:2582 daemon/gvfsbackendsftp.c:736
+#: daemon/gvfsbackendsftp.c:748 daemon/gvfsbackendsftp.c:1580
+#: daemon/gvfsbackendsftp.c:2421 daemon/gvfsbackendsftp.c:2826
+#: daemon/gvfsbackendsftp.c:2890 daemon/gvfsbackendsftp.c:2898
+#: daemon/gvfsbackendsftp.c:2908 daemon/gvfsbackendsftp.c:2966
+#: daemon/gvfsbackendsftp.c:3059 daemon/gvfsbackendsftp.c:3111
+#: daemon/gvfsbackendsftp.c:3166 daemon/gvfsbackendsftp.c:3245
+#: daemon/gvfsbackendsftp.c:3362 daemon/gvfsbackendsftp.c:3522
+#: daemon/gvfsbackendsftp.c:3642 daemon/gvfsbackendsftp.c:3654
+#: daemon/gvfsbackendsftp.c:3724 daemon/gvfsbackendsftp.c:3794
+#: daemon/gvfsbackendsftp.c:3852 daemon/gvfsbackendsftp.c:3872
+#: daemon/gvfsbackendsftp.c:4064 daemon/gvfsbackendsftp.c:4098
+#: daemon/gvfsbackendsftp.c:4156 daemon/gvfsbackendsftp.c:4218
+#: daemon/gvfsbackendsftp.c:4289 daemon/gvfsbackendsftp.c:4564
+#: daemon/gvfsbackendsftp.c:4635 daemon/gvfsbackendsftp.c:4770
+#: daemon/gvfsbackendsftp.c:4883 daemon/gvfsbackendsftp.c:4945
+#: daemon/gvfsbackendsftp.c:4982 daemon/gvfsbackendsftp.c:5010
+#: daemon/gvfsbackendsftp.c:5124 daemon/gvfsbackendsftp.c:5180
+#: daemon/gvfsbackendsftp.c:5221 daemon/gvfsbackendsftp.c:5257
+#: daemon/gvfsbackendsftp.c:5293 daemon/gvfsbackendsftp.c:5308
+#: daemon/gvfsbackendsftp.c:5323 daemon/gvfsbackendsftp.c:5418
+#: daemon/gvfsbackendsftp.c:5486 daemon/gvfsbackendsftp.c:5693
+#: daemon/gvfsbackendsftp.c:5730 daemon/gvfsbackendsftp.c:5848
+#: daemon/gvfsbackendsftp.c:5934 daemon/gvfsbackendsftp.c:6018
+#: daemon/gvfsbackendsftp.c:6061 daemon/gvfsbackendsftp.c:6065
+#: daemon/gvfsbackendsftp.c:6182 daemon/gvfsbackendsftp.c:6186
+#: daemon/gvfsbackendsftp.c:6437 daemon/gvfsbackendsftp.c:6660
+#: daemon/gvfsbackendsftp.c:6680 daemon/gvfsbackendsftp.c:6818
+#: daemon/gvfsbackendsftp.c:6846
+#, c-format
+msgid "Invalid reply received"
+msgstr "Ugyldig svar mottatt"
+
+#: daemon/gvfsafpconnection.c:1674
 msgid "Connection unexpectedly went down"
 msgstr "Tilkoblingen gikk ned uventet"
 
-#: daemon/gvfsafpconnection.c:1548
+#: daemon/gvfsafpconnection.c:1701
 msgid "Got unexpected end of stream"
 msgstr "Fikk uventet slutt på strøm"
 
@@ -270,7 +302,8 @@ msgstr "Kan ikke logge inn på tjener «%s» med oppgitt passord."
 #: daemon/gvfsafpserver.c:823 daemon/gvfsafpserver.c:871
 #: daemon/gvfsafpserver.c:987 daemon/gvfsafpserver.c:1659
 #, c-format
-msgid "Unable to connect to the server “%s”. A communication problem occurred."
+msgid ""
+"Unable to connect to the server “%s”. A communication problem occurred."
 msgstr "Kan ikke koble til tjener «%s». Et kommunikasjonsproblem oppsto."
 
 #: daemon/gvfsafpserver.c:620
@@ -295,8 +328,8 @@ msgstr ""
 #: daemon/gvfsafpserver.c:801
 #, c-format
 msgid ""
-"Unable to connect to the server “%s”. The server doesn’t support AFP version "
-"3.0 or later."
+"Unable to connect to the server “%s”. The server doesn’t support AFP version"
+" 3.0 or later."
 msgstr ""
 "Kan ikke koble til tjener «%s». Tjeneren støtter ikke AFP-versjon 3.0 eller "
 "senere."
@@ -322,8 +355,8 @@ msgid "Your password needs to be changed."
 msgstr "Passordet ditt må byttes."
 
 #. Translators: the first %s is the username, the second the host name
-#: daemon/gvfsafpserver.c:1063 daemon/gvfsbackendftp.c:530
-#: daemon/gvfsbackendsftp.c:1169
+#: daemon/gvfsafpserver.c:1063 daemon/gvfsbackendftp.c:531
+#: daemon/gvfsbackendsftp.c:1188
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -335,8 +368,8 @@ msgstr ""
 #. Translators: %s here is the hostname
 #. Translators: %s is the hostname
 #. Translators: %s is a server name
-#: daemon/gvfsafpserver.c:1066 daemon/gvfsbackendftp.c:533
-#: daemon/gvfsbackendsftp.c:1176 daemon/gvfsbackendsmbbrowse.c:340
+#: daemon/gvfsafpserver.c:1066 daemon/gvfsbackendftp.c:534
+#: daemon/gvfsbackendsftp.c:1195 daemon/gvfsbackendsmbbrowse.c:360
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -387,27 +420,27 @@ msgstr "Kunne ikke laste %s på %s"
 #: daemon/gvfsbackendafpbrowse.c:312 daemon/gvfsbackendafpbrowse.c:344
 #: daemon/gvfsbackendarchive.c:738 daemon/gvfsbackendarchive.c:793
 #: daemon/gvfsbackendarchive.c:845 daemon/gvfsbackendarchive.c:874
-#: daemon/gvfsbackendcdda.c:924 daemon/gvfsbackendcomputer.c:639
-#: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:799
-#: daemon/gvfsbackendftp.c:1227 daemon/gvfsbackendmtp.c:1816
-#: daemon/gvfsbackendmtp.c:1832 daemon/gvfsbackendmtp.c:2239
-#: daemon/gvfsbackendmtp.c:2302 daemon/gvfsbackendmtp.c:2368
-#: daemon/gvfsbackendmtp.c:3060 daemon/gvfsbackendmtp.c:3227
-#: daemon/gvfsbackendnetwork.c:893 daemon/gvfsbackendsmbbrowse.c:916
-#: daemon/gvfsbackendsmbbrowse.c:983 daemon/gvfsbackendsmbbrowse.c:1165
-#: daemon/gvfsbackendsmbbrowse.c:1238
+#: daemon/gvfsbackendcdda.c:924 daemon/gvfsbackendcomputer.c:649
+#: daemon/gvfsbackenddnssd.c:425 daemon/gvfsbackendftp.c:800
+#: daemon/gvfsbackendftp.c:1228 daemon/gvfsbackendmtp.c:1817
+#: daemon/gvfsbackendmtp.c:1833 daemon/gvfsbackendmtp.c:2240
+#: daemon/gvfsbackendmtp.c:2303 daemon/gvfsbackendmtp.c:2369
+#: daemon/gvfsbackendmtp.c:3069 daemon/gvfsbackendmtp.c:3236
+#: daemon/gvfsbackendnetwork.c:901 daemon/gvfsbackendsmbbrowse.c:955
+#: daemon/gvfsbackendsmbbrowse.c:1022 daemon/gvfsbackendsmbbrowse.c:1204
+#: daemon/gvfsbackendsmbbrowse.c:1277
 #, c-format
 msgid "File doesn’t exist"
 msgstr "Filen eksisterer ikke"
 
 #: daemon/gvfsafpvolume.c:402 daemon/gvfsafpvolume.c:2411
 #: daemon/gvfsbackendafp.c:280 daemon/gvfsbackendafp.c:483
-#: daemon/gvfsbackendafp.c:1361 daemon/gvfsbackenddav.c:2799
-#: daemon/gvfsbackenddav.c:3758 daemon/gvfsbackenddav.c:4010
-#: daemon/gvfsbackendftp.c:836 daemon/gvfsbackendnfs.c:2609
-#: daemon/gvfsbackendsftp.c:2730 daemon/gvfsbackendsftp.c:3439
-#: daemon/gvfsbackendsftp.c:3940 daemon/gvfsbackendsftp.c:5012
-#: daemon/gvfsbackendsftp.c:6097
+#: daemon/gvfsbackendafp.c:1361 daemon/gvfsbackenddav.c:2845
+#: daemon/gvfsbackenddav.c:3806 daemon/gvfsbackenddav.c:4058
+#: daemon/gvfsbackendftp.c:837 daemon/gvfsbackendnfs.c:2609
+#: daemon/gvfsbackendsftp.c:2759 daemon/gvfsbackendsftp.c:3476
+#: daemon/gvfsbackendsftp.c:3977 daemon/gvfsbackendsftp.c:5049
+#: daemon/gvfsbackendsftp.c:6134
 msgid "File is directory"
 msgstr "Filen er en katalog"
 
@@ -420,9 +453,8 @@ msgid "Target file is open"
 msgstr "Målfilen er åpen"
 
 #: daemon/gvfsafpvolume.c:663 daemon/gvfsbackendafc.c:154
-#: daemon/gvfsbackendburn.c:421 daemon/gvfsbackenddav.c:3311
-#: daemon/gvfsbackendgoogle.c:2497 daemon/gvfsbackendonedrive.c:970
-#: daemon/gvfsbackendsftp.c:2211
+#: daemon/gvfsbackenddav.c:3357 daemon/gvfsbackendgoogle.c:2497
+#: daemon/gvfsbackendonedrive.c:970 daemon/gvfsbackendsftp.c:2240
 msgid "Directory not empty"
 msgstr "Katalogen er ikke tom"
 
@@ -450,20 +482,20 @@ msgstr "Ikke nok plass på volumet"
 
 #: daemon/gvfsafpvolume.c:812 daemon/gvfsafpvolume.c:1356
 #: daemon/gvfsafpvolume.c:1508 daemon/gvfsbackendafp.c:287
-#: daemon/gvfsbackendafp.c:490 daemon/gvfsbackenddav.c:2870
-#: daemon/gvfsbackenddav.c:3224 daemon/gvfsbackenddav.c:3384
-#: daemon/gvfsbackenddav.c:3490 daemon/gvfsbackenddav.c:3724
-#: daemon/gvfsbackenddav.c:3768 daemon/gvfsbackenddav.c:4000
-#: daemon/gvfsbackendftp.c:815 daemon/gvfsbackendftp.c:1014
-#: daemon/gvfsbackendftp.c:1639 daemon/gvfsbackendftp.c:1707
+#: daemon/gvfsbackendafp.c:490 daemon/gvfsbackenddav.c:2916
+#: daemon/gvfsbackenddav.c:3270 daemon/gvfsbackenddav.c:3430
+#: daemon/gvfsbackenddav.c:3536 daemon/gvfsbackenddav.c:3772
+#: daemon/gvfsbackenddav.c:3816 daemon/gvfsbackenddav.c:4048
+#: daemon/gvfsbackendftp.c:816 daemon/gvfsbackendftp.c:1015
+#: daemon/gvfsbackendftp.c:1640 daemon/gvfsbackendftp.c:1708
 #: daemon/gvfsbackendgoogle.c:1703 daemon/gvfsbackendgoogle.c:1780
 #: daemon/gvfsbackendgoogle.c:2157 daemon/gvfsbackendgoogle.c:2237
 #: daemon/gvfsbackendgoogle.c:2757 daemon/gvfsbackendgoogle.c:3204
-#: daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1712
-#: daemon/gvfsbackendmtp.c:1755 daemon/gvfsbackendmtp.c:2660
-#: daemon/gvfsbackendnfs.c:2619 daemon/gvfsbackendonedrive.c:1123
-#: daemon/gvfsbackendonedrive.c:1750 daemon/gvfsbackendsftp.c:5021
-#: daemon/gvfsbackendsmb.c:2192
+#: daemon/gvfsbackendgoogle.c:3869 daemon/gvfsbackendmtp.c:1713
+#: daemon/gvfsbackendmtp.c:1756 daemon/gvfsbackendmtp.c:2669
+#: daemon/gvfsbackendnfs.c:2619 daemon/gvfsbackendonedrive.c:1124
+#: daemon/gvfsbackendonedrive.c:1750 daemon/gvfsbackendsftp.c:5058
+#: daemon/gvfsbackendsmb.c:2209
 msgid "Target file already exists"
 msgstr "Målfilen eksisterer allerede"
 
@@ -535,10 +567,10 @@ msgstr "Kildefilen er en katalog"
 msgid "Range lock conflict exists"
 msgstr "Konflikt i områdelås eksisterer"
 
-#: daemon/gvfsafpvolume.c:2194 daemon/gvfsbackendmtp.c:1535
-#: daemon/gvfsbackendmtp.c:1560 daemon/gvfsbackendmtp.c:1763
-#: daemon/gvfsbackendmtp.c:2139 daemon/gvfsbackendmtp.c:2673
-#: daemon/gvfsbackendmtp.c:3101 daemon/gvfsbackendmtp.c:3261
+#: daemon/gvfsafpvolume.c:2194 daemon/gvfsbackendmtp.c:1536
+#: daemon/gvfsbackendmtp.c:1561 daemon/gvfsbackendmtp.c:1764
+#: daemon/gvfsbackendmtp.c:2140 daemon/gvfsbackendmtp.c:2682
+#: daemon/gvfsbackendmtp.c:3110 daemon/gvfsbackendmtp.c:3270
 msgid "Directory doesn’t exist"
 msgstr "Katalogen eksisterer ikke"
 
@@ -561,14 +593,12 @@ msgstr "Filen er ikke åpen for lesetilgang"
 #. Return G_IO_ERROR_NOT_SUPPORTED instead of
 #. * G_IO_ERROR_CANT_CREATE_BACKUP to proceed with the GIO
 #. * fallback copy.
-#.
 #: daemon/gvfsbackendadmin.c:104 daemon/gvfsbackendadmin.c:871
 #: daemon/gvfsbackendafc.c:2361 daemon/gvfsbackendafp.c:1743
-#: daemon/gvfsbackendburn.c:829 daemon/gvfsbackendburn.c:951
-#: daemon/gvfsbackendcomputer.c:812 daemon/gvfsbackenddav.c:4107
-#: daemon/gvfsbackenddav.c:4139 daemon/gvfsbackenddav.c:4167
-#: daemon/gvfsbackendftp.c:1267 daemon/gvfsbackendftp.c:1361
-#: daemon/gvfsbackendftp.c:1762 daemon/gvfsbackendgoogle.c:1590
+#: daemon/gvfsbackendcomputer.c:823 daemon/gvfsbackenddav.c:4155
+#: daemon/gvfsbackenddav.c:4187 daemon/gvfsbackenddav.c:4215
+#: daemon/gvfsbackendftp.c:1268 daemon/gvfsbackendftp.c:1362
+#: daemon/gvfsbackendftp.c:1763 daemon/gvfsbackendgoogle.c:1590
 #: daemon/gvfsbackendgoogle.c:1623 daemon/gvfsbackendgoogle.c:1652
 #: daemon/gvfsbackendgoogle.c:1675 daemon/gvfsbackendgoogle.c:1741
 #: daemon/gvfsbackendgoogle.c:2013 daemon/gvfsbackendgoogle.c:2045
@@ -584,25 +614,26 @@ msgstr "Filen er ikke åpen for lesetilgang"
 #: daemon/gvfsbackendgphoto2.c:2238 daemon/gvfsbackendgphoto2.c:2451
 #: daemon/gvfsbackendgphoto2.c:2548 daemon/gvfsbackendgphoto2.c:2641
 #: daemon/gvfsbackendgphoto2.c:3274 daemon/gvfsbackendgphoto2.c:3282
-#: daemon/gvfsbackendgphoto2.c:3292 daemon/gvfsbackendhttp.c:745
-#: daemon/gvfsbackendmtp.c:1808 daemon/gvfsbackendmtp.c:2109
-#: daemon/gvfsbackendmtp.c:2357 daemon/gvfsbackendmtp.c:2549
-#: daemon/gvfsbackendmtp.c:2635 daemon/gvfsbackendmtp.c:2786
-#: daemon/gvfsbackendmtp.c:3032 daemon/gvfsbackendmtp.c:3200
+#: daemon/gvfsbackendgphoto2.c:3292 daemon/gvfsbackendhttp.c:749
+#: daemon/gvfsbackendmtp.c:1809 daemon/gvfsbackendmtp.c:2110
+#: daemon/gvfsbackendmtp.c:2358 daemon/gvfsbackendmtp.c:2550
+#: daemon/gvfsbackendmtp.c:2644 daemon/gvfsbackendmtp.c:2795
+#: daemon/gvfsbackendmtp.c:3041 daemon/gvfsbackendmtp.c:3209
 #: daemon/gvfsbackendnfs.c:2501 daemon/gvfsbackendnfs.c:2551
 #: daemon/gvfsbackendnfs.c:2677 daemon/gvfsbackendonedrive.c:881
 #: daemon/gvfsbackendonedrive.c:980 daemon/gvfsbackendonedrive.c:1102
-#: daemon/gvfsbackendonedrive.c:1665 daemon/gvfsbackendonedrive.c:1717
-#: daemon/gvfsbackendonedrive.c:1733 daemon/gvfsbackendonedrive.c:1745
-#: daemon/gvfsbackendonedrive.c:1905 daemon/gvfsbackendonedrive.c:1921
-#: daemon/gvfsbackendsftp.c:2215 daemon/gvfsbackendsftp.c:5409
-#: daemon/gvfsbackendsftp.c:5507 daemon/gvfsbackendsftp.c:6219
-#: daemon/gvfsbackendsftp.c:6251 daemon/gvfsbackendsftp.c:6277
-#: daemon/gvfsbackendsftp.c:6285 daemon/gvfsbackendsftp.c:6772
-#: daemon/gvfsbackendsftp.c:6834 daemon/gvfsbackendsftp.c:6842
-#: daemon/gvfsbackendsmb.c:1784 daemon/gvfsbackendsmb.c:2264
-#: daemon/gvfsbackendtrash.c:937 daemon/gvfsbackendtrash.c:963
-#: daemon/gvfsbackendwsdd.c:364 daemon/gvfsftptask.c:430
+#: daemon/gvfsbackendonedrive.c:1117 daemon/gvfsbackendonedrive.c:1666
+#: daemon/gvfsbackendonedrive.c:1717 daemon/gvfsbackendonedrive.c:1733
+#: daemon/gvfsbackendonedrive.c:1745 daemon/gvfsbackendonedrive.c:1905
+#: daemon/gvfsbackendonedrive.c:1921 daemon/gvfsbackendrecent.c:743
+#: daemon/gvfsbackendsftp.c:2244 daemon/gvfsbackendsftp.c:5446
+#: daemon/gvfsbackendsftp.c:5544 daemon/gvfsbackendsftp.c:6256
+#: daemon/gvfsbackendsftp.c:6288 daemon/gvfsbackendsftp.c:6314
+#: daemon/gvfsbackendsftp.c:6322 daemon/gvfsbackendsftp.c:6812
+#: daemon/gvfsbackendsftp.c:6874 daemon/gvfsbackendsftp.c:6882
+#: daemon/gvfsbackendsmb.c:1799 daemon/gvfsbackendsmb.c:2281
+#: daemon/gvfsbackendtrash.c:964 daemon/gvfsbackendtrash.c:990
+#: daemon/gvfsbackendwsdd.c:364 daemon/gvfsftptask.c:436
 #: daemon/gvfsjobcloseread.c:113 daemon/gvfsjobclosewrite.c:121
 #: daemon/gvfsjobcopy.c:121 daemon/gvfsjobcreatemonitor.c:143
 #: daemon/gvfsjobcreatemonitor.c:154 daemon/gvfsjobcreatemonitor.c:177
@@ -627,9 +658,9 @@ msgid "Operation not supported"
 msgstr "Operasjonen støttes ikke"
 
 #: daemon/gvfsbackendadmin.c:999 daemon/gvfsbackendarchive.c:639
-#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2355
+#: daemon/gvfsbackendarchive.c:668 daemon/gvfsbackenddav.c:2401
 #: daemon/gvfsbackendgoogle.c:2943 daemon/gvfsbackendhttp.c:303
-#: daemon/gvfsbackendonedrive.c:1202 daemon/gvfsbackendsmb.c:628
+#: daemon/gvfsbackendonedrive.c:1203 daemon/gvfsbackendsmb.c:643
 msgid "Invalid mount spec"
 msgstr "Ugyldige monteringsspesifikasjon"
 
@@ -708,8 +739,8 @@ msgstr "Ikke håndtert feil i libimobiledevice (%d)"
 msgid "Try again"
 msgstr "Prøv igjen"
 
-#: daemon/gvfsbackendafc.c:394 daemon/gvfsbackend.c:1024
-#: monitor/udisks2/gvfsudisks2mount.c:752
+#: daemon/gvfsbackendafc.c:394 daemon/gvfsbackend.c:1042
+#: monitor/udisks2/gvfsudisks2mount.c:753
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -782,50 +813,51 @@ msgstr ""
 "Velg «Etabler tillit» på enheten og klikk på «Prøv igjen»."
 
 #: daemon/gvfsbackendafc.c:1053 daemon/gvfsbackendarchive.c:746
-#: daemon/gvfsbackendcomputer.c:657 daemon/gvfsbackendgoogle.c:3577
-#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2390
-#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendonedrive.c:1471
-#: daemon/gvfsbackendrecent.c:126 daemon/gvfsbackendsmb.c:718
-#: daemon/gvfsbackendtrash.c:333
+#: daemon/gvfsbackendcomputer.c:667 daemon/gvfsbackendgoogle.c:3577
+#: daemon/gvfsbackendgphoto2.c:1548 daemon/gvfsbackendmtp.c:2391
+#: daemon/gvfsbackendnfs.c:363 daemon/gvfsbackendonedrive.c:1472
+#: daemon/gvfsbackendrecent.c:106 daemon/gvfsbackendsmb.c:733
+#: daemon/gvfsbackendtrash.c:360
 msgid "Can’t open directory"
 msgstr "Kan ikke åpne katalog"
 
 #: daemon/gvfsbackendafc.c:1273 daemon/gvfsbackendafc.c:2528
 #: daemon/gvfsbackendafp.c:1290 daemon/gvfsbackendafp.c:1379
-#: daemon/gvfsbackenddav.c:3665 daemon/gvfsbackendftp.c:1593
-#: daemon/gvfsbackendonedrive.c:1899 daemon/gvfsbackendsftp.c:3714
-#: daemon/gvfsbackendsftp.c:4001
+#: daemon/gvfsbackenddav.c:3713 daemon/gvfsbackendftp.c:1594
+#: daemon/gvfsbackendonedrive.c:1899 daemon/gvfsbackendsftp.c:3751
+#: daemon/gvfsbackendsftp.c:4038
 msgid "Backups not supported"
 msgstr "Sikkerhetskopier støttes ikke"
 
-#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:771
-#: daemon/gvfsbackendsmb.c:1257
+#: daemon/gvfsbackendafc.c:1435 daemon/gvfsbackendsmb.c:786
+#: daemon/gvfsbackendsmb.c:1272
 msgid "Unsupported seek type"
 msgstr "Søketype ikke støttet"
 
-#: daemon/gvfsbackendafpbrowse.c:208 daemon/gvfsbackendcomputer.c:958
-#: daemon/gvfsbackendcomputer.c:1053 daemon/gvfsbackendcomputer.c:1159
-#: daemon/gvfsbackendcomputer.c:1249 daemon/gvfsbackendcomputer.c:1322
-#: daemon/gvfsbackendcomputer.c:1391 daemon/gvfsbackendsmbbrowse.c:911
-#: daemon/gvfsbackendsmbbrowse.c:957
+#: daemon/gvfsbackendafpbrowse.c:208 daemon/gvfsbackendcomputer.c:976
+#: daemon/gvfsbackendcomputer.c:1071 daemon/gvfsbackendcomputer.c:1177
+#: daemon/gvfsbackendcomputer.c:1267 daemon/gvfsbackendcomputer.c:1340
+#: daemon/gvfsbackendcomputer.c:1409 daemon/gvfsbackendsmbbrowse.c:950
+#: daemon/gvfsbackendsmbbrowse.c:996
 msgid "Not a mountable file"
 msgstr "Ikke en monterbar fil"
 
 #. Translators: first %s is username and second serververname
 #. Translators: first %s is volumename and second servername
 #. Translators: the first %s is the username, the second the host name
-#. Translators: This is "<mount point> on <host>" and is used as name for an NFS mount
+#. Translators: This is "<mount point> on <host>" and is used as name for an
+#. NFS mount
 #. Translators: This is the name of an SFTP share, like "<user> on <hostname>"
 #. Set the mountspec according to original uri, no matter whether user changes
 #. credentials during mount loop. Nautilus and other gio clients depend
 #. on correct mountspec, setting it to real (different) credentials would
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
-#.
-#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#. Translators: This is "<sharename> on <servername>" and is used as name for
+#. an SMB share
 #: daemon/gvfsbackendafpbrowse.c:446 daemon/gvfsbackendafp.c:2067
-#: daemon/gvfsbackendftp.c:681 daemon/gvfsbackendnfs.c:297
-#: daemon/gvfsbackendsftp.c:2072 daemon/gvfsbackendsmb.c:483
-#: daemon/gvfsbackendsmb.c:1446
+#: daemon/gvfsbackendftp.c:682 daemon/gvfsbackendnfs.c:297
+#: daemon/gvfsbackendsftp.c:2101 daemon/gvfsbackendsmb.c:489
+#: daemon/gvfsbackendsmb.c:1461
 #, c-format
 msgid "%s on %s"
 msgstr "%s på %s"
@@ -837,33 +869,31 @@ msgid "%s"
 msgstr "%s"
 
 #: daemon/gvfsbackendafpbrowse.c:483 daemon/gvfsbackendafp.c:2102
-#: daemon/gvfsbackendarchive.c:628 daemon/gvfsbackendftp.c:724
-#: daemon/gvfsbackendnfs.c:198 daemon/gvfsbackendsftp.c:2124
+#: daemon/gvfsbackendarchive.c:628 daemon/gvfsbackendftp.c:725
+#: daemon/gvfsbackendnfs.c:198 daemon/gvfsbackendsftp.c:2153
 msgid "No hostname specified"
 msgstr "Ingen vertsnavn oppgitt"
 
 #: daemon/gvfsbackendafpbrowse.c:568 daemon/gvfsbackendafp.c:2198
 msgid "Apple Filing Protocol Service"
-msgstr "Apple Filing Protocol Service"
+msgstr "Apple Filing Protocol-tjeneste"
 
-#: daemon/gvfsbackendafp.c:277 daemon/gvfsbackendburn.c:877
-#: daemon/gvfsbackenddav.c:3753 daemon/gvfsbackendftp.c:1699
-#: daemon/gvfsbackendgoogle.c:1752 daemon/gvfsbackendgoogle.c:2095
-#: daemon/gvfsbackendgoogle.c:3141
+#: daemon/gvfsbackendafp.c:277 daemon/gvfsbackenddav.c:3801
+#: daemon/gvfsbackendftp.c:1700 daemon/gvfsbackendgoogle.c:1752
+#: daemon/gvfsbackendgoogle.c:2095 daemon/gvfsbackendgoogle.c:3141
 msgid "Can’t copy directory over directory"
 msgstr "Kan ikke kopiere katalog over katalog"
 
-#: daemon/gvfsbackendafp.c:296 daemon/gvfsbackendburn.c:893
-#: daemon/gvfsbackenddav.c:3788 daemon/gvfsbackendftp.c:1722
-#: daemon/gvfsbackendgoogle.c:1814 daemon/gvfsbackendgoogle.c:3168
-#: daemon/gvfsbackendgoogle.c:3216 daemon/gvfsbackendmtp.c:1703
-#: daemon/gvfsbackendmtp.c:1718
+#: daemon/gvfsbackendafp.c:296 daemon/gvfsbackenddav.c:3836
+#: daemon/gvfsbackendftp.c:1723 daemon/gvfsbackendgoogle.c:1814
+#: daemon/gvfsbackendgoogle.c:3168 daemon/gvfsbackendgoogle.c:3216
+#: daemon/gvfsbackendmtp.c:1704 daemon/gvfsbackendmtp.c:1719
 msgid "Can’t recursively copy directory"
 msgstr "Kan ikke kopiere katalog rekursivt"
 
-#: daemon/gvfsbackendafp.c:480 daemon/gvfsbackenddav.c:3566
+#: daemon/gvfsbackendafp.c:480 daemon/gvfsbackenddav.c:3614
 #: daemon/gvfsbackendgoogle.c:2209 daemon/gvfsbackendnfs.c:2603
-#: daemon/gvfsbackendsftp.c:5007 daemon/gvfsbackendsmb.c:2181
+#: daemon/gvfsbackendsftp.c:5044 daemon/gvfsbackendsmb.c:2198
 msgid "Can’t move directory over directory"
 msgstr "Kan ikke flytte katalog over katalog"
 
@@ -872,14 +902,14 @@ msgstr "Kan ikke flytte katalog over katalog"
 msgid "Unable to create temporary file (%s)"
 msgstr "Kan ikke opprette midlertidig fil (%s)"
 
-#: daemon/gvfsbackendafp.c:1368 daemon/gvfsbackenddav.c:2977
-#: daemon/gvfsbackendnfs.c:1313 daemon/gvfsbackendsftp.c:3955
-#: daemon/gvfsbackendsmb.c:1129
+#: daemon/gvfsbackendafp.c:1368 daemon/gvfsbackenddav.c:3023
+#: daemon/gvfsbackendnfs.c:1313 daemon/gvfsbackendsftp.c:3992
+#: daemon/gvfsbackendsmb.c:1144
 msgid "The file was externally modified"
 msgstr "Filen er endret eksternt"
 
-#: daemon/gvfsbackendafp.c:1727 daemon/gvfsbackendftp.c:1309
-#: daemon/gvfsbackendsftp.c:5471
+#: daemon/gvfsbackendafp.c:1727 daemon/gvfsbackendftp.c:1310
+#: daemon/gvfsbackendsftp.c:5508
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "Ugyldig type attributt (uint32 forventet)"
 
@@ -900,75 +930,27 @@ msgstr "Ingen volumer oppgitt"
 msgid "/ in %s"
 msgstr "/ i %s"
 
-#: daemon/gvfsbackendarchive.c:883 daemon/gvfsbackendburn.c:681
-#: daemon/gvfsbackendcomputer.c:729 daemon/gvfsbackenddnssd.c:475
-#: daemon/gvfsbackendftp.c:354 daemon/gvfsbackendgoogle.c:1204
-#: daemon/gvfsbackendgoogle.c:2410 daemon/gvfsbackendgoogle.c:2637
-#: daemon/gvfsbackendnetwork.c:944 daemon/gvfsbackendonedrive.c:695
-#: daemon/gvfsbackendonedrive.c:897 daemon/gvfsbackendonedrive.c:1033
-#: daemon/gvfsbackendsftp.c:4494 daemon/gvfsftpdircache.c:157
+#: daemon/gvfsbackendarchive.c:883 daemon/gvfsbackendcomputer.c:739
+#: daemon/gvfsbackenddnssd.c:475 daemon/gvfsbackendftp.c:355
+#: daemon/gvfsbackendgoogle.c:1204 daemon/gvfsbackendgoogle.c:2410
+#: daemon/gvfsbackendgoogle.c:2637 daemon/gvfsbackendnetwork.c:952
+#: daemon/gvfsbackendonedrive.c:695 daemon/gvfsbackendonedrive.c:897
+#: daemon/gvfsbackendonedrive.c:1033 daemon/gvfsbackendsftp.c:4531
+#: daemon/gvfsftpdircache.c:157
 #, c-format
 msgid "The file is not a directory"
 msgstr "Filen er ikke en katalog"
 
-#. Translators: This is the name of the backend
-#: daemon/gvfsbackendburn.c:346
-msgid "Burn"
-msgstr "Brenn"
-
-#: daemon/gvfsbackendburn.c:372
-msgid "Unable to create temporary directory"
-msgstr "Kan ikke opprette midlertidig katalog"
-
-#: daemon/gvfsbackendburn.c:401 daemon/gvfsbackendburn.c:412
-#: daemon/gvfsbackendburn.c:447 daemon/gvfsbackendburn.c:673
-#: daemon/gvfsbackendburn.c:718 daemon/gvfsbackendburn.c:744
-#: daemon/gvfsbackendburn.c:782 daemon/gvfsbackendburn.c:854
-#: daemon/gvfsbackendburn.c:973 daemon/gvfsbackendburn.c:1009
-#: daemon/gvfsbackenddav.c:3228 daemon/gvfsbackendftp.c:856
-#: daemon/gvfsbackendgoogle.c:1097 daemon/gvfsbackendgphoto2.c:938
-#: daemon/gvfsbackendgphoto2.c:1869 daemon/gvfsbackendgphoto2.c:2588
-#: daemon/gvfsbackendonedrive.c:612 daemon/gvfsbackendrecent.c:110
-#: daemon/gvfsbackendrecent.c:293 daemon/gvfsbackendsftp.c:2219
-#: daemon/gvfsbackendsftp.c:3382 daemon/gvfsbackendsftp.c:3395
-#: daemon/gvfsbackendsftp.c:3415 daemon/gvfsbackendtrash.c:317
-#, c-format
-msgid "No such file or directory"
-msgstr "Filen eller katalogen finnes ikke"
-
-#: daemon/gvfsbackendburn.c:455 daemon/gvfsbackendburn.c:905
-#: daemon/gvfsbackendgoogle.c:1760 daemon/gvfsbackendgoogle.c:2103
-#: daemon/gvfsbackendgoogle.c:3149
-msgid "Can’t copy file over directory"
-msgstr "Kan ikke kopiere fil over katalog"
-
-#. Translators: this is the display name of the backend
-#: daemon/gvfsbackendburn.c:652
-msgid "CD/DVD Creator"
-msgstr "CD/DVD-oppretting"
-
-#: daemon/gvfsbackendburn.c:754 daemon/gvfsbackendburn.c:790
-#: daemon/gvfsbackendburn.c:925 daemon/gvfsbackendburn.c:987
-#: daemon/gvfsbackendburn.c:991 daemon/gvfsbackendburn.c:1001
-#: daemon/gvfsbackendgphoto2.c:2662
-msgid "File exists"
-msgstr "Filen eksisterer"
-
-#: daemon/gvfsbackendburn.c:886 daemon/gvfsbackenddav.c:3605
-#: daemon/gvfsbackendsftp.c:2213 daemon/gvfsbackendsftp.c:5187
-msgid "Target file exists"
-msgstr "Målfilen eksisterer"
-
-#: daemon/gvfsbackend.c:889 daemon/gvfsjobunmount.c:197
+#: daemon/gvfsbackend.c:907 daemon/gvfsjobunmount.c:197
 #: daemon/gvfsjobunmount.c:264
 msgid "File system is busy"
 msgstr "Filsystemet er opptatt"
 
-#: daemon/gvfsbackend.c:1023 monitor/udisks2/gvfsudisks2mount.c:750
+#: daemon/gvfsbackend.c:1041 monitor/udisks2/gvfsudisks2mount.c:751
 msgid "Unmount Anyway"
 msgstr "Avmonter likevel"
 
-#: daemon/gvfsbackend.c:1026 monitor/udisks2/gvfsudisks2mount.c:753
+#: daemon/gvfsbackend.c:1044 monitor/udisks2/gvfsudisks2mount.c:754
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -977,7 +959,7 @@ msgstr ""
 "Et eller flere programmer holder volumet opptatt."
 
 #: daemon/gvfsbackendcdda.c:306 daemon/gvfsbackendgphoto2.c:1289
-#: daemon/gvfsbackendmtp.c:920
+#: daemon/gvfsbackendmtp.c:921
 msgid "Cannot create gudev client"
 msgstr "Kan ikke opprette gudev-klient"
 
@@ -1045,48 +1027,48 @@ msgstr "Filen eksisterer ikke eller er ikke et lydspor"
 msgid "Audio CD File System Service"
 msgstr "Filsystemtjeneste for lyd-CD"
 
-#: daemon/gvfsbackendcomputer.c:198 daemon/gvfsbackendcomputer.c:771
+#: daemon/gvfsbackendcomputer.c:200 daemon/gvfsbackendcomputer.c:781
 msgid "Computer"
 msgstr "Datamaskin"
 
-#: daemon/gvfsbackendcomputer.c:532
+#: daemon/gvfsbackendcomputer.c:542
 msgid "File System"
 msgstr "Filsystem"
 
-#: daemon/gvfsbackendcomputer.c:661
+#: daemon/gvfsbackendcomputer.c:671
 msgid "Can’t open mountable file"
 msgstr "Kan ikke åpne monterbar fil"
 
-#: daemon/gvfsbackendcomputer.c:858
+#: daemon/gvfsbackendcomputer.c:876
 #, c-format
 msgid "Internal error: %s"
 msgstr "Intern feil: %s"
 
-#: daemon/gvfsbackendcomputer.c:890 daemon/gvfsbackendcomputer.c:1008
+#: daemon/gvfsbackendcomputer.c:908 daemon/gvfsbackendcomputer.c:1026
 msgid "Can’t mount file"
 msgstr "Kan ikke montere fil"
 
-#: daemon/gvfsbackendcomputer.c:901
+#: daemon/gvfsbackendcomputer.c:919
 msgid "No medium in the drive"
 msgstr "Ikke noe medie i stasjonen"
 
-#: daemon/gvfsbackendcomputer.c:1072
+#: daemon/gvfsbackendcomputer.c:1090
 msgid "Can’t unmount file"
 msgstr "Kan ikke avmontere fil"
 
-#: daemon/gvfsbackendcomputer.c:1202
+#: daemon/gvfsbackendcomputer.c:1220
 msgid "Can’t eject file"
 msgstr "Kan ikke løse ut fil"
 
-#: daemon/gvfsbackendcomputer.c:1269 daemon/gvfsbackendcomputer.c:1276
+#: daemon/gvfsbackendcomputer.c:1287 daemon/gvfsbackendcomputer.c:1294
 msgid "Can’t start drive"
 msgstr "Kan ikke starte stasjon"
 
-#: daemon/gvfsbackendcomputer.c:1342 daemon/gvfsbackendcomputer.c:1349
+#: daemon/gvfsbackendcomputer.c:1360 daemon/gvfsbackendcomputer.c:1367
 msgid "Can’t stop drive"
 msgstr "Kan ikke stoppe stasjon"
 
-#: daemon/gvfsbackendcomputer.c:1406 daemon/gvfsbackendcomputer.c:1413
+#: daemon/gvfsbackendcomputer.c:1424 daemon/gvfsbackendcomputer.c:1431
 msgid "Can’t poll file"
 msgstr "Kan ikke hente data om fil"
 
@@ -1098,38 +1080,38 @@ msgstr "Kan ikke hente data om fil"
 msgid "%s on %s%s"
 msgstr "%s på %s%s"
 
-#: daemon/gvfsbackenddav.c:767 daemon/gvfsbackenddav.c:1537
-#: daemon/gvfsbackenddav.c:2146 daemon/gvfsbackenddav.c:2310
+#: daemon/gvfsbackenddav.c:598 daemon/gvfsbackenddav.c:845
+msgid "Unexpected reply from server"
+msgstr "Uventet svar fra tjener"
+
+#: daemon/gvfsbackenddav.c:813 daemon/gvfsbackenddav.c:1583
+#: daemon/gvfsbackenddav.c:2192 daemon/gvfsbackenddav.c:2357
 #: daemon/gvfsbackendhttp.c:268 daemon/gvfshttpinputstream.c:273
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP-feil: %s"
 
-#: daemon/gvfsbackenddav.c:782
+#: daemon/gvfsbackenddav.c:828
 msgid "Could not parse response"
 msgstr "Kan ikke fortolke svar"
 
-#: daemon/gvfsbackenddav.c:791
+#: daemon/gvfsbackenddav.c:837
 msgid "Empty response"
 msgstr "Tomt svar"
 
-#: daemon/gvfsbackenddav.c:799
-msgid "Unexpected reply from server"
-msgstr "Uventet svar fra tjener"
-
-#: daemon/gvfsbackenddav.c:1555 daemon/gvfsbackenddav.c:2512
-#: daemon/gvfsbackenddav.c:2607 daemon/gvfsbackenddav.c:2791
+#: daemon/gvfsbackenddav.c:1601 daemon/gvfsbackenddav.c:2558
+#: daemon/gvfsbackenddav.c:2653 daemon/gvfsbackenddav.c:2837
 #, c-format
 msgid "Response invalid"
 msgstr "Ugyldig svar"
 
-#: daemon/gvfsbackenddav.c:1776
+#: daemon/gvfsbackenddav.c:1822
 msgid "WebDAV share"
 msgstr "WebDAV-ressurs"
 
 #. Translators: %s is the name of the WebDAV share
 #. Translators: %s is a server name
-#: daemon/gvfsbackenddav.c:1779 daemon/gvfsbackendsmbbrowse.c:334
+#: daemon/gvfsbackenddav.c:1825 daemon/gvfsbackendsmbbrowse.c:354
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -1138,7 +1120,7 @@ msgstr ""
 "Autentisering kreves\n"
 "Oppgi passord for «%s»:"
 
-#: daemon/gvfsbackenddav.c:1782
+#: daemon/gvfsbackenddav.c:1828
 msgid ""
 "Authentication Required\n"
 "Enter proxy password:"
@@ -1146,36 +1128,52 @@ msgstr ""
 "Autentisering kreves\n"
 "Skriv inn passord for proxy:"
 
-#: daemon/gvfsbackenddav.c:2154
+#: daemon/gvfsbackenddav.c:2200
 msgid "Could not find an enclosing directory"
 msgstr "Kan ikke finne omsluttende katalog"
 
-#: daemon/gvfsbackenddav.c:2298
+#: daemon/gvfsbackenddav.c:2345
 msgid "Not a WebDAV enabled share"
 msgstr "Ressursen støtter ikke WebDAV"
 
-#: daemon/gvfsbackenddav.c:2538 daemon/gvfsbackenddav.c:2651
-#: daemon/gvfsbackenddav.c:2738 daemon/gvfsbackenddav.c:2825
+#: daemon/gvfsbackenddav.c:2584 daemon/gvfsbackenddav.c:2697
+#: daemon/gvfsbackenddav.c:2784 daemon/gvfsbackenddav.c:2871
 msgid "Could not create request"
 msgstr "Kan ikke opprette forespørsel"
 
-#: daemon/gvfsbackenddav.c:3011 daemon/gvfsbackendftp.c:1134
+#: daemon/gvfsbackenddav.c:3057 daemon/gvfsbackendftp.c:1135
 #: daemon/gvfsbackendgoogle.c:3944 daemon/gvfsbackendnfs.c:1069
 #: daemon/gvfsbackendnfs.c:1092 daemon/gvfsbackendnfs.c:1118
-#: daemon/gvfsbackendnfs.c:1519 daemon/gvfsbackendsmb.c:1165
-#: daemon/gvfsbackendsmb.c:2209
+#: daemon/gvfsbackendnfs.c:1519 daemon/gvfsbackendsmb.c:1180
+#: daemon/gvfsbackendsmb.c:2226
 msgid "Backup file creation failed"
 msgstr "Oppretting av sikkerhetskopi feilet"
 
-#: daemon/gvfsbackenddav.c:3571
+#: daemon/gvfsbackenddav.c:3274 daemon/gvfsbackendftp.c:857
+#: daemon/gvfsbackendgoogle.c:1097 daemon/gvfsbackendgphoto2.c:938
+#: daemon/gvfsbackendgphoto2.c:1869 daemon/gvfsbackendgphoto2.c:2588
+#: daemon/gvfsbackendonedrive.c:612 daemon/gvfsbackendrecent.c:90
+#: daemon/gvfsbackendrecent.c:273 daemon/gvfsbackendsftp.c:2248
+#: daemon/gvfsbackendsftp.c:3419 daemon/gvfsbackendsftp.c:3432
+#: daemon/gvfsbackendsftp.c:3452 daemon/gvfsbackendtrash.c:344
+#, c-format
+msgid "No such file or directory"
+msgstr "Filen eller katalogen finnes ikke"
+
+#: daemon/gvfsbackenddav.c:3619
 msgid "Can’t move over directory"
 msgstr "Kan ikke flytte over katalog"
 
-#: daemon/gvfsbackenddnssd.c:522 daemon/gvfsbackendnetwork.c:545
+#: daemon/gvfsbackenddav.c:3653 daemon/gvfsbackendsftp.c:2242
+#: daemon/gvfsbackendsftp.c:5224
+msgid "Target file exists"
+msgstr "Målfilen eksisterer"
+
+#: daemon/gvfsbackenddnssd.c:522 daemon/gvfsbackendnetwork.c:553
 msgid "Local Network"
 msgstr "Lokalt nettverk"
 
-#: daemon/gvfsbackenddnssd.c:777 daemon/gvfsbackendnetwork.c:1060
+#: daemon/gvfsbackenddnssd.c:777 daemon/gvfsbackendnetwork.c:1069
 msgid "Can’t monitor file or directory."
 msgstr "Kan ikke overvåke fil eller katalog."
 
@@ -1184,25 +1182,30 @@ msgstr "Kan ikke overvåke fil eller katalog."
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: daemon/gvfsbackenddnssd.c:796 daemon/gvfsbackendnetwork.c:990
-#: daemon/gvfsbackendnetwork.c:1150 daemon/gvfsbackendnetwork.c:1151
+#: daemon/gvfsbackenddnssd.c:796 daemon/gvfsbackendnetwork.c:998
+#: daemon/gvfsbackendnetwork.c:1168 daemon/gvfsbackendnetwork.c:1169
 msgid "Network"
 msgstr "Nettverk"
 
-#: daemon/gvfsbackendftp.c:560 daemon/gvfsbackendsftp.c:1193
-#: daemon/gvfsbackendsftp.c:1297 daemon/gvfsbackendsmbbrowse.c:811
-#: daemon/gvfsbackendsmb.c:583
+#: daemon/gvfsbackendftp.c:561 daemon/gvfsbackendsftp.c:1212
+#: daemon/gvfsbackendsftp.c:1316 daemon/gvfsbackendsmbbrowse.c:850
+#: daemon/gvfsbackendsmb.c:598
 msgid "Password dialog cancelled"
 msgstr "Passorddialog avbrutt"
 
-#: daemon/gvfsbackendftp.c:790
+#: daemon/gvfsbackendftp.c:791
 msgid "Insufficient permissions"
 msgstr "Ikke nok rettigheter"
 
-#: daemon/gvfsbackendftp.c:1333 daemon/gvfsbackendsftp.c:5492
-#: daemon/gvfsbackendsmb.c:1809
+#: daemon/gvfsbackendftp.c:1334 daemon/gvfsbackendsftp.c:5529
+#: daemon/gvfsbackendsmb.c:1824
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "Ugyldig type attributt (uint64 forventet)"
+
+#: daemon/gvfsbackendgoogle.c:1760 daemon/gvfsbackendgoogle.c:2103
+#: daemon/gvfsbackendgoogle.c:3149
+msgid "Can’t copy file over directory"
+msgstr "Kan ikke kopiere fil over katalog"
 
 #: daemon/gvfsbackendgoogle.c:2217
 msgid "Can’t move file over directory"
@@ -1212,18 +1215,20 @@ msgstr "Kan ikke flytte over katalog"
 msgid "Error moving file/folder"
 msgstr "Feil under flytting av fil/mappe"
 
-#. Translators: This is the "Shared with me" folder on https://drive.google.com.
-#: daemon/gvfsbackendgoogle.c:2971 daemon/gvfsbackendonedrive.c:1263
+#. Translators: This is the "Shared with me" folder on
+#. https://drive.google.com.
+#: daemon/gvfsbackendgoogle.c:2971 daemon/gvfsbackendonedrive.c:1264
 msgid "Shared with me"
 msgstr "Delt med meg"
 
-#. Translators: This is the "Shared drives" folder on https://drive.google.com.
+#. Translators: This is the "Shared drives" folder on
+#. https://drive.google.com.
 #: daemon/gvfsbackendgoogle.c:2987
 msgid "Shared drives"
 msgstr "Delte stasjoner"
 
 #: daemon/gvfsbackendgoogle.c:3021 daemon/gvfsbackendgoogle.c:3599
-#: daemon/gvfsbackendgphoto2.c:1589 daemon/gvfsbackendonedrive.c:1299
+#: daemon/gvfsbackendgphoto2.c:1589 daemon/gvfsbackendonedrive.c:1300
 msgid "Error getting data from file"
 msgstr "Feil under henting av data fra fil"
 
@@ -1232,42 +1237,12 @@ msgstr "Feil under henting av data fra fil"
 msgid "Target file is not a regular file"
 msgstr "Målfilen er ikke en vanlig fil"
 
-#: daemon/gvfsbackendgoogle.c:3584 daemon/gvfsbackendsftp.c:2392
-#: daemon/gvfsbackendsftp.c:2797 daemon/gvfsbackendsftp.c:2860
-#: daemon/gvfsbackendsftp.c:2871 daemon/gvfsbackendsftp.c:2929
-#: daemon/gvfsbackendsftp.c:3022 daemon/gvfsbackendsftp.c:3074
-#: daemon/gvfsbackendsftp.c:3129 daemon/gvfsbackendsftp.c:3208
-#: daemon/gvfsbackendsftp.c:3325 daemon/gvfsbackendsftp.c:3485
-#: daemon/gvfsbackendsftp.c:3605 daemon/gvfsbackendsftp.c:3617
-#: daemon/gvfsbackendsftp.c:3687 daemon/gvfsbackendsftp.c:3757
-#: daemon/gvfsbackendsftp.c:3815 daemon/gvfsbackendsftp.c:3835
-#: daemon/gvfsbackendsftp.c:4027 daemon/gvfsbackendsftp.c:4061
-#: daemon/gvfsbackendsftp.c:4119 daemon/gvfsbackendsftp.c:4181
-#: daemon/gvfsbackendsftp.c:4252 daemon/gvfsbackendsftp.c:4527
-#: daemon/gvfsbackendsftp.c:4598 daemon/gvfsbackendsftp.c:4733
-#: daemon/gvfsbackendsftp.c:4846 daemon/gvfsbackendsftp.c:4908
-#: daemon/gvfsbackendsftp.c:4945 daemon/gvfsbackendsftp.c:4973
-#: daemon/gvfsbackendsftp.c:5087 daemon/gvfsbackendsftp.c:5143
-#: daemon/gvfsbackendsftp.c:5184 daemon/gvfsbackendsftp.c:5220
-#: daemon/gvfsbackendsftp.c:5256 daemon/gvfsbackendsftp.c:5271
-#: daemon/gvfsbackendsftp.c:5286 daemon/gvfsbackendsftp.c:5381
-#: daemon/gvfsbackendsftp.c:5449 daemon/gvfsbackendsftp.c:5656
-#: daemon/gvfsbackendsftp.c:5693 daemon/gvfsbackendsftp.c:5811
-#: daemon/gvfsbackendsftp.c:5897 daemon/gvfsbackendsftp.c:5981
-#: daemon/gvfsbackendsftp.c:6024 daemon/gvfsbackendsftp.c:6028
-#: daemon/gvfsbackendsftp.c:6145 daemon/gvfsbackendsftp.c:6149
-#: daemon/gvfsbackendsftp.c:6400 daemon/gvfsbackendsftp.c:6623
-#: daemon/gvfsbackendsftp.c:6640 daemon/gvfsbackendsftp.c:6778
-#: daemon/gvfsbackendsftp.c:6806
-msgid "Invalid reply received"
-msgstr "Ugyldig svar mottatt"
-
 #: daemon/gvfsbackendgoogle.c:3590
 msgid "File is not a regular file"
 msgstr "Filen er ikke en vanlig fil"
 
-#: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendmtp.c:2703
-#: daemon/gvfsbackendmtp.c:2817 daemon/gvfsbackendnfs.c:802
+#: daemon/gvfsbackendgoogle.c:3976 daemon/gvfsbackendmtp.c:2712
+#: daemon/gvfsbackendmtp.c:2826 daemon/gvfsbackendnfs.c:802
 #: daemon/gvfsbackendnfs.c:1288 daemon/gvfsbackendonedrive.c:1930
 msgid "Target file is a directory"
 msgstr "Målfilen er en katalog"
@@ -1277,25 +1252,29 @@ msgstr "Målfilen er en katalog"
 msgid "Error writing file"
 msgstr "Feil under skriving til fil"
 
-#. Translator: %s represents a more specific error message and %d the specific error code
+#. Translator: %s represents a more specific error message and %d the specific
+#. error code
 #: daemon/gvfsbackendgphoto2.c:479
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "%s: %d: Katalog eller fil eksisterer"
 
-#. Translator: %s represents a more specific error message and %d the specific error code
+#. Translator: %s represents a more specific error message and %d the specific
+#. error code
 #: daemon/gvfsbackendgphoto2.c:486
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "%s: %d: Filen eller katalogen finnes ikke"
 
-#. Translator: %s represents a more specific error message and %d the specific error code
+#. Translator: %s represents a more specific error message and %d the specific
+#. error code
 #: daemon/gvfsbackendgphoto2.c:492
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: Ugyldig filnavn"
 
-#. Translator: %s represents a more specific error message and %d the specific error code
+#. Translator: %s represents a more specific error message and %d the specific
+#. error code
 #: daemon/gvfsbackendgphoto2.c:498
 #, c-format
 msgid "%s: %d: Not Supported"
@@ -1307,7 +1286,7 @@ msgstr "%s: %d: Ikke støttet"
 msgid "Digital Camera (%s)"
 msgstr "Digitalt kamera (%s)"
 
-#: daemon/gvfsbackendgphoto2.c:1256 daemon/gvfsbackendmtp.c:891
+#: daemon/gvfsbackendgphoto2.c:1256 daemon/gvfsbackendmtp.c:892
 msgid "Couldn’t find matching udev device."
 msgstr "Fant ikke passende udev-enhet."
 
@@ -1339,7 +1318,8 @@ msgstr "Feil ved oppsett av kommunikasjonsport for kamera"
 msgid "Error initializing camera"
 msgstr "Feil ved initiering av kamera"
 
-#. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the name of the
+#. Translator: %s represents the device, e.g. usb:001,042. 'gphoto2' is the
+#. name of the
 #. backend and shouldn't be translated.
 #: daemon/gvfsbackendgphoto2.c:1404
 #, c-format
@@ -1358,7 +1338,7 @@ msgstr "Feil under oppretting av filobjekt"
 msgid "Error getting file"
 msgstr "Feil under henting av fil"
 
-#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2478
+#: daemon/gvfsbackendgphoto2.c:1647 daemon/gvfsbackendmtp.c:2479
 #, c-format
 msgid "Malformed icon identifier “%s”"
 msgstr "Feilutformet ikonidentifikator «%s»"
@@ -1368,8 +1348,8 @@ msgstr "Feilutformet ikonidentifikator «%s»"
 msgid "Error seeking in stream on camera %s"
 msgstr "Feil ved søking i strøm på kamera %s"
 
-#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3385
-#: daemon/gvfsbackendsmbbrowse.c:1234
+#: daemon/gvfsbackendgphoto2.c:1863 daemon/gvfsbackendsftp.c:3422
+#: daemon/gvfsbackendsmbbrowse.c:1273
 msgid "Not a directory"
 msgstr "Ikke en katalog"
 
@@ -1418,6 +1398,10 @@ msgstr "Feil under sletting av fil"
 msgid "Can’t write to directory"
 msgstr "Kan ikke skrive til katalog"
 
+#: daemon/gvfsbackendgphoto2.c:2662
+msgid "File exists"
+msgstr "Filen eksisterer"
+
 #: daemon/gvfsbackendgphoto2.c:2698
 msgid "Cannot allocate new file to append to"
 msgstr "Kan ikke lage ny fil å legge til i"
@@ -1436,13 +1420,14 @@ msgstr "Ikke støttet (ikke samme katalog)"
 
 #: daemon/gvfsbackendgphoto2.c:3134
 msgid ""
-"Not supported (the source is a directory, the destination is a directory too)"
+"Not supported (the source is a directory, the destination is a directory "
+"too)"
 msgstr "Ikke støttet (kilde er en katalog, mål er også en katalog)"
 
 #: daemon/gvfsbackendgphoto2.c:3142
 msgid ""
-"Not supported (the source is a directory, but the destination is an existing "
-"file)"
+"Not supported (the source is a directory, but the destination is an existing"
+" file)"
 msgstr "Ikke støttet (kilde er en katalog, mål er en eksisterende fil)"
 
 #: daemon/gvfsbackendgphoto2.c:3154
@@ -1455,7 +1440,7 @@ msgstr "Ikke støttet (kilde er fil, mål er katalog)"
 msgid "HTTP Client Error: %s"
 msgstr "HTTP-klientfeil: %s"
 
-#: daemon/gvfsbackendlocaltest.c:865
+#: daemon/gvfsbackendlocaltest.c:866
 msgid "Directory notification not supported"
 msgstr "Varsling for kataloger er ikke støttet"
 
@@ -1467,75 +1452,75 @@ msgstr "Varsling for kataloger er ikke støttet"
 msgid "Storage (%X)"
 msgstr "Lagring (%X)"
 
-#: daemon/gvfsbackendmtp.c:595
+#: daemon/gvfsbackendmtp.c:596
 msgid "Unknown error."
 msgstr "Ukjent feil."
 
-#: daemon/gvfsbackendmtp.c:601
+#: daemon/gvfsbackendmtp.c:602
 #, c-format
 msgid "libmtp error: %s"
 msgstr "feil i libmtp: %s"
 
-#: daemon/gvfsbackendmtp.c:912
+#: daemon/gvfsbackendmtp.c:913
 msgid "No device specified"
 msgstr "Ingen enhet oppgitt"
 
-#: daemon/gvfsbackendmtp.c:1058
+#: daemon/gvfsbackendmtp.c:1059
 msgid "No MTP devices found"
 msgstr "Fant ingen MTP-enheter"
 
-#: daemon/gvfsbackendmtp.c:1063
+#: daemon/gvfsbackendmtp.c:1064
 msgid "Unable to connect to MTP device"
 msgstr "Kan ikke koble til MTP-enhet"
 
-#: daemon/gvfsbackendmtp.c:1068
+#: daemon/gvfsbackendmtp.c:1069
 msgid "Unable to allocate memory while detecting MTP devices"
 msgstr "Kan ikke allokere minne under søk etter MTP-enheter"
 
-#: daemon/gvfsbackendmtp.c:1074
+#: daemon/gvfsbackendmtp.c:1075
 msgid "Generic libmtp error"
 msgstr "Generisk libmtp-feil"
 
-#: daemon/gvfsbackendmtp.c:1087
+#: daemon/gvfsbackendmtp.c:1088
 #, c-format
 msgid "Unable to open MTP device “%03u,%03u”"
 msgstr "Kan ikke åpne MTP-enhet «%03u,%03u»"
 
-#: daemon/gvfsbackendmtp.c:1104
+#: daemon/gvfsbackendmtp.c:1105
 msgid "Device not found"
 msgstr "Fant ikke enhet"
 
-#: daemon/gvfsbackendmtp.c:1422 daemon/gvfsbackendmtp.c:1571
-#: daemon/gvfsbackendmtp.c:1623 daemon/gvfsbackendwsdd.c:263
+#: daemon/gvfsbackendmtp.c:1423 daemon/gvfsbackendmtp.c:1572
+#: daemon/gvfsbackendmtp.c:1624 daemon/gvfsbackendwsdd.c:263
 #: daemon/gvfsbackendwsdd.c:321
 msgid "File not found"
 msgstr "Fant ikke fil"
 
-#: daemon/gvfsbackendmtp.c:1693
+#: daemon/gvfsbackendmtp.c:1694
 msgid "Target is a directory"
 msgstr "Målet er en katalog"
 
-#: daemon/gvfsbackendmtp.c:1698
+#: daemon/gvfsbackendmtp.c:1699
 msgid "Can’t merge directories"
 msgstr "Kan ikke slå sammen kataloger"
 
-#: daemon/gvfsbackendmtp.c:1744
+#: daemon/gvfsbackendmtp.c:1745
 msgid "Cannot make directory in this location"
 msgstr "Kan ikke lage katalog på denne lokasjonen"
 
-#: daemon/gvfsbackendmtp.c:1821 daemon/gvfsbackendmtp.c:2244
-#: daemon/gvfsbackendmtp.c:2307 daemon/gvfsbackendmtp.c:2373
-#: daemon/gvfsbackendmtp.c:2800 daemon/gvfsbackendmtp.c:3065
-#: daemon/gvfsbackendmtp.c:3232 daemon/gvfsbackendsmbbrowse.c:979
+#: daemon/gvfsbackendmtp.c:1822 daemon/gvfsbackendmtp.c:2245
+#: daemon/gvfsbackendmtp.c:2308 daemon/gvfsbackendmtp.c:2374
+#: daemon/gvfsbackendmtp.c:2809 daemon/gvfsbackendmtp.c:3074
+#: daemon/gvfsbackendmtp.c:3241 daemon/gvfsbackendsmbbrowse.c:1018
 msgid "Not a regular file"
 msgstr "Ikke en vanlig fil"
 
-#: daemon/gvfsbackendmtp.c:2116 daemon/gvfsbackendmtp.c:2651
-#: daemon/gvfsbackendmtp.c:3049 daemon/gvfsbackendmtp.c:3216
+#: daemon/gvfsbackendmtp.c:2117 daemon/gvfsbackendmtp.c:2660
+#: daemon/gvfsbackendmtp.c:3058 daemon/gvfsbackendmtp.c:3225
 msgid "Cannot write to this location"
 msgstr "Kan ikke skrive til lokasjonen"
 
-#: daemon/gvfsbackendmtp.c:2460
+#: daemon/gvfsbackendmtp.c:2461
 #, c-format
 msgid "No thumbnail for entity “%s”"
 msgstr "Ingen miniatyr for entitet «%s»"
@@ -1548,17 +1533,17 @@ msgstr "Fildeling"
 msgid "Remote Login"
 msgstr "Ekstern pålogging"
 
-#: daemon/gvfsbackendnetwork.c:499 daemon/gvfsbackendsmbbrowse.c:696
+#: daemon/gvfsbackendnetwork.c:507 daemon/gvfsbackendsmbbrowse.c:721
 msgid "Windows Network"
 msgstr "Windows nettverk"
 
-#: daemon/gvfsbackendnetwork.c:625
+#: daemon/gvfsbackendnetwork.c:633
 msgid "WSDD Network"
 msgstr "WSDD-nettverk"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: daemon/gvfsbackendnetwork.c:1245
+#: daemon/gvfsbackendnetwork.c:1263
 msgid "Network Location Monitor"
 msgstr "Vis nettverksadresser"
 
@@ -1575,8 +1560,8 @@ msgstr ""
 "ekstra rettigheter kreves"
 
 #: daemon/gvfsbackendnfs.c:1184 daemon/gvfsbackendnfs.c:1207
-#: daemon/gvfsbackendnfs.c:1255 daemon/gvfsbackendsftp.c:3882
-#: daemon/gvfsbackendsftp.c:6052
+#: daemon/gvfsbackendnfs.c:1255 daemon/gvfsbackendsftp.c:3919
+#: daemon/gvfsbackendsftp.c:6089
 msgid "Unable to create temporary file"
 msgstr "Kan ikke opprette midlertidig fil"
 
@@ -1584,75 +1569,75 @@ msgstr "Kan ikke opprette midlertidig fil"
 msgid "Invalid attribute type"
 msgstr "Ugyldig type attributt"
 
-#: daemon/gvfsbackendonedrive.c:1255
+#: daemon/gvfsbackendonedrive.c:1256
 msgid "My Files"
 msgstr "Mine filer"
 
-#: daemon/gvfsbackendrecent.c:270
+#: daemon/gvfsbackendrecent.c:250
 msgid "The recent folder may not be deleted"
 msgstr "Mappe for nylig brukte filer kan ikke slettes"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: daemon/gvfsbackendrecent.c:693 daemon/gvfsbackendrecent.c:814
+#: daemon/gvfsbackendrecent.c:684 daemon/gvfsbackendrecent.c:789
 msgid "Recent"
 msgstr "Nylig brukt"
 
-#: daemon/gvfsbackendsftp.c:337 daemon/gvfsbackendsftp.c:720
+#: daemon/gvfsbackendsftp.c:344 daemon/gvfsbackendsftp.c:727
 msgid "Connection failed"
 msgstr "Tilkobling feilet"
 
-#: daemon/gvfsbackendsftp.c:353
+#: daemon/gvfsbackendsftp.c:360
 msgid "Hostname not known"
 msgstr "Vertsnavn ikke kjent"
 
-#: daemon/gvfsbackendsftp.c:360
+#: daemon/gvfsbackendsftp.c:367
 msgid "No route to host"
 msgstr "Ingen rute til vert"
 
-#: daemon/gvfsbackendsftp.c:368
+#: daemon/gvfsbackendsftp.c:375
 msgid "Connection refused by server"
 msgstr "Tilkobling nektet av tjener"
 
-#: daemon/gvfsbackendsftp.c:375
+#: daemon/gvfsbackendsftp.c:382
 msgid "Host key verification failed"
 msgstr "Verifisering av vertsnøkkel feilet"
 
-#: daemon/gvfsbackendsftp.c:382
+#: daemon/gvfsbackendsftp.c:389
 msgid "Too many authentication failures"
 msgstr "For mange feilede autentiseringer"
 
-#: daemon/gvfsbackendsftp.c:564
+#: daemon/gvfsbackendsftp.c:571
 msgid "Unable to spawn SSH program"
 msgstr "Kan ikke starte SSH-program"
 
-#: daemon/gvfsbackendsftp.c:580
+#: daemon/gvfsbackendsftp.c:587
 #, c-format
 msgid "Unable to spawn SSH program: %s"
 msgstr "Kan ikke starte SSH-program: %s"
 
-#: daemon/gvfsbackendsftp.c:682 daemon/gvfsbackendsftp.c:1060
+#: daemon/gvfsbackendsftp.c:689 daemon/gvfsbackendsftp.c:1079
 msgid "Timed out when logging in"
 msgstr "Tidsavbrudd ved innlogging"
 
-#: daemon/gvfsbackendsftp.c:935
+#: daemon/gvfsbackendsftp.c:954
 msgid "Log In Anyway"
 msgstr "Logg inn likevel"
 
-#: daemon/gvfsbackendsftp.c:935
+#: daemon/gvfsbackendsftp.c:954
 msgid "Cancel Login"
 msgstr "Avbryt pålogging"
 
-#: daemon/gvfsbackendsftp.c:950
+#: daemon/gvfsbackendsftp.c:969
 msgid "Login dialog cancelled"
 msgstr "Påloggingsdialog avbrutt"
 
-#: daemon/gvfsbackendsftp.c:969
+#: daemon/gvfsbackendsftp.c:988
 msgid "Can’t send host identity confirmation"
 msgstr "Kan ikke sende bekreftelse på vertsidentitet"
 
 #. Translators: the first %s is the username, the second the host name
-#: daemon/gvfsbackendsftp.c:1166
+#: daemon/gvfsbackendsftp.c:1185
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -1662,7 +1647,7 @@ msgstr ""
 "Oppgi passordfrase for sikker nøkkel for «%s» på «%s»:"
 
 #. Translators: %s is the hostname
-#: daemon/gvfsbackendsftp.c:1173
+#: daemon/gvfsbackendsftp.c:1192
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -1671,128 +1656,123 @@ msgstr ""
 "Autentisering kreves\n"
 "Oppgi passord for sikker nøkkel for «%s»:"
 
-#: daemon/gvfsbackendsftp.c:1265 daemon/gvfsbackendsftp.c:1312
+#: daemon/gvfsbackendsftp.c:1284 daemon/gvfsbackendsftp.c:1331
 msgid "Can’t send password"
 msgstr "Kan ikke sende passord"
 
 #. Translators: the first %s is the username, the second the host name
-#: daemon/gvfsbackendsftp.c:1280
+#: daemon/gvfsbackendsftp.c:1299
 #, c-format
 msgid "Enter verification code for %s on %s"
 msgstr "Skriv inn verifikasjonskode for %s på %s"
 
 #. Translators: %s is the hostname
-#: daemon/gvfsbackendsftp.c:1284
+#: daemon/gvfsbackendsftp.c:1303
 #, c-format
 msgid "Enter verification code for %s"
 msgstr "Skriv inn verifikasjonskode for %s"
 
 #. Translators: the first %s is the hostname, the second the key fingerprint
-#: daemon/gvfsbackendsftp.c:1331
+#: daemon/gvfsbackendsftp.c:1350
 #, c-format
 msgid ""
 "Identity Verification Failed\n"
-"Verifying the identity of “%s” failed, this happens when you log in to a "
-"computer the first time.\n"
+"Verifying the identity of “%s” failed, this happens when you log in to a computer the first time.\n"
 "\n"
-"The identity sent by the remote computer is “%s”. If you want to be "
-"absolutely sure it is safe to continue, contact the system administrator."
+"The identity sent by the remote computer is “%s”. If you want to be absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
 "Feil under verifikasjon av identitet\n"
-"Kan ikke verifisere identitet for «%s». Dette skjer første gang du logger "
-"inn på en datamaskin.\n"
+"Kan ikke verifisere identitet for «%s». Dette skjer første gang du logger inn på en datamaskin.\n"
 "\n"
-"Identiteten som oversendes av ekstern datamaskin er «%s». Kontakt "
-"systemadministrator hvis du vil være helt sikker på at det er trygt å "
-"fortsette."
+"Identiteten som oversendes av ekstern datamaskin er «%s». Kontakt systemadministrator hvis du vil være helt sikker på at det er trygt å fortsette."
 
 #. Translators: the first %s is the hostname, the second is an ip address
-#: daemon/gvfsbackendsftp.c:1360
+#: daemon/gvfsbackendsftp.c:1379
 #, c-format
 msgid ""
 "Identity Verification Failed\n"
 "The host key for “%s” differs from the key for the IP address “%s”\n"
-"If you want to be absolutely sure it is safe to continue, contact the system "
-"administrator."
+"If you want to be absolutely sure it is safe to continue, contact the system administrator."
 msgstr ""
 "Verifikasjon av identitet feilet\n"
 "Vertsnøkkelen for «%s» er forskjellig fra nøkkelen for IP-adresse «%s».\n"
 "\n"
-"Kontakt systemadministrator hvis du vil være helt sikker på at det er trygt "
-"å fortsette."
+"Kontakt systemadministrator hvis du vil være helt sikker på at det er trygt å fortsette."
 
-#: daemon/gvfsbackendsftp.c:1452
+#: daemon/gvfsbackendsftp.c:1471
 #, c-format
 msgid "The connection is closed (the underlying SSH process exited)"
 msgstr "Tilkoblingen er lukket (underliggende SSH-prosess døde)"
 
-#: daemon/gvfsbackendsftp.c:1453
+#: daemon/gvfsbackendsftp.c:1472
 #, c-format
 msgid "Internal error: Unknown Error"
 msgstr "Intern feil: Ukjent feil"
 
-#: daemon/gvfsbackendsftp.c:1972 daemon/gvfsbackendsftp.c:1999
+#: daemon/gvfsbackendsftp.c:2001 daemon/gvfsbackendsftp.c:2028
 msgid "Protocol error"
 msgstr "Feil i protokoll"
 
-#: daemon/gvfsbackendsftp.c:2114
+#: daemon/gvfsbackendsftp.c:2143
 msgid "Unable to find supported SSH command"
 msgstr "Kan ikke finne støttet SSH-kommando"
 
-#: daemon/gvfsbackendsftp.c:2221
+#: daemon/gvfsbackendsftp.c:2250
 msgid "Unknown reason"
 msgstr "Ukjent årsak"
 
-#: daemon/gvfsbackendsftp.c:2654 daemon/gvfsbackendsmb.c:1453
+#: daemon/gvfsbackendsftp.c:2683 daemon/gvfsbackendsmb.c:1468
 #: daemon/gvfsdaemonutils.c:140
 msgid " (invalid encoding)"
 msgstr " (ugyldig koding)"
 
-#. Translators: This is the name of the root of an SFTP share, like "/ on <hostname>"
-#: daemon/gvfsbackendsftp.c:2666 daemon/gvfsftpdircache.c:484
+#. Translators: This is the name of the root of an SFTP share, like "/ on
+#. <hostname>"
+#: daemon/gvfsbackendsftp.c:2695 daemon/gvfsftpdircache.c:484
 #, c-format
 msgid "/ on %s"
 msgstr "/ på %s"
 
-#: daemon/gvfsbackendsftp.c:2739
+#: daemon/gvfsbackendsftp.c:2768
 msgid "Failure"
 msgstr "Feil"
 
-#: daemon/gvfsbackendsftp.c:3151
+#: daemon/gvfsbackendsftp.c:3188
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Feil under oppretting av sikkerhetskopi: %s"
 
-#: daemon/gvfsbackendsftp.c:5417
+#: daemon/gvfsbackendsftp.c:5454
 msgid "Value out of range, sftp only supports 32bit timestamps"
-msgstr "Verdien er utenfor gyldig område. SFTP støtter kun 32-bits tidsstempel"
+msgstr ""
+"Verdien er utenfor gyldig område. SFTP støtter kun 32-bits tidsstempel"
 
-#: daemon/gvfsbackendsmbbrowse.c:644 daemon/gvfsbackendsmbbrowse.c:678
-#: daemon/gvfsbackendsmb.c:442 daemon/gvfsbackendsmb.c:469
-#: daemon/gvfsbackendsmb.c:664
+#: daemon/gvfsbackendsmbbrowse.c:669 daemon/gvfsbackendsmbbrowse.c:703
+#: daemon/gvfsbackendsmb.c:448 daemon/gvfsbackendsmb.c:475
+#: daemon/gvfsbackendsmb.c:679
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "Intern feil (%s)"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: daemon/gvfsbackendsmbbrowse.c:705
+#: daemon/gvfsbackendsmbbrowse.c:730
 #, c-format
 msgid "Windows shares on %s"
 msgstr "Delt Windows-ressurs på %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: daemon/gvfsbackendsmbbrowse.c:816
+#: daemon/gvfsbackendsmbbrowse.c:855
 #, c-format
 msgid "Failed to retrieve share list from server: %s"
 msgstr "Klarte ikke å hente liste over delte ressurser fra tjener: %s"
 
-#: daemon/gvfsbackendsmbbrowse.c:1338
+#: daemon/gvfsbackendsmbbrowse.c:1377
 msgid "Windows Network File System Service"
 msgstr "Filsystemtjeneste for Windows nettverk"
 
 #. Translators: First %s is a share name, second is a server name
-#: daemon/gvfsbackendsmb.c:262
+#: daemon/gvfsbackendsmb.c:265
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -1802,7 +1782,7 @@ msgstr ""
 "Oppgi passord for delt ressurs «%s» på «%s»:"
 
 #. Translators: First %s is a share name, second is a server name
-#: daemon/gvfsbackendsmb.c:268
+#: daemon/gvfsbackendsmb.c:271
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -1812,54 +1792,54 @@ msgstr ""
 "Oppgi bruker og passord for delt ressurs «%s» på «%s»:"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: daemon/gvfsbackendsmb.c:588
+#: daemon/gvfsbackendsmb.c:603
 #, c-format
 msgid "Failed to mount Windows share: %s"
 msgstr "Klarte ikke å montere delt Windows-ressurs: %s"
 
-#: daemon/gvfsbackendsmb.c:1382
+#: daemon/gvfsbackendsmb.c:1397
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Oppretting av sikkerhetskopi feilet: %s"
 
-#: daemon/gvfsbackendsmb.c:2017
+#: daemon/gvfsbackendsmb.c:2034
 msgid "Can’t rename file, filename already exists"
 msgstr "Kan ikke endre navn på fil. Filnavnet eksisterer allerede"
 
-#: daemon/gvfsbackendsmb.c:2069
+#: daemon/gvfsbackendsmb.c:2086
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Feil under sletting av fil: %s"
 
-#: daemon/gvfsbackendsmb.c:2156
+#: daemon/gvfsbackendsmb.c:2173
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Feil under flytting av fil: %s"
 
-#: daemon/gvfsbackendsmb.c:2229
+#: daemon/gvfsbackendsmb.c:2246
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Feil under fjerning av målfil: %s"
 
-#: daemon/gvfsbackendsmb.c:2257
+#: daemon/gvfsbackendsmb.c:2274
 msgid "Can’t recursively move directory"
 msgstr "Kan ikke flytte katalog rekursivt"
 
-#: daemon/gvfsbackendsmb.c:2316
+#: daemon/gvfsbackendsmb.c:2333
 msgid "Windows Shares File System Service"
 msgstr "Filsystemtjeneste for delte Windows-ressurser"
 
-#: daemon/gvfsbackendtrash.c:490 daemon/gvfsbackendtrash.c:544
+#: daemon/gvfsbackendtrash.c:517 daemon/gvfsbackendtrash.c:571
 msgid "The trash folder may not be deleted"
 msgstr "Papirkurven kan ikke slettes"
 
-#: daemon/gvfsbackendtrash.c:507 daemon/gvfsbackendtrash.c:558
+#: daemon/gvfsbackendtrash.c:534 daemon/gvfsbackendtrash.c:585
 msgid "Items in the trash may not be modified"
 msgstr "Oppføringer i papirkurven kan ikke endres"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: daemon/gvfsbackendtrash.c:879 daemon/gvfsbackendtrash.c:999
+#: daemon/gvfsbackendtrash.c:906 daemon/gvfsbackendtrash.c:1036
 msgid "Trash"
 msgstr "Papirkurv"
 
@@ -1911,7 +1891,8 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nei"
 
-#. Translators: The first %s is the reason why verification failed, the second a certificate
+#. Translators: The first %s is the reason why verification failed, the second
+#. a certificate
 #: daemon/gvfsdaemonutils.c:338
 #, c-format
 msgid ""
@@ -1934,7 +1915,7 @@ msgid "Unexpected end of stream"
 msgstr "Uventet slutt på strøm"
 
 #: daemon/gvfsftpconnection.c:227 daemon/gvfsftpconnection.c:240
-#: daemon/gvfsftptask.c:450 daemon/gvfsftptask.c:893
+#: daemon/gvfsftptask.c:456 daemon/gvfsftptask.c:899
 msgid "Invalid reply"
 msgstr "Ugyldig svar"
 
@@ -1945,47 +1926,47 @@ msgid ""
 msgstr ""
 "Kan ikke åpne aktiv FTP-tilkobling. Kanskje din ruter ikke støtter dette?"
 
-#: daemon/gvfsftpconnection.c:485
+#: daemon/gvfsftpconnection.c:485 daemon/gvfsftpconnection.c:518
 msgid "Failed to create active FTP connection."
 msgstr "Klarte ikke å åpne aktiv FTP-tilkobling."
 
-#: daemon/gvfsftptask.c:291
+#: daemon/gvfsftptask.c:297
 msgid "The FTP server is busy. Try again later"
 msgstr "FTP-tjeneren er opptatt. Prøv igjen senere"
 
-#: daemon/gvfsftptask.c:297
+#: daemon/gvfsftptask.c:303
 msgid "Backend currently unmounting"
 msgstr "Motoren holder på med avmontering"
 
-#: daemon/gvfsftptask.c:394
+#: daemon/gvfsftptask.c:400
 msgid "Accounts are unsupported"
 msgstr "Kontoer er ikke støttet"
 
-#: daemon/gvfsftptask.c:402
+#: daemon/gvfsftptask.c:408
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "Kan ikke åpne dataforbindelse. Kanskje en brannmur forhindrer dette?"
 
-#: daemon/gvfsftptask.c:406
+#: daemon/gvfsftptask.c:412
 msgid "Data connection closed"
 msgstr "Dataforbindelse lukket"
 
-#: daemon/gvfsftptask.c:413 daemon/gvfsftptask.c:417
+#: daemon/gvfsftptask.c:419 daemon/gvfsftptask.c:423
 msgid "Operation failed"
 msgstr "Operasjonen feilet"
 
-#: daemon/gvfsftptask.c:422
+#: daemon/gvfsftptask.c:428
 msgid "No space left on server"
 msgstr "Ikke mer plass på tjener"
 
-#: daemon/gvfsftptask.c:434
+#: daemon/gvfsftptask.c:440
 msgid "Unsupported network protocol"
 msgstr "Nettverksprotokoll ikke støttet"
 
-#: daemon/gvfsftptask.c:442
+#: daemon/gvfsftptask.c:448
 msgid "Page type unknown"
 msgstr "Ukjent sidetype"
 
-#: daemon/gvfsftptask.c:446
+#: daemon/gvfsftptask.c:452
 msgid "Invalid filename"
 msgstr "Ugyldig filnavn"
 
@@ -2111,20 +2092,24 @@ msgid ""
 "values are \"merged\", \"separate\" (the Local Network folder) and "
 "\"disabled\"."
 msgstr ""
+"Hvordan DNS-SD-tjenester vises i \"network:///\"-lokasjonen. Mulige verdier "
+"er \"merged\", \"separate\" (mappen Lokalt nettverk) og \"disabled\"."
 
 #: daemon/org.gnome.system.dns_sd.gschema.xml:10
 msgid "Extra domains to look for DNS-SD services in"
-msgstr ""
+msgstr "Ekstra domener å se etter DNS-SD-tjenester i"
 
 #: daemon/org.gnome.system.dns_sd.gschema.xml:11
 msgid ""
 "Comma separated list of DNS-SD domains that should be visible in the "
 "\"network:///\" location."
 msgstr ""
+"Komma-separert liste over DNS-SD-domener som skal være synlige i "
+"\"network:///\"-stedet."
 
 #: daemon/org.gnome.system.smb.gschema.xml:5
 msgid "How to display SMB devices"
-msgstr ""
+msgstr "Slik viser du SMB-enheter"
 
 #: daemon/org.gnome.system.smb.gschema.xml:6
 msgid ""
@@ -2132,10 +2117,12 @@ msgid ""
 "values are \"merged\", \"separate\" (the Windows Network folder) and "
 "\"disabled\"."
 msgstr ""
+"Hvordan SMB-enheter vises i \"network:///\"-lokasjonen. Mulige verdier er "
+"\"merged\", \"separate\" (Windows-nettverksmappen) og \"disabled\"."
 
 #: daemon/org.gnome.system.smb.gschema.xml:10
 msgid "SMB workgroup"
-msgstr ""
+msgstr "SMB-arbeidsgruppe"
 
 #: daemon/org.gnome.system.smb.gschema.xml:11
 msgid ""
@@ -2143,10 +2130,13 @@ msgid ""
 "order for a new workgroup to fully take effect the user may need to log out "
 "and log back in."
 msgstr ""
+"Windows-nettverksarbeidsgruppen eller domenet som brukeren er en del av. For"
+" at en ny arbeidsgruppe skal tre i kraft, må brukeren kanskje logge ut og "
+"logge inn igjen."
 
 #: daemon/org.gnome.system.wsdd.gschema.xml:5
 msgid "How to display WSDD devices"
-msgstr ""
+msgstr "Slik viser du WSDD-enheter"
 
 #: daemon/org.gnome.system.wsdd.gschema.xml:6
 msgid ""
@@ -2154,6 +2144,8 @@ msgid ""
 "values are \"merged\", \"separate\" (the WSDD Network folder) and "
 "\"disabled\"."
 msgstr ""
+"Hvordan WSDD-enheter vises i \"network:///\"-lokasjonen. Mulige verdier er "
+"\"merged\", \"separate\" (WSDD-mappen) og \"disabled\"."
 
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:13
 #: daemon/org.gtk.vfs.file-operations.policy.in.in:25
@@ -2256,19 +2248,18 @@ msgid "Failed to eject medium; one or more volumes on the medium are busy."
 msgstr ""
 "Klarte ikke å løse ut medie. Ett eller flere volum på mediet er opptatt."
 
-#: monitor/udisks2/gvfsudisks2mount.c:636
+#: monitor/udisks2/gvfsudisks2mount.c:622
 msgid "One or more programs are preventing the unmount operation."
 msgstr "Ett eller flere programmer forhindrer avmonteringsoperasjonen."
 
 #. Note that the GUI (Shell, Files) currently use the term
 #. * "Eject" for both GDrive.stop() and GDrive.eject().
-#.
-#: monitor/udisks2/gvfsudisks2mount.c:746
+#: monitor/udisks2/gvfsudisks2mount.c:747
 msgid "Eject Anyway"
 msgstr "Løs ut likevel"
 
-#: monitor/udisks2/gvfsudisks2mount.c:1154
-#: monitor/udisks2/gvfsudisks2volume.c:1771
+#: monitor/udisks2/gvfsudisks2mount.c:1145
+#: monitor/udisks2/gvfsudisks2volume.c:1774
 msgid "Operation not supported by backend"
 msgstr "Operasjonen ikke tillatt av motoren"
 
@@ -2277,7 +2268,7 @@ msgstr "Operasjonen ikke tillatt av motoren"
 msgid "Timed out running command-line “%s”"
 msgstr "Tidsavbrudd ved kjøring av kommandolinje «%s»"
 
-#: monitor/udisks2/gvfsudisks2utils.c:646
+#: monitor/udisks2/gvfsudisks2utils.c:662
 #, c-format
 msgid ""
 "Unmounting %s\n"
@@ -2286,7 +2277,7 @@ msgstr ""
 "Avmonterer %s\n"
 "Kobler fra filsystemet."
 
-#: monitor/udisks2/gvfsudisks2utils.c:648
+#: monitor/udisks2/gvfsudisks2utils.c:664
 #, c-format
 msgid ""
 "Writing data to %s\n"
@@ -2295,7 +2286,7 @@ msgstr ""
 "Skriver data til %s\n"
 "Enbeten bør ikke kobles fra."
 
-#: monitor/udisks2/gvfsudisks2utils.c:784
+#: monitor/udisks2/gvfsudisks2utils.c:800
 #, c-format
 msgid ""
 "%s unmounted\n"
@@ -2304,7 +2295,7 @@ msgstr ""
 "%s avmontert\n"
 "Filsystemet er frakoblet."
 
-#: monitor/udisks2/gvfsudisks2utils.c:786
+#: monitor/udisks2/gvfsudisks2utils.c:802
 #, c-format
 msgid ""
 "%s can be safely unplugged\n"
@@ -2315,7 +2306,6 @@ msgstr ""
 
 #. Translators: This is used for possibly encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
-#.
 #: monitor/udisks2/gvfsudisks2volume.c:304
 #, c-format
 msgid "%s Possibly Encrypted"
@@ -2323,7 +2313,6 @@ msgstr "%s muligvis kryptert"
 
 #. Translators: This is used for encrypted volumes.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
-#.
 #: monitor/udisks2/gvfsudisks2volume.c:311
 #, c-format
 msgid "%s Encrypted"
@@ -2331,7 +2320,6 @@ msgstr "%s kryptert"
 
 #. Translators: This is used for volume with no filesystem label.
 #. *              The first %s is the formatted size (e.g. "42.0 MB").
-#.
 #: monitor/udisks2/gvfsudisks2volume.c:324
 #, c-format
 msgid "%s Volume"
@@ -2342,31 +2330,31 @@ msgstr "%s volum"
 msgid "Volume"
 msgstr "Volum"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1154
+#: monitor/udisks2/gvfsudisks2volume.c:1157
 #, c-format
 msgid "Error storing passphrase in keyring (%s)"
 msgstr "Feil ved lagring av passordfrase på nøkkelring (%s)"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1187
+#: monitor/udisks2/gvfsudisks2volume.c:1190
 #, c-format
 msgid "Error deleting invalid passphrase from keyring (%s)"
 msgstr "Feil ved sletting av ugyldig passordfrase fra nøkkelring (%s)"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1249
+#: monitor/udisks2/gvfsudisks2volume.c:1252
 msgid "The unlocked device does not have a recognizable file system on it"
 msgstr "Kjenner ikke igjen filsystemet på enhet som ble låst opp"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1277
+#: monitor/udisks2/gvfsudisks2volume.c:1280
 #, c-format
 msgid "Encryption passphrase for %s"
 msgstr "Passordfrase for kryptering for %s"
 
-#: monitor/udisks2/gvfsudisks2volume.c:1486
+#: monitor/udisks2/gvfsudisks2volume.c:1489
 msgid "A passphrase is required to access the volume"
 msgstr "En passordfrase kreves for å aksessere volumet"
 
 #. Translators: %s is the description of the volume that is being unlocked
-#: monitor/udisks2/gvfsudisks2volume.c:1501
+#: monitor/udisks2/gvfsudisks2volume.c:1504
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -2378,7 +2366,7 @@ msgstr ""
 "Volumet kan være et VeraCrypt-volum siden det inneholder tilfeldige data."
 
 #. Translators: %s is the description of the volume that is being unlocked
-#: monitor/udisks2/gvfsudisks2volume.c:1507
+#: monitor/udisks2/gvfsudisks2volume.c:1510
 #, c-format
 msgid ""
 "Authentication Required\n"
@@ -2390,8 +2378,7 @@ msgstr ""
 #. Translators: this is used to describe the drive the encrypted media
 #. * is on - the first %s is the name (such as 'WD 2500JB External'), the
 #. * second %s is the description ('250 GB Hard Disk').
-#.
-#: monitor/udisks2/gvfsudisks2volume.c:1687
+#: monitor/udisks2/gvfsudisks2volume.c:1690
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
