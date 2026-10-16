@@ -430,12 +430,19 @@ setup_ssh_environment (void)
   GError *error;
   GVariant *iter;
   gchar *env;
-  
+  const gchar *ssh_auth_sock;
+
+  ssh_auth_sock = g_getenv ("SSH_AUTH_SOCK");
+  if (ssh_auth_sock && ssh_auth_sock[0])
+    return;
+
   error = NULL;
   conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   if (! conn)
     {
-      g_warning ("Failed to setup SSH evironment: %s (%s, %d)",
+      g_warning ("Failed to obtain SSH_AUTH_SOCK from GNOME Keyring: %s (%s, %d). "
+                 "Set SSH_AUTH_SOCK in the GVfs activation environment, or configure "
+                 "systemd_ssh_agent_unit at build time.",
                  error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
       return;
@@ -455,7 +462,9 @@ setup_ssh_environment (void)
   if (! iter)
     {
       g_dbus_error_strip_remote_error (error);
-      g_warning ("Failed to setup SSH evironment: %s (%s, %d)",
+      g_warning ("Failed to obtain SSH_AUTH_SOCK from GNOME Keyring: %s (%s, %d). "
+                 "Set SSH_AUTH_SOCK in the GVfs activation environment, or configure "
+                 "systemd_ssh_agent_unit at build time.",
                  error->message, g_quark_to_string (error->domain), error->code);
       g_error_free (error);
     }
