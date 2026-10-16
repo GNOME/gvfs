@@ -1,7 +1,7 @@
 [Unit]
 Description=Virtual filesystem service
 PartOf=graphical-session.target
-
+@ssh_agent_dependencies@
 [Service]
 ExecStart=@libexecdir@/gvfsd
 Type=dbus

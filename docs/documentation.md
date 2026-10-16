@@ -32,6 +32,21 @@ using standard `GMountOperation` object.
 All daemons are listening to session bus changes and will exit once the bus is
 torn down. Should this not be true, please file a bug.
 
+### SSH agent integration
+
+SFTP uses the runtime `SSH_AUTH_SOCK` inherited from `gvfsd`, falling back to
+GNOME Keyring when unset or empty. For systemd sessions, configure agent startup
+ordering with:
+
+```
+meson setup build -Dsystemd_ssh_agent_unit=gcr-ssh-agent.socket
+```
+
+This adds `Wants=` and `After=` to `gvfs-daemon.service`. The selected unit must
+export `SSH_AUTH_SOCK` to the systemd user manager before startup completes,
+as GCR's socket does. The default is empty, adding no dependencies. The option
+only affects systemd-activated GVfs and is unrelated to `gcr` certificate support.
+
 ## Environment variables
 
 See also

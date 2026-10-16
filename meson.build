@@ -273,6 +273,13 @@ gio_schemasdir = gio_dep.get_variable(
 systemd_systemduserunitdir = get_option('systemduserunitdir')
 install_systemd_systemduserunitdir = (systemd_systemduserunitdir != 'no')
 
+systemd_ssh_agent_unit = get_option('systemd_ssh_agent_unit')
+enable_systemd_ssh_agent = (systemd_ssh_agent_unit != '')
+if enable_systemd_ssh_agent
+  assert(systemd_ssh_agent_unit.endswith('.socket') or systemd_ssh_agent_unit.endswith('.service'),
+         'systemd_ssh_agent_unit must name a socket or service unit')
+endif
+
 systemd_tmpfilesdir = get_option('tmpfilesdir')
 install_systemd_tmpfilesdir = (systemd_tmpfilesdir != 'no')
 
@@ -512,6 +519,7 @@ gnome.post_install(
 summary({
   'busy_processes_command': busy_processes_command,
   'systemduserunitdir': systemd_systemduserunitdir,
+  'systemd_ssh_agent_unit': systemd_ssh_agent_unit,
   'tmpfilesdir': systemd_tmpfilesdir,
   'privileged_group': privileged_group,
 }, section: 'Configuration')

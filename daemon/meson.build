@@ -8,10 +8,15 @@ dbus_systemd_service = ''
 if install_systemd_systemduserunitdir
   service = 'gvfs-daemon.service'
 
+  ssh_agent_dependencies = ''
+  if enable_systemd_ssh_agent
+    ssh_agent_dependencies = 'Wants=@0@\nAfter=@0@\n'.format(systemd_ssh_agent_unit)
+  endif
+
   configure_file(
     input: service + '.in',
     output: '@BASENAME@',
-    configuration: service_conf,
+    configuration: service_conf + {'ssh_agent_dependencies': ssh_agent_dependencies},
     install: true,
     install_dir: systemd_systemduserunitdir,
   )
