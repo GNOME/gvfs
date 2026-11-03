@@ -429,6 +429,7 @@ if enable_cdda
 
   libcdio_paranoia_dep = dependency('libcdio_paranoia', version: '>= 0.78.2')
   config_h.set('HAVE_PARANOIA_NEW_INCLUDES', cc.has_header('cdio/paranoia/paranoia.h', dependencies: libcdio_paranoia_dep))
+  config_h.set('HAVE_PARANOIA_CACHEMODEL_SIZE', cc.has_function('cdio_paranoia_cachemodel_size', prefix: '#include <cdio/paranoia/paranoia.h>', dependencies: libcdio_paranoia_dep))
 
   config_h.set('HAVE_CDDA', enable_cdda)
 endif

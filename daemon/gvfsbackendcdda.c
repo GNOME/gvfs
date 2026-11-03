@@ -640,6 +640,11 @@ do_open_for_read (GVfsBackend *backend,
 
   read_handle->paranoia = cdio_paranoia_init (cdda_backend->drive);
   cdio_paranoia_modeset (read_handle->paranoia, PARANOIA_MODE_DISABLE);
+#ifdef HAVE_PARANOIA_CACHEMODEL_SIZE
+  /* Use short refills for playback, as GStreamer's cdparanoiasrc does */
+  cdio_paranoia_cachemodel_size (read_handle->paranoia,
+                                 2 * CDIO_CD_FRAMES_PER_SEC);
+#endif
 
   cdda_backend->num_open_files++;
 
