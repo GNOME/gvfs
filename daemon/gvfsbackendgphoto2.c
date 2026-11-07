@@ -234,6 +234,7 @@ monitor_proxy_free (MonitorProxy *proxy)
   /* vfs_monitor is owned by the gvfs core; see the functions
    * vfs_dir_monitor_destroyed() and do_create_monitor()
    */
+  g_free (proxy);
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -3457,7 +3458,7 @@ vfs_file_monitor_destroyed (gpointer user_data, GObject *where_the_object_was)
       MonitorProxy *proxy = l->data;
       if (G_OBJECT (proxy->vfs_monitor) == where_the_object_was)
         {
-          gphoto2_backend->dir_monitor_proxies = g_list_remove (gphoto2_backend->dir_monitor_proxies, proxy);
+          gphoto2_backend->file_monitor_proxies = g_list_remove (gphoto2_backend->file_monitor_proxies, proxy);
           g_debug ("  Removed dead file monitor for '%s'\n", proxy->path);
           monitor_proxy_free (proxy);
           break;
