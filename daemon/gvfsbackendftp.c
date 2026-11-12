@@ -392,6 +392,7 @@ g_vfs_backend_ftp_finalize (GObject *object)
   g_mutex_clear (&ftp->mutex);
 
   g_free (ftp->user);
+  g_free (ftp->charset);
   gvfs_free_password (ftp->password);
 
   g_clear_object (&ftp->server_identity);
@@ -739,6 +740,20 @@ try_mount (GVfsBackend *backend,
   ftp->addr = g_network_address_new (host, port);
   ftp->user = g_strdup (g_mount_spec_get (mount_spec, "user"));
   ftp->has_initial_user = ftp->user != NULL;
+
+  /* Character set of the server. Can be given as a mount option ("charset")
+   * or through the GVFS_FTP_CHARSET environment variable. When unset the
+   * server is assumed to use UTF-8, which is the historic gvfs behaviour. */
+  {
+    const char *charset = g_mount_spec_get (mount_spec, "charset");
+
+    if (charset == NULL || *charset == '\0')
+      charset = g_getenv ("GVFS_FTP_CHARSET");
+
+    if (charset != NULL && *charset != '\0' && g_ascii_strcasecmp (charset, "utf-8") != 0)
+      ftp->charset = g_strdup (charset);
+  }
+
   if (port == g_vfs_backend_ftp_default_port (ftp))
     ftp->host_display_name = g_strdup (host);
   else

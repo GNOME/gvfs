@@ -27,6 +27,22 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GVfsFtpFile:
+ * @backend: the backend
+ * @gvfs_path: path in gvfs terms
+ * @ftp_path: path in ftp terms
+ *
+ * This structure maps between GVfs paths and the actual paths as used on an
+ * FTP server. The mapping may not be a 1-to-1 mapping, so always use this
+ * structure if you need to do operations on paths.
+ */
+struct _GVfsFtpFile {
+  GVfsBackendFtp *      backend;        /* the backend */
+  char *                gvfs_path;      /* path in gvfs terms */
+  char *                ftp_path;       /* path in ftp terms */
+};
+
 GVfsFtpFile *     g_vfs_ftp_file_new_from_gvfs          (GVfsBackendFtp *       ftp,
                                                          const char *           gvfs_path,
                                                          GError **              error);

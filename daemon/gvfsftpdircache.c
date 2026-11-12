@@ -656,6 +656,7 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
   GVfsFtpFile *file;
   char *line, *s;
   gsize length;
+  GVfsBackendFtp *ftp = dir->backend;
 
   /* protect against code reorg - in current code, error never is NULL */
   g_assert (error != NULL);
@@ -702,6 +703,22 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
         }
 
       s = g_strndup (result.fe_fname, result.fe_fnlen);
+
+      /* The server sends file names in its own character set. Convert them
+       * to UTF-8 so that GIO (and thus Nautilus) can display them. If the
+       * server speaks UTF-8 already, or the name cannot be converted, the
+       * raw bytes are kept as-is. */
+      if (ftp->charset != NULL)
+        {
+          gchar *converted = g_convert (s, -1, "UTF-8", ftp->charset, NULL, NULL, NULL);
+
+          if (converted != NULL)
+            {
+              g_free (s);
+              s = converted;
+            }
+        }
+
       file = g_vfs_ftp_file_new_child  (dir, s, NULL);
       g_free (s);
       if (file == NULL)

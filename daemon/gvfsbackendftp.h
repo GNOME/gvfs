@@ -99,6 +99,11 @@ struct _GVfsBackendFtp
   char *                host_display_name;
   GVfsFtpFile *         root;
 
+  /* Character set used by the server for file names (e.g. "gbk").
+   * NULL means the server is assumed to speak UTF-8 (the default behaviour).
+   * When set, file names are converted between this charset and UTF-8. */
+  char *                charset;
+
   /* ftps support */
   GVfsFtpTlsMode        tls_mode;
   GSocketConnectable *  server_identity;        /* Server identity used for verification */

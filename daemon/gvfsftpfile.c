@@ -36,12 +36,6 @@
  * structure if you need to do operations on paths.
  */
 
-struct _GVfsFtpFile {
-  GVfsBackendFtp *      backend;        /* the backend */
-  char *                gvfs_path;      /* path in gvfs terms */
-  char *                ftp_path;       /* path in ftp terms */
-};
-
 /*** VFUNCS (that aren't yet made into vfuncs) ***/
 
 /* FIXME: This most likely needs adaption to non-unix like directory structures.
@@ -51,8 +45,20 @@ struct _GVfsFtpFile {
  */
 
 static char *
-g_vfs_ftp_file_compute_ftp_path (const char *gvfs_path)
+g_vfs_ftp_file_compute_ftp_path (GVfsBackendFtp *ftp, const char *gvfs_path)
 {
+  /* The path that gets sent to the server has to be encoded in the
+   * server's character set. When no charset is configured the path is
+   * passed through unchanged (historic behaviour: the server is assumed
+   * to speak UTF-8). */
+  if (ftp != NULL && ftp->charset != NULL)
+    {
+      gchar *converted = g_convert (gvfs_path, -1, ftp->charset, "UTF-8", NULL, NULL, NULL);
+
+      if (converted != NULL)
+        return converted;
+    }
+
   return g_strdup (gvfs_path);
 }
 
@@ -94,7 +100,7 @@ g_vfs_ftp_file_new_from_gvfs (GVfsBackendFtp *ftp, const char *gvfs_path, GError
   file = g_slice_new (GVfsFtpFile);
   file->backend = g_object_ref (ftp);
   file->gvfs_path = g_strdup (gvfs_path);
-  file->ftp_path = g_vfs_ftp_file_compute_ftp_path (gvfs_path);
+  file->ftp_path = g_vfs_ftp_file_compute_ftp_path (ftp, gvfs_path);
 
   return file;
 }
