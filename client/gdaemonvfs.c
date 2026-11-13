@@ -83,9 +83,19 @@ G_LOCK_DEFINE_STATIC(mount_cache);
 static void fill_mountable_info (GDaemonVfs *vfs);
 
 static void
+mountable_info_free (MountableInfo *info)
+{
+  g_free (info->type);
+  g_free (info->scheme);
+  g_strfreev (info->scheme_aliases);
+  g_free (info);
+}
+
+static void
 g_daemon_vfs_finalize (GObject *object)
 {
   GDaemonVfs *vfs;
+  int i;
 
   vfs = G_DAEMON_VFS (object);
 
@@ -95,8 +105,19 @@ g_daemon_vfs_finalize (GObject *object)
   if (vfs->to_uri_hash)
     g_hash_table_destroy (vfs->to_uri_hash);
 
+  if (vfs->mountable_info)
+    {
+      for (i = 0; vfs->mountable_info[i] != NULL; i++)
+        mountable_info_free (vfs->mountable_info[i]);
+
+      g_free (vfs->mountable_info);
+    }
+
   g_strfreev (vfs->supported_uri_schemes);
 
+  g_list_free_full (vfs->mount_cache, (GDestroyNotify) g_mount_info_unref);
+
+  g_clear_object (&vfs->fuse_root);
   g_clear_object (&vfs->async_bus);
   g_clear_object (&vfs->wrapped_vfs);
   
@@ -317,8 +338,12 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   
   modules = g_io_modules_load_all_in_directory (GVFS_MODULE_DIR);
 
-  vfs->from_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
-  vfs->to_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
+  /* The keys are owned by the mappers, which are kept alive by the
+     value references. */
+  vfs->from_uri_hash = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                              NULL, g_object_unref);
+  vfs->to_uri_hash = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                            NULL, g_object_unref);
   
   mappers = g_type_children (G_VFS_TYPE_URI_MAPPER, &n_mappers);
 
@@ -330,11 +355,15 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
       schemes = g_vfs_uri_mapper_get_handled_schemes (mapper);
 
       for (j = 0; schemes != NULL && schemes[j] != NULL; j++)
-	g_hash_table_insert (vfs->from_uri_hash, (char *)schemes[j], mapper);
+        g_hash_table_replace (vfs->from_uri_hash, (char *)schemes[j],
+                              g_object_ref (mapper));
       
       mount_types = g_vfs_uri_mapper_get_handled_mount_types (mapper);
       for (j = 0; mount_types != NULL && mount_types[j] != NULL; j++)
-	g_hash_table_insert (vfs->to_uri_hash, (char *)mount_types[j], mapper);
+        g_hash_table_replace (vfs->to_uri_hash, (char *)mount_types[j],
+                              g_object_ref (mapper));
+
+      g_object_unref (mapper);
     }
 
   /* The above should have ref:ed the modules anyway */
