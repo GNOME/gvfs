@@ -824,7 +824,11 @@ read_string (GDataInputStream *stream, gsize *len_out)
       g_error_free (error);
       return NULL;
     }
-  
+
+  /* Prevent excessive allocation. */
+  if (len > MAX_REPLY_SIZE)
+    return NULL;
+
   data = g_malloc (len + 1);
 
   if (!g_input_stream_read_all (G_INPUT_STREAM (stream), data, len, &bytes_read, NULL, NULL) ||
@@ -4810,7 +4814,8 @@ query_fs_info_reply (GVfsBackendSftp *backend,
         result_from_status_code (job, code, -1, -1);
       return;
     }
-  else if (reply_type != SSH_FXP_EXTENDED_REPLY)
+  /* statvfs@openssh.com returns eleven uint64 fields after type and id. */
+  else if (reply_type != SSH_FXP_EXTENDED_REPLY || len < 5 + 11 * 8)
     {
       g_vfs_job_failed (job,
                         G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -6711,6 +6716,15 @@ pull_read_reply (GVfsBackendSftp *backend,
       gsize bytes_read;
 
       request->response_len = g_data_input_stream_read_uint32 (reply, NULL, NULL);
+      if (request->response_len > request->request_len)
+        {
+          g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                            _("Invalid reply received"));
+          pull_request_free (request);
+          sftp_pull_handle_free (handle);
+          return;
+        }
+
       request->buffer = g_slice_alloc (request->response_len);
 
       if (g_input_stream_read_all (G_INPUT_STREAM (reply),
