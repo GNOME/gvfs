@@ -1929,7 +1929,11 @@ get_home_sync (GVfsBackendSftp *backend)
   /* On error, set home to NULL and ignore */
   if (type == SSH_FXP_NAME)
     {
-    /* count = */ (void) g_data_input_stream_read_uint32 (reply, NULL, NULL);
+      if (g_data_input_stream_read_uint32 (reply, NULL, NULL) != 1)
+        {
+          g_object_unref (reply);
+          return FALSE;
+        }
 
       home_path = read_string (reply, NULL);
       g_vfs_backend_set_default_location (G_VFS_BACKEND (backend), home_path);
@@ -4388,10 +4392,9 @@ read_dir_readlink_reply (GVfsBackendSftp *backend,
 
   data = job->backend_data;
 
-  if (reply_type == SSH_FXP_NAME)
+  if (reply_type == SSH_FXP_NAME &&
+      g_data_input_stream_read_uint32 (reply, NULL, NULL) == 1)
     {
-      /* count = */ (void) g_data_input_stream_read_uint32 (reply, NULL, NULL);
-      
       target = read_string (reply, NULL);
       if (target)
         {
@@ -4735,8 +4738,13 @@ query_info_reply (GVfsBackendSftp *backend,
         {
           char *symlink_target;
           
-          /* Skip count (always 1 for replies to SSH_FXP_READLINK) */
-          g_data_input_stream_read_uint32 (reply->data, NULL, NULL);
+          if (g_data_input_stream_read_uint32 (reply->data, NULL, NULL) != 1)
+            {
+              g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                _("Invalid reply received"));
+              return;
+            }
+
           symlink_target = read_string (reply->data, NULL);
           g_file_info_set_symlink_target (op_job->file_info, symlink_target);
           g_free (symlink_target);
