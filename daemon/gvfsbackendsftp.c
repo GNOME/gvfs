@@ -850,10 +850,17 @@ static DataBuffer *
 read_data_buffer (GDataInputStream *stream)
 {
   DataBuffer *buffer;
+  guchar *data;
+  gsize size;
+
+  data = (guchar *)read_string (stream, &size);
+  if (data == NULL)
+    return NULL;
 
   buffer = g_slice_new (DataBuffer);
-  buffer->data = (guchar *)read_string (stream, &buffer->size);
-  
+  buffer->data = data;
+  buffer->size = size;
+
   return buffer;
 }
 
@@ -2767,9 +2774,14 @@ static SftpHandle *
 sftp_handle_new (GDataInputStream *reply)
 {
   SftpHandle *handle;
+  DataBuffer *raw_handle;
+
+  raw_handle = read_data_buffer (reply);
+  if (raw_handle == NULL)
+    return NULL;
 
   handle = g_slice_new0 (SftpHandle);
-  handle->raw_handle = read_data_buffer (reply);
+  handle->raw_handle = raw_handle;
   handle->offset = 0;
 
   return handle;
@@ -2847,14 +2859,17 @@ open_for_read_reply (GVfsBackendSftp *backend,
           DataBuffer *bhandle;
 
           bhandle = read_data_buffer (reply);
-          
-          command = new_command_stream (backend, SSH_FXP_CLOSE);
-          put_data_buffer (command, bhandle);
-          queue_command_stream_and_free (&backend->command_connection, command,
-                                         NULL,
-                                         G_VFS_JOB (job), NULL);
+          if (bhandle != NULL)
+            {
+              command = new_command_stream (backend, SSH_FXP_CLOSE);
+              put_data_buffer (command, bhandle);
+              queue_command_stream_and_free (&backend->command_connection,
+                                             command,
+                                             NULL,
+                                             G_VFS_JOB (job), NULL);
 
-          data_buffer_free (bhandle);
+              data_buffer_free (bhandle);
+            }
         }
       
       return;
@@ -2883,6 +2898,12 @@ open_for_read_reply (GVfsBackendSftp *backend,
     }
 
   handle = sftp_handle_new (reply);
+  if (handle == NULL)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply received"));
+      return;
+    }
   
   g_vfs_job_open_for_read_set_handle (G_VFS_JOB_OPEN_FOR_READ (job), handle);
   g_vfs_job_open_for_read_set_can_seek (G_VFS_JOB_OPEN_FOR_READ (job), TRUE);
@@ -3579,6 +3600,12 @@ open_for_write_reply (GVfsBackendSftp *backend,
     }
 
   handle = sftp_handle_new (reply);
+  if (handle == NULL)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply received"));
+      return;
+    }
   
   g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
   g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
@@ -3711,6 +3738,13 @@ replace_truncate_original_reply (GVfsBackendSftp *backend,
     }
 
   handle = sftp_handle_new (reply);
+  if (handle == NULL)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply received"));
+      return;
+    }
+
   handle->filename = g_strdup (op_job->filename);
   handle->tempname = NULL;
   handle->permissions = data->permissions;
@@ -3929,6 +3963,13 @@ replace_create_temp_reply (GVfsBackendSftp *backend,
     }
 
   handle = sftp_handle_new (reply);
+  if (handle == NULL)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply received"));
+      return;
+    }
+
   handle->filename = g_strdup (op_job->filename);
   handle->tempname = g_strdup (data->tempname);
   handle->permissions = data->permissions;
@@ -4155,6 +4196,12 @@ replace_exclusive_reply (GVfsBackendSftp *backend,
     }
   
   handle = sftp_handle_new (reply);
+  if (handle == NULL)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply received"));
+      return;
+    }
   
   g_vfs_job_open_for_write_set_handle (op_job, handle);
   g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
@@ -4619,9 +4666,15 @@ open_dir_reply (GVfsBackendSftp *backend,
       return;
     }
 
-  g_vfs_job_succeeded (G_VFS_JOB (job));
-  
   data->handle = read_data_buffer (reply);
+  if (data->handle == NULL)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply received"));
+      return;
+    }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
   
   command = new_command_stream (op_backend,
                                 SSH_FXP_READDIR);
@@ -6069,7 +6122,11 @@ push_truncate_original_reply (GVfsBackendSftp *backend,
   if (reply_type == SSH_FXP_HANDLE)
     {
       handle->raw_handle = read_data_buffer (reply);
-      push_enqueue_request (handle);
+      if (handle->raw_handle == NULL)
+        g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Invalid reply received"));
+      else
+        push_enqueue_request (handle);
     }
   else if (reply_type == SSH_FXP_STATUS)
     result_from_status (job, reply, -1, -1);
@@ -6126,7 +6183,11 @@ push_create_temp_reply (GVfsBackendSftp *backend,
   else
     {
       handle->raw_handle = read_data_buffer (reply);
-      push_enqueue_request (handle);
+      if (handle->raw_handle == NULL)
+        g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Invalid reply received"));
+      else
+        push_enqueue_request (handle);
     }
 
   sftp_push_handle_free (handle);
@@ -6247,7 +6308,11 @@ push_open_reply (GVfsBackendSftp *backend,
   else
     {
       handle->raw_handle = read_data_buffer (reply);
-      push_enqueue_request (handle);
+      if (handle->raw_handle == NULL)
+        g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Invalid reply received"));
+      else
+        push_enqueue_request (handle);
     }
 
   sftp_push_handle_free (handle);
@@ -6889,6 +6954,13 @@ pull_open_reply (GVfsBackendSftp *backend,
         {
           /* We got a valid file handle. */
           handle->raw_handle = read_data_buffer (replies[1].data);
+          if (handle->raw_handle == NULL)
+            {
+              g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                _("Invalid reply received"));
+              sftp_pull_handle_free (handle);
+              return;
+            }
 
           if (handle->op_job->flags & G_FILE_COPY_OVERWRITE)
             g_file_replace_async (handle->dest,
