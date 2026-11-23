@@ -748,11 +748,20 @@ read_reply_sync (Connection *conn, gsize *len_out, GError **error)
                            _("Connection failed"));
       return NULL;
     }
+
+  if (bytes_read != 4)
+    {
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Invalid reply received"));
+      return NULL;
+    }
   
   len = GUINT32_FROM_BE (len);
-  if (len > MAX_REPLY_SIZE)
+
+  /* At minimum a reply holds a one-byte type and a four-byte request id. */
+  if (len < 5 || len > MAX_REPLY_SIZE)
     {
-      g_debug ("Server sent oversized packet (%u bytes)", len);
+      g_debug ("Server sent invalid packet size (%u bytes)", len);
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                            _("Invalid reply received"));
       return NULL;
@@ -1606,11 +1615,13 @@ read_reply_async_got_len  (GObject *source_object,
       return;
     }
   conn->reply_size = GUINT32_FROM_BE (conn->reply_size);
-  if (conn->reply_size > MAX_REPLY_SIZE)
+
+  /* At minimum a reply holds a one-byte type and a four-byte request id. */
+  if (conn->reply_size < 5 || conn->reply_size > MAX_REPLY_SIZE)
     {
       GError *error = NULL;
 
-      g_debug ("Server sent oversized packet (%u bytes)", conn->reply_size);
+      g_debug ("Server sent invalid packet size (%u bytes)", conn->reply_size);
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
                            _("Invalid reply received"));
       fail_jobs_and_unmount (conn->op_backend, error);
