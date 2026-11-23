@@ -2534,7 +2534,7 @@ parse_attributes (GVfsBackendSftp *backend,
   else
     g_file_info_set_name (info, "/");
   
-  if (basename != NULL && basename[strlen (basename) -1] == '~')
+  if (basename != NULL && g_str_has_suffix (basename, "~"))
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_BACKUP, TRUE);
 
   if (flags & SSH_FILEXFER_ATTR_SIZE)
