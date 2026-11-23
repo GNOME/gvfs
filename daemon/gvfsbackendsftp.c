@@ -721,6 +721,9 @@ read_reply_sync (Connection *conn, gsize *len_out, GError **error)
   gsize bytes_read;
   GByteArray *array;
   guint8 *data;
+
+  if (len_out)
+    *len_out = 0;
   
   if (!g_input_stream_read_all (conn->reply_stream,
 				&len, 4,
@@ -792,6 +795,9 @@ read_string (GDataInputStream *stream, gsize *len_out)
   char *data;
   GError *error;
   gsize bytes_read;
+
+  if (len_out)
+    *len_out = 0;
 
   error = NULL;
   len = g_data_input_stream_read_uint32 (stream, NULL, &error);
