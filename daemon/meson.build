@@ -239,6 +239,7 @@ mounts += ['network']
 if enable_sftp
   sources = files(
     'gvfsbackendsftp.c',
+    'gvfssftputils.c',
     'pty_open.c',
   )
 

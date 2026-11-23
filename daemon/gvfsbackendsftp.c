@@ -42,6 +42,7 @@
 #include "gvfsicon.h"
 
 #include "gvfsbackendsftp.h"
+#include "gvfssftputils.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobopeniconforread.h"
 #include "gvfsjobmount.h"
@@ -702,11 +703,19 @@ wait_for_reply (GVfsBackend *backend, int stdout_fd, GError **error)
 }
 
 static GDataInputStream *
-make_reply_stream (guint8 *data, gsize len)
+make_reply_stream (guint8 *data, gsize len, GError **error)
 {
   GInputStream *mem_stream;
   GDataInputStream *data_stream;
-  
+
+  if (!g_vfs_sftp_validate_reply (data, len))
+    {
+      g_free (data);
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Invalid reply received"));
+      return NULL;
+    }
+
   mem_stream = g_memory_input_stream_new_from_data (data, len, g_free);
   data_stream = g_data_input_stream_new (mem_stream);
   g_object_unref (mem_stream);
@@ -768,7 +777,7 @@ read_reply_sync (Connection *conn, gsize *len_out, GError **error)
   data = array->data;
   g_byte_array_free (array, FALSE);
   
-  return make_reply_stream (data, len);
+  return make_reply_stream (data, len, error);
 }
 
 static void
@@ -1532,8 +1541,14 @@ read_reply_async_got_data  (GObject *source_object,
       return;
     }
 
-  reply = make_reply_stream (conn->reply, conn->reply_size);
+  reply = make_reply_stream (conn->reply, conn->reply_size, &error);
   conn->reply = NULL;
+
+  if (reply == NULL)
+    {
+      fail_jobs_and_unmount (conn->op_backend, error);
+      return;
+    }
 
   type = g_data_input_stream_read_byte (reply, NULL, NULL);
   id = g_data_input_stream_read_uint32 (reply, NULL, NULL);
