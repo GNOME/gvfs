@@ -1456,7 +1456,10 @@ static void
 fail_jobs_and_unmount (GVfsBackendSftp *backend, GError *error)
 {
   if (backend->force_unmounted)
-    return;
+    {
+      g_clear_error (&error);
+      return;
+    }
 
   backend->force_unmounted = TRUE;
 
@@ -1473,6 +1476,8 @@ check_input_stream_read_result (Connection *conn, gssize res, GError *error)
 {
   if (G_UNLIKELY (res <= 0))
     {
+      g_clear_pointer (&conn->reply, g_free);
+
       if (res == 0 || error == NULL)
         {
           g_clear_error (&error);
@@ -2008,6 +2013,7 @@ setup_connection (GVfsBackend *backend,
   if (g_data_input_stream_read_byte (reply, NULL, NULL) != SSH_FXP_VERSION)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Protocol error"));
+      g_object_unref (reply);
       return FALSE;
     }
 
