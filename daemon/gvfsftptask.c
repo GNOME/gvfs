@@ -801,27 +801,46 @@ g_vfs_ftp_task_create_remote_address (GVfsFtpTask *task, guint port)
 {
   GSocketAddress *old, *new;
   GInetSocketAddress *old_inet;
-  GInetAddress *old_addr;
 
   old = g_vfs_ftp_connection_get_address (task->conn, &task->error);
   if (old == NULL)
     return NULL;
   g_assert (G_IS_INET_SOCKET_ADDRESS (old));
   old_inet = G_INET_SOCKET_ADDRESS (old);
-  old_addr = g_inet_socket_address_get_address (old_inet);
 
-  if (g_inet_address_get_family (old_addr) == G_SOCKET_FAMILY_IPV6)
-    new = g_object_new (G_TYPE_INET_SOCKET_ADDRESS,
-                        "address", old_addr,
-                        "port", port,
-                        "flowinfo", g_inet_socket_address_get_flowinfo (old_inet),
-                        "scope-id", g_inet_socket_address_get_scope_id (old_inet),
-                        NULL);
+  if (G_IS_PROXY_ADDRESS (old))
+    {
+      /* In a proxy environment, get_address() returns a GProxyAddress whose
+       * inherited GInetAddress is the proxy's IP, not the FTP server's.
+       * Reuse the proxy coordinates but target the real FTP server at the
+       * given data port, so the data connection also tunnels through the
+       * proxy via CONNECT/SOCKS to the correct destination. */
+      GProxyAddress *old_proxy = G_PROXY_ADDRESS (old);
+      new = g_proxy_address_new (g_inet_socket_address_get_address (old_inet),
+                                 g_inet_socket_address_get_port (old_inet),
+                                 g_proxy_address_get_protocol (old_proxy),
+                                 g_proxy_address_get_destination_hostname (old_proxy),
+                                 port,
+                                 g_proxy_address_get_username (old_proxy),
+                                 g_proxy_address_get_password (old_proxy));
+    }
   else
-    new = g_object_new (G_TYPE_INET_SOCKET_ADDRESS,
-                        "address", old_addr,
-                        "port", port,
-                        NULL);
+    {
+      GInetAddress *old_addr = g_inet_socket_address_get_address (old_inet);
+
+      if (g_inet_address_get_family (old_addr) == G_SOCKET_FAMILY_IPV6)
+        new = g_object_new (G_TYPE_INET_SOCKET_ADDRESS,
+                            "address", old_addr,
+                            "port", port,
+                            "flowinfo", g_inet_socket_address_get_flowinfo (old_inet),
+                            "scope-id", g_inet_socket_address_get_scope_id (old_inet),
+                            NULL);
+      else
+        new = g_object_new (G_TYPE_INET_SOCKET_ADDRESS,
+                            "address", old_addr,
+                            "port", port,
+                            NULL);
+    }
 
   g_object_unref (old);
   return new;
