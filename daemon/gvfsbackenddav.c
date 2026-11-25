@@ -1755,13 +1755,15 @@ soup_authenticate (SoupMessage *msg,
 
   have_auth = info->username && info->password;
 
+  /* Saving proxy credentials is not implemented */
+  if (g_vfs_keyring_is_available () && !is_proxy)
+    pw_ask_flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
+
   if (have_auth == FALSE && g_vfs_keyring_is_available ())
     {
       const char *host;
       gchar *hostp = NULL;
       gint port;
-
-      pw_ask_flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
 
       if (is_proxy)
         {
